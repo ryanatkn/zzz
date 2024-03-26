@@ -9,7 +9,7 @@ that builds on [SvelteKit](https://kit.svelte.dev/).
 
 It's not yet published but should be in 2024 and I plan to write more about it here soon.
 
-To support the project visit [spiderspace.org](https://www.spiderspace.org/).
+To support the project visit [ryanatkn.com/funding](https://www.ryanatkn.com/funding).
 
 ## license 🐦
 
