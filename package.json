@@ -1,11 +1,19 @@
 {
-  "name": "@fuz.dev/fuz_template",
+  "name": "@ryanatkn/zzz",
   "version": "0.0.1",
-  "description": "a static web app and Node library template with TypeScript, Svelte, SvelteKit, Vite, esbuild, Fuz, and Gro",
-  "icon": "❄",
+  "description": "social web app framework",
+  "icon": "💤",
   "public": true,
-  "homepage": "https://template.fuz.dev/",
-  "repository": "https://github.com/fuz-dev/fuz_template",
+  "license": "MIT",
+  "homepage": "https://zzz.ryanatkn.com/",
+  "repository": "https://github.com/ryanatkn/zzz",
+  "author": {
+    "name": "Ryan Atkinson",
+    "email": "mail@ryanatkn.com",
+    "url": "https://www.ryanatkn.com/"
+  },
+  "bugs": "https://github.com/ryanatkn/zzz/issues",
+  "funding": "https://www.ryanatkn.com/funding",
   "type": "module",
   "engines": {
     "node": ">=20.10"
@@ -21,31 +29,27 @@
     "dist"
   ],
   "devDependencies": {
-    "@feltjs/eslint-config": "^0.4.1",
-    "@fuz.dev/fuz": "^0.81.0",
-    "@fuz.dev/fuz_contextmenu": "^0.7.0",
-    "@fuz.dev/fuz_dialog": "^0.6.0",
-    "@fuz.dev/fuz_library": "^0.23.0",
-    "@grogarden/gro": "^0.108.0",
-    "@grogarden/util": "^0.18.3",
+    "@ryanatkn/eslint-config": "^0.1.0",
+    "@ryanatkn/fuz": "^0.92.0",
+    "@ryanatkn/gro": "^0.113.0",
     "@sveltejs/adapter-static": "^3.0.1",
-    "@sveltejs/kit": "^2.0.6",
-    "@sveltejs/vite-plugin-svelte": "^3.0.1",
-    "@typescript-eslint/eslint-plugin": "^6.16.0",
-    "@typescript-eslint/parser": "^6.16.0",
-    "eslint": "^8.56.0",
+    "@sveltejs/kit": "^2.5.4",
+    "@sveltejs/vite-plugin-svelte": "^3.0.2",
+    "@typescript-eslint/eslint-plugin": "^7.4.0",
+    "@typescript-eslint/parser": "^7.4.0",
+    "eslint": "^8.57.0",
     "eslint-plugin-svelte": "^2.35.1",
-    "prettier": "^3.1.1",
-    "prettier-plugin-svelte": "^3.1.2",
-    "svelte": "^4.2.8",
-    "svelte-check": "^3.6.2",
+    "prettier": "^3.2.5",
+    "prettier-plugin-svelte": "^3.2.2",
+    "svelte": "^4.2.12",
+    "svelte-check": "^3.6.8",
     "tslib": "^2.6.2",
-    "typescript": "^5.3.3",
+    "typescript": "^5.4.3",
     "uvu": "^0.5.6"
   },
   "eslintConfig": {
     "root": true,
-    "extends": "@feltjs"
+    "extends": "@ryanatkn"
   },
   "prettier": {
     "plugins": [

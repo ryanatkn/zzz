@@ -1,24 +1,22 @@
-<script lang="ts">
-	import Alert from '@fuz.dev/fuz_library/Alert.svelte';
-	import {base} from '$app/paths';
-
-	import Mreows from '$routes/Mreows.svelte';
-
-	let mreows: Array<{icon: string}> | undefined;
-</script>
-
-<main class="prose">
+<main class="prose width_sm">
 	<section class="box">
 		<header class="prose">
-			<h1>fuz_template</h1>
+			<h1><a href="https://github.com/ryanatkn/zzz">💤</a></h1>
 		</header>
-		<Alert>
-			<span slot="icon"
-				>{#if mreows}{mreows[0].icon}{:else}✨{/if}</span
-			><a class="chip" href="{base}/about">about</a>
-		</Alert>
 	</section>
-	<Mreows bind:mreows />
+	<section>
+		<p>
+			Zzz (pronounced "zees") is a social web app framework that builds on <a
+				href="https://kit.svelte.dev/">SvelteKit</a
+			>. It's not yet published but should be in 2024 and I plan to write more about it here soon.
+		</p>
+		<p>
+			To support the project visit <a href="https://www.ryanatkn.com/funding"
+				>ryanatkn.com/funding</a
+			>.
+		</p>
+		<p><a href="https://github.com/ryanatkn/zzz">source code</a></p>
+	</section>
 </main>
 
 <style>
