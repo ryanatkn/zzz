@@ -1,4 +1,4 @@
-[<img src="/static/favicon.png" align="right" width="192" height="192">](https://zzz.ryanatkn.com/)
+[<img src="/static/favicon.png" align="right" width="256" height="256">](https://zzz.ryanatkn.com/)
 
 # Zzz 💤
 
