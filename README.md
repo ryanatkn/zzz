@@ -1,3 +1,5 @@
+[<img src="/static/favicon.png" align="right" width="192" height="192">](https://zzz.ryanatkn.com/)
+
 # Zzz 💤
 
 > social web app framework 💤 tools for the tired
