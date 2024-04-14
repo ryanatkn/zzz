@@ -2,7 +2,7 @@
 
 # Zzz 💤
 
-> social web app framework 💤 tools for the tired
+> social web app framework 💤 toolz for the tired
 
 [zzz.ryanatkn.com](https://zzz.ryanatkn.com/)
 

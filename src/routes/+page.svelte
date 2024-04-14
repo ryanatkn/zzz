@@ -6,7 +6,7 @@
 	<section class="box">
 		<header class="box prose">
 			<h1><a href="https://github.com/ryanatkn/zzz">💤</a></h1>
-			<blockquote class="shadow_inset_active">tools for the tired</blockquote>
+			<blockquote class="shadow_inset_active">toolz for the tired</blockquote>
 		</header>
 	</section>
 	<section class="panel p_lg shadow_inset_active">
