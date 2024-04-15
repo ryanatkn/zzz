@@ -2,45 +2,58 @@
 	import Github_Logo from '@ryanatkn/fuz/Github_Logo.svelte';
 </script>
 
-<main class="prose width_sm">
+<main class="width_sm">
 	<section class="box">
-		<header class="box prose">
-			<h1><a href="https://github.com/ryanatkn/zzz">💤</a></h1>
-			<blockquote class="shadow_inset_active">toolz for the tired</blockquote>
+		<header class="box">
+			<h1 class="mt_xl"><a href="https://github.com/ryanatkn/zzz" title="View source">💤</a></h1>
+			<blockquote class="shadow_inset_inverse_md px_xl">toolz for the tired</blockquote>
 		</header>
 	</section>
-	<section class="panel p_lg shadow_inset_active">
-		<div class="panel bg p_md shadow">
+	<section class="panel p_lg shadow_inset_inverse_md">
+		<div class="panel bg p_md shadow_md">
 			<p>
 				Zzz (pronounced "zees") is a social web app framework that builds on <a
 					href="https://kit.svelte.dev/">SvelteKit</a
 				>
 				and several of <a href="https://www.ryanatkn.com/">my projects</a>. It's not yet published
-				but should be in 2024 and I plan to write more about it here soon and make videos too.
+				but should be in 2024 and I plan to make videos and blog about it here soon.
 			</p>
 			<p>
-				Subscribe on YouTube to
-				<a href="https://www.youtube.com/@spiderspace_8000">@spiderspace_8000</a> and
-				<a href="https://www.youtube.com/@webdevladder">@webdevladder</a>
-				to see the videos when they're out.
+				Join <a href="https://discord.gg/YU5tyeK72X">the Discord</a> and subscribe on YouTube:
 			</p>
+			<ul>
+				<li>
+					<a href="https://www.youtube.com/@spiderspace_8000">@spiderspace_8000</a> - nontechnical process
+					and design videos
+				</li>
+				<li>
+					<a href="https://www.youtube.com/@webdevladder">@webdevladder</a> - advanced programming videos
+				</li>
+			</ul>
 			<p>
 				The websites
 				<a href="https://www.spiderspace.org/">spiderspace.org</a>
 				and <a href="https://www.webdevladder.net/">webdevladder.net</a> will be created in future screencasts
 				along with their Atom blog feeds.
 			</p>
-			<footer class="box">
-				<a
-					class="box text_align_center p_sm panel shadow_inset"
-					style:display="flex"
-					href="https://github.com/ryanatkn/zzz"
-					><div class="mb_xs">source code</div>
-					<Github_Logo /></a
-				>
-			</footer>
+			<p>
+				See how Zzz fits with my other software on <a href="https://www.ryanatkn.com/"
+					>my homepage</a
+				>.
+			</p>
 		</div>
 	</section>
+	<footer class="box mb_xl7">
+		<a
+			class="box text_align_center p_sm panel shadow_inset_md"
+			style:display="flex"
+			href="https://github.com/ryanatkn/zzz"
+			title="View source"
+		>
+			<div class="mb_xs">source code</div>
+			<Github_Logo />
+		</a>
+	</footer>
 </main>
 
 <style>
@@ -52,7 +65,11 @@
 	}
 	/* TODO accidentally selected all the links like this, I kind of like it */
 	/* TODO construct for this in CSS classes */
+	/* TODO something like this but toned down
+	a:hover {
+		box-shadow: var(--shadow_md); 
+	} */
 	a:active {
-		box-shadow: var(--shadow_inset_active);
+		box-shadow: var(--shadow_inset_inverse_md);
 	}
 </style>

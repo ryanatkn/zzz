@@ -1,10 +1,8 @@
 [<img src="/static/favicon.png" align="right" width="256" height="256">](https://zzz.ryanatkn.com/)
 
-# Zzz 💤
+# Zzz
 
-> social web app framework 💤 toolz for the tired
-
-[zzz.ryanatkn.com](https://zzz.ryanatkn.com/)
+> toolz for the tired 💤 [zzz.ryanatkn.com](https://zzz.ryanatkn.com/)
 
 ⚠️ work in progress - not yet published
 
