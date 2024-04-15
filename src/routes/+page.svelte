@@ -36,6 +36,11 @@
 				and <a href="https://www.webdevladder.net/">webdevladder.net</a> will be created in future screencasts
 				along with their Atom blog feeds.
 			</p>
+			<p>
+				See how Zzz fits with my other software on <a href="https://www.ryanatkn.com/"
+					>my homepage</a
+				>.
+			</p>
 		</div>
 	</section>
 	<footer class="box mb_xl7">
