@@ -1,12 +1,16 @@
 <script lang="ts">
 	import Github_Logo from '@ryanatkn/fuz/Github_Logo.svelte';
+	import Zzz_Logo from '@ryanatkn/fuz/Zzz_Logo.svelte';
 </script>
 
 <main class="width_sm">
 	<section class="box">
 		<header class="box">
-			<h1 class="mt_xl"><a href="https://github.com/ryanatkn/zzz" title="View source">💤</a></h1>
-			<blockquote class="shadow_inset_inverse_md px_xl">toolz for the tired</blockquote>
+			<h1 class="mt_xl mb_xl">Zzz</h1>
+			<blockquote class="shadow_inset_inverse_md px_xl mb_xl">
+				toolz for the tired <a href="https://github.com/ryanatkn/zzz" title="View source">💤</a>
+			</blockquote>
+			<Zzz_Logo size="var(--icon_size_xl)" />
 		</header>
 	</section>
 	<section class="panel pr_md pl_xl3 pt_xl pb_xl4 shadow_inset_inverse_md">
