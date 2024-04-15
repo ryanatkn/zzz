@@ -53,7 +53,7 @@
 	<Contextmenu_Root>
 		{@render children()}
 		{#if show_settings}
-			<Dialog on:close={() => (show_settings = false)}>
+			<Dialog onclose={() => (show_settings = false)}>
 				<div class="pane">
 					<Settings />
 				</div>
