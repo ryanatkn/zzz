@@ -6,7 +6,7 @@
 	<section class="box">
 		<header class="box">
 			<h1><a href="https://github.com/ryanatkn/zzz" title="View source">💤</a></h1>
-			<blockquote class="shadow_inset_inverse_md">toolz for the tired</blockquote>
+			<blockquote class="shadow_inset_inverse_md px_xl">toolz for the tired</blockquote>
 		</header>
 	</section>
 	<section class="panel p_lg shadow_inset_inverse_md">
@@ -16,16 +16,16 @@
 					href="https://kit.svelte.dev/">SvelteKit</a
 				>
 				and several of <a href="https://www.ryanatkn.com/">my projects</a>. It's not yet published
-				but should be in 2024 and I plan to write more about it here soon and make videos too.
+				but should be in 2024 and I plan to make videos and blog about it here soon.
 			</p>
 			<p>Subscribe on YouTube:</p>
 			<ul>
 				<li>
-					<a href="https://www.youtube.com/@spiderspace_8000">@spiderspace_8000</a> - non-technical process
+					<a href="https://www.youtube.com/@spiderspace_8000">@spiderspace_8000</a> - nontechnical process
 					and design videos
 				</li>
 				<li>
-					<a href="https://www.youtube.com/@webdevladder">@webdevladder</a> - advanced technical videos
+					<a href="https://www.youtube.com/@webdevladder">@webdevladder</a> - advanced programming videos
 				</li>
 			</ul>
 			<p>
