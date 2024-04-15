@@ -34,19 +34,19 @@
 				and <a href="https://www.webdevladder.net/">webdevladder.net</a> will be created in future screencasts
 				along with their Atom blog feeds.
 			</p>
-			<footer class="box">
-				<a
-					class="box text_align_center p_sm panel shadow_inset_md"
-					style:display="flex"
-					href="https://github.com/ryanatkn/zzz"
-					title="View source"
-				>
-					<div class="mb_xs">source code</div>
-					<Github_Logo />
-				</a>
-			</footer>
 		</div>
 	</section>
+	<footer class="box mb_xl7">
+		<a
+			class="box text_align_center p_sm panel shadow_inset_md"
+			style:display="flex"
+			href="https://github.com/ryanatkn/zzz"
+			title="View source"
+		>
+			<div class="mb_xs">source code</div>
+			<Github_Logo />
+		</a>
+	</footer>
 </main>
 
 <style>
