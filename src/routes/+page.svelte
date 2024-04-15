@@ -5,7 +5,7 @@
 <main class="width_sm">
 	<section class="box">
 		<header class="box">
-			<h1><a href="https://github.com/ryanatkn/zzz" title="View source">💤</a></h1>
+			<h1 class="mt_xl"><a href="https://github.com/ryanatkn/zzz" title="View source">💤</a></h1>
 			<blockquote class="shadow_inset_inverse_md px_xl">toolz for the tired</blockquote>
 		</header>
 	</section>
@@ -58,6 +58,10 @@
 	}
 	/* TODO accidentally selected all the links like this, I kind of like it */
 	/* TODO construct for this in CSS classes */
+	/* TODO something like this but toned down
+	a:hover {
+		box-shadow: var(--shadow_md); 
+	} */
 	a:active {
 		box-shadow: var(--shadow_inset_inverse_md);
 	}
