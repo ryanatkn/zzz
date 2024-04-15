@@ -5,7 +5,7 @@
 <main class="width_sm">
 	<section class="box">
 		<header class="box">
-			<h1><a href="https://github.com/ryanatkn/zzz">💤</a></h1>
+			<h1><a href="https://github.com/ryanatkn/zzz" title="View source">💤</a></h1>
 			<blockquote class="shadow_inset_inverse_md">toolz for the tired</blockquote>
 		</header>
 	</section>
@@ -39,9 +39,11 @@
 					class="box text_align_center p_sm panel shadow_inset_md"
 					style:display="flex"
 					href="https://github.com/ryanatkn/zzz"
-					><div class="mb_xs">source code</div>
-					<Github_Logo /></a
+					title="View source"
 				>
+					<div class="mb_xs">source code</div>
+					<Github_Logo />
+				</a>
 			</footer>
 		</div>
 	</section>
