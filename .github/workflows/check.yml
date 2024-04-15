@@ -24,5 +24,5 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - run: npm ci
-      - run: npx gro check --workspace
+      - run: npx gro check --workspace --no-lint # TODO enable when Svelte 5 eslint is ready
       - run: npx gro build
