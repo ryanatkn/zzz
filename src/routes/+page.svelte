@@ -9,7 +9,7 @@
 			<blockquote class="shadow_inset_inverse_md px_xl">toolz for the tired</blockquote>
 		</header>
 	</section>
-	<section class="panel p_lg shadow_inset_inverse_md">
+	<section class="panel pr_md pl_xl3 pt_xl pb_xl4 shadow_inset_inverse_md">
 		<div class="panel bg p_md shadow_md">
 			<p>
 				Zzz (pronounced "zees") is a social web app framework that builds on <a
