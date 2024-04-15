@@ -18,7 +18,9 @@
 				and several of <a href="https://www.ryanatkn.com/">my projects</a>. It's not yet published
 				but should be in 2024 and I plan to make videos and blog about it here soon.
 			</p>
-			<p>Subscribe on YouTube:</p>
+			<p>
+				Join <a href="https://discord.gg/YU5tyeK72X">the Discord</a> and subscribe on YouTube:
+			</p>
 			<ul>
 				<li>
 					<a href="https://www.youtube.com/@spiderspace_8000">@spiderspace_8000</a> - nontechnical process
