@@ -7,13 +7,15 @@
 	<section class="box">
 		<header class="box">
 			<h1 class="mt_xl mb_xl">Zzz</h1>
-			<blockquote class="shadow_inset_inverse_md px_xl mb_xl">
-				toolz for the tired <a href="https://github.com/ryanatkn/zzz" title="View source">💤</a>
-			</blockquote>
-			<Zzz_Logo size="var(--icon_size_xl)" />
+			<div class="shadow_inset_md px_xl3 py_xl radius_md mb_xl box">
+				<blockquote class="shadow_inset_xs bg px_xl">
+					toolz for the tired <a href="https://github.com/ryanatkn/zzz" title="View source">💤</a>
+				</blockquote>
+				<Zzz_Logo size="var(--icon_size_xl)" />
+			</div>
 		</header>
 	</section>
-	<section class="panel pr_md pl_xl3 pt_xl pb_xl4 shadow_inset_inverse_md">
+	<section class="panel pr_md pl_xl3 pt_xl pb_xl4 shadow_inset_md">
 		<div class="panel bg p_md shadow_md">
 			<p>
 				Zzz (pronounced "zees") is a social web app framework that builds on <a
@@ -47,17 +49,19 @@
 			</p>
 		</div>
 	</section>
-	<footer class="box mb_xl7">
-		<a
-			class="box text_align_center p_sm panel shadow_inset_md"
-			style:display="flex"
-			href="https://github.com/ryanatkn/zzz"
-			title="View source"
-		>
-			<div class="mb_xs">source code</div>
-			<Github_Logo />
-		</a>
-	</footer>
+	<div class="shadow_outset_sm pt_xl px_xl2 pb_xl3 radius_lg mb_xl box">
+		<footer class="box">
+			<a
+				class="box text_align_center px_xl py_md panel shadow_outset_sm"
+				style:display="flex"
+				href="https://github.com/ryanatkn/zzz"
+				title="View source"
+			>
+				<div class="mb_xs">source code</div>
+				<Github_Logo />
+			</a>
+		</footer>
+	</div>
 </main>
 
 <style>
@@ -74,6 +78,6 @@
 		box-shadow: var(--shadow_md); 
 	} */
 	a:active {
-		box-shadow: var(--shadow_inset_inverse_md);
+		box-shadow: var(--shadow_inset_sm);
 	}
 </style>
