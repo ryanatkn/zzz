@@ -2,7 +2,7 @@
 
 # Zzz
 
-> toolz for the tired 💤 [zzz.ryanatkn.com](https://zzz.ryanatkn.com/)
+> social toolz for the tired 💤 [zzz.ryanatkn.com](https://zzz.ryanatkn.com/)
 
 ⚠️ work in progress - not yet published
 

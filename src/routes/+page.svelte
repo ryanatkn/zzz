@@ -9,7 +9,9 @@
 			<h1 class="mt_xl mb_xl">Zzz</h1>
 			<div class="shadow_inset_md px_xl3 py_xl radius_md mb_xl box">
 				<blockquote class="shadow_inset_xs bg px_xl">
-					toolz for the tired <a href="https://github.com/ryanatkn/zzz" title="View source">💤</a>
+					social toolz for the tired <a href="https://github.com/ryanatkn/zzz" title="View source"
+						>💤</a
+					>
 				</blockquote>
 				<Zzz_Logo size="var(--icon_size_xl)" />
 			</div>
