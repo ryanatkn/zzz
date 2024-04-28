@@ -29,8 +29,8 @@
 			</p>
 			<ul>
 				<li>
-					<a href="https://www.youtube.com/@spiderspace_8000">@spiderspace_8000</a> - nontechnical process
-					and design videos
+					<a href="https://www.youtube.com/@spiderspace_8000">@spiderspace_8000</a> - nontechnical design
+					videos where we'll make a social website together with Zzz
 				</li>
 				<li>
 					<a href="https://www.youtube.com/@webdevladder">@webdevladder</a> - advanced programming videos
@@ -38,8 +38,8 @@
 				</li>
 			</ul>
 			<p>
-				Each video will also have a blog post on either
-				<a href="https://www.spiderspace.org/">spiderspace.org</a> or and
+				Each video will also have a blog post on
+				<a href="https://www.spiderspace.org/">spiderspace.org</a> or
 				<a href="https://www.webdevladder.net/">webdevladder.net</a>.
 			</p>
 			<p>
