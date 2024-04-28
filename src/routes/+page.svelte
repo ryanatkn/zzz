@@ -6,19 +6,17 @@
 <main class="width_sm">
 	<section class="box">
 		<header class="box">
-			<h1 class="mt_xl mb_xl">Zzz</h1>
-			<div class="shadow_inset_md px_xl3 py_xl radius_md mb_xl box">
-				<blockquote class="shadow_inset_xs bg px_xl">
-					social toolz for the tired <a href="https://github.com/ryanatkn/zzz" title="View source"
-						>💤</a
-					>
-				</blockquote>
-				<Zzz_Logo size="var(--icon_size_xl)" />
-			</div>
+			<h1 class="mt_xl mb_xl2">Zzz</h1>
+			<blockquote class="shadow_inset_xs bg px_xl">
+				social toolz for the tired <a href="https://github.com/ryanatkn/zzz" title="View source"
+					>💤</a
+				>
+			</blockquote>
+			<Zzz_Logo size="var(--icon_size_xl)" />
 		</header>
 	</section>
-	<section class="panel pr_md pl_xl3 pt_xl pb_xl4 shadow_inset_md">
-		<div class="panel bg p_md shadow_md">
+	<section class="panel p_xl shadow_inset_sm">
+		<div class="panel bg p_md shadow_sm">
 			<p>
 				Zzz (pronounced "zees") is a social web app framework that builds on <a
 					href="https://kit.svelte.dev/">SvelteKit</a
@@ -36,13 +34,13 @@
 				</li>
 				<li>
 					<a href="https://www.youtube.com/@webdevladder">@webdevladder</a> - advanced programming videos
+					with a focus on Svelte and TypeScript
 				</li>
 			</ul>
 			<p>
-				The websites
-				<a href="https://www.spiderspace.org/">spiderspace.org</a>
-				and <a href="https://www.webdevladder.net/">webdevladder.net</a> will be created in future screencasts
-				along with their Atom blog feeds.
+				Each video will also have a blog post on either
+				<a href="https://www.spiderspace.org/">spiderspace.org</a> or and
+				<a href="https://www.webdevladder.net/">webdevladder.net</a>.
 			</p>
 			<p>
 				See how Zzz fits with my other software on <a href="https://www.ryanatkn.com/"
@@ -51,10 +49,10 @@
 			</p>
 		</div>
 	</section>
-	<div class="shadow_outset_sm pt_xl px_xl2 pb_xl3 radius_lg mb_xl box">
+	<div class="shadow_outset_xs p_xl radius_lg mb_xl box">
 		<footer class="box">
 			<a
-				class="box text_align_center px_xl py_md panel shadow_outset_sm"
+				class="box text_align_center px_xl py_md panel shadow_outset_xs"
 				style:display="flex"
 				href="https://github.com/ryanatkn/zzz"
 				title="View source"
