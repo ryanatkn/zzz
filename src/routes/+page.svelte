@@ -18,7 +18,7 @@
 	<section class="panel p_xl shadow_inset_sm">
 		<div class="panel bg p_md shadow_sm">
 			<p>
-				Zzz (pronounced "zees") is a social web app framework that builds on <a
+				Zzz (pronounced "zees" like please) is a social web app framework that builds on <a
 					href="https://kit.svelte.dev/">SvelteKit</a
 				>
 				and several of <a href="https://www.ryanatkn.com/">my projects</a>. It's not yet published

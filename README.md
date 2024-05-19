@@ -6,7 +6,7 @@
 
 ⚠️ work in progress - not yet published
 
-Zzz (pronounced "zees") is a social web app framework
+Zzz (pronounced "zees" like please) is a social web app framework
 that builds on [SvelteKit](https://kit.svelte.dev/).
 
 It's not yet published but should be in 2024 and I plan to write more about it here soon.
