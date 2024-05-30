@@ -35,8 +35,8 @@
 					>)
 				</li>
 				<li>
-					<a href="https://www.youtube.com/@webdevladder">@webdevladder</a> - advanced programming
-					videos with a focus on Svelte and TypeScript (blog:
+					<a href="https://www.youtube.com/@webdevladder">@webdevladder</a> - advanced realworld
+					webdev videos with TypeScript and Svelte (blog:
 					<a href="https://www.webdevladder.net/">webdevladder.net</a>)
 				</li>
 			</ul>
