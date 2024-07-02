@@ -11,7 +11,7 @@ that builds on [SvelteKit](https://kit.svelte.dev/).
 
 It's not yet published but should be in 2024 and I plan to write more about it here soon.
 
-To support the project visit [ryanatkn.com/funding](https://www.ryanatkn.com/funding).
+More at [zzz.ryanatkn.com](https://zzz.ryanatkn.com/).
 
 ## license 🐦
 

@@ -42,7 +42,8 @@
 			<p>
 				See how Zzz fits with my other software on <a href="https://www.ryanatkn.com/"
 					>my homepage</a
-				>.
+				>. To support the project visit
+				<a href="https://www.ryanatkn.com/funding">ryanatkn.com/funding</a>.
 			</p>
 		</div>
 	</section>
