@@ -6,7 +6,7 @@
 <main class="width_sm">
 	<section class="box">
 		<header class="box">
-			<Zzz_Logo size="var(--icon_size_xl)" classes="my_xl2" />
+			<Zzz_Logo size="var(--icon_size_xl)" classes="my_xl5" />
 			<blockquote class="shadow_inset_xs bg px_xl">
 				social toolz for the tired <a href="https://github.com/ryanatkn/zzz" title="View source"
 					>💤</a
