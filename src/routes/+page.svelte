@@ -6,13 +6,12 @@
 <main class="width_sm">
 	<section class="box">
 		<header class="box">
-			<h1 class="mt_xl mb_xl2">Zzz</h1>
+			<Zzz_Logo size="var(--icon_size_xl)" classes="my_xl2" />
 			<blockquote class="shadow_inset_xs bg px_xl">
 				social toolz for the tired <a href="https://github.com/ryanatkn/zzz" title="View source"
 					>💤</a
 				>
 			</blockquote>
-			<Zzz_Logo size="var(--icon_size_xl)" />
 		</header>
 	</section>
 	<section class="panel p_xl shadow_inset_sm">
