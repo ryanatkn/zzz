@@ -1,6 +1,6 @@
-[<img src="/static/logo.svg" alt="three sleepy z's" align="right" width="192" height="192">](https://zzz.ryanatkn.com/)
-
 # Zzz
+
+[<img src="/static/logo.svg" alt="three sleepy z's" align="right" width="192" height="192">](https://zzz.ryanatkn.com/)
 
 > social toolz for the tired 💤 [zzz.ryanatkn.com](https://zzz.ryanatkn.com/)
 
