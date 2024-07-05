@@ -28,15 +28,18 @@
 			</p>
 			<ul>
 				<li>
-					<a href="https://www.youtube.com/@spiderspace_8000">@spiderspace_8000</a> - nontechnical
-					design videos where we'll make a social website together with Zzz (<a
-						href="https://www.spiderspace.org/">spiderspace.org</a
-					>)
+					<a href="https://www.youtube.com/@spiderspace_8000">@spiderspace_8000</a> -
+					<a href="https://www.spiderspace.org/">spiderspace.org</a> - nontechnical design videos where
+					we'll make a social website together with Zzz when it's ready
 				</li>
 				<li>
-					<a href="https://www.youtube.com/@webdevladder">@webdevladder</a> - advanced realworld
-					webdev videos with TypeScript and Svelte (blog:
-					<a href="https://www.webdevladder.net/">webdevladder.net</a>)
+					<a href="https://www.youtube.com/@webdevladder">@webdevladder</a> -
+					<a href="https://www.webdevladder.net/">webdevladder.net</a> - advanced realworld webdev videos
+					with TypeScript and Svelte
+				</li>
+				<li>
+					<a href="https://www.youtube.com/@webdevladder_vods">@webdevladder_vods</a> - unedited videos
+					of me programming
 				</li>
 			</ul>
 			<p>
@@ -47,7 +50,7 @@
 			</p>
 		</div>
 	</section>
-	<div class="shadow_outset_xs p_xl radius_lg mb_xl box">
+	<div class="shadow_outset_xs p_xl radius_lg mb_xl8 box">
 		<footer class="box">
 			<a
 				class="box text_align_center px_xl py_md panel shadow_outset_xs"
