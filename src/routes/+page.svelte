@@ -34,8 +34,8 @@
 				</li>
 				<li>
 					<a href="https://www.youtube.com/@webdevladder">@webdevladder</a> -
-					<a href="https://www.webdevladder.net/">webdevladder.net</a> - advanced realworld webdev videos
-					with TypeScript and Svelte
+					<a href="https://www.webdevladder.net/">webdevladder.net</a> - realworld webdev with TypeScript
+					and Svelte
 				</li>
 				<li>
 					<a href="https://www.youtube.com/@webdevladder_vods">@webdevladder_vods</a> - unedited videos
