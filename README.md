@@ -9,7 +9,8 @@
 Zzz (pronounced "zees" like please) is a social web app framework
 that builds on [SvelteKit](https://kit.svelte.dev/).
 
-It's not yet published but should be in 2024 and I plan to write more about it here soon.
+It's not yet published but should be in late 2024 or 2025,
+and I plan to make videos and blog posts about it here soon.
 
 More at [zzz.ryanatkn.com](https://zzz.ryanatkn.com/).
 

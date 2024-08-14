@@ -21,7 +21,8 @@
 					href="https://kit.svelte.dev/">SvelteKit</a
 				>
 				and several of <a href="https://www.ryanatkn.com/">my projects</a>. It's not yet published
-				but should be in 2024 and I plan to make videos and blog about it here soon.
+				but should be in late 2024 or 2025, and I plan to make videos and blog posts about it here
+				soon.
 			</p>
 			<p>
 				Join <a href="https://discord.gg/YU5tyeK72X">the Discord</a> and subscribe on YouTube:
