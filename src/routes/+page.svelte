@@ -77,9 +77,9 @@
 	/* TODO construct for this in CSS classes */
 	/* TODO something like this but toned down
 	a:hover {
-		box-shadow: var(--shadow_md) var(--shadow_color_md); 
+		box-shadow: var(--shadow_md) var(--shadow_color_3); 
 	} */
 	a:active {
-		box-shadow: var(--shadow_inset_sm) var(--shadow_color_sm);
+		box-shadow: var(--shadow_inset_sm) var(--shadow_color_2);
 	}
 </style>
