@@ -51,10 +51,10 @@
 			</p>
 		</div>
 	</section>
-	<div class="shadow_outset_xs p_xl radius_lg mb_xl8 box">
+	<div class="shadow_inset_bottom_xs p_xl radius_lg mb_xl8 box">
 		<footer class="box">
 			<a
-				class="box text_align_center px_xl py_md panel shadow_outset_xs"
+				class="box text_align_center px_xl py_md panel shadow_inset_bottom_xs"
 				style:display="flex"
 				href="https://github.com/ryanatkn/zzz"
 				title="View source"
@@ -77,9 +77,10 @@
 	/* TODO construct for this in CSS classes */
 	/* TODO something like this but toned down
 	a:hover {
-		box-shadow: var(--shadow_md) var(--shadow_color_3); 
+		box-shadow: var(--shadow_md) color-mix(in hsl, var(--shadow_color) var(--shadow_alpha_3), transparent); 
 	} */
 	a:active {
-		box-shadow: var(--shadow_inset_sm) var(--shadow_color_2);
+		box-shadow: var(--shadow_inset_top_sm)
+			color-mix(in hsl, var(--shadow_color) var(--shadow_alpha_2), transparent);
 	}
 </style>
