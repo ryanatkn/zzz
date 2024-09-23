@@ -1,12 +1,12 @@
 <script lang="ts">
-	import Github_Logo from '@ryanatkn/fuz/Github_Logo.svelte';
-	import Zzz_Logo from '@ryanatkn/fuz/Zzz_Logo.svelte';
+	import Svg from '@ryanatkn/fuz/Svg.svelte';
+	import {github_logo, zzz_logo} from '@ryanatkn/fuz/logos.js';
 </script>
 
 <main class="width_sm">
 	<section class="box">
 		<header class="box">
-			<Zzz_Logo size="var(--icon_size_xl2)" classes="my_xl5" />
+			<Svg data={zzz_logo} size="var(--icon_size_xl2)" classes="my_xl5" />
 			<blockquote class="shadow_inset_xs bg px_xl">
 				social toolz for the tired <a href="https://github.com/ryanatkn/zzz" title="View source"
 					>💤</a
@@ -60,7 +60,7 @@
 				title="View source"
 			>
 				<div class="mb_xs">source code</div>
-				<Github_Logo />
+				<Svg data={github_logo} size="var(--icon_size_lg)" />
 			</a>
 		</footer>
 	</div>
