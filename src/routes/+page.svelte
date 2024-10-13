@@ -24,9 +24,7 @@
 				but should be in late 2024 or 2025, and I plan to make videos and blog posts about it here
 				soon.
 			</p>
-			<p>
-				Join <a href="https://discord.gg/YU5tyeK72X">the Discord</a> and subscribe on YouTube:
-			</p>
+			<p>on YouTube:</p>
 			<ul>
 				<li>
 					<a href="https://www.youtube.com/@spiderspace_8000">@spiderspace_8000</a> -
