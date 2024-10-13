@@ -39,7 +39,7 @@ export const package_json = {
 		'@sveltejs/adapter-static': '^3.0.5',
 		'@sveltejs/kit': '^2.7.0',
 		'@sveltejs/package': '^2.3.5',
-		'@sveltejs/vite-plugin-svelte': '4.0.0-next.6',
+		'@sveltejs/vite-plugin-svelte': '4.0.0-next.7',
 		eslint: '^9.12.0',
 		'eslint-plugin-svelte': '^2.44.1',
 		prettier: '^3.3.3',
