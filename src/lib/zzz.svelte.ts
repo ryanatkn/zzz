@@ -14,7 +14,7 @@ export interface Zzz_Json {
 }
 
 export class Zzz {
-	data: Zzz_Data = $state()!;
+	data: Zzz_Data = $state()!; // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion
 
 	constructor(options: Zzz_Options = EMPTY_OBJECT) {
 		this.data = options.data ?? new Zzz_Data();

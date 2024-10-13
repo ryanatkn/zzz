@@ -5,6 +5,7 @@
 
 	import Zzz_Main from '$lib/Zzz_Main.svelte';
 	import {hud_context} from '$lib/Hud.svelte';
+	import {zzz_context} from '$lib/zzz.svelte.js';
 
 	// TODO remove this after fixing
 	// class:row
@@ -12,15 +13,25 @@
 	// class:icon
 	// class:title
 
+	const zzz = zzz_context.get();
+
 	hud_context.set(hud);
 </script>
 
 <Zzz_Main>
 	<header class="box">
 		<Svg data={zzz_logo} size="var(--icon_size_xl2)" classes="my_xl5" />
+		<p class="mt_xl3">bot control hq</p>
+		<p class="mt_xl3">work in progress</p>
+		<p class="size_xl3">💤</p>
 	</header>
 </Zzz_Main>
 
 {#snippet hud()}
-	<a href="{base}/about" class="size_xl3 justify_self_end">?</a>
+	<div class="row justify_content_space_between">
+		<button type="button" class="radius_0 plain" onclick={() => (zzz.data.show_main_menu = true)}
+			>menu</button
+		>
+		<a href="{base}/about" class="p_md radius_0">about</a>
+	</div>
 {/snippet}
