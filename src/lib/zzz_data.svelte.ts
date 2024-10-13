@@ -1,3 +1,4 @@
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface Zzz_Data_Json {}
 
 export class Zzz_Data {
