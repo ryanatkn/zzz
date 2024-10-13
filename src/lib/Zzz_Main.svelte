@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type {Snippet} from 'svelte';
 
-	import Hud from '$lib/Hud.svelte';
+	import Hud_Root from '$lib/Hud_Root.svelte';
 
 	interface Props {
 		children: Snippet;
@@ -10,8 +10,8 @@
 	const {children}: Props = $props();
 </script>
 
-<Hud>
+<Hud_Root>
 	<main>
 		{@render children()}
 	</main>
-</Hud>
+</Hud_Root>

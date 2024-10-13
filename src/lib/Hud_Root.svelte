@@ -1,12 +1,8 @@
-<script lang="ts" module>
-	import {base} from '$app/paths';
-	import {create_context} from '@ryanatkn/fuz/context_helpers.js';
-
-	export const hud_context = create_context<Snippet | undefined>();
-</script>
-
 <script lang="ts">
+	import {base} from '$app/paths';
 	import type {Snippet} from 'svelte';
+
+	import {hud_context} from './hud.svelte.js';
 
 	interface Props {
 		hud?: Snippet;

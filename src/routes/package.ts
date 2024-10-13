@@ -39,7 +39,7 @@ export const package_json = {
 		'@sveltejs/adapter-static': '^3.0.5',
 		'@sveltejs/kit': '^2.7.0',
 		'@sveltejs/package': '^2.3.5',
-		'@sveltejs/vite-plugin-svelte': '4.0.0-next.7',
+		'@sveltejs/vite-plugin-svelte': '4.0.0-next.6',
 		eslint: '^9.12.0',
 		'eslint-plugin-svelte': '^2.44.1',
 		prettier: '^3.3.3',
@@ -63,11 +63,12 @@ export const package_json = {
 	files: ['dist'],
 	exports: {
 		'./package.json': './package.json',
-		'./Hud.svelte': {
-			types: './dist/Hud.svelte.d.ts',
-			svelte: './dist/Hud.svelte',
-			default: './dist/Hud.svelte',
+		'./Hud_Root.svelte': {
+			types: './dist/Hud_Root.svelte.d.ts',
+			svelte: './dist/Hud_Root.svelte',
+			default: './dist/Hud_Root.svelte',
 		},
+		'./hud.svelte.js': {types: './dist/hud.svelte.d.ts', default: './dist/hud.svelte.js'},
 		'./zzz_data.svelte.js': {
 			types: './dist/zzz_data.svelte.d.ts',
 			default: './dist/zzz_data.svelte.js',
@@ -91,7 +92,11 @@ export const src_json = {
 	version: '0.0.1',
 	modules: {
 		'./package.json': {path: 'package.json', declarations: []},
-		'./Hud.svelte': {path: 'Hud.svelte', declarations: []},
+		'./Hud_Root.svelte': {path: 'Hud_Root.svelte', declarations: []},
+		'./hud.svelte.js': {
+			path: 'hud.svelte.ts',
+			declarations: [{name: 'hud_context', kind: 'variable'}],
+		},
 		'./zzz_data.svelte.js': {
 			path: 'zzz_data.svelte.ts',
 			declarations: [

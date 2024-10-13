@@ -4,7 +4,7 @@
 	import {base} from '$app/paths';
 
 	import Zzz_Main from '$lib/Zzz_Main.svelte';
-	import {hud_context} from '$lib/Hud.svelte';
+	import {hud_context} from '$lib/hud.svelte.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 
 	// TODO remove this after fixing
