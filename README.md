@@ -1,18 +1,19 @@
 # Zzz
 
-[<img src="/static/logo.svg" alt="three sleepy z's" align="right" width="192" height="192">](https://zzz.ryanatkn.com/)
+[<img src="/static/logo.svg" alt="three sleepy z's" align="right" width="192" height="192">](https://www.zzzbot.dev/)
 
-> social toolz for the tired 💤 [zzz.ryanatkn.com](https://zzz.ryanatkn.com/)
+> bot control hq 💤 copy this software
 
-⚠️ work in progress - not yet published
+⚠️ early release
 
-Zzz (pronounced "zees" like please) is a social web app framework
-that builds on [SvelteKit](https://kit.svelte.dev/).
+**[www.zzzbot.dev](https://www.zzzbot.dev/)**
 
-It's not yet published but should be in late 2024 or 2025,
-and I plan to make videos and blog posts about it here soon.
+Zzz (pronounced "zees" like the sound of electricity)
+is a toolkit that builds on [SvelteKit](https://kit.svelte.dev/).
 
-More at [zzz.ryanatkn.com](https://zzz.ryanatkn.com/).
+It's still early. To get involved seek the issues and discussions.
+
+More at [www.zzzbot.dev](https://www.zzzbot.dev/).
 
 ## license 🐦
 
