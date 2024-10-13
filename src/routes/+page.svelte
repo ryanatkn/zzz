@@ -1,8 +1,18 @@
 <script lang="ts">
 	import Svg from '@ryanatkn/fuz/Svg.svelte';
 	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
+	import {base} from '$app/paths';
 
 	import Zzz_Main from '$lib/Zzz_Main.svelte';
+	import {hud_context} from '$lib/Hud.svelte';
+
+	// TODO remove this after fixing
+	// class:row
+	// class:content
+	// class:icon
+	// class:title
+
+	hud_context.set(hud);
 </script>
 
 <Zzz_Main>
@@ -11,15 +21,6 @@
 	</header>
 </Zzz_Main>
 
-<style>
-	/* TODO accidentally selected all the links like this, I kind of like it */
-	/* TODO construct for this in CSS classes */
-	/* TODO something like this but toned down
-	a:hover {
-		box-shadow: var(--shadow_md) color-mix(in hsl, var(--shadow_color) var(--shadow_alpha_3), transparent); 
-	} */
-	a:active {
-		box-shadow: var(--shadow_inset_top_sm)
-			color-mix(in hsl, var(--shadow_color) var(--shadow_alpha_2), transparent);
-	}
-</style>
+{#snippet hud()}
+	<a href="{base}/about" class="size_xl3 justify_self_end">?</a>
+{/snippet}

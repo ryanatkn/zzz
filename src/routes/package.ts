@@ -6,8 +6,8 @@ import type {Src_Json} from '@ryanatkn/gro/src_json.js';
 export const package_json = {
 	name: '@ryanatkn/zzz',
 	version: '0.0.1',
-	description: 'social web app framework',
-	motto: 'social toolz for the tired',
+	description: 'bot control hq',
+	motto: 'copy this software',
 	glyph: '💤',
 	logo: 'logo.svg',
 	logo_alt: "three sleepy z's",
@@ -34,12 +34,12 @@ export const package_json = {
 		'@ryanatkn/belt': '^0.25.3',
 		'@ryanatkn/eslint-config': '^0.5.5',
 		'@ryanatkn/fuz': '^0.129.4',
-		'@ryanatkn/gro': '^0.140.4',
-		'@ryanatkn/moss': '^0.18.2',
+		'@ryanatkn/gro': '0.140.0',
+		'@ryanatkn/moss': '^0.16.1',
 		'@sveltejs/adapter-static': '^3.0.5',
 		'@sveltejs/kit': '^2.7.0',
 		'@sveltejs/package': '^2.3.5',
-		'@sveltejs/vite-plugin-svelte': '4.0.0-next.8',
+		'@sveltejs/vite-plugin-svelte': '4.0.0-next.6',
 		eslint: '^9.12.0',
 		'eslint-plugin-svelte': '^2.44.1',
 		prettier: '^3.3.3',
@@ -63,6 +63,11 @@ export const package_json = {
 	files: ['dist'],
 	exports: {
 		'./package.json': './package.json',
+		'./Hud.svelte': {
+			types: './dist/Hud.svelte.d.ts',
+			svelte: './dist/Hud.svelte',
+			default: './dist/Hud.svelte',
+		},
 		'./zzz_data.svelte.js': {
 			types: './dist/zzz_data.svelte.d.ts',
 			default: './dist/zzz_data.svelte.js',
@@ -86,6 +91,7 @@ export const src_json = {
 	version: '0.0.1',
 	modules: {
 		'./package.json': {path: 'package.json', declarations: []},
+		'./Hud.svelte': {path: 'Hud.svelte', declarations: []},
 		'./zzz_data.svelte.js': {
 			path: 'zzz_data.svelte.ts',
 			declarations: [

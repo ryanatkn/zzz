@@ -49,6 +49,13 @@
 	background-color: var(--panel_bg, var(--fg_1));
 }
 
+/* can be used to override the direction of a `.box` */
+.row {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+}
+
 /* TODO rename these? use to be columns, maybe should be? */
 .width_md {
 	width: 100%;
