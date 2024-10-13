@@ -4,7 +4,7 @@
 
 > bot control hq 💤 copy this software
 
-⚠️ early release
+⚠️ early pre-release
 
 **[www.zzzbot.dev](https://www.zzzbot.dev/)**
 
