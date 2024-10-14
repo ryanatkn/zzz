@@ -73,16 +73,16 @@ export class Zzz_Server {
 
 				// TODO refactor to support multiple storage backends (starting with fs+postgres), maybe something like:
 				// await storage.save_prompt_response(r);
-				const r: Prompt_Response_Message = {
+				const response: Prompt_Response_Message = {
 					type: 'prompt_response',
 					agent_name: message.agent_name,
 					text,
 					data,
 				};
 				const path = `./src/lib/prompts/${data.id}__${data.model}.json`;
-				writeFileSync(path, JSON.stringify(r, null, '\t'));
+				writeFileSync(path, JSON.stringify({message, response}, null, '\t'));
 
-				return r; // TODO @many sending the text again is wasteful, need ids
+				return response; // TODO @many sending the text again is wasteful, need ids
 			}
 			default:
 				throw new Unreachable_Error(message);

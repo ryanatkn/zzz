@@ -50,6 +50,13 @@
 {/snippet}
 
 {#snippet contextmenu_entries()}
+	<!-- TODO maybe show disabled? -->
+	{#if file.contents !== null}
+		<Contextmenu_Entry run={() => void navigator.clipboard.writeText(file.contents!)}>
+			{#snippet icon()}📋{/snippet}
+			<span>Copy {file.contents.length} chars</span>
+		</Contextmenu_Entry>
+	{/if}
 	<Contextmenu_Submenu>
 		{#snippet icon()}>{/snippet}
 		View with
@@ -65,11 +72,4 @@
 			</Contextmenu_Entry>
 		{/snippet}
 	</Contextmenu_Submenu>
-	<!-- TODO maybe show disabled? -->
-	{#if file.contents !== null}
-		<Contextmenu_Entry run={() => void navigator.clipboard.writeText(file.contents!)}>
-			{#snippet icon()}📋{/snippet}
-			<span>Copy {file.contents.length} chars</span>
-		</Contextmenu_Entry>
-	{/if}
 {/snippet}

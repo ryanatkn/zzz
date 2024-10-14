@@ -96,6 +96,7 @@
 					}
 					case 'echo': {
 						console.log(`[page] echo`, message);
+						zzz.echos.push(message);
 						break;
 					}
 					default:

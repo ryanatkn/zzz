@@ -48,6 +48,15 @@
 {/if}
 
 {#snippet contextmenu_entries()}
+	<!-- TODO maybe show disabled? -->
+	<Contextmenu_Entry run={() => void navigator.clipboard.writeText(content)}>
+		{#snippet icon()}📋{/snippet}
+		<span>Copy response text ({content.length} chars)</span>
+	</Contextmenu_Entry>
+	<Contextmenu_Entry run={() => void navigator.clipboard.writeText(prompt_response.text)}>
+		{#snippet icon()}📋{/snippet}
+		<span>Copy prompt text ({prompt_response.text.length} chars)</span>
+	</Contextmenu_Entry>
 	<Contextmenu_Submenu>
 		{#snippet icon()}>{/snippet}
 		View with
@@ -63,13 +72,4 @@
 			</Contextmenu_Entry>
 		{/snippet}
 	</Contextmenu_Submenu>
-	<!-- TODO maybe show disabled? -->
-	<Contextmenu_Entry run={() => void navigator.clipboard.writeText(content)}>
-		{#snippet icon()}📋{/snippet}
-		<span>Copy response text ({content.length} chars)</span>
-	</Contextmenu_Entry>
-	<Contextmenu_Entry run={() => void navigator.clipboard.writeText(prompt_response.text)}>
-		{#snippet icon()}📋{/snippet}
-		<span>Copy prompt text ({prompt_response.text.length} chars)</span>
-	</Contextmenu_Entry>
 {/snippet}

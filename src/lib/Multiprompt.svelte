@@ -1,7 +1,8 @@
 <script lang="ts">
+	import Pending_Button from '@ryanatkn/fuz/Pending_Button.svelte';
+
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import Prompt_Responses_List from '$lib/Prompt_Responses_List.svelte';
-	import Prompt_Form from '$lib/Prompt_Form.svelte';
 
 	interface Props {}
 
@@ -9,40 +10,39 @@
 
 	const zzz = zzz_context.get();
 
-	const {pending_prompts} = $derived(zzz);
+	const {agents} = $derived(zzz);
 
-	// TODO refactor
-	let claude_text = $state('');
-	let chatgpt_text = $state('');
-	let gemini_text = $state('');
+	let pending = $state(false);
+
+	let value = $state('');
+
+	let textarea_el: HTMLTextAreaElement | undefined;
+
+	const onsubmit = async () => {
+		const text = value;
+		pending = true;
+		// TODO BLOCK create a prompt locally that doesn't have its response yet
+		await zzz.send_prompt(value);
+		pending = false;
+		if (text === value) value = '';
+	};
 </script>
 
-{#each zzz.agents.values() as agent (agent)}
+{#each agents.values() as agent (agent)}
 	<!-- TODO pass a zap? -->
-	<Prompt_Form
-		{agent}
-		onsubmit={(text) => {
-			void zzz.send_prompt(text, agent);
-			if (agent.name === 'claude') {
-				claude_text = text;
-			} else if (agent.name === 'chatgpt') {
-				chatgpt_text = text;
-			} else if (agent.name === 'gemini') {
-				gemini_text = text;
-			} else {
-				throw Error('TODO refactor');
-			}
-		}}
-		pending={pending_prompts.has(
-			// TODO hacky, refactor with the above
-			agent.name === 'claude'
-				? claude_text
-				: agent.name === 'chatgpt'
-					? chatgpt_text
-					: agent.name === 'gemini'
-						? gemini_text
-						: (null as any),
-		)}
-	/>
+	<textarea bind:this={textarea_el} placeholder="prompt" bind:value></textarea>
+
 	<Prompt_Responses_List {agent} prompt_responses={zzz.prompt_responses} />
 {/each}
+<Pending_Button
+	{pending}
+	onclick={() => {
+		if (!value) {
+			textarea_el?.focus();
+			return;
+		}
+		void onsubmit();
+	}}
+>
+	send prompt
+</Pending_Button>
