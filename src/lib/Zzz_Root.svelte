@@ -8,7 +8,7 @@
 		children: Snippet<[zzz: Zzz]>;
 	}
 
-	const {zzz = new Zzz(), children}: Props = $props();
+	const {zzz, children}: Props = $props();
 
 	zzz_context.set(zzz);
 </script>

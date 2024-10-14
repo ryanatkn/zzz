@@ -31,7 +31,10 @@
     "node": ">=20.17"
   },
   "devDependencies": {
+    "@anthropic-ai/sdk": "^0.29.0",
     "@changesets/changelog-git": "^0.2.0",
+    "@hono/node-server": "^1.13.2",
+    "@hono/node-ws": "^1.0.4",
     "@ryanatkn/belt": "^0.25.3",
     "@ryanatkn/eslint-config": "^0.5.5",
     "@ryanatkn/fuz": "^0.129.4",
@@ -43,6 +46,7 @@
     "@sveltejs/vite-plugin-svelte": "^3.0.0",
     "eslint": "^9.12.0",
     "eslint-plugin-svelte": "^2.44.1",
+    "hono": "^4.6.4",
     "prettier": "^3.3.3",
     "prettier-plugin-svelte": "^3.2.7",
     "svelte": "^5.0.0-next.264",
@@ -77,6 +81,26 @@
   ],
   "exports": {
     "./package.json": "./package.json",
+    "./Dashboard.svelte": {
+      "types": "./dist/Dashboard.svelte.d.ts",
+      "svelte": "./dist/Dashboard.svelte",
+      "default": "./dist/Dashboard.svelte"
+    },
+    "./File_Editor.svelte": {
+      "types": "./dist/File_Editor.svelte.d.ts",
+      "svelte": "./dist/File_Editor.svelte",
+      "default": "./dist/File_Editor.svelte"
+    },
+    "./File_Info.svelte": {
+      "types": "./dist/File_Info.svelte.d.ts",
+      "svelte": "./dist/File_Info.svelte",
+      "default": "./dist/File_Info.svelte"
+    },
+    "./File_List.svelte": {
+      "types": "./dist/File_List.svelte.d.ts",
+      "svelte": "./dist/File_List.svelte",
+      "default": "./dist/File_List.svelte"
+    },
     "./Hud_Root.svelte": {
       "types": "./dist/Hud_Root.svelte.d.ts",
       "svelte": "./dist/Hud_Root.svelte",
@@ -86,6 +110,46 @@
       "types": "./dist/hud.svelte.d.ts",
       "default": "./dist/hud.svelte.js"
     },
+    "./path.js": {
+      "types": "./dist/path.d.ts",
+      "default": "./dist/path.js"
+    },
+    "./Prompt_Form.svelte": {
+      "types": "./dist/Prompt_Form.svelte.d.ts",
+      "svelte": "./dist/Prompt_Form.svelte",
+      "default": "./dist/Prompt_Form.svelte"
+    },
+    "./Prompt_Response_Info.svelte": {
+      "types": "./dist/Prompt_Response_Info.svelte.d.ts",
+      "svelte": "./dist/Prompt_Response_Info.svelte",
+      "default": "./dist/Prompt_Response_Info.svelte"
+    },
+    "./Prompt_Responses_List.svelte": {
+      "types": "./dist/Prompt_Responses_List.svelte.d.ts",
+      "svelte": "./dist/Prompt_Responses_List.svelte",
+      "default": "./dist/Prompt_Responses_List.svelte"
+    },
+    "./prompts/msg_01Czgxph5PqanjMkkWxYt9vj__claude-3-5-sonnet-20240620.json": {
+      "default": "./dist/prompts/msg_01Czgxph5PqanjMkkWxYt9vj__claude-3-5-sonnet-20240620.json"
+    },
+    "./prompts/msg_01Djg174SuRTeTeatUJ77Ajs__claude-3-5-sonnet-20240620.json": {
+      "default": "./dist/prompts/msg_01Djg174SuRTeTeatUJ77Ajs__claude-3-5-sonnet-20240620.json"
+    },
+    "./prompts/msg_01HzqtqPi4xQtd9be9jBt2s4__claude-3-5-sonnet-20240620.json": {
+      "default": "./dist/prompts/msg_01HzqtqPi4xQtd9be9jBt2s4__claude-3-5-sonnet-20240620.json"
+    },
+    "./server/server.js": {
+      "types": "./dist/server/server.d.ts",
+      "default": "./dist/server/server.js"
+    },
+    "./server/zzz_server.js": {
+      "types": "./dist/server/zzz_server.d.ts",
+      "default": "./dist/server/zzz_server.js"
+    },
+    "./zzz_client.js": {
+      "types": "./dist/zzz_client.d.ts",
+      "default": "./dist/zzz_client.js"
+    },
     "./zzz_data.svelte.js": {
       "types": "./dist/zzz_data.svelte.d.ts",
       "default": "./dist/zzz_data.svelte.js"
@@ -94,6 +158,10 @@
       "types": "./dist/Zzz_Main.svelte.d.ts",
       "svelte": "./dist/Zzz_Main.svelte",
       "default": "./dist/Zzz_Main.svelte"
+    },
+    "./zzz_message.js": {
+      "types": "./dist/zzz_message.d.ts",
+      "default": "./dist/zzz_message.js"
     },
     "./Zzz_Root.svelte": {
       "types": "./dist/Zzz_Root.svelte.d.ts",

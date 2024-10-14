@@ -15,6 +15,10 @@ It's still early. To get involved seek the issues and discussions.
 
 More at [www.zzzbot.dev](https://www.zzzbot.dev/).
 
+## Setup
+
+- add to `.env.development` - `SECRET_ANTHROPIC_API_KEY`, `SECRET_OPENAI_API_KEY`, `SECRET_GOOGLE_API_KEY`
+
 ## license 🐦
 
 [MIT](LICENSE)

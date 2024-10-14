@@ -23,7 +23,7 @@
 		<Svg data={zzz_logo} size="var(--icon_size_xl2)" classes="my_xl5" />
 		<p class="mt_xl3">bot control hq</p>
 		<p class="mt_xl3">work in progress</p>
-		<p class="size_xl3">💤</p>
+		<p class="size_xl3"><span title="copy this software">💤</span></p>
 	</header>
 </Zzz_Main>
 
