@@ -104,6 +104,11 @@ export const package_json = {
 			default: './dist/Hud_Root.svelte',
 		},
 		'./hud.svelte.js': {types: './dist/hud.svelte.d.ts', default: './dist/hud.svelte.js'},
+		'./Multiprompt.svelte': {
+			types: './dist/Multiprompt.svelte.d.ts',
+			svelte: './dist/Multiprompt.svelte',
+			default: './dist/Multiprompt.svelte',
+		},
 		'./path.js': {types: './dist/path.d.ts', default: './dist/path.js'},
 		'./Prompt_Form.svelte': {
 			types: './dist/Prompt_Form.svelte.d.ts',
@@ -119,6 +124,9 @@ export const package_json = {
 			types: './dist/Prompt_Responses_List.svelte.d.ts',
 			svelte: './dist/Prompt_Responses_List.svelte',
 			default: './dist/Prompt_Responses_List.svelte',
+		},
+		'./prompts/msg_018oXWH1pfkBuEbEfcyi3s1U__claude-3-5-sonnet-20240620.json': {
+			default: './dist/prompts/msg_018oXWH1pfkBuEbEfcyi3s1U__claude-3-5-sonnet-20240620.json',
 		},
 		'./server/server.js': {types: './dist/server/server.d.ts', default: './dist/server/server.js'},
 		'./server/zzz_server.js': {
@@ -169,10 +177,15 @@ export const src_json = {
 			path: 'hud.svelte.ts',
 			declarations: [{name: 'hud_context', kind: 'variable'}],
 		},
+		'./Multiprompt.svelte': {path: 'Multiprompt.svelte', declarations: []},
 		'./path.js': {path: 'path.ts', declarations: [{name: 'to_base_path', kind: 'function'}]},
 		'./Prompt_Form.svelte': {path: 'Prompt_Form.svelte', declarations: []},
 		'./Prompt_Response_Info.svelte': {path: 'Prompt_Response_Info.svelte', declarations: []},
 		'./Prompt_Responses_List.svelte': {path: 'Prompt_Responses_List.svelte', declarations: []},
+		'./prompts/msg_018oXWH1pfkBuEbEfcyi3s1U__claude-3-5-sonnet-20240620.json': {
+			path: 'prompts/msg_018oXWH1pfkBuEbEfcyi3s1U__claude-3-5-sonnet-20240620.json',
+			declarations: [],
+		},
 		'./server/server.js': {path: 'server/server.ts', declarations: []},
 		'./server/zzz_server.js': {
 			path: 'server/zzz_server.ts',

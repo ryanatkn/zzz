@@ -124,6 +124,11 @@
       "types": "./dist/hud.svelte.d.ts",
       "default": "./dist/hud.svelte.js"
     },
+    "./Multiprompt.svelte": {
+      "types": "./dist/Multiprompt.svelte.d.ts",
+      "svelte": "./dist/Multiprompt.svelte",
+      "default": "./dist/Multiprompt.svelte"
+    },
     "./path.js": {
       "types": "./dist/path.d.ts",
       "default": "./dist/path.js"
@@ -142,6 +147,9 @@
       "types": "./dist/Prompt_Responses_List.svelte.d.ts",
       "svelte": "./dist/Prompt_Responses_List.svelte",
       "default": "./dist/Prompt_Responses_List.svelte"
+    },
+    "./prompts/msg_018oXWH1pfkBuEbEfcyi3s1U__claude-3-5-sonnet-20240620.json": {
+      "default": "./dist/prompts/msg_018oXWH1pfkBuEbEfcyi3s1U__claude-3-5-sonnet-20240620.json"
     },
     "./server/server.js": {
       "types": "./dist/server/server.d.ts",
