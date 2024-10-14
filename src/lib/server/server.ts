@@ -25,7 +25,7 @@ app.get(
 	/**
 	 * @see https://hono.dev/helpers/websocket
 	 */
-	upgradeWebSocket((c) => {
+	upgradeWebSocket(() => {
 		return {
 			onOpen(event, ws) {
 				sockets.add(ws);

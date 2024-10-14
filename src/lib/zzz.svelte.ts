@@ -8,10 +8,12 @@ import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 import {Zzz_Data, type Zzz_Data_Json} from '$lib/zzz_data.svelte.js';
 import type {Zzz_Client} from '$lib/zzz_client.js';
 import type {Filer_Change_Message, Prompt_Response_Message} from '$lib/zzz_message.js';
+import type {Agent} from '$lib/agent.svelte.js';
 
 export const zzz_context = create_context<Zzz>();
 
 export interface Zzz_Options {
+	agents: Agent[];
 	client: Zzz_Client;
 	data?: Zzz_Data;
 }
@@ -25,14 +27,28 @@ export class Zzz {
 
 	client: Zzz_Client;
 
+	// TODO what APi for these? `Agents` or `Agent_Manager` class?
+	agents: SvelteMap<string, Agent> = new SvelteMap();
+
 	files_by_id: SvelteMap<Path_Id, Source_File> = new SvelteMap();
 
 	pending_prompts: SvelteMap<string, Deferred<Prompt_Response_Message>> = new SvelteMap();
 
 	prompt_responses: SvelteMap<string, Prompt_Response_Message> = new SvelteMap();
 
+	pending_prompts_by_agent: Map<Agent, Prompt_Response_Message[]> = $derived(
+		new Map(
+			Array.from(this.agents.values()).map((agent) => [
+				agent,
+				Array.from(this.prompt_responses.values()).filter((p) => agent.name === p.agent_name),
+			]),
+		),
+	);
+	// TODO BLOCK store state granularly for each agent
+
 	constructor(options: Zzz_Options) {
-		const {client, data = new Zzz_Data()} = options;
+		const {agents, client, data = new Zzz_Data()} = options;
+		for (const agent of agents) this.agents.set(agent.name, agent);
 		this.client = client;
 		this.data = data;
 	}
@@ -43,9 +59,9 @@ export class Zzz {
 		};
 	}
 
-	async send_prompt(text: string): Promise<void> {
+	async send_prompt(text: string, agent: Agent): Promise<void> {
 		// TODO need ids, and then the response promise, tracking by text isn't robust to duplicates
-		this.client.send({type: 'send_prompt', text});
+		this.client.send({type: 'send_prompt', agent_name: agent.name, text});
 		const deferred = create_deferred<Prompt_Response_Message>();
 		this.pending_prompts.set(text, deferred);
 		const response = await deferred.promise;

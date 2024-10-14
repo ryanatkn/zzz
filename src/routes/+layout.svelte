@@ -22,6 +22,7 @@
 	import {Zzz_Client} from '$lib/zzz_client.js';
 	import {page} from '$app/stores';
 	import {Unreachable_Error} from '@ryanatkn/belt/error.js';
+	import {Agent} from '$lib/agent.svelte.js';
 
 	interface Props {
 		children: Snippet;
@@ -36,6 +37,12 @@
 
 	// gives app-wide support for Zzz
 	const zzz = new Zzz({
+		// TODO refactor
+		agents: [
+			new Agent({data: {name: 'claude', title: 'Claude'}}),
+			new Agent({data: {name: 'chatgpt', title: 'ChatGPT'}}),
+			new Agent({data: {name: 'gemini', title: 'Gemini'}}),
+		],
 		client: new Zzz_Client({
 			send: async (message) => {
 				if (!browser) return;

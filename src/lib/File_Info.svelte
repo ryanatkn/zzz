@@ -56,7 +56,7 @@
 	contents {#if file.contents === null}
 		null
 	{:else}
-		({file.contents.length} characters)
+		({file.contents.length} chars)
 	{/if}
 {/snippet}
 

@@ -1,5 +1,4 @@
 import {Unreachable_Error} from '@ryanatkn/belt/error.js';
-import * as devalue from 'devalue';
 import Anthropic from '@anthropic-ai/sdk';
 import {Filer, type Cleanup_Watch} from '@ryanatkn/gro/filer.js';
 import {SECRET_ANTHROPIC_API_KEY} from '$env/static/private';
@@ -74,7 +73,12 @@ export class Zzz_Server {
 
 				// TODO refactor to support multiple storage backends (starting with fs+postgres), maybe something like:
 				// await storage.save_prompt_response(r);
-				const r: Prompt_Response_Message = {type: 'prompt_response', text, data};
+				const r: Prompt_Response_Message = {
+					type: 'prompt_response',
+					agent_name: message.agent_name,
+					text,
+					data,
+				};
 				const path = `./src/lib/prompts/${data.id}__${data.model}.json`;
 				writeFileSync(path, JSON.stringify(r, null, '\t'));
 

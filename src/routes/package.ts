@@ -67,6 +67,7 @@ export const package_json = {
 	files: ['dist'],
 	exports: {
 		'./package.json': './package.json',
+		'./agent.svelte.js': {types: './dist/agent.svelte.d.ts', default: './dist/agent.svelte.js'},
 		'./Dashboard.svelte': {
 			types: './dist/Dashboard.svelte.d.ts',
 			svelte: './dist/Dashboard.svelte',
@@ -86,6 +87,16 @@ export const package_json = {
 			types: './dist/File_List.svelte.d.ts',
 			svelte: './dist/File_List.svelte',
 			default: './dist/File_List.svelte',
+		},
+		'./File_Summary.svelte': {
+			types: './dist/File_Summary.svelte.d.ts',
+			svelte: './dist/File_Summary.svelte',
+			default: './dist/File_Summary.svelte',
+		},
+		'./File_View.svelte': {
+			types: './dist/File_View.svelte.d.ts',
+			svelte: './dist/File_View.svelte',
+			default: './dist/File_View.svelte',
 		},
 		'./Hud_Root.svelte': {
 			types: './dist/Hud_Root.svelte.d.ts',
@@ -139,10 +150,20 @@ export const src_json = {
 	version: '0.0.1',
 	modules: {
 		'./package.json': {path: 'package.json', declarations: []},
+		'./agent.svelte.js': {
+			path: 'agent.svelte.ts',
+			declarations: [
+				{name: 'Agent_Json', kind: 'type'},
+				{name: 'Agent_Options', kind: 'type'},
+				{name: 'Agent', kind: 'class'},
+			],
+		},
 		'./Dashboard.svelte': {path: 'Dashboard.svelte', declarations: []},
 		'./File_Editor.svelte': {path: 'File_Editor.svelte', declarations: []},
 		'./File_Info.svelte': {path: 'File_Info.svelte', declarations: []},
 		'./File_List.svelte': {path: 'File_List.svelte', declarations: []},
+		'./File_Summary.svelte': {path: 'File_Summary.svelte', declarations: []},
+		'./File_View.svelte': {path: 'File_View.svelte', declarations: []},
 		'./Hud_Root.svelte': {path: 'Hud_Root.svelte', declarations: []},
 		'./hud.svelte.js': {
 			path: 'hud.svelte.ts',

@@ -1,88 +1,63 @@
 <script lang="ts">
 	import type {Prompt_Response_Message} from '$lib/zzz_message.js';
+	import type {Agent} from '$lib/agent.svelte.js';
 
 	interface Props {
+		agent: Agent;
 		// TODO more efficient data structures, reactive source prompt_responses
 		prompt_response: Prompt_Response_Message;
 	}
 
-	const {prompt_response}: Props = $props();
-
-	const data = {
-		id: 'msg_01FKQ7unuUSmJe43K3KzTJmk',
-		type: 'message',
-		role: 'assistant',
-		model: 'claude-3-5-sonnet-20240620',
-		content: [
-			{
-				type: 'text',
-				text: "You're welcome, friend\nWords in rhythm, a sweet blend\nShort and sweet, our chat did end",
-			},
-		],
-		stop_reason: 'end_turn',
-		stop_sequence: null,
-		usage: {input_tokens: 18, output_tokens: 25},
-	};
+	const {agent, prompt_response}: Props = $props();
 </script>
 
 <h3>prompt</h3>
 <pre>{prompt_response.text}</pre>
-<h3>response</h3>
+<h3>response from {agent.title}</h3>
 <table>
 	<tbody>
 		<tr>
-			<th>ID</th>
-			<td>{data.id}</td>
-		</tr>
-		{#if data.type !== 'message'}
-			<tr>
-				<th>Type</th>
-				<td>{data.type}</td>
-			</tr>
-		{/if}
-		{#if data.role !== 'assistant'}
-			<tr>
-				<th>Role</th>
-				<td>{data.role}</td>
-			</tr>
-		{/if}
-		<tr>
-			<th>Model</th>
-			<td>{data.model}</td>
+			<th>id</th>
+			<td>{prompt_response.data.id}</td>
 		</tr>
 		<tr>
-			<th>Content</th>
+			<th>model</th>
+			<td>{prompt_response.data.model}</td>
+		</tr>
+		<tr>
+			<th>content </th>
 			<td>
 				<ul class="content-list">
-					{#each data.content as item}
+					{#each prompt_response.data.content as item}
 						<li class="content-item">
-							<strong>Type:</strong>
-							{item.type}<br />
-							<strong>Text:</strong>
-							{item.text}
+							{#if item.type === 'text'}
+								{item.text}
+							{:else if item.type === 'tool_use'}
+								used tool {item.name} - {item.input} - {item.id}
+							{/if}
 						</li>
 					{/each}
 				</ul>
 			</td>
 		</tr>
-		{#if data.stop_reason !== 'end_turn'}
+		{#if prompt_response.data.stop_reason !== 'end_turn'}
 			<tr>
-				<th>Stop Reason</th>
-				<td>{data.stop_reason}</td>
+				<th>stop Reason</th>
+				<td>{prompt_response.data.stop_reason}</td>
 			</tr>
 		{/if}
-		{#if data.stop_sequence}
+		{#if prompt_response.data.stop_sequence}
 			<tr>
-				<th>Stop Sequence</th>
-				<td>{data.stop_sequence}</td>
+				<th>stop Sequence</th>
+				<td>{prompt_response.data.stop_sequence}</td>
 			</tr>
 		{/if}
 		<tr>
-			<th>Usage</th>
+			<th>tokens</th>
 			<td>
 				<ul>
-					<li><strong>Input Tokens:</strong> {data.usage.input_tokens}</li>
-					<li><strong>Output Tokens:</strong> {data.usage.output_tokens}</li>
+					<li><strong>in:</strong> {prompt_response.data.usage.input_tokens}</li>
+					<li><strong>out:</strong> {prompt_response.data.usage.output_tokens}</li>
 				</ul>
 			</td>
 		</tr>

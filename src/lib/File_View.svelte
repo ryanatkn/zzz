@@ -45,7 +45,7 @@
 	contents {#if file.contents === null}
 		null
 	{:else}
-		({file.contents.length} characters)
+		({file.contents.length} chars)
 	{/if}
 {/snippet}
 
@@ -65,4 +65,11 @@
 			</Contextmenu_Entry>
 		{/snippet}
 	</Contextmenu_Submenu>
+	<!-- TODO maybe show disabled? -->
+	{#if file.contents !== null}
+		<Contextmenu_Entry run={() => void navigator.clipboard.writeText(file.contents!)}>
+			{#snippet icon()}📋{/snippet}
+			<span>Copy {file.contents.length} chars</span>
+		</Contextmenu_Entry>
+	{/if}
 {/snippet}
