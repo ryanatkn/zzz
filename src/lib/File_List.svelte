@@ -3,7 +3,7 @@
 	import type {Path_Id} from '@ryanatkn/gro/path.js';
 	import type {Source_File} from '@ryanatkn/gro/filer.js';
 
-	import File_Info from '$lib/File_Info.svelte';
+	import File_View from '$lib/File_View.svelte';
 
 	interface Props {
 		// TODO more efficient data structures, reactive source files
@@ -13,10 +13,10 @@
 	const {files}: Props = $props();
 </script>
 
-<ul class="unstyled">
+<ul class="unstyled flex column gap_md">
 	{#each files.values() as file (file.id)}
-		<li>
-			<File_Info {file} />
+		<li class="panel p_xs">
+			<File_View {file} />
 		</li>
 	{/each}
 </ul>

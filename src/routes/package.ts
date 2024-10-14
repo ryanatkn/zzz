@@ -109,15 +109,6 @@ export const package_json = {
 			svelte: './dist/Prompt_Responses_List.svelte',
 			default: './dist/Prompt_Responses_List.svelte',
 		},
-		'./prompts/msg_01Czgxph5PqanjMkkWxYt9vj__claude-3-5-sonnet-20240620.json': {
-			default: './dist/prompts/msg_01Czgxph5PqanjMkkWxYt9vj__claude-3-5-sonnet-20240620.json',
-		},
-		'./prompts/msg_01Djg174SuRTeTeatUJ77Ajs__claude-3-5-sonnet-20240620.json': {
-			default: './dist/prompts/msg_01Djg174SuRTeTeatUJ77Ajs__claude-3-5-sonnet-20240620.json',
-		},
-		'./prompts/msg_01HzqtqPi4xQtd9be9jBt2s4__claude-3-5-sonnet-20240620.json': {
-			default: './dist/prompts/msg_01HzqtqPi4xQtd9be9jBt2s4__claude-3-5-sonnet-20240620.json',
-		},
 		'./server/server.js': {types: './dist/server/server.d.ts', default: './dist/server/server.js'},
 		'./server/zzz_server.js': {
 			types: './dist/server/zzz_server.d.ts',
@@ -161,18 +152,6 @@ export const src_json = {
 		'./Prompt_Form.svelte': {path: 'Prompt_Form.svelte', declarations: []},
 		'./Prompt_Response_Info.svelte': {path: 'Prompt_Response_Info.svelte', declarations: []},
 		'./Prompt_Responses_List.svelte': {path: 'Prompt_Responses_List.svelte', declarations: []},
-		'./prompts/msg_01Czgxph5PqanjMkkWxYt9vj__claude-3-5-sonnet-20240620.json': {
-			path: 'prompts/msg_01Czgxph5PqanjMkkWxYt9vj__claude-3-5-sonnet-20240620.json',
-			declarations: [],
-		},
-		'./prompts/msg_01Djg174SuRTeTeatUJ77Ajs__claude-3-5-sonnet-20240620.json': {
-			path: 'prompts/msg_01Djg174SuRTeTeatUJ77Ajs__claude-3-5-sonnet-20240620.json',
-			declarations: [],
-		},
-		'./prompts/msg_01HzqtqPi4xQtd9be9jBt2s4__claude-3-5-sonnet-20240620.json': {
-			path: 'prompts/msg_01HzqtqPi4xQtd9be9jBt2s4__claude-3-5-sonnet-20240620.json',
-			declarations: [],
-		},
 		'./server/server.js': {path: 'server/server.ts', declarations: []},
 		'./server/zzz_server.js': {
 			path: 'server/zzz_server.ts',

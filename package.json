@@ -129,15 +129,6 @@
       "svelte": "./dist/Prompt_Responses_List.svelte",
       "default": "./dist/Prompt_Responses_List.svelte"
     },
-    "./prompts/msg_01Czgxph5PqanjMkkWxYt9vj__claude-3-5-sonnet-20240620.json": {
-      "default": "./dist/prompts/msg_01Czgxph5PqanjMkkWxYt9vj__claude-3-5-sonnet-20240620.json"
-    },
-    "./prompts/msg_01Djg174SuRTeTeatUJ77Ajs__claude-3-5-sonnet-20240620.json": {
-      "default": "./dist/prompts/msg_01Djg174SuRTeTeatUJ77Ajs__claude-3-5-sonnet-20240620.json"
-    },
-    "./prompts/msg_01HzqtqPi4xQtd9be9jBt2s4__claude-3-5-sonnet-20240620.json": {
-      "default": "./dist/prompts/msg_01HzqtqPi4xQtd9be9jBt2s4__claude-3-5-sonnet-20240620.json"
-    },
     "./server/server.js": {
       "types": "./dist/server/server.d.ts",
       "default": "./dist/server/server.js"
