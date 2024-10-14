@@ -18,7 +18,7 @@
 
 <section class="box width_100 mx_auto p_md panel">
 	<section>
-		<button type="button" onclick={hello_server}>hello server</button>
+		<button type="button" onclick={hello_server}>⛬ hello server</button>
 	</section>
 
 	<Multiprompt />
