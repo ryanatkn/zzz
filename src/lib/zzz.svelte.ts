@@ -109,4 +109,14 @@ export class Zzz {
 				throw new Unreachable_Error(change.type);
 		}
 	}
+
+	update_file(id: Path_Id, contents: string): void {
+		const source_file = this.files_by_id.get(id);
+		if (!source_file) {
+			console.error('expected source file', id);
+			return;
+		}
+
+		this.client.send({type: 'update_file', id, contents});
+	}
 }

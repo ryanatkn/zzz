@@ -118,6 +118,11 @@ export class Zzz_Server {
 				save_response(request, response);
 				return response; // TODO @many sending the text again is wasteful, need ids
 			}
+			case 'update_file': {
+				const {id, contents} = request;
+				writeFileSync(id, contents, 'utf8');
+				return null;
+			}
 			default:
 				throw new Unreachable_Error(request);
 		}

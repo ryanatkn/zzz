@@ -1,22 +1,25 @@
 <script lang="ts">
-	import Details from '@ryanatkn/fuz/Details.svelte';
 	import Dialog from '@ryanatkn/fuz/Dialog.svelte';
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
 	import type {Source_File} from '@ryanatkn/gro/filer.js';
 
 	import {to_base_path} from '$lib/path.js';
+	import {zzz_context} from './zzz.svelte.js';
 
 	interface Props {
 		// TODO more efficient data structures, reactive source files
 		file: Source_File;
+		height?: number;
 	}
 
-	const {file}: Props = $props();
+	const {file, height = 600}: Props = $props();
 
 	const dependencies = $derived(Array.from(file.dependencies.values()));
 	const dependents = $derived(Array.from(file.dependents.values()));
 
 	let show_dialog = $state(false);
+
+	const zzz = zzz_context.get();
 </script>
 
 <div class="row size_xl"><span class="size_xl3 mr_md">🗎</span> {to_base_path(file.id)}</div>
@@ -41,19 +44,28 @@ deps ({dependencies.length} dependencies, {dependents.length} dependents)
 	</div>
 {/if}
 
-<div class="row">
+<div>
 	<Copy_To_Clipboard text={file.contents} />
-	<Details>
-		{#snippet summary()}{@render file_contents()}
-		{/snippet}
-		<div class="flex_1">{file.contents}</div>
-	</Details>
+
+	{@render file_contents()}
+</div>
+<div class="editor">
+	<div class="flex_1">
+		<textarea style:height="{height}px">{file.contents}</textarea>
+	</div>
+	<pre class="flex_1">{file.contents}</pre>
 </div>
 
 {#if show_dialog}
 	<Dialog onclose={() => (show_dialog = false)}>
 		<div class="bg">
 			<h2>dialog</h2>
+			<button
+				type="button"
+				onclick={async () => {
+					zzz;
+				}}>save</button
+			>
 			<button type="button" onclick={() => (show_dialog = false)}>close</button>
 			{@render file_contents()}
 		</div>
@@ -69,6 +81,11 @@ deps ({dependencies.length} dependencies, {dependents.length} dependents)
 {/snippet}
 
 <style>
+	.editor {
+		display: flex;
+		align-items: flex-start;
+	}
+
 	.dep_list {
 		width: 100%;
 		display: grid;

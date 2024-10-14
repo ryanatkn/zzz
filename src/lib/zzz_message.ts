@@ -7,7 +7,11 @@ import type {Agent_Name} from '$lib/agent.svelte.js';
 
 export type Zzz_Message = Client_Message | Server_Message;
 
-export type Client_Message = Echo_Message | Load_Session_Message | Send_Prompt_Message;
+export type Client_Message =
+	| Echo_Message
+	| Load_Session_Message
+	| Send_Prompt_Message
+	| Update_File_Message;
 
 export type Server_Message =
 	| Echo_Message
@@ -71,4 +75,13 @@ export interface Receive_Prompt_Message extends Base_Message {
 		| {type: 'anthropic'; value: Anthropic.Messages.Message}
 		| {type: 'openai'; value: unknown}
 		| {type: 'google'; value: unknown};
+}
+
+/**
+ * @client
+ */
+export interface Update_File_Message extends Base_Message {
+	type: 'update_file';
+	id: Path_Id;
+	contents: string;
 }

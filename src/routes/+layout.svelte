@@ -37,11 +37,11 @@
 
 	// gives app-wide support for Zzz
 	const zzz = new Zzz({
-		// TODO refactor
+		// TODO refactor - config in `zzz.config.ts`?
 		agents: [
-			new Agent({data: {name: 'claude', title: 'Claude'}}),
-			new Agent({data: {name: 'chatgpt', title: 'ChatGPT'}}),
-			new Agent({data: {name: 'gemini', title: 'Gemini'}}),
+			new Agent({data: {name: 'claude', icon: 'c', title: 'Claude', model: '', url: ''}}),
+			new Agent({data: {name: 'chatgpt', icon: 'c', title: 'ChatGPT', model: '', url: ''}}),
+			new Agent({data: {name: 'gemini', icon: 'c', title: 'Gemini', model: '', url: ''}}),
 		],
 		client: new Zzz_Client({
 			send: async (message) => {

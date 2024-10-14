@@ -33,7 +33,7 @@
 {#if show_more}
 	<Dialog onclose={() => (show_more = false)}>
 		<!-- TODO expand width, might need to change `Dialog` -->
-		<div class="bg p_md radius_sm width_md">
+		<div class="bg p_md radius_sm">
 			<File_Editor {file} />
 			<button type="button" onclick={() => (show_more = false)}>close</button>
 			{@render file_contents()}
