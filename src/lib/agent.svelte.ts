@@ -1,5 +1,8 @@
+export type Agent_Name = 'claude' | 'chatgpt' | 'gemini'; // TODO extensible
+
 export interface Agent_Json {
-	name: string;
+	name: Agent_Name;
+	icon: string;
 	title: string;
 	model: string;
 	url: string;
@@ -10,7 +13,8 @@ export interface Agent_Options {
 }
 
 export class Agent {
-	name: string = $state()!;
+	name: Agent_Name = $state()!;
+	icon: string = $state()!;
 	title: string = $state()!;
 	model: string = $state()!;
 	url: string = $state()!;
@@ -20,9 +24,10 @@ export class Agent {
 
 	constructor(options: Agent_Options) {
 		const {
-			data: {name, title, model, url},
+			data: {name, icon, title, model, url},
 		} = options;
 		this.name = name;
+		this.icon = icon;
 		this.title = title;
 		this.model = model;
 		this.url = url;
@@ -31,6 +36,7 @@ export class Agent {
 	toJSON(): Agent_Json {
 		return {
 			name: this.name,
+			icon: this.icon,
 			title: this.title,
 			model: this.model,
 			url: this.url,

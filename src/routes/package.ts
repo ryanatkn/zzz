@@ -67,6 +67,21 @@ export const package_json = {
 	files: ['dist'],
 	exports: {
 		'./package.json': './package.json',
+		'./Agent_Info.svelte': {
+			types: './dist/Agent_Info.svelte.d.ts',
+			svelte: './dist/Agent_Info.svelte',
+			default: './dist/Agent_Info.svelte',
+		},
+		'./Agent_Summary.svelte': {
+			types: './dist/Agent_Summary.svelte.d.ts',
+			svelte: './dist/Agent_Summary.svelte',
+			default: './dist/Agent_Summary.svelte',
+		},
+		'./Agent_View.svelte': {
+			types: './dist/Agent_View.svelte.d.ts',
+			svelte: './dist/Agent_View.svelte',
+			default: './dist/Agent_View.svelte',
+		},
 		'./agent.svelte.js': {types: './dist/agent.svelte.d.ts', default: './dist/agent.svelte.js'},
 		'./Dashboard.svelte': {
 			types: './dist/Dashboard.svelte.d.ts',
@@ -152,6 +167,15 @@ export const package_json = {
 			default: './dist/Prompt_Responses_List.svelte',
 		},
 		'./prompt.svelte.js': {types: './dist/prompt.svelte.d.ts', default: './dist/prompt.svelte.js'},
+		'./prompts/msg_01HhsZqH2PNvN1HBcuoGs53k__claude-3-5-sonnet-20240620.json': {
+			default: './dist/prompts/msg_01HhsZqH2PNvN1HBcuoGs53k__claude-3-5-sonnet-20240620.json',
+		},
+		'./prompts/msg_01WAboELRr5xYhWWLqYqyJPk__claude-3-5-sonnet-20240620.json': {
+			default: './dist/prompts/msg_01WAboELRr5xYhWWLqYqyJPk__claude-3-5-sonnet-20240620.json',
+		},
+		'./prompts/msg_01WD9qTnxseoaVwtW1ksqfu5__claude-3-5-sonnet-20240620.json': {
+			default: './dist/prompts/msg_01WD9qTnxseoaVwtW1ksqfu5__claude-3-5-sonnet-20240620.json',
+		},
 		'./server/server.js': {types: './dist/server/server.d.ts', default: './dist/server/server.js'},
 		'./server/zzz_server.js': {
 			types: './dist/server/zzz_server.d.ts',
@@ -182,9 +206,13 @@ export const src_json = {
 	version: '0.0.1',
 	modules: {
 		'./package.json': {path: 'package.json', declarations: []},
+		'./Agent_Info.svelte': {path: 'Agent_Info.svelte', declarations: []},
+		'./Agent_Summary.svelte': {path: 'Agent_Summary.svelte', declarations: []},
+		'./Agent_View.svelte': {path: 'Agent_View.svelte', declarations: []},
 		'./agent.svelte.js': {
 			path: 'agent.svelte.ts',
 			declarations: [
+				{name: 'Agent_Name', kind: 'type'},
 				{name: 'Agent_Json', kind: 'type'},
 				{name: 'Agent_Options', kind: 'type'},
 				{name: 'Agent', kind: 'class'},
@@ -228,6 +256,18 @@ export const src_json = {
 				{name: 'Prompt', kind: 'class'},
 			],
 		},
+		'./prompts/msg_01HhsZqH2PNvN1HBcuoGs53k__claude-3-5-sonnet-20240620.json': {
+			path: 'prompts/msg_01HhsZqH2PNvN1HBcuoGs53k__claude-3-5-sonnet-20240620.json',
+			declarations: [],
+		},
+		'./prompts/msg_01WAboELRr5xYhWWLqYqyJPk__claude-3-5-sonnet-20240620.json': {
+			path: 'prompts/msg_01WAboELRr5xYhWWLqYqyJPk__claude-3-5-sonnet-20240620.json',
+			declarations: [],
+		},
+		'./prompts/msg_01WD9qTnxseoaVwtW1ksqfu5__claude-3-5-sonnet-20240620.json': {
+			path: 'prompts/msg_01WD9qTnxseoaVwtW1ksqfu5__claude-3-5-sonnet-20240620.json',
+			declarations: [],
+		},
 		'./server/server.js': {path: 'server/server.ts', declarations: []},
 		'./server/zzz_server.js': {
 			path: 'server/zzz_server.ts',
@@ -254,6 +294,7 @@ export const src_json = {
 		'./zzz_message.js': {
 			path: 'zzz_message.ts',
 			declarations: [
+				{name: 'Zzz_Message', kind: 'type'},
 				{name: 'Client_Message', kind: 'type'},
 				{name: 'Server_Message', kind: 'type'},
 				{name: 'Base_Message', kind: 'type'},

@@ -16,7 +16,10 @@
 </script>
 
 <div class="row justify_content_space_between">
-	<div class="size_xl">{to_base_path(file.id)}</div>
+	<div class="row">
+		<div class="size_xl3">🗎</div>
+		<div class="size_xl ml_lg">{to_base_path(file.id)}</div>
+	</div>
 	<div class="row">
 		<div class="px_md flex align_items_end column">
 			<div>

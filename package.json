@@ -81,6 +81,21 @@
   ],
   "exports": {
     "./package.json": "./package.json",
+    "./Agent_Info.svelte": {
+      "types": "./dist/Agent_Info.svelte.d.ts",
+      "svelte": "./dist/Agent_Info.svelte",
+      "default": "./dist/Agent_Info.svelte"
+    },
+    "./Agent_Summary.svelte": {
+      "types": "./dist/Agent_Summary.svelte.d.ts",
+      "svelte": "./dist/Agent_Summary.svelte",
+      "default": "./dist/Agent_Summary.svelte"
+    },
+    "./Agent_View.svelte": {
+      "types": "./dist/Agent_View.svelte.d.ts",
+      "svelte": "./dist/Agent_View.svelte",
+      "default": "./dist/Agent_View.svelte"
+    },
     "./agent.svelte.js": {
       "types": "./dist/agent.svelte.d.ts",
       "default": "./dist/agent.svelte.js"
@@ -180,6 +195,15 @@
     "./prompt.svelte.js": {
       "types": "./dist/prompt.svelte.d.ts",
       "default": "./dist/prompt.svelte.js"
+    },
+    "./prompts/msg_01HhsZqH2PNvN1HBcuoGs53k__claude-3-5-sonnet-20240620.json": {
+      "default": "./dist/prompts/msg_01HhsZqH2PNvN1HBcuoGs53k__claude-3-5-sonnet-20240620.json"
+    },
+    "./prompts/msg_01WAboELRr5xYhWWLqYqyJPk__claude-3-5-sonnet-20240620.json": {
+      "default": "./dist/prompts/msg_01WAboELRr5xYhWWLqYqyJPk__claude-3-5-sonnet-20240620.json"
+    },
+    "./prompts/msg_01WD9qTnxseoaVwtW1ksqfu5__claude-3-5-sonnet-20240620.json": {
+      "default": "./dist/prompts/msg_01WD9qTnxseoaVwtW1ksqfu5__claude-3-5-sonnet-20240620.json"
     },
     "./server/server.js": {
       "types": "./dist/server/server.d.ts",

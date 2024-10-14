@@ -3,6 +3,10 @@ import type {Watcher_Change} from '@ryanatkn/gro/watch_dir.js';
 import type Anthropic from '@anthropic-ai/sdk';
 import type {Path_Id} from '@ryanatkn/gro/path.js';
 
+import type {Agent_Name} from '$lib/agent.svelte.js';
+
+export type Zzz_Message = Client_Message | Server_Message;
+
 export type Client_Message = Echo_Message | Load_Session_Message | Send_Prompt_Message;
 
 export type Server_Message =
@@ -52,7 +56,7 @@ export interface Filer_Change_Message extends Base_Message {
  */
 export interface Send_Prompt_Message extends Base_Message {
 	type: 'send_prompt';
-	agent_name: string;
+	agent_name: Agent_Name;
 	text: string;
 }
 
@@ -63,5 +67,8 @@ export interface Receive_Prompt_Message extends Base_Message {
 	type: 'prompt_response';
 	agent_name: string;
 	text: string; // TODO @many sending the text again is wasteful, need ids
-	data: Anthropic.Messages.Message;
+	data:
+		| {type: 'anthropic'; value: Anthropic.Messages.Message}
+		| {type: 'openai'; value: unknown}
+		| {type: 'google'; value: unknown};
 }

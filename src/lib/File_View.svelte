@@ -16,7 +16,7 @@
 
 	const {file}: Props = $props();
 
-	let show_editor = $state(false);
+	let show_more = $state(false);
 
 	// TODO refactor
 	let view_with: 'summary' | 'info' = $state('summary');
@@ -30,12 +30,12 @@
 	{/if}
 </div>
 
-{#if show_editor}
-	<Dialog onclose={() => (show_editor = false)}>
+{#if show_more}
+	<Dialog onclose={() => (show_more = false)}>
 		<!-- TODO expand width, might need to change `Dialog` -->
 		<div class="bg p_md radius_sm width_md">
 			<File_Editor {file} />
-			<button type="button" onclick={() => (show_editor = false)}>close</button>
+			<button type="button" onclick={() => (show_more = false)}>close</button>
 			{@render file_contents()}
 		</div>
 	</Dialog>
@@ -50,6 +50,14 @@
 {/snippet}
 
 {#snippet contextmenu_entries()}
+	<Contextmenu_Entry
+		run={() => {
+			show_more = true;
+		}}
+	>
+		{#snippet icon()}🗎{/snippet}
+		<span>More info</span>
+	</Contextmenu_Entry>
 	<!-- TODO maybe show disabled? -->
 	{#if file.contents !== null}
 		<Contextmenu_Entry run={() => void navigator.clipboard.writeText(file.contents!)}>

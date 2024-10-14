@@ -16,7 +16,7 @@
 
 	const {agent}: Props = $props();
 
-	let show_help = $state(false);
+	let show_more = $state(false);
 
 	const components: Record<typeof view_with, Component<{agent: Agent}>> = {
 		summary: Agent_Summary,
@@ -37,12 +37,12 @@
 	{/if} -->
 </div>
 
-{#if show_help}
-	<Dialog onclose={() => (show_help = false)}>
+{#if show_more}
+	<Dialog onclose={() => (show_more = false)}>
 		<!-- TODO expand width, might need to change `Dialog` -->
 		<div class="bg p_md radius_sm width_md">
 			<Agent_Info {agent} />
-			<button type="button" onclick={() => (show_help = false)}>close</button>
+			<button type="button" onclick={() => (show_more = false)}>close</button>
 		</div>
 	</Dialog>
 {/if}
@@ -51,7 +51,7 @@
 	<!-- TODO maybe show disabled? -->
 	<Contextmenu_Entry
 		run={() => {
-			show_help = true;
+			show_more = true;
 		}}
 	>
 		{#snippet icon()}🪄{/snippet}

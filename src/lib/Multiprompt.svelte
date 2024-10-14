@@ -34,7 +34,8 @@
 		<Agent_View {agent} />
 	{/each}
 </div>
-<textarea bind:this={textarea_el} placeholder="send prompt" bind:value></textarea>
+<!-- TODO instead of a `"prompt"` placeholder show a contextmenu with recent history onfocus -->
+<textarea bind:this={textarea_el} placeholder="prompt" bind:value></textarea>
 <Pending_Button
 	{pending}
 	onclick={() => {
@@ -45,5 +46,5 @@
 		void onsubmit();
 	}}
 >
-	send prompt
+	⚞ send prompt
 </Pending_Button>
