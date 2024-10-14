@@ -1,0 +1,18 @@
+{
+	"request": {
+		"type": "send_prompt",
+		"agent_name": "gemini",
+		"text": "prompt we are"
+	},
+	"response": {
+		"type": "prompt_response",
+		"agent_name": "gemini",
+		"text": "prompt we are",
+		"data": {
+			"type": "google",
+			"value": {
+				"placeholder": "TODO"
+			}
+		}
+	}
+}

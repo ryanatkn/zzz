@@ -14,13 +14,15 @@
 <p>user: {prompt_response.text}</p>
 <p>{agent.title}:</p>
 <ul class="content-list">
-	{#each prompt_response.data.content as item}
-		<li class="content-item">
-			{#if item.type === 'text'}
-				{item.text}
-			{:else if item.type === 'tool_use'}
-				used tool {item.name} - {item.input} - {item.id}
-			{/if}
-		</li>
-	{/each}
+	{#if prompt_response.data.type === 'anthropic'}
+		{#each prompt_response.data.value.content as item (item)}
+			<li class="content-item">
+				{#if item.type === 'text'}
+					{item.text}
+				{:else if item.type === 'tool_use'}
+					used tool {item.name} - {item.input} - {item.id}
+				{/if}
+			</li>
+		{/each}
+	{/if}
 </ul>

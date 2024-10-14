@@ -1,0 +1,18 @@
+{
+	"request": {
+		"type": "send_prompt",
+		"agent_name": "chatgpt",
+		"text": "prompt we are"
+	},
+	"response": {
+		"type": "prompt_response",
+		"agent_name": "chatgpt",
+		"text": "prompt we are",
+		"data": {
+			"type": "openai",
+			"value": {
+				"placeholder": "TODO"
+			}
+		}
+	}
+}

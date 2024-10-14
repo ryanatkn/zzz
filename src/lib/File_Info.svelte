@@ -16,7 +16,7 @@
 	const dependents = $derived(Array.from(file.dependents.values()));
 </script>
 
-<div class="size_xl">{to_base_path(file.id)}</div>
+<div class="row size_xl"><span class="size_xl3 mr_md">🗎</span> {to_base_path(file.id)}</div>
 
 <p>
 	deps (

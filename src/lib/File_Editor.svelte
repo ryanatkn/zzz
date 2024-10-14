@@ -19,7 +19,7 @@
 	let show_dialog = $state(false);
 </script>
 
-<button type="button">{to_base_path(file.id)}</button>
+<div class="row size_xl"><span class="size_xl3 mr_md">🗎</span> {to_base_path(file.id)}</div>
 
 deps ({dependencies.length} dependencies, {dependents.length} dependents)
 <h2>dependencies</h2>

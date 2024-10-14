@@ -1,0 +1,33 @@
+{
+	"request": {
+		"type": "send_prompt",
+		"agent_name": "claude",
+		"text": "prompt we are"
+	},
+	"response": {
+		"type": "prompt_response",
+		"agent_name": "claude",
+		"text": "prompt we are",
+		"data": {
+			"type": "anthropic",
+			"value": {
+				"id": "msg_01AiwSSuzxhRHW2ytQfnun3K",
+				"type": "message",
+				"role": "assistant",
+				"model": "claude-3-5-sonnet-20240620",
+				"content": [
+					{
+						"type": "text",
+						"text": "We're discussing prompts or instructions given to AI."
+					}
+				],
+				"stop_reason": "end_turn",
+				"stop_sequence": null,
+				"usage": {
+					"input_tokens": 24,
+					"output_tokens": 14
+				}
+			}
+		}
+	}
+}

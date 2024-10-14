@@ -24,7 +24,11 @@
 
 	// TODO hacky
 	const content = $derived(
-		prompt_response.data.content.map((c) => (c.type === 'text' ? c.text : c.name)).join('\n\n'),
+		prompt_response.data.type === 'anthropic'
+			? prompt_response.data.value.content
+					.map((c) => (c.type === 'text' ? c.text : c.name))
+					.join('\n\n')
+			: '',
 	);
 </script>
 
@@ -49,10 +53,12 @@
 
 {#snippet contextmenu_entries()}
 	<!-- TODO maybe show disabled? -->
-	<Contextmenu_Entry run={() => void navigator.clipboard.writeText(content)}>
-		{#snippet icon()}📋{/snippet}
-		<span>Copy response text ({content.length} chars)</span>
-	</Contextmenu_Entry>
+	{#if content}
+		<Contextmenu_Entry run={() => void navigator.clipboard.writeText(content)}>
+			{#snippet icon()}📋{/snippet}
+			<span>Copy response text ({content.length} chars)</span>
+		</Contextmenu_Entry>
+	{/if}
 	<Contextmenu_Entry run={() => void navigator.clipboard.writeText(prompt_response.text)}>
 		{#snippet icon()}📋{/snippet}
 		<span>Copy prompt text ({prompt_response.text.length} chars)</span>
