@@ -2,12 +2,12 @@
 	"request": {
 		"type": "send_prompt",
 		"agent_name": "chatgpt",
-		"text": "prompt we are"
+		"text": "once upon two times"
 	},
 	"response": {
 		"type": "prompt_response",
 		"agent_name": "chatgpt",
-		"text": "prompt we are",
+		"text": "once upon two times",
 		"data": {
 			"type": "openai",
 			"value": {

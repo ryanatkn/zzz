@@ -52,9 +52,11 @@ deps ({dependencies.length} dependencies, {dependents.length} dependents)
 
 {#if show_dialog}
 	<Dialog onclose={() => (show_dialog = false)}>
-		<h2>dialog</h2>
-		<button type="button" onclick={() => (show_dialog = false)}>close</button>
-		{@render file_contents()}
+		<div class="bg">
+			<h2>dialog</h2>
+			<button type="button" onclick={() => (show_dialog = false)}>close</button>
+			{@render file_contents()}
+		</div>
 	</Dialog>
 {/if}
 
