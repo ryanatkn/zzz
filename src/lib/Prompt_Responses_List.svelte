@@ -2,12 +2,12 @@
 	import type {SvelteMap} from 'svelte/reactivity';
 
 	import Prompt_Response_View from '$lib/Prompt_Response_View.svelte';
-	import type {Prompt_Response_Message} from '$lib/zzz_message.js';
+	import type {Receive_Prompt_Message} from '$lib/zzz_message.js';
 	import type {Agent} from '$lib/agent.svelte.js';
 
 	interface Props {
 		agent: Agent;
-		prompt_responses: SvelteMap<string, Prompt_Response_Message>;
+		prompt_responses: SvelteMap<string, Receive_Prompt_Message>;
 	}
 
 	const {agent, prompt_responses}: Props = $props();

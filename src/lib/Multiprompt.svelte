@@ -2,7 +2,7 @@
 	import Pending_Button from '@ryanatkn/fuz/Pending_Button.svelte';
 
 	import {zzz_context} from '$lib/zzz.svelte.js';
-	import Prompt_Responses_List from '$lib/Prompt_Responses_List.svelte';
+	import Agent_View from '$lib/Agent_View.svelte';
 
 	interface Props {}
 
@@ -16,24 +16,25 @@
 
 	let value = $state('');
 
-	let textarea_el: HTMLTextAreaElement | undefined;
+	let textarea_el: HTMLTextAreaElement | undefined = $state();
 
 	const onsubmit = async () => {
 		const text = value;
 		pending = true;
-		// TODO BLOCK create a prompt locally that doesn't have its response yet
+		// TODO BLOCK create an object locally that doesn't have its response yet, has the request
+		// use its toJSON in the server
 		await zzz.send_prompt(value);
 		pending = false;
 		if (text === value) value = '';
 	};
 </script>
 
-{#each agents.values() as agent (agent)}
-	<!-- TODO pass a zap? -->
-	<textarea bind:this={textarea_el} placeholder="prompt" bind:value></textarea>
-
-	<Prompt_Responses_List {agent} prompt_responses={zzz.prompt_responses} />
-{/each}
+<div class="w_100 flex mb_lg">
+	{#each agents.values() as agent (agent)}
+		<Agent_View {agent} />
+	{/each}
+</div>
+<textarea bind:this={textarea_el} placeholder="send prompt" bind:value></textarea>
 <Pending_Button
 	{pending}
 	onclick={() => {

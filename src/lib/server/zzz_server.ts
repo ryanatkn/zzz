@@ -4,7 +4,8 @@ import {Filer, type Cleanup_Watch} from '@ryanatkn/gro/filer.js';
 import {SECRET_ANTHROPIC_API_KEY} from '$env/static/private';
 import {writeFileSync} from 'node:fs';
 
-import type {Client_Message, Prompt_Response_Message, Server_Message} from '$lib/zzz_message.js';
+import type {Client_Message, Receive_Prompt_Message, Server_Message} from '$lib/zzz_message.js';
+import type {Prompt_Json} from '$lib/prompt.svelte.js';
 
 // SECRET_ANTHROPIC_API_KEY
 // SECRET_OPENAI_API_KEY
@@ -46,11 +47,11 @@ export class Zzz_Server {
 	}
 
 	// TODO add an abstraction here, so the server isn't concerned with message content/types
-	async receive(message: Client_Message): Promise<Server_Message | null> {
-		console.log(`[zzz_server.receive] message`, message, message.type === 'load_session');
-		switch (message.type) {
+	async receive(request: Client_Message): Promise<Server_Message | null> {
+		console.log(`[zzz_server.receive] message`, request, request.type === 'load_session');
+		switch (request.type) {
 			case 'echo': {
-				return message;
+				return request;
 			}
 			case 'load_session': {
 				return {
@@ -59,7 +60,7 @@ export class Zzz_Server {
 				};
 			}
 			case 'send_prompt': {
-				const {text} = message;
+				const {text} = request;
 				console.log(`texting Claude`, text);
 				const data = await anthropic.messages.create({
 					model: 'claude-3-5-sonnet-20240620',
@@ -73,19 +74,20 @@ export class Zzz_Server {
 
 				// TODO refactor to support multiple storage backends (starting with fs+postgres), maybe something like:
 				// await storage.save_prompt_response(r);
-				const response: Prompt_Response_Message = {
+				const response: Receive_Prompt_Message = {
 					type: 'prompt_response',
-					agent_name: message.agent_name,
+					agent_name: request.agent_name,
 					text,
 					data,
 				};
 				const path = `./src/lib/prompts/${data.id}__${data.model}.json`;
-				writeFileSync(path, JSON.stringify({message, response}, null, '\t'));
+				const json: Prompt_Json = {request, response};
+				writeFileSync(path, JSON.stringify(json, null, '\t'));
 
 				return response; // TODO @many sending the text again is wasteful, need ids
 			}
 			default:
-				throw new Unreachable_Error(message);
+				throw new Unreachable_Error(request);
 		}
 	}
 

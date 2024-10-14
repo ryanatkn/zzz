@@ -115,6 +115,10 @@
       "svelte": "./dist/File_View.svelte",
       "default": "./dist/File_View.svelte"
     },
+    "./file.svelte.js": {
+      "types": "./dist/file.svelte.d.ts",
+      "default": "./dist/file.svelte.js"
+    },
     "./Hud_Root.svelte": {
       "types": "./dist/Hud_Root.svelte.d.ts",
       "svelte": "./dist/Hud_Root.svelte",
@@ -123,6 +127,21 @@
     "./hud.svelte.js": {
       "types": "./dist/hud.svelte.d.ts",
       "default": "./dist/hud.svelte.js"
+    },
+    "./Message_Info.svelte": {
+      "types": "./dist/Message_Info.svelte.d.ts",
+      "svelte": "./dist/Message_Info.svelte",
+      "default": "./dist/Message_Info.svelte"
+    },
+    "./Message_Summary.svelte": {
+      "types": "./dist/Message_Summary.svelte.d.ts",
+      "svelte": "./dist/Message_Summary.svelte",
+      "default": "./dist/Message_Summary.svelte"
+    },
+    "./Message_View.svelte": {
+      "types": "./dist/Message_View.svelte.d.ts",
+      "svelte": "./dist/Message_View.svelte",
+      "default": "./dist/Message_View.svelte"
     },
     "./Multiprompt.svelte": {
       "types": "./dist/Multiprompt.svelte.d.ts",
@@ -133,10 +152,10 @@
       "types": "./dist/path.d.ts",
       "default": "./dist/path.js"
     },
-    "./Prompt_Form.svelte": {
-      "types": "./dist/Prompt_Form.svelte.d.ts",
-      "svelte": "./dist/Prompt_Form.svelte",
-      "default": "./dist/Prompt_Form.svelte"
+    "./Prompt_Agent_Form.svelte": {
+      "types": "./dist/Prompt_Agent_Form.svelte.d.ts",
+      "svelte": "./dist/Prompt_Agent_Form.svelte",
+      "default": "./dist/Prompt_Agent_Form.svelte"
     },
     "./Prompt_Response_Info.svelte": {
       "types": "./dist/Prompt_Response_Info.svelte.d.ts",
@@ -158,11 +177,9 @@
       "svelte": "./dist/Prompt_Responses_List.svelte",
       "default": "./dist/Prompt_Responses_List.svelte"
     },
-    "./prompts/msg_018oXWH1pfkBuEbEfcyi3s1U__claude-3-5-sonnet-20240620.json": {
-      "default": "./dist/prompts/msg_018oXWH1pfkBuEbEfcyi3s1U__claude-3-5-sonnet-20240620.json"
-    },
-    "./prompts/msg_01CvaZVuahZndFryBpwCHXdv__claude-3-5-sonnet-20240620.json": {
-      "default": "./dist/prompts/msg_01CvaZVuahZndFryBpwCHXdv__claude-3-5-sonnet-20240620.json"
+    "./prompt.svelte.js": {
+      "types": "./dist/prompt.svelte.d.ts",
+      "default": "./dist/prompt.svelte.js"
     },
     "./server/server.js": {
       "types": "./dist/server/server.d.ts",

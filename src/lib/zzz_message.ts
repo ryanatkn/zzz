@@ -9,7 +9,7 @@ export type Server_Message =
 	| Echo_Message
 	| Loaded_Session_Message
 	| Filer_Change_Message
-	| Prompt_Response_Message;
+	| Receive_Prompt_Message;
 
 export interface Base_Message {
 	type: string;
@@ -59,7 +59,7 @@ export interface Send_Prompt_Message extends Base_Message {
 /**
  * @server
  */
-export interface Prompt_Response_Message extends Base_Message {
+export interface Receive_Prompt_Message extends Base_Message {
 	type: 'prompt_response';
 	agent_name: string;
 	text: string; // TODO @many sending the text again is wasteful, need ids

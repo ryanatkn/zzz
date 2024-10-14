@@ -98,22 +98,38 @@ export const package_json = {
 			svelte: './dist/File_View.svelte',
 			default: './dist/File_View.svelte',
 		},
+		'./file.svelte.js': {types: './dist/file.svelte.d.ts', default: './dist/file.svelte.js'},
 		'./Hud_Root.svelte': {
 			types: './dist/Hud_Root.svelte.d.ts',
 			svelte: './dist/Hud_Root.svelte',
 			default: './dist/Hud_Root.svelte',
 		},
 		'./hud.svelte.js': {types: './dist/hud.svelte.d.ts', default: './dist/hud.svelte.js'},
+		'./Message_Info.svelte': {
+			types: './dist/Message_Info.svelte.d.ts',
+			svelte: './dist/Message_Info.svelte',
+			default: './dist/Message_Info.svelte',
+		},
+		'./Message_Summary.svelte': {
+			types: './dist/Message_Summary.svelte.d.ts',
+			svelte: './dist/Message_Summary.svelte',
+			default: './dist/Message_Summary.svelte',
+		},
+		'./Message_View.svelte': {
+			types: './dist/Message_View.svelte.d.ts',
+			svelte: './dist/Message_View.svelte',
+			default: './dist/Message_View.svelte',
+		},
 		'./Multiprompt.svelte': {
 			types: './dist/Multiprompt.svelte.d.ts',
 			svelte: './dist/Multiprompt.svelte',
 			default: './dist/Multiprompt.svelte',
 		},
 		'./path.js': {types: './dist/path.d.ts', default: './dist/path.js'},
-		'./Prompt_Form.svelte': {
-			types: './dist/Prompt_Form.svelte.d.ts',
-			svelte: './dist/Prompt_Form.svelte',
-			default: './dist/Prompt_Form.svelte',
+		'./Prompt_Agent_Form.svelte': {
+			types: './dist/Prompt_Agent_Form.svelte.d.ts',
+			svelte: './dist/Prompt_Agent_Form.svelte',
+			default: './dist/Prompt_Agent_Form.svelte',
 		},
 		'./Prompt_Response_Info.svelte': {
 			types: './dist/Prompt_Response_Info.svelte.d.ts',
@@ -135,12 +151,7 @@ export const package_json = {
 			svelte: './dist/Prompt_Responses_List.svelte',
 			default: './dist/Prompt_Responses_List.svelte',
 		},
-		'./prompts/msg_018oXWH1pfkBuEbEfcyi3s1U__claude-3-5-sonnet-20240620.json': {
-			default: './dist/prompts/msg_018oXWH1pfkBuEbEfcyi3s1U__claude-3-5-sonnet-20240620.json',
-		},
-		'./prompts/msg_01CvaZVuahZndFryBpwCHXdv__claude-3-5-sonnet-20240620.json': {
-			default: './dist/prompts/msg_01CvaZVuahZndFryBpwCHXdv__claude-3-5-sonnet-20240620.json',
-		},
+		'./prompt.svelte.js': {types: './dist/prompt.svelte.d.ts', default: './dist/prompt.svelte.js'},
 		'./server/server.js': {types: './dist/server/server.d.ts', default: './dist/server/server.js'},
 		'./server/zzz_server.js': {
 			types: './dist/server/zzz_server.d.ts',
@@ -185,25 +196,37 @@ export const src_json = {
 		'./File_List.svelte': {path: 'File_List.svelte', declarations: []},
 		'./File_Summary.svelte': {path: 'File_Summary.svelte', declarations: []},
 		'./File_View.svelte': {path: 'File_View.svelte', declarations: []},
+		'./file.svelte.js': {
+			path: 'file.svelte.ts',
+			declarations: [
+				{name: 'Source_File_Json', kind: 'type'},
+				{name: 'Prompt_Json', kind: 'type'},
+				{name: 'Prompt_Options', kind: 'type'},
+				{name: 'Prompt', kind: 'class'},
+			],
+		},
 		'./Hud_Root.svelte': {path: 'Hud_Root.svelte', declarations: []},
 		'./hud.svelte.js': {
 			path: 'hud.svelte.ts',
 			declarations: [{name: 'hud_context', kind: 'variable'}],
 		},
+		'./Message_Info.svelte': {path: 'Message_Info.svelte', declarations: []},
+		'./Message_Summary.svelte': {path: 'Message_Summary.svelte', declarations: []},
+		'./Message_View.svelte': {path: 'Message_View.svelte', declarations: []},
 		'./Multiprompt.svelte': {path: 'Multiprompt.svelte', declarations: []},
 		'./path.js': {path: 'path.ts', declarations: [{name: 'to_base_path', kind: 'function'}]},
-		'./Prompt_Form.svelte': {path: 'Prompt_Form.svelte', declarations: []},
+		'./Prompt_Agent_Form.svelte': {path: 'Prompt_Agent_Form.svelte', declarations: []},
 		'./Prompt_Response_Info.svelte': {path: 'Prompt_Response_Info.svelte', declarations: []},
 		'./Prompt_Response_Summary.svelte': {path: 'Prompt_Response_Summary.svelte', declarations: []},
 		'./Prompt_Response_View.svelte': {path: 'Prompt_Response_View.svelte', declarations: []},
 		'./Prompt_Responses_List.svelte': {path: 'Prompt_Responses_List.svelte', declarations: []},
-		'./prompts/msg_018oXWH1pfkBuEbEfcyi3s1U__claude-3-5-sonnet-20240620.json': {
-			path: 'prompts/msg_018oXWH1pfkBuEbEfcyi3s1U__claude-3-5-sonnet-20240620.json',
-			declarations: [],
-		},
-		'./prompts/msg_01CvaZVuahZndFryBpwCHXdv__claude-3-5-sonnet-20240620.json': {
-			path: 'prompts/msg_01CvaZVuahZndFryBpwCHXdv__claude-3-5-sonnet-20240620.json',
-			declarations: [],
+		'./prompt.svelte.js': {
+			path: 'prompt.svelte.ts',
+			declarations: [
+				{name: 'Prompt_Json', kind: 'type'},
+				{name: 'Prompt_Options', kind: 'type'},
+				{name: 'Prompt', kind: 'class'},
+			],
 		},
 		'./server/server.js': {path: 'server/server.ts', declarations: []},
 		'./server/zzz_server.js': {
@@ -239,7 +262,7 @@ export const src_json = {
 				{name: 'Loaded_Session_Message', kind: 'type'},
 				{name: 'Filer_Change_Message', kind: 'type'},
 				{name: 'Send_Prompt_Message', kind: 'type'},
-				{name: 'Prompt_Response_Message', kind: 'type'},
+				{name: 'Receive_Prompt_Message', kind: 'type'},
 			],
 		},
 		'./Zzz_Root.svelte': {path: 'Zzz_Root.svelte', declarations: []},

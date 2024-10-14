@@ -8,11 +8,7 @@ import {to_array} from '@ryanatkn/belt/array.js';
 
 import {Zzz_Data, type Zzz_Data_Json} from '$lib/zzz_data.svelte.js';
 import type {Zzz_Client} from '$lib/zzz_client.js';
-import type {
-	Echo_Message,
-	Filer_Change_Message,
-	Prompt_Response_Message,
-} from '$lib/zzz_message.js';
+import type {Echo_Message, Filer_Change_Message, Receive_Prompt_Message} from '$lib/zzz_message.js';
 import type {Agent} from '$lib/agent.svelte.js';
 
 export const zzz_context = create_context<Zzz>();
@@ -40,11 +36,11 @@ export class Zzz {
 
 	echos: Echo_Message[] = $state([]);
 
-	pending_prompts: SvelteMap<string, Deferred<Prompt_Response_Message>> = new SvelteMap();
+	pending_prompts: SvelteMap<string, Deferred<Receive_Prompt_Message>> = new SvelteMap();
 
-	prompt_responses: SvelteMap<string, Prompt_Response_Message> = new SvelteMap();
+	prompt_responses: SvelteMap<string, Receive_Prompt_Message> = new SvelteMap();
 
-	pending_prompts_by_agent: Map<Agent, Prompt_Response_Message[]> = $derived(
+	pending_prompts_by_agent: Map<Agent, Receive_Prompt_Message[]> = $derived(
 		new Map(
 			Array.from(this.agents.values()).map((agent) => [
 				agent,
@@ -70,14 +66,14 @@ export class Zzz {
 	async send_prompt(
 		text: string,
 		agent: Agent | Agent[] = Array.from(this.agents.values()),
-	): Promise<Prompt_Response_Message[]> {
+	): Promise<Receive_Prompt_Message[]> {
 		// TODO need ids, and then the response promise, tracking by text isn't robust to duplicates
 		const agents = to_array(agent);
 
 		const responses = await Promise.all(
 			Array.from(agents.values()).map(async (agent) => {
 				this.client.send({type: 'send_prompt', agent_name: agent.name, text});
-				const deferred = create_deferred<Prompt_Response_Message>();
+				const deferred = create_deferred<Receive_Prompt_Message>();
 				this.pending_prompts.set(text, deferred);
 				const response = await deferred.promise;
 				console.log(`prompt response`, response);
@@ -89,7 +85,7 @@ export class Zzz {
 		return responses;
 	}
 
-	receive_prompt_response(message: Prompt_Response_Message): void {
+	receive_prompt_response(message: Receive_Prompt_Message): void {
 		const deferred = this.pending_prompts.get(message.text);
 		if (!deferred) {
 			console.error('expected pending', message);

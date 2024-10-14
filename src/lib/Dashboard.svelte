@@ -16,7 +16,7 @@
 	// TODO
 </script>
 
-<section class="box width_md mx_auto p_md panel">
+<section class="box width_100 mx_auto p_md panel">
 	<section>
 		<button type="button" onclick={hello_server}>hello server</button>
 	</section>

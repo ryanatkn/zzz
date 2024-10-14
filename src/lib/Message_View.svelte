@@ -28,6 +28,7 @@
 	);
 </script>
 
+.
 <div class="file_view" use:contextmenu_action={contextmenu_entries}>
 	{#if view_with === 'summary'}
 		<Prompt_Response_Summary {agent} {prompt_response} />

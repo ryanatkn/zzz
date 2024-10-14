@@ -13,7 +13,7 @@
 
 	let value = $state('');
 
-	let textarea_el: HTMLTextAreaElement | undefined;
+	let textarea_el: HTMLTextAreaElement | undefined = $state();
 
 	// TODO connect `Claude` to the server data in `src/routes/gui/gui.server.svelte`
 </script>
