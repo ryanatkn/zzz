@@ -116,7 +116,8 @@ export class Zzz_Server {
 						throw new Unreachable_Error(agent_name);
 				}
 
-				// don't need to wait for this to finish, the file event is now separate
+				// don't need to wait for this to finish,
+				// the expected file event is now independent of the request
 				void save_response(request, response);
 
 				return response; // TODO @many sending the text again is wasteful, need ids

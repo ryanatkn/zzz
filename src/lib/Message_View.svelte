@@ -21,7 +21,7 @@
 </script>
 
 .
-<div class="file_view" use:contextmenu_action={contextmenu_entries}>
+<div class="message_view" use:contextmenu_action={contextmenu_entries}>
 	{#if view_with === 'summary'}
 		<Message_Summary {message} />
 	{:else}
