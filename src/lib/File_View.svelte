@@ -3,6 +3,7 @@
 	import Contextmenu_Entry from '@ryanatkn/fuz/Contextmenu_Entry.svelte';
 	import type {Source_File} from '@ryanatkn/gro/filer.js';
 	import {contextmenu_action} from '@ryanatkn/fuz/contextmenu_state.svelte.js';
+	import {slide} from 'svelte/transition';
 
 	import File_Editor from '$lib/File_Editor.svelte';
 	import File_Info from '$lib/File_Info.svelte';
@@ -31,7 +32,11 @@
 </script>
 
 <div class="file_view" use:contextmenu_action={contextmenu_entries}>
-	<File_View_Type_Component {file} />
+	{#key File_View_Type_Component}
+		<div transition:slide>
+			<File_View_Type_Component {file} />
+		</div>
+	{/key}
 </div>
 
 {#snippet contextmenu_entries()}
