@@ -3,6 +3,7 @@
 	import Contextmenu_Submenu from '@ryanatkn/fuz/Contextmenu_Submenu.svelte';
 	import Contextmenu_Entry from '@ryanatkn/fuz/Contextmenu_Entry.svelte';
 	import {contextmenu_action} from '@ryanatkn/fuz/contextmenu_state.svelte.js';
+	import {slide} from 'svelte/transition';
 
 	import Message_Info from '$lib/Message_Info.svelte';
 	import Message_Summary from '$lib/Message_Summary.svelte';
@@ -18,15 +19,17 @@
 
 	// TODO refactor
 	let view_with: 'summary' | 'info' = $state('summary');
+
+	const Message_View_Component = $derived(view_with === 'summary' ? Message_Summary : Message_Info);
 </script>
 
 .
 <div class="message_view" use:contextmenu_action={contextmenu_entries}>
-	{#if view_with === 'summary'}
-		<Message_Summary {message} />
-	{:else}
-		<Message_Info {message} />
-	{/if}
+	{#key Message_View_Component}
+		<div transition:slide>
+			<Message_View_Component {message} />
+		</div>
+	{/key}
 </div>
 
 {#if show_more}

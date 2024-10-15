@@ -6,22 +6,20 @@
 
 	import Themed from '@ryanatkn/fuz/Themed.svelte';
 	import type {Snippet} from 'svelte';
-	import Dialog from '@ryanatkn/fuz/Dialog.svelte';
 	import Contextmenu_Root from '@ryanatkn/fuz/Contextmenu_Root.svelte';
 	import {contextmenu_action} from '@ryanatkn/fuz/contextmenu_state.svelte.js';
 	import {parse_package_meta} from '@ryanatkn/gro/package_meta.js';
 	import * as devalue from 'devalue';
 	import {create_deferred, type Deferred} from '@ryanatkn/belt/async.js';
 	import {browser} from '$app/environment';
+	import {page} from '$app/stores';
+	import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 
-	import Settings from '$routes/Settings.svelte';
 	import {Zzz} from '$lib/zzz.svelte.js';
 	import Zzz_Root from '$lib/Zzz_Root.svelte';
 	import {pkg_context} from '$routes/pkg.js';
 	import {package_json, src_json} from '$routes/package.js';
 	import {Zzz_Client} from '$lib/zzz_client.js';
-	import {page} from '$app/stores';
-	import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 	import {Agent} from '$lib/agent.svelte.js';
 
 	interface Props {
@@ -145,13 +143,6 @@
 	<Themed>
 		<Contextmenu_Root>
 			{@render children()}
-			{#if zzz.data.show_main_menu}
-				<Dialog onclose={() => (zzz.data.show_main_menu = false)}>
-					<div class="pane">
-						<Settings />
-					</div>
-				</Dialog>
-			{/if}
 		</Contextmenu_Root>
 	</Themed>
 </Zzz_Root>

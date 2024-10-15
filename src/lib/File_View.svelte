@@ -21,7 +21,7 @@
 	let view_with_prev: File_View_Type = $state('summary');
 	let view_with: File_View_Type = $state('summary'); // TODO `selection` class pattern instead? `new Selection('summary')`
 
-	const File_View_Type_Component = $derived(
+	const File_View_Component = $derived(
 		view_with === 'summary' ? File_Summary : view_with === 'info' ? File_Info : File_Editor,
 	);
 
@@ -32,9 +32,9 @@
 </script>
 
 <div class="file_view" use:contextmenu_action={contextmenu_entries}>
-	{#key File_View_Type_Component}
+	{#key File_View_Component}
 		<div transition:slide>
-			<File_View_Type_Component {file} />
+			<File_View_Component {file} />
 		</div>
 	{/key}
 </div>

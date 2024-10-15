@@ -1,9 +1,0 @@
-{
-	"request": {"type": "send_prompt", "agent_name": "chatgpt", "text": "I need a tool"},
-	"response": {
-		"type": "prompt_response",
-		"agent_name": "chatgpt",
-		"text": "I need a tool",
-		"data": {"type": "openai", "value": {"placeholder": "TODO"}}
-	}
-}
