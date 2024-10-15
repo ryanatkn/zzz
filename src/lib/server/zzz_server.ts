@@ -3,6 +3,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import {Filer, type Cleanup_Watch} from '@ryanatkn/gro/filer.js';
 import {SECRET_ANTHROPIC_API_KEY} from '$env/static/private';
 import {writeFileSync} from 'node:fs';
+import {format_file} from '@ryanatkn/gro/format_file.js';
 
 import type {
 	Client_Message,
@@ -115,7 +116,9 @@ export class Zzz_Server {
 						throw new Unreachable_Error(agent_name);
 				}
 
-				save_response(request, response);
+				// don't need to wait for this to finish, the file event is now separate
+				void save_response(request, response);
+
 				return response; // TODO @many sending the text again is wasteful, need ids
 			}
 			case 'update_file': {
@@ -137,7 +140,10 @@ export class Zzz_Server {
 
 // TODO refactor to support multiple storage backends (starting with fs+postgres), maybe something like
 // await storage.save_prompt_response(r);
-const save_response = (request: Send_Prompt_Message, response: Receive_Prompt_Message): void => {
+const save_response = async (
+	request: Send_Prompt_Message,
+	response: Receive_Prompt_Message,
+): Promise<void> => {
 	let filename;
 	switch (response.data.type) {
 		case 'anthropic':
@@ -157,5 +163,5 @@ const save_response = (request: Send_Prompt_Message, response: Receive_Prompt_Me
 
 	const json: Prompt_Json = {request, response};
 
-	writeFileSync(path, JSON.stringify(json, null, '\t'));
+	writeFileSync(path, await format_file(JSON.stringify(json), {parser: 'json'}));
 };
