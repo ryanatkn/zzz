@@ -93,6 +93,11 @@ export const package_json = {
 			svelte: './dist/Dashboard.svelte',
 			default: './dist/Dashboard.svelte',
 		},
+		'./Echo_Form.svelte': {
+			types: './dist/Echo_Form.svelte.d.ts',
+			svelte: './dist/Echo_Form.svelte',
+			default: './dist/Echo_Form.svelte',
+		},
 		'./File_Editor.svelte': {
 			types: './dist/File_Editor.svelte.d.ts',
 			svelte: './dist/File_Editor.svelte',
@@ -119,6 +124,11 @@ export const package_json = {
 			default: './dist/File_View.svelte',
 		},
 		'./file.svelte.js': {types: './dist/file.svelte.d.ts', default: './dist/file.svelte.js'},
+		'./Hud_Dialog.svelte': {
+			types: './dist/Hud_Dialog.svelte.d.ts',
+			svelte: './dist/Hud_Dialog.svelte',
+			default: './dist/Hud_Dialog.svelte',
+		},
 		'./Hud_Root.svelte': {
 			types: './dist/Hud_Root.svelte.d.ts',
 			svelte: './dist/Hud_Root.svelte',
@@ -173,21 +183,25 @@ export const package_json = {
 			default: './dist/Prompt_Responses_List.svelte',
 		},
 		'./prompt.svelte.js': {types: './dist/prompt.svelte.d.ts', default: './dist/prompt.svelte.js'},
-		'./prompts/anthropic_msg_01AiwSSuzxhRHW2ytQfnun3K__claude-3-5-sonnet-20240620.json': {
+		'./prompts/anthropic_msg_015Suvdq6WkFBCQTctHgEMZ9__claude-3-5-sonnet-20240620.json': {
 			default:
-				'./dist/prompts/anthropic_msg_01AiwSSuzxhRHW2ytQfnun3K__claude-3-5-sonnet-20240620.json',
+				'./dist/prompts/anthropic_msg_015Suvdq6WkFBCQTctHgEMZ9__claude-3-5-sonnet-20240620.json',
 		},
-		'./prompts/anthropic_msg_01CoCU1DaTXHrJ8vtFyUenNf__claude-3-5-sonnet-20240620.json': {
+		'./prompts/anthropic_msg_018tRhfRN6RiXyY4P6zdFEiL__claude-3-5-sonnet-20240620.json': {
 			default:
-				'./dist/prompts/anthropic_msg_01CoCU1DaTXHrJ8vtFyUenNf__claude-3-5-sonnet-20240620.json',
+				'./dist/prompts/anthropic_msg_018tRhfRN6RiXyY4P6zdFEiL__claude-3-5-sonnet-20240620.json',
 		},
-		'./prompts/anthropic_msg_01EeCuiJpb5NHpeCvBA9KA2b__claude-3-5-sonnet-20240620.json': {
+		'./prompts/anthropic_msg_01QJqKwX24Ec5JGVzeKxzMXA__claude-3-5-sonnet-20240620.json': {
 			default:
-				'./dist/prompts/anthropic_msg_01EeCuiJpb5NHpeCvBA9KA2b__claude-3-5-sonnet-20240620.json',
+				'./dist/prompts/anthropic_msg_01QJqKwX24Ec5JGVzeKxzMXA__claude-3-5-sonnet-20240620.json',
 		},
-		'./prompts/anthropic_msg_01KNDFvqfzePQRGSRWp39APQ__claude-3-5-sonnet-20240620.json': {
+		'./prompts/anthropic_msg_01R59BZaL6k1VeXdjQCMdqyE__claude-3-5-sonnet-20240620.json': {
 			default:
-				'./dist/prompts/anthropic_msg_01KNDFvqfzePQRGSRWp39APQ__claude-3-5-sonnet-20240620.json',
+				'./dist/prompts/anthropic_msg_01R59BZaL6k1VeXdjQCMdqyE__claude-3-5-sonnet-20240620.json',
+		},
+		'./prompts/anthropic_msg_01UZL7XY9SpZbS3dML8kFeNM__claude-3-5-sonnet-20240620.json': {
+			default:
+				'./dist/prompts/anthropic_msg_01UZL7XY9SpZbS3dML8kFeNM__claude-3-5-sonnet-20240620.json',
 		},
 		'./prompts/google_TODO.json': {default: './dist/prompts/google_TODO.json'},
 		'./prompts/openai_TODO.json': {default: './dist/prompts/openai_TODO.json'},
@@ -195,6 +209,11 @@ export const package_json = {
 		'./server/zzz_server.js': {
 			types: './dist/server/zzz_server.d.ts',
 			default: './dist/server/zzz_server.js',
+		},
+		'./Settings.svelte': {
+			types: './dist/Settings.svelte.d.ts',
+			svelte: './dist/Settings.svelte',
+			default: './dist/Settings.svelte',
 		},
 		'./zzz_client.js': {types: './dist/zzz_client.d.ts', default: './dist/zzz_client.js'},
 		'./zzz_data.svelte.js': {
@@ -235,6 +254,7 @@ export const src_json = {
 		},
 		'./Control_Panel.svelte': {path: 'Control_Panel.svelte', declarations: []},
 		'./Dashboard.svelte': {path: 'Dashboard.svelte', declarations: []},
+		'./Echo_Form.svelte': {path: 'Echo_Form.svelte', declarations: []},
 		'./File_Editor.svelte': {path: 'File_Editor.svelte', declarations: []},
 		'./File_Info.svelte': {path: 'File_Info.svelte', declarations: []},
 		'./File_List.svelte': {path: 'File_List.svelte', declarations: []},
@@ -249,6 +269,7 @@ export const src_json = {
 				{name: 'Prompt', kind: 'class'},
 			],
 		},
+		'./Hud_Dialog.svelte': {path: 'Hud_Dialog.svelte', declarations: []},
 		'./Hud_Root.svelte': {path: 'Hud_Root.svelte', declarations: []},
 		'./hud.svelte.js': {
 			path: 'hud.svelte.ts',
@@ -279,20 +300,24 @@ export const src_json = {
 				{name: 'Prompt', kind: 'class'},
 			],
 		},
-		'./prompts/anthropic_msg_01AiwSSuzxhRHW2ytQfnun3K__claude-3-5-sonnet-20240620.json': {
-			path: 'prompts/anthropic_msg_01AiwSSuzxhRHW2ytQfnun3K__claude-3-5-sonnet-20240620.json',
+		'./prompts/anthropic_msg_015Suvdq6WkFBCQTctHgEMZ9__claude-3-5-sonnet-20240620.json': {
+			path: 'prompts/anthropic_msg_015Suvdq6WkFBCQTctHgEMZ9__claude-3-5-sonnet-20240620.json',
 			declarations: [],
 		},
-		'./prompts/anthropic_msg_01CoCU1DaTXHrJ8vtFyUenNf__claude-3-5-sonnet-20240620.json': {
-			path: 'prompts/anthropic_msg_01CoCU1DaTXHrJ8vtFyUenNf__claude-3-5-sonnet-20240620.json',
+		'./prompts/anthropic_msg_018tRhfRN6RiXyY4P6zdFEiL__claude-3-5-sonnet-20240620.json': {
+			path: 'prompts/anthropic_msg_018tRhfRN6RiXyY4P6zdFEiL__claude-3-5-sonnet-20240620.json',
 			declarations: [],
 		},
-		'./prompts/anthropic_msg_01EeCuiJpb5NHpeCvBA9KA2b__claude-3-5-sonnet-20240620.json': {
-			path: 'prompts/anthropic_msg_01EeCuiJpb5NHpeCvBA9KA2b__claude-3-5-sonnet-20240620.json',
+		'./prompts/anthropic_msg_01QJqKwX24Ec5JGVzeKxzMXA__claude-3-5-sonnet-20240620.json': {
+			path: 'prompts/anthropic_msg_01QJqKwX24Ec5JGVzeKxzMXA__claude-3-5-sonnet-20240620.json',
 			declarations: [],
 		},
-		'./prompts/anthropic_msg_01KNDFvqfzePQRGSRWp39APQ__claude-3-5-sonnet-20240620.json': {
-			path: 'prompts/anthropic_msg_01KNDFvqfzePQRGSRWp39APQ__claude-3-5-sonnet-20240620.json',
+		'./prompts/anthropic_msg_01R59BZaL6k1VeXdjQCMdqyE__claude-3-5-sonnet-20240620.json': {
+			path: 'prompts/anthropic_msg_01R59BZaL6k1VeXdjQCMdqyE__claude-3-5-sonnet-20240620.json',
+			declarations: [],
+		},
+		'./prompts/anthropic_msg_01UZL7XY9SpZbS3dML8kFeNM__claude-3-5-sonnet-20240620.json': {
+			path: 'prompts/anthropic_msg_01UZL7XY9SpZbS3dML8kFeNM__claude-3-5-sonnet-20240620.json',
 			declarations: [],
 		},
 		'./prompts/google_TODO.json': {path: 'prompts/google_TODO.json', declarations: []},
@@ -305,6 +330,7 @@ export const src_json = {
 				{name: 'Zzz_Server', kind: 'class'},
 			],
 		},
+		'./Settings.svelte': {path: 'Settings.svelte', declarations: []},
 		'./zzz_client.js': {
 			path: 'zzz_client.ts',
 			declarations: [

@@ -48,6 +48,8 @@ export class Zzz {
 			]),
 		),
 	);
+
+	// TODO @many need ids for req/res
 	// TODO BLOCK store state granularly for each agent
 
 	constructor(options: Zzz_Options) {
@@ -73,22 +75,33 @@ export class Zzz {
 		const responses = await Promise.all(
 			Array.from(agents.values()).map(async (agent) => {
 				this.client.send({type: 'send_prompt', agent_name: agent.name, text});
-				const deferred = create_deferred<Receive_Prompt_Message>();
-				this.pending_prompts.set(text, deferred);
-				const response = await deferred.promise;
-				console.log(`prompt response`, response);
-				this.pending_prompts.delete(text);
-				return response;
+
+				// TODO @many need ids for req/res
+				if (agent.name === 'claude') {
+					const deferred = create_deferred<Receive_Prompt_Message>();
+					this.pending_prompts.set(text, deferred);
+					const response = await deferred.promise;
+					console.log(`prompt response`, response);
+					this.pending_prompts.delete(text); // TODO @many need ids for req/res
+					return response;
+				}
+
+				return null;
 			}),
 		);
 
-		return responses;
+		return responses.filter((r) => !!r); // TODO @many need ids for req/res
 	}
 
 	receive_prompt_response(message: Receive_Prompt_Message): void {
 		const deferred = this.pending_prompts.get(message.text);
 		if (!deferred) {
 			console.error('expected pending', message);
+			return;
+		}
+		if (message.data.type !== 'anthropic') {
+			// TODO @many need ids for req/res
+			console.error('TODO ignoring all but anthropic messages', message);
 			return;
 		}
 		this.prompt_responses.set(message.text, message);

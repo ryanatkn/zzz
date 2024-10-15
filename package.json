@@ -110,6 +110,11 @@
       "svelte": "./dist/Dashboard.svelte",
       "default": "./dist/Dashboard.svelte"
     },
+    "./Echo_Form.svelte": {
+      "types": "./dist/Echo_Form.svelte.d.ts",
+      "svelte": "./dist/Echo_Form.svelte",
+      "default": "./dist/Echo_Form.svelte"
+    },
     "./File_Editor.svelte": {
       "types": "./dist/File_Editor.svelte.d.ts",
       "svelte": "./dist/File_Editor.svelte",
@@ -138,6 +143,11 @@
     "./file.svelte.js": {
       "types": "./dist/file.svelte.d.ts",
       "default": "./dist/file.svelte.js"
+    },
+    "./Hud_Dialog.svelte": {
+      "types": "./dist/Hud_Dialog.svelte.d.ts",
+      "svelte": "./dist/Hud_Dialog.svelte",
+      "default": "./dist/Hud_Dialog.svelte"
     },
     "./Hud_Root.svelte": {
       "types": "./dist/Hud_Root.svelte.d.ts",
@@ -205,17 +215,20 @@
       "types": "./dist/prompt.svelte.d.ts",
       "default": "./dist/prompt.svelte.js"
     },
-    "./prompts/anthropic_msg_01AiwSSuzxhRHW2ytQfnun3K__claude-3-5-sonnet-20240620.json": {
-      "default": "./dist/prompts/anthropic_msg_01AiwSSuzxhRHW2ytQfnun3K__claude-3-5-sonnet-20240620.json"
+    "./prompts/anthropic_msg_015Suvdq6WkFBCQTctHgEMZ9__claude-3-5-sonnet-20240620.json": {
+      "default": "./dist/prompts/anthropic_msg_015Suvdq6WkFBCQTctHgEMZ9__claude-3-5-sonnet-20240620.json"
     },
-    "./prompts/anthropic_msg_01CoCU1DaTXHrJ8vtFyUenNf__claude-3-5-sonnet-20240620.json": {
-      "default": "./dist/prompts/anthropic_msg_01CoCU1DaTXHrJ8vtFyUenNf__claude-3-5-sonnet-20240620.json"
+    "./prompts/anthropic_msg_018tRhfRN6RiXyY4P6zdFEiL__claude-3-5-sonnet-20240620.json": {
+      "default": "./dist/prompts/anthropic_msg_018tRhfRN6RiXyY4P6zdFEiL__claude-3-5-sonnet-20240620.json"
     },
-    "./prompts/anthropic_msg_01EeCuiJpb5NHpeCvBA9KA2b__claude-3-5-sonnet-20240620.json": {
-      "default": "./dist/prompts/anthropic_msg_01EeCuiJpb5NHpeCvBA9KA2b__claude-3-5-sonnet-20240620.json"
+    "./prompts/anthropic_msg_01QJqKwX24Ec5JGVzeKxzMXA__claude-3-5-sonnet-20240620.json": {
+      "default": "./dist/prompts/anthropic_msg_01QJqKwX24Ec5JGVzeKxzMXA__claude-3-5-sonnet-20240620.json"
     },
-    "./prompts/anthropic_msg_01KNDFvqfzePQRGSRWp39APQ__claude-3-5-sonnet-20240620.json": {
-      "default": "./dist/prompts/anthropic_msg_01KNDFvqfzePQRGSRWp39APQ__claude-3-5-sonnet-20240620.json"
+    "./prompts/anthropic_msg_01R59BZaL6k1VeXdjQCMdqyE__claude-3-5-sonnet-20240620.json": {
+      "default": "./dist/prompts/anthropic_msg_01R59BZaL6k1VeXdjQCMdqyE__claude-3-5-sonnet-20240620.json"
+    },
+    "./prompts/anthropic_msg_01UZL7XY9SpZbS3dML8kFeNM__claude-3-5-sonnet-20240620.json": {
+      "default": "./dist/prompts/anthropic_msg_01UZL7XY9SpZbS3dML8kFeNM__claude-3-5-sonnet-20240620.json"
     },
     "./prompts/google_TODO.json": {
       "default": "./dist/prompts/google_TODO.json"
@@ -230,6 +243,11 @@
     "./server/zzz_server.js": {
       "types": "./dist/server/zzz_server.d.ts",
       "default": "./dist/server/zzz_server.js"
+    },
+    "./Settings.svelte": {
+      "types": "./dist/Settings.svelte.d.ts",
+      "svelte": "./dist/Settings.svelte",
+      "default": "./dist/Settings.svelte"
     },
     "./zzz_client.js": {
       "types": "./dist/zzz_client.d.ts",
