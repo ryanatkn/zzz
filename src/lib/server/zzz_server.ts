@@ -39,7 +39,7 @@ export class Zzz_Server {
 				case 'add':
 				case 'update':
 				case 'delete': {
-					this.#send({type: 'filer_change', change, source_file}); // TODO BLOCK shouldn't send unless inited
+					this.#send({type: 'filer_change', change, source_file});
 					break;
 				}
 				default:
