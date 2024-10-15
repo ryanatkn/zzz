@@ -1,18 +1,9 @@
 {
-	"request": {
-		"type": "send_prompt",
-		"agent_name": "chatgpt",
-		"text": "once upon two times"
-	},
+	"request": {"type": "send_prompt", "agent_name": "chatgpt", "text": "i need "},
 	"response": {
 		"type": "prompt_response",
 		"agent_name": "chatgpt",
-		"text": "once upon two times",
-		"data": {
-			"type": "openai",
-			"value": {
-				"placeholder": "TODO"
-			}
-		}
+		"text": "i need ",
+		"data": {"type": "openai", "value": {"placeholder": "TODO"}}
 	}
 }
