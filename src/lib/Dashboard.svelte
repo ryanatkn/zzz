@@ -15,7 +15,7 @@
 
 <!-- TODO drive with data -->
 <section class="dashboard_prompts">
-	<div class="flex pane p_md">
+	<div class="flex shadow_inset_top_sm p_lg">
 		<Control_Panel />
 	</div>
 	<div class="flex_1">

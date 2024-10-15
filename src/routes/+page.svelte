@@ -2,6 +2,7 @@
 	import Svg from '@ryanatkn/fuz/Svg.svelte';
 	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
 	import {base} from '$app/paths';
+	import {DEV} from 'esm-env';
 
 	import Zzz_Main from '$lib/Zzz_Main.svelte';
 	import {hud_context} from '$lib/hud.svelte.js';
@@ -24,6 +25,12 @@
 		<p class="mt_xl3">bot control hq</p>
 		<p class="mt_xl3">work in progress</p>
 		<p class="size_xl3"><span title="copy this software">💤</span></p>
+		{#if !DEV}
+			<p>
+				At the moment, Zzz only functions when run locally on your dev machine. The goal is to make
+				it available in all contexts, but you gotta start somewhere.
+			</p>
+		{/if}
 	</header>
 </Zzz_Main>
 

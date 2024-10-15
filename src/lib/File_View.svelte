@@ -1,5 +1,4 @@
 <script lang="ts">
-	import Dialog from '@ryanatkn/fuz/Dialog.svelte';
 	import Contextmenu_Submenu from '@ryanatkn/fuz/Contextmenu_Submenu.svelte';
 	import Contextmenu_Entry from '@ryanatkn/fuz/Contextmenu_Entry.svelte';
 	import type {Source_File} from '@ryanatkn/gro/filer.js';
@@ -16,48 +15,46 @@
 
 	const {file}: Props = $props();
 
-	let show_more = $state(false);
-
 	// TODO refactor
-	let view_with: 'summary' | 'info' = $state('summary');
+	type File_View_Type = 'summary' | 'info' | 'editor';
+	let view_with_prev: File_View_Type = $state('summary');
+	let view_with: File_View_Type = $state('summary');
+
+	const File_View_Type_Component = $derived(
+		view_with === 'summary' ? File_Summary : view_with === 'info' ? File_Info : File_Editor,
+	);
+
+	const update_view_with = () => {
+		view_with;
+	};
 </script>
 
 <div class="file_view" use:contextmenu_action={contextmenu_entries}>
-	{#if view_with === 'summary'}
-		<File_Summary {file} />
-	{:else}
-		<File_Info {file} />
-	{/if}
+	<File_View_Type_Component {file} />
 </div>
 
-{#if show_more}
-	<Dialog onclose={() => (show_more = false)}>
-		<!-- TODO expand width, might need to change `Dialog` -->
-		<div class="bg p_md radius_sm">
-			<File_Editor {file} />
-			<button type="button" onclick={() => (show_more = false)}>close</button>
-			{@render file_contents()}
-		</div>
-	</Dialog>
-{/if}
-
-{#snippet file_contents()}
-	contents {#if file.contents === null}
-		null
-	{:else}
-		({file.contents.length} chars)
-	{/if}
-{/snippet}
-
 {#snippet contextmenu_entries()}
-	<Contextmenu_Entry
-		run={() => {
-			show_more = true;
-		}}
-	>
-		{#snippet icon()}🗎{/snippet}
-		<span>Edit file</span>
-	</Contextmenu_Entry>
+	{#if view_with !== 'editor'}
+		<Contextmenu_Entry
+			run={() => {
+				view_with_prev = view_with;
+				view_with = 'editor';
+			}}
+		>
+			{#snippet icon()}🗎{/snippet}
+			<span>Edit file</span>
+		</Contextmenu_Entry>
+	{:else}
+		<Contextmenu_Entry
+			run={() => {
+				view_with = view_with_prev;
+			}}
+		>
+			{#snippet icon()}🗎{/snippet}
+			<span>Close editor</span>
+		</Contextmenu_Entry>
+	{/if}
+
 	<!-- TODO maybe show disabled? -->
 	{#if file.contents !== null}
 		<Contextmenu_Entry run={() => void navigator.clipboard.writeText(file.contents!)}>
@@ -65,18 +62,24 @@
 			<span>Copy {file.contents.length} chars</span>
 		</Contextmenu_Entry>
 	{/if}
+
 	<Contextmenu_Submenu>
 		{#snippet icon()}>{/snippet}
 		View with
 		{#snippet menu()}
 			<!-- TODO `disabled` property to the entry -->
-			<Contextmenu_Entry run={() => (view_with = 'summary')}>
+			<!-- TODO refactor into data with the types -->
+			<Contextmenu_Entry run={() => update_view_with('summary')}>
 				{#snippet icon()}{#if view_with === 'summary'}{'>'}{/if}{/snippet}
 				<span>Summary</span>
 			</Contextmenu_Entry>
-			<Contextmenu_Entry run={() => (view_with = 'info')}>
+			<Contextmenu_Entry run={() => update_view_with('info')}>
 				{#snippet icon()}{#if view_with === 'info'}{'>'}{/if}{/snippet}
 				<span>Info</span>
+			</Contextmenu_Entry>
+			<Contextmenu_Entry run={() => update_view_with('editor')}>
+				{#snippet icon()}{#if view_with === 'editor'}{'>'}{/if}{/snippet}
+				<span>Editor</span>
 			</Contextmenu_Entry>
 		{/snippet}
 	</Contextmenu_Submenu>
