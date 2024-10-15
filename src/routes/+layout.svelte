@@ -108,11 +108,6 @@
 
 	// zzz.send({type: 'echo', data: 'echo from client'});
 	zzz.client.send({type: 'load_session'});
-
-	import.meta.hot?.on('gro_client_message', (message) => {
-		console.log('[page] receiving gro_client_message', message);
-		zzz.client.receive(message);
-	});
 </script>
 
 <svelte:head>

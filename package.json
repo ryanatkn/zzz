@@ -143,6 +143,10 @@
       "types": "./dist/hud.svelte.d.ts",
       "default": "./dist/hud.svelte.js"
     },
+    "./id.js": {
+      "types": "./dist/id.d.ts",
+      "default": "./dist/id.js"
+    },
     "./Message_Info.svelte": {
       "types": "./dist/Message_Info.svelte.d.ts",
       "svelte": "./dist/Message_Info.svelte",
@@ -201,6 +205,9 @@
     },
     "./prompts/anthropic_msg_01EeCuiJpb5NHpeCvBA9KA2b__claude-3-5-sonnet-20240620.json": {
       "default": "./dist/prompts/anthropic_msg_01EeCuiJpb5NHpeCvBA9KA2b__claude-3-5-sonnet-20240620.json"
+    },
+    "./prompts/anthropic_msg_01KNDFvqfzePQRGSRWp39APQ__claude-3-5-sonnet-20240620.json": {
+      "default": "./dist/prompts/anthropic_msg_01KNDFvqfzePQRGSRWp39APQ__claude-3-5-sonnet-20240620.json"
     },
     "./prompts/google_TODO.json": {
       "default": "./dist/prompts/google_TODO.json"

@@ -120,6 +120,7 @@ export const package_json = {
 			default: './dist/Hud_Root.svelte',
 		},
 		'./hud.svelte.js': {types: './dist/hud.svelte.d.ts', default: './dist/hud.svelte.js'},
+		'./id.js': {types: './dist/id.d.ts', default: './dist/id.js'},
 		'./Message_Info.svelte': {
 			types: './dist/Message_Info.svelte.d.ts',
 			svelte: './dist/Message_Info.svelte',
@@ -174,6 +175,10 @@ export const package_json = {
 		'./prompts/anthropic_msg_01EeCuiJpb5NHpeCvBA9KA2b__claude-3-5-sonnet-20240620.json': {
 			default:
 				'./dist/prompts/anthropic_msg_01EeCuiJpb5NHpeCvBA9KA2b__claude-3-5-sonnet-20240620.json',
+		},
+		'./prompts/anthropic_msg_01KNDFvqfzePQRGSRWp39APQ__claude-3-5-sonnet-20240620.json': {
+			default:
+				'./dist/prompts/anthropic_msg_01KNDFvqfzePQRGSRWp39APQ__claude-3-5-sonnet-20240620.json',
 		},
 		'./prompts/google_TODO.json': {default: './dist/prompts/google_TODO.json'},
 		'./prompts/openai_TODO.json': {default: './dist/prompts/openai_TODO.json'},
@@ -239,6 +244,13 @@ export const src_json = {
 			path: 'hud.svelte.ts',
 			declarations: [{name: 'hud_context', kind: 'variable'}],
 		},
+		'./id.js': {
+			path: 'id.ts',
+			declarations: [
+				{name: 'Id', kind: 'type'},
+				{name: 'random_id', kind: 'function'},
+			],
+		},
 		'./Message_Info.svelte': {path: 'Message_Info.svelte', declarations: []},
 		'./Message_Summary.svelte': {path: 'Message_Summary.svelte', declarations: []},
 		'./Message_View.svelte': {path: 'Message_View.svelte', declarations: []},
@@ -263,6 +275,10 @@ export const src_json = {
 		},
 		'./prompts/anthropic_msg_01EeCuiJpb5NHpeCvBA9KA2b__claude-3-5-sonnet-20240620.json': {
 			path: 'prompts/anthropic_msg_01EeCuiJpb5NHpeCvBA9KA2b__claude-3-5-sonnet-20240620.json',
+			declarations: [],
+		},
+		'./prompts/anthropic_msg_01KNDFvqfzePQRGSRWp39APQ__claude-3-5-sonnet-20240620.json': {
+			path: 'prompts/anthropic_msg_01KNDFvqfzePQRGSRWp39APQ__claude-3-5-sonnet-20240620.json',
 			declarations: [],
 		},
 		'./prompts/google_TODO.json': {path: 'prompts/google_TODO.json', declarations: []},
