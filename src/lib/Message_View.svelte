@@ -44,7 +44,7 @@
 	<!-- TODO maybe show disabled? -->
 	<Contextmenu_Entry run={() => (show_more = true)}>
 		{#snippet icon()}⚡{/snippet}
-		<span>More info</span>
+		<span>View message details</span>
 	</Contextmenu_Entry>
 	<Contextmenu_Submenu>
 		{#snippet icon()}>{/snippet}

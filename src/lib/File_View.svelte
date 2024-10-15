@@ -56,7 +56,7 @@
 		}}
 	>
 		{#snippet icon()}🗎{/snippet}
-		<span>More info</span>
+		<span>Edit file</span>
 	</Contextmenu_Entry>
 	<!-- TODO maybe show disabled? -->
 	{#if file.contents !== null}

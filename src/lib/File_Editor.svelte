@@ -1,5 +1,4 @@
 <script lang="ts">
-	import Dialog from '@ryanatkn/fuz/Dialog.svelte';
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
 	import type {Source_File} from '@ryanatkn/gro/filer.js';
 
@@ -17,9 +16,9 @@
 	const dependencies = $derived(Array.from(file.dependencies.values()));
 	const dependents = $derived(Array.from(file.dependents.values()));
 
-	let show_dialog = $state(false);
-
 	const zzz = zzz_context.get();
+
+	let updated_contents = $state(file.contents ?? '');
 </script>
 
 <div class="row size_xl"><span class="size_xl3 mr_md">🗎</span> {to_base_path(file.id)}</div>
@@ -37,48 +36,34 @@ deps ({dependencies.length} dependencies, {dependents.length} dependents)
 {#if dependents.length > 0}
 	<div class="dep_list">
 		{#each dependents as dependent (dependent.id)}
-			<button type="button" onclick={() => (show_dialog = true)}
-				>{to_base_path(dependent.id)}</button
-			>
+			<div>{to_base_path(dependent.id)}</div>
 		{/each}
 	</div>
 {/if}
 
 <div>
 	<Copy_To_Clipboard text={file.contents} />
-
-	{@render file_contents()}
-</div>
-<div class="editor">
-	<div class="flex_1">
-		<textarea style:height="{height}px">{file.contents}</textarea>
-	</div>
-	<pre class="flex_1">{file.contents}</pre>
-</div>
-
-{#if show_dialog}
-	<Dialog onclose={() => (show_dialog = false)}>
-		<div class="bg">
-			<h2>dialog</h2>
-			<button
-				type="button"
-				onclick={async () => {
-					zzz;
-				}}>save</button
-			>
-			<button type="button" onclick={() => (show_dialog = false)}>close</button>
-			{@render file_contents()}
-		</div>
-	</Dialog>
-{/if}
-
-{#snippet file_contents()}
 	contents {#if file.contents === null}
 		null
 	{:else}
 		({file.contents.length} chars)
 	{/if}
-{/snippet}
+</div>
+<div class="editor">
+	<div class="flex_1">
+		<div>
+			<textarea style:height="{height}px" bind:value={updated_contents}></textarea>
+		</div>
+		<button
+			type="button"
+			disabled={updated_contents === file.contents}
+			onclick={() => {
+				zzz.update_file(file.id, updated_contents);
+			}}>save</button
+		>
+	</div>
+	<pre style:height="{height}px" class="flex_1 fg_1 radius_sm p_md">{file.contents}</pre>
+</div>
 
 <style>
 	.editor {

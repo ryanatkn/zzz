@@ -167,15 +167,16 @@ export const package_json = {
 			default: './dist/Prompt_Responses_List.svelte',
 		},
 		'./prompt.svelte.js': {types: './dist/prompt.svelte.d.ts', default: './dist/prompt.svelte.js'},
-		'./prompts/msg_01HhsZqH2PNvN1HBcuoGs53k__claude-3-5-sonnet-20240620.json': {
-			default: './dist/prompts/msg_01HhsZqH2PNvN1HBcuoGs53k__claude-3-5-sonnet-20240620.json',
+		'./prompts/anthropic_msg_01AiwSSuzxhRHW2ytQfnun3K__claude-3-5-sonnet-20240620.json': {
+			default:
+				'./dist/prompts/anthropic_msg_01AiwSSuzxhRHW2ytQfnun3K__claude-3-5-sonnet-20240620.json',
 		},
-		'./prompts/msg_01WAboELRr5xYhWWLqYqyJPk__claude-3-5-sonnet-20240620.json': {
-			default: './dist/prompts/msg_01WAboELRr5xYhWWLqYqyJPk__claude-3-5-sonnet-20240620.json',
+		'./prompts/anthropic_msg_01EeCuiJpb5NHpeCvBA9KA2b__claude-3-5-sonnet-20240620.json': {
+			default:
+				'./dist/prompts/anthropic_msg_01EeCuiJpb5NHpeCvBA9KA2b__claude-3-5-sonnet-20240620.json',
 		},
-		'./prompts/msg_01WD9qTnxseoaVwtW1ksqfu5__claude-3-5-sonnet-20240620.json': {
-			default: './dist/prompts/msg_01WD9qTnxseoaVwtW1ksqfu5__claude-3-5-sonnet-20240620.json',
-		},
+		'./prompts/google_TODO.json': {default: './dist/prompts/google_TODO.json'},
+		'./prompts/openai_TODO.json': {default: './dist/prompts/openai_TODO.json'},
 		'./server/server.js': {types: './dist/server/server.d.ts', default: './dist/server/server.js'},
 		'./server/zzz_server.js': {
 			types: './dist/server/zzz_server.d.ts',
@@ -256,18 +257,16 @@ export const src_json = {
 				{name: 'Prompt', kind: 'class'},
 			],
 		},
-		'./prompts/msg_01HhsZqH2PNvN1HBcuoGs53k__claude-3-5-sonnet-20240620.json': {
-			path: 'prompts/msg_01HhsZqH2PNvN1HBcuoGs53k__claude-3-5-sonnet-20240620.json',
+		'./prompts/anthropic_msg_01AiwSSuzxhRHW2ytQfnun3K__claude-3-5-sonnet-20240620.json': {
+			path: 'prompts/anthropic_msg_01AiwSSuzxhRHW2ytQfnun3K__claude-3-5-sonnet-20240620.json',
 			declarations: [],
 		},
-		'./prompts/msg_01WAboELRr5xYhWWLqYqyJPk__claude-3-5-sonnet-20240620.json': {
-			path: 'prompts/msg_01WAboELRr5xYhWWLqYqyJPk__claude-3-5-sonnet-20240620.json',
+		'./prompts/anthropic_msg_01EeCuiJpb5NHpeCvBA9KA2b__claude-3-5-sonnet-20240620.json': {
+			path: 'prompts/anthropic_msg_01EeCuiJpb5NHpeCvBA9KA2b__claude-3-5-sonnet-20240620.json',
 			declarations: [],
 		},
-		'./prompts/msg_01WD9qTnxseoaVwtW1ksqfu5__claude-3-5-sonnet-20240620.json': {
-			path: 'prompts/msg_01WD9qTnxseoaVwtW1ksqfu5__claude-3-5-sonnet-20240620.json',
-			declarations: [],
-		},
+		'./prompts/google_TODO.json': {path: 'prompts/google_TODO.json', declarations: []},
+		'./prompts/openai_TODO.json': {path: 'prompts/openai_TODO.json', declarations: []},
 		'./server/server.js': {path: 'server/server.ts', declarations: []},
 		'./server/zzz_server.js': {
 			path: 'server/zzz_server.ts',
@@ -304,6 +303,7 @@ export const src_json = {
 				{name: 'Filer_Change_Message', kind: 'type'},
 				{name: 'Send_Prompt_Message', kind: 'type'},
 				{name: 'Receive_Prompt_Message', kind: 'type'},
+				{name: 'Update_File_Message', kind: 'type'},
 			],
 		},
 		'./Zzz_Root.svelte': {path: 'Zzz_Root.svelte', declarations: []},
