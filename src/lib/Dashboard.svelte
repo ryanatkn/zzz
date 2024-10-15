@@ -2,27 +2,36 @@
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import File_List from '$lib/File_List.svelte';
 	import Multiprompt from './Multiprompt.svelte';
+	import Control_Panel from './Control_Panel.svelte';
 
-	interface Props {}
+	// interface Props {}
 
-	const {}: Props = $props();
+	// const {}: Props = $props();
 
 	const zzz = zzz_context.get();
-
-	const hello_server = () => {
-		zzz.client.send({type: 'echo', data: 'hello server'});
-	};
 
 	// TODO
 </script>
 
-<section class="box width_100 mx_auto p_md panel">
-	<section>
-		<button type="button" onclick={hello_server}>⛬ hello server</button>
-	</section>
-
-	<Multiprompt />
+<!-- TODO drive with data -->
+<section class="dashboard_prompts">
+	<div class="flex pane p_md">
+		<Control_Panel />
+	</div>
+	<div class="flex_1">
+		<Multiprompt />
+	</div>
 </section>
 <section>
 	<File_List files={zzz.files_by_id} />
 </section>
+
+<style>
+	.dashboard_prompts {
+		display: flex;
+		align-items: stretch;
+		width: 100%;
+		padding: var(--space_md);
+		gap: var(--space_md);
+	}
+</style>

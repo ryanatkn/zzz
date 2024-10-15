@@ -96,7 +96,7 @@
 					}
 					case 'echo': {
 						console.log(`[page] echo`, message);
-						zzz.echos.push(message);
+						zzz.echos = [message, ...zzz.echos.slice(0, 10)];
 						break;
 					}
 					default:

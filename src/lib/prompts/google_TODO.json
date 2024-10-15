@@ -1,9 +1,9 @@
 {
-	"request": {"type": "send_prompt", "agent_name": "gemini", "text": "i need "},
+	"request": {"type": "send_prompt", "agent_name": "gemini", "text": "hello server"},
 	"response": {
 		"type": "prompt_response",
 		"agent_name": "gemini",
-		"text": "i need ",
+		"text": "hello server",
 		"data": {"type": "google", "value": {"placeholder": "TODO"}}
 	}
 }
