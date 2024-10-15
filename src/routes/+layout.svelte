@@ -30,6 +30,8 @@
 
 	const {children}: Props = $props();
 
+	// TODO BLOCK load `project.json` in production to populate files
+
 	pkg_context.set(parse_package_meta(package_json, src_json));
 
 	let ws: WebSocket | undefined;

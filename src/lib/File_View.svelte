@@ -18,14 +18,15 @@
 	// TODO refactor
 	type File_View_Type = 'summary' | 'info' | 'editor';
 	let view_with_prev: File_View_Type = $state('summary');
-	let view_with: File_View_Type = $state('summary');
+	let view_with: File_View_Type = $state('summary'); // TODO `selection` class pattern instead? `new Selection('summary')`
 
 	const File_View_Type_Component = $derived(
 		view_with === 'summary' ? File_Summary : view_with === 'info' ? File_Info : File_Editor,
 	);
 
-	const update_view_with = () => {
-		view_with;
+	const update_view_with = (v: File_View_Type) => {
+		view_with_prev = view_with;
+		view_with = v;
 	};
 </script>
 
@@ -37,8 +38,7 @@
 	{#if view_with !== 'editor'}
 		<Contextmenu_Entry
 			run={() => {
-				view_with_prev = view_with;
-				view_with = 'editor';
+				update_view_with('editor');
 			}}
 		>
 			{#snippet icon()}🗎{/snippet}
@@ -47,7 +47,7 @@
 	{:else}
 		<Contextmenu_Entry
 			run={() => {
-				view_with = view_with_prev;
+				update_view_with(view_with_prev);
 			}}
 		>
 			{#snippet icon()}🗎{/snippet}
