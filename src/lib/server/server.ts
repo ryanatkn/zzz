@@ -72,4 +72,5 @@ const zzz_server = new Zzz_Server({
 			ws.send(devalue.stringify({type: 'gro_server_message', message}));
 		}
 	},
+	// model_type: 'cheap', // TODO source from env or config?
 });

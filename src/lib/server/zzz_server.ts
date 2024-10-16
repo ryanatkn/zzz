@@ -20,28 +20,40 @@ import type {
 import type {Prompt_Json} from '$lib/prompt.svelte.js';
 import {random_id} from '$lib/id.js';
 
-// SECRET_ANTHROPIC_API_KEY
-// SECRET_OPENAI_API_KEY
-// SECRET_GOOGLE_API_KEY
-const ANTHROPIC_MODEL = 'claude-3-5-sonnet-20240620';
-const OPENAI_MODEL = 'gpt-4o';
-const GOOGLE_MODEL = 'gemini-1.5-pro';
+// TODO extract config
+export const models: Record<Model_Type, {anthropic: string; openai: string; google: string}> = {
+	cheap: {
+		anthropic: 'claude-3-haiku-20240307',
+		openai: 'gpt-4o-mini',
+		google: 'gemini-1.5-pro',
+	},
+	smart: {
+		anthropic: 'claude-3-5-sonnet-20240620',
+		openai: 'gpt-4o',
+		google: 'gemini-1.5-pro',
+	},
+} as const;
+export type Model_Type = 'cheap' | 'smart';
+
+// TODO refactor
 const SYSTEM_MESSAGE =
 	'You are a helpful assistant. Respond with the shortest sentence possible to describe the current context with reasonable clarity, admitting when you have no context but being creative.';
 const anthropic = new Anthropic({apiKey: SECRET_ANTHROPIC_API_KEY});
 const openai = new OpenAI({apiKey: SECRET_OPENAI_API_KEY});
 const google = new GoogleGenerativeAI(SECRET_GOOGLE_API_KEY);
-const google_model = google.getGenerativeModel({model: GOOGLE_MODEL}); // TODO flag for messy dev that uses `gemini-1.5-flash` instead of `gemini-1.5-pro`
 
 export interface Options {
 	send: (message: Server_Message) => void;
 	filer?: Filer;
+	model_type?: Model_Type;
 }
 
 export class Zzz_Server {
 	#send: (message: Server_Message) => void;
 
 	filer: Filer;
+
+	model_type: Model_Type;
 
 	#cleanup_filer: Promise<Cleanup_Watch>;
 
@@ -61,6 +73,7 @@ export class Zzz_Server {
 					throw new Unreachable_Error(change.type);
 			}
 		});
+		this.model_type = options.model_type ?? 'cheap';
 	}
 
 	send(message: Server_Message): void {
@@ -87,7 +100,7 @@ export class Zzz_Server {
 				switch (agent_name) {
 					case 'claude': {
 						const api_response = await anthropic.messages.create({
-							model: ANTHROPIC_MODEL,
+							model: models[this.model_type].anthropic,
 							max_tokens: 1000,
 							temperature: 0,
 							system: SYSTEM_MESSAGE,
@@ -108,7 +121,7 @@ export class Zzz_Server {
 					case 'chatgpt': {
 						console.log(`texting OpenAI`, request.agent_name); // TODO model
 						const api_response = await openai.chat.completions.create({
-							model: OPENAI_MODEL,
+							model: models[this.model_type].openai,
 							messages: [
 								{role: 'system', content: SYSTEM_MESSAGE},
 								{role: 'user', content: text},
@@ -129,7 +142,8 @@ export class Zzz_Server {
 
 					case 'gemini': {
 						console.log(`texting Gemini`, request.agent_name); // TODO model
-						const api_response = await google_model.generateContent(text);
+						const google_model = google.getGenerativeModel({model: models[this.model_type].google});
+						const api_response = await google_model.generateContent(SYSTEM_MESSAGE + '\n\n' + text);
 						console.log(`gemini api_response`, api_response);
 						response = {
 							id: random_id(),
