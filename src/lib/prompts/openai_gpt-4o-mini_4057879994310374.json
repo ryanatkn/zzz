@@ -1,0 +1,23 @@
+{
+	"model": "gpt-4o-mini",
+	"request": {
+		"id": 6110443180297401,
+		"type": "send_prompt",
+		"agent_name": "chatgpt",
+		"text": "once upon a time"
+	},
+	"response": {
+		"id": 4057879994310374,
+		"type": "prompt_response",
+		"request_id": 6110443180297401,
+		"agent_name": "chatgpt",
+		"data": {
+			"type": "openai",
+			"value": {
+				"role": "assistant",
+				"content": "Once upon a time, in a whispering wood,  \nDreams danced with shadows where magic once stood.  \nA tale spun in starlight, with secrets to find,  \nWhere hearts wove their stories, and love intertwined.",
+				"refusal": null
+			}
+		}
+	}
+}

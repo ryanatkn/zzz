@@ -1,0 +1,33 @@
+{
+	"model": "claude-3-haiku-20240307",
+	"request": {
+		"id": 8130376596380042,
+		"type": "send_prompt",
+		"agent_name": "claude",
+		"text": "once upon a time"
+	},
+	"response": {
+		"id": 3067492502110254,
+		"type": "prompt_response",
+		"request_id": 8130376596380042,
+		"agent_name": "claude",
+		"data": {
+			"type": "anthropic",
+			"value": {
+				"id": "msg_015H1zHXW7fYkhQNacvKMe2P",
+				"type": "message",
+				"role": "assistant",
+				"model": "claude-3-haiku-20240307",
+				"content": [
+					{
+						"type": "text",
+						"text": "Enchanted dreams take flight,\nWhispers of a world so bright,\nWhere imagination knows no bounds,\nAnd wonder's song forever sounds."
+					}
+				],
+				"stop_reason": "end_turn",
+				"stop_sequence": null,
+				"usage": {"input_tokens": 34, "output_tokens": 35}
+			}
+		}
+	}
+}

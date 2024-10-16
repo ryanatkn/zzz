@@ -1,0 +1,46 @@
+{
+	"model": "gemini-1.5-pro",
+	"request": {
+		"id": 4529295727080118,
+		"type": "send_prompt",
+		"agent_name": "gemini",
+		"text": "once upon a time"
+	},
+	"response": {
+		"id": 6229778016883003,
+		"type": "prompt_response",
+		"request_id": 4529295727080118,
+		"agent_name": "gemini",
+		"data": {
+			"type": "google",
+			"value": {
+				"text": "Once upon a time, a whisper bloomed into a symphony of stars. \n",
+				"candidates": [
+					{
+						"content": {
+							"parts": [
+								{"text": "Once upon a time, a whisper bloomed into a symphony of stars. \n"}
+							],
+							"role": "model"
+						},
+						"finishReason": "STOP",
+						"index": 0,
+						"safetyRatings": [
+							{"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "probability": "NEGLIGIBLE"},
+							{"category": "HARM_CATEGORY_HATE_SPEECH", "probability": "NEGLIGIBLE"},
+							{"category": "HARM_CATEGORY_HARASSMENT", "probability": "NEGLIGIBLE"},
+							{"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "probability": "NEGLIGIBLE"}
+						]
+					}
+				],
+				"function_calls": null,
+				"prompt_feedback": null,
+				"usage_metadata": {
+					"promptTokenCount": 26,
+					"candidatesTokenCount": 15,
+					"totalTokenCount": 41
+				}
+			}
+		}
+	}
+}

@@ -1,0 +1,105 @@
+Message from client: {"type":"gro_server_message","message":{"id":4562286009137787,"type":"load_session"}} - string
+[zzz_server.receive] message { id: 4562286009137787, type: 'load_session' } true
+Message from client: {"type":"gro_server_message","message":{"id":5602441004062553,"type":"send_prompt","agent_name":"claude","text":"once upon a time, "}} - string
+[zzz_server.receive] message {
+  id: 5602441004062553,
+  type: 'send_prompt',
+  agent_name: 'claude',
+  text: 'once upon a time, '
+} false
+texting claude once upon a time, 
+Message from client: {"type":"gro_server_message","message":{"id":5028431295659408,"type":"send_prompt","agent_name":"chatgpt","text":"once upon a time, "}} - string
+[zzz_server.receive] message {
+  id: 5028431295659408,
+  type: 'send_prompt',
+  agent_name: 'chatgpt',
+  text: 'once upon a time, '
+} false
+texting chatgpt once upon a time, 
+texting OpenAI chatgpt
+Message from client: {"type":"gro_server_message","message":{"id":1699893643709629,"type":"send_prompt","agent_name":"gemini","text":"once upon a time, "}} - string
+[zzz_server.receive] message {
+  id: 1699893643709629,
+  type: 'send_prompt',
+  agent_name: 'gemini',
+  text: 'once upon a time, '
+} false
+texting gemini once upon a time, 
+texting Gemini gemini
+openai api_response {
+  id: 'chatcmpl-AIr3tq4RfUWFTY5qM4EU5JzC934bH',
+  object: 'chat.completion',
+  created: 1729057237,
+  model: 'gpt-4o-2024-08-06',
+  choices: [
+    {
+      index: 0,
+      message: [Object],
+      logprobs: null,
+      finish_reason: 'stop'
+    }
+  ],
+  usage: {
+    prompt_tokens: 48,
+    completion_tokens: 7,
+    total_tokens: 55,
+    prompt_tokens_details: { cached_tokens: 0 },
+    completion_tokens_details: { reasoning_tokens: 0 }
+  },
+  system_fingerprint: 'fp_6b68a8204b'
+}
+got OpenAI message {
+  type: 'openai',
+  value: {
+    role: 'assistant',
+    content: 'a dragon flew over a village.',
+    refusal: null
+  }
+}
+claude api_response {
+  id: 'msg_01YXncQdih4Tsm1UcLCJxS78',
+  type: 'message',
+  role: 'assistant',
+  model: 'claude-3-5-sonnet-20240620',
+  content: [ { type: 'text', text: 'A fairy tale begins.' } ],
+  stop_reason: 'end_turn',
+  stop_sequence: null,
+  usage: { input_tokens: 46, output_tokens: 8 }
+}
+got Claude message {
+  id: 'msg_01YXncQdih4Tsm1UcLCJxS78',
+  type: 'message',
+  role: 'assistant',
+  model: 'claude-3-5-sonnet-20240620',
+  content: [ { type: 'text', text: 'A fairy tale begins.' } ],
+  stop_reason: 'end_turn',
+  stop_sequence: null,
+  usage: { input_tokens: 46, output_tokens: 8 }
+}
+gemini api_response {
+  response: {
+    candidates: [ [Object] ],
+    usageMetadata: {
+      promptTokenCount: 7,
+      candidatesTokenCount: 69,
+      totalTokenCount: 76
+    },
+    text: [Function (anonymous)],
+    functionCall: [Function (anonymous)],
+    functionCalls: [Function (anonymous)]
+  }
+}
+got Gemini message {
+  type: 'google',
+  value: {
+    text: '...in a kingdom cloaked in emerald forests and crowned with snow-capped mountains, there lived a young woman named Elara. She possessed hair like spun moonlight and eyes that shimmered with the secrets of the ancient woods.  But Elara harbored a secret of her own, one that whispered on the wind and danced in the shadows... \n',
+    candidates: [ [Object] ],
+    function_calls: null,
+    prompt_feedback: null,
+    usage_metadata: {
+      promptTokenCount: 7,
+      candidatesTokenCount: 69,
+      totalTokenCount: 76
+    }
+  }
+}

@@ -37,7 +37,7 @@ export type Model_Type = 'cheap' | 'smart';
 
 // TODO refactor
 const SYSTEM_MESSAGE =
-	'You are a helpful assistant. Respond with the shortest sentence possible to describe the current context with reasonable clarity, admitting when you have no context but being creative.';
+	'You are a helpful assistant. Respond with a short creative sentence or poem, whichever strikes your fancy.';
 const anthropic = new Anthropic({apiKey: SECRET_ANTHROPIC_API_KEY});
 const openai = new OpenAI({apiKey: SECRET_OPENAI_API_KEY});
 const google = new GoogleGenerativeAI(SECRET_GOOGLE_API_KEY);
