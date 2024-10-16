@@ -18,6 +18,7 @@ import type {
 	Server_Message,
 } from '$lib/zzz_message.js';
 import type {Prompt_Json} from '$lib/prompt.svelte.js';
+import {random_id} from '$lib/id.js';
 
 // SECRET_ANTHROPIC_API_KEY
 // SECRET_OPENAI_API_KEY
@@ -25,6 +26,8 @@ import type {Prompt_Json} from '$lib/prompt.svelte.js';
 const ANTHROPIC_MODEL = 'claude-3-5-sonnet-20240620';
 const OPENAI_MODEL = 'gpt-4o';
 const GOOGLE_MODEL = 'gemini-1.5-pro';
+const SYSTEM_MESSAGE =
+	'You are a helpful assistant. Respond with the shortest sentence possible to describe the current context with reasonable clarity, admitting when you have no context but being creative.';
 const anthropic = new Anthropic({apiKey: SECRET_ANTHROPIC_API_KEY});
 const openai = new OpenAI({apiKey: SECRET_OPENAI_API_KEY});
 const google = new GoogleGenerativeAI(SECRET_GOOGLE_API_KEY);
@@ -51,7 +54,7 @@ export class Zzz_Server {
 				case 'add':
 				case 'update':
 				case 'delete': {
-					this.#send({type: 'filer_change', change, source_file});
+					this.#send({id: random_id(), type: 'filer_change', change, source_file});
 					break;
 				}
 				default:
@@ -72,10 +75,7 @@ export class Zzz_Server {
 				return request;
 			}
 			case 'load_session': {
-				return {
-					type: 'loaded_session',
-					data: {files: this.filer.files},
-				};
+				return {id: random_id(), type: 'loaded_session', data: {files: this.filer.files}};
 			}
 			case 'send_prompt': {
 				const {text, agent_name} = request;
@@ -90,15 +90,15 @@ export class Zzz_Server {
 							model: ANTHROPIC_MODEL,
 							max_tokens: 1000,
 							temperature: 0,
-							system:
-								'respond with the shortest sentence possible to describe the current context with reasonable clarity',
+							system: SYSTEM_MESSAGE,
 							messages: [{role: 'user', content: [{type: 'text', text}]}],
 						});
 						console.log(`claude api_response`, api_response);
 						response = {
+							id: random_id(),
 							type: 'prompt_response',
+							request_id: request.id,
 							agent_name: request.agent_name,
-							text,
 							data: {type: 'anthropic', value: api_response},
 						};
 						console.log(`got Claude message`, api_response);
@@ -110,17 +110,17 @@ export class Zzz_Server {
 						const api_response = await openai.chat.completions.create({
 							model: OPENAI_MODEL,
 							messages: [
-								// TODO needs to be uniform across agents
-								{role: 'system', content: 'You are a helpful assistant.'},
+								{role: 'system', content: SYSTEM_MESSAGE},
 								{role: 'user', content: text},
 							],
 						});
 						console.log(`openai api_response`, api_response);
 						const api_response_text = api_response.choices[0].message;
 						response = {
+							id: random_id(),
 							type: 'prompt_response',
+							request_id: request.id,
 							agent_name: request.agent_name,
-							text,
 							data: {type: 'openai', value: api_response_text},
 						};
 						console.log(`got OpenAI message`, response.data);
@@ -132,9 +132,10 @@ export class Zzz_Server {
 						const api_response = await google_model.generateContent(text);
 						console.log(`gemini api_response`, api_response);
 						response = {
+							id: random_id(),
 							type: 'prompt_response',
+							request_id: request.id,
 							agent_name: request.agent_name,
-							text,
 							data: {
 								type: 'google',
 								// some of these are functions, and we want `null` for full JSON documents, so manually spelling them out:

@@ -10,6 +10,7 @@ import {Zzz_Data, type Zzz_Data_Json} from '$lib/zzz_data.svelte.js';
 import type {Zzz_Client} from '$lib/zzz_client.js';
 import type {Echo_Message, Filer_Change_Message, Receive_Prompt_Message} from '$lib/zzz_message.js';
 import type {Agent} from '$lib/agent.svelte.js';
+import {random_id, type Id} from '$lib/id.js';
 
 export const zzz_context = create_context<Zzz>();
 
@@ -40,9 +41,11 @@ export class Zzz {
 
 	echos: Echo_Message[] = $state([]);
 
-	pending_prompts: SvelteMap<string, Deferred<Receive_Prompt_Message>> = new SvelteMap();
+	// TODO could track this more formally, and add time tracking
+	pending_prompts: SvelteMap<Id, Deferred<Receive_Prompt_Message>> = new SvelteMap();
 
-	prompt_responses: SvelteMap<string, Receive_Prompt_Message> = new SvelteMap();
+	// TODO maybe this should be an array, and have a cached map by id? but that would re-create the map each change
+	prompt_responses: SvelteMap<Id, Receive_Prompt_Message> = new SvelteMap();
 
 	pending_prompts_by_agent: Map<Agent, Receive_Prompt_Message[]> = $derived(
 		new Map(
@@ -78,41 +81,35 @@ export class Zzz {
 
 		const responses = await Promise.all(
 			Array.from(agents.values()).map(async (agent) => {
-				this.client.send({type: 'send_prompt', agent_name: agent.name, text});
+				const message = {
+					id: random_id(),
+					type: 'send_prompt',
+					agent_name: agent.name,
+					text,
+				} as const;
+				this.client.send(message);
 
-				// TODO @many need ids for req/res
-				if (agent.name === 'claude') {
-					const deferred = create_deferred<Receive_Prompt_Message>();
-					const prompt_responses_key = agent.name + '::' + text; // TODO @many leave this messy code until we have message ids and req/res pairs
-					this.pending_prompts.set(prompt_responses_key, deferred);
-					const response = await deferred.promise;
-					console.log(`prompt response`, response);
-					this.pending_prompts.delete(prompt_responses_key); // TODO @many need ids for req/res
-					return response;
-				}
-
-				return null;
+				const deferred = create_deferred<Receive_Prompt_Message>();
+				this.pending_prompts.set(message.id, deferred);
+				const response = await deferred.promise;
+				console.log(`prompt response`, response);
+				this.pending_prompts.delete(message.id); // TODO @many need ids for req/res
+				return response;
 			}),
 		);
 
-		return responses.filter((r) => !!r); // TODO @many need ids for req/res
+		return responses;
 	}
 
 	receive_prompt_response(message: Receive_Prompt_Message): void {
-		const deferred = this.pending_prompts.get(message.text);
+		const deferred = this.pending_prompts.get(message.request_id);
 		if (!deferred) {
 			console.error('expected pending', message);
 			return;
 		}
-		if (message.data.type !== 'anthropic') {
-			// TODO @many need ids for req/res
-			console.error('TODO ignoring all but anthropic messages', message);
-			return;
-		}
-		const prompt_responses_key = message.agent_name + '::' + message.text; // TODO @many leave this messy code until we have message ids and req/res pairs
-		this.prompt_responses.set(prompt_responses_key, message);
+		this.prompt_responses.set(message.request_id, message);
 		deferred.resolve(message);
-		this.pending_prompts.delete(message.text); // deleting intentionally after resolving to maybe avoid a corner case loop of sending the same prompt again
+		this.pending_prompts.delete(message.request_id); // deleting intentionally after resolving to maybe avoid a corner case loop of sending the same prompt again
 	}
 
 	receive_filer_change(message: Filer_Change_Message): void {
@@ -136,7 +133,7 @@ export class Zzz {
 			return;
 		}
 
-		this.client.send({type: 'update_file', file_id, contents});
+		this.client.send({id: random_id(), type: 'update_file', file_id, contents});
 	}
 
 	// TODO API? close/open/toggle? just toggle? messages+mutations?

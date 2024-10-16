@@ -21,6 +21,7 @@
 	import {package_json, src_json} from '$routes/package.js';
 	import {Zzz_Client} from '$lib/zzz_client.js';
 	import {Agent} from '$lib/agent.svelte.js';
+	import {random_id} from '$lib/id.js';
 
 	interface Props {
 		children: Snippet;
@@ -107,7 +108,7 @@
 	});
 
 	// zzz.send({type: 'echo', data: 'echo from client'});
-	zzz.client.send({type: 'load_session'});
+	zzz.client.send({id: random_id(), type: 'load_session'});
 </script>
 
 <svelte:head>

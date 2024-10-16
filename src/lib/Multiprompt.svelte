@@ -46,5 +46,5 @@
 		void onsubmit();
 	}}
 >
-	⚞ send prompt
+	⚞ send prompt ⚟
 </Pending_Button>

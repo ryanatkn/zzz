@@ -23,6 +23,7 @@ export type Server_Message =
 	| Receive_Prompt_Message;
 
 export interface Base_Message {
+	id: Id; // TODO trusting the client to make these for now because it's simpler
 	type: string;
 }
 
@@ -72,8 +73,8 @@ export interface Send_Prompt_Message extends Base_Message {
  */
 export interface Receive_Prompt_Message extends Base_Message {
 	type: 'prompt_response';
+	request_id: Id;
 	agent_name: Agent_Name;
-	text: string; // TODO @many sending the text again is wasteful, need ids
 	data:
 		| {type: 'anthropic'; value: Anthropic.Messages.Message}
 		| {type: 'openai'; value: OpenAI.Chat.Completions.ChatCompletionMessage}
