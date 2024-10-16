@@ -1,10 +1,10 @@
 <script lang="ts">
 	import Dialog from '@ryanatkn/fuz/Dialog.svelte';
 	import {onNavigate} from '$app/navigation';
-	import {is_editable} from '@ryanatkn/belt/dom.js';
 	import Svg from '@ryanatkn/fuz/Svg.svelte';
 	import {base} from '$app/paths';
 	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
+	import {is_editable, swallow} from '@ryanatkn/belt/dom.js';
 
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import Settings from '$lib/Settings.svelte';
@@ -21,9 +21,10 @@
 </script>
 
 <svelte:window
-	onkeydown={(e) => {
+	onkeydowncapture={(e) => {
 		if (e.key === 'Escape' && !is_editable(e.target)) {
 			zzz.toggle_main_menu();
+			swallow(e);
 		}
 	}}
 />
