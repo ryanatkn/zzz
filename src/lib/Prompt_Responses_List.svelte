@@ -19,7 +19,7 @@
 
 <ul class="unstyled">
 	{#each responses as prompt_response (prompt_response)}
-		<li>
+		<li class="p_md">
 			<Prompt_Response_View {agent} {prompt_response} />
 		</li>
 	{/each}

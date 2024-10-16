@@ -14,9 +14,8 @@
 </script>
 
 <div class="flex_1">
-	<!-- TODO pass a zap? -->
-	<div class="size_xl">{agent.icon}</div>
-	<div>{agent.title}</div>
+	<!-- TODO instead of `prompt_responses`, a higher-level abstraction like a conversation -->
+	<div><span class="size_xl">{agent.icon}</span> {agent.title}</div>
 	<div>{agent.model}</div>
 	<Prompt_Responses_List {agent} prompt_responses={zzz.prompt_responses} />
 </div>
