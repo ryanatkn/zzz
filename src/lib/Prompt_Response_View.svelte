@@ -8,6 +8,7 @@
 	import Prompt_Response_Summary from '$lib/Prompt_Response_Summary.svelte';
 	import type {Receive_Prompt_Message} from '$lib/zzz_message.js';
 	import type {Agent} from '$lib/agent.svelte.js';
+	import {zzz_context} from './zzz.svelte.js';
 
 	interface Props {
 		agent: Agent;
@@ -16,6 +17,10 @@
 	}
 
 	const {agent, prompt_response}: Props = $props();
+
+	const zzz = zzz_context.get();
+
+	const prompt_request = $derived(zzz.prompt_requests.get(prompt_response.request_id));
 
 	let show_editor = $state(false);
 
@@ -59,10 +64,12 @@
 			<span>Copy response text ({content.length} chars)</span>
 		</Contextmenu_Entry>
 	{/if}
-	<Contextmenu_Entry run={() => void navigator.clipboard.writeText(prompt_response.text)}>
-		{#snippet icon()}📋{/snippet}
-		<span>Copy prompt text ({prompt_response.text.length} chars)</span>
-	</Contextmenu_Entry>
+	{#if prompt_request}
+		<Contextmenu_Entry run={() => void navigator.clipboard.writeText(prompt_request.request.text)}>
+			{#snippet icon()}📋{/snippet}
+			<span>Copy prompt text ({prompt_request.request.text.length} chars)</span>
+		</Contextmenu_Entry>
+	{/if}
 	<Contextmenu_Submenu>
 		{#snippet icon()}>{/snippet}
 		View with

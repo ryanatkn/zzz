@@ -185,32 +185,16 @@ export const package_json = {
 			default: './dist/Prompt_Responses_List.svelte',
 		},
 		'./prompt.svelte.js': {types: './dist/prompt.svelte.d.ts', default: './dist/prompt.svelte.js'},
-		'./prompts/anthropic_msg_015Suvdq6WkFBCQTctHgEMZ9__claude-3-5-sonnet-20240620.json': {
+		'./prompts/anthropic_msg_015LiDboX7g98nkKNGwomzL8__claude-3-5-sonnet-20240620.json': {
 			default:
-				'./dist/prompts/anthropic_msg_015Suvdq6WkFBCQTctHgEMZ9__claude-3-5-sonnet-20240620.json',
+				'./dist/prompts/anthropic_msg_015LiDboX7g98nkKNGwomzL8__claude-3-5-sonnet-20240620.json',
 		},
-		'./prompts/anthropic_msg_018tRhfRN6RiXyY4P6zdFEiL__claude-3-5-sonnet-20240620.json': {
-			default:
-				'./dist/prompts/anthropic_msg_018tRhfRN6RiXyY4P6zdFEiL__claude-3-5-sonnet-20240620.json',
-		},
-		'./prompts/anthropic_msg_01KC4LUW4HGs2ujyEYvHJ9Vc__claude-3-5-sonnet-20240620.json': {
-			default:
-				'./dist/prompts/anthropic_msg_01KC4LUW4HGs2ujyEYvHJ9Vc__claude-3-5-sonnet-20240620.json',
-		},
-		'./prompts/anthropic_msg_01QJqKwX24Ec5JGVzeKxzMXA__claude-3-5-sonnet-20240620.json': {
-			default:
-				'./dist/prompts/anthropic_msg_01QJqKwX24Ec5JGVzeKxzMXA__claude-3-5-sonnet-20240620.json',
-		},
-		'./prompts/anthropic_msg_01R59BZaL6k1VeXdjQCMdqyE__claude-3-5-sonnet-20240620.json': {
-			default:
-				'./dist/prompts/anthropic_msg_01R59BZaL6k1VeXdjQCMdqyE__claude-3-5-sonnet-20240620.json',
-		},
-		'./prompts/anthropic_msg_01UZL7XY9SpZbS3dML8kFeNM__claude-3-5-sonnet-20240620.json': {
-			default:
-				'./dist/prompts/anthropic_msg_01UZL7XY9SpZbS3dML8kFeNM__claude-3-5-sonnet-20240620.json',
-		},
+		'./prompts/anthropic_undefined.json': {default: './dist/prompts/anthropic_undefined.json'},
 		'./prompts/google_TODO.json': {default: './dist/prompts/google_TODO.json'},
+		'./prompts/google_undefined.json': {default: './dist/prompts/google_undefined.json'},
 		'./prompts/openai_TODO.json': {default: './dist/prompts/openai_TODO.json'},
+		'./prompts/openai_undefined.json': {default: './dist/prompts/openai_undefined.json'},
+		'./server/prompt_request.log': {default: './dist/server/prompt_request.log'},
 		'./server/server.js': {types: './dist/server/server.d.ts', default: './dist/server/server.js'},
 		'./server/zzz_server.js': {
 			types: './dist/server/zzz_server.d.ts',
@@ -306,32 +290,19 @@ export const src_json = {
 				{name: 'Prompt', kind: 'class'},
 			],
 		},
-		'./prompts/anthropic_msg_015Suvdq6WkFBCQTctHgEMZ9__claude-3-5-sonnet-20240620.json': {
-			path: 'prompts/anthropic_msg_015Suvdq6WkFBCQTctHgEMZ9__claude-3-5-sonnet-20240620.json',
+		'./prompts/anthropic_msg_015LiDboX7g98nkKNGwomzL8__claude-3-5-sonnet-20240620.json': {
+			path: 'prompts/anthropic_msg_015LiDboX7g98nkKNGwomzL8__claude-3-5-sonnet-20240620.json',
 			declarations: [],
 		},
-		'./prompts/anthropic_msg_018tRhfRN6RiXyY4P6zdFEiL__claude-3-5-sonnet-20240620.json': {
-			path: 'prompts/anthropic_msg_018tRhfRN6RiXyY4P6zdFEiL__claude-3-5-sonnet-20240620.json',
-			declarations: [],
-		},
-		'./prompts/anthropic_msg_01KC4LUW4HGs2ujyEYvHJ9Vc__claude-3-5-sonnet-20240620.json': {
-			path: 'prompts/anthropic_msg_01KC4LUW4HGs2ujyEYvHJ9Vc__claude-3-5-sonnet-20240620.json',
-			declarations: [],
-		},
-		'./prompts/anthropic_msg_01QJqKwX24Ec5JGVzeKxzMXA__claude-3-5-sonnet-20240620.json': {
-			path: 'prompts/anthropic_msg_01QJqKwX24Ec5JGVzeKxzMXA__claude-3-5-sonnet-20240620.json',
-			declarations: [],
-		},
-		'./prompts/anthropic_msg_01R59BZaL6k1VeXdjQCMdqyE__claude-3-5-sonnet-20240620.json': {
-			path: 'prompts/anthropic_msg_01R59BZaL6k1VeXdjQCMdqyE__claude-3-5-sonnet-20240620.json',
-			declarations: [],
-		},
-		'./prompts/anthropic_msg_01UZL7XY9SpZbS3dML8kFeNM__claude-3-5-sonnet-20240620.json': {
-			path: 'prompts/anthropic_msg_01UZL7XY9SpZbS3dML8kFeNM__claude-3-5-sonnet-20240620.json',
+		'./prompts/anthropic_undefined.json': {
+			path: 'prompts/anthropic_undefined.json',
 			declarations: [],
 		},
 		'./prompts/google_TODO.json': {path: 'prompts/google_TODO.json', declarations: []},
+		'./prompts/google_undefined.json': {path: 'prompts/google_undefined.json', declarations: []},
 		'./prompts/openai_TODO.json': {path: 'prompts/openai_TODO.json', declarations: []},
+		'./prompts/openai_undefined.json': {path: 'prompts/openai_undefined.json', declarations: []},
+		'./server/prompt_request.log': {path: 'server/prompt_request.log', declarations: []},
 		'./server/server.js': {path: 'server/server.ts', declarations: []},
 		'./server/zzz_server.js': {
 			path: 'server/zzz_server.ts',

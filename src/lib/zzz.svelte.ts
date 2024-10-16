@@ -8,7 +8,12 @@ import {to_array} from '@ryanatkn/belt/array.js';
 
 import {Zzz_Data, type Zzz_Data_Json} from '$lib/zzz_data.svelte.js';
 import type {Zzz_Client} from '$lib/zzz_client.js';
-import type {Echo_Message, Filer_Change_Message, Receive_Prompt_Message} from '$lib/zzz_message.js';
+import type {
+	Echo_Message,
+	Filer_Change_Message,
+	Receive_Prompt_Message,
+	Send_Prompt_Message,
+} from '$lib/zzz_message.js';
 import type {Agent} from '$lib/agent.svelte.js';
 import {random_id, type Id} from '$lib/id.js';
 
@@ -35,7 +40,7 @@ export class Zzz {
 
 	// TODO what APi for these? `Agents` or `Agent_Manager` class?
 	// maybe have the source of truth by an array?
-	agents: SvelteMap<string, Agent> = new SvelteMap();
+	agents: Agent[] = $state([]);
 
 	files_by_id: SvelteMap<Path_Id, Source_File> = new SvelteMap();
 
@@ -43,15 +48,17 @@ export class Zzz {
 
 	// TODO could track this more formally, and add time tracking
 	pending_prompts: SvelteMap<Id, Deferred<Receive_Prompt_Message>> = new SvelteMap();
+	// TODO generically track req/res pairs
+	prompt_requests: SvelteMap<Id, {request: Send_Prompt_Message; response: Receive_Prompt_Message}> =
+		new SvelteMap();
 
-	// TODO maybe this should be an array, and have a cached map by id? but that would re-create the map each change
-	prompt_responses: SvelteMap<Id, Receive_Prompt_Message> = new SvelteMap();
+	prompt_responses: Receive_Prompt_Message[] = $state([]);
 
 	pending_prompts_by_agent: Map<Agent, Receive_Prompt_Message[]> = $derived(
 		new Map(
-			Array.from(this.agents.values()).map((agent) => [
+			this.agents.map((agent) => [
 				agent,
-				Array.from(this.prompt_responses.values()).filter((p) => agent.name === p.agent_name),
+				this.prompt_responses.filter((p) => agent.name === p.agent_name),
 			]),
 		),
 	);
@@ -61,7 +68,7 @@ export class Zzz {
 
 	constructor(options: Zzz_Options) {
 		const {agents, client, data = new Zzz_Data()} = options;
-		for (const agent of agents) this.agents.set(agent.name, agent);
+		this.agents.push(...agents);
 		this.client = client;
 		this.data = data;
 	}
@@ -81,19 +88,19 @@ export class Zzz {
 
 		const responses = await Promise.all(
 			Array.from(agents.values()).map(async (agent) => {
-				const message = {
+				const message: Send_Prompt_Message = {
 					id: random_id(),
 					type: 'send_prompt',
 					agent_name: agent.name,
 					text,
-				} as const;
+				};
 				this.client.send(message);
 
 				const deferred = create_deferred<Receive_Prompt_Message>();
-				this.pending_prompts.set(message.id, deferred);
+				this.pending_prompts.set(message.id, deferred); // TODO roundabout way to get req/res
 				const response = await deferred.promise;
 				console.log(`prompt response`, response);
-				this.pending_prompts.delete(message.id); // TODO @many need ids for req/res
+				this.prompt_requests.set(message.id, {request: message, response});
 				return response;
 			}),
 		);
@@ -107,7 +114,7 @@ export class Zzz {
 			console.error('expected pending', message);
 			return;
 		}
-		this.prompt_responses.set(message.request_id, message);
+		this.prompt_responses.push(message);
 		deferred.resolve(message);
 		this.pending_prompts.delete(message.request_id); // deleting intentionally after resolving to maybe avoid a corner case loop of sending the same prompt again
 	}

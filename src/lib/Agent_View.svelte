@@ -30,11 +30,6 @@
 
 <div class="agent_view" use:contextmenu_action={contextmenu_entries}>
 	<View_With {agent} />
-	<!-- {#if view_with === 'summary'}
-		<Agent_Summary {agent} />
-	{:else}
-		<Agent_Info {agent} />
-	{/if} -->
 </div>
 
 {#if show_more}

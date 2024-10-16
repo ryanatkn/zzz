@@ -1,0 +1,27 @@
+{
+	"request": {
+		"id": 5602441004062553,
+		"type": "send_prompt",
+		"agent_name": "claude",
+		"text": "once upon a time, "
+	},
+	"response": {
+		"id": 8156653094747115,
+		"type": "prompt_response",
+		"request_id": 5602441004062553,
+		"agent_name": "claude",
+		"data": {
+			"type": "anthropic",
+			"value": {
+				"id": "msg_01YXncQdih4Tsm1UcLCJxS78",
+				"type": "message",
+				"role": "assistant",
+				"model": "claude-3-5-sonnet-20240620",
+				"content": [{"type": "text", "text": "A fairy tale begins."}],
+				"stop_reason": "end_turn",
+				"stop_sequence": null,
+				"usage": {"input_tokens": 46, "output_tokens": 8}
+			}
+		}
+	}
+}

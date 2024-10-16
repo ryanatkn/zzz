@@ -4,9 +4,9 @@
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import Agent_View from '$lib/Agent_View.svelte';
 
-	interface Props {}
+	// interface Props {}
 
-	const {}: Props = $props();
+	// const {}: Props = $props();
 
 	const zzz = zzz_context.get();
 
