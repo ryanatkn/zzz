@@ -185,6 +185,33 @@ export const package_json = {
 			default: './dist/Prompt_Responses_List.svelte',
 		},
 		'./prompt.svelte.js': {types: './dist/prompt.svelte.d.ts', default: './dist/prompt.svelte.js'},
+		'./prompts/anthropic_claude-3-haiku-20240307_3067492502110254.json': {
+			default: './dist/prompts/anthropic_claude-3-haiku-20240307_3067492502110254.json',
+		},
+		'./prompts/anthropic_claude-3-haiku-20240307_4944451929116606.json': {
+			default: './dist/prompts/anthropic_claude-3-haiku-20240307_4944451929116606.json',
+		},
+		'./prompts/anthropic_claude-3-haiku-20240307_6214957760326989.json': {
+			default: './dist/prompts/anthropic_claude-3-haiku-20240307_6214957760326989.json',
+		},
+		'./prompts/google_gemini-1.5-pro_6229778016883003.json': {
+			default: './dist/prompts/google_gemini-1.5-pro_6229778016883003.json',
+		},
+		'./prompts/google_gemini-1.5-pro_7843438025951819.json': {
+			default: './dist/prompts/google_gemini-1.5-pro_7843438025951819.json',
+		},
+		'./prompts/google_gemini-1.5-pro_8208194086203746.json': {
+			default: './dist/prompts/google_gemini-1.5-pro_8208194086203746.json',
+		},
+		'./prompts/openai_gpt-4o-mini_4057879994310374.json': {
+			default: './dist/prompts/openai_gpt-4o-mini_4057879994310374.json',
+		},
+		'./prompts/openai_gpt-4o-mini_5514072615768842.json': {
+			default: './dist/prompts/openai_gpt-4o-mini_5514072615768842.json',
+		},
+		'./prompts/openai_gpt-4o-mini_7997240978446325.json': {
+			default: './dist/prompts/openai_gpt-4o-mini_7997240978446325.json',
+		},
 		'./server/prompt.log': {default: './dist/server/prompt.log'},
 		'./server/server.js': {types: './dist/server/server.d.ts', default: './dist/server/server.js'},
 		'./server/zzz_server.js': {
@@ -280,6 +307,42 @@ export const src_json = {
 				{name: 'Prompt_Options', kind: 'type'},
 				{name: 'Prompt', kind: 'class'},
 			],
+		},
+		'./prompts/anthropic_claude-3-haiku-20240307_3067492502110254.json': {
+			path: 'prompts/anthropic_claude-3-haiku-20240307_3067492502110254.json',
+			declarations: [],
+		},
+		'./prompts/anthropic_claude-3-haiku-20240307_4944451929116606.json': {
+			path: 'prompts/anthropic_claude-3-haiku-20240307_4944451929116606.json',
+			declarations: [],
+		},
+		'./prompts/anthropic_claude-3-haiku-20240307_6214957760326989.json': {
+			path: 'prompts/anthropic_claude-3-haiku-20240307_6214957760326989.json',
+			declarations: [],
+		},
+		'./prompts/google_gemini-1.5-pro_6229778016883003.json': {
+			path: 'prompts/google_gemini-1.5-pro_6229778016883003.json',
+			declarations: [],
+		},
+		'./prompts/google_gemini-1.5-pro_7843438025951819.json': {
+			path: 'prompts/google_gemini-1.5-pro_7843438025951819.json',
+			declarations: [],
+		},
+		'./prompts/google_gemini-1.5-pro_8208194086203746.json': {
+			path: 'prompts/google_gemini-1.5-pro_8208194086203746.json',
+			declarations: [],
+		},
+		'./prompts/openai_gpt-4o-mini_4057879994310374.json': {
+			path: 'prompts/openai_gpt-4o-mini_4057879994310374.json',
+			declarations: [],
+		},
+		'./prompts/openai_gpt-4o-mini_5514072615768842.json': {
+			path: 'prompts/openai_gpt-4o-mini_5514072615768842.json',
+			declarations: [],
+		},
+		'./prompts/openai_gpt-4o-mini_7997240978446325.json': {
+			path: 'prompts/openai_gpt-4o-mini_7997240978446325.json',
+			declarations: [],
 		},
 		'./server/prompt.log': {path: 'server/prompt.log', declarations: []},
 		'./server/server.js': {path: 'server/server.ts', declarations: []},

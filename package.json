@@ -45,6 +45,7 @@
     "@sveltejs/kit": "^2.7.1",
     "@sveltejs/package": "^2.3.5",
     "@sveltejs/vite-plugin-svelte": "^3.1.2",
+    "devalue": "^5.1.1",
     "eslint": "^9.12.0",
     "eslint-plugin-svelte": "^2.44.1",
     "hono": "^4.6.5",
@@ -216,6 +217,33 @@
     "./prompt.svelte.js": {
       "types": "./dist/prompt.svelte.d.ts",
       "default": "./dist/prompt.svelte.js"
+    },
+    "./prompts/anthropic_claude-3-haiku-20240307_3067492502110254.json": {
+      "default": "./dist/prompts/anthropic_claude-3-haiku-20240307_3067492502110254.json"
+    },
+    "./prompts/anthropic_claude-3-haiku-20240307_4944451929116606.json": {
+      "default": "./dist/prompts/anthropic_claude-3-haiku-20240307_4944451929116606.json"
+    },
+    "./prompts/anthropic_claude-3-haiku-20240307_6214957760326989.json": {
+      "default": "./dist/prompts/anthropic_claude-3-haiku-20240307_6214957760326989.json"
+    },
+    "./prompts/google_gemini-1.5-pro_6229778016883003.json": {
+      "default": "./dist/prompts/google_gemini-1.5-pro_6229778016883003.json"
+    },
+    "./prompts/google_gemini-1.5-pro_7843438025951819.json": {
+      "default": "./dist/prompts/google_gemini-1.5-pro_7843438025951819.json"
+    },
+    "./prompts/google_gemini-1.5-pro_8208194086203746.json": {
+      "default": "./dist/prompts/google_gemini-1.5-pro_8208194086203746.json"
+    },
+    "./prompts/openai_gpt-4o-mini_4057879994310374.json": {
+      "default": "./dist/prompts/openai_gpt-4o-mini_4057879994310374.json"
+    },
+    "./prompts/openai_gpt-4o-mini_5514072615768842.json": {
+      "default": "./dist/prompts/openai_gpt-4o-mini_5514072615768842.json"
+    },
+    "./prompts/openai_gpt-4o-mini_7997240978446325.json": {
+      "default": "./dist/prompts/openai_gpt-4o-mini_7997240978446325.json"
     },
     "./server/prompt.log": {
       "default": "./dist/server/prompt.log"
