@@ -43,7 +43,7 @@
 >
 	send prompt ⚟
 </Pending_Button>
-<div class="w_100 flex mb_lg">
+<div class="w_100 flex py_lg">
 	{#each agents.values() as agent (agent)}
 		<Agent_View {agent} />
 	{/each}

@@ -1,4 +1,4 @@
-export type Agent_Name = 'claude' | 'chatgpt' | 'gemini'; // TODO extensible
+export type Agent_Name = 'claude' | 'gpt' | 'gemini'; // TODO extensible
 
 export interface Agent_Json {
 	name: Agent_Name;

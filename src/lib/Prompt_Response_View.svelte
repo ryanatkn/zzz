@@ -29,11 +29,13 @@
 
 	// TODO hacky
 	const content = $derived(
-		prompt_response.data.type === 'anthropic'
+		prompt_response.data.type === 'claude'
 			? prompt_response.data.value.content
 					.map((c) => (c.type === 'text' ? c.text : c.name))
 					.join('\n\n')
-			: '',
+			: prompt_response.data.type === 'gpt'
+				? prompt_response.data.value.content
+				: prompt_response.data.value.text,
 	);
 </script>
 

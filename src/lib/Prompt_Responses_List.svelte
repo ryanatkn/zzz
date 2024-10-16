@@ -17,7 +17,7 @@
 	);
 </script>
 
-<ul class="unstyled">
+<ul class="unstyled py_lg">
 	{#each responses as prompt_response (prompt_response)}
 		<li class="p_md">
 			<Prompt_Response_View {agent} {prompt_response} />

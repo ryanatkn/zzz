@@ -18,5 +18,5 @@
 
 <h3>prompt</h3>
 <pre>{prompt_request?.request.text}</pre>
-<h3>response from {agent.title}</h3>
+<h3>response from {agent.title} (@{agent.name})</h3>
 <pre>{JSON.stringify(prompt_response, null, '\t')}</pre>

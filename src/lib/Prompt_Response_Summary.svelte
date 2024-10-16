@@ -2,6 +2,7 @@
 	import type {Receive_Prompt_Message} from '$lib/zzz_message.js';
 	import type {Agent} from '$lib/agent.svelte.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {unreachable} from '@ryanatkn/belt/error.js';
 
 	interface Props {
 		agent: Agent;
@@ -18,7 +19,7 @@
 
 <p>@user: {prompt_request?.request.text}</p>
 <p>
-	@{agent.title}: {#if prompt_response.data.type === 'anthropic'}
+	@{agent.title}: {#if prompt_response.data.type === 'claude'}
 		{#each prompt_response.data.value.content as item (item)}
 			{#if item.type === 'text'}
 				{item.text}
@@ -26,9 +27,11 @@
 				used tool {item.name} - {item.input} - {item.id}
 			{/if}
 		{/each}
-	{:else if prompt_response.data.type === 'openai'}
+	{:else if prompt_response.data.type === 'gpt'}
 		{prompt_response.data.value.content}
-	{:else}
+	{:else if prompt_response.data.type === 'gemini'}
 		{prompt_response.data.value.text}
+	{:else}
+		{unreachable(prompt_response.data)}
 	{/if}
 </p>

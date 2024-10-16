@@ -41,7 +41,7 @@
 		// TODO refactor - config in `zzz.config.ts`?
 		agents: [
 			new Agent({data: {name: 'claude', icon: 'c', title: 'Claude', model: '', url: ''}}),
-			new Agent({data: {name: 'chatgpt', icon: 'c', title: 'ChatGPT', model: '', url: ''}}),
+			new Agent({data: {name: 'gpt', icon: 'c', title: 'ChatGPT', model: '', url: ''}}),
 			new Agent({data: {name: 'gemini', icon: 'c', title: 'Gemini', model: '', url: ''}}),
 		],
 		client: new Zzz_Client({

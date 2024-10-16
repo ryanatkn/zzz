@@ -76,16 +76,16 @@ export interface Receive_Prompt_Message extends Base_Message {
 	request_id: Id;
 	agent_name: Agent_Name;
 	data:
-		| {type: 'anthropic'; value: Anthropic.Messages.Message}
-		| {type: 'openai'; value: OpenAI.Chat.Completions.ChatCompletionMessage}
+		| {type: 'claude'; value: Anthropic.Messages.Message}
+		| {type: 'gpt'; value: OpenAI.Chat.Completions.ChatCompletionMessage}
 		| {
-				type: 'google';
+				type: 'gemini';
 				value: {
 					text: string;
 					candidates: Google.GenerateContentCandidate[] | null;
 					function_calls: Google.FunctionCall[] | null;
-					prompt_feedback: Google.PromptFeedback | null; // eslint-disable-line @typescript-eslint/no-redundant-type-constituents
-					usage_metadata: Google.UsageMetadata | null; // eslint-disable-line @typescript-eslint/no-redundant-type-constituents
+					prompt_feedback: Google.PromptFeedback | null;
+					usage_metadata: Google.UsageMetadata | null;
 				};
 		  };
 }

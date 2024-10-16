@@ -19,25 +19,13 @@ import type {
 } from '$lib/zzz_message.js';
 import type {Prompt_Json} from '$lib/prompt.svelte.js';
 import {random_id} from '$lib/id.js';
+import type {Model_Type, Models} from '$lib/config_helpers.js';
+import {default_models} from '$lib/config.js';
 
-// TODO extract config
-export const models: Record<Model_Type, {claude: string; chatgpt: string; gemini: string}> = {
-	cheap: {
-		claude: 'claude-3-haiku-20240307',
-		chatgpt: 'gpt-4o-mini',
-		gemini: 'gemini-1.5-pro',
-	},
-	smart: {
-		claude: 'claude-3-5-sonnet-20240620',
-		chatgpt: 'gpt-4o',
-		gemini: 'gemini-1.5-pro',
-	},
-} as const;
-export type Model_Type = 'cheap' | 'smart';
+// TODO refactor to config
+const SYSTEM_MESSAGE_DEFAULT =
+	'You are a helpful assistant. Respond with a short creative message, a sentence or two in length, that continues from where the user left off, playing along for fun.';
 
-// TODO refactor
-const SYSTEM_MESSAGE =
-	'You are a helpful assistant. Respond with a short creative message that continues the vibe set by the user.';
 const anthropic = new Anthropic({apiKey: SECRET_ANTHROPIC_API_KEY});
 const openai = new OpenAI({apiKey: SECRET_OPENAI_API_KEY});
 const google = new GoogleGenerativeAI(SECRET_GOOGLE_API_KEY);
@@ -45,7 +33,9 @@ const google = new GoogleGenerativeAI(SECRET_GOOGLE_API_KEY);
 export interface Options {
 	send: (message: Server_Message) => void;
 	filer?: Filer;
+	models?: Models;
 	model_type?: Model_Type;
+	system_message?: string;
 }
 
 export class Zzz_Server {
@@ -54,6 +44,8 @@ export class Zzz_Server {
 	filer: Filer;
 
 	model_type: Model_Type;
+	models: Models;
+	system_message: string;
 
 	#cleanup_filer: Promise<Cleanup_Watch>;
 
@@ -74,6 +66,8 @@ export class Zzz_Server {
 			}
 		});
 		this.model_type = options.model_type ?? 'cheap';
+		this.models = options.models ?? default_models;
+		this.system_message = options.system_message ?? SYSTEM_MESSAGE_DEFAULT;
 	}
 
 	send(message: Server_Message): void {
@@ -96,15 +90,15 @@ export class Zzz_Server {
 
 				let response: Receive_Prompt_Message;
 
-				console.log(`texting ${agent_name}`, text);
+				console.log(`texting ${agent_name}`, text.substring(0, 1000));
 
 				switch (agent_name) {
 					case 'claude': {
 						const api_response = await anthropic.messages.create({
-							model: models[this.model_type].claude,
+							model: this.models[this.model_type].claude,
 							max_tokens: 1000,
 							temperature: 0,
-							system: SYSTEM_MESSAGE,
+							system: this.system_message,
 							messages: [{role: 'user', content: [{type: 'text', text}]}],
 						});
 						console.log(`claude api_response`, api_response);
@@ -113,18 +107,16 @@ export class Zzz_Server {
 							type: 'prompt_response',
 							request_id: request.id,
 							agent_name: request.agent_name,
-							data: {type: 'anthropic', value: api_response},
+							data: {type: 'claude', value: api_response},
 						};
-						console.log(`got Claude message`, api_response);
 						break;
 					}
 
-					case 'chatgpt': {
-						console.log(`texting OpenAI`, request.agent_name); // TODO model
+					case 'gpt': {
 						const api_response = await openai.chat.completions.create({
-							model: models[this.model_type].chatgpt,
+							model: this.models[this.model_type].gpt,
 							messages: [
-								{role: 'system', content: SYSTEM_MESSAGE},
+								{role: 'system', content: this.system_message},
 								{role: 'user', content: text},
 							],
 						});
@@ -135,16 +127,18 @@ export class Zzz_Server {
 							type: 'prompt_response',
 							request_id: request.id,
 							agent_name: request.agent_name,
-							data: {type: 'openai', value: api_response_text},
+							data: {type: 'gpt', value: api_response_text},
 						};
-						console.log(`got OpenAI message`, response.data);
 						break;
 					}
 
 					case 'gemini': {
-						console.log(`texting Gemini`, request.agent_name); // TODO model
-						const google_model = google.getGenerativeModel({model: models[this.model_type].gemini});
-						const api_response = await google_model.generateContent(SYSTEM_MESSAGE + '\n\n' + text);
+						const google_model = google.getGenerativeModel({
+							model: this.models[this.model_type].gemini,
+						});
+						const api_response = await google_model.generateContent(
+							this.system_message + '\n\n' + text,
+						);
 						console.log(`gemini api_response`, api_response);
 						response = {
 							id: random_id(),
@@ -152,7 +146,7 @@ export class Zzz_Server {
 							request_id: request.id,
 							agent_name: request.agent_name,
 							data: {
-								type: 'google',
+								type: 'gemini',
 								// some of these are functions, and we want `null` for full JSON documents, so manually spelling them out:
 								value: {
 									text: api_response.response.text(),
@@ -163,7 +157,6 @@ export class Zzz_Server {
 								},
 							},
 						};
-						console.log(`got Gemini message`, response.data);
 						break;
 					}
 
@@ -173,7 +166,9 @@ export class Zzz_Server {
 
 				// don't need to wait for this to finish,
 				// the expected file event is now independent of the request
-				void save_response(request, response, models[this.model_type][agent_name]);
+				void save_response(request, response, this.models[this.model_type][agent_name]);
+
+				console.log(`got ${agent_name} message`, response.data);
 
 				return response; // TODO @many sending the text again is wasteful, need ids
 			}
@@ -201,7 +196,7 @@ const save_response = async (
 	response: Receive_Prompt_Message,
 	model: string,
 ): Promise<void> => {
-	const filename = `${response.data.type}_${model}_${response.id}.json`; // TODO include model data in these
+	const filename = `${request.agent_name}__${model}__${response.id}.json`; // TODO include model data in these
 
 	const path = `./src/lib/prompts/` + filename;
 

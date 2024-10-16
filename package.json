@@ -218,24 +218,6 @@
       "types": "./dist/prompt.svelte.d.ts",
       "default": "./dist/prompt.svelte.js"
     },
-    "./prompts/anthropic_claude-3-haiku-20240307_5206337729303807.json": {
-      "default": "./dist/prompts/anthropic_claude-3-haiku-20240307_5206337729303807.json"
-    },
-    "./prompts/anthropic_claude-3-haiku-20240307_8867751139722531.json": {
-      "default": "./dist/prompts/anthropic_claude-3-haiku-20240307_8867751139722531.json"
-    },
-    "./prompts/google_gemini-1.5-pro_4812505093666467.json": {
-      "default": "./dist/prompts/google_gemini-1.5-pro_4812505093666467.json"
-    },
-    "./prompts/google_gemini-1.5-pro_7216333785782076.json": {
-      "default": "./dist/prompts/google_gemini-1.5-pro_7216333785782076.json"
-    },
-    "./prompts/openai_gpt-4o-mini_6079498772160213.json": {
-      "default": "./dist/prompts/openai_gpt-4o-mini_6079498772160213.json"
-    },
-    "./prompts/openai_gpt-4o-mini_6429949583514594.json": {
-      "default": "./dist/prompts/openai_gpt-4o-mini_6429949583514594.json"
-    },
     "./server/prompt.log": {
       "default": "./dist/server/prompt.log"
     },
@@ -251,6 +233,10 @@
       "types": "./dist/Settings.svelte.d.ts",
       "svelte": "./dist/Settings.svelte",
       "default": "./dist/Settings.svelte"
+    },
+    "./tape.svelte.js": {
+      "types": "./dist/tape.svelte.d.ts",
+      "default": "./dist/tape.svelte.js"
     },
     "./zzz_client.js": {
       "types": "./dist/zzz_client.d.ts",

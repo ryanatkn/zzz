@@ -8,15 +8,15 @@ Message from client: {"type":"gro_server_message","message":{"id":56024410040625
   text: 'once upon a time, '
 } false
 texting claude once upon a time, 
-Message from client: {"type":"gro_server_message","message":{"id":5028431295659408,"type":"send_prompt","agent_name":"chatgpt","text":"once upon a time, "}} - string
+Message from client: {"type":"gro_server_message","message":{"id":5028431295659408,"type":"send_prompt","agent_name":"gpt","text":"once upon a time, "}} - string
 [zzz_server.receive] message {
   id: 5028431295659408,
   type: 'send_prompt',
-  agent_name: 'chatgpt',
+  agent_name: 'gpt',
   text: 'once upon a time, '
 } false
-texting chatgpt once upon a time, 
-texting OpenAI chatgpt
+texting gpt once upon a time, 
+texting OpenAI gpt
 Message from client: {"type":"gro_server_message","message":{"id":1699893643709629,"type":"send_prompt","agent_name":"gemini","text":"once upon a time, "}} - string
 [zzz_server.receive] message {
   id: 1699893643709629,
@@ -49,7 +49,7 @@ openai api_response {
   system_fingerprint: 'fp_6b68a8204b'
 }
 got OpenAI message {
-  type: 'openai',
+  type: 'gpt',
   value: {
     role: 'assistant',
     content: 'a dragon flew over a village.',
