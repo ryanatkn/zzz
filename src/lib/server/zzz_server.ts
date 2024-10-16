@@ -21,16 +21,16 @@ import type {Prompt_Json} from '$lib/prompt.svelte.js';
 import {random_id} from '$lib/id.js';
 
 // TODO extract config
-export const models: Record<Model_Type, {anthropic: string; openai: string; google: string}> = {
+export const models: Record<Model_Type, {claude: string; chatgpt: string; gemini: string}> = {
 	cheap: {
-		anthropic: 'claude-3-haiku-20240307',
-		openai: 'gpt-4o-mini',
-		google: 'gemini-1.5-pro',
+		claude: 'claude-3-haiku-20240307',
+		chatgpt: 'gpt-4o-mini',
+		gemini: 'gemini-1.5-pro',
 	},
 	smart: {
-		anthropic: 'claude-3-5-sonnet-20240620',
-		openai: 'gpt-4o',
-		google: 'gemini-1.5-pro',
+		claude: 'claude-3-5-sonnet-20240620',
+		chatgpt: 'gpt-4o',
+		gemini: 'gemini-1.5-pro',
 	},
 } as const;
 export type Model_Type = 'cheap' | 'smart';
@@ -100,7 +100,7 @@ export class Zzz_Server {
 				switch (agent_name) {
 					case 'claude': {
 						const api_response = await anthropic.messages.create({
-							model: models[this.model_type].anthropic,
+							model: models[this.model_type].claude,
 							max_tokens: 1000,
 							temperature: 0,
 							system: SYSTEM_MESSAGE,
@@ -121,7 +121,7 @@ export class Zzz_Server {
 					case 'chatgpt': {
 						console.log(`texting OpenAI`, request.agent_name); // TODO model
 						const api_response = await openai.chat.completions.create({
-							model: models[this.model_type].openai,
+							model: models[this.model_type].chatgpt,
 							messages: [
 								{role: 'system', content: SYSTEM_MESSAGE},
 								{role: 'user', content: text},
@@ -142,7 +142,7 @@ export class Zzz_Server {
 
 					case 'gemini': {
 						console.log(`texting Gemini`, request.agent_name); // TODO model
-						const google_model = google.getGenerativeModel({model: models[this.model_type].google});
+						const google_model = google.getGenerativeModel({model: models[this.model_type].gemini});
 						const api_response = await google_model.generateContent(SYSTEM_MESSAGE + '\n\n' + text);
 						console.log(`gemini api_response`, api_response);
 						response = {
@@ -172,7 +172,7 @@ export class Zzz_Server {
 
 				// don't need to wait for this to finish,
 				// the expected file event is now independent of the request
-				void save_response(request, response);
+				void save_response(request, response, models[this.model_type][agent_name]);
 
 				return response; // TODO @many sending the text again is wasteful, need ids
 			}
@@ -198,12 +198,13 @@ export class Zzz_Server {
 const save_response = async (
 	request: Send_Prompt_Message,
 	response: Receive_Prompt_Message,
+	model: string,
 ): Promise<void> => {
-	const filename = `${response.data.type}_${response.id}.json`; // TODO include model data in these
+	const filename = `${response.data.type}_${model}_${response.id}.json`; // TODO include model data in these
 
 	const path = `./src/lib/prompts/` + filename;
 
-	const json: Prompt_Json = {request, response};
+	const json: Prompt_Json = {model, request, response};
 
 	writeFileSync(path, await format_file(JSON.stringify(json), {parser: 'json'}));
 };
