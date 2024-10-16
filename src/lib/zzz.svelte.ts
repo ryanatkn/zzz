@@ -63,7 +63,6 @@ export class Zzz {
 		),
 	);
 
-	// TODO @many need ids for req/res
 	// TODO BLOCK store state granularly for each agent
 
 	constructor(options: Zzz_Options) {

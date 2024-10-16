@@ -9,10 +9,14 @@
 	}
 
 	const {agent, prompt_responses}: Props = $props();
+
+	const responses = Array.from(prompt_responses.values()).filter(
+		(r) => r.agent_name === agent.name,
+	);
 </script>
 
 <ul class="unstyled">
-	{#each prompt_responses.values() as prompt_response (prompt_response)}
+	{#each responses as prompt_response (prompt_response)}
 		<li>
 			<Prompt_Response_View {agent} {prompt_response} />
 		</li>
