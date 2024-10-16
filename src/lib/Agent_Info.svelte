@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type {Agent} from '$lib/agent.svelte.js';
-	import Prompt_Responses_List from '$lib/Prompt_Responses_List.svelte';
+	import Tapes_List from '$lib/Tapes_List.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 
 	interface Props {
@@ -22,7 +22,7 @@
 	<div>{agent.title}</div>
 	<div>{agent.model}</div>
 	{#if tape}
-		<Prompt_Responses_List {agent} {tape} />
+		<Tapes_List {agent} {tape} />
 	{:else}
 		<p>no tape found for {agent.name}</p>
 	{/if}

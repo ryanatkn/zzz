@@ -4,8 +4,8 @@
 	import Contextmenu_Entry from '@ryanatkn/fuz/Contextmenu_Entry.svelte';
 	import {contextmenu_action} from '@ryanatkn/fuz/contextmenu_state.svelte.js';
 
-	import Prompt_Response_Info from '$lib/Prompt_Response_Info.svelte';
-	import Prompt_Response_Summary from '$lib/Prompt_Response_Summary.svelte';
+	import Tape_Info from '$lib/Tape_Info.svelte';
+	import Tape_Summary from '$lib/Tape_Summary.svelte';
 	import type {Receive_Prompt_Message} from '$lib/zzz_message.js';
 	import type {Agent} from '$lib/agent.svelte.js';
 	import {zzz_context} from './zzz.svelte.js';
@@ -41,9 +41,9 @@
 
 <div class="prompt_response_view" use:contextmenu_action={contextmenu_entries}>
 	{#if view_with === 'summary'}
-		<Prompt_Response_Summary {agent} {prompt_response} />
+		<Tape_Summary {agent} {prompt_response} />
 	{:else}
-		<Prompt_Response_Info {agent} {prompt_response} />
+		<Tape_Info {agent} {prompt_response} />
 	{/if}
 </div>
 
@@ -52,7 +52,7 @@
 		<!-- TODO expand width, might need to change `Dialog` -->
 		<div class="bg p_md radius_sm width_md">
 			<!-- TODO should this be a `Prompt_Response_Editor`? -->
-			<Prompt_Response_Info {agent} {prompt_response} />
+			<Tape_Info {agent} {prompt_response} />
 			<button type="button" onclick={() => (show_editor = false)}>close</button>
 		</div>
 	</Dialog>
