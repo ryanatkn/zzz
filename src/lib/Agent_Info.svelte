@@ -15,7 +15,7 @@
 
 <div class="flex_1 {classes}">
 	<!-- TODO pass a zap? -->
-	<div class="size_xl">{agent.icon}</div>
+	<!-- <div class="size_xl">{agent.icon}</div> -->
 	<div>{agent.title}</div>
 	<div>{agent.model}</div>
 	<Prompt_Responses_List {agent} prompt_responses={zzz.prompt_responses} />

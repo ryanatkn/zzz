@@ -44,6 +44,7 @@ export const package_json = {
 		'@sveltejs/kit': '^2.7.1',
 		'@sveltejs/package': '^2.3.5',
 		'@sveltejs/vite-plugin-svelte': '^3.1.2',
+		devalue: '^5.1.1',
 		eslint: '^9.12.0',
 		'eslint-plugin-svelte': '^2.44.1',
 		hono: '^4.6.5',

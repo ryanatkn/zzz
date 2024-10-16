@@ -9,7 +9,7 @@
 
 	const zzz = zzz_context.get();
 
-	let echo_text = $state('echo server');
+	let echo_text = $state('echo server ⚞');
 
 	const send_echo = () => {
 		zzz.send_echo(echo_text);
@@ -19,7 +19,6 @@
 </script>
 
 <div class="row">
-	<button type="button" onclick={send_echo}>⚏</button>
 	<input
 		bind:value={echo_text}
 		onkeydown={(e) => {

@@ -15,7 +15,7 @@
 
 <div class="flex_1">
 	<!-- TODO instead of `prompt_responses`, a higher-level abstraction like a conversation -->
-	<div><span class="size_xl">{agent.icon}</span> {agent.title}</div>
+	<div><!--<span class="size_xl">{agent.icon}</span> -->{agent.title}</div>
 	<div>{agent.model}</div>
 	<Prompt_Responses_List {agent} prompt_responses={zzz.prompt_responses} />
 </div>

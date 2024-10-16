@@ -14,7 +14,7 @@
 
 	let pending = $state(false);
 
-	let value = $state('');
+	let value = $state('the traveler stopped and asked the three AIs the same question, ');
 
 	let textarea_el: HTMLTextAreaElement | undefined = $state();
 
@@ -41,7 +41,7 @@
 		void onsubmit();
 	}}
 >
-	⚞ send prompt ⚟
+	send prompt ⚟
 </Pending_Button>
 <div class="w_100 flex mb_lg">
 	{#each agents.values() as agent (agent)}
