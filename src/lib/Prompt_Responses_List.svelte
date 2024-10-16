@@ -11,7 +11,9 @@
 	const {agent, prompt_responses}: Props = $props();
 
 	const responses = $derived(
-		Array.from(prompt_responses).filter((r) => r.agent_name === agent.name),
+		Array.from(prompt_responses)
+			.filter((r) => r.agent_name === agent.name)
+			.reverse(),
 	);
 </script>
 

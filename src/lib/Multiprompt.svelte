@@ -29,11 +29,6 @@
 	};
 </script>
 
-<div class="w_100 flex mb_lg">
-	{#each agents.values() as agent (agent)}
-		<Agent_View {agent} />
-	{/each}
-</div>
 <!-- TODO instead of a `"prompt"` placeholder show a contextmenu with recent history onfocus -->
 <textarea bind:this={textarea_el} placeholder="prompt" bind:value></textarea>
 <Pending_Button
@@ -48,3 +43,8 @@
 >
 	⚞ send prompt ⚟
 </Pending_Button>
+<div class="w_100 flex mb_lg">
+	{#each agents.values() as agent (agent)}
+		<Agent_View {agent} />
+	{/each}
+</div>
