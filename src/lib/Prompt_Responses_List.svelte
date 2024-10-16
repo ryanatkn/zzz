@@ -10,7 +10,9 @@
 
 	const {agent, prompt_responses}: Props = $props();
 
-	const responses = Array.from(prompt_responses).filter((r) => r.agent_name === agent.name);
+	const responses = $derived(
+		Array.from(prompt_responses).filter((r) => r.agent_name === agent.name),
+	);
 </script>
 
 <ul class="unstyled">
