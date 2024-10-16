@@ -191,33 +191,6 @@ export const package_json = {
 			default: './dist/Prompt_Responses_List.svelte',
 		},
 		'./prompt.svelte.js': {types: './dist/prompt.svelte.d.ts', default: './dist/prompt.svelte.js'},
-		'./prompts/claude__claude-3-haiku-20240307__6777068715551859.json': {
-			default: './dist/prompts/claude__claude-3-haiku-20240307__6777068715551859.json',
-		},
-		'./prompts/claude__claude-3-haiku-20240307__803762750798388.json': {
-			default: './dist/prompts/claude__claude-3-haiku-20240307__803762750798388.json',
-		},
-		'./prompts/claude__claude-3-haiku-20240307__8296772218296189.json': {
-			default: './dist/prompts/claude__claude-3-haiku-20240307__8296772218296189.json',
-		},
-		'./prompts/gemini__gemini-1.5-flash__4675694645404938.json': {
-			default: './dist/prompts/gemini__gemini-1.5-flash__4675694645404938.json',
-		},
-		'./prompts/gemini__gemini-1.5-flash__720090602849282.json': {
-			default: './dist/prompts/gemini__gemini-1.5-flash__720090602849282.json',
-		},
-		'./prompts/gemini__gemini-1.5-flash__78726623409503.json': {
-			default: './dist/prompts/gemini__gemini-1.5-flash__78726623409503.json',
-		},
-		'./prompts/gpt__gpt-4o-mini__5821669774185783.json': {
-			default: './dist/prompts/gpt__gpt-4o-mini__5821669774185783.json',
-		},
-		'./prompts/gpt__gpt-4o-mini__786858608160796.json': {
-			default: './dist/prompts/gpt__gpt-4o-mini__786858608160796.json',
-		},
-		'./prompts/gpt__gpt-4o-mini__8316481051676459.json': {
-			default: './dist/prompts/gpt__gpt-4o-mini__8316481051676459.json',
-		},
 		'./server/prompt.log': {default: './dist/server/prompt.log'},
 		'./server/server.js': {types: './dist/server/server.d.ts', default: './dist/server/server.js'},
 		'./server/zzz_server.js': {
@@ -280,7 +253,8 @@ export const src_json = {
 			path: 'config.ts',
 			declarations: [
 				{name: 'default_models', kind: 'variable'},
-				{name: 'config', kind: 'variable'},
+				{name: 'default_agents', kind: 'variable'},
+				{name: 'default', kind: 'variable'},
 			],
 		},
 		'./Control_Panel.svelte': {path: 'Control_Panel.svelte', declarations: []},
@@ -331,42 +305,6 @@ export const src_json = {
 				{name: 'Prompt', kind: 'class'},
 			],
 		},
-		'./prompts/claude__claude-3-haiku-20240307__6777068715551859.json': {
-			path: 'prompts/claude__claude-3-haiku-20240307__6777068715551859.json',
-			declarations: [],
-		},
-		'./prompts/claude__claude-3-haiku-20240307__803762750798388.json': {
-			path: 'prompts/claude__claude-3-haiku-20240307__803762750798388.json',
-			declarations: [],
-		},
-		'./prompts/claude__claude-3-haiku-20240307__8296772218296189.json': {
-			path: 'prompts/claude__claude-3-haiku-20240307__8296772218296189.json',
-			declarations: [],
-		},
-		'./prompts/gemini__gemini-1.5-flash__4675694645404938.json': {
-			path: 'prompts/gemini__gemini-1.5-flash__4675694645404938.json',
-			declarations: [],
-		},
-		'./prompts/gemini__gemini-1.5-flash__720090602849282.json': {
-			path: 'prompts/gemini__gemini-1.5-flash__720090602849282.json',
-			declarations: [],
-		},
-		'./prompts/gemini__gemini-1.5-flash__78726623409503.json': {
-			path: 'prompts/gemini__gemini-1.5-flash__78726623409503.json',
-			declarations: [],
-		},
-		'./prompts/gpt__gpt-4o-mini__5821669774185783.json': {
-			path: 'prompts/gpt__gpt-4o-mini__5821669774185783.json',
-			declarations: [],
-		},
-		'./prompts/gpt__gpt-4o-mini__786858608160796.json': {
-			path: 'prompts/gpt__gpt-4o-mini__786858608160796.json',
-			declarations: [],
-		},
-		'./prompts/gpt__gpt-4o-mini__8316481051676459.json': {
-			path: 'prompts/gpt__gpt-4o-mini__8316481051676459.json',
-			declarations: [],
-		},
 		'./server/prompt.log': {path: 'server/prompt.log', declarations: []},
 		'./server/server.js': {path: 'server/server.ts', declarations: []},
 		'./server/zzz_server.js': {
@@ -381,9 +319,11 @@ export const src_json = {
 			path: 'tape.svelte.ts',
 			declarations: [
 				{name: 'Tapes_Json', kind: 'type'},
+				{name: 'Tapes_Options', kind: 'type'},
 				{name: 'Tape_History_Item', kind: 'type'},
 				{name: 'Tapes', kind: 'class'},
 				{name: 'Tape_Json', kind: 'type'},
+				{name: 'Tape_Options', kind: 'type'},
 				{name: 'Tape', kind: 'class'},
 			],
 		},
