@@ -70,7 +70,7 @@
 
 	<Contextmenu_Submenu>
 		{#snippet icon()}>{/snippet}
-		View with
+		View file with
 		{#snippet menu()}
 			<!-- TODO `disabled` property to the entry -->
 			<!-- TODO refactor into data with the types -->

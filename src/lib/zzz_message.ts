@@ -75,6 +75,7 @@ export interface Receive_Prompt_Message extends Base_Message {
 	type: 'prompt_response';
 	request_id: Id;
 	agent_name: Agent_Name;
+	model: string;
 	data:
 		| {type: 'claude'; value: Anthropic.Messages.Message}
 		| {type: 'gpt'; value: OpenAI.Chat.Completions.ChatCompletionMessage}

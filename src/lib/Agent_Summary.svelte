@@ -12,11 +12,18 @@
 	const {agent, classes = ''}: Props = $props();
 
 	const zzz = zzz_context.get();
+
+	// TODO @many hacky, need id - should be a list? or component takes a `tape`
+	const tape = $derived(zzz.tapes.all.find((t) => t.agents_by_name.get(agent.name)));
 </script>
 
 <div class="flex_1 {classes}">
 	<!-- TODO instead of `prompt_responses`, a higher-level abstraction like a conversation -->
 	<div><!--<span class="size_xl">{agent.icon}</span> -->{agent.title}</div>
 	<div>{agent.model}</div>
-	<Prompt_Responses_List {agent} prompt_responses={zzz.prompt_responses} />
+	{#if tape}
+		<Prompt_Responses_List {agent} {tape} />
+	{:else}
+		<p>no tape found for {agent.name}</p>
+	{/if}
 </div>

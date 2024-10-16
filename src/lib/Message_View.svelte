@@ -51,7 +51,7 @@
 	</Contextmenu_Entry>
 	<Contextmenu_Submenu>
 		{#snippet icon()}>{/snippet}
-		View with
+		View message with
 		{#snippet menu()}
 			<!-- TODO `disabled` property to the entry -->
 			<Contextmenu_Entry run={() => (view_with = 'summary')}>

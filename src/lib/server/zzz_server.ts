@@ -92,10 +92,12 @@ export class Zzz_Server {
 
 				console.log(`texting ${agent_name}`, text.substring(0, 1000));
 
+				const model = this.models[this.model_type][agent_name];
+
 				switch (agent_name) {
 					case 'claude': {
 						const api_response = await anthropic.messages.create({
-							model: this.models[this.model_type].claude,
+							model,
 							max_tokens: 1000,
 							temperature: 0,
 							system: this.system_message,
@@ -107,6 +109,7 @@ export class Zzz_Server {
 							type: 'prompt_response',
 							request_id: request.id,
 							agent_name: request.agent_name,
+							model,
 							data: {type: 'claude', value: api_response},
 						};
 						break;
@@ -114,7 +117,7 @@ export class Zzz_Server {
 
 					case 'gpt': {
 						const api_response = await openai.chat.completions.create({
-							model: this.models[this.model_type].gpt,
+							model,
 							messages: [
 								{role: 'system', content: this.system_message},
 								{role: 'user', content: text},
@@ -127,15 +130,14 @@ export class Zzz_Server {
 							type: 'prompt_response',
 							request_id: request.id,
 							agent_name: request.agent_name,
+							model,
 							data: {type: 'gpt', value: api_response_text},
 						};
 						break;
 					}
 
 					case 'gemini': {
-						const google_model = google.getGenerativeModel({
-							model: this.models[this.model_type].gemini,
-						});
+						const google_model = google.getGenerativeModel({model});
 						const api_response = await google_model.generateContent(
 							this.system_message + '\n\n' + text,
 						);
@@ -145,6 +147,7 @@ export class Zzz_Server {
 							type: 'prompt_response',
 							request_id: request.id,
 							agent_name: request.agent_name,
+							model,
 							data: {
 								type: 'gemini',
 								// some of these are functions, and we want `null` for full JSON documents, so manually spelling them out:

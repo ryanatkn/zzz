@@ -16,7 +16,7 @@ export class Agent {
 	name: Agent_Name = $state()!;
 	icon: string = $state()!;
 	title: string = $state()!;
-	model: string = $state()!;
+	model: string = $state()!; // TODO seems overly coupled, if this is 1:1 maybe `Agent` isn't the right concept?
 	url: string = $state()!;
 
 	// TODO

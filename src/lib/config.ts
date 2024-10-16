@@ -1,4 +1,5 @@
 import type {Models, Zzz_Config_Creator} from '$lib/config_helpers.js';
+import type {Agent_Json} from './agent.svelte.js';
 
 // TODO refactor
 
@@ -15,8 +16,35 @@ export const default_models: Models = {
 	},
 } as const;
 
-export const config: Zzz_Config_Creator = () => {
+export const default_agents: Agent_Json[] = [
+	{
+		name: 'claude',
+		icon: '',
+		title: 'Claude',
+		model: '',
+		url: 'https://docs.anthropic.com/en/home',
+	},
+	{
+		name: 'gpt',
+		icon: '',
+		title: 'ChatGPT',
+		model: '',
+		url: 'https://platform.openai.com/docs/overview',
+	},
+	{
+		name: 'gemini',
+		icon: '',
+		title: 'Gemini',
+		model: '',
+		url: 'https://ai.google.dev/gemini-api/docs/',
+	},
+];
+
+const config: Zzz_Config_Creator = () => {
 	return {
 		models: default_models,
+		agents: default_agents,
 	};
 };
+
+export default config;

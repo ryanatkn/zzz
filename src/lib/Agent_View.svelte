@@ -18,6 +18,7 @@
 
 	let show_more = $state(false);
 
+	// TODO lazy loading
 	const components: Record<typeof view_with, Component<{agent: Agent}>> = {
 		summary: Agent_Summary,
 		info: Agent_Info,
@@ -25,11 +26,11 @@
 
 	// TODO refactor
 	let view_with: 'summary' | 'info' = $state('summary');
-	const View_With = $derived(components[view_with]);
+	const Agent_View_Component = $derived(components[view_with]);
 </script>
 
 <div class="agent_view" use:contextmenu_action={contextmenu_entries}>
-	<View_With {agent} />
+	<Agent_View_Component {agent} />
 </div>
 
 {#if show_more}
@@ -54,7 +55,7 @@
 	</Contextmenu_Entry>
 	<Contextmenu_Submenu>
 		{#snippet icon()}>{/snippet}
-		View with
+		View agent with
 		{#snippet menu()}
 			<!-- TODO `disabled` property to the entry -->
 			<Contextmenu_Entry run={() => (view_with = 'summary')}>

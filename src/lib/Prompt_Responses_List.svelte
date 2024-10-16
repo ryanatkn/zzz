@@ -1,26 +1,20 @@
 <script lang="ts">
 	import Prompt_Response_View from '$lib/Prompt_Response_View.svelte';
-	import type {Receive_Prompt_Message} from '$lib/zzz_message.js';
 	import type {Agent} from '$lib/agent.svelte.js';
+	import type {Tape} from './tape.svelte.js';
 
 	interface Props {
 		agent: Agent;
-		prompt_responses: Receive_Prompt_Message[];
+		tape: Tape;
 	}
 
-	const {agent, prompt_responses}: Props = $props();
-
-	const responses = $derived(
-		Array.from(prompt_responses)
-			.filter((r) => r.agent_name === agent.name)
-			.reverse(),
-	);
+	const {agent, tape}: Props = $props();
 </script>
 
 <ul class="unstyled py_lg">
-	{#each responses as prompt_response (prompt_response)}
+	{#each tape.history as t (t)}
 		<li class="p_md">
-			<Prompt_Response_View {agent} {prompt_response} />
+			<Prompt_Response_View {agent} prompt_response={t.response} />
 		</li>
 	{/each}
 </ul>

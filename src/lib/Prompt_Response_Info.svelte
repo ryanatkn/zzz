@@ -13,7 +13,7 @@
 
 	const zzz = zzz_context.get();
 
-	const prompt_request = $derived(zzz.prompt_requests.get(prompt_response.request_id));
+	const prompt_request = $derived(zzz.tapes.prompt_requests.get(prompt_response.request_id));
 </script>
 
 <h3>prompt</h3>

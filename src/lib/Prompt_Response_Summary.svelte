@@ -14,7 +14,7 @@
 
 	const zzz = zzz_context.get();
 
-	const prompt_request = $derived(zzz.prompt_requests.get(prompt_response.request_id));
+	const prompt_request = $derived(zzz.tapes.prompt_requests.get(prompt_response.request_id));
 </script>
 
 <p>@user: {prompt_request?.request.text}</p>

@@ -16,17 +16,20 @@ import type {
 } from '$lib/zzz_message.js';
 import type {Agent} from '$lib/agent.svelte.js';
 import {random_id, type Id} from '$lib/id.js';
+import {Tapes, type Tapes_Json} from './tape.svelte.js';
 
 export const zzz_context = create_context<Zzz>();
 
 export interface Zzz_Options {
 	agents: Agent[];
 	client: Zzz_Client;
+	tapes?: Tapes;
 	data?: Zzz_Data;
 }
 
 export interface Zzz_Json {
 	data: Zzz_Data_Json;
+	tapes: Tapes_Json;
 }
 
 /**
@@ -49,19 +52,10 @@ export class Zzz {
 	// TODO could track this more formally, and add time tracking
 	pending_prompts: SvelteMap<Id, Deferred<Receive_Prompt_Message>> = new SvelteMap();
 	// TODO generically track req/res pairs
-	prompt_requests: SvelteMap<Id, {request: Send_Prompt_Message; response: Receive_Prompt_Message}> =
-		new SvelteMap();
+	// prompt_requests: SvelteMap<Id, {request: Send_Prompt_Message; response: Receive_Prompt_Message}> =
+	// 	new SvelteMap();
 
-	prompt_responses: Receive_Prompt_Message[] = $state([]);
-
-	pending_prompts_by_agent: Map<Agent, Receive_Prompt_Message[]> = $derived(
-		new Map(
-			this.agents.map((agent) => [
-				agent,
-				this.prompt_responses.filter((p) => agent.name === p.agent_name),
-			]),
-		),
-	);
+	tapes: Tapes = $state()!; // TODO should this be an option?
 
 	// TODO BLOCK store state granularly for each agent
 
@@ -69,12 +63,14 @@ export class Zzz {
 		const {agents, client, data = new Zzz_Data()} = options;
 		this.agents.push(...agents);
 		this.client = client;
+		this.tapes = options.tapes ?? new Tapes({all_agents: agents});
 		this.data = data;
 	}
 
 	toJSON(): Zzz_Json {
 		return {
 			data: this.data.toJSON(),
+			tapes: this.tapes.toJSON(),
 		};
 	}
 
@@ -98,8 +94,7 @@ export class Zzz {
 				const deferred = create_deferred<Receive_Prompt_Message>();
 				this.pending_prompts.set(message.id, deferred); // TODO roundabout way to get req/res
 				const response = await deferred.promise;
-				console.log(`prompt response`, response);
-				this.prompt_requests.set(message.id, {request: message, response});
+				this.tapes.receive_prompt_response(message, response);
 				return response;
 			}),
 		);
@@ -113,7 +108,6 @@ export class Zzz {
 			console.error('expected pending', message);
 			return;
 		}
-		this.prompt_responses.push(message);
 		deferred.resolve(message);
 		this.pending_prompts.delete(message.request_id); // deleting intentionally after resolving to maybe avoid a corner case loop of sending the same prompt again
 	}

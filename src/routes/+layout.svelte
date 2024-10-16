@@ -22,6 +22,7 @@
 	import {Zzz_Client} from '$lib/zzz_client.js';
 	import {Agent} from '$lib/agent.svelte.js';
 	import {random_id} from '$lib/id.js';
+	import create_zzz_config from '$lib/config.js';
 
 	interface Props {
 		children: Snippet;
@@ -31,6 +32,8 @@
 
 	// TODO BLOCK load `project.json` in production to populate files
 
+	const zzz_config = create_zzz_config();
+
 	pkg_context.set(parse_package_meta(package_json, src_json));
 
 	let ws: WebSocket | undefined;
@@ -38,12 +41,7 @@
 
 	// gives app-wide support for Zzz
 	const zzz = new Zzz({
-		// TODO refactor - config in `zzz.config.ts`?
-		agents: [
-			new Agent({data: {name: 'claude', icon: 'c', title: 'Claude', model: '', url: ''}}),
-			new Agent({data: {name: 'gpt', icon: 'c', title: 'ChatGPT', model: '', url: ''}}),
-			new Agent({data: {name: 'gemini', icon: 'c', title: 'Gemini', model: '', url: ''}}),
-		],
+		agents: zzz_config.agents.map((data) => new Agent({data})),
 		client: new Zzz_Client({
 			send: async (message) => {
 				if (!browser) return;

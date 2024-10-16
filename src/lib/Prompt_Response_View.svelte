@@ -20,7 +20,7 @@
 
 	const zzz = zzz_context.get();
 
-	const prompt_request = $derived(zzz.prompt_requests.get(prompt_response.request_id));
+	const prompt_request = $derived(zzz.tapes.prompt_requests.get(prompt_response.request_id));
 
 	let show_editor = $state(false);
 
@@ -74,7 +74,7 @@
 	{/if}
 	<Contextmenu_Submenu>
 		{#snippet icon()}>{/snippet}
-		View with
+		View prompt response with
 		{#snippet menu()}
 			<!-- TODO `disabled` property to the entry -->
 			<Contextmenu_Entry run={() => (view_with = 'summary')}>
