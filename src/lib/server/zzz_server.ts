@@ -85,6 +85,7 @@ export class Zzz_Server {
 		console.log(`[zzz_server.receive] message`, request, request.type === 'load_session');
 		switch (request.type) {
 			case 'echo': {
+				// await wait(1000);
 				return request;
 			}
 			case 'load_session': {

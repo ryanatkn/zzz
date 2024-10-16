@@ -30,9 +30,6 @@ app.get(
 			onOpen(event, ws) {
 				sockets.add(ws);
 				console.log('ws opened', event);
-				ws.send(
-					devalue.stringify({type: 'gro_server_message', message: {type: 'echo', data: 'zzz'}}),
-				);
 			},
 			async onMessage(event, ws) {
 				console.log(`Message from client: ${event.data} - ${typeof event.data}`);

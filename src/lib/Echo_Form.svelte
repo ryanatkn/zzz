@@ -1,6 +1,7 @@
 <script lang="ts">
+	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
+
 	import {zzz_context} from '$lib/zzz.svelte.js';
-	import {random_id} from '$lib/id.js';
 
 	// interface Props {}
 
@@ -11,7 +12,7 @@
 	let echo_text = $state('echo server');
 
 	const send_echo = () => {
-		zzz.client.send({id: random_id(), type: 'echo', data: echo_text});
+		zzz.send_echo(echo_text);
 	};
 
 	// TODO
@@ -27,9 +28,15 @@
 	/>
 </div>
 {#if zzz.echos.length > 0}
-	<ul class="column reverse">
+	<ul class="unstyled column reverse">
 		{#each zzz.echos as echo (echo)}
-			<li>{echo.data}</li>
+			{@const elapsed = zzz.echo_elapsed.get(echo.id)}
+			<li class="row justify_content_space_between">
+				<div class="ellipsis" style:max-width="200px">{echo.data}</div>
+				<span>
+					{#if elapsed}{elapsed}ms{:else}<Pending_Animation />{/if}
+				</span>
+			</li>
 		{/each}
 	</ul>
 {/if}

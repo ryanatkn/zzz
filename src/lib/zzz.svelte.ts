@@ -132,6 +132,30 @@ export class Zzz {
 		}
 	}
 
+	echo_start_times: Map<Id, number> = new Map();
+
+	echo_elapsed: SvelteMap<Id, number> = new SvelteMap();
+
+	send_echo(data: unknown): void {
+		const id = random_id();
+		const message: Echo_Message = {id, type: 'echo', data};
+		this.client.send(message);
+		this.echo_start_times.set(id, Date.now());
+		this.echos = [message, ...this.echos.slice(0, 9)];
+	}
+
+	receive_echo(message: Echo_Message): void {
+		const {id} = message;
+		const start_time = this.echo_start_times.get(id);
+		if (start_time === undefined) {
+			console.error('expected start time', id);
+			return;
+		}
+		this.echo_start_times.delete(id);
+		const elapsed = Date.now() - start_time;
+		this.echo_elapsed.set(id, elapsed);
+	}
+
 	update_file(file_id: Path_Id, contents: string): void {
 		const source_file = this.files_by_id.get(file_id);
 		if (!source_file) {
