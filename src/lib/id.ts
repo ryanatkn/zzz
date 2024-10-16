@@ -6,7 +6,7 @@ export type Id = Flavored<number, 'Id'>;
 export const random_id = (): Id => {
 	let v = parseInt(Math.random().toString().substring(2), 10);
 	while (v > Number.MAX_SAFE_INTEGER) {
-		v = Math.round(v / 2);
+		v = Math.floor(v / 2);
 	}
 	return v;
 };

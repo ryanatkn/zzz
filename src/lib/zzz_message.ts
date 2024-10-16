@@ -6,6 +6,7 @@ import type OpenAI from 'openai';
 import type * as Google from '@google/generative-ai';
 
 import type {Agent_Name} from '$lib/agent.svelte.js';
+import type {Id} from '$lib/id.js';
 
 export type Zzz_Message = Client_Message | Server_Message;
 
@@ -93,6 +94,6 @@ export interface Receive_Prompt_Message extends Base_Message {
  */
 export interface Update_File_Message extends Base_Message {
 	type: 'update_file';
-	id: Path_Id;
+	file_id: Path_Id;
 	contents: string;
 }

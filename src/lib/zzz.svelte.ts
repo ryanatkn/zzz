@@ -129,14 +129,14 @@ export class Zzz {
 		}
 	}
 
-	update_file(id: Path_Id, contents: string): void {
-		const source_file = this.files_by_id.get(id);
+	update_file(file_id: Path_Id, contents: string): void {
+		const source_file = this.files_by_id.get(file_id);
 		if (!source_file) {
-			console.error('expected source file', id);
+			console.error('expected source file', file_id);
 			return;
 		}
 
-		this.client.send({type: 'update_file', id, contents});
+		this.client.send({type: 'update_file', file_id, contents});
 	}
 
 	// TODO API? close/open/toggle? just toggle? messages+mutations?

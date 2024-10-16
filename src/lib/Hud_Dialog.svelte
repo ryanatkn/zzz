@@ -22,14 +22,14 @@
 
 <svelte:window
 	onkeydown={(e) => {
-		if (e.key === 'Escape' && !is_editable(e.currentTarget)) {
+		if (e.key === 'Escape' && !is_editable(e.target)) {
 			zzz.toggle_main_menu();
 		}
 	}}
 />
 
 {#if zzz.data.show_main_menu}
-	<Dialog onclose={() => zzz.toggle_main_menu()} layout="page">
+	<Dialog onclose={() => zzz.toggle_main_menu(false)} layout="page">
 		<div class="pane">
 			<section>
 				<Settings />

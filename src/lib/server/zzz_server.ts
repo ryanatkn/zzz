@@ -184,20 +184,7 @@ const save_response = async (
 	request: Send_Prompt_Message,
 	response: Receive_Prompt_Message,
 ): Promise<void> => {
-	let filename;
-	switch (response.data.type) {
-		case 'anthropic':
-			filename = `anthropic_${response.data.value.id}__${response.data.value.model}.json`;
-			break;
-		case 'google':
-			filename = `google_TODO.json`;
-			break;
-		case 'openai':
-			filename = `openai_TODO.json`;
-			break;
-		default:
-			throw new Unreachable_Error(response.data);
-	}
+	const filename = `${response.data.type}_${response.id}.json`; // TODO include model data in these
 
 	const path = `./src/lib/prompts/` + filename;
 
