@@ -1,7 +1,13 @@
 import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 import Anthropic from '@anthropic-ai/sdk';
+import OpenAI from 'openai';
+import {GoogleGenerativeAI} from '@google/generative-ai';
 import {Filer, type Cleanup_Watch} from '@ryanatkn/gro/filer.js';
-import {SECRET_ANTHROPIC_API_KEY} from '$env/static/private';
+import {
+	SECRET_ANTHROPIC_API_KEY,
+	SECRET_GOOGLE_API_KEY,
+	SECRET_OPENAI_API_KEY,
+} from '$env/static/private';
 import {writeFileSync} from 'node:fs';
 import {format_file} from '@ryanatkn/gro/format_file.js';
 
@@ -16,7 +22,13 @@ import type {Prompt_Json} from '$lib/prompt.svelte.js';
 // SECRET_ANTHROPIC_API_KEY
 // SECRET_OPENAI_API_KEY
 // SECRET_GOOGLE_API_KEY
+const ANTHROPIC_MODEL = 'claude-3-5-sonnet-20240620';
+const OPENAI_MODEL = 'gpt-4o';
+const GOOGLE_MODEL = 'gemini-1.5-pro';
 const anthropic = new Anthropic({apiKey: SECRET_ANTHROPIC_API_KEY});
+const openai = new OpenAI({apiKey: SECRET_OPENAI_API_KEY});
+const google = new GoogleGenerativeAI(SECRET_GOOGLE_API_KEY);
+const google_model = google.getGenerativeModel({model: GOOGLE_MODEL}); // TODO flag for messy dev that uses `gemini-1.5-flash` instead of `gemini-1.5-pro`
 
 export interface Options {
 	send: (message: Server_Message) => void;
@@ -70,17 +82,19 @@ export class Zzz_Server {
 
 				let response: Receive_Prompt_Message;
 
+				console.log(`texting ${agent_name}`, text);
+
 				switch (agent_name) {
 					case 'claude': {
-						console.log(`texting Claude`, text);
 						const api_response = await anthropic.messages.create({
-							model: 'claude-3-5-sonnet-20240620',
+							model: ANTHROPIC_MODEL,
 							max_tokens: 1000,
 							temperature: 0,
 							system:
 								'respond with the shortest sentence possible to describe the current context with reasonable clarity',
 							messages: [{role: 'user', content: [{type: 'text', text}]}],
 						});
+						console.log(`claude api_response`, api_response);
 						response = {
 							type: 'prompt_response',
 							agent_name: request.agent_name,
@@ -90,28 +104,53 @@ export class Zzz_Server {
 						console.log(`got Claude message`, api_response);
 						break;
 					}
+
 					case 'chatgpt': {
 						console.log(`texting OpenAI`, request.agent_name); // TODO model
-						//  TODO
+						const api_response = await openai.chat.completions.create({
+							model: OPENAI_MODEL,
+							messages: [
+								// TODO needs to be uniform across agents
+								{role: 'system', content: 'You are a helpful assistant.'},
+								{role: 'user', content: text},
+							],
+						});
+						console.log(`openai api_response`, api_response);
+						const api_response_text = api_response.choices[0].message;
 						response = {
 							type: 'prompt_response',
 							agent_name: request.agent_name,
 							text,
-							data: {type: 'openai', value: {placeholder: 'TODO'}},
+							data: {type: 'openai', value: api_response_text},
 						};
+						console.log(`got OpenAI message`, response.data);
 						break;
 					}
+
 					case 'gemini': {
-						//  TODO
+						console.log(`texting Gemini`, request.agent_name); // TODO model
+						const api_response = await google_model.generateContent(text);
+						console.log(`gemini api_response`, api_response);
 						response = {
 							type: 'prompt_response',
 							agent_name: request.agent_name,
 							text,
-							data: {type: 'google', value: {placeholder: 'TODO'}},
+							data: {
+								type: 'google',
+								// some of these are functions, and we want `null` for full JSON documents, so manually spelling them out:
+								value: {
+									text: api_response.response.text(),
+									candidates: api_response.response.candidates ?? null,
+									function_calls: api_response.response.functionCalls() ?? null,
+									prompt_feedback: api_response.response.promptFeedback ?? null,
+									usage_metadata: api_response.response.usageMetadata ?? null,
+								},
+							},
 						};
-						console.log(`texting Gemini`, request.agent_name); // TODO model
+						console.log(`got Gemini message`, response.data);
 						break;
 					}
+
 					default:
 						throw new Unreachable_Error(agent_name);
 				}

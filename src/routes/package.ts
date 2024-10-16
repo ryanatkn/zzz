@@ -32,6 +32,7 @@ export const package_json = {
 	devDependencies: {
 		'@anthropic-ai/sdk': '^0.29.0',
 		'@changesets/changelog-git': '^0.2.0',
+		'@google/generative-ai': '^0.21.0',
 		'@hono/node-server': '^1.13.2',
 		'@hono/node-ws': '^1.0.4',
 		'@ryanatkn/belt': '^0.25.3',
@@ -46,6 +47,7 @@ export const package_json = {
 		eslint: '^9.12.0',
 		'eslint-plugin-svelte': '^2.44.1',
 		hono: '^4.6.4',
+		openai: '^4.67.3',
 		prettier: '^3.3.3',
 		'prettier-plugin-svelte': '^3.2.7',
 		svelte: '^5.0.0-next.264',
@@ -191,6 +193,10 @@ export const package_json = {
 			default:
 				'./dist/prompts/anthropic_msg_018tRhfRN6RiXyY4P6zdFEiL__claude-3-5-sonnet-20240620.json',
 		},
+		'./prompts/anthropic_msg_01KC4LUW4HGs2ujyEYvHJ9Vc__claude-3-5-sonnet-20240620.json': {
+			default:
+				'./dist/prompts/anthropic_msg_01KC4LUW4HGs2ujyEYvHJ9Vc__claude-3-5-sonnet-20240620.json',
+		},
 		'./prompts/anthropic_msg_01QJqKwX24Ec5JGVzeKxzMXA__claude-3-5-sonnet-20240620.json': {
 			default:
 				'./dist/prompts/anthropic_msg_01QJqKwX24Ec5JGVzeKxzMXA__claude-3-5-sonnet-20240620.json',
@@ -306,6 +312,10 @@ export const src_json = {
 		},
 		'./prompts/anthropic_msg_018tRhfRN6RiXyY4P6zdFEiL__claude-3-5-sonnet-20240620.json': {
 			path: 'prompts/anthropic_msg_018tRhfRN6RiXyY4P6zdFEiL__claude-3-5-sonnet-20240620.json',
+			declarations: [],
+		},
+		'./prompts/anthropic_msg_01KC4LUW4HGs2ujyEYvHJ9Vc__claude-3-5-sonnet-20240620.json': {
+			path: 'prompts/anthropic_msg_01KC4LUW4HGs2ujyEYvHJ9Vc__claude-3-5-sonnet-20240620.json',
 			declarations: [],
 		},
 		'./prompts/anthropic_msg_01QJqKwX24Ec5JGVzeKxzMXA__claude-3-5-sonnet-20240620.json': {

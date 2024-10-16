@@ -23,6 +23,10 @@ export interface Zzz_Json {
 	data: Zzz_Data_Json;
 }
 
+/**
+ * The main client. Like a site-wide `app` instance for Zzz.
+ * Gettable with `zzz_context.get()` inside a `<Zzz_Root>`.
+ */
 export class Zzz {
 	data: Zzz_Data = $state()!;
 
@@ -79,10 +83,11 @@ export class Zzz {
 				// TODO @many need ids for req/res
 				if (agent.name === 'claude') {
 					const deferred = create_deferred<Receive_Prompt_Message>();
-					this.pending_prompts.set(text, deferred);
+					const prompt_responses_key = agent.name + '::' + text; // TODO @many leave this messy code until we have message ids and req/res pairs
+					this.pending_prompts.set(prompt_responses_key, deferred);
 					const response = await deferred.promise;
 					console.log(`prompt response`, response);
-					this.pending_prompts.delete(text); // TODO @many need ids for req/res
+					this.pending_prompts.delete(prompt_responses_key); // TODO @many need ids for req/res
 					return response;
 				}
 
@@ -104,7 +109,8 @@ export class Zzz {
 			console.error('TODO ignoring all but anthropic messages', message);
 			return;
 		}
-		this.prompt_responses.set(message.text, message);
+		const prompt_responses_key = message.agent_name + '::' + message.text; // TODO @many leave this messy code until we have message ids and req/res pairs
+		this.prompt_responses.set(prompt_responses_key, message);
 		deferred.resolve(message);
 		this.pending_prompts.delete(message.text); // deleting intentionally after resolving to maybe avoid a corner case loop of sending the same prompt again
 	}

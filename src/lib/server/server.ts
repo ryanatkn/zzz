@@ -6,7 +6,7 @@ import * as devalue from 'devalue';
 
 import {Zzz_Server} from '$lib/server/zzz_server.js';
 
-console.log('hello server!!');
+console.log('creating server');
 
 const sockets: Set<WSContext> = new Set();
 

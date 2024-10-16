@@ -2,6 +2,8 @@ import type {Source_File} from '@ryanatkn/gro/filer.js';
 import type {Watcher_Change} from '@ryanatkn/gro/watch_dir.js';
 import type Anthropic from '@anthropic-ai/sdk';
 import type {Path_Id} from '@ryanatkn/gro/path.js';
+import type OpenAI from 'openai';
+import type * as Google from '@google/generative-ai';
 
 import type {Agent_Name} from '$lib/agent.svelte.js';
 
@@ -69,12 +71,21 @@ export interface Send_Prompt_Message extends Base_Message {
  */
 export interface Receive_Prompt_Message extends Base_Message {
 	type: 'prompt_response';
-	agent_name: string;
+	agent_name: Agent_Name;
 	text: string; // TODO @many sending the text again is wasteful, need ids
 	data:
 		| {type: 'anthropic'; value: Anthropic.Messages.Message}
-		| {type: 'openai'; value: unknown}
-		| {type: 'google'; value: unknown};
+		| {type: 'openai'; value: OpenAI.Chat.Completions.ChatCompletionMessage}
+		| {
+				type: 'google';
+				value: {
+					text: string;
+					candidates: Google.GenerateContentCandidate[] | null;
+					function_calls: Google.FunctionCall[] | null;
+					prompt_feedback: Google.PromptFeedback | null; // eslint-disable-line @typescript-eslint/no-redundant-type-constituents
+					usage_metadata: Google.UsageMetadata | null; // eslint-disable-line @typescript-eslint/no-redundant-type-constituents
+				};
+		  };
 }
 
 /**

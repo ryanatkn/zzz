@@ -7,9 +7,9 @@
 
 	const zzz = zzz_context.get();
 
-	let echo_text = $state('hello server');
+	let echo_text = $state('echo server');
 
-	const hello_server = () => {
+	const send_echo = () => {
 		zzz.client.send({type: 'echo', data: echo_text});
 	};
 
@@ -17,7 +17,7 @@
 </script>
 
 <div class="row">
-	<button type="button" onclick={hello_server}>⛬</button><input bind:value={echo_text} />
+	<button type="button" onclick={send_echo}>⚏</button><input bind:value={echo_text} />
 </div>
 {#if zzz.echos.length > 0}
 	<ul class="column reverse">
