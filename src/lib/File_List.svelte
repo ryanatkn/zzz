@@ -13,9 +13,9 @@
 	const {files}: Props = $props();
 </script>
 
-<ul class="unstyled flex column gap_md">
+<ul class="unstyled flex column">
 	{#each files.values() as file (file.id)}
-		<li class="panel p_xs">
+		<li>
 			<File_View {file} />
 		</li>
 	{/each}

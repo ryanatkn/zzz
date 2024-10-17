@@ -18,11 +18,10 @@
 </script>
 
 <div class="flex_1 {classes}">
-	<!-- TODO instead of `prompt_responses`, a higher-level abstraction like a conversation -->
 	<div><!--<span class="size_xl">{agent.icon}</span> -->{agent.title}</div>
 	{#if tape}
 		<Tapes_List {agent} {tape} />
 	{:else}
-		<p>no tape found for {agent.name}</p>
+		<p>no tapes yet</p>
 	{/if}
 </div>

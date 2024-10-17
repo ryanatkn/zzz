@@ -74,5 +74,6 @@
 	.agent_view {
 		/* TODO or should this be optional in a `classes` prop? */
 		width: 100%;
+		overflow: auto;
 	}
 </style>

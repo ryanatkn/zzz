@@ -1,7 +1,4 @@
-import {SvelteMap} from 'svelte/reactivity';
-
 import type {Receive_Prompt_Message, Send_Prompt_Message} from '$lib/zzz_message.js';
-import type {Id} from '$lib/id.js';
 import type {Agent, Agent_Name} from './agent.svelte.js';
 
 export interface Tapes_Json {
@@ -38,10 +35,6 @@ export class Tapes {
 			tapes: $state.snapshot(this.all),
 		};
 	}
-
-	// TODO BLOCK old code just hacked in for now
-	prompt_requests: SvelteMap<Id, {request: Send_Prompt_Message; response: Receive_Prompt_Message}> =
-		new SvelteMap();
 
 	receive_prompt_response(request: Send_Prompt_Message, response: Receive_Prompt_Message): void {
 		// TODO we need a `tape.id` I think, this is hacky

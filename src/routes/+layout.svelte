@@ -30,7 +30,7 @@
 
 	const {children}: Props = $props();
 
-	// TODO BLOCK load `project.json` in production to populate files
+	// TODO load `project.json` in production to populate files
 
 	const zzz_config = create_zzz_config();
 

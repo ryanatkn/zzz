@@ -206,69 +206,6 @@
       "types": "./dist/prompt.svelte.d.ts",
       "default": "./dist/prompt.svelte.js"
     },
-    "./prompts/claude__claude-3-haiku-20240307__1034901372588406.json": {
-      "default": "./dist/prompts/claude__claude-3-haiku-20240307__1034901372588406.json"
-    },
-    "./prompts/claude__claude-3-haiku-20240307__2273228048335727.json": {
-      "default": "./dist/prompts/claude__claude-3-haiku-20240307__2273228048335727.json"
-    },
-    "./prompts/claude__claude-3-haiku-20240307__5465837004520857.json": {
-      "default": "./dist/prompts/claude__claude-3-haiku-20240307__5465837004520857.json"
-    },
-    "./prompts/claude__claude-3-haiku-20240307__6863675997234122.json": {
-      "default": "./dist/prompts/claude__claude-3-haiku-20240307__6863675997234122.json"
-    },
-    "./prompts/claude__claude-3-haiku-20240307__6990839573842766.json": {
-      "default": "./dist/prompts/claude__claude-3-haiku-20240307__6990839573842766.json"
-    },
-    "./prompts/claude__claude-3-haiku-20240307__7307956183060804.json": {
-      "default": "./dist/prompts/claude__claude-3-haiku-20240307__7307956183060804.json"
-    },
-    "./prompts/claude__claude-3-haiku-20240307__7592342919707928.json": {
-      "default": "./dist/prompts/claude__claude-3-haiku-20240307__7592342919707928.json"
-    },
-    "./prompts/gemini__gemini-1.5-flash__2213965204009396.json": {
-      "default": "./dist/prompts/gemini__gemini-1.5-flash__2213965204009396.json"
-    },
-    "./prompts/gemini__gemini-1.5-flash__4729592659113463.json": {
-      "default": "./dist/prompts/gemini__gemini-1.5-flash__4729592659113463.json"
-    },
-    "./prompts/gemini__gemini-1.5-flash__4895122383086692.json": {
-      "default": "./dist/prompts/gemini__gemini-1.5-flash__4895122383086692.json"
-    },
-    "./prompts/gemini__gemini-1.5-flash__5027617884373645.json": {
-      "default": "./dist/prompts/gemini__gemini-1.5-flash__5027617884373645.json"
-    },
-    "./prompts/gemini__gemini-1.5-flash__6351385114300565.json": {
-      "default": "./dist/prompts/gemini__gemini-1.5-flash__6351385114300565.json"
-    },
-    "./prompts/gemini__gemini-1.5-flash__6744453567508824.json": {
-      "default": "./dist/prompts/gemini__gemini-1.5-flash__6744453567508824.json"
-    },
-    "./prompts/gemini__gemini-1.5-flash__7440621931240325.json": {
-      "default": "./dist/prompts/gemini__gemini-1.5-flash__7440621931240325.json"
-    },
-    "./prompts/gpt__gpt-4o-mini__5420634280026271.json": {
-      "default": "./dist/prompts/gpt__gpt-4o-mini__5420634280026271.json"
-    },
-    "./prompts/gpt__gpt-4o-mini__5721698788638402.json": {
-      "default": "./dist/prompts/gpt__gpt-4o-mini__5721698788638402.json"
-    },
-    "./prompts/gpt__gpt-4o-mini__6248556996006865.json": {
-      "default": "./dist/prompts/gpt__gpt-4o-mini__6248556996006865.json"
-    },
-    "./prompts/gpt__gpt-4o-mini__6885464770707335.json": {
-      "default": "./dist/prompts/gpt__gpt-4o-mini__6885464770707335.json"
-    },
-    "./prompts/gpt__gpt-4o-mini__7473945736429963.json": {
-      "default": "./dist/prompts/gpt__gpt-4o-mini__7473945736429963.json"
-    },
-    "./prompts/gpt__gpt-4o-mini__7857757111499317.json": {
-      "default": "./dist/prompts/gpt__gpt-4o-mini__7857757111499317.json"
-    },
-    "./prompts/gpt__gpt-4o-mini__807610670086433.json": {
-      "default": "./dist/prompts/gpt__gpt-4o-mini__807610670086433.json"
-    },
     "./server/prompt.log": {
       "default": "./dist/server/prompt.log"
     },

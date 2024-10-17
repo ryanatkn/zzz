@@ -15,28 +15,35 @@
 	const dependents = $derived(Array.from(file.dependents.values()));
 </script>
 
-<div class="row justify_content_space_between">
-	<div class="row">
-		<div class="size_xl3">🗎</div>
-		<div class="size_xl ml_lg">{to_base_path(file.id)}</div>
+<div class="file_summary row justify_content_space_between">
+	<div class="row flex_1 overflow_auto">
+		<div class="size_xl">🗎</div>
+		<div class="px_lg ellipsis">{to_base_path(file.id)}</div>
 	</div>
-	<div class="row">
-		<div class="px_md flex align_items_end column">
-			<div>
-				{#if file.contents === null}
-					null
-				{:else}
-					{file.contents.length}
-					{#if file.contents.length === 1}character{:else}chars{/if}
-				{/if}
-			</div>
-			<div>
-				{dependencies.length}
-				{#if dependencies.length === 1}dependency{:else}dependency{/if} and
-				{dependents.length}
-				{#if dependents.length === 1}dependent{:else}dependents{/if}
-			</div>
-		</div>
-		<Copy_To_Clipboard text={file.contents} />
+	<div
+		style:width="70px"
+		class="shrink_0 text_align_right"
+		title="{dependencies.length} dependenc{dependencies.length === 1 ? 'y' : 'ies'}"
+	>
+		{dependencies.length} ⇉
+	</div>
+	<div
+		style:width="70px"
+		class="shrink_0 text_align_right"
+		title="{dependents.length} dependent{dependents.length === 1 ? '' : 's'}"
+	>
+		{dependents.length} ⇇
+	</div>
+	<div style:width="130px" class="shrink_0 text_align_right pr_md">
+		{#if file.contents !== null}
+			{file.contents.length}
+			{#if file.contents.length === 1}character{:else}chars{/if}
+		{/if}
 	</div>
 </div>
+
+<style>
+	.file_summary:hover {
+		background: var(--fg_0);
+	}
+</style>

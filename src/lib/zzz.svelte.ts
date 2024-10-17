@@ -57,7 +57,7 @@ export class Zzz {
 
 	tapes: Tapes = $state()!; // TODO should this be an option?
 
-	// TODO BLOCK store state granularly for each agent
+	// TODO store state granularly for each agent
 
 	constructor(options: Zzz_Options) {
 		const {agents, client, data = new Zzz_Data()} = options;

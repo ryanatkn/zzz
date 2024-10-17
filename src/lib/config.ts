@@ -51,12 +51,15 @@ export const default_agents: Agent_Json[] = [
 	},
 ];
 
+export const SYSTEM_MESSAGE_DEFAULT =
+	'You are a helpful assistant. Respond with a very short creative message, just a short sentence or two in length, that continues from where the user left off, playing along for fun.';
+
 const config: Zzz_Config_Creator = () => {
 	return {
-		system_message: undefined, // TODO is this the right place for this?
-		models: default_models,
 		agents: default_agents,
+		models: default_models,
 		default_model_type: 'cheap',
+		system_message: SYSTEM_MESSAGE_DEFAULT,
 	};
 };
 

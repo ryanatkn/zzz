@@ -19,7 +19,7 @@
 </script>
 
 <Zzz_Main>
-	<header class="box">
+	<footer class="box py_xl9">
 		<Svg data={zzz_logo} size="var(--icon_size_xl2)" classes="my_xl5" />
 		<p class="mt_xl3">bot control hq</p>
 		<p class="mt_xl3">work in progress</p>
@@ -30,7 +30,7 @@
 				it available in all contexts, but you gotta start somewhere.
 			</p>
 		{/if}
-	</header>
+	</footer>
 </Zzz_Main>
 
 {#snippet hud()}

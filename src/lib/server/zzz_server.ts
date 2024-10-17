@@ -20,11 +20,7 @@ import type {
 import type {Prompt_Json} from '$lib/prompt.svelte.js';
 import {random_id} from '$lib/id.js';
 import type {Model_Type, Models} from '$lib/config_helpers.js';
-import {default_models} from '$lib/config.js';
-
-// TODO refactor to config
-const SYSTEM_MESSAGE_DEFAULT =
-	'You are a helpful assistant. Respond with a very short creative message, just a short sentence or two in length, that continues from where the user left off, playing along for fun.';
+import {default_models, SYSTEM_MESSAGE_DEFAULT} from '$lib/config.js';
 
 const anthropic = new Anthropic({apiKey: SECRET_ANTHROPIC_API_KEY});
 const openai = new OpenAI({apiKey: SECRET_OPENAI_API_KEY});
@@ -58,6 +54,7 @@ export class Zzz_Server {
 				case 'add':
 				case 'update':
 				case 'delete': {
+					if (source_file.id.includes('.css')) console.log(`source_file`, source_file);
 					this.#send({id: random_id(), type: 'filer_change', change, source_file});
 					break;
 				}
@@ -186,9 +183,8 @@ export class Zzz_Server {
 	}
 
 	async destroy(): Promise<void> {
-		await (
-			await this.#cleanup_filer
-		)();
+		const cleanup_filer = await this.#cleanup_filer;
+		await cleanup_filer();
 	}
 }
 
