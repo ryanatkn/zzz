@@ -9,12 +9,14 @@
 	}
 
 	const {agent, tape}: Props = $props();
+
+	// TODO BLOCK multiple tapes?
 </script>
 
 <ul class="unstyled py_lg">
-	{#each tape.history as t (t)}
+	{#each tape.history as history_item (history_item)}
 		<li class="p_md">
-			<Tape_View {agent} prompt_response={t.response} />
+			<Tape_View {agent} {tape} />
 		</li>
 	{/each}
 </ul>
