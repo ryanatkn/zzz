@@ -32,14 +32,14 @@ app.get(
 				console.log('ws opened', event);
 			},
 			async onMessage(event, ws) {
-				console.log(`Message from client: ${event.data} - ${typeof event.data}`);
 				let data;
 				try {
-					data = JSON.parse(event.data.toString());
+					data = JSON.parse(event.data.toString()); // eslint-disable-line @typescript-eslint/no-base-to-string
 				} catch (_err) {
 					console.error(`received non-json message`, event.data);
 					return;
 				}
+				console.log(`[server] handling message`, data);
 				if (data.type === 'gro_server_message') {
 					const message = await zzz_server.receive(data.message);
 					if (message) {

@@ -24,7 +24,7 @@ import {default_models} from '$lib/config.js';
 
 // TODO refactor to config
 const SYSTEM_MESSAGE_DEFAULT =
-	'You are a helpful assistant. Respond with a short creative message, a sentence or two in length, that continues from where the user left off, playing along for fun.';
+	'You are a helpful assistant. Respond with a very short creative message, just a short sentence or two in length, that continues from where the user left off, playing along for fun.';
 
 const anthropic = new Anthropic({apiKey: SECRET_ANTHROPIC_API_KEY});
 const openai = new OpenAI({apiKey: SECRET_OPENAI_API_KEY});
