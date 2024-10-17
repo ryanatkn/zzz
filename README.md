@@ -17,7 +17,8 @@ More at [www.zzzbot.dev](https://www.zzzbot.dev/).
 
 ## Setup
 
-- add to `.env.development` - `SECRET_ANTHROPIC_API_KEY`, `SECRET_OPENAI_API_KEY`, `SECRET_GOOGLE_API_KEY`
+- add to `.env.development` and `.env.production` -
+  `SECRET_ANTHROPIC_API_KEY`, `SECRET_OPENAI_API_KEY`, `SECRET_GOOGLE_API_KEY`
 
 In your terminal:
 

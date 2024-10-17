@@ -21,6 +21,7 @@ import type {Prompt_Json} from '$lib/prompt.svelte.js';
 import {random_id} from '$lib/id.js';
 import type {Model_Type, Models} from '$lib/config_helpers.js';
 import {default_models, SYSTEM_MESSAGE_DEFAULT} from '$lib/config.js';
+import {write_file_in_scope} from '$lib/server/helpers.js';
 
 const anthropic = new Anthropic({apiKey: SECRET_ANTHROPIC_API_KEY});
 const openai = new OpenAI({apiKey: SECRET_OPENAI_API_KEY});
@@ -173,8 +174,8 @@ export class Zzz_Server {
 				return response; // TODO @many sending the text again is wasteful, need ids
 			}
 			case 'update_file': {
-				const {id, contents} = request;
-				writeFileSync(id, contents, 'utf8');
+				const {file_id, contents} = request;
+				write_file_in_scope(file_id, contents, this.filer.root_dir);
 				return null;
 			}
 			default:
