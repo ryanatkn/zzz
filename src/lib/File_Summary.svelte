@@ -1,5 +1,4 @@
 <script lang="ts">
-	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
 	import type {Source_File} from '@ryanatkn/gro/filer.js';
 
 	import {to_base_path} from '$lib/path.js';
