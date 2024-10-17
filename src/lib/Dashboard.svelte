@@ -2,7 +2,6 @@
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import File_List from '$lib/File_List.svelte';
 	import Multiprompt from './Multiprompt.svelte';
-	import Control_Panel from './Control_Panel.svelte';
 
 	// interface Props {}
 
