@@ -174,8 +174,29 @@ export const package_json = {
 		'./prompts/claude__claude-3-haiku-20240307__1034901372588406.json': {
 			default: './dist/prompts/claude__claude-3-haiku-20240307__1034901372588406.json',
 		},
+		'./prompts/claude__claude-3-haiku-20240307__2273228048335727.json': {
+			default: './dist/prompts/claude__claude-3-haiku-20240307__2273228048335727.json',
+		},
+		'./prompts/claude__claude-3-haiku-20240307__5465837004520857.json': {
+			default: './dist/prompts/claude__claude-3-haiku-20240307__5465837004520857.json',
+		},
+		'./prompts/claude__claude-3-haiku-20240307__6990839573842766.json': {
+			default: './dist/prompts/claude__claude-3-haiku-20240307__6990839573842766.json',
+		},
 		'./prompts/claude__claude-3-haiku-20240307__7307956183060804.json': {
 			default: './dist/prompts/claude__claude-3-haiku-20240307__7307956183060804.json',
+		},
+		'./prompts/claude__claude-3-haiku-20240307__7592342919707928.json': {
+			default: './dist/prompts/claude__claude-3-haiku-20240307__7592342919707928.json',
+		},
+		'./prompts/gemini__gemini-1.5-flash__2213965204009396.json': {
+			default: './dist/prompts/gemini__gemini-1.5-flash__2213965204009396.json',
+		},
+		'./prompts/gemini__gemini-1.5-flash__4729592659113463.json': {
+			default: './dist/prompts/gemini__gemini-1.5-flash__4729592659113463.json',
+		},
+		'./prompts/gemini__gemini-1.5-flash__4895122383086692.json': {
+			default: './dist/prompts/gemini__gemini-1.5-flash__4895122383086692.json',
 		},
 		'./prompts/gemini__gemini-1.5-flash__5027617884373645.json': {
 			default: './dist/prompts/gemini__gemini-1.5-flash__5027617884373645.json',
@@ -183,11 +204,26 @@ export const package_json = {
 		'./prompts/gemini__gemini-1.5-flash__6744453567508824.json': {
 			default: './dist/prompts/gemini__gemini-1.5-flash__6744453567508824.json',
 		},
+		'./prompts/gemini__gemini-1.5-flash__7440621931240325.json': {
+			default: './dist/prompts/gemini__gemini-1.5-flash__7440621931240325.json',
+		},
+		'./prompts/gpt__gpt-4o-mini__5420634280026271.json': {
+			default: './dist/prompts/gpt__gpt-4o-mini__5420634280026271.json',
+		},
 		'./prompts/gpt__gpt-4o-mini__6248556996006865.json': {
 			default: './dist/prompts/gpt__gpt-4o-mini__6248556996006865.json',
 		},
+		'./prompts/gpt__gpt-4o-mini__6885464770707335.json': {
+			default: './dist/prompts/gpt__gpt-4o-mini__6885464770707335.json',
+		},
+		'./prompts/gpt__gpt-4o-mini__7473945736429963.json': {
+			default: './dist/prompts/gpt__gpt-4o-mini__7473945736429963.json',
+		},
 		'./prompts/gpt__gpt-4o-mini__7857757111499317.json': {
 			default: './dist/prompts/gpt__gpt-4o-mini__7857757111499317.json',
+		},
+		'./prompts/gpt__gpt-4o-mini__807610670086433.json': {
+			default: './dist/prompts/gpt__gpt-4o-mini__807610670086433.json',
 		},
 		'./server/prompt.log': {default: './dist/server/prompt.log'},
 		'./server/server.js': {types: './dist/server/server.d.ts', default: './dist/server/server.js'},
@@ -323,8 +359,36 @@ export const src_json = {
 			path: 'prompts/claude__claude-3-haiku-20240307__1034901372588406.json',
 			declarations: [],
 		},
+		'./prompts/claude__claude-3-haiku-20240307__2273228048335727.json': {
+			path: 'prompts/claude__claude-3-haiku-20240307__2273228048335727.json',
+			declarations: [],
+		},
+		'./prompts/claude__claude-3-haiku-20240307__5465837004520857.json': {
+			path: 'prompts/claude__claude-3-haiku-20240307__5465837004520857.json',
+			declarations: [],
+		},
+		'./prompts/claude__claude-3-haiku-20240307__6990839573842766.json': {
+			path: 'prompts/claude__claude-3-haiku-20240307__6990839573842766.json',
+			declarations: [],
+		},
 		'./prompts/claude__claude-3-haiku-20240307__7307956183060804.json': {
 			path: 'prompts/claude__claude-3-haiku-20240307__7307956183060804.json',
+			declarations: [],
+		},
+		'./prompts/claude__claude-3-haiku-20240307__7592342919707928.json': {
+			path: 'prompts/claude__claude-3-haiku-20240307__7592342919707928.json',
+			declarations: [],
+		},
+		'./prompts/gemini__gemini-1.5-flash__2213965204009396.json': {
+			path: 'prompts/gemini__gemini-1.5-flash__2213965204009396.json',
+			declarations: [],
+		},
+		'./prompts/gemini__gemini-1.5-flash__4729592659113463.json': {
+			path: 'prompts/gemini__gemini-1.5-flash__4729592659113463.json',
+			declarations: [],
+		},
+		'./prompts/gemini__gemini-1.5-flash__4895122383086692.json': {
+			path: 'prompts/gemini__gemini-1.5-flash__4895122383086692.json',
 			declarations: [],
 		},
 		'./prompts/gemini__gemini-1.5-flash__5027617884373645.json': {
@@ -335,12 +399,32 @@ export const src_json = {
 			path: 'prompts/gemini__gemini-1.5-flash__6744453567508824.json',
 			declarations: [],
 		},
+		'./prompts/gemini__gemini-1.5-flash__7440621931240325.json': {
+			path: 'prompts/gemini__gemini-1.5-flash__7440621931240325.json',
+			declarations: [],
+		},
+		'./prompts/gpt__gpt-4o-mini__5420634280026271.json': {
+			path: 'prompts/gpt__gpt-4o-mini__5420634280026271.json',
+			declarations: [],
+		},
 		'./prompts/gpt__gpt-4o-mini__6248556996006865.json': {
 			path: 'prompts/gpt__gpt-4o-mini__6248556996006865.json',
 			declarations: [],
 		},
+		'./prompts/gpt__gpt-4o-mini__6885464770707335.json': {
+			path: 'prompts/gpt__gpt-4o-mini__6885464770707335.json',
+			declarations: [],
+		},
+		'./prompts/gpt__gpt-4o-mini__7473945736429963.json': {
+			path: 'prompts/gpt__gpt-4o-mini__7473945736429963.json',
+			declarations: [],
+		},
 		'./prompts/gpt__gpt-4o-mini__7857757111499317.json': {
 			path: 'prompts/gpt__gpt-4o-mini__7857757111499317.json',
+			declarations: [],
+		},
+		'./prompts/gpt__gpt-4o-mini__807610670086433.json': {
+			path: 'prompts/gpt__gpt-4o-mini__807610670086433.json',
 			declarations: [],
 		},
 		'./server/prompt.log': {path: 'server/prompt.log', declarations: []},

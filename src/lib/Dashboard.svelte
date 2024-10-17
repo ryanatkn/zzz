@@ -15,9 +15,6 @@
 
 <!-- TODO drive with data -->
 <section class="dashboard_prompts">
-	<div class="flex shadow_inset_top_sm p_lg">
-		<Control_Panel />
-	</div>
 	<div class="w_100 flex_1">
 		<Multiprompt />
 	</div>
@@ -29,7 +26,6 @@
 <style>
 	.dashboard_prompts {
 		display: flex;
-		align-items: stretch;
 		width: 100%;
 		padding: var(--space_md);
 		gap: var(--space_md);
