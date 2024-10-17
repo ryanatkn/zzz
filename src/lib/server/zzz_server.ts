@@ -92,7 +92,7 @@ export class Zzz_Server {
 
 				console.log(`texting ${agent_name}`, text.substring(0, 1000));
 
-				const model = this.models[this.model_type][agent_name];
+				const model = this.models[agent_name][this.model_type];
 
 				switch (agent_name) {
 					case 'claude': {
@@ -169,7 +169,7 @@ export class Zzz_Server {
 
 				// don't need to wait for this to finish,
 				// the expected file event is now independent of the request
-				void save_response(request, response, this.models[this.model_type][agent_name]);
+				void save_response(request, response, this.models[agent_name][this.model_type]);
 
 				console.log(`got ${agent_name} message`, response.data);
 

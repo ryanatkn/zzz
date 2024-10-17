@@ -1,0 +1,49 @@
+{
+	"model": "gemini-1.5-flash",
+	"request": {
+		"id": 7595052772857158,
+		"type": "send_prompt",
+		"agent_name": "gemini",
+		"text": "the traveler stopped and asked the three AIs the same question, care to take this cognitive burden?"
+	},
+	"response": {
+		"id": 6744453567508824,
+		"type": "prompt_response",
+		"request_id": 7595052772857158,
+		"agent_name": "gemini",
+		"model": "gemini-1.5-flash",
+		"data": {
+			"type": "gemini",
+			"value": {
+				"text": "\"What's the question, friend? We're always happy to lend a digital hand, or at least a few lines of code.\" \n",
+				"candidates": [
+					{
+						"content": {
+							"parts": [
+								{
+									"text": "\"What's the question, friend? We're always happy to lend a digital hand, or at least a few lines of code.\" \n"
+								}
+							],
+							"role": "model"
+						},
+						"finishReason": "STOP",
+						"index": 0,
+						"safetyRatings": [
+							{"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "probability": "NEGLIGIBLE"},
+							{"category": "HARM_CATEGORY_HATE_SPEECH", "probability": "NEGLIGIBLE"},
+							{"category": "HARM_CATEGORY_HARASSMENT", "probability": "NEGLIGIBLE"},
+							{"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "probability": "NEGLIGIBLE"}
+						]
+					}
+				],
+				"function_calls": null,
+				"prompt_feedback": null,
+				"usage_metadata": {
+					"promptTokenCount": 56,
+					"candidatesTokenCount": 29,
+					"totalTokenCount": 85
+				}
+			}
+		}
+	}
+}

@@ -4,15 +4,17 @@ import type {Agent_Json} from './agent.svelte.js';
 // TODO refactor
 
 export const default_models: Models = {
-	cheap: {
-		claude: 'claude-3-haiku-20240307',
-		gpt: 'gpt-4o-mini',
-		gemini: 'gemini-1.5-flash',
+	claude: {
+		cheap: 'claude-3-haiku-20240307',
+		smart: 'claude-3-5-sonnet-20240620',
 	},
-	smart: {
-		claude: 'claude-3-5-sonnet-20240620',
-		gpt: 'gpt-4o',
-		gemini: 'gemini-1.5-pro',
+	gpt: {
+		cheap: 'gpt-4o-mini',
+		smart: 'gpt-4o',
+	},
+	gemini: {
+		cheap: 'gemini-1.5-flash',
+		smart: 'gemini-1.5-pro',
 	},
 } as const;
 
@@ -21,21 +23,30 @@ export const default_agents: Agent_Json[] = [
 		name: 'claude',
 		icon: '',
 		title: 'Claude',
-		model: '',
+		models: {
+			smart: '',
+			cheap: '',
+		},
 		url: 'https://docs.anthropic.com/en/home',
 	},
 	{
 		name: 'gpt',
 		icon: '',
 		title: 'ChatGPT',
-		model: '',
+		models: {
+			smart: '',
+			cheap: '',
+		},
 		url: 'https://platform.openai.com/docs/overview',
 	},
 	{
 		name: 'gemini',
 		icon: '',
 		title: 'Gemini',
-		model: '',
+		models: {
+			smart: '',
+			cheap: '',
+		},
 		url: 'https://ai.google.dev/gemini-api/docs/',
 	},
 ];

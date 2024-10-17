@@ -20,7 +20,7 @@
 	<!-- TODO pass a zap? -->
 	<!-- <div class="size_xl">{agent.icon}</div> -->
 	<div>{agent.title}</div>
-	<div>{agent.model}</div>
+	<div>models: {JSON.stringify(agent.models)}</div>
 	{#if tape}
 		<Tapes_List {agent} {tape} />
 	{:else}

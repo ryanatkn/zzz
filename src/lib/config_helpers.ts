@@ -1,6 +1,6 @@
 // TODO expand similar to gitops/gro config
 
-import type {Agent_Json} from '$lib/agent.svelte.js';
+import type {Agent_Json, Agent_Name} from '$lib/agent.svelte.js';
 
 export type Zzz_Config_Creator = () => Zzz_Config;
 
@@ -14,4 +14,4 @@ export interface Zzz_Config {
 
 // TODO move where? make this data?
 export type Model_Type = 'cheap' | 'smart';
-export type Models = Record<Model_Type, {claude: string; gpt: string; gemini: string}>;
+export type Models = Record<Agent_Name, Record<Model_Type, string>>;

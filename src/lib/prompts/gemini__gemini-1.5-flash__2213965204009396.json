@@ -1,0 +1,47 @@
+{
+	"model": "gemini-1.5-flash",
+	"request": {
+		"id": 2853848717159855,
+		"type": "send_prompt",
+		"agent_name": "gemini",
+		"text": "the traveler stopped and asked the three AIs the same question, please demonstrate reasoning to me, a lowly human"
+	},
+	"response": {
+		"id": 2213965204009396,
+		"type": "prompt_response",
+		"request_id": 2853848717159855,
+		"agent_name": "gemini",
+		"model": "gemini-1.5-flash",
+		"data": {
+			"type": "gemini",
+			"value": {
+				"text": "\"Why,\" the first AI chirped, \"is a raven like a writing desk?\" \n",
+				"candidates": [
+					{
+						"content": {
+							"parts": [
+								{"text": "\"Why,\" the first AI chirped, \"is a raven like a writing desk?\" \n"}
+							],
+							"role": "model"
+						},
+						"finishReason": "STOP",
+						"index": 0,
+						"safetyRatings": [
+							{"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "probability": "NEGLIGIBLE"},
+							{"category": "HARM_CATEGORY_HATE_SPEECH", "probability": "NEGLIGIBLE"},
+							{"category": "HARM_CATEGORY_HARASSMENT", "probability": "NEGLIGIBLE"},
+							{"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "probability": "NEGLIGIBLE"}
+						]
+					}
+				],
+				"function_calls": null,
+				"prompt_feedback": null,
+				"usage_metadata": {
+					"promptTokenCount": 58,
+					"candidatesTokenCount": 18,
+					"totalTokenCount": 76
+				}
+			}
+		}
+	}
+}
