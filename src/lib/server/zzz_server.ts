@@ -34,7 +34,7 @@ export interface Options {
 	send: (message: Server_Message) => void;
 	filer?: Filer;
 	models?: Models;
-	model_type?: Model_Type;
+	default_model_type?: Model_Type;
 	system_message?: string;
 }
 
@@ -43,7 +43,7 @@ export class Zzz_Server {
 
 	filer: Filer;
 
-	model_type: Model_Type;
+	default_model_type: Model_Type;
 	models: Models;
 	system_message: string;
 
@@ -65,8 +65,8 @@ export class Zzz_Server {
 					throw new Unreachable_Error(change.type);
 			}
 		});
-		this.model_type = options.model_type ?? 'cheap';
 		this.models = options.models ?? default_models;
+		this.default_model_type = options.default_model_type ?? 'cheap';
 		this.system_message = options.system_message ?? SYSTEM_MESSAGE_DEFAULT;
 	}
 
@@ -92,7 +92,7 @@ export class Zzz_Server {
 
 				console.log(`texting ${agent_name}`, text.substring(0, 1000));
 
-				const model = this.models[agent_name][this.model_type];
+				const model = this.models[agent_name][this.default_model_type];
 
 				switch (agent_name) {
 					case 'claude': {
@@ -169,7 +169,7 @@ export class Zzz_Server {
 
 				// don't need to wait for this to finish,
 				// the expected file event is now independent of the request
-				void save_response(request, response, this.models[agent_name][this.model_type]);
+				void save_response(request, response, this.models[agent_name][this.default_model_type]);
 
 				console.log(`got ${agent_name} message`, response.data);
 

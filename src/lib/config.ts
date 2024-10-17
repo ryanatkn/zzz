@@ -53,8 +53,10 @@ export const default_agents: Agent_Json[] = [
 
 const config: Zzz_Config_Creator = () => {
 	return {
+		system_message: undefined, // TODO is this the right place for this?
 		models: default_models,
 		agents: default_agents,
+		default_model_type: 'cheap',
 	};
 };
 

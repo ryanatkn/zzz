@@ -18,7 +18,7 @@
 	<div class="flex shadow_inset_top_sm p_lg">
 		<Control_Panel />
 	</div>
-	<div class="flex_1">
+	<div class="w_100 flex_1">
 		<Multiprompt />
 	</div>
 </section>

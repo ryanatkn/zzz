@@ -8,8 +8,10 @@ export type Zzz_Config_Creator = () => Zzz_Config;
  * @json
  */
 export interface Zzz_Config {
+	system_message: string | undefined;
 	models: Models;
 	agents: Agent_Json[];
+	default_model_type: Model_Type;
 }
 
 // TODO move where? make this data?

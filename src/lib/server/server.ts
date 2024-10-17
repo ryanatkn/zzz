@@ -5,8 +5,11 @@ import type {WSContext} from 'hono/ws';
 import * as devalue from 'devalue';
 
 import {Zzz_Server} from '$lib/server/zzz_server.js';
+import create_config from '$lib/config.js';
 
 console.log('creating server');
+
+const {system_message, models, default_model_type} = create_config();
 
 const sockets: Set<WSContext> = new Set();
 
@@ -69,5 +72,8 @@ const zzz_server = new Zzz_Server({
 			ws.send(devalue.stringify({type: 'gro_server_message', message}));
 		}
 	},
-	// model_type: 'cheap', // TODO source from env or config?
+	// agents, // TODO ?
+	models,
+	default_model_type,
+	system_message,
 });
