@@ -19,7 +19,14 @@
 <div class="flex_1 {classes}">
 	<!-- TODO pass a zap? -->
 	<!-- <div class="size_xl">{agent.icon}</div> -->
-	<div>{agent.title} - {agent.model}</div>
+	<div class="row">
+		{agent.title}
+		<select bind:value={agent.selected_model_name}>
+			{#each Object.values(agent.models) as model}
+				<option value={model.name}>{model.name}</option>
+			{/each}
+		</select>
+	</div>
 	<div>models: {JSON.stringify(agent.models)}</div>
 	{#if tape}
 		<Tapes_List {agent} {tape} />

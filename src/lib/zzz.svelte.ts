@@ -4,7 +4,6 @@ import {create_deferred, type Deferred} from '@ryanatkn/belt/async.js';
 import type {Source_File} from '@ryanatkn/gro/filer.js';
 import type {Path_Id} from '@ryanatkn/gro/path.js';
 import {Unreachable_Error} from '@ryanatkn/belt/error.js';
-import {to_array} from '@ryanatkn/belt/array.js';
 
 import {Zzz_Data, type Zzz_Data_Json} from '$lib/zzz_data.svelte.js';
 import type {Zzz_Client} from '$lib/zzz_client.js';
@@ -17,11 +16,13 @@ import type {
 import type {Agent} from '$lib/agent.svelte.js';
 import {random_id, type Id} from '$lib/id.js';
 import {Tapes, type Tapes_Json} from './tape.svelte.js';
+import type {Model} from '$lib/model.svelte.js';
 
 export const zzz_context = create_context<Zzz>();
 
 export interface Zzz_Options {
 	agents: Agent[];
+	models: Model[];
 	client: Zzz_Client;
 	tapes?: Tapes;
 	data?: Zzz_Data;
@@ -45,6 +46,8 @@ export class Zzz {
 	// maybe have the source of truth by an array?
 	agents: Agent[] = $state([]);
 
+	models: Model[] = $state([]);
+
 	files_by_id: SvelteMap<Path_Id, Source_File> = new SvelteMap();
 
 	echos: Echo_Message[] = $state([]);
@@ -60,8 +63,9 @@ export class Zzz {
 	// TODO store state granularly for each agent
 
 	constructor(options: Zzz_Options) {
-		const {agents, client, data = new Zzz_Data()} = options;
+		const {agents, models, client, data = new Zzz_Data()} = options;
 		this.agents.push(...agents);
+		this.models.push(...models);
 		this.client = client;
 		this.tapes = options.tapes ?? new Tapes({all_agents: agents});
 		this.data = data;
@@ -74,33 +78,21 @@ export class Zzz {
 		};
 	}
 
-	async send_prompt(
-		text: string,
-		agent: Agent | Agent[] = Array.from(this.agents.values()),
-	): Promise<Receive_Prompt_Message[]> {
-		// TODO need ids, and then the response promise, tracking by text isn't robust to duplicates
-		const agents = to_array(agent);
+	async send_prompt(text: string, agent: Agent, model: string): Promise<Receive_Prompt_Message> {
+		const message: Send_Prompt_Message = {
+			id: random_id(),
+			type: 'send_prompt',
+			agent_name: agent.name,
+			model,
+			text,
+		};
+		this.client.send(message);
 
-		const responses = await Promise.all(
-			agents.map(async (agent) => {
-				const message: Send_Prompt_Message = {
-					id: random_id(),
-					type: 'send_prompt',
-					agent_name: agent.name,
-					model: agent.model,
-					text,
-				};
-				this.client.send(message);
-
-				const deferred = create_deferred<Receive_Prompt_Message>();
-				this.pending_prompts.set(message.id, deferred); // TODO roundabout way to get req/res
-				const response = await deferred.promise;
-				this.tapes.receive_prompt_response(message, response);
-				return response;
-			}),
-		);
-
-		return responses;
+		const deferred = create_deferred<Receive_Prompt_Message>();
+		this.pending_prompts.set(message.id, deferred); // TODO roundabout way to get req/res
+		const response = await deferred.promise;
+		this.tapes.receive_prompt_response(message, response);
+		return response;
 	}
 
 	receive_prompt_response(message: Receive_Prompt_Message): void {

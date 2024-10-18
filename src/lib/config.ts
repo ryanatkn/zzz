@@ -1,5 +1,6 @@
 import type {Zzz_Config_Creator} from '$lib/config_helpers.js';
-import type {Agent_Json} from './agent.svelte.js';
+import type {Agent_Json} from '$lib/agent.svelte.js';
+import type {Model_Json} from '$lib/model.svelte.js';
 
 // TODO refactor
 
@@ -8,35 +9,31 @@ export const default_agents: Agent_Json[] = [
 		name: 'claude',
 		icon: '',
 		title: 'Claude',
-		model: 'claude-3-haiku-20240307',
-		models: {
-			cheap: 'claude-3-haiku-20240307',
-			smart: 'claude-3-5-sonnet-20240620',
-		},
 		url: 'https://docs.anthropic.com/en/home',
 	},
 	{
 		name: 'gpt',
 		icon: '',
 		title: 'ChatGPT',
-		model: 'gpt-4o-mini',
-		models: {
-			cheap: 'gpt-4o-mini',
-			smart: 'gpt-4o',
-		},
 		url: 'https://platform.openai.com/docs/overview',
 	},
 	{
 		name: 'gemini',
 		icon: '',
 		title: 'Gemini',
-		model: 'gemini-1.5-flash',
-		models: {
-			cheap: 'gemini-1.5-flash',
-			smart: 'gemini-1.5-pro',
-		},
 		url: 'https://ai.google.dev/gemini-api/docs/',
 	},
+];
+
+export const default_models: Model_Json[] = [
+	{name: 'claude-3-haiku-20240307', agent_name: 'claude', tags: ['cheap']},
+	{name: 'claude-3-5-sonnet-20240620', agent_name: 'claude', tags: ['smart']},
+	{name: 'gpt-4o-mini', agent_name: 'gpt', tags: ['cheap']},
+	{name: 'gpt-4o', agent_name: 'gpt', tags: ['smart']},
+	{name: 'o1-preview', agent_name: 'gpt', tags: ['reasoning']},
+	{name: 'o1-mini', agent_name: 'gpt', tags: ['reasoning']},
+	{name: 'gemini-1.5-flash', agent_name: 'gemini', tags: ['cheap']},
+	{name: 'gemini-1.5-pro', agent_name: 'gemini', tags: ['smart']},
 ];
 
 export const SYSTEM_MESSAGE_DEFAULT =
@@ -45,6 +42,7 @@ export const SYSTEM_MESSAGE_DEFAULT =
 const config: Zzz_Config_Creator = () => {
 	return {
 		agents: default_agents,
+		models: default_models,
 		system_message: SYSTEM_MESSAGE_DEFAULT,
 	};
 };

@@ -18,7 +18,14 @@
 </script>
 
 <div class="flex_1 {classes}">
-	<div><!--<span class="size_xl">{agent.icon}</span> -->{agent.model}</div>
+	<div>
+		<!--<span class="size_xl">{agent.icon}</span> -->
+		<select bind:value={agent.selected_model_name}>
+			{#each Object.values(agent.models) as model}
+				<option value={model.name}>{model.name}</option>
+			{/each}
+		</select>
+	</div>
 	{#if tape}
 		<Tapes_List {agent} {tape} />
 	{:else}

@@ -19,7 +19,6 @@ import type {
 } from '$lib/zzz_message.js';
 import type {Prompt_Json} from '$lib/prompt.svelte.js';
 import {random_id} from '$lib/id.js';
-import type {Model_Type} from '$lib/config_helpers.js';
 import {SYSTEM_MESSAGE_DEFAULT} from '$lib/config.js';
 import {write_file_in_scope as write_file_in_root_dir} from '$lib/server/helpers.js';
 
@@ -30,7 +29,6 @@ const google = new GoogleGenerativeAI(SECRET_GOOGLE_API_KEY);
 export interface Options {
 	send: (message: Server_Message) => void;
 	filer?: Filer;
-	default_model_type?: Model_Type;
 	system_message?: string;
 }
 

@@ -159,6 +159,7 @@ export const package_json = {
 			svelte: './dist/Message_View.svelte',
 			default: './dist/Message_View.svelte',
 		},
+		'./model.svelte.js': {types: './dist/model.svelte.d.ts', default: './dist/model.svelte.js'},
 		'./Multiprompt.svelte': {
 			types: './dist/Multiprompt.svelte.d.ts',
 			svelte: './dist/Multiprompt.svelte',
@@ -171,6 +172,15 @@ export const package_json = {
 			default: './dist/Prompt_Agent_Form.svelte',
 		},
 		'./prompt.svelte.js': {types: './dist/prompt.svelte.d.ts', default: './dist/prompt.svelte.js'},
+		'./prompts/claude__claude-3-haiku-20240307__4444134401421189.json': {
+			default: './dist/prompts/claude__claude-3-haiku-20240307__4444134401421189.json',
+		},
+		'./prompts/gemini__gemini-1.5-flash__2475485639731989.json': {
+			default: './dist/prompts/gemini__gemini-1.5-flash__2475485639731989.json',
+		},
+		'./prompts/gpt__gpt-4o-mini__7461234247402992.json': {
+			default: './dist/prompts/gpt__gpt-4o-mini__7461234247402992.json',
+		},
 		'./server/helpers.js': {
 			types: './dist/server/helpers.d.ts',
 			default: './dist/server/helpers.js',
@@ -249,15 +259,13 @@ export const src_json = {
 			declarations: [
 				{name: 'Zzz_Config_Creator', kind: 'type'},
 				{name: 'Zzz_Config', kind: 'type'},
-				{name: 'Model_Type', kind: 'type'},
-				{name: 'Models', kind: 'type'},
 			],
 		},
 		'./config.js': {
 			path: 'config.ts',
 			declarations: [
-				{name: 'default_models', kind: 'variable'},
 				{name: 'default_agents', kind: 'variable'},
+				{name: 'default_models', kind: 'variable'},
 				{name: 'SYSTEM_MESSAGE_DEFAULT', kind: 'variable'},
 				{name: 'default', kind: 'variable'},
 			],
@@ -295,6 +303,15 @@ export const src_json = {
 		'./Message_Info.svelte': {path: 'Message_Info.svelte', declarations: []},
 		'./Message_Summary.svelte': {path: 'Message_Summary.svelte', declarations: []},
 		'./Message_View.svelte': {path: 'Message_View.svelte', declarations: []},
+		'./model.svelte.js': {
+			path: 'model.svelte.ts',
+			declarations: [
+				{name: 'Model_Name', kind: 'type'},
+				{name: 'Model_Json', kind: 'type'},
+				{name: 'Model_Options', kind: 'type'},
+				{name: 'Model', kind: 'class'},
+			],
+		},
 		'./Multiprompt.svelte': {path: 'Multiprompt.svelte', declarations: []},
 		'./path.js': {path: 'path.ts', declarations: [{name: 'to_base_path', kind: 'function'}]},
 		'./Prompt_Agent_Form.svelte': {path: 'Prompt_Agent_Form.svelte', declarations: []},
@@ -305,6 +322,18 @@ export const src_json = {
 				{name: 'Prompt_Options', kind: 'type'},
 				{name: 'Prompt', kind: 'class'},
 			],
+		},
+		'./prompts/claude__claude-3-haiku-20240307__4444134401421189.json': {
+			path: 'prompts/claude__claude-3-haiku-20240307__4444134401421189.json',
+			declarations: [],
+		},
+		'./prompts/gemini__gemini-1.5-flash__2475485639731989.json': {
+			path: 'prompts/gemini__gemini-1.5-flash__2475485639731989.json',
+			declarations: [],
+		},
+		'./prompts/gpt__gpt-4o-mini__7461234247402992.json': {
+			path: 'prompts/gpt__gpt-4o-mini__7461234247402992.json',
+			declarations: [],
 		},
 		'./server/helpers.js': {
 			path: 'server/helpers.ts',

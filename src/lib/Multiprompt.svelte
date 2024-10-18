@@ -23,7 +23,9 @@
 		pending = true;
 		// TODO BLOCK create an object locally that doesn't have its response yet, has the request
 		// use its toJSON in the server
-		await zzz.send_prompt(value);
+		await Promise.all(
+			agents.map(async (agent) => zzz.send_prompt(text, agent, agent.selected_model_name)), // TODO `agent.selected_model_name` needs to be granular per instance
+		);
 		pending = false;
 		if (text === value) value = '';
 	};
@@ -44,7 +46,7 @@
 	send prompt ⚟
 </Pending_Button>
 <div class="w_100 flex py_lg">
-	{#each agents.values() as agent (agent)}
+	{#each agents as agent (agent)}
 		<Agent_View {agent} />
 	{/each}
 </div>

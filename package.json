@@ -188,6 +188,10 @@
       "svelte": "./dist/Message_View.svelte",
       "default": "./dist/Message_View.svelte"
     },
+    "./model.svelte.js": {
+      "types": "./dist/model.svelte.d.ts",
+      "default": "./dist/model.svelte.js"
+    },
     "./Multiprompt.svelte": {
       "types": "./dist/Multiprompt.svelte.d.ts",
       "svelte": "./dist/Multiprompt.svelte",
@@ -205,6 +209,15 @@
     "./prompt.svelte.js": {
       "types": "./dist/prompt.svelte.d.ts",
       "default": "./dist/prompt.svelte.js"
+    },
+    "./prompts/claude__claude-3-haiku-20240307__4444134401421189.json": {
+      "default": "./dist/prompts/claude__claude-3-haiku-20240307__4444134401421189.json"
+    },
+    "./prompts/gemini__gemini-1.5-flash__2475485639731989.json": {
+      "default": "./dist/prompts/gemini__gemini-1.5-flash__2475485639731989.json"
+    },
+    "./prompts/gpt__gpt-4o-mini__7461234247402992.json": {
+      "default": "./dist/prompts/gpt__gpt-4o-mini__7461234247402992.json"
     },
     "./server/helpers.js": {
       "types": "./dist/server/helpers.d.ts",

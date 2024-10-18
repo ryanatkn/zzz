@@ -23,6 +23,7 @@
 	import {Agent} from '$lib/agent.svelte.js';
 	import {random_id} from '$lib/id.js';
 	import create_zzz_config from '$lib/config.js';
+	import {Model} from '$lib/model.svelte.js';
 
 	interface Props {
 		children: Snippet;
@@ -39,9 +40,12 @@
 	let ws: WebSocket | undefined;
 	let ws_connecting: Deferred<void> | undefined;
 
+	const models = zzz_config.models.map((data) => new Model({data}));
+
 	// gives app-wide support for Zzz
 	const zzz = new Zzz({
-		agents: zzz_config.agents.map((data) => new Agent({data})),
+		agents: zzz_config.agents.map((data) => new Agent({data, all_models: models})),
+		models,
 		client: new Zzz_Client({
 			send: async (message) => {
 				if (!browser) return;
@@ -104,7 +108,8 @@
 		}),
 	});
 	if (browser) (window as any).zzz = zzz;
-	$inspect(zzz.agents);
+
+	$inspect('agents', zzz.agents);
 
 	// zzz.send({type: 'echo', data: 'echo from client'});
 	zzz.client.send({id: random_id(), type: 'load_session'});
