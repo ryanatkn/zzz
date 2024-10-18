@@ -6,6 +6,7 @@ export interface Agent_Json {
 	name: Agent_Name;
 	icon: string;
 	title: string;
+	model: string;
 	models: Record<Model_Type, string>;
 	url: string;
 }
@@ -18,19 +19,18 @@ export class Agent {
 	name: Agent_Name = $state()!;
 	icon: string = $state()!;
 	title: string = $state()!;
+	model: string = $state()!;
 	models: Record<Model_Type, string> = $state()!;
 	url: string = $state()!;
 
-	// TODO
-	// models
-
 	constructor(options: Agent_Options) {
 		const {
-			data: {name, icon, title, models, url},
+			data: {name, icon, title, model, models, url},
 		} = options;
 		this.name = name;
 		this.icon = icon;
 		this.title = title;
+		this.model = model;
 		this.models = models;
 		this.url = url;
 	}
@@ -40,6 +40,7 @@ export class Agent {
 			name: this.name,
 			icon: this.icon,
 			title: this.title,
+			model: this.model,
 			models: this.models,
 			url: this.url,
 		};

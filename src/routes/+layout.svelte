@@ -103,6 +103,8 @@
 			},
 		}),
 	});
+	if (browser) (window as any).zzz = zzz;
+	$inspect(zzz.agents);
 
 	// zzz.send({type: 'echo', data: 'echo from client'});
 	zzz.client.send({id: random_id(), type: 'load_session'});

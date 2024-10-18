@@ -82,11 +82,12 @@ export class Zzz {
 		const agents = to_array(agent);
 
 		const responses = await Promise.all(
-			Array.from(agents.values()).map(async (agent) => {
+			agents.map(async (agent) => {
 				const message: Send_Prompt_Message = {
 					id: random_id(),
 					type: 'send_prompt',
 					agent_name: agent.name,
+					model: agent.model,
 					text,
 				};
 				this.client.send(message);

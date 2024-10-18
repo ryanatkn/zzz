@@ -65,6 +65,7 @@ export interface Filer_Change_Message extends Base_Message {
 export interface Send_Prompt_Message extends Base_Message {
 	type: 'send_prompt';
 	agent_name: Agent_Name;
+	model: string;
 	text: string;
 	// TODO ?
 	// model: string;

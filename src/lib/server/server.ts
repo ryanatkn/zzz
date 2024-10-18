@@ -9,7 +9,7 @@ import create_config from '$lib/config.js';
 
 console.log('creating server');
 
-const {system_message, models, default_model_type} = create_config();
+const {system_message} = create_config();
 
 const sockets: Set<WSContext> = new Set();
 
@@ -73,7 +73,5 @@ const zzz_server = new Zzz_Server({
 		}
 	},
 	// agents, // TODO ?
-	models,
-	default_model_type,
 	system_message,
 });

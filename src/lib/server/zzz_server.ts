@@ -19,8 +19,8 @@ import type {
 } from '$lib/zzz_message.js';
 import type {Prompt_Json} from '$lib/prompt.svelte.js';
 import {random_id} from '$lib/id.js';
-import type {Model_Type, Models} from '$lib/config_helpers.js';
-import {default_models, SYSTEM_MESSAGE_DEFAULT} from '$lib/config.js';
+import type {Model_Type} from '$lib/config_helpers.js';
+import {SYSTEM_MESSAGE_DEFAULT} from '$lib/config.js';
 import {write_file_in_scope as write_file_in_root_dir} from '$lib/server/helpers.js';
 
 const anthropic = new Anthropic({apiKey: SECRET_ANTHROPIC_API_KEY});
@@ -30,7 +30,6 @@ const google = new GoogleGenerativeAI(SECRET_GOOGLE_API_KEY);
 export interface Options {
 	send: (message: Server_Message) => void;
 	filer?: Filer;
-	models?: Models;
 	default_model_type?: Model_Type;
 	system_message?: string;
 }
@@ -40,8 +39,6 @@ export class Zzz_Server {
 
 	filer: Filer;
 
-	default_model_type: Model_Type;
-	models: Models;
 	system_message: string;
 
 	#cleanup_filer: Promise<Cleanup_Watch>;
@@ -55,7 +52,7 @@ export class Zzz_Server {
 				case 'add':
 				case 'update':
 				case 'delete': {
-					if (source_file.id.includes('.css')) console.log(`source_file`, source_file);
+					if (source_file.id.includes('.css')) console.log(`source_file`, source_file.id);
 					this.#send({id: random_id(), type: 'filer_change', change, source_file});
 					break;
 				}
@@ -63,8 +60,6 @@ export class Zzz_Server {
 					throw new Unreachable_Error(change.type);
 			}
 		});
-		this.models = options.models ?? default_models;
-		this.default_model_type = options.default_model_type ?? 'cheap';
 		this.system_message = options.system_message ?? SYSTEM_MESSAGE_DEFAULT;
 	}
 
@@ -84,13 +79,11 @@ export class Zzz_Server {
 				return {id: random_id(), type: 'loaded_session', data: {files: this.filer.files}};
 			}
 			case 'send_prompt': {
-				const {text, agent_name} = request;
+				const {text, agent_name, model} = request;
 
 				let response: Receive_Prompt_Message;
 
 				console.log(`texting ${agent_name}`, text.substring(0, 1000));
-
-				const model = this.models[agent_name][this.default_model_type];
 
 				switch (agent_name) {
 					case 'claude': {
@@ -167,7 +160,7 @@ export class Zzz_Server {
 
 				// don't need to wait for this to finish,
 				// the expected file event is now independent of the request
-				void save_response(request, response, this.models[agent_name][this.default_model_type]);
+				void save_response(request, response);
 
 				console.log(`got ${agent_name} message`, response.data);
 
@@ -194,13 +187,12 @@ export class Zzz_Server {
 const save_response = async (
 	request: Send_Prompt_Message,
 	response: Receive_Prompt_Message,
-	model: string,
 ): Promise<void> => {
-	const filename = `${request.agent_name}__${model}__${response.id}.json`; // TODO include model data in these
+	const filename = `${request.agent_name}__${request.model}__${response.id}.json`; // TODO include model data in these
 
 	const path = `./src/lib/prompts/` + filename;
 
-	const json: Prompt_Json = {model, request, response};
+	const json: Prompt_Json = {request, response};
 
 	writeFileSync(path, await format_file(JSON.stringify(json), {parser: 'json'}));
 };

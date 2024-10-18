@@ -18,7 +18,7 @@
 </script>
 
 <div class="flex_1 {classes}">
-	<div><!--<span class="size_xl">{agent.icon}</span> -->{agent.title}</div>
+	<div><!--<span class="size_xl">{agent.icon}</span> -->{agent.model}</div>
 	{#if tape}
 		<Tapes_List {agent} {tape} />
 	{:else}
