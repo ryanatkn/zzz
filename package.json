@@ -206,15 +206,29 @@
       "svelte": "./dist/Prompt_Agent_Form.svelte",
       "default": "./dist/Prompt_Agent_Form.svelte"
     },
+    "./Prompt_Instance.svelte": {
+      "types": "./dist/Prompt_Instance.svelte.d.ts",
+      "svelte": "./dist/Prompt_Instance.svelte",
+      "default": "./dist/Prompt_Instance.svelte"
+    },
     "./prompt.svelte.js": {
       "types": "./dist/prompt.svelte.d.ts",
       "default": "./dist/prompt.svelte.js"
+    },
+    "./prompts/claude__claude-3-5-sonnet-20240620__7154479336055197.json": {
+      "default": "./dist/prompts/claude__claude-3-5-sonnet-20240620__7154479336055197.json"
     },
     "./prompts/claude__claude-3-haiku-20240307__4444134401421189.json": {
       "default": "./dist/prompts/claude__claude-3-haiku-20240307__4444134401421189.json"
     },
     "./prompts/gemini__gemini-1.5-flash__2475485639731989.json": {
       "default": "./dist/prompts/gemini__gemini-1.5-flash__2475485639731989.json"
+    },
+    "./prompts/gemini__gemini-1.5-pro__7675592755575567.json": {
+      "default": "./dist/prompts/gemini__gemini-1.5-pro__7675592755575567.json"
+    },
+    "./prompts/gpt__gpt-4o__6762858168497241.json": {
+      "default": "./dist/prompts/gpt__gpt-4o__6762858168497241.json"
     },
     "./prompts/gpt__gpt-4o-mini__7461234247402992.json": {
       "default": "./dist/prompts/gpt__gpt-4o-mini__7461234247402992.json"

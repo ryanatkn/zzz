@@ -17,12 +17,12 @@ export class Zzz_Client {
 	}
 
 	send(message: Client_Message): void {
-		console.log(`[zzz_client.send] message`, message);
+		console.log(`[zzz_client.send] message`, message.id, message.type);
 		this.#send(message);
 	}
 
 	receive(message: Server_Message): void {
-		console.log(`[zzz_client.receive] message`, message);
+		console.log(`[zzz_client.receive] message`, message.id, message.type);
 		this.#receive(message);
 	}
 }

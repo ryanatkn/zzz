@@ -171,12 +171,26 @@ export const package_json = {
 			svelte: './dist/Prompt_Agent_Form.svelte',
 			default: './dist/Prompt_Agent_Form.svelte',
 		},
+		'./Prompt_Instance.svelte': {
+			types: './dist/Prompt_Instance.svelte.d.ts',
+			svelte: './dist/Prompt_Instance.svelte',
+			default: './dist/Prompt_Instance.svelte',
+		},
 		'./prompt.svelte.js': {types: './dist/prompt.svelte.d.ts', default: './dist/prompt.svelte.js'},
+		'./prompts/claude__claude-3-5-sonnet-20240620__7154479336055197.json': {
+			default: './dist/prompts/claude__claude-3-5-sonnet-20240620__7154479336055197.json',
+		},
 		'./prompts/claude__claude-3-haiku-20240307__4444134401421189.json': {
 			default: './dist/prompts/claude__claude-3-haiku-20240307__4444134401421189.json',
 		},
 		'./prompts/gemini__gemini-1.5-flash__2475485639731989.json': {
 			default: './dist/prompts/gemini__gemini-1.5-flash__2475485639731989.json',
+		},
+		'./prompts/gemini__gemini-1.5-pro__7675592755575567.json': {
+			default: './dist/prompts/gemini__gemini-1.5-pro__7675592755575567.json',
+		},
+		'./prompts/gpt__gpt-4o__6762858168497241.json': {
+			default: './dist/prompts/gpt__gpt-4o__6762858168497241.json',
 		},
 		'./prompts/gpt__gpt-4o-mini__7461234247402992.json': {
 			default: './dist/prompts/gpt__gpt-4o-mini__7461234247402992.json',
@@ -315,6 +329,7 @@ export const src_json = {
 		'./Multiprompt.svelte': {path: 'Multiprompt.svelte', declarations: []},
 		'./path.js': {path: 'path.ts', declarations: [{name: 'to_base_path', kind: 'function'}]},
 		'./Prompt_Agent_Form.svelte': {path: 'Prompt_Agent_Form.svelte', declarations: []},
+		'./Prompt_Instance.svelte': {path: 'Prompt_Instance.svelte', declarations: []},
 		'./prompt.svelte.js': {
 			path: 'prompt.svelte.ts',
 			declarations: [
@@ -323,12 +338,24 @@ export const src_json = {
 				{name: 'Prompt', kind: 'class'},
 			],
 		},
+		'./prompts/claude__claude-3-5-sonnet-20240620__7154479336055197.json': {
+			path: 'prompts/claude__claude-3-5-sonnet-20240620__7154479336055197.json',
+			declarations: [],
+		},
 		'./prompts/claude__claude-3-haiku-20240307__4444134401421189.json': {
 			path: 'prompts/claude__claude-3-haiku-20240307__4444134401421189.json',
 			declarations: [],
 		},
 		'./prompts/gemini__gemini-1.5-flash__2475485639731989.json': {
 			path: 'prompts/gemini__gemini-1.5-flash__2475485639731989.json',
+			declarations: [],
+		},
+		'./prompts/gemini__gemini-1.5-pro__7675592755575567.json': {
+			path: 'prompts/gemini__gemini-1.5-pro__7675592755575567.json',
+			declarations: [],
+		},
+		'./prompts/gpt__gpt-4o__6762858168497241.json': {
+			path: 'prompts/gpt__gpt-4o__6762858168497241.json',
 			declarations: [],
 		},
 		'./prompts/gpt__gpt-4o-mini__7461234247402992.json': {

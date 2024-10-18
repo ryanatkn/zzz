@@ -67,7 +67,7 @@ export class Zzz_Server {
 
 	// TODO add an abstraction here, so the server isn't concerned with message content/types
 	async receive(request: Client_Message): Promise<Server_Message | null> {
-		console.log(`[zzz_server.receive] message`, request, request.type === 'load_session');
+		console.log(`[zzz_server.receive] message`, request.id, request.type);
 		switch (request.type) {
 			case 'echo': {
 				// await wait(1000);
