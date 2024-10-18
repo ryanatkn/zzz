@@ -1,32 +1,33 @@
 <script lang="ts">
-	import {base} from '$app/paths';
 	import type {Snippet} from 'svelte';
 
 	import {hud_context} from './hud.svelte.js';
+	import Hud_Dialog from './Hud_Dialog.svelte';
 
 	interface Props {
-		hud?: Snippet;
+		hud?: Snippet; // TODO maybe delete all of this, design still shaking out
 		children: Snippet;
 	}
 
 	const {hud, children}: Props = $props();
 
-	const final_hud: Snippet = $derived(hud ?? hud_context.get() ?? hud_default);
+	const hud_from_context = hud_context.get();
+
+	const hud_snippet = $derived(hud ?? hud_from_context);
 </script>
 
+<Hud_Dialog />
 {@render children()}
-<div class="hud">
-	{@render final_hud()}
-</div>
-
-{#snippet hud_default()}
-	<a href="{base}/about" class="size_xl3 justify_self_end">about</a>
-{/snippet}
+{#if hud_snippet}
+	<div class="hud">
+		{@render hud_snippet()}
+	</div>
+{/if}
 
 <style>
 	.hud {
 		position: fixed;
-		bottom: 0;
+		top: 0;
 		left: 0;
 		height: var(--input_height);
 		width: 100%;

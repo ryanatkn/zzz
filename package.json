@@ -31,25 +31,32 @@
     "node": ">=20.17"
   },
   "devDependencies": {
+    "@anthropic-ai/sdk": "^0.29.1",
     "@changesets/changelog-git": "^0.2.0",
+    "@google/generative-ai": "^0.21.0",
+    "@hono/node-server": "^1.13.2",
+    "@hono/node-ws": "^1.0.4",
     "@ryanatkn/belt": "^0.25.3",
     "@ryanatkn/eslint-config": "^0.5.5",
-    "@ryanatkn/fuz": "^0.129.4",
-    "@ryanatkn/gro": "0.140.0",
+    "@ryanatkn/fuz": "^0.129.5",
+    "@ryanatkn/gro": "^0.140.7",
     "@ryanatkn/moss": "^0.16.1",
     "@sveltejs/adapter-static": "^3.0.5",
-    "@sveltejs/kit": "^2.7.0",
+    "@sveltejs/kit": "^2.7.1",
     "@sveltejs/package": "^2.3.5",
-    "@sveltejs/vite-plugin-svelte": "^3.0.0",
+    "@sveltejs/vite-plugin-svelte": "^3.1.2",
+    "devalue": "^5.1.1",
     "eslint": "^9.12.0",
     "eslint-plugin-svelte": "^2.44.1",
+    "hono": "^4.6.5",
+    "openai": "^4.67.3",
     "prettier": "^3.3.3",
     "prettier-plugin-svelte": "^3.2.7",
-    "svelte": "^5.0.0-next.264",
+    "svelte": "^5.0.0-next.266",
     "svelte-check": "^4.0.5",
-    "tslib": "^2.7.0",
+    "tslib": "^2.8.0",
     "typescript": "^5.6.3",
-    "typescript-eslint": "^8.8.1",
+    "typescript-eslint": "^8.9.0",
     "uvu": "^0.5.6"
   },
   "prettier": {
@@ -77,6 +84,82 @@
   ],
   "exports": {
     "./package.json": "./package.json",
+    "./Agent_Info.svelte": {
+      "types": "./dist/Agent_Info.svelte.d.ts",
+      "svelte": "./dist/Agent_Info.svelte",
+      "default": "./dist/Agent_Info.svelte"
+    },
+    "./Agent_Summary.svelte": {
+      "types": "./dist/Agent_Summary.svelte.d.ts",
+      "svelte": "./dist/Agent_Summary.svelte",
+      "default": "./dist/Agent_Summary.svelte"
+    },
+    "./Agent_View.svelte": {
+      "types": "./dist/Agent_View.svelte.d.ts",
+      "svelte": "./dist/Agent_View.svelte",
+      "default": "./dist/Agent_View.svelte"
+    },
+    "./agent.svelte.js": {
+      "types": "./dist/agent.svelte.d.ts",
+      "default": "./dist/agent.svelte.js"
+    },
+    "./config_helpers.js": {
+      "types": "./dist/config_helpers.d.ts",
+      "default": "./dist/config_helpers.js"
+    },
+    "./config.js": {
+      "types": "./dist/config.d.ts",
+      "default": "./dist/config.js"
+    },
+    "./Control_Panel.svelte": {
+      "types": "./dist/Control_Panel.svelte.d.ts",
+      "svelte": "./dist/Control_Panel.svelte",
+      "default": "./dist/Control_Panel.svelte"
+    },
+    "./Dashboard.svelte": {
+      "types": "./dist/Dashboard.svelte.d.ts",
+      "svelte": "./dist/Dashboard.svelte",
+      "default": "./dist/Dashboard.svelte"
+    },
+    "./Echo_Form.svelte": {
+      "types": "./dist/Echo_Form.svelte.d.ts",
+      "svelte": "./dist/Echo_Form.svelte",
+      "default": "./dist/Echo_Form.svelte"
+    },
+    "./File_Editor.svelte": {
+      "types": "./dist/File_Editor.svelte.d.ts",
+      "svelte": "./dist/File_Editor.svelte",
+      "default": "./dist/File_Editor.svelte"
+    },
+    "./File_Info.svelte": {
+      "types": "./dist/File_Info.svelte.d.ts",
+      "svelte": "./dist/File_Info.svelte",
+      "default": "./dist/File_Info.svelte"
+    },
+    "./File_List.svelte": {
+      "types": "./dist/File_List.svelte.d.ts",
+      "svelte": "./dist/File_List.svelte",
+      "default": "./dist/File_List.svelte"
+    },
+    "./File_Summary.svelte": {
+      "types": "./dist/File_Summary.svelte.d.ts",
+      "svelte": "./dist/File_Summary.svelte",
+      "default": "./dist/File_Summary.svelte"
+    },
+    "./File_View.svelte": {
+      "types": "./dist/File_View.svelte.d.ts",
+      "svelte": "./dist/File_View.svelte",
+      "default": "./dist/File_View.svelte"
+    },
+    "./file.svelte.js": {
+      "types": "./dist/file.svelte.d.ts",
+      "default": "./dist/file.svelte.js"
+    },
+    "./Hud_Dialog.svelte": {
+      "types": "./dist/Hud_Dialog.svelte.d.ts",
+      "svelte": "./dist/Hud_Dialog.svelte",
+      "default": "./dist/Hud_Dialog.svelte"
+    },
     "./Hud_Root.svelte": {
       "types": "./dist/Hud_Root.svelte.d.ts",
       "svelte": "./dist/Hud_Root.svelte",
@@ -86,6 +169,118 @@
       "types": "./dist/hud.svelte.d.ts",
       "default": "./dist/hud.svelte.js"
     },
+    "./id.js": {
+      "types": "./dist/id.d.ts",
+      "default": "./dist/id.js"
+    },
+    "./Message_Info.svelte": {
+      "types": "./dist/Message_Info.svelte.d.ts",
+      "svelte": "./dist/Message_Info.svelte",
+      "default": "./dist/Message_Info.svelte"
+    },
+    "./Message_Summary.svelte": {
+      "types": "./dist/Message_Summary.svelte.d.ts",
+      "svelte": "./dist/Message_Summary.svelte",
+      "default": "./dist/Message_Summary.svelte"
+    },
+    "./Message_View.svelte": {
+      "types": "./dist/Message_View.svelte.d.ts",
+      "svelte": "./dist/Message_View.svelte",
+      "default": "./dist/Message_View.svelte"
+    },
+    "./model.svelte.js": {
+      "types": "./dist/model.svelte.d.ts",
+      "default": "./dist/model.svelte.js"
+    },
+    "./Multiprompt.svelte": {
+      "types": "./dist/Multiprompt.svelte.d.ts",
+      "svelte": "./dist/Multiprompt.svelte",
+      "default": "./dist/Multiprompt.svelte"
+    },
+    "./path.js": {
+      "types": "./dist/path.d.ts",
+      "default": "./dist/path.js"
+    },
+    "./Prompt_Agent_Form.svelte": {
+      "types": "./dist/Prompt_Agent_Form.svelte.d.ts",
+      "svelte": "./dist/Prompt_Agent_Form.svelte",
+      "default": "./dist/Prompt_Agent_Form.svelte"
+    },
+    "./Prompt_Instance.svelte": {
+      "types": "./dist/Prompt_Instance.svelte.d.ts",
+      "svelte": "./dist/Prompt_Instance.svelte",
+      "default": "./dist/Prompt_Instance.svelte"
+    },
+    "./prompt.svelte.js": {
+      "types": "./dist/prompt.svelte.d.ts",
+      "default": "./dist/prompt.svelte.js"
+    },
+    "./prompts/claude__claude-3-5-sonnet-20240620__7154479336055197.json": {
+      "default": "./dist/prompts/claude__claude-3-5-sonnet-20240620__7154479336055197.json"
+    },
+    "./prompts/claude__claude-3-haiku-20240307__4444134401421189.json": {
+      "default": "./dist/prompts/claude__claude-3-haiku-20240307__4444134401421189.json"
+    },
+    "./prompts/gemini__gemini-1.5-flash__2475485639731989.json": {
+      "default": "./dist/prompts/gemini__gemini-1.5-flash__2475485639731989.json"
+    },
+    "./prompts/gemini__gemini-1.5-pro__7675592755575567.json": {
+      "default": "./dist/prompts/gemini__gemini-1.5-pro__7675592755575567.json"
+    },
+    "./prompts/gpt__gpt-4o__6762858168497241.json": {
+      "default": "./dist/prompts/gpt__gpt-4o__6762858168497241.json"
+    },
+    "./prompts/gpt__gpt-4o-mini__7461234247402992.json": {
+      "default": "./dist/prompts/gpt__gpt-4o-mini__7461234247402992.json"
+    },
+    "./server/helpers.js": {
+      "types": "./dist/server/helpers.d.ts",
+      "default": "./dist/server/helpers.js"
+    },
+    "./server/prompt.log": {
+      "default": "./dist/server/prompt.log"
+    },
+    "./server/server.js": {
+      "types": "./dist/server/server.d.ts",
+      "default": "./dist/server/server.js"
+    },
+    "./server/zzz_server.js": {
+      "types": "./dist/server/zzz_server.d.ts",
+      "default": "./dist/server/zzz_server.js"
+    },
+    "./Settings.svelte": {
+      "types": "./dist/Settings.svelte.d.ts",
+      "svelte": "./dist/Settings.svelte",
+      "default": "./dist/Settings.svelte"
+    },
+    "./Tape_Info.svelte": {
+      "types": "./dist/Tape_Info.svelte.d.ts",
+      "svelte": "./dist/Tape_Info.svelte",
+      "default": "./dist/Tape_Info.svelte"
+    },
+    "./Tape_Summary.svelte": {
+      "types": "./dist/Tape_Summary.svelte.d.ts",
+      "svelte": "./dist/Tape_Summary.svelte",
+      "default": "./dist/Tape_Summary.svelte"
+    },
+    "./Tape_View.svelte": {
+      "types": "./dist/Tape_View.svelte.d.ts",
+      "svelte": "./dist/Tape_View.svelte",
+      "default": "./dist/Tape_View.svelte"
+    },
+    "./tape.svelte.js": {
+      "types": "./dist/tape.svelte.d.ts",
+      "default": "./dist/tape.svelte.js"
+    },
+    "./Tapes_List.svelte": {
+      "types": "./dist/Tapes_List.svelte.d.ts",
+      "svelte": "./dist/Tapes_List.svelte",
+      "default": "./dist/Tapes_List.svelte"
+    },
+    "./zzz_client.js": {
+      "types": "./dist/zzz_client.d.ts",
+      "default": "./dist/zzz_client.js"
+    },
     "./zzz_data.svelte.js": {
       "types": "./dist/zzz_data.svelte.d.ts",
       "default": "./dist/zzz_data.svelte.js"
@@ -94,6 +289,10 @@
       "types": "./dist/Zzz_Main.svelte.d.ts",
       "svelte": "./dist/Zzz_Main.svelte",
       "default": "./dist/Zzz_Main.svelte"
+    },
+    "./zzz_message.js": {
+      "types": "./dist/zzz_message.d.ts",
+      "default": "./dist/zzz_message.js"
     },
     "./Zzz_Root.svelte": {
       "types": "./dist/Zzz_Root.svelte.d.ts",
