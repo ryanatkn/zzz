@@ -2,7 +2,7 @@
 
 [<img src="/static/logo.svg" alt="three sleepy z's" align="right" width="192" height="192">](https://www.zzzbot.dev/)
 
-> bot control hq 💤 copy this software
+> bot control hq 💤
 
 ⚠️ early pre-release
 
