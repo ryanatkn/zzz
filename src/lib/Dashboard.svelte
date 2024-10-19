@@ -12,7 +12,7 @@
 
 	// TODO
 
-	const agent = $derived(zzz.agents.find((a) => a.name === 'gpt')); // TODO hacky assertion
+	const agent = $derived(zzz.agents.find((a) => a.name === 'chatgpt')); // TODO hacky assertion
 </script>
 
 <!-- TODO drive with data -->

@@ -6,7 +6,7 @@ export interface Tapes_Json {
 }
 
 export interface Tapes_Options {
-	all_agents: Agent[];
+	agents: Agent[];
 }
 
 export interface Tape_History_Item {
@@ -24,10 +24,10 @@ export class Tapes {
 
 	all: Tape[] = $state([]);
 
-	all_agents: Agent[] = $state()!;
+	agents: Agent[] = $state()!;
 
-	constructor({all_agents}: Tapes_Options) {
-		this.all_agents = all_agents;
+	constructor({agents}: Tapes_Options) {
+		this.agents = agents;
 	}
 
 	toJSON(): Tapes_Json {
@@ -41,7 +41,7 @@ export class Tapes {
 		// TODO multiple? feels like could be more derived, using a `Map` being read from the derived agents from the `history`
 		let tape = this.all.find((t) => t.agents_by_name.get(request.agent_name));
 		if (!tape) {
-			this.all.push((tape = new Tape({all_agents: this.all_agents}))); // TODO BLOCK instead of creating new tapes, should push to its history
+			this.all.push((tape = new Tape({agents: this.agents}))); // TODO BLOCK instead of creating new tapes, should push to its history
 		}
 		tape.history.push({request, response}); // TODO call a method?
 		console.log(`[tape.receive_prompt_response] tape`, $state.snapshot(tape));
@@ -68,15 +68,16 @@ export interface Tape_Json {
 }
 
 export interface Tape_Options {
-	all_agents: Agent[];
+	agents: Agent[];
 }
 
 export class Tape {
 	// TODO look up these agents based on all of the agents in `history`
-	all_agents: Agent[] = $state()!; // handles a group conversation
+	agents: Agent[] = $state()!; // handles a group conversation
 
 	history: Tape_History_Item[] = $state([]);
 
+	// TODO move to an `Agents` or `Agent_Manager` class?
 	// TODO more efficient data structures?
 	agents_by_name: Map<Agent_Name, Agent> = $derived.by(() => {
 		const agents_by_name: Map<Agent_Name, Agent> = new Map();
@@ -85,7 +86,7 @@ export class Tape {
 			if (agents_by_name.has(agent_name)) {
 				continue;
 			}
-			const agent = this.all_agents.find((a) => a.name === agent_name);
+			const agent = this.agents.find((a) => a.name === agent_name);
 			if (!agent) {
 				console.error('expected to find agent', agent_name);
 				continue;
@@ -96,9 +97,9 @@ export class Tape {
 		return agents_by_name;
 	});
 
-	constructor({all_agents}: Tape_Options) {
-		this.all_agents = all_agents;
-		console.log('[tape] creating new tape', all_agents);
+	constructor({agents}: Tape_Options) {
+		this.agents = agents;
+		console.log('[tape] creating new tape', agents);
 	}
 
 	// TODO maybe `tape_id` should be the original id of the `request.id`?

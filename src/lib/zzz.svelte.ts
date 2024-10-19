@@ -67,7 +67,7 @@ export class Zzz {
 		this.agents.push(...agents);
 		this.models.push(...models);
 		this.client = client;
-		this.tapes = options.tapes ?? new Tapes({all_agents: agents});
+		this.tapes = options.tapes ?? new Tapes({agents});
 		this.data = data;
 	}
 

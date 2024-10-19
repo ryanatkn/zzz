@@ -81,7 +81,7 @@ export interface Receive_Prompt_Message extends Base_Message {
 	model: string;
 	data:
 		| {type: 'claude'; value: Anthropic.Messages.Message}
-		| {type: 'gpt'; value: OpenAI.Chat.Completions.ChatCompletionMessage}
+		| {type: 'chatgpt'; value: OpenAI.Chat.Completions.ChatCompletionMessage}
 		| {
 				type: 'gemini';
 				value: {

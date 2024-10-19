@@ -30,7 +30,7 @@
 					used tool {item.name} - {item.input} - {item.id}
 				{/if}
 			{/each}
-		{:else if prompt_response.data.type === 'gpt'}
+		{:else if prompt_response.data.type === 'chatgpt'}
 			{prompt_response.data.value.content}
 		{:else if prompt_response.data.type === 'gemini'}
 			{prompt_response.data.value.text}

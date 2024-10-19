@@ -104,7 +104,7 @@ export class Zzz_Server {
 						break;
 					}
 
-					case 'gpt': {
+					case 'chatgpt': {
 						const api_response = await openai.chat.completions.create({
 							model,
 							messages: [
@@ -120,7 +120,7 @@ export class Zzz_Server {
 							request_id: request.id,
 							agent_name: request.agent_name,
 							model,
-							data: {type: 'gpt', value: api_response_text},
+							data: {type: 'chatgpt', value: api_response_text},
 						};
 						break;
 					}
