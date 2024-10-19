@@ -22,7 +22,7 @@
 
 <svelte:window
 	onkeydowncapture={(e) => {
-		if (e.key === 'Escape' && !is_editable(e.target)) {
+		if (e.key === '`' && !is_editable(e.target)) {
 			zzz.toggle_main_menu();
 			swallow(e);
 		}
