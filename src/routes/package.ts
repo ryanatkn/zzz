@@ -38,7 +38,7 @@ export const package_json = {
 		'@ryanatkn/belt': '^0.25.3',
 		'@ryanatkn/eslint-config': '^0.5.5',
 		'@ryanatkn/fuz': '^0.129.5',
-		'@ryanatkn/gro': '^0.140.7',
+		'@ryanatkn/gro': '^0.141.1',
 		'@ryanatkn/moss': '^0.16.1',
 		'@sveltejs/adapter-static': '^3.0.5',
 		'@sveltejs/kit': '^2.7.1',
@@ -177,24 +177,6 @@ export const package_json = {
 			default: './dist/Prompt_Instance.svelte',
 		},
 		'./prompt.svelte.js': {types: './dist/prompt.svelte.d.ts', default: './dist/prompt.svelte.js'},
-		'./prompts/chatgpt__gpt-4o-mini__5761516263084004.json': {
-			default: './dist/prompts/chatgpt__gpt-4o-mini__5761516263084004.json',
-		},
-		'./prompts/chatgpt__gpt-4o-mini__6736481123796221.json': {
-			default: './dist/prompts/chatgpt__gpt-4o-mini__6736481123796221.json',
-		},
-		'./prompts/claude__claude-3-haiku-20240307__4537999973032982.json': {
-			default: './dist/prompts/claude__claude-3-haiku-20240307__4537999973032982.json',
-		},
-		'./prompts/claude__claude-3-haiku-20240307__6641214262288058.json': {
-			default: './dist/prompts/claude__claude-3-haiku-20240307__6641214262288058.json',
-		},
-		'./prompts/gemini__gemini-1.5-flash__4928484350242898.json': {
-			default: './dist/prompts/gemini__gemini-1.5-flash__4928484350242898.json',
-		},
-		'./prompts/gemini__gemini-1.5-flash__8920957416834696.json': {
-			default: './dist/prompts/gemini__gemini-1.5-flash__8920957416834696.json',
-		},
 		'./server/helpers.js': {
 			types: './dist/server/helpers.d.ts',
 			default: './dist/server/helpers.js',
@@ -336,30 +318,6 @@ export const src_json = {
 				{name: 'Prompt_Options', kind: 'type'},
 				{name: 'Prompt', kind: 'class'},
 			],
-		},
-		'./prompts/chatgpt__gpt-4o-mini__5761516263084004.json': {
-			path: 'prompts/chatgpt__gpt-4o-mini__5761516263084004.json',
-			declarations: [],
-		},
-		'./prompts/chatgpt__gpt-4o-mini__6736481123796221.json': {
-			path: 'prompts/chatgpt__gpt-4o-mini__6736481123796221.json',
-			declarations: [],
-		},
-		'./prompts/claude__claude-3-haiku-20240307__4537999973032982.json': {
-			path: 'prompts/claude__claude-3-haiku-20240307__4537999973032982.json',
-			declarations: [],
-		},
-		'./prompts/claude__claude-3-haiku-20240307__6641214262288058.json': {
-			path: 'prompts/claude__claude-3-haiku-20240307__6641214262288058.json',
-			declarations: [],
-		},
-		'./prompts/gemini__gemini-1.5-flash__4928484350242898.json': {
-			path: 'prompts/gemini__gemini-1.5-flash__4928484350242898.json',
-			declarations: [],
-		},
-		'./prompts/gemini__gemini-1.5-flash__8920957416834696.json': {
-			path: 'prompts/gemini__gemini-1.5-flash__8920957416834696.json',
-			declarations: [],
 		},
 		'./server/helpers.js': {
 			path: 'server/helpers.ts',

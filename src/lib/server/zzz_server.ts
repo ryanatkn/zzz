@@ -50,7 +50,8 @@ export class Zzz_Server {
 				case 'add':
 				case 'update':
 				case 'delete': {
-					if (source_file.id.includes('.css')) console.log(`source_file`, source_file.id);
+					if (source_file.id.includes('.css'))
+						console.log(`source_file`, source_file.id, source_file.contents?.length);
 					this.#send({id: random_id(), type: 'filer_change', change, source_file});
 					break;
 				}
