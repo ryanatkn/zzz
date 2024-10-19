@@ -1,29 +1,25 @@
 {
 	"request": {
-		"id": 4601389911621411,
+		"id": 6811553336961146,
 		"type": "send_prompt",
 		"agent_name": "gemini",
 		"model": "gemini-1.5-flash",
 		"text": "the traveler stopped and asked the three AIs the same question, "
 	},
 	"response": {
-		"id": 7860179920803971,
+		"id": 8920957416834696,
 		"type": "prompt_response",
-		"request_id": 4601389911621411,
+		"request_id": 6811553336961146,
 		"agent_name": "gemini",
 		"model": "gemini-1.5-flash",
 		"data": {
 			"type": "gemini",
 			"value": {
-				"text": "\"Can you tell me, which path leads to the Land of Forgotten Dreams?\" \n",
+				"text": "\"Can you tell me the way to the nearest coffee shop?\" \n",
 				"candidates": [
 					{
 						"content": {
-							"parts": [
-								{
-									"text": "\"Can you tell me, which path leads to the Land of Forgotten Dreams?\" \n"
-								}
-							],
+							"parts": [{"text": "\"Can you tell me the way to the nearest coffee shop?\" \n"}],
 							"role": "model"
 						},
 						"finishReason": "STOP",
@@ -40,8 +36,8 @@
 				"prompt_feedback": null,
 				"usage_metadata": {
 					"promptTokenCount": 50,
-					"candidatesTokenCount": 16,
-					"totalTokenCount": 66
+					"candidatesTokenCount": 13,
+					"totalTokenCount": 63
 				}
 			}
 		}
