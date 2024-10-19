@@ -30,6 +30,9 @@
 	{/if}
 </section>
 <section>
+	<button type="button" onclick={() => zzz.create_tape(agent)}>create new tape</button>
+</section>
+<section>
 	<File_List files={zzz.files_by_id} />
 </section>
 
