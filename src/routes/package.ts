@@ -177,29 +177,10 @@ export const package_json = {
 			default: './dist/Prompt_Instance.svelte',
 		},
 		'./prompt.svelte.js': {types: './dist/prompt.svelte.d.ts', default: './dist/prompt.svelte.js'},
-		'./prompts/claude__claude-3-5-sonnet-20240620__7154479336055197.json': {
-			default: './dist/prompts/claude__claude-3-5-sonnet-20240620__7154479336055197.json',
-		},
-		'./prompts/claude__claude-3-haiku-20240307__4444134401421189.json': {
-			default: './dist/prompts/claude__claude-3-haiku-20240307__4444134401421189.json',
-		},
-		'./prompts/gemini__gemini-1.5-flash__2475485639731989.json': {
-			default: './dist/prompts/gemini__gemini-1.5-flash__2475485639731989.json',
-		},
-		'./prompts/gemini__gemini-1.5-pro__7675592755575567.json': {
-			default: './dist/prompts/gemini__gemini-1.5-pro__7675592755575567.json',
-		},
-		'./prompts/gpt__gpt-4o__6762858168497241.json': {
-			default: './dist/prompts/gpt__gpt-4o__6762858168497241.json',
-		},
-		'./prompts/gpt__gpt-4o-mini__7461234247402992.json': {
-			default: './dist/prompts/gpt__gpt-4o-mini__7461234247402992.json',
-		},
 		'./server/helpers.js': {
 			types: './dist/server/helpers.d.ts',
 			default: './dist/server/helpers.js',
 		},
-		'./server/prompt.log': {default: './dist/server/prompt.log'},
 		'./server/server.js': {types: './dist/server/server.d.ts', default: './dist/server/server.js'},
 		'./server/zzz_server.js': {
 			types: './dist/server/zzz_server.d.ts',
@@ -338,35 +319,10 @@ export const src_json = {
 				{name: 'Prompt', kind: 'class'},
 			],
 		},
-		'./prompts/claude__claude-3-5-sonnet-20240620__7154479336055197.json': {
-			path: 'prompts/claude__claude-3-5-sonnet-20240620__7154479336055197.json',
-			declarations: [],
-		},
-		'./prompts/claude__claude-3-haiku-20240307__4444134401421189.json': {
-			path: 'prompts/claude__claude-3-haiku-20240307__4444134401421189.json',
-			declarations: [],
-		},
-		'./prompts/gemini__gemini-1.5-flash__2475485639731989.json': {
-			path: 'prompts/gemini__gemini-1.5-flash__2475485639731989.json',
-			declarations: [],
-		},
-		'./prompts/gemini__gemini-1.5-pro__7675592755575567.json': {
-			path: 'prompts/gemini__gemini-1.5-pro__7675592755575567.json',
-			declarations: [],
-		},
-		'./prompts/gpt__gpt-4o__6762858168497241.json': {
-			path: 'prompts/gpt__gpt-4o__6762858168497241.json',
-			declarations: [],
-		},
-		'./prompts/gpt__gpt-4o-mini__7461234247402992.json': {
-			path: 'prompts/gpt__gpt-4o-mini__7461234247402992.json',
-			declarations: [],
-		},
 		'./server/helpers.js': {
 			path: 'server/helpers.ts',
 			declarations: [{name: 'write_file_in_scope', kind: 'function'}],
 		},
-		'./server/prompt.log': {path: 'server/prompt.log', declarations: []},
 		'./server/server.js': {path: 'server/server.ts', declarations: []},
 		'./server/zzz_server.js': {
 			path: 'server/zzz_server.ts',

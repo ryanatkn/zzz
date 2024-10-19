@@ -41,10 +41,16 @@ export class Tapes {
 		// TODO multiple? feels like could be more derived, using a `Map` being read from the derived agents from the `history`
 		let tape = this.all.find((t) => t.agents_by_name.get(request.agent_name));
 		if (!tape) {
-			this.all.push((tape = new Tape({agents: this.agents}))); // TODO BLOCK instead of creating new tapes, should push to its history
+			tape = this.create_tape(); // TODO BLOCK instead of creating new tapes, should push to its history
 		}
 		tape.history.push({request, response}); // TODO call a method?
 		console.log(`[tape.receive_prompt_response] tape`, $state.snapshot(tape));
+	}
+
+	create_tape(agents: Agent[] = this.agents): Tape {
+		const tape = new Tape({agents});
+		this.all.push(tape);
+		return tape;
 	}
 
 	// TODO

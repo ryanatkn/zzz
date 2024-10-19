@@ -3,6 +3,7 @@
 	import File_List from '$lib/File_List.svelte';
 	import Multiprompt from '$lib/Multiprompt.svelte';
 	import Prompt_Instance from '$lib/Prompt_Instance.svelte';
+	import type {Agent_Name} from '$lib/agent.svelte.js';
 
 	// interface Props {}
 
@@ -10,9 +11,10 @@
 
 	const zzz = zzz_context.get();
 
-	// TODO
+	// TODO BLOCK get this source of truth right, on the tapes, with multi-select as appropriate
+	const selected_agent_names: Agent_Name[] = $state(['chatgpt']);
 
-	const agent = $derived(zzz.agents.find((a) => a.name === 'chatgpt')); // TODO hacky assertion
+	const agents = $derived(zzz.agents.filter((a) => selected_agent_names.includes(a.name))); // TODO hacky assertion
 </script>
 
 <!-- TODO drive with data -->
@@ -22,15 +24,16 @@
 	</div>
 </section>
 <section class="w_100 flex_1">
-	{#if agent}
-		<Prompt_Instance {agent} />
-	{:else}
-		<!-- TODO agent picker -->
-		<p>no agent selected</p>
-	{/if}
+	{#each zzz.tapes.all as tape (tape)}
+		<!-- TODO hack just to get stuff onscreen -->
+		<Prompt_Instance agent={tape.agents[0]} />
+		<!-- <p>{tape.id}</p>
+			<p>{tape.agent_name}</p>
+			<p>{tape.created_at}</p> -->
+	{/each}
 </section>
 <section>
-	<button type="button" onclick={() => zzz.create_tape(agent)}>create new tape</button>
+	<button type="button" onclick={() => zzz.tapes.create_tape(agents)}>create new tape</button>
 </section>
 <section>
 	<File_List files={zzz.files_by_id} />
