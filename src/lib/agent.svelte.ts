@@ -14,6 +14,7 @@ export interface Agent_Options {
 	all_models: Model[];
 }
 
+// TODO BLOCK `Agent` might be the wrong word here, more like Model_Service
 export class Agent {
 	name: Agent_Name = $state()!;
 	icon: string = $state()!;
@@ -22,6 +23,7 @@ export class Agent {
 	url: string = $state()!;
 
 	models = $derived(this.all_models.filter((m) => m.agent_name === this.name));
+	// TODO BLOCK this isn't a thing, each message is to an agent+model
 	selected_model_name: string = $state()!;
 	selected_model: Model = $derived(
 		this.all_models.find((m) => m.name === this.selected_model_name)!,

@@ -27,7 +27,6 @@
 			{/each}
 		</select>
 	</div>
-	<div>models: {JSON.stringify(agent.models)}</div>
 	{#if tape}
 		<Tapes_List {agent} {tape} />
 	{:else}
@@ -35,3 +34,5 @@
 	{/if}
 </div>
 <pre>{JSON.stringify(agent.toJSON(), null, '\t')}</pre>
+<div>models</div>
+<pre>{JSON.stringify(agent.models, null, '\t')}</pre>
