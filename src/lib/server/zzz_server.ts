@@ -114,23 +114,24 @@ export class Zzz_Server {
 							],
 						});
 						console.log(`openai api_response`, api_response);
-						const api_response_text = api_response.choices[0].message;
 						response = {
 							id: random_id(),
 							type: 'prompt_response',
 							request_id: request.id,
 							agent_name: request.agent_name,
 							model,
-							data: {type: 'chatgpt', value: api_response_text},
+							data: {type: 'chatgpt', value: api_response},
 						};
 						break;
 					}
 
 					case 'gemini': {
-						const google_model = google.getGenerativeModel({model});
-						const api_response = await google_model.generateContent(
-							this.system_message + '\n\n' + text,
-						);
+						// TODO cache this by model?
+						const google_model = google.getGenerativeModel({
+							model,
+							systemInstruction: this.system_message,
+						});
+						const api_response = await google_model.generateContent(text);
 						console.log(`gemini api_response`, api_response);
 						response = {
 							id: random_id(),

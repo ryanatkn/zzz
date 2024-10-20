@@ -31,7 +31,10 @@
 				{/if}
 			{/each}
 		{:else if prompt_response.data.type === 'chatgpt'}
-			{prompt_response.data.value.content}
+			{#each prompt_response.data.value.choices as choice (choice)}
+				<!-- [{choice.message.role}] -->
+				{choice.message.content}
+			{/each}
 		{:else if prompt_response.data.type === 'gemini'}
 			{prompt_response.data.value.text}
 		{:else}

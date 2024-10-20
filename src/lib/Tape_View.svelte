@@ -35,7 +35,7 @@
 						.map((c) => (c.type === 'text' ? c.text : c.name))
 						.join('\n\n')
 				: prompt_response.data.type === 'chatgpt'
-					? prompt_response.data.value.content
+					? prompt_response.data.value.choices[0].message.content
 					: prompt_response.data.value.text
 			: undefined,
 	);

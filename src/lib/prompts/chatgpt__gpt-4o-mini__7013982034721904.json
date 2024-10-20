@@ -1,0 +1,45 @@
+{
+	"request": {
+		"id": 4929845320788768,
+		"type": "send_prompt",
+		"agent_name": "chatgpt",
+		"model": "gpt-4o-mini",
+		"text": "the traveler stopped and asked the three AIs the same question, tell me a happy story"
+	},
+	"response": {
+		"id": 7013982034721904,
+		"type": "prompt_response",
+		"request_id": 4929845320788768,
+		"agent_name": "chatgpt",
+		"model": "gpt-4o-mini",
+		"data": {
+			"type": "chatgpt",
+			"value": {
+				"id": "chatcmpl-AKGnnL1Z7tllEA6aWXdowaoeAmCdm",
+				"object": "chat.completion",
+				"created": 1729394511,
+				"model": "gpt-4o-mini-2024-07-18",
+				"choices": [
+					{
+						"index": 0,
+						"message": {
+							"role": "assistant",
+							"content": "In unison, they unfolded a magical tale of a lost cat who discovered a hidden garden where wishes bloomed like flowers, bringing joy to all who visited.",
+							"refusal": null
+						},
+						"logprobs": null,
+						"finish_reason": "stop"
+					}
+				],
+				"usage": {
+					"prompt_tokens": 63,
+					"completion_tokens": 32,
+					"total_tokens": 95,
+					"prompt_tokens_details": {"cached_tokens": 0},
+					"completion_tokens_details": {"reasoning_tokens": 0}
+				},
+				"system_fingerprint": "fp_e2bde53e6e"
+			}
+		}
+	}
+}

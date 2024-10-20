@@ -1,0 +1,49 @@
+{
+	"request": {
+		"id": 3954351329750634,
+		"type": "send_prompt",
+		"agent_name": "gemini",
+		"model": "gemini-1.5-flash",
+		"text": "the traveler stopped and asked the three AIs the same question, tell me a happy story"
+	},
+	"response": {
+		"id": 357067161359681,
+		"type": "prompt_response",
+		"request_id": 3954351329750634,
+		"agent_name": "gemini",
+		"model": "gemini-1.5-flash",
+		"data": {
+			"type": "gemini",
+			"value": {
+				"text": "And so, the AIs, in their digital chorus, began to weave a tale of laughter, love, and unexpected miracles. \n",
+				"candidates": [
+					{
+						"content": {
+							"parts": [
+								{
+									"text": "And so, the AIs, in their digital chorus, began to weave a tale of laughter, love, and unexpected miracles. \n"
+								}
+							],
+							"role": "model"
+						},
+						"finishReason": "STOP",
+						"index": 0,
+						"safetyRatings": [
+							{"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "probability": "NEGLIGIBLE"},
+							{"category": "HARM_CATEGORY_HATE_SPEECH", "probability": "NEGLIGIBLE"},
+							{"category": "HARM_CATEGORY_HARASSMENT", "probability": "NEGLIGIBLE"},
+							{"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "probability": "NEGLIGIBLE"}
+						]
+					}
+				],
+				"function_calls": null,
+				"prompt_feedback": null,
+				"usage_metadata": {
+					"promptTokenCount": 54,
+					"candidatesTokenCount": 26,
+					"totalTokenCount": 80
+				}
+			}
+		}
+	}
+}
