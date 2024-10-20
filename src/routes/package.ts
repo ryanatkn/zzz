@@ -177,6 +177,15 @@ export const package_json = {
 			default: './dist/Prompt_Instance.svelte',
 		},
 		'./prompt.svelte.js': {types: './dist/prompt.svelte.d.ts', default: './dist/prompt.svelte.js'},
+		'./prompts/chatgpt__gpt-4o-mini__7013982034721904.json': {
+			default: './dist/prompts/chatgpt__gpt-4o-mini__7013982034721904.json',
+		},
+		'./prompts/claude__claude-3-haiku-20240307__5060293806699850.json': {
+			default: './dist/prompts/claude__claude-3-haiku-20240307__5060293806699850.json',
+		},
+		'./prompts/gemini__gemini-1.5-flash__357067161359681.json': {
+			default: './dist/prompts/gemini__gemini-1.5-flash__357067161359681.json',
+		},
 		'./server/helpers.js': {
 			types: './dist/server/helpers.d.ts',
 			default: './dist/server/helpers.js',
@@ -318,6 +327,18 @@ export const src_json = {
 				{name: 'Prompt_Options', kind: 'type'},
 				{name: 'Prompt', kind: 'class'},
 			],
+		},
+		'./prompts/chatgpt__gpt-4o-mini__7013982034721904.json': {
+			path: 'prompts/chatgpt__gpt-4o-mini__7013982034721904.json',
+			declarations: [],
+		},
+		'./prompts/claude__claude-3-haiku-20240307__5060293806699850.json': {
+			path: 'prompts/claude__claude-3-haiku-20240307__5060293806699850.json',
+			declarations: [],
+		},
+		'./prompts/gemini__gemini-1.5-flash__357067161359681.json': {
+			path: 'prompts/gemini__gemini-1.5-flash__357067161359681.json',
+			declarations: [],
 		},
 		'./server/helpers.js': {
 			path: 'server/helpers.ts',

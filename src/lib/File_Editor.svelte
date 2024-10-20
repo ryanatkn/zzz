@@ -23,15 +23,20 @@
 
 <div class="row size_xl"><span class="size_xl3 mr_md">🗎</span> {to_base_path(file.id)}</div>
 
-deps ({dependencies.length} dependencies, {dependents.length} dependents)
-<h2>dependencies</h2>
-<div class="dep_list">
-	{#each dependencies as dependency (dependency.id)}
-		<div>{to_base_path(dependency.id)}</div>
-	{/each}
-</div>
 <h2>
-	{#if !dependents.length}no{' '}{/if}dependents
+	{#if !dependencies.length}no{:else}{dependencies.length}{/if}
+	{dependencies.length === 1 ? 'dependency' : 'dependencies'}
+</h2>
+{#if dependencies.length > 0}
+	<div class="dep_list">
+		{#each dependencies as dependency (dependency.id)}
+			<div>{to_base_path(dependency.id)}</div>
+		{/each}
+	</div>
+{/if}
+<h2>
+	{#if !dependents.length}no{:else}{dependents.length}{/if}
+	{dependents.length === 1 ? 'dependent' : 'dependents'}
 </h2>
 {#if dependents.length > 0}
 	<div class="dep_list">
