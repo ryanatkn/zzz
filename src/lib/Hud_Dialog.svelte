@@ -33,6 +33,10 @@
 	<Dialog onclose={() => zzz.toggle_main_menu(false)} layout="page">
 		<div class="pane">
 			<section>
+				<h2>Capabilities</h2>
+				<aside>TODO - list out the available capabilities</aside>
+			</section>
+			<section>
 				<Settings />
 			</section>
 			<section class="box pb_xl7">
