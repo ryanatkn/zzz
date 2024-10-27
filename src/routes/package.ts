@@ -7,7 +7,7 @@ export const package_json = {
 	name: '@ryanatkn/zzz',
 	version: '0.0.1',
 	description: 'bot control hq',
-	motto: 'copy this software',
+	motto: 'electric buzz',
 	glyph: '💤',
 	logo: 'logo.svg',
 	logo_alt: "three sleepy z's",
