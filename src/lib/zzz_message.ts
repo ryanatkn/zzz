@@ -1,12 +1,9 @@
 import type {Source_File} from '@ryanatkn/gro/filer.js';
 import type {Watcher_Change} from '@ryanatkn/gro/watch_dir.js';
-import type Anthropic from '@anthropic-ai/sdk';
 import type {Path_Id} from '@ryanatkn/gro/path.js';
-import type OpenAI from 'openai';
-import type * as Google from '@google/generative-ai';
 
-import type {Agent_Name} from '$lib/agent.svelte.js';
 import type {Id} from '$lib/id.js';
+import type {Completion_Request, Completion_Response} from '$lib/completion.js';
 
 export type Zzz_Message = Client_Message | Server_Message;
 
@@ -64,39 +61,15 @@ export interface Filer_Change_Message extends Base_Message {
  */
 export interface Send_Prompt_Message extends Base_Message {
 	type: 'send_prompt';
-	agent_name: Agent_Name;
-	model: string;
-	text: string;
-	// TODO ?
-	// model: string;
+	completion_request: Completion_Request;
 }
 
 /**
  * @server
  */
 export interface Receive_Prompt_Message extends Base_Message {
-	type: 'prompt_response';
-	request_id: Id;
-	agent_name: Agent_Name;
-	model: string;
-	data:
-		| {type: 'claude'; value: Anthropic.Messages.Message}
-		| {
-				type: 'chatgpt';
-				value: OpenAI.Chat.Completions.ChatCompletion & {
-					_request_id?: string | null;
-				};
-		  }
-		| {
-				type: 'gemini';
-				value: {
-					text: string;
-					candidates: Google.GenerateContentCandidate[] | null;
-					function_calls: Google.FunctionCall[] | null;
-					prompt_feedback: Google.PromptFeedback | null;
-					usage_metadata: Google.UsageMetadata | null;
-				};
-		  };
+	type: 'completion_response';
+	completion_response: Completion_Response;
 }
 
 /**

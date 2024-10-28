@@ -14,7 +14,7 @@
 
 	interface Props {
 		agent: Agent;
-		// TODO more efficient data structures, reactive source prompt_responses
+		// TODO more efficient data structures, reactive source completion_responses
 		tape: Completion_Thread;
 	}
 
@@ -27,24 +27,24 @@
 
 	// TODO hardcoded to one history item
 	const history_item = $derived(tape.history[0] as Completion_Thread_History_Item | undefined);
-	const prompt_request = $derived(history_item?.request);
-	const prompt_response = $derived(history_item?.response);
+	const completion_request = $derived(history_item?.completion_request);
+	const completion_response = $derived(history_item?.completion_response);
 
 	// TODO hacky
 	const content = $derived(
-		prompt_response
-			? prompt_response.data.type === 'claude'
-				? prompt_response.data.value.content
+		completion_response
+			? completion_response.data.type === 'claude'
+				? completion_response.data.value.content
 						.map((c) => (c.type === 'text' ? c.text : c.name))
 						.join('\n\n')
-				: prompt_response.data.type === 'chatgpt'
-					? prompt_response.data.value.choices[0].message.content
-					: prompt_response.data.value.text
+				: completion_response.data.type === 'chatgpt'
+					? completion_response.data.value.choices[0].message.content
+					: completion_response.data.value.text
 			: undefined,
 	);
 </script>
 
-<div class="prompt_response_view" use:contextmenu_action={contextmenu_entries}>
+<div class="completion_response_view" use:contextmenu_action={contextmenu_entries}>
 	{#if view_with === 'summary'}
 		<Completion_Thread_Summary {agent} {tape} />
 	{:else}
@@ -71,10 +71,10 @@
 			<span>Copy response text ({content.length} chars)</span>
 		</Contextmenu_Entry>
 	{/if}
-	{#if prompt_request}
-		<Contextmenu_Entry run={() => void navigator.clipboard.writeText(prompt_request.text)}>
+	{#if completion_request}
+		<Contextmenu_Entry run={() => void navigator.clipboard.writeText(completion_request.prompt)}>
 			{#snippet icon()}📋{/snippet}
-			<span>Copy prompt text ({prompt_request.text.length} chars)</span>
+			<span>Copy prompt text ({completion_request.prompt.length} chars)</span>
 		</Contextmenu_Entry>
 	{/if}
 	<Contextmenu_Submenu>

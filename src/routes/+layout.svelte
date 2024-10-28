@@ -89,8 +89,8 @@
 						}
 						break;
 					}
-					case 'prompt_response': {
-						zzz.receive_prompt_response(message);
+					case 'completion_response': {
+						zzz.receive_completion_response(message);
 						break;
 					}
 					case 'filer_change': {

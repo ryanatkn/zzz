@@ -86,6 +86,10 @@ export const package_json = {
 			default: './dist/Agent_View.svelte',
 		},
 		'./agent.svelte.js': {types: './dist/agent.svelte.d.ts', default: './dist/agent.svelte.js'},
+		'./completion_state.svelte.js': {
+			types: './dist/completion_state.svelte.d.ts',
+			default: './dist/completion_state.svelte.js',
+		},
 		'./Completion_Thread_Info.svelte': {
 			types: './dist/Completion_Thread_Info.svelte.d.ts',
 			svelte: './dist/Completion_Thread_Info.svelte',
@@ -110,6 +114,7 @@ export const package_json = {
 			svelte: './dist/Completion_Threads_List.svelte',
 			default: './dist/Completion_Threads_List.svelte',
 		},
+		'./completion.js': {types: './dist/completion.d.ts', default: './dist/completion.js'},
 		'./config_helpers.js': {
 			types: './dist/config_helpers.d.ts',
 			default: './dist/config_helpers.js',
@@ -200,15 +205,15 @@ export const package_json = {
 			svelte: './dist/Prompt_Instance.svelte',
 			default: './dist/Prompt_Instance.svelte',
 		},
-		'./prompt.svelte.js': {types: './dist/prompt.svelte.d.ts', default: './dist/prompt.svelte.js'},
-		'./prompts/chatgpt__gpt-4o-mini__7013982034721904.json': {
-			default: './dist/prompts/chatgpt__gpt-4o-mini__7013982034721904.json',
+		'./prompt.js': {types: './dist/prompt.d.ts', default: './dist/prompt.js'},
+		'./prompts/chatgpt__gpt-4o-mini__4914764047379688.json': {
+			default: './dist/prompts/chatgpt__gpt-4o-mini__4914764047379688.json',
 		},
-		'./prompts/claude__claude-3-haiku-20240307__5060293806699850.json': {
-			default: './dist/prompts/claude__claude-3-haiku-20240307__5060293806699850.json',
+		'./prompts/claude__claude-3-haiku-20240307__5107511667300690.json': {
+			default: './dist/prompts/claude__claude-3-haiku-20240307__5107511667300690.json',
 		},
-		'./prompts/gemini__gemini-1.5-flash__357067161359681.json': {
-			default: './dist/prompts/gemini__gemini-1.5-flash__357067161359681.json',
+		'./prompts/gemini__gemini-1.5-flash__2453604184426632.json': {
+			default: './dist/prompts/gemini__gemini-1.5-flash__2453604184426632.json',
 		},
 		'./server/helpers.js': {
 			types: './dist/server/helpers.d.ts',
@@ -261,6 +266,7 @@ export const src_json = {
 				{name: 'Agent', kind: 'class'},
 			],
 		},
+		'./completion_state.svelte.js': {path: 'completion_state.svelte.ts', declarations: []},
 		'./Completion_Thread_Info.svelte': {path: 'Completion_Thread_Info.svelte', declarations: []},
 		'./Completion_Thread_Summary.svelte': {
 			path: 'Completion_Thread_Summary.svelte',
@@ -280,6 +286,14 @@ export const src_json = {
 			],
 		},
 		'./Completion_Threads_List.svelte': {path: 'Completion_Threads_List.svelte', declarations: []},
+		'./completion.js': {
+			path: 'completion.ts',
+			declarations: [
+				{name: 'Completion_Request', kind: 'type'},
+				{name: 'Completion_Response', kind: 'type'},
+				{name: 'Completion', kind: 'type'},
+			],
+		},
 		'./config_helpers.js': {
 			path: 'config_helpers.ts',
 			declarations: [
@@ -342,24 +356,24 @@ export const src_json = {
 		'./path.js': {path: 'path.ts', declarations: [{name: 'to_base_path', kind: 'function'}]},
 		'./Prompt_Agent_Form.svelte': {path: 'Prompt_Agent_Form.svelte', declarations: []},
 		'./Prompt_Instance.svelte': {path: 'Prompt_Instance.svelte', declarations: []},
-		'./prompt.svelte.js': {
-			path: 'prompt.svelte.ts',
+		'./prompt.js': {
+			path: 'prompt.ts',
 			declarations: [
-				{name: 'Prompt_Json', kind: 'type'},
-				{name: 'Prompt_Options', kind: 'type'},
-				{name: 'Prompt', kind: 'class'},
+				{name: 'Prompt', kind: 'type'},
+				{name: 'Prompt_Message', kind: 'type'},
+				{name: 'Prompt_Message_Content', kind: 'type'},
 			],
 		},
-		'./prompts/chatgpt__gpt-4o-mini__7013982034721904.json': {
-			path: 'prompts/chatgpt__gpt-4o-mini__7013982034721904.json',
+		'./prompts/chatgpt__gpt-4o-mini__4914764047379688.json': {
+			path: 'prompts/chatgpt__gpt-4o-mini__4914764047379688.json',
 			declarations: [],
 		},
-		'./prompts/claude__claude-3-haiku-20240307__5060293806699850.json': {
-			path: 'prompts/claude__claude-3-haiku-20240307__5060293806699850.json',
+		'./prompts/claude__claude-3-haiku-20240307__5107511667300690.json': {
+			path: 'prompts/claude__claude-3-haiku-20240307__5107511667300690.json',
 			declarations: [],
 		},
-		'./prompts/gemini__gemini-1.5-flash__357067161359681.json': {
-			path: 'prompts/gemini__gemini-1.5-flash__357067161359681.json',
+		'./prompts/gemini__gemini-1.5-flash__2453604184426632.json': {
+			path: 'prompts/gemini__gemini-1.5-flash__2453604184426632.json',
 			declarations: [],
 		},
 		'./server/helpers.js': {

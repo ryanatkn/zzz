@@ -103,6 +103,10 @@
       "types": "./dist/agent.svelte.d.ts",
       "default": "./dist/agent.svelte.js"
     },
+    "./completion_state.svelte.js": {
+      "types": "./dist/completion_state.svelte.d.ts",
+      "default": "./dist/completion_state.svelte.js"
+    },
     "./Completion_Thread_Info.svelte": {
       "types": "./dist/Completion_Thread_Info.svelte.d.ts",
       "svelte": "./dist/Completion_Thread_Info.svelte",
@@ -126,6 +130,10 @@
       "types": "./dist/Completion_Threads_List.svelte.d.ts",
       "svelte": "./dist/Completion_Threads_List.svelte",
       "default": "./dist/Completion_Threads_List.svelte"
+    },
+    "./completion.js": {
+      "types": "./dist/completion.d.ts",
+      "default": "./dist/completion.js"
     },
     "./config_helpers.js": {
       "types": "./dist/config_helpers.d.ts",
@@ -235,18 +243,18 @@
       "svelte": "./dist/Prompt_Instance.svelte",
       "default": "./dist/Prompt_Instance.svelte"
     },
-    "./prompt.svelte.js": {
-      "types": "./dist/prompt.svelte.d.ts",
-      "default": "./dist/prompt.svelte.js"
+    "./prompt.js": {
+      "types": "./dist/prompt.d.ts",
+      "default": "./dist/prompt.js"
     },
-    "./prompts/chatgpt__gpt-4o-mini__7013982034721904.json": {
-      "default": "./dist/prompts/chatgpt__gpt-4o-mini__7013982034721904.json"
+    "./prompts/chatgpt__gpt-4o-mini__4914764047379688.json": {
+      "default": "./dist/prompts/chatgpt__gpt-4o-mini__4914764047379688.json"
     },
-    "./prompts/claude__claude-3-haiku-20240307__5060293806699850.json": {
-      "default": "./dist/prompts/claude__claude-3-haiku-20240307__5060293806699850.json"
+    "./prompts/claude__claude-3-haiku-20240307__5107511667300690.json": {
+      "default": "./dist/prompts/claude__claude-3-haiku-20240307__5107511667300690.json"
     },
-    "./prompts/gemini__gemini-1.5-flash__357067161359681.json": {
-      "default": "./dist/prompts/gemini__gemini-1.5-flash__357067161359681.json"
+    "./prompts/gemini__gemini-1.5-flash__2453604184426632.json": {
+      "default": "./dist/prompts/gemini__gemini-1.5-flash__2453604184426632.json"
     },
     "./server/helpers.js": {
       "types": "./dist/server/helpers.d.ts",

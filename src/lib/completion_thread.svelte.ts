@@ -1,5 +1,5 @@
-import type {Receive_Prompt_Message, Send_Prompt_Message} from '$lib/zzz_message.js';
 import type {Agent, Agent_Name} from '$lib/agent.svelte.js';
+import type {Completion_Request, Completion_Response} from '$lib/completion.js';
 
 export interface Completion_Threads_Json {
 	tapes: Completion_Thread_Json[];
@@ -10,8 +10,8 @@ export interface Completion_Threads_Options {
 }
 
 export interface Completion_Thread_History_Item {
-	request: Send_Prompt_Message;
-	response: Receive_Prompt_Message;
+	completion_request: Completion_Request;
+	completion_response: Completion_Response;
 }
 
 // Common wrapper around a conversation with a group agent.
@@ -36,15 +36,15 @@ export class Completion_Threads {
 		};
 	}
 
-	receive_prompt_response(request: Send_Prompt_Message, response: Receive_Prompt_Message): void {
+	receive_completion_response(request: Completion_Request, response: Completion_Response): void {
 		// TODO we need a `tape.id` I think, this is hacky
 		// TODO multiple? feels like could be more derived, using a `Map` being read from the derived agents from the `history`
 		let tape = this.all.find((t) => t.agents_by_name.get(request.agent_name));
 		if (!tape) {
 			tape = this.create_tape(); // TODO BLOCK instead of creating new tapes, should push to its history
 		}
-		tape.history.push({request, response}); // TODO call a method?
-		console.log(`[tape.receive_prompt_response] tape`, $state.snapshot(tape));
+		tape.history.push({completion_request: request, completion_response: response}); // TODO call a method?
+		console.log(`[tape.receive_completion_response] tape`, $state.snapshot(tape));
 	}
 
 	create_tape(agents: Agent[] = this.agents): Completion_Thread {
@@ -54,14 +54,14 @@ export class Completion_Threads {
 	}
 
 	// TODO
-	// prompt_responses: Receive_Prompt_Message[] = $state([]);
+	// completion_responses: Receive_Prompt_Message[] = $state([]);
 
 	// TODO efficiently do something like this for fast lookup
 	// pending_prompts_by_agent: Map<Agent, Receive_Prompt_Message[]> = $derived(
 	// 	new Map(
 	// 		this.agents.map((agent) => [
 	// 			agent,
-	// 			this.prompt_responses.filter((p) => agent.name === p.agent_name),
+	// 			this.completion_responses.filter((p) => agent.name === p.agent_name),
 	// 		]),
 	// 	),
 	// );
@@ -88,7 +88,7 @@ export class Completion_Thread {
 	agents_by_name: Map<Agent_Name, Agent> = $derived.by(() => {
 		const agents_by_name: Map<Agent_Name, Agent> = new Map();
 		for (const h of this.history) {
-			const {agent_name} = h.request;
+			const {agent_name} = h.completion_request;
 			if (agents_by_name.has(agent_name)) {
 				continue;
 			}

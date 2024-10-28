@@ -17,7 +17,6 @@ import type {
 	Send_Prompt_Message,
 	Server_Message,
 } from '$lib/zzz_message.js';
-import type {Prompt_Json} from '$lib/prompt.svelte.js';
 import {random_id} from '$lib/id.js';
 import {SYSTEM_MESSAGE_DEFAULT} from '$lib/config.js';
 import {write_file_in_scope as write_file_in_root_dir} from '$lib/server/helpers.js';
@@ -78,11 +77,11 @@ export class Zzz_Server {
 				return {id: random_id(), type: 'loaded_session', data: {files: this.filer.files}};
 			}
 			case 'send_prompt': {
-				const {text, agent_name, model} = request;
+				const {prompt, agent_name, model} = request.completion_request;
 
 				let response: Receive_Prompt_Message;
 
-				console.log(`texting ${agent_name}`, text.substring(0, 1000));
+				console.log(`texting ${agent_name}`, prompt.substring(0, 1000));
 
 				switch (agent_name) {
 					case 'claude': {
@@ -91,16 +90,18 @@ export class Zzz_Server {
 							max_tokens: 1000,
 							temperature: 0,
 							system: this.system_message,
-							messages: [{role: 'user', content: [{type: 'text', text}]}],
+							messages: [{role: 'user', content: [{type: 'text', text: prompt}]}],
 						});
 						console.log(`claude api_response`, api_response);
 						response = {
 							id: random_id(),
-							type: 'prompt_response',
-							request_id: request.id,
-							agent_name: request.agent_name,
-							model,
-							data: {type: 'claude', value: api_response},
+							type: 'completion_response',
+							completion_response: {
+								request_id: request.id,
+								agent_name,
+								model,
+								data: {type: 'claude', value: api_response},
+							},
 						};
 						break;
 					}
@@ -110,17 +111,19 @@ export class Zzz_Server {
 							model,
 							messages: [
 								{role: 'system', content: this.system_message},
-								{role: 'user', content: text},
+								{role: 'user', content: prompt},
 							],
 						});
 						console.log(`openai api_response`, api_response);
 						response = {
 							id: random_id(),
-							type: 'prompt_response',
-							request_id: request.id,
-							agent_name: request.agent_name,
-							model,
-							data: {type: 'chatgpt', value: api_response},
+							type: 'completion_response',
+							completion_response: {
+								request_id: request.id,
+								agent_name,
+								model,
+								data: {type: 'chatgpt', value: api_response},
+							},
 						};
 						break;
 					}
@@ -131,23 +134,25 @@ export class Zzz_Server {
 							model,
 							systemInstruction: this.system_message,
 						});
-						const api_response = await google_model.generateContent(text);
+						const api_response = await google_model.generateContent(prompt);
 						console.log(`gemini api_response`, api_response);
 						response = {
 							id: random_id(),
-							type: 'prompt_response',
-							request_id: request.id,
-							agent_name: request.agent_name,
-							model,
-							data: {
-								type: 'gemini',
-								// some of these are functions, and we want `null` for full JSON documents, so manually spelling them out:
-								value: {
-									text: api_response.response.text(),
-									candidates: api_response.response.candidates ?? null,
-									function_calls: api_response.response.functionCalls() ?? null,
-									prompt_feedback: api_response.response.promptFeedback ?? null,
-									usage_metadata: api_response.response.usageMetadata ?? null,
+							type: 'completion_response',
+							completion_response: {
+								request_id: request.id,
+								agent_name,
+								model,
+								data: {
+									type: 'gemini',
+									// some of these are functions, and we want `null` for full JSON documents, so manually spelling them out:
+									value: {
+										text: api_response.response.text(),
+										candidates: api_response.response.candidates ?? null,
+										function_calls: api_response.response.functionCalls() ?? null,
+										prompt_feedback: api_response.response.promptFeedback ?? null,
+										usage_metadata: api_response.response.usageMetadata ?? null,
+									},
 								},
 							},
 						};
@@ -162,7 +167,7 @@ export class Zzz_Server {
 				// the expected file event is now independent of the request
 				void save_response(request, response);
 
-				console.log(`got ${agent_name} message`, response.data);
+				console.log(`got ${agent_name} message`, response.completion_response.data);
 
 				return response; // TODO @many sending the text again is wasteful, need ids
 			}
@@ -183,16 +188,16 @@ export class Zzz_Server {
 }
 
 // TODO refactor to support multiple storage backends (starting with fs+postgres), maybe something like
-// await storage.save_prompt_response(r);
+// await storage.save_completion_response(r);
 const save_response = async (
 	request: Send_Prompt_Message,
 	response: Receive_Prompt_Message,
 ): Promise<void> => {
-	const filename = `${request.agent_name}__${request.model}__${response.id}.json`; // TODO include model data in these
+	const filename = `${request.completion_request.agent_name}__${request.completion_request.model}__${response.id}.json`; // TODO include model data in these
 
 	const path = `./src/lib/prompts/` + filename;
 
-	const json: Prompt_Json = {request, response};
+	const json = {request, response}; // TODO type?
 
 	writeFileSync(path, await format_file(JSON.stringify(json), {parser: 'json'}));
 };

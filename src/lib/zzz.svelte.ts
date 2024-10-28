@@ -55,7 +55,7 @@ export class Zzz {
 	// TODO could track this more formally, and add time tracking
 	pending_prompts: SvelteMap<Id, Deferred<Receive_Prompt_Message>> = new SvelteMap();
 	// TODO generically track req/res pairs
-	// prompt_requests: SvelteMap<Id, {request: Send_Prompt_Message; response: Receive_Prompt_Message}> =
+	// completion_requests: SvelteMap<Id, {request: Send_Prompt_Message; response: Receive_Prompt_Message}> =
 	// 	new SvelteMap();
 
 	tapes: Completion_Threads = $state()!; // TODO should this be an option?
@@ -78,31 +78,38 @@ export class Zzz {
 		};
 	}
 
-	async send_prompt(text: string, agent: Agent, model: string): Promise<Receive_Prompt_Message> {
+	async send_prompt(prompt: string, agent: Agent, model: string): Promise<Receive_Prompt_Message> {
+		const request_id = random_id();
 		const message: Send_Prompt_Message = {
-			id: random_id(),
+			id: request_id,
 			type: 'send_prompt',
-			agent_name: agent.name,
-			model,
-			text,
+			completion_request: {
+				request_id,
+				agent_name: agent.name,
+				model,
+				prompt,
+			},
 		};
 		this.client.send(message);
 
 		const deferred = create_deferred<Receive_Prompt_Message>();
 		this.pending_prompts.set(message.id, deferred); // TODO roundabout way to get req/res
 		const response = await deferred.promise;
-		this.tapes.receive_prompt_response(message, response);
+		this.tapes.receive_completion_response(
+			message.completion_request,
+			response.completion_response,
+		);
 		return response;
 	}
 
-	receive_prompt_response(message: Receive_Prompt_Message): void {
-		const deferred = this.pending_prompts.get(message.request_id);
+	receive_completion_response(message: Receive_Prompt_Message): void {
+		const deferred = this.pending_prompts.get(message.completion_response.request_id);
 		if (!deferred) {
 			console.error('expected pending', message);
 			return;
 		}
 		deferred.resolve(message);
-		this.pending_prompts.delete(message.request_id); // deleting intentionally after resolving to maybe avoid a corner case loop of sending the same prompt again
+		this.pending_prompts.delete(message.completion_response.request_id); // deleting intentionally after resolving to maybe avoid a corner case loop of sending the same prompt again
 	}
 
 	receive_filer_change(message: Filer_Change_Message): void {

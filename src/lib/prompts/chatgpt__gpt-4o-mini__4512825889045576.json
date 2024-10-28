@@ -1,0 +1,50 @@
+{
+	"request": {
+		"id": 976587752775407,
+		"type": "send_prompt",
+		"completion_request": {
+			"request_id": 976587752775407,
+			"agent_name": "chatgpt",
+			"model": "gpt-4o-mini",
+			"prompt": "the traveler stopped and spoke to the three AIs, please tell me your best joke about humans"
+		}
+	},
+	"response": {
+		"id": 4512825889045576,
+		"type": "completion_response",
+		"completion_response": {
+			"request_id": 976587752775407,
+			"agent_name": "chatgpt",
+			"model": "gpt-4o-mini",
+			"data": {
+				"type": "chatgpt",
+				"value": {
+					"id": "chatcmpl-ANNIL991PvVkZBhya42Ni66I9PD4I",
+					"object": "chat.completion",
+					"created": 1730134453,
+					"model": "gpt-4o-mini-2024-07-18",
+					"choices": [
+						{
+							"index": 0,
+							"message": {
+								"role": "assistant",
+								"content": "\"Why did the human bring a ladder to the bar? Because they heard the drinks were on the house!\"",
+								"refusal": null
+							},
+							"logprobs": null,
+							"finish_reason": "stop"
+						}
+					],
+					"usage": {
+						"prompt_tokens": 64,
+						"completion_tokens": 22,
+						"total_tokens": 86,
+						"prompt_tokens_details": {"cached_tokens": 0},
+						"completion_tokens_details": {"reasoning_tokens": 0}
+					},
+					"system_fingerprint": "fp_f59a81427f"
+				}
+			}
+		}
+	}
+}
