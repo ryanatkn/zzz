@@ -206,14 +206,14 @@ export const package_json = {
 			default: './dist/Prompt_Instance.svelte',
 		},
 		'./prompt.js': {types: './dist/prompt.d.ts', default: './dist/prompt.js'},
-		'./prompts/chatgpt__gpt-4o-mini__4914764047379688.json': {
-			default: './dist/prompts/chatgpt__gpt-4o-mini__4914764047379688.json',
+		'./prompts/chatgpt__gpt-4o-mini__4512825889045576.json': {
+			default: './dist/prompts/chatgpt__gpt-4o-mini__4512825889045576.json',
 		},
-		'./prompts/claude__claude-3-haiku-20240307__5107511667300690.json': {
-			default: './dist/prompts/claude__claude-3-haiku-20240307__5107511667300690.json',
+		'./prompts/claude__claude-3-haiku-20240307__7511303871068069.json': {
+			default: './dist/prompts/claude__claude-3-haiku-20240307__7511303871068069.json',
 		},
-		'./prompts/gemini__gemini-1.5-flash__2453604184426632.json': {
-			default: './dist/prompts/gemini__gemini-1.5-flash__2453604184426632.json',
+		'./prompts/gemini__gemini-1.5-flash__5281499751420507.json': {
+			default: './dist/prompts/gemini__gemini-1.5-flash__5281499751420507.json',
 		},
 		'./server/helpers.js': {
 			types: './dist/server/helpers.d.ts',
@@ -364,16 +364,16 @@ export const src_json = {
 				{name: 'Prompt_Message_Content', kind: 'type'},
 			],
 		},
-		'./prompts/chatgpt__gpt-4o-mini__4914764047379688.json': {
-			path: 'prompts/chatgpt__gpt-4o-mini__4914764047379688.json',
+		'./prompts/chatgpt__gpt-4o-mini__4512825889045576.json': {
+			path: 'prompts/chatgpt__gpt-4o-mini__4512825889045576.json',
 			declarations: [],
 		},
-		'./prompts/claude__claude-3-haiku-20240307__5107511667300690.json': {
-			path: 'prompts/claude__claude-3-haiku-20240307__5107511667300690.json',
+		'./prompts/claude__claude-3-haiku-20240307__7511303871068069.json': {
+			path: 'prompts/claude__claude-3-haiku-20240307__7511303871068069.json',
 			declarations: [],
 		},
-		'./prompts/gemini__gemini-1.5-flash__2453604184426632.json': {
-			path: 'prompts/gemini__gemini-1.5-flash__2453604184426632.json',
+		'./prompts/gemini__gemini-1.5-flash__5281499751420507.json': {
+			path: 'prompts/gemini__gemini-1.5-flash__5281499751420507.json',
 			declarations: [],
 		},
 		'./server/helpers.js': {
