@@ -15,6 +15,8 @@
 	const selected_agent_names: Agent_Name[] = $state(['chatgpt']);
 
 	const agents = $derived(zzz.agents.filter((a) => selected_agent_names.includes(a.name))); // TODO hacky assertion
+
+	const files = $derived(Array.from(zzz.files_by_id.values()).filter((file) => !file.external));
 </script>
 
 <!-- TODO drive with data -->
@@ -36,7 +38,7 @@
 	<button type="button" onclick={() => zzz.tapes.create_tape(agents)}>create new tape</button>
 </section>
 <section>
-	<File_List files={zzz.files_by_id} />
+	<File_List {files} />
 </section>
 
 <style>
