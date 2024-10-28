@@ -33,7 +33,7 @@ export const package_json = {
 		'@anthropic-ai/sdk': '^0.30.1',
 		'@changesets/changelog-git': '^0.2.0',
 		'@google/generative-ai': '^0.21.0',
-		'@hono/node-server': '^1.13.2',
+		'@hono/node-server': '^1.13.3',
 		'@hono/node-ws': '^1.0.4',
 		'@ryanatkn/belt': '^0.25.3',
 		'@ryanatkn/eslint-config': '^0.5.5',
