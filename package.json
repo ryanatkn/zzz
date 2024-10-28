@@ -103,6 +103,30 @@
       "types": "./dist/agent.svelte.d.ts",
       "default": "./dist/agent.svelte.js"
     },
+    "./Completion_Thread_Info.svelte": {
+      "types": "./dist/Completion_Thread_Info.svelte.d.ts",
+      "svelte": "./dist/Completion_Thread_Info.svelte",
+      "default": "./dist/Completion_Thread_Info.svelte"
+    },
+    "./Completion_Thread_Summary.svelte": {
+      "types": "./dist/Completion_Thread_Summary.svelte.d.ts",
+      "svelte": "./dist/Completion_Thread_Summary.svelte",
+      "default": "./dist/Completion_Thread_Summary.svelte"
+    },
+    "./Completion_Thread_View.svelte": {
+      "types": "./dist/Completion_Thread_View.svelte.d.ts",
+      "svelte": "./dist/Completion_Thread_View.svelte",
+      "default": "./dist/Completion_Thread_View.svelte"
+    },
+    "./completion_thread.svelte.js": {
+      "types": "./dist/completion_thread.svelte.d.ts",
+      "default": "./dist/completion_thread.svelte.js"
+    },
+    "./Completion_Threads_List.svelte": {
+      "types": "./dist/Completion_Threads_List.svelte.d.ts",
+      "svelte": "./dist/Completion_Threads_List.svelte",
+      "default": "./dist/Completion_Threads_List.svelte"
+    },
     "./config_helpers.js": {
       "types": "./dist/config_helpers.d.ts",
       "default": "./dist/config_helpers.js"
@@ -240,30 +264,6 @@
       "types": "./dist/Settings.svelte.d.ts",
       "svelte": "./dist/Settings.svelte",
       "default": "./dist/Settings.svelte"
-    },
-    "./Tape_Info.svelte": {
-      "types": "./dist/Tape_Info.svelte.d.ts",
-      "svelte": "./dist/Tape_Info.svelte",
-      "default": "./dist/Tape_Info.svelte"
-    },
-    "./Tape_Summary.svelte": {
-      "types": "./dist/Tape_Summary.svelte.d.ts",
-      "svelte": "./dist/Tape_Summary.svelte",
-      "default": "./dist/Tape_Summary.svelte"
-    },
-    "./Tape_View.svelte": {
-      "types": "./dist/Tape_View.svelte.d.ts",
-      "svelte": "./dist/Tape_View.svelte",
-      "default": "./dist/Tape_View.svelte"
-    },
-    "./tape.svelte.js": {
-      "types": "./dist/tape.svelte.d.ts",
-      "default": "./dist/tape.svelte.js"
-    },
-    "./Tapes_List.svelte": {
-      "types": "./dist/Tapes_List.svelte.d.ts",
-      "svelte": "./dist/Tapes_List.svelte",
-      "default": "./dist/Tapes_List.svelte"
     },
     "./zzz_client.js": {
       "types": "./dist/zzz_client.d.ts",

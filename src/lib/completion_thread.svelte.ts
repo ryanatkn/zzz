@@ -1,15 +1,15 @@
 import type {Receive_Prompt_Message, Send_Prompt_Message} from '$lib/zzz_message.js';
-import type {Agent, Agent_Name} from './agent.svelte.js';
+import type {Agent, Agent_Name} from '$lib/agent.svelte.js';
 
-export interface Tapes_Json {
-	tapes: Tape_Json[];
+export interface Completion_Threads_Json {
+	tapes: Completion_Thread_Json[];
 }
 
-export interface Tapes_Options {
+export interface Completion_Threads_Options {
 	agents: Agent[];
 }
 
-export interface Tape_History_Item {
+export interface Completion_Thread_History_Item {
 	request: Send_Prompt_Message;
 	response: Receive_Prompt_Message;
 }
@@ -18,19 +18,19 @@ export interface Tape_History_Item {
 // Groups history across multiple agents and prompts.
 // Other single-word names: Log, History, Session, Logbook, Dialogue, Conversation, Chat, Transcript
 // Other names using `Prompt_`: Prompt_Log, Prompt_History, Prompt_Session, Prompt_Logbook, Prompt_Dialogue, Prompt_Conversation, Prompt_Chat, Prompt_Transcript
-export class Tapes {
+export class Completion_Threads {
 	// TODO maybe a global history?
-	// history: Tape_History_Item[] = $state([]); // TODO does this make sense anymore, to have the full history in addition to the child tapes?
+	// history: Completion_Thread_History_Item[] = $state([]); // TODO does this make sense anymore, to have the full history in addition to the child tapes?
 
-	all: Tape[] = $state([]);
+	all: Completion_Thread[] = $state([]);
 
 	agents: Agent[] = $state()!;
 
-	constructor({agents}: Tapes_Options) {
+	constructor({agents}: Completion_Threads_Options) {
 		this.agents = agents;
 	}
 
-	toJSON(): Tapes_Json {
+	toJSON(): Completion_Threads_Json {
 		return {
 			tapes: $state.snapshot(this.all),
 		};
@@ -47,8 +47,8 @@ export class Tapes {
 		console.log(`[tape.receive_prompt_response] tape`, $state.snapshot(tape));
 	}
 
-	create_tape(agents: Agent[] = this.agents): Tape {
-		const tape = new Tape({agents});
+	create_tape(agents: Agent[] = this.agents): Completion_Thread {
+		const tape = new Completion_Thread({agents});
 		this.all.push(tape);
 		return tape;
 	}
@@ -69,19 +69,19 @@ export class Tapes {
 	// constructor(options?: {}) {}
 }
 
-export interface Tape_Json {
-	history: Tape_History_Item[];
+export interface Completion_Thread_Json {
+	history: Completion_Thread_History_Item[];
 }
 
-export interface Tape_Options {
+export interface Completion_Thread_Options {
 	agents: Agent[];
 }
 
-export class Tape {
+export class Completion_Thread {
 	// TODO look up these agents based on all of the agents in `history`
 	agents: Agent[] = $state()!; // handles a group conversation
 
-	history: Tape_History_Item[] = $state([]);
+	history: Completion_Thread_History_Item[] = $state([]);
 
 	// TODO move to an `Agents` or `Agent_Manager` class?
 	// TODO more efficient data structures?
@@ -103,14 +103,14 @@ export class Tape {
 		return agents_by_name;
 	});
 
-	constructor({agents}: Tape_Options) {
+	constructor({agents}: Completion_Thread_Options) {
 		this.agents = agents;
 		console.log('[tape] creating new tape', agents);
 	}
 
 	// TODO maybe `tape_id` should be the original id of the `request.id`?
 
-	toJSON(): Tape_Json {
+	toJSON(): Completion_Thread_Json {
 		return {
 			history: $state.snapshot(this.history),
 		};

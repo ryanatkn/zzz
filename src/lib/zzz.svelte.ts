@@ -15,7 +15,7 @@ import type {
 } from '$lib/zzz_message.js';
 import type {Agent} from '$lib/agent.svelte.js';
 import {random_id, type Id} from '$lib/id.js';
-import {Tapes, type Tapes_Json} from './tape.svelte.js';
+import {Completion_Threads, type Completion_Threads_Json} from '$lib/completion_thread.svelte.js';
 import type {Model} from '$lib/model.svelte.js';
 
 export const zzz_context = create_context<Zzz>();
@@ -24,13 +24,13 @@ export interface Zzz_Options {
 	agents: Agent[];
 	models: Model[];
 	client: Zzz_Client;
-	tapes?: Tapes;
+	tapes?: Completion_Threads;
 	data?: Zzz_Data;
 }
 
 export interface Zzz_Json {
 	data: Zzz_Data_Json;
-	tapes: Tapes_Json;
+	tapes: Completion_Threads_Json;
 }
 
 /**
@@ -58,7 +58,7 @@ export class Zzz {
 	// prompt_requests: SvelteMap<Id, {request: Send_Prompt_Message; response: Receive_Prompt_Message}> =
 	// 	new SvelteMap();
 
-	tapes: Tapes = $state()!; // TODO should this be an option?
+	tapes: Completion_Threads = $state()!; // TODO should this be an option?
 
 	// TODO store state granularly for each agent
 
@@ -67,7 +67,7 @@ export class Zzz {
 		this.agents.push(...agents);
 		this.models.push(...models);
 		this.client = client;
-		this.tapes = options.tapes ?? new Tapes({agents});
+		this.tapes = options.tapes ?? new Completion_Threads({agents});
 		this.data = data;
 	}
 

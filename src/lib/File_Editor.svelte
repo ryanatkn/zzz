@@ -3,7 +3,7 @@
 	import type {Source_File} from '@ryanatkn/gro/filer.js';
 
 	import {to_base_path} from '$lib/path.js';
-	import {zzz_context} from './zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz.svelte.js';
 
 	interface Props {
 		// TODO more efficient data structures, reactive source files

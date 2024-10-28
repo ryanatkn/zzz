@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type {Snippet} from 'svelte';
 
-	import {hud_context} from './hud.svelte.js';
-	import Hud_Dialog from './Hud_Dialog.svelte';
+	import {hud_context} from '$lib/hud.svelte.js';
+	import Hud_Dialog from '$lib/Hud_Dialog.svelte';
 
 	interface Props {
 		hud?: Snippet; // TODO maybe delete all of this, design still shaking out

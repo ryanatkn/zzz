@@ -86,6 +86,30 @@ export const package_json = {
 			default: './dist/Agent_View.svelte',
 		},
 		'./agent.svelte.js': {types: './dist/agent.svelte.d.ts', default: './dist/agent.svelte.js'},
+		'./Completion_Thread_Info.svelte': {
+			types: './dist/Completion_Thread_Info.svelte.d.ts',
+			svelte: './dist/Completion_Thread_Info.svelte',
+			default: './dist/Completion_Thread_Info.svelte',
+		},
+		'./Completion_Thread_Summary.svelte': {
+			types: './dist/Completion_Thread_Summary.svelte.d.ts',
+			svelte: './dist/Completion_Thread_Summary.svelte',
+			default: './dist/Completion_Thread_Summary.svelte',
+		},
+		'./Completion_Thread_View.svelte': {
+			types: './dist/Completion_Thread_View.svelte.d.ts',
+			svelte: './dist/Completion_Thread_View.svelte',
+			default: './dist/Completion_Thread_View.svelte',
+		},
+		'./completion_thread.svelte.js': {
+			types: './dist/completion_thread.svelte.d.ts',
+			default: './dist/completion_thread.svelte.js',
+		},
+		'./Completion_Threads_List.svelte': {
+			types: './dist/Completion_Threads_List.svelte.d.ts',
+			svelte: './dist/Completion_Threads_List.svelte',
+			default: './dist/Completion_Threads_List.svelte',
+		},
 		'./config_helpers.js': {
 			types: './dist/config_helpers.d.ts',
 			default: './dist/config_helpers.js',
@@ -200,27 +224,6 @@ export const package_json = {
 			svelte: './dist/Settings.svelte',
 			default: './dist/Settings.svelte',
 		},
-		'./Tape_Info.svelte': {
-			types: './dist/Tape_Info.svelte.d.ts',
-			svelte: './dist/Tape_Info.svelte',
-			default: './dist/Tape_Info.svelte',
-		},
-		'./Tape_Summary.svelte': {
-			types: './dist/Tape_Summary.svelte.d.ts',
-			svelte: './dist/Tape_Summary.svelte',
-			default: './dist/Tape_Summary.svelte',
-		},
-		'./Tape_View.svelte': {
-			types: './dist/Tape_View.svelte.d.ts',
-			svelte: './dist/Tape_View.svelte',
-			default: './dist/Tape_View.svelte',
-		},
-		'./tape.svelte.js': {types: './dist/tape.svelte.d.ts', default: './dist/tape.svelte.js'},
-		'./Tapes_List.svelte': {
-			types: './dist/Tapes_List.svelte.d.ts',
-			svelte: './dist/Tapes_List.svelte',
-			default: './dist/Tapes_List.svelte',
-		},
 		'./zzz_client.js': {types: './dist/zzz_client.d.ts', default: './dist/zzz_client.js'},
 		'./zzz_data.svelte.js': {
 			types: './dist/zzz_data.svelte.d.ts',
@@ -258,6 +261,25 @@ export const src_json = {
 				{name: 'Agent', kind: 'class'},
 			],
 		},
+		'./Completion_Thread_Info.svelte': {path: 'Completion_Thread_Info.svelte', declarations: []},
+		'./Completion_Thread_Summary.svelte': {
+			path: 'Completion_Thread_Summary.svelte',
+			declarations: [],
+		},
+		'./Completion_Thread_View.svelte': {path: 'Completion_Thread_View.svelte', declarations: []},
+		'./completion_thread.svelte.js': {
+			path: 'completion_thread.svelte.ts',
+			declarations: [
+				{name: 'Completion_Threads_Json', kind: 'type'},
+				{name: 'Completion_Threads_Options', kind: 'type'},
+				{name: 'Completion_Thread_History_Item', kind: 'type'},
+				{name: 'Completion_Threads', kind: 'class'},
+				{name: 'Completion_Thread_Json', kind: 'type'},
+				{name: 'Completion_Thread_Options', kind: 'type'},
+				{name: 'Completion_Thread', kind: 'class'},
+			],
+		},
+		'./Completion_Threads_List.svelte': {path: 'Completion_Threads_List.svelte', declarations: []},
 		'./config_helpers.js': {
 			path: 'config_helpers.ts',
 			declarations: [
@@ -353,22 +375,6 @@ export const src_json = {
 			],
 		},
 		'./Settings.svelte': {path: 'Settings.svelte', declarations: []},
-		'./Tape_Info.svelte': {path: 'Tape_Info.svelte', declarations: []},
-		'./Tape_Summary.svelte': {path: 'Tape_Summary.svelte', declarations: []},
-		'./Tape_View.svelte': {path: 'Tape_View.svelte', declarations: []},
-		'./tape.svelte.js': {
-			path: 'tape.svelte.ts',
-			declarations: [
-				{name: 'Tapes_Json', kind: 'type'},
-				{name: 'Tapes_Options', kind: 'type'},
-				{name: 'Tape_History_Item', kind: 'type'},
-				{name: 'Tapes', kind: 'class'},
-				{name: 'Tape_Json', kind: 'type'},
-				{name: 'Tape_Options', kind: 'type'},
-				{name: 'Tape', kind: 'class'},
-			],
-		},
-		'./Tapes_List.svelte': {path: 'Tapes_List.svelte', declarations: []},
 		'./zzz_client.js': {
 			path: 'zzz_client.ts',
 			declarations: [

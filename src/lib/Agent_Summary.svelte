@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type {Agent} from '$lib/agent.svelte.js';
-	import Tapes_List from '$lib/Tapes_List.svelte';
+	import Completion_Threads_List from '$lib/Completion_Threads_List.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 
 	interface Props {
@@ -27,7 +27,7 @@
 		</select>
 	</div>
 	{#if tape}
-		<Tapes_List {agent} {tape} />
+		<Completion_Threads_List {agent} {tape} />
 	{:else}
 		<p>no tapes yet</p>
 	{/if}

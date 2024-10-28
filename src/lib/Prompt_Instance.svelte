@@ -3,7 +3,7 @@
 
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import Agent_View from '$lib/Agent_View.svelte';
-	import type {Agent} from './agent.svelte.js';
+	import type {Agent} from '$lib/agent.svelte.js';
 
 	interface Props {
 		agent: Agent;
@@ -11,7 +11,7 @@
 
 	const {agent}: Props = $props();
 
-	// TODO BLOCK name with `Multiprompt` and `Tape_View`, maybe `Tape_Item`?
+	// TODO BLOCK name with `Multiprompt` and `Completion_Thread_View`, maybe `Completion_Thread_Item`?
 
 	const zzz = zzz_context.get();
 

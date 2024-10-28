@@ -4,15 +4,18 @@
 	import Contextmenu_Entry from '@ryanatkn/fuz/Contextmenu_Entry.svelte';
 	import {contextmenu_action} from '@ryanatkn/fuz/contextmenu_state.svelte.js';
 
-	import Tape_Info from '$lib/Tape_Info.svelte';
-	import Tape_Summary from '$lib/Tape_Summary.svelte';
+	import Completion_Thread_Info from '$lib/Completion_Thread_Info.svelte';
+	import Completion_Thread_Summary from '$lib/Completion_Thread_Summary.svelte';
 	import type {Agent} from '$lib/agent.svelte.js';
-	import type {Tape, Tape_History_Item} from './tape.svelte.js';
+	import type {
+		Completion_Thread,
+		Completion_Thread_History_Item,
+	} from '$lib/completion_thread.svelte.js';
 
 	interface Props {
 		agent: Agent;
 		// TODO more efficient data structures, reactive source prompt_responses
-		tape: Tape;
+		tape: Completion_Thread;
 	}
 
 	const {agent, tape}: Props = $props();
@@ -23,7 +26,7 @@
 	let view_with: 'summary' | 'info' = $state('summary');
 
 	// TODO hardcoded to one history item
-	const history_item = $derived(tape.history[0] as Tape_History_Item | undefined);
+	const history_item = $derived(tape.history[0] as Completion_Thread_History_Item | undefined);
 	const prompt_request = $derived(history_item?.request);
 	const prompt_response = $derived(history_item?.response);
 
@@ -43,9 +46,9 @@
 
 <div class="prompt_response_view" use:contextmenu_action={contextmenu_entries}>
 	{#if view_with === 'summary'}
-		<Tape_Summary {agent} {tape} />
+		<Completion_Thread_Summary {agent} {tape} />
 	{:else}
-		<Tape_Info {agent} {tape} />
+		<Completion_Thread_Info {agent} {tape} />
 	{/if}
 </div>
 
@@ -54,7 +57,7 @@
 		<!-- TODO expand width, might need to change `Dialog` -->
 		<div class="bg p_md radius_sm width_md">
 			<!-- TODO should this be a `Prompt_Response_Editor`? -->
-			<Tape_Info {agent} {tape} />
+			<Completion_Thread_Info {agent} {tape} />
 			<button type="button" onclick={() => (show_editor = false)}>close</button>
 		</div>
 	</Dialog>

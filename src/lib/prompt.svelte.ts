@@ -1,4 +1,4 @@
-import type {Receive_Prompt_Message, Send_Prompt_Message} from './zzz_message.js';
+import type {Receive_Prompt_Message, Send_Prompt_Message} from '$lib/zzz_message.js';
 
 export interface Prompt_Json {
 	request: Send_Prompt_Message;
