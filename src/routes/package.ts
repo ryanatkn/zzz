@@ -29,6 +29,7 @@ export const package_json = {
 	},
 	type: 'module',
 	engines: {node: '>=20.17'},
+	peerDependencies: {'@sveltejs/kit': '^2', svelte: '^5'},
 	devDependencies: {
 		'@changesets/changelog-git': '^0.2.0',
 		'@ryanatkn/belt': '^0.26.0',
