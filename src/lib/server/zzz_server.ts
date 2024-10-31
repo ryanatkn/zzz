@@ -25,14 +25,22 @@ const anthropic = new Anthropic({apiKey: SECRET_ANTHROPIC_API_KEY});
 const openai = new OpenAI({apiKey: SECRET_OPENAI_API_KEY});
 const google = new GoogleGenerativeAI(SECRET_GOOGLE_API_KEY);
 
+const ZZZ_DIR_DEFAULT = './.zzz';
+
 export interface Options {
 	send: (message: Server_Message) => void;
+	/**
+	 * @default ZZZ_DIR_DEFAULT
+	 */
+	zzz_dir?: string;
 	filer?: Filer;
 	system_message?: string;
 }
 
 export class Zzz_Server {
 	#send: (message: Server_Message) => void;
+
+	zzz_dir: string;
 
 	filer: Filer;
 
@@ -43,7 +51,8 @@ export class Zzz_Server {
 	constructor(options: Options) {
 		console.log('create Zzz_Server');
 		this.#send = options.send;
-		this.filer = options.filer ?? new Filer();
+		this.zzz_dir = options.zzz_dir ?? ZZZ_DIR_DEFAULT;
+		this.filer = options.filer ?? new Filer({watch_dir_options: {dir: this.zzz_dir}});
 		this.#cleanup_filer = this.filer.watch((change, source_file) => {
 			switch (change.type) {
 				case 'add':
