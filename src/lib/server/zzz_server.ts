@@ -28,7 +28,7 @@ const google = new GoogleGenerativeAI(SECRET_GOOGLE_API_KEY);
 
 const ZZZ_DIR_DEFAULT = './.zzz';
 
-export interface Options {
+export interface Zzz_Server_Options {
 	send: (message: Server_Message) => void;
 	/**
 	 * @default ZZZ_DIR_DEFAULT
@@ -49,7 +49,7 @@ export class Zzz_Server {
 
 	#cleanup_filer: Promise<Cleanup_Watch>;
 
-	constructor(options: Options) {
+	constructor(options: Zzz_Server_Options) {
 		console.log('create Zzz_Server');
 		this.#send = options.send;
 		this.zzz_dir = options.zzz_dir ?? ZZZ_DIR_DEFAULT;
