@@ -11,6 +11,7 @@
 	justify-content: center;
 }
 
+<<<<<<< HEAD
 .chevron {
 	position: relative;
 	height: 8px;
@@ -22,6 +23,8 @@
 	border-left-color: var(--text_color_3);
 }
 
+=======
+>>>>>>> main
 .chip {
 	font-weight: 600;
 	padding: var(--space_xs5) var(--space_sm); /* maybe different inside `p`? using `calc` with `--size`? */
@@ -32,6 +35,7 @@ a.chip {
 	font-weight: 700;
 }
 
+<<<<<<< HEAD
 .color_b_5 {
 	color: var(--color_b_5);
 }
@@ -54,15 +58,20 @@ a.chip {
 .fg_1 {
 	background-color: var(--fg_1);
 }
+=======
+>>>>>>> main
 .flex {
 	display: flex;
 }
 .flex_1 {
 	flex: 1;
 }
+<<<<<<< HEAD
 .font_mono {
 	font-family: var(--font_mono);
 }
+=======
+>>>>>>> main
 .h_100 {
 	height: 100%;
 }
@@ -83,12 +92,21 @@ a.chip {
 .inline {
 	display: inline;
 }
+<<<<<<< HEAD
 .justify_content_end {
 	justify-content: end;
 }
 .justify_content_space_between {
 	justify-content: space-between;
 }
+=======
+.justify_content_space_between {
+	justify-content: space-between;
+}
+.justify_self_end {
+	justify-self: end;
+}
+>>>>>>> main
 .mb_0 {
 	margin-bottom: 0;
 }
@@ -146,11 +164,16 @@ a.chip {
 	line-height: var(--line_height_lg); /* prevents the bottom of g's and others from being cut off */
 }
 
+<<<<<<< HEAD
 .ml_md {
 	margin-left: var(--space_md);
 }
 .mr_md {
 	margin-right: var(--space_md);
+=======
+.ml_sm {
+	margin-left: var(--space_sm);
+>>>>>>> main
 }
 .mt_0 {
 	margin-top: 0;
@@ -168,9 +191,12 @@ a.chip {
 	margin-top: var(--space_xl5);
 	margin-bottom: var(--space_xl5);
 }
+<<<<<<< HEAD
 .overflow_auto {
 	overflow: auto;
 }
+=======
+>>>>>>> main
 .p_lg {
 	padding: var(--space_lg);
 }
@@ -200,10 +226,13 @@ a.chip {
 	background-color: var(--panel_bg, var(--fg_1));
 }
 
+<<<<<<< HEAD
 .pb_xl7 {
 	padding-bottom: var(--space_xl7);
 }
 
+=======
+>>>>>>> main
 /* TODO maybe this belongs with the reset, like `selected`? or does `selected` belong here? */
 .plain:not(:hover) {
 	border-color: transparent;
@@ -211,6 +240,7 @@ a.chip {
 	--button_fill: transparent;
 }
 
+<<<<<<< HEAD
 .pr_md {
 	padding-right: var(--space_md);
 }
@@ -232,6 +262,15 @@ a.chip {
 .radius_sm {
 	border-radius: var(--radius_sm);
 }
+=======
+.px_md {
+	padding-left: var(--space_md);
+	padding-right: var(--space_md);
+}
+.radius_0 {
+	border-radius: 0;
+}
+>>>>>>> main
 
 /* can be used to override the direction of a `.box` */
 .row {
@@ -266,14 +305,18 @@ a.chip {
 	cursor: pointer;
 }
 
+<<<<<<< HEAD
 .shadow_inset_top_sm {
 	box-shadow: var(--shadow_inset_top_sm)
 		color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_2)), transparent);
 }
+=======
+>>>>>>> main
 .shadow_inset_xs {
 	box-shadow: var(--shadow_inset_xs)
 		color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_1)), transparent);
 }
+<<<<<<< HEAD
 .shrink_0 {
 	flex-shrink: 0;
 }
@@ -292,6 +335,11 @@ a.chip {
 .w_100 {
 	width: 100%;
 }
+=======
+.size_xl3 {
+	font-size: var(--size_xl3);
+}
+>>>>>>> main
 
 /* TODO rename these? use to be columns, maybe should be? */
 .width_md {
