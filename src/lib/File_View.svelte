@@ -64,7 +64,10 @@
 	{#if file.contents !== null}
 		<Contextmenu_Entry run={() => void navigator.clipboard.writeText(file.contents!)}>
 			{#snippet icon()}📋{/snippet}
-			<span>Copy {file.contents.length} chars</span>
+			<div class="flex">
+				Copy {file.contents.length} chars
+				<code class="size_sm ellipsis ml_sm">{file.contents.substring(0, 100)}</code>
+			</div>
 		</Contextmenu_Entry>
 	{/if}
 

@@ -345,7 +345,7 @@ export const src_json = {
 			],
 		},
 		'./Multiprompt.svelte': {path: 'Multiprompt.svelte', declarations: []},
-		'./path.js': {path: 'path.ts', declarations: [{name: 'to_base_path', kind: 'function'}]},
+		'./path.js': {path: 'path.ts', declarations: [{name: 'to_root_path', kind: 'function'}]},
 		'./Prompt_Agent_Form.svelte': {path: 'Prompt_Agent_Form.svelte', declarations: []},
 		'./Prompt_Instance.svelte': {path: 'Prompt_Instance.svelte', declarations: []},
 		'./prompt.js': {

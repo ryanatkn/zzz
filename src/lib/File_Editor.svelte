@@ -2,7 +2,7 @@
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
 	import type {Source_File} from '@ryanatkn/gro/filer.js';
 
-	import {to_base_path} from '$lib/path.js';
+	import {to_root_path} from '$lib/path.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 
 	interface Props {
@@ -21,7 +21,7 @@
 	let updated_contents = $state(file.contents ?? '');
 </script>
 
-<div class="row size_xl"><span class="size_xl3 mr_md">🗎</span> {to_base_path(file.id)}</div>
+<div class="row size_xl"><span class="size_xl3 mr_md">🗎</span> {to_root_path(file.id)}</div>
 
 <h2>
 	{#if !dependencies.length}no{:else}{dependencies.length}{/if}
@@ -30,7 +30,7 @@
 {#if dependencies.length > 0}
 	<div class="dep_list">
 		{#each dependencies as dependency (dependency.id)}
-			<div>{to_base_path(dependency.id)}</div>
+			<div>{to_root_path(dependency.id)}</div>
 		{/each}
 	</div>
 {/if}
@@ -41,7 +41,7 @@
 {#if dependents.length > 0}
 	<div class="dep_list">
 		{#each dependents as dependent (dependent.id)}
-			<div>{to_base_path(dependent.id)}</div>
+			<div>{to_root_path(dependent.id)}</div>
 		{/each}
 	</div>
 {/if}

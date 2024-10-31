@@ -3,7 +3,7 @@
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
 	import type {Source_File} from '@ryanatkn/gro/filer.js';
 
-	import {to_base_path} from '$lib/path.js';
+	import {to_root_path} from '$lib/path.js';
 
 	interface Props {
 		// TODO more efficient data structures, reactive source files
@@ -16,7 +16,7 @@
 	const dependents = $derived(Array.from(file.dependents.values()));
 </script>
 
-<div class="row size_xl"><span class="size_xl3 mr_md">🗎</span> {to_base_path(file.id)}</div>
+<div class="row size_xl"><span class="size_xl3 mr_md">🗎</span> {to_root_path(file.id)}</div>
 
 <p>
 	deps (
@@ -30,7 +30,7 @@
 <h2>dependencies</h2>
 <div class="dep_list">
 	{#each dependencies as dependency (dependency.id)}
-		<div>{to_base_path(dependency.id)}</div>
+		<div>{to_root_path(dependency.id)}</div>
 	{/each}
 </div>
 <h2>
@@ -39,7 +39,7 @@
 {#if dependents.length > 0}
 	<div class="dep_list">
 		{#each dependents as dependent (dependent.id)}
-			{to_base_path(dependent.id)}
+			{to_root_path(dependent.id)}
 		{/each}
 	</div>
 {/if}

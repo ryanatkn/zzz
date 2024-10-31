@@ -149,6 +149,9 @@ a.chip {
 .ml_md {
 	margin-left: var(--space_md);
 }
+.ml_sm {
+	margin-left: var(--space_sm);
+}
 .mr_md {
 	margin-right: var(--space_md);
 }
@@ -279,6 +282,9 @@ a.chip {
 }
 .size_lg {
 	font-size: var(--size_lg);
+}
+.size_sm {
+	font-size: var(--size_sm);
 }
 .size_xl {
 	font-size: var(--size_xl);

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type {Source_File} from '@ryanatkn/gro/filer.js';
 
-	import {to_base_path} from '$lib/path.js';
+	import {to_root_path} from '$lib/path.js';
 
 	interface Props {
 		// TODO more efficient data structures, reactive source files
@@ -17,7 +17,7 @@
 <div class="file_summary row justify_content_space_between">
 	<div class="row flex_1 overflow_auto">
 		<div class="size_xl">🗎</div>
-		<div class="px_lg ellipsis">{to_base_path(file.id)}</div>
+		<div class="px_lg ellipsis">{to_root_path(file.id)}</div>
 	</div>
 	<div
 		style:width="70px"
