@@ -8,8 +8,8 @@ import {
 	SECRET_GOOGLE_API_KEY,
 	SECRET_OPENAI_API_KEY,
 } from '$env/static/private';
-import {writeFileSync} from 'node:fs';
-import {join} from 'node:path';
+import {existsSync, mkdirSync, writeFileSync} from 'node:fs';
+import {dirname, join} from 'node:path';
 import {format_file} from '@ryanatkn/gro/format_file.js';
 
 import type {
@@ -210,5 +210,16 @@ const save_response = async (
 
 	const json = {request, response}; // TODO type?
 
-	writeFileSync(path, await format_file(JSON.stringify(json), {parser: 'json'}));
+	await write_json(path, json);
+};
+
+const write_json = async (path: string, json: unknown): Promise<void> => {
+	const dir = dirname(path);
+	if (!existsSync(dir)) {
+		mkdirSync(dir, {recursive: true});
+	}
+
+	const formatted = await format_file(JSON.stringify(json), {parser: 'json'});
+
+	writeFileSync(path, formatted);
 };
