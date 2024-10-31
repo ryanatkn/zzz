@@ -34,13 +34,13 @@ export const package_json = {
 		'@anthropic-ai/sdk': '^0.30.1',
 		'@changesets/changelog-git': '^0.2.0',
 		'@google/generative-ai': '^0.21.0',
-		'@hono/node-server': '^1.13.3',
+		'@hono/node-server': '^1.13.4',
 		'@hono/node-ws': '^1.0.4',
 		'@ryanatkn/belt': '^0.26.0',
 		'@ryanatkn/eslint-config': '^0.5.6',
 		'@ryanatkn/fuz': '^0.130.3',
-		'@ryanatkn/gro': '^0.145.0',
-		'@ryanatkn/moss': '^0.19.0',
+		'@ryanatkn/gro': '^0.146.0',
+		'@ryanatkn/moss': '^0.20.0',
 		'@sveltejs/adapter-static': '^3.0.6',
 		'@sveltejs/kit': '^2.7.3',
 		'@sveltejs/package': '^2.3.7',
@@ -364,7 +364,7 @@ export const src_json = {
 		'./server/zzz_server.js': {
 			path: 'server/zzz_server.ts',
 			declarations: [
-				{name: 'Options', kind: 'type'},
+				{name: 'Zzz_Server_Options', kind: 'type'},
 				{name: 'Zzz_Server', kind: 'class'},
 			],
 		},
@@ -372,7 +372,7 @@ export const src_json = {
 		'./zzz_client.js': {
 			path: 'zzz_client.ts',
 			declarations: [
-				{name: 'Options', kind: 'type'},
+				{name: 'Zzz_Client_Options', kind: 'type'},
 				{name: 'Zzz_Client', kind: 'class'},
 			],
 		},
