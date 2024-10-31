@@ -9,6 +9,7 @@ import {
 	SECRET_OPENAI_API_KEY,
 } from '$env/static/private';
 import {writeFileSync} from 'node:fs';
+import {join} from 'node:path';
 import {format_file} from '@ryanatkn/gro/format_file.js';
 
 import type {
@@ -174,7 +175,7 @@ export class Zzz_Server {
 
 				// don't need to wait for this to finish,
 				// the expected file event is now independent of the request
-				void save_response(request, response);
+				void save_response(request, response, this.zzz_dir);
 
 				console.log(`got ${agent_name} message`, response.completion_response.data);
 
@@ -201,10 +202,11 @@ export class Zzz_Server {
 const save_response = async (
 	request: Send_Prompt_Message,
 	response: Receive_Prompt_Message,
+	dir: string,
 ): Promise<void> => {
 	const filename = `${request.completion_request.agent_name}__${request.completion_request.model}__${response.id}.json`; // TODO include model data in these
 
-	const path = `./src/lib/prompts/` + filename;
+	const path = join(dir, filename);
 
 	const json = {request, response}; // TODO type?
 
