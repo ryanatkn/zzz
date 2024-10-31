@@ -5,18 +5,18 @@
 
 	interface Props {
 		agent: Agent;
-		tape: Completion_Thread;
+		completion_thread: Completion_Thread;
 	}
 
-	const {agent, tape}: Props = $props();
+	const {agent, completion_thread}: Props = $props();
 
-	// TODO BLOCK multiple tapes?
+	// TODO BLOCK multiple completion_threads?
 </script>
 
 <ul class="unstyled py_lg">
-	{#each tape.history as history_item (history_item)}
+	{#each completion_thread.history as history_item (history_item)}
 		<li class="p_md">
-			<Completion_Thread_View {agent} {tape} />
+			<Completion_Thread_View {agent} {completion_thread} />
 		</li>
 	{/each}
 </ul>

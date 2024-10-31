@@ -15,10 +15,10 @@
 	interface Props {
 		agent: Agent;
 		// TODO more efficient data structures, reactive source completion_responses
-		tape: Completion_Thread;
+		completion_thread: Completion_Thread;
 	}
 
-	const {agent, tape}: Props = $props();
+	const {agent, completion_thread}: Props = $props();
 
 	let show_editor = $state(false);
 
@@ -26,7 +26,9 @@
 	let view_with: 'summary' | 'info' = $state('summary');
 
 	// TODO hardcoded to one history item
-	const history_item = $derived(tape.history[0] as Completion_Thread_History_Item | undefined);
+	const history_item = $derived(
+		completion_thread.history[0] as Completion_Thread_History_Item | undefined,
+	);
 	const completion_request = $derived(history_item?.completion_request);
 	const completion_response = $derived(history_item?.completion_response);
 
@@ -46,9 +48,9 @@
 
 <div class="completion_response_view" use:contextmenu_action={contextmenu_entries}>
 	{#if view_with === 'summary'}
-		<Completion_Thread_Summary {agent} {tape} />
+		<Completion_Thread_Summary {agent} {completion_thread} />
 	{:else}
-		<Completion_Thread_Info {agent} {tape} />
+		<Completion_Thread_Info {agent} {completion_thread} />
 	{/if}
 </div>
 
@@ -57,7 +59,7 @@
 		<!-- TODO expand width, might need to change `Dialog` -->
 		<div class="bg p_md radius_sm width_md">
 			<!-- TODO should this be a `Prompt_Response_Editor`? -->
-			<Completion_Thread_Info {agent} {tape} />
+			<Completion_Thread_Info {agent} {completion_thread} />
 			<button type="button" onclick={() => (show_editor = false)}>close</button>
 		</div>
 	</Dialog>

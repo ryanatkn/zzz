@@ -24,13 +24,13 @@ export interface Zzz_Options {
 	agents: Agent[];
 	models: Model[];
 	client: Zzz_Client;
-	tapes?: Completion_Threads;
+	completion_threads?: Completion_Threads;
 	data?: Zzz_Data;
 }
 
 export interface Zzz_Json {
 	data: Zzz_Data_Json;
-	tapes: Completion_Threads_Json;
+	completion_threads: Completion_Threads_Json;
 }
 
 /**
@@ -58,7 +58,7 @@ export class Zzz {
 	// completion_requests: SvelteMap<Id, {request: Send_Prompt_Message; response: Receive_Prompt_Message}> =
 	// 	new SvelteMap();
 
-	tapes: Completion_Threads = $state()!; // TODO should this be an option?
+	completion_threads: Completion_Threads = $state()!; // TODO should this be an option?
 
 	// TODO store state granularly for each agent
 
@@ -67,14 +67,14 @@ export class Zzz {
 		this.agents.push(...agents);
 		this.models.push(...models);
 		this.client = client;
-		this.tapes = options.tapes ?? new Completion_Threads({agents});
+		this.completion_threads = options.completion_threads ?? new Completion_Threads({agents});
 		this.data = data;
 	}
 
 	toJSON(): Zzz_Json {
 		return {
 			data: this.data.toJSON(),
-			tapes: this.tapes.toJSON(),
+			completion_threads: this.completion_threads.toJSON(),
 		};
 	}
 
@@ -95,7 +95,7 @@ export class Zzz {
 		const deferred = create_deferred<Receive_Prompt_Message>();
 		this.pending_prompts.set(message.id, deferred); // TODO roundabout way to get req/res
 		const response = await deferred.promise;
-		this.tapes.receive_completion_response(
+		this.completion_threads.receive_completion_response(
 			message.completion_request,
 			response.completion_response,
 		);

@@ -13,8 +13,10 @@
 
 	const zzz = zzz_context.get();
 
-	// TODO @many hacky, need id - should be a list? or component takes a `tape`
-	const tape = $derived(zzz.tapes.all.find((t) => t.agents_by_name.get(agent.name)));
+	// TODO @many hacky, need id - should be a list? or component takes a `completion_thread`
+	const completion_thread = $derived(
+		zzz.completion_threads.all.find((t) => t.agents_by_name.get(agent.name)),
+	);
 </script>
 
 <div class="flex_1 {classes}">
@@ -26,9 +28,9 @@
 			{/each}
 		</select>
 	</div>
-	{#if tape}
-		<Completion_Threads_List {agent} {tape} />
+	{#if completion_thread}
+		<Completion_Threads_List {agent} {completion_thread} />
 	{:else}
-		<p>no tapes yet</p>
+		<p>no completion_threads yet</p>
 	{/if}
 </div>

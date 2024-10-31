@@ -2,7 +2,7 @@ import type {Agent, Agent_Name} from '$lib/agent.svelte.js';
 import type {Completion_Request, Completion_Response} from '$lib/completion.js';
 
 export interface Completion_Threads_Json {
-	tapes: Completion_Thread_Json[];
+	completion_threads: Completion_Thread_Json[];
 }
 
 export interface Completion_Threads_Options {
@@ -20,7 +20,7 @@ export interface Completion_Thread_History_Item {
 // Other names using `Prompt_`: Prompt_Log, Prompt_History, Prompt_Session, Prompt_Logbook, Prompt_Dialogue, Prompt_Conversation, Prompt_Chat, Prompt_Transcript
 export class Completion_Threads {
 	// TODO maybe a global history?
-	// history: Completion_Thread_History_Item[] = $state([]); // TODO does this make sense anymore, to have the full history in addition to the child tapes?
+	// history: Completion_Thread_History_Item[] = $state([]); // TODO does this make sense anymore, to have the full history in addition to the child completion_threads?
 
 	all: Completion_Thread[] = $state([]);
 
@@ -32,25 +32,28 @@ export class Completion_Threads {
 
 	toJSON(): Completion_Threads_Json {
 		return {
-			tapes: $state.snapshot(this.all),
+			completion_threads: $state.snapshot(this.all),
 		};
 	}
 
 	receive_completion_response(request: Completion_Request, response: Completion_Response): void {
-		// TODO we need a `tape.id` I think, this is hacky
+		// TODO we need a `completion_thread.id` I think, this is hacky
 		// TODO multiple? feels like could be more derived, using a `Map` being read from the derived agents from the `history`
-		let tape = this.all.find((t) => t.agents_by_name.get(request.agent_name));
-		if (!tape) {
-			tape = this.create_tape(); // TODO BLOCK instead of creating new tapes, should push to its history
+		let completion_thread = this.all.find((t) => t.agents_by_name.get(request.agent_name));
+		if (!completion_thread) {
+			completion_thread = this.create_completion_thread(); // TODO BLOCK instead of creating new completion_threads, should push to its history
 		}
-		tape.history.push({completion_request: request, completion_response: response}); // TODO call a method?
-		console.log(`[tape.receive_completion_response] tape`, $state.snapshot(tape));
+		completion_thread.history.push({completion_request: request, completion_response: response}); // TODO call a method?
+		console.log(
+			`[completion_thread.receive_completion_response]`,
+			$state.snapshot(completion_thread),
+		);
 	}
 
-	create_tape(agents: Agent[] = this.agents): Completion_Thread {
-		const tape = new Completion_Thread({agents});
-		this.all.push(tape);
-		return tape;
+	create_completion_thread(agents: Agent[] = this.agents): Completion_Thread {
+		const completion_thread = new Completion_Thread({agents});
+		this.all.push(completion_thread);
+		return completion_thread;
 	}
 
 	// TODO
@@ -105,10 +108,10 @@ export class Completion_Thread {
 
 	constructor({agents}: Completion_Thread_Options) {
 		this.agents = agents;
-		console.log('[tape] creating new tape', agents);
+		console.log('[completion_thread] creating new', agents);
 	}
 
-	// TODO maybe `tape_id` should be the original id of the `request.id`?
+	// TODO maybe `completion_thread_id` should be the original id of the `request.id`?
 
 	toJSON(): Completion_Thread_Json {
 		return {

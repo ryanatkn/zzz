@@ -9,19 +9,21 @@
 
 	interface Props {
 		agent: Agent;
-		tape: Completion_Thread;
+		completion_thread: Completion_Thread;
 	}
 
-	const {agent, tape}: Props = $props();
+	const {agent, completion_thread}: Props = $props();
 
 	// TODO hardcoded to one history item
-	const history_item = $derived(tape.history[0] as Completion_Thread_History_Item | undefined);
+	const history_item = $derived(
+		completion_thread.history[0] as Completion_Thread_History_Item | undefined,
+	);
 	const completion_request = $derived(history_item?.completion_request);
 	const completion_response = $derived(history_item?.completion_response);
 </script>
 
 {#if completion_request}
-	<p>@user: {completion_request.prompt} ({tape.history.length} history items)</p>
+	<p>@user: {completion_request.prompt} ({completion_thread.history.length} history items)</p>
 {/if}
 {#if completion_response}
 	<p>
