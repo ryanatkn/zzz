@@ -19,7 +19,11 @@
 			<h1 class="mt_xl4">{pkg.repo_name}</h1>
 		</header>
 		<Breadcrumb><Svg data={zzz_logo} size="var(--icon_size_sm)" /></Breadcrumb>
-		<p class="mt_xl5">⚠️ early pre-release</p>
+		<p class="mt_xl5">
+			⚠️ early pre-release, see the <a href="https://github.com/ryanatkn/zzz/discussions"
+				>discussions</a
+			>
+		</p>
 	</section>
 	<section>
 		<div class="panel p_md width_md">
