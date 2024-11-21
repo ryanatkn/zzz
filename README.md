@@ -32,7 +32,8 @@ Browse to the location is says, probably `localhost:5173`.
 
 - publish library
 - improve website
+- **`name`**`.zzzbot.dev`
 
-## license 🐦
+## License 🐦
 
 [MIT](LICENSE)
