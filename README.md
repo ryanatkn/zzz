@@ -18,7 +18,7 @@ More at [zzz.ztack.net](https://zzz.ztack.net/).
 
 ## Motivation
 
-bot at hand plz
+botz at hand
 
 ## Todo
 
