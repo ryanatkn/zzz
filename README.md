@@ -17,7 +17,7 @@ More at [www.zzzbot.dev](https://www.zzzbot.dev/).
 
 ## Todo
 
-- **`name`**`.zzzbot.dev`
+- <code>**name**.zzzbot.dev</code>
 
 ## License 🐦
 
