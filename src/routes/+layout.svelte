@@ -66,6 +66,14 @@
 			{#if zzz.data.show_main_menu}
 				<Dialog onclose={() => (zzz.data.show_main_menu = false)}>
 					<div class="pane">
+						<section class="width_md box">
+							<h1>Zzz</h1>
+							<p>electric buzz</p>
+							<p>work in progress</p>
+							<p>
+								don't miss the <a href="https://github.com/ryanatkn/zzz/discussions">discussions</a>
+							</p>
+						</section>
 						<Settings />
 					</div>
 				</Dialog>

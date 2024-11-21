@@ -11,7 +11,8 @@
 Zzz (pronounced "zees" like the sound of electricity)
 is a toolkit that builds on [SvelteKit](https://kit.svelte.dev/).
 
-It's still early. To get involved seek the issues and discussions.
+It's still early. To help see the issues
+and [discussions](https://github.com/ryanatkn/zzz/discussions).
 
 More at [zzz.ztack.net](https://zzz.ztack.net/).
 
