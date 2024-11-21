@@ -32,7 +32,7 @@ Browse to the location is says, probably `localhost:5173`.
 
 - publish library
 - improve website
-- **`name`**`.zzzbot.dev`
+- <code>**name**.zzzbot.dev</code>
 
 ## License 🐦
 
