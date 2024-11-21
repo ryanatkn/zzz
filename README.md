@@ -19,8 +19,23 @@ More at [www.zzzbot.dev](https://www.zzzbot.dev/).
 
 bot at hand plz
 
+## Setup
+
+- add to `.env.development` and `.env.production` -
+  `SECRET_ANTHROPIC_API_KEY`, `SECRET_OPENAI_API_KEY`, `SECRET_GOOGLE_API_KEY`
+
+In your terminal:
+
+```bash
+npm run dev
+```
+
+Browse to the location is says, probably `localhost:5173`.
+
 ## Todo
 
+- publish library
+- improve website
 - <code>**name**.zzzbot.dev</code>
 
 ## License 🐦
