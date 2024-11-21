@@ -66,7 +66,7 @@
 			{#if zzz.data.show_main_menu}
 				<Dialog onclose={() => (zzz.data.show_main_menu = false)}>
 					<div class="pane">
-						<section class="width_md box">
+						<section class="width_md box pt_lg">
 							<h1>Zzz</h1>
 							<p>electric buzz</p>
 							<p>work in progress</p>
