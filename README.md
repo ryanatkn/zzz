@@ -15,6 +15,10 @@ It's still early. To get involved seek the issues and discussions.
 
 More at [www.zzzbot.dev](https://www.zzzbot.dev/).
 
-## license 🐦
+## Todo
+
+- **`name`**`.zzzbot.dev`
+
+## License 🐦
 
 [MIT](LICENSE)
