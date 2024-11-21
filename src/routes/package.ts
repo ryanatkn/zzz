@@ -13,7 +13,7 @@ export const package_json = {
 	logo_alt: "three sleepy z's",
 	public: true,
 	license: 'MIT',
-	homepage: 'https://www.zzzbot.dev/',
+	homepage: 'https://zzz.ztack.net/',
 	repository: 'https://github.com/ryanatkn/zzz',
 	author: {name: 'Ryan Atkinson', email: 'mail@ryanatkn.com', url: 'https://www.ryanatkn.com/'},
 	bugs: 'https://github.com/ryanatkn/zzz/issues',
