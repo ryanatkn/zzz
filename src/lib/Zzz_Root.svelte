@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type {Snippet} from 'svelte';
-	import {swallow} from '@ryanatkn/belt/dom.js';
+	import {is_editable, swallow} from '@ryanatkn/belt/dom.js';
 
 	import {Zzz, zzz_context} from '$lib/zzz.svelte.js';
 
@@ -16,8 +16,8 @@
 
 <svelte:window
 	onkeydown={(e) => {
-		if (e.key === '`') {
-			zzz.data.show_main_menu = !zzz.data.show_main_menu;
+		if (e.key === '`' && !is_editable(e.target)) {
+			zzz.data.toggle_main_menu();
 			swallow(e);
 		}
 	}}
