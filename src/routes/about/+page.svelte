@@ -15,10 +15,9 @@
 
 <main class="width_md">
 	<section class="box">
-		<header class="box">
-			<h1 class="mt_xl4">{pkg.repo_name}</h1>
+		<header class="box mt_xl4">
+			<Breadcrumb><Svg data={zzz_logo} size="var(--icon_size_sm)" /></Breadcrumb>
 		</header>
-		<Breadcrumb><Svg data={zzz_logo} size="var(--icon_size_sm)" /></Breadcrumb>
 		<p class="mt_xl5">
 			⚠️ early pre-release, see the <a href="https://github.com/ryanatkn/zzz/discussions"
 				>discussions</a
