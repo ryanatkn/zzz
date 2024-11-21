@@ -158,8 +158,8 @@ a.chip {
 	--button_fill: transparent;
 }
 
-.pt_lg {
-	padding-top: var(--space_lg);
+.pt_xl3 {
+	padding-top: var(--space_xl3);
 }
 .px_md {
 	padding-left: var(--space_md);
