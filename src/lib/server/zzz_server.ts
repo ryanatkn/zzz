@@ -45,6 +45,7 @@ export class Zzz_Server {
 
 	filer: Filer;
 
+	// TODO BLOCK make this part of the cached conversation/completion state
 	system_message: string;
 
 	#cleanup_filer: Promise<Cleanup_Watch>;

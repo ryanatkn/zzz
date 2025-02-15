@@ -62,19 +62,22 @@ export const default_models: Array<Model_Json> = [
 		cost_input: 1.1,
 		cost_output: 4.4,
 	},
-	{
-		name: 'o3-mini',
-		agent_name: 'chatgpt',
-		tags: ['reasoning', 'cheap'],
-		cost_input: 1.1,
-		cost_output: 4.4,
-	},
+	// no access :[
+	// {
+	// 	name: 'o3-mini',
+	// 	agent_name: 'chatgpt',
+	// 	tags: ['reasoning', 'cheap'],
+	// 	cost_input: 1.1,
+	// 	cost_output: 4.4,
+	// },
 	{
 		name: 'gemini-2.0-flash-lite-preview-02-05',
 		agent_name: 'gemini',
 		tags: ['cheaper'],
 		context_window: 1_048_576,
 		output_token_limit: 8_192,
+		cost_input: 0.075,
+		cost_output: 0.3,
 		training_cutoff: 'August 2024',
 	},
 	{
@@ -83,6 +86,8 @@ export const default_models: Array<Model_Json> = [
 		tags: ['cheap'],
 		context_window: 1_048_576,
 		output_token_limit: 8_192,
+		cost_input: 0.1,
+		cost_output: 0.4,
 		training_cutoff: 'August 2024',
 	},
 	{name: 'gemini-2.0-pro-exp-02-05', agent_name: 'gemini', tags: ['smart']},
