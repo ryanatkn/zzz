@@ -1,8 +1,4 @@
 <script lang="ts">
-	import Svg from '@ryanatkn/fuz/Svg.svelte';
-	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
-	import {base} from '$app/paths';
-
 	import Multiprompt from '$lib/Multiprompt.svelte';
 	import Prompt_Instance from '$lib/Prompt_Instance.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
@@ -15,11 +11,6 @@
 
 	const agents = $derived(zzz.agents.filter((a) => selected_agent_names.includes(a.name))); // TODO hacky assertion
 </script>
-
-<header class="box">
-	<a href="{base}/"><Svg data={zzz_logo} size="var(--icon_size_xl2)" classes="my_xl5" /></a>
-	chats
-</header>
 
 <section class="dashboard_prompts">
 	<div class="w_100 flex_1">
