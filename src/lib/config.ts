@@ -90,7 +90,13 @@ export const default_models: Array<Model_Json> = [
 		cost_output: 0.4,
 		training_cutoff: 'August 2024',
 	},
-	{name: 'gemini-2.0-pro-exp-02-05', agent_name: 'gemini', tags: ['smart']},
+	{
+		name: 'gemini-2.0-pro-exp-02-05',
+		agent_name: 'gemini',
+		tags: ['smart'],
+		cost_input: 0.15,
+		cost_output: 0.6,
+	}, // TODO input is $0.075, prompts <= 128k tokens, $0.15, prompts > 128k tokens -- output is $0.30, prompts <= 128k tokens, $0.60, prompts > 128k tokens
 	{name: 'gemini-2.0-flash-thinking-exp-01-21', agent_name: 'gemini', tags: ['cheap', 'reasoning']},
 	{name: 'gemini-1.5-pro', agent_name: 'gemini', tags: ['smart']},
 ];
