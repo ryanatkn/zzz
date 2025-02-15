@@ -8,6 +8,11 @@ export interface Model_Json {
 	name: string;
 	agent_name: Agent_Name;
 	tags: Array<string>;
+	context_window?: number;
+	max_output?: number;
+	cost_input?: number;
+	cost_output?: number;
+	training_cutoff?: string;
 }
 
 export interface Model_Options {
