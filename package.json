@@ -1,14 +1,14 @@
 {
   "name": "@ryanatkn/zzz",
   "version": "0.0.1",
-  "description": "bot control hq",
+  "description": "bot control web",
   "motto": "electric buzz",
   "glyph": "💤",
   "logo": "logo.svg",
   "logo_alt": "three sleepy z's",
   "public": true,
   "license": "MIT",
-  "homepage": "https://zzz.ztack.net/",
+  "homepage": "https://www.zzzbot.dev/",
   "repository": "https://github.com/ryanatkn/zzz",
   "author": {
     "name": "Ryan Atkinson",
