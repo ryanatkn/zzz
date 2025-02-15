@@ -51,6 +51,8 @@
 				if (!browser) return;
 				if (!ws) {
 					console.log('[page] creating ws');
+					// TODO extract helper with reconnect logic (and message buffering and what else? rate limiting?)
+					// TODO proxy through normal port? I failed to try to configure with Vite
 					ws = new WebSocket(`ws://${$page.url.hostname}:3000/ws`);
 					console.log('[page] ws', ws);
 					ws.addEventListener('open', () => {

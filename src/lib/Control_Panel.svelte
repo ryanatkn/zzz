@@ -8,6 +8,7 @@
 	// TODO
 </script>
 
-<section>
+<section class="width_sm">
+	<h2>Echo test</h2>
 	<Echo_Form />
 </section>

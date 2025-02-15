@@ -32,7 +32,7 @@
 {#if zzz.data.show_main_menu}
 	<Dialog onclose={() => zzz.toggle_main_menu(false)} layout="page">
 		<div class="pane">
-			<section>
+			<section class="p_xl box">
 				<Settings />
 			</section>
 			<section class="box pb_xl7">
