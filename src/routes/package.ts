@@ -6,7 +6,7 @@ import type {Src_Json} from '@ryanatkn/gro/src_json.js';
 export const package_json = {
 	name: '@ryanatkn/zzz',
 	version: '0.0.1',
-	description: 'bot control hq',
+	description: 'bot control web',
 	motto: 'electric buzz',
 	glyph: '💤',
 	logo: 'logo.svg',
@@ -39,7 +39,7 @@ export const package_json = {
 		'@ryanatkn/belt': '^0.26.0',
 		'@ryanatkn/eslint-config': '^0.5.6',
 		'@ryanatkn/fuz': '^0.130.3',
-		'@ryanatkn/gro': '^0.146.0',
+		'@ryanatkn/gro': '^0.148.0',
 		'@ryanatkn/moss': '^0.20.0',
 		'@sveltejs/adapter-static': '^3.0.6',
 		'@sveltejs/kit': '^2.7.3',

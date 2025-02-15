@@ -10,4 +10,10 @@ export class Zzz_Data {
 			show_main_menu: this.show_main_menu,
 		};
 	}
+
+	// TODO pluggable mutations
+	toggle_main_menu(value: boolean = !this.show_main_menu): boolean {
+		this.show_main_menu = value;
+		return value;
+	}
 }

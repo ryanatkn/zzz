@@ -5,7 +5,6 @@
 
 	import Zzz_Main from '$lib/Zzz_Main.svelte';
 	import {hud_context} from '$lib/hud.svelte.js';
-	import {zzz_context} from '$lib/zzz.svelte.js';
 
 	// TODO remove this after fixing
 	// class:row
@@ -13,15 +12,13 @@
 	// class:icon
 	// class:title
 
-	const zzz = zzz_context.get();
-
 	hud_context.set(hud);
 </script>
 
 <Zzz_Main>
 	<footer class="box py_xl9">
 		<Svg data={zzz_logo} size="var(--icon_size_xl2)" classes="my_xl5" />
-		<p class="mt_xl3">bot control hq</p>
+		<p class="mt_xl3">bot control web</p>
 		<p class="mt_xl3">work in progress</p>
 		{#if !DEV}
 			<p>
