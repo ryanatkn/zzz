@@ -5,12 +5,15 @@
 
 	import Zzz_Main from '$lib/Zzz_Main.svelte';
 	import {hud_context} from '$lib/hud.svelte.js';
+	import {zzz_context} from '$lib/zzz.svelte.js';
 
 	// TODO remove this after fixing
 	// class:row
 	// class:content
 	// class:icon
 	// class:title
+
+	const zzz = zzz_context.get();
 
 	hud_context.set(hud);
 </script>
