@@ -69,6 +69,7 @@ export interface Send_Prompt_Message extends Base_Message {
  */
 export interface Receive_Prompt_Message extends Base_Message {
 	type: 'completion_response';
+	// TODO BLOCK add time somewhere here? `created`?
 	completion_response: Completion_Response;
 }
 

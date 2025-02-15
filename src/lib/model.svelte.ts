@@ -9,7 +9,7 @@ export interface Model_Json {
 	agent_name: Agent_Name;
 	tags: Array<string>;
 	context_window?: number;
-	max_output?: number;
+	output_token_limit?: number;
 	cost_input?: number;
 	cost_output?: number;
 	training_cutoff?: string;
