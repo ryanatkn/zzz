@@ -155,7 +155,6 @@ a.chip {
 .mr_md {
 	margin-right: var(--space_md);
 }
-
 .mt_0 {
 	margin-top: 0;
 }
@@ -215,9 +214,7 @@ a.chip {
 	--button_fill: transparent;
 }
 
-.px_md {
-	padding-left: var(--space_md);
-
+.pr_md {
 	padding-right: var(--space_md);
 }
 .px_lg {

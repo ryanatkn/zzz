@@ -26,8 +26,8 @@ export const default_agents: Array<Agent_Json> = [
 ];
 
 export const default_models: Array<Model_Json> = [
-	{name: 'claude-3-haiku-20240307', agent_name: 'claude', tags: ['cheap']},
-	{name: 'claude-3-5-sonnet-20240620', agent_name: 'claude', tags: ['smart']},
+	{name: 'claude-3-5-haiku-20241022', agent_name: 'claude', tags: ['cheap']},
+	{name: 'claude-3-5-sonnet-20241022', agent_name: 'claude', tags: ['smart']},
 	{name: 'gpt-4o-mini', agent_name: 'chatgpt', tags: ['cheap']},
 	{name: 'gpt-4o', agent_name: 'chatgpt', tags: ['smart']},
 	{name: 'chatgpt-4o-latest', agent_name: 'chatgpt', tags: ['evaluation']},
