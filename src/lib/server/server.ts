@@ -3,6 +3,7 @@ import {serve} from '@hono/node-server';
 import {createNodeWebSocket} from '@hono/node-ws';
 import type {WSContext} from 'hono/ws';
 import * as devalue from 'devalue';
+import {PUBLIC_SERVER_HOSTNAME, PUBLIC_SERVER_PORT} from '$env/static/public';
 
 import {Zzz_Server} from '$lib/server/zzz_server.js';
 import create_config from '$lib/config.js';
@@ -60,9 +61,16 @@ app.get(
 	}),
 );
 
-const server = serve(app, (info) => {
-	console.log('listening on http://localhost:' + info.port);
-});
+const server = serve(
+	{
+		fetch: app.fetch,
+		hostname: PUBLIC_SERVER_HOSTNAME,
+		port: parseInt(PUBLIC_SERVER_PORT, 10) || 8999,
+	},
+	(info) => {
+		console.log(`listening on http://${info.address}:${info.port}`);
+	},
+);
 
 injectWebSocket(server);
 

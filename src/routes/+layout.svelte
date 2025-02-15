@@ -12,8 +12,8 @@
 	import * as devalue from 'devalue';
 	import {create_deferred, type Deferred} from '@ryanatkn/belt/async.js';
 	import {browser} from '$app/environment';
-	import {page} from '$app/stores';
 	import {Unreachable_Error} from '@ryanatkn/belt/error.js';
+	import {PUBLIC_SERVER_HOSTNAME, PUBLIC_SERVER_PORT} from '$env/static/public';
 
 	import {Zzz} from '$lib/zzz.svelte.js';
 	import Zzz_Root from '$lib/Zzz_Root.svelte';
@@ -53,7 +53,7 @@
 					console.log('[page] creating ws');
 					// TODO extract helper with reconnect logic (and message buffering and what else? rate limiting?)
 					// TODO proxy through normal port? I failed to try to configure with Vite
-					ws = new WebSocket(`ws://${$page.url.hostname}:3000/ws`);
+					ws = new WebSocket(`ws://${PUBLIC_SERVER_HOSTNAME}:${PUBLIC_SERVER_PORT}/ws`);
 					console.log('[page] ws', ws);
 					ws.addEventListener('open', () => {
 						console.log('[page] ws.onopen');

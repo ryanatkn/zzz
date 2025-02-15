@@ -1,5 +1,7 @@
 <script lang="ts">
+	import {base} from '$app/paths';
 	import Svg from '@ryanatkn/fuz/Svg.svelte';
+	import Card from '@ryanatkn/fuz/Card.svelte';
 	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
 	import {DEV} from 'esm-env';
 
@@ -20,4 +22,5 @@
 			available in all contexts, but you gotta start somewhere.
 		</p>
 	{/if}
+	<p><Card href="{base}/about" icon="?" align="right">about</Card></p>
 </footer>

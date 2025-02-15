@@ -16,11 +16,11 @@
 		<!-- TODO refactor -->
 		<div class="sidebar absolute t_0 l_0 h_100 w_100 p_md">
 			<nav class="column size_lg">
-				<a href="/" class:selected={page.url.pathname === base + '/'}>home</a>
-				<a href="/chats" class:selected={page.url.pathname === base + '/chats'}>chats</a>
-				<a href="/files" class:selected={page.url.pathname === base + '/files'}>files</a>
-				<a href="/models" class:selected={page.url.pathname === base + '/models'}>models</a>
-				<a href="/system" class:selected={page.url.pathname === base + '/system'}>system</a>
+				<a href="{base}/" class:selected={page.url.pathname === base + '/'}>home</a>
+				<a href="{base}/chats" class:selected={page.url.pathname === base + '/chats'}>chats</a>
+				<a href="{base}/files" class:selected={page.url.pathname === base + '/files'}>files</a>
+				<a href="{base}/models" class:selected={page.url.pathname === base + '/models'}>models</a>
+				<a href="{base}/system" class:selected={page.url.pathname === base + '/system'}>system</a>
 			</nav>
 		</div>
 	</div>
