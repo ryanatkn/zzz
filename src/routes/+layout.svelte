@@ -144,10 +144,10 @@
 	]}
 />
 
-<Zzz_Root {zzz}>
-	<Themed>
-		<Contextmenu_Root>
+<Themed>
+	<Contextmenu_Root>
+		<Zzz_Root {zzz}>
 			{@render children()}
-		</Contextmenu_Root>
-	</Themed>
-</Zzz_Root>
+		</Zzz_Root>
+	</Contextmenu_Root>
+</Themed>

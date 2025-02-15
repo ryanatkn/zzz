@@ -1,53 +1,30 @@
 <script lang="ts">
-	import {zzz_context} from '$lib/zzz.svelte.js';
-	import File_List from '$lib/File_List.svelte';
-	import Multiprompt from '$lib/Multiprompt.svelte';
-	import Prompt_Instance from '$lib/Prompt_Instance.svelte';
-	import type {Agent_Name} from '$lib/agent.svelte.js';
+	import {page} from '$app/state';
+	import {base} from '$app/paths';
+	import type {Snippet} from 'svelte';
 
-	// interface Props {}
+	interface Props {
+		children: Snippet;
+	}
 
-	// const {}: Props = $props();
-
-	const zzz = zzz_context.get();
-
-	// TODO BLOCK get this source of truth right, on the completion_threads, with multi-select as appropriate
-	const selected_agent_names: Array<Agent_Name> = $state(['chatgpt']);
-
-	const agents = $derived(zzz.agents.filter((a) => selected_agent_names.includes(a.name))); // TODO hacky assertion
-
-	const files = $derived(Array.from(zzz.files_by_id.values()).filter((file) => !file.external));
+	const {children}: Props = $props();
 </script>
 
 <!-- TODO drive with data -->
-<section class="dashboard_prompts">
-	<div class="w_100 flex_1">
-		<Multiprompt />
+<div class="flex h_100">
+	<div class="h_100 relative" style:width="200px">
+		<!-- TODO refactor -->
+		<div class="sidebar absolute t_0 l_0 h_100 w_100 p_md">
+			<nav class="column size_lg">
+				<a href="/" class:selected={page.url.pathname === base + '/'}>home</a>
+				<a href="/chats" class:selected={page.url.pathname === base + '/chats'}>chats</a>
+				<a href="/files" class:selected={page.url.pathname === base + '/files'}>files</a>
+				<a href="/models" class:selected={page.url.pathname === base + '/models'}>models</a>
+				<a href="/system" class:selected={page.url.pathname === base + '/system'}>system</a>
+			</nav>
+		</div>
 	</div>
-</section>
-<section class="w_100 flex_1">
-	{#each zzz.completion_threads.all as completion_thread (completion_thread)}
-		<!-- TODO hack just to get stuff onscreen -->
-		<Prompt_Instance agent={completion_thread.agents[0]} />
-		<!-- <p>{completion_thread.id}</p>
-			<p>{completion_thread.agent_name}</p>
-			<p>{completion_thread.created_at}</p> -->
-	{/each}
-</section>
-<section>
-	<button type="button" onclick={() => zzz.completion_threads.create_completion_thread(agents)}
-		>create new completion thread</button
-	>
-</section>
-<section>
-	<File_List {files} />
-</section>
-
-<style>
-	.dashboard_prompts {
-		display: flex;
-		width: 100%;
-		padding: var(--space_md);
-		gap: var(--space_md);
-	}
-</style>
+	<div class="flex_1 h_100">
+		{@render children()}
+	</div>
+</div>

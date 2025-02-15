@@ -12,7 +12,7 @@
 	let echo_text = $state('echo server ⚞');
 
 	const send_echo = () => {
-		zzz.send_echo(echo_text);
+		zzz.send_echo(echo_text || 'ping');
 	};
 
 	// TODO
@@ -24,17 +24,24 @@
 		onkeydown={(e) => {
 			if (e.key === 'Enter') send_echo();
 		}}
+		placeholder="enter text to echo"
 	/>
+	<button
+		type="button"
+		onclick={() => {
+			send_echo();
+		}}>echo</button
+	>
 </div>
 {#if zzz.echos.length > 0}
 	<ul class="unstyled column reverse">
 		{#each zzz.echos as echo (echo)}
 			{@const elapsed = zzz.echo_elapsed.get(echo.id)}
-			<li class="row justify_content_space_between">
-				<div class="ellipsis" style:max-width="200px">{echo.data}</div>
-				<span>
+			<li class="row">
+				<small>
 					{#if elapsed}{elapsed}ms{:else}<Pending_Animation />{/if}
-				</span>
+				</small>
+				<div class="ellipsis pl_md" style:max-width="200px">{echo.data}</div>
 			</li>
 		{/each}
 	</ul>

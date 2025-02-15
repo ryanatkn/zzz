@@ -46,12 +46,30 @@ export const default_models: Array<Model_Json> = [
 		cost_output: 4,
 		training_cutoff: 'July 2024',
 	},
-	{name: 'gpt-4o-mini', agent_name: 'chatgpt', tags: ['cheap'], cost_input: 0.15, cost_output: 0.6},
-	{name: 'gpt-4o', agent_name: 'chatgpt', tags: ['smart'], cost_input: 2.5, cost_output: 10},
+	{
+		name: 'gpt-4o-mini',
+		agent_name: 'chatgpt',
+		tags: ['cheap'],
+		context_window: 128_000,
+		output_token_limit: 16_384,
+		cost_input: 0.15,
+		cost_output: 0.6,
+	},
+	{
+		name: 'gpt-4o',
+		agent_name: 'chatgpt',
+		tags: ['smart'],
+		context_window: 128_000,
+		output_token_limit: 16_384,
+		cost_input: 2.5,
+		cost_output: 10,
+	},
 	{
 		name: 'o1',
 		agent_name: 'chatgpt',
 		tags: ['reasoning', 'smart'],
+		context_window: 200_000,
+		output_token_limit: 100_000,
 		cost_input: 15,
 		cost_output: 60,
 	},
@@ -59,6 +77,8 @@ export const default_models: Array<Model_Json> = [
 		name: 'o1-mini',
 		agent_name: 'chatgpt',
 		tags: ['reasoning', 'cheap'],
+		context_window: 128_000,
+		output_token_limit: 65_536,
 		cost_input: 1.1,
 		cost_output: 4.4,
 	},
@@ -67,6 +87,8 @@ export const default_models: Array<Model_Json> = [
 	// 	name: 'o3-mini',
 	// 	agent_name: 'chatgpt',
 	// 	tags: ['reasoning', 'cheap'],
+	// context_window: 200_000,
+	// output_token_limit: 100_000,
 	// 	cost_input: 1.1,
 	// 	cost_output: 4.4,
 	// },
@@ -98,7 +120,14 @@ export const default_models: Array<Model_Json> = [
 		cost_output: 0.6,
 	}, // TODO input is $0.075, prompts <= 128k tokens, $0.15, prompts > 128k tokens -- output is $0.30, prompts <= 128k tokens, $0.60, prompts > 128k tokens
 	{name: 'gemini-2.0-flash-thinking-exp-01-21', agent_name: 'gemini', tags: ['cheap', 'reasoning']},
-	{name: 'gemini-1.5-pro', agent_name: 'gemini', tags: ['smart']},
+	{
+		name: 'gemini-1.5-pro',
+		agent_name: 'gemini',
+		tags: ['smart'],
+		context_window: 2_000_000,
+		cost_input: 2.5, // $1.25, prompts <= 128k tokens, $2.50, prompts > 128k tokens
+		cost_output: 10, // $5.00, prompts <= 128k tokens, $10.00, prompts > 128k tokens
+	},
 ];
 
 export const SYSTEM_MESSAGE_DEFAULT =

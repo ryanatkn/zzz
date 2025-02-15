@@ -227,11 +227,6 @@ export const package_json = {
 			types: './dist/zzz_data.svelte.d.ts',
 			default: './dist/zzz_data.svelte.js',
 		},
-		'./Zzz_Main.svelte': {
-			types: './dist/Zzz_Main.svelte.d.ts',
-			svelte: './dist/Zzz_Main.svelte',
-			default: './dist/Zzz_Main.svelte',
-		},
 		'./zzz_message.js': {types: './dist/zzz_message.d.ts', default: './dist/zzz_message.js'},
 		'./Zzz_Root.svelte': {
 			types: './dist/Zzz_Root.svelte.d.ts',
@@ -385,7 +380,6 @@ export const src_json = {
 				{name: 'Zzz_Data', kind: 'class'},
 			],
 		},
-		'./Zzz_Main.svelte': {path: 'Zzz_Main.svelte', declarations: []},
 		'./zzz_message.js': {
 			path: 'zzz_message.ts',
 			declarations: [
