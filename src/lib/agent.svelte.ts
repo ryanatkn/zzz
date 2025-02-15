@@ -11,7 +11,7 @@ export interface Agent_Json {
 
 export interface Agent_Options {
 	data: Agent_Json;
-	all_models: Model[];
+	all_models: Array<Model>;
 }
 
 // TODO BLOCK `Agent` might be the wrong word here, more like Model_Service
@@ -19,7 +19,7 @@ export class Agent {
 	name: Agent_Name = $state()!;
 	icon: string = $state()!;
 	title: string = $state()!;
-	all_models: Model[] = $state()!;
+	all_models: Array<Model> = $state()!;
 	url: string = $state()!;
 
 	models = $derived(this.all_models.filter((m) => m.agent_name === this.name));

@@ -4,7 +4,7 @@
 	import File_View from '$lib/File_View.svelte';
 
 	interface Props {
-		files: Source_File[];
+		files: Array<Source_File>;
 	}
 
 	const {files}: Props = $props();

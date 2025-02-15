@@ -9,7 +9,7 @@ export type Zzz_Config_Creator = () => Zzz_Config;
  * @json
  */
 export interface Zzz_Config {
-	agents: Agent_Json[];
-	models: Model_Json[];
+	agents: Array<Agent_Json>;
+	models: Array<Model_Json>;
 	system_message: string | undefined;
 }

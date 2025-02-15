@@ -29,8 +29,8 @@ export interface Completion_Response {
 				type: 'gemini';
 				value: {
 					text: string;
-					candidates: Google.GenerateContentCandidate[] | null;
-					function_calls: Google.FunctionCall[] | null;
+					candidates: Array<Google.GenerateContentCandidate> | null;
+					function_calls: Array<Google.FunctionCall> | null;
 					prompt_feedback: Google.PromptFeedback | null;
 					usage_metadata: Google.UsageMetadata | null;
 				};

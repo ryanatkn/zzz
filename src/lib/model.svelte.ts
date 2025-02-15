@@ -7,7 +7,7 @@ export type Model_Name = Flavored<string, 'Model'>;
 export interface Model_Json {
 	name: string;
 	agent_name: Agent_Name;
-	tags: string[];
+	tags: Array<string>;
 }
 
 export interface Model_Options {
@@ -17,7 +17,7 @@ export interface Model_Options {
 export class Model {
 	name: Model_Name = $state()!;
 	agent_name: Agent_Name = $state()!;
-	tags: string[] = $state()!;
+	tags: Array<string> = $state()!;
 
 	constructor(options: Model_Options) {
 		const {

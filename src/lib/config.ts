@@ -4,7 +4,7 @@ import type {Model_Json} from '$lib/model.svelte.js';
 
 // TODO refactor - zzz.config.ts
 
-export const default_agents: Agent_Json[] = [
+export const default_agents: Array<Agent_Json> = [
 	{
 		name: 'claude',
 		icon: '',
@@ -25,7 +25,7 @@ export const default_agents: Agent_Json[] = [
 	},
 ];
 
-export const default_models: Model_Json[] = [
+export const default_models: Array<Model_Json> = [
 	{name: 'claude-3-haiku-20240307', agent_name: 'claude', tags: ['cheap']},
 	{name: 'claude-3-5-sonnet-20240620', agent_name: 'claude', tags: ['smart']},
 	{name: 'gpt-4o-mini', agent_name: 'chatgpt', tags: ['cheap']},

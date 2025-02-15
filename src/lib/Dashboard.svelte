@@ -12,7 +12,7 @@
 	const zzz = zzz_context.get();
 
 	// TODO BLOCK get this source of truth right, on the completion_threads, with multi-select as appropriate
-	const selected_agent_names: Agent_Name[] = $state(['chatgpt']);
+	const selected_agent_names: Array<Agent_Name> = $state(['chatgpt']);
 
 	const agents = $derived(zzz.agents.filter((a) => selected_agent_names.includes(a.name))); // TODO hacky assertion
 

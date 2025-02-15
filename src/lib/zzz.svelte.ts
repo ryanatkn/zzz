@@ -21,8 +21,8 @@ import type {Model} from '$lib/model.svelte.js';
 export const zzz_context = create_context<Zzz>();
 
 export interface Zzz_Options {
-	agents: Agent[];
-	models: Model[];
+	agents: Array<Agent>;
+	models: Array<Model>;
 	client: Zzz_Client;
 	completion_threads?: Completion_Threads;
 	data?: Zzz_Data;
@@ -44,13 +44,13 @@ export class Zzz {
 
 	// TODO what APi for these? `Agents` or `Agent_Manager` class?
 	// maybe have the source of truth by an array?
-	agents: Agent[] = $state([]);
+	agents: Array<Agent> = $state([]);
 
-	models: Model[] = $state([]);
+	models: Array<Model> = $state([]);
 
 	files_by_id: SvelteMap<Path_Id, Source_File> = new SvelteMap();
 
-	echos: Echo_Message[] = $state([]);
+	echos: Array<Echo_Message> = $state([]);
 
 	// TODO could track this more formally, and add time tracking
 	pending_prompts: SvelteMap<Id, Deferred<Receive_Prompt_Message>> = new SvelteMap();

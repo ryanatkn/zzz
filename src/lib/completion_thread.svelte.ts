@@ -2,11 +2,11 @@ import type {Agent, Agent_Name} from '$lib/agent.svelte.js';
 import type {Completion_Request, Completion_Response} from '$lib/completion.js';
 
 export interface Completion_Threads_Json {
-	completion_threads: Completion_Thread_Json[];
+	completion_threads: Array<Completion_Thread_Json>;
 }
 
 export interface Completion_Threads_Options {
-	agents: Agent[];
+	agents: Array<Agent>;
 }
 
 export interface Completion_Thread_History_Item {
@@ -22,9 +22,9 @@ export class Completion_Threads {
 	// TODO maybe a global history?
 	// history: Completion_Thread_History_Item[] = $state([]); // TODO does this make sense anymore, to have the full history in addition to the child completion_threads?
 
-	all: Completion_Thread[] = $state([]);
+	all: Array<Completion_Thread> = $state([]);
 
-	agents: Agent[] = $state()!;
+	agents: Array<Agent> = $state()!;
 
 	constructor({agents}: Completion_Threads_Options) {
 		this.agents = agents;
@@ -50,7 +50,7 @@ export class Completion_Threads {
 		);
 	}
 
-	create_completion_thread(agents: Agent[] = this.agents): Completion_Thread {
+	create_completion_thread(agents: Array<Agent> = this.agents): Completion_Thread {
 		const completion_thread = new Completion_Thread({agents});
 		this.all.push(completion_thread);
 		return completion_thread;
@@ -73,18 +73,18 @@ export class Completion_Threads {
 }
 
 export interface Completion_Thread_Json {
-	history: Completion_Thread_History_Item[];
+	history: Array<Completion_Thread_History_Item>;
 }
 
 export interface Completion_Thread_Options {
-	agents: Agent[];
+	agents: Array<Agent>;
 }
 
 export class Completion_Thread {
 	// TODO look up these agents based on all of the agents in `history`
-	agents: Agent[] = $state()!; // handles a group conversation
+	agents: Array<Agent> = $state()!; // handles a group conversation
 
-	history: Completion_Thread_History_Item[] = $state([]);
+	history: Array<Completion_Thread_History_Item> = $state([]);
 
 	// TODO move to an `Agents` or `Agent_Manager` class?
 	// TODO more efficient data structures?
