@@ -34,7 +34,7 @@
 <div class="chat">
 	<div class="items">
 		<!-- {#if query && items} -->
-		<ul>
+		<ul class="unstyled">
 			{#each items as thread (thread)}
 				{#each thread.history as item (item)}
 					<Chat_Item {thread} {item} />
