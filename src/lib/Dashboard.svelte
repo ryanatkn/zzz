@@ -1,4 +1,6 @@
 <script lang="ts">
+	import Nav_Link from './Nav_Link.svelte';
+
 	import {page} from '$app/state';
 	import {base} from '$app/paths';
 	import type {Snippet} from 'svelte';
@@ -17,16 +19,22 @@
 	<div class="h_100 relative" style:width="200px">
 		<!-- TODO refactor -->
 		<div class="sidebar absolute t_0 l_0 h_100 w_100 p_md">
-			<nav>
-				<!-- TODO what else? pages? data/cells? lists? (specialization of "cells"/"data") -->
-				<a href="{base}/" class:selected={page.url.pathname === base + '/'} title="home">
-					<Svg data={zzz_logo} size="var(--icon_size_md)" />
-				</a>
-			</nav>
 			<nav class="column size_lg">
+				<div class="flex mb_sm">
+					<Nav_Link
+						href="{base}/"
+						attrs={{
+							title: 'home',
+							style: 'width: auto; background: transparent',
+							class: 'click_effect_scale',
+						}}
+					>
+						<Svg data={zzz_logo} size="var(--icon_size_md)" />
+					</Nav_Link>
+				</div>
 				<!-- Content -->
-				<a href="{base}/chats" class:selected={page.url.pathname === base + '/chats'}>chats</a>
-				<a href="{base}/files" class:selected={page.url.pathname === base + '/files'}>files</a>
+				<Nav_Link href="{base}/chats">chats</Nav_Link>
+				<Nav_Link href="{base}/files">files</Nav_Link>
 				<!-- <a href="{base}/pages" class:selected={page.url.pathname === base + '/pages'}>pages</a>
 				<a href="{base}/lists" class:selected={page.url.pathname === base + '/lists'}>lists</a>
 				<a href="{base}/posts" class:selected={page.url.pathname === base + '/posts'}>posts</a>
@@ -39,10 +47,8 @@
 
 				<!-- AI Tools -->
 				<h3 class="mb_xs">AI</h3>
-				<a href="{base}/providers" class:selected={page.url.pathname === base + '/providers'}
-					>providers</a
-				>
-				<a href="{base}/models" class:selected={page.url.pathname === base + '/models'}>models</a>
+				<Nav_Link href="{base}/providers">providers</Nav_Link>
+				<Nav_Link href="{base}/models">models</Nav_Link>
 				<!-- <a href="{base}/experiments" class:selected={page.url.pathname === base + '/experiments'}
 					>experiments</a
 				>
@@ -50,9 +56,9 @@
 
 				<!-- System -->
 				<h3 class="mb_xs">System</h3>
-				<a href="{base}/about" class:selected={page.url.pathname === base + '/about'}>about</a>
+				<Nav_Link href="{base}/about">about</Nav_Link>
 				<!-- TODO capabilities - server, API keys for the 3 services -->
-				<a href="{base}/system" class:selected={page.url.pathname === base + '/system'}>settings</a>
+				<Nav_Link href="{base}/settings">settings</Nav_Link>
 			</nav>
 		</div>
 	</div>

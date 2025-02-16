@@ -98,6 +98,9 @@ a.chip {
 .mb_lg {
 	margin-bottom: var(--space_lg);
 }
+.mb_sm {
+	margin-bottom: var(--space_sm);
+}
 .mb_xl5 {
 	margin-bottom: var(--space_xl5);
 }
