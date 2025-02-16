@@ -51,6 +51,7 @@
 				<!-- System -->
 				<h3 class="mb_xs">System</h3>
 				<a href="{base}/about" class:selected={page.url.pathname === base + '/about'}>about</a>
+				<!-- TODO capabilities - server, API keys for the 3 services -->
 				<a href="{base}/system" class:selected={page.url.pathname === base + '/system'}>settings</a>
 			</nav>
 		</div>
