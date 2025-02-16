@@ -36,7 +36,7 @@
 />
 
 <Hud_Root>
-	<!-- TODO pages should be able to control the full page -->
+	<!-- TODO user-defined pages should be able to control the full page at runtime -->
 	<Dashboard>
 		<main>
 			{@render children(zzz)}
