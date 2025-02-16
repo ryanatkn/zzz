@@ -66,6 +66,13 @@ a.chip {
 .font_mono {
 	font-family: var(--font_mono);
 }
+
+/* Formats content to wrap long strings and preserve displayed whitespace. */
+.formatted {
+	overflow: hidden;
+	white-space: break-spaces;
+}
+
 .h_100 {
 	height: 100%;
 }

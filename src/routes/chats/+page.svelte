@@ -3,6 +3,7 @@
 	import Prompt_Instance from '$lib/Prompt_Instance.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import type {Agent_Name} from '$lib/agent.svelte.js';
+	import Chat from '$lib/Chat.svelte';
 
 	const zzz = zzz_context.get();
 
@@ -10,8 +11,15 @@
 	const selected_agent_names: Array<Agent_Name> = $state(['chatgpt']);
 
 	const agents = $derived(zzz.agents.filter((a) => selected_agent_names.includes(a.name))); // TODO hacky assertion
+
+	// TODO BLOCK do the `Chat` integration correctly
 </script>
 
+<section>
+	{#each zzz.completion_threads.all as completion_thread (completion_thread)}
+		<Chat items={zzz.completion_threads.all} />
+	{/each}
+</section>
 <section class="dashboard_prompts">
 	<div class="w_100 flex_1">
 		<Multiprompt />

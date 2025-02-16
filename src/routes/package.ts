@@ -45,6 +45,7 @@ export const package_json = {
 		'@sveltejs/kit': '^2.17.2',
 		'@sveltejs/package': '^2.3.10',
 		'@sveltejs/vite-plugin-svelte': '^4.0.0',
+		'date-fns': '^4.1.0',
 		devalue: '^5.1.1',
 		eslint: '^9.20.1',
 		'eslint-plugin-svelte': '^2.46.1',
@@ -87,6 +88,16 @@ export const package_json = {
 			default: './dist/Agent_View.svelte',
 		},
 		'./agent.svelte.js': {types: './dist/agent.svelte.d.ts', default: './dist/agent.svelte.js'},
+		'./Chat_Item.svelte': {
+			types: './dist/Chat_Item.svelte.d.ts',
+			svelte: './dist/Chat_Item.svelte',
+			default: './dist/Chat_Item.svelte',
+		},
+		'./Chat.svelte': {
+			types: './dist/Chat.svelte.d.ts',
+			svelte: './dist/Chat.svelte',
+			default: './dist/Chat.svelte',
+		},
 		'./completion_state.svelte.js': {
 			types: './dist/completion_state.svelte.d.ts',
 			default: './dist/completion_state.svelte.js',
@@ -195,6 +206,11 @@ export const package_json = {
 			svelte: './dist/Multiprompt.svelte',
 			default: './dist/Multiprompt.svelte',
 		},
+		'./Nav_Link.svelte': {
+			types: './dist/Nav_Link.svelte.d.ts',
+			svelte: './dist/Nav_Link.svelte',
+			default: './dist/Nav_Link.svelte',
+		},
 		'./path.js': {types: './dist/path.d.ts', default: './dist/path.js'},
 		'./Prompt_Agent_Form.svelte': {
 			types: './dist/Prompt_Agent_Form.svelte.d.ts',
@@ -254,6 +270,8 @@ export const src_json = {
 				{name: 'Agent', kind: 'class'},
 			],
 		},
+		'./Chat_Item.svelte': {path: 'Chat_Item.svelte', declarations: []},
+		'./Chat.svelte': {path: 'Chat.svelte', declarations: []},
 		'./completion_state.svelte.js': {path: 'completion_state.svelte.ts', declarations: []},
 		'./Completion_Thread_Info.svelte': {path: 'Completion_Thread_Info.svelte', declarations: []},
 		'./Completion_Thread_Summary.svelte': {
@@ -341,6 +359,7 @@ export const src_json = {
 			],
 		},
 		'./Multiprompt.svelte': {path: 'Multiprompt.svelte', declarations: []},
+		'./Nav_Link.svelte': {path: 'Nav_Link.svelte', declarations: []},
 		'./path.js': {path: 'path.ts', declarations: [{name: 'to_root_path', kind: 'function'}]},
 		'./Prompt_Agent_Form.svelte': {path: 'Prompt_Agent_Form.svelte', declarations: []},
 		'./Prompt_Instance.svelte': {path: 'Prompt_Instance.svelte', declarations: []},

@@ -49,6 +49,7 @@
     "@sveltejs/kit": "^2.17.2",
     "@sveltejs/package": "^2.3.10",
     "@sveltejs/vite-plugin-svelte": "^4.0.0",
+    "date-fns": "^4.1.0",
     "devalue": "^5.1.1",
     "eslint": "^9.20.1",
     "eslint-plugin-svelte": "^2.46.1",
@@ -106,6 +107,16 @@
     "./agent.svelte.js": {
       "types": "./dist/agent.svelte.d.ts",
       "default": "./dist/agent.svelte.js"
+    },
+    "./Chat_Item.svelte": {
+      "types": "./dist/Chat_Item.svelte.d.ts",
+      "svelte": "./dist/Chat_Item.svelte",
+      "default": "./dist/Chat_Item.svelte"
+    },
+    "./Chat.svelte": {
+      "types": "./dist/Chat.svelte.d.ts",
+      "svelte": "./dist/Chat.svelte",
+      "default": "./dist/Chat.svelte"
     },
     "./completion_state.svelte.js": {
       "types": "./dist/completion_state.svelte.d.ts",
@@ -232,6 +243,11 @@
       "types": "./dist/Multiprompt.svelte.d.ts",
       "svelte": "./dist/Multiprompt.svelte",
       "default": "./dist/Multiprompt.svelte"
+    },
+    "./Nav_Link.svelte": {
+      "types": "./dist/Nav_Link.svelte.d.ts",
+      "svelte": "./dist/Nav_Link.svelte",
+      "default": "./dist/Nav_Link.svelte"
     },
     "./path.js": {
       "types": "./dist/path.d.ts",
