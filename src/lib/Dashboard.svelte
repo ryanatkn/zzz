@@ -57,6 +57,7 @@
 				<h3 class="mb_xs">System</h3>
 				<Nav_Link href="{base}/about">about</Nav_Link>
 				<Nav_Link href="{base}/capabilities">capabilities</Nav_Link>
+				<!-- TODO more - terminal, account -->
 				<Nav_Link href="{base}/settings">settings</Nav_Link>
 			</nav>
 		</div>
