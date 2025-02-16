@@ -77,18 +77,18 @@ export class Zzz_Server {
 	}
 
 	// TODO add an abstraction here, so the server isn't concerned with message content/types
-	async receive(request: Client_Message): Promise<Server_Message | null> {
-		console.log(`[zzz_server.receive] message`, request.id, request.type);
-		switch (request.type) {
+	async receive(message: Client_Message): Promise<Server_Message | null> {
+		console.log(`[zzz_server.receive] message`, message.id, message.type);
+		switch (message.type) {
 			case 'echo': {
 				// await wait(1000);
-				return request;
+				return message;
 			}
 			case 'load_session': {
 				return {id: random_id(), type: 'loaded_session', data: {files: this.filer.files}};
 			}
 			case 'send_prompt': {
-				const {prompt, agent_name, model} = request.completion_request;
+				const {prompt, agent_name, model} = message.completion_request;
 
 				let response: Receive_Prompt_Message;
 
@@ -109,7 +109,7 @@ export class Zzz_Server {
 							type: 'completion_response',
 							completion_response: {
 								created: new Date().toISOString(),
-								request_id: request.id,
+								request_id: message.id,
 								agent_name,
 								model,
 								data: {type: 'claude', value: api_response},
@@ -132,7 +132,7 @@ export class Zzz_Server {
 							type: 'completion_response',
 							completion_response: {
 								created: new Date().toISOString(),
-								request_id: request.id,
+								request_id: message.id,
 								agent_name,
 								model,
 								data: {type: 'chatgpt', value: api_response},
@@ -154,7 +154,7 @@ export class Zzz_Server {
 							type: 'completion_response',
 							completion_response: {
 								created: new Date().toISOString(),
-								request_id: request.id,
+								request_id: message.id,
 								agent_name,
 								model,
 								data: {
@@ -179,19 +179,19 @@ export class Zzz_Server {
 
 				// don't need to wait for this to finish,
 				// the expected file event is now independent of the request
-				void save_response(request, response, this.zzz_dir);
+				void save_response(message, response, this.zzz_dir);
 
 				console.log(`got ${agent_name} message`, response.completion_response.data);
 
 				return response; // TODO @many sending the text again is wasteful, need ids
 			}
 			case 'update_file': {
-				const {file_id, contents} = request;
+				const {file_id, contents} = message;
 				write_file_in_root_dir(file_id, contents, this.filer.root_dir);
 				return null;
 			}
 			default:
-				throw new Unreachable_Error(request);
+				throw new Unreachable_Error(message);
 		}
 	}
 
@@ -212,7 +212,7 @@ const save_response = async (
 
 	const path = join(dir, filename);
 
-	const json = {request, response}; // TODO type?
+	const json = {request, response}; // TODO BLOCK type - include the id on each
 
 	await write_json(path, json);
 };
