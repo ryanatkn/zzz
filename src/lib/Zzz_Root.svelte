@@ -36,6 +36,7 @@
 />
 
 <Hud_Root>
+	<!-- TODO pages should be able to control the full page -->
 	<Dashboard>
 		<main>
 			{@render children(zzz)}
