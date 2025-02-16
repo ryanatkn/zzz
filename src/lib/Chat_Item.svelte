@@ -1,8 +1,14 @@
 <script lang="ts">
 	import {format} from 'date-fns';
 
+	import type {
+		Completion_Thread,
+		Completion_Thread_History_Item,
+	} from '$lib/completion_thread.svelte.js';
+
 	interface Props {
-		item: any; // TODO BLOCK
+		thread: Completion_Thread;
+		item: Completion_Thread_History_Item;
 	}
 
 	const {item}: Props = $props();
@@ -18,9 +24,9 @@
 	<div class="content">
 		<div class="signature">
 			<!-- <Actor_Avatar {actor} show_icon={false} /> -->
-			<small>{format(item.created, 'MMM d, p')}</small>
+			<small>{format(item.completion_request.created, 'MMM d, p')}</small>
 		</div>
-		<div class="formatted">{item.text}</div>
+		<div class="formatted">{item.completion_response.data.value.text}</div>
 	</div>
 </li>
 

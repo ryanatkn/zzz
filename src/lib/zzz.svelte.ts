@@ -84,6 +84,7 @@ export class Zzz {
 			id: request_id,
 			type: 'send_prompt',
 			completion_request: {
+				created: new Date().toISOString(),
 				request_id,
 				agent_name: agent.name,
 				model,

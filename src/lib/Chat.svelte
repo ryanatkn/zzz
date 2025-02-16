@@ -1,8 +1,9 @@
 <script lang="ts">
 	import Chat_Item from '$lib/Chat_Item.svelte';
+	import type {Completion_Thread} from '$lib/completion_thread.svelte.js';
 
 	interface Props {
-		items: Array<any>; // TODO BLOCK
+		items: Array<Completion_Thread>;
 	}
 
 	const {items}: Props = $props();
@@ -34,8 +35,10 @@
 	<div class="items">
 		<!-- {#if query && items} -->
 		<ul>
-			{#each items as item (item)}
-				<Chat_Item {item} />
+			{#each items as thread (thread)}
+				{#each thread.history as item (item)}
+					<Chat_Item {thread} {item} />
+				{/each}
 			{/each}
 		</ul>
 		<!-- <Load_More_Button {query} /> -->

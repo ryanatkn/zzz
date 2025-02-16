@@ -72,8 +72,4 @@
 	:global(body, html) {
 		height: 100%;
 	}
-
-	a {
-		display: flex;
-	}
 </style>

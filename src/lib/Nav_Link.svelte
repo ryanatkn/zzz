@@ -12,19 +12,29 @@
 	const {href, attrs, children}: Props = $props();
 
 	const selected = $derived(page.url.pathname === href);
+
+	// TODO link styles should have focus always be blue, and active should be thicker
 </script>
 
-<a {...attrs} {href} class:selected class:menu_item={true}>{@render children()}</a>
+<a {...attrs} {href} class:selected>{@render children()}</a>
 
 <style>
 	a {
+		display: flex;
 		padding: var(--space_xs2) var(--space_md);
 		text-decoration: none;
+		border: var(--border_width_2) var(--border_style) transparent;
+		color: var(--text_color_2);
 	}
 	a:hover {
-		background-color: var(--fg_2);
+		/* TODO probably add up to `border_color_5` */
+		border-color: var(--border_color_5);
+	}
+	a:active {
+		border-color: var(--border_color_a);
 	}
 	a.selected {
-		background-color: var(--fg_1);
+		border-color: var(--border_color_a);
+		color: var(--color_a_6);
 	}
 </style>

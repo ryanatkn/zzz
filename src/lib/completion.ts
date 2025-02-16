@@ -6,6 +6,7 @@ import type {Agent_Name} from '$lib/agent.svelte.js';
 import type {Id} from '$lib/id.js';
 
 export interface Completion_Request {
+	created: string;
 	request_id: Id;
 	agent_name: Agent_Name;
 	model: string;
@@ -14,6 +15,7 @@ export interface Completion_Request {
 }
 
 export interface Completion_Response {
+	created: string;
 	request_id: Id;
 	agent_name: Agent_Name;
 	model: string;

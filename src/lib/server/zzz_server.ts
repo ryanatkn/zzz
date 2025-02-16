@@ -108,6 +108,7 @@ export class Zzz_Server {
 							id: random_id(),
 							type: 'completion_response',
 							completion_response: {
+								created: new Date().toISOString(),
 								request_id: request.id,
 								agent_name,
 								model,
@@ -130,6 +131,7 @@ export class Zzz_Server {
 							id: random_id(),
 							type: 'completion_response',
 							completion_response: {
+								created: new Date().toISOString(),
 								request_id: request.id,
 								agent_name,
 								model,
@@ -151,6 +153,7 @@ export class Zzz_Server {
 							id: random_id(),
 							type: 'completion_response',
 							completion_response: {
+								created: new Date().toISOString(),
 								request_id: request.id,
 								agent_name,
 								model,
