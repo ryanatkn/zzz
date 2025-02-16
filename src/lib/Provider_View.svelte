@@ -5,39 +5,39 @@
 	import {contextmenu_action} from '@ryanatkn/fuz/contextmenu_state.svelte.js';
 	import type {Component} from 'svelte';
 
-	import Agent_Info from '$lib/Agent_Info.svelte';
-	import Agent_Summary from '$lib/Agent_Summary.svelte';
-	import type {Agent} from '$lib/agent.svelte.js';
+	import Provider_Info from '$lib/Provider_Info.svelte';
+	import Provider_Summary from '$lib/Provider_Summary.svelte';
+	import type {Provider} from '$lib/provider.svelte.js';
 
 	interface Props {
-		// TODO more efficient data structures, reactive source agents
-		agent: Agent;
+		// TODO more efficient data structures, reactive source providers
+		provider: Provider;
 	}
 
-	const {agent}: Props = $props();
+	const {provider}: Props = $props();
 
 	let show_more = $state(false);
 
 	// TODO lazy loading
-	const components: Record<typeof view_with, Component<{agent: Agent}>> = {
-		summary: Agent_Summary,
-		info: Agent_Info,
+	const components: Record<typeof view_with, Component<{provider: Provider}>> = {
+		summary: Provider_Summary,
+		info: Provider_Info,
 	} as const;
 
 	// TODO refactor
 	let view_with: 'summary' | 'info' = $state('summary');
-	const Agent_View_Component = $derived(components[view_with]);
+	const Provider_View_Component = $derived(components[view_with]);
 </script>
 
-<div class="agent_view" use:contextmenu_action={contextmenu_entries}>
-	<Agent_View_Component {agent} />
+<div class="provider_view" use:contextmenu_action={contextmenu_entries}>
+	<Provider_View_Component {provider} />
 </div>
 
 {#if show_more}
 	<Dialog onclose={() => (show_more = false)}>
 		<!-- TODO expand width, might need to change `Dialog` -->
 		<div class="bg p_md radius_sm width_md">
-			<Agent_Info {agent} />
+			<Provider_Info {provider} />
 			<button type="button" onclick={() => (show_more = false)}>close</button>
 		</div>
 	</Dialog>
@@ -51,11 +51,11 @@
 		}}
 	>
 		{#snippet icon()}🪄{/snippet}
-		<span>{agent.title}</span>
+		<span>{provider.title}</span>
 	</Contextmenu_Entry>
 	<Contextmenu_Submenu>
 		{#snippet icon()}>{/snippet}
-		View agent with
+		View provider with
 		{#snippet menu()}
 			<!-- TODO `disabled` property to the entry -->
 			<Contextmenu_Entry run={() => (view_with = 'summary')}>
@@ -71,7 +71,7 @@
 {/snippet}
 
 <style>
-	.agent_view {
+	.provider_view {
 		/* TODO or should this be optional in a `classes` prop? */
 		width: 100%;
 		overflow: auto;

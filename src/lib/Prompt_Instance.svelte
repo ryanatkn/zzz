@@ -2,14 +2,14 @@
 	import Pending_Button from '@ryanatkn/fuz/Pending_Button.svelte';
 
 	import {zzz_context} from '$lib/zzz.svelte.js';
-	import Agent_View from '$lib/Agent_View.svelte';
-	import type {Agent} from '$lib/agent.svelte.js';
+	import Provider_View from '$lib/Provider_View.svelte';
+	import type {Provider} from '$lib/provider.svelte.js';
 
 	interface Props {
-		agent: Agent;
+		provider: Provider;
 	}
 
-	const {agent}: Props = $props();
+	const {provider}: Props = $props();
 
 	// TODO BLOCK name with `Multiprompt` and `Completion_Thread_View`, maybe `Completion_Thread_Item`?
 
@@ -26,7 +26,7 @@
 		pending = true;
 		// TODO BLOCK create an object locally that doesn't have its response yet, has the request
 		// use its toJSON in the server
-		await zzz.send_prompt(text, agent, agent.selected_model_name); // TODO `agent.selected_model_name` needs to be granular per instance
+		await zzz.send_prompt(text, provider, provider.selected_model_name); // TODO `provider.selected_model_name` needs to be granular per instance
 		pending = false;
 		if (text === value) value = '';
 	};
@@ -47,5 +47,5 @@
 	send prompt ⚟
 </Pending_Button>
 <div class="w_100 flex py_lg">
-	<Agent_View {agent} />
+	<Provider_View {provider} />
 </div>

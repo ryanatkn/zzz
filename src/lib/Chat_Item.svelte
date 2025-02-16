@@ -6,15 +6,15 @@
 		Completion_Thread_History_Item,
 	} from '$lib/completion_thread.svelte.js';
 	import Completion_Thread_Summary from '$lib/Completion_Thread_Summary.svelte';
-	import type {Agent} from '$lib/agent.svelte.js';
+	import type {Provider} from '$lib/provider.svelte.js';
 
 	interface Props {
-		agent: Agent;
+		provider: Provider;
 		completion_thread: Completion_Thread;
 		item: Completion_Thread_History_Item;
 	}
 
-	const {agent, completion_thread, item}: Props = $props();
+	const {provider, completion_thread, item}: Props = $props();
 
 	$inspect('Chat_Item item', item);
 </script>
@@ -30,7 +30,7 @@
 			<small>{format(item.completion_request.created, 'MMM d, p')}</small>
 		</div>
 		<div class="formatted">
-			<Completion_Thread_Summary {agent} {completion_thread} />
+			<Completion_Thread_Summary {provider} {completion_thread} />
 		</div>
 	</div>
 </li>

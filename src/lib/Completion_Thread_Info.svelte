@@ -1,16 +1,16 @@
 <script lang="ts">
-	import type {Agent} from '$lib/agent.svelte.js';
+	import type {Provider} from '$lib/provider.svelte.js';
 	import type {
 		Completion_Thread,
 		Completion_Thread_History_Item,
 	} from '$lib/completion_thread.svelte.js';
 
 	interface Props {
-		agent: Agent;
+		provider: Provider;
 		completion_thread: Completion_Thread;
 	}
 
-	const {agent, completion_thread}: Props = $props();
+	const {provider, completion_thread}: Props = $props();
 
 	// TODO hardcoded to one history item
 	const history_item = $derived(
@@ -24,5 +24,5 @@
 {#if completion_request}
 	<pre>{completion_request.prompt}</pre>
 {/if}
-<h3>response from {agent.title} (@{agent.name})</h3>
+<h3>response from {provider.title} (@{provider.name})</h3>
 <pre>{JSON.stringify(completion_response, null, '\t')}</pre>

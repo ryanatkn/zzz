@@ -20,7 +20,7 @@
 	<div class="h_100 relative" style:width="var(--sidebar_width)">
 		<!-- TODO refactor -->
 		<div class="absolute t_0 l_0 h_100 w_100 p_lg">
-			<nav class="column size_lg fg_1 radius_xs p_md">
+			<nav class="panel column size_lg p_md">
 				<div class="flex mb_sm">
 					<Nav_Link
 						href="{base}/"
@@ -53,7 +53,7 @@
 				<!-- <a href="{base}/experiments" class:selected={page.url.pathname === base + '/experiments'}
 					>experiments</a
 				>
-				<a href="{base}/agents" class:selected={page.url.pathname === base + '/agents'}>agents</a> -->
+				<a href="{base}/providers" class:selected={page.url.pathname === base + '/providers'}>providers</a> -->
 
 				<!-- System -->
 				<h3 class="mb_xs">System</h3>

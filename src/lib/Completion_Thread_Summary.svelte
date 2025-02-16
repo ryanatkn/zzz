@@ -1,18 +1,18 @@
 <script lang="ts">
 	import {unreachable} from '@ryanatkn/belt/error.js';
 
-	import type {Agent} from '$lib/agent.svelte.js';
+	import type {Provider} from '$lib/provider.svelte.js';
 	import type {
 		Completion_Thread,
 		Completion_Thread_History_Item,
 	} from '$lib/completion_thread.svelte.js';
 
 	interface Props {
-		agent: Agent;
+		provider: Provider;
 		completion_thread: Completion_Thread;
 	}
 
-	const {agent, completion_thread}: Props = $props();
+	const {provider, completion_thread}: Props = $props();
 
 	// TODO hardcoded to one history item
 	const history_item = $derived(
@@ -27,7 +27,7 @@
 {/if}
 {#if completion_response}
 	<p>
-		@{agent.title}: {#if completion_response.data.type === 'claude'}
+		@{provider.title}: {#if completion_response.data.type === 'claude'}
 			{#each completion_response.data.value.content as item (item)}
 				{#if item.type === 'text'}
 					{item.text}

@@ -20,7 +20,7 @@
 	import {pkg_context} from '$routes/pkg.js';
 	import {package_json, src_json} from '$routes/package.js';
 	import {Zzz_Client} from '$lib/zzz_client.js';
-	import {Agent} from '$lib/agent.svelte.js';
+	import {Provider} from '$lib/provider.svelte.js';
 	import {random_id} from '$lib/id.js';
 	import create_zzz_config from '$lib/config.js';
 	import {Model} from '$lib/model.svelte.js';
@@ -44,7 +44,7 @@
 
 	// gives app-wide support for Zzz
 	const zzz = new Zzz({
-		agents: zzz_config.agents.map((data) => new Agent({data, all_models: models})),
+		providers: zzz_config.providers.map((data) => new Provider({data, all_models: models})),
 		models,
 		client: new Zzz_Client({
 			send: async (message) => {
@@ -111,7 +111,7 @@
 	});
 	if (browser) (window as any).zzz = zzz;
 
-	$inspect('agents', zzz.agents);
+	$inspect('providers', zzz.providers);
 
 	// zzz.send({type: 'echo', data: 'echo from client'});
 	zzz.client.send({id: random_id(), type: 'load_session'});

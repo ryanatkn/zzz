@@ -2,13 +2,13 @@ import type Anthropic from '@anthropic-ai/sdk';
 import type OpenAI from 'openai';
 import type * as Google from '@google/generative-ai';
 
-import type {Agent_Name} from '$lib/agent.svelte.js';
+import type {Provider_Name} from '$lib/provider.svelte.js';
 import type {Id} from '$lib/id.js';
 
 export interface Completion_Request {
 	created: string;
 	request_id: Id;
-	agent_name: Agent_Name;
+	provider_name: Provider_Name;
 	model: string;
 	// TODO BLOCK `prompt` should be a `Prompt` type
 	prompt: string;
@@ -17,7 +17,7 @@ export interface Completion_Request {
 export interface Completion_Response {
 	created: string;
 	request_id: Id;
-	agent_name: Agent_Name;
+	provider_name: Provider_Name;
 	model: string;
 	data:
 		| {type: 'claude'; value: Anthropic.Messages.Message}

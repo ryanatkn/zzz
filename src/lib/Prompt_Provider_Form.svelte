@@ -1,15 +1,15 @@
 <script lang="ts">
 	import Pending_Button from '@ryanatkn/fuz/Pending_Button.svelte';
 
-	import type {Agent} from '$lib/agent.svelte.js';
+	import type {Provider} from '$lib/provider.svelte.js';
 
 	interface Props {
-		agent: Agent;
+		provider: Provider;
 		onsubmit: (value: string) => void;
 		pending: boolean;
 	}
 
-	const {agent, onsubmit, pending}: Props = $props();
+	const {provider, onsubmit, pending}: Props = $props();
 
 	let value = $state('');
 
@@ -29,5 +29,5 @@
 		onsubmit(value);
 	}}
 >
-	prompt {agent.title}
+	prompt {provider.title}
 </Pending_Button>

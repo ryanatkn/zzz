@@ -1,4 +1,4 @@
-import type {Agent, Agent_Name} from '$lib/agent.svelte.js';
+import type {Provider, Provider_Name} from '$lib/provider.svelte.js';
 import type {Completion_Request, Completion_Response} from '$lib/completion.js';
 
 export interface Completion_Threads_Json {
@@ -6,7 +6,7 @@ export interface Completion_Threads_Json {
 }
 
 export interface Completion_Threads_Options {
-	agents: Array<Agent>;
+	providers: Array<Provider>;
 }
 
 export interface Completion_Thread_History_Item {
@@ -14,8 +14,8 @@ export interface Completion_Thread_History_Item {
 	completion_response: Completion_Response;
 }
 
-// Common wrapper around a conversation with a group agent.
-// Groups history across multiple agents and prompts.
+// Common wrapper around a conversation with a group provider.
+// Groups history across multiple providers and prompts.
 // Other single-word names: Log, History, Session, Logbook, Dialogue, Conversation, Chat, Transcript
 // Other names using `Prompt_`: Prompt_Log, Prompt_History, Prompt_Session, Prompt_Logbook, Prompt_Dialogue, Prompt_Conversation, Prompt_Chat, Prompt_Transcript
 export class Completion_Threads {
@@ -24,10 +24,10 @@ export class Completion_Threads {
 
 	all: Array<Completion_Thread> = $state([]);
 
-	agents: Array<Agent> = $state()!;
+	providers: Array<Provider> = $state()!;
 
-	constructor({agents}: Completion_Threads_Options) {
-		this.agents = agents;
+	constructor({providers}: Completion_Threads_Options) {
+		this.providers = providers;
 	}
 
 	toJSON(): Completion_Threads_Json {
@@ -38,8 +38,8 @@ export class Completion_Threads {
 
 	receive_completion_response(request: Completion_Request, response: Completion_Response): void {
 		// TODO we need a `completion_thread.id` I think, this is hacky
-		// TODO multiple? feels like could be more derived, using a `Map` being read from the derived agents from the `history`
-		let completion_thread = this.all.find((t) => t.agents_by_name.get(request.agent_name));
+		// TODO multiple? feels like could be more derived, using a `Map` being read from the derived providers from the `history`
+		let completion_thread = this.all.find((t) => t.providers_by_name.get(request.provider_name));
 		if (!completion_thread) {
 			completion_thread = this.create_completion_thread(); // TODO BLOCK instead of creating new completion_threads, should push to its history
 		}
@@ -50,8 +50,8 @@ export class Completion_Threads {
 		);
 	}
 
-	create_completion_thread(agents: Array<Agent> = this.agents): Completion_Thread {
-		const completion_thread = new Completion_Thread({agents});
+	create_completion_thread(providers: Array<Provider> = this.providers): Completion_Thread {
+		const completion_thread = new Completion_Thread({providers});
 		this.all.push(completion_thread);
 		return completion_thread;
 	}
@@ -60,11 +60,11 @@ export class Completion_Threads {
 	// completion_responses: Receive_Prompt_Message[] = $state([]);
 
 	// TODO efficiently do something like this for fast lookup
-	// pending_prompts_by_agent: Map<Agent, Receive_Prompt_Message[]> = $derived(
+	// pending_prompts_by_provider: Map<Provider, Receive_Prompt_Message[]> = $derived(
 	// 	new Map(
-	// 		this.agents.map((agent) => [
-	// 			agent,
-	// 			this.completion_responses.filter((p) => agent.name === p.agent_name),
+	// 		this.providers.map((provider) => [
+	// 			provider,
+	// 			this.completion_responses.filter((p) => provider.name === p.provider_name),
 	// 		]),
 	// 	),
 	// );
@@ -77,38 +77,38 @@ export interface Completion_Thread_Json {
 }
 
 export interface Completion_Thread_Options {
-	agents: Array<Agent>;
+	providers: Array<Provider>;
 }
 
 export class Completion_Thread {
-	// TODO look up these agents based on all of the agents in `history`
-	agents: Array<Agent> = $state()!; // handles a group conversation
+	// TODO look up these providers based on all of the providers in `history`
+	providers: Array<Provider> = $state()!; // handles a group conversation
 
 	history: Array<Completion_Thread_History_Item> = $state([]);
 
-	// TODO move to an `Agents` or `Agent_Manager` class?
+	// TODO move to an `Providers` or `Provider_Manager` class?
 	// TODO more efficient data structures?
-	agents_by_name: Map<Agent_Name, Agent> = $derived.by(() => {
-		const agents_by_name: Map<Agent_Name, Agent> = new Map();
+	providers_by_name: Map<Provider_Name, Provider> = $derived.by(() => {
+		const providers_by_name: Map<Provider_Name, Provider> = new Map();
 		for (const h of this.history) {
-			const {agent_name} = h.completion_request;
-			if (agents_by_name.has(agent_name)) {
+			const {provider_name} = h.completion_request;
+			if (providers_by_name.has(provider_name)) {
 				continue;
 			}
-			const agent = this.agents.find((a) => a.name === agent_name);
-			if (!agent) {
-				console.error('expected to find agent', agent_name);
+			const provider = this.providers.find((a) => a.name === provider_name);
+			if (!provider) {
+				console.error('expected to find provider', provider_name);
 				continue;
 			}
-			agents_by_name.set(agent_name, agent);
+			providers_by_name.set(provider_name, provider);
 		}
-		console.log(`agents_by_name`, agents_by_name);
-		return agents_by_name;
+		console.log(`providers_by_name`, providers_by_name);
+		return providers_by_name;
 	});
 
-	constructor({agents}: Completion_Thread_Options) {
-		this.agents = agents;
-		console.log('[completion_thread] creating new', agents);
+	constructor({providers}: Completion_Thread_Options) {
+		this.providers = providers;
+		console.log('[completion_thread] creating new', providers);
 	}
 
 	// TODO maybe `completion_thread_id` should be the original id of the `request.id`?

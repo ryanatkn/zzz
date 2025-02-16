@@ -2,13 +2,13 @@
 	import {default_models} from '$lib/config.js';
 </script>
 
-<div class="shadow_inset_top_sm p_lg">
+<div class="p_lg">
 	<h1>Models</h1>
 	<div class="models_grid">
 		{#each default_models as model}
 			<div class="model_card">
 				<h2 class="model_name">{model.name}</h2>
-				<div class="model_agent">{model.agent_name}</div>
+				<div class="model_provider">{model.provider_name}</div>
 				{#if model.tags?.length}
 					<div class="model_tags">
 						{#each model.tags as tag}
@@ -64,7 +64,7 @@
 		margin: 0 0 var(--space_sm);
 	}
 
-	.model_agent {
+	.model_provider {
 		color: var(--text_2);
 		margin-bottom: var(--space_sm);
 	}

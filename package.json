@@ -89,24 +89,24 @@
   ],
   "exports": {
     "./package.json": "./package.json",
-    "./Agent_Info.svelte": {
-      "types": "./dist/Agent_Info.svelte.d.ts",
-      "svelte": "./dist/Agent_Info.svelte",
-      "default": "./dist/Agent_Info.svelte"
+    "./Provider_Info.svelte": {
+      "types": "./dist/Provider_Info.svelte.d.ts",
+      "svelte": "./dist/Provider_Info.svelte",
+      "default": "./dist/Provider_Info.svelte"
     },
-    "./Agent_Summary.svelte": {
-      "types": "./dist/Agent_Summary.svelte.d.ts",
-      "svelte": "./dist/Agent_Summary.svelte",
-      "default": "./dist/Agent_Summary.svelte"
+    "./Provider_Summary.svelte": {
+      "types": "./dist/Provider_Summary.svelte.d.ts",
+      "svelte": "./dist/Provider_Summary.svelte",
+      "default": "./dist/Provider_Summary.svelte"
     },
-    "./Agent_View.svelte": {
-      "types": "./dist/Agent_View.svelte.d.ts",
-      "svelte": "./dist/Agent_View.svelte",
-      "default": "./dist/Agent_View.svelte"
+    "./Provider_View.svelte": {
+      "types": "./dist/Provider_View.svelte.d.ts",
+      "svelte": "./dist/Provider_View.svelte",
+      "default": "./dist/Provider_View.svelte"
     },
-    "./agent.svelte.js": {
-      "types": "./dist/agent.svelte.d.ts",
-      "default": "./dist/agent.svelte.js"
+    "./provider.svelte.js": {
+      "types": "./dist/provider.svelte.d.ts",
+      "default": "./dist/provider.svelte.js"
     },
     "./Chat_Item.svelte": {
       "types": "./dist/Chat_Item.svelte.d.ts",
@@ -253,10 +253,10 @@
       "types": "./dist/path.d.ts",
       "default": "./dist/path.js"
     },
-    "./Prompt_Agent_Form.svelte": {
-      "types": "./dist/Prompt_Agent_Form.svelte.d.ts",
-      "svelte": "./dist/Prompt_Agent_Form.svelte",
-      "default": "./dist/Prompt_Agent_Form.svelte"
+    "./Prompt_Provider_Form.svelte": {
+      "types": "./dist/Prompt_Provider_Form.svelte.d.ts",
+      "svelte": "./dist/Prompt_Provider_Form.svelte",
+      "default": "./dist/Prompt_Provider_Form.svelte"
     },
     "./Prompt_Instance.svelte": {
       "types": "./dist/Prompt_Instance.svelte.d.ts",

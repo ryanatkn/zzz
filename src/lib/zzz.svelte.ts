@@ -13,7 +13,7 @@ import type {
 	Receive_Prompt_Message,
 	Send_Prompt_Message,
 } from '$lib/zzz_message.js';
-import type {Agent} from '$lib/agent.svelte.js';
+import type {Provider} from '$lib/provider.svelte.js';
 import {random_id, type Id} from '$lib/id.js';
 import {Completion_Threads, type Completion_Threads_Json} from '$lib/completion_thread.svelte.js';
 import type {Model} from '$lib/model.svelte.js';
@@ -21,7 +21,7 @@ import type {Model} from '$lib/model.svelte.js';
 export const zzz_context = create_context<Zzz>();
 
 export interface Zzz_Options {
-	agents: Array<Agent>;
+	providers: Array<Provider>;
 	models: Array<Model>;
 	client: Zzz_Client;
 	completion_threads?: Completion_Threads;
@@ -42,9 +42,9 @@ export class Zzz {
 
 	client: Zzz_Client;
 
-	// TODO what APi for these? `Agents` or `Agent_Manager` class?
+	// TODO what APi for these? `Providers` or `Provider_Manager` class?
 	// maybe have the source of truth by an array?
-	agents: Array<Agent> = $state([]);
+	providers: Array<Provider> = $state([]);
 
 	models: Array<Model> = $state([]);
 
@@ -60,14 +60,14 @@ export class Zzz {
 
 	completion_threads: Completion_Threads = $state()!; // TODO should this be an option?
 
-	// TODO store state granularly for each agent
+	// TODO store state granularly for each provider
 
 	constructor(options: Zzz_Options) {
-		const {agents, models, client, data = new Zzz_Data()} = options;
-		this.agents.push(...agents);
+		const {providers, models, client, data = new Zzz_Data()} = options;
+		this.providers.push(...providers);
 		this.models.push(...models);
 		this.client = client;
-		this.completion_threads = options.completion_threads ?? new Completion_Threads({agents});
+		this.completion_threads = options.completion_threads ?? new Completion_Threads({providers});
 		this.data = data;
 	}
 
@@ -78,7 +78,11 @@ export class Zzz {
 		};
 	}
 
-	async send_prompt(prompt: string, agent: Agent, model: string): Promise<Receive_Prompt_Message> {
+	async send_prompt(
+		prompt: string,
+		provider: Provider,
+		model: string,
+	): Promise<Receive_Prompt_Message> {
 		const request_id = random_id();
 		const message: Send_Prompt_Message = {
 			id: request_id,
@@ -86,7 +90,7 @@ export class Zzz {
 			completion_request: {
 				created: new Date().toISOString(),
 				request_id,
-				agent_name: agent.name,
+				provider_name: provider.name,
 				model,
 				prompt,
 			},

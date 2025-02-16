@@ -88,13 +88,13 @@ export class Zzz_Server {
 				return {id: random_id(), type: 'loaded_session', data: {files: this.filer.files}};
 			}
 			case 'send_prompt': {
-				const {prompt, agent_name, model} = message.completion_request;
+				const {prompt, provider_name, model} = message.completion_request;
 
 				let response: Receive_Prompt_Message;
 
-				console.log(`texting ${agent_name}`, prompt.substring(0, 1000));
+				console.log(`texting ${provider_name}`, prompt.substring(0, 1000));
 
-				switch (agent_name) {
+				switch (provider_name) {
 					case 'claude': {
 						const api_response = await anthropic.messages.create({
 							model,
@@ -110,7 +110,7 @@ export class Zzz_Server {
 							completion_response: {
 								created: new Date().toISOString(),
 								request_id: message.id,
-								agent_name,
+								provider_name,
 								model,
 								data: {type: 'claude', value: api_response},
 							},
@@ -133,7 +133,7 @@ export class Zzz_Server {
 							completion_response: {
 								created: new Date().toISOString(),
 								request_id: message.id,
-								agent_name,
+								provider_name,
 								model,
 								data: {type: 'chatgpt', value: api_response},
 							},
@@ -155,7 +155,7 @@ export class Zzz_Server {
 							completion_response: {
 								created: new Date().toISOString(),
 								request_id: message.id,
-								agent_name,
+								provider_name,
 								model,
 								data: {
 									type: 'gemini',
@@ -174,14 +174,14 @@ export class Zzz_Server {
 					}
 
 					default:
-						throw new Unreachable_Error(agent_name);
+						throw new Unreachable_Error(provider_name);
 				}
 
 				// don't need to wait for this to finish,
 				// the expected file event is now independent of the request
 				void save_response(message, response, this.zzz_dir);
 
-				console.log(`got ${agent_name} message`, response.completion_response.data);
+				console.log(`got ${provider_name} message`, response.completion_response.data);
 
 				return response; // TODO @many sending the text again is wasteful, need ids
 			}
@@ -208,7 +208,7 @@ const save_response = async (
 	response: Receive_Prompt_Message,
 	dir: string,
 ): Promise<void> => {
-	const filename = `${request.completion_request.agent_name}__${request.completion_request.model}__${response.id}.json`; // TODO include model data in these
+	const filename = `${request.completion_request.provider_name}__${request.completion_request.model}__${response.id}.json`; // TODO include model data in these
 
 	const path = join(dir, filename);
 

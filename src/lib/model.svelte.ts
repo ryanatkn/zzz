@@ -1,12 +1,12 @@
 import type {Flavored} from '@ryanatkn/belt/types.js';
 
-import type {Agent_Name} from '$lib/agent.svelte.js';
+import type {Provider_Name} from '$lib/provider.svelte.js';
 
 export type Model_Name = Flavored<string, 'Model'>;
 
 export interface Model_Json {
 	name: string;
-	agent_name: Agent_Name;
+	provider_name: Provider_Name;
 	tags: Array<string>;
 	context_window?: number;
 	output_token_limit?: number;
@@ -21,22 +21,22 @@ export interface Model_Options {
 
 export class Model {
 	name: Model_Name = $state()!;
-	agent_name: Agent_Name = $state()!;
+	provider_name: Provider_Name = $state()!;
 	tags: Array<string> = $state()!;
 
 	constructor(options: Model_Options) {
 		const {
-			data: {name, agent_name, tags},
+			data: {name, provider_name, tags},
 		} = options;
 		this.name = name;
-		this.agent_name = agent_name;
+		this.provider_name = provider_name;
 		this.tags = tags;
 	}
 
 	toJSON(): Model_Json {
 		return {
 			name: this.name,
-			agent_name: this.agent_name,
+			provider_name: this.provider_name,
 			tags: this.tags,
 		};
 	}

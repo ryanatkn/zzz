@@ -72,22 +72,25 @@ export const package_json = {
 	files: ['dist'],
 	exports: {
 		'./package.json': './package.json',
-		'./Agent_Info.svelte': {
-			types: './dist/Agent_Info.svelte.d.ts',
-			svelte: './dist/Agent_Info.svelte',
-			default: './dist/Agent_Info.svelte',
+		'./Provider_Info.svelte': {
+			types: './dist/Provider_Info.svelte.d.ts',
+			svelte: './dist/Provider_Info.svelte',
+			default: './dist/Provider_Info.svelte',
 		},
-		'./Agent_Summary.svelte': {
-			types: './dist/Agent_Summary.svelte.d.ts',
-			svelte: './dist/Agent_Summary.svelte',
-			default: './dist/Agent_Summary.svelte',
+		'./Provider_Summary.svelte': {
+			types: './dist/Provider_Summary.svelte.d.ts',
+			svelte: './dist/Provider_Summary.svelte',
+			default: './dist/Provider_Summary.svelte',
 		},
-		'./Agent_View.svelte': {
-			types: './dist/Agent_View.svelte.d.ts',
-			svelte: './dist/Agent_View.svelte',
-			default: './dist/Agent_View.svelte',
+		'./Provider_View.svelte': {
+			types: './dist/Provider_View.svelte.d.ts',
+			svelte: './dist/Provider_View.svelte',
+			default: './dist/Provider_View.svelte',
 		},
-		'./agent.svelte.js': {types: './dist/agent.svelte.d.ts', default: './dist/agent.svelte.js'},
+		'./provider.svelte.js': {
+			types: './dist/provider.svelte.d.ts',
+			default: './dist/provider.svelte.js',
+		},
 		'./Chat_Item.svelte': {
 			types: './dist/Chat_Item.svelte.d.ts',
 			svelte: './dist/Chat_Item.svelte',
@@ -212,10 +215,10 @@ export const package_json = {
 			default: './dist/Nav_Link.svelte',
 		},
 		'./path.js': {types: './dist/path.d.ts', default: './dist/path.js'},
-		'./Prompt_Agent_Form.svelte': {
-			types: './dist/Prompt_Agent_Form.svelte.d.ts',
-			svelte: './dist/Prompt_Agent_Form.svelte',
-			default: './dist/Prompt_Agent_Form.svelte',
+		'./Prompt_Provider_Form.svelte': {
+			types: './dist/Prompt_Provider_Form.svelte.d.ts',
+			svelte: './dist/Prompt_Provider_Form.svelte',
+			default: './dist/Prompt_Provider_Form.svelte',
 		},
 		'./Prompt_Instance.svelte': {
 			types: './dist/Prompt_Instance.svelte.d.ts',
@@ -258,16 +261,16 @@ export const src_json = {
 	version: '0.0.1',
 	modules: {
 		'./package.json': {path: 'package.json', declarations: []},
-		'./Agent_Info.svelte': {path: 'Agent_Info.svelte', declarations: []},
-		'./Agent_Summary.svelte': {path: 'Agent_Summary.svelte', declarations: []},
-		'./Agent_View.svelte': {path: 'Agent_View.svelte', declarations: []},
-		'./agent.svelte.js': {
-			path: 'agent.svelte.ts',
+		'./Provider_Info.svelte': {path: 'Provider_Info.svelte', declarations: []},
+		'./Provider_Summary.svelte': {path: 'Provider_Summary.svelte', declarations: []},
+		'./Provider_View.svelte': {path: 'Provider_View.svelte', declarations: []},
+		'./provider.svelte.js': {
+			path: 'provider.svelte.ts',
 			declarations: [
-				{name: 'Agent_Name', kind: 'type'},
-				{name: 'Agent_Json', kind: 'type'},
-				{name: 'Agent_Options', kind: 'type'},
-				{name: 'Agent', kind: 'class'},
+				{name: 'Provider_Name', kind: 'type'},
+				{name: 'Provider_Json', kind: 'type'},
+				{name: 'Provider_Options', kind: 'type'},
+				{name: 'Provider', kind: 'class'},
 			],
 		},
 		'./Chat_Item.svelte': {path: 'Chat_Item.svelte', declarations: []},
@@ -310,7 +313,7 @@ export const src_json = {
 		'./config.js': {
 			path: 'config.ts',
 			declarations: [
-				{name: 'default_agents', kind: 'variable'},
+				{name: 'default_providers', kind: 'variable'},
 				{name: 'default_models', kind: 'variable'},
 				{name: 'SYSTEM_MESSAGE_DEFAULT', kind: 'variable'},
 				{name: 'default', kind: 'variable'},
@@ -361,7 +364,7 @@ export const src_json = {
 		'./Multiprompt.svelte': {path: 'Multiprompt.svelte', declarations: []},
 		'./Nav_Link.svelte': {path: 'Nav_Link.svelte', declarations: []},
 		'./path.js': {path: 'path.ts', declarations: [{name: 'to_root_path', kind: 'function'}]},
-		'./Prompt_Agent_Form.svelte': {path: 'Prompt_Agent_Form.svelte', declarations: []},
+		'./Prompt_Provider_Form.svelte': {path: 'Prompt_Provider_Form.svelte', declarations: []},
 		'./Prompt_Instance.svelte': {path: 'Prompt_Instance.svelte', declarations: []},
 		'./prompt.js': {
 			path: 'prompt.ts',

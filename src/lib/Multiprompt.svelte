@@ -2,7 +2,7 @@
 	import Pending_Button from '@ryanatkn/fuz/Pending_Button.svelte';
 
 	import {zzz_context} from '$lib/zzz.svelte.js';
-	import Agent_View from '$lib/Agent_View.svelte';
+	import Provider_View from '$lib/Provider_View.svelte';
 
 	// interface Props {}
 
@@ -10,7 +10,7 @@
 
 	const zzz = zzz_context.get();
 
-	const {agents} = $derived(zzz);
+	const {providers} = $derived(zzz);
 
 	let pending = $state(false);
 
@@ -26,7 +26,9 @@
 		// TODO BLOCK create an object locally that doesn't have its response yet, has the request
 		// use its toJSON in the server
 		await Promise.all(
-			agents.map(async (agent) => zzz.send_prompt(text, agent, agent.selected_model_name)), // TODO `agent.selected_model_name` needs to be granular per instance
+			providers.map(async (provider) =>
+				zzz.send_prompt(text, provider, provider.selected_model_name),
+			), // TODO `provider.selected_model_name` needs to be granular per instance
 		);
 		pending = false;
 		if (text === value) value = '';
@@ -48,7 +50,7 @@
 	send prompt ⚟
 </Pending_Button>
 <div class="w_100 flex py_lg">
-	{#each agents as agent (agent)}
-		<Agent_View {agent} />
+	{#each providers as provider (provider)}
+		<Provider_View {provider} />
 	{/each}
 </div>

@@ -6,19 +6,19 @@
 
 	import Completion_Thread_Info from '$lib/Completion_Thread_Info.svelte';
 	import Completion_Thread_Summary from '$lib/Completion_Thread_Summary.svelte';
-	import type {Agent} from '$lib/agent.svelte.js';
+	import type {Provider} from '$lib/provider.svelte.js';
 	import type {
 		Completion_Thread,
 		Completion_Thread_History_Item,
 	} from '$lib/completion_thread.svelte.js';
 
 	interface Props {
-		agent: Agent;
+		provider: Provider;
 		// TODO more efficient data structures, reactive source completion_responses
 		completion_thread: Completion_Thread;
 	}
 
-	const {agent, completion_thread}: Props = $props();
+	const {provider, completion_thread}: Props = $props();
 
 	let show_editor = $state(false);
 
@@ -48,9 +48,9 @@
 
 <div class="completion_response_view" use:contextmenu_action={contextmenu_entries}>
 	{#if view_with === 'summary'}
-		<Completion_Thread_Summary {agent} {completion_thread} />
+		<Completion_Thread_Summary {provider} {completion_thread} />
 	{:else}
-		<Completion_Thread_Info {agent} {completion_thread} />
+		<Completion_Thread_Info {provider} {completion_thread} />
 	{/if}
 </div>
 
@@ -59,7 +59,7 @@
 		<!-- TODO expand width, might need to change `Dialog` -->
 		<div class="bg p_md radius_sm width_md">
 			<!-- TODO should this be a `Prompt_Response_Editor`? -->
-			<Completion_Thread_Info {agent} {completion_thread} />
+			<Completion_Thread_Info {provider} {completion_thread} />
 			<button type="button" onclick={() => (show_editor = false)}>close</button>
 		</div>
 	</Dialog>
