@@ -1,12 +1,14 @@
 <script lang="ts">
 	import Chat_Item from '$lib/Chat_Item.svelte';
 	import type {Completion_Thread} from '$lib/completion_thread.svelte.js';
+	import type {Agent} from '$lib/agent.svelte.js';
 
 	interface Props {
+		agent: Agent;
 		items: Array<Completion_Thread>;
 	}
 
-	const {items}: Props = $props();
+	const {agent, items}: Props = $props();
 
 	let text = $state('');
 
@@ -37,7 +39,7 @@
 		<ul class="unstyled">
 			{#each items as thread (thread)}
 				{#each thread.history as item (item)}
-					<Chat_Item {thread} {item} />
+					<Chat_Item {agent} completion_thread={thread} {item} />
 				{/each}
 			{/each}
 		</ul>

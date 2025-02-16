@@ -17,7 +17,7 @@
 
 <section>
 	{#each zzz.completion_threads.all as completion_thread (completion_thread)}
-		<Chat items={zzz.completion_threads.all} />
+		<Chat agent={completion_thread.agents[0]} items={zzz.completion_threads.all} />
 	{/each}
 </section>
 <section class="dashboard_prompts">

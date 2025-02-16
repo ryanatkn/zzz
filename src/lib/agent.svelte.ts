@@ -14,7 +14,7 @@ export interface Agent_Options {
 	all_models: Array<Model>;
 }
 
-// TODO BLOCK `Agent` might be the wrong word here, more like Model_Service
+// TODO BLOCK `Agent` is the wrong word here, more like Model_Service
 export class Agent {
 	name: Agent_Name = $state()!;
 	icon: string = $state()!;

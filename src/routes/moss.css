@@ -254,6 +254,9 @@ a.chip {
 .radius_sm {
 	border-radius: var(--radius_sm);
 }
+.radius_xs {
+	border-radius: var(--radius_xs);
+}
 .relative {
 	position: relative;
 }

@@ -11,14 +11,16 @@
 	}
 
 	const {children}: Props = $props();
+
+	const sidebar_width = 200;
 </script>
 
 <!-- TODO drive with data -->
-<div class="flex h_100">
-	<div class="h_100 relative" style:width="200px">
+<div class="flex h_100" style:--sidebar_width="{sidebar_width}px">
+	<div class="h_100 relative" style:width="var(--sidebar_width)">
 		<!-- TODO refactor -->
-		<div class="sidebar absolute t_0 l_0 h_100 w_100 p_md">
-			<nav class="column size_lg">
+		<div class="absolute t_0 l_0 h_100 w_100 p_lg">
+			<nav class="column size_lg fg_1 radius_xs p_md">
 				<div class="flex mb_sm">
 					<Nav_Link
 						href="{base}/"
