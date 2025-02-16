@@ -1,7 +1,6 @@
 <script lang="ts">
 	import Nav_Link from './Nav_Link.svelte';
 
-	import {page} from '$app/state';
 	import {base} from '$app/paths';
 	import type {Snippet} from 'svelte';
 	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
@@ -57,7 +56,7 @@
 				<!-- System -->
 				<h3 class="mb_xs">System</h3>
 				<Nav_Link href="{base}/about">about</Nav_Link>
-				<!-- TODO capabilities - server, API keys for the 3 services -->
+				<Nav_Link href="{base}/capabilities">capabilities</Nav_Link>
 				<Nav_Link href="{base}/settings">settings</Nav_Link>
 			</nav>
 		</div>

@@ -6,8 +6,8 @@ import type {Src_Json} from '@ryanatkn/gro/src_json.js';
 export const package_json = {
 	name: '@ryanatkn/zzz',
 	version: '0.0.1',
-	description: 'bot control web',
-	motto: 'electric buzz',
+	description: 'bot and web toolkit',
+	motto: 'bot control web',
 	glyph: '💤',
 	logo: 'logo.svg',
 	logo_alt: "three sleepy z's",

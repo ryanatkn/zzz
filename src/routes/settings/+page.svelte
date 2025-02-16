@@ -8,7 +8,7 @@
 
 <div class="p_lg">
 	<header>
-		<h1>System</h1>
+		<h1>System settings</h1>
 	</header>
 	<Control_Panel />
 	<section class="width_sm">
