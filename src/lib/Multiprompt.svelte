@@ -15,7 +15,7 @@
 	let pending = $state(false);
 
 	let value = $state(
-		'the traveler stopped and faced the three AIs, who then spoke in unison, saying something entirely unexpected with surreal specificity:',
+		'the traveler stopped and faced the three AIs, who then spoke in unison, saying something entirely unexpected with surreal specificity, detail, and confidence:',
 	);
 
 	let textarea_el: HTMLTextAreaElement | undefined = $state();
