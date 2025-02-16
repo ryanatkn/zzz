@@ -24,7 +24,8 @@
     "check": "gro check",
     "test": "gro test",
     "preview": "vite preview",
-    "deploy": "gro deploy"
+    "deploy": "gro deploy",
+    "serve": "gro build && npm run preview"
   },
   "type": "module",
   "engines": {
@@ -89,25 +90,6 @@
   ],
   "exports": {
     "./package.json": "./package.json",
-    "./Provider_Info.svelte": {
-      "types": "./dist/Provider_Info.svelte.d.ts",
-      "svelte": "./dist/Provider_Info.svelte",
-      "default": "./dist/Provider_Info.svelte"
-    },
-    "./Provider_Summary.svelte": {
-      "types": "./dist/Provider_Summary.svelte.d.ts",
-      "svelte": "./dist/Provider_Summary.svelte",
-      "default": "./dist/Provider_Summary.svelte"
-    },
-    "./Provider_View.svelte": {
-      "types": "./dist/Provider_View.svelte.d.ts",
-      "svelte": "./dist/Provider_View.svelte",
-      "default": "./dist/Provider_View.svelte"
-    },
-    "./provider.svelte.js": {
-      "types": "./dist/provider.svelte.d.ts",
-      "default": "./dist/provider.svelte.js"
-    },
     "./Chat_Item.svelte": {
       "types": "./dist/Chat_Item.svelte.d.ts",
       "svelte": "./dist/Chat_Item.svelte",
@@ -253,19 +235,38 @@
       "types": "./dist/path.d.ts",
       "default": "./dist/path.js"
     },
-    "./Prompt_Provider_Form.svelte": {
-      "types": "./dist/Prompt_Provider_Form.svelte.d.ts",
-      "svelte": "./dist/Prompt_Provider_Form.svelte",
-      "default": "./dist/Prompt_Provider_Form.svelte"
-    },
     "./Prompt_Instance.svelte": {
       "types": "./dist/Prompt_Instance.svelte.d.ts",
       "svelte": "./dist/Prompt_Instance.svelte",
       "default": "./dist/Prompt_Instance.svelte"
     },
+    "./Prompt_Provider_Form.svelte": {
+      "types": "./dist/Prompt_Provider_Form.svelte.d.ts",
+      "svelte": "./dist/Prompt_Provider_Form.svelte",
+      "default": "./dist/Prompt_Provider_Form.svelte"
+    },
     "./prompt.js": {
       "types": "./dist/prompt.d.ts",
       "default": "./dist/prompt.js"
+    },
+    "./Provider_Info.svelte": {
+      "types": "./dist/Provider_Info.svelte.d.ts",
+      "svelte": "./dist/Provider_Info.svelte",
+      "default": "./dist/Provider_Info.svelte"
+    },
+    "./Provider_Summary.svelte": {
+      "types": "./dist/Provider_Summary.svelte.d.ts",
+      "svelte": "./dist/Provider_Summary.svelte",
+      "default": "./dist/Provider_Summary.svelte"
+    },
+    "./Provider_View.svelte": {
+      "types": "./dist/Provider_View.svelte.d.ts",
+      "svelte": "./dist/Provider_View.svelte",
+      "default": "./dist/Provider_View.svelte"
+    },
+    "./provider.svelte.js": {
+      "types": "./dist/provider.svelte.d.ts",
+      "default": "./dist/provider.svelte.js"
     },
     "./server/.env.example": {
       "default": "./dist/server/.env.example"

@@ -13,15 +13,16 @@
 	// TODO standardize
 </script>
 
-<main class="width_md">
-	<section class="box">
-		<header class="box mt_xl4">
-			<Breadcrumb><Svg data={zzz_logo} size="var(--icon_size_sm)" /></Breadcrumb>
+<main class="width_md p_lg">
+	<section>
+		<header style:--size="var(--size_xl)">
+			<h1>About Zzz</h1>
 		</header>
 		<p class="mt_xl5">
-			⚠️ early pre-release, see the <a href="https://github.com/ryanatkn/zzz/discussions"
-				>discussions</a
+			⚠️ This is an early pre-release, see the <a href="https://github.com/ryanatkn/zzz"
+				>source code</a
 			>
+			and <a href="https://github.com/ryanatkn/zzz/discussions">discussions</a>.
 		</p>
 	</section>
 	<section>
@@ -30,7 +31,7 @@
 		</div>
 	</section>
 	<Community_Links_Panel />
-	<section class="box mb_xl7">
+	<section class="mb_xl7">
 		<Library_Footer {pkg}>
 			<div class="mb_xl5">
 				<Breadcrumb><Svg data={zzz_logo} size="var(--icon_size_sm)" /></Breadcrumb>
@@ -38,12 +39,3 @@
 		</Library_Footer>
 	</section>
 </main>
-
-<style>
-	main {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		margin: 0 auto;
-	}
-</style>

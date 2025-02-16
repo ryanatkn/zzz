@@ -26,6 +26,7 @@ export const package_json = {
 		test: 'gro test',
 		preview: 'vite preview',
 		deploy: 'gro deploy',
+		serve: 'gro build && npm run preview',
 	},
 	type: 'module',
 	engines: {node: '>=20.17'},
@@ -72,25 +73,6 @@ export const package_json = {
 	files: ['dist'],
 	exports: {
 		'./package.json': './package.json',
-		'./Provider_Info.svelte': {
-			types: './dist/Provider_Info.svelte.d.ts',
-			svelte: './dist/Provider_Info.svelte',
-			default: './dist/Provider_Info.svelte',
-		},
-		'./Provider_Summary.svelte': {
-			types: './dist/Provider_Summary.svelte.d.ts',
-			svelte: './dist/Provider_Summary.svelte',
-			default: './dist/Provider_Summary.svelte',
-		},
-		'./Provider_View.svelte': {
-			types: './dist/Provider_View.svelte.d.ts',
-			svelte: './dist/Provider_View.svelte',
-			default: './dist/Provider_View.svelte',
-		},
-		'./provider.svelte.js': {
-			types: './dist/provider.svelte.d.ts',
-			default: './dist/provider.svelte.js',
-		},
 		'./Chat_Item.svelte': {
 			types: './dist/Chat_Item.svelte.d.ts',
 			svelte: './dist/Chat_Item.svelte',
@@ -215,17 +197,36 @@ export const package_json = {
 			default: './dist/Nav_Link.svelte',
 		},
 		'./path.js': {types: './dist/path.d.ts', default: './dist/path.js'},
-		'./Prompt_Provider_Form.svelte': {
-			types: './dist/Prompt_Provider_Form.svelte.d.ts',
-			svelte: './dist/Prompt_Provider_Form.svelte',
-			default: './dist/Prompt_Provider_Form.svelte',
-		},
 		'./Prompt_Instance.svelte': {
 			types: './dist/Prompt_Instance.svelte.d.ts',
 			svelte: './dist/Prompt_Instance.svelte',
 			default: './dist/Prompt_Instance.svelte',
 		},
+		'./Prompt_Provider_Form.svelte': {
+			types: './dist/Prompt_Provider_Form.svelte.d.ts',
+			svelte: './dist/Prompt_Provider_Form.svelte',
+			default: './dist/Prompt_Provider_Form.svelte',
+		},
 		'./prompt.js': {types: './dist/prompt.d.ts', default: './dist/prompt.js'},
+		'./Provider_Info.svelte': {
+			types: './dist/Provider_Info.svelte.d.ts',
+			svelte: './dist/Provider_Info.svelte',
+			default: './dist/Provider_Info.svelte',
+		},
+		'./Provider_Summary.svelte': {
+			types: './dist/Provider_Summary.svelte.d.ts',
+			svelte: './dist/Provider_Summary.svelte',
+			default: './dist/Provider_Summary.svelte',
+		},
+		'./Provider_View.svelte': {
+			types: './dist/Provider_View.svelte.d.ts',
+			svelte: './dist/Provider_View.svelte',
+			default: './dist/Provider_View.svelte',
+		},
+		'./provider.svelte.js': {
+			types: './dist/provider.svelte.d.ts',
+			default: './dist/provider.svelte.js',
+		},
 		'./server/.env.example': {default: './dist/server/.env.example'},
 		'./server/helpers.js': {
 			types: './dist/server/helpers.d.ts',
@@ -261,18 +262,6 @@ export const src_json = {
 	version: '0.0.1',
 	modules: {
 		'./package.json': {path: 'package.json', declarations: []},
-		'./Provider_Info.svelte': {path: 'Provider_Info.svelte', declarations: []},
-		'./Provider_Summary.svelte': {path: 'Provider_Summary.svelte', declarations: []},
-		'./Provider_View.svelte': {path: 'Provider_View.svelte', declarations: []},
-		'./provider.svelte.js': {
-			path: 'provider.svelte.ts',
-			declarations: [
-				{name: 'Provider_Name', kind: 'type'},
-				{name: 'Provider_Json', kind: 'type'},
-				{name: 'Provider_Options', kind: 'type'},
-				{name: 'Provider', kind: 'class'},
-			],
-		},
 		'./Chat_Item.svelte': {path: 'Chat_Item.svelte', declarations: []},
 		'./Chat.svelte': {path: 'Chat.svelte', declarations: []},
 		'./completion_state.svelte.js': {path: 'completion_state.svelte.ts', declarations: []},
@@ -364,14 +353,26 @@ export const src_json = {
 		'./Multiprompt.svelte': {path: 'Multiprompt.svelte', declarations: []},
 		'./Nav_Link.svelte': {path: 'Nav_Link.svelte', declarations: []},
 		'./path.js': {path: 'path.ts', declarations: [{name: 'to_root_path', kind: 'function'}]},
-		'./Prompt_Provider_Form.svelte': {path: 'Prompt_Provider_Form.svelte', declarations: []},
 		'./Prompt_Instance.svelte': {path: 'Prompt_Instance.svelte', declarations: []},
+		'./Prompt_Provider_Form.svelte': {path: 'Prompt_Provider_Form.svelte', declarations: []},
 		'./prompt.js': {
 			path: 'prompt.ts',
 			declarations: [
 				{name: 'Prompt', kind: 'type'},
 				{name: 'Prompt_Message', kind: 'type'},
 				{name: 'Prompt_Message_Content', kind: 'type'},
+			],
+		},
+		'./Provider_Info.svelte': {path: 'Provider_Info.svelte', declarations: []},
+		'./Provider_Summary.svelte': {path: 'Provider_Summary.svelte', declarations: []},
+		'./Provider_View.svelte': {path: 'Provider_View.svelte', declarations: []},
+		'./provider.svelte.js': {
+			path: 'provider.svelte.ts',
+			declarations: [
+				{name: 'Provider_Name', kind: 'type'},
+				{name: 'Provider_Json', kind: 'type'},
+				{name: 'Provider_Options', kind: 'type'},
+				{name: 'Provider', kind: 'class'},
 			],
 		},
 		'./server/.env.example': {path: 'server/.env.example', declarations: []},
