@@ -16,6 +16,7 @@
 		<!-- TODO refactor -->
 		<div class="sidebar absolute t_0 l_0 h_100 w_100 p_md">
 			<nav class="column size_lg">
+				<!-- TODO what else? pages? data/cells? -->
 				<a href="{base}/" class:selected={page.url.pathname === base + '/'}>home</a>
 				<a href="{base}/chats" class:selected={page.url.pathname === base + '/chats'}>chats</a>
 				<a href="{base}/files" class:selected={page.url.pathname === base + '/files'}>files</a>
