@@ -1,4 +1,6 @@
 <script lang="ts">
+	// import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
+
 	import type {Provider} from '$lib/provider.svelte.js';
 	import Completion_Threads_List from '$lib/Completion_Threads_List.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
@@ -30,7 +32,7 @@
 	</div>
 	{#if completion_thread}
 		<Completion_Threads_List {provider} {completion_thread} />
-	{:else}
-		<p>no completion_threads yet</p>
+		<!-- {:else}
+		<Pending_Animation /> -->
 	{/if}
 </div>

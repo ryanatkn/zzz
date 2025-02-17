@@ -29,6 +29,13 @@ const google = new GoogleGenerativeAI(SECRET_GOOGLE_API_KEY);
 
 const ZZZ_DIR_DEFAULT = './.zzz';
 
+const OUTPUT_TOKEN_MAX_DEFAULT = 1000; // TODO config
+const TEMPERATURE_DEFAULT = 0; // TODO config
+const TOP_K_DEFAULT: number | undefined = undefined; // TODO config
+const TOP_P_DEFAULT: number | undefined = undefined; // TODO config
+const FREQUENCY_PENALTY_DEFAULT: number | undefined = undefined; // TODO config
+const PRESENCE_PENALTY_DEFAULT: number | undefined = undefined; // TODO config
+
 export interface Zzz_Server_Options {
 	send: (message: Server_Message) => void;
 	/**
@@ -36,7 +43,14 @@ export interface Zzz_Server_Options {
 	 */
 	zzz_dir?: string;
 	filer?: Filer;
+	// TODO BLOCK @many make these part of the cached conversation/completion state, source of truth is where?
 	system_message?: string;
+	output_token_max?: number;
+	temperature?: number;
+	top_k?: number;
+	top_p?: number;
+	frequency_penalty?: number;
+	presence_penalty?: number;
 }
 
 export class Zzz_Server {
@@ -46,8 +60,15 @@ export class Zzz_Server {
 
 	filer: Filer;
 
-	// TODO BLOCK make this part of the cached conversation/completion state
+	// TODO BLOCK @many make these part of the cached conversation/completion state, source of truth is where?
 	system_message: string;
+	output_token_max: number;
+	// TODO add UI for these
+	temperature: number;
+	top_k: number | undefined;
+	top_p: number | undefined;
+	frequency_penalty: number | undefined;
+	presence_penalty: number | undefined;
 
 	#cleanup_filer: Promise<Cleanup_Watch>;
 
@@ -71,6 +92,12 @@ export class Zzz_Server {
 			}
 		});
 		this.system_message = options.system_message ?? SYSTEM_MESSAGE_DEFAULT;
+		this.output_token_max = options.output_token_max ?? OUTPUT_TOKEN_MAX_DEFAULT;
+		this.temperature = options.temperature ?? TEMPERATURE_DEFAULT;
+		this.top_k = options.top_k ?? TOP_K_DEFAULT;
+		this.top_p = options.top_p ?? TOP_P_DEFAULT;
+		this.frequency_penalty = options.frequency_penalty ?? FREQUENCY_PENALTY_DEFAULT;
+		this.presence_penalty = options.presence_penalty ?? PRESENCE_PENALTY_DEFAULT;
 	}
 
 	send(message: Server_Message): void {
@@ -99,9 +126,15 @@ export class Zzz_Server {
 					case 'ollama': {
 						const api_response = await ollama.chat({
 							model,
-							// TODO BLOCK max_tokens
-							// max_tokens: 1000,
-							options: {temperature: 0},
+							// TODO
+							// tools,
+							options: {
+								temperature: this.temperature,
+								num_predict: this.output_token_max,
+								top_k: this.top_k,
+								top_p: this.top_p,
+								frequency_penalty: this.frequency_penalty,
+							},
 							messages: [
 								{role: 'system', content: this.system_message},
 								{role: 'user', content: prompt},
@@ -126,8 +159,13 @@ export class Zzz_Server {
 					case 'claude': {
 						const api_response = await anthropic.messages.create({
 							model,
-							max_tokens: 1000,
-							temperature: 0,
+							max_tokens: this.output_token_max,
+							// TODO
+							// tools:
+							// tool_choice
+							temperature: this.temperature,
+							top_k: this.top_k,
+							top_p: this.top_p,
 							system: this.system_message,
 							messages: [{role: 'user', content: [{type: 'text', text: prompt}]}],
 						});
@@ -149,6 +187,14 @@ export class Zzz_Server {
 					case 'chatgpt': {
 						const api_response = await openai.chat.completions.create({
 							model,
+							max_completion_tokens: this.output_token_max,
+							// TODO
+							// tools
+							// tool_choice
+							temperature: this.temperature,
+							top_p: this.top_p,
+							frequency_penalty: this.frequency_penalty,
+							presence_penalty: this.presence_penalty,
 							messages: [
 								{role: 'system', content: this.system_message},
 								{role: 'user', content: prompt},
@@ -174,6 +220,17 @@ export class Zzz_Server {
 						const google_model = google.getGenerativeModel({
 							model,
 							systemInstruction: this.system_message,
+							// TODO
+							// tools,
+							// toolConfig
+							generationConfig: {
+								maxOutputTokens: this.output_token_max,
+								temperature: this.temperature,
+								topK: this.top_k,
+								topP: this.top_p,
+								frequencyPenalty: this.frequency_penalty,
+								presencePenalty: this.presence_penalty,
+							},
 						});
 						const api_response = await google_model.generateContent(prompt);
 						console.log(`gemini api_response`, api_response);
