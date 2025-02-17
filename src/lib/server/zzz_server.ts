@@ -103,8 +103,9 @@ export class Zzz_Server {
 							// max_tokens: 1000,
 							options: {temperature: 0},
 							messages: [
-								{role: 'systen', content: this.system_message},
+								{role: 'system', content: this.system_message},
 								{role: 'user', content: prompt},
+								// TODO BLOCK add assistant messages (full history), validate 'user' | 'system' | 'assistant'
 							],
 						});
 						console.log(`ollama api_response`, api_response);
