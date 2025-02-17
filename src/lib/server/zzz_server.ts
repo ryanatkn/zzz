@@ -124,6 +124,10 @@ export class Zzz_Server {
 
 				switch (provider_name) {
 					case 'ollama': {
+						const listed = await ollama.list();
+						if (!listed.models.find((m) => m.name === model)) {
+							await ollama.pull({model}); // TODO handle stream
+						}
 						const api_response = await ollama.chat({
 							model,
 							// TODO

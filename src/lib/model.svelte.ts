@@ -8,9 +8,12 @@ export interface Model_Json {
 	name: string;
 	provider_name: Provider_Name;
 	tags: Array<string>;
+	architecture?: string;
 	parameter_count?: number;
 	context_window?: number;
 	output_token_limit?: number;
+	/** Size of the model file in gigabytes. */
+	filesize?: number;
 	cost_input?: number;
 	cost_output?: number;
 	training_cutoff?: string;
