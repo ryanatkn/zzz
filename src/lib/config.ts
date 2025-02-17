@@ -6,6 +6,12 @@ import type {Model_Json} from '$lib/model.svelte.js';
 
 export const default_providers: Array<Provider_Json> = [
 	{
+		name: 'ollama',
+		icon: '',
+		title: 'Ollama',
+		url: 'https://ollama.com/',
+	},
+	{
 		name: 'claude',
 		icon: '',
 		title: 'Claude',
@@ -26,6 +32,25 @@ export const default_providers: Array<Provider_Json> = [
 ];
 
 export const default_models: Array<Model_Json> = [
+	// TODO import/map these directly when possible
+	{
+		name: 'llama3.2',
+		provider_name: 'ollama',
+		tags: ['llama', 'llama3'],
+		parameter_count: 3.21,
+		context_window: 131_072,
+		output_token_limit: 8_192,
+		training_cutoff: 'December 2023',
+	},
+	{
+		name: 'llama3.2:1b',
+		provider_name: 'ollama',
+		tags: ['llama', 'llama3'],
+		parameter_count: 1.24,
+		context_window: 131_072,
+		output_token_limit: 8_192,
+		training_cutoff: 'December 2023',
+	},
 	{
 		name: 'claude-3-5-haiku-20241022',
 		provider_name: 'claude',

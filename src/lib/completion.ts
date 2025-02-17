@@ -1,6 +1,7 @@
 import type Anthropic from '@anthropic-ai/sdk';
 import type OpenAI from 'openai';
 import type * as Google from '@google/generative-ai';
+import type {ChatResponse} from 'ollama';
 
 import type {Provider_Name} from '$lib/provider.svelte.js';
 import type {Id} from '$lib/id.js';
@@ -10,7 +11,7 @@ export interface Completion_Request {
 	request_id: Id;
 	provider_name: Provider_Name;
 	model: string;
-	// TODO BLOCK `prompt` should be a `Prompt` type
+	// TODO BLOCK `prompt` should be a `Prompt` type that captures the entire input to each API
 	prompt: string;
 }
 
@@ -20,6 +21,7 @@ export interface Completion_Response {
 	provider_name: Provider_Name;
 	model: string;
 	data:
+		| {type: 'ollama'; value: ChatResponse}
 		| {type: 'claude'; value: Anthropic.Messages.Message}
 		| {
 				type: 'chatgpt';

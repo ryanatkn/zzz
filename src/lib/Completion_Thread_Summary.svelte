@@ -20,14 +20,40 @@
 	);
 	const completion_request = $derived(history_item?.completion_request);
 	const completion_response = $derived(history_item?.completion_response);
+
+	// 	interface Message {
+	//     role: string;
+	//     content: string;
+	//     images?: Uint8Array[] | string[];
+	//     tool_calls?: ToolCall[];
+	// }
+	// interface ToolCall {
+	//     function: {
+	//         name: string;
+	//         arguments: {
+	//             [key: string]: any;
+	//         };
+	//     };
+	// }
 </script>
 
 {#if completion_request}
-	<p>@user: {completion_request.prompt} ({completion_thread.history.length} history items)</p>
+	<p>@user: {completion_request.prompt}</p>
+	<!-- ({completion_thread.history.length} history items) -->
 {/if}
 {#if completion_response}
-	<p>
-		@{provider.title}: {#if completion_response.data.type === 'claude'}
+	<div class="mb_sm">
+		@{provider.title}: {#if completion_response.data.type === 'ollama'}
+			{completion_response.data.value.message.content}
+			{#if completion_response.data.value.message.tool_calls}
+				{#each completion_response.data.value.message.tool_calls as item (item)}
+					<div>
+						used tool {item.function.name} -
+						<pre>{JSON.stringify(item.function.arguments, null, '\t')}</pre>
+					</div>
+				{/each}
+			{/if}
+		{:else if completion_response.data.type === 'claude'}
 			{#each completion_response.data.value.content as item (item)}
 				{#if item.type === 'text'}
 					{item.text}
@@ -45,5 +71,5 @@
 		{:else}
 			{unreachable(completion_response.data)}
 		{/if}
-	</p>
+	</div>
 {/if}

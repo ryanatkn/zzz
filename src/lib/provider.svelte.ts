@@ -1,6 +1,6 @@
 import type {Model} from '$lib/model.svelte.js';
 
-export type Provider_Name = 'claude' | 'chatgpt' | 'gemini'; // TODO extensible
+export type Provider_Name = 'ollama' | 'claude' | 'chatgpt' | 'gemini'; // TODO extensible
 
 export interface Provider_Json {
 	name: Provider_Name;
@@ -38,7 +38,9 @@ export class Provider {
 		this.icon = icon;
 		this.title = title;
 		this.all_models = all_models;
-		this.selected_model_name = this.models[0].name;
+		const selected_model = this.models[0];
+		if (!selected_model) throw Error(`No models for provider ${name}`); // eslint-disable-line @typescript-eslint/no-unnecessary-condition
+		this.selected_model_name = selected_model.name;
 		this.url = url;
 	}
 

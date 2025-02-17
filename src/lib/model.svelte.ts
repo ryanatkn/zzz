@@ -8,6 +8,7 @@ export interface Model_Json {
 	name: string;
 	provider_name: Provider_Name;
 	tags: Array<string>;
+	parameter_count?: number;
 	context_window?: number;
 	output_token_limit?: number;
 	cost_input?: number;

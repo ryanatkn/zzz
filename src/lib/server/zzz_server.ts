@@ -1,6 +1,7 @@
 import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 import Anthropic from '@anthropic-ai/sdk';
 import OpenAI from 'openai';
+import ollama from 'ollama';
 import {GoogleGenerativeAI} from '@google/generative-ai';
 import {Filer, type Cleanup_Watch} from '@ryanatkn/gro/filer.js';
 import {
@@ -95,6 +96,32 @@ export class Zzz_Server {
 				console.log(`texting ${provider_name}`, prompt.substring(0, 1000));
 
 				switch (provider_name) {
+					case 'ollama': {
+						const api_response = await ollama.chat({
+							model,
+							// TODO BLOCK max_tokens
+							// max_tokens: 1000,
+							options: {temperature: 0},
+							messages: [
+								{role: 'systen', content: this.system_message},
+								{role: 'user', content: prompt},
+							],
+						});
+						console.log(`ollama api_response`, api_response);
+						response = {
+							id: random_id(),
+							type: 'completion_response',
+							completion_response: {
+								created: new Date().toISOString(),
+								request_id: message.id,
+								provider_name,
+								model,
+								data: {type: 'ollama', value: api_response},
+							},
+						};
+						break;
+					}
+
 					case 'claude': {
 						const api_response = await anthropic.messages.create({
 							model,

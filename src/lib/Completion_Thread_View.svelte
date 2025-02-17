@@ -35,13 +35,15 @@
 	// TODO hacky
 	const content = $derived(
 		completion_response
-			? completion_response.data.type === 'claude'
-				? completion_response.data.value.content
-						.map((c) => (c.type === 'text' ? c.text : c.name))
-						.join('\n\n')
-				: completion_response.data.type === 'chatgpt'
-					? completion_response.data.value.choices[0].message.content
-					: completion_response.data.value.text
+			? completion_response.data.type === 'ollama'
+				? completion_response.data.value.message.content
+				: completion_response.data.type === 'claude'
+					? completion_response.data.value.content
+							.map((c) => (c.type === 'text' ? c.text : c.name))
+							.join('\n\n')
+					: completion_response.data.type === 'chatgpt'
+						? completion_response.data.value.choices[0].message.content
+						: completion_response.data.value.text
 			: undefined,
 	);
 </script>
