@@ -9,12 +9,17 @@
 **[www.zzzbot.dev](https://www.zzzbot.dev/)**
 
 Zzz (pronounced "zees" like the sound of electricity)
-is web a toolkit that builds on [SvelteKit](https://kit.svelte.dev/) and [Vite](https://vite.dev/).
+is an open source web UI and toolkit
+that builds on [SvelteKit](https://kit.svelte.dev/) and [Vite](https://vite.dev/).
 
-It's still early. To help see the issues
-and [discussions](https://github.com/ryanatkn/zzz/discussions).
+It's designed for plugins,
+and it comes with batteries included for AI and local-first personal data/file management.
 
-More at [www.zzzbot.dev](https://www.zzzbot.dev/).
+This is a pre-alpha - there's a lot to figure out and nothing is documented yet.
+To help see the issues and [discussions](https://github.com/ryanatkn/zzz/discussions),
+or find me on [Bluesky](https://bsky.app/profile/ryanatkn.com).
+
+[www.zzzbot.dev](https://www.zzzbot.dev/).
 
 ## Motivation
 
