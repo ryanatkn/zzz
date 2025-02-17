@@ -35,6 +35,7 @@ const TOP_K_DEFAULT: number | undefined = undefined; // TODO config
 const TOP_P_DEFAULT: number | undefined = undefined; // TODO config
 const FREQUENCY_PENALTY_DEFAULT: number | undefined = undefined; // TODO config
 const PRESENCE_PENALTY_DEFAULT: number | undefined = undefined; // TODO config
+const STOP_SEQUENCES_DEFAULT: string[] | undefined = undefined; // TODO config
 
 export interface Zzz_Server_Options {
 	send: (message: Server_Message) => void;
@@ -51,6 +52,7 @@ export interface Zzz_Server_Options {
 	top_p?: number;
 	frequency_penalty?: number;
 	presence_penalty?: number;
+	stop_sequences?: Array<string>;
 }
 
 export class Zzz_Server {
@@ -69,6 +71,7 @@ export class Zzz_Server {
 	top_p: number | undefined;
 	frequency_penalty: number | undefined;
 	presence_penalty: number | undefined;
+	stop_sequences: Array<string> | undefined;
 
 	#cleanup_filer: Promise<Cleanup_Watch>;
 
@@ -98,6 +101,7 @@ export class Zzz_Server {
 		this.top_p = options.top_p ?? TOP_P_DEFAULT;
 		this.frequency_penalty = options.frequency_penalty ?? FREQUENCY_PENALTY_DEFAULT;
 		this.presence_penalty = options.presence_penalty ?? PRESENCE_PENALTY_DEFAULT;
+		this.stop_sequences = options.stop_sequences ?? STOP_SEQUENCES_DEFAULT;
 	}
 
 	send(message: Server_Message): void {
@@ -138,6 +142,8 @@ export class Zzz_Server {
 								top_k: this.top_k,
 								top_p: this.top_p,
 								frequency_penalty: this.frequency_penalty,
+								presence_penalty: this.presence_penalty,
+								stop: this.stop_sequences,
 							},
 							messages: [
 								{role: 'system', content: this.system_message},
@@ -170,6 +176,7 @@ export class Zzz_Server {
 							temperature: this.temperature,
 							top_k: this.top_k,
 							top_p: this.top_p,
+							stop_sequences: this.stop_sequences,
 							system: this.system_message,
 							messages: [{role: 'user', content: [{type: 'text', text: prompt}]}],
 						});
@@ -199,6 +206,7 @@ export class Zzz_Server {
 							top_p: this.top_p,
 							frequency_penalty: this.frequency_penalty,
 							presence_penalty: this.presence_penalty,
+							stop: this.stop_sequences,
 							messages: [
 								{role: 'system', content: this.system_message},
 								{role: 'user', content: prompt},
@@ -234,6 +242,7 @@ export class Zzz_Server {
 								topP: this.top_p,
 								frequencyPenalty: this.frequency_penalty,
 								presencePenalty: this.presence_penalty,
+								stopSequences: this.stop_sequences,
 							},
 						});
 						const api_response = await google_model.generateContent(prompt);
