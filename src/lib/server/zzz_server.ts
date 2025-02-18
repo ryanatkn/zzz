@@ -306,7 +306,8 @@ const save_response = async (
 	response: Receive_Prompt_Message,
 	dir: string,
 ): Promise<void> => {
-	const filename = `${request.completion_request.provider_name}__${request.completion_request.model}__${response.id}.json`; // TODO include model data in these
+	// includes `Date.now()` for sorting purposes
+	const filename = `${request.completion_request.provider_name}__${Date.now()}__${request.completion_request.model}__${response.id}.json`; // TODO include model data in these
 
 	const path = join(dir, filename);
 

@@ -4,6 +4,7 @@
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import type {Provider_Name} from '$lib/provider.svelte.js';
 	import Chat from '$lib/Chat.svelte';
+	import {SYSTEM_MESSAGE_DEFAULT} from '$lib/config.js';
 
 	const zzz = zzz_context.get();
 
@@ -13,9 +14,12 @@
 	const providers = $derived(zzz.providers.filter((a) => selected_provider_names.includes(a.name))); // TODO hacky assertion
 
 	// TODO BLOCK do the `Chat` integration correctly
+
+	// TODO BLOCK get the system_message correctly (and make sure it's added to the protocol)
 </script>
 
 <section>
+	<p>system_message: <code>{SYSTEM_MESSAGE_DEFAULT}</code></p>
 	{#each zzz.completion_threads.all as completion_thread (completion_thread)}
 		<Chat provider={completion_thread.providers[0]} items={zzz.completion_threads.all} />
 	{/each}
@@ -36,7 +40,7 @@
 </section>
 <section>
 	<button type="button" onclick={() => zzz.completion_threads.create_completion_thread(providers)}
-		>create new completion thread</button
+		>⨁ create new completion thread</button
 	>
 </section>
 

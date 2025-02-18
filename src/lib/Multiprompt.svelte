@@ -47,7 +47,7 @@
 		void onsubmit();
 	}}
 >
-	send prompt{providers.length > 1 ? ' to ' + providers.length : ''} ⚟
+	⚟ send prompt{providers.length > 1 ? ' to ' + providers.length : ''}
 </Pending_Button>
 <div class="w_100 flex py_lg">
 	{#each providers as provider (provider)}

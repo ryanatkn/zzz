@@ -3,7 +3,10 @@
 
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import Provider_View from '$lib/Provider_View.svelte';
+	import Model_Select from '$lib/Model_Select.svelte';
 	import type {Provider} from '$lib/provider.svelte.js';
+	import type {Model_Json} from '$lib/model.svelte.js';
+	import {default_models} from '$lib/config.js';
 
 	interface Props {
 		provider: Provider;
@@ -30,10 +33,21 @@
 		pending = false;
 		if (text === value) value = '';
 	};
+
+	let model: Model_Json = $state(default_models[0]);
 </script>
 
+<!-- TODO these are just a hack -->
+<div class="row">
+	<Model_Select bind:selected_model={model} />
+</div>
 <!-- TODO instead of a `"prompt"` placeholder show a contextmenu with recent history onfocus -->
-<textarea bind:this={textarea_el} placeholder="prompt" bind:value></textarea>
+
+<label>
+	{provider.title}
+	{model.name}
+	<textarea bind:this={textarea_el} placeholder="prompt" bind:value></textarea>
+</label>
 <Pending_Button
 	{pending}
 	onclick={() => {
@@ -44,7 +58,7 @@
 		void onsubmit();
 	}}
 >
-	send prompt ⚟
+	⚟ send prompt
 </Pending_Button>
 <div class="w_100 flex py_lg">
 	<Provider_View {provider} />

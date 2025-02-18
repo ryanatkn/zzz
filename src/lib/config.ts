@@ -194,7 +194,8 @@ export const default_models: Array<Model_Json> = [
 ];
 
 export const SYSTEM_MESSAGE_DEFAULT =
-	'You are a helpful and brilliant collaborator. Respond with a short creative message, one sentence in length, that continues from where the user left off, playing along for fun.';
+	'You are a helpful and brilliant AI assistant that responds with extreme terseness.';
+// 'You are a helpful and brilliant collaborator. Respond with a short creative message, one sentence in length, that continues from where the user left off, playing along for fun.';
 
 // TODO currently this is imported directly by client and server, but we probably only want to forward a serialized subset to the client
 const config: Zzz_Config_Creator = () => {

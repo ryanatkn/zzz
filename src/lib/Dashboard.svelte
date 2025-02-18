@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Nav_Link from './Nav_Link.svelte';
+	import Nav_Link from '$lib/Nav_Link.svelte';
 
 	import {base} from '$app/paths';
 	import type {Snippet} from 'svelte';

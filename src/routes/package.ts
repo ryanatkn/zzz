@@ -188,6 +188,11 @@ export const package_json = {
 			svelte: './dist/Message_View.svelte',
 			default: './dist/Message_View.svelte',
 		},
+		'./Model_Select.svelte': {
+			types: './dist/Model_Select.svelte.d.ts',
+			svelte: './dist/Model_Select.svelte',
+			default: './dist/Model_Select.svelte',
+		},
 		'./model.svelte.js': {types: './dist/model.svelte.d.ts', default: './dist/model.svelte.js'},
 		'./Multiprompt.svelte': {
 			types: './dist/Multiprompt.svelte.d.ts',
@@ -215,6 +220,11 @@ export const package_json = {
 			types: './dist/Provider_Info.svelte.d.ts',
 			svelte: './dist/Provider_Info.svelte',
 			default: './dist/Provider_Info.svelte',
+		},
+		'./Provider_Select.svelte': {
+			types: './dist/Provider_Select.svelte.d.ts',
+			svelte: './dist/Provider_Select.svelte',
+			default: './dist/Provider_Select.svelte',
 		},
 		'./Provider_Summary.svelte': {
 			types: './dist/Provider_Summary.svelte.d.ts',
@@ -344,6 +354,7 @@ export const src_json = {
 		'./Message_Info.svelte': {path: 'Message_Info.svelte', declarations: []},
 		'./Message_Summary.svelte': {path: 'Message_Summary.svelte', declarations: []},
 		'./Message_View.svelte': {path: 'Message_View.svelte', declarations: []},
+		'./Model_Select.svelte': {path: 'Model_Select.svelte', declarations: []},
 		'./model.svelte.js': {
 			path: 'model.svelte.ts',
 			declarations: [
@@ -367,6 +378,7 @@ export const src_json = {
 			],
 		},
 		'./Provider_Info.svelte': {path: 'Provider_Info.svelte', declarations: []},
+		'./Provider_Select.svelte': {path: 'Provider_Select.svelte', declarations: []},
 		'./Provider_Summary.svelte': {path: 'Provider_Summary.svelte', declarations: []},
 		'./Provider_View.svelte': {path: 'Provider_View.svelte', declarations: []},
 		'./provider.svelte.js': {
