@@ -6,7 +6,7 @@ import type {Model_Json} from '$lib/model.svelte.js';
 
 // TODO add WebLLM ? https://github.com/mlc-ai/web-llm - others? maybe Vercel and/or other meta providers?
 
-export const default_providers: Array<Provider_Json> = [
+export const providers_default: Array<Provider_Json> = [
 	{
 		name: 'ollama',
 		icon: '',
@@ -33,7 +33,7 @@ export const default_providers: Array<Provider_Json> = [
 	},
 ];
 
-export const default_models: Array<Model_Json> = [
+export const models_default: Array<Model_Json> = [
 	// TODO import/map these directly when possible
 	{
 		name: 'llama3.2',
@@ -202,8 +202,8 @@ export const SYSTEM_MESSAGE_DEFAULT =
 // TODO currently this is imported directly by client and server, but we probably only want to forward a serialized subset to the client
 const config: Zzz_Config_Creator = () => {
 	return {
-		providers: default_providers,
-		models: default_models,
+		providers: providers_default,
+		models: models_default,
 		system_message: SYSTEM_MESSAGE_DEFAULT,
 	};
 };

@@ -1,11 +1,11 @@
 <script lang="ts">
-	import {default_providers} from '$lib/config.js';
+	import {providers_default} from '$lib/config.js';
 </script>
 
 <div class="p_lg">
 	<h1>Providers</h1>
 	<div class="providers_grid">
-		{#each default_providers as provider}
+		{#each providers_default as provider}
 			<div class="provider_card">
 				<h2 class="provider_name">{provider.title}</h2>
 				<div class="provider_id">{provider.name}</div>

@@ -1,11 +1,11 @@
 <script lang="ts">
-	import {default_models} from '$lib/config.js';
+	import {models_default} from '$lib/config.js';
 </script>
 
 <div class="p_lg">
 	<h1>Models</h1>
 	<div class="models_grid">
-		{#each default_models as model}
+		{#each models_default as model}
 			<div class="model_card">
 				<h2 class="model_name">{model.name}</h2>
 				<div class="model_provider">{model.provider_name}</div>

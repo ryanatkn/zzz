@@ -1,13 +1,13 @@
 <script lang="ts">
 	import type {Provider_Json} from '$lib/provider.svelte.js';
-	import {default_providers} from '$lib/config.js';
+	import {providers_default} from '$lib/config.js';
 
 	interface Props {
 		providers?: Array<Provider_Json>;
 		selected_provider: Provider_Json; // TODO get from context?
 	}
 
-	let {providers = default_providers, selected_provider = $bindable()}: Props = $props();
+	let {providers = providers_default, selected_provider = $bindable()}: Props = $props();
 
 	// TODO currently unused but I assume I'll want something like this
 </script>

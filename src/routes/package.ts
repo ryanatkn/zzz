@@ -315,8 +315,8 @@ export const src_json = {
 		'./config.js': {
 			path: 'config.ts',
 			declarations: [
-				{name: 'default_providers', kind: 'variable'},
-				{name: 'default_models', kind: 'variable'},
+				{name: 'providers_default', kind: 'variable'},
+				{name: 'models_default', kind: 'variable'},
 				{name: 'SYSTEM_MESSAGE_DEFAULT', kind: 'variable'},
 				{name: 'default', kind: 'variable'},
 			],
