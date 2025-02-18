@@ -1,5 +1,7 @@
 <script lang="ts">
-	import {providers_default} from '$lib/config.js';
+	import {providers_default, models_default} from '$lib/config.js';
+
+	// TODO BLOCK link the models below to a page per model (lookup from model_default/context)
 </script>
 
 <div class="p_lg">
@@ -19,6 +21,11 @@
 						<img src={provider.icon} alt={`${provider.title} icon`} class="provider_icon" />
 					</div>
 				{/if}
+				<ul class="unstyled">
+					{#each models_default.filter((m) => m.provider_name === provider.name) as model}
+						<li class="row"><small class="chip">{model.name}</small></li>
+					{/each}
+				</ul>
 			</div>
 		{/each}
 	</div>
