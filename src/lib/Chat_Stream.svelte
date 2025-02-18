@@ -28,10 +28,10 @@
 	let removing = $state(false);
 </script>
 
-<!-- ⨉ -->
-<div class="chat-stream" transition:scale>
+<!-- TODO `duration_2` is the Moss variable for 200ms, but it's not in a usable form -->
+<div class="chat-stream" transition:scale={{duration: 200}}>
 	<div class="header">
-		<h3>{stream.model.name}</h3>
+		<h3 class="mt_0">{stream.model.name}</h3>
 		<div class="relative">
 			{#if removing}<button
 					type="button"
@@ -63,7 +63,7 @@
 			placeholder="Send to this stream..."
 			onkeydown={(e) => e.key === 'Enter' && !e.shiftKey && (send(), e.preventDefault())}
 		></textarea>
-		<button type="button" onclick={() => send()}>Send</button>
+		<button type="button" onclick={() => send()}>send</button>
 	</div>
 </div>
 
@@ -80,7 +80,6 @@
 	.header {
 		display: flex;
 		justify-content: space-between;
-		align-items: center;
 	}
 	.messages {
 		display: flex;

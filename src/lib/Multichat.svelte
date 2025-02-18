@@ -43,11 +43,15 @@
 						: ''}streams..."
 				></textarea>
 				<Pending_Button {pending} onclick={send_to_all}>
-					Send to all ({multichat.streams.length})
+					send to all ({multichat.streams.length})
 				</Pending_Button>
 			</div>
-			<div>
-				<button type="button" onclick={() => multichat.remove_all_streams()}>🗙 remove all</button>
+			<div class="mb_lg">
+				<button
+					type="button"
+					onclick={() => multichat.remove_all_streams()}
+					disabled={!multichat.streams.length}>🗙 remove all streams</button
+				>
 			</div>
 			<div class="streams">
 				{#each multichat.streams as stream (stream.id)}
