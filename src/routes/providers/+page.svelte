@@ -4,8 +4,6 @@
 
 <div class="p_lg">
 	<h1>Providers</h1>
-	<aside>TODO add <a href="https://github.com/mlc-ai/web-llm">WebLLM</a></aside>
-	<aside>TODO add <a href="https://github.com/ollama/ollama-js">Ollama</a></aside>
 	<div class="providers_grid">
 		{#each default_providers as provider}
 			<div class="provider_card">

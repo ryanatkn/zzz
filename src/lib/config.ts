@@ -4,6 +4,8 @@ import type {Model_Json} from '$lib/model.svelte.js';
 
 // TODO refactor - zzz.config.ts
 
+// TODO add WebLLM ? https://github.com/mlc-ai/web-llm - others? maybe Vercel and/or other meta providers?
+
 export const default_providers: Array<Provider_Json> = [
 	{
 		name: 'ollama',
