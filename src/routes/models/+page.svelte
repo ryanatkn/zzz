@@ -1,5 +1,7 @@
 <script lang="ts">
 	import {models_default} from '$lib/config.js';
+
+	// TODO BLOCK link the providers below to a page per provider (lookup from provider_default/context)
 </script>
 
 <div class="p_lg">
@@ -24,6 +26,21 @@
 				{#if model.output_token_limit}
 					<div class="model_stat">
 						Output limit: {model.output_token_limit.toLocaleString()} tokens
+					</div>
+				{/if}
+				{#if model.parameter_count}
+					<div class="model_stat">
+						Parameters: {model.parameter_count.toLocaleString()}B
+					</div>
+				{/if}
+				{#if model.filesize}
+					<div class="model_stat">
+						File size: {model.filesize}GB
+					</div>
+				{/if}
+				{#if model.architecture}
+					<div class="model_stat">
+						Architecture: {model.architecture}
 					</div>
 				{/if}
 				{#if model.cost_input || model.cost_output}
