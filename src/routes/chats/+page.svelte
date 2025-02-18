@@ -15,7 +15,9 @@
 
 	// TODO BLOCK do the `Chat` integration correctly
 
-	// TODO BLOCK get the system_message correctly (and make sure it's added to the protocol)
+	// TODO BLOCK get the system_message correctly (and make sure it's added to the protocol) - maybe radio buttons for them?
+
+	// TODO BLOCK the provider should be inferred from the model
 </script>
 
 <section>
