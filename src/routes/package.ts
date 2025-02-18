@@ -81,11 +81,17 @@ export const package_json = {
 			svelte: './dist/Chat_Item.svelte',
 			default: './dist/Chat_Item.svelte',
 		},
+		'./Chat_Stream.svelte': {
+			types: './dist/Chat_Stream.svelte.d.ts',
+			svelte: './dist/Chat_Stream.svelte',
+			default: './dist/Chat_Stream.svelte',
+		},
 		'./Chat.svelte': {
 			types: './dist/Chat.svelte.d.ts',
 			svelte: './dist/Chat.svelte',
 			default: './dist/Chat.svelte',
 		},
+		'./chat.svelte.js': {types: './dist/chat.svelte.d.ts', default: './dist/chat.svelte.js'},
 		'./completion_state.svelte.js': {
 			types: './dist/completion_state.svelte.d.ts',
 			default: './dist/completion_state.svelte.js',
@@ -193,7 +199,21 @@ export const package_json = {
 			svelte: './dist/Model_Select.svelte',
 			default: './dist/Model_Select.svelte',
 		},
+		'./Model_Selector.svelte': {
+			types: './dist/Model_Selector.svelte.d.ts',
+			svelte: './dist/Model_Selector.svelte',
+			default: './dist/Model_Selector.svelte',
+		},
 		'./model.svelte.js': {types: './dist/model.svelte.d.ts', default: './dist/model.svelte.js'},
+		'./Multichat.svelte': {
+			types: './dist/Multichat.svelte.d.ts',
+			svelte: './dist/Multichat.svelte',
+			default: './dist/Multichat.svelte',
+		},
+		'./multichat.svelte.js': {
+			types: './dist/multichat.svelte.d.ts',
+			default: './dist/multichat.svelte.js',
+		},
 		'./Multiprompt.svelte': {
 			types: './dist/Multiprompt.svelte.d.ts',
 			svelte: './dist/Multiprompt.svelte',
@@ -276,7 +296,16 @@ export const src_json = {
 	modules: {
 		'./package.json': {path: 'package.json', declarations: []},
 		'./Chat_Item.svelte': {path: 'Chat_Item.svelte', declarations: []},
+		'./Chat_Stream.svelte': {path: 'Chat_Stream.svelte', declarations: []},
 		'./Chat.svelte': {path: 'Chat.svelte', declarations: []},
+		'./chat.svelte.js': {
+			path: 'chat.svelte.ts',
+			declarations: [
+				{name: 'Chat_Message', kind: 'type'},
+				{name: 'Chat_Instance', kind: 'type'},
+				{name: 'Chat', kind: 'class'},
+			],
+		},
 		'./completion_state.svelte.js': {path: 'completion_state.svelte.ts', declarations: []},
 		'./Completion_Thread_Info.svelte': {path: 'Completion_Thread_Info.svelte', declarations: []},
 		'./Completion_Thread_Summary.svelte': {
@@ -355,6 +384,7 @@ export const src_json = {
 		'./Message_Summary.svelte': {path: 'Message_Summary.svelte', declarations: []},
 		'./Message_View.svelte': {path: 'Message_View.svelte', declarations: []},
 		'./Model_Select.svelte': {path: 'Model_Select.svelte', declarations: []},
+		'./Model_Selector.svelte': {path: 'Model_Selector.svelte', declarations: []},
 		'./model.svelte.js': {
 			path: 'model.svelte.ts',
 			declarations: [
@@ -362,6 +392,15 @@ export const src_json = {
 				{name: 'Model_Json', kind: 'type'},
 				{name: 'Model_Options', kind: 'type'},
 				{name: 'Model', kind: 'class'},
+			],
+		},
+		'./Multichat.svelte': {path: 'Multichat.svelte', declarations: []},
+		'./multichat.svelte.js': {
+			path: 'multichat.svelte.ts',
+			declarations: [
+				{name: 'Chat_Message', kind: 'type'},
+				{name: 'Chat_Stream', kind: 'type'},
+				{name: 'Multichat', kind: 'class'},
 			],
 		},
 		'./Multiprompt.svelte': {path: 'Multiprompt.svelte', declarations: []},

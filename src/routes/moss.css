@@ -73,6 +73,9 @@ a.chip {
 	white-space: break-spaces;
 }
 
+.gap_sm {
+	gap: var(--space_sm);
+}
 .h_100 {
 	height: 100%;
 }

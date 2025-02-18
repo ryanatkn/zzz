@@ -29,7 +29,7 @@
 		pending = true;
 		// TODO BLOCK create an object locally that doesn't have its response yet, has the request
 		// use its toJSON in the server
-		await zzz.send_prompt(text, provider, provider.selected_model_name); // TODO `provider.selected_model_name` needs to be granular per instance
+		await zzz.send_prompt(text, provider.name, provider.selected_model_name); // TODO `provider.selected_model_name` needs to be granular per instance
 		pending = false;
 		if (text === value) value = '';
 	};

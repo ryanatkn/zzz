@@ -13,7 +13,7 @@ import type {
 	Receive_Prompt_Message,
 	Send_Prompt_Message,
 } from '$lib/zzz_message.js';
-import type {Provider} from '$lib/provider.svelte.js';
+import type {Provider, Provider_Name} from '$lib/provider.svelte.js';
 import {random_id, type Id} from '$lib/id.js';
 import {Completion_Threads, type Completion_Threads_Json} from '$lib/completion_thread.svelte.js';
 import type {Model} from '$lib/model.svelte.js';
@@ -80,7 +80,7 @@ export class Zzz {
 
 	async send_prompt(
 		prompt: string,
-		provider: Provider,
+		provider_name: Provider_Name,
 		model: string,
 	): Promise<Receive_Prompt_Message> {
 		const request_id = random_id();
@@ -90,7 +90,7 @@ export class Zzz {
 			completion_request: {
 				created: new Date().toISOString(),
 				request_id,
-				provider_name: provider.name,
+				provider_name,
 				model,
 				prompt,
 			},

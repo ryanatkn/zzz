@@ -98,10 +98,19 @@
       "svelte": "./dist/Chat_Item.svelte",
       "default": "./dist/Chat_Item.svelte"
     },
+    "./Chat_Stream.svelte": {
+      "types": "./dist/Chat_Stream.svelte.d.ts",
+      "svelte": "./dist/Chat_Stream.svelte",
+      "default": "./dist/Chat_Stream.svelte"
+    },
     "./Chat.svelte": {
       "types": "./dist/Chat.svelte.d.ts",
       "svelte": "./dist/Chat.svelte",
       "default": "./dist/Chat.svelte"
+    },
+    "./chat.svelte.js": {
+      "types": "./dist/chat.svelte.d.ts",
+      "default": "./dist/chat.svelte.js"
     },
     "./completion_state.svelte.js": {
       "types": "./dist/completion_state.svelte.d.ts",
@@ -225,9 +234,23 @@
       "svelte": "./dist/Model_Select.svelte",
       "default": "./dist/Model_Select.svelte"
     },
+    "./Model_Selector.svelte": {
+      "types": "./dist/Model_Selector.svelte.d.ts",
+      "svelte": "./dist/Model_Selector.svelte",
+      "default": "./dist/Model_Selector.svelte"
+    },
     "./model.svelte.js": {
       "types": "./dist/model.svelte.d.ts",
       "default": "./dist/model.svelte.js"
+    },
+    "./Multichat.svelte": {
+      "types": "./dist/Multichat.svelte.d.ts",
+      "svelte": "./dist/Multichat.svelte",
+      "default": "./dist/Multichat.svelte"
+    },
+    "./multichat.svelte.js": {
+      "types": "./dist/multichat.svelte.d.ts",
+      "default": "./dist/multichat.svelte.js"
     },
     "./Multiprompt.svelte": {
       "types": "./dist/Multiprompt.svelte.d.ts",
