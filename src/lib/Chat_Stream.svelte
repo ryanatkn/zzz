@@ -1,5 +1,8 @@
 <script lang="ts">
-	import type {Chat_Stream} from './multichat.svelte.js';
+	import {scale} from 'svelte/transition';
+
+	import type {Chat_Stream} from '$lib/multichat.svelte.js';
+	import Chat_Message from '$lib/Chat_Message.svelte';
 
 	interface Props {
 		stream: Chat_Stream;
@@ -10,32 +13,45 @@
 	const {stream, onremove, onsend}: Props = $props();
 
 	let input = $state('');
+	let input_el: HTMLTextAreaElement | undefined;
 
 	function send() {
-		if (!input.trim()) return;
-		onsend(input);
+		const parsed = input.trim();
+		if (!parsed) {
+			input_el?.focus();
+			return;
+		}
+		onsend(parsed);
 		input = '';
 	}
+
+	let removing = $state(false);
 </script>
 
-<div class="chat-stream">
+<!-- ⨉ -->
+<div class="chat-stream" transition:scale>
 	<div class="header">
 		<h3>{stream.model.name}</h3>
-		<button type="button" class="remove" onclick={() => onremove()}>×</button>
+		<div class="relative">
+			{#if removing}<button
+					type="button"
+					class="color_c absolute icon_button"
+					style:left="-100%"
+					onclick={() => onremove()}>🗙</button
+				>{/if}
+			<button
+				type="button"
+				class="icon_button"
+				class:plain={!removing}
+				onclick={() => (removing = !removing)}
+				>{#if removing}×{:else}🗙{/if}</button
+			>
+		</div>
 	</div>
 
 	<div class="messages">
 		{#each stream.messages as message}
-			<div class="message">
-				<div class="user">{message.text}</div>
-				{#if message.response}
-					<div class="assistant">
-						{message.response.data.type === 'ollama'
-							? message.response.data.value.message.content
-							: JSON.stringify(message.response.data)}
-					</div>
-				{/if}
-			</div>
+			<Chat_Message {message} />
 		{/each}
 	</div>
 
@@ -43,6 +59,7 @@
 		<textarea
 			class="flex_1"
 			bind:value={input}
+			bind:this={input_el}
 			placeholder="Send to this stream..."
 			onkeydown={(e) => e.key === 'Enter' && !e.shiftKey && (send(), e.preventDefault())}
 		></textarea>
@@ -57,6 +74,8 @@
 		display: flex;
 		flex-direction: column;
 		gap: 1rem;
+		background-color: var(--input_fill);
+		border-radius: var(--radius_xs);
 	}
 	.header {
 		display: flex;

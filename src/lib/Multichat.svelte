@@ -1,17 +1,26 @@
 <script lang="ts">
+	import Pending_Button from '@ryanatkn/fuz/Pending_Button.svelte';
+
 	import {Multichat} from '$lib/multichat.svelte.js';
 	import Model_Selector from '$lib/Model_Selector.svelte';
 	import Chat_Stream from '$lib/Chat_Stream.svelte';
-	import Pending_Button from '@ryanatkn/fuz/Pending_Button.svelte';
+	import {zzz_context} from '$lib/zzz.svelte.js';
 
-	const multichat = new Multichat();
+	const zzz = zzz_context.get();
+
+	const multichat = new Multichat(zzz);
 	let main_input = $state('');
 	let pending = $state(false);
+	let input_el: HTMLTextAreaElement | undefined;
 
 	async function send_to_all() {
-		if (!main_input.trim()) return;
+		const parsed = main_input.trim();
+		if (!parsed) {
+			input_el?.focus();
+			return;
+		}
 		pending = true;
-		await multichat.send_to_all(main_input);
+		await multichat.send_to_all(parsed);
 		main_input = '';
 		pending = false;
 	}
@@ -19,23 +28,37 @@
 
 <div class="multichat">
 	<div class="controls">
-		<Model_Selector onselect={(model) => multichat.add_stream(model)} />
-		<div class="main-input">
-			<textarea bind:value={main_input} placeholder="Send to all streams..."></textarea>
-			<Pending_Button {pending} onclick={send_to_all}>
-				Send to all ({multichat.streams.length})
-			</Pending_Button>
+		<!-- TODO, show the counts of active items for each of the model selector buttons in a snippet here -->
+		<div>
+			<h3>Add streams</h3>
+			<Model_Selector onselect={(model) => multichat.add_stream(model)} />
 		</div>
-	</div>
-
-	<div class="streams">
-		{#each multichat.streams as stream (stream.id)}
-			<Chat_Stream
-				{stream}
-				onremove={() => multichat.remove_stream(stream.id)}
-				onsend={(input: string) => multichat.send_to_stream(stream.id, input)}
-			/>
-		{/each}
+		<div class="flex_1">
+			<div class="main-input">
+				<textarea
+					bind:value={main_input}
+					bind:this={input_el}
+					placeholder="Send to all {multichat.streams.length >= 2
+						? multichat.streams.length + ' '
+						: ''}streams..."
+				></textarea>
+				<Pending_Button {pending} onclick={send_to_all}>
+					Send to all ({multichat.streams.length})
+				</Pending_Button>
+			</div>
+			<div>
+				<button type="button" onclick={() => multichat.remove_all_streams()}>🗙 remove all</button>
+			</div>
+			<div class="streams">
+				{#each multichat.streams as stream (stream.id)}
+					<Chat_Stream
+						{stream}
+						onremove={() => multichat.remove_stream(stream.id)}
+						onsend={(input: string) => multichat.send_to_stream(stream.id, input)}
+					/>
+				{/each}
+			</div>
+		</div>
 	</div>
 </div>
 

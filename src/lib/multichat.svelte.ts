@@ -1,7 +1,7 @@
 import type {Model} from '$lib/model.svelte.js';
 import type {Completion_Request, Completion_Response} from '$lib/completion.js';
 import {random_id, type Id} from '$lib/id.js';
-import {zzz_context} from '$lib/zzz.svelte.js';
+import type {Zzz} from '$lib/zzz.svelte.js';
 
 export interface Chat_Message {
 	id: Id;
@@ -19,7 +19,11 @@ export interface Chat_Stream {
 
 export class Multichat {
 	streams: Array<Chat_Stream> = $state([]);
-	zzz = zzz_context.get();
+	zzz: Zzz;
+
+	constructor(zzz: Zzz) {
+		this.zzz = zzz;
+	}
 
 	add_stream(model: Model): void {
 		this.streams.push({
@@ -32,6 +36,10 @@ export class Multichat {
 	remove_stream(id: Id): void {
 		const idx = this.streams.findIndex((s) => s.id === id);
 		if (idx !== -1) this.streams.splice(idx, 1);
+	}
+
+	remove_all_streams(): void {
+		this.streams.length = 0;
 	}
 
 	async send_to_all(text: string): Promise<void> {

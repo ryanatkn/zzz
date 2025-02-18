@@ -1,31 +1,28 @@
 <script lang="ts">
+	import {slide} from 'svelte/transition';
+
 	import type {Model} from '$lib/model.svelte.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 
+	const zzz = zzz_context.get();
+
 	interface Props {
+		models?: Array<Model>;
 		onselect: (model: Model) => void;
 	}
 
-	const {onselect}: Props = $props();
-
-	const zzz = zzz_context.get();
-
-	const all_models = $derived(zzz.providers.flatMap((p) => p.models));
+	const {models = zzz.models, onselect}: Props = $props();
 </script>
 
-<div class="model-selector">
-	<select
-		onchange={(e) => {
-			const model = all_models.find((m) => m.name === e.currentTarget.value);
-			if (model) onselect(model);
-			e.currentTarget.value = ''; // Reset select after use
-		}}
-	>
-		<option value="">Add chat stream...</option>
-		{#each all_models as model}
-			<option value={model.name}>
-				{model.name} ({model.provider_name})
-			</option>
-		{/each}
-	</select>
-</div>
+<ul class="model-selector unstyled">
+	{#each models as model (model)}
+		<li value={model.name} class="display_contents" transition:slide>
+			<button type="button" class="plain w_100" onclick={() => onselect(model)}
+				><div class="w_100 text_align_left">
+					<div class="font_weight_500">{model.name}</div>
+					<div class="size_sm font_weight_400">{model.provider_name}</div>
+				</div></button
+			>
+		</li>
+	{/each}
+</ul>

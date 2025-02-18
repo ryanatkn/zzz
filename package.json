@@ -252,11 +252,6 @@
       "types": "./dist/multichat.svelte.d.ts",
       "default": "./dist/multichat.svelte.js"
     },
-    "./Multiprompt.svelte": {
-      "types": "./dist/Multiprompt.svelte.d.ts",
-      "svelte": "./dist/Multiprompt.svelte",
-      "default": "./dist/Multiprompt.svelte"
-    },
     "./Nav_Link.svelte": {
       "types": "./dist/Nav_Link.svelte.d.ts",
       "svelte": "./dist/Nav_Link.svelte",

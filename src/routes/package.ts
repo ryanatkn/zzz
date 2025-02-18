@@ -214,11 +214,6 @@ export const package_json = {
 			types: './dist/multichat.svelte.d.ts',
 			default: './dist/multichat.svelte.js',
 		},
-		'./Multiprompt.svelte': {
-			types: './dist/Multiprompt.svelte.d.ts',
-			svelte: './dist/Multiprompt.svelte',
-			default: './dist/Multiprompt.svelte',
-		},
 		'./Nav_Link.svelte': {
 			types: './dist/Nav_Link.svelte.d.ts',
 			svelte: './dist/Nav_Link.svelte',
@@ -403,7 +398,6 @@ export const src_json = {
 				{name: 'Multichat', kind: 'class'},
 			],
 		},
-		'./Multiprompt.svelte': {path: 'Multiprompt.svelte', declarations: []},
 		'./Nav_Link.svelte': {path: 'Nav_Link.svelte', declarations: []},
 		'./path.js': {path: 'path.ts', declarations: [{name: 'to_root_path', kind: 'function'}]},
 		'./Prompt_Instance.svelte': {path: 'Prompt_Instance.svelte', declarations: []},
