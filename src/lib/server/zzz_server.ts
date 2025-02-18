@@ -31,11 +31,12 @@ const ZZZ_DIR_DEFAULT = './.zzz';
 
 const OUTPUT_TOKEN_MAX_DEFAULT = 1000; // TODO config
 const TEMPERATURE_DEFAULT = 0; // TODO config
+const SEED_DEFAULT: number | undefined = undefined; // TODO config
 const TOP_K_DEFAULT: number | undefined = undefined; // TODO config
 const TOP_P_DEFAULT: number | undefined = undefined; // TODO config
 const FREQUENCY_PENALTY_DEFAULT: number | undefined = undefined; // TODO config
 const PRESENCE_PENALTY_DEFAULT: number | undefined = undefined; // TODO config
-const STOP_SEQUENCES_DEFAULT: string[] | undefined = undefined; // TODO config
+const STOP_SEQUENCES_DEFAULT: Array<string> | undefined = undefined; // TODO config
 
 export interface Zzz_Server_Options {
 	send: (message: Server_Message) => void;
@@ -48,6 +49,7 @@ export interface Zzz_Server_Options {
 	system_message?: string;
 	output_token_max?: number;
 	temperature?: number;
+	seed?: number;
 	top_k?: number;
 	top_p?: number;
 	frequency_penalty?: number;
@@ -67,6 +69,7 @@ export class Zzz_Server {
 	output_token_max: number;
 	// TODO add UI for these
 	temperature: number;
+	seed: number | undefined;
 	top_k: number | undefined;
 	top_p: number | undefined;
 	frequency_penalty: number | undefined;
@@ -97,6 +100,7 @@ export class Zzz_Server {
 		this.system_message = options.system_message ?? SYSTEM_MESSAGE_DEFAULT;
 		this.output_token_max = options.output_token_max ?? OUTPUT_TOKEN_MAX_DEFAULT;
 		this.temperature = options.temperature ?? TEMPERATURE_DEFAULT;
+		this.seed = options.seed ?? SEED_DEFAULT;
 		this.top_k = options.top_k ?? TOP_K_DEFAULT;
 		this.top_p = options.top_p ?? TOP_P_DEFAULT;
 		this.frequency_penalty = options.frequency_penalty ?? FREQUENCY_PENALTY_DEFAULT;
@@ -138,6 +142,7 @@ export class Zzz_Server {
 							// tools,
 							options: {
 								temperature: this.temperature,
+								seed: this.seed,
 								num_predict: this.output_token_max,
 								top_k: this.top_k,
 								top_p: this.top_p,
@@ -203,6 +208,7 @@ export class Zzz_Server {
 							// tools
 							// tool_choice
 							temperature: this.temperature,
+							seed: this.seed,
 							top_p: this.top_p,
 							frequency_penalty: this.frequency_penalty,
 							presence_penalty: this.presence_penalty,
