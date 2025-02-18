@@ -64,6 +64,7 @@ export class Multichat {
 			stream.model.name,
 		);
 
+		// TODO refactor
 		const msg = stream.messages.find((m) => m.id === msg_id);
 		if (msg) msg.response = response.completion_response;
 	}
