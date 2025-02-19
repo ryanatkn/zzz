@@ -153,6 +153,16 @@
       "svelte": "./dist/Control_Panel.svelte",
       "default": "./dist/Control_Panel.svelte"
     },
+    "./Dashboard_Chats.svelte": {
+      "types": "./dist/Dashboard_Chats.svelte.d.ts",
+      "svelte": "./dist/Dashboard_Chats.svelte",
+      "default": "./dist/Dashboard_Chats.svelte"
+    },
+    "./Dashboard_Files.svelte": {
+      "types": "./dist/Dashboard_Files.svelte.d.ts",
+      "svelte": "./dist/Dashboard_Files.svelte",
+      "default": "./dist/Dashboard_Files.svelte"
+    },
     "./Dashboard.svelte": {
       "types": "./dist/Dashboard.svelte.d.ts",
       "svelte": "./dist/Dashboard.svelte",
@@ -167,6 +177,11 @@
       "types": "./dist/File_Editor.svelte.d.ts",
       "svelte": "./dist/File_Editor.svelte",
       "default": "./dist/File_Editor.svelte"
+    },
+    "./File_Explorer.svelte": {
+      "types": "./dist/File_Explorer.svelte.d.ts",
+      "svelte": "./dist/File_Explorer.svelte",
+      "default": "./dist/File_Explorer.svelte"
     },
     "./File_Info.svelte": {
       "types": "./dist/File_Info.svelte.d.ts",
@@ -220,6 +235,11 @@
       "svelte": "./dist/Message_View.svelte",
       "default": "./dist/Message_View.svelte"
     },
+    "./Model_Link.svelte": {
+      "types": "./dist/Model_Link.svelte.d.ts",
+      "svelte": "./dist/Model_Link.svelte",
+      "default": "./dist/Model_Link.svelte"
+    },
     "./Model_Select.svelte": {
       "types": "./dist/Model_Select.svelte.d.ts",
       "svelte": "./dist/Model_Select.svelte",
@@ -234,10 +254,10 @@
       "types": "./dist/model.svelte.d.ts",
       "default": "./dist/model.svelte.js"
     },
-    "./Multichat.svelte": {
-      "types": "./dist/Multichat.svelte.d.ts",
-      "svelte": "./dist/Multichat.svelte",
-      "default": "./dist/Multichat.svelte"
+    "./Multichat_View.svelte": {
+      "types": "./dist/Multichat_View.svelte.d.ts",
+      "svelte": "./dist/Multichat_View.svelte",
+      "default": "./dist/Multichat_View.svelte"
     },
     "./multichat.svelte.js": {
       "types": "./dist/multichat.svelte.d.ts",
@@ -270,6 +290,11 @@
       "types": "./dist/Provider_Info.svelte.d.ts",
       "svelte": "./dist/Provider_Info.svelte",
       "default": "./dist/Provider_Info.svelte"
+    },
+    "./Provider_Link.svelte": {
+      "types": "./dist/Provider_Link.svelte.d.ts",
+      "svelte": "./dist/Provider_Link.svelte",
+      "default": "./dist/Provider_Link.svelte"
     },
     "./Provider_Select.svelte": {
       "types": "./dist/Provider_Select.svelte.d.ts",

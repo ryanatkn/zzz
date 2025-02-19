@@ -130,6 +130,16 @@ export const package_json = {
 			svelte: './dist/Control_Panel.svelte',
 			default: './dist/Control_Panel.svelte',
 		},
+		'./Dashboard_Chats.svelte': {
+			types: './dist/Dashboard_Chats.svelte.d.ts',
+			svelte: './dist/Dashboard_Chats.svelte',
+			default: './dist/Dashboard_Chats.svelte',
+		},
+		'./Dashboard_Files.svelte': {
+			types: './dist/Dashboard_Files.svelte.d.ts',
+			svelte: './dist/Dashboard_Files.svelte',
+			default: './dist/Dashboard_Files.svelte',
+		},
 		'./Dashboard.svelte': {
 			types: './dist/Dashboard.svelte.d.ts',
 			svelte: './dist/Dashboard.svelte',
@@ -144,6 +154,11 @@ export const package_json = {
 			types: './dist/File_Editor.svelte.d.ts',
 			svelte: './dist/File_Editor.svelte',
 			default: './dist/File_Editor.svelte',
+		},
+		'./File_Explorer.svelte': {
+			types: './dist/File_Explorer.svelte.d.ts',
+			svelte: './dist/File_Explorer.svelte',
+			default: './dist/File_Explorer.svelte',
 		},
 		'./File_Info.svelte': {
 			types: './dist/File_Info.svelte.d.ts',
@@ -188,6 +203,11 @@ export const package_json = {
 			svelte: './dist/Message_View.svelte',
 			default: './dist/Message_View.svelte',
 		},
+		'./Model_Link.svelte': {
+			types: './dist/Model_Link.svelte.d.ts',
+			svelte: './dist/Model_Link.svelte',
+			default: './dist/Model_Link.svelte',
+		},
 		'./Model_Select.svelte': {
 			types: './dist/Model_Select.svelte.d.ts',
 			svelte: './dist/Model_Select.svelte',
@@ -199,10 +219,10 @@ export const package_json = {
 			default: './dist/Model_Selector.svelte',
 		},
 		'./model.svelte.js': {types: './dist/model.svelte.d.ts', default: './dist/model.svelte.js'},
-		'./Multichat.svelte': {
-			types: './dist/Multichat.svelte.d.ts',
-			svelte: './dist/Multichat.svelte',
-			default: './dist/Multichat.svelte',
+		'./Multichat_View.svelte': {
+			types: './dist/Multichat_View.svelte.d.ts',
+			svelte: './dist/Multichat_View.svelte',
+			default: './dist/Multichat_View.svelte',
 		},
 		'./multichat.svelte.js': {
 			types: './dist/multichat.svelte.d.ts',
@@ -229,6 +249,11 @@ export const package_json = {
 			types: './dist/Provider_Info.svelte.d.ts',
 			svelte: './dist/Provider_Info.svelte',
 			default: './dist/Provider_Info.svelte',
+		},
+		'./Provider_Link.svelte': {
+			types: './dist/Provider_Link.svelte.d.ts',
+			svelte: './dist/Provider_Link.svelte',
+			default: './dist/Provider_Link.svelte',
 		},
 		'./Provider_Select.svelte': {
 			types: './dist/Provider_Select.svelte.d.ts',
@@ -332,9 +357,12 @@ export const src_json = {
 			],
 		},
 		'./Control_Panel.svelte': {path: 'Control_Panel.svelte', declarations: []},
+		'./Dashboard_Chats.svelte': {path: 'Dashboard_Chats.svelte', declarations: []},
+		'./Dashboard_Files.svelte': {path: 'Dashboard_Files.svelte', declarations: []},
 		'./Dashboard.svelte': {path: 'Dashboard.svelte', declarations: []},
 		'./Echo_Form.svelte': {path: 'Echo_Form.svelte', declarations: []},
 		'./File_Editor.svelte': {path: 'File_Editor.svelte', declarations: []},
+		'./File_Explorer.svelte': {path: 'File_Explorer.svelte', declarations: []},
 		'./File_Info.svelte': {path: 'File_Info.svelte', declarations: []},
 		'./File_List.svelte': {path: 'File_List.svelte', declarations: []},
 		'./File_Summary.svelte': {path: 'File_Summary.svelte', declarations: []},
@@ -363,6 +391,7 @@ export const src_json = {
 		'./Message_Info.svelte': {path: 'Message_Info.svelte', declarations: []},
 		'./Message_Summary.svelte': {path: 'Message_Summary.svelte', declarations: []},
 		'./Message_View.svelte': {path: 'Message_View.svelte', declarations: []},
+		'./Model_Link.svelte': {path: 'Model_Link.svelte', declarations: []},
 		'./Model_Select.svelte': {path: 'Model_Select.svelte', declarations: []},
 		'./Model_Selector.svelte': {path: 'Model_Selector.svelte', declarations: []},
 		'./model.svelte.js': {
@@ -374,7 +403,7 @@ export const src_json = {
 				{name: 'Model', kind: 'class'},
 			],
 		},
-		'./Multichat.svelte': {path: 'Multichat.svelte', declarations: []},
+		'./Multichat_View.svelte': {path: 'Multichat_View.svelte', declarations: []},
 		'./multichat.svelte.js': {
 			path: 'multichat.svelte.ts',
 			declarations: [
@@ -396,6 +425,7 @@ export const src_json = {
 			],
 		},
 		'./Provider_Info.svelte': {path: 'Provider_Info.svelte', declarations: []},
+		'./Provider_Link.svelte': {path: 'Provider_Link.svelte', declarations: []},
 		'./Provider_Select.svelte': {path: 'Provider_Select.svelte', declarations: []},
 		'./Provider_Summary.svelte': {path: 'Provider_Summary.svelte', declarations: []},
 		'./Provider_View.svelte': {path: 'Provider_View.svelte', declarations: []},

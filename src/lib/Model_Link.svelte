@@ -14,6 +14,6 @@
 	const {model, attrs, children}: Props = $props();
 </script>
 
-<a {...attrs} href="{base}/model/{model.name}"
+<a {...attrs} href="{base}/models/{model.name}"
 	>{#if children}{@render children()}{:else}{model.name}{/if}</a
 >

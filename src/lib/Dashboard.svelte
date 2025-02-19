@@ -52,12 +52,12 @@
 
 				<!-- AI Tools -->
 				<h3 class="mb_xs">AI</h3>
-				<Nav_Link href="{base}/provider">providers</Nav_Link>
-				<Nav_Link href="{base}/model">models</Nav_Link>
+				<Nav_Link href="{base}/providers">providers</Nav_Link>
+				<Nav_Link href="{base}/models">models</Nav_Link>
 				<!-- <a href="{base}/experiments" class:selected={page.url.pathname === base + '/experiments'}
 					>experiments</a
 				>
-				<a href="{base}/provider" class:selected={page.url.pathname === base + '/provider'}>providers</a> -->
+				<a href="{base}/providers" class:selected={page.url.pathname === base + '/provider'}>providers</a> -->
 
 				<!-- System -->
 				<h3 class="mb_xs">System</h3>
@@ -107,8 +107,8 @@
 				<!-- Intelligence -->
 				<!-- <h3 class="mb_xs">Intelligence</h3>
 				<Nav_Link href="{base}/agents">Agents</Nav_Link>
-				<Nav_Link href="{base}/provider">Providers</Nav_Link>
-				<Nav_Link href="{base}/model">Models</Nav_Link>
+				<Nav_Link href="{base}/providers">Providers</Nav_Link>
+				<Nav_Link href="{base}/models">Models</Nav_Link>
 				<Nav_Link href="{base}/prompts">Prompts</Nav_Link>
 				<Nav_Link href="{base}/experiments">Experiments</Nav_Link> -->
 
@@ -189,8 +189,8 @@
 				<!-- Intelligence -->
 				<!-- <h3 class="mb_xs">Intelligence</h3>
 				<Nav_Link href="{base}/agents">Agents</Nav_Link>
-				<Nav_Link href="{base}/provider">Providers</Nav_Link>
-				<Nav_Link href="{base}/model">Models</Nav_Link>
+				<Nav_Link href="{base}/providers">Providers</Nav_Link>
+				<Nav_Link href="{base}/models">Models</Nav_Link>
 				<Nav_Link href="{base}/prompts">Prompts</Nav_Link>
 				<Nav_Link href="{base}/experiments">Experiments</Nav_Link>
 				<Nav_Link href="{base}/training">Training</Nav_Link>

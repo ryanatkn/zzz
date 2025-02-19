@@ -14,6 +14,6 @@
 	const {provider, attrs, children}: Props = $props();
 </script>
 
-<a {...attrs} href="{base}/provider/{provider.name}"
+<a {...attrs} href="{base}/providers/{provider.name}"
 	>{#if children}{@render children()}{:else}{provider.title}{/if}</a
 >
