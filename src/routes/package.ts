@@ -86,10 +86,10 @@ export const package_json = {
 			svelte: './dist/Chat_Message.svelte',
 			default: './dist/Chat_Message.svelte',
 		},
-		'./Tape.svelte': {
-			types: './dist/Tape.svelte.d.ts',
-			svelte: './dist/Tape.svelte',
-			default: './dist/Tape.svelte',
+		'./Chat_Tape.svelte': {
+			types: './dist/Chat_Tape.svelte.d.ts',
+			svelte: './dist/Chat_Tape.svelte',
+			default: './dist/Chat_Tape.svelte',
 		},
 		'./completion_state.svelte.js': {
 			types: './dist/completion_state.svelte.d.ts',
@@ -286,7 +286,7 @@ export const src_json = {
 		'./package.json': {path: 'package.json', declarations: []},
 		'./Chat_Item.svelte': {path: 'Chat_Item.svelte', declarations: []},
 		'./Chat_Message.svelte': {path: 'Chat_Message.svelte', declarations: []},
-		'./Tape.svelte': {path: 'Tape.svelte', declarations: []},
+		'./Chat_Tape.svelte': {path: 'Chat_Tape.svelte', declarations: []},
 		'./completion_state.svelte.js': {path: 'completion_state.svelte.ts', declarations: []},
 		'./Completion_Thread_Info.svelte': {path: 'Completion_Thread_Info.svelte', declarations: []},
 		'./Completion_Thread_Summary.svelte': {
@@ -411,7 +411,10 @@ export const src_json = {
 		'./server/.env.example': {path: 'server/.env.example', declarations: []},
 		'./server/helpers.js': {
 			path: 'server/helpers.ts',
-			declarations: [{name: 'write_file_in_scope', kind: 'function'}],
+			declarations: [
+				{name: 'write_file_in_scope', kind: 'function'},
+				{name: 'delete_file_in_scope', kind: 'function'},
+			],
 		},
 		'./server/server.js': {path: 'server/server.ts', declarations: []},
 		'./server/zzz_server.js': {
@@ -450,6 +453,7 @@ export const src_json = {
 				{name: 'Send_Prompt_Message', kind: 'type'},
 				{name: 'Receive_Prompt_Message', kind: 'type'},
 				{name: 'Update_File_Message', kind: 'type'},
+				{name: 'Delete_File_Message', kind: 'type'},
 			],
 		},
 		'./Zzz_Root.svelte': {path: 'Zzz_Root.svelte', declarations: []},
