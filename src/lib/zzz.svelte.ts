@@ -121,9 +121,12 @@ export class Zzz {
 		const {change, source_file} = message;
 		switch (change.type) {
 			case 'add':
-			case 'update':
-			case 'delete': {
+			case 'update': {
 				this.files_by_id.set(source_file.id, source_file);
+				break;
+			}
+			case 'delete': {
+				this.files_by_id.delete(source_file.id);
 				break;
 			}
 			default:

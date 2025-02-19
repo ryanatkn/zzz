@@ -29,6 +29,8 @@
 		view_with_prev = view_with;
 		view_with = v;
 	};
+
+	// TODO BLOCK show content in the right panel for the selected file
 </script>
 
 <div class="file_view" use:contextmenu_action={contextmenu_entries}>
@@ -48,6 +50,18 @@
 		>
 			{#snippet icon()}🗎{/snippet}
 			<span>Edit file</span>
+		</Contextmenu_Entry>
+		<Contextmenu_Entry
+			run={() => {
+				// TODO custom confirm dialog
+				// eslint-disable-next-line no-alert
+				if (confirm('Delete file "' + file.id + '"?')) {
+					zzz.delete_file(file.id);
+				}
+			}}
+		>
+			{#snippet icon()}🗙{/snippet}
+			<span>Delete file</span>
 		</Contextmenu_Entry>
 	{:else}
 		<Contextmenu_Entry
