@@ -1,16 +1,16 @@
 <script lang="ts">
 	import {scale} from 'svelte/transition';
 
-	import type {Chat_Stream} from '$lib/multichat.svelte.js';
+	import type {Tape} from '$lib/multichat.svelte.js';
 	import Chat_Message from '$lib/Chat_Message.svelte';
 
 	interface Props {
-		stream: Chat_Stream;
+		tape: Tape;
 		onremove: () => void;
 		onsend: (input: string) => void;
 	}
 
-	const {stream, onremove, onsend}: Props = $props();
+	const {tape, onremove, onsend}: Props = $props();
 
 	let input = $state('');
 	let input_el: HTMLTextAreaElement | undefined;
@@ -29,13 +29,13 @@
 </script>
 
 <!-- TODO `duration_2` is the Moss variable for 200ms and 1 for 80ms, but it's not in a usable form -->
-<div class="chat-stream" transition:scale={{duration: 200}}>
+<div class="chat_tape" transition:scale={{duration: 200}}>
 	<div class="header">
 		<header>
-			<div class="size_lg">{stream.model.name}</div>
-			<small>{stream.model.provider_name}</small>
+			<div class="size_lg">{tape.model.name}</div>
+			<small>{tape.model.provider_name}</small>
 		</header>
-		<!-- <small>{stream.provider.name}</small> -->
+		<!-- <small>{tape.provider.name}</small> -->
 		<div class="relative">
 			{#if removing}<button
 					type="button"
@@ -57,7 +57,7 @@
 	</div>
 
 	<div class="messages">
-		{#each stream.messages as message}
+		{#each tape.messages as message}
 			<Chat_Message {message} />
 		{/each}
 	</div>
@@ -67,7 +67,7 @@
 			class="flex_1"
 			bind:value={input}
 			bind:this={input_el}
-			placeholder="send to this stream..."
+			placeholder="send to this tape..."
 			onkeydown={(e) => e.key === 'Enter' && !e.shiftKey && (send(), e.preventDefault())}
 		></textarea>
 		<button type="button" onclick={() => send()}>send</button>
@@ -75,7 +75,7 @@
 </div>
 
 <style>
-	.chat-stream {
+	.chat_tape {
 		border: var(--border_size_1) solid #ccc;
 		padding: var(--space_md);
 		display: flex;

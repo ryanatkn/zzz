@@ -8,6 +8,7 @@
 	import File_Editor from '$lib/File_Editor.svelte';
 	import File_Info from '$lib/File_Info.svelte';
 	import File_Summary from '$lib/File_Summary.svelte';
+	import {zzz_context} from '$lib/zzz.svelte.js';
 
 	interface Props {
 		// TODO more efficient data structures, reactive source files
@@ -29,6 +30,8 @@
 		view_with_prev = view_with;
 		view_with = v;
 	};
+
+	const zzz = zzz_context.get();
 
 	// TODO BLOCK show content in the right panel for the selected file
 </script>

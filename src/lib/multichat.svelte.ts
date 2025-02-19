@@ -11,44 +11,44 @@ export interface Chat_Message {
 	response?: Completion_Response;
 }
 
-export interface Chat_Stream {
+export interface Tape {
 	id: Id;
 	model: Model;
 	messages: Array<Chat_Message>;
 }
 
 export class Multichat {
-	streams: Array<Chat_Stream> = $state([]);
+	tapes: Array<Tape> = $state([]);
 	zzz: Zzz;
 
 	constructor(zzz: Zzz) {
 		this.zzz = zzz;
 	}
 
-	add_stream(model: Model): void {
-		this.streams.push({
+	add_tape(model: Model): void {
+		this.tapes.push({
 			id: random_id(),
 			model,
 			messages: [],
 		});
 	}
 
-	remove_stream(id: Id): void {
-		const idx = this.streams.findIndex((s) => s.id === id);
-		if (idx !== -1) this.streams.splice(idx, 1);
+	remove_tape(id: Id): void {
+		const index = this.tapes.findIndex((s) => s.id === id);
+		if (index !== -1) this.tapes.splice(index, 1);
 	}
 
-	remove_all_streams(): void {
-		this.streams.length = 0;
+	remove_all_tapes(): void {
+		this.tapes.length = 0;
 	}
 
 	async send_to_all(text: string): Promise<void> {
-		await Promise.all(this.streams.map((stream) => this.send_to_stream(stream.id, text)));
+		await Promise.all(this.tapes.map((tape) => this.send_to_tape(tape.id, text)));
 	}
 
-	async send_to_stream(stream_id: Id, text: string): Promise<void> {
-		const stream = this.streams.find((s) => s.id === stream_id);
-		if (!stream) return;
+	async send_to_tape(tape_id: Id, text: string): Promise<void> {
+		const tape = this.tapes.find((s) => s.id === tape_id);
+		if (!tape) return;
 
 		const msg_id = random_id();
 		const message: Chat_Message = {
@@ -58,22 +58,18 @@ export class Multichat {
 			request: {
 				created: new Date().toISOString(),
 				request_id: msg_id,
-				provider_name: stream.model.provider_name,
-				model: stream.model.name,
+				provider_name: tape.model.provider_name,
+				model: tape.model.name,
 				prompt: text,
 			},
 		};
 
-		stream.messages.push(message);
+		tape.messages.push(message);
 
-		const response = await this.zzz.send_prompt(
-			text,
-			stream.model.provider_name,
-			stream.model.name,
-		);
+		const response = await this.zzz.send_prompt(text, tape.model.provider_name, tape.model.name);
 
 		// TODO refactor
-		const msg = stream.messages.find((m) => m.id === msg_id);
+		const msg = tape.messages.find((m) => m.id === msg_id);
 		if (msg) msg.response = response.completion_response;
 	}
 }

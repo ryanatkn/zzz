@@ -103,10 +103,10 @@
       "svelte": "./dist/Chat_Message.svelte",
       "default": "./dist/Chat_Message.svelte"
     },
-    "./Chat_Stream.svelte": {
-      "types": "./dist/Chat_Stream.svelte.d.ts",
-      "svelte": "./dist/Chat_Stream.svelte",
-      "default": "./dist/Chat_Stream.svelte"
+    "./Tape.svelte": {
+      "types": "./dist/Tape.svelte.d.ts",
+      "svelte": "./dist/Tape.svelte",
+      "default": "./dist/Tape.svelte"
     },
     "./completion_state.svelte.js": {
       "types": "./dist/completion_state.svelte.d.ts",

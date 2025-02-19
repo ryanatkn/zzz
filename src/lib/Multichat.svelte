@@ -3,7 +3,7 @@
 
 	import {Multichat} from '$lib/multichat.svelte.js';
 	import Model_Selector from '$lib/Model_Selector.svelte';
-	import Chat_Stream from '$lib/Chat_Stream.svelte';
+	import Chat_Tape from '$lib/Chat_Tape.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 
 	const zzz = zzz_context.get();
@@ -24,6 +24,8 @@
 		main_input = '';
 		pending = false;
 	}
+
+	// TODO BLOCK make a component for the confirm X on the "remove all tapes" button below
 </script>
 
 <div class="multichat">
@@ -35,36 +37,36 @@
 			<!-- TODO implement data class and markup -->
 		</div>
 		<div class="panel p_sm mt_lg">
-			<header class="size_xl mb_md">Add streams</header>
-			<Model_Selector onselect={(model) => multichat.add_stream(model)} />
+			<header class="size_xl mb_md">Add tapes</header>
+			<Model_Selector onselect={(model) => multichat.add_tape(model)} />
 		</div>
 		<div class="panel p_sm flex_1 mt_lg">
 			<div class="main_input">
 				<textarea
 					bind:value={main_input}
 					bind:this={input_el}
-					placeholder="send to all {multichat.streams.length >= 2
-						? multichat.streams.length + ' '
-						: ''}streams..."
+					placeholder="send to all {multichat.tapes.length >= 2
+						? multichat.tapes.length + ' '
+						: ''}tapes..."
 				></textarea>
 				<Pending_Button {pending} onclick={send_to_all}>
-					send to all ({multichat.streams.length})
+					send to all ({multichat.tapes.length})
 				</Pending_Button>
 			</div>
 			<div class="mb_lg">
 				<button
 					type="button"
-					onclick={() => multichat.remove_all_streams()}
-					disabled={!multichat.streams.length}>🗙 remove all streams</button
+					onclick={() => multichat.remove_all_tapes()}
+					disabled={!multichat.tapes.length}>🗙 remove all tapes</button
 				>
 			</div>
-			<!-- TODO duplicate stream button -->
-			<div class="streams">
-				{#each multichat.streams as stream (stream.id)}
-					<Chat_Stream
-						{stream}
-						onremove={() => multichat.remove_stream(stream.id)}
-						onsend={(input: string) => multichat.send_to_stream(stream.id, input)}
+			<!-- TODO duplicate tape button -->
+			<div class="tapes">
+				{#each multichat.tapes as tape (tape.id)}
+					<Chat_Tape
+						{tape}
+						onremove={() => multichat.remove_tape(tape.id)}
+						onsend={(input: string) => multichat.send_to_tape(tape.id, input)}
 					/>
 				{/each}
 			</div>
@@ -93,7 +95,7 @@
 		flex: 1;
 		min-height: 4rem;
 	}
-	.streams {
+	.tapes {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 		gap: var(--space_md);

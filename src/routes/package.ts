@@ -86,10 +86,10 @@ export const package_json = {
 			svelte: './dist/Chat_Message.svelte',
 			default: './dist/Chat_Message.svelte',
 		},
-		'./Chat_Stream.svelte': {
-			types: './dist/Chat_Stream.svelte.d.ts',
-			svelte: './dist/Chat_Stream.svelte',
-			default: './dist/Chat_Stream.svelte',
+		'./Tape.svelte': {
+			types: './dist/Tape.svelte.d.ts',
+			svelte: './dist/Tape.svelte',
+			default: './dist/Tape.svelte',
 		},
 		'./completion_state.svelte.js': {
 			types: './dist/completion_state.svelte.d.ts',
@@ -286,7 +286,7 @@ export const src_json = {
 		'./package.json': {path: 'package.json', declarations: []},
 		'./Chat_Item.svelte': {path: 'Chat_Item.svelte', declarations: []},
 		'./Chat_Message.svelte': {path: 'Chat_Message.svelte', declarations: []},
-		'./Chat_Stream.svelte': {path: 'Chat_Stream.svelte', declarations: []},
+		'./Tape.svelte': {path: 'Tape.svelte', declarations: []},
 		'./completion_state.svelte.js': {path: 'completion_state.svelte.ts', declarations: []},
 		'./Completion_Thread_Info.svelte': {path: 'Completion_Thread_Info.svelte', declarations: []},
 		'./Completion_Thread_Summary.svelte': {
@@ -379,7 +379,7 @@ export const src_json = {
 			path: 'multichat.svelte.ts',
 			declarations: [
 				{name: 'Chat_Message', kind: 'type'},
-				{name: 'Chat_Stream', kind: 'type'},
+				{name: 'Tape', kind: 'type'},
 				{name: 'Multichat', kind: 'class'},
 			],
 		},
