@@ -66,6 +66,13 @@
 				zzz.update_file(file.id, updated_contents);
 			}}>save</button
 		>
+		<button
+			class="color_c"
+			type="button"
+			onclick={() => {
+				zzz.delete_file(file.id);
+			}}>delete</button
+		>
 	</div>
 	<pre style:height="{height}px" class="flex_1 fg_1 radius_sm p_md">{file.contents}</pre>
 </div>

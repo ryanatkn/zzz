@@ -76,11 +76,11 @@
 
 <style>
 	.chat-stream {
-		border: 1px solid #ccc;
-		padding: 1rem;
+		border: var(--border_size_1) solid #ccc;
+		padding: var(--space_md);
 		display: flex;
 		flex-direction: column;
-		gap: 1rem;
+		gap: var(--space_md);
 		background-color: var(--input_fill);
 		border-radius: var(--radius_xs);
 	}

@@ -21,7 +21,7 @@ import type {
 } from '$lib/zzz_message.js';
 import {random_id} from '$lib/id.js';
 import {SYSTEM_MESSAGE_DEFAULT} from '$lib/config.js';
-import {write_file_in_scope as write_file_in_root_dir} from '$lib/server/helpers.js';
+import {delete_file_in_scope, write_file_in_scope} from '$lib/server/helpers.js';
 
 const anthropic = new Anthropic({apiKey: SECRET_ANTHROPIC_API_KEY});
 const openai = new OpenAI({apiKey: SECRET_OPENAI_API_KEY});
@@ -128,7 +128,7 @@ export class Zzz_Server {
 
 				let response: Receive_Prompt_Message;
 
-				console.log(`texting ${provider_name}`, prompt.substring(0, 1000));
+				console.log(`texting ${provider_name}:`, prompt.substring(0, 1000));
 
 				switch (provider_name) {
 					case 'ollama': {
@@ -291,7 +291,12 @@ export class Zzz_Server {
 			}
 			case 'update_file': {
 				const {file_id, contents} = message;
-				write_file_in_root_dir(file_id, contents, this.filer.root_dir);
+				write_file_in_scope(file_id, contents, this.filer.root_dir);
+				return null;
+			}
+			case 'delete_file': {
+				const {file_id} = message;
+				delete_file_in_scope(file_id, this.filer.root_dir);
 				return null;
 			}
 			default:

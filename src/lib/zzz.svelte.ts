@@ -165,6 +165,17 @@ export class Zzz {
 		this.client.send({id: random_id(), type: 'update_file', file_id, contents});
 	}
 
+	delete_file(file_id: Path_Id): void {
+		const source_file = this.files_by_id.get(file_id);
+		if (!source_file) {
+			console.error('expected source file', file_id);
+			return;
+		}
+		// TODO BLOCK this isn't removing it from the `/files` list
+
+		this.client.send({id: random_id(), type: 'delete_file', file_id});
+	}
+
 	// TODO API? close/open/toggle? just toggle? messages+mutations?
 	toggle_main_menu(value = !this.data.show_main_dialog): void {
 		this.data.show_main_dialog = value;

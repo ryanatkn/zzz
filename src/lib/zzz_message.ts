@@ -11,7 +11,8 @@ export type Client_Message =
 	| Echo_Message
 	| Load_Session_Message
 	| Send_Prompt_Message
-	| Update_File_Message;
+	| Update_File_Message
+	| Delete_File_Message;
 
 export type Server_Message =
 	| Echo_Message
@@ -80,4 +81,12 @@ export interface Update_File_Message extends Base_Message {
 	type: 'update_file';
 	file_id: Path_Id;
 	contents: string;
+}
+
+/**
+ * @client
+ */
+export interface Delete_File_Message extends Base_Message {
+	type: 'delete_file';
+	file_id: Path_Id;
 }
