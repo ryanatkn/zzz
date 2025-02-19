@@ -33,7 +33,7 @@
 	<div class="header">
 		<header>
 			<div class="size_lg">{stream.model.name}</div>
-			<div>{stream.model.provider_name}</div>
+			<small>{stream.model.provider_name}</small>
 		</header>
 		<!-- <small>{stream.provider.name}</small> -->
 		<div class="relative">
@@ -67,7 +67,7 @@
 			class="flex_1"
 			bind:value={input}
 			bind:this={input_el}
-			placeholder="Send to this stream..."
+			placeholder="send to this stream..."
 			onkeydown={(e) => e.key === 'Enter' && !e.shiftKey && (send(), e.preventDefault())}
 		></textarea>
 		<button type="button" onclick={() => send()}>send</button>

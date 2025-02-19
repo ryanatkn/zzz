@@ -43,7 +43,7 @@
 				<textarea
 					bind:value={main_input}
 					bind:this={input_el}
-					placeholder="Send to all {multichat.streams.length >= 2
+					placeholder="send to all {multichat.streams.length >= 2
 						? multichat.streams.length + ' '
 						: ''}streams..."
 				></textarea>
