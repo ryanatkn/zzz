@@ -1,5 +1,7 @@
 <script lang="ts">
-	import {models_default} from '$lib/config.js';
+	import {models_default, providers_default} from '$lib/config.js';
+	import Model_Link from '$lib/Model_Link.svelte';
+	import Provider_Link from '$lib/Provider_Link.svelte';
 
 	// TODO BLOCK link the providers below to a page per provider (lookup from provider_default/context)
 </script>
@@ -9,9 +11,16 @@
 	<div class="models_grid">
 		{#each models_default as model}
 			<div class="model_card">
-				<h2 class="model_name">{model.name}</h2>
-				<div class="model_provider">{model.provider_name}</div>
-				{#if model.tags?.length}
+				<h2 class="model_name">
+					<Model_Link {model} />
+				</h2>
+				<div class="model_provider">
+					<!-- TODO hacky -->
+					<Provider_Link provider={providers_default.find((p) => p.name === model.provider_name)!}
+						>{model.provider_name}</Provider_Link
+					>
+				</div>
+				{#if model.tags.length}
 					<div class="model_tags">
 						{#each model.tags as tag}
 							<span class="model_tag">{tag}</span>

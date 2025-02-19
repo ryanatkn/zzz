@@ -21,8 +21,8 @@
 	// TODO BLOCK name for "File_Explorer" and "File_List" parent component?
 </script>
 
-<div class="flex p_sm">
-	<div class="shrink_0">
+<div class="flex">
+	<div class="panel p_sm shrink_0">
 		<header class="size_xl mb_md">File Explorer</header>
 		<File_Explorer
 			files={files_map}

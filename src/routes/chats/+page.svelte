@@ -1,7 +1,7 @@
 <script lang="ts">
-	import Multichat from '$lib/Multichat.svelte';
+	import Dashboard_Chats from '$lib/Dashboard_Chats.svelte';
 </script>
 
 <div>
-	<Multichat />
+	<Dashboard_Chats />
 </div>

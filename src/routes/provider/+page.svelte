@@ -1,5 +1,7 @@
 <script lang="ts">
 	import {providers_default, models_default} from '$lib/config.js';
+	import Provider_Link from '$lib/Provider_Link.svelte';
+	import Model_Link from '$lib/Model_Link.svelte';
 
 	// TODO BLOCK link the models below to a page per model (lookup from model_default/context)
 </script>
@@ -9,11 +11,13 @@
 	<div class="providers_grid">
 		{#each providers_default as provider}
 			<div class="provider_card">
-				<h2 class="provider_name">{provider.title}</h2>
-				<div class="provider_id">{provider.name}</div>
+				<h2 class="provider_title">
+					<Provider_Link {provider} />
+				</h2>
+				<div class="provider_name">{provider.name}</div>
 				{#if provider.url}
 					<div class="provider_stat">
-						<a href={provider.url} target="_blank">Docs</a>
+						<a href={provider.url} target="_blank">docs <sup class="size_xs font_mono">[🡵]</sup></a>
 					</div>
 				{/if}
 				{#if provider.icon}
@@ -23,7 +27,9 @@
 				{/if}
 				<ul class="unstyled">
 					{#each models_default.filter((m) => m.provider_name === provider.name) as model}
-						<li class="row"><small class="chip">{model.name}</small></li>
+						<li class="row">
+							<small class="chip"><Model_Link {model} /></small>
+						</li>
 					{/each}
 				</ul>
 			</div>
@@ -46,12 +52,12 @@
 		padding: var(--space_lg);
 	}
 
-	.provider_name {
+	.provider_title {
 		font-size: var(--size_lg);
 		margin: 0 0 var(--space_sm);
 	}
 
-	.provider_id {
+	.provider_name {
 		color: var(--text_2);
 		margin-bottom: var(--space_sm);
 	}

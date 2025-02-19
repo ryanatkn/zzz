@@ -192,11 +192,11 @@ a.chip {
 .mr_md {
 	margin-right: var(--space_md);
 }
+.mr_xs2 {
+	margin-right: var(--space_xs2);
+}
 .mt_0 {
 	margin-top: 0;
-}
-.mt_lg {
-	margin-top: var(--space_lg);
 }
 .mt_xl3 {
 	margin-top: var(--space_xl3);
@@ -246,11 +246,11 @@ a.chip {
 .pb_xl7 {
 	padding-bottom: var(--space_xl7);
 }
-.pl_lg {
-	padding-left: var(--space_lg);
-}
 .pl_md {
 	padding-left: var(--space_md);
+}
+.pl_sm {
+	padding-left: var(--space_sm);
 }
 
 /* TODO maybe this belongs with the reset, like `selected`? or does `selected` belong here? */
@@ -263,8 +263,8 @@ a.chip {
 .pr_md {
 	padding-right: var(--space_md);
 }
-.pt_lg {
-	padding-top: var(--space_lg);
+.pt_sm {
+	padding-top: var(--space_sm);
 }
 .px_lg {
 	padding-left: var(--space_lg);

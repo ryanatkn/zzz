@@ -50,7 +50,7 @@
 				type="button"
 				class="icon_button"
 				class:plain={!removing}
-				class:size_xs={removing}
+				class:size_sm={removing}
 				onclick={() => (removing = !removing)}>🗙</button
 			>
 		</div>

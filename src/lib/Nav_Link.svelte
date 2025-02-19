@@ -2,6 +2,7 @@
 	import {page} from '$app/state';
 	import type {SvelteHTMLElements} from 'svelte/elements';
 	import type {Snippet} from 'svelte';
+	import {base} from '$app/paths';
 
 	interface Props {
 		href: string;
@@ -12,11 +13,14 @@
 	const {href, attrs, children}: Props = $props();
 
 	const selected = $derived(page.url.pathname === href);
+	const selected_descendent = $derived(
+		selected || href === base + '/' ? false : page.url.pathname.startsWith(href),
+	);
 
 	// TODO link styles should have focus always be blue, and active should be thicker
 </script>
 
-<a {...attrs} {href} class:selected>{@render children()}</a>
+<a {...attrs} {href} class:selected class:selected_descendent>{@render children()}</a>
 
 <style>
 	a {
@@ -36,5 +40,8 @@
 	a.selected {
 		border-color: var(--border_color_a);
 		color: var(--color_a_6);
+	}
+	a.selected_descendent {
+		border-color: var(--border_color_5);
 	}
 </style>
