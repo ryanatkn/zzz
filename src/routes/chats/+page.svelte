@@ -2,6 +2,6 @@
 	import Multichat from '$lib/Multichat.svelte';
 </script>
 
-<div class="p_lg">
+<div>
 	<Multichat />
 </div>

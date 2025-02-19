@@ -6,6 +6,9 @@
 .bg {
 	background-color: var(--bg);
 }
+.bg_c_1 {
+	background-color: var(--color_c_1);
+}
 
 .box {
 	display: flex;
@@ -108,9 +111,6 @@ a.chip {
 .inline {
 	display: inline;
 }
-.justify_content_end {
-	justify-content: end;
-}
 .justify_content_space_between {
 	justify-content: space-between;
 }
@@ -208,6 +208,9 @@ a.chip {
 .p_md {
 	padding: var(--space_md);
 }
+.p_sm {
+	padding: var(--space_sm);
+}
 .p_xl {
 	padding: var(--space_xl);
 }
@@ -260,8 +263,9 @@ a.chip {
 	padding-top: var(--space_xl9);
 	padding-bottom: var(--space_xl9);
 }
-.radius_0 {
-	border-radius: 0;
+.py_xs3 {
+	padding-top: var(--space_xs3);
+	padding-bottom: var(--space_xs3);
 }
 .radius_sm {
 	border-radius: var(--radius_sm);
@@ -321,6 +325,9 @@ a.chip {
 }
 .size_xl3 {
 	font-size: var(--size_xl3);
+}
+.size_xs {
+	font-size: var(--size_xs);
 }
 .t_0 {
 	top: 0;

@@ -166,7 +166,7 @@ export class Zzz {
 	}
 
 	// TODO API? close/open/toggle? just toggle? messages+mutations?
-	toggle_main_menu(value = !this.data.show_main_menu): void {
-		this.data.show_main_menu = value;
+	toggle_main_menu(value = !this.data.show_main_dialog): void {
+		this.data.show_main_dialog = value;
 	}
 }

@@ -28,23 +28,30 @@
 	let removing = $state(false);
 </script>
 
-<!-- TODO `duration_2` is the Moss variable for 200ms, but it's not in a usable form -->
+<!-- TODO `duration_2` is the Moss variable for 200ms and 1 for 80ms, but it's not in a usable form -->
 <div class="chat-stream" transition:scale={{duration: 200}}>
 	<div class="header">
-		<h3 class="mt_0">{stream.model.name}</h3>
+		<header>
+			<div class="size_lg">{stream.model.name}</div>
+			<div>{stream.model.provider_name}</div>
+		</header>
+		<!-- <small>{stream.provider.name}</small> -->
 		<div class="relative">
 			{#if removing}<button
 					type="button"
-					class="color_c absolute icon_button"
-					style:left="-100%"
-					onclick={() => onremove()}>🗙</button
+					class="color_c absolute icon_button bg_c_1"
+					style:left="calc(-1 * var(--input_height))"
+					style:transform-origin="right"
+					onclick={() => onremove()}
+					in:scale={{duration: 80}}
+					out:scale={{duration: 200}}>🗙</button
 				>{/if}
 			<button
 				type="button"
 				class="icon_button"
 				class:plain={!removing}
-				onclick={() => (removing = !removing)}
-				>{#if removing}×{:else}🗙{/if}</button
+				class:size_xs={removing}
+				onclick={() => (removing = !removing)}>🗙</button
 			>
 		</div>
 	</div>

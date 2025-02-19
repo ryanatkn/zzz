@@ -3,8 +3,8 @@
 	import {is_editable, swallow} from '@ryanatkn/belt/dom.js';
 
 	import {Zzz, zzz_context} from '$lib/zzz.svelte.js';
-	import Hud_Root from '$lib/Hud_Root.svelte';
 	import Dashboard from '$lib/Dashboard.svelte';
+	import Main_Dialog from '$lib/Main_Dialog.svelte';
 	import {hud_context} from '$lib/hud.svelte.js';
 
 	/*
@@ -35,19 +35,12 @@
 	}}
 />
 
-<Hud_Root>
-	<!-- TODO user-defined pages should be able to control the full page at runtime -->
-	<Dashboard>
-		<main>
-			{@render children(zzz)}
-		</main>
-	</Dashboard>
-</Hud_Root>
+<Main_Dialog />
+<!-- TODO user-defined pages should be able to control the full page at runtime -->
+<Dashboard>
+	<main>
+		{@render children(zzz)}
+	</main>
+</Dashboard>
 
-{#snippet hud_default()}
-	<div class="h_100 row justify_content_end">
-		<button type="button" class="radius_0 plain" onclick={() => (zzz.data.show_main_menu = true)}
-			>☰</button
-		>
-	</div>
-{/snippet}
+{#snippet hud_default()}{/snippet}

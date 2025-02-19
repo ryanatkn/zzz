@@ -29,8 +29,8 @@
 <div class="multichat">
 	<div class="controls">
 		<!-- TODO, show the counts of active items for each of the model selector buttons in a snippet here -->
-		<div>
-			<h3>Add streams</h3>
+		<div class="panel p_sm">
+			<h3 class="mt_0">Add streams</h3>
 			<Model_Selector onselect={(model) => multichat.add_stream(model)} />
 		</div>
 		<div class="flex_1">

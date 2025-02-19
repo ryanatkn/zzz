@@ -98,19 +98,15 @@
       "svelte": "./dist/Chat_Item.svelte",
       "default": "./dist/Chat_Item.svelte"
     },
+    "./Chat_Message.svelte": {
+      "types": "./dist/Chat_Message.svelte.d.ts",
+      "svelte": "./dist/Chat_Message.svelte",
+      "default": "./dist/Chat_Message.svelte"
+    },
     "./Chat_Stream.svelte": {
       "types": "./dist/Chat_Stream.svelte.d.ts",
       "svelte": "./dist/Chat_Stream.svelte",
       "default": "./dist/Chat_Stream.svelte"
-    },
-    "./Chat.svelte": {
-      "types": "./dist/Chat.svelte.d.ts",
-      "svelte": "./dist/Chat.svelte",
-      "default": "./dist/Chat.svelte"
-    },
-    "./chat.svelte.js": {
-      "types": "./dist/chat.svelte.d.ts",
-      "default": "./dist/chat.svelte.js"
     },
     "./completion_state.svelte.js": {
       "types": "./dist/completion_state.svelte.d.ts",
@@ -196,16 +192,6 @@
       "types": "./dist/file.svelte.d.ts",
       "default": "./dist/file.svelte.js"
     },
-    "./Hud_Dialog.svelte": {
-      "types": "./dist/Hud_Dialog.svelte.d.ts",
-      "svelte": "./dist/Hud_Dialog.svelte",
-      "default": "./dist/Hud_Dialog.svelte"
-    },
-    "./Hud_Root.svelte": {
-      "types": "./dist/Hud_Root.svelte.d.ts",
-      "svelte": "./dist/Hud_Root.svelte",
-      "default": "./dist/Hud_Root.svelte"
-    },
     "./hud.svelte.js": {
       "types": "./dist/hud.svelte.d.ts",
       "default": "./dist/hud.svelte.js"
@@ -213,6 +199,11 @@
     "./id.js": {
       "types": "./dist/id.d.ts",
       "default": "./dist/id.js"
+    },
+    "./Main_Dialog.svelte": {
+      "types": "./dist/Main_Dialog.svelte.d.ts",
+      "svelte": "./dist/Main_Dialog.svelte",
+      "default": "./dist/Main_Dialog.svelte"
     },
     "./Message_Info.svelte": {
       "types": "./dist/Message_Info.svelte.d.ts",

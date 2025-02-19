@@ -14,6 +14,8 @@
 
 	const SIDEBAR_WIDTH_MAX = 200;
 	const sidebar_width = $state(SIDEBAR_WIDTH_MAX);
+
+	// TODO dashboard should be mounted with Markdown
 </script>
 
 <!-- TODO drive with data -->
@@ -22,7 +24,7 @@
 		<!-- TODO refactor -->
 		<div class="h_100 w_100 p_lg" style:width="var(--sidebar_width)">
 			<!-- TODO support `max_height_100` in Moss -->
-			<nav class="panel column size_lg p_md overflow_auto" style:max-height="100%">
+			<nav class="panel column size_lg p_sm overflow_auto" style:max-height="100%">
 				<div class="flex mb_sm">
 					<Nav_Link
 						href="{base}/"

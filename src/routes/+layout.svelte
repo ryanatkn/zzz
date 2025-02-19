@@ -129,7 +129,7 @@
 				content: 'Settings',
 				icon: '?',
 				run: () => {
-					zzz.data.show_main_menu = true;
+					zzz.data.show_main_dialog = true;
 				},
 			},
 		},

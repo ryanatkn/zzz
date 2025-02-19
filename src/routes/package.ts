@@ -81,17 +81,16 @@ export const package_json = {
 			svelte: './dist/Chat_Item.svelte',
 			default: './dist/Chat_Item.svelte',
 		},
+		'./Chat_Message.svelte': {
+			types: './dist/Chat_Message.svelte.d.ts',
+			svelte: './dist/Chat_Message.svelte',
+			default: './dist/Chat_Message.svelte',
+		},
 		'./Chat_Stream.svelte': {
 			types: './dist/Chat_Stream.svelte.d.ts',
 			svelte: './dist/Chat_Stream.svelte',
 			default: './dist/Chat_Stream.svelte',
 		},
-		'./Chat.svelte': {
-			types: './dist/Chat.svelte.d.ts',
-			svelte: './dist/Chat.svelte',
-			default: './dist/Chat.svelte',
-		},
-		'./chat.svelte.js': {types: './dist/chat.svelte.d.ts', default: './dist/chat.svelte.js'},
 		'./completion_state.svelte.js': {
 			types: './dist/completion_state.svelte.d.ts',
 			default: './dist/completion_state.svelte.js',
@@ -167,18 +166,13 @@ export const package_json = {
 			default: './dist/File_View.svelte',
 		},
 		'./file.svelte.js': {types: './dist/file.svelte.d.ts', default: './dist/file.svelte.js'},
-		'./Hud_Dialog.svelte': {
-			types: './dist/Hud_Dialog.svelte.d.ts',
-			svelte: './dist/Hud_Dialog.svelte',
-			default: './dist/Hud_Dialog.svelte',
-		},
-		'./Hud_Root.svelte': {
-			types: './dist/Hud_Root.svelte.d.ts',
-			svelte: './dist/Hud_Root.svelte',
-			default: './dist/Hud_Root.svelte',
-		},
 		'./hud.svelte.js': {types: './dist/hud.svelte.d.ts', default: './dist/hud.svelte.js'},
 		'./id.js': {types: './dist/id.d.ts', default: './dist/id.js'},
+		'./Main_Dialog.svelte': {
+			types: './dist/Main_Dialog.svelte.d.ts',
+			svelte: './dist/Main_Dialog.svelte',
+			default: './dist/Main_Dialog.svelte',
+		},
 		'./Message_Info.svelte': {
 			types: './dist/Message_Info.svelte.d.ts',
 			svelte: './dist/Message_Info.svelte',
@@ -291,16 +285,8 @@ export const src_json = {
 	modules: {
 		'./package.json': {path: 'package.json', declarations: []},
 		'./Chat_Item.svelte': {path: 'Chat_Item.svelte', declarations: []},
+		'./Chat_Message.svelte': {path: 'Chat_Message.svelte', declarations: []},
 		'./Chat_Stream.svelte': {path: 'Chat_Stream.svelte', declarations: []},
-		'./Chat.svelte': {path: 'Chat.svelte', declarations: []},
-		'./chat.svelte.js': {
-			path: 'chat.svelte.ts',
-			declarations: [
-				{name: 'Chat_Message', kind: 'type'},
-				{name: 'Chat_Instance', kind: 'type'},
-				{name: 'Chat', kind: 'class'},
-			],
-		},
 		'./completion_state.svelte.js': {path: 'completion_state.svelte.ts', declarations: []},
 		'./Completion_Thread_Info.svelte': {path: 'Completion_Thread_Info.svelte', declarations: []},
 		'./Completion_Thread_Summary.svelte': {
@@ -362,8 +348,6 @@ export const src_json = {
 				{name: 'Prompt', kind: 'class'},
 			],
 		},
-		'./Hud_Dialog.svelte': {path: 'Hud_Dialog.svelte', declarations: []},
-		'./Hud_Root.svelte': {path: 'Hud_Root.svelte', declarations: []},
 		'./hud.svelte.js': {
 			path: 'hud.svelte.ts',
 			declarations: [{name: 'hud_context', kind: 'variable'}],
@@ -375,6 +359,7 @@ export const src_json = {
 				{name: 'random_id', kind: 'function'},
 			],
 		},
+		'./Main_Dialog.svelte': {path: 'Main_Dialog.svelte', declarations: []},
 		'./Message_Info.svelte': {path: 'Message_Info.svelte', declarations: []},
 		'./Message_Summary.svelte': {path: 'Message_Summary.svelte', declarations: []},
 		'./Message_View.svelte': {path: 'Message_View.svelte', declarations: []},
