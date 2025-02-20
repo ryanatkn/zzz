@@ -4,7 +4,7 @@ export const SYMBOL_FILE = '⏚'; // ⏚ ⧈ ⊞ ⧉ ⌺ ▤
 export const SYMBOL_PROMPTS = '⌇'; // ⌇ ⍋  ⌭
 export const SYMBOL_PROVIDER = '⨕';
 export const SYMBOL_MODEL = '⊛'; // ⨹ ⨺ ⊛
-// export const SYMBOL_ABOUT = '⍾'; // using Zzz logo instead - ⎎ ⍰ ? ⍾
+// export const SYMBOL_ABOUT =
 export const SYMBOL_CAPABILITIES = '⧰'; // ⌁
 export const SYMBOL_SETTINGS = '⛮'; // ⛭  ⚙  ⛮  ⛯ ⛣
 // ⏛
@@ -25,13 +25,24 @@ export const SYMBOL_SETTINGS = '⛮'; // ⛭  ⚙  ⛮  ⛯ ⛣
 
 // ⌾
 // ⌓
+// ⍜
+// ⍖
+// ⍤
+
+// ⍾
+// ⎎
 
 // ⌯
 // ⌗
 // ⎍
+
+// ⨳
 
 // ⎕
 // ⌘
 
 // ⌥
 // ⌤
+
+// ⏀
+// ⏁
