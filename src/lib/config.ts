@@ -239,4 +239,4 @@ const config: Zzz_Config_Creator = () => {
 	};
 };
 
-export default config;
+export default config; // TODO I guess this acts like a seed file? `zzz.config.ts`? could we create a config helper with gro? (see the equivalent code in fuz_gitops)

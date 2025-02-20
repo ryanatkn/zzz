@@ -305,10 +305,10 @@ export const package_json = {
 			svelte: './dist/Settings.svelte',
 			default: './dist/Settings.svelte',
 		},
-		'./Unicode_Icon.svelte': {
-			types: './dist/Unicode_Icon.svelte.d.ts',
-			svelte: './dist/Unicode_Icon.svelte',
-			default: './dist/Unicode_Icon.svelte',
+		'./Text_Icon.svelte': {
+			types: './dist/Text_Icon.svelte.d.ts',
+			svelte: './dist/Text_Icon.svelte',
+			default: './dist/Text_Icon.svelte',
 		},
 		'./zzz_client.js': {types: './dist/zzz_client.d.ts', default: './dist/zzz_client.js'},
 		'./zzz_data.svelte.js': {
@@ -381,11 +381,11 @@ export const src_json = {
 			path: 'constants.ts',
 			declarations: [
 				{name: 'SYMBOL_CHAT', kind: 'variable'},
+				{name: 'SYMBOL_TAPE', kind: 'variable'},
 				{name: 'SYMBOL_FILE', kind: 'variable'},
 				{name: 'SYMBOL_PROMPTS', kind: 'variable'},
 				{name: 'SYMBOL_PROVIDER', kind: 'variable'},
 				{name: 'SYMBOL_MODEL', kind: 'variable'},
-				{name: 'SYMBOL_ABOUT', kind: 'variable'},
 				{name: 'SYMBOL_CAPABILITIES', kind: 'variable'},
 				{name: 'SYMBOL_SETTINGS', kind: 'variable'},
 			],
@@ -492,7 +492,7 @@ export const src_json = {
 			],
 		},
 		'./Settings.svelte': {path: 'Settings.svelte', declarations: []},
-		'./Unicode_Icon.svelte': {path: 'Unicode_Icon.svelte', declarations: []},
+		'./Text_Icon.svelte': {path: 'Text_Icon.svelte', declarations: []},
 		'./zzz_client.js': {
 			path: 'zzz_client.ts',
 			declarations: [

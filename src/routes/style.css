@@ -15,7 +15,7 @@
 	transform: scale(1.14);
 }
 
-/* TODO refactor with `Unicode_Icon`*/
+/* TODO refactor with `Text_Icon`*/
 .icon_xs {
 	display: flex;
 	align-items: center;

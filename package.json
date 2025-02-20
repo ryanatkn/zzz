@@ -354,10 +354,10 @@
       "svelte": "./dist/Settings.svelte",
       "default": "./dist/Settings.svelte"
     },
-    "./Unicode_Icon.svelte": {
-      "types": "./dist/Unicode_Icon.svelte.d.ts",
-      "svelte": "./dist/Unicode_Icon.svelte",
-      "default": "./dist/Unicode_Icon.svelte"
+    "./Text_Icon.svelte": {
+      "types": "./dist/Text_Icon.svelte.d.ts",
+      "svelte": "./dist/Text_Icon.svelte",
+      "default": "./dist/Text_Icon.svelte"
     },
     "./zzz_client.js": {
       "types": "./dist/zzz_client.d.ts",

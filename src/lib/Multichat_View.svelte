@@ -4,8 +4,10 @@
 
 	import {Multichat} from '$lib/multichat.svelte.js';
 	import Model_Selector from '$lib/Model_Selector.svelte';
+	import Text_Icon from '$lib/Text_Icon.svelte';
 	import Chat_Tape from '$lib/Chat_Tape.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {SYMBOL_MODEL, SYMBOL_TAPE} from '$lib/constants.js';
 
 	const zzz = zzz_context.get();
 
@@ -44,7 +46,9 @@
 <div class="multichat">
 	<div class="column gap_md">
 		<div class="panel p_sm">
-			<header class="size_xl mb_md">Add tapes to chat</header>
+			<header class="size_xl mb_md">
+				<h2 class="mt_0"><Text_Icon icon={SYMBOL_TAPE} /> tapes</h2>
+			</header>
 			<!-- TODO add user-customizable sets of models -->
 			<menu class="unstyled column">
 				<button
@@ -82,7 +86,9 @@
 			</menu>
 		</div>
 		<div class="panel p_sm">
-			<header class="size_xl mb_md">Add tape with model</header>
+			<header class="mb_md">
+				<h3 class="mt_0"><Text_Icon icon={SYMBOL_MODEL} /> add tape with model</h3>
+			</header>
 			<Model_Selector onselect={(model) => multichat.add_tape(model)} />
 		</div>
 	</div>

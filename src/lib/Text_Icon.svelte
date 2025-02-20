@@ -4,7 +4,7 @@
 		size?: string;
 	}
 
-	const {icon, size = 'var(--icon_size_md)'}: Props = $props();
+	const {icon, size = 'var(--size, var(--icon_size_md))'}: Props = $props();
 
 	// TODO BLOCK refactor with `icon_xs`
 </script>

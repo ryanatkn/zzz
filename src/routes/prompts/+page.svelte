@@ -1,13 +1,13 @@
 <script lang="ts">
 	import {SYMBOL_PROMPTS} from '$lib/constants.js';
-	import Unicode_Icon from '$lib/Unicode_Icon.svelte';
+	import Text_Icon from '$lib/Text_Icon.svelte';
 
 	// TODO implement
 </script>
 
-<div class="p_sm">
+<div class="width_md p_sm">
 	<header>
-		<h1><Unicode_Icon icon={SYMBOL_PROMPTS} /> prompts</h1>
+		<h1><Text_Icon icon={SYMBOL_PROMPTS} /> prompts</h1>
 	</header>
 	<section>
 		<aside>⚠️ under contruction</aside>
