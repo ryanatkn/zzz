@@ -26,18 +26,23 @@
 			</h1>
 		</header>
 		<p>
-			Zzz, pronounced "zees" like the sound of electricity, is an endgame web UI. The idea is still
-			being developed, but some important points include:
+			Zzz, pronounced "zees" like the sound of electricity, is an endgame web UI, the kind that
+			adapts to your needs on the fly, and that's fully open and in your control. Concepts include:
 		</p>
 		<ul>
+			<li>open source</li>
+			<li>fully controlled by the user</li>
+			<li>client is the nexus of many services</li>
 			<li>local-first</li>
-			<li></li>
 			<li>customizable and programmable</li>
-			<li>progressively enhanced with capabilities like a web server and local models</li>
+			<li>
+				progressively enhanced with capabilities like a local or remote web server and local model
+				providers like Ollama
+			</li>
 		</ul>
 		<p class="mt_xl5">
 			⚠️ This is an early pre-release, see the <a href="https://github.com/ryanatkn/zzz"
-				>source code</a
+				>readme and source code</a
 			>
 			and <a href="https://github.com/ryanatkn/zzz/discussions">discussions</a>.
 		</p>

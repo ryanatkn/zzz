@@ -38,12 +38,6 @@ npm run dev
 
 Browse to the location is says, probably `localhost:5173`.
 
-## Todo
-
-- publish library
-- improve website
-- <code>**name**.zzzbot.dev</code>
-
 ## License 🐦
 
 [MIT](LICENSE)
