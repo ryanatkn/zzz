@@ -67,7 +67,7 @@
 				<a href="{base}/spaces" class:selected={page.url.pathname === base + '/spaces'}>spaces</a> -->
 
 				<!-- AI Tools -->
-				<h3 class="h3_subheading">AI</h3>
+				<h3 class="h3_ui">AI</h3>
 				<Nav_Link href="{base}/providers"
 					><span class="icon_xs">{SYMBOL_PROVIDER}</span> providers</Nav_Link
 				>
@@ -78,7 +78,7 @@
 				<a href="{base}/providers" class:selected={page.url.pathname === base + '/provider'}>providers</a> -->
 
 				<!-- System -->
-				<h3 class="h3_subheading">system</h3>
+				<h3 class="h3_ui">system</h3>
 				<Nav_Link href="{base}/about">
 					{#snippet children(selected)}<span class="icon_xs"
 							><Svg
@@ -113,14 +113,14 @@
 				</div> -->
 
 				<!-- Quick Actions -->
-				<!-- <h3 class="h3_subheading">Quick Actions</h3>
+				<!-- <h3 class="h3_ui">Quick Actions</h3>
 				<Nav_Link href="{base}/new/chat">New Chat</Nav_Link>
 				<Nav_Link href="{base}/new/page">New Page</Nav_Link>
 				<Nav_Link href="{base}/new/agent">New Agent</Nav_Link>
 				<Nav_Link href="{base}/files/browse">Browse Files</Nav_Link> -->
 
 				<!-- Content -->
-				<!-- <h3 class="h3_subheading">Content</h3>
+				<!-- <h3 class="h3_ui">Content</h3>
 				<Nav_Link href="{base}/files">Files & Media</Nav_Link>
 				<Nav_Link href="{base}/pages">Pages</Nav_Link>
 				<Nav_Link href="{base}/lists">Lists</Nav_Link>
@@ -128,14 +128,14 @@
 				<Nav_Link href="{base}/media">Media Library</Nav_Link> -->
 
 				<!-- Communication -->
-				<!-- <h3 class="h3_subheading">Communication</h3>
+				<!-- <h3 class="h3_ui">Communication</h3>
 				<Nav_Link href="{base}/chats">Chats</Nav_Link>
 				<Nav_Link href="{base}/forums">Forums</Nav_Link>
 				<Nav_Link href="{base}/spaces">Spaces</Nav_Link>
 				<Nav_Link href="{base}/channels">Channels</Nav_Link> -->
 
 				<!-- Intelligence -->
-				<!-- <h3 class="h3_subheading">Intelligence</h3>
+				<!-- <h3 class="h3_ui">Intelligence</h3>
 				<Nav_Link href="{base}/agents">Agents</Nav_Link>
 				<Nav_Link href="{base}/providers">Providers</Nav_Link>
 				<Nav_Link href="{base}/models">Models</Nav_Link>
@@ -143,26 +143,26 @@
 				<Nav_Link href="{base}/experiments">Experiments</Nav_Link> -->
 
 				<!-- Development -->
-				<!-- <h3 class="h3_subheading">Development</h3>
+				<!-- <h3 class="h3_ui">Development</h3>
 				<Nav_Link href="{base}/plugins">Plugins</Nav_Link>
 				<Nav_Link href="{base}/api">API</Nav_Link>
 				<Nav_Link href="{base}/terminal">Terminal</Nav_Link>
 				<Nav_Link href="{base}/database">Database</Nav_Link> -->
 
 				<!-- Analytics -->
-				<!-- <h3 class="h3_subheading">Analytics</h3>
+				<!-- <h3 class="h3_ui">Analytics</h3>
 				<Nav_Link href="{base}/metrics">Metrics</Nav_Link>
 				<Nav_Link href="{base}/usage">Usage</Nav_Link>
 				<Nav_Link href="{base}/logs">Logs</Nav_Link> -->
 
 				<!-- Network -->
-				<!-- <h3 class="h3_subheading">Network</h3>
+				<!-- <h3 class="h3_ui">Network</h3>
 				<Nav_Link href="{base}/peers">Peers</Nav_Link>
 				<Nav_Link href="{base}/federation">Federation</Nav_Link>
 				<Nav_Link href="{base}/sync">Sync</Nav_Link> -->
 
 				<!-- System -->
-				<!-- <h3 class="h3_subheading">System</h3>
+				<!-- <h3 class="h3_ui">System</h3>
 				<Nav_Link href="{base}/settings">Settings</Nav_Link>
 				<Nav_Link href="{base}/capabilities">Capabilities</Nav_Link>
 				<Nav_Link href="{base}/security">Security</Nav_Link>
@@ -186,7 +186,7 @@
 				</div> -->
 
 				<!-- Quick Actions -->
-				<!-- <h3 class="h3_subheading">Quick Actions</h3>
+				<!-- <h3 class="h3_ui">Quick Actions</h3>
 				<Nav_Link href="{base}/new/chat">New Chat</Nav_Link>
 				<Nav_Link href="{base}/new/page">New Page</Nav_Link>
 				<Nav_Link href="{base}/new/agent">New Agent</Nav_Link>
@@ -195,7 +195,7 @@
 				<Nav_Link href="{base}/quick/deploy">Quick Deploy</Nav_Link> -->
 
 				<!-- Content Management -->
-				<!-- <h3 class="h3_subheading">Content</h3>
+				<!-- <h3 class="h3_ui">Content</h3>
 				<Nav_Link href="{base}/files">Files & Media</Nav_Link>
 				<Nav_Link href="{base}/pages">Pages</Nav_Link>
 				<Nav_Link href="{base}/lists">Lists</Nav_Link>
@@ -206,7 +206,7 @@
 				<Nav_Link href="{base}/archives">Archives</Nav_Link> -->
 
 				<!-- Communication -->
-				<!-- <h3 class="h3_subheading">Communication</h3>
+				<!-- <h3 class="h3_ui">Communication</h3>
 				<Nav_Link href="{base}/chats">Chats</Nav_Link>
 				<Nav_Link href="{base}/forums">Forums</Nav_Link>
 				<Nav_Link href="{base}/spaces">Spaces</Nav_Link>
@@ -217,7 +217,7 @@
 				<Nav_Link href="{base}/comments">Comments</Nav_Link>
  -->
 				<!-- Intelligence -->
-				<!-- <h3 class="h3_subheading">Intelligence</h3>
+				<!-- <h3 class="h3_ui">Intelligence</h3>
 				<Nav_Link href="{base}/agents">Agents</Nav_Link>
 				<Nav_Link href="{base}/providers">Providers</Nav_Link>
 				<Nav_Link href="{base}/models">Models</Nav_Link>
@@ -228,7 +228,7 @@
 				<Nav_Link href="{base}/knowledge">Knowledge Base</Nav_Link> -->
 
 				<!-- Automation -->
-				<!-- <h3 class="h3_subheading">Automation</h3>
+				<!-- <h3 class="h3_ui">Automation</h3>
 				<Nav_Link href="{base}/workflows">Workflows</Nav_Link>
 				<Nav_Link href="{base}/tasks">Tasks</Nav_Link>
 				<Nav_Link href="{base}/schedules">Schedules</Nav_Link>
@@ -237,7 +237,7 @@
 				<Nav_Link href="{base}/rules">Rules</Nav_Link> -->
 
 				<!-- Development -->
-				<!-- <h3 class="h3_subheading">Development</h3>
+				<!-- <h3 class="h3_ui">Development</h3>
 				<Nav_Link href="{base}/plugins">Plugins</Nav_Link>
 				<Nav_Link href="{base}/api">API</Nav_Link>
 				<Nav_Link href="{base}/terminal">Terminal</Nav_Link>
@@ -248,7 +248,7 @@
 				<Nav_Link href="{base}/builds">Builds</Nav_Link> -->
 
 				<!-- Analytics -->
-				<!-- <h3 class="h3_subheading">Analytics</h3>
+				<!-- <h3 class="h3_ui">Analytics</h3>
 				<Nav_Link href="{base}/metrics">Metrics</Nav_Link>
 				<Nav_Link href="{base}/usage">Usage</Nav_Link>
 				<Nav_Link href="{base}/logs">Logs</Nav_Link>
@@ -257,7 +257,7 @@
 				<Nav_Link href="{base}/reports">Reports</Nav_Link> -->
 
 				<!-- Network -->
-				<!-- <h3 class="h3_subheading">Network</h3>
+				<!-- <h3 class="h3_ui">Network</h3>
 				<Nav_Link href="{base}/peers">Peers</Nav_Link>
 				<Nav_Link href="{base}/federation">Federation</Nav_Link>
 				<Nav_Link href="{base}/sync">Sync</Nav_Link>
@@ -266,7 +266,7 @@
 				<Nav_Link href="{base}/gateways">Gateways</Nav_Link> -->
 
 				<!-- Security -->
-				<!-- <h3 class="h3_subheading">Security</h3>
+				<!-- <h3 class="h3_ui">Security</h3>
 				<Nav_Link href="{base}/access">Access Control</Nav_Link>
 				<Nav_Link href="{base}/encryption">Encryption</Nav_Link>
 				<Nav_Link href="{base}/keys">Key Management</Nav_Link>
@@ -275,7 +275,7 @@
 				<Nav_Link href="{base}/recovery">Recovery</Nav_Link> -->
 
 				<!-- Collaboration -->
-				<!-- <h3 class="h3_subheading">Collaboration</h3>
+				<!-- <h3 class="h3_ui">Collaboration</h3>
 				<Nav_Link href="{base}/teams">Teams</Nav_Link>
 				<Nav_Link href="{base}/projects">Projects</Nav_Link>
 				<Nav_Link href="{base}/sharing">Sharing</Nav_Link>
@@ -284,7 +284,7 @@
 				<Nav_Link href="{base}/invites">Invites</Nav_Link> -->
 
 				<!-- System -->
-				<!-- <h3 class="h3_subheading">System</h3>
+				<!-- <h3 class="h3_ui">System</h3>
 				<Nav_Link href="{base}/settings">Settings</Nav_Link>
 				<Nav_Link href="{base}/capabilities">Capabilities</Nav_Link>
 				<Nav_Link href="{base}/resources">Resources</Nav_Link>
