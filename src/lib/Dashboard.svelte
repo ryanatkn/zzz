@@ -11,6 +11,7 @@
 		SYMBOL_CHAT,
 		SYMBOL_FILE,
 		SYMBOL_MODEL,
+		SYMBOL_PROMPTS,
 		SYMBOL_PROVIDER,
 		SYMBOL_SETTINGS,
 	} from '$lib/constants.js';
@@ -50,9 +51,13 @@
 				<Nav_Link href="{base}/chats"
 					><span class="icon_inline_xs">{SYMBOL_CHAT}</span> chats</Nav_Link
 				>
+				<Nav_Link href="{base}/prompts"
+					><span class="icon_inline_xs">{SYMBOL_PROMPTS}</span> prompts</Nav_Link
+				>
 				<Nav_Link href="{base}/files"
 					><span class="icon_inline_xs">{SYMBOL_FILE}</span> files</Nav_Link
 				>
+
 				<!-- <a href="{base}/pages" class:selected={page.url.pathname === base + '/pages'}>pages</a>
 				<a href="{base}/lists" class:selected={page.url.pathname === base + '/lists'}>lists</a>
 				<a href="{base}/posts" class:selected={page.url.pathname === base + '/posts'}>posts</a>

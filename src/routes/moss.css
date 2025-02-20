@@ -120,6 +120,9 @@ a.chip {
 .inline {
 	display: inline;
 }
+.inline_block {
+	display: inline-block;
+}
 .justify_content_space_between {
 	justify-content: space-between;
 }
@@ -128,6 +131,9 @@ a.chip {
 }
 .l_0 {
 	left: 0;
+}
+.mb_0 {
+	margin-bottom: 0;
 }
 .mb_lg {
 	margin-bottom: var(--space_lg);
@@ -212,6 +218,10 @@ a.chip {
 }
 .mt_xl5 {
 	margin-top: var(--space_xl5);
+}
+.my_lg {
+	margin-top: var(--space_lg);
+	margin-bottom: var(--space_lg);
 }
 .my_xl5 {
 	margin-top: var(--space_xl5);
@@ -355,6 +365,9 @@ a.chip {
 }
 .t_0 {
 	top: 0;
+}
+.text_align_center {
+	text-align: center;
 }
 .text_align_left {
 	text-align: left;

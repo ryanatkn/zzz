@@ -2,6 +2,7 @@
 	import {DEV} from 'esm-env';
 
 	import {SYMBOL_CAPABILITIES} from '$lib/constants.js';
+	import Unicode_Icon from '$lib/Unicode_Icon.svelte';
 
 	// TODO display capabilities (like what APIs are available, including remote server (off when deployed statically), local pglite (could be disconnected, websockets?))
 	// TODO display database info/explorer
@@ -9,7 +10,7 @@
 
 <div class="p_lg">
 	<header>
-		<h1>{SYMBOL_CAPABILITIES} System capabilities</h1>
+		<h1><Unicode_Icon icon={SYMBOL_CAPABILITIES} /> System capabilities</h1>
 	</header>
 	<section>
 		<h2>Todo</h2>

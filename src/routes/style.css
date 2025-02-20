@@ -15,7 +15,7 @@
 	transform: scale(1.14);
 }
 
-/* TODO rename/rethink */
+/* TODO refactor with `Unicode_Icon`*/
 .icon_inline_xs {
 	display: inline-block;
 	vertical-align: middle;

@@ -377,6 +377,7 @@ export const src_json = {
 			declarations: [
 				{name: 'SYMBOL_CHAT', kind: 'variable'},
 				{name: 'SYMBOL_FILE', kind: 'variable'},
+				{name: 'SYMBOL_PROMPTS', kind: 'variable'},
 				{name: 'SYMBOL_PROVIDER', kind: 'variable'},
 				{name: 'SYMBOL_MODEL', kind: 'variable'},
 				{name: 'SYMBOL_ABOUT', kind: 'variable'},

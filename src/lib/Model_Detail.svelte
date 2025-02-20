@@ -66,6 +66,11 @@
 			Architecture: {model.architecture}
 		</div>
 	{/if}
+	{#if model.embedding_length}
+		<div>
+			Embedding length: {model.embedding_length}
+		</div>
+	{/if}
 	{#if model.cost_input || model.cost_output}
 		<div>
 			{#if model.cost_input}

@@ -8,6 +8,7 @@
 
 	import {pkg_context} from '$routes/pkg.js';
 	import {SYMBOL_ABOUT} from '$lib/constants.js';
+	import Unicode_Icon from '$lib/Unicode_Icon.svelte';
 
 	const pkg = pkg_context.get();
 
@@ -17,7 +18,7 @@
 <main class="width_md p_lg">
 	<section>
 		<header style:--size="var(--size_xl)">
-			<h1>{SYMBOL_ABOUT} About Zzz</h1>
+			<h1><Unicode_Icon icon={SYMBOL_ABOUT} /> About Zzz</h1>
 		</header>
 		<p class="mt_xl5">
 			⚠️ This is an early pre-release, see the <a href="https://github.com/ryanatkn/zzz"

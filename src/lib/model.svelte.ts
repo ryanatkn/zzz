@@ -12,6 +12,7 @@ export interface Model_Json {
 	parameter_count?: number;
 	context_window?: number;
 	output_token_limit?: number;
+	embedding_length?: number;
 	/** Size of the model file in gigabytes. */
 	filesize?: number;
 	cost_input?: number;

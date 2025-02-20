@@ -64,7 +64,7 @@
 
 	<div class="flex gap_sm">
 		<textarea
-			class="flex_1"
+			class="flex_1 mb_0"
 			bind:value={input}
 			bind:this={input_el}
 			placeholder="send to this tape..."
