@@ -305,6 +305,11 @@ export const package_json = {
 			svelte: './dist/Settings.svelte',
 			default: './dist/Settings.svelte',
 		},
+		'./Unicode_Icon.svelte': {
+			types: './dist/Unicode_Icon.svelte.d.ts',
+			svelte: './dist/Unicode_Icon.svelte',
+			default: './dist/Unicode_Icon.svelte',
+		},
 		'./zzz_client.js': {types: './dist/zzz_client.d.ts', default: './dist/zzz_client.js'},
 		'./zzz_data.svelte.js': {
 			types: './dist/zzz_data.svelte.d.ts',
@@ -487,6 +492,7 @@ export const src_json = {
 			],
 		},
 		'./Settings.svelte': {path: 'Settings.svelte', declarations: []},
+		'./Unicode_Icon.svelte': {path: 'Unicode_Icon.svelte', declarations: []},
 		'./zzz_client.js': {
 			path: 'zzz_client.ts',
 			declarations: [
