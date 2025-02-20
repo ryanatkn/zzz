@@ -217,7 +217,7 @@ export const models_default: Array<Model_Json> = [
 	{
 		name: 'gemini-1.5-pro',
 		provider_name: 'gemini',
-		tags: ['smart'],
+		tags: [],
 		context_window: 2_000_000,
 		cost_input: 2.5, // $1.25, prompts <= 128k tokens, $2.50, prompts > 128k tokens
 		cost_output: 10, // $5.00, prompts <= 128k tokens, $10.00, prompts > 128k tokens

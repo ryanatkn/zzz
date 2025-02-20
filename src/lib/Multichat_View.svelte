@@ -8,6 +8,7 @@
 
 	const zzz = zzz_context.get();
 
+	// TODO BLOCK this needs to be persisted state
 	const multichat = new Multichat(zzz);
 	multichat.add_tape(zzz.models.find((m) => m.name === 'llama3.2:1b')!);
 	let main_input = $state('');
@@ -37,12 +38,46 @@
 <div class="multichat">
 	<div class="column gap_md">
 		<div class="panel p_sm">
-			<header class="size_xl mb_md">Add tape for model</header>
-			<Model_Selector onselect={(model) => multichat.add_tape(model)} />
+			<header class="size_xl mb_md">Add tapes to chat</header>
+			<!-- TODO add user-customizable sets of models -->
+			<menu class="unstyled column">
+				<button
+					class="w_100 justify_content_start plain"
+					type="button"
+					onclick={() => {
+						for (const model of zzz.models) {
+							multichat.add_tape(model);
+						}
+					}}>add one of each</button
+				>
+				<button
+					class="w_100 justify_content_start plain"
+					type="button"
+					onclick={() => {
+						for (const model of zzz.models) {
+							if (model.tags.includes('small')) {
+								multichat.add_tape(model);
+							}
+						}
+					}}>add small models</button
+				>
+				<button
+					class="w_100 justify_content_start plain"
+					type="button"
+					onclick={() => {
+						for (const model of zzz.models) {
+							if (model.tags.includes('smart')) {
+								multichat.add_tape(model);
+							}
+						}
+					}}>add smart models</button
+				>
+				<!-- TODO add custom buttons -->
+			</menu>
 		</div>
 		<div class="panel p_sm">
-			<header class="size_xl mb_md">Custom model sets</header>
-			<!-- TODO add user-customizable sets of models -->
+			<header class="size_xl mb_md">Add tape for model</header>
+			<Model_Selector onselect={(model) => multichat.add_tape(model)} />
 		</div>
 	</div>
 	<div class="panel p_sm flex_1">

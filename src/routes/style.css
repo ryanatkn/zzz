@@ -16,9 +16,10 @@
 }
 
 /* TODO refactor with `Unicode_Icon`*/
-.icon_inline_xs {
-	display: inline-block;
-	vertical-align: middle;
+.icon_xs {
+	display: flex;
+	align-items: center;
+	justify-content: center;
 	width: 2ch;
 	margin-right: var(--space_xs);
 	text-align: center;

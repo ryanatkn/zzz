@@ -25,7 +25,7 @@
 
 <div class="flex p_sm">
 	<div class="shrink_0">
-		<header class="size_xl mb_md"><Unicode_Icon icon={SYMBOL_FILE} /> File Explorer</header>
+		<header class="size_xl mb_md"><h1><Unicode_Icon icon={SYMBOL_FILE} /> files</h1></header>
 		<File_Explorer
 			files={files_map}
 			{selected_file_id}
@@ -33,7 +33,7 @@
 		/>
 	</div>
 	<div class="p_md">
-		<header class="size_xl mb_md"><Unicode_Icon icon={SYMBOL_FILE} /> Files</header>
+		<header class="size_xl mb_md"><h1><Unicode_Icon icon={SYMBOL_FILE} /> files</h1></header>
 		<File_List {files} />
 	</div>
 </div>

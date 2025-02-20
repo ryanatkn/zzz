@@ -9,7 +9,7 @@
 </script>
 
 <div class="p_lg">
-	<h1><Unicode_Icon icon={SYMBOL_PROVIDER} /> Providers</h1>
+	<h1><Unicode_Icon icon={SYMBOL_PROVIDER} /> providers</h1>
 	<div class="providers_grid">
 		{#each providers_default as provider (provider)}
 			<div class="provider_card">

@@ -7,7 +7,7 @@
 	interface Props {
 		href: string;
 		attrs?: SvelteHTMLElements['a'];
-		children: Snippet;
+		children: Snippet<[selected: boolean, selected_descendent: boolean]>;
 	}
 
 	const {href, attrs, children}: Props = $props();
@@ -20,11 +20,14 @@
 	// TODO link styles should have focus always be blue, and active should be thicker
 </script>
 
-<a {...attrs} {href} class:selected class:selected_descendent>{@render children()}</a>
+<a {...attrs} {href} class:selected class:selected_descendent
+	>{@render children(selected, selected_descendent)}</a
+>
 
 <style>
 	a {
 		display: flex;
+		align-items: center;
 		padding: var(--space_xs2) var(--space_md);
 		text-decoration: none;
 		border: var(--border_width_2) var(--border_style) transparent;

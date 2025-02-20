@@ -7,7 +7,7 @@
 
 <div class="p_sm">
 	<header class="size_xl mb_md">
-		<h1><Unicode_Icon icon={SYMBOL_PROMPTS} /> Prompts</h1>
+		<h1><Unicode_Icon icon={SYMBOL_PROMPTS} /> prompts</h1>
 	</header>
 	TODO
 </div>

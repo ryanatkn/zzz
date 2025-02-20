@@ -10,7 +10,7 @@
 
 <div class="p_lg">
 	<header>
-		<h1><Unicode_Icon icon={SYMBOL_SETTINGS} /> System settings</h1>
+		<h1><Unicode_Icon icon={SYMBOL_SETTINGS} /> system settings</h1>
 	</header>
 	<Control_Panel />
 	<section class="width_sm">

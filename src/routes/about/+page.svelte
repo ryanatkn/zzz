@@ -1,14 +1,12 @@
 <script lang="ts">
 	import Library_Footer from '@ryanatkn/fuz/Library_Footer.svelte';
+	import Svg from '@ryanatkn/fuz/Svg.svelte';
 	import Package_Detail from '@ryanatkn/fuz/Package_Detail.svelte';
 	import Community_Links_Panel from '@ryanatkn/fuz/Community_Links_Panel.svelte';
 	import Breadcrumb from '@ryanatkn/fuz/Breadcrumb.svelte';
-	import Svg from '@ryanatkn/fuz/Svg.svelte';
 	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
 
 	import {pkg_context} from '$routes/pkg.js';
-	import {SYMBOL_ABOUT} from '$lib/constants.js';
-	import Unicode_Icon from '$lib/Unicode_Icon.svelte';
 
 	const pkg = pkg_context.get();
 
@@ -18,8 +16,25 @@
 <main class="width_md p_lg">
 	<section>
 		<header style:--size="var(--size_xl)">
-			<h1><Unicode_Icon icon={SYMBOL_ABOUT} /> About Zzz</h1>
+			<h1 class="row">
+				<Svg
+					data={zzz_logo}
+					fill="var(--text_color)"
+					size="var(--icon_size_md)"
+					classes="ml_xs mr_xl"
+				/> about
+			</h1>
 		</header>
+		<p>
+			Zzz, pronounced "zees" like the sound of electricity, is an endgame web UI. The idea is still
+			being developed, but some important points include:
+		</p>
+		<ul>
+			<li>local-first</li>
+			<li></li>
+			<li>customizable and programmable</li>
+			<li>progressively enhanced with capabilities like a web server and local models</li>
+		</ul>
 		<p class="mt_xl5">
 			⚠️ This is an early pre-release, see the <a href="https://github.com/ryanatkn/zzz"
 				>source code</a

@@ -10,7 +10,7 @@
 
 <div class="p_lg">
 	<header>
-		<h1><Unicode_Icon icon={SYMBOL_CAPABILITIES} /> System capabilities</h1>
+		<h1><Unicode_Icon icon={SYMBOL_CAPABILITIES} /> system capabilities</h1>
 	</header>
 	<section>
 		<h2>Todo</h2>
@@ -20,6 +20,7 @@
 				<li>websocket connection</li>
 			</ul>
 			<li>Providers (API keys)</li>
+			<li>mic, webcam, midi, etc</li>
 		</ul>
 	</section>
 	<section class="width_sm">

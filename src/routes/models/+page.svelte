@@ -8,7 +8,7 @@
 </script>
 
 <div class="p_lg">
-	<h1><Unicode_Icon icon={SYMBOL_MODEL} /> Models</h1>
+	<h1><Unicode_Icon icon={SYMBOL_MODEL} /> models</h1>
 	<div class="models_grid">
 		{#each models_default as model (model)}
 			<Model_Summary {model} />
