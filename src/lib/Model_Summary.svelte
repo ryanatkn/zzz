@@ -14,10 +14,10 @@
 </script>
 
 <div class="panel p_lg">
-	<h2 class="mt_0">
+	<h2 class="mt_0 mb_lg">
 		<Model_Link {model} />
 	</h2>
-	<div class="font_mono">
+	<div class="mb_lg font_mono">
 		<!-- TODO hacky -->
 		<Provider_Link provider={providers_default.find((p) => p.name === model.provider_name)!}
 			>{model.provider_name}</Provider_Link

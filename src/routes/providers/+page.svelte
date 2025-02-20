@@ -12,20 +12,20 @@
 	<h1><Text_Icon icon={SYMBOL_PROVIDER} /> providers</h1>
 	<div class="providers_grid">
 		{#each providers_default as provider (provider)}
-			<div class="provider_card">
-				<h2 class="provider_title">
+			<div class="panel p_lg">
+				<h2 class="mt_0 mb_lg">
 					<Provider_Link {provider} />
 				</h2>
-				<div class="provider_name font_mono">{provider.name}</div>
+				<div class="mb_sm font_mono">{provider.name}</div>
 				{#if provider.url}
-					<div class="provider_stat">
+					<div class="mb_sm">
 						<a href={provider.url} target="_blank" rel="noreferrer"
 							>docs <sup class="size_xs font_mono">[🡵]</sup></a
 						>
 					</div>
 				{/if}
 				{#if provider.icon}
-					<div class="provider_stat">
+					<div class="mb_sm">
 						<img src={provider.icon} alt={`${provider.title} icon`} class="provider_icon" />
 					</div>
 				{/if}
@@ -48,25 +48,6 @@
 		gap: var(--space_lg);
 		width: 100%;
 		padding: var(--space_md);
-	}
-
-	.provider_card {
-		background: var(--fg_1);
-		border-radius: var(--radius_md);
-		padding: var(--space_lg);
-	}
-
-	.provider_title {
-		font-size: var(--size_lg);
-		margin: 0 0 var(--space_sm);
-	}
-
-	.provider_name {
-		margin-bottom: var(--space_sm);
-	}
-
-	.provider_stat {
-		margin-bottom: var(--space_xs);
 	}
 
 	.provider_icon {
