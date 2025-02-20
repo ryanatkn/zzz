@@ -125,6 +125,7 @@ export const package_json = {
 			default: './dist/config_helpers.js',
 		},
 		'./config.js': {types: './dist/config.d.ts', default: './dist/config.js'},
+		'./constants.js': {types: './dist/constants.d.ts', default: './dist/constants.js'},
 		'./Control_Panel.svelte': {
 			types: './dist/Control_Panel.svelte.d.ts',
 			svelte: './dist/Control_Panel.svelte',
@@ -369,6 +370,18 @@ export const src_json = {
 				{name: 'models_default', kind: 'variable'},
 				{name: 'SYSTEM_MESSAGE_DEFAULT', kind: 'variable'},
 				{name: 'default', kind: 'variable'},
+			],
+		},
+		'./constants.js': {
+			path: 'constants.ts',
+			declarations: [
+				{name: 'SYMBOL_CHAT', kind: 'variable'},
+				{name: 'SYMBOL_FILE', kind: 'variable'},
+				{name: 'SYMBOL_PROVIDER', kind: 'variable'},
+				{name: 'SYMBOL_MODEL', kind: 'variable'},
+				{name: 'SYMBOL_ABOUT', kind: 'variable'},
+				{name: 'SYMBOL_CAPABILITIES', kind: 'variable'},
+				{name: 'SYMBOL_SETTINGS', kind: 'variable'},
 			],
 		},
 		'./Control_Panel.svelte': {path: 'Control_Panel.svelte', declarations: []},

@@ -148,6 +148,10 @@
       "types": "./dist/config.d.ts",
       "default": "./dist/config.js"
     },
+    "./constants.js": {
+      "types": "./dist/constants.d.ts",
+      "default": "./dist/constants.js"
+    },
     "./Control_Panel.svelte": {
       "types": "./dist/Control_Panel.svelte.d.ts",
       "svelte": "./dist/Control_Panel.svelte",
