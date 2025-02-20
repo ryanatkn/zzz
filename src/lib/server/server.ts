@@ -10,7 +10,7 @@ import create_config from '$lib/config.js';
 
 console.log('creating server');
 
-const {system_message} = create_config();
+const {system_message} = await create_config();
 
 const sockets: Set<WSContext> = new Set();
 

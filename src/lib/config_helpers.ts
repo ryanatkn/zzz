@@ -3,7 +3,7 @@
 import type {Provider_Json} from '$lib/provider.svelte.js';
 import type {Model_Json} from '$lib/model.svelte.js';
 
-export type Zzz_Config_Creator = () => Zzz_Config;
+export type Zzz_Config_Creator = () => Zzz_Config | Promise<Zzz_Config>;
 
 /**
  * @json

@@ -282,19 +282,13 @@
       "svelte": "./dist/Nav_Link.svelte",
       "default": "./dist/Nav_Link.svelte"
     },
+    "./ollama.js": {
+      "types": "./dist/ollama.d.ts",
+      "default": "./dist/ollama.js"
+    },
     "./path.js": {
       "types": "./dist/path.d.ts",
       "default": "./dist/path.js"
-    },
-    "./Prompt_Instance.svelte": {
-      "types": "./dist/Prompt_Instance.svelte.d.ts",
-      "svelte": "./dist/Prompt_Instance.svelte",
-      "default": "./dist/Prompt_Instance.svelte"
-    },
-    "./Prompt_Provider_Form.svelte": {
-      "types": "./dist/Prompt_Provider_Form.svelte.d.ts",
-      "svelte": "./dist/Prompt_Provider_Form.svelte",
-      "default": "./dist/Prompt_Provider_Form.svelte"
     },
     "./prompt.js": {
       "types": "./dist/prompt.d.ts",

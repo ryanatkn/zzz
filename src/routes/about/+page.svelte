@@ -26,15 +26,17 @@
 			</h1>
 		</header>
 		<p>
-			Zzz, pronounced "zees" like the sound of electricity, is an endgame web UI, the kind that
-			adapts to your needs on the fly, and that's fully open and in your control. Concepts include:
+			Zzz, pronounced "zees" like the sound of electricity, is a bot and web toolkit. It's one of
+			what I call an "endgame web UI", the kind that adapts to your needs on the fly, and that's
+			fully open and in your control. Concepts include:
 		</p>
 		<ul>
 			<li>open source</li>
 			<li>fully controlled by the user</li>
 			<li>client is the nexus of many services</li>
-			<li>local-first</li>
+			<li>local-first, pluggable cloud</li>
 			<li>customizable and programmable</li>
+			<li>leverages the web dev ecosystem</li>
 			<li>
 				progressively enhanced with capabilities like a local or remote web server and local model
 				providers like Ollama

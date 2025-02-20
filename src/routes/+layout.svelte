@@ -14,17 +14,15 @@
 	import {browser} from '$app/environment';
 	import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 	import {PUBLIC_SERVER_HOSTNAME, PUBLIC_SERVER_PORT} from '$env/static/public';
-	import ollama, {type ListResponse} from 'ollama/browser';
 
 	import {Zzz} from '$lib/zzz.svelte.js';
 	import Zzz_Root from '$lib/Zzz_Root.svelte';
 	import {pkg_context} from '$routes/pkg.js';
 	import {package_json, src_json} from '$routes/package.js';
 	import {Zzz_Client} from '$lib/zzz_client.js';
-	import {Provider} from '$lib/provider.svelte.js';
 	import {random_id} from '$lib/id.js';
-	import create_zzz_config from '$lib/config.js';
-	import {Model} from '$lib/model.svelte.js';
+	import {ollama_list} from '$lib/ollama.js';
+	import {zzz_config} from '$lib/zzz_config.js';
 
 	interface Props {
 		children: Snippet;
@@ -34,21 +32,13 @@
 
 	// TODO load `project.json` in production to populate files
 
-	const zzz_config = create_zzz_config();
-
 	pkg_context.set(parse_package_meta(package_json, src_json));
 
 	let ws: WebSocket | undefined;
 	let ws_connecting: Deferred<void> | undefined;
 
-	const models = zzz_config.models
-		.map((m) => (m.provider_name === 'ollama' ? null : new Model({data: m})))
-		.filter((m) => !!m);
-
 	// gives app-wide support for Zzz
 	const zzz = new Zzz({
-		providers: zzz_config.providers.map((data) => new Provider({data, all_models: models})),
-		models,
 		client: new Zzz_Client({
 			send: async (message) => {
 				if (!browser) return;
@@ -114,23 +104,15 @@
 	});
 	if (browser) (window as any).zzz = zzz;
 
+	// Add providers and models
+	zzz.add_providers(zzz_config.providers);
+
 	// TODO BLOCK refactor with capabilities
 	if (browser) {
 		onMount(async () => {
 			zzz.capability_ollama = null;
-			let list_response: ListResponse;
-			try {
-				// const fetched = await fetch('http://127.0.0.1:11434/api/tags', {
-				// 	method: 'GET',
-				// 	mode: 'cors',
-				// 	headers: {
-				// 		'Content-Type': 'application/json',
-				// 	},
-				// });
-				// const json = await fetched.json();
-				list_response = await ollama.list();
-			} catch (err) {
-				console.log(`failed to fetch ollama tags`, err);
+			const list_response = await ollama_list();
+			if (!list_response) {
 				zzz.capability_ollama = false;
 				return;
 			}

@@ -244,17 +244,8 @@ export const package_json = {
 			svelte: './dist/Nav_Link.svelte',
 			default: './dist/Nav_Link.svelte',
 		},
+		'./ollama.js': {types: './dist/ollama.d.ts', default: './dist/ollama.js'},
 		'./path.js': {types: './dist/path.d.ts', default: './dist/path.js'},
-		'./Prompt_Instance.svelte': {
-			types: './dist/Prompt_Instance.svelte.d.ts',
-			svelte: './dist/Prompt_Instance.svelte',
-			default: './dist/Prompt_Instance.svelte',
-		},
-		'./Prompt_Provider_Form.svelte': {
-			types: './dist/Prompt_Provider_Form.svelte.d.ts',
-			svelte: './dist/Prompt_Provider_Form.svelte',
-			default: './dist/Prompt_Provider_Form.svelte',
-		},
 		'./prompt.js': {types: './dist/prompt.d.ts', default: './dist/prompt.js'},
 		'./Provider_Detail.svelte': {
 			types: './dist/Provider_Detail.svelte.d.ts',
@@ -449,9 +440,14 @@ export const src_json = {
 			],
 		},
 		'./Nav_Link.svelte': {path: 'Nav_Link.svelte', declarations: []},
+		'./ollama.js': {
+			path: 'ollama.ts',
+			declarations: [
+				{name: 'import_ollama', kind: 'function'},
+				{name: 'ollama_list', kind: 'function'},
+			],
+		},
 		'./path.js': {path: 'path.ts', declarations: [{name: 'to_root_path', kind: 'function'}]},
-		'./Prompt_Instance.svelte': {path: 'Prompt_Instance.svelte', declarations: []},
-		'./Prompt_Provider_Form.svelte': {path: 'Prompt_Provider_Form.svelte', declarations: []},
 		'./prompt.js': {
 			path: 'prompt.ts',
 			declarations: [

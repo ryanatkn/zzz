@@ -1,4 +1,5 @@
 import type {Model} from '$lib/model.svelte.js';
+import type {Zzz} from '$lib/zzz.svelte.js';
 
 export type Provider_Name = 'ollama' | 'claude' | 'chatgpt' | 'gemini'; // TODO extensible
 
@@ -10,34 +11,37 @@ export interface Provider_Json {
 }
 
 export interface Provider_Options {
-	data: Provider_Json;
-	all_models: Array<Model>;
+	zzz: Zzz;
+	json: Provider_Json;
 }
 
 // TODO BLOCK `Provider` is the wrong word here, more like Model_Service
 export class Provider {
+	zzz: Zzz;
+
 	name: Provider_Name = $state()!;
 	icon: string = $state()!;
 	title: string = $state()!;
-	all_models: Array<Model> = $state()!;
 	url: string = $state()!;
 
-	models: Array<Model> = $derived(this.all_models.filter((m) => m.provider_name === this.name));
+	models: Array<Model> = $derived.by(() =>
+		this.zzz.models.filter((m) => m.provider_name === this.name),
+	);
 	// TODO BLOCK this isn't a thing, each message is to an provider+model
 	selected_model_name: string | undefined = $state();
-	selected_model: Model | undefined = $derived(
-		this.all_models.find((m) => m.name === this.selected_model_name),
+	selected_model: Model | undefined = $derived.by(() =>
+		this.zzz.models.find((m) => m.name === this.selected_model_name),
 	);
 
 	constructor(options: Provider_Options) {
 		const {
-			data: {name, icon, title, url},
-			all_models,
+			zzz,
+			json: {name, icon, title, url},
 		} = options;
+		this.zzz = zzz;
 		this.name = name;
 		this.icon = icon;
 		this.title = title;
-		this.all_models = all_models;
 		const selected_model = this.models[0] as Model | undefined;
 		this.selected_model_name = selected_model?.name;
 		this.url = url;

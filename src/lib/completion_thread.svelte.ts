@@ -1,12 +1,13 @@
 import type {Provider, Provider_Name} from '$lib/provider.svelte.js';
 import type {Completion_Request, Completion_Response} from '$lib/completion.js';
+import type {Zzz} from './zzz.svelte.js';
 
 export interface Completion_Threads_Json {
 	completion_threads: Array<Completion_Thread_Json>;
 }
 
 export interface Completion_Threads_Options {
-	providers: Array<Provider>;
+	zzz: Zzz;
 }
 
 export interface Completion_Thread_History_Item {
@@ -24,10 +25,10 @@ export class Completion_Threads {
 
 	all: Array<Completion_Thread> = $state([]);
 
-	providers: Array<Provider> = $state()!;
+	zzz: Zzz;
 
-	constructor({providers}: Completion_Threads_Options) {
-		this.providers = providers;
+	constructor({zzz}: Completion_Threads_Options) {
+		this.zzz = zzz;
 	}
 
 	toJSON(): Completion_Threads_Json {
@@ -50,7 +51,7 @@ export class Completion_Threads {
 		);
 	}
 
-	create_completion_thread(providers: Array<Provider> = this.providers): Completion_Thread {
+	create_completion_thread(providers: Array<Provider> = this.zzz.providers): Completion_Thread {
 		const completion_thread = new Completion_Thread({providers});
 		this.all.push(completion_thread);
 		return completion_thread;

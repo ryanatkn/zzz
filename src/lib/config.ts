@@ -1,6 +1,7 @@
 import type {Zzz_Config_Creator} from '$lib/config_helpers.js';
 import type {Provider_Json} from '$lib/provider.svelte.js';
 import type {Model_Json} from '$lib/model.svelte.js';
+import {ollama_list} from './ollama.js';
 
 // TODO BLOCK instead of hardcoding Ollama models, pull from `http://127.0.0.1:11434/api/tags`
 
@@ -37,6 +38,7 @@ export const providers_default: Array<Provider_Json> = [
 	},
 ];
 
+// TODO BLOCK use these defaults to extend the ones added by ollama, `map_to_zzz_model`
 export const models_default: Array<Model_Json> = [
 	// TODO import/map these directly when possible
 	{
@@ -231,7 +233,11 @@ export const SYSTEM_MESSAGE_DEFAULT =
 // 'You are a helpful and brilliant collaborator. Respond with a short creative message, one sentence in length, that continues from where the user left off, playing along for fun.';
 
 // TODO currently this is imported directly by client and server, but we probably only want to forward a serialized subset to the client
-const config: Zzz_Config_Creator = () => {
+const config: Zzz_Config_Creator = async () => {
+	const list_response = await ollama_list();
+	console.log(`ollama list_response`, list_response);
+	// TODO BLOCK merge models with a helper, that's also used in layout
+
 	return {
 		providers: providers_default,
 		models: models_default, // TODO BLOCK change to async and call the API based on browser/server? or pass as an option?

@@ -14,7 +14,7 @@ import type {
 	Receive_Prompt_Message,
 	Send_Prompt_Message,
 } from '$lib/zzz_message.js';
-import type {Provider, Provider_Name} from '$lib/provider.svelte.js';
+import {Provider, type Provider_Json, type Provider_Name} from '$lib/provider.svelte.js';
 import {random_id, type Id} from '$lib/id.js';
 import {Completion_Threads, type Completion_Threads_Json} from '$lib/completion_thread.svelte.js';
 import {Model} from '$lib/model.svelte.js';
@@ -22,8 +22,6 @@ import {Model} from '$lib/model.svelte.js';
 export const zzz_context = create_context<Zzz>();
 
 export interface Zzz_Options {
-	providers: Array<Provider>;
-	models: Array<Model>;
 	client: Zzz_Client;
 	completion_threads?: Completion_Threads;
 	data?: Zzz_Data;
@@ -66,11 +64,9 @@ export class Zzz {
 	// TODO store state granularly for each provider
 
 	constructor(options: Zzz_Options) {
-		const {providers, models, client, data = new Zzz_Data()} = options;
-		this.providers.push(...providers);
-		this.models.push(...models);
+		const {client, data = new Zzz_Data()} = options;
 		this.client = client;
-		this.completion_threads = options.completion_threads ?? new Completion_Threads({providers});
+		this.completion_threads = options.completion_threads ?? new Completion_Threads({zzz: this});
 		this.data = data;
 	}
 
@@ -185,6 +181,16 @@ export class Zzz {
 	// TODO API? close/open/toggle? just toggle? messages+mutations?
 	toggle_main_menu(value = !this.data.show_main_dialog): void {
 		this.data.show_main_dialog = value;
+	}
+
+	add_providers(providers_json: Array<Provider_Json>): void {
+		for (const json of providers_json) {
+			this.add_provider(new Provider({zzz: this, json}));
+		}
+	}
+
+	add_provider(provider: Provider): void {
+		this.providers.push(provider);
 	}
 
 	add_ollama_models(model_responses: Array<ModelResponse>): void {
