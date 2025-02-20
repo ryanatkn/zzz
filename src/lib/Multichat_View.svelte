@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Pending_Button from '@ryanatkn/fuz/Pending_Button.svelte';
+	import ollama from 'ollama/browser';
 
 	import {Multichat} from '$lib/multichat.svelte.js';
 	import Model_Selector from '$lib/Model_Selector.svelte';
@@ -23,6 +24,11 @@
 			return;
 		}
 		pending = true;
+		const r = await ollama.chat({
+			model: 'llama3.2:1b',
+			messages: [{role: 'user', content: parsed}],
+		});
+		console.log(`ollama browser response`, r);
 		await multichat.send_to_all(parsed);
 		main_input = '';
 		pending = false;

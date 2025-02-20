@@ -2,6 +2,8 @@ import type {Zzz_Config_Creator} from '$lib/config_helpers.js';
 import type {Provider_Json} from '$lib/provider.svelte.js';
 import type {Model_Json} from '$lib/model.svelte.js';
 
+// TODO BLOCK instead of hardcoding Ollama models, pull from `http://127.0.0.1:11434/api/tags`
+
 // TODO refactor - zzz.config.ts
 
 // TODO other providers, or some generic one? (vercel, mistral, ...)
