@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type {Chat_Message} from '$lib/multichat.svelte.js';
+	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
 
 	interface Props {
 		message: Chat_Message;
@@ -27,7 +28,9 @@
 
 <div class="message">
 	<div class="request">@me: {message.text}</div>
-	<div class="response">@model: {response_content}</div>
+	<div class="response">
+		@model: {#if response}{response_content}{:else}<Pending_Animation />{/if}
+	</div>
 </div>
 
 <!-- {#if show_editor}

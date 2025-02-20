@@ -5,7 +5,7 @@ import type {Zzz} from '$lib/zzz.svelte.js';
 
 export interface Chat_Message {
 	id: Id;
-	timestamp: string;
+	created: string;
 	text: string;
 	request?: Completion_Request;
 	response?: Completion_Response;
@@ -53,7 +53,7 @@ export class Multichat {
 		const msg_id = random_id();
 		const message: Chat_Message = {
 			id: msg_id,
-			timestamp: new Date().toISOString(),
+			created: new Date().toISOString(),
 			text,
 			request: {
 				created: new Date().toISOString(),
