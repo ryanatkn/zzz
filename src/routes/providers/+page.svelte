@@ -13,9 +13,9 @@
 	<div class="providers_grid">
 		{#each providers_default as provider (provider)}
 			<div class="panel p_lg">
-				<h2 class="mt_0 mb_lg">
+				<div class="size_xl mb_lg">
 					<Provider_Link {provider} />
-				</h2>
+				</div>
 				<div class="mb_sm font_mono">{provider.name}</div>
 				{#if provider.url}
 					<div class="mb_sm">

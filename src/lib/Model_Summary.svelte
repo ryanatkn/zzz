@@ -14,9 +14,9 @@
 </script>
 
 <div class="panel p_lg">
-	<h2 class="mt_0 mb_lg">
+	<div class="size_xl mb_lg">
 		<Model_Link {model} />
-	</h2>
+	</div>
 	<div class="mb_lg font_mono">
 		<!-- TODO hacky -->
 		<Provider_Link provider={providers_default.find((p) => p.name === model.provider_name)!}
