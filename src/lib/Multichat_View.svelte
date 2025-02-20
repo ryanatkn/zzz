@@ -76,7 +76,7 @@
 			</menu>
 		</div>
 		<div class="panel p_sm">
-			<header class="size_xl mb_md">Add tape for model</header>
+			<header class="size_xl mb_md">Add tape with model</header>
 			<Model_Selector onselect={(model) => multichat.add_tape(model)} />
 		</div>
 	</div>
