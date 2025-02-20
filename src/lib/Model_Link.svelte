@@ -1,9 +1,10 @@
 <script lang="ts">
 	import type {Snippet} from 'svelte';
-
-	import type {Model_Json} from '$lib/model.svelte.js';
+	import {page} from '$app/state';
 	import {base} from '$app/paths';
 	import type {SvelteHTMLElements} from 'svelte/elements';
+
+	import type {Model_Json} from '$lib/model.svelte.js';
 
 	interface Props {
 		model: Model_Json; // TODO BLOCK Model, not Model_Json?
@@ -12,8 +13,10 @@
 	}
 
 	const {model, attrs, children}: Props = $props();
+
+	const selected = $derived(page.url.pathname === `${base}/models/${model.name}`);
 </script>
 
-<a {...attrs} href="{base}/models/{model.name}"
+<a {...attrs} href="{base}/models/{model.name}" class:selected
 	>{#if children}{@render children()}{:else}{model.name}{/if}</a
 >

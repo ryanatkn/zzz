@@ -8,7 +8,7 @@
 <div class="p_lg">
 	<h1>Models</h1>
 	<div class="models_grid">
-		{#each models_default as model}
+		{#each models_default as model (model)}
 			<Model_Summary {model} />
 		{/each}
 	</div>

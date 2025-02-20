@@ -1,9 +1,9 @@
 <script lang="ts">
 	import type {Snippet} from 'svelte';
-
-	import type {Provider_Json} from '$lib/provider.svelte.js';
 	import {base} from '$app/paths';
 	import type {SvelteHTMLElements} from 'svelte/elements';
+
+	import type {Provider_Json} from '$lib/provider.svelte.js';
 
 	interface Props {
 		provider: Provider_Json; // TODO BLOCK Provider, not Provider_Json?

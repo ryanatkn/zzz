@@ -1,40 +1,49 @@
 <script lang="ts">
+	import {base} from '$app/paths';
+	import {page} from '$app/state';
+	import type {SvelteHTMLElements} from 'svelte/elements';
+
 	import type {Provider_Json} from '$lib/provider.svelte.js';
-	import Completion_Threads_List from '$lib/Completion_Threads_List.svelte';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {models_default} from '$lib/config.js';
+	import Model_Summary from '$lib/Model_Summary.svelte';
 
 	interface Props {
 		provider: Provider_Json;
-		classes?: string;
+		attrs?: SvelteHTMLElements['div'];
 	}
 
-	const {provider, classes = ''}: Props = $props();
+	const {provider, attrs}: Props = $props();
 
-	const zzz = zzz_context.get();
+	const on_detail_page = $derived(page.url.pathname === `${base}/providers/${provider.name}`);
 
-	// TODO @many hacky, need id - should be a list? or component takes a `completion_thread`
-	const completion_thread = $derived(
-		zzz.completion_threads.all.find((t) => t.providers_by_name.get(provider.name)),
-	);
+	// TODO BLOCK use `provider.models`
+	const models = $derived(models_default.filter((m) => m.provider_name === provider.name));
 </script>
 
-<div class="flex_1 {classes}">
-	<!-- TODO pass a zap? -->
-	<!-- <div class="size_xl">{provider.icon}</div> -->
-	<div class="row">
-		{provider.title}
-		<!-- <select bind:value={provider.selected_model_name}>
-			{#each Object.values(provider.models) as model}
-				<option value={model.name}>{model.name}</option>
-			{/each}
-		</select> -->
-	</div>
-	<!-- {#if completion_thread}
-		<Completion_Threads_List {provider} {completion_thread} />
+<div {...attrs} class="panel p_lg {attrs?.class}">
+	{#if on_detail_page}
+		<h1>
+			{provider.title}
+		</h1>
 	{:else}
-		<p>no completion thread found for {provider.name}</p>
-	{/if} -->
+		<h2>
+			<a href={provider.url} target="_blank" rel="noreferrer">{provider.title}</a>
+		</h2>
+	{/if}
+	{#if provider.icon}
+		<div>{provider.icon}</div>
+	{/if}
+	<section>
+		<div class="mb_md font_mono">{provider.name}</div>
+		<div>
+			<a href={provider.url} target="_blank" rel="noreferrer"
+				>docs <sup class="size_xs font_mono">[🡵]</sup></a
+			>
+		</div>
+	</section>
+	<ul class="flex flex_wrap unstyled gap_md">
+		{#each models as model (model)}
+			<Model_Summary {model} />
+		{/each}
+	</ul>
 </div>
-<pre>{JSON.stringify(provider, null, '\t')}</pre>
-<!-- <div>models</div>
-<pre>{JSON.stringify(provider.models, null, '\t')}</pre> -->

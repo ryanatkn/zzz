@@ -8,7 +8,7 @@
 	const provider = $derived(providers_default.find((p) => p.name === page.params.slug));
 </script>
 
-<main class="width_sm">
+<div class="p_sm">
 	{#if provider}
 		<Provider_Detail {provider} />
 	{:else}
@@ -16,4 +16,4 @@
 			no provider found with name "{page.params.slug}"
 		</Alert>
 	{/if}
-</main>
+</div>

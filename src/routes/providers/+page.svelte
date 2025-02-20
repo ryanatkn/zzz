@@ -9,15 +9,17 @@
 <div class="p_lg">
 	<h1>Providers</h1>
 	<div class="providers_grid">
-		{#each providers_default as provider}
+		{#each providers_default as provider (provider)}
 			<div class="provider_card">
 				<h2 class="provider_title">
 					<Provider_Link {provider} />
 				</h2>
-				<div class="provider_name">{provider.name}</div>
+				<div class="provider_name font_mono">{provider.name}</div>
 				{#if provider.url}
 					<div class="provider_stat">
-						<a href={provider.url} target="_blank">docs <sup class="size_xs font_mono">[🡵]</sup></a>
+						<a href={provider.url} target="_blank" rel="noreferrer"
+							>docs <sup class="size_xs font_mono">[🡵]</sup></a
+						>
 					</div>
 				{/if}
 				{#if provider.icon}
@@ -26,9 +28,9 @@
 					</div>
 				{/if}
 				<ul class="unstyled">
-					{#each models_default.filter((m) => m.provider_name === provider.name) as model}
+					{#each models_default.filter((m) => m.provider_name === provider.name) as model (model)}
 						<li class="row">
-							<small class="chip"><Model_Link {model} /></small>
+							<Model_Link attrs={{class: 'chip'}} {model} />
 						</li>
 					{/each}
 				</ul>
@@ -58,12 +60,10 @@
 	}
 
 	.provider_name {
-		color: var(--text_2);
 		margin-bottom: var(--space_sm);
 	}
 
 	.provider_stat {
-		color: var(--text_2);
 		margin-bottom: var(--space_xs);
 	}
 

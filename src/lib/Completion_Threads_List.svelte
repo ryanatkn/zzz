@@ -10,7 +10,7 @@
 
 	const {provider, completion_thread}: Props = $props();
 
-	// TODO BLOCK multiple completion_threads?
+	// TODO BLOCK multiple completion_threads? delete all of this?
 </script>
 
 <ul class="unstyled py_lg">

@@ -57,7 +57,7 @@
 	</div>
 
 	<div class="messages">
-		{#each tape.messages as message}
+		{#each tape.messages as message (message.id)}
 			<Chat_Message {message} />
 		{/each}
 	</div>

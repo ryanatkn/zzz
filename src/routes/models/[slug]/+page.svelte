@@ -8,7 +8,7 @@
 	const model = $derived(models_default.find((p) => p.name === page.params.slug));
 </script>
 
-<main class="width_sm">
+<div class="p_sm">
 	{#if model}
 		<Model_Detail {model} />
 	{:else}
@@ -16,4 +16,4 @@
 			no model found with name "{page.params.slug}"
 		</Alert>
 	{/if}
-</main>
+</div>

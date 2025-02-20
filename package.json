@@ -235,6 +235,11 @@
       "svelte": "./dist/Message_View.svelte",
       "default": "./dist/Message_View.svelte"
     },
+    "./Model_Detail.svelte": {
+      "types": "./dist/Model_Detail.svelte.d.ts",
+      "svelte": "./dist/Model_Detail.svelte",
+      "default": "./dist/Model_Detail.svelte"
+    },
     "./Model_Link.svelte": {
       "types": "./dist/Model_Link.svelte.d.ts",
       "svelte": "./dist/Model_Link.svelte",
@@ -249,6 +254,11 @@
       "types": "./dist/Model_Selector.svelte.d.ts",
       "svelte": "./dist/Model_Selector.svelte",
       "default": "./dist/Model_Selector.svelte"
+    },
+    "./Model_Summary.svelte": {
+      "types": "./dist/Model_Summary.svelte.d.ts",
+      "svelte": "./dist/Model_Summary.svelte",
+      "default": "./dist/Model_Summary.svelte"
     },
     "./model.svelte.js": {
       "types": "./dist/model.svelte.d.ts",
@@ -285,6 +295,11 @@
     "./prompt.js": {
       "types": "./dist/prompt.d.ts",
       "default": "./dist/prompt.js"
+    },
+    "./Provider_Detail.svelte": {
+      "types": "./dist/Provider_Detail.svelte.d.ts",
+      "svelte": "./dist/Provider_Detail.svelte",
+      "default": "./dist/Provider_Detail.svelte"
     },
     "./Provider_Info.svelte": {
       "types": "./dist/Provider_Info.svelte.d.ts",

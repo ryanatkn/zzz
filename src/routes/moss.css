@@ -72,6 +72,9 @@ a.chip {
 .flex_1 {
 	flex: 1;
 }
+.flex_wrap {
+	flex-wrap: wrap;
+}
 .font_mono {
 	font-family: var(--font_mono);
 }
@@ -88,8 +91,14 @@ a.chip {
 	white-space: break-spaces;
 }
 
+.gap_md {
+	gap: var(--space_md);
+}
 .gap_sm {
 	gap: var(--space_sm);
+}
+.gap_xs {
+	gap: var(--space_xs);
 }
 .h_100 {
 	height: 100%;

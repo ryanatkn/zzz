@@ -203,6 +203,11 @@ export const package_json = {
 			svelte: './dist/Message_View.svelte',
 			default: './dist/Message_View.svelte',
 		},
+		'./Model_Detail.svelte': {
+			types: './dist/Model_Detail.svelte.d.ts',
+			svelte: './dist/Model_Detail.svelte',
+			default: './dist/Model_Detail.svelte',
+		},
 		'./Model_Link.svelte': {
 			types: './dist/Model_Link.svelte.d.ts',
 			svelte: './dist/Model_Link.svelte',
@@ -217,6 +222,11 @@ export const package_json = {
 			types: './dist/Model_Selector.svelte.d.ts',
 			svelte: './dist/Model_Selector.svelte',
 			default: './dist/Model_Selector.svelte',
+		},
+		'./Model_Summary.svelte': {
+			types: './dist/Model_Summary.svelte.d.ts',
+			svelte: './dist/Model_Summary.svelte',
+			default: './dist/Model_Summary.svelte',
 		},
 		'./model.svelte.js': {types: './dist/model.svelte.d.ts', default: './dist/model.svelte.js'},
 		'./Multichat_View.svelte': {
@@ -245,6 +255,11 @@ export const package_json = {
 			default: './dist/Prompt_Provider_Form.svelte',
 		},
 		'./prompt.js': {types: './dist/prompt.d.ts', default: './dist/prompt.js'},
+		'./Provider_Detail.svelte': {
+			types: './dist/Provider_Detail.svelte.d.ts',
+			svelte: './dist/Provider_Detail.svelte',
+			default: './dist/Provider_Detail.svelte',
+		},
 		'./Provider_Info.svelte': {
 			types: './dist/Provider_Info.svelte.d.ts',
 			svelte: './dist/Provider_Info.svelte',
@@ -391,9 +406,11 @@ export const src_json = {
 		'./Message_Info.svelte': {path: 'Message_Info.svelte', declarations: []},
 		'./Message_Summary.svelte': {path: 'Message_Summary.svelte', declarations: []},
 		'./Message_View.svelte': {path: 'Message_View.svelte', declarations: []},
+		'./Model_Detail.svelte': {path: 'Model_Detail.svelte', declarations: []},
 		'./Model_Link.svelte': {path: 'Model_Link.svelte', declarations: []},
 		'./Model_Select.svelte': {path: 'Model_Select.svelte', declarations: []},
 		'./Model_Selector.svelte': {path: 'Model_Selector.svelte', declarations: []},
+		'./Model_Summary.svelte': {path: 'Model_Summary.svelte', declarations: []},
 		'./model.svelte.js': {
 			path: 'model.svelte.ts',
 			declarations: [
@@ -424,6 +441,7 @@ export const src_json = {
 				{name: 'Prompt_Message_Content', kind: 'type'},
 			],
 		},
+		'./Provider_Detail.svelte': {path: 'Provider_Detail.svelte', declarations: []},
 		'./Provider_Info.svelte': {path: 'Provider_Info.svelte', declarations: []},
 		'./Provider_Link.svelte': {path: 'Provider_Link.svelte', declarations: []},
 		'./Provider_Select.svelte': {path: 'Provider_Select.svelte', declarations: []},

@@ -24,7 +24,7 @@
 	<div class="row">
 		{provider.title}
 		<select bind:value={provider.selected_model_name}>
-			{#each Object.values(provider.models) as model}
+			{#each Object.values(provider.models) as model (model)}
 				<option value={model.name}>{model.name}</option>
 			{/each}
 		</select>
