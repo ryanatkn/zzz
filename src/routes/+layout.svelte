@@ -114,7 +114,6 @@
 	// TODO BLOCK refactor with capabilities
 	if (browser) {
 		onMount(async () => {
-			// TODO maybe different states
 			zzz.capability_ollama = null;
 			try {
 				const fetched = await fetch('http://127.0.0.1:11434/api/tags', {
@@ -129,7 +128,9 @@
 				zzz.capability_ollama = true;
 				zzz.add_ollama_models(json.models);
 			} catch (err) {
+				console.log(`failed to fetch ollama tags`, err);
 				zzz.capability_ollama = false;
+				return;
 			}
 		});
 	}
