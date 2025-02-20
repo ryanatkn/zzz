@@ -19,7 +19,7 @@
 		children: Snippet<[zzz: Zzz]>;
 	}
 
-	const {zzz, hud = hud_default, children}: Props = $props();
+	const {zzz, hud, children}: Props = $props();
 
 	zzz_context.set(zzz);
 
@@ -42,5 +42,3 @@
 		{@render children(zzz)}
 	</main>
 </Dashboard>
-
-{#snippet hud_default()}{/snippet}
