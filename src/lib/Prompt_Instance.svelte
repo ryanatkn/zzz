@@ -6,7 +6,6 @@
 	import Model_Select from '$lib/Model_Select.svelte';
 	import type {Provider} from '$lib/provider.svelte.js';
 	import type {Model_Json} from '$lib/model.svelte.js';
-	import {models_default} from '$lib/config.js';
 
 	interface Props {
 		provider: Provider;
@@ -34,7 +33,7 @@
 		if (text === value) value = '';
 	};
 
-	let model: Model_Json = $state(models_default[0]);
+	let model: Model_Json = $state(zzz.models[0]);
 </script>
 
 <!-- TODO these are just a hack -->

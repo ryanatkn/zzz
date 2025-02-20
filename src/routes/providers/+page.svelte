@@ -1,11 +1,14 @@
 <script lang="ts">
-	import {providers_default, models_default} from '$lib/config.js';
+	import {providers_default} from '$lib/config.js';
 	import Provider_Link from '$lib/Provider_Link.svelte';
 	import Model_Link from '$lib/Model_Link.svelte';
 	import Text_Icon from '$lib/Text_Icon.svelte';
 	import {SYMBOL_PROVIDER} from '$lib/constants.js';
+	import {zzz_context} from '$lib/zzz.svelte.js';
 
-	// TODO BLOCK link the models below to a page per model (lookup from model_default/context)
+	const zzz = zzz_context.get();
+
+	const models = $derived(zzz.models);
 </script>
 
 <div class="p_lg">
@@ -30,7 +33,7 @@
 					</div>
 				{/if}
 				<ul class="unstyled">
-					{#each models_default.filter((m) => m.provider_name === provider.name) as model (model)}
+					{#each models.filter((m) => m.provider_name === provider.name) as model (model)}
 						<li class="row">
 							<Model_Link attrs={{class: 'chip'}} {model} />
 						</li>

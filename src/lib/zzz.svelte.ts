@@ -17,7 +17,7 @@ import type {
 import type {Provider, Provider_Name} from '$lib/provider.svelte.js';
 import {random_id, type Id} from '$lib/id.js';
 import {Completion_Threads, type Completion_Threads_Json} from '$lib/completion_thread.svelte.js';
-import type {Model} from '$lib/model.svelte.js';
+import {Model} from '$lib/model.svelte.js';
 
 export const zzz_context = create_context<Zzz>();
 
@@ -187,10 +187,16 @@ export class Zzz {
 		this.data.show_main_dialog = value;
 	}
 
-	add_ollama_models(models: Array<ModelResponse>): void {
-		for (const model of models) {
-			// TODO BLOCK ?
-			// this.models.push(new Model({data: model}));
-		}
+	add_ollama_model(model_response: ModelResponse): void {
+		this.models.push(
+			new Model({
+				data: {
+					name: model_response.name,
+					provider_name: 'ollama',
+					tags: model_response.details.families,
+					ollama_model_response: model_response,
+				},
+			}),
+		);
 	}
 }

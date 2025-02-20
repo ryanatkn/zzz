@@ -4,8 +4,10 @@
 	import type {SvelteHTMLElements} from 'svelte/elements';
 
 	import type {Provider_Json} from '$lib/provider.svelte.js';
-	import {models_default} from '$lib/config.js';
 	import Model_Summary from '$lib/Model_Summary.svelte';
+	import {zzz_context} from '$lib/zzz.svelte.js';
+
+	const zzz = zzz_context.get();
 
 	interface Props {
 		provider: Provider_Json;
@@ -17,7 +19,7 @@
 	const on_detail_page = $derived(page.url.pathname === `${base}/providers/${provider.name}`);
 
 	// TODO BLOCK use `provider.models`
-	const models = $derived(models_default.filter((m) => m.provider_name === provider.name));
+	const models = $derived(zzz.models.filter((m) => m.provider_name === provider.name));
 </script>
 
 <div {...attrs} class="panel p_lg {attrs?.class}">

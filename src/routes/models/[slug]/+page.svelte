@@ -2,10 +2,12 @@
 	import Alert from '@ryanatkn/fuz/Alert.svelte';
 	import {page} from '$app/state';
 
-	import {models_default} from '$lib/config.js';
 	import Model_Detail from '$lib/Model_Detail.svelte';
+	import {zzz_context} from '$lib/zzz.svelte.js';
 
-	const model = $derived(models_default.find((p) => p.name === page.params.slug));
+	const zzz = zzz_context.get();
+
+	const model = $derived(zzz.models.find((p) => p.name === page.params.slug));
 </script>
 
 <div class="p_sm">

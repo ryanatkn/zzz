@@ -234,7 +234,7 @@ export const SYSTEM_MESSAGE_DEFAULT =
 const config: Zzz_Config_Creator = () => {
 	return {
 		providers: providers_default,
-		models: models_default,
+		models: models_default, // TODO BLOCK change to async and call the API based on browser/server? or pass as an option?
 		system_message: SYSTEM_MESSAGE_DEFAULT,
 	};
 };

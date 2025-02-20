@@ -14,6 +14,7 @@
 	import {browser} from '$app/environment';
 	import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 	import {PUBLIC_SERVER_HOSTNAME, PUBLIC_SERVER_PORT} from '$env/static/public';
+	import ollama, {type ListResponse} from 'ollama/browser';
 
 	import {Zzz} from '$lib/zzz.svelte.js';
 	import Zzz_Root from '$lib/Zzz_Root.svelte';
@@ -115,22 +116,27 @@
 	if (browser) {
 		onMount(async () => {
 			zzz.capability_ollama = null;
+			let list_response: ListResponse;
 			try {
-				const fetched = await fetch('http://127.0.0.1:11434/api/tags', {
-					method: 'GET',
-					mode: 'cors',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-				});
-				const json = await fetched.json();
-				console.log(`ollama api/tags json`, json);
-				zzz.capability_ollama = true;
-				zzz.add_ollama_models(json.models);
+				// const fetched = await fetch('http://127.0.0.1:11434/api/tags', {
+				// 	method: 'GET',
+				// 	mode: 'cors',
+				// 	headers: {
+				// 		'Content-Type': 'application/json',
+				// 	},
+				// });
+				// const json = await fetched.json();
+				list_response = await ollama.list();
 			} catch (err) {
 				console.log(`failed to fetch ollama tags`, err);
 				zzz.capability_ollama = false;
 				return;
+			}
+
+			console.log(`ollama list_response`, list_response);
+			zzz.capability_ollama = true;
+			for (const model_response of list_response.models) {
+				zzz.add_ollama_model(model_response);
 			}
 		});
 	}

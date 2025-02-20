@@ -1,4 +1,5 @@
 import type {Flavored} from '@ryanatkn/belt/types.js';
+import type {ModelResponse} from 'ollama';
 
 import type {Provider_Name} from '$lib/provider.svelte.js';
 
@@ -18,6 +19,7 @@ export interface Model_Json {
 	cost_input?: number;
 	cost_output?: number;
 	training_cutoff?: string;
+	ollama_model_response?: ModelResponse;
 }
 
 export interface Model_Options {
