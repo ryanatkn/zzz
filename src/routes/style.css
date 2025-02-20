@@ -24,3 +24,9 @@
 	margin-right: var(--space_xs);
 	text-align: center;
 }
+
+/* TODO name? */
+.h3_subheading {
+	margin-bottom: var(--space_lg);
+	font-weight: 400;
+}

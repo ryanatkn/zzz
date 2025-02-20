@@ -150,9 +150,6 @@ a.chip {
 .mb_xl7 {
 	margin-bottom: var(--space_xl7);
 }
-.mb_xs {
-	margin-bottom: var(--space_xs);
-}
 
 .menu_item {
 	--border_radius: 0;
