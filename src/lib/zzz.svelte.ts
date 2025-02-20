@@ -4,6 +4,7 @@ import {create_deferred, type Deferred} from '@ryanatkn/belt/async.js';
 import type {Source_File} from '@ryanatkn/gro/filer.js';
 import type {Path_Id} from '@ryanatkn/gro/path.js';
 import {Unreachable_Error} from '@ryanatkn/belt/error.js';
+import type {ModelResponse} from 'ollama/browser';
 
 import {Zzz_Data, type Zzz_Data_Json} from '$lib/zzz_data.svelte.js';
 import type {Zzz_Client} from '$lib/zzz_client.js';
@@ -59,6 +60,8 @@ export class Zzz {
 	// 	new SvelteMap();
 
 	completion_threads: Completion_Threads = $state()!; // TODO should this be an option?
+
+	capability_ollama: undefined | null | boolean = $state(); // TODO probably rethink - `null` means pending, `undefined` means uninitialized/not yet checked
 
 	// TODO store state granularly for each provider
 
@@ -182,5 +185,12 @@ export class Zzz {
 	// TODO API? close/open/toggle? just toggle? messages+mutations?
 	toggle_main_menu(value = !this.data.show_main_dialog): void {
 		this.data.show_main_dialog = value;
+	}
+
+	add_ollama_models(models: Array<ModelResponse>): void {
+		for (const model of models) {
+			// TODO BLOCK ?
+			// this.models.push(new Model({data: model}));
+		}
 	}
 }

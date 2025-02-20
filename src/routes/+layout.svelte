@@ -5,7 +5,7 @@
 	import '$routes/style.css';
 
 	import Themed from '@ryanatkn/fuz/Themed.svelte';
-	import type {Snippet} from 'svelte';
+	import {onMount, type Snippet} from 'svelte';
 	import Contextmenu_Root from '@ryanatkn/fuz/Contextmenu_Root.svelte';
 	import {contextmenu_action} from '@ryanatkn/fuz/contextmenu_state.svelte.js';
 	import {parse_package_meta} from '@ryanatkn/gro/package_meta.js';
@@ -110,6 +110,29 @@
 		}),
 	});
 	if (browser) (window as any).zzz = zzz;
+
+	// TODO BLOCK refactor with capabilities
+	if (browser) {
+		onMount(async () => {
+			// TODO maybe different states
+			zzz.capability_ollama = null;
+			try {
+				const fetched = await fetch('http://127.0.0.1:11434/api/tags', {
+					method: 'GET',
+					mode: 'cors',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+				});
+				const json = await fetched.json();
+				console.log(`ollama api/tags json`, json);
+				zzz.capability_ollama = true;
+				zzz.add_ollama_models(json.models);
+			} catch (err) {
+				zzz.capability_ollama = false;
+			}
+		});
+	}
 
 	$inspect('providers', zzz.providers);
 
