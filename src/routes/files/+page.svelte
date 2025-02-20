@@ -4,6 +4,7 @@
 	import File_List from '$lib/File_List.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import File_Explorer from '$lib/File_Explorer.svelte';
+	import {SYMBOL_FILE} from '$lib/constants.js';
 
 	const zzz = zzz_context.get();
 
@@ -23,7 +24,7 @@
 
 <div class="flex p_sm">
 	<div class="shrink_0">
-		<header class="size_xl mb_md">File Explorer</header>
+		<header class="size_xl mb_md">{SYMBOL_FILE} File Explorer</header>
 		<File_Explorer
 			files={files_map}
 			{selected_file_id}
@@ -31,7 +32,7 @@
 		/>
 	</div>
 	<div class="p_md">
-		<header class="size_xl mb_md">Files</header>
+		<header class="size_xl mb_md">{SYMBOL_FILE} Files</header>
 		<File_List {files} />
 	</div>
 </div>

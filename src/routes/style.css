@@ -14,3 +14,12 @@
 .click_effect_scale:active {
 	transform: scale(1.14);
 }
+
+/* TODO rename/rethink */
+.icon_inline_xs {
+	display: inline-block;
+	vertical-align: middle;
+	width: 2ch;
+	margin-right: var(--space_xs);
+	text-align: center;
+}

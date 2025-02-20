@@ -41,9 +41,12 @@
 			>
 		</div>
 	</section>
-	<ul class="flex flex_wrap unstyled gap_md">
-		{#each models as model (model)}
-			<Model_Summary {model} />
-		{/each}
-	</ul>
+	<section>
+		<h2>Models</h2>
+		<ul class="flex flex_wrap unstyled gap_md">
+			{#each models as model (model)}
+				<Model_Summary {model} />
+			{/each}
+		</ul>
+	</section>
 </div>

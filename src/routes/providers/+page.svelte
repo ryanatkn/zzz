@@ -2,12 +2,13 @@
 	import {providers_default, models_default} from '$lib/config.js';
 	import Provider_Link from '$lib/Provider_Link.svelte';
 	import Model_Link from '$lib/Model_Link.svelte';
+	import {SYMBOL_PROVIDER} from '$lib/constants.js';
 
 	// TODO BLOCK link the models below to a page per model (lookup from model_default/context)
 </script>
 
 <div class="p_lg">
-	<h1>Providers</h1>
+	<h1>{SYMBOL_PROVIDER} Providers</h1>
 	<div class="providers_grid">
 		{#each providers_default as provider (provider)}
 			<div class="provider_card">
