@@ -28,7 +28,10 @@
 </script>
 
 <!-- TODO drive with data -->
-<div style:--sidebar_width="{sidebar_width}px">
+<div class="dashboard" style:--sidebar_width="{sidebar_width}px">
+	<div class="h_100 w_100 fixed t_0 l_0" style:padding-left="var(--sidebar_width)">
+		{@render children()}
+	</div>
 	<div class="h_100 fixed t_0 l_0" style:width="var(--sidebar_width)">
 		<!-- TODO refactor -->
 		<div class="h_100 w_100 pt_sm pl_sm" style:width="var(--sidebar_width)">
@@ -292,8 +295,5 @@
 				<Nav_Link href="{base}/help">Help</Nav_Link> -->
 			</nav>
 		</div>
-	</div>
-	<div style:padding-left="var(--sidebar_width)">
-		{@render children()}
 	</div>
 </div>

@@ -38,7 +38,7 @@
 <Main_Dialog />
 <!-- TODO user-defined pages should be able to control the full page at runtime -->
 <Dashboard>
-	<main>
+	<main class="h_100 overflow_auto">
 		{@render children(zzz)}
 	</main>
 </Dashboard>

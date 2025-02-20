@@ -23,7 +23,7 @@
 	// TODO BLOCK name for "File_Explorer" and "File_List" parent component?
 </script>
 
-<div class="flex p_sm">
+<div class="flex p_sm gap_md">
 	<div class="shrink_0">
 		<header class="size_xl mb_md"><h1><Text_Icon icon={SYMBOL_FILE} /> files</h1></header>
 		<File_Explorer
@@ -32,7 +32,7 @@
 			onselect={(file) => handle_file_selection(file)}
 		/>
 	</div>
-	<div class="p_md">
+	<div>
 		<header class="size_xl mb_md"><h1><Text_Icon icon={SYMBOL_FILE} /> files</h1></header>
 		<File_List {files} />
 	</div>

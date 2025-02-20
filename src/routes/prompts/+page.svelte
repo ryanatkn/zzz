@@ -5,11 +5,11 @@
 	// TODO implement
 </script>
 
-<div class="width_md p_sm">
+<div class="width_md p_lg">
 	<header>
 		<h1><Text_Icon icon={SYMBOL_PROMPTS} /> prompts</h1>
 	</header>
-	<section>
+	<section class="p_md">
 		<aside>⚠️ under contruction</aside>
 		<p>
 			Zzz has tools for precise prompt control, helping you construct, use, and manage the prompts

@@ -20,7 +20,7 @@
 	// TODO link styles should have focus always be blue, and active should be thicker
 </script>
 
-<a {...attrs} {href} class:selected class:selected_descendent
+<a {...attrs} {href} class="nav_link {attrs?.class}" class:selected class:selected_descendent
 	>{@render children(selected, selected_descendent)}</a
 >
 
