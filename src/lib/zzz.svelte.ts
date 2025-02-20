@@ -187,16 +187,20 @@ export class Zzz {
 		this.data.show_main_dialog = value;
 	}
 
-	add_ollama_model(model_response: ModelResponse): void {
-		this.models.push(
-			new Model({
-				data: {
-					name: model_response.name,
-					provider_name: 'ollama',
-					tags: model_response.details.families,
-					ollama_model_response: model_response,
-				},
-			}),
-		);
+	add_ollama_models(model_responses: Array<ModelResponse>): void {
+		this.models = [
+			...model_responses.map(
+				(model_response) =>
+					new Model({
+						data: {
+							name: model_response.name,
+							provider_name: 'ollama',
+							tags: model_response.details.families,
+							ollama_model_response: model_response,
+						},
+					}),
+			),
+			...this.models,
+		];
 	}
 }

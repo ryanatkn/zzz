@@ -22,11 +22,11 @@ export class Provider {
 	all_models: Array<Model> = $state()!;
 	url: string = $state()!;
 
-	models = $derived(this.all_models.filter((m) => m.provider_name === this.name));
+	models: Array<Model> = $derived(this.all_models.filter((m) => m.provider_name === this.name));
 	// TODO BLOCK this isn't a thing, each message is to an provider+model
-	selected_model_name: string = $state()!;
-	selected_model: Model = $derived(
-		this.all_models.find((m) => m.name === this.selected_model_name)!,
+	selected_model_name: string | undefined = $state();
+	selected_model: Model | undefined = $derived(
+		this.all_models.find((m) => m.name === this.selected_model_name),
 	);
 
 	constructor(options: Provider_Options) {
@@ -38,9 +38,8 @@ export class Provider {
 		this.icon = icon;
 		this.title = title;
 		this.all_models = all_models;
-		const selected_model = this.models[0];
-		if (!selected_model) throw Error(`No models for provider ${name}`); // eslint-disable-line @typescript-eslint/no-unnecessary-condition
-		this.selected_model_name = selected_model.name;
+		const selected_model = this.models[0] as Model | undefined;
+		this.selected_model_name = selected_model?.name;
 		this.url = url;
 	}
 

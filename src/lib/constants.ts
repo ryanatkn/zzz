@@ -12,3 +12,5 @@ export const SYMBOL_SETTINGS = '⛮'; // ⛭  ⚙  ⛮  ⛯ ⛣
 // ≣
 // TODO SYMBOL_TAPE
 // ⧛
+
+// ⚟

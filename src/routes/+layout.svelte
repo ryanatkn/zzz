@@ -41,7 +41,9 @@
 	let ws: WebSocket | undefined;
 	let ws_connecting: Deferred<void> | undefined;
 
-	const models = zzz_config.models.map((data) => new Model({data}));
+	const models = zzz_config.models
+		.map((m) => (m.provider_name === 'ollama' ? null : new Model({data: m})))
+		.filter((m) => !!m);
 
 	// gives app-wide support for Zzz
 	const zzz = new Zzz({
@@ -135,9 +137,7 @@
 
 			console.log(`ollama list_response`, list_response);
 			zzz.capability_ollama = true;
-			for (const model_response of list_response.models) {
-				zzz.add_ollama_model(model_response);
-			}
+			zzz.add_ollama_models(list_response.models);
 		});
 	}
 
