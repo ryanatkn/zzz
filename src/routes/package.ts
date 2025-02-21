@@ -444,8 +444,12 @@ export const src_json = {
 		'./ollama.js': {
 			path: 'ollama.ts',
 			declarations: [
+				{name: 'Ollama_Model_Info', kind: 'type'},
+				{name: 'Ollama_Models_Response', kind: 'type'},
 				{name: 'import_ollama', kind: 'function'},
 				{name: 'ollama_list', kind: 'function'},
+				{name: 'ollama_list_with_metadata', kind: 'function'},
+				{name: 'merge_ollama_models', kind: 'function'},
 			],
 		},
 		'./path.js': {path: 'path.ts', declarations: [{name: 'to_root_path', kind: 'function'}]},

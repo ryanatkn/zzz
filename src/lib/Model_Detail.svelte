@@ -1,14 +1,15 @@
 <script lang="ts">
 	import {base} from '$app/paths';
 	import {page} from '$app/state';
+	import Alert from '@ryanatkn/fuz/Alert.svelte';
 
 	import {providers_default} from '$lib/config.js';
 	import Model_Link from '$lib/Model_Link.svelte';
 	import Provider_Link from '$lib/Provider_Link.svelte';
-	import type {Model_Json} from '$lib/model.svelte.js';
+	import type {Model} from '$lib/model.svelte.js';
 
 	interface Props {
-		model: Model_Json; // TODO Model class instance
+		model: Model;
 	}
 
 	const {model}: Props = $props();
@@ -34,6 +35,13 @@
 			>{model.provider_name}</Provider_Link
 		>
 	</div>
+	{#if model.provider_name === 'ollama'}
+		{#if model.ollama_model_info}
+			<pre><code>{JSON.stringify(model.ollama_model_info, null, '\t')}</code></pre>
+		{:else}
+			<Alert status="error">no Ollama info</Alert>
+		{/if}
+	{/if}
 	{#if model.tags.length}
 		<ul class="unstyled flex gap_xs">
 			{#each model.tags as tag (tag)}

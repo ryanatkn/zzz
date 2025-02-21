@@ -4,10 +4,10 @@
 	import {base} from '$app/paths';
 	import type {SvelteHTMLElements} from 'svelte/elements';
 
-	import type {Model_Json} from '$lib/model.svelte.js';
+	import type {Model} from '$lib/model.svelte.js';
 
 	interface Props {
-		model: Model_Json; // TODO BLOCK Model, not Model_Json?
+		model: Model;
 		attrs?: SvelteHTMLElements['a'];
 		children?: Snippet;
 	}

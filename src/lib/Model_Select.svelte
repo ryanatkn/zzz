@@ -1,10 +1,10 @@
 <script lang="ts">
-	import type {Model_Json} from '$lib/model.svelte.js';
+	import type {Model} from '$lib/model.svelte.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 
 	interface Props {
-		models?: Array<Model_Json>;
-		selected_model: Model_Json; // TODO get from context?
+		models?: Array<Model>;
+		selected_model: Model; // TODO get from context?
 	}
 
 	let {models, selected_model = $bindable()}: Props = $props();
