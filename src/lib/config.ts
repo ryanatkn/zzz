@@ -90,7 +90,7 @@ export const models_default: Array<Model_Json> = [
 	{
 		name: 'deepseek-r1:7b',
 		provider_name: 'ollama',
-		tags: ['deepseek'],
+		tags: ['deepseek', 'reasoning'],
 		architecture: 'qwen2',
 		parameter_count: 7.62,
 		context_window: 131_072,
@@ -101,7 +101,7 @@ export const models_default: Array<Model_Json> = [
 	{
 		name: 'deepseek-r1:8b',
 		provider_name: 'ollama',
-		tags: ['deepseek'],
+		tags: ['deepseek', 'reasoning'],
 		architecture: 'llama',
 		parameter_count: 8.03,
 		context_window: 131_072,
@@ -112,7 +112,7 @@ export const models_default: Array<Model_Json> = [
 	{
 		name: 'deepseek-r1:1.5b',
 		provider_name: 'ollama',
-		tags: ['deepseek', 'small'],
+		tags: ['deepseek', 'reasoning', 'small'],
 		architecture: 'qwen2',
 		parameter_count: 1.78,
 		context_window: 131_072,

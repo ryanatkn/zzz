@@ -41,6 +41,8 @@
 	// TODO BLOCK custom buttons section - including quick local, smartest all, all, etc
 
 	// TODO BLOCK make a component for the confirm X on the "remove all tapes" button below
+
+	// TODO BLOCK maybe there should be 2 columns of tags, one to include and one to exclude?
 </script>
 
 <div class="multichat">
