@@ -180,7 +180,7 @@ export const models_default: Array<Model_Json> = [
 	{
 		name: 'o1-mini',
 		provider_name: 'chatgpt',
-		tags: ['reasoning', 'cheap'],
+		tags: ['reasoning'],
 		context_window: 128_000,
 		output_token_limit: 65_536,
 		cost_input: 1.1,

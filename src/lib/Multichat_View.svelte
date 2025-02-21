@@ -76,6 +76,28 @@
 					type="button"
 					onclick={() => {
 						for (const model of zzz.models) {
+							if (model.tags.includes('cheap')) {
+								multichat.add_tape(model);
+							}
+						}
+					}}>add cheap models</button
+				>
+				<button
+					class="w_100 justify_content_start plain"
+					type="button"
+					onclick={() => {
+						for (const model of zzz.models) {
+							if (model.tags.includes('reasoning')) {
+								multichat.add_tape(model);
+							}
+						}
+					}}>add reasoning models</button
+				>
+				<button
+					class="w_100 justify_content_start plain"
+					type="button"
+					onclick={() => {
+						for (const model of zzz.models) {
 							if (model.tags.includes('smart')) {
 								multichat.add_tape(model);
 							}
