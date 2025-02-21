@@ -62,7 +62,7 @@
 						for (const model of zzz.models) {
 							multichat.add_tape(model);
 						}
-					}}>add one of each</button
+					}}>add one for each model</button
 				>
 				<button
 					class="w_100 justify_content_start plain"
