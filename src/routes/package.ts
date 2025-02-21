@@ -125,6 +125,11 @@ export const package_json = {
 			default: './dist/config_helpers.js',
 		},
 		'./config.js': {types: './dist/config.d.ts', default: './dist/config.js'},
+		'./Confirm_Button.svelte': {
+			types: './dist/Confirm_Button.svelte.d.ts',
+			svelte: './dist/Confirm_Button.svelte',
+			default: './dist/Confirm_Button.svelte',
+		},
 		'./constants.js': {types: './dist/constants.d.ts', default: './dist/constants.js'},
 		'./Control_Panel.svelte': {
 			types: './dist/Control_Panel.svelte.d.ts',
@@ -369,6 +374,7 @@ export const src_json = {
 				{name: 'default', kind: 'variable'},
 			],
 		},
+		'./Confirm_Button.svelte': {path: 'Confirm_Button.svelte', declarations: []},
 		'./constants.js': {
 			path: 'constants.ts',
 			declarations: [

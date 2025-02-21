@@ -39,6 +39,8 @@
 
 	const count = $derived(multichat.tapes.length);
 
+	// TODO BLOCK maybe a mode that allows duplicates by holding a key like shift, but otherwise only setting up 1 tape per model?
+
 	// TODO BLOCK the "send to all" button below could have a sibling that creates a new table for each
 
 	// TODO BLOCK custom buttons section - including quick local, smartest all, all, etc
