@@ -3,7 +3,7 @@
 	import Provider_Link from '$lib/Provider_Link.svelte';
 	import Model_Link from '$lib/Model_Link.svelte';
 	import Text_Icon from '$lib/Text_Icon.svelte';
-	import {SYMBOL_PROVIDER} from '$lib/constants.js';
+	import {SYMBOL_MODEL, SYMBOL_PROVIDER} from '$lib/constants.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 
 	const zzz = zzz_context.get();
@@ -36,7 +36,9 @@
 				<ul class="unstyled">
 					{#each models.filter((m) => m.provider_name === provider.name) as model (model)}
 						<li class="row flex_wrap mb_xs3">
-							<Model_Link attrs={{class: 'font_mono px_xs size_sm font_weight_500'}} {model} />
+							<Model_Link attrs={{class: 'font_mono px_xs size_sm font_weight_500'}} {model}
+								>{SYMBOL_MODEL} {model.name}</Model_Link
+							>
 							<!-- {#each model.tags as tag (tag)}
 								<small class="chip">{tag}</small>
 							{/each} -->

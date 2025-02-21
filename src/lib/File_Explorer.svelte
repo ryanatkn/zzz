@@ -30,7 +30,7 @@
 			>
 				<div class="font_weight_400">
 					<span class="mr_xs2">🗎</span>
-					<span class="file_name">{to_root_path(file.id)}</span>
+					<small class="word_break_break_all">{to_root_path(file.id)}</small>
 				</div>
 			</button>
 		{/each}
@@ -58,9 +58,5 @@
 		border-radius: 0;
 		border: none;
 		box-shadow: none;
-	}
-
-	.file_name {
-		word-break: break-all;
 	}
 </style>

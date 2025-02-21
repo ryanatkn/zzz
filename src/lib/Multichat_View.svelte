@@ -7,7 +7,7 @@
 	import Text_Icon from '$lib/Text_Icon.svelte';
 	import Chat_Tape from '$lib/Chat_Tape.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
-	import {SYMBOL_MODEL, SYMBOL_TAPE} from '$lib/constants.js';
+	import {SYMBOL_TAPE} from '$lib/constants.js';
 
 	const zzz = zzz_context.get();
 

@@ -5,7 +5,6 @@
 	import {page} from '$app/state';
 
 	import type {Provider_Json} from '$lib/provider.svelte.js';
-	import {SYMBOL_PROVIDER} from '$lib/constants.js';
 
 	interface Props {
 		provider: Provider_Json; // TODO BLOCK Provider, not Provider_Json?
@@ -19,7 +18,7 @@
 </script>
 
 <a {...attrs} href="{base}/providers/{provider.name}" class:selected
-	>{#if children}{@render children()}{:else}{SYMBOL_PROVIDER} {provider.title}{/if}</a
+	>{#if children}{@render children()}{:else}{provider.title}{/if}</a
 >
 
 <style>

@@ -32,7 +32,7 @@
 	{/if}
 </div>
 <div class="editor">
-	<div class="flex_1">
+	<div class="flex_1 width_md">
 		<div>
 			<textarea style:height="{height}px" bind:value={updated_contents}></textarea>
 		</div>
@@ -51,7 +51,7 @@
 			}}>delete</button
 		>
 	</div>
-	<pre style:height="{height}px" class="flex_1 fg_1 radius_sm p_md">{file.contents}</pre>
+	<pre style:height="{height}px" class="flex_1 fg_1 radius_sm p_md width_md">{file.contents}</pre>
 </div>
 
 <h2>

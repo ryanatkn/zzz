@@ -45,7 +45,7 @@
 		</div>
 	</section>
 	<section>
-		<h2>Models</h2>
+		<h2>models</h2>
 		<ul class="flex flex_wrap unstyled gap_md">
 			{#each models as model (model)}
 				<Model_Summary {model} />

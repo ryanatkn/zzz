@@ -27,7 +27,7 @@
 </script>
 
 <div class="flex p_sm gap_md">
-	<div class="shrink_0">
+	<div class="width_sm shrink_0">
 		<header class="size_xl mb_md"><h1><Text_Icon icon={SYMBOL_FILE} /> files</h1></header>
 		<File_Explorer
 			files={files_map}
@@ -35,7 +35,7 @@
 			onselect={(file) => handle_file_selection(file)}
 		/>
 	</div>
-	<div>
+	<div class="flex_1">
 		<header class="size_xl mb_md"><h1><Text_Icon icon={SYMBOL_FILE} /> file</h1></header>
 		{#if selected_file}
 			<File_Editor file={selected_file} />

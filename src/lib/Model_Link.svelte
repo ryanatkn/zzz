@@ -5,7 +5,6 @@
 	import type {SvelteHTMLElements} from 'svelte/elements';
 
 	import type {Model} from '$lib/model.svelte.js';
-	import {SYMBOL_MODEL} from '$lib/constants.js';
 
 	interface Props {
 		model: Model;
@@ -19,7 +18,7 @@
 </script>
 
 <a {...attrs} href="{base}/models/{model.name}" class:selected
-	>{#if children}{@render children()}{:else}{SYMBOL_MODEL} {model.name}{/if}</a
+	>{#if children}{@render children()}{:else}{model.name}{/if}</a
 >
 
 <style>
