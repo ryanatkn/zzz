@@ -59,32 +59,44 @@
 			<!-- TODO add user-customizable sets of models -->
 			<div class="flex">
 				<div class="flex_1 p_xs radius_xs">
-					<header class="size_lg">add by tag</header>
+					<header class="size_lg text_align_center">add by tag</header>
 					<menu class="unstyled column">
 						{#each Array.from(zzz.tags) as tag (tag)}
 							<button
-								class="w_100 size_sm py_xs3 justify_content_start plain"
-								style:min-height="0"
 								type="button"
+								class="w_100 size_sm py_xs3 justify_content_space_between plain"
+								style:min-height="0"
 								onclick={() => {
 									multichat.add_tapes_by_model_tag(tag);
-								}}>{tag}</button
+								}}
 							>
+								<span>{tag}</span>
+								{#if zzz.models.filter((m) => m.tags.includes(tag)).length}
+									<span>{zzz.models.filter((m) => m.tags.includes(tag)).length}</span>
+								{/if}
+							</button>
 						{/each}
 					</menu>
 				</div>
 				<div class="flex_1 p_xs radius_xs fg_1">
 					<menu class="unstyled column">
-						<header class="size_lg">delete by tag</header>
+						<header class="size_lg text_align_center">delete by tag</header>
 						{#each Array.from(zzz.tags) as tag (tag)}
+							{@const tapes_with_tag = multichat.tapes.filter((t) => t.model.tags.includes(tag))}
 							<button
-								class="w_100 min_height_0 size_sm py_xs3 justify_content_start plain"
-								style:min-height="0"
 								type="button"
+								class="w_100 min_height_0 size_sm py_xs3 justify_content_space_between plain"
+								style:min-height="0"
+								disabled={!tapes_with_tag.length}
 								onclick={() => {
 									multichat.remove_tapes_by_model_tag(tag);
-								}}>{tag}</button
+								}}
 							>
+								<span>{tag}</span>
+								{#if tapes_with_tag.length}
+									<span>{tapes_with_tag.length}</span>
+								{/if}
+							</button>
 						{/each}
 					</menu>
 				</div>
@@ -110,7 +122,10 @@
 			</Pending_Button>
 		</div>
 		<div class="my_lg">
-			<Confirm_Button onclick={() => multichat.remove_all_tapes()}>
+			<Confirm_Button
+				onclick={() => multichat.remove_all_tapes()}
+				button_attrs={{disabled: !count}}
+			>
 				🗙 <span class="ml_xs">remove all tapes</span>
 			</Confirm_Button>
 		</div>
