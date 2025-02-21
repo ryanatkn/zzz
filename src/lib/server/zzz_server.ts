@@ -207,16 +207,20 @@ export class Zzz_Server {
 							// TODO
 							// tools
 							// tool_choice
-							temperature: this.temperature,
+							// TODO `supports_temperature` flag on model or similar
+							temperature: model === 'o1-mini' ? undefined : this.temperature,
 							seed: this.seed,
 							top_p: this.top_p,
 							frequency_penalty: this.frequency_penalty,
 							presence_penalty: this.presence_penalty,
 							stop: this.stop_sequences,
 							messages: [
-								{role: 'system', content: this.system_message},
-								{role: 'user', content: prompt},
-							],
+								// TODO `supports_system_message` flag on model or similar
+								model === 'o1-mini'
+									? null
+									: ({role: 'system', content: this.system_message} as const),
+								{role: 'user', content: prompt} as const,
+							].filter((m) => !!m),
 						});
 						console.log(`openai api_response`, api_response);
 						response = {
