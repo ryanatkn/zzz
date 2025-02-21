@@ -27,6 +27,7 @@
 			<ul>
 				<li>websocket connection</li>
 			</ul>
+			<li>pg db (Postgres, pglite, or some other compatible database)</li>
 			<li>Providers (API keys)</li>
 			<li>mic, webcam, midi, etc</li>
 		</ul>
