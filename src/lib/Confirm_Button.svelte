@@ -48,7 +48,7 @@
 		<button
 			type="button"
 			class:icon_button={!children}
-			class:plain={!confirming}
+			class:plain={!children && !confirming}
 			class:size_sm={!children && confirming}
 			onclick={toggle}
 			{...button_attrs}

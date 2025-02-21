@@ -5,6 +5,7 @@
 
 	import {to_root_path} from '$lib/path.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
+	import Confirm_Button from '$lib/Confirm_Button.svelte';
 
 	interface Props {
 		// TODO more efficient data structures, reactive source files
@@ -53,19 +54,18 @@
 </div>
 <div class="flex justify_content_space_between">
 	<button
+		class="color_a"
 		type="button"
 		disabled={updated_contents === file.contents}
 		onclick={() => {
 			zzz.update_file(file.id, updated_contents);
 		}}>save file</button
 	>
-	<button
-		class="color_c"
-		type="button"
-		onclick={() => {
-			zzz.delete_file(file.id);
-		}}>delete file</button
-	>
+	<Confirm_Button onclick={() => zzz.delete_file(file.id)} button_attrs={{class: 'color_c'}}>
+		{#snippet children()}
+			delete file
+		{/snippet}
+	</Confirm_Button>
 </div>
 
 {#if dependencies.length}

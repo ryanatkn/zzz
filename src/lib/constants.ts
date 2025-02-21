@@ -31,7 +31,6 @@ export const GLYPH_SETTINGS = '⛮'; // ⛭  ⚙  ⛮  ⛯ ⛣
 // ⍤
 
 // ⍾
-// ⎎
 
 // ⌯
 // ⌗
@@ -47,3 +46,6 @@ export const GLYPH_SETTINGS = '⛮'; // ⛭  ⚙  ⛮  ⛯ ⛣
 
 // ⏀
 // ⏁
+
+// ⎎
+// 🗎  🗏  🗀  🗁  🗂  🗃  🗄  ❏  ❐  ▣  ▢  □  ⧉  ⧈
