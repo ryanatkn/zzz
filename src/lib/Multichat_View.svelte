@@ -38,6 +38,8 @@
 
 	const count = $derived(multichat.tapes.length);
 
+	// TODO BLOCK the "send to all" button below could have a sibling that creates a new table for each
+
 	// TODO BLOCK custom buttons section - including quick local, smartest all, all, etc
 
 	// TODO BLOCK make a component for the confirm X on the "remove all tapes" button below

@@ -68,22 +68,22 @@
 	>
 </div>
 
-<h2>
-	{#if !dependencies.length}no{:else}{dependencies.length}{/if}
-	{dependencies.length === 1 ? 'dependency' : 'dependencies'}
-</h2>
-{#if dependencies.length > 0}
+{#if dependencies.length}
+	<h2>
+		{dependencies.length}
+		{#if dependencies.length === 1}dependency{:else}dependencies{/if}
+	</h2>
 	<div class="dep_list">
 		{#each dependencies as dependency (dependency.id)}
 			<div>{to_root_path(dependency.id)}</div>
 		{/each}
 	</div>
 {/if}
-<h2>
-	{#if !dependents.length}no{:else}{dependents.length}{/if}
-	{dependents.length === 1 ? 'dependent' : 'dependents'}
-</h2>
-{#if dependents.length > 0}
+{#if dependents.length}
+	<h2>
+		{dependents.length}
+		dependent{#if dependents.length !== 1}s{/if}
+	</h2>
 	<div class="dep_list">
 		{#each dependents as dependent (dependent.id)}
 			<div>{to_root_path(dependent.id)}</div>
