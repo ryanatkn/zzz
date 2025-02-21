@@ -17,7 +17,7 @@
 		{#each providers_default as provider (provider)}
 			<div class="panel p_lg">
 				<div class="size_xl mb_lg">
-					<Provider_Link {provider} />
+					<Provider_Link {provider} attrs={{class: 'font_weight_500'}} />
 				</div>
 				<div class="mb_sm font_mono">{SYMBOL_PROVIDER} {provider.name}</div>
 				{#if provider.url}

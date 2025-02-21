@@ -2,6 +2,7 @@
 	import type {Snippet} from 'svelte';
 	import {base} from '$app/paths';
 	import type {SvelteHTMLElements} from 'svelte/elements';
+	import {page} from '$app/state';
 
 	import type {Provider_Json} from '$lib/provider.svelte.js';
 	import {SYMBOL_PROVIDER} from '$lib/constants.js';
@@ -13,8 +14,18 @@
 	}
 
 	const {provider, attrs, children}: Props = $props();
+
+	const selected = $derived(page.url.pathname === `${base}/providers/${provider.name}`);
 </script>
 
-<a {...attrs} href="{base}/providers/{provider.name}"
+<a {...attrs} href="{base}/providers/{provider.name}" class:selected
 	>{#if children}{@render children()}{:else}{SYMBOL_PROVIDER} {provider.title}{/if}</a
 >
+
+<style>
+	/* TODO breaks convention, but I think it looks better in a lot of cases, maybe extract a class? `plain_selected_link` or `plain`? */
+	.selected {
+		font-weight: 400;
+		text-decoration: none;
+	}
+</style>

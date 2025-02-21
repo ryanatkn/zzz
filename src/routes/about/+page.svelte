@@ -20,7 +20,7 @@
 				<Svg
 					data={zzz_logo}
 					fill="var(--text_color)"
-					size="var(--icon_size_md)"
+					size="var(--icon_size_sm)"
 					classes="ml_xs mr_xl"
 				/> about
 			</h1>

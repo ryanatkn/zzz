@@ -16,12 +16,12 @@
 
 <div class="panel p_lg">
 	<div class="size_xl mb_lg">
-		<Model_Link {model} />
+		<Model_Link {model} attrs={{class: 'font_weight_500'}} />
 	</div>
 	<div class="mb_lg font_mono">
 		<!-- TODO hacky -->
 		<Provider_Link provider={providers_default.find((p) => p.name === model.provider_name)!}
-			>{SYMBOL_PROVIDER} {model.provider_name}</Provider_Link
+			><span class="font_weight_400">{SYMBOL_PROVIDER} {model.provider_name}</span></Provider_Link
 		>
 	</div>
 	<!-- {#if model.provider_name === 'ollama'}
@@ -32,7 +32,7 @@
 	{#if model.tags.length}
 		<ul class="unstyled flex gap_xs">
 			{#each model.tags as tag (tag)}
-				<span class="chip">{tag}</span>
+				<span class="chip size_sm font_weight_400">{tag}</span>
 			{/each}
 		</ul>
 	{/if}
