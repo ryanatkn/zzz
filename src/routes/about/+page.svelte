@@ -27,10 +27,10 @@
 		</header>
 		<p>
 			Zzz, pronounced "zees" like the sound of electricity, is a bot and web toolkit. It's one
-			example of what I call an "endgame web UI", a user interface that adapts to your needs on the
+			example of what I call an "endgame web UI", a digital tool that adapts to your needs on the
 			fly, while remaining fully in your control and always open.
 		</p>
-		<p>The main concepts include:</p>
+		<p>The main ideas include:</p>
 		<ul>
 			<li>open source</li>
 			<li>fully controlled by the user</li>
@@ -46,6 +46,11 @@
 				providers like Ollama
 			</li>
 		</ul>
+		<p>
+			I think there will be many tools like this in the future. Perhaps every person will use at
+			least one, whether they know it or not? Or maybe it's just a weird web app. In any case, it's
+			one developer's take on a web UI that hopes to evolve forwards with the ecosystem.
+		</p>
 		<p class="mt_xl5">
 			⚠️ This is an early pre-release, see the <a href="https://github.com/ryanatkn/zzz"
 				>readme and source code</a

@@ -3,6 +3,14 @@
 
 	import {SYMBOL_CAPABILITIES} from '$lib/constants.js';
 	import Text_Icon from '$lib/Text_Icon.svelte';
+	import Breadcrumb from '@ryanatkn/fuz/Breadcrumb.svelte';
+	import Library_Footer from '@ryanatkn/fuz/Library_Footer.svelte';
+	import Svg from '@ryanatkn/fuz/Svg.svelte';
+	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
+
+	import {pkg_context} from '$routes/pkg.js';
+
+	const pkg = pkg_context.get();
 
 	// TODO display capabilities (like what APIs are available, including remote server (off when deployed statically), local pglite (could be disconnected, websockets?))
 	// TODO display database info/explorer
@@ -27,5 +35,12 @@
 		<p>
 			DEV mode: {DEV.toString()}
 		</p>
+	</section>
+	<section class="mb_xl7 flex">
+		<Library_Footer {pkg}>
+			<div class="mb_xl5">
+				<Breadcrumb><Svg data={zzz_logo} size="var(--icon_size_sm)" /></Breadcrumb>
+			</div>
+		</Library_Footer>
 	</section>
 </div>
