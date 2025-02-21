@@ -6,6 +6,7 @@
 	import type {Provider_Json} from '$lib/provider.svelte.js';
 	import Model_Summary from '$lib/Model_Summary.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {SYMBOL_PROVIDER} from '$lib/constants.js';
 
 	const zzz = zzz_context.get();
 
@@ -36,7 +37,7 @@
 		<div>{provider.icon}</div>
 	{/if}
 	<section>
-		<div class="mb_md font_mono">{provider.name}</div>
+		<div class="mb_md font_mono">{SYMBOL_PROVIDER} {provider.name}</div>
 		<div>
 			<a href={provider.url} target="_blank" rel="noreferrer"
 				>docs <sup class="size_xs font_mono">[🡵]</sup></a

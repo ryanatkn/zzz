@@ -150,6 +150,9 @@ a.chip {
 .mb_xl7 {
 	margin-bottom: var(--space_xl7);
 }
+.mb_xs3 {
+	margin-bottom: var(--space_xs3);
+}
 
 .menu_item {
 	--border_radius: 0;
@@ -294,6 +297,10 @@ a.chip {
 .px_lg {
 	padding-left: var(--space_lg);
 	padding-right: var(--space_lg);
+}
+.px_xs {
+	padding-left: var(--space_xs);
+	padding-right: var(--space_xs);
 }
 .py_lg {
 	padding-top: var(--space_lg);

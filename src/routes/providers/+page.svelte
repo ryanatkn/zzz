@@ -19,7 +19,7 @@
 				<div class="size_xl mb_lg">
 					<Provider_Link {provider} />
 				</div>
-				<div class="mb_sm font_mono">{provider.name}</div>
+				<div class="mb_sm font_mono">{SYMBOL_PROVIDER} {provider.name}</div>
 				{#if provider.url}
 					<div class="mb_sm">
 						<a href={provider.url} target="_blank" rel="noreferrer"
@@ -32,10 +32,14 @@
 						<img src={provider.icon} alt={`${provider.title} icon`} class="provider_icon" />
 					</div>
 				{/if}
+				<!-- <h3><Text_Icon icon={SYMBOL_MODEL} /> models</h3> -->
 				<ul class="unstyled">
 					{#each models.filter((m) => m.provider_name === provider.name) as model (model)}
-						<li class="row">
-							<Model_Link attrs={{class: 'chip'}} {model} />
+						<li class="row flex_wrap mb_xs3">
+							<Model_Link attrs={{class: 'font_mono px_xs size_sm font_weight_500'}} {model} />
+							<!-- {#each model.tags as tag (tag)}
+								<small class="chip">{tag}</small>
+							{/each} -->
 						</li>
 					{/each}
 				</ul>
