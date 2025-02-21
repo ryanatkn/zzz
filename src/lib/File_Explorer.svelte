@@ -19,6 +19,8 @@
 	const handle_select = (file: Source_File): void => {
 		onselect?.(file);
 	};
+
+	// TODO BLOCK contextmenu to delete
 </script>
 
 <menu class="flex_1 unstyled">
