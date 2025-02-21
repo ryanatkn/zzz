@@ -111,7 +111,7 @@
 		</div>
 		<div class="panel p_sm">
 			<header class="mb_md">
-				<h3 class="mt_0"><Text_Icon icon={SYMBOL_MODEL} /> add tape with model</h3>
+				<h3 class="mt_0">add tape with model</h3>
 			</header>
 			<Model_Selector onselect={(model) => multichat.add_tape(model)} />
 		</div>
