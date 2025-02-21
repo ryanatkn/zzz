@@ -249,6 +249,9 @@ a.chip {
 .p_xl {
 	padding: var(--space_xl);
 }
+.p_xs {
+	padding: var(--space_xs);
+}
 
 /* A pane is a box floating over the page, like for dialogs.
 			By default it's opaque, resetting the background to the initial depth. */
@@ -314,6 +317,9 @@ a.chip {
 }
 .radius_sm {
 	border-radius: var(--radius_sm);
+}
+.radius_xs {
+	border-radius: var(--radius_xs);
 }
 .relative {
 	position: relative;

@@ -34,9 +34,21 @@ export class Multichat {
 		});
 	}
 
+	add_tapes_by_model_tag(tag: string): void {
+		for (const model of this.zzz.models.filter((m) => m.tags.includes(tag))) {
+			this.add_tape(model);
+		}
+	}
+
 	remove_tape(id: Id): void {
 		const index = this.tapes.findIndex((s) => s.id === id);
 		if (index !== -1) this.tapes.splice(index, 1);
+	}
+
+	remove_tapes_by_model_tag(tag: string): void {
+		for (const tape of this.tapes.filter((t) => t.model.tags.includes(tag))) {
+			this.remove_tape(tape.id);
+		}
 	}
 
 	remove_all_tapes(): void {

@@ -49,6 +49,9 @@ export class Zzz {
 
 	models: Array<Model> = $state([]);
 
+	// TODO `SvelteSet`?
+	tags: Set<string> = $derived(new Set(this.models.flatMap((m) => m.tags)));
+
 	files_by_id: SvelteMap<Path_Id, Source_File> = new SvelteMap();
 
 	echos: Array<Echo_Message> = $state([]);

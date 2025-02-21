@@ -56,62 +56,39 @@
 				</h2>
 			</header>
 			<!-- TODO add user-customizable sets of models -->
-			<menu class="unstyled column">
-				<button
-					class="w_100 justify_content_start plain"
-					type="button"
-					onclick={() => {
-						for (const model of zzz.models) {
-							multichat.add_tape(model);
-						}
-					}}>add one for each model</button
-				>
-				<button
-					class="w_100 justify_content_start plain"
-					type="button"
-					onclick={() => {
-						for (const model of zzz.models) {
-							if (model.tags.includes('small')) {
-								multichat.add_tape(model);
-							}
-						}
-					}}>add small models</button
-				>
-				<button
-					class="w_100 justify_content_start plain"
-					type="button"
-					onclick={() => {
-						for (const model of zzz.models) {
-							if (model.tags.includes('cheap')) {
-								multichat.add_tape(model);
-							}
-						}
-					}}>add cheap models</button
-				>
-				<button
-					class="w_100 justify_content_start plain"
-					type="button"
-					onclick={() => {
-						for (const model of zzz.models) {
-							if (model.tags.includes('reasoning')) {
-								multichat.add_tape(model);
-							}
-						}
-					}}>add reasoning models</button
-				>
-				<button
-					class="w_100 justify_content_start plain"
-					type="button"
-					onclick={() => {
-						for (const model of zzz.models) {
-							if (model.tags.includes('smart')) {
-								multichat.add_tape(model);
-							}
-						}
-					}}>add smart models</button
-				>
+			<div class="flex">
+				<div class="flex_1 p_xs radius_xs">
+					<header class="size_lg">add by tag</header>
+					<menu class="unstyled column">
+						{#each Array.from(zzz.tags) as tag (tag)}
+							<button
+								class="w_100 size_sm py_xs3 justify_content_start plain"
+								style:min-height="0"
+								type="button"
+								onclick={() => {
+									multichat.add_tapes_by_model_tag(tag);
+								}}>{tag}</button
+							>
+						{/each}
+					</menu>
+				</div>
+				<div class="flex_1 p_xs radius_xs fg_1">
+					<menu class="unstyled column">
+						<header class="size_lg">delete by tag</header>
+						{#each Array.from(zzz.tags) as tag (tag)}
+							<button
+								class="w_100 min_height_0 size_sm py_xs3 justify_content_start plain"
+								style:min-height="0"
+								type="button"
+								onclick={() => {
+									multichat.remove_tapes_by_model_tag(tag);
+								}}>{tag}</button
+							>
+						{/each}
+					</menu>
+				</div>
 				<!-- TODO add custom buttons -->
-			</menu>
+			</div>
 		</div>
 		<div class="panel p_sm">
 			<header class="mb_md">
