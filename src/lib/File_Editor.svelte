@@ -23,29 +23,6 @@
 
 <div class="row size_xl"><span class="size_xl3 mr_md">🗎</span> {to_root_path(file.id)}</div>
 
-<h2>
-	{#if !dependencies.length}no{:else}{dependencies.length}{/if}
-	{dependencies.length === 1 ? 'dependency' : 'dependencies'}
-</h2>
-{#if dependencies.length > 0}
-	<div class="dep_list">
-		{#each dependencies as dependency (dependency.id)}
-			<div>{to_root_path(dependency.id)}</div>
-		{/each}
-	</div>
-{/if}
-<h2>
-	{#if !dependents.length}no{:else}{dependents.length}{/if}
-	{dependents.length === 1 ? 'dependent' : 'dependents'}
-</h2>
-{#if dependents.length > 0}
-	<div class="dep_list">
-		{#each dependents as dependent (dependent.id)}
-			<div>{to_root_path(dependent.id)}</div>
-		{/each}
-	</div>
-{/if}
-
 <div>
 	<Copy_To_Clipboard text={file.contents} />
 	contents {#if file.contents === null}
@@ -76,6 +53,29 @@
 	</div>
 	<pre style:height="{height}px" class="flex_1 fg_1 radius_sm p_md">{file.contents}</pre>
 </div>
+
+<h2>
+	{#if !dependencies.length}no{:else}{dependencies.length}{/if}
+	{dependencies.length === 1 ? 'dependency' : 'dependencies'}
+</h2>
+{#if dependencies.length > 0}
+	<div class="dep_list">
+		{#each dependencies as dependency (dependency.id)}
+			<div>{to_root_path(dependency.id)}</div>
+		{/each}
+	</div>
+{/if}
+<h2>
+	{#if !dependents.length}no{:else}{dependents.length}{/if}
+	{dependents.length === 1 ? 'dependent' : 'dependents'}
+</h2>
+{#if dependents.length > 0}
+	<div class="dep_list">
+		{#each dependents as dependent (dependent.id)}
+			<div>{to_root_path(dependent.id)}</div>
+		{/each}
+	</div>
+{/if}
 
 <style>
 	.editor {

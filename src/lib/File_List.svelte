@@ -8,6 +8,8 @@
 	}
 
 	const {files}: Props = $props();
+
+	// TODO BLOCK delete this and children if not used
 </script>
 
 <ul class="unstyled flex column">

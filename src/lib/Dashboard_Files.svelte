@@ -11,7 +11,7 @@
 
 	// TODO BLOCK shouldnt be needed
 	const files_map: Map<string, Source_File> = $derived(new Map(files.map((f) => [f.id, f])));
-	let selected_file_id = $state<string | null>(null);
+	let selected_file_id: string | null = $state(null);
 	const handle_file_selection = (file: Source_File): void => {
 		selected_file_id = file.id;
 	};
