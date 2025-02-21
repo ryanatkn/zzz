@@ -2,6 +2,7 @@
 	import Pending_Button from '@ryanatkn/fuz/Pending_Button.svelte';
 	import ollama from 'ollama/browser';
 
+	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import {Multichat} from '$lib/multichat.svelte.js';
 	import Model_Selector from '$lib/Model_Selector.svelte';
 	import Text_Icon from '$lib/Text_Icon.svelte';
@@ -109,9 +110,9 @@
 			</Pending_Button>
 		</div>
 		<div class="my_lg">
-			<button type="button" onclick={() => multichat.remove_all_tapes()} disabled={!count}
-				>🗙 remove all tapes</button
-			>
+			<Confirm_Button onclick={() => multichat.remove_all_tapes()}>
+				🗙 <span class="ml_xs">remove all tapes</span>
+			</Confirm_Button>
 		</div>
 		<!-- TODO duplicate tape button -->
 		<div class="tapes">

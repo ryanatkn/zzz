@@ -1,6 +1,7 @@
 <script lang="ts">
 	import {scale} from 'svelte/transition';
 
+	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import type {Tape} from '$lib/multichat.svelte.js';
 	import Chat_Message from '$lib/Chat_Message.svelte';
 
@@ -24,8 +25,6 @@
 		onsend(parsed);
 		input = '';
 	}
-
-	let removing = $state(false);
 </script>
 
 <!-- TODO `duration_2` is the Moss variable for 200ms and 1 for 80ms, but it's not in a usable form -->
@@ -35,25 +34,7 @@
 			<div class="size_lg">{tape.model.name}</div>
 			<small>{tape.model.provider_name}</small>
 		</header>
-		<!-- <small>{tape.provider.name}</small> -->
-		<div class="relative">
-			{#if removing}<button
-					type="button"
-					class="color_c absolute icon_button bg_c_1"
-					style:left="calc(-1 * var(--input_height))"
-					style:transform-origin="right"
-					onclick={() => onremove()}
-					in:scale={{duration: 80}}
-					out:scale={{duration: 200}}>🗙</button
-				>{/if}
-			<button
-				type="button"
-				class="icon_button"
-				class:plain={!removing}
-				class:size_sm={removing}
-				onclick={() => (removing = !removing)}>🗙</button
-			>
-		</div>
+		<Confirm_Button onclick={onremove} />
 	</div>
 
 	<div class="messages">
