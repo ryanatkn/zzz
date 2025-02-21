@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
 	import type {Source_File} from '@ryanatkn/gro/filer.js';
+	import {untrack} from 'svelte';
 
 	import {to_root_path} from '$lib/path.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
@@ -19,9 +20,19 @@
 	const zzz = zzz_context.get();
 
 	let updated_contents = $state(file.contents ?? '');
+	// TODO sync without an effect
+	$effect.pre(() => {
+		const f = file;
+		updated_contents = untrack(() => f.contents) ?? '';
+	});
+
+	// TODO BLOCK add the slidey X for the delete button below
 </script>
 
-<div class="row size_xl"><span class="size_xl3 mr_md">🗎</span> {to_root_path(file.id)}</div>
+<div class="row size_xl word_break_break_all">
+	<span class="size_xl3 mr_md">🗎</span>
+	{to_root_path(file.id)}
+</div>
 
 <div>
 	<Copy_To_Clipboard text={file.contents} />
@@ -31,27 +42,30 @@
 		({file.contents.length} chars)
 	{/if}
 </div>
-<div class="editor">
-	<div class="flex_1 width_md">
-		<div>
-			<textarea style:height="{height}px" bind:value={updated_contents}></textarea>
-		</div>
-		<button
-			type="button"
-			disabled={updated_contents === file.contents}
-			onclick={() => {
-				zzz.update_file(file.id, updated_contents);
-			}}>save</button
-		>
-		<button
-			class="color_c"
-			type="button"
-			onclick={() => {
-				zzz.delete_file(file.id);
-			}}>delete</button
-		>
+<div class="flex flex_wrap">
+	<div class="flex_1 width_md min_width_sm">
+		<textarea style:height="{height}px" bind:value={updated_contents}></textarea>
 	</div>
-	<pre style:height="{height}px" class="flex_1 fg_1 radius_sm p_md width_md">{file.contents}</pre>
+	<pre
+		style:height="{height}px"
+		class="flex_1 fg_1 radius_sm p_md width_md min_width_sm"
+		style:min-width="var(--width_sm)">{file.contents}</pre>
+</div>
+<div class="flex justify_content_space_between">
+	<button
+		type="button"
+		disabled={updated_contents === file.contents}
+		onclick={() => {
+			zzz.update_file(file.id, updated_contents);
+		}}>save</button
+	>
+	<button
+		class="color_c"
+		type="button"
+		onclick={() => {
+			zzz.delete_file(file.id);
+		}}>delete</button
+	>
 </div>
 
 <h2>
@@ -78,11 +92,6 @@
 {/if}
 
 <style>
-	.editor {
-		display: flex;
-		align-items: flex-start;
-	}
-
 	.dep_list {
 		width: 100%;
 		display: grid;

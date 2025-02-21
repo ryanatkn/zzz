@@ -1,5 +1,7 @@
 <script lang="ts">
 	import type {Source_File} from '@ryanatkn/gro/filer.js';
+	import {slide} from 'svelte/transition';
+
 	import {to_root_path} from '$lib/path.js';
 
 	interface Props {
@@ -19,38 +21,26 @@
 	};
 </script>
 
-<div class="file_explorer">
-	<menu class="files unstyled">
-		{#each sorted_files as file (file.id)}
-			<button
-				type="button"
-				class="file"
-				class:selected={file.id === selected_file_id}
-				onclick={() => handle_select(file)}
-			>
-				<div class="font_weight_400">
-					<span class="mr_xs2">🗎</span>
-					<small class="word_break_break_all">{to_root_path(file.id)}</small>
-				</div>
-			</button>
-		{/each}
-	</menu>
-</div>
+<menu class="flex_1 unstyled">
+	{#each sorted_files as file (file.id)}
+		<!-- TODO make these links, using query param? -->
+		<button
+			type="button"
+			class="file"
+			class:selected={file.id === selected_file_id}
+			onclick={() => handle_select(file)}
+			transition:slide
+		>
+			<div class="font_weight_400">
+				<span class="mr_xs2">🗎</span>
+				<small class="word_break_break_all">{to_root_path(file.id)}</small>
+			</div>
+		</button>
+	{/each}
+</menu>
 
 <style>
-	.file_explorer {
-		height: 100%;
-		overflow: hidden;
-		display: flex;
-		flex-direction: column;
-	}
-
-	.files {
-		flex: 1;
-		overflow-y: auto;
-	}
-
-	.file {
+	button {
 		justify-content: flex-start;
 		width: 100%;
 		text-align: left;

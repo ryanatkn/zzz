@@ -198,6 +198,11 @@ a.chip {
 	line-height: var(--line_height_lg); /* prevents the bottom of g's and others from being cut off */
 }
 
+.min_width_sm {
+	width: 100%;
+	min-width: var(--width_sm);
+}
+
 .ml_md {
 	margin-left: var(--space_md);
 }
@@ -392,7 +397,6 @@ a.chip {
 	width: 100%;
 }
 
-/* TODO rename these? use to be columns, maybe should be? */
 .width_md {
 	width: 100%;
 	max-width: var(--width_md);

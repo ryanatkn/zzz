@@ -13,7 +13,7 @@
 	// TODO standardize
 </script>
 
-<main class="width_md p_lg">
+<div class="width_md p_lg">
 	<section>
 		<header style:--size="var(--size_xl)">
 			<h1 class="row">
@@ -26,17 +26,21 @@
 			</h1>
 		</header>
 		<p>
-			Zzz, pronounced "zees" like the sound of electricity, is a bot and web toolkit. It's one of
-			what I call an "endgame web UI", the kind that adapts to your needs on the fly, and that's
-			fully open and in your control. Concepts include:
+			Zzz, pronounced "zees" like the sound of electricity, is a bot and web toolkit. It's one
+			example of what I call an "endgame web UI", a user interface that adapts to your needs on the
+			fly, while remaining fully in your control and always open.
 		</p>
+		<p>The main concepts include:</p>
 		<ul>
 			<li>open source</li>
 			<li>fully controlled by the user</li>
+			<li>optimize for UX first</li>
 			<li>client is the nexus of many services</li>
 			<li>local-first, pluggable cloud</li>
+			<li>designed for extensibility</li>
 			<li>customizable and programmable</li>
-			<li>leverages the web dev ecosystem</li>
+			<li>leverages the web dev ecosystem for TypeScript and Svelte</li>
+			<li>encourages normal dev patterns, unintrusive to your preferred workflows</li>
 			<li>
 				progressively enhanced with capabilities like a local or remote web server and local model
 				providers like Ollama
@@ -62,4 +66,4 @@
 			</div>
 		</Library_Footer>
 	</section>
-</main>
+</div>
