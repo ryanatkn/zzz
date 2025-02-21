@@ -20,7 +20,8 @@
 	const toggle = () => (confirming = !confirming);
 
 	// TODO ideally there would be an active state visible on the button when confirming, but `selected` is too visually heavy
-	// TODO changing the font size works if there's no children, but that's a weird difference
+
+	// TODO changing the font size works if there's no children, but that's a weird difference - the UX is broken for custom buttons because they change size when the font size changes
 </script>
 
 <div class="relative">
