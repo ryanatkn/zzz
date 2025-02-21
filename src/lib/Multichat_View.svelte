@@ -107,7 +107,11 @@
 			<header class="mb_md">
 				<h3 class="mt_0">add tape with model</h3>
 			</header>
-			<Model_Selector onselect={(model) => multichat.add_tape(model)} />
+			<Model_Selector onselect={(model) => multichat.add_tape(model)}>
+				{#snippet children(model)}
+					<div>{multichat.tapes.filter((t) => t.model.name === model.name).length}</div>
+				{/snippet}
+			</Model_Selector>
 		</div>
 	</div>
 	<div class="panel p_sm flex_1">
