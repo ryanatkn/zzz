@@ -32,13 +32,16 @@
 		text-decoration: none;
 		border: var(--border_width_2) var(--border_style) transparent;
 		color: var(--text_color_2);
+		transform-origin: center;
 	}
 	.nav_link:hover {
 		/* TODO probably add up to `border_color_5` */
 		border-color: var(--border_color_5);
+		transform: scale(1.02);
 	}
 	.nav_link:active {
 		border-color: var(--border_color_a);
+		transform: scale(1.05);
 	}
 	.nav_link.selected {
 		border-color: var(--border_color_a);

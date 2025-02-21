@@ -50,8 +50,10 @@
 <div class="multichat">
 	<div class="column gap_md">
 		<div class="panel p_sm">
-			<header class="size_xl mb_md">
-				<h2 class="mt_0"><Text_Icon icon={SYMBOL_TAPE} /> tapes</h2>
+			<header class="size_xl">
+				<h2 class="mt_0 mb_lg">
+					<Text_Icon icon={SYMBOL_TAPE} size="var(--icon_size_sm)" /> tapes
+				</h2>
 			</header>
 			<!-- TODO add user-customizable sets of models -->
 			<menu class="unstyled column">

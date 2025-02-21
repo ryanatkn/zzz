@@ -24,7 +24,7 @@
 		<h2>Todo</h2>
 		<ul>
 			<li>Node server</li>
-			<ul>
+			<ul class="mb_0">
 				<li>websocket connection</li>
 			</ul>
 			<li>pg db (Postgres, pglite, or some other compatible database)</li>
