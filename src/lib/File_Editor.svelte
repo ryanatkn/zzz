@@ -57,14 +57,14 @@
 		disabled={updated_contents === file.contents}
 		onclick={() => {
 			zzz.update_file(file.id, updated_contents);
-		}}>save</button
+		}}>save file</button
 	>
 	<button
 		class="color_c"
 		type="button"
 		onclick={() => {
 			zzz.delete_file(file.id);
-		}}>delete</button
+		}}>delete file</button
 	>
 </div>
 

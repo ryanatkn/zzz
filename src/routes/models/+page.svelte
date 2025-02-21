@@ -1,5 +1,5 @@
 <script lang="ts">
-	import {SYMBOL_MODEL} from '$lib/constants.js';
+	import {GLYPH_MODEL} from '$lib/constants.js';
 	import Model_Summary from '$lib/Model_Summary.svelte';
 	import Text_Icon from '$lib/Text_Icon.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
@@ -10,7 +10,7 @@
 </script>
 
 <div class="p_lg">
-	<h1><Text_Icon icon={SYMBOL_MODEL} /> models</h1>
+	<h1><Text_Icon icon={GLYPH_MODEL} /> models</h1>
 	<div class="models_grid">
 		{#each zzz.models as model (model)}
 			<Model_Summary {model} />

@@ -8,7 +8,7 @@
 	import Text_Icon from '$lib/Text_Icon.svelte';
 	import Chat_Tape from '$lib/Chat_Tape.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
-	import {SYMBOL_TAPE} from '$lib/constants.js';
+	import {GLYPH_TAPE} from '$lib/constants.js';
 
 	const zzz = zzz_context.get();
 
@@ -55,7 +55,7 @@
 		<div class="panel p_sm">
 			<header class="size_xl">
 				<h2 class="mt_0 mb_lg">
-					<Text_Icon icon={SYMBOL_TAPE} size="var(--icon_size_sm)" /> tapes
+					<Text_Icon icon={GLYPH_TAPE} size="var(--icon_size_sm)" /> tapes
 				</h2>
 			</header>
 			<!-- TODO add user-customizable sets of models -->

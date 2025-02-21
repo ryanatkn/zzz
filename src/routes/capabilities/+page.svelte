@@ -1,7 +1,7 @@
 <script lang="ts">
 	import {DEV} from 'esm-env';
 
-	import {SYMBOL_CAPABILITIES} from '$lib/constants.js';
+	import {GLYPH_CAPABILITIES} from '$lib/constants.js';
 	import Text_Icon from '$lib/Text_Icon.svelte';
 	import Breadcrumb from '@ryanatkn/fuz/Breadcrumb.svelte';
 	import Library_Footer from '@ryanatkn/fuz/Library_Footer.svelte';
@@ -18,7 +18,7 @@
 
 <div class="p_lg">
 	<header>
-		<h1><Text_Icon icon={SYMBOL_CAPABILITIES} /> system capabilities</h1>
+		<h1><Text_Icon icon={GLYPH_CAPABILITIES} /> system capabilities</h1>
 	</header>
 	<section>
 		<h2>Todo</h2>

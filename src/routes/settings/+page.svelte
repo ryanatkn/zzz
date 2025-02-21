@@ -1,5 +1,5 @@
 <script lang="ts">
-	import {SYMBOL_SETTINGS} from '$lib/constants.js';
+	import {GLYPH_SETTINGS} from '$lib/constants.js';
 	import Control_Panel from '$lib/Control_Panel.svelte';
 	import Text_Icon from '$lib/Text_Icon.svelte';
 	import Settings from '$lib/Settings.svelte';
@@ -18,7 +18,7 @@
 
 <div class="p_lg">
 	<header>
-		<h1><Text_Icon icon={SYMBOL_SETTINGS} /> system settings</h1>
+		<h1><Text_Icon icon={GLYPH_SETTINGS} /> system settings</h1>
 	</header>
 	<Control_Panel />
 	<section class="width_sm">

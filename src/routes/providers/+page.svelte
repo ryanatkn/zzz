@@ -3,7 +3,7 @@
 	import Provider_Link from '$lib/Provider_Link.svelte';
 	import Model_Link from '$lib/Model_Link.svelte';
 	import Text_Icon from '$lib/Text_Icon.svelte';
-	import {SYMBOL_MODEL, SYMBOL_PROVIDER} from '$lib/constants.js';
+	import {GLYPH_MODEL, GLYPH_PROVIDER} from '$lib/constants.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 
 	const zzz = zzz_context.get();
@@ -12,14 +12,14 @@
 </script>
 
 <div class="p_lg">
-	<h1><Text_Icon icon={SYMBOL_PROVIDER} /> providers</h1>
+	<h1><Text_Icon icon={GLYPH_PROVIDER} /> providers</h1>
 	<div class="providers_grid">
 		{#each providers_default as provider (provider)}
 			<div class="panel p_lg">
 				<div class="size_xl mb_lg">
 					<Provider_Link {provider} attrs={{class: 'font_weight_500'}} />
 				</div>
-				<div class="mb_sm font_mono">{SYMBOL_PROVIDER} {provider.name}</div>
+				<div class="mb_sm font_mono">{GLYPH_PROVIDER} {provider.name}</div>
 				{#if provider.url}
 					<div class="mb_sm">
 						<a href={provider.url} target="_blank" rel="noreferrer"
@@ -32,12 +32,12 @@
 						<img src={provider.icon} alt={`${provider.title} icon`} class="provider_icon" />
 					</div>
 				{/if}
-				<!-- <h3><Text_Icon icon={SYMBOL_MODEL} /> models</h3> -->
+				<!-- <h3><Text_Icon icon={GLYPH_MODEL} /> models</h3> -->
 				<ul class="unstyled">
 					{#each models.filter((m) => m.provider_name === provider.name) as model (model)}
 						<li class="row flex_wrap mb_xs3">
 							<Model_Link attrs={{class: 'font_mono px_xs size_sm font_weight_500'}} {model}
-								>{SYMBOL_MODEL} {model.name}</Model_Link
+								>{GLYPH_MODEL} {model.name}</Model_Link
 							>
 							<!-- {#each model.tags as tag (tag)}
 								<small class="chip">{tag}</small>

@@ -1,6 +1,6 @@
 import type {Provider, Provider_Name} from '$lib/provider.svelte.js';
 import type {Completion_Request, Completion_Response} from '$lib/completion.js';
-import type {Zzz} from './zzz.svelte.js';
+import type {Zzz} from '$lib/zzz.svelte.js';
 
 export interface Completion_Threads_Json {
 	completion_threads: Array<Completion_Thread_Json>;

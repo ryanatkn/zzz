@@ -5,7 +5,7 @@
 	import File_Explorer from '$lib/File_Explorer.svelte';
 	import File_Editor from '$lib/File_Editor.svelte';
 	import Text_Icon from '$lib/Text_Icon.svelte';
-	import {SYMBOL_FILE} from '$lib/constants.js';
+	import {GLYPH_FILE} from '$lib/constants.js';
 
 	const zzz = zzz_context.get();
 
@@ -28,7 +28,7 @@
 
 <div class="h_100 flex p_sm gap_md overflow_hidden">
 	<div class="width_sm shrink_0 overflow_auto">
-		<header class="size_xl mb_md"><h1><Text_Icon icon={SYMBOL_FILE} /> files</h1></header>
+		<header class="size_xl mb_md"><h1><Text_Icon icon={GLYPH_FILE} /> files</h1></header>
 		<File_Explorer
 			files={files_map}
 			{selected_file_id}
@@ -36,7 +36,6 @@
 		/>
 	</div>
 	<div class="flex_1 overflow_auto">
-		<header class="size_xl mb_md"><h1><Text_Icon icon={SYMBOL_FILE} /> file</h1></header>
 		{#if selected_file}
 			<File_Editor file={selected_file} />
 		{/if}

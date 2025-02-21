@@ -3,7 +3,7 @@
 	import Model_Link from '$lib/Model_Link.svelte';
 	import Provider_Link from '$lib/Provider_Link.svelte';
 	import type {Model} from '$lib/model.svelte.js';
-	import {SYMBOL_PROVIDER} from './constants.js';
+	import {GLYPH_PROVIDER} from '$lib/constants.js';
 
 	interface Props {
 		model: Model;
@@ -21,7 +21,7 @@
 	<div class="mb_lg font_mono">
 		<!-- TODO hacky -->
 		<Provider_Link provider={providers_default.find((p) => p.name === model.provider_name)!}
-			><span class="font_weight_400">{SYMBOL_PROVIDER} {model.provider_name}</span></Provider_Link
+			><span class="font_weight_400">{GLYPH_PROVIDER} {model.provider_name}</span></Provider_Link
 		>
 	</div>
 	<!-- {#if model.provider_name === 'ollama'}

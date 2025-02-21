@@ -1,17 +1,17 @@
-export const SYMBOL_CHAT = '⌸';
-export const SYMBOL_TAPE = '☷';
-export const SYMBOL_FILE = '⏚'; // ⏚ ⧈ ⊞ ⧉ ⌺ ▤
-export const SYMBOL_PROMPTS = '⌇'; // ⌇ ⍋  ⌭
-export const SYMBOL_PROVIDER = '⨕';
-export const SYMBOL_MODEL = '⊛'; // ⨹ ⨺ ⊛
-// export const SYMBOL_ABOUT =
-export const SYMBOL_CAPABILITIES = '⧰'; // ⌁
-export const SYMBOL_SETTINGS = '⛮'; // ⛭  ⚙  ⛮  ⛯ ⛣
+export const GLYPH_CHAT = '⌸';
+export const GLYPH_TAPE = '☷';
+export const GLYPH_FILE = '⏚'; // ⏚ ⧈ ⊞ ⧉ ⌺ ▤
+export const GLYPH_PROMPTS = '⌇'; // ⌇ ⍋  ⌭
+export const GLYPH_PROVIDER = '⨕';
+export const GLYPH_MODEL = '⊛'; // ⨹ ⨺ ⊛
+// export const GLYPH_ABOUT =
+export const GLYPH_CAPABILITIES = '⧰'; // ⌁
+export const GLYPH_SETTINGS = '⛮'; // ⛭  ⚙  ⛮  ⛯ ⛣
 // ⏛
 // ☳ ☷
 // ≣
 // ⠿
-// TODO SYMBOL_TAPE
+// TODO GLYPH_TAPE
 // ⧛
 
 // ⚟
