@@ -21,7 +21,6 @@
 	import {package_json, src_json} from '$routes/package.js';
 	import {Zzz_Client} from '$lib/zzz_client.js';
 	import {random_id} from '$lib/id.js';
-	import {ollama_list} from '$lib/ollama.js';
 	import {zzz_config} from '$lib/zzz_config.js';
 
 	interface Props {
@@ -110,16 +109,7 @@
 	// TODO BLOCK refactor with capabilities
 	if (browser) {
 		onMount(async () => {
-			zzz.capability_ollama = null;
-			const list_response = await ollama_list();
-			if (!list_response) {
-				zzz.capability_ollama = false;
-				return;
-			}
-
-			console.log(`ollama list_response`, list_response);
-			zzz.capability_ollama = true;
-			zzz.add_ollama_models(list_response.models);
+			await zzz.init_models();
 		});
 	}
 

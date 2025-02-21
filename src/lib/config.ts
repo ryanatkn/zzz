@@ -1,7 +1,7 @@
 import type {Zzz_Config_Creator} from '$lib/config_helpers.js';
 import type {Provider_Json} from '$lib/provider.svelte.js';
 import type {Model_Json} from '$lib/model.svelte.js';
-import {ollama_list} from './ollama.js';
+import {merge_ollama_models, ollama_list_with_metadata} from '$lib/ollama.js';
 
 // TODO BLOCK instead of hardcoding Ollama models, pull from `http://127.0.0.1:11434/api/tags`
 
@@ -42,7 +42,7 @@ export const providers_default: Array<Provider_Json> = [
 export const models_default: Array<Model_Json> = [
 	// TODO import/map these directly when possible
 	{
-		name: 'llama3.2',
+		name: 'llama3.2:3b',
 		provider_name: 'ollama',
 		tags: ['llama', 'llama3'],
 		architecture: 'llama',
@@ -88,7 +88,7 @@ export const models_default: Array<Model_Json> = [
 		filesize: 0.986,
 	},
 	{
-		name: 'deepseek-r1',
+		name: 'deepseek-r1:7b',
 		provider_name: 'ollama',
 		tags: ['deepseek'],
 		architecture: 'qwen2',
@@ -234,13 +234,16 @@ export const SYSTEM_MESSAGE_DEFAULT =
 
 // TODO currently this is imported directly by client and server, but we probably only want to forward a serialized subset to the client
 const config: Zzz_Config_Creator = async () => {
-	const list_response = await ollama_list();
-	console.log(`ollama list_response`, list_response);
+	const models_info = await ollama_list_with_metadata();
 	// TODO BLOCK merge models with a helper, that's also used in layout
+
+	const models = models_info
+		? merge_ollama_models(models_default, models_info.model_infos)
+		: models_default;
 
 	return {
 		providers: providers_default,
-		models: models_default, // TODO BLOCK change to async and call the API based on browser/server? or pass as an option?
+		models,
 		system_message: SYSTEM_MESSAGE_DEFAULT,
 	};
 };

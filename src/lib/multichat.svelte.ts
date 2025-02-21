@@ -26,6 +26,7 @@ export class Multichat {
 	}
 
 	add_tape(model: Model): void {
+		console.log(`add_tape model`, model);
 		this.tapes.push({
 			id: random_id(),
 			model,

@@ -302,6 +302,7 @@ export const package_json = {
 			default: './dist/Text_Icon.svelte',
 		},
 		'./zzz_client.js': {types: './dist/zzz_client.d.ts', default: './dist/zzz_client.js'},
+		'./zzz_config.js': {types: './dist/zzz_config.d.ts', default: './dist/zzz_config.js'},
 		'./zzz_data.svelte.js': {
 			types: './dist/zzz_data.svelte.d.ts',
 			default: './dist/zzz_data.svelte.js',
@@ -495,6 +496,10 @@ export const src_json = {
 				{name: 'Zzz_Client_Options', kind: 'type'},
 				{name: 'Zzz_Client', kind: 'class'},
 			],
+		},
+		'./zzz_config.js': {
+			path: 'zzz_config.ts',
+			declarations: [{name: 'zzz_config', kind: 'variable'}],
 		},
 		'./zzz_data.svelte.js': {
 			path: 'zzz_data.svelte.ts',

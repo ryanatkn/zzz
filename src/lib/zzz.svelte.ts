@@ -4,7 +4,6 @@ import {create_deferred, type Deferred} from '@ryanatkn/belt/async.js';
 import type {Source_File} from '@ryanatkn/gro/filer.js';
 import type {Path_Id} from '@ryanatkn/gro/path.js';
 import {Unreachable_Error} from '@ryanatkn/belt/error.js';
-import type {ModelResponse} from 'ollama/browser';
 
 import {Zzz_Data, type Zzz_Data_Json} from '$lib/zzz_data.svelte.js';
 import type {Zzz_Client} from '$lib/zzz_client.js';
@@ -17,7 +16,10 @@ import type {
 import {Provider, type Provider_Json, type Provider_Name} from '$lib/provider.svelte.js';
 import {random_id, type Id} from '$lib/id.js';
 import {Completion_Threads, type Completion_Threads_Json} from '$lib/completion_thread.svelte.js';
-import {Model} from '$lib/model.svelte.js';
+import {Model, type Model_Json} from '$lib/model.svelte.js';
+import {ollama_list_with_metadata, type Ollama_Model_Info} from '$lib/ollama.js';
+import {models_default} from '$lib/config.js';
+import {zzz_config} from '$lib/zzz_config.js';
 
 export const zzz_context = create_context<Zzz>();
 
@@ -75,6 +77,33 @@ export class Zzz {
 			data: this.data.toJSON(),
 			completion_threads: this.completion_threads.toJSON(),
 		};
+	}
+
+	inited_models: boolean | undefined = $state();
+
+	// TODO maybe make this sync instead of init?
+	async init_models(): Promise<void> {
+		this.inited_models = false;
+
+		// First add the ollama models
+		this.capability_ollama = null;
+		const ollama_models_response = await ollama_list_with_metadata();
+		if (!ollama_models_response) {
+			this.capability_ollama = false;
+			return;
+		}
+
+		console.log(`ollama list_response`, ollama_models_response);
+		this.capability_ollama = true;
+		this.add_ollama_models(ollama_models_response.model_infos);
+
+		// Add non-ollama models
+		for (const model of zzz_config.models) {
+			if (model.provider_name === 'ollama') continue;
+			this.add_model(model);
+		}
+
+		this.inited_models = true;
 	}
 
 	async send_prompt(
@@ -193,19 +222,27 @@ export class Zzz {
 		this.providers.push(provider);
 	}
 
-	add_ollama_models(model_responses: Array<ModelResponse>): void {
+	add_model(model_json: Model_Json): void {
+		this.models.push(new Model({zzz: this, json: model_json}));
+	}
+
+	add_ollama_models(model_infos: Array<Ollama_Model_Info>): void {
+		console.log(`add_ollama_models model_infos`, model_infos);
 		this.models = [
-			...model_responses.map(
-				(model_response) =>
-					new Model({
-						data: {
-							name: model_response.name,
-							provider_name: 'ollama',
-							tags: model_response.details.families,
-							ollama_model_response: model_response,
-						},
-					}),
-			),
+			...model_infos.map((ollama_model_info) => {
+				const model_default = models_default.find((m) => m.name === ollama_model_info.model.name);
+				return new Model({
+					zzz: this,
+					json: model_default
+						? {...model_default, ollama_model_info}
+						: {
+								name: ollama_model_info.model.name,
+								provider_name: 'ollama',
+								tags: ollama_model_info.model.details.families,
+								ollama_model_info,
+							},
+				});
+			}),
 			...this.models,
 		];
 	}

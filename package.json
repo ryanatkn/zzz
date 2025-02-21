@@ -357,6 +357,10 @@
       "types": "./dist/zzz_client.d.ts",
       "default": "./dist/zzz_client.js"
     },
+    "./zzz_config.js": {
+      "types": "./dist/zzz_config.d.ts",
+      "default": "./dist/zzz_config.js"
+    },
     "./zzz_data.svelte.js": {
       "types": "./dist/zzz_data.svelte.d.ts",
       "default": "./dist/zzz_data.svelte.js"
