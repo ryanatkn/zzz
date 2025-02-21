@@ -35,13 +35,6 @@
 			>{model.provider_name}</Provider_Link
 		>
 	</div>
-	{#if model.provider_name === 'ollama'}
-		{#if model.ollama_model_info}
-			<pre><code>{JSON.stringify(model.ollama_model_info, null, '\t')}</code></pre>
-		{:else}
-			<Alert status="error">no Ollama info</Alert>
-		{/if}
-	{/if}
 	{#if model.tags.length}
 		<ul class="unstyled flex gap_xs">
 			{#each model.tags as tag (tag)}
@@ -91,5 +84,15 @@
 	{/if}
 	{#if model.training_cutoff}
 		<div>Training cutoff: {model.training_cutoff}</div>
+	{/if}
+	{#if model.provider_name === 'ollama'}
+		<h3>Ollama model info</h3>
+		{#if model.ollama_model_info}
+			<pre class="overflow_hidden"><code class="overflow_auto p_md"
+					>{JSON.stringify(model.ollama_model_info, null, '\t')}</code
+				></pre>
+		{:else}
+			<Alert status="error">no Ollama info</Alert>
+		{/if}
 	{/if}
 </div>

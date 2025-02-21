@@ -233,6 +233,9 @@ a.chip {
 .overflow_auto {
 	overflow: auto;
 }
+.overflow_hidden {
+	overflow: hidden;
+}
 .p_lg {
 	padding: var(--space_lg);
 }
