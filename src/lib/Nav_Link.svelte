@@ -25,26 +25,26 @@
 >
 
 <style>
-	a {
+	.nav_link {
 		display: flex;
 		align-items: center;
-		padding: var(--space_xs2) var(--space_md);
+		padding: var(--space_xs2) var(--space_sm);
 		text-decoration: none;
 		border: var(--border_width_2) var(--border_style) transparent;
 		color: var(--text_color_2);
 	}
-	a:hover {
+	.nav_link:hover {
 		/* TODO probably add up to `border_color_5` */
 		border-color: var(--border_color_5);
 	}
-	a:active {
+	.nav_link:active {
 		border-color: var(--border_color_a);
 	}
-	a.selected {
+	.nav_link.selected {
 		border-color: var(--border_color_a);
 		color: var(--color_a_6);
 	}
-	a.selected_descendent {
+	.nav_link.selected_descendent {
 		border-color: var(--border_color_5);
 	}
 </style>

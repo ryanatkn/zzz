@@ -1,9 +1,11 @@
 <script lang="ts">
 	import type {Source_File} from '@ryanatkn/gro/filer.js';
 
-	import File_List from '$lib/File_List.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import File_Explorer from '$lib/File_Explorer.svelte';
+	import File_Editor from '$lib/File_Editor.svelte';
+	import Text_Icon from '$lib/Text_Icon.svelte';
+	import {SYMBOL_FILE} from '$lib/constants.js';
 
 	const zzz = zzz_context.get();
 
@@ -12,6 +14,9 @@
 	// TODO BLOCK shouldnt be needed
 	const files_map: Map<string, Source_File> = $derived(new Map(files.map((f) => [f.id, f])));
 	let selected_file_id: string | null = $state(null);
+	const selected_file: Source_File | null = $derived(
+		selected_file_id && (files_map.get(selected_file_id) ?? null),
+	);
 	const handle_file_selection = (file: Source_File): void => {
 		selected_file_id = file.id;
 	};
@@ -21,17 +26,19 @@
 	// TODO BLOCK name for "File_Explorer" and "File_List" parent component?
 </script>
 
-<div class="flex">
-	<div class="panel p_sm shrink_0">
-		<header class="size_xl mb_md">File Explorer</header>
+<div class="flex p_sm gap_md">
+	<div class="shrink_0">
+		<header class="size_xl mb_md"><h1><Text_Icon icon={SYMBOL_FILE} /> files</h1></header>
 		<File_Explorer
 			files={files_map}
 			{selected_file_id}
 			onselect={(file) => handle_file_selection(file)}
 		/>
 	</div>
-	<div class="p_md">
-		<header class="size_xl mb_md">Files</header>
-		<File_List {files} />
+	<div>
+		<header class="size_xl mb_md"><h1><Text_Icon icon={SYMBOL_FILE} /> file</h1></header>
+		{#if selected_file}
+			<File_Editor file={selected_file} />
+		{/if}
 	</div>
 </div>

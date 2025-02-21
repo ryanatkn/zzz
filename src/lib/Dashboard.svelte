@@ -68,10 +68,10 @@
 
 				<!-- AI Tools -->
 				<h3 class="h3_ui">AI</h3>
+				<Nav_Link href="{base}/models"><span class="icon_xs">{SYMBOL_MODEL}</span> models</Nav_Link>
 				<Nav_Link href="{base}/providers"
 					><span class="icon_xs">{SYMBOL_PROVIDER}</span> providers</Nav_Link
 				>
-				<Nav_Link href="{base}/models"><span class="icon_xs">{SYMBOL_MODEL}</span> models</Nav_Link>
 				<!-- <a href="{base}/experiments" class:selected={page.url.pathname === base + '/experiments'}
 					>experiments</a
 				>
