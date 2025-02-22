@@ -32,7 +32,7 @@
 	});
 </script>
 
-<div class="row size_xl word_break_break_all">
+<div class="row size_lg word_break_break_all">
 	<span class="size_xl3 mr_md">🗎</span>
 	{to_root_path(file.id)}
 </div>
