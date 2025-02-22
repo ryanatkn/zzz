@@ -37,12 +37,12 @@
 	{to_root_path(file.id)}
 </div>
 
-<div class="row gap_md mb_lg px_xs">
+<div class="row gap_md mb_sm">
 	<Copy_To_Clipboard text={file.contents} />
 	<div>{file.contents?.length} char{file.contents?.length === 1 ? '' : 's'}</div>
 </div>
 
-<div class="flex flex_wrap">
+<div class="flex flex_wrap mb_sm">
 	<div class="flex_1 width_md min_width_sm">
 		<textarea style:height="{height}px" bind:value={updated_contents}></textarea>
 	</div>
@@ -62,7 +62,7 @@
 			zzz.update_file(file.id, updated_contents);
 		}}>save file</button
 	>
-	<div class="flex">
+	<div class="flex gap_sm">
 		<button
 			type="button"
 			disabled={updated_contents === file.contents}

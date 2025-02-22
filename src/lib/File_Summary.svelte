@@ -15,7 +15,7 @@
 </script>
 
 <div class="file_summary row justify_content_space_between">
-	<div class="row flex_1 overflow_auto">
+	<div class="flex flex_1 overflow_auto">
 		<div class="size_xl">🗎</div>
 		<div class="px_lg ellipsis">{to_root_path(file.id)}</div>
 	</div>
