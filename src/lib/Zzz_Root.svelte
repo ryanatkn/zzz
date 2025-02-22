@@ -5,7 +5,6 @@
 	import {Zzz, zzz_context} from '$lib/zzz.svelte.js';
 	import Dashboard from '$lib/Dashboard.svelte';
 	import Main_Dialog from '$lib/Main_Dialog.svelte';
-	import {hud_context} from '$lib/hud.svelte.js';
 
 	/*
 
@@ -15,15 +14,12 @@
 
 	interface Props {
 		zzz: Zzz;
-		hud?: Snippet;
 		children: Snippet<[zzz: Zzz]>;
 	}
 
-	const {zzz, hud, children}: Props = $props();
+	const {zzz, children}: Props = $props();
 
 	zzz_context.set(zzz);
-
-	hud_context.set(hud);
 </script>
 
 <svelte:window

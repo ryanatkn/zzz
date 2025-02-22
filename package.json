@@ -216,10 +216,6 @@
       "types": "./dist/file.svelte.d.ts",
       "default": "./dist/file.svelte.js"
     },
-    "./hud.svelte.js": {
-      "types": "./dist/hud.svelte.d.ts",
-      "default": "./dist/hud.svelte.js"
-    },
     "./id.js": {
       "types": "./dist/id.d.ts",
       "default": "./dist/id.js"

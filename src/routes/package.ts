@@ -187,7 +187,6 @@ export const package_json = {
 			default: './dist/File_View.svelte',
 		},
 		'./file.svelte.js': {types: './dist/file.svelte.d.ts', default: './dist/file.svelte.js'},
-		'./hud.svelte.js': {types: './dist/hud.svelte.d.ts', default: './dist/hud.svelte.js'},
 		'./id.js': {types: './dist/id.d.ts', default: './dist/id.js'},
 		'./Main_Dialog.svelte': {
 			types: './dist/Main_Dialog.svelte.d.ts',
@@ -407,10 +406,6 @@ export const src_json = {
 				{name: 'Prompt_Options', kind: 'type'},
 				{name: 'Prompt', kind: 'class'},
 			],
-		},
-		'./hud.svelte.js': {
-			path: 'hud.svelte.ts',
-			declarations: [{name: 'hud_context', kind: 'variable'}],
 		},
 		'./id.js': {
 			path: 'id.ts',
