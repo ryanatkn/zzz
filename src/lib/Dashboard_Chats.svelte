@@ -45,6 +45,7 @@
 					selected={chat.id === zzz.selected_chat_id}
 					attrs={{
 						type: 'button',
+						class: 'justify_content_space_between',
 						style: 'min-height: 0;',
 						onclick: () => zzz.select_chat(chat.id),
 					}}

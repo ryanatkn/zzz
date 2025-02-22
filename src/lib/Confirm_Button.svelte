@@ -26,17 +26,25 @@
 	// TODO add contextmenu behavior to dismiss the confirmation button
 </script>
 
+<!-- I did the ternary below because Svelte treats `undefined` `class:` directive values as `false`, so they override the attribute classes -->
+<!-- eslint-disable svelte/prefer-class-directive -->
+
 <div class="relative">
 	{#if button}
 		{@render button(confirming, toggle)}
 	{:else}
 		<button
 			type="button"
-			class:icon_button={!children}
-			class:plain={!children && !confirming}
-			class:size_sm={!children && confirming}
 			onclick={toggle}
+			class:confirming
 			{...button_attrs}
+			class="{button_attrs?.class} {!children && !button_attrs?.class?.includes('icon_button')
+				? 'icon_button'
+				: ''} {!children && !confirming && !button_attrs?.class?.includes('plain')
+				? 'plain'
+				: ''} {!children && confirming && !button_attrs?.class?.includes('size_sm')
+				? 'size_sm'
+				: ''}"
 		>
 			{#if children}{@render children(confirming)}{:else}🗙{/if}
 		</button>
