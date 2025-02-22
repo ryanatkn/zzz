@@ -2,6 +2,7 @@
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
 	import type {Source_File} from '@ryanatkn/gro/filer.js';
 	import {untrack} from 'svelte';
+	import {slide} from 'svelte/transition';
 
 	import {to_root_path} from '$lib/path.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
@@ -52,7 +53,7 @@
 		style:min-width="var(--width_sm)">{file.contents}</pre>
 </div>
 
-<div class="flex justify_content_space_between">
+<section class="flex justify_content_space_between">
 	<button
 		class="color_a"
 		type="button"
@@ -60,6 +61,7 @@
 		onclick={() => {
 			contents_history.push({created: Date.now(), contents: updated_contents});
 			zzz.update_file(file.id, updated_contents);
+			discarded_contents = null;
 		}}>save file</button
 	>
 	<div class="flex gap_sm">
@@ -88,24 +90,30 @@
 			delete file
 		{/snippet}
 	</Confirm_Button>
-</div>
+</section>
 
-<div class="width_sm">
-	<h3>history</h3>
-	<div class="flex flex_column_reverse gap_xs5">
-		{#each contents_history as entry (entry)}
-			<button
-				type="button"
-				class="justify_content_space_between"
-				class:selected={entry.contents === updated_contents}
-				onclick={() => (updated_contents = entry.contents)}
-			>
-				<span>{new Date(entry.created).toLocaleTimeString()}</span>
-				<span>{entry.contents.length} chars</span>
-			</button>
-		{/each}
+{#if contents_history.length > 1 || contents_history[0].contents !== updated_contents}
+	<div class="width_sm panel p_md" transition:slide>
+		<h3 class="mt_0 mb_lg">history</h3>
+		<div class="flex flex_column_reverse">
+			{#each contents_history as entry (entry)}
+				<button
+					type="button"
+					class="justify_content_space_between"
+					class:selected={entry.contents === updated_contents}
+					onclick={() => {
+						updated_contents = entry.contents;
+						discarded_contents = null;
+					}}
+					transition:slide
+				>
+					<span>{new Date(entry.created).toLocaleTimeString()}</span>
+					<span>{entry.contents.length} chars</span>
+				</button>
+			{/each}
+		</div>
 	</div>
-</div>
+{/if}
 
 {#if dependencies.length}
 	<h2>
