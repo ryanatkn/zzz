@@ -15,8 +15,8 @@
 	// TODO BLOCK this needs to be persisted state
 	const multichat = new Multichat(zzz);
 	multichat.add_tape(zzz.models.find((m) => m.name === 'llama3.2:1b')!);
-	let main_input = $state('');
-	let pending = $state(false);
+	let main_input = $state(''); // TODO BLOCK @many this state probably belongs on the `multichat` object
+	let pending = $state(false); // TODO BLOCK @many this state probably belongs on the `multichat` object
 	let input_el: HTMLTextAreaElement | undefined;
 
 	const send_to_all = async () => {

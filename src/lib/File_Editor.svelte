@@ -20,6 +20,7 @@
 
 	const zzz = zzz_context.get();
 
+	// TODO hoist this state to `zzz` per file?
 	let updated_contents = $state(file.contents ?? '');
 	// TODO sync without an effect
 	$effect.pre(() => {
@@ -60,6 +61,13 @@
 		onclick={() => {
 			zzz.update_file(file.id, updated_contents);
 		}}>save file</button
+	>
+	<button
+		type="button"
+		disabled={updated_contents === file.contents}
+		onclick={() => {
+			updated_contents = file.contents ?? '';
+		}}>discard changes</button
 	>
 	<Confirm_Button onclick={() => zzz.delete_file(file.id)} button_attrs={{class: 'color_c'}}>
 		{#snippet children()}
