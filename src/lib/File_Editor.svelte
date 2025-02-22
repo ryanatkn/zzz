@@ -20,6 +20,8 @@
 
 	const zzz = zzz_context.get();
 
+	// TODO BLOCK on revert save, disable the button
+
 	// TODO hoist this state to `zzz` per file?
 	let updated_contents: string = $state(file.contents ?? '');
 	let previous_contents: string | null = $state(null);
@@ -31,8 +33,7 @@
 	$effect.pre(() => {
 		const f = file;
 		updated_contents = untrack(() => f.contents) ?? '';
-		// TODO BLOCK idk about this
-		// <-- DO NOT update last_save_contents here -->
+		last_save_contents = untrack(() => f.contents) ?? '';
 	});
 
 	// TODO BLOCK add the slidey X for the delete button below
