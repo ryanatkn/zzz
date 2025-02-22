@@ -80,6 +80,9 @@ a.chip {
 .font_weight_500 {
 	font-weight: 500;
 }
+.font_weight_600 {
+	font-weight: 600;
+}
 
 /* Formats content to wrap long strings and preserve displayed whitespace. */
 .formatted {
@@ -382,10 +385,6 @@ a.chip {
 	box-shadow: var(--shadow_inset_xs)
 		color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_1)), transparent);
 }
-.shadow_xs {
-	box-shadow: var(--shadow_xs)
-		color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_1)), transparent);
-}
 .shrink_0 {
 	flex-shrink: 0;
 }
@@ -418,6 +417,9 @@ a.chip {
 }
 .text_align_right {
 	text-align: right;
+}
+.text_color_3 {
+	color: var(--text_color_3);
 }
 .w_100 {
 	width: 100%;

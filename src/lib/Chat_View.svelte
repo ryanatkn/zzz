@@ -62,16 +62,16 @@
 			<header class="mt_0 mb_lg size_lg">{GLYPH_TAPE} tapes</header>
 			<p>TODO add buttons with sets</p>
 		</div>
-		<div class="panel p_sm">
+		<div class="panel">
 			<!-- TODO add user-customizable sets of models -->
 			<div class="flex">
-				<div class="flex_1 p_xs radius_xs shadow_inset_xs">
+				<div class="flex_1 p_xs radius_xs">
 					<header class="size_md text_align_center mb_xs">add by tag</header>
 					<menu class="unstyled column">
 						{#each Array.from(zzz.tags) as tag (tag)}
 							<button
 								type="button"
-								class="w_100 size_sm py_xs3 justify_content_space_between plain radius_xs"
+								class="w_100 size_sm py_xs3 justify_content_space_between plain radius_xs font_weight_600"
 								style:min-height="0"
 								onclick={() => {
 									chat.add_tapes_by_model_tag(tag);
@@ -85,14 +85,14 @@
 						{/each}
 					</menu>
 				</div>
-				<div class="flex_1 p_xs radius_xs fg_1 shadow_xs">
+				<div class="flex_1 p_xs radius_xs fg_1">
 					<header class="size_md text_align_center mb_xs">remove by tag</header>
 					<menu class="unstyled column">
 						{#each Array.from(zzz.tags) as tag (tag)}
 							{@const tapes_with_tag = chat.tapes.filter((t) => t.model.tags.includes(tag))}
 							<button
 								type="button"
-								class="w_100 size_sm py_xs3 justify_content_space_between plain radius_xs"
+								class="w_100 size_sm py_xs3 justify_content_space_between plain radius_xs font_weight_600"
 								style:min-height="0"
 								disabled={!tapes_with_tag.length}
 								onclick={() => {

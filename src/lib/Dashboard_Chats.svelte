@@ -1,5 +1,7 @@
 <script lang="ts">
 	import {slide} from 'svelte/transition';
+	import {format} from 'date-fns';
+
 	import Chat_View from '$lib/Chat_View.svelte';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import {GLYPH_CHAT} from '$lib/constants.js';
@@ -17,10 +19,11 @@
 				<div class="column">
 					<!-- TODO needs work -->
 					<div class="size_lg">Chat {zzz.selected_chat.id}</div>
-					<div>
+					<small>
 						{zzz.selected_chat.tapes.length}
 						tape{#if zzz.selected_chat.tapes.length !== 1}s{/if}
-					</div>
+					</small>
+					<small>created {format(zzz.selected_chat.created, 'MMM d, p')}</small>
 					<div class="flex justify_content_end">
 						<Confirm_Button
 							onclick={() => zzz.selected_chat && zzz.remove_chat(zzz.selected_chat)}
@@ -30,18 +33,15 @@
 				</div>
 			</div>
 		{/if}
-		<button
-			class="plain w_100 justify_content_start radius_xs2"
-			type="button"
-			onclick={() => zzz.add_chat()}
-		>
+		<button class="plain w_100 justify_content_start" type="button" onclick={() => zzz.add_chat()}>
 			+ new chat
 		</button>
 		<menu class="unstyled">
 			{#each zzz.chats as chat (chat.id)}
-				<button
+				<!-- TODO change to href from onclick -->
+				<a
 					type="button"
-					class="w_100 justify_content_space_between px_sm py_xs2 radius_xs2 font_weight_500"
+					class="flex w_100 justify_content_space_between px_sm font_weight_600 py_xs2 radius_xs2 plain text_color_3"
 					style:min-height="0"
 					class:selected={chat.id === zzz.selected_chat_id}
 					onclick={() => zzz.select_chat(chat.id)}
@@ -52,7 +52,7 @@
 						<small>Chat {chat.id}</small>
 					</div>
 					{#if chat.tapes.length}<small>{chat.tapes.length}</small>{/if}
-				</button>
+				</a>
 			{/each}
 		</menu>
 	</div>

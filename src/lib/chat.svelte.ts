@@ -18,7 +18,10 @@ export interface Tape {
 }
 
 export class Chat {
+	// TODO json pattern
 	id: Id = random_id();
+	name: string = $state('');
+	created: string = new Date().toISOString();
 	tapes: Array<Tape> = $state([]);
 	zzz: Zzz;
 
@@ -64,14 +67,15 @@ export class Chat {
 		const tape = this.tapes.find((s) => s.id === tape_id);
 		if (!tape) return;
 
-		const msg_id = random_id();
+		const message_id = random_id();
 		const message: Chat_Message = {
-			id: msg_id,
+			id: message_id,
+			// TODO add `chat_id`?
 			created: new Date().toISOString(),
 			text,
 			request: {
 				created: new Date().toISOString(),
-				request_id: msg_id,
+				request_id: message_id,
 				provider_name: tape.model.provider_name,
 				model: tape.model.name,
 				prompt: text,
@@ -83,7 +87,7 @@ export class Chat {
 		const response = await this.zzz.send_prompt(text, tape.model.provider_name, tape.model.name);
 
 		// TODO refactor
-		const msg = tape.messages.find((m) => m.id === msg_id);
-		if (msg) msg.response = response.completion_response;
+		const message_updated = tape.messages.find((m) => m.id === message_id);
+		if (message_updated) message_updated.response = response.completion_response;
 	}
 }
