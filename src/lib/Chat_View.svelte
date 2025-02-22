@@ -34,6 +34,7 @@
 		const r = await ollama.chat({
 			model: 'llama3.2:1b',
 			messages: [{role: 'user', content: parsed}],
+			options: {temperature: 1}, // TODO BLOCK same options as server (proxy through our endpoint? we still want to be able to separate the Ollama and server endpoints though, not forced through our proxy)
 		});
 		console.log(`ollama browser response`, r);
 		await chat.send_to_all(parsed);
