@@ -13,10 +13,10 @@
 	<!-- TODO, show the counts of active items for each of the model selector buttons in a snippet here -->
 	<div class="panel p_sm width_sm">
 		{#if zzz.selected_chat}
-			<div class="p_sm radius_xs2 border_solid border_width_2 border_color_4" transition:slide>
+			<div class="p_sm fg_1 radius_xs2" transition:slide>
 				<div class="column">
 					<!-- TODO needs work -->
-					<div>Chat {zzz.selected_chat.id}</div>
+					<div class="size_lg">Chat {zzz.selected_chat.id}</div>
 					<div>
 						{zzz.selected_chat.tapes.length}
 						tape{#if zzz.selected_chat.tapes.length !== 1}s{/if}

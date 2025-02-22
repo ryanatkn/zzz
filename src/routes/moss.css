@@ -9,15 +9,6 @@
 .bg_c_1 {
 	background-color: var(--color_c_1);
 }
-.border_color_4 {
-	border-color: var(--border_color_4);
-}
-.border_solid {
-	border-style: solid;
-}
-.border_width_2 {
-	border-width: var(--border_width_2);
-}
 
 .box {
 	display: flex;
