@@ -95,7 +95,7 @@ export class Completion_Thread {
 			if (providers_by_name.has(provider_name)) {
 				continue;
 			}
-			const provider = this.zzz.providers.items.find((a) => a.name === provider_name);
+			const provider = this.zzz.providers.find_by_name(provider_name);
 			if (!provider) {
 				console.error('expected to find provider', provider_name);
 				continue;
