@@ -21,6 +21,16 @@ or find me on [Bluesky](https://bsky.app/profile/ryanatkn.com).
 
 [www.zzzbot.dev](https://www.zzzbot.dev/).
 
+## Features
+
+- integrations (everything's a work in progress, but some basics should be working)
+  - [Ollama](https://github.com/ollama/ollama)
+  - [ChatGPT](https://github.com/openai/openai-node)
+  - [Claude](https://github.com/anthropics/anthropic-sdk-typescript)
+  - [Gemini](https://github.com/google-gemini/generative-ai-js)
+  - more planned, and I welcome feedback/requests/assistance
+    - [Model Context Protocol](https://modelcontextprotocol.io/) ([TS lib](https://github.com/modelcontextprotocol/typescript-sdk))
+
 ## Motivation
 
 1. control botz

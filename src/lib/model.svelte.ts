@@ -12,7 +12,9 @@ export interface Model_Json {
 	tags: Array<string>;
 	architecture?: string;
 	parameter_count?: number;
+	/** In Ollama this is `embedding_length`. */
 	context_window?: number;
+	/** In Ollama this is `feed_forward_length`. */
 	output_token_limit?: number;
 	embedding_length?: number;
 	/** Size of the model file in gigabytes. */

@@ -88,6 +88,17 @@ export const models_default: Array<Model_Json> = [
 		filesize: 0.986,
 	},
 	{
+		name: 'qwen2.5:0.5b',
+		provider_name: 'ollama',
+		tags: ['qwen2', 'small'],
+		architecture: 'qwen2',
+		parameter_count: 0.494,
+		context_window: 32_768,
+		output_token_limit: 4_864,
+		embedding_length: 896,
+		filesize: 0.398,
+	},
+	{
 		name: 'deepseek-r1:7b',
 		provider_name: 'ollama',
 		tags: ['deepseek', 'reasoning'],
