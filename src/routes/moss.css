@@ -96,6 +96,9 @@ a.chip {
 .gap_xs {
 	gap: var(--space_xs);
 }
+.gap_xs5 {
+	gap: var(--space_xs5);
+}
 .h_100 {
 	height: 100%;
 }

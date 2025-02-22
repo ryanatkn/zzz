@@ -21,14 +21,12 @@
 
 	const zzz = zzz_context.get();
 
-	// Track the content history
 	let contents_history: Array<{created: number; contents: string}> = $state([]);
 	let updated_contents: string = $state(file.contents ?? '');
 	let discarded_contents: string | null = $state(null);
 
 	$effect.pre(() => {
-		console.log('RUNNING PRE');
-		id; // When file changes, reset the local state
+		id; // When the file changes, reset the local state
 		updated_contents = untrack(() => file.contents) ?? '';
 		contents_history = [{created: Date.now(), contents: untrack(() => updated_contents)}];
 	});
@@ -96,21 +94,21 @@
 	</Confirm_Button>
 </div>
 
-<div class="history_list width_sm">
-	<h3>History</h3>
-	<ul class="unstyled flex flex_column_reverse">
+<div class="width_sm">
+	<h3>history</h3>
+	<div class="flex flex_column_reverse gap_xs5">
 		{#each contents_history as entry (entry)}
 			<button
 				type="button"
-				class="history_entry"
-				class:active={entry.contents === updated_contents}
+				class="justify_content_space_between"
+				class:selected={entry.contents === updated_contents}
 				onclick={() => (updated_contents = entry.contents)}
 			>
-				{new Date(entry.created).toLocaleTimeString()}
-				({entry.contents.length} chars)
+				<span>{new Date(entry.created).toLocaleTimeString()}</span>
+				<span>{entry.contents.length} chars</span>
 			</button>
 		{/each}
-	</ul>
+	</div>
 </div>
 
 {#if dependencies.length}
@@ -137,30 +135,6 @@
 {/if}
 
 <style>
-	.history_list {
-		display: flex;
-		flex-direction: column;
-		gap: 0.5rem;
-		overflow-y: auto;
-		max-height: var(--height);
-	}
-
-	.history_entry {
-		text-align: left;
-		padding: 0.5rem;
-		border-radius: 4px;
-		background: none;
-		border: 1px solid var(--fg_3);
-	}
-
-	.history_entry:hover {
-		background: var(--fg_5);
-	}
-
-	.history_entry.active {
-		background: var(--fg_4);
-	}
-
 	.dep_list {
 		width: 100%;
 		display: grid;
