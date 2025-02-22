@@ -39,7 +39,7 @@ export class Chat {
 	}
 
 	add_tapes_by_model_tag(tag: string): void {
-		for (const model of this.zzz.models.filter((m) => m.tags.includes(tag))) {
+		for (const model of this.zzz.models.items.filter((m) => m.tags.includes(tag))) {
 			this.add_tape(model);
 		}
 	}

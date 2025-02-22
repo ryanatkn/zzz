@@ -18,7 +18,7 @@
 	const {chat}: Props = $props();
 
 	// TODO BLOCK this needs to be persisted state
-	chat.add_tape(zzz.models.find((m) => m.name === 'llama3.2:1b')!);
+	chat.add_tape(zzz.models.items.find((m) => m.name === 'llama3.2:1b')!);
 	let main_input = $state(''); // TODO BLOCK @many this state probably belongs on the `multichat` object
 	let pending = $state(false); // TODO BLOCK @many this state probably belongs on the `multichat` object
 	let input_el: HTMLTextAreaElement | undefined;
@@ -79,8 +79,8 @@
 								}}
 							>
 								<span>{tag}</span>
-								{#if zzz.models.filter((m) => m.tags.includes(tag)).length}
-									<span>{zzz.models.filter((m) => m.tags.includes(tag)).length}</span>
+								{#if zzz.models.items.filter((m) => m.tags.includes(tag)).length}
+									<span>{zzz.models.items.filter((m) => m.tags.includes(tag)).length}</span>
 								{/if}
 							</button>
 						{/each}

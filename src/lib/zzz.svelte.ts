@@ -16,11 +16,10 @@ import type {
 import {Provider, type Provider_Json, type Provider_Name} from '$lib/provider.svelte.js';
 import {random_id, type Id} from '$lib/id.js';
 import {Completion_Threads, type Completion_Threads_Json} from '$lib/completion_thread.svelte.js';
-import {Model, type Model_Json} from '$lib/model.svelte.js';
-import {ollama_list_with_metadata, type Ollama_Model_Info} from '$lib/ollama.js';
-import {models_default} from '$lib/config.js';
+import {ollama_list_with_metadata} from '$lib/ollama.js';
 import {zzz_config} from '$lib/zzz_config.js';
 import {Chat} from '$lib/chat.svelte.js';
+import {Models} from '$lib/models.svelte.js';
 
 export const zzz_context = create_context<Zzz>();
 
@@ -42,18 +41,18 @@ export interface Zzz_Json {
 export class Zzz {
 	data: Zzz_Data = $state()!;
 
-	client: Zzz_Client;
+	readonly client: Zzz_Client;
 
 	// TODO what APi for these? `Providers` or `Provider_Manager` class?
 	// maybe have the source of truth by an array?
 	providers: Array<Provider> = $state([]);
 
-	models: Array<Model> = $state([]);
+	readonly models = new Models(this);
 
-	// TODO `SvelteSet`?
-	tags: Set<string> = $derived(new Set(this.models.flatMap((m) => m.tags)));
+	// Change tags to use the readonly models instance
+	tags: Set<string> = $derived(new Set(this.models.items.flatMap((m) => m.tags)));
 
-	files_by_id: SvelteMap<Path_Id, Source_File> = new SvelteMap();
+	readonly files_by_id: SvelteMap<Path_Id, Source_File> = new SvelteMap();
 
 	echos: Array<Echo_Message> = $state([]);
 
@@ -105,12 +104,12 @@ export class Zzz {
 		}
 
 		this.capability_ollama = true;
-		this.add_ollama_models(ollama_models_response.model_infos);
+		this.models.add_ollama_models(ollama_models_response.model_infos);
 
 		// Add non-ollama models
 		for (const model of zzz_config.models) {
 			if (model.provider_name === 'ollama') continue;
-			this.add_model(model);
+			this.models.add(model);
 		}
 
 		this.inited_models = true;
@@ -172,9 +171,9 @@ export class Zzz {
 		}
 	}
 
-	echo_start_times: Map<Id, number> = new Map();
+	readonly echo_start_times: Map<Id, number> = new Map();
 
-	echo_elapsed: SvelteMap<Id, number> = new SvelteMap();
+	readonly echo_elapsed: SvelteMap<Id, number> = new SvelteMap();
 
 	send_echo(data: unknown): void {
 		const id = random_id();
@@ -232,30 +231,6 @@ export class Zzz {
 		this.providers.push(provider);
 	}
 
-	add_model(model_json: Model_Json): void {
-		this.models.push(new Model({zzz: this, json: model_json}));
-	}
-
-	add_ollama_models(model_infos: Array<Ollama_Model_Info>): void {
-		this.models = [
-			...model_infos.map((ollama_model_info) => {
-				const model_default = models_default.find((m) => m.name === ollama_model_info.model.name);
-				return new Model({
-					zzz: this,
-					json: model_default
-						? {...model_default, ollama_model_info}
-						: {
-								name: ollama_model_info.model.name,
-								provider_name: 'ollama',
-								tags: ollama_model_info.model.details.families,
-								ollama_model_info,
-							},
-				});
-			}),
-			...this.models,
-		];
-	}
-
 	add_chat(): void {
 		const chat = new Chat(this);
 		this.chats.unshift(chat);
@@ -268,6 +243,7 @@ export class Zzz {
 			const removed = this.chats.splice(index, 1);
 			if (removed[0].id === this.selected_chat_id) {
 				const next_chat = this.chats[index === 0 ? 0 : index - 1];
+				// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 				if (next_chat) {
 					this.select_chat(next_chat.id);
 				}

@@ -13,7 +13,7 @@
 		children?: Snippet<[model: Model]>;
 	}
 
-	const {onselect, models = zzz.models, children}: Props = $props();
+	const {onselect, models = zzz.models.items, children}: Props = $props();
 
 	// TODO layout needs to probably be calculated so we can animate things (see template.fuz.dev for an example)
 

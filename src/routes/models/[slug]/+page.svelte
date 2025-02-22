@@ -7,7 +7,7 @@
 
 	const zzz = zzz_context.get();
 
-	const model = $derived(zzz.models.find((p) => p.name === page.params.slug));
+	const model = $derived(zzz.models.items.find((p) => p.name === page.params.slug));
 </script>
 
 <div class="p_sm">

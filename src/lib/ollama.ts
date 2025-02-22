@@ -71,7 +71,7 @@ export const merge_ollama_models = (
 ): Array<Model_Json> => {
 	for (const ollama_model_info of model_infos) {
 		const {model} = ollama_model_info;
-		const existing_index = models.findIndex((m) => m.name === model.name);
+		const existing_index = models.items.findIndex((m) => m.name === model.name);
 		if (existing_index === -1) {
 			models.push({
 				name: model.name,

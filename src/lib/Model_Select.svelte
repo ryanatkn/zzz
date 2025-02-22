@@ -7,17 +7,19 @@
 		selected_model: Model; // TODO get from context?
 	}
 
-	let {models, selected_model = $bindable()}: Props = $props();
+	// I think I like this pattern of `prop_` aliasing for situations like this because
+	// it makes acciental use less likely, the `final_models` pattern is more error-prone
+	let {models: prop_models, selected_model = $bindable()}: Props = $props();
 
 	const zzz = zzz_context.get();
 
 	// TODO cleanup this pattern, but using the fallback isn't reactive, right?
-	const final_models = $derived(models ?? zzz.models);
+	const models = $derived(prop_models ?? zzz.models.items);
 </script>
 
 <div class="row">
 	<select bind:value={selected_model}>
-		{#each final_models as model (model)}
+		{#each models as model (model)}
 			<option value={model}>{model.name}</option>
 		{/each}
 	</select>

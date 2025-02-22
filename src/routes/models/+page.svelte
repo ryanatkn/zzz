@@ -12,7 +12,7 @@
 <div class="p_lg">
 	<h1><Text_Icon icon={GLYPH_MODEL} /> models</h1>
 	<div class="models_grid">
-		{#each zzz.models as model (model)}
+		{#each zzz.models.items as model (model)}
 			<Model_Summary {model} />
 		{/each}
 	</div>

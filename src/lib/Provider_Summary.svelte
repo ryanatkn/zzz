@@ -19,7 +19,7 @@
 	const on_detail_page = $derived(page.url.pathname === `${base}/providers/${provider.name}`);
 
 	// TODO BLOCK use `provider.models`
-	const models = $derived(zzz.models.filter((m) => m.provider_name === provider.name));
+	const models = $derived(zzz.models.items.filter((m) => m.provider_name === provider.name));
 </script>
 
 <div {...attrs} class="panel p_lg {attrs?.class}">

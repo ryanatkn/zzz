@@ -34,7 +34,7 @@
 				{/if}
 				<!-- <h3><Text_Icon icon={GLYPH_MODEL} /> models</h3> -->
 				<ul class="unstyled">
-					{#each models.filter((m) => m.provider_name === provider.name) as model (model)}
+					{#each models.items.filter((m) => m.provider_name === provider.name) as model (model)}
 						<li class="row flex_wrap mb_xs3">
 							<Model_Link attrs={{class: 'font_mono px_xs size_sm'}} {model}
 								>{GLYPH_MODEL} {model.name}</Model_Link
