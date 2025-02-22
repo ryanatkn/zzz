@@ -19,7 +19,8 @@
 			<div class="p_sm fg_1 radius_xs2" transition:slide>
 				<div class="column">
 					<!-- TODO needs work -->
-					<div class="size_lg">Chat {zzz.selected_chat.id}</div>
+					<div class="size_lg">{zzz.selected_chat.name}</div>
+					<small>{zzz.selected_chat.id}</small>
 					<small>
 						{zzz.selected_chat.tapes.length}
 						tape{#if zzz.selected_chat.tapes.length !== 1}s{/if}
