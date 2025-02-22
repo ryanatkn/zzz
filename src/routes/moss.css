@@ -65,6 +65,9 @@ a.chip {
 .flex_1 {
 	flex: 1;
 }
+.flex_column_reverse {
+	flex-direction: column-reverse;
+}
 .flex_wrap {
 	flex-wrap: wrap;
 }

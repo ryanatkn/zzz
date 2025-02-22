@@ -8,34 +8,29 @@
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 
 	interface Props {
-		// TODO more efficient data structures, reactive source files
 		file: Source_File;
 		height?: number;
 	}
 
 	const {file, height = 600}: Props = $props();
 
+	const {id} = $derived(file);
+
 	const dependencies = $derived(Array.from(file.dependencies.values()));
 	const dependents = $derived(Array.from(file.dependents.values()));
 
 	const zzz = zzz_context.get();
 
-	// TODO BLOCK revert save never gets enabled
-
-	// Track the content as it was before the last save
+	// Track the content history
+	let contents_history: Array<{created: number; contents: string}> = $state([]);
 	let updated_contents: string = $state(file.contents ?? '');
-	let previous_contents: string | null = $state(null);
-	// Track what we last explicitly saved (not the file.contents)
-	let last_explicit_save: string | null = $state(null);
 
 	$effect.pre(() => {
-		file; // When file changes, reset the local state
+		console.log('RUNNING PRE');
+		id; // When file changes, reset the local state
 		updated_contents = untrack(() => file.contents) ?? '';
-		previous_contents = null;
-		last_explicit_save = null;
+		contents_history = [{created: Date.now(), contents: untrack(() => updated_contents)}];
 	});
-
-	// TODO BLOCK add the slidey X for the delete button below
 </script>
 
 <div class="row size_xl word_break_break_all">
@@ -51,6 +46,7 @@
 		({file.contents.length} chars)
 	{/if}
 </div>
+
 <div class="flex flex_wrap">
 	<div class="flex_1 width_md min_width_sm">
 		<textarea style:height="{height}px" bind:value={updated_contents}></textarea>
@@ -60,47 +56,47 @@
 		class="flex_1 fg_1 radius_sm p_md width_md min_width_sm"
 		style:min-width="var(--width_sm)">{file.contents}</pre>
 </div>
+
 <div class="flex justify_content_space_between">
 	<button
 		class="color_a"
 		type="button"
 		disabled={updated_contents === file.contents}
 		onclick={() => {
-			last_explicit_save = updated_contents;
+			contents_history.push({created: Date.now(), contents: updated_contents});
 			zzz.update_file(file.id, updated_contents);
 		}}>save file</button
 	>
-	<div class="flex">
-		<button
-			type="button"
-			disabled={updated_contents === file.contents}
-			onclick={() => {
-				previous_contents = updated_contents;
-				updated_contents = file.contents ?? '';
-			}}>discard changes</button
-		>
-		<button
-			type="button"
-			disabled={previous_contents === null}
-			onclick={() => {
-				updated_contents = previous_contents ?? '';
-				previous_contents = null;
-			}}>redo changes</button
-		>
-		<button
-			type="button"
-			disabled={last_explicit_save === null || updated_contents === last_explicit_save}
-			onclick={() => {
-				previous_contents = updated_contents;
-				updated_contents = last_explicit_save ?? '';
-			}}>revert save</button
-		>
-	</div>
+	<button
+		type="button"
+		disabled={updated_contents === file.contents}
+		onclick={() => {
+			updated_contents = file.contents ?? '';
+		}}>discard changes</button
+	>
+
 	<Confirm_Button onclick={() => zzz.delete_file(file.id)} button_attrs={{class: 'color_c'}}>
 		{#snippet children()}
 			delete file
 		{/snippet}
 	</Confirm_Button>
+</div>
+
+<div class="history_list width_sm">
+	<h3>History</h3>
+	<ul class="unstyled flex flex_column_reverse">
+		{#each contents_history as entry (entry)}
+			<button
+				type="button"
+				class="history_entry"
+				class:active={entry.contents === updated_contents}
+				onclick={() => (updated_contents = entry.contents)}
+			>
+				{new Date(entry.created).toLocaleTimeString()}
+				({entry.contents.length} chars)
+			</button>
+		{/each}
+	</ul>
 </div>
 
 {#if dependencies.length}
@@ -127,6 +123,30 @@
 {/if}
 
 <style>
+	.history_list {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5rem;
+		overflow-y: auto;
+		max-height: var(--height);
+	}
+
+	.history_entry {
+		text-align: left;
+		padding: 0.5rem;
+		border-radius: 4px;
+		background: none;
+		border: 1px solid var(--fg_3);
+	}
+
+	.history_entry:hover {
+		background: var(--fg_5);
+	}
+
+	.history_entry.active {
+		background: var(--fg_4);
+	}
+
 	.dep_list {
 		width: 100%;
 		display: grid;
