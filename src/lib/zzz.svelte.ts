@@ -265,11 +265,17 @@ export class Zzz {
 	remove_chat(chat: Chat): void {
 		const index = this.chats.indexOf(chat);
 		if (index !== -1) {
-			this.chats.splice(index, 1);
+			const removed = this.chats.splice(index, 1);
+			if (removed[0].id === this.selected_chat_id) {
+				const next_chat = this.chats[index === 0 ? 0 : index - 1];
+				if (next_chat) {
+					this.select_chat(next_chat.id);
+				}
+			}
 		}
 	}
 
-	select_chat(chat: Chat | null): void {
-		this.selected_chat_id = chat?.id ?? null;
+	select_chat(chat_id: Id | null): void {
+		this.selected_chat_id = chat_id ?? null;
 	}
 }

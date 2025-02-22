@@ -13,7 +13,10 @@
 	<!-- TODO, show the counts of active items for each of the model selector buttons in a snippet here -->
 	<div class="panel p_sm">
 		{#if zzz.selected_chat}
-			<div class="bg p_sm shadow_inset_top_xs radius_xs" transition:slide>
+			<div
+				class="p_sm shadow_color_a radius_xs border_solid border_width_2 border_color_a"
+				transition:slide
+			>
 				<div class="column">
 					<!-- TODO needs work -->
 					<div>Chat {zzz.selected_chat.id}</div>
@@ -36,7 +39,7 @@
 				<button
 					type="button"
 					class:selected={chat.id === zzz.selected_chat_id}
-					onclick={() => zzz.select_chat(chat)}
+					onclick={() => zzz.select_chat(chat.id)}
 					transition:slide
 				>
 					<div class="font_weight_400">

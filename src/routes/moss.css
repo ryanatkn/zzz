@@ -9,6 +9,15 @@
 .bg_c_1 {
 	background-color: var(--color_c_1);
 }
+.border_color_a {
+	border-color: var(--border_color_a);
+}
+.border_solid {
+	border-style: solid;
+}
+.border_width_2 {
+	border-width: var(--border_width_2);
+}
 
 .box {
 	display: flex;
@@ -364,9 +373,8 @@ a.chip {
 	cursor: pointer;
 }
 
-.shadow_inset_top_xs {
-	box-shadow: var(--shadow_inset_top_xs)
-		color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_1)), transparent);
+.shadow_color_a {
+	--shadow_color: var(--shadow_color_a);
 }
 .shadow_inset_xs {
 	box-shadow: var(--shadow_inset_xs)
