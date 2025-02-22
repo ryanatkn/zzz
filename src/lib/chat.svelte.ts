@@ -70,7 +70,7 @@ export class Chat {
 		const message_id = random_id();
 		const message: Chat_Message = {
 			id: message_id,
-			// TODO add `chat_id`?
+			// TODO BLOCK add `chat_id`? and use it to get the chat to rename below
 			created: new Date().toISOString(),
 			text,
 			request: {
