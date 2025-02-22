@@ -21,11 +21,18 @@
 	const zzz = zzz_context.get();
 
 	// TODO hoist this state to `zzz` per file?
-	let updated_contents = $state(file.contents ?? '');
-	// TODO sync without an effect
+	let updated_contents: string = $state(file.contents ?? '');
+	let previous_contents: string | null = $state(null);
+	let last_save_contents: string = $state(file.contents ?? '');
+	// Replace the derived store with a reactive statement
+	const is_file_modified = $derived(file.contents !== last_save_contents);
+
+	// Remove updating last_save_contents here so it stays as the saved version
 	$effect.pre(() => {
 		const f = file;
 		updated_contents = untrack(() => f.contents) ?? '';
+		// TODO BLOCK idk about this
+		// <-- DO NOT update last_save_contents here -->
 	});
 
 	// TODO BLOCK add the slidey X for the delete button below
@@ -59,16 +66,45 @@
 		type="button"
 		disabled={updated_contents === file.contents}
 		onclick={() => {
+			const previous = file.contents ?? '';
 			zzz.update_file(file.id, updated_contents);
+			// Update file.contents to the new value and set last_save_contents to the previous version
+			file.contents = updated_contents;
+			last_save_contents = previous;
+			console.log('saved:', {
+				previous,
+				current: file.contents,
+				last_save_contents,
+				is_file_modified,
+			});
 		}}>save file</button
 	>
-	<button
-		type="button"
-		disabled={updated_contents === file.contents}
-		onclick={() => {
-			updated_contents = file.contents ?? '';
-		}}>discard changes</button
-	>
+	<div class="flex">
+		<button
+			type="button"
+			disabled={updated_contents === file.contents}
+			onclick={() => {
+				previous_contents = updated_contents;
+				updated_contents = file.contents ?? '';
+			}}>discard changes</button
+		>
+		<button
+			type="button"
+			disabled={previous_contents === null}
+			onclick={() => {
+				updated_contents = previous_contents ?? '';
+				previous_contents = null;
+			}}>redo changes</button
+		>
+		<button
+			type="button"
+			disabled={!is_file_modified}
+			onclick={() => {
+				previous_contents = updated_contents;
+				updated_contents = last_save_contents;
+			}}>revert save</button
+		>
+	</div>
 	<Confirm_Button onclick={() => zzz.delete_file(file.id)} button_attrs={{class: 'color_c'}}>
 		{#snippet children()}
 			delete file
