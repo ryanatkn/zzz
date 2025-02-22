@@ -97,6 +97,7 @@ export const package_json = {
 			default: './dist/Chat_View.svelte',
 		},
 		'./chat.svelte.js': {types: './dist/chat.svelte.d.ts', default: './dist/chat.svelte.js'},
+		'./chats.svelte.js': {types: './dist/chats.svelte.d.ts', default: './dist/chats.svelte.js'},
 		'./completion_state.svelte.js': {
 			types: './dist/completion_state.svelte.d.ts',
 			default: './dist/completion_state.svelte.js',
@@ -336,6 +337,7 @@ export const src_json = {
 				{name: 'Chat', kind: 'class'},
 			],
 		},
+		'./chats.svelte.js': {path: 'chats.svelte.ts', declarations: [{name: 'Chats', kind: 'class'}]},
 		'./completion_state.svelte.js': {path: 'completion_state.svelte.ts', declarations: []},
 		'./Completion_Thread_Info.svelte': {path: 'Completion_Thread_Info.svelte', declarations: []},
 		'./Completion_Thread_Summary.svelte': {

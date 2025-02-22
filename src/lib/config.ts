@@ -38,6 +38,7 @@ export const providers_default: Array<Provider_Json> = [
 	},
 ];
 
+// TODO BLOCK show these on /chats if present here but not in Ollama data -- just have the buttons be disabled
 // TODO BLOCK use these defaults to extend the ones added by ollama, `map_to_zzz_model`
 export const models_default: Array<Model_Json> = [
 	// TODO import/map these directly when possible

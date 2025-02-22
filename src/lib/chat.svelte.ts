@@ -138,7 +138,7 @@ export class Chat {
 				return;
 			}
 			this.init_name_status = 'success';
-			this.name = response_text; // TODO handle duplicates?
+			this.name = response_text; // TODO handle duplicates
 		} catch (err) {
 			this.init_name_status = 'initial'; // ignore failures, will retry
 			console.error('failed to infer a name for a chat', err);

@@ -15,40 +15,40 @@
 	<!-- TODO show the selected chat's info, if any -->
 	<!-- TODO, show the counts of active items for each of the model selector buttons in a snippet here -->
 	<div class="panel p_sm width_sm">
-		{#if zzz.selected_chat}
+		{#if zzz.chats.selected}
 			<div class="p_sm fg_1 radius_xs2" transition:slide>
 				<div class="column">
 					<!-- TODO needs work -->
-					<div class="size_lg">{zzz.selected_chat.name}</div>
-					<small>{zzz.selected_chat.id}</small>
+					<div class="size_lg">{zzz.chats.selected.name}</div>
+					<small>{zzz.chats.selected.id}</small>
 					<small>
-						{zzz.selected_chat.tapes.length}
-						tape{#if zzz.selected_chat.tapes.length !== 1}s{/if}
+						{zzz.chats.selected.tapes.length}
+						tape{#if zzz.chats.selected.tapes.length !== 1}s{/if}
 					</small>
-					<small>created {format(zzz.selected_chat.created, 'MMM d, p')}</small>
+					<small>created {format(zzz.chats.selected.created, 'MMM d, p')}</small>
 					<div class="flex justify_content_end">
 						<Confirm_Button
-							onclick={() => zzz.selected_chat && zzz.remove_chat(zzz.selected_chat)}
-							button_attrs={{title: `remove Chat ${zzz.selected_chat.id}`}}
+							onclick={() => zzz.chats.selected && zzz.chats.remove(zzz.chats.selected)}
+							button_attrs={{title: `remove Chat ${zzz.chats.selected.id}`}}
 						/>
 					</div>
 				</div>
 			</div>
 		{/if}
-		<button class="plain w_100 justify_content_start" type="button" onclick={() => zzz.add_chat()}>
+		<button class="plain w_100 justify_content_start" type="button" onclick={() => zzz.chats.add()}>
 			+ new chat
 		</button>
 		<menu class="unstyled">
-			{#each zzz.chats as chat (chat.id)}
+			{#each zzz.chats.items as chat (chat.id)}
 				<!-- TODO change to href from onclick -->
 				<Nav_Link
 					href="#TODO"
-					selected={chat.id === zzz.selected_chat_id}
+					selected={chat.id === zzz.chats.selected_id}
 					attrs={{
 						type: 'button',
 						class: 'justify_content_space_between',
 						style: 'min-height: 0;',
-						onclick: () => zzz.select_chat(chat.id),
+						onclick: () => zzz.chats.select(chat.id),
 					}}
 				>
 					<div>
@@ -61,8 +61,8 @@
 		</menu>
 	</div>
 	<!-- TODO select view (tabs?) -->
-	{#if zzz.inited_models && zzz.selected_chat}
-		<Chat_View chat={zzz.selected_chat} />
+	{#if zzz.inited_models && zzz.chats.selected}
+		<Chat_View chat={zzz.chats.selected} />
 	{/if}
 </div>
 

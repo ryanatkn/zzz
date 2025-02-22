@@ -117,6 +117,10 @@
       "types": "./dist/chat.svelte.d.ts",
       "default": "./dist/chat.svelte.js"
     },
+    "./chats.svelte.js": {
+      "types": "./dist/chats.svelte.d.ts",
+      "default": "./dist/chats.svelte.js"
+    },
     "./completion_state.svelte.js": {
       "types": "./dist/completion_state.svelte.d.ts",
       "default": "./dist/completion_state.svelte.js"

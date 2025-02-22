@@ -18,8 +18,8 @@ import {random_id, type Id} from '$lib/id.js';
 import {Completion_Threads, type Completion_Threads_Json} from '$lib/completion_thread.svelte.js';
 import {ollama_list_with_metadata} from '$lib/ollama.js';
 import {zzz_config} from '$lib/zzz_config.js';
-import {Chat} from '$lib/chat.svelte.js';
 import {Models} from '$lib/models.svelte.js';
+import {Chats} from '$lib/chats.svelte.js';
 
 export const zzz_context = create_context<Zzz>();
 
@@ -48,6 +48,7 @@ export class Zzz {
 	providers: Array<Provider> = $state([]);
 
 	readonly models = new Models(this);
+	readonly chats = new Chats(this);
 
 	// Change tags to use the readonly models instance
 	tags: Set<string> = $derived(new Set(this.models.items.flatMap((m) => m.tags)));
@@ -67,13 +68,6 @@ export class Zzz {
 	capability_ollama: undefined | null | boolean = $state(); // TODO probably rethink - `null` means pending, `undefined` means uninitialized/not yet checked
 
 	// TODO store state granularly for each provider
-
-	chats: Array<Chat> = $state([]);
-
-	selected_chat_id: Id | null = $state(null);
-	selected_chat: Chat | undefined = $derived(
-		this.chats.find((c) => c.id === this.selected_chat_id),
-	);
 
 	constructor(options: Zzz_Options) {
 		const {client, data = new Zzz_Data()} = options;
@@ -229,29 +223,5 @@ export class Zzz {
 
 	add_provider(provider: Provider): void {
 		this.providers.push(provider);
-	}
-
-	add_chat(): void {
-		const chat = new Chat(this);
-		this.chats.unshift(chat);
-		this.selected_chat_id = chat.id; // Select newly created chat
-	}
-
-	remove_chat(chat: Chat): void {
-		const index = this.chats.indexOf(chat);
-		if (index !== -1) {
-			const removed = this.chats.splice(index, 1);
-			if (removed[0].id === this.selected_chat_id) {
-				const next_chat = this.chats[index === 0 ? 0 : index - 1];
-				// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-				if (next_chat) {
-					this.select_chat(next_chat.id);
-				}
-			}
-		}
-	}
-
-	select_chat(chat_id: Id | null): void {
-		this.selected_chat_id = chat_id ?? null;
 	}
 }

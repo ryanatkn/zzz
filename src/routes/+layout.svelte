@@ -111,7 +111,7 @@
 		onMount(async () => {
 			await zzz.init_models();
 			// TODO init properly
-			zzz.add_chat();
+			zzz.chats.add();
 		});
 	}
 
