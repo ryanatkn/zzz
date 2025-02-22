@@ -51,8 +51,8 @@ export class Completion_Threads {
 		);
 	}
 
-	create_completion_thread(providers: Array<Provider> = this.zzz.providers): Completion_Thread {
-		const completion_thread = new Completion_Thread({providers});
+	create_completion_thread(): Completion_Thread {
+		const completion_thread = new Completion_Thread({zzz: this.zzz});
 		this.all.push(completion_thread);
 		return completion_thread;
 	}
@@ -78,12 +78,11 @@ export interface Completion_Thread_Json {
 }
 
 export interface Completion_Thread_Options {
-	providers: Array<Provider>;
+	zzz: Zzz;
 }
 
 export class Completion_Thread {
-	// TODO look up these providers based on all of the providers in `history`
-	providers: Array<Provider> = $state()!; // handles a group conversation
+	zzz: Zzz;
 
 	history: Array<Completion_Thread_History_Item> = $state([]);
 
@@ -96,7 +95,7 @@ export class Completion_Thread {
 			if (providers_by_name.has(provider_name)) {
 				continue;
 			}
-			const provider = this.providers.find((a) => a.name === provider_name);
+			const provider = this.zzz.providers.items.find((a) => a.name === provider_name);
 			if (!provider) {
 				console.error('expected to find provider', provider_name);
 				continue;
@@ -107,9 +106,8 @@ export class Completion_Thread {
 		return providers_by_name;
 	});
 
-	constructor({providers}: Completion_Thread_Options) {
-		this.providers = providers;
-		// console.log('[completion_thread] creating new', providers);
+	constructor({zzz}: Completion_Thread_Options) {
+		this.zzz = zzz;
 	}
 
 	// TODO maybe `completion_thread_id` should be the original id of the `request.id`?

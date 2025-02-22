@@ -20,6 +20,7 @@ import {ollama_list_with_metadata} from '$lib/ollama.js';
 import {zzz_config} from '$lib/zzz_config.js';
 import {Models} from '$lib/models.svelte.js';
 import {Chats} from '$lib/chats.svelte.js';
+import {Providers} from '$lib/providers.svelte.js';
 
 export const zzz_context = create_context<Zzz>();
 
@@ -43,12 +44,9 @@ export class Zzz {
 
 	readonly client: Zzz_Client;
 
-	// TODO what APi for these? `Providers` or `Provider_Manager` class?
-	// maybe have the source of truth by an array?
-	providers: Array<Provider> = $state([]);
-
 	readonly models = new Models(this);
 	readonly chats = new Chats(this);
+	readonly providers = new Providers(this);
 
 	// Change tags to use the readonly models instance
 	tags: Set<string> = $derived(new Set(this.models.items.flatMap((m) => m.tags)));
@@ -74,6 +72,8 @@ export class Zzz {
 		this.client = client;
 		this.completion_threads = options.completion_threads ?? new Completion_Threads({zzz: this});
 		this.data = data;
+		// TODO move this? options? same with models below?
+		this.add_providers(zzz_config.providers);
 	}
 
 	toJSON(): Zzz_Json {
@@ -101,6 +101,7 @@ export class Zzz {
 		this.models.add_ollama_models(ollama_models_response.model_infos);
 
 		// Add non-ollama models
+		// TODO maybe instead of `zzz_config.models` make an option, but set that as the default
 		for (const model of zzz_config.models) {
 			if (model.provider_name === 'ollama') continue;
 			this.models.add(model);
@@ -222,6 +223,6 @@ export class Zzz {
 	}
 
 	add_provider(provider: Provider): void {
-		this.providers.push(provider);
+		this.providers.add(provider);
 	}
 }
