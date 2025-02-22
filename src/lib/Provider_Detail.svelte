@@ -6,7 +6,7 @@
 	import type {Provider_Json} from '$lib/provider.svelte.js';
 	import Model_Summary from '$lib/Model_Summary.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
-	import {GLYPH_PROVIDER} from '$lib/constants.js';
+	import {GLYPH_PROVIDER, GLYPH_MODEL} from '$lib/constants.js';
 
 	const zzz = zzz_context.get();
 
@@ -45,7 +45,7 @@
 		</div>
 	</section>
 	<section>
-		<h2>models</h2>
+		<h2>{GLYPH_MODEL} models</h2>
 		<ul class="flex flex_wrap unstyled gap_md">
 			{#each models as model (model)}
 				<Model_Summary {model} />

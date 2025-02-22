@@ -20,8 +20,12 @@
 	<header>
 		<h1><Text_Icon icon={GLYPH_CAPABILITIES} /> system capabilities</h1>
 	</header>
-	<section>
+	<section class="width_md">
 		<h2>Todo</h2>
+		<aside>
+			⚠️ This is unfinished. The plan is to show what capabilities are available to the system. Zzz
+			can run in many contexts, and users are limited by what capabilities are available in each.
+		</aside>
 		<ul>
 			<li>Node server</li>
 			<ul class="mb_0">
