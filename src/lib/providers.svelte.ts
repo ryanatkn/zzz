@@ -1,5 +1,5 @@
 import type {Zzz} from '$lib/zzz.svelte.js';
-import {Provider, type Provider_Json} from '$lib/provider.svelte.js';
+import type {Provider} from '$lib/provider.svelte.js';
 
 export class Providers {
 	readonly zzz: Zzz;
@@ -10,8 +10,8 @@ export class Providers {
 		this.zzz = zzz;
 	}
 
-	add(provider_json: Provider_Json): void {
-		this.items.push(new Provider({zzz: this.zzz, json: provider_json}));
+	add(provider: Provider): void {
+		this.items.push(provider);
 	}
 
 	find_by_name(name: string): Provider | undefined {
