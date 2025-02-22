@@ -31,9 +31,9 @@
 			<ul class="mb_0">
 				<li>websocket connection</li>
 			</ul>
+			<li>AI providers (API keys)</li>
 			<li>pg db (Postgres, pglite, or some other compatible database)</li>
-			<li>Providers (API keys)</li>
-			<li>mic, webcam, midi, etc</li>
+			<li>ephemerally connected devices - mic, webcam, midi, etc</li>
 		</ul>
 	</section>
 	<section class="width_sm">
