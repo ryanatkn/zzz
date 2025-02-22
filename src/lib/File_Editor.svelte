@@ -37,13 +37,9 @@
 	{to_root_path(file.id)}
 </div>
 
-<div>
+<div class="row gap_md mb_lg px_xs">
 	<Copy_To_Clipboard text={file.contents} />
-	contents {#if file.contents === null}
-		null
-	{:else}
-		({file.contents.length} chars)
-	{/if}
+	<div>{file.contents?.length} char{file.contents?.length === 1 ? '' : 's'}</div>
 </div>
 
 <div class="flex flex_wrap">
