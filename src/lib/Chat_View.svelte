@@ -86,7 +86,7 @@
 					</menu>
 				</div>
 				<div class="flex_1 p_xs radius_xs fg_1">
-					<header class="size_lg text_align_center">delete by tag</header>
+					<header class="size_lg text_align_center">remove by tag</header>
 					<menu class="unstyled column">
 						{#each Array.from(zzz.tags) as tag (tag)}
 							{@const tapes_with_tag = chat.tapes.filter((t) => t.model.tags.includes(tag))}
