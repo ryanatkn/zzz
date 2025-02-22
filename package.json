@@ -278,6 +278,10 @@
       "types": "./dist/model.svelte.d.ts",
       "default": "./dist/model.svelte.js"
     },
+    "./models.svelte.js": {
+      "types": "./dist/models.svelte.d.ts",
+      "default": "./dist/models.svelte.js"
+    },
     "./Nav_Link.svelte": {
       "types": "./dist/Nav_Link.svelte.d.ts",
       "svelte": "./dist/Nav_Link.svelte",

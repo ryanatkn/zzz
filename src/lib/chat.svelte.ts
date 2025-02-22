@@ -102,7 +102,8 @@ export class Chat {
 		message_updated.response = response.completion_response;
 
 		// Infer a name for the chat now that we have a response.
-		await this.init_name(message_updated);
+		// Don't await because callers don't care about the result.
+		void this.init_name(message_updated);
 	}
 
 	init_name_status: Async_Status = $state('initial');
@@ -128,7 +129,7 @@ export class Chat {
 
 		try {
 			// TODO BLOCK configure this utility LLM (roles?), and set the output token count from config as well
-			const name_response = await this.zzz.send_prompt(p, 'ollama', 'llama3.2:1b');
+			const name_response = await this.zzz.send_prompt(p, 'ollama', 'llama3.2:3b');
 			const response_text = to_completion_response_text(name_response.completion_response);
 			console.log(`response_text`, response_text);
 			if (!response_text) {

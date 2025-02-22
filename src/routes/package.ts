@@ -240,6 +240,7 @@ export const package_json = {
 			default: './dist/Model_Summary.svelte',
 		},
 		'./model.svelte.js': {types: './dist/model.svelte.d.ts', default: './dist/model.svelte.js'},
+		'./models.svelte.js': {types: './dist/models.svelte.d.ts', default: './dist/models.svelte.js'},
 		'./Nav_Link.svelte': {
 			types: './dist/Nav_Link.svelte.d.ts',
 			svelte: './dist/Nav_Link.svelte',
@@ -361,6 +362,7 @@ export const src_json = {
 				{name: 'Completion_Request', kind: 'type'},
 				{name: 'Completion_Response', kind: 'type'},
 				{name: 'Completion', kind: 'type'},
+				{name: 'to_completion_response_text', kind: 'function'},
 			],
 		},
 		'./config_helpers.js': {
@@ -437,6 +439,10 @@ export const src_json = {
 				{name: 'Model_Options', kind: 'type'},
 				{name: 'Model', kind: 'class'},
 			],
+		},
+		'./models.svelte.js': {
+			path: 'models.svelte.ts',
+			declarations: [{name: 'Models', kind: 'class'}],
 		},
 		'./Nav_Link.svelte': {path: 'Nav_Link.svelte', declarations: []},
 		'./ollama.js': {
