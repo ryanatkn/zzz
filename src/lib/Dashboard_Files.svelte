@@ -28,7 +28,9 @@
 
 <div class="h_100 flex p_sm gap_md overflow_hidden">
 	<div class="width_sm shrink_0 overflow_auto">
-		<header class="size_xl mb_md"><h1><Text_Icon icon={GLYPH_FILE} /> files</h1></header>
+		<header class="size_xl mb_md">
+			<h1 class="mb_0"><Text_Icon icon={GLYPH_FILE} /> files</h1>
+		</header>
 		<File_Explorer
 			files={files_map}
 			{selected_file_id}
