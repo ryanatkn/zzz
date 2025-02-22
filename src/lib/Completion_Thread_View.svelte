@@ -11,6 +11,7 @@
 		Completion_Thread,
 		Completion_Thread_History_Item,
 	} from '$lib/completion_thread.svelte.js';
+	import {to_completion_response_text} from '$lib/completion.js';
 
 	interface Props {
 		provider: Provider;
@@ -32,19 +33,8 @@
 	const completion_request = $derived(history_item?.completion_request);
 	const completion_response = $derived(history_item?.completion_response);
 
-	// TODO hacky
 	const content = $derived(
-		completion_response
-			? completion_response.data.type === 'ollama'
-				? completion_response.data.value.message.content
-				: completion_response.data.type === 'claude'
-					? completion_response.data.value.content
-							.map((c) => (c.type === 'text' ? c.text : c.name))
-							.join('\n\n')
-					: completion_response.data.type === 'chatgpt'
-						? completion_response.data.value.choices[0].message.content
-						: completion_response.data.value.text
-			: undefined,
+		completion_response ? to_completion_response_text(completion_response) : undefined,
 	);
 </script>
 

@@ -52,7 +52,7 @@
 				>
 					<div>
 						<span class="mr_xs2">{GLYPH_CHAT}</span>
-						<small>Chat {chat.id}</small>
+						<small>{chat.name}</small>
 					</div>
 					{#if chat.tapes.length}<small>{chat.tapes.length}</small>{/if}
 				</Nav_Link>

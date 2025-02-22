@@ -45,3 +45,16 @@ export interface Completion {
 	completion_request: Completion_Request;
 	completion_response: Completion_Response;
 }
+
+export const to_completion_response_text = (
+	completion_response: Completion_Response,
+): string | null | undefined =>
+	completion_response.data.type === 'ollama'
+		? completion_response.data.value.message.content
+		: completion_response.data.type === 'claude'
+			? completion_response.data.value.content
+					.map((c) => (c.type === 'text' ? c.text : c.name))
+					.join('\n\n')
+			: completion_response.data.type === 'chatgpt'
+				? completion_response.data.value.choices[0].message.content
+				: completion_response.data.value.text;
