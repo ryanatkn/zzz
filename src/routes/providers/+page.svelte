@@ -17,7 +17,7 @@
 		{#each providers_default as provider (provider)}
 			<div class="panel p_lg">
 				<div class="size_xl mb_lg">
-					<Provider_Link {provider} attrs={{class: 'font_weight_500'}} />
+					<Provider_Link {provider} />
 				</div>
 				<div class="mb_sm font_mono">{GLYPH_PROVIDER} {provider.name}</div>
 				{#if provider.url}
@@ -36,7 +36,7 @@
 				<ul class="unstyled">
 					{#each models.filter((m) => m.provider_name === provider.name) as model (model)}
 						<li class="row flex_wrap mb_xs3">
-							<Model_Link attrs={{class: 'font_mono px_xs size_sm font_weight_500'}} {model}
+							<Model_Link attrs={{class: 'font_mono px_xs size_sm'}} {model}
 								>{GLYPH_MODEL} {model.name}</Model_Link
 							>
 							<!-- {#each model.tags as tag (tag)}

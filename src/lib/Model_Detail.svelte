@@ -33,7 +33,7 @@
 	<div class="mb_lg font_mono">
 		<!-- TODO hacky -->
 		<Provider_Link provider={providers_default.find((p) => p.name === model.provider_name)!}
-			><span class="font_weight_400">{GLYPH_PROVIDER} {model.provider_name}</span></Provider_Link
+			>{GLYPH_PROVIDER} {model.provider_name}</Provider_Link
 		>
 	</div>
 	{#if model.tags.length}
