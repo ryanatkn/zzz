@@ -123,8 +123,9 @@
 		</div>
 	</div>
 	<div class="panel p_sm flex_1">
-		<div class="main_input">
+		<div class="flex flex_1">
 			<textarea
+				class="flex_1 mb_0"
 				bind:value={main_input}
 				bind:this={input_el}
 				placeholder="send to all {count >= 2 ? count + ' ' : ''}tapes..."
@@ -157,15 +158,6 @@
 		align-items: start;
 		flex: 1;
 		gap: var(--space_md);
-	}
-	.main_input {
-		flex: 1;
-		display: flex;
-	}
-	.main_input textarea {
-		flex: 1;
-		height: 100px;
-		margin-bottom: 0;
 	}
 	.tapes {
 		display: grid;

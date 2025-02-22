@@ -24,6 +24,16 @@
 	// TODO changing the font size works if there's no children, but that's a weird difference - the UX is broken for custom buttons because they change size when the font size changes
 
 	// TODO add contextmenu behavior to dismiss the confirmation button
+
+	// This hides the confirmation button when the button is disabled.
+	// TODO do it more declaratively without the effect and instead use derived?
+	// But then `confirming` would need to be split into `confirming`
+	// with either `confirming_open` or `final_confirming`?
+	$effect.pre(() => {
+		if (button_attrs?.disabled) {
+			confirming = false;
+		}
+	});
 </script>
 
 <!-- I did the ternary below because Svelte treats `undefined` `class:` directive values as `false`, so they override the attribute classes -->
