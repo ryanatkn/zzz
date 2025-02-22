@@ -24,6 +24,7 @@
 	// Track the content history
 	let contents_history: Array<{created: number; contents: string}> = $state([]);
 	let updated_contents: string = $state(file.contents ?? '');
+	let discarded_contents: string | null = $state(null);
 
 	$effect.pre(() => {
 		console.log('RUNNING PRE');
@@ -67,13 +68,26 @@
 			zzz.update_file(file.id, updated_contents);
 		}}>save file</button
 	>
-	<button
-		type="button"
-		disabled={updated_contents === file.contents}
-		onclick={() => {
-			updated_contents = file.contents ?? '';
-		}}>discard changes</button
-	>
+	<div class="flex">
+		<button
+			type="button"
+			disabled={updated_contents === file.contents}
+			onclick={() => {
+				discarded_contents = updated_contents;
+				updated_contents = file.contents ?? '';
+			}}>discard changes</button
+		>
+		<button
+			type="button"
+			disabled={discarded_contents === null}
+			onclick={() => {
+				if (discarded_contents !== null) {
+					updated_contents = discarded_contents;
+					discarded_contents = null;
+				}
+			}}>undo discard</button
+		>
+	</div>
 
 	<Confirm_Button onclick={() => zzz.delete_file(file.id)} button_attrs={{class: 'color_c'}}>
 		{#snippet children()}
