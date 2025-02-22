@@ -3,16 +3,18 @@
 	import type {SvelteHTMLElements} from 'svelte/elements';
 	import type {Snippet} from 'svelte';
 	import {base} from '$app/paths';
+	import {slide} from 'svelte/transition';
 
 	interface Props {
 		href: string;
+		selected?: boolean;
 		attrs?: SvelteHTMLElements['a'];
 		children: Snippet<[selected: boolean, selected_descendent: boolean]>;
 	}
 
-	const {href, attrs, children}: Props = $props();
+	const {href, selected: prop_selected, attrs, children}: Props = $props();
 
-	const selected = $derived(page.url.pathname === href);
+	const selected = $derived(prop_selected ?? page.url.pathname === href);
 	const selected_descendent = $derived(
 		selected || href === base + '/' ? false : page.url.pathname.startsWith(href),
 	);
@@ -20,8 +22,13 @@
 	// TODO link styles should have focus always be blue, and active should be thicker
 </script>
 
-<a {...attrs} {href} class="nav_link {attrs?.class}" class:selected class:selected_descendent
-	>{@render children(selected, selected_descendent)}</a
+<a
+	{...attrs}
+	{href}
+	class="nav_link {attrs?.class}"
+	class:selected
+	class:selected_descendent
+	transition:slide>{@render children(selected, selected_descendent)}</a
 >
 
 <style>
@@ -41,7 +48,7 @@
 	}
 	.nav_link:active {
 		border-color: var(--border_color_a);
-		transform: scale(1.05);
+		transform: scale(1.044);
 	}
 	.nav_link.selected {
 		border-color: var(--border_color_a);

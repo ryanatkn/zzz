@@ -4,6 +4,7 @@
 
 	import Chat_View from '$lib/Chat_View.svelte';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
+	import Nav_Link from '$lib/Nav_Link.svelte';
 	import {GLYPH_CHAT} from '$lib/constants.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 
@@ -39,20 +40,21 @@
 		<menu class="unstyled">
 			{#each zzz.chats as chat (chat.id)}
 				<!-- TODO change to href from onclick -->
-				<a
-					type="button"
-					class="flex w_100 justify_content_space_between px_sm font_weight_600 py_xs2 radius_xs2 plain text_color_3"
-					style:min-height="0"
-					class:selected={chat.id === zzz.selected_chat_id}
-					onclick={() => zzz.select_chat(chat.id)}
-					transition:slide
+				<Nav_Link
+					href="#TODO"
+					selected={chat.id === zzz.selected_chat_id}
+					attrs={{
+						type: 'button',
+						style: 'min-height: 0;',
+						onclick: () => zzz.select_chat(chat.id),
+					}}
 				>
 					<div>
 						<span class="mr_xs2">{GLYPH_CHAT}</span>
 						<small>Chat {chat.id}</small>
 					</div>
 					{#if chat.tapes.length}<small>{chat.tapes.length}</small>{/if}
-				</a>
+				</Nav_Link>
 			{/each}
 		</menu>
 	</div>

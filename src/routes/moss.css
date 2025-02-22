@@ -311,10 +311,6 @@ a.chip {
 	padding-left: var(--space_lg);
 	padding-right: var(--space_lg);
 }
-.px_sm {
-	padding-left: var(--space_sm);
-	padding-right: var(--space_sm);
-}
 .px_xs {
 	padding-left: var(--space_xs);
 	padding-right: var(--space_xs);
@@ -326,10 +322,6 @@ a.chip {
 .py_xl9 {
 	padding-top: var(--space_xl9);
 	padding-bottom: var(--space_xl9);
-}
-.py_xs2 {
-	padding-top: var(--space_xs2);
-	padding-bottom: var(--space_xs2);
 }
 .py_xs3 {
 	padding-top: var(--space_xs3);
@@ -414,9 +406,6 @@ a.chip {
 }
 .text_align_right {
 	text-align: right;
-}
-.text_color_3 {
-	color: var(--text_color_3);
 }
 .w_100 {
 	width: 100%;
