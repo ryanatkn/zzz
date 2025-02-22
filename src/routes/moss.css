@@ -158,6 +158,9 @@ a.chip {
 .mb_xl7 {
 	margin-bottom: var(--space_xl7);
 }
+.mb_xs {
+	margin-bottom: var(--space_xs);
+}
 .mb_xs3 {
 	margin-bottom: var(--space_xs3);
 }
@@ -388,11 +391,18 @@ a.chip {
 	box-shadow: var(--shadow_inset_xs)
 		color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_1)), transparent);
 }
+.shadow_xs {
+	box-shadow: var(--shadow_xs)
+		color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_1)), transparent);
+}
 .shrink_0 {
 	flex-shrink: 0;
 }
 .size_lg {
 	font-size: var(--size_lg);
+}
+.size_md {
+	font-size: var(--size_md);
 }
 .size_sm {
 	font-size: var(--size_sm);

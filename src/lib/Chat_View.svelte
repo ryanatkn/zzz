@@ -60,20 +60,16 @@
 <div class="chat_view">
 	<div class="column gap_md">
 		<div class="panel p_sm">
-			<header class="size_xl">
-				<h2 class="mt_0 mb_lg">
-					<Text_Icon icon={GLYPH_TAPE} size="var(--icon_size_sm)" /> tapes
-				</h2>
-			</header>
+			<header class="mt_0 mb_lg size_lg">manage tapes</header>
 			<!-- TODO add user-customizable sets of models -->
 			<div class="flex">
-				<div class="flex_1 p_xs radius_xs">
-					<header class="size_lg text_align_center">add by tag</header>
+				<div class="flex_1 p_xs radius_xs shadow_inset_xs">
+					<header class="size_md text_align_center mb_xs">add by tag</header>
 					<menu class="unstyled column">
 						{#each Array.from(zzz.tags) as tag (tag)}
 							<button
 								type="button"
-								class="w_100 size_sm py_xs3 justify_content_space_between plain"
+								class="w_100 size_sm py_xs3 justify_content_space_between plain radius_xs"
 								style:min-height="0"
 								onclick={() => {
 									chat.add_tapes_by_model_tag(tag);
@@ -87,14 +83,14 @@
 						{/each}
 					</menu>
 				</div>
-				<div class="flex_1 p_xs radius_xs fg_1">
-					<header class="size_lg text_align_center">remove by tag</header>
+				<div class="flex_1 p_xs radius_xs fg_1 shadow_xs">
+					<header class="size_md text_align_center mb_xs">remove by tag</header>
 					<menu class="unstyled column">
 						{#each Array.from(zzz.tags) as tag (tag)}
 							{@const tapes_with_tag = chat.tapes.filter((t) => t.model.tags.includes(tag))}
 							<button
 								type="button"
-								class="w_100 min_height_0 size_sm py_xs3 justify_content_space_between plain"
+								class="w_100 size_sm py_xs3 justify_content_space_between plain radius_xs"
 								style:min-height="0"
 								disabled={!tapes_with_tag.length}
 								onclick={() => {
@@ -113,9 +109,7 @@
 			</div>
 		</div>
 		<div class="panel p_sm">
-			<header class="mb_md">
-				<h3 class="mt_0">add tape with model</h3>
-			</header>
+			<header class="mb_md mt_0 size_lg">add tape with model</header>
 			<Model_Selector onselect={(model) => chat.add_tape(model)}>
 				{#snippet children(model)}
 					<div>{chat.tapes.filter((t) => t.model.name === model.name).length}</div>
@@ -162,11 +156,10 @@
 	.main_input {
 		flex: 1;
 		display: flex;
-		gap: var(--space_xs);
 	}
 	.main_input textarea {
 		flex: 1;
-		min-height: 4rem;
+		height: 100px;
 		margin-bottom: 0;
 	}
 	.tapes {

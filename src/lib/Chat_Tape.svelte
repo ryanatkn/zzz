@@ -52,7 +52,7 @@
 		{/each}
 	</div>
 
-	<div class="flex gap_sm">
+	<div class="flex">
 		<textarea
 			class="flex_1 mb_0"
 			bind:value={input}
@@ -84,5 +84,8 @@
 		gap: 0.5rem;
 		max-height: 400px;
 		overflow-y: auto;
+	}
+	textarea {
+		height: 80px;
 	}
 </style>

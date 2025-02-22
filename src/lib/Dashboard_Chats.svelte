@@ -18,11 +18,13 @@
 					<!-- TODO needs work -->
 					<div>Chat {zzz.selected_chat.id}</div>
 					<div>
-						{zzz.selected_chat.tapes.length} tape{#if zzz.selected_chat.tapes.length !== 1}s{/if}
+						{zzz.selected_chat.tapes.length}
+						tape{#if zzz.selected_chat.tapes.length !== 1}s{/if}
 					</div>
 					<div class="flex justify_content_end">
 						<Confirm_Button
 							onclick={() => zzz.selected_chat && zzz.remove_chat(zzz.selected_chat)}
+							button_attrs={{title: `remove Chat ${zzz.selected_chat.id}`}}
 						/>
 					</div>
 				</div>
