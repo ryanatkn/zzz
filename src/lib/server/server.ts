@@ -34,7 +34,7 @@ app.get(
 		return {
 			onOpen(event, ws) {
 				sockets.add(ws);
-				console.log('ws opened', event);
+				console.log('[server] ws opened', event);
 			},
 			async onMessage(event, ws) {
 				let data;
@@ -44,7 +44,7 @@ app.get(
 					console.error(`received non-json message`, event.data);
 					return;
 				}
-				console.log(`[server] handling message`, data);
+				// console.log(`[server] handling message`, data);
 				if (data.type === 'gro_server_message') {
 					let message: Server_Message | null;
 					try {
@@ -63,7 +63,7 @@ app.get(
 			},
 			onClose: (event, ws) => {
 				sockets.delete(ws);
-				console.log('ws closed', event);
+				console.log('[server] ws closed', event);
 			},
 		};
 	}),
@@ -76,7 +76,7 @@ const server = serve(
 		port: parseInt(PUBLIC_SERVER_PORT, 10) || 8999,
 	},
 	(info) => {
-		console.log(`listening on http://${info.address}:${info.port}`);
+		console.log(`[server] listening on http://${info.address}:${info.port}`);
 	},
 );
 
