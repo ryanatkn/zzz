@@ -91,6 +91,12 @@ export const package_json = {
 			svelte: './dist/Chat_Tape.svelte',
 			default: './dist/Chat_Tape.svelte',
 		},
+		'./Chat_View.svelte': {
+			types: './dist/Chat_View.svelte.d.ts',
+			svelte: './dist/Chat_View.svelte',
+			default: './dist/Chat_View.svelte',
+		},
+		'./chat.svelte.js': {types: './dist/chat.svelte.d.ts', default: './dist/chat.svelte.js'},
 		'./completion_state.svelte.js': {
 			types: './dist/completion_state.svelte.d.ts',
 			default: './dist/completion_state.svelte.js',
@@ -234,15 +240,6 @@ export const package_json = {
 			default: './dist/Model_Summary.svelte',
 		},
 		'./model.svelte.js': {types: './dist/model.svelte.d.ts', default: './dist/model.svelte.js'},
-		'./Multichat_View.svelte': {
-			types: './dist/Multichat_View.svelte.d.ts',
-			svelte: './dist/Multichat_View.svelte',
-			default: './dist/Multichat_View.svelte',
-		},
-		'./multichat.svelte.js': {
-			types: './dist/multichat.svelte.d.ts',
-			default: './dist/multichat.svelte.js',
-		},
 		'./Nav_Link.svelte': {
 			types: './dist/Nav_Link.svelte.d.ts',
 			svelte: './dist/Nav_Link.svelte',
@@ -329,6 +326,15 @@ export const src_json = {
 		'./Chat_Item.svelte': {path: 'Chat_Item.svelte', declarations: []},
 		'./Chat_Message.svelte': {path: 'Chat_Message.svelte', declarations: []},
 		'./Chat_Tape.svelte': {path: 'Chat_Tape.svelte', declarations: []},
+		'./Chat_View.svelte': {path: 'Chat_View.svelte', declarations: []},
+		'./chat.svelte.js': {
+			path: 'chat.svelte.ts',
+			declarations: [
+				{name: 'Chat_Message', kind: 'type'},
+				{name: 'Tape', kind: 'type'},
+				{name: 'Chat', kind: 'class'},
+			],
+		},
 		'./completion_state.svelte.js': {path: 'completion_state.svelte.ts', declarations: []},
 		'./Completion_Thread_Info.svelte': {path: 'Completion_Thread_Info.svelte', declarations: []},
 		'./Completion_Thread_Summary.svelte': {
@@ -430,15 +436,6 @@ export const src_json = {
 				{name: 'Model_Json', kind: 'type'},
 				{name: 'Model_Options', kind: 'type'},
 				{name: 'Model', kind: 'class'},
-			],
-		},
-		'./Multichat_View.svelte': {path: 'Multichat_View.svelte', declarations: []},
-		'./multichat.svelte.js': {
-			path: 'multichat.svelte.ts',
-			declarations: [
-				{name: 'Chat_Message', kind: 'type'},
-				{name: 'Tape', kind: 'type'},
-				{name: 'Multichat', kind: 'class'},
 			],
 		},
 		'./Nav_Link.svelte': {path: 'Nav_Link.svelte', declarations: []},

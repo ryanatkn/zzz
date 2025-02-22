@@ -103,13 +103,13 @@ export class Completion_Thread {
 			}
 			providers_by_name.set(provider_name, provider);
 		}
-		console.log(`providers_by_name`, providers_by_name);
+		// console.log(`providers_by_name`, providers_by_name);
 		return providers_by_name;
 	});
 
 	constructor({providers}: Completion_Thread_Options) {
 		this.providers = providers;
-		console.log('[completion_thread] creating new', providers);
+		// console.log('[completion_thread] creating new', providers);
 	}
 
 	// TODO maybe `completion_thread_id` should be the original id of the `request.id`?

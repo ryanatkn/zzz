@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type {Chat_Message} from '$lib/multichat.svelte.js';
+	import type {Chat_Message} from '$lib/chat.svelte.js';
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
 
 	interface Props {

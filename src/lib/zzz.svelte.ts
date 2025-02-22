@@ -20,6 +20,7 @@ import {Model, type Model_Json} from '$lib/model.svelte.js';
 import {ollama_list_with_metadata, type Ollama_Model_Info} from '$lib/ollama.js';
 import {models_default} from '$lib/config.js';
 import {zzz_config} from '$lib/zzz_config.js';
+import {Chat} from '$lib/chat.svelte.js';
 
 export const zzz_context = create_context<Zzz>();
 
@@ -68,6 +69,11 @@ export class Zzz {
 
 	// TODO store state granularly for each provider
 
+	chats: Array<Chat> = $state([]);
+
+	selected_chat_id: Id | null = $state(null);
+	selected_chat = $derived(this.chats.find((c) => c.id === this.selected_chat_id));
+
 	constructor(options: Zzz_Options) {
 		const {client, data = new Zzz_Data()} = options;
 		this.client = client;
@@ -96,7 +102,6 @@ export class Zzz {
 			return;
 		}
 
-		console.log(`ollama list_response`, ollama_models_response);
 		this.capability_ollama = true;
 		this.add_ollama_models(ollama_models_response.model_infos);
 
@@ -230,7 +235,6 @@ export class Zzz {
 	}
 
 	add_ollama_models(model_infos: Array<Ollama_Model_Info>): void {
-		console.log(`add_ollama_models model_infos`, model_infos);
 		this.models = [
 			...model_infos.map((ollama_model_info) => {
 				const model_default = models_default.find((m) => m.name === ollama_model_info.model.name);
@@ -248,5 +252,22 @@ export class Zzz {
 			}),
 			...this.models,
 		];
+	}
+
+	add_chat(): void {
+		const chat = new Chat(this);
+		this.chats.unshift(chat);
+		this.selected_chat_id = chat.id; // Select newly created chat
+	}
+
+	remove_chat(chat: Chat): void {
+		const index = this.chats.indexOf(chat);
+		if (index !== -1) {
+			this.chats.splice(index, 1);
+		}
+	}
+
+	select_chat(chat: Chat | null): void {
+		this.selected_chat_id = chat?.id ?? null;
 	}
 }

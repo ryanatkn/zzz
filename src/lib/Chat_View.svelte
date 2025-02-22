@@ -3,7 +3,7 @@
 	import ollama from 'ollama/browser';
 
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
-	import {Multichat} from '$lib/multichat.svelte.js';
+	import {Chat} from '$lib/chat.svelte.js';
 	import Model_Selector from '$lib/Model_Selector.svelte';
 	import Text_Icon from '$lib/Text_Icon.svelte';
 	import Chat_Tape from '$lib/Chat_Tape.svelte';
@@ -12,9 +12,14 @@
 
 	const zzz = zzz_context.get();
 
+	interface Props {
+		chat: Chat;
+	}
+
+	const {chat}: Props = $props();
+
 	// TODO BLOCK this needs to be persisted state
-	const multichat = new Multichat(zzz);
-	multichat.add_tape(zzz.models.find((m) => m.name === 'llama3.2:1b')!);
+	chat.add_tape(zzz.models.find((m) => m.name === 'llama3.2:1b')!);
 	let main_input = $state(''); // TODO BLOCK @many this state probably belongs on the `multichat` object
 	let pending = $state(false); // TODO BLOCK @many this state probably belongs on the `multichat` object
 	let input_el: HTMLTextAreaElement | undefined;
@@ -32,12 +37,12 @@
 			messages: [{role: 'user', content: parsed}],
 		});
 		console.log(`ollama browser response`, r);
-		await multichat.send_to_all(parsed);
+		await chat.send_to_all(parsed);
 		main_input = '';
 		pending = false;
 	};
 
-	const count = $derived(multichat.tapes.length);
+	const count = $derived(chat.tapes.length);
 
 	// TODO BLOCK maybe a mode that allows duplicates by holding a key like shift, but otherwise only setting up 1 tape per model?
 
@@ -50,7 +55,7 @@
 	// TODO BLOCK maybe there should be 2 columns of tags, one to include and one to exclude?
 </script>
 
-<div class="multichat">
+<div class="chat_view">
 	<div class="column gap_md">
 		<div class="panel p_sm">
 			<header class="size_xl">
@@ -69,7 +74,7 @@
 								class="w_100 size_sm py_xs3 justify_content_space_between plain"
 								style:min-height="0"
 								onclick={() => {
-									multichat.add_tapes_by_model_tag(tag);
+									chat.add_tapes_by_model_tag(tag);
 								}}
 							>
 								<span>{tag}</span>
@@ -81,17 +86,17 @@
 					</menu>
 				</div>
 				<div class="flex_1 p_xs radius_xs fg_1">
+					<header class="size_lg text_align_center">delete by tag</header>
 					<menu class="unstyled column">
-						<header class="size_lg text_align_center">delete by tag</header>
 						{#each Array.from(zzz.tags) as tag (tag)}
-							{@const tapes_with_tag = multichat.tapes.filter((t) => t.model.tags.includes(tag))}
+							{@const tapes_with_tag = chat.tapes.filter((t) => t.model.tags.includes(tag))}
 							<button
 								type="button"
 								class="w_100 min_height_0 size_sm py_xs3 justify_content_space_between plain"
 								style:min-height="0"
 								disabled={!tapes_with_tag.length}
 								onclick={() => {
-									multichat.remove_tapes_by_model_tag(tag);
+									chat.remove_tapes_by_model_tag(tag);
 								}}
 							>
 								<span>{tag}</span>
@@ -109,9 +114,9 @@
 			<header class="mb_md">
 				<h3 class="mt_0">add tape with model</h3>
 			</header>
-			<Model_Selector onselect={(model) => multichat.add_tape(model)}>
+			<Model_Selector onselect={(model) => chat.add_tape(model)}>
 				{#snippet children(model)}
-					<div>{multichat.tapes.filter((t) => t.model.name === model.name).length}</div>
+					<div>{chat.tapes.filter((t) => t.model.name === model.name).length}</div>
 				{/snippet}
 			</Model_Selector>
 		</div>
@@ -128,20 +133,17 @@
 			</Pending_Button>
 		</div>
 		<div class="my_lg">
-			<Confirm_Button
-				onclick={() => multichat.remove_all_tapes()}
-				button_attrs={{disabled: !count}}
-			>
+			<Confirm_Button onclick={() => chat.remove_all_tapes()} button_attrs={{disabled: !count}}>
 				🗙 <span class="ml_xs">remove all tapes</span>
 			</Confirm_Button>
 		</div>
 		<!-- TODO duplicate tape button -->
 		<div class="tapes">
-			{#each multichat.tapes as tape (tape.id)}
+			{#each chat.tapes as tape (tape.id)}
 				<Chat_Tape
 					{tape}
-					onremove={() => multichat.remove_tape(tape.id)}
-					onsend={(input: string) => multichat.send_to_tape(tape.id, input)}
+					onremove={() => chat.remove_tape(tape.id)}
+					onsend={(input: string) => chat.send_to_tape(tape.id, input)}
 				/>
 			{/each}
 		</div>
@@ -149,7 +151,7 @@
 </div>
 
 <style>
-	.multichat {
+	.chat_view {
 		display: flex;
 		align-items: start;
 		flex: 1;

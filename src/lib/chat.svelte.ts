@@ -17,7 +17,8 @@ export interface Tape {
 	messages: Array<Chat_Message>;
 }
 
-export class Multichat {
+export class Chat {
+	id: Id = random_id();
 	tapes: Array<Tape> = $state([]);
 	zzz: Zzz;
 

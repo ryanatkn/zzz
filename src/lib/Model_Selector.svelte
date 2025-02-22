@@ -20,7 +20,7 @@
 	// TODO think about an interaction here for better UX - like highlighting the cards on hover or something
 </script>
 
-<ul class="model-selector unstyled">
+<ul class="unstyled">
 	{#each models as model (model)}
 		<li value={model.name} class="display_contents" transition:slide>
 			<button type="button" class="plain w_100 py_xs3" onclick={() => onselect(model)}

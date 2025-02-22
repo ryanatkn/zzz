@@ -95,7 +95,7 @@
 {#if contents_history.length > 1 || contents_history[0].contents !== updated_contents}
 	<div class="width_sm panel p_md" transition:slide>
 		<h3 class="mt_0 mb_lg">history</h3>
-		<div class="flex flex_column_reverse">
+		<menu class="unstyled flex flex_column_reverse">
 			{#each contents_history as entry (entry)}
 				<button
 					type="button"
@@ -111,7 +111,7 @@
 					<span>{entry.contents.length} chars</span>
 				</button>
 			{/each}
-		</div>
+		</menu>
 	</div>
 {/if}
 

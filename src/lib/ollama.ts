@@ -69,13 +69,10 @@ export const merge_ollama_models = (
 	models: Array<Model_Json>,
 	model_infos: Array<Ollama_Model_Info>,
 ): Array<Model_Json> => {
-	console.log(`model_infos`, model_infos);
-
 	for (const ollama_model_info of model_infos) {
 		const {model} = ollama_model_info;
 		const existing_index = models.findIndex((m) => m.name === model.name);
 		if (existing_index === -1) {
-			console.log('not found', model.name);
 			models.push({
 				name: model.name,
 				provider_name: 'ollama',
