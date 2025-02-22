@@ -5,7 +5,6 @@
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import {Chat} from '$lib/chat.svelte.js';
 	import Model_Selector from '$lib/Model_Selector.svelte';
-	import Text_Icon from '$lib/Text_Icon.svelte';
 	import Chat_Tape from '$lib/Chat_Tape.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import {GLYPH_TAPE} from '$lib/constants.js';
@@ -60,7 +59,10 @@
 <div class="chat_view">
 	<div class="column gap_md">
 		<div class="panel p_sm">
-			<header class="mt_0 mb_lg size_lg">manage tapes</header>
+			<header class="mt_0 mb_lg size_lg">{GLYPH_TAPE} tapes</header>
+			<p>TODO add buttons with sets</p>
+		</div>
+		<div class="panel p_sm">
 			<!-- TODO add user-customizable sets of models -->
 			<div class="flex">
 				<div class="flex_1 p_xs radius_xs shadow_inset_xs">
