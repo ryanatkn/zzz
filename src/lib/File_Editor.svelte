@@ -20,20 +20,19 @@
 
 	const zzz = zzz_context.get();
 
-	// TODO BLOCK on revert save, disable the button
+	// TODO BLOCK revert save never gets enabled
 
-	// TODO hoist this state to `zzz` per file?
+	// Track the content as it was before the last save
 	let updated_contents: string = $state(file.contents ?? '');
 	let previous_contents: string | null = $state(null);
-	let last_save_contents: string = $state(file.contents ?? '');
-	// Replace the derived store with a reactive statement
-	const is_file_modified = $derived(file.contents !== last_save_contents);
+	// Track what we last explicitly saved (not the file.contents)
+	let last_explicit_save: string | null = $state(null);
 
-	// Remove updating last_save_contents here so it stays as the saved version
 	$effect.pre(() => {
-		const f = file;
-		updated_contents = untrack(() => f.contents) ?? '';
-		last_save_contents = untrack(() => f.contents) ?? '';
+		file; // When file changes, reset the local state
+		updated_contents = untrack(() => file.contents) ?? '';
+		previous_contents = null;
+		last_explicit_save = null;
 	});
 
 	// TODO BLOCK add the slidey X for the delete button below
@@ -67,17 +66,8 @@
 		type="button"
 		disabled={updated_contents === file.contents}
 		onclick={() => {
-			const previous = file.contents ?? '';
+			last_explicit_save = updated_contents;
 			zzz.update_file(file.id, updated_contents);
-			// Update file.contents to the new value and set last_save_contents to the previous version
-			file.contents = updated_contents;
-			last_save_contents = previous;
-			console.log('saved:', {
-				previous,
-				current: file.contents,
-				last_save_contents,
-				is_file_modified,
-			});
 		}}>save file</button
 	>
 	<div class="flex">
@@ -99,10 +89,10 @@
 		>
 		<button
 			type="button"
-			disabled={!is_file_modified}
+			disabled={last_explicit_save === null || updated_contents === last_explicit_save}
 			onclick={() => {
 				previous_contents = updated_contents;
-				updated_contents = last_save_contents;
+				updated_contents = last_explicit_save ?? '';
 			}}>revert save</button
 		>
 	</div>
