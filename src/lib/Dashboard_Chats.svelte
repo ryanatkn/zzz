@@ -11,12 +11,9 @@
 <div class="dashboard_chats">
 	<!-- TODO show the selected chat's info, if any -->
 	<!-- TODO, show the counts of active items for each of the model selector buttons in a snippet here -->
-	<div class="panel p_sm">
+	<div class="panel p_sm width_sm">
 		{#if zzz.selected_chat}
-			<div
-				class="p_sm shadow_color_a radius_xs border_solid border_width_2 border_color_a"
-				transition:slide
-			>
+			<div class="p_sm radius_xs2 border_solid border_width_2 border_color_4" transition:slide>
 				<div class="column">
 					<!-- TODO needs work -->
 					<div>Chat {zzz.selected_chat.id}</div>
@@ -31,21 +28,28 @@
 				</div>
 			</div>
 		{/if}
-		<button class="plain w_100 justify_content_start" type="button" onclick={() => zzz.add_chat()}>
+		<button
+			class="plain w_100 justify_content_start radius_xs2"
+			type="button"
+			onclick={() => zzz.add_chat()}
+		>
 			+ new chat
 		</button>
 		<menu class="unstyled">
 			{#each zzz.chats as chat (chat.id)}
 				<button
 					type="button"
+					class="w_100 justify_content_space_between px_sm py_xs2 radius_xs2 font_weight_500"
+					style:min-height="0"
 					class:selected={chat.id === zzz.selected_chat_id}
 					onclick={() => zzz.select_chat(chat.id)}
 					transition:slide
 				>
-					<div class="font_weight_400">
+					<div>
 						<span class="mr_xs2">{GLYPH_CHAT}</span>
 						<small>Chat {chat.id}</small>
 					</div>
+					{#if chat.tapes.length}<small>{chat.tapes.length}</small>{/if}
 				</button>
 			{/each}
 		</menu>

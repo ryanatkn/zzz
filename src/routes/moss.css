@@ -9,8 +9,8 @@
 .bg_c_1 {
 	background-color: var(--color_c_1);
 }
-.border_color_a {
-	border-color: var(--border_color_a);
+.border_color_4 {
+	border-color: var(--border_color_4);
 }
 .border_solid {
 	border-style: solid;
@@ -314,6 +314,10 @@ a.chip {
 	padding-left: var(--space_lg);
 	padding-right: var(--space_lg);
 }
+.px_sm {
+	padding-left: var(--space_sm);
+	padding-right: var(--space_sm);
+}
 .px_xs {
 	padding-left: var(--space_xs);
 	padding-right: var(--space_xs);
@@ -326,6 +330,10 @@ a.chip {
 	padding-top: var(--space_xl9);
 	padding-bottom: var(--space_xl9);
 }
+.py_xs2 {
+	padding-top: var(--space_xs2);
+	padding-bottom: var(--space_xs2);
+}
 .py_xs3 {
 	padding-top: var(--space_xs3);
 	padding-bottom: var(--space_xs3);
@@ -335,6 +343,9 @@ a.chip {
 }
 .radius_xs {
 	border-radius: var(--radius_xs);
+}
+.radius_xs2 {
+	border-radius: var(--radius_xs2);
 }
 .relative {
 	position: relative;
@@ -373,9 +384,6 @@ a.chip {
 	cursor: pointer;
 }
 
-.shadow_color_a {
-	--shadow_color: var(--shadow_color_a);
-}
 .shadow_inset_xs {
 	box-shadow: var(--shadow_inset_xs)
 		color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_1)), transparent);
