@@ -91,11 +91,13 @@
 					<menu class="unstyled column">
 						{#each Array.from(zzz.tags) as tag (tag)}
 							{@const tapes_with_tag = chat.tapes.filter((t) => t.model.tags.includes(tag))}
-							<button
-								type="button"
-								class="w_100 size_sm py_xs3 justify_content_space_between plain radius_xs font_weight_600"
-								style:min-height="0"
-								disabled={!tapes_with_tag.length}
+							<Confirm_Button
+								button_attrs={{
+									disabled: !tapes_with_tag.length,
+									class:
+										'w_100 size_sm py_xs3 justify_content_space_between plain radius_xs font_weight_600',
+									style: 'min-height: 0;',
+								}}
 								onclick={() => {
 									chat.remove_tapes_by_model_tag(tag);
 								}}
@@ -104,7 +106,7 @@
 								{#if tapes_with_tag.length}
 									<span>{tapes_with_tag.length}</span>
 								{/if}
-							</button>
+							</Confirm_Button>
 						{/each}
 					</menu>
 				</div>
