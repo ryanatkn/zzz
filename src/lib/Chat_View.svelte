@@ -44,6 +44,8 @@
 
 	const count = $derived(chat.tapes.length);
 
+	// TODO BLOCK add `presets`  section to the top with the custom buttons/sets (accessible via contextmenu)
+
 	// TODO BLOCK maybe a mode that allows duplicates by holding a key like shift, but otherwise only setting up 1 tape per model?
 
 	// TODO BLOCK the "send to all" button below could have a sibling that creates a new table for each

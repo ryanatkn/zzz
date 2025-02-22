@@ -119,6 +119,9 @@ a.chip {
 .inline_block {
 	display: inline-block;
 }
+.justify_content_end {
+	justify-content: end;
+}
 .justify_content_space_between {
 	justify-content: space-between;
 }
@@ -361,6 +364,10 @@ a.chip {
 	cursor: pointer;
 }
 
+.shadow_inset_top_xs {
+	box-shadow: var(--shadow_inset_top_xs)
+		color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_1)), transparent);
+}
 .shadow_inset_xs {
 	box-shadow: var(--shadow_inset_xs)
 		color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_1)), transparent);

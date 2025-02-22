@@ -72,7 +72,9 @@ export class Zzz {
 	chats: Array<Chat> = $state([]);
 
 	selected_chat_id: Id | null = $state(null);
-	selected_chat = $derived(this.chats.find((c) => c.id === this.selected_chat_id));
+	selected_chat: Chat | undefined = $derived(
+		this.chats.find((c) => c.id === this.selected_chat_id),
+	);
 
 	constructor(options: Zzz_Options) {
 		const {client, data = new Zzz_Data()} = options;
