@@ -36,7 +36,7 @@ export class Models {
 		const uninstalled_ollama_models = zzz_config.models
 			.filter(
 				(m) =>
-					m.provider_name === 'ollama' && !installed_ollama_models.find((m2) => m2.name === m.name),
+					m.provider_name === 'ollama' && !installed_ollama_models.some((m2) => m2.name === m.name),
 			)
 			.map((m) => new Model({zzz: this.zzz, json: m}));
 		this.items = [...installed_ollama_models, ...uninstalled_ollama_models, ...this.items];

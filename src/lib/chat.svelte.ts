@@ -146,7 +146,7 @@ export class Chat {
 	get_unique_name(text: string): string {
 		let name = text;
 		let i = 2;
-		while (this.zzz.chats.items.find((c) => c.name === name)) {
+		while (this.zzz.chats.items.some((c) => c !== this && c.name === name)) {
 			name = `${text} ${i++}`;
 		}
 		return name;
