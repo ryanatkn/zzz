@@ -10,12 +10,15 @@
 	import Prompt_Fragment_View from '$lib/Prompt_Fragment_View.svelte';
 	import {GLYPH_FRAGMENT, GLYPH_PROMPT} from '$lib/constants.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
+	import Fragment_Summary from '$lib/Fragment_Summary.svelte';
 
 	const zzz = zzz_context.get();
 
 	const fragment_textareas = $state<Record<string, HTMLTextAreaElement>>({});
 
 	// TODO BLOCK save both fragments and prompts to the library, right?
+
+	// TODO BLOCK make it have optional attributes like file type
 </script>
 
 <div class="flex align_items_start gap_md p_sm">
@@ -146,10 +149,7 @@
 		<div class="column">
 			{#if zzz.prompts.selected}
 				{#each zzz.prompts.selected.fragments as fragment (fragment.id)}
-					<div class="flex panel px_sm py_xs3 white_space_nowrap size_sm">
-						<div>{fragment.name}</div>
-						<div class="pl_md ellipsis">{fragment.content}</div>
-					</div>
+					<Fragment_Summary {fragment} />
 				{/each}
 			{/if}
 		</div>

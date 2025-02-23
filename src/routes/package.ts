@@ -199,6 +199,11 @@ export const package_json = {
 			default: './dist/File_View.svelte',
 		},
 		'./file.svelte.js': {types: './dist/file.svelte.d.ts', default: './dist/file.svelte.js'},
+		'./Fragment_Summary.svelte': {
+			types: './dist/Fragment_Summary.svelte.d.ts',
+			svelte: './dist/Fragment_Summary.svelte',
+			default: './dist/Fragment_Summary.svelte',
+		},
 		'./id.js': {types: './dist/id.d.ts', default: './dist/id.js'},
 		'./Main_Dialog.svelte': {
 			types: './dist/Main_Dialog.svelte.d.ts',
@@ -442,6 +447,7 @@ export const src_json = {
 				{name: 'Prompt', kind: 'class'},
 			],
 		},
+		'./Fragment_Summary.svelte': {path: 'Fragment_Summary.svelte', declarations: []},
 		'./id.js': {
 			path: 'id.ts',
 			declarations: [
