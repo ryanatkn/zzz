@@ -6,6 +6,7 @@
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Nav_Link from '$lib/Nav_Link.svelte';
 	import Text_Icon from '$lib/Text_Icon.svelte';
+	import Prompt_Fragment_View from '$lib/Prompt_Fragment_View.svelte';
 	import {GLYPH_FRAGMENT, GLYPH_PROMPT} from '$lib/constants.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 
@@ -106,42 +107,7 @@
 			>
 				{#each zzz.prompts.selected.fragments as fragment (fragment.id)}
 					<div class="panel p_sm" transition:scale>
-						<div class="flex justify_content_space_between mb_sm">
-							<h3 class="m_0">{fragment.name}</h3>
-						</div>
-						<textarea
-							style:height="200px"
-							class="mb_xs"
-							bind:this={fragment_textareas[fragment.id]}
-							value={fragment.content}
-							oninput={(e) =>
-								zzz.prompts.update_fragment_content(fragment.id, e.currentTarget.value)}
-						></textarea>
-						<div class="flex justify_content_space_between">
-							<div class="flex">
-								<Copy_To_Clipboard text={fragment.content} classes="plain" />
-								<button
-									type="button"
-									class="plain"
-									onclick={async () => {
-										fragment.content += await navigator.clipboard.readText();
-										fragment_textareas[fragment.id].focus();
-									}}>paste</button
-								>
-								<button
-									type="button"
-									class="plain"
-									onclick={() => {
-										fragment.content = '';
-									}}>clear</button
-								>
-								<!-- TODO undo -->
-							</div>
-							<Confirm_Button
-								onclick={() => zzz.prompts.remove_fragment(fragment.id)}
-								button_attrs={{title: `remove fragment ${fragment.id}`}}
-							/>
-						</div>
+						<Prompt_Fragment_View {fragment} prompts={zzz.prompts} {fragment_textareas} />
 					</div>
 				{/each}
 			</div>
