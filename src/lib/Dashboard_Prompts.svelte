@@ -71,18 +71,37 @@
 		</menu>
 	</div>
 
-	<div class="panel p_sm width_sm">
-		<header class="size_lg mb_lg"><Text_Icon icon={GLYPH_FRAGMENT} /> fragments</header>
-		<div class="column">
+	<div class="width_sm column gap_md">
+		<div class="panel p_sm">
+			<div class="size_lg"><Text_Icon icon={GLYPH_PROMPT} /> final prompt</div>
 			{#if zzz.prompts.selected}
-				{#each zzz.prompts.selected.fragments as fragment (fragment.id)}
-					<div class="flex panel px_sm py_xs3 white_space_nowrap size_sm">
-						<div>{fragment.name}</div>
-						<div class="pl_md ellipsis">{fragment.content}</div>
+				<div class="row gap_sm mt_md mb_sm">
+					<Copy_To_Clipboard text={zzz.prompts.selected.value} classes="plain" />
+					<span>{print_number_with_separators(zzz.prompts.selected.length + '', ',')} chars</span>
+					<span
+						>~{print_number_with_separators(zzz.prompts.selected.token_count + '', ',')} tokens</span
+					>
+				</div>
+				<pre class="panel p_xs overflow_auto" style:height="300px" style:max-height="300px">{zzz
+						.prompts.selected.value}</pre>
+				<!-- TODO something like these? -->
+				<!-- <div class="mt_sm flex gap_sm justify_content_space_between">
+					<div class="flex gap_sm">
+						<button type="button" class="plain">save to library</button>
+						<button type="button" class="plain">export</button>
 					</div>
-				{/each}
+				</div> -->
 			{/if}
 		</div>
+
+		<!-- TODO maybe a library panel? could be like brushes -->
+		<!-- <div class="panel p_sm">
+			<h3 class="mt_0">library</h3>
+			<div class="mb_sm">
+				<input type="search" placeholder="Search prompts and fragments..." class="w_100" />
+			</div>
+			<menu class="unstyled"> TODO </menu>
+		</div> -->
 	</div>
 
 	<div class="panel p_sm flex_1">
@@ -122,36 +141,17 @@
 		{/if}
 	</div>
 
-	<div class="width_sm column gap_md">
-		<div class="panel p_sm">
-			<div class="size_lg"><Text_Icon icon={GLYPH_PROMPT} /> final prompt</div>
+	<div class="panel p_sm width_sm">
+		<header class="size_lg mb_lg"><Text_Icon icon={GLYPH_FRAGMENT} /> fragments</header>
+		<div class="column">
 			{#if zzz.prompts.selected}
-				<div class="row gap_sm mt_md mb_sm">
-					<Copy_To_Clipboard text={zzz.prompts.selected.value} classes="plain" />
-					<span>{print_number_with_separators(zzz.prompts.selected.length + '', ',')} chars</span>
-					<span
-						>~{print_number_with_separators(zzz.prompts.selected.token_count + '', ',')} tokens</span
-					>
-				</div>
-				<pre class="panel p_xs overflow_auto" style:height="300px" style:max-height="300px">{zzz
-						.prompts.selected.value}</pre>
-				<!-- TODO something like these? -->
-				<!-- <div class="mt_sm flex gap_sm justify_content_space_between">
-					<div class="flex gap_sm">
-						<button type="button" class="plain">save to library</button>
-						<button type="button" class="plain">export</button>
+				{#each zzz.prompts.selected.fragments as fragment (fragment.id)}
+					<div class="flex panel px_sm py_xs3 white_space_nowrap size_sm">
+						<div>{fragment.name}</div>
+						<div class="pl_md ellipsis">{fragment.content}</div>
 					</div>
-				</div> -->
+				{/each}
 			{/if}
 		</div>
-
-		<!-- TODO maybe a library panel? could be like brushes -->
-		<!-- <div class="panel p_sm">
-			<h3 class="mt_0">library</h3>
-			<div class="mb_sm">
-				<input type="search" placeholder="Search prompts and fragments..." class="w_100" />
-			</div>
-			<menu class="unstyled"> TODO </menu>
-		</div> -->
 	</div>
 </div>
