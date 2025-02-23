@@ -13,8 +13,6 @@
 
 	const fragment_textareas = $state<Record<string, HTMLTextAreaElement>>({});
 
-	// TODO BLOCK show the character count (maybe grapheme count?) and token count (which tokenizer(s)?)
-
 	// TODO BLOCK save both fragments and prompts to the library, right?
 
 	// TODO BLOCK checkbox that toggles a `<File>` block around it, optionally fill input with path
