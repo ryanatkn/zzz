@@ -128,17 +128,9 @@
 			{#if zzz.prompts.selected}
 				<div class="row gap_sm mt_md mb_sm">
 					<Copy_To_Clipboard text={zzz.prompts.selected.value} classes="plain" />
+					<span>{print_number_with_separators(zzz.prompts.selected.length + '', ',')} chars</span>
 					<span
-						>{print_number_with_separators(
-							zzz.prompts.selected.fragments.reduce((v, f) => v + f.content.length, 0) + '',
-							',',
-						)} chars</span
-					>
-					<span
-						>~{print_number_with_separators(
-							Math.round(zzz.prompts.selected.value.length / 4) + '',
-							',',
-						)} tokens</span
+						>~{print_number_with_separators(zzz.prompts.selected.token_count + '', ',')} tokens</span
 					>
 				</div>
 				<pre class="panel p_xs overflow_auto" style:height="300px" style:max-height="300px">{zzz

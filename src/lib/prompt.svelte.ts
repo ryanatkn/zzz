@@ -22,9 +22,12 @@ export class Prompt {
 	name: string = $state('new prompt');
 	created: string = new Date().toISOString();
 	fragments: Array<Prompt_Fragment> = $state([]);
+
 	zzz: Zzz;
 
 	value: string = $derived(join_prompt_fragments(this.fragments));
+	length: number = $derived(this.value.length); // TODO use segmenter for more precision? will it be slow for large values tho?
+	token_count: number = $derived(Math.round(this.length / 4)); // TODO use a tokenizer
 
 	constructor(zzz: Zzz) {
 		this.zzz = zzz;
