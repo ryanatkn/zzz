@@ -7,7 +7,7 @@ export const package_json = {
 	name: '@ryanatkn/zzz',
 	version: '0.0.1',
 	description: 'bot and web toolkit',
-	motto: 'endgame web UI',
+	motto: 'bot control web',
 	glyph: '💤',
 	logo: 'logo.svg',
 	logo_alt: "three sleepy z's",
