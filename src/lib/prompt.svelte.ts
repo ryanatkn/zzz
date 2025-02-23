@@ -46,7 +46,8 @@ export class Prompt {
 	update_fragment(id: Id, updates: Partial<Omit<Prompt_Fragment, 'id'>>): void {
 		const fragment = this.fragments.find((f) => f.id === id);
 		if (fragment) {
-			Object.assign(fragment, updates);
+			if (updates.name !== undefined) fragment.name = updates.name;
+			if (updates.content !== undefined) fragment.content = updates.content;
 		}
 	}
 
