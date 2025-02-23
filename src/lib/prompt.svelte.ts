@@ -6,6 +6,8 @@ export interface Prompt_Fragment {
 	id: Id;
 	name: string;
 	content: string;
+	is_file: boolean;
+	file_path: string;
 }
 
 export interface Prompt_Message {
@@ -24,8 +26,13 @@ export class Prompt {
 
 	value: string = $derived(
 		this.fragments
-			.map((f) => f.content)
-			.filter((c) => c.trim().length > 0)
+			.map((f) => {
+				const content = f.content.trim();
+				if (!content) return '';
+				if (!f.is_file) return content;
+				return `<File${f.file_path ? ` path="${f.file_path}"` : ''}>\n${content}\n</File>`;
+			})
+			.filter((c) => !!c)
 			.join('\n\n'),
 	);
 
@@ -33,11 +40,18 @@ export class Prompt {
 		this.zzz = zzz;
 	}
 
-	add_fragment(content: string = '', name: string = 'new fragment'): Prompt_Fragment {
+	add_fragment(
+		content: string = '',
+		name: string = 'new fragment',
+		file_path: string = '',
+		is_file: boolean = false,
+	): Prompt_Fragment {
 		const fragment: Prompt_Fragment = {
 			id: random_id(),
 			name,
 			content,
+			file_path,
+			is_file,
 		};
 		this.fragments.push(fragment);
 		return fragment;
@@ -48,6 +62,8 @@ export class Prompt {
 		if (fragment) {
 			if (updates.name !== undefined) fragment.name = updates.name;
 			if (updates.content !== undefined) fragment.content = updates.content;
+			if (updates.file_path !== undefined) fragment.file_path = updates.file_path;
+			if (updates.is_file !== undefined) fragment.is_file = updates.is_file;
 		}
 	}
 

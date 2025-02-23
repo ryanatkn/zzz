@@ -304,13 +304,19 @@
       "types": "./dist/path.d.ts",
       "default": "./dist/path.js"
     },
+    "./Prompt_Fragment_File_Controls.svelte": {
+      "types": "./dist/Prompt_Fragment_File_Controls.svelte.d.ts",
+      "svelte": "./dist/Prompt_Fragment_File_Controls.svelte",
+      "default": "./dist/Prompt_Fragment_File_Controls.svelte"
+    },
+    "./Prompt_Fragment_View.svelte": {
+      "types": "./dist/Prompt_Fragment_View.svelte.d.ts",
+      "svelte": "./dist/Prompt_Fragment_View.svelte",
+      "default": "./dist/Prompt_Fragment_View.svelte"
+    },
     "./prompt.svelte.js": {
       "types": "./dist/prompt.svelte.d.ts",
       "default": "./dist/prompt.svelte.js"
-    },
-    "./prompt.js": {
-      "types": "./dist/prompt.d.ts",
-      "default": "./dist/prompt.js"
     },
     "./prompts.svelte.js": {
       "types": "./dist/prompts.svelte.d.ts",

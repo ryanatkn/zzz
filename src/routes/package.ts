@@ -254,8 +254,17 @@ export const package_json = {
 		},
 		'./ollama.js': {types: './dist/ollama.d.ts', default: './dist/ollama.js'},
 		'./path.js': {types: './dist/path.d.ts', default: './dist/path.js'},
+		'./Prompt_Fragment_File_Controls.svelte': {
+			types: './dist/Prompt_Fragment_File_Controls.svelte.d.ts',
+			svelte: './dist/Prompt_Fragment_File_Controls.svelte',
+			default: './dist/Prompt_Fragment_File_Controls.svelte',
+		},
+		'./Prompt_Fragment_View.svelte': {
+			types: './dist/Prompt_Fragment_View.svelte.d.ts',
+			svelte: './dist/Prompt_Fragment_View.svelte',
+			default: './dist/Prompt_Fragment_View.svelte',
+		},
 		'./prompt.svelte.js': {types: './dist/prompt.svelte.d.ts', default: './dist/prompt.svelte.js'},
-		'./prompt.js': {types: './dist/prompt.d.ts', default: './dist/prompt.js'},
 		'./prompts.svelte.js': {
 			types: './dist/prompts.svelte.d.ts',
 			default: './dist/prompts.svelte.js',
@@ -405,6 +414,7 @@ export const src_json = {
 				{name: 'GLYPH_TAPE', kind: 'variable'},
 				{name: 'GLYPH_FILE', kind: 'variable'},
 				{name: 'GLYPH_PROMPT', kind: 'variable'},
+				{name: 'GLYPH_FRAGMENT', kind: 'variable'},
 				{name: 'GLYPH_PROVIDER', kind: 'variable'},
 				{name: 'GLYPH_MODEL', kind: 'variable'},
 				{name: 'GLYPH_CAPABILITY', kind: 'variable'},
@@ -474,20 +484,18 @@ export const src_json = {
 			],
 		},
 		'./path.js': {path: 'path.ts', declarations: [{name: 'to_root_path', kind: 'function'}]},
+		'./Prompt_Fragment_File_Controls.svelte': {
+			path: 'Prompt_Fragment_File_Controls.svelte',
+			declarations: [],
+		},
+		'./Prompt_Fragment_View.svelte': {path: 'Prompt_Fragment_View.svelte', declarations: []},
 		'./prompt.svelte.js': {
 			path: 'prompt.svelte.ts',
 			declarations: [
+				{name: 'Prompt_Fragment', kind: 'type'},
 				{name: 'Prompt_Message', kind: 'type'},
 				{name: 'Prompt_Message_Content', kind: 'type'},
 				{name: 'Prompt', kind: 'class'},
-			],
-		},
-		'./prompt.js': {
-			path: 'prompt.ts',
-			declarations: [
-				{name: 'Prompt', kind: 'type'},
-				{name: 'Prompt_Message', kind: 'type'},
-				{name: 'Prompt_Message_Content', kind: 'type'},
 			],
 		},
 		'./prompts.svelte.js': {

@@ -94,12 +94,23 @@
 				<button type="button" class="plain" onclick={() => zzz.prompts.add_fragment()}>
 					+ add fragment
 				</button>
-				<Confirm_Button
-					onclick={() => zzz.prompts.selected?.remove_all_fragments()}
-					button_attrs={{disabled: !zzz.prompts.selected.fragments.length, class: 'plain'}}
-				>
-					🗙 remove all fragments
-				</Confirm_Button>
+				<div class="flex gap_md">
+					<!-- Add file toggle -->
+					<!-- <label class="flex gap_xs">
+						<input type="checkbox" bind:checked={fragment.file_path !== null} />
+						Is File
+					</label> -->
+					<!-- File path input -->
+					<!-- {#if fragment.file_path !== null}
+						<input type="text" placeholder="file path (optional)" bind:value={fragment.file_path} />
+					{/if} -->
+					<Confirm_Button
+						onclick={() => zzz.prompts.selected?.remove_all_fragments()}
+						button_attrs={{disabled: !zzz.prompts.selected.fragments.length, class: 'plain'}}
+					>
+						🗙 remove all fragments
+					</Confirm_Button>
+				</div>
 			</div>
 			<div
 				class="grid gap_md"
@@ -125,9 +136,8 @@
 					>
 					<span>~{Math.round(zzz.prompts.selected.value.length / 4)} tokens</span>
 				</div>
-				<pre class="panel p_xs overflow_auto" style:height="300px" style:max-height="300px">
-					{zzz.prompts.selected.value}
-				</pre>
+				<pre class="panel p_xs overflow_auto" style:height="300px" style:max-height="300px">{zzz
+						.prompts.selected.value}</pre>
 				<!-- TODO something like these? -->
 				<!-- <div class="mt_sm flex gap_sm justify_content_space_between">
 					<div class="flex gap_sm">

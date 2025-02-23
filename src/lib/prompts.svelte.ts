@@ -1,5 +1,5 @@
 import type {Zzz} from '$lib/zzz.svelte.js';
-import {Prompt} from '$lib/prompt.svelte.js';
+import {Prompt, type Prompt_Fragment} from '$lib/prompt.svelte.js';
 import type {Id} from '$lib/id.js';
 
 export class Prompts {
@@ -42,10 +42,9 @@ export class Prompts {
 		this.selected.add_fragment();
 	}
 
-	// TODO should `update_fragment` even exist?
-	update_fragment_content(fragment_id: Id, content: string): void {
+	update_fragment(fragment_id: Id, updates: Partial<Omit<Prompt_Fragment, 'id'>>): void {
 		if (!this.selected) return;
-		this.selected.update_fragment(fragment_id, {content});
+		this.selected.update_fragment(fragment_id, updates);
 	}
 
 	remove_fragment(fragment_id: Id): void {
