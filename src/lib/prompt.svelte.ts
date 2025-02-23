@@ -1,6 +1,9 @@
 import type {Zzz} from '$lib/zzz.svelte.js';
 import {random_id, type Id} from '$lib/id.js';
 
+// TODO use a tokenizer
+export const count_tokens = (text: string): number => Math.round(text.length / 4);
+
 // TODO maybe rename to just `Fragment`? extract to `fragment.svelte.ts`?
 export interface Prompt_Fragment {
 	id: Id;
@@ -27,7 +30,7 @@ export class Prompt {
 
 	value: string = $derived(join_prompt_fragments(this.fragments));
 	length: number = $derived(this.value.length); // TODO use segmenter for more precision? will it be slow for large values tho?
-	token_count: number = $derived(Math.round(this.length / 4)); // TODO use a tokenizer
+	token_count: number = $derived(count_tokens(this.value));
 
 	constructor(zzz: Zzz) {
 		this.zzz = zzz;

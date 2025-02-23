@@ -2,7 +2,6 @@
 	import {slide, scale} from 'svelte/transition';
 	import {format} from 'date-fns';
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
-	import {print_number_with_separators} from '@ryanatkn/belt/print.js';
 
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Nav_Link from '$lib/Nav_Link.svelte';
@@ -11,10 +10,9 @@
 	import {GLYPH_FRAGMENT, GLYPH_PROMPT} from '$lib/constants.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import Fragment_Summary from '$lib/Fragment_Summary.svelte';
+	import Prompt_Stats from '$lib/Prompt_Stats.svelte';
 
 	const zzz = zzz_context.get();
-
-	const fragment_textareas = $state<Record<string, HTMLTextAreaElement>>({});
 
 	// TODO BLOCK save both fragments and prompts to the library, right?
 
@@ -80,10 +78,7 @@
 			{#if zzz.prompts.selected}
 				<div class="row gap_sm mt_md mb_sm">
 					<Copy_To_Clipboard text={zzz.prompts.selected.value} classes="plain" />
-					<span>{print_number_with_separators(zzz.prompts.selected.length + '', ',')} chars</span>
-					<span
-						>~{print_number_with_separators(zzz.prompts.selected.token_count + '', ',')} tokens</span
-					>
+					<Prompt_Stats prompt={zzz.prompts.selected} />
 				</div>
 				<pre class="panel p_xs overflow_auto" style:height="300px" style:max-height="300px">{zzz
 						.prompts.selected.value}</pre>
@@ -137,7 +132,7 @@
 			>
 				{#each zzz.prompts.selected.fragments as fragment (fragment.id)}
 					<div class="panel p_sm" transition:scale>
-						<Prompt_Fragment_View {fragment} prompts={zzz.prompts} {fragment_textareas} />
+						<Prompt_Fragment_View {fragment} prompts={zzz.prompts} />
 					</div>
 				{/each}
 			</div>

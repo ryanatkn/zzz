@@ -1,17 +1,20 @@
 <script lang="ts">
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
+
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
-	import type {Prompt_Fragment} from '$lib/prompt.svelte.js';
+	import {count_tokens, type Prompt_Fragment} from '$lib/prompt.svelte.js';
 	import type {Prompts} from '$lib/prompts.svelte.js';
 	import Prompt_Fragment_File_Controls from '$lib/Prompt_Fragment_File_Controls.svelte';
+	import Prompt_Fragment_Stats from '$lib/Prompt_Fragment_Stats.svelte';
 
 	interface Props {
 		fragment: Prompt_Fragment;
 		prompts: Prompts;
-		fragment_textareas: Record<string, HTMLTextAreaElement>;
 	}
 
-	const {fragment, prompts, fragment_textareas}: Props = $props();
+	const {fragment, prompts}: Props = $props();
+
+	const fragment_textareas = $state<Record<string, HTMLTextAreaElement>>({});
 </script>
 
 <div class="column gap_sm">
@@ -51,5 +54,9 @@
 			button_attrs={{title: `remove fragment ${fragment.id}`}}
 		/>
 	</div>
+	<Prompt_Fragment_Stats
+		length={fragment.content.length}
+		token_count={count_tokens(fragment.content)}
+	/>
 	<Prompt_Fragment_File_Controls {fragment} {prompts} />
 </div>
