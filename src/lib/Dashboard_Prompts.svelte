@@ -6,7 +6,7 @@
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Nav_Link from '$lib/Nav_Link.svelte';
 	import Text_Icon from '$lib/Text_Icon.svelte';
-	import {GLYPH_PROMPT} from '$lib/constants.js';
+	import {GLYPH_FRAGMENT, GLYPH_PROMPT} from '$lib/constants.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 
 	const zzz = zzz_context.get();
@@ -69,9 +69,22 @@
 		</menu>
 	</div>
 
+	<div class="panel p_sm width_sm">
+		<header class="size_lg mb_lg"><Text_Icon icon={GLYPH_FRAGMENT} /> fragments</header>
+		<div class="column">
+			{#if zzz.prompts.selected}
+				{#each zzz.prompts.selected.fragments as fragment (fragment.id)}
+					<div class="flex panel px_sm py_xs3 white_space_nowrap size_sm">
+						<div>{fragment.name}</div>
+						<div class="pl_md ellipsis">{fragment.content}</div>
+					</div>
+				{/each}
+			{/if}
+		</div>
+	</div>
+
 	<div class="panel p_sm flex_1">
 		<div class="flex justify_content_space_between mb_lg">
-			<h2 class="m_0">fragments</h2>
 			<button type="button" class="plain" onclick={() => zzz.prompts.add_fragment()}>
 				+ add fragment
 			</button>
@@ -135,19 +148,6 @@
 				<li><button type="button" class="plain w_100">Import Template</button></li>
 				<li><button type="button" class="plain w_100">Share</button></li>
 			</menu>
-		</div>
-		<div class="panel p_sm">
-			<h3 class="mt_0">fragments</h3>
-			<div class="column">
-				{#if zzz.prompts.selected}
-					{#each zzz.prompts.selected.fragments as fragment (fragment.id)}
-						<div class="flex panel px_sm py_xs3 white_space_nowrap size_sm">
-							<div>{fragment.name}</div>
-							<div class="pl_md ellipsis">{fragment.content}</div>
-						</div>
-					{/each}
-				{/if}
-			</div>
 		</div>
 	</div>
 </div>
