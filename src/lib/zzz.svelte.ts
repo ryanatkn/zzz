@@ -40,7 +40,7 @@ export interface Zzz_Json {
  * Gettable with `zzz_context.get()` inside a `<Zzz_Root>`.
  */
 export class Zzz {
-	data: Zzz_Data = $state()!;
+	data: Zzz_Data = $state()!; // TODO stable ref or state?
 
 	readonly client: Zzz_Client;
 
