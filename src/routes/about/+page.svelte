@@ -56,27 +56,22 @@
 				and AI assistance
 			</li>
 		</ul>
-		<p>Features:</p>
+		<p>Integrations: (everything's a work in progress, but some basics work)</p>
 		<ul>
+			<li><a href="https://github.com/ollama/ollama">Ollama</a></li>
+			<li><a href="https://github.com/openai/openai-node">ChatGPT</a></li>
+			<li><a href="https://github.com/anthropics/anthropic-sdk-typescript">Claude</a></li>
+			<li><a href="https://github.com/google-gemini/generative-ai-js">Gemini</a></li>
 			<li>
-				integrations (everything's a work in progress, but some basics should be working)
+				Planned:
 				<ul>
-					<li><a href="https://github.com/ollama/ollama">Ollama</a></li>
-					<li><a href="https://github.com/openai/openai-node">ChatGPT</a></li>
-					<li><a href="https://github.com/anthropics/anthropic-sdk-typescript">Claude</a></li>
-					<li><a href="https://github.com/google-gemini/generative-ai-js">Gemini</a></li>
+					<li>RSS/Atom/JSONFeed</li>
 					<li>
-						Planned:
-						<ul>
-							<li>
-								<a href="https://modelcontextprotocol.io/">Model Context Protocol</a> (<a
-									href="https://github.com/modelcontextprotocol/typescript-sdk">TS lib</a
-								>)
-							</li>
-
-							<li>more planned, also I welcome feedback/requests/assistance</li>
-						</ul>
+						<a href="https://modelcontextprotocol.io/">Model Context Protocol</a> (<a
+							href="https://github.com/modelcontextprotocol/typescript-sdk">TS lib</a
+						>)
 					</li>
+					<li>more planned, also I welcome feedback/requests/assistance</li>
 				</ul>
 			</li>
 		</ul>
