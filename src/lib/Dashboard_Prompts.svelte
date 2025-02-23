@@ -18,8 +18,6 @@
 	// TODO BLOCK save both fragments and prompts to the library, right?
 
 	// TODO BLOCK checkbox that toggles a `<File>` block around it, optionally fill input with path
-
-	// TODO BLOCK see the commented-out markup at the bottom of the file for more ideas
 </script>
 
 <div class="dashboard_prompts">
@@ -150,32 +148,32 @@
 		<div class="panel p_sm">
 			<h3 class="mt_0">prompt</h3>
 			{#if zzz.prompts.selected}
-				<!-- TODO 300px var -->
-				<pre class="panel p_xs overflow_auto" style:height="300px" style:max-height="300px">{zzz
-						.prompts.selected.value}</pre>
+				<div class="flex gap_sm mb_sm">
+					<span class="badge"
+						>{zzz.prompts.selected.fragments.reduce((acc, f) => acc + f.content.length, 0)} chars</span
+					>
+					<span class="badge">~{Math.round(zzz.prompts.selected.value.length / 4)} tokens</span>
+				</div>
+				<pre class="panel p_xs overflow_auto" style:height="300px" style:max-height="300px">
+					{zzz.prompts.selected.value}
+				</pre>
 				<div class="mt_sm flex gap_sm justify_content_space_between">
 					<Copy_To_Clipboard text={zzz.prompts.selected.value} classes="plain" />
-					<!-- TODO maybe something like this? -->
-					<button type="button" class="plain">save to library</button>
+					<div class="flex gap_sm">
+						<button type="button" class="plain">save to library</button>
+						<button type="button" class="plain">export</button>
+					</div>
 				</div>
 			{/if}
 		</div>
+
+		<!-- TODO maybe a library panel? could be like brushes -->
 		<!-- <div class="panel p_sm">
 			<h3 class="mt_0">library</h3>
-			<menu class="unstyled">
-				<li><button type="button" class="plain w_100">System Context</button></li>
-				<li><button type="button" class="plain w_100">Task Instructions</button></li>
-				<li><button type="button" class="plain w_100">Response Format</button></li>
-				<li><button type="button" class="plain w_100">Constraints</button></li>
-			</menu>
-		</div>
-		<div class="panel p_sm">
-			<h3 class="mt_0">actions</h3>
-			<menu class="unstyled">
-				<li><button type="button" class="plain w_100">Export Library</button></li>
-				<li><button type="button" class="plain w_100">Import Template</button></li>
-				<li><button type="button" class="plain w_100">Share</button></li>
-			</menu>
+			<div class="mb_sm">
+				<input type="search" placeholder="Search prompts and fragments..." class="w_100" />
+			</div>
+			<menu class="unstyled"> TODO </menu>
 		</div> -->
 	</div>
 </div>
@@ -196,5 +194,12 @@
 
 	textarea {
 		height: 200px;
+	}
+
+	.badge {
+		background: var(--bg_2);
+		padding: var(--space_xs3) var(--space_xs2);
+		border-radius: var(--radius_xs);
+		font-size: var(--size_sm);
 	}
 </style>
