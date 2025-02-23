@@ -44,6 +44,8 @@
 
 	const count = $derived(chat.tapes.length);
 
+	// TODO BLOCK prompts in a column on the right - custom buttons to do common things, compose them with a textarea with buttons like "fill all" or "fill with tag" or at least drag
+
 	// TODO BLOCK add `presets`  section to the top with the custom buttons/sets (accessible via contextmenu)
 
 	// TODO BLOCK maybe a mode that allows duplicates by holding a key like shift, but otherwise only setting up 1 tape per model?
