@@ -2,27 +2,39 @@
 
 [<img src="/static/logo.svg" alt="three sleepy z's" align="right" width="192" height="192">](https://www.zzzbot.dev/)
 
-> bot control web 💤
+> bot and web toolkit 💤 endgame web UI
 
 ⚠️ early pre-release
 
-**[www.zzzbot.dev](https://www.zzzbot.dev/)**
+**[zzzbot.dev](https://www.zzzbot.dev/)**
 
-Zzz (pronounced "zees" like the sound of electricity)
-is web a toolkit that builds on [SvelteKit](https://kit.svelte.dev/).
+Zzz, pronounced "zees" like the sound of electricity, is a bot and web toolkit with a focus on
+AI and user power. It's a digital tool that adapts to your needs on the fly, while remaining
+fully in your control and open source.
 
-It's still early. To help see the issues
-and [discussions](https://github.com/ryanatkn/zzz/discussions).
+This is a pre-alpha and the ideas are still developing.
+To help see the issues and [discussions](https://github.com/ryanatkn/zzz/discussions),
+or find me on [Bluesky](https://bsky.app/profile/ryanatkn.com).
 
-More at [www.zzzbot.dev](https://www.zzzbot.dev/).
+More at [zzzbot.dev/about](https://www.zzzbot.dev/about).
 
 ## Motivation
 
 1. control botz
 
-## Todo
+## Setup
 
-- <code>**name**.zzzbot.dev</code>
+- see [src/lib/server/.env.example](/src/lib/server/.env.example)
+  - add to `.env` or `.env.development` and `.env.production` -
+    `SECRET_ANTHROPIC_API_KEY`, `SECRET_OPENAI_API_KEY`, `SECRET_GOOGLE_API_KEY`
+
+In your terminal:
+
+```bash
+npm run dev
+```
+
+Browse to the location is says, probably `localhost:5173`.
 
 ## License 🐦
 
