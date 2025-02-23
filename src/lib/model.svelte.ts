@@ -47,6 +47,15 @@ export class Model {
 	training_cutoff: string | undefined = $state();
 	ollama_model_info: Ollama_Model_Info | undefined = $state();
 
+	// TODO problem is loading status - goal is to show the loading status of the model, we need to get syncing with the API figured out
+	/**
+	 * For models that run locally, this is a boolean indicating if the model is downloaded.
+	 * Is `undefined` for non-local models.
+	 */
+	downloaded: boolean | undefined = $derived(
+		this.provider_name === 'ollama' ? !!this.ollama_model_info : undefined,
+	);
+
 	constructor(options: Model_Options) {
 		const {zzz, json} = options;
 		this.zzz = zzz;

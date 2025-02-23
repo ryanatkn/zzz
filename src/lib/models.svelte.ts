@@ -17,25 +17,29 @@ export class Models {
 	}
 
 	add_ollama_models(model_infos: Array<Ollama_Model_Info>): void {
-		this.items = [
-			...model_infos.map((ollama_model_info) => {
-				const model_default = zzz_config.models.find(
-					(m) => m.name === ollama_model_info.model.name,
-				);
-				return new Model({
-					zzz: this.zzz,
-					json: model_default
-						? {...model_default, ollama_model_info}
-						: {
-								name: ollama_model_info.model.name,
-								provider_name: 'ollama',
-								tags: ollama_model_info.model.details.families,
-								ollama_model_info,
-							},
-				});
-			}),
-			...this.items,
-		];
+		// First add the models that are installed
+		const installed_ollama_models = model_infos.map((ollama_model_info) => {
+			const model_default = zzz_config.models.find((m) => m.name === ollama_model_info.model.name);
+			return new Model({
+				zzz: this.zzz,
+				json: model_default
+					? {...model_default, ollama_model_info}
+					: {
+							name: ollama_model_info.model.name,
+							provider_name: 'ollama',
+							tags: ollama_model_info.model.details.families, // TODO maybe not this?
+							ollama_model_info,
+						},
+			});
+		});
+		// Then add the models from the Zzz config that are not installed
+		const uninstalled_ollama_models = zzz_config.models
+			.filter(
+				(m) =>
+					m.provider_name === 'ollama' && !installed_ollama_models.find((m2) => m2.name === m.name),
+			)
+			.map((m) => new Model({zzz: this.zzz, json: m}));
+		this.items = [...installed_ollama_models, ...uninstalled_ollama_models, ...this.items];
 	}
 
 	find_by_name(name: string): Model | undefined {

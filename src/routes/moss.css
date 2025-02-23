@@ -9,6 +9,9 @@
 .bg_c_1 {
 	background-color: var(--color_c_1);
 }
+.bg_e_1 {
+	background-color: var(--color_e_1);
+}
 
 .box {
 	display: flex;
@@ -310,6 +313,10 @@ a.chip {
 .px_lg {
 	padding-left: var(--space_lg);
 	padding-right: var(--space_lg);
+}
+.px_sm {
+	padding-left: var(--space_sm);
+	padding-right: var(--space_sm);
 }
 .px_xs {
 	padding-left: var(--space_xs);

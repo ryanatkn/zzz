@@ -1,7 +1,6 @@
 <script lang="ts">
 	import {base} from '$app/paths';
 	import {page} from '$app/state';
-	import Alert from '@ryanatkn/fuz/Alert.svelte';
 
 	import {providers_default} from '$lib/config.js';
 	import Model_Link from '$lib/Model_Link.svelte';
@@ -93,7 +92,10 @@
 					>{JSON.stringify(model.ollama_model_info, null, '\t')}</code
 				></pre>
 		{:else}
-			<Alert status="error">no Ollama info</Alert>
+			<p>
+				<small class="bg_e_1 px_sm radius_xs">not downloaded</small>
+				<!-- TODO add a button to download it -->
+			</p>
 		{/if}
 	{/if}
 </div>

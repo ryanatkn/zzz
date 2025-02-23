@@ -24,17 +24,17 @@
 			>{GLYPH_PROVIDER} {model.provider_name}</Provider_Link
 		>
 	</div>
-	<!-- {#if model.provider_name === 'ollama'}
-		{#if !model.ollama_model_info}
-			TODO maybe show an error?
-		{/if}
-	{/if} -->
 	{#if model.tags.length}
 		<ul class="unstyled flex gap_xs">
 			{#each model.tags as tag (tag)}
 				<span class="chip size_sm font_weight_400">{tag}</span>
 			{/each}
 		</ul>
+	{/if}
+	{#if model.downloaded === false}
+		<div class="mb_lg">
+			<small class="bg_e_1 px_sm radius_xs">not downloaded</small>
+		</div>
 	{/if}
 	{#if model.context_window}
 		<div>
