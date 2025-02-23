@@ -42,7 +42,8 @@ export class Prompts {
 		this.selected.add_fragment();
 	}
 
-	update_fragment(fragment_id: Id, content: string): void {
+	// TODO should `update_fragment` even exist?
+	update_fragment_content(fragment_id: Id, content: string): void {
 		if (!this.selected) return;
 		this.selected.update_fragment(fragment_id, {content});
 	}

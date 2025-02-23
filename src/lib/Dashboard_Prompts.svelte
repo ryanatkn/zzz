@@ -11,6 +11,8 @@
 
 	const zzz = zzz_context.get();
 
+	let fragment_textareas = $state<Record<string, HTMLTextAreaElement>>({});
+
 	// TODO BLOCK save both fragments and prompts to the library, right?
 
 	// TODO BLOCK checkbox that toggles a `<File>` block around it, optionally fill input with path
@@ -98,15 +100,31 @@
 						</div>
 						<textarea
 							class="mb_xs"
+							bind:this={fragment_textareas[fragment.id]}
 							value={fragment.content}
-							oninput={(e) => zzz.prompts.update_fragment(fragment.id, e.currentTarget.value)}
+							oninput={(e) =>
+								zzz.prompts.update_fragment_content(fragment.id, e.currentTarget.value)}
 						></textarea>
-						<div class="flex gap_sm justify_content_space_between">
-							<Copy_To_Clipboard text={fragment.content} />
-							<!-- TODO what other buttons?
-							<button type="button" class="plain flex_1">Preview</button>
-							<button type="button" class="plain flex_1">Test</button>
-							<button type="button" class="plain flex_1">Variables</button> -->
+						<div class="flex gap_xs justify_content_space_between">
+							<div class="flex gap_xs">
+								<Copy_To_Clipboard text={fragment.content} classes="plain" />
+								<button
+									type="button"
+									class="plain"
+									onclick={async () => {
+										fragment.content += await navigator.clipboard.readText();
+										fragment_textareas[fragment.id].focus();
+									}}>paste</button
+								>
+								<button
+									type="button"
+									class="plain"
+									onclick={() => {
+										fragment.content = '';
+									}}>clear</button
+								>
+								<!-- TODO undo -->
+							</div>
 							<Confirm_Button
 								onclick={() => zzz.prompts.remove_fragment(fragment.id)}
 								button_attrs={{title: `remove fragment ${fragment.id}`}}
@@ -126,7 +144,7 @@
 					{zzz.prompts.selected.value}
 				</div>
 				<div class="mt_sm flex gap_sm">
-					<Copy_To_Clipboard text={zzz.prompts.selected.value} />
+					<Copy_To_Clipboard text={zzz.prompts.selected.value} classes="plain" />
 					<button type="button" class="plain flex_1">Test</button>
 					<button type="button" class="plain flex_1">Save as Template</button>
 				</div>
