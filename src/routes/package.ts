@@ -284,6 +284,10 @@ export const package_json = {
 			types: './dist/provider.svelte.d.ts',
 			default: './dist/provider.svelte.js',
 		},
+		'./providers.svelte.js': {
+			types: './dist/providers.svelte.d.ts',
+			default: './dist/providers.svelte.js',
+		},
 		'./server/.env.example': {default: './dist/server/.env.example'},
 		'./server/helpers.js': {
 			types: './dist/server/helpers.d.ts',
@@ -481,6 +485,10 @@ export const src_json = {
 				{name: 'Provider_Options', kind: 'type'},
 				{name: 'Provider', kind: 'class'},
 			],
+		},
+		'./providers.svelte.js': {
+			path: 'providers.svelte.ts',
+			declarations: [{name: 'Providers', kind: 'class'}],
 		},
 		'./server/.env.example': {path: 'server/.env.example', declarations: []},
 		'./server/helpers.js': {

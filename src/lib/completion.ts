@@ -46,6 +46,7 @@ export interface Completion {
 	completion_response: Completion_Response;
 }
 
+// TODO delete this, replace with a class that wraps everything (replacing `Chat_Message` probably)
 export const to_completion_response_text = (
 	completion_response: Completion_Response,
 ): string | null | undefined =>

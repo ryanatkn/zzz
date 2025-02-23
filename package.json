@@ -337,6 +337,10 @@
       "types": "./dist/provider.svelte.d.ts",
       "default": "./dist/provider.svelte.js"
     },
+    "./providers.svelte.js": {
+      "types": "./dist/providers.svelte.d.ts",
+      "default": "./dist/providers.svelte.js"
+    },
     "./server/.env.example": {
       "default": "./dist/server/.env.example"
     },
