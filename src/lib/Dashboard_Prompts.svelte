@@ -18,6 +18,8 @@
 	// TODO BLOCK save both fragments and prompts to the library, right?
 
 	// TODO BLOCK checkbox that toggles a `<File>` block around it, optionally fill input with path
+
+	// TODO BLOCK see the commented-out markup at the bottom of the file for more ideas
 </script>
 
 <div class="dashboard_prompts">
@@ -158,7 +160,7 @@
 				</div>
 			{/if}
 		</div>
-		<div class="panel p_sm">
+		<!-- <div class="panel p_sm">
 			<h3 class="mt_0">library</h3>
 			<menu class="unstyled">
 				<li><button type="button" class="plain w_100">System Context</button></li>
@@ -174,7 +176,7 @@
 				<li><button type="button" class="plain w_100">Import Template</button></li>
 				<li><button type="button" class="plain w_100">Share</button></li>
 			</menu>
-		</div>
+		</div> -->
 	</div>
 </div>
 
