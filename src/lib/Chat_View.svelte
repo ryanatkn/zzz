@@ -66,7 +66,7 @@
 </script>
 
 <div class="chat_view">
-	<div class="column gap_md">
+	<div class="width_sm column gap_md">
 		<div class="panel p_sm">
 			<header class="mt_0 mb_lg size_lg">{GLYPH_TAPE} tapes</header>
 			<p>TODO add buttons with sets</p>
@@ -158,7 +158,7 @@
 			{/each}
 		</div>
 	</div>
-	<div class="column gap_md">
+	<div class="width_sm column gap_md">
 		<div class="panel p_sm">
 			<header class="mt_0 mb_lg size_lg">{GLYPH_PROMPT} prompts</header>
 			<p>TODO custom prompt buttons</p>
