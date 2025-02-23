@@ -1,5 +1,3 @@
-import {create_client_id_creator} from '@ryanatkn/belt/id.js';
-
 import type {Model} from '$lib/model.svelte.js';
 import {
 	to_completion_response_text,
@@ -10,8 +8,7 @@ import {random_id, type Id} from '$lib/id.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 import type {Async_Status} from '@ryanatkn/belt/async.js';
 
-const new_chat_name_id = create_client_id_creator('new chat ', 1, '');
-const create_new_chat_name = (): string => new_chat_name_id();
+const NEW_CHAT_PREFIX = 'new chat';
 
 export interface Chat_Message {
 	id: Id;
@@ -28,15 +25,16 @@ export interface Tape {
 }
 
 export class Chat {
-	// TODO json pattern
+	// TODO json/serializable pattern
 	id: Id = random_id();
-	name: string = $state(create_new_chat_name());
+	name: string = $state()!;
 	created: string = new Date().toISOString();
 	tapes: Array<Tape> = $state([]);
 	zzz: Zzz;
 
 	constructor(zzz: Zzz) {
 		this.zzz = zzz;
+		this.name = this.get_unique_name(NEW_CHAT_PREFIX);
 	}
 
 	add_tape(model: Model): void {
@@ -138,10 +136,19 @@ export class Chat {
 				return;
 			}
 			this.init_name_status = 'success';
-			this.name = response_text; // TODO handle duplicates
+			this.name = this.get_unique_name(response_text); // TODO handle duplicates
 		} catch (err) {
 			this.init_name_status = 'initial'; // ignore failures, will retry
 			console.error('failed to infer a name for a chat', err);
 		}
+	}
+
+	get_unique_name(text: string): string {
+		let name = text;
+		let i = 2;
+		while (this.zzz.chats.items.find((c) => c.name === name)) {
+			name = `${text} ${i++}`;
+		}
+		return name;
 	}
 }

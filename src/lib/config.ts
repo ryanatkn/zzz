@@ -266,6 +266,9 @@ const config: Zzz_Config_Creator = async () => {
 		providers: providers_default,
 		models,
 		system_message: SYSTEM_MESSAGE_DEFAULT,
+		bots: {
+			namerbot: 'llama3.2:1b',
+		},
 	};
 };
 

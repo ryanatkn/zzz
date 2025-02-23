@@ -8,6 +8,7 @@
 	import Chat_Tape from '$lib/Chat_Tape.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import {GLYPH_TAPE} from '$lib/constants.js';
+	import {zzz_config} from '$lib/zzz_config.js';
 
 	const zzz = zzz_context.get();
 
@@ -18,7 +19,12 @@
 	const {chat}: Props = $props();
 
 	// TODO BLOCK this needs to be persisted state
-	chat.add_tape(zzz.models.items.find((m) => m.name === 'llama3.2:1b')!);
+	const initial_model = zzz.models.items.find((m) => m.name === zzz_config.bots.namerbot);
+	if (initial_model) {
+		chat.add_tape(initial_model);
+	} else {
+		console.error(`model not found: ${zzz_config.bots.namerbot}`);
+	}
 	let main_input = $state(''); // TODO BLOCK @many this state probably belongs on the `multichat` object
 	let pending = $state(false); // TODO BLOCK @many this state probably belongs on the `multichat` object
 	let input_el: HTMLTextAreaElement | undefined;
@@ -32,7 +38,7 @@
 		}
 		pending = true;
 		const r = await ollama.chat({
-			model: 'llama3.2:1b',
+			model: zzz_config.bots.namerbot,
 			messages: [{role: 'user', content: parsed}],
 			options: {temperature: 1}, // TODO BLOCK same options as server (proxy through our endpoint? we still want to be able to separate the Ollama and server endpoints though, not forced through our proxy)
 		});
