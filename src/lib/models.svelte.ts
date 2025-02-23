@@ -8,6 +8,8 @@ export class Models {
 
 	items: Array<Model> = $state([]);
 
+	items_by_name: Map<string, Model> = $derived(new Map(this.items.map((m) => [m.name, m])));
+
 	constructor(zzz: Zzz) {
 		this.zzz = zzz;
 	}
@@ -43,7 +45,19 @@ export class Models {
 	}
 
 	find_by_name(name: string): Model | undefined {
-		return this.items.find((m) => m.name === name);
+		return this.items_by_name.get(name);
+	}
+
+	// TODO maybe cache this in a derived?
+	filter_by_names(names: Array<string>): Array<Model> | undefined {
+		let found: Array<Model> | undefined;
+		for (const name of names) {
+			const model = this.items_by_name.get(name);
+			if (model) {
+				(found ??= []).push(model);
+			}
+		}
+		return found;
 	}
 
 	find_by_tag(tag: string): Array<Model> {
