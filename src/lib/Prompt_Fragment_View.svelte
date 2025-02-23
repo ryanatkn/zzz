@@ -39,6 +39,7 @@
 			<button
 				type="button"
 				class="plain"
+				disabled={!fragment.content}
 				onclick={() => {
 					fragment.content = '';
 				}}>clear</button
