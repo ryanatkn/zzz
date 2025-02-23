@@ -16,8 +16,6 @@
 	const fragment_textareas = $state<Record<string, HTMLTextAreaElement>>({});
 
 	// TODO BLOCK save both fragments and prompts to the library, right?
-
-	// TODO BLOCK use the belt helpers to print numbers for tokens/chars
 </script>
 
 <div class="flex align_items_start gap_md p_sm">
