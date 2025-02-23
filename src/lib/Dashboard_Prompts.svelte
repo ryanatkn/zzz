@@ -16,8 +16,6 @@
 
 	// TODO BLOCK save both fragments and prompts to the library, right?
 
-	// TODO BLOCK checkbox that toggles a `<File>` block around it, optionally fill input with path
-
 	// TODO BLOCK use the belt helpers to print numbers for tokens/chars
 </script>
 
