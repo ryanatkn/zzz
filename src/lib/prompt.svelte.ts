@@ -24,17 +24,7 @@ export class Prompt {
 	fragments: Array<Prompt_Fragment> = $state([]);
 	zzz: Zzz;
 
-	value: string = $derived(
-		this.fragments
-			.map((f) => {
-				const content = f.content.trim();
-				if (!content) return '';
-				if (!f.is_file) return content;
-				return `<File${f.file_path ? ` path="${f.file_path}"` : ''}>\n${content}\n</File>`;
-			})
-			.filter((c) => !!c)
-			.join('\n\n'),
-	);
+	value: string = $derived(join_prompt_fragments(this.fragments));
 
 	constructor(zzz: Zzz) {
 		this.zzz = zzz;
@@ -80,3 +70,14 @@ export class Prompt {
 		this.fragments = [];
 	}
 }
+
+export const join_prompt_fragments = (fragments: Array<Prompt_Fragment>): string =>
+	fragments
+		.map((f) => {
+			const content = f.content.trim();
+			if (!content) return '';
+			if (!f.is_file) return content;
+			return `<File${f.file_path ? ` path="${f.file_path}"` : ''}>\n${content}\n</File>`;
+		})
+		.filter((c) => !!c)
+		.join('\n\n');

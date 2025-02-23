@@ -11,7 +11,7 @@
 </script>
 
 <div class="flex gap_md align_items_center">
-	<label class="row mb_0">
+	<label class="row mb_0" style:height="var(--input_height)">
 		<input
 			type="checkbox"
 			checked={fragment.is_file}
@@ -23,7 +23,7 @@
 		<input
 			type="text"
 			class="flex_1"
-			placeholder="file path"
+			placeholder="/path/to/file"
 			value={fragment.file_path}
 			oninput={(e) => prompts.update_fragment(fragment.id, {file_path: e.currentTarget.value})}
 		/>
