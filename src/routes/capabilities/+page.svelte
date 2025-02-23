@@ -23,8 +23,8 @@
 	<section class="width_md">
 		<h2>Todo</h2>
 		<aside>
-			⚠️ This is unfinished. The plan is to show what capabilities are available to the system. Zzz
-			can run in many contexts, and users are limited by what capabilities are available in each.
+			⚠️ This is unfinished. It will show the capabilities available to the system. Zzz can run in
+			many contexts, and users are empowered by the capabilities available in each.
 		</aside>
 		<ul>
 			<li>utility models (like the first one for `Chat.init_name`)</li>
