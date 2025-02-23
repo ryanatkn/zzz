@@ -6,20 +6,16 @@
 
 ⚠️ early pre-release
 
-**[www.zzzbot.dev](https://www.zzzbot.dev/)**
+**[zzzbot.dev](https://www.zzzbot.dev/)**
 
-Zzz (pronounced "zees" like the sound of electricity)
-is an open source web UI and toolkit
-that builds on [SvelteKit](https://kit.svelte.dev/) and [Vite](https://vite.dev/).
+Zzz, pronounced "zees" like the sound of electricity,
+is an open source web UI and toolkit with a focus on AI and user power.
 
-It's designed for plugins,
-and it comes with batteries included for AI and local-first personal data/file management.
-
-This is a pre-alpha - there's a lot to figure out and nothing is documented yet.
+This is a pre-alpha and the ideas are still developing.
 To help see the issues and [discussions](https://github.com/ryanatkn/zzz/discussions),
 or find me on [Bluesky](https://bsky.app/profile/ryanatkn.com).
 
-[www.zzzbot.dev](https://www.zzzbot.dev/).
+More at [zzzbot.dev/about](https://www.zzzbot.dev/about).
 
 ## Features
 
@@ -37,8 +33,9 @@ or find me on [Bluesky](https://bsky.app/profile/ryanatkn.com).
 
 ## Setup
 
-- add to `.env.development` and `.env.production` -
-  `SECRET_ANTHROPIC_API_KEY`, `SECRET_OPENAI_API_KEY`, `SECRET_GOOGLE_API_KEY`
+- see [src/lib/server/.env.example](/src/lib/server/.env.example)
+  - add to `.env` or `.env.development` and `.env.production` -
+    `SECRET_ANTHROPIC_API_KEY`, `SECRET_OPENAI_API_KEY`, `SECRET_GOOGLE_API_KEY`
 
 In your terminal:
 
