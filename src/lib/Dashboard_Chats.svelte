@@ -5,6 +5,7 @@
 	import Chat_View from '$lib/Chat_View.svelte';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Nav_Link from '$lib/Nav_Link.svelte';
+	import Text_Icon from '$lib/Text_Icon.svelte';
 	import {GLYPH_CHAT} from '$lib/constants.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 
@@ -19,7 +20,10 @@
 			<div class="p_sm fg_1 radius_xs2" transition:slide>
 				<div class="column">
 					<!-- TODO needs work -->
-					<div class="size_lg">{zzz.chats.selected.name}</div>
+					<div class="size_lg">
+						<Text_Icon icon={GLYPH_CHAT} />
+						{zzz.chats.selected.name}
+					</div>
 					<small>{zzz.chats.selected.id}</small>
 					<small>
 						{zzz.chats.selected.tapes.length}

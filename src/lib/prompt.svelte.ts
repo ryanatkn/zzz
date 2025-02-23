@@ -12,19 +12,21 @@ export class Prompt {
 	readonly id: Id = random_id();
 	name: string = $state('new prompt'); // TODO BLOCK use the same pattern as Chat to get unique names
 	created: string = new Date().toISOString();
-	fragments: Array<{id: Id; name: string; content: string}> = $state([]);
+	fragments: Array<{id: Id; name: string; content: string}> = $state([]); // TODO should this be a `Fragments` class?
 	zzz: Zzz;
 
-  value: string = $derived(this.fragments
-    .map(f => f.content)
-    .filter(c => c.trim().length > 0)
-    .join('\n\n'))
+	value: string = $derived(
+		this.fragments
+			.map((f) => f.content)
+			.filter((c) => c.trim().length > 0)
+			.join('\n\n'),
+	);
 
 	constructor(zzz: Zzz) {
 		this.zzz = zzz;
 	}
 
-	add_fragment(name: string = 'new fragment', content: string = ''): void {
+	add_fragment(content: string = '', name: string = 'new fragment'): void {
 		this.fragments.push({
 			id: random_id(),
 			name,
@@ -40,11 +42,12 @@ export class Prompt {
 		}
 	}
 
-	remove_fragment(id: Id): void {
+	remove_fragment(id: Id): boolean {
 		const index = this.fragments.findIndex((f) => f.id === id);
 		if (index !== -1) {
 			this.fragments.splice(index, 1);
+			return true;
 		}
+		return false;
 	}
- 
 }

@@ -112,7 +112,10 @@
 			await zzz.init_models();
 			// TODO init properly
 			zzz.chats.add();
-			zzz.prompts.add();
+			const prompt = zzz.prompts.add();
+			prompt.add_fragment('one');
+			prompt.add_fragment('2');
+			prompt.add_fragment('c');
 		});
 	}
 

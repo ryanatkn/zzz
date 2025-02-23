@@ -13,10 +13,11 @@ export class Prompts {
 		this.zzz = zzz;
 	}
 
-	add(): void {
+	add(): Prompt {
 		const prompt = new Prompt(this.zzz);
 		this.items.unshift(prompt);
 		this.selected_id = prompt.id;
+		return prompt;
 	}
 
 	remove(prompt: Prompt): void {

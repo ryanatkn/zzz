@@ -1,14 +1,17 @@
 <script lang="ts">
-	import {slide} from 'svelte/transition';
+	import {slide, scale} from 'svelte/transition';
 	import {format} from 'date-fns';
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
 
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Nav_Link from '$lib/Nav_Link.svelte';
+	import Text_Icon from '$lib/Text_Icon.svelte';
 	import {GLYPH_PROMPT} from '$lib/constants.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 
 	const zzz = zzz_context.get();
+
+	// TODO BLOCK save both fragments and prompts to the library, right?
 
 	// TODO BLOCK checkbox that toggles a `<File>` block around it, optionally fill input with path
 </script>
@@ -18,7 +21,10 @@
 		{#if zzz.prompts.selected}
 			<div class="p_sm fg_1 radius_xs2" transition:slide>
 				<div class="column">
-					<div class="size_lg">{zzz.prompts.selected.name}</div>
+					<div class="size_lg">
+						<Text_Icon icon={GLYPH_PROMPT} />
+						{zzz.prompts.selected.name}
+					</div>
 					<small>{zzz.prompts.selected.id}</small>
 					<small>
 						{zzz.prompts.selected.fragments.length}
@@ -73,24 +79,25 @@
 		<div class="fragments">
 			{#if zzz.prompts.selected}
 				{#each zzz.prompts.selected.fragments as fragment (fragment.id)}
-					<div class="panel p_sm">
+					<div class="panel p_sm" transition:scale>
 						<div class="flex justify_content_space_between mb_sm">
 							<h3 class="m_0">{fragment.name}</h3>
+						</div>
+						<textarea
+							class="mb_xs"
+							value={fragment.content}
+							oninput={(e) => zzz.prompts.update_fragment(fragment.id, e.currentTarget.value)}
+						></textarea>
+						<div class="flex gap_sm justify_content_space_between">
+							<Copy_To_Clipboard text={fragment.content} />
+							<!-- TODO what other buttons?
+							<button type="button" class="plain flex_1">Preview</button>
+							<button type="button" class="plain flex_1">Test</button>
+							<button type="button" class="plain flex_1">Variables</button> -->
 							<Confirm_Button
 								onclick={() => zzz.prompts.remove_fragment(fragment.id)}
 								button_attrs={{title: `remove fragment ${fragment.id}`}}
 							/>
-						</div>
-						<textarea
-							class="mb_xs"
-							rows="4"
-							value={fragment.content}
-							oninput={(e) => zzz.prompts.update_fragment(fragment.id, e.currentTarget.value)}
-						></textarea>
-						<div class="flex gap_sm">
-							<button type="button" class="plain flex_1">Preview</button>
-							<button type="button" class="plain flex_1">Test</button>
-							<button type="button" class="plain flex_1">Variables</button>
 						</div>
 					</div>
 				{/each}
@@ -152,16 +159,22 @@
 		gap: var(--space_md);
 		padding: var(--space_sm);
 	}
+
 	.fragments {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 		gap: var(--space_md);
 	}
+
 	.preview {
 		white-space: pre-wrap;
 		border: var(--border_width_sm) solid var(--border_color);
 		border-radius: var(--radius_xs);
 		background: var(--bg_panel_overlay);
 		min-height: 100px;
+	}
+
+	textarea {
+		height: 80px;
 	}
 </style>
