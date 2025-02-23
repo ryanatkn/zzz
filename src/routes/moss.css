@@ -3,6 +3,9 @@
 .absolute {
 	position: absolute;
 }
+.align_items_start {
+	align-items: start;
+}
 .bg {
 	background-color: var(--bg);
 }
@@ -101,6 +104,9 @@ a.chip {
 }
 .gap_xs {
 	gap: var(--space_xs);
+}
+.grid {
+	display: grid;
 }
 .h_100 {
 	height: 100%;

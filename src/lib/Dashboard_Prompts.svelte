@@ -20,7 +20,7 @@
 	// TODO BLOCK checkbox that toggles a `<File>` block around it, optionally fill input with path
 </script>
 
-<div class="dashboard_prompts">
+<div class="flex align_items_start gap_md p_sm">
 	<div class="panel p_sm width_sm">
 		{#if zzz.prompts.selected}
 			<div class="p_sm fg_1 radius_xs2" transition:slide>
@@ -100,13 +100,17 @@
 					🗙 remove all fragments
 				</Confirm_Button>
 			</div>
-			<div class="fragments">
+			<div
+				class="grid gap_md"
+				style:grid-template-columns="repeat(auto-fill, minmax(var(--width_sm), 1fr))"
+			>
 				{#each zzz.prompts.selected.fragments as fragment (fragment.id)}
 					<div class="panel p_sm" transition:scale>
 						<div class="flex justify_content_space_between mb_sm">
 							<h3 class="m_0">{fragment.name}</h3>
 						</div>
 						<textarea
+							style:height="200px"
 							class="mb_xs"
 							bind:this={fragment_textareas[fragment.id]}
 							value={fragment.content}
@@ -146,24 +150,25 @@
 
 	<div class="width_sm column gap_md">
 		<div class="panel p_sm">
-			<h3 class="mt_0">prompt</h3>
+			<div class="size_lg"><Text_Icon icon={GLYPH_PROMPT} /> final prompt</div>
 			{#if zzz.prompts.selected}
-				<div class="flex gap_sm mb_sm">
-					<span class="badge"
+				<div class="row gap_sm mb_sm">
+					<Copy_To_Clipboard text={zzz.prompts.selected.value} classes="plain" />
+					<span
 						>{zzz.prompts.selected.fragments.reduce((acc, f) => acc + f.content.length, 0)} chars</span
 					>
-					<span class="badge">~{Math.round(zzz.prompts.selected.value.length / 4)} tokens</span>
+					<span>~{Math.round(zzz.prompts.selected.value.length / 4)} tokens</span>
 				</div>
 				<pre class="panel p_xs overflow_auto" style:height="300px" style:max-height="300px">
 					{zzz.prompts.selected.value}
 				</pre>
-				<div class="mt_sm flex gap_sm justify_content_space_between">
-					<Copy_To_Clipboard text={zzz.prompts.selected.value} classes="plain" />
+				<!-- TODO something like these? -->
+				<!-- <div class="mt_sm flex gap_sm justify_content_space_between">
 					<div class="flex gap_sm">
 						<button type="button" class="plain">save to library</button>
 						<button type="button" class="plain">export</button>
 					</div>
-				</div>
+				</div> -->
 			{/if}
 		</div>
 
@@ -177,29 +182,3 @@
 		</div> -->
 	</div>
 </div>
-
-<style>
-	.dashboard_prompts {
-		display: flex;
-		align-items: start;
-		gap: var(--space_md);
-		padding: var(--space_sm);
-	}
-
-	.fragments {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-		gap: var(--space_md);
-	}
-
-	textarea {
-		height: 200px;
-	}
-
-	.badge {
-		background: var(--bg_2);
-		padding: var(--space_xs3) var(--space_xs2);
-		border-radius: var(--radius_xs);
-		font-size: var(--size_sm);
-	}
-</style>
