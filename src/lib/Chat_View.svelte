@@ -7,7 +7,7 @@
 	import Model_Selector from '$lib/Model_Selector.svelte';
 	import Chat_Tape from '$lib/Chat_Tape.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
-	import {GLYPH_TAPE} from '$lib/constants.js';
+	import {GLYPH_TAPE, GLYPH_PROMPT} from '$lib/constants.js';
 	import {zzz_config} from '$lib/zzz_config.js';
 
 	const zzz = zzz_context.get();
@@ -156,6 +156,12 @@
 					onsend={(input: string) => chat.send_to_tape(tape.id, input)}
 				/>
 			{/each}
+		</div>
+	</div>
+	<div class="column gap_md">
+		<div class="panel p_sm">
+			<header class="mt_0 mb_lg size_lg">{GLYPH_PROMPT} prompts</header>
+			<p>TODO custom prompt buttons</p>
 		</div>
 	</div>
 </div>

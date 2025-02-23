@@ -6,11 +6,11 @@
 
 	import Nav_Link from '$lib/Nav_Link.svelte';
 	import {
-		GLYPH_CAPABILITIES,
+		GLYPH_CAPABILITY,
 		GLYPH_CHAT,
 		GLYPH_FILE,
 		GLYPH_MODEL,
-		GLYPH_PROMPTS,
+		GLYPH_PROMPT,
 		GLYPH_PROVIDER,
 		GLYPH_SETTINGS,
 	} from '$lib/constants.js';
@@ -52,7 +52,7 @@
 				<!-- Content -->
 				<Nav_Link href="{base}/chats"><span class="icon_xs">{GLYPH_CHAT}</span> chats</Nav_Link>
 				<Nav_Link href="{base}/prompts"
-					><span class="icon_xs">{GLYPH_PROMPTS}</span> prompts</Nav_Link
+					><span class="icon_xs">{GLYPH_PROMPT}</span> prompts</Nav_Link
 				>
 				<Nav_Link href="{base}/files"><span class="icon_xs">{GLYPH_FILE}</span> files</Nav_Link>
 
@@ -89,7 +89,7 @@
 						> about{/snippet}</Nav_Link
 				>
 				<Nav_Link href="{base}/capabilities"
-					><span class="icon_xs">{GLYPH_CAPABILITIES}</span> capabilities</Nav_Link
+					><span class="icon_xs">{GLYPH_CAPABILITY}</span> capabilities</Nav_Link
 				>
 				<!-- TODO more - terminal, database, account -->
 				<Nav_Link href="{base}/settings"

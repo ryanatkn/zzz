@@ -1,5 +1,5 @@
 <script lang="ts">
-	import {GLYPH_PROMPTS} from '$lib/constants.js';
+	import {GLYPH_PROMPT} from '$lib/constants.js';
 	import Text_Icon from '$lib/Text_Icon.svelte';
 
 	// TODO implement
@@ -7,7 +7,7 @@
 
 <div class="width_md p_lg">
 	<header>
-		<h1><Text_Icon icon={GLYPH_PROMPTS} /> prompts</h1>
+		<h1><Text_Icon icon={GLYPH_PROMPT} /> prompts</h1>
 	</header>
 	<section class="p_md">
 		<aside>⚠️ under contruction</aside>
