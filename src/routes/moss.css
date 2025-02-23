@@ -428,6 +428,11 @@ a.chip {
 	max-width: var(--width_sm);
 }
 
+.width_xl {
+	width: 100%;
+	max-width: var(--width_xl);
+}
+
 .word_break_break_all {
 	word-break: break-all;
 }

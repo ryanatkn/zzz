@@ -53,7 +53,7 @@
 		style:min-width="var(--width_sm)">{file.contents}</pre>
 </div>
 
-<section class="flex justify_content_space_between">
+<section class="flex justify_content_space_between width_xl">
 	<button
 		class="color_a"
 		type="button"
