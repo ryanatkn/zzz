@@ -43,7 +43,7 @@
 					fragment.content = '';
 				}}>clear</button
 			>
-			<!-- TODO undo -->
+			<!-- TODO restore -->
 		</div>
 		<Confirm_Button
 			onclick={() => prompts.remove_fragment(fragment.id)}

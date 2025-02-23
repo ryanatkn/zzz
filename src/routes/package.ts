@@ -496,6 +496,7 @@ export const src_json = {
 				{name: 'Prompt_Message', kind: 'type'},
 				{name: 'Prompt_Message_Content', kind: 'type'},
 				{name: 'Prompt', kind: 'class'},
+				{name: 'join_prompt_fragments', kind: 'function'},
 			],
 		},
 		'./prompts.svelte.js': {
