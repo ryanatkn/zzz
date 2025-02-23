@@ -264,10 +264,20 @@ export const package_json = {
 			svelte: './dist/Prompt_Fragment_File_Controls.svelte',
 			default: './dist/Prompt_Fragment_File_Controls.svelte',
 		},
+		'./Prompt_Fragment_Stats.svelte': {
+			types: './dist/Prompt_Fragment_Stats.svelte.d.ts',
+			svelte: './dist/Prompt_Fragment_Stats.svelte',
+			default: './dist/Prompt_Fragment_Stats.svelte',
+		},
 		'./Prompt_Fragment_View.svelte': {
 			types: './dist/Prompt_Fragment_View.svelte.d.ts',
 			svelte: './dist/Prompt_Fragment_View.svelte',
 			default: './dist/Prompt_Fragment_View.svelte',
+		},
+		'./Prompt_Stats.svelte': {
+			types: './dist/Prompt_Stats.svelte.d.ts',
+			svelte: './dist/Prompt_Stats.svelte',
+			default: './dist/Prompt_Stats.svelte',
 		},
 		'./prompt.svelte.js': {types: './dist/prompt.svelte.d.ts', default: './dist/prompt.svelte.js'},
 		'./prompts.svelte.js': {
@@ -494,10 +504,13 @@ export const src_json = {
 			path: 'Prompt_Fragment_File_Controls.svelte',
 			declarations: [],
 		},
+		'./Prompt_Fragment_Stats.svelte': {path: 'Prompt_Fragment_Stats.svelte', declarations: []},
 		'./Prompt_Fragment_View.svelte': {path: 'Prompt_Fragment_View.svelte', declarations: []},
+		'./Prompt_Stats.svelte': {path: 'Prompt_Stats.svelte', declarations: []},
 		'./prompt.svelte.js': {
 			path: 'prompt.svelte.ts',
 			declarations: [
+				{name: 'count_tokens', kind: 'function'},
 				{name: 'Prompt_Fragment', kind: 'type'},
 				{name: 'Prompt_Message', kind: 'type'},
 				{name: 'Prompt_Message_Content', kind: 'type'},

@@ -314,10 +314,20 @@
       "svelte": "./dist/Prompt_Fragment_File_Controls.svelte",
       "default": "./dist/Prompt_Fragment_File_Controls.svelte"
     },
+    "./Prompt_Fragment_Stats.svelte": {
+      "types": "./dist/Prompt_Fragment_Stats.svelte.d.ts",
+      "svelte": "./dist/Prompt_Fragment_Stats.svelte",
+      "default": "./dist/Prompt_Fragment_Stats.svelte"
+    },
     "./Prompt_Fragment_View.svelte": {
       "types": "./dist/Prompt_Fragment_View.svelte.d.ts",
       "svelte": "./dist/Prompt_Fragment_View.svelte",
       "default": "./dist/Prompt_Fragment_View.svelte"
+    },
+    "./Prompt_Stats.svelte": {
+      "types": "./dist/Prompt_Stats.svelte.d.ts",
+      "svelte": "./dist/Prompt_Stats.svelte",
+      "default": "./dist/Prompt_Stats.svelte"
     },
     "./prompt.svelte.js": {
       "types": "./dist/prompt.svelte.d.ts",
