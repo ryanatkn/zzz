@@ -11,7 +11,7 @@
 
 	const zzz = zzz_context.get();
 
-	let fragment_textareas = $state<Record<string, HTMLTextAreaElement>>({});
+	const fragment_textareas = $state<Record<string, HTMLTextAreaElement>>({});
 
 	// TODO BLOCK save both fragments and prompts to the library, right?
 
@@ -86,13 +86,19 @@
 	</div>
 
 	<div class="panel p_sm flex_1">
-		<div class="flex justify_content_space_between mb_lg">
-			<button type="button" class="plain" onclick={() => zzz.prompts.add_fragment()}>
-				+ add fragment
-			</button>
-		</div>
-		<div class="fragments">
-			{#if zzz.prompts.selected}
+		{#if zzz.prompts.selected}
+			<div class="flex justify_content_space_between mb_lg">
+				<button type="button" class="plain" onclick={() => zzz.prompts.add_fragment()}>
+					+ add fragment
+				</button>
+				<Confirm_Button
+					onclick={() => zzz.prompts.selected?.remove_all_fragments()}
+					button_attrs={{disabled: !zzz.prompts.selected.fragments.length, class: 'plain'}}
+				>
+					🗙 remove all fragments
+				</Confirm_Button>
+			</div>
+			<div class="fragments">
 				{#each zzz.prompts.selected.fragments as fragment (fragment.id)}
 					<div class="panel p_sm" transition:scale>
 						<div class="flex justify_content_space_between mb_sm">
@@ -132,8 +138,8 @@
 						</div>
 					</div>
 				{/each}
-			{/if}
-		</div>
+			</div>
+		{/if}
 	</div>
 
 	<div class="width_sm column gap_md">

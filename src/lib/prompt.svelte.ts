@@ -59,4 +59,8 @@ export class Prompt {
 		}
 		return false;
 	}
+
+	remove_all_fragments(): void {
+		this.fragments = [];
+	}
 }
