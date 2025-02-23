@@ -18,6 +18,8 @@
 	// TODO BLOCK save both fragments and prompts to the library, right?
 
 	// TODO BLOCK checkbox that toggles a `<File>` block around it, optionally fill input with path
+
+	// TODO BLOCK use the belt helpers to print numbers for tokens/chars
 </script>
 
 <div class="flex align_items_start gap_md p_sm">
@@ -152,7 +154,7 @@
 		<div class="panel p_sm">
 			<div class="size_lg"><Text_Icon icon={GLYPH_PROMPT} /> final prompt</div>
 			{#if zzz.prompts.selected}
-				<div class="row gap_sm mb_sm">
+				<div class="row gap_sm mt_md mb_sm">
 					<Copy_To_Clipboard text={zzz.prompts.selected.value} classes="plain" />
 					<span
 						>{zzz.prompts.selected.fragments.reduce((acc, f) => acc + f.content.length, 0)} chars</span

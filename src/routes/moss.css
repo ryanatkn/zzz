@@ -241,6 +241,9 @@ a.chip {
 .mt_0 {
 	margin-top: 0;
 }
+.mt_md {
+	margin-top: var(--space_md);
+}
 .mt_sm {
 	margin-top: var(--space_sm);
 }
