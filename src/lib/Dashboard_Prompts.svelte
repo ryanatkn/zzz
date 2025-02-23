@@ -2,6 +2,7 @@
 	import {slide, scale} from 'svelte/transition';
 	import {format} from 'date-fns';
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
+	import {print_number_with_separators} from '@ryanatkn/belt/print.js';
 
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Nav_Link from '$lib/Nav_Link.svelte';
@@ -130,9 +131,17 @@
 				<div class="row gap_sm mt_md mb_sm">
 					<Copy_To_Clipboard text={zzz.prompts.selected.value} classes="plain" />
 					<span
-						>{zzz.prompts.selected.fragments.reduce((acc, f) => acc + f.content.length, 0)} chars</span
+						>{print_number_with_separators(
+							zzz.prompts.selected.fragments.reduce((v, f) => v + f.content.length, 0) + '',
+							',',
+						)} chars</span
 					>
-					<span>~{Math.round(zzz.prompts.selected.value.length / 4)} tokens</span>
+					<span
+						>~{print_number_with_separators(
+							Math.round(zzz.prompts.selected.value.length / 4) + '',
+							',',
+						)} tokens</span
+					>
 				</div>
 				<pre class="panel p_xs overflow_auto" style:height="300px" style:max-height="300px">{zzz
 						.prompts.selected.value}</pre>
