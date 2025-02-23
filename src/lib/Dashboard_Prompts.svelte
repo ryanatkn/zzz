@@ -13,6 +13,8 @@
 
 	const fragment_textareas = $state<Record<string, HTMLTextAreaElement>>({});
 
+	// TODO BLOCK show the character count (maybe grapheme count?) and token count (which tokenizer(s)?)
+
 	// TODO BLOCK save both fragments and prompts to the library, right?
 
 	// TODO BLOCK checkbox that toggles a `<File>` block around it, optionally fill input with path
@@ -111,8 +113,8 @@
 							oninput={(e) =>
 								zzz.prompts.update_fragment_content(fragment.id, e.currentTarget.value)}
 						></textarea>
-						<div class="flex gap_xs justify_content_space_between">
-							<div class="flex gap_xs">
+						<div class="flex justify_content_space_between">
+							<div class="flex">
 								<Copy_To_Clipboard text={fragment.content} classes="plain" />
 								<button
 									type="button"
@@ -144,15 +146,15 @@
 
 	<div class="width_sm column gap_md">
 		<div class="panel p_sm">
-			<h3 class="mt_0">preview</h3>
+			<h3 class="mt_0">prompt</h3>
 			{#if zzz.prompts.selected}
-				<div class="preview font_mono p_xs ellipsis">
-					{zzz.prompts.selected.value}
-				</div>
-				<div class="mt_sm flex gap_sm">
+				<!-- TODO 300px var -->
+				<pre class="panel p_xs overflow_auto" style:height="300px" style:max-height="300px">{zzz
+						.prompts.selected.value}</pre>
+				<div class="mt_sm flex gap_sm justify_content_space_between">
 					<Copy_To_Clipboard text={zzz.prompts.selected.value} classes="plain" />
-					<button type="button" class="plain flex_1">Test</button>
-					<button type="button" class="plain flex_1">Save as Template</button>
+					<!-- TODO maybe something like this? -->
+					<button type="button" class="plain">save to library</button>
 				</div>
 			{/if}
 		</div>
@@ -190,15 +192,7 @@
 		gap: var(--space_md);
 	}
 
-	.preview {
-		white-space: pre-wrap;
-		border: var(--border_width_sm) solid var(--border_color);
-		border-radius: var(--radius_xs);
-		background: var(--bg_panel_overlay);
-		min-height: 100px;
-	}
-
 	textarea {
-		height: 80px;
+		height: 200px;
 	}
 </style>
