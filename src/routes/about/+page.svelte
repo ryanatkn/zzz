@@ -26,31 +26,57 @@
 			</h1>
 		</header>
 		<p>
-			Zzz, pronounced "zees" like the sound of electricity, is a bot and web toolkit. It's one
-			example of what I call an "endgame web UI", a digital tool that adapts to your needs on the
-			fly, while remaining fully in your control and always open.
+			Zzz, pronounced "zees" like the sound of electricity, is a bot and web toolkit with a focus on
+			AI and user power. It's a digital tool that adapts to your needs on the fly, while remaining
+			fully in your control and open source.
 		</p>
 		<p>The main ideas include:</p>
 		<ul>
-			<li>open source</li>
-			<li>fully controlled by the user</li>
-			<li>optimize for UX first</li>
-			<li>client is the nexus of many services</li>
-			<li>local-first, pluggable cloud</li>
-			<li>designed for extensibility</li>
-			<li>customizable and programmable</li>
-			<li>leverages the web dev ecosystem for TypeScript and Svelte</li>
-			<li>encourages normal dev patterns, unintrusive to your preferred workflows</li>
+			<li>optimize for user agency and power</li>
+			<li>care about UX for both power users and novices</li>
+			<li>open source, permissive license, noncommercial project</li>
 			<li>
-				progressively enhanced with capabilities like a local or remote web server and local model
-				providers like Ollama
+				local-first architecture with user-owned data, offline functionality, and optional cloud
+				sync
+			</li>
+			<li>interoperable design using standard protocols, open APIs, and common data formats</li>
+			<li>
+				extensive plugin APIs, scripting capabilities, and documented internals for deep
+				extensibility
+			</li>
+			<li>
+				building blocks that you can configure and combine to create new tools that solve your
+				unique problems, and share them with others
+			</li>
+			<li>
+				adaptable interfaces that evolve with user needs through customization, context awareness,
+				and AI assistance
 			</li>
 		</ul>
-		<p>
-			I think there will be many tools like this in the future. Perhaps every person will use at
-			least one, whether they know it or not? Or maybe it's just a weird web app. In any case, it's
-			one developer's take on a web UI that hopes to evolve forwards with the ecosystem.
-		</p>
+		<p>Features:</p>
+		<ul>
+			<li>
+				integrations (everything's a work in progress, but some basics should be working)
+				<ul>
+					<li><a href="https://github.com/ollama/ollama">Ollama</a></li>
+					<li><a href="https://github.com/openai/openai-node">ChatGPT</a></li>
+					<li><a href="https://github.com/anthropics/anthropic-sdk-typescript">Claude</a></li>
+					<li><a href="https://github.com/google-gemini/generative-ai-js">Gemini</a></li>
+					<li>
+						Planned:
+						<ul>
+							<li>
+								<a href="https://modelcontextprotocol.io/">Model Context Protocol</a> (<a
+									href="https://github.com/modelcontextprotocol/typescript-sdk">TS lib</a
+								>)
+							</li>
+
+							<li>more planned, also I welcome feedback/requests/assistance</li>
+						</ul>
+					</li>
+				</ul>
+			</li>
+		</ul>
 		<p class="mt_xl5">
 			⚠️ This is an early pre-release, see the <a href="https://github.com/ryanatkn/zzz"
 				>readme and source code</a

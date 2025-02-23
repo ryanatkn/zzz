@@ -8,24 +8,15 @@
 
 **[zzzbot.dev](https://www.zzzbot.dev/)**
 
-Zzz, pronounced "zees" like the sound of electricity,
-is an open source web UI and toolkit with a focus on AI and user power.
+Zzz, pronounced "zees" like the sound of electricity, is a bot and web toolkit with a focus on
+AI and user power. It's a digital tool that adapts to your needs on the fly, while remaining
+fully in your control and open source.
 
 This is a pre-alpha and the ideas are still developing.
 To help see the issues and [discussions](https://github.com/ryanatkn/zzz/discussions),
 or find me on [Bluesky](https://bsky.app/profile/ryanatkn.com).
 
 More at [zzzbot.dev/about](https://www.zzzbot.dev/about).
-
-## Features
-
-- integrations (everything's a work in progress, but some basics should be working)
-  - [Ollama](https://github.com/ollama/ollama)
-  - [ChatGPT](https://github.com/openai/openai-node)
-  - [Claude](https://github.com/anthropics/anthropic-sdk-typescript)
-  - [Gemini](https://github.com/google-gemini/generative-ai-js)
-  - more planned, and I welcome feedback/requests/assistance
-    - [Model Context Protocol](https://modelcontextprotocol.io/) ([TS lib](https://github.com/modelcontextprotocol/typescript-sdk))
 
 ## Motivation
 
