@@ -39,14 +39,17 @@
 				local-first architecture with user-owned data, offline functionality, and optional cloud
 				sync
 			</li>
-			<li>interoperable design using standard protocols, open APIs, and common data formats</li>
 			<li>
-				extensive plugin APIs, scripting capabilities, and documented internals for deep
-				extensibility
+				interoperable design using standard and popular protocols, open APIs, and common data
+				formats
 			</li>
 			<li>
-				building blocks that you can configure and combine to create new tools that solve your
-				unique problems, and share them with others
+				designed for plugins, scripting, and deep extensibility, and has a dev library in TypeScript
+				and Svelte
+			</li>
+			<li>
+				building blocks that you can configure and combine to create new experiences and tools that
+				solve your unique problems, and share them with others
 			</li>
 			<li>
 				adaptable interfaces that evolve with user needs through customization, context awareness,
