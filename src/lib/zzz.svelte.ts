@@ -21,6 +21,7 @@ import {zzz_config} from '$lib/zzz_config.js';
 import {Models} from '$lib/models.svelte.js';
 import {Chats} from '$lib/chats.svelte.js';
 import {Providers} from '$lib/providers.svelte.js';
+import {Prompts} from '$lib/prompts.svelte.js';
 
 export const zzz_context = create_context<Zzz>();
 
@@ -47,6 +48,7 @@ export class Zzz {
 	readonly models = new Models(this);
 	readonly chats = new Chats(this);
 	readonly providers = new Providers(this);
+	readonly prompts = new Prompts(this); // Added this line
 
 	// Change tags to use the readonly models instance
 	tags: Set<string> = $derived(new Set(this.models.items.flatMap((m) => m.tags)));

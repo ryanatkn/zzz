@@ -153,6 +153,11 @@ export const package_json = {
 			svelte: './dist/Dashboard_Files.svelte',
 			default: './dist/Dashboard_Files.svelte',
 		},
+		'./Dashboard_Prompts.svelte': {
+			types: './dist/Dashboard_Prompts.svelte.d.ts',
+			svelte: './dist/Dashboard_Prompts.svelte',
+			default: './dist/Dashboard_Prompts.svelte',
+		},
 		'./Dashboard.svelte': {
 			types: './dist/Dashboard.svelte.d.ts',
 			svelte: './dist/Dashboard.svelte',
@@ -249,7 +254,12 @@ export const package_json = {
 		},
 		'./ollama.js': {types: './dist/ollama.d.ts', default: './dist/ollama.js'},
 		'./path.js': {types: './dist/path.d.ts', default: './dist/path.js'},
+		'./prompt.svelte.js': {types: './dist/prompt.svelte.d.ts', default: './dist/prompt.svelte.js'},
 		'./prompt.js': {types: './dist/prompt.d.ts', default: './dist/prompt.js'},
+		'./prompts.svelte.js': {
+			types: './dist/prompts.svelte.d.ts',
+			default: './dist/prompts.svelte.js',
+		},
 		'./Provider_Detail.svelte': {
 			types: './dist/Provider_Detail.svelte.d.ts',
 			svelte: './dist/Provider_Detail.svelte',
@@ -404,6 +414,7 @@ export const src_json = {
 		'./Control_Panel.svelte': {path: 'Control_Panel.svelte', declarations: []},
 		'./Dashboard_Chats.svelte': {path: 'Dashboard_Chats.svelte', declarations: []},
 		'./Dashboard_Files.svelte': {path: 'Dashboard_Files.svelte', declarations: []},
+		'./Dashboard_Prompts.svelte': {path: 'Dashboard_Prompts.svelte', declarations: []},
 		'./Dashboard.svelte': {path: 'Dashboard.svelte', declarations: []},
 		'./Echo_Form.svelte': {path: 'Echo_Form.svelte', declarations: []},
 		'./File_Editor.svelte': {path: 'File_Editor.svelte', declarations: []},
@@ -463,6 +474,14 @@ export const src_json = {
 			],
 		},
 		'./path.js': {path: 'path.ts', declarations: [{name: 'to_root_path', kind: 'function'}]},
+		'./prompt.svelte.js': {
+			path: 'prompt.svelte.ts',
+			declarations: [
+				{name: 'Prompt_Message', kind: 'type'},
+				{name: 'Prompt_Message_Content', kind: 'type'},
+				{name: 'Prompt', kind: 'class'},
+			],
+		},
 		'./prompt.js': {
 			path: 'prompt.ts',
 			declarations: [
@@ -470,6 +489,10 @@ export const src_json = {
 				{name: 'Prompt_Message', kind: 'type'},
 				{name: 'Prompt_Message_Content', kind: 'type'},
 			],
+		},
+		'./prompts.svelte.js': {
+			path: 'prompts.svelte.ts',
+			declarations: [{name: 'Prompts', kind: 'class'}],
 		},
 		'./Provider_Detail.svelte': {path: 'Provider_Detail.svelte', declarations: []},
 		'./Provider_Info.svelte': {path: 'Provider_Info.svelte', declarations: []},

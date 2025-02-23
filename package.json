@@ -185,6 +185,11 @@
       "svelte": "./dist/Dashboard_Files.svelte",
       "default": "./dist/Dashboard_Files.svelte"
     },
+    "./Dashboard_Prompts.svelte": {
+      "types": "./dist/Dashboard_Prompts.svelte.d.ts",
+      "svelte": "./dist/Dashboard_Prompts.svelte",
+      "default": "./dist/Dashboard_Prompts.svelte"
+    },
     "./Dashboard.svelte": {
       "types": "./dist/Dashboard.svelte.d.ts",
       "svelte": "./dist/Dashboard.svelte",
@@ -299,9 +304,17 @@
       "types": "./dist/path.d.ts",
       "default": "./dist/path.js"
     },
+    "./prompt.svelte.js": {
+      "types": "./dist/prompt.svelte.d.ts",
+      "default": "./dist/prompt.svelte.js"
+    },
     "./prompt.js": {
       "types": "./dist/prompt.d.ts",
       "default": "./dist/prompt.js"
+    },
+    "./prompts.svelte.js": {
+      "types": "./dist/prompts.svelte.d.ts",
+      "default": "./dist/prompts.svelte.js"
     },
     "./Provider_Detail.svelte": {
       "types": "./dist/Provider_Detail.svelte.d.ts",

@@ -112,6 +112,7 @@
 			await zzz.init_models();
 			// TODO init properly
 			zzz.chats.add();
+			zzz.prompts.add();
 		});
 	}
 
