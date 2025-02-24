@@ -7,6 +7,7 @@ import {
 import {random_id, type Id} from '$lib/id.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 import type {Async_Status} from '@ryanatkn/belt/async.js';
+import {get_unique_name} from '$lib/helpers.js';
 
 const NEW_CHAT_PREFIX = 'new chat';
 
@@ -34,7 +35,10 @@ export class Chat {
 
 	constructor(zzz: Zzz) {
 		this.zzz = zzz;
-		this.name = this.get_unique_name(NEW_CHAT_PREFIX);
+		this.name = get_unique_name(
+			NEW_CHAT_PREFIX,
+			this.zzz.chats.items.map((c) => c.name),
+		);
 	}
 
 	add_tape(model: Model): void {
@@ -136,19 +140,15 @@ export class Chat {
 				return;
 			}
 			this.init_name_status = 'success';
-			this.name = this.get_unique_name(response_text); // TODO handle duplicates
+			if (response_text !== this.name) {
+				this.name = get_unique_name(
+					response_text,
+					this.zzz.chats.items.map((c) => c.name),
+				);
+			}
 		} catch (err) {
 			this.init_name_status = 'initial'; // ignore failures, will retry
 			console.error('failed to infer a name for a chat', err);
 		}
-	}
-
-	get_unique_name(text: string): string {
-		let name = text;
-		let i = 2;
-		while (this.zzz.chats.items.some((c) => c !== this && c.name === name)) {
-			name = `${text} ${i++}`;
-		}
-		return name;
 	}
 }

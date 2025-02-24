@@ -34,5 +34,6 @@
 		height: 100%;
 		background: var(--fg_5);
 		opacity: 0.1;
+		transition: width 200ms ease-in-out;
 	}
 </style>

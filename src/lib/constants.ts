@@ -50,3 +50,5 @@ export const GLYPH_SETTINGS = '⛮'; // ⛭  ⚙  ⛮  ⛯ ⛣
 
 // ⎎
 // 🗎  🗏  🗀  🗁  🗂  🗃  🗄  ❏  ❐  ▣  ▢  □  ⧉  ⧈
+
+export const XML_TAG_NAME_DEFAULT = 'fragment'; // TODO config?

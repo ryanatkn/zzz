@@ -238,6 +238,10 @@
       "types": "./dist/id.d.ts",
       "default": "./dist/id.js"
     },
+    "./list_helpers.js": {
+      "types": "./dist/list_helpers.d.ts",
+      "default": "./dist/list_helpers.js"
+    },
     "./Main_Dialog.svelte": {
       "types": "./dist/Main_Dialog.svelte.d.ts",
       "svelte": "./dist/Main_Dialog.svelte",
@@ -303,6 +307,11 @@
     "./path.js": {
       "types": "./dist/path.d.ts",
       "default": "./dist/path.js"
+    },
+    "./Prompt_Fragment_List.svelte": {
+      "types": "./dist/Prompt_Fragment_List.svelte.d.ts",
+      "svelte": "./dist/Prompt_Fragment_List.svelte",
+      "default": "./dist/Prompt_Fragment_List.svelte"
     },
     "./Prompt_Fragment_Stats.svelte": {
       "types": "./dist/Prompt_Fragment_Stats.svelte.d.ts",

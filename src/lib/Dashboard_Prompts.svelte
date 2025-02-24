@@ -22,7 +22,7 @@
 <div class="flex align_items_start gap_md p_sm">
 	<div class="panel p_sm width_sm">
 		{#if zzz.prompts.selected}
-			<div class="p_sm fg_1 radius_xs2" transition:slide>
+			<div class="p_sm bg radius_xs2" transition:slide>
 				<div class="column">
 					<div class="size_lg">
 						<Text_Icon icon={GLYPH_PROMPT} />
@@ -131,7 +131,7 @@
 				style:grid-template-columns="repeat(auto-fill, minmax(var(--width_sm), 1fr))"
 			>
 				{#each zzz.prompts.selected.fragments as fragment (fragment.id)}
-					<div class="panel p_sm" transition:scale>
+					<div class="bg radius_xs p_sm" transition:scale>
 						<Prompt_Fragment_View {fragment} prompts={zzz.prompts} />
 					</div>
 				{/each}

@@ -19,6 +19,9 @@
 	let confirming = $state(false);
 	const toggle = () => (confirming = !confirming);
 
+	// TODO BLOCK probably replace the remove button with an edit button that also changes the name to be an editable input,
+	// and the remove button expands from the edit button, and there's also a save button
+
 	// TODO BLOCK make the active state visible on the button when `confirming=true`, but `selected` is too visually heavy
 
 	// TODO changing the font size works if there's no children, but that's a weird difference - the UX is broken for custom buttons because they change size when the font size changes

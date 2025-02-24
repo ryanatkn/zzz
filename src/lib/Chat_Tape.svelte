@@ -60,18 +60,17 @@
 			placeholder="send to this tape..."
 			onkeydown={(e) => e.key === 'Enter' && !e.shiftKey && (send(), e.preventDefault())}
 		></textarea>
-		<button type="button" onclick={() => send()}>send</button>
+		<button type="button" class="plain" onclick={() => send()}>send</button>
 	</div>
 </div>
 
 <style>
 	.chat_tape {
-		border: var(--border_size_1) solid #ccc;
 		padding: var(--space_md);
 		display: flex;
 		flex-direction: column;
 		gap: var(--space_md);
-		background-color: var(--input_fill);
+		background-color: var(--bg);
 		border-radius: var(--radius_xs);
 	}
 	.header {

@@ -17,7 +17,7 @@
 	<!-- TODO, show the counts of active items for each of the model selector buttons in a snippet here -->
 	<div class="panel p_sm width_sm">
 		{#if zzz.chats.selected}
-			<div class="p_sm fg_1 radius_xs2" transition:slide>
+			<div class="p_sm bg radius_xs2" transition:slide>
 				<div class="column">
 					<!-- TODO needs work -->
 					<div class="size_lg">

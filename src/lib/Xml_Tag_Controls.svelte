@@ -3,6 +3,7 @@
 
 	import type {Prompt_Fragment} from '$lib/prompt.svelte.js';
 	import Xml_Attribute from '$lib/Xml_Attribute.svelte';
+	import {XML_TAG_NAME_DEFAULT} from '$lib/constants.js';
 
 	interface Props {
 		fragment: Prompt_Fragment;
@@ -17,11 +18,16 @@
 
 <div class="flex gap_xs align_items_start column">
 	<div class="flex align_items_center gap_xs2">
-		<label class="row mb_0" style:height="var(--input_height)">
-			{'<'}xml>
-			<input class="plain clean ml_md" type="checkbox" bind:checked={fragment.has_xml_tag} />
+		<label
+			class="row mb_0"
+			style:height="var(--input_height)"
+			title="when enabled, the prompt's content will be wrapped with {fragment.xml_tag_name ||
+				XML_TAG_NAME_DEFAULT}"
+		>
+			xml tag
+			<input class="plain ml_md" type="checkbox" bind:checked={fragment.has_xml_tag} />
 		</label>
-		<input class="plain clean flex_1" placeholder="fragment" bind:value={fragment.xml_tag_name} />
+		<input class="plain flex_1" placeholder="fragment" bind:value={fragment.xml_tag_name} />
 		<button
 			type="button"
 			class="icon_button plain"

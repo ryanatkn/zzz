@@ -24,7 +24,7 @@
 		title="this prompt fragment is {fragment.enabled ? 'enabled' : 'disabled'}"
 	>
 		<div class="size_lg m_0">{fragment.name}</div>
-		<input type="checkbox" class="plain clean ml_md" bind:checked={fragment.enabled} />
+		<input type="checkbox" class="plain ml_md" bind:checked={fragment.enabled} />
 	</label>
 	<textarea
 		style:height="200px"

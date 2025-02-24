@@ -15,14 +15,14 @@
 	class:dormant_wrapper={!attribute.key || !attribute.value}
 >
 	<input
-		class="plain compact clean"
+		class="plain compact"
 		class:dormant={!attribute.key}
 		placeholder="key"
 		value={attribute.key}
 		oninput={(e) => onupdate({key: e.currentTarget.value})}
 	/>
 	<input
-		class="plain compact clean"
+		class="plain compact"
 		class:dormant={!attribute.value}
 		placeholder="value"
 		value={attribute.value}

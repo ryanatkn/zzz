@@ -1,7 +1,7 @@
 import type {Zzz} from '$lib/zzz.svelte.js';
 import {random_id, type Id} from '$lib/id.js';
-
-const XML_TAG_NAME_DEFAULT = 'fragment'; // TODO config
+import {get_unique_name} from '$lib/helpers.js';
+import {XML_TAG_NAME_DEFAULT} from '$lib/constants.js';
 
 export interface Prompt_Message {
 	role: 'user' | 'system';
@@ -12,7 +12,7 @@ export type Prompt_Message_Content = string; // TODO ?
 
 export class Prompt {
 	readonly id: Id = random_id();
-	name: string = $state('new prompt');
+	name: string = $state('');
 	created: string = new Date().toISOString();
 	fragments: Array<Prompt_Fragment> = $state([]);
 
@@ -22,23 +22,24 @@ export class Prompt {
 	length: number = $derived(this.value.length); // TODO use segmenter for more precision? will it be slow for large values tho?
 	token_count: number = $derived(count_tokens(this.value));
 
-	constructor(zzz: Zzz) {
+	constructor(zzz: Zzz, name: string = 'new prompt') {
 		this.zzz = zzz;
+		this.name = get_unique_name(
+			name,
+			zzz.prompts.items.map((p) => p.name),
+		);
 	}
 
 	add_fragment(content: string = '', name: string = 'new fragment'): Prompt_Fragment {
-		const fragment = new Prompt_Fragment(this.get_unique_name(name), content);
+		const fragment = new Prompt_Fragment(
+			get_unique_name(
+				name,
+				this.fragments.map((f) => f.name),
+			),
+			content,
+		);
 		this.fragments.push(fragment);
 		return fragment;
-	}
-
-	get_unique_name(text: string): string {
-		let name = text;
-		let i = 2;
-		while (this.fragments.some((f) => f.name === name)) {
-			name = `${text} ${i++}`;
-		}
-		return name;
 	}
 
 	update_fragment(

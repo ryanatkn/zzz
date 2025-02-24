@@ -200,6 +200,7 @@ export const package_json = {
 		},
 		'./file.svelte.js': {types: './dist/file.svelte.d.ts', default: './dist/file.svelte.js'},
 		'./id.js': {types: './dist/id.d.ts', default: './dist/id.js'},
+		'./list_helpers.js': {types: './dist/list_helpers.d.ts', default: './dist/list_helpers.js'},
 		'./Main_Dialog.svelte': {
 			types: './dist/Main_Dialog.svelte.d.ts',
 			svelte: './dist/Main_Dialog.svelte',
@@ -254,6 +255,11 @@ export const package_json = {
 		},
 		'./ollama.js': {types: './dist/ollama.d.ts', default: './dist/ollama.js'},
 		'./path.js': {types: './dist/path.d.ts', default: './dist/path.js'},
+		'./Prompt_Fragment_List.svelte': {
+			types: './dist/Prompt_Fragment_List.svelte.d.ts',
+			svelte: './dist/Prompt_Fragment_List.svelte',
+			default: './dist/Prompt_Fragment_List.svelte',
+		},
 		'./Prompt_Fragment_Stats.svelte': {
 			types: './dist/Prompt_Fragment_Stats.svelte.d.ts',
 			svelte: './dist/Prompt_Fragment_Stats.svelte',
@@ -474,6 +480,10 @@ export const src_json = {
 				{name: 'random_id', kind: 'function'},
 			],
 		},
+		'./list_helpers.js': {
+			path: 'list_helpers.ts',
+			declarations: [{name: 'reorder_list', kind: 'function'}],
+		},
 		'./Main_Dialog.svelte': {path: 'Main_Dialog.svelte', declarations: []},
 		'./Message_Info.svelte': {path: 'Message_Info.svelte', declarations: []},
 		'./Message_Summary.svelte': {path: 'Message_Summary.svelte', declarations: []},
@@ -509,6 +519,7 @@ export const src_json = {
 			],
 		},
 		'./path.js': {path: 'path.ts', declarations: [{name: 'to_root_path', kind: 'function'}]},
+		'./Prompt_Fragment_List.svelte': {path: 'Prompt_Fragment_List.svelte', declarations: []},
 		'./Prompt_Fragment_Stats.svelte': {path: 'Prompt_Fragment_Stats.svelte', declarations: []},
 		'./Prompt_Fragment_Summary.svelte': {path: 'Prompt_Fragment_Summary.svelte', declarations: []},
 		'./Prompt_Fragment_View.svelte': {path: 'Prompt_Fragment_View.svelte', declarations: []},

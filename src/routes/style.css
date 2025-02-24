@@ -23,11 +23,6 @@
 	font-weight: 400;
 }
 
-/* TODO upstream? */
-input.clean {
-	--input_fill: var(--bg_6);
-}
-
 /* TODO upstream */
 .compact {
 	--input_height: 2.6rem;
@@ -42,5 +37,5 @@ input.clean {
 }
 
 .dormant {
-	opacity: 0.8;
+	opacity: 0.7;
 }
