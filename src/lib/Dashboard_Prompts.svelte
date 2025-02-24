@@ -9,7 +9,7 @@
 	import Prompt_Fragment_View from '$lib/Prompt_Fragment_View.svelte';
 	import {GLYPH_FRAGMENT, GLYPH_PROMPT} from '$lib/constants.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
-	import Fragment_Summary from '$lib/Fragment_Summary.svelte';
+	import Prompt_Fragment_Summary from '$lib/Prompt_Fragment_Summary.svelte';
 	import Prompt_Stats from '$lib/Prompt_Stats.svelte';
 
 	const zzz = zzz_context.get();
@@ -144,7 +144,7 @@
 		<div class="column">
 			{#if zzz.prompts.selected}
 				{#each zzz.prompts.selected.fragments as fragment (fragment.id)}
-					<Fragment_Summary {fragment} />
+					<Prompt_Fragment_Summary {fragment} />
 				{/each}
 			{/if}
 		</div>
