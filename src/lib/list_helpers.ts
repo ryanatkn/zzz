@@ -1,4 +1,4 @@
-export const reorder_list = (from_index: number, to_index: number, fragments: Array<any>): void => {
+export const reorder_list = (fragments: Array<any>, from_index: number, to_index: number): void => {
 	if (from_index === to_index) return;
 	if (
 		from_index < 0 ||

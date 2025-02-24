@@ -9,7 +9,7 @@
 		children,
 	}: {
 		items: Array<T_Item>;
-		on_reorder?: (from_index: number, to_index: number, items: Array<T_Item>) => void;
+		on_reorder?: (items: Array<T_Item>, from_index: number, to_index: number) => void;
 		children: Snippet<[item: T_Item, dragging: boolean, dragging_any: boolean]>;
 	} = $props();
 
@@ -58,7 +58,7 @@
 			drop_target_index !== null &&
 			drag_source_index !== drop_target_index
 		) {
-			on_reorder(drag_source_index, drop_target_index, items);
+			on_reorder(items, drag_source_index, drop_target_index);
 		}
 
 		// Reset state

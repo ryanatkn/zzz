@@ -21,7 +21,7 @@
 			xml tag
 			<input class="plain clean ml_md" type="checkbox" bind:checked={fragment.has_xml_tag} />
 		</label>
-		<input class="plain clean flex_1" placeholder="tag name" bind:value={fragment.xml_tag_name} />
+		<input class="plain clean flex_1" placeholder="fragment" bind:value={fragment.xml_tag_name} />
 		<button
 			type="button"
 			class="icon_button plain"
