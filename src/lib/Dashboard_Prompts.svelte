@@ -14,6 +14,8 @@
 
 	const zzz = zzz_context.get();
 
+	// TODO BLOCK integrate with sources like the local filesystem (just the `zzz.files`?)
+
 	// TODO BLOCK save both fragments and prompts to the library, right?
 
 	// TODO BLOCK make it have optional attributes like file type

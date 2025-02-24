@@ -199,6 +199,7 @@ export const package_json = {
 			default: './dist/File_View.svelte',
 		},
 		'./file.svelte.js': {types: './dist/file.svelte.d.ts', default: './dist/file.svelte.js'},
+		'./helpers.js': {types: './dist/helpers.d.ts', default: './dist/helpers.js'},
 		'./id.js': {types: './dist/id.d.ts', default: './dist/id.js'},
 		'./list_helpers.js': {types: './dist/list_helpers.d.ts', default: './dist/list_helpers.js'},
 		'./Main_Dialog.svelte': {
@@ -450,6 +451,7 @@ export const src_json = {
 				{name: 'GLYPH_MODEL', kind: 'variable'},
 				{name: 'GLYPH_CAPABILITY', kind: 'variable'},
 				{name: 'GLYPH_SETTINGS', kind: 'variable'},
+				{name: 'XML_TAG_NAME_DEFAULT', kind: 'variable'},
 			],
 		},
 		'./Control_Panel.svelte': {path: 'Control_Panel.svelte', declarations: []},
@@ -472,6 +474,10 @@ export const src_json = {
 				{name: 'Prompt_Options', kind: 'type'},
 				{name: 'Prompt', kind: 'class'},
 			],
+		},
+		'./helpers.js': {
+			path: 'helpers.ts',
+			declarations: [{name: 'get_unique_name', kind: 'function'}],
 		},
 		'./id.js': {
 			path: 'id.ts',

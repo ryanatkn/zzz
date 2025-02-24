@@ -9,15 +9,15 @@ export interface Source_File_Json {
 	dependencies: Array<[Path_Id, Source_File]>;
 }
 
-export interface Prompt_Json {
+export interface File_Json {
 	source_file: Source_File_Json;
 }
 
-export interface Prompt_Options {
-	data: Prompt_Json;
+export interface File_Options {
+	data: File_Json;
 }
 
-export class Prompt {
+export class File {
 	// TODO better name?
 	original: Source_File_Json = $state()!;
 
@@ -28,18 +28,19 @@ export class Prompt {
 
 	// TODO what else, current text?
 
-	constructor(options: Prompt_Options) {
+	constructor(options: File_Options) {
 		const {
 			data: {source_file},
 		} = options;
 		this.original = source_file;
 		this.id = source_file.id;
 		this.contents = source_file.contents;
+		// TODO Serializable pattern with `to_json`, `from_json`, derived json/str? `toJSON` calls `to_json`, and the latter is abstract
 		this.dependents = new Map(source_file.dependents);
 		this.dependencies = new Map(source_file.dependencies);
 	}
 
-	toJSON(): Prompt_Json {
+	toJSON(): File_Json {
 		return {
 			source_file: {
 				id: this.id,
