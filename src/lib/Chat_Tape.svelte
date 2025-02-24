@@ -18,6 +18,7 @@
 	const {tape, onremove, onsend}: Props = $props();
 
 	let input = $state('');
+	let cleared_content = $state('');
 	let input_el: HTMLTextAreaElement | undefined;
 
 	const send = () => {
@@ -61,6 +62,29 @@
 			onkeydown={(e) => e.key === 'Enter' && !e.shiftKey && (send(), e.preventDefault())}
 		></textarea>
 		<button type="button" class="plain" onclick={() => send()}>send</button>
+	</div>
+	<div class="flex">
+		<button
+			type="button"
+			class="plain"
+			disabled={!input && !cleared_content}
+			onclick={() => {
+				if (input) {
+					cleared_content = input;
+					input = '';
+				} else {
+					input = cleared_content;
+					cleared_content = '';
+				}
+			}}
+		>
+			<span class="relative">
+				<span style:visibility="hidden">restore</span>
+				<span class="absolute" style:inset="0"
+					>{#if input || !cleared_content}clear{:else}restore{/if}</span
+				>
+			</span>
+		</button>
 	</div>
 </div>
 

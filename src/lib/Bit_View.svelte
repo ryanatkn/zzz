@@ -68,7 +68,7 @@
 				<span class="relative">
 					<span style:visibility="hidden">restore</span>
 					<span class="absolute" style:inset="0"
-						>{bit.content || !cleared_content ? 'clear' : 'restore'}</span
+						>{#if bit.content || !cleared_content}clear{:else}restore{/if}</span
 					>
 				</span>
 			</button>

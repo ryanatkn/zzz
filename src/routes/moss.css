@@ -262,6 +262,9 @@ a.chip {
 .mt_xl5 {
 	margin-top: var(--space_xl5);
 }
+.mt_xs {
+	margin-top: var(--space_xs);
+}
 .my_xl5 {
 	margin-top: var(--space_xl5);
 	margin-bottom: var(--space_xl5);
