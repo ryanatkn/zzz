@@ -1,7 +1,7 @@
 import type {Zzz} from '$lib/zzz.svelte.js';
 import {random_id, type Id} from '$lib/id.js';
 
-const XML_TAG_NAME_DEFAULT = 'content'; // TODO config
+const XML_TAG_NAME_DEFAULT = 'fragment'; // TODO config
 
 export interface Prompt_Message {
 	role: 'user' | 'system';
