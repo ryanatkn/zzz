@@ -61,6 +61,7 @@ export class Prompt {
 
 export const join_prompt_fragments = (fragments: Array<Prompt_Fragment>): string =>
 	fragments
+		.filter((f) => f.enabled)
 		.map((f) => {
 			const content = f.content.trim();
 			if (!content) return '';
@@ -95,6 +96,7 @@ export class Prompt_Fragment {
 	has_xml_tag: boolean = $state(false);
 	xml_tag_name: string = $state('');
 	attributes: Array<Xml_Attribute> = $state([]);
+	enabled: boolean = $state(true);
 
 	constructor(name: string = 'new fragment', content: string = '') {
 		this.name = name;

@@ -9,7 +9,7 @@
 	const {length, token_count}: Props = $props();
 </script>
 
-<div class="flex gap_sm">
-	<span>{print_number_with_separators(length + '', ',')} chars</span>
-	<span>~{print_number_with_separators(token_count + '', ',')} tokens</span>
+<div class="flex justify_content_space_between gap_sm">
+	<span>{print_number_with_separators(length + '', ',')} char{length === 1 ? '' : 's'}</span>
+	<span>~{print_number_with_separators(token_count + '', ',')} token{length === 1 ? '' : 's'}</span>
 </div>

@@ -10,15 +10,20 @@
 	const {attribute, onupdate, onremove}: Props = $props();
 </script>
 
-<div class="flex gap_xs2 align_items_center">
+<div
+	class="flex gap_xs2 align_items_center"
+	class:dormant_wrapper={!attribute.key || !attribute.value}
+>
 	<input
-		class="plain compact"
+		class="plain compact clean"
+		class:dormant={!attribute.key}
 		placeholder="key"
 		value={attribute.key}
 		oninput={(e) => onupdate({key: e.currentTarget.value})}
 	/>
 	<input
-		class="plain compact"
+		class="plain compact clean"
+		class:dormant={!attribute.value}
 		placeholder="value"
 		value={attribute.value}
 		oninput={(e) => onupdate({value: e.currentTarget.value})}

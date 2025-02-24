@@ -15,17 +15,22 @@
 
 	const fragment_textareas = $state<Record<string, HTMLTextAreaElement>>({});
 
-	// svelte-ignore non_reactive_update
-	let cleared_content = '';
+	let cleared_content = $state('');
 </script>
 
 <div class="column gap_sm">
-	<div class="flex justify_content_space_between mb_sm">
+	<label
+		class="flex mb_0 justify_content_space_between"
+		title="this prompt fragment is {fragment.enabled ? 'enabled' : 'disabled'}"
+	>
 		<h3 class="m_0">{fragment.name}</h3>
-	</div>
+		<input type="checkbox" class="plain clean ml_md" bind:checked={fragment.enabled} />
+	</label>
 	<textarea
 		style:height="200px"
-		class="mb_xs"
+		class="mb_0"
+		class:dormant={!fragment.content}
+		class:dormant_wrapper={!fragment.enabled}
 		bind:this={fragment_textareas[fragment.id]}
 		value={fragment.content}
 		oninput={(e) => prompts.update_fragment(fragment.id, {content: e.currentTarget.value})}
@@ -69,9 +74,9 @@
 			button_attrs={{title: `remove fragment ${fragment.id}`}}
 		/>
 	</div>
+	<Xml_Tag_Controls {fragment} />
 	<Prompt_Fragment_Stats
 		length={fragment.content.length}
 		token_count={count_tokens(fragment.content)}
 	/>
-	<Xml_Tag_Controls {fragment} />
 </div>

@@ -23,9 +23,24 @@
 	font-weight: 400;
 }
 
+/* TODO upstream? */
+input.clean {
+	--input_fill: var(--bg_6);
+}
+
 /* TODO upstream */
 .compact {
 	--input_height: 2.6rem;
 	--min_height: 2.6rem;
 	--border_radius: var(--radius_xs);
+}
+
+.dormant {
+	border-width: var(--border_width_2) !important;
+	border-style: dashed !important;
+	border-color: var(--border_color_1) !important;
+}
+
+.dormant_wrapper {
+	opacity: 0.8;
 }
