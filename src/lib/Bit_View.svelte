@@ -7,6 +7,7 @@
 	import Xml_Tag_Controls from '$lib/Xml_Tag_Controls.svelte';
 	import Bit_Stats from '$lib/Bit_Stats.svelte';
 	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
+	import Paste_From_Clipboard from '$lib/Paste_From_Clipboard.svelte';
 
 	interface Props {
 		bit: Bit;
@@ -42,14 +43,13 @@
 	<div class="flex justify_content_space_between">
 		<div class="flex">
 			<Copy_To_Clipboard text={bit.content} classes="plain" />
-			<button
-				type="button"
-				class="plain"
-				onclick={async () => {
-					bit.content += await navigator.clipboard.readText();
+			<Paste_From_Clipboard
+				onpaste={(text) => {
+					bit.content += text;
 					bit_textareas[bit.id].focus();
-				}}>paste</button
-			>
+				}}
+				attrs={{class: 'plain'}}
+			/>
 			<Clear_Restore_Button
 				value={bit.content}
 				onchange={(value) => {

@@ -10,6 +10,8 @@
 	import {GLYPH_TAPE, GLYPH_PROMPT} from '$lib/constants.js';
 	import {zzz_config} from '$lib/zzz_config.js';
 	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
+	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
+	import Paste_From_Clipboard from '$lib/Paste_From_Clipboard.svelte';
 
 	const zzz = zzz_context.get();
 
@@ -33,13 +35,13 @@
 	}
 	let main_input = $state(''); // TODO BLOCK @many this state probably belongs on the `multichat` object
 	let pending = $state(false); // TODO BLOCK @many this state probably belongs on the `multichat` object
-	let input_el: HTMLTextAreaElement | undefined;
+	let main_input_el: HTMLTextAreaElement | undefined;
 
 	const send_to_all = async () => {
 		if (!count) return;
 		const parsed = main_input.trim();
 		if (!parsed) {
-			input_el?.focus();
+			main_input_el?.focus();
 			return;
 		}
 		pending = true;
@@ -141,7 +143,7 @@
 			<textarea
 				class="flex_1 mb_0"
 				bind:value={main_input}
-				bind:this={input_el}
+				bind:this={main_input_el}
 				placeholder="send to all {count >= 2 ? count + ' ' : ''}tapes..."
 			></textarea>
 			<Pending_Button
@@ -154,6 +156,14 @@
 			</Pending_Button>
 		</div>
 		<div class="flex mt_xs">
+			<Copy_To_Clipboard text={main_input} classes="plain" />
+			<Paste_From_Clipboard
+				onpaste={(text) => {
+					main_input += text;
+					main_input_el?.focus();
+				}}
+				attrs={{class: 'plain'}}
+			/>
 			<Clear_Restore_Button
 				value={main_input}
 				onchange={(value) => {
