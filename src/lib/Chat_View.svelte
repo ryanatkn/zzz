@@ -18,15 +18,17 @@
 
 	const {chat}: Props = $props();
 
-	// TODO this needs to be persisted state
-	const initial_model_names = ['llama3.2:1b', 'qwen2.5:0.5b', 'qwen2.5:1.5b'];
-	const initial_models = zzz.models.filter_by_names(initial_model_names);
-	if (initial_models) {
-		for (const initial_model of initial_models) {
-			chat.add_tape(initial_model);
+	// TODO BLOCK this needs to be persisted state
+	if (chat.tapes.length === 0) {
+		const initial_model_names = ['llama3.2:1b', 'qwen2.5:0.5b', 'qwen2.5:1.5b'];
+		const initial_models = zzz.models.filter_by_names(initial_model_names);
+		if (initial_models) {
+			for (const initial_model of initial_models) {
+				chat.add_tape(initial_model);
+			}
+		} else {
+			console.error(`model not found: ${zzz_config.bots.namerbot}`);
 		}
-	} else {
-		console.error(`model not found: ${zzz_config.bots.namerbot}`);
 	}
 	let main_input = $state(''); // TODO BLOCK @many this state probably belongs on the `multichat` object
 	let pending = $state(false); // TODO BLOCK @many this state probably belongs on the `multichat` object
