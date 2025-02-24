@@ -11,12 +11,21 @@
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import Prompt_Fragment_Summary from '$lib/Prompt_Fragment_Summary.svelte';
 	import Prompt_Stats from '$lib/Prompt_Stats.svelte';
+	import Reorderable_List from '$lib/Reorderable_List.svelte';
 
 	const zzz = zzz_context.get();
 
 	// TODO BLOCK save both fragments and prompts to the library, right?
 
 	// TODO BLOCK make it have optional attributes like file type
+
+	const handle_reorder = (from_index: number, to_index: number): void => {
+		if (!zzz.prompts.selected) return;
+		const fragments = [...zzz.prompts.selected.fragments];
+		const [removed] = fragments.splice(from_index, 1);
+		fragments.splice(to_index, 0, removed);
+		zzz.prompts.selected.fragments = fragments;
+	};
 </script>
 
 <div class="flex align_items_start gap_md p_sm">
@@ -143,9 +152,11 @@
 		<header class="size_lg mb_lg"><Text_Icon icon={GLYPH_FRAGMENT} /> fragments</header>
 		<div class="column">
 			{#if zzz.prompts.selected}
-				{#each zzz.prompts.selected.fragments as fragment (fragment.id)}
-					<Prompt_Fragment_Summary {fragment} prompt={zzz.prompts.selected} />
-				{/each}
+				<Reorderable_List items={zzz.prompts.selected.fragments} on_reorder={handle_reorder}>
+					{#snippet children(fragment)}
+						<Prompt_Fragment_Summary {fragment} prompt={zzz.prompts.selected!} />
+					{/snippet}
+				</Reorderable_List>
 			{/if}
 		</div>
 	</div>

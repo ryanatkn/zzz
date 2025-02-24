@@ -511,12 +511,13 @@ export const src_json = {
 		'./prompt.svelte.js': {
 			path: 'prompt.svelte.ts',
 			declarations: [
-				{name: 'count_tokens', kind: 'function'},
-				{name: 'Prompt_Fragment', kind: 'type'},
 				{name: 'Prompt_Message', kind: 'type'},
 				{name: 'Prompt_Message_Content', kind: 'type'},
 				{name: 'Prompt', kind: 'class'},
 				{name: 'join_prompt_fragments', kind: 'function'},
+				{name: 'count_tokens', kind: 'function'},
+				{name: 'Xml_Attribute', kind: 'type'},
+				{name: 'Prompt_Fragment', kind: 'class'},
 			],
 		},
 		'./prompts.svelte.js': {

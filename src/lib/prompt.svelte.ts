@@ -123,17 +123,15 @@ export class Prompt_Fragment {
 		const attribute = this.attributes[index];
 		const final_updates: Partial<Omit<Xml_Attribute, 'id'>> = {...updates};
 
-		if (updates.key !== undefined && updates.key !== attribute.key) {
-			// Only check for duplicates if the new key is non-empty
-			if (updates.key !== '') {
-				let key = updates.key;
-				let counter = 1;
-				while (this.attributes.some((a) => a.id !== id && a.key === key)) {
-					key = `${updates.key}${counter}`;
-					counter++;
-				}
-				final_updates.key = key;
+		// Only check for duplicates if the new key is non-empty
+		if (updates.key !== undefined && updates.key !== attribute.key && updates.key !== '') {
+			let key = updates.key;
+			let counter = 1;
+			while (this.attributes.some((a) => a.id !== id && a.key === key)) {
+				key = `${updates.key}${counter}`;
+				counter++;
 			}
+			final_updates.key = key;
 		}
 
 		Object.assign(attribute, final_updates);
