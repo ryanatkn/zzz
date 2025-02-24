@@ -75,7 +75,7 @@
 
 	<div class="width_sm column gap_md">
 		<div class="panel p_sm">
-			<div class="size_lg"><Text_Icon icon={GLYPH_PROMPT} /> final prompt</div>
+			<div class="size_lg"><Text_Icon icon={GLYPH_PROMPT} /> prompt</div>
 			{#if zzz.prompts.selected}
 				<div class="row gap_sm mt_md mb_sm">
 					<Copy_To_Clipboard text={zzz.prompts.selected.value} classes="plain" />
