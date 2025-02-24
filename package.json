@@ -370,6 +370,11 @@
       "types": "./dist/providers.svelte.d.ts",
       "default": "./dist/providers.svelte.js"
     },
+    "./Reorderable_List.svelte": {
+      "types": "./dist/Reorderable_List.svelte.d.ts",
+      "svelte": "./dist/Reorderable_List.svelte",
+      "default": "./dist/Reorderable_List.svelte"
+    },
     "./server/.env.example": {
       "default": "./dist/server/.env.example"
     },

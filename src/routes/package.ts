@@ -317,6 +317,11 @@ export const package_json = {
 			types: './dist/providers.svelte.d.ts',
 			default: './dist/providers.svelte.js',
 		},
+		'./Reorderable_List.svelte': {
+			types: './dist/Reorderable_List.svelte.d.ts',
+			svelte: './dist/Reorderable_List.svelte',
+			default: './dist/Reorderable_List.svelte',
+		},
 		'./server/.env.example': {default: './dist/server/.env.example'},
 		'./server/helpers.js': {
 			types: './dist/server/helpers.d.ts',
@@ -543,6 +548,7 @@ export const src_json = {
 			path: 'providers.svelte.ts',
 			declarations: [{name: 'Providers', kind: 'class'}],
 		},
+		'./Reorderable_List.svelte': {path: 'Reorderable_List.svelte', declarations: []},
 		'./server/.env.example': {path: 'server/.env.example', declarations: []},
 		'./server/helpers.js': {
 			path: 'server/helpers.ts',
