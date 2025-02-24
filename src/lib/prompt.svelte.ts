@@ -27,9 +27,18 @@ export class Prompt {
 	}
 
 	add_fragment(content: string = '', name: string = 'new fragment'): Prompt_Fragment {
-		const fragment = new Prompt_Fragment(name, content);
+		const fragment = new Prompt_Fragment(this.get_unique_name(name), content);
 		this.fragments.push(fragment);
 		return fragment;
+	}
+
+	get_unique_name(text: string): string {
+		let name = text;
+		let i = 2;
+		while (this.fragments.some((f) => f.name === name)) {
+			name = `${text} ${i++}`;
+		}
+		return name;
 	}
 
 	update_fragment(

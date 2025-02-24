@@ -18,7 +18,7 @@
 <div class="flex gap_xs align_items_start column">
 	<div class="flex align_items_center gap_xs2">
 		<label class="row mb_0" style:height="var(--input_height)">
-			xml tag
+			{'<'}xml>
 			<input class="plain clean ml_md" type="checkbox" bind:checked={fragment.has_xml_tag} />
 		</label>
 		<input class="plain clean flex_1" placeholder="fragment" bind:value={fragment.xml_tag_name} />

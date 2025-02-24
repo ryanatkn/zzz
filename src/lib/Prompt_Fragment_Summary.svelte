@@ -13,6 +13,8 @@
 	);
 
 	// TODO visuals are very basic
+
+	// TODO BLOCK add controls to the right, starting with enable/disable toggle, maybe remove button, or an edit button that brings up a dialog? so far we've avoided dialogs tho
 </script>
 
 <div
