@@ -16,11 +16,11 @@
 
 	// TODO BLOCK link the providers below to a page per provider (lookup from provider_default/context)
 
-	const on_detail_page = $derived(page.url.pathname === `${base}/models/${model.name}`);
+	const at_detail_page = $derived(page.url.pathname === `${base}/models/${model.name}`);
 </script>
 
 <div class="panel p_lg">
-	{#if on_detail_page}
+	{#if at_detail_page}
 		<h1>
 			{model.name}
 		</h1>

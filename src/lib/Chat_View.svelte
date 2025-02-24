@@ -9,6 +9,7 @@
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import {GLYPH_TAPE, GLYPH_PROMPT} from '$lib/constants.js';
 	import {zzz_config} from '$lib/zzz_config.js';
+	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
 
 	const zzz = zzz_context.get();
 
@@ -31,7 +32,6 @@
 		}
 	}
 	let main_input = $state(''); // TODO BLOCK @many this state probably belongs on the `multichat` object
-	let main_cleared_content = $state('');
 	let pending = $state(false); // TODO BLOCK @many this state probably belongs on the `multichat` object
 	let input_el: HTMLTextAreaElement | undefined;
 
@@ -154,27 +154,12 @@
 			</Pending_Button>
 		</div>
 		<div class="flex mt_xs">
-			<button
-				type="button"
-				class="plain"
-				disabled={!main_input && !main_cleared_content}
-				onclick={() => {
-					if (main_input) {
-						main_cleared_content = main_input;
-						main_input = '';
-					} else {
-						main_input = main_cleared_content;
-						main_cleared_content = '';
-					}
+			<Clear_Restore_Button
+				value={main_input}
+				onchange={(value) => {
+					main_input = value;
 				}}
-			>
-				<span class="relative">
-					<span style:visibility="hidden">restore</span>
-					<span class="absolute" style:inset="0"
-						>{#if main_input || !main_cleared_content}clear{:else}restore{/if}</span
-					>
-				</span>
-			</button>
+			/>
 		</div>
 		<div class="mt_lg">
 			<Confirm_Button

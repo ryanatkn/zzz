@@ -8,6 +8,7 @@
 	import Provider_Link from '$lib/Provider_Link.svelte';
 	import {providers_default} from '$lib/config.js';
 	import {GLYPH_PROVIDER} from '$lib/constants.js';
+	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
 
 	interface Props {
 		tape: Tape;
@@ -18,7 +19,6 @@
 	const {tape, onremove, onsend}: Props = $props();
 
 	let input = $state('');
-	let cleared_content = $state('');
 	let input_el: HTMLTextAreaElement | undefined;
 
 	const send = () => {
@@ -64,27 +64,12 @@
 		<button type="button" class="plain" onclick={() => send()}>send</button>
 	</div>
 	<div class="flex">
-		<button
-			type="button"
-			class="plain"
-			disabled={!input && !cleared_content}
-			onclick={() => {
-				if (input) {
-					cleared_content = input;
-					input = '';
-				} else {
-					input = cleared_content;
-					cleared_content = '';
-				}
+		<Clear_Restore_Button
+			value={input}
+			onchange={(value) => {
+				input = value;
 			}}
-		>
-			<span class="relative">
-				<span style:visibility="hidden">restore</span>
-				<span class="absolute" style:inset="0"
-					>{#if input || !cleared_content}clear{:else}restore{/if}</span
-				>
-			</span>
-		</button>
+		/>
 	</div>
 </div>
 

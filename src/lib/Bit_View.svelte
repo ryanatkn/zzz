@@ -6,6 +6,7 @@
 	import type {Prompts} from '$lib/prompts.svelte.js';
 	import Xml_Tag_Controls from '$lib/Xml_Tag_Controls.svelte';
 	import Bit_Stats from '$lib/Bit_Stats.svelte';
+	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
 
 	interface Props {
 		bit: Bit;
@@ -15,8 +16,6 @@
 	const {bit, prompts}: Props = $props();
 
 	const bit_textareas = $state<Record<string, HTMLTextAreaElement>>({});
-
-	let cleared_content = $state('');
 </script>
 
 <div class="column gap_sm">
@@ -51,27 +50,12 @@
 					bit_textareas[bit.id].focus();
 				}}>paste</button
 			>
-			<button
-				type="button"
-				class="plain"
-				disabled={!bit.content && !cleared_content}
-				onclick={() => {
-					if (bit.content) {
-						cleared_content = bit.content;
-						bit.content = '';
-					} else {
-						bit.content = cleared_content;
-						cleared_content = '';
-					}
+			<Clear_Restore_Button
+				value={bit.content}
+				onchange={(value) => {
+					bit.content = value;
 				}}
-			>
-				<span class="relative">
-					<span style:visibility="hidden">restore</span>
-					<span class="absolute" style:inset="0"
-						>{#if bit.content || !cleared_content}clear{:else}restore{/if}</span
-					>
-				</span>
-			</button>
+			/>
 			<!-- TODO restore -->
 		</div>
 		<Confirm_Button

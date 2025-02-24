@@ -17,14 +17,14 @@
 
 	const {provider, attrs}: Props = $props();
 
-	const on_detail_page = $derived(page.url.pathname === `${base}/providers/${provider.name}`);
+	const at_detail_page = $derived(page.url.pathname === `${base}/providers/${provider.name}`);
 
 	// TODO BLOCK use `provider.models`
 	const models = $derived(zzz.models.items.filter((m) => m.provider_name === provider.name));
 </script>
 
 <div {...attrs} class="panel p_lg {attrs?.class}">
-	{#if on_detail_page}
+	{#if at_detail_page}
 		<h1>
 			{provider.title}
 		</h1>
