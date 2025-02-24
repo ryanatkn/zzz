@@ -14,6 +14,9 @@
 	const {fragment, prompts}: Props = $props();
 
 	const fragment_textareas = $state<Record<string, HTMLTextAreaElement>>({});
+
+	// svelte-ignore non_reactive_update
+	let cleared_content = '';
 </script>
 
 <div class="column gap_sm">
@@ -41,11 +44,24 @@
 			<button
 				type="button"
 				class="plain"
-				disabled={!fragment.content}
+				disabled={!fragment.content && !cleared_content}
 				onclick={() => {
-					fragment.content = '';
-				}}>clear</button
+					if (fragment.content) {
+						cleared_content = fragment.content;
+						fragment.content = '';
+					} else {
+						fragment.content = cleared_content;
+						cleared_content = '';
+					}
+				}}
 			>
+				<span class="relative">
+					<span style:visibility="hidden">restore</span>
+					<span class="absolute" style:inset="0"
+						>{fragment.content || !cleared_content ? 'clear' : 'restore'}</span
+					>
+				</span>
+			</button>
 			<!-- TODO restore -->
 		</div>
 		<Confirm_Button

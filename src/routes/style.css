@@ -22,3 +22,10 @@
 	margin-bottom: var(--space_lg);
 	font-weight: 400;
 }
+
+/* TODO upstream */
+.compact {
+	--input_height: 2.6rem;
+	--min_height: 2.6rem;
+	--border_radius: var(--radius_xs);
+}

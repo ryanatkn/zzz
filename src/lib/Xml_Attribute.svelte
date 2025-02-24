@@ -12,16 +12,16 @@
 
 <div class="flex gap_xs2 align_items_center">
 	<input
-		class="plain"
+		class="plain compact"
 		placeholder="key"
 		value={attribute.key}
 		oninput={(e) => onupdate({key: e.currentTarget.value})}
 	/>
 	<input
-		class="plain"
+		class="plain compact"
 		placeholder="value"
 		value={attribute.value}
 		oninput={(e) => onupdate({value: e.currentTarget.value})}
 	/>
-	<button type="button" class="plain" onclick={onremove}>🗙</button>
+	<button type="button" class="plain compact" onclick={onremove}>🗙</button>
 </div>
