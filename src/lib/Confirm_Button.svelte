@@ -6,11 +6,11 @@
 	interface Props {
 		onclick: () => void;
 		attrs?: SvelteHTMLElements['button'];
-		button_attrs?: SvelteHTMLElements['button'];
 		button?: Snippet<[confirming: boolean, toggle: () => void]>;
+		confirm_button_attrs?: SvelteHTMLElements['button'];
 		children?: Snippet<[confirming: boolean]>;
 	}
-	const {onclick, children, button, button_attrs, attrs}: Props = $props();
+	const {onclick, children, button, attrs, confirm_button_attrs}: Props = $props();
 
 	if (children && button) {
 		console.warn('Confirm_Button has both children and button defined - button takes precedence');
@@ -33,7 +33,7 @@
 	// But then `confirming` would need to be split into `confirming`
 	// with either `confirming_open` or `final_confirming`?
 	$effect.pre(() => {
-		if (button_attrs?.disabled) {
+		if (attrs?.disabled) {
 			confirming = false;
 		}
 	});
@@ -50,14 +50,12 @@
 			type="button"
 			onclick={toggle}
 			class:confirming
-			{...button_attrs}
-			class="{button_attrs?.class} {!children && !button_attrs?.class?.includes('icon_button')
+			{...attrs}
+			class="{attrs?.class} {!children && !attrs?.class?.includes('icon_button')
 				? 'icon_button'
-				: ''} {!children && !confirming && !button_attrs?.class?.includes('plain')
+				: ''} {!children && !confirming && !attrs?.class?.includes('plain')
 				? 'plain'
-				: ''} {!children && confirming && !button_attrs?.class?.includes('size_sm')
-				? 'size_sm'
-				: ''}"
+				: ''} {!children && confirming && !attrs?.class?.includes('size_sm') ? 'size_sm' : ''}"
 		>
 			{#if children}{@render children(confirming)}{:else}🗙{/if}
 		</button>
@@ -75,7 +73,7 @@
 			}}
 			in:scale={{duration: 80}}
 			out:scale={{duration: 200}}
-			{...attrs}
+			{...confirm_button_attrs}
 		>
 			🗙
 		</button>

@@ -33,7 +33,7 @@
 					<div class="flex justify_content_end">
 						<Confirm_Button
 							onclick={() => zzz.chats.selected && zzz.chats.remove(zzz.chats.selected)}
-							button_attrs={{title: `remove Chat ${zzz.chats.selected.id}`}}
+							attrs={{title: `remove Chat ${zzz.chats.selected.id}`}}
 						/>
 					</div>
 				</div>
@@ -49,7 +49,6 @@
 					href="#TODO"
 					selected={chat.id === zzz.chats.selected_id}
 					attrs={{
-						type: 'button',
 						class: 'justify_content_space_between',
 						style: 'min-height: 0;',
 						onclick: () => zzz.chats.select(chat.id),
@@ -57,7 +56,7 @@
 				>
 					<div>
 						<span class="mr_xs2">{GLYPH_CHAT}</span>
-						<small>{chat.name}</small>
+						<span>{chat.name}</span>
 					</div>
 					{#if chat.tapes.length}<small>{chat.tapes.length}</small>{/if}
 				</Nav_Link>

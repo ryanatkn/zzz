@@ -71,7 +71,7 @@
 		</div>
 		<Confirm_Button
 			onclick={() => prompts.remove_fragment(fragment.id)}
-			button_attrs={{title: `remove fragment ${fragment.id}`}}
+			attrs={{title: `remove fragment ${fragment.id}`}}
 		/>
 	</div>
 	<Xml_Tag_Controls {fragment} />

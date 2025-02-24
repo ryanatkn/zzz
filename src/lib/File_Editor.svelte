@@ -86,7 +86,7 @@
 		>
 	</div>
 
-	<Confirm_Button onclick={() => zzz.delete_file(file.id)} button_attrs={{class: 'color_c'}}>
+	<Confirm_Button onclick={() => zzz.delete_file(file.id)} attrs={{class: 'color_c'}}>
 		{#snippet children()}
 			delete file
 		{/snippet}

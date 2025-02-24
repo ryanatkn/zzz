@@ -105,7 +105,7 @@
 						{#each Array.from(zzz.tags) as tag (tag)}
 							{@const tapes_with_tag = chat.tapes.filter((t) => t.model.tags.includes(tag))}
 							<Confirm_Button
-								button_attrs={{
+								attrs={{
 									disabled: !tapes_with_tag.length,
 									class:
 										'w_100 size_sm py_xs3 justify_content_space_between plain radius_xs font_weight_600',
@@ -143,17 +143,20 @@
 				bind:this={input_el}
 				placeholder="send to all {count >= 2 ? count + ' ' : ''}tapes..."
 			></textarea>
-			<Pending_Button {pending} onclick={send_to_all}>
+			<Pending_Button {pending} onclick={send_to_all} disabled={!count}>
 				send to all ({count})
 			</Pending_Button>
 		</div>
-		<div class="my_lg">
-			<Confirm_Button onclick={() => chat.remove_all_tapes()} button_attrs={{disabled: !count}}>
+		<div class="mt_lg">
+			<Confirm_Button
+				onclick={() => chat.remove_all_tapes()}
+				attrs={{disabled: !count, class: 'plain'}}
+			>
 				🗙 <span class="ml_xs">remove all tapes</span>
 			</Confirm_Button>
 		</div>
 		<!-- TODO duplicate tape button -->
-		<div class="tapes">
+		<div class="tapes mt_lg">
 			{#each chat.tapes as tape (tape.id)}
 				<Chat_Tape
 					{tape}

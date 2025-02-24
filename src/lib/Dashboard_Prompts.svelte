@@ -37,7 +37,7 @@
 					<div class="flex justify_content_end">
 						<Confirm_Button
 							onclick={() => zzz.prompts.selected && zzz.prompts.remove(zzz.prompts.selected)}
-							button_attrs={{title: `remove Prompt ${zzz.prompts.selected.id}`}}
+							attrs={{title: `remove Prompt ${zzz.prompts.selected.id}`}}
 						/>
 					</div>
 				</div>
@@ -56,7 +56,6 @@
 					href="#TODO"
 					selected={prompt.id === zzz.prompts.selected_id}
 					attrs={{
-						type: 'button',
 						class: 'justify_content_space_between',
 						style: 'min-height: 0;',
 						onclick: () => zzz.prompts.select(prompt.id),
@@ -64,7 +63,7 @@
 				>
 					<div>
 						<span class="mr_xs2">{GLYPH_PROMPT}</span>
-						<small>{prompt.name}</small>
+						<span>{prompt.name}</span>
 					</div>
 					{#if prompt.fragments.length}<small>{prompt.fragments.length}</small>{/if}
 				</Nav_Link>
@@ -120,7 +119,7 @@
 					{/if} -->
 					<Confirm_Button
 						onclick={() => zzz.prompts.selected?.remove_all_fragments()}
-						button_attrs={{disabled: !zzz.prompts.selected.fragments.length, class: 'plain'}}
+						attrs={{disabled: !zzz.prompts.selected.fragments.length, class: 'plain'}}
 					>
 						🗙 remove all fragments
 					</Confirm_Button>
