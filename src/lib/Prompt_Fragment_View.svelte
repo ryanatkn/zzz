@@ -23,7 +23,7 @@
 		class="flex mb_0 justify_content_space_between"
 		title="this prompt fragment is {fragment.enabled ? 'enabled' : 'disabled'}"
 	>
-		<h3 class="m_0">{fragment.name}</h3>
+		<div class="size_lg m_0">{fragment.name}</div>
 		<input type="checkbox" class="plain clean ml_md" bind:checked={fragment.enabled} />
 	</label>
 	<textarea
