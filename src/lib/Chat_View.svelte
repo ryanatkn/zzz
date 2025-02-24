@@ -143,7 +143,12 @@
 				bind:this={input_el}
 				placeholder="send to all {count >= 2 ? count + ' ' : ''}tapes..."
 			></textarea>
-			<Pending_Button {pending} onclick={send_to_all} disabled={!count ? true : undefined}>
+			<Pending_Button
+				{pending}
+				onclick={send_to_all}
+				disabled={!count ? true : undefined}
+				attrs={{class: 'plain'}}
+			>
 				send to all ({count})
 			</Pending_Button>
 		</div>
