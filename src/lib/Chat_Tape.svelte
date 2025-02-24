@@ -2,7 +2,7 @@
 	import {scale} from 'svelte/transition';
 
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
-	import type {Tape} from '$lib/chat.svelte.js';
+	import type {Tape} from '$lib/tape.svelte.js';
 	import Chat_Message from '$lib/Chat_Message.svelte';
 	import Model_Link from '$lib/Model_Link.svelte';
 	import Provider_Link from '$lib/Provider_Link.svelte';

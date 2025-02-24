@@ -199,6 +199,7 @@ export const package_json = {
 			default: './dist/File_View.svelte',
 		},
 		'./file.svelte.js': {types: './dist/file.svelte.d.ts', default: './dist/file.svelte.js'},
+		'./files.svelte.js': {types: './dist/files.svelte.d.ts', default: './dist/files.svelte.js'},
 		'./helpers.js': {types: './dist/helpers.d.ts', default: './dist/helpers.js'},
 		'./id.js': {types: './dist/id.d.ts', default: './dist/id.js'},
 		'./list_helpers.js': {types: './dist/list_helpers.d.ts', default: './dist/list_helpers.js'},
@@ -470,11 +471,12 @@ export const src_json = {
 			path: 'file.svelte.ts',
 			declarations: [
 				{name: 'Source_File_Json', kind: 'type'},
-				{name: 'Prompt_Json', kind: 'type'},
-				{name: 'Prompt_Options', kind: 'type'},
-				{name: 'Prompt', kind: 'class'},
+				{name: 'File_Json', kind: 'type'},
+				{name: 'File_Options', kind: 'type'},
+				{name: 'File', kind: 'class'},
 			],
 		},
+		'./files.svelte.js': {path: 'files.svelte.ts', declarations: [{name: 'Files', kind: 'class'}]},
 		'./helpers.js': {
 			path: 'helpers.ts',
 			declarations: [{name: 'get_unique_name', kind: 'function'}],

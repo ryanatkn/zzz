@@ -8,6 +8,7 @@ import {random_id, type Id} from '$lib/id.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 import type {Async_Status} from '@ryanatkn/belt/async.js';
 import {get_unique_name} from '$lib/helpers.js';
+import {Tape} from '$lib/tape.svelte.js';
 
 const NEW_CHAT_PREFIX = 'new chat';
 
@@ -17,12 +18,6 @@ export interface Chat_Message {
 	text: string;
 	request?: Completion_Request;
 	response?: Completion_Response;
-}
-
-export interface Tape {
-	id: Id;
-	model: Model;
-	messages: Array<Chat_Message>;
 }
 
 export class Chat {
@@ -43,11 +38,7 @@ export class Chat {
 
 	add_tape(model: Model): void {
 		console.log(`add_tape model`, model);
-		this.tapes.push({
-			id: random_id(),
-			model,
-			messages: [],
-		});
+		this.tapes.push(new Tape(model));
 	}
 
 	add_tapes_by_model_tag(tag: string): void {

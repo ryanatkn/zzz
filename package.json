@@ -234,6 +234,10 @@
       "types": "./dist/file.svelte.d.ts",
       "default": "./dist/file.svelte.js"
     },
+    "./files.svelte.js": {
+      "types": "./dist/files.svelte.d.ts",
+      "default": "./dist/files.svelte.js"
+    },
     "./helpers.js": {
       "types": "./dist/helpers.d.ts",
       "default": "./dist/helpers.js"
