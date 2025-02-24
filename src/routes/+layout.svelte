@@ -113,9 +113,9 @@
 			// TODO init properly
 			zzz.chats.add();
 			const prompt = zzz.prompts.add();
-			prompt.add_fragment('one');
-			prompt.add_fragment('2');
-			prompt.add_fragment('c');
+			prompt.add_bit('one');
+			prompt.add_bit('2');
+			prompt.add_bit('c');
 		});
 	}
 

@@ -1,6 +1,7 @@
 import type {Zzz} from '$lib/zzz.svelte.js';
-import {Prompt, type Prompt_Fragment} from '$lib/prompt.svelte.js';
+import {Prompt} from '$lib/prompt.svelte.js';
 import type {Id} from '$lib/id.js';
+import type {Bit} from '$lib/bit.svelte.js';
 
 export class Prompts {
 	readonly zzz: Zzz;
@@ -37,18 +38,18 @@ export class Prompts {
 		this.selected_id = prompt_id;
 	}
 
-	add_fragment(): void {
+	add_bit(): void {
 		if (!this.selected) return;
-		this.selected.add_fragment();
+		this.selected.add_bit();
 	}
 
-	update_fragment(fragment_id: Id, updates: Partial<Omit<Prompt_Fragment, 'id'>>): void {
+	update_bit(bit_id: Id, updates: Partial<Omit<Bit, 'id'>>): void {
 		if (!this.selected) return;
-		this.selected.update_fragment(fragment_id, updates);
+		this.selected.update_bit(bit_id, updates);
 	}
 
-	remove_fragment(fragment_id: Id): void {
+	remove_bit(bit_id: Id): void {
 		if (!this.selected) return;
-		this.selected.remove_fragment(fragment_id);
+		this.selected.remove_bit(bit_id);
 	}
 }

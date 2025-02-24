@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type {Prompt} from '$lib/prompt.svelte.js';
 	import Reorderable_List from '$lib/Reorderable_List.svelte';
-	import Prompt_Fragment_Summary from '$lib/Prompt_Fragment_Summary.svelte';
+	import Bit_Summary from '$lib/Bit_Summary.svelte';
 
 	interface Props {
 		prompt: Prompt;
@@ -11,15 +11,15 @@
 </script>
 
 <div class="column">
-	<Reorderable_List items={prompt.fragments}>
-		{#snippet children(fragment, dragging, dragging_any)}
+	<Reorderable_List items={prompt.bits}>
+		{#snippet children(bit, dragging, dragging_any)}
 			<div
 				class="item_wrapper radius_xs"
 				class:dragging
 				class:dragging_any
 				class:dragging_other={dragging_any && !dragging}
 			>
-				<Prompt_Fragment_Summary {fragment} {prompt} />
+				<Bit_Summary {bit} {prompt} />
 			</div>
 		{/snippet}
 	</Reorderable_List>

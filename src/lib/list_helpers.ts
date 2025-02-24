@@ -1,13 +1,8 @@
-export const reorder_list = (fragments: Array<any>, from_index: number, to_index: number): void => {
+export const reorder_list = (bits: Array<any>, from_index: number, to_index: number): void => {
 	if (from_index === to_index) return;
-	if (
-		from_index < 0 ||
-		to_index < 0 ||
-		from_index >= fragments.length ||
-		to_index >= fragments.length
-	) {
+	if (from_index < 0 || to_index < 0 || from_index >= bits.length || to_index >= bits.length) {
 		throw Error('index out of bounds');
 	}
-	const [moved] = fragments.splice(from_index, 1);
-	fragments.splice(to_index, 0, moved);
+	const [moved] = bits.splice(from_index, 1);
+	bits.splice(to_index, 0, moved);
 };

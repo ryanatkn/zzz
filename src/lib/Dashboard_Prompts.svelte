@@ -6,17 +6,17 @@
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Nav_Link from '$lib/Nav_Link.svelte';
 	import Text_Icon from '$lib/Text_Icon.svelte';
-	import Prompt_Fragment_View from '$lib/Prompt_Fragment_View.svelte';
-	import {GLYPH_FRAGMENT, GLYPH_PROMPT} from '$lib/constants.js';
+	import Bit_View from '$lib/Bit_View.svelte';
+	import {GLYPH_BIT, GLYPH_PROMPT} from '$lib/constants.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import Prompt_Stats from '$lib/Prompt_Stats.svelte';
-	import Prompt_Fragment_List from '$lib/Prompt_Fragment_List.svelte';
+	import Bit_List from '$lib/Bit_List.svelte';
 
 	const zzz = zzz_context.get();
 
 	// TODO BLOCK integrate with sources like the local filesystem (just the `zzz.files`?)
 
-	// TODO BLOCK save both fragments and prompts to the library, right?
+	// TODO BLOCK save both bits and prompts to the library, right?
 
 	// TODO BLOCK make it have optional attributes like file type
 </script>
@@ -32,8 +32,8 @@
 					</div>
 					<small>{zzz.prompts.selected.id}</small>
 					<small>
-						{zzz.prompts.selected.fragments.length}
-						fragment{#if zzz.prompts.selected.fragments.length !== 1}s{/if}
+						{zzz.prompts.selected.bits.length}
+						bit{#if zzz.prompts.selected.bits.length !== 1}s{/if}
 					</small>
 					<small>created {format(zzz.prompts.selected.created, 'MMM d, p')}</small>
 					<div class="flex justify_content_end">
@@ -67,7 +67,7 @@
 						<span class="mr_xs2">{GLYPH_PROMPT}</span>
 						<span>{prompt.name}</span>
 					</div>
-					{#if prompt.fragments.length}<small>{prompt.fragments.length}</small>{/if}
+					{#if prompt.bits.length}<small>{prompt.bits.length}</small>{/if}
 				</Nav_Link>
 			{/each}
 		</menu>
@@ -97,7 +97,7 @@
 		<!-- <div class="panel p_sm">
 			<h3 class="mt_0">library</h3>
 			<div class="mb_sm">
-				<input type="search" placeholder="Search prompts and fragments..." class="w_100" />
+				<input type="search" placeholder="Search prompts and bits..." class="w_100" />
 			</div>
 			<menu class="unstyled"> TODO </menu>
 		</div> -->
@@ -106,24 +106,24 @@
 	<div class="panel p_sm flex_1">
 		{#if zzz.prompts.selected}
 			<div class="flex justify_content_space_between mb_lg">
-				<button type="button" class="plain" onclick={() => zzz.prompts.add_fragment()}>
-					+ add fragment
+				<button type="button" class="plain" onclick={() => zzz.prompts.add_bit()}>
+					+ add bit
 				</button>
 				<div class="flex gap_md">
 					<!-- Add file toggle -->
 					<!-- <label class="flex gap_xs">
-						<input type="checkbox" bind:checked={fragment.file_path !== null} />
+						<input type="checkbox" bind:checked={bit.file_path !== null} />
 						Is File
 					</label> -->
 					<!-- File path input -->
-					<!-- {#if fragment.file_path !== null}
-						<input placeholder="file path (optional)" bind:value={fragment.file_path} />
+					<!-- {#if bit.file_path !== null}
+						<input placeholder="file path (optional)" bind:value={bit.file_path} />
 					{/if} -->
 					<Confirm_Button
-						onclick={() => zzz.prompts.selected?.remove_all_fragments()}
-						attrs={{disabled: !zzz.prompts.selected.fragments.length, class: 'plain'}}
+						onclick={() => zzz.prompts.selected?.remove_all_bits()}
+						attrs={{disabled: !zzz.prompts.selected.bits.length, class: 'plain'}}
 					>
-						🗙 remove all fragments
+						🗙 remove all bits
 					</Confirm_Button>
 				</div>
 			</div>
@@ -131,9 +131,9 @@
 				class="grid gap_md"
 				style:grid-template-columns="repeat(auto-fill, minmax(var(--width_sm), 1fr))"
 			>
-				{#each zzz.prompts.selected.fragments as fragment (fragment.id)}
+				{#each zzz.prompts.selected.bits as bit (bit.id)}
 					<div class="bg radius_xs p_sm" transition:scale>
-						<Prompt_Fragment_View {fragment} prompts={zzz.prompts} />
+						<Bit_View {bit} prompts={zzz.prompts} />
 					</div>
 				{/each}
 			</div>
@@ -141,9 +141,9 @@
 	</div>
 
 	<div class="panel p_sm width_sm">
-		<header class="size_lg mb_lg"><Text_Icon icon={GLYPH_FRAGMENT} /> fragments</header>
+		<header class="size_lg mb_lg"><Text_Icon icon={GLYPH_BIT} /> bits</header>
 		{#if zzz.prompts.selected}
-			<Prompt_Fragment_List prompt={zzz.prompts.selected} />
+			<Bit_List prompt={zzz.prompts.selected} />
 		{/if}
 	</div>
 </div>

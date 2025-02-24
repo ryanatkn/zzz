@@ -2,6 +2,7 @@ import type {Zzz} from '$lib/zzz.svelte.js';
 import {random_id, type Id} from '$lib/id.js';
 import {get_unique_name} from '$lib/helpers.js';
 import {XML_TAG_NAME_DEFAULT} from '$lib/constants.js';
+import {Bit} from '$lib/bit.svelte.js';
 
 export interface Prompt_Message {
 	role: 'user' | 'system';
@@ -14,11 +15,11 @@ export class Prompt {
 	readonly id: Id = random_id();
 	name: string = $state('');
 	created: string = new Date().toISOString();
-	fragments: Array<Prompt_Fragment> = $state([]);
+	bits: Array<Bit> = $state([]);
 
 	zzz: Zzz;
 
-	value: string = $derived(join_prompt_fragments(this.fragments));
+	value: string = $derived(join_prompt_bits(this.bits));
 	length: number = $derived(this.value.length); // TODO use segmenter for more precision? will it be slow for large values tho?
 	token_count: number = $derived(count_tokens(this.value));
 
@@ -30,47 +31,47 @@ export class Prompt {
 		);
 	}
 
-	add_fragment(content: string = '', name: string = 'new fragment'): Prompt_Fragment {
-		const fragment = new Prompt_Fragment(
+	add_bit(content: string = '', name: string = 'new bit'): Bit {
+		const bit = new Bit(
 			get_unique_name(
 				name,
-				this.fragments.map((f) => f.name),
+				this.bits.map((f) => f.name),
 			),
 			content,
 		);
-		this.fragments.push(fragment);
-		return fragment;
+		this.bits.push(bit);
+		return bit;
 	}
 
-	update_fragment(
+	update_bit(
 		id: Id,
-		updates: Partial<Pick<Prompt_Fragment, 'name' | 'content' | 'has_xml_tag' | 'xml_tag_name'>>,
+		updates: Partial<Pick<Bit, 'name' | 'content' | 'has_xml_tag' | 'xml_tag_name'>>,
 	): void {
-		const fragment = this.fragments.find((f) => f.id === id);
-		if (fragment) {
-			if (updates.name !== undefined) fragment.name = updates.name;
-			if (updates.content !== undefined) fragment.content = updates.content;
-			if (updates.has_xml_tag !== undefined) fragment.has_xml_tag = updates.has_xml_tag;
-			if (updates.xml_tag_name !== undefined) fragment.xml_tag_name = updates.xml_tag_name;
+		const bit = this.bits.find((f) => f.id === id);
+		if (bit) {
+			if (updates.name !== undefined) bit.name = updates.name;
+			if (updates.content !== undefined) bit.content = updates.content;
+			if (updates.has_xml_tag !== undefined) bit.has_xml_tag = updates.has_xml_tag;
+			if (updates.xml_tag_name !== undefined) bit.xml_tag_name = updates.xml_tag_name;
 		}
 	}
 
-	remove_fragment(id: Id): boolean {
-		const index = this.fragments.findIndex((f) => f.id === id);
+	remove_bit(id: Id): boolean {
+		const index = this.bits.findIndex((f) => f.id === id);
 		if (index !== -1) {
-			this.fragments.splice(index, 1);
+			this.bits.splice(index, 1);
 			return true;
 		}
 		return false;
 	}
 
-	remove_all_fragments(): void {
-		this.fragments = [];
+	remove_all_bits(): void {
+		this.bits = [];
 	}
 }
 
-export const join_prompt_fragments = (fragments: Array<Prompt_Fragment>): string =>
-	fragments
+export const join_prompt_bits = (bits: Array<Bit>): string =>
+	bits
 		.filter((f) => f.enabled)
 		.map((f) => {
 			const content = f.content.trim();
@@ -96,61 +97,4 @@ export interface Xml_Attribute {
 	id: Id;
 	key: string;
 	value: string;
-}
-
-// TODO maybe rename to just `Fragment`? extract to `fragment.svelte.ts`?
-export class Prompt_Fragment {
-	readonly id: Id = random_id();
-	name: string = $state('');
-	content: string = $state('');
-	has_xml_tag: boolean = $state(false);
-	xml_tag_name: string = $state('');
-	attributes: Array<Xml_Attribute> = $state([]);
-	enabled: boolean = $state(true);
-
-	length: number = $derived(this.content.length); // TODO use segmenter for more precision? will it be slow for large contents tho?
-	token_count: number = $derived(count_tokens(this.content));
-
-	constructor(name: string = 'new fragment', content: string = '') {
-		this.name = name;
-		this.content = content;
-	}
-
-	// TODO defaults/partial?
-	add_attribute(): void {
-		const attr: Xml_Attribute = {
-			id: random_id(),
-			key: '',
-			value: '',
-		};
-		this.attributes.push(attr);
-	}
-
-	update_attribute(id: Id, updates: Partial<Omit<Xml_Attribute, 'id'>>): void {
-		const index = this.attributes.findIndex((a) => a.id === id);
-		if (index === -1) return;
-
-		const attribute = this.attributes[index];
-		const final_updates: Partial<Omit<Xml_Attribute, 'id'>> = {...updates};
-
-		// Only check for duplicates if the new key is non-empty
-		if (updates.key !== undefined && updates.key !== attribute.key && updates.key !== '') {
-			let key = updates.key;
-			let counter = 1;
-			while (this.attributes.some((a) => a.id !== id && a.key === key)) {
-				key = `${updates.key}${counter}`;
-				counter++;
-			}
-			final_updates.key = key;
-		}
-
-		Object.assign(attribute, final_updates);
-	}
-
-	remove_attribute(id: Id): void {
-		const index = this.attributes.findIndex((a) => a.id === id);
-		if (index !== -1) {
-			this.attributes.splice(index, 1);
-		}
-	}
 }

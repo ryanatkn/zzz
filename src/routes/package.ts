@@ -76,6 +76,27 @@ export const package_json = {
 	files: ['dist'],
 	exports: {
 		'./package.json': './package.json',
+		'./Bit_List.svelte': {
+			types: './dist/Bit_List.svelte.d.ts',
+			svelte: './dist/Bit_List.svelte',
+			default: './dist/Bit_List.svelte',
+		},
+		'./Bit_Stats.svelte': {
+			types: './dist/Bit_Stats.svelte.d.ts',
+			svelte: './dist/Bit_Stats.svelte',
+			default: './dist/Bit_Stats.svelte',
+		},
+		'./Bit_Summary.svelte': {
+			types: './dist/Bit_Summary.svelte.d.ts',
+			svelte: './dist/Bit_Summary.svelte',
+			default: './dist/Bit_Summary.svelte',
+		},
+		'./Bit_View.svelte': {
+			types: './dist/Bit_View.svelte.d.ts',
+			svelte: './dist/Bit_View.svelte',
+			default: './dist/Bit_View.svelte',
+		},
+		'./bit.svelte.js': {types: './dist/bit.svelte.d.ts', default: './dist/bit.svelte.js'},
 		'./Chat_Item.svelte': {
 			types: './dist/Chat_Item.svelte.d.ts',
 			svelte: './dist/Chat_Item.svelte',
@@ -257,26 +278,6 @@ export const package_json = {
 		},
 		'./ollama.js': {types: './dist/ollama.d.ts', default: './dist/ollama.js'},
 		'./path.js': {types: './dist/path.d.ts', default: './dist/path.js'},
-		'./Prompt_Fragment_List.svelte': {
-			types: './dist/Prompt_Fragment_List.svelte.d.ts',
-			svelte: './dist/Prompt_Fragment_List.svelte',
-			default: './dist/Prompt_Fragment_List.svelte',
-		},
-		'./Prompt_Fragment_Stats.svelte': {
-			types: './dist/Prompt_Fragment_Stats.svelte.d.ts',
-			svelte: './dist/Prompt_Fragment_Stats.svelte',
-			default: './dist/Prompt_Fragment_Stats.svelte',
-		},
-		'./Prompt_Fragment_Summary.svelte': {
-			types: './dist/Prompt_Fragment_Summary.svelte.d.ts',
-			svelte: './dist/Prompt_Fragment_Summary.svelte',
-			default: './dist/Prompt_Fragment_Summary.svelte',
-		},
-		'./Prompt_Fragment_View.svelte': {
-			types: './dist/Prompt_Fragment_View.svelte.d.ts',
-			svelte: './dist/Prompt_Fragment_View.svelte',
-			default: './dist/Prompt_Fragment_View.svelte',
-		},
 		'./Prompt_Stats.svelte': {
 			types: './dist/Prompt_Stats.svelte.d.ts',
 			svelte: './dist/Prompt_Stats.svelte',
@@ -345,6 +346,7 @@ export const package_json = {
 			svelte: './dist/Settings.svelte',
 			default: './dist/Settings.svelte',
 		},
+		'./tape.svelte.js': {types: './dist/tape.svelte.d.ts', default: './dist/tape.svelte.js'},
 		'./Text_Icon.svelte': {
 			types: './dist/Text_Icon.svelte.d.ts',
 			svelte: './dist/Text_Icon.svelte',
@@ -381,6 +383,11 @@ export const src_json = {
 	version: '0.0.1',
 	modules: {
 		'./package.json': {path: 'package.json', declarations: []},
+		'./Bit_List.svelte': {path: 'Bit_List.svelte', declarations: []},
+		'./Bit_Stats.svelte': {path: 'Bit_Stats.svelte', declarations: []},
+		'./Bit_Summary.svelte': {path: 'Bit_Summary.svelte', declarations: []},
+		'./Bit_View.svelte': {path: 'Bit_View.svelte', declarations: []},
+		'./bit.svelte.js': {path: 'bit.svelte.ts', declarations: [{name: 'Bit', kind: 'class'}]},
 		'./Chat_Item.svelte': {path: 'Chat_Item.svelte', declarations: []},
 		'./Chat_Message.svelte': {path: 'Chat_Message.svelte', declarations: []},
 		'./Chat_Tape.svelte': {path: 'Chat_Tape.svelte', declarations: []},
@@ -389,7 +396,6 @@ export const src_json = {
 			path: 'chat.svelte.ts',
 			declarations: [
 				{name: 'Chat_Message', kind: 'type'},
-				{name: 'Tape', kind: 'type'},
 				{name: 'Chat', kind: 'class'},
 			],
 		},
@@ -447,7 +453,7 @@ export const src_json = {
 				{name: 'GLYPH_TAPE', kind: 'variable'},
 				{name: 'GLYPH_FILE', kind: 'variable'},
 				{name: 'GLYPH_PROMPT', kind: 'variable'},
-				{name: 'GLYPH_FRAGMENT', kind: 'variable'},
+				{name: 'GLYPH_BIT', kind: 'variable'},
 				{name: 'GLYPH_PROVIDER', kind: 'variable'},
 				{name: 'GLYPH_MODEL', kind: 'variable'},
 				{name: 'GLYPH_CAPABILITY', kind: 'variable'},
@@ -527,10 +533,6 @@ export const src_json = {
 			],
 		},
 		'./path.js': {path: 'path.ts', declarations: [{name: 'to_root_path', kind: 'function'}]},
-		'./Prompt_Fragment_List.svelte': {path: 'Prompt_Fragment_List.svelte', declarations: []},
-		'./Prompt_Fragment_Stats.svelte': {path: 'Prompt_Fragment_Stats.svelte', declarations: []},
-		'./Prompt_Fragment_Summary.svelte': {path: 'Prompt_Fragment_Summary.svelte', declarations: []},
-		'./Prompt_Fragment_View.svelte': {path: 'Prompt_Fragment_View.svelte', declarations: []},
 		'./Prompt_Stats.svelte': {path: 'Prompt_Stats.svelte', declarations: []},
 		'./prompt.svelte.js': {
 			path: 'prompt.svelte.ts',
@@ -538,10 +540,9 @@ export const src_json = {
 				{name: 'Prompt_Message', kind: 'type'},
 				{name: 'Prompt_Message_Content', kind: 'type'},
 				{name: 'Prompt', kind: 'class'},
-				{name: 'join_prompt_fragments', kind: 'function'},
+				{name: 'join_prompt_bits', kind: 'function'},
 				{name: 'count_tokens', kind: 'function'},
 				{name: 'Xml_Attribute', kind: 'type'},
-				{name: 'Prompt_Fragment', kind: 'class'},
 			],
 		},
 		'./prompts.svelte.js': {
@@ -585,6 +586,7 @@ export const src_json = {
 			],
 		},
 		'./Settings.svelte': {path: 'Settings.svelte', declarations: []},
+		'./tape.svelte.js': {path: 'tape.svelte.ts', declarations: [{name: 'Tape', kind: 'class'}]},
 		'./Text_Icon.svelte': {path: 'Text_Icon.svelte', declarations: []},
 		'./Xml_Attribute.svelte': {path: 'Xml_Attribute.svelte', declarations: []},
 		'./Xml_Tag_Controls.svelte': {path: 'Xml_Tag_Controls.svelte', declarations: []},

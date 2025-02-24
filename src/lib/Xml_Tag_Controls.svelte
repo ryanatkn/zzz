@@ -1,17 +1,17 @@
 <script lang="ts">
 	import {slide} from 'svelte/transition';
 
-	import type {Prompt_Fragment} from '$lib/prompt.svelte.js';
+	import type {Bit} from '$lib/bit.svelte.js';
 	import Xml_Attribute from '$lib/Xml_Attribute.svelte';
 	import {XML_TAG_NAME_DEFAULT} from '$lib/constants.js';
 
 	interface Props {
-		fragment: Prompt_Fragment;
+		bit: Bit;
 	}
 
-	const {fragment}: Props = $props();
+	const {bit}: Props = $props();
 
-	// TODO BLOCK visually show when the attributes are not being used, but don't actually disable them (maybe red outline? - similarly need something for fragments that are empty)
+	// TODO BLOCK visually show when the attributes are not being used, but don't actually disable them (maybe red outline? - similarly need something for bits that are empty)
 
 	// TODO BLOCK experiment with the checkbox being a button with `.deselectable`
 </script>
@@ -21,29 +21,29 @@
 		<label
 			class="row mb_0"
 			style:height="var(--input_height)"
-			title="when enabled, the prompt's content will be wrapped with {fragment.xml_tag_name ||
+			title="when enabled, the prompt's content will be wrapped with {bit.xml_tag_name ||
 				XML_TAG_NAME_DEFAULT}"
 		>
 			xml tag
-			<input class="plain ml_md" type="checkbox" bind:checked={fragment.has_xml_tag} />
+			<input class="plain ml_md" type="checkbox" bind:checked={bit.has_xml_tag} />
 		</label>
-		<input class="plain flex_1" placeholder="fragment" bind:value={fragment.xml_tag_name} />
+		<input class="plain flex_1" placeholder="bit" bind:value={bit.xml_tag_name} />
 		<button
 			type="button"
 			class="icon_button plain"
 			title="add xml attribute"
-			onclick={() => fragment.add_attribute()}
+			onclick={() => bit.add_attribute()}
 		>
 			✛
 		</button>
 	</div>
 	<div class="attributes column gap_xs2">
-		{#each fragment.attributes as attribute (attribute.id)}
+		{#each bit.attributes as attribute (attribute.id)}
 			<div transition:slide>
 				<Xml_Attribute
 					{attribute}
-					onupdate={(updates) => fragment.update_attribute(attribute.id, updates)}
-					onremove={() => fragment.remove_attribute(attribute.id)}
+					onupdate={(updates) => bit.update_attribute(attribute.id, updates)}
+					onremove={() => bit.remove_attribute(attribute.id)}
 				/>
 			</div>
 		{/each}

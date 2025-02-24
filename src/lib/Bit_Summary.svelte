@@ -1,13 +1,14 @@
 <script lang="ts">
-	import type {Prompt, Prompt_Fragment} from '$lib/prompt.svelte.js';
+	import type {Prompt} from '$lib/prompt.svelte.js';
+	import type {Bit} from '$lib/bit.svelte.js';
 
 	interface Props {
-		fragment: Prompt_Fragment;
+		bit: Bit;
 		prompt: Prompt;
 	}
-	const {fragment, prompt}: Props = $props();
+	const {bit, prompt}: Props = $props();
 
-	const total_tokens = $derived(fragment.enabled ? fragment.token_count : 0);
+	const total_tokens = $derived(bit.enabled ? bit.token_count : 0);
 	const percent = $derived(
 		total_tokens && prompt.token_count ? (total_tokens / prompt.token_count) * 100 : 0,
 	);
@@ -19,11 +20,11 @@
 
 <div
 	class="flex panel px_sm py_xs3 white_space_nowrap size_sm relative"
-	class:dormant={!fragment.enabled}
+	class:dormant={!bit.enabled}
 >
 	<div class="progress_bar" style:width="{percent}%"></div>
-	<div>{fragment.name}</div>
-	<div class="pl_md ellipsis">{fragment.content}</div>
+	<div>{bit.name}</div>
+	<div class="pl_md ellipsis">{bit.content}</div>
 </div>
 
 <style>
