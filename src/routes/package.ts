@@ -199,11 +199,6 @@ export const package_json = {
 			default: './dist/File_View.svelte',
 		},
 		'./file.svelte.js': {types: './dist/file.svelte.d.ts', default: './dist/file.svelte.js'},
-		'./Fragment_Summary.svelte': {
-			types: './dist/Fragment_Summary.svelte.d.ts',
-			svelte: './dist/Fragment_Summary.svelte',
-			default: './dist/Fragment_Summary.svelte',
-		},
 		'./id.js': {types: './dist/id.d.ts', default: './dist/id.js'},
 		'./Main_Dialog.svelte': {
 			types: './dist/Main_Dialog.svelte.d.ts',
@@ -259,15 +254,15 @@ export const package_json = {
 		},
 		'./ollama.js': {types: './dist/ollama.d.ts', default: './dist/ollama.js'},
 		'./path.js': {types: './dist/path.d.ts', default: './dist/path.js'},
-		'./Prompt_Fragment_File_Controls.svelte': {
-			types: './dist/Prompt_Fragment_File_Controls.svelte.d.ts',
-			svelte: './dist/Prompt_Fragment_File_Controls.svelte',
-			default: './dist/Prompt_Fragment_File_Controls.svelte',
-		},
 		'./Prompt_Fragment_Stats.svelte': {
 			types: './dist/Prompt_Fragment_Stats.svelte.d.ts',
 			svelte: './dist/Prompt_Fragment_Stats.svelte',
 			default: './dist/Prompt_Fragment_Stats.svelte',
+		},
+		'./Prompt_Fragment_Summary.svelte': {
+			types: './dist/Prompt_Fragment_Summary.svelte.d.ts',
+			svelte: './dist/Prompt_Fragment_Summary.svelte',
+			default: './dist/Prompt_Fragment_Summary.svelte',
 		},
 		'./Prompt_Fragment_View.svelte': {
 			types: './dist/Prompt_Fragment_View.svelte.d.ts',
@@ -341,6 +336,16 @@ export const package_json = {
 			types: './dist/Text_Icon.svelte.d.ts',
 			svelte: './dist/Text_Icon.svelte',
 			default: './dist/Text_Icon.svelte',
+		},
+		'./Xml_Attribute.svelte': {
+			types: './dist/Xml_Attribute.svelte.d.ts',
+			svelte: './dist/Xml_Attribute.svelte',
+			default: './dist/Xml_Attribute.svelte',
+		},
+		'./Xml_Tag_Controls.svelte': {
+			types: './dist/Xml_Tag_Controls.svelte.d.ts',
+			svelte: './dist/Xml_Tag_Controls.svelte',
+			default: './dist/Xml_Tag_Controls.svelte',
 		},
 		'./zzz_client.js': {types: './dist/zzz_client.d.ts', default: './dist/zzz_client.js'},
 		'./zzz_config.js': {types: './dist/zzz_config.d.ts', default: './dist/zzz_config.js'},
@@ -457,7 +462,6 @@ export const src_json = {
 				{name: 'Prompt', kind: 'class'},
 			],
 		},
-		'./Fragment_Summary.svelte': {path: 'Fragment_Summary.svelte', declarations: []},
 		'./id.js': {
 			path: 'id.ts',
 			declarations: [
@@ -500,11 +504,8 @@ export const src_json = {
 			],
 		},
 		'./path.js': {path: 'path.ts', declarations: [{name: 'to_root_path', kind: 'function'}]},
-		'./Prompt_Fragment_File_Controls.svelte': {
-			path: 'Prompt_Fragment_File_Controls.svelte',
-			declarations: [],
-		},
 		'./Prompt_Fragment_Stats.svelte': {path: 'Prompt_Fragment_Stats.svelte', declarations: []},
+		'./Prompt_Fragment_Summary.svelte': {path: 'Prompt_Fragment_Summary.svelte', declarations: []},
 		'./Prompt_Fragment_View.svelte': {path: 'Prompt_Fragment_View.svelte', declarations: []},
 		'./Prompt_Stats.svelte': {path: 'Prompt_Stats.svelte', declarations: []},
 		'./prompt.svelte.js': {
@@ -559,6 +560,8 @@ export const src_json = {
 		},
 		'./Settings.svelte': {path: 'Settings.svelte', declarations: []},
 		'./Text_Icon.svelte': {path: 'Text_Icon.svelte', declarations: []},
+		'./Xml_Attribute.svelte': {path: 'Xml_Attribute.svelte', declarations: []},
+		'./Xml_Tag_Controls.svelte': {path: 'Xml_Tag_Controls.svelte', declarations: []},
 		'./zzz_client.js': {
 			path: 'zzz_client.ts',
 			declarations: [

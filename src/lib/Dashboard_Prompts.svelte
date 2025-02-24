@@ -116,7 +116,7 @@
 					</label> -->
 					<!-- File path input -->
 					<!-- {#if fragment.file_path !== null}
-						<input type="text" placeholder="file path (optional)" bind:value={fragment.file_path} />
+						<input placeholder="file path (optional)" bind:value={fragment.file_path} />
 					{/if} -->
 					<Confirm_Button
 						onclick={() => zzz.prompts.selected?.remove_all_fragments()}
