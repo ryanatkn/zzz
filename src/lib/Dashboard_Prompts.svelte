@@ -144,7 +144,7 @@
 		<div class="column">
 			{#if zzz.prompts.selected}
 				{#each zzz.prompts.selected.fragments as fragment (fragment.id)}
-					<Prompt_Fragment_Summary {fragment} />
+					<Prompt_Fragment_Summary {fragment} prompt={zzz.prompts.selected} />
 				{/each}
 			{/if}
 		</div>

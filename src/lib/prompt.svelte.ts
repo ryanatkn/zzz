@@ -98,6 +98,9 @@ export class Prompt_Fragment {
 	attributes: Array<Xml_Attribute> = $state([]);
 	enabled: boolean = $state(true);
 
+	length: number = $derived(this.content.length); // TODO use segmenter for more precision? will it be slow for large contents tho?
+	token_count: number = $derived(count_tokens(this.content));
+
 	constructor(name: string = 'new fragment', content: string = '') {
 		this.name = name;
 		this.content = content;

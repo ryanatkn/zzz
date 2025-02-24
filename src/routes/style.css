@@ -35,12 +35,12 @@ input.clean {
 	--border_radius: var(--radius_xs);
 }
 
-.dormant {
+.dormant_input {
 	border-width: var(--border_width_2) !important;
 	border-style: dashed !important;
 	border-color: var(--border_color_1) !important;
 }
 
-.dormant_wrapper {
+.dormant {
 	opacity: 0.8;
 }

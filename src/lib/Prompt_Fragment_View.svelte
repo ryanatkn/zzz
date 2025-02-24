@@ -29,8 +29,8 @@
 	<textarea
 		style:height="200px"
 		class="mb_0"
-		class:dormant={!fragment.content}
-		class:dormant_wrapper={!fragment.enabled}
+		class:dormant_input={!fragment.content}
+		class:dormant={!fragment.enabled}
 		bind:this={fragment_textareas[fragment.id]}
 		value={fragment.content}
 		oninput={(e) => prompts.update_fragment(fragment.id, {content: e.currentTarget.value})}
