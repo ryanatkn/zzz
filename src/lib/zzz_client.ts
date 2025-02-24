@@ -5,6 +5,8 @@ export interface Zzz_Client_Options {
 	receive: (message: Server_Message) => void;
 }
 
+// TODO rename?
+
 // TODO reactive?
 export class Zzz_Client {
 	#send: (message: Client_Message) => void;

@@ -1,18 +1,10 @@
 import {create_context} from '@ryanatkn/fuz/context_helpers.js';
 import {SvelteMap} from 'svelte/reactivity';
 import {create_deferred, type Deferred} from '@ryanatkn/belt/async.js';
-import type {Source_File} from '@ryanatkn/gro/filer.js';
-import type {Path_Id} from '@ryanatkn/gro/path.js';
-import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 
 import {Zzz_Data, type Zzz_Data_Json} from '$lib/zzz_data.svelte.js';
 import type {Zzz_Client} from '$lib/zzz_client.js';
-import type {
-	Echo_Message,
-	Filer_Change_Message,
-	Receive_Prompt_Message,
-	Send_Prompt_Message,
-} from '$lib/zzz_message.js';
+import type {Echo_Message, Receive_Prompt_Message, Send_Prompt_Message} from '$lib/zzz_message.js';
 import {Provider, type Provider_Json, type Provider_Name} from '$lib/provider.svelte.js';
 import {random_id, type Id} from '$lib/id.js';
 import {Completion_Threads, type Completion_Threads_Json} from '$lib/completion_thread.svelte.js';
@@ -22,6 +14,7 @@ import {Models} from '$lib/models.svelte.js';
 import {Chats} from '$lib/chats.svelte.js';
 import {Providers} from '$lib/providers.svelte.js';
 import {Prompts} from '$lib/prompts.svelte.js';
+import {Files} from '$lib/files.svelte.js';
 
 export const zzz_context = create_context<Zzz>();
 
@@ -48,12 +41,11 @@ export class Zzz {
 	readonly models = new Models(this);
 	readonly chats = new Chats(this);
 	readonly providers = new Providers(this);
-	readonly prompts = new Prompts(this); // Added this line
+	readonly prompts = new Prompts(this);
+	readonly files = new Files(this);
 
 	// Change tags to use the readonly models instance
 	tags: Set<string> = $derived(new Set(this.models.items.flatMap((m) => m.tags)));
-
-	readonly files_by_id: SvelteMap<Path_Id, Source_File> = new SvelteMap();
 
 	echos: Array<Echo_Message> = $state([]);
 
@@ -151,23 +143,6 @@ export class Zzz {
 		this.pending_prompts.delete(message.completion_response.request_id); // deleting intentionally after resolving to maybe avoid a corner case loop of sending the same prompt again
 	}
 
-	receive_filer_change(message: Filer_Change_Message): void {
-		const {change, source_file} = message;
-		switch (change.type) {
-			case 'add':
-			case 'update': {
-				this.files_by_id.set(source_file.id, source_file);
-				break;
-			}
-			case 'delete': {
-				this.files_by_id.delete(source_file.id);
-				break;
-			}
-			default:
-				throw new Unreachable_Error(change.type);
-		}
-	}
-
 	readonly echo_start_times: Map<Id, number> = new Map();
 
 	readonly echo_elapsed: SvelteMap<Id, number> = new SvelteMap();
@@ -190,27 +165,6 @@ export class Zzz {
 		this.echo_start_times.delete(id);
 		const elapsed = Date.now() - start_time;
 		this.echo_elapsed.set(id, elapsed);
-	}
-
-	update_file(file_id: Path_Id, contents: string): void {
-		const source_file = this.files_by_id.get(file_id);
-		if (!source_file) {
-			console.error('expected source file', file_id);
-			return;
-		}
-
-		this.client.send({id: random_id(), type: 'update_file', file_id, contents});
-	}
-
-	delete_file(file_id: Path_Id): void {
-		const source_file = this.files_by_id.get(file_id);
-		if (!source_file) {
-			console.error('expected source file', file_id);
-			return;
-		}
-		// TODO BLOCK this isn't removing it from the `/files` list
-
-		this.client.send({id: random_id(), type: 'delete_file', file_id});
 	}
 
 	// TODO API? close/open/toggle? just toggle? messages+mutations?

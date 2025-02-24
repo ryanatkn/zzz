@@ -79,7 +79,7 @@
 					case 'loaded_session': {
 						console.log(`[page] loaded_session`, message);
 						for (const source_file of message.data.files.values()) {
-							zzz.files_by_id.set(source_file.id, source_file);
+							zzz.files.by_id.set(source_file.id, source_file);
 						}
 						break;
 					}
@@ -88,7 +88,7 @@
 						break;
 					}
 					case 'filer_change': {
-						zzz.receive_filer_change(message);
+						zzz.files.handle_change(message);
 						break;
 					}
 					case 'echo': {

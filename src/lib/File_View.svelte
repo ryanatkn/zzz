@@ -59,7 +59,7 @@
 				// TODO custom confirm dialog
 				// eslint-disable-next-line no-alert
 				if (confirm('Delete file "' + file.id + '"?')) {
-					zzz.delete_file(file.id);
+					zzz.files.delete(file.id);
 				}
 			}}
 		>

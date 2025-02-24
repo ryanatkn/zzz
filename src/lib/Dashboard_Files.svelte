@@ -9,7 +9,7 @@
 
 	const zzz = zzz_context.get();
 
-	const files = $derived(Array.from(zzz.files_by_id.values()).filter((file) => !file.external));
+	const files = $derived(Array.from(zzz.files.by_id.values()).filter((file) => !file.external));
 
 	// TODO BLOCK shouldnt be needed
 	const files_map: Map<string, Source_File> = $derived(new Map(files.map((f) => [f.id, f])));

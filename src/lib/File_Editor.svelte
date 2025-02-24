@@ -56,7 +56,7 @@
 			disabled={updated_contents === file.contents}
 			onclick={() => {
 				contents_history.push({created: Date.now(), contents: updated_contents});
-				zzz.update_file(file.id, updated_contents);
+				zzz.files.update(file.id, updated_contents);
 				discarded_contents = null;
 			}}>save file</button
 		>
@@ -86,7 +86,7 @@
 		>
 	</div>
 
-	<Confirm_Button onclick={() => zzz.delete_file(file.id)} attrs={{class: 'color_c'}}>
+	<Confirm_Button onclick={() => zzz.files.delete(file.id)} attrs={{class: 'color_c'}}>
 		{#snippet children()}
 			delete file
 		{/snippet}
