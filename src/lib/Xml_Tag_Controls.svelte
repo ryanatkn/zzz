@@ -27,7 +27,12 @@
 			xml tag
 			<input class="plain ml_md" type="checkbox" bind:checked={bit.has_xml_tag} />
 		</label>
-		<input class="plain flex_1" placeholder="bit" bind:value={bit.xml_tag_name} />
+		<input
+			class="plain flex_1"
+			class:dormant={!bit.has_xml_tag}
+			placeholder="bit"
+			bind:value={bit.xml_tag_name}
+		/>
 		<button
 			type="button"
 			class="icon_button plain"
@@ -42,6 +47,7 @@
 			<div transition:slide>
 				<Xml_Attribute
 					{attribute}
+					dormant={!bit.has_xml_tag}
 					onupdate={(updates) => bit.update_attribute(attribute.id, updates)}
 					onremove={() => bit.remove_attribute(attribute.id)}
 				/>

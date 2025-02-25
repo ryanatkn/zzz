@@ -31,9 +31,8 @@
 }
 
 .dormant_input {
-	border-width: var(--border_width_2) !important;
-	border-style: dashed !important;
-	border-color: var(--border_color_1) !important;
+	/* TODO better visual? */
+	background-color: var(--fg_1);
 }
 
 .dormant {

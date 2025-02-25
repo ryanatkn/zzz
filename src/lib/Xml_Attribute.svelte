@@ -3,11 +3,12 @@
 
 	interface Props {
 		attribute: Xml_Attribute;
+		dormant?: boolean;
 		onupdate: (updates: Partial<Omit<Xml_Attribute, 'id'>>) => void;
 		onremove: () => void;
 	}
 
-	const {attribute, onupdate, onremove}: Props = $props();
+	const {attribute, dormant, onupdate, onremove}: Props = $props();
 </script>
 
 <div
@@ -16,14 +17,14 @@
 >
 	<input
 		class="plain compact"
-		class:dormant={!attribute.key}
+		class:dormant={!!dormant || !attribute.key}
 		placeholder="key"
 		value={attribute.key}
 		oninput={(e) => onupdate({key: e.currentTarget.value})}
 	/>
 	<input
 		class="plain compact"
-		class:dormant={!attribute.value}
+		class:dormant={!!dormant || !attribute.value}
 		placeholder="value"
 		value={attribute.value}
 		oninput={(e) => onupdate({value: e.currentTarget.value})}
