@@ -20,7 +20,7 @@
 
 	// TODO BLOCK make it have optional attributes like file type
 
-	// TODO BLOCK the dashed pattern state isn't working
+	// TODO BLOCK the dashed pattern state isn't working for the attributes
 </script>
 
 <div class="flex align_items_start gap_md p_sm">
