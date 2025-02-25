@@ -141,7 +141,7 @@
 	<div class="panel p_sm flex_1">
 		<div class="flex gap_xs2 flex_1">
 			<textarea
-				class="flex_1 mb_0"
+				class="plain flex_1 mb_0"
 				bind:value={main_input}
 				bind:this={main_input_el}
 				placeholder="send to all {count >= 2 ? count + ' ' : ''}tapes..."
