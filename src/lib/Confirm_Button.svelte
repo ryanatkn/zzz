@@ -75,7 +75,22 @@
 			out:scale={{duration: 200}}
 			{...confirm_button_attrs}
 		>
-			🗙
+			<div class="icon">🗙</div>
 		</button>
 	{/if}
 </div>
+
+<style>
+	.icon {
+		transform-origin: center;
+		transition: transform var(--duration_1);
+	}
+
+	button:hover:not(:disabled) .icon {
+		transform: scale(1.1);
+	}
+
+	button:active:not(:disabled) .icon {
+		transform: scale(0.95);
+	}
+</style>
