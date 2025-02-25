@@ -11,7 +11,7 @@ export interface Completion_Request {
 	request_id: Id;
 	provider_name: Provider_Name;
 	model: string;
-	// TODO BLOCK `prompt` should be a `Prompt` type that captures the entire input to each API
+	// TODO BLOCK `prompt` should be a `Prompt` type that captures the entire input to each API? renamed to a `content` string?
 	prompt: string;
 }
 
