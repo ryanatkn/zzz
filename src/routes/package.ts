@@ -119,6 +119,11 @@ export const package_json = {
 		},
 		'./chat.svelte.js': {types: './dist/chat.svelte.d.ts', default: './dist/chat.svelte.js'},
 		'./chats.svelte.js': {types: './dist/chats.svelte.d.ts', default: './dist/chats.svelte.js'},
+		'./Clear_Restore_Button.svelte': {
+			types: './dist/Clear_Restore_Button.svelte.d.ts',
+			svelte: './dist/Clear_Restore_Button.svelte',
+			default: './dist/Clear_Restore_Button.svelte',
+		},
 		'./completion_state.svelte.js': {
 			types: './dist/completion_state.svelte.d.ts',
 			default: './dist/completion_state.svelte.js',
@@ -277,6 +282,11 @@ export const package_json = {
 			default: './dist/Nav_Link.svelte',
 		},
 		'./ollama.js': {types: './dist/ollama.d.ts', default: './dist/ollama.js'},
+		'./Paste_From_Clipboard.svelte': {
+			types: './dist/Paste_From_Clipboard.svelte.d.ts',
+			svelte: './dist/Paste_From_Clipboard.svelte',
+			default: './dist/Paste_From_Clipboard.svelte',
+		},
 		'./path.js': {types: './dist/path.d.ts', default: './dist/path.js'},
 		'./Prompt_Stats.svelte': {
 			types: './dist/Prompt_Stats.svelte.d.ts',
@@ -400,6 +410,7 @@ export const src_json = {
 			],
 		},
 		'./chats.svelte.js': {path: 'chats.svelte.ts', declarations: [{name: 'Chats', kind: 'class'}]},
+		'./Clear_Restore_Button.svelte': {path: 'Clear_Restore_Button.svelte', declarations: []},
 		'./completion_state.svelte.js': {path: 'completion_state.svelte.ts', declarations: []},
 		'./Completion_Thread_Info.svelte': {path: 'Completion_Thread_Info.svelte', declarations: []},
 		'./Completion_Thread_Summary.svelte': {
@@ -532,6 +543,7 @@ export const src_json = {
 				{name: 'merge_ollama_models', kind: 'function'},
 			],
 		},
+		'./Paste_From_Clipboard.svelte': {path: 'Paste_From_Clipboard.svelte', declarations: []},
 		'./path.js': {path: 'path.ts', declarations: [{name: 'to_root_path', kind: 'function'}]},
 		'./Prompt_Stats.svelte': {path: 'Prompt_Stats.svelte', declarations: []},
 		'./prompt.svelte.js': {

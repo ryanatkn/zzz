@@ -8,9 +8,9 @@
 	}
 	const {bit, prompt}: Props = $props();
 
-	const total_tokens = $derived(bit.enabled ? bit.token_count : 0);
+	const total_chars = $derived(bit.enabled ? bit.content.length : 0);
 	const percent = $derived(
-		total_tokens && prompt.token_count ? (total_tokens / prompt.token_count) * 100 : 0,
+		total_chars && prompt.value.length ? (total_chars / prompt.value.length) * 100 : 0,
 	);
 
 	// TODO visuals are very basic

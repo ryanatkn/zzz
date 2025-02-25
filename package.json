@@ -145,6 +145,11 @@
       "types": "./dist/chats.svelte.d.ts",
       "default": "./dist/chats.svelte.js"
     },
+    "./Clear_Restore_Button.svelte": {
+      "types": "./dist/Clear_Restore_Button.svelte.d.ts",
+      "svelte": "./dist/Clear_Restore_Button.svelte",
+      "default": "./dist/Clear_Restore_Button.svelte"
+    },
     "./completion_state.svelte.js": {
       "types": "./dist/completion_state.svelte.d.ts",
       "default": "./dist/completion_state.svelte.js"
@@ -335,6 +340,11 @@
     "./ollama.js": {
       "types": "./dist/ollama.d.ts",
       "default": "./dist/ollama.js"
+    },
+    "./Paste_From_Clipboard.svelte": {
+      "types": "./dist/Paste_From_Clipboard.svelte.d.ts",
+      "svelte": "./dist/Paste_From_Clipboard.svelte",
+      "default": "./dist/Paste_From_Clipboard.svelte"
     },
     "./path.js": {
       "types": "./dist/path.d.ts",
