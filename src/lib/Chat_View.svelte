@@ -12,6 +12,8 @@
 	import {GLYPH_TAPE, GLYPH_PROMPT} from '$lib/constants.js';
 	import {zzz_config} from '$lib/zzz_config.js';
 	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
+	import Bit_Stats from '$lib/Bit_Stats.svelte';
+	import {count_tokens} from '$lib/prompt.svelte.js';
 
 	const zzz = zzz_context.get();
 
@@ -139,7 +141,7 @@
 		</div>
 	</div>
 	<div class="panel p_sm flex_1">
-		<div class="flex gap_xs2 flex_1">
+		<div class="flex gap_xs2 flex_1 mb_xs">
 			<textarea
 				class="plain flex_1 mb_0"
 				bind:value={main_input}
@@ -155,6 +157,7 @@
 				send to all ({count})
 			</Pending_Button>
 		</div>
+		<Bit_Stats length={main_input.length} token_count={count_tokens(main_input)} />
 		<div class="flex mt_xs">
 			<Copy_To_Clipboard text={main_input} attrs={{class: 'plain', disabled: !main_input}} />
 			<Paste_From_Clipboard
