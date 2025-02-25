@@ -270,6 +270,10 @@ a.chip {
 	margin-top: var(--space_xl5);
 	margin-bottom: var(--space_xl5);
 }
+.my_xs {
+	margin-top: var(--space_xs);
+	margin-bottom: var(--space_xs);
+}
 .overflow_auto {
 	overflow: auto;
 }

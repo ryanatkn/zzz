@@ -54,7 +54,6 @@
 	<div class="messages">
 		{#each tape.messages as message (message.id)}
 			<Chat_Message {message} />
-			<Bit_Stats length={message.content.length} token_count={count_tokens(message.content)} />
 		{/each}
 	</div>
 
@@ -69,7 +68,7 @@
 			></textarea>
 			<button type="button" class="plain" onclick={() => send()}>send</button>
 		</div>
-		<div class="flex mt_xs">
+		<div class="flex my_xs">
 			<Copy_To_Clipboard text={input} attrs={{class: 'plain', disabled: !input}} />
 			<Paste_From_Clipboard
 				onpaste={(text) => {
@@ -85,6 +84,7 @@
 				}}
 			/>
 		</div>
+		<Bit_Stats length={input.length} token_count={count_tokens(input)} />
 	</div>
 </div>
 

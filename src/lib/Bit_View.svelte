@@ -64,6 +64,6 @@
 			attrs={{title: `remove bit ${bit.id}`}}
 		/>
 	</div>
-	<Xml_Tag_Controls {bit} />
 	<Bit_Stats length={bit.content.length} token_count={count_tokens(bit.content)} />
+	<Xml_Tag_Controls {bit} />
 </div>
