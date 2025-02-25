@@ -46,7 +46,7 @@ export const package_json = {
 		ollama: '^0.5.14',
 		prettier: '^3.5.2',
 		'prettier-plugin-svelte': '^3.3.3',
-		svelte: '^5.20.4',
+		svelte: '5.20.2',
 		'svelte-check': '^4.1.4',
 		tslib: '^2.8.1',
 		typescript: '^5.7.3',
