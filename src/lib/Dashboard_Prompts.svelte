@@ -19,6 +19,8 @@
 	// TODO BLOCK save both bits and prompts to the library, right?
 
 	// TODO BLOCK make it have optional attributes like file type
+
+	// TODO BLOCK the dashed pattern state isn't working
 </script>
 
 <div class="flex align_items_start gap_md p_sm">
