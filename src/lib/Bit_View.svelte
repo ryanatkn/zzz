@@ -35,7 +35,6 @@
 	<textarea
 		style:height="200px"
 		class="plain mb_0"
-		class:dormant_input={!bit.content}
 		class:dormant={!bit.enabled}
 		bind:this={bit_textareas[bit.id]}
 		value={bit.content}

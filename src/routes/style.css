@@ -30,11 +30,6 @@
 	--border_radius: var(--radius_xs);
 }
 
-.dormant_input {
-	/* TODO better visual? */
-	background-color: var(--fg_1);
-}
-
 .dormant {
 	opacity: 0.6;
 }
