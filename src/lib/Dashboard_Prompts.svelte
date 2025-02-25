@@ -73,38 +73,40 @@
 		</menu>
 	</div>
 
-	<div class="width_sm column gap_md">
-		<div class="panel p_sm">
-			<div class="size_lg"><Text_Icon icon={GLYPH_PROMPT} /> prompt</div>
-			{#if zzz.prompts.selected}
-				<div class="row gap_sm mt_md mb_sm">
-					<Copy_To_Clipboard text={zzz.prompts.selected.value} attrs={{class: 'plain'}} />
-					<Prompt_Stats prompt={zzz.prompts.selected} />
-				</div>
-				<pre class="panel p_xs overflow_auto" style:height="300px" style:max-height="300px">{zzz
-						.prompts.selected.value}</pre>
-				<!-- TODO something like these? -->
-				<!-- <div class="mt_sm flex gap_sm justify_content_space_between">
+	{#if zzz.prompts.selected}
+		<div class="width_sm column gap_md">
+			<div class="panel p_sm">
+				<div class="size_lg"><Text_Icon icon={GLYPH_PROMPT} /> prompt</div>
+				{#if zzz.prompts.selected}
+					<div class="row gap_sm mt_md mb_sm">
+						<Copy_To_Clipboard text={zzz.prompts.selected.value} attrs={{class: 'plain'}} />
+						<Prompt_Stats prompt={zzz.prompts.selected} />
+					</div>
+					<pre class="panel p_xs overflow_auto" style:height="300px" style:max-height="300px">{zzz
+							.prompts.selected.value}</pre>
+					<!-- TODO something like these? -->
+					<!-- <div class="mt_sm flex gap_sm justify_content_space_between">
 					<div class="flex gap_sm">
 						<button type="button" class="plain">save to library</button>
 						<button type="button" class="plain">export</button>
 					</div>
 				</div> -->
-			{/if}
-		</div>
+				{/if}
+			</div>
 
-		<!-- TODO maybe a library panel? could be like brushes -->
-		<!-- <div class="panel p_sm">
+			<!-- TODO maybe a library panel? could be like brushes -->
+			<!-- <div class="panel p_sm">
 			<h3 class="mt_0">library</h3>
 			<div class="mb_sm">
 				<input type="search" placeholder="Search prompts and bits..." class="w_100" />
 			</div>
 			<menu class="unstyled"> TODO </menu>
-		</div> -->
-	</div>
+			</div> -->
+		</div>
+	{/if}
 
-	<div class="panel p_sm flex_1">
-		{#if zzz.prompts.selected}
+	{#if zzz.prompts.selected}
+		<div class="panel p_sm flex_1">
 			<div class="flex justify_content_space_between mb_lg">
 				<button type="button" class="plain" onclick={() => zzz.prompts.add_bit()}>
 					+ add bit
@@ -137,13 +139,13 @@
 					</div>
 				{/each}
 			</div>
-		{/if}
-	</div>
+		</div>
+	{/if}
 
-	<div class="panel p_sm width_sm">
-		<header class="size_lg mb_lg"><Text_Icon icon={GLYPH_BIT} /> bits</header>
-		{#if zzz.prompts.selected}
+	{#if zzz.prompts.selected}
+		<div class="panel p_sm width_sm">
+			<header class="size_lg mb_lg"><Text_Icon icon={GLYPH_BIT} /> bits</header>
 			<Bit_List prompt={zzz.prompts.selected} />
-		{/if}
-	</div>
+		</div>
+	{/if}
 </div>

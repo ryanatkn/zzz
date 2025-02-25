@@ -143,6 +143,16 @@ export const models_default: Array<Model_Json> = [
 		training_cutoff: 'April 2024',
 	},
 	{
+		name: 'claude-3-7-sonnet-20250219',
+		provider_name: 'claude',
+		tags: ['smart'],
+		context_window: 200_000,
+		output_token_limit: 128_192,
+		cost_input: 0.8,
+		cost_output: 4,
+		training_cutoff: 'November 2024',
+	},
+	{
 		name: 'claude-3-5-sonnet-20241022',
 		provider_name: 'claude',
 		tags: ['smart'],

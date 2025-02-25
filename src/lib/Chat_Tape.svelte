@@ -66,7 +66,7 @@
 			></textarea>
 			<button type="button" class="plain" onclick={() => send()}>send</button>
 		</div>
-		<div class="flex gap_xs2 mt_xs">
+		<div class="flex mt_xs">
 			<Copy_To_Clipboard text={input} attrs={{class: 'plain', disabled: !input}} />
 			<Paste_From_Clipboard
 				onpaste={(text) => {

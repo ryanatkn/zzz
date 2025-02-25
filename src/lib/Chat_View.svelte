@@ -155,7 +155,7 @@
 				send to all ({count})
 			</Pending_Button>
 		</div>
-		<div class="flex gap_xs2 mt_xs">
+		<div class="flex mt_xs">
 			<Copy_To_Clipboard text={main_input} attrs={{class: 'plain', disabled: !main_input}} />
 			<Paste_From_Clipboard
 				onpaste={(text) => {
