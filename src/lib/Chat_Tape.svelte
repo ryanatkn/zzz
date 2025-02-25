@@ -54,7 +54,7 @@
 	<div class="messages">
 		{#each tape.messages as message (message.id)}
 			<Chat_Message {message} />
-			<Bit_Stats length={message.text.length} token_count={count_tokens(message.text)} />
+			<Bit_Stats length={message.content.length} token_count={count_tokens(message.content)} />
 		{/each}
 	</div>
 

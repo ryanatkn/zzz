@@ -36,7 +36,7 @@
 </script>
 
 <div class="message">
-	<div class="request">@me: {message.text}</div>
+	<div class="request">@me: {message.content}</div>
 	<div class="response">
 		@model: {#if response}{response_content}{:else}<Pending_Animation />{/if}
 	</div>

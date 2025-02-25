@@ -15,7 +15,7 @@ const NEW_CHAT_PREFIX = 'new chat';
 export interface Chat_Message {
 	id: Id;
 	created: string;
-	text: string; // TODO rename to `content`?
+	content: string; // renamed from text
 	request?: Completion_Request;
 	response?: Completion_Response;
 }
@@ -62,11 +62,11 @@ export class Chat {
 		this.tapes.length = 0;
 	}
 
-	async send_to_all(text: string): Promise<void> {
-		await Promise.all(this.tapes.map((tape) => this.send_to_tape(tape.id, text)));
+	async send_to_all(content: string): Promise<void> {
+		await Promise.all(this.tapes.map((tape) => this.send_to_tape(tape.id, content)));
 	}
 
-	async send_to_tape(tape_id: Id, text: string): Promise<void> {
+	async send_to_tape(tape_id: Id, content: string): Promise<void> {
 		const tape = this.tapes.find((s) => s.id === tape_id);
 		if (!tape) return;
 
@@ -75,19 +75,19 @@ export class Chat {
 			id: message_id,
 			// TODO add `chat_id`?
 			created: new Date().toISOString(),
-			text,
+			content,
 			request: {
 				created: new Date().toISOString(),
 				request_id: message_id,
 				provider_name: tape.model.provider_name,
 				model: tape.model.name,
-				prompt: text,
+				prompt: content,
 			},
 		};
 
 		tape.messages.push(message);
 
-		const response = await this.zzz.send_prompt(text, tape.model.provider_name, tape.model.name);
+		const response = await this.zzz.send_prompt(content, tape.model.provider_name, tape.model.name);
 
 		// TODO refactor
 		const message_updated = tape.messages.find((m) => m.id === message_id);
@@ -115,7 +115,7 @@ export class Chat {
 			Prefer lowercase unless it's a proper noun or acronym.`;
 
 		// TODO hacky, needs better conventions
-		p += `\n<User_Message>${chat_message.text}</User_Message>`;
+		p += `<User_Message>${chat_message.content}</User_Message>`;
 		if (chat_message.response) {
 			p += `\n<Assistant_Message> ${to_completion_response_text(chat_message.response)}</Assistant_Message>`;
 		}
