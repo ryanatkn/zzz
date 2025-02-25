@@ -17,7 +17,16 @@
 				? response.data.value.message.content
 				: response.data.type === 'claude'
 					? response.data.value.content
-							.map((c) => (c.type === 'text' ? c.text : c.name))
+							.map(
+								(c) =>
+									c.type === 'text'
+										? c.text
+										: c.type === 'tool_use'
+											? c.name
+											: c.type === 'thinking'
+												? c.thinking
+												: c.data, // TODO refactor
+							)
 							.join('\n\n')
 					: response.data.type === 'chatgpt'
 						? response.data.value.choices[0].message.content

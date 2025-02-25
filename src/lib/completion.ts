@@ -54,7 +54,16 @@ export const to_completion_response_text = (
 		? completion_response.data.value.message.content
 		: completion_response.data.type === 'claude'
 			? completion_response.data.value.content
-					.map((c) => (c.type === 'text' ? c.text : c.name))
+					.map(
+						(c) =>
+							c.type === 'text'
+								? c.text
+								: c.type === 'tool_use'
+									? c.name
+									: c.type === 'thinking'
+										? c.thinking
+										: c.data, // TODO refactor
+					)
 					.join('\n\n')
 			: completion_response.data.type === 'chatgpt'
 				? completion_response.data.value.choices[0].message.content
