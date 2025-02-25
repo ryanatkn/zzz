@@ -139,7 +139,7 @@
 		</div>
 	</div>
 	<div class="panel p_sm flex_1">
-		<div class="flex flex_1">
+		<div class="flex gap_xs2 flex_1">
 			<textarea
 				class="flex_1 mb_0"
 				bind:value={main_input}
@@ -155,7 +155,7 @@
 				send to all ({count})
 			</Pending_Button>
 		</div>
-		<div class="flex mt_xs">
+		<div class="flex gap_xs2 mt_xs">
 			<Copy_To_Clipboard text={main_input} attrs={{class: 'plain', disabled: !main_input}} />
 			<Paste_From_Clipboard
 				onpaste={(text) => {

@@ -55,31 +55,33 @@
 		{/each}
 	</div>
 
-	<div class="flex">
-		<textarea
-			class="flex_1 mb_0"
-			bind:value={input}
-			bind:this={input_el}
-			placeholder="send to this tape..."
-			onkeydown={(e) => e.key === 'Enter' && !e.shiftKey && (send(), e.preventDefault())}
-		></textarea>
-		<button type="button" class="plain" onclick={() => send()}>send</button>
-	</div>
-	<div class="flex">
-		<Copy_To_Clipboard text={input} attrs={{class: 'plain', disabled: !input}} />
-		<Paste_From_Clipboard
-			onpaste={(text) => {
-				input += text;
-				input_el?.focus();
-			}}
-			attrs={{class: 'plain'}}
-		/>
-		<Clear_Restore_Button
-			value={input}
-			onchange={(value) => {
-				input = value;
-			}}
-		/>
+	<div>
+		<div class="flex gap_xs2">
+			<textarea
+				class="flex_1 mb_0"
+				bind:value={input}
+				bind:this={input_el}
+				placeholder="send to this tape..."
+				onkeydown={(e) => e.key === 'Enter' && !e.shiftKey && (send(), e.preventDefault())}
+			></textarea>
+			<button type="button" class="plain" onclick={() => send()}>send</button>
+		</div>
+		<div class="flex gap_xs2 mt_xs">
+			<Copy_To_Clipboard text={input} attrs={{class: 'plain', disabled: !input}} />
+			<Paste_From_Clipboard
+				onpaste={(text) => {
+					input += text;
+					input_el?.focus();
+				}}
+				attrs={{class: 'plain'}}
+			/>
+			<Clear_Restore_Button
+				value={input}
+				onchange={(value) => {
+					input = value;
+				}}
+			/>
+		</div>
 	</div>
 </div>
 
