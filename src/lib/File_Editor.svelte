@@ -60,7 +60,7 @@
 				discarded_contents = null;
 			}}>save file</button
 		>
-		<Copy_To_Clipboard text={file.contents} classes="plain" />
+		<Copy_To_Clipboard text={file.contents} attrs={{class: 'plain'}} />
 		<div class="row">
 			{file.contents?.length} char{file.contents?.length === 1 ? '' : 's'}
 		</div>

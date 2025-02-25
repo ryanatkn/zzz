@@ -1,6 +1,8 @@
 <script lang="ts">
 	import Pending_Button from '@ryanatkn/fuz/Pending_Button.svelte';
 	import ollama from 'ollama/browser';
+	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
+	import Paste_From_Clipboard from '@ryanatkn/fuz/Paste_From_Clipboard.svelte';
 
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import {Chat} from '$lib/chat.svelte.js';
@@ -10,8 +12,6 @@
 	import {GLYPH_TAPE, GLYPH_PROMPT} from '$lib/constants.js';
 	import {zzz_config} from '$lib/zzz_config.js';
 	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
-	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
-	import Paste_From_Clipboard from '$lib/Paste_From_Clipboard.svelte';
 
 	const zzz = zzz_context.get();
 
@@ -156,7 +156,7 @@
 			</Pending_Button>
 		</div>
 		<div class="flex mt_xs">
-			<Copy_To_Clipboard text={main_input} classes="plain" />
+			<Copy_To_Clipboard text={main_input} attrs={{class: 'plain', disabled: !main_input}} />
 			<Paste_From_Clipboard
 				onpaste={(text) => {
 					main_input += text;

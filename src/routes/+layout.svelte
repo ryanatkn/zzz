@@ -119,7 +119,7 @@
 		});
 	}
 
-	$inspect('providers', zzz.providers);
+	if (browser) $inspect('providers', zzz.providers);
 
 	// zzz.send({type: 'echo', data: 'echo from client'});
 	zzz.client.send({id: random_id(), type: 'load_session'});

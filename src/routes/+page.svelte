@@ -10,7 +10,7 @@
 </script>
 
 <footer class="box py_xl9">
-	<Svg data={zzz_logo} size="var(--icon_size_xl2)" classes="my_xl5" />
+	<Svg data={zzz_logo} size="var(--icon_size_xl2)" attrs={{class: 'my_xl5'}} />
 	<p class="mt_xl3">bot and web toolkit 💤 endgame web UI</p>
 	<p class="mt_xl3">work in progress</p>
 </footer>

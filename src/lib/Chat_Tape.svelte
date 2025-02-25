@@ -1,7 +1,7 @@
 <script lang="ts">
 	import {scale} from 'svelte/transition';
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
-	import Paste_From_Clipboard from '$lib/Paste_From_Clipboard.svelte';
+	import Paste_From_Clipboard from '@ryanatkn/fuz/Paste_From_Clipboard.svelte';
 
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import type {Tape} from '$lib/tape.svelte.js';
@@ -66,7 +66,7 @@
 		<button type="button" class="plain" onclick={() => send()}>send</button>
 	</div>
 	<div class="flex">
-		<Copy_To_Clipboard text={input} classes="plain" attrs={{disabled: !input}} />
+		<Copy_To_Clipboard text={input} attrs={{class: 'plain', disabled: !input}} />
 		<Paste_From_Clipboard
 			onpaste={(text) => {
 				input += text;

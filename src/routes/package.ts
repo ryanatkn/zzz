@@ -34,7 +34,7 @@ export const package_json = {
 	devDependencies: {
 		'@changesets/changelog-git': '^0.2.1',
 		'@ryanatkn/eslint-config': '^0.6.0',
-		'@ryanatkn/fuz': '^0.131.6',
+		'@ryanatkn/fuz': '^0.132.1',
 		'@ryanatkn/gro': '^0.148.0',
 		'@ryanatkn/moss': '^0.22.1',
 		'@sveltejs/adapter-static': '^3.0.8',
@@ -282,11 +282,6 @@ export const package_json = {
 			default: './dist/Nav_Link.svelte',
 		},
 		'./ollama.js': {types: './dist/ollama.d.ts', default: './dist/ollama.js'},
-		'./Paste_From_Clipboard.svelte': {
-			types: './dist/Paste_From_Clipboard.svelte.d.ts',
-			svelte: './dist/Paste_From_Clipboard.svelte',
-			default: './dist/Paste_From_Clipboard.svelte',
-		},
 		'./path.js': {types: './dist/path.d.ts', default: './dist/path.js'},
 		'./Prompt_Stats.svelte': {
 			types: './dist/Prompt_Stats.svelte.d.ts',
@@ -543,7 +538,6 @@ export const src_json = {
 				{name: 'merge_ollama_models', kind: 'function'},
 			],
 		},
-		'./Paste_From_Clipboard.svelte': {path: 'Paste_From_Clipboard.svelte', declarations: []},
 		'./path.js': {path: 'path.ts', declarations: [{name: 'to_root_path', kind: 'function'}]},
 		'./Prompt_Stats.svelte': {path: 'Prompt_Stats.svelte', declarations: []},
 		'./prompt.svelte.js': {

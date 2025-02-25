@@ -1,5 +1,7 @@
 <script lang="ts">
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
+	import Paste_From_Clipboard from '@ryanatkn/fuz/Paste_From_Clipboard.svelte';
+
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import {count_tokens} from '$lib/prompt.svelte.js';
 	import type {Bit} from '$lib/bit.svelte.js';
@@ -7,7 +9,6 @@
 	import Xml_Tag_Controls from '$lib/Xml_Tag_Controls.svelte';
 	import Bit_Stats from '$lib/Bit_Stats.svelte';
 	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
-	import Paste_From_Clipboard from '$lib/Paste_From_Clipboard.svelte';
 
 	interface Props {
 		bit: Bit;
@@ -42,7 +43,7 @@
 	></textarea>
 	<div class="flex justify_content_space_between">
 		<div class="flex">
-			<Copy_To_Clipboard text={bit.content} classes="plain" />
+			<Copy_To_Clipboard text={bit.content} attrs={{class: 'plain'}} />
 			<Paste_From_Clipboard
 				onpaste={(text) => {
 					bit.content += text;
