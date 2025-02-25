@@ -66,7 +66,7 @@
 		<button type="button" class="plain" onclick={() => send()}>send</button>
 	</div>
 	<div class="flex">
-		<Copy_To_Clipboard text={input} classes="plain" />
+		<Copy_To_Clipboard text={input} classes="plain" attrs={{disabled: !input}} />
 		<Paste_From_Clipboard
 			onpaste={(text) => {
 				input += text;
