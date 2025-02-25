@@ -15,7 +15,7 @@ const NEW_CHAT_PREFIX = 'new chat';
 export interface Chat_Message {
 	id: Id;
 	created: string;
-	text: string;
+	text: string; // TODO rename to `content`?
 	request?: Completion_Request;
 	response?: Completion_Response;
 }

@@ -11,6 +11,8 @@
 	import {providers_default} from '$lib/config.js';
 	import {GLYPH_PROVIDER} from '$lib/constants.js';
 	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
+	import Bit_Stats from '$lib/Bit_Stats.svelte';
+	import {count_tokens} from '$lib/prompt.svelte.js';
 
 	interface Props {
 		tape: Tape;
@@ -52,6 +54,7 @@
 	<div class="messages">
 		{#each tape.messages as message (message.id)}
 			<Chat_Message {message} />
+			<Bit_Stats length={message.text.length} token_count={count_tokens(message.text)} />
 		{/each}
 	</div>
 
