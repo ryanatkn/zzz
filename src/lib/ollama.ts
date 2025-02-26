@@ -1,5 +1,5 @@
 import type ollama from 'ollama/browser';
-import type {ListResponse, ModelResponse, ShowResponse} from 'ollama';
+import type {ListResponse, ModelResponse, ShowResponse} from 'ollama/browser';
 import {BROWSER} from 'esm-env';
 
 import type {Model_Json} from '$lib/model.svelte.js';

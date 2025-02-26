@@ -1,7 +1,7 @@
 import type Anthropic from '@anthropic-ai/sdk';
 import type OpenAI from 'openai';
 import type * as Google from '@google/generative-ai';
-import type {ChatResponse} from 'ollama';
+import type {ChatResponse} from 'ollama/browser';
 
 import type {Provider_Name} from '$lib/provider.svelte.js';
 import type {Id} from '$lib/id.js';

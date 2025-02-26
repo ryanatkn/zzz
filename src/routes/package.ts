@@ -61,6 +61,7 @@ export const package_json = {
 		'@ryanatkn/belt': '^0.29.0',
 		'date-fns': '^4.1.0',
 		devalue: '^5.1.1',
+		'gpt-tokenizer': '^2.8.1',
 		hono: '^4.7.2',
 		openai: '^4.85.4',
 	},
@@ -455,6 +456,7 @@ export const src_json = {
 		'./constants.js': {
 			path: 'constants.ts',
 			declarations: [
+				{name: 'GLYPH_REMOVE', kind: 'variable'},
 				{name: 'GLYPH_CHAT', kind: 'variable'},
 				{name: 'GLYPH_TAPE', kind: 'variable'},
 				{name: 'GLYPH_FILE', kind: 'variable'},
@@ -547,7 +549,6 @@ export const src_json = {
 				{name: 'Prompt_Message_Content', kind: 'type'},
 				{name: 'Prompt', kind: 'class'},
 				{name: 'join_prompt_bits', kind: 'function'},
-				{name: 'count_tokens', kind: 'function'},
 				{name: 'Xml_Attribute', kind: 'type'},
 			],
 		},
