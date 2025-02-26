@@ -131,16 +131,18 @@
 					</Confirm_Button>
 				</div>
 			</div>
-			<div
-				class="grid gap_md"
+			<ul
+				class="unstyled grid gap_md"
 				style:grid-template-columns="repeat(auto-fill, minmax(var(--width_sm), 1fr))"
 			>
 				{#each zzz.prompts.selected.bits as bit (bit.id)}
-					<div class="bg radius_xs p_sm" transition:scale>
-						<Bit_View {bit} prompts={zzz.prompts} />
-					</div>
+					<li>
+						<div class="bg radius_xs p_sm" transition:scale>
+							<Bit_View {bit} prompts={zzz.prompts} />
+						</div>
+					</li>
 				{/each}
-			</div>
+			</ul>
 		</div>
 	{/if}
 
