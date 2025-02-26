@@ -55,16 +55,16 @@
 				sync
 			</li>
 			<li>
-				interoperable design using standard and popular protocols, open APIs, and common libraries
-				and data formats
+				interoperable design using standard and popular protocols, open APIs, the web and JS
+				ecosystem, and common data formats
 			</li>
 			<li>
 				designed for plugins, scripting, and deep extensibility, and has a dev library in TypeScript
 				and Svelte
 			</li>
 			<li>
-				building blocks that you can configure and combine to create new experiences and tools that
-				solve your unique problems, and share them with others
+				building blocks that you can configure and combine, both manually and with AI, to create new
+				experiences and tools that solve your unique problems, and share them with others
 			</li>
 			<li>
 				adaptable interfaces that evolve with user needs through customization, context awareness,
