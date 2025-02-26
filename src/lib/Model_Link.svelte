@@ -5,20 +5,29 @@
 	import type {SvelteHTMLElements} from 'svelte/elements';
 
 	import type {Model} from '$lib/model.svelte.js';
+	import {GLYPH_MODEL} from '$lib/constants.js';
 
 	interface Props {
 		model: Model;
+		icon?: boolean;
 		attrs?: SvelteHTMLElements['a'];
 		children?: Snippet;
 	}
 
-	const {model, attrs, children}: Props = $props();
+	const {model, icon, attrs, children}: Props = $props();
 
 	const selected = $derived(page.url.pathname === `${base}/models/${model.name}`);
 </script>
 
 <a {...attrs} href="{base}/models/{model.name}" class:selected
-	>{#if children}{@render children()}{:else}{model.name}{/if}</a
+	>{#if children}
+		{@render children()}
+	{:else}
+		{#if icon}
+			{GLYPH_MODEL}
+		{/if}
+		{model.name}
+	{/if}</a
 >
 
 <style>

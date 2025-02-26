@@ -10,7 +10,6 @@
 	import Model_Link from '$lib/Model_Link.svelte';
 	import Provider_Link from '$lib/Provider_Link.svelte';
 	import {providers_default} from '$lib/config.js';
-	import {GLYPH_PROVIDER} from '$lib/constants.js';
 	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
 	import Bit_Stats from '$lib/Bit_Stats.svelte';
 
@@ -43,12 +42,15 @@
 <div class="chat_tape" transition:scale={{duration: 200}}>
 	<div class="header">
 		<header>
-			<div class="size_lg"><Model_Link model={tape.model} /></div>
+			<div class="size_lg">
+				<Model_Link model={tape.model} icon />
+			</div>
 			<small
 				><Provider_Link
 					provider={providers_default.find((p) => p.name === tape.model.provider_name)!}
-					>{GLYPH_PROVIDER} {tape.model.provider_name}</Provider_Link
-				></small
+					icon
+					show_name
+				/></small
 			>
 		</header>
 		<Confirm_Button onclick={onremove} />

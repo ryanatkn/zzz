@@ -3,7 +3,6 @@
 	import Model_Link from '$lib/Model_Link.svelte';
 	import Provider_Link from '$lib/Provider_Link.svelte';
 	import type {Model} from '$lib/model.svelte.js';
-	import {GLYPH_PROVIDER} from '$lib/constants.js';
 
 	interface Props {
 		model: Model;
@@ -16,13 +15,15 @@
 
 <div class="panel p_lg">
 	<div class="size_xl mb_lg">
-		<Model_Link {model} />
+		<Model_Link {model} icon />
 	</div>
 	<div class="mb_lg font_mono">
 		<!-- TODO hacky -->
-		<Provider_Link provider={providers_default.find((p) => p.name === model.provider_name)!}
-			>{GLYPH_PROVIDER} {model.provider_name}</Provider_Link
-		>
+		<Provider_Link
+			provider={providers_default.find((p) => p.name === model.provider_name)!}
+			icon
+			show_name
+		/>
 	</div>
 	{#if model.tags.length}
 		<ul class="unstyled flex gap_xs">
