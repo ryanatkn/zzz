@@ -13,7 +13,7 @@ export class Bit {
 
 	content: string = $state('');
 	length: number = $derived(this.content.length);
-	tokens: Array<number> = $derived(encode(this.content));
+	tokens: Array<number> = $derived(encode(this.content)); // TODO @many eager computation in some UI cases is bad UX with large values (e.g. bottleneck typing)
 	token_count: number = $derived(this.tokens.length);
 
 	constructor(name: string = 'new bit', content: string = '') {
