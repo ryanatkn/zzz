@@ -331,6 +331,9 @@ a.chip {
 	box-shadow: none;
 	--button_fill: transparent;
 }
+.plain:hover {
+	border-color: transparent;
+}
 
 .pr_md {
 	padding-right: var(--space_md);

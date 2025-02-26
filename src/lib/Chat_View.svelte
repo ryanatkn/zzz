@@ -187,15 +187,17 @@
 			</Confirm_Button>
 		</div>
 		<!-- TODO duplicate tape button -->
-		<div class="tapes mt_lg">
+		<ul class="tapes unstyled mt_lg">
 			{#each chat.tapes as tape (tape.id)}
-				<Chat_Tape
-					{tape}
-					onremove={() => chat.remove_tape(tape.id)}
-					onsend={(input: string) => chat.send_to_tape(tape.id, input)}
-				/>
+				<li>
+					<Chat_Tape
+						{tape}
+						onremove={() => chat.remove_tape(tape.id)}
+						onsend={(input: string) => chat.send_to_tape(tape.id, input)}
+					/>
+				</li>
 			{/each}
-		</div>
+		</ul>
 	</div>
 	<div class="width_sm column gap_md">
 		<div class="panel p_sm">
