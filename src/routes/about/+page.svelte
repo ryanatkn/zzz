@@ -43,8 +43,8 @@
 			figure out what we like and what works. Zzz specifically aims to support multiple protocols
 			and expose the interfaces needed to implement support for your own systems. When enough people
 			adopt protocols, they become standards. Zzz joins many other software projects working toward
-			collective and individual web empowerment—doing so publicly, with open tools and methods, as
-			part of a technological convergence spanning the entire stack.
+			individual and collective empowerment on the web - doing so publicly, with open tools and
+			communications, as part of a technological convergence spanning the entire stack.
 		</p>
 		<p>The main ideas include:</p>
 		<ul>
