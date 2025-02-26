@@ -47,7 +47,7 @@
 
 <div class="flex flex_wrap mb_sm">
 	<div class="flex_1 width_md min_width_sm">
-		<textarea style:height="{height}px" bind:value={updated_contents} placeholder="file content..."
+		<textarea style:height="{height}px" bind:value={updated_contents} placeholder="file contents..."
 		></textarea>
 	</div>
 	<pre
