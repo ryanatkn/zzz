@@ -1,6 +1,8 @@
 <script lang="ts">
-	import type {Chat_Message} from '$lib/chat.svelte.js';
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
+
+	import type {Chat_Message} from '$lib/chat.svelte.js';
+	import {to_completion_response_text} from '$lib/completion.js';
 
 	interface Props {
 		message: Chat_Message;
@@ -10,29 +12,7 @@
 
 	const {response} = $derived(message);
 
-	// TODO hacky
-	const response_content = $derived(
-		response
-			? response.data.type === 'ollama'
-				? response.data.value.message.content
-				: response.data.type === 'claude'
-					? response.data.value.content
-							.map(
-								(c) =>
-									c.type === 'text'
-										? c.text
-										: c.type === 'tool_use'
-											? c.name
-											: c.type === 'thinking'
-												? c.thinking
-												: c.data, // TODO refactor
-							)
-							.join('\n\n')
-					: response.data.type === 'chatgpt'
-						? response.data.value.choices[0].message.content
-						: response.data.value.text
-			: undefined,
-	);
+	const response_content = $derived(response && to_completion_response_text(response));
 </script>
 
 <div class="message">
