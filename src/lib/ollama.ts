@@ -19,7 +19,7 @@ let ollama_imported: typeof ollama | undefined;
 
 export const import_ollama = async (): Promise<typeof ollama> => {
 	if (ollama_imported) return ollama_imported;
-	const imported = await (BROWSER ? import('ollama') : import('ollama/browser'));
+	const imported = await (BROWSER ? import('ollama/browser') : import('ollama'));
 	ollama_imported = imported.default;
 	return ollama_imported;
 };
