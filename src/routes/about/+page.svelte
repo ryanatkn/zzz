@@ -26,24 +26,23 @@
 			</h1>
 		</header>
 		<p>
-			Zzz, pronounced "zees" like the sound of electricity, is a bot and web toolkit focused on AI
-			and user power. It's a digital tool that adapts to your needs on the fly, and critically, it's
-			fully in your control and open source. It's currently pre-alpha and will remain so for some
-			time - it'll take a while for it to be robust and reliable.
+			Zzz, pronounced "zees" like the sound of electricity, is a bot and web toolkit focused on user
+			power and experimentation. The idea is to make a digital tool that adapts to your needs on the
+			fly while remaining fully in your control and open source. It's currently pre-alpha and it
+			will take some time for it to be featureful and reliable.
 		</p>
 		<p>
 			Zzz is part of a growing ecosystem of client software that interacts with and is enhanced by
 			AI. Most users today use AI through the proprietary clients of the major providers, and while
 			that situation may continue, open clients like Zzz offer custom power that proprietary
 			solutions can't match. Clients mediate and control our interactions with AI, so they're super
-			powerful but they can be surprisingly simple to build, and there's a lot of design surface to
-			explore!
+			powerful, and they can be surprisingly simple to build - it's a new tech world and there's a
+			lot of design space to explore!
 		</p>
 		<p>
-			Zzz will support many protocols and have extensive plugin support so you can implement your
-			own systems. Zzz joins many other software projects working toward individual and collective
-			empowerment on the web - doing so publicly, with open tools and communications, as part of a
-			technological convergence spanning the entire stack on some new class of software that's been
+			Zzz joins many other software projects working toward individual and collective empowerment on
+			the web - doing so publicly, with open tools and communications and protocols, as part of a
+			technological convergence spanning the web stack on some new class of software that's been
 			prompted by the AI era.
 		</p>
 		<p>The main ideas of Zzz include: (I'm sure I'm missing some)</p>
@@ -81,6 +80,7 @@
 			<li>
 				Planned:
 				<ul>
+					<li>pglite via Drizzle</li>
 					<li>RSS/Atom/JSONFeed</li>
 					<li>
 						<a href="https://modelcontextprotocol.io/">Model Context Protocol</a> (<a
