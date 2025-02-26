@@ -59,8 +59,8 @@
 				sync
 			</li>
 			<li>
-				interoperable design using standard and popular protocols, open APIs, and common data
-				formats
+				interoperable design using standard and popular protocols, open APIs, and common libraries
+				and data formats
 			</li>
 			<li>
 				designed for plugins, scripting, and deep extensibility, and has a dev library in TypeScript
