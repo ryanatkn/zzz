@@ -32,18 +32,18 @@
 			will take some time for it to be featureful and reliable.
 		</p>
 		<p>
-			Zzz is part of a growing ecosystem of client software that interacts with and is enhanced by
-			AI. Most users today use AI through the proprietary clients of the major providers, and while
-			that situation may continue, open clients like Zzz offer custom power that proprietary
-			solutions can't match. Clients mediate and control our interactions with AI, so they're super
-			powerful, and they can be surprisingly simple to build - it's a new tech world and there's a
-			lot of design space to explore!
+			Zzz is part of a growing ecosystem of open source client software that interacts with and is
+			enhanced by AI. Most users today use AI through the proprietary clients of the major
+			providers, and while that situation may continue, open clients like Zzz offer custom power
+			that proprietary solutions can't match. Clients mediate and control our interactions with AI,
+			so they're super powerful, and they can be surprisingly simple to build - it's a new tech
+			world and there's a lot of design space to explore!
 		</p>
 		<p>
-			Zzz joins many other software projects working toward individual and collective empowerment on
-			the web - doing so publicly, with open tools and communications and protocols, as part of a
-			technological convergence spanning the web stack on some new class of software that's been
-			prompted by the AI era.
+			Zzz joins many other open software projects working toward individual and collective
+			empowerment on the web. These projects operate publicly, sharing tools, communications, and
+			protocols, as part of what I believe is a technological convergence spanning the web stack on
+			some new class of software that's been prompted by the AI era.
 		</p>
 		<p>The main ideas of Zzz include: (I'm sure I'm missing some)</p>
 		<ul>
