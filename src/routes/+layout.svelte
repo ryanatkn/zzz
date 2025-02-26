@@ -115,9 +115,9 @@
 		prompt.add_bit('one');
 		prompt.add_bit('2');
 		prompt.add_bit('c');
-
-		$inspect('providers', zzz.providers);
 	});
+
+	$inspect('providers', zzz.providers);
 
 	// zzz.send({type: 'echo', data: 'echo from client'});
 	zzz.client.send({id: random_id(), type: 'load_session'});

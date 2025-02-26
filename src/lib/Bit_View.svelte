@@ -38,6 +38,7 @@
 		bind:this={bit_textareas[bit.id]}
 		value={bit.content}
 		oninput={(e) => prompts.update_bit(bit.id, {content: e.currentTarget.value})}
+		placeholder="content..."
 	></textarea>
 	<div class="flex justify_content_space_between">
 		<div class="flex">

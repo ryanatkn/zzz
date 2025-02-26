@@ -26,9 +26,25 @@
 			</h1>
 		</header>
 		<p>
-			Zzz, pronounced "zees" like the sound of electricity, is a bot and web toolkit with a focus on
-			AI and user power. It's a digital tool that adapts to your needs on the fly, while remaining
-			fully in your control and open source.
+			Zzz, pronounced "zees" like the sound of electricity, is a bot and web toolkit focused on AI
+			and user power. It's a digital tool that adapts to your needs on the fly while remaining fully
+			in your control and open source. It's currently pre-alpha and will remain so for some time.
+		</p>
+		<p>
+			Zzz is part of a growing ecosystem developing client software for AI—known variously as web
+			UIs, AI interfaces, AI frontends, and LLM wrappers. While most users may continue with
+			proprietary clients from major providers, open clients like Zzz offer customizable power that
+			proprietary solutions can't match. These clients mediate and control our interactions with AI,
+			so some say that it's important they be free, and open platforms are necessary to foster our
+			best experimentation.
+		</p>
+		<p>
+			In a healthy open source ecosystem, users and contributors help developers and designers
+			figure out what we like and what works. Zzz specifically aims to support multiple protocols
+			and expose the interfaces needed to implement support for your own systems. When enough people
+			adopt protocols, they become standards. Zzz joins many other software projects working toward
+			collective and individual web empowerment—doing so publicly, with open tools and methods, as
+			part of a technological convergence spanning the entire stack.
 		</p>
 		<p>The main ideas include:</p>
 		<ul>

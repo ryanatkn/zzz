@@ -64,7 +64,7 @@
 				class="plain flex_1 mb_0"
 				bind:value={input}
 				bind:this={input_el}
-				placeholder="send to this tape..."
+				placeholder="content..."
 				onkeydown={(e) => e.key === 'Enter' && !e.shiftKey && (send(), e.preventDefault())}
 			></textarea>
 			<button type="button" class="plain" onclick={() => send()}>send</button>
