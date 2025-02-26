@@ -101,25 +101,23 @@
 			},
 		}),
 	});
-	if (browser) (window as any).zzz = zzz;
+	if (browser) (window as any).zzz = zzz; // no types for this, just for runtime convenience
 
 	// Add providers and models
 	zzz.add_providers(zzz_config.providers);
 
 	// TODO BLOCK refactor with capabilities
-	if (browser) {
-		onMount(async () => {
-			await zzz.init_models();
-			// TODO init properly
-			zzz.chats.add();
-			const prompt = zzz.prompts.add();
-			prompt.add_bit('one');
-			prompt.add_bit('2');
-			prompt.add_bit('c');
-		});
-	}
+	onMount(async () => {
+		await zzz.init_models();
+		// TODO init properly
+		zzz.chats.add();
+		const prompt = zzz.prompts.add();
+		prompt.add_bit('one');
+		prompt.add_bit('2');
+		prompt.add_bit('c');
 
-	if (browser) $inspect('providers', zzz.providers);
+		$inspect('providers', zzz.providers);
+	});
 
 	// zzz.send({type: 'echo', data: 'echo from client'});
 	zzz.client.send({id: random_id(), type: 'load_session'});
