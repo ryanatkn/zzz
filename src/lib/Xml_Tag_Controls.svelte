@@ -17,7 +17,7 @@
 </script>
 
 <div class="flex gap_xs align_items_start column">
-	<div class="flex align_items_center gap_xs2">
+	<div class="flex align_items_center gap_xs2 w_100">
 		<label
 			class="row mb_0"
 			style:height="var(--input_height)"
