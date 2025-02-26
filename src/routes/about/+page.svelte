@@ -27,27 +27,24 @@
 		</header>
 		<p>
 			Zzz, pronounced "zees" like the sound of electricity, is a bot and web toolkit focused on AI
-			and user power. It's a digital tool that adapts to your needs on the fly while remaining fully
-			in your control and open source. It's currently pre-alpha and will remain so for some time -
-			it'll take a while for it to be robust and reliable, but the ideas are already interesting to
-			me.
+			and user power. It's a digital tool that adapts to your needs on the fly, and critically, it's
+			fully in your control and open source. It's currently pre-alpha and will remain so for some
+			time - it'll take a while for it to be robust and reliable.
 		</p>
 		<p>
-			Zzz is part of a growing ecosystem of AI client software for AI - these software projects are
-			known variously as web UIs, AI interfaces, AI frontends, LLM wrappers, and many others, which
-			I think is a sign we haven't figured things out yet, but there's undoutably convergence ahead.
-			Most users today use AI through the proprietary clients of the major providers, and while that
-			may continue, open clients like Zzz offer custom power that proprietary solutions can't match.
-			Clients mediate and control our interactions with AI, so some say that it's important they be
-			free and open, and open platforms are obviously necessary to foster our best experimentation.
+			Zzz is part of a growing ecosystem of client software that interacts with and is enhanced by
+			AI. Most users today use AI through the proprietary clients of the major providers, and while
+			that situation may continue, open clients like Zzz offer custom power that proprietary
+			solutions can't match. Clients mediate and control our interactions with AI, so they're super
+			powerful but they can be surprisingly simple to build, and there's a lot of design surface to
+			explore!
 		</p>
 		<p>
-			In a healthy open source ecosystem, users and contributors help developers and designers
-			figure out what we like and what works. Zzz will support many protocols and have extensive
-			plugin support so you can implement your own systems. Zzz joins many other software projects
-			working toward individual and collective empowerment on the web - doing so publicly, with open
-			tools and communications, as part of a technological convergence spanning the entire stack.
-			Your feedback and input is really helpful in moving it all forward.
+			Zzz will support many protocols and have extensive plugin support so you can implement your
+			own systems. Zzz joins many other software projects working toward individual and collective
+			empowerment on the web - doing so publicly, with open tools and communications, as part of a
+			technological convergence spanning the entire stack on some new class of software that's been
+			prompted by the AI era.
 		</p>
 		<p>The main ideas of Zzz include: (I'm sure I'm missing some)</p>
 		<ul>

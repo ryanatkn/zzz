@@ -35,6 +35,8 @@
 		onsend(parsed);
 		input = '';
 	};
+
+	// TODO BLOCK the link should instead be a model picker (dialog? or overlaid without a bg maybe?)
 </script>
 
 <!-- TODO `duration_2` is the Moss variable for 200ms and 1 for 80ms, but it's not in a usable form -->
