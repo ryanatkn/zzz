@@ -2,6 +2,7 @@
 	import {scale} from 'svelte/transition';
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
 	import Paste_From_Clipboard from '@ryanatkn/fuz/Paste_From_Clipboard.svelte';
+	import {encode} from 'gpt-tokenizer';
 
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import type {Tape} from '$lib/tape.svelte.js';
@@ -12,7 +13,6 @@
 	import {GLYPH_PROVIDER} from '$lib/constants.js';
 	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
 	import Bit_Stats from '$lib/Bit_Stats.svelte';
-	import {count_tokens} from '$lib/prompt.svelte.js';
 
 	interface Props {
 		tape: Tape;
@@ -23,6 +23,7 @@
 	const {tape, onremove, onsend}: Props = $props();
 
 	let input = $state('');
+	const input_tokens = $derived(encode(input));
 	let input_el: HTMLTextAreaElement | undefined;
 
 	const send = () => {
@@ -84,7 +85,7 @@
 				}}
 			/>
 		</div>
-		<Bit_Stats length={input.length} token_count={count_tokens(input)} />
+		<Bit_Stats length={input.length} token_count={input_tokens.length} />
 	</div>
 </div>
 

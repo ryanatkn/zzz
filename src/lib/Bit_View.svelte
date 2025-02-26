@@ -3,7 +3,6 @@
 	import Paste_From_Clipboard from '@ryanatkn/fuz/Paste_From_Clipboard.svelte';
 
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
-	import {count_tokens} from '$lib/prompt.svelte.js';
 	import type {Bit} from '$lib/bit.svelte.js';
 	import type {Prompts} from '$lib/prompts.svelte.js';
 	import Xml_Tag_Controls from '$lib/Xml_Tag_Controls.svelte';
@@ -63,6 +62,6 @@
 			attrs={{title: `remove bit ${bit.id}`}}
 		/>
 	</div>
-	<Bit_Stats length={bit.content.length} token_count={count_tokens(bit.content)} />
+	<Bit_Stats length={bit.content.length} token_count={bit.token_count} />
 	<Xml_Tag_Controls {bit} />
 </div>

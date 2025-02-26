@@ -81,11 +81,11 @@
 				<div class="size_lg"><Text_Icon icon={GLYPH_PROMPT} /> prompt</div>
 				{#if zzz.prompts.selected}
 					<div class="row gap_sm mt_md mb_sm">
-						<Copy_To_Clipboard text={zzz.prompts.selected.value} attrs={{class: 'plain'}} />
+						<Copy_To_Clipboard text={zzz.prompts.selected.content} attrs={{class: 'plain'}} />
 						<Prompt_Stats prompt={zzz.prompts.selected} />
 					</div>
 					<pre class="panel p_xs overflow_auto" style:height="300px" style:max-height="300px">{zzz
-							.prompts.selected.value}</pre>
+							.prompts.selected.content}</pre>
 					<!-- TODO something like these? -->
 					<!-- <div class="mt_sm flex gap_sm justify_content_space_between">
 					<div class="flex gap_sm">

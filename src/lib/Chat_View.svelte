@@ -3,6 +3,7 @@
 	import ollama from 'ollama/browser';
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
 	import Paste_From_Clipboard from '@ryanatkn/fuz/Paste_From_Clipboard.svelte';
+	import {encode} from 'gpt-tokenizer';
 
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import {Chat} from '$lib/chat.svelte.js';
@@ -13,7 +14,6 @@
 	import {zzz_config} from '$lib/zzz_config.js';
 	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
 	import Bit_Stats from '$lib/Bit_Stats.svelte';
-	import {count_tokens} from '$lib/prompt.svelte.js';
 
 	const zzz = zzz_context.get();
 
@@ -36,6 +36,8 @@
 		}
 	}
 	let main_input = $state(''); // TODO BLOCK @many this state probably belongs on the `multichat` object
+	const main_input_tokens = $derived(encode(main_input));
+
 	let pending = $state(false); // TODO BLOCK @many this state probably belongs on the `multichat` object
 	let main_input_el: HTMLTextAreaElement | undefined;
 
@@ -161,7 +163,7 @@
 				send to all ({count})
 			</Pending_Button>
 		</div>
-		<Bit_Stats length={main_input.length} token_count={count_tokens(main_input)} />
+		<Bit_Stats length={main_input.length} token_count={main_input_tokens.length} />
 		<div class="flex mt_xs">
 			<Copy_To_Clipboard text={main_input} attrs={{class: 'plain', disabled: !main_input}} />
 			<Paste_From_Clipboard

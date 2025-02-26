@@ -1,3 +1,5 @@
+import {encode} from 'gpt-tokenizer';
+
 import type {Zzz} from '$lib/zzz.svelte.js';
 import {random_id, type Id} from '$lib/id.js';
 import {get_unique_name} from '$lib/helpers.js';
@@ -19,9 +21,11 @@ export class Prompt {
 
 	zzz: Zzz;
 
-	value: string = $derived(join_prompt_bits(this.bits));
-	length: number = $derived(this.value.length); // TODO use segmenter for more precision? will it be slow for large values tho?
-	token_count: number = $derived(count_tokens(this.value));
+	content: string = $derived(join_prompt_bits(this.bits));
+
+	length: number = $derived(this.content.length);
+	tokens: Array<number> = $derived(encode(this.content));
+	token_count: number = $derived(this.tokens.length);
 
 	constructor(zzz: Zzz, name: string = 'new prompt') {
 		this.zzz = zzz;
@@ -89,9 +93,6 @@ export const join_prompt_bits = (bits: Array<Bit>): string =>
 		})
 		.filter((c) => !!c)
 		.join('\n\n');
-
-// TODO use a tokenizer
-export const count_tokens = (text: string): number => Math.round(text.length / 4);
 
 export interface Xml_Attribute {
 	id: Id;

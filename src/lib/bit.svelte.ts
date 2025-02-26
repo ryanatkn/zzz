@@ -1,17 +1,20 @@
+import {encode} from 'gpt-tokenizer';
+
 import {random_id, type Id} from '$lib/id.js';
-import {count_tokens, type Xml_Attribute} from '$lib/prompt.svelte.js';
+import type {Xml_Attribute} from '$lib/prompt.svelte.js';
 
 export class Bit {
 	readonly id: Id = random_id();
 	name: string = $state('');
-	content: string = $state('');
 	has_xml_tag: boolean = $state(false);
 	xml_tag_name: string = $state('');
 	attributes: Array<Xml_Attribute> = $state([]);
 	enabled: boolean = $state(true);
 
-	length: number = $derived(this.content.length); // TODO use segmenter for more precision? will it be slow for large contents tho?
-	token_count: number = $derived(count_tokens(this.content));
+	content: string = $state('');
+	length: number = $derived(this.content.length);
+	tokens: Array<number> = $derived(encode(this.content));
+	token_count: number = $derived(this.tokens.length);
 
 	constructor(name: string = 'new bit', content: string = '') {
 		this.name = name;

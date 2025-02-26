@@ -11,7 +11,7 @@
 	const total_chars = $derived(bit.enabled ? bit.content.length : 0);
 	// TODO bug here where the xml tag is not taken into account, so they add up to less than 100% as calculated
 	const percent = $derived(
-		total_chars && prompt.value.length ? (total_chars / prompt.value.length) * 100 : 0,
+		total_chars && prompt.content.length ? (total_chars / prompt.content.length) * 100 : 0,
 	);
 
 	// TODO visuals are very basic
