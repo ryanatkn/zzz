@@ -1,3 +1,5 @@
+import type {Async_Status} from '@ryanatkn/belt/async.js';
+
 import type {Model} from '$lib/model.svelte.js';
 import {
 	to_completion_response_text,
@@ -6,7 +8,6 @@ import {
 } from '$lib/completion.js';
 import {random_id, type Id} from '$lib/id.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
-import type {Async_Status} from '@ryanatkn/belt/async.js';
 import {get_unique_name} from '$lib/helpers.js';
 import {Tape} from '$lib/tape.svelte.js';
 
