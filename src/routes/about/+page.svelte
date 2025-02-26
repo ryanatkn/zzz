@@ -49,7 +49,7 @@
 			tools and communications, as part of a technological convergence spanning the entire stack.
 			Your feedback and input is really helpful in moving it all forward.
 		</p>
-		<p>The main ideas of Zzz include:</p>
+		<p>The main ideas of Zzz include: (I'm sure I'm missing some)</p>
 		<ul>
 			<li>optimize for user agency and power</li>
 			<li>care about UX for both power users and novices</li>
