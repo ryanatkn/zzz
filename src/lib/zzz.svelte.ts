@@ -62,10 +62,9 @@ export class Zzz {
 	// TODO store state granularly for each provider
 
 	constructor(options: Zzz_Options) {
-		const {client, data = new Zzz_Data()} = options;
-		this.client = client;
+		this.client = options.client;
 		this.completion_threads = options.completion_threads ?? new Completion_Threads({zzz: this});
-		this.data = data;
+		this.data = options.data ?? new Zzz_Data();
 		// TODO move this? options? same with models below?
 		this.add_providers(zzz_config.providers);
 	}

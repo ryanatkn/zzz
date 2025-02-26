@@ -1,3 +1,5 @@
+export const GLYPH_REMOVE = '⨉'; // ⨉ ✕ 🗙 ⤫ ⤬
+
 export const GLYPH_CHAT = '⌸';
 export const GLYPH_TAPE = '☷';
 export const GLYPH_FILE = '⏚'; // ⏚ ⧈ ⊞ ⧉ ⌺ ▤

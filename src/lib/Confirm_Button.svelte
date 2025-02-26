@@ -3,6 +3,8 @@
 	import type {SvelteHTMLElements} from 'svelte/elements';
 	import type {Snippet} from 'svelte';
 
+	import {GLYPH_REMOVE} from '$lib/constants.js';
+
 	interface Props {
 		onclick: () => void;
 		attrs?: SvelteHTMLElements['button'];
@@ -57,7 +59,7 @@
 				? 'plain'
 				: ''} {!children && confirming && !attrs?.class?.includes('size_sm') ? 'size_sm' : ''}"
 		>
-			{#if children}{@render children(confirming)}{:else}🗙{/if}
+			{#if children}{@render children(confirming)}{:else}{GLYPH_REMOVE}{/if}
 		</button>
 	{/if}
 	{#if confirming}
@@ -75,7 +77,7 @@
 			out:scale={{duration: 200}}
 			{...confirm_button_attrs}
 		>
-			<div class="icon">🗙</div>
+			<div class="icon">{GLYPH_REMOVE}</div>
 		</button>
 	{/if}
 </div>

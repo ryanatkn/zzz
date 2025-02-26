@@ -5,7 +5,7 @@ export interface Zzz_Client_Options {
 	receive: (message: Server_Message) => void;
 }
 
-// TODO either rename/refactor/remove
+// TODO either rename/refactor/remove - maybe `Messages`?
 
 // TODO reactive?
 export class Zzz_Client {
@@ -13,7 +13,6 @@ export class Zzz_Client {
 	#receive: (message: Server_Message) => void;
 
 	constructor(options: Zzz_Client_Options) {
-		console.log('[zzz_client] creating');
 		this.#send = options.send;
 		this.#receive = options.receive;
 	}

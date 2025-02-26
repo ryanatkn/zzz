@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type {Xml_Attribute} from '$lib/prompt.svelte.js';
+	import {GLYPH_REMOVE} from '$lib/constants.js';
 
 	interface Props {
 		attribute: Xml_Attribute;
@@ -29,5 +30,5 @@
 		value={attribute.value}
 		oninput={(e) => onupdate({value: e.currentTarget.value})}
 	/>
-	<button type="button" class="plain compact" onclick={onremove}>🗙</button>
+	<button type="button" class="plain compact" onclick={onremove}>{GLYPH_REMOVE}</button>
 </div>

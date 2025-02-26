@@ -9,6 +9,7 @@
 	import File_Info from '$lib/File_Info.svelte';
 	import File_Summary from '$lib/File_Summary.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {GLYPH_REMOVE} from '$lib/constants.js';
 
 	interface Props {
 		// TODO more efficient data structures, reactive source files
@@ -63,7 +64,7 @@
 				}
 			}}
 		>
-			{#snippet icon()}🗙{/snippet}
+			{#snippet icon()}{GLYPH_REMOVE}{/snippet}
 			<span>Delete file</span>
 		</Contextmenu_Entry>
 	{:else}
