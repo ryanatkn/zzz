@@ -110,9 +110,11 @@
 						>
 					</li>
 					<li>
-						<External_Link href="https://wikipedia.org/wiki/RSS">RSS</External_Link>/<External_Link
+						<External_Link href="https://wikipedia.org/wiki/RSS">RSS</External_Link> and <External_Link
 							href="https://wikipedia.org/wiki/Atom_(web_standard)">Atom</External_Link
-						>/<External_Link href="https://wikipedia.org/wiki/JSON_Feed">JSON Feed</External_Link>
+						> and <External_Link href="https://wikipedia.org/wiki/JSON_Feed"
+							>JSON Feed</External_Link
+						>
 					</li>
 					<li>
 						<External_Link href="https://activitypub.rocks/">ActivityPub</External_Link>
