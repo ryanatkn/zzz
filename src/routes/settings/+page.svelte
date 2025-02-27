@@ -1,6 +1,5 @@
 <script lang="ts">
 	import {GLYPH_SETTINGS} from '$lib/constants.js';
-	import Control_Panel from '$lib/Control_Panel.svelte';
 	import Text_Icon from '$lib/Text_Icon.svelte';
 	import Settings from '$lib/Settings.svelte';
 	import Breadcrumb from '@ryanatkn/fuz/Breadcrumb.svelte';
@@ -20,7 +19,6 @@
 	<header>
 		<h1><Text_Icon icon={GLYPH_SETTINGS} /> system settings</h1>
 	</header>
-	<Control_Panel />
 	<section class="width_sm">
 		<Settings />
 	</section>

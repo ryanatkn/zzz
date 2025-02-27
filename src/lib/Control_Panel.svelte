@@ -9,6 +9,6 @@
 </script>
 
 <section class="width_sm">
-	<h2>Echo test</h2>
+	<h2>echo test</h2>
 	<Echo_Form />
 </section>

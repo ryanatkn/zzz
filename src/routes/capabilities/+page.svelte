@@ -7,6 +7,7 @@
 	import Library_Footer from '@ryanatkn/fuz/Library_Footer.svelte';
 	import Svg from '@ryanatkn/fuz/Svg.svelte';
 	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
+	import Control_Panel from '$lib/Control_Panel.svelte';
 
 	import {pkg_context} from '$routes/pkg.js';
 
@@ -21,7 +22,7 @@
 		<h1><Text_Icon icon={GLYPH_CAPABILITY} /> system capabilities</h1>
 	</header>
 	<section class="width_md">
-		<h2>Todo</h2>
+		<h2>todo</h2>
 		<aside>
 			⚠️ This is unfinished. It will show the capabilities available to the system. Zzz can run in
 			many contexts, and users are empowered by the capabilities available in each.
@@ -36,6 +37,9 @@
 			<li>pg db (Postgres, pglite, or some other compatible database)</li>
 			<li>ephemerally connected devices - mic, webcam, midi, etc</li>
 		</ul>
+	</section>
+	<section>
+		<Control_Panel />
 	</section>
 	<section class="width_sm">
 		<p>
