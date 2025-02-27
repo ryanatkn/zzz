@@ -5,6 +5,7 @@
 
 	import type {Provider_Json} from '$lib/provider.svelte.js';
 	import Model_Summary from '$lib/Model_Summary.svelte';
+	import Provider_Logo from '$lib/Provider_Logo.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import {GLYPH_PROVIDER, GLYPH_MODEL} from '$lib/constants.js';
 
@@ -19,13 +20,14 @@
 
 	const at_detail_page = $derived(page.url.pathname === `${base}/providers/${provider.name}`);
 
-	// TODO BLOCK use `provider.models`
+	// TODO BLOCK use `provider.models` or some cached data structure
 	const models = $derived(zzz.models.items.filter((m) => m.provider_name === provider.name));
 </script>
 
 <div {...attrs} class="panel p_lg {attrs?.class}">
 	{#if at_detail_page}
 		<h1>
+			<Provider_Logo name={provider.name} size="var(--size_xl3)" />
 			{provider.title}
 		</h1>
 	{:else}

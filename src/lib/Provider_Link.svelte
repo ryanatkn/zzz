@@ -4,45 +4,26 @@
 	import type {SvelteHTMLElements} from 'svelte/elements';
 	import {page} from '$app/state';
 	import {DEV} from 'esm-env';
-	import Svg from '@ryanatkn/fuz/Svg.svelte';
-	import {chatgpt_logo, claude_logo, gemini_logo, ollama_logo} from '@ryanatkn/fuz/logos.js';
 
 	import type {Provider_Json} from '$lib/provider.svelte.js';
 	import {GLYPH_PROVIDER} from '$lib/constants.js';
+	import Provider_Logo from '$lib/Provider_Logo.svelte';
 
 	interface Props {
 		provider: Provider_Json; // TODO BLOCK Provider, not Provider_Json?
-		icon?: 'glyph' | 'svg' | Snippet<[svg_icon: Snippet, glyph: string]>;
-		svg_fill?: string;
-		svg_size?: string;
-		svg_inline?: boolean;
+		icon?: 'glyph' | 'svg' | Snippet<[provider: Provider_Json, glyph: string]>;
+		icon_props?: Record<string, any>;
 		row?: boolean;
 		show_name?: boolean;
 		attrs?: SvelteHTMLElements['a'];
 		children?: Snippet;
 	}
 
-	const {
-		provider,
-		icon,
-		svg_fill = 'var(--text_color)',
-		svg_size = 'var(--size_xl)',
-		svg_inline = true,
-		show_name,
-		attrs,
-		children,
-	}: Props = $props();
+	const {provider, icon, icon_props = {}, show_name, attrs, children}: Props = $props();
 
 	if (DEV && icon && children) console.error('icon and children are mutually exclusive');
 
 	const selected = $derived(page.url.pathname === `${base}/providers/${provider.name}`);
-
-	const provider_logos = {
-		chatgpt: chatgpt_logo,
-		claude: claude_logo,
-		gemini: gemini_logo,
-		ollama: ollama_logo,
-	};
 </script>
 
 <a {...attrs} href="{base}/providers/{provider.name}" class:selected
@@ -52,9 +33,9 @@
 		{#if icon === 'glyph'}
 			{GLYPH_PROVIDER}
 		{:else if icon === 'svg'}
-			{@render svg_icon()}
+			<Provider_Logo name={provider.name} {...icon_props} />
 		{:else if icon}
-			{@render icon(svg_icon, GLYPH_PROVIDER)}
+			{@render icon(provider, GLYPH_PROVIDER)}
 		{/if}
 		{#if show_name}
 			{provider.name}
@@ -63,10 +44,6 @@
 		{/if}
 	{/if}</a
 >
-
-{#snippet svg_icon(fill = svg_fill, size = svg_size, inline = svg_inline)}
-	<Svg data={provider_logos[provider.name]} {fill} {size} {inline} />
-{/snippet}
 
 <style>
 	a {

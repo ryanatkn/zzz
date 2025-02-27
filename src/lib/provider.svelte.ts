@@ -1,7 +1,7 @@
 import type {Model} from '$lib/model.svelte.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 
-export type Provider_Name = 'ollama' | 'claude' | 'chatgpt' | 'gemini'; // TODO extensible
+export type Provider_Name = 'ollama' | 'claude' | 'chatgpt' | 'gemini'; // TODO extensible, this will probably become a flavored string
 
 export interface Provider_Json {
 	name: Provider_Name;
