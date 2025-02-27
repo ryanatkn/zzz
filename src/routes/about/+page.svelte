@@ -37,15 +37,15 @@
 			proprietary clients of the major providers, and while that situation may continue, open
 			clients like Zzz offer custom power that closed software can't match. Clients mediate and
 			control our interactions with AI, so they're powerful and rather important, being able to
-			gatekeep and shape the information we send and receive, and happily, they can be surprisingly
-			simple to build. AI has opened new worlds of technology and there's a lot of design space to
-			explore!
+			gatekeep and shape the information we send and receive, and happily, they're becoming easier
+			and cheaper to build and distribute. AI has opened new worlds of technology with vast new
+			design spaces to explore, where anyone with ideas can participate.
 		</p>
 		<p>
 			Zzz joins many other open software projects working towards individual and collective
-			empowerment on the web. These projects operate publicly—sharing tools, communications, and
-			protocols—as part of what I believe is a technological convergence, spanning the web stack, on
-			some new class of software prompted by the AI era.
+			empowerment on the web. These projects operate publicly—sharing tools, protocols, and
+			communities—as part of what I believe is a technological convergence, spanning the web stack,
+			on some new class of software prompted by the AI era.
 		</p>
 		<p>The main ideas of Zzz include: (I'm sure I'm missing some)</p>
 		<ul>
