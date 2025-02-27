@@ -325,6 +325,9 @@ a.chip {
 .pl_sm {
 	padding-left: var(--space_sm);
 }
+.pl_xl {
+	padding-left: var(--space_xl);
+}
 
 /* TODO maybe this belongs with the reset, like `selected`? or does `selected` belong here? */
 .plain:not(:hover) {

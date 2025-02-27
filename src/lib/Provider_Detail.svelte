@@ -25,27 +25,31 @@
 </script>
 
 <div {...attrs} class="panel p_lg {attrs?.class}">
-	{#if at_detail_page}
-		<h1>
-			<Provider_Logo name={provider.name} size="var(--size_xl3)" fill={null} />
-			{provider.title}
-		</h1>
-	{:else}
-		<h2>
-			<a href={provider.url} target="_blank" rel="noreferrer">{provider.title}</a>
-		</h2>
-	{/if}
-	{#if provider.icon}
-		<div>{provider.icon}</div>
-	{/if}
-	<section>
-		<div class="mb_md font_mono">{GLYPH_PROVIDER} {provider.name}</div>
-		<div>
-			<a href={provider.url} target="_blank" rel="noreferrer"
-				>docs <sup class="size_xs font_mono">[🡵]</sup></a
-			>
+	<div class="row">
+		<Provider_Logo name={provider.name} size="var(--icon_size_xl)" fill={null} />
+		<div class="pl_xl">
+			{#if at_detail_page}
+				<h1 class="mb_md">
+					{provider.title}
+				</h1>
+			{:else}
+				<h2>
+					<a href={provider.url} target="_blank" rel="noreferrer">{provider.title}</a>
+				</h2>
+			{/if}
+			{#if provider.icon}
+				<div>{provider.icon}</div>
+			{/if}
+			<div>
+				<div class="mb_md font_mono">{GLYPH_PROVIDER} {provider.name}</div>
+				<div>
+					<a href={provider.url} target="_blank" rel="noreferrer"
+						>docs <sup class="size_xs font_mono">[🡵]</sup></a
+					>
+				</div>
+			</div>
 		</div>
-	</section>
+	</div>
 	<section>
 		<h2>{GLYPH_MODEL} models</h2>
 		<ul class="flex flex_wrap unstyled gap_md">
