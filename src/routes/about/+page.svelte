@@ -162,10 +162,7 @@
 				>
 			</li>
 			<li>
-				<External_Link href="https://wikipedia.org/">wikis</External_Link> and <External_Link
-					href="https://wikipedia.org/wiki/Knowledge_management_software"
-					>knowledge management systems</External_Link
-				>
+				<External_Link href="https://wikipedia.org/">wikis</External_Link> and knowledge management systems
 			</li>
 			<li>cloud office suites</li>
 			<li>web IDEs and integrated hosts</li>
