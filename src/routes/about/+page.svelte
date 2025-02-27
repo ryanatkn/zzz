@@ -47,7 +47,7 @@
 			individual and collective empowerment on the web. These projects operate publicly—sharing
 			ideas, code, tools, protocols, and communities—as part of what I believe is a technological
 			design convergence, spanning the web stack, on some new class of software prompted by the AI
-			era.
+			era, that will integrate all the things into one UX.
 		</p>
 		<p>The main ideas of Zzz include: (I'm sure I'm missing some)</p>
 		<ul>
@@ -142,10 +142,30 @@
 					>Ink & Switch post</External_Link
 				>
 			</li>
-			<li>web metaframeworks – Zzz extends SvelteKit and Vite without wrapping them</li>
-			<li>content management systems, headless and traditional</li>
-			<li>static site generators</li>
-			<li>wikis and knowledge management systems</li>
+			<li>
+				web metaframeworks – Zzz extends <External_Link href="https://svelte.dev/"
+					>SvelteKit</External_Link
+				> and <External_Link href="https://vite.dev/">Vite</External_Link> without wrapping them
+			</li>
+			<li>
+				<External_Link href="https://wikipedia.org/wiki/Content_management_system"
+					>content management systems</External_Link
+				>, headless and traditional, see this <External_Link
+					href="https://wikipedia.org/wiki/List_of_content_management_systems"
+					>list on Wikipedia</External_Link
+				>
+			</li>
+			<li>
+				<External_Link href="https://wikipedia.org/wiki/Static_site_generator"
+					>static site generators</External_Link
+				>
+			</li>
+			<li>
+				<External_Link href="https://wikipedia.org/">wikis</External_Link> and <External_Link
+					href="https://wikipedia.org/wiki/Knowledge_management_software"
+					>knowledge management systems</External_Link
+				>
+			</li>
 			<li>cloud office suites</li>
 			<li>web IDEs and integrated hosts</li>
 			<li>learning platforms</li>
