@@ -136,7 +136,7 @@
 							>TypeScript lib</External_Link
 						>
 					</li>
-					<li>more planned, also I welcome feedback/requests/assistance</li>
+					<li>more plans in my head, also I welcome feedback/requests/assistance</li>
 				</ul>
 			</li>
 		</ul>
