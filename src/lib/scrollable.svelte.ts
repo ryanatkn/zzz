@@ -3,15 +3,17 @@ import {on} from 'svelte/events';
 
 // TODO BLOCK upstream to Fuz, and see the global `.scrolled` style
 
+// TODO make this more generic than just always adding a class?
+
 export interface Scrollable_Parameters {
-	/** CSS class to apply when scrolled. Defaults to 'scrolled'. */
+	/** CSS class to apply when scrolled. Defaults to 'scrolled' */
 	class_to_add?: string;
-	/** Threshold in pixels before considering the element scrolled. Defaults to 0. */
+	/** Threshold in pixels before considering the element scrolled. Defaults to 0 */
 	threshold?: number;
 }
 
 /**
- * Class that manages scroll state and provides actions for scroll detection and styling
+ * Manages scroll state and provides actions for scroll detection and styling
  */
 export class Scrollable {
 	/** The current scroll Y position */
@@ -59,7 +61,7 @@ export class Scrollable {
 			node.classList.add(this.class_to_add);
 		}
 
-		// TODO BLOCK is this orphaned? better pattern without effect?
+		// TODO is this orphaned? better pattern without effect? if keeping the effect, then correctly removing the previous `class_to_add` on change
 		$effect(() => {
 			if (this.scrolled) {
 				node.classList.add(this.class_to_add);
