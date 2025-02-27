@@ -408,6 +408,10 @@
       "svelte": "./dist/Reorderable_List.svelte",
       "default": "./dist/Reorderable_List.svelte"
     },
+    "./scrollable.svelte.js": {
+      "types": "./dist/scrollable.svelte.d.ts",
+      "default": "./dist/scrollable.svelte.js"
+    },
     "./server/.env.example": {
       "default": "./dist/server/.env.example"
     },

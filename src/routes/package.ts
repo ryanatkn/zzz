@@ -343,6 +343,10 @@ export const package_json = {
 			svelte: './dist/Reorderable_List.svelte',
 			default: './dist/Reorderable_List.svelte',
 		},
+		'./scrollable.svelte.js': {
+			types: './dist/scrollable.svelte.d.ts',
+			default: './dist/scrollable.svelte.js',
+		},
 		'./server/.env.example': {default: './dist/server/.env.example'},
 		'./server/helpers.js': {
 			types: './dist/server/helpers.d.ts',
@@ -582,6 +586,13 @@ export const src_json = {
 			declarations: [{name: 'Providers', kind: 'class'}],
 		},
 		'./Reorderable_List.svelte': {path: 'Reorderable_List.svelte', declarations: []},
+		'./scrollable.svelte.js': {
+			path: 'scrollable.svelte.ts',
+			declarations: [
+				{name: 'Scrollable_Parameters', kind: 'type'},
+				{name: 'Scrollable', kind: 'class'},
+			],
+		},
 		'./server/.env.example': {path: 'server/.env.example', declarations: []},
 		'./server/helpers.js': {
 			path: 'server/helpers.ts',
