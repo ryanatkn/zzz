@@ -26,6 +26,12 @@
 				/> about
 			</h1>
 		</header>
+		<aside class="mt_xl5">
+			⚠️ This is an early pre-release, see the
+			<External_Link href="https://github.com/ryanatkn/zzz">repo</External_Link>
+			and
+			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link> 💤
+		</aside>
 		<p>
 			Zzz, pronounced "zees" like the sound of electricity, is a bot and web toolkit focused on user
 			power and experimentation. The idea is to make a digital tool that adapts to your needs on the
@@ -180,19 +186,14 @@
 		</p>
 		<p>
 			Zzz is just one implementation with quirks personal to its author, and it will evolve
-			chaotically alongside its cohort of AI-informed web frontends and fullstack apps. I'd love to
-			get input of all kinds—for now see the
+			chaotically alongside its cohort of AI-informed web frontends and fullstack apps with the goal
+			of converging with the herd on the many choices that must be made. I'd love to get input of
+			all kinds—for now see the
 			<External_Link href="https://github.com/ryanatkn/zzz/issues">issues</External_Link>
 			and
 			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link>
 			or find me on
 			<External_Link href="https://bsky.app/profile/ryanatkn.com">Bluesky</External_Link>.
-		</p>
-		<p class="mt_xl5">
-			⚠️ This is an early pre-release, see the
-			<External_Link href="https://github.com/ryanatkn/zzz">repo</External_Link>
-			and
-			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link> 💤
 		</p>
 	</section>
 	<section>
