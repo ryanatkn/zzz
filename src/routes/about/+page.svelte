@@ -41,21 +41,22 @@
 		</p>
 		<p>
 			Zzz is part of a growing ecosystem of open source client software that both provides a UI to
-			AI, and also uses AI for self-enhancement at runtime. Today most people use AI through the
-			proprietary clients of the major providers, and while that situation may continue, open
-			clients like Zzz offer custom power that closed software can't match. Clients mediate and
-			control our interactions with AI, so they're powerful and rather important, being able to
-			gatekeep and shape the information we send and receive, and happily, they're becoming easier
-			and cheaper to build and distribute.
+			AI, and also uses AI for self-enhancement at runtime. I expect that in the future, AI will
+			write our UIs on demand, and I think a lot of existing software will evolve to become this
+			kind of client. Today most people use AI through the proprietary clients of the major
+			providers, and while that situation may continue, open clients like Zzz offer custom power
+			that closed software can't match. Clients mediate and control our interactions with AI, so
+			they're powerful and rather important, being able to gatekeep and shape the information we
+			send and receive, and happily, they're becoming easier and cheaper to build and distribute.
 		</p>
 		<p>
 			AI has opened new worlds of technology with vast new design spaces to explore, where anyone
 			with ideas can participate. Zzz joins many other open software projects working towards
 			individual and collective empowerment on the web. These projects operate publicly—sharing
 			ideas, code, tools, protocols, and communities—as part of what I believe is a technological
-			design convergence on a new class of software prompted by LLMs. This software genre spans the
-			web stack, values openness and interoperability, and aims to integrate all the things in one
-			UX.
+			design convergence on a new class of software prompted by LLMs. (by design convergence I mean
+			the genre of app/software, not everyone using Tailwind) This software genre spans the web
+			stack, values openness and interoperability, and aims to integrate all the things in one UX.
 		</p>
 		<p>The main ideas of Zzz include: (I'm sure I'm missing some)</p>
 		<ul>
@@ -182,6 +183,7 @@
 			</li>
 			<li>cloud office suites</li>
 			<li>website builders and web IDEs</li>
+			<li>social media apps</li>
 			<li>learning platforms</li>
 			<li>local code editors (supplementing editors like VSCode, not replacing)</li>
 			<li>
