@@ -34,7 +34,7 @@ export const package_json = {
 	devDependencies: {
 		'@changesets/changelog-git': '^0.2.1',
 		'@ryanatkn/eslint-config': '^0.6.0',
-		'@ryanatkn/fuz': '^0.132.5',
+		'@ryanatkn/fuz': '^0.133.0',
 		'@ryanatkn/gro': '^0.148.0',
 		'@ryanatkn/moss': '^0.22.4',
 		'@sveltejs/adapter-static': '^3.0.8',
@@ -310,6 +310,11 @@ export const package_json = {
 			svelte: './dist/Provider_Link.svelte',
 			default: './dist/Provider_Link.svelte',
 		},
+		'./Provider_Logo.svelte': {
+			types: './dist/Provider_Logo.svelte.d.ts',
+			svelte: './dist/Provider_Logo.svelte',
+			default: './dist/Provider_Logo.svelte',
+		},
 		'./Provider_Select.svelte': {
 			types: './dist/Provider_Select.svelte.d.ts',
 			svelte: './dist/Provider_Select.svelte',
@@ -559,6 +564,7 @@ export const src_json = {
 		'./Provider_Detail.svelte': {path: 'Provider_Detail.svelte', declarations: []},
 		'./Provider_Info.svelte': {path: 'Provider_Info.svelte', declarations: []},
 		'./Provider_Link.svelte': {path: 'Provider_Link.svelte', declarations: []},
+		'./Provider_Logo.svelte': {path: 'Provider_Logo.svelte', declarations: []},
 		'./Provider_Select.svelte': {path: 'Provider_Select.svelte', declarations: []},
 		'./Provider_Summary.svelte': {path: 'Provider_Summary.svelte', declarations: []},
 		'./Provider_View.svelte': {path: 'Provider_View.svelte', declarations: []},

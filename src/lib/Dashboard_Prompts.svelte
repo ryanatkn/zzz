@@ -49,7 +49,7 @@
 		{/if}
 		<button
 			type="button"
-			class="plain w_100 justify_content_start"
+			class="plain w_100 justify_content_start my_sm"
 			onclick={() => zzz.prompts.add()}
 		>
 			+ new prompt

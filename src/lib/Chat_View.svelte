@@ -165,7 +165,7 @@
 		</div>
 		<Bit_Stats length={main_input.length} token_count={main_input_tokens.length} />
 		<div class="flex mt_xs">
-			<Copy_To_Clipboard text={main_input} attrs={{class: 'plain', disabled: !main_input}} />
+			<Copy_To_Clipboard text={main_input} attrs={{class: 'plain'}} />
 			<Paste_From_Clipboard
 				onpaste={(text) => {
 					main_input += text;

@@ -39,7 +39,11 @@
 				</div>
 			</div>
 		{/if}
-		<button class="plain w_100 justify_content_start" type="button" onclick={() => zzz.chats.add()}>
+		<button
+			class="plain w_100 justify_content_start my_sm"
+			type="button"
+			onclick={() => zzz.chats.add()}
+		>
 			+ new chat
 		</button>
 		<menu class="unstyled">
