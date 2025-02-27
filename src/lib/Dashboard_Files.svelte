@@ -23,8 +23,7 @@
 	};
 
 	// Create scrolled instances for sidebar and content areas
-	const sidebar_scroll = new Scrollable();
-	const content_scroll = new Scrollable();
+	const sidebar_scrollable = new Scrollable();
 
 	// TODO BLOCK open directories and show their paths in a list on the left (or panel above, configurable I guess)
 
@@ -32,8 +31,8 @@
 </script>
 
 <div class="h_100 flex gap_md overflow_hidden">
-	<div class="width_sm shrink_0 overflow_auto" use:sidebar_scroll.container>
-		<header class="bg p_md size_lg sticky" style:top="0" use:sidebar_scroll.target>
+	<div class="width_sm shrink_0 overflow_auto" use:sidebar_scrollable.container>
+		<header class="bg p_md size_lg sticky" style:top="0" use:sidebar_scrollable.target>
 			<!-- TODO size_lg shouldnt be needed after the Moss --size change -->
 			<Text_Icon icon={GLYPH_FILE} size="var(--size_lg)" /> files
 		</header>
@@ -43,11 +42,9 @@
 			onselect={(file) => handle_file_selection(file)}
 		/>
 	</div>
-	<div class="flex_1 overflow_auto" use:content_scroll.container>
-		<div use:content_scroll.target>
-			{#if selected_file}
-				<File_Editor file={selected_file} />
-			{/if}
-		</div>
+	<div class="flex_1 overflow_auto">
+		{#if selected_file}
+			<File_Editor file={selected_file} />
+		{/if}
 	</div>
 </div>
