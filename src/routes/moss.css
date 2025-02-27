@@ -435,6 +435,9 @@ a.chip {
 .size_xs {
 	font-size: var(--size_xs);
 }
+.sticky {
+	position: sticky;
+}
 .t_0 {
 	top: 0;
 }

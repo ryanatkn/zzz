@@ -51,7 +51,7 @@
 <style>
 	.providers_grid {
 		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+		grid-template-columns: repeat(auto-fill, minmax(var(--width_sm), 1fr));
 		gap: var(--space_lg);
 		width: 100%;
 		padding: var(--space_md);

@@ -109,7 +109,7 @@
 
 	{#if zzz.prompts.selected}
 		<div class="panel p_sm flex_1">
-			<div class="flex justify_content_space_between mb_lg">
+			<div class="flex justify_content_space_between mb_lg fg_1 radius_sm">
 				<button type="button" class="plain" onclick={() => zzz.prompts.add_bit()}>
 					+ add bit
 				</button>

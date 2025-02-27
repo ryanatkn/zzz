@@ -21,15 +21,16 @@
 		selected_file_id = file.id;
 	};
 
-	// TODO BLOCK show path
+	// TODO BLOCK open directories and show their paths in a list on the left (or panel above, configurable I guess)
 
 	// TODO BLOCK name for "File_Explorer" and "File_List" parent component?
 </script>
 
-<div class="h_100 flex p_sm gap_md overflow_hidden">
+<div class="h_100 flex gap_md overflow_hidden">
 	<div class="width_sm shrink_0 overflow_auto">
-		<header class="size_xl mb_md">
-			<h1 class="mb_0"><Text_Icon icon={GLYPH_FILE} /> files</h1>
+		<header class="bg p_md size_lg sticky" style:top="0">
+			<!-- TODO size_lg shouldnt be needed after the Moss --size change -->
+			<Text_Icon icon={GLYPH_FILE} size="var(--size_lg)" /> files
 		</header>
 		<File_Explorer
 			files={files_map}

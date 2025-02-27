@@ -1,16 +1,14 @@
 <script lang="ts">
-	import type {Provider_Json} from '$lib/provider.svelte.js';
-	import {providers_default} from '$lib/config.js';
+	import type {Provider} from '$lib/provider.svelte.js';
 
 	interface Props {
-		providers?: Array<Provider_Json>;
-		// TODO BLOCK Provider, not Provider_Json?
-		selected_provider: Provider_Json; // TODO get from context?
+		providers: Array<Provider>; // TODO fallback to get from context?
+		selected_provider: Provider; // TODO fallback to get from context?
 	}
 
-	let {providers = providers_default, selected_provider = $bindable()}: Props = $props();
+	let {providers, selected_provider = $bindable()}: Props = $props();
 
-	// TODO currently unused but I assume I'll want something like this
+	// TODO BLOCK currently unused but I assume I'll want something like this
 </script>
 
 <div class="row">
