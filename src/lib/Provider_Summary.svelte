@@ -6,6 +6,7 @@
 	import type {Provider_Json} from '$lib/provider.svelte.js';
 	import Model_Summary from '$lib/Model_Summary.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
+	import External_Link from '$lib/External_Link.svelte';
 
 	const zzz = zzz_context.get();
 
@@ -29,7 +30,7 @@
 		</h1>
 	{:else}
 		<h2>
-			<a href={provider.url} target="_blank" rel="noreferrer">{provider.title}</a>
+			<a href={provider.url} target="_blank" rel="noopener">{provider.title}</a>
 		</h2>
 	{/if}
 	{#if provider.icon}
@@ -38,9 +39,7 @@
 	<section>
 		<div class="mb_md font_mono">{provider.name}</div>
 		<div>
-			<a href={provider.url} target="_blank" rel="noreferrer"
-				>docs <sup class="size_xs font_mono">[🡵]</sup></a
-			>
+			<External_Link href={provider.url}>docs</External_Link>
 		</div>
 	</section>
 	<ul class="flex flex_wrap unstyled gap_md">

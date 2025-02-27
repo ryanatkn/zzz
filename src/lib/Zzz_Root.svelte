@@ -22,15 +22,6 @@
 	zzz_context.set(zzz);
 </script>
 
-<svelte:window
-	onkeydown={(e) => {
-		if (e.key === '`' && !is_editable(e.target)) {
-			zzz.data.toggle_main_menu();
-			swallow(e);
-		}
-	}}
-/>
-
 <Main_Dialog />
 <!-- TODO user-defined pages should be able to control the full page at runtime -->
 <Dashboard>

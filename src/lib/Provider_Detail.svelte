@@ -8,6 +8,7 @@
 	import Provider_Logo from '$lib/Provider_Logo.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import {GLYPH_PROVIDER, GLYPH_MODEL} from '$lib/constants.js';
+	import External_Link_Symbol from '$lib/External_Link_Symbol.svelte';
 
 	const zzz = zzz_context.get();
 
@@ -19,6 +20,9 @@
 	const {provider, attrs}: Props = $props();
 
 	const at_detail_page = $derived(page.url.pathname === `${base}/providers/${provider.name}`);
+
+	// TODO BLOCK add repo link for Ollama https://github.com/ollama/ollama and
+	// TODO BLOCK add repo link for Ollama https://github.com/ollama/ollama and change homepage link to show the path, and the rest not
 
 	// TODO BLOCK use `provider.models` or some cached data structure
 	const models = $derived(zzz.models.items.filter((m) => m.provider_name === provider.name));
@@ -34,7 +38,7 @@
 				</h1>
 			{:else}
 				<h2>
-					<a href={provider.url} target="_blank" rel="noreferrer">{provider.title}</a>
+					<a href={provider.url} target="_blank" rel="noopener">{provider.title}</a>
 				</h2>
 			{/if}
 			{#if provider.icon}
@@ -43,9 +47,7 @@
 			<div>
 				<div class="mb_md font_mono">{GLYPH_PROVIDER} {provider.name}</div>
 				<div>
-					<a href={provider.url} target="_blank" rel="noreferrer"
-						>docs <sup class="size_xs font_mono">[🡵]</sup></a
-					>
+					<a href={provider.url} target="_blank" rel="noopener">docs <External_Link_Symbol /></a>
 				</div>
 			</div>
 		</div>

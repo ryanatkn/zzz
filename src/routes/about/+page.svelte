@@ -7,6 +7,7 @@
 	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
 
 	import {pkg_context} from '$routes/pkg.js';
+	import External_Link from '$lib/External_Link.svelte';
 
 	const pkg = pkg_context.get();
 
@@ -77,20 +78,41 @@
 		</ul>
 		<p>Integrations: (everything's a work in progress, but some basics work)</p>
 		<ul>
-			<li><a href="https://github.com/ollama/ollama">Ollama</a></li>
-			<li><a href="https://github.com/openai/openai-node">ChatGPT</a></li>
-			<li><a href="https://github.com/anthropics/anthropic-sdk-typescript">Claude</a></li>
-			<li><a href="https://github.com/google-gemini/generative-ai-js">Gemini</a></li>
+			<li>
+				<External_Link href="https://github.com/ollama/ollama">Ollama</External_Link>
+			</li>
+			<li>
+				<External_Link href="https://github.com/openai/openai-node">ChatGPT</External_Link>
+			</li>
+			<li>
+				<External_Link href="https://github.com/anthropics/anthropic-sdk-typescript"
+					>Claude</External_Link
+				>
+			</li>
+			<li>
+				<External_Link href="https://github.com/google-gemini/generative-ai-js"
+					>Gemini</External_Link
+				>
+			</li>
 			<li>
 				Planned:
 				<ul>
 					<li>pglite via Drizzle</li>
 					<li>RSS/Atom/JSON Feed</li>
-					<li>ActivityPub and AT Protocol</li>
 					<li>
-						<a href="https://modelcontextprotocol.io/">Model Context Protocol</a> (<a
-							href="https://github.com/modelcontextprotocol/typescript-sdk">TS lib</a
-						>)
+						<External_Link href="https://wikipedia.org/wiki/ActivityPub">ActivityPub</External_Link>
+						and
+						<External_Link href="https://atproto.com/">AT Protocol</External_Link>
+					</li>
+					<li>
+						<External_Link href="https://modelcontextprotocol.io/"
+							>Model Context Protocol</External_Link
+						>
+						(see its
+						<External_Link href="https://github.com/modelcontextprotocol/typescript-sdk"
+							>TypeScript lib</External_Link
+						>
+						)
 					</li>
 					<li>more planned, also I welcome feedback/requests/assistance</li>
 				</ul>
@@ -121,13 +143,18 @@
 		<p>
 			Zzz is just one implementation with quirks personal to its author, and it will evolve
 			chaotically alongside its cohort of AI-informed web frontends. I'd love to get input of all
-			kinds - for now see the <a href="https://github.com/ryanatkn/zzz/issues">issues</a> and
-			<a href="https://github.com/ryanatkn/zzz/discussions">discussions</a>, or find me on
-			<a href="https://bsky.app/profile/ryanatkn.com">Bluesky</a>.
+			kinds - for now see the
+			<External_Link href="https://github.com/ryanatkn/zzz/issues">issues</External_Link>
+			and
+			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link>,
+			or find me on
+			<External_Link href="https://bsky.app/profile/ryanatkn.com">Bluesky</External_Link>.
 		</p>
 		<p class="mt_xl5">
-			⚠️ This is an early pre-release, see the <a href="https://github.com/ryanatkn/zzz">repo</a>
-			and <a href="https://github.com/ryanatkn/zzz/discussions">discussions</a>.
+			⚠️ This is an early pre-release, see the
+			<External_Link href="https://github.com/ryanatkn/zzz">repo</External_Link>
+			and
+			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link>.
 		</p>
 	</section>
 	<section>
