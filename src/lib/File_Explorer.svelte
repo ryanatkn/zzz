@@ -25,11 +25,15 @@
 
 <menu class="flex_1 unstyled">
 	{#each sorted_files as file (file.id)}
+		{@const selected = file.id === selected_file_id}
 		<!-- TODO make these links, using query param? -->
 		<button
 			type="button"
 			class="file"
-			class:selected={file.id === selected_file_id}
+			class:selected
+			class:sticky={selected}
+			style:top={selected ? 0 : undefined}
+			style:bottom={selected ? 0 : undefined}
 			onclick={() => handle_select(file)}
 			transition:slide
 		>
