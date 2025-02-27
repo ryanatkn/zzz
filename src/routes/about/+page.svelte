@@ -100,7 +100,7 @@
 					<li>pglite via Drizzle</li>
 					<li>RSS/Atom/JSON Feed</li>
 					<li>
-						<External_Link href="https://wikipedia.org/wiki/ActivityPub">ActivityPub</External_Link>
+						<External_Link href="https://activitypub.rocks/">ActivityPub</External_Link>
 						and
 						<External_Link href="https://atproto.com/">AT Protocol</External_Link>
 					</li>
