@@ -1,8 +1,19 @@
-export const reorder_list = (bits: Array<any>, from_index: number, to_index: number): void => {
+import {DEV} from 'esm-env';
+
+export const reorder_list = (items: Array<any>, from_index: number, to_index: number): void => {
 	if (from_index === to_index) return;
-	if (from_index < 0 || to_index < 0 || from_index >= bits.length || to_index >= bits.length) {
-		throw Error('index out of bounds');
+
+	// Validate indices
+	if (from_index < 0 || to_index < 0 || from_index >= items.length || to_index > items.length) {
+		if (DEV) {
+			console.error(
+				`Invalid indices: from ${from_index} to ${to_index} in array of length ${items.length}`,
+			);
+		}
+		return; // Better to return than throw here
 	}
-	const [moved] = bits.splice(from_index, 1);
-	bits.splice(to_index, 0, moved);
+
+	// Perform the reorder
+	const [moved] = items.splice(from_index, 1);
+	items.splice(to_index, 0, moved);
 };

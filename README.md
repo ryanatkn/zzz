@@ -36,6 +36,13 @@ npm run dev
 
 Browse to the location is says, probably `localhost:5173`.
 
+## Credits 🐢<sub>🐢</sub><sub><sub>🐢</sub></sub>
+
+Zzz builds on a great deal of software.
+
+- see the deps in [package.json](package.json)
+- Claude wrote a lot of code after the initial version, but I try to be meticulous
+
 ## License 🐦
 
 [MIT](LICENSE)

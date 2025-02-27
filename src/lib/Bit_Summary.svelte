@@ -35,7 +35,8 @@
 		top: 0;
 		height: 100%;
 		background: var(--fg_5);
-		opacity: 0.1;
-		transition: width 200ms ease-in-out;
+		opacity: var(--fade_6);
+		transition: width var(--duration_3) ease-in-out;
+		border-radius: var(--radius_xs);
 	}
 </style>

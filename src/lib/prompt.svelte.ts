@@ -5,6 +5,9 @@ import {random_id, type Id} from '$lib/id.js';
 import {get_unique_name} from '$lib/helpers.js';
 import {XML_TAG_NAME_DEFAULT} from '$lib/constants.js';
 import {Bit} from '$lib/bit.svelte.js';
+import {reorder_list} from '$lib/list_helpers.js';
+
+export const PROMPT_CONTENT_TRUNCATED_LENGTH = 100;
 
 export interface Prompt_Message {
 	role: 'user' | 'system';
@@ -26,6 +29,11 @@ export class Prompt {
 	length: number = $derived(this.content.length);
 	tokens: Array<number> = $derived(encode(this.content)); // TODO @many eager computation in some UI cases is bad UX with large values (e.g. bottleneck typing)
 	token_count: number = $derived(this.tokens.length);
+	content_truncated: string = $derived(
+		this.content.length > PROMPT_CONTENT_TRUNCATED_LENGTH
+			? this.content.substring(0, PROMPT_CONTENT_TRUNCATED_LENGTH) + '...'
+			: this.content,
+	);
 
 	constructor(zzz: Zzz, name: string = 'new prompt') {
 		this.zzz = zzz;
@@ -71,6 +79,10 @@ export class Prompt {
 
 	remove_all_bits(): void {
 		this.bits = [];
+	}
+
+	reorder_bits(from_index: number, to_index: number): void {
+		reorder_list(this.bits, from_index, to_index);
 	}
 }
 

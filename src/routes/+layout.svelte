@@ -111,10 +111,15 @@
 		await zzz.init_models();
 		// TODO init properly
 		zzz.chats.add();
+		zzz.chats.add();
+		zzz.chats.add();
+		zzz.chats.add();
 		const prompt = zzz.prompts.add();
 		prompt.add_bit('one');
 		prompt.add_bit('2');
 		prompt.add_bit('c');
+		zzz.prompts.add().add_bit();
+		zzz.prompts.add().add_bit();
 	});
 
 	$inspect('providers', zzz.providers);

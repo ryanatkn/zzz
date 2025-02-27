@@ -5,7 +5,7 @@
 	import type {SvelteHTMLElements} from 'svelte/elements';
 
 	import type {Model} from '$lib/model.svelte.js';
-	import {GLYPH_MODEL} from '$lib/constants.js';
+	import Provider_Logo from '$lib/Provider_Logo.svelte';
 
 	interface Props {
 		model: Model;
@@ -24,7 +24,7 @@
 		{@render children()}
 	{:else}
 		{#if icon}
-			<span class="glyph">{GLYPH_MODEL}</span>
+			<Provider_Logo name={model.provider_name} size="var(--size_lg)" />
 		{/if}
 		{model.name}
 	{/if}</a

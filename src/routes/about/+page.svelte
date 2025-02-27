@@ -198,9 +198,10 @@
 		</p>
 		<p>
 			Zzz is just one implementation of an increasingly common idea with quirks personal to its
-			author, and it will evolve chaotically alongside its cohort of AI-informed web software, with
-			the goal of converging with the herd on the many choices that must be made in service of
-			interoperability. Your input is highly valued to keep things on track and fun—see the
+			author, and I expect it to evolve chaotically alongside its cohort of AI-informed web
+			software, with the goal of converging with the herd on the many specific choices that improve
+			the ecosystem's interoperability. Your input is highly valued to keep things on track and
+			fun—see the
 			<External_Link href="https://github.com/ryanatkn/zzz/issues">issues</External_Link>
 			and
 			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link>

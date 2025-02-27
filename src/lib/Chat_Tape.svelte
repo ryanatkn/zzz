@@ -12,11 +12,12 @@
 	import {providers_default} from '$lib/config.js';
 	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
 	import Bit_Stats from '$lib/Bit_Stats.svelte';
+	import Pending_Button from '@ryanatkn/fuz/Pending_Button.svelte';
 
 	interface Props {
 		tape: Tape;
 		onremove: () => void;
-		onsend: (input: string) => void;
+		onsend: (input: string) => Promise<void>;
 	}
 
 	const {tape, onremove, onsend}: Props = $props();
@@ -24,15 +25,18 @@
 	let input = $state('');
 	const input_tokens = $derived(encode(input));
 	let input_el: HTMLTextAreaElement | undefined;
+	let pending = $state(false);
 
-	const send = () => {
+	const send = async () => {
 		const parsed = input.trim();
 		if (!parsed) {
 			input_el?.focus();
 			return;
 		}
-		onsend(parsed);
+		pending = true;
+		await onsend(parsed);
 		input = '';
+		pending = false;
 	};
 
 	// TODO BLOCK the link should instead be a model picker (dialog? or overlaid without a bg maybe?)
@@ -69,9 +73,8 @@
 				bind:value={input}
 				bind:this={input_el}
 				placeholder="content..."
-				onkeydown={(e) => e.key === 'Enter' && !e.shiftKey && (send(), e.preventDefault())}
 			></textarea>
-			<button type="button" class="plain" onclick={() => send()}>send</button>
+			<Pending_Button {pending} onclick={send} attrs={{class: 'plain'}}>send</Pending_Button>
 		</div>
 		<div class="flex my_xs">
 			<Copy_To_Clipboard text={input} attrs={{class: 'plain'}} />

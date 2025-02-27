@@ -17,7 +17,9 @@ export class Prompts {
 	add(): Prompt {
 		const prompt = new Prompt(this.zzz);
 		this.items.unshift(prompt);
-		this.selected_id = prompt.id;
+		if (this.selected_id === null) {
+			this.selected_id = prompt.id;
+		}
 		return prompt;
 	}
 

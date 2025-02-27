@@ -18,7 +18,9 @@ export class Chats {
 	add(): void {
 		const chat = new Chat(this.zzz);
 		this.items.unshift(chat);
-		this.selected_id = chat.id;
+		if (this.selected_id === null) {
+			this.selected_id = chat.id;
+		}
 	}
 
 	remove(chat: Chat): void {

@@ -69,6 +69,7 @@
 			style:left="calc(-1 * var(--input_height))"
 			style:top="0"
 			style:transform-origin="right"
+			style:z-index="10"
 			onclick={() => {
 				confirming = false;
 				onclick();

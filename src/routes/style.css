@@ -60,3 +60,65 @@ h6 {
 			color-mix(in hsl, var(--shadow_color) var(--shadow_alpha_1), transparent)
 	);
 }
+
+/* TODO @many upstream to Fuz? (not Moss right?) */
+.reorderable_item {
+	--outline_style: dashed;
+	outline: var(--outline_width) var(--outline_style) var(--outline_color);
+}
+.reorderable_item:hover {
+	outline-width: var(--border_width_1);
+	outline-color: var(--border_color_3);
+}
+
+.reorderable_item:active {
+	outline-width: var(--border_width_1);
+	outline-color: var(--outline_color);
+}
+
+.reorderable_item.dragging {
+	opacity: var(--fade_3);
+	outline-width: var(--border_width_2);
+}
+
+/* TODO @many upstream to Fuz? (not Moss right?) */
+[draggable='true'] {
+	cursor: grab;
+}
+[draggable='true']:active {
+	cursor: grabbing;
+}
+
+/* Drag indicator */
+.drag_over {
+	position: relative;
+}
+
+/* Before drag indicator - top edge */
+/* TODO one of these is screwed up */
+.drag_over_before::before {
+	content: '';
+	position: absolute;
+	top: calc(-1 * var(--drag_over_height, 4px) / 2);
+	left: 0;
+	right: 0;
+	height: var(--drag_over_height, 4px);
+	background-color: var(--drag_over_color, var(--color_a_5));
+	z-index: 100; /* TODO @many arbitrary */
+	pointer-events: none;
+}
+
+/* After drag indicator - bottom edge */
+/* TODO one of these is screwed up */
+.drag_over_after::after {
+	content: '';
+	position: absolute;
+	bottom: calc(-1 * var(--drag_over_height, 4px) / 2);
+	left: 0;
+	right: 0;
+	height: var(--drag_over_height, 4px);
+	background-color: var(--drag_over_color, var(--color_a_5));
+	z-index: 100; /* TODO @many arbitrary */
+	pointer-events: none;
+}
+

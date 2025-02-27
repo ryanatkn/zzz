@@ -14,6 +14,7 @@
 	import {zzz_config} from '$lib/zzz_config.js';
 	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
 	import Bit_Stats from '$lib/Bit_Stats.svelte';
+	import Prompt_List from '$lib/Prompt_List.svelte';
 
 	const zzz = zzz_context.get();
 
@@ -204,7 +205,7 @@
 	<div class="width_sm column gap_md">
 		<div class="panel p_sm">
 			<header class="mt_0 mb_lg size_lg">{GLYPH_PROMPT} prompts</header>
-			<p>TODO prompt list - drag and drop to the inputs?</p>
+			<Prompt_List {chat} />
 		</div>
 	</div>
 </div>

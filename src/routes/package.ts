@@ -33,8 +33,8 @@ export const package_json = {
 	peerDependencies: {'@sveltejs/kit': '^2', svelte: '^5'},
 	devDependencies: {
 		'@changesets/changelog-git': '^0.2.1',
-		'@ryanatkn/eslint-config': '^0.6.0',
-		'@ryanatkn/fuz': '^0.133.0',
+		'@ryanatkn/eslint-config': '^0.7.0',
+		'@ryanatkn/fuz': '^0.133.1',
 		'@ryanatkn/gro': '^0.148.0',
 		'@ryanatkn/moss': '^0.23.0',
 		'@sveltejs/adapter-static': '^3.0.8',
@@ -196,6 +196,16 @@ export const package_json = {
 			svelte: './dist/Echo_Form.svelte',
 			default: './dist/Echo_Form.svelte',
 		},
+		'./External_Link_Symbol.svelte': {
+			types: './dist/External_Link_Symbol.svelte.d.ts',
+			svelte: './dist/External_Link_Symbol.svelte',
+			default: './dist/External_Link_Symbol.svelte',
+		},
+		'./External_Link.svelte': {
+			types: './dist/External_Link.svelte.d.ts',
+			svelte: './dist/External_Link.svelte',
+			default: './dist/External_Link.svelte',
+		},
 		'./File_Editor.svelte': {
 			types: './dist/File_Editor.svelte.d.ts',
 			svelte: './dist/File_Editor.svelte',
@@ -285,10 +295,20 @@ export const package_json = {
 		},
 		'./ollama.js': {types: './dist/ollama.d.ts', default: './dist/ollama.js'},
 		'./path.js': {types: './dist/path.d.ts', default: './dist/path.js'},
+		'./Prompt_List.svelte': {
+			types: './dist/Prompt_List.svelte.d.ts',
+			svelte: './dist/Prompt_List.svelte',
+			default: './dist/Prompt_List.svelte',
+		},
 		'./Prompt_Stats.svelte': {
 			types: './dist/Prompt_Stats.svelte.d.ts',
 			svelte: './dist/Prompt_Stats.svelte',
 			default: './dist/Prompt_Stats.svelte',
+		},
+		'./Prompt_Summary.svelte': {
+			types: './dist/Prompt_Summary.svelte.d.ts',
+			svelte: './dist/Prompt_Summary.svelte',
+			default: './dist/Prompt_Summary.svelte',
 		},
 		'./prompt.svelte.js': {types: './dist/prompt.svelte.d.ts', default: './dist/prompt.svelte.js'},
 		'./prompts.svelte.js': {
@@ -338,10 +358,9 @@ export const package_json = {
 			types: './dist/providers.svelte.d.ts',
 			default: './dist/providers.svelte.js',
 		},
-		'./Reorderable_List.svelte': {
-			types: './dist/Reorderable_List.svelte.d.ts',
-			svelte: './dist/Reorderable_List.svelte',
-			default: './dist/Reorderable_List.svelte',
+		'./reorderable.svelte.js': {
+			types: './dist/reorderable.svelte.d.ts',
+			default: './dist/reorderable.svelte.js',
 		},
 		'./scrollable.svelte.js': {
 			types: './dist/scrollable.svelte.d.ts',
@@ -467,6 +486,7 @@ export const src_json = {
 			path: 'constants.ts',
 			declarations: [
 				{name: 'GLYPH_REMOVE', kind: 'variable'},
+				{name: 'GLYPH_DRAG', kind: 'variable'},
 				{name: 'GLYPH_CHAT', kind: 'variable'},
 				{name: 'GLYPH_TAPE', kind: 'variable'},
 				{name: 'GLYPH_FILE', kind: 'variable'},
@@ -485,6 +505,8 @@ export const src_json = {
 		'./Dashboard_Prompts.svelte': {path: 'Dashboard_Prompts.svelte', declarations: []},
 		'./Dashboard.svelte': {path: 'Dashboard.svelte', declarations: []},
 		'./Echo_Form.svelte': {path: 'Echo_Form.svelte', declarations: []},
+		'./External_Link_Symbol.svelte': {path: 'External_Link_Symbol.svelte', declarations: []},
+		'./External_Link.svelte': {path: 'External_Link.svelte', declarations: []},
 		'./File_Editor.svelte': {path: 'File_Editor.svelte', declarations: []},
 		'./File_Explorer.svelte': {path: 'File_Explorer.svelte', declarations: []},
 		'./File_Info.svelte': {path: 'File_Info.svelte', declarations: []},
@@ -550,10 +572,13 @@ export const src_json = {
 			],
 		},
 		'./path.js': {path: 'path.ts', declarations: [{name: 'to_root_path', kind: 'function'}]},
+		'./Prompt_List.svelte': {path: 'Prompt_List.svelte', declarations: []},
 		'./Prompt_Stats.svelte': {path: 'Prompt_Stats.svelte', declarations: []},
+		'./Prompt_Summary.svelte': {path: 'Prompt_Summary.svelte', declarations: []},
 		'./prompt.svelte.js': {
 			path: 'prompt.svelte.ts',
 			declarations: [
+				{name: 'PROMPT_CONTENT_TRUNCATED_LENGTH', kind: 'variable'},
 				{name: 'Prompt_Message', kind: 'type'},
 				{name: 'Prompt_Message_Content', kind: 'type'},
 				{name: 'Prompt', kind: 'class'},
@@ -585,7 +610,15 @@ export const src_json = {
 			path: 'providers.svelte.ts',
 			declarations: [{name: 'Providers', kind: 'class'}],
 		},
-		'./Reorderable_List.svelte': {path: 'Reorderable_List.svelte', declarations: []},
+		'./reorderable.svelte.js': {
+			path: 'reorderable.svelte.ts',
+			declarations: [
+				{name: 'Drag_Context', kind: 'type'},
+				{name: 'reorderable_list', kind: 'function'},
+				{name: 'ITEM_CLASS_DEFAULT', kind: 'variable'},
+				{name: 'reorderable_item', kind: 'function'},
+			],
+		},
 		'./scrollable.svelte.js': {
 			path: 'scrollable.svelte.ts',
 			declarations: [

@@ -10,6 +10,8 @@ import {random_id, type Id} from '$lib/id.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 import {get_unique_name} from '$lib/helpers.js';
 import {Tape} from '$lib/tape.svelte.js';
+import type {Prompt} from '$lib/prompt.svelte.js';
+import {reorder_list} from '$lib/list_helpers.js';
 
 const NEW_CHAT_PREFIX = 'new chat';
 
@@ -27,6 +29,7 @@ export class Chat {
 	name: string = $state()!;
 	created: string = new Date().toISOString();
 	tapes: Array<Tape> = $state([]);
+	selected_prompts: Array<Prompt> = $state([]);
 	zzz: Zzz;
 
 	constructor(zzz: Zzz) {
@@ -61,6 +64,23 @@ export class Chat {
 
 	remove_all_tapes(): void {
 		this.tapes.length = 0;
+	}
+
+	add_selected_prompt(prompt: Prompt): void {
+		if (!this.selected_prompts.some((p) => p.id === prompt.id)) {
+			this.selected_prompts.push(prompt);
+		}
+	}
+
+	remove_selected_prompt(prompt_id: Id): void {
+		const index = this.selected_prompts.findIndex((p) => p.id === prompt_id);
+		if (index !== -1) {
+			this.selected_prompts.splice(index, 1);
+		}
+	}
+
+	reorder_selected_prompts(from_index: number, to_index: number): void {
+		reorder_list(this.selected_prompts, from_index, to_index);
 	}
 
 	async send_to_all(content: string): Promise<void> {

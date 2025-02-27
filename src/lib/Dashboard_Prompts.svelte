@@ -50,7 +50,10 @@
 		<button
 			type="button"
 			class="plain w_100 justify_content_start my_sm"
-			onclick={() => zzz.prompts.add()}
+			onclick={() => {
+				const prompt = zzz.prompts.add();
+				prompt.add_bit();
+			}}
 		>
 			+ new prompt
 		</button>
