@@ -102,6 +102,12 @@
 				>
 			</li>
 			<li>
+				<External_Link href="https://github.com/honojs/hono">Hono</External_Link> as the web server with
+				<External_Link href="https://svelte.dev/">SvelteKit</External_Link> and <External_Link
+					href="https://vite.dev/">Vite</External_Link
+				>
+			</li>
+			<li>
 				Planned:
 				<ul>
 					<li>
