@@ -174,12 +174,12 @@
 				systems
 			</li>
 			<li>cloud office suites</li>
-			<li>web IDEs and integrated hosts</li>
+			<li>website builders and web IDEs</li>
 			<li>learning platforms</li>
 			<li>local code editors (supplementing editors like VSCode, not replacing)</li>
 			<li>
-				people could technically make integrations with email and code forges, but I'm not going
-				there in my head yet
+				people could technically make integrations with code forges and even email, but I'm not
+				thinking that far ahead, but maybe Zzz will converge with Gmail
 			</li>
 		</ul>
 		<p>
