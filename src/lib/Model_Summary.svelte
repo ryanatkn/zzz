@@ -21,7 +21,7 @@
 		<!-- TODO hacky -->
 		<Provider_Link
 			provider={providers_default.find((p) => p.name === model.provider_name)!}
-			icon
+			icon="glyph"
 			show_name
 		/>
 	</div>

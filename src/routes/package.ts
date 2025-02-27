@@ -34,7 +34,7 @@ export const package_json = {
 	devDependencies: {
 		'@changesets/changelog-git': '^0.2.1',
 		'@ryanatkn/eslint-config': '^0.6.0',
-		'@ryanatkn/fuz': '^0.132.3',
+		'@ryanatkn/fuz': '^0.132.5',
 		'@ryanatkn/gro': '^0.148.0',
 		'@ryanatkn/moss': '^0.22.4',
 		'@sveltejs/adapter-static': '^3.0.8',
@@ -61,6 +61,7 @@ export const package_json = {
 		'@ryanatkn/belt': '^0.29.0',
 		'date-fns': '^4.1.0',
 		devalue: '^5.1.1',
+		'esm-env': '^1.2.2',
 		'gpt-tokenizer': '^2.8.1',
 		hono: '^4.7.2',
 		openai: '^4.85.4',

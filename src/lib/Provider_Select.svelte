@@ -4,6 +4,7 @@
 
 	interface Props {
 		providers?: Array<Provider_Json>;
+		// TODO BLOCK Provider, not Provider_Json?
 		selected_provider: Provider_Json; // TODO get from context?
 	}
 
