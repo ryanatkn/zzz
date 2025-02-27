@@ -47,10 +47,12 @@ h6 {
 	--border_radius: var(--radius_xs);
 }
 
+/* TODO upstream? something like it? */
 .dormant {
 	opacity: 0.6;
 }
 
+/* TODO upstream probably */
 .scrolled {
 	box-shadow: var(
 		--box_shadow,

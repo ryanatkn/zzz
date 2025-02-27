@@ -58,8 +58,8 @@
 				sovereignty, and optional cloud deployment (create websites!) and sync
 			</li>
 			<li>
-				interoperable design using standard and popular protocols (RSS/Atom, ActivityPub, AT
-				Protocol), open APIs, the web and JS ecosystem, and common data formats
+				interoperable design using standard and popular protocols (see ahead), open APIs, the web
+				and JS ecosystem, and common data formats
 			</li>
 			<li>
 				designed for plugins, scripting, and deep extensibility, and has a dev library in TypeScript
@@ -85,7 +85,8 @@
 				Planned:
 				<ul>
 					<li>pglite via Drizzle</li>
-					<li>RSS/Atom/JSONFeed</li>
+					<li>RSS/Atom/JSON Feed</li>
+					<li>ActivityPub and AT Protocol</li>
 					<li>
 						<a href="https://modelcontextprotocol.io/">Model Context Protocol</a> (<a
 							href="https://github.com/modelcontextprotocol/typescript-sdk">TS lib</a
@@ -95,28 +96,37 @@
 				</ul>
 			</li>
 		</ul>
-		<p>Zzz will be adding features from many kinds of software:</p>
+		<p>Zzz will include features from many kinds of software:</p>
 		<ul>
-			<li>web metaframeworks</li>
-			<li>traditional CMS</li>
-			<li>headless CMS</li>
-			<li>static site generators</li>
-			<li>local-first app</li>
 			<li>AI frontends</li>
+			<li>local-first apps</li>
+			<li>web metaframeworks (Zzz extends and exposes SvelteKit)</li>
+			<li>traditional content management systems</li>
+			<li>headless content management systems</li>
+			<li>static site generators</li>
 			<li>local code editors</li>
-			<li>web IDEs</li>
+			<li>web IDEs and integrated hosts</li>
 			<li>cloud office suites</li>
-			<li>wikis</li>
-			<li>knowledge management systems</li>
+			<li>wikis and knowledge management systems</li>
 			<li>learning platforms</li>
 			<li>
-				and probably things like email and code forges, though I'm not going there in my head yet
+				people could technically make integrations with email and code forges, but I'm not going
+				there in my head yet
 			</li>
 		</ul>
+		<p>
+			Most features are optional through plugins, so the core experience stays minimal and
+			efficient.
+		</p>
+		<p>
+			Zzz is just one implementation with quirks personal to its author, and it will evolve
+			chaotically alongside its cohort of AI-informed web frontends. I'd love to get input of all
+			kinds - for now see the <a href="https://github.com/ryanatkn/zzz/issues">issues</a> and
+			<a href="https://github.com/ryanatkn/zzz/discussions">discussions</a>, or find me on
+			<a href="https://bsky.app/profile/ryanatkn.com">Bluesky</a>.
+		</p>
 		<p class="mt_xl5">
-			⚠️ This is an early pre-release, see the <a href="https://github.com/ryanatkn/zzz"
-				>readme and source code</a
-			>
+			⚠️ This is an early pre-release, see the <a href="https://github.com/ryanatkn/zzz">repo</a>
 			and <a href="https://github.com/ryanatkn/zzz/discussions">discussions</a>.
 		</p>
 	</section>
