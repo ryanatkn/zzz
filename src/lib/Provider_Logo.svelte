@@ -6,7 +6,7 @@
 
 	interface Props {
 		name: Provider_Name;
-		fill?: string;
+		fill?: string | null | undefined;
 		size?: string;
 		inline?: boolean;
 		props?: ComponentProps<typeof Svg>;
@@ -28,4 +28,4 @@
 	};
 </script>
 
-<Svg data={provider_logos[name]} {...props} {fill} {size} {inline} />
+<Svg data={provider_logos[name]} {...props} fill={fill ?? undefined} {size} {inline} />

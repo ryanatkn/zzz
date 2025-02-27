@@ -27,7 +27,7 @@
 <div {...attrs} class="panel p_lg {attrs?.class}">
 	{#if at_detail_page}
 		<h1>
-			<Provider_Logo name={provider.name} size="var(--size_xl3)" />
+			<Provider_Logo name={provider.name} size="var(--size_xl3)" fill={null} />
 			{provider.title}
 		</h1>
 	{:else}

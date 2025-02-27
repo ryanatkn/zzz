@@ -1,5 +1,14 @@
 /* global stylesheet imported by `src/routes/+layout.svelte */
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+	font-family: 'DM Serif Display', Georgia, serif; /* copying svelte's homework and taste */
+}
+
 .click_effect_scale:hover {
 	transform: scale(1.08);
 }
