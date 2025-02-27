@@ -47,7 +47,7 @@
 			providers, and while that situation may continue, open clients like Zzz offer custom power
 			that closed software can't match. Clients mediate and control our interactions with AI, so
 			they're powerful and rather important, being able to gatekeep and shape the information we
-			send and receive, and happily, they're becoming easier and cheaper to build and distribute.
+			send and receive. Fortunately, they're becoming easier and cheaper to build and distribute.
 		</p>
 		<p>
 			AI has opened new worlds of technology with vast new design spaces to explore, where anyone
