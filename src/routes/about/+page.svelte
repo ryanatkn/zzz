@@ -55,8 +55,9 @@
 			individual and collective empowerment on the web. These projects operate publicly—sharing
 			ideas, code, tools, protocols, and communities—as part of what I believe is a technological
 			design convergence on a new class of software prompted by LLMs. (by design convergence I mean
-			the genre of app/software, not everyone using Tailwind) This software genre spans the web
-			stack, values openness and interoperability, and aims to integrate all the things in one UX.
+			the genre of web app/software, not everyone using Tailwind) This software genre spans the full
+			stack, values openness and interoperability, and aims to integrate all the things in one UX
+			with uncompromising power to users.
 		</p>
 		<p>The main ideas of Zzz include: (I'm sure I'm missing some)</p>
 		<ul>
