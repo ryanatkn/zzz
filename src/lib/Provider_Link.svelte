@@ -31,7 +31,7 @@
 		{@render children()}
 	{:else}
 		{#if icon === 'glyph'}
-			{GLYPH_PROVIDER}
+			<span class="glyph">{GLYPH_PROVIDER}</span>
 		{:else if icon === 'svg'}
 			<Provider_Logo name={provider.name} {...icon_props} />
 		{:else if icon}

@@ -11,7 +11,8 @@ h6 {
 	font-family: 'DM Serif Display', Georgia, serif; /* copying svelte's homework and taste */
 }
 
-/* TODO upstream this? needed because the heading font changes them */
+/* TODO upstream */
+/* This is needed in places where glyphs may appear with non-sans fonts like headings. */
 .glyph {
 	font-family: var(--font_sans);
 }

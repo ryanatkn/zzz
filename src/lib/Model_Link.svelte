@@ -24,7 +24,7 @@
 		{@render children()}
 	{:else}
 		{#if icon}
-			{GLYPH_MODEL}
+			<span class="glyph">{GLYPH_MODEL}</span>
 		{/if}
 		{model.name}
 	{/if}</a

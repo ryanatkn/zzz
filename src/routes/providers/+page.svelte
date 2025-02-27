@@ -19,7 +19,10 @@
 				<div class="size_xl mb_lg">
 					<Provider_Link {provider} icon="svg" />
 				</div>
-				<div class="mb_sm font_mono">{GLYPH_PROVIDER} {provider.name}</div>
+				<div class="mb_sm font_mono">
+					<span class="glyph">{GLYPH_PROVIDER}</span>
+					{provider.name}
+				</div>
 				{#if provider.url}
 					<div class="mb_sm">
 						<a href={provider.url} target="_blank" rel="noreferrer"

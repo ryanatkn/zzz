@@ -22,7 +22,7 @@
 <div class="panel p_lg">
 	{#if at_detail_page}
 		<h1>
-			{GLYPH_MODEL}
+			<span class="glyph">{GLYPH_MODEL}</span>
 			{model.name}
 		</h1>
 	{:else}

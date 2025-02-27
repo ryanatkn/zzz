@@ -15,7 +15,7 @@
 
 <!-- TODO maybe set line height? -->
 <span
-	class="inline_block text_align_center"
+	class="glyph inline_block text_align_center"
 	style:width={size ?? DEFAULT_SIZE}
 	style:height={size ?? DEFAULT_SIZE}
 	style:font-size={size ?? DEFAULT_FONT}

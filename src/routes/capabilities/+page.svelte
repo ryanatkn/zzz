@@ -27,7 +27,7 @@
 			many contexts, and users are empowered by the capabilities available in each.
 		</aside>
 		<ul>
-			<li>utility models (like the first one for `Chat.init_name`)</li>
+			<li>utility models (like the first one for `namerbot`)</li>
 			<li>Node server</li>
 			<ul class="mb_0">
 				<li>websocket connection</li>
