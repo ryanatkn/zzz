@@ -193,14 +193,14 @@
 			efficient.
 		</p>
 		<p>
-			Zzz is just one implementation with quirks personal to its author, and it will evolve
-			chaotically alongside its cohort of AI-informed web frontends and fullstack apps with the goal
-			of converging with the herd on the many choices that must be made. I'd love to get input of
-			all kinds—for now see the
+			Zzz is just one implementation of an increasingly common idea with quirks personal to its
+			author, and it will evolve chaotically alongside its cohort of AI-informed web software, with
+			the goal of converging with the herd on the many choices that must be made in service of
+			interoperability. Your input is highly valued to keep things on track and fun—see the
 			<External_Link href="https://github.com/ryanatkn/zzz/issues">issues</External_Link>
 			and
 			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link>
-			or find me on
+			and find me on
 			<External_Link href="https://bsky.app/profile/ryanatkn.com">Bluesky</External_Link>.
 		</p>
 	</section>
