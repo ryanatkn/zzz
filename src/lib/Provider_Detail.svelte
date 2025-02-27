@@ -51,7 +51,7 @@
 		</div>
 	</div>
 	<section>
-		<h2>{GLYPH_MODEL} models</h2>
+		<h2>{GLYPH_MODEL} models ‧ {models.length}</h2>
 		<ul class="flex flex_wrap unstyled gap_md">
 			{#each models as model (model)}
 				<Model_Summary {model} />
