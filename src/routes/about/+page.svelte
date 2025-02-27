@@ -38,14 +38,15 @@
 			clients like Zzz offer custom power that closed software can't match. Clients mediate and
 			control our interactions with AI, so they're powerful and rather important, being able to
 			gatekeep and shape the information we send and receive, and happily, they're becoming easier
-			and cheaper to build and distribute. AI has opened new worlds of technology with vast new
-			design spaces to explore, where anyone with ideas can participate.
+			and cheaper to build and distribute.
 		</p>
 		<p>
-			Zzz joins many other open software projects working towards individual and collective
-			empowerment on the web. These projects operate publicly—sharing tools, protocols, and
-			communities—as part of what I believe is a technological convergence, spanning the web stack,
-			on some new class of software prompted by the AI era.
+			AI has opened new worlds of technology with vast new design spaces to explore, where anyone
+			with ideas can participate. Zzz joins many other open software projects working towards
+			individual and collective empowerment on the web. These projects operate publicly—sharing
+			ideas, code, tools, protocols, and communities—as part of what I believe is a technological
+			design convergence, spanning the web stack, on some new class of software prompted by the AI
+			era.
 		</p>
 		<p>The main ideas of Zzz include: (I'm sure I'm missing some)</p>
 		<ul>
@@ -53,8 +54,8 @@
 			<li>care about UX for both power users and novices</li>
 			<li>open source, permissive license, noncommercial project</li>
 			<li>
-				local-first architecture with user-owned data, offline functionality, and optional cloud
-				sync
+				local-first architecture with offline functionality, user-controlled data, client
+				sovereignty, and optional cloud deployment (create websites!) and sync
 			</li>
 			<li>
 				interoperable design using standard and popular protocols, open APIs, the web and JS
@@ -65,8 +66,9 @@
 				and Svelte
 			</li>
 			<li>
-				building blocks that you can configure and combine, both manually and with AI, to create new
-				experiences and tools that solve your unique problems, and share them with others
+				composable building blocks that you can configure and combine based on the available
+				capabilities, both manually and with AI, to create new experiences and tools that solve your
+				unique problems, and share them with others
 			</li>
 			<li>
 				adaptable interfaces that evolve with user needs through customization, context awareness,
@@ -91,6 +93,24 @@
 					</li>
 					<li>more planned, also I welcome feedback/requests/assistance</li>
 				</ul>
+			</li>
+		</ul>
+		<p>I think we'll see software like Zzz start taking on features of a range of d:</p>
+		<ul>
+			<li>web metaframeworks</li>
+			<li>traditional CMS</li>
+			<li>headless CMS</li>
+			<li>static site generators</li>
+			<li>local-first app</li>
+			<li>AI frontends</li>
+			<li>local code editors</li>
+			<li>web IDEs</li>
+			<li>cloud office suites</li>
+			<li>wikis</li>
+			<li>knowledge management systems</li>
+			<li>learning platforms</li>
+			<li>
+				and probably things like email and code forges, though I'm not going there in my head yet
 			</li>
 		</ul>
 		<p class="mt_xl5">
