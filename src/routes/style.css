@@ -33,3 +33,11 @@
 .dormant {
 	opacity: 0.6;
 }
+
+.scrolled {
+	box-shadow: var(
+		--box_shadow,
+		var(--shadow_bottom_sm)
+			color-mix(in hsl, var(--shadow_color) var(--shadow_alpha_1), transparent)
+	);
+}
