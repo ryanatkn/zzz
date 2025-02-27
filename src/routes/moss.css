@@ -85,12 +85,15 @@ a.chip {
 }
 .font_weight_400 {
 	font-weight: 400;
+	--font_weight: 400;
 }
 .font_weight_500 {
 	font-weight: 500;
+	--font_weight: 500;
 }
 .font_weight_600 {
 	font-weight: 600;
+	--font_weight: 600;
 }
 
 /* Formats content to wrap long strings and preserve displayed whitespace. */
@@ -331,13 +334,13 @@ a.chip {
 
 /* TODO maybe this belongs with the reset, like `selected`? or does `selected` belong here? */
 .plain:not(:hover) {
-	border-color: transparent;
+	--border_color: transparent;
 	box-shadow: none;
 	--button_fill: transparent;
 }
 .plain:hover,
 .plain:active {
-	border-color: transparent;
+	--border_color: transparent;
 }
 
 .pr_md {
@@ -425,18 +428,23 @@ a.chip {
 }
 .size_lg {
 	font-size: var(--size_lg);
+	--size: var(--size_lg);
 }
 .size_sm {
 	font-size: var(--size_sm);
+	--size: var(--size_sm);
 }
 .size_xl {
 	font-size: var(--size_xl);
+	--size: var(--size_xl);
 }
 .size_xl3 {
 	font-size: var(--size_xl3);
+	--size: var(--size_xl3);
 }
 .size_xs {
 	font-size: var(--size_xs);
+	--size: var(--size_xs);
 }
 .sticky {
 	position: sticky;

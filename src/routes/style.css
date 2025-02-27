@@ -11,6 +11,11 @@ h6 {
 	font-family: 'DM Serif Display', Georgia, serif; /* copying svelte's homework and taste */
 }
 
+/* TODO upstream this? needed because the heading font changes them */
+.glyph {
+	font-family: var(--font_sans);
+}
+
 .click_effect_scale:hover {
 	transform: scale(1.08);
 }
