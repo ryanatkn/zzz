@@ -95,7 +95,7 @@
 				</ul>
 			</li>
 		</ul>
-		<p>I think we'll see software like Zzz start taking on features of a range of d:</p>
+		<p>Zzz will be adding features from many kinds of software:</p>
 		<ul>
 			<li>web metaframeworks</li>
 			<li>traditional CMS</li>
