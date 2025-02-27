@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type {Snippet} from 'svelte';
-	import {is_editable, swallow} from '@ryanatkn/belt/dom.js';
 
 	import {Zzz, zzz_context} from '$lib/zzz.svelte.js';
 	import Dashboard from '$lib/Dashboard.svelte';
