@@ -204,7 +204,7 @@
 	<div class="width_sm column gap_md">
 		<div class="panel p_sm">
 			<header class="mt_0 mb_lg size_lg">{GLYPH_PROMPT} prompts</header>
-			<p>TODO custom prompt buttons</p>
+			<p>TODO prompt list - drag and drop to the inputs?</p>
 		</div>
 	</div>
 </div>
