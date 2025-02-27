@@ -32,8 +32,8 @@
 			will take some time for it to be featureful and reliable.
 		</p>
 		<p>
-			Zzz is part of a growing ecosystem of open source client software that interacts with and is
-			enhanced by AI. Most users today use AI through the proprietary clients of the major
+			Zzz is part of a growing ecosystem of open source client software that both interacts with and
+			is enhanced by AI. Most users today use AI through the proprietary clients of the major
 			providers, and while that situation may continue, open clients like Zzz offer custom power
 			that closed software can't match. Clients mediate and control our interactions with AI, so
 			they're super powerful, and they can be surprisingly simple to build - it's a new tech world
