@@ -97,8 +97,16 @@
 			<li>
 				Planned:
 				<ul>
-					<li>pglite via Drizzle</li>
-					<li>RSS/Atom/JSON Feed</li>
+					<li>
+						<External_Link href="https://github.com/electric-sql/pglite">pglite</External_Link> via
+						<External_Link href="https://github.com/drizzle-team/drizzle-orm">Drizzle</External_Link
+						>
+					</li>
+					<li>
+						<External_Link href="https://wikipedia.org/wiki/RSS">RSS</External_Link>/<External_Link
+							href="https://wikipedia.org/wiki/Atom_(web_standard)">Atom</External_Link
+						>/<External_Link href="https://wikipedia.org/wiki/JSON_Feed">JSON Feed</External_Link>
+					</li>
 					<li>
 						<External_Link href="https://activitypub.rocks/">ActivityPub</External_Link>
 						and
@@ -108,11 +116,10 @@
 						<External_Link href="https://modelcontextprotocol.io/"
 							>Model Context Protocol</External_Link
 						>
-						(see its
+						via its
 						<External_Link href="https://github.com/modelcontextprotocol/typescript-sdk"
 							>TypeScript lib</External_Link
 						>
-						)
 					</li>
 					<li>more planned, also I welcome feedback/requests/assistance</li>
 				</ul>
@@ -120,17 +127,29 @@
 		</ul>
 		<p>Zzz will include features from many kinds of software:</p>
 		<ul>
-			<li>AI frontends</li>
-			<li>local-first apps</li>
-			<li>web metaframeworks (Zzz extends and exposes SvelteKit)</li>
-			<li>traditional content management systems</li>
-			<li>headless content management systems</li>
+			<li>
+				AI frontends and fullstack apps like <External_Link
+					href="https://github.com/Mintplex-Labs/anything-llm">AnythingLLM</External_Link
+				>
+				and <External_Link href="https://github.com/open-webui/open-webui">Open WebUI</External_Link
+				>
+			</li>
+			<li>
+				local-first apps – see <External_Link href="https://localfirstweb.dev/"
+					>localfirstweb.dev</External_Link
+				> and this
+				<External_Link href="https://www.inkandswitch.com/local-first/"
+					>Ink & Switch post</External_Link
+				>
+			</li>
+			<li>web metaframeworks – Zzz extends SvelteKit and Vite without wrapping them</li>
+			<li>content management systems, headless and traditional</li>
 			<li>static site generators</li>
-			<li>local code editors</li>
-			<li>web IDEs and integrated hosts</li>
-			<li>cloud office suites</li>
 			<li>wikis and knowledge management systems</li>
+			<li>cloud office suites</li>
+			<li>web IDEs and integrated hosts</li>
 			<li>learning platforms</li>
+			<li>local code editors (supplementing editors like VSCode, not replacing)</li>
 			<li>
 				people could technically make integrations with email and code forges, but I'm not going
 				there in my head yet
@@ -142,11 +161,11 @@
 		</p>
 		<p>
 			Zzz is just one implementation with quirks personal to its author, and it will evolve
-			chaotically alongside its cohort of AI-informed web frontends. I'd love to get input of all
-			kinds - for now see the
+			chaotically alongside its cohort of AI-informed web frontends and fullstack apps. I'd love to
+			get input of all kinds—for now see the
 			<External_Link href="https://github.com/ryanatkn/zzz/issues">issues</External_Link>
 			and
-			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link>,
+			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link>
 			or find me on
 			<External_Link href="https://bsky.app/profile/ryanatkn.com">Bluesky</External_Link>.
 		</p>
@@ -154,7 +173,7 @@
 			⚠️ This is an early pre-release, see the
 			<External_Link href="https://github.com/ryanatkn/zzz">repo</External_Link>
 			and
-			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link>.
+			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link> 💤
 		</p>
 	</section>
 	<section>

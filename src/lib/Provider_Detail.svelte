@@ -8,7 +8,7 @@
 	import Provider_Logo from '$lib/Provider_Logo.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import {GLYPH_PROVIDER, GLYPH_MODEL} from '$lib/constants.js';
-	import External_Link_Symbol from '$lib/External_Link_Symbol.svelte';
+	import External_Link from '$lib/External_Link.svelte';
 
 	const zzz = zzz_context.get();
 
@@ -38,7 +38,7 @@
 				</h1>
 			{:else}
 				<h2>
-					<a href={provider.url} target="_blank" rel="noopener">{provider.title}</a>
+					<External_Link href={provider.url}>{provider.title}</External_Link>
 				</h2>
 			{/if}
 			{#if provider.icon}
@@ -47,7 +47,7 @@
 			<div>
 				<div class="mb_md font_mono">{GLYPH_PROVIDER} {provider.name}</div>
 				<div>
-					<a href={provider.url} target="_blank" rel="noopener">docs <External_Link_Symbol /></a>
+					<External_Link href={provider.url}>docs</External_Link>
 				</div>
 			</div>
 		</div>

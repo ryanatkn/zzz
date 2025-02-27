@@ -30,7 +30,7 @@
 		</h1>
 	{:else}
 		<h2>
-			<a href={provider.url} target="_blank" rel="noopener">{provider.title}</a>
+			<External_Link href={provider.url}>{provider.title}</External_Link>
 		</h2>
 	{/if}
 	{#if provider.icon}
