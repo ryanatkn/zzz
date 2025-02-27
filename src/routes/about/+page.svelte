@@ -27,7 +27,7 @@
 			</h1>
 		</header>
 		<aside class="mt_xl5">
-			⚠️ This is an early pre-release, see the
+			⚠️ this is an early pre-release, see the
 			<External_Link href="https://github.com/ryanatkn/zzz">repo</External_Link>
 			and
 			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link> 💤
