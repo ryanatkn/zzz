@@ -29,7 +29,7 @@
 
 	// TODO BLOCK name for "File_Explorer" and "File_List" parent component?
 
-	// TODO probably show a history of the last N files opened, click to reopen
+	// TODO probably show a history of the last N files opened, click to reopen (do this after changing to links)
 </script>
 
 <div class="h_100 flex gap_md">
