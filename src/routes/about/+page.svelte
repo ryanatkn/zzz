@@ -51,12 +51,13 @@
 		</p>
 		<p>
 			AI has opened new worlds of technology with vast new design spaces to explore, where anyone
-			with ideas can participate. Zzz joins many other open software projects working towards
-			individual and collective empowerment on the web. These projects operate publicly—sharing
-			ideas, code, tools, protocols, and communities—as part of what I believe is a technological
-			design convergence on a new class of software prompted by LLMs. (by design convergence I mean
-			the genre of app/software, not everyone using Tailwind) This software genre spans the web
-			stack, values openness and interoperability, and aims to integrate all the things in one UX.
+			with ideas or opinions can participate. Zzz joins many other open software projects working
+			towards individual and collective empowerment on the web. These projects operate
+			publicly—sharing ideas, code, tools, protocols, and communities—as part of what I believe is a
+			technological design convergence on a new class of software prompted by LLMs. (by design
+			convergence I mean the genre of app/software, not everyone using Tailwind) This software genre
+			spans the web stack, values openness and interoperability, and aims to integrate all the
+			things in one UX.
 		</p>
 		<p>The main ideas of Zzz include: (I'm sure I'm missing some)</p>
 		<ul>
