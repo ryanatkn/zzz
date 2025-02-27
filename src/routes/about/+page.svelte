@@ -58,8 +58,8 @@
 				sovereignty, and optional cloud deployment (create websites!) and sync
 			</li>
 			<li>
-				interoperable design using standard and popular protocols, open APIs, the web and JS
-				ecosystem, and common data formats
+				interoperable design using standard and popular protocols (RSS/Atom, ActivityPub, AT
+				Protocol), open APIs, the web and JS ecosystem, and common data formats
 			</li>
 			<li>
 				designed for plugins, scripting, and deep extensibility, and has a dev library in TypeScript
