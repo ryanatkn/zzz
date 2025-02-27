@@ -30,17 +30,19 @@
 	// TODO BLOCK name for "File_Explorer" and "File_List" parent component?
 </script>
 
-<div class="h_100 flex gap_md overflow_hidden">
-	<div class="width_sm shrink_0 overflow_auto" use:sidebar_scrollable.container>
-		<header class="bg p_md size_lg sticky" style:top="0" use:sidebar_scrollable.target>
+<div class="h_100 flex gap_md">
+	<div class="h_100 column overflow_hidden">
+		<header class="bg p_md size_lg" use:sidebar_scrollable.target>
 			<!-- TODO size_lg shouldnt be needed after the Moss --size change -->
 			<Text_Icon icon={GLYPH_FILE} size="var(--size_lg)" /> files
 		</header>
-		<File_Explorer
-			files={files_map}
-			{selected_file_id}
-			onselect={(file) => handle_file_selection(file)}
-		/>
+		<div class="flex_1 width_sm overflow_auto" use:sidebar_scrollable.container>
+			<File_Explorer
+				files={files_map}
+				{selected_file_id}
+				onselect={(file) => handle_file_selection(file)}
+			/>
+		</div>
 	</div>
 	<div class="flex_1 overflow_auto">
 		{#if selected_file}
