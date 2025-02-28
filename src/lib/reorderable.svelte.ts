@@ -136,11 +136,9 @@ export const reorderable_list: Action<
 	node.setAttribute('role', 'list');
 
 	// Only listening for dragover at the container level to prevent default
-	const handle_dragover = (e: DragEvent) => {
+	const cleanup_dragover = on(node, 'dragover', (e) => {
 		e.preventDefault();
-	};
-
-	const cleanup_dragover = on(node, 'dragover', handle_dragover);
+	});
 
 	return {
 		update(new_params) {
