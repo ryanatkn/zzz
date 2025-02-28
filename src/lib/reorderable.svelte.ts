@@ -416,78 +416,51 @@ export const reorderable_item: Action<
 			// Update the index if it changes
 			index = new_params.index;
 
-			// Define mapping between parameter keys and their corresponding variables
-			const class_mappings: Array<{
-				param_key: keyof typeof new_params;
-				current_value: string;
-				setter: (value: string) => void;
-			}> = [
-				{
-					param_key: 'item_class',
-					current_value: item_class,
-					setter: (value) => {
-						node.classList.remove(item_class);
-						node.classList.add(value);
-						item_class = value;
-					},
-				},
-				{
-					param_key: 'dragging_class',
-					current_value: dragging_class,
-					setter: (value) => {
-						dragging_class = value;
-					},
-				},
-				{
-					param_key: 'drag_over_class',
-					current_value: drag_over_class,
-					setter: (value) => {
-						drag_over_class = value;
-					},
-				},
-				{
-					param_key: 'drag_over_top_class',
-					current_value: drag_over_top_class,
-					setter: (value) => {
-						drag_over_top_class = value;
-					},
-				},
-				{
-					param_key: 'drag_over_bottom_class',
-					current_value: drag_over_bottom_class,
-					setter: (value) => {
-						drag_over_bottom_class = value;
-					},
-				},
-				{
-					param_key: 'drag_over_left_class',
-					current_value: drag_over_left_class,
-					setter: (value) => {
-						drag_over_left_class = value;
-					},
-				},
-				{
-					param_key: 'drag_over_right_class',
-					current_value: drag_over_right_class,
-					setter: (value) => {
-						drag_over_right_class = value;
-					},
-				},
-				{
-					param_key: 'invalid_drop_class',
-					current_value: invalid_drop_class,
-					setter: (value) => {
-						invalid_drop_class = value;
-					},
-				},
-			];
+			// Handle all possible class changes with proper variable updates
+			if (new_params.item_class && new_params.item_class !== item_class) {
+				node.classList.remove(item_class);
+				node.classList.add(new_params.item_class);
+				item_class = new_params.item_class;
+			}
 
-			// Update each class property if it has changed
-			for (const mapping of class_mappings) {
-				const new_value = new_params[mapping.param_key] as string | undefined;
-				if (new_value && new_value !== mapping.current_value) {
-					mapping.setter(new_value);
-				}
+			if (new_params.dragging_class && new_params.dragging_class !== dragging_class) {
+				dragging_class = new_params.dragging_class;
+			}
+
+			if (new_params.drag_over_class && new_params.drag_over_class !== drag_over_class) {
+				drag_over_class = new_params.drag_over_class;
+			}
+
+			if (
+				new_params.drag_over_top_class &&
+				new_params.drag_over_top_class !== drag_over_top_class
+			) {
+				drag_over_top_class = new_params.drag_over_top_class;
+			}
+
+			if (
+				new_params.drag_over_bottom_class &&
+				new_params.drag_over_bottom_class !== drag_over_bottom_class
+			) {
+				drag_over_bottom_class = new_params.drag_over_bottom_class;
+			}
+
+			if (
+				new_params.drag_over_left_class &&
+				new_params.drag_over_left_class !== drag_over_left_class
+			) {
+				drag_over_left_class = new_params.drag_over_left_class;
+			}
+
+			if (
+				new_params.drag_over_right_class &&
+				new_params.drag_over_right_class !== drag_over_right_class
+			) {
+				drag_over_right_class = new_params.drag_over_right_class;
+			}
+
+			if (new_params.invalid_drop_class && new_params.invalid_drop_class !== invalid_drop_class) {
+				invalid_drop_class = new_params.invalid_drop_class;
 			}
 		},
 		destroy() {
