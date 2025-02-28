@@ -21,6 +21,8 @@
 	// TODO BLOCK make it have optional attributes like file type
 
 	// TODO BLOCK the dashed pattern state isn't working for the xml tag input or attributes
+
+	// TODO BLOCK make the prompt links below reorderable
 </script>
 
 <div class="flex align_items_start gap_md p_sm">

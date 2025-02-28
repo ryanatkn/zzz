@@ -10,6 +10,8 @@
 	import {zzz_context} from '$lib/zzz.svelte.js';
 
 	const zzz = zzz_context.get();
+
+	// TODO BLOCK make the chat links below reorderable
 </script>
 
 <div class="dashboard_chats">
