@@ -89,36 +89,54 @@ h6 {
 	cursor: grabbing;
 }
 
-/* Drag indicator */
+/* Drag indicator base style */
 .drag_over {
+	--drag_indicator_size: 4px;
+	--drag_indicator_color: var(--color_a_5);
+	--drag_indicator_z_index: 100;
 	position: relative;
 }
 
-/* Before drag indicator - top edge */
-/* TODO one of these is screwed up */
-.drag_over_before::before {
+/* Common styles for all indicators */
+.drag_over_top::before,
+.drag_over_bottom::after,
+.drag_over_left::before,
+.drag_over_right::after {
 	content: '';
 	position: absolute;
-	top: calc(-1 * var(--drag_over_height, 4px) / 2);
-	left: 0;
-	right: 0;
-	height: var(--drag_over_height, 4px);
-	background-color: var(--drag_over_color, var(--color_a_5));
-	z-index: 100; /* TODO @many arbitrary */
+	background-color: var(--drag_indicator_color);
+	z-index: var(--drag_indicator_z_index);
 	pointer-events: none;
 }
 
-/* After drag indicator - bottom edge */
-/* TODO one of these is screwed up */
-.drag_over_after::after {
-	content: '';
-	position: absolute;
-	bottom: calc(-1 * var(--drag_over_height, 4px) / 2);
+/* Top drag indicator */
+.drag_over_top::before {
+	top: calc(-1 * var(--drag_indicator_size) / 2);
 	left: 0;
 	right: 0;
-	height: var(--drag_over_height, 4px);
-	background-color: var(--drag_over_color, var(--color_a_5));
-	z-index: 100; /* TODO @many arbitrary */
-	pointer-events: none;
+	height: var(--drag_indicator_size);
 }
 
+/* Bottom drag indicator */
+.drag_over_bottom::after {
+	bottom: calc(-1 * var(--drag_indicator_size) / 2);
+	left: 0;
+	right: 0;
+	height: var(--drag_indicator_size);
+}
+
+/* Left drag indicator */
+.drag_over_left::before {
+	left: calc(-1 * var(--drag_indicator_size) / 2);
+	top: 0;
+	bottom: 0;
+	width: var(--drag_indicator_size);
+}
+
+/* Right drag indicator */
+.drag_over_right::after {
+	right: calc(-1 * var(--drag_indicator_size) / 2);
+	top: 0;
+	bottom: 0;
+	width: var(--drag_indicator_size);
+}
