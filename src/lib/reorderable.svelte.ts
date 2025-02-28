@@ -1,6 +1,6 @@
-import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 import type {Action} from 'svelte/action';
 import {on} from 'svelte/events';
+import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 
 export type Direction = 'horizontal' | 'vertical';
 
@@ -164,9 +164,6 @@ export const reorderable_item: Action<
 	// Track last known indicator state to avoid redundant DOM updates
 	let current_indicator: Drop_Position = 'none';
 
-	// Track RAF to avoid multiple renders in the same frame
-	let raf_id: number | null = null;
-
 	// Add the reorderable_item class automatically
 	node.classList.add(item_class);
 
@@ -269,12 +266,6 @@ export const reorderable_item: Action<
 		// Remove dragging style
 		node.classList.remove(dragging_class);
 
-		// Clear any pending indicator updates
-		if (raf_id !== null) {
-			cancelAnimationFrame(raf_id);
-			raf_id = null;
-		}
-
 		// Reset indicators
 		update_indicator('none');
 		clear_indicators();
@@ -288,7 +279,7 @@ export const reorderable_item: Action<
 		current_indicator = 'none';
 	};
 
-	// Handle drag over with RAF for efficiency
+	// Handle drag over
 	const handle_dragover = (e: DragEvent) => {
 		e.preventDefault();
 
@@ -296,21 +287,13 @@ export const reorderable_item: Action<
 		const context = get_context();
 		if (!context || context.source_index === index || context.source_index === -1) return;
 
-		// Use RAF to batch updates
-		if (raf_id !== null) {
-			return; // Already have a pending update
-		}
+		// Get drop position based on relative indices, not mouse coordinates
+		const position = get_drop_position(context.source_index, index, context.direction);
 
-		raf_id = requestAnimationFrame(() => {
-			// Get drop position based on relative indices, not mouse coordinates
-			const position = get_drop_position(context.source_index, index, context.direction);
+		// Update indicator with the new position - only if it's different
+		update_indicator(position);
 
-			// Update indicator with the new position
-			update_indicator(position);
-
-			if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
-			raf_id = null;
-		});
+		if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
 	};
 
 	// Handle drop
@@ -320,12 +303,6 @@ export const reorderable_item: Action<
 		// Get list context
 		const context = get_context();
 		if (!context || context.source_index === -1) return;
-
-		// Cancel any pending indicator updates
-		if (raf_id !== null) {
-			cancelAnimationFrame(raf_id);
-			raf_id = null;
-		}
 
 		const source_index = context.source_index;
 
@@ -374,12 +351,6 @@ export const reorderable_item: Action<
 			return;
 		}
 
-		// Cancel any pending indicator updates
-		if (raf_id !== null) {
-			cancelAnimationFrame(raf_id);
-			raf_id = null;
-		}
-
 		// Only update if we currently have indicators
 		if (current_indicator !== 'none') {
 			update_indicator('none');
@@ -408,12 +379,6 @@ export const reorderable_item: Action<
 		destroy() {
 			// Remove the class we added
 			node.classList.remove(item_class);
-
-			// Cancel any pending RAF
-			if (raf_id !== null) {
-				cancelAnimationFrame(raf_id);
-				raf_id = null;
-			}
 
 			// Clean up all event listeners
 			cleanup_dragstart();
