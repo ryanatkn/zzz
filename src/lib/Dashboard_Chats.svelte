@@ -57,7 +57,7 @@
 		>
 			{#each zzz.chats.items as chat, i (chat.id)}
 				<!-- TODO change to href from onclick -->
-				<li use:reorderable_item={{index: i}} class="mb_xs">
+				<li use:reorderable_item={{index: i}}>
 					<Nav_Link
 						href="#TODO"
 						selected={chat.id === zzz.chats.selected_id}

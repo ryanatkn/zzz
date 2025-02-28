@@ -1,4 +1,3 @@
-// reorderable.svelte.ts
 import type {Action} from 'svelte/action';
 import {on} from 'svelte/events';
 import {Unreachable_Error} from '@ryanatkn/belt/error.js';
@@ -18,11 +17,86 @@ export type Valid_Drop_Position = Exclude<Drop_Position, 'none'>;
 /**
  * State between list and item actions
  */
-export interface Reorderable_Context {
-	source_index: number;
-	direction: Direction;
+export class Reorderable_Context {
+	source_index: number = $state(-1);
+	direction: Direction = $state('vertical');
 	onreorder: (from_index: number, to_index: number) => void;
 	can_reorder?: (from_index: number, to_index: number) => boolean;
+
+	// Styling configuration
+	item_class: string = $state(ITEM_CLASS_DEFAULT);
+	dragging_class: string = $state(DRAGGING_CLASS_DEFAULT);
+	drag_over_class: string = $state(DRAG_OVER_CLASS_DEFAULT);
+	drag_over_top_class: string = $state(DRAG_OVER_TOP_CLASS_DEFAULT);
+	drag_over_bottom_class: string = $state(DRAG_OVER_BOTTOM_CLASS_DEFAULT);
+	drag_over_left_class: string = $state(DRAG_OVER_LEFT_CLASS_DEFAULT);
+	drag_over_right_class: string = $state(DRAG_OVER_RIGHT_CLASS_DEFAULT);
+	invalid_drop_class: string = $state(INVALID_DROP_CLASS_DEFAULT);
+
+	constructor(
+		onreorder: (from_index: number, to_index: number) => void,
+		direction: Direction,
+		can_reorder?: (from_index: number, to_index: number) => boolean,
+		styles?: Partial<{
+			item_class: string;
+			dragging_class: string;
+			drag_over_class: string;
+			drag_over_top_class: string;
+			drag_over_bottom_class: string;
+			drag_over_left_class: string;
+			drag_over_right_class: string;
+			invalid_drop_class: string;
+		}>,
+	) {
+		this.onreorder = onreorder;
+		this.direction = direction;
+		this.can_reorder = can_reorder;
+
+		// Apply custom styles if provided
+		if (styles) {
+			if (styles.item_class !== undefined) this.item_class = styles.item_class;
+			if (styles.dragging_class !== undefined) this.dragging_class = styles.dragging_class;
+			if (styles.drag_over_class !== undefined) this.drag_over_class = styles.drag_over_class;
+			if (styles.drag_over_top_class !== undefined)
+				this.drag_over_top_class = styles.drag_over_top_class;
+			if (styles.drag_over_bottom_class !== undefined)
+				this.drag_over_bottom_class = styles.drag_over_bottom_class;
+			if (styles.drag_over_left_class !== undefined)
+				this.drag_over_left_class = styles.drag_over_left_class;
+			if (styles.drag_over_right_class !== undefined)
+				this.drag_over_right_class = styles.drag_over_right_class;
+			if (styles.invalid_drop_class !== undefined)
+				this.invalid_drop_class = styles.invalid_drop_class;
+		}
+	}
+
+	// Helper to update styling options
+	update_styles(
+		styles: Partial<{
+			item_class: string;
+			dragging_class: string;
+			drag_over_class: string;
+			drag_over_top_class: string;
+			drag_over_bottom_class: string;
+			drag_over_left_class: string;
+			drag_over_right_class: string;
+			invalid_drop_class: string;
+		}>,
+	): void {
+		if (styles.item_class !== undefined) this.item_class = styles.item_class;
+		if (styles.dragging_class !== undefined) this.dragging_class = styles.dragging_class;
+		if (styles.drag_over_class !== undefined) this.drag_over_class = styles.drag_over_class;
+		if (styles.drag_over_top_class !== undefined)
+			this.drag_over_top_class = styles.drag_over_top_class;
+		if (styles.drag_over_bottom_class !== undefined)
+			this.drag_over_bottom_class = styles.drag_over_bottom_class;
+		if (styles.drag_over_left_class !== undefined)
+			this.drag_over_left_class = styles.drag_over_left_class;
+		if (styles.drag_over_right_class !== undefined)
+			this.drag_over_right_class = styles.drag_over_right_class;
+		if (styles.invalid_drop_class !== undefined)
+			this.invalid_drop_class = styles.invalid_drop_class;
+	}
 }
 
 // WeakMap ensures contexts are garbage collected when elements are removed
@@ -104,6 +178,34 @@ const calculate_target_index = (
 };
 
 /**
+ * Helper to extract style parameters from action parameters
+ */
+const extract_style_params = (params: any) => ({
+	item_class: params.item_class,
+	dragging_class: params.dragging_class,
+	drag_over_class: params.drag_over_class,
+	drag_over_top_class: params.drag_over_top_class,
+	drag_over_bottom_class: params.drag_over_bottom_class,
+	drag_over_left_class: params.drag_over_left_class,
+	drag_over_right_class: params.drag_over_right_class,
+	invalid_drop_class: params.invalid_drop_class,
+});
+
+/**
+ * Find the parent list's context
+ */
+const get_reorderable_context = (node: HTMLElement): Reorderable_Context | undefined => {
+	// Traverse up to find list element with a context
+	let el = node.parentElement;
+	while (el) {
+		const ctx = contexts.get(el);
+		if (ctx) return ctx;
+		el = el.parentElement;
+	}
+	return undefined;
+};
+
+/**
  * Action for a reorderable list container
  */
 export const reorderable_list: Action<
@@ -112,18 +214,30 @@ export const reorderable_list: Action<
 		onreorder: (from_index: number, to_index: number) => void;
 		list_class?: string;
 		can_reorder?: (from_index: number, to_index: number) => boolean;
+		// Allow class customization but make it optional for backward compatibility
+		item_class?: string;
+		dragging_class?: string;
+		drag_over_class?: string;
+		drag_over_top_class?: string;
+		drag_over_bottom_class?: string;
+		drag_over_left_class?: string;
+		drag_over_right_class?: string;
+		invalid_drop_class?: string;
 	}
 > = (node, params) => {
 	// Detect the layout direction
 	const direction = detect_direction(node);
 
+	// Extract style parameters
+	const style_params = extract_style_params(params);
+
 	// Create context for this list with default values
-	const context: Reorderable_Context = {
-		source_index: -1,
+	const context = new Reorderable_Context(
+		params.onreorder,
 		direction,
-		onreorder: params.onreorder,
-		can_reorder: params.can_reorder,
-	};
+		params.can_reorder,
+		style_params,
+	);
 
 	// Store the context for items to access
 	contexts.set(node, context);
@@ -148,6 +262,9 @@ export const reorderable_list: Action<
 
 			// Update direction in case layout changes
 			context.direction = detect_direction(node);
+
+			// Update styling options
+			context.update_styles(extract_style_params(new_params));
 
 			// Handle class changes if provided
 			const new_list_class = new_params.list_class || LIST_CLASS_DEFAULT;
@@ -186,39 +303,44 @@ export const reorderable_item: Action<
 	// The current index of this item
 	let {index} = params;
 
-	// Use mutable bindings for classes so they can be updated
-	let item_class = params.item_class || ITEM_CLASS_DEFAULT;
-	let dragging_class = params.dragging_class || DRAGGING_CLASS_DEFAULT;
-	let drag_over_class = params.drag_over_class || DRAG_OVER_CLASS_DEFAULT;
-	let drag_over_top_class = params.drag_over_top_class || DRAG_OVER_TOP_CLASS_DEFAULT;
-	let drag_over_bottom_class = params.drag_over_bottom_class || DRAG_OVER_BOTTOM_CLASS_DEFAULT;
-	let drag_over_left_class = params.drag_over_left_class || DRAG_OVER_LEFT_CLASS_DEFAULT;
-	let drag_over_right_class = params.drag_over_right_class || DRAG_OVER_RIGHT_CLASS_DEFAULT;
-	let invalid_drop_class = params.invalid_drop_class || INVALID_DROP_CLASS_DEFAULT;
-
 	// Track active elements that have indicators for more efficient clearing
 	let active_indicator_element: HTMLElement | null = null;
 
 	// Track last known indicator state to avoid redundant DOM updates
 	let current_indicator: Drop_Position = 'none';
 
+	// Use mutable bindings for classes so they can be updated
+	let item_class = params.item_class !== undefined ? params.item_class : ITEM_CLASS_DEFAULT;
+	let dragging_class =
+		params.dragging_class !== undefined ? params.dragging_class : DRAGGING_CLASS_DEFAULT;
+	let drag_over_class =
+		params.drag_over_class !== undefined ? params.drag_over_class : DRAG_OVER_CLASS_DEFAULT;
+	let drag_over_top_class =
+		params.drag_over_top_class !== undefined
+			? params.drag_over_top_class
+			: DRAG_OVER_TOP_CLASS_DEFAULT;
+	let drag_over_bottom_class =
+		params.drag_over_bottom_class !== undefined
+			? params.drag_over_bottom_class
+			: DRAG_OVER_BOTTOM_CLASS_DEFAULT;
+	let drag_over_left_class =
+		params.drag_over_left_class !== undefined
+			? params.drag_over_left_class
+			: DRAG_OVER_LEFT_CLASS_DEFAULT;
+	let drag_over_right_class =
+		params.drag_over_right_class !== undefined
+			? params.drag_over_right_class
+			: DRAG_OVER_RIGHT_CLASS_DEFAULT;
+	let invalid_drop_class =
+		params.invalid_drop_class !== undefined
+			? params.invalid_drop_class
+			: INVALID_DROP_CLASS_DEFAULT;
+
 	// Add the reorderable_item class automatically
 	node.classList.add(item_class);
 
 	// Add basic accessibility attribute
 	node.setAttribute('role', 'listitem');
-
-	// Find the parent list's context
-	const get_context = (): Reorderable_Context | undefined => {
-		// Traverse up to find list element with a context
-		let el = node.parentElement;
-		while (el) {
-			const ctx = contexts.get(el);
-			if (ctx) return ctx;
-			el = el.parentElement;
-		}
-		return undefined;
-	};
 
 	// Make the item draggable
 	node.setAttribute('draggable', 'true');
@@ -232,13 +354,18 @@ export const reorderable_item: Action<
 				drag_over_bottom_class,
 				drag_over_left_class,
 				drag_over_right_class,
+				invalid_drop_class, // Added invalid drop class
 			);
 			active_indicator_element = null;
 		}
 	};
 
 	// More efficient indicator update that only changes what's needed
-	const update_indicator = (element: HTMLElement, new_indicator: Drop_Position) => {
+	const update_indicator = (
+		element: HTMLElement,
+		new_indicator: Drop_Position,
+		is_valid = true,
+	) => {
 		// No change, skip update
 		if (element === active_indicator_element && new_indicator === current_indicator) return;
 
@@ -248,6 +375,14 @@ export const reorderable_item: Action<
 		// Apply new indicator classes if needed
 		if (new_indicator !== 'none') {
 			element.classList.add(drag_over_class);
+
+			// Add invalid drop class if needed
+			if (!is_valid) {
+				element.classList.add(invalid_drop_class);
+				active_indicator_element = element;
+				current_indicator = new_indicator;
+				return;
+			}
 
 			// Add specific direction class
 			switch (new_indicator) {
@@ -279,14 +414,17 @@ export const reorderable_item: Action<
 		if (!e.dataTransfer) return;
 
 		// Get list context
-		const context = get_context();
+		const context = get_reorderable_context(node);
 		if (!context) return;
 
 		// Store the dragged item's index
 		context.source_index = index;
 
+		// Check if we should use context class names or local ones
+		const effective_dragging_class = context.dragging_class;
+
 		// Add dragging style
-		node.classList.add(dragging_class);
+		node.classList.add(effective_dragging_class);
 
 		// Required for Firefox
 		e.dataTransfer.effectAllowed = 'move';
@@ -295,14 +433,19 @@ export const reorderable_item: Action<
 
 	// Handle drag end
 	const handle_dragend = () => {
+		// Get context to check if we had a source index
+		const context = get_reorderable_context(node);
+
+		// Use context class if available
+		const effective_dragging_class = context?.dragging_class || dragging_class;
+
 		// Remove dragging style
-		node.classList.remove(dragging_class);
+		node.classList.remove(effective_dragging_class);
 
 		// Reset indicators
 		clear_indicators();
 
-		// Reset source index
-		const context = get_context();
+		// Reset source index if we have a context
 		if (context) {
 			context.source_index = -1;
 		}
@@ -315,7 +458,7 @@ export const reorderable_item: Action<
 		e.preventDefault();
 
 		// Get list context
-		const context = get_context();
+		const context = get_reorderable_context(node);
 		if (!context || context.source_index === index || context.source_index === -1) return;
 
 		// Get drop position based on relative indices, not mouse coordinates
@@ -326,8 +469,8 @@ export const reorderable_item: Action<
 			const target_index = calculate_target_index(context.source_index, index, position);
 
 			if (!context.can_reorder(context.source_index, target_index)) {
-				// Not allowed - don't show drop indicator
-				clear_indicators();
+				// Not allowed - show invalid drop indicator
+				update_indicator(node, position, false);
 				return;
 			}
 		}
@@ -343,7 +486,7 @@ export const reorderable_item: Action<
 		e.preventDefault();
 
 		// Get list context
-		const context = get_context();
+		const context = get_reorderable_context(node);
 		if (!context || context.source_index === -1) return;
 
 		const source_index = context.source_index;
@@ -414,50 +557,33 @@ export const reorderable_item: Action<
 			// Update the index if it changes
 			index = new_params.index;
 
-			// Handle all possible class changes with proper variable updates
-			if (new_params.item_class && new_params.item_class !== item_class) {
+			// Handle all possible class changes with proper undefined checks
+			if (new_params.item_class !== undefined) {
 				node.classList.remove(item_class);
 				node.classList.add(new_params.item_class);
 				item_class = new_params.item_class;
 			}
 
-			if (new_params.dragging_class && new_params.dragging_class !== dragging_class) {
+			// Update other class names if provided, with proper undefined checks
+			if (new_params.dragging_class !== undefined) {
 				dragging_class = new_params.dragging_class;
 			}
-
-			if (new_params.drag_over_class && new_params.drag_over_class !== drag_over_class) {
+			if (new_params.drag_over_class !== undefined) {
 				drag_over_class = new_params.drag_over_class;
 			}
-
-			if (
-				new_params.drag_over_top_class &&
-				new_params.drag_over_top_class !== drag_over_top_class
-			) {
+			if (new_params.drag_over_top_class !== undefined) {
 				drag_over_top_class = new_params.drag_over_top_class;
 			}
-
-			if (
-				new_params.drag_over_bottom_class &&
-				new_params.drag_over_bottom_class !== drag_over_bottom_class
-			) {
+			if (new_params.drag_over_bottom_class !== undefined) {
 				drag_over_bottom_class = new_params.drag_over_bottom_class;
 			}
-
-			if (
-				new_params.drag_over_left_class &&
-				new_params.drag_over_left_class !== drag_over_left_class
-			) {
+			if (new_params.drag_over_left_class !== undefined) {
 				drag_over_left_class = new_params.drag_over_left_class;
 			}
-
-			if (
-				new_params.drag_over_right_class &&
-				new_params.drag_over_right_class !== drag_over_right_class
-			) {
+			if (new_params.drag_over_right_class !== undefined) {
 				drag_over_right_class = new_params.drag_over_right_class;
 			}
-
-			if (new_params.invalid_drop_class && new_params.invalid_drop_class !== invalid_drop_class) {
+			if (new_params.invalid_drop_class !== undefined) {
 				invalid_drop_class = new_params.invalid_drop_class;
 			}
 		},

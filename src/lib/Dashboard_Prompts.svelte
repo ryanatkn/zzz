@@ -67,7 +67,7 @@
 			}}
 		>
 			{#each zzz.prompts.items as prompt, i (prompt.id)}
-				<li use:reorderable_item={{index: i}} class="mb_xs">
+				<li use:reorderable_item={{index: i}}>
 					<Nav_Link
 						href="#TODO"
 						selected={prompt.id === zzz.prompts.selected_id}
