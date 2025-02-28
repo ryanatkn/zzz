@@ -2,87 +2,100 @@ import type {Action} from 'svelte/action';
 import {on} from 'svelte/events';
 import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 
-export type Direction = 'horizontal' | 'vertical';
+export type Reorderable_Direction = 'horizontal' | 'vertical';
 
 /**
  * Drop positions on the box model.
  */
-export type Drop_Position = 'none' | 'top' | 'bottom' | 'left' | 'right';
+export type Reorderable_Drop_Position = 'none' | 'top' | 'bottom' | 'left' | 'right';
 
 /**
  * Valid drop positions, excluding 'none'
  */
-export type Valid_Drop_Position = Exclude<Drop_Position, 'none'>;
+export type Reorderable_Valid_Drop_Position = Exclude<Reorderable_Drop_Position, 'none'>;
+
+/**
+ * Styling configuration for reorderable components
+ */
+export interface Reorderable_Style_Config {
+	item_class: string;
+	dragging_class: string;
+	drag_over_class: string;
+	drag_over_top_class: string;
+	drag_over_bottom_class: string;
+	drag_over_left_class: string;
+	drag_over_right_class: string;
+	invalid_drop_class: string;
+}
+
+/**
+ * Partial styling configuration used for updates
+ */
+export type Reorderable_Style_Config_Partial = Partial<Reorderable_Style_Config>;
+
+/**
+ * Parameters for reorderable_list action
+ */
+export interface Reorderable_List_Params extends Reorderable_Style_Config_Partial {
+	onreorder: (from_index: number, to_index: number) => void;
+	list_class?: string;
+	can_reorder?: (from_index: number, to_index: number) => boolean;
+}
+
+/**
+ * Parameters for reorderable_item action
+ */
+export interface Reorderable_Item_Params extends Reorderable_Style_Config_Partial {
+	index: number;
+}
 
 /**
  * State between list and item actions
  */
 export class Reorderable_Context {
-	source_index: number = $state(-1);
-	direction: Direction = $state('vertical');
+	source_index: number = -1;
+	direction: Reorderable_Direction;
 	onreorder: (from_index: number, to_index: number) => void;
 	can_reorder?: (from_index: number, to_index: number) => boolean;
 
 	// Styling configuration
-	item_class: string = $state(ITEM_CLASS_DEFAULT);
-	dragging_class: string = $state(DRAGGING_CLASS_DEFAULT);
-	drag_over_class: string = $state(DRAG_OVER_CLASS_DEFAULT);
-	drag_over_top_class: string = $state(DRAG_OVER_TOP_CLASS_DEFAULT);
-	drag_over_bottom_class: string = $state(DRAG_OVER_BOTTOM_CLASS_DEFAULT);
-	drag_over_left_class: string = $state(DRAG_OVER_LEFT_CLASS_DEFAULT);
-	drag_over_right_class: string = $state(DRAG_OVER_RIGHT_CLASS_DEFAULT);
-	invalid_drop_class: string = $state(INVALID_DROP_CLASS_DEFAULT);
+	item_class: string;
+	dragging_class: string;
+	drag_over_class: string;
+	drag_over_top_class: string;
+	drag_over_bottom_class: string;
+	drag_over_left_class: string;
+	drag_over_right_class: string;
+	invalid_drop_class: string;
 
 	constructor(
 		onreorder: (from_index: number, to_index: number) => void,
-		direction: Direction,
+		direction: Reorderable_Direction,
 		can_reorder?: (from_index: number, to_index: number) => boolean,
-		styles?: Partial<{
-			item_class: string;
-			dragging_class: string;
-			drag_over_class: string;
-			drag_over_top_class: string;
-			drag_over_bottom_class: string;
-			drag_over_left_class: string;
-			drag_over_right_class: string;
-			invalid_drop_class: string;
-		}>,
+		styles?: Reorderable_Style_Config_Partial,
 	) {
 		this.onreorder = onreorder;
 		this.direction = direction;
 		this.can_reorder = can_reorder;
 
+		// Initialize with defaults
+		this.item_class = ITEM_CLASS_DEFAULT;
+		this.dragging_class = DRAGGING_CLASS_DEFAULT;
+		this.drag_over_class = DRAG_OVER_CLASS_DEFAULT;
+		this.drag_over_top_class = DRAG_OVER_TOP_CLASS_DEFAULT;
+		this.drag_over_bottom_class = DRAG_OVER_BOTTOM_CLASS_DEFAULT;
+		this.drag_over_left_class = DRAG_OVER_LEFT_CLASS_DEFAULT;
+		this.drag_over_right_class = DRAG_OVER_RIGHT_CLASS_DEFAULT;
+		this.invalid_drop_class = INVALID_DROP_CLASS_DEFAULT;
+
 		// Apply custom styles if provided
 		if (styles) {
-			if (styles.item_class !== undefined) this.item_class = styles.item_class;
-			if (styles.dragging_class !== undefined) this.dragging_class = styles.dragging_class;
-			if (styles.drag_over_class !== undefined) this.drag_over_class = styles.drag_over_class;
-			if (styles.drag_over_top_class !== undefined)
-				this.drag_over_top_class = styles.drag_over_top_class;
-			if (styles.drag_over_bottom_class !== undefined)
-				this.drag_over_bottom_class = styles.drag_over_bottom_class;
-			if (styles.drag_over_left_class !== undefined)
-				this.drag_over_left_class = styles.drag_over_left_class;
-			if (styles.drag_over_right_class !== undefined)
-				this.drag_over_right_class = styles.drag_over_right_class;
-			if (styles.invalid_drop_class !== undefined)
-				this.invalid_drop_class = styles.invalid_drop_class;
+			this.update_styles(styles);
 		}
 	}
 
 	// Helper to update styling options
-	update_styles(
-		styles: Partial<{
-			item_class: string;
-			dragging_class: string;
-			drag_over_class: string;
-			drag_over_top_class: string;
-			drag_over_bottom_class: string;
-			drag_over_left_class: string;
-			drag_over_right_class: string;
-			invalid_drop_class: string;
-		}>,
-	): void {
+	update_styles(styles: Reorderable_Style_Config_Partial): void {
 		if (styles.item_class !== undefined) this.item_class = styles.item_class;
 		if (styles.dragging_class !== undefined) this.dragging_class = styles.dragging_class;
 		if (styles.drag_over_class !== undefined) this.drag_over_class = styles.drag_over_class;
@@ -96,6 +109,49 @@ export class Reorderable_Context {
 			this.drag_over_right_class = styles.drag_over_right_class;
 		if (styles.invalid_drop_class !== undefined)
 			this.invalid_drop_class = styles.invalid_drop_class;
+	}
+
+	/**
+	 * Helper to determine the drop position based on source and target indices and layout direction
+	 */
+	get_drop_position(source_index: number, target_index: number): Reorderable_Valid_Drop_Position {
+		if (this.direction === 'horizontal') {
+			// For horizontal layouts
+			return source_index > target_index ? 'left' : 'right';
+		} else {
+			// For vertical layouts
+			return source_index > target_index ? 'top' : 'bottom';
+		}
+	}
+
+	/**
+	 * Helper to calculate the target index based on source, current index, and position
+	 */
+	calculate_target_index(
+		source_index: number,
+		current_index: number,
+		position: Reorderable_Valid_Drop_Position,
+	): number {
+		let target_index = current_index;
+
+		// Adjust based on drop position
+		if (position === 'bottom' || position === 'right') {
+			target_index += 1;
+		}
+
+		// Adjust target index when moving from earlier position
+		if (source_index < current_index) {
+			target_index -= 1;
+		}
+
+		return target_index;
+	}
+
+	/**
+	 * Check if reordering is allowed between the two indices
+	 */
+	is_reorder_allowed(source_index: number, target_index: number): boolean {
+		return !this.can_reorder || this.can_reorder(source_index, target_index);
 	}
 }
 
@@ -116,7 +172,7 @@ export const INVALID_DROP_CLASS_DEFAULT = 'invalid_drop';
 /**
  * Enhanced helper to detect layout direction - supports both flex and grid
  */
-const detect_direction = (element: HTMLElement): Direction => {
+const detect_direction = (element: HTMLElement): Reorderable_Direction => {
 	const computed_style = window.getComputedStyle(element);
 	const display = computed_style.display;
 
@@ -138,49 +194,11 @@ const detect_direction = (element: HTMLElement): Direction => {
 };
 
 /**
- * Helper to determine the drop position based on source and target indices and layout direction
+ * Extract style parameters from action parameters
  */
-const get_drop_position = (
-	source_index: number,
-	target_index: number,
-	direction: Direction,
-): Valid_Drop_Position => {
-	if (direction === 'horizontal') {
-		// For horizontal layouts
-		return source_index > target_index ? 'left' : 'right';
-	} else {
-		// For vertical layouts
-		return source_index > target_index ? 'top' : 'bottom';
-	}
-};
-
-/**
- * Helper to calculate the target index based on source, current index, and position
- */
-const calculate_target_index = (
-	source_index: number,
-	current_index: number,
-	position: Valid_Drop_Position,
-): number => {
-	let target_index = current_index;
-
-	// Adjust based on drop position
-	if (position === 'bottom' || position === 'right') {
-		target_index += 1;
-	}
-
-	// Adjust target index when moving from earlier position
-	if (source_index < current_index) {
-		target_index -= 1;
-	}
-
-	return target_index;
-};
-
-/**
- * Helper to extract style parameters from action parameters
- */
-const extract_style_params = (params: any) => ({
+const extract_style_params = (
+	params: Partial<Reorderable_Style_Config>,
+): Reorderable_Style_Config_Partial => ({
 	item_class: params.item_class,
 	dragging_class: params.dragging_class,
 	drag_over_class: params.drag_over_class,
@@ -208,35 +226,16 @@ const get_reorderable_context = (node: HTMLElement): Reorderable_Context | undef
 /**
  * Action for a reorderable list container
  */
-export const reorderable_list: Action<
-	HTMLElement,
-	{
-		onreorder: (from_index: number, to_index: number) => void;
-		list_class?: string;
-		can_reorder?: (from_index: number, to_index: number) => boolean;
-		// Allow class customization but make it optional for backward compatibility
-		item_class?: string;
-		dragging_class?: string;
-		drag_over_class?: string;
-		drag_over_top_class?: string;
-		drag_over_bottom_class?: string;
-		drag_over_left_class?: string;
-		drag_over_right_class?: string;
-		invalid_drop_class?: string;
-	}
-> = (node, params) => {
+export const reorderable_list: Action<HTMLElement, Reorderable_List_Params> = (node, params) => {
 	// Detect the layout direction
 	const direction = detect_direction(node);
-
-	// Extract style parameters
-	const style_params = extract_style_params(params);
 
 	// Create context for this list with default values
 	const context = new Reorderable_Context(
 		params.onreorder,
 		direction,
 		params.can_reorder,
-		style_params,
+		extract_style_params(params),
 	);
 
 	// Store the context for items to access
@@ -286,20 +285,7 @@ export const reorderable_list: Action<
 /**
  * Action for a reorderable item
  */
-export const reorderable_item: Action<
-	HTMLElement,
-	{
-		index: number;
-		item_class?: string;
-		dragging_class?: string;
-		drag_over_class?: string;
-		drag_over_top_class?: string;
-		drag_over_bottom_class?: string;
-		drag_over_left_class?: string;
-		drag_over_right_class?: string;
-		invalid_drop_class?: string;
-	}
-> = (node, params) => {
+export const reorderable_item: Action<HTMLElement, Reorderable_Item_Params> = (node, params) => {
 	// The current index of this item
 	let {index} = params;
 
@@ -307,7 +293,7 @@ export const reorderable_item: Action<
 	let active_indicator_element: HTMLElement | null = null;
 
 	// Track last known indicator state to avoid redundant DOM updates
-	let current_indicator: Drop_Position = 'none';
+	let current_indicator: Reorderable_Drop_Position = 'none';
 
 	// Use mutable bindings for classes so they can be updated
 	let item_class = params.item_class !== undefined ? params.item_class : ITEM_CLASS_DEFAULT;
@@ -354,7 +340,7 @@ export const reorderable_item: Action<
 				drag_over_bottom_class,
 				drag_over_left_class,
 				drag_over_right_class,
-				invalid_drop_class, // Added invalid drop class
+				invalid_drop_class,
 			);
 			active_indicator_element = null;
 		}
@@ -363,7 +349,7 @@ export const reorderable_item: Action<
 	// More efficient indicator update that only changes what's needed
 	const update_indicator = (
 		element: HTMLElement,
-		new_indicator: Drop_Position,
+		new_indicator: Reorderable_Drop_Position,
 		is_valid = true,
 	) => {
 		// No change, skip update
@@ -461,22 +447,17 @@ export const reorderable_item: Action<
 		const context = get_reorderable_context(node);
 		if (!context || context.source_index === index || context.source_index === -1) return;
 
-		// Get drop position based on relative indices, not mouse coordinates
-		const position = get_drop_position(context.source_index, index, context.direction);
+		// Get drop position based on relative indices
+		const position = context.get_drop_position(context.source_index, index);
+
+		// Calculate the target index
+		const target_index = context.calculate_target_index(context.source_index, index, position);
 
 		// Check if reordering is allowed
-		if (context.can_reorder) {
-			const target_index = calculate_target_index(context.source_index, index, position);
+		const is_allowed = context.is_reorder_allowed(context.source_index, target_index);
 
-			if (!context.can_reorder(context.source_index, target_index)) {
-				// Not allowed - show invalid drop indicator
-				update_indicator(node, position, false);
-				return;
-			}
-		}
-
-		// Update indicator with the new position
-		update_indicator(node, position);
+		// Update indicator with the new position and validity
+		update_indicator(node, position, is_allowed);
 
 		if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
 	};
@@ -500,10 +481,10 @@ export const reorderable_item: Action<
 		}
 
 		// Get drop position based on relative indices
-		const position = get_drop_position(source_index, index, context.direction);
+		const position = context.get_drop_position(source_index, index);
 
-		// Calculate target index using the helper function
-		let target_index = calculate_target_index(source_index, index, position);
+		// Calculate target index using the context method
+		let target_index = context.calculate_target_index(source_index, index, position);
 
 		// Ensure target index is valid
 		const parent = node.parentElement;
@@ -512,7 +493,7 @@ export const reorderable_item: Action<
 		if (target_index > max_index + 1) target_index = max_index + 1;
 
 		// Check if reordering is allowed
-		if (context.can_reorder && !context.can_reorder(source_index, target_index)) {
+		if (!context.is_reorder_allowed(source_index, target_index)) {
 			// Not allowed - just clean up
 			clear_indicators();
 			context.source_index = -1;
@@ -532,7 +513,6 @@ export const reorderable_item: Action<
 	// Handle drag leave - optimize to avoid unnecessary updates
 	const handle_dragleave = (e: DragEvent) => {
 		// Check if we're actually leaving this element (not its children)
-		// This prevents unnecessary updates when moving within the element
 		const related_target = e.relatedTarget as Node | null;
 		if (related_target && node.contains(related_target)) {
 			return;
@@ -564,7 +544,7 @@ export const reorderable_item: Action<
 				item_class = new_params.item_class;
 			}
 
-			// Update other class names if provided, with proper undefined checks
+			// Update other class names if provided
 			if (new_params.dragging_class !== undefined) {
 				dragging_class = new_params.dragging_class;
 			}

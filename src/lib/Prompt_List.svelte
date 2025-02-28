@@ -41,11 +41,6 @@
 			selected_prompt_id = unselected_prompts.find((p) => p.id !== selected_prompt_id)?.id ?? null;
 		}
 	};
-
-	const handle_reorder = (from_index: number, to_index: number) => {
-		console.log(`Reordering prompt from ${from_index} to ${to_index}`);
-		chat.reorder_selected_prompts(from_index, to_index);
-	};
 </script>
 
 <div class="w_100 column gap_md">
@@ -71,7 +66,14 @@
 
 	{#if chat.selected_prompts.length > 0}
 		<div class="w_100">
-			<ul class="unstyled" use:reorderable_list={{onreorder: handle_reorder}}>
+			<ul
+				class="unstyled"
+				use:reorderable_list={{
+					onreorder: (from_index, to_index) => {
+						chat.reorder_selected_prompts(from_index, to_index);
+					},
+				}}
+			>
 				{#each chat.selected_prompts as prompt, i (prompt.id)}
 					<li class="radius_xs" use:reorderable_item={{index: i}}>
 						<div class="flex justify_content_space_between">
