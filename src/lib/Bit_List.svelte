@@ -25,19 +25,4 @@
 			</li>
 		{/each}
 	</ul>
-	<!-- TODO delete -->
-	<ul
-		class="unstyled row"
-		use:reorderable_list={{
-			onreorder: (from_index, to_index) => {
-				prompt.reorder_bits(from_index, to_index);
-			},
-		}}
-	>
-		{#each prompt.bits as bit, i (bit.id)}
-			<li class="radius_xs" use:reorderable_item={{index: i}}>
-				<Bit_Summary {bit} {prompt} />
-			</li>
-		{/each}
-	</ul>
 </div>
