@@ -11,9 +11,11 @@
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import Prompt_Stats from '$lib/Prompt_Stats.svelte';
 	import Bit_List from '$lib/Bit_List.svelte';
-	import {reorderable_list, reorderable_item} from '$lib/reorderable.svelte.js';
+	import {Reorderable} from '$lib/reorderable.svelte.js';
 
 	const zzz = zzz_context.get();
+
+	const reorderable = new Reorderable();
 
 	// TODO BLOCK integrate with sources like the local filesystem (just the `zzz.files`?)
 
@@ -22,8 +24,6 @@
 	// TODO BLOCK make it have optional attributes like file type
 
 	// TODO BLOCK the dashed pattern state isn't working for the xml tag input or attributes
-
-	// TODO BLOCK make the prompt links below reorderable
 </script>
 
 <div class="flex align_items_start gap_md p_sm">
@@ -62,12 +62,12 @@
 		</button>
 		<ul
 			class="unstyled"
-			use:reorderable_list={{
+			use:reorderable.list={{
 				onreorder: (from_index, to_index) => zzz.prompts.reorder_prompts(from_index, to_index),
 			}}
 		>
 			{#each zzz.prompts.items as prompt, i (prompt.id)}
-				<li use:reorderable_item={{index: i}}>
+				<li use:reorderable.item={{index: i}}>
 					<Nav_Link
 						href="#TODO"
 						selected={prompt.id === zzz.prompts.selected_id}

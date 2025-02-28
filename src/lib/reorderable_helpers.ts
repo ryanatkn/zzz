@@ -1,0 +1,107 @@
+import type {
+	Reorderable_Direction,
+	Reorderable_Valid_Drop_Position,
+	Reorderable_Style_Config_Partial,
+} from '$lib/reorderable.svelte.js';
+
+// TODO maybe make this a DOM helper? in Belt?
+/**
+ * Detect layout direction from an element - supports flex and grid
+ */
+export const detect_direction = (element: HTMLElement): Reorderable_Direction => {
+	const computed_style = window.getComputedStyle(element);
+	const display = computed_style.display;
+
+	// Check for grid layouts
+	if (display === 'grid' || display === 'inline-grid') {
+		const grid_auto_flow = computed_style.gridAutoFlow;
+		// For grid layouts, "row" flow means items flow horizontally, "column" flow means items flow vertically
+		return grid_auto_flow.includes('column') ? 'vertical' : 'horizontal';
+	}
+
+	// Check for flex layouts
+	if (display === 'flex' || display === 'inline-flex') {
+		const flex_direction = computed_style.flexDirection;
+		// Row means horizontal, column means vertical
+		return flex_direction.includes('column') ? 'vertical' : 'horizontal';
+	}
+
+	// For all other layouts, default to vertical
+	return 'vertical';
+};
+
+/**
+ * Determine the drop position based on source and target indices and layout direction
+ */
+export const get_drop_position = (
+	direction: Reorderable_Direction,
+	source_index: number,
+	target_index: number,
+): Reorderable_Valid_Drop_Position => {
+	if (direction === 'horizontal') {
+		// For horizontal layouts
+		return source_index > target_index ? 'left' : 'right';
+	} else {
+		// For vertical layouts - always use top/bottom for vertical
+		return source_index > target_index ? 'top' : 'bottom';
+	}
+};
+
+/**
+ * Calculate the target index based on source, current index, and position
+ */
+export const calculate_target_index = (
+	source_index: number,
+	current_index: number,
+	position: Reorderable_Valid_Drop_Position,
+): number => {
+	let target_index = current_index;
+
+	// Adjust based on drop position
+	if (position === 'bottom' || position === 'right') {
+		target_index += 1;
+	}
+
+	// Adjust target index when moving from earlier position
+	if (source_index < current_index) {
+		target_index -= 1;
+	}
+
+	return target_index;
+};
+
+/**
+ * Check if reordering is allowed between two indices
+ */
+export const is_reorder_allowed = (
+	can_reorder: ((from_index: number, to_index: number) => boolean) | undefined,
+	source_index: number,
+	target_index: number,
+): boolean => !can_reorder || can_reorder(source_index, target_index);
+
+/**
+ * Update styling configuration without changing direction
+ */
+export const update_styles_excluding_direction = (
+	target: Record<string, any>,
+	styles: Reorderable_Style_Config_Partial,
+): void => {
+	for (const key in styles) {
+		// Skip 'direction' which isn't a style
+		if (key === 'direction') continue;
+
+		const value = styles[key as keyof Reorderable_Style_Config_Partial];
+		if (value !== undefined) {
+			target[key] = value;
+		}
+	}
+};
+
+/**
+ * Validate and adjust a target index to ensure it's within bounds
+ */
+export const validate_target_index = (target_index: number, max_index: number): number => {
+	if (target_index < 0) return 0;
+	if (target_index > max_index + 1) return max_index + 1;
+	return target_index;
+};

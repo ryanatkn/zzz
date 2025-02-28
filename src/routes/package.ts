@@ -358,6 +358,10 @@ export const package_json = {
 			types: './dist/providers.svelte.d.ts',
 			default: './dist/providers.svelte.js',
 		},
+		'./reorderable_helpers.js': {
+			types: './dist/reorderable_helpers.d.ts',
+			default: './dist/reorderable_helpers.js',
+		},
 		'./reorderable.svelte.js': {
 			types: './dist/reorderable.svelte.d.ts',
 			default: './dist/reorderable.svelte.js',
@@ -610,13 +614,28 @@ export const src_json = {
 			path: 'providers.svelte.ts',
 			declarations: [{name: 'Providers', kind: 'class'}],
 		},
+		'./reorderable_helpers.js': {
+			path: 'reorderable_helpers.ts',
+			declarations: [
+				{name: 'detect_direction', kind: 'function'},
+				{name: 'get_drop_position', kind: 'function'},
+				{name: 'calculate_target_index', kind: 'function'},
+				{name: 'is_reorder_allowed', kind: 'function'},
+				{name: 'update_styles_excluding_direction', kind: 'function'},
+				{name: 'validate_target_index', kind: 'function'},
+			],
+		},
 		'./reorderable.svelte.js': {
 			path: 'reorderable.svelte.ts',
 			declarations: [
-				{name: 'Direction', kind: 'type'},
-				{name: 'Drop_Position', kind: 'type'},
-				{name: 'Valid_Drop_Position', kind: 'type'},
-				{name: 'Reorderable_Context', kind: 'type'},
+				{name: 'Reorderable_Direction', kind: 'type'},
+				{name: 'Reorderable_Drop_Position', kind: 'type'},
+				{name: 'Reorderable_Valid_Drop_Position', kind: 'type'},
+				{name: 'Reorderable_Style_Config', kind: 'type'},
+				{name: 'Reorderable_Style_Config_Partial', kind: 'type'},
+				{name: 'Reorderable_List_Params', kind: 'type'},
+				{name: 'Reorderable_Item_Params', kind: 'type'},
+				{name: 'Reorderable_Options', kind: 'type'},
 				{name: 'LIST_CLASS_DEFAULT', kind: 'variable'},
 				{name: 'ITEM_CLASS_DEFAULT', kind: 'variable'},
 				{name: 'DRAGGING_CLASS_DEFAULT', kind: 'variable'},
@@ -626,8 +645,7 @@ export const src_json = {
 				{name: 'DRAG_OVER_LEFT_CLASS_DEFAULT', kind: 'variable'},
 				{name: 'DRAG_OVER_RIGHT_CLASS_DEFAULT', kind: 'variable'},
 				{name: 'INVALID_DROP_CLASS_DEFAULT', kind: 'variable'},
-				{name: 'reorderable_list', kind: 'function'},
-				{name: 'reorderable_item', kind: 'function'},
+				{name: 'Reorderable', kind: 'class'},
 			],
 		},
 		'./scrollable.svelte.js': {

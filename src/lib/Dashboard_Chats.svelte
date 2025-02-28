@@ -8,11 +8,11 @@
 	import Text_Icon from '$lib/Text_Icon.svelte';
 	import {GLYPH_CHAT} from '$lib/constants.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
-	import {reorderable_list, reorderable_item} from '$lib/reorderable.svelte.js';
+	import {Reorderable} from '$lib/reorderable.svelte.js';
 
 	const zzz = zzz_context.get();
 
-	// TODO BLOCK make the chat links below reorderable
+	const reorderable = new Reorderable();
 </script>
 
 <div class="dashboard_chats">
@@ -51,13 +51,13 @@
 		</button>
 		<menu
 			class="unstyled"
-			use:reorderable_list={{
+			use:reorderable.list={{
 				onreorder: (from_index, to_index) => zzz.chats.reorder_chats(from_index, to_index),
 			}}
 		>
 			{#each zzz.chats.items as chat, i (chat.id)}
 				<!-- TODO change to href from onclick -->
-				<li use:reorderable_item={{index: i}}>
+				<li use:reorderable.item={{index: i}}>
 					<Nav_Link
 						href="#TODO"
 						selected={chat.id === zzz.chats.selected_id}

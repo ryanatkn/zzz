@@ -423,6 +423,10 @@
       "types": "./dist/providers.svelte.d.ts",
       "default": "./dist/providers.svelte.js"
     },
+    "./reorderable_helpers.js": {
+      "types": "./dist/reorderable_helpers.d.ts",
+      "default": "./dist/reorderable_helpers.js"
+    },
     "./reorderable.svelte.js": {
       "types": "./dist/reorderable.svelte.d.ts",
       "default": "./dist/reorderable.svelte.js"

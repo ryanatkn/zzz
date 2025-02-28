@@ -4,7 +4,7 @@
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import type {Chat} from '$lib/chat.svelte.js';
 	import {GLYPH_REMOVE} from '$lib/constants.js';
-	import {reorderable_list, reorderable_item} from '$lib/reorderable.svelte.js';
+	import {Reorderable} from '$lib/reorderable.svelte.js';
 	import type {Id} from '$lib/id.js';
 
 	interface Props {
@@ -12,6 +12,8 @@
 	}
 
 	const {chat}: Props = $props();
+
+	const reorderable = new Reorderable();
 
 	// Create a derived that filters out already selected prompts
 	const unselected_prompts = $derived(
@@ -68,14 +70,14 @@
 		<div class="w_100">
 			<ul
 				class="unstyled"
-				use:reorderable_list={{
+				use:reorderable.list={{
 					onreorder: (from_index, to_index) => {
 						chat.reorder_selected_prompts(from_index, to_index);
 					},
 				}}
 			>
 				{#each chat.selected_prompts as prompt, i (prompt.id)}
-					<li class="radius_xs" use:reorderable_item={{index: i}}>
+					<li class="radius_xs" use:reorderable.item={{index: i}}>
 						<div class="flex justify_content_space_between">
 							<Copy_To_Clipboard
 								text={prompt.content}
