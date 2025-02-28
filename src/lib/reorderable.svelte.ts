@@ -49,6 +49,17 @@ export interface Reorderable_Item_Params extends Reorderable_Style_Config_Partia
 	index: number;
 }
 
+// Default CSS class names for styling
+export const LIST_CLASS_DEFAULT = 'reorderable_list';
+export const ITEM_CLASS_DEFAULT = 'reorderable_item';
+export const DRAGGING_CLASS_DEFAULT = 'dragging';
+export const DRAG_OVER_CLASS_DEFAULT = 'drag_over';
+export const DRAG_OVER_TOP_CLASS_DEFAULT = 'drag_over_top';
+export const DRAG_OVER_BOTTOM_CLASS_DEFAULT = 'drag_over_bottom';
+export const DRAG_OVER_LEFT_CLASS_DEFAULT = 'drag_over_left';
+export const DRAG_OVER_RIGHT_CLASS_DEFAULT = 'drag_over_right';
+export const INVALID_DROP_CLASS_DEFAULT = 'invalid_drop';
+
 /**
  * State between list and item actions
  */
@@ -57,6 +68,10 @@ export class Reorderable_Context {
 	direction: Reorderable_Direction;
 	onreorder: (from_index: number, to_index: number) => void;
 	can_reorder?: (from_index: number, to_index: number) => boolean;
+
+	// Track active elements that have indicators for more efficient clearing
+	active_indicator_element: HTMLElement | null = null;
+	current_indicator: Reorderable_Drop_Position = 'none';
 
 	// Styling configuration
 	item_class: string;
@@ -153,21 +168,79 @@ export class Reorderable_Context {
 	is_reorder_allowed(source_index: number, target_index: number): boolean {
 		return !this.can_reorder || this.can_reorder(source_index, target_index);
 	}
+
+	/**
+	 * Efficiently clear only the active element's indicators
+	 */
+	clear_indicators(): void {
+		if (this.active_indicator_element) {
+			this.active_indicator_element.classList.remove(
+				this.drag_over_class,
+				this.drag_over_top_class,
+				this.drag_over_bottom_class,
+				this.drag_over_left_class,
+				this.drag_over_right_class,
+				this.invalid_drop_class,
+			);
+			this.active_indicator_element = null;
+			this.current_indicator = 'none';
+		}
+	}
+
+	/**
+	 * More efficient indicator update that only changes what's needed
+	 */
+	update_indicator(
+		element: HTMLElement,
+		new_indicator: Reorderable_Drop_Position,
+		is_valid = true,
+	): void {
+		// No change, skip update
+		if (element === this.active_indicator_element && new_indicator === this.current_indicator)
+			return;
+
+		// Clear existing indicator on previous element if needed
+		this.clear_indicators();
+
+		// Apply new indicator classes if needed
+		if (new_indicator !== 'none') {
+			element.classList.add(this.drag_over_class);
+
+			// Add invalid drop class if needed
+			if (!is_valid) {
+				element.classList.add(this.invalid_drop_class);
+				this.active_indicator_element = element;
+				this.current_indicator = new_indicator;
+				return;
+			}
+
+			// Add specific direction class
+			switch (new_indicator) {
+				case 'top':
+					element.classList.add(this.drag_over_top_class);
+					break;
+				case 'bottom':
+					element.classList.add(this.drag_over_bottom_class);
+					break;
+				case 'left':
+					element.classList.add(this.drag_over_left_class);
+					break;
+				case 'right':
+					element.classList.add(this.drag_over_right_class);
+					break;
+				default:
+					throw new Unreachable_Error(new_indicator);
+			}
+
+			// Update the active element
+			this.active_indicator_element = element;
+			this.current_indicator = new_indicator;
+		}
+	}
 }
 
 // WeakMap ensures contexts are garbage collected when elements are removed
 const contexts: WeakMap<HTMLElement, Reorderable_Context> = new WeakMap();
-
-// Default CSS class names for styling
-export const LIST_CLASS_DEFAULT = 'reorderable_list';
-export const ITEM_CLASS_DEFAULT = 'reorderable_item';
-export const DRAGGING_CLASS_DEFAULT = 'dragging';
-export const DRAG_OVER_CLASS_DEFAULT = 'drag_over';
-export const DRAG_OVER_TOP_CLASS_DEFAULT = 'drag_over_top';
-export const DRAG_OVER_BOTTOM_CLASS_DEFAULT = 'drag_over_bottom';
-export const DRAG_OVER_LEFT_CLASS_DEFAULT = 'drag_over_left';
-export const DRAG_OVER_RIGHT_CLASS_DEFAULT = 'drag_over_right';
-export const INVALID_DROP_CLASS_DEFAULT = 'invalid_drop';
 
 /**
  * Enhanced helper to detect layout direction - supports both flex and grid
@@ -289,111 +362,24 @@ export const reorderable_item: Action<HTMLElement, Reorderable_Item_Params> = (n
 	// The current index of this item
 	let {index} = params;
 
-	// Track active elements that have indicators for more efficient clearing
-	let active_indicator_element: HTMLElement | null = null;
+	// Get list context (for styling purposes initially)
+	const context = get_reorderable_context(node);
 
-	// Track last known indicator state to avoid redundant DOM updates
-	let current_indicator: Reorderable_Drop_Position = 'none';
+	// Use the context's item class if available, otherwise use param or default
+	const initial_item_class =
+		(context ? context.item_class : undefined) || params.item_class || ITEM_CLASS_DEFAULT;
 
-	// Use mutable bindings for classes so they can be updated
-	let item_class = params.item_class !== undefined ? params.item_class : ITEM_CLASS_DEFAULT;
-	let dragging_class =
-		params.dragging_class !== undefined ? params.dragging_class : DRAGGING_CLASS_DEFAULT;
-	let drag_over_class =
-		params.drag_over_class !== undefined ? params.drag_over_class : DRAG_OVER_CLASS_DEFAULT;
-	let drag_over_top_class =
-		params.drag_over_top_class !== undefined
-			? params.drag_over_top_class
-			: DRAG_OVER_TOP_CLASS_DEFAULT;
-	let drag_over_bottom_class =
-		params.drag_over_bottom_class !== undefined
-			? params.drag_over_bottom_class
-			: DRAG_OVER_BOTTOM_CLASS_DEFAULT;
-	let drag_over_left_class =
-		params.drag_over_left_class !== undefined
-			? params.drag_over_left_class
-			: DRAG_OVER_LEFT_CLASS_DEFAULT;
-	let drag_over_right_class =
-		params.drag_over_right_class !== undefined
-			? params.drag_over_right_class
-			: DRAG_OVER_RIGHT_CLASS_DEFAULT;
-	let invalid_drop_class =
-		params.invalid_drop_class !== undefined
-			? params.invalid_drop_class
-			: INVALID_DROP_CLASS_DEFAULT;
+	// Track the current item class for proper cleanup
+	let current_item_class = initial_item_class;
 
 	// Add the reorderable_item class automatically
-	node.classList.add(item_class);
+	node.classList.add(current_item_class);
 
 	// Add basic accessibility attribute
 	node.setAttribute('role', 'listitem');
 
 	// Make the item draggable
 	node.setAttribute('draggable', 'true');
-
-	// Efficiently clear only the active element
-	const clear_indicators = () => {
-		if (active_indicator_element) {
-			active_indicator_element.classList.remove(
-				drag_over_class,
-				drag_over_top_class,
-				drag_over_bottom_class,
-				drag_over_left_class,
-				drag_over_right_class,
-				invalid_drop_class,
-			);
-			active_indicator_element = null;
-		}
-	};
-
-	// More efficient indicator update that only changes what's needed
-	const update_indicator = (
-		element: HTMLElement,
-		new_indicator: Reorderable_Drop_Position,
-		is_valid = true,
-	) => {
-		// No change, skip update
-		if (element === active_indicator_element && new_indicator === current_indicator) return;
-
-		// Clear existing indicator on previous element if needed
-		clear_indicators();
-
-		// Apply new indicator classes if needed
-		if (new_indicator !== 'none') {
-			element.classList.add(drag_over_class);
-
-			// Add invalid drop class if needed
-			if (!is_valid) {
-				element.classList.add(invalid_drop_class);
-				active_indicator_element = element;
-				current_indicator = new_indicator;
-				return;
-			}
-
-			// Add specific direction class
-			switch (new_indicator) {
-				case 'top':
-					element.classList.add(drag_over_top_class);
-					break;
-				case 'bottom':
-					element.classList.add(drag_over_bottom_class);
-					break;
-				case 'left':
-					element.classList.add(drag_over_left_class);
-					break;
-				case 'right':
-					element.classList.add(drag_over_right_class);
-					break;
-				default:
-					throw new Unreachable_Error(new_indicator);
-			}
-
-			// Update the active element
-			active_indicator_element = element;
-		}
-
-		current_indicator = new_indicator;
-	};
 
 	// Handle drag start
 	const handle_dragstart = (e: DragEvent) => {
@@ -406,11 +392,8 @@ export const reorderable_item: Action<HTMLElement, Reorderable_Item_Params> = (n
 		// Store the dragged item's index
 		context.source_index = index;
 
-		// Check if we should use context class names or local ones
-		const effective_dragging_class = context.dragging_class;
-
 		// Add dragging style
-		node.classList.add(effective_dragging_class);
+		node.classList.add(context.dragging_class);
 
 		// Required for Firefox
 		e.dataTransfer.effectAllowed = 'move';
@@ -421,22 +404,16 @@ export const reorderable_item: Action<HTMLElement, Reorderable_Item_Params> = (n
 	const handle_dragend = () => {
 		// Get context to check if we had a source index
 		const context = get_reorderable_context(node);
-
-		// Use context class if available
-		const effective_dragging_class = context?.dragging_class || dragging_class;
+		if (!context) return;
 
 		// Remove dragging style
-		node.classList.remove(effective_dragging_class);
+		node.classList.remove(context.dragging_class);
 
 		// Reset indicators
-		clear_indicators();
+		context.clear_indicators();
 
-		// Reset source index if we have a context
-		if (context) {
-			context.source_index = -1;
-		}
-
-		current_indicator = 'none';
+		// Reset source index
+		context.source_index = -1;
 	};
 
 	// Handle drag over
@@ -457,7 +434,7 @@ export const reorderable_item: Action<HTMLElement, Reorderable_Item_Params> = (n
 		const is_allowed = context.is_reorder_allowed(context.source_index, target_index);
 
 		// Update indicator with the new position and validity
-		update_indicator(node, position, is_allowed);
+		context.update_indicator(node, position, is_allowed);
 
 		if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
 	};
@@ -475,7 +452,7 @@ export const reorderable_item: Action<HTMLElement, Reorderable_Item_Params> = (n
 		// Don't allow dragging to self
 		if (source_index === index) {
 			// Clean up and return without reordering
-			clear_indicators();
+			context.clear_indicators();
 			context.source_index = -1;
 			return;
 		}
@@ -495,7 +472,7 @@ export const reorderable_item: Action<HTMLElement, Reorderable_Item_Params> = (n
 		// Check if reordering is allowed
 		if (!context.is_reorder_allowed(source_index, target_index)) {
 			// Not allowed - just clean up
-			clear_indicators();
+			context.clear_indicators();
 			context.source_index = -1;
 			return;
 		}
@@ -504,7 +481,7 @@ export const reorderable_item: Action<HTMLElement, Reorderable_Item_Params> = (n
 		context.onreorder(source_index, target_index);
 
 		// Clear indicators
-		clear_indicators();
+		context.clear_indicators();
 
 		// Reset drag state
 		context.source_index = -1;
@@ -518,10 +495,14 @@ export const reorderable_item: Action<HTMLElement, Reorderable_Item_Params> = (n
 			return;
 		}
 
-		// Only clear if we currently have indicators
-		if (current_indicator !== 'none') {
-			clear_indicators();
-			current_indicator = 'none';
+		// Get context to clear indicators if needed
+		const context = get_reorderable_context(node);
+		if (
+			context &&
+			context.current_indicator !== 'none' &&
+			context.active_indicator_element === node
+		) {
+			context.clear_indicators();
 		}
 	};
 
@@ -537,34 +518,24 @@ export const reorderable_item: Action<HTMLElement, Reorderable_Item_Params> = (n
 			// Update the index if it changes
 			index = new_params.index;
 
-			// Handle all possible class changes with proper undefined checks
-			if (new_params.item_class !== undefined) {
-				node.classList.remove(item_class);
-				node.classList.add(new_params.item_class);
-				item_class = new_params.item_class;
+			// Get the current context (may have changed)
+			const context = get_reorderable_context(node);
+
+			// Determine the new item class to use
+			const new_item_class =
+				(context ? context.item_class : undefined) || new_params.item_class || ITEM_CLASS_DEFAULT;
+
+			// Update item class if it changed
+			if (new_item_class !== current_item_class) {
+				node.classList.remove(current_item_class);
+				node.classList.add(new_item_class);
+				current_item_class = new_item_class;
 			}
 
-			// Update other class names if provided
-			if (new_params.dragging_class !== undefined) {
-				dragging_class = new_params.dragging_class;
-			}
-			if (new_params.drag_over_class !== undefined) {
-				drag_over_class = new_params.drag_over_class;
-			}
-			if (new_params.drag_over_top_class !== undefined) {
-				drag_over_top_class = new_params.drag_over_top_class;
-			}
-			if (new_params.drag_over_bottom_class !== undefined) {
-				drag_over_bottom_class = new_params.drag_over_bottom_class;
-			}
-			if (new_params.drag_over_left_class !== undefined) {
-				drag_over_left_class = new_params.drag_over_left_class;
-			}
-			if (new_params.drag_over_right_class !== undefined) {
-				drag_over_right_class = new_params.drag_over_right_class;
-			}
-			if (new_params.invalid_drop_class !== undefined) {
-				invalid_drop_class = new_params.invalid_drop_class;
+			// If we have a context, update its styles with any provided params
+			if (context && Object.keys(new_params).length > 1) {
+				// More than just index
+				context.update_styles(extract_style_params(new_params));
 			}
 		},
 		destroy() {
@@ -576,13 +547,19 @@ export const reorderable_item: Action<HTMLElement, Reorderable_Item_Params> = (n
 			cleanup_dragleave();
 
 			// Remove the class we added
-			node.classList.remove(item_class);
+			node.classList.remove(current_item_class);
 
 			// Remove accessibility attributes
 			node.removeAttribute('role');
 
 			// Remove draggable attribute
 			node.removeAttribute('draggable');
+
+			// Clear any active indicators if this node has them
+			const context = get_reorderable_context(node);
+			if (context && context.active_indicator_element === node) {
+				context.clear_indicators();
+			}
 		},
 	};
 };
