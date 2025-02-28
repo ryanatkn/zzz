@@ -1,6 +1,7 @@
 import type {Zzz} from '$lib/zzz.svelte.js';
 import {Chat} from '$lib/chat.svelte.js';
 import type {Id} from '$lib/id.js';
+import {reorder_list} from '$lib/list_helpers.js';
 
 export class Chats {
 	readonly zzz: Zzz;
@@ -15,12 +16,13 @@ export class Chats {
 		this.zzz = zzz;
 	}
 
-	add(): void {
+	add(): Chat {
 		const chat = new Chat(this.zzz);
 		this.items.unshift(chat);
 		if (this.selected_id === null) {
 			this.selected_id = chat.id;
 		}
+		return chat;
 	}
 
 	remove(chat: Chat): void {
@@ -38,5 +40,9 @@ export class Chats {
 
 	select(chat_id: Id | null): void {
 		this.selected_id = chat_id;
+	}
+
+	reorder_chats(from_index: number, to_index: number): void {
+		reorder_list(this.items, from_index, to_index);
 	}
 }

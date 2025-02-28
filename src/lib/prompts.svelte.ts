@@ -2,6 +2,7 @@ import type {Zzz} from '$lib/zzz.svelte.js';
 import {Prompt} from '$lib/prompt.svelte.js';
 import type {Id} from '$lib/id.js';
 import type {Bit} from '$lib/bit.svelte.js';
+import {reorder_list} from '$lib/list_helpers.js';
 
 export class Prompts {
 	readonly zzz: Zzz;
@@ -38,6 +39,10 @@ export class Prompts {
 
 	select(prompt_id: Id | null): void {
 		this.selected_id = prompt_id;
+	}
+
+	reorder_prompts(from_index: number, to_index: number): void {
+		reorder_list(this.items, from_index, to_index);
 	}
 
 	add_bit(): void {

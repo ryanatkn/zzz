@@ -11,6 +11,7 @@
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import Prompt_Stats from '$lib/Prompt_Stats.svelte';
 	import Bit_List from '$lib/Bit_List.svelte';
+	import {reorderable_list, reorderable_item} from '$lib/reorderable.svelte.js';
 
 	const zzz = zzz_context.get();
 
@@ -59,25 +60,32 @@
 		>
 			+ new prompt
 		</button>
-		<menu class="unstyled">
-			{#each zzz.prompts.items as prompt (prompt.id)}
-				<Nav_Link
-					href="#TODO"
-					selected={prompt.id === zzz.prompts.selected_id}
-					attrs={{
-						class: 'justify_content_space_between',
-						style: 'min-height: 0;',
-						onclick: () => zzz.prompts.select(prompt.id),
-					}}
-				>
-					<div>
-						<span class="mr_xs2">{GLYPH_PROMPT}</span>
-						<span>{prompt.name}</span>
-					</div>
-					{#if prompt.bits.length}<small>{prompt.bits.length}</small>{/if}
-				</Nav_Link>
+		<ul
+			class="unstyled"
+			use:reorderable_list={{
+				onreorder: (from_index, to_index) => zzz.prompts.reorder_prompts(from_index, to_index),
+			}}
+		>
+			{#each zzz.prompts.items as prompt, i (prompt.id)}
+				<li use:reorderable_item={{index: i}} class="mb_xs">
+					<Nav_Link
+						href="#TODO"
+						selected={prompt.id === zzz.prompts.selected_id}
+						attrs={{
+							class: 'justify_content_space_between',
+							style: 'min-height: 0;',
+							onclick: () => zzz.prompts.select(prompt.id),
+						}}
+					>
+						<div>
+							<span class="mr_xs2">{GLYPH_PROMPT}</span>
+							<span>{prompt.name}</span>
+						</div>
+						{#if prompt.bits.length}<small>{prompt.bits.length}</small>{/if}
+					</Nav_Link>
+				</li>
 			{/each}
-		</menu>
+		</ul>
 	</div>
 
 	{#if zzz.prompts.selected}

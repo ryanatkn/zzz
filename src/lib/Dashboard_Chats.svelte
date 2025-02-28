@@ -8,6 +8,7 @@
 	import Text_Icon from '$lib/Text_Icon.svelte';
 	import {GLYPH_CHAT} from '$lib/constants.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {reorderable_list, reorderable_item} from '$lib/reorderable.svelte.js';
 
 	const zzz = zzz_context.get();
 
@@ -48,24 +49,31 @@
 		>
 			+ new chat
 		</button>
-		<menu class="unstyled">
-			{#each zzz.chats.items as chat (chat.id)}
+		<menu
+			class="unstyled"
+			use:reorderable_list={{
+				onreorder: (from_index, to_index) => zzz.chats.reorder_chats(from_index, to_index),
+			}}
+		>
+			{#each zzz.chats.items as chat, i (chat.id)}
 				<!-- TODO change to href from onclick -->
-				<Nav_Link
-					href="#TODO"
-					selected={chat.id === zzz.chats.selected_id}
-					attrs={{
-						class: 'justify_content_space_between',
-						style: 'min-height: 0;',
-						onclick: () => zzz.chats.select(chat.id),
-					}}
-				>
-					<div>
-						<span class="mr_xs2">{GLYPH_CHAT}</span>
-						<span>{chat.name}</span>
-					</div>
-					{#if chat.tapes.length}<small>{chat.tapes.length}</small>{/if}
-				</Nav_Link>
+				<li use:reorderable_item={{index: i}} class="mb_xs">
+					<Nav_Link
+						href="#TODO"
+						selected={chat.id === zzz.chats.selected_id}
+						attrs={{
+							class: 'justify_content_space_between',
+							style: 'min-height: 0;',
+							onclick: () => zzz.chats.select(chat.id),
+						}}
+					>
+						<div>
+							<span class="mr_xs2">{GLYPH_CHAT}</span>
+							<span>{chat.name}</span>
+						</div>
+						{#if chat.tapes.length}<small>{chat.tapes.length}</small>{/if}
+					</Nav_Link>
+				</li>
 			{/each}
 		</menu>
 	</div>
