@@ -81,6 +81,9 @@ a.chip {
 .flex_1 {
 	flex: 1;
 }
+.flex_column {
+	flex-direction: column;
+}
 .flex_column_reverse {
 	flex-direction: column-reverse;
 }
@@ -144,6 +147,9 @@ a.chip {
 
 .inline_block {
 	display: inline-block;
+}
+.justify_content_center {
+	justify-content: center;
 }
 .justify_content_end {
 	justify-content: end;
@@ -287,6 +293,9 @@ a.chip {
 }
 .overflow_hidden {
 	overflow: hidden;
+}
+.overflow_y_auto {
+	overflow-y: auto;
 }
 .p_lg {
 	padding: var(--space_lg);
@@ -472,6 +481,9 @@ a.chip {
 }
 .white_space_nowrap {
 	white-space: nowrap;
+}
+.white_space_pre_wrap {
+	white-space: pre-wrap;
 }
 
 .width_md {
