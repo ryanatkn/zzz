@@ -5,7 +5,11 @@ import {test, expect, vi} from 'vitest';
 import {Reorderable, type Reorderable_Item_Id} from '$lib/reorderable.svelte.js';
 
 // Mock helper function for DOM testing
-const create_elements = () => {
+const create_elements = (): {
+	container: HTMLElement;
+	list: HTMLElement;
+	items: Array<HTMLElement>;
+} => {
 	// Create container
 	const container = document.createElement('div');
 

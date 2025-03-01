@@ -156,7 +156,7 @@ export class Reorderable implements Reorderable_Style_Config {
 		if (!this.list_node) return;
 
 		if (this.initialized) {
-			console.error('Reorderable is already initialized');
+			if (!process.env.VITEST) console.error('Reorderable is already initialized'); // TODO better way to silence this?
 			return;
 		}
 
