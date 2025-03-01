@@ -7,7 +7,7 @@ export type Args = z.infer<typeof Args>;
 
 export const task: Task<Args> = {
 	Args,
-	summary: 'gets gitops ready and runs scripts',
+	summary: 'quick and dirty wrapper around vitest',
 	run: async () => {
 		// TODO BLOCK do with helpers to find cli
 		const spawned = await spawn_out('npx', ['vitest', '--no-watch']);
