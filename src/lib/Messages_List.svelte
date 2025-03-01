@@ -93,15 +93,18 @@
 						<div class="message-preview mt_xs">
 							{#if message.type === 'send_prompt'}
 								<small class="message-preview-label">Prompt:</small>
-								<pre class="message-preview-content">{(
-										message.data as any
-									).completion_request?.prompt.substring(0, 50) + '...' || 'No prompt'}</pre>
+								<pre
+									class="message-preview-content">{message.data.completion_request?.prompt.substring(
+										0,
+										50,
+									) + '...' || 'No prompt'}</pre>
 							{:else if message.type === 'completion_response'}
 								<small class="message-preview-label">Response:</small>
-								<pre class="message-preview-content">{(
-										message.data as any
-									).completion_response?.completion.substring(0, 50) + '...' ||
-										'No completion'}</pre>
+								<pre
+									class="message-preview-content">{message.data.completion_response?.completion.substring(
+										0,
+										50,
+									) + '...' || 'No completion'}</pre>
 							{/if}
 						</div>
 					{/if}

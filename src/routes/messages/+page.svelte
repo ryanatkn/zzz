@@ -49,38 +49,38 @@
 					{:else if selected_message.type === 'send_prompt'}
 						<div class="message-section">
 							<h3>Prompt</h3>
-							<pre class="message-data">{(selected_message.data as any).completion_request
-									?.prompt || 'No prompt'}</pre>
+							<pre class="message-data">{selected_message.data.completion_request?.prompt ||
+									'No prompt'}</pre>
 
 							<h3>Request Details</h3>
 							<dl class="message-details">
 								<dt>Model</dt>
-								<dd>{(selected_message.data as any).completion_request?.model || 'Unknown'}</dd>
+								<dd>{selected_message.data.completion_request?.model || 'Unknown'}</dd>
 
 								<dt>Provider</dt>
 								<dd>
-									{(selected_message.data as any).completion_request?.provider_name || 'Unknown'}
+									{selected_message.data.completion_request?.provider_name || 'Unknown'}
 								</dd>
 
 								<dt>Created</dt>
-								<dd>{(selected_message.data as any).completion_request?.created || 'Unknown'}</dd>
+								<dd>{selected_message.data.completion_request?.created || 'Unknown'}</dd>
 							</dl>
 						</div>
 					{:else if selected_message.type === 'completion_response'}
 						<div class="message-section">
 							<h3>Completion</h3>
-							<pre class="message-data">{(selected_message.data as any).completion_response
-									?.completion || 'No completion'}</pre>
+							<pre class="message-data">{selected_message.data.completion_response?.completion ||
+									'No completion'}</pre>
 
 							<h3>Response Details</h3>
 							<dl class="message-details">
 								<dt>Request ID</dt>
 								<dd>
-									{(selected_message.data as any).completion_response?.request_id || 'Unknown'}
+									{selected_message.data.completion_response?.request_id || 'Unknown'}
 								</dd>
 
 								<dt>Created</dt>
-								<dd>{(selected_message.data as any).completion_response?.created || 'Unknown'}</dd>
+								<dd>{selected_message.data.completion_response?.created || 'Unknown'}</dd>
 							</dl>
 						</div>
 					{:else}
@@ -89,6 +89,7 @@
 				</div>
 			{:else}
 				<div class="message-empty-state">
+					<!-- TODO maybe show some useful default info/content here? it's like the root/home state -->
 					<p>Select a message from the list to view its details</p>
 				</div>
 			{/if}
