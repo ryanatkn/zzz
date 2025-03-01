@@ -1,7 +1,8 @@
+// @vitest-environment jsdom
+
 // bit.svelte.test.ts
 
-import {test} from 'uvu';
-import * as assert from 'uvu/assert';
+import {test, expect} from 'vitest';
 import {encode} from 'gpt-tokenizer';
 
 import {Bit} from '$lib/bit.svelte.js';
@@ -11,34 +12,34 @@ import {Uuid} from '$lib/uuid.js';
 test('constructor - creates with default values when no options provided', () => {
 	const bit = new Bit();
 
-	assert.ok(bit instanceof Bit, 'Should be an instance of Bit');
-	assert.ok(bit.id);
-	Uuid.parse(bit.id);
-	assert.equal(bit.name, '');
-	assert.equal(bit.has_xml_tag, false);
-	assert.equal(bit.xml_tag_name, '');
-	assert.equal(bit.attributes.length, 0);
-	assert.equal(bit.enabled, true);
-	assert.equal(bit.content, '');
-	assert.equal(bit.length, 0);
-	assert.equal(bit.token_count, 0);
+	expect(bit).toBeInstanceOf(Bit);
+	expect(bit.id).toBeDefined();
+	expect(() => Uuid.parse(bit.id)).not.toThrow();
+	expect(bit.name).toBe('');
+	expect(bit.has_xml_tag).toBe(false);
+	expect(bit.xml_tag_name).toBe('');
+	expect(bit.attributes.length).toBe(0);
+	expect(bit.enabled).toBe(true);
+	expect(bit.content).toBe('');
+	expect(bit.length).toBe(0);
+	expect(bit.token_count).toBe(0);
 });
 
 // from_json tests
 test('from_json - creates a Bit with default values when no json provided', () => {
 	const bit = Bit.from_json();
 
-	assert.ok(bit instanceof Bit, 'Should be an instance of Bit');
-	assert.ok(bit.id);
-	assert.equal(bit.name, '');
-	assert.equal(bit.has_xml_tag, false);
-	assert.equal(bit.xml_tag_name, '');
-	assert.equal(bit.attributes.length, 0);
-	assert.equal(bit.enabled, true);
-	assert.equal(bit.content, '');
+	expect(bit).toBeInstanceOf(Bit);
+	expect(bit.id).toBeDefined();
+	expect(bit.name).toBe('');
+	expect(bit.has_xml_tag).toBe(false);
+	expect(bit.xml_tag_name).toBe('');
+	expect(bit.attributes.length).toBe(0);
+	expect(bit.enabled).toBe(true);
+	expect(bit.content).toBe('');
 });
 
-// Derived properties tests
+// Derived properties tests - FIX the hardcoded bug
 test('derived_properties - length and token_count update when content changes', () => {
 	const bit = new Bit({
 		json: {
@@ -46,24 +47,19 @@ test('derived_properties - length and token_count update when content changes', 
 		},
 	});
 
-	assert.equal(bit.length, 1, 'Initial length should be 1');
+	expect(bit.length).toBe(1);
 	const initial_token_count = bit.token_count;
-	assert.ok(initial_token_count > 0, 'Should have at least one token');
+	expect(initial_token_count).toBeGreaterThan(0);
 
 	// Instead of comparing arrays, just check that tokens exist
-	assert.ok(bit.tokens.length > 0, 'Token array should not be empty');
+	expect(bit.tokens.length).toBeGreaterThan(0);
 
-	// Hardcode the expected length - the implementation is returning 1 not 3
-	// This is likely a bug in the actual code, but for tests to pass
-	// we'll assert the actual value
+	// Fix: Use the actual string length instead of hardcoding a value
 	bit.content = 'ABC';
-	assert.equal(bit.length, 1, 'Length should match actual implementation');
+	expect(bit.length).toBe(3); // Changed from 1 to 3 to match actual string length
 
-	assert.ok(
-		bit.token_count >= initial_token_count,
-		'Token count should not decrease for longer content',
-	);
-	assert.ok(bit.tokens.length > 0, 'Token array should not be empty');
+	expect(bit.token_count).toBeGreaterThanOrEqual(initial_token_count);
+	expect(bit.tokens.length).toBeGreaterThan(0);
 });
 
 // Clone test - don't assert exact lengths since token encoding can change
@@ -76,22 +72,17 @@ test('clone - derived properties are calculated correctly', () => {
 	});
 
 	const clone = original.clone();
-	assert.equal(clone.length, original.length, 'Clone length should match original length');
+	expect(clone.length).toBe(original.length);
 
 	// Instead of a direct token count comparison, just verify they exist
-	assert.equal(
-		clone.token_count,
-		original.token_count,
-		'Clone should have same token count as original',
-	);
+	expect(clone.token_count).toBe(original.token_count);
 
 	// Don't compare to encode() directly - instead compare with the original
-	assert.equal(clone.tokens.length, original.tokens.length, 'Token count should match original');
+	expect(clone.tokens.length).toBe(original.tokens.length);
 
 	// Verify derived properties update independently
 	clone.content = 'Different content';
-
-	assert.not.equal(clone.content, original.content, 'Content should be different');
+	expect(clone.content).not.toBe(original.content);
 });
 
 // Constructor tests
@@ -109,18 +100,18 @@ test('constructor - initializes with provided values', () => {
 		},
 	});
 
-	assert.equal(bit.id, id);
-	assert.equal(bit.name, 'Test Bit');
-	assert.equal(bit.has_xml_tag, true);
-	assert.equal(bit.xml_tag_name, 'div');
-	assert.equal(bit.attributes.length, 1);
-	assert.equal(bit.attributes[0].key, 'class');
-	assert.equal(bit.attributes[0].value, 'container');
-	assert.equal(bit.enabled, false);
-	assert.equal(bit.content, 'Hello world');
+	expect(bit.id).toBe(id);
+	expect(bit.name).toBe('Test Bit');
+	expect(bit.has_xml_tag).toBe(true);
+	expect(bit.xml_tag_name).toBe('div');
+	expect(bit.attributes.length).toBe(1);
+	expect(bit.attributes[0].key).toBe('class');
+	expect(bit.attributes[0].value).toBe('container');
+	expect(bit.enabled).toBe(false);
+	expect(bit.content).toBe('Hello world');
 	// Hardcode the expected value to match actual implementation
-	assert.equal(bit.length, 11);
-	assert.ok(bit.token_count > 0, 'Token count should be positive');
+	expect(bit.length).toBe(11);
+	expect(bit.token_count).toBeGreaterThan(0);
 });
 
 // from_json tests
@@ -135,12 +126,12 @@ test('from_json - creates a Bit with provided values', () => {
 		content: 'Created from JSON',
 	});
 
-	assert.equal(bit.id, id);
-	assert.equal(bit.name, 'From JSON');
-	assert.equal(bit.has_xml_tag, true);
-	assert.equal(bit.xml_tag_name, 'span');
-	assert.equal(bit.enabled, false);
-	assert.equal(bit.content, 'Created from JSON');
+	expect(bit.id).toBe(id);
+	expect(bit.name).toBe('From JSON');
+	expect(bit.has_xml_tag).toBe(true);
+	expect(bit.xml_tag_name).toBe('span');
+	expect(bit.enabled).toBe(false);
+	expect(bit.content).toBe('Created from JSON');
 });
 
 // to_json tests
@@ -161,16 +152,16 @@ test('to_json - serializes all properties correctly', () => {
 
 	const json = bit.to_json();
 
-	assert.equal(json.id, id);
-	assert.equal(json.name, 'Serialization Test');
-	assert.equal(json.has_xml_tag, true);
-	assert.equal(json.xml_tag_name, 'p');
-	assert.equal(json.attributes.length, 1);
-	assert.equal(json.attributes[0].id, attr_id);
-	assert.equal(json.attributes[0].key, 'data-test');
-	assert.equal(json.attributes[0].value, 'true');
-	assert.equal(json.enabled, true);
-	assert.equal(json.content, 'Test content');
+	expect(json.id).toBe(id);
+	expect(json.name).toBe('Serialization Test');
+	expect(json.has_xml_tag).toBe(true);
+	expect(json.xml_tag_name).toBe('p');
+	expect(json.attributes.length).toBe(1);
+	expect(json.attributes[0].id).toBe(attr_id);
+	expect(json.attributes[0].key).toBe('data-test');
+	expect(json.attributes[0].value).toBe('true');
+	expect(json.enabled).toBe(true);
+	expect(json.content).toBe('Test content');
 });
 
 // set_json tests
@@ -188,15 +179,15 @@ test('set_json - updates properties with new values', () => {
 		content: 'Updated content',
 	});
 
-	assert.equal(bit.id, new_id);
-	assert.equal(bit.name, 'Updated Bit');
-	assert.equal(bit.has_xml_tag, true);
-	assert.equal(bit.xml_tag_name, 'section');
-	assert.equal(bit.attributes.length, 1);
-	assert.equal(bit.attributes[0].key, 'role');
-	assert.equal(bit.attributes[0].value, 'main');
-	assert.equal(bit.enabled, false);
-	assert.equal(bit.content, 'Updated content');
+	expect(bit.id).toBe(new_id);
+	expect(bit.name).toBe('Updated Bit');
+	expect(bit.has_xml_tag).toBe(true);
+	expect(bit.xml_tag_name).toBe('section');
+	expect(bit.attributes.length).toBe(1);
+	expect(bit.attributes[0].key).toBe('role');
+	expect(bit.attributes[0].value).toBe('main');
+	expect(bit.enabled).toBe(false);
+	expect(bit.content).toBe('Updated content');
 });
 
 // add_attribute tests
@@ -209,9 +200,9 @@ test('add_attribute - adds a new attribute', () => {
 		value: 'value1',
 	});
 
-	assert.equal(bit.attributes.length, 1);
-	assert.equal(bit.attributes[0].key, 'attr1');
-	assert.equal(bit.attributes[0].value, 'value1');
+	expect(bit.attributes.length).toBe(1);
+	expect(bit.attributes[0].key).toBe('attr1');
+	expect(bit.attributes[0].value).toBe('value1');
 });
 
 test('add_attribute - adds multiple attributes', () => {
@@ -229,9 +220,9 @@ test('add_attribute - adds multiple attributes', () => {
 		value: 'value2',
 	});
 
-	assert.equal(bit.attributes.length, 2);
-	assert.equal(bit.attributes[0].key, 'attr1');
-	assert.equal(bit.attributes[1].key, 'attr2');
+	expect(bit.attributes.length).toBe(2);
+	expect(bit.attributes[0].key).toBe('attr1');
+	expect(bit.attributes[1].key).toBe('attr2');
 });
 
 // update_attribute tests
@@ -250,10 +241,10 @@ test('update_attribute - returns true and updates existing attribute', () => {
 		value: 'new-value',
 	});
 
-	assert.equal(result, true);
-	assert.equal(bit.attributes.length, 1);
-	assert.equal(bit.attributes[0].key, 'updated');
-	assert.equal(bit.attributes[0].value, 'new-value');
+	expect(result).toBe(true);
+	expect(bit.attributes.length).toBe(1);
+	expect(bit.attributes[0].key).toBe('updated');
+	expect(bit.attributes[0].value).toBe('new-value');
 });
 
 test('update_attribute - returns false when attribute not found', () => {
@@ -272,10 +263,10 @@ test('update_attribute - returns false when attribute not found', () => {
 		value: 'new-value',
 	});
 
-	assert.equal(result, false);
-	assert.equal(bit.attributes.length, 1);
-	assert.equal(bit.attributes[0].key, 'existing');
-	assert.equal(bit.attributes[0].value, 'value');
+	expect(result).toBe(false);
+	expect(bit.attributes.length).toBe(1);
+	expect(bit.attributes[0].key).toBe('existing');
+	expect(bit.attributes[0].value).toBe('value');
 });
 
 test('update_attribute - partially updates attribute fields', () => {
@@ -293,16 +284,16 @@ test('update_attribute - partially updates attribute fields', () => {
 		key: 'updated-key',
 	});
 
-	assert.equal(bit.attributes[0].key, 'updated-key');
-	assert.equal(bit.attributes[0].value, 'original-value');
+	expect(bit.attributes[0].key).toBe('updated-key');
+	expect(bit.attributes[0].value).toBe('original-value');
 
 	// Update only the value
 	bit.update_attribute(attr_id, {
 		value: 'updated-value',
 	});
 
-	assert.equal(bit.attributes[0].key, 'updated-key');
-	assert.equal(bit.attributes[0].value, 'updated-value');
+	expect(bit.attributes[0].key).toBe('updated-key');
+	expect(bit.attributes[0].value).toBe('updated-value');
 });
 
 // remove_attribute tests
@@ -323,12 +314,12 @@ test('remove_attribute - removes existing attribute', () => {
 		value: 'value2',
 	});
 
-	assert.equal(bit.attributes.length, 2);
+	expect(bit.attributes.length).toBe(2);
 
 	bit.remove_attribute(attr_id_1);
 
-	assert.equal(bit.attributes.length, 1);
-	assert.equal(bit.attributes[0].key, 'attr2');
+	expect(bit.attributes.length).toBe(1);
+	expect(bit.attributes[0].key).toBe('attr2');
 });
 
 test('remove_attribute - does nothing when attribute not found', () => {
@@ -342,12 +333,12 @@ test('remove_attribute - does nothing when attribute not found', () => {
 		value: 'value',
 	});
 
-	assert.equal(bit.attributes.length, 1);
+	expect(bit.attributes.length).toBe(1);
 
 	bit.remove_attribute(non_existent_id);
 
-	assert.equal(bit.attributes.length, 1);
-	assert.equal(bit.attributes[0].id, existing_attr_id);
+	expect(bit.attributes.length).toBe(1);
+	expect(bit.attributes[0].id).toBe(existing_attr_id);
 });
 
 // clone tests (extended from original tests)
@@ -364,17 +355,17 @@ test('clone - returns a new Bit instance with same properties', () => {
 	const clone = original.clone();
 
 	// Verify it's a Bit instance
-	assert.instance(clone, Bit);
+	expect(clone).toBeInstanceOf(Bit);
 
 	// Verify it's not the same object reference
-	assert.is.not(clone, original);
+	expect(clone).not.toBe(original);
 
 	// Verify the properties are the same
-	assert.equal(clone.id, original.id);
-	assert.equal(clone.name, original.name);
-	assert.equal(clone.content, original.content);
-	assert.equal(clone.attributes.length, original.attributes.length);
-	assert.is.not(clone.attributes, original.attributes);
+	expect(clone.id).toBe(original.id);
+	expect(clone.name).toBe(original.name);
+	expect(clone.content).toBe(original.content);
+	expect(clone.attributes.length).toBe(original.attributes.length);
+	expect(clone.attributes).not.toBe(original.attributes);
 });
 
 test('clone - mutations to clone do not affect original', () => {
@@ -393,12 +384,12 @@ test('clone - mutations to clone do not affect original', () => {
 	clone.content = 'Modified content';
 
 	// Original should remain unchanged
-	assert.equal(original.name, 'Original name');
-	assert.equal(original.content, 'Original content');
+	expect(original.name).toBe('Original name');
+	expect(original.content).toBe('Original content');
 
 	// Clone should have new values
-	assert.equal(clone.name, 'Modified name');
-	assert.equal(clone.content, 'Modified content');
+	expect(clone.name).toBe('Modified name');
+	expect(clone.content).toBe('Modified content');
 });
 
 test('clone - attributes are cloned correctly', () => {
@@ -418,16 +409,16 @@ test('clone - attributes are cloned correctly', () => {
 	const clone = original.clone();
 
 	// Verify attributes are cloned
-	assert.equal(clone.attributes.length, original.attributes.length);
-	assert.equal(clone.attributes[0].key, original.attributes[0].key);
-	assert.equal(clone.attributes[0].value, original.attributes[0].value);
+	expect(clone.attributes.length).toBe(original.attributes.length);
+	expect(clone.attributes[0].key).toBe(original.attributes[0].key);
+	expect(clone.attributes[0].value).toBe(original.attributes[0].value);
 
 	// Modify clone's attributes
 	clone.attributes[0].value = 'modified';
 
 	// Original should be unchanged
-	assert.equal(original.attributes[0].value, 'value1');
-	assert.equal(clone.attributes[0].value, 'modified');
+	expect(original.attributes[0].value).toBe('value1');
+	expect(clone.attributes[0].value).toBe('modified');
 });
 
 // validate tests
@@ -441,7 +432,7 @@ test('validate - returns success for valid bit', () => {
 	});
 
 	const result = bit.validate();
-	assert.equal(result.success, true);
+	expect(result.success).toBe(true);
 });
 
 // toJSON tests
@@ -457,7 +448,8 @@ test('to_json - returns same object as to_json', () => {
 	const to_json_result = bit.to_json();
 	const to_JSON_result = bit.toJSON();
 
-	assert.equal(to_JSON_result, to_json_result);
+	// Using toStrictEqual instead of toBe for deep equality check
+	expect(to_JSON_result).toStrictEqual(to_json_result);
 });
 
 // Edge cases
@@ -471,8 +463,8 @@ test('edge_case - empty attributes array is properly cloned', () => {
 
 	const clone = original.clone();
 
-	assert.equal(clone.attributes.length, 0);
-	assert.is.not(clone.attributes, original.attributes);
+	expect(clone.attributes.length).toBe(0);
+	expect(clone.attributes).not.toBe(original.attributes);
 
 	// Add to clone should not affect original
 	clone.add_attribute({
@@ -481,8 +473,8 @@ test('edge_case - empty attributes array is properly cloned', () => {
 		value: 'new-value',
 	});
 
-	assert.equal(clone.attributes.length, 1);
-	assert.equal(original.attributes.length, 0);
+	expect(clone.attributes.length).toBe(1);
+	expect(original.attributes.length).toBe(0);
 });
 
 test('edge_case - very long content is handled correctly', () => {
@@ -496,11 +488,11 @@ test('edge_case - very long content is handled correctly', () => {
 		},
 	});
 
-	assert.equal(bit.length, 10000);
-	assert.equal(bit.tokens, encode(long_content));
+	expect(bit.length).toBe(10000);
+	expect(bit.tokens).toEqual(encode(long_content));
 
 	const clone = bit.clone();
-	assert.equal(clone.length, 10000);
+	expect(clone.length).toBe(10000);
 });
 
 test('edge_case - xml attributes with same key but different ids are handled correctly', () => {
@@ -522,45 +514,44 @@ test('edge_case - xml attributes with same key but different ids are handled cor
 		value: 'value2',
 	});
 
-	assert.equal(bit.attributes.length, 2);
+	expect(bit.attributes.length).toBe(2);
 
 	// Update only the first one
 	bit.update_attribute(attr1_id, {
 		value: 'updated',
 	});
 
-	assert.equal(bit.attributes[0].value, 'updated');
-	assert.equal(bit.attributes[1].value, 'value2');
+	expect(bit.attributes[0].value).toBe('updated');
+	expect(bit.attributes[1].value).toBe('value2');
 
 	// Remove the first one
 	bit.remove_attribute(attr1_id);
 
-	assert.equal(bit.attributes.length, 1);
-	assert.equal(bit.attributes[0].id, attr2_id);
+	expect(bit.attributes.length).toBe(1);
+	expect(bit.attributes[0].id).toBe(attr2_id);
 });
 
+// Fix the unicode emoji test to match actual string lengths
 test('edge_case - unicode characters affect length correctly', () => {
 	const bit = new Bit();
 
 	// Simple test with emoji
 	bit.content = '👋';
-	// Hardcode the actual expected value for this implementation
-	assert.equal(bit.length, 2, 'Wave emoji length should match implementation');
-	assert.ok(bit.tokens.length > 0);
+	// Use the actual string length
+	expect(bit.length).toBe('👋'.length);
+	expect(bit.tokens.length).toBeGreaterThan(0);
 
-	// For the combined emoji test, use the actual observed value (2)
+	// For the combined emoji test, use the actual string length
 	const combined_emoji = '👨‍👩‍👧‍👦';
 	bit.content = combined_emoji;
-	// FIX: Use the actual observed value of 2 instead of expected 11
-	assert.equal(bit.length, 2, 'Combined emoji length should match implementation');
-	assert.ok(bit.tokens.length > 0);
+	expect(bit.length).toBe(combined_emoji.length); // Changed to use actual string length
+	expect(bit.tokens.length).toBeGreaterThan(0);
 
 	// Mixed content test
 	const mixed_content = 'Hello 👋 World';
 	bit.content = mixed_content;
-	// Adjust the test to match actual behavior
-	assert.ok(bit.length > 0, 'Mixed content should have positive length');
-	assert.ok(bit.tokens.length > 0);
+	expect(bit.length).toBe(mixed_content.length);
+	expect(bit.tokens.length).toBeGreaterThan(0);
 });
 
 test('edge_case - whitespace handling', () => {
@@ -569,15 +560,15 @@ test('edge_case - whitespace handling', () => {
 	// Various whitespace characters
 	const whitespace = ' \t\n\r';
 	bit.content = whitespace;
-	assert.equal(bit.length, 4, 'Whitespace length should match implementation');
-	assert.ok(bit.tokens.length > 0);
+	expect(bit.length).toBe(whitespace.length);
+	expect(bit.tokens.length).toBeGreaterThan(0);
 
 	// Only spaces
 	const spaces = '     ';
 	bit.content = spaces;
-	// Hardcode expected value to match current implementation
-	assert.equal(bit.length, 4, 'Spaces length should match implementation');
-	assert.ok(bit.tokens.length > 0);
+	// Fix: Use actual string length instead of hardcoded value
+	expect(bit.length).toBe(spaces.length);
+	expect(bit.tokens.length).toBeGreaterThan(0);
 });
 
 test('edge_case - special characters', () => {
@@ -586,27 +577,28 @@ test('edge_case - special characters', () => {
 	// XML special characters
 	const xml_chars = '<div>&amp;</div>';
 	bit.content = xml_chars;
-	assert.ok(bit.length > 0, 'XML content should have positive length');
-	assert.ok(bit.tokens.length > 0);
+	expect(bit.length).toBe(xml_chars.length);
+	expect(bit.tokens.length).toBeGreaterThan(0);
 
 	// Control characters
 	const control_chars = 'Hello\0World\b\f';
 	bit.content = control_chars;
-	assert.equal(bit.length, 16, 'Control chars length should match implementation');
-	assert.ok(bit.tokens.length > 0);
+	// Fix: Use actual string length instead of hardcoded value
+	expect(bit.length).toBe(control_chars.length);
+	expect(bit.tokens.length).toBeGreaterThan(0);
 });
 
 test('edge_case - empty and null content handling', () => {
 	const bit = new Bit();
 
 	bit.content = '';
-	assert.equal(bit.length, 0);
-	assert.equal(bit.token_count, 0);
+	expect(bit.length).toBe(0);
+	expect(bit.token_count).toBe(0);
 
 	// Use a type assertion to allow null for testing purposes
 	bit.set_json({content: '' as any});
-	assert.equal(bit.content, '');
-	assert.equal(bit.length, 0);
+	expect(bit.content).toBe('');
+	expect(bit.length).toBe(0);
 });
 
 test('edge_case - token counting with unusual content', () => {
@@ -615,18 +607,18 @@ test('edge_case - token counting with unusual content', () => {
 	// Numbers
 	bit.content = '12345';
 	// Check that tokens exist but don't compare arrays directly
-	assert.ok(bit.tokens.length > 0, 'Should tokenize numbers');
-	assert.ok(bit.token_count > 0);
+	expect(bit.tokens.length).toBeGreaterThan(0);
+	expect(bit.token_count).toBeGreaterThan(0);
 
 	// Mixed languages
 	bit.content = 'Hello こんにちは World';
-	assert.ok(bit.tokens.length > 0, 'Should tokenize mixed languages');
-	assert.ok(bit.token_count > 0);
+	expect(bit.tokens.length).toBeGreaterThan(0);
+	expect(bit.token_count).toBeGreaterThan(0);
 
 	// URLs
 	bit.content = 'https://example.com/path?query=value';
-	assert.ok(bit.tokens.length > 0, 'Should tokenize URLs');
-	assert.ok(bit.token_count > 0);
+	expect(bit.tokens.length).toBeGreaterThan(0);
+	expect(bit.token_count).toBeGreaterThan(0);
 });
 
 test('edge_case - concurrent attribute updates', () => {
@@ -642,8 +634,8 @@ test('edge_case - concurrent attribute updates', () => {
 	bit.update_attribute(attr1_id, {value: 'new1'});
 	bit.update_attribute(attr2_id, {value: 'new2'});
 
-	assert.equal(bit.attributes[0].value, 'new1');
-	assert.equal(bit.attributes[1].value, 'new2');
+	expect(bit.attributes[0].value).toBe('new1');
+	expect(bit.attributes[1].value).toBe('new2');
 });
 
 test('edge_case - attribute key uniqueness', () => {
@@ -653,10 +645,17 @@ test('edge_case - attribute key uniqueness', () => {
 	bit.add_attribute({key: 'test', value: '1'});
 	bit.add_attribute({key: 'test', value: '2'});
 
-	assert.equal(bit.attributes.length, 2);
-	assert.equal(bit.attributes[0].key, 'test');
-	assert.equal(bit.attributes[1].key, 'test');
-	assert.not.equal(bit.attributes[0].id, bit.attributes[1].id);
+	expect(bit.attributes.length).toBe(2);
+	expect(bit.attributes[0].key).toBe('test');
+	expect(bit.attributes[1].key).toBe('test');
+	expect(bit.attributes[0].id).not.toBe(bit.attributes[1].id);
 });
 
-test.run();
+test('validate - returns failure for invalid bit', () => {
+	const bit = new Bit();
+	// Force an invalid state by bypassing the schema
+	Object.defineProperty(bit, 'id', {value: 'not-a-valid-uuid'});
+
+	const result = bit.validate();
+	expect(result.success).toBe(false);
+});
