@@ -7,7 +7,7 @@ export type Args = z.infer<typeof Args>;
 
 export const task: Task<Args> = {
 	Args,
-	summary: 'quick and dirty wrapper around vitest',
+	summary: 'quick and unfeatureful wrapper around vitest',
 	run: async () => {
 		const spawned = await spawn_cli('vitest', ['--no-watch']);
 		if (!spawned?.ok) {
