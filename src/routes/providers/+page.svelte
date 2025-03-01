@@ -1,5 +1,4 @@
 <script lang="ts">
-	import {providers_default} from '$lib/config.js';
 	import Provider_Link from '$lib/Provider_Link.svelte';
 	import Model_Link from '$lib/Model_Link.svelte';
 	import Text_Icon from '$lib/Text_Icon.svelte';
@@ -15,7 +14,7 @@
 <div class="p_lg">
 	<h1><Text_Icon icon={GLYPH_PROVIDER} /> providers</h1>
 	<div class="providers_grid">
-		{#each providers_default as provider (provider)}
+		{#each zzz.providers.items as provider (provider)}
 			<div class="panel p_lg">
 				<div class="size_xl mb_lg">
 					<Provider_Link {provider} icon="svg" />

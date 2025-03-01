@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type {SvelteHTMLElements} from 'svelte/elements';
-	import {providers_default} from '$lib/config.js';
 	import Model_Link from '$lib/Model_Link.svelte';
 	import Provider_Link from '$lib/Provider_Link.svelte';
 	import type {Model} from '$lib/model.svelte.js';
@@ -12,7 +11,7 @@
 	}
 
 	const {model, attrs = {}}: Props = $props();
-	const provider = $derived(providers_default.find((p) => p.name === model.provider_name)!);
+	const provider = $derived(model.zzz.providers.find_by_name(model.provider_name));
 </script>
 
 <div {...attrs} class="panel p_lg {attrs.class}">

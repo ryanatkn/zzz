@@ -50,6 +50,10 @@ a.chip {
 	font-weight: 700;
 }
 
+.color_c_5 {
+	color: var(--color_c_5);
+}
+
 /* like `.box` but uncentered */
 .column {
 	display: flex;

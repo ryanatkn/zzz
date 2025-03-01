@@ -10,40 +10,66 @@
 	import Provider_Logo from '$lib/Provider_Logo.svelte';
 
 	interface Props {
-		provider: Provider_Json; // TODO BLOCK Provider, not Provider_Json?
+		provider: Provider_Json | null | undefined; // TODO BLOCK Provider, not Provider_Json?
 		icon?: 'glyph' | 'svg' | Snippet<[provider: Provider_Json, glyph: string]>;
 		icon_props?: Record<string, any>;
 		row?: boolean;
 		show_name?: boolean;
 		attrs?: SvelteHTMLElements['a'];
+		fallback_attrs?: SvelteHTMLElements['span'];
+		fallback?: Snippet;
 		children?: Snippet;
 	}
 
-	const {provider, icon, icon_props = {}, show_name, attrs, children}: Props = $props();
+	const {
+		provider,
+		icon,
+		icon_props = {},
+		show_name,
+		attrs,
+		fallback_attrs,
+		fallback,
+		children,
+	}: Props = $props();
 
-	if (DEV && icon && children) console.error('icon and children are mutually exclusive');
+	if (DEV && icon && children) {
+		console.error('icon and children are mutually exclusive');
+	}
+	if (DEV && fallback && fallback_attrs) {
+		console.error('fallback and fallback_attrs are mutually exclusive');
+	}
 
-	const selected = $derived(page.url.pathname === `${base}/providers/${provider.name}`);
+	const selected = $derived(
+		!!provider && page.url.pathname === `${base}/providers/${provider.name}`,
+	);
 </script>
 
-<a {...attrs} href="{base}/providers/{provider.name}" class:selected
-	>{#if children}
-		{@render children()}
-	{:else}
-		{#if icon === 'glyph'}
-			<span class="glyph">{GLYPH_PROVIDER}</span>
-		{:else if icon === 'svg'}
-			<Provider_Logo name={provider.name} {...icon_props} />
-		{:else if icon}
-			{@render icon(provider, GLYPH_PROVIDER)}
-		{/if}
-		{#if show_name}
-			{provider.name}
+{#if provider}
+	<a {...attrs} href="{base}/providers/{provider.name}" class:selected
+		>{#if children}
+			{@render children()}
 		{:else}
-			{provider.title}
-		{/if}
-	{/if}</a
->
+			{#if icon === 'glyph'}
+				<span class="glyph">{GLYPH_PROVIDER}</span>
+			{:else if icon === 'svg'}
+				<Provider_Logo name={provider.name} {...icon_props} />
+			{:else if icon}
+				{@render icon(provider, GLYPH_PROVIDER)}
+			{/if}
+			{#if show_name}
+				{provider.name}
+			{:else}
+				{provider.title}
+			{/if}
+		{/if}</a
+	>
+{:else if fallback}
+	{@render fallback()}
+{:else}
+	<small {...fallback_attrs} class="font_mono color_c_5 {fallback_attrs?.class}"
+		>{GLYPH_PROVIDER} missing provider</small
+	>
+{/if}
 
 <style>
 	a {

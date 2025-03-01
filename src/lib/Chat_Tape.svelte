@@ -9,7 +9,6 @@
 	import Chat_Message from '$lib/Chat_Message.svelte';
 	import Model_Link from '$lib/Model_Link.svelte';
 	import Provider_Link from '$lib/Provider_Link.svelte';
-	import {providers_default} from '$lib/config.js';
 	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
 	import Bit_Stats from '$lib/Bit_Stats.svelte';
 	import Pending_Button from '@ryanatkn/fuz/Pending_Button.svelte';
@@ -51,7 +50,7 @@
 			</div>
 			<small
 				><Provider_Link
-					provider={providers_default.find((p) => p.name === tape.model.provider_name)!}
+					provider={tape.zzz.providers.find_by_name(tape.model.provider_name)}
 					icon="glyph"
 					show_name
 				/></small

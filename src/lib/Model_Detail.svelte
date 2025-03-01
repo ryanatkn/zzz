@@ -3,11 +3,11 @@
 	import {page} from '$app/state';
 	import type {SvelteHTMLElements} from 'svelte/elements';
 
-	import {providers_default} from '$lib/config.js';
 	import Model_Link from '$lib/Model_Link.svelte';
 	import Provider_Link from '$lib/Provider_Link.svelte';
 	import type {Model} from '$lib/model.svelte.js';
 	import {GLYPH_MODEL} from '$lib/constants.js';
+	import {zzz_context} from '$lib/zzz.svelte.js';
 
 	interface Props {
 		model: Model;
@@ -16,10 +16,12 @@
 
 	const {model, attrs}: Props = $props();
 
+	const zzz = zzz_context.get();
+
 	// TODO BLOCK link the providers below to a page per provider (lookup from provider_default/context)
 
 	const at_detail_page = $derived(page.url.pathname === `${base}/models/${model.name}`);
-	const provider = $derived(providers_default.find((p) => p.name === model.provider_name)!);
+	const provider = $derived(zzz.providers.find_by_name(model.provider_name));
 </script>
 
 <div {...attrs} class={['panel', 'pixelated', 'p_lg', attrs?.class]}>

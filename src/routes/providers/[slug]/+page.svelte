@@ -2,10 +2,12 @@
 	import Alert from '@ryanatkn/fuz/Alert.svelte';
 	import {page} from '$app/state';
 
-	import {providers_default} from '$lib/config.js';
 	import Provider_Detail from '$lib/Provider_Detail.svelte';
+	import {zzz_context} from '$lib/zzz.svelte.js';
 
-	const provider = $derived(providers_default.find((p) => p.name === page.params.slug));
+	const zzz = zzz_context.get();
+
+	const provider = $derived(zzz.providers.find_by_name(page.params.slug));
 </script>
 
 <div class="p_sm">
