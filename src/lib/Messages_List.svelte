@@ -3,8 +3,6 @@
 	import Text_Icon from '$lib/Text_Icon.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import type {Message} from '$lib/message.svelte.js';
-	import type {Send_Prompt_Message, Receive_Prompt_Message} from '$lib/message.svelte.js';
-	import {to_completion_response_text} from '$lib/completion.js';
 	import {get_icon_for_message_type, get_direction_icon} from '$lib/glyphs.js';
 
 	interface Props {
@@ -23,31 +21,6 @@
 
 	const handle_select = (message: Message): void => {
 		onselect?.(message);
-	};
-
-	// Helper functions for type safety
-	const get_prompt_preview = (message: Message): string => {
-		if (message.type !== 'send_prompt') return 'Not a prompt message';
-
-		const send_message = message.data as Send_Prompt_Message;
-		const prompt = send_message.completion_request?.prompt;
-		if (!prompt) return 'No prompt';
-
-		return prompt.length > 50 ? prompt.substring(0, 50) + '...' : prompt;
-	};
-
-	const get_completion_preview = (message: Message): string => {
-		if (message.type !== 'completion_response') return 'Not a completion message';
-
-		const receive_message = message.data as Receive_Prompt_Message;
-		const completion_text = to_completion_response_text(receive_message.completion_response);
-		if (!completion_text) return 'No completion';
-
-		return completion_text.length > 50 ? completion_text.substring(0, 50) + '...' : completion_text;
-	};
-
-	const format_timestamp = (date: Date): string => {
-		return date.toLocaleTimeString();
 	};
 
 	// TODO BLOCK use component/class for the list (they'll be Nav_Links yeah?)
@@ -74,18 +47,17 @@
 						<Text_Icon icon={get_icon_for_message_type(message.type)} />
 						<Text_Icon icon={get_direction_icon(message.direction)} />
 						<span class="message-type font_mono">{message.type}</span>
-						<span class="message-time font_mono size_sm">{format_timestamp(message.timestamp)}</span
-						>
+						<span class="message-time font_mono size_sm">{message.created_formatted_time}</span>
 					</div>
 
 					{#if selected && message.data}
 						<div class="message-preview mt_xs">
-							{#if message.type === 'send_prompt'}
+							{#if message.is_prompt}
 								<small class="message-preview-label">Prompt:</small>
-								<pre class="message-preview-content">{get_prompt_preview(message)}</pre>
-							{:else if message.type === 'completion_response'}
+								<pre class="message-preview-content">{message.prompt_preview}</pre>
+							{:else if message.is_completion}
 								<small class="message-preview-label">Response:</small>
-								<pre class="message-preview-content">{get_completion_preview(message)}</pre>
+								<pre class="message-preview-content">{message.completion_preview}</pre>
 							{/if}
 						</div>
 					{/if}

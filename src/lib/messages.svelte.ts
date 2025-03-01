@@ -62,7 +62,7 @@ export class Messages {
 			type: base_message.type as any, // Type assertion needed
 			direction,
 			data,
-			created_at: new Date().toISOString(),
+			created: new Date().toISOString(),
 		};
 		const message = new Message({zzz: this.zzz, json});
 		this.items.unshift(message); // Add at the beginning for newest first
