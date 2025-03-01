@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Messages_List from '$lib/Messages_List.svelte';
 	import Text_Icon from '$lib/Text_Icon.svelte';
+	import {GLYPH_MESSAGE} from '$lib/glyphs.js';
 	import type {Message} from '$lib/message.svelte.js';
 
 	let selected_message: Message | null = $state(null);
@@ -11,7 +12,7 @@
 </script>
 
 <div class="messages-page p_lg">
-	<h1><Text_Icon icon="📨" /> messages</h1>
+	<h1><Text_Icon icon={GLYPH_MESSAGE} /> messages</h1>
 	<p>System messages between client and server.</p>
 
 	<div class="messages-container mt_md">
@@ -32,7 +33,7 @@
 						{:else if selected_message.type === 'completion_response'}
 							<Text_Icon icon="💬" /> Response
 						{:else}
-							<Text_Icon icon="📨" /> {selected_message.type}
+							<Text_Icon icon={GLYPH_MESSAGE} /> {selected_message.type}
 						{/if}
 					</h2>
 					<div class="message-meta">

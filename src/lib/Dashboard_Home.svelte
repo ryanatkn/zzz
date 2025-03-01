@@ -3,6 +3,7 @@
 	import Messages_List from '$lib/Messages_List.svelte';
 	import Text_Icon from '$lib/Text_Icon.svelte';
 	import Provider_Link from '$lib/Provider_Link.svelte';
+	import {GLYPH_MESSAGE} from '$lib/glyphs.js';
 
 	const zzz = zzz_context.get();
 </script>
@@ -13,7 +14,7 @@
 
 	<div class="sections mt_lg">
 		<section class="panel p_md">
-			<h2><Text_Icon icon="📨" /> Recent Messages</h2>
+			<h2><Text_Icon icon={GLYPH_MESSAGE} /> Recent Messages</h2>
 			<Messages_List limit={5} class_name="mt_sm" />
 			<div class="mt_md text_align_center">
 				<a href="/messages">View All Messages</a>
