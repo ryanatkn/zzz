@@ -18,7 +18,6 @@ export const Bit_Json = z
 		content: z.string().default(''),
 	})
 	.default({});
-
 export type Bit_Json = z.infer<typeof Bit_Json>;
 
 export interface Bit_Options {
