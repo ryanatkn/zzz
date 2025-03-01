@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type {Xml_Attribute} from '$lib/prompt.svelte.js';
 	import {GLYPH_REMOVE} from '$lib/constants.js';
+	import Confirm_Button from '$lib/Confirm_Button.svelte';
 
 	interface Props {
 		attribute: Xml_Attribute;
@@ -30,5 +31,10 @@
 		value={attribute.value}
 		oninput={(e) => onupdate({value: e.currentTarget.value})}
 	/>
-	<button type="button" class="plain compact" onclick={onremove}>{GLYPH_REMOVE}</button>
+	<Confirm_Button
+		onclick={onremove}
+		attrs={{title: `remove attribute ${attribute.key || ''}`, class: 'plain compact'}}
+	>
+		{GLYPH_REMOVE}
+	</Confirm_Button>
 </div>
