@@ -22,6 +22,7 @@
 		onselect?.(message);
 	};
 
+	// TODO BLOCK extract to glyphs.ts
 	const getIconForMessageType = (type: string): string => {
 		switch (type) {
 			case 'echo':
