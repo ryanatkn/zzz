@@ -23,7 +23,6 @@ test('constructor - creates with default values when no options provided', () =>
 	expect(bit.content).toBe('');
 	expect(bit.length).toBe(0);
 	expect(bit.token_count).toBe(0);
-	console.log(`bit.json`, bit.json);
 });
 
 // from_json tests

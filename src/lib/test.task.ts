@@ -10,10 +10,6 @@ export const task: Task<Args> = {
 	summary: 'quick and dirty wrapper around vitest',
 	run: async () => {
 		const spawned = await spawn_cli('vitest', ['--no-watch']);
-		const stdout = spawned?.child.stdout;
-		const stderr = spawned?.child.stderr;
-		if (stdout) console.log(`stdout`, stdout);
-		if (stderr) console.error(`stderr`, stderr);
 		if (!spawned?.ok) {
 			throw Error(`vitest failed with exit code ${spawned?.code}`);
 		}

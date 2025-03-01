@@ -1,10 +1,11 @@
 // @vitest-environment jsdom
 
 import {test, expect, vi} from 'vitest';
+
 import {Reorderable, type Reorderable_Item_Id} from '$lib/reorderable.svelte.js';
 
 // Mock helper function for DOM testing
-function create_elements() {
+const create_elements = () => {
 	// Create container
 	const container = document.createElement('div');
 
@@ -22,14 +23,14 @@ function create_elements() {
 	}
 
 	return {container, list, items};
-}
+};
 
 // Mock DragEvent for testing
-function create_mock_drag_event(
+const create_mock_drag_event = (
 	type: string,
 	target?: HTMLElement,
 	data_transfer?: object,
-): DragEvent {
+): DragEvent => {
 	const event = new Event(type, {bubbles: true}) as DragEvent;
 
 	// Add target
@@ -55,7 +56,7 @@ function create_mock_drag_event(
 	}
 
 	return event;
-}
+};
 
 // Constructor tests
 test('constructor - creates with default values', () => {
