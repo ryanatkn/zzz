@@ -53,19 +53,6 @@ export class Bit extends Serializable<z.output<typeof Bit_Json>, typeof Bit_Json
 		return new Bit({json});
 	}
 
-	// TODO BLOCK add a default impl that introspects the Zod schema
-	to_json(): Bit_Json {
-		return {
-			id: this.id,
-			name: this.name,
-			has_xml_tag: this.has_xml_tag,
-			xml_tag_name: this.xml_tag_name,
-			attributes: $state.snapshot(this.attributes),
-			enabled: this.enabled,
-			content: this.content,
-		};
-	}
-
 	add_attribute(partial?: z.input<typeof Xml_Attribute>): void {
 		this.attributes.push(Xml_Attribute.parse(partial));
 	}
