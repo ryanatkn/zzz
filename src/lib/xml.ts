@@ -32,9 +32,7 @@ export type Xml_Attribute_Base = z.infer<typeof Xml_Attribute_Base>;
 // Default attribute applies defaults and includes id with default
 export const Xml_Attribute = z
 	.object({
-		// Use Uuid_Base instead of Uuid to require an explicit ID when the object is created
-		// This ensures the field must be present in the input object
-		id: Uuid_Base,
+		id: Uuid,
 		key: Xml_Attribute_Key,
 		value: Xml_Attribute_Value,
 	})

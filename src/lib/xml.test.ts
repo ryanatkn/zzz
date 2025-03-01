@@ -114,14 +114,21 @@ test('Xml_Attribute - applies defaults for key and value when missing', () => {
 	}
 });
 
-test('Xml_Attribute - rejects objects with missing id', () => {
+test('Xml_Attribute - accepts objects with missing id and auto-generates it', () => {
 	const invalid_attribute = {
 		key: 'class',
 		value: 'btn btn-primary',
 	};
 
 	const result = Xml_Attribute.safeParse(invalid_attribute);
-	expect(result.success).toBe(false);
+	expect(result.success).toBe(true);
+	if (result.success) {
+		expect(result.data.id).toMatch(
+			/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
+		);
+		expect(result.data.key).toBe('class');
+		expect(result.data.value).toBe('btn btn-primary');
+	}
 });
 
 test('Xml_Attribute - rejects objects with invalid id', () => {
@@ -244,7 +251,7 @@ test('Xml_Attribute - validation performance is reasonable', () => {
 });
 
 // Let's add a new test to clarify the behavior
-test('Xml_Attribute with Uuid_Base - requires id to be present but allows undefined', () => {
+test('Xml_Attribute with Uuid - allows id to be undefined and auto-generates it', () => {
 	// undefined value is different from missing property
 	// Properties must exist but can be undefined (which would trigger default)
 	const obj_with_undefined_id = {
@@ -254,6 +261,29 @@ test('Xml_Attribute with Uuid_Base - requires id to be present but allows undefi
 	};
 
 	const result = Xml_Attribute.safeParse(obj_with_undefined_id);
-	// This should fail because we now use Uuid_Base which has no default
-	expect(result.success).toBe(false);
+	// This should now succeed because we use Uuid which has a default
+	expect(result.success).toBe(true);
+	if (result.success) {
+		expect(result.data.id).toMatch(
+			/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
+		);
+	}
+});
+
+// Add a new test to verify omitted id behavior
+test('Xml_Attribute - auto-generates id when property is omitted', () => {
+	const partial_attribute = {
+		key: 'style',
+		value: 'color: red',
+	};
+
+	const result = Xml_Attribute.safeParse(partial_attribute);
+	expect(result.success).toBe(true);
+	if (result.success) {
+		expect(result.data.id).toMatch(
+			/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/,
+		);
+		expect(result.data.key).toBe('style');
+		expect(result.data.value).toBe('color: red');
+	}
 });
