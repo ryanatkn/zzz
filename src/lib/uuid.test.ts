@@ -31,8 +31,6 @@ test('Uuid - rejects invalid UUID strings', () => {
 
 	for (const value of invalid_values) {
 		const result = Uuid.safeParse(value);
-		console.log(`value`, value);
-		console.log(`result`, result);
 		expect(result.success).toBe(false);
 	}
 });
