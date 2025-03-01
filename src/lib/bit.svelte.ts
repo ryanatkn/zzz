@@ -63,7 +63,7 @@ export class Bit extends Serializable<z.output<typeof Bit_Json>, typeof Bit_Json
 	update_attribute(id: Uuid, updates: Partial<Omit<Xml_Attribute, 'id'>>): boolean {
 		const attribute = this.attributes.find((a) => a.id === id);
 		if (!attribute) return false;
-		Object.assign(attribute, updates); // TODO BLOCK parse? can zod do this?
+		Object.assign(attribute, updates); // TODO BLOCK parse? can zod do this? guard against undefineds?
 		return true;
 	}
 
