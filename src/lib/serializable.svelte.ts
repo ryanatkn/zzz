@@ -39,7 +39,8 @@ export abstract class Serializable<T_Json, T_Schema extends z.ZodType> {
 	}
 
 	/**
-	 * Type check helper - does nothing at runtime but enforces static interface compliance
+	 * Type check helper - does nothing at runtime
+	 * but enforces static interface compliance with `Serializable_Constructor`
 	 */
 	protected static check_subclass<
 		T_Class extends Serializable<T_Json, T_Schema>,

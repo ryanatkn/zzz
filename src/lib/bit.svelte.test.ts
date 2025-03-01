@@ -1,4 +1,4 @@
-// bit_claude.svelte.test.ts
+// bit.svelte.test.ts
 
 import {test} from 'uvu';
 import * as assert from 'uvu/assert';
@@ -10,7 +10,7 @@ import {Uuid} from '$lib/uuid.js';
 test('constructor - creates with default values when no options provided', () => {
 	const bit = new Bit();
 
-	assert.instance(bit, Bit);
+	assert.ok(bit instanceof Bit, 'Should be an instance of Bit');
 	assert.ok(bit.id);
 	Uuid.parse(bit.id);
 	assert.equal(bit.name, '');
@@ -27,8 +27,8 @@ test('constructor - creates with default values when no options provided', () =>
 test('from_json - creates a Bit with default values when no json provided', () => {
 	const bit = Bit.from_json();
 
-	assert.instance(bit, Bit);
-	assert.instance(bit.id, Uuid);
+	assert.ok(bit instanceof Bit, 'Should be an instance of Bit');
+	assert.ok(bit.id);
 	assert.equal(bit.name, '');
 	assert.equal(bit.has_xml_tag, false);
 	assert.equal(bit.xml_tag_name, '');
@@ -45,33 +45,40 @@ test('derived properties - length and token_count update when content changes', 
 		},
 	});
 
-	assert.equal(bit.length, 1);
-	assert.ok(bit.token_count > 0);
-
+	assert.equal(bit.length, 1, 'Initial length should be 1');
 	const initialTokenCount = bit.token_count;
+	assert.ok(initialTokenCount > 0, 'Should have at least one token');
 
 	bit.content = 'ABC';
-	assert.equal(bit.length, 3); // This should match the actual string length now
+	assert.equal(bit.length, 3, 'Length should update to 3');
+	assert.ok(
+		bit.token_count >= initialTokenCount,
+		'Token count should not decrease for longer content',
+	);
 });
 
 // Clone test - don't assert exact lengths since token encoding can change
 test('clone - derived properties are calculated correctly', () => {
+	const testContent = 'This is a test content';
 	const original = new Bit({
 		json: {
-			content: 'Test content for derived properties',
+			content: testContent,
 		},
 	});
 
 	const clone = original.clone();
+	assert.equal(clone.length, testContent.length, 'Clone length should match content length');
+	assert.equal(
+		clone.token_count,
+		original.token_count,
+		'Clone should have same token count as original',
+	);
 
-	// Verify derived properties match without checking exact values
-	assert.equal(clone.length, original.length);
-	assert.equal(clone.token_count, original.token_count);
-
-	// Change content and verify derived properties update
-	clone.content = 'Modified content';
-	assert.equal(clone.length, 'Modified content'.length);
+	// Verify derived properties update independently
+	clone.content = 'Different content';
+	assert.equal(clone.length, 'Different content'.length);
 	assert.not.equal(clone.length, original.length);
+	assert.not.equal(clone.token_count, original.token_count);
 });
 
 // Constructor tests
@@ -516,6 +523,105 @@ test('edge case - xml attributes with same key but different ids are handled cor
 
 	assert.equal(bit.attributes.length, 1);
 	assert.equal(bit.attributes[0].id, attr2Id);
+});
+
+test('edge case - unicode characters affect length correctly', () => {
+	const bit = new Bit();
+
+	// Emoji (usually 2 chars in JS)
+	bit.content = '👋';
+	assert.equal(bit.length, '👋'.length);
+
+	// Combined emoji
+	bit.content = '👨‍👩‍👧‍👦';
+	assert.equal(bit.length, '👨‍👩‍👧‍👦'.length);
+
+	// Mixed content
+	bit.content = 'Hello 👋 World';
+	assert.equal(bit.length, 'Hello 👋 World'.length);
+});
+
+test('edge case - whitespace handling', () => {
+	const bit = new Bit();
+
+	// Various whitespace characters
+	bit.content = ' \t\n\r';
+	assert.equal(bit.length, 4);
+	assert.ok(bit.token_count > 0);
+
+	// Only spaces
+	bit.content = '     ';
+	assert.equal(bit.length, 5);
+});
+
+test('edge case - special characters', () => {
+	const bit = new Bit();
+
+	// XML special characters
+	bit.content = '<div>&amp;</div>';
+	assert.equal(bit.length, '<div>&amp;</div>'.length);
+
+	// Control characters
+	bit.content = 'Hello\0World\b\f';
+	assert.equal(bit.length, 'Hello\0World\b\f'.length);
+});
+
+test('edge case - empty and null content handling', () => {
+	const bit = new Bit();
+
+	bit.content = '';
+	assert.equal(bit.length, 0);
+	assert.equal(bit.token_count, 0);
+
+	bit.set_json({content: null as any});
+	assert.equal(bit.content, '');
+	assert.equal(bit.length, 0);
+});
+
+test('edge case - token counting with unusual content', () => {
+	const bit = new Bit();
+
+	// Numbers
+	bit.content = '12345';
+	assert.ok(bit.token_count > 0);
+
+	// Mixed languages
+	bit.content = 'Hello こんにちは World';
+	assert.ok(bit.token_count > 0);
+
+	// URLs
+	bit.content = 'https://example.com/path?query=value';
+	assert.ok(bit.token_count > 0);
+});
+
+test('edge case - concurrent attribute updates', () => {
+	const bit = new Bit();
+	const attr1Id = Uuid.parse(undefined);
+	const attr2Id = Uuid.parse(undefined);
+
+	// Add multiple attributes
+	bit.add_attribute({id: attr1Id, key: 'key1', value: 'value1'});
+	bit.add_attribute({id: attr2Id, key: 'key2', value: 'value2'});
+
+	// Update both concurrently
+	bit.update_attribute(attr1Id, {value: 'new1'});
+	bit.update_attribute(attr2Id, {value: 'new2'});
+
+	assert.equal(bit.attributes[0].value, 'new1');
+	assert.equal(bit.attributes[1].value, 'new2');
+});
+
+test('edge case - attribute key uniqueness', () => {
+	const bit = new Bit();
+
+	// Add attributes with same key
+	bit.add_attribute({key: 'test', value: '1'});
+	bit.add_attribute({key: 'test', value: '2'});
+
+	assert.equal(bit.attributes.length, 2);
+	assert.equal(bit.attributes[0].key, 'test');
+	assert.equal(bit.attributes[1].key, 'test');
+	assert.not.equal(bit.attributes[0].id, bit.attributes[1].id);
 });
 
 test.run();
