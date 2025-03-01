@@ -2,32 +2,26 @@
 
 import type {z} from 'zod';
 
-export interface Serializable_Options<T_Json> {
-	json?: Partial<T_Json>;
-}
-
 /**
- * Interface to describe the expected static methods on Serializable classes
+ * Describes the expected static methods on Serializable classes
  */
 export interface Serializable_Constructor<T extends Serializable<any, any>, J = any> {
-	new (options?: Serializable_Options<J>): T;
+	new (schema: z.ZodTypeAny): T;
 	create_default: () => T;
 	from_json: (json: Partial<J>) => T;
 }
 
+// TODO maybe rename to `Json_Serializable`?
 export abstract class Serializable<T_Json, T_Schema extends z.ZodType> {
-	json: T_Json = $derived.by(() => this.to_json());
-	json_serialized: string = $derived(JSON.stringify(this.json));
+	readonly schema: T_Schema;
 
-	protected abstract schema: T_Schema;
+	readonly json: T_Json = $derived.by(() => this.to_json());
+	readonly json_serialized: string = $derived(JSON.stringify(this.json));
 
-	constructor(options?: Serializable_Options<T_Json>) {
-		if (options?.json) {
-			this.set_json(options.json);
-		}
+	constructor(schema: T_Schema) {
+		this.schema = schema;
 	}
 
-	// Core serialization methods
 	abstract to_json(): T_Json;
 	abstract set_json(value: z.input<T_Schema>): void;
 
@@ -40,7 +34,8 @@ export abstract class Serializable<T_Json, T_Schema extends z.ZodType> {
 	}
 
 	clone(): this {
-		const clone = new (this.constructor as new () => this)();
+		// Pass the schema as first argument when creating a new instance
+		const clone = new (this.constructor as any)(this.schema);
 		clone.set_json(this.to_json() as z.input<T_Schema>);
 		return clone;
 	}

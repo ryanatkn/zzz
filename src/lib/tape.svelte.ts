@@ -7,7 +7,7 @@ export class Tape {
 	readonly model: Model;
 	messages: Array<Chat_Message> = $state([]);
 
-	constructor(model: Model, id: Uuid = Uuid.parse(null)) {
+	constructor(model: Model, id: Uuid = Uuid.parse(undefined)) {
 		this.id = id;
 		this.model = model;
 	}

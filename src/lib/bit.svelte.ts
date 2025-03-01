@@ -4,7 +4,7 @@ import {encode} from 'gpt-tokenizer';
 import {z} from 'zod';
 
 import type {Xml_Attribute} from '$lib/prompt.svelte.js';
-import {Serializable} from '$lib/serializable.svelte.js';
+import {Serializable, type Serializable_Options} from '$lib/serializable.svelte.js';
 import {Uuid} from '$lib/uuid.js';
 
 export const Bit_Attribute = z.object({
@@ -27,10 +27,7 @@ export type Bit_Json = z.infer<typeof Bit_Json>;
 export type Bit_Json_Input = z.input<typeof Bit_Json>; // TODO BLOCK use these
 export type Bit_Json_Output = z.output<typeof Bit_Json>; // TODO BLOCK use these
 
-// Correctly extend Serializable with proper type parameters
 export class Bit extends Serializable<Bit_Json_Output, typeof Bit_Json> {
-	protected schema = Bit_Json;
-
 	id: Uuid = $state()!;
 	name: string = $state()!;
 	has_xml_tag: boolean = $state()!;
@@ -39,49 +36,52 @@ export class Bit extends Serializable<Bit_Json_Output, typeof Bit_Json> {
 	enabled: boolean = $state()!;
 	content: string = $state()!;
 
-	// Derived properties
 	length: number = $derived(this.content.length);
 	tokens: Array<number> = $derived(encode(this.content));
 	token_count: number = $derived(this.tokens.length);
 
-	// Constructor is inherited from parent class, no need to override
+	constructor(options?: Serializable_Options<Bit_Json_Output>) {
+		super(Bit_Json);
 
-	// JSON serialization and deserialization
+		if (options?.json) {
+			this.set_json(options.json);
+		}
+	}
+
+	static create_default(): Bit {
+		return new Bit();
+	}
+
+	static from_json(json: Partial<Bit_Json>): Bit {
+		return new Bit({json});
+	}
+
 	to_json(): Bit_Json {
 		return this.schema.parse({
 			id: this.id,
 			name: this.name,
 			has_xml_tag: this.has_xml_tag,
 			xml_tag_name: this.xml_tag_name,
-			attributes: this.attributes.map((attr) => ({...attr, id: attr.id})),
+			attributes: $state.snapshot(this.attributes),
 			enabled: this.enabled,
 			content: this.content,
 		});
 	}
 
 	set_json(value: z.input<typeof Bit_Json>): void {
-		// Parse through schema to ensure defaults and validation
-		const parsed = this.schema.partial().parse(value);
+		const parsed = this.schema.parse(value);
 
-		if (parsed.id !== undefined && this.id && parsed.id !== this.id) {
-			console.warn('Cannot change id after initialization');
-		} else if (parsed.id !== undefined) {
-			this.id = parsed.id;
-		}
-
-		if (parsed.name !== undefined) this.name = parsed.name;
-		if (parsed.has_xml_tag !== undefined) this.has_xml_tag = parsed.has_xml_tag;
-		if (parsed.xml_tag_name !== undefined) this.xml_tag_name = parsed.xml_tag_name;
-		if (parsed.enabled !== undefined) this.enabled = parsed.enabled;
-		if (parsed.content !== undefined) this.content = parsed.content;
-
-		if (parsed.attributes !== undefined) {
-			this.attributes = parsed.attributes.map((attr) => ({
-				id: attr.id,
-				key: attr.key,
-				value: attr.value,
-			}));
-		}
+		this.id = parsed.id;
+		this.name = parsed.name;
+		this.has_xml_tag = parsed.has_xml_tag;
+		this.xml_tag_name = parsed.xml_tag_name;
+		this.attributes = parsed.attributes.map((attr) => ({
+			id: attr.id,
+			key: attr.key,
+			value: attr.value,
+		}));
+		this.enabled = parsed.enabled;
+		this.content = parsed.content;
 	}
 
 	// Attribute management methods
@@ -122,14 +122,5 @@ export class Bit extends Serializable<Bit_Json_Output, typeof Bit_Json> {
 		if (index !== -1) {
 			this.attributes.splice(index, 1);
 		}
-	}
-
-	// Static factory methods
-	static create_default(): Bit {
-		return new Bit();
-	}
-
-	static from_json(json: Partial<Bit_Json>): Bit {
-		return new Bit({json});
 	}
 }

@@ -68,7 +68,8 @@
     "esm-env": "^1.2.2",
     "gpt-tokenizer": "^2.8.1",
     "hono": "^4.7.2",
-    "openai": "^4.85.4"
+    "openai": "^4.85.4",
+    "zod": "^3.24.2"
   },
   "prettier": {
     "plugins": [
@@ -283,10 +284,6 @@
       "types": "./dist/helpers.d.ts",
       "default": "./dist/helpers.js"
     },
-    "./id.js": {
-      "types": "./dist/id.d.ts",
-      "default": "./dist/id.js"
-    },
     "./list_helpers.js": {
       "types": "./dist/list_helpers.d.ts",
       "default": "./dist/list_helpers.js"
@@ -435,6 +432,10 @@
       "types": "./dist/scrollable.svelte.d.ts",
       "default": "./dist/scrollable.svelte.js"
     },
+    "./serializable.svelte.js": {
+      "types": "./dist/serializable.svelte.d.ts",
+      "default": "./dist/serializable.svelte.js"
+    },
     "./server/.env.example": {
       "default": "./dist/server/.env.example"
     },
@@ -463,6 +464,10 @@
       "types": "./dist/Text_Icon.svelte.d.ts",
       "svelte": "./dist/Text_Icon.svelte",
       "default": "./dist/Text_Icon.svelte"
+    },
+    "./uuid.js": {
+      "types": "./dist/uuid.d.ts",
+      "default": "./dist/uuid.js"
     },
     "./Xml_Attribute.svelte": {
       "types": "./dist/Xml_Attribute.svelte.d.ts",

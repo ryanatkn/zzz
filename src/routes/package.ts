@@ -65,6 +65,7 @@ export const package_json = {
 		'gpt-tokenizer': '^2.8.1',
 		hono: '^4.7.2',
 		openai: '^4.85.4',
+		zod: '^3.24.2',
 	},
 	prettier: {
 		plugins: ['prettier-plugin-svelte'],
@@ -239,7 +240,6 @@ export const package_json = {
 		'./file.svelte.js': {types: './dist/file.svelte.d.ts', default: './dist/file.svelte.js'},
 		'./files.svelte.js': {types: './dist/files.svelte.d.ts', default: './dist/files.svelte.js'},
 		'./helpers.js': {types: './dist/helpers.d.ts', default: './dist/helpers.js'},
-		'./id.js': {types: './dist/id.d.ts', default: './dist/id.js'},
 		'./list_helpers.js': {types: './dist/list_helpers.d.ts', default: './dist/list_helpers.js'},
 		'./Main_Dialog.svelte': {
 			types: './dist/Main_Dialog.svelte.d.ts',
@@ -370,6 +370,10 @@ export const package_json = {
 			types: './dist/scrollable.svelte.d.ts',
 			default: './dist/scrollable.svelte.js',
 		},
+		'./serializable.svelte.js': {
+			types: './dist/serializable.svelte.d.ts',
+			default: './dist/serializable.svelte.js',
+		},
 		'./server/.env.example': {default: './dist/server/.env.example'},
 		'./server/helpers.js': {
 			types: './dist/server/helpers.d.ts',
@@ -391,6 +395,7 @@ export const package_json = {
 			svelte: './dist/Text_Icon.svelte',
 			default: './dist/Text_Icon.svelte',
 		},
+		'./uuid.js': {types: './dist/uuid.d.ts', default: './dist/uuid.js'},
 		'./Xml_Attribute.svelte': {
 			types: './dist/Xml_Attribute.svelte.d.ts',
 			svelte: './dist/Xml_Attribute.svelte',
@@ -426,7 +431,16 @@ export const src_json = {
 		'./Bit_Stats.svelte': {path: 'Bit_Stats.svelte', declarations: []},
 		'./Bit_Summary.svelte': {path: 'Bit_Summary.svelte', declarations: []},
 		'./Bit_View.svelte': {path: 'Bit_View.svelte', declarations: []},
-		'./bit.svelte.js': {path: 'bit.svelte.ts', declarations: [{name: 'Bit', kind: 'class'}]},
+		'./bit.svelte.js': {
+			path: 'bit.svelte.ts',
+			declarations: [
+				{name: 'Bit_Attribute', kind: 'variable'},
+				{name: 'Bit_Json', kind: 'variable'},
+				{name: 'Bit_Json_Input', kind: 'type'},
+				{name: 'Bit_Json_Output', kind: 'type'},
+				{name: 'Bit', kind: 'class'},
+			],
+		},
 		'./Chat_Item.svelte': {path: 'Chat_Item.svelte', declarations: []},
 		'./Chat_Message.svelte': {path: 'Chat_Message.svelte', declarations: []},
 		'./Chat_Tape.svelte': {path: 'Chat_Tape.svelte', declarations: []},
@@ -530,13 +544,6 @@ export const src_json = {
 		'./helpers.js': {
 			path: 'helpers.ts',
 			declarations: [{name: 'get_unique_name', kind: 'function'}],
-		},
-		'./id.js': {
-			path: 'id.ts',
-			declarations: [
-				{name: 'Id', kind: 'type'},
-				{name: 'random_id', kind: 'function'},
-			],
 		},
 		'./list_helpers.js': {
 			path: 'list_helpers.ts',
@@ -657,6 +664,14 @@ export const src_json = {
 				{name: 'Scrollable', kind: 'class'},
 			],
 		},
+		'./serializable.svelte.js': {
+			path: 'serializable.svelte.ts',
+			declarations: [
+				{name: 'Serializable_Options', kind: 'type'},
+				{name: 'Serializable_Constructor', kind: 'type'},
+				{name: 'Serializable', kind: 'class'},
+			],
+		},
 		'./server/.env.example': {path: 'server/.env.example', declarations: []},
 		'./server/helpers.js': {
 			path: 'server/helpers.ts',
@@ -676,6 +691,13 @@ export const src_json = {
 		'./Settings.svelte': {path: 'Settings.svelte', declarations: []},
 		'./tape.svelte.js': {path: 'tape.svelte.ts', declarations: [{name: 'Tape', kind: 'class'}]},
 		'./Text_Icon.svelte': {path: 'Text_Icon.svelte', declarations: []},
+		'./uuid.js': {
+			path: 'uuid.ts',
+			declarations: [
+				{name: 'Uuid', kind: 'variable'},
+				{name: 'Uuid_Input', kind: 'type'},
+			],
+		},
 		'./Xml_Attribute.svelte': {path: 'Xml_Attribute.svelte', declarations: []},
 		'./Xml_Tag_Controls.svelte': {path: 'Xml_Tag_Controls.svelte', declarations: []},
 		'./zzz_client.js': {

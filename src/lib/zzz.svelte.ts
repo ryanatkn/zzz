@@ -108,7 +108,7 @@ export class Zzz {
 		provider_name: Provider_Name,
 		model: string,
 	): Promise<Receive_Prompt_Message> {
-		const request_id = Uuid.parse(null);
+		const request_id = Uuid.parse(undefined);
 		const message: Send_Prompt_Message = {
 			id: request_id,
 			type: 'send_prompt',
@@ -147,7 +147,7 @@ export class Zzz {
 	readonly echo_elapsed: SvelteMap<Uuid, number> = new SvelteMap();
 
 	send_echo(data: unknown): void {
-		const id = Uuid.parse(null);
+		const id = Uuid.parse(undefined);
 		const message: Echo_Message = {id, type: 'echo', data};
 		this.client.send(message);
 		this.echo_start_times.set(id, Date.now());

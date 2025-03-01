@@ -125,7 +125,7 @@
 	$inspect('providers', zzz.providers);
 
 	// zzz.send({type: 'echo', data: 'echo from client'});
-	zzz.client.send({id: Uuid.parse(null), type: 'load_session'});
+	zzz.client.send({id: Uuid.parse(undefined), type: 'load_session'});
 </script>
 
 <svelte:head>

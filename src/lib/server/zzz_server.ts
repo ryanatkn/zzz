@@ -90,7 +90,7 @@ export class Zzz_Server {
 				case 'delete': {
 					if (source_file.id.includes('.css'))
 						console.log(`source_file`, source_file.id, source_file.contents?.length);
-					this.#send({id: Uuid.parse(null), type: 'filer_change', change, source_file});
+					this.#send({id: Uuid.parse(undefined), type: 'filer_change', change, source_file});
 					break;
 				}
 				default:
@@ -121,7 +121,7 @@ export class Zzz_Server {
 				return message;
 			}
 			case 'load_session': {
-				return {id: Uuid.parse(null), type: 'loaded_session', data: {files: this.filer.files}};
+				return {id: Uuid.parse(undefined), type: 'loaded_session', data: {files: this.filer.files}};
 			}
 			case 'send_prompt': {
 				const {prompt, provider_name, model} = message.completion_request;
@@ -158,7 +158,7 @@ export class Zzz_Server {
 						});
 						console.log(`ollama api_response`, api_response);
 						response = {
-							id: Uuid.parse(null),
+							id: Uuid.parse(undefined),
 							type: 'completion_response',
 							completion_response: {
 								created: new Date().toISOString(),
@@ -187,7 +187,7 @@ export class Zzz_Server {
 						});
 						console.log(`claude api_response`, api_response);
 						response = {
-							id: Uuid.parse(null),
+							id: Uuid.parse(undefined),
 							type: 'completion_response',
 							completion_response: {
 								created: new Date().toISOString(),
@@ -224,7 +224,7 @@ export class Zzz_Server {
 						});
 						console.log(`openai api_response`, api_response);
 						response = {
-							id: Uuid.parse(null),
+							id: Uuid.parse(undefined),
 							type: 'completion_response',
 							completion_response: {
 								created: new Date().toISOString(),
@@ -258,7 +258,7 @@ export class Zzz_Server {
 						const api_response = await google_model.generateContent(prompt);
 						console.log(`gemini api_response`, api_response);
 						response = {
-							id: Uuid.parse(null),
+							id: Uuid.parse(undefined),
 							type: 'completion_response',
 							completion_response: {
 								created: new Date().toISOString(),

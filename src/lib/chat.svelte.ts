@@ -25,7 +25,7 @@ export interface Chat_Message {
 
 export class Chat {
 	// TODO json/serializable pattern
-	id: Uuid = Uuid.parse(null);
+	id: Uuid = Uuid.parse(undefined);
 	name: string = $state()!;
 	created: string = new Date().toISOString();
 	tapes: Array<Tape> = $state([]);
@@ -91,7 +91,7 @@ export class Chat {
 		const tape = this.tapes.find((s) => s.id === tape_id);
 		if (!tape) return;
 
-		const message_id = Uuid.parse(null);
+		const message_id = Uuid.parse(undefined);
 		const message: Chat_Message = {
 			id: message_id,
 			// TODO add `chat_id`?

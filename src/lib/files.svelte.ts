@@ -23,7 +23,7 @@ export class Files {
 			return;
 		}
 
-		this.zzz.client.send({id: Uuid.parse(null), type: 'update_file', file_id, contents});
+		this.zzz.client.send({id: Uuid.parse(undefined), type: 'update_file', file_id, contents});
 	}
 
 	delete(file_id: Path_Id): void {
@@ -33,7 +33,7 @@ export class Files {
 			return;
 		}
 
-		this.zzz.client.send({id: Uuid.parse(null), type: 'delete_file', file_id});
+		this.zzz.client.send({id: Uuid.parse(undefined), type: 'delete_file', file_id});
 	}
 
 	handle_change(message: Filer_Change_Message): void {

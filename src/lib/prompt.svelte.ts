@@ -17,7 +17,7 @@ export interface Prompt_Message {
 export type Prompt_Message_Content = string; // TODO ?
 
 export class Prompt {
-	readonly id: Uuid = Uuid.parse(null);
+	readonly id: Uuid = Uuid.parse(undefined);
 	name: string = $state('');
 	created: string = new Date().toISOString();
 	bits: Array<Bit> = $state([]);
@@ -108,6 +108,7 @@ export const join_prompt_bits = (bits: Array<Bit>): string =>
 		.filter((c) => !!c)
 		.join('\n\n');
 
+// TODO extract?
 export interface Xml_Attribute {
 	id: Uuid;
 	key: string;
