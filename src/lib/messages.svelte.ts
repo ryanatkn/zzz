@@ -8,22 +8,31 @@ import {Message} from '$lib/message.svelte.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 import {Uuid} from '$lib/uuid.js';
 
-export interface Messages_Options {
-	zzz: Zzz;
-	send: (message: Client_Message) => void;
-	receive: (message: Server_Message) => void;
-}
-
 export class Messages {
 	readonly zzz: Zzz;
 
 	items: Array<Message> = $state([]);
 
-	#send_handler: ((message: Client_Message) => void) | undefined;
-	#receive_handler: ((message: Server_Message) => void) | undefined;
+	#send_handler: (message: Client_Message) => void;
+	#receive_handler: (message: Server_Message) => void;
 
 	constructor(zzz: Zzz) {
 		this.zzz = zzz;
+
+		// Default no-op handlers that log errors with instructions
+		this.#send_handler = (message) => {
+			console.error(
+				'[messages.send] No send handler registered. Set handlers with zzz.messages.set_handlers().',
+				message,
+			);
+		};
+
+		this.#receive_handler = (message) => {
+			console.error(
+				'[messages.receive] No receive handler registered. Set handlers with zzz.messages.set_handlers().',
+				message,
+			);
+		};
 	}
 
 	set_handlers(
@@ -36,21 +45,13 @@ export class Messages {
 
 	send(message: Client_Message): void {
 		console.log(`[messages.send] message`, message.id, message.type);
-		if (this.#send_handler) {
-			this.#send_handler(message);
-		} else {
-			console.error('[messages.send] No send handler registered');
-		}
+		this.#send_handler(message);
 		this.add_message(message, 'client');
 	}
 
 	receive(message: Server_Message): void {
 		console.log(`[messages.receive] message`, message.id, message.type);
-		if (this.#receive_handler) {
-			this.#receive_handler(message);
-		} else {
-			console.error('[messages.receive] No receive handler registered');
-		}
+		this.#receive_handler(message);
 		this.add_message(message, 'server');
 	}
 
@@ -58,7 +59,7 @@ export class Messages {
 		const base_message = data as {id: Uuid; type: string};
 		const json: Message_Json = {
 			id: base_message.id,
-			type: base_message.type as any, // Type coercion needed here
+			type: base_message.type as any, // Type assertion needed
 			direction,
 			data,
 			created_at: new Date().toISOString(),

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type {Zzz_Message} from '$lib/zzz_message.js';
+	import type {Zzz_Message} from '$lib/message.svelte.js';
 
 	interface Props {
 		message: Zzz_Message;

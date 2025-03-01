@@ -1,9 +1,6 @@
 <script lang="ts">
 	import Messages_List from '$lib/Messages_List.svelte';
 	import Text_Icon from '$lib/Text_Icon.svelte';
-	import {zzz_context} from '$lib/zzz.svelte.js';
-
-	const zzz = zzz_context.get();
 </script>
 
 <div class="p_lg">

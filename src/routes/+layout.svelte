@@ -19,7 +19,6 @@
 	import Zzz_Root from '$lib/Zzz_Root.svelte';
 	import {pkg_context} from '$routes/pkg.js';
 	import {package_json, src_json} from '$routes/package.js';
-	import {Zzz_Client} from '$lib/zzz_client.js';
 	import {Uuid} from '$lib/uuid.js';
 	import {zzz_config} from '$lib/zzz_config.js';
 
@@ -29,82 +28,78 @@
 
 	const {children}: Props = $props();
 
-	// TODO load `project.json` in production to populate files
-
 	pkg_context.set(parse_package_meta(package_json, src_json));
 
 	let ws: WebSocket | undefined;
 	let ws_connecting: Deferred<void> | undefined;
 
 	// gives app-wide support for Zzz
-	const zzz = new Zzz({
-		client: new Zzz_Client({
-			send: async (message) => {
-				if (!browser) return;
-				if (!ws) {
-					console.log('[page] creating ws');
-					// TODO extract helper with reconnect logic (and message buffering and what else? rate limiting?)
-					// TODO proxy through normal port? I failed to try to configure with Vite
-					ws = new WebSocket(`ws://${PUBLIC_SERVER_HOSTNAME}:${PUBLIC_SERVER_PORT}/ws`);
-					console.log('[page] ws', ws);
-					ws.addEventListener('open', () => {
-						console.log('[page] ws.onopen');
-						ws_connecting?.resolve();
-					});
-					ws.addEventListener('close', () => {
-						console.log('[page] ws.onclose');
-					});
-					ws.addEventListener('message', (e) => {
-						// last_receive_time = Date.now();
-						// handle_message(e);
-						const data = devalue.parse(e.data);
-						console.log('[page] ws.onmessage', message);
-						// TODO parse
-						if (data.type === 'gro_server_message') {
-							zzz.client.receive(data.message);
-						} else {
-							console.error('unknown message', data);
-						}
-					});
-					ws_connecting = create_deferred<void>();
-				}
-				await ws_connecting?.promise;
-				console.log('[page] sending zzz_client_message', message);
-				ws.send(JSON.stringify({type: 'gro_server_message', message}));
-			},
-			receive: (message) => {
-				console.log(`message`, message);
-				// TODO where does this mutation code live?
-				switch (message.type) {
-					case 'loaded_session': {
-						console.log(`[page] loaded_session`, message);
-						for (const source_file of message.data.files.values()) {
-							zzz.files.by_id.set(source_file.id, source_file);
-						}
-						break;
-					}
-					case 'completion_response': {
-						zzz.receive_completion_response(message);
-						break;
-					}
-					case 'filer_change': {
-						zzz.files.handle_change(message);
-						break;
-					}
-					case 'echo': {
-						zzz.receive_echo(message);
-						break;
-					}
-					default:
-						throw new Unreachable_Error(message);
-				}
-			},
-		}),
-	});
-	if (browser) (window as any).zzz = zzz; // no types for this, just for runtime convenience
+	const zzz = new Zzz();
 
-	// Add providers and models
+	// Add providers and models from config
 	zzz.add_providers(zzz_config.providers);
+	zzz.add_models(zzz_config.models);
+
+	zzz.messages.set_handlers(
+		// Message sending handler
+		async (message) => {
+			if (!browser) return;
+			if (!ws) {
+				console.log('[page] creating ws');
+				ws = new WebSocket(`ws://${PUBLIC_SERVER_HOSTNAME}:${PUBLIC_SERVER_PORT}/ws`);
+				console.log('[page] ws', ws);
+				ws.addEventListener('open', () => {
+					console.log('[page] ws.onopen');
+					ws_connecting?.resolve();
+				});
+				ws.addEventListener('close', () => {
+					console.log('[page] ws.onclose');
+				});
+				ws.addEventListener('message', (e) => {
+					const data = devalue.parse(e.data);
+					console.log('[page] ws.onmessage', data);
+					if (data.type === 'gro_server_message') {
+						zzz.messages.receive(data.message);
+					} else {
+						console.error('unknown message', data);
+					}
+				});
+				ws_connecting = create_deferred<void>();
+			}
+			await ws_connecting?.promise;
+			console.log('[page] sending message', message);
+			ws.send(JSON.stringify({type: 'gro_server_message', message}));
+		},
+		// Message receiving handler
+		(message) => {
+			console.log(`[page] received message`, message);
+			switch (message.type) {
+				case 'loaded_session': {
+					console.log(`[page] loaded_session`, message);
+					for (const source_file of message.data.files.values()) {
+						zzz.files.by_id.set(source_file.id, source_file);
+					}
+					break;
+				}
+				case 'completion_response': {
+					zzz.receive_completion_response(message);
+					break;
+				}
+				case 'filer_change': {
+					zzz.files.handle_change(message);
+					break;
+				}
+				case 'echo': {
+					zzz.receive_echo(message);
+					break;
+				}
+				default:
+					throw new Unreachable_Error(message);
+			}
+		},
+	);
+
+	if (browser) (window as any).zzz = zzz; // no types for this, just for runtime convenience
 
 	// TODO BLOCK refactor with capabilities
 	onMount(async () => {
@@ -124,8 +119,8 @@
 
 	$inspect('providers', zzz.providers);
 
-	// zzz.send({type: 'echo', data: 'echo from client'});
-	zzz.client.send({id: Uuid.parse(undefined), type: 'load_session'});
+	// Initialize the session
+	zzz.messages.send({id: Uuid.parse(undefined), type: 'load_session'});
 </script>
 
 <svelte:head>

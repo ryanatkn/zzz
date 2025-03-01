@@ -6,7 +6,6 @@ import type {Uuid} from '$lib/uuid.js';
 import type {Completion_Request, Completion_Response} from '$lib/completion.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 
-// Legacy type definitions kept for backward compatibility
 export type Zzz_Message = Client_Message | Server_Message;
 
 export type Client_Message =

@@ -13,12 +13,7 @@
 	const zzz = zzz_context.get();
 	const messages = $derived(zzz.messages);
 
-	$derived.by(() => {
-		limited_messages = messages.items.slice(0, limit);
-		return limited_messages;
-	});
-
-	let limited_messages: Array<Message> = [];
+	const limited_messages: Array<Message> = $derived(messages.items.slice(0, limit));
 
 	const formatTimestamp = (date: Date): string => {
 		return date.toLocaleTimeString();

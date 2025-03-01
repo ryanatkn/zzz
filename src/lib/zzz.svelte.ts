@@ -3,14 +3,17 @@ import {SvelteMap} from 'svelte/reactivity';
 import {create_deferred, type Deferred} from '@ryanatkn/belt/async.js';
 
 import {Zzz_Data, type Zzz_Data_Json} from '$lib/zzz_data.svelte.js';
-import type {Zzz_Client} from '$lib/zzz_client.js';
-import type {Echo_Message, Receive_Prompt_Message, Send_Prompt_Message} from '$lib/zzz_message.js';
+import type {
+	Echo_Message,
+	Receive_Prompt_Message,
+	Send_Prompt_Message,
+} from '$lib/message.svelte.js';
 import {Provider, type Provider_Json, type Provider_Name} from '$lib/provider.svelte.js';
 import {Uuid} from '$lib/uuid.js';
 import {Completion_Threads, type Completion_Threads_Json} from '$lib/completion_thread.svelte.js';
 import {ollama_list_with_metadata} from '$lib/ollama.js';
-import {zzz_config} from '$lib/zzz_config.js';
 import {Models} from '$lib/models.svelte.js';
+import type {Model_Json} from '$lib/model.svelte.js';
 import {Chats} from '$lib/chats.svelte.js';
 import {Providers} from '$lib/providers.svelte.js';
 import {Prompts} from '$lib/prompts.svelte.js';
@@ -24,6 +27,8 @@ export interface Zzz_Options {
 	receive?: (message: any) => void;
 	completion_threads?: Completion_Threads;
 	data?: Zzz_Data;
+	models?: Array<Model_Json>;
+	providers?: Array<Provider_Json>;
 }
 
 export interface Zzz_Json {
@@ -36,9 +41,9 @@ export interface Zzz_Json {
  * Gettable with `zzz_context.get()` inside a `<Zzz_Root>`.
  */
 export class Zzz {
-	data: Zzz_Data = $state()!; // TODO stable ref or state?
+	data: Zzz_Data = $state()!;
 
-	readonly messages: Messages;
+	readonly messages = new Messages(this);
 	readonly models = new Models(this);
 	readonly chats = new Chats(this);
 	readonly providers = new Providers(this);
@@ -52,15 +57,10 @@ export class Zzz {
 
 	// TODO could track this more formally, and add time tracking
 	pending_prompts: SvelteMap<Uuid, Deferred<Receive_Prompt_Message>> = new SvelteMap();
-	// TODO generically track req/res pairs
-	// completion_requests: SvelteMap<Id, {request: Send_Prompt_Message; response: Receive_Prompt_Message}> =
-	// 	new SvelteMap();
 
-	completion_threads: Completion_Threads = $state()!; // TODO should this be an option?
+	completion_threads: Completion_Threads = $state()!;
 
-	capability_ollama: undefined | null | boolean = $state(); // TODO probably rethink - `null` means pending, `undefined` means uninitialized/not yet checked
-
-	// TODO store state granularly for each provider
+	capability_ollama: undefined | null | boolean = $state();
 
 	constructor(options: Zzz_Options = {}) {
 		// Setup message handlers if provided
@@ -70,8 +70,16 @@ export class Zzz {
 
 		this.completion_threads = options.completion_threads ?? new Completion_Threads({zzz: this});
 		this.data = options.data ?? new Zzz_Data();
-		// TODO move this? options? same with models below?
-		this.add_providers(zzz_config.providers);
+
+		// Add providers if provided in options
+		if (options.providers?.length) {
+			this.add_providers(options.providers);
+		}
+
+		// Add models if provided in options
+		if (options.models?.length) {
+			this.add_models(options.models);
+		}
 	}
 
 	toJSON(): Zzz_Json {
@@ -98,14 +106,14 @@ export class Zzz {
 		this.capability_ollama = true;
 		this.models.add_ollama_models(ollama_models_response.model_infos);
 
-		// Add non-ollama models
-		// TODO maybe instead of `zzz_config.models` make an option, but set that as the default
-		for (const model of zzz_config.models) {
-			if (model.provider_name === 'ollama') continue;
-			this.models.add(model);
-		}
-
 		this.inited_models = true;
+	}
+
+	add_models(models_json: Array<Model_Json>): void {
+		for (const model_json of models_json) {
+			if (model_json.provider_name === 'ollama') continue; // TODO Skip ollama models added dynamically for now, but refactor this so it doesn't have a special case
+			this.models.add(model_json);
+		}
 	}
 
 	async send_prompt(

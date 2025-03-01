@@ -1,7 +1,7 @@
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface Zzz_Data_Json {}
 
-// TODO rename to `Ui_State` or `Ui` or something?
+// TODO BLOCK rename to `Ui_State` or `Ui` or something? also make Serializable
 export class Zzz_Data {
 	show_main_dialog = $state(false);
 

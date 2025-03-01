@@ -3,7 +3,7 @@ import type {Source_File} from '@ryanatkn/gro/filer.js';
 import type {Path_Id} from '@ryanatkn/gro/path.js';
 import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 
-import type {Filer_Change_Message} from '$lib/zzz_message.js';
+import type {Filer_Change_Message} from '$lib/message.svelte.js';
 import {Uuid} from '$lib/uuid.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 
@@ -23,7 +23,7 @@ export class Files {
 			return;
 		}
 
-		this.zzz.client.send({id: Uuid.parse(undefined), type: 'update_file', file_id, contents});
+		this.zzz.messages.send({id: Uuid.parse(undefined), type: 'update_file', file_id, contents});
 	}
 
 	delete(file_id: Path_Id): void {
@@ -33,7 +33,7 @@ export class Files {
 			return;
 		}
 
-		this.zzz.client.send({id: Uuid.parse(undefined), type: 'delete_file', file_id});
+		this.zzz.messages.send({id: Uuid.parse(undefined), type: 'delete_file', file_id});
 	}
 
 	handle_change(message: Filer_Change_Message): void {

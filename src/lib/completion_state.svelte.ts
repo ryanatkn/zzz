@@ -1,6 +1,6 @@
 // TODO BLOCK
 
-// import type {Receive_Prompt_Message, Send_Prompt_Message} from '$lib/zzz_message.js';
+// import type {Receive_Prompt_Message, Send_Prompt_Message} from '$lib/message.svelte.js';
 
 // export interface Completion_State_Json {
 // 	completion_request: Send_Prompt_Message;

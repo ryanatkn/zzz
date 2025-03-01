@@ -218,6 +218,11 @@
       "svelte": "./dist/Dashboard_Files.svelte",
       "default": "./dist/Dashboard_Files.svelte"
     },
+    "./Dashboard_Home.svelte": {
+      "types": "./dist/Dashboard_Home.svelte.d.ts",
+      "svelte": "./dist/Dashboard_Home.svelte",
+      "default": "./dist/Dashboard_Home.svelte"
+    },
     "./Dashboard_Prompts.svelte": {
       "types": "./dist/Dashboard_Prompts.svelte.d.ts",
       "svelte": "./dist/Dashboard_Prompts.svelte",
@@ -308,6 +313,19 @@
       "types": "./dist/Message_View.svelte.d.ts",
       "svelte": "./dist/Message_View.svelte",
       "default": "./dist/Message_View.svelte"
+    },
+    "./message.svelte.js": {
+      "types": "./dist/message.svelte.d.ts",
+      "default": "./dist/message.svelte.js"
+    },
+    "./Messages_List.svelte": {
+      "types": "./dist/Messages_List.svelte.d.ts",
+      "svelte": "./dist/Messages_List.svelte",
+      "default": "./dist/Messages_List.svelte"
+    },
+    "./messages.svelte.js": {
+      "types": "./dist/messages.svelte.d.ts",
+      "default": "./dist/messages.svelte.js"
     },
     "./Model_Detail.svelte": {
       "types": "./dist/Model_Detail.svelte.d.ts",
@@ -492,10 +510,6 @@
       "types": "./dist/zod_helpers.d.ts",
       "default": "./dist/zod_helpers.js"
     },
-    "./zzz_client.js": {
-      "types": "./dist/zzz_client.d.ts",
-      "default": "./dist/zzz_client.js"
-    },
     "./zzz_config.js": {
       "types": "./dist/zzz_config.d.ts",
       "default": "./dist/zzz_config.js"
@@ -503,10 +517,6 @@
     "./zzz_data.svelte.js": {
       "types": "./dist/zzz_data.svelte.d.ts",
       "default": "./dist/zzz_data.svelte.js"
-    },
-    "./zzz_message.js": {
-      "types": "./dist/zzz_message.d.ts",
-      "default": "./dist/zzz_message.js"
     },
     "./Zzz_Root.svelte": {
       "types": "./dist/Zzz_Root.svelte.d.ts",
