@@ -488,6 +488,10 @@
       "types": "./dist/xml.d.ts",
       "default": "./dist/xml.js"
     },
+    "./zod_helpers.js": {
+      "types": "./dist/zod_helpers.d.ts",
+      "default": "./dist/zod_helpers.js"
+    },
     "./zzz_client.js": {
       "types": "./dist/zzz_client.d.ts",
       "default": "./dist/zzz_client.js"

@@ -409,6 +409,7 @@ export const package_json = {
 			default: './dist/Xml_Tag_Controls.svelte',
 		},
 		'./xml.js': {types: './dist/xml.d.ts', default: './dist/xml.js'},
+		'./zod_helpers.js': {types: './dist/zod_helpers.d.ts', default: './dist/zod_helpers.js'},
 		'./zzz_client.js': {types: './dist/zzz_client.d.ts', default: './dist/zzz_client.js'},
 		'./zzz_config.js': {types: './dist/zzz_config.d.ts', default: './dist/zzz_config.js'},
 		'./zzz_data.svelte.js': {
@@ -697,10 +698,30 @@ export const src_json = {
 			],
 		},
 		'./Text_Icon.svelte': {path: 'Text_Icon.svelte', declarations: []},
-		'./uuid.js': {path: 'uuid.ts', declarations: [{name: 'Uuid', kind: 'variable'}]},
+		'./uuid.js': {
+			path: 'uuid.ts',
+			declarations: [
+				{name: 'Uuid_Base', kind: 'variable'},
+				{name: 'Uuid', kind: 'variable'},
+			],
+		},
 		'./Xml_Attribute_Input.svelte': {path: 'Xml_Attribute_Input.svelte', declarations: []},
 		'./Xml_Tag_Controls.svelte': {path: 'Xml_Tag_Controls.svelte', declarations: []},
-		'./xml.js': {path: 'xml.ts', declarations: [{name: 'Xml_Attribute', kind: 'variable'}]},
+		'./xml.js': {
+			path: 'xml.ts',
+			declarations: [
+				{name: 'Xml_Attribute_Key_Base', kind: 'variable'},
+				{name: 'Xml_Attribute_Key', kind: 'variable'},
+				{name: 'Xml_Attribute_Value_Base', kind: 'variable'},
+				{name: 'Xml_Attribute_Value', kind: 'variable'},
+				{name: 'Xml_Attribute_Base', kind: 'variable'},
+				{name: 'Xml_Attribute', kind: 'variable'},
+			],
+		},
+		'./zod_helpers.js': {
+			path: 'zod_helpers.ts',
+			declarations: [{name: 'zod_get_schema_keys', kind: 'function'}],
+		},
 		'./zzz_client.js': {
 			path: 'zzz_client.ts',
 			declarations: [

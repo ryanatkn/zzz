@@ -16,6 +16,7 @@
 
 	const {provider, completion_thread, item}: Props = $props();
 
+	// TODO BLOCK currently unused
 	$inspect('Chat_Item item', item);
 </script>
 
