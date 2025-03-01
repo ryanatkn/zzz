@@ -621,13 +621,14 @@ export const src_json = {
 				{name: 'get_drop_position', kind: 'function'},
 				{name: 'calculate_target_index', kind: 'function'},
 				{name: 'is_reorder_allowed', kind: 'function'},
-				{name: 'update_styles_excluding_direction', kind: 'function'},
 				{name: 'validate_target_index', kind: 'function'},
 			],
 		},
 		'./reorderable.svelte.js': {
 			path: 'reorderable.svelte.ts',
 			declarations: [
+				{name: 'Reorderable_Id', kind: 'type'},
+				{name: 'Reorderable_Item_Id', kind: 'type'},
 				{name: 'Reorderable_Direction', kind: 'type'},
 				{name: 'Reorderable_Drop_Position', kind: 'type'},
 				{name: 'Reorderable_Valid_Drop_Position', kind: 'type'},

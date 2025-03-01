@@ -80,24 +80,6 @@ export const is_reorder_allowed = (
 ): boolean => !can_reorder || can_reorder(source_index, target_index);
 
 /**
- * Update styling configuration without changing direction
- */
-export const update_styles_excluding_direction = (
-	target: Record<string, any>,
-	styles: Reorderable_Style_Config_Partial,
-): void => {
-	for (const key in styles) {
-		// Skip 'direction' which isn't a style
-		if (key === 'direction') continue;
-
-		const value = styles[key as keyof Reorderable_Style_Config_Partial];
-		if (value !== undefined) {
-			target[key] = value;
-		}
-	}
-};
-
-/**
  * Validate and adjust a target index to ensure it's within bounds
  */
 export const validate_target_index = (target_index: number, max_index: number): number => {

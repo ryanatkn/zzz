@@ -10,7 +10,7 @@
 	const {prompt}: Props = $props();
 
 	const reorderable = new Reorderable();
-	const reorderable2 = new Reorderable();
+	// const reorderable2 = new Reorderable();
 
 	// Define a shared reorder handler
 	const handle_reorder = (from_index: number, to_index: number) => {
@@ -33,7 +33,7 @@
 	</ul>
 
 	<!-- Uncomment to test horizontal layout -->
-	<ul
+	<!-- <ul
 		class="unstyled row"
 		use:reorderable2.list={{
 			onreorder: handle_reorder,
@@ -44,5 +44,5 @@
 				<Bit_Summary {bit} {prompt} />
 			</li>
 		{/each}
-	</ul>
+	</ul> -->
 </div>

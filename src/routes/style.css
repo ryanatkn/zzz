@@ -140,3 +140,8 @@ h6 {
 	bottom: 0;
 	width: var(--drag_indicator_size);
 }
+
+/* TODO ? */
+/* .drag_over_invalid::before {
+	background-color: var(--color_c_5);
+} */
