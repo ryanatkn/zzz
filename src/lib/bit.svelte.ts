@@ -1,9 +1,23 @@
+// bit.svelte.ts
+
 import {encode} from 'gpt-tokenizer';
+import type {Json_Object} from '@ryanatkn/belt/json.js';
 
 import {random_id, type Id} from '$lib/id.js';
 import type {Xml_Attribute} from '$lib/prompt.svelte.js';
+import {Serializable} from '$lib/serializable.svelte.js';
 
-export class Bit {
+export interface Bit_Json extends Json_Object {
+	id: string;
+	name: string;
+	has_xml_tag: boolean;
+	xml_tag_name: string;
+	attributes: Array<Omit<Xml_Attribute, 'id'> & {id: string}>;
+	enabled: boolean;
+	content: string;
+}
+
+export class Bit extends Serializable<Bit_Json> {
 	readonly id: Id = random_id();
 	name: string = $state('');
 	has_xml_tag: boolean = $state(false);
@@ -17,6 +31,7 @@ export class Bit {
 	token_count: number = $derived(this.tokens.length);
 
 	constructor(name: string = 'new bit', content: string = '') {
+		super();
 		this.name = name;
 		this.content = content;
 	}
@@ -56,6 +71,34 @@ export class Bit {
 		const index = this.attributes.findIndex((a) => a.id === id);
 		if (index !== -1) {
 			this.attributes.splice(index, 1);
+		}
+	}
+
+	to_json(): Bit_Json {
+		return {
+			id: this.id,
+			name: this.name,
+			has_xml_tag: this.has_xml_tag,
+			xml_tag_name: this.xml_tag_name,
+			attributes: this.attributes.map((attr) => ({...attr, id: attr.id})),
+			enabled: this.enabled,
+			content: this.content,
+		};
+	}
+
+	set_json(value: Partial<Bit_Json>): void {
+		if (value.name !== undefined) this.name = value.name;
+		if (value.has_xml_tag !== undefined) this.has_xml_tag = value.has_xml_tag;
+		if (value.xml_tag_name !== undefined) this.xml_tag_name = value.xml_tag_name;
+		if (value.enabled !== undefined) this.enabled = value.enabled;
+		if (value.content !== undefined) this.content = value.content;
+
+		if (value.attributes !== undefined) {
+			this.attributes = value.attributes.map((attr) => ({
+				id: attr.id,
+				key: attr.key,
+				value: attr.value,
+			}));
 		}
 	}
 }
