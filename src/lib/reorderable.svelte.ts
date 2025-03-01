@@ -2,11 +2,12 @@ import type {Action} from 'svelte/action';
 import {on} from 'svelte/events';
 import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 import {
-	detect_direction,
-	get_drop_position,
-	calculate_target_index,
+	detect_reorderable_direction,
+	get_reorderable_drop_position,
+	calculate_reorderable_target_index,
 	is_reorder_allowed,
-	validate_target_index,
+	validate_reorderable_target_index,
+	set_reorderable_drag_data_transfer,
 } from '$lib/reorderable_helpers.js';
 import type {Flavored} from '@ryanatkn/belt/types.js';
 
@@ -365,11 +366,8 @@ export class Reorderable implements Reorderable_Style_Config {
 					// Add dragging style
 					element.classList.add(this.dragging_class);
 
-					// Required for Firefox
-					e.dataTransfer.effectAllowed = 'move';
-					e.dataTransfer.setData('text/plain', index.toString());
-					// Add item ID to dataTransfer for more robust handling
-					e.dataTransfer.setData('application/reorderable-item-id', item_id);
+					// Set up drag data with the helper function
+					set_reorderable_drag_data_transfer(e.dataTransfer, item_id);
 				},
 				{capture: true},
 			),
@@ -415,10 +413,18 @@ export class Reorderable implements Reorderable_Style_Config {
 				}
 
 				// Get drop position
-				const position = get_drop_position(this.direction, this.source_index, item_index);
+				const position = get_reorderable_drop_position(
+					this.direction,
+					this.source_index,
+					item_index,
+				);
 
 				// Calculate target index
-				const target_index = calculate_target_index(this.source_index, item_index, position);
+				const target_index = calculate_reorderable_target_index(
+					this.source_index,
+					item_index,
+					position,
+				);
 
 				// Check if reordering is allowed
 				const allowed = is_reorder_allowed(
@@ -462,14 +468,22 @@ export class Reorderable implements Reorderable_Style_Config {
 				}
 
 				// Get drop position
-				const position = get_drop_position(this.direction, current_source_index, item_index);
+				const position = get_reorderable_drop_position(
+					this.direction,
+					current_source_index,
+					item_index,
+				);
 
 				// Calculate target index
-				let target_index = calculate_target_index(current_source_index, item_index, position);
+				let target_index = calculate_reorderable_target_index(
+					current_source_index,
+					item_index,
+					position,
+				);
 
 				// Validate target index
 				const max_items_count = this.indices.size;
-				target_index = validate_target_index(target_index, max_items_count - 1);
+				target_index = validate_reorderable_target_index(target_index, max_items_count - 1);
 
 				// Check if reordering is allowed
 				const allowed = is_reorder_allowed(
@@ -546,7 +560,7 @@ export class Reorderable implements Reorderable_Style_Config {
 		}
 
 		// Update direction based on the list's layout if not manually set
-		this.direction = detect_direction(node);
+		this.direction = detect_reorderable_direction(node);
 
 		// Store the list params and node
 		this.list_params = params;
@@ -562,7 +576,7 @@ export class Reorderable implements Reorderable_Style_Config {
 		// Add the list class and identifier
 		node.classList.add(this.list_class);
 		node.setAttribute('role', 'list');
-		node.dataset.reorderableId = this.id;
+		node.dataset.reorderableListId = this.id;
 
 		// Use requestAnimationFrame for initialization - allows all items to register first
 		// because the order isn't always guaranteed
@@ -580,7 +594,7 @@ export class Reorderable implements Reorderable_Style_Config {
 				// Remove the list class and data attribute
 				node.classList.remove(this.list_class);
 				node.removeAttribute('role');
-				delete node.dataset.reorderableId;
+				delete node.dataset.reorderableListId;
 
 				// Reset state
 				this.list_node = null;
@@ -615,8 +629,7 @@ export class Reorderable implements Reorderable_Style_Config {
 		node.setAttribute('draggable', 'true');
 		node.classList.add(this.item_class);
 		node.setAttribute('role', 'listitem');
-		node.dataset.reorderableId = this.id;
-		node.dataset.reorderableIdx = String(index);
+		node.dataset.reorderableListId = this.id;
 
 		if (this.initialized) {
 			// If already initialized, add directly to maps
@@ -641,10 +654,8 @@ export class Reorderable implements Reorderable_Style_Config {
 				// Add dragging style
 				node.classList.add(this.dragging_class);
 
-				// Required for Firefox
-				e.dataTransfer.effectAllowed = 'move';
-				e.dataTransfer.setData('text/plain', index.toString());
-				e.dataTransfer.setData('application/reorderable-item-id', item_id);
+				// Set up drag data with the helper function
+				set_reorderable_drag_data_transfer(e.dataTransfer, item_id);
 			}
 		});
 
@@ -664,9 +675,6 @@ export class Reorderable implements Reorderable_Style_Config {
 							pending_item.index = index;
 						}
 					}
-
-					// Update data attribute
-					node.dataset.reorderableIdx = String(index);
 				}
 			},
 			destroy: () => {
@@ -685,9 +693,8 @@ export class Reorderable implements Reorderable_Style_Config {
 				node.classList.remove(this.item_class);
 				node.removeAttribute('role');
 				node.removeAttribute('draggable');
-				delete node.dataset.reorderableId;
+				delete node.dataset.reorderableListId;
 				delete node.dataset.reorderableItemId;
-				delete node.dataset.reorderableIdx;
 
 				// Clean up indicator state if needed
 				if (this.active_indicator_item_id === item_id) {

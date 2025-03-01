@@ -1,14 +1,14 @@
 import type {
 	Reorderable_Direction,
 	Reorderable_Valid_Drop_Position,
-	Reorderable_Style_Config_Partial,
+	Reorderable_Item_Id,
 } from '$lib/reorderable.svelte.js';
 
 // TODO maybe make this a DOM helper? in Belt?
 /**
  * Detect layout direction from an element - supports flex and grid
  */
-export const detect_direction = (element: HTMLElement): Reorderable_Direction => {
+export const detect_reorderable_direction = (element: HTMLElement): Reorderable_Direction => {
 	const computed_style = window.getComputedStyle(element);
 	const display = computed_style.display;
 
@@ -33,7 +33,7 @@ export const detect_direction = (element: HTMLElement): Reorderable_Direction =>
 /**
  * Determine the drop position based on source and target indices and layout direction
  */
-export const get_drop_position = (
+export const get_reorderable_drop_position = (
 	direction: Reorderable_Direction,
 	source_index: number,
 	target_index: number,
@@ -50,7 +50,7 @@ export const get_drop_position = (
 /**
  * Calculate the target index based on source, current index, and position
  */
-export const calculate_target_index = (
+export const calculate_reorderable_target_index = (
 	source_index: number,
 	current_index: number,
 	position: Reorderable_Valid_Drop_Position,
@@ -82,8 +82,24 @@ export const is_reorder_allowed = (
 /**
  * Validate and adjust a target index to ensure it's within bounds
  */
-export const validate_target_index = (target_index: number, max_index: number): number => {
+export const validate_reorderable_target_index = (
+	target_index: number,
+	max_index: number,
+): number => {
 	if (target_index < 0) return 0;
 	if (target_index > max_index + 1) return max_index + 1;
 	return target_index;
+};
+
+/**
+ * Set up drag data transfer with consistent properties and formats
+ * This centralizes the dataTransfer setup logic used in multiple places
+ */
+export const set_reorderable_drag_data_transfer = (
+	dataTransfer: DataTransfer,
+	item_id: Reorderable_Item_Id,
+): void => {
+	dataTransfer.effectAllowed = 'move';
+	dataTransfer.setData('text/plain', item_id);
+	dataTransfer.setData('application/reorderable-item-id', item_id);
 };

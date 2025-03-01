@@ -617,11 +617,12 @@ export const src_json = {
 		'./reorderable_helpers.js': {
 			path: 'reorderable_helpers.ts',
 			declarations: [
-				{name: 'detect_direction', kind: 'function'},
-				{name: 'get_drop_position', kind: 'function'},
-				{name: 'calculate_target_index', kind: 'function'},
+				{name: 'detect_reorderable_direction', kind: 'function'},
+				{name: 'get_reorderable_drop_position', kind: 'function'},
+				{name: 'calculate_reorderable_target_index', kind: 'function'},
 				{name: 'is_reorder_allowed', kind: 'function'},
-				{name: 'validate_target_index', kind: 'function'},
+				{name: 'validate_reorderable_target_index', kind: 'function'},
+				{name: 'set_reorderable_drag_data_transfer', kind: 'function'},
 			],
 		},
 		'./reorderable.svelte.js': {
