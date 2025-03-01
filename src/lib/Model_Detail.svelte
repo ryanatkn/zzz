@@ -6,7 +6,6 @@
 	import {providers_default} from '$lib/config.js';
 	import Model_Link from '$lib/Model_Link.svelte';
 	import Provider_Link from '$lib/Provider_Link.svelte';
-	import Provider_Logo from '$lib/Provider_Logo.svelte';
 	import type {Model} from '$lib/model.svelte.js';
 	import {GLYPH_MODEL} from '$lib/constants.js';
 
@@ -38,11 +37,8 @@
 					<Model_Link {model} />
 				</h2>
 			{/if}
-			<div class="provider_info mb_md">
-				<Provider_Logo name={provider.name} size="var(--icon_size_md)" fill={null} />
-				<div class="font_mono ml_sm">
-					<Provider_Link {provider} icon="glyph" show_name />
-				</div>
+			<div class="flex font_mono ml_sm mb_md size_lg">
+				<Provider_Link {provider} attrs={{class: 'row gap_sm'}} icon="svg" />
 			</div>
 			{#if model.tags.length}
 				<ul class="unstyled flex gap_xs mb_md">
@@ -148,9 +144,5 @@
 	}
 	section {
 		margin-top: var(--space_lg);
-	}
-	.provider_info {
-		display: flex;
-		align-items: center;
 	}
 </style>

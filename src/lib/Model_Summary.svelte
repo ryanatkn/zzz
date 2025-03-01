@@ -3,7 +3,6 @@
 	import {providers_default} from '$lib/config.js';
 	import Model_Link from '$lib/Model_Link.svelte';
 	import Provider_Link from '$lib/Provider_Link.svelte';
-	import Provider_Logo from '$lib/Provider_Logo.svelte';
 	import type {Model} from '$lib/model.svelte.js';
 	import {GLYPH_MODEL} from '$lib/constants.js';
 
@@ -25,11 +24,8 @@
 			<div class="size_lg mb_sm">
 				<Model_Link {model} />
 			</div>
-			<div class="flex align_items_center mb_sm">
-				<Provider_Logo name={provider.name} size="var(--icon_size_sm)" fill={null} />
-				<div class="font_mono ml_xs">
-					<Provider_Link {provider} icon="glyph" show_name />
-				</div>
+			<div class="font_mono ml_xs flex align_items_center mb_sm">
+				<Provider_Link {provider} icon="svg" attrs={{class: 'row gap_sm'}} />
 			</div>
 		</div>
 	</div>
