@@ -641,9 +641,18 @@ test('edge_case - concurrent attribute updates', () => {
 test('edge_case - attribute key uniqueness', () => {
 	const bit = new Bit();
 
-	// Add attributes with same key
-	bit.add_attribute({key: 'test', value: '1'});
-	bit.add_attribute({key: 'test', value: '2'});
+	// Add attributes with same key but with explicit IDs
+	bit.add_attribute({
+		id: Uuid.parse(undefined),
+		key: 'test',
+		value: '1',
+	});
+
+	bit.add_attribute({
+		id: Uuid.parse(undefined),
+		key: 'test',
+		value: '2',
+	});
 
 	expect(bit.attributes.length).toBe(2);
 	expect(bit.attributes[0].key).toBe('test');
