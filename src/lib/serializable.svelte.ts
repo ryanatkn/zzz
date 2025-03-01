@@ -8,7 +8,9 @@ export interface Serializable_Constructor<T_Class extends Serializable<any, any>
 	from_json: (json?: T_Json) => T_Class;
 }
 
-// Helper function to get all property keys from a Zod object schema
+/**
+ * Gets all property keys from a Zod object schema
+ */
 const get_schema_keys = <T extends z.ZodTypeAny>(schema: T): Array<string> => {
 	if (schema instanceof z.ZodObject) {
 		// For ZodObject, we can access the shape to get the keys
@@ -26,7 +28,7 @@ const get_schema_keys = <T extends z.ZodTypeAny>(schema: T): Array<string> => {
 	}
 };
 
-// TODO maybe rename to `Json_Serializable` to be more explicit?
+// TODO maybe rename to `Json_Serializable` to be more explicit? Or `Snapshottable`?
 export abstract class Serializable<T_Json, T_Schema extends z.ZodType> {
 	readonly schema: T_Schema;
 
