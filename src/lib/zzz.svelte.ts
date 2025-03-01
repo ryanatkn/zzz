@@ -15,11 +15,13 @@ import {Chats} from '$lib/chats.svelte.js';
 import {Providers} from '$lib/providers.svelte.js';
 import {Prompts} from '$lib/prompts.svelte.js';
 import {Files} from '$lib/files.svelte.js';
+import {Messages} from '$lib/messages.svelte.js';
 
 export const zzz_context = create_context<Zzz>();
 
 export interface Zzz_Options {
-	client: Zzz_Client;
+	send?: (message: any) => void;
+	receive?: (message: any) => void;
 	completion_threads?: Completion_Threads;
 	data?: Zzz_Data;
 }
@@ -36,8 +38,7 @@ export interface Zzz_Json {
 export class Zzz {
 	data: Zzz_Data = $state()!; // TODO stable ref or state?
 
-	readonly client: Zzz_Client;
-
+	readonly messages: Messages;
 	readonly models = new Models(this);
 	readonly chats = new Chats(this);
 	readonly providers = new Providers(this);
@@ -61,8 +62,12 @@ export class Zzz {
 
 	// TODO store state granularly for each provider
 
-	constructor(options: Zzz_Options) {
-		this.client = options.client;
+	constructor(options: Zzz_Options = {}) {
+		// Setup message handlers if provided
+		if (options.send && options.receive) {
+			this.messages.set_handlers(options.send, options.receive);
+		}
+
 		this.completion_threads = options.completion_threads ?? new Completion_Threads({zzz: this});
 		this.data = options.data ?? new Zzz_Data();
 		// TODO move this? options? same with models below?
@@ -120,7 +125,7 @@ export class Zzz {
 				prompt,
 			},
 		};
-		this.client.send(message);
+		this.messages.send(message);
 
 		const deferred = create_deferred<Receive_Prompt_Message>();
 		this.pending_prompts.set(message.id, deferred); // TODO roundabout way to get req/res
@@ -149,7 +154,7 @@ export class Zzz {
 	send_echo(data: unknown): void {
 		const id = Uuid.parse(undefined);
 		const message: Echo_Message = {id, type: 'echo', data};
-		this.client.send(message);
+		this.messages.send(message);
 		this.echo_start_times.set(id, Date.now());
 		this.echos = [message, ...this.echos.slice(0, 9)];
 	}

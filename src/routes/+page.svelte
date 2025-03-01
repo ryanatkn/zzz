@@ -9,7 +9,11 @@
 	// class:content
 	// class:icon
 	// class:title
+
+	import Dashboard_Home from '$lib/Dashboard_Home.svelte';
 </script>
+
+<Dashboard_Home />
 
 <footer class="box py_xl9">
 	<Svg data={zzz_logo} size="var(--icon_size_xl2)" attrs={{class: 'my_xl5'}} />
