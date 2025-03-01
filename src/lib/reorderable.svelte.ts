@@ -1,6 +1,5 @@
 import type {Action} from 'svelte/action';
 import {on} from 'svelte/events';
-import {onDestroy} from 'svelte';
 import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 import {
 	detect_direction,
@@ -68,7 +67,6 @@ export interface Reorderable_Item_Params {
  */
 export interface Reorderable_Options extends Reorderable_Style_Config_Partial {
 	direction?: Reorderable_Direction;
-	autodestroy?: boolean;
 }
 
 // Default CSS class names for styling
@@ -148,22 +146,6 @@ export class Reorderable implements Reorderable_Style_Config {
 		// Apply custom styles if provided
 		if (options) {
 			this.update_styles(options);
-		}
-
-		// Auto-destroy with Svelte lifecycle if not disabled
-		const autodestroy = options?.autodestroy !== false;
-		if (autodestroy) {
-			try {
-				onDestroy(() => this.destroy());
-			} catch (e) {
-				// Ignore if not in a Svelte component context
-				if (DEV) {
-					console.error(
-						'Reorderable was created outside of component initialization, if this was intentional set option `autodestroy: false`.',
-						e,
-					);
-				}
-			}
 		}
 	}
 
@@ -548,7 +530,9 @@ export class Reorderable implements Reorderable_Style_Config {
 	 * Clean up event handlers
 	 */
 	#cleanup_events(): void {
-		this.cleanup_handlers.forEach((cleanup) => cleanup());
+		for (const cleanup of this.cleanup_handlers) {
+			cleanup();
+		}
 		this.cleanup_handlers = [];
 	}
 
@@ -736,34 +720,6 @@ export class Reorderable implements Reorderable_Style_Config {
 			},
 		};
 	};
-
-	/**
-	 * Clean up all resources
-	 */
-	destroy(): void {
-		// Clean up events
-		this.#cleanup_events();
-
-		// Clear indicators and state
-		this.clear_indicators();
-		this.source_index = -1;
-		this.source_item_id = null;
-		this.reordering_in_progress = false;
-
-		// Clean up list node
-		if (this.list_node) {
-			this.list_node.classList.remove(this.list_class);
-			this.list_node.removeAttribute('role');
-			delete this.list_node.dataset.reorderableId;
-			this.list_node = null;
-		}
-
-		this.list_params = null;
-		this.indices.clear();
-		this.elements.clear();
-		this.initialized = false;
-		this.pending_items = [];
-	}
 
 	/**
 	 * Update styling configuration
