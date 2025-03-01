@@ -3,7 +3,7 @@
 	import Prompt_Summary from '$lib/Prompt_Summary.svelte';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import type {Chat} from '$lib/chat.svelte.js';
-	import {GLYPH_REMOVE} from '$lib/constants.js';
+	import {GLYPH_REMOVE} from '$lib/glyphs.js';
 	import {Reorderable} from '$lib/reorderable.svelte.js';
 	import type {Uuid} from '$lib/uuid.js';
 

@@ -9,11 +9,12 @@
 		GLYPH_CAPABILITY,
 		GLYPH_CHAT,
 		GLYPH_FILE,
+		GLYPH_MESSAGE,
 		GLYPH_MODEL,
 		GLYPH_PROMPT,
 		GLYPH_PROVIDER,
 		GLYPH_SETTINGS,
-	} from '$lib/constants.js';
+	} from '$lib/glyphs.js';
 
 	interface Props {
 		children: Snippet;
@@ -87,6 +88,9 @@
 								size="var(--icon_size_xs)"
 							/></span
 						> about{/snippet}</Nav_Link
+				>
+				<Nav_Link href="{base}/messages"
+					><span class="icon_xs">{GLYPH_MESSAGE}</span> messages</Nav_Link
 				>
 				<Nav_Link href="{base}/capabilities"
 					><span class="icon_xs">{GLYPH_CAPABILITY}</span> capabilities</Nav_Link

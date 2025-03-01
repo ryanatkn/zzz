@@ -6,7 +6,7 @@
 	import {DEV} from 'esm-env';
 
 	import type {Provider_Json} from '$lib/provider.svelte.js';
-	import {GLYPH_PROVIDER} from '$lib/constants.js';
+	import {GLYPH_PROVIDER} from '$lib/glyphs.js';
 	import Provider_Logo from '$lib/Provider_Logo.svelte';
 
 	interface Props {

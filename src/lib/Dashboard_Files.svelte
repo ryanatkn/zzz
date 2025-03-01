@@ -5,7 +5,7 @@
 	import File_Explorer from '$lib/File_Explorer.svelte';
 	import File_Editor from '$lib/File_Editor.svelte';
 	import Text_Icon from '$lib/Text_Icon.svelte';
-	import {GLYPH_FILE} from '$lib/constants.js';
+	import {GLYPH_FILE} from '$lib/glyphs.js';
 	import {Scrollable} from '$lib/scrollable.svelte.js';
 
 	const zzz = zzz_context.get();

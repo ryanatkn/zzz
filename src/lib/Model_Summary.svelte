@@ -3,7 +3,7 @@
 	import Model_Link from '$lib/Model_Link.svelte';
 	import Provider_Link from '$lib/Provider_Link.svelte';
 	import type {Model} from '$lib/model.svelte.js';
-	import {GLYPH_MODEL} from '$lib/constants.js';
+	import {GLYPH_MODEL} from '$lib/glyphs.js';
 
 	interface Props {
 		model: Model;

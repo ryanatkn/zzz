@@ -7,7 +7,7 @@
 	import Model_Summary from '$lib/Model_Summary.svelte';
 	import Provider_Logo from '$lib/Provider_Logo.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
-	import {GLYPH_PROVIDER, GLYPH_MODEL} from '$lib/constants.js';
+	import {GLYPH_PROVIDER, GLYPH_MODEL} from '$lib/glyphs.js';
 	import External_Link from '$lib/External_Link.svelte';
 
 	const zzz = zzz_context.get();

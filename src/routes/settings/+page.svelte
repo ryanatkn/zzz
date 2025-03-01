@@ -1,5 +1,5 @@
 <script lang="ts">
-	import {GLYPH_SETTINGS} from '$lib/constants.js';
+	import {GLYPH_SETTINGS} from '$lib/glyphs.js';
 	import Text_Icon from '$lib/Text_Icon.svelte';
 	import Settings from '$lib/Settings.svelte';
 	import Breadcrumb from '@ryanatkn/fuz/Breadcrumb.svelte';

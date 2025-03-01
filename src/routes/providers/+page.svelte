@@ -2,7 +2,7 @@
 	import Provider_Link from '$lib/Provider_Link.svelte';
 	import Model_Link from '$lib/Model_Link.svelte';
 	import Text_Icon from '$lib/Text_Icon.svelte';
-	import {GLYPH_PROVIDER} from '$lib/constants.js';
+	import {GLYPH_PROVIDER} from '$lib/glyphs.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import External_Link from '$lib/External_Link.svelte';
 

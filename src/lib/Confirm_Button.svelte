@@ -3,7 +3,7 @@
 	import type {SvelteHTMLElements} from 'svelte/elements';
 	import type {Snippet} from 'svelte';
 
-	import {GLYPH_REMOVE} from '$lib/constants.js';
+	import {GLYPH_REMOVE} from '$lib/glyphs.js';
 
 	interface Props {
 		onclick: () => void;

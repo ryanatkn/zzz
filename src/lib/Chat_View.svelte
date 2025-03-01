@@ -10,7 +10,7 @@
 	import Model_Selector from '$lib/Model_Selector.svelte';
 	import Chat_Tape from '$lib/Chat_Tape.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
-	import {GLYPH_TAPE, GLYPH_PROMPT, GLYPH_REMOVE} from '$lib/constants.js';
+	import {GLYPH_TAPE, GLYPH_PROMPT, GLYPH_REMOVE} from '$lib/glyphs.js';
 	import {zzz_config} from '$lib/zzz_config.js';
 	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
 	import Bit_Stats from '$lib/Bit_Stats.svelte';

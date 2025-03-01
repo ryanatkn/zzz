@@ -1,4 +1,5 @@
 <script lang="ts">
+	import {slide} from 'svelte/transition';
 	import Text_Icon from '$lib/Text_Icon.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import type {Message} from '$lib/message.svelte.js';
@@ -6,17 +7,19 @@
 	interface Props {
 		limit?: number;
 		class_name?: string;
+		selected_message_id?: string | null;
+		onselect?: (message: Message) => void;
 	}
 
-	const {limit = 20, class_name = ''}: Props = $props();
+	const {limit = 20, class_name = '', selected_message_id = null, onselect}: Props = $props();
 
 	const zzz = zzz_context.get();
 	const messages = $derived(zzz.messages);
 
 	const limited_messages: Array<Message> = $derived(messages.items.slice(0, limit));
 
-	const formatTimestamp = (date: Date): string => {
-		return date.toLocaleTimeString();
+	const handle_select = (message: Message): void => {
+		onselect?.(message);
 	};
 
 	const getIconForMessageType = (type: string): string => {
@@ -54,54 +57,58 @@
 				return '❓';
 		}
 	};
+
+	const formatTimestamp = (date: Date): string => {
+		return date.toLocaleTimeString();
+	};
 </script>
 
 <div class="messages-list {class_name}">
-	<h2><Text_Icon icon="📨" /> Messages ({messages.items.length})</h2>
-
 	{#if messages.items.length === 0}
-		<p>No messages yet.</p>
+		<p class="empty-state">No messages yet.</p>
 	{:else}
-		<ul class="unstyled">
+		<menu class="flex_1 unstyled">
 			{#each limited_messages as message (message.id)}
-				<li class="message panel p_md mb_sm">
-					<div class="row space_between">
-						<div class="message-header">
-							<Text_Icon icon={getIconForMessageType(message.type)} />
-							<Text_Icon icon={getDirectionIcon(message.direction)} />
-							<span class="font_mono">{message.type}</span>
-						</div>
-						<div class="message-time font_mono size_sm">
-							{formatTimestamp(message.timestamp)}
-						</div>
+				{@const selected = message.id === selected_message_id}
+				<button
+					type="button"
+					class="message-item"
+					class:selected
+					class:sticky={selected}
+					style:top={selected ? 0 : undefined}
+					style:bottom={selected ? 0 : undefined}
+					onclick={() => handle_select(message)}
+					transition:slide
+				>
+					<div class="message-header font_weight_400">
+						<Text_Icon icon={getIconForMessageType(message.type)} />
+						<Text_Icon icon={getDirectionIcon(message.direction)} />
+						<span class="message-type font_mono">{message.type}</span>
+						<span class="message-time font_mono size_sm">{formatTimestamp(message.timestamp)}</span>
 					</div>
-					<div class="message-content mt_xs">
-						{#if message.type === 'echo'}
-							<pre class="message-data">{JSON.stringify(message.data, null, 2)}</pre>
-						{:else if message.type === 'send_prompt'}
-							<div class="message-prompt">
-								<strong>Prompt:</strong>
-								<pre>{(message.data as any).completion_request?.prompt || 'No prompt'}</pre>
-							</div>
-						{:else if message.type === 'completion_response'}
-							<div class="message-response">
-								<strong>Response:</strong>
-								<pre>{(message.data as any).completion_response?.completion ||
+
+					{#if selected && message.data}
+						<div class="message-preview mt_xs">
+							{#if message.type === 'send_prompt'}
+								<small class="message-preview-label">Prompt:</small>
+								<pre class="message-preview-content">{(
+										message.data as any
+									).completion_request?.prompt.substring(0, 50) + '...' || 'No prompt'}</pre>
+							{:else if message.type === 'completion_response'}
+								<small class="message-preview-label">Response:</small>
+								<pre class="message-preview-content">{(
+										message.data as any
+									).completion_response?.completion.substring(0, 50) + '...' ||
 										'No completion'}</pre>
-							</div>
-						{:else}
-							<details>
-								<summary>Message data</summary>
-								<pre class="message-data">{JSON.stringify(message.data, null, 2)}</pre>
-							</details>
-						{/if}
-					</div>
-				</li>
+							{/if}
+						</div>
+					{/if}
+				</button>
 			{/each}
-		</ul>
+		</menu>
 
 		{#if messages.items.length > limit}
-			<div class="text-center mt_md">
+			<div class="text_align_center mt_md">
 				<small>Showing {limit} of {messages.items.length} messages</small>
 			</div>
 		{/if}
@@ -111,10 +118,29 @@
 <style>
 	.messages-list {
 		width: 100%;
+		max-height: 100%;
+		overflow-y: auto;
 	}
 
-	.message {
-		border-left: 3px solid var(--color_border);
+	.empty-state {
+		padding: var(--space_md);
+		color: var(--color_text_subtle);
+		text-align: center;
+	}
+
+	.message-item {
+		justify-content: flex-start;
+		width: 100%;
+		text-align: left;
+		padding: var(--space_xs) var(--space_md);
+		border-radius: 0;
+		border: none;
+		box-shadow: none;
+		border-left: 3px solid transparent;
+	}
+
+	.message-item:hover {
+		background-color: var(--color_bg_hover);
 	}
 
 	.message-header {
@@ -123,25 +149,34 @@
 		gap: var(--space_xs);
 	}
 
-	.message-content {
-		max-height: 300px;
-		overflow-y: auto;
+	.message-time {
+		margin-left: auto;
+		color: var(--color_text_subtle);
 	}
 
-	.message-data,
-	.message-prompt pre,
-	.message-response pre {
+	.message-type {
+		color: var(--color_text);
+	}
+
+	.message-preview {
+		max-height: 50px;
+		overflow: hidden;
+	}
+
+	.message-preview-label {
+		color: var(--color_text_subtle);
+		margin-bottom: var(--space_xs2);
+		display: block;
+	}
+
+	.message-preview-content {
 		font-family: var(--font_mono);
-		font-size: var(--size_sm);
+		font-size: var(--size_xs);
 		white-space: pre-wrap;
 		word-break: break-word;
-		margin: var(--space_xs) 0;
-		padding: var(--space_xs);
+		margin: 0;
+		padding: var(--space_xs2);
 		background-color: var(--color_bg_alt);
-		border-radius: var(--radius_sm);
-	}
-
-	.text-center {
-		text-align: center;
+		border-radius: var(--radius_xs);
 	}
 </style>

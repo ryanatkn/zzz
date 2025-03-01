@@ -6,7 +6,7 @@
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Nav_Link from '$lib/Nav_Link.svelte';
 	import Text_Icon from '$lib/Text_Icon.svelte';
-	import {GLYPH_CHAT} from '$lib/constants.js';
+	import {GLYPH_CHAT} from '$lib/glyphs.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import {Reorderable} from '$lib/reorderable.svelte.js';
 

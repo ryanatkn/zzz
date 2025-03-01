@@ -1,5 +1,5 @@
 <script lang="ts">
-	import {GLYPH_MODEL} from '$lib/constants.js';
+	import {GLYPH_MODEL} from '$lib/glyphs.js';
 	import Model_Summary from '$lib/Model_Summary.svelte';
 	import Text_Icon from '$lib/Text_Icon.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';

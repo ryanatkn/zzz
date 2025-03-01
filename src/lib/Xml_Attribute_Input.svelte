@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type {Xml_Attribute} from '$lib/xml.js';
-	import {GLYPH_REMOVE} from '$lib/constants.js';
+	import {GLYPH_REMOVE} from '$lib/glyphs.js';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 
 	interface Props {

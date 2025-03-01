@@ -1,7 +1,7 @@
 <script lang="ts">
 	import {DEV} from 'esm-env';
 
-	import {GLYPH_CAPABILITY} from '$lib/constants.js';
+	import {GLYPH_CAPABILITY} from '$lib/glyphs.js';
 	import Text_Icon from '$lib/Text_Icon.svelte';
 	import Breadcrumb from '@ryanatkn/fuz/Breadcrumb.svelte';
 	import Library_Footer from '@ryanatkn/fuz/Library_Footer.svelte';

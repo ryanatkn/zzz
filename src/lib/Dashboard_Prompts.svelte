@@ -7,7 +7,7 @@
 	import Nav_Link from '$lib/Nav_Link.svelte';
 	import Text_Icon from '$lib/Text_Icon.svelte';
 	import Bit_View from '$lib/Bit_View.svelte';
-	import {GLYPH_BIT, GLYPH_PROMPT, GLYPH_REMOVE} from '$lib/constants.js';
+	import {GLYPH_BIT, GLYPH_PROMPT, GLYPH_REMOVE} from '$lib/glyphs.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import Prompt_Stats from '$lib/Prompt_Stats.svelte';
 	import Bit_List from '$lib/Bit_List.svelte';

@@ -167,7 +167,7 @@ export const package_json = {
 			svelte: './dist/Confirm_Button.svelte',
 			default: './dist/Confirm_Button.svelte',
 		},
-		'./constants.js': {types: './dist/constants.d.ts', default: './dist/constants.js'},
+		'./glyphs.js': {types: './dist/constants.d.ts', default: './dist/glyphs.js'},
 		'./Control_Panel.svelte': {
 			types: './dist/Control_Panel.svelte.d.ts',
 			svelte: './dist/Control_Panel.svelte',
@@ -518,7 +518,7 @@ export const src_json = {
 			],
 		},
 		'./Confirm_Button.svelte': {path: 'Confirm_Button.svelte', declarations: []},
-		'./constants.js': {
+		'./glyphs.js': {
 			path: 'constants.ts',
 			declarations: [
 				{name: 'GLYPH_REMOVE', kind: 'variable'},
