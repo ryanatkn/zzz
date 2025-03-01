@@ -325,6 +325,12 @@ a.chip {
 .pb_xl7 {
 	padding-bottom: var(--space_xl7);
 }
+.pixelated {
+	image-rendering: -webkit-optimize-contrast; /* Safari */
+	image-rendering: -o-crisp-edges; /* OS X & Windows Opera (12.02+) */
+	image-rendering: pixelated; /* in case crisp-edges isn't supported */
+	image-rendering: crisp-edges; /* the recommended pixel art setting according to MDN */
+}
 .pl_md {
 	padding-left: var(--space_md);
 }
