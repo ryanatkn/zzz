@@ -461,6 +461,10 @@
       "types": "./dist/tape.svelte.d.ts",
       "default": "./dist/tape.svelte.js"
     },
+    "./test.task.js": {
+      "types": "./dist/test.task.d.ts",
+      "default": "./dist/test.task.js"
+    },
     "./Text_Icon.svelte": {
       "types": "./dist/Text_Icon.svelte.d.ts",
       "svelte": "./dist/Text_Icon.svelte",

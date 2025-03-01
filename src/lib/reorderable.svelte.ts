@@ -200,6 +200,14 @@ export class Reorderable implements Reorderable_Style_Config {
 		this.source_index = -1;
 	}
 
+	// TODO better way to do this?
+	/**
+	 * Meant for testing only
+	 */
+	dangerously_reset_drag_state(): void {
+		this.#reset_drag_state();
+	}
+
 	/**
 	 * Check if a drag operation is valid
 	 */
@@ -342,17 +350,18 @@ export class Reorderable implements Reorderable_Style_Config {
 				(e: DragEvent) => {
 					if (!e.dataTransfer) return;
 
+					// If reordering is in progress, don't start a new drag
+					// FIXED: Check this first before doing any other work
+					if (this.reordering_in_progress) {
+						e.preventDefault();
+						return;
+					}
+
 					// Find the item being dragged
 					const found = this.#find_item_from_event(e);
 					if (!found) return;
 
 					const [item_id, index, element] = found;
-
-					// If reordering is in progress, don't start a new drag
-					if (this.reordering_in_progress) {
-						e.preventDefault();
-						return;
-					}
 
 					// Clear any existing drag operation
 					this.clear_indicators();

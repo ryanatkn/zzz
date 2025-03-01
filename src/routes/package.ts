@@ -391,6 +391,7 @@ export const package_json = {
 			default: './dist/Settings.svelte',
 		},
 		'./tape.svelte.js': {types: './dist/tape.svelte.d.ts', default: './dist/tape.svelte.js'},
+		'./test.task.js': {types: './dist/test.task.d.ts', default: './dist/test.task.js'},
 		'./Text_Icon.svelte': {
 			types: './dist/Text_Icon.svelte.d.ts',
 			svelte: './dist/Text_Icon.svelte',
@@ -688,6 +689,13 @@ export const src_json = {
 		},
 		'./Settings.svelte': {path: 'Settings.svelte', declarations: []},
 		'./tape.svelte.js': {path: 'tape.svelte.ts', declarations: [{name: 'Tape', kind: 'class'}]},
+		'./test.task.js': {
+			path: 'test.task.ts',
+			declarations: [
+				{name: 'Args', kind: 'variable'},
+				{name: 'task', kind: 'variable'},
+			],
+		},
 		'./Text_Icon.svelte': {path: 'Text_Icon.svelte', declarations: []},
 		'./uuid.js': {path: 'uuid.ts', declarations: [{name: 'Uuid', kind: 'variable'}]},
 		'./Xml_Attribute_Input.svelte': {path: 'Xml_Attribute_Input.svelte', declarations: []},
