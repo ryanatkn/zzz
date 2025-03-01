@@ -63,7 +63,12 @@ export class Bit extends Serializable<z.output<typeof Bit_Json>, typeof Bit_Json
 	update_attribute(id: Uuid, updates: Partial<Omit<Xml_Attribute, 'id'>>): boolean {
 		const attribute = this.attributes.find((a) => a.id === id);
 		if (!attribute) return false;
-		Object.assign(attribute, updates); // TODO BLOCK parse? can zod do this? guard against undefineds?
+
+		// Use Zod to validate the updates against the Xml_Attribute schema
+		const validated_updates = Xml_Attribute.partial().omit({id: true}).parse(updates);
+
+		// Apply only the validated updates
+		Object.assign(attribute, validated_updates);
 		return true;
 	}
 
