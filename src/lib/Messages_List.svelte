@@ -23,7 +23,7 @@
 	};
 
 	// TODO BLOCK extract to glyphs.ts
-	const getIconForMessageType = (type: string): string => {
+	const get_icon_for_message_type = (type: string): string => {
 		switch (type) {
 			case 'echo':
 				return '🔄';
@@ -46,7 +46,7 @@
 		}
 	};
 
-	const getDirectionIcon = (direction: string): string => {
+	const get_direction_icon = (direction: string): string => {
 		switch (direction) {
 			case 'client':
 				return '↗️';
@@ -59,7 +59,7 @@
 		}
 	};
 
-	const formatTimestamp = (date: Date): string => {
+	const format_timestamp = (date: Date): string => {
 		return date.toLocaleTimeString();
 	};
 </script>
@@ -82,10 +82,11 @@
 					transition:slide
 				>
 					<div class="message-header font_weight_400">
-						<Text_Icon icon={getIconForMessageType(message.type)} />
-						<Text_Icon icon={getDirectionIcon(message.direction)} />
+						<Text_Icon icon={get_icon_for_message_type(message.type)} />
+						<Text_Icon icon={get_direction_icon(message.direction)} />
 						<span class="message-type font_mono">{message.type}</span>
-						<span class="message-time font_mono size_sm">{formatTimestamp(message.timestamp)}</span>
+						<span class="message-time font_mono size_sm">{format_timestamp(message.timestamp)}</span
+						>
 					</div>
 
 					{#if selected && message.data}
