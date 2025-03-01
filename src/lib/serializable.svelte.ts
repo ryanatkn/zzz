@@ -21,7 +21,16 @@ export abstract class Serializable<T_Json, T_Schema extends z.ZodType> {
 	}
 
 	abstract to_json(): T_Json;
-	abstract set_json(value?: z.input<T_Schema>): void;
+
+	/**
+	 * Override for custom behavior
+	 */
+	set_json(value?: z.input<T_Schema>): void {
+		const parsed = this.schema.parse(value);
+		for (const key in parsed) {
+			(this as any)[key] = parsed[key];
+		}
+	}
 
 	toJSON(): T_Json {
 		return this.json;
