@@ -7,15 +7,18 @@ import {Serializable} from '$lib/serializable.svelte.js';
 import {Uuid} from '$lib/uuid.js';
 import {Xml_Attribute} from '$lib/xml.js';
 
-export const Bit_Json = z.object({
-	id: Uuid,
-	name: z.string().default(''), // TODO maybe use zzz or something else in context to get a non-colliding default?
-	has_xml_tag: z.boolean().default(false),
-	xml_tag_name: z.string().default(''),
-	attributes: z.array(Xml_Attribute).default(() => []),
-	enabled: z.boolean().default(true),
-	content: z.string().default(''),
-});
+export const Bit_Json = z
+	.object({
+		id: Uuid,
+		name: z.string().default(''), // TODO maybe use zzz or something else in context to get a non-colliding default?
+		has_xml_tag: z.boolean().default(false),
+		xml_tag_name: z.string().default(''),
+		attributes: z.array(Xml_Attribute).default(() => []),
+		enabled: z.boolean().default(true),
+		content: z.string().default(''),
+	})
+	.default({});
+
 export type Bit_Json = z.infer<typeof Bit_Json>;
 
 export interface Bit_Options {
