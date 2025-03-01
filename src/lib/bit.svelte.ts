@@ -27,15 +27,8 @@ export type Bit_Json = z.infer<typeof Bit_Json>;
 export type Bit_Json_Input = z.input<typeof Bit_Json>; // TODO BLOCK use these
 export type Bit_Json_Output = z.output<typeof Bit_Json>; // TODO BLOCK use these
 
-// We don't need a custom options type anymore since everything is handled through json
-
-// TODO BLOCK ERROR
-// Type 'ZodObject<{ id: ZodDefault<ZodString>; name: ZodDefault<ZodString>; has_xml_tag: ZodDefault<ZodBoolean>; xml_tag_name: ZodDefault<...>; attributes: ZodDefault<...>; enabled: ZodDefault<...>; content: ZodDefault<...>; }, "strip", ZodTypeAny, { ...; }, { ...; }>' does not satisfy the constraint 'ZodType<{ id: string; name: string; has_xml_tag: boolean; xml_tag_name: string; attributes: { value: string; id: string; key: string; }[]; enabled: boolean; content: string; }, ZodTypeDef, { ...; }>'.
-//   The types of '_input.id' are incompatible between these types.
-//     Type 'string | undefined' is not assignable to type 'string'.
-//       Type 'undefined' is not assignable to type 'string'.ts(2344)
-export class Bit extends Serializable<Bit_Json, typeof Bit_Json> {
-	// Fix the schema type by using a getter that returns the properly typed schema
+// Correctly extend Serializable with proper type parameters
+export class Bit extends Serializable<Bit_Json_Output, typeof Bit_Json> {
 	protected schema = Bit_Json;
 
 	id: Uuid = $state()!;
@@ -66,7 +59,7 @@ export class Bit extends Serializable<Bit_Json, typeof Bit_Json> {
 		});
 	}
 
-	set_json(value: Partial<Bit_Json>): void {
+	set_json(value: z.input<typeof Bit_Json>): void {
 		// Parse through schema to ensure defaults and validation
 		const parsed = this.schema.partial().parse(value);
 
