@@ -431,7 +431,7 @@ test('validate - returns success for valid bit', () => {
 		},
 	});
 
-	const result = bit.validate();
+	const result = bit.json_parsed;
 	expect(result.success).toBe(true);
 });
 
@@ -656,6 +656,6 @@ test('validate - returns failure for invalid bit', () => {
 	// Force an invalid state by bypassing the schema
 	Object.defineProperty(bit, 'id', {value: 'not-a-valid-uuid'});
 
-	const result = bit.validate();
+	const result = bit.json_parsed;
 	expect(result.success).toBe(false);
 });

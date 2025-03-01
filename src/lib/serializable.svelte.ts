@@ -12,6 +12,9 @@ export abstract class Serializable<T_Json, T_Schema extends z.ZodType> {
 
 	readonly json: T_Json = $derived.by(() => this.to_json());
 	readonly json_serialized: string = $derived(JSON.stringify(this.json));
+	readonly json_parsed: z.SafeParseReturnType<z.output<T_Schema>, z.output<T_Schema>> = $derived.by(
+		() => this.schema.safeParse(this.json),
+	);
 
 	constructor(schema: T_Schema) {
 		this.schema = schema;
@@ -22,10 +25,6 @@ export abstract class Serializable<T_Json, T_Schema extends z.ZodType> {
 
 	toJSON(): T_Json {
 		return this.json;
-	}
-
-	validate(): z.SafeParseReturnType<z.output<T_Schema>, z.output<T_Schema>> {
-		return this.schema.safeParse(this.json);
 	}
 
 	clone(): this {

@@ -43,6 +43,7 @@ export const package_json = {
 		'@sveltejs/vite-plugin-svelte': '^4.0.0',
 		eslint: '^9.21.0',
 		'eslint-plugin-svelte': '^2.46.1',
+		jsdom: '^26.0.0',
 		ollama: '^0.5.14',
 		prettier: '^3.5.2',
 		'prettier-plugin-svelte': '^3.3.3',
@@ -51,7 +52,7 @@ export const package_json = {
 		tslib: '^2.8.1',
 		typescript: '^5.7.3',
 		'typescript-eslint': '^8.25.0',
-		uvu: '^0.5.6',
+		vitest: '^3.0.7',
 	},
 	dependencies: {
 		'@anthropic-ai/sdk': '^0.37.0',
