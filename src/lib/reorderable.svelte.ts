@@ -8,7 +8,6 @@ import {
 	is_reorder_allowed,
 	validate_target_index,
 } from '$lib/reorderable_helpers.js';
-import {DEV} from 'esm-env';
 import type {Flavored} from '@ryanatkn/belt/types.js';
 
 export type Reorderable_Id = Flavored<string, 'Reorderable_Id'>;
@@ -51,7 +50,6 @@ export type Reorderable_Style_Config_Partial = Partial<Reorderable_Style_Config>
  */
 export interface Reorderable_List_Params {
 	onreorder: (from_index: number, to_index: number) => void;
-	list_class?: string; // Keep for backward compatibility but mark as deprecated
 	can_reorder?: (from_index: number, to_index: number) => boolean;
 }
 
@@ -156,9 +154,7 @@ export class Reorderable implements Reorderable_Style_Config {
 		if (!this.list_node) return;
 
 		if (this.initialized) {
-			if (DEV) {
-				console.warn('Reorderable is already initialized');
-			}
+			console.error('Reorderable is already initialized');
 			return;
 		}
 
@@ -497,9 +493,7 @@ export class Reorderable implements Reorderable_Style_Config {
 					// Perform the reordering using the callback
 					this.list_params?.onreorder(current_source_index, target_index);
 				} catch (error) {
-					if (DEV) {
-						console.error('Error during reordering:', error);
-					}
+					console.error('Error during reordering:', error);
 				} finally {
 					this.reordering_in_progress = false;
 				}
@@ -571,24 +565,13 @@ export class Reorderable implements Reorderable_Style_Config {
 		node.dataset.reorderableId = this.id;
 
 		// Use requestAnimationFrame for initialization - allows all items to register first
+		// because the order isn't always guaranteed
 		requestAnimationFrame(() => this.#init());
 
 		return {
 			update: (new_params) => {
 				// Update the stored parameters
 				this.list_params = new_params;
-
-				// For backward compatibility, check if list_class is provided in params
-				if (new_params.list_class && new_params.list_class !== params.list_class) {
-					if (DEV) {
-						console.warn(
-							'Providing list_class in params is deprecated. Set it in the Reorderable constructor options instead.',
-						);
-					}
-					// If list_class was changed, handle the class swap
-					if (params.list_class) node.classList.remove(params.list_class);
-					node.classList.add(new_params.list_class);
-				}
 			},
 			destroy: () => {
 				// Clean up event handlers
