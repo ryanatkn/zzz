@@ -14,7 +14,7 @@ export abstract class Serializable<T_Json, T_Schema extends z.ZodType> {
 	}
 
 	abstract to_json(): T_Json;
-	abstract set_json(value: z.input<T_Schema>): void;
+	abstract set_json(value?: z.input<T_Schema>): void;
 
 	toJSON(): T_Json {
 		return this.json;
