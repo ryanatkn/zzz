@@ -575,7 +575,7 @@ export const src_json = {
 		'./message.svelte.js': {
 			path: 'message.svelte.ts',
 			declarations: [
-				{name: 'Zzz_Message', kind: 'type'},
+				{name: 'Api_Message', kind: 'type'},
 				{name: 'Client_Message', kind: 'type'},
 				{name: 'Server_Message', kind: 'type'},
 				{name: 'Base_Message', kind: 'type'},

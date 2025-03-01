@@ -1,115 +1,23 @@
 import {format} from 'date-fns';
-import type {Source_File} from '@ryanatkn/gro/filer.js';
-import type {Watcher_Change} from '@ryanatkn/gro/watch_dir.js';
-import type {Path_Id} from '@ryanatkn/gro/path.js';
 
-import type {Uuid} from '$lib/uuid.js';
-import type {Completion_Request, Completion_Response} from '$lib/completion.js';
-import {to_completion_response_text} from '$lib/completion.js';
+import type {
+	Message_Type,
+	Message_Direction,
+	Message_Json,
+	Send_Prompt_Message,
+	Receive_Prompt_Message,
+} from '$lib/api.js';
+import {
+	to_completion_response_text,
+	type Completion_Request,
+	type Completion_Response,
+} from '$lib/completion.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 
 // Constants for preview length and formatting
 export const MESSAGE_PREVIEW_MAX_LENGTH = 50;
 export const MESSAGE_DATE_FORMAT = 'MMM d, p';
 export const MESSAGE_TIME_FORMAT = 'p';
-
-// Type definitions - these should be moved to a separate module
-export type Zzz_Message = Client_Message | Server_Message;
-
-export type Client_Message =
-	| Echo_Message
-	| Load_Session_Message
-	| Send_Prompt_Message
-	| Update_File_Message
-	| Delete_File_Message;
-
-export type Server_Message =
-	| Echo_Message
-	| Loaded_Session_Message
-	| Filer_Change_Message
-	| Receive_Prompt_Message;
-
-export interface Base_Message {
-	id: Uuid;
-	type: string;
-}
-
-/**
- * @client @server
- */
-export interface Echo_Message extends Base_Message {
-	type: 'echo';
-	data: unknown;
-}
-
-/**
- * @client
- */
-export interface Load_Session_Message extends Base_Message {
-	type: 'load_session';
-}
-
-/**
- * @server
- */
-export interface Loaded_Session_Message extends Base_Message {
-	type: 'loaded_session';
-	data: {files: Map<Path_Id, Source_File>};
-}
-
-/**
- * @server
- */
-export interface Filer_Change_Message extends Base_Message {
-	type: 'filer_change';
-	change: Watcher_Change;
-	source_file: Source_File;
-}
-
-/**
- * @client
- */
-export interface Send_Prompt_Message extends Base_Message {
-	type: 'send_prompt';
-	completion_request: Completion_Request;
-}
-
-/**
- * @server
- */
-export interface Receive_Prompt_Message extends Base_Message {
-	type: 'completion_response';
-	completion_response: Completion_Response;
-}
-
-/**
- * @client
- */
-export interface Update_File_Message extends Base_Message {
-	type: 'update_file';
-	file_id: Path_Id;
-	contents: string;
-}
-
-/**
- * @client
- */
-export interface Delete_File_Message extends Base_Message {
-	type: 'delete_file';
-	file_id: Path_Id;
-}
-
-// Extract type from Zzz_Message definition
-export type Message_Type = Zzz_Message['type'];
-export type Message_Direction = 'client' | 'server' | 'both';
-
-export interface Message_Json {
-	id: Uuid;
-	type: Message_Type;
-	direction: Message_Direction;
-	data: unknown;
-	created: string;
-}
 
 export interface Message_Options {
 	zzz: Zzz;
@@ -119,7 +27,7 @@ export interface Message_Options {
 export class Message {
 	readonly zzz: Zzz;
 
-	id: Uuid = $state()!;
+	id: string = $state()!;
 	type: Message_Type = $state()!;
 	direction: Message_Direction = $state()!;
 	data: unknown = $state();
@@ -133,17 +41,17 @@ export class Message {
 
 	is_echo: boolean = $derived(this.type === 'echo');
 	is_prompt: boolean = $derived(this.type === 'send_prompt');
-	is_completion: boolean = $derived(this.type === 'completion_response'); // TODO naming smell
+	is_completion: boolean = $derived(this.type === 'completion_response');
 	is_session: boolean = $derived(this.type === 'load_session' || this.type === 'loaded_session');
 	is_file_related: boolean = $derived(
 		this.type === 'update_file' || this.type === 'delete_file' || this.type === 'filer_change',
 	);
 
-	prompt_data: Send_Prompt_Message['completion_request'] | null = $derived(
+	prompt_data: Completion_Request | null = $derived(
 		this.is_prompt ? (this.data as Send_Prompt_Message).completion_request : null,
 	);
 
-	completion_data: Receive_Prompt_Message['completion_response'] | null = $derived(
+	completion_data: Completion_Response | null = $derived(
 		this.is_completion ? (this.data as Receive_Prompt_Message).completion_response : null,
 	);
 

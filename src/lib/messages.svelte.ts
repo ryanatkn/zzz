@@ -1,9 +1,9 @@
-import type {
-	Client_Message,
-	Server_Message,
-	Message_Json,
-	Message_Direction,
-} from '$lib/message.svelte.js';
+import {
+	create_message_with_metadata,
+	type Client_Message,
+	type Server_Message,
+	type Message_Direction,
+} from '$lib/api.js';
 import {Message} from '$lib/message.svelte.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 import {Uuid} from '$lib/uuid.js';
@@ -57,14 +57,8 @@ export class Messages {
 
 	add_message(data: unknown, direction: Message_Direction): void {
 		const base_message = data as {id: Uuid; type: string};
-		const json: Message_Json = {
-			id: base_message.id,
-			type: base_message.type as any, // Type assertion needed
-			direction,
-			data,
-			created: new Date().toISOString(),
-		};
-		const message = new Message({zzz: this.zzz, json});
+		const message_json = create_message_with_metadata(base_message as any, direction);
+		const message = new Message({zzz: this.zzz, json: message_json});
 		this.items.unshift(message); // Add at the beginning for newest first
 
 		// Limit message history to prevent performance issues

@@ -3,7 +3,7 @@ import type {Source_File} from '@ryanatkn/gro/filer.js';
 import type {Path_Id} from '@ryanatkn/gro/path.js';
 import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 
-import type {Filer_Change_Message} from '$lib/message.svelte.js';
+import type {Filer_Change_Message} from '$lib/api.js';
 import {Uuid} from '$lib/uuid.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 

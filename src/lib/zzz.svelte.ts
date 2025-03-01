@@ -3,11 +3,7 @@ import {SvelteMap} from 'svelte/reactivity';
 import {create_deferred, type Deferred} from '@ryanatkn/belt/async.js';
 
 import {Zzz_Data, type Zzz_Data_Json} from '$lib/zzz_data.svelte.js';
-import type {
-	Echo_Message,
-	Receive_Prompt_Message,
-	Send_Prompt_Message,
-} from '$lib/message.svelte.js';
+import type {Echo_Message, Receive_Prompt_Message, Send_Prompt_Message} from '$lib/api.js';
 import {Provider, type Provider_Json, type Provider_Name} from '$lib/provider.svelte.js';
 import {Uuid} from '$lib/uuid.js';
 import {Completion_Threads, type Completion_Threads_Json} from '$lib/completion_thread.svelte.js';

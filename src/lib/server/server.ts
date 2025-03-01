@@ -7,7 +7,7 @@ import {PUBLIC_SERVER_HOSTNAME, PUBLIC_SERVER_PORT} from '$env/static/public';
 
 import {Zzz_Server} from '$lib/server/zzz_server.js';
 import create_config from '$lib/config.js';
-import type {Server_Message} from '$lib/message.svelte.js';
+import type {Server_Message} from '$lib/api.js';
 
 console.log('creating server');
 

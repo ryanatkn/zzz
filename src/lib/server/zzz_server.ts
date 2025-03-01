@@ -18,7 +18,7 @@ import type {
 	Receive_Prompt_Message,
 	Send_Prompt_Message,
 	Server_Message,
-} from '$lib/message.svelte.js';
+} from '$lib/api.js';
 import {Uuid} from '$lib/uuid.js';
 import {SYSTEM_MESSAGE_DEFAULT} from '$lib/config.js';
 import {delete_file_in_scope, write_file_in_scope} from '$lib/server/helpers.js';
