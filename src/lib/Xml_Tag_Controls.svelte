@@ -2,7 +2,7 @@
 	import {slide} from 'svelte/transition';
 
 	import type {Bit} from '$lib/bit.svelte.js';
-	import Xml_Attribute from '$lib/Xml_Attribute.svelte';
+	import Xml_Attribute_Input from '$lib/Xml_Attribute_Input.svelte';
 	import {XML_TAG_NAME_DEFAULT} from '$lib/constants.js';
 
 	interface Props {
@@ -45,7 +45,7 @@
 	<div class="attributes column gap_xs2">
 		{#each bit.attributes as attribute (attribute.id)}
 			<div transition:slide>
-				<Xml_Attribute
+				<Xml_Attribute_Input
 					{attribute}
 					dormant={!bit.has_xml_tag}
 					onupdate={(updates) => bit.update_attribute(attribute.id, updates)}

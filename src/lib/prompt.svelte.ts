@@ -107,10 +107,3 @@ export const join_prompt_bits = (bits: Array<Bit>): string =>
 		})
 		.filter((c) => !!c)
 		.join('\n\n');
-
-// TODO extract?
-export interface Xml_Attribute {
-	id: Uuid;
-	key: string;
-	value: string;
-}

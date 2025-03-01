@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type {Xml_Attribute} from '$lib/prompt.svelte.js';
+	import type {Xml_Attribute} from '$lib/xml.js';
 	import {GLYPH_REMOVE} from '$lib/constants.js';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 
