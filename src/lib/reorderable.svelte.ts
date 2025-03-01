@@ -1,6 +1,8 @@
 import type {Action} from 'svelte/action';
 import {on} from 'svelte/events';
 import {Unreachable_Error} from '@ryanatkn/belt/error.js';
+import type {Flavored} from '@ryanatkn/belt/types.js';
+
 import {
 	detect_reorderable_direction,
 	get_reorderable_drop_position,
@@ -9,7 +11,6 @@ import {
 	validate_reorderable_target_index,
 	set_reorderable_drag_data_transfer,
 } from '$lib/reorderable_helpers.js';
-import type {Flavored} from '@ryanatkn/belt/types.js';
 
 export type Reorderable_Id = Flavored<string, 'Reorderable_Id'>;
 export type Reorderable_Item_Id = Flavored<string, 'Reorderable_Item_Id'>;
