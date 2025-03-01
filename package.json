@@ -469,15 +469,19 @@
       "types": "./dist/uuid.d.ts",
       "default": "./dist/uuid.js"
     },
-    "./Xml_Attribute.svelte": {
-      "types": "./dist/Xml_Attribute.svelte.d.ts",
-      "svelte": "./dist/Xml_Attribute.svelte",
-      "default": "./dist/Xml_Attribute.svelte"
+    "./Xml_Attribute_Input.svelte": {
+      "types": "./dist/Xml_Attribute_Input.svelte.d.ts",
+      "svelte": "./dist/Xml_Attribute_Input.svelte",
+      "default": "./dist/Xml_Attribute_Input.svelte"
     },
     "./Xml_Tag_Controls.svelte": {
       "types": "./dist/Xml_Tag_Controls.svelte.d.ts",
       "svelte": "./dist/Xml_Tag_Controls.svelte",
       "default": "./dist/Xml_Tag_Controls.svelte"
+    },
+    "./xml.js": {
+      "types": "./dist/xml.d.ts",
+      "default": "./dist/xml.js"
     },
     "./zzz_client.js": {
       "types": "./dist/zzz_client.d.ts",

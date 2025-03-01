@@ -396,16 +396,17 @@ export const package_json = {
 			default: './dist/Text_Icon.svelte',
 		},
 		'./uuid.js': {types: './dist/uuid.d.ts', default: './dist/uuid.js'},
-		'./Xml_Attribute.svelte': {
-			types: './dist/Xml_Attribute.svelte.d.ts',
-			svelte: './dist/Xml_Attribute.svelte',
-			default: './dist/Xml_Attribute.svelte',
+		'./Xml_Attribute_Input.svelte': {
+			types: './dist/Xml_Attribute_Input.svelte.d.ts',
+			svelte: './dist/Xml_Attribute_Input.svelte',
+			default: './dist/Xml_Attribute_Input.svelte',
 		},
 		'./Xml_Tag_Controls.svelte': {
 			types: './dist/Xml_Tag_Controls.svelte.d.ts',
 			svelte: './dist/Xml_Tag_Controls.svelte',
 			default: './dist/Xml_Tag_Controls.svelte',
 		},
+		'./xml.js': {types: './dist/xml.d.ts', default: './dist/xml.js'},
 		'./zzz_client.js': {types: './dist/zzz_client.d.ts', default: './dist/zzz_client.js'},
 		'./zzz_config.js': {types: './dist/zzz_config.d.ts', default: './dist/zzz_config.js'},
 		'./zzz_data.svelte.js': {
@@ -434,10 +435,8 @@ export const src_json = {
 		'./bit.svelte.js': {
 			path: 'bit.svelte.ts',
 			declarations: [
-				{name: 'Bit_Attribute', kind: 'variable'},
 				{name: 'Bit_Json', kind: 'variable'},
-				{name: 'Bit_Json_Input', kind: 'type'},
-				{name: 'Bit_Json_Output', kind: 'type'},
+				{name: 'Bit_Options', kind: 'type'},
 				{name: 'Bit', kind: 'class'},
 			],
 		},
@@ -594,7 +593,6 @@ export const src_json = {
 				{name: 'Prompt_Message_Content', kind: 'type'},
 				{name: 'Prompt', kind: 'class'},
 				{name: 'join_prompt_bits', kind: 'function'},
-				{name: 'Xml_Attribute', kind: 'type'},
 			],
 		},
 		'./prompts.svelte.js': {
@@ -667,7 +665,6 @@ export const src_json = {
 		'./serializable.svelte.js': {
 			path: 'serializable.svelte.ts',
 			declarations: [
-				{name: 'Serializable_Options', kind: 'type'},
 				{name: 'Serializable_Constructor', kind: 'type'},
 				{name: 'Serializable', kind: 'class'},
 			],
@@ -691,15 +688,10 @@ export const src_json = {
 		'./Settings.svelte': {path: 'Settings.svelte', declarations: []},
 		'./tape.svelte.js': {path: 'tape.svelte.ts', declarations: [{name: 'Tape', kind: 'class'}]},
 		'./Text_Icon.svelte': {path: 'Text_Icon.svelte', declarations: []},
-		'./uuid.js': {
-			path: 'uuid.ts',
-			declarations: [
-				{name: 'Uuid', kind: 'variable'},
-				{name: 'Uuid_Input', kind: 'type'},
-			],
-		},
-		'./Xml_Attribute.svelte': {path: 'Xml_Attribute.svelte', declarations: []},
+		'./uuid.js': {path: 'uuid.ts', declarations: [{name: 'Uuid', kind: 'variable'}]},
+		'./Xml_Attribute_Input.svelte': {path: 'Xml_Attribute_Input.svelte', declarations: []},
 		'./Xml_Tag_Controls.svelte': {path: 'Xml_Tag_Controls.svelte', declarations: []},
+		'./xml.js': {path: 'xml.ts', declarations: [{name: 'Xml_Attribute', kind: 'variable'}]},
 		'./zzz_client.js': {
 			path: 'zzz_client.ts',
 			declarations: [
