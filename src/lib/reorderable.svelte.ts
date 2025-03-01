@@ -715,20 +715,10 @@ export class Reorderable implements Reorderable_Style_Config {
 	 * Update styling configuration
 	 */
 	update_styles(styles: Reorderable_Style_Config_Partial): void {
-		// Apply styles, avoiding any casting
-		if (styles.list_class !== undefined) this.list_class = styles.list_class;
-		if (styles.item_class !== undefined) this.item_class = styles.item_class;
-		if (styles.dragging_class !== undefined) this.dragging_class = styles.dragging_class;
-		if (styles.drag_over_class !== undefined) this.drag_over_class = styles.drag_over_class;
-		if (styles.drag_over_top_class !== undefined)
-			this.drag_over_top_class = styles.drag_over_top_class;
-		if (styles.drag_over_bottom_class !== undefined)
-			this.drag_over_bottom_class = styles.drag_over_bottom_class;
-		if (styles.drag_over_left_class !== undefined)
-			this.drag_over_left_class = styles.drag_over_left_class;
-		if (styles.drag_over_right_class !== undefined)
-			this.drag_over_right_class = styles.drag_over_right_class;
-		if (styles.invalid_drop_class !== undefined)
-			this.invalid_drop_class = styles.invalid_drop_class;
+		for (const key in styles) {
+			const value = (styles as any)[key];
+			if (value === undefined) continue;
+			(this as any)[key] = value;
+		}
 	}
 }
