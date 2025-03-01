@@ -2,7 +2,7 @@ import type {Source_File} from '@ryanatkn/gro/filer.js';
 import type {Watcher_Change} from '@ryanatkn/gro/watch_dir.js';
 import type {Path_Id} from '@ryanatkn/gro/path.js';
 
-import type {Id} from '$lib/id.js';
+import type {Uuid} from '$lib/uuid.js';
 import type {Completion_Request, Completion_Response} from '$lib/completion.js';
 
 export type Zzz_Message = Client_Message | Server_Message;
@@ -21,7 +21,7 @@ export type Server_Message =
 	| Receive_Prompt_Message;
 
 export interface Base_Message {
-	id: Id; // TODO trusting the client to make these for now because it's simpler
+	id: Uuid; // TODO trusting the client to make these for now because it's simpler
 	type: string;
 }
 

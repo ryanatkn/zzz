@@ -1,13 +1,13 @@
 import type {Zzz} from '$lib/zzz.svelte.js';
 import {Chat} from '$lib/chat.svelte.js';
-import type {Id} from '$lib/id.js';
+import type {Uuid} from '$lib/uuid.js';
 import {reorder_list} from '$lib/list_helpers.js';
 
 export class Chats {
 	readonly zzz: Zzz;
 
 	items: Array<Chat> = $state([]);
-	selected_id: Id | null = $state(null);
+	selected_id: Uuid | null = $state(null);
 	selected: Chat | undefined = $derived(this.items.find((c) => c.id === this.selected_id));
 	// TODO use this
 	selected_id_error: boolean = $derived(this.selected_id !== null && this.selected === undefined);
@@ -38,7 +38,7 @@ export class Chats {
 		}
 	}
 
-	select(chat_id: Id | null): void {
+	select(chat_id: Uuid | null): void {
 		this.selected_id = chat_id;
 	}
 

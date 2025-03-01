@@ -4,11 +4,11 @@ import type * as Google from '@google/generative-ai';
 import type {ChatResponse} from 'ollama/browser';
 
 import type {Provider_Name} from '$lib/provider.svelte.js';
-import type {Id} from '$lib/id.js';
+import type {Uuid} from '$lib/uuid.js';
 
 export interface Completion_Request {
 	created: string;
-	request_id: Id;
+	request_id: Uuid;
 	provider_name: Provider_Name;
 	model: string;
 	// TODO BLOCK `prompt` should be a `Prompt` type that captures the entire input to each API? renamed to a `content` string?
@@ -17,7 +17,7 @@ export interface Completion_Request {
 
 export interface Completion_Response {
 	created: string;
-	request_id: Id;
+	request_id: Uuid;
 	provider_name: Provider_Name;
 	model: string;
 	data:

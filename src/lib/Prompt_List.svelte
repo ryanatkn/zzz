@@ -5,7 +5,7 @@
 	import type {Chat} from '$lib/chat.svelte.js';
 	import {GLYPH_REMOVE} from '$lib/constants.js';
 	import {Reorderable} from '$lib/reorderable.svelte.js';
-	import type {Id} from '$lib/id.js';
+	import type {Uuid} from '$lib/uuid.js';
 
 	interface Props {
 		chat: Chat;
@@ -24,7 +24,7 @@
 
 	// Track the selected prompt ID
 	// svelte-ignore state_referenced_locally
-	let selected_prompt_id: Id | null = $state(unselected_prompts[0]?.id ?? null);
+	let selected_prompt_id: Uuid | null = $state(unselected_prompts[0]?.id ?? null);
 
 	// Derive the selected prompt object from the ID
 	const selected_prompt = $derived(chat.zzz.prompts.items.find((p) => p.id === selected_prompt_id));

@@ -20,7 +20,7 @@
 	import {pkg_context} from '$routes/pkg.js';
 	import {package_json, src_json} from '$routes/package.js';
 	import {Zzz_Client} from '$lib/zzz_client.js';
-	import {random_id} from '$lib/id.js';
+	import {Uuid} from '$lib/uuid.js';
 	import {zzz_config} from '$lib/zzz_config.js';
 
 	interface Props {
@@ -125,7 +125,7 @@
 	$inspect('providers', zzz.providers);
 
 	// zzz.send({type: 'echo', data: 'echo from client'});
-	zzz.client.send({id: random_id(), type: 'load_session'});
+	zzz.client.send({id: Uuid.parse(null), type: 'load_session'});
 </script>
 
 <svelte:head>

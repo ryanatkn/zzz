@@ -1,7 +1,7 @@
 import {encode} from 'gpt-tokenizer';
 
 import type {Zzz} from '$lib/zzz.svelte.js';
-import {random_id, type Id} from '$lib/id.js';
+import {Uuid} from '$lib/uuid.js';
 import {get_unique_name} from '$lib/helpers.js';
 import {XML_TAG_NAME_DEFAULT} from '$lib/constants.js';
 import {Bit} from '$lib/bit.svelte.js';
@@ -17,7 +17,7 @@ export interface Prompt_Message {
 export type Prompt_Message_Content = string; // TODO ?
 
 export class Prompt {
-	readonly id: Id = random_id();
+	readonly id: Uuid = Uuid.parse(null);
 	name: string = $state('');
 	created: string = new Date().toISOString();
 	bits: Array<Bit> = $state([]);
@@ -44,19 +44,21 @@ export class Prompt {
 	}
 
 	add_bit(content: string = '', name: string = 'new bit'): Bit {
-		const bit = new Bit(
-			get_unique_name(
-				name,
-				this.bits.map((f) => f.name),
-			),
-			content,
-		);
+		const bit = new Bit({
+			json: {
+				name: get_unique_name(
+					name,
+					this.bits.map((f) => f.name),
+				),
+				content,
+			},
+		});
 		this.bits.push(bit);
 		return bit;
 	}
 
 	update_bit(
-		id: Id,
+		id: Uuid,
 		updates: Partial<Pick<Bit, 'name' | 'content' | 'has_xml_tag' | 'xml_tag_name'>>,
 	): void {
 		const bit = this.bits.find((f) => f.id === id);
@@ -68,7 +70,7 @@ export class Prompt {
 		}
 	}
 
-	remove_bit(id: Id): boolean {
+	remove_bit(id: Uuid): boolean {
 		const index = this.bits.findIndex((f) => f.id === id);
 		if (index !== -1) {
 			this.bits.splice(index, 1);
@@ -107,7 +109,7 @@ export const join_prompt_bits = (bits: Array<Bit>): string =>
 		.join('\n\n');
 
 export interface Xml_Attribute {
-	id: Id;
+	id: Uuid;
 	key: string;
 	value: string;
 }

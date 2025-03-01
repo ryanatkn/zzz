@@ -6,7 +6,7 @@ import {Zzz_Data, type Zzz_Data_Json} from '$lib/zzz_data.svelte.js';
 import type {Zzz_Client} from '$lib/zzz_client.js';
 import type {Echo_Message, Receive_Prompt_Message, Send_Prompt_Message} from '$lib/zzz_message.js';
 import {Provider, type Provider_Json, type Provider_Name} from '$lib/provider.svelte.js';
-import {random_id, type Id} from '$lib/id.js';
+import {Uuid} from '$lib/uuid.js';
 import {Completion_Threads, type Completion_Threads_Json} from '$lib/completion_thread.svelte.js';
 import {ollama_list_with_metadata} from '$lib/ollama.js';
 import {zzz_config} from '$lib/zzz_config.js';
@@ -50,7 +50,7 @@ export class Zzz {
 	echos: Array<Echo_Message> = $state([]);
 
 	// TODO could track this more formally, and add time tracking
-	pending_prompts: SvelteMap<Id, Deferred<Receive_Prompt_Message>> = new SvelteMap();
+	pending_prompts: SvelteMap<Uuid, Deferred<Receive_Prompt_Message>> = new SvelteMap();
 	// TODO generically track req/res pairs
 	// completion_requests: SvelteMap<Id, {request: Send_Prompt_Message; response: Receive_Prompt_Message}> =
 	// 	new SvelteMap();
@@ -108,7 +108,7 @@ export class Zzz {
 		provider_name: Provider_Name,
 		model: string,
 	): Promise<Receive_Prompt_Message> {
-		const request_id = random_id();
+		const request_id = Uuid.parse(null);
 		const message: Send_Prompt_Message = {
 			id: request_id,
 			type: 'send_prompt',
@@ -142,12 +142,12 @@ export class Zzz {
 		this.pending_prompts.delete(message.completion_response.request_id); // deleting intentionally after resolving to maybe avoid a corner case loop of sending the same prompt again
 	}
 
-	readonly echo_start_times: Map<Id, number> = new Map();
+	readonly echo_start_times: Map<Uuid, number> = new Map();
 
-	readonly echo_elapsed: SvelteMap<Id, number> = new SvelteMap();
+	readonly echo_elapsed: SvelteMap<Uuid, number> = new SvelteMap();
 
 	send_echo(data: unknown): void {
-		const id = random_id();
+		const id = Uuid.parse(null);
 		const message: Echo_Message = {id, type: 'echo', data};
 		this.client.send(message);
 		this.echo_start_times.set(id, Date.now());

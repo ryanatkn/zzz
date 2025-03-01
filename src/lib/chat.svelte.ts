@@ -6,7 +6,7 @@ import {
 	type Completion_Request,
 	type Completion_Response,
 } from '$lib/completion.js';
-import {random_id, type Id} from '$lib/id.js';
+import {Uuid} from '$lib/uuid.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 import {get_unique_name} from '$lib/helpers.js';
 import {Tape} from '$lib/tape.svelte.js';
@@ -16,7 +16,7 @@ import {reorder_list} from '$lib/list_helpers.js';
 const NEW_CHAT_PREFIX = 'new chat';
 
 export interface Chat_Message {
-	id: Id;
+	id: Uuid;
 	created: string;
 	content: string; // renamed from text
 	request?: Completion_Request;
@@ -25,7 +25,7 @@ export interface Chat_Message {
 
 export class Chat {
 	// TODO json/serializable pattern
-	id: Id = random_id();
+	id: Uuid = Uuid.parse(null);
 	name: string = $state()!;
 	created: string = new Date().toISOString();
 	tapes: Array<Tape> = $state([]);
@@ -51,7 +51,7 @@ export class Chat {
 		}
 	}
 
-	remove_tape(id: Id): void {
+	remove_tape(id: Uuid): void {
 		const index = this.tapes.findIndex((s) => s.id === id);
 		if (index !== -1) this.tapes.splice(index, 1);
 	}
@@ -72,7 +72,7 @@ export class Chat {
 		}
 	}
 
-	remove_selected_prompt(prompt_id: Id): void {
+	remove_selected_prompt(prompt_id: Uuid): void {
 		const index = this.selected_prompts.findIndex((p) => p.id === prompt_id);
 		if (index !== -1) {
 			this.selected_prompts.splice(index, 1);
@@ -87,11 +87,11 @@ export class Chat {
 		await Promise.all(this.tapes.map((tape) => this.send_to_tape(tape.id, content)));
 	}
 
-	async send_to_tape(tape_id: Id, content: string): Promise<void> {
+	async send_to_tape(tape_id: Uuid, content: string): Promise<void> {
 		const tape = this.tapes.find((s) => s.id === tape_id);
 		if (!tape) return;
 
-		const message_id = random_id();
+		const message_id = Uuid.parse(null);
 		const message: Chat_Message = {
 			id: message_id,
 			// TODO add `chat_id`?

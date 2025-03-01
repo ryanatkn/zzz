@@ -1,6 +1,6 @@
 import type {Zzz} from '$lib/zzz.svelte.js';
 import {Prompt} from '$lib/prompt.svelte.js';
-import type {Id} from '$lib/id.js';
+import type {Uuid} from '$lib/uuid.js';
 import type {Bit} from '$lib/bit.svelte.js';
 import {reorder_list} from '$lib/list_helpers.js';
 
@@ -8,7 +8,7 @@ export class Prompts {
 	readonly zzz: Zzz;
 
 	items: Array<Prompt> = $state([]);
-	selected_id: Id | null = $state(null);
+	selected_id: Uuid | null = $state(null);
 	selected: Prompt | undefined = $derived(this.items.find((p) => p.id === this.selected_id));
 
 	constructor(zzz: Zzz) {
@@ -37,7 +37,7 @@ export class Prompts {
 		}
 	}
 
-	select(prompt_id: Id | null): void {
+	select(prompt_id: Uuid | null): void {
 		this.selected_id = prompt_id;
 	}
 
@@ -50,12 +50,12 @@ export class Prompts {
 		this.selected.add_bit();
 	}
 
-	update_bit(bit_id: Id, updates: Partial<Omit<Bit, 'id'>>): void {
+	update_bit(bit_id: Uuid, updates: Partial<Omit<Bit, 'id'>>): void {
 		if (!this.selected) return;
 		this.selected.update_bit(bit_id, updates);
 	}
 
-	remove_bit(bit_id: Id): void {
+	remove_bit(bit_id: Uuid): void {
 		if (!this.selected) return;
 		this.selected.remove_bit(bit_id);
 	}
