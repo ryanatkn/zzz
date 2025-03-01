@@ -12,6 +12,7 @@ export interface Serializable_Constructor<T_Class extends Serializable<any, any>
 // TODO maybe rename to `Json_Serializable` to be more explicit? Or `Snapshottable`?
 export abstract class Serializable<T_Json, T_Schema extends z.ZodType> {
 	readonly schema: T_Schema;
+	readonly schema_keys: Array<string> = $derived.by(() => zod_get_schema_keys(this.schema));
 
 	readonly json: T_Json = $derived.by(() => this.to_json());
 	readonly json_serialized: string = $derived(JSON.stringify(this.json));
@@ -29,10 +30,9 @@ export abstract class Serializable<T_Json, T_Schema extends z.ZodType> {
 	 * Override this method for custom serialization behavior.
 	 */
 	to_json(): T_Json {
-		const keys = zod_get_schema_keys(this.schema);
 		const result: Record<string, any> = {};
 
-		for (const key of keys) {
+		for (const key of this.schema_keys) {
 			// Only include properties that exist on this instance
 			if (key in this) {
 				// Use $state.snapshot for all values to handle Svelte 5 reactivity
