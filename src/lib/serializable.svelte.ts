@@ -2,6 +2,10 @@
 
 import type {z} from 'zod';
 
+export interface Serializable_Constructor<T_Class extends Serializable<any, any>, T_Json = any> {
+	from_json: (json?: T_Json) => T_Class;
+}
+
 // TODO maybe rename to `Json_Serializable` to be more explicit?
 export abstract class Serializable<T_Json, T_Schema extends z.ZodType> {
 	readonly schema: T_Schema;
@@ -25,9 +29,23 @@ export abstract class Serializable<T_Json, T_Schema extends z.ZodType> {
 	}
 
 	clone(): this {
-		// Pass the schema as first argument when creating a new instance
-		const clone = new (this.constructor as any)(this.schema);
-		clone.set_json(this.to_json() as z.input<T_Schema>);
-		return clone;
+		const constructor = this.constructor as typeof Serializable & {from_json: (json: any) => any};
+
+		if (typeof constructor.from_json !== 'function') {
+			throw new Error(`${constructor.name} must implement static from_json method for cloning`);
+		}
+
+		return constructor.from_json(this.to_json());
+	}
+
+	/**
+	 * Type check helper - does nothing at runtime but enforces static interface compliance
+	 */
+	protected static check_subclass<
+		T_Class extends Serializable<T_Json, T_Schema>,
+		T_Json,
+		T_Schema extends z.ZodType,
+	>(_c: Serializable_Constructor<T_Class, T_Json>): void {
+		// typechecking
 	}
 }

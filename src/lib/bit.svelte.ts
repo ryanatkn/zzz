@@ -9,7 +9,7 @@ import {Xml_Attribute} from '$lib/xml.js';
 
 export const Bit_Json = z.object({
 	id: Uuid,
-	name: z.string().default('new bit'),
+	name: z.string().default(''), // TODO maybe use zzz or something else in context to get a non-colliding default?
 	has_xml_tag: z.boolean().default(false),
 	xml_tag_name: z.string().default(''),
 	attributes: z.array(Xml_Attribute).default(() => []),
@@ -23,6 +23,10 @@ export interface Bit_Options {
 }
 
 export class Bit extends Serializable<z.output<typeof Bit_Json>, typeof Bit_Json> {
+	static {
+		Serializable.check_subclass(Bit);
+	}
+
 	// Defaults for json properties are set in the schema and assigned via `to_json()`
 	id: Uuid = $state()!;
 	name: string = $state()!;
@@ -47,7 +51,7 @@ export class Bit extends Serializable<z.output<typeof Bit_Json>, typeof Bit_Json
 	}
 
 	to_json(): Bit_Json {
-		return this.schema.parse({
+		return {
 			id: this.id,
 			name: this.name,
 			has_xml_tag: this.has_xml_tag,
@@ -55,7 +59,7 @@ export class Bit extends Serializable<z.output<typeof Bit_Json>, typeof Bit_Json
 			attributes: $state.snapshot(this.attributes),
 			enabled: this.enabled,
 			content: this.content,
-		});
+		};
 	}
 
 	set_json(value?: z.input<typeof Bit_Json>): void {
@@ -80,8 +84,7 @@ export class Bit extends Serializable<z.output<typeof Bit_Json>, typeof Bit_Json
 	update_attribute(id: Uuid, updates: Partial<Omit<Xml_Attribute, 'id'>>): boolean {
 		const attribute = this.attributes.find((a) => a.id === id);
 		if (!attribute) return false;
-
-		Object.assign(attribute, updates); // TODO BLOCK parse?
+		Object.assign(attribute, updates); // TODO BLOCK parse? can zod do this?
 		return true;
 	}
 
