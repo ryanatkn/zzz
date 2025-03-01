@@ -12,7 +12,7 @@ export const Bit_Json = z.object({
 	name: z.string().default('new bit'),
 	has_xml_tag: z.boolean().default(false),
 	xml_tag_name: z.string().default(''),
-	attributes: z.array(Xml_Attribute).default([]),
+	attributes: z.array(Xml_Attribute).default(() => []),
 	enabled: z.boolean().default(true),
 	content: z.string().default(''),
 });
@@ -23,6 +23,7 @@ export interface Bit_Options {
 }
 
 export class Bit extends Serializable<z.output<typeof Bit_Json>, typeof Bit_Json> {
+	// Defaults for json properties are set in the schema and assigned via `to_json()`
 	id: Uuid = $state()!;
 	name: string = $state()!;
 	has_xml_tag: boolean = $state()!;
@@ -39,14 +40,6 @@ export class Bit extends Serializable<z.output<typeof Bit_Json>, typeof Bit_Json
 		super(Bit_Json);
 
 		this.set_json(options?.json);
-	}
-
-	static create_default(): Bit {
-		return new Bit();
-	}
-
-	static from_json(json: Partial<Bit_Json>): Bit {
-		return new Bit({json});
 	}
 
 	to_json(): Bit_Json {
@@ -77,25 +70,15 @@ export class Bit extends Serializable<z.output<typeof Bit_Json>, typeof Bit_Json
 		this.attributes.push(Xml_Attribute.parse(partial));
 	}
 
-	update_attribute(id: Uuid, updates: Partial<Omit<Xml_Attribute, 'id'>>): void {
-		const index = this.attributes.findIndex((a) => a.id === id);
-		if (index === -1) return;
+	/**
+	 * @returns `true` if the attribute was updated, `false` if the attribute was not found
+	 */
+	update_attribute(id: Uuid, updates: Partial<Omit<Xml_Attribute, 'id'>>): boolean {
+		const attribute = this.attributes.find((a) => a.id === id);
+		if (!attribute) return false;
 
-		const attribute = this.attributes[index];
-		const final_updates: Partial<Omit<Xml_Attribute, 'id'>> = {...updates};
-
-		// Only check for duplicates if the new key is non-empty
-		if (updates.key !== undefined && updates.key !== attribute.key && updates.key !== '') {
-			let key = updates.key;
-			let counter = 1;
-			while (this.attributes.some((a) => a.id !== id && a.key === key)) {
-				key = `${updates.key}${counter}`;
-				counter++;
-			}
-			final_updates.key = key;
-		}
-
-		Object.assign(attribute, final_updates);
+		Object.assign(attribute, updates); // TODO BLOCK parse?
+		return true;
 	}
 
 	remove_attribute(id: Uuid): void {

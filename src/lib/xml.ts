@@ -1,5 +1,3 @@
-// bit.svelte.ts
-
 import {z} from 'zod';
 
 import {Uuid} from '$lib/uuid.js';

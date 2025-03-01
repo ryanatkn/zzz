@@ -2,16 +2,7 @@
 
 import type {z} from 'zod';
 
-/**
- * Describes the expected static methods on Serializable classes
- */
-export interface Serializable_Constructor<T extends Serializable<any, any>, J = any> {
-	new (schema: z.ZodTypeAny): T;
-	create_default: () => T;
-	from_json: (json: Partial<J>) => T;
-}
-
-// TODO maybe rename to `Json_Serializable`?
+// TODO maybe rename to `Json_Serializable` to be more explicit?
 export abstract class Serializable<T_Json, T_Schema extends z.ZodType> {
 	readonly schema: T_Schema;
 
