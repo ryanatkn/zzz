@@ -42,6 +42,10 @@ export class Bit extends Serializable<z.output<typeof Bit_Json>, typeof Bit_Json
 		this.set_json(options?.json);
 	}
 
+	static from_json(json?: z.input<typeof Bit_Json>): Bit {
+		return new Bit({json});
+	}
+
 	to_json(): Bit_Json {
 		return this.schema.parse({
 			id: this.id,
