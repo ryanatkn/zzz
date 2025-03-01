@@ -7,7 +7,7 @@ import {PUBLIC_SERVER_HOSTNAME, PUBLIC_SERVER_PORT} from '$env/static/public';
 
 import {Zzz_Server} from '$lib/server/zzz_server.js';
 import create_config from '$lib/config.js';
-import type {Server_Message} from '$lib/api.js';
+import type {Api_Server_Message} from '$lib/api.js';
 
 console.log('creating server');
 
@@ -46,7 +46,7 @@ app.get(
 				}
 				// console.log(`[server] handling message`, data);
 				if (data.type === 'gro_server_message') {
-					let message: Server_Message | null;
+					let message: Api_Server_Message | null;
 					try {
 						message = await zzz_server.receive(data.message);
 					} catch (err) {

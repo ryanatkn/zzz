@@ -3,18 +3,22 @@ import {SvelteMap} from 'svelte/reactivity';
 import {create_deferred, type Deferred} from '@ryanatkn/belt/async.js';
 
 import {Zzz_Data, type Zzz_Data_Json} from '$lib/zzz_data.svelte.js';
-import type {Echo_Message, Receive_Prompt_Message, Send_Prompt_Message} from '$lib/api.js';
+import type {
+	Api_Echo_Message,
+	Api_Receive_Prompt_Message,
+	Api_Send_Prompt_Message,
+} from '$lib/api.js';
 import {Provider, type Provider_Json, type Provider_Name} from '$lib/provider.svelte.js';
 import {Uuid} from '$lib/uuid.js';
 import {Completion_Threads, type Completion_Threads_Json} from '$lib/completion_thread.svelte.js';
 import {ollama_list_with_metadata} from '$lib/ollama.js';
 import {Models} from '$lib/models.svelte.js';
-import type {Model_Json} from '$lib/model.svelte.js';
 import {Chats} from '$lib/chats.svelte.js';
 import {Providers} from '$lib/providers.svelte.js';
 import {Prompts} from '$lib/prompts.svelte.js';
 import {Files} from '$lib/files.svelte.js';
 import {Messages} from '$lib/messages.svelte.js';
+import type {Model_Json} from './model.svelte.js';
 
 export const zzz_context = create_context<Zzz>();
 
@@ -39,20 +43,20 @@ export interface Zzz_Json {
 export class Zzz {
 	data: Zzz_Data = $state()!;
 
-	readonly messages = new Messages(this);
 	readonly models = new Models(this);
 	readonly chats = new Chats(this);
 	readonly providers = new Providers(this);
 	readonly prompts = new Prompts(this);
 	readonly files = new Files(this);
+	readonly messages = new Messages(this);
 
 	// Change tags to use the readonly models instance
 	tags: Set<string> = $derived(new Set(this.models.items.flatMap((m) => m.tags)));
 
-	echos: Array<Echo_Message> = $state([]);
+	echos: Array<Api_Echo_Message> = $state([]);
 
 	// TODO could track this more formally, and add time tracking
-	pending_prompts: SvelteMap<Uuid, Deferred<Receive_Prompt_Message>> = new SvelteMap();
+	pending_prompts: SvelteMap<Uuid, Deferred<Api_Receive_Prompt_Message>> = new SvelteMap();
 
 	completion_threads: Completion_Threads = $state()!;
 
@@ -116,9 +120,9 @@ export class Zzz {
 		prompt: string,
 		provider_name: Provider_Name,
 		model: string,
-	): Promise<Receive_Prompt_Message> {
+	): Promise<Api_Receive_Prompt_Message> {
 		const request_id = Uuid.parse(undefined);
-		const message: Send_Prompt_Message = {
+		const message: Api_Send_Prompt_Message = {
 			id: request_id,
 			type: 'send_prompt',
 			completion_request: {
@@ -131,7 +135,7 @@ export class Zzz {
 		};
 		this.messages.send(message);
 
-		const deferred = create_deferred<Receive_Prompt_Message>();
+		const deferred = create_deferred<Api_Receive_Prompt_Message>();
 		this.pending_prompts.set(message.id, deferred); // TODO roundabout way to get req/res
 		const response = await deferred.promise;
 		this.completion_threads.receive_completion_response(
@@ -141,7 +145,7 @@ export class Zzz {
 		return response;
 	}
 
-	receive_completion_response(message: Receive_Prompt_Message): void {
+	receive_completion_response(message: Api_Receive_Prompt_Message): void {
 		const deferred = this.pending_prompts.get(message.completion_response.request_id);
 		if (!deferred) {
 			console.error('expected pending', message);
@@ -157,13 +161,13 @@ export class Zzz {
 
 	send_echo(data: unknown): void {
 		const id = Uuid.parse(undefined);
-		const message: Echo_Message = {id, type: 'echo', data};
+		const message: Api_Echo_Message = {id, type: 'echo', data};
 		this.messages.send(message);
 		this.echo_start_times.set(id, Date.now());
 		this.echos = [message, ...this.echos.slice(0, 9)];
 	}
 
-	receive_echo(message: Echo_Message): void {
+	receive_echo(message: Api_Echo_Message): void {
 		const {id} = message;
 		const start_time = this.echo_start_times.get(id);
 		if (start_time === undefined) {

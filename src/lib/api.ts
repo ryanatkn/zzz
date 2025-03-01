@@ -2,6 +2,9 @@ import {z} from 'zod';
 
 import {Uuid} from '$lib/uuid.js';
 
+export const Api_Change_Type = z.enum(['add', 'change', 'unlink']);
+export type Api_Change_Type = z.infer<typeof Api_Change_Type>;
+
 // Base schema for all messages
 export const Api_Base_Message = z.object({
 	id: Uuid,
@@ -22,7 +25,6 @@ export const Api_Load_Session_Message = Api_Base_Message.extend({
 export const Api_Loaded_Session_Message = Api_Base_Message.extend({
 	type: z.literal('loaded_session'),
 	data: z.object({
-		// Can't directly validate Map in Zod, we'll need custom validation
 		files: z.any(), // This would ideally be a Map<Path_Id, Source_File>
 	}),
 });
@@ -30,7 +32,10 @@ export const Api_Loaded_Session_Message = Api_Base_Message.extend({
 // File related message schemas
 export const Api_Filer_Change_Message = Api_Base_Message.extend({
 	type: z.literal('filer_change'),
-	change: z.any(), // Watcher_Change
+	change: z.object({
+		type: Api_Change_Type,
+		path: z.string(),
+	}),
 	source_file: z.any(), // Source_File
 });
 
@@ -74,19 +79,28 @@ export const Api_Server_Message = z.discriminatedUnion('type', [
 ]);
 
 // Union of all message types
-export const Api_Message = z.union([Api_Client_Message, Api_Server_Message]);
+export const Api_Message = z.discriminatedUnion('type', [
+	Api_Echo_Message,
+	Api_Load_Session_Message,
+	Api_Loaded_Session_Message,
+	Api_Filer_Change_Message,
+	Api_Send_Prompt_Message,
+	Api_Receive_Prompt_Message,
+	Api_Update_File_Message,
+	Api_Delete_File_Message,
+]);
 
 // Message direction
 export const Api_Message_Direction = z.enum(['client', 'server', 'both']);
 
-// Message with metadata
-export const Api_Message_With_Metadata = z.object({
-	id: Uuid,
-	type: z.string(),
-	direction: Api_Message_Direction,
-	data: z.any(),
-	created: z.string().datetime(),
-});
+// Message with metadata - use `merge` instead of `extend` for discriminated unions
+export const Api_Message_With_Metadata = z.intersection(
+	Api_Message,
+	z.object({
+		direction: Api_Message_Direction,
+		created: z.string().datetime(),
+	}),
+);
 
 // Export TypeScript types derived from the Zod schemas
 export type Api_Base_Message = z.infer<typeof Api_Base_Message>;
@@ -104,22 +118,6 @@ export type Api_Message = z.infer<typeof Api_Message>;
 export type Api_Message_Direction = z.infer<typeof Api_Message_Direction>;
 export type Api_Message_With_Metadata = z.infer<typeof Api_Message_With_Metadata>;
 
-// Legacy type mappings for backward compatibility
-export type Base_Message = Api_Base_Message;
-export type Echo_Message = Api_Echo_Message;
-export type Load_Session_Message = Api_Load_Session_Message;
-export type Loaded_Session_Message = Api_Loaded_Session_Message;
-export type Filer_Change_Message = Api_Filer_Change_Message;
-export type Update_File_Message = Api_Update_File_Message;
-export type Delete_File_Message = Api_Delete_File_Message;
-export type Send_Prompt_Message = Api_Send_Prompt_Message;
-export type Receive_Prompt_Message = Api_Receive_Prompt_Message;
-export type Client_Message = Api_Client_Message;
-export type Server_Message = Api_Server_Message;
-export type Message_Type = Api_Message['type'];
-export type Message_Direction = Api_Message_Direction;
-export type Message_Json = Api_Message_With_Metadata;
-
 // Helper function to validate messages
 export const validate_message = (message: unknown): Api_Message => {
 	return Api_Message.parse(message);
@@ -134,5 +132,5 @@ export const create_message_with_metadata = (
 		...message,
 		direction,
 		created: new Date().toISOString(),
-	};
+	} as Api_Message_With_Metadata;
 };

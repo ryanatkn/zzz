@@ -1,11 +1,11 @@
 import {format} from 'date-fns';
 
-import type {
-	Message_Type,
-	Message_Direction,
-	Message_Json,
-	Send_Prompt_Message,
-	Receive_Prompt_Message,
+import {
+	type Api_Message_With_Metadata,
+	type Api_Message,
+	type Api_Message_Direction,
+	type Api_Send_Prompt_Message,
+	type Api_Receive_Prompt_Message,
 } from '$lib/api.js';
 import {
 	to_completion_response_text,
@@ -13,6 +13,7 @@ import {
 	type Completion_Response,
 } from '$lib/completion.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
+import {Uuid} from '$lib/uuid.js';
 
 // Constants for preview length and formatting
 export const MESSAGE_PREVIEW_MAX_LENGTH = 50;
@@ -21,15 +22,15 @@ export const MESSAGE_TIME_FORMAT = 'p';
 
 export interface Message_Options {
 	zzz: Zzz;
-	json: Message_Json;
+	json: Api_Message_With_Metadata;
 }
 
 export class Message {
 	readonly zzz: Zzz;
 
-	id: string = $state()!;
-	type: Message_Type = $state()!;
-	direction: Message_Direction = $state()!;
+	id: Uuid = $state()!;
+	type: Api_Message['type'] = $state()!;
+	direction: Api_Message_Direction = $state()!;
 	data: unknown = $state();
 	created: string = $state()!;
 
@@ -48,11 +49,11 @@ export class Message {
 	);
 
 	prompt_data: Completion_Request | null = $derived(
-		this.is_prompt ? (this.data as Send_Prompt_Message).completion_request : null,
+		this.is_prompt ? (this.data as Api_Send_Prompt_Message).completion_request : null,
 	);
 
 	completion_data: Completion_Response | null = $derived(
-		this.is_completion ? (this.data as Receive_Prompt_Message).completion_response : null,
+		this.is_completion ? (this.data as Api_Receive_Prompt_Message).completion_response : null,
 	);
 
 	completion_text: string | null | undefined = $derived(
@@ -93,13 +94,13 @@ export class Message {
 		this.created = created;
 	}
 
-	toJSON(): Message_Json {
+	toJSON(): Api_Message_With_Metadata {
 		return {
 			id: this.id,
 			type: this.type,
 			direction: this.direction,
 			data: this.data,
 			created: this.created,
-		};
+		} as Api_Message_With_Metadata; // Cast needed because we don't have the full discriminated union type information
 	}
 }
