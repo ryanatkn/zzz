@@ -24,7 +24,7 @@
 		{@render children()}
 	{:else}
 		{#if icon}
-			<Provider_Logo name={model.provider_name} size="var(--size_lg)" />
+			<Provider_Logo name={model.provider_name} />
 		{/if}
 		{model.name}
 	{/if}</a

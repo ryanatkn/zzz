@@ -15,7 +15,7 @@
 	const {
 		name,
 		fill = 'var(--text_color)',
-		size = 'var(--size_xl)', // TODO remove after changing the default in Svg.svelte upstream
+		size = 'var(--size, var(--size_xl))', // TODO remove after changing the default in Svg.svelte upstream
 		inline = true,
 		props,
 	}: Props = $props();
