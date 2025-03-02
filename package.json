@@ -129,6 +129,10 @@
       "types": "./dist/cell_registry.d.ts",
       "default": "./dist/cell_registry.js"
     },
+    "./cell.svelte.js": {
+      "types": "./dist/cell.svelte.d.ts",
+      "default": "./dist/cell.svelte.js"
+    },
     "./Chat_Item.svelte": {
       "types": "./dist/Chat_Item.svelte.d.ts",
       "svelte": "./dist/Chat_Item.svelte",
@@ -474,10 +478,6 @@
     "./scrollable.svelte.js": {
       "types": "./dist/scrollable.svelte.d.ts",
       "default": "./dist/scrollable.svelte.js"
-    },
-    "./serializable.svelte.js": {
-      "types": "./dist/serializable.svelte.d.ts",
-      "default": "./dist/serializable.svelte.js"
     },
     "./server/.env.example": {
       "default": "./dist/server/.env.example"

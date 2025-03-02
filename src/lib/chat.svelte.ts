@@ -24,7 +24,7 @@ export interface Chat_Message {
 }
 
 export class Chat {
-	// TODO json/serializable pattern
+	// TODO json/cell pattern
 	id: Uuid = Uuid.parse(undefined);
 	name: string = $state()!;
 	created: string = new Date().toISOString();

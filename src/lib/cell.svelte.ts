@@ -1,4 +1,4 @@
-// serializable.svelte.ts
+// cell.svelte.ts
 
 import {z} from 'zod';
 import {DEV} from 'esm-env';
@@ -6,14 +6,14 @@ import {DEV} from 'esm-env';
 import {zod_get_schema_keys} from '$lib/zod_helpers.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 
-// Base options type that all serializable objects will extend
-export interface Serializable_Options<T_Schema extends z.ZodType, T_Zzz extends Zzz = Zzz> {
+// Base options type that all cells will extend
+export interface Cell_Options<T_Schema extends z.ZodType, T_Zzz extends Zzz = Zzz> {
 	zzz: T_Zzz;
 	json?: z.input<T_Schema>;
 }
 
-// TODO maybe rename to `Json_Serializable` to be more explicit? Or `Snapshottable`?
-export abstract class Serializable<T_Schema extends z.ZodType, T_Zzz extends Zzz = Zzz> {
+// TODO maybe rename to `Json_Cell` to be more explicit? Or `Snapshottable`?
+export abstract class Cell<T_Schema extends z.ZodType, T_Zzz extends Zzz = Zzz> {
 	readonly schema: T_Schema;
 	readonly schema_keys: Array<string> = $derived.by(() => zod_get_schema_keys(this.schema));
 
@@ -27,12 +27,12 @@ export abstract class Serializable<T_Schema extends z.ZodType, T_Zzz extends Zzz
 	readonly zzz: T_Zzz;
 
 	// Store options for use during initialization
-	protected readonly options: Serializable_Options<T_Schema, T_Zzz>;
+	protected readonly options: Cell_Options<T_Schema, T_Zzz>;
 
 	// Property to store class-specific metadata for deserialization
 	static readonly schema_id?: string;
 
-	constructor(schema: T_Schema, options: Serializable_Options<T_Schema, T_Zzz>) {
+	constructor(schema: T_Schema, options: Cell_Options<T_Schema, T_Zzz>) {
 		this.schema = schema;
 		this.zzz = options.zzz;
 		this.options = options;
@@ -83,7 +83,7 @@ export abstract class Serializable<T_Schema extends z.ZodType, T_Zzz extends Zzz
 	}
 
 	/**
-	 * Decode values during deserialization, handling nested serializable objects
+	 * Decode values during deserialization, handling nested cells
 	 * @param value The value to decode
 	 * @param key The property key
 	 * @param parsed The complete parsed object
@@ -123,9 +123,7 @@ export abstract class Serializable<T_Schema extends z.ZodType, T_Zzz extends Zzz
 	 */
 	clone(): this {
 		// Get the constructor of this instance
-		const constructor = this.constructor as new (
-			options: Serializable_Options<T_Schema, T_Zzz>,
-		) => this;
+		const constructor = this.constructor as new (options: Cell_Options<T_Schema, T_Zzz>) => this;
 
 		try {
 			// Create a new instance with the copied JSON and the same zzz reference

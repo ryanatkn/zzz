@@ -5,7 +5,7 @@ import {encode} from 'gpt-tokenizer';
 
 import {Bit, Bit_Json} from '$lib/bit.svelte.js';
 import {Uuid} from '$lib/uuid.js';
-import {Serializable} from '$lib/serializable.svelte.js';
+import {Cell} from '$lib/cell.svelte.js';
 
 // TODO new one per test?
 const mock_zzz = {} as any;
@@ -63,7 +63,7 @@ test('clone - derived properties are calculated correctly', () => {
 
 	const clone = original.clone();
 
-	// Check that the clone is specifically a Bit instance, not just Serializable
+	// Check that the clone is specifically a Bit instance, not just Cell
 	expect(clone).toBeInstanceOf(Bit);
 
 	// Verify it has the correct prototype chain
@@ -697,7 +697,7 @@ test('initialization - properties are properly initialized from options.json', (
 // Test for subclass that forgets to call init()
 test('initialization - all subclasses must call init() in constructor', () => {
 	// Create a test subclass that doesn't call init
-	class Bad_Subclass extends Serializable<typeof Bit_Json, any> {
+	class Bad_Subclass extends Cell<typeof Bit_Json, any> {
 		name: string = $state('default');
 
 		constructor(options: any) {

@@ -41,7 +41,7 @@
 	// Initialize Zzz
 	const zzz = new Zzz();
 
-	// Register serializable classes with the registry by their class name
+	// Register cell classes with the registry by their class name
 	zzz.registry.register(Bit);
 	zzz.registry.register(Prompt);
 	zzz.registry.register(Model);

@@ -6,7 +6,7 @@ import {get_unique_name} from '$lib/helpers.js';
 import {XML_TAG_NAME_DEFAULT} from '$lib/constants.js';
 import {Bit, Bit_Json} from '$lib/bit.svelte.js';
 import {reorder_list} from '$lib/list_helpers.js';
-import {Serializable, type Serializable_Options} from '$lib/serializable.svelte.js';
+import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 
 export const PROMPT_CONTENT_TRUNCATED_LENGTH = 100;
 
@@ -37,11 +37,11 @@ export const Prompt_Json = z
 	.default(() => ({}));
 export type Prompt_Json = z.infer<typeof Prompt_Json>;
 
-export interface Prompt_Options extends Serializable_Options<typeof Prompt_Json> {
+export interface Prompt_Options extends Cell_Options<typeof Prompt_Json> {
 	name?: string;
 }
 
-export class Prompt extends Serializable<typeof Prompt_Json> {
+export class Prompt extends Cell<typeof Prompt_Json> {
 	id: Uuid = $state()!;
 	name: string = $state()!;
 	created: string = $state()!;

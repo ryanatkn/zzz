@@ -103,6 +103,7 @@ export const package_json = {
 		},
 		'./bit.svelte.js': {types: './dist/bit.svelte.d.ts', default: './dist/bit.svelte.js'},
 		'./cell_registry.js': {types: './dist/cell_registry.d.ts', default: './dist/cell_registry.js'},
+		'./cell.svelte.js': {types: './dist/cell.svelte.d.ts', default: './dist/cell.svelte.js'},
 		'./Chat_Item.svelte': {
 			types: './dist/Chat_Item.svelte.d.ts',
 			svelte: './dist/Chat_Item.svelte',
@@ -401,10 +402,6 @@ export const package_json = {
 			types: './dist/scrollable.svelte.d.ts',
 			default: './dist/scrollable.svelte.js',
 		},
-		'./serializable.svelte.js': {
-			types: './dist/serializable.svelte.d.ts',
-			default: './dist/serializable.svelte.js',
-		},
 		'./server/.env.example': {default: './dist/server/.env.example'},
 		'./server/helpers.js': {
 			types: './dist/server/helpers.d.ts',
@@ -475,6 +472,13 @@ export const src_json = {
 		'./cell_registry.js': {
 			path: 'cell_registry.ts',
 			declarations: [{name: 'Cell_Registry', kind: 'class'}],
+		},
+		'./cell.svelte.js': {
+			path: 'cell.svelte.ts',
+			declarations: [
+				{name: 'Cell_Options', kind: 'type'},
+				{name: 'Cell', kind: 'class'},
+			],
 		},
 		'./Chat_Item.svelte': {path: 'Chat_Item.svelte', declarations: []},
 		'./Chat_Message.svelte': {path: 'Chat_Message.svelte', declarations: []},
@@ -771,13 +775,6 @@ export const src_json = {
 			declarations: [
 				{name: 'Scrollable_Parameters', kind: 'type'},
 				{name: 'Scrollable', kind: 'class'},
-			],
-		},
-		'./serializable.svelte.js': {
-			path: 'serializable.svelte.ts',
-			declarations: [
-				{name: 'Serializable_Options', kind: 'type'},
-				{name: 'Serializable', kind: 'class'},
 			],
 		},
 		'./server/.env.example': {path: 'server/.env.example', declarations: []},

@@ -3,7 +3,7 @@
 import {encode} from 'gpt-tokenizer';
 import {z} from 'zod';
 
-import {Serializable, type Serializable_Options} from '$lib/serializable.svelte.js';
+import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Uuid} from '$lib/uuid.js';
 import {Xml_Attribute} from '$lib/xml.js';
 
@@ -20,9 +20,9 @@ export const Bit_Json = z
 	.default(() => ({}));
 export type Bit_Json = z.infer<typeof Bit_Json>;
 
-export interface Bit_Options extends Serializable_Options<typeof Bit_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
+export interface Bit_Options extends Cell_Options<typeof Bit_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
-export class Bit extends Serializable<typeof Bit_Json> {
+export class Bit extends Cell<typeof Bit_Json> {
 	// Defaults for json properties are set in the schema and assigned via `to_json()`
 	id: Uuid = $state()!;
 	name: string = $state()!;

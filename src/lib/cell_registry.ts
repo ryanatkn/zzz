@@ -1,4 +1,4 @@
-import type {Serializable} from '$lib/serializable.svelte';
+import type {Cell} from '$lib/cell.svelte.js';
 
 // TODO extract helper?
 type Class_Constructor<T> = new (options: any) => T;
@@ -20,7 +20,7 @@ export class Cell_Registry<T_Zzz> {
 	/**
 	 * Register a class constructor with its name
 	 */
-	register<T_Class extends Serializable<any, any>>(constructor: Class_Constructor<T_Class>): void {
+	register<T_Class extends Cell<any, any>>(constructor: Class_Constructor<T_Class>): void {
 		// Use the constructor's name as the key
 		const class_name = constructor.name;
 		this.#constructors.set(class_name, constructor);

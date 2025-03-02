@@ -1,7 +1,7 @@
 import {format} from 'date-fns';
 import {z} from 'zod';
 
-import {Serializable, type Serializable_Options} from '$lib/serializable.svelte.js';
+import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {
 	to_completion_response_text,
 	type Completion_Request,
@@ -16,9 +16,9 @@ export const MESSAGE_DATE_FORMAT = 'MMM d, p';
 export const MESSAGE_TIME_FORMAT = 'p';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface Message_Options extends Serializable_Options<typeof Message_Json> {}
+export interface Message_Options extends Cell_Options<typeof Message_Json> {}
 
-export class Message extends Serializable<typeof Message_Json> {
+export class Message extends Cell<typeof Message_Json> {
 	id: Uuid = $state()!;
 	type: Message_Type = $state()!;
 	direction: Message_Direction = $state()!;
