@@ -7,7 +7,7 @@ import {Bit, Bit_Json} from '$lib/bit.svelte.js';
 import {Uuid} from '$lib/uuid.js';
 import {Serializable} from '$lib/serializable.svelte.js';
 
-// TODO BLOCK new one per test?
+// TODO new one per test?
 const mock_zzz = {} as any;
 
 // Constructor tests
@@ -697,7 +697,7 @@ test('initialization - properties are properly initialized from options.json', (
 // Test for subclass that forgets to call init()
 test('initialization - all subclasses must call init() in constructor', () => {
 	// Create a test subclass that doesn't call init
-	class Bad_Subclass extends Serializable<any, typeof Bit_Json, any> {
+	class Bad_Subclass extends Serializable<any, typeof Bit_Json> {
 		name: string = $state('default');
 
 		constructor(options: any) {
@@ -713,4 +713,60 @@ test('initialization - all subclasses must call init() in constructor', () => {
 
 	// Properties should not be set from json if init() wasn't called
 	expect(instance.name).toBe('default');
+});
+
+// Test default values applied properly
+test('initialization - default values are applied properly when not provided', () => {
+	const bit = new Bit({zzz: mock_zzz});
+
+	// Verify all default values are correct
+	expect(bit.id).toBeDefined();
+	expect(bit.name).toBe('');
+	expect(bit.has_xml_tag).toBe(false);
+	expect(bit.xml_tag_name).toBe('');
+	expect(bit.attributes).toEqual([]);
+	expect(bit.enabled).toBe(true);
+	expect(bit.content).toBe('');
+});
+
+// Test initialization with null values
+test('initialization - throws error when null values are provided', () => {
+	// Should throw when null values are passed for string fields
+	expect(
+		() =>
+			new Bit({
+				zzz: mock_zzz,
+				json: {
+					name: null as any,
+					content: null as any,
+				},
+			}),
+	).toThrow(); // Zod should throw a validation error
+});
+
+// Add a test for undefined values which should use defaults
+test('initialization - uses defaults for undefined values', () => {
+	const bit = new Bit({
+		zzz: mock_zzz,
+		json: {
+			// Don't set name or content - should use defaults
+		},
+	});
+
+	expect(bit.name).toBe('');
+	expect(bit.content).toBe('');
+});
+
+// Test partial initialization with some fields provided
+test('initialization - supports partial initialization', () => {
+	const bit = new Bit({
+		zzz: mock_zzz,
+		json: {
+			name: 'Test Name',
+			// content is left undefined
+		},
+	});
+
+	expect(bit.name).toBe('Test Name');
+	expect(bit.content).toBe(''); // Should get default value
 });

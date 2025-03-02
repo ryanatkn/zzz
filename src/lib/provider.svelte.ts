@@ -3,25 +3,22 @@ import {Serializable, type Serializable_Options} from '$lib/serializable.svelte.
 
 import type {Model} from '$lib/model.svelte.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
+import {Provider_Name} from '$lib/api.js';
 
-// Define the schema here as the single source of truth
-export const Provider_Name = z.enum(['ollama', 'claude', 'chatgpt', 'gemini']);
-export type Provider_Name = z.infer<typeof Provider_Name>;
-
-export const Provider_Json_Schema = z.object({
+export const Provider_Json = z.object({
 	name: Provider_Name,
 	icon: z.string(),
 	title: z.string(),
 	url: z.string(),
 });
-export type Provider_Json = z.infer<typeof Provider_Json_Schema>;
+export type Provider_Json = z.infer<typeof Provider_Json>;
 
-export interface Provider_Options extends Serializable_Options<typeof Provider_Json_Schema, Zzz> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
+export interface Provider_Options extends Serializable_Options<typeof Provider_Json, Zzz> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
 // TODO BLOCK `Provider` is the wrong word here, more like Model_Service
 export class Provider extends Serializable<
-	z.output<typeof Provider_Json_Schema>,
-	typeof Provider_Json_Schema,
+	z.output<typeof Provider_Json>,
+	typeof Provider_Json,
 	Zzz
 > {
 	name: Provider_Name = $state()!;
@@ -40,7 +37,7 @@ export class Provider extends Serializable<
 
 	constructor(options: Provider_Options) {
 		// Pass schema and options to base constructor
-		super(Provider_Json_Schema, options);
+		super(Provider_Json, options);
 
 		// Initialize properties with the json data
 		this.init();

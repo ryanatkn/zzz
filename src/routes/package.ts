@@ -452,10 +452,10 @@ export const src_json = {
 		'./api.js': {
 			path: 'api.ts',
 			declarations: [
+				{name: 'Provider_Name', kind: 'variable'},
+				{name: 'Api_Change_Type', kind: 'variable'},
 				{name: 'map_watcher_change_to_api_change', kind: 'function'},
 				{name: 'Api_Message_Type', kind: 'variable'},
-				{name: 'Api_Change_Type', kind: 'variable'},
-				{name: 'Provider_Name', kind: 'variable'},
 				{name: 'Api_Base_Message', kind: 'variable'},
 				{name: 'Api_Echo_Message', kind: 'variable'},
 				{name: 'Api_Load_Session_Message', kind: 'variable'},
@@ -524,14 +524,17 @@ export const src_json = {
 		'./completion.js': {
 			path: 'completion.ts',
 			declarations: [
-				{name: 'Completion_Request', kind: 'type'},
+				{name: 'Completion', kind: 'type'},
+				{name: 'Completion_Request', kind: 'variable'},
+				{name: 'Completion_Response', kind: 'type'},
+				{name: 'Completion_Response_Data', kind: 'type'},
 				{name: 'Ollama_Completion_Data', kind: 'type'},
 				{name: 'Claude_Completion_Data', kind: 'type'},
 				{name: 'Chatgpt_Completion_Data', kind: 'type'},
 				{name: 'Gemini_Completion_Data', kind: 'type'},
-				{name: 'Completion_Response_Data', kind: 'type'},
-				{name: 'Completion_Response', kind: 'type'},
-				{name: 'Completion', kind: 'type'},
+				{name: 'Completion_Response_Data_Schema', kind: 'variable'},
+				{name: 'Completion_Response_Schema', kind: 'variable'},
+				{name: 'Completion_Schema', kind: 'variable'},
 				{name: 'to_completion_response_text', kind: 'function'},
 			],
 		},
@@ -641,8 +644,8 @@ export const src_json = {
 		'./model.svelte.js': {
 			path: 'model.svelte.ts',
 			declarations: [
+				{name: 'Model_Json', kind: 'variable'},
 				{name: 'Model_Name', kind: 'type'},
-				{name: 'Model_Json', kind: 'type'},
 				{name: 'Model_Options', kind: 'type'},
 				{name: 'Model', kind: 'class'},
 			],
@@ -672,6 +675,8 @@ export const src_json = {
 				{name: 'PROMPT_CONTENT_TRUNCATED_LENGTH', kind: 'variable'},
 				{name: 'Prompt_Message', kind: 'type'},
 				{name: 'Prompt_Message_Content', kind: 'type'},
+				{name: 'Prompt_Json', kind: 'variable'},
+				{name: 'Prompt_Options', kind: 'type'},
 				{name: 'Prompt', kind: 'class'},
 				{name: 'join_prompt_bits', kind: 'function'},
 			],
@@ -690,7 +695,7 @@ export const src_json = {
 		'./provider.svelte.js': {
 			path: 'provider.svelte.ts',
 			declarations: [
-				{name: 'Provider_Json', kind: 'type'},
+				{name: 'Provider_Json', kind: 'variable'},
 				{name: 'Provider_Options', kind: 'type'},
 				{name: 'Provider', kind: 'class'},
 			],
@@ -745,7 +750,7 @@ export const src_json = {
 		'./serializable.svelte.js': {
 			path: 'serializable.svelte.ts',
 			declarations: [
-				{name: 'Serializable_Constructor', kind: 'type'},
+				{name: 'Serializable_Options', kind: 'type'},
 				{name: 'Serializable', kind: 'class'},
 			],
 		},

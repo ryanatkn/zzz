@@ -8,6 +8,10 @@ import {
 	type Completion_Response,
 } from '$lib/completion.js';
 
+// TODO there's a problem with .svelte.ts files in the server build, so I'm putting these here as a hack
+export const Provider_Name = z.enum(['ollama', 'claude', 'chatgpt', 'gemini']);
+export type Provider_Name = z.infer<typeof Provider_Name>;
+
 // Define a proper map from Watcher_Change_Type to Api_Change_Type
 export const Api_Change_Type = z.enum(['add', 'change', 'unlink']);
 export type Api_Change_Type = z.infer<typeof Api_Change_Type>;
@@ -168,13 +172,14 @@ export type Api_Message_With_Metadata = z.infer<typeof Api_Message_With_Metadata
 	completion_response?: Completion_Response;
 };
 
+// TODO BLOCK these shouldn't exist
 // Helper functions remain for API compatibility
 export const to_completion_request = (
 	api_request: Api_Send_Prompt_Message['completion_request'],
 ): Completion_Request => {
 	return api_request;
 };
-
+// TODO BLOCK these shouldn't exist
 export const to_completion_response = (
 	api_response: Api_Receive_Prompt_Message['completion_response'],
 ): Completion_Response => {

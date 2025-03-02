@@ -138,6 +138,7 @@ export class Message extends Serializable<
 		}
 	}
 
+	// TODO BLOCK ideally this does not exist, use the base class method, fix the data structures if possible (and if that's actually the best design)
 	override to_json(): z.output<typeof Api_Message_With_Metadata> {
 		const base = {
 			id: this.id,
