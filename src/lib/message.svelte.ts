@@ -91,6 +91,7 @@ export class Message extends Serializable<typeof Message_With_Metadata, Zzz> {
 		// Initialize base properties
 		this.init();
 
+		// TODO BLOCK @many this is hacky
 		// Process message-specific fields after properties are set from JSON
 		if (options.json) {
 			// Initialize type-specific properties based on message type
@@ -134,6 +135,10 @@ export class Message extends Serializable<typeof Message_With_Metadata, Zzz> {
 						this.data = options.json.data;
 					}
 					break;
+				default:
+					// unexpected
+					console.error('Unexpected message type', this.type, this);
+					break;
 			}
 		}
 	}
@@ -147,6 +152,7 @@ export class Message extends Serializable<typeof Message_With_Metadata, Zzz> {
 			created: this.created,
 		};
 
+		// TODO BLOCK @many this is hacky
 		// Add type-specific properties
 		switch (this.type) {
 			case 'echo':

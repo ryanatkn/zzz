@@ -79,15 +79,7 @@ export class Prompt extends Serializable<typeof Prompt_Json, Zzz> {
 		}
 
 		// Process bits separately
-		this.bits = bit_jsons.map((bit_json) => {
-			// If it's already a Bit instance, return it
-			if (bit_json instanceof Bit) return bit_json;
-			// Otherwise create a new Bit
-			return new Bit({
-				zzz: this.zzz,
-				json: bit_json as Bit_Json,
-			});
-		});
+		this.bits = bit_jsons.map((b) => new Bit({zzz: this.zzz, json: b}));
 	}
 
 	add_bit(content: string = '', name: string = 'new bit'): Bit {
