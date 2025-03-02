@@ -2,8 +2,8 @@ import {format} from 'date-fns';
 
 import {
 	type Api_Message_With_Metadata,
-	type Api_Message,
 	type Api_Message_Direction,
+	type Api_Message_Type,
 	type Api_Send_Prompt_Message,
 	type Api_Receive_Prompt_Message,
 } from '$lib/api.js';
@@ -29,10 +29,18 @@ export class Message {
 	readonly zzz: Zzz;
 
 	id: Uuid = $state()!;
-	type: Api_Message['type'] = $state()!;
+	type: Api_Message_Type = $state()!;
 	direction: Api_Message_Direction = $state()!;
-	data: unknown = $state();
 	created: string = $state()!;
+
+	// Store data based on message type
+	data: unknown = $state();
+	completion_request: Completion_Request | undefined = $state();
+	completion_response: Completion_Response | undefined = $state();
+	file_id: string | undefined = $state();
+	contents: string | undefined = $state();
+	change: any | undefined = $state();
+	source_file: any | undefined = $state();
 
 	created_date: Date = $derived(new Date(this.created));
 	created_formatted_time: string = $derived(format(this.created_date, MESSAGE_TIME_FORMAT));
@@ -81,26 +89,94 @@ export class Message {
 			: this.completion_text;
 	});
 
+	// Update the constructor to handle the different message types
 	constructor(options: Message_Options) {
-		const {
-			zzz,
-			json: {id, type, direction, data, created},
-		} = options;
+		const {zzz, json} = options;
 		this.zzz = zzz;
-		this.id = id;
-		this.type = type;
-		this.direction = direction;
-		this.data = data;
-		this.created = created;
+		this.id = json.id;
+		this.type = json.type;
+		this.direction = json.direction;
+		this.created = json.created;
+
+		// Depending on message type, assign the appropriate properties
+		switch (json.type) {
+			case 'echo':
+				this.data = json.data;
+				break;
+			case 'send_prompt':
+				this.completion_request = json.completion_request;
+				break;
+			case 'completion_response':
+				this.completion_response = json.completion_response;
+				break;
+			case 'update_file':
+				this.file_id = json.file_id;
+				this.contents = json.contents;
+				break;
+			case 'delete_file':
+				this.file_id = json.file_id;
+				break;
+			case 'filer_change':
+				this.change = json.change;
+				this.source_file = json.source_file;
+				break;
+			case 'load_session':
+				// No additional data
+				break;
+			case 'loaded_session':
+				this.data = json.data;
+				break;
+		}
+
+		// For backward compatibility, ensure data is populated
+		if (this.data === undefined) {
+			switch (json.type) {
+				case 'send_prompt':
+					this.data = {completion_request: this.completion_request};
+					break;
+				case 'completion_response':
+					this.data = {completion_response: this.completion_response};
+					break;
+				case 'update_file':
+					this.data = {file_id: this.file_id, contents: this.contents};
+					break;
+				case 'delete_file':
+					this.data = {file_id: this.file_id};
+					break;
+				case 'filer_change':
+					this.data = {change: this.change, source_file: this.source_file};
+					break;
+			}
+		}
 	}
 
 	toJSON(): Api_Message_With_Metadata {
-		return {
+		const base = {
 			id: this.id,
 			type: this.type,
 			direction: this.direction,
-			data: this.data,
 			created: this.created,
-		} as Api_Message_With_Metadata; // Cast needed because we don't have the full discriminated union type information
+		};
+
+		// Add type-specific properties
+		switch (this.type) {
+			case 'echo':
+				return {...base, data: this.data};
+			case 'send_prompt':
+				return {...base, completion_request: this.completion_request};
+			case 'completion_response':
+				return {...base, completion_response: this.completion_response};
+			case 'update_file':
+				return {...base, file_id: this.file_id, contents: this.contents};
+			case 'delete_file':
+				return {...base, file_id: this.file_id};
+			case 'filer_change':
+				return {...base, change: this.change, source_file: this.source_file};
+			case 'loaded_session':
+				return {...base, data: this.data};
+			case 'load_session':
+			default:
+				return base;
+		}
 	}
 }

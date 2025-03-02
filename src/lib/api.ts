@@ -1,6 +1,27 @@
 import {z} from 'zod';
+import type {Watcher_Change_Type} from '@ryanatkn/gro/watch_dir.js';
 
 import {Uuid} from '$lib/uuid.js';
+import {Provider_Name} from '$lib/provider.svelte.js';
+
+// Define a proper map from Watcher_Change_Type to Api_Change_Type
+export const map_watcher_change_to_api_change = (type: Watcher_Change_Type): Api_Change_Type => {
+	if (type === 'update') return 'change';
+	return type as Api_Change_Type;
+};
+
+// Define all message types as literals for better type safety
+export const Api_Message_Type = z.enum([
+	'echo',
+	'load_session',
+	'loaded_session',
+	'filer_change',
+	'send_prompt',
+	'completion_response',
+	'update_file',
+	'delete_file',
+]);
+export type Api_Message_Type = z.infer<typeof Api_Message_Type>;
 
 export const Api_Change_Type = z.enum(['add', 'change', 'unlink']);
 export type Api_Change_Type = z.infer<typeof Api_Change_Type>;
@@ -8,7 +29,7 @@ export type Api_Change_Type = z.infer<typeof Api_Change_Type>;
 // Base schema for all messages
 export const Api_Base_Message = z.object({
 	id: Uuid,
-	type: z.string(),
+	type: Api_Message_Type,
 });
 
 // Echo message schema
@@ -53,12 +74,24 @@ export const Api_Delete_File_Message = Api_Base_Message.extend({
 // Completion related message schemas
 export const Api_Send_Prompt_Message = Api_Base_Message.extend({
 	type: z.literal('send_prompt'),
-	completion_request: z.any(), // Completion_Request
+	completion_request: z.object({
+		created: z.string().datetime(),
+		request_id: Uuid,
+		provider_name: Provider_Name,
+		model: z.string(),
+		prompt: z.string(),
+	}),
 });
 
 export const Api_Receive_Prompt_Message = Api_Base_Message.extend({
 	type: z.literal('completion_response'),
-	completion_response: z.any(), // Completion_Response
+	completion_response: z.object({
+		created: z.string().datetime(),
+		request_id: Uuid,
+		provider_name: Provider_Name,
+		model: z.string(),
+		data: z.any(),
+	}),
 });
 
 // Union of all client message types
@@ -92,15 +125,23 @@ export const Api_Message = z.discriminatedUnion('type', [
 
 // Message direction
 export const Api_Message_Direction = z.enum(['client', 'server', 'both']);
+export type Api_Message_Direction = z.infer<typeof Api_Message_Direction>;
 
-// Message with metadata - use `merge` instead of `extend` for discriminated unions
-export const Api_Message_With_Metadata = z.intersection(
-	Api_Message,
-	z.object({
-		direction: Api_Message_Direction,
-		created: z.string().datetime(),
-	}),
-);
+// Message with metadata schema
+export const Api_Message_With_Metadata = z.object({
+	id: Uuid,
+	type: Api_Message_Type,
+	direction: Api_Message_Direction,
+	created: z.string().datetime(),
+	// Optional fields with proper type checking
+	data: z.any().optional(),
+	completion_request: z.any().optional(),
+	completion_response: z.any().optional(),
+	file_id: z.string().optional(),
+	contents: z.string().optional(),
+	change: z.any().optional(),
+	source_file: z.any().optional(),
+});
 
 // Export TypeScript types derived from the Zod schemas
 export type Api_Base_Message = z.infer<typeof Api_Base_Message>;
@@ -115,7 +156,6 @@ export type Api_Receive_Prompt_Message = z.infer<typeof Api_Receive_Prompt_Messa
 export type Api_Client_Message = z.infer<typeof Api_Client_Message>;
 export type Api_Server_Message = z.infer<typeof Api_Server_Message>;
 export type Api_Message = z.infer<typeof Api_Message>;
-export type Api_Message_Direction = z.infer<typeof Api_Message_Direction>;
 export type Api_Message_With_Metadata = z.infer<typeof Api_Message_With_Metadata>;
 
 // Helper function to validate messages

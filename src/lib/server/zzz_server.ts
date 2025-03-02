@@ -18,6 +18,7 @@ import {
 	type Api_Receive_Prompt_Message,
 	type Api_Send_Prompt_Message,
 	type Api_Server_Message,
+	map_watcher_change_to_api_change,
 } from '$lib/api.js';
 import {Uuid} from '$lib/uuid.js';
 import {SYSTEM_MESSAGE_DEFAULT} from '$lib/config.js';
@@ -84,18 +85,20 @@ export class Zzz_Server {
 		this.zzz_dir = options.zzz_dir ?? ZZZ_DIR_DEFAULT;
 		this.filer = options.filer ?? new Filer({watch_dir_options: {dir: this.zzz_dir}});
 		this.#cleanup_filer = this.filer.watch((change, source_file) => {
-			switch (change.type) {
-				case 'add':
-				case 'update':
-				case 'delete': {
-					if (source_file.id.includes('.css'))
-						console.log(`source_file`, source_file.id, source_file.contents?.length);
-					this.#send({id: Uuid.parse(undefined), type: 'filer_change', change, source_file});
-					break;
-				}
-				default:
-					throw new Unreachable_Error(change.type);
-			}
+			// Convert watcher change type to API change type
+			const api_change = {
+				type: map_watcher_change_to_api_change(change.type),
+				path: change.path,
+			};
+
+			if (source_file.id.includes('.css'))
+				console.log(`source_file`, source_file.id, source_file.contents?.length);
+			this.#send({
+				id: Uuid.parse(undefined),
+				type: 'filer_change',
+				change: api_change,
+				source_file,
+			});
 		});
 		this.system_message = options.system_message ?? SYSTEM_MESSAGE_DEFAULT;
 		this.output_token_max = options.output_token_max ?? OUTPUT_TOKEN_MAX_DEFAULT;
