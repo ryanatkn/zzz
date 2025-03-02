@@ -136,8 +136,8 @@ export class Message extends Serializable<typeof Message_With_Metadata, Zzz> {
 					}
 					break;
 				default:
-					// unexpected
-					console.error('Unexpected message type', this.type, this);
+					// TODO what to do here?
+					console.log('unhandled message', this.type, this);
 					break;
 			}
 		}

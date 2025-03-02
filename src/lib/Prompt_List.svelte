@@ -29,6 +29,7 @@
 	// Derive the selected prompt object from the ID
 	const selected_prompt = $derived(chat.zzz.prompts.items.find((p) => p.id === selected_prompt_id));
 
+	// TODO can this be refactored away?
 	// Reset selection when the available prompts change
 	$effect(() => {
 		if (unselected_prompts.length && !unselected_prompts.some((p) => p.id === selected_prompt_id)) {

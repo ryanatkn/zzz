@@ -18,7 +18,7 @@ export const Bit_Json = z
 		enabled: z.boolean().default(true),
 		content: z.string().default(''),
 	})
-	.default({});
+	.default(() => ({}));
 export type Bit_Json = z.infer<typeof Bit_Json>;
 
 export interface Bit_Options extends Serializable_Options<typeof Bit_Json, Zzz> {} // eslint-disable-line @typescript-eslint/no-empty-object-type

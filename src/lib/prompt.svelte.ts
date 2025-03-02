@@ -18,12 +18,14 @@ export interface Prompt_Message {
 
 export type Prompt_Message_Content = string; // TODO ?
 
-export const Prompt_Json = z.object({
-	id: Uuid,
-	name: z.string().default(''),
-	created: z.string().default(() => new Date().toISOString()),
-	bits: z.array(Bit_Json).default(() => []),
-});
+export const Prompt_Json = z
+	.object({
+		id: Uuid,
+		name: z.string().default(''),
+		created: z.string().default(() => new Date().toISOString()),
+		bits: z.array(Bit_Json).default(() => []),
+	})
+	.default(() => ({}));
 export type Prompt_Json = z.infer<typeof Prompt_Json>;
 
 export interface Prompt_Options extends Serializable_Options<typeof Prompt_Json, Zzz> {
@@ -34,7 +36,7 @@ export class Prompt extends Serializable<typeof Prompt_Json, Zzz> {
 	id: Uuid = $state()!;
 	name: string = $state()!;
 	created: string = $state()!;
-	bits: Array<Bit> = $state([]);
+	bits: Array<Bit> = $state()!;
 
 	content: string = $derived(join_prompt_bits(this.bits));
 
@@ -63,23 +65,11 @@ export class Prompt extends Serializable<typeof Prompt_Json, Zzz> {
 	}
 
 	// TODO BLOCK generically implement via schema
-	override set_json(value?: z.input<typeof Prompt_Json>): void {
-		// Parse the input value
-		const parsed = this.schema.parse(value);
-
-		// Handle bits specially - convert JSON to Bit instances
-		const bit_jsons = parsed.bits;
-		parsed.bits = [];
-
-		// Set all other properties
-		for (const key in parsed) {
-			if (key !== 'bits') {
-				(this as any)[key] = (parsed as any)[key];
-			}
+	override decode(value: unknown, key: string): unknown {
+		if (key === 'bits') {
+			return (value as Array<Bit_Json>).map((b) => new Bit({zzz: this.zzz, json: b}));
 		}
-
-		// Process bits separately
-		this.bits = bit_jsons.map((b) => new Bit({zzz: this.zzz, json: b}));
+		return value;
 	}
 
 	add_bit(content: string = '', name: string = 'new bit'): Bit {

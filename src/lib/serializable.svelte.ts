@@ -42,6 +42,7 @@ export abstract class Serializable<T_Schema extends z.ZodType, T_Zzz = any> {
 	 * Must be called by subclasses at the end of their constructor.
 	 */
 	protected init(): void {
+		console.log(`init`, this.constructor.name, this.options.json);
 		this.set_json(this.schema.parse(this.options.json));
 	}
 
@@ -71,9 +72,15 @@ export abstract class Serializable<T_Schema extends z.ZodType, T_Zzz = any> {
 	 */
 	set_json(value?: z.input<T_Schema>): void {
 		const parsed = this.schema.parse(value);
+		console.log(`set_json`, this.constructor.name, parsed, value);
 		for (const key in parsed) {
-			(this as any)[key] = parsed[key];
+			(this as any)[key] = this.decode(parsed[key], key, parsed, this.schema);
 		}
+	}
+
+	// TODO BLOCK do this pattern? so consumers can implement their own switch?
+	decode(value: unknown, _key: string, _parsed: any, _schema: any): unknown {
+		return value;
 	}
 
 	/**
