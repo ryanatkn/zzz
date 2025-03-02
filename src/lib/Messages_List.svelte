@@ -43,7 +43,7 @@
 				type="button"
 				class="w_100 text_align_left justify_content_start py_xs px_md radius_0 border_none box_shadow_none"
 				class:selected
-				on:click={() => handle_select(message)}
+				onclick={() => handle_select(message)}
 				transition:slide
 			>
 				<div class="font_weight_400 flex align_items_center gap_xs">

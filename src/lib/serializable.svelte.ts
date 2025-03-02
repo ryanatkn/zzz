@@ -5,8 +5,14 @@ import {DEV} from 'esm-env';
 
 import {zod_get_schema_keys} from '$lib/zod_helpers.js';
 
+// Base options type that all serializable objects will extend
+export interface Serializable_Options<T_Schema extends z.ZodType, T_Zzz = any> {
+	zzz: T_Zzz;
+	json?: z.input<T_Schema>;
+}
+
 // TODO maybe rename to `Json_Serializable` to be more explicit? Or `Snapshottable`?
-export abstract class Serializable<T_Json, T_Schema extends z.ZodType> {
+export abstract class Serializable<T_Json, T_Schema extends z.ZodType, T_Zzz = any> {
 	readonly schema: T_Schema;
 	readonly schema_keys: Array<string> = $derived.by(() => zod_get_schema_keys(this.schema));
 
@@ -16,12 +22,30 @@ export abstract class Serializable<T_Json, T_Schema extends z.ZodType> {
 		() => this.schema.safeParse(this.json),
 	);
 
-	// Add an optional zzz property that will be available to all subclasses
-	readonly zzz?: any;
+	// Make zzz required
+	readonly zzz: T_Zzz;
 
-	constructor(schema: T_Schema, zzz?: any) {
+	// Store options for use during initialization
+	protected readonly options: Serializable_Options<T_Schema, T_Zzz>;
+
+	constructor(schema: T_Schema, options: Serializable_Options<T_Schema, T_Zzz>) {
 		this.schema = schema;
-		this.zzz = zzz;
+		this.zzz = options.zzz;
+		this.options = options;
+
+		// We do NOT automatically call this.init() here due to Svelte's initialization order
+		// Subclasses must call this.init() at the end of their constructor
+	}
+
+	/**
+	 * Initialize the instance with options.json data if provided.
+	 * Must be called by subclasses at the end of their constructor.
+	 */
+	protected init(): void {
+		// Initialize properties from JSON if provided
+		if (this.options.json) {
+			this.set_json(this.options.json);
+		}
 	}
 
 	/**
@@ -68,10 +92,9 @@ export abstract class Serializable<T_Json, T_Schema extends z.ZodType> {
 	 */
 	clone(): this {
 		// Get the constructor of this instance
-		const constructor = this.constructor as new (options: {
-			zzz?: any;
-			json?: z.input<T_Schema>;
-		}) => this;
+		const constructor = this.constructor as new (
+			options: Serializable_Options<T_Schema, T_Zzz>,
+		) => this;
 
 		try {
 			// Create a new instance with the copied JSON and the same zzz reference

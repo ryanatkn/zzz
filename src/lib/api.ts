@@ -5,7 +5,6 @@ import {Uuid} from '$lib/uuid.js';
 import {
 	Completion_Request,
 	Completion_Response_Schema,
-	type Completion_Request,
 	type Completion_Response,
 } from '$lib/completion.js';
 

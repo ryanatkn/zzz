@@ -1,5 +1,5 @@
 import {z} from 'zod';
-import {Serializable} from '$lib/serializable.svelte.js';
+import {Serializable, type Serializable_Options} from '$lib/serializable.svelte.js';
 
 import type {Model} from '$lib/model.svelte.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
@@ -16,18 +16,14 @@ export const Provider_Json_Schema = z.object({
 });
 export type Provider_Json = z.infer<typeof Provider_Json_Schema>;
 
-export interface Provider_Options {
-	zzz: Zzz;
-	json?: z.input<typeof Provider_Json_Schema>;
-}
+export interface Provider_Options extends Serializable_Options<typeof Provider_Json_Schema, Zzz> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
 // TODO BLOCK `Provider` is the wrong word here, more like Model_Service
 export class Provider extends Serializable<
 	z.output<typeof Provider_Json_Schema>,
-	typeof Provider_Json_Schema
+	typeof Provider_Json_Schema,
+	Zzz
 > {
-	zzz: Zzz;
-
 	name: Provider_Name = $state()!;
 	icon: string = $state()!;
 	title: string = $state()!;
@@ -43,21 +39,15 @@ export class Provider extends Serializable<
 	);
 
 	constructor(options: Provider_Options) {
-		super(Provider_Json_Schema);
-		this.zzz = options.zzz;
+		// Pass schema and options to base constructor
+		super(Provider_Json_Schema, options);
 
-		if (options.json) {
-			this.set_json(options.json);
+		// Initialize properties with the json data
+		this.init();
+
+		// Handle any provider-specific initialization after properties are set
+		if (!this.selected_model_name && this.models.length > 0) {
+			this.selected_model_name = this.models[0]?.name;
 		}
-
-		const {
-			json: {name, icon, title, url},
-		} = options;
-		this.name = name;
-		this.icon = icon;
-		this.title = title;
-		const selected_model = this.models[0] as Model | undefined;
-		this.selected_model_name = selected_model?.name;
-		this.url = url;
 	}
 }

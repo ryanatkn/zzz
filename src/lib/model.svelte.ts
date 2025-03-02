@@ -1,12 +1,12 @@
 import type {Flavored} from '@ryanatkn/belt/types.js';
 import {z} from 'zod';
-import {Provider_Name} from '$lib/provider.svelte.js';
 
+import {Provider_Name} from '$lib/provider.svelte.js';
+import {Serializable, type Serializable_Options} from '$lib/serializable.svelte.js';
 import type {Ollama_Model_Info} from '$lib/ollama.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 
-// Define schema for Model_Json to enforce consistency
-export const Model_Json_Schema = z.object({
+export const Model_Json = z.object({
 	name: z.string(),
 	provider_name: Provider_Name,
 	tags: z.array(z.string()),
@@ -21,18 +21,13 @@ export const Model_Json_Schema = z.object({
 	training_cutoff: z.string().optional(),
 	ollama_model_info: z.any().optional(),
 });
-export type Model_Json = z.infer<typeof Model_Json_Schema>;
+export type Model_Json = z.infer<typeof Model_Json>;
 
 export type Model_Name = Flavored<string, 'Model'>;
 
-export interface Model_Options {
-	zzz: Zzz;
-	json: Model_Json;
-}
+export interface Model_Options extends Serializable_Options<typeof Model_Json, Zzz> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
-export class Model {
-	zzz: Zzz;
-
+export class Model extends Serializable<z.output<typeof Model_Json>, typeof Model_Json, Zzz> {
 	name: Model_Name = $state()!;
 	provider_name: Provider_Name = $state()!;
 	tags: Array<string> = $state()!;
@@ -57,39 +52,10 @@ export class Model {
 	);
 
 	constructor(options: Model_Options) {
-		const {zzz, json} = options;
-		this.zzz = zzz;
+		// Pass schema and options to base constructor
+		super(Model_Json, options);
 
-		this.name = json.name;
-		this.provider_name = json.provider_name;
-		this.tags = json.tags;
-		this.architecture = json.architecture;
-		this.parameter_count = json.parameter_count;
-		this.context_window = json.context_window;
-		this.output_token_limit = json.output_token_limit;
-		this.embedding_length = json.embedding_length;
-		this.filesize = json.filesize;
-		this.cost_input = json.cost_input;
-		this.cost_output = json.cost_output;
-		this.training_cutoff = json.training_cutoff;
-		this.ollama_model_info = json.ollama_model_info;
-	}
-
-	toJSON(): Model_Json {
-		return {
-			name: this.name,
-			provider_name: this.provider_name,
-			tags: this.tags,
-			architecture: this.architecture,
-			parameter_count: this.parameter_count,
-			context_window: this.context_window,
-			output_token_limit: this.output_token_limit,
-			embedding_length: this.embedding_length,
-			filesize: this.filesize,
-			cost_input: this.cost_input,
-			cost_output: this.cost_output,
-			training_cutoff: this.training_cutoff,
-			ollama_model_info: this.ollama_model_info,
-		};
+		// Call init after instance properties are defined
+		this.init();
 	}
 }

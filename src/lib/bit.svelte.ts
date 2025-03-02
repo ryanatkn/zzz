@@ -3,9 +3,10 @@
 import {encode} from 'gpt-tokenizer';
 import {z} from 'zod';
 
-import {Serializable} from '$lib/serializable.svelte.js';
+import {Serializable, type Serializable_Options} from '$lib/serializable.svelte.js';
 import {Uuid} from '$lib/uuid.js';
 import {Xml_Attribute} from '$lib/xml.js';
+import type {Zzz} from '$lib/zzz.svelte.js';
 
 export const Bit_Json = z
 	.object({
@@ -20,11 +21,9 @@ export const Bit_Json = z
 	.default({});
 export type Bit_Json = z.infer<typeof Bit_Json>;
 
-export interface Bit_Options {
-	json?: z.input<typeof Bit_Json>;
-}
+export interface Bit_Options extends Serializable_Options<typeof Bit_Json, Zzz> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
-export class Bit extends Serializable<z.output<typeof Bit_Json>, typeof Bit_Json> {
+export class Bit extends Serializable<z.output<typeof Bit_Json>, typeof Bit_Json, Zzz> {
 	// Defaults for json properties are set in the schema and assigned via `to_json()`
 	id: Uuid = $state()!;
 	name: string = $state()!;
@@ -38,10 +37,11 @@ export class Bit extends Serializable<z.output<typeof Bit_Json>, typeof Bit_Json
 	tokens: Array<number> = $derived(encode(this.content));
 	token_count: number = $derived(this.tokens.length);
 
-	constructor(options?: Bit_Options) {
-		super(Bit_Json);
+	constructor(options: Bit_Options) {
+		super(Bit_Json, options);
 
-		this.set_json(options?.json);
+		// Call init after instance creation to safely initialize properties
+		this.init();
 	}
 
 	add_attribute(partial?: z.input<typeof Xml_Attribute>): void {

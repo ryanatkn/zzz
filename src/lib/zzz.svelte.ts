@@ -1,16 +1,17 @@
 import {create_context} from '@ryanatkn/fuz/context_helpers.js';
 import {SvelteMap} from 'svelte/reactivity';
 import {create_deferred, type Deferred} from '@ryanatkn/belt/async.js';
+import type {z} from 'zod';
 
 import {Zzz_Data, type Zzz_Data_Json} from '$lib/zzz_data.svelte.js';
 import {
+	Api_Message_With_Metadata,
 	to_completion_response,
 	type Api_Echo_Message,
 	type Api_Receive_Prompt_Message,
 	type Api_Send_Prompt_Message,
-	type Provider_Name,
 } from '$lib/api.js';
-import {Provider, type Provider_Json} from '$lib/provider.svelte.js';
+import {Provider, Provider_Name, type Provider_Json} from '$lib/provider.svelte.js';
 import {Uuid} from '$lib/uuid.js';
 import {Completion_Threads, type Completion_Threads_Json} from '$lib/completion_thread.svelte.js';
 import {ollama_list_with_metadata} from '$lib/ollama.js';
@@ -20,7 +21,8 @@ import {Providers} from '$lib/providers.svelte.js';
 import {Prompts} from '$lib/prompts.svelte.js';
 import {Files} from '$lib/files.svelte.js';
 import {Messages} from '$lib/messages.svelte.js';
-import type {Model_Json} from './model.svelte.js';
+import {Model, type Model_Json} from '$lib/model.svelte.js';
+import {Message} from '$lib/message.svelte.js';
 
 export const zzz_context = create_context<Zzz>();
 
@@ -197,11 +199,22 @@ export class Zzz {
 
 	add_providers(providers_json: Array<Provider_Json>): void {
 		for (const json of providers_json) {
-			this.add_provider(new Provider({zzz: this, json}));
+			this.add_provider(this.create_provider(json));
 		}
 	}
 
 	add_provider(provider: Provider): void {
 		this.providers.add(provider);
+	}
+
+	// TODO BLOCK what if instead of these methods we had a generic one?
+	create_provider(provider_json: Provider_Json): Provider {
+		return new Provider({zzz: this, json: provider_json});
+	}
+	create_model(model_json: Model_Json): Model {
+		return new Model({zzz: this, json: model_json});
+	}
+	create_message(message_json: z.input<typeof Api_Message_With_Metadata>): Message {
+		return new Message({zzz: this, json: message_json});
 	}
 }

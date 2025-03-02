@@ -1,16 +1,18 @@
 // @vitest-environment jsdom
 
-// bit.svelte.test.ts
-
 import {test, expect} from 'vitest';
 import {encode} from 'gpt-tokenizer';
 
-import {Bit} from '$lib/bit.svelte.js';
+import {Bit, Bit_Json} from '$lib/bit.svelte.js';
 import {Uuid} from '$lib/uuid.js';
+import {Serializable} from '$lib/serializable.svelte.js';
+
+// TODO BLOCK new one per test?
+const mock_zzz = {} as any;
 
 // Constructor tests
 test('constructor - creates with default values when no options provided', () => {
-	const bit = new Bit();
+	const bit = new Bit({zzz: mock_zzz});
 
 	expect(bit).toBeInstanceOf(Bit);
 	expect(bit.id).toBeDefined();
@@ -28,6 +30,7 @@ test('constructor - creates with default values when no options provided', () =>
 // Derived properties tests - FIX the hardcoded bug
 test('derived_properties - length and token_count update when content changes', () => {
 	const bit = new Bit({
+		zzz: mock_zzz,
 		json: {
 			content: 'A',
 		},
@@ -52,6 +55,7 @@ test('derived_properties - length and token_count update when content changes', 
 test('clone - derived properties are calculated correctly', () => {
 	const test_content = 'This is a test content';
 	const original = new Bit({
+		zzz: mock_zzz,
 		json: {
 			content: test_content,
 		},
@@ -82,6 +86,7 @@ test('clone - derived properties are calculated correctly', () => {
 test('constructor - initializes with provided values', () => {
 	const id = Uuid.parse(undefined);
 	const bit = new Bit({
+		zzz: mock_zzz,
 		json: {
 			id,
 			name: 'Test Bit',
@@ -112,6 +117,7 @@ test('to_json - serializes all properties correctly', () => {
 	const id = Uuid.parse(undefined);
 	const attr_id = Uuid.parse(undefined);
 	const bit = new Bit({
+		zzz: mock_zzz,
 		json: {
 			id,
 			name: 'Serialization Test',
@@ -139,7 +145,7 @@ test('to_json - serializes all properties correctly', () => {
 
 // set_json tests
 test('set_json - updates properties with new values', () => {
-	const bit = new Bit();
+	const bit = new Bit({zzz: mock_zzz});
 	const new_id = Uuid.parse(undefined);
 
 	bit.set_json({
@@ -165,7 +171,7 @@ test('set_json - updates properties with new values', () => {
 
 // add_attribute tests
 test('add_attribute - adds a new attribute', () => {
-	const bit = new Bit();
+	const bit = new Bit({zzz: mock_zzz});
 
 	bit.add_attribute({
 		id: Uuid.parse(undefined),
@@ -179,7 +185,7 @@ test('add_attribute - adds a new attribute', () => {
 });
 
 test('add_attribute - adds multiple attributes', () => {
-	const bit = new Bit();
+	const bit = new Bit({zzz: mock_zzz});
 
 	bit.add_attribute({
 		id: Uuid.parse(undefined),
@@ -200,7 +206,7 @@ test('add_attribute - adds multiple attributes', () => {
 
 // update_attribute tests
 test('update_attribute - returns true and updates existing attribute', () => {
-	const bit = new Bit();
+	const bit = new Bit({zzz: mock_zzz});
 	const attr_id = Uuid.parse(undefined);
 
 	bit.add_attribute({
@@ -221,7 +227,7 @@ test('update_attribute - returns true and updates existing attribute', () => {
 });
 
 test('update_attribute - returns false when attribute not found', () => {
-	const bit = new Bit();
+	const bit = new Bit({zzz: mock_zzz});
 	const existing_attr_id = Uuid.parse(undefined);
 	const non_existent_id = Uuid.parse(undefined);
 
@@ -243,7 +249,7 @@ test('update_attribute - returns false when attribute not found', () => {
 });
 
 test('update_attribute - partially updates attribute fields', () => {
-	const bit = new Bit();
+	const bit = new Bit({zzz: mock_zzz});
 	const attr_id = Uuid.parse(undefined);
 
 	bit.add_attribute({
@@ -271,7 +277,7 @@ test('update_attribute - partially updates attribute fields', () => {
 
 // remove_attribute tests
 test('remove_attribute - removes existing attribute', () => {
-	const bit = new Bit();
+	const bit = new Bit({zzz: mock_zzz});
 	const attr_id_1 = Uuid.parse(undefined);
 	const attr_id_2 = Uuid.parse(undefined);
 
@@ -296,7 +302,7 @@ test('remove_attribute - removes existing attribute', () => {
 });
 
 test('remove_attribute - does nothing when attribute not found', () => {
-	const bit = new Bit();
+	const bit = new Bit({zzz: mock_zzz});
 	const existing_attr_id = Uuid.parse(undefined);
 	const non_existent_id = Uuid.parse(undefined);
 
@@ -317,6 +323,7 @@ test('remove_attribute - does nothing when attribute not found', () => {
 // clone tests (extended from original tests)
 test('clone - returns a new Bit instance with same properties', () => {
 	const original = new Bit({
+		zzz: mock_zzz,
 		json: {
 			id: Uuid.parse(undefined),
 			name: 'Test Bit',
@@ -343,6 +350,7 @@ test('clone - returns a new Bit instance with same properties', () => {
 
 test('clone - mutations to clone do not affect original', () => {
 	const original = new Bit({
+		zzz: mock_zzz,
 		json: {
 			id: Uuid.parse(undefined),
 			name: 'Original name',
@@ -367,6 +375,7 @@ test('clone - mutations to clone do not affect original', () => {
 
 test('clone - attributes are cloned correctly', () => {
 	const original = new Bit({
+		zzz: mock_zzz,
 		json: {
 			id: Uuid.parse(undefined),
 			name: 'Bit with attributes',
@@ -397,6 +406,7 @@ test('clone - attributes are cloned correctly', () => {
 // validate tests
 test('validate - returns success for valid bit', () => {
 	const bit = new Bit({
+		zzz: mock_zzz,
 		json: {
 			id: Uuid.parse(undefined),
 			name: 'Valid Bit',
@@ -411,6 +421,7 @@ test('validate - returns success for valid bit', () => {
 // toJSON tests
 test('to_json - returns same object as to_json', () => {
 	const bit = new Bit({
+		zzz: mock_zzz,
 		json: {
 			id: Uuid.parse(undefined),
 			name: 'JSON Test',
@@ -428,6 +439,7 @@ test('to_json - returns same object as to_json', () => {
 // Edge cases
 test('edge_case - empty attributes array is properly cloned', () => {
 	const original = new Bit({
+		zzz: mock_zzz,
 		json: {
 			id: Uuid.parse(undefined),
 			attributes: [],
@@ -455,6 +467,7 @@ test('edge_case - very long content is handled correctly', () => {
 	const long_content = 'a'.repeat(10000);
 
 	const bit = new Bit({
+		zzz: mock_zzz,
 		json: {
 			id: Uuid.parse(undefined),
 			content: long_content,
@@ -469,7 +482,7 @@ test('edge_case - very long content is handled correctly', () => {
 });
 
 test('edge_case - xml attributes with same key but different ids are handled correctly', () => {
-	const bit = new Bit();
+	const bit = new Bit({zzz: mock_zzz});
 
 	// Add two attributes with same key
 	const attr1_id = Uuid.parse(undefined);
@@ -506,7 +519,7 @@ test('edge_case - xml attributes with same key but different ids are handled cor
 
 // Fix the unicode emoji test to match actual string lengths
 test('edge_case - unicode characters affect length correctly', () => {
-	const bit = new Bit();
+	const bit = new Bit({zzz: mock_zzz});
 
 	// Simple test with emoji
 	bit.content = '👋';
@@ -528,7 +541,7 @@ test('edge_case - unicode characters affect length correctly', () => {
 });
 
 test('edge_case - whitespace handling', () => {
-	const bit = new Bit();
+	const bit = new Bit({zzz: mock_zzz});
 
 	// Various whitespace characters
 	const whitespace = ' \t\n\r';
@@ -545,7 +558,7 @@ test('edge_case - whitespace handling', () => {
 });
 
 test('edge_case - special characters', () => {
-	const bit = new Bit();
+	const bit = new Bit({zzz: mock_zzz});
 
 	// XML special characters
 	const xml_chars = '<div>&amp;</div>';
@@ -562,7 +575,7 @@ test('edge_case - special characters', () => {
 });
 
 test('edge_case - empty and null content handling', () => {
-	const bit = new Bit();
+	const bit = new Bit({zzz: mock_zzz});
 
 	bit.content = '';
 	expect(bit.length).toBe(0);
@@ -575,7 +588,7 @@ test('edge_case - empty and null content handling', () => {
 });
 
 test('edge_case - token counting with unusual content', () => {
-	const bit = new Bit();
+	const bit = new Bit({zzz: mock_zzz});
 
 	// Numbers
 	bit.content = '12345';
@@ -595,7 +608,7 @@ test('edge_case - token counting with unusual content', () => {
 });
 
 test('edge_case - concurrent attribute updates', () => {
-	const bit = new Bit();
+	const bit = new Bit({zzz: mock_zzz});
 	const attr1_id = Uuid.parse(undefined);
 	const attr2_id = Uuid.parse(undefined);
 
@@ -612,7 +625,7 @@ test('edge_case - concurrent attribute updates', () => {
 });
 
 test('edge_case - attribute key uniqueness', () => {
-	const bit = new Bit();
+	const bit = new Bit({zzz: mock_zzz});
 
 	// Add attributes with same key but with explicit IDs
 	bit.add_attribute({
@@ -634,10 +647,70 @@ test('edge_case - attribute key uniqueness', () => {
 });
 
 test('validate - returns failure for invalid bit', () => {
-	const bit = new Bit();
+	const bit = new Bit({zzz: mock_zzz});
 	// Force an invalid state by bypassing the schema
 	Object.defineProperty(bit, 'id', {value: 'not-a-valid-uuid'});
 
 	const result = bit.json_parsed;
 	expect(result.success).toBe(false);
+});
+
+// Add test for using the zzz reference
+test('constructor - stores zzz reference correctly', () => {
+	const custom_zzz = {custom: true} as any;
+	const bit = new Bit({zzz: custom_zzz});
+
+	expect(bit.zzz).toBe(custom_zzz);
+});
+
+// Test that clone maintains the same zzz reference
+test('clone - maintains the same zzz reference', () => {
+	const custom_zzz = {custom: true} as any;
+	const original = new Bit({zzz: custom_zzz});
+	const clone = original.clone();
+
+	expect(clone.zzz).toBe(custom_zzz);
+	expect(clone.zzz).toBe(original.zzz);
+});
+
+// Add test for initialization pattern
+test('initialization - properties are properly initialized from options.json', () => {
+	const test_name = 'Initialization Test';
+	const test_content = 'Test content for init';
+	const bit = new Bit({
+		zzz: mock_zzz,
+		json: {
+			name: test_name,
+			content: test_content,
+		},
+	});
+
+	// Verify properties were initialized correctly
+	expect(bit.name).toBe(test_name);
+	expect(bit.content).toBe(test_content);
+
+	// Verify derived properties calculated after initialization
+	expect(bit.length).toBe(test_content.length);
+	expect(bit.token_count).toBe(encode(test_content).length);
+});
+
+// Test for subclass that forgets to call init()
+test('initialization - all subclasses must call init() in constructor', () => {
+	// Create a test subclass that doesn't call init
+	class Bad_Subclass extends Serializable<any, typeof Bit_Json, any> {
+		name: string = $state('default');
+
+		constructor(options: any) {
+			super(Bit_Json, options);
+			// Intentionally not calling this.init()
+		}
+	}
+
+	const instance = new Bad_Subclass({
+		zzz: mock_zzz,
+		json: {name: 'Should not be set'},
+	});
+
+	// Properties should not be set from json if init() wasn't called
+	expect(instance.name).toBe('default');
 });

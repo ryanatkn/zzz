@@ -2,7 +2,8 @@
 	import type {ComponentProps} from 'svelte';
 	import Svg from '@ryanatkn/fuz/Svg.svelte';
 	import {chatgpt_logo, claude_logo, gemini_logo, ollama_logo} from '@ryanatkn/fuz/logos.js';
-	import type {Provider_Name} from '$lib/api.js';
+
+	import type {Provider_Name} from '$lib/provider.svelte.js';
 
 	interface Props {
 		name: Provider_Name;

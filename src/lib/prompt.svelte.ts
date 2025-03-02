@@ -45,6 +45,7 @@ export class Prompt {
 
 	add_bit(content: string = '', name: string = 'new bit'): Bit {
 		const bit = new Bit({
+			zzz: this.zzz,
 			json: {
 				name: get_unique_name(
 					name,

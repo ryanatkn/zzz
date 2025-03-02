@@ -1,6 +1,6 @@
 import {format} from 'date-fns';
 import {z} from 'zod';
-import {Serializable} from '$lib/serializable.svelte.js';
+import {Serializable, type Serializable_Options} from '$lib/serializable.svelte.js';
 
 import {
 	Api_Message_With_Metadata,
@@ -22,17 +22,15 @@ export const MESSAGE_PREVIEW_MAX_LENGTH = 50;
 export const MESSAGE_DATE_FORMAT = 'MMM d, p';
 export const MESSAGE_TIME_FORMAT = 'p';
 
-export interface Message_Options {
-	zzz: Zzz;
-	json?: z.input<typeof Api_Message_With_Metadata>;
-}
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface Message_Options
+	extends Serializable_Options<typeof Api_Message_With_Metadata, Zzz> {}
 
 export class Message extends Serializable<
 	z.output<typeof Api_Message_With_Metadata>,
-	typeof Api_Message_With_Metadata
+	typeof Api_Message_With_Metadata,
+	Zzz
 > {
-	readonly zzz: Zzz;
-
 	id: Uuid = $state()!;
 	type: Api_Message_Type = $state()!;
 	direction: Api_Message_Direction = $state()!;
@@ -95,16 +93,16 @@ export class Message extends Serializable<
 	});
 
 	constructor(options: Message_Options) {
-		super(Api_Message_With_Metadata);
-		this.zzz = options.zzz;
+		super(Api_Message_With_Metadata, options);
 
+		// Initialize base properties
+		this.init();
+
+		// Process message-specific fields after properties are set from JSON
 		if (options.json) {
-			this.set_json(options.json);
-
-			// Process message-specific fields
 			const json = options.json as z.infer<typeof Api_Message_With_Metadata>;
 
-			// Depending on message type, assign the appropriate properties
+			// Process type-specific data
 			switch (json.type) {
 				case 'echo':
 					this.data = json.data;
