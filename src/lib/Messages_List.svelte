@@ -26,16 +26,16 @@
 	// TODO BLOCK use component/class for the list (they'll be Nav_Links yeah?)
 </script>
 
-<div class="messages-list {class_name}">
+<div class="messages_list {class_name}">
 	{#if messages.items.length === 0}
-		<p class="empty-state">No messages yet.</p>
+		<p class="p_md text_align_center color_text_subtle">No messages yet.</p>
 	{:else}
 		<menu class="flex_1 unstyled">
 			{#each limited_messages as message (message.id)}
 				{@const selected = message.id === selected_message_id}
 				<button
 					type="button"
-					class="message-item"
+					class="w_100 text_align_left justify_content_start py_xs px_md radius_0 border_none"
 					class:selected
 					class:sticky={selected}
 					style:top={selected ? 0 : undefined}
@@ -43,21 +43,23 @@
 					onclick={() => handle_select(message)}
 					transition:slide
 				>
-					<div class="message-header font_weight_400">
+					<div class="font_weight_400 flex align_items_center gap_xs">
 						<Text_Icon icon={get_icon_for_message_type(message.type)} />
 						<Text_Icon icon={get_direction_icon(message.direction)} />
-						<span class="message-type font_mono">{message.type}</span>
-						<span class="message-time font_mono size_sm">{message.created_formatted_time}</span>
+						<span class="font_mono">{message.type}</span>
+						<span class="font_mono size_sm ml_auto">{message.created_formatted_time}</span>
 					</div>
 
 					{#if selected && message.data}
-						<div class="message-preview mt_xs">
+						<div class="mt_xs">
 							{#if message.is_prompt}
-								<small class="message-preview-label">Prompt:</small>
-								<pre class="message-preview-content">{message.prompt_preview}</pre>
+								<small class="mb_xs2 block">Prompt:</small>
+								<pre
+									class="font_mono size_xs white_space_pre_wrap word_break_break_word m_0 p_xs2 bg_alt rounded_xs">{message.prompt_preview}</pre>
 							{:else if message.is_completion}
-								<small class="message-preview-label">Response:</small>
-								<pre class="message-preview-content">{message.completion_preview}</pre>
+								<small class="mb_xs2 block">Response:</small>
+								<pre
+									class="font_mono size_xs white_space_pre_wrap word_break_break_word m_0 p_xs2 bg_alt rounded_xs">{message.completion_preview}</pre>
 							{/if}
 						</div>
 					{/if}
@@ -74,71 +76,9 @@
 </div>
 
 <style>
-	.messages-list {
+	.messages_list {
 		width: 100%;
 		max-height: 100%;
 		overflow-y: auto;
-	}
-
-	.empty-state {
-		padding: var(--space_md);
-		color: var(--color_text_subtle);
-		text-align: center;
-	}
-
-	.message-item {
-		justify-content: flex-start;
-		width: 100%;
-		text-align: left;
-		padding: var(--space_xs) var(--space_md);
-		border-radius: 0;
-		border: none;
-		box-shadow: none;
-		border-left: 3px solid transparent;
-	}
-
-	.message-item:hover {
-		background-color: var(--fg_1);
-	}
-	.message-item:active {
-		background-color: var(--fg_2);
-	}
-	.message-item.selected {
-		background-color: var(--fg_3);
-	}
-
-	.message-header {
-		display: flex;
-		align-items: center;
-		gap: var(--space_xs);
-	}
-
-	.message-time {
-		margin-left: auto;
-	}
-
-	.message-type {
-		color: var(--color_text);
-	}
-
-	.message-preview {
-		max-height: 50px;
-		overflow: hidden;
-	}
-
-	.message-preview-label {
-		margin-bottom: var(--space_xs2);
-		display: block;
-	}
-
-	.message-preview-content {
-		font-family: var(--font_mono);
-		font-size: var(--size_xs);
-		white-space: pre-wrap;
-		word-break: break-word;
-		margin: 0;
-		padding: var(--space_xs2);
-		background-color: var(--color_bg_alt);
-		border-radius: var(--radius_xs);
 	}
 </style>

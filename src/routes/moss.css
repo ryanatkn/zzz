@@ -21,6 +21,12 @@
 .bg_e_1 {
 	background-color: var(--color_e_1);
 }
+.block {
+	display: block;
+}
+.border_none {
+	border-style: none;
+}
 
 .box {
 	display: flex;
@@ -187,6 +193,9 @@ a.chip {
 .mb_xs {
 	margin-bottom: var(--space_xs);
 }
+.mb_xs2 {
+	margin-bottom: var(--space_xs2);
+}
 .mb_xs3 {
 	margin-bottom: var(--space_xs3);
 }
@@ -240,6 +249,9 @@ a.chip {
 	min-width: var(--width_sm);
 }
 
+.ml_auto {
+	margin-left: auto;
+}
 .ml_md {
 	margin-left: var(--space_md);
 }
@@ -315,6 +327,9 @@ a.chip {
 .p_xs {
 	padding: var(--space_xs);
 }
+.p_xs2 {
+	padding: var(--space_xs2);
+}
 
 /* A pane is a box floating over the page, like for dialogs.
 			By default it's opaque, resetting the background to the initial depth. */
@@ -375,6 +390,10 @@ a.chip {
 	padding-left: var(--space_lg);
 	padding-right: var(--space_lg);
 }
+.px_md {
+	padding-left: var(--space_md);
+	padding-right: var(--space_md);
+}
 .px_sm {
 	padding-left: var(--space_sm);
 	padding-right: var(--space_sm);
@@ -391,9 +410,16 @@ a.chip {
 	padding-top: var(--space_xl9);
 	padding-bottom: var(--space_xl9);
 }
+.py_xs {
+	padding-top: var(--space_xs);
+	padding-bottom: var(--space_xs);
+}
 .py_xs3 {
 	padding-top: var(--space_xs3);
 	padding-bottom: var(--space_xs3);
+}
+.radius_0 {
+	border-radius: 0;
 }
 .radius_sm {
 	border-radius: var(--radius_sm);
