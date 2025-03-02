@@ -42,10 +42,7 @@ export abstract class Serializable<T_Json, T_Schema extends z.ZodType, T_Zzz = a
 	 * Must be called by subclasses at the end of their constructor.
 	 */
 	protected init(): void {
-		// Initialize properties from JSON if provided
-		if (this.options.json) {
-			this.set_json(this.options.json);
-		}
+		this.set_json(this.schema.parse(this.options.json));
 	}
 
 	/**
