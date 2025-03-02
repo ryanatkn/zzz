@@ -1,29 +1,29 @@
 import type {Flavored} from '@ryanatkn/belt/types.js';
+import {z} from 'zod';
+import {Provider_Name} from '$lib/provider.svelte.js';
 
-import type {Provider_Name} from '$lib/api.js';
 import type {Ollama_Model_Info} from '$lib/ollama.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 
-export type Model_Name = Flavored<string, 'Model'>;
+// Define schema for Model_Json to enforce consistency
+export const Model_Json_Schema = z.object({
+	name: z.string(),
+	provider_name: Provider_Name,
+	tags: z.array(z.string()),
+	architecture: z.string().optional(),
+	parameter_count: z.number().optional(),
+	context_window: z.number().optional(),
+	output_token_limit: z.number().optional(),
+	embedding_length: z.number().optional(),
+	filesize: z.number().optional(),
+	cost_input: z.number().optional(),
+	cost_output: z.number().optional(),
+	training_cutoff: z.string().optional(),
+	ollama_model_info: z.any().optional(),
+});
+export type Model_Json = z.infer<typeof Model_Json_Schema>;
 
-export interface Model_Json {
-	name: string;
-	provider_name: Provider_Name;
-	tags: Array<string>;
-	architecture?: string;
-	parameter_count?: number;
-	/** In Ollama this is `embedding_length`. */
-	context_window?: number;
-	/** In Ollama this is `feed_forward_length`. */
-	output_token_limit?: number;
-	embedding_length?: number;
-	/** Size of the model file in gigabytes. */
-	filesize?: number;
-	cost_input?: number;
-	cost_output?: number;
-	training_cutoff?: string;
-	ollama_model_info?: Ollama_Model_Info;
-}
+export type Model_Name = Flavored<string, 'Model'>;
 
 export interface Model_Options {
 	zzz: Zzz;

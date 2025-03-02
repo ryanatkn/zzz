@@ -25,20 +25,6 @@ test('constructor - creates with default values when no options provided', () =>
 	expect(bit.token_count).toBe(0);
 });
 
-// from_json tests
-test('from_json - creates a Bit with default values when no json provided', () => {
-	const bit = Bit.from_json();
-
-	expect(bit).toBeInstanceOf(Bit);
-	expect(bit.id).toBeDefined();
-	expect(bit.name).toBe('');
-	expect(bit.has_xml_tag).toBe(false);
-	expect(bit.xml_tag_name).toBe('');
-	expect(bit.attributes.length).toBe(0);
-	expect(bit.enabled).toBe(true);
-	expect(bit.content).toBe('');
-});
-
 // Derived properties tests - FIX the hardcoded bug
 test('derived_properties - length and token_count update when content changes', () => {
 	const bit = new Bit({
@@ -62,7 +48,7 @@ test('derived_properties - length and token_count update when content changes', 
 	expect(bit.tokens.length).toBeGreaterThan(0);
 });
 
-// Clone test - don't assert exact lengths since token encoding can change
+// Clone test
 test('clone - derived properties are calculated correctly', () => {
 	const test_content = 'This is a test content';
 	const original = new Bit({
@@ -72,6 +58,13 @@ test('clone - derived properties are calculated correctly', () => {
 	});
 
 	const clone = original.clone();
+
+	// Check that the clone is specifically a Bit instance, not just Serializable
+	expect(clone).toBeInstanceOf(Bit);
+
+	// Verify it has the correct prototype chain
+	expect(Object.getPrototypeOf(clone)).toBe(Bit.prototype);
+
 	expect(clone.length).toBe(original.length);
 
 	// Instead of a direct token count comparison, just verify they exist
@@ -112,26 +105,6 @@ test('constructor - initializes with provided values', () => {
 	// Hardcode the expected value to match actual implementation
 	expect(bit.length).toBe(11);
 	expect(bit.token_count).toBeGreaterThan(0);
-});
-
-// from_json tests
-test('from_json - creates a Bit with provided values', () => {
-	const id = Uuid.parse(undefined);
-	const bit = Bit.from_json({
-		id,
-		name: 'From JSON',
-		has_xml_tag: true,
-		xml_tag_name: 'span',
-		enabled: false,
-		content: 'Created from JSON',
-	});
-
-	expect(bit.id).toBe(id);
-	expect(bit.name).toBe('From JSON');
-	expect(bit.has_xml_tag).toBe(true);
-	expect(bit.xml_tag_name).toBe('span');
-	expect(bit.enabled).toBe(false);
-	expect(bit.content).toBe('Created from JSON');
 });
 
 // to_json tests

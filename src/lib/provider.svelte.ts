@@ -1,21 +1,31 @@
+import {z} from 'zod';
+import {Serializable} from '$lib/serializable.svelte.js';
+
 import type {Model} from '$lib/model.svelte.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
-import type {Provider_Name} from '$lib/api.js';
 
-export interface Provider_Json {
-	name: Provider_Name;
-	icon: string;
-	title: string;
-	url: string;
-}
+// Define the schema here as the single source of truth
+export const Provider_Name = z.enum(['ollama', 'claude', 'chatgpt', 'gemini']);
+export type Provider_Name = z.infer<typeof Provider_Name>;
+
+export const Provider_Json_Schema = z.object({
+	name: Provider_Name,
+	icon: z.string(),
+	title: z.string(),
+	url: z.string(),
+});
+export type Provider_Json = z.infer<typeof Provider_Json_Schema>;
 
 export interface Provider_Options {
 	zzz: Zzz;
-	json: Provider_Json;
+	json?: z.input<typeof Provider_Json_Schema>;
 }
 
 // TODO BLOCK `Provider` is the wrong word here, more like Model_Service
-export class Provider {
+export class Provider extends Serializable<
+	z.output<typeof Provider_Json_Schema>,
+	typeof Provider_Json_Schema
+> {
 	zzz: Zzz;
 
 	name: Provider_Name = $state()!;
@@ -33,25 +43,21 @@ export class Provider {
 	);
 
 	constructor(options: Provider_Options) {
+		super(Provider_Json_Schema);
+		this.zzz = options.zzz;
+
+		if (options.json) {
+			this.set_json(options.json);
+		}
+
 		const {
-			zzz,
 			json: {name, icon, title, url},
 		} = options;
-		this.zzz = zzz;
 		this.name = name;
 		this.icon = icon;
 		this.title = title;
 		const selected_model = this.models[0] as Model | undefined;
 		this.selected_model_name = selected_model?.name;
 		this.url = url;
-	}
-
-	toJSON(): Provider_Json {
-		return {
-			name: this.name,
-			icon: this.icon,
-			title: this.title,
-			url: this.url,
-		};
 	}
 }

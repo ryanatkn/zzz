@@ -5,10 +5,6 @@ import {DEV} from 'esm-env';
 
 import {zod_get_schema_keys} from '$lib/zod_helpers.js';
 
-export interface Serializable_Constructor<T_Class extends Serializable<any, any>, T_Json = any> {
-	from_json: (json?: T_Json) => T_Class;
-}
-
 // TODO maybe rename to `Json_Serializable` to be more explicit? Or `Snapshottable`?
 export abstract class Serializable<T_Json, T_Schema extends z.ZodType> {
 	readonly schema: T_Schema;
@@ -20,8 +16,12 @@ export abstract class Serializable<T_Json, T_Schema extends z.ZodType> {
 		() => this.schema.safeParse(this.json),
 	);
 
-	constructor(schema: T_Schema) {
+	// Add an optional zzz property that will be available to all subclasses
+	readonly zzz?: any;
+
+	constructor(schema: T_Schema, zzz?: any) {
 		this.schema = schema;
+		this.zzz = zzz;
 	}
 
 	/**
@@ -55,29 +55,33 @@ export abstract class Serializable<T_Json, T_Schema extends z.ZodType> {
 		}
 	}
 
+	/**
+	 * For Svelte's $snapshot
+	 */
 	toJSON(): T_Json {
 		return this.json;
 	}
 
-	clone(): this {
-		const constructor = this.constructor as typeof Serializable & {from_json: (json: any) => any};
-
-		if (typeof constructor.from_json !== 'function') {
-			throw new Error(`${constructor.name} must implement static from_json method for cloning`);
-		}
-
-		return constructor.from_json(this.to_json());
-	}
-
 	/**
-	 * Type check helper - does nothing at runtime
-	 * but enforces static interface compliance with `Serializable_Constructor`
+	 * Generic clone method that works for any subclass.
+	 * Returns the same type as 'this' to preserve the exact subclass type.
 	 */
-	protected static check_subclass<
-		T_Class extends Serializable<T_Json, T_Schema>,
-		T_Json,
-		T_Schema extends z.ZodType,
-	>(_c: Serializable_Constructor<T_Class, T_Json>): void {
-		// typechecking
+	clone(): this {
+		// Get the constructor of this instance
+		const constructor = this.constructor as new (options: {
+			zzz?: any;
+			json?: z.input<T_Schema>;
+		}) => this;
+
+		try {
+			// Create a new instance with the copied JSON and the same zzz reference
+			return new constructor({
+				zzz: this.zzz,
+				json: structuredClone(this.to_json()),
+			});
+		} catch (error) {
+			console.error(`Failed to clone instance of ${constructor.name}:`, error);
+			throw new Error(`Failed to clone: ${error instanceof Error ? error.message : String(error)}`);
+		}
 	}
 }

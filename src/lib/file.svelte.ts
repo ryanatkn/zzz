@@ -35,7 +35,6 @@ export class File {
 		this.original = source_file;
 		this.id = source_file.id;
 		this.contents = source_file.contents;
-		// TODO Serializable pattern with `to_json`, `from_json`, derived json/str? `toJSON` calls `to_json`, and the latter is abstract
 		this.dependents = new Map(source_file.dependents);
 		this.dependencies = new Map(source_file.dependencies);
 	}

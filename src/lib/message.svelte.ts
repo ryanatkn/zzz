@@ -1,7 +1,9 @@
 import {format} from 'date-fns';
+import {z} from 'zod';
+import {Serializable} from '$lib/serializable.svelte.js';
 
 import {
-	type Api_Message_With_Metadata,
+	Api_Message_With_Metadata,
 	type Api_Message_Direction,
 	type Api_Message_Type,
 	to_completion_request,
@@ -22,10 +24,13 @@ export const MESSAGE_TIME_FORMAT = 'p';
 
 export interface Message_Options {
 	zzz: Zzz;
-	json: Api_Message_With_Metadata;
+	json?: z.input<typeof Api_Message_With_Metadata>;
 }
 
-export class Message {
+export class Message extends Serializable<
+	z.output<typeof Api_Message_With_Metadata>,
+	typeof Api_Message_With_Metadata
+> {
 	readonly zzz: Zzz;
 
 	id: Uuid = $state()!;
@@ -89,72 +94,53 @@ export class Message {
 			: this.completion_text;
 	});
 
-	// Update the constructor to handle the different message types
 	constructor(options: Message_Options) {
-		const {zzz, json} = options;
-		this.zzz = zzz;
-		this.id = json.id;
-		this.type = json.type;
-		this.direction = json.direction;
-		this.created = json.created;
+		super(Api_Message_With_Metadata);
+		this.zzz = options.zzz;
 
-		// Depending on message type, assign the appropriate properties
-		switch (json.type) {
-			case 'echo':
-				this.data = json.data;
-				break;
-			case 'send_prompt':
-				this.completion_request = json.completion_request
-					? to_completion_request(json.completion_request)
-					: undefined;
-				break;
-			case 'completion_response':
-				this.completion_response = json.completion_response
-					? to_completion_response(json.completion_response)
-					: undefined;
-				break;
-			case 'update_file':
-				this.file_id = json.file_id;
-				this.contents = json.contents;
-				break;
-			case 'delete_file':
-				this.file_id = json.file_id;
-				break;
-			case 'filer_change':
-				this.change = json.change;
-				this.source_file = json.source_file;
-				break;
-			case 'load_session':
-				// No additional data
-				break;
-			case 'loaded_session':
-				this.data = json.data;
-				break;
-		}
+		if (options.json) {
+			this.set_json(options.json);
 
-		// For backward compatibility, ensure data is populated
-		if (this.data === undefined) {
+			// Process message-specific fields
+			const json = options.json as z.infer<typeof Api_Message_With_Metadata>;
+
+			// Depending on message type, assign the appropriate properties
 			switch (json.type) {
+				case 'echo':
+					this.data = json.data;
+					break;
 				case 'send_prompt':
-					this.data = {completion_request: this.completion_request};
+					if (json.completion_request) {
+						this.completion_request = to_completion_request(json.completion_request);
+					}
 					break;
 				case 'completion_response':
-					this.data = {completion_response: this.completion_response};
+					if (json.completion_response) {
+						this.completion_response = to_completion_response(json.completion_response);
+					}
 					break;
 				case 'update_file':
-					this.data = {file_id: this.file_id, contents: this.contents};
+					this.file_id = json.file_id;
+					this.contents = json.contents;
 					break;
 				case 'delete_file':
-					this.data = {file_id: this.file_id};
+					this.file_id = json.file_id;
 					break;
 				case 'filer_change':
-					this.data = {change: this.change, source_file: this.source_file};
+					this.change = json.change;
+					this.source_file = json.source_file;
+					break;
+				case 'load_session':
+					// No additional data
+					break;
+				case 'loaded_session':
+					this.data = json.data;
 					break;
 			}
 		}
 	}
 
-	toJSON(): Api_Message_With_Metadata {
+	override to_json(): z.output<typeof Api_Message_With_Metadata> {
 		const base = {
 			id: this.id,
 			type: this.type,
@@ -180,7 +166,7 @@ export class Message {
 				return {...base, data: this.data};
 			case 'load_session':
 			default:
-				return base;
+				return base as z.output<typeof Api_Message_With_Metadata>;
 		}
 	}
 }

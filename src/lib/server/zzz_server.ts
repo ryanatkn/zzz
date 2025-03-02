@@ -168,7 +168,7 @@ export class Zzz_Server {
 								request_id: message.id,
 								provider_name,
 								model,
-								data: {type: 'ollama', value: api_response},
+								data: {type: provider_name, value: api_response},
 							},
 						};
 						break;
@@ -197,7 +197,7 @@ export class Zzz_Server {
 								request_id: message.id,
 								provider_name,
 								model,
-								data: {type: 'claude', value: api_response},
+								data: {type: provider_name, value: api_response},
 							},
 						};
 						break;
@@ -234,7 +234,7 @@ export class Zzz_Server {
 								request_id: message.id,
 								provider_name,
 								model,
-								data: {type: 'chatgpt', value: api_response},
+								data: {type: provider_name, value: api_response},
 							},
 						};
 						break;
@@ -269,7 +269,7 @@ export class Zzz_Server {
 								provider_name,
 								model,
 								data: {
-									type: 'gemini',
+									type: provider_name,
 									// some of these are functions, and we want `null` for full JSON documents, so manually spelling them out:
 									value: {
 										text: api_response.response.text(),

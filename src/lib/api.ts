@@ -2,13 +2,17 @@ import {z} from 'zod';
 import type {Watcher_Change_Type} from '@ryanatkn/gro/watch_dir.js';
 
 import {Uuid} from '$lib/uuid.js';
-import type {
+import {
 	Completion_Request,
-	Completion_Response,
-	Completion_Response_Data,
+	Completion_Response_Schema,
+	type Completion_Request,
+	type Completion_Response,
 } from '$lib/completion.js';
 
 // Define a proper map from Watcher_Change_Type to Api_Change_Type
+export const Api_Change_Type = z.enum(['add', 'change', 'unlink']);
+export type Api_Change_Type = z.infer<typeof Api_Change_Type>;
+
 export const map_watcher_change_to_api_change = (type: Watcher_Change_Type): Api_Change_Type => {
 	if (type === 'update') return 'change';
 	return type as Api_Change_Type;
@@ -26,13 +30,6 @@ export const Api_Message_Type = z.enum([
 	'delete_file',
 ]);
 export type Api_Message_Type = z.infer<typeof Api_Message_Type>;
-
-export const Api_Change_Type = z.enum(['add', 'change', 'unlink']);
-export type Api_Change_Type = z.infer<typeof Api_Change_Type>;
-
-// TODO where does this belong? extensible?
-export const Provider_Name = z.enum(['ollama', 'claude', 'chatgpt', 'gemini']);
-export type Provider_Name = z.infer<typeof Provider_Name>;
 
 // Base schema for all messages
 export const Api_Base_Message = z.object({
@@ -79,33 +76,15 @@ export const Api_Delete_File_Message = Api_Base_Message.extend({
 	file_id: z.string(), // Path_Id
 });
 
-// Define a schema for each data type
-const Api_Completion_Response_Data = z.object({
-	type: Provider_Name,
-	value: z.any(),
-});
-
-// Completion related message schemas
+// Completion related message schemas - Using the placeholder schemas
 export const Api_Send_Prompt_Message = Api_Base_Message.extend({
 	type: z.literal('send_prompt'),
-	completion_request: z.object({
-		created: z.string().datetime(),
-		request_id: Uuid,
-		provider_name: Provider_Name,
-		model: z.string(),
-		prompt: z.string(),
-	}),
+	completion_request: Completion_Request, // Placeholder schema for validation
 });
 
 export const Api_Receive_Prompt_Message = Api_Base_Message.extend({
 	type: z.literal('completion_response'),
-	completion_response: z.object({
-		created: z.string().datetime(),
-		request_id: Uuid,
-		provider_name: Provider_Name,
-		model: z.string(),
-		data: Api_Completion_Response_Data,
-	}),
+	completion_response: Completion_Response_Schema, // Placeholder schema for validation
 });
 
 // Union of all client message types
@@ -147,17 +126,22 @@ export const Api_Message_With_Metadata = z.object({
 	type: Api_Message_Type,
 	direction: Api_Message_Direction,
 	created: z.string().datetime(),
-	// Optional fields with proper type checking
+	// Optional fields with proper type checking using placeholder schemas
 	data: z.any().optional(),
-	completion_request: z.any().optional(),
-	completion_response: z.any().optional(),
+	completion_request: Completion_Request.optional(),
+	completion_response: Completion_Response_Schema.optional(),
 	file_id: z.string().optional(),
 	contents: z.string().optional(),
-	change: z.any().optional(),
+	change: z
+		.object({
+			type: Api_Change_Type,
+			path: z.string(),
+		})
+		.optional(),
 	source_file: z.any().optional(),
 });
 
-// Export TypeScript types derived from the Zod schemas
+// Export TypeScript types - use the TypeScript interfaces for completion types
 export type Api_Base_Message = z.infer<typeof Api_Base_Message>;
 export type Api_Echo_Message = z.infer<typeof Api_Echo_Message>;
 export type Api_Load_Session_Message = z.infer<typeof Api_Load_Session_Message>;
@@ -165,28 +149,37 @@ export type Api_Loaded_Session_Message = z.infer<typeof Api_Loaded_Session_Messa
 export type Api_Filer_Change_Message = z.infer<typeof Api_Filer_Change_Message>;
 export type Api_Update_File_Message = z.infer<typeof Api_Update_File_Message>;
 export type Api_Delete_File_Message = z.infer<typeof Api_Delete_File_Message>;
-export type Api_Send_Prompt_Message = z.infer<typeof Api_Send_Prompt_Message>;
-export type Api_Receive_Prompt_Message = z.infer<typeof Api_Receive_Prompt_Message>;
+export type Api_Send_Prompt_Message = Omit<
+	z.infer<typeof Api_Send_Prompt_Message>,
+	'completion_request'
+> & {
+	completion_request: Completion_Request;
+};
+export type Api_Receive_Prompt_Message = Omit<
+	z.infer<typeof Api_Receive_Prompt_Message>,
+	'completion_response'
+> & {
+	completion_response: Completion_Response;
+};
 export type Api_Client_Message = z.infer<typeof Api_Client_Message>;
 export type Api_Server_Message = z.infer<typeof Api_Server_Message>;
 export type Api_Message = z.infer<typeof Api_Message>;
-export type Api_Message_With_Metadata = z.infer<typeof Api_Message_With_Metadata>;
+export type Api_Message_With_Metadata = z.infer<typeof Api_Message_With_Metadata> & {
+	completion_request?: Completion_Request;
+	completion_response?: Completion_Response;
+};
 
-// TODO these shouldnt be needed
-// Helper functions to convert between API and internal types
+// Helper functions remain for API compatibility
 export const to_completion_request = (
 	api_request: Api_Send_Prompt_Message['completion_request'],
 ): Completion_Request => {
-	return api_request as Completion_Request;
+	return api_request;
 };
 
 export const to_completion_response = (
 	api_response: Api_Receive_Prompt_Message['completion_response'],
 ): Completion_Response => {
-	return {
-		...api_response,
-		data: api_response.data as Completion_Response_Data,
-	};
+	return api_response;
 };
 
 // Helper function to validate messages

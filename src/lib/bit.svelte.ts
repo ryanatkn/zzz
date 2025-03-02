@@ -25,10 +25,6 @@ export interface Bit_Options {
 }
 
 export class Bit extends Serializable<z.output<typeof Bit_Json>, typeof Bit_Json> {
-	static {
-		Serializable.check_subclass(Bit);
-	}
-
 	// Defaults for json properties are set in the schema and assigned via `to_json()`
 	id: Uuid = $state()!;
 	name: string = $state()!;
@@ -46,10 +42,6 @@ export class Bit extends Serializable<z.output<typeof Bit_Json>, typeof Bit_Json
 		super(Bit_Json);
 
 		this.set_json(options?.json);
-	}
-
-	static from_json(json?: z.input<typeof Bit_Json>): Bit {
-		return new Bit({json});
 	}
 
 	add_attribute(partial?: z.input<typeof Xml_Attribute>): void {

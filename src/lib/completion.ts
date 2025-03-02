@@ -2,33 +2,58 @@ import type Anthropic from '@anthropic-ai/sdk';
 import type OpenAI from 'openai';
 import type * as Google from '@google/generative-ai';
 import type {ChatResponse} from 'ollama/browser';
+import {z} from 'zod';
 
-import type {Provider_Name} from '$lib/api.js';
-import type {Uuid} from '$lib/uuid.js';
+import {Provider_Name} from '$lib/provider.svelte.js';
+import {Uuid} from '$lib/uuid.js';
 
-export interface Completion_Request {
+export interface Completion {
+	completion_request: Completion_Request;
+	completion_response: Completion_Response;
+}
+
+export const Completion_Request = z.object({
+	created: z.string().datetime(),
+	request_id: Uuid,
+	provider_name: Provider_Name,
+	model: z.string(),
+	prompt: z.string(),
+});
+export type Completion_Request = z.infer<typeof Completion_Request>;
+
+export interface Completion_Response {
 	created: string;
 	request_id: Uuid;
 	provider_name: Provider_Name;
 	model: string;
-	prompt: string;
+	data: Completion_Response_Data;
 }
+
+// Union type of all possible data structures
+export type Completion_Response_Data =
+	| Ollama_Completion_Data
+	| Claude_Completion_Data
+	| Chatgpt_Completion_Data
+	| Gemini_Completion_Data;
 
 // Define specific data types for each provider
 export interface Ollama_Completion_Data {
 	type: 'ollama';
 	value: ChatResponse;
 }
+
 export interface Claude_Completion_Data {
 	type: 'claude';
 	value: Anthropic.Messages.Message;
 }
+
 export interface Chatgpt_Completion_Data {
 	type: 'chatgpt';
 	value: OpenAI.Chat.Completions.ChatCompletion & {
 		_request_id?: string | null;
 	};
 }
+
 export interface Gemini_Completion_Data {
 	type: 'gemini';
 	value: {
@@ -40,26 +65,26 @@ export interface Gemini_Completion_Data {
 	};
 }
 
-// Union type of all possible data structures
-export type Completion_Response_Data =
-	| Ollama_Completion_Data
-	| Claude_Completion_Data
-	| Chatgpt_Completion_Data
-	| Gemini_Completion_Data;
+// Placeholder schemas for use in Zod validation without inferring types
+export const Completion_Response_Data_Schema = z.object({
+	type: Provider_Name,
+	value: z.any(),
+});
 
-export interface Completion_Response {
-	created: string;
-	request_id: Uuid;
-	provider_name: Provider_Name;
-	model: string;
-	data: Completion_Response_Data;
-}
+export const Completion_Response_Schema = z.object({
+	created: z.string().datetime(),
+	request_id: Uuid,
+	provider_name: Provider_Name,
+	model: z.string(),
+	data: Completion_Response_Data_Schema,
+});
 
-export interface Completion {
-	completion_request: Completion_Request;
-	completion_response: Completion_Response;
-}
+export const Completion_Schema = z.object({
+	completion_request: Completion_Request,
+	completion_response: Completion_Response_Schema,
+});
 
+// Helper function remains the same
 export const to_completion_response_text = (
 	completion_response: Completion_Response,
 ): string | null | undefined => {
