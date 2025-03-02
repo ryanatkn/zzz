@@ -23,7 +23,7 @@ export type Bit_Json = z.infer<typeof Bit_Json>;
 
 export interface Bit_Options extends Serializable_Options<typeof Bit_Json, Zzz> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
-export class Bit extends Serializable<z.output<typeof Bit_Json>, typeof Bit_Json, Zzz> {
+export class Bit extends Serializable<typeof Bit_Json, Zzz> {
 	// Defaults for json properties are set in the schema and assigned via `to_json()`
 	id: Uuid = $state()!;
 	name: string = $state()!;

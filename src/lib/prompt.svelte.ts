@@ -30,7 +30,7 @@ export interface Prompt_Options extends Serializable_Options<typeof Prompt_Json,
 	name?: string;
 }
 
-export class Prompt extends Serializable<z.output<typeof Prompt_Json>, typeof Prompt_Json, Zzz> {
+export class Prompt extends Serializable<typeof Prompt_Json, Zzz> {
 	id: Uuid = $state()!;
 	name: string = $state()!;
 	created: string = $state()!;

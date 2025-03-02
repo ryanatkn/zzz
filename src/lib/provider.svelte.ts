@@ -16,11 +16,7 @@ export type Provider_Json = z.infer<typeof Provider_Json>;
 export interface Provider_Options extends Serializable_Options<typeof Provider_Json, Zzz> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
 // TODO BLOCK `Provider` is the wrong word here, more like Model_Service
-export class Provider extends Serializable<
-	z.output<typeof Provider_Json>,
-	typeof Provider_Json,
-	Zzz
-> {
+export class Provider extends Serializable<typeof Provider_Json, Zzz> {
 	name: Provider_Name = $state()!;
 	icon: string = $state()!;
 	title: string = $state()!;

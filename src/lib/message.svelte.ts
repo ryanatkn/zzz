@@ -23,11 +23,7 @@ export const MESSAGE_TIME_FORMAT = 'p';
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface Message_Options extends Serializable_Options<typeof Message_With_Metadata, Zzz> {}
 
-export class Message extends Serializable<
-	z.output<typeof Message_With_Metadata>,
-	typeof Message_With_Metadata,
-	Zzz
-> {
+export class Message extends Serializable<typeof Message_With_Metadata, Zzz> {
 	id: Uuid = $state()!;
 	type: Message_Type = $state()!;
 	direction: Message_Direction = $state()!;

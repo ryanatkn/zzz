@@ -27,7 +27,7 @@ export type Model_Name = Flavored<string, 'Model'>;
 
 export interface Model_Options extends Serializable_Options<typeof Model_Json, Zzz> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
-export class Model extends Serializable<z.output<typeof Model_Json>, typeof Model_Json, Zzz> {
+export class Model extends Serializable<typeof Model_Json, Zzz> {
 	name: Model_Name = $state()!;
 	provider_name: Provider_Name = $state()!;
 	tags: Array<string> = $state()!;

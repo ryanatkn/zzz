@@ -12,11 +12,11 @@ export interface Serializable_Options<T_Schema extends z.ZodType, T_Zzz = any> {
 }
 
 // TODO maybe rename to `Json_Serializable` to be more explicit? Or `Snapshottable`?
-export abstract class Serializable<T_Json, T_Schema extends z.ZodType, T_Zzz = any> {
+export abstract class Serializable<T_Schema extends z.ZodType, T_Zzz = any> {
 	readonly schema: T_Schema;
 	readonly schema_keys: Array<string> = $derived.by(() => zod_get_schema_keys(this.schema));
 
-	readonly json: T_Json = $derived.by(() => this.to_json());
+	readonly json: z.output<T_Schema> = $derived.by(() => this.to_json());
 	readonly json_serialized: string = $derived(JSON.stringify(this.json));
 	readonly json_parsed: z.SafeParseReturnType<z.output<T_Schema>, z.output<T_Schema>> = $derived.by(
 		() => this.schema.safeParse(this.json),
@@ -50,7 +50,7 @@ export abstract class Serializable<T_Json, T_Schema extends z.ZodType, T_Zzz = a
 	 * which properties to include in the serialized object.
 	 * Override this method for custom serialization behavior.
 	 */
-	to_json(): T_Json {
+	to_json(): z.output<T_Schema> {
 		const result: Record<string, any> = {};
 
 		for (const key of this.schema_keys) {
@@ -63,7 +63,7 @@ export abstract class Serializable<T_Json, T_Schema extends z.ZodType, T_Zzz = a
 			}
 		}
 
-		return result as T_Json;
+		return result as z.output<T_Schema>;
 	}
 
 	/**
@@ -79,7 +79,7 @@ export abstract class Serializable<T_Json, T_Schema extends z.ZodType, T_Zzz = a
 	/**
 	 * For Svelte's $snapshot
 	 */
-	toJSON(): T_Json {
+	toJSON(): z.output<T_Schema> {
 		return this.json;
 	}
 
