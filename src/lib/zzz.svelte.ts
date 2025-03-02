@@ -5,12 +5,11 @@ import type {z} from 'zod';
 
 import {Zzz_Data, type Zzz_Data_Json} from '$lib/zzz_data.svelte.js';
 import {
-	Api_Message_With_Metadata,
-	to_completion_response,
-	type Api_Echo_Message,
-	type Api_Receive_Prompt_Message,
-	type Api_Send_Prompt_Message,
-} from '$lib/api.js';
+	type Message_Echo,
+	type Message_Send_Prompt,
+	type Message_Completion_Response,
+	Message_With_Metadata,
+} from '$lib/message.schema.js';
 import {Provider, type Provider_Json} from '$lib/provider.svelte.js';
 import type {Provider_Name} from '$lib/provider.schema.js';
 import {Uuid} from '$lib/uuid.js';
@@ -58,10 +57,10 @@ export class Zzz {
 	// Change tags to use the readonly models instance
 	tags: Set<string> = $derived(new Set(this.models.items.flatMap((m) => m.tags)));
 
-	echos: Array<Api_Echo_Message> = $state([]);
+	echos: Array<Message_Echo> = $state([]);
 
 	// TODO could track this more formally, and add time tracking
-	pending_prompts: SvelteMap<Uuid, Deferred<Api_Receive_Prompt_Message>> = new SvelteMap();
+	pending_prompts: SvelteMap<Uuid, Deferred<Message_Completion_Response>> = new SvelteMap();
 
 	completion_threads: Completion_Threads = $state()!;
 
@@ -125,9 +124,9 @@ export class Zzz {
 		prompt: string,
 		provider_name: Provider_Name,
 		model: string,
-	): Promise<Api_Receive_Prompt_Message> {
+	): Promise<Message_Completion_Response> {
 		const request_id = Uuid.parse(undefined);
-		const message: Api_Send_Prompt_Message = {
+		const message: Message_Send_Prompt = {
 			id: request_id,
 			type: 'send_prompt',
 			completion_request: {
@@ -140,17 +139,16 @@ export class Zzz {
 		};
 		this.messages.send(message);
 
-		const deferred = create_deferred<Api_Receive_Prompt_Message>();
+		const deferred = create_deferred<Message_Completion_Response>();
 		this.pending_prompts.set(message.id, deferred);
 		const response = await deferred.promise;
 
 		// Ensure the completion response matches the required structure
 		if (response.completion_response) {
-			// Convert the API response to the internal format
-			const completion_response = to_completion_response(response.completion_response);
+			// Direct assignment without helper
 			this.completion_threads.receive_completion_response(
 				message.completion_request,
-				completion_response,
+				response.completion_response,
 			);
 		} else {
 			console.error('Invalid completion response format:', response);
@@ -159,7 +157,7 @@ export class Zzz {
 		return response;
 	}
 
-	receive_completion_response(message: Api_Receive_Prompt_Message): void {
+	receive_completion_response(message: Message_Completion_Response): void {
 		const deferred = this.pending_prompts.get(message.completion_response.request_id);
 		if (!deferred) {
 			console.error('expected pending', message);
@@ -175,13 +173,13 @@ export class Zzz {
 
 	send_echo(data: unknown): void {
 		const id = Uuid.parse(undefined);
-		const message: Api_Echo_Message = {id, type: 'echo', data};
+		const message: Message_Echo = {id, type: 'echo', data};
 		this.messages.send(message);
 		this.echo_start_times.set(id, Date.now());
 		this.echos = [message, ...this.echos.slice(0, 9)];
 	}
 
-	receive_echo(message: Api_Echo_Message): void {
+	receive_echo(message: Message_Echo): void {
 		const {id} = message;
 		const start_time = this.echo_start_times.get(id);
 		if (start_time === undefined) {
@@ -215,7 +213,7 @@ export class Zzz {
 	create_model(model_json: Model_Json): Model {
 		return new Model({zzz: this, json: model_json});
 	}
-	create_message(message_json: z.input<typeof Api_Message_With_Metadata>): Message {
+	create_message(message_json: z.input<typeof Message_With_Metadata>): Message {
 		return new Message({zzz: this, json: message_json});
 	}
 }

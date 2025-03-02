@@ -2,7 +2,7 @@ import {SvelteMap} from 'svelte/reactivity';
 import type {Source_File} from '@ryanatkn/gro/filer.js';
 import type {Path_Id} from '@ryanatkn/gro/path.js';
 
-import type {Api_Filer_Change_Message} from '$lib/api.js';
+import type {Message_Filer_Change} from '$lib/message.schema.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 import {Uuid} from '$lib/uuid.js';
 
@@ -17,7 +17,7 @@ export class Files {
 		this.zzz = zzz;
 	}
 
-	handle_change(message: Api_Filer_Change_Message): void {
+	handle_change(message: Message_Filer_Change): void {
 		const change = message.change;
 		const file = message.source_file;
 		switch (change.type) {

@@ -2,7 +2,6 @@ import {format} from 'date-fns';
 import {z} from 'zod';
 
 import {Serializable, type Serializable_Options} from '$lib/serializable.svelte.js';
-import {to_completion_request, to_completion_response} from '$lib/api.js';
 import {
 	to_completion_response_text,
 	type Completion_Request,
@@ -11,9 +10,9 @@ import {
 import type {Zzz} from '$lib/zzz.svelte.js';
 import {Uuid} from '$lib/uuid.js';
 import {
-	Message_Json,
-	type Api_Message_Direction,
-	type Api_Message_Type,
+	Message_With_Metadata,
+	type Message_Direction,
+	type Message_Type,
 } from '$lib/message.schema.js';
 
 // Constants for preview length and formatting
@@ -22,12 +21,16 @@ export const MESSAGE_DATE_FORMAT = 'MMM d, p';
 export const MESSAGE_TIME_FORMAT = 'p';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface Message_Options extends Serializable_Options<typeof Message_Json, Zzz> {}
+export interface Message_Options extends Serializable_Options<typeof Message_With_Metadata, Zzz> {}
 
-export class Message extends Serializable<z.output<typeof Message_Json>, typeof Message_Json, Zzz> {
+export class Message extends Serializable<
+	z.output<typeof Message_With_Metadata>,
+	typeof Message_With_Metadata,
+	Zzz
+> {
 	id: Uuid = $state()!;
-	type: Api_Message_Type = $state()!;
-	direction: Api_Message_Direction = $state()!;
+	type: Message_Type = $state()!;
+	direction: Message_Direction = $state()!;
 	created: string = $state()!;
 
 	// Store data based on message type
@@ -87,7 +90,7 @@ export class Message extends Serializable<z.output<typeof Message_Json>, typeof 
 	});
 
 	constructor(options: Message_Options) {
-		super(Message_Json, options);
+		super(Message_With_Metadata, options);
 
 		// Initialize base properties
 		this.init();
@@ -98,12 +101,14 @@ export class Message extends Serializable<z.output<typeof Message_Json>, typeof 
 			switch (this.type) {
 				case 'send_prompt':
 					if ('completion_request' in options.json) {
-						this.completion_request = to_completion_request(options.json.completion_request);
+						// Direct assignment instead of using helper
+						this.completion_request = options.json.completion_request;
 					}
 					break;
 				case 'completion_response':
 					if ('completion_response' in options.json) {
-						this.completion_response = to_completion_response(options.json.completion_response);
+						// Direct assignment instead of using helper
+						this.completion_response = options.json.completion_response;
 					}
 					break;
 				case 'echo':
@@ -137,7 +142,7 @@ export class Message extends Serializable<z.output<typeof Message_Json>, typeof 
 		}
 	}
 
-	override to_json(): z.output<typeof Message_Json> {
+	override to_json(): z.output<typeof Message_With_Metadata> {
 		// Create base message data
 		const base = {
 			id: this.id,
@@ -165,7 +170,7 @@ export class Message extends Serializable<z.output<typeof Message_Json>, typeof 
 			case 'load_session':
 				return base;
 			default:
-				return base as z.output<typeof Message_Json>;
+				return base as z.output<typeof Message_With_Metadata>;
 		}
 	}
 }

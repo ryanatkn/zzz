@@ -12,7 +12,6 @@ import {get_unique_name} from '$lib/helpers.js';
 import {Tape} from '$lib/tape.svelte.js';
 import type {Prompt} from '$lib/prompt.svelte.js';
 import {reorder_list} from '$lib/list_helpers.js';
-import {to_completion_response} from '$lib/api.js';
 
 const NEW_CHAT_PREFIX = 'new chat';
 
@@ -115,8 +114,8 @@ export class Chat {
 		const message_updated = tape.messages.find((m) => m.id === message_id);
 		if (!message_updated) return;
 
-		// Convert the API response to the internal format
-		message_updated.response = to_completion_response(response.completion_response);
+		// Direct assignment instead of using helper
+		message_updated.response = response.completion_response;
 
 		// Infer a name for the chat now that we have a response.
 		// Don't await because callers don't care about the result.
@@ -147,8 +146,8 @@ export class Chat {
 		try {
 			// TODO BLOCK configure this utility LLM (roles?), and set the output token count from config as well
 			const name_response = await this.zzz.send_prompt(p, 'ollama', 'llama3.2:3b');
-			// Convert the API response to the internal format
-			const completion_response = to_completion_response(name_response.completion_response);
+			// Direct assignment instead of using helper
+			const completion_response = name_response.completion_response;
 			const response_text = to_completion_response_text(completion_response);
 			console.log(`response_text`, response_text);
 			if (!response_text) {

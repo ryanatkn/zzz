@@ -7,10 +7,10 @@
 
 	import Message_Info from '$lib/Message_Info.svelte';
 	import Message_Summary from '$lib/Message_Summary.svelte';
-	import type {Api_Message} from '$lib/api.js';
+	import type {Message} from '$lib/message.schema.js';
 
 	interface Props {
-		message: Api_Message;
+		message: Message;
 	}
 
 	const {message}: Props = $props();

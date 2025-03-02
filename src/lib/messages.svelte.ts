@@ -1,9 +1,9 @@
 import {
+	type Message_Client,
+	type Message_Server,
+	type Message_Direction,
 	create_message_with_metadata,
-	type Api_Client_Message,
-	type Api_Server_Message,
-	type Api_Message_Direction,
-} from '$lib/api.js';
+} from '$lib/message.schema.js';
 import {Message} from '$lib/message.svelte.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 import type {Uuid} from '$lib/uuid.js';
@@ -13,8 +13,8 @@ export class Messages {
 
 	items: Array<Message> = $state([]);
 
-	#send_handler: (message: Api_Client_Message) => void;
-	#receive_handler: (message: Api_Server_Message) => void;
+	#send_handler: (message: Message_Client) => void;
+	#receive_handler: (message: Message_Server) => void;
 
 	constructor(zzz: Zzz) {
 		this.zzz = zzz;
@@ -36,26 +36,26 @@ export class Messages {
 	}
 
 	set_handlers(
-		send_handler: (message: Api_Client_Message) => void,
-		receive_handler: (message: Api_Server_Message) => void,
+		send_handler: (message: Message_Client) => void,
+		receive_handler: (message: Message_Server) => void,
 	): void {
 		this.#send_handler = send_handler;
 		this.#receive_handler = receive_handler;
 	}
 
-	send(message: Api_Client_Message): void {
+	send(message: Message_Client): void {
 		console.log(`[messages.send] message`, message.id, message.type);
 		this.#send_handler(message);
 		this.add_message(message, 'client');
 	}
 
-	receive(message: Api_Server_Message): void {
+	receive(message: Message_Server): void {
 		console.log(`[messages.receive] message`, message.id, message.type);
 		this.#receive_handler(message);
 		this.add_message(message, 'server');
 	}
 
-	add_message(data: unknown, direction: Api_Message_Direction): void {
+	add_message(data: unknown, direction: Message_Direction): void {
 		const base_message = data as {id: Uuid; type: string};
 		const message_json = create_message_with_metadata(base_message as any, direction);
 		const message = new Message({zzz: this.zzz, json: message_json});

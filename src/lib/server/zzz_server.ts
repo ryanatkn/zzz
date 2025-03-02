@@ -14,11 +14,11 @@ import {dirname, join} from 'node:path';
 import {format_file} from '@ryanatkn/gro/format_file.js';
 
 import {
-	type Api_Client_Message,
-	type Api_Receive_Prompt_Message,
-	type Api_Send_Prompt_Message,
-	type Api_Server_Message,
-} from '$lib/api.js';
+	type Message_Client,
+	type Message_Completion_Response,
+	type Message_Send_Prompt,
+	type Message_Server,
+} from '$lib/message.schema.js';
 import {Uuid} from '$lib/uuid.js';
 import {SYSTEM_MESSAGE_DEFAULT} from '$lib/config.js';
 import {delete_file_in_scope, write_file_in_scope} from '$lib/server/helpers.js';
@@ -40,7 +40,7 @@ const PRESENCE_PENALTY_DEFAULT: number | undefined = undefined; // TODO config
 const STOP_SEQUENCES_DEFAULT: Array<string> | undefined = undefined; // TODO config
 
 export interface Zzz_Server_Options {
-	send: (message: Api_Server_Message) => void;
+	send: (message: Message_Server) => void;
 	/**
 	 * @default ZZZ_DIR_DEFAULT
 	 */
@@ -59,7 +59,7 @@ export interface Zzz_Server_Options {
 }
 
 export class Zzz_Server {
-	#send: (message: Api_Server_Message) => void;
+	#send: (message: Message_Server) => void;
 
 	zzz_dir: string;
 
@@ -111,12 +111,12 @@ export class Zzz_Server {
 		this.stop_sequences = options.stop_sequences ?? STOP_SEQUENCES_DEFAULT;
 	}
 
-	send(message: Api_Server_Message): void {
+	send(message: Message_Server): void {
 		this.#send(message);
 	}
 
 	// TODO add an abstraction here, so the server isn't concerned with message content/types
-	async receive(message: Api_Client_Message): Promise<Api_Server_Message | null> {
+	async receive(message: Message_Client): Promise<Message_Server | null> {
 		console.log(`[zzz_server.receive] message`, message.id, message.type);
 		switch (message.type) {
 			case 'echo': {
@@ -129,7 +129,7 @@ export class Zzz_Server {
 			case 'send_prompt': {
 				const {prompt, provider_name, model} = message.completion_request;
 
-				let response: Api_Receive_Prompt_Message;
+				let response: Message_Completion_Response;
 
 				console.log(`texting ${provider_name}:`, prompt.substring(0, 1000));
 
@@ -320,8 +320,8 @@ export class Zzz_Server {
 // TODO refactor to support multiple storage backends (starting with fs+postgres), maybe something like
 // await storage.save_completion_response(r);
 const save_response = async (
-	request: Api_Send_Prompt_Message,
-	response: Api_Receive_Prompt_Message,
+	request: Message_Send_Prompt,
+	response: Message_Completion_Response,
 	dir: string,
 ): Promise<void> => {
 	// includes `Date.now()` for sorting purposes

@@ -1,12 +1,19 @@
 import {z} from 'zod';
 
 import {Uuid} from '$lib/uuid.js';
-import {Provider_Name} from '$lib/provider.schema.js';
+import {File_Change_Type} from '$lib/file.schema.js';
+import {
+	Completion_Request,
+	Completion_Response_Schema,
+	type Completion_Response,
+} from '$lib/completion.js';
 
-export const Api_Message_Direction = z.enum(['inbound', 'outbound']);
-export type Api_Message_Direction = z.infer<typeof Api_Message_Direction>;
+// Direction enum
+export const Message_Direction = z.enum(['client', 'server', 'both']);
+export type Message_Direction = z.infer<typeof Message_Direction>;
 
-export const Api_Message_Type = z.enum([
+// Message type enum
+export const Message_Type = z.enum([
 	'echo',
 	'send_prompt',
 	'completion_response',
@@ -16,81 +23,150 @@ export const Api_Message_Type = z.enum([
 	'load_session',
 	'loaded_session',
 ]);
-export type Api_Message_Type = z.infer<typeof Api_Message_Type>;
+export type Message_Type = z.infer<typeof Message_Type>;
 
-// Define base message schema
-export const Message_Json_Base = z.object({
+// Base message schema
+export const Message_Base = z.object({
 	id: Uuid,
-	type: Api_Message_Type,
-	direction: Api_Message_Direction,
-	created: z.string().default(() => new Date().toISOString()),
+	type: Message_Type,
 });
 
-// Schema for completion request data
-export const Completion_Request_Json = z.object({
-	prompt: z.string(),
-	provider_name: Provider_Name,
-	model_name: z.string(),
-	options: z.record(z.any()).optional(),
+// Echo message schema
+export const Message_Echo = Message_Base.extend({
+	type: z.literal('echo'),
+	data: z.any(),
 });
 
-// Schema for completion response data
-export const Completion_Response_Json = z.object({
-	text: z.string().optional(),
-	data: z.any().optional(),
-	raw: z.any().optional(),
+// Session related message schemas
+export const Message_Load_Session = Message_Base.extend({
+	type: z.literal('load_session'),
 });
 
-// Define specific message schemas by type
-export const Message_Json = z.discriminatedUnion('type', [
-	// Echo message
-	Message_Json_Base.extend({
-		type: z.literal('echo'),
-		data: z.any(),
+export const Message_Loaded_Session = Message_Base.extend({
+	type: z.literal('loaded_session'),
+	data: z.object({
+		files: z.any(), // This would ideally be a Map<Path_Id, Source_File>
 	}),
+});
 
-	// Send prompt message
-	Message_Json_Base.extend({
-		type: z.literal('send_prompt'),
-		completion_request: Completion_Request_Json,
+// File related message schemas
+export const Message_Filer_Change = Message_Base.extend({
+	type: z.literal('filer_change'),
+	change: z.object({
+		type: File_Change_Type,
+		path: z.string(),
 	}),
+	source_file: z.any(), // Source_File
+});
 
-	// Completion response message
-	Message_Json_Base.extend({
-		type: z.literal('completion_response'),
-		completion_response: Completion_Response_Json,
-	}),
+export const Message_Update_File = Message_Base.extend({
+	type: z.literal('update_file'),
+	file_id: z.string(), // Path_Id
+	contents: z.string(),
+});
 
-	// Update file message
-	Message_Json_Base.extend({
-		type: z.literal('update_file'),
-		file_id: z.string(),
-		contents: z.string(),
-	}),
+export const Message_Delete_File = Message_Base.extend({
+	type: z.literal('delete_file'),
+	file_id: z.string(), // Path_Id
+});
 
-	// Delete file message
-	Message_Json_Base.extend({
-		type: z.literal('delete_file'),
-		file_id: z.string(),
-	}),
+// Completion related message schemas
+export const Message_Send_Prompt = Message_Base.extend({
+	type: z.literal('send_prompt'),
+	completion_request: Completion_Request,
+});
 
-	// Filer change message
-	Message_Json_Base.extend({
-		type: z.literal('filer_change'),
-		change: z.any(),
-		source_file: z.any(),
-	}),
+export const Message_Completion_Response = Message_Base.extend({
+	type: z.literal('completion_response'),
+	completion_response: Completion_Response_Schema,
+});
 
-	// Load session message
-	Message_Json_Base.extend({
-		type: z.literal('load_session'),
-	}),
-
-	// Loaded session message
-	Message_Json_Base.extend({
-		type: z.literal('loaded_session'),
-		data: z.any(),
-	}),
+// Union of all client message types
+export const Message_Client = z.discriminatedUnion('type', [
+	Message_Echo,
+	Message_Load_Session,
+	Message_Send_Prompt,
+	Message_Update_File,
+	Message_Delete_File,
 ]);
 
-export type Message_Json = z.infer<typeof Message_Json>;
+// Union of all server message types
+export const Message_Server = z.discriminatedUnion('type', [
+	Message_Echo,
+	Message_Loaded_Session,
+	Message_Filer_Change,
+	Message_Completion_Response,
+]);
+
+// Union of all message types
+export const Message = z.discriminatedUnion('type', [
+	Message_Echo,
+	Message_Load_Session,
+	Message_Loaded_Session,
+	Message_Filer_Change,
+	Message_Send_Prompt,
+	Message_Completion_Response,
+	Message_Update_File,
+	Message_Delete_File,
+]);
+
+// Message with metadata schema
+export const Message_With_Metadata = z.object({
+	id: Uuid,
+	type: Message_Type,
+	direction: Message_Direction,
+	created: z.string().datetime(),
+	// Optional fields with proper type checking
+	data: z.any().optional(),
+	completion_request: Completion_Request.optional(),
+	completion_response: Completion_Response_Schema.optional(),
+	file_id: z.string().optional(),
+	contents: z.string().optional(),
+	change: z
+		.object({
+			type: File_Change_Type,
+			path: z.string(),
+		})
+		.optional(),
+	source_file: z.any().optional(),
+});
+
+// Helper function to create a message with metadata
+export const create_message_with_metadata = (
+	message: Message,
+	direction: Message_Direction,
+): Message_With_Metadata => {
+	return {
+		...message,
+		direction,
+		created: new Date().toISOString(),
+	} as Message_With_Metadata;
+};
+
+// Export TypeScript types
+export type Message_Base = z.infer<typeof Message_Base>;
+export type Message_Echo = z.infer<typeof Message_Echo>;
+export type Message_Load_Session = z.infer<typeof Message_Load_Session>;
+export type Message_Loaded_Session = z.infer<typeof Message_Loaded_Session>;
+export type Message_Filer_Change = z.infer<typeof Message_Filer_Change>;
+export type Message_Update_File = z.infer<typeof Message_Update_File>;
+export type Message_Delete_File = z.infer<typeof Message_Delete_File>;
+export type Message_Send_Prompt = Omit<
+	z.infer<typeof Message_Send_Prompt>,
+	'completion_request'
+> & {
+	completion_request: Completion_Request;
+};
+export type Message_Completion_Response = Omit<
+	z.infer<typeof Message_Completion_Response>,
+	'completion_response'
+> & {
+	completion_response: Completion_Response;
+};
+export type Message_Client = z.infer<typeof Message_Client>;
+export type Message_Server = z.infer<typeof Message_Server>;
+export type Message = z.infer<typeof Message>;
+export type Message_With_Metadata = z.infer<typeof Message_With_Metadata> & {
+	completion_request?: Completion_Request;
+	completion_response?: Completion_Response;
+};
