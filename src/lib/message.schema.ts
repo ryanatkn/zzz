@@ -115,7 +115,10 @@ export const Message_Json = z.object({
 	id: Uuid,
 	type: Message_Type,
 	direction: Message_Direction,
-	created: z.string().datetime(),
+	created: z
+		.string()
+		.datetime()
+		.default(() => new Date().toISOString()),
 	// Optional fields with proper type checking
 	data: z.any().optional(),
 	completion_request: Completion_Request.optional(),

@@ -13,7 +13,10 @@ export interface Completion {
 }
 
 export const Completion_Request = z.object({
-	created: z.string().datetime(),
+	created: z
+		.string()
+		.datetime()
+		.default(() => new Date().toISOString()),
 	request_id: Uuid,
 	provider_name: Provider_Name,
 	model: z.string(),
@@ -72,7 +75,10 @@ export const Completion_Response_Data_Schema = z.object({
 });
 
 export const Completion_Response_Schema = z.object({
-	created: z.string().datetime(),
+	created: z
+		.string()
+		.datetime()
+		.default(() => new Date().toISOString()),
 	request_id: Uuid,
 	provider_name: Provider_Name,
 	model: z.string(),

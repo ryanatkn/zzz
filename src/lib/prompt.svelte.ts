@@ -28,7 +28,10 @@ export const Prompt_Json = z
 			prompt_names.push(name);
 			return name;
 		}),
-		created: z.string().default(() => new Date().toISOString()),
+		created: z
+			.string()
+			.datetime()
+			.default(() => new Date().toISOString()),
 		bits: z.array(Bit_Json).default(() => []),
 	})
 	.default(() => ({}));
