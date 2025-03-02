@@ -1,11 +1,14 @@
 <script lang="ts">
 	import type {Source_File} from '@ryanatkn/gro/filer.js';
 	import {slide} from 'svelte/transition';
+	import Text_Icon from '$lib/Text_Icon.svelte';
+	import {GLYPH_FILE} from '$lib/glyphs.js';
+	import {format} from 'date-fns';
 
 	import {to_root_path} from '$lib/path.js';
 
 	interface Props {
-		files: Map<string, Source_File>;
+		files: Map<string, Source_File>; // TODO BLOCK should be File right? need to remove Source_File from frontend state, replace
 		selected_file_id?: string | null;
 		onselect?: (file: Source_File) => void;
 	}
@@ -23,10 +26,9 @@
 	// TODO BLOCK contextmenu to delete
 </script>
 
-<menu class="flex_1 unstyled">
+<menu class="h_100 flex_1 unstyled overflow_y_auto">
 	{#each sorted_files as file (file.id)}
 		{@const selected = file.id === selected_file_id}
-		<!-- TODO make these links, using query param? -->
 		<button
 			type="button"
 			class="file"
@@ -37,11 +39,23 @@
 			onclick={() => handle_select(file)}
 			transition:slide
 		>
-			<div class="font_weight_400">
-				<span class="mr_xs2">🗎</span>
-				<small class="word_break_break_all">{to_root_path(file.id)}</small>
+			<div class="font_weight_400 flex align_items_center gap_xs">
+				<Text_Icon icon={GLYPH_FILE} />
+				<span class="word_break_break_all">{to_root_path(file.id)}</span>
 			</div>
+
+			{#if selected}
+				<div class="mt_xs flex justfiy_content_space_between">
+					<small class="font_mono size_sm">
+						<!-- TODO ideally would be `modified_formatted_date` but it's a Source_File -->
+						{file.contents?.length || 0} chars
+					</small>
+					<small>{file.mtime ? format(new Date(file.mtime), 'MMM d, HH:mm') : 'null'}</small>
+				</div>
+			{/if}
 		</button>
+	{:else}
+		<p class="p_md text_align_center">No files available.</p>
 	{/each}
 </menu>
 

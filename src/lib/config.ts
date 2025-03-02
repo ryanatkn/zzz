@@ -3,6 +3,8 @@ import type {Provider_Json} from '$lib/provider.svelte.js';
 import type {Model_Json} from '$lib/model.svelte.js';
 import {merge_ollama_models, ollama_list_with_metadata} from '$lib/ollama.js';
 
+// TODO BLOCK configure dirs - from env vars?
+
 // TODO BLOCK instead of hardcoding Ollama models, pull from `http://127.0.0.1:11434/api/tags`
 
 // TODO refactor - zzz.config.ts
@@ -150,7 +152,7 @@ export const models_default: Array<Model_Json> = [
 		output_token_limit: 128_192,
 		cost_input: 0.8,
 		cost_output: 4,
-		training_cutoff: 'November 2024',
+		training_cutoff: 'October 2024',
 	},
 	{
 		name: 'claude-3-5-sonnet-20241022',

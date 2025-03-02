@@ -6,10 +6,14 @@
 
 	import type {Model} from '$lib/model.svelte.js';
 	import Provider_Logo from '$lib/Provider_Logo.svelte';
+	import {GLYPH_MODEL} from '$lib/glyphs.js';
 
 	interface Props {
 		model: Model;
-		icon?: boolean;
+		/**
+		 * `true` is equivalent to `'svg'`
+		 */
+		icon?: boolean | 'svg' | 'glyph';
 		attrs?: SvelteHTMLElements['a'];
 		children?: Snippet;
 	}
@@ -23,8 +27,10 @@
 	>{#if children}
 		{@render children()}
 	{:else}
-		{#if icon}
+		{#if icon === 'svg' || icon === true}
 			<Provider_Logo name={model.provider_name} />
+		{:else if icon === 'glyph'}
+			<span class="glyph">{GLYPH_MODEL}</span>
 		{/if}
 		{model.name}
 	{/if}</a

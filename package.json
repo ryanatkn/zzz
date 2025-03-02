@@ -97,10 +97,6 @@
   ],
   "exports": {
     "./package.json": "./package.json",
-    "./api.js": {
-      "types": "./dist/api.d.ts",
-      "default": "./dist/api.js"
-    },
     "./Bit_List.svelte": {
       "types": "./dist/Bit_List.svelte.d.ts",
       "svelte": "./dist/Bit_List.svelte",

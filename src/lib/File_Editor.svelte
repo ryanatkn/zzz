@@ -3,17 +3,20 @@
 	import type {Source_File} from '@ryanatkn/gro/filer.js';
 	import {untrack} from 'svelte';
 	import {slide} from 'svelte/transition';
+	import {format} from 'date-fns';
 
 	import {to_root_path} from '$lib/path.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
+	import Text_Icon from '$lib/Text_Icon.svelte';
+	import {GLYPH_FILE} from '$lib/glyphs.js';
+	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
 
 	interface Props {
-		file: Source_File;
-		height?: number;
+		file: Source_File; // TODO BLOCK `File` object
 	}
 
-	const {file, height = 600}: Props = $props();
+	const {file}: Props = $props();
 
 	const {id} = $derived(file);
 
@@ -31,79 +34,84 @@
 		updated_contents = untrack(() => file.contents) ?? '';
 		contents_history = [{created: Date.now(), contents: untrack(() => updated_contents)}];
 	});
+
+	const has_changes = $derived(updated_contents !== file.contents);
+
+	const handle_discard_changes = (new_value: string): void => {
+		// If we're restoring, the new value is the previously discarded content
+		// If we're discarding, the new value is empty and we set updated_contents to the original file contents
+		if (new_value) {
+			updated_contents = new_value;
+			discarded_contents = null;
+		} else {
+			discarded_contents = updated_contents;
+			updated_contents = file.contents ?? '';
+		}
+	};
 </script>
 
-<div class="row size_lg word_break_break_all">
-	<span class="size_xl3 mr_md">🗎</span>
-	{to_root_path(file.id)}
+<div class="mb_md">
+	<div class="size_lg">
+		<Text_Icon icon={GLYPH_FILE} />
+		{to_root_path(file.id)}
+	</div>
+	<div class="flex flex_column gap_xs mt_sm">
+		<small class="font_mono">Size: {file.contents?.length || 0} characters</small>
+		<small class="font_mono">Created: {file.ctime}</small>
+		<small class="font_mono">Modified: {file.mtime}</small>
+		<small class="font_mono">
+			Dependencies: {dependencies.length} • Dependents: {dependents.length}
+		</small>
+	</div>
 </div>
 
-<div class="flex gap_md mb_sm">
+<div class="file_editor_actions flex gap_md mb_sm">
 	<Copy_To_Clipboard text={file.contents} attrs={{class: 'plain'}} />
-	<div class="row">
-		{file.contents?.length} char{file.contents?.length === 1 ? '' : 's'}
-	</div>
-</div>
 
-<div class="flex flex_wrap mb_sm">
-	<div class="flex_1 width_md min_width_sm">
-		<textarea
-			class="plain"
-			style:height="{height}px"
-			bind:value={updated_contents}
-			placeholder="file contents..."
-		></textarea>
-	</div>
-	<pre
-		style:height="{height}px"
-		class="flex_1 fg_1 radius_sm p_md width_md min_width_sm"
-		style:min-width="var(--width_sm)">{file.contents}</pre>
-</div>
+	<button
+		class="color_a"
+		type="button"
+		disabled={!has_changes}
+		onclick={() => {
+			contents_history.push({created: Date.now(), contents: updated_contents});
+			zzz.files.update(file.id, updated_contents);
+			discarded_contents = null;
+		}}>save changes</button
+	>
 
-<section class="flex justify_content_space_between width_xl">
-	<div class="flex gap_md">
-		<button
-			class="color_a"
-			type="button"
-			disabled={updated_contents === file.contents}
-			onclick={() => {
-				contents_history.push({created: Date.now(), contents: updated_contents});
-				zzz.files.update(file.id, updated_contents);
-				discarded_contents = null;
-			}}>save file</button
-		>
-	</div>
-	<div class="flex gap_sm">
-		<button
-			type="button"
-			disabled={updated_contents === file.contents}
-			onclick={() => {
-				discarded_contents = updated_contents;
-				updated_contents = file.contents ?? '';
-			}}>discard changes</button
-		>
-		<button
-			type="button"
-			disabled={discarded_contents === null}
-			onclick={() => {
-				if (discarded_contents !== null) {
-					updated_contents = discarded_contents;
-					discarded_contents = null;
-				}
-			}}>undo discard</button
-		>
-	</div>
+	<Clear_Restore_Button
+		value={discarded_contents ? '' : updated_contents === file.contents ? '' : updated_contents}
+		onchange={handle_discard_changes}
+		attrs={{disabled: !has_changes && discarded_contents === null}}
+	>
+		discard changes
+		{#snippet restore()}
+			undo discard
+		{/snippet}
+	</Clear_Restore_Button>
 
 	<Confirm_Button onclick={() => zzz.files.delete(file.id)} attrs={{class: 'color_c'}}>
 		{#snippet children()}
 			delete file
 		{/snippet}
 	</Confirm_Button>
-</section>
+</div>
+
+<div class="editor_container">
+	<div class="flex flex_column h_100 gap_md">
+		<div class="flex_1 min_height_0">
+			<textarea
+				class="plain file_editor_textarea h_100 w_100 p_sm font_mono"
+				bind:value={updated_contents}
+				placeholder="File contents..."
+			></textarea>
+		</div>
+	</div>
+</div>
 
 {#if contents_history.length > 1 || contents_history[0].contents !== updated_contents}
-	<div class="width_sm panel p_md" transition:slide>
-		<h3 class="mt_0 mb_lg">history</h3>
+	<div class="mt_md panel p_md" transition:slide>
+		<h3 class="mt_0 mb_md">Edit History</h3>
 		<menu class="unstyled flex flex_column_reverse">
 			{#each contents_history as entry (entry)}
 				<button
@@ -116,7 +124,7 @@
 					}}
 					transition:slide
 				>
-					<span>{new Date(entry.created).toLocaleTimeString()}</span>
+					<span>{format(new Date(entry.created), 'HH:mm:ss')}</span>
 					<span>{entry.contents.length} chars</span>
 				</button>
 			{/each}
@@ -124,38 +132,61 @@
 	</div>
 {/if}
 
-{#if dependencies.length}
-	<h2>
-		{dependencies.length}
-		{#if dependencies.length === 1}dependency{:else}dependencies{/if}
-	</h2>
-	<div class="dep_list">
-		{#each dependencies as dependency (dependency.id)}
-			<div>{to_root_path(dependency.id)}</div>
-		{/each}
-	</div>
-{/if}
-{#if dependents.length}
-	<h2>
-		{dependents.length}
-		dependent{#if dependents.length !== 1}s{/if}
-	</h2>
-	<div class="dep_list">
-		{#each dependents as dependent (dependent.id)}
-			<div>{to_root_path(dependent.id)}</div>
-		{/each}
+{#if dependencies.length || dependents.length}
+	<div class="mt_md panel p_md">
+		{#if dependencies.length}
+			<div class="mb_md">
+				<h3 class="mt_0 mb_sm">
+					Dependencies ({dependencies.length})
+				</h3>
+				<div class="dep_list">
+					{#each dependencies as dependency (dependency.id)}
+						<div class="dep_item">{to_root_path(dependency.id)}</div>
+					{/each}
+				</div>
+			</div>
+		{/if}
+
+		{#if dependents.length}
+			<div>
+				<h3 class="mt_0 mb_sm">
+					Dependents ({dependents.length})
+				</h3>
+				<div class="dep_list">
+					{#each dependents as dependent (dependent.id)}
+						<div class="dep_item">{to_root_path(dependent.id)}</div>
+					{/each}
+				</div>
+			</div>
+		{/if}
 	</div>
 {/if}
 
 <style>
-	.dep_list {
+	.editor_container {
 		width: 100%;
+		margin-bottom: var(--space_md);
+		flex: 1;
+	}
+
+	.file_editor_textarea {
+		resize: none;
+	}
+
+	.dep_list {
 		display: grid;
-		/* TODO make them fill the available space tiling horizontally but not wrapping the widest item.
-		This makes them all collapse down on each other.
-		*/
-		/* grid-template-columns: repeat(auto-fill, minmax(0, 1fr)); */
 		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-		gap: 10px;
+		gap: var(--space_xs);
+	}
+
+	.dep_item {
+		font-family: monospace;
+		font-size: var(--size_sm);
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		padding: var(--space_xs2);
+		background: var(--color_bg_alt);
+		border-radius: var(--radius_xs);
 	}
 </style>

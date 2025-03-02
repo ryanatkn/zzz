@@ -3,7 +3,6 @@
 	import Model_Link from '$lib/Model_Link.svelte';
 	import Provider_Link from '$lib/Provider_Link.svelte';
 	import type {Model} from '$lib/model.svelte.js';
-	import {GLYPH_MODEL} from '$lib/glyphs.js';
 
 	interface Props {
 		model: Model;
@@ -15,18 +14,11 @@
 </script>
 
 <div {...attrs} class="panel p_lg {attrs.class}">
-	<div class="header_row">
-		<div class="model_icon">
-			<span class="glyph">{GLYPH_MODEL}</span>
-		</div>
-		<div>
-			<div class="size_lg mb_sm">
-				<Model_Link {model} />
-			</div>
-			<div class="font_mono ml_xs flex align_items_center mb_sm">
-				<Provider_Link {provider} icon="svg" attrs={{class: 'row gap_sm'}} />
-			</div>
-		</div>
+	<div class="size_xl mb_lg">
+		<Model_Link {model} icon="glyph" />
+	</div>
+	<div class="mb_lg">
+		<Provider_Link {provider} icon="svg" attrs={{class: 'row gap_sm'}} />
 	</div>
 
 	{#if model.tags.length}
@@ -44,16 +36,16 @@
 	{/if}
 
 	<div class="specs_grid">
-		{#if model.parameter_count}
-			<div class="spec_item">
-				<span class="spec_label">Parameters:</span>
-				<span>{model.parameter_count.toLocaleString()}B</span>
-			</div>
-		{/if}
 		{#if model.context_window}
 			<div class="spec_item">
 				<span class="spec_label">Context:</span>
 				<span>{model.context_window.toLocaleString()} tokens</span>
+			</div>
+		{/if}
+		{#if model.parameter_count}
+			<div class="spec_item">
+				<span class="spec_label">Parameters:</span>
+				<span>{model.parameter_count.toLocaleString()}B</span>
 			</div>
 		{/if}
 		{#if model.filesize}
@@ -66,19 +58,6 @@
 </div>
 
 <style>
-	.header_row {
-		display: flex;
-		align-items: flex-start;
-		gap: var(--space_md);
-		margin-bottom: var(--space_sm);
-	}
-	.model_icon {
-		display: flex;
-		align-items: center;
-		justify-content: center;
-		min-width: var(--icon_size_md);
-		font-size: var(--icon_size_md);
-	}
 	.specs_grid {
 		display: grid;
 		grid-template-columns: 1fr;

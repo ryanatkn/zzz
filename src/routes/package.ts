@@ -80,7 +80,6 @@ export const package_json = {
 	files: ['dist'],
 	exports: {
 		'./package.json': './package.json',
-		'./api.js': {types: './dist/api.d.ts', default: './dist/api.js'},
 		'./Bit_List.svelte': {
 			types: './dist/Bit_List.svelte.d.ts',
 			svelte: './dist/Bit_List.svelte',
@@ -456,7 +455,6 @@ export const src_json = {
 	version: '0.0.1',
 	modules: {
 		'./package.json': {path: 'package.json', declarations: []},
-		'./api.js': {path: 'api.ts', declarations: []},
 		'./Bit_List.svelte': {path: 'Bit_List.svelte', declarations: []},
 		'./Bit_Stats.svelte': {path: 'Bit_Stats.svelte', declarations: []},
 		'./Bit_Summary.svelte': {path: 'Bit_Summary.svelte', declarations: []},
@@ -578,6 +576,8 @@ export const src_json = {
 				{name: 'Source_File_Json', kind: 'type'},
 				{name: 'File_Json', kind: 'type'},
 				{name: 'File_Options', kind: 'type'},
+				{name: 'FILE_DATE_FORMAT', kind: 'variable'},
+				{name: 'FILE_TIME_FORMAT', kind: 'variable'},
 				{name: 'File', kind: 'class'},
 			],
 		},

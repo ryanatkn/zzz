@@ -17,8 +17,8 @@ export const GLYPH_RESPONSE = '⮑';
 export const GLYPH_SESSION = '⏣';
 
 // Direction icons
-export const GLYPH_DIRECTION_CLIENT = '⤣'; // ⤤ ⤳
-export const GLYPH_DIRECTION_SERVER = '⬎'; // ⤷
+export const GLYPH_DIRECTION_CLIENT = '⥘'; // ⤤ ⤳
+export const GLYPH_DIRECTION_SERVER = '⥙'; // ⤷
 export const GLYPH_DIRECTION_BOTH = '⤨';
 
 export const get_icon_for_message_type = (type: string): string => {
@@ -55,6 +55,8 @@ export const get_direction_icon = (direction: string): string => {
 };
 
 // ⭍
+//⥘ ⥙
+// ⬎⤣
 
 // ⏛
 // ☳ ☷

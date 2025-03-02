@@ -154,6 +154,9 @@ a.chip {
 .inline_block {
 	display: inline-block;
 }
+.inline_flex {
+	display: inline-flex;
+}
 .justify_content_center {
 	justify-content: center;
 }
@@ -242,11 +245,6 @@ a.chip {
 	white-space: nowrap;
 	text-overflow: ellipsis;
 	line-height: var(--line_height_lg); /* prevents the bottom of g's and others from being cut off */
-}
-
-.min_width_sm {
-	width: 100%;
-	min-width: var(--width_sm);
 }
 
 .ml_auto {
@@ -527,11 +525,6 @@ a.chip {
 .width_sm {
 	width: 100%;
 	max-width: var(--width_sm);
-}
-
-.width_xl {
-	width: 100%;
-	max-width: var(--width_xl);
 }
 
 .word_break_break_all {

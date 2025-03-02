@@ -36,7 +36,7 @@
 							<Text_Icon icon={GLYPH_MESSAGE} /> {selected_message.type}
 						{/if}
 					</h2>
-					<div class="flex flex_column gap_xs mt_sm color_text_subtle">
+					<div class="flex flex_column gap_xs mt_sm">
 						<small class="font_mono">ID: {selected_message.id}</small>
 						<small class="font_mono">
 							Time: {selected_message.created_formatted_date}
@@ -98,7 +98,7 @@
 					{/if}
 				</div>
 			{:else}
-				<div class="flex align_items_center justify_content_center h_100 color_text_subtle">
+				<div class="flex align_items_center justify_content_center h_100">
 					<p>Select a message from the list to view its details</p>
 				</div>
 			{/if}
