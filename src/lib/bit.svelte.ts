@@ -6,7 +6,6 @@ import {z} from 'zod';
 import {Serializable, type Serializable_Options} from '$lib/serializable.svelte.js';
 import {Uuid} from '$lib/uuid.js';
 import {Xml_Attribute} from '$lib/xml.js';
-import type {Zzz} from '$lib/zzz.svelte.js';
 
 export const Bit_Json = z
 	.object({
@@ -21,9 +20,9 @@ export const Bit_Json = z
 	.default(() => ({}));
 export type Bit_Json = z.infer<typeof Bit_Json>;
 
-export interface Bit_Options extends Serializable_Options<typeof Bit_Json, Zzz> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
+export interface Bit_Options extends Serializable_Options<typeof Bit_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
-export class Bit extends Serializable<typeof Bit_Json, Zzz> {
+export class Bit extends Serializable<typeof Bit_Json> {
 	// Defaults for json properties are set in the schema and assigned via `to_json()`
 	id: Uuid = $state()!;
 	name: string = $state()!;

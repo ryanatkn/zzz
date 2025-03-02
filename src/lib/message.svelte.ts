@@ -7,13 +7,8 @@ import {
 	type Completion_Request,
 	type Completion_Response,
 } from '$lib/completion.js';
-import type {Zzz} from '$lib/zzz.svelte.js';
 import {Uuid} from '$lib/uuid.js';
-import {
-	Message_With_Metadata,
-	type Message_Direction,
-	type Message_Type,
-} from '$lib/message.schema.js';
+import {Message_Json, type Message_Direction, type Message_Type} from '$lib/message.schema.js';
 
 // Constants for preview length and formatting
 export const MESSAGE_PREVIEW_MAX_LENGTH = 50;
@@ -21,9 +16,9 @@ export const MESSAGE_DATE_FORMAT = 'MMM d, p';
 export const MESSAGE_TIME_FORMAT = 'p';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface Message_Options extends Serializable_Options<typeof Message_With_Metadata, Zzz> {}
+export interface Message_Options extends Serializable_Options<typeof Message_Json> {}
 
-export class Message extends Serializable<typeof Message_With_Metadata, Zzz> {
+export class Message extends Serializable<typeof Message_Json> {
 	id: Uuid = $state()!;
 	type: Message_Type = $state()!;
 	direction: Message_Direction = $state()!;
@@ -86,7 +81,7 @@ export class Message extends Serializable<typeof Message_With_Metadata, Zzz> {
 	});
 
 	constructor(options: Message_Options) {
-		super(Message_With_Metadata, options);
+		super(Message_Json, options);
 
 		// Initialize base properties
 		this.init();
@@ -143,7 +138,7 @@ export class Message extends Serializable<typeof Message_With_Metadata, Zzz> {
 		}
 	}
 
-	override to_json(): z.output<typeof Message_With_Metadata> {
+	override to_json(): z.output<typeof Message_Json> {
 		// Create base message data
 		const base = {
 			id: this.id,
@@ -172,7 +167,7 @@ export class Message extends Serializable<typeof Message_With_Metadata, Zzz> {
 			case 'load_session':
 				return base;
 			default:
-				return base as z.output<typeof Message_With_Metadata>;
+				return base as z.output<typeof Message_Json>;
 		}
 	}
 }

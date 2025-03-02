@@ -2,7 +2,6 @@ import {z} from 'zod';
 import {Serializable, type Serializable_Options} from '$lib/serializable.svelte.js';
 
 import type {Model} from '$lib/model.svelte.js';
-import type {Zzz} from '$lib/zzz.svelte.js';
 import {Provider_Name} from '$lib/provider.schema.js';
 
 // TODO optional/defaults?
@@ -14,10 +13,10 @@ export const Provider_Json = z.object({
 });
 export type Provider_Json = z.infer<typeof Provider_Json>;
 
-export interface Provider_Options extends Serializable_Options<typeof Provider_Json, Zzz> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
+export interface Provider_Options extends Serializable_Options<typeof Provider_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
 // TODO BLOCK `Provider` is the wrong word here, more like Model_Service
-export class Provider extends Serializable<typeof Provider_Json, Zzz> {
+export class Provider extends Serializable<typeof Provider_Json> {
 	name: Provider_Name = $state()!;
 	icon: string = $state()!;
 	title: string = $state()!;

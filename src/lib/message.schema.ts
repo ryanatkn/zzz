@@ -110,8 +110,8 @@ export const Message = z.discriminatedUnion('type', [
 	Message_Delete_File,
 ]);
 
-// Message with metadata schema
-export const Message_With_Metadata = z.object({
+// Message with metadata schema - renamed to Message_Json
+export const Message_Json = z.object({
 	id: Uuid,
 	type: Message_Type,
 	direction: Message_Direction,
@@ -131,16 +131,16 @@ export const Message_With_Metadata = z.object({
 	source_file: z.any().optional(),
 });
 
-// Helper function to create a message with metadata
-export const create_message_with_metadata = (
+// Helper function to create a message with json representation - renamed
+export const create_message_json = (
 	message: Message,
 	direction: Message_Direction,
-): Message_With_Metadata => {
+): Message_Json => {
 	return {
 		...message,
 		direction,
 		created: new Date().toISOString(),
-	} as Message_With_Metadata;
+	} as Message_Json;
 };
 
 // Export TypeScript types
@@ -166,7 +166,7 @@ export type Message_Completion_Response = Omit<
 export type Message_Client = z.infer<typeof Message_Client>;
 export type Message_Server = z.infer<typeof Message_Server>;
 export type Message = z.infer<typeof Message>;
-export type Message_With_Metadata = z.infer<typeof Message_With_Metadata> & {
+export type Message_Json = z.infer<typeof Message_Json> & {
 	completion_request?: Completion_Request;
 	completion_response?: Completion_Response;
 };

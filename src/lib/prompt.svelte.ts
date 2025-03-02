@@ -1,7 +1,6 @@
 import {encode} from 'gpt-tokenizer';
 import {z} from 'zod';
 
-import type {Zzz} from '$lib/zzz.svelte.js';
 import {Uuid} from '$lib/uuid.js';
 import {get_unique_name} from '$lib/helpers.js';
 import {XML_TAG_NAME_DEFAULT} from '$lib/constants.js';
@@ -35,11 +34,11 @@ export const Prompt_Json = z
 	.default(() => ({}));
 export type Prompt_Json = z.infer<typeof Prompt_Json>;
 
-export interface Prompt_Options extends Serializable_Options<typeof Prompt_Json, Zzz> {
+export interface Prompt_Options extends Serializable_Options<typeof Prompt_Json> {
 	name?: string;
 }
 
-export class Prompt extends Serializable<typeof Prompt_Json, Zzz> {
+export class Prompt extends Serializable<typeof Prompt_Json> {
 	id: Uuid = $state()!;
 	name: string = $state()!;
 	created: string = $state()!;

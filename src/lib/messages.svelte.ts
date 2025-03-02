@@ -2,7 +2,7 @@ import {
 	type Message_Client,
 	type Message_Server,
 	type Message_Direction,
-	create_message_with_metadata,
+	create_message_json,
 } from '$lib/message.schema.js';
 import {Message} from '$lib/message.svelte.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
@@ -57,7 +57,7 @@ export class Messages {
 
 	add_message(data: unknown, direction: Message_Direction): void {
 		const base_message = data as {id: Uuid; type: string};
-		const message_json = create_message_with_metadata(base_message as any, direction);
+		const message_json = create_message_json(base_message as any, direction);
 		const message = new Message({zzz: this.zzz, json: message_json});
 		this.items.unshift(message); // TODO BLOCK @many use push and render with sort+filter
 

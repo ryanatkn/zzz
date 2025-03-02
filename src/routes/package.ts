@@ -639,8 +639,8 @@ export const src_json = {
 				{name: 'Message_Client', kind: 'variable'},
 				{name: 'Message_Server', kind: 'variable'},
 				{name: 'Message', kind: 'variable'},
-				{name: 'Message_With_Metadata', kind: 'variable'},
-				{name: 'create_message_with_metadata', kind: 'function'},
+				{name: 'Message_Json', kind: 'variable'},
+				{name: 'create_message_json', kind: 'function'},
 			],
 		},
 		'./message.svelte.js': {

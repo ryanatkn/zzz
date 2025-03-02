@@ -8,7 +8,7 @@ import {
 	type Message_Echo,
 	type Message_Send_Prompt,
 	type Message_Completion_Response,
-	Message_With_Metadata,
+	Message_Json,
 } from '$lib/message.schema.js';
 import {Provider, type Provider_Json} from '$lib/provider.svelte.js';
 import type {Provider_Name} from '$lib/provider.schema.js';
@@ -215,7 +215,7 @@ export class Zzz {
 	create_model(model_json: Model_Json): Model {
 		return new Model({zzz: this, json: model_json});
 	}
-	create_message(message_json: z.input<typeof Message_With_Metadata>): Message {
+	create_message(message_json: z.input<typeof Message_Json>): Message {
 		return new Message({zzz: this, json: message_json});
 	}
 }
