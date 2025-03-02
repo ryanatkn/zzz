@@ -1,14 +1,8 @@
 import {format} from 'date-fns';
 import {z} from 'zod';
-import {Serializable, type Serializable_Options} from '$lib/serializable.svelte.js';
 
-import {
-	Api_Message_With_Metadata,
-	type Api_Message_Direction,
-	type Api_Message_Type,
-	to_completion_request,
-	to_completion_response,
-} from '$lib/api.js';
+import {Serializable, type Serializable_Options} from '$lib/serializable.svelte.js';
+import {to_completion_request, to_completion_response} from '$lib/api.js';
 import {
 	to_completion_response_text,
 	type Completion_Request,
@@ -16,6 +10,11 @@ import {
 } from '$lib/completion.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 import {Uuid} from '$lib/uuid.js';
+import {
+	Message_Json,
+	type Api_Message_Direction,
+	type Api_Message_Type,
+} from '$lib/message.schema.js';
 
 // Constants for preview length and formatting
 export const MESSAGE_PREVIEW_MAX_LENGTH = 50;
@@ -23,14 +22,9 @@ export const MESSAGE_DATE_FORMAT = 'MMM d, p';
 export const MESSAGE_TIME_FORMAT = 'p';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface Message_Options
-	extends Serializable_Options<typeof Api_Message_With_Metadata, Zzz> {}
+export interface Message_Options extends Serializable_Options<typeof Message_Json, Zzz> {}
 
-export class Message extends Serializable<
-	z.output<typeof Api_Message_With_Metadata>,
-	typeof Api_Message_With_Metadata,
-	Zzz
-> {
+export class Message extends Serializable<z.output<typeof Message_Json>, typeof Message_Json, Zzz> {
 	id: Uuid = $state()!;
 	type: Api_Message_Type = $state()!;
 	direction: Api_Message_Direction = $state()!;
@@ -93,53 +87,58 @@ export class Message extends Serializable<
 	});
 
 	constructor(options: Message_Options) {
-		super(Api_Message_With_Metadata, options);
+		super(Message_Json, options);
 
 		// Initialize base properties
 		this.init();
 
 		// Process message-specific fields after properties are set from JSON
 		if (options.json) {
-			const json = options.json as z.infer<typeof Api_Message_With_Metadata>;
-
-			// Process type-specific data
-			switch (json.type) {
-				case 'echo':
-					this.data = json.data;
-					break;
+			// Initialize type-specific properties based on message type
+			switch (this.type) {
 				case 'send_prompt':
-					if (json.completion_request) {
-						this.completion_request = to_completion_request(json.completion_request);
+					if ('completion_request' in options.json) {
+						this.completion_request = to_completion_request(options.json.completion_request);
 					}
 					break;
 				case 'completion_response':
-					if (json.completion_response) {
-						this.completion_response = to_completion_response(json.completion_response);
+					if ('completion_response' in options.json) {
+						this.completion_response = to_completion_response(options.json.completion_response);
+					}
+					break;
+				case 'echo':
+					if ('data' in options.json) {
+						this.data = options.json.data;
 					}
 					break;
 				case 'update_file':
-					this.file_id = json.file_id;
-					this.contents = json.contents;
+					if ('file_id' in options.json) {
+						this.file_id = options.json.file_id;
+						this.contents = options.json.contents;
+					}
 					break;
 				case 'delete_file':
-					this.file_id = json.file_id;
+					if ('file_id' in options.json) {
+						this.file_id = options.json.file_id;
+					}
 					break;
 				case 'filer_change':
-					this.change = json.change;
-					this.source_file = json.source_file;
-					break;
-				case 'load_session':
-					// No additional data
+					if ('change' in options.json && 'source_file' in options.json) {
+						this.change = options.json.change;
+						this.source_file = options.json.source_file;
+					}
 					break;
 				case 'loaded_session':
-					this.data = json.data;
+					if ('data' in options.json) {
+						this.data = options.json.data;
+					}
 					break;
 			}
 		}
 	}
 
-	// TODO BLOCK ideally this does not exist, use the base class method, fix the data structures if possible (and if that's actually the best design)
-	override to_json(): z.output<typeof Api_Message_With_Metadata> {
+	override to_json(): z.output<typeof Message_Json> {
+		// Create base message data
 		const base = {
 			id: this.id,
 			type: this.type,
@@ -164,8 +163,9 @@ export class Message extends Serializable<
 			case 'loaded_session':
 				return {...base, data: this.data};
 			case 'load_session':
+				return base;
 			default:
-				return base as z.output<typeof Api_Message_With_Metadata>;
+				return base as z.output<typeof Message_Json>;
 		}
 	}
 }
