@@ -21,6 +21,11 @@
 	import {package_json, src_json} from '$routes/package.js';
 	import {Uuid} from '$lib/uuid.js';
 	import {zzz_config} from '$lib/zzz_config.js';
+	import {Prompt, Prompt_Json} from '$lib/prompt.svelte.js';
+	import {Bit} from '$lib/bit.svelte.js';
+	import {Model} from '$lib/model.svelte.js';
+	import {Message} from '$lib/message.svelte.js';
+	import {Provider} from '$lib/provider.svelte.js';
 
 	interface Props {
 		children: Snippet;
@@ -33,8 +38,23 @@
 	let ws: WebSocket | undefined;
 	let ws_connecting: Deferred<void> | undefined;
 
-	// gives app-wide support for Zzz
+	// Initialize Zzz
 	const zzz = new Zzz();
+
+	// Register serializable classes with the registry by their class name
+	zzz.registry.register(Bit);
+	zzz.registry.register(Prompt);
+	zzz.registry.register(Model);
+	zzz.registry.register(Message);
+	zzz.registry.register(Provider);
+
+	// Enhance schemas with metadata for deserialization - use class names
+	// Safely access Zod schema internals using type assertion
+	const prompt_json_obj = Prompt_Json as unknown as {shape?: {bits?: {_def?: {type?: any}}}};
+	if (prompt_json_obj.shape?.bits?._def?.type) {
+		// Store class name instead of schema ID
+		prompt_json_obj.shape.bits._def.type.class_name = 'Bit';
+	}
 
 	// Add providers and models from config
 	zzz.add_providers(zzz_config.providers);

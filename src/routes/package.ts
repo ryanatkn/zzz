@@ -102,6 +102,7 @@ export const package_json = {
 			default: './dist/Bit_View.svelte',
 		},
 		'./bit.svelte.js': {types: './dist/bit.svelte.d.ts', default: './dist/bit.svelte.js'},
+		'./cell_registry.js': {types: './dist/cell_registry.d.ts', default: './dist/cell_registry.js'},
 		'./Chat_Item.svelte': {
 			types: './dist/Chat_Item.svelte.d.ts',
 			svelte: './dist/Chat_Item.svelte',
@@ -128,10 +129,6 @@ export const package_json = {
 			types: './dist/Clear_Restore_Button.svelte.d.ts',
 			svelte: './dist/Clear_Restore_Button.svelte',
 			default: './dist/Clear_Restore_Button.svelte',
-		},
-		'./completion_state.svelte.js': {
-			types: './dist/completion_state.svelte.d.ts',
-			default: './dist/completion_state.svelte.js',
 		},
 		'./Completion_Thread_Info.svelte': {
 			types: './dist/Completion_Thread_Info.svelte.d.ts',
@@ -269,6 +266,14 @@ export const package_json = {
 			types: './dist/Message_View.svelte.d.ts',
 			svelte: './dist/Message_View.svelte',
 			default: './dist/Message_View.svelte',
+		},
+		'./message.helpers.js': {
+			types: './dist/message.helpers.d.ts',
+			default: './dist/message.helpers.js',
+		},
+		'./message.schema.js': {
+			types: './dist/message.schema.d.ts',
+			default: './dist/message.schema.js',
 		},
 		'./message.svelte.js': {
 			types: './dist/message.svelte.d.ts',
@@ -454,30 +459,7 @@ export const src_json = {
 	version: '0.0.1',
 	modules: {
 		'./package.json': {path: 'package.json', declarations: []},
-		'./api.js': {
-			path: 'api.ts',
-			declarations: [
-				{name: 'Message_Type', kind: 'variable'},
-				{name: 'Message_Base', kind: 'variable'},
-				{name: 'Message_Echo', kind: 'variable'},
-				{name: 'Message_Load_Session', kind: 'variable'},
-				{name: 'Message_Loaded_Session', kind: 'variable'},
-				{name: 'Message_Filer_Change', kind: 'variable'},
-				{name: 'Message_Update_File', kind: 'variable'},
-				{name: 'Message_Delete_File', kind: 'variable'},
-				{name: 'Message_Send_Prompt', kind: 'variable'},
-				{name: 'Message_Completion_Response', kind: 'variable'},
-				{name: 'Message_Client', kind: 'variable'},
-				{name: 'Message_Server', kind: 'variable'},
-				{name: 'Message', kind: 'variable'},
-				{name: 'Message_Direction', kind: 'variable'},
-				{name: 'Message_With_Metadata', kind: 'variable'},
-				{name: 'to_completion_request', kind: 'function'},
-				{name: 'to_completion_response', kind: 'function'},
-				{name: 'validate_message', kind: 'function'},
-				{name: 'create_message_with_metadata', kind: 'function'},
-			],
-		},
+		'./api.js': {path: 'api.ts', declarations: []},
 		'./Bit_List.svelte': {path: 'Bit_List.svelte', declarations: []},
 		'./Bit_Stats.svelte': {path: 'Bit_Stats.svelte', declarations: []},
 		'./Bit_Summary.svelte': {path: 'Bit_Summary.svelte', declarations: []},
@@ -489,6 +471,10 @@ export const src_json = {
 				{name: 'Bit_Options', kind: 'type'},
 				{name: 'Bit', kind: 'class'},
 			],
+		},
+		'./cell_registry.js': {
+			path: 'cell_registry.ts',
+			declarations: [{name: 'Cell_Registry', kind: 'class'}],
 		},
 		'./Chat_Item.svelte': {path: 'Chat_Item.svelte', declarations: []},
 		'./Chat_Message.svelte': {path: 'Chat_Message.svelte', declarations: []},
@@ -503,7 +489,6 @@ export const src_json = {
 		},
 		'./chats.svelte.js': {path: 'chats.svelte.ts', declarations: [{name: 'Chats', kind: 'class'}]},
 		'./Clear_Restore_Button.svelte': {path: 'Clear_Restore_Button.svelte', declarations: []},
-		'./completion_state.svelte.js': {path: 'completion_state.svelte.ts', declarations: []},
 		'./Completion_Thread_Info.svelte': {path: 'Completion_Thread_Info.svelte', declarations: []},
 		'./Completion_Thread_Summary.svelte': {
 			path: 'Completion_Thread_Summary.svelte',
@@ -630,6 +615,34 @@ export const src_json = {
 		'./Message_Info.svelte': {path: 'Message_Info.svelte', declarations: []},
 		'./Message_Summary.svelte': {path: 'Message_Summary.svelte', declarations: []},
 		'./Message_View.svelte': {path: 'Message_View.svelte', declarations: []},
+		'./message.helpers.js': {
+			path: 'message.helpers.ts',
+			declarations: [
+				{name: 'is_message_type', kind: null},
+				{name: 'get_message_debug_info', kind: null},
+			],
+		},
+		'./message.schema.js': {
+			path: 'message.schema.ts',
+			declarations: [
+				{name: 'Message_Direction', kind: 'variable'},
+				{name: 'Message_Type', kind: 'variable'},
+				{name: 'Message_Base', kind: 'variable'},
+				{name: 'Message_Echo', kind: 'variable'},
+				{name: 'Message_Load_Session', kind: 'variable'},
+				{name: 'Message_Loaded_Session', kind: 'variable'},
+				{name: 'Message_Filer_Change', kind: 'variable'},
+				{name: 'Message_Update_File', kind: 'variable'},
+				{name: 'Message_Delete_File', kind: 'variable'},
+				{name: 'Message_Send_Prompt', kind: 'variable'},
+				{name: 'Message_Completion_Response', kind: 'variable'},
+				{name: 'Message_Client', kind: 'variable'},
+				{name: 'Message_Server', kind: 'variable'},
+				{name: 'Message', kind: 'variable'},
+				{name: 'Message_With_Metadata', kind: 'variable'},
+				{name: 'create_message_with_metadata', kind: 'function'},
+			],
+		},
 		'./message.svelte.js': {
 			path: 'message.svelte.ts',
 			declarations: [

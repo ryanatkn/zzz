@@ -23,6 +23,7 @@ import {Files} from '$lib/files.svelte.js';
 import {Messages} from '$lib/messages.svelte.js';
 import {Model, type Model_Json} from '$lib/model.svelte.js';
 import {Message} from '$lib/message.svelte.js';
+import {Cell_Registry} from '$lib/cell_registry.js';
 
 export const zzz_context = create_context<Zzz>();
 
@@ -53,6 +54,7 @@ export class Zzz {
 	readonly prompts = new Prompts(this);
 	readonly files = new Files(this);
 	readonly messages = new Messages(this);
+	readonly registry = new Cell_Registry<Zzz>(this);
 
 	// Change tags to use the readonly models instance
 	tags: Set<string> = $derived(new Set(this.models.items.flatMap((m) => m.tags)));

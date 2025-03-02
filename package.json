@@ -125,6 +125,10 @@
       "types": "./dist/bit.svelte.d.ts",
       "default": "./dist/bit.svelte.js"
     },
+    "./cell_registry.js": {
+      "types": "./dist/cell_registry.d.ts",
+      "default": "./dist/cell_registry.js"
+    },
     "./Chat_Item.svelte": {
       "types": "./dist/Chat_Item.svelte.d.ts",
       "svelte": "./dist/Chat_Item.svelte",
@@ -157,10 +161,6 @@
       "types": "./dist/Clear_Restore_Button.svelte.d.ts",
       "svelte": "./dist/Clear_Restore_Button.svelte",
       "default": "./dist/Clear_Restore_Button.svelte"
-    },
-    "./completion_state.svelte.js": {
-      "types": "./dist/completion_state.svelte.d.ts",
-      "default": "./dist/completion_state.svelte.js"
     },
     "./Completion_Thread_Info.svelte": {
       "types": "./dist/Completion_Thread_Info.svelte.d.ts",
@@ -325,6 +325,14 @@
       "types": "./dist/Message_View.svelte.d.ts",
       "svelte": "./dist/Message_View.svelte",
       "default": "./dist/Message_View.svelte"
+    },
+    "./message.helpers.js": {
+      "types": "./dist/message.helpers.d.ts",
+      "default": "./dist/message.helpers.js"
+    },
+    "./message.schema.js": {
+      "types": "./dist/message.schema.d.ts",
+      "default": "./dist/message.schema.js"
     },
     "./message.svelte.js": {
       "types": "./dist/message.svelte.d.ts",

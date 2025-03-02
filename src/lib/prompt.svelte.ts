@@ -64,14 +64,6 @@ export class Prompt extends Serializable<typeof Prompt_Json, Zzz> {
 		this.init();
 	}
 
-	// TODO BLOCK generically implement via schema
-	override decode(value: unknown, key: string): unknown {
-		if (key === 'bits') {
-			return (value as Array<Bit_Json>).map((b) => new Bit({zzz: this.zzz, json: b}));
-		}
-		return value;
-	}
-
 	add_bit(content: string = '', name: string = 'new bit'): Bit {
 		const bit = new Bit({
 			zzz: this.zzz,

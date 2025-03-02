@@ -4,15 +4,16 @@ import {z} from 'zod';
 import {DEV} from 'esm-env';
 
 import {zod_get_schema_keys} from '$lib/zod_helpers.js';
+import type {Zzz} from '$lib/zzz.svelte.js';
 
 // Base options type that all serializable objects will extend
-export interface Serializable_Options<T_Schema extends z.ZodType, T_Zzz = any> {
+export interface Serializable_Options<T_Schema extends z.ZodType, T_Zzz extends Zzz = Zzz> {
 	zzz: T_Zzz;
 	json?: z.input<T_Schema>;
 }
 
 // TODO maybe rename to `Json_Serializable` to be more explicit? Or `Snapshottable`?
-export abstract class Serializable<T_Schema extends z.ZodType, T_Zzz = any> {
+export abstract class Serializable<T_Schema extends z.ZodType, T_Zzz extends Zzz = Zzz> {
 	readonly schema: T_Schema;
 	readonly schema_keys: Array<string> = $derived.by(() => zod_get_schema_keys(this.schema));
 
@@ -28,6 +29,9 @@ export abstract class Serializable<T_Schema extends z.ZodType, T_Zzz = any> {
 	// Store options for use during initialization
 	protected readonly options: Serializable_Options<T_Schema, T_Zzz>;
 
+	// Property to store class-specific metadata for deserialization
+	static readonly schema_id?: string;
+
 	constructor(schema: T_Schema, options: Serializable_Options<T_Schema, T_Zzz>) {
 		this.schema = schema;
 		this.zzz = options.zzz;
@@ -42,7 +46,7 @@ export abstract class Serializable<T_Schema extends z.ZodType, T_Zzz = any> {
 	 * Must be called by subclasses at the end of their constructor.
 	 */
 	protected init(): void {
-		console.log(`init`, this.constructor.name, this.options.json);
+		// console.log(`init`, this.constructor.name, this.options.json);
 		this.set_json(this.schema.parse(this.options.json));
 	}
 
@@ -72,14 +76,37 @@ export abstract class Serializable<T_Schema extends z.ZodType, T_Zzz = any> {
 	 */
 	set_json(value?: z.input<T_Schema>): void {
 		const parsed = this.schema.parse(value);
-		console.log(`set_json`, this.constructor.name, parsed, value);
+		// console.log(`set_json`, this.constructor.name, parsed, value);
 		for (const key in parsed) {
 			(this as any)[key] = this.decode(parsed[key], key, parsed, this.schema);
 		}
 	}
 
-	// TODO BLOCK do this pattern? so consumers can implement their own switch?
-	decode(value: unknown, _key: string, _parsed: any, _schema: any): unknown {
+	/**
+	 * Decode values during deserialization, handling nested serializable objects
+	 * @param value The value to decode
+	 * @param key The property key
+	 * @param parsed The complete parsed object
+	 * @param schema The schema for validation
+	 * @returns The decoded value
+	 */
+	decode(value: unknown, key: string, _parsed: Record<string, unknown>, schema: T_Schema): unknown {
+		// Check if we have type information in the schema with safer access
+		// Use type assertion since we know the internal structure of Zod schemas
+		const zod_obj = schema as unknown as {shape?: Record<string, any>};
+		const field_schema = zod_obj.shape?.[key];
+
+		if (field_schema?._def?.typeName === 'ZodArray') {
+			const element_schema = field_schema._def.type;
+			// Use class_name attribute instead of schema_id
+			if (element_schema?.class_name && Array.isArray(value)) {
+				return value.map((item) => this.zzz.registry.decode(item, element_schema.class_name));
+			}
+		} else if (field_schema?.class_name) {
+			return this.zzz.registry.decode(value, field_schema.class_name);
+		}
+
+		// Default behavior
 		return value;
 	}
 
