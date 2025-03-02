@@ -95,7 +95,7 @@
 				<Nav_Link href="{base}/capabilities"
 					><span class="icon_xs">{GLYPH_CAPABILITY}</span> capabilities</Nav_Link
 				>
-				<!-- TODO more - terminal, database, account -->
+				<!-- TODO more - terminal, database, account, internals? -->
 				<Nav_Link href="{base}/settings"
 					><span class="icon_xs">{GLYPH_SETTINGS}</span> settings</Nav_Link
 				>
