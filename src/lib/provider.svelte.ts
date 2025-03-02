@@ -1,11 +1,6 @@
-import {z} from 'zod';
-
 import type {Model} from '$lib/model.svelte.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
-
-// TODO extensible?
-export const Provider_Name = z.enum(['ollama', 'claude', 'chatgpt', 'gemini']);
-export type Provider_Name = z.infer<typeof Provider_Name>;
+import type {Provider_Name} from '$lib/api.js';
 
 export interface Provider_Json {
 	name: Provider_Name;

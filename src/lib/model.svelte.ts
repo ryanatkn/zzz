@@ -1,6 +1,6 @@
 import type {Flavored} from '@ryanatkn/belt/types.js';
 
-import type {Provider_Name} from '$lib/provider.svelte.js';
+import type {Provider_Name} from '$lib/api.js';
 import type {Ollama_Model_Info} from '$lib/ollama.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 

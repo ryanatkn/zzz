@@ -53,6 +53,7 @@ export const package_json = {
 		typescript: '^5.7.3',
 		'typescript-eslint': '^8.25.0',
 		vitest: '^3.0.7',
+		zod: '^3.24.2',
 	},
 	dependencies: {
 		'@anthropic-ai/sdk': '^0.37.0',
@@ -66,7 +67,6 @@ export const package_json = {
 		'gpt-tokenizer': '^2.8.1',
 		hono: '^4.7.2',
 		openai: '^4.85.4',
-		zod: '^3.24.2',
 	},
 	prettier: {
 		plugins: ['prettier-plugin-svelte'],
@@ -455,6 +455,7 @@ export const src_json = {
 				{name: 'map_watcher_change_to_api_change', kind: 'function'},
 				{name: 'Api_Message_Type', kind: 'variable'},
 				{name: 'Api_Change_Type', kind: 'variable'},
+				{name: 'Provider_Name', kind: 'variable'},
 				{name: 'Api_Base_Message', kind: 'variable'},
 				{name: 'Api_Echo_Message', kind: 'variable'},
 				{name: 'Api_Load_Session_Message', kind: 'variable'},
@@ -689,7 +690,6 @@ export const src_json = {
 		'./provider.svelte.js': {
 			path: 'provider.svelte.ts',
 			declarations: [
-				{name: 'Provider_Name', kind: 'variable'},
 				{name: 'Provider_Json', kind: 'type'},
 				{name: 'Provider_Options', kind: 'type'},
 				{name: 'Provider', kind: 'class'},

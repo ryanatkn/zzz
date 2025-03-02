@@ -3,7 +3,7 @@ import type OpenAI from 'openai';
 import type * as Google from '@google/generative-ai';
 import type {ChatResponse} from 'ollama/browser';
 
-import type {Provider_Name} from '$lib/provider.svelte.js';
+import type {Provider_Name} from '$lib/api.js';
 import type {Uuid} from '$lib/uuid.js';
 
 export interface Completion_Request {

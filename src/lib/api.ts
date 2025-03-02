@@ -2,7 +2,6 @@ import {z} from 'zod';
 import type {Watcher_Change_Type} from '@ryanatkn/gro/watch_dir.js';
 
 import {Uuid} from '$lib/uuid.js';
-import {Provider_Name} from '$lib/provider.svelte.js';
 import type {
 	Completion_Request,
 	Completion_Response,
@@ -30,6 +29,10 @@ export type Api_Message_Type = z.infer<typeof Api_Message_Type>;
 
 export const Api_Change_Type = z.enum(['add', 'change', 'unlink']);
 export type Api_Change_Type = z.infer<typeof Api_Change_Type>;
+
+// TODO where does this belong? extensible?
+export const Provider_Name = z.enum(['ollama', 'claude', 'chatgpt', 'gemini']);
+export type Provider_Name = z.infer<typeof Provider_Name>;
 
 // Base schema for all messages
 export const Api_Base_Message = z.object({

@@ -8,8 +8,9 @@ import {
 	type Api_Echo_Message,
 	type Api_Receive_Prompt_Message,
 	type Api_Send_Prompt_Message,
+	type Provider_Name,
 } from '$lib/api.js';
-import {Provider, type Provider_Json, type Provider_Name} from '$lib/provider.svelte.js';
+import {Provider, type Provider_Json} from '$lib/provider.svelte.js';
 import {Uuid} from '$lib/uuid.js';
 import {Completion_Threads, type Completion_Threads_Json} from '$lib/completion_thread.svelte.js';
 import {ollama_list_with_metadata} from '$lib/ollama.js';
