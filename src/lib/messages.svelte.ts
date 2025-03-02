@@ -59,7 +59,7 @@ export class Messages {
 		const base_message = data as {id: Uuid; type: string};
 		const message_json = create_message_with_metadata(base_message as any, direction);
 		const message = new Message({zzz: this.zzz, json: message_json});
-		this.items.unshift(message); // Add at the beginning for newest first
+		this.items.unshift(message); // TODO BLOCK @many use push and render with sort+filter
 
 		// Limit message history to prevent performance issues
 		if (this.items.length > 100) {

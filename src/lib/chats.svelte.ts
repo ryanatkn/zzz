@@ -18,7 +18,7 @@ export class Chats {
 
 	add(): Chat {
 		const chat = new Chat(this.zzz);
-		this.items.unshift(chat);
+		this.items.unshift(chat); // TODO BLOCK @many use push and render with sort+filter
 		if (this.selected_id === null) {
 			this.selected_id = chat.id;
 		}

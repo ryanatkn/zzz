@@ -17,7 +17,7 @@ export class Prompts {
 
 	add(): Prompt {
 		const prompt = new Prompt({zzz: this.zzz});
-		this.items.unshift(prompt);
+		this.items.unshift(prompt); // TODO BLOCK @many use push and render with sort+filter
 		if (this.selected_id === null) {
 			this.selected_id = prompt.id;
 		}
