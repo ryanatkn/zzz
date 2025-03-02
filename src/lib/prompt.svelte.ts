@@ -18,10 +18,17 @@ export interface Prompt_Message {
 
 export type Prompt_Message_Content = string; // TODO ?
 
+const prompt_names: Array<string> = [];
+
 export const Prompt_Json = z
 	.object({
 		id: Uuid,
-		name: z.string().default(''),
+		name: z.string().default(() => {
+			// TODO BLOCK how to do this correctly? can you make it stateful and still have a static module-scoped schema? I dont see a context object arg or anything
+			const name = get_unique_name('prompt', prompt_names);
+			prompt_names.push(name);
+			return name;
+		}),
 		created: z.string().default(() => new Date().toISOString()),
 		bits: z.array(Bit_Json).default(() => []),
 	})
