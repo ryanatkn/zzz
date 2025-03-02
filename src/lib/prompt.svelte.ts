@@ -5,7 +5,7 @@ import type {Zzz} from '$lib/zzz.svelte.js';
 import {Uuid} from '$lib/uuid.js';
 import {get_unique_name} from '$lib/helpers.js';
 import {XML_TAG_NAME_DEFAULT} from '$lib/constants.js';
-import {Bit, type Bit_Json} from '$lib/bit.svelte.js';
+import {Bit, Bit_Json} from '$lib/bit.svelte.js';
 import {reorder_list} from '$lib/list_helpers.js';
 import {Serializable, type Serializable_Options} from '$lib/serializable.svelte.js';
 
@@ -19,10 +19,10 @@ export interface Prompt_Message {
 export type Prompt_Message_Content = string; // TODO ?
 
 export const Prompt_Json = z.object({
-	id: Uuid.default(() => Uuid.parse(undefined)),
+	id: Uuid,
 	name: z.string().default(''),
 	created: z.string().default(() => new Date().toISOString()),
-	bits: z.array(z.custom<Bit>()).default([]),
+	bits: z.array(Bit_Json).default(() => []),
 });
 export type Prompt_Json = z.infer<typeof Prompt_Json>;
 

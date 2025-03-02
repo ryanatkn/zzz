@@ -9,7 +9,7 @@ import type {Zzz} from '$lib/zzz.svelte.js';
 export const Model_Json = z.object({
 	name: z.string(),
 	provider_name: Provider_Name,
-	tags: z.array(z.string()),
+	tags: z.array(z.string()).default(() => []),
 	architecture: z.string().optional(),
 	parameter_count: z.number().optional(),
 	context_window: z.number().optional(),
