@@ -11,34 +11,48 @@ export interface Completion_Request {
 	request_id: Uuid;
 	provider_name: Provider_Name;
 	model: string;
-	// TODO BLOCK `prompt` should be a `Prompt` type that captures the entire input to each API? renamed to a `content` string?
 	prompt: string;
 }
+
+// Define specific data types for each provider
+export interface Ollama_Completion_Data {
+	type: 'ollama';
+	value: ChatResponse;
+}
+export interface Claude_Completion_Data {
+	type: 'claude';
+	value: Anthropic.Messages.Message;
+}
+export interface Chatgpt_Completion_Data {
+	type: 'chatgpt';
+	value: OpenAI.Chat.Completions.ChatCompletion & {
+		_request_id?: string | null;
+	};
+}
+export interface Gemini_Completion_Data {
+	type: 'gemini';
+	value: {
+		text: string;
+		candidates: Array<Google.GenerateContentCandidate> | null;
+		function_calls: Array<Google.FunctionCall> | null;
+		prompt_feedback: Google.PromptFeedback | null;
+		usage_metadata: Google.UsageMetadata | null;
+	};
+}
+
+// Union type of all possible data structures
+export type Completion_Response_Data =
+	| Ollama_Completion_Data
+	| Claude_Completion_Data
+	| Chatgpt_Completion_Data
+	| Gemini_Completion_Data;
 
 export interface Completion_Response {
 	created: string;
 	request_id: Uuid;
 	provider_name: Provider_Name;
 	model: string;
-	data:
-		| {type: 'ollama'; value: ChatResponse}
-		| {type: 'claude'; value: Anthropic.Messages.Message}
-		| {
-				type: 'chatgpt';
-				value: OpenAI.Chat.Completions.ChatCompletion & {
-					_request_id?: string | null;
-				};
-		  }
-		| {
-				type: 'gemini';
-				value: {
-					text: string;
-					candidates: Array<Google.GenerateContentCandidate> | null;
-					function_calls: Array<Google.FunctionCall> | null;
-					prompt_feedback: Google.PromptFeedback | null;
-					usage_metadata: Google.UsageMetadata | null;
-				};
-		  };
+	data: Completion_Response_Data;
 }
 
 export interface Completion {
@@ -46,25 +60,31 @@ export interface Completion {
 	completion_response: Completion_Response;
 }
 
-// TODO delete this, replace with a class that wraps everything (replacing `Chat_Message` probably)
 export const to_completion_response_text = (
 	completion_response: Completion_Response,
-): string | null | undefined =>
-	completion_response.data.type === 'ollama'
-		? completion_response.data.value.message.content
-		: completion_response.data.type === 'claude'
-			? completion_response.data.value.content
-					.map(
-						(c) =>
-							c.type === 'text'
-								? c.text
-								: c.type === 'tool_use'
-									? c.name
-									: c.type === 'thinking'
-										? c.thinking
-										: c.data, // TODO refactor
-					)
-					.join('\n\n')
-			: completion_response.data.type === 'chatgpt'
-				? completion_response.data.value.choices[0].message.content
-				: completion_response.data.value.text;
+): string | null | undefined => {
+	if (!completion_response.data) return null;
+
+	switch (completion_response.data.type) {
+		case 'ollama':
+			return completion_response.data.value.message.content;
+		case 'claude':
+			return completion_response.data.value.content
+				.map((c) =>
+					c.type === 'text'
+						? c.text
+						: c.type === 'tool_use'
+							? c.name
+							: c.type === 'thinking'
+								? c.thinking
+								: c.data,
+				)
+				.join('\n\n');
+		case 'chatgpt':
+			return completion_response.data.value.choices[0].message.content;
+		case 'gemini':
+			return completion_response.data.value.text;
+		default:
+			return null;
+	}
+};

@@ -3,6 +3,11 @@ import type {Watcher_Change_Type} from '@ryanatkn/gro/watch_dir.js';
 
 import {Uuid} from '$lib/uuid.js';
 import {Provider_Name} from '$lib/provider.svelte.js';
+import type {
+	Completion_Request,
+	Completion_Response,
+	Completion_Response_Data,
+} from '$lib/completion.js';
 
 // Define a proper map from Watcher_Change_Type to Api_Change_Type
 export const map_watcher_change_to_api_change = (type: Watcher_Change_Type): Api_Change_Type => {
@@ -71,6 +76,12 @@ export const Api_Delete_File_Message = Api_Base_Message.extend({
 	file_id: z.string(), // Path_Id
 });
 
+// Define a schema for each data type
+const Api_Completion_Response_Data = z.object({
+	type: Provider_Name,
+	value: z.any(),
+});
+
 // Completion related message schemas
 export const Api_Send_Prompt_Message = Api_Base_Message.extend({
 	type: z.literal('send_prompt'),
@@ -90,7 +101,7 @@ export const Api_Receive_Prompt_Message = Api_Base_Message.extend({
 		request_id: Uuid,
 		provider_name: Provider_Name,
 		model: z.string(),
-		data: z.any(),
+		data: Api_Completion_Response_Data,
 	}),
 });
 
@@ -157,6 +168,23 @@ export type Api_Client_Message = z.infer<typeof Api_Client_Message>;
 export type Api_Server_Message = z.infer<typeof Api_Server_Message>;
 export type Api_Message = z.infer<typeof Api_Message>;
 export type Api_Message_With_Metadata = z.infer<typeof Api_Message_With_Metadata>;
+
+// TODO these shouldnt be needed
+// Helper functions to convert between API and internal types
+export const to_completion_request = (
+	api_request: Api_Send_Prompt_Message['completion_request'],
+): Completion_Request => {
+	return api_request as Completion_Request;
+};
+
+export const to_completion_response = (
+	api_response: Api_Receive_Prompt_Message['completion_response'],
+): Completion_Response => {
+	return {
+		...api_response,
+		data: api_response.data as Completion_Response_Data,
+	};
+};
 
 // Helper function to validate messages
 export const validate_message = (message: unknown): Api_Message => {

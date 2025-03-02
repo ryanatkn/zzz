@@ -4,8 +4,8 @@ import {
 	type Api_Message_With_Metadata,
 	type Api_Message_Direction,
 	type Api_Message_Type,
-	type Api_Send_Prompt_Message,
-	type Api_Receive_Prompt_Message,
+	to_completion_request,
+	to_completion_response,
 } from '$lib/api.js';
 import {
 	to_completion_response_text,
@@ -57,11 +57,11 @@ export class Message {
 	);
 
 	prompt_data: Completion_Request | null = $derived(
-		this.is_prompt ? (this.data as Api_Send_Prompt_Message).completion_request : null,
+		this.is_prompt && this.completion_request ? this.completion_request : null,
 	);
 
 	completion_data: Completion_Response | null = $derived(
-		this.is_completion ? (this.data as Api_Receive_Prompt_Message).completion_response : null,
+		this.is_completion && this.completion_response ? this.completion_response : null,
 	);
 
 	completion_text: string | null | undefined = $derived(
@@ -104,10 +104,14 @@ export class Message {
 				this.data = json.data;
 				break;
 			case 'send_prompt':
-				this.completion_request = json.completion_request;
+				this.completion_request = json.completion_request
+					? to_completion_request(json.completion_request)
+					: undefined;
 				break;
 			case 'completion_response':
-				this.completion_response = json.completion_response;
+				this.completion_response = json.completion_response
+					? to_completion_response(json.completion_response)
+					: undefined;
 				break;
 			case 'update_file':
 				this.file_id = json.file_id;

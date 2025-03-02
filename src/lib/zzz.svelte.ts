@@ -3,10 +3,11 @@ import {SvelteMap} from 'svelte/reactivity';
 import {create_deferred, type Deferred} from '@ryanatkn/belt/async.js';
 
 import {Zzz_Data, type Zzz_Data_Json} from '$lib/zzz_data.svelte.js';
-import type {
-	Api_Echo_Message,
-	Api_Receive_Prompt_Message,
-	Api_Send_Prompt_Message,
+import {
+	to_completion_response,
+	type Api_Echo_Message,
+	type Api_Receive_Prompt_Message,
+	type Api_Send_Prompt_Message,
 } from '$lib/api.js';
 import {Provider, type Provider_Json, type Provider_Name} from '$lib/provider.svelte.js';
 import {Uuid} from '$lib/uuid.js';
@@ -136,12 +137,21 @@ export class Zzz {
 		this.messages.send(message);
 
 		const deferred = create_deferred<Api_Receive_Prompt_Message>();
-		this.pending_prompts.set(message.id, deferred); // TODO roundabout way to get req/res
+		this.pending_prompts.set(message.id, deferred);
 		const response = await deferred.promise;
-		this.completion_threads.receive_completion_response(
-			message.completion_request,
-			response.completion_response,
-		);
+
+		// Ensure the completion response matches the required structure
+		if (response.completion_response) {
+			// Convert the API response to the internal format
+			const completion_response = to_completion_response(response.completion_response);
+			this.completion_threads.receive_completion_response(
+				message.completion_request,
+				completion_response,
+			);
+		} else {
+			console.error('Invalid completion response format:', response);
+		}
+
 		return response;
 	}
 
