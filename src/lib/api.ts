@@ -1,25 +1,12 @@
 import {z} from 'zod';
-import type {Watcher_Change_Type} from '@ryanatkn/gro/watch_dir.js';
 
+import {File_Change_Type} from '$lib/file_types.js';
 import {Uuid} from '$lib/uuid.js';
 import {
 	Completion_Request,
 	Completion_Response_Schema,
 	type Completion_Response,
 } from '$lib/completion.js';
-
-// TODO there's a problem with .svelte.ts files in the server build, so I'm putting these here as a hack
-export const Provider_Name = z.enum(['ollama', 'claude', 'chatgpt', 'gemini']);
-export type Provider_Name = z.infer<typeof Provider_Name>;
-
-// Define a proper map from Watcher_Change_Type to Api_Change_Type
-export const Api_Change_Type = z.enum(['add', 'change', 'unlink']);
-export type Api_Change_Type = z.infer<typeof Api_Change_Type>;
-
-export const map_watcher_change_to_api_change = (type: Watcher_Change_Type): Api_Change_Type => {
-	if (type === 'update') return 'change';
-	return type as Api_Change_Type;
-};
 
 // Define all message types as literals for better type safety
 export const Api_Message_Type = z.enum([
@@ -62,7 +49,7 @@ export const Api_Loaded_Session_Message = Api_Base_Message.extend({
 export const Api_Filer_Change_Message = Api_Base_Message.extend({
 	type: z.literal('filer_change'),
 	change: z.object({
-		type: Api_Change_Type,
+		type: File_Change_Type,
 		path: z.string(),
 	}),
 	source_file: z.any(), // Source_File
@@ -137,7 +124,7 @@ export const Api_Message_With_Metadata = z.object({
 	contents: z.string().optional(),
 	change: z
 		.object({
-			type: Api_Change_Type,
+			type: File_Change_Type,
 			path: z.string(),
 		})
 		.optional(),

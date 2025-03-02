@@ -18,11 +18,11 @@ import {
 	type Api_Receive_Prompt_Message,
 	type Api_Send_Prompt_Message,
 	type Api_Server_Message,
-	map_watcher_change_to_api_change,
 } from '$lib/api.js';
 import {Uuid} from '$lib/uuid.js';
 import {SYSTEM_MESSAGE_DEFAULT} from '$lib/config.js';
 import {delete_file_in_scope, write_file_in_scope} from '$lib/server/helpers.js';
+import {map_watcher_change_to_file_change} from '$lib/file_types.js';
 
 const anthropic = new Anthropic({apiKey: SECRET_ANTHROPIC_API_KEY});
 const openai = new OpenAI({apiKey: SECRET_OPENAI_API_KEY});
@@ -87,7 +87,7 @@ export class Zzz_Server {
 		this.#cleanup_filer = this.filer.watch((change, source_file) => {
 			// Convert watcher change type to API change type
 			const api_change = {
-				type: map_watcher_change_to_api_change(change.type),
+				type: map_watcher_change_to_file_change(change.type),
 				path: change.path,
 			};
 

@@ -3,7 +3,7 @@ import {Serializable, type Serializable_Options} from '$lib/serializable.svelte.
 
 import type {Model} from '$lib/model.svelte.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
-import {Provider_Name} from '$lib/api.js';
+import {Provider_Name} from '$lib/provider_types.js';
 
 export const Provider_Json = z.object({
 	name: Provider_Name,

@@ -239,6 +239,7 @@ export const package_json = {
 			svelte: './dist/File_Summary.svelte',
 			default: './dist/File_Summary.svelte',
 		},
+		'./file_types.js': {types: './dist/file_types.d.ts', default: './dist/file_types.js'},
 		'./File_View.svelte': {
 			types: './dist/File_View.svelte.d.ts',
 			svelte: './dist/File_View.svelte',
@@ -366,6 +367,10 @@ export const package_json = {
 			svelte: './dist/Provider_Summary.svelte',
 			default: './dist/Provider_Summary.svelte',
 		},
+		'./provider_types.js': {
+			types: './dist/provider_types.d.ts',
+			default: './dist/provider_types.js',
+		},
 		'./Provider_View.svelte': {
 			types: './dist/Provider_View.svelte.d.ts',
 			svelte: './dist/Provider_View.svelte',
@@ -452,9 +457,6 @@ export const src_json = {
 		'./api.js': {
 			path: 'api.ts',
 			declarations: [
-				{name: 'Provider_Name', kind: 'variable'},
-				{name: 'Api_Change_Type', kind: 'variable'},
-				{name: 'map_watcher_change_to_api_change', kind: 'function'},
 				{name: 'Api_Message_Type', kind: 'variable'},
 				{name: 'Api_Base_Message', kind: 'variable'},
 				{name: 'Api_Echo_Message', kind: 'variable'},
@@ -573,6 +575,13 @@ export const src_json = {
 		'./File_Info.svelte': {path: 'File_Info.svelte', declarations: []},
 		'./File_List.svelte': {path: 'File_List.svelte', declarations: []},
 		'./File_Summary.svelte': {path: 'File_Summary.svelte', declarations: []},
+		'./file_types.js': {
+			path: 'file_types.ts',
+			declarations: [
+				{name: 'File_Change_Type', kind: 'variable'},
+				{name: 'map_watcher_change_to_file_change', kind: 'function'},
+			],
+		},
 		'./File_View.svelte': {path: 'File_View.svelte', declarations: []},
 		'./file.svelte.js': {
 			path: 'file.svelte.ts',
@@ -691,6 +700,10 @@ export const src_json = {
 		'./Provider_Logo.svelte': {path: 'Provider_Logo.svelte', declarations: []},
 		'./Provider_Select.svelte': {path: 'Provider_Select.svelte', declarations: []},
 		'./Provider_Summary.svelte': {path: 'Provider_Summary.svelte', declarations: []},
+		'./provider_types.js': {
+			path: 'provider_types.ts',
+			declarations: [{name: 'Provider_Name', kind: 'variable'}],
+		},
 		'./Provider_View.svelte': {path: 'Provider_View.svelte', declarations: []},
 		'./provider.svelte.js': {
 			path: 'provider.svelte.ts',

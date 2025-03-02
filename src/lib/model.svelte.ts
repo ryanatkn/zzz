@@ -1,7 +1,7 @@
 import type {Flavored} from '@ryanatkn/belt/types.js';
 import {z} from 'zod';
 
-import {Provider_Name} from '$lib/api.js';
+import {Provider_Name} from '$lib/provider_types.js';
 import {Serializable, type Serializable_Options} from '$lib/serializable.svelte.js';
 import type {Ollama_Model_Info} from '$lib/ollama.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
