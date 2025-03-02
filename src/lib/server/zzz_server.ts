@@ -22,7 +22,7 @@ import {
 import {Uuid} from '$lib/uuid.js';
 import {SYSTEM_MESSAGE_DEFAULT} from '$lib/config.js';
 import {delete_file_in_scope, write_file_in_scope} from '$lib/server/helpers.js';
-import {map_watcher_change_to_file_change} from '$lib/file_types.js';
+import {map_watcher_change_to_file_change} from '$lib/file.schema.js';
 
 const anthropic = new Anthropic({apiKey: SECRET_ANTHROPIC_API_KEY});
 const openai = new OpenAI({apiKey: SECRET_OPENAI_API_KEY});

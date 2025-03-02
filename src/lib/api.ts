@@ -1,6 +1,6 @@
 import {z} from 'zod';
 
-import {File_Change_Type} from '$lib/file_types.js';
+import {File_Change_Type} from '$lib/file.schema.js';
 import {Uuid} from '$lib/uuid.js';
 import {
 	Completion_Request,
@@ -173,11 +173,7 @@ export const to_completion_response = (
 	return api_response;
 };
 
-// Helper function to validate messages
-export const validate_message = (message: unknown): Api_Message => {
-	return Api_Message.parse(message);
-};
-
+// TODO refactor this, smells
 // Helper function to create a message with metadata
 export const create_message_with_metadata = (
 	message: Api_Message,

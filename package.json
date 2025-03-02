@@ -277,14 +277,14 @@
       "svelte": "./dist/File_Summary.svelte",
       "default": "./dist/File_Summary.svelte"
     },
-    "./file_types.js": {
-      "types": "./dist/file_types.d.ts",
-      "default": "./dist/file_types.js"
-    },
     "./File_View.svelte": {
       "types": "./dist/File_View.svelte.d.ts",
       "svelte": "./dist/File_View.svelte",
       "default": "./dist/File_View.svelte"
+    },
+    "./file.schema.js": {
+      "types": "./dist/file.schema.d.ts",
+      "default": "./dist/file.schema.js"
     },
     "./file.svelte.js": {
       "types": "./dist/file.svelte.d.ts",
@@ -438,14 +438,14 @@
       "svelte": "./dist/Provider_Summary.svelte",
       "default": "./dist/Provider_Summary.svelte"
     },
-    "./provider_types.js": {
-      "types": "./dist/provider_types.d.ts",
-      "default": "./dist/provider_types.js"
-    },
     "./Provider_View.svelte": {
       "types": "./dist/Provider_View.svelte.d.ts",
       "svelte": "./dist/Provider_View.svelte",
       "default": "./dist/Provider_View.svelte"
+    },
+    "./provider.schema.js": {
+      "types": "./dist/provider.schema.d.ts",
+      "default": "./dist/provider.schema.js"
     },
     "./provider.svelte.js": {
       "types": "./dist/provider.svelte.d.ts",
