@@ -50,7 +50,7 @@ export const get_direction_icon = (direction: string): string => {
 		case 'both':
 			return GLYPH_DIRECTION_BOTH;
 		default:
-			return '❓';
+			return '?';
 	}
 };
 
