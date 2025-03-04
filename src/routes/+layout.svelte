@@ -97,7 +97,12 @@
 				case 'loaded_session': {
 					console.log(`[page] loaded_session`, message);
 					for (const source_file of message.data.files.values()) {
-						zzz.files.by_id.set(source_file.id, source_file);
+						zzz.files.handle_change({
+							type: 'filer_change',
+							id: Uuid.parse(undefined),
+							change: {type: 'add', path: source_file.id},
+							source_file,
+						});
 					}
 					break;
 				}

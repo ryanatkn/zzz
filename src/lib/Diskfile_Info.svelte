@@ -1,45 +1,43 @@
 <script lang="ts">
 	import Details from '@ryanatkn/fuz/Details.svelte';
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
-	import type {Source_File} from '@ryanatkn/gro/filer.js';
 
+	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import {to_root_path} from '$lib/path.js';
 
 	interface Props {
-		// TODO more efficient data structures, reactive source files
-		file: Source_File;
+		file: Diskfile;
 	}
 
 	const {file}: Props = $props();
 
-	const dependencies = $derived(Array.from(file.dependencies.values()));
-	const dependents = $derived(Array.from(file.dependents.values()));
+	// TODO BLOCK remove the the Array.from() calls below
 </script>
 
 <div class="row size_xl"><span class="size_xl3 mr_md">🗎</span> {to_root_path(file.id)}</div>
 
 <p>
 	deps (
-	{dependencies.length}
-	{#if dependencies.length === 1}dependency{:else}dependency{/if} and
-	{dependents.length}
-	{#if dependents.length === 1}dependent{:else}dependents{/if}
+	{file.dependencies_count}
+	{#if file.dependencies_count === 1}dependency{:else}dependency{/if} and
+	{file.dependents_count}
+	{#if file.dependents_count === 1}dependent{:else}dependents{/if}
 	)
 </p>
 
 <h2>dependencies</h2>
 <div class="dep_list">
-	{#each dependencies as dependency (dependency.id)}
-		<div>{to_root_path(dependency.id)}</div>
+	{#each Array.from(file.dependencies.keys()) as dependency_id (dependency_id)}
+		<div>{to_root_path(dependency_id)}</div>
 	{/each}
 </div>
 <h2>
-	{#if !dependents.length}no{' '}{/if}dependents
+	{#if !file.has_dependents}no{' '}{/if}dependents
 </h2>
-{#if dependents.length > 0}
+{#if file.has_dependents}
 	<div class="dep_list">
-		{#each dependents as dependent (dependent.id)}
-			{to_root_path(dependent.id)}
+		{#each Array.from(file.dependents.keys()) as dependent_id (dependent_id)}
+			{to_root_path(dependent_id)}
 		{/each}
 	</div>
 {/if}
@@ -56,7 +54,7 @@
 	contents {#if file.contents === null}
 		null
 	{:else}
-		({file.contents.length} chars)
+		({file.content_length} chars)
 	{/if}
 {/snippet}
 

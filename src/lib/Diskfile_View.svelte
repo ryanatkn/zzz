@@ -1,7 +1,6 @@
 <script lang="ts">
 	import Contextmenu_Submenu from '@ryanatkn/fuz/Contextmenu_Submenu.svelte';
 	import Contextmenu_Entry from '@ryanatkn/fuz/Contextmenu_Entry.svelte';
-	import type {Source_File} from '@ryanatkn/gro/filer.js';
 	import {contextmenu_action} from '@ryanatkn/fuz/contextmenu_state.svelte.js';
 	import {slide} from 'svelte/transition';
 
@@ -10,10 +9,10 @@
 	import Diskfile_Summary from '$lib/Diskfile_Summary.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import {GLYPH_REMOVE} from '$lib/glyphs.js';
+	import type {Diskfile} from '$lib/diskfile.svelte.js';
 
 	interface Props {
-		// TODO more efficient data structures, reactive source files
-		file: Source_File;
+		file: Diskfile;
 	}
 
 	const {file}: Props = $props();

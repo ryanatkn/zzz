@@ -1,15 +1,15 @@
 <script lang="ts">
-	import type {Source_File} from '@ryanatkn/gro/filer.js';
 	import {slide} from 'svelte/transition';
 
+	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import Text_Icon from '$lib/Text_Icon.svelte';
 	import {GLYPH_FILE} from '$lib/glyphs.js';
 	import {to_root_path} from '$lib/path.js';
 
 	interface Props {
-		files: Map<string, Source_File>; // TODO BLOCK should be File right? need to remove Source_File from frontend state, replace
+		files: Map<string, Diskfile>;
 		selected_file_id?: string | null;
-		onselect?: (file: Source_File) => void;
+		onselect?: (file: Diskfile) => void;
 	}
 
 	const {files, selected_file_id = null, onselect}: Props = $props();
@@ -18,7 +18,7 @@
 		Array.from(files.values()).sort((a, b) => to_root_path(a.id).localeCompare(to_root_path(b.id))),
 	);
 
-	const handle_select = (file: Source_File): void => {
+	const handle_select = (file: Diskfile): void => {
 		onselect?.(file);
 	};
 

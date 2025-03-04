@@ -1,22 +1,21 @@
 <script lang="ts">
-	import type {Source_File} from '@ryanatkn/gro/filer.js';
-
+	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import Diskfile_Explorer from '$lib/Diskfile_Explorer.svelte';
 	import Diskfile_Editor from '$lib/Diskfile_Editor.svelte';
-	// import {Scrollable} from '$lib/scrollable.svelte.js';
 
 	const zzz = zzz_context.get();
 
-	const files = $derived(Array.from(zzz.files.by_id.values()).filter((file) => !file.external));
+	// TODO BLOCK shouldn't be needed
+	const files = $derived(zzz.files.files.filter((file) => !file.external));
 
 	// TODO BLOCK shouldnt be needed
-	const files_map: Map<string, Source_File> = $derived(new Map(files.map((f) => [f.id, f])));
+	const files_map: Map<string, Diskfile> = $derived(new Map(files.map((f) => [f.id, f])));
 	let selected_file_id: string | null = $state(null);
-	const selected_file: Source_File | null = $derived(
+	const selected_file: Diskfile | null = $derived(
 		selected_file_id && (files_map.get(selected_file_id) ?? null),
 	);
-	const handle_file_selection = (file: Source_File): void => {
+	const handle_file_selection = (file: Diskfile): void => {
 		selected_file_id = file.id;
 	};
 

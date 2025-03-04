@@ -1,17 +1,12 @@
 <script lang="ts">
-	import type {Source_File} from '@ryanatkn/gro/filer.js';
-
+	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import {to_root_path} from '$lib/path.js';
 
 	interface Props {
-		// TODO more efficient data structures, reactive source files
-		file: Source_File;
+		file: Diskfile;
 	}
 
 	const {file}: Props = $props();
-
-	const dependencies = $derived(Array.from(file.dependencies.values()));
-	const dependents = $derived(Array.from(file.dependents.values()));
 </script>
 
 <div class="file_summary row justify_content_space_between">
@@ -22,21 +17,21 @@
 	<div
 		style:width="70px"
 		class="shrink_0 text_align_right"
-		title="{dependencies.length} dependenc{dependencies.length === 1 ? 'y' : 'ies'}"
+		title="{file.dependencies_count} dependenc{file.dependencies_count === 1 ? 'y' : 'ies'}"
 	>
-		{dependencies.length} ⇉
+		{file.dependencies_count} ⇉
 	</div>
 	<div
 		style:width="70px"
 		class="shrink_0 text_align_right"
-		title="{dependents.length} dependent{dependents.length === 1 ? '' : 's'}"
+		title="{file.dependents_count} dependent{file.dependents_count === 1 ? '' : 's'}"
 	>
-		{dependents.length} ⇇
+		{file.dependents_count} ⇇
 	</div>
 	<div style:width="130px" class="shrink_0 text_align_right pr_md">
 		{#if file.contents !== null}
-			{file.contents.length}
-			{#if file.contents.length === 1}character{:else}chars{/if}
+			{file.content_length}
+			{#if file.content_length === 1}character{:else}chars{/if}
 		{/if}
 	</div>
 </div>

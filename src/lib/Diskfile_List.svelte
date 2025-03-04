@@ -1,10 +1,10 @@
 <script lang="ts">
-	import type {Source_File} from '@ryanatkn/gro/filer.js';
+	import type {Diskfile} from '$lib/diskfile.svelte.js';
 
 	import Diskfile_View from '$lib/Diskfile_View.svelte';
 
 	interface Props {
-		files: Array<Source_File>;
+		files: Array<Diskfile>;
 	}
 
 	const {files}: Props = $props();

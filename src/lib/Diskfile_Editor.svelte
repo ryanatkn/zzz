@@ -1,6 +1,5 @@
 <script lang="ts">
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
-	import type {Source_File} from '@ryanatkn/gro/filer.js';
 	import {untrack} from 'svelte';
 	import {slide} from 'svelte/transition';
 	import {format} from 'date-fns';
@@ -11,17 +10,15 @@
 	import Text_Icon from '$lib/Text_Icon.svelte';
 	import {GLYPH_FILE} from '$lib/glyphs.js';
 	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
+	import type {Diskfile} from '$lib/diskfile.svelte.js';
 
 	interface Props {
-		file: Source_File; // TODO BLOCK `Diskfile` object
+		file: Diskfile;
 	}
 
 	const {file}: Props = $props();
 
 	const {id} = $derived(file);
-
-	const dependencies = $derived(Array.from(file.dependencies.values()));
-	const dependents = $derived(Array.from(file.dependents.values()));
 
 	const zzz = zzz_context.get();
 
@@ -48,6 +45,8 @@
 			updated_contents = file.contents ?? '';
 		}
 	};
+
+	// TODO BLOCK remove the Array.froms below
 </script>
 
 <div class="mb_md">
@@ -56,11 +55,10 @@
 		{to_root_path(file.id)}
 	</div>
 	<div class="flex flex_column gap_xs mt_sm">
-		<small class="font_mono">Size: {file.contents?.length || 0} characters</small>
-		<small class="font_mono">Created: {file.ctime}</small>
-		<small class="font_mono">Modified: {file.mtime}</small>
+		<small class="font_mono">Size: {file.content_length} characters</small>
+		<small class="font_mono">Modified: {file.modified_formatted_date}</small>
 		<small class="font_mono">
-			Dependencies: {dependencies.length} • Dependents: {dependents.length}
+			Dependencies: {file.dependencies_count} • Dependents: {file.dependents_count}
 		</small>
 	</div>
 </div>
@@ -132,29 +130,29 @@
 	</div>
 {/if}
 
-{#if dependencies.length || dependents.length}
+{#if file.dependencies_count || file.dependents_count}
 	<div class="mt_md panel p_md">
-		{#if dependencies.length}
+		{#if file.dependencies_count}
 			<div class="mb_md">
 				<h3 class="mt_0 mb_sm">
-					Dependencies ({dependencies.length})
+					Dependencies ({file.dependencies_count})
 				</h3>
 				<div class="dep_list">
-					{#each dependencies as dependency (dependency.id)}
-						<div class="dep_item">{to_root_path(dependency.id)}</div>
+					{#each Array.from(file.dependencies.keys()) as dependency_id (dependency_id)}
+						<div class="dep_item">{to_root_path(dependency_id)}</div>
 					{/each}
 				</div>
 			</div>
 		{/if}
 
-		{#if dependents.length}
+		{#if file.dependents_count}
 			<div>
 				<h3 class="mt_0 mb_sm">
-					Dependents ({dependents.length})
+					Dependents ({file.dependents_count})
 				</h3>
 				<div class="dep_list">
-					{#each dependents as dependent (dependent.id)}
-						<div class="dep_item">{to_root_path(dependent.id)}</div>
+					{#each Array.from(file.dependents.keys()) as dependent_id (dependent_id)}
+						<div class="dep_item">{to_root_path(dependent_id)}</div>
 					{/each}
 				</div>
 			</div>
