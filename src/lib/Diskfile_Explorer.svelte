@@ -86,6 +86,5 @@
 		justify-content: center;
 		align-items: center;
 		height: 100%;
-		color: var(--color_text_subtle);
 	}
 </style>
