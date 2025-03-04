@@ -89,6 +89,7 @@ export class Zzz {
 		}
 	}
 
+	// TODO BLOCK extend cell so this doesnt exist, automatic from the schema
 	toJSON(): Zzz_Json {
 		return {
 			data: this.data.toJSON(),
