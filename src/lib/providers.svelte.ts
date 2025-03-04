@@ -1,13 +1,30 @@
-import type {Zzz} from '$lib/zzz.svelte.js';
-import type {Provider} from '$lib/provider.svelte.js';
+import {z} from 'zod';
 
-export class Providers {
-	readonly zzz: Zzz;
+import {Cell, type Cell_Options, cell_array} from '$lib/cell.svelte.js';
+import {Provider, Provider_Json} from '$lib/provider.svelte.js';
 
+// Define the schema with cell_array for proper class association
+export const Providers_Json = z
+	.object({
+		items: cell_array(
+			z.array(Provider_Json).default(() => []),
+			'Provider',
+		),
+	})
+	.default(() => ({
+		items: [],
+	}));
+
+export type Providers_Json = z.infer<typeof Providers_Json>;
+
+export interface Providers_Options extends Cell_Options<typeof Providers_Json> {}
+
+export class Providers extends Cell<typeof Providers_Json> {
 	items: Array<Provider> = $state([]);
 
-	constructor(zzz: Zzz) {
-		this.zzz = zzz;
+	constructor(options: Providers_Options) {
+		super(Providers_Json, options);
+		this.init();
 	}
 
 	add(provider: Provider): void {

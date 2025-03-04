@@ -490,6 +490,8 @@ export const src_json = {
 		'./cell.svelte.js': {
 			path: 'cell.svelte.ts',
 			declarations: [
+				{name: 'cell_class', kind: null},
+				{name: 'cell_array', kind: null},
 				{name: 'Cell_Options', kind: 'type'},
 				{name: 'Cell', kind: 'class'},
 			],
@@ -507,7 +509,14 @@ export const src_json = {
 				{name: 'Chat', kind: 'class'},
 			],
 		},
-		'./chats.svelte.js': {path: 'chats.svelte.ts', declarations: [{name: 'Chats', kind: 'class'}]},
+		'./chats.svelte.js': {
+			path: 'chats.svelte.ts',
+			declarations: [
+				{name: 'Chats_Json', kind: 'variable'},
+				{name: 'Chats_Options', kind: 'type'},
+				{name: 'Chats', kind: 'class'},
+			],
+		},
 		'./Clear_Restore_Button.svelte': {path: 'Clear_Restore_Button.svelte', declarations: []},
 		'./Completion_Thread_Info.svelte': {path: 'Completion_Thread_Info.svelte', declarations: []},
 		'./Completion_Thread_Summary.svelte': {

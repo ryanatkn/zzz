@@ -4,6 +4,8 @@ import type {Zzz} from '$lib/zzz.svelte.js';
 // TODO extract helper?
 type Class_Constructor<T> = new (options: any) => T;
 
+// TODO BLOCK should this not be a cell?
+
 /**
  * Registry for managing class constructors and handling instantiation
  */

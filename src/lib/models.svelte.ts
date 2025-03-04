@@ -1,17 +1,35 @@
-import type {Zzz} from '$lib/zzz.svelte.js';
-import {Model, type Model_Json} from '$lib/model.svelte.js';
+import {z} from 'zod';
+
+import {Cell, type Cell_Options, cell_array} from '$lib/cell.svelte.js';
+import {Model, Model_Json} from '$lib/model.svelte.js';
 import type {Ollama_Model_Info} from '$lib/ollama.js';
 import {zzz_config} from '$lib/zzz_config.js';
 
-export class Models {
-	readonly zzz: Zzz;
+// Define the schema with cell_array for proper class association
+export const Models_Json = z
+	.object({
+		items: cell_array(
+			z.array(Model_Json).default(() => []),
+			'Model',
+		),
+	})
+	.default(() => ({
+		items: [],
+	}));
 
+export type Models_Json = z.infer<typeof Models_Json>;
+
+export interface Models_Options extends Cell_Options<typeof Models_Json> {}
+
+export class Models extends Cell<typeof Models_Json> {
 	items: Array<Model> = $state([]);
 
+	// Derived property
 	items_by_name: Map<string, Model> = $derived(new Map(this.items.map((m) => [m.name, m])));
 
-	constructor(zzz: Zzz) {
-		this.zzz = zzz;
+	constructor(options: Models_Options) {
+		super(Models_Json, options);
+		this.init();
 	}
 
 	add(model_json: Model_Json): void {

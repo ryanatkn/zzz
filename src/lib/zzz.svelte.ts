@@ -18,7 +18,6 @@ import {ollama_list_with_metadata} from '$lib/ollama.js';
 import {Models} from '$lib/models.svelte.js';
 import {Chats} from '$lib/chats.svelte.js';
 import {Providers} from '$lib/providers.svelte.js';
-import {Prompts} from '$lib/prompts.svelte.js';
 import {Diskfiles} from '$lib/diskfiles.svelte.js';
 import {Messages} from '$lib/messages.svelte.js';
 import {Model, type Model_Json} from '$lib/model.svelte.js';
@@ -27,6 +26,10 @@ import {Cell_Registry} from '$lib/cell_registry.js';
 import {Datetime_Now} from '$lib/zod_helpers.js';
 import {Chat} from '$lib/chat.svelte.js';
 import {Diskfile} from '$lib/diskfile.svelte.js';
+import {Bit} from '$lib/bit.svelte.js'; // Add import for Bit
+import {Prompt} from '$lib/prompt.svelte.js';
+import {Prompts} from '$lib/prompts.svelte.js';
+import {Tape} from '$lib/tape.svelte.js';
 
 export const zzz_context = create_context<Zzz>();
 
@@ -51,11 +54,12 @@ export interface Zzz_Json {
 export class Zzz {
 	data: Zzz_Data = $state()!;
 
+	// TODO maybe change these APIs to have `zzz` be the first arg without the object wrapper
 	readonly registry = new Cell_Registry(this);
-	readonly models = new Models(this);
+	readonly models = new Models({zzz: this});
 	readonly chats = new Chats({zzz: this});
-	readonly providers = new Providers(this);
-	readonly prompts = new Prompts(this);
+	readonly providers = new Providers({zzz: this});
+	readonly prompts = new Prompts({zzz: this});
 	readonly files = new Diskfiles({zzz: this});
 	readonly messages = new Messages(this);
 
@@ -231,10 +235,19 @@ export class Zzz {
 	 * Register all cell classes with the registry
 	 */
 	#register_cell_classes(): void {
-		// Register by constructor name
-		this.registry.register(Chats);
+		// Register all classes that extend Cell
+		this.registry.register(Bit);
 		this.registry.register(Chat);
+		this.registry.register(Chats);
 		this.registry.register(Diskfile);
-		// Register other cell classes as needed
+		this.registry.register(Diskfiles);
+		this.registry.register(Message);
+		this.registry.register(Model);
+		this.registry.register(Models);
+		this.registry.register(Prompt);
+		this.registry.register(Prompts);
+		this.registry.register(Provider);
+		this.registry.register(Providers);
+		this.registry.register(Tape);
 	}
 }

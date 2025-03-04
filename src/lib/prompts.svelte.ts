@@ -1,18 +1,39 @@
-import type {Zzz} from '$lib/zzz.svelte.js';
-import {Prompt} from '$lib/prompt.svelte.js';
+import {z} from 'zod';
+
+import {Cell, type Cell_Options, cell_array} from '$lib/cell.svelte.js';
+import {Prompt, Prompt_Json} from '$lib/prompt.svelte.js';
 import type {Uuid} from '$lib/uuid.js';
 import type {Bit} from '$lib/bit.svelte.js';
 import {reorder_list} from '$lib/list_helpers.js';
 
-export class Prompts {
-	readonly zzz: Zzz;
+// Define the schema with cell_array for proper class association
+export const Prompts_Json = z
+	.object({
+		items: cell_array(
+			z.array(Prompt_Json).default(() => []),
+			'Prompt',
+		),
+		selected_id: z.string().nullable().default(null),
+	})
+	.default(() => ({
+		items: [],
+		selected_id: null,
+	}));
 
+export type Prompts_Json = z.infer<typeof Prompts_Json>;
+
+export interface Prompts_Options extends Cell_Options<typeof Prompts_Json> {}
+
+export class Prompts extends Cell<typeof Prompts_Json> {
 	items: Array<Prompt> = $state([]);
 	selected_id: Uuid | null = $state(null);
+
+	// Derived property
 	selected: Prompt | undefined = $derived(this.items.find((p) => p.id === this.selected_id));
 
-	constructor(zzz: Zzz) {
-		this.zzz = zzz;
+	constructor(options: Prompts_Options) {
+		super(Prompts_Json, options);
+		this.init();
 	}
 
 	add(): Prompt {
@@ -32,6 +53,8 @@ export class Prompts {
 				const next_prompt = this.items[index === 0 ? 0 : index - 1] as Prompt | undefined;
 				if (next_prompt) {
 					this.select(next_prompt.id);
+				} else {
+					this.selected_id = null;
 				}
 			}
 		}
