@@ -3,8 +3,9 @@ import type {Async_Status} from '@ryanatkn/belt/async.js';
 
 import type {Model} from '$lib/model.svelte.js';
 import {
+	Completion_Request,
 	to_completion_response_text,
-	type Completion_Request,
+	type Completion_Request as Completion_Request_Type,
 	type Completion_Response,
 } from '$lib/completion.js';
 import {Uuid} from '$lib/uuid.js';
@@ -21,7 +22,7 @@ export interface Chat_Message {
 	id: Uuid;
 	created: Datetime_Now;
 	content: string; // renamed from text
-	request?: Completion_Request;
+	request?: Completion_Request_Type;
 	response?: Completion_Response;
 }
 
@@ -146,33 +147,34 @@ export class Chat extends Cell<typeof Chat_Json> {
 		if (!tape) return;
 
 		const message_id = Uuid.parse(undefined);
+
+		// Create a properly typed completion request
+		const completion_request = Completion_Request.parse({
+			created: Datetime_Now.parse(undefined),
+			request_id: message_id,
+			provider_name: tape.model.provider_name,
+			model: tape.model.name,
+			prompt: content,
+		});
+
 		const message: Chat_Message = {
 			id: message_id,
-			// TODO add `chat_id`?
 			created: Datetime_Now.parse(undefined),
 			content,
-			request: {
-				created: Datetime_Now.parse(undefined),
-				request_id: message_id,
-				provider_name: tape.model.provider_name,
-				model: tape.model.name,
-				prompt: content,
-			},
+			request: completion_request,
 		};
 
 		tape.messages.push(message);
 
 		const response = await this.zzz.send_prompt(content, tape.model.provider_name, tape.model.name);
 
-		// TODO refactor
 		const message_updated = tape.messages.find((m) => m.id === message_id);
 		if (!message_updated) return;
 
-		// Direct assignment instead of using helper
+		// Direct assignment with proper typing
 		message_updated.response = response.completion_response;
 
 		// Infer a name for the chat now that we have a response.
-		// Don't await because callers don't care about the result.
 		void this.init_name(message_updated);
 	}
 

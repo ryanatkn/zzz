@@ -9,6 +9,8 @@
 	import {GLYPH_MESSAGE, GLYPH_PROVIDER, GLYPH_MODEL} from '$lib/glyphs.js';
 
 	const zzz = zzz_context.get();
+
+	// TODO BLOCK the messages list below should be links to the /messages?id=... page (or whatever URL structure)
 </script>
 
 <div class="p_lg">

@@ -8,11 +8,7 @@ import {Provider_Name} from '$lib/provider.schema.js';
 import {Uuid} from '$lib/uuid.js';
 import {Datetime_Now} from '$lib/zod_helpers.js';
 
-export interface Completion {
-	completion_request: Completion_Request;
-	completion_response: Completion_Response;
-}
-
+// Create proper Zod schema for Completion_Request
 export const Completion_Request = z.object({
 	created: Datetime_Now,
 	request_id: Uuid,
@@ -22,41 +18,65 @@ export const Completion_Request = z.object({
 });
 export type Completion_Request = z.infer<typeof Completion_Request>;
 
-export interface Completion_Response {
-	created: Datetime_Now;
-	request_id: Uuid;
-	provider_name: Provider_Name;
-	model: string;
-	data: Completion_Response_Data;
-}
-
-// Union type of all possible data structures
-export type Completion_Response_Data =
-	| Ollama_Completion_Data
-	| Claude_Completion_Data
-	| Chatgpt_Completion_Data
-	| Gemini_Completion_Data;
-
-// Define specific data types for each provider
-export interface Ollama_Completion_Data {
-	type: 'ollama';
+// Enhanced schemas for vendor-specific data types - using z.any() with proper type refinements
+export const Ollama_Completion_Data = z.object({
+	type: z.literal('ollama'),
+	// Use z.any() initially but refine to expected type structure
+	value: z.any().refine(
+		(_val): _val is ChatResponse => true, // Runtime check disabled, TypeScript enforced
+		{message: 'Expected Ollama ChatResponse format'},
+	),
+});
+export type Ollama_Completion_Data = z.infer<typeof Ollama_Completion_Data> & {
 	value: ChatResponse;
-}
+};
 
-export interface Claude_Completion_Data {
-	type: 'claude';
+export const Claude_Completion_Data = z.object({
+	type: z.literal('claude'),
+	value: z.any().refine((_val): _val is Anthropic.Messages.Message => true, {
+		message: 'Expected Claude Message format',
+	}),
+});
+export type Claude_Completion_Data = z.infer<typeof Claude_Completion_Data> & {
 	value: Anthropic.Messages.Message;
-}
+};
 
-export interface Chatgpt_Completion_Data {
-	type: 'chatgpt';
+export const Chatgpt_Completion_Data = z.object({
+	type: z.literal('chatgpt'),
+	value: z.any().refine((_val): _val is OpenAI.Chat.Completions.ChatCompletion => true, {
+		message: 'Expected OpenAI ChatCompletion format',
+	}),
+});
+export type Chatgpt_Completion_Data = z.infer<typeof Chatgpt_Completion_Data> & {
 	value: OpenAI.Chat.Completions.ChatCompletion & {
 		_request_id?: string | null;
 	};
-}
+};
 
-export interface Gemini_Completion_Data {
-	type: 'gemini';
+export const Gemini_Completion_Data = z.object({
+	type: z.literal('gemini'),
+	value: z
+		.object({
+			text: z.string(),
+			candidates: z.array(z.any()).nullable(),
+			function_calls: z.array(z.any()).nullable(),
+			prompt_feedback: z.any().nullable(),
+			usage_metadata: z.any().nullable(),
+		})
+		.refine(
+			(
+				_val,
+			): _val is {
+				text: string;
+				candidates: Array<Google.GenerateContentCandidate> | null;
+				function_calls: Array<Google.FunctionCall> | null;
+				prompt_feedback: Google.PromptFeedback | null;
+				usage_metadata: Google.UsageMetadata | null;
+			} => true,
+			{message: 'Expected Gemini result format'},
+		),
+});
+export type Gemini_Completion_Data = z.infer<typeof Gemini_Completion_Data> & {
 	value: {
 		text: string;
 		candidates: Array<Google.GenerateContentCandidate> | null;
@@ -64,52 +84,69 @@ export interface Gemini_Completion_Data {
 		prompt_feedback: Google.PromptFeedback | null;
 		usage_metadata: Google.UsageMetadata | null;
 	};
-}
+};
 
-// Placeholder schemas for use in Zod validation without inferring types
-export const Completion_Response_Data_Schema = z.object({
-	type: Provider_Name,
-	value: z.any(),
-});
+// Combine the response data schemas into a discriminated union
+export const Completion_Response_Data = z.discriminatedUnion('type', [
+	Ollama_Completion_Data,
+	Claude_Completion_Data,
+	Chatgpt_Completion_Data,
+	Gemini_Completion_Data,
+]);
+export type Completion_Response_Data =
+	| Ollama_Completion_Data
+	| Claude_Completion_Data
+	| Chatgpt_Completion_Data
+	| Gemini_Completion_Data;
 
-export const Completion_Response_Schema = z.object({
+// Complete response schema
+export const Completion_Response = z.object({
 	created: Datetime_Now,
 	request_id: Uuid,
 	provider_name: Provider_Name,
 	model: z.string(),
-	data: Completion_Response_Data_Schema,
+	data: Completion_Response_Data,
 });
+export type Completion_Response = z.infer<typeof Completion_Response>;
 
-export const Completion_Schema = z.object({
+// Schema for the entire completion
+export const Completion = z.object({
 	completion_request: Completion_Request,
-	completion_response: Completion_Response_Schema,
+	completion_response: Completion_Response,
 });
+export type Completion = z.infer<typeof Completion>;
 
-// Helper function remains the same
+// Helper function for extracting text from completion responses
 export const to_completion_response_text = (
 	completion_response: Completion_Response,
 ): string | null | undefined => {
-	if (!completion_response.data) return null;
-
 	switch (completion_response.data.type) {
-		case 'ollama':
-			return completion_response.data.value.message.content;
-		case 'claude':
-			return completion_response.data.value.content
+		case 'ollama': {
+			const data = completion_response.data.value;
+			return data.message.content;
+		}
+		case 'claude': {
+			const data = completion_response.data.value;
+			return data.content
 				.map((c) =>
 					c.type === 'text'
-						? c.text
+						? c.text || ''
 						: c.type === 'tool_use'
-							? c.name
+							? c.name || ''
 							: c.type === 'thinking'
-								? c.thinking
-								: c.data,
+								? c.thinking || ''
+								: '',
 				)
 				.join('\n\n');
-		case 'chatgpt':
-			return completion_response.data.value.choices[0].message.content;
-		case 'gemini':
-			return completion_response.data.value.text;
+		}
+		case 'chatgpt': {
+			const data = completion_response.data.value;
+			return data.choices[0]?.message?.content || null;
+		}
+		case 'gemini': {
+			const data = completion_response.data.value;
+			return data.text || null;
+		}
 		default:
 			return null;
 	}

@@ -495,6 +495,8 @@ export const src_json = {
 			path: 'chat.svelte.ts',
 			declarations: [
 				{name: 'Chat_Message', kind: 'type'},
+				{name: 'Chat_Json', kind: 'variable'},
+				{name: 'Chat_Options', kind: 'type'},
 				{name: 'Chat', kind: 'class'},
 			],
 		},
@@ -522,17 +524,14 @@ export const src_json = {
 		'./completion.js': {
 			path: 'completion.ts',
 			declarations: [
-				{name: 'Completion', kind: 'type'},
 				{name: 'Completion_Request', kind: 'variable'},
-				{name: 'Completion_Response', kind: 'type'},
-				{name: 'Completion_Response_Data', kind: 'type'},
-				{name: 'Ollama_Completion_Data', kind: 'type'},
-				{name: 'Claude_Completion_Data', kind: 'type'},
-				{name: 'Chatgpt_Completion_Data', kind: 'type'},
-				{name: 'Gemini_Completion_Data', kind: 'type'},
-				{name: 'Completion_Response_Data_Schema', kind: 'variable'},
-				{name: 'Completion_Response_Schema', kind: 'variable'},
-				{name: 'Completion_Schema', kind: 'variable'},
+				{name: 'Ollama_Completion_Data', kind: 'variable'},
+				{name: 'Claude_Completion_Data', kind: 'variable'},
+				{name: 'Chatgpt_Completion_Data', kind: 'variable'},
+				{name: 'Gemini_Completion_Data', kind: 'variable'},
+				{name: 'Completion_Response_Data', kind: 'variable'},
+				{name: 'Completion_Response', kind: 'variable'},
+				{name: 'Completion', kind: 'variable'},
 				{name: 'to_completion_response_text', kind: 'function'},
 			],
 		},
@@ -579,7 +578,7 @@ export const src_json = {
 		'./diskfile.svelte.js': {
 			path: 'diskfile.svelte.ts',
 			declarations: [
-				{name: 'Source_Diskfile_Json', kind: 'type'},
+				{name: 'Source_File_Json', kind: 'type'},
 				{name: 'Diskfile_Json', kind: 'type'},
 				{name: 'Diskfile_Options', kind: 'type'},
 				{name: 'FILE_DATE_FORMAT', kind: 'variable'},
@@ -682,8 +681,8 @@ export const src_json = {
 		'./model.svelte.js': {
 			path: 'model.svelte.ts',
 			declarations: [
+				{name: 'Model_Name', kind: 'variable'},
 				{name: 'Model_Json', kind: 'variable'},
-				{name: 'Model_Name', kind: 'type'},
 				{name: 'Model_Options', kind: 'type'},
 				{name: 'Model', kind: 'class'},
 			],
@@ -806,7 +805,14 @@ export const src_json = {
 			],
 		},
 		'./Settings.svelte': {path: 'Settings.svelte', declarations: []},
-		'./tape.svelte.js': {path: 'tape.svelte.ts', declarations: [{name: 'Tape', kind: 'class'}]},
+		'./tape.svelte.js': {
+			path: 'tape.svelte.ts',
+			declarations: [
+				{name: 'Tape_Json', kind: 'variable'},
+				{name: 'Tape_Options', kind: 'type'},
+				{name: 'Tape', kind: 'class'},
+			],
+		},
 		'./test.task.js': {
 			path: 'test.task.ts',
 			declarations: [
@@ -837,7 +843,11 @@ export const src_json = {
 		},
 		'./zod_helpers.js': {
 			path: 'zod_helpers.ts',
-			declarations: [{name: 'zod_get_schema_keys', kind: 'function'}],
+			declarations: [
+				{name: 'Datetime', kind: 'variable'},
+				{name: 'Datetime_Now', kind: 'variable'},
+				{name: 'zod_get_schema_keys', kind: 'function'},
+			],
 		},
 		'./zzz_config.js': {
 			path: 'zzz_config.ts',

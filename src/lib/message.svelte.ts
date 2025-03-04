@@ -4,8 +4,9 @@ import {z} from 'zod';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {
 	to_completion_response_text,
-	type Completion_Request,
-	type Completion_Response,
+	Completion_Request,
+	Completion_Response,
+	type Completion_Request as Completion_Request_Type,
 } from '$lib/completion.js';
 import {Uuid} from '$lib/uuid.js';
 import {Message_Json, type Message_Direction, type Message_Type} from '$lib/message.schema.js';
@@ -27,7 +28,7 @@ export class Message extends Cell<typeof Message_Json> {
 
 	// Store data based on message type
 	data: unknown = $state();
-	completion_request: Completion_Request | undefined = $state();
+	completion_request: Completion_Request_Type | undefined = $state();
 	completion_response: Completion_Response | undefined = $state();
 	file_id: string | undefined = $state();
 	contents: string | undefined = $state();
@@ -50,7 +51,7 @@ export class Message extends Cell<typeof Message_Json> {
 			this.type === 'filer_change',
 	);
 
-	prompt_data: Completion_Request | null = $derived(
+	prompt_data: Completion_Request_Type | null = $derived(
 		this.is_prompt && this.completion_request ? this.completion_request : null,
 	);
 
@@ -89,21 +90,18 @@ export class Message extends Cell<typeof Message_Json> {
 		// Initialize base properties
 		this.init();
 
-		// TODO BLOCK @many this is hacky
 		// Process message-specific fields after properties are set from JSON
 		if (options.json) {
 			// Initialize type-specific properties based on message type
 			switch (this.type) {
 				case 'send_prompt':
-					if ('completion_request' in options.json) {
-						// Direct assignment instead of using helper
-						this.completion_request = options.json.completion_request;
+					if ('completion_request' in options.json && options.json.completion_request) {
+						this.completion_request = Completion_Request.parse(options.json.completion_request);
 					}
 					break;
 				case 'completion_response':
-					if ('completion_response' in options.json) {
-						// Direct assignment instead of using helper
-						this.completion_response = options.json.completion_response;
+					if ('completion_response' in options.json && options.json.completion_response) {
+						this.completion_response = Completion_Response.parse(options.json.completion_response);
 					}
 					break;
 				case 'echo':
@@ -150,7 +148,6 @@ export class Message extends Cell<typeof Message_Json> {
 			created: this.created,
 		};
 
-		// TODO BLOCK @many this is hacky
 		// Add type-specific properties
 		switch (this.type) {
 			case 'echo':

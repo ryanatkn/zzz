@@ -7,11 +7,12 @@ import {encode} from 'gpt-tokenizer';
 export interface Source_File_Json {
 	id: Path_Id;
 	contents: string | null;
+	external: boolean;
+	ctime: number | null;
+	mtime: number | null;
 	dependents: Array<[Path_Id, Source_File]>;
 	dependencies: Array<[Path_Id, Source_File]>;
-	mtime: number | null;
-	size: number | null;
-	external: boolean;
+	size?: number | undefined; // TODO BLOCK add to `Source_File`?
 }
 
 export interface Diskfile_Json {
@@ -34,6 +35,7 @@ export class Diskfile {
 	contents: string | null = $state()!;
 	dependents: Map<Path_Id, Source_File> = $state()!;
 	dependencies: Map<Path_Id, Source_File> = $state()!;
+	ctime: number = $state()!;
 	mtime: number = $state()!;
 	size: number = $state(0);
 	external: boolean = $state(false);
@@ -73,6 +75,7 @@ export class Diskfile {
 		this.contents = source_file.contents;
 		this.dependents = new Map(source_file.dependents);
 		this.dependencies = new Map(source_file.dependencies);
+		this.ctime = source_file.ctime ?? Date.now(); // Default to current time if null/undefined
 		this.mtime = source_file.mtime ?? Date.now(); // Default to current time if null/undefined
 		this.size = source_file.size ?? source_file.contents?.length ?? 0;
 		this.external = source_file.external ?? false;
@@ -92,10 +95,11 @@ export class Diskfile {
 			source_file: {
 				id: this.id,
 				contents: this.contents,
-				dependents: Array.from(this.dependents),
-				dependencies: Array.from(this.dependencies),
+				ctime: this.ctime,
 				mtime: this.mtime,
 				size: this.size,
+				dependents: Array.from(this.dependents),
+				dependencies: Array.from(this.dependencies),
 				external: this.external,
 			},
 		};

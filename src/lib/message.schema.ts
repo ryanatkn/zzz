@@ -2,11 +2,7 @@ import {z} from 'zod';
 
 import {Uuid} from '$lib/uuid.js';
 import {Diskfile_Change_Type} from '$lib/diskfile.schema.js';
-import {
-	Completion_Request,
-	Completion_Response_Schema,
-	type Completion_Response,
-} from '$lib/completion.js';
+import {Completion_Request, Completion_Response} from '$lib/completion.js';
 import {Datetime_Now} from '$lib/zod_helpers.js';
 
 // Direction enum
@@ -83,11 +79,13 @@ export const Message_Send_Prompt = Message_Base.extend({
 	type: z.literal('send_prompt'),
 	completion_request: Completion_Request,
 });
+export type Message_Send_Prompt = z.infer<typeof Message_Send_Prompt>;
 
 export const Message_Completion_Response = Message_Base.extend({
 	type: z.literal('completion_response'),
-	completion_response: Completion_Response_Schema,
+	completion_response: Completion_Response,
 });
+export type Message_Completion_Response = z.infer<typeof Message_Completion_Response>;
 
 // Union of all client message types
 export const Message_Client = z.discriminatedUnion('type', [
@@ -121,7 +119,7 @@ export const Message = z.discriminatedUnion('type', [
 ]);
 export type Message = z.infer<typeof Message>;
 
-// Message with metadata schema - renamed to Message_Json
+// Message with metadata schema
 export const Message_Json = z.object({
 	id: Uuid,
 	type: Message_Type,
@@ -130,7 +128,7 @@ export const Message_Json = z.object({
 	// Optional fields with proper type checking
 	data: z.any().optional(),
 	completion_request: Completion_Request.optional(),
-	completion_response: Completion_Response_Schema.optional(),
+	completion_response: Completion_Response.optional(),
 	file_id: z.string().optional(),
 	contents: z.string().optional(),
 	change: z
@@ -141,8 +139,9 @@ export const Message_Json = z.object({
 		.optional(),
 	source_file: z.any().optional(),
 });
+export type Message_Json = z.infer<typeof Message_Json>;
 
-// Helper function to create a message with json representation - renamed
+// Helper function to create a message with json representation
 export const create_message_json = (
 	message: Message,
 	direction: Message_Direction,
@@ -152,22 +151,4 @@ export const create_message_json = (
 		direction,
 		created: Datetime_Now.parse(undefined),
 	} as Message_Json;
-};
-
-// TODO BLOCK these should be inferred, need schemas or something
-export type Message_Send_Prompt = Omit<
-	z.infer<typeof Message_Send_Prompt>,
-	'completion_request'
-> & {
-	completion_request: Completion_Request;
-};
-export type Message_Completion_Response = Omit<
-	z.infer<typeof Message_Completion_Response>,
-	'completion_response'
-> & {
-	completion_response: Completion_Response;
-};
-export type Message_Json = z.infer<typeof Message_Json> & {
-	completion_request?: Completion_Request;
-	completion_response?: Completion_Response;
 };

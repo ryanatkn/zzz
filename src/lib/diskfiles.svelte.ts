@@ -51,11 +51,12 @@ export class Diskfiles {
 				source_file: {
 					id: source_file.id,
 					contents: source_file.contents,
+					external: source_file.external,
+					ctime: source_file.ctime,
+					mtime: source_file.mtime,
 					dependents: Array.from(source_file.dependents.entries()),
 					dependencies: Array.from(source_file.dependencies.entries()),
-					mtime: source_file.mtime,
-					size: source_file.contents?.length ?? null,
-					external: source_file.external,
+					size: source_file.contents?.length ?? undefined,
 				},
 			},
 		});

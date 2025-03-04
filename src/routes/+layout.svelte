@@ -107,6 +107,7 @@
 					break;
 				}
 				case 'completion_response': {
+					// Simply use the message directly now that types are aligned
 					zzz.receive_completion_response(message);
 					break;
 				}

@@ -39,10 +39,10 @@
 			onclick={() => handle_select(message)}
 			transition:slide
 		>
-			<div class="font_weight_400 flex align_items_center gap_xs">
+			<div class="font_weight_400 flex align_items_center gap_xs w_100">
 				<Text_Icon icon={get_icon_for_message_type(message.type)} />
 				<Text_Icon icon={get_direction_icon(message.direction)} />
-				<span class="font_mono">{message.type}</span>
+				<span class="font_mono flex_1">{message.type}</span>
 				<span class="font_mono size_sm ml_auto">{message.created_formatted_time}</span>
 			</div>
 
