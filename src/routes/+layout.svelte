@@ -26,6 +26,15 @@
 	import {Model} from '$lib/model.svelte.js';
 	import {Message} from '$lib/message.svelte.js';
 	import {Provider} from '$lib/provider.svelte.js';
+	import {Chat} from '$lib/chat.svelte.js';
+	import {Chats} from '$lib/chats.svelte.js';
+	import {Diskfile} from '$lib/diskfile.svelte.js';
+	import {Diskfiles} from '$lib/diskfiles.svelte.js';
+	import {Messages} from '$lib/messages.svelte.js';
+	import {Models} from '$lib/models.svelte.js';
+	import {Prompts} from '$lib/prompts.svelte.js';
+	import {Providers} from '$lib/providers.svelte.js';
+	import {Tape} from '$lib/tape.svelte.js';
 	import type {Diskfile_Path} from '$lib/diskfile_types.js';
 
 	interface Props {
@@ -42,12 +51,21 @@
 	// Initialize Zzz
 	const zzz = new Zzz();
 
-	// Register cell classes with the registry by their class name
-	zzz.registry.register(Bit);
-	zzz.registry.register(Prompt);
-	zzz.registry.register(Model);
-	zzz.registry.register(Message);
-	zzz.registry.register(Provider);
+	// Register all cell classes with the registry
+	zzz.register(Bit);
+	zzz.register(Chat);
+	zzz.register(Chats);
+	zzz.register(Diskfile);
+	zzz.register(Diskfiles);
+	zzz.register(Message);
+	zzz.register(Messages);
+	zzz.register(Model);
+	zzz.register(Models);
+	zzz.register(Prompt);
+	zzz.register(Prompts);
+	zzz.register(Provider);
+	zzz.register(Providers);
+	zzz.register(Tape);
 
 	// Enhance schemas with metadata for deserialization - use class names
 	// Safely access Zod schema internals using type assertion

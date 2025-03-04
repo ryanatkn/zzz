@@ -1,14 +1,12 @@
 import {create_context} from '@ryanatkn/fuz/context_helpers.js';
 import {SvelteMap} from 'svelte/reactivity';
 import {create_deferred, type Deferred} from '@ryanatkn/belt/async.js';
-import type {z} from 'zod';
 
 import {Zzz_Data, type Zzz_Data_Json} from '$lib/zzz_data.svelte.js';
-import {
-	type Message_Echo,
-	type Message_Send_Prompt,
-	type Message_Completion_Response,
-	Message_Json,
+import type {
+	Message_Echo,
+	Message_Send_Prompt,
+	Message_Completion_Response,
 } from '$lib/message_types.js';
 import {Provider, type Provider_Json} from '$lib/provider.svelte.js';
 import type {Provider_Name} from '$lib/provider_types.js';
@@ -20,16 +18,12 @@ import {Chats} from '$lib/chats.svelte.js';
 import {Providers} from '$lib/providers.svelte.js';
 import {Diskfiles} from '$lib/diskfiles.svelte.js';
 import {Messages} from '$lib/messages.svelte.js';
-import {Model, type Model_Json} from '$lib/model.svelte.js';
-import {Message} from '$lib/message.svelte.js';
+import type {Model_Json} from '$lib/model.svelte.js';
 import {Cell_Registry} from '$lib/cell_registry.js';
 import {Datetime_Now} from '$lib/zod_helpers.js';
-import {Chat} from '$lib/chat.svelte.js';
-import {Diskfile} from '$lib/diskfile.svelte.js';
-import {Bit} from '$lib/bit.svelte.js'; // Add import for Bit
-import {Prompt} from '$lib/prompt.svelte.js';
 import {Prompts} from '$lib/prompts.svelte.js';
-import {Tape} from '$lib/tape.svelte.js';
+import type {Cell} from './cell.svelte.js';
+import type {Class_Constructor} from '@ryanatkn/belt/types.js';
 
 export const zzz_context = create_context<Zzz>();
 
@@ -56,7 +50,6 @@ export class Zzz {
 
 	readonly registry = new Cell_Registry(this);
 
-	// TODO maybe change these APIs to have `zzz` be the first arg without the object wrapper
 	readonly models = new Models({zzz: this});
 	readonly chats = new Chats({zzz: this});
 	readonly providers = new Providers({zzz: this});
@@ -64,7 +57,6 @@ export class Zzz {
 	readonly diskfiles = new Diskfiles({zzz: this});
 	readonly messages = new Messages({zzz: this});
 
-	// Change tags to use the readonly models instance
 	tags: Set<string> = $derived(new Set(this.models.items.flatMap((m) => m.tags)));
 
 	echos: Array<Message_Echo> = $state([]);
@@ -78,9 +70,6 @@ export class Zzz {
 	capability_ollama: undefined | null | boolean = $state();
 
 	constructor(options: Zzz_Options = {}) {
-		// Register all cell classes first so they're available during instantiation
-		this.#register_cell_classes();
-
 		// Setup message handlers if provided
 		if (options.send && options.receive) {
 			this.messages.set_handlers(options.send, options.receive);
@@ -100,25 +89,11 @@ export class Zzz {
 		}
 	}
 
-	// TODO BLOCK do this externally for extensibility but need to make sure initialization in the constructor continues to work
 	/**
-	 * Register all cell classes with the registry
+	 * Register a cell class with the registry
 	 */
-	#register_cell_classes(): void {
-		this.registry.register(Bit);
-		this.registry.register(Chat);
-		this.registry.register(Chats);
-		this.registry.register(Diskfile);
-		this.registry.register(Diskfiles);
-		this.registry.register(Message);
-		this.registry.register(Messages);
-		this.registry.register(Model);
-		this.registry.register(Models);
-		this.registry.register(Prompt);
-		this.registry.register(Prompts);
-		this.registry.register(Provider);
-		this.registry.register(Providers);
-		this.registry.register(Tape);
+	register(cell_class: Class_Constructor<Cell>): void {
+		this.registry.register(cell_class);
 	}
 
 	// TODO BLOCK extend cell so this doesnt exist, automatic from the schema
@@ -242,14 +217,8 @@ export class Zzz {
 		this.providers.add(provider);
 	}
 
-	// TODO BLOCK what if instead of these methods we had a generic one?
+	// TODO BLOCK what if instead of these methods we had a generic one? replace with registry usage
 	create_provider(provider_json: Provider_Json): Provider {
 		return new Provider({zzz: this, json: provider_json});
-	}
-	create_model(model_json: Model_Json): Model {
-		return new Model({zzz: this, json: model_json});
-	}
-	create_message(message_json: z.input<typeof Message_Json>): Message {
-		return new Message({zzz: this, json: message_json});
 	}
 }

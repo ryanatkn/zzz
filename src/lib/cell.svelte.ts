@@ -14,7 +14,7 @@ export interface Cell_Options<T_Schema extends z.ZodType, T_Zzz extends Zzz = Zz
 }
 
 // TODO maybe rename to `Json_Cell` to be more explicit? Or `Snapshottable`?
-export abstract class Cell<T_Schema extends z.ZodType, T_Zzz extends Zzz = Zzz> {
+export abstract class Cell<T_Schema extends z.ZodType = z.ZodType, T_Zzz extends Zzz = Zzz> {
 	readonly schema: T_Schema;
 	readonly schema_keys: Array<string> = $derived.by(() => zod_get_schema_keys(this.schema));
 
