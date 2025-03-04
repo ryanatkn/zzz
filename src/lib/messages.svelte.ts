@@ -5,7 +5,6 @@ import {Cell, type Cell_Options, cell_array} from '$lib/cell.svelte.js';
 import {Message} from '$lib/message.svelte.js';
 import {Message_Json, type Message_Client, type Message_Server} from '$lib/message_types.js';
 import type {Uuid} from '$lib/uuid.js';
-import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 
 // Define the schema with cell_array for proper class association
 export const Messages_Json = z
@@ -32,6 +31,7 @@ export class Messages extends Cell<typeof Messages_Json> {
 
 	// Use proper message types instead of any
 	#send_handler?: (message: Message_Client) => void;
+	#receive_handler?: (message: Message_Server) => void;
 
 	// Remove the unused #receive_handler property
 
@@ -71,14 +71,11 @@ export class Messages extends Cell<typeof Messages_Json> {
 	 */
 	set_handlers(
 		send_handler: (message: Message_Client) => void,
-		receive_handler: (callback: (message: Message_Server) => void) => void,
+		receive_handler: (message: Message_Server) => void,
 	): void {
 		// Store the send handler
 		this.#send_handler = send_handler;
-
-		// Set up receiver to handle incoming messages
-		// Instead of storing the receive handler, use it directly
-		receive_handler(this.receive.bind(this));
+		this.#receive_handler = receive_handler;
 	}
 
 	/**
@@ -97,24 +94,12 @@ export class Messages extends Cell<typeof Messages_Json> {
 	 * Handle a received message with proper typing
 	 */
 	receive(message: Message_Server): void {
-		// Process incoming message based on type
-		switch (message.type) {
-			case 'echo':
-				this.zzz.receive_echo(message);
-				break;
-			case 'completion_response':
-				this.zzz.receive_completion_response(message);
-				break;
-			case 'filer_change':
-				this.zzz.files.handle_change(message);
-				break;
-			case 'loaded_session':
-				// Handle loaded_session if needed
-				// TODO BLOCK
-				break;
-			default:
-				throw new Unreachable_Error(message);
+		if (!this.#receive_handler) {
+			console.error('No receive handler registered');
+			return;
 		}
+
+		this.#receive_handler(message);
 	}
 
 	/**

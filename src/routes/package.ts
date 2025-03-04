@@ -697,7 +697,11 @@ export const src_json = {
 		'./Messages_List.svelte': {path: 'Messages_List.svelte', declarations: []},
 		'./messages.svelte.js': {
 			path: 'messages.svelte.ts',
-			declarations: [{name: 'Messages', kind: 'class'}],
+			declarations: [
+				{name: 'Messages_Json', kind: 'variable'},
+				{name: 'Messages_Options', kind: 'type'},
+				{name: 'Messages', kind: 'class'},
+			],
 		},
 		'./Model_Detail.svelte': {path: 'Model_Detail.svelte', declarations: []},
 		'./Model_Link.svelte': {path: 'Model_Link.svelte', declarations: []},
@@ -715,7 +719,11 @@ export const src_json = {
 		},
 		'./models.svelte.js': {
 			path: 'models.svelte.ts',
-			declarations: [{name: 'Models', kind: 'class'}],
+			declarations: [
+				{name: 'Models_Json', kind: 'variable'},
+				{name: 'Models_Options', kind: 'type'},
+				{name: 'Models', kind: 'class'},
+			],
 		},
 		'./Nav_Link.svelte': {path: 'Nav_Link.svelte', declarations: []},
 		'./ollama.js': {
@@ -746,7 +754,11 @@ export const src_json = {
 		},
 		'./prompts.svelte.js': {
 			path: 'prompts.svelte.ts',
-			declarations: [{name: 'Prompts', kind: 'class'}],
+			declarations: [
+				{name: 'Prompts_Json', kind: 'variable'},
+				{name: 'Prompts_Options', kind: 'type'},
+				{name: 'Prompts', kind: 'class'},
+			],
 		},
 		'./Provider_Detail.svelte': {path: 'Provider_Detail.svelte', declarations: []},
 		'./Provider_Info.svelte': {path: 'Provider_Info.svelte', declarations: []},
@@ -769,7 +781,11 @@ export const src_json = {
 		},
 		'./providers.svelte.js': {
 			path: 'providers.svelte.ts',
-			declarations: [{name: 'Providers', kind: 'class'}],
+			declarations: [
+				{name: 'Providers_Json', kind: 'variable'},
+				{name: 'Providers_Options', kind: 'type'},
+				{name: 'Providers', kind: 'class'},
+			],
 		},
 		'./reorderable_helpers.js': {
 			path: 'reorderable_helpers.ts',
