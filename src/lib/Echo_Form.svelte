@@ -15,6 +15,10 @@
 	const send_echo = () => {
 		zzz.send_echo(echo_text || 'ping');
 	};
+
+	const echos = $derived(zzz.echos.slice().reverse());
+
+	const remaining_placeholders = $derived(Math.max(0, zzz.echos_max_length - zzz.echos.length));
 </script>
 
 <div class="row gap_sm">
@@ -32,16 +36,17 @@
 		}}>echo</button
 	>
 </div>
-{#if zzz.echos.length > 0}
-	<ul class="unstyled column reverse p_md">
-		{#each zzz.echos as echo (echo)}
-			{@const elapsed = zzz.echo_elapsed.get(echo.id)}
-			<li class="row" transition:slide>
-				<small>
-					{#if elapsed}{elapsed}ms{:else}<Pending_Animation />{/if}
-				</small>
-				<div class="ellipsis pl_md" style:max-width="200px">{echo.data}</div>
-			</li>
-		{/each}
-	</ul>
-{/if}
+<ul class="unstyled column reverse p_md">
+	{#each echos as echo (echo)}
+		{@const elapsed = zzz.echo_elapsed.get(echo.id)}
+		<li class="row ellipsis" transition:slide>
+			<small>
+				{#if elapsed}{elapsed}ms{:else}<Pending_Animation />{/if}
+			</small>
+			<div class="ellipsis pl_md">{echo.data}</div>
+		</li>
+	{/each}
+	{#each {length: remaining_placeholders} as _}
+		<li class="row" style:opacity="0.2" transition:slide><div>&nbsp;</div></li>
+	{/each}
+</ul>

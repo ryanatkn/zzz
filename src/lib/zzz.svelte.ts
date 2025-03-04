@@ -61,6 +61,7 @@ export class Zzz {
 	tags: Set<string> = $derived(new Set(this.models.items.flatMap((m) => m.tags)));
 
 	echos: Array<Message_Echo> = $state([]);
+	echos_max_length: number = $state(10);
 
 	// TODO could track this more formally, and add time tracking
 	pending_prompts: SvelteMap<Uuid, Deferred<Message_Completion_Response>> = new SvelteMap();
@@ -180,7 +181,7 @@ export class Zzz {
 		const message: Message_Echo = {id, type: 'echo', data};
 		this.messages.send(message);
 		this.echo_start_times.set(id, Date.now());
-		this.echos = [message, ...this.echos.slice(0, 9)];
+		this.echos = [message, ...this.echos.slice(0, this.echos_max_length - 1)];
 	}
 
 	receive_echo(message: Message_Echo): void {
