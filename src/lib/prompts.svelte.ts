@@ -1,12 +1,12 @@
 import {z} from 'zod';
 
-import {Cell, type Cell_Options, cell_array} from '$lib/cell.svelte.js';
+import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Prompt, Prompt_Json} from '$lib/prompt.svelte.js';
 import type {Uuid} from '$lib/uuid.js';
 import type {Bit} from '$lib/bit.svelte.js';
 import {reorder_list} from '$lib/list_helpers.js';
+import {cell_array} from '$lib/cell_helpers.js';
 
-// Define the schema with cell_array for proper class association
 export const Prompts_Json = z
 	.object({
 		items: cell_array(

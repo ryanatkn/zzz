@@ -33,7 +33,7 @@
 </script>
 
 <div class="file_explorer">
-	<div class="file_list panel">
+	<div class="file_list">
 		{#if sorted_files.length === 0}
 			<div class="empty_state">No files available</div>
 		{:else}

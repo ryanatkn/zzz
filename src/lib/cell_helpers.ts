@@ -1,5 +1,4 @@
 import {z} from 'zod';
-import {get_field_schema} from '$lib/zod_helpers.js';
 
 // Metadata properties for Zod schemas.
 // These constants are used to attach class information to schemas

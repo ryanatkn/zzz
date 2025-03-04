@@ -1,11 +1,11 @@
 import {z} from 'zod';
 
-import {Cell, type Cell_Options, cell_array} from '$lib/cell.svelte.js';
+import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Model, Model_Json} from '$lib/model.svelte.js';
 import type {Ollama_Model_Info} from '$lib/ollama.js';
 import {zzz_config} from '$lib/zzz_config.js';
+import {cell_array} from '$lib/cell_helpers.js';
 
-// Define the schema with cell_array for proper class association
 export const Models_Json = z
 	.object({
 		items: cell_array(

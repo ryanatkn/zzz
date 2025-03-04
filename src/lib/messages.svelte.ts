@@ -1,7 +1,7 @@
 import {z} from 'zod';
 import {SvelteMap} from 'svelte/reactivity';
 
-import {Cell, type Cell_Options, cell_array} from '$lib/cell.svelte.js';
+import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Message} from '$lib/message.svelte.js';
 import {
 	Message_Json,
@@ -10,6 +10,7 @@ import {
 	create_message_json,
 } from '$lib/message_types.js';
 import type {Uuid} from '$lib/uuid.js';
+import {cell_array} from '$lib/cell_helpers.js';
 
 export const Messages_Json = z
 	.object({

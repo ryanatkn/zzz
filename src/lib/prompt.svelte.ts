@@ -115,11 +115,6 @@ export class Prompt extends Cell<typeof Prompt_Json> {
 	reorder_bits(from_index: number, to_index: number): void {
 		reorder_list(this.bits, from_index, to_index);
 	}
-
-	// Additional methods to deserialize bit arrays for compatibility
-	set_bits_from_json(bit_jsons: Array<Bit_Json>): void {
-		this.bits = bit_jsons.map((json) => new Bit({zzz: this.zzz, json}));
-	}
 }
 
 export const join_prompt_bits = (bits: Array<Bit>): string =>

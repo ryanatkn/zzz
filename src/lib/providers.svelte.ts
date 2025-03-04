@@ -1,9 +1,9 @@
 import {z} from 'zod';
 
-import {Cell, type Cell_Options, cell_array} from '$lib/cell.svelte.js';
+import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Provider, Provider_Json} from '$lib/provider.svelte.js';
+import {cell_array} from '$lib/cell_helpers.js';
 
-// Define the schema with cell_array for proper class association
 export const Providers_Json = z
 	.object({
 		items: cell_array(

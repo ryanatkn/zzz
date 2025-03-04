@@ -5,16 +5,7 @@ import {DEV} from 'esm-env';
 
 import {get_field_schema, zod_get_schema_keys} from '$lib/zod_helpers.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
-import {
-	cell_class,
-	cell_array,
-	get_schema_class_info,
-	ZOD_CELL_CLASS_NAME,
-	ZOD_ELEMENT_CLASS_NAME,
-} from '$lib/cell_helpers.js';
-
-// Re-export the helpers for backward compatibility
-export {cell_class, cell_array, ZOD_CELL_CLASS_NAME, ZOD_ELEMENT_CLASS_NAME};
+import {get_schema_class_info} from '$lib/cell_helpers.js';
 
 // Base options type that all cells will extend
 export interface Cell_Options<T_Schema extends z.ZodType, T_Zzz extends Zzz = Zzz> {

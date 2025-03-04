@@ -11,7 +11,8 @@ import {
 	type Diskfile_Path,
 	assert_valid_source_file,
 } from '$lib/diskfile_types.js';
-import {Cell, cell_array, type Cell_Options} from '$lib/cell.svelte.js';
+import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
+import {cell_array} from '$lib/cell_helpers.js';
 
 export const Diskfiles_Json = z
 	.object({
@@ -31,7 +32,6 @@ export type Diskfiles_Json = z.infer<typeof Diskfiles_Json>;
 export interface Diskfiles_Options extends Cell_Options<typeof Diskfiles_Json> {}
 
 export class Diskfiles extends Cell<typeof Diskfiles_Json> {
-	// Define property explicitly to match schema
 	items: Array<Diskfile> = $state([]);
 	selected_file_id: Uuid | null = $state(null);
 

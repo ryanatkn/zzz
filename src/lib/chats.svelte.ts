@@ -1,9 +1,10 @@
 import {z} from 'zod';
 
-import {Cell, type Cell_Options, cell_array} from '$lib/cell.svelte.js';
+import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Chat, Chat_Json} from '$lib/chat.svelte.js';
 import type {Uuid} from '$lib/uuid.js';
 import {reorder_list} from '$lib/list_helpers.js';
+import {cell_array} from '$lib/cell_helpers.js';
 
 // Fix the schema definition for Chats_Json
 export const Chats_Json = z
