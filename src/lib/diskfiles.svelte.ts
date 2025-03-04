@@ -40,7 +40,6 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 	by_id: SvelteMap<Uuid, Diskfile> = new SvelteMap();
 	by_path: SvelteMap<Diskfile_Path, Uuid> = new SvelteMap();
 
-	// Derived properties for file filtering and selection
 	non_external_files: Array<Diskfile> = $derived(this.items.filter((file) => !file.external));
 	files_map: Map<string, Diskfile> = $derived(
 		new Map(this.non_external_files.map((f) => [f.id, f])),
@@ -49,7 +48,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 		this.selected_file_id && (this.files_map.get(this.selected_file_id) ?? null),
 	);
 
-	// Private source files storage
+	// TODO maybe don't duplicate this data?
 	#source_files: SvelteMap<Diskfile_Path, Gro_Source_File> = new SvelteMap();
 
 	constructor(options: Diskfiles_Options) {

@@ -27,7 +27,6 @@ test('constructor - creates with default values when no options provided', () =>
 	expect(bit.token_count).toBe(0);
 });
 
-// Derived properties tests - FIX the hardcoded bug
 test('derived_properties - length and token_count update when content changes', () => {
 	const bit = new Bit({
 		zzz: mock_zzz,

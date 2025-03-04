@@ -28,7 +28,6 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 	items: Array<Prompt> = $state([]);
 	selected_id: Uuid | null = $state(null);
 
-	// Derived property
 	selected: Prompt | undefined = $derived(this.items.find((p) => p.id === this.selected_id));
 
 	constructor(options: Prompts_Options) {

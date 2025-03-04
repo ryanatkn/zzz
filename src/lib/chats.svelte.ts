@@ -29,7 +29,6 @@ export class Chats extends Cell<typeof Chats_Json> {
 	items: Array<Chat> = $state([]);
 	selected_id: Uuid | null = $state(null);
 
-	// Derived properties
 	selected: Chat | undefined = $derived(this.items.find((c) => c.id === this.selected_id));
 	selected_id_error: boolean = $derived(this.selected_id !== null && this.selected === undefined);
 

@@ -24,7 +24,6 @@ export interface Models_Options extends Cell_Options<typeof Models_Json> {}
 export class Models extends Cell<typeof Models_Json> {
 	items: Array<Model> = $state([]);
 
-	// Derived property
 	items_by_name: Map<string, Model> = $derived(new Map(this.items.map((m) => [m.name, m])));
 
 	constructor(options: Models_Options) {

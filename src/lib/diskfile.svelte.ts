@@ -32,15 +32,12 @@ export class Diskfile extends Cell<typeof Diskfile_Json> {
 	dependents: Array<[Diskfile_Path, Source_File_Type]> = $state([]);
 	dependencies: Array<[Diskfile_Path, Source_File_Type]> = $state([]);
 
-	// Derived Maps from array data
 	dependencies_by_id: Map<Diskfile_Path, Source_File_Type> = $derived(new Map(this.dependencies));
 	dependents_by_id: Map<Diskfile_Path, Source_File_Type> = $derived(new Map(this.dependents));
 
-	// Also derive the lists of IDs directly
 	dependency_ids: Array<Diskfile_Path> = $derived(this.dependencies.map(([id]) => id));
 	dependent_ids: Array<Diskfile_Path> = $derived(this.dependents.map(([id]) => id));
 
-	// Derived properties
 	modified_date: Date = $derived(this.updated ? new Date(this.updated) : new Date());
 	modified_formatted_date: string = $derived(format(this.modified_date, FILE_DATE_FORMAT));
 	modified_formatted_time: string = $derived(format(this.modified_date, FILE_TIME_FORMAT));
