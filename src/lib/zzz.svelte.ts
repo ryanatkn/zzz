@@ -25,6 +25,8 @@ import {Model, type Model_Json} from '$lib/model.svelte.js';
 import {Message} from '$lib/message.svelte.js';
 import {Cell_Registry} from '$lib/cell_registry.js';
 import {Datetime_Now} from '$lib/zod_helpers.js';
+import {Chat} from '$lib/chat.svelte.js';
+import {Diskfile} from '$lib/diskfile.svelte.js';
 
 export const zzz_context = create_context<Zzz>();
 
@@ -49,13 +51,13 @@ export interface Zzz_Json {
 export class Zzz {
 	data: Zzz_Data = $state()!;
 
+	readonly registry = new Cell_Registry(this);
 	readonly models = new Models(this);
-	readonly chats = new Chats(this);
+	readonly chats = new Chats({zzz: this});
 	readonly providers = new Providers(this);
 	readonly prompts = new Prompts(this);
 	readonly files = new Diskfiles({zzz: this});
 	readonly messages = new Messages(this);
-	readonly registry = new Cell_Registry(this);
 
 	// Change tags to use the readonly models instance
 	tags: Set<string> = $derived(new Set(this.models.items.flatMap((m) => m.tags)));
@@ -71,6 +73,9 @@ export class Zzz {
 	capability_ollama: undefined | null | boolean = $state();
 
 	constructor(options: Zzz_Options = {}) {
+		// Register all cell classes first so they're available during instantiation
+		this.#register_cell_classes();
+
 		// Setup message handlers if provided
 		if (options.send && options.receive) {
 			this.messages.set_handlers(options.send, options.receive);
@@ -220,5 +225,16 @@ export class Zzz {
 	}
 	create_message(message_json: z.input<typeof Message_Json>): Message {
 		return new Message({zzz: this, json: message_json});
+	}
+
+	/**
+	 * Register all cell classes with the registry
+	 */
+	#register_cell_classes(): void {
+		// Register by constructor name
+		this.registry.register(Chats);
+		this.registry.register(Chat);
+		this.registry.register(Diskfile);
+		// Register other cell classes as needed
 	}
 }

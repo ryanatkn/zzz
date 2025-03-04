@@ -1,24 +1,46 @@
-import type {Zzz} from '$lib/zzz.svelte.js';
+import {z} from 'zod';
+
+import {Cell, type Cell_Options, cell_array} from '$lib/cell.svelte.js';
 import {Chat, Chat_Json} from '$lib/chat.svelte.js';
 import type {Uuid} from '$lib/uuid.js';
 import {reorder_list} from '$lib/list_helpers.js';
 
-export class Chats {
-	readonly zzz: Zzz;
+// Fix the schema definition for Chats_Json
+export const Chats_Json = z
+	.object({
+		// First create the array, then apply default, then attach metadata
+		items: cell_array(
+			z.array(Chat_Json).default(() => []),
+			'Chat',
+		),
+		selected_id: z.string().nullable().default(null),
+	})
+	.default(() => ({
+		items: [],
+		selected_id: null,
+	}));
 
+export type Chats_Json = z.infer<typeof Chats_Json>;
+
+export interface Chats_Options extends Cell_Options<typeof Chats_Json> {}
+
+export class Chats extends Cell<typeof Chats_Json> {
 	items: Array<Chat> = $state([]);
 	selected_id: Uuid | null = $state(null);
+
+	// Derived properties
 	selected: Chat | undefined = $derived(this.items.find((c) => c.id === this.selected_id));
-	// TODO use this
 	selected_id_error: boolean = $derived(this.selected_id !== null && this.selected === undefined);
 
-	constructor(zzz: Zzz) {
-		this.zzz = zzz;
+	constructor(options: Chats_Options) {
+		super(Chats_Json, options);
+		// Initialize explicitly after all properties are defined
+		this.init();
 	}
 
 	add(json?: Chat_Json): Chat {
 		const chat = new Chat({zzz: this.zzz, json});
-		this.items.unshift(chat); // TODO BLOCK @many use push and render with sort+filter
+		this.items.unshift(chat);
 		if (this.selected_id === null) {
 			this.selected_id = chat.id;
 		}
@@ -33,6 +55,8 @@ export class Chats {
 				const next_chat = this.items[index === 0 ? 0 : index - 1] as Chat | undefined;
 				if (next_chat) {
 					this.select(next_chat.id);
+				} else {
+					this.selected_id = null;
 				}
 			}
 		}

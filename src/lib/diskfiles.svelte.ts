@@ -1,6 +1,7 @@
 import {SvelteMap} from 'svelte/reactivity';
 import type {Source_File as Gro_Source_File} from '@ryanatkn/gro/filer.js';
 import {z} from 'zod';
+import {cell_array} from '$lib/cell.svelte.js';
 
 import type {Message_Filer_Change} from '$lib/message_types.js';
 import {Uuid} from '$lib/uuid.js';
@@ -13,48 +14,65 @@ import {
 } from '$lib/diskfile_types.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 
+// Update schema to use cell_array for proper class association
 export const Diskfiles_Json = z
 	.object({
-		files: z.array(Diskfile_Json).default(() => []),
+		files: cell_array(
+			z.array(Diskfile_Json).default(() => []),
+			'Diskfile',
+		),
 	})
-	.default(() => ({}));
+	.default(() => ({
+		files: [],
+	}));
 
 export type Diskfiles_Json = z.infer<typeof Diskfiles_Json>;
 
 export interface Diskfiles_Options extends Cell_Options<typeof Diskfiles_Json> {}
 
 export class Diskfiles extends Cell<typeof Diskfiles_Json> {
-	// Store Diskfile instances by unique uuid
-	by_id: SvelteMap<Uuid, Diskfile> = new SvelteMap();
+	// Define property explicitly to match schema
+	files: Array<Diskfile> = $state([]);
 
-	// Store mapping from path to diskfile id (uuid)
+	// TODO these are managed incrementally instead of using `$derived`, which makes the code more efficient but harder to follow and more error prone, maybe rethink, or put additional abstraction around it for safeguards
+	// Maps for lookup - separate from schema
+	by_id: SvelteMap<Uuid, Diskfile> = new SvelteMap();
 	by_path: SvelteMap<Diskfile_Path, Uuid> = new SvelteMap();
 
-	// Keep track of source files for reference - use the Gro type here
+	// Private source files storage
 	#source_files: SvelteMap<Diskfile_Path, Gro_Source_File> = new SvelteMap();
-
-	files: Array<Diskfile> = $derived(Array.from(this.by_id.values()));
 
 	constructor(options: Diskfiles_Options) {
 		super(Diskfiles_Json, options);
+		// Don't initialize maps from defaults, just init from json or leave them empty
 		this.init();
+
+		// Populate lookup maps after initialization
+		this.#rebuild_indexes();
 	}
 
-	// Override the set_json to handle the special case of files
-	override set_json(value?: z.input<typeof Diskfiles_Json>): void {
-		const parsed = this.schema.parse(value);
+	/**
+	 * Rebuild the lookup indexes after files are loaded or changed
+	 */
+	#rebuild_indexes(): void {
+		this.by_id.clear();
+		this.by_path.clear();
 
-		// Special handling for files array
-		if (parsed.files.length) {
-			for (const file_json of parsed.files) {
-				const diskfile = new Diskfile({
-					zzz: this.zzz,
-					json: file_json,
-				});
-				this.by_id.set(diskfile.id, diskfile);
-				this.by_path.set(diskfile.path, diskfile.id);
+		for (const file of this.files) {
+			if (file.id && file.path) {
+				this.by_id.set(file.id, file);
+				this.by_path.set(file.path, file.id);
 			}
 		}
+	}
+
+	// Override set_json to handle the special case of rebuilding indexes
+	override set_json(value?: z.input<typeof Diskfiles_Json>): void {
+		// Let the parent handle the basic parsing and assignment
+		super.set_json(value);
+
+		// Then rebuild our indexes
+		this.#rebuild_indexes();
 	}
 
 	handle_change(message: Message_Filer_Change): void {
@@ -68,6 +86,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 			case 'add': {
 				this.#source_files.set(validated_source_file.id, source_file as Gro_Source_File);
 				const diskfile = this.#create_diskfile(source_file as Gro_Source_File);
+				this.files.push(diskfile);
 				this.by_id.set(diskfile.id, diskfile);
 				this.by_path.set(diskfile.path, diskfile.id);
 				break;
@@ -75,6 +94,15 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 			case 'change': {
 				this.#source_files.set(validated_source_file.id, source_file as Gro_Source_File);
 				const diskfile = this.#create_diskfile(source_file as Gro_Source_File);
+
+				// Find and replace the existing diskfile if it exists
+				const index = this.files.findIndex((f) => f.path === diskfile.path);
+				if (index >= 0) {
+					this.files[index] = diskfile;
+				} else {
+					this.files.push(diskfile);
+				}
+
 				this.by_id.set(diskfile.id, diskfile);
 				this.by_path.set(diskfile.path, diskfile.id);
 				break;
@@ -83,6 +111,12 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 				this.#source_files.delete(validated_source_file.id);
 				const diskfile_id = this.by_path.get(validated_source_file.id);
 				if (diskfile_id) {
+					// Remove from the files array
+					const index = this.files.findIndex((f) => f.id === diskfile_id);
+					if (index >= 0) {
+						this.files.splice(index, 1);
+					}
+
 					this.by_id.delete(diskfile_id);
 					this.by_path.delete(validated_source_file.id);
 				}
