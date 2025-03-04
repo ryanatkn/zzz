@@ -15,26 +15,18 @@
 	const selected_file: Diskfile | null = $derived(
 		selected_file_id && (files_map.get(selected_file_id) ?? null),
 	);
-	const handle_file_selection = (file: Diskfile): void => {
-		selected_file_id = file.id;
-	};
-
-	// Create scrolled instances for sidebar and content areas
-	// const sidebar_scrollable = new Scrollable();
 
 	// TODO BLOCK open directories and show their paths in a list on the left (or panel above, configurable I guess)
-
 	// TODO BLOCK name for "Diskfile_Explorer" and "Diskfile_List" parent component?
-
 	// TODO probably show a history of the last N files opened, click to reopen (do this after changing to links)
 </script>
 
 <div class="h_100 flex">
 	<div class="h_100 overflow_hidden width_sm">
 		<Diskfile_Explorer
-			files={files_map}
-			{selected_file_id}
-			onselect={(file) => handle_file_selection(file)}
+			onselect={(file) => {
+				selected_file_id = file.id;
+			}}
 		/>
 	</div>
 

@@ -46,7 +46,6 @@ export abstract class Cell<T_Schema extends z.ZodType, T_Zzz extends Zzz = Zzz> 
 	 * Must be called by subclasses at the end of their constructor.
 	 */
 	protected init(): void {
-		// console.log(`init`, this.constructor.name, this.options.json);
 		this.set_json(this.schema.parse(this.options.json));
 	}
 
@@ -62,7 +61,7 @@ export abstract class Cell<T_Schema extends z.ZodType, T_Zzz extends Zzz = Zzz> 
 			// Only include properties that exist on this instance
 			if (key in this) {
 				// Use $state.snapshot for all values to handle Svelte 5 reactivity
-				result[key] = $state.snapshot((this as any)[key]);
+				result[key] = this.encode((this as any)[key], key);
 			} else {
 				if (DEV) console.error(`Property ${key} not found on instance of ${this.constructor.name}`);
 			}
@@ -72,18 +71,28 @@ export abstract class Cell<T_Schema extends z.ZodType, T_Zzz extends Zzz = Zzz> 
 	}
 
 	/**
+	 * Encode a value during serialization. Can be overridden for custom encoding logic.
+	 * @param value The value to encode
+	 * @param key The property key
+	 * @returns The encoded value
+	 */
+	encode(value: unknown, _key: string): unknown {
+		// TODO inspect the schema to automate encoding behavior
+		return $state.snapshot(value);
+	}
+
+	/**
 	 * Override for custom behavior
 	 */
 	set_json(value?: z.input<T_Schema>): void {
 		const parsed = this.schema.parse(value);
-		// console.log(`set_json`, this.constructor.name, parsed, value);
 		for (const key in parsed) {
 			(this as any)[key] = this.decode(parsed[key], key, parsed, this.schema);
 		}
 	}
 
 	/**
-	 * Decode values during deserialization, handling nested cells
+	 * Decode values during deserialization, handling nested cells and complex types
 	 * @param value The value to decode
 	 * @param key The property key
 	 * @param parsed The complete parsed object
@@ -96,14 +105,33 @@ export abstract class Cell<T_Schema extends z.ZodType, T_Zzz extends Zzz = Zzz> 
 		const zod_obj = schema as unknown as {shape?: Record<string, any>};
 		const field_schema = zod_obj.shape?.[key];
 
+		// Handle arrays of cells
 		if (field_schema?._def?.typeName === 'ZodArray') {
 			const element_schema = field_schema._def.type;
 			// Use class_name attribute instead of schema_id
 			if (element_schema?.class_name && Array.isArray(value)) {
 				return value.map((item) => this.zzz.registry.decode(item, element_schema.class_name));
 			}
-		} else if (field_schema?.class_name) {
+		}
+		// Handle single cell objects
+		else if (field_schema?.class_name) {
 			return this.zzz.registry.decode(value, field_schema.class_name);
+		}
+		// Handle Maps
+		else if (field_schema?._def?.typeName === 'ZodMap' && Array.isArray(value)) {
+			return new Map(value as Array<[any, any]>);
+		}
+		// Handle Sets
+		else if (field_schema?._def?.typeName === 'ZodSet' && Array.isArray(value)) {
+			return new Set(value);
+		}
+		// Handle branded types
+		else if (
+			field_schema?._def?.typeName === 'ZodBranded' &&
+			value !== null &&
+			value !== undefined
+		) {
+			return field_schema.parse(value);
 		}
 
 		// Default behavior
@@ -129,7 +157,7 @@ export abstract class Cell<T_Schema extends z.ZodType, T_Zzz extends Zzz = Zzz> 
 			// Create a new instance with the copied JSON and the same zzz reference
 			return new constructor({
 				zzz: this.zzz,
-				json: structuredClone(this.to_json()),
+				json: structuredClone(this.json),
 			});
 		} catch (error) {
 			console.error(`Failed to clone instance of ${constructor.name}:`, error);

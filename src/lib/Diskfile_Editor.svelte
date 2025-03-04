@@ -72,7 +72,7 @@
 		disabled={!has_changes}
 		onclick={() => {
 			contents_history.push({created: Date.now(), contents: updated_contents});
-			zzz.files.update(file.id, updated_contents);
+			zzz.files.update(file.path, updated_contents); // Use path instead of file_id
 			discarded_contents = null;
 		}}>save changes</button
 	>
@@ -88,7 +88,8 @@
 		{/snippet}
 	</Clear_Restore_Button>
 
-	<Confirm_Button onclick={() => zzz.files.delete(file.id)} attrs={{class: 'color_c'}}>
+	<Confirm_Button onclick={() => zzz.files.delete(file.path)} attrs={{class: 'color_c'}}>
+		<!-- Use path instead of file_id -->
 		{#snippet children()}
 			delete file
 		{/snippet}
@@ -138,7 +139,7 @@
 					Dependencies ({file.dependencies_count})
 				</h3>
 				<div class="dep_list">
-					{#each Array.from(file.dependencies.keys()) as dependency_id (dependency_id)}
+					{#each file.dependency_ids as dependency_id (dependency_id)}
 						<div class="dep_item">{to_root_path(dependency_id)}</div>
 					{/each}
 				</div>
@@ -151,7 +152,7 @@
 					Dependents ({file.dependents_count})
 				</h3>
 				<div class="dep_list">
-					{#each Array.from(file.dependents.keys()) as dependent_id (dependent_id)}
+					{#each file.dependent_ids as dependent_id (dependent_id)}
 						<div class="dep_item">{to_root_path(dependent_id)}</div>
 					{/each}
 				</div>

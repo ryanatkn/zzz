@@ -1,7 +1,7 @@
 import {z} from 'zod';
 
 import {Uuid} from '$lib/uuid.js';
-import {Diskfile_Change_Type} from '$lib/diskfile_types.js';
+import {Diskfile_Change_Type, Source_File, Diskfile_Path} from '$lib/diskfile_types.js';
 import {Completion_Request, Completion_Response} from '$lib/completion.js';
 import {Datetime_Now} from '$lib/zod_helpers.js';
 
@@ -45,7 +45,7 @@ export type Message_Load_Session = z.infer<typeof Message_Load_Session>;
 export const Message_Loaded_Session = Message_Base.extend({
 	type: z.literal('loaded_session'),
 	data: z.object({
-		files: z.any(), // This would ideally be a Map<Path_Id, Source_File>
+		files: z.record(Diskfile_Path, Source_File),
 	}),
 });
 export type Message_Loaded_Session = z.infer<typeof Message_Loaded_Session>;
@@ -55,22 +55,22 @@ export const Message_Filer_Change = Message_Base.extend({
 	type: z.literal('filer_change'),
 	change: z.object({
 		type: Diskfile_Change_Type,
-		path: z.string(),
+		path: Diskfile_Path,
 	}),
-	source_file: z.any(), // Source_File
+	source_file: Source_File,
 });
 export type Message_Filer_Change = z.infer<typeof Message_Filer_Change>;
 
 export const Message_Update_Diskfile = Message_Base.extend({
 	type: z.literal('update_diskfile'),
-	file_id: z.string(), // Path_Id
+	path: Diskfile_Path,
 	contents: z.string(),
 });
 export type Message_Update_Diskfile = z.infer<typeof Message_Update_Diskfile>;
 
 export const Message_Delete_Diskfile = Message_Base.extend({
 	type: z.literal('delete_diskfile'),
-	file_id: z.string(), // Path_Id
+	path: Diskfile_Path,
 });
 export type Message_Delete_Diskfile = z.infer<typeof Message_Delete_Diskfile>;
 
@@ -129,12 +129,12 @@ export const Message_Json = z.object({
 	data: z.any().optional(),
 	completion_request: Completion_Request.optional(),
 	completion_response: Completion_Response.optional(),
-	file_id: z.string().optional(),
+	path: Diskfile_Path.optional(), // Renamed from file_id to path
 	contents: z.string().optional(),
 	change: z
 		.object({
 			type: Diskfile_Change_Type,
-			path: z.string(),
+			path: Diskfile_Path, // Updated to use Diskfile_Path
 		})
 		.optional(),
 	source_file: z.any().optional(),

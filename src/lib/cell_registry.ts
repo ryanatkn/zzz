@@ -1,5 +1,5 @@
 import type {Cell} from '$lib/cell.svelte.js';
-import type {Zzz} from './zzz.svelte.js';
+import type {Zzz} from '$lib/zzz.svelte.js';
 
 // TODO extract helper?
 type Class_Constructor<T> = new (options: any) => T;

@@ -11,6 +11,7 @@ import {
 import {Uuid} from '$lib/uuid.js';
 import {Message_Json, type Message_Direction, type Message_Type} from '$lib/message_types.js';
 import type {Datetime_Now} from '$lib/zod_helpers.js';
+import {Diskfile_Path} from '$lib/diskfile_types.js';
 
 // Constants for preview length and formatting
 export const MESSAGE_PREVIEW_MAX_LENGTH = 50;
@@ -30,7 +31,7 @@ export class Message extends Cell<typeof Message_Json> {
 	data: unknown = $state();
 	completion_request: Completion_Request_Type | undefined = $state();
 	completion_response: Completion_Response | undefined = $state();
-	file_id: string | undefined = $state();
+	path: Diskfile_Path | undefined = $state();
 	contents: string | undefined = $state();
 	change: any | undefined = $state();
 	source_file: any | undefined = $state();
@@ -110,14 +111,14 @@ export class Message extends Cell<typeof Message_Json> {
 					}
 					break;
 				case 'update_diskfile':
-					if ('file_id' in options.json) {
-						this.file_id = options.json.file_id;
+					if ('path' in options.json && options.json.path) {
+						this.path = Diskfile_Path.parse(options.json.path);
 						this.contents = options.json.contents;
 					}
 					break;
 				case 'delete_diskfile':
-					if ('file_id' in options.json) {
-						this.file_id = options.json.file_id;
+					if ('path' in options.json && options.json.path) {
+						this.path = Diskfile_Path.parse(options.json.path);
 					}
 					break;
 				case 'filer_change':
@@ -157,9 +158,9 @@ export class Message extends Cell<typeof Message_Json> {
 			case 'completion_response':
 				return {...base, completion_response: this.completion_response};
 			case 'update_diskfile':
-				return {...base, file_id: this.file_id, contents: this.contents};
+				return {...base, path: this.path, contents: this.contents};
 			case 'delete_diskfile':
-				return {...base, file_id: this.file_id};
+				return {...base, path: this.path};
 			case 'filer_change':
 				return {...base, change: this.change, source_file: this.source_file};
 			case 'loaded_session':

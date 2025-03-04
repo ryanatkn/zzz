@@ -83,7 +83,7 @@ const server = serve(
 injectWebSocket(server);
 
 const zzz_server = new Zzz_Server({
-	send: (message) => {
+	send_to_all_clients: (message) => {
 		for (const ws of sockets) {
 			ws.send(devalue.stringify({type: 'gro_server_message', message}));
 		}

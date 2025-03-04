@@ -27,7 +27,7 @@
 
 <h2>dependencies</h2>
 <div class="dep_list">
-	{#each Array.from(file.dependencies.keys()) as dependency_id (dependency_id)}
+	{#each file.dependency_ids as dependency_id (dependency_id)}
 		<div>{to_root_path(dependency_id)}</div>
 	{/each}
 </div>
@@ -36,7 +36,7 @@
 </h2>
 {#if file.has_dependents}
 	<div class="dep_list">
-		{#each Array.from(file.dependents.keys()) as dependent_id (dependent_id)}
+		{#each file.dependent_ids as dependent_id (dependent_id)}
 			{to_root_path(dependent_id)}
 		{/each}
 	</div>

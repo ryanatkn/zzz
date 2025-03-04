@@ -26,6 +26,7 @@
 	import {Model} from '$lib/model.svelte.js';
 	import {Message} from '$lib/message.svelte.js';
 	import {Provider} from '$lib/provider.svelte.js';
+	import type {Diskfile_Path} from '$lib/diskfile_types.js';
 
 	interface Props {
 		children: Snippet;
@@ -96,11 +97,12 @@
 			switch (message.type) {
 				case 'loaded_session': {
 					console.log(`[page] loaded_session`, message);
-					for (const source_file of message.data.files.values()) {
+					for (const [path_id, source_file] of Object.entries(message.data.files)) {
+						if (!source_file) continue;
 						zzz.files.handle_change({
 							type: 'filer_change',
 							id: Uuid.parse(undefined),
-							change: {type: 'add', path: source_file.id},
+							change: {type: 'add', path: path_id as Diskfile_Path},
 							source_file,
 						});
 					}

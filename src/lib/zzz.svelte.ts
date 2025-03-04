@@ -53,7 +53,7 @@ export class Zzz {
 	readonly chats = new Chats(this);
 	readonly providers = new Providers(this);
 	readonly prompts = new Prompts(this);
-	readonly files = new Diskfiles(this);
+	readonly files = new Diskfiles({zzz: this});
 	readonly messages = new Messages(this);
 	readonly registry = new Cell_Registry(this);
 

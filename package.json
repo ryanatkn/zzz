@@ -212,6 +212,11 @@
       "svelte": "./dist/Control_Panel.svelte",
       "default": "./dist/Control_Panel.svelte"
     },
+    "./Dashboard_Capabilities.svelte": {
+      "types": "./dist/Dashboard_Capabilities.svelte.d.ts",
+      "svelte": "./dist/Dashboard_Capabilities.svelte",
+      "default": "./dist/Dashboard_Capabilities.svelte"
+    },
     "./Dashboard_Chats.svelte": {
       "types": "./dist/Dashboard_Chats.svelte.d.ts",
       "svelte": "./dist/Dashboard_Chats.svelte",
@@ -227,10 +232,30 @@
       "svelte": "./dist/Dashboard_Home.svelte",
       "default": "./dist/Dashboard_Home.svelte"
     },
+    "./Dashboard_Messages.svelte": {
+      "types": "./dist/Dashboard_Messages.svelte.d.ts",
+      "svelte": "./dist/Dashboard_Messages.svelte",
+      "default": "./dist/Dashboard_Messages.svelte"
+    },
+    "./Dashboard_Models.svelte": {
+      "types": "./dist/Dashboard_Models.svelte.d.ts",
+      "svelte": "./dist/Dashboard_Models.svelte",
+      "default": "./dist/Dashboard_Models.svelte"
+    },
     "./Dashboard_Prompts.svelte": {
       "types": "./dist/Dashboard_Prompts.svelte.d.ts",
       "svelte": "./dist/Dashboard_Prompts.svelte",
       "default": "./dist/Dashboard_Prompts.svelte"
+    },
+    "./Dashboard_Providers.svelte": {
+      "types": "./dist/Dashboard_Providers.svelte.d.ts",
+      "svelte": "./dist/Dashboard_Providers.svelte",
+      "default": "./dist/Dashboard_Providers.svelte"
+    },
+    "./Dashboard_Settings.svelte": {
+      "types": "./dist/Dashboard_Settings.svelte.d.ts",
+      "svelte": "./dist/Dashboard_Settings.svelte",
+      "default": "./dist/Dashboard_Settings.svelte"
     },
     "./Dashboard.svelte": {
       "types": "./dist/Dashboard.svelte.d.ts",

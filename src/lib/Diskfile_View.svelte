@@ -62,8 +62,8 @@
 			run={() => {
 				// TODO custom confirm dialog
 				// eslint-disable-next-line no-alert
-				if (confirm('Delete file "' + file.id + '"?')) {
-					zzz.files.delete(file.id);
+				if (confirm('Delete file "' + file.path + '"?')) {
+					zzz.files.delete(file.path);
 				}
 			}}
 		>

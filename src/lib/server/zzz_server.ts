@@ -3,7 +3,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import OpenAI from 'openai';
 import ollama from 'ollama';
 import {GoogleGenerativeAI} from '@google/generative-ai';
-import {Filer, type Cleanup_Watch} from '@ryanatkn/gro/filer.js';
+import {Filer, type Cleanup_Watch, type Source_File} from '@ryanatkn/gro/filer.js';
 import {
 	SECRET_ANTHROPIC_API_KEY,
 	SECRET_GOOGLE_API_KEY,
@@ -12,6 +12,7 @@ import {
 import {existsSync, mkdirSync, writeFileSync} from 'node:fs';
 import {dirname, join} from 'node:path';
 import {format_file} from '@ryanatkn/gro/format_file.js';
+import type {Watcher_Change} from '@ryanatkn/gro/watch_dir.js';
 
 import {
 	type Message_Client,
@@ -22,7 +23,7 @@ import {
 import {Uuid} from '$lib/uuid.js';
 import {SYSTEM_MESSAGE_DEFAULT} from '$lib/config.js';
 import {delete_diskfile_in_scope, write_file_in_scope} from '$lib/server/helpers.js';
-import {map_watcher_change_to_diskfile_change} from '$lib/diskfile_types.js';
+import {map_watcher_change_to_diskfile_change, Diskfile_Path} from '$lib/diskfile_types.js';
 import {Datetime_Now} from '$lib/zod_helpers.js';
 
 const anthropic = new Anthropic({apiKey: SECRET_ANTHROPIC_API_KEY});
@@ -41,7 +42,7 @@ const PRESENCE_PENALTY_DEFAULT: number | undefined = undefined; // TODO config
 const STOP_SEQUENCES_DEFAULT: Array<string> | undefined = undefined; // TODO config
 
 export interface Zzz_Server_Options {
-	send: (message: Message_Server) => void;
+	send_to_all_clients: (message: Message_Server) => void;
 	/**
 	 * @default ZZZ_DIR_DEFAULT
 	 */
@@ -60,7 +61,7 @@ export interface Zzz_Server_Options {
 }
 
 export class Zzz_Server {
-	#send: (message: Message_Server) => void;
+	#send_to_all_clients: (message: Message_Server) => void;
 
 	zzz_dir: string;
 
@@ -82,24 +83,11 @@ export class Zzz_Server {
 
 	constructor(options: Zzz_Server_Options) {
 		console.log('create Zzz_Server');
-		this.#send = options.send;
+		this.#send_to_all_clients = options.send_to_all_clients;
 		this.zzz_dir = options.zzz_dir ?? ZZZ_DIR_DEFAULT;
 		this.filer = options.filer ?? new Filer({watch_dir_options: {dir: this.zzz_dir}});
 		this.#cleanup_filer = this.filer.watch((change, source_file) => {
-			// Convert watcher change type to API change type
-			const api_change = {
-				type: map_watcher_change_to_diskfile_change(change.type),
-				path: change.path,
-			};
-
-			if (source_file.id.includes('.css'))
-				console.log(`source_file`, source_file.id, source_file.contents?.length);
-			this.#send({
-				id: Uuid.parse(undefined),
-				type: 'filer_change',
-				change: api_change,
-				source_file,
-			});
+			this.handle_filer_change(change, source_file);
 		});
 		this.system_message = options.system_message ?? SYSTEM_MESSAGE_DEFAULT;
 		this.output_token_max = options.output_token_max ?? OUTPUT_TOKEN_MAX_DEFAULT;
@@ -113,7 +101,7 @@ export class Zzz_Server {
 	}
 
 	send(message: Message_Server): void {
-		this.#send(message);
+		this.#send_to_all_clients(message);
 	}
 
 	// TODO add an abstraction here, so the server isn't concerned with message content/types
@@ -125,7 +113,26 @@ export class Zzz_Server {
 				return message;
 			}
 			case 'load_session': {
-				return {id: Uuid.parse(undefined), type: 'loaded_session', data: {files: this.filer.files}};
+				// Use encode method directly on the files Map to convert it to a compatible format
+				// This replaces the custom source_files_map_to_record function
+				const files_record: Record<string, any> = {};
+
+				this.filer.files.forEach((file, id) => {
+					const path_id = Diskfile_Path.parse(id);
+					files_record[path_id] = {
+						...file,
+						id: path_id,
+						// Maps will be automatically handled by our encode/decode system
+						dependents: file.dependents,
+						dependencies: file.dependencies,
+					};
+				});
+
+				return {
+					id: Uuid.parse(undefined),
+					type: 'loaded_session',
+					data: {files: files_record},
+				};
 			}
 			case 'send_prompt': {
 				const {prompt, provider_name, model} = message.completion_request;
@@ -298,13 +305,13 @@ export class Zzz_Server {
 				return response; // TODO @many sending the text again is wasteful, need ids
 			}
 			case 'update_diskfile': {
-				const {file_id, contents} = message;
-				write_file_in_scope(file_id, contents, this.filer.root_dir);
+				const {path, contents} = message;
+				write_file_in_scope(path, contents, this.filer.root_dir);
 				return null;
 			}
 			case 'delete_diskfile': {
-				const {file_id} = message;
-				delete_diskfile_in_scope(file_id, this.filer.root_dir);
+				const {path} = message;
+				delete_diskfile_in_scope(path, this.filer.root_dir);
 				return null;
 			}
 			default:
@@ -315,6 +322,23 @@ export class Zzz_Server {
 	async destroy(): Promise<void> {
 		const cleanup_filer = await this.#cleanup_filer;
 		await cleanup_filer();
+	}
+
+	handle_filer_change(change: Watcher_Change, source_file: Source_File): void {
+		const api_change = {
+			type: map_watcher_change_to_diskfile_change(change.type),
+			path: Diskfile_Path.parse(change.path),
+		};
+
+		this.#send_to_all_clients({
+			id: Uuid.parse(undefined),
+			type: 'filer_change',
+			change: api_change,
+			source_file: {
+				...source_file,
+				id: Diskfile_Path.parse(source_file.id),
+			},
+		});
 	}
 }
 

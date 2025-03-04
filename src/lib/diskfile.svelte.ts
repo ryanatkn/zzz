@@ -1,49 +1,51 @@
-import type {Source_File} from '@ryanatkn/gro/filer.js';
-import type {Path_Id} from '@ryanatkn/gro/path.js';
+import type {Source_File as Source_File_Type} from '@ryanatkn/gro/filer.js';
 import {format} from 'date-fns';
 import {encode} from 'gpt-tokenizer';
 
-// TODO upstream to Filer probably
-export interface Source_File_Json {
-	id: Path_Id;
-	contents: string | null;
-	external: boolean;
-	ctime: number | null;
-	mtime: number | null;
-	dependents: Array<[Path_Id, Source_File]>;
-	dependencies: Array<[Path_Id, Source_File]>;
-	size?: number | undefined; // TODO BLOCK add to `Source_File`?
-}
-
-export interface Diskfile_Json {
-	source_file: Source_File_Json;
-}
-
-export interface Diskfile_Options {
-	data: Diskfile_Json;
-}
+import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
+import {
+	Diskfile_Json,
+	type Diskfile_Path,
+	source_file_to_diskfile_json,
+} from '$lib/diskfile_types.js';
+import type {Datetime, Datetime_Now} from '$lib/zod_helpers.js';
+import {Uuid} from '$lib/uuid.js';
 
 // Constants for formatting
 export const FILE_DATE_FORMAT = 'MMM d, yyyy HH:mm:ss';
 export const FILE_TIME_FORMAT = 'HH:mm:ss';
 
-export class Diskfile {
-	// TODO better name?
-	original: Source_File_Json = $state()!;
+export interface Diskfile_Options extends Cell_Options<typeof Diskfile_Json> {
+	data?: {
+		source_file: Source_File_Type;
+	};
+}
 
-	id: Path_Id = $state()!;
+export class Diskfile extends Cell<typeof Diskfile_Json> {
+	// JSON-serialized properties
+	id: Uuid = $state()!;
+	path: Diskfile_Path = $state()!; // Renamed from file_id
 	contents: string | null = $state()!;
-	dependents: Map<Path_Id, Source_File> = $state()!;
-	dependencies: Map<Path_Id, Source_File> = $state()!;
-	ctime: number = $state()!;
-	mtime: number = $state()!;
-	size: number = $state(0);
 	external: boolean = $state(false);
+	created: Datetime_Now = $state()!;
+	updated: Datetime = $state()!;
+	dependents: Array<[Diskfile_Path, Source_File_Type]> = $state([]);
+	dependencies: Array<[Diskfile_Path, Source_File_Type]> = $state([]);
+
+	// Derived Maps from array data
+	dependencies_by_id: Map<Diskfile_Path, Source_File_Type> = $derived(new Map(this.dependencies));
+	dependents_by_id: Map<Diskfile_Path, Source_File_Type> = $derived(new Map(this.dependents));
+
+	// Also derive the lists of IDs directly
+	dependency_ids: Array<Diskfile_Path> = $derived(this.dependencies.map(([id]) => id));
+	dependent_ids: Array<Diskfile_Path> = $derived(this.dependents.map(([id]) => id));
 
 	// Derived properties
-	modified_date: Date = $derived(new Date(this.mtime));
+	modified_date: Date = $derived(this.updated ? new Date(this.updated) : new Date());
 	modified_formatted_date: string = $derived(format(this.modified_date, FILE_DATE_FORMAT));
 	modified_formatted_time: string = $derived(format(this.modified_date, FILE_TIME_FORMAT));
+
+	size: number | null = $derived(this.contents?.length ?? null);
 
 	// TODO BLOCK maybe have a Bit for this? just for text files?
 	content_length: number = $derived(this.contents?.length ?? 0);
@@ -60,48 +62,20 @@ export class Diskfile {
 			: '',
 	);
 
-	has_dependencies: boolean = $derived(this.dependencies.size > 0);
-	has_dependents: boolean = $derived(this.dependents.size > 0);
+	has_dependencies: boolean = $derived(this.dependencies.length > 0);
+	has_dependents: boolean = $derived(this.dependents.length > 0);
 
-	dependencies_count: number = $derived(this.dependencies.size);
-	dependents_count: number = $derived(this.dependents.size);
+	dependencies_count: number = $derived(this.dependencies.length);
+	dependents_count: number = $derived(this.dependents.length);
 
 	constructor(options: Diskfile_Options) {
-		const {
-			data: {source_file},
-		} = options;
-		this.original = source_file;
-		this.id = source_file.id;
-		this.contents = source_file.contents;
-		this.dependents = new Map(source_file.dependents);
-		this.dependencies = new Map(source_file.dependencies);
-		this.ctime = source_file.ctime ?? Date.now(); // Default to current time if null/undefined
-		this.mtime = source_file.mtime ?? Date.now(); // Default to current time if null/undefined
-		this.size = source_file.size ?? source_file.contents?.length ?? 0;
-		this.external = source_file.external ?? false;
-	}
+		super(Diskfile_Json, options);
 
-	// Helper methods to get keys directly
-	get dependency_ids(): Array<Path_Id> {
-		return Array.from(this.dependencies.keys());
-	}
-
-	get dependent_ids(): Array<Path_Id> {
-		return Array.from(this.dependents.keys());
-	}
-
-	toJSON(): Diskfile_Json {
-		return {
-			source_file: {
-				id: this.id,
-				contents: this.contents,
-				ctime: this.ctime,
-				mtime: this.mtime,
-				size: this.size,
-				dependents: Array.from(this.dependents),
-				dependencies: Array.from(this.dependencies),
-				external: this.external,
-			},
-		};
+		// If source_file data is provided, use the helper function to convert to json
+		if (options.data?.source_file) {
+			this.set_json(source_file_to_diskfile_json(options.data.source_file));
+		} else {
+			this.init();
+		}
 	}
 }
