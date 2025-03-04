@@ -3,7 +3,12 @@ import {SvelteMap} from 'svelte/reactivity';
 
 import {Cell, type Cell_Options, cell_array} from '$lib/cell.svelte.js';
 import {Message} from '$lib/message.svelte.js';
-import {Message_Json, type Message_Client, type Message_Server} from '$lib/message_types.js';
+import {
+	Message_Json,
+	type Message_Client,
+	type Message_Server,
+	create_message_json,
+} from '$lib/message_types.js';
 import type {Uuid} from '$lib/uuid.js';
 
 // Define the schema with cell_array for proper class association
@@ -87,6 +92,7 @@ export class Messages extends Cell<typeof Messages_Json> {
 			return;
 		}
 
+		this.add(create_message_json(message, 'client'));
 		this.#send_message(message);
 	}
 
@@ -99,26 +105,7 @@ export class Messages extends Cell<typeof Messages_Json> {
 			return;
 		}
 
-		// TODO something like this should be correct, right?
-		//
-		// but the type here is wrong and it fails to parse as a Message:
-		// cell.svelte.ts:156 Error setting JSON for Message: ZodError: [
-		// 	{
-		// 		"expected": "'client' | 'server' | 'both'",
-		// 		"received": "undefined",
-		// 		"code": "invalid_type",
-		// 		"path": [
-		// 			"direction"
-		// 		],
-		// 		"message": "Required"
-		// 	}
-		// ]
-		//
-		// and the type error:
-		//
-		// Argument of type '{ id: string & BRAND<"Uuid">; type: "echo"; data?: any; } | { id: string & BRAND<"Uuid">; type: "loaded_session"; data: { files: Partial<Record<string & BRAND<"Diskfile_Path">, { ...; }>>; }; } | { ...; } | { ...; }' is not assignable to parameter of type '{ id: string & BRAND<"Uuid">; type: "echo" | "send_prompt" | "completion_response" | "update_diskfile" | "delete_diskfile" | "filer_change" | "load_session" | "loaded_session"; ... 8 more ...; source_file?: any; }'.
-		// Type '{ id: string & BRAND<"Uuid">; type: "echo"; data?: any; }' is missing the following properties from type '{ id: string & BRAND<"Uuid">; type: "echo" | "send_prompt" | "completion_response" | "update_diskfile" | "delete_diskfile" | "filer_change" | "load_session" | "loaded_session"; ... 8 more ...; source_file?: any; }': direction, createdts(2345)
-		this.add(message);
+		this.add(create_message_json(message, 'server'));
 		this.#onreceive(message);
 	}
 
