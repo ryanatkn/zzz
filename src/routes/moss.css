@@ -259,9 +259,6 @@ a.chip {
 .ml_xs {
 	margin-left: var(--space_xs);
 }
-.mr_md {
-	margin-right: var(--space_md);
-}
 .mr_xl {
 	margin-right: var(--space_xl);
 }
@@ -384,10 +381,6 @@ a.chip {
 .pt_sm {
 	padding-top: var(--space_sm);
 }
-.px_lg {
-	padding-left: var(--space_lg);
-	padding-right: var(--space_lg);
-}
 .px_md {
 	padding-left: var(--space_md);
 	padding-right: var(--space_md);
@@ -469,9 +462,6 @@ a.chip {
 	box-shadow: var(--shadow_inset_xs)
 		color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_1)), transparent);
 }
-.shrink_0 {
-	flex-shrink: 0;
-}
 .size_lg {
 	font-size: var(--size_lg);
 	--size: var(--size_lg);
@@ -483,10 +473,6 @@ a.chip {
 .size_xl {
 	font-size: var(--size_xl);
 	--size: var(--size_xl);
-}
-.size_xl3 {
-	font-size: var(--size_xl3);
-	--size: var(--size_xl3);
 }
 .size_xs {
 	font-size: var(--size_xs);
@@ -500,9 +486,6 @@ a.chip {
 }
 .text_align_left {
 	text-align: left;
-}
-.text_align_right {
-	text-align: right;
 }
 .w_100 {
 	width: 100%;

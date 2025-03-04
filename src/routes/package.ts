@@ -231,34 +231,14 @@ export const package_json = {
 			svelte: './dist/Diskfile_Explorer.svelte',
 			default: './dist/Diskfile_Explorer.svelte',
 		},
-		'./Diskfile_Info.svelte': {
-			types: './dist/Diskfile_Info.svelte.d.ts',
-			svelte: './dist/Diskfile_Info.svelte',
-			default: './dist/Diskfile_Info.svelte',
-		},
 		'./Diskfile_List_Item.svelte': {
 			types: './dist/Diskfile_List_Item.svelte.d.ts',
 			svelte: './dist/Diskfile_List_Item.svelte',
 			default: './dist/Diskfile_List_Item.svelte',
 		},
-		'./Diskfile_List.svelte': {
-			types: './dist/Diskfile_List.svelte.d.ts',
-			svelte: './dist/Diskfile_List.svelte',
-			default: './dist/Diskfile_List.svelte',
-		},
-		'./Diskfile_Summary.svelte': {
-			types: './dist/Diskfile_Summary.svelte.d.ts',
-			svelte: './dist/Diskfile_Summary.svelte',
-			default: './dist/Diskfile_Summary.svelte',
-		},
 		'./diskfile_types.js': {
 			types: './dist/diskfile_types.d.ts',
 			default: './dist/diskfile_types.js',
-		},
-		'./Diskfile_View.svelte': {
-			types: './dist/Diskfile_View.svelte.d.ts',
-			svelte: './dist/Diskfile_View.svelte',
-			default: './dist/Diskfile_View.svelte',
 		},
 		'./diskfile.svelte.js': {
 			types: './dist/diskfile.svelte.d.ts',
@@ -596,10 +576,7 @@ export const src_json = {
 		'./Dashboard.svelte': {path: 'Dashboard.svelte', declarations: []},
 		'./Diskfile_Editor.svelte': {path: 'Diskfile_Editor.svelte', declarations: []},
 		'./Diskfile_Explorer.svelte': {path: 'Diskfile_Explorer.svelte', declarations: []},
-		'./Diskfile_Info.svelte': {path: 'Diskfile_Info.svelte', declarations: []},
 		'./Diskfile_List_Item.svelte': {path: 'Diskfile_List_Item.svelte', declarations: []},
-		'./Diskfile_List.svelte': {path: 'Diskfile_List.svelte', declarations: []},
-		'./Diskfile_Summary.svelte': {path: 'Diskfile_Summary.svelte', declarations: []},
 		'./diskfile_types.js': {
 			path: 'diskfile_types.ts',
 			declarations: [
@@ -612,7 +589,6 @@ export const src_json = {
 				{name: 'source_file_to_diskfile_json', kind: 'function'},
 			],
 		},
-		'./Diskfile_View.svelte': {path: 'Diskfile_View.svelte', declarations: []},
 		'./diskfile.svelte.js': {
 			path: 'diskfile.svelte.ts',
 			declarations: [

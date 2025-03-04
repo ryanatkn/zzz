@@ -272,34 +272,14 @@
       "svelte": "./dist/Diskfile_Explorer.svelte",
       "default": "./dist/Diskfile_Explorer.svelte"
     },
-    "./Diskfile_Info.svelte": {
-      "types": "./dist/Diskfile_Info.svelte.d.ts",
-      "svelte": "./dist/Diskfile_Info.svelte",
-      "default": "./dist/Diskfile_Info.svelte"
-    },
     "./Diskfile_List_Item.svelte": {
       "types": "./dist/Diskfile_List_Item.svelte.d.ts",
       "svelte": "./dist/Diskfile_List_Item.svelte",
       "default": "./dist/Diskfile_List_Item.svelte"
     },
-    "./Diskfile_List.svelte": {
-      "types": "./dist/Diskfile_List.svelte.d.ts",
-      "svelte": "./dist/Diskfile_List.svelte",
-      "default": "./dist/Diskfile_List.svelte"
-    },
-    "./Diskfile_Summary.svelte": {
-      "types": "./dist/Diskfile_Summary.svelte.d.ts",
-      "svelte": "./dist/Diskfile_Summary.svelte",
-      "default": "./dist/Diskfile_Summary.svelte"
-    },
     "./diskfile_types.js": {
       "types": "./dist/diskfile_types.d.ts",
       "default": "./dist/diskfile_types.js"
-    },
-    "./Diskfile_View.svelte": {
-      "types": "./dist/Diskfile_View.svelte.d.ts",
-      "svelte": "./dist/Diskfile_View.svelte",
-      "default": "./dist/Diskfile_View.svelte"
     },
     "./diskfile.svelte.js": {
       "types": "./dist/diskfile.svelte.d.ts",
