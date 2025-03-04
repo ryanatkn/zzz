@@ -25,10 +25,17 @@ export interface Chat_Message {
 	response?: Completion_Response;
 }
 
+const chat_names: Array<string> = [];
+
 export const Chat_Json = z
 	.object({
 		id: Uuid,
-		name: z.string().default(''),
+		name: z.string().default(() => {
+			// TODO BLOCK how to do this correctly? can you make it stateful and still have a static module-scoped schema? I dont see a context object arg or anything
+			const name = get_unique_name('chat', chat_names);
+			chat_names.push(name);
+			return name;
+		}),
 		created: Datetime_Now,
 		tapes: z.array(Tape_Json).default(() => []),
 		selected_prompt_ids: z.array(Uuid).default(() => []),
