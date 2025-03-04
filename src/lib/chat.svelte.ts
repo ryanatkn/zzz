@@ -28,7 +28,7 @@ export interface Chat_Message {
 export const Chat_Json = z
 	.object({
 		id: Uuid,
-		name: z.string(),
+		name: z.string().default(''),
 		created: Datetime_Now,
 		tapes: z.array(Tape_Json).default(() => []),
 		selected_prompt_ids: z.array(Uuid).default(() => []),
