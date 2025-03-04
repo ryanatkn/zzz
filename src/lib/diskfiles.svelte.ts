@@ -1,7 +1,6 @@
 import {SvelteMap} from 'svelte/reactivity';
 import type {Source_File as Gro_Source_File} from '@ryanatkn/gro/filer.js';
 import {z} from 'zod';
-import {cell_array} from '$lib/cell.svelte.js';
 
 import type {Message_Filer_Change} from '$lib/message_types.js';
 import {Uuid} from '$lib/uuid.js';
@@ -12,9 +11,8 @@ import {
 	type Diskfile_Path,
 	assert_valid_source_file,
 } from '$lib/diskfile_types.js';
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
+import {Cell, cell_array, type Cell_Options} from '$lib/cell.svelte.js';
 
-// Update schema to use cell_array for proper class association
 export const Diskfiles_Json = z
 	.object({
 		files: cell_array(

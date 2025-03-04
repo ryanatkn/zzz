@@ -11,7 +11,6 @@ import {
 } from '$lib/message_types.js';
 import type {Uuid} from '$lib/uuid.js';
 
-// Define the schema with cell_array for proper class association
 export const Messages_Json = z
 	.object({
 		items: cell_array(

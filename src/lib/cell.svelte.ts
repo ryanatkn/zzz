@@ -6,6 +6,11 @@ import {DEV} from 'esm-env';
 import {zod_get_schema_keys} from '$lib/zod_helpers.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 
+// Metadata properties for Zod schemas.
+// TODO better way to do this? Forces use of the helpers `cell_class` and `cell_array`
+export const ZOD_CELL_CLASS_NAME = 'zzz_cell_class_name';
+export const ZOD_ELEMENT_CLASS_NAME = 'zzz_element_class_name';
+
 // TODO refactor
 interface Schema_Info {
 	type?: string;
@@ -20,14 +25,28 @@ export interface Cell_Options<T_Schema extends z.ZodType, T_Zzz extends Zzz = Zz
 	json?: z.input<T_Schema>;
 }
 
-// Fix cell_class to maintain the type
+/**
+ * Attaches class name metadata to a Zod schema for cell instantiation.
+ * This allows the cell system to know which class to instantiate for a given schema.
+ *
+ * @param schema The Zod schema to annotate
+ * @param className The name of the class to instantiate for this schema
+ * @returns The original schema with metadata attached
+ */
 export function cell_class<T extends z.ZodTypeAny>(schema: T, className: string): T {
 	// Instead of using transform which changes the type, just attach metadata
-	(schema as any)._cell_class = className;
+	(schema as any)[ZOD_CELL_CLASS_NAME] = className;
 	return schema;
 }
 
-// Fixed cell_array function to properly handle ZodDefault
+/**
+ * Attaches element class name metadata to an array schema for cell array instantiation.
+ * This allows the cell system to know which class to instantiate for each element in the array.
+ *
+ * @param schema The array Zod schema to annotate (or ZodDefault containing an array)
+ * @param className The name of the class to instantiate for each element
+ * @returns The original schema with metadata attached
+ */
 export function cell_array<T extends z.ZodTypeAny>(schema: T, className: string): T {
 	// Use type casting to access the inner ZodArray if this is a ZodDefault
 	// This safely handles both direct ZodArrays and ZodDefault<ZodArray>
@@ -43,7 +62,7 @@ export function cell_array<T extends z.ZodTypeAny>(schema: T, className: string)
 	}
 
 	// Add the element_class property to the array schema
-	(arraySchema._def as any).element_class = className;
+	(arraySchema._def as any)[ZOD_ELEMENT_CLASS_NAME] = className;
 	return schema;
 }
 
@@ -85,7 +104,7 @@ export abstract class Cell<T_Schema extends z.ZodType, T_Zzz extends Zzz = Zzz> 
 	}
 
 	/**
-	 * Apply schema defaults safely for properties that don't already have values
+	 * Apply schema defaults safely for properties that don't already have values.
 	 */
 	protected apply_defaults(): void {
 		try {
@@ -217,19 +236,19 @@ export abstract class Cell<T_Schema extends z.ZodType, T_Zzz extends Zzz = Zzz> 
 			result.is_array = true;
 
 			// Look for element class metadata
-			if (def.element_class) {
-				result.element_class = def.element_class;
+			if (def[ZOD_ELEMENT_CLASS_NAME]) {
+				result.element_class = def[ZOD_ELEMENT_CLASS_NAME];
 			}
 
 			// Also look at the inner type
 			const element_type = def.type;
-			if (element_type?._cell_class) {
-				result.element_class = element_type._cell_class;
+			if (element_type?.[ZOD_CELL_CLASS_NAME]) {
+				result.element_class = element_type[ZOD_CELL_CLASS_NAME];
 			}
 		}
 		// Check for class metadata on the field itself
-		else if ((field_schema as any)._cell_class) {
-			result.class_name = (field_schema as any)._cell_class;
+		else if ((field_schema as any)[ZOD_CELL_CLASS_NAME]) {
+			result.class_name = (field_schema as any)[ZOD_CELL_CLASS_NAME];
 		}
 
 		return result;
