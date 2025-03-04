@@ -2,7 +2,7 @@ import {z} from 'zod';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 
 import type {Model} from '$lib/model.svelte.js';
-import {Provider_Name} from '$lib/provider.schema.js';
+import {Provider_Name} from '$lib/provider_types.js';
 
 // TODO optional/defaults?
 export const Provider_Json = z.object({

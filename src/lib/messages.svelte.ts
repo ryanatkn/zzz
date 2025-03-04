@@ -3,7 +3,7 @@ import {
 	type Message_Server,
 	type Message_Direction,
 	create_message_json,
-} from '$lib/message.schema.js';
+} from '$lib/message_types.js';
 import {Message} from '$lib/message.svelte.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 import type {Uuid} from '$lib/uuid.js';

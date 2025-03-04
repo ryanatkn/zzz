@@ -7,7 +7,7 @@ import {PUBLIC_SERVER_HOSTNAME, PUBLIC_SERVER_PORT} from '$env/static/public';
 
 import {Zzz_Server} from '$lib/server/zzz_server.js';
 import create_config from '$lib/config.js';
-import type {Message_Server} from '$lib/message.schema.js';
+import type {Message_Server} from '$lib/message_types.js';
 
 console.log('creating server');
 

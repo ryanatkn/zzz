@@ -18,11 +18,11 @@ import {
 	type Message_Completion_Response,
 	type Message_Send_Prompt,
 	type Message_Server,
-} from '$lib/message.schema.js';
+} from '$lib/message_types.js';
 import {Uuid} from '$lib/uuid.js';
 import {SYSTEM_MESSAGE_DEFAULT} from '$lib/config.js';
 import {delete_diskfile_in_scope, write_file_in_scope} from '$lib/server/helpers.js';
-import {map_watcher_change_to_diskfile_change} from '$lib/diskfile.schema.js';
+import {map_watcher_change_to_diskfile_change} from '$lib/diskfile_types.js';
 import {Datetime_Now} from '$lib/zod_helpers.js';
 
 const anthropic = new Anthropic({apiKey: SECRET_ANTHROPIC_API_KEY});

@@ -4,7 +4,7 @@ import type * as Google from '@google/generative-ai';
 import type {ChatResponse} from 'ollama/browser';
 import {z} from 'zod';
 
-import {Provider_Name} from '$lib/provider.schema.js';
+import {Provider_Name} from '$lib/provider_types.js';
 import {Uuid} from '$lib/uuid.js';
 import {Datetime_Now} from '$lib/zod_helpers.js';
 

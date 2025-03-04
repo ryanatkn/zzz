@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type {Message} from '$lib/message.schema.js';
+	import type {Message} from '$lib/message_types.js';
 
 	interface Props {
 		message: Message;

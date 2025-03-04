@@ -262,14 +262,14 @@
       "svelte": "./dist/Diskfile_Summary.svelte",
       "default": "./dist/Diskfile_Summary.svelte"
     },
+    "./diskfile_types.js": {
+      "types": "./dist/diskfile_types.d.ts",
+      "default": "./dist/diskfile_types.js"
+    },
     "./Diskfile_View.svelte": {
       "types": "./dist/Diskfile_View.svelte.d.ts",
       "svelte": "./dist/Diskfile_View.svelte",
       "default": "./dist/Diskfile_View.svelte"
-    },
-    "./diskfile.schema.js": {
-      "types": "./dist/diskfile.schema.d.ts",
-      "default": "./dist/diskfile.schema.js"
     },
     "./diskfile.svelte.js": {
       "types": "./dist/diskfile.svelte.d.ts",
@@ -321,6 +321,10 @@
       "svelte": "./dist/Message_Summary.svelte",
       "default": "./dist/Message_Summary.svelte"
     },
+    "./message_types.js": {
+      "types": "./dist/message_types.d.ts",
+      "default": "./dist/message_types.js"
+    },
     "./Message_View.svelte": {
       "types": "./dist/Message_View.svelte.d.ts",
       "svelte": "./dist/Message_View.svelte",
@@ -329,10 +333,6 @@
     "./message.helpers.js": {
       "types": "./dist/message.helpers.d.ts",
       "default": "./dist/message.helpers.js"
-    },
-    "./message.schema.js": {
-      "types": "./dist/message.schema.d.ts",
-      "default": "./dist/message.schema.js"
     },
     "./message.svelte.js": {
       "types": "./dist/message.svelte.d.ts",
@@ -446,14 +446,14 @@
       "svelte": "./dist/Provider_Summary.svelte",
       "default": "./dist/Provider_Summary.svelte"
     },
+    "./provider_types.js": {
+      "types": "./dist/provider_types.d.ts",
+      "default": "./dist/provider_types.js"
+    },
     "./Provider_View.svelte": {
       "types": "./dist/Provider_View.svelte.d.ts",
       "svelte": "./dist/Provider_View.svelte",
       "default": "./dist/Provider_View.svelte"
-    },
-    "./provider.schema.js": {
-      "types": "./dist/provider.schema.d.ts",
-      "default": "./dist/provider.schema.js"
     },
     "./provider.svelte.js": {
       "types": "./dist/provider.svelte.d.ts",

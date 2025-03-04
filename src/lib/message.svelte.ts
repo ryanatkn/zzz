@@ -9,7 +9,7 @@ import {
 	type Completion_Request as Completion_Request_Type,
 } from '$lib/completion.js';
 import {Uuid} from '$lib/uuid.js';
-import {Message_Json, type Message_Direction, type Message_Type} from '$lib/message.schema.js';
+import {Message_Json, type Message_Direction, type Message_Type} from '$lib/message_types.js';
 import type {Datetime_Now} from '$lib/zod_helpers.js';
 
 // Constants for preview length and formatting

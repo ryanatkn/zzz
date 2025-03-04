@@ -1,7 +1,7 @@
 /**
  * Helper functions for working with messages
  */
-import type {Message} from '$lib/message.schema.js';
+import type {Message} from '$lib/message_types.js';
 
 /**
  * Checks if a message is of a certain type

@@ -9,9 +9,9 @@ import {
 	type Message_Send_Prompt,
 	type Message_Completion_Response,
 	Message_Json,
-} from '$lib/message.schema.js';
+} from '$lib/message_types.js';
 import {Provider, type Provider_Json} from '$lib/provider.svelte.js';
-import type {Provider_Name} from '$lib/provider.schema.js';
+import type {Provider_Name} from '$lib/provider_types.js';
 import {Uuid} from '$lib/uuid.js';
 import {Completion_Threads, type Completion_Threads_Json} from '$lib/completion_thread.svelte.js';
 import {ollama_list_with_metadata} from '$lib/ollama.js';

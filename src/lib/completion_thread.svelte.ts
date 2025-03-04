@@ -1,4 +1,4 @@
-import type {Provider_Name} from '$lib/provider.schema.js';
+import type {Provider_Name} from '$lib/provider_types.js';
 import type {Provider} from '$lib/provider.svelte.js';
 import type {Completion_Request, Completion_Response} from '$lib/completion.js';
 import type {Zzz} from '$lib/zzz.svelte.js';

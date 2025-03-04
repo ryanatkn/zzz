@@ -221,14 +221,14 @@ export const package_json = {
 			svelte: './dist/Diskfile_Summary.svelte',
 			default: './dist/Diskfile_Summary.svelte',
 		},
+		'./diskfile_types.js': {
+			types: './dist/diskfile_types.d.ts',
+			default: './dist/diskfile_types.js',
+		},
 		'./Diskfile_View.svelte': {
 			types: './dist/Diskfile_View.svelte.d.ts',
 			svelte: './dist/Diskfile_View.svelte',
 			default: './dist/Diskfile_View.svelte',
-		},
-		'./diskfile.schema.js': {
-			types: './dist/diskfile.schema.d.ts',
-			default: './dist/diskfile.schema.js',
 		},
 		'./diskfile.svelte.js': {
 			types: './dist/diskfile.svelte.d.ts',
@@ -271,6 +271,7 @@ export const package_json = {
 			svelte: './dist/Message_Summary.svelte',
 			default: './dist/Message_Summary.svelte',
 		},
+		'./message_types.js': {types: './dist/message_types.d.ts', default: './dist/message_types.js'},
 		'./Message_View.svelte': {
 			types: './dist/Message_View.svelte.d.ts',
 			svelte: './dist/Message_View.svelte',
@@ -279,10 +280,6 @@ export const package_json = {
 		'./message.helpers.js': {
 			types: './dist/message.helpers.d.ts',
 			default: './dist/message.helpers.js',
-		},
-		'./message.schema.js': {
-			types: './dist/message.schema.d.ts',
-			default: './dist/message.schema.js',
 		},
 		'./message.svelte.js': {
 			types: './dist/message.svelte.d.ts',
@@ -381,14 +378,14 @@ export const package_json = {
 			svelte: './dist/Provider_Summary.svelte',
 			default: './dist/Provider_Summary.svelte',
 		},
+		'./provider_types.js': {
+			types: './dist/provider_types.d.ts',
+			default: './dist/provider_types.js',
+		},
 		'./Provider_View.svelte': {
 			types: './dist/Provider_View.svelte.d.ts',
 			svelte: './dist/Provider_View.svelte',
 			default: './dist/Provider_View.svelte',
-		},
-		'./provider.schema.js': {
-			types: './dist/provider.schema.d.ts',
-			default: './dist/provider.schema.js',
 		},
 		'./provider.svelte.js': {
 			types: './dist/provider.svelte.d.ts',
@@ -567,14 +564,14 @@ export const src_json = {
 		'./Diskfile_Info.svelte': {path: 'Diskfile_Info.svelte', declarations: []},
 		'./Diskfile_List.svelte': {path: 'Diskfile_List.svelte', declarations: []},
 		'./Diskfile_Summary.svelte': {path: 'Diskfile_Summary.svelte', declarations: []},
-		'./Diskfile_View.svelte': {path: 'Diskfile_View.svelte', declarations: []},
-		'./diskfile.schema.js': {
-			path: 'diskfile.schema.ts',
+		'./diskfile_types.js': {
+			path: 'diskfile_types.ts',
 			declarations: [
 				{name: 'Diskfile_Change_Type', kind: 'variable'},
 				{name: 'map_watcher_change_to_diskfile_change', kind: 'function'},
 			],
 		},
+		'./Diskfile_View.svelte': {path: 'Diskfile_View.svelte', declarations: []},
 		'./diskfile.svelte.js': {
 			path: 'diskfile.svelte.ts',
 			declarations: [
@@ -629,16 +626,8 @@ export const src_json = {
 		'./Main_Dialog.svelte': {path: 'Main_Dialog.svelte', declarations: []},
 		'./Message_Info.svelte': {path: 'Message_Info.svelte', declarations: []},
 		'./Message_Summary.svelte': {path: 'Message_Summary.svelte', declarations: []},
-		'./Message_View.svelte': {path: 'Message_View.svelte', declarations: []},
-		'./message.helpers.js': {
-			path: 'message.helpers.ts',
-			declarations: [
-				{name: 'is_message_type', kind: null},
-				{name: 'get_message_debug_info', kind: null},
-			],
-		},
-		'./message.schema.js': {
-			path: 'message.schema.ts',
+		'./message_types.js': {
+			path: 'message_types.ts',
 			declarations: [
 				{name: 'Message_Direction', kind: 'variable'},
 				{name: 'Message_Type', kind: 'variable'},
@@ -656,6 +645,14 @@ export const src_json = {
 				{name: 'Message', kind: 'variable'},
 				{name: 'Message_Json', kind: 'variable'},
 				{name: 'create_message_json', kind: 'function'},
+			],
+		},
+		'./Message_View.svelte': {path: 'Message_View.svelte', declarations: []},
+		'./message.helpers.js': {
+			path: 'message.helpers.ts',
+			declarations: [
+				{name: 'is_message_type', kind: null},
+				{name: 'get_message_debug_info', kind: null},
 			],
 		},
 		'./message.svelte.js': {
@@ -728,11 +725,11 @@ export const src_json = {
 		'./Provider_Logo.svelte': {path: 'Provider_Logo.svelte', declarations: []},
 		'./Provider_Select.svelte': {path: 'Provider_Select.svelte', declarations: []},
 		'./Provider_Summary.svelte': {path: 'Provider_Summary.svelte', declarations: []},
-		'./Provider_View.svelte': {path: 'Provider_View.svelte', declarations: []},
-		'./provider.schema.js': {
-			path: 'provider.schema.ts',
+		'./provider_types.js': {
+			path: 'provider_types.ts',
 			declarations: [{name: 'Provider_Name', kind: 'variable'}],
 		},
+		'./Provider_View.svelte': {path: 'Provider_View.svelte', declarations: []},
 		'./provider.svelte.js': {
 			path: 'provider.svelte.ts',
 			declarations: [

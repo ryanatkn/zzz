@@ -2,7 +2,7 @@ import {SvelteMap} from 'svelte/reactivity';
 import type {Source_File} from '@ryanatkn/gro/filer.js';
 import type {Path_Id} from '@ryanatkn/gro/path.js';
 
-import type {Message_Filer_Change} from '$lib/message.schema.js';
+import type {Message_Filer_Change} from '$lib/message_types.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 import {Uuid} from '$lib/uuid.js';
 import {Diskfile} from '$lib/diskfile.svelte.js';

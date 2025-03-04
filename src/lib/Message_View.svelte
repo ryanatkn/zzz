@@ -7,7 +7,7 @@
 
 	import Message_Info from '$lib/Message_Info.svelte';
 	import Message_Summary from '$lib/Message_Summary.svelte';
-	import type {Message} from '$lib/message.schema.js';
+	import type {Message} from '$lib/message_types.js';
 
 	interface Props {
 		message: Message;

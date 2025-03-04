@@ -1,7 +1,7 @@
 import {z} from 'zod';
 
 import {Uuid} from '$lib/uuid.js';
-import {Diskfile_Change_Type} from '$lib/diskfile.schema.js';
+import {Diskfile_Change_Type} from '$lib/diskfile_types.js';
 import {Completion_Request, Completion_Response} from '$lib/completion.js';
 import {Datetime_Now} from '$lib/zod_helpers.js';
 
