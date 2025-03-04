@@ -3,67 +3,23 @@
 import {z} from 'zod';
 import {DEV} from 'esm-env';
 
-import {zod_get_schema_keys} from '$lib/zod_helpers.js';
+import {get_field_schema, zod_get_schema_keys} from '$lib/zod_helpers.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
+import {
+	cell_class,
+	cell_array,
+	get_schema_class_info,
+	ZOD_CELL_CLASS_NAME,
+	ZOD_ELEMENT_CLASS_NAME,
+} from '$lib/cell_helpers.js';
 
-// Metadata properties for Zod schemas.
-// TODO better way to do this? Forces use of the helpers `cell_class` and `cell_array`
-export const ZOD_CELL_CLASS_NAME = 'zzz_cell_class_name';
-export const ZOD_ELEMENT_CLASS_NAME = 'zzz_element_class_name';
-
-// TODO refactor
-interface Schema_Info {
-	type?: string;
-	is_array?: boolean;
-	class_name?: string;
-	element_class?: string;
-}
+// Re-export the helpers for backward compatibility
+export {cell_class, cell_array, ZOD_CELL_CLASS_NAME, ZOD_ELEMENT_CLASS_NAME};
 
 // Base options type that all cells will extend
 export interface Cell_Options<T_Schema extends z.ZodType, T_Zzz extends Zzz = Zzz> {
 	zzz: T_Zzz;
 	json?: z.input<T_Schema>;
-}
-
-/**
- * Attaches class name metadata to a Zod schema for cell instantiation.
- * This allows the cell system to know which class to instantiate for a given schema.
- *
- * @param schema The Zod schema to annotate
- * @param className The name of the class to instantiate for this schema
- * @returns The original schema with metadata attached
- */
-export function cell_class<T extends z.ZodTypeAny>(schema: T, className: string): T {
-	// Instead of using transform which changes the type, just attach metadata
-	(schema as any)[ZOD_CELL_CLASS_NAME] = className;
-	return schema;
-}
-
-/**
- * Attaches element class name metadata to an array schema for cell array instantiation.
- * This allows the cell system to know which class to instantiate for each element in the array.
- *
- * @param schema The array Zod schema to annotate (or ZodDefault containing an array)
- * @param className The name of the class to instantiate for each element
- * @returns The original schema with metadata attached
- */
-export function cell_array<T extends z.ZodTypeAny>(schema: T, className: string): T {
-	// Use type casting to access the inner ZodArray if this is a ZodDefault
-	// This safely handles both direct ZodArrays and ZodDefault<ZodArray>
-	const arraySchema =
-		schema instanceof z.ZodDefault
-			? (schema._def.innerType as z.ZodArray<any>)
-			: (schema as unknown as z.ZodArray<any>);
-
-	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-	if (!arraySchema._def) {
-		console.warn('cell_array: Schema is not a ZodArray or ZodDefault<ZodArray>');
-		return schema;
-	}
-
-	// Add the element_class property to the array schema
-	(arraySchema._def as any)[ZOD_ELEMENT_CLASS_NAME] = className;
-	return schema;
 }
 
 // TODO maybe rename to `Json_Cell` to be more explicit? Or `Snapshottable`?
@@ -92,11 +48,19 @@ export abstract class Cell<T_Schema extends z.ZodType, T_Zzz extends Zzz = Zzz> 
 	}
 
 	/**
-	 * Initialize the instance with options.json data if provided.
-	 * Should be called by subclasses at the end of their constructor.
+	 * Initialize the instance with `options.json` data if provided.
+	 * Should be called by subclasses at the end of their constructor
+	 * or elsewhere before using the instance.
 	 */
 	protected init(): void {
 		this.set_json(this.options.json); // `set_json` parses with the schema, so this may be `undefined` and it's fine
+	}
+
+	/**
+	 * For Svelte's $snapshot
+	 */
+	toJSON(): z.output<T_Schema> {
+		return this.json;
 	}
 
 	to_json(): z.output<T_Schema> {
@@ -111,6 +75,23 @@ export abstract class Cell<T_Schema extends z.ZodType, T_Zzz extends Zzz = Zzz> 
 		}
 
 		return result as z.output<T_Schema>;
+	}
+
+	/**
+	 * Generic clone method that works for any subclass.
+	 */
+	clone(): this {
+		const constructor = this.constructor as new (options: Cell_Options<T_Schema, T_Zzz>) => this;
+
+		try {
+			return new constructor({
+				zzz: this.zzz,
+				json: structuredClone(this.json),
+			});
+		} catch (error) {
+			console.error(`Failed to clone instance of ${constructor.name}:`, error);
+			throw new Error(`Failed to clone: ${error instanceof Error ? error.message : String(error)}`);
+		}
 	}
 
 	/**
@@ -185,51 +166,28 @@ export abstract class Cell<T_Schema extends z.ZodType, T_Zzz extends Zzz = Zzz> 
 		return value;
 	}
 
-	// TODO cache, derived?
 	/**
 	 * Extract schema information for a field
 	 */
-	#get_schema_info(key: string): Schema_Info | null {
+	#get_schema_info(key: string): {
+		type?: string;
+		is_array?: boolean;
+		class_name?: string;
+		element_class?: string;
+	} | null {
 		const field_schema = this.#get_field_schema(key);
-		if (!field_schema) return null;
-
-		const def = (field_schema as any)._def;
-		if (!def) return null;
-
-		const result: Schema_Info = {
-			type: def.typeName,
-		};
-
-		// Check if it's an array
-		if (def.typeName === 'ZodArray') {
-			result.is_array = true;
-
-			// Look for element class metadata
-			if (def[ZOD_ELEMENT_CLASS_NAME]) {
-				result.element_class = def[ZOD_ELEMENT_CLASS_NAME];
-			}
-
-			// Also look at the inner type
-			const element_type = def.type;
-			if (element_type?.[ZOD_CELL_CLASS_NAME]) {
-				result.element_class = element_type[ZOD_CELL_CLASS_NAME];
-			}
+		// Fix the error by handling the undefined case
+		if (!field_schema) {
+			return null;
 		}
-		// Check for class metadata on the field itself
-		else if ((field_schema as any)[ZOD_CELL_CLASS_NAME]) {
-			result.class_name = (field_schema as any)[ZOD_CELL_CLASS_NAME];
-		}
-
-		return result;
+		return get_schema_class_info(field_schema);
 	}
 
 	/**
 	 * Get the Zod schema for a specific field
 	 */
 	#get_field_schema(key: string): z.ZodTypeAny | undefined {
-		// Access the schema's shape if it's an object schema
-		const schema_obj = this.schema as unknown as {shape?: Record<string, z.ZodTypeAny>};
-		return schema_obj.shape?.[key];
+		return get_field_schema(this.schema, key);
 	}
 
 	// Fix the instantiate_class method to handle undefined
@@ -240,29 +198,5 @@ export abstract class Cell<T_Schema extends z.ZodType, T_Zzz extends Zzz = Zzz> 
 
 		const instance = this.zzz.registry.instantiate<T>(class_name, json);
 		return instance !== null ? instance : json;
-	}
-
-	/**
-	 * For Svelte's $snapshot
-	 */
-	toJSON(): z.output<T_Schema> {
-		return this.json;
-	}
-
-	/**
-	 * Generic clone method that works for any subclass.
-	 */
-	clone(): this {
-		const constructor = this.constructor as new (options: Cell_Options<T_Schema, T_Zzz>) => this;
-
-		try {
-			return new constructor({
-				zzz: this.zzz,
-				json: structuredClone(this.json),
-			});
-		} catch (error) {
-			console.error(`Failed to clone instance of ${constructor.name}:`, error);
-			throw new Error(`Failed to clone: ${error instanceof Error ? error.message : String(error)}`);
-		}
 	}
 }

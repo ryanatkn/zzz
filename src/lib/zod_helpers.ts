@@ -25,3 +25,16 @@ export const zod_get_schema_keys = <T extends z.ZodTypeAny>(schema: T): Array<st
 		return EMPTY_ARRAY;
 	}
 };
+
+/**
+ * Get the Zod schema for a specific field in an object schema
+ *
+ * @param schema The object schema
+ * @param key The property name
+ * @returns The field's schema, or undefined if not found
+ */
+export const get_field_schema = (schema: z.ZodTypeAny, key: string): z.ZodTypeAny | undefined => {
+	// Access the schema's shape if it's an object schema
+	const schema_obj = schema as unknown as {shape?: Record<string, z.ZodTypeAny>};
+	return schema_obj.shape?.[key];
+};
