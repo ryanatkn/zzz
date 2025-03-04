@@ -35,6 +35,8 @@
 		selected_file_id = file.id;
 		onselect?.(file);
 	};
+
+	// TODO BLOCK `Select a file to view details` is bugged before anything is selected
 </script>
 
 <div class="file_explorer">
