@@ -7,14 +7,13 @@ type Class_Constructor<T> = new (options: any) => T;
  * Registry for managing class constructors and handling instantiation
  */
 export class Cell_Registry<T_Zzz> {
-	// Store a reference to the parent zzz instance
-	readonly #zzz: T_Zzz;
+	readonly zzz: T_Zzz;
 
 	// Map of class names to constructors
 	readonly #constructors: Map<string, Class_Constructor<any>> = new Map();
 
 	constructor(zzz: T_Zzz) {
-		this.#zzz = zzz;
+		this.zzz = zzz;
 	}
 
 	/**
@@ -36,7 +35,7 @@ export class Cell_Registry<T_Zzz> {
 			return null;
 		}
 
-		return new constructor({zzz: this.#zzz, json}) as T;
+		return new constructor({zzz: this.zzz, json}) as T;
 	}
 
 	/**
