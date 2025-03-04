@@ -32,7 +32,6 @@ export class Messages extends Cell<typeof Messages_Json> {
 
 	// Lookup maps for performance
 	by_id: SvelteMap<Uuid, Message> = new SvelteMap();
-	by_time: SvelteMap<number, Message> = new SvelteMap();
 
 	// Use proper message types instead of any
 	#send_message?: (message: Message_Client) => void;
@@ -53,7 +52,6 @@ export class Messages extends Cell<typeof Messages_Json> {
 	 */
 	#rebuild_indexes(): void {
 		this.by_id.clear();
-		this.by_time.clear();
 
 		for (const message of this.items) {
 			if (message.id) {
@@ -117,9 +115,7 @@ export class Messages extends Cell<typeof Messages_Json> {
 		this.items.push(message);
 
 		// Update indexes
-		if (message.id) {
-			this.by_id.set(message.id, message);
-		}
+		this.by_id.set(message.id, message);
 
 		return message;
 	}
