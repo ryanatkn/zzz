@@ -61,7 +61,7 @@ export class Zzz {
 	readonly chats = new Chats({zzz: this});
 	readonly providers = new Providers({zzz: this});
 	readonly prompts = new Prompts({zzz: this});
-	readonly files = new Diskfiles({zzz: this});
+	readonly diskfiles = new Diskfiles({zzz: this});
 	readonly messages = new Messages({zzz: this});
 
 	// Change tags to use the readonly models instance

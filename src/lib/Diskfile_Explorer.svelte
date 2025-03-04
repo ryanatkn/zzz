@@ -16,7 +16,7 @@
 	let selected_file_id: string | null = $state(null); // TODO BLOCK hoist to zzz
 
 	const sorted_files: Array<Diskfile> = $derived(
-		[...zzz.files.items].sort((a, b) => {
+		[...zzz.diskfiles.items].sort((a, b) => {
 			// Handle null/undefined path values
 			if (!a.path && !b.path) return 0;
 			if (!a.path) return 1; // null paths go last

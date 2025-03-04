@@ -7,7 +7,7 @@
 	const zzz = zzz_context.get();
 
 	// TODO BLOCK shouldn't be needed
-	const files = $derived(zzz.files.items.filter((file) => !file.external));
+	const files = $derived(zzz.diskfiles.items.filter((file) => !file.external));
 
 	// TODO BLOCK shouldnt be needed
 	const files_map: Map<string, Diskfile> = $derived(new Map(files.map((f) => [f.id, f])));

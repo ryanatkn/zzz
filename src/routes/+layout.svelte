@@ -99,7 +99,7 @@
 					console.log(`[page] loaded_session`, message);
 					for (const [path_id, source_file] of Object.entries(message.data.files)) {
 						if (!source_file) continue;
-						zzz.files.handle_change({
+						zzz.diskfiles.handle_change({
 							type: 'filer_change',
 							id: Uuid.parse(undefined),
 							change: {type: 'add', path: path_id as Diskfile_Path},
@@ -114,7 +114,7 @@
 					break;
 				}
 				case 'filer_change': {
-					zzz.files.handle_change(message);
+					zzz.diskfiles.handle_change(message);
 					break;
 				}
 				case 'echo': {

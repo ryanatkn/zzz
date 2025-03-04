@@ -56,7 +56,7 @@
 			// TODO BLOCK better confirmation
 			// eslint-disable-next-line no-alert
 			if (confirm(`Are you sure you want to delete ${display_name}?`)) {
-				zzz.files.delete(file.path);
+				zzz.diskfiles.delete(file.path);
 			}
 		}}
 	>

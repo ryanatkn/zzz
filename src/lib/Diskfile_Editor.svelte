@@ -72,7 +72,7 @@
 		disabled={!has_changes}
 		onclick={() => {
 			contents_history.push({created: Date.now(), contents: updated_contents});
-			zzz.files.update(file.path, updated_contents); // Use path instead of file_id
+			zzz.diskfiles.update(file.path, updated_contents); // Use path instead of file_id
 			discarded_contents = null;
 		}}>save changes</button
 	>
@@ -88,7 +88,7 @@
 		{/snippet}
 	</Clear_Restore_Button>
 
-	<Confirm_Button onclick={() => zzz.files.delete(file.path)} attrs={{class: 'color_c'}}>
+	<Confirm_Button onclick={() => zzz.diskfiles.delete(file.path)} attrs={{class: 'color_c'}}>
 		<!-- Use path instead of file_id -->
 		{#snippet children()}
 			delete file
