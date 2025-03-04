@@ -100,6 +100,7 @@ export class Zzz {
 		}
 	}
 
+	// TODO BLOCK do this externally for extensibility but need to make sure initialization in the constructor continues to work
 	/**
 	 * Register all cell classes with the registry
 	 */

@@ -30,8 +30,8 @@ export class Messages extends Cell<typeof Messages_Json> {
 	by_time: SvelteMap<number, Message> = new SvelteMap();
 
 	// Use proper message types instead of any
-	#send_handler?: (message: Message_Client) => void;
-	#receive_handler?: (message: Message_Server) => void;
+	#send_message?: (message: Message_Client) => void;
+	#onreceive?: (message: Message_Server) => void;
 
 	// Remove the unused #receive_handler property
 
@@ -70,36 +70,56 @@ export class Messages extends Cell<typeof Messages_Json> {
 	 * Set message handlers with proper typing
 	 */
 	set_handlers(
-		send_handler: (message: Message_Client) => void,
-		receive_handler: (message: Message_Server) => void,
+		send_message: (message: Message_Client) => void,
+		onreceive: (message: Message_Server) => void,
 	): void {
 		// Store the send handler
-		this.#send_handler = send_handler;
-		this.#receive_handler = receive_handler;
+		this.#send_message = send_message;
+		this.#onreceive = onreceive;
 	}
 
 	/**
 	 * Send a message using the registered handler with proper typing
 	 */
 	send(message: Message_Client): void {
-		if (!this.#send_handler) {
+		if (!this.#send_message) {
 			console.error('No send handler registered');
 			return;
 		}
 
-		this.#send_handler(message);
+		this.#send_message(message);
 	}
 
 	/**
 	 * Handle a received message with proper typing
 	 */
 	receive(message: Message_Server): void {
-		if (!this.#receive_handler) {
+		if (!this.#onreceive) {
 			console.error('No receive handler registered');
 			return;
 		}
 
-		this.#receive_handler(message);
+		// TODO something like this should be correct, right?
+		//
+		// but the type here is wrong and it fails to parse as a Message:
+		// cell.svelte.ts:156 Error setting JSON for Message: ZodError: [
+		// 	{
+		// 		"expected": "'client' | 'server' | 'both'",
+		// 		"received": "undefined",
+		// 		"code": "invalid_type",
+		// 		"path": [
+		// 			"direction"
+		// 		],
+		// 		"message": "Required"
+		// 	}
+		// ]
+		//
+		// and the type error:
+		//
+		// Argument of type '{ id: string & BRAND<"Uuid">; type: "echo"; data?: any; } | { id: string & BRAND<"Uuid">; type: "loaded_session"; data: { files: Partial<Record<string & BRAND<"Diskfile_Path">, { ...; }>>; }; } | { ...; } | { ...; }' is not assignable to parameter of type '{ id: string & BRAND<"Uuid">; type: "echo" | "send_prompt" | "completion_response" | "update_diskfile" | "delete_diskfile" | "filer_change" | "load_session" | "loaded_session"; ... 8 more ...; source_file?: any; }'.
+		// Type '{ id: string & BRAND<"Uuid">; type: "echo"; data?: any; }' is missing the following properties from type '{ id: string & BRAND<"Uuid">; type: "echo" | "send_prompt" | "completion_response" | "update_diskfile" | "delete_diskfile" | "filer_change" | "load_session" | "loaded_session"; ... 8 more ...; source_file?: any; }': direction, createdts(2345)
+		this.add(message);
+		this.#onreceive(message);
 	}
 
 	/**
@@ -115,21 +135,5 @@ export class Messages extends Cell<typeof Messages_Json> {
 		}
 
 		return message;
-	}
-
-	/**
-	 * Get a message by ID
-	 */
-	get_by_id(id: Uuid): Message | undefined {
-		return this.by_id.get(id);
-	}
-
-	/**
-	 * Clear all messages
-	 */
-	clear(): void {
-		this.items.length = 0;
-		this.by_id.clear();
-		this.by_time.clear();
 	}
 }
