@@ -96,38 +96,7 @@ export abstract class Cell<T_Schema extends z.ZodType, T_Zzz extends Zzz = Zzz> 
 	 * Should be called by subclasses at the end of their constructor.
 	 */
 	protected init(): void {
-		if (this.options.json !== undefined) {
-			this.set_json(this.options.json);
-		} else {
-			this.apply_defaults();
-		}
-	}
-
-	/**
-	 * Apply schema defaults safely for properties that don't already have values.
-	 */
-	protected apply_defaults(): void {
-		try {
-			// Get the default values from the schema
-			const defaults = this.schema.parse(undefined);
-
-			// Only apply defaults for properties that don't exist yet
-			for (const key of this.schema_keys) {
-				if (!(key in this) || (this as any)[key] === undefined) {
-					try {
-						(this as any)[key] = defaults[key];
-					} catch (e) {
-						// Skip properties that can't be assigned (e.g., private members)
-						console.warn(
-							`Couldn't apply default for property ${key} in ${this.constructor.name}`,
-							e,
-						);
-					}
-				}
-			}
-		} catch (error) {
-			console.error(`Error applying defaults for ${this.constructor.name}:`, error);
-		}
+		this.set_json(this.options.json); // `set_json` parses with the schema, so this may be `undefined` and it's fine
 	}
 
 	to_json(): z.output<T_Schema> {
