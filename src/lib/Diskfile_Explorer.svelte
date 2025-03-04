@@ -1,7 +1,6 @@
 <script lang="ts">
 	import {slide} from 'svelte/transition';
 
-	import Diskfile_View from '$lib/Diskfile_View.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import Diskfile_List_Item from '$lib/Diskfile_List_Item.svelte';
@@ -14,10 +13,7 @@
 
 	const zzz = zzz_context.get();
 
-	let selected_file_id: string | null = $state(null);
-	let selected_file: Diskfile | undefined = $derived(
-		selected_file_id ? zzz.files.by_id.get(selected_file_id) : undefined,
-	);
+	let selected_file_id: string | null = $state(null); // TODO BLOCK hoist to zzz
 
 	const sorted_files: Array<Diskfile> = $derived(
 		[...zzz.files.files].sort((a, b) => {
@@ -35,8 +31,6 @@
 		selected_file_id = file.id;
 		onselect?.(file);
 	};
-
-	// TODO BLOCK `Select a file to view details` is bugged before anything is selected
 </script>
 
 <div class="file_explorer">
@@ -57,14 +51,6 @@
 			</ul>
 		{/if}
 	</div>
-
-	<div class="file_details panel">
-		{#if selected_file}
-			<Diskfile_View file={selected_file} />
-		{:else}
-			<div class="empty_state">Select a file to view details</div>
-		{/if}
-	</div>
 </div>
 
 <style>
@@ -75,8 +61,7 @@
 		height: 100%;
 	}
 
-	.file_list,
-	.file_details {
+	.file_list {
 		overflow: auto;
 		height: 100%;
 	}

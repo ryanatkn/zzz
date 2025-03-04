@@ -7,7 +7,7 @@ import {Datetime, Datetime_Now} from '$lib/zod_helpers.js';
 import {Uuid} from '$lib/uuid.js';
 
 // Define file change types
-export const Diskfile_Change_Type = z.enum(['add', 'change', 'unlink']);
+export const Diskfile_Change_Type = z.enum(['add', 'change', 'delete']);
 export type Diskfile_Change_Type = z.infer<typeof Diskfile_Change_Type>;
 
 // TODO ideally this shouldn't exist, right?

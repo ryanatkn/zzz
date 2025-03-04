@@ -79,7 +79,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 				this.by_path.set(diskfile.path, diskfile.id);
 				break;
 			}
-			case 'unlink': {
+			case 'delete': {
 				this.#source_files.delete(validated_source_file.id);
 				const diskfile_id = this.by_path.get(validated_source_file.id);
 				if (diskfile_id) {

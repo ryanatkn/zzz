@@ -21,21 +21,7 @@
 	// Computed properties
 	const display_name = $derived(file.path ? to_root_path(file.path) : 'Unnamed file');
 
-	// Handler for deleting the file
-	const delete_file = () => {
-		// TODO BLOCK
-		// eslint-disable-next-line no-alert
-		if (confirm(`Are you sure you want to delete ${display_name}?`)) {
-			zzz.files.delete(file.path);
-		}
-	};
-
-	// Handler for copying file contents
-	const copy_contents = () => {
-		if (file.contents) {
-			navigator.clipboard.writeText(file.contents);
-		}
-	};
+	// TODO BLOCK generic contextmenu entries for other components? so module scope export?
 </script>
 
 <button
@@ -54,12 +40,26 @@
 
 {#snippet contextmenu_entries()}
 	<!-- TODO add this contextmenu feature: disabled={!file.contents} -->
-	<Contextmenu_Entry run={copy_contents}>
+	<Contextmenu_Entry
+		run={async () => {
+			if (file.contents) {
+				await navigator.clipboard.writeText(file.contents);
+			}
+		}}
+	>
 		{#snippet icon()}{GLYPH_COPY}{/snippet}
 		<span>Copy contents</span>
 	</Contextmenu_Entry>
 
-	<Contextmenu_Entry run={delete_file}>
+	<Contextmenu_Entry
+		run={() => {
+			// TODO BLOCK better confirmation
+			// eslint-disable-next-line no-alert
+			if (confirm(`Are you sure you want to delete ${display_name}?`)) {
+				zzz.files.delete(file.path);
+			}
+		}}
+	>
 		{#snippet icon()}{GLYPH_REMOVE}{/snippet}
 		<span>Delete file</span>
 	</Contextmenu_Entry>
@@ -74,6 +74,8 @@
 		padding: 0 var(--space_xs);
 		box-shadow: none;
 		border: var(--border_width_1) solid transparent;
+		font-weight: 400;
+		font-size: var(--size_sm);
 	}
 
 	button.selected {

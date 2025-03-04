@@ -236,6 +236,11 @@ export const package_json = {
 			svelte: './dist/Diskfile_Info.svelte',
 			default: './dist/Diskfile_Info.svelte',
 		},
+		'./Diskfile_List_Item.svelte': {
+			types: './dist/Diskfile_List_Item.svelte.d.ts',
+			svelte: './dist/Diskfile_List_Item.svelte',
+			default: './dist/Diskfile_List_Item.svelte',
+		},
 		'./Diskfile_List.svelte': {
 			types: './dist/Diskfile_List.svelte.d.ts',
 			svelte: './dist/Diskfile_List.svelte',
@@ -592,6 +597,7 @@ export const src_json = {
 		'./Diskfile_Editor.svelte': {path: 'Diskfile_Editor.svelte', declarations: []},
 		'./Diskfile_Explorer.svelte': {path: 'Diskfile_Explorer.svelte', declarations: []},
 		'./Diskfile_Info.svelte': {path: 'Diskfile_Info.svelte', declarations: []},
+		'./Diskfile_List_Item.svelte': {path: 'Diskfile_List_Item.svelte', declarations: []},
 		'./Diskfile_List.svelte': {path: 'Diskfile_List.svelte', declarations: []},
 		'./Diskfile_Summary.svelte': {path: 'Diskfile_Summary.svelte', declarations: []},
 		'./diskfile_types.js': {
@@ -632,6 +638,7 @@ export const src_json = {
 			declarations: [
 				{name: 'GLYPH_REMOVE', kind: 'variable'},
 				{name: 'GLYPH_DRAG', kind: 'variable'},
+				{name: 'GLYPH_COPY', kind: 'variable'},
 				{name: 'GLYPH_CHAT', kind: 'variable'},
 				{name: 'GLYPH_TAPE', kind: 'variable'},
 				{name: 'GLYPH_FILE', kind: 'variable'},

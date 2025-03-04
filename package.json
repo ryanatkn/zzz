@@ -277,6 +277,11 @@
       "svelte": "./dist/Diskfile_Info.svelte",
       "default": "./dist/Diskfile_Info.svelte"
     },
+    "./Diskfile_List_Item.svelte": {
+      "types": "./dist/Diskfile_List_Item.svelte.d.ts",
+      "svelte": "./dist/Diskfile_List_Item.svelte",
+      "default": "./dist/Diskfile_List_Item.svelte"
+    },
     "./Diskfile_List.svelte": {
       "types": "./dist/Diskfile_List.svelte.d.ts",
       "svelte": "./dist/Diskfile_List.svelte",
