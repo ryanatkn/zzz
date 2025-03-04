@@ -21,9 +21,11 @@ export const Diskfiles_Json = z
 			z.array(Diskfile_Json).default(() => []),
 			'Diskfile',
 		),
+		selected_file_id: Uuid.nullable().default(null),
 	})
 	.default(() => ({
 		files: [],
+		selected_file_id: null,
 	}));
 
 export type Diskfiles_Json = z.infer<typeof Diskfiles_Json>;
@@ -33,11 +35,21 @@ export interface Diskfiles_Options extends Cell_Options<typeof Diskfiles_Json> {
 export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 	// Define property explicitly to match schema
 	items: Array<Diskfile> = $state([]);
+	selected_file_id: Uuid | null = $state(null);
 
 	// TODO these are managed incrementally instead of using `$derived`, which makes the code more efficient but harder to follow and more error prone, maybe rethink, or put additional abstraction around it for safeguards
 	// Maps for lookup - separate from schema
 	by_id: SvelteMap<Uuid, Diskfile> = new SvelteMap();
 	by_path: SvelteMap<Diskfile_Path, Uuid> = new SvelteMap();
+
+	// Derived properties for file filtering and selection
+	non_external_files: Array<Diskfile> = $derived(this.items.filter((file) => !file.external));
+	files_map: Map<string, Diskfile> = $derived(
+		new Map(this.non_external_files.map((f) => [f.id, f])),
+	);
+	selected_file: Diskfile | null = $derived(
+		this.selected_file_id && (this.files_map.get(this.selected_file_id) ?? null),
+	);
 
 	// Private source files storage
 	#source_files: SvelteMap<Diskfile_Path, Gro_Source_File> = new SvelteMap();
@@ -156,5 +168,12 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 	get_by_path(path: Diskfile_Path): Diskfile | undefined {
 		const id = this.by_path.get(path);
 		return id ? this.by_id.get(id) : undefined;
+	}
+
+	/**
+	 * Select a file by ID
+	 */
+	select_file(id: Uuid | null): void {
+		this.selected_file_id = id;
 	}
 }

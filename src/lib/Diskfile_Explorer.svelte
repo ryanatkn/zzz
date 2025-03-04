@@ -12,11 +12,10 @@
 	const {onselect}: Props = $props();
 
 	const zzz = zzz_context.get();
-
-	let selected_file_id: string | null = $state(null); // TODO BLOCK hoist to zzz
+	const {diskfiles} = zzz;
 
 	const sorted_files: Array<Diskfile> = $derived(
-		[...zzz.diskfiles.items].sort((a, b) => {
+		[...diskfiles.non_external_files].sort((a, b) => {
 			// Handle null/undefined path values
 			if (!a.path && !b.path) return 0;
 			if (!a.path) return 1; // null paths go last
@@ -26,9 +25,9 @@
 		}),
 	);
 
-	// Handler for selecting a file
+	// Handler for selecting a file, now using the diskfiles.select_file method
 	const select_file = (file: Diskfile): void => {
-		selected_file_id = file.id;
+		diskfiles.select_file(file.id);
 		onselect?.(file);
 	};
 </script>
@@ -43,7 +42,7 @@
 					<li transition:slide>
 						<Diskfile_List_Item
 							{file}
-							selected={selected_file_id === file.id}
+							selected={diskfiles.selected_file_id === file.id}
 							onclick={select_file}
 						/>
 					</li>
