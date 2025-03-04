@@ -125,19 +125,16 @@ export abstract class Cell<T_Schema extends z.ZodType, T_Zzz extends Zzz = Zzz> 
 		return result as z.output<T_Schema>;
 	}
 
-	// Fix the encode method by removing the unused parameter warning
+	/**
+	 * Encode a value during serialization. Can be overridden for custom encoding logic.
+	 * Defaults to Svelte's `$state.snapshot`,
+	 * which handles most cases and uses `toJSON` when available,
+	 * so overriding `to_json` is sufficient for most cases before overriding `encode`.
+	 * @param value The value to encode
+	 * @param key The property key
+	 * @returns The encoded value
+	 */
 	encode(value: unknown, _key: string): unknown {
-		// Handle arrays of Cell objects
-		if (Array.isArray(value) && value.length > 0 && value[0] instanceof Cell) {
-			return value.map((item) => (item instanceof Cell ? item.to_json() : item));
-		}
-
-		// Handle individual Cell objects
-		if (value instanceof Cell) {
-			return value.to_json();
-		}
-
-		// Default snapshot
 		return $state.snapshot(value);
 	}
 
