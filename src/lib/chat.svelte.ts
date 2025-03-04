@@ -1,3 +1,4 @@
+import {z} from 'zod';
 import type {Async_Status} from '@ryanatkn/belt/async.js';
 
 import type {Model} from '$lib/model.svelte.js';
@@ -7,42 +8,88 @@ import {
 	type Completion_Response,
 } from '$lib/completion.js';
 import {Uuid} from '$lib/uuid.js';
-import type {Zzz} from '$lib/zzz.svelte.js';
 import {get_unique_name} from '$lib/helpers.js';
-import {Tape} from '$lib/tape.svelte.js';
+import {Tape, Tape_Json} from '$lib/tape.svelte.js';
 import type {Prompt} from '$lib/prompt.svelte.js';
 import {reorder_list} from '$lib/list_helpers.js';
+import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
+import {Datetime_Now} from '$lib/zod_helpers.js';
 
 const NEW_CHAT_PREFIX = 'new chat';
 
 export interface Chat_Message {
 	id: Uuid;
-	created: string;
+	created: Datetime_Now;
 	content: string; // renamed from text
 	request?: Completion_Request;
 	response?: Completion_Response;
 }
 
-export class Chat {
-	// TODO json/cell pattern
-	id: Uuid = Uuid.parse(undefined);
+export const Chat_Json = z
+	.object({
+		id: Uuid,
+		name: z.string(),
+		created: Datetime_Now,
+		tapes: z.array(Tape_Json).default(() => []),
+		selected_prompt_ids: z.array(Uuid).default(() => []),
+	})
+	.default(() => ({}));
+
+export type Chat_Json = z.infer<typeof Chat_Json>;
+
+export interface Chat_Options extends Cell_Options<typeof Chat_Json> {}
+
+export class Chat extends Cell<typeof Chat_Json> {
+	id: Uuid = $state()!;
 	name: string = $state()!;
-	created: string = new Date().toISOString();
+	created: Datetime_Now = $state()!;
 	tapes: Array<Tape> = $state([]);
 	selected_prompts: Array<Prompt> = $state([]);
-	zzz: Zzz;
 
-	constructor(zzz: Zzz) {
-		this.zzz = zzz;
-		this.name = get_unique_name(
-			NEW_CHAT_PREFIX,
-			this.zzz.chats.items.map((c) => c.name),
-		);
+	init_name_status: Async_Status = $state('initial');
+
+	constructor(options: Chat_Options) {
+		super(Chat_Json, options);
+
+		if (!options.json?.name) {
+			this.name = get_unique_name(
+				NEW_CHAT_PREFIX,
+				this.zzz.chats.items.map((c) => c.name),
+			);
+		}
+
+		if (!options.json?.created) {
+			this.created = Datetime_Now.parse(undefined);
+		}
+
+		this.init();
+
+		// Handle selected prompts separately after initialization
+		if (options.json?.selected_prompt_ids) {
+			this.selected_prompts = options.json.selected_prompt_ids
+				.map((id) => this.zzz.prompts.items.find((p) => p.id === id))
+				.filter((p): p is Prompt => p !== undefined);
+		}
+	}
+
+	// TODO BLOCK @many shouldn't exist, need to somehow know to only use the id instead of `$state.snapshot(thing)`
+	override to_json(): z.output<typeof Chat_Json> {
+		return {
+			id: this.id,
+			name: this.name,
+			created: this.created,
+			tapes: this.tapes.map((tape) => tape.json),
+			selected_prompt_ids: this.selected_prompts.map((p) => p.id),
+		};
 	}
 
 	add_tape(model: Model): void {
-		console.log(`add_tape model`, model);
-		this.tapes.push(new Tape(model));
+		this.tapes.push(
+			new Tape({
+				zzz: this.zzz,
+				model,
+			}),
+		);
 	}
 
 	add_tapes_by_model_tag(tag: string): void {
@@ -95,10 +142,10 @@ export class Chat {
 		const message: Chat_Message = {
 			id: message_id,
 			// TODO add `chat_id`?
-			created: new Date().toISOString(),
+			created: Datetime_Now.parse(undefined),
 			content,
 			request: {
-				created: new Date().toISOString(),
+				created: Datetime_Now.parse(undefined),
 				request_id: message_id,
 				provider_name: tape.model.provider_name,
 				model: tape.model.name,
@@ -121,8 +168,6 @@ export class Chat {
 		// Don't await because callers don't care about the result.
 		void this.init_name(message_updated);
 	}
-
-	init_name_status: Async_Status = $state('initial');
 
 	/**
 	 * Uses an LLM to name the chat based on the current messages.

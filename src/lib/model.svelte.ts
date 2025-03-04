@@ -1,12 +1,14 @@
-import type {Flavored} from '@ryanatkn/belt/types.js';
 import {z} from 'zod';
 
 import {Provider_Name} from '$lib/provider.schema.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import type {Ollama_Model_Info} from '$lib/ollama.js';
 
+export const Model_Name = z.string();
+export type Model_Name = z.infer<typeof Model_Name>;
+
 export const Model_Json = z.object({
-	name: z.string(),
+	name: Model_Name,
 	provider_name: Provider_Name,
 	tags: z.array(z.string()).default(() => []),
 	architecture: z.string().optional(),
@@ -21,8 +23,6 @@ export const Model_Json = z.object({
 	ollama_model_info: z.any().optional(),
 });
 export type Model_Json = z.infer<typeof Model_Json>;
-
-export type Model_Name = Flavored<string, 'Model'>;
 
 export interface Model_Options extends Cell_Options<typeof Model_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 

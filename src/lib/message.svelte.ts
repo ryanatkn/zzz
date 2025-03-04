@@ -9,6 +9,7 @@ import {
 } from '$lib/completion.js';
 import {Uuid} from '$lib/uuid.js';
 import {Message_Json, type Message_Direction, type Message_Type} from '$lib/message.schema.js';
+import type {Datetime_Now} from '$lib/zod_helpers.js';
 
 // Constants for preview length and formatting
 export const MESSAGE_PREVIEW_MAX_LENGTH = 50;
@@ -22,7 +23,7 @@ export class Message extends Cell<typeof Message_Json> {
 	id: Uuid = $state()!;
 	type: Message_Type = $state()!;
 	direction: Message_Direction = $state()!;
-	created: string = $state()!;
+	created: Datetime_Now = $state()!;
 
 	// Store data based on message type
 	data: unknown = $state();

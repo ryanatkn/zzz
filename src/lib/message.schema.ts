@@ -7,6 +7,7 @@ import {
 	Completion_Response_Schema,
 	type Completion_Response,
 } from '$lib/completion.js';
+import {Datetime_Now} from '$lib/zod_helpers.js';
 
 // Direction enum
 export const Message_Direction = z.enum(['client', 'server', 'both']);
@@ -115,10 +116,7 @@ export const Message_Json = z.object({
 	id: Uuid,
 	type: Message_Type,
 	direction: Message_Direction,
-	created: z
-		.string()
-		.datetime()
-		.default(() => new Date().toISOString()),
+	created: Datetime_Now,
 	// Optional fields with proper type checking
 	data: z.any().optional(),
 	completion_request: Completion_Request.optional(),
@@ -142,7 +140,7 @@ export const create_message_json = (
 	return {
 		...message,
 		direction,
-		created: new Date().toISOString(),
+		created: Datetime_Now.parse(undefined),
 	} as Message_Json;
 };
 

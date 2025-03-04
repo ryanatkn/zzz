@@ -7,6 +7,7 @@ import {XML_TAG_NAME_DEFAULT} from '$lib/constants.js';
 import {Bit, Bit_Json} from '$lib/bit.svelte.js';
 import {reorder_list} from '$lib/list_helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
+import {Datetime_Now} from '$lib/zod_helpers.js';
 
 export const PROMPT_CONTENT_TRUNCATED_LENGTH = 100;
 
@@ -28,10 +29,7 @@ export const Prompt_Json = z
 			prompt_names.push(name);
 			return name;
 		}),
-		created: z
-			.string()
-			.datetime()
-			.default(() => new Date().toISOString()),
+		created: Datetime_Now,
 		bits: z.array(Bit_Json).default(() => []),
 	})
 	.default(() => ({}));
@@ -44,7 +42,7 @@ export interface Prompt_Options extends Cell_Options<typeof Prompt_Json> {
 export class Prompt extends Cell<typeof Prompt_Json> {
 	id: Uuid = $state()!;
 	name: string = $state()!;
-	created: string = $state()!;
+	created: Datetime_Now = $state()!;
 	bits: Array<Bit> = $state()!;
 
 	content: string = $derived(join_prompt_bits(this.bits));

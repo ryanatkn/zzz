@@ -1,6 +1,12 @@
 import {z} from 'zod';
 import {EMPTY_ARRAY} from '@ryanatkn/belt/array.js';
 
+// TODO move these?
+export const Datetime = z.string().datetime().brand('Datetime');
+export type Datetime = z.infer<typeof Datetime>;
+export const Datetime_Now = Datetime.default(() => new Date().toISOString());
+export type Datetime_Now = z.infer<typeof Datetime_Now>;
+
 /**
  * Gets all property keys from a Zod object schema
  */

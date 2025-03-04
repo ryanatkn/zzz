@@ -24,6 +24,7 @@ import {Messages} from '$lib/messages.svelte.js';
 import {Model, type Model_Json} from '$lib/model.svelte.js';
 import {Message} from '$lib/message.svelte.js';
 import {Cell_Registry} from '$lib/cell_registry.js';
+import {Datetime_Now} from '$lib/zod_helpers.js';
 
 export const zzz_context = create_context<Zzz>();
 
@@ -54,7 +55,7 @@ export class Zzz {
 	readonly prompts = new Prompts(this);
 	readonly files = new Diskfiles(this);
 	readonly messages = new Messages(this);
-	readonly registry = new Cell_Registry<Zzz>(this);
+	readonly registry = new Cell_Registry(this);
 
 	// Change tags to use the readonly models instance
 	tags: Set<string> = $derived(new Set(this.models.items.flatMap((m) => m.tags)));
@@ -132,7 +133,7 @@ export class Zzz {
 			id: request_id,
 			type: 'send_prompt',
 			completion_request: {
-				created: new Date().toISOString(),
+				created: Datetime_Now.parse(undefined),
 				request_id,
 				provider_name,
 				model,

@@ -6,6 +6,7 @@ import {z} from 'zod';
 
 import {Provider_Name} from '$lib/provider.schema.js';
 import {Uuid} from '$lib/uuid.js';
+import {Datetime_Now} from '$lib/zod_helpers.js';
 
 export interface Completion {
 	completion_request: Completion_Request;
@@ -13,10 +14,7 @@ export interface Completion {
 }
 
 export const Completion_Request = z.object({
-	created: z
-		.string()
-		.datetime()
-		.default(() => new Date().toISOString()),
+	created: Datetime_Now,
 	request_id: Uuid,
 	provider_name: Provider_Name,
 	model: z.string(),
@@ -25,7 +23,7 @@ export const Completion_Request = z.object({
 export type Completion_Request = z.infer<typeof Completion_Request>;
 
 export interface Completion_Response {
-	created: string;
+	created: Datetime_Now;
 	request_id: Uuid;
 	provider_name: Provider_Name;
 	model: string;
@@ -75,10 +73,7 @@ export const Completion_Response_Data_Schema = z.object({
 });
 
 export const Completion_Response_Schema = z.object({
-	created: z
-		.string()
-		.datetime()
-		.default(() => new Date().toISOString()),
+	created: Datetime_Now,
 	request_id: Uuid,
 	provider_name: Provider_Name,
 	model: z.string(),

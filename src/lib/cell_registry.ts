@@ -1,4 +1,5 @@
 import type {Cell} from '$lib/cell.svelte.js';
+import type {Zzz} from './zzz.svelte.js';
 
 // TODO extract helper?
 type Class_Constructor<T> = new (options: any) => T;
@@ -6,7 +7,7 @@ type Class_Constructor<T> = new (options: any) => T;
 /**
  * Registry for managing class constructors and handling instantiation
  */
-export class Cell_Registry<T_Zzz> {
+export class Cell_Registry<T_Zzz extends Zzz = Zzz> {
 	readonly zzz: T_Zzz;
 
 	// Map of class names to constructors

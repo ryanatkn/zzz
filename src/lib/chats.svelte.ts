@@ -1,5 +1,5 @@
 import type {Zzz} from '$lib/zzz.svelte.js';
-import {Chat} from '$lib/chat.svelte.js';
+import {Chat, Chat_Json} from '$lib/chat.svelte.js';
 import type {Uuid} from '$lib/uuid.js';
 import {reorder_list} from '$lib/list_helpers.js';
 
@@ -16,8 +16,8 @@ export class Chats {
 		this.zzz = zzz;
 	}
 
-	add(): Chat {
-		const chat = new Chat(this.zzz);
+	add(json?: Chat_Json): Chat {
+		const chat = new Chat({zzz: this.zzz, json});
 		this.items.unshift(chat); // TODO BLOCK @many use push and render with sort+filter
 		if (this.selected_id === null) {
 			this.selected_id = chat.id;
