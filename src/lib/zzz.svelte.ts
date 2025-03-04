@@ -54,14 +54,15 @@ export interface Zzz_Json {
 export class Zzz {
 	data: Zzz_Data = $state()!;
 
-	// TODO maybe change these APIs to have `zzz` be the first arg without the object wrapper
 	readonly registry = new Cell_Registry(this);
+
+	// TODO maybe change these APIs to have `zzz` be the first arg without the object wrapper
 	readonly models = new Models({zzz: this});
 	readonly chats = new Chats({zzz: this});
 	readonly providers = new Providers({zzz: this});
 	readonly prompts = new Prompts({zzz: this});
 	readonly files = new Diskfiles({zzz: this});
-	readonly messages = new Messages(this);
+	readonly messages = new Messages({zzz: this});
 
 	// Change tags to use the readonly models instance
 	tags: Set<string> = $derived(new Set(this.models.items.flatMap((m) => m.tags)));
@@ -97,6 +98,26 @@ export class Zzz {
 		if (options.models?.length) {
 			this.add_models(options.models);
 		}
+	}
+
+	/**
+	 * Register all cell classes with the registry
+	 */
+	#register_cell_classes(): void {
+		this.registry.register(Bit);
+		this.registry.register(Chat);
+		this.registry.register(Chats);
+		this.registry.register(Diskfile);
+		this.registry.register(Diskfiles);
+		this.registry.register(Message);
+		this.registry.register(Messages);
+		this.registry.register(Model);
+		this.registry.register(Models);
+		this.registry.register(Prompt);
+		this.registry.register(Prompts);
+		this.registry.register(Provider);
+		this.registry.register(Providers);
+		this.registry.register(Tape);
 	}
 
 	// TODO BLOCK extend cell so this doesnt exist, automatic from the schema
@@ -229,25 +250,5 @@ export class Zzz {
 	}
 	create_message(message_json: z.input<typeof Message_Json>): Message {
 		return new Message({zzz: this, json: message_json});
-	}
-
-	/**
-	 * Register all cell classes with the registry
-	 */
-	#register_cell_classes(): void {
-		// Register all classes that extend Cell
-		this.registry.register(Bit);
-		this.registry.register(Chat);
-		this.registry.register(Chats);
-		this.registry.register(Diskfile);
-		this.registry.register(Diskfiles);
-		this.registry.register(Message);
-		this.registry.register(Model);
-		this.registry.register(Models);
-		this.registry.register(Prompt);
-		this.registry.register(Prompts);
-		this.registry.register(Provider);
-		this.registry.register(Providers);
-		this.registry.register(Tape);
 	}
 }
