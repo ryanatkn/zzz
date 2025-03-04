@@ -200,6 +200,7 @@ export abstract class Cell<T_Schema extends z.ZodType, T_Zzz extends Zzz = Zzz> 
 		return value;
 	}
 
+	// TODO cache, derived?
 	/**
 	 * Extract schema information for a field
 	 */
