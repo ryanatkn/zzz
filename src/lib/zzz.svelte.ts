@@ -19,7 +19,7 @@ import {Models} from '$lib/models.svelte.js';
 import {Chats} from '$lib/chats.svelte.js';
 import {Providers} from '$lib/providers.svelte.js';
 import {Prompts} from '$lib/prompts.svelte.js';
-import {Files} from '$lib/files.svelte.js';
+import {Diskfiles} from '$lib/diskfiles.svelte.js';
 import {Messages} from '$lib/messages.svelte.js';
 import {Model, type Model_Json} from '$lib/model.svelte.js';
 import {Message} from '$lib/message.svelte.js';
@@ -52,7 +52,7 @@ export class Zzz {
 	readonly chats = new Chats(this);
 	readonly providers = new Providers(this);
 	readonly prompts = new Prompts(this);
-	readonly files = new Files(this);
+	readonly files = new Diskfiles(this);
 	readonly messages = new Messages(this);
 	readonly registry = new Cell_Registry<Zzz>(this);
 

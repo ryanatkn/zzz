@@ -44,7 +44,9 @@ export class Message extends Cell<typeof Message_Json> {
 	is_completion: boolean = $derived(this.type === 'completion_response');
 	is_session: boolean = $derived(this.type === 'load_session' || this.type === 'loaded_session');
 	is_file_related: boolean = $derived(
-		this.type === 'update_file' || this.type === 'delete_file' || this.type === 'filer_change',
+		this.type === 'update_diskfile' ||
+			this.type === 'delete_diskfile' ||
+			this.type === 'filer_change',
 	);
 
 	prompt_data: Completion_Request | null = $derived(
@@ -108,13 +110,13 @@ export class Message extends Cell<typeof Message_Json> {
 						this.data = options.json.data;
 					}
 					break;
-				case 'update_file':
+				case 'update_diskfile':
 					if ('file_id' in options.json) {
 						this.file_id = options.json.file_id;
 						this.contents = options.json.contents;
 					}
 					break;
-				case 'delete_file':
+				case 'delete_diskfile':
 					if ('file_id' in options.json) {
 						this.file_id = options.json.file_id;
 					}
@@ -156,9 +158,9 @@ export class Message extends Cell<typeof Message_Json> {
 				return {...base, completion_request: this.completion_request};
 			case 'completion_response':
 				return {...base, completion_response: this.completion_response};
-			case 'update_file':
+			case 'update_diskfile':
 				return {...base, file_id: this.file_id, contents: this.contents};
-			case 'delete_file':
+			case 'delete_diskfile':
 				return {...base, file_id: this.file_id};
 			case 'filer_change':
 				return {...base, change: this.change, source_file: this.source_file};

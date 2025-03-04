@@ -3,7 +3,7 @@ import type {Path_Id} from '@ryanatkn/gro/path.js';
 import {format} from 'date-fns';
 
 // TODO upstream to Filer probably
-export interface Source_File_Json {
+export interface Source_Diskfile_Json {
 	id: Path_Id;
 	contents: string | null;
 	dependents: Array<[Path_Id, Source_File]>;
@@ -13,21 +13,21 @@ export interface Source_File_Json {
 	external: boolean;
 }
 
-export interface File_Json {
-	source_file: Source_File_Json;
+export interface Diskfile_Json {
+	source_file: Source_Diskfile_Json;
 }
 
-export interface File_Options {
-	data: File_Json;
+export interface Diskfile_Options {
+	data: Diskfile_Json;
 }
 
 // Constants for formatting
 export const FILE_DATE_FORMAT = 'MMM d, yyyy HH:mm:ss';
 export const FILE_TIME_FORMAT = 'HH:mm:ss';
 
-export class File {
+export class Diskfile {
 	// TODO better name?
-	original: Source_File_Json = $state()!;
+	original: Source_Diskfile_Json = $state()!;
 
 	id: Path_Id = $state()!;
 	contents: string | null = $state()!;
@@ -57,7 +57,7 @@ export class File {
 	dependencies_count: number = $derived(this.dependencies.size);
 	dependents_count: number = $derived(this.dependents.size);
 
-	constructor(options: File_Options) {
+	constructor(options: Diskfile_Options) {
 		const {
 			data: {source_file},
 		} = options;
@@ -71,7 +71,7 @@ export class File {
 		this.external = source_file.external ?? false;
 	}
 
-	toJSON(): File_Json {
+	toJSON(): Diskfile_Json {
 		return {
 			source_file: {
 				id: this.id,

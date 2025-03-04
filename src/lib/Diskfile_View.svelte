@@ -5,9 +5,9 @@
 	import {contextmenu_action} from '@ryanatkn/fuz/contextmenu_state.svelte.js';
 	import {slide} from 'svelte/transition';
 
-	import File_Editor from '$lib/File_Editor.svelte';
-	import File_Info from '$lib/File_Info.svelte';
-	import File_Summary from '$lib/File_Summary.svelte';
+	import Diskfile_Editor from '$lib/Diskfile_Editor.svelte';
+	import Diskfile_Info from '$lib/Diskfile_Info.svelte';
+	import Diskfile_Summary from '$lib/Diskfile_Summary.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import {GLYPH_REMOVE} from '$lib/glyphs.js';
 
@@ -19,15 +19,19 @@
 	const {file}: Props = $props();
 
 	// TODO refactor
-	type File_View_Type = 'summary' | 'info' | 'editor';
-	let view_with_prev: File_View_Type = $state('summary');
-	let view_with: File_View_Type = $state('summary'); // TODO `selection` class pattern instead? `new Selection('summary')`
+	type Diskfile_View_Type = 'summary' | 'info' | 'editor';
+	let view_with_prev: Diskfile_View_Type = $state('summary');
+	let view_with: Diskfile_View_Type = $state('summary'); // TODO `selection` class pattern instead? `new Selection('summary')`
 
-	const File_View_Component = $derived(
-		view_with === 'summary' ? File_Summary : view_with === 'info' ? File_Info : File_Editor,
+	const Diskfile_View_Component = $derived(
+		view_with === 'summary'
+			? Diskfile_Summary
+			: view_with === 'info'
+				? Diskfile_Info
+				: Diskfile_Editor,
 	);
 
-	const update_view_with = (v: File_View_Type) => {
+	const update_view_with = (v: Diskfile_View_Type) => {
 		view_with_prev = view_with;
 		view_with = v;
 	};
@@ -38,9 +42,9 @@
 </script>
 
 <div class="file_view" use:contextmenu_action={contextmenu_entries}>
-	{#key File_View_Component}
+	{#key Diskfile_View_Component}
 		<div transition:slide>
-			<File_View_Component {file} />
+			<Diskfile_View_Component {file} />
 		</div>
 	{/key}
 </div>

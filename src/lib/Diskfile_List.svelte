@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type {Source_File} from '@ryanatkn/gro/filer.js';
 
-	import File_View from '$lib/File_View.svelte';
+	import Diskfile_View from '$lib/Diskfile_View.svelte';
 
 	interface Props {
 		files: Array<Source_File>;
@@ -15,7 +15,7 @@
 <ul class="unstyled flex column">
 	{#each files as file (file.id)}
 		<li>
-			<File_View {file} />
+			<Diskfile_View {file} />
 		</li>
 	{/each}
 </ul>

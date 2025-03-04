@@ -13,7 +13,7 @@
 	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
 
 	interface Props {
-		file: Source_File; // TODO BLOCK `File` object
+		file: Source_File; // TODO BLOCK `Diskfile` object
 	}
 
 	const {file}: Props = $props();

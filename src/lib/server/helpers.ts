@@ -17,7 +17,7 @@ export const write_file_in_scope = (id: Path_Id, contents: string, dir: string):
 /**
  * Deletes the file at `id` but only if it's inside `dir`.
  */
-export const delete_file_in_scope = (id: Path_Id, dir: string): boolean => {
+export const delete_diskfile_in_scope = (id: Path_Id, dir: string): boolean => {
 	if (!id.startsWith(ensure_end(dir, '/'))) {
 		console.error(`refused to delete file, path ${id} must be in dir ${dir}`);
 		return false;

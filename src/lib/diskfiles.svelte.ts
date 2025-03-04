@@ -6,7 +6,7 @@ import type {Message_Filer_Change} from '$lib/message.schema.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 import {Uuid} from '$lib/uuid.js';
 
-export class Files {
+export class Diskfiles {
 	readonly zzz: Zzz;
 
 	by_id: SvelteMap<Path_Id, Source_File> = new SvelteMap();
@@ -39,7 +39,7 @@ export class Files {
 	update(file_id: Path_Id, contents: string): void {
 		this.zzz.messages.send({
 			id: Uuid.parse(undefined),
-			type: 'update_file',
+			type: 'update_diskfile',
 			file_id,
 			contents,
 		});
@@ -48,7 +48,7 @@ export class Files {
 	delete(file_id: Path_Id): void {
 		this.zzz.messages.send({
 			id: Uuid.parse(undefined),
-			type: 'delete_file',
+			type: 'delete_diskfile',
 			file_id,
 		});
 	}

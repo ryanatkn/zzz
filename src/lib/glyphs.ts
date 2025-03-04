@@ -32,8 +32,8 @@ export const get_icon_for_message_type = (type: string): string => {
 		case 'load_session':
 		case 'loaded_session':
 			return GLYPH_SESSION;
-		case 'update_file':
-		case 'delete_file':
+		case 'update_diskfile':
+		case 'delete_diskfile':
 		case 'filer_change':
 			return GLYPH_FILE;
 		default:

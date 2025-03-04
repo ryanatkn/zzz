@@ -1,7 +1,7 @@
 import {z} from 'zod';
 
 import {Uuid} from '$lib/uuid.js';
-import {File_Change_Type} from '$lib/file.schema.js';
+import {Diskfile_Change_Type} from '$lib/diskfile.schema.js';
 import {
 	Completion_Request,
 	Completion_Response_Schema,
@@ -17,8 +17,8 @@ export const Message_Type = z.enum([
 	'echo',
 	'send_prompt',
 	'completion_response',
-	'update_file',
-	'delete_file',
+	'update_diskfile',
+	'delete_diskfile',
 	'filer_change',
 	'load_session',
 	'loaded_session',
@@ -53,20 +53,20 @@ export const Message_Loaded_Session = Message_Base.extend({
 export const Message_Filer_Change = Message_Base.extend({
 	type: z.literal('filer_change'),
 	change: z.object({
-		type: File_Change_Type,
+		type: Diskfile_Change_Type,
 		path: z.string(),
 	}),
 	source_file: z.any(), // Source_File
 });
 
-export const Message_Update_File = Message_Base.extend({
-	type: z.literal('update_file'),
+export const Message_Update_Diskfile = Message_Base.extend({
+	type: z.literal('update_diskfile'),
 	file_id: z.string(), // Path_Id
 	contents: z.string(),
 });
 
-export const Message_Delete_File = Message_Base.extend({
-	type: z.literal('delete_file'),
+export const Message_Delete_Diskfile = Message_Base.extend({
+	type: z.literal('delete_diskfile'),
 	file_id: z.string(), // Path_Id
 });
 
@@ -86,8 +86,8 @@ export const Message_Client = z.discriminatedUnion('type', [
 	Message_Echo,
 	Message_Load_Session,
 	Message_Send_Prompt,
-	Message_Update_File,
-	Message_Delete_File,
+	Message_Update_Diskfile,
+	Message_Delete_Diskfile,
 ]);
 
 // Union of all server message types
@@ -106,8 +106,8 @@ export const Message = z.discriminatedUnion('type', [
 	Message_Filer_Change,
 	Message_Send_Prompt,
 	Message_Completion_Response,
-	Message_Update_File,
-	Message_Delete_File,
+	Message_Update_Diskfile,
+	Message_Delete_Diskfile,
 ]);
 
 // Message with metadata schema - renamed to Message_Json
@@ -127,7 +127,7 @@ export const Message_Json = z.object({
 	contents: z.string().optional(),
 	change: z
 		.object({
-			type: File_Change_Type,
+			type: Diskfile_Change_Type,
 			path: z.string(),
 		})
 		.optional(),
@@ -152,8 +152,8 @@ export type Message_Echo = z.infer<typeof Message_Echo>;
 export type Message_Load_Session = z.infer<typeof Message_Load_Session>;
 export type Message_Loaded_Session = z.infer<typeof Message_Loaded_Session>;
 export type Message_Filer_Change = z.infer<typeof Message_Filer_Change>;
-export type Message_Update_File = z.infer<typeof Message_Update_File>;
-export type Message_Delete_File = z.infer<typeof Message_Delete_File>;
+export type Message_Update_Diskfile = z.infer<typeof Message_Update_Diskfile>;
+export type Message_Delete_Diskfile = z.infer<typeof Message_Delete_Diskfile>;
 export type Message_Send_Prompt = Omit<
 	z.infer<typeof Message_Send_Prompt>,
 	'completion_request'

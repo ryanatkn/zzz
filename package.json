@@ -237,6 +237,48 @@
       "svelte": "./dist/Dashboard.svelte",
       "default": "./dist/Dashboard.svelte"
     },
+    "./Diskfile_Editor.svelte": {
+      "types": "./dist/Diskfile_Editor.svelte.d.ts",
+      "svelte": "./dist/Diskfile_Editor.svelte",
+      "default": "./dist/Diskfile_Editor.svelte"
+    },
+    "./Diskfile_Explorer.svelte": {
+      "types": "./dist/Diskfile_Explorer.svelte.d.ts",
+      "svelte": "./dist/Diskfile_Explorer.svelte",
+      "default": "./dist/Diskfile_Explorer.svelte"
+    },
+    "./Diskfile_Info.svelte": {
+      "types": "./dist/Diskfile_Info.svelte.d.ts",
+      "svelte": "./dist/Diskfile_Info.svelte",
+      "default": "./dist/Diskfile_Info.svelte"
+    },
+    "./Diskfile_List.svelte": {
+      "types": "./dist/Diskfile_List.svelte.d.ts",
+      "svelte": "./dist/Diskfile_List.svelte",
+      "default": "./dist/Diskfile_List.svelte"
+    },
+    "./Diskfile_Summary.svelte": {
+      "types": "./dist/Diskfile_Summary.svelte.d.ts",
+      "svelte": "./dist/Diskfile_Summary.svelte",
+      "default": "./dist/Diskfile_Summary.svelte"
+    },
+    "./Diskfile_View.svelte": {
+      "types": "./dist/Diskfile_View.svelte.d.ts",
+      "svelte": "./dist/Diskfile_View.svelte",
+      "default": "./dist/Diskfile_View.svelte"
+    },
+    "./diskfile.schema.js": {
+      "types": "./dist/diskfile.schema.d.ts",
+      "default": "./dist/diskfile.schema.js"
+    },
+    "./diskfile.svelte.js": {
+      "types": "./dist/diskfile.svelte.d.ts",
+      "default": "./dist/diskfile.svelte.js"
+    },
+    "./diskfiles.svelte.js": {
+      "types": "./dist/diskfiles.svelte.d.ts",
+      "default": "./dist/diskfiles.svelte.js"
+    },
     "./Echo_Form.svelte": {
       "types": "./dist/Echo_Form.svelte.d.ts",
       "svelte": "./dist/Echo_Form.svelte",
@@ -251,48 +293,6 @@
       "types": "./dist/External_Link.svelte.d.ts",
       "svelte": "./dist/External_Link.svelte",
       "default": "./dist/External_Link.svelte"
-    },
-    "./File_Editor.svelte": {
-      "types": "./dist/File_Editor.svelte.d.ts",
-      "svelte": "./dist/File_Editor.svelte",
-      "default": "./dist/File_Editor.svelte"
-    },
-    "./File_Explorer.svelte": {
-      "types": "./dist/File_Explorer.svelte.d.ts",
-      "svelte": "./dist/File_Explorer.svelte",
-      "default": "./dist/File_Explorer.svelte"
-    },
-    "./File_Info.svelte": {
-      "types": "./dist/File_Info.svelte.d.ts",
-      "svelte": "./dist/File_Info.svelte",
-      "default": "./dist/File_Info.svelte"
-    },
-    "./File_List.svelte": {
-      "types": "./dist/File_List.svelte.d.ts",
-      "svelte": "./dist/File_List.svelte",
-      "default": "./dist/File_List.svelte"
-    },
-    "./File_Summary.svelte": {
-      "types": "./dist/File_Summary.svelte.d.ts",
-      "svelte": "./dist/File_Summary.svelte",
-      "default": "./dist/File_Summary.svelte"
-    },
-    "./File_View.svelte": {
-      "types": "./dist/File_View.svelte.d.ts",
-      "svelte": "./dist/File_View.svelte",
-      "default": "./dist/File_View.svelte"
-    },
-    "./file.schema.js": {
-      "types": "./dist/file.schema.d.ts",
-      "default": "./dist/file.schema.js"
-    },
-    "./file.svelte.js": {
-      "types": "./dist/file.svelte.d.ts",
-      "default": "./dist/file.svelte.js"
-    },
-    "./files.svelte.js": {
-      "types": "./dist/files.svelte.d.ts",
-      "default": "./dist/files.svelte.js"
     },
     "./glyphs.js": {
       "types": "./dist/glyphs.d.ts",

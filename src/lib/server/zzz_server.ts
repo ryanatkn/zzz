@@ -21,8 +21,8 @@ import {
 } from '$lib/message.schema.js';
 import {Uuid} from '$lib/uuid.js';
 import {SYSTEM_MESSAGE_DEFAULT} from '$lib/config.js';
-import {delete_file_in_scope, write_file_in_scope} from '$lib/server/helpers.js';
-import {map_watcher_change_to_file_change} from '$lib/file.schema.js';
+import {delete_diskfile_in_scope, write_file_in_scope} from '$lib/server/helpers.js';
+import {map_watcher_change_to_diskfile_change} from '$lib/diskfile.schema.js';
 
 const anthropic = new Anthropic({apiKey: SECRET_ANTHROPIC_API_KEY});
 const openai = new OpenAI({apiKey: SECRET_OPENAI_API_KEY});
@@ -44,7 +44,7 @@ export interface Zzz_Server_Options {
 	/**
 	 * @default ZZZ_DIR_DEFAULT
 	 */
-	zzz_dir?: string;
+	zzz_dir?: string; // TODO rename to `filesystem_dirs` or something? `zzz_dirs`?
 	filer?: Filer;
 	// TODO BLOCK @many make these part of the cached conversation/completion state, source of truth is where?
 	system_message?: string;
@@ -87,7 +87,7 @@ export class Zzz_Server {
 		this.#cleanup_filer = this.filer.watch((change, source_file) => {
 			// Convert watcher change type to API change type
 			const api_change = {
-				type: map_watcher_change_to_file_change(change.type),
+				type: map_watcher_change_to_diskfile_change(change.type),
 				path: change.path,
 			};
 
@@ -296,14 +296,14 @@ export class Zzz_Server {
 
 				return response; // TODO @many sending the text again is wasteful, need ids
 			}
-			case 'update_file': {
+			case 'update_diskfile': {
 				const {file_id, contents} = message;
 				write_file_in_scope(file_id, contents, this.filer.root_dir);
 				return null;
 			}
-			case 'delete_file': {
+			case 'delete_diskfile': {
 				const {file_id} = message;
-				delete_file_in_scope(file_id, this.filer.root_dir);
+				delete_diskfile_in_scope(file_id, this.filer.root_dir);
 				return null;
 			}
 			default:
