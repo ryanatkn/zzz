@@ -121,6 +121,10 @@
       "types": "./dist/bit.svelte.d.ts",
       "default": "./dist/bit.svelte.js"
     },
+    "./cell_helpers.js": {
+      "types": "./dist/cell_helpers.d.ts",
+      "default": "./dist/cell_helpers.js"
+    },
     "./cell_registry.js": {
       "types": "./dist/cell_registry.d.ts",
       "default": "./dist/cell_registry.js"

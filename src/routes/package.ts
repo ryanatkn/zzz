@@ -101,6 +101,7 @@ export const package_json = {
 			default: './dist/Bit_View.svelte',
 		},
 		'./bit.svelte.js': {types: './dist/bit.svelte.d.ts', default: './dist/bit.svelte.js'},
+		'./cell_helpers.js': {types: './dist/cell_helpers.d.ts', default: './dist/cell_helpers.js'},
 		'./cell_registry.js': {types: './dist/cell_registry.d.ts', default: './dist/cell_registry.js'},
 		'./cell.svelte.js': {types: './dist/cell.svelte.d.ts', default: './dist/cell.svelte.js'},
 		'./Chat_Item.svelte': {
@@ -483,6 +484,16 @@ export const src_json = {
 				{name: 'Bit', kind: 'class'},
 			],
 		},
+		'./cell_helpers.js': {
+			path: 'cell_helpers.ts',
+			declarations: [
+				{name: 'ZOD_CELL_CLASS_NAME', kind: 'variable'},
+				{name: 'ZOD_ELEMENT_CLASS_NAME', kind: 'variable'},
+				{name: 'cell_class', kind: 'function'},
+				{name: 'cell_array', kind: 'function'},
+				{name: 'get_schema_class_info', kind: 'function'},
+			],
+		},
 		'./cell_registry.js': {
 			path: 'cell_registry.ts',
 			declarations: [{name: 'Cell_Registry', kind: 'class'}],
@@ -490,8 +501,6 @@ export const src_json = {
 		'./cell.svelte.js': {
 			path: 'cell.svelte.ts',
 			declarations: [
-				{name: 'cell_class', kind: null},
-				{name: 'cell_array', kind: null},
 				{name: 'Cell_Options', kind: 'type'},
 				{name: 'Cell', kind: 'class'},
 			],
@@ -889,6 +898,7 @@ export const src_json = {
 				{name: 'Datetime', kind: 'variable'},
 				{name: 'Datetime_Now', kind: 'variable'},
 				{name: 'zod_get_schema_keys', kind: 'function'},
+				{name: 'get_field_schema', kind: 'function'},
 			],
 		},
 		'./zzz_config.js': {
