@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
+	import {slide} from 'svelte/transition';
 
 	import {zzz_context} from '$lib/zzz.svelte.js';
 
@@ -14,11 +15,9 @@
 	const send_echo = () => {
 		zzz.send_echo(echo_text || 'ping');
 	};
-
-	// TODO
 </script>
 
-<div class="row">
+<div class="row gap_sm">
 	<input
 		bind:value={echo_text}
 		onkeydown={(e) => {
@@ -34,10 +33,10 @@
 	>
 </div>
 {#if zzz.echos.length > 0}
-	<ul class="unstyled column reverse">
+	<ul class="unstyled column reverse p_md">
 		{#each zzz.echos as echo (echo)}
 			{@const elapsed = zzz.echo_elapsed.get(echo.id)}
-			<li class="row">
+			<li class="row" transition:slide>
 				<small>
 					{#if elapsed}{elapsed}ms{:else}<Pending_Animation />{/if}
 				</small>
