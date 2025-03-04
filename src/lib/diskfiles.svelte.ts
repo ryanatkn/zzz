@@ -32,7 +32,7 @@ export interface Diskfiles_Options extends Cell_Options<typeof Diskfiles_Json> {
 
 export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 	// Define property explicitly to match schema
-	files: Array<Diskfile> = $state([]);
+	items: Array<Diskfile> = $state([]);
 
 	// TODO these are managed incrementally instead of using `$derived`, which makes the code more efficient but harder to follow and more error prone, maybe rethink, or put additional abstraction around it for safeguards
 	// Maps for lookup - separate from schema
@@ -58,7 +58,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 		this.by_id.clear();
 		this.by_path.clear();
 
-		for (const file of this.files) {
+		for (const file of this.items) {
 			if (file.id && file.path) {
 				this.by_id.set(file.id, file);
 				this.by_path.set(file.path, file.id);
@@ -86,7 +86,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 			case 'add': {
 				this.#source_files.set(validated_source_file.id, source_file as Gro_Source_File);
 				const diskfile = this.#create_diskfile(source_file as Gro_Source_File);
-				this.files.push(diskfile);
+				this.items.push(diskfile);
 				this.by_id.set(diskfile.id, diskfile);
 				this.by_path.set(diskfile.path, diskfile.id);
 				break;
@@ -96,11 +96,11 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 				const diskfile = this.#create_diskfile(source_file as Gro_Source_File);
 
 				// Find and replace the existing diskfile if it exists
-				const index = this.files.findIndex((f) => f.path === diskfile.path);
+				const index = this.items.findIndex((f) => f.path === diskfile.path);
 				if (index >= 0) {
-					this.files[index] = diskfile;
+					this.items[index] = diskfile;
 				} else {
-					this.files.push(diskfile);
+					this.items.push(diskfile);
 				}
 
 				this.by_id.set(diskfile.id, diskfile);
@@ -112,9 +112,9 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 				const diskfile_id = this.by_path.get(validated_source_file.id);
 				if (diskfile_id) {
 					// Remove from the files array
-					const index = this.files.findIndex((f) => f.id === diskfile_id);
+					const index = this.items.findIndex((f) => f.id === diskfile_id);
 					if (index >= 0) {
-						this.files.splice(index, 1);
+						this.items.splice(index, 1);
 					}
 
 					this.by_id.delete(diskfile_id);
