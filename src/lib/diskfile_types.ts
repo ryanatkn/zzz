@@ -48,8 +48,8 @@ export const Diskfile_Json = z
 		external: z.boolean().default(false),
 		created: Datetime_Now,
 		updated: Datetime.nullable().default(null),
-		dependents: z.array(z.tuple([z.string(), z.any()])).default(() => []),
-		dependencies: z.array(z.tuple([z.string(), z.any()])).default(() => []),
+		dependents: z.array(z.tuple([Diskfile_Path, z.any()])).default(() => []),
+		dependencies: z.array(z.tuple([Diskfile_Path, z.any()])).default(() => []),
 	})
 	.default(() => ({}));
 
@@ -66,7 +66,13 @@ export const source_file_to_diskfile_json = (source_file: Source_File_Type): Dis
 		external: source_file.external,
 		created: Datetime_Now.parse(undefined),
 		updated: source_file.mtime ? Datetime.parse(new Date(source_file.mtime).toISOString()) : null,
-		dependents: Array.from(source_file.dependents.entries()),
-		dependencies: Array.from(source_file.dependencies.entries()),
+		dependents: Array.from(source_file.dependents.entries()).map(([id, s]) => [
+			Diskfile_Path.parse(id),
+			s,
+		]),
+		dependencies: Array.from(source_file.dependencies.entries()).map(([id, s]) => [
+			Diskfile_Path.parse(id),
+			s,
+		]),
 	};
 };
