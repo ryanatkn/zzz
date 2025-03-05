@@ -696,7 +696,7 @@ test('initialization - properties are properly initialized from options.json', (
 // Test for subclass that forgets to call init()
 test('initialization - all subclasses must call init() in constructor', () => {
 	// Create a test subclass that doesn't call init
-	class Bad_Subclass extends Cell<typeof Bit_Json, any> {
+	class Bad_Subclass extends Cell<typeof Bit_Json> {
 		name: string = $state('default');
 
 		constructor(options: any) {

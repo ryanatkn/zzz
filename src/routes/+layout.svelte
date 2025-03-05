@@ -15,27 +15,14 @@
 	import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 	import {PUBLIC_SERVER_HOSTNAME, PUBLIC_SERVER_PORT} from '$env/static/public';
 
-	import {Zzz} from '$lib/zzz.svelte.js';
 	import Zzz_Root from '$lib/Zzz_Root.svelte';
 	import {pkg_context} from '$routes/pkg.js';
 	import {package_json, src_json} from '$routes/package.js';
 	import {Uuid} from '$lib/uuid.js';
 	import {zzz_config} from '$lib/zzz_config.js';
-	import {Prompt, Prompt_Json} from '$lib/prompt.svelte.js';
-	import {Bit} from '$lib/bit.svelte.js';
-	import {Model} from '$lib/model.svelte.js';
-	import {Message} from '$lib/message.svelte.js';
-	import {Provider} from '$lib/provider.svelte.js';
-	import {Chat} from '$lib/chat.svelte.js';
-	import {Chats} from '$lib/chats.svelte.js';
-	import {Diskfile} from '$lib/diskfile.svelte.js';
-	import {Diskfiles} from '$lib/diskfiles.svelte.js';
-	import {Messages} from '$lib/messages.svelte.js';
-	import {Models} from '$lib/models.svelte.js';
-	import {Prompts} from '$lib/prompts.svelte.js';
-	import {Providers} from '$lib/providers.svelte.js';
-	import {Tape} from '$lib/tape.svelte.js';
 	import type {Diskfile_Path} from '$lib/diskfile_types.js';
+	import {Prompt_Json} from '$lib/prompt.svelte.js';
+	import {Zzz, cell_classes} from '$lib/zzz.svelte.js';
 
 	interface Props {
 		children: Snippet;
@@ -48,24 +35,12 @@
 	let ws: WebSocket | undefined;
 	let ws_connecting: Deferred<void> | undefined;
 
-	// Initialize Zzz
-	const zzz = new Zzz();
+	// Create an instance of Zzz
+	const zzz = new Zzz({
+		cells: cell_classes,
+	});
 
-	// Register all cell classes with the registry
-	zzz.register(Bit);
-	zzz.register(Chat);
-	zzz.register(Chats);
-	zzz.register(Diskfile);
-	zzz.register(Diskfiles);
-	zzz.register(Message);
-	zzz.register(Messages);
-	zzz.register(Model);
-	zzz.register(Models);
-	zzz.register(Prompt);
-	zzz.register(Prompts);
-	zzz.register(Provider);
-	zzz.register(Providers);
-	zzz.register(Tape);
+	// No more individual register calls needed!
 
 	// Enhance schemas with metadata for deserialization - use class names
 	// Safely access Zod schema internals using type assertion

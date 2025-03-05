@@ -1,6 +1,7 @@
 import {create_context} from '@ryanatkn/fuz/context_helpers.js';
 import {SvelteMap} from 'svelte/reactivity';
 import {create_deferred, type Deferred} from '@ryanatkn/belt/async.js';
+import type {Class_Constructor} from '@ryanatkn/belt/types.js';
 
 import {Zzz_Data, type Zzz_Data_Json} from '$lib/zzz_data.svelte.js';
 import type {
@@ -18,12 +19,40 @@ import {Chats} from '$lib/chats.svelte.js';
 import {Providers} from '$lib/providers.svelte.js';
 import {Diskfiles} from '$lib/diskfiles.svelte.js';
 import {Messages} from '$lib/messages.svelte.js';
-import type {Model_Json} from '$lib/model.svelte.js';
+import {Model, type Model_Json} from '$lib/model.svelte.js';
 import {Cell_Registry} from '$lib/cell_registry.js';
 import {Datetime_Now} from '$lib/zod_helpers.js';
 import {Prompts} from '$lib/prompts.svelte.js';
 import type {Cell} from './cell.svelte.js';
-import type {Class_Constructor} from '@ryanatkn/belt/types.js';
+import {Bit} from '$lib/bit.svelte.js';
+import {Chat} from '$lib/chat.svelte.js';
+import {Diskfile} from '$lib/diskfile.svelte.js';
+import {Message} from '$lib/message.svelte.js';
+import {Prompt} from '$lib/prompt.svelte.js';
+import {Tape} from '$lib/tape.svelte.js';
+
+// Define standard cell classes
+export const cell_classes = {
+	Bit,
+	Chat,
+	Chats,
+	Diskfile,
+	Diskfiles,
+	Message,
+	Messages,
+	Model,
+	Models,
+	Prompt,
+	Prompts,
+	Provider,
+	Providers,
+	Tape,
+};
+
+// Automatically derive Cell_Registry_Map from cell_classes
+export type Cell_Registry_Map = {
+	[K in keyof typeof cell_classes]: InstanceType<(typeof cell_classes)[K]>;
+};
 
 export const zzz_context = create_context<Zzz>();
 
@@ -34,6 +63,7 @@ export interface Zzz_Options {
 	data?: Zzz_Data;
 	models?: Array<Model_Json>;
 	providers?: Array<Provider_Json>;
+	cells?: Record<string, Class_Constructor<Cell>>;
 }
 
 export interface Zzz_Json {
@@ -46,18 +76,16 @@ export interface Zzz_Json {
  * Gettable with `zzz_context.get()` inside a `<Zzz_Root>`.
  */
 export class Zzz {
-	data: Zzz_Data = $state()!;
+	data: Zzz_Data;
+	readonly registry: Cell_Registry;
+	readonly models: Models;
+	readonly chats: Chats;
+	readonly providers: Providers;
+	readonly prompts: Prompts;
+	readonly diskfiles: Diskfiles;
+	readonly messages: Messages;
 
-	readonly registry = new Cell_Registry(this);
-
-	readonly models = new Models({zzz: this});
-	readonly chats = new Chats({zzz: this});
-	readonly providers = new Providers({zzz: this});
-	readonly prompts = new Prompts({zzz: this});
-	readonly diskfiles = new Diskfiles({zzz: this});
-	readonly messages = new Messages({zzz: this});
-
-	tags: Set<string> = $derived(new Set(this.models.items.flatMap((m) => m.tags)));
+	tags: Set<string> = $derived.by(() => new Set(this.models.items.flatMap((m) => m.tags)));
 
 	echos: Array<Message_Echo> = $state([]);
 	echos_max_length: number = $state(10);
@@ -65,18 +93,36 @@ export class Zzz {
 	// TODO could track this more formally, and add time tracking
 	pending_prompts: SvelteMap<Uuid, Deferred<Message_Completion_Response>> = new SvelteMap();
 
-	completion_threads: Completion_Threads = $state()!;
+	completion_threads: Completion_Threads;
 
 	capability_ollama: undefined | null | boolean = $state();
 
 	constructor(options: Zzz_Options = {}) {
-		// Setup message handlers if provided
+		// Initialize properties in the correct order
+		this.data = options.data ?? new Zzz_Data();
+		this.completion_threads = options.completion_threads ?? new Completion_Threads({zzz: this});
+
+		// Initialize the registry
+		this.registry = new Cell_Registry(this);
+
+		// Initialize component collections first
+		this.models = new Models({zzz: this});
+		this.chats = new Chats({zzz: this});
+		this.providers = new Providers({zzz: this});
+		this.prompts = new Prompts({zzz: this});
+		this.diskfiles = new Diskfiles({zzz: this});
+		this.messages = new Messages({zzz: this});
+
+		// Set up message handlers if provided
 		if (options.send && options.receive) {
 			this.messages.set_handlers(options.send, options.receive);
 		}
 
-		this.completion_threads = options.completion_threads ?? new Completion_Threads({zzz: this});
-		this.data = options.data ?? new Zzz_Data();
+		// Register cell classes if provided, otherwise use default cell_classes
+		const cells_to_register = options.cells || cell_classes;
+		for (const constructor of Object.values(cells_to_register)) {
+			this.registry.register(constructor);
+		}
 
 		// Add providers if provided in options
 		if (options.providers?.length) {
@@ -92,7 +138,7 @@ export class Zzz {
 	/**
 	 * Register a cell class with the registry
 	 */
-	register(cell_class: Class_Constructor<Cell>): void {
+	register<T extends Cell>(cell_class: Class_Constructor<T>): void {
 		this.registry.register(cell_class);
 	}
 
@@ -209,16 +255,15 @@ export class Zzz {
 
 	add_providers(providers_json: Array<Provider_Json>): void {
 		for (const json of providers_json) {
-			this.add_provider(this.create_provider(json));
+			// Type assertion is safe here because we know we've registered Provider
+			const provider = this.registry.instantiate<Provider>('Provider', json);
+			if (provider) {
+				this.add_provider(provider);
+			}
 		}
 	}
 
 	add_provider(provider: Provider): void {
 		this.providers.add(provider);
-	}
-
-	// TODO BLOCK what if instead of these methods we had a generic one? replace with registry usage
-	create_provider(provider_json: Provider_Json): Provider {
-		return new Provider({zzz: this, json: provider_json});
 	}
 }

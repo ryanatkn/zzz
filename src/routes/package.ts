@@ -60,7 +60,7 @@ export const package_json = {
 		'@google/generative-ai': '^0.22.0',
 		'@hono/node-server': '^1.13.8',
 		'@hono/node-ws': '^1.1.0',
-		'@ryanatkn/belt': '^0.29.0',
+		'@ryanatkn/belt': '^0.29.1',
 		'date-fns': '^4.1.0',
 		devalue: '^5.1.1',
 		'esm-env': '^1.2.2',
@@ -916,6 +916,8 @@ export const src_json = {
 		'./zzz.svelte.js': {
 			path: 'zzz.svelte.ts',
 			declarations: [
+				{name: 'cell_classes', kind: 'variable'},
+				{name: 'Cell_Registry_Map', kind: 'type'},
 				{name: 'zzz_context', kind: 'variable'},
 				{name: 'Zzz_Options', kind: 'type'},
 				{name: 'Zzz_Json', kind: 'type'},

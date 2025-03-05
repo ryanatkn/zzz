@@ -1,6 +1,5 @@
 import {z} from 'zod';
 import type {Watcher_Change_Type} from '@ryanatkn/gro/watch_dir.js';
-import type {Path_Id as Path_Id_Type} from '@ryanatkn/gro/path.js';
 import type {Source_File as Source_File_Type} from '@ryanatkn/gro/filer.js';
 
 import {Datetime, Datetime_Now} from '$lib/zod_helpers.js';
@@ -20,10 +19,6 @@ export const map_watcher_change_to_diskfile_change = (
 
 export const Diskfile_Path = z.string().brand('Diskfile_Path');
 export type Diskfile_Path = z.infer<typeof Diskfile_Path>;
-// Assert that the imported Path_Id type is compatible with our Diskfile_Path type
-// This ensures we're using the right type when interacting with Gro
-// @ts-expect-error - This is intentional to check type compatibility
-const _path_id_assertion: Diskfile_Path = null as unknown as Path_Id_Type;
 
 // TODO upstream to Gro
 export const Source_File = z.object({

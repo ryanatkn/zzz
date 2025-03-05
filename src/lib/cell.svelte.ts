@@ -8,13 +8,13 @@ import type {Zzz} from '$lib/zzz.svelte.js';
 import {get_schema_class_info} from '$lib/cell_helpers.js';
 
 // Base options type that all cells will extend
-export interface Cell_Options<T_Schema extends z.ZodType, T_Zzz extends Zzz = Zzz> {
-	zzz: T_Zzz;
+export interface Cell_Options<T_Schema extends z.ZodType> {
+	zzz: Zzz;
 	json?: z.input<T_Schema>;
 }
 
 // TODO maybe rename to `Json_Cell` to be more explicit? Or `Snapshottable`?
-export abstract class Cell<T_Schema extends z.ZodType = z.ZodType, T_Zzz extends Zzz = Zzz> {
+export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> {
 	readonly schema: T_Schema;
 	readonly schema_keys: Array<string> = $derived.by(() => zod_get_schema_keys(this.schema));
 
@@ -25,12 +25,12 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType, T_Zzz extends
 	);
 
 	// Make zzz required
-	readonly zzz: T_Zzz;
+	readonly zzz: Zzz;
 
 	// Store options for use during initialization
-	protected readonly options: Cell_Options<T_Schema, T_Zzz>;
+	protected readonly options: Cell_Options<T_Schema>;
 
-	constructor(schema: T_Schema, options: Cell_Options<T_Schema, T_Zzz>) {
+	constructor(schema: T_Schema, options: Cell_Options<T_Schema>) {
 		this.schema = schema;
 		this.zzz = options.zzz;
 		this.options = options;
@@ -72,7 +72,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType, T_Zzz extends
 	 * Generic clone method that works for any subclass.
 	 */
 	clone(): this {
-		const constructor = this.constructor as new (options: Cell_Options<T_Schema, T_Zzz>) => this;
+		const constructor = this.constructor as new (options: Cell_Options<T_Schema>) => this;
 
 		try {
 			return new constructor({
@@ -181,13 +181,16 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType, T_Zzz extends
 		return get_field_schema(this.schema, key);
 	}
 
-	// Fix the instantiate_class method to handle undefined
-	#instantiate_class<T>(class_name: string | undefined, json: unknown): T | unknown {
+	/**
+	 * Instantiate a cell class using the registry
+	 */
+	#instantiate_class(class_name: string | undefined, json: unknown): unknown {
 		if (!class_name) {
 			return json;
 		}
 
-		const instance = this.zzz.registry.instantiate<T>(class_name, json);
+		// No type assertion needed - this will be validated at runtime
+		const instance = this.zzz.registry.instantiate(class_name, json);
 		return instance !== null ? instance : json;
 	}
 }
