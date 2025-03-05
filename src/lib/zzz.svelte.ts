@@ -23,7 +23,7 @@ import {Model, type Model_Json} from '$lib/model.svelte.js';
 import {Cell_Registry} from '$lib/cell_registry.js';
 import {Datetime_Now} from '$lib/zod_helpers.js';
 import {Prompts} from '$lib/prompts.svelte.js';
-import type {Cell} from './cell.svelte.js';
+import type {Cell} from '$lib/cell.svelte.js';
 import {Bit} from '$lib/bit.svelte.js';
 import {Chat} from '$lib/chat.svelte.js';
 import {Diskfile} from '$lib/diskfile.svelte.js';
