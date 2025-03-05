@@ -12,6 +12,8 @@ import {
 import type {Uuid} from '$lib/uuid.js';
 import {cell_array} from '$lib/cell_helpers.js';
 
+export const HISTORY_LIMIT_DEFAULT = 512;
+
 export const Messages_Json = z
 	.object({
 		items: cell_array(
@@ -25,19 +27,18 @@ export const Messages_Json = z
 
 export type Messages_Json = z.infer<typeof Messages_Json>;
 
-export interface Messages_Options extends Cell_Options<typeof Messages_Json> {}
+export interface Messages_Options extends Cell_Options<typeof Messages_Json> {
+	history_limit?: number;
+}
 
 export class Messages extends Cell<typeof Messages_Json> {
 	items: Array<Message> = $state([]);
+	history_limit: number = $state(HISTORY_LIMIT_DEFAULT);
 
-	// Lookup maps for performance
 	by_id: SvelteMap<Uuid, Message> = new SvelteMap();
 
-	// Use proper message types instead of any
-	#send_message?: (message: Message_Client) => void;
+	onsend?: (message: Message_Client) => void;
 	#onreceive?: (message: Message_Server) => void;
-
-	// Remove the unused #receive_handler property
 
 	constructor(options: Messages_Options) {
 		super(Messages_Json, options);
@@ -73,11 +74,11 @@ export class Messages extends Cell<typeof Messages_Json> {
 	 * Set message handlers with proper typing
 	 */
 	set_handlers(
-		send_message: (message: Message_Client) => void,
+		onsend: (message: Message_Client) => void,
 		onreceive: (message: Message_Server) => void,
 	): void {
 		// Store the send handler
-		this.#send_message = send_message;
+		this.onsend = onsend;
 		this.#onreceive = onreceive;
 	}
 
@@ -85,13 +86,13 @@ export class Messages extends Cell<typeof Messages_Json> {
 	 * Send a message using the registered handler with proper typing
 	 */
 	send(message: Message_Client): void {
-		if (!this.#send_message) {
+		if (!this.onsend) {
 			console.error('No send handler registered');
 			return;
 		}
 
 		this.add(create_message_json(message, 'client'));
-		this.#send_message(message);
+		this.onsend(message);
 	}
 
 	/**
@@ -117,6 +118,29 @@ export class Messages extends Cell<typeof Messages_Json> {
 		// Update indexes
 		this.by_id.set(message.id, message);
 
+		// Trim collection if it exceeds history limit
+		this.#trim_to_history_limit();
+
 		return message;
+	}
+
+	/**
+	 * Trims the collection to the maximum allowed size by removing oldest messages
+	 */
+	#trim_to_history_limit(): void {
+		if (this.items.length <= this.history_limit) return;
+
+		// Calculate how many items to remove
+		const excess = this.items.length - this.history_limit;
+
+		// Remove oldest messages (those at the beginning of the array)
+		const removed = this.items.splice(0, excess);
+
+		// Update indexes by removing the references to deleted messages
+		for (const message of removed) {
+			if (message.id) {
+				this.by_id.delete(message.id);
+			}
+		}
 	}
 }
