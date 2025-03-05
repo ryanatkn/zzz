@@ -30,7 +30,7 @@ Claude gets as much credit as I do for the code, more if you're talking about li
 This is some of the lowest quality code I've ever published and I need to own that.
 I think it's mostly good, much better than the statistical average,
 but there's definitely slop in less important parts of the code
-that I'm breezing through in the interest of speed and priorities.)
+that I'm breezing through in the interest of speed and priorities.
 You can see my degeneration from enthusiast coder to slop merchant
 in [PR #6](https://github.com/ryanatkn/zzz/pull/6).
 
