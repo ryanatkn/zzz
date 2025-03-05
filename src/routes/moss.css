@@ -345,6 +345,9 @@ a.chip {
 	background-color: var(--panel_bg, var(--fg_1));
 }
 
+.pb_md {
+	padding-bottom: var(--space_md);
+}
 .pb_xl7 {
 	padding-bottom: var(--space_xl7);
 }

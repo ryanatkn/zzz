@@ -51,6 +51,7 @@ export type Message_Load_Session = z.infer<typeof Message_Load_Session>;
 export const Message_Loaded_Session = Message_Base.extend({
 	type: z.literal('loaded_session'),
 	data: z
+		// TODO BLOCK extract a schema
 		.object({
 			files: z.record(Diskfile_Path, Source_File),
 		})

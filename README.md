@@ -19,16 +19,19 @@ To help see the issues and [discussions](https://github.com/ryanatkn/zzz/discuss
 or find me on [Bluesky](https://bsky.app/profile/ryanatkn.com).
 
 Unlike all of my previous projects, I'm slopping out Zzz's code with generative AI.
-I started with several thousand lines of handwritten code in a couple weeks in 2024,
+I started with several thousand handwritten lines over a couple weeks in October 2024
+(after naming the project that January and thinking about it a while),
 but Claude 3.6 released a week after I started,
-and Claude kept delivering results that justified increasing time investment,
-and things kept escalating,
-and so now today, in this project where I find myself increasingly ~~lazy~~ vibes coding,
+and Claude kept delivering results that justified increasing time investment.
+
+Things kept escalating to where I find myself increasingly ~~lazy~~ vibes coding.
 Claude gets as much credit as I do for the code, more if you're talking about lines written.
-(and **blame**!! this is some of the lowest quality code I've ever published and I need to own that.
-I think it's mostly good but there's definitely slop that I'm breezing over in the interest of speed)
-You can see the full history of my degeneration from enthusiast coder to slop merchant
-in [this PR](https://github.com/ryanatkn/zzz/pull/6).
+(and shares the **blame**!!
+this is some of the lowest quality code I've ever published and I need to own that.
+I think it's mostly good
+but there's definitely slop that I'm breezing through in the interest of speed and priorities)
+The full history of my degeneration from enthusiast coder to slop merchant
+is documented in [PR #6](https://github.com/ryanatkn/zzz/pull/6).
 
 ## Motivation
 
