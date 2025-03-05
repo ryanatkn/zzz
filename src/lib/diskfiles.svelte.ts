@@ -5,12 +5,8 @@ import {z} from 'zod';
 import type {Message_Filer_Change} from '$lib/message_types.js';
 import {Uuid} from '$lib/uuid.js';
 import {Diskfile} from '$lib/diskfile.svelte.js';
-import {
-	Diskfile_Json,
-	source_file_to_diskfile_json,
-	type Diskfile_Path,
-	assert_valid_source_file,
-} from '$lib/diskfile_types.js';
+import {Diskfile_Json, type Diskfile_Path} from '$lib/diskfile_types.js';
+import {source_file_to_diskfile_json, assert_valid_source_file} from '$lib/diskfile_helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {cell_array} from '$lib/cell_helpers.js';
 
