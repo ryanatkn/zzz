@@ -98,56 +98,28 @@ export class Message extends Cell<typeof Message_Json> {
 
 		// Initialize base properties
 		this.init();
+	}
 
-		// Process message-specific fields after properties are set from JSON
-		if (options.json) {
-			// Initialize type-specific properties based on message type
-			switch (this.type) {
-				case 'send_prompt':
-					if ('completion_request' in options.json && options.json.completion_request) {
-						this.completion_request = Completion_Request.parse(options.json.completion_request);
-					}
-					break;
-				case 'completion_response':
-					if ('completion_response' in options.json && options.json.completion_response) {
-						this.completion_response = Completion_Response.parse(options.json.completion_response);
-					}
-					break;
-				case 'ping':
-					break;
-				case 'pong':
-					if ('ping_id' in options.json && options.json.ping_id) {
-						this.ping_id = Uuid.parse(options.json.ping_id);
-					}
-					break;
-				case 'update_diskfile':
-					if ('path' in options.json && options.json.path) {
-						this.path = Diskfile_Path.parse(options.json.path);
-						this.contents = options.json.contents;
-					}
-					break;
-				case 'delete_diskfile':
-					if ('path' in options.json && options.json.path) {
-						this.path = Diskfile_Path.parse(options.json.path);
-					}
-					break;
-				case 'filer_change':
-					if ('change' in options.json && 'source_file' in options.json) {
-						this.change = options.json.change;
-						this.source_file = options.json.source_file;
-					}
-					break;
-				case 'loaded_session':
-					if ('data' in options.json) {
-						this.data = options.json.data;
-					}
-					break;
-				default:
-					// TODO what to do here?
-					console.log('unhandled message', this.type, this);
-					break;
-			}
+	// Override the decode_value method to handle type-specific properties
+	override decode_value(value: unknown, key: string): unknown {
+		// First use the base class implementation for general cases
+		const decoded = super.decode_value(value, key);
+
+		// Then handle specific fields based on message type and key
+		if (this.type && key === 'completion_request' && this.type === 'send_prompt') {
+			return Completion_Request.parse(value);
+		} else if (this.type && key === 'completion_response' && this.type === 'completion_response') {
+			return Completion_Response.parse(value);
+		} else if (this.type && key === 'ping_id' && this.type === 'pong') {
+			return Uuid.parse(value);
+		} else if (
+			(this.type === 'update_diskfile' || this.type === 'delete_diskfile') &&
+			key === 'path'
+		) {
+			return Diskfile_Path.parse(value);
 		}
+
+		return decoded;
 	}
 
 	// TODO make this automated with the schemas

@@ -71,13 +71,20 @@ export class Chat extends Cell<typeof Chat_Json> {
 		}
 
 		this.init();
+	}
 
-		// Handle selected prompts separately after initialization
-		if (options.json?.selected_prompt_ids) {
-			this.selected_prompts = options.json.selected_prompt_ids
+	// Override decode_value to handle special case for selected_prompt_ids
+	override decode_value(value: unknown, key: string): unknown {
+		const decoded = super.decode_value(value, key);
+
+		// Special handling for selected_prompt_ids
+		if (key === 'selected_prompt_ids' && Array.isArray(value)) {
+			return value
 				.map((id) => this.zzz.prompts.items.find((p) => p.id === id))
 				.filter((p): p is Prompt => p !== undefined);
 		}
+
+		return decoded;
 	}
 
 	// TODO BLOCK @many shouldn't exist, need to somehow know to only use the id instead of `$state.snapshot(thing)`

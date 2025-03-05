@@ -8,7 +8,7 @@
 	const zzz = zzz_context.get();
 
 	// Fixed history size
-	const HISTORY_SIZE = 10;
+	const HISTORY_SIZE = 6;
 
 	// TODO BLOCK failing here, is it being added?
 	$inspect('pongs', zzz.messages.pongs);
@@ -27,27 +27,29 @@
 	const remaining_placeholders = $derived(Math.max(0, HISTORY_SIZE - pings.length));
 </script>
 
-<div>
-	<button type="button" onclick={() => zzz.send_ping()} class="flex_1">⚞ ping</button>
-</div>
+<div class="flex row gap_md">
+	<div>
+		<button type="button" onclick={() => zzz.send_ping()} class="flex_1">⚞ ping</button>
+	</div>
 
-<ul class="ping_list p_md mt_md">
-	{#each displayed_pings as ping (ping.id)}
-		{@const response_time = ping_response_times.get(ping.id)}
-		<li transition:slide>
-			{#if response_time !== undefined}
-				{@render ping_item(response_time)}
-			{:else}
-				<Pending_Animation />
-			{/if}
-		</li>
-	{/each}
-	{#each {length: remaining_placeholders} as _}
-		<li class="placeholder" transition:slide>
-			<div style:visibility="hidden">{@render ping_item(1)}</div>
-		</li>
-	{/each}
-</ul>
+	<ul class="ping_list p_md mt_md">
+		{#each displayed_pings as ping (ping.id)}
+			{@const response_time = ping_response_times.get(ping.id)}
+			<li transition:slide>
+				{#if response_time !== undefined}
+					{@render ping_item(response_time)}
+				{:else}
+					<Pending_Animation />
+				{/if}
+			</li>
+		{/each}
+		{#each {length: remaining_placeholders} as _}
+			<li class="placeholder" transition:slide>
+				<div style:visibility="hidden">{@render ping_item(1)}</div>
+			</li>
+		{/each}
+	</ul>
+</div>
 
 {#snippet ping_item(response_time: number)}
 	{GLYPH_DIRECTION_CLIENT}{GLYPH_DIRECTION_SERVER}
@@ -56,8 +58,6 @@
 
 <style>
 	.ping_list {
-		min-height: 200px;
-		max-height: 400px;
 		overflow-y: auto;
 		display: flex;
 		flex-direction: column;
