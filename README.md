@@ -24,8 +24,7 @@ but Claude 3.6 released a week after I started,
 and Claude kept delivering results that justified increasing time investment,
 and things kept escalating,
 and so now today, in this project where I find myself increasingly ~~lazy~~ vibes coding,
-Claude gets as much credit as I do for the code, more if you're talking about lines written -
-it's way less on the design side, but not insignificant.
+Claude gets as much credit as I do for the code, more if you're talking about lines written.
 (and **blame**!! this is some of the lowest quality code I've ever published and I need to own that.
 I think it's mostly good but there's definitely slop that I'm breezing over in the interest of speed)
 You can see the full history of my degeneration from enthusiast coder to slop merchant
