@@ -36,11 +36,22 @@ in [this PR](https://github.com/ryanatkn/zzz/pull/6).
 
 ## Setup
 
+Zzz uses SvelteKit and Vite and currently requires Node.
+(or at least, that's the only one I've tested)
+The goal is to make it support many deployment targets and all the JS runtimes,
+including a desktop installation and npm library,
+but it's not there yet - for now you'll need Node 20.17+ and git to clone the repo.
+
+> Windows probably doesn't work but will be supported - help is appreciated.
+> For now I recommend [WSL](https://learn.microsoft.com/en-us/windows/wsl/install).
+
+First set up an `.env` file in your project root:
+
 - see [src/lib/server/.env.example](/src/lib/server/.env.example)
   - add to `.env` or `.env.development` and `.env.production` -
     `SECRET_ANTHROPIC_API_KEY`, `SECRET_OPENAI_API_KEY`, `SECRET_GOOGLE_API_KEY`
 
-In your terminal:
+Then in your terminal:
 
 ```bash
 npm run dev
