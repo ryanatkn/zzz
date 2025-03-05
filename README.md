@@ -23,7 +23,7 @@ I started with several thousand lines of handwritten code in a couple weeks in 2
 but then I started using Claude more and more, and it got better and better,
 and Claude basically should now get as much credit as I do.
 (and **blame**!! this is some of the lowest quality code I've ever published.
-I think it's mostly good but there's definitely slop)
+I think it's mostly good but there's definitely slop that I'm breezing over in the interest of speed)
 You can see the full history of my degeneration from enthusiast coder to slop merchant
 in [this PR](https://github.com/ryanatkn/zzz/pull/6).
 
