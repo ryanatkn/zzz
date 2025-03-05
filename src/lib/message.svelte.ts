@@ -116,8 +116,8 @@ export class Message extends Cell<typeof Message_Json> {
 				case 'ping':
 					break;
 				case 'pong':
-					if ('ping_id' in options.json) {
-						this.ping_id = options.json.ping_id;
+					if ('ping_id' in options.json && options.json.ping_id) {
+						this.ping_id = Uuid.parse(options.json.ping_id);
 					}
 					break;
 				case 'update_diskfile':

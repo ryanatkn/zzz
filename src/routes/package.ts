@@ -249,11 +249,6 @@ export const package_json = {
 			types: './dist/diskfiles.svelte.d.ts',
 			default: './dist/diskfiles.svelte.js',
 		},
-		'./Echo_Form.svelte': {
-			types: './dist/Echo_Form.svelte.d.ts',
-			svelte: './dist/Echo_Form.svelte',
-			default: './dist/Echo_Form.svelte',
-		},
 		'./External_Link_Symbol.svelte': {
 			types: './dist/External_Link_Symbol.svelte.d.ts',
 			svelte: './dist/External_Link_Symbol.svelte',
@@ -339,6 +334,11 @@ export const package_json = {
 		},
 		'./ollama.js': {types: './dist/ollama.d.ts', default: './dist/ollama.js'},
 		'./path.js': {types: './dist/path.d.ts', default: './dist/path.js'},
+		'./Ping_Form.svelte': {
+			types: './dist/Ping_Form.svelte.d.ts',
+			svelte: './dist/Ping_Form.svelte',
+			default: './dist/Ping_Form.svelte',
+		},
 		'./Prompt_List.svelte': {
 			types: './dist/Prompt_List.svelte.d.ts',
 			svelte: './dist/Prompt_List.svelte',
@@ -455,10 +455,6 @@ export const package_json = {
 		'./xml.js': {types: './dist/xml.d.ts', default: './dist/xml.js'},
 		'./zod_helpers.js': {types: './dist/zod_helpers.d.ts', default: './dist/zod_helpers.js'},
 		'./zzz_config.js': {types: './dist/zzz_config.d.ts', default: './dist/zzz_config.js'},
-		'./zzz_data.svelte.js': {
-			types: './dist/zzz_data.svelte.d.ts',
-			default: './dist/zzz_data.svelte.js',
-		},
 		'./Zzz_Root.svelte': {
 			types: './dist/Zzz_Root.svelte.d.ts',
 			svelte: './dist/Zzz_Root.svelte',
@@ -625,7 +621,6 @@ export const src_json = {
 				{name: 'Diskfiles', kind: 'class'},
 			],
 		},
-		'./Echo_Form.svelte': {path: 'Echo_Form.svelte', declarations: []},
 		'./External_Link_Symbol.svelte': {path: 'External_Link_Symbol.svelte', declarations: []},
 		'./External_Link.svelte': {path: 'External_Link.svelte', declarations: []},
 		'./glyphs.js': {
@@ -671,7 +666,8 @@ export const src_json = {
 				{name: 'Message_Direction', kind: 'variable'},
 				{name: 'Message_Type', kind: 'variable'},
 				{name: 'Message_Base', kind: 'variable'},
-				{name: 'Message_Echo', kind: 'variable'},
+				{name: 'Message_Ping', kind: 'variable'},
+				{name: 'Message_Pong', kind: 'variable'},
 				{name: 'Message_Load_Session', kind: 'variable'},
 				{name: 'Message_Loaded_Session', kind: 'variable'},
 				{name: 'Message_Filer_Change', kind: 'variable'},
@@ -708,6 +704,7 @@ export const src_json = {
 		'./messages.svelte.js': {
 			path: 'messages.svelte.ts',
 			declarations: [
+				{name: 'HISTORY_LIMIT_DEFAULT', kind: 'variable'},
 				{name: 'Messages_Json', kind: 'variable'},
 				{name: 'Messages_Options', kind: 'type'},
 				{name: 'Messages', kind: 'class'},
@@ -747,6 +744,7 @@ export const src_json = {
 			],
 		},
 		'./path.js': {path: 'path.ts', declarations: [{name: 'to_root_path', kind: 'function'}]},
+		'./Ping_Form.svelte': {path: 'Ping_Form.svelte', declarations: []},
 		'./Prompt_List.svelte': {path: 'Prompt_List.svelte', declarations: []},
 		'./Prompt_Stats.svelte': {path: 'Prompt_Stats.svelte', declarations: []},
 		'./Prompt_Summary.svelte': {path: 'Prompt_Summary.svelte', declarations: []},
@@ -913,13 +911,6 @@ export const src_json = {
 		'./zzz_config.js': {
 			path: 'zzz_config.ts',
 			declarations: [{name: 'zzz_config', kind: 'variable'}],
-		},
-		'./zzz_data.svelte.js': {
-			path: 'zzz_data.svelte.ts',
-			declarations: [
-				{name: 'Zzz_Data_Json', kind: 'type'},
-				{name: 'Zzz_Data', kind: 'class'},
-			],
 		},
 		'./Zzz_Root.svelte': {path: 'Zzz_Root.svelte', declarations: []},
 		'./zzz.svelte.js': {

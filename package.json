@@ -293,11 +293,6 @@
       "types": "./dist/diskfiles.svelte.d.ts",
       "default": "./dist/diskfiles.svelte.js"
     },
-    "./Echo_Form.svelte": {
-      "types": "./dist/Echo_Form.svelte.d.ts",
-      "svelte": "./dist/Echo_Form.svelte",
-      "default": "./dist/Echo_Form.svelte"
-    },
     "./External_Link_Symbol.svelte": {
       "types": "./dist/External_Link_Symbol.svelte.d.ts",
       "svelte": "./dist/External_Link_Symbol.svelte",
@@ -406,6 +401,11 @@
     "./path.js": {
       "types": "./dist/path.d.ts",
       "default": "./dist/path.js"
+    },
+    "./Ping_Form.svelte": {
+      "types": "./dist/Ping_Form.svelte.d.ts",
+      "svelte": "./dist/Ping_Form.svelte",
+      "default": "./dist/Ping_Form.svelte"
     },
     "./Prompt_List.svelte": {
       "types": "./dist/Prompt_List.svelte.d.ts",
@@ -551,10 +551,6 @@
     "./zzz_config.js": {
       "types": "./dist/zzz_config.d.ts",
       "default": "./dist/zzz_config.js"
-    },
-    "./zzz_data.svelte.js": {
-      "types": "./dist/zzz_data.svelte.d.ts",
-      "default": "./dist/zzz_data.svelte.js"
     },
     "./Zzz_Root.svelte": {
       "types": "./dist/Zzz_Root.svelte.d.ts",
