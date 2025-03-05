@@ -52,14 +52,16 @@
 <div class="mb_md">
 	<div class="size_lg">
 		<Text_Icon icon={GLYPH_FILE} />
-		{to_root_path(file.id)}
+		{to_root_path(file.path)}
 	</div>
 	<div class="flex flex_column gap_xs mt_sm">
-		<small class="font_mono">Size: {file.content_length} characters</small>
-		<small class="font_mono">Modified: {file.modified_formatted_date}</small>
-		<small class="font_mono">
-			Dependencies: {file.dependencies_count} • Dependents: {file.dependents_count}
-		</small>
+		<small class="font_mono">{file.id}</small>
+		<small class="font_mono">{file.content_length} characters </small>
+		<small class="font_mono">{file.contents_token_count} tokens</small>
+		<small class="font_mono">{file.dependencies_count} dependencies </small>
+		<small class="font_mono">{file.dependents_count} dependents </small>
+		<small class="font_mono">created {file.created_formatted_date}</small>
+		<small class="font_mono">updated {file.updated_formatted_date}</small>
 	</div>
 </div>
 
