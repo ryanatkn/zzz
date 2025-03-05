@@ -64,7 +64,8 @@ Browse to the location is says, probably `localhost:5173`.
 Zzz builds on a great deal of software.
 
 - see the deps in [package.json](package.json)
-- Claude wrote a lot of code after the initial version and is the main writer these days
+- [Claude](https://claude.ai/) wrote a lot of code after the initial version
+  and is the main writer these days
 
 ## License 🐦
 
