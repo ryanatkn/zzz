@@ -1,7 +1,7 @@
 import type {Class_Constructor} from '@ryanatkn/belt/types.js';
 
 import type {Cell} from '$lib/cell.svelte.js';
-import type {Zzz} from '$lib/zzz.svelte.js';
+import type {Zzz, Cell_Registry_Map} from '$lib/zzz.svelte.js';
 
 /**
  * Registry for managing cell classes and their instances
@@ -26,27 +26,38 @@ export class Cell_Registry {
 
 	/**
 	 * Create an instance of a registered cell class by name
+	 * Type is automatically inferred from class name literals
 	 */
-	instantiate<T = Cell>(class_name: string, json?: unknown): T | null {
+	instantiate<K extends keyof Cell_Registry_Map>(
+		class_name: K,
+		json?: unknown,
+	): Cell_Registry_Map[K] | null;
+	instantiate(class_name: string, json?: unknown): Cell | null;
+	instantiate(class_name: string, json?: unknown): Cell | null {
 		const constructor = this.#constructors.get(class_name);
 		if (!constructor) {
 			console.warn(`Class "${class_name}" not registered in registry`);
 			return null;
 		}
 
-		return new constructor({zzz: this.zzz, json}) as T;
+		return new constructor({zzz: this.zzz, json});
 	}
 
 	/**
 	 * Decode a value into a cell instance if applicable
 	 */
-	decode<T = Cell>(value: unknown, class_name: string): T | Array<T> | unknown {
+	decode<K extends keyof Cell_Registry_Map>(
+		value: unknown,
+		class_name: K,
+	): Cell_Registry_Map[K] | Array<Cell_Registry_Map[K]> | unknown;
+	decode(value: unknown, class_name: string): Cell | Array<Cell> | unknown;
+	decode(value: unknown, class_name: string): Cell | Array<Cell> | unknown {
 		if (Array.isArray(value)) {
-			return value.map((item) => this.decode<T>(item, class_name));
+			return value.map((item) => this.decode(item, class_name));
 		}
 
 		if (value && typeof value === 'object') {
-			return this.instantiate<T>(class_name, value);
+			return this.instantiate(class_name, value) ?? value; // TODO defaults to the value, but is that right? should it be null?
 		}
 
 		return value;

@@ -255,8 +255,7 @@ export class Zzz {
 
 	add_providers(providers_json: Array<Provider_Json>): void {
 		for (const json of providers_json) {
-			// Type assertion is safe here because we know we've registered Provider
-			const provider = this.registry.instantiate<Provider>('Provider', json);
+			const provider = this.registry.instantiate('Provider', json);
 			if (provider) {
 				this.add_provider(provider);
 			}
