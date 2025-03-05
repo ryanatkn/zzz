@@ -15,13 +15,12 @@ while remaining fully in your control and open source.
 More at [zzzbot.dev/about](https://www.zzzbot.dev/about).
 
 This is a pre-alpha and the ideas are still developing.
-To help see the issues and [discussions](https://github.com/ryanatkn/zzz/discussions),
+To help see the issues and [discussions](https://github.com/ryanatkn/zzz/discussions)
 or find me on [Bluesky](https://bsky.app/profile/ryanatkn.com).
 
 Unlike all of my previous projects, I'm slopping out Zzz's code with generative AI.
 I started with several thousand lines of handwritten code in a couple weeks in 2024
-but then I started using Claude more and more, and it got better and better,
-and I got better using it as I built tools for it,
+but then I started using Claude more and more, and it got better and I got better using it
 and so now today, in this project where I find myself increasingly ~~lazy~~ vibes coding,
 Claude should probably get as much credit as I do for the code.
 (and **blame**!! this is some of the lowest quality code I've ever published.
