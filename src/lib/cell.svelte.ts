@@ -5,7 +5,7 @@ import {DEV} from 'esm-env';
 
 import {get_field_schema, zod_get_schema_keys} from '$lib/zod_helpers.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
-import {get_schema_class_info} from '$lib/cell_helpers.js';
+import {get_schema_class_info, type Value_Parser} from '$lib/cell_helpers.js';
 
 // Base options type that all cells will extend
 export interface Cell_Options<T_Schema extends z.ZodType> {
@@ -29,6 +29,13 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> {
 
 	// Store options for use during initialization
 	protected readonly options: Cell_Options<T_Schema>;
+
+	// TODO most of the overrides for this should be replaceable with schema introspection I think
+	/**
+	 * Type-safe parsers for custom field decoding
+	 * Override in subclasses to handle special field types
+	 */
+	protected parsers: Value_Parser<T_Schema> = {};
 
 	constructor(schema: T_Schema, options: Cell_Options<T_Schema>) {
 		this.schema = schema;
@@ -103,24 +110,74 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> {
 	 */
 	set_json(value?: z.input<T_Schema>): void {
 		try {
-			const parsed = this.schema.parse(value);
-			for (const key in parsed) {
-				if (parsed[key] !== undefined) {
-					(this as any)[key] = this.decode_value(parsed[key], key);
+			// Use empty object if value is undefined to ensure schema processes defaults
+			const input = value === undefined ? {} : value;
+
+			// Parse input with schema - this will apply schema defaults for missing fields
+			const parsed = this.schema.parse(input);
+
+			// Get all schema keys to process them with parsers
+			const keys = this.schema_keys;
+
+			for (const key of keys) {
+				// Get the value from parsed data (might be schema default)
+				const parsed_value = (parsed as any)[key];
+
+				// Check if we have a custom parser for this key
+				if (key in this.parsers) {
+					const parser = this.parsers[key as keyof typeof this.parsers];
+					if (parser) {
+						// Run parser on the value (could be schema default or from JSON)
+						const result = parser(parsed_value);
+						if (result !== undefined) {
+							// Parser returned a value, use it
+							(this as any)[key] = result;
+							continue; // Skip standard decoding
+						}
+					}
+				}
+
+				// If parser didn't handle it (returned undefined) or no parser exists,
+				// use standard decoding if the value exists
+				if (parsed_value !== undefined) {
+					(this as any)[key] = this.decode_value_without_parser(parsed_value, key);
 				}
 			}
 		} catch (error) {
 			console.error(`Error setting JSON for ${this.constructor.name}:`, error);
+			throw error; // Re-throw so tests that expect errors will pass
 		}
 	}
 
 	/**
 	 * Decode a value using schema information to instantiate the right class
+	 * This is the public API that first checks parsers
+	 * @param value The value to decode
+	 * @param key The key in the schema where this value belongs
 	 */
 	decode_value(value: unknown, key: string): unknown {
-		// Get schema information for this field
-		const schema_info = this.#get_schema_info(key);
+		// First check if we have a custom parser for this key
+		if (key in this.parsers) {
+			const parser = this.parsers[key as keyof typeof this.parsers];
+			if (parser) {
+				const parsed = parser(value);
+				// Only return the parsed value if it's not undefined
+				if (parsed !== undefined) {
+					return parsed;
+				}
+			}
+		}
 
+		// If no custom parser or parser returned undefined, use standard decoding
+		return this.decode_value_without_parser(value, key);
+	}
+
+	/**
+	 * Internal method to decode a value without using parsers
+	 * This is used by the set_json method and as a fallback from decode_value
+	 */
+	decode_value_without_parser(value: unknown, key: string): unknown {
+		const schema_info = this.#get_schema_info(key);
 		if (!schema_info) return value;
 
 		// Handle arrays of cells
@@ -186,7 +243,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> {
 	 */
 	#instantiate_class(class_name: string | undefined, json: unknown): unknown {
 		if (!class_name) {
-			return json;
+			return json; // TODO BLOCK this seems weird
 		}
 
 		// No type assertion needed - this will be validated at runtime

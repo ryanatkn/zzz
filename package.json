@@ -129,6 +129,10 @@
       "types": "./dist/cell_registry.d.ts",
       "default": "./dist/cell_registry.js"
     },
+    "./cell_types.js": {
+      "types": "./dist/cell_types.d.ts",
+      "default": "./dist/cell_types.js"
+    },
     "./cell.svelte.js": {
       "types": "./dist/cell.svelte.d.ts",
       "default": "./dist/cell.svelte.js"

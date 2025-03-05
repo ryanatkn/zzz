@@ -39,7 +39,7 @@ export const Chat_Json = z
 		}),
 		created: Datetime_Now,
 		tapes: z.array(Tape_Json).default(() => []),
-		selected_prompt_ids: z.array(Uuid).default(() => []),
+		selected_prompt_ids: z.array(Uuid).default(() => []), // TODO consider making these refs, automatic classes (maybe as separate properties by convention, so the original is still the plain ids)
 	})
 	.default(() => ({}));
 
@@ -59,32 +59,30 @@ export class Chat extends Cell<typeof Chat_Json> {
 	constructor(options: Chat_Options) {
 		super(Chat_Json, options);
 
-		if (!options.json?.name) {
-			this.name = get_unique_name(
-				NEW_CHAT_PREFIX,
-				this.zzz.chats.items.map((c) => c.name),
-			);
-		}
+		// Initialize parsers with type-specific handlers
+		this.parsers = {
+			name: (value) => {
+				// If name is undefined, generate a unique name
+				if (value === undefined) {
+					return get_unique_name(
+						NEW_CHAT_PREFIX,
+						this.zzz.chats.items.map((c) => c.name),
+					);
+				}
+				return undefined; // Let the schema handle it
+			},
+			selected_prompt_ids: (value) => {
+				if (Array.isArray(value)) {
+					return value
+						.map((id) => this.zzz.prompts.items.find((p) => p.id === id)?.id)
+						.filter((p) => p !== undefined);
+				}
+				return undefined;
+			},
+		};
 
-		if (!options.json?.created) {
-			this.created = Datetime_Now.parse(undefined);
-		}
-
+		// Initialize the instance
 		this.init();
-	}
-
-	// Override decode_value to handle special case for selected_prompt_ids
-	override decode_value(value: unknown, key: string): unknown {
-		const decoded = super.decode_value(value, key);
-
-		// Special handling for selected_prompt_ids
-		if (key === 'selected_prompt_ids' && Array.isArray(value)) {
-			return value
-				.map((id) => this.zzz.prompts.items.find((p) => p.id === id))
-				.filter((p): p is Prompt => p !== undefined);
-		}
-
-		return decoded;
 	}
 
 	// TODO BLOCK @many shouldn't exist, need to somehow know to only use the id instead of `$state.snapshot(thing)`

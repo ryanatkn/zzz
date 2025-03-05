@@ -116,6 +116,7 @@ export const Message_Server = z.discriminatedUnion('type', [
 ]);
 export type Message_Server = z.infer<typeof Message_Server>;
 
+// TODO BLOCK this name conflicts with the other Message
 // Union of all message types
 export const Message = z.discriminatedUnion('type', [
 	Message_Ping,

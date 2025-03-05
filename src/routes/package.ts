@@ -103,6 +103,7 @@ export const package_json = {
 		'./bit.svelte.js': {types: './dist/bit.svelte.d.ts', default: './dist/bit.svelte.js'},
 		'./cell_helpers.js': {types: './dist/cell_helpers.d.ts', default: './dist/cell_helpers.js'},
 		'./cell_registry.js': {types: './dist/cell_registry.d.ts', default: './dist/cell_registry.js'},
+		'./cell_types.js': {types: './dist/cell_types.d.ts', default: './dist/cell_types.js'},
 		'./cell.svelte.js': {types: './dist/cell.svelte.d.ts', default: './dist/cell.svelte.js'},
 		'./Chat_Item.svelte': {
 			types: './dist/Chat_Item.svelte.d.ts',
@@ -488,12 +489,20 @@ export const src_json = {
 				{name: 'ZOD_ELEMENT_CLASS_NAME', kind: 'variable'},
 				{name: 'cell_class', kind: 'function'},
 				{name: 'cell_array', kind: 'function'},
+				{name: 'Value_Parser', kind: 'type'},
 				{name: 'get_schema_class_info', kind: 'function'},
 			],
 		},
 		'./cell_registry.js': {
 			path: 'cell_registry.ts',
 			declarations: [{name: 'Cell_Registry', kind: 'class'}],
+		},
+		'./cell_types.js': {
+			path: 'cell_types.ts',
+			declarations: [
+				{name: 'Schema_Keys', kind: 'type'},
+				{name: 'Schema_Value', kind: 'type'},
+			],
 		},
 		'./cell.svelte.js': {
 			path: 'cell.svelte.ts',

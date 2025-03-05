@@ -46,53 +46,66 @@ export const cell_array = <T extends z.ZodTypeAny>(schema: T, className: string)
 	return schema;
 };
 
+// A type helper that makes it easier to define value parsers with correct input types
+export type Value_Parser<
+	TSchema extends z.ZodType,
+	TKey extends keyof z.infer<TSchema> & string = keyof z.infer<TSchema> & string,
+> = {
+	[K in TKey]?: (value: unknown) => z.infer<TSchema>[K] | undefined;
+};
+
 /**
- * Utility function to extract cell-specific class information from a schema
- *
- * @param field_schema The zod schema to examine
- * @returns Object containing class information
+ * Get schema class information from a Zod schema.
+ * This helps determine how to decode values based on their schema definition.
  */
 export const get_schema_class_info = (
-	field_schema: z.ZodTypeAny,
+	schema: z.ZodTypeAny,
 ): {
 	type?: string;
 	is_array?: boolean;
 	class_name?: string;
 	element_class?: string;
 } | null => {
-	if (!field_schema) return null;
+	if (!schema) return null;
 
-	const def = (field_schema as any)._def;
-	if (!def) return null;
-
-	const result: {
-		type?: string;
-		is_array?: boolean;
-		class_name?: string;
-		element_class?: string;
-	} = {
-		type: def.typeName,
-	};
-
-	// Check if it's an array
-	if (def.typeName === 'ZodArray') {
-		result.is_array = true;
-
-		// Look for element class metadata
-		if (def[ZOD_ELEMENT_CLASS_NAME]) {
-			result.element_class = def[ZOD_ELEMENT_CLASS_NAME];
-		}
-
-		// Also look at the inner type
-		const element_type = def.type;
-		if (element_type?.[ZOD_CELL_CLASS_NAME]) {
-			result.element_class = element_type[ZOD_CELL_CLASS_NAME];
-		}
-	}
-	// Check for class metadata on the field itself
-	else if ((field_schema as any)[ZOD_CELL_CLASS_NAME]) {
-		result.class_name = (field_schema as any)[ZOD_CELL_CLASS_NAME];
+	// Handle ZodEffects (refinement, transformation, etc.)
+	if (schema instanceof z.ZodEffects) {
+		return get_schema_class_info(schema.innerType());
 	}
 
-	return result;
+	// Handle ZodObject with _zMetadata property
+	if (
+		schema instanceof z.ZodObject &&
+		typeof schema._def.description === 'string' &&
+		schema._def.description.startsWith('_zMetadata:')
+	) {
+		const class_name = schema._def.description.split(':')[1];
+		return {type: 'ZodObject', class_name};
+	}
+
+	// Handle ZodArray
+	if (schema instanceof z.ZodArray) {
+		const element_info = get_schema_class_info(schema.element);
+		return {
+			type: 'ZodArray',
+			is_array: true,
+			element_class: element_info?.class_name,
+		};
+	}
+
+	// Handle ZodBranded
+	if (schema instanceof z.ZodBranded) {
+		return {type: 'ZodBranded'};
+	}
+
+	// Handle ZodMap and ZodSet
+	if (schema instanceof z.ZodMap) {
+		return {type: 'ZodMap'};
+	}
+	if (schema instanceof z.ZodSet) {
+		return {type: 'ZodSet'};
+	}
+
+	// Handle other types
+	return {type: schema.constructor.name};
 };

@@ -11,7 +11,7 @@ import {
 } from '$lib/completion.js';
 import {Uuid} from '$lib/uuid.js';
 import {Message_Json, type Message_Direction, type Message_Type} from '$lib/message_types.js';
-import type {Datetime_Now} from '$lib/zod_helpers.js';
+import {Datetime_Now} from '$lib/zod_helpers.js';
 import {Diskfile_Path} from '$lib/diskfile_types.js';
 
 // Constants for preview length and formatting
@@ -96,30 +96,21 @@ export class Message extends Cell<typeof Message_Json> {
 	constructor(options: Message_Options) {
 		super(Message_Json, options);
 
+		// Initialize parsers with type-specific handlers
+		this.parsers = {
+			completion_request: (value) =>
+				this.type === 'send_prompt' ? Completion_Request.parse(value) : undefined,
+			completion_response: (value) =>
+				this.type === 'completion_response' ? Completion_Response.parse(value) : undefined,
+			ping_id: (value) => (this.type === 'pong' ? Uuid.parse(value) : undefined),
+			path: (value) =>
+				this.type === 'update_diskfile' || this.type === 'delete_diskfile'
+					? Diskfile_Path.parse(value)
+					: undefined,
+		};
+
 		// Initialize base properties
 		this.init();
-	}
-
-	// Override the decode_value method to handle type-specific properties
-	override decode_value(value: unknown, key: string): unknown {
-		// First use the base class implementation for general cases
-		const decoded = super.decode_value(value, key);
-
-		// Then handle specific fields based on message type and key
-		if (this.type && key === 'completion_request' && this.type === 'send_prompt') {
-			return Completion_Request.parse(value);
-		} else if (this.type && key === 'completion_response' && this.type === 'completion_response') {
-			return Completion_Response.parse(value);
-		} else if (this.type && key === 'ping_id' && this.type === 'pong') {
-			return Uuid.parse(value);
-		} else if (
-			(this.type === 'update_diskfile' || this.type === 'delete_diskfile') &&
-			key === 'path'
-		) {
-			return Diskfile_Path.parse(value);
-		}
-
-		return decoded;
 	}
 
 	// TODO make this automated with the schemas
