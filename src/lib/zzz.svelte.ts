@@ -2,11 +2,13 @@ import {create_context} from '@ryanatkn/fuz/context_helpers.js';
 import {SvelteMap} from 'svelte/reactivity';
 import {create_deferred, type Deferred} from '@ryanatkn/belt/async.js';
 import type {Class_Constructor} from '@ryanatkn/belt/types.js';
+import {DEV} from 'esm-env';
 
 import type {
-	Message_Echo,
 	Message_Send_Prompt,
 	Message_Completion_Response,
+	Message_Ping,
+	Message_Pong,
 } from '$lib/message_types.js';
 import {Provider, type Provider_Json} from '$lib/provider.svelte.js';
 import type {Provider_Name} from '$lib/provider_types.js';
@@ -89,8 +91,8 @@ export class Zzz {
 
 	tags: Set<string> = $derived.by(() => new Set(this.models.items.flatMap((m) => m.tags)));
 
-	echos: Array<Message_Echo> = $state([]);
-	echos_max_length: number = $state(10);
+	ping_start_times: Map<Uuid, number> = new Map();
+	ping_elapsed: SvelteMap<Uuid, number> = new SvelteMap();
 
 	// TODO could track this more formally, and add time tracking
 	pending_prompts: SvelteMap<Uuid, Deferred<Message_Completion_Response>> = new SvelteMap();
@@ -226,28 +228,37 @@ export class Zzz {
 		this.pending_prompts.delete(message.completion_response.request_id); // deleting intentionally after resolving to maybe avoid a corner case loop of sending the same prompt again
 	}
 
-	readonly echo_start_times: Map<Uuid, number> = new Map();
-
-	readonly echo_elapsed: SvelteMap<Uuid, number> = new SvelteMap();
-
-	send_echo(data: unknown): void {
+	/**
+	 * Sends a ping to the server and tracks its start time
+	 * @param message The text message to include in the ping
+	 */
+	send_ping(): void {
 		const id = Uuid.parse(undefined);
-		const message: Message_Echo = {id, type: 'echo', data};
-		this.messages.send(message);
-		this.echo_start_times.set(id, Date.now());
-		this.echos = [message, ...this.echos.slice(0, this.echos_max_length - 1)];
+		const ping: Message_Ping = {
+			id,
+			type: 'ping',
+		};
+
+		this.messages.send(ping);
+		this.ping_start_times.set(id, performance.now());
 	}
 
-	receive_echo(message: Message_Echo): void {
-		const {id} = message;
-		const start_time = this.echo_start_times.get(id);
+	/**
+	 * Handle a pong response from the server
+	 * @param pong The pong message received
+	 */
+	receive_pong(pong: Message_Pong): void {
+		const ping_id = pong.ping_id;
+		const start_time = this.ping_start_times.get(ping_id);
+
 		if (start_time === undefined) {
-			console.error('expected start time', id);
+			if (DEV) console.error('Expected start time for ping', ping_id);
 			return;
 		}
-		this.echo_start_times.delete(id);
-		const elapsed = Date.now() - start_time;
-		this.echo_elapsed.set(id, elapsed);
+
+		this.ping_start_times.delete(ping_id);
+		const elapsed = performance.now() - start_time;
+		this.ping_elapsed.set(ping_id, elapsed);
 	}
 
 	// TODO API? close/open/toggle? just toggle? messages+mutations?

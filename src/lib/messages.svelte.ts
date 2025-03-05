@@ -8,6 +8,7 @@ import {
 	type Message_Client,
 	type Message_Server,
 	create_message_json,
+	type Message_Type,
 } from '$lib/message_types.js';
 import type {Uuid} from '$lib/uuid.js';
 import {cell_array} from '$lib/cell_helpers.js';
@@ -37,6 +38,18 @@ export class Messages extends Cell<typeof Messages_Json> {
 
 	by_id: SvelteMap<Uuid, Message> = new SvelteMap();
 
+	by_type: SvelteMap<Message_Type, Array<Message>> = new SvelteMap();
+
+	// Derived collections for easy access
+	pings: Array<Message> = $derived(this.by_type.get('ping') || []);
+	pongs: Array<Message> = $derived(this.by_type.get('pong') || []);
+	prompts: Array<Message> = $derived(this.by_type.get('send_prompt') || []);
+	completions: Array<Message> = $derived(this.by_type.get('completion_response') || []);
+	diskfile_updates: Array<Message> = $derived(this.by_type.get('update_diskfile') || []);
+	diskfile_deletes: Array<Message> = $derived(this.by_type.get('delete_diskfile') || []);
+	filer_changes: Array<Message> = $derived(this.by_type.get('filer_change') || []);
+
+	// Message handlers
 	onsend?: (message: Message_Client) => void;
 	#onreceive?: (message: Message_Server) => void;
 
@@ -49,16 +62,43 @@ export class Messages extends Cell<typeof Messages_Json> {
 	}
 
 	/**
+	 * Add a message to a type collection
+	 */
+	#add_to_type_collection(message: Message): void {
+		const type_collection = this.by_type.get(message.type);
+		if (type_collection) {
+			type_collection.push(message);
+		} else {
+			const messages = $state([message]);
+			this.by_type.set(message.type, messages);
+		}
+	}
+
+	/**
+	 * Remove a message from a type collection
+	 */
+	#remove_from_type_collection(message: Message): void {
+		const type_collection = this.by_type.get(message.type);
+		if (type_collection) {
+			const updated_collection = type_collection.filter((m) => m.id !== message.id);
+			if (!updated_collection.length) {
+				this.by_type.delete(message.type);
+			} else {
+				this.by_type.set(message.type, updated_collection);
+			}
+		}
+	}
+
+	/**
 	 * Rebuild the lookup indexes for the messages
 	 */
 	#rebuild_indexes(): void {
 		this.by_id.clear();
+		this.by_type.clear();
 
 		for (const message of this.items) {
-			if (message.id) {
-				this.by_id.set(message.id, message);
-			}
-			// Add other indexes as needed
+			this.by_id.set(message.id, message);
+			this.#add_to_type_collection(message);
 		}
 	}
 
@@ -117,6 +157,7 @@ export class Messages extends Cell<typeof Messages_Json> {
 
 		// Update indexes
 		this.by_id.set(message.id, message);
+		this.#add_to_type_collection(message);
 
 		// Trim collection if it exceeds history limit
 		this.#trim_to_history_limit();
@@ -138,9 +179,8 @@ export class Messages extends Cell<typeof Messages_Json> {
 
 		// Update indexes by removing the references to deleted messages
 		for (const message of removed) {
-			if (message.id) {
-				this.by_id.delete(message.id);
-			}
+			this.by_id.delete(message.id);
+			this.#remove_from_type_collection(message);
 		}
 	}
 }

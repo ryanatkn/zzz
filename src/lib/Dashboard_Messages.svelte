@@ -48,10 +48,10 @@
 				</div>
 
 				<div>
-					{#if selected_message.is_echo}
+					{#if selected_message.is_pong}
 						<pre
 							class="font_mono size_sm white_space_pre_wrap word_break_break_word p_sm bg_alt rounded">{JSON.stringify(
-								selected_message.data,
+								selected_message.ping_id,
 								null,
 								2,
 							)}</pre>

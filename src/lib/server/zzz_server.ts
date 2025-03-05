@@ -108,10 +108,12 @@ export class Zzz_Server {
 	async receive(message: Message_Client): Promise<Message_Server | null> {
 		console.log(`[zzz_server.receive] message`, message.id, message.type);
 		switch (message.type) {
-			case 'echo': {
-				// TODO make this a middleware with a configurable value controllable by the frontend
-				// await wait(1000);
-				return message; // TODO BLOCK problem here is the id needs to be new, and it needs to reference the original message id, so maybe PING and PONG ? we need a conventional property for messages to be like "this is a response to this message"
+			case 'ping': {
+				return {
+					id: Uuid.parse(undefined),
+					type: 'pong',
+					ping_id: message.id,
+				};
 			}
 			case 'load_session': {
 				// Use encode method directly on the files Map to convert it to a compatible format

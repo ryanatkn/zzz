@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Echo_Form from '$lib/Echo_Form.svelte';
+	import Ping_Form from '$lib/Ping_Form.svelte';
 
 	// interface Props {}
 
@@ -8,7 +8,7 @@
 	// TODO
 </script>
 
-<section class="width_sm">
+<section class="column align_items_start">
 	<h2>echo test</h2>
-	<Echo_Form />
+	<Ping_Form />
 </section>

@@ -110,8 +110,8 @@
 					zzz.diskfiles.handle_change(message);
 					break;
 				}
-				case 'echo': {
-					zzz.receive_echo(message);
+				case 'pong': {
+					zzz.receive_pong(message);
 					break;
 				}
 				default:

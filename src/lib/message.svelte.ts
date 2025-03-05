@@ -1,5 +1,6 @@
 import {format} from 'date-fns';
 import {z} from 'zod';
+import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {
@@ -21,6 +22,10 @@ export const MESSAGE_TIME_FORMAT = 'p';
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface Message_Options extends Cell_Options<typeof Message_Json> {}
 
+// TODO think about splitting out a different non-reactive version
+// that only handles the static expectation,
+// but then another for dynamic usage? is there even such a thing of a message changing?
+// if not shouldn't we just remove the $state below?
 export class Message extends Cell<typeof Message_Json> {
 	id: Uuid = $state()!;
 	type: Message_Type = $state()!;
@@ -28,13 +33,14 @@ export class Message extends Cell<typeof Message_Json> {
 	created: Datetime_Now = $state()!;
 
 	// Store data based on message type
-	data: unknown = $state();
+	data: Record<string, any> | undefined = $state();
+	ping_id: Uuid | undefined = $state();
 	completion_request: Completion_Request_Type | undefined = $state();
 	completion_response: Completion_Response | undefined = $state();
 	path: Diskfile_Path | undefined = $state();
 	contents: string | undefined = $state();
-	change: any | undefined = $state();
-	source_file: any | undefined = $state();
+	change: any | undefined = $state(); // TODO schema types
+	source_file: any | undefined = $state(); // TODO schema types
 
 	created_date: Date = $derived(new Date(this.created));
 	created_formatted_time: string = $derived(format(this.created_date, MESSAGE_TIME_FORMAT));
@@ -42,7 +48,9 @@ export class Message extends Cell<typeof Message_Json> {
 
 	display_name: string = $derived(`${this.type} (${this.direction})`);
 
-	is_echo: boolean = $derived(this.type === 'echo');
+	// TODO maybe change these to be located on `this.type` as a `Message_Type_Name` class which JSON serializes to the string `Message_Type` but at runtime has properties like these:
+	is_ping: boolean = $derived(this.type === 'ping');
+	is_pong: boolean = $derived(this.type === 'pong');
 	is_prompt: boolean = $derived(this.type === 'send_prompt');
 	is_completion: boolean = $derived(this.type === 'completion_response');
 	is_session: boolean = $derived(this.type === 'load_session' || this.type === 'loaded_session');
@@ -105,9 +113,11 @@ export class Message extends Cell<typeof Message_Json> {
 						this.completion_response = Completion_Response.parse(options.json.completion_response);
 					}
 					break;
-				case 'echo':
-					if ('data' in options.json) {
-						this.data = options.json.data;
+				case 'ping':
+					break;
+				case 'pong':
+					if ('ping_id' in options.json) {
+						this.ping_id = options.json.ping_id;
 					}
 					break;
 				case 'update_diskfile':
@@ -140,6 +150,7 @@ export class Message extends Cell<typeof Message_Json> {
 		}
 	}
 
+	// TODO make this automated with the schemas
 	override to_json(): z.output<typeof Message_Json> {
 		// Create base message data
 		const base = {
@@ -151,8 +162,10 @@ export class Message extends Cell<typeof Message_Json> {
 
 		// Add type-specific properties
 		switch (this.type) {
-			case 'echo':
-				return {...base, data: this.data};
+			case 'ping':
+				return base;
+			case 'pong':
+				return {...base, ping_id: this.ping_id};
 			case 'send_prompt':
 				return {...base, completion_request: this.completion_request};
 			case 'completion_response':
@@ -168,7 +181,7 @@ export class Message extends Cell<typeof Message_Json> {
 			case 'load_session':
 				return base;
 			default:
-				return base as z.output<typeof Message_Json>;
+				throw new Unreachable_Error(this.type);
 		}
 	}
 }
