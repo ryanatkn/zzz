@@ -156,7 +156,7 @@
 				content: 'Settings',
 				icon: '?',
 				run: () => {
-					zzz.data.show_main_dialog = true;
+					zzz.ui.show_main_dialog = true;
 				},
 			},
 		},

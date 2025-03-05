@@ -522,6 +522,10 @@
       "svelte": "./dist/Text_Icon.svelte",
       "default": "./dist/Text_Icon.svelte"
     },
+    "./ui.svelte.js": {
+      "types": "./dist/ui.svelte.d.ts",
+      "default": "./dist/ui.svelte.js"
+    },
     "./uuid.js": {
       "types": "./dist/uuid.d.ts",
       "default": "./dist/uuid.js"

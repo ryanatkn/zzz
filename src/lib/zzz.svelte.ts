@@ -3,7 +3,6 @@ import {SvelteMap} from 'svelte/reactivity';
 import {create_deferred, type Deferred} from '@ryanatkn/belt/async.js';
 import type {Class_Constructor} from '@ryanatkn/belt/types.js';
 
-import {Zzz_Data, type Zzz_Data_Json} from '$lib/zzz_data.svelte.js';
 import type {
 	Message_Echo,
 	Message_Send_Prompt,
@@ -30,6 +29,7 @@ import {Diskfile} from '$lib/diskfile.svelte.js';
 import {Message} from '$lib/message.svelte.js';
 import {Prompt} from '$lib/prompt.svelte.js';
 import {Tape} from '$lib/tape.svelte.js';
+import {Ui, Ui_Json} from '$lib/ui.svelte.js';
 
 // Define standard cell classes
 export const cell_classes = {
@@ -47,6 +47,7 @@ export const cell_classes = {
 	Provider,
 	Providers,
 	Tape,
+	Ui,
 };
 
 // Automatically derive Cell_Registry_Map from cell_classes
@@ -60,14 +61,13 @@ export interface Zzz_Options {
 	send?: (message: any) => void;
 	receive?: (message: any) => void;
 	completion_threads?: Completion_Threads;
-	data?: Zzz_Data;
 	models?: Array<Model_Json>;
 	providers?: Array<Provider_Json>;
 	cells?: Record<string, Class_Constructor<Cell>>;
 }
 
 export interface Zzz_Json {
-	data: Zzz_Data_Json;
+	ui: Ui_Json;
 	completion_threads: Completion_Threads_Json;
 }
 
@@ -76,8 +76,10 @@ export interface Zzz_Json {
  * Gettable with `zzz_context.get()` inside a `<Zzz_Root>`.
  */
 export class Zzz {
-	data: Zzz_Data;
 	readonly registry: Cell_Registry;
+
+	// Cells
+	readonly ui: Ui;
 	readonly models: Models;
 	readonly chats: Chats;
 	readonly providers: Providers;
@@ -99,13 +101,19 @@ export class Zzz {
 
 	constructor(options: Zzz_Options = {}) {
 		// Initialize properties in the correct order
-		this.data = options.data ?? new Zzz_Data();
 		this.completion_threads = options.completion_threads ?? new Completion_Threads({zzz: this});
 
 		// Initialize the registry
 		this.registry = new Cell_Registry(this);
 
-		// Initialize component collections first
+		// Register cell classes if provided, otherwise use default cell_classes
+		const cells_to_register = options.cells || cell_classes;
+		for (const constructor of Object.values(cells_to_register)) {
+			this.registry.register(constructor);
+		}
+
+		// Initialize cell collections first
+		this.ui = new Ui({zzz: this});
 		this.models = new Models({zzz: this});
 		this.chats = new Chats({zzz: this});
 		this.providers = new Providers({zzz: this});
@@ -116,12 +124,6 @@ export class Zzz {
 		// Set up message handlers if provided
 		if (options.send && options.receive) {
 			this.messages.set_handlers(options.send, options.receive);
-		}
-
-		// Register cell classes if provided, otherwise use default cell_classes
-		const cells_to_register = options.cells || cell_classes;
-		for (const constructor of Object.values(cells_to_register)) {
-			this.registry.register(constructor);
 		}
 
 		// Add providers if provided in options
@@ -145,7 +147,7 @@ export class Zzz {
 	// TODO BLOCK extend cell so this doesnt exist, automatic from the schema
 	toJSON(): Zzz_Json {
 		return {
-			data: this.data.toJSON(),
+			ui: this.ui.toJSON(),
 			completion_threads: this.completion_threads.toJSON(),
 		};
 	}
@@ -249,8 +251,8 @@ export class Zzz {
 	}
 
 	// TODO API? close/open/toggle? just toggle? messages+mutations?
-	toggle_main_menu(value = !this.data.show_main_dialog): void {
-		this.data.show_main_dialog = value;
+	toggle_main_menu(value = !this.ui.show_main_dialog): void {
+		this.ui.show_main_dialog = value;
 	}
 
 	add_providers(providers_json: Array<Provider_Json>): void {

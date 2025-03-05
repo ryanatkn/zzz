@@ -90,14 +90,13 @@
 								<dd>{selected_message.completion_data?.created || 'Unknown'}</dd>
 							</dl>
 						</div>
-					{:else}
-						<pre
-							class="font_mono size_sm white_space_pre_wrap word_break_break_word p_sm bg_alt rounded">{JSON.stringify(
-								selected_message.data,
-								null,
-								2,
-							)}</pre>
 					{/if}
+					<pre
+						class="font_mono size_sm white_space_pre_wrap word_break_break_word p_sm bg_alt rounded">{JSON.stringify(
+							selected_message.json,
+							null,
+							2,
+						)}</pre>
 				</div>
 			{:else}
 				<div class="flex align_items_center justify_content_center h_100">

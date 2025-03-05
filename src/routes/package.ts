@@ -440,6 +440,7 @@ export const package_json = {
 			svelte: './dist/Text_Icon.svelte',
 			default: './dist/Text_Icon.svelte',
 		},
+		'./ui.svelte.js': {types: './dist/ui.svelte.d.ts', default: './dist/ui.svelte.js'},
 		'./uuid.js': {types: './dist/uuid.d.ts', default: './dist/uuid.js'},
 		'./Xml_Attribute_Input.svelte': {
 			types: './dist/Xml_Attribute_Input.svelte.d.ts',
@@ -872,6 +873,14 @@ export const src_json = {
 			],
 		},
 		'./Text_Icon.svelte': {path: 'Text_Icon.svelte', declarations: []},
+		'./ui.svelte.js': {
+			path: 'ui.svelte.ts',
+			declarations: [
+				{name: 'Ui_Json', kind: 'variable'},
+				{name: 'Ui_Options', kind: 'type'},
+				{name: 'Ui', kind: 'class'},
+			],
+		},
 		'./uuid.js': {
 			path: 'uuid.ts',
 			declarations: [

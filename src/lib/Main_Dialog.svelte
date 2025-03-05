@@ -18,7 +18,7 @@
 	const zzz = zzz_context.get();
 
 	onNavigate(() => {
-		if (zzz.data.show_main_dialog) zzz.toggle_main_menu(false);
+		if (zzz.ui.show_main_dialog) zzz.toggle_main_menu(false);
 	});
 </script>
 
@@ -33,7 +33,7 @@
 			}}
 />
 
-{#if !disabled && zzz.data.show_main_dialog}
+{#if !disabled && zzz.ui.show_main_dialog}
 	<Dialog onclose={() => zzz.toggle_main_menu(false)} layout="page">
 		<div class="pane">
 			<section class="p_xl box">
