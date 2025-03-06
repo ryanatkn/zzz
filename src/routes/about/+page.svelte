@@ -47,7 +47,7 @@
 			proprietary clients of the major providers, and while that situation may continue, open
 			clients like Zzz offer custom power that closed software can't access. A user of an open
 			client may begin by comparing the outputs of two models, but the possibilities are an entire
-			universe unavailable to closed software.
+			social universe unavailable to closed software.
 		</p>
 		<p>
 			Clients mediate and control our interactions with AI, so they're powerful and rather
