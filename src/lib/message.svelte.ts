@@ -8,6 +8,7 @@ import {
 	Completion_Request,
 	Completion_Response,
 	type Completion_Request as Completion_Request_Type,
+	ensure_valid_response,
 } from '$lib/completion.js';
 import {Uuid} from '$lib/uuid.js';
 import {Message_Json, type Message_Direction, type Message_Type} from '$lib/message_types.js';
@@ -69,7 +70,9 @@ export class Message extends Cell<typeof Message_Json> {
 	);
 
 	completion_text: string | null | undefined = $derived(
-		this.completion_data ? to_completion_response_text(this.completion_data) : null,
+		this.completion_data
+			? to_completion_response_text(ensure_valid_response(this.completion_data))
+			: null,
 	);
 
 	prompt_preview: string = $derived.by(() => {

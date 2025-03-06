@@ -40,6 +40,31 @@ export class Tape extends Cell<typeof Tape_Json> {
 	}
 
 	add_message(message: Chat_Message): void {
+		// If no conversation ID, create one for the first message in a conversation
+		if (!message.conversation_id) {
+			const existingConversation = this.get_active_conversation_id();
+			if (existingConversation) {
+				message.conversation_id = existingConversation;
+			} else {
+				// Start a new conversation
+				message.conversation_id = Uuid.parse(undefined);
+			}
+		}
 		this.messages.push(message);
+	}
+
+	get_active_conversation_id(): Uuid | null {
+		// Get the last message's conversation ID, if any
+		const lastMessage = this.messages[this.messages.length - 1];
+		return lastMessage?.conversation_id || null;
+	}
+
+	get_active_conversation_messages(): Array<Chat_Message> {
+		const activeConversationId = this.get_active_conversation_id();
+		if (!activeConversationId) return this.messages;
+
+		return this.messages.filter(
+			(m) => m.conversation_id === activeConversationId || !m.conversation_id,
+		);
 	}
 }

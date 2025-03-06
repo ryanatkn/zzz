@@ -8,6 +8,13 @@ import {Provider_Name} from '$lib/provider_types.js';
 import {Uuid} from '$lib/uuid.js';
 import {Datetime_Now} from '$lib/zod_helpers.js';
 
+// Define conversation history message schema
+export const Conversation_History_Message = z.object({
+	role: z.enum(['user', 'system', 'assistant']),
+	content: z.string(),
+});
+export type Conversation_History_Message = z.infer<typeof Conversation_History_Message>;
+
 // Create proper Zod schema for Completion_Request
 export const Completion_Request = z.object({
 	created: Datetime_Now,
@@ -15,6 +22,7 @@ export const Completion_Request = z.object({
 	provider_name: Provider_Name,
 	model: z.string(),
 	prompt: z.string(),
+	conversation_history: z.array(Conversation_History_Message).optional(),
 });
 export type Completion_Request = z.infer<typeof Completion_Request>;
 
@@ -118,8 +126,10 @@ export type Completion = z.infer<typeof Completion>;
 
 // Helper function for extracting text from completion responses
 export const to_completion_response_text = (
-	completion_response: Completion_Response,
-): string | null | undefined => {
+	completion_response: Completion_Response | null | undefined,
+): string | null => {
+	if (!completion_response) return null;
+
 	switch (completion_response.data.type) {
 		case 'ollama': {
 			const data = completion_response.data.value;
@@ -150,4 +160,26 @@ export const to_completion_response_text = (
 		default:
 			return null;
 	}
+};
+
+/**
+ * Safe cast function to handle potentially incompatible completion response types
+ * from different parts of the system
+ */
+export const ensure_valid_response = (response: any): Completion_Response | null => {
+	if (!response) return null;
+
+	// Ensure data and type are present
+	if (!response.data || !response.data.type) {
+		console.error('Invalid completion response format:', response);
+		return null;
+	}
+
+	// Ensure value exists
+	if (!response.data.value) {
+		// Add a default value to make the type compatible
+		response.data.value = {};
+	}
+
+	return response as Completion_Response;
 };

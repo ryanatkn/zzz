@@ -1,6 +1,4 @@
 <script lang="ts">
-	import {unreachable} from '@ryanatkn/belt/error.js';
-
 	import type {Provider} from '$lib/provider.svelte.js';
 	import type {
 		Completion_Thread,
@@ -35,6 +33,11 @@
 	//         };
 	//     };
 	// }
+
+	// Add a safe provider data handler
+	function handle_provider_data(provider_type: string | undefined): string {
+		return `Unknown provider type: ${provider_type || 'undefined'}`;
+	}
 </script>
 
 {#if completion_request}
@@ -68,8 +71,10 @@
 			{/each}
 		{:else if completion_response.data.type === 'gemini'}
 			{completion_response.data.value.text}
+		{:else if completion_response.data}
+			{handle_provider_data(completion_response.data.type)}
 		{:else}
-			{unreachable(completion_response.data)}
+			{handle_provider_data(undefined)}
 		{/if}
 	</div>
 {/if}

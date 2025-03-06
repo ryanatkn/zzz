@@ -4,6 +4,7 @@ import type {Async_Status} from '@ryanatkn/belt/async.js';
 import type {Model} from '$lib/model.svelte.js';
 import {
 	Completion_Request,
+	ensure_valid_response,
 	to_completion_response_text,
 	type Completion_Request as Completion_Request_Type,
 	type Completion_Response,
@@ -21,7 +22,9 @@ const NEW_CHAT_PREFIX = 'new chat';
 export interface Chat_Message {
 	id: Uuid;
 	created: Datetime_Now;
-	content: string; // renamed from text
+	content: string;
+	role: 'user' | 'system' | 'assistant'; // Make role required for all messages
+	conversation_id?: Uuid | null; // Add conversation_id
 	request?: Completion_Request_Type;
 	response?: Completion_Response;
 }
@@ -166,6 +169,7 @@ export class Chat extends Cell<typeof Chat_Json> {
 			id: message_id,
 			created: Datetime_Now.parse(undefined),
 			content,
+			role: 'user', // Set the role for user messages
 			request: completion_request,
 		};
 
@@ -176,11 +180,28 @@ export class Chat extends Cell<typeof Chat_Json> {
 		const message_updated = tape.messages.find((m) => m.id === message_id);
 		if (!message_updated) return;
 
-		// Direct assignment with proper typing
-		message_updated.response = response.completion_response;
+		// Simplify response handling by using the ensure_valid_response function
+		const valid_response = ensure_valid_response(response.completion_response);
+		if (valid_response && message_updated) {
+			message_updated.response = valid_response;
 
-		// Infer a name for the chat now that we have a response.
-		void this.init_name(message_updated);
+			// Extract text with null coalescing
+			const responseText = to_completion_response_text(valid_response) || '';
+
+			// Create assistant message
+			const assistant_message: Chat_Message = {
+				id: Uuid.parse(undefined),
+				created: Datetime_Now.parse(undefined),
+				content: responseText,
+				role: 'assistant',
+				conversation_id: message_updated.conversation_id,
+			};
+
+			tape.add_message(assistant_message);
+
+			// Infer a name for the chat now that we have a response.
+			void this.init_name(message_updated);
+		}
 	}
 
 	/**

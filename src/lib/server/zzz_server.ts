@@ -26,6 +26,7 @@ import {delete_diskfile_in_scope, write_file_in_scope} from '$lib/server/helpers
 import {Diskfile_Path} from '$lib/diskfile_types.js';
 import {map_watcher_change_to_diskfile_change} from '$lib/diskfile_helpers.js';
 import {Datetime_Now} from '$lib/zod_helpers.js';
+import type {Provider_Name} from '$lib/provider_types.js';
 
 const anthropic = new Anthropic({apiKey: SECRET_ANTHROPIC_API_KEY});
 const openai = new OpenAI({apiKey: SECRET_OPENAI_API_KEY});
@@ -145,6 +146,26 @@ export class Zzz_Server {
 
 				console.log(`texting ${provider_name}:`, prompt.substring(0, 1000));
 
+				// Standardize the response creation pattern across all providers
+				const create_completion_response = (
+					request_id: Uuid,
+					provider_name: Provider_Name,
+					model: string,
+					provider_data: any,
+				): Message_Completion_Response => {
+					return {
+						id: Uuid.parse(undefined),
+						type: 'completion_response',
+						completion_response: {
+							created: Datetime_Now.parse(undefined),
+							request_id,
+							provider_name,
+							model,
+							data: {type: provider_name, value: provider_data},
+						},
+					};
+				};
+
 				switch (provider_name) {
 					case 'ollama': {
 						const listed = await ollama.list();
@@ -172,17 +193,7 @@ export class Zzz_Server {
 							],
 						});
 						console.log(`ollama api_response`, api_response);
-						response = {
-							id: Uuid.parse(undefined),
-							type: 'completion_response',
-							completion_response: {
-								created: Datetime_Now.parse(undefined),
-								request_id: message.id,
-								provider_name,
-								model,
-								data: {type: provider_name, value: api_response},
-							},
-						};
+						response = create_completion_response(message.id, provider_name, model, api_response);
 						break;
 					}
 
@@ -201,17 +212,7 @@ export class Zzz_Server {
 							messages: [{role: 'user', content: [{type: 'text', text: prompt}]}],
 						});
 						console.log(`claude api_response`, api_response);
-						response = {
-							id: Uuid.parse(undefined),
-							type: 'completion_response',
-							completion_response: {
-								created: Datetime_Now.parse(undefined),
-								request_id: message.id,
-								provider_name,
-								model,
-								data: {type: provider_name, value: api_response},
-							},
-						};
+						response = create_completion_response(message.id, provider_name, model, api_response);
 						break;
 					}
 
@@ -238,17 +239,7 @@ export class Zzz_Server {
 							].filter((m) => !!m),
 						});
 						console.log(`openai api_response`, api_response);
-						response = {
-							id: Uuid.parse(undefined),
-							type: 'completion_response',
-							completion_response: {
-								created: Datetime_Now.parse(undefined),
-								request_id: message.id,
-								provider_name,
-								model,
-								data: {type: provider_name, value: api_response},
-							},
-						};
+						response = create_completion_response(message.id, provider_name, model, api_response);
 						break;
 					}
 
@@ -272,27 +263,7 @@ export class Zzz_Server {
 						});
 						const api_response = await google_model.generateContent(prompt);
 						console.log(`gemini api_response`, api_response);
-						response = {
-							id: Uuid.parse(undefined),
-							type: 'completion_response',
-							completion_response: {
-								created: Datetime_Now.parse(undefined),
-								request_id: message.id,
-								provider_name,
-								model,
-								data: {
-									type: provider_name,
-									// some of these are functions, and we want `null` for full JSON documents, so manually spelling them out:
-									value: {
-										text: api_response.response.text(),
-										candidates: api_response.response.candidates ?? null,
-										function_calls: api_response.response.functionCalls() ?? null,
-										prompt_feedback: api_response.response.promptFeedback ?? null,
-										usage_metadata: api_response.response.usageMetadata ?? null,
-									},
-								},
-							},
-						};
+						response = create_completion_response(message.id, provider_name, model, api_response);
 						break;
 					}
 
