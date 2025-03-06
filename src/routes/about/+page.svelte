@@ -46,7 +46,7 @@
 			this kind of client that does whatever you need it to do. Today most people use AI through the
 			proprietary clients of the major providers, and while that situation may continue, open
 			clients like Zzz offer custom power that closed software can't access. A user of an open
-			client may start with comparing the outputs of two models, but the possibilities are an entire
+			client may begin by comparing the outputs of two models, but the possibilities are an entire
 			universe unavailable to closed software.
 		</p>
 		<p>
