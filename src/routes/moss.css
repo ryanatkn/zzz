@@ -6,9 +6,6 @@
 .align_items_center {
 	align-items: center;
 }
-.align_items_end {
-	align-items: end;
-}
 .align_items_start {
 	align-items: start;
 }
@@ -333,6 +330,9 @@ a.chip {
 .p_xs2 {
 	padding: var(--space_xs2);
 }
+.p_xs5 {
+	padding: var(--space_xs5);
+}
 
 /* A pane is a box floating over the page, like for dialogs.
 			By default it's opaque, resetting the background to the initial depth. */
@@ -388,6 +388,9 @@ a.chip {
 }
 .pt_sm {
 	padding-top: var(--space_sm);
+}
+.pt_xs {
+	padding-top: var(--space_xs);
 }
 .px_md {
 	padding-left: var(--space_md);
@@ -494,6 +497,9 @@ a.chip {
 }
 .text_align_left {
 	text-align: left;
+}
+.text_align_right {
+	text-align: right;
 }
 .w_100 {
 	width: 100%;

@@ -1,5 +1,7 @@
 <script lang="ts">
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
+	import {slide} from 'svelte/transition';
+
 	import Prompt_Summary from '$lib/Prompt_Summary.svelte';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import type {Chat} from '$lib/chat.svelte.js';
@@ -46,7 +48,7 @@
 	};
 </script>
 
-<div class="w_100 column gap_md">
+<div class="w_100 column">
 	<div class="flex gap_xs align_items_center">
 		<select
 			class="flex_1 mb_0"
@@ -68,9 +70,9 @@
 	</div>
 
 	{#if chat.selected_prompts.length > 0}
-		<div class="w_100">
+		<div class="w_100 pt_xs">
 			<ul
-				class="unstyled column gap_xs5"
+				class="unstyled column"
 				use:reorderable.list={{
 					onreorder: (from_index, to_index) => {
 						chat.reorder_selected_prompts(from_index, to_index);
@@ -78,7 +80,7 @@
 				}}
 			>
 				{#each chat.selected_prompts as prompt, i (prompt.id)}
-					<li class="radius_xs" use:reorderable.item={{index: i}}>
+					<li class="radius_xs p_xs5" use:reorderable.item={{index: i}} transition:slide>
 						<div class="flex justify_content_space_between">
 							<Copy_To_Clipboard
 								text={prompt.content}
@@ -110,8 +112,8 @@
 			</ul>
 		</div>
 	{:else}
-		<div class="box align_items_end">
-			<blockquote class="p_md fg_1 size_sm">
+		<div class="flex justify_content_end text_align_right pt_xs" transition:slide>
+			<blockquote class="p_md fg_1 size_sm mb_0">
 				Add prompts from the list and<br />then use copy to add<br />their content to chats
 			</blockquote>
 		</div>
