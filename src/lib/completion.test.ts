@@ -1,6 +1,12 @@
 // @vitest-environment jsdom
+
 import {test, expect} from 'vitest';
-import {to_completion_response_text, ensure_valid_response} from '$lib/completion.js';
+
+import {
+	to_completion_response_text,
+	ensure_valid_response,
+	type Completion_Response,
+} from '$lib/completion.js';
 import {Uuid} from '$lib/uuid.js';
 import {Datetime_Now} from '$lib/zod_helpers.js';
 import type {Provider_Name} from '$lib/provider_types.js';
@@ -10,18 +16,24 @@ test('to_completion_response_text - handles null response', () => {
 });
 
 test('to_completion_response_text - extracts text from ollama response', () => {
-	const response = {
+	// Use a proper type assertion for the test data
+	const response: Completion_Response = {
 		created: Datetime_Now.parse(undefined),
 		request_id: Uuid.parse(undefined),
-		provider_name: 'ollama' as Provider_Name, // Cast as Provider_Name
+		provider_name: 'ollama' as Provider_Name,
 		model: 'llama3.2',
 		data: {
-			type: 'ollama',
+			type: 'ollama' as const, // Use const assertion for literal type
 			value: {
 				message: {
 					content: 'Hello, world!',
+					role: 'assistant',
 				},
-			},
+				done: true,
+				model: 'llama3.2',
+				created_at: new Date('2023-01-01'),
+				total_duration: 0,
+			} as any,
 		},
 	};
 
