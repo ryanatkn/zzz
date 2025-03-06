@@ -24,7 +24,7 @@ after naming the project that January and thinking about it a lot.
 A week later Claude 3.6 was released - I had been using 3.5 with enthusiasm
 but this model gave me a series of "oh.." moments that filled me with excitement and dread.
 
-Things kept escalating to where I find myself increasingly ~~lazy~~ vibes coding.
+Things kept escalating to where I find myself increasingly ~~lazy~~ vibecoding.
 Claude gets as much credit as I do for the code, more if you're talking about lines written.
 (and none of the **blame**!?)
 This is some of the lowest quality code I've ever published and I need to own that.

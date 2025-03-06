@@ -20,7 +20,7 @@
 
 <div class="column">
 	<ul
-		class="unstyled"
+		class="unstyled column gap_xs5"
 		use:reorderable.list={{
 			onreorder: handle_reorder,
 		}}

@@ -105,15 +105,14 @@ export const package_json = {
 		'./cell_registry.js': {types: './dist/cell_registry.d.ts', default: './dist/cell_registry.js'},
 		'./cell_types.js': {types: './dist/cell_types.d.ts', default: './dist/cell_types.js'},
 		'./cell.svelte.js': {types: './dist/cell.svelte.d.ts', default: './dist/cell.svelte.js'},
-		'./Chat_Item.svelte': {
-			types: './dist/Chat_Item.svelte.d.ts',
-			svelte: './dist/Chat_Item.svelte',
-			default: './dist/Chat_Item.svelte',
+		'./Chat_Message_Item.svelte': {
+			types: './dist/Chat_Message_Item.svelte.d.ts',
+			svelte: './dist/Chat_Message_Item.svelte',
+			default: './dist/Chat_Message_Item.svelte',
 		},
-		'./Chat_Message.svelte': {
-			types: './dist/Chat_Message.svelte.d.ts',
-			svelte: './dist/Chat_Message.svelte',
-			default: './dist/Chat_Message.svelte',
+		'./chat_message.svelte.js': {
+			types: './dist/chat_message.svelte.d.ts',
+			default: './dist/chat_message.svelte.js',
 		},
 		'./Chat_Tape.svelte': {
 			types: './dist/Chat_Tape.svelte.d.ts',
@@ -156,7 +155,6 @@ export const package_json = {
 			svelte: './dist/Completion_Threads_List.svelte',
 			default: './dist/Completion_Threads_List.svelte',
 		},
-		'./completion.js': {types: './dist/completion.d.ts', default: './dist/completion.js'},
 		'./config_helpers.js': {
 			types: './dist/config_helpers.d.ts',
 			default: './dist/config_helpers.js',
@@ -172,6 +170,10 @@ export const package_json = {
 			types: './dist/Control_Panel.svelte.d.ts',
 			svelte: './dist/Control_Panel.svelte',
 			default: './dist/Control_Panel.svelte',
+		},
+		'./conversation.svelte.js': {
+			types: './dist/conversation.svelte.d.ts',
+			default: './dist/conversation.svelte.js',
 		},
 		'./Dashboard_Capabilities.svelte': {
 			types: './dist/Dashboard_Capabilities.svelte.d.ts',
@@ -233,6 +235,10 @@ export const package_json = {
 			svelte: './dist/Diskfile_Explorer.svelte',
 			default: './dist/Diskfile_Explorer.svelte',
 		},
+		'./diskfile_helpers.js': {
+			types: './dist/diskfile_helpers.d.ts',
+			default: './dist/diskfile_helpers.js',
+		},
 		'./Diskfile_List_Item.svelte': {
 			types: './dist/Diskfile_List_Item.svelte.d.ts',
 			svelte: './dist/Diskfile_List_Item.svelte',
@@ -249,6 +255,11 @@ export const package_json = {
 		'./diskfiles.svelte.js': {
 			types: './dist/diskfiles.svelte.d.ts',
 			default: './dist/diskfiles.svelte.js',
+		},
+		'./Error_Message.svelte': {
+			types: './dist/Error_Message.svelte.d.ts',
+			svelte: './dist/Error_Message.svelte',
+			default: './dist/Error_Message.svelte',
 		},
 		'./External_Link_Symbol.svelte': {
 			types: './dist/External_Link_Symbol.svelte.d.ts',
@@ -267,6 +278,11 @@ export const package_json = {
 			types: './dist/Main_Dialog.svelte.d.ts',
 			svelte: './dist/Main_Dialog.svelte',
 			default: './dist/Main_Dialog.svelte',
+		},
+		'./Message_Detail.svelte': {
+			types: './dist/Message_Detail.svelte.d.ts',
+			svelte: './dist/Message_Detail.svelte',
+			default: './dist/Message_Detail.svelte',
 		},
 		'./Message_Info.svelte': {
 			types: './dist/Message_Info.svelte.d.ts',
@@ -415,6 +431,10 @@ export const package_json = {
 			types: './dist/reorderable.svelte.d.ts',
 			default: './dist/reorderable.svelte.js',
 		},
+		'./response_helpers.js': {
+			types: './dist/response_helpers.d.ts',
+			default: './dist/response_helpers.js',
+		},
 		'./scrollable.svelte.js': {
 			types: './dist/scrollable.svelte.d.ts',
 			default: './dist/scrollable.svelte.js',
@@ -434,6 +454,16 @@ export const package_json = {
 			svelte: './dist/Settings.svelte',
 			default: './dist/Settings.svelte',
 		},
+		'./Tape_List.svelte': {
+			types: './dist/Tape_List.svelte.d.ts',
+			svelte: './dist/Tape_List.svelte',
+			default: './dist/Tape_List.svelte',
+		},
+		'./Tape_Summary.svelte': {
+			types: './dist/Tape_Summary.svelte.d.ts',
+			svelte: './dist/Tape_Summary.svelte',
+			default: './dist/Tape_Summary.svelte',
+		},
 		'./tape.svelte.js': {types: './dist/tape.svelte.d.ts', default: './dist/tape.svelte.js'},
 		'./test.task.js': {types: './dist/test.task.d.ts', default: './dist/test.task.js'},
 		'./Text_Icon.svelte': {
@@ -442,7 +472,6 @@ export const package_json = {
 			default: './dist/Text_Icon.svelte',
 		},
 		'./ui.svelte.js': {types: './dist/ui.svelte.d.ts', default: './dist/ui.svelte.js'},
-		'./uuid.js': {types: './dist/uuid.d.ts', default: './dist/uuid.js'},
 		'./Xml_Attribute_Input.svelte': {
 			types: './dist/Xml_Attribute_Input.svelte.d.ts',
 			svelte: './dist/Xml_Attribute_Input.svelte',
@@ -487,6 +516,7 @@ export const src_json = {
 			declarations: [
 				{name: 'ZOD_CELL_CLASS_NAME', kind: 'variable'},
 				{name: 'ZOD_ELEMENT_CLASS_NAME', kind: 'variable'},
+				{name: 'Schema_Class_Info', kind: 'type'},
 				{name: 'cell_class', kind: 'function'},
 				{name: 'cell_array', kind: 'function'},
 				{name: 'Value_Parser', kind: 'type'},
@@ -511,14 +541,22 @@ export const src_json = {
 				{name: 'Cell', kind: 'class'},
 			],
 		},
-		'./Chat_Item.svelte': {path: 'Chat_Item.svelte', declarations: []},
-		'./Chat_Message.svelte': {path: 'Chat_Message.svelte', declarations: []},
+		'./Chat_Message_Item.svelte': {path: 'Chat_Message_Item.svelte', declarations: []},
+		'./chat_message.svelte.js': {
+			path: 'chat_message.svelte.ts',
+			declarations: [
+				{name: 'Chat_Message_Role', kind: 'variable'},
+				{name: 'Chat_Message_Json', kind: 'variable'},
+				{name: 'Chat_Message_Options', kind: 'type'},
+				{name: 'Chat_Message', kind: 'class'},
+				{name: 'create_chat_message', kind: 'function'},
+			],
+		},
 		'./Chat_Tape.svelte': {path: 'Chat_Tape.svelte', declarations: []},
 		'./Chat_View.svelte': {path: 'Chat_View.svelte', declarations: []},
 		'./chat.svelte.js': {
 			path: 'chat.svelte.ts',
 			declarations: [
-				{name: 'Chat_Message', kind: 'type'},
 				{name: 'Chat_Json', kind: 'variable'},
 				{name: 'Chat_Options', kind: 'type'},
 				{name: 'Chat', kind: 'class'},
@@ -552,20 +590,6 @@ export const src_json = {
 			],
 		},
 		'./Completion_Threads_List.svelte': {path: 'Completion_Threads_List.svelte', declarations: []},
-		'./completion.js': {
-			path: 'completion.ts',
-			declarations: [
-				{name: 'Completion_Request', kind: 'variable'},
-				{name: 'Ollama_Completion_Data', kind: 'variable'},
-				{name: 'Claude_Completion_Data', kind: 'variable'},
-				{name: 'Chatgpt_Completion_Data', kind: 'variable'},
-				{name: 'Gemini_Completion_Data', kind: 'variable'},
-				{name: 'Completion_Response_Data', kind: 'variable'},
-				{name: 'Completion_Response', kind: 'variable'},
-				{name: 'Completion', kind: 'variable'},
-				{name: 'to_completion_response_text', kind: 'function'},
-			],
-		},
 		'./config_helpers.js': {
 			path: 'config_helpers.ts',
 			declarations: [
@@ -588,6 +612,14 @@ export const src_json = {
 			declarations: [{name: 'XML_TAG_NAME_DEFAULT', kind: 'variable'}],
 		},
 		'./Control_Panel.svelte': {path: 'Control_Panel.svelte', declarations: []},
+		'./conversation.svelte.js': {
+			path: 'conversation.svelte.ts',
+			declarations: [
+				{name: 'Conversation_Json', kind: 'variable'},
+				{name: 'Conversation_Options', kind: 'type'},
+				{name: 'Conversation', kind: 'class'},
+			],
+		},
 		'./Dashboard_Capabilities.svelte': {path: 'Dashboard_Capabilities.svelte', declarations: []},
 		'./Dashboard_Chats.svelte': {path: 'Dashboard_Chats.svelte', declarations: []},
 		'./Dashboard_Files.svelte': {path: 'Dashboard_Files.svelte', declarations: []},
@@ -600,17 +632,22 @@ export const src_json = {
 		'./Dashboard.svelte': {path: 'Dashboard.svelte', declarations: []},
 		'./Diskfile_Editor.svelte': {path: 'Diskfile_Editor.svelte', declarations: []},
 		'./Diskfile_Explorer.svelte': {path: 'Diskfile_Explorer.svelte', declarations: []},
+		'./diskfile_helpers.js': {
+			path: 'diskfile_helpers.ts',
+			declarations: [
+				{name: 'map_watcher_change_to_diskfile_change', kind: 'function'},
+				{name: 'assert_valid_source_file', kind: 'function'},
+				{name: 'source_file_to_diskfile_json', kind: 'function'},
+			],
+		},
 		'./Diskfile_List_Item.svelte': {path: 'Diskfile_List_Item.svelte', declarations: []},
 		'./diskfile_types.js': {
 			path: 'diskfile_types.ts',
 			declarations: [
 				{name: 'Diskfile_Change_Type', kind: 'variable'},
-				{name: 'map_watcher_change_to_diskfile_change', kind: 'function'},
 				{name: 'Diskfile_Path', kind: 'variable'},
 				{name: 'Source_File', kind: 'variable'},
-				{name: 'assert_valid_source_file', kind: 'function'},
 				{name: 'Diskfile_Json', kind: 'variable'},
-				{name: 'source_file_to_diskfile_json', kind: 'function'},
 			],
 		},
 		'./diskfile.svelte.js': {
@@ -630,6 +667,7 @@ export const src_json = {
 				{name: 'Diskfiles', kind: 'class'},
 			],
 		},
+		'./Error_Message.svelte': {path: 'Error_Message.svelte', declarations: []},
 		'./External_Link_Symbol.svelte': {path: 'External_Link_Symbol.svelte', declarations: []},
 		'./External_Link.svelte': {path: 'External_Link.svelte', declarations: []},
 		'./glyphs.js': {
@@ -667,6 +705,7 @@ export const src_json = {
 			declarations: [{name: 'reorder_list', kind: 'function'}],
 		},
 		'./Main_Dialog.svelte': {path: 'Main_Dialog.svelte', declarations: []},
+		'./Message_Detail.svelte': {path: 'Message_Detail.svelte', declarations: []},
 		'./Message_Info.svelte': {path: 'Message_Info.svelte', declarations: []},
 		'./Message_Summary.svelte': {path: 'Message_Summary.svelte', declarations: []},
 		'./message_types.js': {
@@ -674,6 +713,16 @@ export const src_json = {
 			declarations: [
 				{name: 'Message_Direction', kind: 'variable'},
 				{name: 'Message_Type', kind: 'variable'},
+				{name: 'Conversation_History_Message', kind: 'variable'},
+				{name: 'Ollama_Provider_Data', kind: 'type'},
+				{name: 'Claude_Provider_Data', kind: 'type'},
+				{name: 'Chatgpt_Provider_Data', kind: 'type'},
+				{name: 'Gemini_Provider_Data', kind: 'type'},
+				{name: 'Provider_Data', kind: 'type'},
+				{name: 'Provider_Data_Schema', kind: 'variable'},
+				{name: 'Completion_Request', kind: 'variable'},
+				{name: 'Completion_Response', kind: 'variable'},
+				{name: 'Completion_Response', kind: 'type'},
 				{name: 'Message_Base', kind: 'variable'},
 				{name: 'Message_Ping', kind: 'variable'},
 				{name: 'Message_Pong', kind: 'variable'},
@@ -840,6 +889,15 @@ export const src_json = {
 				{name: 'Reorderable', kind: 'class'},
 			],
 		},
+		'./response_helpers.js': {
+			path: 'response_helpers.ts',
+			declarations: [
+				{name: 'Unified_Completion_Response', kind: 'type'},
+				{name: 'as_unified_response', kind: 'function'},
+				{name: 'create_completion_response', kind: 'function'},
+				{name: 'to_completion_response_text', kind: 'function'},
+			],
+		},
 		'./scrollable.svelte.js': {
 			path: 'scrollable.svelte.ts',
 			declarations: [
@@ -864,6 +922,8 @@ export const src_json = {
 			],
 		},
 		'./Settings.svelte': {path: 'Settings.svelte', declarations: []},
+		'./Tape_List.svelte': {path: 'Tape_List.svelte', declarations: []},
+		'./Tape_Summary.svelte': {path: 'Tape_Summary.svelte', declarations: []},
 		'./tape.svelte.js': {
 			path: 'tape.svelte.ts',
 			declarations: [
@@ -888,13 +948,6 @@ export const src_json = {
 				{name: 'Ui', kind: 'class'},
 			],
 		},
-		'./uuid.js': {
-			path: 'uuid.ts',
-			declarations: [
-				{name: 'Uuid_Base', kind: 'variable'},
-				{name: 'Uuid', kind: 'variable'},
-			],
-		},
 		'./Xml_Attribute_Input.svelte': {path: 'Xml_Attribute_Input.svelte', declarations: []},
 		'./Xml_Tag_Controls.svelte': {path: 'Xml_Tag_Controls.svelte', declarations: []},
 		'./xml.js': {
@@ -913,6 +966,8 @@ export const src_json = {
 			declarations: [
 				{name: 'Datetime', kind: 'variable'},
 				{name: 'Datetime_Now', kind: 'variable'},
+				{name: 'Uuid_Base', kind: 'variable'},
+				{name: 'Uuid', kind: 'variable'},
 				{name: 'zod_get_schema_keys', kind: 'function'},
 				{name: 'get_field_schema', kind: 'function'},
 			],
@@ -930,6 +985,7 @@ export const src_json = {
 				{name: 'zzz_context', kind: 'variable'},
 				{name: 'Zzz_Options', kind: 'type'},
 				{name: 'Zzz_Json', kind: 'type'},
+				{name: 'Message_With_History', kind: 'type'},
 				{name: 'Zzz', kind: 'class'},
 			],
 		},

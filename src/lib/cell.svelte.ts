@@ -1,11 +1,12 @@
-// cell.svelte.ts
-
 import {z} from 'zod';
-import {DEV} from 'esm-env';
 
 import {get_field_schema, zod_get_schema_keys} from '$lib/zod_helpers.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
-import {get_schema_class_info, type Value_Parser} from '$lib/cell_helpers.js';
+import {
+	get_schema_class_info,
+	type Schema_Class_Info,
+	type Value_Parser,
+} from '$lib/cell_helpers.js';
 
 // Base options type that all cells will extend
 export interface Cell_Options<T_Schema extends z.ZodType> {
@@ -15,8 +16,23 @@ export interface Cell_Options<T_Schema extends z.ZodType> {
 
 // TODO maybe rename to `Json_Cell` to be more explicit? Or `Snapshottable`?
 export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> {
-	readonly schema: T_Schema;
+	readonly schema: T_Schema; // TODO think about making this $state - dynamic schemas? idk, not yet
+
 	readonly schema_keys: Array<string> = $derived.by(() => zod_get_schema_keys(this.schema));
+	readonly field_schemas: Map<string, z.ZodType> = $derived.by(
+		() => new Map(this.schema_keys.map((key) => [key, get_field_schema(this.schema, key)])),
+	);
+	readonly field_schema_info: Map<string, Schema_Class_Info | null> = $derived(
+		new Map(
+			this.schema_keys.map((key) => {
+				const field_schema = this.field_schemas.get(key);
+				if (!field_schema) {
+					return [key, null];
+				}
+				return [key, get_schema_class_info(field_schema)] as const;
+			}),
+		),
+	);
 
 	readonly json: z.output<T_Schema> = $derived.by(() => this.to_json());
 	readonly json_serialized: string = $derived(JSON.stringify(this.json));
@@ -32,8 +48,8 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> {
 
 	// TODO most of the overrides for this should be replaceable with schema introspection I think
 	/**
-	 * Type-safe parsers for custom field decoding
-	 * Override in subclasses to handle special field types
+	 * Type-safe parsers for custom field decoding.
+	 * Override in subclasses to handle special field types.
 	 */
 	protected parsers: Value_Parser<T_Schema> = {};
 
@@ -55,7 +71,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> {
 	}
 
 	/**
-	 * For Svelte's $snapshot
+	 * For Svelte's $snapshot.
 	 */
 	toJSON(): z.output<T_Schema> {
 		return this.json;
@@ -68,7 +84,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> {
 			if (key in this) {
 				result[key] = this.encode((this as any)[key], key);
 			} else {
-				if (DEV) console.error(`Property ${key} not found on instance of ${this.constructor.name}`);
+				console.error(`Property ${key} not found on instance of ${this.constructor.name}`);
 			}
 		}
 
@@ -106,7 +122,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> {
 	}
 
 	/**
-	 * Apply JSON data to this instance
+	 * Apply JSON data to this instance.
 	 */
 	set_json(value?: z.input<T_Schema>): void {
 		try {
@@ -121,7 +137,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> {
 
 			for (const key of keys) {
 				// Get the value from parsed data (might be schema default)
-				const parsed_value = (parsed as any)[key];
+				const parsed_value = parsed[key];
 
 				// Check if we have a custom parser for this key
 				if (key in this.parsers) {
@@ -150,8 +166,8 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> {
 	}
 
 	/**
-	 * Decode a value using schema information to instantiate the right class
-	 * This is the public API that first checks parsers
+	 * Decode a value using schema information to instantiate the right class.
+	 * This is the public API that first checks parsers.
 	 * @param value The value to decode
 	 * @param key The key in the schema where this value belongs
 	 */
@@ -173,24 +189,30 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> {
 	}
 
 	/**
-	 * Internal method to decode a value without using parsers
-	 * This is used by the set_json method and as a fallback from decode_value
+	 * Internal method to decode a value without using parsers.
+	 * This is used by the set_json method and as a fallback from decode_value.
 	 */
 	decode_value_without_parser(value: unknown, key: string): unknown {
-		const schema_info = this.#get_schema_info(key);
+		const schema_info = this.field_schema_info.get(key);
 		if (!schema_info) return value;
 
 		// Handle arrays of cells
 		if (schema_info.is_array && Array.isArray(value)) {
 			if (schema_info.element_class) {
-				return value.map((item) => this.#instantiate_class(schema_info.element_class, item));
+				return value.map((item) => {
+					const instance = this.#instantiate_class(schema_info.element_class, item);
+					// Return the item if instantiation returns null
+					return instance !== null ? instance : item;
+				});
 			}
 			return value;
 		}
 
 		// Handle individual cell
 		if (schema_info.class_name && value && typeof value === 'object') {
-			return this.#instantiate_class(schema_info.class_name, value);
+			const instance = this.#instantiate_class(schema_info.class_name, value);
+			// Return the original value if instantiation returns null
+			return instance !== null ? instance : value;
 		}
 
 		// Handle special types
@@ -203,7 +225,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> {
 		if (schema_info.type === 'ZodBranded' && value !== null && value !== undefined) {
 			try {
 				// Use the schema directly to parse branded types
-				const field_schema = this.#get_field_schema(key);
+				const field_schema = this.field_schemas.get(key);
 				return field_schema?.parse(value) ?? value;
 			} catch (e) {
 				console.error(`Failed to parse branded type for ${key}:`, e);
@@ -215,39 +237,16 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> {
 	}
 
 	/**
-	 * Extract schema information for a field
-	 */
-	#get_schema_info(key: string): {
-		type?: string;
-		is_array?: boolean;
-		class_name?: string;
-		element_class?: string;
-	} | null {
-		const field_schema = this.#get_field_schema(key);
-		// Fix the error by handling the undefined case
-		if (!field_schema) {
-			return null;
-		}
-		return get_schema_class_info(field_schema);
-	}
-
-	/**
-	 * Get the Zod schema for a specific field
-	 */
-	#get_field_schema(key: string): z.ZodTypeAny | undefined {
-		return get_field_schema(this.schema, key);
-	}
-
-	/**
-	 * Instantiate a cell class using the registry
+	 * Instantiate a cell class using the registry.
 	 */
 	#instantiate_class(class_name: string | undefined, json: unknown): unknown {
 		if (!class_name) {
-			return json; // TODO BLOCK this seems weird
+			console.error('No class name provided for instantiation');
+			return null;
 		}
 
-		// No type assertion needed - this will be validated at runtime
 		const instance = this.zzz.registry.instantiate(class_name, json);
-		return instance !== null ? instance : json;
+		if (!instance) console.error('No class name provided for instantiation');
+		return instance;
 	}
 }

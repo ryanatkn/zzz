@@ -10,7 +10,7 @@ import {
 	create_message_json,
 	type Message_Type,
 } from '$lib/message_types.js';
-import type {Uuid} from '$lib/uuid.js';
+import type {Uuid} from '$lib/zod_helpers.js';
 import {cell_array} from '$lib/cell_helpers.js';
 
 export const HISTORY_LIMIT_DEFAULT = 512;

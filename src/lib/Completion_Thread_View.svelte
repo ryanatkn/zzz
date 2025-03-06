@@ -11,7 +11,7 @@
 		Completion_Thread,
 		Completion_Thread_History_Item,
 	} from '$lib/completion_thread.svelte.js';
-	import {to_completion_response_text} from '$lib/completion.js';
+	import {as_unified_response, to_completion_response_text} from '$lib/response_helpers.js';
 
 	interface Props {
 		provider: Provider;
@@ -33,8 +33,11 @@
 	const completion_request = $derived(history_item?.completion_request);
 	const completion_response = $derived(history_item?.completion_response);
 
+	// Use $derived to properly calculate content when completion_response changes
 	const content = $derived(
-		completion_response ? to_completion_response_text(completion_response) : undefined,
+		completion_response
+			? to_completion_response_text(as_unified_response(completion_response))
+			: undefined,
 	);
 </script>
 

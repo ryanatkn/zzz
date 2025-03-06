@@ -1,21 +1,38 @@
 import {z} from 'zod';
 
 // Metadata properties for Zod schemas.
-// These constants are used to attach class information to schemas
+// These constants are used to attach class information to schemas.
+// It's a bit hacky but feels better than abusing `.description` with JSON.
+// Zod does not support metadata - https://github.com/colinhacks/zod/issues/273
+// Maybe we should follow this recommended pattern instead of adding properties:
+// type MyEndpoint<T extends z.Schema<any>> = {
+//   validator: T;
+//   label: string;
+// }
 export const ZOD_CELL_CLASS_NAME = 'zzz_cell_class_name';
 export const ZOD_ELEMENT_CLASS_NAME = 'zzz_element_class_name';
+
+/**
+ * Schema class information extracted from a Zod schema.
+ */
+export interface Schema_Class_Info {
+	type?: string;
+	is_array?: boolean;
+	class_name?: string;
+	element_class?: string;
+}
 
 /**
  * Attaches class name metadata to a Zod schema for cell instantiation.
  * This allows the cell system to know which class to instantiate for a given schema.
  *
  * @param schema The Zod schema to annotate
- * @param className The name of the class to instantiate for this schema
+ * @param class_name The name of the class to instantiate for this schema
  * @returns The original schema with metadata attached
  */
-export const cell_class = <T extends z.ZodTypeAny>(schema: T, className: string): T => {
+export const cell_class = <T extends z.ZodTypeAny>(schema: T, class_name: string): T => {
 	// Instead of using transform which changes the type, just attach metadata
-	(schema as any)[ZOD_CELL_CLASS_NAME] = className;
+	(schema as any)[ZOD_CELL_CLASS_NAME] = class_name;
 	return schema;
 };
 
@@ -24,25 +41,25 @@ export const cell_class = <T extends z.ZodTypeAny>(schema: T, className: string)
  * This allows the cell system to know which class to instantiate for each element in the array.
  *
  * @param schema The array Zod schema to annotate (or ZodDefault containing an array)
- * @param className The name of the class to instantiate for each element
+ * @param class_name The name of the class to instantiate for each element
  * @returns The original schema with metadata attached
  */
-export const cell_array = <T extends z.ZodTypeAny>(schema: T, className: string): T => {
+export const cell_array = <T extends z.ZodTypeAny>(schema: T, class_name: string): T => {
 	// Use type casting to access the inner ZodArray if this is a ZodDefault
 	// This safely handles both direct ZodArrays and ZodDefault<ZodArray>
-	const arraySchema =
+	const array_schema =
 		schema instanceof z.ZodDefault
 			? (schema._def.innerType as z.ZodArray<any>)
 			: (schema as unknown as z.ZodArray<any>);
 
 	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-	if (!arraySchema._def) {
+	if (!array_schema._def) {
 		console.warn('cell_array: Schema is not a ZodArray or ZodDefault<ZodArray>');
 		return schema;
 	}
 
 	// Add the element_class property to the array schema
-	(arraySchema._def as any)[ZOD_ELEMENT_CLASS_NAME] = className;
+	(array_schema._def as any)[ZOD_ELEMENT_CLASS_NAME] = class_name;
 	return schema;
 };
 
@@ -59,13 +76,8 @@ export type Value_Parser<
  * This helps determine how to decode values based on their schema definition.
  */
 export const get_schema_class_info = (
-	schema: z.ZodTypeAny,
-): {
-	type?: string;
-	is_array?: boolean;
-	class_name?: string;
-	element_class?: string;
-} | null => {
+	schema: z.ZodTypeAny | null | undefined,
+): Schema_Class_Info | null => {
 	if (!schema) return null;
 
 	// Handle ZodEffects (refinement, transformation, etc.)
@@ -85,12 +97,21 @@ export const get_schema_class_info = (
 
 	// Handle ZodArray
 	if (schema instanceof z.ZodArray) {
-		const element_info = get_schema_class_info(schema.element);
+		// Get class name from schema metadata if present
+		const element_class =
+			(schema._def as any)[ZOD_ELEMENT_CLASS_NAME] ||
+			get_schema_class_info(schema.element)?.class_name;
 		return {
 			type: 'ZodArray',
 			is_array: true,
-			element_class: element_info?.class_name,
+			element_class,
 		};
+	}
+
+	// Get class name from schema metadata if present
+	const class_name = (schema as any)[ZOD_CELL_CLASS_NAME];
+	if (class_name) {
+		return {type: schema.constructor.name, class_name};
 	}
 
 	// Handle ZodBranded

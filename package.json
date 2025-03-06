@@ -137,15 +137,14 @@
       "types": "./dist/cell.svelte.d.ts",
       "default": "./dist/cell.svelte.js"
     },
-    "./Chat_Item.svelte": {
-      "types": "./dist/Chat_Item.svelte.d.ts",
-      "svelte": "./dist/Chat_Item.svelte",
-      "default": "./dist/Chat_Item.svelte"
+    "./Chat_Message_Item.svelte": {
+      "types": "./dist/Chat_Message_Item.svelte.d.ts",
+      "svelte": "./dist/Chat_Message_Item.svelte",
+      "default": "./dist/Chat_Message_Item.svelte"
     },
-    "./Chat_Message.svelte": {
-      "types": "./dist/Chat_Message.svelte.d.ts",
-      "svelte": "./dist/Chat_Message.svelte",
-      "default": "./dist/Chat_Message.svelte"
+    "./chat_message.svelte.js": {
+      "types": "./dist/chat_message.svelte.d.ts",
+      "default": "./dist/chat_message.svelte.js"
     },
     "./Chat_Tape.svelte": {
       "types": "./dist/Chat_Tape.svelte.d.ts",
@@ -194,10 +193,6 @@
       "svelte": "./dist/Completion_Threads_List.svelte",
       "default": "./dist/Completion_Threads_List.svelte"
     },
-    "./completion.js": {
-      "types": "./dist/completion.d.ts",
-      "default": "./dist/completion.js"
-    },
     "./config_helpers.js": {
       "types": "./dist/config_helpers.d.ts",
       "default": "./dist/config_helpers.js"
@@ -219,6 +214,10 @@
       "types": "./dist/Control_Panel.svelte.d.ts",
       "svelte": "./dist/Control_Panel.svelte",
       "default": "./dist/Control_Panel.svelte"
+    },
+    "./conversation.svelte.js": {
+      "types": "./dist/conversation.svelte.d.ts",
+      "default": "./dist/conversation.svelte.js"
     },
     "./Dashboard_Capabilities.svelte": {
       "types": "./dist/Dashboard_Capabilities.svelte.d.ts",
@@ -280,6 +279,10 @@
       "svelte": "./dist/Diskfile_Explorer.svelte",
       "default": "./dist/Diskfile_Explorer.svelte"
     },
+    "./diskfile_helpers.js": {
+      "types": "./dist/diskfile_helpers.d.ts",
+      "default": "./dist/diskfile_helpers.js"
+    },
     "./Diskfile_List_Item.svelte": {
       "types": "./dist/Diskfile_List_Item.svelte.d.ts",
       "svelte": "./dist/Diskfile_List_Item.svelte",
@@ -296,6 +299,11 @@
     "./diskfiles.svelte.js": {
       "types": "./dist/diskfiles.svelte.d.ts",
       "default": "./dist/diskfiles.svelte.js"
+    },
+    "./Error_Message.svelte": {
+      "types": "./dist/Error_Message.svelte.d.ts",
+      "svelte": "./dist/Error_Message.svelte",
+      "default": "./dist/Error_Message.svelte"
     },
     "./External_Link_Symbol.svelte": {
       "types": "./dist/External_Link_Symbol.svelte.d.ts",
@@ -323,6 +331,11 @@
       "types": "./dist/Main_Dialog.svelte.d.ts",
       "svelte": "./dist/Main_Dialog.svelte",
       "default": "./dist/Main_Dialog.svelte"
+    },
+    "./Message_Detail.svelte": {
+      "types": "./dist/Message_Detail.svelte.d.ts",
+      "svelte": "./dist/Message_Detail.svelte",
+      "default": "./dist/Message_Detail.svelte"
     },
     "./Message_Info.svelte": {
       "types": "./dist/Message_Info.svelte.d.ts",
@@ -489,6 +502,10 @@
       "types": "./dist/reorderable.svelte.d.ts",
       "default": "./dist/reorderable.svelte.js"
     },
+    "./response_helpers.js": {
+      "types": "./dist/response_helpers.d.ts",
+      "default": "./dist/response_helpers.js"
+    },
     "./scrollable.svelte.js": {
       "types": "./dist/scrollable.svelte.d.ts",
       "default": "./dist/scrollable.svelte.js"
@@ -513,6 +530,16 @@
       "svelte": "./dist/Settings.svelte",
       "default": "./dist/Settings.svelte"
     },
+    "./Tape_List.svelte": {
+      "types": "./dist/Tape_List.svelte.d.ts",
+      "svelte": "./dist/Tape_List.svelte",
+      "default": "./dist/Tape_List.svelte"
+    },
+    "./Tape_Summary.svelte": {
+      "types": "./dist/Tape_Summary.svelte.d.ts",
+      "svelte": "./dist/Tape_Summary.svelte",
+      "default": "./dist/Tape_Summary.svelte"
+    },
     "./tape.svelte.js": {
       "types": "./dist/tape.svelte.d.ts",
       "default": "./dist/tape.svelte.js"
@@ -529,10 +556,6 @@
     "./ui.svelte.js": {
       "types": "./dist/ui.svelte.d.ts",
       "default": "./dist/ui.svelte.js"
-    },
-    "./uuid.js": {
-      "types": "./dist/uuid.d.ts",
-      "default": "./dist/uuid.js"
     },
     "./Xml_Attribute_Input.svelte": {
       "types": "./dist/Xml_Attribute_Input.svelte.d.ts",

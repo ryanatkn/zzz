@@ -2,49 +2,33 @@ import {z} from 'zod';
 import type {Async_Status} from '@ryanatkn/belt/async.js';
 
 import type {Model} from '$lib/model.svelte.js';
-import {
-	Completion_Request,
-	ensure_valid_response,
-	to_completion_response_text,
-	type Completion_Request as Completion_Request_Type,
-	type Completion_Response,
-} from '$lib/completion.js';
-import {Uuid} from '$lib/uuid.js';
+import {to_completion_response_text, as_unified_response} from '$lib/response_helpers.js';
+import {Completion_Request} from '$lib/message_types.js';
+import {Uuid} from '$lib/zod_helpers.js';
 import {get_unique_name} from '$lib/helpers.js';
 import {Tape, Tape_Json} from '$lib/tape.svelte.js';
 import type {Prompt} from '$lib/prompt.svelte.js';
 import {reorder_list} from '$lib/list_helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Datetime_Now} from '$lib/zod_helpers.js';
+import {type Chat_Message, create_chat_message} from '$lib/chat_message.svelte.js';
 
 const NEW_CHAT_PREFIX = 'new chat';
 
-export interface Chat_Message {
-	id: Uuid;
-	created: Datetime_Now;
-	content: string;
-	role: 'user' | 'system' | 'assistant'; // Make role required for all messages
-	conversation_id?: Uuid | null; // Add conversation_id
-	request?: Completion_Request_Type;
-	response?: Completion_Response;
-}
-
 const chat_names: Array<string> = [];
 
-export const Chat_Json = z
-	.object({
-		id: Uuid,
-		name: z.string().default(() => {
-			// TODO BLOCK how to do this correctly? can you make it stateful and still have a static module-scoped schema? I dont see a context object arg or anything
-			const name = get_unique_name('chat', chat_names);
-			chat_names.push(name);
-			return name;
-		}),
-		created: Datetime_Now,
-		tapes: z.array(Tape_Json).default(() => []),
-		selected_prompt_ids: z.array(Uuid).default(() => []), // TODO consider making these refs, automatic classes (maybe as separate properties by convention, so the original is still the plain ids)
-	})
-	.default(() => ({}));
+export const Chat_Json = z.object({
+	id: Uuid,
+	name: z.string().default(() => {
+		// TODO BLOCK how to do this correctly? can you make it stateful and still have a static module-scoped schema? I dont see a context object arg or anything
+		const name = get_unique_name('chat', chat_names);
+		chat_names.push(name);
+		return name;
+	}),
+	created: Datetime_Now,
+	tapes: z.array(Tape_Json).default(() => []),
+	selected_prompt_ids: z.array(Uuid).default(() => []), // TODO consider making these refs, automatic classes (maybe as separate properties by convention, so the original is still the plain ids)
+});
 
 export type Chat_Json = z.infer<typeof Chat_Json>;
 
@@ -86,17 +70,6 @@ export class Chat extends Cell<typeof Chat_Json> {
 
 		// Initialize the instance
 		this.init();
-	}
-
-	// TODO BLOCK @many shouldn't exist, need to somehow know to only use the id instead of `$state.snapshot(thing)`
-	override to_json(): z.output<typeof Chat_Json> {
-		return {
-			id: this.id,
-			name: this.name,
-			created: this.created,
-			tapes: this.tapes.map((tape) => tape.json),
-			selected_prompt_ids: this.selected_prompts.map((p) => p.id),
-		};
 	}
 
 	add_tape(model: Model): void {
@@ -165,43 +138,51 @@ export class Chat extends Cell<typeof Chat_Json> {
 			prompt: content,
 		});
 
-		const message: Chat_Message = {
-			id: message_id,
-			created: Datetime_Now.parse(undefined),
-			content,
-			role: 'user', // Set the role for user messages
+		// Create user message using the helper function
+		const message = create_chat_message(content, 'user', {
+			id: message_id, // Override the auto-generated ID
 			request: completion_request,
-		};
+		});
 
-		tape.messages.push(message);
+		tape.add_chat_message(message);
 
-		const response = await this.zzz.send_prompt(content, tape.model.provider_name, tape.model.name);
+		// TODO this seems messy, probably refactor
+		// Build message history for the AI - ensure all content is a string
+		const tape_history = tape.chat_messages
+			.filter((m) => m.id !== message_id) // Exclude the current message
+			.map((m) => ({
+				role: m.role,
+				content:
+					m.role === 'assistant' && m.response
+						? to_completion_response_text(m.response) || '' // Ensure content is not null/undefined
+						: m.content,
+			}));
 
-		const message_updated = tape.messages.find((m) => m.id === message_id);
+		// Send the prompt with tape history
+		const response = await this.zzz.send_prompt(
+			content,
+			tape.model.provider_name,
+			tape.model.name,
+			tape_history,
+		);
+
+		// Find the message we just added
+		const message_updated = tape.chat_messages_by_id.get(message_id);
 		if (!message_updated) return;
 
-		// Simplify response handling by using the ensure_valid_response function
-		const valid_response = ensure_valid_response(response.completion_response);
-		if (valid_response && message_updated) {
-			message_updated.response = valid_response;
+		// Get the response text
+		const response_text =
+			to_completion_response_text(as_unified_response(response.completion_response)) || '';
 
-			// Extract text with null coalescing
-			const responseText = to_completion_response_text(valid_response) || '';
+		// Add the assistant's response as a separate message
+		const assistant_message = create_chat_message(response_text, 'assistant', {
+			tape_id: message_updated.tape_id,
+		});
 
-			// Create assistant message
-			const assistant_message: Chat_Message = {
-				id: Uuid.parse(undefined),
-				created: Datetime_Now.parse(undefined),
-				content: responseText,
-				role: 'assistant',
-				conversation_id: message_updated.conversation_id,
-			};
+		tape.add_chat_message(assistant_message);
 
-			tape.add_message(assistant_message);
-
-			// Infer a name for the chat now that we have a response.
-			void this.init_name(message_updated);
-		}
+		// Infer a name for the chat now that we have a response.
+		void this.init_name(message_updated);
 	}
 
 	/**
@@ -220,15 +201,25 @@ export class Chat extends Cell<typeof Chat_Json> {
 		// TODO hacky, needs better conventions
 		p += `<User_Message>${chat_message.content}</User_Message>`;
 		if (chat_message.response) {
-			p += `\n<Assistant_Message> ${to_completion_response_text(chat_message.response)}</Assistant_Message>`;
+			const responseText = to_completion_response_text(chat_message.response) || '';
+			p += `\n<Assistant_Message>${responseText}</Assistant_Message>`;
 		}
 
 		try {
 			// TODO BLOCK configure this utility LLM (roles?), and set the output token count from config as well
 			const name_response = await this.zzz.send_prompt(p, 'ollama', 'llama3.2:3b');
-			// Direct assignment instead of using helper
 			const completion_response = name_response.completion_response;
-			const response_text = to_completion_response_text(completion_response);
+			// Add null check here
+			// TODO BLOCK maybe make nullable? would silence this linting issue:
+			if (!completion_response) {
+				console.error('No completion response received');
+				this.init_name_status = 'initial';
+				return;
+			}
+			const unified_response = as_unified_response(completion_response);
+			const response_text = unified_response
+				? to_completion_response_text(unified_response) || ''
+				: '';
 			console.log(`response_text`, response_text);
 			if (!response_text) {
 				console.error('unknown inference failure', name_response);
@@ -246,5 +237,16 @@ export class Chat extends Cell<typeof Chat_Json> {
 			this.init_name_status = 'initial'; // ignore failures, will retry
 			console.error('failed to infer a name for a chat', err);
 		}
+	}
+
+	/**
+	 * Reorder tapes by moving from one index to another
+	 */
+	reorder_tapes(from_index: number, to_index: number): void {
+		if (from_index === to_index) return;
+		if (from_index < 0 || from_index >= this.tapes.length) return;
+		if (to_index < 0 || to_index >= this.tapes.length) return;
+
+		reorder_list(this.tapes, from_index, to_index);
 	}
 }

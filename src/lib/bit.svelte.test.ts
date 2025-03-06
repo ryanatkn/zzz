@@ -4,7 +4,7 @@ import {test, expect} from 'vitest';
 import {encode} from 'gpt-tokenizer';
 
 import {Bit, Bit_Json} from '$lib/bit.svelte.js';
-import {Uuid} from '$lib/uuid.js';
+import {Uuid} from '$lib/zod_helpers.js';
 import {Cell} from '$lib/cell.svelte.js';
 
 // TODO new one per test?

@@ -5,7 +5,7 @@ import {encode} from 'gpt-tokenizer';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Diskfile_Json, type Diskfile_Path} from '$lib/diskfile_types.js';
 import type {Datetime, Datetime_Now} from '$lib/zod_helpers.js';
-import {Uuid} from '$lib/uuid.js';
+import {Uuid} from '$lib/zod_helpers.js';
 
 // Constants for formatting
 export const FILE_DATE_FORMAT = 'MMM d, yyyy h:mm:ss a';

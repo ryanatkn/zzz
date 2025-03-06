@@ -20,12 +20,17 @@ import {
 	type Message_Send_Prompt,
 	type Message_Server,
 } from '$lib/message_types.js';
-import {Uuid} from '$lib/uuid.js';
+import {Uuid, Datetime_Now} from '$lib/zod_helpers.js';
 import {SYSTEM_MESSAGE_DEFAULT} from '$lib/config.js';
 import {delete_diskfile_in_scope, write_file_in_scope} from '$lib/server/helpers.js';
 import {Diskfile_Path} from '$lib/diskfile_types.js';
 import {map_watcher_change_to_diskfile_change} from '$lib/diskfile_helpers.js';
-import {Datetime_Now} from '$lib/zod_helpers.js';
+import {
+	format_ollama_messages,
+	format_claude_messages,
+	format_openai_messages,
+	format_gemini_messages,
+} from '$lib/server/ai_provider_utils.js';
 import type {Provider_Name} from '$lib/provider_types.js';
 
 const anthropic = new Anthropic({apiKey: SECRET_ANTHROPIC_API_KEY});
@@ -50,7 +55,7 @@ export interface Zzz_Server_Options {
 	 */
 	zzz_dir?: string; // TODO rename to `filesystem_dirs` or something? `zzz_dirs`?
 	filer?: Filer;
-	// TODO BLOCK @many make these part of the cached conversation/completion state, source of truth is where?
+	// TODO BLOCK @many make these part of the cached tape/completion state, source of truth is where?
 	system_message?: string;
 	output_token_max?: number;
 	temperature?: number;
@@ -69,7 +74,7 @@ export class Zzz_Server {
 
 	filer: Filer;
 
-	// TODO BLOCK @many make these part of the cached conversation/completion state, source of truth is where?
+	// TODO BLOCK @many make these part of the cached tape/completion state, source of truth is where?
 	system_message: string;
 	output_token_max: number;
 	// TODO add UI for these
@@ -140,7 +145,7 @@ export class Zzz_Server {
 				};
 			}
 			case 'send_prompt': {
-				const {prompt, provider_name, model} = message.completion_request;
+				const {prompt, provider_name, model, tape_history} = message.completion_request;
 
 				let response: Message_Completion_Response;
 
@@ -186,11 +191,7 @@ export class Zzz_Server {
 								presence_penalty: this.presence_penalty,
 								stop: this.stop_sequences,
 							},
-							messages: [
-								{role: 'system', content: this.system_message},
-								{role: 'user', content: prompt},
-								// TODO BLOCK add assistant messages (full history), validate 'user' | 'system' | 'assistant'
-							],
+							messages: format_ollama_messages(this.system_message, tape_history, prompt),
 						});
 						console.log(`ollama api_response`, api_response);
 						response = create_completion_response(message.id, provider_name, model, api_response);
@@ -201,15 +202,12 @@ export class Zzz_Server {
 						const api_response = await anthropic.messages.create({
 							model,
 							max_tokens: this.output_token_max,
-							// TODO
-							// tools:
-							// tool_choice
 							temperature: this.temperature,
 							top_k: this.top_k,
 							top_p: this.top_p,
 							stop_sequences: this.stop_sequences,
 							system: this.system_message,
-							messages: [{role: 'user', content: [{type: 'text', text: prompt}]}],
+							messages: format_claude_messages(tape_history, prompt),
 						});
 						console.log(`claude api_response`, api_response);
 						response = create_completion_response(message.id, provider_name, model, api_response);
@@ -220,23 +218,13 @@ export class Zzz_Server {
 						const api_response = await openai.chat.completions.create({
 							model,
 							max_completion_tokens: this.output_token_max,
-							// TODO
-							// tools
-							// tool_choice
-							// TODO `supports_temperature` flag on model or similar
 							temperature: model === 'o1-mini' ? undefined : this.temperature,
 							seed: this.seed,
 							top_p: this.top_p,
 							frequency_penalty: this.frequency_penalty,
 							presence_penalty: this.presence_penalty,
 							stop: this.stop_sequences,
-							messages: [
-								// TODO `supports_system_message` flag on model or similar
-								model === 'o1-mini'
-									? null
-									: ({role: 'system', content: this.system_message} as const),
-								{role: 'user', content: prompt} as const,
-							].filter((m) => !!m),
+							messages: format_openai_messages(this.system_message, tape_history, prompt, model),
 						});
 						console.log(`openai api_response`, api_response);
 						response = create_completion_response(message.id, provider_name, model, api_response);
@@ -261,7 +249,9 @@ export class Zzz_Server {
 								stopSequences: this.stop_sequences,
 							},
 						});
-						const api_response = await google_model.generateContent(prompt);
+
+						const content = format_gemini_messages(tape_history, prompt);
+						const api_response = await google_model.generateContent(content);
 						console.log(`gemini api_response`, api_response);
 						response = create_completion_response(message.id, provider_name, model, api_response);
 						break;

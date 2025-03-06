@@ -3,7 +3,7 @@ import type {Source_File as Gro_Source_File} from '@ryanatkn/gro/filer.js';
 import {z} from 'zod';
 
 import type {Message_Filer_Change} from '$lib/message_types.js';
-import {Uuid} from '$lib/uuid.js';
+import {Uuid} from '$lib/zod_helpers.js';
 import {Diskfile} from '$lib/diskfile.svelte.js';
 import {Diskfile_Json, type Diskfile_Path} from '$lib/diskfile_types.js';
 import {source_file_to_diskfile_json, assert_valid_source_file} from '$lib/diskfile_helpers.js';

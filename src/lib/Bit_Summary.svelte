@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type {Prompt} from '$lib/prompt.svelte.js';
 	import type {Bit} from '$lib/bit.svelte.js';
+	import Confirm_Button from '$lib/Confirm_Button.svelte';
+	import {GLYPH_REMOVE} from '$lib/glyphs.js';
 
 	interface Props {
 		bit: Bit;
@@ -20,12 +22,24 @@
 </script>
 
 <div
-	class="flex panel px_sm py_xs3 white_space_nowrap size_sm relative"
+	class="flex justify_content_space_between gap_xs3 size_sm relative"
 	class:dormant={!bit.enabled}
 >
 	<div class="progress_bar" style:width="{percent}%"></div>
-	<div>{bit.name}</div>
-	<div class="pl_md ellipsis">{bit.content}</div>
+	<div class="flex_1 panel px_sm py_xs3 ellipsis">
+		{bit.name}
+	</div>
+	<Confirm_Button
+		onclick={() => {
+			prompt.remove_bit(bit.id);
+		}}
+		attrs={{
+			class: 'plain compact',
+			title: `Remove bit ${bit.name}`,
+		}}
+	>
+		{GLYPH_REMOVE}
+	</Confirm_Button>
 </div>
 
 <style>

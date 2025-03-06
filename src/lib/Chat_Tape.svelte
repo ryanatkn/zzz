@@ -3,15 +3,16 @@
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
 	import Paste_From_Clipboard from '@ryanatkn/fuz/Paste_From_Clipboard.svelte';
 	import {encode} from 'gpt-tokenizer';
+	import Pending_Button from '@ryanatkn/fuz/Pending_Button.svelte';
 
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import type {Tape} from '$lib/tape.svelte.js';
-	import Chat_Message from '$lib/Chat_Message.svelte';
+	import Chat_Message_Item from '$lib/Chat_Message_Item.svelte';
 	import Model_Link from '$lib/Model_Link.svelte';
 	import Provider_Link from '$lib/Provider_Link.svelte';
 	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
 	import Bit_Stats from '$lib/Bit_Stats.svelte';
-	import Pending_Button from '@ryanatkn/fuz/Pending_Button.svelte';
+	import Error_Message from '$lib/Error_Message.svelte';
 
 	interface Props {
 		tape: Tape;
@@ -38,6 +39,8 @@
 		pending = false;
 	};
 
+	const tape_messages = $derived(tape.chat_messages);
+
 	// TODO BLOCK the link should instead be a model picker (dialog? or overlaid without a bg maybe?)
 </script>
 
@@ -60,9 +63,13 @@
 	</div>
 
 	<div class="messages">
-		{#each tape.messages as message (message.id)}
-			<Chat_Message {message} />
-		{/each}
+		{#if tape_messages}
+			{#each tape_messages as message (message.id)}
+				<Chat_Message_Item {message} />
+			{/each}
+		{:else}
+			<Error_Message>something went wrong getting this tape's messages</Error_Message>
+		{/if}
 	</div>
 
 	<div>

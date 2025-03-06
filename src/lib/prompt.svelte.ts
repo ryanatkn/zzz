@@ -1,7 +1,7 @@
 import {encode} from 'gpt-tokenizer';
 import {z} from 'zod';
 
-import {Uuid} from '$lib/uuid.js';
+import {Uuid} from '$lib/zod_helpers.js';
 import {get_unique_name} from '$lib/helpers.js';
 import {XML_TAG_NAME_DEFAULT} from '$lib/constants.js';
 import {Bit, Bit_Json} from '$lib/bit.svelte.js';
@@ -20,19 +20,17 @@ export type Prompt_Message_Content = string; // TODO ?
 
 const prompt_names: Array<string> = [];
 
-export const Prompt_Json = z
-	.object({
-		id: Uuid,
-		name: z.string().default(() => {
-			// TODO BLOCK how to do this correctly? can you make it stateful and still have a static module-scoped schema? I dont see a context object arg or anything
-			const name = get_unique_name('prompt', prompt_names);
-			prompt_names.push(name);
-			return name;
-		}),
-		created: Datetime_Now,
-		bits: z.array(Bit_Json).default(() => []),
-	})
-	.default(() => ({}));
+export const Prompt_Json = z.object({
+	id: Uuid,
+	name: z.string().default(() => {
+		// TODO BLOCK how to do this correctly? can you make it stateful and still have a static module-scoped schema? I dont see a context object arg or anything
+		const name = get_unique_name('prompt', prompt_names);
+		prompt_names.push(name);
+		return name;
+	}),
+	created: Datetime_Now,
+	bits: z.array(Bit_Json).default(() => []),
+});
 export type Prompt_Json = z.infer<typeof Prompt_Json>;
 
 export interface Prompt_Options extends Cell_Options<typeof Prompt_Json> {

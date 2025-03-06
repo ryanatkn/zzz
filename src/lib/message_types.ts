@@ -1,9 +1,8 @@
 import {z} from 'zod';
 
-import {Uuid} from '$lib/uuid.js';
 import {Diskfile_Change_Type, Source_File, Diskfile_Path} from '$lib/diskfile_types.js';
-import {Completion_Request, Completion_Response} from '$lib/completion.js';
-import {Datetime_Now} from '$lib/zod_helpers.js';
+import {Datetime_Now, Uuid} from '$lib/zod_helpers.js';
+import type {Provider_Name} from '$lib/provider_types.js';
 
 export const Message_Direction = z.enum(['client', 'server', 'both']);
 export type Message_Direction = z.infer<typeof Message_Direction>;
@@ -20,6 +19,102 @@ export const Message_Type = z.enum([
 	'loaded_session',
 ]);
 export type Message_Type = z.infer<typeof Message_Type>;
+
+// Define schema for tape history message
+export const Tape_History_Message = z.object({
+	role: z.enum(['user', 'system', 'assistant']),
+	content: z.string(),
+});
+export type Tape_History_Message = z.infer<typeof Tape_History_Message>;
+
+// Define explicit interfaces for provider-specific data
+export interface Ollama_Provider_Data {
+	type: 'ollama';
+	value: any; // ChatResponse from ollama - must be required
+}
+
+export interface Claude_Provider_Data {
+	type: 'claude';
+	value: any; // Message from Anthropic - must be required
+}
+
+export interface Chatgpt_Provider_Data {
+	type: 'chatgpt';
+	value: any; // ChatCompletion from OpenAI - must be required
+}
+
+export interface Gemini_Provider_Data {
+	type: 'gemini';
+	value: {
+		text: string;
+		candidates: any[] | null;
+		function_calls: any[] | null;
+		prompt_feedback: any | null;
+		usage_metadata: any | null;
+	};
+}
+
+// Union type of all provider data types
+export type Provider_Data =
+	| Ollama_Provider_Data
+	| Claude_Provider_Data
+	| Chatgpt_Provider_Data
+	| Gemini_Provider_Data;
+
+// Schema validation for provider data
+export const Provider_Data_Schema = z.discriminatedUnion('type', [
+	z.object({
+		type: z.literal('ollama'),
+		value: z
+			.any()
+			.optional()
+			.transform((v) => v || {}), // Ensure value exists even if undefined
+	}),
+	z.object({
+		type: z.literal('claude'),
+		value: z
+			.any()
+			.optional()
+			.transform((v) => v || {}),
+	}),
+	z.object({
+		type: z.literal('chatgpt'),
+		value: z
+			.any()
+			.optional()
+			.transform((v) => v || {}),
+	}),
+	z.object({
+		type: z.literal('gemini'),
+		value: z.object({
+			text: z.string(),
+			candidates: z.array(z.any()).nullable().optional(),
+			function_calls: z.array(z.any()).nullable().optional(),
+			prompt_feedback: z.any().nullable().optional(),
+			usage_metadata: z.any().nullable().optional(),
+		}),
+	}),
+]);
+
+// Define Completion Request and Response schemas
+export const Completion_Request = z.object({
+	created: Datetime_Now,
+	request_id: Uuid,
+	provider_name: z.string() as z.ZodType<Provider_Name>,
+	model: z.string(),
+	prompt: z.string(),
+	tape_history: z.array(Tape_History_Message).optional(),
+});
+export type Completion_Request = z.infer<typeof Completion_Request>;
+
+export const Completion_Response = z.object({
+	created: Datetime_Now,
+	request_id: Uuid,
+	provider_name: z.string() as z.ZodType<Provider_Name>,
+	model: z.string(),
+	data: Provider_Data_Schema,
+});
+export type Completion_Response = z.infer<typeof Completion_Response>;
 
 // Base message schema
 export const Message_Base = z
@@ -51,7 +146,6 @@ export type Message_Load_Session = z.infer<typeof Message_Load_Session>;
 export const Message_Loaded_Session = Message_Base.extend({
 	type: z.literal('loaded_session'),
 	data: z
-		// TODO BLOCK extract a schema
 		.object({
 			files: z.record(Diskfile_Path, Source_File),
 		})

@@ -15,6 +15,7 @@
 	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
 	import Bit_Stats from '$lib/Bit_Stats.svelte';
 	import Prompt_List from '$lib/Prompt_List.svelte';
+	import Tape_List from '$lib/Tape_List.svelte';
 
 	const zzz = zzz_context.get();
 
@@ -26,7 +27,7 @@
 
 	// TODO BLOCK this needs to be persisted state
 	if (chat.tapes.length === 0) {
-		const initial_model_names = ['llama3.2:1b', 'qwen2.5:0.5b', 'qwen2.5:1.5b'];
+		const initial_model_names = ['llama3.2:1b', 'llama3.2:3b', 'qwen2.5:0.5b', 'qwen2.5:1.5b'];
 		const initial_models = zzz.models.filter_by_names(initial_model_names);
 		if (initial_models) {
 			for (const initial_model of initial_models) {
@@ -84,10 +85,6 @@
 
 <div class="chat_view">
 	<div class="width_sm column gap_md">
-		<div class="panel p_sm">
-			<header class="mt_0 mb_lg size_lg">{GLYPH_TAPE} tapes</header>
-			<p>TODO add buttons with sets</p>
-		</div>
 		<div class="panel">
 			<!-- TODO add user-customizable sets of models -->
 			<div class="flex">
@@ -203,6 +200,10 @@
 		</ul>
 	</div>
 	<div class="width_sm column gap_md">
+		<div class="panel p_sm">
+			<header class="mt_0 mb_lg size_lg">{GLYPH_TAPE} tapes</header>
+			<Tape_List {chat} />
+		</div>
 		<div class="panel p_sm">
 			<header class="mt_0 mb_lg size_lg">{GLYPH_PROMPT} prompts</header>
 			<Prompt_List {chat} />

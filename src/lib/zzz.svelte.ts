@@ -2,7 +2,6 @@ import {create_context} from '@ryanatkn/fuz/context_helpers.js';
 import {SvelteMap} from 'svelte/reactivity';
 import {create_deferred, type Deferred} from '@ryanatkn/belt/async.js';
 import type {Class_Constructor} from '@ryanatkn/belt/types.js';
-import {DEV} from 'esm-env';
 
 import type {
 	Message_Send_Prompt,
@@ -12,7 +11,7 @@ import type {
 } from '$lib/message_types.js';
 import {Provider, type Provider_Json} from '$lib/provider.svelte.js';
 import type {Provider_Name} from '$lib/provider_types.js';
-import {Uuid} from '$lib/uuid.js';
+import {Uuid} from '$lib/zod_helpers.js';
 import {Completion_Threads, type Completion_Threads_Json} from '$lib/completion_thread.svelte.js';
 import {ollama_list_with_metadata} from '$lib/ollama.js';
 import {Models} from '$lib/models.svelte.js';
@@ -32,6 +31,7 @@ import {Message} from '$lib/message.svelte.js';
 import {Prompt} from '$lib/prompt.svelte.js';
 import {Tape} from '$lib/tape.svelte.js';
 import {Ui, Ui_Json} from '$lib/ui.svelte.js';
+import {as_unified_response} from '$lib/response_helpers.js';
 
 // Define standard cell classes
 export const cell_classes = {
@@ -71,6 +71,15 @@ export interface Zzz_Options {
 export interface Zzz_Json {
 	ui: Ui_Json;
 	completion_threads: Completion_Threads_Json;
+}
+
+/**
+ * Message with history structure for conversation context.
+ * Use explicit union type rather than string to match the expected role values.
+ */
+export interface Message_With_History {
+	role: 'user' | 'system' | 'assistant';
+	content: string;
 }
 
 /**
@@ -185,6 +194,7 @@ export class Zzz {
 		prompt: string,
 		provider_name: Provider_Name,
 		model: string,
+		tape_history?: Array<Message_With_History>,
 	): Promise<Message_Completion_Response> {
 		const request_id = Uuid.parse(undefined);
 		const message: Message_Send_Prompt = {
@@ -196,6 +206,7 @@ export class Zzz {
 				provider_name,
 				model,
 				prompt,
+				tape_history,
 			},
 		};
 		this.messages.send(message);
@@ -206,11 +217,14 @@ export class Zzz {
 
 		// Ensure the completion response matches the required structure
 		if (response.completion_response) {
-			// Direct assignment without helper
-			this.completion_threads.receive_completion_response(
-				message.completion_request,
-				response.completion_response,
-			);
+			// Use safe type assertion with null check
+			const unified_response = as_unified_response(response.completion_response);
+			if (unified_response) {
+				this.completion_threads.receive_completion_response(
+					message.completion_request,
+					unified_response,
+				);
+			}
 		} else {
 			console.error('Invalid completion response format:', response);
 		}
@@ -252,7 +266,7 @@ export class Zzz {
 		const start_time = this.ping_start_times.get(ping_id);
 
 		if (start_time === undefined) {
-			if (DEV) console.error('Expected start time for ping', ping_id);
+			console.error('Expected start time for ping', ping_id);
 			return;
 		}
 

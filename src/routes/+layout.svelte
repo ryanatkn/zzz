@@ -18,7 +18,7 @@
 	import Zzz_Root from '$lib/Zzz_Root.svelte';
 	import {pkg_context} from '$routes/pkg.js';
 	import {package_json, src_json} from '$routes/package.js';
-	import {Uuid} from '$lib/uuid.js';
+	import {Uuid} from '$lib/zod_helpers.js';
 	import {zzz_config} from '$lib/zzz_config.js';
 	import type {Diskfile_Path} from '$lib/diskfile_types.js';
 	import {Prompt_Json} from '$lib/prompt.svelte.js';

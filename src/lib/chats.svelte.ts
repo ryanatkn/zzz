@@ -2,7 +2,7 @@ import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Chat, Chat_Json} from '$lib/chat.svelte.js';
-import type {Uuid} from '$lib/uuid.js';
+import type {Uuid} from '$lib/zod_helpers.js';
 import {reorder_list} from '$lib/list_helpers.js';
 import {cell_array} from '$lib/cell_helpers.js';
 

@@ -1,6 +1,6 @@
 import {z} from 'zod';
 
-import {Uuid, Uuid_Base} from '$lib/uuid.js';
+import {Uuid, Uuid_Base} from '$lib/zod_helpers.js';
 
 // Base schema enforces minimum length to reject empty strings
 export const Xml_Attribute_Key_Base = z.string().min(1);

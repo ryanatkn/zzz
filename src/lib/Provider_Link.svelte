@@ -3,7 +3,6 @@
 	import {base} from '$app/paths';
 	import type {SvelteHTMLElements} from 'svelte/elements';
 	import {page} from '$app/state';
-	import {DEV} from 'esm-env';
 
 	import type {Provider_Json} from '$lib/provider.svelte.js';
 	import {GLYPH_PROVIDER} from '$lib/glyphs.js';
@@ -32,10 +31,10 @@
 		children,
 	}: Props = $props();
 
-	if (DEV && icon && children) {
+	if (icon && children) {
 		console.error('icon and children are mutually exclusive');
 	}
-	if (DEV && fallback && fallback_attrs) {
+	if (fallback && fallback_attrs) {
 		console.error('fallback and fallback_attrs are mutually exclusive');
 	}
 

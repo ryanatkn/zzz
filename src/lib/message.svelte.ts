@@ -3,17 +3,16 @@ import {z} from 'zod';
 import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
+import {Uuid, Datetime_Now} from '$lib/zod_helpers.js';
 import {
-	to_completion_response_text,
-	Completion_Request,
+	Message_Json,
 	Completion_Response,
-	type Completion_Request as Completion_Request_Type,
-	ensure_valid_response,
-} from '$lib/completion.js';
-import {Uuid} from '$lib/uuid.js';
-import {Message_Json, type Message_Direction, type Message_Type} from '$lib/message_types.js';
-import {Datetime_Now} from '$lib/zod_helpers.js';
+	Completion_Request,
+	type Message_Direction,
+	type Message_Type,
+} from '$lib/message_types.js';
 import {Diskfile_Path} from '$lib/diskfile_types.js';
+import {as_unified_response, to_completion_response_text} from '$lib/response_helpers.js';
 
 // Constants for preview length and formatting
 export const MESSAGE_PREVIEW_MAX_LENGTH = 50;
@@ -36,7 +35,7 @@ export class Message extends Cell<typeof Message_Json> {
 	// Store data based on message type
 	data: Record<string, any> | undefined = $state();
 	ping_id: Uuid | undefined = $state();
-	completion_request: Completion_Request_Type | undefined = $state();
+	completion_request: Completion_Request | undefined = $state();
 	completion_response: Completion_Response | undefined = $state();
 	path: Diskfile_Path | undefined = $state();
 	contents: string | undefined = $state(); // TODO BLOCK derived token count like with diskfiles?
@@ -61,7 +60,7 @@ export class Message extends Cell<typeof Message_Json> {
 			this.type === 'filer_change',
 	);
 
-	prompt_data: Completion_Request_Type | null = $derived(
+	prompt_data: Completion_Request | null = $derived(
 		this.is_prompt && this.completion_request ? this.completion_request : null,
 	);
 
@@ -71,7 +70,7 @@ export class Message extends Cell<typeof Message_Json> {
 
 	completion_text: string | null | undefined = $derived(
 		this.completion_data
-			? to_completion_response_text(ensure_valid_response(this.completion_data))
+			? to_completion_response_text(as_unified_response(this.completion_data))
 			: null,
 	);
 
@@ -116,7 +115,7 @@ export class Message extends Cell<typeof Message_Json> {
 		this.init();
 	}
 
-	// TODO make this automated with the schemas
+	// TODO make this automated with the schemas - encode method?
 	override to_json(): z.output<typeof Message_Json> {
 		// Create base message data
 		const base = {

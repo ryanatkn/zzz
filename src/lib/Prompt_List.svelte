@@ -5,7 +5,7 @@
 	import type {Chat} from '$lib/chat.svelte.js';
 	import {GLYPH_REMOVE} from '$lib/glyphs.js';
 	import {Reorderable} from '$lib/reorderable.svelte.js';
-	import type {Uuid} from '$lib/uuid.js';
+	import type {Uuid} from '$lib/zod_helpers.js';
 
 	interface Props {
 		chat: Chat;
@@ -70,7 +70,7 @@
 	{#if chat.selected_prompts.length > 0}
 		<div class="w_100">
 			<ul
-				class="unstyled"
+				class="unstyled column gap_xs5"
 				use:reorderable.list={{
 					onreorder: (from_index, to_index) => {
 						chat.reorder_selected_prompts(from_index, to_index);
@@ -84,7 +84,7 @@
 								text={prompt.content}
 								icon_button={false}
 								attrs={{
-									class: 'plain size_sm compact radius_xs',
+									class: 'plain compact',
 									style: 'width: 4rem',
 									disabled: !prompt.content,
 									title: prompt.content ? 'Copy prompt content' : 'No content to copy',
@@ -98,7 +98,7 @@
 							<Confirm_Button
 								onclick={() => chat.remove_selected_prompt(prompt.id)}
 								attrs={{
-									class: 'plain size_sm compact radius_xs',
+									class: 'plain compact',
 									title: `Remove prompt ${prompt.name}`,
 								}}
 							>

@@ -39,10 +39,14 @@
 			confirming = false;
 		}
 	});
+
+	const class_attr = $derived(attrs?.class);
 </script>
 
 <!-- I did the ternary below because Svelte treats `undefined` `class:` directive values as `false`, so they override the attribute classes -->
 <!-- eslint-disable svelte/prefer-class-directive -->
+
+<!-- TODO the class detection is hacky, probably move to props -->
 
 <div class="relative">
 	{#if button}
@@ -53,11 +57,17 @@
 			onclick={toggle}
 			class:confirming
 			{...attrs}
-			class="{attrs?.class} {!children && !attrs?.class?.includes('icon_button')
+			class="{class_attr} {!children && !class_attr?.includes('icon_button')
 				? 'icon_button'
-				: ''} {!children && !confirming && !attrs?.class?.includes('plain')
+				: ''} {!children && !confirming && !class_attr?.includes('plain')
 				? 'plain'
-				: ''} {!children && confirming && !attrs?.class?.includes('size_sm') ? 'size_sm' : ''}"
+				: ''} {!children &&
+			confirming &&
+			!class_attr?.includes(class_attr?.includes('compact') ? 'size_xs' : 'size_sm')
+				? class_attr?.includes('compact')
+					? 'size_xs'
+					: 'size_sm'
+				: ''}"
 		>
 			{#if children}{@render children(confirming)}{:else}{GLYPH_REMOVE}{/if}
 		</button>
