@@ -40,6 +40,7 @@ export class Cell_Registry {
 			return null;
 		}
 
+		// TODO @many maybe optionally forward additional rest options?
 		return new constructor({zzz: this.zzz, json});
 	}
 

@@ -7,6 +7,7 @@ import {
 	type Schema_Class_Info,
 	type Value_Parser,
 } from '$lib/cell_helpers.js';
+import type {Schema_Keys} from '$lib/cell_types.js';
 
 // Base options type that all cells will extend
 export interface Cell_Options<T_Schema extends z.ZodType> {
@@ -18,18 +19,20 @@ export interface Cell_Options<T_Schema extends z.ZodType> {
 export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> {
 	readonly schema: T_Schema; // TODO think about making this $state - dynamic schemas? idk, not yet
 
-	readonly schema_keys: Array<string> = $derived.by(() => zod_get_schema_keys(this.schema));
-	readonly field_schemas: Map<string, z.ZodType> = $derived.by(
+	readonly schema_keys: Array<Schema_Keys<T_Schema>> = $derived.by(() =>
+		zod_get_schema_keys(this.schema),
+	);
+	readonly field_schemas: Map<Schema_Keys<T_Schema>, z.ZodType> = $derived.by(
 		() => new Map(this.schema_keys.map((key) => [key, get_field_schema(this.schema, key)])),
 	);
-	readonly field_schema_info: Map<string, Schema_Class_Info | null> = $derived(
+	readonly field_schema_info: Map<Schema_Keys<T_Schema>, Schema_Class_Info | null> = $derived(
 		new Map(
 			this.schema_keys.map((key) => {
 				const field_schema = this.field_schemas.get(key);
 				if (!field_schema) {
 					return [key, null];
 				}
-				return [key, get_schema_class_info(field_schema)] as const;
+				return [key, get_schema_class_info(field_schema)];
 			}),
 		),
 	);
@@ -78,17 +81,17 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> {
 	}
 
 	to_json(): z.output<T_Schema> {
-		const result: Record<string, any> = {};
+		const result: z.output<T_Schema> = {};
 
 		for (const key of this.schema_keys) {
 			if (key in this) {
-				result[key] = this.encode((this as any)[key], key);
+				result[key] = this.encode(this[key], key);
 			} else {
 				console.error(`Property ${key} not found on instance of ${this.constructor.name}`);
 			}
 		}
 
-		return result as z.output<T_Schema>;
+		return result;
 	}
 
 	/**
@@ -98,6 +101,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> {
 		const constructor = this.constructor as new (options: Cell_Options<T_Schema>) => this;
 
 		try {
+			// TODO @many maybe optionally forward additional rest options?
 			return new constructor({
 				zzz: this.zzz,
 				json: structuredClone(this.json),
@@ -136,18 +140,25 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> {
 			const keys = this.schema_keys;
 
 			for (const key of keys) {
+				// TODO BLOCK maybe this should throw? and the class has to provide a custom parser?
+				// Check if this key exists as a property on this instance
+				if (!(key in this)) {
+					console.warn(`Property ${key} not found on instance of ${this.constructor.name}`);
+					continue;
+				}
+
 				// Get the value from parsed data (might be schema default)
 				const parsed_value = parsed[key];
 
 				// Check if we have a custom parser for this key
 				if (key in this.parsers) {
-					const parser = this.parsers[key as keyof typeof this.parsers];
+					const parser = this.parsers[key];
 					if (parser) {
 						// Run parser on the value (could be schema default or from JSON)
 						const result = parser(parsed_value);
 						if (result !== undefined) {
 							// Parser returned a value, use it
-							(this as any)[key] = result;
+							this[key] = result;
 							continue; // Skip standard decoding
 						}
 					}
@@ -156,7 +167,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> {
 				// If parser didn't handle it (returned undefined) or no parser exists,
 				// use standard decoding if the value exists
 				if (parsed_value !== undefined) {
-					(this as any)[key] = this.decode_value_without_parser(parsed_value, key);
+					this[key] = this.decode_value_without_parser(parsed_value, key);
 				}
 			}
 		} catch (error) {
@@ -171,10 +182,10 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> {
 	 * @param value The value to decode
 	 * @param key The key in the schema where this value belongs
 	 */
-	decode_value(value: unknown, key: string): unknown {
+	decode_value<K extends Schema_Keys<T_Schema>>(value: unknown, key: K): this[K] {
 		// First check if we have a custom parser for this key
 		if (key in this.parsers) {
-			const parser = this.parsers[key as keyof typeof this.parsers];
+			const parser = this.parsers[key];
 			if (parser) {
 				const parsed = parser(value);
 				// Only return the parsed value if it's not undefined
@@ -192,9 +203,9 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> {
 	 * Internal method to decode a value without using parsers.
 	 * This is used by the set_json method and as a fallback from decode_value.
 	 */
-	decode_value_without_parser(value: unknown, key: string): unknown {
+	decode_value_without_parser<K extends Schema_Keys<T_Schema>>(value: unknown, key: K): this[K] {
 		const schema_info = this.field_schema_info.get(key);
-		if (!schema_info) return value;
+		if (!schema_info) return value as this[K];
 
 		// Handle arrays of cells
 		if (schema_info.is_array && Array.isArray(value)) {
@@ -203,37 +214,37 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> {
 					const instance = this.#instantiate_class(schema_info.element_class, item);
 					// Return the item if instantiation returns null
 					return instance !== null ? instance : item;
-				});
+				}) as this[K];
 			}
-			return value;
+			return value as this[K];
 		}
 
 		// Handle individual cell
 		if (schema_info.class_name && value && typeof value === 'object') {
 			const instance = this.#instantiate_class(schema_info.class_name, value);
 			// Return the original value if instantiation returns null
-			return instance !== null ? instance : value;
+			return (instance !== null ? instance : value) as this[K];
 		}
 
 		// Handle special types
 		if (schema_info.type === 'ZodMap' && Array.isArray(value)) {
-			return new Map(value as Array<[any, any]>);
+			return new Map(value) as this[K];
 		}
 		if (schema_info.type === 'ZodSet' && Array.isArray(value)) {
-			return new Set(value);
+			return new Set(value) as this[K];
 		}
 		if (schema_info.type === 'ZodBranded' && value !== null && value !== undefined) {
 			try {
 				// Use the schema directly to parse branded types
 				const field_schema = this.field_schemas.get(key);
-				return field_schema?.parse(value) ?? value;
+				return (field_schema?.parse(value) ?? value) as this[K];
 			} catch (e) {
 				console.error(`Failed to parse branded type for ${key}:`, e);
-				return value;
+				return value as this[K];
 			}
 		}
 
-		return value;
+		return value as this[K];
 	}
 
 	/**

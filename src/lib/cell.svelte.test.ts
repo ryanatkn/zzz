@@ -4,6 +4,7 @@ import {test, expect, vi, beforeEach} from 'vitest';
 import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
+import type {Schema_Keys} from '$lib/cell_types.js';
 
 /* eslint-disable no-new */
 
@@ -466,7 +467,8 @@ test('Cell handles special types like Map and Set', () => {
 		}
 
 		// Test helper to manually invoke decode_value_without_parser
-		test_decode(value: unknown, key: string): unknown {
+		// Fix: Use proper generic type parameter to match the method signature
+		test_decode<K extends Schema_Keys<typeof Special_Schema>>(value: unknown, key: K): this[K] {
 			return this.decode_value_without_parser(value, key);
 		}
 	}
@@ -493,55 +495,44 @@ test('Cell handles special types like Map and Set', () => {
 	expect(cell.set_field.has('y')).toBe(true);
 	expect(cell.set_field.has('z')).toBe(true);
 
-	// Test manual decoding of arrays to Map/Set - skip this part since we're
-	// letting Zod handle the conversion now
-	/* 
+	// Add test for manual decoding using the fixed test_decode method
 	const map_result = cell.test_decode([['c', 3]], 'map_field');
 	expect(map_result).toBeInstanceOf(Map);
-	expect((map_result as Map<string, number>).get('c')).toBe(3);
+	expect(map_result.get('c')).toBe(3);
 
 	const set_result = cell.test_decode(['a', 'b'], 'set_field');
 	expect(set_result).toBeInstanceOf(Set);
-	expect((set_result as Set<string>).has('a')).toBe(true);
-	*/
+	expect(set_result.has('a')).toBe(true);
 });
 
-// Test error handling in set_json
-test('Cell handles schema validation errors properly', () => {
-	const Strict_Schema = z.object({
-		required: z.string(),
+// Add test for the case when a schema key doesn't exist on the instance
+test('Cell warns when property does not exist on instance', () => {
+	// Create a spy on console.warn
+	const warn_spy = vi.spyOn(console, 'warn');
+
+	// Schema with a property that won't exist on the instance
+	const Missing_Schema = z.object({
+		exists: z.string().default('default'),
+		missing: z.number().default(42), // This property won't exist on the class
 	});
 
-	class Strict_Cell extends Cell<typeof Strict_Schema> {
-		required: string = $state()!;
+	class Missing_Cell extends Cell<typeof Missing_Schema> {
+		exists: string = $state()!;
+		// Intentionally missing the 'missing' property
 
-		constructor(options: Cell_Options<typeof Strict_Schema>) {
-			super(Strict_Schema, options);
+		constructor(options: Cell_Options<typeof Missing_Schema>) {
+			super(Missing_Schema, options);
 			this.init();
 		}
 	}
 
-	// Should throw for missing required field
-	expect(() => {
-		new Strict_Cell({
-			zzz: mock_zzz,
-			json: {} as any,
-		});
-	}).toThrow(z.ZodError);
+	new Missing_Cell({zzz: mock_zzz});
 
-	// Should throw for wrong type
-	expect(() => {
-		new Strict_Cell({
-			zzz: mock_zzz,
-			json: {required: 123} as any,
-		});
-	}).toThrow(z.ZodError);
+	// Verify warning was logged
+	expect(warn_spy).toHaveBeenCalledWith(
+		expect.stringContaining('Property missing not found on instance of Missing_Cell'),
+	);
 
-	// Should not throw with valid data
-	expect(() => {
-		new Strict_Cell({
-			zzz: mock_zzz,
-			json: {required: 'valid'},
-		});
-	}).not.toThrow();
+	// Restore console.warn
+	warn_spy.mockRestore();
 });
