@@ -1,6 +1,10 @@
 export const GLYPH_REMOVE = '⨉'; // ⨉ ✕ 🗙 ⤫ ⤬
 export const GLYPH_DRAG = '≡'; // ≡ ☰ ☷
 export const GLYPH_COPY = '⧉';
+export const GLYPH_PASTE = '⎌'; // ⧈ ⎗ ⎘ ⎙
+// export const GLYPH_EDIT = '✎'; // ✎ ✏ ✐ ✑ ✒
+// export const GLYPH_ADD = '⊞'; // ⊞ ⧉ ⧈
+// export const GLYPH_MOVE = '⧈';
 
 export const GLYPH_CHAT = '⌸';
 export const GLYPH_TAPE = '☷';
@@ -58,6 +62,8 @@ export const get_direction_icon = (direction: string): string => {
 // ⭍
 //⥘ ⥙
 // ⬎⤣
+
+// ⎗ ⎘
 
 // ⇇ ⇉  maybe use these for deps?
 

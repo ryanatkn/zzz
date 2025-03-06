@@ -8,6 +8,7 @@
 	import Xml_Tag_Controls from '$lib/Xml_Tag_Controls.svelte';
 	import Bit_Stats from '$lib/Bit_Stats.svelte';
 	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
+	import {GLYPH_PASTE} from '$lib/glyphs.js';
 
 	interface Props {
 		bit: Bit;
@@ -48,8 +49,8 @@
 					bit.content += text;
 					bit_textareas[bit.id].focus();
 				}}
-				attrs={{class: 'plain'}}
-			/>
+				attrs={{class: 'plain'}}>{GLYPH_PASTE}</Paste_From_Clipboard
+			>
 			<Clear_Restore_Button
 				value={bit.content}
 				onchange={(value) => {

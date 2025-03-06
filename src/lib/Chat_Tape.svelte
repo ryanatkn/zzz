@@ -13,6 +13,7 @@
 	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
 	import Bit_Stats from '$lib/Bit_Stats.svelte';
 	import Error_Message from '$lib/Error_Message.svelte';
+	import {GLYPH_PASTE} from '$lib/glyphs.js';
 
 	interface Props {
 		tape: Tape;
@@ -89,8 +90,8 @@
 					input += text;
 					input_el?.focus();
 				}}
-				attrs={{class: 'plain'}}
-			/>
+				attrs={{class: 'plain'}}>{GLYPH_PASTE}</Paste_From_Clipboard
+			>
 			<Clear_Restore_Button
 				value={input}
 				onchange={(value) => {
