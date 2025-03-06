@@ -1,11 +1,9 @@
-import type {Source_File as Source_File_Type} from '@ryanatkn/gro/filer.js';
 import {format} from 'date-fns';
 import {encode} from 'gpt-tokenizer';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Diskfile_Json, type Diskfile_Path} from '$lib/diskfile_types.js';
-import type {Datetime, Datetime_Now} from '$lib/zod_helpers.js';
-import {Uuid} from '$lib/zod_helpers.js';
+import {Diskfile_Json, type Diskfile_Path, type Source_File} from '$lib/diskfile_types.js';
+import type {Datetime, Datetime_Now, Uuid} from '$lib/zod_helpers.js';
 
 // Constants for formatting
 export const FILE_DATE_FORMAT = 'MMM d, yyyy h:mm:ss a';
@@ -21,11 +19,11 @@ export class Diskfile extends Cell<typeof Diskfile_Json> {
 	external: boolean = $state(false);
 	created: Datetime_Now = $state()!;
 	updated: Datetime = $state()!;
-	dependents: Array<[Diskfile_Path, Source_File_Type]> = $state([]);
-	dependencies: Array<[Diskfile_Path, Source_File_Type]> = $state([]);
+	dependents: Array<[Diskfile_Path, Source_File]> = $state([]);
+	dependencies: Array<[Diskfile_Path, Source_File]> = $state([]);
 
-	dependencies_by_id: Map<Diskfile_Path, Source_File_Type> = $derived(new Map(this.dependencies));
-	dependents_by_id: Map<Diskfile_Path, Source_File_Type> = $derived(new Map(this.dependents));
+	dependencies_by_id: Map<Diskfile_Path, Source_File> = $derived(new Map(this.dependencies));
+	dependents_by_id: Map<Diskfile_Path, Source_File> = $derived(new Map(this.dependents));
 
 	dependency_ids: Array<Diskfile_Path> = $derived(this.dependencies.map(([id]) => id));
 	dependent_ids: Array<Diskfile_Path> = $derived(this.dependents.map(([id]) => id));

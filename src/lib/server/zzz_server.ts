@@ -3,7 +3,7 @@ import Anthropic from '@anthropic-ai/sdk';
 import OpenAI from 'openai';
 import ollama from 'ollama';
 import {GoogleGenerativeAI} from '@google/generative-ai';
-import {Filer, type Cleanup_Watch, type Source_File} from '@ryanatkn/gro/filer.js';
+import {Filer, type Cleanup_Watch} from '@ryanatkn/gro/filer.js';
 import {
 	SECRET_ANTHROPIC_API_KEY,
 	SECRET_GOOGLE_API_KEY,
@@ -13,6 +13,7 @@ import {existsSync, mkdirSync, writeFileSync} from 'node:fs';
 import {dirname, join} from 'node:path';
 import {format_file} from '@ryanatkn/gro/format_file.js';
 import type {Watcher_Change} from '@ryanatkn/gro/watch_dir.js';
+import {DEV} from 'esm-env';
 
 import {
 	type Message_Client,
@@ -23,7 +24,7 @@ import {
 import {Uuid, Datetime_Now} from '$lib/zod_helpers.js';
 import {SYSTEM_MESSAGE_DEFAULT} from '$lib/config.js';
 import {delete_diskfile_in_scope, write_file_in_scope} from '$lib/server/helpers.js';
-import {Diskfile_Path} from '$lib/diskfile_types.js';
+import {Diskfile_Path, Source_File} from '$lib/diskfile_types.js';
 import {map_watcher_change_to_diskfile_change} from '$lib/diskfile_helpers.js';
 import {
 	format_ollama_messages,
@@ -289,20 +290,32 @@ export class Zzz_Server {
 		await cleanup_filer();
 	}
 
-	handle_filer_change(change: Watcher_Change, source_file: Source_File): void {
+	handle_filer_change(change: Watcher_Change, source_file: Record<string, any>): void {
 		const api_change = {
 			type: map_watcher_change_to_diskfile_change(change.type),
 			path: Diskfile_Path.parse(change.path),
 		};
 
+		// Ensure the ID is properly typed
+		source_file.id = Diskfile_Path.parse(source_file.id);
+
+		// Declare variable for the source file that will be sent
+		let parsed_source_file: Source_File;
+
+		// In development mode, validate strictly
+		if (DEV) {
+			// Use direct parse to make errors loud and fail fast
+			parsed_source_file = Source_File.parse(source_file);
+		} else {
+			// In production, simply typecast for performance (we control both sides)
+			parsed_source_file = source_file as Source_File;
+		}
+
 		this.#send_to_all_clients({
 			id: Uuid.parse(undefined),
 			type: 'filer_change',
 			change: api_change,
-			source_file: {
-				...source_file,
-				id: Diskfile_Path.parse(source_file.id),
-			},
+			source_file: parsed_source_file,
 		});
 	}
 }

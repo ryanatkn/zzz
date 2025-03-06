@@ -1,7 +1,6 @@
 import {z} from 'zod';
 
-import {Datetime, Datetime_Now} from '$lib/zod_helpers.js';
-import {Uuid} from '$lib/zod_helpers.js';
+import {Datetime, Datetime_Now, Uuid} from '$lib/zod_helpers.js';
 
 // Define file change types
 export const Diskfile_Change_Type = z.enum(['add', 'change', 'delete']);
@@ -10,15 +9,17 @@ export type Diskfile_Change_Type = z.infer<typeof Diskfile_Change_Type>;
 export const Diskfile_Path = z.string().brand('Diskfile_Path');
 export type Diskfile_Path = z.infer<typeof Diskfile_Path>;
 
-// TODO upstream to Gro
+// Use a more specific definition for Maps compatible with Gro's Source_File
 export const Source_File = z.object({
 	id: Diskfile_Path,
 	contents: z.string().nullable(),
 	external: z.boolean(),
 	ctime: z.number().nullable(),
 	mtime: z.number().nullable(),
-	dependents: z.instanceof(Map),
-	dependencies: z.instanceof(Map),
+	// Using any for Map generics to avoid circular references
+	// but still preserve the Map instance type
+	dependents: z.instanceof(Map) as z.ZodType<Map<any, any>>,
+	dependencies: z.instanceof(Map) as z.ZodType<Map<any, any>>,
 });
 export type Source_File = z.infer<typeof Source_File>;
 

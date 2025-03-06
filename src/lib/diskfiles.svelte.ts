@@ -1,12 +1,11 @@
 import {SvelteMap} from 'svelte/reactivity';
-import type {Source_File as Gro_Source_File} from '@ryanatkn/gro/filer.js';
 import {z} from 'zod';
 
 import type {Message_Filer_Change} from '$lib/message_types.js';
 import {Uuid} from '$lib/zod_helpers.js';
 import {Diskfile} from '$lib/diskfile.svelte.js';
-import {Diskfile_Json, type Diskfile_Path} from '$lib/diskfile_types.js';
-import {source_file_to_diskfile_json, assert_valid_source_file} from '$lib/diskfile_helpers.js';
+import {Diskfile_Json, type Diskfile_Path, Source_File} from '$lib/diskfile_types.js';
+import {source_file_to_diskfile_json} from '$lib/diskfile_helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {cell_array} from '$lib/cell_helpers.js';
 
@@ -45,7 +44,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 	);
 
 	// TODO maybe don't duplicate this data?
-	#source_files: SvelteMap<Diskfile_Path, Gro_Source_File> = new SvelteMap();
+	#source_files: SvelteMap<Diskfile_Path, Source_File> = new SvelteMap();
 
 	constructor(options: Diskfiles_Options) {
 		super(Diskfiles_Json, options);
@@ -81,39 +80,54 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 	}
 
 	handle_change(message: Message_Filer_Change): void {
-		const change = message.change;
-		const source_file = message.source_file;
+		// Use safeParse for robust error handling
+		const parsed = Source_File.safeParse(message.source_file);
 
-		// Use the helper function to validate the source file
-		const validated_source_file = assert_valid_source_file(source_file as Gro_Source_File);
+		if (!parsed.success) {
+			console.error('Invalid source file received from server:', parsed.error);
+			return; // Don't proceed with invalid data
+		}
 
-		switch (change.type) {
+		const validated_source_file = parsed.data;
+
+		// Store the parsed source file
+		this.#source_files.set(validated_source_file.id, validated_source_file);
+
+		switch (message.change.type) {
 			case 'add': {
-				this.#source_files.set(validated_source_file.id, source_file as Gro_Source_File);
-				const diskfile = this.#create_diskfile(source_file as Gro_Source_File);
+				const diskfile = this.#create_diskfile(validated_source_file);
 				this.items.push(diskfile);
 				this.by_id.set(diskfile.id, diskfile);
 				this.by_path.set(diskfile.path, diskfile.id);
 				break;
 			}
 			case 'change': {
-				this.#source_files.set(validated_source_file.id, source_file as Gro_Source_File);
-				const diskfile = this.#create_diskfile(source_file as Gro_Source_File);
+				// Find existing diskfile by path
+				const existing_diskfile = this.get_by_path(validated_source_file.id);
 
-				// Find and replace the existing diskfile if it exists
-				const index = this.items.findIndex((f) => f.path === diskfile.path);
-				if (index >= 0) {
-					this.items[index] = diskfile;
+				if (existing_diskfile) {
+					// Update the existing diskfile, preserving its ID
+					const diskfile_json = source_file_to_diskfile_json(
+						validated_source_file,
+						existing_diskfile.id, // Pass the existing ID to maintain stability
+					);
+
+					// Only update changed properties, not the entire object
+					// This preserves created timestamp and other stable properties
+					existing_diskfile.set_json({
+						...diskfile_json,
+						created: existing_diskfile.created, // Preserve original creation date
+					});
 				} else {
+					// If it doesn't exist yet, create a new one
+					const diskfile = this.#create_diskfile(validated_source_file);
 					this.items.push(diskfile);
+					this.by_id.set(diskfile.id, diskfile);
+					this.by_path.set(diskfile.path, diskfile.id);
 				}
-
-				this.by_id.set(diskfile.id, diskfile);
-				this.by_path.set(diskfile.path, diskfile.id);
 				break;
 			}
 			case 'delete': {
-				this.#source_files.delete(validated_source_file.id);
 				const diskfile_id = this.by_path.get(validated_source_file.id);
 				if (diskfile_id) {
 					// Remove from the files array
@@ -124,13 +138,14 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 
 					this.by_id.delete(diskfile_id);
 					this.by_path.delete(validated_source_file.id);
+					this.#source_files.delete(validated_source_file.id);
 				}
 				break;
 			}
 		}
 	}
 
-	#create_diskfile(source_file: Gro_Source_File): Diskfile {
+	#create_diskfile(source_file: Source_File): Diskfile {
 		return new Diskfile({
 			zzz: this.zzz,
 			json: source_file_to_diskfile_json(source_file),
@@ -154,7 +169,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 		});
 	}
 
-	get_source_file(path: Diskfile_Path): Gro_Source_File | undefined {
+	get_source_file(path: Diskfile_Path): Source_File | undefined {
 		return this.#source_files.get(path);
 	}
 
