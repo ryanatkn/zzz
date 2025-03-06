@@ -215,10 +215,6 @@
       "svelte": "./dist/Control_Panel.svelte",
       "default": "./dist/Control_Panel.svelte"
     },
-    "./conversation.svelte.js": {
-      "types": "./dist/conversation.svelte.d.ts",
-      "default": "./dist/conversation.svelte.js"
-    },
     "./Dashboard_Capabilities.svelte": {
       "types": "./dist/Dashboard_Capabilities.svelte.d.ts",
       "svelte": "./dist/Dashboard_Capabilities.svelte",
@@ -355,10 +351,6 @@
       "types": "./dist/Message_View.svelte.d.ts",
       "svelte": "./dist/Message_View.svelte",
       "default": "./dist/Message_View.svelte"
-    },
-    "./message.helpers.js": {
-      "types": "./dist/message.helpers.d.ts",
-      "default": "./dist/message.helpers.js"
     },
     "./message.svelte.js": {
       "types": "./dist/message.svelte.d.ts",
@@ -512,6 +504,10 @@
     },
     "./server/.env.example": {
       "default": "./dist/server/.env.example"
+    },
+    "./server/ai_provider_utils.js": {
+      "types": "./dist/server/ai_provider_utils.d.ts",
+      "default": "./dist/server/ai_provider_utils.js"
     },
     "./server/helpers.js": {
       "types": "./dist/server/helpers.d.ts",

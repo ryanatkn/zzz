@@ -171,10 +171,6 @@ export const package_json = {
 			svelte: './dist/Control_Panel.svelte',
 			default: './dist/Control_Panel.svelte',
 		},
-		'./conversation.svelte.js': {
-			types: './dist/conversation.svelte.d.ts',
-			default: './dist/conversation.svelte.js',
-		},
 		'./Dashboard_Capabilities.svelte': {
 			types: './dist/Dashboard_Capabilities.svelte.d.ts',
 			svelte: './dist/Dashboard_Capabilities.svelte',
@@ -299,10 +295,6 @@ export const package_json = {
 			types: './dist/Message_View.svelte.d.ts',
 			svelte: './dist/Message_View.svelte',
 			default: './dist/Message_View.svelte',
-		},
-		'./message.helpers.js': {
-			types: './dist/message.helpers.d.ts',
-			default: './dist/message.helpers.js',
 		},
 		'./message.svelte.js': {
 			types: './dist/message.svelte.d.ts',
@@ -440,6 +432,10 @@ export const package_json = {
 			default: './dist/scrollable.svelte.js',
 		},
 		'./server/.env.example': {default: './dist/server/.env.example'},
+		'./server/ai_provider_utils.js': {
+			types: './dist/server/ai_provider_utils.d.ts',
+			default: './dist/server/ai_provider_utils.js',
+		},
 		'./server/helpers.js': {
 			types: './dist/server/helpers.d.ts',
 			default: './dist/server/helpers.js',
@@ -612,14 +608,6 @@ export const src_json = {
 			declarations: [{name: 'XML_TAG_NAME_DEFAULT', kind: 'variable'}],
 		},
 		'./Control_Panel.svelte': {path: 'Control_Panel.svelte', declarations: []},
-		'./conversation.svelte.js': {
-			path: 'conversation.svelte.ts',
-			declarations: [
-				{name: 'Conversation_Json', kind: 'variable'},
-				{name: 'Conversation_Options', kind: 'type'},
-				{name: 'Conversation', kind: 'class'},
-			],
-		},
 		'./Dashboard_Capabilities.svelte': {path: 'Dashboard_Capabilities.svelte', declarations: []},
 		'./Dashboard_Chats.svelte': {path: 'Dashboard_Chats.svelte', declarations: []},
 		'./Dashboard_Files.svelte': {path: 'Dashboard_Files.svelte', declarations: []},
@@ -713,7 +701,7 @@ export const src_json = {
 			declarations: [
 				{name: 'Message_Direction', kind: 'variable'},
 				{name: 'Message_Type', kind: 'variable'},
-				{name: 'Conversation_History_Message', kind: 'variable'},
+				{name: 'Tape_History_Message', kind: 'variable'},
 				{name: 'Ollama_Provider_Data', kind: 'type'},
 				{name: 'Claude_Provider_Data', kind: 'type'},
 				{name: 'Chatgpt_Provider_Data', kind: 'type'},
@@ -722,7 +710,6 @@ export const src_json = {
 				{name: 'Provider_Data_Schema', kind: 'variable'},
 				{name: 'Completion_Request', kind: 'variable'},
 				{name: 'Completion_Response', kind: 'variable'},
-				{name: 'Completion_Response', kind: 'type'},
 				{name: 'Message_Base', kind: 'variable'},
 				{name: 'Message_Ping', kind: 'variable'},
 				{name: 'Message_Pong', kind: 'variable'},
@@ -741,13 +728,6 @@ export const src_json = {
 			],
 		},
 		'./Message_View.svelte': {path: 'Message_View.svelte', declarations: []},
-		'./message.helpers.js': {
-			path: 'message.helpers.ts',
-			declarations: [
-				{name: 'is_message_type', kind: null},
-				{name: 'get_message_debug_info', kind: null},
-			],
-		},
 		'./message.svelte.js': {
 			path: 'message.svelte.ts',
 			declarations: [
@@ -906,6 +886,15 @@ export const src_json = {
 			],
 		},
 		'./server/.env.example': {path: 'server/.env.example', declarations: []},
+		'./server/ai_provider_utils.js': {
+			path: 'server/ai_provider_utils.ts',
+			declarations: [
+				{name: 'format_ollama_messages', kind: 'function'},
+				{name: 'format_claude_messages', kind: 'function'},
+				{name: 'format_openai_messages', kind: 'function'},
+				{name: 'format_gemini_messages', kind: 'function'},
+			],
+		},
 		'./server/helpers.js': {
 			path: 'server/helpers.ts',
 			declarations: [
@@ -970,6 +959,7 @@ export const src_json = {
 				{name: 'Uuid', kind: 'variable'},
 				{name: 'zod_get_schema_keys', kind: 'function'},
 				{name: 'get_field_schema', kind: 'function'},
+				{name: 'maybe_get_field_schema', kind: 'function'},
 			],
 		},
 		'./zzz_config.js': {
