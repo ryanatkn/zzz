@@ -41,9 +41,9 @@
 		</p>
 		<p>
 			Zzz is part of a growing ecosystem of open source client software that both provides a UI to
-			AI, and also uses AI for self-enhancement at runtime. I expect that in the future, AI will
-			write our UIs on demand, and I think a lot of existing software will evolve to become this
-			kind of client. Today most people use AI through the proprietary clients of the major
+			AI, and also uses AI to enhance the UX and runtime capabilities. I expect that in the future,
+			AI will create our UIs on demand, and I think a lot of existing software will evolve to become
+			this kind of client. Today most people use AI through the proprietary clients of the major
 			providers, and while that situation may continue, open clients like Zzz offer custom power
 			that closed software can't match. Clients mediate and control our interactions with AI, so
 			they're powerful and rather important, being able to gatekeep and shape the information we

@@ -624,7 +624,6 @@ export const src_json = {
 			path: 'diskfile_helpers.ts',
 			declarations: [
 				{name: 'map_watcher_change_to_diskfile_change', kind: 'function'},
-				{name: 'assert_valid_source_file', kind: 'function'},
 				{name: 'source_file_to_diskfile_json', kind: 'function'},
 			],
 		},
