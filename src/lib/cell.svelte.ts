@@ -117,9 +117,6 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> {
 	 * Defaults to Svelte's `$state.snapshot`,
 	 * which handles most cases and uses `toJSON` when available,
 	 * so overriding `to_json` is sufficient for most cases before overriding `encode`.
-	 * @param value The value to encode
-	 * @param key The property key
-	 * @returns The encoded value
 	 */
 	encode(value: unknown, _key: string): unknown {
 		return $state.snapshot(value);
@@ -136,39 +133,13 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> {
 			// Parse input with schema - this will apply schema defaults for missing fields
 			const parsed = this.schema.parse(input);
 
-			// Get all schema keys to process them with parsers
-			const keys = this.schema_keys;
-
-			for (const key of keys) {
-				// TODO BLOCK maybe this should throw? and the class has to provide a custom parser?
-				// Check if this key exists as a property on this instance
-				if (!(key in this)) {
-					console.warn(`Property ${key} not found on instance of ${this.constructor.name}`);
-					continue;
-				}
-
+			// Process each schema key
+			for (const key of this.schema_keys) {
 				// Get the value from parsed data (might be schema default)
 				const parsed_value = parsed[key];
 
-				// Check if we have a custom parser for this key
-				if (key in this.parsers) {
-					const parser = this.parsers[key];
-					if (parser) {
-						// Run parser on the value (could be schema default or from JSON)
-						const result = parser(parsed_value);
-						if (result !== undefined) {
-							// Parser returned a value, use it
-							this[key] = result;
-							continue; // Skip standard decoding
-						}
-					}
-				}
-
-				// If parser didn't handle it (returned undefined) or no parser exists,
-				// use standard decoding if the value exists
-				if (parsed_value !== undefined) {
-					this[key] = this.decode_value_without_parser(parsed_value, key);
-				}
+				// Process this schema property
+				this.assign_schema_property(key, parsed_value);
 			}
 		} catch (error) {
 			console.error(`Error setting JSON for ${this.constructor.name}:`, error);
@@ -177,10 +148,64 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> {
 	}
 
 	/**
+	 * Process a single schema property during JSON deserialization.
+	 * This method handles the flow for how schema properties map to instance properties.
+	 */
+	protected assign_schema_property(key: Schema_Keys<T_Schema>, value: unknown): void {
+		// 1. Check if we have a parser for this key
+		const has_parser = key in this.parsers;
+		const has_property = key in this;
+
+		// 2. If we don't have a property or parser, we can't proceed
+		if (!has_property && !has_parser) {
+			throw new Error(
+				`Schema key "${key}" not found as a property on instance of ${this.constructor.name}. ` +
+					`All schema keys must have corresponding class properties. ` +
+					`Either add a "${key}" property to the class, or provide a custom parser for this key.`,
+			);
+		}
+
+		// 3. Try to use the parser if available
+		if (has_parser) {
+			const parser = this.parsers[key];
+			if (parser) {
+				const parser_result = parser(value);
+
+				// 3a. If parser returns a defined value AND we have a property, assign it
+				if (parser_result !== undefined && has_property) {
+					this.assign_property(key, parser_result);
+					return;
+				}
+
+				// 3b. If parser returns undefined but we have a property,
+				// fall through to standard decoding
+
+				// 3c. If we don't have a property but have a parser,
+				// the parser is expected to handle the virtual property
+				if (!has_property) {
+					return;
+				}
+			}
+		}
+
+		// 4. Use standard decoding if we have a property and value
+		if (has_property && value !== undefined) {
+			const decoded = this.decode_value_without_parser(value, key);
+			this.assign_property(key, decoded);
+		}
+	}
+
+	/**
+	 * Assign a value to a property on the instance.
+	 * This method can be overridden by subclasses to customize how values are assigned.
+	 */
+	protected assign_property<K extends Schema_Keys<T_Schema>>(key: K, value: this[K]): void {
+		this[key] = value;
+	}
+
+	/**
 	 * Decode a value using schema information to instantiate the right class.
 	 * This is the public API that first checks parsers.
-	 * @param value The value to decode
-	 * @param key The key in the schema where this value belongs
 	 */
 	decode_value<K extends Schema_Keys<T_Schema>>(value: unknown, key: K): this[K] {
 		// First check if we have a custom parser for this key

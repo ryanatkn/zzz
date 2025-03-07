@@ -663,6 +663,7 @@ export const src_json = {
 				{name: 'GLYPH_REMOVE', kind: 'variable'},
 				{name: 'GLYPH_DRAG', kind: 'variable'},
 				{name: 'GLYPH_COPY', kind: 'variable'},
+				{name: 'GLYPH_PASTE', kind: 'variable'},
 				{name: 'GLYPH_CHAT', kind: 'variable'},
 				{name: 'GLYPH_TAPE', kind: 'variable'},
 				{name: 'GLYPH_FILE', kind: 'variable'},
