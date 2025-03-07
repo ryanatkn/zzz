@@ -20,14 +20,13 @@
 	const bit_textareas = $state<Record<string, HTMLTextAreaElement>>({});
 </script>
 
-<div class="column gap_sm">
+<div class="column gap_sm" class:dormant={!bit.enabled}>
 	<div class="flex mb_0 justify_content_space_between">
 		<div class="size_lg m_0">{bit.name}</div>
 	</div>
 	<textarea
 		style:height="200px"
 		class="plain mb_0"
-		class:dormant={!bit.enabled}
 		bind:this={bit_textareas[bit.id]}
 		value={bit.content}
 		oninput={(e) => prompts.update_bit(bit.id, {content: e.currentTarget.value})}

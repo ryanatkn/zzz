@@ -79,7 +79,7 @@ export class Scrollable {
 	/**
 	 * Updates the parameters of the scrolled instance
 	 */
-	update(params: Scrollable_Parameters = {}): void {
+	update(params: Scrollable_Parameters): void {
 		if (params.target_class !== undefined) {
 			this.target_class = params.target_class;
 		}

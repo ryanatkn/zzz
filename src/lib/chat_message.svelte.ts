@@ -46,7 +46,7 @@ export class Chat_Message extends Cell<typeof Chat_Message_Json> {
 export const create_chat_message = (
 	content: string,
 	role: Chat_Message_Role,
-	options: Partial<Omit<Chat_Message_Json, 'content' | 'role'>> = {},
+	options?: Partial<Omit<Chat_Message_Json, 'content' | 'role'>>,
 	zzz?: any,
 ): Chat_Message => {
 	return new Chat_Message({
@@ -54,11 +54,11 @@ export const create_chat_message = (
 		json: {
 			content,
 			role,
-			id: options.id || Uuid.parse(undefined),
-			created: options.created || Datetime_Now.parse(undefined),
-			tape_id: options.tape_id,
-			request: options.request,
-			response: options.response,
+			id: options?.id || Uuid.parse(undefined),
+			created: options?.created || Datetime_Now.parse(undefined),
+			tape_id: options?.tape_id,
+			request: options?.request,
+			response: options?.response,
 		},
 	});
 };

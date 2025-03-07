@@ -3,6 +3,7 @@ import {SvelteMap} from 'svelte/reactivity';
 import {create_deferred, type Deferred} from '@ryanatkn/belt/async.js';
 import type {Assignable, Class_Constructor} from '@ryanatkn/belt/types.js';
 import {z} from 'zod';
+import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
 
 import type {
 	Message_Send_Prompt,
@@ -116,7 +117,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	capability_ollama: undefined | null | boolean = $state();
 	inited_models: boolean | undefined = $state();
 
-	constructor(options: Zzz_Options = {}) {
+	constructor(options: Zzz_Options = EMPTY_OBJECT) {
 		// Pass this instance as its own zzz reference
 		super(Zzz_Json, {...options, zzz: undefined as any}); // Temporary type assertion, will be fixed after construction
 

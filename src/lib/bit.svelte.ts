@@ -1,5 +1,6 @@
 import {encode as tokenize} from 'gpt-tokenizer';
 import {z} from 'zod';
+import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Uuid} from '$lib/zod_helpers.js';
@@ -39,7 +40,7 @@ export class Bit extends Cell<typeof Bit_Json> {
 		this.init();
 	}
 
-	add_attribute(partial?: z.input<typeof Xml_Attribute>): void {
+	add_attribute(partial: z.input<typeof Xml_Attribute> = EMPTY_OBJECT): void {
 		this.attributes.push(Xml_Attribute.parse(partial));
 	}
 

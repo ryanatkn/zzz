@@ -20,16 +20,8 @@
 		children?: Snippet;
 	}
 
-	const {
-		provider,
-		icon,
-		icon_props = {},
-		show_name,
-		attrs,
-		fallback_attrs,
-		fallback,
-		children,
-	}: Props = $props();
+	const {provider, icon, icon_props, show_name, attrs, fallback_attrs, fallback, children}: Props =
+		$props();
 
 	if (icon && children) {
 		console.error('icon and children are mutually exclusive');
