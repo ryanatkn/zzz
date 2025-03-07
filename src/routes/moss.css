@@ -362,9 +362,6 @@ a.chip {
 	image-rendering: pixelated; /* in case crisp-edges isn't supported */
 	image-rendering: crisp-edges; /* the recommended pixel art setting according to MDN */
 }
-.pl_sm {
-	padding-left: var(--space_sm);
-}
 .pl_xl {
 	padding-left: var(--space_xl);
 }
@@ -382,9 +379,6 @@ a.chip {
 
 .pr_md {
 	padding-right: var(--space_md);
-}
-.pt_sm {
-	padding-top: var(--space_sm);
 }
 .pt_xs {
 	padding-top: var(--space_xs);

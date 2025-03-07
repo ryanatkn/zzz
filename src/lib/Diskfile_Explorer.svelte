@@ -32,43 +32,20 @@
 	};
 </script>
 
-<div class="file_explorer">
-	<div class="file_list">
-		{#if sorted_files.length === 0}
-			<div class="empty_state">No files available</div>
-		{:else}
-			<ul class="unstyled">
-				{#each sorted_files as file (file.id)}
-					<li transition:slide>
-						<Diskfile_List_Item
-							{file}
-							selected={diskfiles.selected_file_id === file.id}
-							onclick={select_file}
-						/>
-					</li>
-				{/each}
-			</ul>
-		{/if}
-	</div>
+<div class="overflow_auto h_100">
+	{#if sorted_files.length === 0}
+		<div class="box h_100">No files available</div>
+	{:else}
+		<ul class="unstyled">
+			{#each sorted_files as file (file.id)}
+				<li transition:slide>
+					<Diskfile_List_Item
+						{file}
+						selected={diskfiles.selected_file_id === file.id}
+						onclick={select_file}
+					/>
+				</li>
+			{/each}
+		</ul>
+	{/if}
 </div>
-
-<style>
-	.file_explorer {
-		display: grid;
-		grid-template-columns: 300px 1fr;
-		gap: var(--space_md);
-		height: 100%;
-	}
-
-	.file_list {
-		overflow: auto;
-		height: 100%;
-	}
-
-	.empty_state {
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		height: 100%;
-	}
-</style>

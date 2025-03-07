@@ -22,6 +22,14 @@ or find me on [Bluesky](https://bsky.app/profile/ryanatkn.com).
 
 1. control botz
 
+## Roadmap
+
+Zzz is currently not usable for real work, but there's a lot to play with.
+The main limitation right now is the lack of data persistence - there is none
+other than writing files to your local filesystem manually through its UI.
+I'm working on it full-time until it helps me get a job,
+so hopefully I make a lot of progress through this.
+
 ## Setup
 
 Zzz uses SvelteKit and Vite and currently requires Node.

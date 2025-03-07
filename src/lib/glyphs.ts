@@ -8,7 +8,7 @@ export const GLYPH_PASTE = '⎌'; // ⧈ ⎗ ⎘ ⎙
 
 export const GLYPH_CHAT = '⌸';
 export const GLYPH_TAPE = '☷';
-export const GLYPH_FILE = '⏚'; // ⏚ ⧈ ⊞ ⌺ ▤
+export const GLYPH_FILE = '⧈'; // ⏚ ⧈ ⊞ ⌺ ▤
 export const GLYPH_PROMPT = '⌇'; // ⌇ ⍋  ⌭
 export const GLYPH_BIT = '┊'; //  ┊ ┋ ╎ ╏
 export const GLYPH_PROVIDER = '⨕';

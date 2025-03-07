@@ -76,8 +76,8 @@
 	// TODO BLOCK maybe there should be 2 columns of tags, one to include and one to exclude?
 </script>
 
-<div class="chat_view">
-	<div class="width_sm column gap_md">
+<div class="flex_1 flex align_items_start">
+	<div class="width_sm column p_sm gap_md">
 		<div class="panel">
 			<!-- TODO add user-customizable sets of models -->
 			<div class="flex">
@@ -137,68 +137,70 @@
 			</Model_Selector>
 		</div>
 	</div>
-	<div class="panel p_sm flex_1">
-		<div class="flex gap_xs2 flex_1 mb_xs">
-			<textarea
-				class="plain flex_1 mb_0"
-				bind:value={main_input}
-				bind:this={main_input_el}
-				placeholder="send to all {count >= 2 ? count + ' ' : ''}tapes..."
-			></textarea>
-			<Pending_Button
-				{pending}
-				onclick={send_to_all}
-				disabled={!count ? true : undefined}
-				attrs={{class: 'plain'}}
-			>
-				send to all ({count})
-			</Pending_Button>
+	<div class="p_sm flex_1">
+		<div class="panel p_sm">
+			<div class="flex gap_xs2 flex_1 mb_xs">
+				<textarea
+					class="plain flex_1 mb_0"
+					bind:value={main_input}
+					bind:this={main_input_el}
+					placeholder="send to all {count >= 2 ? count + ' ' : ''}tapes..."
+				></textarea>
+				<Pending_Button
+					{pending}
+					onclick={send_to_all}
+					disabled={!count ? true : undefined}
+					attrs={{class: 'plain'}}
+				>
+					send to all ({count})
+				</Pending_Button>
+			</div>
+			<Bit_Stats length={main_input.length} token_count={main_input_tokens.length} />
+			<div class="flex mt_xs">
+				<Copy_To_Clipboard text={main_input} attrs={{class: 'plain'}} />
+				<Paste_From_Clipboard
+					onpaste={(text) => {
+						main_input += text;
+						main_input_el?.focus();
+					}}
+					attrs={{class: 'plain icon_button size_lg', title: 'paste'}}
+					>{GLYPH_PASTE}</Paste_From_Clipboard
+				>
+				<Clear_Restore_Button
+					value={main_input}
+					onchange={(value) => {
+						main_input = value;
+					}}
+				/>
+			</div>
+			<div class="mt_lg">
+				<Confirm_Button
+					onclick={() => chat.remove_all_tapes()}
+					attrs={{disabled: !count, class: 'plain'}}
+				>
+					{GLYPH_REMOVE} <span class="ml_xs">remove all tapes</span>
+				</Confirm_Button>
+			</div>
+			<!-- TODO duplicate tape button -->
+			<ul class="tapes unstyled mt_lg">
+				{#each chat.tapes as tape (tape.id)}
+					<li>
+						<Chat_Tape
+							{tape}
+							onremove={() => chat.remove_tape(tape.id)}
+							onsend={(input: string) => chat.send_to_tape(tape.id, input)}
+						/>
+					</li>
+				{/each}
+			</ul>
 		</div>
-		<Bit_Stats length={main_input.length} token_count={main_input_tokens.length} />
-		<div class="flex mt_xs">
-			<Copy_To_Clipboard text={main_input} attrs={{class: 'plain'}} />
-			<Paste_From_Clipboard
-				onpaste={(text) => {
-					main_input += text;
-					main_input_el?.focus();
-				}}
-				attrs={{class: 'plain icon_button size_lg', title: 'paste'}}
-				>{GLYPH_PASTE}</Paste_From_Clipboard
-			>
-			<Clear_Restore_Button
-				value={main_input}
-				onchange={(value) => {
-					main_input = value;
-				}}
-			/>
-		</div>
-		<div class="mt_lg">
-			<Confirm_Button
-				onclick={() => chat.remove_all_tapes()}
-				attrs={{disabled: !count, class: 'plain'}}
-			>
-				{GLYPH_REMOVE} <span class="ml_xs">remove all tapes</span>
-			</Confirm_Button>
-		</div>
-		<!-- TODO duplicate tape button -->
-		<ul class="tapes unstyled mt_lg">
-			{#each chat.tapes as tape (tape.id)}
-				<li>
-					<Chat_Tape
-						{tape}
-						onremove={() => chat.remove_tape(tape.id)}
-						onsend={(input: string) => chat.send_to_tape(tape.id, input)}
-					/>
-				</li>
-			{/each}
-		</ul>
 	</div>
 	<div class="width_sm column gap_md">
-		<div class="panel p_sm">
+		<div class="p_sm">
 			<header class="mt_0 mb_lg size_lg">{GLYPH_TAPE} tapes</header>
 			<Tape_List {chat} />
 		</div>
-		<div class="panel p_sm">
+		<div class="p_sm">
 			<header class="mt_0 mb_lg size_lg">{GLYPH_PROMPT} prompts</header>
 			<Prompt_List {chat} />
 		</div>
@@ -206,12 +208,6 @@
 </div>
 
 <style>
-	.chat_view {
-		display: flex;
-		align-items: start;
-		flex: 1;
-		gap: var(--space_md);
-	}
 	.tapes {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(var(--width_sm), 1fr));

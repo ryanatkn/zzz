@@ -35,10 +35,10 @@
 	</div>
 	<div class="h_100 fixed t_0 l_0" style:width="var(--sidebar_width)">
 		<!-- TODO refactor -->
-		<div class="h_100 w_100 pt_sm pl_sm" style:width="var(--sidebar_width)">
+		<div class="h_100 w_100 p_sm" style:width="var(--sidebar_width)">
 			<!-- TODO support `max_height_100` in Moss -->
-			<nav class="panel column size_lg p_sm overflow_auto" style:max-height="100%">
-				<div class="flex mb_sm">
+			<nav class="size_lg overflow_auto" style:max-height="100%">
+				<div class="flex p_sm mb_sm">
 					<Nav_Link
 						href="{base}/"
 						attrs={{

@@ -7,8 +7,7 @@
 	import {to_root_path} from '$lib/path.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
-	import Text_Icon from '$lib/Text_Icon.svelte';
-	import {GLYPH_FILE} from '$lib/glyphs.js';
+	import Diskfile_Info from '$lib/Diskfile_Info.svelte';
 	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
 
@@ -49,127 +48,114 @@
 	// TODO BLOCK remove the Array.froms below
 </script>
 
-<div class="mb_md">
-	<div class="size_lg">
-		<Text_Icon icon={GLYPH_FILE} />
-		{to_root_path(file.path)}
-	</div>
-	<div class="flex flex_column gap_xs mt_sm">
-		<small class="font_mono">{file.id}</small>
-		<small class="font_mono">{file.contents_token_count} tokens</small>
-		<small class="font_mono">{file.content_length} characters </small>
-		<small class="font_mono">{file.dependencies_count} dependencies </small>
-		<small class="font_mono">{file.dependents_count} dependents </small>
-		<small class="font_mono">created {file.created_formatted_date}</small>
-		<small class="font_mono">updated {file.updated_formatted_date}</small>
-	</div>
-</div>
-
-<div class="file_editor_actions flex gap_md mb_sm">
-	<Copy_To_Clipboard text={file.contents} attrs={{class: 'plain'}} />
-
-	<button
-		class="color_a"
-		type="button"
-		disabled={!has_changes}
-		onclick={() => {
-			contents_history.push({created: Date.now(), contents: updated_contents});
-			zzz.diskfiles.update(file.path, updated_contents); // Use path instead of file_id
-			discarded_contents = null;
-		}}>save changes</button
-	>
-
-	<Clear_Restore_Button
-		value={discarded_contents ? '' : updated_contents === file.contents ? '' : updated_contents}
-		onchange={handle_discard_changes}
-		attrs={{disabled: !has_changes && discarded_contents === null}}
-	>
-		discard changes
-		{#snippet restore()}
-			undo discard
-		{/snippet}
-	</Clear_Restore_Button>
-
-	<Confirm_Button onclick={() => zzz.diskfiles.delete(file.path)} attrs={{class: 'color_c'}}>
-		<!-- Use path instead of file_id -->
-		{#snippet children()}
-			delete file
-		{/snippet}
-	</Confirm_Button>
-</div>
-
-<div class="editor_container">
-	<div class="flex flex_column h_100 gap_md">
-		<div class="flex_1 min_height_0">
+<div class="flex h_100">
+	<div class="flex_1">
+		<div class="h_100">
 			<textarea
-				class="plain file_editor_textarea h_100 w_100 p_sm font_mono"
+				class="plain file_editor_textarea h_100 w_100 p_sm font_mono radius_0"
 				bind:value={updated_contents}
 				placeholder="File contents..."
 			></textarea>
 		</div>
 	</div>
+
+	<div class="width_sm">
+		<div class="mb_md p_sm">
+			<!-- TODO .panel here looks too heavy I think, though we probably want an abstraction for theming -->
+			<div class="p_xs">
+				<Diskfile_Info {file} />
+			</div>
+		</div>
+
+		<div class="row flex_wrap justify_content_space_between gap_xs mb_sm p_sm">
+			<Copy_To_Clipboard text={file.contents} attrs={{class: 'plain'}} />
+
+			<Clear_Restore_Button
+				value={discarded_contents ? '' : updated_contents === file.contents ? '' : updated_contents}
+				onchange={handle_discard_changes}
+				attrs={{disabled: !has_changes && discarded_contents === null}}
+			>
+				discard changes
+				{#snippet restore()}
+					undo discard
+				{/snippet}
+			</Clear_Restore_Button>
+
+			<button
+				class="color_a"
+				type="button"
+				disabled={!has_changes}
+				onclick={() => {
+					contents_history.push({created: Date.now(), contents: updated_contents});
+					zzz.diskfiles.update(file.path, updated_contents); // Use path instead of file_id
+					discarded_contents = null;
+				}}>save changes</button
+			>
+
+			<Confirm_Button onclick={() => zzz.diskfiles.delete(file.path)} attrs={{class: 'color_c'}}>
+				<!-- Use path instead of file_id -->
+				{#snippet children()}
+					delete file
+				{/snippet}
+			</Confirm_Button>
+		</div>
+
+		{#if contents_history.length > 1 || contents_history[0].contents !== updated_contents}
+			<div class="mt_md panel p_md" transition:slide>
+				<h3 class="mt_0 mb_md">Edit History</h3>
+				<menu class="unstyled flex flex_column_reverse">
+					{#each contents_history as entry (entry)}
+						<button
+							type="button"
+							class="justify_content_space_between"
+							class:selected={entry.contents === updated_contents}
+							onclick={() => {
+								updated_contents = entry.contents;
+								discarded_contents = null;
+							}}
+							transition:slide
+						>
+							<span>{format(new Date(entry.created), 'HH:mm:ss')}</span>
+							<span>{entry.contents.length} chars</span>
+						</button>
+					{/each}
+				</menu>
+			</div>
+		{/if}
+
+		{#if file.dependencies_count || file.dependents_count}
+			<div class="mt_md panel p_md">
+				{#if file.dependencies_count}
+					<div class="mb_md">
+						<h3 class="mt_0 mb_sm">
+							Dependencies ({file.dependencies_count})
+						</h3>
+						<div class="dep_list">
+							{#each file.dependency_ids as dependency_id (dependency_id)}
+								<div class="dep_item">{to_root_path(dependency_id)}</div>
+							{/each}
+						</div>
+					</div>
+				{/if}
+
+				{#if file.dependents_count}
+					<div>
+						<h3 class="mt_0 mb_sm">
+							Dependents ({file.dependents_count})
+						</h3>
+						<div class="dep_list">
+							{#each file.dependent_ids as dependent_id (dependent_id)}
+								<div class="dep_item">{to_root_path(dependent_id)}</div>
+							{/each}
+						</div>
+					</div>
+				{/if}
+			</div>
+		{/if}
+	</div>
 </div>
 
-{#if contents_history.length > 1 || contents_history[0].contents !== updated_contents}
-	<div class="mt_md panel p_md" transition:slide>
-		<h3 class="mt_0 mb_md">Edit History</h3>
-		<menu class="unstyled flex flex_column_reverse">
-			{#each contents_history as entry (entry)}
-				<button
-					type="button"
-					class="justify_content_space_between"
-					class:selected={entry.contents === updated_contents}
-					onclick={() => {
-						updated_contents = entry.contents;
-						discarded_contents = null;
-					}}
-					transition:slide
-				>
-					<span>{format(new Date(entry.created), 'HH:mm:ss')}</span>
-					<span>{entry.contents.length} chars</span>
-				</button>
-			{/each}
-		</menu>
-	</div>
-{/if}
-
-{#if file.dependencies_count || file.dependents_count}
-	<div class="mt_md panel p_md">
-		{#if file.dependencies_count}
-			<div class="mb_md">
-				<h3 class="mt_0 mb_sm">
-					Dependencies ({file.dependencies_count})
-				</h3>
-				<div class="dep_list">
-					{#each file.dependency_ids as dependency_id (dependency_id)}
-						<div class="dep_item">{to_root_path(dependency_id)}</div>
-					{/each}
-				</div>
-			</div>
-		{/if}
-
-		{#if file.dependents_count}
-			<div>
-				<h3 class="mt_0 mb_sm">
-					Dependents ({file.dependents_count})
-				</h3>
-				<div class="dep_list">
-					{#each file.dependent_ids as dependent_id (dependent_id)}
-						<div class="dep_item">{to_root_path(dependent_id)}</div>
-					{/each}
-				</div>
-			</div>
-		{/if}
-	</div>
-{/if}
-
 <style>
-	.editor_container {
-		width: 100%;
-		margin-bottom: var(--space_md);
-		flex: 1;
-	}
-
 	.file_editor_textarea {
 		resize: none;
 	}

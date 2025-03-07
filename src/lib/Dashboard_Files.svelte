@@ -20,7 +20,7 @@
 		/>
 	</div>
 
-	<div class="flex_1 column p_md overflow_y_auto h_100">
+	<div class="flex_1 column overflow_y_auto h_100">
 		{#if diskfiles.selected_file}
 			<Diskfile_Editor file={diskfiles.selected_file} />
 		{:else}

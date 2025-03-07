@@ -22,6 +22,8 @@ export const MESSAGE_TIME_FORMAT = 'p';
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface Message_Options extends Cell_Options<typeof Message_Json> {}
 
+// TODO BLOCK `Message` is not a good user-facing term - what else?
+
 // TODO think about splitting out a different non-reactive version
 // that only handles the static expectation,
 // but then another for dynamic usage? is there even such a thing of a message changing?
