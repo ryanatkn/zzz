@@ -54,13 +54,6 @@
 		pending = true;
 		await chat.send_to_all(parsed);
 		pending = false;
-
-		const r = await ollama.chat({
-			model: zzz_config.bots.namerbot,
-			messages: [{role: 'user', content: parsed}],
-			options: {temperature: 1}, // TODO BLOCK same options as server (proxy through our endpoint? we still want to be able to separate the Ollama and server endpoints though, not forced through our proxy)
-		});
-		console.log(`ollama browser response naming the thing`, r);
 	};
 
 	const count = $derived(chat.tapes.length);

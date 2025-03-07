@@ -34,9 +34,9 @@
 			input_el?.focus();
 			return;
 		}
+		input = '';
 		pending = true;
 		await onsend(parsed);
-		input = '';
 		pending = false;
 	};
 

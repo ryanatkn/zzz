@@ -13,6 +13,8 @@
 
 	// Count messages in the tape
 	const message_count = $derived(tape.chat_messages.length);
+
+	// TODO BLOCK list token count
 </script>
 
 <div class="tape_summary panel p_xs">
