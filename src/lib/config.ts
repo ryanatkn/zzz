@@ -270,7 +270,7 @@ export const SYSTEM_MESSAGE_DEFAULT =
 
 // TODO currently this is imported directly by client and server, but we probably only want to forward a serialized subset to the client
 const config: Zzz_Config_Creator = async () => {
-	const models_info = await ollama_list_with_metadata();
+	const models_info = await ollama_list_with_metadata(); // TODO BLOCK cant do this here, maybe gen? where's the final source of truth?
 
 	const models = models_info
 		? merge_ollama_models(models_default, models_info.model_infos)
