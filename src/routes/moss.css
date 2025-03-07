@@ -96,6 +96,9 @@ a.chip {
 .font_mono {
 	font-family: var(--font_mono);
 }
+.font_serif {
+	font-family: var(--font_serif);
+}
 .font_weight_400 {
 	font-weight: 400;
 	--font_weight: 400;
@@ -284,6 +287,9 @@ a.chip {
 }
 .mt_xl5 {
 	margin-top: var(--space_xl5);
+}
+.mt_xl7 {
+	margin-top: var(--space_xl7);
 }
 .mt_xs {
 	margin-top: var(--space_xs);
@@ -494,6 +500,9 @@ a.chip {
 }
 .text_align_right {
 	text-align: right;
+}
+.text_color_3 {
+	color: var(--text_color_3);
 }
 .w_100 {
 	width: 100%;
