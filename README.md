@@ -16,7 +16,7 @@ More at [zzzbot.dev/about](https://www.zzzbot.dev/about).
 
 This is a pre-alpha and the ideas are still developing -
 see the issues and [discussions](https://github.com/ryanatkn/zzz/discussions)
-or find me on [Bluesky](https://bsky.app/profile/ryanatkn.com).
+or @ me on [Bluesky](https://bsky.app/profile/ryanatkn.com).
 
 ## Motivation
 
