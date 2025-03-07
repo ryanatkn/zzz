@@ -28,10 +28,10 @@
 
 <div class="flex w_100 h_100">
 	<div class="width_sm min_width_sm h_100 overflow_auto scrollbar_width_thin">
-		<div class="panel p_sm width_sm">
+		<div class="p_sm">
 			<button
 				type="button"
-				class="plain w_100 justify_content_start my_sm"
+				class="plain w_100 justify_content_start"
 				onclick={() => {
 					const prompt = zzz.prompts.add();
 					prompt.add_bit();
@@ -40,7 +40,7 @@
 				+ new prompt
 			</button>
 			<ul
-				class="unstyled"
+				class="unstyled mt_sm"
 				use:reorderable.list={{
 					onreorder: (from_index, to_index) => zzz.prompts.reorder_prompts(from_index, to_index),
 				}}

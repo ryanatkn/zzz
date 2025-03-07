@@ -17,45 +17,43 @@
 	<!-- TODO show the selected chat's info, if any -->
 	<!-- TODO, show the counts of active items for each of the model selector buttons in a snippet here -->
 	<div class="width_sm min_width_sm h_100 overflow_auto scrollbar_width_thin">
-		<div class="fg_1">
-			<div class="p_sm">
-				<button
-					class="plain w_100 justify_content_start"
-					type="button"
-					onclick={() => zzz.chats.add()}
+		<div class="p_sm">
+			<button
+				class="plain w_100 justify_content_start"
+				type="button"
+				onclick={() => zzz.chats.add()}
+			>
+				+ new chat
+			</button>
+			{#if zzz.chats.items.length}
+				<menu
+					class="unstyled mt_sm"
+					use:reorderable.list={{
+						onreorder: (from_index, to_index) => zzz.chats.reorder_chats(from_index, to_index),
+					}}
 				>
-					+ new chat
-				</button>
-				{#if zzz.chats.items.length}
-					<menu
-						class="unstyled mt_sm"
-						use:reorderable.list={{
-							onreorder: (from_index, to_index) => zzz.chats.reorder_chats(from_index, to_index),
-						}}
-					>
-						{#each zzz.chats.items as chat, i (chat.id)}
-							<!-- TODO change to href from onclick -->
-							<li use:reorderable.item={{index: i}}>
-								<Nav_Link
-									href="#TODO"
-									selected={chat.id === zzz.chats.selected_id}
-									attrs={{
-										class: 'justify_content_space_between',
-										style: 'min-height: 0;',
-										onclick: () => zzz.chats.select(chat.id),
-									}}
-								>
-									<div>
-										<span class="mr_xs2">{GLYPH_CHAT}</span>
-										<span>{chat.name}</span>
-									</div>
-									{#if chat.tapes.length}<small>{chat.tapes.length}</small>{/if}
-								</Nav_Link>
-							</li>
-						{/each}
-					</menu>
-				{/if}
-			</div>
+					{#each zzz.chats.items as chat, i (chat.id)}
+						<!-- TODO change to href from onclick -->
+						<li use:reorderable.item={{index: i}}>
+							<Nav_Link
+								href="#TODO"
+								selected={chat.id === zzz.chats.selected_id}
+								attrs={{
+									class: 'justify_content_space_between',
+									style: 'min-height: 0;',
+									onclick: () => zzz.chats.select(chat.id),
+								}}
+							>
+								<div>
+									<span class="mr_xs2">{GLYPH_CHAT}</span>
+									<span>{chat.name}</span>
+								</div>
+								{#if chat.tapes.length}<small>{chat.tapes.length}</small>{/if}
+							</Nav_Link>
+						</li>
+					{/each}
+				</menu>
+			{/if}
 		</div>
 	</div>
 	<!-- TODO select view (tabs?) -->
