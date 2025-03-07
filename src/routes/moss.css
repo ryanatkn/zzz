@@ -430,6 +430,10 @@ a.chip {
 	align-items: center;
 }
 
+.scrollbar_width_thin {
+	scrollbar-width: thin;
+}
+
 .selectable {
 	--button_fill: color-mix(in hsl, var(--fill) 8%, transparent);
 	--button_fill_hover: color-mix(in hsl, var(--fill) 16%, transparent);

@@ -33,7 +33,10 @@
 	<div class="h_100 w_100 fixed t_0 l_0" style:padding-left="var(--sidebar_width)">
 		{@render children()}
 	</div>
-	<div class="h_100 fixed t_0 l_0 overflow_auto" style:width="var(--sidebar_width)">
+	<div
+		class="h_100 fixed t_0 l_0 overflow_auto scrollbar_width_thin"
+		style:width="var(--sidebar_width)"
+	>
 		<!-- TODO refactor -->
 		<div class="p_sm">
 			<!-- TODO support `max_height_100` in Moss -->

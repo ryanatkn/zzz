@@ -32,7 +32,7 @@
 	};
 </script>
 
-<div class="overflow_auto h_100">
+<div class="h_100 overflow_auto scrollbar_width_thin">
 	{#if sorted_files.length === 0}
 		<div class="box h_100">No files available</div>
 	{:else}

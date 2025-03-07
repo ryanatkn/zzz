@@ -117,7 +117,7 @@
 			<section>
 				<h3>Ollama model info</h3>
 				{#if model.ollama_model_info}
-					<pre class="overflow_hidden"><code class="overflow_auto p_md"
+					<pre class="overflow_hidden"><code class="overflow_auto scrollbar_width_thin p_md"
 							>{JSON.stringify(model.ollama_model_info, null, '\t')}</code
 						></pre>
 				{:else}
