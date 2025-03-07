@@ -3,7 +3,6 @@ import {encode} from 'gpt-tokenizer';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Diskfile_Json, type Diskfile_Path, type Source_File} from '$lib/diskfile_types.js';
-import type {Datetime, Datetime_Now, Uuid} from '$lib/zod_helpers.js';
 
 // Constants for formatting
 export const FILE_DATE_FORMAT = 'MMM d, yyyy h:mm:ss a';
@@ -12,13 +11,9 @@ export const FILE_TIME_FORMAT = 'HH:mm:ss';
 export interface Diskfile_Options extends Cell_Options<typeof Diskfile_Json> {}
 
 export class Diskfile extends Cell<typeof Diskfile_Json> {
-	// JSON-serialized properties
-	id: Uuid = $state()!;
 	path: Diskfile_Path = $state()!; // Renamed from file_id
 	contents: string | null = $state()!;
 	external: boolean = $state(false);
-	created: Datetime_Now = $state()!;
-	updated: Datetime = $state()!;
 	dependents: Array<[Diskfile_Path, Source_File]> = $state([]);
 	dependencies: Array<[Diskfile_Path, Source_File]> = $state([]);
 

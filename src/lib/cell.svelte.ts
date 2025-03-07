@@ -1,13 +1,13 @@
 import {z} from 'zod';
 
-import {get_field_schema, zod_get_schema_keys} from '$lib/zod_helpers.js';
+import {get_field_schema, zod_get_schema_keys, type Uuid, type Datetime} from '$lib/zod_helpers.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 import {
 	get_schema_class_info,
 	type Schema_Class_Info,
-	type Value_Parser,
+	type Cell_Value_Parser,
 } from '$lib/cell_helpers.js';
-import type {Schema_Keys} from '$lib/cell_types.js';
+import type {Schema_Keys, Cell_Json} from '$lib/cell_types.js';
 
 // Base options type that all cells will extend
 export interface Cell_Options<T_Schema extends z.ZodType> {
@@ -18,7 +18,12 @@ export interface Cell_Options<T_Schema extends z.ZodType> {
 // TODO BLOCK maybe `id` belongs on `Cell`, so we can do things with that - then the schema needs a constraint, maybe a base cell schema (and _options) gets extended
 
 // TODO maybe rename to `Json_Cell` to be more explicit? Or `Snapshottable`?
-export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> {
+export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Cell_Json {
+	// Base properties from Cell_Json
+	id: Uuid = $state()!;
+	created: Datetime = $state()!;
+	updated: Datetime | null = $state()!;
+
 	readonly schema: T_Schema; // TODO think about making this $state - dynamic schemas? idk, not yet
 
 	readonly schema_keys: Array<Schema_Keys<T_Schema>> = $derived.by(() =>
@@ -55,8 +60,11 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> {
 	/**
 	 * Type-safe parsers for custom field decoding.
 	 * Override in subclasses to handle special field types.
+	 *
+	 * This uses Cell_Value_Parser which includes typing for
+	 * the base cell properties (id, created, updated).
 	 */
-	protected parsers: Value_Parser<T_Schema> = {};
+	protected parsers: Cell_Value_Parser<T_Schema> = {};
 
 	constructor(schema: T_Schema, options: Cell_Options<T_Schema>) {
 		this.schema = schema;

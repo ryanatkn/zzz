@@ -1,6 +1,6 @@
 import {z} from 'zod';
 
-import {Datetime, Datetime_Now, Uuid} from '$lib/zod_helpers.js';
+import {Cell_Json} from '$lib/cell_types.js';
 
 // Define file change types
 export const Diskfile_Change_Type = z.enum(['add', 'change', 'delete']);
@@ -23,13 +23,11 @@ export const Source_File = z.object({
 });
 export type Source_File = z.infer<typeof Source_File>;
 
-export const Diskfile_Json = z.object({
-	id: Uuid,
+// Directly extend the base schema with Diskfile-specific properties
+export const Diskfile_Json = Cell_Json.extend({
 	path: Diskfile_Path.nullable().default(null), // Renamed from file_id to path
 	contents: z.string().nullable().default(null),
 	external: z.boolean().default(false),
-	created: Datetime_Now,
-	updated: Datetime.nullable().default(null),
 	dependents: z.array(z.tuple([Diskfile_Path, z.any()])).default(() => []),
 	dependencies: z.array(z.tuple([Diskfile_Path, z.any()])).default(() => []),
 });

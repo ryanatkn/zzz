@@ -3,16 +3,17 @@ import {z} from 'zod';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Datetime_Now, Uuid} from '$lib/zod_helpers.js';
 import {Completion_Request, Completion_Response} from '$lib/message_types.js';
+import {Cell_Json} from '$lib/cell_types.js';
 
 // Define the Chat_Message role type
 export const Chat_Message_Role = z.enum(['user', 'assistant', 'system']);
 export type Chat_Message_Role = z.infer<typeof Chat_Message_Role>;
 
 // Define the Chat_Message schema
-export const Chat_Message_Json = z.object({
+export const Chat_Message_Json = Cell_Json.extend({
 	id: Uuid,
 	created: Datetime_Now,
-	content: z.string(),
+	content: z.string(), // TODO BLOCK instead of this should it be just the tape, which has the list of bits? (normalized data, so we're not duplicating content in storage across cells) and content here is a runtime derived property?
 	tape_id: Uuid.nullable().optional(),
 	role: Chat_Message_Role,
 	request: Completion_Request.optional(),
@@ -24,8 +25,6 @@ export type Chat_Message_Json = z.infer<typeof Chat_Message_Json>;
 export interface Chat_Message_Options extends Cell_Options<typeof Chat_Message_Json> {}
 
 export class Chat_Message extends Cell<typeof Chat_Message_Json> {
-	id: Uuid = $state()!;
-	created: Datetime_Now = $state()!;
 	content: string = $state()!;
 	tape_id: Uuid | null | undefined = $state();
 	role: Chat_Message_Role = $state()!;

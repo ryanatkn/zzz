@@ -12,12 +12,13 @@ import {reorder_list} from '$lib/list_helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Datetime_Now} from '$lib/zod_helpers.js';
 import {type Chat_Message, create_chat_message} from '$lib/chat_message.svelte.js';
+import {Cell_Json} from '$lib/cell_types.js';
 
 const NEW_CHAT_PREFIX = 'new chat';
 
 const chat_names: Array<string> = [];
 
-export const Chat_Json = z.object({
+export const Chat_Json = Cell_Json.extend({
 	id: Uuid,
 	name: z.string().default(() => {
 		// TODO BLOCK how to do this correctly? can you make it stateful and still have a static module-scoped schema? I dont see a context object arg or anything
@@ -35,9 +36,7 @@ export type Chat_Json = z.infer<typeof Chat_Json>;
 export interface Chat_Options extends Cell_Options<typeof Chat_Json> {}
 
 export class Chat extends Cell<typeof Chat_Json> {
-	id: Uuid = $state()!;
 	name: string = $state()!;
-	created: Datetime_Now = $state()!;
 	tapes: Array<Tape> = $state([]);
 	selected_prompts: Array<Prompt> = $state([]);
 

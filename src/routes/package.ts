@@ -516,6 +516,7 @@ export const src_json = {
 				{name: 'cell_class', kind: 'function'},
 				{name: 'cell_array', kind: 'function'},
 				{name: 'Value_Parser', kind: 'type'},
+				{name: 'Cell_Value_Parser', kind: 'type'},
 				{name: 'get_schema_class_info', kind: 'function'},
 			],
 		},
@@ -528,6 +529,7 @@ export const src_json = {
 			declarations: [
 				{name: 'Schema_Keys', kind: 'type'},
 				{name: 'Schema_Value', kind: 'type'},
+				{name: 'Cell_Json', kind: 'variable'},
 			],
 		},
 		'./cell.svelte.js': {

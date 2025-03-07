@@ -3,6 +3,7 @@ import {z} from 'zod';
 import {Diskfile_Change_Type, Source_File, Diskfile_Path} from '$lib/diskfile_types.js';
 import {Datetime_Now, Uuid} from '$lib/zod_helpers.js';
 import type {Provider_Name} from '$lib/provider_types.js';
+import {Cell_Json} from '$lib/cell_types.js';
 
 export const Message_Direction = z.enum(['client', 'server', 'both']);
 export type Message_Direction = z.infer<typeof Message_Direction>;
@@ -227,29 +228,27 @@ export const Message = z.discriminatedUnion('type', [
 export type Message = z.infer<typeof Message>;
 
 // Message with metadata schema
-export const Message_Json = z
-	.object({
-		id: Uuid,
-		type: Message_Type,
-		direction: Message_Direction,
-		created: Datetime_Now,
-		// Optional fields with proper type checking
-		ping_id: Uuid.optional(),
-		completion_request: Completion_Request.optional(),
-		completion_response: Completion_Response.optional(),
-		path: Diskfile_Path.optional(),
-		contents: z.string().optional(),
-		change: z
-			.object({
-				type: Diskfile_Change_Type,
-				path: Diskfile_Path,
-			})
-			.strict()
-			.optional(),
-		source_file: Source_File.optional(),
-		data: z.record(z.string(), z.any()).optional(),
-	})
-	.strict();
+export const Message_Json = Cell_Json.extend({
+	id: Uuid,
+	type: Message_Type,
+	direction: Message_Direction,
+	created: Datetime_Now,
+	// Optional fields with proper type checking
+	ping_id: Uuid.optional(),
+	completion_request: Completion_Request.optional(),
+	completion_response: Completion_Response.optional(),
+	path: Diskfile_Path.optional(),
+	contents: z.string().optional(),
+	change: z
+		.object({
+			type: Diskfile_Change_Type,
+			path: Diskfile_Path,
+		})
+		.strict()
+		.optional(),
+	source_file: Source_File.optional(),
+	data: z.record(z.string(), z.any()).optional(),
+}).strict();
 export type Message_Json = z.infer<typeof Message_Json>;
 
 // Helper function to create a message with json representation

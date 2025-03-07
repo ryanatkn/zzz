@@ -1,3 +1,5 @@
+import type {z} from 'zod';
+
 import type {Zzz_Config_Creator} from '$lib/config_helpers.js';
 import type {Provider_Json} from '$lib/provider.svelte.js';
 import type {Model_Json} from '$lib/model.svelte.js';
@@ -13,7 +15,7 @@ import {merge_ollama_models, ollama_list_with_metadata} from '$lib/ollama.js';
 
 // TODO add WebLLM ? https://github.com/mlc-ai/web-llm - others?
 
-export const providers_default: Array<Provider_Json> = [
+export const providers_default: Array<z.input<typeof Provider_Json>> = [
 	{
 		name: 'ollama',
 		icon: '',
@@ -42,7 +44,7 @@ export const providers_default: Array<Provider_Json> = [
 
 // TODO BLOCK show these on /chats if present here but not in Ollama data -- just have the buttons be disabled
 // TODO BLOCK use these defaults to extend the ones added by ollama, `map_to_zzz_model`
-export const models_default: Array<Model_Json> = [
+export const models_default: Array<z.input<typeof Model_Json>> = [
 	// TODO import/map these directly when possible
 	{
 		name: 'llama3.2:3b',

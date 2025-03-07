@@ -5,8 +5,9 @@ import {Uuid, Datetime_Now} from '$lib/zod_helpers.js';
 import type {Chat_Message} from '$lib/chat_message.svelte.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {cell_array} from '$lib/cell_helpers.js';
+import {Cell_Json} from '$lib/cell_types.js';
 
-export const Tape_Json = z.object({
+export const Tape_Json = Cell_Json.extend({
 	id: Uuid,
 	created: Datetime_Now,
 	model_name: Model_Name.default(''), // TODO BLOCK `model_id`?
@@ -28,8 +29,6 @@ export interface Tape_Options extends Cell_Options<typeof Tape_Json> {}
  * record of interactions between the user and the AI.
  */
 export class Tape extends Cell<typeof Tape_Json> {
-	id: Uuid = $state()!;
-	created: Datetime_Now = $state()!;
 	model_name: string = $state()!;
 	model: Model = $derived.by(() => {
 		const model = this.zzz.models.find_by_name(this.model_name);

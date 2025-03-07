@@ -8,6 +8,7 @@ import {Bit, Bit_Json} from '$lib/bit.svelte.js';
 import {reorder_list} from '$lib/list_helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Datetime_Now} from '$lib/zod_helpers.js';
+import {Cell_Json} from '$lib/cell_types.js';
 
 export const PROMPT_CONTENT_TRUNCATED_LENGTH = 100;
 
@@ -20,7 +21,7 @@ export type Prompt_Message_Content = string; // TODO ?
 
 const prompt_names: Array<string> = [];
 
-export const Prompt_Json = z.object({
+export const Prompt_Json = Cell_Json.extend({
 	id: Uuid,
 	name: z.string().default(() => {
 		// TODO BLOCK how to do this correctly? can you make it stateful and still have a static module-scoped schema? I dont see a context object arg or anything
@@ -38,9 +39,7 @@ export interface Prompt_Options extends Cell_Options<typeof Prompt_Json> {
 }
 
 export class Prompt extends Cell<typeof Prompt_Json> {
-	id: Uuid = $state()!;
 	name: string = $state()!;
-	created: Datetime_Now = $state()!;
 	bits: Array<Bit> = $state()!;
 
 	content: string = $derived(join_prompt_bits(this.bits));

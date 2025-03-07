@@ -3,9 +3,10 @@ import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 
 import type {Model} from '$lib/model.svelte.js';
 import {Provider_Name} from '$lib/provider_types.js';
+import {Cell_Json} from '$lib/cell_types.js';
 
 // TODO optional/defaults?
-export const Provider_Json = z.object({
+export const Provider_Json = Cell_Json.extend({
 	name: Provider_Name,
 	icon: z.string(),
 	title: z.string(),

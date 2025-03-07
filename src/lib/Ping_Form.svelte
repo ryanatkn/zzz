@@ -3,7 +3,7 @@
 	import {slide} from 'svelte/transition';
 
 	import {zzz_context} from '$lib/zzz.svelte.js';
-	import {GLYPH_DIRECTION_CLIENT, GLYPH_DIRECTION_SERVER} from './glyphs.js';
+	import {GLYPH_DIRECTION_CLIENT, GLYPH_DIRECTION_SERVER} from '$lib/glyphs.js';
 
 	const zzz = zzz_context.get();
 

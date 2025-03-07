@@ -3,11 +3,12 @@ import {z} from 'zod';
 import {Provider_Name} from '$lib/provider_types.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import type {Ollama_Model_Info} from '$lib/ollama.js';
+import {Cell_Json} from '$lib/cell_types.js';
 
 export const Model_Name = z.string();
 export type Model_Name = z.infer<typeof Model_Name>;
 
-export const Model_Json = z.object({
+export const Model_Json = Cell_Json.extend({
 	name: Model_Name,
 	provider_name: Provider_Name,
 	tags: z.array(z.string()).default(() => []),

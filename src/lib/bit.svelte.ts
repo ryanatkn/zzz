@@ -4,8 +4,9 @@ import {z} from 'zod';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Uuid} from '$lib/zod_helpers.js';
 import {Xml_Attribute} from '$lib/xml.js';
+import {Cell_Json} from '$lib/cell_types.js';
 
-export const Bit_Json = z.object({
+export const Bit_Json = Cell_Json.extend({
 	id: Uuid,
 	name: z.string().default(''), // TODO maybe use zzz or something else in context to get a non-colliding default?
 	has_xml_tag: z.boolean().default(false),
@@ -20,7 +21,6 @@ export interface Bit_Options extends Cell_Options<typeof Bit_Json> {} // eslint-
 
 export class Bit extends Cell<typeof Bit_Json> {
 	// Defaults for json properties are set in the schema and assigned via `to_json()`
-	id: Uuid = $state()!;
 	name: string = $state()!;
 	has_xml_tag: boolean = $state()!;
 	xml_tag_name: string = $state()!;

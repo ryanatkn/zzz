@@ -1,5 +1,7 @@
 import {z} from 'zod';
 
+import type {Cell_Json} from '$lib/cell_types.js';
+
 // Metadata properties for Zod schemas.
 // These constants are used to attach class information to schemas.
 // It's a bit hacky but feels better than abusing `.description` with JSON.
@@ -25,6 +27,8 @@ export interface Schema_Class_Info {
 /**
  * Attaches class name metadata to a Zod schema for cell instantiation.
  * This allows the cell system to know which class to instantiate for a given schema.
+ *
+ * Works with both regular schemas and extended cell schemas.
  *
  * @param schema The Zod schema to annotate
  * @param class_name The name of the class to instantiate for this schema
@@ -70,6 +74,16 @@ export type Value_Parser<
 > = {
 	[K in TKey]?: (value: unknown) => z.infer<TSchema>[K] | undefined;
 };
+
+/**
+ * Type helper for parsers that includes base schema properties.
+ * Use this instead of Value_Parser when creating parsers for cells
+ * to properly type the base properties.
+ */
+export type Cell_Value_Parser<
+	TSchema extends z.ZodType,
+	TKey extends keyof z.infer<TSchema> & string = keyof z.infer<TSchema> & string,
+> = Value_Parser<TSchema, TKey> & Value_Parser<z.ZodType<Cell_Json>, keyof Cell_Json & string>;
 
 /**
  * Get schema class information from a Zod schema.

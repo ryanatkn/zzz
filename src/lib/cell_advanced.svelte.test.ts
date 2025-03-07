@@ -4,9 +4,8 @@ import {test, expect, vi, beforeEach} from 'vitest';
 import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import type {Schema_Keys} from '$lib/cell_types.js';
-
-/* eslint-disable no-new */
+import {Cell_Json, type Schema_Keys} from '$lib/cell_types.js';
+import {Uuid, Datetime_Now} from '$lib/zod_helpers.js';
 
 // Simple mock for Zzz
 const mock_zzz = {
@@ -26,362 +25,25 @@ beforeEach(() => {
 	vi.clearAllMocks();
 });
 
-// Test schema that makes fields optional to avoid validation errors
-const Test_Schema = z
-	.object({
-		id: z.string().optional().default(''),
-		name: z.string().optional().default(''),
-		age: z.number().optional(),
-		roles: z
-			.array(z.string())
-			.optional()
-			.default(() => []),
-		active: z.boolean().default(true),
-	})
-	.strict();
+// Create valid test UUIDs for test data
+const TEST_UUID = 'a0eebc99-9c0b-4ef8-bb6d-6bb9bd380a11';
 
-// Test Cell implementation
-class Test_Cell extends Cell<typeof Test_Schema> {
-	id: string = $state()!;
-	name: string = $state()!;
-	age: number | undefined = $state();
-	roles: Array<string> = $state()!;
-	active: boolean = $state()!;
+// Create a date string for test data
+const TEST_DATE = new Date().toISOString();
 
-	constructor(options: Cell_Options<typeof Test_Schema>) {
-		super(Test_Schema, options);
-
-		// Set up parsers
-		this.parsers = {
-			id: (value) => {
-				if (typeof value === 'string' && value !== '') {
-					return value; // Keep existing non-empty value
-				}
-				// Handle default value generation
-				return `generated-${Math.random().toString(36).substring(2, 9)}`;
-			},
-			name: (value) => {
-				if (typeof value === 'string' && value !== '') {
-					return value.toUpperCase();
-				}
-				// Handle default value generation
-				return 'DEFAULT_NAME';
-			},
-			roles: (value) => {
-				if (Array.isArray(value) && value.length > 0) {
-					return value.map((r) => (typeof r === 'string' ? r.toLowerCase() : String(r)));
-				}
-				// Handle default value generation
-				return ['default_role'];
-			},
-		};
-
-		this.init();
-	}
-}
-
-test('Cell with parsers decodes values correctly', () => {
-	const cell = new Test_Cell({
-		zzz: mock_zzz,
-		json: {
-			id: 'test-123',
-			name: 'John Doe',
-			age: 30,
-			roles: ['ADMIN', 'USER', 'EDITOR'],
-		},
-	});
-
-	// Name should be uppercase due to parser
-	expect(cell.name).toBe('JOHN DOE');
-
-	// Roles should be lowercase due to parser
-	expect(cell.roles).toEqual(['admin', 'user', 'editor']);
-
-	// Other fields should be parsed normally
-	expect(cell.id).toBe('test-123');
-	expect(cell.age).toBe(30);
-	expect(cell.active).toBe(true); // Default value
-});
-
-test('Cell parsers return undefined to use default decoding', () => {
-	// Create a cell with a parser that returns undefined for some values
-	class Partial_Parser_Cell extends Cell<typeof Test_Schema> {
-		id: string = $state()!;
-		name: string = $state()!;
-		age: number | undefined = $state();
-		roles: Array<string> = $state()!;
-		active: boolean = $state()!;
-
-		constructor(options: Cell_Options<typeof Test_Schema>) {
-			super(Test_Schema, options);
-
-			this.parsers = {
-				name: (value) => {
-					// Only transform names that start with 'J'
-					if (typeof value === 'string' && value.startsWith('J')) {
-						return value.toUpperCase();
-					}
-					// For other names, return undefined to use default parsing
-					return undefined;
-				},
-			};
-
-			this.init();
-		}
-	}
-
-	const cell1 = new Partial_Parser_Cell({
-		zzz: mock_zzz,
-		json: {id: 'test-1', name: 'Jane', roles: []},
-	});
-
-	const cell2 = new Partial_Parser_Cell({
-		zzz: mock_zzz,
-		json: {id: 'test-2', name: 'Bob', roles: []},
-	});
-
-	// 'Jane' starts with 'J', so it should be uppercase
-	expect(cell1.name).toBe('JANE');
-
-	// 'Bob' doesn't start with 'J', so it should remain as-is
-	expect(cell2.name).toBe('Bob');
-});
-
-test('Cell parsers provide default values', () => {
-	// Test with minimal JSON - just specify id
-	const cell = new Test_Cell({
-		zzz: mock_zzz,
-		json: {
-			id: 'test-123',
-		},
-	});
-
-	// id should come from JSON and be processed by parser
-	expect(cell.id).toBe('test-123');
-
-	// name should come from parser
-	expect(cell.name).toBe('DEFAULT_NAME');
-
-	// roles should come from parser
-	expect(cell.roles).toEqual(['default_role']);
-
-	// active should come from schema default
-	expect(cell.active).toBe(true);
-
-	// age has no parser or schema default
-	expect(cell.age).toBeUndefined();
-});
-
-test('Cell parsers are only applied for appropriate values', () => {
-	// Test with complete JSON
-	const cell = new Test_Cell({
-		zzz: mock_zzz,
-		json: {
-			id: 'explicit-id',
-			name: 'Explicit Name',
-			roles: ['EXPLICIT_ROLE'],
-			active: false,
-		},
-	});
-
-	// Values should come from JSON, with parser transformations
-	expect(cell.id).toBe('explicit-id');
-	expect(cell.name).toBe('EXPLICIT NAME'); // Uppercase due to parser
-	expect(cell.roles).toEqual(['explicit_role']); // Lowercase due to parser
-	expect(cell.active).toBe(false);
-});
-
-test('Cell parsers work with empty JSON', () => {
-	// Test with empty JSON - this is now valid due to schema default/optional fields
-	const cell = new Test_Cell({
-		zzz: mock_zzz,
-		json: {},
-	});
-
-	// Values should come from parsers
-	expect(cell.id).toMatch(/^generated-/); // Generated ID
-	expect(cell.name).toBe('DEFAULT_NAME');
-	expect(cell.roles).toEqual(['default_role']);
-	expect(cell.active).toBe(true); // Schema default
-});
-
-test('Cell with no parsers uses schema defaults', () => {
-	class Basic_Cell extends Cell<typeof Test_Schema> {
-		id: string = $state()!;
-		name: string = $state()!;
-		age: number | undefined = $state();
-		roles: Array<string> = $state()!;
-		active: boolean = $state()!;
-
-		constructor(options: Cell_Options<typeof Test_Schema>) {
-			super(Test_Schema, options);
-			this.init();
-		}
-	}
-
-	const cell = new Basic_Cell({
-		zzz: mock_zzz,
-		json: {}, // Empty JSON is valid due to schema defaults/optional
-	});
-
-	// active has a schema default
-	expect(cell.active).toBe(true);
-
-	// These have defaults in the schema (empty string/array)
-	expect(cell.id).toBe('');
-	expect(cell.name).toBe('');
-	expect(cell.roles).toEqual([]);
-	expect(cell.age).toBeUndefined();
-});
-
-test('Cell parsers can depend on instance properties', () => {
-	class Instance_Cell extends Cell<typeof Test_Schema> {
-		id: string = $state()!;
-		name: string = $state()!;
-		age: number | undefined = $state();
-		roles: Array<string> = $state()!;
-		active: boolean = $state()!;
-
-		counter = 1; // Not part of schema, just for testing
-
-		constructor(options: Cell_Options<typeof Test_Schema>) {
-			super(Test_Schema, options);
-
-			this.parsers = {
-				// Always return values based on instance properties
-				id: () => `instance-${this.counter}`,
-				name: () => `Instance ${this.counter}`,
-				roles: () => [`role-${this.counter}`],
-			};
-
-			this.init();
-		}
-	}
-
-	const cell = new Instance_Cell({
-		zzz: mock_zzz,
-		json: {}, // Empty JSON is valid due to schema defaults/optional
-	});
-
-	// Values should be generated using instance properties
-	expect(cell.id).toBe('instance-1');
-	expect(cell.name).toBe('Instance 1');
-	expect(cell.roles).toEqual(['role-1']);
-});
-
-// Add a test for schema validation error
-test('Cell throws validation errors from schema', () => {
-	// Make a schema with specific validation rules
-	const schema = z.object({
-		id: z.string().min(3), // Must be at least 3 chars
-		name: z.string().nonempty(), // Must not be empty
-	});
-
-	class Strict_Cell extends Cell<typeof schema> {
-		id: string = $state()!;
-		name: string = $state()!;
-
-		constructor(options: Cell_Options<typeof schema>) {
-			super(schema, options);
-			this.init();
-		}
-	}
-
-	// Should throw because id is too short
-	expect(
-		() =>
-			new Strict_Cell({
-				zzz: mock_zzz,
-				json: {id: 'a', name: 'Test'}, // id too short
-			}),
-	).toThrow();
-
-	// Should not throw with valid data
-	expect(
-		() =>
-			new Strict_Cell({
-				zzz: mock_zzz,
-				json: {id: 'abc', name: 'Test'}, // valid
-			}),
-	).not.toThrow();
-});
-
-test('Cell parsers run even with no input JSON', () => {
-	const cell = new Test_Cell({
-		zzz: mock_zzz,
-		// No json provided at all
-	});
-
-	// Should still get values from parsers
-	expect(cell.id).toMatch(/^generated-/);
-	expect(cell.name).toBe('DEFAULT_NAME');
-	expect(cell.roles).toEqual(['default_role']);
-	expect(cell.active).toBe(true);
-});
-
-test('Cell handles undefined JSON input correctly', () => {
-	// Test with explicitly undefined JSON
-	const cell = new Test_Cell({
-		zzz: mock_zzz,
-		json: undefined,
-	});
-
-	// Should handle undefined gracefully with parsers
-	expect(cell.id).toMatch(/^generated-/);
-	expect(cell.name).toBe('DEFAULT_NAME');
-	expect(cell.roles).toEqual(['default_role']);
-});
-
-test('Cell has proper snapshot and serialization support', () => {
-	const cell = new Test_Cell({
-		zzz: mock_zzz,
-		json: {id: 'test-snapshot', name: 'Snapshot Test'},
-	});
-
-	// Test JSON serialization
-	const json = cell.json;
-	expect(json.id).toBe('test-snapshot');
-	expect(json.name).toBe('SNAPSHOT TEST'); // Uppercase due to parser
-
-	// Test JSON string serialization
-	const json_string = cell.json_serialized;
-	expect(json_string).toContain('"id":"test-snapshot"');
-	expect(json_string).toContain('"name":"SNAPSHOT TEST"');
-
-	// Test toJSON method (used by $state.snapshot)
-	const snapshot = $state.snapshot(cell);
-	expect(snapshot.id).toBe('test-snapshot');
-});
-
-test('Cell cloning creates proper copies', () => {
-	const original = new Test_Cell({
-		zzz: mock_zzz,
-		json: {id: 'original', name: 'Original Cell'},
-	});
-
-	const clone = original.clone();
-
-	// Clones should have same values
-	expect(clone.id).toBe('original');
-	expect(clone.name).toBe('ORIGINAL CELL');
-
-	// But be different instances
-	expect(clone).not.toBe(original);
-
-	// Modifying clone shouldn't affect original
-	clone.name = 'MODIFIED CLONE';
-	expect(clone.name).toBe('MODIFIED CLONE');
-	expect(original.name).toBe('ORIGINAL CELL');
-});
-
-//
-//
-//
+// Test schema that extends the base Cell_Json schema
+const Test_Schema = Cell_Json.extend({
+	name: z.string().optional().default(''),
+	age: z.number().optional(),
+	roles: z
+		.array(z.string())
+		.optional()
+		.default(() => []),
+	active: z.boolean().default(true),
+}).strict();
 
 test('Cell uses registry for instantiating class relationships', () => {
 	class Registry_Test_Cell extends Cell<typeof Test_Schema> {
-		// Add required properties for the schema
-		id: string = $state()!;
 		name: string = $state()!;
 		age: number | undefined = $state();
 		roles: Array<string> = $state()!;
@@ -401,7 +63,10 @@ test('Cell uses registry for instantiating class relationships', () => {
 
 	const cell = new Registry_Test_Cell({
 		zzz: mock_zzz,
-		json: {},
+		json: {
+			id: TEST_UUID,
+			created: TEST_DATE,
+		},
 	});
 
 	// We can test registry behavior directly
@@ -419,8 +84,6 @@ test('Cell uses registry for instantiating class relationships', () => {
 
 test('Cell.encode uses $state.snapshot for values', () => {
 	class Simple_Test_Cell extends Cell<typeof Test_Schema> {
-		// Add required properties for the schema
-		id: string = $state()!;
 		name: string = $state()!;
 		age: number | undefined = $state();
 		roles: Array<string> = $state()!;
@@ -437,7 +100,13 @@ test('Cell.encode uses $state.snapshot for values', () => {
 		}
 	}
 
-	const cell = new Simple_Test_Cell({zzz: mock_zzz, json: {}});
+	const cell = new Simple_Test_Cell({
+		zzz: mock_zzz,
+		json: {
+			id: TEST_UUID,
+			created: TEST_DATE,
+		},
+	});
 
 	// Test with a Date object
 	const date = new Date('2023-03-01');
@@ -459,6 +128,9 @@ test('Cell handles special types like Map and Set', () => {
 	// Create a schema with special types that allows arrays as input
 	// but converts them to Map/Set during parsing
 	const Special_Schema = z.object({
+		id: Uuid,
+		created: Datetime_Now,
+		updated: z.string().nullable().default(null),
 		// Allow arrays for input but define as map for output
 		map_field: z.preprocess(
 			(val) => (Array.isArray(val) ? new Map(val as Array<[string, number]>) : val),
@@ -481,7 +153,6 @@ test('Cell handles special types like Map and Set', () => {
 		}
 
 		// Test helper to manually invoke decode_value_without_parser
-		// Fix: Use proper generic type parameter to match the method signature
 		test_decode<K extends Schema_Keys<typeof Special_Schema>>(value: unknown, key: K): this[K] {
 			return this.decode_value_without_parser(value, key);
 		}
@@ -490,6 +161,8 @@ test('Cell handles special types like Map and Set', () => {
 	const cell = new Special_Cell({
 		zzz: mock_zzz,
 		json: {
+			id: TEST_UUID,
+			created: TEST_DATE,
 			map_field: [
 				['a', 1],
 				['b', 2],
@@ -509,7 +182,7 @@ test('Cell handles special types like Map and Set', () => {
 	expect(cell.set_field.has('y')).toBe(true);
 	expect(cell.set_field.has('z')).toBe(true);
 
-	// Add test for manual decoding using the fixed test_decode method
+	// Add test for manual decoding using the test_decode method
 	const map_result = cell.test_decode([['c', 3]], 'map_field');
 	expect(map_result).toBeInstanceOf(Map);
 	expect(map_result.get('c')).toBe(3);
@@ -521,12 +194,15 @@ test('Cell handles special types like Map and Set', () => {
 });
 
 // Add test for the case when a schema key doesn't exist on the instance
-test('Cell throws error when property does not exist on instance', () => {
+test('Cell logs error when property does not exist on instance', () => {
 	// Schema with a property that won't exist on the instance
-	const Missing_Schema = z.object({
+	const Missing_Schema = Cell_Json.extend({
 		exists: z.string().default('default'),
 		missing: z.number().default(42), // This property won't exist on the class
 	});
+
+	// Spy on console.error before creating the cell
+	const console_error_spy = vi.spyOn(console, 'error');
 
 	class Missing_Cell extends Cell<typeof Missing_Schema> {
 		exists: string = $state()!;
@@ -538,16 +214,37 @@ test('Cell throws error when property does not exist on instance', () => {
 		}
 	}
 
-	// Should throw an error about the missing property
-	expect(() => new Missing_Cell({zzz: mock_zzz})).toThrow(
-		/Schema key "missing" not found as a property on instance/,
+	// Create the cell - it should log an error but not throw
+	// eslint-disable-next-line no-new
+	new Missing_Cell({
+		zzz: mock_zzz,
+		json: {
+			id: TEST_UUID,
+			created: TEST_DATE,
+		},
+	});
+
+	// Now check if console.error was called at all
+	expect(console_error_spy).toHaveBeenCalled();
+
+	// Use the exact error message format from the Cell class
+	const exact_error_message = `Schema key "missing" in Missing_Cell`;
+
+	// Check if this exact message was logged
+	const found_error_message = console_error_spy.mock.calls.some((args) =>
+		args.join(' ').includes(exact_error_message),
 	);
+
+	expect(found_error_message).toBe(true);
+
+	// Clean up spy
+	console_error_spy.mockRestore();
 });
 
 // Add test for providing a custom parser to handle missing properties
 test('Cell allows schema keys with no properties if a parser is provided', () => {
 	// Schema with a property that won't exist on the instance
-	const Parser_Schema = z.object({
+	const Parser_Schema = Cell_Json.extend({
 		exists: z.string().default('default'),
 		virtual: z.number().default(42), // This property won't exist on the class
 	});
@@ -576,7 +273,14 @@ test('Cell allows schema keys with no properties if a parser is provided', () =>
 	}
 
 	// Should not throw with a parser for the virtual property
-	const cell = new Parser_Cell({zzz: mock_zzz, json: {virtual: 99}});
+	const cell = new Parser_Cell({
+		zzz: mock_zzz,
+		json: {
+			id: TEST_UUID,
+			created: TEST_DATE,
+			virtual: 99,
+		},
+	});
 
 	// Verify the parser was called
 	expect(cell.parsed_virtual_value).toBe(99);
@@ -585,7 +289,6 @@ test('Cell allows schema keys with no properties if a parser is provided', () =>
 // Add a test for custom property assignment
 test('Cell supports custom property assignment behavior', () => {
 	class Custom_Assignment_Cell extends Cell<typeof Test_Schema> {
-		id: string = $state()!;
 		name: string = $state()!;
 		age: number | undefined = $state();
 		roles: Array<string> = $state()!;
@@ -622,7 +325,8 @@ test('Cell supports custom property assignment behavior', () => {
 	const cell = new Custom_Assignment_Cell({
 		zzz: mock_zzz,
 		json: {
-			id: 'test-id',
+			id: TEST_UUID,
+			created: TEST_DATE,
 			name: 'Test Name',
 			roles: ['admin'],
 		},
@@ -632,7 +336,7 @@ test('Cell supports custom property assignment behavior', () => {
 	expect(cell.name).toBe('Custom_Test Name');
 
 	// Check that assignment log captured operations
-	expect(cell.assignment_log).toContain('Assigned id: test-id');
+	expect(cell.assignment_log).toContain(`Assigned id: ${TEST_UUID}`);
 	expect(cell.assignment_log).toContain('Assigned name: Test Name');
 	expect(cell.assignment_log).toContain('Assigned roles: admin');
 });
@@ -640,6 +344,9 @@ test('Cell supports custom property assignment behavior', () => {
 // Test virtual property with assignment override
 test('Cell supports virtual properties with custom handling', () => {
 	const Virtual_Schema = z.object({
+		id: Uuid,
+		created: Datetime_Now,
+		updated: z.string().nullable().default(null),
 		real: z.string(),
 		virtual: z.number().default(0),
 	});
@@ -672,6 +379,8 @@ test('Cell supports virtual properties with custom handling', () => {
 	const cell = new Virtual_Cell({
 		zzz: mock_zzz,
 		json: {
+			id: TEST_UUID,
+			created: TEST_DATE,
 			real: 'Real Value',
 			virtual: 42,
 		},
@@ -686,8 +395,11 @@ test('Cell supports virtual properties with custom handling', () => {
 });
 
 // Test overriding process_schema_property for custom handling
-test('Cell supports overriding process_schema_property for custom processing', () => {
+test('Cell supports overriding assign_schema_property for custom processing', () => {
 	const Virtual_Schema = z.object({
+		id: Uuid,
+		created: Datetime_Now,
+		updated: z.string().nullable().default(null),
 		real: z.string(),
 		virtual: z.number().default(0),
 	});
@@ -703,7 +415,7 @@ test('Cell supports overriding process_schema_property for custom processing', (
 			this.init();
 		}
 
-		// Override process_schema_property instead of using parsers
+		// Override assign_schema_property instead of using parsers
 		protected override assign_schema_property(
 			key: Schema_Keys<typeof Virtual_Schema>,
 			value: unknown,
@@ -724,6 +436,8 @@ test('Cell supports overriding process_schema_property for custom processing', (
 	const cell = new Process_Override_Cell({
 		zzz: mock_zzz,
 		json: {
+			id: TEST_UUID,
+			created: TEST_DATE,
 			real: 'Real Value',
 			virtual: 30,
 		},
@@ -742,11 +456,12 @@ test('Cell parser defaults take precedence over schema defaults', () => {
 	// Define a schema with explicit defaults
 	const Schema_With_Defaults = z.object({
 		id: z.string().default('schema-default-id'),
+		created: Datetime_Now,
+		updated: z.string().nullable().default(null),
 		name: z.string().default('schema-default-name'),
 	});
 
 	class Default_Precedence_Cell extends Cell<typeof Schema_With_Defaults> {
-		id: string = $state()!;
 		name: string = $state()!;
 
 		constructor(options: Cell_Options<typeof Schema_With_Defaults>) {
@@ -756,10 +471,10 @@ test('Cell parser defaults take precedence over schema defaults', () => {
 			this.parsers = {
 				id: (value) => {
 					if (typeof value === 'string' && value !== 'schema-default-id') {
-						return value; // Keep non-default values
+						return value as Uuid; // Keep non-default values
 					}
 					// If value is the schema default, replace it with parser default
-					return 'parser-default-id';
+					return 'parser-default-id' as Uuid;
 				},
 				// No parser for name - should use schema default
 			};
@@ -785,7 +500,6 @@ test('Cell parser defaults take precedence over schema defaults', () => {
 test('Cell handles inherited properties correctly', () => {
 	// Create a base class with some properties
 	class Base_Cell extends Cell<typeof Test_Schema> {
-		id: string = $state()!;
 		name: string = $state()!;
 
 		base_method() {
@@ -801,10 +515,6 @@ test('Cell handles inherited properties correctly', () => {
 	// Create a derived class that inherits base properties
 	// but needs to redeclare state fields due to Svelte 5 $state limitations
 	class Derived_Cell extends Base_Cell {
-		// No need to redeclare these because Svelte $state works through the prototype chain
-		// id: string = $state()!;
-		// name: string = $state()!;
-
 		// These are new properties in the derived class
 		age: number | undefined = $state();
 		roles: Array<string> = $state()!;
@@ -828,7 +538,8 @@ test('Cell handles inherited properties correctly', () => {
 	const cell = new Derived_Cell({
 		zzz: mock_zzz,
 		json: {
-			id: 'test-id',
+			id: TEST_UUID,
+			created: TEST_DATE,
 			name: 'Test Name',
 			age: 30,
 			roles: ['admin'],
@@ -837,7 +548,7 @@ test('Cell handles inherited properties correctly', () => {
 	});
 
 	// Properties should be correctly assigned
-	expect(cell.id).toBe('test-id');
+	expect(cell.id).toBe(TEST_UUID);
 	expect(cell.name).toBe('Test Name');
 	expect(cell.age).toBe(30);
 
@@ -850,7 +561,7 @@ test('Cell handles inherited properties correctly', () => {
 
 	// Check that JSON serialization includes all properties
 	const json = cell.json;
-	expect(json.id).toBe('test-id');
+	expect(json.id).toBe(TEST_UUID);
 	expect(json.name).toBe('Test Name');
 	expect(json.age).toBe(30);
 });

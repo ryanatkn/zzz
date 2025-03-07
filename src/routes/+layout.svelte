@@ -23,6 +23,8 @@
 	import type {Diskfile_Path} from '$lib/diskfile_types.js';
 	import {Prompt_Json} from '$lib/prompt.svelte.js';
 	import {Zzz, cell_classes} from '$lib/zzz.svelte.js';
+	import {Provider_Json} from '$lib/provider.svelte.js';
+	import {Model_Json} from '$lib/model.svelte.js';
 
 	interface Props {
 		children: Snippet;
@@ -51,8 +53,8 @@
 	}
 
 	// Add providers and models from config
-	zzz.add_providers(zzz_config.providers);
-	zzz.add_models(zzz_config.models);
+	zzz.add_providers(zzz_config.providers.map((p) => Provider_Json.parse(p))); // TODO BLOCK @many probably want a config helper to bake the raw config, parsing should be an upstream concern
+	zzz.add_models(zzz_config.models.map((m) => Model_Json.parse(m))); // TODO BLOCK @many probably want a config helper to bake the raw config, parsing should be an upstream concern
 
 	zzz.messages.set_handlers(
 		// Message sending handler

@@ -3,7 +3,7 @@ import {z} from 'zod';
 import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Uuid, Datetime_Now} from '$lib/zod_helpers.js';
+import {Uuid} from '$lib/zod_helpers.js';
 import {
 	Message_Json,
 	Completion_Response,
@@ -27,10 +27,8 @@ export interface Message_Options extends Cell_Options<typeof Message_Json> {}
 // but then another for dynamic usage? is there even such a thing of a message changing?
 // if not shouldn't we just remove the $state below?
 export class Message extends Cell<typeof Message_Json> {
-	id: Uuid = $state()!;
 	type: Message_Type = $state()!;
 	direction: Message_Direction = $state()!;
-	created: Datetime_Now = $state()!;
 
 	// Store data based on message type
 	data: Record<string, any> | undefined = $state();
@@ -120,9 +118,10 @@ export class Message extends Cell<typeof Message_Json> {
 		// Create base message data
 		const base = {
 			id: this.id,
+			created: this.created,
+			updated: this.updated,
 			type: this.type,
 			direction: this.direction,
-			created: this.created,
 		};
 
 		// Add type-specific properties
