@@ -23,14 +23,6 @@
 <div class="column gap_sm">
 	<div class="flex mb_0 justify_content_space_between">
 		<div class="size_lg m_0">{bit.name}</div>
-		<input
-			type="checkbox"
-			class="plain ml_md"
-			title="this bit is {bit.enabled ? 'enabled' : 'disabled'} and {bit.enabled
-				? ''
-				: 'not '}included in the prompt"
-			bind:checked={bit.enabled}
-		/>
 	</div>
 	<textarea
 		style:height="200px"

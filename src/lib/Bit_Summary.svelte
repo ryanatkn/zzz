@@ -22,13 +22,21 @@
 </script>
 
 <div
-	class="flex justify_content_space_between gap_xs3 size_sm relative"
+	class="flex justify_content_space_between gap_xs2 size_sm relative"
 	class:dormant={!bit.enabled}
 >
 	<div class="progress_bar" style:width="{percent}%"></div>
 	<div class="flex_1 panel px_sm py_xs3 ellipsis">
 		{bit.name}
 	</div>
+	<input
+		type="checkbox"
+		class="plain compact"
+		title="This bit is {bit.enabled ? 'enabled' : 'disabled'} and {bit.enabled
+			? ''
+			: 'not '}included in the prompt"
+		bind:checked={bit.enabled}
+	/>
 	<Confirm_Button
 		onclick={() => {
 			prompt.remove_bit(bit.id);

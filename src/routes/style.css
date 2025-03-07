@@ -34,13 +34,28 @@ h6 {
 	text-align: center;
 }
 
-/* TODO upstream */
+/* TODO upstream most of this */
 .compact {
 	--input_height: 2.6rem;
 	--min_height: 2.6rem;
 	--border_radius: var(--radius_xs);
 }
+input[type='checkbox'].compact {
+	height: var(--input_height);
+	min-height: var(--input_height);
+}
+input[type='checkbox'].compact:not(:hover)::before {
+	color: var(--text_color_3);
+}
 
+/* TODO upstream */
+input[type='checkbox'].plain {
+	height: var(--input_height);
+	min-height: var(--input_height);
+}
+input[type='checkbox'].plain:not(:hover) {
+	--input_fill: transparent;
+}
 /* TODO upstream? something like it? */
 .dormant {
 	opacity: 0.6;
@@ -56,8 +71,8 @@ h6 {
 
 /* TODO @many upstream to Fuz? (not Moss right?) */
 .reorderable_item {
-	--outline_style: dashed;
-	outline: var(--outline_width) var(--outline_style) var(--outline_color);
+	--reorderable_outline_style: dashed;
+	outline: var(--outline_width) var(--reorderable_outline_style) var(--outline_color);
 }
 .reorderable_item:hover {
 	outline-width: var(--border_width_1);

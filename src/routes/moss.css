@@ -126,9 +126,6 @@ a.chip {
 .gap_xs2 {
 	gap: var(--space_xs2);
 }
-.gap_xs3 {
-	gap: var(--space_xs3);
-}
 .gap_xs5 {
 	gap: var(--space_xs5);
 }
