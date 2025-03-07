@@ -1,6 +1,5 @@
 <script lang="ts">
 	import Pending_Button from '@ryanatkn/fuz/Pending_Button.svelte';
-	import ollama from 'ollama/browser';
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
 	import Paste_From_Clipboard from '@ryanatkn/fuz/Paste_From_Clipboard.svelte';
 	import {encode} from 'gpt-tokenizer';
