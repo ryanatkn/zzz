@@ -1,4 +1,6 @@
 <script lang="ts">
+	import {slide} from 'svelte/transition';
+
 	import type {Chat} from '$lib/chat.svelte.js';
 	import {Reorderable} from '$lib/reorderable.svelte.js';
 	import Tape_Summary from '$lib/Tape_Summary.svelte';
@@ -29,7 +31,7 @@
 			}}
 		>
 			{#each chat.tapes as tape, i (tape.id)}
-				<li class="radius_xs" use:reorderable.item={{index: i}}>
+				<li class="radius_xs" use:reorderable.item={{index: i}} transition:slide>
 					<Tape_Summary {tape} {chat} />
 				</li>
 			{/each}
