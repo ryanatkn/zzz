@@ -14,6 +14,6 @@
 		title="the token count is currently approximated using just one algorithm, when in practice models differ"
 		>≈ {print_number_with_separators(token_count + '', ',')} token{token_count === 1
 			? ''
-			: 's'},</small
+			: 's'}</small
 	> <small>{print_number_with_separators(length + '', ',')} char{length === 1 ? '' : 's'}</small>
 </div>
