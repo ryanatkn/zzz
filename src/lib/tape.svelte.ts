@@ -16,11 +16,12 @@ export const Tape_Json = z.object({
 	),
 });
 
+// TODO BLOCK should tapes be immutable, so the single model makes sense?
+// TODO BLOCK I think we need a way to say at each step what the model was?
+
 export type Tape_Json = z.infer<typeof Tape_Json>;
 
-export interface Tape_Options extends Cell_Options<typeof Tape_Json> {
-	model: Model;
-}
+export interface Tape_Options extends Cell_Options<typeof Tape_Json> {}
 
 /**
  * A tape is a linear sequence of chat messages that maintains a chronological
@@ -29,7 +30,12 @@ export interface Tape_Options extends Cell_Options<typeof Tape_Json> {
 export class Tape extends Cell<typeof Tape_Json> {
 	id: Uuid = $state()!;
 	created: Datetime_Now = $state()!;
-	model: Model;
+	model_name: string = $state()!;
+	model: Model = $derived.by(() => {
+		const model = this.zzz.models.find_by_name(this.model_name);
+		if (!model) throw Error(`Model "${this.model_name}" not found`); // TODO do this differently?
+		return model;
+	});
 	chat_messages: Array<Chat_Message> = $state([]); // TODO @many incrementally update with a helper class
 	chat_messages_by_id: Map<Uuid, Chat_Message> = $derived(
 		new Map(this.chat_messages.map((m) => [m.id, m])),
@@ -37,7 +43,6 @@ export class Tape extends Cell<typeof Tape_Json> {
 
 	constructor(options: Tape_Options) {
 		super(Tape_Json, options);
-		this.model = options.model;
 		this.init();
 	}
 

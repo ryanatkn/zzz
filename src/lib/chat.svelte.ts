@@ -76,7 +76,7 @@ export class Chat extends Cell<typeof Chat_Json> {
 		this.tapes.push(
 			new Tape({
 				zzz: this.zzz,
-				model,
+				json: {model_name: model.name},
 			}),
 		);
 	}
