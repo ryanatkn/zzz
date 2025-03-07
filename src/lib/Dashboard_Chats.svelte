@@ -13,6 +13,8 @@
 	const zzz = zzz_context.get();
 
 	const reorderable = new Reorderable();
+
+	// TODO BLOCK columns with overflow, not the whole page
 </script>
 
 <div class="dashboard_chats">
