@@ -42,7 +42,7 @@
 
 	const tape_messages = $derived(tape.chat_messages);
 
-	// TODO BLOCK show pending animation
+	// TODO BLOCK show pending animation - it should first create the message in the pending Async_Status
 
 	// TODO BLOCK the link should instead be a model picker (dialog? or overlaid without a bg maybe?)
 </script>
