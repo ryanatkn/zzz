@@ -819,8 +819,6 @@ export const src_json = {
 		'./response_helpers.js': {
 			path: 'response_helpers.ts',
 			declarations: [
-				{name: 'Unified_Completion_Response', kind: 'type'},
-				{name: 'as_unified_response', kind: 'function'},
 				{name: 'create_completion_response', kind: 'function'},
 				{name: 'to_completion_response_text', kind: 'function'},
 			],
