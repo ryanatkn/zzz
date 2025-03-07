@@ -131,7 +131,6 @@
 		zzz.chats.add();
 		zzz.chats.add();
 		zzz.chats.add();
-		zzz.chats.add();
 		const prompt = zzz.prompts.add();
 		prompt.add_bit('one');
 		prompt.add_bit('2');
