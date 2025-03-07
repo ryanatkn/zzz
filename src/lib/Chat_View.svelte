@@ -202,14 +202,14 @@
 			<div transition:slide>
 				<div class="column bg p_sm radius_xs2">
 					<!-- TODO needs work -->
-					<div class="flex justify_content_space_between">
+					<div class="flex justify_content_space_between mb_md">
 						<div class="size_lg">
 							<Glyph_Icon icon={GLYPH_CHAT} />
 							{zzz.chats.selected.name}
 						</div>
 						<Confirm_Button
 							onclick={() => zzz.chats.selected && zzz.chats.remove(zzz.chats.selected)}
-							attrs={{title: `remove Chat ${zzz.chats.selected.id}`}}
+							attrs={{title: `delete chat "${zzz.chats.selected.name}"`}}
 						/>
 					</div>
 					<small>{zzz.chats.selected.id}</small>
@@ -224,11 +224,11 @@
 			</div>
 		{/if}
 		<div class="p_sm">
-			<header class="mt_0 mb_lg size_lg">{GLYPH_TAPE} tapes</header>
+			<header class="mt_0 mb_lg size_lg"><Glyph_Icon icon={GLYPH_TAPE} /> tapes</header>
 			<Tape_List {chat} />
 		</div>
 		<div class="p_sm">
-			<header class="mt_0 mb_lg size_lg">{GLYPH_PROMPT} prompts</header>
+			<header class="mt_0 mb_lg size_lg"><Glyph_Icon icon={GLYPH_PROMPT} /> prompts</header>
 			<Prompt_List {chat} />
 		</div>
 	</div>

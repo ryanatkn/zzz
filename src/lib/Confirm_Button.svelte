@@ -40,7 +40,7 @@
 		}
 	});
 
-	const class_attr = $derived(attrs?.class);
+	const c = $derived(attrs?.class);
 </script>
 
 <!-- I did the ternary below because Svelte treats `undefined` `class:` directive values as `false`, so they override the attribute classes -->
@@ -57,14 +57,14 @@
 			onclick={toggle}
 			class:confirming
 			{...attrs}
-			class="{class_attr} {!children && !class_attr?.includes('icon_button')
-				? 'icon_button'
-				: ''} {!children && !confirming && !class_attr?.includes('plain')
+			class="{c} {!children && !c?.includes('icon_button') ? 'icon_button' : ''} {!children &&
+			!confirming &&
+			!c?.includes('plain')
 				? 'plain'
 				: ''} {!children &&
 			confirming &&
-			!class_attr?.includes(class_attr?.includes('compact') ? 'size_xs' : 'size_sm')
-				? class_attr?.includes('compact')
+			!c?.includes(c.includes('compact') ? 'size_xs' : 'size_sm')
+				? c?.includes('compact')
 					? 'size_xs'
 					: 'size_sm'
 				: ''}"
