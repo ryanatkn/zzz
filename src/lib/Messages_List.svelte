@@ -29,7 +29,7 @@
 	// TODO BLOCK use component/class for the list (they'll be Nav_Links yeah?)
 </script>
 
-<menu {...attrs} class="flex_1 unstyled overflow_y_auto {attrs?.class}">
+<menu {...attrs} class="flex_1 unstyled overflow_auto scrollbar_width_thin {attrs?.class}">
 	{#each limited_messages as message (message.id)}
 		{@const selected = message.id === selected_message_id}
 		<button

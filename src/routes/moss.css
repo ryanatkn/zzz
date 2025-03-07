@@ -252,6 +252,11 @@ a.chip {
 	line-height: var(--line_height_lg); /* prevents the bottom of g's and others from being cut off */
 }
 
+.min_width_sm {
+	width: 100%;
+	min-width: var(--width_sm);
+}
+
 .ml_auto {
 	margin-left: auto;
 }
@@ -315,9 +320,6 @@ a.chip {
 .overflow_wrap_break_word {
 	overflow-wrap: break-word;
 }
-.overflow_y_auto {
-	overflow-y: auto;
-}
 .p_lg {
 	padding: var(--space_lg);
 }
@@ -364,12 +366,6 @@ a.chip {
 }
 .pb_xl7 {
 	padding-bottom: var(--space_xl7);
-}
-.pixelated {
-	image-rendering: -webkit-optimize-contrast; /* Safari */
-	image-rendering: -o-crisp-edges; /* OS X & Windows Opera (12.02+) */
-	image-rendering: pixelated; /* in case crisp-edges isn't supported */
-	image-rendering: crisp-edges; /* the recommended pixel art setting according to MDN */
 }
 .pl_xl {
 	padding-left: var(--space_xl);
@@ -424,9 +420,6 @@ a.chip {
 }
 .radius_xs {
 	border-radius: var(--radius_xs);
-}
-.radius_xs2 {
-	border-radius: var(--radius_xs2);
 }
 .relative {
 	position: relative;

@@ -40,6 +40,7 @@
 		border: var(--border_width_2) var(--border_style) transparent;
 		color: var(--text_color_2);
 		font-weight: 500;
+		white-space: nowrap;
 	}
 	.nav_link:hover {
 		/* TODO probably add up to `border_color_5` */

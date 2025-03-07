@@ -29,7 +29,7 @@
 </script>
 
 <div {...attrs} class="panel p_lg {attrs?.class}">
-	<div class="row">
+	<div class="flex">
 		<Provider_Logo name={provider.name} size="var(--icon_size_xl)" fill={null} />
 		<div class="pl_xl">
 			{#if at_detail_page}

@@ -24,7 +24,7 @@
 	const provider = $derived(zzz.providers.find_by_name(model.provider_name));
 </script>
 
-<div {...attrs} class={['panel', 'pixelated', 'p_lg', attrs?.class]}>
+<div {...attrs} class="panel p_lg {attrs?.class}">
 	<div class="row">
 		<div class="glyph_container">
 			<span class="glyph" style:font-size="var(--icon_size_xl)">{GLYPH_MODEL}</span>
@@ -137,6 +137,7 @@
 		align-items: center;
 		justify-content: center;
 		min-width: var(--icon_size_xl);
+		line-height: 1;
 	}
 	.specs_grid {
 		display: grid;

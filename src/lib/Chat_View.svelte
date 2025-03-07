@@ -78,12 +78,12 @@
 	// TODO BLOCK maybe there should be 2 columns of tags, one to include and one to exclude?
 </script>
 
-<div class="flex_1 flex align_items_start">
-	<div class="width_sm column p_sm gap_md">
-		<div class="panel">
+<div class="flex_1 h_100 flex align_items_start">
+	<div class="width_sm min_width_sm h_100 overflow_auto scrollbar_width_thin column">
+		<div class="fg_1">
 			<!-- TODO add user-customizable sets of models -->
 			<div class="flex">
-				<div class="flex_1 p_xs radius_xs">
+				<div class="flex_1 p_xs">
 					<header class="size_lg text_align_center mb_xs">add by tag</header>
 					<menu class="unstyled column">
 						{#each Array.from(zzz.tags) as tag (tag)}
@@ -103,7 +103,7 @@
 						{/each}
 					</menu>
 				</div>
-				<div class="flex_1 p_xs radius_xs fg_1">
+				<div class="flex_1 p_xs fg_1">
 					<header class="size_lg text_align_center mb_xs">remove by tag</header>
 					<menu class="unstyled column">
 						{#each Array.from(zzz.tags) as tag (tag)}
@@ -130,8 +130,8 @@
 				<!-- TODO add custom buttons -->
 			</div>
 		</div>
-		<div class="panel p_sm">
-			<header class="mb_md mt_0 size_lg">add tape with model</header>
+		<div class="fg_1 p_sm">
+			<header class="mb_md size_lg">add tape with model</header>
 			<Model_Selector onselect={(model) => chat.add_tape(model)}>
 				{#snippet children(model)}
 					<div>{chat.tapes.filter((t) => t.model.name === model.name).length}</div>
@@ -139,8 +139,8 @@
 			</Model_Selector>
 		</div>
 	</div>
-	<div class="p_sm flex_1">
-		<div class="panel p_sm">
+	<div class="flex_1 h_100 overflow_auto scrollbar_width_thin">
+		<div class="fg_1 p_sm">
 			<div class="flex gap_xs2 flex_1 mb_xs">
 				<textarea
 					class="plain flex_1 mb_0"
@@ -197,39 +197,41 @@
 			</ul>
 		</div>
 	</div>
-	<div class="width_sm column gap_md">
-		{#if zzz.chats.selected}
-			<div transition:slide>
-				<div class="column bg p_sm radius_xs2">
-					<!-- TODO needs work -->
-					<div class="flex justify_content_space_between mb_md">
-						<div class="size_lg">
-							<Glyph_Icon icon={GLYPH_CHAT} />
-							{zzz.chats.selected.name}
+	<div class="width_sm min_width_sm h_100 overflow_auto scrollbar_width_thin">
+		<div class="column gap_md">
+			{#if zzz.chats.selected}
+				<div transition:slide>
+					<div class="column p_sm">
+						<!-- TODO needs work -->
+						<div class="flex justify_content_space_between mb_md">
+							<div class="size_lg">
+								<Glyph_Icon icon={GLYPH_CHAT} />
+								{zzz.chats.selected.name}
+							</div>
+							<Confirm_Button
+								onclick={() => zzz.chats.selected && zzz.chats.remove(zzz.chats.selected)}
+								attrs={{title: `delete chat "${zzz.chats.selected.name}"`}}
+							/>
 						</div>
-						<Confirm_Button
-							onclick={() => zzz.chats.selected && zzz.chats.remove(zzz.chats.selected)}
-							attrs={{title: `delete chat "${zzz.chats.selected.name}"`}}
-						/>
+						<small>{zzz.chats.selected.id}</small>
+						<small title={zzz.chats.selected.created_formatted_date}
+							>created {zzz.chats.selected.created_formatted_short_date}</small
+						>
+						<small>
+							{zzz.chats.selected.tapes.length}
+							tape{#if zzz.chats.selected.tapes.length !== 1}s{/if}
+						</small>
 					</div>
-					<small>{zzz.chats.selected.id}</small>
-					<small title={zzz.chats.selected.created_formatted_date}
-						>created {zzz.chats.selected.created_formatted_short_date}</small
-					>
-					<small>
-						{zzz.chats.selected.tapes.length}
-						tape{#if zzz.chats.selected.tapes.length !== 1}s{/if}
-					</small>
 				</div>
+			{/if}
+			<div class="p_sm">
+				<header class="mt_0 mb_lg size_lg"><Glyph_Icon icon={GLYPH_TAPE} /> tapes</header>
+				<Tape_List {chat} />
 			</div>
-		{/if}
-		<div class="p_sm">
-			<header class="mt_0 mb_lg size_lg"><Glyph_Icon icon={GLYPH_TAPE} /> tapes</header>
-			<Tape_List {chat} />
-		</div>
-		<div class="p_sm">
-			<header class="mt_0 mb_lg size_lg"><Glyph_Icon icon={GLYPH_PROMPT} /> prompts</header>
-			<Prompt_List {chat} />
+			<div class="p_sm">
+				<header class="mt_0 mb_lg size_lg"><Glyph_Icon icon={GLYPH_PROMPT} /> prompts</header>
+				<Prompt_List {chat} />
+			</div>
 		</div>
 	</div>
 </div>

@@ -21,7 +21,7 @@
 		style:grid-template-columns="320px 1fr"
 		style:gap="var(--space_md)"
 	>
-		<div class="overflow_y_auto border_right">
+		<div class="overflow_auto border_right">
 			<Messages_List
 				limit={100}
 				selected_message_id={selected_message?.id}
@@ -29,7 +29,7 @@
 			/>
 		</div>
 
-		<div class="panel p_md overflow_y_auto h_100">
+		<div class="panel p_md overflow_auto h_100">
 			{#if selected_message}
 				<Message_Detail message={selected_message} />
 			{:else}

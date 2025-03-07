@@ -163,7 +163,7 @@
 				</div>
 				<h4 class="mt_sm mb_xs">Contents</h4>
 				<pre
-					class="font_mono size_sm white_space_pre_wrap word_break_break_word p_sm bg_alt rounded w_100 overflow_y_auto"
+					class="font_mono size_sm white_space_pre_wrap word_break_break_word p_sm bg_alt rounded w_100 overflow_auto scrollbar_width_thin"
 					style:max-height="300px">{message.contents || ''}</pre>
 			{/if}
 			{#if message.change}
@@ -185,7 +185,7 @@
 				</div>
 
 				<h4 class="mt_sm mb_xs">Files</h4>
-				<div class="w_100 overflow_y_auto" style:max-height="200px">
+				<div class="w_100 overflow_auto scrollbar_width_thin" style:max-height="200px">
 					<table class="w_100">
 						<thead>
 							<tr>
@@ -213,7 +213,7 @@
 			{:else}
 				<div class="w_100">
 					<pre
-						class="font_mono size_sm white_space_pre_wrap word_break_break_word p_sm bg_alt rounded w_100 overflow_y_auto"
+						class="font_mono size_sm white_space_pre_wrap word_break_break_word p_sm bg_alt rounded w_100 overflow_auto scrollbar_width_thin"
 						style:max-height="300px">{JSON.stringify(message.data, null, 2)}</pre>
 				</div>
 			{/if}

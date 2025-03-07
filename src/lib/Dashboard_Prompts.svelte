@@ -27,7 +27,7 @@
 </script>
 
 <div class="flex w_100 h_100">
-	<div class="width_sm h_100 overflow_auto scrollbar_width_thin">
+	<div class="width_sm min_width_sm h_100 overflow_auto scrollbar_width_thin">
 		<div class="panel p_sm width_sm">
 			<button
 				type="button"
@@ -69,7 +69,7 @@
 	</div>
 
 	{#if zzz.prompts.selected}
-		<div class="width_sm column gap_md">
+		<div class="width_sm h_100">
 			<div class="panel p_sm">
 				<div class="size_lg"><Glyph_Icon icon={GLYPH_PROMPT} /> prompt</div>
 				{#if zzz.prompts.selected}
@@ -100,47 +100,48 @@
 			<menu class="unstyled"> TODO </menu>
 			</div> -->
 		</div>
-	{/if}
 
-	{#if zzz.prompts.selected}
-		<div class="panel column gap_md p_sm flex_1">
-			<div class="flex justify_content_space_between">
-				<button type="button" class="plain" onclick={() => zzz.prompts.add_bit()}>
-					+ add bit
-				</button>
-				<div class="flex gap_md">
-					<!-- Add file toggle -->
-					<!-- <label class="flex gap_xs">
+		<div class="flex_1 h_100 fg_1 overflow_auto scrollbar_width_thin">
+			<div class="column gap_md p_sm">
+				<div class="flex justify_content_space_between">
+					<button type="button" class="plain" onclick={() => zzz.prompts.add_bit()}>
+						+ add bit
+					</button>
+					<div class="flex gap_md">
+						<!-- Add file toggle -->
+						<!-- <label class="flex gap_xs">
 						<input type="checkbox" bind:checked={bit.file_path !== null} />
 						Is File
 					</label> -->
-					<!-- File path input -->
-					<!-- {#if bit.file_path !== null}
+						<!-- File path input -->
+						<!-- {#if bit.file_path !== null}
 						<input placeholder="file path (optional)" bind:value={bit.file_path} />
 					{/if} -->
-					<Confirm_Button
-						onclick={() => zzz.prompts.selected?.remove_all_bits()}
-						attrs={{disabled: !zzz.prompts.selected.bits.length, class: 'plain'}}
-					>
-						{GLYPH_REMOVE} remove all bits
-					</Confirm_Button>
+						<Confirm_Button
+							onclick={() => zzz.prompts.selected?.remove_all_bits()}
+							attrs={{disabled: !zzz.prompts.selected.bits.length, class: 'plain'}}
+						>
+							{GLYPH_REMOVE} remove all bits
+						</Confirm_Button>
+					</div>
 				</div>
+				<ul
+					class="unstyled grid gap_md"
+					style:grid-template-columns="repeat(auto-fill, minmax(var(--width_sm), 1fr))"
+				>
+					{#each zzz.prompts.selected.bits as bit (bit.id)}
+						<li>
+							<div class="bg radius_xs p_sm" transition:scale>
+								<Bit_View {bit} prompts={zzz.prompts} />
+							</div>
+						</li>
+					{/each}
+				</ul>
 			</div>
-			<ul
-				class="unstyled grid gap_md"
-				style:grid-template-columns="repeat(auto-fill, minmax(var(--width_sm), 1fr))"
-			>
-				{#each zzz.prompts.selected.bits as bit (bit.id)}
-					<li>
-						<div class="bg radius_xs p_sm" transition:scale>
-							<Bit_View {bit} prompts={zzz.prompts} />
-						</div>
-					</li>
-				{/each}
-			</ul>
 		</div>
-		<div class="p_sm width_sm" in:slide>
-			<div class="column">
+
+		<div class="width_sm h_100" in:slide>
+			<div class="column p_sm">
 				<div class="flex justify_content_space_between">
 					<div class="size_lg">
 						<Glyph_Icon icon={GLYPH_PROMPT} />
