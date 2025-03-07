@@ -12,7 +12,7 @@
 </script>
 
 <div class="flex flex_column gap_xs">
-	<small>
+	<small class="overflow_wrap_break_word">
 		<Text_Icon icon={GLYPH_FILE} />
 		{to_root_path(file.path)}
 	</small>
