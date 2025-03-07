@@ -1,12 +1,7 @@
-import {format} from 'date-fns';
 import {encode as tokenize} from 'gpt-tokenizer';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Diskfile_Json, type Diskfile_Path, type Source_File} from '$lib/diskfile_types.js';
-
-// Constants for formatting
-export const FILE_DATE_FORMAT = 'MMM d, yyyy h:mm:ss a';
-export const FILE_TIME_FORMAT = 'HH:mm:ss';
 
 export interface Diskfile_Options extends Cell_Options<typeof Diskfile_Json> {}
 
@@ -22,18 +17,6 @@ export class Diskfile extends Cell<typeof Diskfile_Json> {
 
 	dependency_ids: Array<Diskfile_Path> = $derived(this.dependencies.map(([id]) => id));
 	dependent_ids: Array<Diskfile_Path> = $derived(this.dependents.map(([id]) => id));
-
-	created_date: Date = $derived(new Date(this.created));
-	created_formatted_date: string = $derived(format(this.created_date, FILE_DATE_FORMAT));
-	created_formatted_time: string = $derived(format(this.created_date, FILE_TIME_FORMAT));
-
-	updated_date: Date | null = $derived(this.updated ? new Date(this.updated) : null);
-	updated_formatted_date: string | null = $derived(
-		this.updated_date ? format(this.updated_date, FILE_DATE_FORMAT) : null,
-	);
-	updated_formatted_time: string | null = $derived(
-		this.updated_date ? format(this.updated_date, FILE_TIME_FORMAT) : null,
-	);
 
 	size: number | null = $derived(this.contents?.length ?? null);
 

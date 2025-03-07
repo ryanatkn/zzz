@@ -1,4 +1,5 @@
 import {z} from 'zod';
+import {format} from 'date-fns';
 
 import {get_field_schema, zod_get_schema_keys, type Uuid, type Datetime} from '$lib/zod_helpers.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
@@ -8,6 +9,12 @@ import {
 	type Cell_Value_Parser,
 } from '$lib/cell_helpers.js';
 import type {Schema_Keys, Cell_Json} from '$lib/cell_types.js';
+
+// TODO needs refinement
+// Constants for date formatting
+export const FILE_SHORT_DATE_FORMAT = 'MMM d, p';
+export const FILE_DATE_FORMAT = 'MMM d, yyyy h:mm:ss a';
+export const FILE_TIME_FORMAT = 'HH:mm:ss';
 
 // Base options type that all cells will extend
 export interface Cell_Options<T_Schema extends z.ZodType> {
@@ -65,6 +72,24 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	 * the base cell properties (id, created, updated).
 	 */
 	protected parsers: Cell_Value_Parser<T_Schema> = {};
+
+	created_date: Date = $derived(new Date(this.created));
+	created_formatted_short_date: string = $derived(
+		format(this.created_date, FILE_SHORT_DATE_FORMAT),
+	);
+	created_formatted_date: string = $derived(format(this.created_date, FILE_DATE_FORMAT));
+	created_formatted_time: string = $derived(format(this.created_date, FILE_TIME_FORMAT));
+
+	updated_date: Date | null = $derived(this.updated ? new Date(this.updated) : null);
+	updated_formatted_short_date: string | null = $derived(
+		this.updated_date ? format(this.updated_date, FILE_SHORT_DATE_FORMAT) : null,
+	);
+	updated_formatted_date: string | null = $derived(
+		this.updated_date ? format(this.updated_date, FILE_DATE_FORMAT) : null,
+	);
+	updated_formatted_time: string | null = $derived(
+		this.updated_date ? format(this.updated_date, FILE_TIME_FORMAT) : null,
+	);
 
 	constructor(schema: T_Schema, options: Cell_Options<T_Schema>) {
 		this.schema = schema;

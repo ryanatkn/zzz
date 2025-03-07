@@ -3,13 +3,15 @@
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
 	import Paste_From_Clipboard from '@ryanatkn/fuz/Paste_From_Clipboard.svelte';
 	import {encode as tokenize} from 'gpt-tokenizer';
+	import {slide} from 'svelte/transition';
 
+	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import {Chat} from '$lib/chat.svelte.js';
 	import Model_Selector from '$lib/Model_Selector.svelte';
 	import Chat_Tape from '$lib/Chat_Tape.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
-	import {GLYPH_TAPE, GLYPH_PROMPT, GLYPH_REMOVE, GLYPH_PASTE} from '$lib/glyphs.js';
+	import {GLYPH_TAPE, GLYPH_PROMPT, GLYPH_REMOVE, GLYPH_PASTE, GLYPH_CHAT} from '$lib/glyphs.js';
 	import {zzz_config} from '$lib/zzz_config.js';
 	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
 	import Bit_Stats from '$lib/Bit_Stats.svelte';
@@ -196,6 +198,31 @@
 		</div>
 	</div>
 	<div class="width_sm column gap_md">
+		{#if zzz.chats.selected}
+			<div transition:slide>
+				<div class="column bg p_sm radius_xs2">
+					<!-- TODO needs work -->
+					<div class="flex justify_content_space_between">
+						<div class="size_lg">
+							<Glyph_Icon icon={GLYPH_CHAT} />
+							{zzz.chats.selected.name}
+						</div>
+						<Confirm_Button
+							onclick={() => zzz.chats.selected && zzz.chats.remove(zzz.chats.selected)}
+							attrs={{title: `remove Chat ${zzz.chats.selected.id}`}}
+						/>
+					</div>
+					<small>{zzz.chats.selected.id}</small>
+					<small title={zzz.chats.selected.created_formatted_date}
+						>created {zzz.chats.selected.created_formatted_short_date}</small
+					>
+					<small>
+						{zzz.chats.selected.tapes.length}
+						tape{#if zzz.chats.selected.tapes.length !== 1}s{/if}
+					</small>
+				</div>
+			</div>
+		{/if}
 		<div class="p_sm">
 			<header class="mt_0 mb_lg size_lg">{GLYPH_TAPE} tapes</header>
 			<Tape_List {chat} />
