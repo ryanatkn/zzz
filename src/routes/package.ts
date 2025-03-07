@@ -131,30 +131,6 @@ export const package_json = {
 			svelte: './dist/Clear_Restore_Button.svelte',
 			default: './dist/Clear_Restore_Button.svelte',
 		},
-		'./Completion_Thread_Info.svelte': {
-			types: './dist/Completion_Thread_Info.svelte.d.ts',
-			svelte: './dist/Completion_Thread_Info.svelte',
-			default: './dist/Completion_Thread_Info.svelte',
-		},
-		'./Completion_Thread_Summary.svelte': {
-			types: './dist/Completion_Thread_Summary.svelte.d.ts',
-			svelte: './dist/Completion_Thread_Summary.svelte',
-			default: './dist/Completion_Thread_Summary.svelte',
-		},
-		'./Completion_Thread_View.svelte': {
-			types: './dist/Completion_Thread_View.svelte.d.ts',
-			svelte: './dist/Completion_Thread_View.svelte',
-			default: './dist/Completion_Thread_View.svelte',
-		},
-		'./completion_thread.svelte.js': {
-			types: './dist/completion_thread.svelte.d.ts',
-			default: './dist/completion_thread.svelte.js',
-		},
-		'./Completion_Threads_List.svelte': {
-			types: './dist/Completion_Threads_List.svelte.d.ts',
-			svelte: './dist/Completion_Threads_List.svelte',
-			default: './dist/Completion_Threads_List.svelte',
-		},
 		'./config_helpers.js': {
 			types: './dist/config_helpers.d.ts',
 			default: './dist/config_helpers.js',
@@ -373,11 +349,6 @@ export const package_json = {
 			svelte: './dist/Provider_Detail.svelte',
 			default: './dist/Provider_Detail.svelte',
 		},
-		'./Provider_Info.svelte': {
-			types: './dist/Provider_Info.svelte.d.ts',
-			svelte: './dist/Provider_Info.svelte',
-			default: './dist/Provider_Info.svelte',
-		},
 		'./Provider_Link.svelte': {
 			types: './dist/Provider_Link.svelte.d.ts',
 			svelte: './dist/Provider_Link.svelte',
@@ -401,11 +372,6 @@ export const package_json = {
 		'./provider_types.js': {
 			types: './dist/provider_types.d.ts',
 			default: './dist/provider_types.js',
-		},
-		'./Provider_View.svelte': {
-			types: './dist/Provider_View.svelte.d.ts',
-			svelte: './dist/Provider_View.svelte',
-			default: './dist/Provider_View.svelte',
 		},
 		'./provider.svelte.js': {
 			types: './dist/provider.svelte.d.ts',
@@ -569,25 +535,6 @@ export const src_json = {
 			],
 		},
 		'./Clear_Restore_Button.svelte': {path: 'Clear_Restore_Button.svelte', declarations: []},
-		'./Completion_Thread_Info.svelte': {path: 'Completion_Thread_Info.svelte', declarations: []},
-		'./Completion_Thread_Summary.svelte': {
-			path: 'Completion_Thread_Summary.svelte',
-			declarations: [],
-		},
-		'./Completion_Thread_View.svelte': {path: 'Completion_Thread_View.svelte', declarations: []},
-		'./completion_thread.svelte.js': {
-			path: 'completion_thread.svelte.ts',
-			declarations: [
-				{name: 'Completion_Threads_Json', kind: 'type'},
-				{name: 'Completion_Threads_Options', kind: 'type'},
-				{name: 'Completion_Thread_History_Item', kind: 'type'},
-				{name: 'Completion_Threads', kind: 'class'},
-				{name: 'Completion_Thread_Json', kind: 'type'},
-				{name: 'Completion_Thread_Options', kind: 'type'},
-				{name: 'Completion_Thread', kind: 'class'},
-			],
-		},
-		'./Completion_Threads_List.svelte': {path: 'Completion_Threads_List.svelte', declarations: []},
 		'./config_helpers.js': {
 			path: 'config_helpers.ts',
 			declarations: [
@@ -809,7 +756,6 @@ export const src_json = {
 			],
 		},
 		'./Provider_Detail.svelte': {path: 'Provider_Detail.svelte', declarations: []},
-		'./Provider_Info.svelte': {path: 'Provider_Info.svelte', declarations: []},
 		'./Provider_Link.svelte': {path: 'Provider_Link.svelte', declarations: []},
 		'./Provider_Logo.svelte': {path: 'Provider_Logo.svelte', declarations: []},
 		'./Provider_Select.svelte': {path: 'Provider_Select.svelte', declarations: []},
@@ -818,7 +764,6 @@ export const src_json = {
 			path: 'provider_types.ts',
 			declarations: [{name: 'Provider_Name', kind: 'variable'}],
 		},
-		'./Provider_View.svelte': {path: 'Provider_View.svelte', declarations: []},
 		'./provider.svelte.js': {
 			path: 'provider.svelte.ts',
 			declarations: [
@@ -975,8 +920,8 @@ export const src_json = {
 				{name: 'cell_classes', kind: 'variable'},
 				{name: 'Cell_Registry_Map', kind: 'type'},
 				{name: 'zzz_context', kind: 'variable'},
+				{name: 'Zzz_Json', kind: 'variable'},
 				{name: 'Zzz_Options', kind: 'type'},
-				{name: 'Zzz_Json', kind: 'type'},
 				{name: 'Message_With_History', kind: 'type'},
 				{name: 'Zzz', kind: 'class'},
 			],

@@ -1,7 +1,8 @@
 import {create_context} from '@ryanatkn/fuz/context_helpers.js';
 import {SvelteMap} from 'svelte/reactivity';
 import {create_deferred, type Deferred} from '@ryanatkn/belt/async.js';
-import type {Class_Constructor} from '@ryanatkn/belt/types.js';
+import type {Assignable, Class_Constructor} from '@ryanatkn/belt/types.js';
+import {z} from 'zod';
 
 import type {
 	Message_Send_Prompt,
@@ -11,8 +12,8 @@ import type {
 } from '$lib/message_types.js';
 import {Provider, type Provider_Json} from '$lib/provider.svelte.js';
 import type {Provider_Name} from '$lib/provider_types.js';
-import {Uuid} from '$lib/zod_helpers.js';
-import {Completion_Threads, type Completion_Threads_Json} from '$lib/completion_thread.svelte.js';
+import {Uuid, Datetime_Now} from '$lib/zod_helpers.js';
+// import {Completion_Threads, type Completion_Threads_Json} from '$lib/completion_thread.svelte.js';
 import {ollama_list_with_metadata} from '$lib/ollama.js';
 import {Models} from '$lib/models.svelte.js';
 import {Chats} from '$lib/chats.svelte.js';
@@ -21,9 +22,7 @@ import {Diskfiles} from '$lib/diskfiles.svelte.js';
 import {Messages} from '$lib/messages.svelte.js';
 import {Model, type Model_Json} from '$lib/model.svelte.js';
 import {Cell_Registry} from '$lib/cell_registry.js';
-import {Datetime_Now} from '$lib/zod_helpers.js';
 import {Prompts} from '$lib/prompts.svelte.js';
-import type {Cell} from '$lib/cell.svelte.js';
 import {Bit} from '$lib/bit.svelte.js';
 import {Chat} from '$lib/chat.svelte.js';
 import {Diskfile} from '$lib/diskfile.svelte.js';
@@ -31,7 +30,8 @@ import {Message} from '$lib/message.svelte.js';
 import {Prompt} from '$lib/prompt.svelte.js';
 import {Tape} from '$lib/tape.svelte.js';
 import {Ui, Ui_Json} from '$lib/ui.svelte.js';
-import {as_unified_response} from '$lib/response_helpers.js';
+import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
+import {Cell_Json} from '$lib/cell_types.js';
 
 // Define standard cell classes
 export const cell_classes = {
@@ -59,18 +59,22 @@ export type Cell_Registry_Map = {
 
 export const zzz_context = create_context<Zzz>();
 
-export interface Zzz_Options {
+// Define the schema for Zzz - essential serializable state
+export const Zzz_Json = Cell_Json.extend({
+	ui: Ui_Json,
+	// completion_threads: Completion_Threads_Json,
+});
+export type Zzz_Json = z.infer<typeof Zzz_Json>;
+
+// Special options type for Zzz to handle circular reference
+export interface Zzz_Options extends Omit<Cell_Options<typeof Zzz_Json>, 'zzz'> {
+	zzz?: Zzz; // Make zzz optional for Zzz initialization
 	send?: (message: any) => void;
 	receive?: (message: any) => void;
-	completion_threads?: Completion_Threads;
+	// completion_threads?: Completion_Threads;
 	models?: Array<Model_Json>;
 	providers?: Array<Provider_Json>;
 	cells?: Record<string, Class_Constructor<Cell>>;
-}
-
-export interface Zzz_Json {
-	ui: Ui_Json;
-	completion_threads: Completion_Threads_Json;
 }
 
 /**
@@ -86,33 +90,38 @@ export interface Message_With_History {
  * The main client. Like a site-wide `app` instance for Zzz.
  * Gettable with `zzz_context.get()` inside a `<Zzz_Root>`.
  */
-export class Zzz {
+export class Zzz extends Cell<typeof Zzz_Json> {
 	readonly registry: Cell_Registry;
 
-	// Cells
-	readonly ui: Ui;
-	readonly models: Models;
-	readonly chats: Chats;
-	readonly providers: Providers;
-	readonly prompts: Prompts;
-	readonly diskfiles: Diskfiles;
-	readonly messages: Messages;
+	// Cells - these are managed collections that contain the app state
+	readonly ui: Ui = $state()!;
+	readonly models: Models = $state()!;
+	readonly chats: Chats = $state()!;
+	readonly providers: Providers = $state()!;
+	readonly prompts: Prompts = $state()!;
+	readonly diskfiles: Diskfiles = $state()!;
+	readonly messages: Messages = $state()!;
 
+	// Special property to detect self-reference
+	readonly is_zzz: boolean = $state(true);
+
+	// Derived values
 	tags: Set<string> = $derived.by(() => new Set(this.models.items.flatMap((m) => m.tags)));
 
+	// Runtime-only state (not serialized)
 	ping_start_times: Map<Uuid, number> = new Map();
 	ping_elapsed: SvelteMap<Uuid, number> = new SvelteMap();
-
-	// TODO could track this more formally, and add time tracking
 	pending_prompts: SvelteMap<Uuid, Deferred<Message_Completion_Response>> = new SvelteMap();
-
-	completion_threads: Completion_Threads;
-
+	// completion_threads: Completion_Threads = $state()!;
 	capability_ollama: undefined | null | boolean = $state();
+	inited_models: boolean | undefined = $state();
 
 	constructor(options: Zzz_Options = {}) {
-		// Initialize properties in the correct order
-		this.completion_threads = options.completion_threads ?? new Completion_Threads({zzz: this});
+		// Pass this instance as its own zzz reference
+		super(Zzz_Json, {...options, zzz: undefined as any}); // Temporary type assertion, will be fixed after construction
+
+		// Set the circular reference now that the object is constructed
+		(this as Assignable<typeof this, 'zzz'>).zzz = this;
 
 		// Initialize the registry
 		this.registry = new Cell_Registry(this);
@@ -123,7 +132,10 @@ export class Zzz {
 			this.registry.register(constructor);
 		}
 
-		// Initialize cell collections first
+		// Initialize completion_threads - either use provided or create new
+		// this.completion_threads = options.completion_threads ?? new Completion_Threads({zzz: this});
+
+		// Initialize cell collections
 		this.ui = new Ui({zzz: this});
 		this.models = new Models({zzz: this});
 		this.chats = new Chats({zzz: this});
@@ -146,6 +158,9 @@ export class Zzz {
 		if (options.models?.length) {
 			this.add_models(options.models);
 		}
+
+		// Call init to complete initialization
+		this.init();
 	}
 
 	/**
@@ -155,17 +170,6 @@ export class Zzz {
 		this.registry.register(cell_class);
 	}
 
-	// TODO BLOCK extend cell so this doesnt exist, automatic from the schema
-	toJSON(): Zzz_Json {
-		return {
-			ui: this.ui.toJSON(),
-			completion_threads: this.completion_threads.toJSON(),
-		};
-	}
-
-	inited_models: boolean | undefined = $state();
-
-	// TODO maybe make this sync instead of init?
 	async init_models(): Promise<void> {
 		this.inited_models = false;
 
@@ -216,18 +220,17 @@ export class Zzz {
 		const response = await deferred.promise;
 
 		// Ensure the completion response matches the required structure
-		if (response.completion_response) {
-			// Use safe type assertion with null check
-			const unified_response = as_unified_response(response.completion_response);
-			if (unified_response) {
-				this.completion_threads.receive_completion_response(
-					message.completion_request,
-					unified_response,
-				);
-			}
-		} else {
-			console.error('Invalid completion response format:', response);
-		}
+		// if (response.completion_response) {
+		// Use safe type assertion with null check
+		// if (response.completion_response) {
+		// this.completion_threads.receive_completion_response(
+		// 	message.completion_request,
+		// 	response.completion_response,
+		// );
+		// }
+		// } else {
+		// 	console.error('Invalid completion response format:', response);
+		// }
 
 		return response;
 	}

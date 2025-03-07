@@ -12,7 +12,7 @@ import {
 	type Message_Type,
 } from '$lib/message_types.js';
 import {Diskfile_Path} from '$lib/diskfile_types.js';
-import {as_unified_response, to_completion_response_text} from '$lib/response_helpers.js';
+import {to_completion_response_text} from '$lib/response_helpers.js';
 
 // Constants for preview length and formatting
 export const MESSAGE_PREVIEW_MAX_LENGTH = 50;
@@ -67,9 +67,7 @@ export class Message extends Cell<typeof Message_Json> {
 	);
 
 	completion_text: string | null | undefined = $derived(
-		this.completion_data
-			? to_completion_response_text(as_unified_response(this.completion_data))
-			: null,
+		this.completion_data ? to_completion_response_text(this.completion_data) : null,
 	);
 
 	prompt_preview: string = $derived.by(() => {

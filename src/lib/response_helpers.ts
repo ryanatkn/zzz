@@ -14,30 +14,6 @@ import type {
 import {Datetime_Now, Uuid} from '$lib/zod_helpers.js';
 
 /**
- * A unified Completion Response type that's compatible with both
- * Zod-inferred types and our manually defined types
- */
-export interface Unified_Completion_Response extends Completion_Response {
-	// Additional compatibility fields can be added here if needed
-}
-
-/**
- * Safe type assertion to cast a completion response to our unified type
- * Returns null for invalid responses to allow for null coalescing
- */
-export const as_unified_response = (response: any): Unified_Completion_Response | null => {
-	// Ensure we have a valid response
-	if (!response) return null;
-
-	// Create a proper Provider_Data object with required value
-	if (response.data?.type && !response.data.value) {
-		response.data.value = {};
-	}
-
-	return response as Unified_Completion_Response;
-};
-
-/**
  * Creates a standard completion response object
  */
 export const create_completion_response = (
@@ -45,7 +21,7 @@ export const create_completion_response = (
 	provider_name: Provider_Name,
 	model: string,
 	provider_data: Provider_Data,
-): Unified_Completion_Response => {
+): Completion_Response => {
 	return {
 		created: Datetime_Now.parse(undefined),
 		request_id: Uuid.parse(request_id),

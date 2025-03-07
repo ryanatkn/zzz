@@ -90,7 +90,8 @@
 					input += text;
 					input_el?.focus();
 				}}
-				attrs={{class: 'plain'}}>{GLYPH_PASTE}</Paste_From_Clipboard
+				attrs={{class: 'plain icon_button size_lg', title: 'paste'}}
+				>{GLYPH_PASTE}</Paste_From_Clipboard
 			>
 			<Clear_Restore_Button
 				value={input}

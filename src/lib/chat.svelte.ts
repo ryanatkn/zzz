@@ -2,15 +2,14 @@ import {z} from 'zod';
 import type {Async_Status} from '@ryanatkn/belt/async.js';
 
 import type {Model} from '$lib/model.svelte.js';
-import {to_completion_response_text, as_unified_response} from '$lib/response_helpers.js';
+import {to_completion_response_text} from '$lib/response_helpers.js';
 import {Completion_Request} from '$lib/message_types.js';
-import {Uuid} from '$lib/zod_helpers.js';
+import {Uuid, Datetime_Now} from '$lib/zod_helpers.js';
 import {get_unique_name} from '$lib/helpers.js';
 import {Tape, Tape_Json} from '$lib/tape.svelte.js';
 import type {Prompt} from '$lib/prompt.svelte.js';
 import {reorder_list} from '$lib/list_helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Datetime_Now} from '$lib/zod_helpers.js';
 import {type Chat_Message, create_chat_message} from '$lib/chat_message.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
 
@@ -170,8 +169,7 @@ export class Chat extends Cell<typeof Chat_Json> {
 		if (!message_updated) return;
 
 		// Get the response text
-		const response_text =
-			to_completion_response_text(as_unified_response(response.completion_response)) || '';
+		const response_text = to_completion_response_text(response.completion_response) || '';
 
 		// Add the assistant's response as a separate message
 		const assistant_message = create_chat_message(response_text, 'assistant', {
@@ -215,10 +213,7 @@ export class Chat extends Cell<typeof Chat_Json> {
 				this.init_name_status = 'initial';
 				return;
 			}
-			const unified_response = as_unified_response(completion_response);
-			const response_text = unified_response
-				? to_completion_response_text(unified_response) || ''
-				: '';
+			const response_text = to_completion_response_text(completion_response) || '';
 			console.log(`response_text`, response_text);
 			if (!response_text) {
 				console.error('unknown inference failure', name_response);

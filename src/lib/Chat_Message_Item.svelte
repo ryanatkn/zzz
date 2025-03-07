@@ -15,7 +15,7 @@
 	class:system={message.role === 'system'}
 >
 	<div class="white_space_pre_wrap overflow_wrap_break_word line_height_md">
-		<small class="mb_xs mr_xs font_weight_600" title={message.created}>@{message.role}</small>
+		<small class="mb_xs font_weight_600" title={message.created}>@{message.role}:</small>
 		{message.content}
 	</div>
 </div>

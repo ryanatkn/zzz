@@ -50,16 +50,17 @@
 			main_input_el?.focus();
 			return;
 		}
+		main_input = '';
 		pending = true;
+		await chat.send_to_all(parsed);
+		pending = false;
+
 		const r = await ollama.chat({
 			model: zzz_config.bots.namerbot,
 			messages: [{role: 'user', content: parsed}],
 			options: {temperature: 1}, // TODO BLOCK same options as server (proxy through our endpoint? we still want to be able to separate the Ollama and server endpoints though, not forced through our proxy)
 		});
-		console.log(`ollama browser response`, r);
-		await chat.send_to_all(parsed);
-		main_input = '';
-		pending = false;
+		console.log(`ollama browser response naming the thing`, r);
 	};
 
 	const count = $derived(chat.tapes.length);
@@ -169,7 +170,8 @@
 					main_input += text;
 					main_input_el?.focus();
 				}}
-				attrs={{class: 'plain'}}>{GLYPH_PASTE}</Paste_From_Clipboard
+				attrs={{class: 'plain icon_button size_lg', title: 'paste'}}
+				>{GLYPH_PASTE}</Paste_From_Clipboard
 			>
 			<Clear_Restore_Button
 				value={main_input}

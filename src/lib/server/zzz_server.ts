@@ -152,26 +152,6 @@ export class Zzz_Server {
 
 				console.log(`texting ${provider_name}:`, prompt.substring(0, 1000));
 
-				// Standardize the response creation pattern across all providers
-				const create_completion_response = (
-					request_id: Uuid,
-					provider_name: Provider_Name,
-					model: string,
-					provider_data: any,
-				): Message_Completion_Response => {
-					return {
-						id: Uuid.parse(undefined),
-						type: 'completion_response',
-						completion_response: {
-							created: Datetime_Now.parse(undefined),
-							request_id,
-							provider_name,
-							model,
-							data: {type: provider_name, value: provider_data},
-						},
-					};
-				};
-
 				switch (provider_name) {
 					case 'ollama': {
 						const listed = await ollama.list();
@@ -346,4 +326,25 @@ const write_json = async (path: string, json: unknown): Promise<void> => {
 	const formatted = await format_file(JSON.stringify(json), {parser: 'json'});
 
 	writeFileSync(path, formatted);
+};
+
+// TODO extract helpers? response helpers?
+// Standardize the response creation pattern across all providers
+const create_completion_response = (
+	request_id: Uuid,
+	provider_name: Provider_Name,
+	model: string,
+	provider_data: any,
+): Message_Completion_Response => {
+	return {
+		id: Uuid.parse(undefined),
+		type: 'completion_response',
+		completion_response: {
+			created: Datetime_Now.parse(undefined),
+			request_id,
+			provider_name,
+			model,
+			data: {type: provider_name, value: provider_data},
+		},
+	};
 };

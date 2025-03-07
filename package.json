@@ -169,30 +169,6 @@
       "svelte": "./dist/Clear_Restore_Button.svelte",
       "default": "./dist/Clear_Restore_Button.svelte"
     },
-    "./Completion_Thread_Info.svelte": {
-      "types": "./dist/Completion_Thread_Info.svelte.d.ts",
-      "svelte": "./dist/Completion_Thread_Info.svelte",
-      "default": "./dist/Completion_Thread_Info.svelte"
-    },
-    "./Completion_Thread_Summary.svelte": {
-      "types": "./dist/Completion_Thread_Summary.svelte.d.ts",
-      "svelte": "./dist/Completion_Thread_Summary.svelte",
-      "default": "./dist/Completion_Thread_Summary.svelte"
-    },
-    "./Completion_Thread_View.svelte": {
-      "types": "./dist/Completion_Thread_View.svelte.d.ts",
-      "svelte": "./dist/Completion_Thread_View.svelte",
-      "default": "./dist/Completion_Thread_View.svelte"
-    },
-    "./completion_thread.svelte.js": {
-      "types": "./dist/completion_thread.svelte.d.ts",
-      "default": "./dist/completion_thread.svelte.js"
-    },
-    "./Completion_Threads_List.svelte": {
-      "types": "./dist/Completion_Threads_List.svelte.d.ts",
-      "svelte": "./dist/Completion_Threads_List.svelte",
-      "default": "./dist/Completion_Threads_List.svelte"
-    },
     "./config_helpers.js": {
       "types": "./dist/config_helpers.d.ts",
       "default": "./dist/config_helpers.js"
@@ -444,11 +420,6 @@
       "svelte": "./dist/Provider_Detail.svelte",
       "default": "./dist/Provider_Detail.svelte"
     },
-    "./Provider_Info.svelte": {
-      "types": "./dist/Provider_Info.svelte.d.ts",
-      "svelte": "./dist/Provider_Info.svelte",
-      "default": "./dist/Provider_Info.svelte"
-    },
     "./Provider_Link.svelte": {
       "types": "./dist/Provider_Link.svelte.d.ts",
       "svelte": "./dist/Provider_Link.svelte",
@@ -472,11 +443,6 @@
     "./provider_types.js": {
       "types": "./dist/provider_types.d.ts",
       "default": "./dist/provider_types.js"
-    },
-    "./Provider_View.svelte": {
-      "types": "./dist/Provider_View.svelte.d.ts",
-      "svelte": "./dist/Provider_View.svelte",
-      "default": "./dist/Provider_View.svelte"
     },
     "./provider.svelte.js": {
       "types": "./dist/provider.svelte.d.ts",
