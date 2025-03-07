@@ -1,5 +1,5 @@
 <script lang="ts">
-	import {scale} from 'svelte/transition';
+	import {scale, slide} from 'svelte/transition';
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
 	import Paste_From_Clipboard from '@ryanatkn/fuz/Paste_From_Clipboard.svelte';
 	import {encode as tokenize} from 'gpt-tokenizer';
@@ -14,6 +14,7 @@
 	import Bit_Stats from '$lib/Bit_Stats.svelte';
 	import Error_Message from '$lib/Error_Message.svelte';
 	import {GLYPH_PASTE} from '$lib/glyphs.js';
+	import {Scrollable} from '$lib/scrollable.svelte.js';
 
 	interface Props {
 		tape: Tape;
@@ -42,6 +43,8 @@
 
 	const tape_messages = $derived(tape.chat_messages);
 
+	const scrollable = new Scrollable();
+
 	// TODO BLOCK add reset button
 
 	// TODO BLOCK edit individual items in the list (contextmenu too - show contextmenu target outline)
@@ -53,7 +56,7 @@
 
 <!-- TODO `duration_2` is the Moss variable for 200ms and 1 for 80ms, but it's not in a usable form -->
 <div class="chat_tape" transition:scale={{duration: 200}}>
-	<div class="header">
+	<div class="flex justify_content_space_between">
 		<header>
 			<div class="size_lg">
 				<Model_Link model={tape.model} icon />
@@ -69,11 +72,15 @@
 		<Confirm_Button onclick={onremove} />
 	</div>
 
-	<div class="messages">
+	<div class="messages" use:scrollable.container use:scrollable.target>
 		{#if tape_messages}
-			{#each tape_messages as message (message.id)}
-				<Chat_Message_Item {message} />
-			{/each}
+			<ul class="unstyled">
+				{#each tape_messages as message (message.id)}
+					<li transition:slide>
+						<Chat_Message_Item {message} />
+					</li>
+				{/each}
+			</ul>
 		{:else}
 			<Error_Message>something went wrong getting this tape's messages</Error_Message>
 		{/if}
@@ -118,10 +125,6 @@
 		gap: var(--space_md);
 		background-color: var(--bg);
 		border-radius: var(--radius_xs);
-	}
-	.header {
-		display: flex;
-		justify-content: space-between;
 	}
 	.messages {
 		display: flex;
