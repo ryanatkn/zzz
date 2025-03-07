@@ -15,6 +15,8 @@ export interface Cell_Options<T_Schema extends z.ZodType> {
 	json?: z.input<T_Schema>;
 }
 
+// TODO BLOCK maybe `id` belongs on `Cell`, so we can do things with that - then the schema needs a constraint, maybe a base cell schema (and _options) gets extended
+
 // TODO maybe rename to `Json_Cell` to be more explicit? Or `Snapshottable`?
 export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> {
 	readonly schema: T_Schema; // TODO think about making this $state - dynamic schemas? idk, not yet
