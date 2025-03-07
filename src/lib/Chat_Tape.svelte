@@ -42,6 +42,8 @@
 
 	const tape_messages = $derived(tape.chat_messages);
 
+	// TODO BLOCK show pending animation
+
 	// TODO BLOCK the link should instead be a model picker (dialog? or overlaid without a bg maybe?)
 </script>
 
