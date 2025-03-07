@@ -27,7 +27,7 @@ export type Diskfiles_Json = z.infer<typeof Diskfiles_Json>;
 export interface Diskfiles_Options extends Cell_Options<typeof Diskfiles_Json> {}
 
 export class Diskfiles extends Cell<typeof Diskfiles_Json> {
-	items: Array<Diskfile> = $state([]);
+	files: Array<Diskfile> = $state([]);
 	selected_file_id: Uuid | null = $state(null);
 
 	// TODO these are managed incrementally instead of using `$derived`, which makes the code more efficient but harder to follow and more error prone, maybe rethink, or put additional abstraction around it for safeguards
@@ -35,7 +35,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 	by_id: SvelteMap<Uuid, Diskfile> = new SvelteMap();
 	by_path: SvelteMap<Diskfile_Path, Uuid> = new SvelteMap();
 
-	non_external_files: Array<Diskfile> = $derived(this.items.filter((file) => !file.external));
+	non_external_files: Array<Diskfile> = $derived(this.files.filter((file) => !file.external));
 	files_map: Map<string, Diskfile> = $derived(
 		new Map(this.non_external_files.map((f) => [f.id, f])),
 	);
@@ -62,7 +62,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 		this.by_id.clear();
 		this.by_path.clear();
 
-		for (const file of this.items) {
+		for (const file of this.files) {
 			if (file.id && file.path) {
 				this.by_id.set(file.id, file);
 				this.by_path.set(file.path, file.id);
@@ -96,7 +96,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 		switch (message.change.type) {
 			case 'add': {
 				const diskfile = this.#create_diskfile(validated_source_file);
-				this.items.push(diskfile);
+				this.files.push(diskfile);
 				this.by_id.set(diskfile.id, diskfile);
 				this.by_path.set(diskfile.path, diskfile.id);
 				break;
@@ -121,7 +121,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 				} else {
 					// If it doesn't exist yet, create a new one
 					const diskfile = this.#create_diskfile(validated_source_file);
-					this.items.push(diskfile);
+					this.files.push(diskfile);
 					this.by_id.set(diskfile.id, diskfile);
 					this.by_path.set(diskfile.path, diskfile.id);
 				}
@@ -131,9 +131,9 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 				const diskfile_id = this.by_path.get(validated_source_file.id);
 				if (diskfile_id) {
 					// Remove from the files array
-					const index = this.items.findIndex((f) => f.id === diskfile_id);
+					const index = this.files.findIndex((f) => f.id === diskfile_id);
 					if (index >= 0) {
-						this.items.splice(index, 1);
+						this.files.splice(index, 1);
 					}
 
 					this.by_id.delete(diskfile_id);
