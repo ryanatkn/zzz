@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Messages_List from '$lib/Messages_List.svelte';
 	import Message_Detail from '$lib/Message_Detail.svelte';
-	import Text_Icon from '$lib/Text_Icon.svelte';
+	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
 	import {GLYPH_MESSAGE} from '$lib/glyphs.js';
 	import type {Message} from '$lib/message.svelte.js';
 
@@ -13,7 +13,7 @@
 </script>
 
 <div class="column p_lg h_100">
-	<h1><Text_Icon icon={GLYPH_MESSAGE} /> messages</h1>
+	<h1><Glyph_Icon icon={GLYPH_MESSAGE} /> messages</h1>
 	<p>System messages between client and server.</p>
 
 	<div

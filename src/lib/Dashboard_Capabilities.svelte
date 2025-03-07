@@ -2,7 +2,7 @@
 	import {DEV} from 'esm-env';
 
 	import {GLYPH_CAPABILITY} from '$lib/glyphs.js';
-	import Text_Icon from '$lib/Text_Icon.svelte';
+	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
 	import Breadcrumb from '@ryanatkn/fuz/Breadcrumb.svelte';
 	import Library_Footer from '@ryanatkn/fuz/Library_Footer.svelte';
 	import Svg from '@ryanatkn/fuz/Svg.svelte';
@@ -19,7 +19,7 @@
 
 <div class="p_lg">
 	<header>
-		<h1><Text_Icon icon={GLYPH_CAPABILITY} /> system capabilities</h1>
+		<h1><Glyph_Icon icon={GLYPH_CAPABILITY} /> system capabilities</h1>
 	</header>
 	<section class="width_md">
 		<h2>todo</h2>

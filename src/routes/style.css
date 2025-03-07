@@ -24,7 +24,7 @@ h6 {
 	transform: scale(1.14);
 }
 
-/* TODO refactor with `Text_Icon`*/
+/* TODO refactor with `Glyph_Icon`*/
 .icon_xs {
 	display: flex;
 	align-items: center;

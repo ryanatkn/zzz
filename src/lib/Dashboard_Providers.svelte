@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Provider_Link from '$lib/Provider_Link.svelte';
 	import Model_Link from '$lib/Model_Link.svelte';
-	import Text_Icon from '$lib/Text_Icon.svelte';
+	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
 	import {GLYPH_PROVIDER} from '$lib/glyphs.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import External_Link from '$lib/External_Link.svelte';
@@ -12,7 +12,7 @@
 </script>
 
 <div class="p_lg">
-	<h1><Text_Icon icon={GLYPH_PROVIDER} /> providers</h1>
+	<h1><Glyph_Icon icon={GLYPH_PROVIDER} /> providers</h1>
 	<div class="providers_grid">
 		{#each zzz.providers.items as provider (provider)}
 			<div class="panel p_lg">
@@ -33,7 +33,7 @@
 						<img src={provider.icon} alt={`${provider.title} icon`} class="provider_icon" />
 					</div>
 				{/if}
-				<!-- <h3><Text_Icon icon={GLYPH_MODEL} /> models</h3> -->
+				<!-- <h3><Glyph_Icon icon={GLYPH_MODEL} /> models</h3> -->
 				<ul class="unstyled">
 					{#each models.items.filter((m) => m.provider_name === provider.name) as model (model)}
 						<li class="row flex_wrap mb_xs3">

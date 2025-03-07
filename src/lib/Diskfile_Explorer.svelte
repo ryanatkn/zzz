@@ -38,14 +38,20 @@
 	{:else}
 		<ul class="unstyled">
 			{#each sorted_files as file (file.id)}
-				<li transition:slide>
-					<Diskfile_List_Item
-						{file}
-						selected={diskfiles.selected_file_id === file.id}
-						onclick={select_file}
-					/>
+				{@const selected = diskfiles.selected_file_id === file.id}
+				<li transition:slide class:selected>
+					<Diskfile_List_Item {file} {selected} onclick={select_file} />
 				</li>
 			{/each}
 		</ul>
 	{/if}
 </div>
+
+<style>
+	.selected {
+		position: sticky;
+		top: 0;
+		bottom: 0;
+		background-color: var(--bg); /* TODO needs to be opaque but this is a hack */
+	}
+</style>

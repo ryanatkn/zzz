@@ -33,11 +33,11 @@
 	<div class="h_100 w_100 fixed t_0 l_0" style:padding-left="var(--sidebar_width)">
 		{@render children()}
 	</div>
-	<div class="h_100 fixed t_0 l_0" style:width="var(--sidebar_width)">
+	<div class="h_100 fixed t_0 l_0 overflow_auto" style:width="var(--sidebar_width)">
 		<!-- TODO refactor -->
-		<div class="h_100 w_100 p_sm" style:width="var(--sidebar_width)">
+		<div class="p_sm">
 			<!-- TODO support `max_height_100` in Moss -->
-			<nav class="size_lg overflow_auto" style:max-height="100%">
+			<nav class="size_lg">
 				<div class="flex p_sm mb_sm">
 					<Nav_Link
 						href="{base}/"

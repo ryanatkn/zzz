@@ -488,6 +488,9 @@ a.chip {
 .text_align_right {
 	text-align: right;
 }
+.user_select_none {
+	user-select: none;
+}
 .w_100 {
 	width: 100%;
 }

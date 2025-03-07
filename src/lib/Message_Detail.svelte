@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
 
-	import Text_Icon from '$lib/Text_Icon.svelte';
+	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
 	import {GLYPH_PROMPT, GLYPH_RESPONSE, GLYPH_FILE, GLYPH_MESSAGE} from '$lib/glyphs.js';
 	import type {Message} from '$lib/message.svelte.js';
 
@@ -15,13 +15,13 @@
 <div class="mb_md">
 	<div class="size_lg">
 		{#if message.is_prompt}
-			<Text_Icon icon={GLYPH_PROMPT} /> Prompt
+			<Glyph_Icon icon={GLYPH_PROMPT} /> Prompt
 		{:else if message.is_completion}
-			<Text_Icon icon={GLYPH_RESPONSE} /> Response
+			<Glyph_Icon icon={GLYPH_RESPONSE} /> Response
 		{:else if message.is_file_related}
-			<Text_Icon icon={GLYPH_FILE} /> File {message.type}
+			<Glyph_Icon icon={GLYPH_FILE} /> File {message.type}
 		{:else}
-			<Text_Icon icon={GLYPH_MESSAGE} /> {message.type}
+			<Glyph_Icon icon={GLYPH_MESSAGE} /> {message.type}
 		{/if}
 		<span class="size_sm color_subtle ml_xs">{message.direction}</span>
 	</div>

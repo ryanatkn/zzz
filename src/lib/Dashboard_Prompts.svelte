@@ -5,7 +5,7 @@
 
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Nav_Link from '$lib/Nav_Link.svelte';
-	import Text_Icon from '$lib/Text_Icon.svelte';
+	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
 	import Bit_View from '$lib/Bit_View.svelte';
 	import {GLYPH_BIT, GLYPH_PROMPT, GLYPH_REMOVE} from '$lib/glyphs.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
@@ -32,7 +32,7 @@
 			<div class="p_sm bg radius_xs2" transition:slide>
 				<div class="column">
 					<div class="size_lg">
-						<Text_Icon icon={GLYPH_PROMPT} />
+						<Glyph_Icon icon={GLYPH_PROMPT} />
 						{zzz.prompts.selected.name}
 					</div>
 					<small>{zzz.prompts.selected.id}</small>
@@ -91,7 +91,7 @@
 	{#if zzz.prompts.selected}
 		<div class="width_sm column gap_md">
 			<div class="panel p_sm">
-				<div class="size_lg"><Text_Icon icon={GLYPH_PROMPT} /> prompt</div>
+				<div class="size_lg"><Glyph_Icon icon={GLYPH_PROMPT} /> prompt</div>
 				{#if zzz.prompts.selected}
 					<div class="row gap_sm mt_md mb_sm">
 						<Copy_To_Clipboard text={zzz.prompts.selected.content} attrs={{class: 'plain'}} />
@@ -161,7 +161,7 @@
 
 	{#if zzz.prompts.selected}
 		<div class="panel p_sm width_sm">
-			<header class="size_lg mb_lg"><Text_Icon icon={GLYPH_BIT} /> bits</header>
+			<header class="size_lg mb_lg"><Glyph_Icon icon={GLYPH_BIT} /> bits</header>
 			<Bit_List prompt={zzz.prompts.selected} />
 		</div>
 	{/if}

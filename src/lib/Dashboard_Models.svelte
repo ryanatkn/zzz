@@ -1,7 +1,7 @@
 <script lang="ts">
 	import {GLYPH_MODEL} from '$lib/glyphs.js';
 	import Model_Summary from '$lib/Model_Summary.svelte';
-	import Text_Icon from '$lib/Text_Icon.svelte';
+	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 
 	const zzz = zzz_context.get();
@@ -12,7 +12,7 @@
 </script>
 
 <div class="p_lg">
-	<h1><Text_Icon icon={GLYPH_MODEL} /> models</h1>
+	<h1><Glyph_Icon icon={GLYPH_MODEL} /> models</h1>
 	<div class="models_grid">
 		{#each zzz.models.items as model (model)}
 			<Model_Summary {model} />

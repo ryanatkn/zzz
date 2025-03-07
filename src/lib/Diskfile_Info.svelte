@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import {GLYPH_FILE} from '$lib/glyphs.js';
-	import Text_Icon from '$lib/Text_Icon.svelte';
+	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
 	import {to_root_path} from '$lib/path.js';
 
 	interface Props {
@@ -13,7 +13,7 @@
 
 <div class="flex flex_column gap_xs">
 	<small class="overflow_wrap_break_word">
-		<Text_Icon icon={GLYPH_FILE} />
+		<Glyph_Icon icon={GLYPH_FILE} />
 		{to_root_path(file.path)}
 	</small>
 	<small class="font_mono">{file.id}</small>

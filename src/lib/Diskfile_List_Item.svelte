@@ -4,7 +4,7 @@
 
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import {to_root_path} from '$lib/path.js';
-	import Text_Icon from '$lib/Text_Icon.svelte';
+	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
 	import {GLYPH_FILE, GLYPH_REMOVE, GLYPH_COPY} from '$lib/glyphs.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 
@@ -33,7 +33,7 @@
 	use:contextmenu_action={contextmenu_entries}
 >
 	<div class="ellipsis">
-		<Text_Icon icon={GLYPH_FILE} />
+		<Glyph_Icon icon={GLYPH_FILE} />
 		<span>{display_name}</span>
 	</div>
 </button>

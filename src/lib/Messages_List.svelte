@@ -2,7 +2,7 @@
 	import type {SvelteHTMLElements} from 'svelte/elements';
 	import {slide} from 'svelte/transition';
 
-	import Text_Icon from '$lib/Text_Icon.svelte';
+	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import type {Message} from '$lib/message.svelte.js';
 	import {get_icon_for_message_type, get_direction_icon} from '$lib/glyphs.js';
@@ -40,8 +40,8 @@
 			transition:slide
 		>
 			<div class="font_weight_400 flex align_items_center gap_xs w_100">
-				<Text_Icon icon={get_icon_for_message_type(message.type)} />
-				<Text_Icon icon={get_direction_icon(message.direction)} />
+				<Glyph_Icon icon={get_icon_for_message_type(message.type)} />
+				<Glyph_Icon icon={get_direction_icon(message.direction)} />
 				<span class="font_mono flex_1">{message.type}</span>
 				<span class="font_mono size_sm ml_auto">{message.created_formatted_time}</span>
 			</div>

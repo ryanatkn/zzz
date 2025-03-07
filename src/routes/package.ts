@@ -36,7 +36,7 @@ export const package_json = {
 		'@ryanatkn/eslint-config': '^0.7.0',
 		'@ryanatkn/fuz': '^0.133.1',
 		'@ryanatkn/gro': '^0.148.0',
-		'@ryanatkn/moss': '^0.23.0',
+		'@ryanatkn/moss': '^0.23.1',
 		'@sveltejs/adapter-static': '^3.0.8',
 		'@sveltejs/kit': '^2.17.2',
 		'@sveltejs/package': '^2.3.10',
@@ -211,6 +211,11 @@ export const package_json = {
 			types: './dist/diskfile_helpers.d.ts',
 			default: './dist/diskfile_helpers.js',
 		},
+		'./Diskfile_Info.svelte': {
+			types: './dist/Diskfile_Info.svelte.d.ts',
+			svelte: './dist/Diskfile_Info.svelte',
+			default: './dist/Diskfile_Info.svelte',
+		},
 		'./Diskfile_List_Item.svelte': {
 			types: './dist/Diskfile_List_Item.svelte.d.ts',
 			svelte: './dist/Diskfile_List_Item.svelte',
@@ -242,6 +247,11 @@ export const package_json = {
 			types: './dist/External_Link.svelte.d.ts',
 			svelte: './dist/External_Link.svelte',
 			default: './dist/External_Link.svelte',
+		},
+		'./Glyph_Icon.svelte': {
+			types: './dist/Glyph_Icon.svelte.d.ts',
+			svelte: './dist/Glyph_Icon.svelte',
+			default: './dist/Glyph_Icon.svelte',
 		},
 		'./glyphs.js': {types: './dist/glyphs.d.ts', default: './dist/glyphs.js'},
 		'./helpers.js': {types: './dist/helpers.d.ts', default: './dist/helpers.js'},
@@ -428,11 +438,6 @@ export const package_json = {
 		},
 		'./tape.svelte.js': {types: './dist/tape.svelte.d.ts', default: './dist/tape.svelte.js'},
 		'./test.task.js': {types: './dist/test.task.d.ts', default: './dist/test.task.js'},
-		'./Text_Icon.svelte': {
-			types: './dist/Text_Icon.svelte.d.ts',
-			svelte: './dist/Text_Icon.svelte',
-			default: './dist/Text_Icon.svelte',
-		},
 		'./ui.svelte.js': {types: './dist/ui.svelte.d.ts', default: './dist/ui.svelte.js'},
 		'./Xml_Attribute_Input.svelte': {
 			types: './dist/Xml_Attribute_Input.svelte.d.ts',
@@ -576,6 +581,7 @@ export const src_json = {
 				{name: 'source_file_to_diskfile_json', kind: 'function'},
 			],
 		},
+		'./Diskfile_Info.svelte': {path: 'Diskfile_Info.svelte', declarations: []},
 		'./Diskfile_List_Item.svelte': {path: 'Diskfile_List_Item.svelte', declarations: []},
 		'./diskfile_types.js': {
 			path: 'diskfile_types.ts',
@@ -606,6 +612,7 @@ export const src_json = {
 		'./Error_Message.svelte': {path: 'Error_Message.svelte', declarations: []},
 		'./External_Link_Symbol.svelte': {path: 'External_Link_Symbol.svelte', declarations: []},
 		'./External_Link.svelte': {path: 'External_Link.svelte', declarations: []},
+		'./Glyph_Icon.svelte': {path: 'Glyph_Icon.svelte', declarations: []},
 		'./glyphs.js': {
 			path: 'glyphs.ts',
 			declarations: [
@@ -873,7 +880,6 @@ export const src_json = {
 				{name: 'task', kind: 'variable'},
 			],
 		},
-		'./Text_Icon.svelte': {path: 'Text_Icon.svelte', declarations: []},
 		'./ui.svelte.js': {
 			path: 'ui.svelte.ts',
 			declarations: [
