@@ -30,9 +30,15 @@
 		{#if zzz.prompts.selected}
 			<div class="p_sm bg radius_xs2" transition:slide>
 				<div class="column">
-					<div class="size_lg">
-						<Glyph_Icon icon={GLYPH_PROMPT} />
-						{zzz.prompts.selected.name}
+					<div class="flex justify_content_space_between">
+						<div class="size_lg">
+							<Glyph_Icon icon={GLYPH_PROMPT} />
+							{zzz.prompts.selected.name}
+						</div>
+						<Confirm_Button
+							onclick={() => zzz.prompts.selected && zzz.prompts.remove(zzz.prompts.selected)}
+							attrs={{title: `remove Prompt ${zzz.prompts.selected.id}`}}
+						/>
 					</div>
 					<small>{zzz.prompts.selected.id}</small>
 					<small>
@@ -40,12 +46,6 @@
 						bit{#if zzz.prompts.selected.bits.length !== 1}s{/if}
 					</small>
 					<small>created {zzz.prompts.selected.created_formatted_short_date}</small>
-					<div class="flex justify_content_end">
-						<Confirm_Button
-							onclick={() => zzz.prompts.selected && zzz.prompts.remove(zzz.prompts.selected)}
-							attrs={{title: `remove Prompt ${zzz.prompts.selected.id}`}}
-						/>
-					</div>
 				</div>
 			</div>
 		{/if}
