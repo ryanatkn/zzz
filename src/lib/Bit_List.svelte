@@ -1,4 +1,6 @@
 <script lang="ts">
+	import {slide} from 'svelte/transition';
+
 	import type {Prompt} from '$lib/prompt.svelte.js';
 	import {Reorderable} from '$lib/reorderable.svelte.js';
 	import Bit_Summary from '$lib/Bit_Summary.svelte';
@@ -26,7 +28,7 @@
 		}}
 	>
 		{#each prompt.bits as bit, i (bit.id)}
-			<li class="radius_xs" use:reorderable.item={{index: i}}>
+			<li class="radius_xs" use:reorderable.item={{index: i}} transition:slide>
 				<Bit_Summary {bit} {prompt} />
 			</li>
 		{/each}
