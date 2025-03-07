@@ -69,8 +69,8 @@
 	</div>
 
 	{#if zzz.prompts.selected}
-		<div class="width_sm h_100">
-			<div class="panel p_sm">
+		<div class="width_sm min_width_sm h_100 overflow_auto scrollbar_width_thin">
+			<div class="p_sm">
 				<div class="size_lg"><Glyph_Icon icon={GLYPH_PROMPT} /> prompt</div>
 				{#if zzz.prompts.selected}
 					<div class="row gap_sm mt_md mb_sm">
@@ -78,7 +78,7 @@
 						<Prompt_Stats prompt={zzz.prompts.selected} />
 					</div>
 					<pre
-						class="panel p_xs overflow_auto scrollbar_width_thin"
+						class="panel px_md py_xs overflow_auto scrollbar_width_thin"
 						style:height="300px"
 						style:max-height="300px">{zzz.prompts.selected.content}</pre>
 					<!-- TODO something like these? -->
@@ -140,7 +140,7 @@
 			</div>
 		</div>
 
-		<div class="width_sm h_100" in:slide>
+		<div class="width_sm min_width_sm h_100 overflow_auto scrollbar_width_thin" in:slide>
 			<div class="column p_sm">
 				<div class="flex justify_content_space_between">
 					<div class="size_lg">
