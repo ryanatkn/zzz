@@ -2,7 +2,7 @@
 	import {scale} from 'svelte/transition';
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
 	import Paste_From_Clipboard from '@ryanatkn/fuz/Paste_From_Clipboard.svelte';
-	import {encode} from 'gpt-tokenizer';
+	import {encode as tokenize} from 'gpt-tokenizer';
 	import Pending_Button from '@ryanatkn/fuz/Pending_Button.svelte';
 
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
@@ -24,7 +24,7 @@
 	const {tape, onremove, onsend}: Props = $props();
 
 	let input = $state('');
-	const input_tokens = $derived(encode(input));
+	const input_tokens = $derived(tokenize(input));
 	let input_el: HTMLTextAreaElement | undefined;
 	let pending = $state(false);
 
@@ -129,6 +129,7 @@
 		gap: 0.5rem;
 		max-height: 400px;
 		overflow-y: auto;
+		scrollbar-width: thin;
 	}
 	textarea {
 		height: 80px;

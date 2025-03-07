@@ -2,7 +2,7 @@
 	import Pending_Button from '@ryanatkn/fuz/Pending_Button.svelte';
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
 	import Paste_From_Clipboard from '@ryanatkn/fuz/Paste_From_Clipboard.svelte';
-	import {encode} from 'gpt-tokenizer';
+	import {encode as tokenize} from 'gpt-tokenizer';
 
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import {Chat} from '$lib/chat.svelte.js';
@@ -37,7 +37,7 @@
 		}
 	}
 	let main_input = $state(''); // TODO BLOCK @many this state probably belongs on the `multichat` object
-	const main_input_tokens = $derived(encode(main_input));
+	const main_input_tokens = $derived(tokenize(main_input));
 
 	let pending = $state(false); // TODO BLOCK @many this state probably belongs on the `multichat` object
 	let main_input_el: HTMLTextAreaElement | undefined;

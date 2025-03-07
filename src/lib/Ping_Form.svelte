@@ -59,6 +59,7 @@
 <style>
 	.ping_list {
 		overflow-y: auto;
+		scrollbar-width: thin;
 		display: flex;
 		flex-direction: column;
 		background: var(--fg_1);

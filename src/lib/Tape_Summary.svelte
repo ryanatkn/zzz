@@ -22,7 +22,15 @@
 		<div class="flex_1">
 			<div class="font_weight_600">{tape.model.name}</div>
 			<div class="flex gap_xs">
-				<small>{message_count} message{message_count !== 1 ? 's' : ''}</small>
+				{#if message_count > 0}
+					<small
+						>{message_count} message{message_count !== 1 ? 's' : ''}, {tape.token_count} token{tape.token_count !==
+						1
+							? 's'
+							: ''}</small
+					>
+				{:else}&nbsp;
+				{/if}
 			</div>
 		</div>
 		<div>

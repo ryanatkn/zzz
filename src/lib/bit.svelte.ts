@@ -1,4 +1,4 @@
-import {encode} from 'gpt-tokenizer';
+import {encode as tokenize} from 'gpt-tokenizer';
 import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
@@ -29,7 +29,7 @@ export class Bit extends Cell<typeof Bit_Json> {
 	content: string = $state()!;
 
 	length: number = $derived(this.content.length);
-	tokens: Array<number> = $derived(encode(this.content));
+	tokens: Array<number> = $derived(tokenize(this.content));
 	token_count: number = $derived(this.tokens.length);
 
 	constructor(options: Bit_Options) {

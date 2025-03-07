@@ -1,4 +1,4 @@
-import {encode} from 'gpt-tokenizer';
+import {encode as tokenize} from 'gpt-tokenizer';
 import {z} from 'zod';
 
 import {Uuid} from '$lib/zod_helpers.js';
@@ -45,7 +45,7 @@ export class Prompt extends Cell<typeof Prompt_Json> {
 	content: string = $derived(join_prompt_bits(this.bits));
 
 	length: number = $derived(this.content.length);
-	tokens: Array<number> = $derived(encode(this.content)); // TODO @many eager computation in some UI cases is bad UX with large values (e.g. bottleneck typing)
+	tokens: Array<number> = $derived(tokenize(this.content)); // TODO @many eager computation in some UI cases is bad UX with large values (e.g. bottleneck typing)
 	token_count: number = $derived(this.tokens.length);
 	content_truncated: string = $derived(
 		this.content.length > PROMPT_CONTENT_TRUNCATED_LENGTH

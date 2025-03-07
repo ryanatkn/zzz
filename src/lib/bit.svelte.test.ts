@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 
 import {test, expect} from 'vitest';
-import {encode} from 'gpt-tokenizer';
+import {encode as tokenize} from 'gpt-tokenizer';
 
 import {Bit, Bit_Json} from '$lib/bit.svelte.js';
 import {Uuid} from '$lib/zod_helpers.js';
@@ -73,7 +73,7 @@ test('clone - derived properties are calculated correctly', () => {
 	// Instead of a direct token count comparison, just verify they exist
 	expect(clone.token_count).toBe(original.token_count);
 
-	// Don't compare to encode() directly - instead compare with the original
+	// Don't compare to tokenize() directly - instead compare with the original
 	expect(clone.tokens.length).toBe(original.tokens.length);
 
 	// Verify derived properties update independently
@@ -474,7 +474,7 @@ test('edge_case - very long content is handled correctly', () => {
 	});
 
 	expect(bit.length).toBe(10000);
-	expect(bit.tokens).toEqual(encode(long_content));
+	expect(bit.tokens).toEqual(tokenize(long_content));
 
 	const clone = bit.clone();
 	expect(clone.length).toBe(10000);
@@ -690,7 +690,7 @@ test('initialization - properties are properly initialized from options.json', (
 
 	// Verify derived properties calculated after initialization
 	expect(bit.length).toBe(test_content.length);
-	expect(bit.token_count).toBe(encode(test_content).length);
+	expect(bit.token_count).toBe(tokenize(test_content).length);
 });
 
 // Test for subclass that forgets to call init()

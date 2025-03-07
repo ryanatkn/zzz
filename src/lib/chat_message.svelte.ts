@@ -1,4 +1,5 @@
 import {z} from 'zod';
+import {encode as tokenize} from 'gpt-tokenizer';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Datetime_Now, Uuid} from '$lib/zod_helpers.js';
@@ -25,11 +26,15 @@ export type Chat_Message_Json = z.infer<typeof Chat_Message_Json>;
 export interface Chat_Message_Options extends Cell_Options<typeof Chat_Message_Json> {}
 
 export class Chat_Message extends Cell<typeof Chat_Message_Json> {
-	content: string = $state()!;
+	content: string = $state()!; // TODO BLOCK should this reference bits? (a message could be an array of bits and/or text?) when a tape gets copied, should the chat messages be copied too?
 	tape_id: Uuid | null | undefined = $state();
 	role: Chat_Message_Role = $state()!;
 	request?: Completion_Request = $state();
 	response?: z.infer<typeof Completion_Response> = $state();
+
+	length: number = $derived(this.content.length);
+	tokens: Array<number> = $derived(tokenize(this.content));
+	token_count: number = $derived(this.tokens.length);
 
 	constructor(options: Chat_Message_Options) {
 		super(Chat_Message_Json, options);

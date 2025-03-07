@@ -1,26 +1,11 @@
-import {z} from 'zod';
+import {encode as tokenize} from 'gpt-tokenizer';
 
-import {Model_Name, type Model} from '$lib/model.svelte.js';
-import {Uuid, Datetime_Now} from '$lib/zod_helpers.js';
+import {type Model} from '$lib/model.svelte.js';
+import type {Uuid} from '$lib/zod_helpers.js';
 import type {Chat_Message} from '$lib/chat_message.svelte.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {cell_array} from '$lib/cell_helpers.js';
-import {Cell_Json} from '$lib/cell_types.js';
-
-export const Tape_Json = Cell_Json.extend({
-	id: Uuid,
-	created: Datetime_Now,
-	model_name: Model_Name.default(''), // TODO BLOCK `model_id`?
-	chat_messages: cell_array(
-		z.array(z.any()).default(() => []),
-		'Chat_Message',
-	),
-});
-
-// TODO BLOCK should tapes be immutable, so the single model makes sense?
-// TODO BLOCK I think we need a way to say at each step what the model was?
-
-export type Tape_Json = z.infer<typeof Tape_Json>;
+import {Tape_Json} from '$lib/tape_types.js';
+import {render_tape} from '$lib/tape_helpers.js';
 
 export interface Tape_Options extends Cell_Options<typeof Tape_Json> {}
 
@@ -39,6 +24,11 @@ export class Tape extends Cell<typeof Tape_Json> {
 	chat_messages_by_id: Map<Uuid, Chat_Message> = $derived(
 		new Map(this.chat_messages.map((m) => [m.id, m])),
 	); // TODO @many incrementally update with a helper class
+
+	content: string = $derived(render_tape(this.chat_messages));
+	length: number = $derived(this.content.length);
+	tokens: Array<number> = $derived(tokenize(this.content));
+	token_count: number = $derived(this.tokens.length);
 
 	constructor(options: Tape_Options) {
 		super(Tape_Json, options);

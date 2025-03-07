@@ -1,5 +1,5 @@
 import {format} from 'date-fns';
-import {encode} from 'gpt-tokenizer';
+import {encode as tokenize} from 'gpt-tokenizer';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Diskfile_Json, type Diskfile_Path, type Source_File} from '$lib/diskfile_types.js';
@@ -40,7 +40,7 @@ export class Diskfile extends Cell<typeof Diskfile_Json> {
 	// TODO BLOCK maybe have a Bit for this? just for text files?
 	content_length: number = $derived(this.contents?.length ?? 0);
 	contents_tokens: Array<number> | null = $derived(
-		this.contents === null ? null : encode(this.contents),
+		this.contents === null ? null : tokenize(this.contents),
 	);
 	contents_token_count: number | undefined = $derived(this.contents_tokens?.length);
 
