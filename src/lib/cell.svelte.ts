@@ -156,13 +156,13 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> {
 		const has_parser = key in this.parsers;
 		const has_property = key in this;
 
-		// 2. If we don't have a property or parser, we can't proceed
+		// 2. If we don't have a property or parser, log an error and bail
 		if (!has_property && !has_parser) {
-			throw new Error(
-				`Schema key "${key}" not found as a property on instance of ${this.constructor.name}. ` +
-					`All schema keys must have corresponding class properties. ` +
-					`Either add a "${key}" property to the class, or provide a custom parser for this key.`,
+			console.error(
+				`Schema key "${key}" in ${this.constructor.name} has no matching property or parser. ` +
+					`Consider adding the property or a parser.`,
 			);
+			return;
 		}
 
 		// 3. Try to use the parser if available
