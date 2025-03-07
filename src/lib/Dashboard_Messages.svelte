@@ -12,11 +12,15 @@
 	};
 </script>
 
-<div class="p_lg h_100">
+<div class="column p_lg h_100">
 	<h1><Text_Icon icon={GLYPH_MESSAGE} /> messages</h1>
 	<p>System messages between client and server.</p>
 
-	<div class="grid mt_md h_100" style="grid-template-columns: 320px 1fr; gap: var(--space_md)">
+	<div
+		class="flex_1 grid mt_md"
+		style:grid-template-columns="320px 1fr"
+		style:gap="var(--space_md)"
+	>
 		<div class="overflow_y_auto border_right">
 			<Messages_List
 				limit={100}

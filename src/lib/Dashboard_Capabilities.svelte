@@ -28,6 +28,7 @@
 			many contexts, and users are empowered by the capabilities available in each.
 		</aside>
 		<ul>
+			<li>local Ollama API</li>
 			<li>utility models (like the first one for `namerbot`)</li>
 			<li>Node server</li>
 			<ul class="mb_0">
