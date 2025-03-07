@@ -18,8 +18,8 @@ export const Diskfiles_Json = z
 		selected_file_id: Uuid.nullable().default(null),
 	})
 	.default(() => ({
-		files: [],
-		selected_file_id: null,
+		files: [], // TODO redundant with the above
+		selected_file_id: null, // TODO redundant with the above
 	}));
 
 export type Diskfiles_Json = z.infer<typeof Diskfiles_Json>;
