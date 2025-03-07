@@ -75,9 +75,7 @@
 				<a href="{base}/spaces" class:selected={page.url.pathname === base + '/spaces'}>spaces</a> -->
 
 				<!-- AI Tools -->
-				<div class="size_xl font_serif mt_xl7 mb_md text_color_3 font_weight_400 line_through">
-					AI
-				</div>
+				<div class="size_xl font_serif mt_xl7 mb_md text_color_3 font_weight_400">AI</div>
 				<Nav_Link href="{base}/models"
 					><Glyph_Icon icon={GLYPH_MODEL} attrs={{class: 'icon_xs'}} /> models</Nav_Link
 				>
@@ -90,9 +88,7 @@
 				<a href="{base}/providers" class:selected={page.url.pathname === base + '/provider'}>providers</a> -->
 
 				<!-- System -->
-				<div class="size_xl font_serif mt_xl7 mb_md text_color_3 font_weight_400 line_through">
-					System
-				</div>
+				<div class="size_xl font_serif mt_xl7 mb_md text_color_3 font_weight_400">System</div>
 				<Nav_Link href="{base}/about">
 					{#snippet children(selected)}<span class="icon_xs"
 							><Svg

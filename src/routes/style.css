@@ -138,24 +138,3 @@ h6 {
 /* .drag_over_invalid::before {
 	background-color: var(--color_c_5);
 } */
-
-.line_through {
-	width: 100%;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-}
-.line_through::before,
-.line_through::after {
-	content: '';
-	flex-grow: 1;
-	height: 0;
-	border-bottom: var(--line_through_width, var(--border_width_2)) var(--line_through_style, dotted)
-		var(--line_through_color, var(--border_color_4));
-}
-.line_through::before {
-	margin-right: var(--line_through_spacing, 1ch);
-}
-.line_through::after {
-	margin-left: var(--line_through_spacing, 1ch);
-}
