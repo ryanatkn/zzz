@@ -12,10 +12,13 @@
 	import Prompt_Stats from '$lib/Prompt_Stats.svelte';
 	import Bit_List from '$lib/Bit_List.svelte';
 	import {Reorderable} from '$lib/reorderable.svelte.js';
+	import {Scrollable} from '$lib/scrollable.svelte.js';
 
 	const zzz = zzz_context.get();
 
 	const reorderable = new Reorderable();
+
+	const scrollable = new Scrollable();
 
 	// TODO BLOCK integrate with sources like the local filesystem (just the `zzz.files`?)
 
@@ -78,7 +81,9 @@
 						<Prompt_Stats prompt={zzz.prompts.selected} />
 					</div>
 					<pre
-						class="panel px_md py_xs overflow_auto scrollbar_width_thin"
+						use:scrollable.container
+						use:scrollable.target
+						class="font_sans size_sm panel px_md py_xs overflow_auto scrollbar_width_thin"
 						style:height="300px"
 						style:max-height="300px">{zzz.prompts.selected.content}</pre>
 					<!-- TODO something like these? -->
@@ -159,7 +164,7 @@
 				</small>
 				<small>created {zzz.prompts.selected.created_formatted_short_date}</small>
 			</div>
-			<div class="panel p_sm mt_lg">
+			<div class="p_sm mt_xl3">
 				<header class="size_lg mb_lg"><Glyph_Icon icon={GLYPH_BIT} /> bits</header>
 				<Bit_List prompt={zzz.prompts.selected} />
 			</div>

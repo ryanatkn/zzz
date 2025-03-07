@@ -96,6 +96,9 @@ a.chip {
 .font_mono {
 	font-family: var(--font_mono);
 }
+.font_sans {
+	font-family: var(--font_sans);
+}
 .font_serif {
 	font-family: var(--font_serif);
 }
