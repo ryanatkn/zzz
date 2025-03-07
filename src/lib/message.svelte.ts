@@ -1,4 +1,3 @@
-import {format} from 'date-fns';
 import {z} from 'zod';
 import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 
@@ -41,10 +40,6 @@ export class Message extends Cell<typeof Message_Json> {
 	contents: string | undefined = $state(); // TODO BLOCK derived token count like with diskfiles?
 	change: any | undefined = $state(); // TODO schema types
 	source_file: any | undefined = $state(); // TODO schema types
-
-	created_date: Date = $derived(new Date(this.created));
-	created_formatted_time: string = $derived(format(this.created_date, MESSAGE_TIME_FORMAT));
-	created_formatted_date: string = $derived(format(this.created_date, MESSAGE_DATE_FORMAT));
 
 	display_name: string = $derived(`${this.type} (${this.direction})`);
 

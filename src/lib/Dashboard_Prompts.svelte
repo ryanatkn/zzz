@@ -1,6 +1,5 @@
 <script lang="ts">
 	import {slide, scale} from 'svelte/transition';
-	import {format} from 'date-fns';
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
 
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
@@ -40,7 +39,7 @@
 						{zzz.prompts.selected.bits.length}
 						bit{#if zzz.prompts.selected.bits.length !== 1}s{/if}
 					</small>
-					<small>created {format(zzz.prompts.selected.created, 'MMM d, p')}</small>
+					<small>created {zzz.prompts.selected.created_formatted_short_date}</small>
 					<div class="flex justify_content_end">
 						<Confirm_Button
 							onclick={() => zzz.prompts.selected && zzz.prompts.remove(zzz.prompts.selected)}
