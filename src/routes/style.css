@@ -56,6 +56,7 @@ input[type='checkbox'].plain {
 input[type='checkbox'].plain:not(:hover) {
 	--input_fill: transparent;
 }
+
 /* TODO upstream? something like it? */
 .dormant {
 	opacity: 0.6;
@@ -78,12 +79,10 @@ input[type='checkbox'].plain:not(:hover) {
 	outline-width: var(--border_width_1);
 	outline-color: var(--border_color_3);
 }
-
 .reorderable_item:active {
 	outline-width: var(--border_width_1);
 	outline-color: var(--outline_color);
 }
-
 .reorderable_item.dragging {
 	opacity: var(--fade_3);
 	outline-width: var(--border_width_2);
@@ -96,7 +95,6 @@ input[type='checkbox'].plain:not(:hover) {
 [draggable='true']:active {
 	cursor: grabbing;
 }
-
 /* Drag indicator base style */
 .drag_over {
 	--drag_indicator_size: 4px;
@@ -104,7 +102,6 @@ input[type='checkbox'].plain:not(:hover) {
 	--drag_indicator_z_index: 100;
 	position: relative;
 }
-
 /* Common styles for all indicators */
 .drag_over_top::before,
 .drag_over_bottom::after,
@@ -116,7 +113,6 @@ input[type='checkbox'].plain:not(:hover) {
 	z-index: var(--drag_indicator_z_index);
 	pointer-events: none;
 }
-
 /* Top drag indicator */
 .drag_over_top::before {
 	top: calc(-1 * var(--drag_indicator_size) / 2);
@@ -124,7 +120,6 @@ input[type='checkbox'].plain:not(:hover) {
 	right: 0;
 	height: var(--drag_indicator_size);
 }
-
 /* Bottom drag indicator */
 .drag_over_bottom::after {
 	bottom: calc(-1 * var(--drag_indicator_size) / 2);
@@ -132,7 +127,6 @@ input[type='checkbox'].plain:not(:hover) {
 	right: 0;
 	height: var(--drag_indicator_size);
 }
-
 /* Left drag indicator */
 .drag_over_left::before {
 	left: calc(-1 * var(--drag_indicator_size) / 2);
@@ -140,7 +134,6 @@ input[type='checkbox'].plain:not(:hover) {
 	bottom: 0;
 	width: var(--drag_indicator_size);
 }
-
 /* Right drag indicator */
 .drag_over_right::after {
 	right: calc(-1 * var(--drag_indicator_size) / 2);
@@ -153,3 +146,18 @@ input[type='checkbox'].plain:not(:hover) {
 /* .drag_over_invalid::before {
 	background-color: var(--color_c_5);
 } */
+
+/* Layout classes */
+.column_fixed {
+	width: var(--column_width, var(--width_sm));
+	min-width: var(--column_width, var(--width_sm));
+	height: 100%;
+	overflow: auto;
+	scrollbar-width: thin;
+}
+.column_fluid {
+	flex: 1;
+	height: 100%;
+	overflow: auto;
+	scrollbar-width: thin;
+}

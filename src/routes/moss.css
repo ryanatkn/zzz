@@ -252,11 +252,6 @@ a.chip {
 	line-height: var(--line_height_lg); /* prevents the bottom of g's and others from being cut off */
 }
 
-.min_width_sm {
-	width: 100%;
-	min-width: var(--width_sm);
-}
-
 .ml_auto {
 	margin-left: auto;
 }

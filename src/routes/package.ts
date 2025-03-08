@@ -426,6 +426,7 @@ export const package_json = {
 			svelte: './dist/Settings.svelte',
 			default: './dist/Settings.svelte',
 		},
+		'./tape_helpers.js': {types: './dist/tape_helpers.d.ts', default: './dist/tape_helpers.js'},
 		'./Tape_List.svelte': {
 			types: './dist/Tape_List.svelte.d.ts',
 			svelte: './dist/Tape_List.svelte',
@@ -436,6 +437,7 @@ export const package_json = {
 			svelte: './dist/Tape_Summary.svelte',
 			default: './dist/Tape_Summary.svelte',
 		},
+		'./tape_types.js': {types: './dist/tape_types.d.ts', default: './dist/tape_types.js'},
 		'./tape.svelte.js': {types: './dist/tape.svelte.d.ts', default: './dist/tape.svelte.js'},
 		'./test.task.js': {types: './dist/test.task.d.ts', default: './dist/test.task.js'},
 		'./ui.svelte.js': {types: './dist/ui.svelte.d.ts', default: './dist/ui.svelte.js'},
@@ -506,6 +508,9 @@ export const src_json = {
 		'./cell.svelte.js': {
 			path: 'cell.svelte.ts',
 			declarations: [
+				{name: 'FILE_SHORT_DATE_FORMAT', kind: 'variable'},
+				{name: 'FILE_DATE_FORMAT', kind: 'variable'},
+				{name: 'FILE_TIME_FORMAT', kind: 'variable'},
 				{name: 'Cell_Options', kind: 'type'},
 				{name: 'Cell', kind: 'class'},
 			],
@@ -595,8 +600,6 @@ export const src_json = {
 		'./diskfile.svelte.js': {
 			path: 'diskfile.svelte.ts',
 			declarations: [
-				{name: 'FILE_DATE_FORMAT', kind: 'variable'},
-				{name: 'FILE_TIME_FORMAT', kind: 'variable'},
 				{name: 'Diskfile_Options', kind: 'type'},
 				{name: 'Diskfile', kind: 'class'},
 			],
@@ -863,12 +866,19 @@ export const src_json = {
 			],
 		},
 		'./Settings.svelte': {path: 'Settings.svelte', declarations: []},
+		'./tape_helpers.js': {
+			path: 'tape_helpers.ts',
+			declarations: [{name: 'render_tape', kind: 'function'}],
+		},
 		'./Tape_List.svelte': {path: 'Tape_List.svelte', declarations: []},
 		'./Tape_Summary.svelte': {path: 'Tape_Summary.svelte', declarations: []},
+		'./tape_types.js': {
+			path: 'tape_types.ts',
+			declarations: [{name: 'Tape_Json', kind: 'variable'}],
+		},
 		'./tape.svelte.js': {
 			path: 'tape.svelte.ts',
 			declarations: [
-				{name: 'Tape_Json', kind: 'variable'},
 				{name: 'Tape_Options', kind: 'type'},
 				{name: 'Tape', kind: 'class'},
 			],

@@ -30,7 +30,7 @@
 </script>
 
 <div class="flex w_100 h_100">
-	<div class="width_sm min_width_sm h_100 overflow_auto scrollbar_width_thin">
+	<div class="column_fixed">
 		<div class="p_sm">
 			<button
 				type="button"
@@ -72,7 +72,7 @@
 	</div>
 
 	{#if zzz.prompts.selected}
-		<div class="width_sm min_width_sm h_100 overflow_auto scrollbar_width_thin">
+		<div class="column_fixed">
 			<div class="p_sm">
 				<div class="size_lg"><Glyph_Icon icon={GLYPH_PROMPT} /> prompt</div>
 				{#if zzz.prompts.selected}
@@ -106,7 +106,7 @@
 			</div> -->
 		</div>
 
-		<div class="flex_1 h_100 fg_1 overflow_auto scrollbar_width_thin">
+		<div class="column_fluid">
 			<div class="column gap_md p_sm">
 				<div class="flex justify_content_space_between">
 					<button type="button" class="plain" onclick={() => zzz.prompts.add_bit()}>
@@ -145,7 +145,7 @@
 			</div>
 		</div>
 
-		<div class="width_sm min_width_sm h_100 overflow_auto scrollbar_width_thin" in:slide>
+		<div class="column_fixed" in:slide>
 			<div class="column p_sm">
 				<div class="flex justify_content_space_between">
 					<div class="size_lg">

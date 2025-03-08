@@ -16,7 +16,7 @@
 <div class="flex w_100 h_100">
 	<!-- TODO show the selected chat's info, if any -->
 	<!-- TODO, show the counts of active items for each of the model selector buttons in a snippet here -->
-	<div class="width_sm min_width_sm h_100 overflow_auto scrollbar_width_thin">
+	<div class="column_fixed">
 		<div class="p_sm">
 			<button
 				class="plain w_100 justify_content_start"

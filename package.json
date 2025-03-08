@@ -502,6 +502,10 @@
       "svelte": "./dist/Settings.svelte",
       "default": "./dist/Settings.svelte"
     },
+    "./tape_helpers.js": {
+      "types": "./dist/tape_helpers.d.ts",
+      "default": "./dist/tape_helpers.js"
+    },
     "./Tape_List.svelte": {
       "types": "./dist/Tape_List.svelte.d.ts",
       "svelte": "./dist/Tape_List.svelte",
@@ -511,6 +515,10 @@
       "types": "./dist/Tape_Summary.svelte.d.ts",
       "svelte": "./dist/Tape_Summary.svelte",
       "default": "./dist/Tape_Summary.svelte"
+    },
+    "./tape_types.js": {
+      "types": "./dist/tape_types.d.ts",
+      "default": "./dist/tape_types.js"
     },
     "./tape.svelte.js": {
       "types": "./dist/tape.svelte.d.ts",

@@ -79,7 +79,7 @@
 </script>
 
 <div class="flex_1 h_100 flex align_items_start">
-	<div class="width_sm min_width_sm h_100 overflow_auto scrollbar_width_thin column">
+	<div class="column_fixed column">
 		<div class="fg_1">
 			<!-- TODO add user-customizable sets of models -->
 			<div class="flex">
@@ -139,7 +139,7 @@
 			</Model_Selector>
 		</div>
 	</div>
-	<div class="flex_1 h_100 overflow_auto scrollbar_width_thin">
+	<div class="column_fluid">
 		<div class="fg_1 p_sm">
 			<div class="flex gap_xs2 flex_1 mb_xs">
 				<textarea
@@ -197,7 +197,7 @@
 			</ul>
 		</div>
 	</div>
-	<div class="width_sm min_width_sm h_100 overflow_auto scrollbar_width_thin">
+	<div class="column_fixed">
 		<div class="column gap_md">
 			{#if zzz.chats.selected}
 				<div transition:slide>
