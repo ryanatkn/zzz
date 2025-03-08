@@ -20,8 +20,6 @@
 
 	// TODO BLOCK integrate with sources like the local filesystem (just the `zzz.files`?)
 
-	// TODO BLOCK make it have optional attributes like file type
-
 	// TODO BLOCK the dashed pattern state isn't working for the xml tag input or attributes
 </script>
 
@@ -69,25 +67,13 @@
 
 	{#if zzz.prompts.selected}
 		<div class="column_fixed">
-			<div class="p_sm">
-				<div class="size_lg"><Glyph_Icon icon={GLYPH_PROMPT} /> prompt</div>
-				{#if zzz.prompts.selected}
-					<div class="row gap_sm mt_md mb_sm">
-						<Copy_To_Clipboard text={zzz.prompts.selected.content} attrs={{class: 'plain'}} />
-						<Prompt_Stats prompt={zzz.prompts.selected} />
-					</div>
-					<Prompt_Preview prompt={zzz.prompts.selected} />
-				{/if}
-			</div>
-
-			<!-- TODO maybe a library panel? could be like brushes -->
-			<!-- <div class="panel p_sm">
-			<h3 class="mt_0">library</h3>
-			<div class="mb_sm">
-				<input type="search" placeholder="Search prompts and bits..." class="w_100" />
-			</div>
-			<menu class="unstyled"> TODO </menu>
-			</div> -->
+			{#if zzz.prompts.selected}
+				<div class="row gap_sm p_xs sticky t_0 b_0 bg">
+					<Copy_To_Clipboard text={zzz.prompts.selected.content} attrs={{class: 'plain'}} />
+					<Prompt_Stats prompt={zzz.prompts.selected} />
+				</div>
+				<Prompt_Preview prompt={zzz.prompts.selected} />
+			{/if}
 		</div>
 
 		<div class="column_fluid">
@@ -97,15 +83,6 @@
 						+ add bit
 					</button>
 					<div class="flex gap_md">
-						<!-- Add file toggle -->
-						<!-- <label class="flex gap_xs">
-						<input type="checkbox" bind:checked={bit.file_path !== null} />
-						Is File
-					</label> -->
-						<!-- File path input -->
-						<!-- {#if bit.file_path !== null}
-						<input placeholder="file path (optional)" bind:value={bit.file_path} />
-					{/if} -->
 						<Confirm_Button
 							onclick={() => zzz.prompts.selected?.remove_all_bits()}
 							attrs={{disabled: !zzz.prompts.selected.bits.length, class: 'plain'}}

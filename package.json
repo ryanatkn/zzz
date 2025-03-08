@@ -411,6 +411,11 @@
       "svelte": "./dist/Prompt_List.svelte",
       "default": "./dist/Prompt_List.svelte"
     },
+    "./Prompt_Preview.svelte": {
+      "types": "./dist/Prompt_Preview.svelte.d.ts",
+      "svelte": "./dist/Prompt_Preview.svelte",
+      "default": "./dist/Prompt_Preview.svelte"
+    },
     "./Prompt_Stats.svelte": {
       "types": "./dist/Prompt_Stats.svelte.d.ts",
       "svelte": "./dist/Prompt_Stats.svelte",

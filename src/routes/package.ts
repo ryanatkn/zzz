@@ -346,6 +346,11 @@ export const package_json = {
 			svelte: './dist/Prompt_List.svelte',
 			default: './dist/Prompt_List.svelte',
 		},
+		'./Prompt_Preview.svelte': {
+			types: './dist/Prompt_Preview.svelte.d.ts',
+			svelte: './dist/Prompt_Preview.svelte',
+			default: './dist/Prompt_Preview.svelte',
+		},
 		'./Prompt_Stats.svelte': {
 			types: './dist/Prompt_Stats.svelte.d.ts',
 			svelte: './dist/Prompt_Stats.svelte',
@@ -757,6 +762,7 @@ export const src_json = {
 			],
 		},
 		'./Prompt_List.svelte': {path: 'Prompt_List.svelte', declarations: []},
+		'./Prompt_Preview.svelte': {path: 'Prompt_Preview.svelte', declarations: []},
 		'./Prompt_Stats.svelte': {path: 'Prompt_Stats.svelte', declarations: []},
 		'./Prompt_Summary.svelte': {path: 'Prompt_Summary.svelte', declarations: []},
 		'./prompt.svelte.js': {

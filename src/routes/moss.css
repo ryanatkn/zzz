@@ -9,6 +9,9 @@
 .align_items_start {
 	align-items: start;
 }
+.b_0 {
+	bottom: 0;
+}
 .bg {
 	background-color: var(--bg);
 }
@@ -479,6 +482,9 @@ a.chip {
 .size_xs {
 	font-size: var(--size_xs);
 	--size: var(--size_xs);
+}
+.sticky {
+	position: sticky;
 }
 .t_0 {
 	top: 0;
