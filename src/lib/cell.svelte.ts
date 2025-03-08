@@ -48,7 +48,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 		),
 	);
 
-	readonly json: z.output<T_Schema> = $derived.by(() => this.to_json());
+	readonly json: z.output<T_Schema> = $derived(this.to_json());
 	readonly json_serialized: string = $derived(JSON.stringify(this.json));
 	readonly json_parsed: z.SafeParseReturnType<z.output<T_Schema>, z.output<T_Schema>> = $derived.by(
 		() => this.schema.safeParse(this.json),
