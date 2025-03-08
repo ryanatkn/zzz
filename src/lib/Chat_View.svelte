@@ -140,7 +140,7 @@
 		</div>
 	</div>
 	<div class="column_fluid">
-		<div class="fg_1 p_sm">
+		<div class="column_bg_1 p_sm">
 			<div class="flex gap_xs2 flex_1 mb_xs">
 				<textarea
 					class="plain flex_1 mb_0"

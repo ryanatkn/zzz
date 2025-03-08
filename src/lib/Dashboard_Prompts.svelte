@@ -107,7 +107,7 @@
 		</div>
 
 		<div class="column_fluid">
-			<div class="column fg_1 gap_md p_sm">
+			<div class="column_bg_1 column gap_md p_sm">
 				<div class="flex justify_content_space_between">
 					<button type="button" class="plain" onclick={() => zzz.prompts.add_bit()}>
 						+ add bit

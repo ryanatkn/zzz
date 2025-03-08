@@ -161,3 +161,8 @@ input[type='checkbox'].plain:not(:hover) {
 	overflow: auto;
 	scrollbar-width: thin;
 }
+
+.column_bg_1 {
+	background-color: var(--fg_1);
+	min-height: 100%;
+}
