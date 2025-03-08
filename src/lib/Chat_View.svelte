@@ -69,13 +69,9 @@
 
 	// TODO BLOCK maybe a mode that allows duplicates by holding a key like shift, but otherwise only setting up 1 tape per model?
 
-	// TODO BLOCK the "send to all" button below could have a sibling that creates a new table for each
-
 	// TODO BLOCK custom buttons section - including quick local, smartest all, all, etc
 
-	// TODO BLOCK make a component for the confirm X on the "remove all tapes" button below
-
-	// TODO BLOCK maybe there should be 2 columns of tags, one to include and one to exclude?
+	// TODO BLOCK remove all tapes needs to open to the right of the button
 </script>
 
 <div class="flex_1 h_100 flex align_items_start">
