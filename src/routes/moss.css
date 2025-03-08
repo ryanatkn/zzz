@@ -461,6 +461,10 @@ a.chip {
 	font-size: var(--size_lg);
 	--size: var(--size_lg);
 }
+.size_md {
+	font-size: var(--size_md);
+	--size: var(--size_md);
+}
 .size_sm {
 	font-size: var(--size_sm);
 	--size: var(--size_sm);

@@ -14,6 +14,8 @@
 	// TODO BLOCK visually show when the attributes are not being used, but don't actually disable them (maybe red outline? - similarly need something for bits that are empty)
 
 	// TODO BLOCK experiment with the checkbox being a button with `.deselectable`
+
+	let input_el: HTMLInputElement | undefined;
 </script>
 
 <div class="flex gap_xs align_items_start column">
@@ -21,17 +23,28 @@
 		<label
 			class="row mb_0"
 			style:height="var(--input_height)"
-			title="when enabled, the prompt's content will be wrapped with {bit.xml_tag_name ||
-				XML_TAG_NAME_DEFAULT}"
+			title="when enabled, the prompt's content will be wrapped with the xml tag '{bit.xml_tag_name ||
+				XML_TAG_NAME_DEFAULT}'"
 		>
 			xml tag
-			<input class="plain ml_md" type="checkbox" bind:checked={bit.has_xml_tag} />
+			<input
+				class="plain compact ml_md size_md"
+				type="checkbox"
+				bind:checked={
+					() => bit.has_xml_tag,
+					(v) => {
+						bit.has_xml_tag = v;
+						if (v) input_el?.focus(); // side effect - I like this compared to an $effect placed in some arbitrary place
+					}
+				}
+			/>
 		</label>
 		<input
 			class="plain flex_1"
 			class:dormant={!bit.has_xml_tag}
-			placeholder="bit"
+			placeholder={bit.has_xml_tag ? '⤻ xml tag name' : undefined}
 			bind:value={bit.xml_tag_name}
+			bind:this={input_el}
 		/>
 		<button
 			type="button"
