@@ -82,7 +82,7 @@ test('Cell uses registry for instantiating class relationships', () => {
 	expect(null_result).toBe(null); // Registry returns null if class not found
 });
 
-test('Cell.encode uses $state.snapshot for values', () => {
+test('Cell.encode_property uses $state.snapshot for values', () => {
 	class Simple_Test_Cell extends Cell<typeof Test_Schema> {
 		name: string = $state()!;
 		age: number | undefined = $state();
@@ -94,9 +94,9 @@ test('Cell.encode uses $state.snapshot for values', () => {
 			this.init();
 		}
 
-		// Test helper to access encode
+		// Test helper to access encode_property
 		test_encode(value: unknown, key: string): unknown {
-			return this.encode(value, key);
+			return this.encode_property(value, key);
 		}
 	}
 
@@ -152,9 +152,9 @@ test('Cell handles special types like Map and Set', () => {
 			this.init();
 		}
 
-		// Test helper to manually invoke decode_value_without_parser
+		// Test helper to manually invoke decode_property
 		test_decode<K extends Schema_Keys<typeof Special_Schema>>(value: unknown, key: K): this[K] {
-			return this.decode_value_without_parser(value, key);
+			return this.decode_property(value, key);
 		}
 	}
 
@@ -287,7 +287,7 @@ test('Cell allows schema keys with no properties if a parser is provided', () =>
 });
 
 // Add a test for custom property assignment
-test('Cell supports custom property assignment behavior', () => {
+test('Cell supports overriding assign_property', () => {
 	class Custom_Assignment_Cell extends Cell<typeof Test_Schema> {
 		name: string = $state()!;
 		age: number | undefined = $state();
@@ -302,13 +302,13 @@ test('Cell supports custom property assignment behavior', () => {
 			this.init();
 		}
 
-		// Override assign_property to add custom behavior
+		// Override the protected assign_property method
 		protected override assign_property<K extends Schema_Keys<typeof Test_Schema>>(
 			key: K,
 			value: this[K],
 		): void {
 			// Log the assignment
-			this.assignment_log.push(`Assigned ${key}: ${value}`);
+			this.assignment_log.push(`Assigned ${key}: ${String(value)}`);
 
 			// Custom behavior for specific properties
 			if (key === 'name' && typeof value === 'string') {
@@ -394,61 +394,65 @@ test('Cell supports virtual properties with custom handling', () => {
 	expect(cell.calculated_value).toBe(84); // 42 * 2
 });
 
-// Test overriding process_schema_property for custom handling
-test('Cell supports overriding assign_schema_property for custom processing', () => {
-	const Virtual_Schema = z.object({
-		id: Uuid,
-		created: Datetime_Now,
-		updated: z.string().nullable().default(null),
-		real: z.string(),
-		virtual: z.number().default(0),
-	});
+// Add a new test for early return behavior in assign_property
+test('Cell assign_property returns after handling property correctly', () => {
+	// Create a test implementation with a modified assign_property method
+	class Return_Test_Cell extends Cell<typeof Test_Schema> {
+		name: string = $state()!;
+		age: number | undefined = $state();
+		roles: Array<string> = $state()!;
+		active: boolean = $state()!;
 
-	class Process_Override_Cell extends Cell<typeof Virtual_Schema> {
-		real: string = $state()!;
-		// No virtual property defined
+		// Track method calls
+		property_processing: Array<string> = [];
 
-		calculated_value = 0;
-
-		constructor(options: Cell_Options<typeof Virtual_Schema>) {
-			super(Virtual_Schema, options);
+		constructor(options: Cell_Options<typeof Test_Schema>) {
+			super(Test_Schema, options);
 			this.init();
 		}
 
-		// Override assign_schema_property instead of using parsers
-		protected override assign_schema_property(
-			key: Schema_Keys<typeof Virtual_Schema>,
-			value: unknown,
+		// Override assign_property to track method calls and verify return behavior
+		protected override assign_property<K extends Schema_Keys<typeof Test_Schema>>(
+			key: K,
+			value: this[K],
 		): void {
-			if (key === 'virtual') {
-				// Custom handling for virtual property
-				if (typeof value === 'number') {
-					this.calculated_value = value * 3; // Different multiplier to distinguish from parser approach
-					return; // Skip further processing for this key
-				}
+			this.property_processing.push(`start-${key}`);
+
+			// First property is handled and should return
+			if (key === 'name') {
+				super.assign_property(key, value);
+				this.property_processing.push(`complete-${key}`);
+				return;
 			}
 
-			// For all other keys, use default processing
-			super.assign_schema_property(key, value);
+			// This should not run for 'name' if return works correctly
+			this.property_processing.push(`fallthrough-${key}`);
+			super.assign_property(key, value);
 		}
 	}
 
-	const cell = new Process_Override_Cell({
+	const cell = new Return_Test_Cell({
 		zzz: mock_zzz,
 		json: {
 			id: TEST_UUID,
 			created: TEST_DATE,
-			real: 'Real Value',
-			virtual: 30,
+			name: 'Return Test',
+			age: 42,
 		},
 	});
 
-	// Check real property was set
-	expect(cell.real).toBe('Real Value');
+	// Verify property values are set correctly
+	expect(cell.name).toBe('Return Test');
+	expect(cell.age).toBe(42);
 
-	// Check virtual property was processed but not assigned
-	expect('virtual' in cell).toBe(false);
-	expect(cell.calculated_value).toBe(90); // 30 * 3
+	// Verify method return behavior
+	expect(cell.property_processing).toContain('start-name');
+	expect(cell.property_processing).toContain('complete-name');
+	expect(cell.property_processing).not.toContain('fallthrough-name');
+
+	// Age should have different flow
+	expect(cell.property_processing).toContain('start-age');
+	expect(cell.property_processing).toContain('fallthrough-age');
 });
 
 // Test the precedence between schema defaults and parser defaults

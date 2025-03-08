@@ -22,7 +22,7 @@ import {Providers} from '$lib/providers.svelte.js';
 import {Diskfiles} from '$lib/diskfiles.svelte.js';
 import {Messages} from '$lib/messages.svelte.js';
 import {Model, type Model_Json} from '$lib/model.svelte.js';
-import {Cell_Registry} from '$lib/cell_registry.js';
+import {Cell_Registry} from '$lib/cell_registry.svelte.js';
 import {Prompts} from '$lib/prompts.svelte.js';
 import {Bit} from '$lib/bit.svelte.js';
 import {Chat} from '$lib/chat.svelte.js';

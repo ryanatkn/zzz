@@ -12,6 +12,8 @@ export class Cell_Registry {
 	// Store constructors
 	readonly #constructors: Map<string, Class_Constructor<any>> = new Map();
 
+	class_names: Array<string> = $derived(Array.from(this.#constructors.keys()));
+
 	constructor(zzz: Zzz) {
 		this.zzz = zzz;
 	}
@@ -36,7 +38,6 @@ export class Cell_Registry {
 	instantiate(class_name: string, json?: unknown): Cell | null {
 		const constructor = this.#constructors.get(class_name);
 		if (!constructor) {
-			console.warn(`Class "${class_name}" not registered in registry`);
 			return null;
 		}
 
@@ -62,12 +63,5 @@ export class Cell_Registry {
 		}
 
 		return value;
-	}
-
-	/**
-	 * Get all registered class names
-	 */
-	get class_names(): Array<string> {
-		return Array.from(this.#constructors.keys());
 	}
 }

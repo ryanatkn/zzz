@@ -22,8 +22,6 @@ export interface Cell_Options<T_Schema extends z.ZodType> {
 	json?: z.input<T_Schema>;
 }
 
-// TODO BLOCK maybe `id` belongs on `Cell`, so we can do things with that - then the schema needs a constraint, maybe a base cell schema (and _options) gets extended
-
 // TODO maybe rename to `Json_Cell` to be more explicit? Or `Snapshottable`?
 export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Cell_Json {
 	// Base properties from Cell_Json
@@ -120,41 +118,13 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 
 		for (const key of this.schema_keys) {
 			if (key in this) {
-				result[key] = this.encode(this[key], key);
+				result[key] = this.encode_property(this[key], key);
 			} else {
 				console.error(`Property ${key} not found on instance of ${this.constructor.name}`);
 			}
 		}
 
 		return result;
-	}
-
-	/**
-	 * Generic clone method that works for any subclass.
-	 */
-	clone(): this {
-		const constructor = this.constructor as new (options: Cell_Options<T_Schema>) => this;
-
-		try {
-			// TODO @many maybe optionally forward additional rest options?
-			return new constructor({
-				zzz: this.zzz,
-				json: structuredClone(this.json),
-			});
-		} catch (error) {
-			console.error(`Failed to clone instance of ${constructor.name}:`, error);
-			throw new Error(`Failed to clone: ${error instanceof Error ? error.message : String(error)}`);
-		}
-	}
-
-	/**
-	 * Encode a value during serialization. Can be overridden for custom encoding logic.
-	 * Defaults to Svelte's `$state.snapshot`,
-	 * which handles most cases and uses `toJSON` when available,
-	 * so overriding `to_json` is sufficient for most cases before overriding `encode`.
-	 */
-	encode(value: unknown, _key: string): unknown {
-		return $state.snapshot(value);
 	}
 
 	/**
@@ -174,7 +144,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 				const parsed_value = parsed[key];
 
 				// Process this schema property
-				this.assign_schema_property(key, parsed_value);
+				this.assign_property(key, parsed_value);
 			}
 		} catch (error) {
 			console.error(`Error setting JSON for ${this.constructor.name}:`, error);
@@ -183,87 +153,20 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	}
 
 	/**
-	 * Process a single schema property during JSON deserialization.
-	 * This method handles the flow for how schema properties map to instance properties.
+	 * Encode a value during serialization. Can be overridden for custom encoding logic.
+	 * Defaults to Svelte's `$state.snapshot`,
+	 * which handles most cases and uses `toJSON` when available,
+	 * so overriding `to_json` is sufficient for most cases before overriding `encode`.
 	 */
-	protected assign_schema_property(key: Schema_Keys<T_Schema>, value: unknown): void {
-		// 1. Check if we have a parser for this key
-		const has_parser = key in this.parsers;
-		const has_property = key in this;
-
-		// 2. If we don't have a property or parser, log an error and bail
-		if (!has_property && !has_parser) {
-			console.error(
-				`Schema key "${key}" in ${this.constructor.name} has no matching property or parser. ` +
-					`Consider adding the property or a parser.`,
-			);
-			return;
-		}
-
-		// 3. Try to use the parser if available
-		if (has_parser) {
-			const parser = this.parsers[key];
-			if (parser) {
-				const parser_result = parser(value);
-
-				// 3a. If parser returns a defined value AND we have a property, assign it
-				if (parser_result !== undefined && has_property) {
-					this.assign_property(key, parser_result);
-					return;
-				}
-
-				// 3b. If parser returns undefined but we have a property,
-				// fall through to standard decoding
-
-				// 3c. If we don't have a property but have a parser,
-				// the parser is expected to handle the virtual property
-				if (!has_property) {
-					return;
-				}
-			}
-		}
-
-		// 4. Use standard decoding if we have a property and value
-		if (has_property && value !== undefined) {
-			const decoded = this.decode_value_without_parser(value, key);
-			this.assign_property(key, decoded);
-		}
+	encode_property(value: unknown, _key: string): unknown {
+		return $state.snapshot(value);
 	}
 
 	/**
-	 * Assign a value to a property on the instance.
-	 * This method can be overridden by subclasses to customize how values are assigned.
+	 * Decode a value based on its schema type information.
+	 * This handles instantiating classes, transforming arrays, and special types.
 	 */
-	protected assign_property<K extends Schema_Keys<T_Schema>>(key: K, value: this[K]): void {
-		this[key] = value;
-	}
-
-	/**
-	 * Decode a value using schema information to instantiate the right class.
-	 * This is the public API that first checks parsers.
-	 */
-	decode_value<K extends Schema_Keys<T_Schema>>(value: unknown, key: K): this[K] {
-		// First check if we have a custom parser for this key
-		if (key in this.parsers) {
-			const parser = this.parsers[key];
-			if (parser) {
-				const parsed = parser(value);
-				// Only return the parsed value if it's not undefined
-				if (parsed !== undefined) {
-					return parsed;
-				}
-			}
-		}
-
-		// If no custom parser or parser returned undefined, use standard decoding
-		return this.decode_value_without_parser(value, key);
-	}
-
-	/**
-	 * Internal method to decode a value without using parsers.
-	 * This is used by the set_json method and as a fallback from decode_value.
-	 */
-	decode_value_without_parser<K extends Schema_Keys<T_Schema>>(value: unknown, key: K): this[K] {
+	decode_property<K extends Schema_Keys<T_Schema>>(value: unknown, key: K): this[K] {
 		const schema_info = this.field_schema_info.get(key);
 		if (!schema_info) return value as this[K];
 
@@ -305,6 +208,72 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 		}
 
 		return value as this[K];
+	}
+
+	/**
+	 * Generic clone method that works for any subclass.
+	 */
+	clone(): this {
+		const constructor = this.constructor as new (options: Cell_Options<T_Schema>) => this;
+
+		try {
+			// TODO @many maybe optionally forward additional rest options?
+			return new constructor({
+				zzz: this.zzz,
+				json: structuredClone(this.json),
+			});
+		} catch (error) {
+			console.error(`Failed to clone instance of ${constructor.name}:`, error);
+			throw new Error(`Failed to clone: ${error instanceof Error ? error.message : String(error)}`);
+		}
+	}
+
+	/**
+	 * Process a single schema property during JSON deserialization.
+	 * This method handles the flow for how schema properties map to instance properties.
+	 */
+	protected assign_property(key: Schema_Keys<T_Schema>, value: unknown): void {
+		// 1. Check if we have a parser for this key
+		const has_parser = key in this.parsers;
+		const has_property = key in this;
+
+		// 2. If we don't have a property or parser, log an error and bail
+		if (!has_property && !has_parser) {
+			console.error(
+				`Schema key "${key}" in ${this.constructor.name} has no matching property or parser. ` +
+					`Consider adding the property or a parser.`,
+			);
+			return;
+		}
+
+		// 3. Try to use the parser if available
+		if (has_parser) {
+			const parser = this.parsers[key];
+			if (parser) {
+				const parsed = parser(value);
+
+				// 3a. If parser returns a defined value AND we have a property, assign it
+				if (parsed !== undefined && has_property) {
+					this[key] = parsed;
+					return;
+				}
+
+				// 3b. If parser returns undefined but we have a property,
+				// fall through to standard decoding
+
+				// 3c. If we don't have a property but have a parser,
+				// the parser is expected to handle the virtual property
+				if (!has_property) {
+					return;
+				}
+			}
+		}
+
+		// 4. Use standard decoding if we have a property and value
+		if (has_property && value !== undefined) {
+			const decoded = this.decode_property(value, key);
+			this[key] = decoded;
+		}
 	}
 
 	/**
