@@ -565,3 +565,87 @@ test('Cell handles inherited properties correctly', () => {
 	expect(json.name).toBe('Test Name');
 	expect(json.age).toBe(30);
 });
+
+// Test for Cell serialization with undefined values
+test('Cell - JSON serialization excludes undefined values correctly', () => {
+	// Create a schema with many optional fields to test undefined handling
+	const Complex_Schema = Cell_Json.extend({
+		type: z.enum(['simple', 'complex']),
+		name: z.string().optional(),
+		detail: z
+			.object({
+				code: z.string().optional(),
+				value: z.number().optional(),
+			})
+			.optional(),
+		tags: z.array(z.string()).optional(),
+		status: z.enum(['active', 'inactive']).optional(),
+	});
+
+	class SerializationTest_Cell extends Cell<typeof Complex_Schema> {
+		type: 'simple' | 'complex' = $state()!;
+		name?: string = $state();
+		detail?: {code?: string; value?: number} = $state();
+		tags?: Array<string> = $state();
+		status?: 'active' | 'inactive' = $state();
+
+		constructor(options: Cell_Options<typeof Complex_Schema>) {
+			super(Complex_Schema, options);
+			this.init();
+		}
+	}
+
+	// Create a cell with only required fields
+	const simple_cell = new SerializationTest_Cell({
+		zzz: mock_zzz,
+		json: {
+			id: TEST_UUID,
+			created: TEST_DATE,
+			type: 'simple',
+		},
+	});
+
+	// Create a cell with some optional fields
+	const complex_cell = new SerializationTest_Cell({
+		zzz: mock_zzz,
+		json: {
+			id: TEST_UUID,
+			created: TEST_DATE,
+			type: 'complex',
+			name: 'Test',
+			detail: {code: 'ABC'},
+			tags: ['tag1', 'tag2'],
+		},
+	});
+
+	// Test simple cell JSON
+	const simple_json = simple_cell.to_json();
+	expect(simple_json.type).toBe('simple');
+	expect(simple_json.name).toBeUndefined();
+	expect(simple_json.detail).toBeUndefined();
+	expect(simple_json.tags).toBeUndefined();
+	expect(simple_json.status).toBeUndefined();
+
+	// Test complex cell JSON
+	const complex_json = complex_cell.to_json();
+	expect(complex_json.type).toBe('complex');
+	expect(complex_json.name).toBe('Test');
+	expect(complex_json.detail).toEqual({code: 'ABC'});
+	expect(complex_json.detail?.value).toBeUndefined(); // Nested undefined field
+	expect(complex_json.tags).toEqual(['tag1', 'tag2']);
+	expect(complex_json.status).toBeUndefined();
+
+	// Verify JSON.stringify removes undefined values
+	const serialized_simple = JSON.stringify(simple_cell);
+	const parsed_simple = JSON.parse(serialized_simple);
+	expect(parsed_simple.name).toBeUndefined();
+	expect(parsed_simple.detail).toBeUndefined();
+	expect(parsed_simple.tags).toBeUndefined();
+	expect(parsed_simple.status).toBeUndefined();
+
+	// Verify that toJSON and JSON.stringify handle nested undefined fields
+	const serialized_complex = JSON.stringify(complex_cell);
+	const parsed_complex = JSON.parse(serialized_complex);
+	expect(parsed_complex.detail.code).toBe('ABC');
+	expect('value' in parsed_complex.detail).toBe(false); // Undefined field should be removed from JSON
+});
