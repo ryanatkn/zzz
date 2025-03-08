@@ -358,6 +358,9 @@ a.chip {
 .pb_xl7 {
 	padding-bottom: var(--space_xl7);
 }
+.pl_sm {
+	padding-left: var(--space_sm);
+}
 .pl_xl {
 	padding-left: var(--space_xl);
 }

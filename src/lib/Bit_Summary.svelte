@@ -22,32 +22,34 @@
 </script>
 
 <div
-	class="flex justify_content_space_between gap_xs2 size_sm relative"
+	class="bit_summary flex justify_content_space_between gap_xs2 size_sm relative panel"
 	class:dormant={!bit.enabled}
 >
 	<div class="progress_bar" style:width="{percent}%"></div>
-	<div class="flex_1 panel px_sm py_xs3 ellipsis">
+	<div class="flex_1 pl_sm py_xs3 ellipsis">
 		{bit.name}
 	</div>
-	<input
-		type="checkbox"
-		class="plain compact"
-		title="This bit is {bit.enabled ? 'enabled' : 'disabled'} and {bit.enabled
-			? ''
-			: 'not '}included in the prompt"
-		bind:checked={bit.enabled}
-	/>
-	<Confirm_Button
-		onclick={() => {
-			prompt.remove_bit(bit.id);
-		}}
-		attrs={{
-			class: 'plain compact',
-			title: `Remove bit ${bit.name}`,
-		}}
-	>
-		{GLYPH_REMOVE}
-	</Confirm_Button>
+	<div class="controls flex gap_xs2">
+		<input
+			type="checkbox"
+			class="plain compact"
+			title="This bit is {bit.enabled ? 'enabled' : 'disabled'} and {bit.enabled
+				? ''
+				: 'not '}included in the prompt"
+			bind:checked={bit.enabled}
+		/>
+		<Confirm_Button
+			onclick={() => {
+				prompt.remove_bit(bit.id);
+			}}
+			attrs={{
+				class: 'plain compact',
+				title: `Remove bit ${bit.name}`,
+			}}
+		>
+			{GLYPH_REMOVE}
+		</Confirm_Button>
+	</div>
 </div>
 
 <style>
@@ -60,5 +62,12 @@
 		opacity: var(--fade_6);
 		transition: width var(--duration_3) ease-in-out;
 		border-radius: var(--radius_xs);
+	}
+
+	.controls {
+		visibility: hidden;
+	}
+	.bit_summary:hover .controls {
+		visibility: visible;
 	}
 </style>
