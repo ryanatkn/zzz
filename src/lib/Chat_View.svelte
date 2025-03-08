@@ -139,7 +139,7 @@
 			</Model_Selector>
 		</div>
 	</div>
-	<div class="column_fluid">
+	<div class="column_filled">
 		<div class="column_bg_1 p_sm">
 			<div class="flex gap_xs2 flex_1 mb_xs">
 				<textarea
