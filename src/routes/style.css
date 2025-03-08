@@ -155,7 +155,7 @@ input[type='checkbox'].plain:not(:hover) {
 	overflow: auto;
 	scrollbar-width: thin;
 }
-.column_filled {
+.column_fluid {
 	flex: 1;
 	height: 100%;
 	overflow: auto;
