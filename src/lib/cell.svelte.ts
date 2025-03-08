@@ -22,7 +22,6 @@ export interface Cell_Options<T_Schema extends z.ZodType> {
 	json?: z.input<T_Schema>;
 }
 
-// TODO maybe rename to `Json_Cell` to be more explicit? Or `Snapshottable`?
 export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Cell_Json {
 	// Base properties from Cell_Json
 	id: Uuid = $state()!;
