@@ -107,40 +107,4 @@ export class Message extends Cell<typeof Message_Json> {
 		// Initialize base properties
 		this.init();
 	}
-
-	// TODO make this automated with the schemas - encode method?
-	override to_json(): z.output<typeof Message_Json> {
-		// Create base message data
-		const base = {
-			id: this.id,
-			created: this.created,
-			updated: this.updated,
-			type: this.type,
-			direction: this.direction,
-		};
-
-		// Add type-specific properties
-		switch (this.type) {
-			case 'ping':
-				return base;
-			case 'pong':
-				return {...base, ping_id: this.ping_id};
-			case 'send_prompt':
-				return {...base, completion_request: this.completion_request};
-			case 'completion_response':
-				return {...base, completion_response: this.completion_response};
-			case 'update_diskfile':
-				return {...base, path: this.path, contents: this.contents};
-			case 'delete_diskfile':
-				return {...base, path: this.path};
-			case 'filer_change':
-				return {...base, change: this.change, source_file: this.source_file};
-			case 'loaded_session':
-				return {...base, data: this.data};
-			case 'load_session':
-				return base;
-			default:
-				throw new Unreachable_Error(this.type);
-		}
-	}
 }
