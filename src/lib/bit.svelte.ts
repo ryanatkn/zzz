@@ -48,14 +48,28 @@ export class Bit extends Cell<typeof Bit_Json> {
 	 * @returns `true` if the attribute was updated, `false` if the attribute was not found
 	 */
 	update_attribute(id: Uuid, updates: Partial<Omit<Xml_Attribute, 'id'>>): boolean {
-		const attribute = this.attributes.find((a) => a.id === id);
-		if (!attribute) return false;
+		// Find the attribute by ID
+		const index = this.attributes.findIndex((a) => a.id === id);
+		if (index === -1) return false;
 
-		// Use Zod to validate the updates against the Xml_Attribute schema
-		const validated_updates = Xml_Attribute.partial().omit({id: true}).parse(updates);
+		// Create a new attributes array to ensure reactivity
+		const new_attributes = [...this.attributes];
 
-		// Apply only the validated updates
-		Object.assign(attribute, validated_updates);
+		// Get the attribute to update
+		const attr = new_attributes[index];
+
+		// Apply updates directly
+		if ('key' in updates && updates.key !== undefined) {
+			attr.key = updates.key;
+		}
+
+		if ('value' in updates && updates.value !== undefined) {
+			attr.value = updates.value;
+		}
+
+		// Replace the entire array to ensure reactivity
+		this.attributes = new_attributes;
+
 		return true;
 	}
 

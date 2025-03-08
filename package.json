@@ -125,9 +125,9 @@
       "types": "./dist/cell_helpers.d.ts",
       "default": "./dist/cell_helpers.js"
     },
-    "./cell_registry.js": {
-      "types": "./dist/cell_registry.d.ts",
-      "default": "./dist/cell_registry.js"
+    "./cell_registry.svelte.js": {
+      "types": "./dist/cell_registry.svelte.d.ts",
+      "default": "./dist/cell_registry.svelte.js"
     },
     "./cell_types.js": {
       "types": "./dist/cell_types.d.ts",
@@ -402,6 +402,10 @@
       "svelte": "./dist/Ping_Form.svelte",
       "default": "./dist/Ping_Form.svelte"
     },
+    "./prompt_helpers.js": {
+      "types": "./dist/prompt_helpers.d.ts",
+      "default": "./dist/prompt_helpers.js"
+    },
     "./Prompt_List.svelte": {
       "types": "./dist/Prompt_List.svelte.d.ts",
       "svelte": "./dist/Prompt_List.svelte",
@@ -532,10 +536,10 @@
       "types": "./dist/ui.svelte.d.ts",
       "default": "./dist/ui.svelte.js"
     },
-    "./Xml_Attribute_Input.svelte": {
-      "types": "./dist/Xml_Attribute_Input.svelte.d.ts",
-      "svelte": "./dist/Xml_Attribute_Input.svelte",
-      "default": "./dist/Xml_Attribute_Input.svelte"
+    "./Xml_Attribute_Editor.svelte": {
+      "types": "./dist/Xml_Attribute_Editor.svelte.d.ts",
+      "svelte": "./dist/Xml_Attribute_Editor.svelte",
+      "default": "./dist/Xml_Attribute_Editor.svelte"
     },
     "./Xml_Tag_Controls.svelte": {
       "types": "./dist/Xml_Tag_Controls.svelte.d.ts",

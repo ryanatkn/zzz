@@ -35,18 +35,44 @@ test('Xml_Attribute_Key_Base - rejects empty strings', () => {
 });
 
 test('Xml_Attribute_Key - allows empty strings due to default', () => {
-	// Now testing that it accepts the empty input but returns a valid default
+	// Now testing that it accepts the empty input with our new schema
 	const result = Xml_Attribute_Key.safeParse('');
-	expect(result.success).toBe(false); // Empty string should now fail validation
+	expect(result.success).toBe(true); // Empty string should now be valid
+	if (result.success) {
+		expect(result.data).toBe('');
+	}
 });
 
-test('Xml_Attribute_Key - provides UUID-based default when undefined', () => {
+test('Xml_Attribute_Key - provides empty string as default when undefined', () => {
 	const result = Xml_Attribute_Key.parse(undefined);
-	expect(result).toMatch(/^attr_[0-9a-f]{8}$/); // Should match our default pattern
+	expect(result).toBe(''); // Should be empty string not UUID-based
 });
 
 test('Xml_Attribute_Key_Base - rejects undefined', () => {
 	const result = Xml_Attribute_Key_Base.safeParse(undefined);
+	expect(result.success).toBe(false);
+});
+
+// Update this test to reflect that our schema no longer trims whitespace
+test('Xml_Attribute_Key - does not trim whitespace with the basic schema', () => {
+	// Test with whitespace
+	const result = Xml_Attribute_Key.safeParse('  valid-key  ');
+	expect(result.success).toBe(true);
+	if (result.success) {
+		expect(result.data).toBe('  valid-key  '); // Whitespace should not be trimmed
+	}
+
+	// Test that a key with only whitespace is acceptable
+	const whitespace_result = Xml_Attribute_Key.safeParse('   ');
+	expect(whitespace_result.success).toBe(true);
+	if (whitespace_result.success) {
+		expect(whitespace_result.data).toBe('   ');
+	}
+});
+
+// Update this test to check that null keys are rejected
+test('Xml_Attribute_Key - does not allow null values', () => {
+	const result = Xml_Attribute_Key.safeParse(null);
 	expect(result.success).toBe(false);
 });
 
@@ -109,7 +135,7 @@ test('Xml_Attribute - applies defaults for key and value when missing', () => {
 	expect(result.success).toBe(true);
 	if (result.success) {
 		expect(result.data.id).toBe(valid_uuid);
-		expect(result.data.key).toMatch(/^attr_[0-9a-f]{8}$/); // Should match our default pattern
+		expect(result.data.key).toBe(''); // Key should now be empty string
 		expect(result.data.value).toBe('');
 	}
 });
@@ -286,4 +312,74 @@ test('Xml_Attribute - auto-generates id when property is omitted', () => {
 		expect(result.data.key).toBe('style');
 		expect(result.data.value).toBe('color: red');
 	}
+});
+
+// Add new tests for empty value but defined key behavior
+test('Xml_Attribute - accepts attribute with defined key and empty value', () => {
+	const valid_uuid = '123e4567-e89b-12d3-a456-426614174000';
+	const valid_attribute = {
+		id: valid_uuid,
+		key: 'disabled',
+		value: '',
+	};
+
+	const result = Xml_Attribute.safeParse(valid_attribute);
+	expect(result.success).toBe(true);
+	if (result.success) {
+		expect(result.data.id).toBe(valid_uuid);
+		expect(result.data.key).toBe('disabled');
+		expect(result.data.value).toBe('');
+	}
+});
+
+test('Xml_Attribute - should be considered valid even when value is empty', () => {
+	const valid_uuid = '123e4567-e89b-12d3-a456-426614174000';
+
+	// Test with empty string value
+	const attr_with_empty_value = {
+		id: valid_uuid,
+		key: 'required',
+		value: '',
+	};
+
+	const result = Xml_Attribute.safeParse(attr_with_empty_value);
+	expect(result.success).toBe(true);
+	if (result.success) {
+		expect(result.data.key).toBe('required');
+		expect(result.data.value).toBe('');
+	}
+});
+
+// Test for XML boolean attributes where value is intentionally empty
+test('Xml_Attribute - supports boolean XML attributes with empty values', () => {
+	const valid_uuid = '123e4567-e89b-12d3-a456-426614174000';
+	const boolean_attributes = ['disabled', 'checked', 'readonly', 'required'];
+
+	for (const attr_name of boolean_attributes) {
+		const boolean_attr = {
+			id: valid_uuid,
+			key: attr_name,
+			value: '',
+		};
+
+		const result = Xml_Attribute.safeParse(boolean_attr);
+		expect(result.success).toBe(true);
+		if (result.success) {
+			expect(result.data.key).toBe(attr_name);
+			expect(result.data.value).toBe('');
+		}
+	}
+});
+
+// Update to check that null keys are not accepted
+test('Xml_Attribute - does not accept attributes with null keys', () => {
+	const valid_uuid = '123e4567-e89b-12d3-a456-426614174000';
+	const attr_with_null_key = {
+		id: valid_uuid,
+		key: null,
+		value: 'test',
+	};
+
+	const result = Xml_Attribute.safeParse(attr_with_null_key);
+	expect(result.success).toBe(false);
 });

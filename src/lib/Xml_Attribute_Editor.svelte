@@ -10,23 +10,23 @@
 		onremove: () => void;
 	}
 
-	const {attribute, dormant, onupdate, onremove}: Props = $props();
+	const {attribute, dormant: dormant_prop, onupdate, onremove}: Props = $props();
+
+	// TODO BLOCK isnt correct, make more structured on attribute anyway (as a class probably)
+	const dormant = $derived(dormant_prop ?? !attribute.key);
 </script>
 
-<div
-	class="flex gap_xs2 align_items_center"
-	class:dormant_wrapper={!attribute.key || !attribute.value}
->
+<div class="flex gap_xs2 align_items_center" class:dormant_wrapper={!attribute.key}>
 	<input
 		class="plain compact"
-		class:dormant={!!dormant || !attribute.key}
+		class:dormant
 		placeholder="key"
 		value={attribute.key}
 		oninput={(e) => onupdate({key: e.currentTarget.value})}
 	/>
 	<input
 		class="plain compact"
-		class:dormant={!!dormant || !attribute.value}
+		class:dormant
 		placeholder="value"
 		value={attribute.value}
 		oninput={(e) => onupdate({value: e.currentTarget.value})}

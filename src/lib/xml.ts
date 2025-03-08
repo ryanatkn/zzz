@@ -3,14 +3,15 @@ import {z} from 'zod';
 import {Uuid, Uuid_Base} from '$lib/zod_helpers.js';
 
 // Base schema enforces minimum length to reject empty strings
-export const Xml_Attribute_Key_Base = z.string().min(1);
+// Use transform to trim whitespace before validation, then apply the min constraint
+export const Xml_Attribute_Key_Base = z
+	.string()
+	.transform((s) => s.trim())
+	.pipe(z.string().min(1));
 export type Xml_Attribute_Key_Base = z.infer<typeof Xml_Attribute_Key_Base>;
 
-// Key with default maintains the min(1) constraint but uses a valid default
-// Use attr_ prefix followed by a UUID-like substring as default (better than empty string)
-export const Xml_Attribute_Key = Xml_Attribute_Key_Base.default(
-	() => `attr_${crypto.randomUUID().substring(0, 8)}`,
-);
+// Key with default uses empty string as default
+export const Xml_Attribute_Key = z.string().default('');
 export type Xml_Attribute_Key = z.infer<typeof Xml_Attribute_Key>;
 
 export const Xml_Attribute_Value_Base = z.string();

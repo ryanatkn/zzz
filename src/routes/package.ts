@@ -102,7 +102,10 @@ export const package_json = {
 		},
 		'./bit.svelte.js': {types: './dist/bit.svelte.d.ts', default: './dist/bit.svelte.js'},
 		'./cell_helpers.js': {types: './dist/cell_helpers.d.ts', default: './dist/cell_helpers.js'},
-		'./cell_registry.js': {types: './dist/cell_registry.d.ts', default: './dist/cell_registry.js'},
+		'./cell_registry.svelte.js': {
+			types: './dist/cell_registry.svelte.d.ts',
+			default: './dist/cell_registry.svelte.js',
+		},
 		'./cell_types.js': {types: './dist/cell_types.d.ts', default: './dist/cell_types.js'},
 		'./cell.svelte.js': {types: './dist/cell.svelte.d.ts', default: './dist/cell.svelte.js'},
 		'./Chat_Message_Item.svelte': {
@@ -334,6 +337,10 @@ export const package_json = {
 			svelte: './dist/Ping_Form.svelte',
 			default: './dist/Ping_Form.svelte',
 		},
+		'./prompt_helpers.js': {
+			types: './dist/prompt_helpers.d.ts',
+			default: './dist/prompt_helpers.js',
+		},
 		'./Prompt_List.svelte': {
 			types: './dist/Prompt_List.svelte.d.ts',
 			svelte: './dist/Prompt_List.svelte',
@@ -441,10 +448,10 @@ export const package_json = {
 		'./tape.svelte.js': {types: './dist/tape.svelte.d.ts', default: './dist/tape.svelte.js'},
 		'./test.task.js': {types: './dist/test.task.d.ts', default: './dist/test.task.js'},
 		'./ui.svelte.js': {types: './dist/ui.svelte.d.ts', default: './dist/ui.svelte.js'},
-		'./Xml_Attribute_Input.svelte': {
-			types: './dist/Xml_Attribute_Input.svelte.d.ts',
-			svelte: './dist/Xml_Attribute_Input.svelte',
-			default: './dist/Xml_Attribute_Input.svelte',
+		'./Xml_Attribute_Editor.svelte': {
+			types: './dist/Xml_Attribute_Editor.svelte.d.ts',
+			svelte: './dist/Xml_Attribute_Editor.svelte',
+			default: './dist/Xml_Attribute_Editor.svelte',
 		},
 		'./Xml_Tag_Controls.svelte': {
 			types: './dist/Xml_Tag_Controls.svelte.d.ts',
@@ -493,8 +500,8 @@ export const src_json = {
 				{name: 'get_schema_class_info', kind: 'function'},
 			],
 		},
-		'./cell_registry.js': {
-			path: 'cell_registry.ts',
+		'./cell_registry.svelte.js': {
+			path: 'cell_registry.svelte.ts',
 			declarations: [{name: 'Cell_Registry', kind: 'class'}],
 		},
 		'./cell_types.js': {
@@ -742,6 +749,13 @@ export const src_json = {
 		},
 		'./path.js': {path: 'path.ts', declarations: [{name: 'to_root_path', kind: 'function'}]},
 		'./Ping_Form.svelte': {path: 'Ping_Form.svelte', declarations: []},
+		'./prompt_helpers.js': {
+			path: 'prompt_helpers.ts',
+			declarations: [
+				{name: 'format_prompt_content', kind: 'function'},
+				{name: 'render_prompt', kind: 'function'},
+			],
+		},
 		'./Prompt_List.svelte': {path: 'Prompt_List.svelte', declarations: []},
 		'./Prompt_Stats.svelte': {path: 'Prompt_Stats.svelte', declarations: []},
 		'./Prompt_Summary.svelte': {path: 'Prompt_Summary.svelte', declarations: []},
@@ -754,7 +768,6 @@ export const src_json = {
 				{name: 'Prompt_Json', kind: 'variable'},
 				{name: 'Prompt_Options', kind: 'type'},
 				{name: 'Prompt', kind: 'class'},
-				{name: 'join_prompt_bits', kind: 'function'},
 			],
 		},
 		'./prompts.svelte.js': {
@@ -898,7 +911,7 @@ export const src_json = {
 				{name: 'Ui', kind: 'class'},
 			],
 		},
-		'./Xml_Attribute_Input.svelte': {path: 'Xml_Attribute_Input.svelte', declarations: []},
+		'./Xml_Attribute_Editor.svelte': {path: 'Xml_Attribute_Editor.svelte', declarations: []},
 		'./Xml_Tag_Controls.svelte': {path: 'Xml_Tag_Controls.svelte', declarations: []},
 		'./xml.js': {
 			path: 'xml.ts',

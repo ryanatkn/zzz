@@ -2,7 +2,7 @@
 	import {slide} from 'svelte/transition';
 
 	import type {Bit} from '$lib/bit.svelte.js';
-	import Xml_Attribute_Input from '$lib/Xml_Attribute_Input.svelte';
+	import Xml_Attribute_Editor from '$lib/Xml_Attribute_Editor.svelte';
 	import {XML_TAG_NAME_DEFAULT} from '$lib/constants.js';
 
 	interface Props {
@@ -10,10 +10,6 @@
 	}
 
 	const {bit}: Props = $props();
-
-	// TODO BLOCK visually show when the attributes are not being used, but don't actually disable them (maybe red outline? - similarly need something for bits that are empty)
-
-	// TODO BLOCK experiment with the checkbox being a button with `.deselectable`
 
 	let input_el: HTMLInputElement | undefined;
 </script>
@@ -34,7 +30,7 @@
 					() => bit.has_xml_tag,
 					(v) => {
 						bit.has_xml_tag = v;
-						if (v) input_el?.focus(); // side effect - I like this compared to an $effect placed in some arbitrary place
+						if (v) input_el?.focus(); // I like this compared to an $effect placed in some arbitrary place
 					}
 				}
 			/>
@@ -55,10 +51,11 @@
 			✛
 		</button>
 	</div>
+
 	<div class="attributes column gap_xs2">
 		{#each bit.attributes as attribute (attribute.id)}
 			<div transition:slide>
-				<Xml_Attribute_Input
+				<Xml_Attribute_Editor
 					{attribute}
 					dormant={!bit.has_xml_tag}
 					onupdate={(updates) => bit.update_attribute(attribute.id, updates)}

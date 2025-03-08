@@ -769,3 +769,142 @@ test('initialization - supports partial initialization', () => {
 	expect(bit.name).toBe('Test Name');
 	expect(bit.content).toBe(''); // Should get default value
 });
+
+test('Bit - update_attribute correctly updates key and value', () => {
+	// Create a bit with initial attributes
+	const bit = new Bit({
+		zzz: mock_zzz,
+		json: {
+			attributes: [
+				{
+					id: '123e4567-e89b-12d3-a456-426614174000',
+					key: 'original',
+					value: 'value',
+				},
+			],
+		},
+	});
+
+	// Update the key
+	const updated_key = bit.update_attribute('123e4567-e89b-12d3-a456-426614174000' as Uuid, {
+		key: 'updated',
+	});
+	expect(updated_key).toBe(true);
+	expect(bit.attributes[0].key).toBe('updated');
+	expect(bit.attributes[0].value).toBe('value'); // Value should be unchanged
+
+	// Update the value
+	const updated_value = bit.update_attribute('123e4567-e89b-12d3-a456-426614174000' as Uuid, {
+		value: 'new-value',
+	});
+	expect(updated_value).toBe(true);
+	expect(bit.attributes[0].key).toBe('updated'); // Key should be unchanged
+	expect(bit.attributes[0].value).toBe('new-value');
+});
+
+test('Bit - update_attribute properly handles empty values', () => {
+	const bit = new Bit({
+		zzz: mock_zzz,
+		json: {
+			attributes: [
+				{
+					id: '123e4567-e89b-12d3-a456-426614174000',
+					key: 'test',
+					value: 'original',
+				},
+			],
+		},
+	});
+
+	// Update to empty string value
+	const updated = bit.update_attribute('123e4567-e89b-12d3-a456-426614174000' as Uuid, {
+		value: '',
+	});
+
+	expect(updated).toBe(true);
+	expect(bit.attributes[0].key).toBe('test'); // Key should be unchanged
+	expect(bit.attributes[0].value).toBe(''); // Value should be empty string
+});
+
+test('Bit - update_attribute returns false for nonexistent attribute', () => {
+	const bit = new Bit({
+		zzz: mock_zzz,
+		json: {
+			attributes: [
+				{
+					id: '123e4567-e89b-12d3-a456-426614174000',
+					key: 'test',
+					value: 'original',
+				},
+			],
+		},
+	});
+
+	// Try to update a nonexistent attribute
+	const updated = bit.update_attribute('nonexistent-id' as Uuid, {
+		key: 'new',
+		value: 'new',
+	});
+
+	expect(updated).toBe(false);
+	expect(bit.attributes[0].key).toBe('test'); // Should be unchanged
+	expect(bit.attributes[0].value).toBe('original'); // Should be unchanged
+});
+
+test('Bit - add_attribute and remove_attribute work correctly', () => {
+	const bit = new Bit({
+		zzz: mock_zzz,
+	});
+
+	// Initial state should have no attributes
+	expect(bit.attributes.length).toBe(0);
+
+	// Add an attribute
+	bit.add_attribute({
+		key: 'test-key',
+		value: 'test-value',
+	});
+
+	// Check attribute was added
+	expect(bit.attributes.length).toBe(1);
+	expect(bit.attributes[0].key).toBe('test-key');
+	expect(bit.attributes[0].value).toBe('test-value');
+
+	// Save the ID so we can remove it
+	const id = bit.attributes[0].id;
+
+	// Remove the attribute
+	bit.remove_attribute(id);
+
+	// Check attribute was removed
+	expect(bit.attributes.length).toBe(0);
+});
+
+test('Bit - updating an attribute maintains array reactivity', () => {
+	const bit = new Bit({
+		zzz: mock_zzz,
+		json: {
+			attributes: [
+				{
+					id: '123e4567-e89b-12d3-a456-426614174000',
+					key: 'test',
+					value: 'value',
+				},
+			],
+		},
+	});
+
+	// Get original array reference
+	const original_array = bit.attributes;
+
+	// Update an attribute
+	bit.update_attribute('123e4567-e89b-12d3-a456-426614174000' as Uuid, {
+		value: 'new-value',
+	});
+
+	// Array reference should be different (for reactivity)
+	expect(bit.attributes).not.toBe(original_array);
+
+	// But the contents should be updated
+	expect(bit.attributes[0].value).toBe('new-value');
+});

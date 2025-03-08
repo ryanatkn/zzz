@@ -1,14 +1,13 @@
 import {encode as tokenize} from 'gpt-tokenizer';
 import {z} from 'zod';
 
-import {Uuid} from '$lib/zod_helpers.js';
+import {Uuid, Datetime_Now} from '$lib/zod_helpers.js';
 import {get_unique_name} from '$lib/helpers.js';
-import {XML_TAG_NAME_DEFAULT} from '$lib/constants.js';
 import {Bit, Bit_Json} from '$lib/bit.svelte.js';
 import {reorder_list} from '$lib/list_helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Datetime_Now} from '$lib/zod_helpers.js';
 import {Cell_Json} from '$lib/cell_types.js';
+import {format_prompt_content} from '$lib/prompt_helpers.js';
 
 export const PROMPT_CONTENT_TRUNCATED_LENGTH = 100;
 
@@ -42,7 +41,7 @@ export class Prompt extends Cell<typeof Prompt_Json> {
 	name: string = $state()!;
 	bits: Array<Bit> = $state()!;
 
-	content: string = $derived(join_prompt_bits(this.bits));
+	content: string = $derived(format_prompt_content(this.bits));
 
 	length: number = $derived(this.content.length);
 	tokens: Array<number> = $derived(tokenize(this.content)); // TODO @many eager computation in some UI cases is bad UX with large values (e.g. bottleneck typing)
@@ -85,7 +84,7 @@ export class Prompt extends Cell<typeof Prompt_Json> {
 
 	update_bit(
 		id: Uuid,
-		updates: Partial<Pick<Bit, 'name' | 'content' | 'has_xml_tag' | 'xml_tag_name'>>,
+		updates: Partial<Pick<Bit, 'name' | 'content' | 'has_xml_tag' | 'xml_tag_name' | 'attributes'>>,
 	): void {
 		const bit = this.bits.find((f) => f.id === id);
 		if (bit) {
@@ -93,6 +92,11 @@ export class Prompt extends Cell<typeof Prompt_Json> {
 			if (updates.content !== undefined) bit.content = updates.content;
 			if (updates.has_xml_tag !== undefined) bit.has_xml_tag = updates.has_xml_tag;
 			if (updates.xml_tag_name !== undefined) bit.xml_tag_name = updates.xml_tag_name;
+
+			// If attributes are being updated directly, handle array replacement for reactivity
+			if (updates.attributes !== undefined) {
+				bit.attributes = [...updates.attributes]; // Force reactivity
+			}
 		}
 	}
 
@@ -113,23 +117,3 @@ export class Prompt extends Cell<typeof Prompt_Json> {
 		reorder_list(this.bits, from_index, to_index);
 	}
 }
-
-export const join_prompt_bits = (bits: Array<Bit>): string =>
-	bits
-		.filter((f) => f.enabled)
-		.map((f) => {
-			const content = f.content.trim();
-			if (!content) return '';
-			if (!f.has_xml_tag) return content;
-
-			const xml_tag_name = f.xml_tag_name.trim() || XML_TAG_NAME_DEFAULT;
-
-			const attrs = f.attributes
-				.filter((a) => a.key && a.value)
-				.map((a) => ` ${a.key}="${a.value}"`) // TODO any encoding?
-				.join('');
-
-			return `<${xml_tag_name}${attrs}>\n${content}\n</${xml_tag_name}>`;
-		})
-		.filter((c) => !!c)
-		.join('\n\n');
