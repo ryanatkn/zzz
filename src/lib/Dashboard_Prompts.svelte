@@ -12,17 +12,13 @@
 	import Prompt_Stats from '$lib/Prompt_Stats.svelte';
 	import Bit_List from '$lib/Bit_List.svelte';
 	import {Reorderable} from '$lib/reorderable.svelte.js';
-	import {Scrollable} from '$lib/scrollable.svelte.js';
+	import Prompt_Preview from '$lib/Prompt_Preview.svelte';
 
 	const zzz = zzz_context.get();
 
 	const reorderable = new Reorderable();
 
-	const scrollable = new Scrollable();
-
 	// TODO BLOCK integrate with sources like the local filesystem (just the `zzz.files`?)
-
-	// TODO BLOCK save both bits and prompts to the library, right?
 
 	// TODO BLOCK make it have optional attributes like file type
 
@@ -80,19 +76,7 @@
 						<Copy_To_Clipboard text={zzz.prompts.selected.content} attrs={{class: 'plain'}} />
 						<Prompt_Stats prompt={zzz.prompts.selected} />
 					</div>
-					<pre
-						use:scrollable.container
-						use:scrollable.target
-						class="font_sans size_sm panel px_md py_xs overflow_auto scrollbar_width_thin"
-						style:height="300px"
-						style:max-height="300px">{zzz.prompts.selected.content}</pre>
-					<!-- TODO something like these? -->
-					<!-- <div class="mt_sm flex gap_sm justify_content_space_between">
-					<div class="flex gap_sm">
-						<button type="button" class="plain">save to library</button>
-						<button type="button" class="plain">export</button>
-					</div>
-				</div> -->
+					<Prompt_Preview prompt={zzz.prompts.selected} />
 				{/if}
 			</div>
 
