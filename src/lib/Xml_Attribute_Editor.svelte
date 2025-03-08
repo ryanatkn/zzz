@@ -12,8 +12,7 @@
 
 	const {attribute, dormant: dormant_prop, onupdate, onremove}: Props = $props();
 
-	// TODO BLOCK isnt correct, make more structured on attribute anyway (as a class probably)
-	const dormant = $derived(dormant_prop ?? !attribute.key);
+	const dormant = $derived(dormant_prop || !attribute.key);
 </script>
 
 <div class="flex gap_xs2 align_items_center" class:dormant_wrapper={!attribute.key}>
