@@ -352,11 +352,6 @@ export const package_json = {
 			svelte: './dist/Popover_Button.svelte',
 			default: './dist/Popover_Button.svelte',
 		},
-		'./Popover_Examples.svelte': {
-			types: './dist/Popover_Examples.svelte.d.ts',
-			svelte: './dist/Popover_Examples.svelte',
-			default: './dist/Popover_Examples.svelte',
-		},
 		'./popover.svelte.js': {
 			types: './dist/popover.svelte.d.ts',
 			default: './dist/popover.svelte.js',
@@ -785,7 +780,6 @@ export const src_json = {
 		'./Ping_Form.svelte': {path: 'Ping_Form.svelte', declarations: []},
 		'./Popover_Button_Examples.svelte': {path: 'Popover_Button_Examples.svelte', declarations: []},
 		'./Popover_Button.svelte': {path: 'Popover_Button.svelte', declarations: []},
-		'./Popover_Examples.svelte': {path: 'Popover_Examples.svelte', declarations: []},
 		'./popover.svelte.js': {
 			path: 'popover.svelte.ts',
 			declarations: [

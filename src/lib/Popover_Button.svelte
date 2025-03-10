@@ -53,13 +53,15 @@
 	});
 </script>
 
-<div class="flex">
+<!-- TODO these flex values fix some layout cases so that the container is laid out like the button, but this is a partial solution -->
+<div class="flex align_items_start align_self_start">
 	<div class="flex relative" use:popover.container>
 		{#if button}
 			{@render button(popover)}
 		{:else}
 			<button
 				type="button"
+				class="icon_button"
 				use:popover.trigger={{
 					position,
 					align,

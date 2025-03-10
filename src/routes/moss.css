@@ -9,6 +9,9 @@
 .align_items_start {
 	align-items: start;
 }
+.align_self_start {
+	align-self: start;
+}
 .b_0 {
 	bottom: 0;
 }
@@ -218,9 +221,6 @@ a.chip {
 }
 .mb_sm {
 	margin-bottom: var(--space_sm);
-}
-.mb_xl {
-	margin-bottom: var(--space_xl);
 }
 .mb_xl5 {
 	margin-bottom: var(--space_xl5);

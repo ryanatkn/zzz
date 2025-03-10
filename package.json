@@ -417,11 +417,6 @@
       "svelte": "./dist/Popover_Button.svelte",
       "default": "./dist/Popover_Button.svelte"
     },
-    "./Popover_Examples.svelte": {
-      "types": "./dist/Popover_Examples.svelte.d.ts",
-      "svelte": "./dist/Popover_Examples.svelte",
-      "default": "./dist/Popover_Examples.svelte"
-    },
     "./popover.svelte.js": {
       "types": "./dist/popover.svelte.d.ts",
       "default": "./dist/popover.svelte.js"
