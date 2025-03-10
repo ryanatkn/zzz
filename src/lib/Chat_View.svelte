@@ -16,7 +16,6 @@
 	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
 	import Bit_Stats from '$lib/Bit_Stats.svelte';
 	import Prompt_List from '$lib/Prompt_List.svelte';
-	import Popover_Examples from '$lib/Popover_Examples.svelte';
 	import Tape_List from '$lib/Tape_List.svelte';
 
 	const zzz = zzz_context.get();
@@ -179,8 +178,6 @@
 					attrs={{disabled: !count, class: 'plain'}}>{GLYPH_REMOVE} remove all tapes</Confirm_Button
 				>
 			</div>
-			<!-- Confirm Button Variants Showcase -->
-			<Popover_Examples />
 			<ul class="tapes unstyled mt_lg">
 				{#each chat.tapes as tape (tape.id)}
 					<li>
