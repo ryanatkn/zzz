@@ -2,10 +2,10 @@
 	import type {SvelteHTMLElements} from 'svelte/elements';
 	import type {Snippet} from 'svelte';
 	import {scale} from 'svelte/transition';
+	import {DEV} from 'esm-env';
 
 	import {Popover} from '$lib/popover.svelte.js';
 	import type {Position, Alignment} from '$lib/position_helpers.js';
-	import {DEV} from 'esm-env';
 
 	interface Props {
 		position?: Position;
@@ -31,6 +31,7 @@
 		children,
 	}: Props = $props();
 
+	// TODO @many type union instead of this pattern?
 	if (DEV) {
 		if (children && button) {
 			console.error(

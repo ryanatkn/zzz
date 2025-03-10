@@ -31,6 +31,7 @@
 		children,
 	}: Props = $props();
 
+	// TODO @many type union instead of this pattern?
 	if (DEV) {
 		if (popover_content_prop && popover_button_attrs) {
 			console.error(
