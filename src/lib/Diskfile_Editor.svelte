@@ -92,7 +92,7 @@
 				}}>save changes</button
 			>
 
-			<Confirm_Button onclick={() => zzz.diskfiles.delete(file.path)} attrs={{class: 'color_c'}}>
+			<Confirm_Button onconfirm={() => zzz.diskfiles.delete(file.path)} attrs={{class: 'color_c'}}>
 				<!-- Use path instead of file_id -->
 				{#snippet children()}
 					delete file

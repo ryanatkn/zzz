@@ -39,7 +39,7 @@
 			bind:checked={bit.enabled}
 		/>
 		<Confirm_Button
-			onclick={() => {
+			onconfirm={() => {
 				prompt.remove_bit(bit.id);
 			}}
 			attrs={{

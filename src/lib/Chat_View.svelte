@@ -16,6 +16,7 @@
 	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
 	import Bit_Stats from '$lib/Bit_Stats.svelte';
 	import Prompt_List from '$lib/Prompt_List.svelte';
+	import Popover_Examples from '$lib/Popover_Examples.svelte';
 	import Tape_List from '$lib/Tape_List.svelte';
 
 	const zzz = zzz_context.get();
@@ -111,7 +112,7 @@
 										'w_100 size_sm py_xs3 justify_content_space_between plain radius_xs font_weight_600',
 									style: 'min-height: 0;',
 								}}
-								onclick={() => {
+								onconfirm={() => {
 									chat.remove_tapes_by_model_tag(tag);
 								}}
 							>
@@ -173,13 +174,13 @@
 			</div>
 			<div class="mt_lg">
 				<Confirm_Button
-					onclick={() => chat.remove_all_tapes()}
-					attrs={{disabled: !count, class: 'plain'}}
+					onconfirm={() => chat.remove_all_tapes()}
+					position="right"
+					attrs={{disabled: !count, class: 'plain'}}>{GLYPH_REMOVE} remove all tapes</Confirm_Button
 				>
-					{GLYPH_REMOVE} <span class="ml_xs">remove all tapes</span>
-				</Confirm_Button>
 			</div>
-			<!-- TODO duplicate tape button -->
+			<!-- Confirm Button Variants Showcase -->
+			<Popover_Examples />
 			<ul class="tapes unstyled mt_lg">
 				{#each chat.tapes as tape (tape.id)}
 					<li>
@@ -205,7 +206,7 @@
 								{zzz.chats.selected.name}
 							</div>
 							<Confirm_Button
-								onclick={() => zzz.chats.selected && zzz.chats.remove(zzz.chats.selected)}
+								onconfirm={() => zzz.chats.selected && zzz.chats.remove(zzz.chats.selected)}
 								attrs={{title: `delete chat "${zzz.chats.selected.name}"`}}
 							/>
 						</div>

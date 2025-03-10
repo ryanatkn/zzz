@@ -84,7 +84,7 @@
 					</button>
 					<div class="flex gap_md">
 						<Confirm_Button
-							onclick={() => zzz.prompts.selected?.remove_all_bits()}
+							onconfirm={() => zzz.prompts.selected?.remove_all_bits()}
 							attrs={{disabled: !zzz.prompts.selected.bits.length, class: 'plain'}}
 						>
 							{GLYPH_REMOVE} remove all bits
@@ -114,7 +114,7 @@
 						{zzz.prompts.selected.name}
 					</div>
 					<Confirm_Button
-						onclick={() => zzz.prompts.selected && zzz.prompts.remove(zzz.prompts.selected)}
+						onconfirm={() => zzz.prompts.selected && zzz.prompts.remove(zzz.prompts.selected)}
 						attrs={{title: `remove Prompt ${zzz.prompts.selected.id}`}}
 					/>
 				</div>

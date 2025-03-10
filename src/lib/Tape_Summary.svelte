@@ -35,7 +35,7 @@
 		</div>
 		<div>
 			<Confirm_Button
-				onclick={() => chat.remove_tape(tape.id)}
+				onconfirm={() => chat.remove_tape(tape.id)}
 				attrs={{class: 'icon_button plain', title: 'delete tape'}}
 			>
 				{GLYPH_REMOVE}

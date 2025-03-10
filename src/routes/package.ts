@@ -139,6 +139,11 @@ export const package_json = {
 			default: './dist/config_helpers.js',
 		},
 		'./config.js': {types: './dist/config.d.ts', default: './dist/config.js'},
+		'./Confirm_Button_Examples.svelte': {
+			types: './dist/Confirm_Button_Examples.svelte.d.ts',
+			svelte: './dist/Confirm_Button_Examples.svelte',
+			default: './dist/Confirm_Button_Examples.svelte',
+		},
 		'./Confirm_Button.svelte': {
 			types: './dist/Confirm_Button.svelte.d.ts',
 			svelte: './dist/Confirm_Button.svelte',
@@ -336,6 +341,29 @@ export const package_json = {
 			types: './dist/Ping_Form.svelte.d.ts',
 			svelte: './dist/Ping_Form.svelte',
 			default: './dist/Ping_Form.svelte',
+		},
+		'./Popover_Button_Examples.svelte': {
+			types: './dist/Popover_Button_Examples.svelte.d.ts',
+			svelte: './dist/Popover_Button_Examples.svelte',
+			default: './dist/Popover_Button_Examples.svelte',
+		},
+		'./Popover_Button.svelte': {
+			types: './dist/Popover_Button.svelte.d.ts',
+			svelte: './dist/Popover_Button.svelte',
+			default: './dist/Popover_Button.svelte',
+		},
+		'./Popover_Examples.svelte': {
+			types: './dist/Popover_Examples.svelte.d.ts',
+			svelte: './dist/Popover_Examples.svelte',
+			default: './dist/Popover_Examples.svelte',
+		},
+		'./popover.svelte.js': {
+			types: './dist/popover.svelte.d.ts',
+			default: './dist/popover.svelte.js',
+		},
+		'./position_helpers.js': {
+			types: './dist/position_helpers.d.ts',
+			default: './dist/position_helpers.js',
 		},
 		'./prompt_helpers.js': {
 			types: './dist/prompt_helpers.d.ts',
@@ -573,6 +601,7 @@ export const src_json = {
 				{name: 'default', kind: 'variable'},
 			],
 		},
+		'./Confirm_Button_Examples.svelte': {path: 'Confirm_Button_Examples.svelte', declarations: []},
 		'./Confirm_Button.svelte': {path: 'Confirm_Button.svelte', declarations: []},
 		'./constants.js': {
 			path: 'constants.ts',
@@ -754,6 +783,28 @@ export const src_json = {
 		},
 		'./path.js': {path: 'path.ts', declarations: [{name: 'to_root_path', kind: 'function'}]},
 		'./Ping_Form.svelte': {path: 'Ping_Form.svelte', declarations: []},
+		'./Popover_Button_Examples.svelte': {path: 'Popover_Button_Examples.svelte', declarations: []},
+		'./Popover_Button.svelte': {path: 'Popover_Button.svelte', declarations: []},
+		'./Popover_Examples.svelte': {path: 'Popover_Examples.svelte', declarations: []},
+		'./popover.svelte.js': {
+			path: 'popover.svelte.ts',
+			declarations: [
+				{name: 'Popover_Parameters', kind: 'type'},
+				{name: 'Popover_Trigger_Parameters', kind: 'type'},
+				{name: 'Transition_Function', kind: 'type'},
+				{name: 'Popover_Content_Parameters', kind: 'type'},
+				{name: 'Popover', kind: 'class'},
+			],
+		},
+		'./position_helpers.js': {
+			path: 'position_helpers.ts',
+			declarations: [
+				{name: 'Cardinal_Position', kind: 'type'},
+				{name: 'Position', kind: 'type'},
+				{name: 'Alignment', kind: 'type'},
+				{name: 'generate_position_styles', kind: 'function'},
+			],
+		},
 		'./prompt_helpers.js': {
 			path: 'prompt_helpers.ts',
 			declarations: [

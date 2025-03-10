@@ -18,6 +18,21 @@
 .bg_c_1 {
 	background-color: var(--color_c_1);
 }
+.bg_c_3 {
+	background-color: var(--color_c_3);
+}
+.bg_c_4 {
+	background-color: var(--color_c_4);
+}
+.bg_c_5 {
+	background-color: var(--color_c_5);
+}
+.bg_c_7 {
+	background-color: var(--color_c_7);
+}
+.bg_c_8 {
+	background-color: var(--color_c_8);
+}
 .bg_e_1 {
 	background-color: var(--color_e_1);
 }
@@ -26,6 +41,9 @@
 }
 .border_none {
 	border-style: none;
+}
+.border_solid {
+	border-style: solid;
 }
 
 .box {
@@ -56,6 +74,12 @@ a.chip {
 	font-weight: 700;
 }
 
+.color_a_5 {
+	color: var(--color_a_5);
+}
+.color_bg {
+	color: var(--bg);
+}
 .color_c_5 {
 	color: var(--color_c_5);
 }
@@ -195,6 +219,9 @@ a.chip {
 .mb_sm {
 	margin-bottom: var(--space_sm);
 }
+.mb_xl {
+	margin-bottom: var(--space_xl);
+}
 .mb_xl5 {
 	margin-bottom: var(--space_xl5);
 }
@@ -255,6 +282,11 @@ a.chip {
 	line-height: var(--line_height_lg); /* prevents the bottom of g's and others from being cut off */
 }
 
+.min_width_md {
+	width: 100%;
+	min-width: var(--width_md);
+}
+
 .ml_auto {
 	margin-left: auto;
 }
@@ -269,6 +301,9 @@ a.chip {
 }
 .mr_xl {
 	margin-right: var(--space_xl);
+}
+.mr_xs {
+	margin-right: var(--space_xs);
 }
 .mr_xs2 {
 	margin-right: var(--space_xs2);
@@ -382,6 +417,9 @@ a.chip {
 .pr_md {
 	padding-right: var(--space_md);
 }
+.pt_xl2 {
+	padding-top: var(--space_xl2);
+}
 .pt_xs {
 	padding-top: var(--space_xs);
 }
@@ -409,8 +447,17 @@ a.chip {
 	padding-top: var(--space_xs3);
 	padding-bottom: var(--space_xs3);
 }
+.r_0 {
+	right: 0;
+}
 .radius_0 {
 	border-radius: 0;
+}
+.radius_100 {
+	border-radius: 100%;
+}
+.radius_md {
+	border-radius: var(--radius_md);
 }
 .radius_sm {
 	border-radius: var(--radius_sm);
@@ -463,6 +510,10 @@ a.chip {
 	box-shadow: var(--shadow_inset_xs)
 		color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_1)), transparent);
 }
+.shadow_lg {
+	box-shadow: var(--shadow_lg)
+		color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_4)), transparent);
+}
 .size_lg {
 	font-size: var(--size_lg);
 	--size: var(--size_lg);
@@ -497,6 +548,9 @@ a.chip {
 }
 .text_align_right {
 	text-align: right;
+}
+.text_align_start {
+	text-align: start;
 }
 .text_color_3 {
 	color: var(--text_color_3);

@@ -69,7 +69,7 @@
 				/></small
 			>
 		</header>
-		<Confirm_Button onclick={onremove} />
+		<Confirm_Button onconfirm={onremove} />
 	</div>
 
 	<div class="messages" use:scrollable.container use:scrollable.target>

@@ -31,7 +31,7 @@
 		oninput={(e) => onupdate({value: e.currentTarget.value})}
 	/>
 	<Confirm_Button
-		onclick={onremove}
+		onconfirm={onremove}
 		attrs={{title: `remove attribute ${attribute.key || ''}`, class: 'plain compact'}}
 	>
 		{GLYPH_REMOVE}

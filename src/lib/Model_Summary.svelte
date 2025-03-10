@@ -9,11 +9,11 @@
 		attrs?: SvelteHTMLElements['div'];
 	}
 
-	const {model, attrs = {}}: Props = $props();
+	const {model, attrs}: Props = $props();
 	const provider = $derived(model.zzz.providers.find_by_name(model.provider_name));
 </script>
 
-<div {...attrs} class="panel p_lg {attrs.class}">
+<div {...attrs} class="panel p_lg {attrs?.class}">
 	<div class="size_xl mb_lg">
 		<Model_Link {model} icon="glyph" />
 	</div>

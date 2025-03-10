@@ -52,7 +52,7 @@
 			<!-- TODO restore -->
 		</div>
 		<Confirm_Button
-			onclick={() => prompts.remove_bit(bit.id)}
+			onconfirm={() => prompts.remove_bit(bit.id)}
 			attrs={{title: `remove bit ${bit.id}`}}
 		/>
 	</div>

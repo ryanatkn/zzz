@@ -60,18 +60,21 @@ export class Scrollable {
 			node.classList.add(this.target_class);
 		}
 
-		// TODO is this orphaned? better pattern without effect? if keeping the effect, then correctly removing the previous `target_class` on change
-		$effect(() => {
-			if (this.scrolled) {
-				node.classList.add(this.target_class);
-			} else {
-				node.classList.remove(this.target_class);
-			}
+		// TODO better pattern without effect, maybe require a param? but then the state isn't synced
+		const cleanup = $effect.root(() => {
+			$effect(() => {
+				if (this.scrolled) {
+					node.classList.add(this.target_class);
+				} else {
+					node.classList.remove(this.target_class);
+				}
+			});
 		});
 
 		return {
 			destroy: () => {
 				node.classList.remove(this.target_class);
+				cleanup();
 			},
 		};
 	};

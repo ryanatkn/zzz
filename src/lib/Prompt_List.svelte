@@ -98,7 +98,7 @@
 								<Prompt_Summary {prompt} />
 							</div>
 							<Confirm_Button
-								onclick={() => chat.remove_selected_prompt(prompt.id)}
+								onconfirm={() => chat.remove_selected_prompt(prompt.id)}
 								attrs={{
 									class: 'plain compact',
 									title: `Remove prompt ${prompt.name}`,
