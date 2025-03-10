@@ -177,11 +177,6 @@
       "types": "./dist/config.d.ts",
       "default": "./dist/config.js"
     },
-    "./Confirm_Button_Examples.svelte": {
-      "types": "./dist/Confirm_Button_Examples.svelte.d.ts",
-      "svelte": "./dist/Confirm_Button_Examples.svelte",
-      "default": "./dist/Confirm_Button_Examples.svelte"
-    },
     "./Confirm_Button.svelte": {
       "types": "./dist/Confirm_Button.svelte.d.ts",
       "svelte": "./dist/Confirm_Button.svelte",
@@ -406,11 +401,6 @@
       "types": "./dist/Ping_Form.svelte.d.ts",
       "svelte": "./dist/Ping_Form.svelte",
       "default": "./dist/Ping_Form.svelte"
-    },
-    "./Popover_Button_Examples.svelte": {
-      "types": "./dist/Popover_Button_Examples.svelte.d.ts",
-      "svelte": "./dist/Popover_Button_Examples.svelte",
-      "default": "./dist/Popover_Button_Examples.svelte"
     },
     "./Popover_Button.svelte": {
       "types": "./dist/Popover_Button.svelte.d.ts",

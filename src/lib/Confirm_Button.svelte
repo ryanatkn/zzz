@@ -21,14 +21,10 @@
 		popover_button_attrs,
 		hide_on_confirm = true,
 		position = 'left',
-		align = 'center',
-		disable_outside_click = false,
-		popover_class,
-		popover_attrs,
 		popover_content: popover_content_prop,
-		attrs,
 		button,
 		children,
+		...rest
 	}: Props = $props();
 
 	// TODO @many type union instead of this pattern?
@@ -41,16 +37,7 @@
 	}
 </script>
 
-<Popover_Button
-	{position}
-	{align}
-	{disable_outside_click}
-	{popover_class}
-	{popover_attrs}
-	{attrs}
-	{button}
-	children={button ? undefined : children_default}
->
+<Popover_Button {position} {button} {...rest} children={button ? undefined : children_default}>
 	{#snippet popover_content(popover)}
 		{#if popover_content_prop}
 			{@render popover_content_prop(popover)}

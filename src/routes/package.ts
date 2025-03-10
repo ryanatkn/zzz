@@ -139,11 +139,6 @@ export const package_json = {
 			default: './dist/config_helpers.js',
 		},
 		'./config.js': {types: './dist/config.d.ts', default: './dist/config.js'},
-		'./Confirm_Button_Examples.svelte': {
-			types: './dist/Confirm_Button_Examples.svelte.d.ts',
-			svelte: './dist/Confirm_Button_Examples.svelte',
-			default: './dist/Confirm_Button_Examples.svelte',
-		},
 		'./Confirm_Button.svelte': {
 			types: './dist/Confirm_Button.svelte.d.ts',
 			svelte: './dist/Confirm_Button.svelte',
@@ -341,11 +336,6 @@ export const package_json = {
 			types: './dist/Ping_Form.svelte.d.ts',
 			svelte: './dist/Ping_Form.svelte',
 			default: './dist/Ping_Form.svelte',
-		},
-		'./Popover_Button_Examples.svelte': {
-			types: './dist/Popover_Button_Examples.svelte.d.ts',
-			svelte: './dist/Popover_Button_Examples.svelte',
-			default: './dist/Popover_Button_Examples.svelte',
 		},
 		'./Popover_Button.svelte': {
 			types: './dist/Popover_Button.svelte.d.ts',
@@ -596,7 +586,6 @@ export const src_json = {
 				{name: 'default', kind: 'variable'},
 			],
 		},
-		'./Confirm_Button_Examples.svelte': {path: 'Confirm_Button_Examples.svelte', declarations: []},
 		'./Confirm_Button.svelte': {path: 'Confirm_Button.svelte', declarations: []},
 		'./constants.js': {
 			path: 'constants.ts',
@@ -778,7 +767,6 @@ export const src_json = {
 		},
 		'./path.js': {path: 'path.ts', declarations: [{name: 'to_root_path', kind: 'function'}]},
 		'./Ping_Form.svelte': {path: 'Ping_Form.svelte', declarations: []},
-		'./Popover_Button_Examples.svelte': {path: 'Popover_Button_Examples.svelte', declarations: []},
 		'./Popover_Button.svelte': {path: 'Popover_Button.svelte', declarations: []},
 		'./popover.svelte.js': {
 			path: 'popover.svelte.ts',

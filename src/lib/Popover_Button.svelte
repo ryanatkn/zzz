@@ -55,6 +55,7 @@
 </script>
 
 <!-- TODO these flex values fix some layout cases so that the container is laid out like the button, but this is a partial solution -->
+<!-- TODO add attrs props here? -->
 <div class="flex align_items_start align_self_start">
 	<div class="flex relative" use:popover.container>
 		{#if button}
