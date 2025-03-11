@@ -42,6 +42,9 @@
 .block {
 	display: block;
 }
+.border_color_2 {
+	border-color: var(--border_color_2);
+}
 .border_color_3 {
 	border-color: var(--border_color_3);
 }

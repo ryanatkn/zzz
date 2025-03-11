@@ -13,7 +13,6 @@
 		GLYPH_DESELECT_ALL,
 		GLYPH_INFO,
 	} from '$lib/glyphs.js';
-	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Popover_Button from '$lib/Popover_Button.svelte';
 	import CopyToClipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
@@ -172,16 +171,6 @@
 			>
 				<Glyph_Icon icon={all_selected ? GLYPH_DESELECT_ALL : GLYPH_SELECT_ALL} />
 			</button>
-
-			{#if messages_count > 0}
-				<Clear_Restore_Button
-					value="clear"
-					onchange={clear_all}
-					attrs={{class: 'size_sm', title: `clear all ${type} messages`}}
-				>
-					<Glyph_Icon icon={GLYPH_REMOVE} />
-				</Clear_Restore_Button>
-			{/if}
 		</div>
 	</div>
 
@@ -219,21 +208,25 @@
 
 						<div class="flex gap_xs">
 							<!-- Message details in popover -->
-							<Popover_Button position="left" popover_class="message_data_popover">
-								{#snippet children(_popover)}
-									<button
-										type="button"
-										class="icon_button plain size_sm"
-										title="view message details"
-									>
-										<Glyph_Icon icon={GLYPH_INFO} />
-									</button>
-								{/snippet}
-
+							<Popover_Button
+								position="left"
+								popover_class="message_data_popover"
+								attrs={{class: 'icon_button plain size_sm', title: 'view message details'}}
+							>
+								<Glyph_Icon icon={GLYPH_INFO} size="var(--size_lg)" />
 								{#snippet popover_content(popover)}
-									<div class="message_data_content">
+									<div
+										class="p_md overflow_auto bg"
+										style:max-height="400px"
+										style:max-width="500px"
+										style:min-width="300px"
+										style:border="1px solid var(--border_color_3)"
+										style:border-radius="var(--radius_xs)"
+										style:box-shadow="var(--shadow_md)"
+										style:z-index="100"
+									>
 										<div class="flex justify_content_space_between mb_xs">
-											<strong>Message Details:</strong>
+											<strong>message details</strong>
 											<button
 												type="button"
 												class="icon_button plain size_xs"
@@ -243,7 +236,7 @@
 											</button>
 										</div>
 										<pre
-											class="font_mono size_xs white_space_pre_wrap word_break_break_word m_0">{message_data_serialized}</pre>
+											class="fg_1 radius_xs border_width border_style border_color_2 font_mono size_xs white_space_pre_wrap word_break_break_word p_md">{message_data_serialized}</pre>
 										<CopyToClipboard text={message_data_serialized} />
 									</div>
 								{/snippet}
@@ -311,30 +304,5 @@
 
 	.message_item.selected {
 		border-left: 2px solid var(--color_a);
-	}
-
-	:global(.message_data_popover) {
-		max-width: 500px;
-		min-width: 300px;
-		background-color: var(--bg_2);
-		border: 1px solid var(--border_color_3);
-		border-radius: var(--radius_xs);
-		box-shadow: var(--shadow_md);
-		z-index: 100;
-	}
-
-	.message_data_content {
-		padding: var(--p_sm);
-		max-height: 400px;
-		overflow: auto;
-		background-color: var(--bg);
-	}
-
-	/* Style the JSON pre tag */
-	.message_data_content pre {
-		background-color: var(--fg_1);
-		padding: var(--p_xs);
-		border-radius: var(--radius_xs);
-		border: 1px solid var(--border_color_2);
 	}
 </style>
