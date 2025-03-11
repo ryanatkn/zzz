@@ -62,8 +62,8 @@
 
 	<!-- Hardcode the height to prevent animated content causing weird reflow -->
 	<ul
-		class="unstyled overflow_hidden scrollbar_width_thin column panel p_md mb_0"
-		style:height="162px"
+		class="unstyled overflow_hidden scrollbar_width_thin column panel p_md pb_0 mb_0 shadow_inset_top_xs"
+		style:height="150px"
 	>
 		{#each displayed_pings as ping (ping.id)}
 			{@const response_time = ping_response_times.get(ping.id)}

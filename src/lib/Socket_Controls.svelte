@@ -7,7 +7,6 @@
 
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import type {Socket} from '$lib/socket.svelte.js';
-	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
 	import {GLYPH_CONNECT, GLYPH_CANCEL, GLYPH_DISCONNECT, GLYPH_RESET} from '$lib/glyphs.js';
@@ -17,13 +16,12 @@
 		DEFAULT_RECONNECT_DELAY,
 		DEFAULT_RECONNECT_DELAY_MAX,
 	} from '$lib/socket_helpers.js';
+	import Socket_Message_Queue from '$lib/Socket_Message_Queue.svelte';
 
 	// TODO config - support multiple connections probably
 	const DEFAULT_WS_URL = `${DEV ? 'ws' : 'wss'}://${PUBLIC_SERVER_HOSTNAME}:${PUBLIC_SERVER_PORT}/ws`;
 
 	const pid = $props.id();
-
-	// TODO BLOCK extract a component from here to show the queued messages and have controls to remove them (and bulk actions) - use Messages_List for inspiration but make a new component that takes a socket prop
 
 	interface Props {
 		socket?: Socket;
@@ -35,10 +33,6 @@
 	const zzz = zzz_context.get();
 	const socket = $derived(socket_prop || zzz.socket);
 
-	// Show/hide sections
-	let show_queued_messages = $state(false);
-	let show_failed_messages = $state(false);
-
 	// Track URL state for reset/undo functionality
 	let previous_url = $state('');
 	let has_undo_state = $state(false);
@@ -49,14 +43,6 @@
 		socket.reconnect_delay = DEFAULT_RECONNECT_DELAY;
 		socket.reconnect_delay_max = DEFAULT_RECONNECT_DELAY_MAX;
 	};
-
-	const failed_messages_as_array = $derived.by(() => {
-		const result = [];
-		for (const [_id, message] of socket.failed_messages) {
-			result.push(message);
-		}
-		return result;
-	});
 
 	const format_timestamp = (timestamp: number | null) =>
 		timestamp ? format(timestamp, 'h:mm a') : '-';
@@ -402,121 +388,11 @@
 
 		<div class="flex flex_column gap_md mb_sm">
 			{#if socket.queued_message_count > 0}
-				<div>
-					<div class="flex justify_content_space_between mb_xs">
-						<div class="flex align_items_center gap_xs">
-							<span class="chip color_b">Queued: {socket.queued_message_count}</span>
-							<button
-								type="button"
-								class="plain size_sm"
-								onclick={() => (show_queued_messages = !show_queued_messages)}
-							>
-								{show_queued_messages ? 'hide' : 'show'} messages
-							</button>
-						</div>
-
-						{#if socket.connected}
-							<button
-								type="button"
-								class="color_a size_sm"
-								onclick={() => socket.retry_queued_messages()}
-							>
-								retry now
-							</button>
-						{/if}
-					</div>
-
-					{#if show_queued_messages}
-						<div
-							transition:slide
-							class="border_width_1 border_solid border_color_4 radius_xs my_xs"
-						>
-							<div class="p_sm">
-								<h5 class="mt_0 mb_xs size_md">queued messages</h5>
-							</div>
-							<div class="max_height_sm overflow_auto">
-								{#each socket.message_queue as message (message.id)}
-									<div class="p_sm border_top border_solid border_color_3">
-										<div class="flex justify_content_space_between mb_xs">
-											<small class="font_mono">{message.id}</small>
-											<small>{format(message.created, 'HH:mm:ss')}</small>
-										</div>
-										<pre
-											class="font_mono size_sm bg_2 p_xs radius_xs overflow_auto">{JSON.stringify(
-												message.data,
-												null,
-												2,
-											)}</pre>
-									</div>
-								{:else}
-									<p class="p_sm">no queued messages</p>
-								{/each}
-							</div>
-						</div>
-					{/if}
-				</div>
+				<Socket_Message_Queue {socket} type="queued" />
 			{/if}
 
 			{#if socket.failed_message_count > 0}
-				<div>
-					<div class="flex justify_content_space_between mb_xs">
-						<div class="flex align_items_center gap_xs">
-							<span class="chip color_c">Failed: {socket.failed_message_count}</span>
-							<button
-								type="button"
-								class="plain size_sm"
-								onclick={() => (show_failed_messages = !show_failed_messages)}
-							>
-								{show_failed_messages ? 'hide' : 'show'} messages
-							</button>
-						</div>
-
-						<Clear_Restore_Button
-							value={socket.failed_message_count > 0 ? 'clear' : ''}
-							onchange={() => socket.clear_failed_messages()}
-							attrs={{class: 'size_sm'}}
-						>
-							clear failed
-						</Clear_Restore_Button>
-					</div>
-
-					{#if show_failed_messages}
-						<div
-							transition:slide
-							class="border_width_1 border_solid border_color_4 radius_xs my_xs"
-						>
-							<div class="p_sm">
-								<h5 class="mt_0 mb_xs size_md">failed messages</h5>
-							</div>
-							<div class="max_height_sm overflow_auto">
-								{#each failed_messages_as_array as message (message.id)}
-									<div class="p_sm border_top border_solid border_color_3">
-										<div class="flex justify_content_space_between mb_xs">
-											<small class="font_mono">{message.id}</small>
-											<small>{format(message.created, 'HH:mm:ss')}</small>
-										</div>
-										<div class="flex justify_content_space_between mb_xs">
-											<span>failed at:</span>
-											<span>{format(message.failed_at, 'HH:mm:ss')}</span>
-										</div>
-										<div class="flex justify_content_space_between mb_xs">
-											<span>reason:</span>
-											<span class="color_c">{message.reason}</span>
-										</div>
-										<pre
-											class="font_mono size_sm bg_2 p_xs radius_xs overflow_auto">{JSON.stringify(
-												message.data,
-												null,
-												2,
-											)}</pre>
-									</div>
-								{:else}
-									<p class="p_sm">no failed messages</p>
-								{/each}
-							</div>
-						</div>
-					{/if}
-				</div>
+				<Socket_Message_Queue {socket} type="failed" />
 			{/if}
 		</div>
 	</div>

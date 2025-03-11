@@ -460,6 +460,11 @@ export const package_json = {
 			types: './dist/socket_helpers.d.ts',
 			default: './dist/socket_helpers.js',
 		},
+		'./Socket_Message_Queue.svelte': {
+			types: './dist/Socket_Message_Queue.svelte.d.ts',
+			svelte: './dist/Socket_Message_Queue.svelte',
+			default: './dist/Socket_Message_Queue.svelte',
+		},
 		'./socket.svelte.js': {types: './dist/socket.svelte.d.ts', default: './dist/socket.svelte.js'},
 		'./tape_helpers.js': {types: './dist/tape_helpers.d.ts', default: './dist/tape_helpers.js'},
 		'./Tape_List.svelte': {
@@ -664,6 +669,11 @@ export const src_json = {
 				{name: 'GLYPH_RESET', kind: 'variable'},
 				{name: 'GLYPH_CONNECT', kind: 'variable'},
 				{name: 'GLYPH_DISCONNECT', kind: 'variable'},
+				{name: 'GLYPH_RETRY', kind: 'variable'},
+				{name: 'GLYPH_DELETE', kind: 'variable'},
+				{name: 'GLYPH_CLEAR', kind: 'variable'},
+				{name: 'GLYPH_SELECT_ALL', kind: 'variable'},
+				{name: 'GLYPH_DESELECT_ALL', kind: 'variable'},
 				{name: 'GLYPH_CHAT', kind: 'variable'},
 				{name: 'GLYPH_TAPE', kind: 'variable'},
 				{name: 'GLYPH_FILE', kind: 'variable'},
@@ -950,6 +960,7 @@ export const src_json = {
 				{name: 'DEFAULT_CLOSE_CODE', kind: 'variable'},
 			],
 		},
+		'./Socket_Message_Queue.svelte': {path: 'Socket_Message_Queue.svelte', declarations: []},
 		'./socket.svelte.js': {
 			path: 'socket.svelte.ts',
 			declarations: [

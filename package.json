@@ -533,6 +533,11 @@
       "types": "./dist/socket_helpers.d.ts",
       "default": "./dist/socket_helpers.js"
     },
+    "./Socket_Message_Queue.svelte": {
+      "types": "./dist/Socket_Message_Queue.svelte.d.ts",
+      "svelte": "./dist/Socket_Message_Queue.svelte",
+      "default": "./dist/Socket_Message_Queue.svelte"
+    },
     "./socket.svelte.js": {
       "types": "./dist/socket.svelte.d.ts",
       "default": "./dist/socket.svelte.js"
