@@ -73,12 +73,6 @@
 			reset_url();
 		}
 	};
-
-	// Handle cancel reconnect button click
-	const handle_cancel_reconnect = () => {
-		socket.auto_reconnect = false;
-		socket.cancel_reconnect();
-	};
 </script>
 
 <!-- Main control section with flex layout for wide screens -->
@@ -209,7 +203,9 @@
 							type="button"
 							class="color_d size_xl icon_button plain"
 							title="cancel reconnection attempt"
-							onclick={handle_cancel_reconnect}
+							onclick={() => {
+								socket.cancel_reconnect();
+							}}
 						>
 							{GLYPH_CANCEL}
 						</button>

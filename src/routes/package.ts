@@ -670,10 +670,8 @@ export const src_json = {
 				{name: 'GLYPH_CONNECT', kind: 'variable'},
 				{name: 'GLYPH_DISCONNECT', kind: 'variable'},
 				{name: 'GLYPH_RETRY', kind: 'variable'},
-				{name: 'GLYPH_DELETE', kind: 'variable'},
 				{name: 'GLYPH_CLEAR', kind: 'variable'},
-				{name: 'GLYPH_SELECT_ALL', kind: 'variable'},
-				{name: 'GLYPH_DESELECT_ALL', kind: 'variable'},
+				{name: 'GLYPH_INFO', kind: 'variable'},
 				{name: 'GLYPH_CHAT', kind: 'variable'},
 				{name: 'GLYPH_TAPE', kind: 'variable'},
 				{name: 'GLYPH_FILE', kind: 'variable'},
@@ -999,7 +997,10 @@ export const src_json = {
 		},
 		'./time_helpers.js': {
 			path: 'time_helpers.ts',
-			declarations: [{name: 'format_ms_to_readable', kind: 'function'}],
+			declarations: [
+				{name: 'format_timestamp', kind: 'function'},
+				{name: 'format_ms_to_readable', kind: 'function'},
+			],
 		},
 		'./time.svelte.js': {
 			path: 'time.svelte.ts',
