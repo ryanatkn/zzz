@@ -2,22 +2,13 @@
 	import {slide} from 'svelte/transition';
 	import {format} from 'date-fns';
 	import {SvelteMap} from 'svelte/reactivity';
+	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
 
 	import type {Socket, Queued_Message, Failed_Message} from '$lib/socket.svelte.js';
 	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
-	import {
-		GLYPH_RETRY,
-		GLYPH_DELETE,
-		GLYPH_REMOVE,
-		GLYPH_SELECT_ALL,
-		GLYPH_DESELECT_ALL,
-		GLYPH_INFO,
-	} from '$lib/glyphs.js';
+	import {GLYPH_RETRY, GLYPH_DELETE, GLYPH_REMOVE, GLYPH_INFO} from '$lib/glyphs.js';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Popover_Button from '$lib/Popover_Button.svelte';
-	import CopyToClipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
-
-	// TODO BLOCK hack see below:  `:global(.message_data_popover) {`
 
 	interface Props {
 		socket: Socket;
@@ -25,6 +16,8 @@
 	}
 
 	const {socket, type}: Props = $props();
+
+	// TODO show "ping the server" for both http and websocket transports
 
 	// Track selected messages for bulk actions
 	const selected_messages: SvelteMap<string, boolean> = new SvelteMap();
@@ -118,15 +111,6 @@
 		}
 		deselect_all();
 	};
-
-	const clear_all = () => {
-		if (type === 'queued') {
-			socket.message_queue = [];
-		} else {
-			socket.clear_failed_messages();
-		}
-		deselect_all();
-	};
 </script>
 
 <div class="message_queue_container">
@@ -164,12 +148,12 @@
 
 			<button
 				type="button"
-				class="icon_button plain size_sm"
+				class="plain size_sm"
 				title="{all_selected ? 'deselect' : 'select'} all {type} messages"
 				disabled={messages_count === 0}
 				onclick={all_selected ? deselect_all : select_all}
 			>
-				<Glyph_Icon icon={all_selected ? GLYPH_DESELECT_ALL : GLYPH_SELECT_ALL} />
+				{all_selected ? 'deselect all' : 'select all'}
 			</button>
 		</div>
 	</div>
@@ -191,7 +175,7 @@
 					<div class="flex gap_xs align_items_center flex_wrap">
 						<input
 							type="checkbox"
-							class="m_0"
+							class="m_0 plain compact size_md"
 							checked={is_selected}
 							onclick={(e) => toggle_message_selection(message.id, e.currentTarget.checked)}
 						/>
@@ -201,7 +185,26 @@
 							<span class="chip size_sm">
 								{message_type}
 							</span>
-							<small class="text_color_5">{message.id}</small>
+
+							<Copy_To_Clipboard
+								text={message.id}
+								attrs={{
+									class: 'plain size_xs text_color_5',
+									style: 'width: 120px;',
+									title: 'copy message id to clipboard',
+								}}
+								copied_display_duration={0}
+							>
+								{#snippet children(copied)}
+									{#if copied}
+										<div><small class="size_xs">{message.id}</small></div>
+									{:else}
+										<div in:slide={{duration: 200}}>
+											<small class="size_xs">{message.id}</small>
+										</div>
+									{/if}
+								{/snippet}
+							</Copy_To_Clipboard>
 						</div>
 
 						<span class="font_mono size_xs">{format(message.created, 'HH:mm:ss')}</span>
@@ -210,7 +213,6 @@
 							<!-- Message details in popover -->
 							<Popover_Button
 								position="left"
-								popover_class="message_data_popover"
 								attrs={{class: 'icon_button plain size_sm', title: 'view message details'}}
 							>
 								<Glyph_Icon icon={GLYPH_INFO} size="var(--size_lg)" />
@@ -237,7 +239,7 @@
 										</div>
 										<pre
 											class="fg_1 radius_xs border_width border_style border_color_2 font_mono size_xs white_space_pre_wrap word_break_break_word p_md">{message_data_serialized}</pre>
-										<CopyToClipboard text={message_data_serialized} />
+										<Copy_To_Clipboard text={message_data_serialized} />
 									</div>
 								{/snippet}
 							</Popover_Button>

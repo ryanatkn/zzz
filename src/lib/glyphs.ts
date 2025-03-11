@@ -10,11 +10,12 @@ export const GLYPH_RETRY = '↺'; // ⟲'; // ⟲ ⟳ ⤾ ⤼ ↻
 export const GLYPH_DELETE = '🗑';
 export const GLYPH_CLEAR = '⌫'; // ⌧ ⌫ ⨂ ⊝ ⦸
 export const GLYPH_INFO = 'ⓘ';
-export const GLYPH_SELECT_ALL = '☑'; // ⎗ ⎗ ⎘ ⌖ ⌶ ⎙
-export const GLYPH_DESELECT_ALL = '☒'; // ⎘ ⎘ ⎌ ⌫ ⊘ ⦸
+
 // export const GLYPH_EDIT = '✎'; // ✎ ✏ ✐ ✑ ✒
 // export const GLYPH_ADD = '⊞'; // ⊞ ⧉ ⧈
 // export const GLYPH_MOVE = '⧈';
+// ⎗ ⎗ ⎘ ⌖ ⌶ ⎙
+// ⎘ ⎘ ⎌ ⌫ ⊘ ⦸
 
 export const GLYPH_CHAT = '⌸';
 export const GLYPH_TAPE = '☷';
