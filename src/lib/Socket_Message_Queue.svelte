@@ -174,7 +174,7 @@
 			<button
 				type="button"
 				class="icon_button plain size_sm"
-				title={all_selected ? 'deselect all' : 'select all'}
+				title="{all_selected ? 'deselect' : 'select'} all {type} messages"
 				disabled={messages_count === 0}
 				onclick={all_selected ? deselect_all : select_all}
 			>
