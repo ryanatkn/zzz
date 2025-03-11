@@ -3,7 +3,7 @@ import {encode as tokenize} from 'gpt-tokenizer';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Diskfile_Json, type Diskfile_Path, type Source_File} from '$lib/diskfile_types.js';
 
-export interface Diskfile_Options extends Cell_Options<typeof Diskfile_Json> {}
+export interface Diskfile_Options extends Cell_Options<typeof Diskfile_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
 export class Diskfile extends Cell<typeof Diskfile_Json> {
 	path: Diskfile_Path = $state()!; // Renamed from file_id

@@ -8,12 +8,15 @@
 	import {GLYPH_REMOVE} from '$lib/glyphs.js';
 	import type {Popover} from '$lib/popover.svelte.js';
 
-	interface Props extends Omit_Strict<ComponentProps<typeof Popover_Button>, 'popover_content'> {
+	interface Props
+		extends Omit_Strict<ComponentProps<typeof Popover_Button>, 'popover_content' | 'children'> {
 		onconfirm: (popover: Popover) => void;
 		popover_button_attrs?: SvelteHTMLElements['button'];
 		hide_on_confirm?: boolean;
-		/** Unlike on `Popover_Button` this is optional */
-		popover_content?: Snippet<[popover: Popover]>;
+		/** Unlike on `Popover_Button` this is optional and has a `confirm` arg */
+		popover_content?: Snippet<[popover: Popover, confirm: () => void]>;
+		/** Unlike on `Popover_Button` this has a `confirm` arg */
+		children?: Snippet<[popover: Popover, confirm: () => void]>;
 	}
 
 	const {
@@ -35,23 +38,25 @@
 			);
 		}
 	}
+
+	const confirm = (popover: Popover): void => {
+		if (hide_on_confirm) popover.hide();
+		onconfirm(popover);
+	};
 </script>
 
 <Popover_Button {position} {button} {...rest} children={button ? undefined : children_default}>
 	{#snippet popover_content(popover)}
 		{#if popover_content_prop}
-			{@render popover_content_prop(popover)}
+			{@render popover_content_prop(popover, () => confirm(popover))}
 		{:else}
 			<button
 				type="button"
 				class="color_c icon_button bg_c_1"
-				onclick={() => {
-					if (hide_on_confirm) popover.hide();
-					onconfirm(popover);
-				}}
+				onclick={() => confirm(popover)}
 				{...popover_button_attrs}
 			>
-				<div class="icon">{GLYPH_REMOVE}</div>
+				<div>{GLYPH_REMOVE}</div>
 			</button>
 		{/if}
 	{/snippet}
@@ -59,7 +64,7 @@
 
 {#snippet children_default(popover: Popover)}
 	{#if children}
-		{@render children(popover)}
+		{@render children(popover, () => confirm(popover))}
 	{:else}
 		{GLYPH_REMOVE}
 	{/if}

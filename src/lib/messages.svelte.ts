@@ -51,7 +51,7 @@ export class Messages extends Cell<typeof Messages_Json> {
 
 	// Message handlers
 	onsend?: (message: Message_Client) => void;
-	#onreceive?: (message: Message_Server) => void;
+	onreceive?: (message: Message_Server) => void;
 
 	constructor(options: Messages_Options) {
 		super(Messages_Json, options);
@@ -111,23 +111,11 @@ export class Messages extends Cell<typeof Messages_Json> {
 	}
 
 	/**
-	 * Set message handlers with proper typing
-	 */
-	set_handlers(
-		onsend: (message: Message_Client) => void,
-		onreceive: (message: Message_Server) => void,
-	): void {
-		// Store the send handler
-		this.onsend = onsend;
-		this.#onreceive = onreceive;
-	}
-
-	/**
 	 * Send a message using the registered handler with proper typing
 	 */
 	send(message: Message_Client): void {
 		if (!this.onsend) {
-			console.error('No send handler registered');
+			console.error('No send handler registered', message);
 			return;
 		}
 
@@ -139,13 +127,13 @@ export class Messages extends Cell<typeof Messages_Json> {
 	 * Handle a received message with proper typing
 	 */
 	receive(message: Message_Server): void {
-		if (!this.#onreceive) {
+		if (!this.onreceive) {
 			console.error('No receive handler registered');
 			return;
 		}
 
 		this.add(create_message_json(message, 'server'));
-		this.#onreceive(message);
+		this.onreceive(message);
 	}
 
 	/**

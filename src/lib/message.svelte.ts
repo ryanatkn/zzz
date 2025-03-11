@@ -16,8 +16,7 @@ export const MESSAGE_DATE_FORMAT = 'MMM d, p';
 export const MESSAGE_TIME_FORMAT = 'p';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
-export interface Message_Options extends Cell_Options<typeof Message_Json> {}
-
+export interface Message_Options extends Cell_Options<typeof Message_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 // TODO BLOCK `Message` is not a good user-facing term - what else?
 
 // TODO think about splitting out a different non-reactive version

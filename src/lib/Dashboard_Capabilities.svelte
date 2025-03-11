@@ -31,9 +31,6 @@
 			<li>local Ollama API</li>
 			<li>utility models (like the first one for `namerbot`)</li>
 			<li>Node server</li>
-			<ul class="mb_0">
-				<li>websocket connection</li>
-			</ul>
 			<li>AI providers (API keys)</li>
 			<li>pg db (Postgres, pglite, or some other compatible database)</li>
 			<li>ephemerally connected devices - mic, webcam, midi, etc</li>
@@ -43,11 +40,15 @@
 		<Control_Panel />
 	</section>
 	<section class="width_sm">
-		<p>
-			DEV mode: {DEV.toString()}
-		</p>
+		<h2>Build</h2>
+		<div class="font_mono">
+			<p>{pkg.name}@{pkg.package_json.version}</p>
+			<p>
+				DEV: {DEV + ''}
+			</p>
+		</div>
 	</section>
-	<section class="mb_xl7 flex">
+	<section class="mb_xl7 flex justify_content_center">
 		<Library_Footer {pkg}>
 			<div class="mb_xl5">
 				<Breadcrumb><Svg data={zzz_logo} size="var(--icon_size_sm)" /></Breadcrumb>

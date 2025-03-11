@@ -45,7 +45,7 @@ app.get(
 					return;
 				}
 				// console.log(`[server] handling message`, data);
-				if (data.type === 'gro_server_message') {
+				if (data.type === 'server_message') {
 					let message: Message_Server | null;
 					try {
 						message = await zzz_server.receive(data.message);
@@ -55,7 +55,7 @@ app.get(
 						return;
 					}
 					if (message) {
-						ws.send(devalue.stringify({type: 'gro_server_message', message}));
+						ws.send(devalue.stringify({type: 'server_message', message}));
 					}
 				} else {
 					ws.send(devalue.stringify('hi'));
@@ -85,7 +85,7 @@ injectWebSocket(server);
 const zzz_server = new Zzz_Server({
 	send_to_all_clients: (message) => {
 		for (const ws of sockets) {
-			ws.send(devalue.stringify({type: 'gro_server_message', message}));
+			ws.send(devalue.stringify({type: 'server_message', message}));
 		}
 	},
 	// providers, // TODO ?

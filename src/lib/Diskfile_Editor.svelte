@@ -93,10 +93,7 @@
 			>
 
 			<Confirm_Button onconfirm={() => zzz.diskfiles.delete(file.path)} attrs={{class: 'color_c'}}>
-				<!-- Use path instead of file_id -->
-				{#snippet children()}
-					delete file
-				{/snippet}
+				delete file
 			</Confirm_Button>
 		</div>
 
@@ -173,7 +170,5 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		padding: var(--space_xs2);
-		background: var(--color_bg_alt);
-		border-radius: var(--radius_xs);
 	}
 </style>

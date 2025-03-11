@@ -1,7 +1,11 @@
 export const GLYPH_REMOVE = '⨉'; // ⨉ ✕ 🗙 ⤫ ⤬
+export const GLYPH_CANCEL = '⦸';
 export const GLYPH_DRAG = '≡'; // ≡ ☰ ☷
 export const GLYPH_COPY = '⧉';
 export const GLYPH_PASTE = '⎌'; // ⧈ ⎗ ⎘ ⎙
+export const GLYPH_RESET = '⤺';
+export const GLYPH_CONNECT = '⭍'; // ⨁
+export const GLYPH_DISCONNECT = '⨂';
 // export const GLYPH_EDIT = '✎'; // ✎ ✏ ✐ ✑ ✒
 // export const GLYPH_ADD = '⊞'; // ⊞ ⧉ ⧈
 // export const GLYPH_MOVE = '⧈';
@@ -14,10 +18,12 @@ export const GLYPH_BIT = '┊'; //  ┊ ┋ ╎ ╏
 export const GLYPH_PROVIDER = '⨕';
 export const GLYPH_MODEL = '⊛'; // ⨹ ⨺ ⊛
 export const GLYPH_MESSAGE = '⍾';
+export const GLYPH_LOG = '⎙'; // ⎙ ⏚ ⌺ ⏏ ⍜
 export const GLYPH_CAPABILITY = '⧰'; // ⌁
 export const GLYPH_SETTINGS = '⛮'; // ⛭  ⚙  ⛮  ⛯ ⛣
 
 export const GLYPH_ECHO = '⥀';
+export const GLYPH_HEARTBEAT = '∽'; // ∿ ≋ 〰 ∽ ~
 export const GLYPH_RESPONSE = '⮑';
 export const GLYPH_SESSION = '⏣';
 
@@ -59,7 +65,7 @@ export const get_direction_icon = (direction: string): string => {
 	}
 };
 
-// ⭍
+// ⭍ ⏻
 //⥘ ⥙
 // ⬎⤣
 
@@ -67,6 +73,7 @@ export const get_direction_icon = (direction: string): string => {
 
 // ⇇ ⇉  maybe use these for deps?
 
+// ⛶
 // ⏛
 // ☳ ☷
 // ≣

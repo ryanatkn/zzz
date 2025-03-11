@@ -57,6 +57,12 @@ input[type='checkbox'].plain:not(:hover) {
 	--input_fill: transparent;
 }
 
+/* TOOD upstream */
+input.input_xs {
+	--input_width_min: 80px;
+	max-width: 80px;
+}
+
 /* TODO upstream? something like it? */
 .dormant {
 	opacity: 0.6;
@@ -165,4 +171,91 @@ input[type='checkbox'].plain:not(:hover) {
 .column_bg_1 {
 	background-color: var(--fg_1);
 	min-height: 100%;
+}
+
+/* TODO upstream */
+.max_height_sm {
+	max-height: var(--width_sm);
+	overflow-y: auto;
+	scrollbar-width: thin;
+}
+
+/* TODO upstream */
+/* Chip styles */
+.chip {
+	padding: var(--space_xs5) var(--space_sm);
+	background-color: var(--fg_1);
+	border-radius: var(--radius_xs);
+	display: inline-flex;
+	align-items: center;
+}
+.chip:not(.plain) {
+	border: var(--border_width_1) solid transparent;
+}
+a.chip {
+	font-weight: 700;
+}
+/* Chip color variants */
+.chip.color_a {
+	color: var(--color_a_5);
+	background-color: color-mix(in hsl, var(--fill_a) 12%, transparent);
+}
+.chip.color_b {
+	color: var(--color_b_5);
+	background-color: color-mix(in hsl, var(--fill_b) 12%, transparent);
+}
+.chip.color_c {
+	color: var(--color_c_5);
+	background-color: color-mix(in hsl, var(--fill_c) 12%, transparent);
+}
+.chip.color_d {
+	color: var(--color_d_5);
+	background-color: color-mix(in hsl, var(--fill_d) 12%, transparent);
+}
+.chip.color_e {
+	color: var(--color_e_5);
+	background-color: color-mix(in hsl, var(--fill_e) 12%, transparent);
+}
+.chip.color_f {
+	color: var(--color_f_5);
+	background-color: color-mix(in hsl, var(--fill_f) 12%, transparent);
+}
+.chip.color_g {
+	color: var(--color_g_5);
+	background-color: color-mix(in hsl, var(--fill_g) 12%, transparent);
+}
+.chip.color_h {
+	color: var(--color_h_5);
+	background-color: color-mix(in hsl, var(--fill_h) 12%, transparent);
+}
+.chip.color_i {
+	color: var(--color_i_5);
+	background-color: color-mix(in hsl, var(--fill_i) 12%, transparent);
+}
+.chip.color_a:not(.plain) {
+	border-color: var(--border_color_a);
+}
+.chip.color_b:not(.plain) {
+	border-color: var(--border_color_b);
+}
+.chip.color_c:not(.plain) {
+	border-color: var(--border_color_c);
+}
+.chip.color_d:not(.plain) {
+	border-color: var(--border_color_d);
+}
+.chip.color_e:not(.plain) {
+	border-color: var(--border_color_e);
+}
+.chip.color_f:not(.plain) {
+	border-color: var(--border_color_f);
+}
+.chip.color_g:not(.plain) {
+	border-color: var(--border_color_g);
+}
+.chip.color_h:not(.plain) {
+	border-color: var(--border_color_h);
+}
+.chip.color_i:not(.plain) {
+	border-color: var(--border_color_i);
 }

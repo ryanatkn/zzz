@@ -57,7 +57,7 @@ export const package_json = {
 	},
 	dependencies: {
 		'@anthropic-ai/sdk': '^0.37.0',
-		'@google/generative-ai': '^0.22.0',
+		'@google/generative-ai': '^0.24.0',
 		'@hono/node-server': '^1.13.8',
 		'@hono/node-ws': '^1.1.0',
 		'@ryanatkn/belt': '^0.29.1',
@@ -170,10 +170,10 @@ export const package_json = {
 			svelte: './dist/Dashboard_Home.svelte',
 			default: './dist/Dashboard_Home.svelte',
 		},
-		'./Dashboard_Messages.svelte': {
-			types: './dist/Dashboard_Messages.svelte.d.ts',
-			svelte: './dist/Dashboard_Messages.svelte',
-			default: './dist/Dashboard_Messages.svelte',
+		'./Dashboard_Log.svelte': {
+			types: './dist/Dashboard_Log.svelte.d.ts',
+			svelte: './dist/Dashboard_Log.svelte',
+			default: './dist/Dashboard_Log.svelte',
 		},
 		'./Dashboard_Models.svelte': {
 			types: './dist/Dashboard_Models.svelte.d.ts',
@@ -451,6 +451,16 @@ export const package_json = {
 			svelte: './dist/Settings.svelte',
 			default: './dist/Settings.svelte',
 		},
+		'./Socket_Controls.svelte': {
+			types: './dist/Socket_Controls.svelte.d.ts',
+			svelte: './dist/Socket_Controls.svelte',
+			default: './dist/Socket_Controls.svelte',
+		},
+		'./socket_helpers.js': {
+			types: './dist/socket_helpers.d.ts',
+			default: './dist/socket_helpers.js',
+		},
+		'./socket.svelte.js': {types: './dist/socket.svelte.d.ts', default: './dist/socket.svelte.js'},
 		'./tape_helpers.js': {types: './dist/tape_helpers.d.ts', default: './dist/tape_helpers.js'},
 		'./Tape_List.svelte': {
 			types: './dist/Tape_List.svelte.d.ts',
@@ -465,6 +475,8 @@ export const package_json = {
 		'./tape_types.js': {types: './dist/tape_types.d.ts', default: './dist/tape_types.js'},
 		'./tape.svelte.js': {types: './dist/tape.svelte.d.ts', default: './dist/tape.svelte.js'},
 		'./test.task.js': {types: './dist/test.task.d.ts', default: './dist/test.task.js'},
+		'./time_helpers.js': {types: './dist/time_helpers.d.ts', default: './dist/time_helpers.js'},
+		'./time.svelte.js': {types: './dist/time.svelte.d.ts', default: './dist/time.svelte.js'},
 		'./ui.svelte.js': {types: './dist/ui.svelte.d.ts', default: './dist/ui.svelte.js'},
 		'./Xml_Attribute_Editor.svelte': {
 			types: './dist/Xml_Attribute_Editor.svelte.d.ts',
@@ -596,7 +608,7 @@ export const src_json = {
 		'./Dashboard_Chats.svelte': {path: 'Dashboard_Chats.svelte', declarations: []},
 		'./Dashboard_Files.svelte': {path: 'Dashboard_Files.svelte', declarations: []},
 		'./Dashboard_Home.svelte': {path: 'Dashboard_Home.svelte', declarations: []},
-		'./Dashboard_Messages.svelte': {path: 'Dashboard_Messages.svelte', declarations: []},
+		'./Dashboard_Log.svelte': {path: 'Dashboard_Log.svelte', declarations: []},
 		'./Dashboard_Models.svelte': {path: 'Dashboard_Models.svelte', declarations: []},
 		'./Dashboard_Prompts.svelte': {path: 'Dashboard_Prompts.svelte', declarations: []},
 		'./Dashboard_Providers.svelte': {path: 'Dashboard_Providers.svelte', declarations: []},
@@ -645,9 +657,13 @@ export const src_json = {
 			path: 'glyphs.ts',
 			declarations: [
 				{name: 'GLYPH_REMOVE', kind: 'variable'},
+				{name: 'GLYPH_CANCEL', kind: 'variable'},
 				{name: 'GLYPH_DRAG', kind: 'variable'},
 				{name: 'GLYPH_COPY', kind: 'variable'},
 				{name: 'GLYPH_PASTE', kind: 'variable'},
+				{name: 'GLYPH_RESET', kind: 'variable'},
+				{name: 'GLYPH_CONNECT', kind: 'variable'},
+				{name: 'GLYPH_DISCONNECT', kind: 'variable'},
 				{name: 'GLYPH_CHAT', kind: 'variable'},
 				{name: 'GLYPH_TAPE', kind: 'variable'},
 				{name: 'GLYPH_FILE', kind: 'variable'},
@@ -656,9 +672,11 @@ export const src_json = {
 				{name: 'GLYPH_PROVIDER', kind: 'variable'},
 				{name: 'GLYPH_MODEL', kind: 'variable'},
 				{name: 'GLYPH_MESSAGE', kind: 'variable'},
+				{name: 'GLYPH_LOG', kind: 'variable'},
 				{name: 'GLYPH_CAPABILITY', kind: 'variable'},
 				{name: 'GLYPH_SETTINGS', kind: 'variable'},
 				{name: 'GLYPH_ECHO', kind: 'variable'},
+				{name: 'GLYPH_HEARTBEAT', kind: 'variable'},
 				{name: 'GLYPH_RESPONSE', kind: 'variable'},
 				{name: 'GLYPH_SESSION', kind: 'variable'},
 				{name: 'GLYPH_DIRECTION_CLIENT', kind: 'variable'},
@@ -881,8 +899,10 @@ export const src_json = {
 		'./response_helpers.js': {
 			path: 'response_helpers.ts',
 			declarations: [
-				{name: 'create_completion_response', kind: 'function'},
 				{name: 'to_completion_response_text', kind: 'function'},
+				{name: 'process_provider_data', kind: 'function'},
+				{name: 'create_completion_response', kind: 'function'},
+				{name: 'create_completion_response_message', kind: 'function'},
 			],
 		},
 		'./scrollable.svelte.js': {
@@ -918,6 +938,30 @@ export const src_json = {
 			],
 		},
 		'./Settings.svelte': {path: 'Settings.svelte', declarations: []},
+		'./Socket_Controls.svelte': {path: 'Socket_Controls.svelte', declarations: []},
+		'./socket_helpers.js': {
+			path: 'socket_helpers.ts',
+			declarations: [
+				{name: 'DEFAULT_HEARTBEAT_INTERVAL', kind: 'variable'},
+				{name: 'DEFAULT_RECONNECT_DELAY', kind: 'variable'},
+				{name: 'DEFAULT_RECONNECT_DELAY_MAX', kind: 'variable'},
+				{name: 'DEFAULT_AUTO_RECONNECT', kind: 'variable'},
+				{name: 'DEFAULT_RETRY_COUNT', kind: 'variable'},
+				{name: 'DEFAULT_CLOSE_CODE', kind: 'variable'},
+			],
+		},
+		'./socket.svelte.js': {
+			path: 'socket.svelte.ts',
+			declarations: [
+				{name: 'Socket_Json', kind: 'variable'},
+				{name: 'Socket_Options', kind: 'type'},
+				{name: 'Socket_Message_Handler', kind: 'type'},
+				{name: 'Socket_Error_Handler', kind: 'type'},
+				{name: 'Queued_Message', kind: 'type'},
+				{name: 'Failed_Message', kind: 'type'},
+				{name: 'Socket', kind: 'class'},
+			],
+		},
 		'./tape_helpers.js': {
 			path: 'tape_helpers.ts',
 			declarations: [{name: 'render_tape', kind: 'function'}],
@@ -940,6 +984,18 @@ export const src_json = {
 			declarations: [
 				{name: 'Args', kind: 'variable'},
 				{name: 'task', kind: 'variable'},
+			],
+		},
+		'./time_helpers.js': {
+			path: 'time_helpers.ts',
+			declarations: [{name: 'format_ms_to_readable', kind: 'function'}],
+		},
+		'./time.svelte.js': {
+			path: 'time.svelte.ts',
+			declarations: [
+				{name: 'Time_Json', kind: 'variable'},
+				{name: 'Time_Options', kind: 'type'},
+				{name: 'Time', kind: 'class'},
 			],
 		},
 		'./ui.svelte.js': {

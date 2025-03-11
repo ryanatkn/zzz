@@ -22,8 +22,7 @@ export const Prompts_Json = z
 
 export type Prompts_Json = z.infer<typeof Prompts_Json>;
 
-export interface Prompts_Options extends Cell_Options<typeof Prompts_Json> {}
-
+export interface Prompts_Options extends Cell_Options<typeof Prompts_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 export class Prompts extends Cell<typeof Prompts_Json> {
 	items: Array<Prompt> = $state([]);
 	selected_id: Uuid | null = $state(null);

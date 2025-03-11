@@ -24,8 +24,7 @@ export const Diskfiles_Json = z
 
 export type Diskfiles_Json = z.infer<typeof Diskfiles_Json>;
 
-export interface Diskfiles_Options extends Cell_Options<typeof Diskfiles_Json> {}
-
+export interface Diskfiles_Options extends Cell_Options<typeof Diskfiles_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 	files: Array<Diskfile> = $state([]);
 	selected_file_id: Uuid | null = $state(null);

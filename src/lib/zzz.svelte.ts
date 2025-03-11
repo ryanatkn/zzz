@@ -10,6 +10,8 @@ import type {
 	Message_Completion_Response,
 	Message_Ping,
 	Message_Pong,
+	Message_Client,
+	Message_Server,
 } from '$lib/message_types.js';
 import {Provider, type Provider_Json} from '$lib/provider.svelte.js';
 import type {Provider_Name} from '$lib/provider_types.js';
@@ -33,6 +35,8 @@ import {Tape} from '$lib/tape.svelte.js';
 import {Ui, Ui_Json} from '$lib/ui.svelte.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
+import {Socket} from '$lib/socket.svelte.js';
+import {Time} from '$lib/time.svelte.js';
 
 // Define standard cell classes
 export const cell_classes = {
@@ -49,6 +53,7 @@ export const cell_classes = {
 	Prompts,
 	Provider,
 	Providers,
+	Socket,
 	Tape,
 	Ui,
 };
@@ -70,12 +75,13 @@ export type Zzz_Json = z.infer<typeof Zzz_Json>;
 // Special options type for Zzz to handle circular reference
 export interface Zzz_Options extends Omit<Cell_Options<typeof Zzz_Json>, 'zzz'> {
 	zzz?: Zzz; // Make zzz optional for Zzz initialization
-	send?: (message: any) => void;
-	receive?: (message: any) => void;
+	onsend?: (message: Message_Client) => void;
+	onreceive?: (message: Message_Server) => void;
 	// completion_threads?: Completion_Threads;
 	models?: Array<Model_Json>;
 	providers?: Array<Provider_Json>;
 	cells?: Record<string, Class_Constructor<Cell>>;
+	socket_url?: string | null;
 }
 
 /**
@@ -95,6 +101,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	readonly registry: Cell_Registry;
 
 	// Cells - these are managed collections that contain the app state
+	readonly time: Time = $state()!;
 	readonly ui: Ui = $state()!;
 	readonly models: Models = $state()!;
 	readonly chats: Chats = $state()!;
@@ -102,6 +109,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	readonly prompts: Prompts = $state()!;
 	readonly diskfiles: Diskfiles = $state()!;
 	readonly messages: Messages = $state()!;
+	readonly socket: Socket = $state()!;
 
 	// Special property to detect self-reference
 	readonly is_zzz: boolean = $state(true);
@@ -137,6 +145,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		// this.completion_threads = options.completion_threads ?? new Completion_Threads({zzz: this});
 
 		// Initialize cell collections
+		this.time = new Time({zzz: this});
 		this.ui = new Ui({zzz: this});
 		this.models = new Models({zzz: this});
 		this.chats = new Chats({zzz: this});
@@ -144,10 +153,14 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		this.prompts = new Prompts({zzz: this});
 		this.diskfiles = new Diskfiles({zzz: this});
 		this.messages = new Messages({zzz: this});
+		this.socket = new Socket({zzz: this});
 
 		// Set up message handlers if provided
-		if (options.send && options.receive) {
-			this.messages.set_handlers(options.send, options.receive);
+		if (options.onsend) {
+			this.messages.onsend = options.onsend;
+		}
+		if (options.onreceive) {
+			this.messages.onreceive = options.onreceive;
 		}
 
 		// Add providers if provided in options
@@ -158,6 +171,11 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		// Add models if provided in options
 		if (options.models?.length) {
 			this.add_models(options.models);
+		}
+
+		// Initialize socket connection if URL provided
+		if (options.socket_url) {
+			this.socket.connect(options.socket_url);
 		}
 
 		// Call init to complete initialization
@@ -257,7 +275,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 			type: 'ping',
 		};
 
-		this.messages.send(ping);
+		this.messages.send(ping); // TODO BLOCK I think this should be awaitable? or a cancelable promise?
 		this.ping_start_times.set(id, performance.now());
 	}
 

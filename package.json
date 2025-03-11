@@ -61,7 +61,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.37.0",
-    "@google/generative-ai": "^0.22.0",
+    "@google/generative-ai": "^0.24.0",
     "@hono/node-server": "^1.13.8",
     "@hono/node-ws": "^1.1.0",
     "@ryanatkn/belt": "^0.29.1",
@@ -211,10 +211,10 @@
       "svelte": "./dist/Dashboard_Home.svelte",
       "default": "./dist/Dashboard_Home.svelte"
     },
-    "./Dashboard_Messages.svelte": {
-      "types": "./dist/Dashboard_Messages.svelte.d.ts",
-      "svelte": "./dist/Dashboard_Messages.svelte",
-      "default": "./dist/Dashboard_Messages.svelte"
+    "./Dashboard_Log.svelte": {
+      "types": "./dist/Dashboard_Log.svelte.d.ts",
+      "svelte": "./dist/Dashboard_Log.svelte",
+      "default": "./dist/Dashboard_Log.svelte"
     },
     "./Dashboard_Models.svelte": {
       "types": "./dist/Dashboard_Models.svelte.d.ts",
@@ -524,6 +524,19 @@
       "svelte": "./dist/Settings.svelte",
       "default": "./dist/Settings.svelte"
     },
+    "./Socket_Controls.svelte": {
+      "types": "./dist/Socket_Controls.svelte.d.ts",
+      "svelte": "./dist/Socket_Controls.svelte",
+      "default": "./dist/Socket_Controls.svelte"
+    },
+    "./socket_helpers.js": {
+      "types": "./dist/socket_helpers.d.ts",
+      "default": "./dist/socket_helpers.js"
+    },
+    "./socket.svelte.js": {
+      "types": "./dist/socket.svelte.d.ts",
+      "default": "./dist/socket.svelte.js"
+    },
     "./tape_helpers.js": {
       "types": "./dist/tape_helpers.d.ts",
       "default": "./dist/tape_helpers.js"
@@ -549,6 +562,14 @@
     "./test.task.js": {
       "types": "./dist/test.task.d.ts",
       "default": "./dist/test.task.js"
+    },
+    "./time_helpers.js": {
+      "types": "./dist/time_helpers.d.ts",
+      "default": "./dist/time_helpers.js"
+    },
+    "./time.svelte.js": {
+      "types": "./dist/time.svelte.d.ts",
+      "default": "./dist/time.svelte.js"
     },
     "./ui.svelte.js": {
       "types": "./dist/ui.svelte.d.ts",

@@ -18,7 +18,7 @@
 </script>
 
 <div class="tape_summary panel p_xs">
-	<div class="flex justify_content_space_between align_items_center">
+	<div class="row justify_content_space_between">
 		<div class="flex_1">
 			<div class="font_weight_600">{tape.model.name}</div>
 			<div class="flex gap_xs">

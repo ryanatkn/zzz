@@ -22,7 +22,7 @@
 	<section class="width_sm">
 		<Settings />
 	</section>
-	<section class="mb_xl7 flex">
+	<section class="mb_xl7 flex justify_content_center">
 		<Library_Footer {pkg}>
 			<div class="mb_xl5">
 				<Breadcrumb><Svg data={zzz_logo} size="var(--icon_size_sm)" /></Breadcrumb>

@@ -23,8 +23,7 @@ export const Chat_Message_Json = Cell_Json.extend({
 
 export type Chat_Message_Json = z.infer<typeof Chat_Message_Json>;
 
-export interface Chat_Message_Options extends Cell_Options<typeof Chat_Message_Json> {}
-
+export interface Chat_Message_Options extends Cell_Options<typeof Chat_Message_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 export class Chat_Message extends Cell<typeof Chat_Message_Json> {
 	content: string = $state()!; // TODO BLOCK should this reference bits? (a message could be an array of bits and/or text?) when a tape gets copied, should the chat messages be copied too?
 	tape_id: Uuid | null | undefined = $state();

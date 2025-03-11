@@ -19,8 +19,7 @@ export const Models_Json = z
 
 export type Models_Json = z.infer<typeof Models_Json>;
 
-export interface Models_Options extends Cell_Options<typeof Models_Json> {}
-
+export interface Models_Options extends Cell_Options<typeof Models_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 export class Models extends Cell<typeof Models_Json> {
 	items: Array<Model> = $state([]);
 

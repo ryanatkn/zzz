@@ -6,7 +6,7 @@
 	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
 	import Provider_Link from '$lib/Provider_Link.svelte';
 	import Model_Link from '$lib/Model_Link.svelte';
-	import {GLYPH_MESSAGE, GLYPH_PROVIDER, GLYPH_MODEL} from '$lib/glyphs.js';
+	import {GLYPH_LOG, GLYPH_PROVIDER, GLYPH_MODEL} from '$lib/glyphs.js';
 
 	const zzz = zzz_context.get();
 
@@ -18,9 +18,7 @@
 	<div class="sections mt_lg">
 		<section class="panel p_md mb_0">
 			<div class="mb_lg">
-				<a class="size_xl font_weight_500" href="{base}/messages"
-					><Glyph_Icon icon={GLYPH_MESSAGE} /> recent messages</a
-				>
+				<a class="size_xl font_weight_500" href="{base}/log"><Glyph_Icon icon={GLYPH_LOG} /> log</a>
 			</div>
 			<Messages_List limit={5} attrs={{class: 'mt_sm'}} />
 		</section>

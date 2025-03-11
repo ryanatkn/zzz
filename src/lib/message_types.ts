@@ -48,8 +48,8 @@ export interface Gemini_Provider_Data {
 	type: 'gemini';
 	value: {
 		text: string;
-		candidates: any[] | null;
-		function_calls: any[] | null;
+		candidates: Array<any> | null;
+		function_calls: Array<any> | null;
 		prompt_feedback: any | null;
 		usage_metadata: any | null;
 	};

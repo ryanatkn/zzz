@@ -2,7 +2,7 @@
 	import Messages_List from '$lib/Messages_List.svelte';
 	import Message_Detail from '$lib/Message_Detail.svelte';
 	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
-	import {GLYPH_MESSAGE} from '$lib/glyphs.js';
+	import {GLYPH_LOG} from '$lib/glyphs.js';
 	import type {Message} from '$lib/message.svelte.js';
 
 	let selected_message: Message | null = $state(null);
@@ -13,11 +13,10 @@
 </script>
 
 <div class="column p_lg h_100">
-	<h1><Glyph_Icon icon={GLYPH_MESSAGE} /> messages</h1>
-	<p>System messages between client and server.</p>
+	<h1><Glyph_Icon icon={GLYPH_LOG} /> log</h1>
 
 	<div
-		class="flex_1 grid mt_md"
+		class="flex_1 grid mt_md overflow_hidden"
 		style:grid-template-columns="320px 1fr"
 		style:gap="var(--space_md)"
 	>

@@ -12,8 +12,7 @@ export const Ui_Json = z
 
 export type Ui_Json = z.infer<typeof Ui_Json>;
 
-export interface Ui_Options extends Cell_Options<typeof Ui_Json> {}
-
+export interface Ui_Options extends Cell_Options<typeof Ui_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 export class Ui extends Cell<typeof Ui_Json> {
 	show_main_dialog = $state(false);
 

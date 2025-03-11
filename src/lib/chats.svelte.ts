@@ -23,8 +23,7 @@ export const Chats_Json = z
 
 export type Chats_Json = z.infer<typeof Chats_Json>;
 
-export interface Chats_Options extends Cell_Options<typeof Chats_Json> {}
-
+export interface Chats_Options extends Cell_Options<typeof Chats_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 export class Chats extends Cell<typeof Chats_Json> {
 	items: Array<Chat> = $state([]);
 	selected_id: Uuid | null = $state(null);

@@ -23,7 +23,7 @@
 		{:else}
 			<Glyph_Icon icon={GLYPH_MESSAGE} /> {message.type}
 		{/if}
-		<span class="size_sm color_subtle ml_xs">{message.direction}</span>
+		<small class="color_subtle ml_xs">{message.direction}</small>
 	</div>
 	<div class="flex flex_column gap_xs mt_sm">
 		<small class="font_mono">ID: {message.id}</small>
@@ -50,8 +50,7 @@
 {:else if message.is_prompt}
 	<div class="mb_md pb_md border_bottom">
 		<h3 class="mt_0 mb_sm">Prompt</h3>
-		<pre
-			class="font_mono size_sm white_space_pre_wrap word_break_break_word p_sm bg_alt rounded w_100">{message
+		<pre class="font_mono size_sm white_space_pre_wrap word_break_break_word p_sm w_100">{message
 				.prompt_data?.prompt || 'No prompt'}</pre>
 
 		<h3 class="mt_md mb_sm">Request Details</h3>
@@ -86,7 +85,7 @@
 	<div class="mb_md pb_md border_bottom">
 		<h3 class="mt_0 mb_sm">Completion</h3>
 		<pre
-			class="font_mono size_sm white_space_pre_wrap word_break_break_word p_sm bg_alt rounded w_100">{message.completion_text ||
+			class="font_mono size_sm white_space_pre_wrap word_break_break_word p_sm w_100">{message.completion_text ||
 				'No completion'}</pre>
 
 		<h3 class="mt_md mb_sm">Response Details</h3>
@@ -163,7 +162,7 @@
 				</div>
 				<h4 class="mt_sm mb_xs">Contents</h4>
 				<pre
-					class="font_mono size_sm white_space_pre_wrap word_break_break_word p_sm bg_alt rounded w_100 overflow_auto scrollbar_width_thin"
+					class="font_mono size_sm white_space_pre_wrap word_break_break_word p_sm w_100 overflow_auto scrollbar_width_thin"
 					style:max-height="300px">{message.contents || ''}</pre>
 			{/if}
 			{#if message.change}
@@ -213,7 +212,7 @@
 			{:else}
 				<div class="w_100">
 					<pre
-						class="font_mono size_sm white_space_pre_wrap word_break_break_word p_sm bg_alt rounded w_100 overflow_auto scrollbar_width_thin"
+						class="font_mono size_sm white_space_pre_wrap word_break_break_word p_sm w_100 overflow_auto scrollbar_width_thin"
 						style:max-height="300px">{JSON.stringify(message.data, null, 2)}</pre>
 				</div>
 			{/if}
@@ -226,7 +225,7 @@
 <div>
 	<h3 class="mt_md mb_sm">Raw Message Data</h3>
 	<pre
-		class="font_mono size_sm white_space_pre_wrap word_break_break_word p_sm bg_alt rounded w_100">{JSON.stringify(
+		class="font_mono size_sm white_space_pre_wrap word_break_break_word p_sm w_100">{JSON.stringify(
 			message.json,
 			null,
 			2,

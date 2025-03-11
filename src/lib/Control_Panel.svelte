@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Ping_Form from '$lib/Ping_Form.svelte';
+	import Socket_Controls from '$lib/Socket_Controls.svelte';
 
 	// interface Props {}
 
@@ -8,7 +9,14 @@
 	// TODO
 </script>
 
-<section class="column align_items_start">
-	<h2>echo test</h2>
-	<Ping_Form />
-</section>
+<div class="width_md">
+	<section>
+		<h2>Server</h2>
+		<section class="row gap_lg flex_wrap">
+			<Ping_Form />
+		</section>
+		<section>
+			<Socket_Controls />
+		</section>
+	</section>
+</div>

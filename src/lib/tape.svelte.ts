@@ -7,8 +7,7 @@ import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Tape_Json} from '$lib/tape_types.js';
 import {render_tape} from '$lib/tape_helpers.js';
 
-export interface Tape_Options extends Cell_Options<typeof Tape_Json> {}
-
+export interface Tape_Options extends Cell_Options<typeof Tape_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 /**
  * A tape is a linear sequence of chat messages that maintains a chronological
  * record of interactions between the user and the AI.

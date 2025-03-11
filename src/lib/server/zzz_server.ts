@@ -21,7 +21,7 @@ import {
 	type Message_Send_Prompt,
 	type Message_Server,
 } from '$lib/message_types.js';
-import {Uuid, Datetime_Now} from '$lib/zod_helpers.js';
+import {Uuid} from '$lib/zod_helpers.js';
 import {SYSTEM_MESSAGE_DEFAULT} from '$lib/config.js';
 import {delete_diskfile_in_scope, write_file_in_scope} from '$lib/server/helpers.js';
 import {Diskfile_Path, Source_File} from '$lib/diskfile_types.js';
@@ -32,7 +32,7 @@ import {
 	format_openai_messages,
 	format_gemini_messages,
 } from '$lib/server/ai_provider_utils.js';
-import type {Provider_Name} from '$lib/provider_types.js';
+import {create_completion_response_message} from '$lib/response_helpers.js';
 
 const anthropic = new Anthropic({apiKey: SECRET_ANTHROPIC_API_KEY});
 const openai = new OpenAI({apiKey: SECRET_OPENAI_API_KEY});
@@ -175,7 +175,12 @@ export class Zzz_Server {
 							messages: format_ollama_messages(this.system_message, tape_history, prompt),
 						});
 						console.log(`ollama api_response`, api_response);
-						response = create_completion_response(message.id, provider_name, model, api_response);
+						response = create_completion_response_message(
+							message.id,
+							provider_name,
+							model,
+							api_response,
+						);
 						break;
 					}
 
@@ -191,7 +196,12 @@ export class Zzz_Server {
 							messages: format_claude_messages(tape_history, prompt),
 						});
 						console.log(`claude api_response`, api_response);
-						response = create_completion_response(message.id, provider_name, model, api_response);
+						response = create_completion_response_message(
+							message.id,
+							provider_name,
+							model,
+							api_response,
+						);
 						break;
 					}
 
@@ -208,7 +218,12 @@ export class Zzz_Server {
 							messages: format_openai_messages(this.system_message, tape_history, prompt, model),
 						});
 						console.log(`openai api_response`, api_response);
-						response = create_completion_response(message.id, provider_name, model, api_response);
+						response = create_completion_response_message(
+							message.id,
+							provider_name,
+							model,
+							api_response,
+						);
 						break;
 					}
 
@@ -234,7 +249,12 @@ export class Zzz_Server {
 						const content = format_gemini_messages(tape_history, prompt);
 						const api_response = await google_model.generateContent(content);
 						console.log(`gemini api_response`, api_response);
-						response = create_completion_response(message.id, provider_name, model, api_response);
+						response = create_completion_response_message(
+							message.id,
+							provider_name,
+							model,
+							api_response,
+						);
 						break;
 					}
 
@@ -326,25 +346,4 @@ const write_json = async (path: string, json: unknown): Promise<void> => {
 	const formatted = await format_file(JSON.stringify(json), {parser: 'json'});
 
 	writeFileSync(path, formatted);
-};
-
-// TODO extract helpers? response helpers?
-// Standardize the response creation pattern across all providers
-const create_completion_response = (
-	request_id: Uuid,
-	provider_name: Provider_Name,
-	model: string,
-	provider_data: any,
-): Message_Completion_Response => {
-	return {
-		id: Uuid.parse(undefined),
-		type: 'completion_response',
-		completion_response: {
-			created: Datetime_Now.parse(undefined),
-			request_id,
-			provider_name,
-			model,
-			data: {type: provider_name, value: provider_data},
-		},
-	};
 };

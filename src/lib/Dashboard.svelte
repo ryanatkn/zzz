@@ -10,7 +10,7 @@
 		GLYPH_CAPABILITY,
 		GLYPH_CHAT,
 		GLYPH_FILE,
-		GLYPH_MESSAGE,
+		GLYPH_LOG,
 		GLYPH_MODEL,
 		GLYPH_PROMPT,
 		GLYPH_PROVIDER,
@@ -98,8 +98,8 @@
 							/></span
 						> about{/snippet}</Nav_Link
 				>
-				<Nav_Link href="{base}/messages"
-					><Glyph_Icon icon={GLYPH_MESSAGE} attrs={{class: 'icon_xs'}} /> messages</Nav_Link
+				<Nav_Link href="{base}/log"
+					><Glyph_Icon icon={GLYPH_LOG} attrs={{class: 'icon_xs'}} /> log</Nav_Link
 				>
 				<Nav_Link href="{base}/capabilities"
 					><Glyph_Icon icon={GLYPH_CAPABILITY} attrs={{class: 'icon_xs'}} /> capabilities</Nav_Link
