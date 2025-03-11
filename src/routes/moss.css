@@ -528,6 +528,10 @@ a.chip {
 	cursor: pointer;
 }
 
+.shadow_bottom_md {
+	box-shadow: var(--shadow_bottom_md)
+		color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_3)), transparent);
+}
 .shadow_inset_top_sm {
 	box-shadow: var(--shadow_inset_top_sm)
 		color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_2)), transparent);

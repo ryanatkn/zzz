@@ -52,7 +52,7 @@
 		{:else}
 			<button
 				type="button"
-				class="color_c icon_button bg_c_1"
+				class="icon_button color_c bg_c_1"
 				onclick={() => confirm(popover)}
 				{...popover_button_attrs}
 			>

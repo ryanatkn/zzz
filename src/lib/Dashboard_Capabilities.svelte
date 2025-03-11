@@ -1,15 +1,15 @@
 <script lang="ts">
 	import {DEV} from 'esm-env';
-
-	import {GLYPH_CAPABILITY} from '$lib/glyphs.js';
-	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
+	import {base} from '$app/paths';
 	import Breadcrumb from '@ryanatkn/fuz/Breadcrumb.svelte';
 	import Library_Footer from '@ryanatkn/fuz/Library_Footer.svelte';
 	import Svg from '@ryanatkn/fuz/Svg.svelte';
 	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
-	import Control_Panel from '$lib/Control_Panel.svelte';
 
 	import {pkg_context} from '$routes/pkg.js';
+	import {GLYPH_CAPABILITY} from '$lib/glyphs.js';
+	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
+	import Control_Panel from '$lib/Control_Panel.svelte';
 
 	const pkg = pkg_context.get();
 
@@ -43,12 +43,13 @@
 		<Control_Panel />
 	</section>
 	<section class="width_sm">
-		<h2>Build</h2>
-		<div class="font_mono">
-			<p>{pkg.name}@{pkg.package_json.version}</p>
-			<p>
+		<h2>system</h2>
+		<div>
+			<p class="font_mono">{pkg.name}@{pkg.package_json.version}</p>
+			<p class="font_mono">
 				DEV: {DEV + ''}
 			</p>
+			<p><a href="{base}/about">/about</a></p>
 		</div>
 	</section>
 	<section class="mb_xl7 flex justify_content_center">

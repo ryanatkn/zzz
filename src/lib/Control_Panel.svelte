@@ -11,7 +11,7 @@
 
 <div class="width_md">
 	<section>
-		<h2>Server</h2>
+		<h2>server</h2>
 		<section class="row gap_lg flex_wrap">
 			<Ping_Form />
 		</section>
