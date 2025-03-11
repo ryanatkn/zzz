@@ -73,6 +73,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 	reconnect_timeout: number | null = $state(null);
 	current_reconnect_delay: number = $state(0);
 
+	// TODO need to think about garbage cleanup
 	// Message handling
 	message_queue: Array<Queued_Message> = $state([]);
 	failed_messages: SvelteMap<string, Failed_Message> = new SvelteMap();
