@@ -23,6 +23,8 @@
 
 	const pid = $props.id();
 
+	// TODO BLOCK extract a component from here to show the queued messages and have controls to remove them (and bulk actions) - use Messages_List for inspiration but make a new component that takes a socket prop
+
 	interface Props {
 		socket?: Socket;
 	}
