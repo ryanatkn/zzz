@@ -364,9 +364,6 @@ a.chip {
 .overflow_wrap_break_word {
 	overflow-wrap: break-word;
 }
-.p_0 {
-	padding: 0;
-}
 .p_lg {
 	padding: var(--space_lg);
 }
@@ -577,6 +574,9 @@ a.chip {
 }
 .text_color_3 {
 	color: var(--text_color_3);
+}
+.text_color_5 {
+	color: var(--text_color_5);
 }
 .w_100 {
 	width: 100%;

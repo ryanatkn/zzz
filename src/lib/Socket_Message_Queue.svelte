@@ -9,11 +9,16 @@
 		GLYPH_RETRY,
 		GLYPH_DELETE,
 		GLYPH_REMOVE,
-		GLYPH_CLEAR,
 		GLYPH_SELECT_ALL,
 		GLYPH_DESELECT_ALL,
+		GLYPH_INFO,
 	} from '$lib/glyphs.js';
 	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
+	import Confirm_Button from '$lib/Confirm_Button.svelte';
+	import Popover_Button from '$lib/Popover_Button.svelte';
+	import CopyToClipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
+
+	// TODO BLOCK hack see below:  `:global(.message_data_popover) {`
 
 	interface Props {
 		socket: Socket;
@@ -24,9 +29,6 @@
 
 	// Track selected messages for bulk actions
 	const selected_messages: SvelteMap<string, boolean> = new SvelteMap();
-
-	// Track expanded message details
-	const expanded_messages: SvelteMap<string, boolean> = new SvelteMap();
 
 	// Derive the message list based on type
 	const messages = $derived.by(() => {
@@ -63,15 +65,6 @@
 
 	const deselect_all = () => {
 		selected_messages.clear();
-	};
-
-	// Message expansion handlers
-	const toggle_expand = (id: string) => {
-		if (expanded_messages.has(id)) {
-			expanded_messages.delete(id);
-		} else {
-			expanded_messages.set(id, true);
-		}
 	};
 
 	// Action handlers
@@ -160,14 +153,13 @@
 						</button>
 					{/if}
 
-					<button
-						type="button"
-						class="icon_button plain size_sm color_c"
-						title="remove selected messages"
-						onclick={remove_selected}
+					<Confirm_Button
+						onconfirm={remove_selected}
+						popover_button_attrs={{class: 'size_sm'}}
+						attrs={{class: 'icon_button plain size_sm color_c', title: 'remove selected messages'}}
 					>
 						<Glyph_Icon icon={GLYPH_DELETE} />
-					</button>
+					</Confirm_Button>
 				</div>
 			{/if}
 
@@ -187,7 +179,7 @@
 					onchange={clear_all}
 					attrs={{class: 'size_sm', title: `clear all ${type} messages`}}
 				>
-					<Glyph_Icon icon={GLYPH_CLEAR} />
+					<Glyph_Icon icon={GLYPH_REMOVE} />
 				</Clear_Restore_Button>
 			{/if}
 		</div>
@@ -198,16 +190,16 @@
 		<div class="message_list shadow_inset_top_sm">
 			{#each messages as message (message.id)}
 				{@const is_selected = selected_messages.has(message.id)}
-				{@const is_expanded = expanded_messages.has(message.id)}
-
+				{@const message_type = message.data?.type || 'unknown'}
+				{@const message_data_serialized = JSON.stringify(message.data, null, 2)}
 				<div
 					class="message_item p_sm {is_selected ? 'selected bg_2' : ''} {messages.indexOf(message) >
 					0
 						? 'border_top border_solid border_color_3'
 						: ''}"
 				>
-					<!-- Message header with ID, timestamp and actions -->
-					<div class="flex gap_xs align_items_center mb_xs">
+					<!-- Message header with metadata and actions -->
+					<div class="flex gap_xs align_items_center flex_wrap">
 						<input
 							type="checkbox"
 							class="m_0"
@@ -215,17 +207,48 @@
 							onclick={(e) => toggle_message_selection(message.id, e.currentTarget.checked)}
 						/>
 
-						<button
-							type="button"
-							class="plain font_mono flex_1 text_align_left size_sm p_0"
-							onclick={() => toggle_expand(message.id)}
-						>
-							{message.id}
-						</button>
+						<!-- Message type information -->
+						<div class="font_mono flex_1 flex flex_wrap align_items_center gap_xs">
+							<span class="chip size_sm">
+								{message_type}
+							</span>
+							<small class="text_color_5">{message.id}</small>
+						</div>
 
 						<span class="font_mono size_xs">{format(message.created, 'HH:mm:ss')}</span>
 
 						<div class="flex gap_xs">
+							<!-- Message details in popover -->
+							<Popover_Button position="left" popover_class="message_data_popover">
+								{#snippet children(_popover)}
+									<button
+										type="button"
+										class="icon_button plain size_sm"
+										title="view message details"
+									>
+										<Glyph_Icon icon={GLYPH_INFO} />
+									</button>
+								{/snippet}
+
+								{#snippet popover_content(popover)}
+									<div class="message_data_content">
+										<div class="flex justify_content_space_between mb_xs">
+											<strong>Message Details:</strong>
+											<button
+												type="button"
+												class="icon_button plain size_xs"
+												onclick={() => popover.hide()}
+											>
+												✕
+											</button>
+										</div>
+										<pre
+											class="font_mono size_xs white_space_pre_wrap word_break_break_word m_0">{message_data_serialized}</pre>
+										<CopyToClipboard text={message_data_serialized} />
+									</div>
+								{/snippet}
+							</Popover_Button>
+
 							{#if type === 'queued' || (type === 'failed' && socket.connected)}
 								<button
 									type="button"
@@ -237,35 +260,28 @@
 								</button>
 							{/if}
 
-							<button
-								type="button"
-								class="icon_button plain"
-								title="remove message"
-								onclick={() => remove_message(message.id)}
+							<Confirm_Button
+								onconfirm={() => remove_message(message.id)}
+								popover_button_attrs={{class: 'size_sm'}}
+								attrs={{class: 'icon_button plain size_sm', title: 'remove message'}}
 							>
 								<Glyph_Icon icon={GLYPH_REMOVE} />
-							</button>
+							</Confirm_Button>
 						</div>
 					</div>
 
-					<!-- Message details (expanded on click) -->
-					{#if is_expanded}
-						<div transition:slide={{duration: 150}}>
-							{#if type === 'failed'}
-								{@const failed_message = message as Failed_Message}
-								<div class="flex justify_content_space_between size_xs mb_xs">
-									<span>Failed at:</span>
-									<span class="font_mono">{format(failed_message.failed_at, 'HH:mm:ss')}</span>
-								</div>
-								<div class="flex justify_content_space_between size_xs mb_xs">
-									<span>Reason:</span>
-									<span class="font_mono color_c">{failed_message.reason}</span>
-								</div>
-							{/if}
-
-							<pre class="font_mono size_xs bg_2 p_xs radius_xs overflow_auto white_space_pre_wrap">
-								{JSON.stringify(message.data, null, 2)}
-							</pre>
+					<!-- Failed message details -->
+					{#if type === 'failed'}
+						{@const failed_message = message as Failed_Message}
+						<div class="flex flex_column size_xs mt_xs">
+							<div class="flex justify_content_space_between mb_xs">
+								<span>Failed at:</span>
+								<span class="font_mono">{format(failed_message.failed, 'HH:mm:ss')}</span>
+							</div>
+							<div class="flex justify_content_space_between">
+								<span>Reason:</span>
+								<span class="font_mono color_c">{failed_message.reason}</span>
+							</div>
 						</div>
 					{/if}
 				</div>
@@ -295,5 +311,30 @@
 
 	.message_item.selected {
 		border-left: 2px solid var(--color_a);
+	}
+
+	:global(.message_data_popover) {
+		max-width: 500px;
+		min-width: 300px;
+		background-color: var(--bg_2);
+		border: 1px solid var(--border_color_3);
+		border-radius: var(--radius_xs);
+		box-shadow: var(--shadow_md);
+		z-index: 100;
+	}
+
+	.message_data_content {
+		padding: var(--p_sm);
+		max-height: 400px;
+		overflow: auto;
+		background-color: var(--bg);
+	}
+
+	/* Style the JSON pre tag */
+	.message_data_content pre {
+		background-color: var(--fg_1);
+		padding: var(--p_xs);
+		border-radius: var(--radius_xs);
+		border: 1px solid var(--border_color_2);
 	}
 </style>

@@ -30,12 +30,13 @@ export interface Socket_Options extends Cell_Options<typeof Socket_Json> {} // e
 export type Socket_Message_Handler = (event: MessageEvent) => void;
 export type Socket_Error_Handler = (event: Event) => void;
 
+// TODO BLOCK schemas so it can be serialized (so the full state can be snapshotted, and all queued/failed messages restored)
 /**
  * Queued message that couldn't be sent immediately
  */
 export interface Queued_Message {
 	id: string;
-	data: object;
+	data: any;
 	created: number;
 }
 
@@ -43,7 +44,7 @@ export interface Queued_Message {
  * Failed message that exceeded retry count
  */
 export interface Failed_Message extends Queued_Message {
-	failed_at: number;
+	failed: number;
 	reason: string;
 }
 
@@ -383,7 +384,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 			// Mark as failed immediately since we don't have retry count anymore
 			const failed_message: Failed_Message = {
 				...message,
-				failed_at: Date.now(),
+				failed: Date.now(),
 				reason: err instanceof Error ? err.message : 'Unknown error',
 			};
 			this.failed_messages.set(message.id, failed_message);
