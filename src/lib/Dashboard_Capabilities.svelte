@@ -22,11 +22,11 @@
 		<h1><Glyph_Icon icon={GLYPH_CAPABILITY} /> system capabilities</h1>
 	</header>
 	<section class="width_md">
-		<h2>todo</h2>
 		<aside>
 			⚠️ This is unfinished. It will show the capabilities available to the system. Zzz can run in
-			many contexts, and users are empowered by the capabilities available in each.
+			many contexts, and users can do whatever the available capabilities enable.
 		</aside>
+		<h2>todo</h2>
 		<ul>
 			<li>local Ollama API</li>
 			<li>utility models (like the first one for `namerbot`)</li>

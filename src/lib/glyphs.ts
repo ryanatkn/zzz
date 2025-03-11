@@ -7,7 +7,6 @@ export const GLYPH_RESET = '⤺';
 export const GLYPH_CONNECT = '⭍'; // ⨁
 export const GLYPH_DISCONNECT = '⨂';
 export const GLYPH_RETRY = '↺'; // ⟲'; // ⟲ ⟳ ⤾ ⤼ ↻
-export const GLYPH_DELETE = '🗑';
 export const GLYPH_CLEAR = '⌫'; // ⌧ ⌫ ⨂ ⊝ ⦸
 export const GLYPH_INFO = 'ⓘ';
 

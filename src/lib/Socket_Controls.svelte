@@ -1,6 +1,6 @@
 <script lang="ts">
 	import {slide} from 'svelte/transition';
-	import {format, formatDuration, intervalToDuration} from 'date-fns';
+	import {formatDuration, intervalToDuration} from 'date-fns';
 	import {BROWSER, DEV} from 'esm-env';
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
 	import {PUBLIC_SERVER_HOSTNAME, PUBLIC_SERVER_PORT} from '$env/static/public';
@@ -10,7 +10,7 @@
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
 	import {GLYPH_CONNECT, GLYPH_CANCEL, GLYPH_DISCONNECT, GLYPH_RESET} from '$lib/glyphs.js';
-	import {format_ms_to_readable} from '$lib/time_helpers.js';
+	import {format_ms_to_readable, format_timestamp} from '$lib/time_helpers.js';
 	import {
 		DEFAULT_HEARTBEAT_INTERVAL,
 		DEFAULT_RECONNECT_DELAY,
@@ -43,9 +43,6 @@
 		socket.reconnect_delay = DEFAULT_RECONNECT_DELAY;
 		socket.reconnect_delay_max = DEFAULT_RECONNECT_DELAY_MAX;
 	};
-
-	const format_timestamp = (timestamp: number | null) =>
-		timestamp ? format(timestamp, 'h:mm a') : '-';
 
 	// Reset the URL to the default value
 	const reset_url = () => {
@@ -355,7 +352,7 @@
 				</div>
 			{/if}
 
-			<div class="flex justify_content_space_between" transition:slide>
+			<div class="flex justify_content_space_between">
 				<small>connected for:</small>
 				<small>
 					{socket.connection_duration_rounded

@@ -6,9 +6,10 @@
 
 	import type {Socket, Queued_Message, Failed_Message} from '$lib/socket.svelte.js';
 	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
-	import {GLYPH_RETRY, GLYPH_DELETE, GLYPH_REMOVE, GLYPH_INFO} from '$lib/glyphs.js';
+	import {GLYPH_RETRY, GLYPH_REMOVE, GLYPH_INFO} from '$lib/glyphs.js';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Popover_Button from '$lib/Popover_Button.svelte';
+	import {format_timestamp} from '$lib/time_helpers.js';
 
 	interface Props {
 		socket: Socket;
@@ -117,20 +118,21 @@
 	<!-- Header with message count and action buttons -->
 	<div class="flex justify_content_space_between align_items_center mb_sm">
 		<span class="chip {type === 'queued' ? 'color_e' : 'color_c'}">
-			{type === 'queued' ? 'queued' : 'failed'}: {messages_count}
+			{type}: {messages_count}
 		</span>
 
 		<div class="flex gap_xs">
 			{#if selected_count > 0}
-				<div class="flex gap_xs align_items_center" transition:slide={{duration: 150}}>
+				<div class="flex gap_xs align_items_center">
 					<span class="chip size_sm">{selected_count} selected</span>
 
-					{#if type === 'queued' || (type === 'failed' && socket.connected)}
+					{#if socket.connected}
 						<button
 							type="button"
 							class="icon_button plain size_sm"
 							title="retry selected messages"
 							onclick={retry_selected}
+							transition:slide
 						>
 							<Glyph_Icon icon={GLYPH_RETRY} />
 						</button>
@@ -141,7 +143,7 @@
 						popover_button_attrs={{class: 'size_sm'}}
 						attrs={{class: 'icon_button plain size_sm color_c', title: 'remove selected messages'}}
 					>
-						<Glyph_Icon icon={GLYPH_DELETE} />
+						<Glyph_Icon icon={GLYPH_REMOVE} />
 					</Confirm_Button>
 				</div>
 			{/if}
@@ -153,7 +155,7 @@
 				disabled={messages_count === 0}
 				onclick={all_selected ? deselect_all : select_all}
 			>
-				{all_selected ? 'deselect all' : 'select all'}
+				{all_selected ? 'deselect' : 'select'} all
 			</button>
 		</div>
 	</div>
@@ -182,9 +184,7 @@
 
 						<!-- Message type information -->
 						<div class="font_mono flex_1 flex flex_wrap align_items_center gap_xs">
-							<span class="chip size_sm">
-								{message_type}
-							</span>
+							<small class="chip">{message_type}</small>
 
 							<Copy_To_Clipboard
 								text={message.id}
@@ -205,9 +205,29 @@
 									{/if}
 								{/snippet}
 							</Copy_To_Clipboard>
+							<small class="chip">{message.data.message.type}</small>
+							<Copy_To_Clipboard
+								text={message.data.message.id}
+								attrs={{
+									class: 'plain size_xs text_color_5',
+									style: 'width: 120px;',
+									title: 'copy message id to clipboard',
+								}}
+								copied_display_duration={0}
+							>
+								{#snippet children(copied)}
+									{#if copied}
+										<div><small class="size_xs">{message.data.message.id}</small></div>
+									{:else}
+										<div in:slide={{duration: 200}}>
+											<small class="size_xs">{message.data.message.id}</small>
+										</div>
+									{/if}
+								{/snippet}
+							</Copy_To_Clipboard>
 						</div>
 
-						<span class="font_mono size_xs">{format(message.created, 'HH:mm:ss')}</span>
+						<span class="size_sm">{format_timestamp(message.created)}</span>
 
 						<div class="flex gap_xs">
 							<!-- Message details in popover -->
@@ -228,7 +248,7 @@
 										style:z-index="100"
 									>
 										<div class="flex justify_content_space_between mb_xs">
-											<strong>message details</strong>
+											<h3 class="mt_xs">message details</h3>
 											<button
 												type="button"
 												class="icon_button plain size_xs"
