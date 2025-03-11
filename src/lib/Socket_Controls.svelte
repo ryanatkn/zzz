@@ -185,13 +185,19 @@
 						<input
 							type="checkbox"
 							class="compact size_sm"
-							bind:checked={socket.auto_reconnect}
-							onclick={() => {
-								// If turning off auto-reconnect, cancel any pending reconnects
-								if (socket.auto_reconnect && socket.reconnect_timeout !== null) {
-									socket.cancel_reconnect();
+							bind:checked={
+								() => socket.auto_reconnect,
+								(v) => {
+									// If turning off auto-reconnect, cancel any pending reconnects
+									if (!v && socket.reconnect_timeout !== null) {
+										socket.cancel_reconnect();
+									} else if (v && !socket.connected && socket.status !== 'pending') {
+										// If turning on auto-reconnect and we're disconnected, try to connect immediately
+										socket.connect();
+									}
+									socket.auto_reconnect = v;
 								}
-							}}
+							}
 						/>
 						<small>auto-reconnect</small>
 					</label>
