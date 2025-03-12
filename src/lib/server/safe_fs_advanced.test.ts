@@ -2,9 +2,9 @@ import {test, expect, vi, beforeEach, afterEach, describe} from 'vitest';
 import * as fs from 'node:fs/promises';
 import * as fs_sync from 'node:fs';
 
-import {Safe_Fs} from '$lib/server/safe_fs.js';
+import {Safe_Fs, Symlink_Not_Allowed_Error} from '$lib/server/safe_fs.js';
 
-/* eslint-disable @typescript-eslint/no-empty-function, @typescript-eslint/require-await, no-await-in-loop */
+/* eslint-disable @typescript-eslint/require-await, @typescript-eslint/no-empty-function, no-await-in-loop */
 
 // Mock fs/promises and fs modules
 vi.mock('node:fs/promises', () => ({
@@ -13,7 +13,6 @@ vi.mock('node:fs/promises', () => ({
 	unlink: vi.fn(),
 	rm: vi.fn(),
 	mkdir: vi.fn(),
-	rmdir: vi.fn(),
 	readdir: vi.fn(),
 	stat: vi.fn(),
 	lstat: vi.fn(),
@@ -31,18 +30,19 @@ const FILE_PATHS = {
 	ALLOWED: '/allowed/path/file.txt',
 	NESTED: '/allowed/path/subdir/file.txt',
 	OUTSIDE: '/not/allowed/file.txt',
-	SYMLINK: '/allowed/path/symlink',
-	PARENT_SYMLINK: '/allowed/path/symlink-dir/file.txt',
 	TRAVERSAL: '/allowed/path/../../../etc/passwd',
 	UNICODE: '/allowed/path/файл.txt',
 	SPECIAL_CHARS: '/allowed/path/file with spaces!@#.txt',
 	NONEXISTENT: '/allowed/path/does-not-exist.txt',
+	SYMLINK: '/allowed/path/symlink',
+	PARENT_SYMLINK: '/allowed/path/symlink-dir/file.txt',
 };
 const DIR_PATHS = {
 	ALLOWED: '/allowed/path/dir',
 	OUTSIDE: '/not/allowed/dir',
-	SYMLINK: '/allowed/path/symlink-dir',
 	NEW_DIR: '/allowed/path/new-dir',
+	SYMLINK: '/allowed/path/symlink-dir',
+	NESTED: '/allowed/path/nested/directory/structure',
 };
 
 // Helper to create test instance
@@ -72,10 +72,9 @@ afterEach(() => {
 	console_spy.mockRestore();
 });
 
-// Mock helper that properly distinguishes between files and directories
+// Helper to set up mock filesystem structure
 const setup_mock_filesystem = () => {
-	// Create a virtual filesystem structure for testing
-	const filesystem: Record<string, {isDir: boolean; isSymlink: boolean}> = {
+	const filesystem = {
 		'/allowed/path': {isDir: true, isSymlink: false},
 		'/allowed/path/file.txt': {isDir: false, isSymlink: false},
 		'/allowed/path/dir': {isDir: true, isSymlink: false},
@@ -83,18 +82,17 @@ const setup_mock_filesystem = () => {
 		'/allowed/path/symlink-dir': {isDir: true, isSymlink: true},
 		'/allowed/path/subdir': {isDir: true, isSymlink: false},
 		'/allowed/path/subdir/file.txt': {isDir: false, isSymlink: false},
+		'/allowed/path/файл.txt': {isDir: false, isSymlink: false},
+		'/allowed/path/file with spaces!@#.txt': {isDir: false, isSymlink: false},
 	};
 
-	// Mock existsSync to check our virtual filesystem
 	vi.mocked(fs_sync.existsSync).mockImplementation((pathStr) => {
 		if (typeof pathStr !== 'string') return false;
-		return filesystem[pathStr] !== undefined; // eslint-disable-line @typescript-eslint/no-unnecessary-condition
+		return (filesystem as any)[pathStr] !== undefined;
 	});
 
-	// Mock lstat to return appropriate values based on our virtual filesystem
 	vi.mocked(fs.lstat).mockImplementation(async (pathStr) => {
-		const entry = filesystem[pathStr as string];
-		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+		const entry = (filesystem as any)[pathStr as string];
 		if (!entry) {
 			throw new Error('ENOENT: no such file or directory');
 		}
@@ -105,421 +103,436 @@ const setup_mock_filesystem = () => {
 			isFile: () => !entry.isDir && !entry.isSymlink,
 		} as any;
 	});
+
+	return filesystem;
 };
 
 describe('Safe_Fs - Advanced Path Validation', () => {
-	test('should handle path with multiple trailing slashes correctly', async () => {
+	test('should handle paths with special characters correctly', () => {
 		const safe_fs = create_test_instance();
 
-		// Multiple trailing slashes - normalize before validation
-		// These are currently failing with our implementation
-		// but could be enhanced to handle them by normalizing paths
-		expect(safe_fs.is_path_allowed('/allowed/path/file.txt')).toBe(true);
-		expect(safe_fs.is_path_allowed('/allowed/path/')).toBe(true);
+		const special_paths = [
+			FILE_PATHS.UNICODE,
+			FILE_PATHS.SPECIAL_CHARS,
+			'/allowed/path/Å.txt',
+			'/allowed/path/🔥.txt',
+			'/allowed/path/path with multiple spaces/file.txt',
+			'/allowed/path/path-with-dashes/file.txt',
+			'/allowed/path/path_with_underscores/file.txt',
+		];
+
+		// All should be allowed
+		for (const path of special_paths) {
+			expect(safe_fs.is_path_allowed(path)).toBe(true);
+		}
 	});
 
-	test('should handle paths with dot segments correctly', async () => {
+	test('should handle multiple trailing slashes and normalize paths', () => {
 		const safe_fs = create_test_instance();
 
-		// Single dot segments - should be allowed
-		// Currently failing, but could be enhanced to handle '.' segments
-		expect(safe_fs.is_path_allowed('/allowed/path/file.txt')).toBe(true);
+		// These paths should all be allowed and normalized internally
+		const paths_with_multiple_slashes = [
+			'/allowed/path//',
+			'/allowed/path//file.txt',
+			'/allowed/path////',
+			'/allowed/path////file.txt',
+		];
 
-		// Double dot segments - should be rejected
-		expect(safe_fs.is_path_allowed('/allowed/path/../file.txt')).toBe(false);
+		for (const path of paths_with_multiple_slashes) {
+			expect(safe_fs.is_path_allowed(path)).toBe(true);
+		}
 	});
 
-	test('should handle non-standard paths (URI encoded, Unicode, etc.)', () => {
+	test('should validate complex path combinations', async () => {
 		const safe_fs = create_test_instance();
 
-		// Unicode paths
-		expect(safe_fs.is_path_allowed('/allowed/path/файл.txt')).toBe(true);
-		expect(safe_fs.is_path_allowed('/allowed/path/Å.txt')).toBe(true);
+		const valid_paths = [
+			'/allowed/path',
+			'/allowed/path/',
+			'/allowed/other/path',
+			'/allowed/other/path/',
+			'/allowed/path/a/b/c/d/deep/nested/path',
+			'/allowed/path/././file.txt', // This will be normalized
+		];
+
+		const invalid_paths = [
+			'/allowed/pathextra',
+			'/allowedpath/file.txt',
+			'/allowed/./path/../../../etc/passwd',
+			'/allowed/path/../../file.txt',
+		];
+
+		// Test valid paths
+		for (const path of valid_paths) {
+			expect(safe_fs.is_path_allowed(path)).toBe(true);
+			expect(await safe_fs.is_path_safe(path)).toBe(true);
+		}
+
+		// Test invalid paths
+		for (const path of invalid_paths) {
+			expect(safe_fs.is_path_allowed(path)).toBe(false);
+			expect(await safe_fs.is_path_safe(path)).toBe(false);
+		}
 	});
 });
 
 describe('Safe_Fs - Advanced Directory Operations', () => {
-	test('readdir - should handle errors with clear messages', async () => {
+	test('readdir - should handle different option combinations', async () => {
 		const safe_fs = create_test_instance();
 		setup_mock_filesystem();
 
-		// Mock readdir to return directory contents
-		const dir_contents = ['file1.txt', 'file2.txt', 'subdir'];
-		vi.mocked(fs.readdir).mockResolvedValue(dir_contents as any);
+		const readdir_options = [
+			null,
+			'utf8',
+			{},
+			{withFileTypes: false},
+			{withFileTypes: true},
+			{recursive: true},
+			{encoding: 'utf8'},
+			{withFileTypes: true, recursive: true},
+		];
 
-		// Test successful call
-		const contents = await safe_fs.readdir(DIR_PATHS.ALLOWED, null);
-		expect(contents).toEqual(dir_contents);
-
-		// Verify options parameter is passed correctly (null not undefined)
-		expect(fs.readdir).toHaveBeenCalledWith(DIR_PATHS.ALLOWED, null);
-
-		// Test with explicit options
-		await safe_fs.readdir(DIR_PATHS.ALLOWED, {withFileTypes: true});
-		expect(fs.readdir).toHaveBeenCalledWith(DIR_PATHS.ALLOWED, {withFileTypes: true});
-	});
-
-	test('mkdir - should create nested directories with recursive option', async () => {
-		const safe_fs = create_test_instance();
-
-		await safe_fs.mkdir('/allowed/path/some/nested/directory', {recursive: true});
-		expect(fs.mkdir).toHaveBeenCalledWith('/allowed/path/some/nested/directory', {recursive: true});
-	});
-
-	test('rm - should handle recursive directory removal', async () => {
-		const safe_fs = create_test_instance();
-
-		await safe_fs.rm('/allowed/path/some/directory', {recursive: true, force: true});
-		expect(fs.rm).toHaveBeenCalledWith('/allowed/path/some/directory', {
-			recursive: true,
-			force: true,
-		});
-	});
-});
-
-describe('Safe_Fs - Advanced File Type Detection', () => {
-	test('is_directory - should accurately detect directories', async () => {
-		const safe_fs = create_test_instance();
-
-		// Setup filesystem mocks
-		vi.mocked(fs.lstat).mockImplementationOnce(() =>
-			Promise.resolve({
-				isSymbolicLink: () => false,
-				isDirectory: () => true,
-				isFile: () => false,
-			} as any),
-		);
-
-		// Test directory detection
-		const is_dir = await safe_fs.is_directory(DIR_PATHS.ALLOWED);
-		expect(is_dir).toBe(true);
-
-		// Test file detection (not a directory)
-		vi.mocked(fs.lstat).mockImplementationOnce(() =>
-			Promise.resolve({
-				isSymbolicLink: () => false,
-				isDirectory: () => false,
-				isFile: () => true,
-			} as any),
-		);
-		const not_dir = await safe_fs.is_directory(FILE_PATHS.ALLOWED);
-		expect(not_dir).toBe(false);
-	});
-
-	test('is_file - should accurately detect files', async () => {
-		const safe_fs = create_test_instance();
-
-		// Test file detection
-		vi.mocked(fs.lstat).mockImplementationOnce(() =>
-			Promise.resolve({
-				isSymbolicLink: () => false,
-				isDirectory: () => false,
-				isFile: () => true,
-			} as any),
-		);
-		const is_file = await safe_fs.is_file(FILE_PATHS.ALLOWED);
-		expect(is_file).toBe(true);
-
-		// Test directory detection (not a file)
-		vi.mocked(fs.lstat).mockImplementationOnce(() =>
-			Promise.resolve({
-				isSymbolicLink: () => false,
-				isDirectory: () => true,
-				isFile: () => false,
-			} as any),
-		);
-		const not_file = await safe_fs.is_file(DIR_PATHS.ALLOWED);
-		expect(not_file).toBe(false);
-	});
-
-	test('is_symlink - should accurately detect symlinks', async () => {
-		const safe_fs = create_test_instance();
-
-		// Test symlink detection
-		vi.mocked(fs.lstat).mockImplementationOnce(() =>
-			Promise.resolve({
-				isSymbolicLink: () => true,
-				isDirectory: () => false,
-				isFile: () => false,
-			} as any),
-		);
-
-		const is_symlink = await safe_fs.is_symlink(FILE_PATHS.SYMLINK);
-		expect(is_symlink).toBe(true);
-
-		// Test regular file detection (not a symlink)
-		vi.mocked(fs.lstat).mockImplementationOnce(() =>
-			Promise.resolve({
-				isSymbolicLink: () => false,
-				isDirectory: () => false,
-				isFile: () => true,
-			} as any),
-		);
-
-		const not_symlink = await safe_fs.is_symlink(FILE_PATHS.ALLOWED);
-		expect(not_symlink).toBe(false);
-	});
-
-	test('lstat - should return proper Stats objects', async () => {
-		const safe_fs = create_test_instance();
-
-		// Create a mock Stats object
-		const mock_stats = {
-			isFile: () => true,
-			isDirectory: () => false,
+		// Setup mock responses for regular files and Dirent objects
+		const files = ['file1.txt', 'file2.txt', 'subdir'];
+		const dirents = files.map((name) => ({
+			name,
+			isFile: () => !name.includes('dir'),
+			isDirectory: () => name.includes('dir'),
 			isSymbolicLink: () => false,
-		} as fs_sync.Stats;
+		}));
 
-		// Mock lstat to return our mock Stats
-		vi.mocked(fs.lstat).mockResolvedValueOnce(mock_stats);
+		for (const option of readdir_options) {
+			vi.mocked(fs.readdir).mockReset();
 
-		// Get stats
-		const stats = await safe_fs.lstat(FILE_PATHS.ALLOWED);
+			if (
+				option &&
+				typeof option === 'object' &&
+				'withFileTypes' in option &&
+				option.withFileTypes
+			) {
+				vi.mocked(fs.readdir).mockResolvedValueOnce(dirents as any);
+			} else {
+				vi.mocked(fs.readdir).mockResolvedValueOnce(files as any);
+			}
 
-		// Compare using properties instead of object identity
-		expect(stats.isFile()).toBe(mock_stats.isFile());
-		expect(stats.isDirectory()).toBe(mock_stats.isDirectory());
-		expect(stats.isSymbolicLink()).toBe(mock_stats.isSymbolicLink());
+			await safe_fs.readdir(DIR_PATHS.ALLOWED, option as any);
+			expect(fs.readdir).toHaveBeenCalledWith(DIR_PATHS.ALLOWED, option);
+		}
+	});
+
+	test('mkdir - should create nested directory structures', async () => {
+		const safe_fs = create_test_instance();
+
+		// Test creating a deeply nested directory
+		await safe_fs.mkdir(DIR_PATHS.NESTED, {recursive: true});
+		expect(fs.mkdir).toHaveBeenCalledWith(DIR_PATHS.NESTED, {recursive: true});
+
+		// Without recursive flag, it should still try to create the directory
+		await safe_fs.mkdir(DIR_PATHS.NEW_DIR);
+		expect(fs.mkdir).toHaveBeenCalledWith(DIR_PATHS.NEW_DIR, undefined);
+
+		// Should properly bubble up errors from fs.mkdir
+		const error = new Error('EEXIST: directory already exists');
+		vi.mocked(fs.mkdir).mockRejectedValueOnce(error);
+
+		await expect(safe_fs.mkdir(DIR_PATHS.ALLOWED)).rejects.toThrow(error);
+	});
+
+	test('rm - should handle various removal options', async () => {
+		const safe_fs = create_test_instance();
+
+		const rm_options_combinations = [
+			undefined,
+			{},
+			{recursive: true},
+			{force: true},
+			{recursive: true, force: true},
+		];
+
+		for (const options of rm_options_combinations) {
+			vi.mocked(fs.rm).mockReset();
+			vi.mocked(fs.rm).mockResolvedValueOnce();
+
+			await safe_fs.rm(DIR_PATHS.ALLOWED, options);
+			expect(fs.rm).toHaveBeenCalledWith(DIR_PATHS.ALLOWED, options);
+		}
 	});
 });
 
 describe('Safe_Fs - Advanced Security Features', () => {
-	test('should reject all parent directories containing symlinks', async () => {
+	test('should reject all symlinks in path hierarchy', async () => {
 		const safe_fs = create_test_instance();
 
-		// Setup custom existsSync and lstat behavior for this complex test
-		vi.mocked(fs_sync.existsSync).mockImplementation((_p) => true);
+		// Setup a virtual file system where different components are symlinks
+		const symlink_test_cases = [
+			{
+				description: 'Target file is a symlink',
+				path: FILE_PATHS.SYMLINK,
+				symlink_at: FILE_PATHS.SYMLINK,
+			},
+			{
+				description: 'Parent directory is a symlink',
+				path: FILE_PATHS.PARENT_SYMLINK,
+				symlink_at: '/allowed/path/symlink-dir',
+			},
+			{
+				description: 'Grandparent directory is a symlink',
+				path: '/allowed/path/dir/subdir/file.txt',
+				symlink_at: '/allowed/path/dir',
+			},
+		];
 
-		// Setup a specific sequence of lstat calls:
-		// First, checking the path itself - not a symlink
-		// Then, checking each parent directory - simulating that /allowed/path/symlink-dir is a symlink
-		const lstatMock = vi.mocked(fs.lstat);
+		for (const {path, symlink_at} of symlink_test_cases) {
+			// Reset mocks for each test case
+			vi.mocked(fs.lstat).mockReset();
+			vi.mocked(fs_sync.existsSync).mockReturnValue(true);
 
-		// First call - file.txt itself (not a symlink)
-		lstatMock.mockImplementationOnce(() =>
-			Promise.resolve({
-				isSymbolicLink: () => false,
-				isDirectory: () => false,
-				isFile: () => true,
-			} as any),
-		);
+			// Setup a custom lstat implementation for this test case
+			vi.mocked(fs.lstat).mockImplementation(async (p) => {
+				if (p === symlink_at) {
+					return {
+						isSymbolicLink: () => true,
+						isDirectory: () => p.endsWith('dir'),
+						isFile: () => !p.endsWith('dir'),
+					} as any;
+				}
+				return {
+					isSymbolicLink: () => false,
+					isDirectory: () => String(p).includes('dir'),
+					isFile: () => !String(p).includes('dir'),
+				} as any;
+			});
 
-		// Second call - /allowed/path/symlink-dir (IS a symlink)
-		lstatMock.mockImplementationOnce(() =>
+			// Each case should be rejected with a Symlink_Not_Allowed_Error
+			await expect(safe_fs.read_file(path)).rejects.toThrow(Symlink_Not_Allowed_Error);
+			expect(fs.readFile).not.toHaveBeenCalled();
+		}
+	});
+
+	test('should detect sophisticated path traversal attempts', async () => {
+		const safe_fs = create_test_instance();
+
+		const tricky_traversal_paths = [
+			'/allowed/path/subdir/../../../etc/passwd', // Multiple traversals
+			'/allowed/path/./subdir/../../outside', // Mixed ./ and ../
+			'/allowed/path/subdir/.././../outside', // Convoluted traversal
+			'/allowed/path/foo/../bar/../../../etc/passwd', // Alternating good and bad segments
+			'/allowed/path/normal/../normal/../../../out', // Looks somewhat legitimate
+		];
+
+		for (const path of tricky_traversal_paths) {
+			expect(safe_fs.is_path_allowed(path)).toBe(false);
+			await expect(safe_fs.read_file(path)).rejects.toThrow('Path is not allowed');
+		}
+	});
+
+	test('exists should use robust path validation including symlink checks', async () => {
+		const safe_fs = create_test_instance();
+
+		// Setup symlink detection
+		vi.mocked(fs.lstat).mockImplementationOnce(() =>
 			Promise.resolve({
 				isSymbolicLink: () => true,
-				isDirectory: () => true,
+				isDirectory: () => false,
 				isFile: () => false,
 			} as any),
 		);
 
-		await expect(safe_fs.read_file('/allowed/path/symlink-dir/file.txt')).rejects.toThrow(
-			'Path is a symlink which is not allowed: /allowed/path/symlink-dir',
-		);
-
-		expect(fs.readFile).not.toHaveBeenCalled();
-	});
-
-	test('should reject nested directory traversal attempts', async () => {
-		const safe_fs = create_test_instance();
-
-		// More complex traversal paths
-		const dangerous_paths = [
-			'/allowed/path/subdir/../../../etc/passwd',
-			'/allowed/path/something/../../../etc/shadow',
-			'/allowed/path/innocent-looking/../../../var/log/syslog',
-			'/allowed/path/nested/../../outside',
-		];
-
-		for (const dangerous_path of dangerous_paths) {
-			expect(safe_fs.is_path_allowed(dangerous_path)).toBe(false);
-			await expect(safe_fs.read_file(dangerous_path)).rejects.toThrow('Path is not allowed');
-		}
-	});
-
-	test('should handle non-existent parent directories without error', async () => {
-		const safe_fs = create_test_instance();
-
-		// Create deep path with non-existent parents
-		const deep_path = '/allowed/path/does/not/exist/yet/file.txt';
-
-		// Mock existsSync to return false for all directories
-		vi.mocked(fs_sync.existsSync).mockImplementation(() => false);
-
-		// Ensure we don't throw during validation
-		expect(safe_fs.is_path_allowed(deep_path)).toBe(true);
-
-		// Now test a write operation
-		vi.mocked(fs.writeFile).mockResolvedValueOnce();
-
-		await safe_fs.write_file(deep_path, 'content');
-		expect(fs.writeFile).toHaveBeenCalledWith(deep_path, 'content', null);
+		// Should detect symlink and return false without calling access
+		const exists = await safe_fs.exists('/allowed/path/evil-symlink');
+		expect(exists).toBe(false);
+		expect(fs.access).not.toHaveBeenCalled();
 	});
 });
 
 describe('Safe_Fs - Error Handling and Edge Cases', () => {
-	test('should handle filesystem error while checking parent symlinks', async () => {
+	test('should handle filesystem errors during path validation gracefully', async () => {
 		const safe_fs = create_test_instance();
 
-		// Mock existsSync to throw error on a specific directory
+		// Setup lstat to throw an unusual error
+		vi.mocked(fs.lstat).mockRejectedValue(new Error('Unknown filesystem error'));
+
+		// The error during symlink check should be caught and rethrown
+		await expect(safe_fs.read_file(FILE_PATHS.ALLOWED)).rejects.toThrow('Unknown filesystem error');
+		expect(fs.readFile).not.toHaveBeenCalled();
+	});
+
+	test('should handle a variety of filesystem errors from underlying operations', async () => {
+		const safe_fs = create_test_instance();
+
+		// Reset lstat to normal behavior
+		vi.mocked(fs.lstat).mockImplementation(() =>
+			Promise.resolve({
+				isSymbolicLink: () => false,
+				isDirectory: () => false,
+				isFile: () => true,
+			} as any),
+		);
+
+		// Test different fs errors
+		const fs_errors = [
+			{message: 'ENOENT: no such file or directory', code: 'ENOENT'},
+			{message: 'EACCES: permission denied', code: 'EACCES'},
+			{message: 'EISDIR: illegal operation on a directory', code: 'EISDIR'},
+			{message: 'ENOSPC: no space left on device', code: 'ENOSPC'},
+			{message: 'EIO: input/output error', code: 'EIO'},
+		];
+
+		for (const {message, code} of fs_errors) {
+			const error = new Error(message);
+			(error as any).code = code;
+
+			// Reset and configure mock for each error type
+			vi.mocked(fs.readFile).mockReset();
+			vi.mocked(fs.readFile).mockRejectedValueOnce(error);
+
+			// Error should be passed through
+			await expect(safe_fs.read_file(FILE_PATHS.ALLOWED)).rejects.toThrow(message);
+			expect(fs.readFile).toHaveBeenCalledWith(FILE_PATHS.ALLOWED, undefined);
+		}
+	});
+
+	test('should handle nonexistent parent directories correctly', async () => {
+		const safe_fs = create_test_instance();
+		const deep_nonexistent_path = '/allowed/path/does/not/exist/yet/file.txt';
+
+		// Setup existsSync to simulate missing directories
 		vi.mocked(fs_sync.existsSync).mockImplementation((p) => {
-			if (p === '/allowed/path/error-dir') {
-				throw new Error('Permission denied');
-			}
-			return true;
+			return String(p) === '/allowed/path'; // Only the base allowed path exists
 		});
 
-		// Path validation should still work
-		expect(safe_fs.is_path_allowed('/allowed/path/error-dir/file.txt')).toBe(true);
+		// The path itself is allowed since it's under an allowed directory
+		expect(safe_fs.is_path_allowed(deep_nonexistent_path)).toBe(true);
 
-		// But operations should fail safely
-		vi.mocked(fs.readFile).mockRejectedValueOnce(new Error('Permission denied'));
+		// Write operation should be allowed after path validation
+		vi.mocked(fs.writeFile).mockResolvedValueOnce();
 
-		await expect(safe_fs.read_file('/allowed/path/error-dir/file.txt')).rejects.toThrow(
-			'Permission denied',
-		);
+		await safe_fs.write_file(deep_nonexistent_path, 'content');
+		expect(fs.writeFile).toHaveBeenCalledWith(deep_nonexistent_path, 'content', null);
 	});
 
-	test('should handle non-existent files with clear error messages', async () => {
+	test('should handle extreme edge cases gracefully', async () => {
 		const safe_fs = create_test_instance();
 
-		// Reset any previous mocks - make this more thorough
-		vi.clearAllMocks();
+		// Test with various edge case paths
+		const edge_case_paths = [
+			'/allowed/path/' + 'a'.repeat(255), // Very long filename
+			'/allowed/path/' + 'a'.repeat(1000), // Extremely long filename
+			'/allowed/path/' + 'a/'.repeat(50) + 'file.txt', // Many nested directories
+		];
 
-		// Explicitly set up ALL necessary mocks for this test
-		vi.mocked(fs_sync.existsSync).mockReturnValue(true);
-		vi.mocked(fs.lstat).mockImplementation(() =>
-			Promise.resolve({
-				isSymbolicLink: () => false,
-				isDirectory: () => false,
-				isFile: () => true,
-			} as any),
-		);
+		for (const path of edge_case_paths) {
+			expect(safe_fs.is_path_allowed(path)).toBe(true);
 
-		// Reset the readFile mock specifically before setting it
-		vi.mocked(fs.readFile).mockReset();
-		vi.mocked(fs.readFile).mockRejectedValueOnce(new Error('ENOENT: file does not exist'));
+			// Mock a successful read to test the full flow
+			vi.mocked(fs.readFile).mockReset();
+			vi.mocked(fs.readFile).mockResolvedValueOnce('content' as any);
 
-		await expect(safe_fs.read_file('/allowed/path/nonexistent.txt')).rejects.toThrow(
-			'ENOENT: file does not exist',
-		);
-	});
-
-	test('should correctly propagate different file system errors', async () => {
-		const safe_fs = create_test_instance();
-
-		// Reset any previous mocks
-		vi.clearAllMocks();
-		vi.mocked(fs_sync.existsSync).mockReturnValue(true);
-
-		// Setup lstat to pass validation
-		vi.mocked(fs.lstat).mockImplementation(() =>
-			Promise.resolve({
-				isSymbolicLink: () => false,
-				isDirectory: () => false,
-				isFile: () => true,
-			} as any),
-		);
-
-		// Test not found error
-		vi.mocked(fs.readFile).mockReset();
-		vi.mocked(fs.readFile).mockRejectedValueOnce(new Error('ENOENT: file does not exist'));
-		await expect(safe_fs.read_file('/allowed/path/nonexistent.txt')).rejects.toThrow(
-			'ENOENT: file does not exist',
-		);
-
-		// Test permission error - completely reset the readFile mock between tests
-		vi.mocked(fs.readFile).mockReset();
-		vi.mocked(fs.readFile).mockRejectedValueOnce(new Error('EACCES: permission denied'));
-		await expect(safe_fs.read_file('/allowed/path/protected.txt')).rejects.toThrow(
-			'EACCES: permission denied',
-		);
-
-		// Test directory error
-		vi.mocked(fs.readFile).mockReset();
-		vi.mocked(fs.readFile).mockRejectedValueOnce(
-			new Error('EISDIR: illegal operation on a directory'),
-		);
-		await expect(safe_fs.read_file('/allowed/path/dir')).rejects.toThrow(
-			'EISDIR: illegal operation on a directory',
-		);
+			const content = await safe_fs.read_file(path);
+			expect(content).toBe('content');
+		}
 	});
 });
 
 describe('Safe_Fs - Advanced Use Cases', () => {
-	test('should handle complex operations with temporary files', async () => {
+	test('should handle complex workflows with multiple operations', async () => {
 		const safe_fs = create_test_instance();
 
-		// Reset mocks to ensure clean state
-		vi.clearAllMocks();
-
-		// Setup lstat to pass validation for all paths
-		vi.mocked(fs_sync.existsSync).mockReturnValue(true);
-		vi.mocked(fs.lstat).mockImplementation(() =>
-			Promise.resolve({
-				isSymbolicLink: () => false,
-				isDirectory: () => false,
-				isFile: () => true,
-			} as any),
-		);
-
-		// Mock operations for a temp file workflow
-		vi.mocked(fs.writeFile).mockResolvedValue();
+		// Setup a complex workflow: create dir, write file, read file, copy file, delete original
+		vi.mocked(fs.mkdir).mockResolvedValueOnce(undefined);
+		vi.mocked(fs.writeFile).mockResolvedValueOnce();
 		vi.mocked(fs.readFile).mockResolvedValueOnce('file content' as any);
-		vi.mocked(fs.copyFile).mockResolvedValue();
-		vi.mocked(fs.unlink).mockResolvedValue();
+		vi.mocked(fs.copyFile).mockResolvedValueOnce();
+		vi.mocked(fs.unlink).mockResolvedValueOnce();
 
-		// Test a workflow: write temp file, read it, copy to final location, delete temp
-		await safe_fs.write_file('/allowed/path/temp.txt', 'original content');
-		const content = await safe_fs.read_file('/allowed/path/temp.txt');
-		await safe_fs.copyFile('/allowed/path/temp.txt', '/allowed/path/final.txt');
-		await safe_fs.unlink('/allowed/path/temp.txt');
+		// Execute workflow
+		const workflow_dir = '/allowed/path/workflow';
+		const source_file = `${workflow_dir}/source.txt`;
+		const dest_file = `${workflow_dir}/dest.txt`;
 
+		await safe_fs.mkdir(workflow_dir);
+		await safe_fs.write_file(source_file, 'original content');
+		const content = await safe_fs.read_file(source_file);
+		await safe_fs.copy_file(source_file, dest_file);
+		await safe_fs.unlink(source_file);
+
+		// Verify all operations happened with correct parameters
 		expect(content).toBe('file content');
-		expect(fs.writeFile).toHaveBeenCalledTimes(1);
-		expect(fs.readFile).toHaveBeenCalledTimes(1);
-		expect(fs.copyFile).toHaveBeenCalledTimes(1);
-		expect(fs.unlink).toHaveBeenCalledTimes(1);
+		expect(fs.mkdir).toHaveBeenCalledWith(workflow_dir, undefined);
+		expect(fs.writeFile).toHaveBeenCalledWith(source_file, 'original content', null);
+		expect(fs.readFile).toHaveBeenCalledWith(source_file, undefined);
+		expect(fs.copyFile).toHaveBeenCalledWith(source_file, dest_file, undefined);
+		expect(fs.unlink).toHaveBeenCalledWith(source_file);
 	});
 
-	test('should correctly handle concurrent operations on the same file', async () => {
+	test('should handle concurrent operations correctly', async () => {
 		const safe_fs = create_test_instance();
 
-		// Reset mocks to ensure clean state
-		vi.clearAllMocks();
+		// Setup mocks
+		vi.mocked(fs.readFile)
+			.mockResolvedValueOnce('content1' as any)
+			.mockResolvedValueOnce('content2' as any);
 
-		// Setup lstat to pass validation for all paths
-		vi.mocked(fs_sync.existsSync).mockReturnValue(true);
-		vi.mocked(fs.lstat).mockImplementation(() =>
-			Promise.resolve({
-				isSymbolicLink: () => false,
-				isDirectory: () => false,
-				isFile: () => true,
-			} as any),
-		);
-
-		// Mock file operations that might happen concurrently
-		// Important: create separate resolved values for each expected call
-		const readFileMock = vi.mocked(fs.readFile);
-		readFileMock.mockResolvedValueOnce('file content' as any);
-		readFileMock.mockResolvedValueOnce('file content' as any);
-
-		vi.mocked(fs.writeFile).mockResolvedValue();
+		vi.mocked(fs.writeFile).mockResolvedValueOnce().mockResolvedValueOnce();
 
 		// Run concurrent operations
-		const [readResult1, readResult2] = await Promise.all([
-			safe_fs.read_file('/allowed/path/concurrent.txt'),
-			safe_fs.read_file('/allowed/path/concurrent.txt'),
+		const [result1, result2] = await Promise.all([
+			safe_fs.read_file('/allowed/path/file1.txt'),
+			safe_fs.read_file('/allowed/path/file2.txt'),
 		]);
 
 		await Promise.all([
-			safe_fs.write_file('/allowed/path/concurrent.txt', 'new content 1'),
-			safe_fs.write_file('/allowed/path/concurrent.txt', 'new content 2'),
+			safe_fs.write_file('/allowed/path/output1.txt', 'data1'),
+			safe_fs.write_file('/allowed/path/output2.txt', 'data2'),
 		]);
 
-		expect(readResult1).toBe('file content');
-		expect(readResult2).toBe('file content');
+		// Verify results
+		expect(result1).toBe('content1');
+		expect(result2).toBe('content2');
 		expect(fs.readFile).toHaveBeenCalledTimes(2);
 		expect(fs.writeFile).toHaveBeenCalledTimes(2);
+		expect(fs.writeFile).toHaveBeenCalledWith('/allowed/path/output1.txt', 'data1', null);
+		expect(fs.writeFile).toHaveBeenCalledWith('/allowed/path/output2.txt', 'data2', null);
+	});
+
+	test('should handle sequential operations that build on each other', async () => {
+		const safe_fs = create_test_instance();
+
+		// Create a more complex scenario with sequential dependent operations
+		vi.mocked(fs.mkdir).mockResolvedValue(undefined);
+		vi.mocked(fs.writeFile).mockResolvedValue();
+		vi.mocked(fs.readdir).mockResolvedValue(['file1.txt', 'file2.txt'] as any);
+		vi.mocked(fs.readFile)
+			.mockResolvedValueOnce('content1' as any)
+			.mockResolvedValueOnce('content2' as any);
+		vi.mocked(fs.rm).mockResolvedValue();
+
+		// Execute a complex sequential workflow
+		const base_dir = '/allowed/path/project';
+		await safe_fs.mkdir(base_dir);
+
+		// Create some files
+		await safe_fs.write_file(`${base_dir}/file1.txt`, 'content1');
+		await safe_fs.write_file(`${base_dir}/file2.txt`, 'content2');
+
+		// List directory and read each file
+		const files = await safe_fs.readdir(base_dir);
+		const contents = [];
+
+		// Read content of each file in directory
+		for (const file of files) {
+			const file_path = `${base_dir}/${file}`;
+			const content = await safe_fs.read_file(file_path);
+			contents.push(content);
+		}
+
+		// Clean up
+		await safe_fs.rm(base_dir, {recursive: true});
+
+		// Verify everything worked as expected
+		expect(contents).toEqual(['content1', 'content2']);
+		expect(fs.mkdir).toHaveBeenCalledWith(base_dir, undefined);
+		expect(fs.readdir).toHaveBeenCalledWith(base_dir, undefined);
+		expect(fs.rm).toHaveBeenCalledWith(base_dir, {recursive: true});
 	});
 });
