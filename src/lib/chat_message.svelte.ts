@@ -20,7 +20,6 @@ export const Chat_Message_Json = Cell_Json.extend({
 	request: Completion_Request.optional(),
 	response: Completion_Response.optional(),
 });
-
 export type Chat_Message_Json = z.infer<typeof Chat_Message_Json>;
 
 export interface Chat_Message_Options extends Cell_Options<typeof Chat_Message_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
@@ -29,7 +28,7 @@ export class Chat_Message extends Cell<typeof Chat_Message_Json> {
 	tape_id: Uuid | null | undefined = $state();
 	role: Chat_Message_Role = $state()!;
 	request?: Completion_Request = $state();
-	response?: z.infer<typeof Completion_Response> = $state();
+	response?: Completion_Response = $state();
 
 	length: number = $derived(this.content.length);
 	tokens: Array<number> = $derived(tokenize(this.content));

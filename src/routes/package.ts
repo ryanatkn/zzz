@@ -441,13 +441,17 @@ export const package_json = {
 			types: './dist/server/ai_provider_utils.d.ts',
 			default: './dist/server/ai_provider_utils.js',
 		},
+		'./server/filesystem_helpers.js': {
+			types: './dist/server/filesystem_helpers.d.ts',
+			default: './dist/server/filesystem_helpers.js',
+		},
 		'./server/handler_defaults.js': {
 			types: './dist/server/handler_defaults.d.ts',
 			default: './dist/server/handler_defaults.js',
 		},
-		'./server/helpers.js': {
-			types: './dist/server/helpers.d.ts',
-			default: './dist/server/helpers.js',
+		'./server/server_helpers.js': {
+			types: './dist/server/server_helpers.d.ts',
+			default: './dist/server/server_helpers.js',
 		},
 		'./server/server.js': {types: './dist/server/server.d.ts', default: './dist/server/server.js'},
 		'./server/zzz_server.js': {
@@ -503,7 +507,6 @@ export const package_json = {
 		},
 		'./xml.js': {types: './dist/xml.d.ts', default: './dist/xml.js'},
 		'./zod_helpers.js': {types: './dist/zod_helpers.d.ts', default: './dist/zod_helpers.js'},
-		'./zzz_config.js': {types: './dist/zzz_config.d.ts', default: './dist/zzz_config.js'},
 		'./Zzz_Root.svelte': {
 			types: './dist/Zzz_Root.svelte.d.ts',
 			svelte: './dist/Zzz_Root.svelte',
@@ -607,6 +610,7 @@ export const src_json = {
 				{name: 'FREQUENCY_PENALTY_DEFAULT', kind: 'variable'},
 				{name: 'PRESENCE_PENALTY_DEFAULT', kind: 'variable'},
 				{name: 'STOP_SEQUENCES_DEFAULT', kind: 'variable'},
+				{name: 'BOTS_DEFAULT', kind: 'variable'},
 				{name: 'providers_default', kind: 'variable'},
 				{name: 'models_default', kind: 'variable'},
 			],
@@ -651,6 +655,7 @@ export const src_json = {
 			declarations: [
 				{name: 'Diskfile_Change_Type', kind: 'variable'},
 				{name: 'Diskfile_Path', kind: 'variable'},
+				{name: 'Zzz_Dir', kind: 'variable'},
 				{name: 'Source_File', kind: 'variable'},
 				{name: 'Diskfile_Json', kind: 'variable'},
 			],
@@ -946,6 +951,13 @@ export const src_json = {
 				{name: 'format_gemini_messages', kind: 'function'},
 			],
 		},
+		'./server/filesystem_helpers.js': {
+			path: 'server/filesystem_helpers.ts',
+			declarations: [
+				{name: 'write_diskfile_in_scope', kind: 'function'},
+				{name: 'delete_diskfile_in_scope', kind: 'function'},
+			],
+		},
 		'./server/handler_defaults.js': {
 			path: 'server/handler_defaults.ts',
 			declarations: [
@@ -953,11 +965,11 @@ export const src_json = {
 				{name: 'handle_filer_change', kind: 'function'},
 			],
 		},
-		'./server/helpers.js': {
-			path: 'server/helpers.ts',
+		'./server/server_helpers.js': {
+			path: 'server/server_helpers.ts',
 			declarations: [
-				{name: 'write_file_in_scope', kind: 'function'},
-				{name: 'delete_diskfile_in_scope', kind: 'function'},
+				{name: 'ZZZ_DIR_DEFAULT', kind: 'variable'},
+				{name: 'parse_zzz_dirs', kind: 'function'},
 			],
 		},
 		'./server/server.js': {path: 'server/server.ts', declarations: []},
@@ -1067,10 +1079,6 @@ export const src_json = {
 				{name: 'get_field_schema', kind: 'function'},
 				{name: 'maybe_get_field_schema', kind: 'function'},
 			],
-		},
-		'./zzz_config.js': {
-			path: 'zzz_config.ts',
-			declarations: [{name: 'zzz_config', kind: 'variable'}],
 		},
 		'./Zzz_Root.svelte': {path: 'Zzz_Root.svelte', declarations: []},
 		'./zzz.svelte.js': {

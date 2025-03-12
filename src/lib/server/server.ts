@@ -3,7 +3,7 @@ import {serve} from '@hono/node-server';
 import {createNodeWebSocket} from '@hono/node-ws';
 import type {WSContext} from 'hono/ws';
 import * as devalue from 'devalue';
-import {PUBLIC_SERVER_HOSTNAME, PUBLIC_SERVER_PORT} from '$env/static/public';
+import {PUBLIC_SERVER_HOSTNAME, PUBLIC_SERVER_PORT, PUBLIC_ZZZ_DIRS} from '$env/static/public';
 
 import {Zzz_Server} from '$lib/server/zzz_server.js';
 import {handle_message, handle_filer_change} from '$lib/server/handler_defaults.js';
@@ -12,7 +12,7 @@ import type {Message_Server} from '$lib/message_types.js';
 
 // Needed because some configured deployment targets in SvelteKit don't support top-level await yet
 const main = async () => {
-	console.log('creating server'); // TODO better logging
+	console.log('creating server with zzz_dirs', PUBLIC_ZZZ_DIRS); // TODO better logging
 
 	const config = await create_config();
 
@@ -88,8 +88,6 @@ const main = async () => {
 	// Create the server with handlers and configuration
 	const zzz_server = new Zzz_Server({
 		config,
-		// TODO BLOCK @many root_dirs
-		// zzz_dir,
 		send_to_all_clients: (message) => {
 			for (const ws of sockets) {
 				ws.send(devalue.stringify({type: 'server_message', message}));
@@ -97,6 +95,7 @@ const main = async () => {
 		},
 		handle_message,
 		handle_filer_change,
+		zzz_dirs: PUBLIC_ZZZ_DIRS,
 	});
 };
 

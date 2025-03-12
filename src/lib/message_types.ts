@@ -1,6 +1,6 @@
 import {z} from 'zod';
 
-import {Diskfile_Change_Type, Source_File, Diskfile_Path} from '$lib/diskfile_types.js';
+import {Diskfile_Change_Type, Source_File, Diskfile_Path, Zzz_Dir} from '$lib/diskfile_types.js';
 import {Datetime_Now, Uuid} from '$lib/zod_helpers.js';
 import type {Provider_Name} from '$lib/provider_types.js';
 import {Cell_Json} from '$lib/cell_types.js';
@@ -149,6 +149,7 @@ export const Message_Loaded_Session = Message_Base.extend({
 	data: z
 		.object({
 			files: z.record(Diskfile_Path, Source_File),
+			zzz_dirs: z.array(Zzz_Dir).readonly(),
 		})
 		.strict(),
 }).strict();

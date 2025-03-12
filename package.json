@@ -511,13 +511,17 @@
       "types": "./dist/server/ai_provider_utils.d.ts",
       "default": "./dist/server/ai_provider_utils.js"
     },
+    "./server/filesystem_helpers.js": {
+      "types": "./dist/server/filesystem_helpers.d.ts",
+      "default": "./dist/server/filesystem_helpers.js"
+    },
     "./server/handler_defaults.js": {
       "types": "./dist/server/handler_defaults.d.ts",
       "default": "./dist/server/handler_defaults.js"
     },
-    "./server/helpers.js": {
-      "types": "./dist/server/helpers.d.ts",
-      "default": "./dist/server/helpers.js"
+    "./server/server_helpers.js": {
+      "types": "./dist/server/server_helpers.d.ts",
+      "default": "./dist/server/server_helpers.js"
     },
     "./server/server.js": {
       "types": "./dist/server/server.d.ts",
@@ -605,10 +609,6 @@
     "./zod_helpers.js": {
       "types": "./dist/zod_helpers.d.ts",
       "default": "./dist/zod_helpers.js"
-    },
-    "./zzz_config.js": {
-      "types": "./dist/zzz_config.d.ts",
-      "default": "./dist/zzz_config.js"
     },
     "./Zzz_Root.svelte": {
       "types": "./dist/Zzz_Root.svelte.d.ts",

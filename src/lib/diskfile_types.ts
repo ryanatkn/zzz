@@ -9,6 +9,13 @@ export type Diskfile_Change_Type = z.infer<typeof Diskfile_Change_Type>;
 export const Diskfile_Path = z.string().brand('Diskfile_Path');
 export type Diskfile_Path = z.infer<typeof Diskfile_Path>;
 
+/**
+ * Represents a directory that ZZZ is allowed to read from and write to.
+ * This is a security-sensitive path that should be validated carefully.
+ */
+export const Zzz_Dir = Diskfile_Path.brand('Zzz_Dir');
+export type Zzz_Dir = z.infer<typeof Zzz_Dir>;
+
 // Use a more specific definition for Maps compatible with Gro's Source_File
 export const Source_File = z.object({
 	id: Diskfile_Path,

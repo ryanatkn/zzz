@@ -3,8 +3,8 @@ import type {Watcher_Change} from '@ryanatkn/gro/watch_dir.js';
 
 import {type Message_Client, type Message_Server} from '$lib/message_types.js';
 import type {Zzz_Config} from '$lib/config_helpers.js';
-
-const ZZZ_DIR_DEFAULT = './.zzz'; // TODO BLOCK @many root_dirs
+import type {Zzz_Dir} from '$lib/diskfile_types.js';
+import {parse_zzz_dirs} from '$lib/server/server_helpers.js';
 
 /**
  * Function type for handling client messages
@@ -21,14 +21,19 @@ export type Filer_Change_Handler = (
 	change: Watcher_Change,
 	source_file: Record<string, any>,
 	server: Zzz_Server,
+	dir: Zzz_Dir,
 ) => void;
+
+/**
+ * Structure to hold a Filer and its cleanup function
+ */
+export interface Filer_Instance {
+	filer: Filer;
+	cleanup_promise: Promise<Cleanup_Watch>;
+}
 
 export interface Zzz_Server_Options {
 	send_to_all_clients: (message: Message_Server) => void;
-	/**
-	 * @default ZZZ_DIR_DEFAULT
-	 */
-	zzz_dir?: string; // TODO BLOCK @many root_dirs
 	/**
 	 * Configuration for the server and AI providers
 	 */
@@ -41,6 +46,10 @@ export interface Zzz_Server_Options {
 	 * Handler function for file system changes
 	 */
 	handle_filer_change: Filer_Change_Handler;
+	/**
+	 * Directories that ZZZ is allowed to read from and write to
+	 */
+	zzz_dirs?: string;
 }
 
 /**
@@ -49,32 +58,39 @@ export interface Zzz_Server_Options {
 export class Zzz_Server {
 	#send_to_all_clients: (message: Message_Server) => void;
 
-	zzz_dir: string;
-	filer: Filer;
+	zzz_dirs: ReadonlyArray<Zzz_Dir>;
+
+	// Map of directory paths to their respective Filer instances
+	filers: Map<string, Filer_Instance> = new Map();
+
 	config: Zzz_Config;
 
 	handle_message: Message_Handler;
 	handle_filer_change: Filer_Change_Handler;
 
-	#cleanup_filer: Promise<Cleanup_Watch>;
-
 	constructor(options: Zzz_Server_Options) {
 		console.log('create Zzz_Server');
 		this.#send_to_all_clients = options.send_to_all_clients;
-		this.zzz_dir = options.zzz_dir ?? ZZZ_DIR_DEFAULT;
-		this.filer = new Filer({watch_dir_options: {dir: this.zzz_dir}});
+		this.config = options.config;
 
 		// Store the message and filer change handlers
 		this.handle_message = options.handle_message;
 		this.handle_filer_change = options.handle_filer_change;
 
-		// Set up the filer watcher with the handler
-		this.#cleanup_filer = this.filer.watch((change, source_file) => {
-			this.handle_filer_change(change, source_file, this);
-		});
+		this.zzz_dirs = parse_zzz_dirs(options.zzz_dirs);
 
-		// Store the config directly
-		this.config = options.config;
+		// TODO BLOCK on the frontend, show each directory and whether or not it even exists, and allow creating it if not
+		// Set up a filer for each directory
+		for (const dir of this.zzz_dirs) {
+			const filer = new Filer({watch_dir_options: {dir}});
+
+			// Set up the filer watcher with the handler
+			const cleanup_promise = filer.watch((change, source_file) => {
+				this.handle_filer_change(change, source_file, this, dir);
+			});
+
+			this.filers.set(dir, {filer, cleanup_promise}); // TODO BLOCK test that this errors on duplicate dirs
+		}
 	}
 
 	/**
@@ -96,7 +112,13 @@ export class Zzz_Server {
 	 * Clean up resources when server is shutting down
 	 */
 	async destroy(): Promise<void> {
-		const cleanup_filer = await this.#cleanup_filer;
-		await cleanup_filer();
+		// Clean up all filer watchers
+		const cleanup_promises: Array<Promise<void>> = [];
+
+		for (const {cleanup_promise} of this.filers.values()) {
+			cleanup_promises.push(cleanup_promise.then((cleanup) => cleanup()));
+		}
+
+		await Promise.all(cleanup_promises);
 	}
 }

@@ -21,8 +21,8 @@ import {
 	type Message_Send_Prompt,
 } from '$lib/message_types.js';
 import {Uuid} from '$lib/zod_helpers.js';
-import {Diskfile_Path, Source_File} from '$lib/diskfile_types.js';
-import {delete_diskfile_in_scope, write_file_in_scope} from '$lib/server/helpers.js';
+import {Diskfile_Path, Source_File, type Zzz_Dir} from '$lib/diskfile_types.js';
+import {delete_diskfile_in_scope, write_diskfile_in_scope} from '$lib/server/filesystem_helpers.js';
 import {map_watcher_change_to_diskfile_change} from '$lib/diskfile_helpers.js';
 import {
 	format_ollama_messages,
@@ -57,23 +57,29 @@ export const handle_message = async (
 			};
 		}
 		case 'load_session': {
-			// Access filer through server
+			// Access filers through server and collect all files
 			const files_record: Record<string, any> = {};
 
-			server.filer.files.forEach((file, id) => {
-				const path_id = Diskfile_Path.parse(id);
-				files_record[path_id] = {
-					...file,
-					id: path_id,
-					dependents: file.dependents,
-					dependencies: file.dependencies,
-				};
-			});
+			// Iterate through all filers and collect their files
+			for (const f of server.filers.values()) {
+				f.filer.files.forEach((file, id) => {
+					const path_id = Diskfile_Path.parse(id);
+					files_record[path_id] = {
+						...file,
+						id: path_id,
+						dependents: file.dependents,
+						dependencies: file.dependencies,
+					};
+				});
+			}
 
 			return {
 				id: Uuid.parse(undefined),
 				type: 'loaded_session',
-				data: {files: files_record},
+				data: {
+					files: files_record,
+					zzz_dirs: server.zzz_dirs,
+				},
 			};
 		}
 		case 'send_prompt': {
@@ -194,9 +200,10 @@ export const handle_message = async (
 					throw new Unreachable_Error(provider_name);
 			}
 
-			// don't need to wait for this to finish,
-			// the expected file event is now independent of the request
-			void save_response(message, response, server.filer.root_dir);
+			// TODO enhance this to select a specific directory based on context
+			const primary_dir = server.zzz_dirs[0];
+			// We don't need to wait for this to finish
+			void save_response(message, response, primary_dir);
 
 			console.log(`got ${provider_name} message`, response.completion_response.data);
 
@@ -204,12 +211,14 @@ export const handle_message = async (
 		}
 		case 'update_diskfile': {
 			const {path, contents} = message;
-			write_file_in_scope(path, contents, server.filer.root_dir);
+			// Use all allowed directories
+			write_diskfile_in_scope(path, contents, server.zzz_dirs);
 			return null;
 		}
 		case 'delete_diskfile': {
 			const {path} = message;
-			delete_diskfile_in_scope(path, server.filer.root_dir);
+			// Use all allowed directories
+			delete_diskfile_in_scope(path, server.zzz_dirs);
 			return null;
 		}
 		default:
@@ -224,6 +233,7 @@ export const handle_filer_change = (
 	change: Watcher_Change,
 	source_file: Record<string, any>,
 	server: Zzz_Server,
+	dir: Zzz_Dir,
 ): void => {
 	const api_change = {
 		type: map_watcher_change_to_diskfile_change(change.type),
@@ -232,6 +242,9 @@ export const handle_filer_change = (
 
 	// Ensure the ID is properly typed
 	source_file.id = Diskfile_Path.parse(source_file.id);
+
+	// Include the source directory with the change notification
+	source_file.source_dir = dir;
 
 	// Declare variable for the source file that will be sent
 	let parsed_source_file: Source_File;
@@ -264,7 +277,7 @@ const save_response = async (
 
 	const path = join(dir, filename);
 
-	const json = {request, response}; // TODO BLOCK type - include the id on each
+	const json = {request, response};
 
 	await write_json(path, json);
 };
