@@ -4,20 +4,30 @@ import {to_array} from '@ryanatkn/belt/array.js';
 import * as path from 'node:path';
 
 import {
-	is_path_in_allowed_dirs,
-	write_path_in_scope,
-	delete_path_in_scope,
+	find_matching_allowed_dir,
+	write_to_allowed_dir,
+	delete_from_allowed_dir,
+	is_symlink,
+	has_traversal_segments,
 } from '$lib/server/filesystem_helpers.js';
+
+/* eslint-disable @typescript-eslint/no-empty-function */
 
 // Mock filesystem functions to prevent actual file operations
 vi.mock('node:fs', () => ({
 	writeFileSync: vi.fn(),
 	rmSync: vi.fn(),
+	lstatSync: vi.fn(),
+	existsSync: vi.fn(),
 }));
 
 // Reset mocks before each test
 beforeEach(() => {
 	vi.clearAllMocks();
+	vi.mocked(fs.existsSync).mockReturnValue(true); // default to paths existing
+	vi.mocked(fs.lstatSync).mockReturnValue({
+		isSymbolicLink: () => false,
+	} as any);
 });
 
 // Restore mocks after all tests
@@ -85,123 +95,134 @@ const edge_case_dirs = [
 	false as any,
 ];
 
-// is_path_in_allowed_dirs tests
-test('is_path_in_allowed_dirs - should return true for paths in allowed directories', () => {
+// find_matching_allowed_dir tests
+test('find_matching_allowed_dir - should return matching dir for paths in allowed directories', () => {
 	for (const p of valid_paths) {
 		for (const dirs of [allowed_dirs, allowed_dirs_without_trailing_slash]) {
-			const result = is_path_in_allowed_dirs(p, dirs);
-			if (!result) console.log(`EXPECTED THIS TO BE TRUE`, p, dirs);
-			expect(result).toBe(true);
+			const result = find_matching_allowed_dir(p, dirs);
+			expect(result).not.toBeNull();
+			// Verify it returned one of the dirs
+			expect(dirs.includes(result as any)).toBe(true);
 		}
 	}
 });
 
-test('is_path_in_allowed_dirs - should return false for paths not in allowed directories', () => {
+test('find_matching_allowed_dir - should return null for paths not in allowed directories', () => {
 	for (const p of invalid_paths) {
-		const result = is_path_in_allowed_dirs(p, allowed_dirs);
-		expect(result).toBe(false);
+		const result = find_matching_allowed_dir(p, allowed_dirs);
+		expect(result).toBeNull();
 	}
 });
 
-test('is_path_in_allowed_dirs - should handle edge case paths', () => {
+test('find_matching_allowed_dir - should handle edge case paths', () => {
 	for (const p of edge_case_paths) {
-		const result = is_path_in_allowed_dirs(p, allowed_dirs);
-		expect(result).toBe(false);
+		const result = find_matching_allowed_dir(p, allowed_dirs);
+		expect(result).toBeNull();
 	}
 });
 
-test('is_path_in_allowed_dirs - should handle edge case directories', () => {
+test('find_matching_allowed_dir - should handle edge case directories', () => {
 	// Empty directory should never match
-	expect(is_path_in_allowed_dirs('/any/path', [''])).toBe(false);
+	expect(find_matching_allowed_dir('/any/path', [''])).toBeNull();
 
 	// Root directory should match any absolute path
-	expect(is_path_in_allowed_dirs('/any/path', ['/'])).toBe(true);
+	expect(find_matching_allowed_dir('/any/path', ['/'])).toBe('/');
 
 	// Current directory behavior
-	expect(is_path_in_allowed_dirs('./file.txt', ['.'])).toBe(false); // Explicitly denied in implementation
-	expect(is_path_in_allowed_dirs('./file.txt', ['./'])).toBe(true);
+	expect(find_matching_allowed_dir('./file.txt', ['.'])).toBeNull(); // Explicitly denied in implementation
+	expect(find_matching_allowed_dir('./file.txt', ['./'])).toBe('./');
 
 	// Other edge cases
 	for (const dir of edge_case_dirs) {
 		if (dir === '/') continue; // Skip root dir which has special behavior
 		if (dir === './') continue; // Skip './' which has special behavior
-		const result = is_path_in_allowed_dirs('/any/path', Array.isArray(dir) ? dir : [dir]);
-		expect(result).toBe(false);
+		const result = find_matching_allowed_dir('/any/path', Array.isArray(dir) ? dir : [dir]);
+		expect(result).toBeNull();
 	}
 });
 
-test('is_path_in_allowed_dirs - should handle type-unsafe inputs', () => {
+test('find_matching_allowed_dir - should handle type-unsafe inputs', () => {
 	// Test with null and undefined using type casting
-	expect(is_path_in_allowed_dirs(null as any, allowed_dirs)).toBe(false);
-	expect(is_path_in_allowed_dirs(undefined as any, allowed_dirs)).toBe(false);
-	expect(is_path_in_allowed_dirs('/valid/path', null as any)).toBe(false);
-	expect(is_path_in_allowed_dirs('/valid/path', undefined as any)).toBe(false);
+	expect(find_matching_allowed_dir(null as any, allowed_dirs)).toBeNull();
+	expect(find_matching_allowed_dir(undefined as any, allowed_dirs)).toBeNull();
+	expect(find_matching_allowed_dir('/valid/path', null as any)).toBeNull();
+	expect(find_matching_allowed_dir('/valid/path', undefined as any)).toBeNull();
 
 	// Test with numbers and objects
-	expect(is_path_in_allowed_dirs(123 as any, allowed_dirs)).toBe(false);
-	expect(is_path_in_allowed_dirs('/valid/path', [123] as any)).toBe(false);
-	expect(is_path_in_allowed_dirs({} as any, allowed_dirs)).toBe(false);
+	expect(find_matching_allowed_dir(123 as any, allowed_dirs)).toBeNull();
+	expect(find_matching_allowed_dir('/valid/path', [123] as any)).toBeNull();
+	expect(find_matching_allowed_dir({} as any, allowed_dirs)).toBeNull();
 });
 
 // Test for path traversal protection without mocking path
-test('is_path_in_allowed_dirs - should prevent path traversal attacks', () => {
+test('find_matching_allowed_dir - should prevent path traversal attacks', () => {
 	// Mock console.error to avoid cluttering test output
 	const console_spy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
 	// We need to directly test the paths that would be used in attacks
 	// without relying on path.resolve's behavior
-	expect(is_path_in_allowed_dirs('/allowed/path/../outside/file.txt', ['/allowed'])).toBe(false);
-	expect(is_path_in_allowed_dirs('/allowed/path/../../etc/passwd', ['/allowed/path'])).toBe(false);
-	expect(is_path_in_allowed_dirs('/allowed/path/../path/file.txt', ['/allowed'])).toBe(false);
+	expect(find_matching_allowed_dir('/allowed/path/../outside/file.txt', ['/allowed'])).toBeNull();
+	expect(find_matching_allowed_dir('/allowed/path/../../etc/passwd', ['/allowed/path'])).toBeNull();
+	expect(find_matching_allowed_dir('/allowed/path/../path/file.txt', ['/allowed'])).toBeNull();
 
 	console_spy.mockRestore();
 });
 
 // Test cross-platform behavior
-test('is_path_in_allowed_dirs - should handle platform-specific path features', () => {
+test('find_matching_allowed_dir - should handle platform-specific path features', () => {
 	// Note: This test makes assertions based on whether we're running on Windows or Unix
 	// Testing Windows-style paths on Unix systems will still use Unix resolution
 	const isWindows = process.platform === 'win32';
 
 	// For Windows, test backslash paths, drive letters
 	if (isWindows) {
-		expect(is_path_in_allowed_dirs('C:\\Windows', ['C:\\'])).toBe(true);
-		expect(is_path_in_allowed_dirs('C:\\Windows\\System32', ['C:\\Windows'])).toBe(true);
-		expect(is_path_in_allowed_dirs('C:\\Program Files', ['C:\\Windows'])).toBe(false);
+		expect(find_matching_allowed_dir('C:\\Windows', ['C:\\'])).toBe('C:\\');
+		expect(find_matching_allowed_dir('C:\\Windows\\System32', ['C:\\Windows'])).toBe('C:\\Windows');
+		expect(find_matching_allowed_dir('C:\\Program Files', ['C:\\Windows'])).toBeNull();
 	} else {
 		// On Unix, test Unix-specific features
-		expect(is_path_in_allowed_dirs('/usr/bin', ['/usr'])).toBe(true);
-		expect(is_path_in_allowed_dirs('/usr/local/bin', ['/usr/local'])).toBe(true);
-		expect(is_path_in_allowed_dirs('/var/log', ['/usr'])).toBe(false);
+		expect(find_matching_allowed_dir('/usr/bin', ['/usr'])).toBe('/usr');
+		expect(find_matching_allowed_dir('/usr/local/bin', ['/usr/local'])).toBe('/usr/local');
+		expect(find_matching_allowed_dir('/var/log', ['/usr'])).toBeNull();
 	}
 });
 
-// write_path_in_scope tests
-test('write_path_in_scope - should write file when path is in allowed directory (single dir)', () => {
+// Test that the first matching directory is returned
+test('find_matching_allowed_dir - should return the first matching directory', () => {
+	// Create a list of directories with overlapping scopes
+	const overlapping_dirs = ['/allowed/path/specific/', '/allowed/path/', '/allowed/'];
+
+	// A path that matches multiple directories should return the first one
+	const result = find_matching_allowed_dir('/allowed/path/specific/file.txt', overlapping_dirs);
+	expect(result).toBe('/allowed/path/specific/');
+});
+
+// write_to_allowed_dir tests
+test('write_to_allowed_dir - should write file when path is in allowed directory (single dir)', () => {
 	const path = '/allowed/path/file.txt';
 	const contents = 'test contents';
 	const dir = '/allowed/path/';
 
-	const result = write_path_in_scope(path, contents, dir);
+	const result = write_to_allowed_dir(path, contents, dir);
 
 	expect(result).toBe(true);
 	expect(fs.writeFileSync).toHaveBeenCalledWith(path, contents, 'utf8');
 	expect(fs.writeFileSync).toHaveBeenCalledTimes(1);
 });
 
-test('write_path_in_scope - should write file when path is in allowed directory (multiple dirs)', () => {
+test('write_to_allowed_dir - should write file when path is in allowed directory (multiple dirs)', () => {
 	const path = '/allowed/deeper/file.txt';
 	const contents = 'test contents';
 	const dirs = ['/allowed/path/', '/allowed/deeper/'];
 
-	const result = write_path_in_scope(path, contents, dirs);
+	const result = write_to_allowed_dir(path, contents, dirs);
 
 	expect(result).toBe(true);
 	expect(fs.writeFileSync).toHaveBeenCalledWith(path, contents, 'utf8');
 	expect(fs.writeFileSync).toHaveBeenCalledTimes(1);
 });
 
-test('write_path_in_scope - should not write file when path is outside allowed directory', () => {
+test('write_to_allowed_dir - should not write file when path is outside allowed directory', () => {
 	const path = '/not_allowed/file.txt';
 	const contents = 'test contents';
 	const dir = '/allowed/path/';
@@ -209,7 +230,7 @@ test('write_path_in_scope - should not write file when path is outside allowed d
 	// Mock console.error to avoid cluttering test output
 	const console_spy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-	const result = write_path_in_scope(path, contents, dir);
+	const result = write_to_allowed_dir(path, contents, dir);
 
 	expect(result).toBe(false);
 	expect(fs.writeFileSync).not.toHaveBeenCalled();
@@ -217,56 +238,56 @@ test('write_path_in_scope - should not write file when path is outside allowed d
 	console_spy.mockRestore();
 });
 
-test('write_path_in_scope - should handle various directory input formats', () => {
+test('write_to_allowed_dir - should handle various directory input formats', () => {
 	const path = '/allowed/path/file.txt';
 	const contents = 'test contents';
 
 	// Test with and without trailing slash
-	expect(write_path_in_scope(path, contents, '/allowed/path')).toBe(true);
-	expect(write_path_in_scope(path, contents, '/allowed/path/')).toBe(true);
+	expect(write_to_allowed_dir(path, contents, '/allowed/path')).toBe(true);
+	expect(write_to_allowed_dir(path, contents, '/allowed/path/')).toBe(true);
 
 	// Array versions
-	expect(write_path_in_scope(path, contents, ['/allowed/path'])).toBe(true);
-	expect(write_path_in_scope(path, contents, ['/allowed/path/'])).toBe(true);
+	expect(write_to_allowed_dir(path, contents, ['/allowed/path'])).toBe(true);
+	expect(write_to_allowed_dir(path, contents, ['/allowed/path/'])).toBe(true);
 });
 
-test('write_path_in_scope - should handle empty inputs', () => {
+test('write_to_allowed_dir - should handle empty inputs', () => {
 	// Mock console.error to avoid cluttering test output
 	const console_spy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
 	// Empty path
-	expect(write_path_in_scope('', 'contents', '/allowed/path/')).toBe(false);
+	expect(write_to_allowed_dir('', 'contents', '/allowed/path/')).toBe(false);
 	expect(fs.writeFileSync).not.toHaveBeenCalled();
 
 	// Empty contents should still work
-	expect(write_path_in_scope('/allowed/path/empty.txt', '', '/allowed/path/')).toBe(true);
+	expect(write_to_allowed_dir('/allowed/path/empty.txt', '', '/allowed/path/')).toBe(true);
 	expect(fs.writeFileSync).toHaveBeenCalledWith('/allowed/path/empty.txt', '', 'utf8');
 
 	// Empty directory
-	expect(write_path_in_scope('/some/path/file.txt', 'contents', '')).toBe(false);
+	expect(write_to_allowed_dir('/some/path/file.txt', 'contents', '')).toBe(false);
 
 	console_spy.mockRestore();
 });
 
-test('write_path_in_scope - should handle type-unsafe inputs', () => {
+test('write_to_allowed_dir - should handle type-unsafe inputs', () => {
 	// Mock console.error to avoid cluttering test output
 	const console_spy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
 	// Null and undefined
-	expect(write_path_in_scope(null as any, 'contents', '/allowed/path/')).toBe(false);
-	expect(write_path_in_scope('/allowed/path/file.txt', null as any, '/allowed/path/')).toBe(true); // Contents can be null
-	expect(write_path_in_scope('/allowed/path/file.txt', 'contents', null as any)).toBe(false);
+	expect(write_to_allowed_dir(null as any, 'contents', '/allowed/path/')).toBe(false);
+	expect(write_to_allowed_dir('/allowed/path/file.txt', null as any, '/allowed/path/')).toBe(true); // Contents can be null
+	expect(write_to_allowed_dir('/allowed/path/file.txt', 'contents', null as any)).toBe(false);
 
 	// Numbers and objects
-	expect(write_path_in_scope(123 as any, 'contents', '/allowed/path/')).toBe(false);
-	expect(write_path_in_scope('/allowed/path/file.txt', 123 as any, '/allowed/path/')).toBe(true); // Contents can be number
-	expect(write_path_in_scope('/allowed/path/file.txt', 'contents', 123 as any)).toBe(false);
+	expect(write_to_allowed_dir(123 as any, 'contents', '/allowed/path/')).toBe(false);
+	expect(write_to_allowed_dir('/allowed/path/file.txt', 123 as any, '/allowed/path/')).toBe(true); // Contents can be number
+	expect(write_to_allowed_dir('/allowed/path/file.txt', 'contents', 123 as any)).toBe(false);
 
 	console_spy.mockRestore();
 });
 
-// Test for path traversal protection with write_path_in_scope
-test('write_path_in_scope - should prevent path traversal attacks', () => {
+// Test for path traversal protection with write_to_allowed_dir
+test('write_to_allowed_dir - should prevent path traversal attacks', () => {
 	// Test with a path that resolves outside the allowed directory
 	const path_with_traversal = '/allowed/path/../../../etc/passwd';
 	const contents = 'malicious content';
@@ -275,7 +296,7 @@ test('write_path_in_scope - should prevent path traversal attacks', () => {
 	// Mock console.error to avoid cluttering test output
 	const console_spy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-	const result = write_path_in_scope(path_with_traversal, contents, dir);
+	const result = write_to_allowed_dir(path_with_traversal, contents, dir);
 
 	expect(result).toBe(false);
 	expect(fs.writeFileSync).not.toHaveBeenCalled();
@@ -283,37 +304,37 @@ test('write_path_in_scope - should prevent path traversal attacks', () => {
 	console_spy.mockRestore();
 });
 
-// delete_path_in_scope tests
-test('delete_path_in_scope - should delete file when path is in allowed directory (single dir)', () => {
+// delete_from_allowed_dir tests
+test('delete_from_allowed_dir - should delete file when path is in allowed directory (single dir)', () => {
 	const path = '/allowed/path/file.txt';
 	const dir = '/allowed/path/';
 
-	const result = delete_path_in_scope(path, dir);
+	const result = delete_from_allowed_dir(path, dir);
 
 	expect(result).toBe(true);
 	expect(fs.rmSync).toHaveBeenCalledWith(path);
 	expect(fs.rmSync).toHaveBeenCalledTimes(1);
 });
 
-test('delete_path_in_scope - should delete file when path is in allowed directory (multiple dirs)', () => {
+test('delete_from_allowed_dir - should delete file when path is in allowed directory (multiple dirs)', () => {
 	const path = '/allowed/deeper/file.txt';
 	const dirs = ['/allowed/path/', '/allowed/deeper/'];
 
-	const result = delete_path_in_scope(path, dirs);
+	const result = delete_from_allowed_dir(path, dirs);
 
 	expect(result).toBe(true);
 	expect(fs.rmSync).toHaveBeenCalledWith(path);
 	expect(fs.rmSync).toHaveBeenCalledTimes(1);
 });
 
-test('delete_path_in_scope - should not delete file when path is outside allowed directory', () => {
+test('delete_from_allowed_dir - should not delete file when path is outside allowed directory', () => {
 	const path = '/not_allowed/file.txt';
 	const dir = '/allowed/path/';
 
 	// Mock console.error to avoid cluttering test output
 	const console_spy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-	const result = delete_path_in_scope(path, dir);
+	const result = delete_from_allowed_dir(path, dir);
 
 	expect(result).toBe(false);
 	expect(fs.rmSync).not.toHaveBeenCalled();
@@ -321,49 +342,49 @@ test('delete_path_in_scope - should not delete file when path is outside allowed
 	console_spy.mockRestore();
 });
 
-test('delete_path_in_scope - should handle various directory input formats', () => {
+test('delete_from_allowed_dir - should handle various directory input formats', () => {
 	const path = '/allowed/path/file.txt';
 
 	// Test with and without trailing slash
-	expect(delete_path_in_scope(path, '/allowed/path')).toBe(true);
-	expect(delete_path_in_scope(path, '/allowed/path/')).toBe(true);
+	expect(delete_from_allowed_dir(path, '/allowed/path')).toBe(true);
+	expect(delete_from_allowed_dir(path, '/allowed/path/')).toBe(true);
 
 	// Array versions
-	expect(delete_path_in_scope(path, ['/allowed/path'])).toBe(true);
-	expect(delete_path_in_scope(path, ['/allowed/path/'])).toBe(true);
+	expect(delete_from_allowed_dir(path, ['/allowed/path'])).toBe(true);
+	expect(delete_from_allowed_dir(path, ['/allowed/path/'])).toBe(true);
 });
 
-test('delete_path_in_scope - should handle empty inputs', () => {
+test('delete_from_allowed_dir - should handle empty inputs', () => {
 	// Mock console.error to avoid cluttering test output
 	const console_spy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
 	// Empty path
-	expect(delete_path_in_scope('', '/allowed/path/')).toBe(false);
+	expect(delete_from_allowed_dir('', '/allowed/path/')).toBe(false);
 	expect(fs.rmSync).not.toHaveBeenCalled();
 
 	// Empty directory
-	expect(delete_path_in_scope('/some/path/file.txt', '')).toBe(false);
+	expect(delete_from_allowed_dir('/some/path/file.txt', '')).toBe(false);
 
 	console_spy.mockRestore();
 });
 
-test('delete_path_in_scope - should handle type-unsafe inputs', () => {
+test('delete_from_allowed_dir - should handle type-unsafe inputs', () => {
 	// Mock console.error to avoid cluttering test output
 	const console_spy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
 	// Null and undefined
-	expect(delete_path_in_scope(null as any, '/allowed/path/')).toBe(false);
-	expect(delete_path_in_scope('/allowed/path/file.txt', null as any)).toBe(false);
+	expect(delete_from_allowed_dir(null as any, '/allowed/path/')).toBe(false);
+	expect(delete_from_allowed_dir('/allowed/path/file.txt', null as any)).toBe(false);
 
 	// Numbers and objects
-	expect(delete_path_in_scope(123 as any, '/allowed/path/')).toBe(false);
-	expect(delete_path_in_scope('/allowed/path/file.txt', 123 as any)).toBe(false);
+	expect(delete_from_allowed_dir(123 as any, '/allowed/path/')).toBe(false);
+	expect(delete_from_allowed_dir('/allowed/path/file.txt', 123 as any)).toBe(false);
 
 	console_spy.mockRestore();
 });
 
-// Same for delete_path_in_scope
-test('delete_path_in_scope - should prevent path traversal attacks', () => {
+// Same for delete_from_allowed_dir
+test('delete_from_allowed_dir - should prevent path traversal attacks', () => {
 	// Test with a path that resolves outside the allowed directory
 	const path_with_traversal = '/allowed/path/../../../etc/passwd';
 	const dir = '/allowed/path/';
@@ -371,7 +392,7 @@ test('delete_path_in_scope - should prevent path traversal attacks', () => {
 	// Mock console.error to avoid cluttering test output
 	const console_spy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-	const result = delete_path_in_scope(path_with_traversal, dir);
+	const result = delete_from_allowed_dir(path_with_traversal, dir);
 
 	expect(result).toBe(false);
 	expect(fs.rmSync).not.toHaveBeenCalled();
@@ -408,7 +429,7 @@ test('Combined function behavior - systematic testing of path/dir combinations',
 	// Mock console.error to avoid cluttering test output
 	const console_spy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-	// Test all combinations for write_path_in_scope
+	// Test all combinations for write_to_allowed_dir
 	for (const path of test_paths) {
 		for (const content of test_contents) {
 			for (const dir of test_dirs) {
@@ -423,21 +444,21 @@ test('Combined function behavior - systematic testing of path/dir combinations',
 				// Reset mocks
 				vi.clearAllMocks();
 
-				// Determine expected result using our is_path_in_allowed_dirs function.
+				// Determine expected result using our find_matching_allowed_dir function.
 				const valid_path = path && typeof path === 'string' && path !== '';
 				const valid_dir = dir && (typeof dir === 'string' || Array.isArray(dir));
-				const should_succeed = Boolean(
-					valid_path && valid_dir && is_path_in_allowed_dirs(path, to_array(dir)),
-				);
+				const matching_dir =
+					valid_path && valid_dir ? find_matching_allowed_dir(path, to_array(dir)) : null;
+				const should_succeed = !!matching_dir;
 
 				// Test write
-				const write_result = write_path_in_scope(path, content, dir);
+				const write_result = write_to_allowed_dir(path, content, dir);
 				expect(write_result).toBe(should_succeed);
 				expect(fs.writeFileSync).toHaveBeenCalledTimes(should_succeed ? 1 : 0);
 
 				// Test delete
 				vi.clearAllMocks();
-				const delete_result = delete_path_in_scope(path, dir);
+				const delete_result = delete_from_allowed_dir(path, dir);
 				expect(delete_result).toBe(should_succeed);
 				expect(fs.rmSync).toHaveBeenCalledTimes(should_succeed ? 1 : 0);
 			}
@@ -463,43 +484,218 @@ test('Function error handling - should handle filesystem errors gracefully', () 
 
 	// Test write function with error
 	expect(() => {
-		write_path_in_scope('/allowed/path/file.txt', 'content', '/allowed/path/');
+		write_to_allowed_dir('/allowed/path/file.txt', 'content', '/allowed/path/');
 	}).toThrow('Disk full');
 
 	// Test delete function with error
 	expect(() => {
-		delete_path_in_scope('/allowed/path/file.txt', '/allowed/path/');
+		delete_from_allowed_dir('/allowed/path/file.txt', '/allowed/path/');
 	}).toThrow('File not found');
 
 	console_spy.mockRestore();
 });
 
 // Test for unicode and special character handling
-test('is_path_in_allowed_dirs - should handle unicode and special characters', () => {
+test('find_matching_allowed_dir - should handle unicode and special characters', () => {
 	// These paths are constructed to test if the implementation correctly handles special characters
 	// but doesn't depend on mocking path.resolve
 	const special_path_tests = [
 		{
 			path: path.join('/allowed/path', 'file with spaces.txt'),
 			allowed_in: ['/allowed/path'],
-			expected: true,
+			expected: '/allowed/path',
 		},
 		{
 			path: path.join('/allowed/path', 'file_with_!@#$%^&*().txt'),
 			allowed_in: ['/allowed/path'],
-			expected: true,
+			expected: '/allowed/path',
 		},
 		// Unicode paths test (ensure implementation handles non-ASCII characters)
 		// Note: The exact behavior might differ by OS
 		{
 			path: path.join('/allowed/path', 'файл.txt'),
 			allowed_in: ['/allowed/path'],
-			expected: true,
+			expected: '/allowed/path',
 		},
 	];
 
 	for (const test_case of special_path_tests) {
-		const result = is_path_in_allowed_dirs(test_case.path, test_case.allowed_in);
+		const result = find_matching_allowed_dir(test_case.path, test_case.allowed_in);
 		expect(result).toBe(test_case.expected);
 	}
+});
+
+// Test segment-based directory traversal detection
+test('has_traversal_segments - should detect directory traversal segments', () => {
+	// Paths with traversal segments
+	const paths_with_traversal = [
+		'../file.txt',
+		'/allowed/../file.txt',
+		'/allowed/path/../../etc/passwd',
+	];
+
+	for (const p of paths_with_traversal) {
+		const result = has_traversal_segments(p);
+		expect(result).toBe(true);
+	}
+
+	// Valid paths that contain '..' but not as segments
+	const paths_without_traversal = [
+		'/allowed/path/file..txt',
+		'/allowed/path/my..file.bak',
+		'/allowed/path/file.with...dots.txt',
+	];
+
+	for (const p of paths_without_traversal) {
+		expect(has_traversal_segments(p)).toBe(false);
+	}
+});
+
+// Test symlink detection
+test('is_symlink - should detect symbolic links', () => {
+	// Mock symlink detection
+	vi.mocked(fs.lstatSync).mockReturnValueOnce({
+		isSymbolicLink: () => true,
+	} as any);
+
+	expect(is_symlink('/allowed/path/symlink')).toBe(true);
+
+	// Non-symlink
+	vi.mocked(fs.lstatSync).mockReturnValueOnce({
+		isSymbolicLink: () => false,
+	} as any);
+
+	expect(is_symlink('/allowed/path/regular-file')).toBe(false);
+
+	// Non-existent path
+	vi.mocked(fs.existsSync).mockReturnValueOnce(false);
+	expect(is_symlink('/allowed/path/nonexistent')).toBe(false);
+});
+
+// Test symlink handling in find_matching_allowed_dir
+test('find_matching_allowed_dir - should reject symlinks', () => {
+	// Mock path as symlink
+	vi.mocked(fs.lstatSync).mockReturnValueOnce({
+		isSymbolicLink: () => true,
+	} as any);
+
+	expect(find_matching_allowed_dir('/allowed/path/symlink', ['/allowed/path'])).toBeNull();
+
+	// Mock parent directory as symlink
+	vi.mocked(fs.existsSync).mockImplementation(() => true);
+	vi.mocked(fs.lstatSync)
+		.mockImplementationOnce(
+			() =>
+				({
+					isSymbolicLink: () => false,
+				}) as any,
+		)
+		.mockImplementationOnce(
+			() =>
+				({
+					isSymbolicLink: () => true,
+				}) as any,
+		);
+
+	expect(find_matching_allowed_dir('/allowed/symlink-dir/file.txt', ['/allowed'])).toBeNull();
+});
+
+// Test path resolution and comparison
+test('find_matching_allowed_dir - should use path resolution for comparison', () => {
+	// Set up tests where resolved path will be in allowed dir
+	vi.mocked(fs.existsSync).mockImplementation(() => true);
+	vi.mocked(fs.lstatSync).mockImplementation(
+		() =>
+			({
+				isSymbolicLink: () => false,
+			}) as any,
+	);
+
+	// Test with redundant slashes and dot segments that normalize away
+	expect(find_matching_allowed_dir('/allowed/path//./file.txt', ['/allowed/path'])).toBe(
+		'/allowed/path',
+	);
+});
+
+// Test that filenames containing '..' are allowed if they're not traversal
+test('find_matching_allowed_dir - should allow filenames with dots', () => {
+	vi.mocked(fs.existsSync).mockImplementation(() => true);
+	vi.mocked(fs.lstatSync).mockImplementation(
+		() =>
+			({
+				isSymbolicLink: () => false,
+			}) as any,
+	);
+
+	expect(find_matching_allowed_dir('/allowed/path/file..txt', ['/allowed/path'])).toBe(
+		'/allowed/path',
+	);
+	expect(find_matching_allowed_dir('/allowed/path/file.with...dots.txt', ['/allowed/path'])).toBe(
+		'/allowed/path',
+	);
+	expect(find_matching_allowed_dir('/allowed/path/file...', ['/allowed/path'])).toBe(
+		'/allowed/path',
+	);
+});
+
+// Test with unusual filenames
+test('find_matching_allowed_dir - should handle unusual filenames', () => {
+	vi.mocked(fs.existsSync).mockImplementation(() => true);
+	vi.mocked(fs.lstatSync).mockImplementation(
+		() =>
+			({
+				isSymbolicLink: () => false,
+			}) as any,
+	);
+
+	// Test with spaces, special chars, and Unicode
+	const unusual_paths = [
+		'/allowed/path/file with spaces.txt',
+		'/allowed/path/file_with_!@#$%^&*().txt',
+		'/allowed/path/файл.txt', // Cyrillic
+		'/allowed/path/🔥.txt', // Emoji
+		'/allowed/path/\u0000file.txt', // Null character (might not be valid on all filesystems)
+	];
+
+	for (const p of unusual_paths) {
+		expect(find_matching_allowed_dir(p, ['/allowed/path'])).toBe('/allowed/path');
+	}
+});
+
+// Test write_to_allowed_dir with symlinks
+test('write_to_allowed_dir - should not write to symlinks', () => {
+	// Mock path as symlink
+	vi.mocked(fs.existsSync).mockReturnValue(true);
+	vi.mocked(fs.lstatSync).mockReturnValueOnce({
+		isSymbolicLink: () => true,
+	} as any);
+
+	// Mock console.error to avoid cluttering test output
+	const console_spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+	const result = write_to_allowed_dir('/allowed/path/symlink', 'content', '/allowed/path');
+
+	expect(result).toBe(false);
+	expect(fs.writeFileSync).not.toHaveBeenCalled();
+
+	console_spy.mockRestore();
+});
+
+// Test delete_from_allowed_dir with symlinks
+test('delete_from_allowed_dir - should not delete symlinks', () => {
+	// Mock path as symlink
+	vi.mocked(fs.existsSync).mockReturnValue(true);
+	vi.mocked(fs.lstatSync).mockReturnValueOnce({
+		isSymbolicLink: () => true,
+	} as any);
+
+	// Mock console.error to avoid cluttering test output
+	const console_spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+	const result = delete_from_allowed_dir('/allowed/path/symlink', '/allowed/path');
+
+	expect(result).toBe(false);
+	expect(fs.rmSync).not.toHaveBeenCalled();
+
+	console_spy.mockRestore();
 });

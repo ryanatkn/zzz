@@ -49,7 +49,7 @@ export interface Zzz_Server_Options {
 	/**
 	 * Directories that ZZZ is allowed to read from and write to
 	 */
-	zzz_dirs?: string;
+	zzz_dirs?: string | Array<string>;
 }
 
 /**
