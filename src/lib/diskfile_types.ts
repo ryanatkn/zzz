@@ -7,7 +7,7 @@ import {is_path_absolute} from '$lib/diskfile_helpers.js';
 export const Diskfile_Change_Type = z.enum(['add', 'change', 'delete']);
 export type Diskfile_Change_Type = z.infer<typeof Diskfile_Change_Type>;
 
-// Define Diskfile_Path as an absolute file path
+/** An absolute Unix-style file path */
 export const Diskfile_Path = z
 	.string()
 	.refine((p) => is_path_absolute(p), {message: 'must be an absolute path'});
