@@ -76,6 +76,7 @@
 		width: 100%;
 		max-height: 100%;
 		overflow-y: auto;
+		overflow-x: hidden;
 		scrollbar-width: thin;
 	}
 </style>

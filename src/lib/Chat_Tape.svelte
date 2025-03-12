@@ -128,10 +128,11 @@
 	}
 	.messages {
 		display: flex;
-		flex-direction: column;
+		flex-direction: column-reverse; /* makes scrolling start at the bottom */
 		gap: 0.5rem;
 		max-height: 400px;
 		overflow-y: auto;
+		overflow-x: hidden;
 		scrollbar-width: thin;
 	}
 	textarea {
