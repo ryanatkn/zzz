@@ -1,7 +1,7 @@
 import {test, expect, vi} from 'vitest';
 import * as path from 'node:path';
 
-import {ZZZ_DIR_DEFAULT, parse_zzz_dirs} from '$lib/server/server_helpers.js';
+import {ZZZ_DIR, parse_zzz_dirs} from '$lib/server/server_helpers.js';
 import {Zzz_Dir} from '$lib/diskfile_types.js';
 
 // Mock environment variables
@@ -33,11 +33,11 @@ test('parse_zzz_dirs - should handle array input', () => {
 test('parse_zzz_dirs - should use default when given empty input', () => {
 	const empty_string_result = parse_zzz_dirs('');
 	expect(empty_string_result).toHaveLength(1);
-	expect(empty_string_result[0]).toBe(Zzz_Dir.parse(path.resolve(ZZZ_DIR_DEFAULT)));
+	expect(empty_string_result[0]).toBe(Zzz_Dir.parse(path.resolve(ZZZ_DIR)));
 
 	const empty_array_result = parse_zzz_dirs([]);
 	expect(empty_array_result).toHaveLength(1);
-	expect(empty_array_result[0]).toBe(Zzz_Dir.parse(path.resolve(ZZZ_DIR_DEFAULT)));
+	expect(empty_array_result[0]).toBe(Zzz_Dir.parse(path.resolve(ZZZ_DIR)));
 });
 
 test('parse_zzz_dirs - should trim whitespace from directory entries', () => {
@@ -102,7 +102,7 @@ test('parse_zzz_dirs - should handle type-unsafe inputs', () => {
 	// Test with null and undefined
 	const null_result = parse_zzz_dirs(null as any);
 	expect(null_result).toHaveLength(1);
-	expect(null_result[0]).toBe(Zzz_Dir.parse(path.resolve(ZZZ_DIR_DEFAULT)));
+	expect(null_result[0]).toBe(Zzz_Dir.parse(path.resolve(ZZZ_DIR)));
 
 	const undefined_result = parse_zzz_dirs(undefined);
 	// Should use the default from PUBLIC_ZZZ_DIRS
@@ -113,11 +113,11 @@ test('parse_zzz_dirs - should handle type-unsafe inputs', () => {
 	// Test with numbers and objects
 	const number_result = parse_zzz_dirs(123 as any);
 	expect(number_result).toHaveLength(1);
-	expect(number_result[0]).toBe(Zzz_Dir.parse(path.resolve(ZZZ_DIR_DEFAULT)));
+	expect(number_result[0]).toBe(Zzz_Dir.parse(path.resolve(ZZZ_DIR)));
 
 	const object_result = parse_zzz_dirs({} as any);
 	expect(object_result).toHaveLength(1);
-	expect(object_result[0]).toBe(Zzz_Dir.parse(path.resolve(ZZZ_DIR_DEFAULT)));
+	expect(object_result[0]).toBe(Zzz_Dir.parse(path.resolve(ZZZ_DIR)));
 });
 
 test('parse_zzz_dirs - should handle leading colon', () => {
@@ -143,7 +143,7 @@ test('parse_zzz_dirs - should handle input with only whitespace', () => {
 	const result = parse_zzz_dirs(input);
 	// Whitespace-only input should yield the default directory
 	expect(result).toHaveLength(1);
-	expect(result[0]).toBe(Zzz_Dir.parse(path.resolve(ZZZ_DIR_DEFAULT)));
+	expect(result[0]).toBe(Zzz_Dir.parse(path.resolve(ZZZ_DIR)));
 });
 
 test('parse_zzz_dirs - should return an immutable array', () => {
@@ -188,25 +188,25 @@ test('parse_zzz_dirs - should handle various whitespace inputs', () => {
 	const spaces_input = '    ';
 	const spaces_result = parse_zzz_dirs(spaces_input);
 	expect(spaces_result).toHaveLength(1);
-	expect(spaces_result[0]).toBe(Zzz_Dir.parse(path.resolve(ZZZ_DIR_DEFAULT)));
+	expect(spaces_result[0]).toBe(Zzz_Dir.parse(path.resolve(ZZZ_DIR)));
 
 	// Test tabs
 	const tabs_input = '\t\t\t';
 	const tabs_result = parse_zzz_dirs(tabs_input);
 	expect(tabs_result).toHaveLength(1);
-	expect(tabs_result[0]).toBe(Zzz_Dir.parse(path.resolve(ZZZ_DIR_DEFAULT)));
+	expect(tabs_result[0]).toBe(Zzz_Dir.parse(path.resolve(ZZZ_DIR)));
 
 	// Test mixed whitespace
 	const mixed_input = ' \t \n \r ';
 	const mixed_result = parse_zzz_dirs(mixed_input);
 	expect(mixed_result).toHaveLength(1);
-	expect(mixed_result[0]).toBe(Zzz_Dir.parse(path.resolve(ZZZ_DIR_DEFAULT)));
+	expect(mixed_result[0]).toBe(Zzz_Dir.parse(path.resolve(ZZZ_DIR)));
 
 	// Test whitespace with colons
 	const whitespace_colons_input = '  :  :  ';
 	const whitespace_colons_result = parse_zzz_dirs(whitespace_colons_input);
 	expect(whitespace_colons_result).toHaveLength(1);
-	expect(whitespace_colons_result[0]).toBe(Zzz_Dir.parse(path.resolve(ZZZ_DIR_DEFAULT)));
+	expect(whitespace_colons_result[0]).toBe(Zzz_Dir.parse(path.resolve(ZZZ_DIR)));
 });
 
 test('parse_zzz_dirs - should return a truly immutable array', () => {

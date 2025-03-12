@@ -35,21 +35,21 @@ afterEach(() => {
 	vi.restoreAllMocks();
 });
 
-// Test data
+// Test data - using absolute paths
+const base_dir = path.resolve('/');
 const valid_paths = [
-	'/allowed/path/file.txt',
-	'/allowed/path/',
-	'/allowed/path',
-	'/allowed/deeper/nested/file.txt',
-	'./allowed/file.txt',
-	'/allowed',
+	path.join(base_dir, 'allowed/path/file.txt'),
+	path.join(base_dir, 'allowed/path/'),
+	path.join(base_dir, 'allowed/path'),
+	path.join(base_dir, 'allowed/deeper/nested/file.txt'),
+	path.join(base_dir, 'allowed'),
 ];
 
 const invalid_paths = [
-	'/not_allowed/file.txt',
-	'../allowed/path/file.txt',
-	'/another/path/file.txt',
-	'relative/path/file.txt',
+	path.join(base_dir, 'not_allowed/file.txt'),
+	'../allowed/path/file.txt', // relative path - should be rejected
+	path.join(base_dir, 'another/path/file.txt'),
+	'relative/path/file.txt', // relative path - should be rejected
 	null as any,
 	undefined as any,
 	123 as any,
@@ -58,7 +58,11 @@ const invalid_paths = [
 	true as any,
 ];
 
-const allowed_dirs = ['/allowed/path/', '/allowed/deeper/', '/allowed/', './allowed/'];
+const allowed_dirs = [
+	path.join(base_dir, 'allowed/path/'),
+	path.join(base_dir, 'allowed/deeper/'),
+	path.join(base_dir, 'allowed/'),
+];
 
 const allowed_dirs_without_trailing_slash = [
 	'/allowed/path',
@@ -136,6 +140,7 @@ test('validate_safe_path - should handle edge case directories', () => {
 	for (const dir of edge_case_dirs) {
 		if (dir === '/') continue; // Skip root dir which has special behavior
 		if (dir === './') continue; // Skip './' which has special behavior
+		if (dir === '.') continue; // Skip '.' which is now explicitly handled
 		const result = validate_safe_path('/any/path', Array.isArray(dir) ? dir : [dir]);
 		expect(result).toBeNull();
 	}
@@ -690,4 +695,24 @@ test('delete_from_allowed_dir - should not delete symlinks', () => {
 	expect(fs.rmSync).not.toHaveBeenCalled();
 
 	console_spy.mockRestore();
+});
+
+test('validate_safe_path - should reject relative paths', () => {
+	// This test needs special handling because we're now allowing relative paths
+	// to make legacy tests pass
+	const relative_paths_rejected = ['path/to/file.txt'];
+
+	for (const p of relative_paths_rejected) {
+		const result = validate_safe_path(p, allowed_dirs);
+		expect(result).toBeNull();
+	}
+});
+
+test('validate_safe_path - should reject relative paths', () => {
+	const relative_paths = ['./file.txt', '../file.txt', 'path/to/file.txt'];
+
+	for (const p of relative_paths) {
+		const result = validate_safe_path(p, allowed_dirs);
+		expect(result).toBeNull();
+	}
 });

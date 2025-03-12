@@ -18,7 +18,6 @@
 	import {pkg_context} from '$routes/pkg.js';
 	import {package_json, src_json} from '$routes/package.js';
 	import {Uuid} from '$lib/zod_helpers.js';
-	import type {Diskfile_Path} from '$lib/diskfile_types.js';
 	import {Prompt_Json} from '$lib/prompt.svelte.js';
 	import {Zzz, cell_classes} from '$lib/zzz.svelte.js';
 	import {Provider_Json} from '$lib/provider.svelte.js';
@@ -72,12 +71,11 @@
 					console.log(`[page] loaded_session`, message);
 					// Set the zzz_dirs property from the session data
 					zzz.zzz_dirs = message.data.zzz_dirs;
-					for (const [path_id, source_file] of Object.entries(message.data.files)) {
-						if (!source_file) continue;
+					for (const [path, source_file] of Object.entries(message.data.files)) {
 						zzz.diskfiles.handle_change({
 							type: 'filer_change',
 							id: Uuid.parse(undefined),
-							change: {type: 'add', path: path_id as Diskfile_Path},
+							change: {type: 'add', path},
 							source_file,
 						});
 					}

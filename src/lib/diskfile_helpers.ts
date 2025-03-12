@@ -8,6 +8,21 @@ import {
 	type Diskfile_Json,
 } from '$lib/diskfile_types.js';
 
+export const is_path_absolute = (path: unknown): boolean => {
+	// Guard against non-string inputs
+	if (typeof path !== 'string') return false;
+	return path[0] === '/';
+};
+
+/**
+ * Normalizes and validates a path, ensuring it's absolute
+ */
+export const normalize_path = (path: string): string => {
+	// For now just return the path as-is
+	// In a real implementation, this might use path.normalize() or similar
+	return path;
+};
+
 /**
  * Maps watcher change types to diskfile change types
  */

@@ -1,12 +1,17 @@
 import {z} from 'zod';
 
 import {Cell_Json} from '$lib/cell_types.js';
+import {is_path_absolute} from '$lib/diskfile_helpers.js';
 
 // Define file change types
 export const Diskfile_Change_Type = z.enum(['add', 'change', 'delete']);
 export type Diskfile_Change_Type = z.infer<typeof Diskfile_Change_Type>;
 
-export const Diskfile_Path = z.string().brand('Diskfile_Path');
+// Define Diskfile_Path as an absolute file path
+export const Diskfile_Path = z
+	.string()
+	.refine((p) => is_path_absolute(p), {message: 'must be an absolute path'});
+
 export type Diskfile_Path = z.infer<typeof Diskfile_Path>;
 
 /**
