@@ -10,6 +10,7 @@
 	import {GLYPH_CAPABILITY} from '$lib/glyphs.js';
 	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
 	import Control_Panel from '$lib/Control_Panel.svelte';
+	import Zzz_Dirs from '$lib/Zzz_Dirs.svelte';
 
 	const pkg = pkg_context.get();
 
@@ -38,6 +39,9 @@
 			<li>pg db (Postgres, pglite, or some other compatible database)</li>
 			<li>ephemerally connected devices - mic, webcam, midi, etc</li>
 		</ul>
+	</section>
+	<section class="width_md">
+		<Zzz_Dirs />
 	</section>
 	<section>
 		<Control_Panel />

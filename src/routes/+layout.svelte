@@ -70,6 +70,8 @@
 			switch (message.type) {
 				case 'loaded_session': {
 					console.log(`[page] loaded_session`, message);
+					// Set the zzz_dirs property from the session data
+					zzz.zzz_dirs = message.data.zzz_dirs;
 					for (const [path_id, source_file] of Object.entries(message.data.files)) {
 						if (!source_file) continue;
 						zzz.diskfiles.handle_change({

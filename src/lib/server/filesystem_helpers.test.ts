@@ -482,15 +482,13 @@ test('Function error handling - should handle filesystem errors gracefully', () 
 	// Mock console.error to catch the error messages
 	const console_spy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
-	// Test write function with error
-	expect(() => {
-		write_to_allowed_dir('/allowed/path/file.txt', 'content', '/allowed/path/');
-	}).toThrow('Disk full');
+	// Test write function with error - expect false return instead of throw
+	const write_result = write_to_allowed_dir('/allowed/path/file.txt', 'content', '/allowed/path/');
+	expect(write_result).toBe(false);
 
-	// Test delete function with error
-	expect(() => {
-		delete_from_allowed_dir('/allowed/path/file.txt', '/allowed/path/');
-	}).toThrow('File not found');
+	// Test delete function with error - expect false return instead of throw
+	const delete_result = delete_from_allowed_dir('/allowed/path/file.txt', '/allowed/path/');
+	expect(delete_result).toBe(false);
 
 	console_spy.mockRestore();
 });

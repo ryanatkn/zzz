@@ -39,6 +39,7 @@ import {Socket} from '$lib/socket.svelte.js';
 import {Time} from '$lib/time.svelte.js';
 import type {Zzz_Config} from '$lib/config_helpers.js';
 import {BOTS_DEFAULT} from './config_defaults.js';
+import type {Zzz_Dir} from '$lib/diskfile_types.js';
 
 // Define standard cell classes
 export const cell_classes = {
@@ -114,6 +115,9 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	readonly diskfiles: Diskfiles = $state()!;
 	readonly messages: Messages = $state()!;
 	readonly socket: Socket = $state()!;
+
+	// Null means loading, array means loaded
+	zzz_dirs: ReadonlyArray<Zzz_Dir> | null = $state.raw(null);
 
 	// Special property to detect self-reference
 	readonly is_zzz: boolean = $state(true);

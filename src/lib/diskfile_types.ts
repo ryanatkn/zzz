@@ -10,7 +10,7 @@ export const Diskfile_Path = z.string().brand('Diskfile_Path');
 export type Diskfile_Path = z.infer<typeof Diskfile_Path>;
 
 /**
- * Represents a directory that ZZZ is allowed to read from and write to.
+ * Represents a directory that Zzz is allowed to read from and write to.
  * This is a security-sensitive path that should be validated carefully.
  */
 export const Zzz_Dir = Diskfile_Path.brand('Zzz_Dir');

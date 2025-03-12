@@ -1,12 +1,20 @@
-import {writeFileSync, rmSync, lstatSync, existsSync} from 'node:fs';
+import {
+	writeFileSync,
+	rmSync,
+	lstatSync,
+	existsSync,
+	mkdirSync,
+	rmdirSync,
+	readdirSync,
+	type Dirent,
+} from 'node:fs';
 import {ensure_end} from '@ryanatkn/belt/string.js';
 import {to_array} from '@ryanatkn/belt/array.js';
-import * as path from 'node:path';
+import {resolve, dirname} from 'node:path';
 
 /**
- * Checks if a path is within any of the allowed directories.
- * Returns the first matching directory if found, or null if not found.
- * Prevents path traversal attacks and symlink attacks.
+ * Checks if a path is a symlink
+ * Returns false if the path doesn't exist
  */
 export const find_matching_allowed_dir = (
 	path_to_check: string,
@@ -33,7 +41,7 @@ export const find_matching_allowed_dir = (
 		// Check each parent directory up to the root
 		let current = path_to_check;
 		while (current !== '/') {
-			const parent = path.dirname(current);
+			const parent = dirname(current);
 			if (parent === current) break; // Reached root
 
 			if (is_symlink(parent)) {
@@ -47,14 +55,14 @@ export const find_matching_allowed_dir = (
 	}
 
 	// Resolve the path to get canonical form
-	const resolved_path = path.resolve(path_to_check);
+	const resolved_path = resolve(path_to_check);
 
 	for (const dir of dirs) {
 		// Empty directory should never match
 		if (!dir || typeof dir !== 'string' || dir === '') continue;
 
 		// Convert directory to canonical form
-		const resolved_dir = path.resolve(dir);
+		const resolved_dir = resolve(dir);
 
 		// Handle special case for root directory
 		if (resolved_dir === '/') {
@@ -70,7 +78,7 @@ export const find_matching_allowed_dir = (
 		// Check if resolved path is inside the resolved directory
 		if (resolved_path === resolved_dir) return dir;
 
-		const dir_with_sep = ensure_end(resolved_dir, path.sep);
+		const dir_with_sep = ensure_end(resolved_dir, '/');
 		if (resolved_path.startsWith(dir_with_sep)) return dir;
 	}
 
@@ -78,56 +86,174 @@ export const find_matching_allowed_dir = (
 };
 
 /**
- * Writes `contents` at `path` but only if it's inside one of the allowed dirs.
- * Prevents directory traversal attacks, symlink attacks, and writing outside allowed directories.
+ * Checks if a path is a directory
+ * Returns false if the path doesn't exist or isn't a directory
  */
+export const is_directory = (path_to_check: string): boolean => {
+	try {
+		return existsSync(path_to_check) && lstatSync(path_to_check).isDirectory();
+	} catch {
+		return false;
+	}
+};
+
+/**
+ * Writes content to a path if it's in an allowed directory, or creates a directory
+ * when is_dir is true.
+ *
+ * @param path Path to write to or create directory at
+ * @param content Content to write (ignored for directories)
+ * @param dir Allowed directories
+ * @param is_dir Whether to create a directory instead of writing a file
+ */
+export const write_to_allowed_path = (
+	path_to_write: string,
+	content: string,
+	dir: string | ReadonlyArray<string>,
+	is_dir = false,
+): boolean => {
+	if (!path_to_write || !dir) return false;
+
+	const dirs = to_array(dir);
+	const matching_dir = find_matching_allowed_dir(path_to_write, dirs);
+
+	if (!matching_dir) {
+		const operation = is_dir ? 'create directory' : 'write file';
+		console.error(
+			`refused to ${operation}, path ${path_to_write} must be in one of dirs ${dirs.join(', ')}`,
+		);
+		return false;
+	}
+
+	try {
+		if (is_dir) {
+			mkdirSync(path_to_write, {recursive: true});
+		} else {
+			writeFileSync(path_to_write, content, 'utf8');
+		}
+		return true;
+	} catch (err) {
+		console.error(`Error ${is_dir ? 'creating directory' : 'writing to'} ${path_to_write}:`, err);
+		return false;
+	}
+};
+
+/**
+ * Deletes a file or directory if it's in an allowed directory
+ *
+ * @param path Path to delete
+ * @param dir Allowed directories
+ * @param options Options for deletion
+ */
+export const delete_from_allowed_path = (
+	path_to_delete: string,
+	dir: string | ReadonlyArray<string>,
+	options?: {recursive?: boolean; force_dir?: boolean},
+): boolean => {
+	if (!path_to_delete || !dir) return false;
+
+	const dirs = to_array(dir);
+	const matching_dir = find_matching_allowed_dir(path_to_delete, dirs);
+
+	if (!matching_dir) {
+		console.error(
+			`refused to delete path, ${path_to_delete} must be in one of dirs ${dirs.join(', ')}`,
+		);
+		return false;
+	}
+
+	try {
+		// Check if it's a directory
+		const is_dir = is_directory(path_to_delete);
+
+		// If force_dir is true but the path is not a directory, return false
+		if (options?.force_dir && !is_dir) {
+			console.error(`path ${path_to_delete} is not a directory`);
+			return false;
+		}
+
+		if (is_dir) {
+			if (options?.recursive) {
+				rmSync(path_to_delete, {recursive: true, force: true});
+			} else {
+				rmdirSync(path_to_delete);
+			}
+		} else {
+			rmSync(path_to_delete);
+		}
+		return true;
+	} catch (err) {
+		console.error(`Error deleting ${path_to_delete}:`, err);
+		return false;
+	}
+};
+
+/**
+ * Lists contents of a path if it's in an allowed directory
+ */
+export const list_allowed_path = (
+	path_to_list: string,
+	dir: string | ReadonlyArray<string>,
+): Array<string> | null => {
+	if (!path_to_list || !dir) return null;
+
+	const dirs = to_array(dir);
+	const matching_dir = find_matching_allowed_dir(path_to_list, dirs);
+
+	if (!matching_dir) {
+		console.error(
+			`refused to list path, ${path_to_list} must be in one of dirs ${dirs.join(', ')}`,
+		);
+		return null;
+	}
+
+	if (!is_directory(path_to_list)) {
+		console.error(`path ${path_to_list} is not a directory`);
+		return null;
+	}
+
+	try {
+		// Get directory entries
+		const entries = readdirSync(path_to_list);
+
+		// Handle both string[] and Dirent[] returns depending on Node.js version
+		if (entries.length > 0 && typeof entries[0] === 'string') {
+			// If entries are strings, return as is
+			return entries;
+		} else {
+			// If entries are Dirent objects, extract the names
+			return (entries as unknown as Array<Dirent>).map((entry) => entry.name);
+		}
+	} catch (err) {
+		console.error(`Error listing ${path_to_list}:`, err);
+		return null;
+	}
+};
+
+// Legacy API for backward compatibility
 export const write_to_allowed_dir = (
 	path_to_write: string,
 	contents: string,
 	dir: string | ReadonlyArray<string>,
-): boolean => {
-	if (!path_to_write || !dir) return false;
+): boolean => write_to_allowed_path(path_to_write, contents, dir, false);
 
-	// Normalize to array of directories
-	const dirs = to_array(dir);
+export const create_dir_in_allowed_dir = (
+	path_to_create: string,
+	dir: string | ReadonlyArray<string>,
+): boolean => write_to_allowed_path(path_to_create, '', dir, true);
 
-	const matching_dir = find_matching_allowed_dir(path_to_write, dirs);
-	if (!matching_dir) {
-		console.error(
-			`refused to write file, path ${path_to_write} must be in one of dirs ${dirs.join(', ')}`,
-		);
-		return false;
-	}
+export const delete_dir_from_allowed_dir = (
+	path_to_delete: string,
+	dir: string | ReadonlyArray<string>,
+	recursive = false,
+): boolean => delete_from_allowed_path(path_to_delete, dir, {recursive, force_dir: true});
 
-	// No need to check contents - any value can be written including empty strings and null
-	writeFileSync(path_to_write, contents, 'utf8');
-	return true;
-};
-
-/**
- * Deletes the file at `path` but only if it's inside one of the allowed dirs.
- * Prevents directory traversal attacks, symlink attacks, and deleting outside allowed directories.
- */
 export const delete_from_allowed_dir = (
 	path_to_delete: string,
 	dir: string | ReadonlyArray<string>,
-): boolean => {
-	if (!path_to_delete || !dir) return false;
+): boolean => delete_from_allowed_path(path_to_delete, dir);
 
-	// Normalize to array of directories
-	const dirs = to_array(dir);
-
-	const matching_dir = find_matching_allowed_dir(path_to_delete, dirs);
-	if (!matching_dir) {
-		console.error(
-			`refused to delete file, path ${path_to_delete} must be in one of dirs ${dirs.join(', ')}`,
-		);
-		return false;
-	}
-
-	rmSync(path_to_delete);
-	return true;
-};
+export const list_dir_in_allowed_dir = list_allowed_path;
 
 /**
  * Checks if a path is a symlink

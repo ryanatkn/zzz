@@ -47,13 +47,13 @@ export interface Zzz_Server_Options {
 	 */
 	handle_filer_change: Filer_Change_Handler;
 	/**
-	 * Directories that ZZZ is allowed to read from and write to
+	 * Directories that Zzz is allowed to read from and write to
 	 */
 	zzz_dirs?: string | Array<string>;
 }
 
 /**
- * Server for managing the ZZZ application state and handling client messages
+ * Server for managing the Zzz application state and handling client messages
  */
 export class Zzz_Server {
 	#send_to_all_clients: (message: Message_Server) => void;

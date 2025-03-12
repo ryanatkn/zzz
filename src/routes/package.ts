@@ -507,6 +507,11 @@ export const package_json = {
 		},
 		'./xml.js': {types: './dist/xml.d.ts', default: './dist/xml.js'},
 		'./zod_helpers.js': {types: './dist/zod_helpers.d.ts', default: './dist/zod_helpers.js'},
+		'./Zzz_Dirs.svelte': {
+			types: './dist/Zzz_Dirs.svelte.d.ts',
+			svelte: './dist/Zzz_Dirs.svelte',
+			default: './dist/Zzz_Dirs.svelte',
+		},
 		'./Zzz_Root.svelte': {
 			types: './dist/Zzz_Root.svelte.d.ts',
 			svelte: './dist/Zzz_Root.svelte',
@@ -696,6 +701,7 @@ export const src_json = {
 				{name: 'GLYPH_CHAT', kind: 'variable'},
 				{name: 'GLYPH_TAPE', kind: 'variable'},
 				{name: 'GLYPH_FILE', kind: 'variable'},
+				{name: 'GLYPH_DIRECTORY', kind: 'variable'},
 				{name: 'GLYPH_PROMPT', kind: 'variable'},
 				{name: 'GLYPH_BIT', kind: 'variable'},
 				{name: 'GLYPH_PROVIDER', kind: 'variable'},
@@ -954,8 +960,18 @@ export const src_json = {
 		'./server/filesystem_helpers.js': {
 			path: 'server/filesystem_helpers.ts',
 			declarations: [
+				{name: 'find_matching_allowed_dir', kind: 'function'},
+				{name: 'is_directory', kind: 'function'},
+				{name: 'write_to_allowed_path', kind: 'function'},
+				{name: 'delete_from_allowed_path', kind: 'function'},
+				{name: 'list_allowed_path', kind: 'function'},
 				{name: 'write_to_allowed_dir', kind: 'function'},
+				{name: 'create_dir_in_allowed_dir', kind: 'function'},
+				{name: 'delete_dir_from_allowed_dir', kind: 'function'},
 				{name: 'delete_from_allowed_dir', kind: 'function'},
+				{name: 'list_dir_in_allowed_dir', kind: 'function'},
+				{name: 'is_symlink', kind: 'function'},
+				{name: 'has_traversal_segments', kind: 'function'},
 			],
 		},
 		'./server/handler_defaults.js': {
@@ -978,6 +994,7 @@ export const src_json = {
 			declarations: [
 				{name: 'Message_Handler', kind: 'type'},
 				{name: 'Filer_Change_Handler', kind: 'type'},
+				{name: 'Filer_Instance', kind: 'type'},
 				{name: 'Zzz_Server_Options', kind: 'type'},
 				{name: 'Zzz_Server', kind: 'class'},
 			],
@@ -1080,6 +1097,7 @@ export const src_json = {
 				{name: 'maybe_get_field_schema', kind: 'function'},
 			],
 		},
+		'./Zzz_Dirs.svelte': {path: 'Zzz_Dirs.svelte', declarations: []},
 		'./Zzz_Root.svelte': {path: 'Zzz_Root.svelte', declarations: []},
 		'./zzz.svelte.js': {
 			path: 'zzz.svelte.ts',
