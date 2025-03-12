@@ -15,15 +15,6 @@ export const is_path_absolute = (path: unknown): boolean => {
 };
 
 /**
- * Normalizes and validates a path, ensuring it's absolute
- */
-export const normalize_path = (path: string): string => {
-	// For now just return the path as-is
-	// In a real implementation, this might use path.normalize() or similar
-	return path;
-};
-
-/**
  * Maps watcher change types to diskfile change types
  */
 export const map_watcher_change_to_diskfile_change = (

@@ -441,13 +441,13 @@ export const package_json = {
 			types: './dist/server/ai_provider_utils.d.ts',
 			default: './dist/server/ai_provider_utils.js',
 		},
-		'./server/filesystem_helpers.js': {
-			types: './dist/server/filesystem_helpers.d.ts',
-			default: './dist/server/filesystem_helpers.js',
-		},
 		'./server/handler_defaults.js': {
 			types: './dist/server/handler_defaults.d.ts',
 			default: './dist/server/handler_defaults.js',
+		},
+		'./server/safe_fs.js': {
+			types: './dist/server/safe_fs.d.ts',
+			default: './dist/server/safe_fs.js',
 		},
 		'./server/server_helpers.js': {
 			types: './dist/server/server_helpers.d.ts',
@@ -631,7 +631,10 @@ export const src_json = {
 		'./Confirm_Button.svelte': {path: 'Confirm_Button.svelte', declarations: []},
 		'./constants.js': {
 			path: 'constants.ts',
-			declarations: [{name: 'XML_TAG_NAME_DEFAULT', kind: 'variable'}],
+			declarations: [
+				{name: 'XML_TAG_NAME_DEFAULT', kind: 'variable'},
+				{name: 'ZZZ_DIRNAME', kind: 'variable'},
+			],
 		},
 		'./Control_Panel.svelte': {path: 'Control_Panel.svelte', declarations: []},
 		'./Dashboard_Capabilities.svelte': {path: 'Dashboard_Capabilities.svelte', declarations: []},
@@ -649,6 +652,7 @@ export const src_json = {
 		'./diskfile_helpers.js': {
 			path: 'diskfile_helpers.ts',
 			declarations: [
+				{name: 'is_path_absolute', kind: 'function'},
 				{name: 'map_watcher_change_to_diskfile_change', kind: 'function'},
 				{name: 'source_file_to_diskfile_json', kind: 'function'},
 			],
@@ -957,23 +961,6 @@ export const src_json = {
 				{name: 'format_gemini_messages', kind: 'function'},
 			],
 		},
-		'./server/filesystem_helpers.js': {
-			path: 'server/filesystem_helpers.ts',
-			declarations: [
-				{name: 'find_matching_allowed_dir', kind: 'function'},
-				{name: 'is_directory', kind: 'function'},
-				{name: 'write_to_allowed_path', kind: 'function'},
-				{name: 'delete_from_allowed_path', kind: 'function'},
-				{name: 'list_allowed_path', kind: 'function'},
-				{name: 'write_to_allowed_dir', kind: 'function'},
-				{name: 'create_dir_in_allowed_dir', kind: 'function'},
-				{name: 'delete_dir_from_allowed_dir', kind: 'function'},
-				{name: 'delete_from_allowed_dir', kind: 'function'},
-				{name: 'list_dir_in_allowed_dir', kind: 'function'},
-				{name: 'is_symlink', kind: 'function'},
-				{name: 'has_traversal_segments', kind: 'function'},
-			],
-		},
 		'./server/handler_defaults.js': {
 			path: 'server/handler_defaults.ts',
 			declarations: [
@@ -981,10 +968,18 @@ export const src_json = {
 				{name: 'handle_filer_change', kind: 'function'},
 			],
 		},
+		'./server/safe_fs.js': {
+			path: 'server/safe_fs.ts',
+			declarations: [
+				{name: 'Safe_Fs', kind: 'class'},
+				{name: 'Path_Not_Allowed_Error', kind: 'class'},
+				{name: 'Symlink_Not_Allowed_Error', kind: 'class'},
+			],
+		},
 		'./server/server_helpers.js': {
 			path: 'server/server_helpers.ts',
 			declarations: [
-				{name: 'ZZZ_DIR_DEFAULT', kind: 'variable'},
+				{name: 'ZZZ_DIR', kind: 'variable'},
 				{name: 'parse_zzz_dirs', kind: 'function'},
 			],
 		},

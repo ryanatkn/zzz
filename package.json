@@ -511,13 +511,13 @@
       "types": "./dist/server/ai_provider_utils.d.ts",
       "default": "./dist/server/ai_provider_utils.js"
     },
-    "./server/filesystem_helpers.js": {
-      "types": "./dist/server/filesystem_helpers.d.ts",
-      "default": "./dist/server/filesystem_helpers.js"
-    },
     "./server/handler_defaults.js": {
       "types": "./dist/server/handler_defaults.d.ts",
       "default": "./dist/server/handler_defaults.js"
+    },
+    "./server/safe_fs.js": {
+      "types": "./dist/server/safe_fs.d.ts",
+      "default": "./dist/server/safe_fs.js"
     },
     "./server/server_helpers.js": {
       "types": "./dist/server/server_helpers.d.ts",

@@ -8,7 +8,6 @@ import {
 	SECRET_GOOGLE_API_KEY,
 	SECRET_OPENAI_API_KEY,
 } from '$env/static/private';
-import {existsSync, mkdirSync, writeFileSync} from 'node:fs';
 import {dirname, join} from 'node:path';
 import {format_file} from '@ryanatkn/gro/format_file.js';
 import type {Watcher_Change} from '@ryanatkn/gro/watch_dir.js';
@@ -22,7 +21,6 @@ import {
 } from '$lib/message_types.js';
 import {Uuid} from '$lib/zod_helpers.js';
 import {Diskfile_Path, Source_File, type Zzz_Dir} from '$lib/diskfile_types.js';
-import {delete_from_allowed_dir, write_to_allowed_dir} from '$lib/server/filesystem_helpers.js';
 import {map_watcher_change_to_diskfile_change} from '$lib/diskfile_helpers.js';
 import {
 	format_ollama_messages,
@@ -32,6 +30,7 @@ import {
 } from '$lib/server/ai_provider_utils.js';
 import {create_completion_response_message} from '$lib/response_helpers.js';
 import type {Zzz_Server} from '$lib/server/zzz_server.js';
+import {Safe_Fs} from '$lib/server/safe_fs.js';
 
 // AI provider clients
 const anthropic = new Anthropic({apiKey: SECRET_ANTHROPIC_API_KEY});
@@ -203,7 +202,7 @@ export const handle_message = async (
 			// TODO enhance this to select a specific directory based on context
 			const primary_dir = server.zzz_dirs[0];
 			// We don't need to wait for this to finish
-			void save_response(message, response, primary_dir);
+			void save_response(message, response, primary_dir, server.safe_fs);
 
 			console.log(`got ${provider_name} message`, response.completion_response.data);
 
@@ -211,15 +210,27 @@ export const handle_message = async (
 		}
 		case 'update_diskfile': {
 			const {path, contents} = message;
-			// Use all allowed directories
-			write_to_allowed_dir(path, contents, server.zzz_dirs);
-			return null;
+
+			try {
+				// Use the server's safe_fs instance to write the file
+				await server.safe_fs.write_file(path, contents);
+				return null;
+			} catch (error) {
+				console.error(`Error writing file ${path}:`, error);
+				throw error;
+			}
 		}
 		case 'delete_diskfile': {
 			const {path} = message;
-			// Use all allowed directories
-			delete_from_allowed_dir(path, server.zzz_dirs);
-			return null;
+
+			try {
+				// Use the server's safe_fs instance to delete the file
+				await server.safe_fs.unlink(path);
+				return null;
+			} catch (error) {
+				console.error(`Error deleting file ${path}:`, error);
+				throw error;
+			}
 		}
 		default:
 			throw new Unreachable_Error(message);
@@ -271,6 +282,7 @@ const save_response = async (
 	request: Message_Send_Prompt,
 	response: Message_Completion_Response,
 	dir: string,
+	safe_fs: Safe_Fs,
 ): Promise<void> => {
 	// includes `Date.now()` for sorting purposes
 	const filename = `${request.completion_request.provider_name}__${Date.now()}__${request.completion_request.model}__${response.id}.json`; // TODO include model data in these
@@ -279,16 +291,19 @@ const save_response = async (
 
 	const json = {request, response};
 
-	await write_json(path, json);
+	await write_json(path, json, safe_fs);
 };
 
-const write_json = async (path: string, json: unknown): Promise<void> => {
-	const dir = dirname(path);
-	if (!existsSync(dir)) {
-		mkdirSync(dir, {recursive: true});
+const write_json = async (path: string, json: unknown, safe_fs: Safe_Fs): Promise<void> => {
+	const dir_path = dirname(path);
+
+	// Check if directory exists and create it if needed
+	if (!(await safe_fs.exists(dir_path))) {
+		await safe_fs.mkdir(dir_path, {recursive: true});
 	}
 
 	const formatted = await format_file(JSON.stringify(json), {parser: 'json'});
 
-	writeFileSync(path, formatted);
+	// Use Safe_Fs for writing the file
+	await safe_fs.write_file(path, formatted);
 };

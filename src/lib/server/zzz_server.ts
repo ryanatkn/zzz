@@ -5,6 +5,7 @@ import {type Message_Client, type Message_Server} from '$lib/message_types.js';
 import type {Zzz_Config} from '$lib/config_helpers.js';
 import type {Zzz_Dir} from '$lib/diskfile_types.js';
 import {parse_zzz_dirs} from '$lib/server/server_helpers.js';
+import {Safe_Fs} from '$lib/server/safe_fs.js';
 
 /**
  * Function type for handling client messages
@@ -56,17 +57,23 @@ export interface Zzz_Server_Options {
  * Server for managing the Zzz application state and handling client messages
  */
 export class Zzz_Server {
-	#send_to_all_clients: (message: Message_Server) => void;
+	readonly #send_to_all_clients: (message: Message_Server) => void;
 
-	zzz_dirs: ReadonlyArray<Zzz_Dir>;
+	/** The directories that can be accessed by the `safe_fs` */
+	readonly zzz_dirs: ReadonlyArray<Zzz_Dir>;
+
+	/**
+	 * Safe filesystem interface that restricts operations to allowed directories
+	 */
+	readonly safe_fs: Safe_Fs;
 
 	// Map of directory paths to their respective Filer instances
-	filers: Map<string, Filer_Instance> = new Map();
+	readonly filers: Map<string, Filer_Instance> = new Map();
 
-	config: Zzz_Config;
+	readonly config: Zzz_Config;
 
-	handle_message: Message_Handler;
-	handle_filer_change: Filer_Change_Handler;
+	readonly handle_message: Message_Handler;
+	readonly handle_filer_change: Filer_Change_Handler;
 
 	constructor(options: Zzz_Server_Options) {
 		console.log('create Zzz_Server');
@@ -77,7 +84,11 @@ export class Zzz_Server {
 		this.handle_message = options.handle_message;
 		this.handle_filer_change = options.handle_filer_change;
 
+		// Parse the allowed filesystem directories
 		this.zzz_dirs = parse_zzz_dirs(options.zzz_dirs);
+
+		// Create the safe filesystem interface with the allowed directories
+		this.safe_fs = new Safe_Fs(this.zzz_dirs);
 
 		// TODO BLOCK on the frontend, show each directory and whether or not it even exists, and allow creating it if not
 		// Set up a filer for each directory
