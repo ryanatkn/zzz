@@ -26,7 +26,7 @@
 			<button type="button" class="plain w_100 py_xs3" onclick={() => onselect(model)}
 				><div class="flex w_100 text_align_left">
 					<div class="flex_1 pr_md">
-						<div class="font_weight_500">{model.name}</div>
+						<div class="font_weight_600">{model.name}</div>
 						<div class="size_sm font_weight_400">{model.provider_name}</div>
 					</div>
 					<!-- TODO this is arbitrarily placed -->

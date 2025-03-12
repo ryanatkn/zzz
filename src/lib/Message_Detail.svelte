@@ -43,7 +43,7 @@
 	<div class="mb_md pb_md border_bottom">
 		<h3 class="mt_0 mb_sm">Ping Response</h3>
 		<div class="field_row">
-			<div class="font_weight_500 color_text_subtle">Ping ID</div>
+			<div class="font_weight_600 color_text_subtle">Ping ID</div>
 			<div class="font_mono word_break_break_word">{message.ping_id}</div>
 		</div>
 	</div>
@@ -56,25 +56,25 @@
 		<h3 class="mt_md mb_sm">Request Details</h3>
 		<div class="flex flex_column gap_xs">
 			<div class="field_row">
-				<div class="font_weight_500 color_text_subtle">Model</div>
+				<div class="font_weight_600 color_text_subtle">Model</div>
 				<div>{message.prompt_data?.model || 'Unknown'}</div>
 			</div>
 			<div class="field_row">
-				<div class="font_weight_500 color_text_subtle">Provider</div>
+				<div class="font_weight_600 color_text_subtle">Provider</div>
 				<div>{message.prompt_data?.provider_name || 'Unknown'}</div>
 			</div>
 			<div class="field_row">
-				<div class="font_weight_500 color_text_subtle">Created</div>
+				<div class="font_weight_600 color_text_subtle">Created</div>
 				<div>{message.prompt_data?.created || 'Unknown'}</div>
 			</div>
 			<div class="field_row">
-				<div class="font_weight_500 color_text_subtle">Request ID</div>
+				<div class="font_weight_600 color_text_subtle">Request ID</div>
 				<div class="font_mono">{message.prompt_data?.request_id || 'Unknown'}</div>
 			</div>
 			{#if message.json.completion_request && 'options' in message.json.completion_request}
 				{#each Object.entries(message.json.completion_request.options || {}) as [key, value]}
 					<div class="field_row">
-						<div class="font_weight_500 color_text_subtle">{key}</div>
+						<div class="font_weight_600 color_text_subtle">{key}</div>
 						<div>{JSON.stringify(value)}</div>
 					</div>
 				{/each}
@@ -91,52 +91,52 @@
 		<h3 class="mt_md mb_sm">Response Details</h3>
 		<div class="flex flex_column gap_xs">
 			<div class="field_row">
-				<div class="font_weight_500 color_text_subtle">Request ID</div>
+				<div class="font_weight_600 color_text_subtle">Request ID</div>
 				<div class="font_mono">{message.completion_data?.request_id || 'Unknown'}</div>
 			</div>
 			<div class="field_row">
-				<div class="font_weight_500 color_text_subtle">Created</div>
+				<div class="font_weight_600 color_text_subtle">Created</div>
 				<div>{message.completion_data?.created || 'Unknown'}</div>
 			</div>
 			<div class="field_row">
-				<div class="font_weight_500 color_text_subtle">Model</div>
+				<div class="font_weight_600 color_text_subtle">Model</div>
 				<div>{message.completion_data?.model || 'Unknown'}</div>
 			</div>
 			<div class="field_row">
-				<div class="font_weight_500 color_text_subtle">Provider</div>
+				<div class="font_weight_600 color_text_subtle">Provider</div>
 				<div>{message.completion_data?.provider_name || 'Unknown'}</div>
 			</div>
 			{#if message.json.completion_response?.data}
 				{#if message.json.completion_response.data.type === 'ollama'}
 					<div class="field_row">
-						<div class="font_weight_500 color_text_subtle">Total Duration</div>
+						<div class="font_weight_600 color_text_subtle">Total Duration</div>
 						<div>{message.json.completion_response.data.value.total_duration || 'Unknown'}</div>
 					</div>
 				{:else if message.json.completion_response.data.type === 'claude' && message.json.completion_response.data.value.usage}
 					<div class="field_row">
-						<div class="font_weight_500 color_text_subtle">Input Tokens</div>
+						<div class="font_weight_600 color_text_subtle">Input Tokens</div>
 						<div>{message.json.completion_response.data.value.usage.input_tokens || 0}</div>
 					</div>
 					<div class="field_row">
-						<div class="font_weight_500 color_text_subtle">Output Tokens</div>
+						<div class="font_weight_600 color_text_subtle">Output Tokens</div>
 						<div>{message.json.completion_response.data.value.usage.output_tokens || 0}</div>
 					</div>
 				{:else if message.json.completion_response.data.type === 'chatgpt' && message.json.completion_response.data.value.usage}
 					<div class="field_row">
-						<div class="font_weight_500 color_text_subtle">Prompt Tokens</div>
+						<div class="font_weight_600 color_text_subtle">Prompt Tokens</div>
 						<div>{message.json.completion_response.data.value.usage.prompt_tokens || 0}</div>
 					</div>
 					<div class="field_row">
-						<div class="font_weight_500 color_text_subtle">Completion Tokens</div>
+						<div class="font_weight_600 color_text_subtle">Completion Tokens</div>
 						<div>{message.json.completion_response.data.value.usage.completion_tokens || 0}</div>
 					</div>
 					<div class="field_row">
-						<div class="font_weight_500 color_text_subtle">Total Tokens</div>
+						<div class="font_weight_600 color_text_subtle">Total Tokens</div>
 						<div>{message.json.completion_response.data.value.usage.total_tokens || 0}</div>
 					</div>
 				{:else if message.json.completion_response.data.type === 'gemini'}
 					<div class="field_row">
-						<div class="font_weight_500 color_text_subtle">Total Tokens</div>
+						<div class="font_weight_600 color_text_subtle">Total Tokens</div>
 						<div>
 							{message.json.completion_response.data.value.usage_metadata?.totalTokenCount || 0}
 						</div>
@@ -151,13 +151,13 @@
 		<div class="flex flex_column gap_xs">
 			{#if message.path}
 				<div class="field_row">
-					<div class="font_weight_500 color_text_subtle">Path</div>
+					<div class="font_weight_600 color_text_subtle">Path</div>
 					<div class="font_mono word_break_break_word">{message.path}</div>
 				</div>
 			{/if}
 			{#if message.contents !== undefined}
 				<div class="field_row">
-					<div class="font_weight_500 color_text_subtle">Size</div>
+					<div class="font_weight_600 color_text_subtle">Size</div>
 					<div>{message.contents.length || 0} characters</div>
 				</div>
 				<h4 class="mt_sm mb_xs">Contents</h4>
@@ -167,7 +167,7 @@
 			{/if}
 			{#if message.change}
 				<div class="field_row">
-					<div class="font_weight_500 color_text_subtle">Change Type</div>
+					<div class="font_weight_600 color_text_subtle">Change Type</div>
 					<div>{message.change.type || 'Unknown'}</div>
 				</div>
 			{/if}
@@ -179,7 +179,7 @@
 		{#if message.data}
 			{#if message.type === 'loaded_session' && message.data.files}
 				<div class="field_row">
-					<div class="font_weight_500 color_text_subtle">Files Loaded</div>
+					<div class="font_weight_600 color_text_subtle">Files Loaded</div>
 					<div>{Object.keys(message.data.files).length}</div>
 				</div>
 

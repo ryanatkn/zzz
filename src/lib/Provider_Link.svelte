@@ -64,7 +64,7 @@
 
 <style>
 	a {
-		font-weight: 500;
+		font-weight: 600;
 	}
 	/* TODO breaks convention, but I think it looks better in a lot of cases, maybe extract a class? `plain_selected_link` or `plain`? */
 	.selected {

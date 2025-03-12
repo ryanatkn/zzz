@@ -134,6 +134,10 @@ export const package_json = {
 			svelte: './dist/Clear_Restore_Button.svelte',
 			default: './dist/Clear_Restore_Button.svelte',
 		},
+		'./config_defaults.js': {
+			types: './dist/config_defaults.d.ts',
+			default: './dist/config_defaults.js',
+		},
 		'./config_helpers.js': {
 			types: './dist/config_helpers.d.ts',
 			default: './dist/config_helpers.js',
@@ -437,6 +441,10 @@ export const package_json = {
 			types: './dist/server/ai_provider_utils.d.ts',
 			default: './dist/server/ai_provider_utils.js',
 		},
+		'./server/handler_defaults.js': {
+			types: './dist/server/handler_defaults.d.ts',
+			default: './dist/server/handler_defaults.js',
+		},
 		'./server/helpers.js': {
 			types: './dist/server/helpers.d.ts',
 			default: './dist/server/helpers.js',
@@ -587,6 +595,22 @@ export const src_json = {
 			],
 		},
 		'./Clear_Restore_Button.svelte': {path: 'Clear_Restore_Button.svelte', declarations: []},
+		'./config_defaults.js': {
+			path: 'config_defaults.ts',
+			declarations: [
+				{name: 'SYSTEM_MESSAGE_DEFAULT', kind: 'variable'},
+				{name: 'OUTPUT_TOKEN_MAX_DEFAULT', kind: 'variable'},
+				{name: 'TEMPERATURE_DEFAULT', kind: 'variable'},
+				{name: 'SEED_DEFAULT', kind: 'variable'},
+				{name: 'TOP_K_DEFAULT', kind: 'variable'},
+				{name: 'TOP_P_DEFAULT', kind: 'variable'},
+				{name: 'FREQUENCY_PENALTY_DEFAULT', kind: 'variable'},
+				{name: 'PRESENCE_PENALTY_DEFAULT', kind: 'variable'},
+				{name: 'STOP_SEQUENCES_DEFAULT', kind: 'variable'},
+				{name: 'providers_default', kind: 'variable'},
+				{name: 'models_default', kind: 'variable'},
+			],
+		},
 		'./config_helpers.js': {
 			path: 'config_helpers.ts',
 			declarations: [
@@ -594,15 +618,7 @@ export const src_json = {
 				{name: 'Zzz_Config', kind: 'type'},
 			],
 		},
-		'./config.js': {
-			path: 'config.ts',
-			declarations: [
-				{name: 'providers_default', kind: 'variable'},
-				{name: 'models_default', kind: 'variable'},
-				{name: 'SYSTEM_MESSAGE_DEFAULT', kind: 'variable'},
-				{name: 'default', kind: 'variable'},
-			],
-		},
+		'./config.js': {path: 'config.ts', declarations: [{name: 'default', kind: 'variable'}]},
 		'./Confirm_Button.svelte': {path: 'Confirm_Button.svelte', declarations: []},
 		'./constants.js': {
 			path: 'constants.ts',
@@ -930,6 +946,13 @@ export const src_json = {
 				{name: 'format_gemini_messages', kind: 'function'},
 			],
 		},
+		'./server/handler_defaults.js': {
+			path: 'server/handler_defaults.ts',
+			declarations: [
+				{name: 'handle_message', kind: 'function'},
+				{name: 'handle_filer_change', kind: 'function'},
+			],
+		},
 		'./server/helpers.js': {
 			path: 'server/helpers.ts',
 			declarations: [
@@ -941,6 +964,8 @@ export const src_json = {
 		'./server/zzz_server.js': {
 			path: 'server/zzz_server.ts',
 			declarations: [
+				{name: 'Message_Handler', kind: 'type'},
+				{name: 'Filer_Change_Handler', kind: 'type'},
 				{name: 'Zzz_Server_Options', kind: 'type'},
 				{name: 'Zzz_Server', kind: 'class'},
 			],

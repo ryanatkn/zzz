@@ -18,14 +18,14 @@
 	<div class="sections mt_lg">
 		<section class="panel p_md mb_0">
 			<div class="mb_lg">
-				<a class="size_xl font_weight_500" href="{base}/log"><Glyph_Icon icon={GLYPH_LOG} /> log</a>
+				<a class="size_xl font_weight_600" href="{base}/log"><Glyph_Icon icon={GLYPH_LOG} /> log</a>
 			</div>
 			<Messages_List limit={5} attrs={{class: 'mt_sm'}} />
 		</section>
 
 		<section class="panel p_md mb_0">
 			<div class="mb_lg">
-				<a class="size_xl font_weight_500" href="{base}/providers"
+				<a class="size_xl font_weight_600" href="{base}/providers"
 					><Glyph_Icon icon={GLYPH_PROVIDER} /> providers</a
 				>
 			</div>
@@ -46,7 +46,7 @@
 
 		<section class="panel p_md mb_0">
 			<div class="mb_lg">
-				<a class="size_xl font_weight_500" href="{base}/models"
+				<a class="size_xl font_weight_600" href="{base}/models"
 					><Glyph_Icon icon={GLYPH_MODEL} /> models</a
 				>
 			</div>

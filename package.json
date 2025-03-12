@@ -169,6 +169,10 @@
       "svelte": "./dist/Clear_Restore_Button.svelte",
       "default": "./dist/Clear_Restore_Button.svelte"
     },
+    "./config_defaults.js": {
+      "types": "./dist/config_defaults.d.ts",
+      "default": "./dist/config_defaults.js"
+    },
     "./config_helpers.js": {
       "types": "./dist/config_helpers.d.ts",
       "default": "./dist/config_helpers.js"
@@ -506,6 +510,10 @@
     "./server/ai_provider_utils.js": {
       "types": "./dist/server/ai_provider_utils.d.ts",
       "default": "./dist/server/ai_provider_utils.js"
+    },
+    "./server/handler_defaults.js": {
+      "types": "./dist/server/handler_defaults.d.ts",
+      "default": "./dist/server/handler_defaults.js"
     },
     "./server/helpers.js": {
       "types": "./dist/server/helpers.d.ts",
