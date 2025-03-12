@@ -22,7 +22,7 @@ import {
 } from '$lib/message_types.js';
 import {Uuid} from '$lib/zod_helpers.js';
 import {Diskfile_Path, Source_File, type Zzz_Dir} from '$lib/diskfile_types.js';
-import {delete_diskfile_in_scope, write_diskfile_in_scope} from '$lib/server/filesystem_helpers.js';
+import {delete_path_in_scope, write_path_in_scope} from '$lib/server/filesystem_helpers.js';
 import {map_watcher_change_to_diskfile_change} from '$lib/diskfile_helpers.js';
 import {
 	format_ollama_messages,
@@ -212,13 +212,13 @@ export const handle_message = async (
 		case 'update_diskfile': {
 			const {path, contents} = message;
 			// Use all allowed directories
-			write_diskfile_in_scope(path, contents, server.zzz_dirs);
+			write_path_in_scope(path, contents, server.zzz_dirs);
 			return null;
 		}
 		case 'delete_diskfile': {
 			const {path} = message;
 			// Use all allowed directories
-			delete_diskfile_in_scope(path, server.zzz_dirs);
+			delete_path_in_scope(path, server.zzz_dirs);
 			return null;
 		}
 		default:

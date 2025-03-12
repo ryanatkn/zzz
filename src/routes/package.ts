@@ -954,8 +954,8 @@ export const src_json = {
 		'./server/filesystem_helpers.js': {
 			path: 'server/filesystem_helpers.ts',
 			declarations: [
-				{name: 'write_diskfile_in_scope', kind: 'function'},
-				{name: 'delete_diskfile_in_scope', kind: 'function'},
+				{name: 'write_path_in_scope', kind: 'function'},
+				{name: 'delete_path_in_scope', kind: 'function'},
 			],
 		},
 		'./server/handler_defaults.js': {
