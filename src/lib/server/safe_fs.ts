@@ -13,18 +13,7 @@ export const Safe_Fs_Path = z
 	.refine((p) => p.startsWith('/'), {
 		message: 'Path must be absolute',
 	})
-	.transform((p) => {
-		// Normalize the path to resolve any `.` or `..` segments
-		const normalized = normalize(p);
-
-		// Additional safety check: ensure normalization didn't introduce path traversal
-		// that would escape the intended path's directory hierarchy
-		if (normalized !== p && normalized.includes('..')) {
-			throw new Error(`Path contains invalid traversal segments after normalization: ${p}`);
-		}
-
-		return normalized;
-	})
+	.transform((p) => normalize(p)) // Normalize the path to resolve any `.` or `..` segments and collapse multiple slashes
 	.brand('Safe_Fs_Path');
 
 export type Safe_Fs_Path = z.infer<typeof Safe_Fs_Path>;
@@ -138,6 +127,7 @@ export class Safe_Fs {
 		return fs.rmdir(safe_path, options);
 	}
 
+	// TODO this does not include all of the possible signatures for readdir
 	/**
 	 * List directory contents if it's in an allowed path
 	 */
@@ -186,10 +176,10 @@ export class Safe_Fs {
 	/**
 	 * Copy a file if both source and destination are in allowed paths
 	 */
-	async copyFile(source: string, destination: string, mode?: number | null): Promise<void> {
+	async copyFile(source: string, destination: string, mode?: number): Promise<void> {
 		const safe_source = await this.#ensure_safe_path(source);
 		const safe_destination = await this.#ensure_safe_path(destination);
-		return fs.copyFile(safe_source, safe_destination, mode || 0);
+		return fs.copyFile(safe_source, safe_destination, mode);
 	}
 
 	/**

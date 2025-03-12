@@ -189,7 +189,7 @@ describe('Safe_Fs - File Operations', () => {
 		expect(fs.copyFile).toHaveBeenCalledWith(
 			'/allowed/path/source.txt',
 			'/allowed/path/dest.txt',
-			0,
+			undefined,
 		);
 	});
 
