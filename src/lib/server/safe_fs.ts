@@ -44,10 +44,8 @@ export class Safe_Fs {
 		if (!path_to_check) return false;
 
 		try {
-			// Unicode and URL-encoded traversals
-			if (this.#has_suspicious_patterns(path_to_check)) return false;
-
-			// Let the parser normalize and validate
+			// Let the parser normalize and validate - this handles absolute path requirement
+			// and normalizes all path traversal attempts
 			const normalized_path = Safe_Fs_Path.parse(path_to_check);
 
 			// Check if within allowed paths
@@ -115,6 +113,8 @@ export class Safe_Fs {
 	}
 
 	async unlink(file_path: string): Promise<void> {
+		// Note: We're keeping unlink for consistency with Node's fs API
+		// even though we don't allow operating on symlinks specifically
 		const safe_path = await this.#ensure_safe_path(file_path);
 		return fs.unlink(safe_path);
 	}
@@ -202,42 +202,42 @@ export class Safe_Fs {
 	 * Throws an error if the path is not allowed or contains symlinks.
 	 */
 	async #ensure_safe_path(path_to_check: string): Promise<string> {
-		if (this.#has_suspicious_patterns(path_to_check)) {
-			throw new Path_Not_Allowed_Error(path_to_check);
-		}
 		let normalized_path: Safe_Fs_Path;
 		try {
 			normalized_path = Safe_Fs_Path.parse(path_to_check);
 		} catch {
 			throw new Path_Not_Allowed_Error(path_to_check);
 		}
+
 		if (!this.is_path_allowed(normalized_path)) {
 			throw new Path_Not_Allowed_Error(normalized_path);
 		}
-		// Check the target path if it exists.
+
+		// Check the target path if it exists
 		try {
 			const stats = await fs.lstat(normalized_path);
 			if (stats.isSymbolicLink()) {
 				throw new Symlink_Not_Allowed_Error(normalized_path);
 			}
 		} catch (err) {
-			// If error is due to non-existence, ignore.
+			// If error is due to non-existence, ignore
 			if (!(err instanceof Error && err.message.includes('ENOENT'))) {
 				throw err;
 			}
 		}
-		// Always check all parent directories.
+
+		// Check all parent directories
 		let current: string = normalized_path;
 		while (current !== '/' && current !== '.') {
 			const parent = dirname(current);
 			if (parent === current) break;
+
 			try {
 				const stats = await fs.lstat(parent);
 				if (stats.isSymbolicLink()) {
 					throw new Symlink_Not_Allowed_Error(parent);
 				}
 			} catch (err) {
-				// If parent doesn't exist, skip check.
 				if (!(err instanceof Error && err.message.includes('ENOENT'))) {
 					throw err;
 				}
@@ -245,38 +245,6 @@ export class Safe_Fs {
 			current = parent;
 		}
 		return normalized_path;
-	}
-
-	/**
-	 * Checks for suspicious patterns that might indicate path traversal attempts
-	 */
-	#has_suspicious_patterns(path: string): boolean {
-		// URL/scheme patterns
-		if (path.startsWith('file://') || path.startsWith('http://') || path.startsWith('https://')) {
-			return true;
-		}
-
-		// Windows-style path traversal
-		if (path.includes('..\\') || path.includes('\\..')) {
-			return true;
-		}
-
-		// URL-encoded traversal characters
-		const lower = path.toLowerCase();
-		if (lower.includes('%2e') || lower.includes('%2f')) {
-			return true;
-		}
-
-		// TODO are these needed?
-		// Unicode suspicious characters
-		const suspicious = ['．', '⁄', 'ＮＮ', '...', '…', '％2e', '％2f'];
-		for (const char of suspicious) {
-			if (path.includes(char)) {
-				return true;
-			}
-		}
-
-		return false;
 	}
 }
 
