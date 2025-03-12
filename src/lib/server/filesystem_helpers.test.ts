@@ -1,6 +1,7 @@
 import {test, expect, vi, beforeEach, afterEach} from 'vitest';
 import * as fs from 'node:fs';
 import {to_array} from '@ryanatkn/belt/array.js';
+import * as path from 'node:path';
 
 import {
 	is_path_in_allowed_dirs,
@@ -8,7 +9,7 @@ import {
 	delete_path_in_scope,
 } from '$lib/server/filesystem_helpers.js';
 
-// Mock filesystem functions
+// Mock filesystem functions to prevent actual file operations
 vi.mock('node:fs', () => ({
 	writeFileSync: vi.fn(),
 	rmSync: vi.fn(),
@@ -30,9 +31,8 @@ const valid_paths = [
 	'/allowed/path/',
 	'/allowed/path',
 	'/allowed/deeper/nested/file.txt',
-	// Add more cases
-	'./allowed/file.txt', // Relative path
-	'/allowed', // Just the directory name
+	'./allowed/file.txt',
+	'/allowed',
 ];
 
 const invalid_paths = [
@@ -40,7 +40,6 @@ const invalid_paths = [
 	'../allowed/path/file.txt',
 	'/another/path/file.txt',
 	'relative/path/file.txt',
-	// Add more cases
 	null as any,
 	undefined as any,
 	123 as any,
@@ -49,23 +48,15 @@ const invalid_paths = [
 	true as any,
 ];
 
-const allowed_dirs = [
-	'/allowed/path/',
-	'/allowed/deeper/',
-	'/allowed/', // Parent directory that should match both above
-	// Add more cases
-	'./allowed/', // Relative path
-];
+const allowed_dirs = ['/allowed/path/', '/allowed/deeper/', '/allowed/', './allowed/'];
 
 const allowed_dirs_without_trailing_slash = [
 	'/allowed/path',
 	'/allowed/deeper',
 	'/allowed',
-	// Add more cases
-	'./allowed', // Relative path
+	'./allowed',
 ];
 
-// Use these arrays in tests
 const edge_case_paths = [
 	'',
 	'/',
@@ -96,24 +87,25 @@ const edge_case_dirs = [
 
 // is_path_in_allowed_dirs tests
 test('is_path_in_allowed_dirs - should return true for paths in allowed directories', () => {
-	for (const path of valid_paths) {
+	for (const p of valid_paths) {
 		for (const dirs of [allowed_dirs, allowed_dirs_without_trailing_slash]) {
-			const result = is_path_in_allowed_dirs(path, dirs);
+			const result = is_path_in_allowed_dirs(p, dirs);
+			if (!result) console.log(`EXPECTED THIS TO BE TRUE`, p, dirs);
 			expect(result).toBe(true);
 		}
 	}
 });
 
 test('is_path_in_allowed_dirs - should return false for paths not in allowed directories', () => {
-	for (const path of invalid_paths) {
-		const result = is_path_in_allowed_dirs(path, allowed_dirs);
+	for (const p of invalid_paths) {
+		const result = is_path_in_allowed_dirs(p, allowed_dirs);
 		expect(result).toBe(false);
 	}
 });
 
 test('is_path_in_allowed_dirs - should handle edge case paths', () => {
-	for (const path of edge_case_paths) {
-		const result = is_path_in_allowed_dirs(path, allowed_dirs);
+	for (const p of edge_case_paths) {
+		const result = is_path_in_allowed_dirs(p, allowed_dirs);
 		expect(result).toBe(false);
 	}
 });
@@ -126,7 +118,7 @@ test('is_path_in_allowed_dirs - should handle edge case directories', () => {
 	expect(is_path_in_allowed_dirs('/any/path', ['/'])).toBe(true);
 
 	// Current directory behavior
-	expect(is_path_in_allowed_dirs('./file.txt', ['.'])).toBe(false); // Won't match because ensure_end adds slash
+	expect(is_path_in_allowed_dirs('./file.txt', ['.'])).toBe(false); // Explicitly denied in implementation
 	expect(is_path_in_allowed_dirs('./file.txt', ['./'])).toBe(true);
 
 	// Other edge cases
@@ -136,12 +128,6 @@ test('is_path_in_allowed_dirs - should handle edge case directories', () => {
 		const result = is_path_in_allowed_dirs('/any/path', Array.isArray(dir) ? dir : [dir]);
 		expect(result).toBe(false);
 	}
-});
-
-test('is_path_in_allowed_dirs - should always add trailing slash to directories', () => {
-	// Both versions of directories should work the same
-	expect(is_path_in_allowed_dirs('/allowed/path/file.txt', ['/allowed/path'])).toBe(true);
-	expect(is_path_in_allowed_dirs('/allowed/path/file.txt', ['/allowed/path/'])).toBe(true);
 });
 
 test('is_path_in_allowed_dirs - should handle type-unsafe inputs', () => {
@@ -155,6 +141,39 @@ test('is_path_in_allowed_dirs - should handle type-unsafe inputs', () => {
 	expect(is_path_in_allowed_dirs(123 as any, allowed_dirs)).toBe(false);
 	expect(is_path_in_allowed_dirs('/valid/path', [123] as any)).toBe(false);
 	expect(is_path_in_allowed_dirs({} as any, allowed_dirs)).toBe(false);
+});
+
+// Test for path traversal protection without mocking path
+test('is_path_in_allowed_dirs - should prevent path traversal attacks', () => {
+	// Mock console.error to avoid cluttering test output
+	const console_spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+	// We need to directly test the paths that would be used in attacks
+	// without relying on path.resolve's behavior
+	expect(is_path_in_allowed_dirs('/allowed/path/../outside/file.txt', ['/allowed'])).toBe(false);
+	expect(is_path_in_allowed_dirs('/allowed/path/../../etc/passwd', ['/allowed/path'])).toBe(false);
+	expect(is_path_in_allowed_dirs('/allowed/path/../path/file.txt', ['/allowed'])).toBe(false);
+
+	console_spy.mockRestore();
+});
+
+// Test cross-platform behavior
+test('is_path_in_allowed_dirs - should handle platform-specific path features', () => {
+	// Note: This test makes assertions based on whether we're running on Windows or Unix
+	// Testing Windows-style paths on Unix systems will still use Unix resolution
+	const isWindows = process.platform === 'win32';
+
+	// For Windows, test backslash paths, drive letters
+	if (isWindows) {
+		expect(is_path_in_allowed_dirs('C:\\Windows', ['C:\\'])).toBe(true);
+		expect(is_path_in_allowed_dirs('C:\\Windows\\System32', ['C:\\Windows'])).toBe(true);
+		expect(is_path_in_allowed_dirs('C:\\Program Files', ['C:\\Windows'])).toBe(false);
+	} else {
+		// On Unix, test Unix-specific features
+		expect(is_path_in_allowed_dirs('/usr/bin', ['/usr'])).toBe(true);
+		expect(is_path_in_allowed_dirs('/usr/local/bin', ['/usr/local'])).toBe(true);
+		expect(is_path_in_allowed_dirs('/var/log', ['/usr'])).toBe(false);
+	}
 });
 
 // write_path_in_scope tests
@@ -246,6 +265,24 @@ test('write_path_in_scope - should handle type-unsafe inputs', () => {
 	console_spy.mockRestore();
 });
 
+// Test for path traversal protection with write_path_in_scope
+test('write_path_in_scope - should prevent path traversal attacks', () => {
+	// Test with a path that resolves outside the allowed directory
+	const path_with_traversal = '/allowed/path/../../../etc/passwd';
+	const contents = 'malicious content';
+	const dir = '/allowed/path/';
+
+	// Mock console.error to avoid cluttering test output
+	const console_spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+	const result = write_path_in_scope(path_with_traversal, contents, dir);
+
+	expect(result).toBe(false);
+	expect(fs.writeFileSync).not.toHaveBeenCalled();
+
+	console_spy.mockRestore();
+});
+
 // delete_path_in_scope tests
 test('delete_path_in_scope - should delete file when path is in allowed directory (single dir)', () => {
 	const path = '/allowed/path/file.txt';
@@ -325,6 +362,23 @@ test('delete_path_in_scope - should handle type-unsafe inputs', () => {
 	console_spy.mockRestore();
 });
 
+// Same for delete_path_in_scope
+test('delete_path_in_scope - should prevent path traversal attacks', () => {
+	// Test with a path that resolves outside the allowed directory
+	const path_with_traversal = '/allowed/path/../../../etc/passwd';
+	const dir = '/allowed/path/';
+
+	// Mock console.error to avoid cluttering test output
+	const console_spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+	const result = delete_path_in_scope(path_with_traversal, dir);
+
+	expect(result).toBe(false);
+	expect(fs.rmSync).not.toHaveBeenCalled();
+
+	console_spy.mockRestore();
+});
+
 // Systematic combinatorial tests
 test('Combined function behavior - systematic testing of path/dir combinations', () => {
 	// Create arrays of test cases
@@ -372,10 +426,8 @@ test('Combined function behavior - systematic testing of path/dir combinations',
 				// Determine expected result using our is_path_in_allowed_dirs function.
 				const valid_path = path && typeof path === 'string' && path !== '';
 				const valid_dir = dir && (typeof dir === 'string' || Array.isArray(dir));
-				const should_succeed = !!(
-					valid_path &&
-					valid_dir &&
-					is_path_in_allowed_dirs(path, to_array(dir))
+				const should_succeed = Boolean(
+					valid_path && valid_dir && is_path_in_allowed_dirs(path, to_array(dir)),
 				);
 
 				// Test write
@@ -420,4 +472,34 @@ test('Function error handling - should handle filesystem errors gracefully', () 
 	}).toThrow('File not found');
 
 	console_spy.mockRestore();
+});
+
+// Test for unicode and special character handling
+test('is_path_in_allowed_dirs - should handle unicode and special characters', () => {
+	// These paths are constructed to test if the implementation correctly handles special characters
+	// but doesn't depend on mocking path.resolve
+	const special_path_tests = [
+		{
+			path: path.join('/allowed/path', 'file with spaces.txt'),
+			allowed_in: ['/allowed/path'],
+			expected: true,
+		},
+		{
+			path: path.join('/allowed/path', 'file_with_!@#$%^&*().txt'),
+			allowed_in: ['/allowed/path'],
+			expected: true,
+		},
+		// Unicode paths test (ensure implementation handles non-ASCII characters)
+		// Note: The exact behavior might differ by OS
+		{
+			path: path.join('/allowed/path', 'файл.txt'),
+			allowed_in: ['/allowed/path'],
+			expected: true,
+		},
+	];
+
+	for (const test_case of special_path_tests) {
+		const result = is_path_in_allowed_dirs(test_case.path, test_case.allowed_in);
+		expect(result).toBe(test_case.expected);
+	}
 });
