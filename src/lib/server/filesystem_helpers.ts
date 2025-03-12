@@ -13,10 +13,10 @@ import {to_array} from '@ryanatkn/belt/array.js';
 import {resolve, dirname} from 'node:path';
 
 /**
- * Checks if a path is a symlink
- * Returns false if the path doesn't exist
+ * Validates if a path is safe by checking if it's within allowed directories
+ * and doesn't contain security risks like symlinks or traversal segments
  */
-export const find_matching_allowed_dir = (
+export const validate_safe_path = (
 	path_to_check: string,
 	dirs: ReadonlyArray<string>,
 ): string | null => {
@@ -115,7 +115,7 @@ export const write_to_allowed_path = (
 	if (!path_to_write || !dir) return false;
 
 	const dirs = to_array(dir);
-	const matching_dir = find_matching_allowed_dir(path_to_write, dirs);
+	const matching_dir = validate_safe_path(path_to_write, dirs);
 
 	if (!matching_dir) {
 		const operation = is_dir ? 'create directory' : 'write file';
@@ -153,7 +153,7 @@ export const delete_from_allowed_path = (
 	if (!path_to_delete || !dir) return false;
 
 	const dirs = to_array(dir);
-	const matching_dir = find_matching_allowed_dir(path_to_delete, dirs);
+	const matching_dir = validate_safe_path(path_to_delete, dirs);
 
 	if (!matching_dir) {
 		console.error(
@@ -198,7 +198,7 @@ export const list_allowed_path = (
 	if (!path_to_list || !dir) return null;
 
 	const dirs = to_array(dir);
-	const matching_dir = find_matching_allowed_dir(path_to_list, dirs);
+	const matching_dir = validate_safe_path(path_to_list, dirs);
 
 	if (!matching_dir) {
 		console.error(

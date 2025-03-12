@@ -4,7 +4,7 @@ import {to_array} from '@ryanatkn/belt/array.js';
 import * as path from 'node:path';
 
 import {
-	find_matching_allowed_dir,
+	validate_safe_path,
 	write_to_allowed_dir,
 	delete_from_allowed_dir,
 	is_symlink,
@@ -95,11 +95,11 @@ const edge_case_dirs = [
 	false as any,
 ];
 
-// find_matching_allowed_dir tests
-test('find_matching_allowed_dir - should return matching dir for paths in allowed directories', () => {
+// validate_safe_path tests (renamed from find_matching_allowed_dir)
+test('validate_safe_path - should return matching dir for paths in allowed directories', () => {
 	for (const p of valid_paths) {
 		for (const dirs of [allowed_dirs, allowed_dirs_without_trailing_slash]) {
-			const result = find_matching_allowed_dir(p, dirs);
+			const result = validate_safe_path(p, dirs);
 			expect(result).not.toBeNull();
 			// Verify it returned one of the dirs
 			expect(dirs.includes(result as any)).toBe(true);
@@ -107,93 +107,93 @@ test('find_matching_allowed_dir - should return matching dir for paths in allowe
 	}
 });
 
-test('find_matching_allowed_dir - should return null for paths not in allowed directories', () => {
+test('validate_safe_path - should return null for paths not in allowed directories', () => {
 	for (const p of invalid_paths) {
-		const result = find_matching_allowed_dir(p, allowed_dirs);
+		const result = validate_safe_path(p, allowed_dirs);
 		expect(result).toBeNull();
 	}
 });
 
-test('find_matching_allowed_dir - should handle edge case paths', () => {
+test('validate_safe_path - should handle edge case paths', () => {
 	for (const p of edge_case_paths) {
-		const result = find_matching_allowed_dir(p, allowed_dirs);
+		const result = validate_safe_path(p, allowed_dirs);
 		expect(result).toBeNull();
 	}
 });
 
-test('find_matching_allowed_dir - should handle edge case directories', () => {
+test('validate_safe_path - should handle edge case directories', () => {
 	// Empty directory should never match
-	expect(find_matching_allowed_dir('/any/path', [''])).toBeNull();
+	expect(validate_safe_path('/any/path', [''])).toBeNull();
 
 	// Root directory should match any absolute path
-	expect(find_matching_allowed_dir('/any/path', ['/'])).toBe('/');
+	expect(validate_safe_path('/any/path', ['/'])).toBe('/');
 
 	// Current directory behavior
-	expect(find_matching_allowed_dir('./file.txt', ['.'])).toBeNull(); // Explicitly denied in implementation
-	expect(find_matching_allowed_dir('./file.txt', ['./'])).toBe('./');
+	expect(validate_safe_path('./file.txt', ['.'])).toBeNull(); // Explicitly denied in implementation
+	expect(validate_safe_path('./file.txt', ['./'])).toBe('./');
 
 	// Other edge cases
 	for (const dir of edge_case_dirs) {
 		if (dir === '/') continue; // Skip root dir which has special behavior
 		if (dir === './') continue; // Skip './' which has special behavior
-		const result = find_matching_allowed_dir('/any/path', Array.isArray(dir) ? dir : [dir]);
+		const result = validate_safe_path('/any/path', Array.isArray(dir) ? dir : [dir]);
 		expect(result).toBeNull();
 	}
 });
 
-test('find_matching_allowed_dir - should handle type-unsafe inputs', () => {
+test('validate_safe_path - should handle type-unsafe inputs', () => {
 	// Test with null and undefined using type casting
-	expect(find_matching_allowed_dir(null as any, allowed_dirs)).toBeNull();
-	expect(find_matching_allowed_dir(undefined as any, allowed_dirs)).toBeNull();
-	expect(find_matching_allowed_dir('/valid/path', null as any)).toBeNull();
-	expect(find_matching_allowed_dir('/valid/path', undefined as any)).toBeNull();
+	expect(validate_safe_path(null as any, allowed_dirs)).toBeNull();
+	expect(validate_safe_path(undefined as any, allowed_dirs)).toBeNull();
+	expect(validate_safe_path('/valid/path', null as any)).toBeNull();
+	expect(validate_safe_path('/valid/path', undefined as any)).toBeNull();
 
 	// Test with numbers and objects
-	expect(find_matching_allowed_dir(123 as any, allowed_dirs)).toBeNull();
-	expect(find_matching_allowed_dir('/valid/path', [123] as any)).toBeNull();
-	expect(find_matching_allowed_dir({} as any, allowed_dirs)).toBeNull();
+	expect(validate_safe_path(123 as any, allowed_dirs)).toBeNull();
+	expect(validate_safe_path('/valid/path', [123] as any)).toBeNull();
+	expect(validate_safe_path({} as any, allowed_dirs)).toBeNull();
 });
 
 // Test for path traversal protection without mocking path
-test('find_matching_allowed_dir - should prevent path traversal attacks', () => {
+test('validate_safe_path - should prevent path traversal attacks', () => {
 	// Mock console.error to avoid cluttering test output
 	const console_spy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
 	// We need to directly test the paths that would be used in attacks
 	// without relying on path.resolve's behavior
-	expect(find_matching_allowed_dir('/allowed/path/../outside/file.txt', ['/allowed'])).toBeNull();
-	expect(find_matching_allowed_dir('/allowed/path/../../etc/passwd', ['/allowed/path'])).toBeNull();
-	expect(find_matching_allowed_dir('/allowed/path/../path/file.txt', ['/allowed'])).toBeNull();
+	expect(validate_safe_path('/allowed/path/../outside/file.txt', ['/allowed'])).toBeNull();
+	expect(validate_safe_path('/allowed/path/../../etc/passwd', ['/allowed/path'])).toBeNull();
+	expect(validate_safe_path('/allowed/path/../path/file.txt', ['/allowed'])).toBeNull();
 
 	console_spy.mockRestore();
 });
 
 // Test cross-platform behavior
-test('find_matching_allowed_dir - should handle platform-specific path features', () => {
+test('validate_safe_path - should handle platform-specific path features', () => {
 	// Note: This test makes assertions based on whether we're running on Windows or Unix
 	// Testing Windows-style paths on Unix systems will still use Unix resolution
 	const isWindows = process.platform === 'win32';
 
 	// For Windows, test backslash paths, drive letters
 	if (isWindows) {
-		expect(find_matching_allowed_dir('C:\\Windows', ['C:\\'])).toBe('C:\\');
-		expect(find_matching_allowed_dir('C:\\Windows\\System32', ['C:\\Windows'])).toBe('C:\\Windows');
-		expect(find_matching_allowed_dir('C:\\Program Files', ['C:\\Windows'])).toBeNull();
+		expect(validate_safe_path('C:\\Windows', ['C:\\'])).toBe('C:\\');
+		expect(validate_safe_path('C:\\Windows\\System32', ['C:\\Windows'])).toBe('C:\\Windows');
+		expect(validate_safe_path('C:\\Program Files', ['C:\\Windows'])).toBeNull();
 	} else {
 		// On Unix, test Unix-specific features
-		expect(find_matching_allowed_dir('/usr/bin', ['/usr'])).toBe('/usr');
-		expect(find_matching_allowed_dir('/usr/local/bin', ['/usr/local'])).toBe('/usr/local');
-		expect(find_matching_allowed_dir('/var/log', ['/usr'])).toBeNull();
+		expect(validate_safe_path('/usr/bin', ['/usr'])).toBe('/usr');
+		expect(validate_safe_path('/usr/local/bin', ['/usr/local'])).toBe('/usr/local');
+		expect(validate_safe_path('/var/log', ['/usr'])).toBeNull();
 	}
 });
 
 // Test that the first matching directory is returned
-test('find_matching_allowed_dir - should return the first matching directory', () => {
+test('validate_safe_path - should return the first matching directory', () => {
 	// Create a list of directories with overlapping scopes
 	const overlapping_dirs = ['/allowed/path/specific/', '/allowed/path/', '/allowed/'];
 
 	// A path that matches multiple directories should return the first one
-	const result = find_matching_allowed_dir('/allowed/path/specific/file.txt', overlapping_dirs);
+	const result = validate_safe_path('/allowed/path/specific/file.txt', overlapping_dirs);
 	expect(result).toBe('/allowed/path/specific/');
 });
 
@@ -444,11 +444,11 @@ test('Combined function behavior - systematic testing of path/dir combinations',
 				// Reset mocks
 				vi.clearAllMocks();
 
-				// Determine expected result using our find_matching_allowed_dir function.
+				// Determine expected result using our validate_safe_path function.
 				const valid_path = path && typeof path === 'string' && path !== '';
 				const valid_dir = dir && (typeof dir === 'string' || Array.isArray(dir));
 				const matching_dir =
-					valid_path && valid_dir ? find_matching_allowed_dir(path, to_array(dir)) : null;
+					valid_path && valid_dir ? validate_safe_path(path, to_array(dir)) : null;
 				const should_succeed = !!matching_dir;
 
 				// Test write
@@ -494,7 +494,7 @@ test('Function error handling - should handle filesystem errors gracefully', () 
 });
 
 // Test for unicode and special character handling
-test('find_matching_allowed_dir - should handle unicode and special characters', () => {
+test('validate_safe_path - should handle unicode and special characters', () => {
 	// These paths are constructed to test if the implementation correctly handles special characters
 	// but doesn't depend on mocking path.resolve
 	const special_path_tests = [
@@ -518,7 +518,7 @@ test('find_matching_allowed_dir - should handle unicode and special characters',
 	];
 
 	for (const test_case of special_path_tests) {
-		const result = find_matching_allowed_dir(test_case.path, test_case.allowed_in);
+		const result = validate_safe_path(test_case.path, test_case.allowed_in);
 		expect(result).toBe(test_case.expected);
 	}
 });
@@ -570,14 +570,14 @@ test('is_symlink - should detect symbolic links', () => {
 	expect(is_symlink('/allowed/path/nonexistent')).toBe(false);
 });
 
-// Test symlink handling in find_matching_allowed_dir
-test('find_matching_allowed_dir - should reject symlinks', () => {
+// Test symlink handling in validate_safe_path
+test('validate_safe_path - should reject symlinks', () => {
 	// Mock path as symlink
 	vi.mocked(fs.lstatSync).mockReturnValueOnce({
 		isSymbolicLink: () => true,
 	} as any);
 
-	expect(find_matching_allowed_dir('/allowed/path/symlink', ['/allowed/path'])).toBeNull();
+	expect(validate_safe_path('/allowed/path/symlink', ['/allowed/path'])).toBeNull();
 
 	// Mock parent directory as symlink
 	vi.mocked(fs.existsSync).mockImplementation(() => true);
@@ -595,11 +595,11 @@ test('find_matching_allowed_dir - should reject symlinks', () => {
 				}) as any,
 		);
 
-	expect(find_matching_allowed_dir('/allowed/symlink-dir/file.txt', ['/allowed'])).toBeNull();
+	expect(validate_safe_path('/allowed/symlink-dir/file.txt', ['/allowed'])).toBeNull();
 });
 
 // Test path resolution and comparison
-test('find_matching_allowed_dir - should use path resolution for comparison', () => {
+test('validate_safe_path - should use path resolution for comparison', () => {
 	// Set up tests where resolved path will be in allowed dir
 	vi.mocked(fs.existsSync).mockImplementation(() => true);
 	vi.mocked(fs.lstatSync).mockImplementation(
@@ -610,13 +610,11 @@ test('find_matching_allowed_dir - should use path resolution for comparison', ()
 	);
 
 	// Test with redundant slashes and dot segments that normalize away
-	expect(find_matching_allowed_dir('/allowed/path//./file.txt', ['/allowed/path'])).toBe(
-		'/allowed/path',
-	);
+	expect(validate_safe_path('/allowed/path//./file.txt', ['/allowed/path'])).toBe('/allowed/path');
 });
 
 // Test that filenames containing '..' are allowed if they're not traversal
-test('find_matching_allowed_dir - should allow filenames with dots', () => {
+test('validate_safe_path - should allow filenames with dots', () => {
 	vi.mocked(fs.existsSync).mockImplementation(() => true);
 	vi.mocked(fs.lstatSync).mockImplementation(
 		() =>
@@ -625,19 +623,15 @@ test('find_matching_allowed_dir - should allow filenames with dots', () => {
 			}) as any,
 	);
 
-	expect(find_matching_allowed_dir('/allowed/path/file..txt', ['/allowed/path'])).toBe(
+	expect(validate_safe_path('/allowed/path/file..txt', ['/allowed/path'])).toBe('/allowed/path');
+	expect(validate_safe_path('/allowed/path/file.with...dots.txt', ['/allowed/path'])).toBe(
 		'/allowed/path',
 	);
-	expect(find_matching_allowed_dir('/allowed/path/file.with...dots.txt', ['/allowed/path'])).toBe(
-		'/allowed/path',
-	);
-	expect(find_matching_allowed_dir('/allowed/path/file...', ['/allowed/path'])).toBe(
-		'/allowed/path',
-	);
+	expect(validate_safe_path('/allowed/path/file...', ['/allowed/path'])).toBe('/allowed/path');
 });
 
 // Test with unusual filenames
-test('find_matching_allowed_dir - should handle unusual filenames', () => {
+test('validate_safe_path - should handle unusual filenames', () => {
 	vi.mocked(fs.existsSync).mockImplementation(() => true);
 	vi.mocked(fs.lstatSync).mockImplementation(
 		() =>
@@ -656,7 +650,7 @@ test('find_matching_allowed_dir - should handle unusual filenames', () => {
 	];
 
 	for (const p of unusual_paths) {
-		expect(find_matching_allowed_dir(p, ['/allowed/path'])).toBe('/allowed/path');
+		expect(validate_safe_path(p, ['/allowed/path'])).toBe('/allowed/path');
 	}
 });
 
