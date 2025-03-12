@@ -321,8 +321,7 @@
 
 	.message_list {
 		max-height: 250px;
-		overflow-y: auto;
-		overflow-x: hidden;
+		overflow: auto;
 		scrollbar-width: thin;
 	}
 

@@ -75,8 +75,7 @@
 	.messages_list {
 		width: 100%;
 		max-height: 100%;
-		overflow-y: auto;
-		overflow-x: hidden;
+		overflow: auto;
 		scrollbar-width: thin;
 	}
 </style>

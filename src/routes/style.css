@@ -176,8 +176,7 @@ input.input_xs {
 /* TODO upstream */
 .max_height_sm {
 	max-height: var(--width_sm);
-	overflow-y: auto;
-	overflow-x: hidden;
+	overflow: auto;
 	scrollbar-width: thin;
 }
 
