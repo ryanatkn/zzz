@@ -150,7 +150,7 @@
 					disabled={!count ? true : undefined}
 					attrs={{class: 'plain'}}
 				>
-					send to all ({count})
+					send to {count}
 				</Pending_Button>
 			</div>
 			<Bit_Stats length={main_input.length} token_count={main_input_tokens.length} />
