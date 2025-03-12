@@ -1,4 +1,4 @@
-export const GLYPH_REMOVE = '⨉'; // ⨉ ✕ 🗙 ⤫ ⤬
+export const GLYPH_REMOVE = '⨉'; // ⨉ ✕ 🗙 ⤫ ⤬ ✗ ✘
 export const GLYPH_CANCEL = '⦸';
 export const GLYPH_DRAG = '≡'; // ≡ ☰ ☷
 export const GLYPH_COPY = '⧉';
