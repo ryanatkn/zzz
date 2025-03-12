@@ -13,6 +13,9 @@ export const TOP_P_DEFAULT: number | undefined = undefined;
 export const FREQUENCY_PENALTY_DEFAULT: number | undefined = undefined;
 export const PRESENCE_PENALTY_DEFAULT: number | undefined = undefined;
 export const STOP_SEQUENCES_DEFAULT: Array<string> | undefined = undefined;
+export const BOTS_DEFAULT = {
+	namerbot: 'llama3.2:1b',
+};
 
 // TODO needs work, hardcoding a bunch of stuff for now
 

@@ -28,8 +28,7 @@ export interface Zzz_Server_Options {
 	/**
 	 * @default ZZZ_DIR_DEFAULT
 	 */
-	zzz_dir?: string; // TODO rename to `filesystem_dirs` or something? `zzz_dirs`?
-	filer?: Filer;
+	zzz_dir?: string; // TODO BLOCK @many root_dirs
 	/**
 	 * Configuration for the server and AI providers
 	 */
@@ -63,7 +62,7 @@ export class Zzz_Server {
 		console.log('create Zzz_Server');
 		this.#send_to_all_clients = options.send_to_all_clients;
 		this.zzz_dir = options.zzz_dir ?? ZZZ_DIR_DEFAULT;
-		this.filer = options.filer ?? new Filer({watch_dir_options: {dir: this.zzz_dir}});
+		this.filer = new Filer({watch_dir_options: {dir: this.zzz_dir}});
 
 		// Store the message and filer change handlers
 		this.handle_message = options.handle_message;

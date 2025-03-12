@@ -12,6 +12,7 @@ import {
 	FREQUENCY_PENALTY_DEFAULT,
 	PRESENCE_PENALTY_DEFAULT,
 	STOP_SEQUENCES_DEFAULT,
+	BOTS_DEFAULT,
 } from '$lib/config_defaults.js';
 
 // TODO BLOCK configure dirs - from env vars?
@@ -40,9 +41,7 @@ const config: Zzz_Config_Creator = async () => {
 		frequency_penalty: FREQUENCY_PENALTY_DEFAULT,
 		presence_penalty: PRESENCE_PENALTY_DEFAULT,
 		stop_sequences: STOP_SEQUENCES_DEFAULT,
-		bots: {
-			namerbot: 'llama3.2:1b',
-		},
+		bots: BOTS_DEFAULT,
 	};
 };
 

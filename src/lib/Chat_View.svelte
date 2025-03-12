@@ -12,7 +12,6 @@
 	import Chat_Tape from '$lib/Chat_Tape.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import {GLYPH_TAPE, GLYPH_PROMPT, GLYPH_REMOVE, GLYPH_PASTE, GLYPH_CHAT} from '$lib/glyphs.js';
-	import {zzz_config} from '$lib/zzz_config.js';
 	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
 	import Bit_Stats from '$lib/Bit_Stats.svelte';
 	import Prompt_List from '$lib/Prompt_List.svelte';
@@ -35,7 +34,7 @@
 				chat.add_tape(initial_model);
 			}
 		} else {
-			console.error(`model not found: ${zzz_config.bots.namerbot}`);
+			console.error(`model not found: ${zzz.bots.namerbot}`);
 		}
 	}
 	let main_input = $state(''); // TODO BLOCK @many this state probably belongs on the `multichat` object

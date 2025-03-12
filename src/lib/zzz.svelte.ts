@@ -37,6 +37,8 @@ import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import {Socket} from '$lib/socket.svelte.js';
 import {Time} from '$lib/time.svelte.js';
+import type {Zzz_Config} from '$lib/config_helpers.js';
+import {BOTS_DEFAULT} from './config_defaults.js';
 
 // Define standard cell classes
 export const cell_classes = {
@@ -79,6 +81,7 @@ export interface Zzz_Options extends Omit<Cell_Options<typeof Zzz_Json>, 'zzz'> 
 	onreceive?: (message: Message_Server) => void;
 	// completion_threads?: Completion_Threads;
 	models?: Array<Model_Json>;
+	bots?: Zzz_Config['bots'];
 	providers?: Array<Provider_Json>;
 	cells?: Record<string, Class_Constructor<Cell>>;
 	socket_url?: string | null;
@@ -104,6 +107,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	readonly time: Time = $state()!;
 	readonly ui: Ui = $state()!;
 	readonly models: Models = $state()!;
+	readonly bots: Zzz_Config['bots']; // TODO make this a Cell?
 	readonly chats: Chats = $state()!;
 	readonly providers: Providers = $state()!;
 	readonly prompts: Prompts = $state()!;
@@ -127,7 +131,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 
 	constructor(options: Zzz_Options = EMPTY_OBJECT) {
 		// Pass this instance as its own zzz reference
-		super(Zzz_Json, {...options, zzz: undefined as any}); // Temporary type assertion, will be fixed after construction
+		super(Zzz_Json, options as Zzz_Options & {zzz: Zzz}); // Temporary type assertion, will be fixed after construction
 
 		// Set the circular reference now that the object is constructed
 		(this as Assignable<typeof this, 'zzz'>).zzz = this;
@@ -148,6 +152,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		this.time = new Time({zzz: this});
 		this.ui = new Ui({zzz: this});
 		this.models = new Models({zzz: this});
+		this.bots = options.bots ?? BOTS_DEFAULT;
 		this.chats = new Chats({zzz: this});
 		this.providers = new Providers({zzz: this});
 		this.prompts = new Prompts({zzz: this});

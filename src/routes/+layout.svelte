@@ -11,7 +11,6 @@
 	import {parse_package_meta} from '@ryanatkn/gro/package_meta.js';
 	import * as devalue from 'devalue';
 	import {PUBLIC_SERVER_HOSTNAME, PUBLIC_SERVER_PORT} from '$env/static/public';
-	import {browser} from '$app/environment';
 	import {BROWSER} from 'esm-env';
 	import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 
@@ -19,12 +18,12 @@
 	import {pkg_context} from '$routes/pkg.js';
 	import {package_json, src_json} from '$routes/package.js';
 	import {Uuid} from '$lib/zod_helpers.js';
-	import {zzz_config} from '$lib/zzz_config.js';
 	import type {Diskfile_Path} from '$lib/diskfile_types.js';
 	import {Prompt_Json} from '$lib/prompt.svelte.js';
 	import {Zzz, cell_classes} from '$lib/zzz.svelte.js';
 	import {Provider_Json} from '$lib/provider.svelte.js';
 	import {Model_Json} from '$lib/model.svelte.js';
+	import create_zzz_config from '$lib/config.js';
 
 	interface Props {
 		children: Snippet;
@@ -32,10 +31,31 @@
 
 	const {children}: Props = $props();
 
+	// TODO think through initialization
+	onMount(async () => {
+		const zzz_config = await create_zzz_config();
+
+		// Add providers and models from config
+		zzz.add_providers(zzz_config.providers.map((p) => Provider_Json.parse(p)));
+		zzz.add_models(zzz_config.models.map((m) => Model_Json.parse(m)));
+
+		await zzz.init_models();
+		// TODO init properly
+		zzz.chats.add();
+		zzz.chats.add();
+		zzz.chats.add();
+		const prompt = zzz.prompts.add();
+		prompt.add_bit('one');
+		prompt.add_bit('2');
+		prompt.add_bit('c');
+		zzz.prompts.add().add_bit();
+		zzz.prompts.add().add_bit();
+	});
+
 	pkg_context.set(parse_package_meta(package_json, src_json));
 
 	// Set the WebSocket URL
-	const ws_url = browser ? `ws://${PUBLIC_SERVER_HOSTNAME}:${PUBLIC_SERVER_PORT}/ws` : null;
+	const ws_url = BROWSER ? `ws://${PUBLIC_SERVER_HOSTNAME}:${PUBLIC_SERVER_PORT}/ws` : null;
 
 	// Create an instance of Zzz with socket_url
 	const zzz = new Zzz({
@@ -88,12 +108,8 @@
 		prompt_json_obj.shape.bits._def.type.class_name = 'Bit';
 	}
 
-	// Add providers and models from config
-	zzz.add_providers(zzz_config.providers.map((p) => Provider_Json.parse(p)));
-	zzz.add_models(zzz_config.models.map((m) => Model_Json.parse(m)));
-
 	// Set up the socket message handler
-	if (browser) {
+	if (BROWSER) {
 		// Configure socket message handler
 		zzz.socket.onmessage = (event) => {
 			try {
@@ -110,22 +126,7 @@
 		};
 	}
 
-	if (browser) (window as any).zzz = zzz; // no types for this, just for runtime convenience
-
-	// TODO BLOCK refactor with capabilities
-	onMount(async () => {
-		await zzz.init_models();
-		// TODO init properly
-		zzz.chats.add();
-		zzz.chats.add();
-		zzz.chats.add();
-		const prompt = zzz.prompts.add();
-		prompt.add_bit('one');
-		prompt.add_bit('2');
-		prompt.add_bit('c');
-		zzz.prompts.add().add_bit();
-		zzz.prompts.add().add_bit();
-	});
+	if (BROWSER) (window as any).zzz = zzz; // no types for this, just for runtime convenience
 
 	if (BROWSER) $inspect('providers', zzz.providers);
 

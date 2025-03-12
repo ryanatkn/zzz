@@ -88,6 +88,8 @@ const main = async () => {
 	// Create the server with handlers and configuration
 	const zzz_server = new Zzz_Server({
 		config,
+		// TODO BLOCK @many root_dirs
+		// zzz_dir,
 		send_to_all_clients: (message) => {
 			for (const ws of sockets) {
 				ws.send(devalue.stringify({type: 'server_message', message}));

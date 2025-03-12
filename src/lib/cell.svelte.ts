@@ -57,9 +57,6 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	// Make zzz required
 	readonly zzz: Zzz;
 
-	// Store options for use during initialization
-	protected readonly options: Cell_Options<T_Schema>;
-
 	// TODO most of the overrides for this should be replaceable with schema introspection I think
 	/**
 	 * Type-safe parsers for custom field decoding.
@@ -88,10 +85,13 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 		this.updated_date ? format(this.updated_date, FILE_TIME_FORMAT) : null,
 	);
 
+	/** Stored only between construction and initialization */
+	#initial_json: z.input<T_Schema> | undefined;
+
 	constructor(schema: T_Schema, options: Cell_Options<T_Schema>) {
 		this.schema = schema;
 		this.zzz = options.zzz;
-		this.options = options;
+		this.#initial_json = options.json;
 
 		// Don't auto-initialize here - wait for subclass to call init()
 	}
@@ -100,9 +100,13 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	 * Initialize the instance with `options.json` data if provided.
 	 * Should be called by subclasses at the end of their constructor
 	 * or elsewhere before using the instance.
+	 * It can't be called automatically by the Cell's constructor because
+	 * the subclass' constructor needs to run first.
 	 */
 	protected init(): void {
-		this.set_json(this.options.json); // `set_json` parses with the schema, so this may be `undefined` and it's fine
+		const initial_json = this.#initial_json;
+		this.#initial_json = undefined;
+		this.set_json(initial_json); // `set_json` parses with the schema, so this may be `undefined` and it's fine
 	}
 
 	/**
@@ -209,6 +213,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 		return value as this[K];
 	}
 
+	// TODO add optional json and ctor options
 	/**
 	 * Generic clone method that works for any subclass.
 	 */
