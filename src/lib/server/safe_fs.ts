@@ -65,20 +65,17 @@ export class Safe_Fs {
 			for (const allowed_path of this.allowed_paths) {
 				if (!allowed_path) continue;
 
-				// Root directory is special
-				if (allowed_path === '/' && normalized_path.startsWith('/')) {
-					return true;
-				}
-
-				// Direct path match
-				if (normalized_path === allowed_path) return true;
-
-				// Path is inside directory (allowed_path already has trailing slash)
-				if (normalized_path.startsWith(allowed_path)) return true;
-
-				// Handle case where path equals directory but without trailing slash
-				// e.g., '/dir' matches '/dir/'
-				if (normalized_path === allowed_path.slice(0, -1)) {
+				if (
+					// Root directory is special
+					(allowed_path === '/' && normalized_path.startsWith('/')) ||
+					// Direct path match
+					normalized_path === allowed_path ||
+					// Path is inside directory (allowed_path already has trailing slash)
+					normalized_path.startsWith(allowed_path) ||
+					// Handle case where path equals directory but without trailing slash
+					// e.g., '/dir' matches '/dir/'
+					normalized_path === allowed_path.slice(0, -1)
+				) {
 					return true;
 				}
 			}
