@@ -164,6 +164,7 @@ input.input_xs {
 .column_fluid {
 	flex: 1;
 	height: 100%;
+	min-width: var(--column_width, var(--width_sm));
 	overflow: auto;
 	scrollbar-width: thin;
 }

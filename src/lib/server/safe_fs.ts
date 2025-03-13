@@ -4,19 +4,32 @@ import {dirname, normalize} from 'node:path';
 import {ensure_end} from '@ryanatkn/belt/string.js';
 import {z} from 'zod';
 
+// TODO BLOCK add `filter` option, by default ignore at least .env,  maybe all of .gitignore - what should be readable/writable?
+
 /**
  * A branded type for representing safely normalized filesystem paths
  */
 export const Safe_Fs_Path = z
 	.string()
-	.refine((p) => p.startsWith('/'), {
-		message: 'Path must be absolute',
-	})
-	.transform((p) => normalize(p))
+	.refine((p) => p.startsWith('/'), {message: 'Path must be absolute'})
+	.transform((p) => normalize(p.trim()))
 	.brand('Safe_Fs_Path');
-
 export type Safe_Fs_Path = z.infer<typeof Safe_Fs_Path>;
 
+/**
+ * Provides a secure wrapper around filesystem operations to prevent path traversal attacks and
+ * unauthorized file access.
+ *
+ * Security features:
+ * - Restricts operations to specified allowed paths
+ * - Prevents path traversal attacks by normalizing all paths
+ * - Blocks access to symlinks to avoid arbitrary file access
+ * - Requires absolute paths to avoid relative path confusion
+ * - Validates the entire path hierarchy for each operation
+ *
+ * This class should be used whenever performing filesystem operations on
+ * user-provided or untrusted input paths to ensure proper access boundaries.
+ */
 export class Safe_Fs {
 	readonly #allowed_paths: ReadonlyArray<Safe_Fs_Path>;
 
@@ -97,7 +110,7 @@ export class Safe_Fs {
 
 	async read_file(
 		file_path: string,
-		options?: Parameters<typeof fs.readFile>[1],
+		options: Parameters<typeof fs.readFile>[1] = 'utf8',
 	): Promise<Buffer | string> {
 		const safe_path = await this.#ensure_safe_path(file_path);
 		return fs.readFile(safe_path, options);
@@ -106,17 +119,11 @@ export class Safe_Fs {
 	async write_file(
 		file_path: string,
 		data: string | NodeJS.ArrayBufferView,
-		options?: fs_types.WriteFileOptions | null,
+		options: fs_types.WriteFileOptions | null = 'utf8',
 	): Promise<void> {
 		const safe_path = await this.#ensure_safe_path(file_path);
-		return fs.writeFile(safe_path, data, options ?? null);
-	}
-
-	async unlink(file_path: string): Promise<void> {
-		// Note: We're keeping unlink for consistency with Node's fs API
-		// even though we don't allow operating on symlinks specifically
-		const safe_path = await this.#ensure_safe_path(file_path);
-		return fs.unlink(safe_path);
+		console.log(`safe_path`, safe_path);
+		return fs.writeFile(safe_path, data, options);
 	}
 
 	async rm(path_to_remove: string, options?: fs_types.RmOptions): Promise<void> {
@@ -202,6 +209,7 @@ export class Safe_Fs {
 	 * Throws an error if the path is not allowed or contains symlinks.
 	 */
 	async #ensure_safe_path(path_to_check: string): Promise<string> {
+		console.log(`path_to_check`, path_to_check);
 		let normalized_path: Safe_Fs_Path;
 		try {
 			normalized_path = Safe_Fs_Path.parse(path_to_check);

@@ -449,10 +449,6 @@ export const package_json = {
 			types: './dist/server/safe_fs.d.ts',
 			default: './dist/server/safe_fs.js',
 		},
-		'./server/server_helpers.js': {
-			types: './dist/server/server_helpers.d.ts',
-			default: './dist/server/server_helpers.js',
-		},
 		'./server/server.js': {types: './dist/server/server.d.ts', default: './dist/server/server.js'},
 		'./server/zzz_server.js': {
 			types: './dist/server/zzz_server.d.ts',
@@ -507,10 +503,10 @@ export const package_json = {
 		},
 		'./xml.js': {types: './dist/xml.d.ts', default: './dist/xml.js'},
 		'./zod_helpers.js': {types: './dist/zod_helpers.d.ts', default: './dist/zod_helpers.js'},
-		'./Zzz_Dirs.svelte': {
-			types: './dist/Zzz_Dirs.svelte.d.ts',
-			svelte: './dist/Zzz_Dirs.svelte',
-			default: './dist/Zzz_Dirs.svelte',
+		'./Zzz_Dir_View.svelte': {
+			types: './dist/Zzz_Dir_View.svelte.d.ts',
+			svelte: './dist/Zzz_Dir_View.svelte',
+			default: './dist/Zzz_Dir_View.svelte',
 		},
 		'./Zzz_Root.svelte': {
 			types: './dist/Zzz_Root.svelte.d.ts',
@@ -971,16 +967,10 @@ export const src_json = {
 		'./server/safe_fs.js': {
 			path: 'server/safe_fs.ts',
 			declarations: [
+				{name: 'Safe_Fs_Path', kind: 'variable'},
 				{name: 'Safe_Fs', kind: 'class'},
 				{name: 'Path_Not_Allowed_Error', kind: 'class'},
 				{name: 'Symlink_Not_Allowed_Error', kind: 'class'},
-			],
-		},
-		'./server/server_helpers.js': {
-			path: 'server/server_helpers.ts',
-			declarations: [
-				{name: 'ZZZ_DIR', kind: 'variable'},
-				{name: 'parse_zzz_dirs', kind: 'function'},
 			],
 		},
 		'./server/server.js': {path: 'server/server.ts', declarations: []},
@@ -1092,7 +1082,7 @@ export const src_json = {
 				{name: 'maybe_get_field_schema', kind: 'function'},
 			],
 		},
-		'./Zzz_Dirs.svelte': {path: 'Zzz_Dirs.svelte', declarations: []},
+		'./Zzz_Dir_View.svelte': {path: 'Zzz_Dir_View.svelte', declarations: []},
 		'./Zzz_Root.svelte': {path: 'Zzz_Root.svelte', declarations: []},
 		'./zzz.svelte.js': {
 			path: 'zzz.svelte.ts',

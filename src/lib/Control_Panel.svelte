@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Ping_Form from '$lib/Ping_Form.svelte';
 	import Socket_Controls from '$lib/Socket_Controls.svelte';
+	import Zzz_Dir_View from '$lib/Zzz_Dir_View.svelte';
 
 	// interface Props {}
 
@@ -12,6 +13,7 @@
 <div class="width_md">
 	<section>
 		<h2>server</h2>
+		<Zzz_Dir_View />
 		<section class="row gap_lg flex_wrap">
 			<Ping_Form />
 		</section>

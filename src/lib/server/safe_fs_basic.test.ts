@@ -10,7 +10,6 @@ import {Safe_Fs, Symlink_Not_Allowed_Error} from '$lib/server/safe_fs.js';
 vi.mock('node:fs/promises', () => ({
 	readFile: vi.fn(),
 	writeFile: vi.fn(),
-	unlink: vi.fn(),
 	rm: vi.fn(),
 	mkdir: vi.fn(),
 	readdir: vi.fn(),
@@ -193,7 +192,7 @@ describe('Safe_Fs - File Operations', () => {
 
 		const content = await safe_fs.read_file(FILE_PATHS.ALLOWED);
 		expect(content).toBe(test_content);
-		expect(fs.readFile).toHaveBeenCalledWith(FILE_PATHS.ALLOWED, undefined);
+		expect(fs.readFile).toHaveBeenCalledWith(FILE_PATHS.ALLOWED, 'utf8');
 	});
 
 	test('read_file - should throw for paths outside allowed directories', async () => {
@@ -210,7 +209,7 @@ describe('Safe_Fs - File Operations', () => {
 		vi.mocked(fs.writeFile).mockResolvedValueOnce();
 
 		await safe_fs.write_file(FILE_PATHS.ALLOWED, test_content);
-		expect(fs.writeFile).toHaveBeenCalledWith(FILE_PATHS.ALLOWED, test_content, null);
+		expect(fs.writeFile).toHaveBeenCalledWith(FILE_PATHS.ALLOWED, test_content, 'utf8');
 	});
 
 	test('write_file - should throw for paths outside allowed directories', async () => {
@@ -220,22 +219,6 @@ describe('Safe_Fs - File Operations', () => {
 			'Path is not allowed',
 		);
 		expect(fs.writeFile).not.toHaveBeenCalled();
-	});
-
-	test('unlink - should delete files in allowed paths', async () => {
-		const safe_fs = create_test_instance();
-
-		vi.mocked(fs.unlink).mockResolvedValueOnce();
-
-		await safe_fs.unlink(FILE_PATHS.ALLOWED);
-		expect(fs.unlink).toHaveBeenCalledWith(FILE_PATHS.ALLOWED);
-	});
-
-	test('unlink - should throw for paths outside allowed directories', async () => {
-		const safe_fs = create_test_instance();
-
-		await expect(safe_fs.unlink(FILE_PATHS.OUTSIDE)).rejects.toThrow('Path is not allowed');
-		expect(fs.unlink).not.toHaveBeenCalled();
 	});
 });
 

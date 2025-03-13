@@ -10,7 +10,6 @@ import {Safe_Fs, Path_Not_Allowed_Error, Symlink_Not_Allowed_Error} from '$lib/s
 vi.mock('node:fs/promises', () => ({
 	readFile: vi.fn(),
 	writeFile: vi.fn(),
-	unlink: vi.fn(),
 	rm: vi.fn(),
 	mkdir: vi.fn(),
 	readdir: vi.fn(),
@@ -240,7 +239,6 @@ describe('Safe_Fs - Symlink Security', () => {
 			() => safe_fs.readdir(symlink_dir),
 			() => safe_fs.stat(file_in_symlink),
 			() => safe_fs.rm(file_in_symlink),
-			() => safe_fs.unlink(file_in_symlink),
 		];
 
 		// All operations should detect the symlink

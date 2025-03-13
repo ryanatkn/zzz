@@ -8,7 +8,7 @@ import {
 	SECRET_GOOGLE_API_KEY,
 	SECRET_OPENAI_API_KEY,
 } from '$env/static/private';
-import {dirname, join} from 'node:path';
+import {join} from 'node:path';
 import {format_file} from '@ryanatkn/gro/format_file.js';
 import type {Watcher_Change} from '@ryanatkn/gro/watch_dir.js';
 import {DEV} from 'esm-env';
@@ -77,7 +77,7 @@ export const handle_message = async (
 				type: 'loaded_session',
 				data: {
 					files: files_record,
-					zzz_dirs: server.zzz_dirs,
+					zzz_dir: server.zzz_dir,
 				},
 			};
 		}
@@ -199,10 +199,8 @@ export const handle_message = async (
 					throw new Unreachable_Error(provider_name);
 			}
 
-			// TODO enhance this to select a specific directory based on context
-			const primary_dir = server.zzz_dirs[0];
 			// We don't need to wait for this to finish
-			void save_response(message, response, primary_dir, server.safe_fs);
+			void save_response(message, response, server.zzz_dir, server.safe_fs);
 
 			console.log(`got ${provider_name} message`, response.completion_response.data);
 
@@ -213,7 +211,7 @@ export const handle_message = async (
 
 			try {
 				// Use the server's safe_fs instance to write the file
-				await server.safe_fs.write_file(path, contents);
+				await server.safe_fs.write_file(join(server.zzz_dir, path), contents);
 				return null;
 			} catch (error) {
 				console.error(`Error writing file ${path}:`, error);
@@ -225,7 +223,7 @@ export const handle_message = async (
 
 			try {
 				// Use the server's safe_fs instance to delete the file
-				await server.safe_fs.unlink(path);
+				await server.safe_fs.rm(path);
 				return null;
 			} catch (error) {
 				console.error(`Error deleting file ${path}:`, error);
@@ -295,11 +293,9 @@ const save_response = async (
 };
 
 const write_json = async (path: string, json: unknown, safe_fs: Safe_Fs): Promise<void> => {
-	const dir_path = dirname(path);
-
 	// Check if directory exists and create it if needed
-	if (!(await safe_fs.exists(dir_path))) {
-		await safe_fs.mkdir(dir_path, {recursive: true});
+	if (!(await safe_fs.exists(path))) {
+		await safe_fs.mkdir(path, {recursive: true});
 	}
 
 	const formatted = await format_file(JSON.stringify(json), {parser: 'json'});

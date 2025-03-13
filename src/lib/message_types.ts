@@ -148,8 +148,8 @@ export const Message_Loaded_Session = Message_Base.extend({
 	type: z.literal('loaded_session'),
 	data: z
 		.object({
+			zzz_dir: Zzz_Dir,
 			files: z.record(Diskfile_Path, Source_File),
-			zzz_dirs: z.array(Zzz_Dir).readonly(),
 		})
 		.strict(),
 }).strict();

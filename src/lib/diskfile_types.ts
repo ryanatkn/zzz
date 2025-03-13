@@ -10,15 +10,19 @@ export type Diskfile_Change_Type = z.infer<typeof Diskfile_Change_Type>;
 /** An absolute Unix-style file path */
 export const Diskfile_Path = z
 	.string()
-	.refine((p) => is_path_absolute(p), {message: 'must be an absolute path'});
-
+	.refine((p) => is_path_absolute(p), {message: 'Path must be absolute'})
+	.brand('Diskfile_Path');
 export type Diskfile_Path = z.infer<typeof Diskfile_Path>;
 
 /**
- * Represents a directory that Zzz is allowed to read from and write to.
+ * The Zzz server has a special filesystem directory that contains the app's data at `/.zzz`.
+ * Zzz also provides an API for reading and writing to the parent directory of `.zzz`.
  * This is a security-sensitive path that should be validated carefully.
+ * See the `Safe_Fs` class for usage.
  */
-export const Zzz_Dir = Diskfile_Path.brand('Zzz_Dir');
+export const Zzz_Dir = Diskfile_Path.refine((p) => p.endsWith('/.zzz'), {
+	message: 'Path must end with /.zzz',
+}).brand('Zzz_Dir');
 export type Zzz_Dir = z.infer<typeof Zzz_Dir>;
 
 // Use a more specific definition for Maps compatible with Gro's Source_File

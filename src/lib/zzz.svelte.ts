@@ -116,8 +116,13 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	readonly messages: Messages = $state()!;
 	readonly socket: Socket = $state()!;
 
-	// Null means loading, array means loaded
-	zzz_dirs: ReadonlyArray<Zzz_Dir> | null = $state.raw(null);
+	/**
+	 * The `zzz_dir` is the path to Zzz's primary directory on the server's filesystem.
+	 * The server's `safe_fs` instance restricts operations to this directory.
+	 * The value is `undefined` when uninitialized,
+	 * `null` when loading, and `''` when disabled or no server.
+	 */
+	zzz_dir: Zzz_Dir | null | undefined = $state(null);
 
 	// Special property to detect self-reference
 	readonly is_zzz: boolean = $state(true);

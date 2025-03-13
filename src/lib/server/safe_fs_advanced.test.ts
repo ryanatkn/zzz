@@ -10,7 +10,6 @@ import {Safe_Fs, Symlink_Not_Allowed_Error} from '$lib/server/safe_fs.js';
 vi.mock('node:fs/promises', () => ({
 	readFile: vi.fn(),
 	writeFile: vi.fn(),
-	unlink: vi.fn(),
 	rm: vi.fn(),
 	mkdir: vi.fn(),
 	readdir: vi.fn(),
@@ -388,7 +387,7 @@ describe('Safe_Fs - Error Handling and Edge Cases', () => {
 
 			// Error should be passed through
 			await expect(safe_fs.read_file(FILE_PATHS.ALLOWED)).rejects.toThrow(message);
-			expect(fs.readFile).toHaveBeenCalledWith(FILE_PATHS.ALLOWED, undefined);
+			expect(fs.readFile).toHaveBeenCalledWith(FILE_PATHS.ALLOWED, 'utf8');
 		}
 	});
 
@@ -408,7 +407,7 @@ describe('Safe_Fs - Error Handling and Edge Cases', () => {
 		vi.mocked(fs.writeFile).mockResolvedValueOnce();
 
 		await safe_fs.write_file(deep_nonexistent_path, 'content');
-		expect(fs.writeFile).toHaveBeenCalledWith(deep_nonexistent_path, 'content', null);
+		expect(fs.writeFile).toHaveBeenCalledWith(deep_nonexistent_path, 'content', 'utf8');
 	});
 
 	test('should handle extreme edge cases gracefully', async () => {
@@ -443,7 +442,7 @@ describe('Safe_Fs - Advanced Use Cases', () => {
 		vi.mocked(fs.writeFile).mockResolvedValueOnce();
 		vi.mocked(fs.readFile).mockResolvedValueOnce('file content' as any);
 		vi.mocked(fs.copyFile).mockResolvedValueOnce();
-		vi.mocked(fs.unlink).mockResolvedValueOnce();
+		vi.mocked(fs.rm).mockResolvedValueOnce();
 
 		// Execute workflow
 		const workflow_dir = '/allowed/path/workflow';
@@ -454,15 +453,15 @@ describe('Safe_Fs - Advanced Use Cases', () => {
 		await safe_fs.write_file(source_file, 'original content');
 		const content = await safe_fs.read_file(source_file);
 		await safe_fs.copy_file(source_file, dest_file);
-		await safe_fs.unlink(source_file);
+		await safe_fs.rm(source_file);
 
 		// Verify all operations happened with correct parameters
 		expect(content).toBe('file content');
 		expect(fs.mkdir).toHaveBeenCalledWith(workflow_dir, undefined);
-		expect(fs.writeFile).toHaveBeenCalledWith(source_file, 'original content', null);
-		expect(fs.readFile).toHaveBeenCalledWith(source_file, undefined);
+		expect(fs.writeFile).toHaveBeenCalledWith(source_file, 'original content', 'utf8');
+		expect(fs.readFile).toHaveBeenCalledWith(source_file, 'utf8');
 		expect(fs.copyFile).toHaveBeenCalledWith(source_file, dest_file, undefined);
-		expect(fs.unlink).toHaveBeenCalledWith(source_file);
+		expect(fs.rm).toHaveBeenCalledWith(source_file, undefined);
 	});
 
 	test('should handle concurrent operations correctly', async () => {
@@ -491,8 +490,8 @@ describe('Safe_Fs - Advanced Use Cases', () => {
 		expect(result2).toBe('content2');
 		expect(fs.readFile).toHaveBeenCalledTimes(2);
 		expect(fs.writeFile).toHaveBeenCalledTimes(2);
-		expect(fs.writeFile).toHaveBeenCalledWith('/allowed/path/output1.txt', 'data1', null);
-		expect(fs.writeFile).toHaveBeenCalledWith('/allowed/path/output2.txt', 'data2', null);
+		expect(fs.writeFile).toHaveBeenCalledWith('/allowed/path/output1.txt', 'data1', 'utf8');
+		expect(fs.writeFile).toHaveBeenCalledWith('/allowed/path/output2.txt', 'data2', 'utf8');
 	});
 
 	test('should handle sequential operations that build on each other', async () => {

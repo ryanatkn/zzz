@@ -93,7 +93,7 @@
 				</div>
 				<ul
 					class="unstyled grid gap_md"
-					style:grid-template-columns="repeat(auto-fill, minmax(var(--width_sm), 1fr))"
+					style:grid-template-columns="repeat(auto-fill, minmax(300px, 1fr))"
 				>
 					{#each zzz.prompts.selected.bits as bit (bit.id)}
 						<li>

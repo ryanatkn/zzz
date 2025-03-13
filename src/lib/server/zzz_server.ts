@@ -1,10 +1,10 @@
 import {Filer, type Cleanup_Watch} from '@ryanatkn/gro/filer.js';
 import type {Watcher_Change} from '@ryanatkn/gro/watch_dir.js';
+import {resolve} from 'node:path';
 
 import {type Message_Client, type Message_Server} from '$lib/message_types.js';
 import type {Zzz_Config} from '$lib/config_helpers.js';
-import type {Zzz_Dir} from '$lib/diskfile_types.js';
-import {parse_zzz_dirs} from '$lib/server/server_helpers.js';
+import {Zzz_Dir} from '$lib/diskfile_types.js';
 import {Safe_Fs} from '$lib/server/safe_fs.js';
 
 /**
@@ -34,11 +34,18 @@ export interface Filer_Instance {
 }
 
 export interface Zzz_Server_Options {
-	send_to_all_clients: (message: Message_Server) => void;
+	/**
+	 * Directories that Zzz is allowed to read from and write to
+	 */
+	zzz_dir: string;
 	/**
 	 * Configuration for the server and AI providers
 	 */
 	config: Zzz_Config;
+	/**
+	 * Send a message to all connected websocket clients
+	 */
+	send_to_all_clients: (message: Message_Server) => void;
 	/**
 	 * Handler function for processing client messages
 	 */
@@ -47,20 +54,20 @@ export interface Zzz_Server_Options {
 	 * Handler function for file system changes
 	 */
 	handle_filer_change: Filer_Change_Handler;
-	/**
-	 * Directories that Zzz is allowed to read from and write to
-	 */
-	zzz_dirs?: string | Array<string>;
 }
 
 /**
  * Server for managing the Zzz application state and handling client messages
  */
 export class Zzz_Server {
-	readonly #send_to_all_clients: (message: Message_Server) => void;
+	/** The root Zzz directory on the server's filesystem */
+	readonly zzz_dir: Zzz_Dir;
 
-	/** The directories that can be accessed by the `safe_fs` */
-	readonly zzz_dirs: ReadonlyArray<Zzz_Dir>;
+	readonly config: Zzz_Config;
+
+	readonly #send_to_all_clients: (message: Message_Server) => void;
+	readonly #handle_message: Message_Handler;
+	readonly #handle_filer_change: Filer_Change_Handler;
 
 	/**
 	 * Safe filesystem interface that restricts operations to allowed directories
@@ -70,38 +77,26 @@ export class Zzz_Server {
 	// Map of directory paths to their respective Filer instances
 	readonly filers: Map<string, Filer_Instance> = new Map();
 
-	readonly config: Zzz_Config;
-
-	readonly handle_message: Message_Handler;
-	readonly handle_filer_change: Filer_Change_Handler;
-
 	constructor(options: Zzz_Server_Options) {
-		console.log('create Zzz_Server');
-		this.#send_to_all_clients = options.send_to_all_clients;
-		this.config = options.config;
-
-		// Store the message and filer change handlers
-		this.handle_message = options.handle_message;
-		this.handle_filer_change = options.handle_filer_change;
-
 		// Parse the allowed filesystem directories
-		this.zzz_dirs = parse_zzz_dirs(options.zzz_dirs);
+		this.zzz_dir = Zzz_Dir.parse(resolve(options.zzz_dir)); // TODO if the class get more paths to deal with, add a `cwd` option - for now callers can just resolve to absolute themselves
+
+		this.config = options.config;
+		this.#send_to_all_clients = options.send_to_all_clients;
+		this.#handle_message = options.handle_message;
+		this.#handle_filer_change = options.handle_filer_change;
 
 		// Create the safe filesystem interface with the allowed directories
-		this.safe_fs = new Safe_Fs(this.zzz_dirs);
+		this.safe_fs = new Safe_Fs([this.zzz_dir]); // TODO pass filter through on options
 
-		// TODO BLOCK on the frontend, show each directory and whether or not it even exists, and allow creating it if not
-		// Set up a filer for each directory
-		for (const dir of this.zzz_dirs) {
-			const filer = new Filer({watch_dir_options: {dir}});
-
-			// Set up the filer watcher with the handler
-			const cleanup_promise = filer.watch((change, source_file) => {
-				this.handle_filer_change(change, source_file, this, dir);
-			});
-
-			this.filers.set(dir, {filer, cleanup_promise}); // TODO BLOCK test that this errors on duplicate dirs
-		}
+		// Set up the filer watcher for the zzz_dir
+		console.log(`this.zzz_dir`, this.zzz_dir);
+		const filer = new Filer({watch_dir_options: {dir: this.zzz_dir}}); // TODO maybe filter out the db directory at this level? think about this when db is added
+		const cleanup_promise = filer.watch((change, source_file) => {
+			console.log(`change`, change, source_file.id);
+			this.#handle_filer_change(change, source_file, this, this.zzz_dir);
+		});
+		this.filers.set(this.zzz_dir, {filer, cleanup_promise});
 	}
 
 	/**
@@ -116,7 +111,7 @@ export class Zzz_Server {
 	 */
 	async receive(message: Message_Client): Promise<Message_Server | null> {
 		console.log(`[zzz_server.receive] message`, message.id, message.type);
-		return this.handle_message(message, this);
+		return this.#handle_message(message, this);
 	}
 
 	/**
