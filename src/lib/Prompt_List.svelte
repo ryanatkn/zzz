@@ -19,7 +19,7 @@
 
 	// Create a derived that filters out already selected prompts
 	const unselected_prompts = $derived(
-		chat.zzz.prompts.items.filter(
+		chat.zzz.prompts.items.array.filter(
 			(p) => !chat.selected_prompts.some((selected) => selected.id === p.id),
 		),
 	);
@@ -29,7 +29,9 @@
 	let selected_prompt_id: Uuid | null = $state(unselected_prompts[0]?.id ?? null);
 
 	// Derive the selected prompt object from the ID
-	const selected_prompt = $derived(chat.zzz.prompts.items.find((p) => p.id === selected_prompt_id));
+	const selected_prompt = $derived(
+		selected_prompt_id && chat.zzz.prompts.items.by_id.get(selected_prompt_id),
+	);
 
 	// TODO can this be refactored away?
 	// Reset selection when the available prompts change

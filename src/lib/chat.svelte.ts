@@ -51,7 +51,7 @@ export class Chat extends Cell<typeof Chat_Json> {
 				if (value === undefined) {
 					return get_unique_name(
 						NEW_CHAT_PREFIX,
-						this.zzz.chats.items.map((c) => c.name),
+						this.zzz.chats.items.array.map((c) => c.name),
 					);
 				}
 				return undefined; // Let the schema handle it
@@ -59,7 +59,7 @@ export class Chat extends Cell<typeof Chat_Json> {
 			selected_prompt_ids: (value) => {
 				if (Array.isArray(value)) {
 					return value
-						.map((id) => this.zzz.prompts.items.find((p) => p.id === id)?.id)
+						.map((id) => this.zzz.prompts.items.array.find((p) => p.id === id)?.id)
 						.filter((p) => p !== undefined);
 				}
 				return undefined;
@@ -224,7 +224,7 @@ export class Chat extends Cell<typeof Chat_Json> {
 			if (response_text !== this.name) {
 				this.name = get_unique_name(
 					response_text,
-					this.zzz.chats.items.map((c) => c.name),
+					this.zzz.chats.items.array.map((c) => c.name),
 				);
 			}
 		} catch (err) {

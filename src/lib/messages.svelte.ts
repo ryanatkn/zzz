@@ -1,5 +1,4 @@
 import {z} from 'zod';
-import {SvelteMap} from 'svelte/reactivity';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Message} from '$lib/message.svelte.js';
@@ -12,6 +11,7 @@ import {
 } from '$lib/message_types.js';
 import type {Uuid} from '$lib/zod_helpers.js';
 import {cell_array} from '$lib/cell_helpers.js';
+import {Indexed_Collection, type Index_Config} from '$lib/indexed_collection.svelte.js';
 
 export const HISTORY_LIMIT_DEFAULT = 512;
 
@@ -32,22 +32,38 @@ export interface Messages_Options extends Cell_Options<typeof Messages_Json> {
 	history_limit?: number;
 }
 
+type Message_Indexes = 'by_type';
+
 export class Messages extends Cell<typeof Messages_Json> {
-	items: Array<Message> = $state([]);
+	// Configure indexed collection with type-based indexing statically
+	readonly items = new Indexed_Collection<Message, Message_Indexes>({
+		indexes: [
+			{
+				key: 'by_type',
+				extractor: (message) => message.type,
+				multi: true, // One type can map to multiple messages
+			},
+		],
+	});
+
 	history_limit: number = $state(HISTORY_LIMIT_DEFAULT);
 
-	by_id: SvelteMap<Uuid, Message> = new SvelteMap();
-
-	by_type: SvelteMap<Message_Type, Array<Message>> = new SvelteMap();
-
 	// Derived collections for easy access
-	pings: Array<Message> = $derived(this.by_type.get('ping') || []);
-	pongs: Array<Message> = $derived(this.by_type.get('pong') || []);
-	prompts: Array<Message> = $derived(this.by_type.get('send_prompt') || []);
-	completions: Array<Message> = $derived(this.by_type.get('completion_response') || []);
-	diskfile_updates: Array<Message> = $derived(this.by_type.get('update_diskfile') || []);
-	diskfile_deletes: Array<Message> = $derived(this.by_type.get('delete_diskfile') || []);
-	filer_changes: Array<Message> = $derived(this.by_type.get('filer_change') || []);
+	pings: Array<Message> = $derived(this.items.multi_indexes.by_type?.get('ping') || []);
+	pongs: Array<Message> = $derived(this.items.multi_indexes.by_type?.get('pong') || []);
+	prompts: Array<Message> = $derived(this.items.multi_indexes.by_type?.get('send_prompt') || []);
+	completions: Array<Message> = $derived(
+		this.items.multi_indexes.by_type?.get('completion_response') || [],
+	);
+	diskfile_updates: Array<Message> = $derived(
+		this.items.multi_indexes.by_type?.get('update_diskfile') || [],
+	);
+	diskfile_deletes: Array<Message> = $derived(
+		this.items.multi_indexes.by_type?.get('delete_diskfile') || [],
+	);
+	filer_changes: Array<Message> = $derived(
+		this.items.multi_indexes.by_type?.get('filer_change') || [],
+	);
 
 	// Message handlers
 	onsend?: (message: Message_Client) => void;
@@ -55,59 +71,29 @@ export class Messages extends Cell<typeof Messages_Json> {
 
 	constructor(options: Messages_Options) {
 		super(Messages_Json, options);
+
+		// Set history limit if provided
+		if (options.history_limit !== undefined) {
+			this.history_limit = options.history_limit;
+		}
+
 		this.init();
-
-		// Set up indexes after initialization
-		this.#rebuild_indexes();
 	}
 
 	/**
-	 * Add a message to a type collection
-	 */
-	#add_to_type_collection(message: Message): void {
-		const type_collection = this.by_type.get(message.type);
-		if (type_collection) {
-			type_collection.push(message);
-		} else {
-			const messages = $state([message]);
-			this.by_type.set(message.type, messages);
-		}
-	}
-
-	/**
-	 * Remove a message from a type collection
-	 */
-	#remove_from_type_collection(message: Message): void {
-		const type_collection = this.by_type.get(message.type);
-		if (type_collection) {
-			const updated_collection = type_collection.filter((m) => m.id !== message.id);
-			if (!updated_collection.length) {
-				this.by_type.delete(message.type);
-			} else {
-				this.by_type.set(message.type, updated_collection);
-			}
-		}
-	}
-
-	/**
-	 * Rebuild the lookup indexes for the messages
-	 */
-	#rebuild_indexes(): void {
-		this.by_id.clear();
-		this.by_type.clear();
-
-		for (const message of this.items) {
-			this.by_id.set(message.id, message);
-			this.#add_to_type_collection(message);
-		}
-	}
-
-	/**
-	 * Override to rebuild indexes after setting JSON
+	 * Override to populate the indexed collection after parsing JSON
 	 */
 	override set_json(value?: z.input<typeof Messages_Json>): void {
 		super.set_json(value);
-		this.#rebuild_indexes();
+
+		// Rebuild collection with parsed items
+		this.items.clear();
+		for (const message of this._json.items) {
+			this.items.add(message);
+		}
+
+		// Trim to history limit after loading
+		this.#trim_to_history_limit();
 	}
 
 	/**
@@ -141,11 +127,7 @@ export class Messages extends Cell<typeof Messages_Json> {
 	 */
 	add(message_json: Message_Json): Message {
 		const message = new Message({zzz: this.zzz, json: message_json});
-		this.items.push(message);
-
-		// Update indexes
-		this.by_id.set(message.id, message);
-		this.#add_to_type_collection(message);
+		this.items.add(message);
 
 		// Trim collection if it exceeds history limit
 		this.#trim_to_history_limit();
@@ -157,18 +139,17 @@ export class Messages extends Cell<typeof Messages_Json> {
 	 * Trims the collection to the maximum allowed size by removing oldest messages
 	 */
 	#trim_to_history_limit(): void {
-		if (this.items.length <= this.history_limit) return;
+		if (this.items.array.length <= this.history_limit) return;
 
 		// Calculate how many items to remove
-		const excess = this.items.length - this.history_limit;
+		const excess = this.items.array.length - this.history_limit;
 
-		// Remove oldest messages (those at the beginning of the array)
-		const removed = this.items.splice(0, excess);
-
-		// Update indexes by removing the references to deleted messages
-		for (const message of removed) {
-			this.by_id.delete(message.id);
-			this.#remove_from_type_collection(message);
+		// Remove oldest items one by one to properly update all indexes
+		for (let i = 0; i < excess; i++) {
+			if (this.items.array.length > 0) {
+				const oldest = this.items.array[0];
+				this.items.remove(oldest);
+			}
 		}
 	}
 }

@@ -3,8 +3,8 @@ import {z} from 'zod';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Chat, Chat_Json} from '$lib/chat.svelte.js';
 import type {Uuid} from '$lib/zod_helpers.js';
-import {reorder_list} from '$lib/list_helpers.js';
 import {cell_array} from '$lib/cell_helpers.js';
+import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 
 // Fix the schema definition for Chats_Json
 export const Chats_Json = z
@@ -25,10 +25,13 @@ export type Chats_Json = z.infer<typeof Chats_Json>;
 
 export interface Chats_Options extends Cell_Options<typeof Chats_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 export class Chats extends Cell<typeof Chats_Json> {
-	items: Array<Chat> = $state([]);
-	selected_id: Uuid | null = $state(null);
+	// Initialize items directly at property declaration for availability to other properties
+	readonly items = new Indexed_Collection<Chat>();
 
-	selected: Chat | undefined = $derived(this.items.find((c) => c.id === this.selected_id));
+	selected_id: Uuid | null = $state(null);
+	selected: Chat | undefined = $derived(
+		this.selected_id ? this.items.by_id.get(this.selected_id) : undefined,
+	);
 	selected_id_error: boolean = $derived(this.selected_id !== null && this.selected === undefined);
 
 	constructor(options: Chats_Options) {
@@ -39,7 +42,7 @@ export class Chats extends Cell<typeof Chats_Json> {
 
 	add(json?: Chat_Json): Chat {
 		const chat = new Chat({zzz: this.zzz, json});
-		this.items.unshift(chat);
+		this.items.add_first(chat);
 		if (this.selected_id === null) {
 			this.selected_id = chat.id;
 		}
@@ -47,17 +50,12 @@ export class Chats extends Cell<typeof Chats_Json> {
 	}
 
 	remove(chat: Chat): void {
-		const index = this.items.indexOf(chat);
-		if (index !== -1) {
-			const removed = this.items.splice(index, 1);
-			if (removed[0].id === this.selected_id) {
-				const next_chat = this.items[index === 0 ? 0 : index - 1] as Chat | undefined;
-				if (next_chat) {
-					this.select(next_chat.id);
-				} else {
-					this.selected_id = null;
-				}
-			}
+		const removed = this.items.remove(chat);
+		if (removed && chat.id === this.selected_id) {
+			// Find next chat to select
+			const remaining_items = this.items.array;
+			const next_chat = remaining_items.length > 0 ? remaining_items[0] : undefined;
+			this.selected_id = next_chat ? next_chat.id : null;
 		}
 	}
 
@@ -66,6 +64,17 @@ export class Chats extends Cell<typeof Chats_Json> {
 	}
 
 	reorder_chats(from_index: number, to_index: number): void {
-		reorder_list(this.items, from_index, to_index);
+		this.items.reorder(from_index, to_index);
+	}
+
+	// Override to ensure indexes are properly maintained
+	override set_json(value?: z.input<typeof Chats_Json>): void {
+		super.set_json(value);
+
+		// Rebuild collection with new items
+		this.items.clear();
+		for (const chat of this._json.items) {
+			this.items.add(chat);
+		}
 	}
 }

@@ -32,6 +32,8 @@ import {create_completion_response_message} from '$lib/response_helpers.js';
 import type {Zzz_Server} from '$lib/server/zzz_server.js';
 import {Safe_Fs} from '$lib/server/safe_fs.js';
 
+// TODO refactor to a plugin architecture
+
 // AI provider clients
 const anthropic = new Anthropic({apiKey: SECRET_ANTHROPIC_API_KEY});
 const openai = new OpenAI({apiKey: SECRET_OPENAI_API_KEY});

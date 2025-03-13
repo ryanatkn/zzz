@@ -2,7 +2,9 @@
 	import {slide, scale, fade} from 'svelte/transition';
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
 	import {random_item} from '@ryanatkn/belt/random.js';
+	import {page} from '$app/state';
 
+	import {Uuid} from '$lib/zod_helpers.js';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Nav_Link from '$lib/Nav_Link.svelte';
 	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
@@ -17,6 +19,16 @@
 	const zzz = zzz_context.get();
 
 	const reorderable = new Reorderable();
+
+	// Sync URL parameter with selected prompt
+	$effect(() => {
+		const prompt_id_param = page.url.searchParams.get('prompt');
+		if (!prompt_id_param) return;
+		const parsed_uuid = Uuid.safeParse(prompt_id_param);
+		if (parsed_uuid.success && zzz.prompts.items.by_id.has(parsed_uuid.data)) {
+			zzz.prompts.select(parsed_uuid.data);
+		}
+	});
 
 	// TODO BLOCK integrate with sources like the local filesystem (just the `zzz.files`?)
 
@@ -42,15 +54,14 @@
 					onreorder: (from_index, to_index) => zzz.prompts.reorder_prompts(from_index, to_index),
 				}}
 			>
-				{#each zzz.prompts.items as prompt, i (prompt.id)}
+				{#each zzz.prompts.items.array as prompt, i (prompt.id)}
 					<li use:reorderable.item={{index: i}}>
 						<Nav_Link
-							href="#TODO"
+							href="?prompt={prompt.id}"
 							selected={prompt.id === zzz.prompts.selected_id}
 							attrs={{
 								class: 'justify_content_space_between',
 								style: 'min-height: 0;',
-								onclick: () => zzz.prompts.select(prompt.id),
 							}}
 						>
 							<div>
@@ -145,7 +156,7 @@
 					type="button"
 					class="inline color_f"
 					onclick={() => {
-						zzz.prompts.select(random_item(zzz.prompts.items).id);
+						zzz.prompts.select(random_item(zzz.prompts.items.array).id);
 					}}>random walk</button
 				>?
 			</p>

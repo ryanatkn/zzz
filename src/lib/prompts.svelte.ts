@@ -4,8 +4,8 @@ import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Prompt, Prompt_Json} from '$lib/prompt.svelte.js';
 import type {Uuid} from '$lib/zod_helpers.js';
 import type {Bit} from '$lib/bit.svelte.js';
-import {reorder_list} from '$lib/list_helpers.js';
 import {cell_array} from '$lib/cell_helpers.js';
+import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 
 export const Prompts_Json = z
 	.object({
@@ -24,10 +24,13 @@ export type Prompts_Json = z.infer<typeof Prompts_Json>;
 
 export interface Prompts_Options extends Cell_Options<typeof Prompts_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 export class Prompts extends Cell<typeof Prompts_Json> {
-	items: Array<Prompt> = $state([]);
-	selected_id: Uuid | null = $state(null);
+	// Initialize items directly at property declaration site
+	readonly items = new Indexed_Collection<Prompt>();
 
-	selected: Prompt | undefined = $derived(this.items.find((p) => p.id === this.selected_id));
+	selected_id: Uuid | null = $state(null);
+	selected: Prompt | undefined = $derived(
+		this.selected_id ? this.items.by_id.get(this.selected_id) : undefined,
+	);
 
 	constructor(options: Prompts_Options) {
 		super(Prompts_Json, options);
@@ -36,7 +39,7 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 
 	add(): Prompt {
 		const prompt = new Prompt({zzz: this.zzz});
-		this.items.unshift(prompt); // TODO BLOCK @many use push and render with sort+filter
+		this.items.add_first(prompt);
 		if (this.selected_id === null) {
 			this.selected_id = prompt.id;
 		}
@@ -44,17 +47,12 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 	}
 
 	remove(prompt: Prompt): void {
-		const index = this.items.indexOf(prompt);
-		if (index !== -1) {
-			const removed = this.items.splice(index, 1);
-			if (removed[0].id === this.selected_id) {
-				const next_prompt = this.items[index === 0 ? 0 : index - 1] as Prompt | undefined;
-				if (next_prompt) {
-					this.select(next_prompt.id);
-				} else {
-					this.selected_id = null;
-				}
-			}
+		const removed = this.items.remove(prompt);
+		if (removed && prompt.id === this.selected_id) {
+			// Find next prompt to select
+			const remaining_items = this.items.array;
+			const next_prompt = remaining_items.length > 0 ? remaining_items[0] : undefined;
+			this.selected_id = next_prompt ? next_prompt.id : null;
 		}
 	}
 
@@ -63,7 +61,7 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 	}
 
 	reorder_prompts(from_index: number, to_index: number): void {
-		reorder_list(this.items, from_index, to_index);
+		this.items.reorder(from_index, to_index);
 	}
 
 	add_bit(): void {
@@ -79,5 +77,16 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 	remove_bit(bit_id: Uuid): void {
 		if (!this.selected) return;
 		this.selected.remove_bit(bit_id);
+	}
+
+	// Override to ensure indexes are properly maintained
+	override set_json(value?: z.input<typeof Prompts_Json>): void {
+		super.set_json(value);
+
+		// Rebuild collection with new items
+		this.items.clear();
+		for (const prompt of this._json.items) {
+			this.items.add(prompt);
+		}
 	}
 }

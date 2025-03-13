@@ -59,7 +59,7 @@ export class Prompt extends Cell<typeof Prompt_Json> {
 		if (options.name) {
 			this.name = get_unique_name(
 				options.name,
-				this.zzz.prompts.items.map((p) => p.name),
+				this.zzz.prompts.items.array.map((p) => p.name),
 			);
 		}
 
