@@ -12,7 +12,7 @@ import {z} from 'zod';
 export const Safe_Fs_Path = z
 	.string()
 	.refine((p) => p.startsWith('/'), {message: 'Path must be absolute'})
-	.transform((p) => normalize(p.trim())) // TODO BLOCK ensure_end slash here
+	.transform((p) => normalize(p.trim()))
 	.brand('Safe_Fs_Path');
 export type Safe_Fs_Path = z.infer<typeof Safe_Fs_Path>;
 
@@ -31,7 +31,7 @@ export type Safe_Fs_Path = z.infer<typeof Safe_Fs_Path>;
  * user-provided or untrusted input paths to ensure proper access boundaries.
  */
 export class Safe_Fs {
-	readonly #allowed_paths: ReadonlyArray<Safe_Fs_Path>;
+	readonly allowed_paths: ReadonlyArray<Safe_Fs_Path>;
 
 	/**
 	 * Create a new Safe_Fs instance with the specified allowed paths.
@@ -39,8 +39,8 @@ export class Safe_Fs {
 	 */
 	constructor(allowed_paths: Array<string> | ReadonlyArray<string>) {
 		try {
-			this.#allowed_paths = Object.freeze(
-				allowed_paths.filter(Boolean).map((p) => Safe_Fs_Path.parse(p)),
+			this.allowed_paths = Object.freeze(
+				allowed_paths.filter(Boolean).map((p) => Safe_Fs_Path.parse(ensure_end(p, '/'))),
 			);
 		} catch (error) {
 			if (error instanceof z.ZodError) {
@@ -62,7 +62,7 @@ export class Safe_Fs {
 			const normalized_path = Safe_Fs_Path.parse(path_to_check);
 
 			// Check if within allowed paths
-			for (const allowed_path of this.#allowed_paths) {
+			for (const allowed_path of this.allowed_paths) {
 				if (!allowed_path) continue;
 
 				// Root directory is special
@@ -73,20 +73,12 @@ export class Safe_Fs {
 				// Direct path match
 				if (normalized_path === allowed_path) return true;
 
-				// Path is inside with trailing slash
-				const dir_with_sep = ensure_end(allowed_path, '/');
-				if (normalized_path.startsWith(dir_with_sep)) return true;
+				// Path is inside directory (allowed_path already has trailing slash)
+				if (normalized_path.startsWith(allowed_path)) return true;
 
-				// Handle directory with trailing slash matching path without
-				if (allowed_path.endsWith('/') && normalized_path === allowed_path.slice(0, -1)) {
-					return true;
-				}
-
-				// Handle directory without trailing slash
-				if (
-					!allowed_path.endsWith('/') &&
-					(normalized_path === allowed_path || normalized_path.startsWith(allowed_path + '/'))
-				) {
+				// Handle case where path equals directory but without trailing slash
+				// e.g., '/dir' matches '/dir/'
+				if (normalized_path === allowed_path.slice(0, -1)) {
 					return true;
 				}
 			}

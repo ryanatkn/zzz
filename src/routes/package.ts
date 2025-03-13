@@ -335,7 +335,6 @@ export const package_json = {
 			default: './dist/Nav_Link.svelte',
 		},
 		'./ollama.js': {types: './dist/ollama.d.ts', default: './dist/ollama.js'},
-		'./path.js': {types: './dist/path.d.ts', default: './dist/path.js'},
 		'./Ping_Form.svelte': {
 			types: './dist/Ping_Form.svelte.d.ts',
 			svelte: './dist/Ping_Form.svelte',
@@ -698,6 +697,7 @@ export const src_json = {
 				{name: 'GLYPH_RETRY', kind: 'variable'},
 				{name: 'GLYPH_CLEAR', kind: 'variable'},
 				{name: 'GLYPH_INFO', kind: 'variable'},
+				{name: 'GLYPH_SERVER', kind: 'variable'},
 				{name: 'GLYPH_CHAT', kind: 'variable'},
 				{name: 'GLYPH_TAPE', kind: 'variable'},
 				{name: 'GLYPH_FILE', kind: 'variable'},
@@ -818,7 +818,6 @@ export const src_json = {
 				{name: 'merge_ollama_models', kind: 'function'},
 			],
 		},
-		'./path.js': {path: 'path.ts', declarations: [{name: 'to_root_path', kind: 'function'}]},
 		'./Ping_Form.svelte': {path: 'Ping_Form.svelte', declarations: []},
 		'./Popover_Button.svelte': {path: 'Popover_Button.svelte', declarations: []},
 		'./popover.svelte.js': {

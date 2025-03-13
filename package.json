@@ -397,10 +397,6 @@
       "types": "./dist/ollama.d.ts",
       "default": "./dist/ollama.js"
     },
-    "./path.js": {
-      "types": "./dist/path.d.ts",
-      "default": "./dist/path.js"
-    },
     "./Ping_Form.svelte": {
       "types": "./dist/Ping_Form.svelte.d.ts",
       "svelte": "./dist/Ping_Form.svelte",

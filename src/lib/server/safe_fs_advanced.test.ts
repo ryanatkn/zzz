@@ -535,3 +535,136 @@ describe('Safe_Fs - Advanced Use Cases', () => {
 		expect(fs.rm).toHaveBeenCalledWith(base_dir, {recursive: true});
 	});
 });
+
+describe('Safe_Fs - Directory Path Trailing Slash Handling', () => {
+	test('should ensure all allowed paths have trailing slashes internally', () => {
+		// Create instances with a mix of slashed and unslashed paths
+		const paths_with_mix = ['/path1', '/path2/', '/path3/subdir', '/path4/subdir/'];
+		const safe_fs = new Safe_Fs(paths_with_mix);
+
+		// All paths should have trailing slashes internally
+		for (const path of safe_fs.allowed_paths) {
+			expect(path.endsWith('/')).toBe(true);
+		}
+
+		// Original array should be unmodified
+		expect(paths_with_mix).toEqual(['/path1', '/path2/', '/path3/subdir', '/path4/subdir/']);
+	});
+
+	test('should correctly validate paths regardless of trailing slashes', () => {
+		// Create Safe_Fs with paths that don't have trailing slashes
+		const safe_fs = new Safe_Fs(['/dir1', '/dir2/subdir']);
+
+		// These paths should all be allowed, with or without trailing slashes
+		const valid_paths = [
+			'/dir1',
+			'/dir1/',
+			'/dir1/file.txt',
+			'/dir2/subdir',
+			'/dir2/subdir/',
+			'/dir2/subdir/file.txt',
+		];
+
+		for (const path of valid_paths) {
+			expect(safe_fs.is_path_allowed(path)).toBe(true);
+		}
+
+		// These paths should all be rejected
+		const invalid_paths = [
+			'/dir', // Parent of allowed path
+			'/dir1_extra', // Similar name
+			'/dir2', // Parent directory only
+			'/dir2/other', // Different subdirectory
+		];
+
+		for (const path of invalid_paths) {
+			expect(safe_fs.is_path_allowed(path)).toBe(false);
+		}
+	});
+
+	test('should handle filesystem operations consistently with or without trailing slashes', async () => {
+		// Create Safe_Fs with a mix of slashed and unslashed paths
+		const safe_fs = new Safe_Fs(['/allowed/path', '/other/dir/']);
+
+		// Mock filesystem operations
+		vi.mocked(fs.readFile).mockResolvedValue('content' as any);
+		vi.mocked(fs.writeFile).mockResolvedValue();
+
+		// Test path variations
+		const test_paths = [
+			'/allowed/path',
+			'/allowed/path/',
+			'/allowed/path/file.txt',
+			'/other/dir',
+			'/other/dir/',
+			'/other/dir/file.txt',
+		];
+
+		for (const path of test_paths) {
+			vi.mocked(fs.readFile).mockClear();
+
+			// Read operations should work with all variations
+			await safe_fs.read_file(path);
+			expect(fs.readFile).toHaveBeenCalledWith(path, 'utf8');
+
+			// Write operations should also work
+			vi.mocked(fs.writeFile).mockClear();
+			await safe_fs.write_file(path, 'content');
+			expect(fs.writeFile).toHaveBeenCalledWith(path, 'content', 'utf8');
+		}
+	});
+
+	test('should maintain path boundaries correctly with trailing slash normalization', async () => {
+		// Create Safe_Fs with specific paths
+		const safe_fs = new Safe_Fs(['/data/users', '/data/public/']);
+
+		// These paths should be valid
+		const valid_paths = [
+			'/data/users',
+			'/data/users/',
+			'/data/users/profile.txt',
+			'/data/public',
+			'/data/public/',
+			'/data/public/index.html',
+		];
+
+		// These should be invalid - testing boundary conditions
+		const invalid_paths = [
+			'/data', // Parent directory
+			'/data/user', // Similar but different directory
+			'/data/users_archive', // Directory with similar prefix
+			'/data/public_html', // Directory with similar prefix
+			'/data/users/../private', // Traversal attempt that would normalize outside
+		];
+
+		// Test valid paths
+		for (const path of valid_paths) {
+			expect(safe_fs.is_path_allowed(path)).toBe(true);
+		}
+
+		// Test invalid paths
+		for (const path of invalid_paths) {
+			expect(safe_fs.is_path_allowed(path)).toBe(false);
+			await expect(safe_fs.read_file(path)).rejects.toThrow('Path is not allowed');
+		}
+	});
+
+	test('should continue to handle root directory as a special case', async () => {
+		// Create Safe_Fs with root directory
+		const safe_fs = new Safe_Fs(['/']);
+
+		// All paths should be allowed when root is specified
+		const test_paths = ['/', '/etc', '/usr/bin', '/home/user/file.txt'];
+
+		for (const path of test_paths) {
+			expect(safe_fs.is_path_allowed(path)).toBe(true);
+
+			// Mock successful read
+			vi.mocked(fs.readFile).mockReset();
+			vi.mocked(fs.readFile).mockResolvedValueOnce('content' as any);
+
+			const content = await safe_fs.read_file(path);
+			expect(content).toBe('content');
+		}
+	});
+});
