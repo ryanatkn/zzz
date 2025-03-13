@@ -12,7 +12,7 @@ import {z} from 'zod';
 export const Safe_Fs_Path = z
 	.string()
 	.refine((p) => p.startsWith('/'), {message: 'Path must be absolute'})
-	.transform((p) => normalize(p.trim()))
+	.transform((p) => normalize(p.trim())) // TODO BLOCK ensure_end slash here
 	.brand('Safe_Fs_Path');
 export type Safe_Fs_Path = z.infer<typeof Safe_Fs_Path>;
 
@@ -118,11 +118,10 @@ export class Safe_Fs {
 
 	async write_file(
 		file_path: string,
-		data: string | NodeJS.ArrayBufferView,
-		options: fs_types.WriteFileOptions | null = 'utf8',
+		data: Parameters<typeof fs.writeFile>[1],
+		options: Parameters<typeof fs.writeFile>[2] = 'utf8',
 	): Promise<void> {
 		const safe_path = await this.#ensure_safe_path(file_path);
-		console.log(`safe_path`, safe_path);
 		return fs.writeFile(safe_path, data, options);
 	}
 
@@ -209,7 +208,6 @@ export class Safe_Fs {
 	 * Throws an error if the path is not allowed or contains symlinks.
 	 */
 	async #ensure_safe_path(path_to_check: string): Promise<string> {
-		console.log(`path_to_check`, path_to_check);
 		let normalized_path: Safe_Fs_Path;
 		try {
 			normalized_path = Safe_Fs_Path.parse(path_to_check);
@@ -241,7 +239,7 @@ export class Safe_Fs {
 			if (parent === current) break;
 
 			try {
-				const stats = await fs.lstat(parent);
+				const stats = await fs.lstat(parent); // eslint-disable-line no-await-in-loop
 				if (stats.isSymbolicLink()) {
 					throw new Symlink_Not_Allowed_Error(parent);
 				}

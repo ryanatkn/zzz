@@ -14,28 +14,33 @@
 	const {zzz_dir: zzz_dir_prop}: Props = $props();
 	const zzz = zzz_context.get();
 
+	// TODO BLOCK when server is unavailable, change the content to reflect that (see Socket_Controls for connected status style)
+
 	// Fall back to the context value if not provided
 	const zzz_dir = $derived(zzz_dir_prop !== undefined ? zzz_dir_prop : zzz.zzz_dir);
 </script>
 
-<div class="column align_items_start">
-	<h2 class="flex align_items_center gap_xs">
-		<Glyph_Icon icon={GLYPH_DIRECTORY} /> <span class="ml_xl">directories</span>
-	</h2>
-
+<div class="flex gap_md align_items_center mb_xl size_lg">
+	<Glyph_Icon icon={GLYPH_DIRECTORY} size="var(--size_xl2)" />
 	{#if zzz_dir === undefined}
 		<div>&nbsp;</div>
 	{:else if zzz_dir === null}
 		<div class="row">
-			<span class="mr_xs2 font_mono">loading</span>
 			<Pending_Animation />
 		</div>
 	{:else if zzz_dir === ''}
 		<div>No server directory configured</div>
 	{:else}
-		<div class="flex gap_xs align_items_center p_xs bg_2 radius_xs mb_xs">
-			<Glyph_Icon icon={GLYPH_DIRECTORY} size="xs" />
-			<span class="font_mono">{zzz_dir}</span>
-		</div>
+		<div>{zzz_dir}</div>
 	{/if}
 </div>
+<p>
+	This is the server's filesystem directory, the <code>zzz_dir</code>.
+</p>
+<p>
+	For security reasons, all filesystem operations are confined to this path's parent {#if zzz.zzz_dir_parent}(<small
+			class="chip font_mono">{zzz.zzz_dir_parent}</small
+		>){/if}
+	and the path cannot be modified after the server starts. To configure it set the .env variable
+	<code>PUBLIC_ZZZ_DIR</code>.
+</p>

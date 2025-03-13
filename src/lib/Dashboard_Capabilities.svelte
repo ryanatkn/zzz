@@ -15,6 +15,8 @@
 
 	// TODO display capabilities (like what APIs are available, including remote server (off when deployed statically), local pglite (could be disconnected, websockets?))
 	// TODO display database info/explorer
+
+	// TODO BLOCK use native popover with viewport-relative positioning
 </script>
 
 <div class="p_lg">

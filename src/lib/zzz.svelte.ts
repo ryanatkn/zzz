@@ -38,8 +38,10 @@ import {Cell_Json} from '$lib/cell_types.js';
 import {Socket} from '$lib/socket.svelte.js';
 import {Time} from '$lib/time.svelte.js';
 import type {Zzz_Config} from '$lib/config_helpers.js';
-import {BOTS_DEFAULT} from './config_defaults.js';
-import type {Zzz_Dir} from '$lib/diskfile_types.js';
+import {BOTS_DEFAULT} from '$lib/config_defaults.js';
+import type {Diskfile_Path, Zzz_Dir} from '$lib/diskfile_types.js';
+import {strip_end} from '@ryanatkn/belt/string.js';
+import {ZZZ_DIRNAME} from './constants.js';
 
 // Define standard cell classes
 export const cell_classes = {
@@ -123,6 +125,10 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	 * `null` when loading, and `''` when disabled or no server.
 	 */
 	zzz_dir: Zzz_Dir | null | undefined = $state(null);
+	/** The `zzz_dir` without the trailing `.zzz/`. Has its own trailing slash. */
+	zzz_dir_parent: Diskfile_Path | null | undefined = $derived(
+		this.zzz_dir && (strip_end(this.zzz_dir, ZZZ_DIRNAME + '/') as Diskfile_Path), // casting is safe because `Zzz_Dir` extends `Diskfile_Path`
+	);
 
 	// Special property to detect self-reference
 	readonly is_zzz: boolean = $state(true);

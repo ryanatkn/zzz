@@ -32,21 +32,19 @@ export const map_watcher_change_to_diskfile_change = (
 export const source_file_to_diskfile_json = (
 	source_file: Source_File,
 	existing_id?: Uuid,
-): Diskfile_Json => {
-	return {
-		id: existing_id ?? Uuid.parse(undefined), // Use existing ID if provided, otherwise generate new
-		path: source_file.id,
-		contents: source_file.contents,
-		external: source_file.external,
-		created: Datetime_Now.parse(source_file.ctime && new Date(source_file.ctime).toISOString()), // TODO seems messy
-		updated: source_file.mtime ? Datetime.parse(new Date(source_file.mtime).toISOString()) : null,
-		dependents: Array.from(source_file.dependents.entries()).map(([id, s]) => [
-			Diskfile_Path.parse(id),
-			s,
-		]),
-		dependencies: Array.from(source_file.dependencies.entries()).map(([id, s]) => [
-			Diskfile_Path.parse(id),
-			s,
-		]),
-	};
-};
+): Diskfile_Json => ({
+	id: existing_id ?? Uuid.parse(undefined), // Use existing ID if provided, otherwise generate new
+	path: source_file.id,
+	contents: source_file.contents,
+	external: source_file.external,
+	created: Datetime_Now.parse(source_file.ctime && new Date(source_file.ctime).toISOString()), // TODO seems messy
+	updated: source_file.mtime ? Datetime.parse(new Date(source_file.mtime).toISOString()) : null,
+	dependents: Array.from(source_file.dependents.entries()).map(([id, s]) => [
+		Diskfile_Path.parse(id),
+		s,
+	]),
+	dependencies: Array.from(source_file.dependencies.entries()).map(([id, s]) => [
+		Diskfile_Path.parse(id),
+		s,
+	]),
+});

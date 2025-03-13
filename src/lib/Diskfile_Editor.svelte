@@ -4,7 +4,6 @@
 	import {slide} from 'svelte/transition';
 	import {format} from 'date-fns';
 
-	import {to_root_path} from '$lib/path.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Diskfile_Info from '$lib/Diskfile_Info.svelte';
@@ -129,7 +128,7 @@
 						</h3>
 						<div class="dep_list">
 							{#each file.dependency_ids as dependency_id (dependency_id)}
-								<div class="dep_item">{to_root_path(dependency_id)}</div>
+								<div class="dep_item">{zzz.diskfiles.to_relative_path(dependency_id)}</div>
 							{/each}
 						</div>
 					</div>
@@ -142,7 +141,7 @@
 						</h3>
 						<div class="dep_list">
 							{#each file.dependent_ids as dependent_id (dependent_id)}
-								<div class="dep_item">{to_root_path(dependent_id)}</div>
+								<div class="dep_item">{zzz.diskfiles.to_relative_path(dependent_id)}</div>
 							{/each}
 						</div>
 					</div>

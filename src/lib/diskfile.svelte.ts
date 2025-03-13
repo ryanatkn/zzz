@@ -6,17 +6,24 @@ import {Diskfile_Json, type Diskfile_Path, type Source_File} from '$lib/diskfile
 export interface Diskfile_Options extends Cell_Options<typeof Diskfile_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
 export class Diskfile extends Cell<typeof Diskfile_Json> {
-	path: Diskfile_Path = $state()!; // Renamed from file_id
+	// Serialized properties
+	path: Diskfile_Path = $state()!;
+
 	contents: string | null = $state()!;
 	external: boolean = $state(false);
-	dependents: Array<[Diskfile_Path, Source_File]> = $state([]);
-	dependencies: Array<[Diskfile_Path, Source_File]> = $state([]);
+	dependents: Array<[Diskfile_Path, Source_File]> = $state([]); // TODO @many these need to be null for unknown file types (support JS modules, etc)
+	dependencies: Array<[Diskfile_Path, Source_File]> = $state([]); // TODO @many these need to be null for unknown file types (support JS modules, etc)
 
 	dependencies_by_id: Map<Diskfile_Path, Source_File> = $derived(new Map(this.dependencies));
 	dependents_by_id: Map<Diskfile_Path, Source_File> = $derived(new Map(this.dependents));
 
 	dependency_ids: Array<Diskfile_Path> = $derived(this.dependencies.map(([id]) => id));
 	dependent_ids: Array<Diskfile_Path> = $derived(this.dependents.map(([id]) => id));
+
+	// Derived properties
+	path_relative: string | null | undefined = $derived(
+		this.zzz.diskfiles.to_relative_path(this.path),
+	);
 
 	size: number | null = $derived(this.contents?.length ?? null);
 

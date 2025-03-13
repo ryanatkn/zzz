@@ -1,9 +1,9 @@
 <script lang="ts">
 	import {contextmenu_action} from '@ryanatkn/fuz/contextmenu_state.svelte.js';
 	import Contextmenu_Entry from '@ryanatkn/fuz/Contextmenu_Entry.svelte';
+	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
 
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
-	import {to_root_path} from '$lib/path.js';
 	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
 	import {GLYPH_FILE, GLYPH_REMOVE, GLYPH_COPY} from '$lib/glyphs.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
@@ -18,9 +18,6 @@
 
 	const zzz = zzz_context.get();
 
-	// Computed properties
-	const display_name = $derived(file.path ? to_root_path(file.path) : 'Unnamed file');
-
 	// TODO BLOCK generic contextmenu entries for other components? so module scope export?
 </script>
 
@@ -34,7 +31,9 @@
 >
 	<div class="ellipsis">
 		<Glyph_Icon icon={GLYPH_FILE} />
-		<span>{display_name}</span>
+		<span
+			>{#if file.path_relative}{file.path_relative}{:else}<Pending_Animation />{/if}</span
+		>
 	</div>
 </button>
 
@@ -55,7 +54,7 @@
 		run={() => {
 			// TODO BLOCK better confirmation
 			// eslint-disable-next-line no-alert
-			if (confirm(`Are you sure you want to delete ${display_name}?`)) {
+			if (confirm(`Are you sure you want to delete ${file.path_relative}?`)) {
 				zzz.diskfiles.delete(file.path);
 			}
 		}}

@@ -1,9 +1,12 @@
 <script lang="ts">
 	import {slide} from 'svelte/transition';
+	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
 
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import Diskfile_List_Item from '$lib/Diskfile_List_Item.svelte';
+	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
+	import {GLYPH_DIRECTORY} from '$lib/glyphs.js';
 
 	interface Props {
 		onselect?: (file: Diskfile) => void;
@@ -33,17 +36,24 @@
 </script>
 
 <div class="h_100 overflow_auto scrollbar_width_thin">
-	{#if sorted_files.length === 0}
-		<div class="box h_100">No files available</div>
+	{#if zzz.zzz_dir === undefined}
+		<div>&nbsp;</div>
+	{:else if zzz.zzz_dir === null}
+		<div><Pending_Animation /></div>
 	{:else}
-		<ul class="unstyled">
-			{#each sorted_files as file (file.id)}
-				{@const selected = diskfiles.selected_file_id === file.id}
-				<li transition:slide class:selected>
-					<Diskfile_List_Item {file} {selected} onclick={select_file} />
-				</li>
-			{/each}
-		</ul>
+		<small class="block py_xs"><Glyph_Icon icon={GLYPH_DIRECTORY} /> {zzz.zzz_dir}</small>
+		{#if sorted_files.length === 0}
+			<div>No files available</div>
+		{:else}
+			<ul class="unstyled">
+				{#each sorted_files as file (file.id)}
+					{@const selected = diskfiles.selected_file_id === file.id}
+					<li transition:slide class:selected>
+						<Diskfile_List_Item {file} {selected} onclick={select_file} />
+					</li>
+				{/each}
+			</ul>
+		{/if}
 	{/if}
 </div>
 

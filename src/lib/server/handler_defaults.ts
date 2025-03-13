@@ -8,7 +8,7 @@ import {
 	SECRET_GOOGLE_API_KEY,
 	SECRET_OPENAI_API_KEY,
 } from '$env/static/private';
-import {join} from 'node:path';
+import {dirname, join} from 'node:path';
 import {format_file} from '@ryanatkn/gro/format_file.js';
 import type {Watcher_Change} from '@ryanatkn/gro/watch_dir.js';
 import {DEV} from 'esm-env';
@@ -57,18 +57,15 @@ export const handle_message = async (
 		}
 		case 'load_session': {
 			// Access filers through server and collect all files
-			const files_record: Record<string, any> = {};
+			const files_array: Array<Source_File> = [];
 
 			// Iterate through all filers and collect their files
 			for (const f of server.filers.values()) {
 				f.filer.files.forEach((file, id) => {
-					const path_id = Diskfile_Path.parse(id);
-					files_record[path_id] = {
+					files_array.push({
 						...file,
-						id: path_id,
-						dependents: file.dependents,
-						dependencies: file.dependencies,
-					};
+						id: Diskfile_Path.parse(id),
+					});
 				});
 			}
 
@@ -76,7 +73,7 @@ export const handle_message = async (
 				id: Uuid.parse(undefined),
 				type: 'loaded_session',
 				data: {
-					files: files_record,
+					files: files_array,
 					zzz_dir: server.zzz_dir,
 				},
 			};
@@ -211,7 +208,7 @@ export const handle_message = async (
 
 			try {
 				// Use the server's safe_fs instance to write the file
-				await server.safe_fs.write_file(join(server.zzz_dir, path), contents);
+				await server.safe_fs.write_file(path, contents);
 				return null;
 			} catch (error) {
 				console.error(`Error writing file ${path}:`, error);
@@ -295,11 +292,12 @@ const save_response = async (
 const write_json = async (path: string, json: unknown, safe_fs: Safe_Fs): Promise<void> => {
 	// Check if directory exists and create it if needed
 	if (!(await safe_fs.exists(path))) {
-		await safe_fs.mkdir(path, {recursive: true});
+		await safe_fs.mkdir(dirname(path), {recursive: true});
 	}
 
 	const formatted = await format_file(JSON.stringify(json), {parser: 'json'});
 
 	// Use Safe_Fs for writing the file
+	console.log('WRITING JSON', path, typeof formatted);
 	await safe_fs.write_file(path, formatted);
 };

@@ -13,7 +13,6 @@
 	const DEFAULT_FONT_SIZE = 'var(--size, inherit)';
 </script>
 
-<!-- TODO maybe set line height? -->
 <span
 	{...attrs}
 	class="glyph inline_block text_align_center line_height_1 {attrs?.class}"

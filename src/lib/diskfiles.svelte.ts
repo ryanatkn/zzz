@@ -8,6 +8,7 @@ import {Diskfile_Json, type Diskfile_Path, Source_File} from '$lib/diskfile_type
 import {source_file_to_diskfile_json} from '$lib/diskfile_helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {cell_array} from '$lib/cell_helpers.js';
+import {strip_start} from '@ryanatkn/belt/string.js';
 
 export const Diskfiles_Json = z
 	.object({
@@ -41,9 +42,6 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 	selected_file: Diskfile | null = $derived(
 		this.selected_file_id && (this.files_map.get(this.selected_file_id) ?? null),
 	);
-
-	// TODO maybe don't duplicate this data?
-	#source_files: SvelteMap<Diskfile_Path, Source_File> = new SvelteMap();
 
 	constructor(options: Diskfiles_Options) {
 		super(Diskfiles_Json, options);
@@ -80,17 +78,15 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 
 	handle_change(message: Message_Filer_Change): void {
 		// Use safeParse for robust error handling
-		const parsed = Source_File.safeParse(message.source_file);
+		// const parsed = Source_File.safeParse(message.source_file);
 
-		if (!parsed.success) {
-			console.error('Invalid source file received from server:', parsed.error);
-			return; // Don't proceed with invalid data
-		}
+		// if (!parsed.success) {
+		// 	console.error('Invalid source file received from server:', parsed.error);
+		// 	return; // Don't proceed with invalid data
+		// }
 
-		const validated_source_file = parsed.data;
-
-		// Store the parsed source file
-		this.#source_files.set(validated_source_file.id, validated_source_file);
+		const validated_source_file = message.source_file;
+		console.log(`validated_source_file`, validated_source_file);
 
 		switch (message.change.type) {
 			case 'add': {
@@ -134,10 +130,8 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 					if (index >= 0) {
 						this.files.splice(index, 1);
 					}
-
 					this.by_id.delete(diskfile_id);
 					this.by_path.delete(validated_source_file.id);
-					this.#source_files.delete(validated_source_file.id);
 				}
 				break;
 			}
@@ -168,13 +162,15 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 		});
 	}
 
-	get_source_file(path: Diskfile_Path): Source_File | undefined {
-		return this.#source_files.get(path);
-	}
-
 	get_by_path(path: Diskfile_Path): Diskfile | undefined {
 		const id = this.by_path.get(path);
 		return id ? this.by_id.get(id) : undefined;
+	}
+
+	/** Like `zzz.zzz_dir`, `undefined` means uninitialized, `null` means loading, `''` means none */
+	to_relative_path(path: string): string | null | undefined {
+		const {zzz_dir} = this.zzz;
+		return zzz_dir && strip_start(path, zzz_dir);
 	}
 
 	/**

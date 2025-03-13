@@ -149,7 +149,7 @@ export const Message_Loaded_Session = Message_Base.extend({
 	data: z
 		.object({
 			zzz_dir: Zzz_Dir,
-			files: z.record(Diskfile_Path, Source_File),
+			files: z.array(Source_File),
 		})
 		.strict(),
 }).strict();

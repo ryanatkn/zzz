@@ -16,10 +16,11 @@ export const GLYPH_INFO = 'ⓘ';
 // ⎗ ⎗ ⎘ ⌖ ⌶ ⎙
 // ⎘ ⎘ ⎌ ⌫ ⊘ ⦸
 
+export const GLYPH_SERVER = '🜢';
 export const GLYPH_CHAT = '⌸';
 export const GLYPH_TAPE = '☷';
 export const GLYPH_FILE = '⧈'; // ⏚ ⧈ ⊞ ⌺ ▤
-export const GLYPH_DIRECTORY = '▦'; // 🗀 🗁 ▦ ▥
+export const GLYPH_DIRECTORY = '▦'; // 🗁 ▦ ▥ 🗀
 export const GLYPH_PROMPT = '⌇'; // ⌇ ⍋  ⌭
 export const GLYPH_BIT = '┊'; //  ┊ ┋ ╎ ╏
 export const GLYPH_PROVIDER = '⨕';
@@ -87,7 +88,6 @@ export const get_direction_icon = (direction: string): string => {
 // ⠿
 // TODO GLYPH_TAPE
 // ⧛
-// ☁
 
 // ⚟
 
