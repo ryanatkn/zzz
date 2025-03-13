@@ -309,6 +309,10 @@
       "types": "./dist/helpers.d.ts",
       "default": "./dist/helpers.js"
     },
+    "./indexed_collection.svelte.js": {
+      "types": "./dist/indexed_collection.svelte.d.ts",
+      "default": "./dist/indexed_collection.svelte.js"
+    },
     "./list_helpers.js": {
       "types": "./dist/list_helpers.d.ts",
       "default": "./dist/list_helpers.js"

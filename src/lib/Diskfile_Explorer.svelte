@@ -48,7 +48,7 @@
 		const file_id_param = page.url.searchParams.get('file');
 		if (!file_id_param) return;
 		const parsed_uuid = Uuid.safeParse(file_id_param);
-		if (parsed_uuid.success && diskfiles.by_id.has(parsed_uuid.data)) {
+		if (parsed_uuid.success && diskfiles.items.by_id.has(parsed_uuid.data)) {
 			diskfiles.select_file(parsed_uuid.data);
 			const selected_file = sorted_files.find((file) => file.id === parsed_uuid.data);
 			if (selected_file) {

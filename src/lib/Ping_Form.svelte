@@ -18,9 +18,11 @@
 	const HISTORY_SIZE = 6;
 
 	// Use the Messages collections directly with filter and limit
-	const pongs = $derived(zzz.messages.by_type.get('pong')?.slice(-HISTORY_SIZE));
+	const pongs = $derived(
+		zzz.messages.items.multi_indexes.by_type?.get('pong')?.slice(-HISTORY_SIZE),
+	);
 	const pings = $derived(
-		pongs?.map((p) => zzz.messages.by_id.get(p.ping_id!)).filter((p) => !!p) ?? [],
+		pongs?.map((p) => zzz.messages.items.by_id.get(p.ping_id!)).filter((p) => !!p) ?? [],
 	);
 
 	// Map of ping IDs to response times (use SvelteMap from zzz for reactivity)

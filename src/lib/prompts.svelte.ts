@@ -25,7 +25,7 @@ export type Prompts_Json = z.infer<typeof Prompts_Json>;
 export interface Prompts_Options extends Cell_Options<typeof Prompts_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 export class Prompts extends Cell<typeof Prompts_Json> {
 	// Initialize items directly at property declaration site
-	readonly items = new Indexed_Collection<Prompt>();
+	readonly items: Indexed_Collection<Prompt> = new Indexed_Collection();
 
 	selected_id: Uuid | null = $state(null);
 	selected: Prompt | undefined = $derived(
@@ -77,16 +77,5 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 	remove_bit(bit_id: Uuid): void {
 		if (!this.selected) return;
 		this.selected.remove_bit(bit_id);
-	}
-
-	// Override to ensure indexes are properly maintained
-	override set_json(value?: z.input<typeof Prompts_Json>): void {
-		super.set_json(value);
-
-		// Rebuild collection with new items
-		this.items.clear();
-		for (const prompt of this._json.items) {
-			this.items.add(prompt);
-		}
 	}
 }

@@ -262,6 +262,10 @@ export const package_json = {
 		},
 		'./glyphs.js': {types: './dist/glyphs.d.ts', default: './dist/glyphs.js'},
 		'./helpers.js': {types: './dist/helpers.d.ts', default: './dist/helpers.js'},
+		'./indexed_collection.svelte.js': {
+			types: './dist/indexed_collection.svelte.d.ts',
+			default: './dist/indexed_collection.svelte.js',
+		},
 		'./list_helpers.js': {types: './dist/list_helpers.d.ts', default: './dist/list_helpers.js'},
 		'./Main_Dialog.svelte': {
 			types: './dist/Main_Dialog.svelte.d.ts',
@@ -725,6 +729,14 @@ export const src_json = {
 			path: 'helpers.ts',
 			declarations: [{name: 'get_unique_name', kind: 'function'}],
 		},
+		'./indexed_collection.svelte.js': {
+			path: 'indexed_collection.svelte.ts',
+			declarations: [
+				{name: 'Indexed_Item', kind: 'type'},
+				{name: 'Index_Config', kind: 'type'},
+				{name: 'Indexed_Collection', kind: 'class'},
+			],
+		},
 		'./list_helpers.js': {
 			path: 'list_helpers.ts',
 			declarations: [{name: 'reorder_list', kind: 'function'}],
@@ -782,6 +794,7 @@ export const src_json = {
 				{name: 'HISTORY_LIMIT_DEFAULT', kind: 'variable'},
 				{name: 'Messages_Json', kind: 'variable'},
 				{name: 'Messages_Options', kind: 'type'},
+				{name: 'Message_Indexes', kind: 'type'},
 				{name: 'Messages', kind: 'class'},
 			],
 		},

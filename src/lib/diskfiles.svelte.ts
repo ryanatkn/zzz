@@ -30,8 +30,7 @@ export interface Diskfiles_Options extends Cell_Options<typeof Diskfiles_Json> {
 type Diskfile_Indexes = 'by_path';
 
 export class Diskfiles extends Cell<typeof Diskfiles_Json> {
-	// Initialize items directly with static indexing configuration
-	readonly items = new Indexed_Collection<Diskfile, Diskfile_Indexes>({
+	readonly items: Indexed_Collection<Diskfile, Diskfile_Indexes> = new Indexed_Collection({
 		indexes: [
 			{
 				key: 'by_path',
@@ -51,20 +50,6 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 	constructor(options: Diskfiles_Options) {
 		super(Diskfiles_Json, options);
 		this.init();
-	}
-
-	// Override to populate indexed collection after parsing JSON
-	override set_json(value?: z.input<typeof Diskfiles_Json>): void {
-		super.set_json(value);
-
-		// Update selected file ID
-		this.selected_file_id = this.json.selected_file_id;
-
-		// Rebuild collection with parsed items
-		this.items.clear();
-		for (const file of this.json.files) {
-			this.items.add(file);
-		}
 	}
 
 	handle_change(message: Message_Filer_Change): void {

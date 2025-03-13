@@ -71,7 +71,7 @@ export class Indexed_Collection<T extends Indexed_Item, K extends string = never
 			const key = config.extractor(item);
 			if (key !== undefined && key !== null) {
 				if (config.multi) {
-					const collection = this.multi_indexes[config.key]!.get(key) || $state([]);
+					const collection = this.multi_indexes[config.key]!.get(key) || [];
 					collection.push(item);
 					this.multi_indexes[config.key]!.set(key, collection);
 				} else {
@@ -95,7 +95,7 @@ export class Indexed_Collection<T extends Indexed_Item, K extends string = never
 			const key = config.extractor(item);
 			if (key !== undefined && key !== null) {
 				if (config.multi) {
-					const collection = this.multi_indexes[config.key]!.get(key) || $state([]);
+					const collection = this.multi_indexes[config.key]!.get(key) || [];
 					collection.unshift(item);
 					this.multi_indexes[config.key]!.set(key, collection);
 				} else {

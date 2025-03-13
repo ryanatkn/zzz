@@ -7,11 +7,9 @@ import {
 	type Message_Client,
 	type Message_Server,
 	create_message_json,
-	type Message_Type,
 } from '$lib/message_types.js';
-import type {Uuid} from '$lib/zod_helpers.js';
 import {cell_array} from '$lib/cell_helpers.js';
-import {Indexed_Collection, type Index_Config} from '$lib/indexed_collection.svelte.js';
+import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 
 export const HISTORY_LIMIT_DEFAULT = 512;
 
@@ -32,11 +30,11 @@ export interface Messages_Options extends Cell_Options<typeof Messages_Json> {
 	history_limit?: number;
 }
 
-type Message_Indexes = 'by_type';
+export type Message_Indexes = 'by_type';
 
 export class Messages extends Cell<typeof Messages_Json> {
 	// Configure indexed collection with type-based indexing statically
-	readonly items = new Indexed_Collection<Message, Message_Indexes>({
+	readonly items: Indexed_Collection<Message, Message_Indexes> = new Indexed_Collection({
 		indexes: [
 			{
 				key: 'by_type',
@@ -85,12 +83,6 @@ export class Messages extends Cell<typeof Messages_Json> {
 	 */
 	override set_json(value?: z.input<typeof Messages_Json>): void {
 		super.set_json(value);
-
-		// Rebuild collection with parsed items
-		this.items.clear();
-		for (const message of this._json.items) {
-			this.items.add(message);
-		}
 
 		// Trim to history limit after loading
 		this.#trim_to_history_limit();

@@ -19,7 +19,7 @@ export class Tape extends Cell<typeof Tape_Json> {
 		if (!model) throw Error(`Model "${this.model_name}" not found`); // TODO do this differently?
 		return model;
 	});
-	chat_messages: Array<Chat_Message> = $state([]); // TODO @many incrementally update with a helper class
+	chat_messages: Array<Chat_Message> = $state([]); // TODO Indexed_Collection
 	chat_messages_by_id: Map<Uuid, Chat_Message> = $derived(
 		new Map(this.chat_messages.map((m) => [m.id, m])),
 	); // TODO @many incrementally update with a helper class

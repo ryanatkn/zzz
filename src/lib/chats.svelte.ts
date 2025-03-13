@@ -26,7 +26,7 @@ export type Chats_Json = z.infer<typeof Chats_Json>;
 export interface Chats_Options extends Cell_Options<typeof Chats_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 export class Chats extends Cell<typeof Chats_Json> {
 	// Initialize items directly at property declaration for availability to other properties
-	readonly items = new Indexed_Collection<Chat>();
+	readonly items: Indexed_Collection<Chat> = new Indexed_Collection();
 
 	selected_id: Uuid | null = $state(null);
 	selected: Chat | undefined = $derived(
@@ -65,16 +65,5 @@ export class Chats extends Cell<typeof Chats_Json> {
 
 	reorder_chats(from_index: number, to_index: number): void {
 		this.items.reorder(from_index, to_index);
-	}
-
-	// Override to ensure indexes are properly maintained
-	override set_json(value?: z.input<typeof Chats_Json>): void {
-		super.set_json(value);
-
-		// Rebuild collection with new items
-		this.items.clear();
-		for (const chat of this._json.items) {
-			this.items.add(chat);
-		}
 	}
 }
