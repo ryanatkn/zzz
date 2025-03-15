@@ -59,6 +59,11 @@ export class Indexed_Collection<T extends Indexed_Item, K extends string = never
 		}
 	}
 
+	// TODO maybe make this a cell? could explicitly cleanup on destroy
+	toJSON(): Array<any> {
+		return $state.snapshot(this.array);
+	}
+
 	/**
 	 * Add an item to the collection and update all indexes
 	 */

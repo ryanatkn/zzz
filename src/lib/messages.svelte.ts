@@ -8,7 +8,7 @@ import {
 	type Message_Server,
 	create_message_json,
 } from '$lib/message_types.js';
-import {cell_array} from '$lib/cell_helpers.js';
+import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 
 export const HISTORY_LIMIT_DEFAULT = 512;
@@ -75,6 +75,19 @@ export class Messages extends Cell<typeof Messages_Json> {
 			this.history_limit = options.history_limit;
 		}
 
+		this.parsers = {
+			items: (items) => {
+				if (Array.isArray(items)) {
+					this.items.clear();
+					for (const item_json of items) {
+						const message = new Message({zzz: this.zzz, json: item_json});
+						this.items.add(message);
+					}
+				}
+				return HANDLED;
+			},
+		};
+
 		this.init();
 	}
 
@@ -85,7 +98,9 @@ export class Messages extends Cell<typeof Messages_Json> {
 		super.set_json(value);
 
 		// Trim to history limit after loading
-		this.#trim_to_history_limit();
+		if (this.items && this.items.array) {
+			this.#trim_to_history_limit();
+		}
 	}
 
 	/**
@@ -131,7 +146,7 @@ export class Messages extends Cell<typeof Messages_Json> {
 	 * Trims the collection to the maximum allowed size by removing oldest messages
 	 */
 	#trim_to_history_limit(): void {
-		if (this.items.array.length <= this.history_limit) return;
+		if (!this.items.array || this.items.array.length <= this.history_limit) return;
 
 		// Calculate how many items to remove
 		const excess = this.items.array.length - this.history_limit;

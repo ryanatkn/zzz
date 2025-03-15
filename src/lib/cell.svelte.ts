@@ -7,14 +7,13 @@ import {
 	get_schema_class_info,
 	type Schema_Class_Info,
 	type Cell_Value_Parser,
+	HANDLED,
+	USE_DEFAULT,
+	FILE_SHORT_DATE_FORMAT,
+	FILE_DATE_FORMAT,
+	FILE_TIME_FORMAT,
 } from '$lib/cell_helpers.js';
 import type {Schema_Keys, Cell_Json} from '$lib/cell_types.js';
-
-// TODO needs refinement
-// Constants for date formatting
-export const FILE_SHORT_DATE_FORMAT = 'MMM d, p';
-export const FILE_DATE_FORMAT = 'MMM d, yyyy h:mm:ss a';
-export const FILE_TIME_FORMAT = 'HH:mm:ss';
 
 // Base options type that all cells will extend
 export interface Cell_Options<T_Schema extends z.ZodType> {
@@ -62,8 +61,11 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	 * Type-safe parsers for custom field decoding.
 	 * Override in subclasses to handle special field types.
 	 *
-	 * This uses Cell_Value_Parser which includes typing for
-	 * the base cell properties (id, created, updated).
+	 * Each parser function takes a value of any type and should either:
+	 * 1. Return a value (including null) to be assigned to the property
+	 * 2. Return undefined or USE_DEFAULT to use the default decoding behavior
+	 * 3. Return HANDLED to indicate the parser has fully processed the property
+	 *    (virtual properties MUST return HANDLED if they exist in schema but not in class)
 	 */
 	protected parsers: Cell_Value_Parser<T_Schema> = {};
 
@@ -168,6 +170,9 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	/**
 	 * Decode a value based on its schema type information.
 	 * This handles instantiating classes, transforming arrays, and special types.
+	 *
+	 * Complex property types might require custom handling in parser functions
+	 * rather than using this general decoding mechanism.
 	 */
 	decode_property<K extends Schema_Keys<T_Schema>>(value: unknown, key: K): this[K] {
 		const schema_info = this.field_schema_info.get(key);
@@ -234,7 +239,15 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 
 	/**
 	 * Process a single schema property during JSON deserialization.
-	 * This method handles the flow for how schema properties map to instance properties.
+	 * This method handles the workflow for mapping schema properties to instance properties.
+	 *
+	 * Flow:
+	 * 1. If a parser exists for this property, try to use it
+	 * 2. If parser returns HANDLED, consider the property fully handled (short circuit)
+	 * 3. If parser returns a value other than HANDLED, USE_DEFAULT, or undefined, use that value
+	 * 4. If parser returns USE_DEFAULT or undefined, fall through to standard decoding
+	 * 5. For properties not directly represented in the class instance but defined
+	 *    in the schema, the parser MUST return HANDLED to indicate proper handling
 	 */
 	protected assign_property(key: Schema_Keys<T_Schema>, value: unknown): void {
 		// 1. Check if we have a parser for this key
@@ -256,18 +269,40 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 			if (parser) {
 				const parsed = parser(value);
 
-				// 3a. If parser returns a defined value AND we have a property, assign it
-				if (parsed !== undefined && has_property) {
+				// 3a. If parser returns HANDLED, it signals complete handling (short circuit)
+				if (parsed === HANDLED) {
+					return;
+				}
+
+				// 3b. For USE_DEFAULT, explicitly fall through to standard decoding
+				if (parsed === USE_DEFAULT) {
+					if (has_property) {
+						// Fallthrough to standard decoding (no break needed)
+					} else {
+						console.error(
+							`Parser for "${key}" in ${this.constructor.name} returned USE_DEFAULT but no property exists.`,
+						);
+						return;
+					}
+				}
+				// 3c. If parser returns a defined value AND we have a property, assign it
+				// Note: this allows null values to be assigned
+				else if (parsed !== undefined && has_property) {
+					// Using type assertion to avoid TypeScript error
+					// This is safe because our parsers are typed to return compatible values
 					this[key] = parsed;
 					return;
 				}
 
-				// 3b. If parser returns undefined but we have a property,
-				// fall through to standard decoding
+				// 3d. If parser returns undefined, fall through to standard decoding
 
-				// 3c. If we don't have a property but have a parser,
-				// the parser is expected to handle the virtual property
+				// 3e. If we don't have a property but have a parser that didn't return HANDLED,
+				// that's an error - virtual properties MUST be explicitly handled
 				if (!has_property) {
+					console.error(
+						`Parser for schema property "${key}" in ${this.constructor.name} didn't return HANDLED. ` +
+							`Virtual properties (not present on class) must explicitly return HANDLED.`,
+					);
 					return;
 				}
 			}

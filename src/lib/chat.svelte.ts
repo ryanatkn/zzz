@@ -13,6 +13,7 @@ import {reorder_list} from '$lib/list_helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {type Chat_Message, create_chat_message} from '$lib/chat_message.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
+import {HANDLED, USE_DEFAULT} from '$lib/cell_helpers.js';
 
 const NEW_CHAT_PREFIX = 'new chat';
 
@@ -54,15 +55,20 @@ export class Chat extends Cell<typeof Chat_Json> {
 						this.zzz.chats.items.array.map((c) => c.name),
 					);
 				}
-				return undefined; // Let the schema handle it
+				return USE_DEFAULT; // Explicitly use the default decoding
 			},
 			selected_prompt_ids: (value) => {
 				if (Array.isArray(value)) {
-					return value
-						.map((id) => this.zzz.prompts.items.array.find((p) => p.id === id)?.id)
-						.filter((p) => p !== undefined);
+					// Find all existing prompts with these IDs
+					const selected_prompts = value
+						.map((id) => this.zzz.prompts.items.array.find((p) => p.id === id))
+						.filter((p): p is Prompt => p !== undefined);
+
+					// Update the selected_prompts array
+					this.selected_prompts = selected_prompts;
 				}
-				return undefined;
+				// Return HANDLED to indicate we've fully processed this virtual property
+				return HANDLED;
 			},
 		};
 

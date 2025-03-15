@@ -3,7 +3,7 @@ import {z} from 'zod';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Chat, Chat_Json} from '$lib/chat.svelte.js';
 import type {Uuid} from '$lib/zod_helpers.js';
-import {cell_array} from '$lib/cell_helpers.js';
+import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 
 // Fix the schema definition for Chats_Json
@@ -36,6 +36,20 @@ export class Chats extends Cell<typeof Chats_Json> {
 
 	constructor(options: Chats_Options) {
 		super(Chats_Json, options);
+
+		this.parsers = {
+			items: (items) => {
+				if (Array.isArray(items)) {
+					this.items.clear();
+					for (const item_json of items) {
+						const chat = new Chat({zzz: this.zzz, json: item_json});
+						this.items.add(chat);
+					}
+				}
+				return HANDLED;
+			},
+		};
+
 		// Initialize explicitly after all properties are defined
 		this.init();
 	}

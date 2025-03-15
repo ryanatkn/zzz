@@ -1,6 +1,15 @@
 import {z} from 'zod';
 
-import type {Cell_Json} from '$lib/cell_types.js';
+/** Sentinel value to indicate a parser has completely handled a property */
+export const HANDLED = Symbol('HANDLED_BY_PARSER');
+
+/** Sentinel value to explicitly indicate fallback to default decoding */
+export const USE_DEFAULT = Symbol('USE_DEFAULT_DECODING');
+
+// Constants for date formatting
+export const FILE_SHORT_DATE_FORMAT = 'MMM d, p';
+export const FILE_DATE_FORMAT = 'MMM d, yyyy h:mm:ss a';
+export const FILE_TIME_FORMAT = 'HH:mm:ss';
 
 // Metadata properties for Zod schemas.
 // These constants are used to attach class information to schemas.
@@ -18,8 +27,8 @@ export const ZOD_ELEMENT_CLASS_NAME = 'zzz_element_class_name';
  * Schema class information extracted from a Zod schema.
  */
 export interface Schema_Class_Info {
-	type?: string;
-	is_array?: boolean;
+	type: string;
+	is_array: boolean;
 	class_name?: string;
 	element_class?: string;
 }
@@ -83,7 +92,11 @@ export type Value_Parser<
 export type Cell_Value_Parser<
 	TSchema extends z.ZodType,
 	TKey extends keyof z.infer<TSchema> & string = keyof z.infer<TSchema> & string,
-> = Value_Parser<TSchema, TKey> & Value_Parser<z.ZodType<Cell_Json>, keyof Cell_Json & string>;
+> = {
+	[K in TKey]?: (
+		value: unknown,
+	) => z.infer<TSchema>[K] | undefined | typeof HANDLED | typeof USE_DEFAULT;
+};
 
 /**
  * Get schema class information from a Zod schema.
@@ -106,7 +119,7 @@ export const get_schema_class_info = (
 		schema._def.description.startsWith('_zMetadata:')
 	) {
 		const class_name = schema._def.description.split(':')[1];
-		return {type: 'ZodObject', class_name};
+		return {type: 'ZodObject', class_name, is_array: false};
 	}
 
 	// Handle ZodArray
@@ -125,22 +138,22 @@ export const get_schema_class_info = (
 	// Get class name from schema metadata if present
 	const class_name = (schema as any)[ZOD_CELL_CLASS_NAME];
 	if (class_name) {
-		return {type: schema.constructor.name, class_name};
+		return {type: schema.constructor.name, class_name, is_array: false};
 	}
 
 	// Handle ZodBranded
 	if (schema instanceof z.ZodBranded) {
-		return {type: 'ZodBranded'};
+		return {type: 'ZodBranded', is_array: false};
 	}
 
 	// Handle ZodMap and ZodSet
 	if (schema instanceof z.ZodMap) {
-		return {type: 'ZodMap'};
+		return {type: 'ZodMap', is_array: false};
 	}
 	if (schema instanceof z.ZodSet) {
-		return {type: 'ZodSet'};
+		return {type: 'ZodSet', is_array: false};
 	}
 
 	// Handle other types
-	return {type: schema.constructor.name};
+	return {type: schema.constructor.name, is_array: false};
 };

@@ -6,7 +6,7 @@ import {Diskfile} from '$lib/diskfile.svelte.js';
 import {Diskfile_Json, type Diskfile_Path, Source_File} from '$lib/diskfile_types.js';
 import {source_file_to_diskfile_json} from '$lib/diskfile_helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {cell_array} from '$lib/cell_helpers.js';
+import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {strip_start} from '@ryanatkn/belt/string.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 
@@ -42,13 +42,27 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 
 	selected_file_id: Uuid | null = $state(null);
 
-	non_external_files: Array<Diskfile> = $derived(this.items.array.filter((file) => !file.external));
 	selected_file: Diskfile | null = $derived(
 		this.selected_file_id ? (this.items.by_id.get(this.selected_file_id) ?? null) : null,
 	);
+	non_external_files: Array<Diskfile> = $derived(this.items.array.filter((file) => !file.external));
 
 	constructor(options: Diskfiles_Options) {
 		super(Diskfiles_Json, options);
+
+		this.parsers = {
+			files: (files) => {
+				if (Array.isArray(files)) {
+					this.items.clear();
+					for (const file_json of files) {
+						const file = new Diskfile({zzz: this.zzz, json: file_json});
+						this.items.add(file);
+					}
+				}
+				return HANDLED;
+			},
+		};
+
 		this.init();
 	}
 
@@ -77,9 +91,9 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 					);
 
 					// Only update changed properties, not the entire object
-					// This preserves created timestamp and other stable properties
 					existing_diskfile.set_json({
 						...diskfile_json,
+						// TODO hacky, should be handled more cleanly elsewhere
 						created: existing_diskfile.created, // Preserve original creation date
 					});
 				} else {

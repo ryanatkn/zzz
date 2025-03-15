@@ -4,7 +4,7 @@ import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Prompt, Prompt_Json} from '$lib/prompt.svelte.js';
 import type {Uuid} from '$lib/zod_helpers.js';
 import type {Bit} from '$lib/bit.svelte.js';
-import {cell_array} from '$lib/cell_helpers.js';
+import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 
 export const Prompts_Json = z
@@ -34,6 +34,20 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 
 	constructor(options: Prompts_Options) {
 		super(Prompts_Json, options);
+
+		this.parsers = {
+			items: (items) => {
+				if (Array.isArray(items)) {
+					this.items.clear();
+					for (const item_json of items) {
+						const prompt = new Prompt({zzz: this.zzz, json: item_json});
+						this.items.add(prompt);
+					}
+				}
+				return HANDLED;
+			},
+		};
+
 		this.init();
 	}
 

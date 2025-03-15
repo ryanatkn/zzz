@@ -540,6 +540,10 @@ export const src_json = {
 		'./cell_helpers.js': {
 			path: 'cell_helpers.ts',
 			declarations: [
+				{name: 'HANDLED', kind: 'variable'},
+				{name: 'FILE_SHORT_DATE_FORMAT', kind: 'variable'},
+				{name: 'FILE_DATE_FORMAT', kind: 'variable'},
+				{name: 'FILE_TIME_FORMAT', kind: 'variable'},
 				{name: 'ZOD_CELL_CLASS_NAME', kind: 'variable'},
 				{name: 'ZOD_ELEMENT_CLASS_NAME', kind: 'variable'},
 				{name: 'Schema_Class_Info', kind: 'type'},
@@ -565,9 +569,6 @@ export const src_json = {
 		'./cell.svelte.js': {
 			path: 'cell.svelte.ts',
 			declarations: [
-				{name: 'FILE_SHORT_DATE_FORMAT', kind: 'variable'},
-				{name: 'FILE_DATE_FORMAT', kind: 'variable'},
-				{name: 'FILE_TIME_FORMAT', kind: 'variable'},
 				{name: 'Cell_Options', kind: 'type'},
 				{name: 'Cell', kind: 'class'},
 			],
