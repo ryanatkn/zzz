@@ -109,7 +109,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 
 				const existing_diskfile = path_index.get(validated_source_file.id);
 				if (existing_diskfile) {
-					this.items.remove(existing_diskfile);
+					this.items.remove(existing_diskfile.id);
 				}
 				break;
 			}

@@ -112,55 +112,50 @@ export class Indexed_Collection<T extends Indexed_Item, K extends string = never
 	}
 
 	/**
-	 * Remove an item from the collection and update all indexes
+	 * Remove an item by its ID and update all indexes
 	 */
-	remove(item: T): boolean {
-		// Find the item by ID rather than by reference
-		const stored_item = this.by_id.get(item.id);
-		if (!stored_item) return false;
+	remove(id: string): boolean {
+		const item = this.by_id.get(id);
+		if (!item) return false;
 
 		// Find the index of the item in the array
-		const index = this.array.findIndex((i) => i.id === item.id);
+		const index = this.array.findIndex((i) => i.id === id); // TODO consider using a map for index lookup
 		if (index !== -1) {
 			this.array.splice(index, 1);
-			this.by_id.delete(item.id);
+			this.by_id.delete(id);
 
 			// Update all additional indexes
 			for (const config of this.#configs) {
 				const key = config.extractor(item);
 				if (key !== undefined && key !== null) {
 					if (config.multi) {
-						const collection = this.multi_indexes[config.key]!.get(key);
+						const multi_index = this.multi_indexes[config.key]!;
+						const collection = multi_index.get(key);
+
 						if (collection) {
-							const updated = collection.filter((i) => i.id !== item.id);
+							// Filter out the removed item
+							const updated = collection.filter((i) => i.id !== id);
+
+							// If no items left with this key, remove the key from the index
 							if (updated.length === 0) {
-								this.multi_indexes[config.key]!.delete(key);
+								multi_index.delete(key);
 							} else {
-								this.multi_indexes[config.key]!.set(key, updated);
+								multi_index.set(key, updated);
 							}
 						}
 					} else {
-						// Only delete if this exact key is mapped to this exact item
-						const mapped_item = this.single_indexes[config.key]!.get(key);
-						if (mapped_item && mapped_item.id === item.id) {
-							this.single_indexes[config.key]!.delete(key);
+						// For single-value indexes, only remove if this item is mapped to this key
+						const single_index = this.single_indexes[config.key]!;
+						const mapped_item = single_index.get(key);
+
+						if (mapped_item && mapped_item.id === id) {
+							single_index.delete(key);
 						}
 					}
 				}
 			}
 
 			return true;
-		}
-		return false;
-	}
-
-	/**
-	 * Remove an item by its ID
-	 */
-	remove_by_id(id: string): boolean {
-		const item = this.by_id.get(id);
-		if (item) {
-			return this.remove(item);
 		}
 		return false;
 	}

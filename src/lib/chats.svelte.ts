@@ -63,9 +63,9 @@ export class Chats extends Cell<typeof Chats_Json> {
 		return chat;
 	}
 
-	remove(chat: Chat): void {
-		const removed = this.items.remove(chat);
-		if (removed && chat.id === this.selected_id) {
+	remove(id: Uuid): void {
+		const removed = this.items.remove(id);
+		if (removed && id === this.selected_id) {
 			// Find next chat to select
 			const remaining_items = this.items.array;
 			const next_chat = remaining_items.length > 0 ? remaining_items[0] : undefined;

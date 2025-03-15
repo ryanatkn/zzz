@@ -117,7 +117,7 @@ test('Indexed_Collection - has method checks if item exists by id', () => {
 });
 
 // Removing items
-test('Indexed_Collection - remove method removes items and updates indexes', () => {
+test('Indexed_Collection - remove method removes items by id and updates indexes', () => {
 	const collection: Indexed_Collection<Test_Item, 'name' | 'category'> = new Indexed_Collection({
 		indexes: [
 			{key: 'name', extractor: (item) => item.name},
@@ -126,7 +126,7 @@ test('Indexed_Collection - remove method removes items and updates indexes', () 
 		initial_items: [sample_items[0], sample_items[1], sample_items[2]],
 	});
 
-	const removed = collection.remove(sample_items[1]);
+	const removed = collection.remove('2');
 
 	expect(removed).toBe(true);
 	expect(collection.array.length).toBe(2);
@@ -139,34 +139,11 @@ test('Indexed_Collection - remove method removes items and updates indexes', () 
 	expect(fruit_items?.[0].id).toBe('1');
 });
 
-test('Indexed_Collection - remove method returns false when item not found', () => {
+test('Indexed_Collection - remove method returns false when id not found', () => {
 	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection();
 	collection.add(sample_items[0]);
 
-	const not_in_collection = create_test_item('99', 'not-in-collection', 'unknown');
-	const removed = collection.remove(not_in_collection);
-
-	expect(removed).toBe(false);
-	expect(collection.array.length).toBe(1);
-});
-
-test('Indexed_Collection - remove_by_id removes items by id', () => {
-	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection();
-	collection.add(sample_items[0]);
-	collection.add(sample_items[1]);
-
-	const removed = collection.remove_by_id('1');
-
-	expect(removed).toBe(true);
-	expect(collection.array.length).toBe(1);
-	expect(collection.by_id.has('1')).toBe(false);
-});
-
-test('Indexed_Collection - remove_by_id returns false when id not found', () => {
-	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection();
-	collection.add(sample_items[0]);
-
-	const removed = collection.remove_by_id('99');
+	const removed = collection.remove('99');
 
 	expect(removed).toBe(false);
 	expect(collection.array.length).toBe(1);
@@ -211,7 +188,7 @@ test('Indexed_Collection - handles multi-index removal correctly when last item 
 		initial_items: [sample_items[0]],
 	});
 
-	collection.remove(sample_items[0]);
+	collection.remove('1');
 
 	expect(collection.multi_indexes.category?.has('fruit')).toBe(false);
 });
@@ -222,7 +199,7 @@ test('Indexed_Collection - correctly maintains multi-index when some items remai
 		initial_items: [sample_items[0], sample_items[1], sample_items[2]],
 	});
 
-	collection.remove(sample_items[0]);
+	collection.remove('1');
 
 	const fruit_items = collection.multi_indexes.category?.get('fruit');
 	expect(fruit_items?.length).toBe(1);

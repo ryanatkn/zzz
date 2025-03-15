@@ -61,7 +61,7 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 	}
 
 	remove(prompt: Prompt): void {
-		const removed = this.items.remove(prompt);
+		const removed = this.items.remove(prompt.id);
 		if (removed && prompt.id === this.selected_id) {
 			// Find next prompt to select
 			const remaining_items = this.items.array;

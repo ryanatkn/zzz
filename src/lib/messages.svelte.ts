@@ -98,9 +98,7 @@ export class Messages extends Cell<typeof Messages_Json> {
 		super.set_json(value);
 
 		// Trim to history limit after loading
-		if (this.items && this.items.array) {
-			this.#trim_to_history_limit();
-		}
+		this.#trim_to_history_limit(); // TODO should be unnecessary to override `set_json` for this
 	}
 
 	/**
@@ -146,7 +144,7 @@ export class Messages extends Cell<typeof Messages_Json> {
 	 * Trims the collection to the maximum allowed size by removing oldest messages
 	 */
 	#trim_to_history_limit(): void {
-		if (!this.items.array || this.items.array.length <= this.history_limit) return;
+		if (this.items.array.length <= this.history_limit) return;
 
 		// Calculate how many items to remove
 		const excess = this.items.array.length - this.history_limit;
@@ -155,7 +153,7 @@ export class Messages extends Cell<typeof Messages_Json> {
 		for (let i = 0; i < excess; i++) {
 			if (this.items.array.length > 0) {
 				const oldest = this.items.array[0];
-				this.items.remove(oldest);
+				this.items.remove(oldest.id);
 			}
 		}
 	}

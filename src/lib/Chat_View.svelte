@@ -202,7 +202,7 @@
 								{zzz.chats.selected.name}
 							</div>
 							<Confirm_Button
-								onconfirm={() => zzz.chats.selected && zzz.chats.remove(zzz.chats.selected)}
+								onconfirm={() => zzz.chats.selected_id && zzz.chats.remove(zzz.chats.selected_id)}
 								attrs={{title: `delete chat "${zzz.chats.selected.name}"`}}
 							/>
 						</div>
