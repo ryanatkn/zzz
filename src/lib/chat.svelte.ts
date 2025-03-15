@@ -45,8 +45,8 @@ export class Chat extends Cell<typeof Chat_Json> {
 	constructor(options: Chat_Options) {
 		super(Chat_Json, options);
 
-		// Initialize parsers with type-specific handlers
-		this.parsers = {
+		// Initialize decoders with type-specific handlers
+		this.decoders = {
 			name: (value) => {
 				// If name is undefined, generate a unique name
 				if (value === undefined) {

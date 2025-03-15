@@ -37,7 +37,7 @@ export class Chats extends Cell<typeof Chats_Json> {
 	constructor(options: Chats_Options) {
 		super(Chats_Json, options);
 
-		this.parsers = {
+		this.decoders = {
 			items: (items) => {
 				if (Array.isArray(items)) {
 					this.items.clear();

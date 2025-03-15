@@ -6,12 +6,12 @@ import type {Zzz} from '$lib/zzz.svelte.js';
 import {
 	get_schema_class_info,
 	type Schema_Class_Info,
-	type Cell_Value_Parser,
 	HANDLED,
 	USE_DEFAULT,
 	FILE_SHORT_DATE_FORMAT,
 	FILE_DATE_FORMAT,
 	FILE_TIME_FORMAT,
+	type Cell_Value_Decoder,
 } from '$lib/cell_helpers.js';
 import type {Schema_Keys, Cell_Json} from '$lib/cell_types.js';
 
@@ -57,17 +57,18 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	readonly zzz: Zzz;
 
 	// TODO most of the overrides for this should be replaceable with schema introspection I think
+
 	/**
-	 * Type-safe parsers for custom field decoding.
+	 * Type-safe decoders for custom field decoding.
 	 * Override in subclasses to handle special field types.
 	 *
-	 * Each parser function takes a value of any type and should either:
+	 * Each decoder function takes a value of any type and should either:
 	 * 1. Return a value (including null) to be assigned to the property
 	 * 2. Return undefined or USE_DEFAULT to use the default decoding behavior
-	 * 3. Return HANDLED to indicate the parser has fully processed the property
+	 * 3. Return HANDLED to indicate the decoder has fully processed the property
 	 *    (virtual properties MUST return HANDLED if they exist in schema but not in class)
 	 */
-	protected parsers: Cell_Value_Parser<T_Schema> = {};
+	protected decoders: Cell_Value_Decoder<T_Schema> = {};
 
 	created_date: Date = $derived(new Date(this.created));
 	created_formatted_short_date: string = $derived(
@@ -242,65 +243,63 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	 * This method handles the workflow for mapping schema properties to instance properties.
 	 *
 	 * Flow:
-	 * 1. If a parser exists for this property, try to use it
-	 * 2. If parser returns HANDLED, consider the property fully handled (short circuit)
-	 * 3. If parser returns a value other than HANDLED, USE_DEFAULT, or undefined, use that value
-	 * 4. If parser returns USE_DEFAULT or undefined, fall through to standard decoding
+	 * 1. If a decoder exists for this property, try to use it
+	 * 2. If decoder returns HANDLED, consider the property fully handled (short circuit)
+	 * 3. If decoder returns a value other than HANDLED, USE_DEFAULT, or undefined, use that value
+	 * 4. If decoder returns USE_DEFAULT or undefined, fall through to standard decoding
 	 * 5. For properties not directly represented in the class instance but defined
-	 *    in the schema, the parser MUST return HANDLED to indicate proper handling
+	 *    in the schema, the decoder MUST return HANDLED to indicate proper handling
 	 */
 	protected assign_property(key: Schema_Keys<T_Schema>, value: unknown): void {
-		// 1. Check if we have a parser for this key
-		const has_parser = key in this.parsers;
+		// 1. Check if we have a decoder for this key
+		const has_decoder = key in this.decoders;
 		const has_property = key in this;
 
-		// 2. If we don't have a property or parser, log an error and bail
-		if (!has_property && !has_parser) {
+		// 2. If we don't have a property or decoder, log an error and bail
+		if (!has_property && !has_decoder) {
 			console.error(
-				`Schema key "${key}" in ${this.constructor.name} has no matching property or parser. ` +
-					`Consider adding the property or a parser.`,
+				`Schema key "${key}" in ${this.constructor.name} has no matching property or decoder. ` +
+					`Consider adding the property or a decoder.`,
 			);
 			return;
 		}
 
-		// 3. Try to use the parser if available
-		if (has_parser) {
-			const parser = this.parsers[key];
-			if (parser) {
-				const parsed = parser(value);
+		// 3. Try to use the decoder if available
+		if (has_decoder) {
+			const decoder = this.decoders[key];
+			if (decoder) {
+				const decoded = decoder(value);
 
-				// 3a. If parser returns HANDLED, it signals complete handling (short circuit)
-				if (parsed === HANDLED) {
+				// 3a. If decoder returns HANDLED, it signals complete handling (short circuit)
+				if (decoded === HANDLED) {
 					return;
 				}
 
 				// 3b. For USE_DEFAULT, explicitly fall through to standard decoding
-				if (parsed === USE_DEFAULT) {
+				if (decoded === USE_DEFAULT) {
 					if (has_property) {
 						// Fallthrough to standard decoding (no break needed)
 					} else {
 						console.error(
-							`Parser for "${key}" in ${this.constructor.name} returned USE_DEFAULT but no property exists.`,
+							`Decoder for "${key}" in ${this.constructor.name} returned USE_DEFAULT but no property exists.`,
 						);
 						return;
 					}
 				}
-				// 3c. If parser returns a defined value AND we have a property, assign it
+				// 3c. If decoder returns a defined value AND we have a property, assign it
 				// Note: this allows null values to be assigned
-				else if (parsed !== undefined && has_property) {
-					// Using type assertion to avoid TypeScript error
-					// This is safe because our parsers are typed to return compatible values
-					this[key] = parsed;
+				else if (decoded !== undefined && has_property) {
+					this[key] = decoded;
 					return;
 				}
 
-				// 3d. If parser returns undefined, fall through to standard decoding
+				// 3d. If decoder returns undefined, fall through to standard decoding
 
-				// 3e. If we don't have a property but have a parser that didn't return HANDLED,
+				// 3e. If we don't have a property but have a decoder that didn't return HANDLED,
 				// that's an error - virtual properties MUST be explicitly handled
 				if (!has_property) {
 					console.error(
-						`Parser for schema property "${key}" in ${this.constructor.name} didn't return HANDLED. ` +
+						`Decoder for schema property "${key}" in ${this.constructor.name} didn't return HANDLED. ` +
 							`Virtual properties (not present on class) must explicitly return HANDLED.`,
 					);
 					return;

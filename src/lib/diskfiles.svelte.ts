@@ -50,7 +50,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 	constructor(options: Diskfiles_Options) {
 		super(Diskfiles_Json, options);
 
-		this.parsers = {
+		this.decoders = {
 			files: (files) => {
 				if (Array.isArray(files)) {
 					this.items.clear();

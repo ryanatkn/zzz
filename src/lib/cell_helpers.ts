@@ -85,11 +85,11 @@ export type Value_Parser<
 };
 
 /**
- * Type helper for parsers that includes base schema properties.
- * Use this instead of Value_Parser when creating parsers for cells
+ * Type helper for decoders that includes base schema properties.
+ * Use this instead of Value_Parser when creating decoders for cells
  * to properly type the base properties.
  */
-export type Cell_Value_Parser<
+export type Cell_Value_Decoder<
 	TSchema extends z.ZodType,
 	TKey extends keyof z.infer<TSchema> & string = keyof z.infer<TSchema> & string,
 > = {

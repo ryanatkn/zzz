@@ -87,8 +87,8 @@ export class Message extends Cell<typeof Message_Json> {
 	constructor(options: Message_Options) {
 		super(Message_Json, options);
 
-		// Initialize parsers with type-specific handlers
-		this.parsers = {
+		// Initialize decoders with type-specific handlers
+		this.decoders = {
 			completion_request: (value) =>
 				this.type === 'send_prompt' ? Completion_Request.parse(value) : undefined,
 			completion_response: (value) =>

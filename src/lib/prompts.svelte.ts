@@ -35,7 +35,7 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 	constructor(options: Prompts_Options) {
 		super(Prompts_Json, options);
 
-		this.parsers = {
+		this.decoders = {
 			items: (items) => {
 				if (Array.isArray(items)) {
 					this.items.clear();

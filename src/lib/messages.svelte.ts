@@ -75,7 +75,7 @@ export class Messages extends Cell<typeof Messages_Json> {
 			this.history_limit = options.history_limit;
 		}
 
-		this.parsers = {
+		this.decoders = {
 			items: (items) => {
 				if (Array.isArray(items)) {
 					this.items.clear();

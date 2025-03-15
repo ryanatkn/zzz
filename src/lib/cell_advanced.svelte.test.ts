@@ -259,7 +259,7 @@ test('Cell allows schema keys with no properties if a parser is provided', () =>
 		constructor(options: Cell_Options<typeof Parser_Schema>) {
 			super(Parser_Schema, options);
 
-			this.parsers = {
+			this.decoders = {
 				// Custom parser for the virtual property that doesn't attempt to set a property
 				virtual: (value) => {
 					// Store the value for test verification
@@ -362,7 +362,7 @@ test('Cell supports virtual properties with custom handling', () => {
 			super(Virtual_Schema, options);
 
 			// Parser for virtual property
-			this.parsers = {
+			this.decoders = {
 				virtual: (value) => {
 					if (typeof value === 'number') {
 						// Process the value but return undefined
@@ -473,7 +473,7 @@ test('Cell parser defaults take precedence over schema defaults', () => {
 			super(Schema_With_Defaults, options);
 
 			// Set up parsers with their own defaults
-			this.parsers = {
+			this.decoders = {
 				id: (value) => {
 					if (typeof value === 'string' && value !== 'schema-default-id') {
 						return value as Uuid; // Keep non-default values
@@ -673,7 +673,7 @@ test('Cell properly handles collections with HANDLED sentinel', () => {
 		constructor(options: Cell_Options<typeof Collection_Schema>) {
 			super(Collection_Schema, options);
 
-			this.parsers = {
+			this.decoders = {
 				items: (value) => {
 					if (Array.isArray(value)) {
 						this.tracked_items = value.map((item) =>
@@ -734,7 +734,7 @@ test('Cell handles sentinel values with proper precedence', () => {
 		constructor(options: Cell_Options<typeof Precedence_Schema>) {
 			super(Precedence_Schema, options);
 
-			this.parsers = {
+			this.decoders = {
 				handled_prop: (_value) => {
 					this.called_parsers.push('handled_prop');
 					// Should short-circuit after this parser

@@ -8,6 +8,8 @@ import {Cell_Json} from '$lib/cell_types.js';
 import {Uuid, Datetime_Now} from '$lib/zod_helpers.js';
 import {HANDLED, USE_DEFAULT} from '$lib/cell_helpers.js';
 
+/* eslint-disable no-new */
+
 // Simple mock for Zzz
 const mock_zzz = {
 	registry: {
@@ -55,7 +57,7 @@ class Test_Cell extends Cell<typeof Test_Schema> {
 		super(Test_Schema, options);
 
 		// Set up parsers
-		this.parsers = {
+		this.decoders = {
 			id: (value) => {
 				if (typeof value === 'string' && value.length > 0) {
 					return value as Uuid; // Keep existing non-empty value
@@ -119,7 +121,7 @@ test('Cell parsers return undefined to use default decoding', () => {
 		constructor(options: Cell_Options<typeof Test_Schema>) {
 			super(Test_Schema, options);
 
-			this.parsers = {
+			this.decoders = {
 				name: (value) => {
 					// Only transform names that start with 'J'
 					if (typeof value === 'string' && value.startsWith('J')) {
@@ -219,7 +221,7 @@ test('Cell parsers work with empty JSON', () => {
 			super(Test_Schema, options);
 
 			// Ensure id parser always returns a generated id pattern for this test
-			this.parsers = {
+			this.decoders = {
 				id: () => `generated-${Math.random().toString(36).substring(2, 9)}` as Uuid,
 				name: () => 'DEFAULT_NAME',
 				roles: () => ['default_role'],
@@ -298,7 +300,7 @@ test('Cell parsers can depend on instance properties', () => {
 		constructor(options: Cell_Options<typeof Test_Schema>) {
 			super(Test_Schema, options);
 
-			this.parsers = {
+			this.decoders = {
 				// Always return values based on instance properties
 				id: () => `instance-${this.counter}` as Uuid,
 				name: () => `Instance ${this.counter}`,
@@ -377,7 +379,7 @@ test('Cell parsers run even with no input JSON', () => {
 			super(Test_Schema, options);
 
 			// Ensure id parser always returns a generated id pattern for this test
-			this.parsers = {
+			this.decoders = {
 				id: () => `generated-${Math.random().toString(36).substring(2, 9)}` as Uuid,
 				name: () => 'DEFAULT_NAME',
 				roles: () => ['default_role'],
@@ -411,7 +413,7 @@ test('Cell handles undefined JSON input correctly', () => {
 			super(Test_Schema, options);
 
 			// Ensure id parser always returns a generated id pattern for this test
-			this.parsers = {
+			this.decoders = {
 				id: () => `generated-${Math.random().toString(36).substring(2, 9)}` as Uuid,
 				name: () => 'DEFAULT_NAME',
 				roles: () => ['default_role'],
@@ -493,7 +495,7 @@ test('Cell parsers can return USE_DEFAULT sentinel to explicitly use default dec
 		constructor(options: Cell_Options<typeof Test_Schema>) {
 			super(Test_Schema, options);
 
-			this.parsers = {
+			this.decoders = {
 				name: (value) => {
 					// Only transform names starting with "special"
 					if (typeof value === 'string' && value.startsWith('special')) {
@@ -553,7 +555,7 @@ test('Cell parsers use HANDLED sentinel for virtual properties', () => {
 		constructor(options: Cell_Options<typeof Virtual_Schema>) {
 			super(Virtual_Schema, options);
 
-			this.parsers = {
+			this.decoders = {
 				virtual_prop: (value) => {
 					// Store value for testing
 					if (typeof value === 'number') {
@@ -609,7 +611,7 @@ test("Cell logs error when virtual property parser doesn't return HANDLED", () =
 		constructor(options: Cell_Options<typeof BadVirtual_Schema>) {
 			super(BadVirtual_Schema, options);
 
-			this.parsers = {
+			this.decoders = {
 				virtual_prop: (_value) => {
 					// Incorrectly returning undefined for virtual property
 					return undefined;
@@ -621,7 +623,7 @@ test("Cell logs error when virtual property parser doesn't return HANDLED", () =
 	}
 
 	// Should work but log an error
-	const _cell = new BadVirtualTest_Cell({
+	new BadVirtualTest_Cell({
 		zzz: mock_zzz,
 		json: {
 			id: TEST_UUID,
@@ -632,7 +634,7 @@ test("Cell logs error when virtual property parser doesn't return HANDLED", () =
 	});
 
 	// The expected error message should have been logged
-	const error_message = `Parser for schema property "virtual_prop" in BadVirtualTest_Cell didn't return HANDLED`;
+	const error_message = `Decoder for schema property "virtual_prop" in BadVirtualTest_Cell didn't return HANDLED`; // Updated to match new error message
 	const found_error = console_error_spy.mock.calls.some((args) =>
 		args.join(' ').includes(error_message),
 	);
@@ -657,7 +659,7 @@ test('Cell does not allow USE_DEFAULT for virtual properties', () => {
 		constructor(options: Cell_Options<typeof UseDefaultVirtual_Schema>) {
 			super(UseDefaultVirtual_Schema, options);
 
-			this.parsers = {
+			this.decoders = {
 				virtual_prop: (_value) => {
 					// Incorrectly returning USE_DEFAULT for virtual property
 					return USE_DEFAULT;
@@ -669,7 +671,7 @@ test('Cell does not allow USE_DEFAULT for virtual properties', () => {
 	}
 
 	// Should work but log an error
-	const _cell = new UseDefaultVirtualTest_Cell({
+	new UseDefaultVirtualTest_Cell({
 		zzz: mock_zzz,
 		json: {
 			id: TEST_UUID,
@@ -680,7 +682,7 @@ test('Cell does not allow USE_DEFAULT for virtual properties', () => {
 	});
 
 	// The expected error message should have been logged
-	const error_message = `Parser for "virtual_prop" in UseDefaultVirtualTest_Cell returned USE_DEFAULT but no property exists`;
+	const error_message = `Decoder for "virtual_prop" in UseDefaultVirtualTest_Cell returned USE_DEFAULT but no property exists`; // Updated to match new error message
 	const found_error = console_error_spy.mock.calls.some((args) =>
 		args.join(' ').includes(error_message),
 	);
