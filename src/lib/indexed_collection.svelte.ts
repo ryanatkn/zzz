@@ -1,11 +1,10 @@
 import {SvelteMap} from 'svelte/reactivity';
-import type {Uuid} from '$lib/zod_helpers.js';
 
 /**
  * Interface for objects that can be stored in an indexed collection
  */
 export interface Indexed_Item {
-	id: Uuid;
+	id: string;
 }
 
 /**
@@ -26,7 +25,7 @@ export class Indexed_Collection<T extends Indexed_Item, K extends string = never
 	array: Array<T> = $state([]);
 
 	// The primary index by ID is always available
-	readonly by_id: SvelteMap<Uuid, T> = new SvelteMap();
+	readonly by_id: SvelteMap<string, T> = new SvelteMap();
 
 	// Additional single-value indexes (one key maps to one item)
 	readonly single_indexes: Partial<Record<K, SvelteMap<any, T>>> = {};
@@ -116,7 +115,12 @@ export class Indexed_Collection<T extends Indexed_Item, K extends string = never
 	 * Remove an item from the collection and update all indexes
 	 */
 	remove(item: T): boolean {
-		const index = this.array.indexOf(item);
+		// Find the item by ID rather than by reference
+		const stored_item = this.by_id.get(item.id);
+		if (!stored_item) return false;
+
+		// Find the index of the item in the array
+		const index = this.array.findIndex((i) => i.id === item.id);
 		if (index !== -1) {
 			this.array.splice(index, 1);
 			this.by_id.delete(item.id);
@@ -136,7 +140,11 @@ export class Indexed_Collection<T extends Indexed_Item, K extends string = never
 							}
 						}
 					} else {
-						this.single_indexes[config.key]!.delete(key);
+						// Only delete if this exact key is mapped to this exact item
+						const mapped_item = this.single_indexes[config.key]!.get(key);
+						if (mapped_item && mapped_item.id === item.id) {
+							this.single_indexes[config.key]!.delete(key);
+						}
 					}
 				}
 			}
@@ -149,7 +157,7 @@ export class Indexed_Collection<T extends Indexed_Item, K extends string = never
 	/**
 	 * Remove an item by its ID
 	 */
-	remove_by_id(id: Uuid): boolean {
+	remove_by_id(id: string): boolean {
 		const item = this.by_id.get(id);
 		if (item) {
 			return this.remove(item);
@@ -160,14 +168,14 @@ export class Indexed_Collection<T extends Indexed_Item, K extends string = never
 	/**
 	 * Get an item by its ID
 	 */
-	get(id: Uuid): T | undefined {
+	get(id: string): T | undefined {
 		return this.by_id.get(id);
 	}
 
 	/**
 	 * Check if the collection has an item with the given ID
 	 */
-	has(id: Uuid): boolean {
+	has(id: string): boolean {
 		return this.by_id.has(id);
 	}
 
