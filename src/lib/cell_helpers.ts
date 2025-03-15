@@ -4,7 +4,7 @@ import {z} from 'zod';
 export const HANDLED = Symbol('HANDLED_BY_PARSER');
 
 /** Sentinel value to explicitly indicate fallback to default decoding */
-export const USE_DEFAULT = Symbol('USE_DEFAULT_DECODING');
+export const USE_DEFAULT = Symbol('USE_DEFAULT_DECODING'); // TODO better name?
 
 // Constants for date formatting
 export const FILE_SHORT_DATE_FORMAT = 'MMM d, p';

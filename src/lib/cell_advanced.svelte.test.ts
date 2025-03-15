@@ -6,6 +6,7 @@ import {z} from 'zod';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json, type Schema_Keys} from '$lib/cell_types.js';
 import {Uuid, Datetime_Now} from '$lib/zod_helpers.js';
+import {HANDLED, USE_DEFAULT} from '$lib/cell_helpers.js';
 
 // Simple mock for Zzz
 const mock_zzz = {
@@ -652,4 +653,132 @@ test('Cell - JSON serialization excludes undefined values correctly', () => {
 	const parsed_complex = JSON.parse(serialized_complex);
 	expect(parsed_complex.detail.code).toBe('ABC');
 	expect('value' in parsed_complex.detail).toBe(false); // Undefined field should be removed from JSON
+});
+
+// Test collection handling with HANDLED sentinel value
+test('Cell properly handles collections with HANDLED sentinel', () => {
+	// Create a schema with a collection property
+	const Collection_Schema = Cell_Json.extend({
+		items: z.array(z.string()).default(() => []),
+		name: z.string().default('collection'),
+	});
+
+	class Collection_Cell extends Cell<typeof Collection_Schema> {
+		name: string = $state()!;
+		// Note: no items property - it will be handled separately
+
+		// Track items in a different property to test collection handling
+		tracked_items: Array<string> = [];
+
+		constructor(options: Cell_Options<typeof Collection_Schema>) {
+			super(Collection_Schema, options);
+
+			this.parsers = {
+				items: (value) => {
+					if (Array.isArray(value)) {
+						this.tracked_items = value.map((item) =>
+							typeof item === 'string' ? item.toUpperCase() : String(item),
+						);
+					}
+					// Signal that items is fully handled - no property assignment
+					return HANDLED;
+				},
+			};
+
+			this.init();
+		}
+
+		// Provide a way to access processed items for serialization
+		override to_json(): z.output<typeof Collection_Schema> {
+			const base = super.to_json();
+			return {
+				...base,
+				items: this.tracked_items,
+			};
+		}
+	}
+
+	const cell = new Collection_Cell({
+		zzz: mock_zzz,
+		json: {
+			id: TEST_UUID,
+			created: TEST_DATE,
+			items: ['one', 'two', 'three'],
+			name: 'test collection',
+		},
+	});
+
+	// The items should be processed by the parser and stored in tracked_items
+	expect(cell.tracked_items).toEqual(['ONE', 'TWO', 'THREE']);
+
+	// The items should be included in JSON serialization
+	expect(cell.json.items).toEqual(['ONE', 'TWO', 'THREE']);
+});
+
+// Test precedence between explicit sentinels and normal return values
+test('Cell handles sentinel values with proper precedence', () => {
+	// Create a schema with multiple properties to test precedence
+	const Precedence_Schema = Cell_Json.extend({
+		handled_prop: z.string().default('default'),
+		default_prop: z.number().default(0),
+		normal_prop: z.boolean().default(false),
+	});
+
+	class Precedence_Cell extends Cell<typeof Precedence_Schema> {
+		handled_prop: string = $state('initial'); // Initialize with schema default
+		default_prop: number = $state(-1);
+		normal_prop: boolean = $state()!;
+
+		called_parsers: Array<string> = [];
+
+		constructor(options: Cell_Options<typeof Precedence_Schema>) {
+			super(Precedence_Schema, options);
+
+			this.parsers = {
+				handled_prop: (_value) => {
+					this.called_parsers.push('handled_prop');
+					// Should short-circuit after this parser
+					// The property value will remain at its initial default value
+					return HANDLED;
+				},
+				default_prop: (_value) => {
+					this.called_parsers.push('default_prop');
+					// Should fall through to default decoding
+					return USE_DEFAULT;
+				},
+				normal_prop: (_value) => {
+					this.called_parsers.push('normal_prop');
+					// Regular value should be assigned
+					return true; // Override to always true
+				},
+			};
+
+			this.init();
+		}
+	}
+
+	const cell = new Precedence_Cell({
+		zzz: mock_zzz,
+		json: {
+			id: TEST_UUID,
+			created: TEST_DATE,
+			handled_prop: 'test',
+			default_prop: 42,
+			normal_prop: false,
+		},
+	});
+
+	// All parsers should be called
+	expect(cell.called_parsers).toContain('handled_prop');
+	expect(cell.called_parsers).toContain('default_prop');
+	expect(cell.called_parsers).toContain('normal_prop');
+
+	// handled_prop should keep its initial value since parser returned HANDLED
+	expect(cell.handled_prop).toBe('initial');
+
+	// default_prop should use the value from JSON after USE_DEFAULT
+	expect(cell.default_prop).toBe(42);
+
+	// normal_prop should get the value returned by the parser
+	expect(cell.normal_prop).toBe(true);
 });

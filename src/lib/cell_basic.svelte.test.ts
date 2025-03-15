@@ -6,6 +6,7 @@ import {z} from 'zod';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import {Uuid, Datetime_Now} from '$lib/zod_helpers.js';
+import {HANDLED, USE_DEFAULT} from '$lib/cell_helpers.js';
 
 // Simple mock for Zzz
 const mock_zzz = {
@@ -480,4 +481,210 @@ test('Cell cloning creates proper copies', () => {
 	clone.name = 'MODIFIED CLONE';
 	expect(clone.name).toBe('MODIFIED CLONE');
 	expect(original.name).toBe('ORIGINAL CELL');
+});
+
+test('Cell parsers can return USE_DEFAULT sentinel to explicitly use default decoding', () => {
+	class DefaultTest_Cell extends Cell<typeof Test_Schema> {
+		name: string = $state()!;
+		age: number | undefined = $state();
+		roles: Array<string> = $state()!;
+		active: boolean = $state()!;
+
+		constructor(options: Cell_Options<typeof Test_Schema>) {
+			super(Test_Schema, options);
+
+			this.parsers = {
+				name: (value) => {
+					// Only transform names starting with "special"
+					if (typeof value === 'string' && value.startsWith('special')) {
+						return value.toUpperCase();
+					}
+					// Explicitly use default parsing for other names
+					return USE_DEFAULT;
+				},
+			};
+
+			this.init();
+		}
+	}
+
+	const cell1 = new DefaultTest_Cell({
+		zzz: mock_zzz,
+		json: {
+			id: TEST_UUID,
+			created: TEST_DATE,
+			name: 'special name',
+			roles: [],
+		},
+	});
+
+	const cell2 = new DefaultTest_Cell({
+		zzz: mock_zzz,
+		json: {
+			id: SECOND_UUID,
+			created: TEST_DATE,
+			name: 'regular name',
+			roles: [],
+		},
+	});
+
+	// 'special name' should be uppercase
+	expect(cell1.name).toBe('SPECIAL NAME');
+
+	// 'regular name' should remain as-is through default decoding
+	expect(cell2.name).toBe('regular name');
+});
+
+test('Cell parsers use HANDLED sentinel for virtual properties', () => {
+	// Schema with both real and virtual properties
+	const Virtual_Schema = Cell_Json.extend({
+		real_prop: z.string().default('default'),
+		virtual_prop: z.number().default(42), // This property won't exist on the class
+	});
+
+	const console_error_spy = vi.spyOn(console, 'error');
+
+	class VirtualTest_Cell extends Cell<typeof Virtual_Schema> {
+		real_prop: string = $state()!;
+		// No virtual_prop property
+
+		virtual_value = 0; // Just for tracking parser behavior
+
+		constructor(options: Cell_Options<typeof Virtual_Schema>) {
+			super(Virtual_Schema, options);
+
+			this.parsers = {
+				virtual_prop: (value) => {
+					// Store value for testing
+					if (typeof value === 'number') {
+						this.virtual_value = value * 2;
+					}
+					// Return HANDLED for virtual property
+					return HANDLED;
+				},
+			};
+
+			this.init();
+		}
+	}
+
+	const cell = new VirtualTest_Cell({
+		zzz: mock_zzz,
+		json: {
+			id: TEST_UUID,
+			created: TEST_DATE,
+			real_prop: 'Hello',
+			virtual_prop: 100,
+		},
+	});
+
+	// Real property should be set
+	expect(cell.real_prop).toBe('Hello');
+
+	// Virtual property should be processed
+	expect(cell.virtual_value).toBe(200); // 100 * 2
+
+	// No error should be logged for virtual property
+	const found_error = console_error_spy.mock.calls.some((args) =>
+		args.join(' ').includes("didn't return HANDLED for virtual property"),
+	);
+	expect(found_error).toBe(false);
+
+	console_error_spy.mockRestore();
+});
+
+test("Cell logs error when virtual property parser doesn't return HANDLED", () => {
+	// Schema with virtual property
+	const BadVirtual_Schema = Cell_Json.extend({
+		real_prop: z.string().default('default'),
+		virtual_prop: z.number().default(42), // This property won't exist on the class
+	});
+
+	const console_error_spy = vi.spyOn(console, 'error');
+
+	class BadVirtualTest_Cell extends Cell<typeof BadVirtual_Schema> {
+		real_prop: string = $state()!;
+		// No virtual_prop property
+
+		constructor(options: Cell_Options<typeof BadVirtual_Schema>) {
+			super(BadVirtual_Schema, options);
+
+			this.parsers = {
+				virtual_prop: (_value) => {
+					// Incorrectly returning undefined for virtual property
+					return undefined;
+				},
+			};
+
+			this.init();
+		}
+	}
+
+	// Should work but log an error
+	const _cell = new BadVirtualTest_Cell({
+		zzz: mock_zzz,
+		json: {
+			id: TEST_UUID,
+			created: TEST_DATE,
+			real_prop: 'Hello',
+			virtual_prop: 100,
+		},
+	});
+
+	// The expected error message should have been logged
+	const error_message = `Parser for schema property "virtual_prop" in BadVirtualTest_Cell didn't return HANDLED`;
+	const found_error = console_error_spy.mock.calls.some((args) =>
+		args.join(' ').includes(error_message),
+	);
+	expect(found_error).toBe(true);
+
+	console_error_spy.mockRestore();
+});
+
+test('Cell does not allow USE_DEFAULT for virtual properties', () => {
+	// Schema with virtual property
+	const UseDefaultVirtual_Schema = Cell_Json.extend({
+		real_prop: z.string().default('default'),
+		virtual_prop: z.number().default(42), // This property won't exist on the class
+	});
+
+	const console_error_spy = vi.spyOn(console, 'error');
+
+	class UseDefaultVirtualTest_Cell extends Cell<typeof UseDefaultVirtual_Schema> {
+		real_prop: string = $state()!;
+		// No virtual_prop property
+
+		constructor(options: Cell_Options<typeof UseDefaultVirtual_Schema>) {
+			super(UseDefaultVirtual_Schema, options);
+
+			this.parsers = {
+				virtual_prop: (_value) => {
+					// Incorrectly returning USE_DEFAULT for virtual property
+					return USE_DEFAULT;
+				},
+			};
+
+			this.init();
+		}
+	}
+
+	// Should work but log an error
+	const _cell = new UseDefaultVirtualTest_Cell({
+		zzz: mock_zzz,
+		json: {
+			id: TEST_UUID,
+			created: TEST_DATE,
+			real_prop: 'Hello',
+			virtual_prop: 100,
+		},
+	});
+
+	// The expected error message should have been logged
+	const error_message = `Parser for "virtual_prop" in UseDefaultVirtualTest_Cell returned USE_DEFAULT but no property exists`;
+	const found_error = console_error_spy.mock.calls.some((args) =>
+		args.join(' ').includes(error_message),
+	);
+	expect(found_error).toBe(true);
+
+	console_error_spy.mockRestore();
 });
