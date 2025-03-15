@@ -1,10 +1,11 @@
 import {SvelteMap} from 'svelte/reactivity';
+import {Uuid} from '$lib/zod_helpers.js'; // added import
 
 /**
  * Interface for objects that can be stored in an indexed collection
  */
 export interface Indexed_Item {
-	id: string;
+	id: Uuid; // updated to use Uuid instead of string
 }
 
 /**
@@ -24,8 +25,8 @@ export class Indexed_Collection<T extends Indexed_Item, K extends string = never
 	// The main collection of items
 	array: Array<T> = $state([]);
 
-	// The primary index by ID is always available
-	readonly by_id: SvelteMap<string, T> = new SvelteMap();
+	// The primary index by ID now keyed by Uuid instead of string
+	readonly by_id: SvelteMap<Uuid, T> = new SvelteMap();
 
 	// Additional single-value indexes (one key maps to one item)
 	readonly single_indexes: Partial<Record<K, SvelteMap<any, T>>> = {};
@@ -114,7 +115,7 @@ export class Indexed_Collection<T extends Indexed_Item, K extends string = never
 	/**
 	 * Remove an item by its ID and update all indexes
 	 */
-	remove(id: string): boolean {
+	remove(id: Uuid): boolean {
 		const item = this.by_id.get(id);
 		if (!item) return false;
 
@@ -163,14 +164,14 @@ export class Indexed_Collection<T extends Indexed_Item, K extends string = never
 	/**
 	 * Get an item by its ID
 	 */
-	get(id: string): T | undefined {
+	get(id: Uuid): T | undefined {
 		return this.by_id.get(id);
 	}
 
 	/**
 	 * Check if the collection has an item with the given ID
 	 */
-	has(id: string): boolean {
+	has(id: Uuid): boolean {
 		return this.by_id.has(id);
 	}
 

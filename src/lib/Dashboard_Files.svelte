@@ -13,11 +13,7 @@
 
 <div class="h_100 flex">
 	<div class="h_100 overflow_hidden width_sm">
-		<Diskfile_Explorer
-			onselect={(file) => {
-				diskfiles.select_file(file.id);
-			}}
-		/>
+		<Diskfile_Explorer />
 	</div>
 
 	<div class="flex_1 column overflow_auto h_100">

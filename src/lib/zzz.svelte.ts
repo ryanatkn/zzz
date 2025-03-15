@@ -42,6 +42,7 @@ import {BOTS_DEFAULT} from '$lib/config_defaults.js';
 import type {Diskfile_Path, Zzz_Dir} from '$lib/diskfile_types.js';
 import {strip_end} from '@ryanatkn/belt/string.js';
 import {ZZZ_DIRNAME} from './constants.js';
+import {Url_Params} from './url_params.svelte.js';
 
 // Define standard cell classes
 export const cell_classes = {
@@ -61,6 +62,7 @@ export const cell_classes = {
 	Socket,
 	Tape,
 	Ui,
+	Url_Params,
 };
 
 // Automatically derive Cell_Registry_Map from cell_classes
@@ -107,16 +109,17 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	readonly registry: Cell_Registry;
 
 	// Cells - these are managed collections that contain the app state
-	readonly time: Time = $state()!;
-	readonly ui: Ui = $state()!;
-	readonly models: Models = $state()!;
+	readonly time: Time;
+	readonly ui: Ui;
+	readonly models: Models;
 	readonly bots: Zzz_Config['bots']; // TODO make this a Cell?
-	readonly chats: Chats = $state()!;
-	readonly providers: Providers = $state()!;
-	readonly prompts: Prompts = $state()!;
-	readonly diskfiles: Diskfiles = $state()!;
-	readonly messages: Messages = $state()!;
-	readonly socket: Socket = $state()!;
+	readonly chats: Chats;
+	readonly providers: Providers;
+	readonly prompts: Prompts;
+	readonly diskfiles: Diskfiles;
+	readonly messages: Messages;
+	readonly socket: Socket;
+	readonly url_params: Url_Params;
 
 	/**
 	 * The `zzz_dir` is the path to Zzz's primary directory on the server's filesystem.
@@ -131,7 +134,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	);
 
 	// Special property to detect self-reference
-	readonly is_zzz: boolean = $state(true);
+	readonly is_zzz: boolean = true;
 
 	// Derived values
 	tags: Set<string> = $derived.by(() => new Set(this.models.items.flatMap((m) => m.tags)));
@@ -174,6 +177,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		this.diskfiles = new Diskfiles({zzz: this});
 		this.messages = new Messages({zzz: this});
 		this.socket = new Socket({zzz: this});
+		this.url_params = new Url_Params({zzz: this});
 
 		// Set up message handlers if provided
 		if (options.onsend) {

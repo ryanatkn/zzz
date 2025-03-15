@@ -1,9 +1,7 @@
 <script lang="ts">
 	import {random_item} from '@ryanatkn/belt/random.js';
 	import {fade} from 'svelte/transition';
-	import {page} from '$app/state';
 
-	import {Uuid} from '$lib/zod_helpers.js';
 	import Chat_View from '$lib/Chat_View.svelte';
 	import Nav_Link from '$lib/Nav_Link.svelte';
 	import {GLYPH_CHAT} from '$lib/glyphs.js';
@@ -13,16 +11,6 @@
 	const zzz = zzz_context.get();
 
 	const reorderable = new Reorderable();
-
-	// Sync URL parameter with selected chat
-	$effect(() => {
-		const chat_id_param = page.url.searchParams.get('chat');
-		if (!chat_id_param) return;
-		const parsed_uuid = Uuid.safeParse(chat_id_param);
-		if (parsed_uuid.success && zzz.chats.items.by_id.has(parsed_uuid.data)) {
-			zzz.chats.select(parsed_uuid.data);
-		}
-	});
 </script>
 
 <div class="flex w_100 h_100">

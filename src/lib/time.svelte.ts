@@ -40,7 +40,7 @@ export class Time extends Cell<typeof Time_Json> {
 	 * Current time that updates on the configured interval
 	 * This is reactive and can be used in derived computations
 	 */
-	readonly now: SvelteDate = $state(new SvelteDate());
+	readonly now: SvelteDate = new SvelteDate();
 	readonly now_ms: number = $derived(this.now.getTime());
 
 	/**

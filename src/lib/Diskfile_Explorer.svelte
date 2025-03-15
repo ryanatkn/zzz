@@ -1,20 +1,17 @@
 <script lang="ts">
 	import {slide} from 'svelte/transition';
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
-	import {page} from '$app/state';
 
-	import {Uuid} from '$lib/zod_helpers.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import Diskfile_List_Item from '$lib/Diskfile_List_Item.svelte';
 	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
 	import {GLYPH_DIRECTORY} from '$lib/glyphs.js';
 
-	interface Props {
-		onselect?: (file: Diskfile) => void;
-	}
+	// interface Props {
+	// }
 
-	const {onselect}: Props = $props();
+	// const {}: Props = $props();
 
 	const zzz = zzz_context.get();
 	const {diskfiles} = zzz;
@@ -30,32 +27,6 @@
 			return a.path.localeCompare(b.path);
 		}),
 	);
-
-	// Handler for selecting a file that updates URL and internal state
-	const select_file = (file: Diskfile): void => {
-		// Update the URL with the file ID
-		const url = new URL(window.location.href);
-		url.searchParams.set('file', file.id);
-		history.pushState({}, '', url);
-
-		// Update internal state
-		diskfiles.select_file(file.id);
-		onselect?.(file);
-	};
-
-	// Sync URL parameter with selected file
-	$effect(() => {
-		const file_id_param = page.url.searchParams.get('file');
-		if (!file_id_param) return;
-		const parsed_uuid = Uuid.safeParse(file_id_param);
-		if (parsed_uuid.success && diskfiles.items.by_id.has(parsed_uuid.data)) {
-			diskfiles.select_file(parsed_uuid.data);
-			const selected_file = sorted_files.find((file) => file.id === parsed_uuid.data);
-			if (selected_file) {
-				onselect?.(selected_file);
-			}
-		}
-	});
 </script>
 
 <div class="h_100 overflow_auto scrollbar_width_thin">
@@ -72,7 +43,11 @@
 				{#each sorted_files as file (file.id)}
 					{@const selected = diskfiles.selected_file_id === file.id}
 					<li transition:slide class:selected>
-						<Diskfile_List_Item {file} {selected} onclick={select_file} />
+						<Diskfile_List_Item
+							{file}
+							{selected}
+							onclick={() => zzz.url_params.update_url('file', file.id)}
+						/>
 					</li>
 				{/each}
 			</ul>

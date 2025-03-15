@@ -19,6 +19,8 @@
 	const zzz = zzz_context.get();
 
 	// TODO BLOCK generic contextmenu entries for other components? so module scope export?
+
+	// TODO BLOCK change to links like the others, probably
 </script>
 
 <button
