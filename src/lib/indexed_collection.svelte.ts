@@ -45,6 +45,12 @@ export class Indexed_Collection<
 	// The primary index by ID now keyed by Uuid instead of string
 	readonly by_id: SvelteMap<Uuid, T> = new SvelteMap();
 
+	// Index position map for O(1) position lookups.
+	// Named `position_index` to avoid naming conflicts
+	// with the other kind of index that this class is named after.
+	// TODO Maybe `Indexed_Collection` could be `Cached_Collection` or `Cached_Cells` or `Cell_Collection`?
+	readonly position_index: SvelteMap<Uuid, number> = new SvelteMap();
+
 	// Additional single-value indexes (one key maps to one item)
 	readonly single_indexes: Partial<Record<K, SvelteMap<any, T>>> = {};
 
@@ -84,8 +90,10 @@ export class Indexed_Collection<
 	 * Add an item to the collection and update all indexes
 	 */
 	add(item: T): T {
+		const position = this.all.length;
 		this.all.push(item);
 		this.by_id.set(item.id, item);
+		this.position_index.set(item.id, position);
 
 		// Update all additional indexes
 		for (const config of this.#configs) {
@@ -110,6 +118,12 @@ export class Indexed_Collection<
 	add_first(item: T): T {
 		this.all.unshift(item);
 		this.by_id.set(item.id, item);
+		this.position_index.set(item.id, 0);
+
+		// Update positions for all existing items after the inserted one (oof for perf)
+		for (let i = 1; i < this.all.length; i++) {
+			this.position_index.set(this.all[i].id, i);
+		}
 
 		// Update all additional indexes
 		for (const config of this.#configs) {
@@ -135,46 +149,49 @@ export class Indexed_Collection<
 		const item = this.by_id.get(id);
 		if (!item) return false;
 
-		// Find the index of the item in the array
-		const index = this.all.findIndex((i) => i.id === id); // TODO consider using a map for index lookup
-		if (index !== -1) {
-			this.all.splice(index, 1);
-			this.by_id.delete(id);
+		const index = this.position_index.get(id);
+		if (index === undefined) return false;
 
-			// Update all additional indexes
-			for (const config of this.#configs) {
-				const key = config.extractor(item);
-				if (key !== undefined && key !== null) {
-					if (config.multi) {
-						const multi_index = this.multi_indexes[config.key]!;
-						const collection = multi_index.get(key);
+		this.all.splice(index, 1);
+		this.by_id.delete(id);
+		this.position_index.delete(id);
 
-						if (collection) {
-							// Filter out the removed item
-							const updated = collection.filter((i) => i.id !== id);
+		// Update positions for all items after the removed one (oof)
+		for (let i = index; i < this.all.length; i++) {
+			this.position_index.set(this.all[i].id, i);
+		}
 
-							// If no items left with this key, remove the key from the index
-							if (updated.length === 0) {
-								multi_index.delete(key);
-							} else {
-								multi_index.set(key, updated);
-							}
-						}
+		// Update all additional indexes
+		for (const config of this.#configs) {
+			const key = config.extractor(item);
+			if (key == null) continue;
+			if (config.multi) {
+				const multi_index = this.multi_indexes[config.key]!;
+				const collection = multi_index.get(key);
+
+				if (collection) {
+					// Filter out the removed item
+					const updated = collection.filter((i) => i.id !== id);
+
+					// If no items left with this key, remove the key from the index
+					if (updated.length === 0) {
+						multi_index.delete(key);
 					} else {
-						// For single-value indexes, only remove if this item is mapped to this key
-						const single_index = this.single_indexes[config.key]!;
-						const mapped_item = single_index.get(key);
-
-						if (mapped_item && mapped_item.id === id) {
-							single_index.delete(key);
-						}
+						multi_index.set(key, updated);
 					}
 				}
-			}
+			} else {
+				// For single-value indexes, only remove if this item is mapped to this key
+				const single_index = this.single_indexes[config.key]!;
+				const mapped_item = single_index.get(key);
 
-			return true;
+				if (mapped_item && mapped_item.id === id) {
+					single_index.delete(key);
+				}
+			}
 		}
-		return false;
+
+		return true;
 	}
 
 	/**
@@ -202,6 +219,14 @@ export class Indexed_Collection<
 		// Perform the reorder
 		const [item] = this.all.splice(from_index, 1);
 		this.all.splice(to_index, 0, item);
+
+		// Update position index for affected items
+		const start = Math.min(from_index, to_index);
+		const end = Math.max(from_index, to_index);
+
+		for (let i = start; i <= end; i++) {
+			this.position_index.set(this.all[i].id, i);
+		}
 	}
 
 	/**
@@ -217,6 +242,7 @@ export class Indexed_Collection<
 	clear(): void {
 		this.all.length = 0;
 		this.by_id.clear();
+		this.position_index.clear();
 
 		// Clear all additional indexes
 		for (const config of this.#configs) {
@@ -279,6 +305,7 @@ export class Indexed_Collection<
 		return items.slice(-Math.min(limit, items.length));
 	}
 
+	// TODO make this
 	/**
 	 * Find related items by a property reference
 	 *

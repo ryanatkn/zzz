@@ -127,6 +127,10 @@ test('Indexed_Collection - add method adds items and updates indexes', () => {
 		sample_items[0],
 		sample_items[1],
 	]);
+
+	// Check position index
+	expect(collection.position_index.get(uuid_1)).toBe(0);
+	expect(collection.position_index.get(uuid_2)).toBe(1);
 });
 
 test('Indexed_Collection - add multiple items with various index values', () => {
@@ -158,6 +162,10 @@ test('Indexed_Collection - add_first method adds items at the beginning', () => 
 
 	expect(collection.all[0]).toEqual(sample_items[1]);
 	expect(collection.all[1]).toEqual(sample_items[0]);
+
+	// Check that position indexes are updated correctly
+	expect(collection.position_index.get(uuid_1)).toBe(1); // moved to position 1
+	expect(collection.position_index.get(uuid_2)).toBe(0); // at position 0
 });
 
 test('Indexed_Collection - adding items returns the added item', () => {
@@ -200,12 +208,22 @@ test('Indexed_Collection - remove method removes items by id and updates indexes
 		initial_items: [sample_items[0], sample_items[1], sample_items[2]],
 	});
 
+	// Check initial position indexes
+	expect(collection.position_index.get(uuid_1)).toBe(0);
+	expect(collection.position_index.get(uuid_2)).toBe(1);
+	expect(collection.position_index.get(uuid_3)).toBe(2);
+
 	const removed = collection.remove(uuid_2);
 
 	expect(removed).toBe(true);
 	expect(collection.all.length).toBe(2);
 	expect(collection.by_id.has(uuid_2)).toBe(false);
 	expect(collection.single_indexes.name?.has('banana')).toBe(false);
+
+	// Verify position indexes were updated
+	expect(collection.position_index.has(uuid_2)).toBe(false); // removed item's position should be gone
+	expect(collection.position_index.get(uuid_1)).toBe(0); // unchanged
+	expect(collection.position_index.get(uuid_3)).toBe(1); // moved up one position
 
 	// Check that the category index was updated properly
 	const fruit_items = collection.multi_indexes.category?.get('fruit');
@@ -259,11 +277,21 @@ test('Indexed_Collection - reorder method changes item order', () => {
 		initial_items: [sample_items[0], sample_items[1], sample_items[2]],
 	});
 
+	// Check initial position indexes
+	expect(collection.position_index.get(uuid_1)).toBe(0);
+	expect(collection.position_index.get(uuid_2)).toBe(1);
+	expect(collection.position_index.get(uuid_3)).toBe(2);
+
 	collection.reorder(0, 2);
 
 	expect(collection.all[0].id).toBe(uuid_2);
 	expect(collection.all[1].id).toBe(uuid_3);
 	expect(collection.all[2].id).toBe(uuid_1);
+
+	// Verify position indexes were updated after reordering
+	expect(collection.position_index.get(uuid_1)).toBe(2); // moved to end
+	expect(collection.position_index.get(uuid_2)).toBe(0); // moved to beginning
+	expect(collection.position_index.get(uuid_3)).toBe(1); // moved to middle
 });
 
 test('Indexed_Collection - reorder does nothing when indexes are invalid or equal', () => {
@@ -324,10 +352,15 @@ test('Indexed_Collection - clear method resets the collection', () => {
 		initial_items: [sample_items[0], sample_items[1], sample_items[2]],
 	});
 
+	// Verify position indexes exist before clearing
+	expect(collection.position_index.size).toBe(3);
+	expect(collection.position_index.get(uuid_1)).toBe(0);
+
 	collection.clear();
 
 	expect(collection.all.length).toBe(0);
 	expect(collection.by_id.size).toBe(0);
+	expect(collection.position_index.size).toBe(0); // Position index should be cleared
 	expect(collection.single_indexes.name?.size).toBe(0);
 	expect(collection.multi_indexes.category?.size).toBe(0);
 });
@@ -625,4 +658,146 @@ test('Indexed_Collection - handles duplicate values in multi-indexes', () => {
 	expect(remaining_shared.length).toBe(2);
 	expect(remaining_shared[0].id).toBe(uuid_1);
 	expect(remaining_shared[1].id).toBe(uuid_3);
+});
+
+// Test position index functionality
+test('Indexed_Collection - optimized removal with position index', () => {
+	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		initial_items: [...sample_items],
+	});
+
+	// Remove an item from the middle
+	const result = collection.remove(uuid_3); // Remove 'carrot'
+
+	expect(result).toBe(true);
+	expect(collection.size).toBe(4);
+	expect(collection.all[0].name).toBe('apple');
+	expect(collection.all[1].name).toBe('banana');
+	expect(collection.all[2].name).toBe('daikon'); // Should have moved up one position
+	expect(collection.all[3].name).toBe('eggplant');
+
+	// Re-adding and removing should maintain correct indexes
+	const new_item = create_test_item(Uuid.parse(undefined), 'fig', 'fruit', ['purple']);
+	collection.add(new_item);
+	expect(collection.all[4].name).toBe('fig');
+
+	collection.remove(uuid_1); // Remove 'apple'
+	expect(collection.all[0].name).toBe('banana');
+	expect(collection.all[3].name).toBe('fig');
+});
+
+test('Indexed_Collection - position index works with reordering', () => {
+	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		initial_items: [...sample_items.slice(0, 3)], // apple, banana, carrot
+	});
+
+	// Move carrot to the beginning
+	collection.reorder(2, 0);
+
+	expect(collection.all[0].name).toBe('carrot');
+	expect(collection.all[1].name).toBe('apple');
+	expect(collection.all[2].name).toBe('banana');
+
+	// Remove the middle item
+	collection.remove(uuid_1); // Remove 'apple'
+
+	// Should maintain correct order
+	expect(collection.all[0].name).toBe('carrot');
+	expect(collection.all[1].name).toBe('banana');
+});
+
+test('Indexed_Collection - position index works with add_first', () => {
+	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		initial_items: [...sample_items.slice(0, 2)], // apple, banana
+	});
+
+	// Add carrot to the beginning
+	collection.add_first(sample_items[2]); // carrot
+
+	expect(collection.all[0].name).toBe('carrot');
+	expect(collection.all[1].name).toBe('apple');
+	expect(collection.all[2].name).toBe('banana');
+
+	// Remove the middle item
+	collection.remove(uuid_1); // Remove 'apple'
+
+	// Should maintain correct order
+	expect(collection.all[0].name).toBe('carrot');
+	expect(collection.all[1].name).toBe('banana');
+});
+
+// Test handling multiple add/remove operations
+test('Indexed_Collection - maintains position indexes after multiple operations', () => {
+	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection();
+
+	// Add three items
+	collection.add(sample_items[0]); // apple at index 0
+	collection.add(sample_items[1]); // banana at index 1
+	collection.add(sample_items[2]); // carrot at index 2
+
+	// Verify initial indexes
+	expect(collection.position_index.get(uuid_1)).toBe(0);
+	expect(collection.position_index.get(uuid_2)).toBe(1);
+	expect(collection.position_index.get(uuid_3)).toBe(2);
+
+	// Remove the middle item
+	collection.remove(uuid_2);
+
+	// Verify indexes after removal
+	expect(collection.position_index.get(uuid_1)).toBe(0);
+	expect(collection.position_index.has(uuid_2)).toBe(false);
+	expect(collection.position_index.get(uuid_3)).toBe(1); // moved up
+
+	// Add another item
+	collection.add(sample_items[3]); // daikon at index 2
+
+	// Verify indexes after add
+	expect(collection.position_index.get(uuid_1)).toBe(0);
+	expect(collection.position_index.get(uuid_3)).toBe(1);
+	expect(collection.position_index.get(uuid_4)).toBe(2);
+
+	// Add an item at the beginning
+	collection.add_first(sample_items[4]); // eggplant at index 0, shifting all others
+
+	// Verify indexes after add_first
+	expect(collection.position_index.get(uuid_5)).toBe(0);
+	expect(collection.position_index.get(uuid_1)).toBe(1); // shifted
+	expect(collection.position_index.get(uuid_3)).toBe(2); // shifted
+	expect(collection.position_index.get(uuid_4)).toBe(3); // shifted
+
+	// Reorder (move eggplant to the middle)
+	collection.reorder(0, 2);
+
+	// Verify indexes after reorder
+	expect(collection.position_index.get(uuid_1)).toBe(0); // moved up
+	expect(collection.position_index.get(uuid_3)).toBe(1); // moved up
+	expect(collection.position_index.get(uuid_5)).toBe(2); // moved to middle
+	expect(collection.position_index.get(uuid_4)).toBe(3); // unchanged
+
+	// Check array order matches position indexes
+	for (let i = 0; i < collection.all.length; i++) {
+		const id = collection.all[i].id;
+		expect(collection.position_index.get(id)).toBe(i);
+	}
+});
+
+// Add a test specifically for position index lookup consistency
+test('Indexed_Collection - position index always matches actual array positions', () => {
+	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		initial_items: sample_items,
+	});
+
+	// Perform a series of operations
+	collection.remove(uuid_2); // Remove banana
+	collection.add_first(create_test_item(uuid_99, 'fig', 'fruit', []));
+	collection.reorder(1, 3); // Move apple to position 3
+
+	// Check that position index matches actual array positions for all items
+	for (let i = 0; i < collection.all.length; i++) {
+		const id = collection.all[i].id;
+		expect(collection.position_index.get(id)).toBe(i);
+	}
+
+	// And verify no orphaned entries in position_index
+	expect(collection.position_index.size).toBe(collection.all.length);
 });
