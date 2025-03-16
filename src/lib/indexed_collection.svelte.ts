@@ -40,22 +40,26 @@ export class Indexed_Collection<
 	V extends Index_Value_Types<K> = Record<K, any>,
 > {
 	// The main collection of items
-	all: Array<T> = $state([]); // TODO BLOCK look at all usage of this for indexing opportunities (needs new features to handle some cases)
+	all: Array<T> = $state([]);
 
-	// The primary index by ID now keyed by Uuid instead of string
+	// The primary index by ID keyed by Uuid
 	readonly by_id: SvelteMap<Uuid, T> = new SvelteMap();
 
-	// Index position map for O(1) position lookups.
-	// Named `position_index` to avoid naming conflicts
-	// with the other kind of index that this class is named after.
-	// TODO Maybe `Indexed_Collection` could be `Cached_Collection` or `Cached_Cells` or `Cell_Collection`?
+	// Direct position index lookup for O(1) array position access - integer based
 	readonly position_index: SvelteMap<Uuid, number> = new SvelteMap();
+
+	// Fractional order index for stable ordering with minimum updates
+	readonly fractional_index: SvelteMap<Uuid, number> = new SvelteMap();
 
 	// Additional single-value indexes (one key maps to one item)
 	readonly single_indexes: Partial<Record<K, SvelteMap<any, T>>> = {};
 
 	// Additional multi-value indexes (one key maps to many items)
 	readonly multi_indexes: Partial<Record<K, SvelteMap<any, Array<T>>>> = {};
+
+	// Fractional index constants
+	readonly #POSITION_STEP = 1000.0; // Standard step for normal indexing
+	readonly #REBALANCE_THRESHOLD = 1.0; // When positions get this close, rebalance
 
 	#configs: Array<Index_Config<T, K, any>> = [];
 
@@ -87,13 +91,99 @@ export class Indexed_Collection<
 	}
 
 	/**
+	 * Get a fractional position value between two existing positions.
+	 */
+	#get_fractional_position(before_position?: number, after_position?: number): number {
+		// If no positions provided, use a standard step
+		if (before_position === undefined && after_position === undefined) {
+			return this.#POSITION_STEP;
+		}
+
+		// If only after position exists, place before it
+		if (before_position === undefined && after_position !== undefined) {
+			return after_position - this.#POSITION_STEP;
+		}
+
+		// If only before position exists, place after it
+		if (before_position !== undefined && after_position === undefined) {
+			return before_position + this.#POSITION_STEP;
+		}
+
+		// Get midpoint between positions
+		return (before_position! + after_position!) / 2;
+	}
+
+	/**
+	 * Check if fractional index needs rebalancing and perform if necessary
+	 */
+	#check_rebalance_fractional_positions(): void {
+		if (this.all.length < 2) return;
+
+		// Check if rebalance is needed by looking at adjacent positions
+		let needs_rebalance = false;
+
+		// Sort all items by their fractional positions
+		const sorted_items = [...this.all].sort((a, b) => {
+			const pos_a = this.fractional_index.get(a.id) || 0;
+			const pos_b = this.fractional_index.get(b.id) || 0;
+			return pos_a - pos_b;
+		});
+
+		// Check if any adjacent positions are too close
+		for (let i = 1; i < sorted_items.length; i++) {
+			const prev_pos = this.fractional_index.get(sorted_items[i - 1].id);
+			const curr_pos = this.fractional_index.get(sorted_items[i].id);
+
+			if (prev_pos !== undefined && curr_pos !== undefined) {
+				const diff = curr_pos - prev_pos;
+				if (diff < this.#REBALANCE_THRESHOLD) {
+					needs_rebalance = true;
+					break;
+				}
+			}
+		}
+
+		if (needs_rebalance) {
+			// Rebalance by reassigning evenly spaced positions
+			for (let i = 0; i < sorted_items.length; i++) {
+				this.fractional_index.set(sorted_items[i].id, (i + 1) * this.#POSITION_STEP);
+			}
+		}
+	}
+
+	/**
+	 * Update position_index to match array positions
+	 */
+	#update_position_indexes(start_index: number = 0): void {
+		for (let i = start_index; i < this.all.length; i++) {
+			this.position_index.set(this.all[i].id, i);
+		}
+	}
+
+	/**
 	 * Add an item to the collection and update all indexes
 	 */
 	add(item: T): T {
+		// Add to the end of the array
 		const position = this.all.length;
 		this.all.push(item);
 		this.by_id.set(item.id, item);
+
+		// Position index always reflects the actual array index
 		this.position_index.set(item.id, position);
+
+		// Calculate fractional position for stable ordering
+		// If this is the first item, use the standard step; otherwise
+		// place it after the last item
+		const frac_position =
+			this.all.length > 1
+				? this.#get_fractional_position(
+						this.fractional_index.get(this.all[this.all.length - 2].id),
+						undefined,
+					)
+				: this.#POSITION_STEP;
+
+		this.fractional_index.set(item.id, frac_position);
 
 		// Update all additional indexes
 		for (const config of this.#configs) {
@@ -116,14 +206,23 @@ export class Indexed_Collection<
 	 * Add an item to the beginning of the collection
 	 */
 	add_first(item: T): T {
+		// Add to beginning of array
 		this.all.unshift(item);
 		this.by_id.set(item.id, item);
-		this.position_index.set(item.id, 0);
 
-		// Update positions for all existing items after the inserted one (oof for perf)
-		for (let i = 1; i < this.all.length; i++) {
-			this.position_index.set(this.all[i].id, i);
-		}
+		// Position index MUST be updated for all items to reflect actual array positions
+		this.#update_position_indexes(0);
+
+		// Calculate fractional position - before the first item (if any exist) or use default
+		const frac_position =
+			this.all.length > 1
+				? this.#get_fractional_position(undefined, this.fractional_index.get(this.all[1].id))
+				: this.#POSITION_STEP;
+
+		this.fractional_index.set(item.id, frac_position);
+
+		// Check if we need to rebalance fractional positions
+		this.#check_rebalance_fractional_positions();
 
 		// Update all additional indexes
 		for (const config of this.#configs) {
@@ -132,6 +231,86 @@ export class Indexed_Collection<
 				if (config.multi) {
 					const collection = this.multi_indexes[config.key]!.get(key) || [];
 					collection.unshift(item);
+					this.multi_indexes[config.key]!.set(key, collection);
+				} else {
+					this.single_indexes[config.key]!.set(key, item);
+				}
+			}
+		}
+
+		return item;
+	}
+
+	/**
+	 * Insert an item at a specific position with optimal index updates
+	 */
+	insert_at(item: T, index: number): T {
+		if (index < 0 || index > this.all.length) {
+			throw new Error(
+				`Insert index ${index} out of bounds for collection of size ${this.all.length}`,
+			);
+		}
+
+		if (index === 0) {
+			return this.add_first(item);
+		}
+
+		if (index === this.all.length) {
+			return this.add(item);
+		}
+
+		// Insert into array
+		this.all.splice(index, 0, item);
+		this.by_id.set(item.id, item);
+
+		// Update position indexes for affected items - MUST reflect array positions
+		this.#update_position_indexes(index);
+
+		// Calculate fractional position between surrounding items
+		let frac_position: number;
+
+		if (index === 0) {
+			// First position - place before the next item
+			frac_position =
+				this.all.length > 1
+					? this.#get_fractional_position(undefined, this.fractional_index.get(this.all[1].id))
+					: this.#POSITION_STEP;
+		} else if (index === this.all.length - 1) {
+			// Last position - place after the previous item
+			frac_position = this.#get_fractional_position(
+				this.fractional_index.get(this.all[index - 1].id),
+				undefined,
+			);
+		} else {
+			// Middle position - place between surrounding items
+			frac_position = this.#get_fractional_position(
+				this.fractional_index.get(this.all[index - 1].id),
+				this.fractional_index.get(this.all[index + 1].id),
+			);
+		}
+
+		this.fractional_index.set(item.id, frac_position);
+
+		// Check if rebalance needed
+		this.#check_rebalance_fractional_positions();
+
+		// Update all additional indexes
+		for (const config of this.#configs) {
+			const key = config.extractor(item);
+			if (key !== undefined && key !== null) {
+				if (config.multi) {
+					const collection = this.multi_indexes[config.key]!.get(key) || [];
+					// Find the right position in the collection based on array position
+					const insert_index = collection.findIndex(
+						(existing) => this.position_index.get(existing.id)! > index,
+					);
+
+					if (insert_index === -1) {
+						collection.push(item);
+					} else {
+						collection.splice(insert_index, 0, item);
+					}
+
 					this.multi_indexes[config.key]!.set(key, collection);
 				} else {
 					this.single_indexes[config.key]!.set(key, item);
@@ -152,14 +331,14 @@ export class Indexed_Collection<
 		const index = this.position_index.get(id);
 		if (index === undefined) return false;
 
+		// Remove from array
 		this.all.splice(index, 1);
 		this.by_id.delete(id);
 		this.position_index.delete(id);
+		this.fractional_index.delete(id);
 
-		// Update positions for all items after the removed one (oof)
-		for (let i = index; i < this.all.length; i++) {
-			this.position_index.set(this.all[i].id, i);
-		}
+		// Update position indexes for all subsequent items
+		this.#update_position_indexes(index);
 
 		// Update all additional indexes
 		for (const config of this.#configs) {
@@ -209,6 +388,24 @@ export class Indexed_Collection<
 	}
 
 	/**
+	 * Get the array index of an item by its ID
+	 */
+	index_of(id: Uuid): number | undefined {
+		return this.position_index.get(id);
+	}
+
+	/**
+	 * Get items sorted by their fractional index
+	 */
+	get_ordered_items(): Array<T> {
+		return [...this.all].sort((a, b) => {
+			const pos_a = this.fractional_index.get(a.id) || 0;
+			const pos_b = this.fractional_index.get(b.id) || 0;
+			return pos_a - pos_b;
+		});
+	}
+
+	/**
 	 * Reorder items in the collection
 	 */
 	reorder(from_index: number, to_index: number): void {
@@ -216,17 +413,49 @@ export class Indexed_Collection<
 		if (from_index < 0 || to_index < 0) return;
 		if (from_index >= this.all.length || to_index >= this.all.length) return;
 
-		// Perform the reorder
-		const [item] = this.all.splice(from_index, 1);
+		// Get the item to move
+		const item = this.all[from_index];
+
+		// Remove from array and reinsert at new position
+		this.all.splice(from_index, 1);
 		this.all.splice(to_index, 0, item);
 
-		// Update position index for affected items
-		const start = Math.min(from_index, to_index);
-		const end = Math.max(from_index, to_index);
+		// Update position indexes for affected items
+		const start_index = Math.min(from_index, to_index);
+		const end_index = Math.max(from_index, to_index);
 
-		for (let i = start; i <= end; i++) {
+		for (let i = start_index; i <= end_index; i++) {
 			this.position_index.set(this.all[i].id, i);
 		}
+
+		// Calculate new fractional position for the moved item
+		let new_frac_position: number;
+
+		if (to_index === 0) {
+			// Moving to start
+			new_frac_position = this.#get_fractional_position(
+				undefined,
+				this.fractional_index.get(this.all[1]?.id),
+			);
+		} else if (to_index === this.all.length - 1) {
+			// Moving to end
+			new_frac_position = this.#get_fractional_position(
+				this.fractional_index.get(this.all[to_index - 1]?.id),
+				undefined,
+			);
+		} else {
+			// Moving to middle
+			new_frac_position = this.#get_fractional_position(
+				this.fractional_index.get(this.all[to_index - 1]?.id),
+				this.fractional_index.get(this.all[to_index + 1]?.id),
+			);
+		}
+
+		// Update fractional position
+		this.fractional_index.set(item.id, new_frac_position);
+
+		// Check if rebalance needed
+		this.#check_rebalance_fractional_positions();
 	}
 
 	/**
@@ -243,6 +472,7 @@ export class Indexed_Collection<
 		this.all.length = 0;
 		this.by_id.clear();
 		this.position_index.clear();
+		this.fractional_index.clear();
 
 		// Clear all additional indexes
 		for (const config of this.#configs) {

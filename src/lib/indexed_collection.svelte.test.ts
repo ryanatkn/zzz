@@ -456,7 +456,7 @@ test('Indexed_Collection - handles large number of items efficiently', () => {
 
 	const many_items: Array<Test_Item> = [];
 	for (let i = 0; i < 1000; i++) {
-		const id = Uuid.parse(`00000000-0000-0000-0000-${i.toString().padStart(12, '0')}`);
+		const id = `00000000-0000-0000-0000-${i.toString().padStart(12, '0')}` as Uuid;
 		const category = i % 10 === 0 ? 'special' : 'normal';
 		many_items.push(create_test_item(id, `item${i}`, category, []));
 	}
@@ -800,4 +800,114 @@ test('Indexed_Collection - position index always matches actual array positions'
 
 	// And verify no orphaned entries in position_index
 	expect(collection.position_index.size).toBe(collection.all.length);
+});
+
+// Test fractional indexing functionality
+test('Indexed_Collection - fractional indexing allows efficient insertions', () => {
+	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection();
+
+	// Add initial items
+	collection.add(sample_items[0]); // apple
+	collection.add(sample_items[1]); // banana
+
+	// Store initial fractional positions
+	const frac_apple_initial = collection.fractional_index.get(uuid_1);
+	const frac_banana_initial = collection.fractional_index.get(uuid_2);
+
+	// Add item at beginning
+	collection.add_first(sample_items[2]); // carrot at start
+
+	// Position indexes SHOULD change because array positions changed
+	expect(collection.position_index.get(uuid_1)).toBe(1); // apple moved to index 1
+	expect(collection.position_index.get(uuid_2)).toBe(2); // banana moved to index 2
+	expect(collection.position_index.get(uuid_3)).toBe(0); // carrot added at index 0
+
+	// But fractional positions of existing items should NOT have changed
+	expect(collection.fractional_index.get(uuid_1)).toBe(frac_apple_initial);
+	expect(collection.fractional_index.get(uuid_2)).toBe(frac_banana_initial);
+
+	// New item's fractional position should be before first item
+	expect(collection.fractional_index.get(uuid_3)).toBeLessThan(frac_apple_initial!);
+
+	// Verify get_ordered_items returns items in the correct order by fractional position
+	const ordered_items = collection.get_ordered_items();
+	expect(ordered_items[0].name).toBe('carrot');
+	expect(ordered_items[1].name).toBe('apple');
+	expect(ordered_items[2].name).toBe('banana');
+});
+
+test('Indexed_Collection - position rebalancing occurs when needed', () => {
+	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection();
+	collection.add(sample_items[0]); // apple
+
+	// Add several items to force positions close together
+	for (let i = 0; i < 10; i++) {
+		// Use a proper UUID format
+		const id = `00000000-0000-0000-0000-${i.toString().padStart(12, '0')}` as Uuid;
+		const item = create_test_item(id, `item${i}`, 'test', []);
+		collection.add_first(item);
+	}
+
+	// Manually set fractional positions very close together to force rebalancing
+	const items = [...collection.all];
+	let current_pos = 10.0;
+	const small_gap = 0.01; // Small gap to trigger rebalancing
+
+	// Set decreasing positions with small gaps
+	for (let i = 0; i < items.length; i++) {
+		collection.fractional_index.set(items[i].id, current_pos);
+		current_pos -= small_gap;
+	}
+
+	// Trigger rebalance by inserting a new item
+	const trigger_item = create_test_item(
+		'00000000-0000-0000-0000-000000000099' as Uuid,
+		'trigger',
+		'test',
+		[],
+	);
+	collection.add_first(trigger_item);
+
+	// After rebalancing, positions should have larger gaps
+	const ordered_items = collection.get_ordered_items();
+	for (let i = 1; i < ordered_items.length; i++) {
+		const prev_pos = collection.fractional_index.get(ordered_items[i - 1].id)!;
+		const curr_pos = collection.fractional_index.get(ordered_items[i].id)!;
+		const gap = Math.abs(curr_pos - prev_pos);
+		expect(gap).toBeGreaterThan(small_gap);
+	}
+});
+
+test('Indexed_Collection - fractional indexing preserves order with many operations', () => {
+	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		initial_items: sample_items.slice(0, 3), // apple, banana, carrot
+	});
+
+	// Perform a specific series of operations
+	collection.add_first(sample_items[3]); // Add daikon at beginning
+	// Now: daikon, apple, banana, carrot
+
+	collection.reorder(0, 2); // Move daikon to position 2
+	// Now: apple, banana, daikon, carrot
+
+	collection.add(sample_items[4]); // Add eggplant at end
+	// Now: apple, banana, daikon, carrot, eggplant
+
+	collection.reorder(4, 1); // Move eggplant from position 4 to position 1
+	// Now: apple, eggplant, banana, daikon, carrot
+
+	// Expected order after all operations
+	const expected_order = ['apple', 'eggplant', 'banana', 'daikon', 'carrot'];
+	const actual_order = collection.all.map((item) => item.name);
+
+	expect(actual_order).toEqual(expected_order);
+
+	// Position indexes should correctly reflect array positions
+	for (let i = 0; i < collection.all.length; i++) {
+		expect(collection.position_index.get(collection.all[i].id)).toBe(i);
+	}
+
+	// Fractional ordering should also produce the same sequence
+	const sorted_by_fraction = collection.get_ordered_items().map((item) => item.name);
+	expect(sorted_by_fraction).toEqual(expected_order);
 });
