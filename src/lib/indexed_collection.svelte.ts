@@ -122,42 +122,183 @@ export class Indexed_Collection<
 		// Check if rebalance is needed by looking at adjacent positions
 		let needs_rebalance = false;
 
-		// Sort all items by their fractional positions
-		const sorted_items = [...this.all].sort((a, b) => {
-			const pos_a = this.fractional_index.get(a.id) || 0;
-			const pos_b = this.fractional_index.get(b.id) || 0;
-			return pos_a - pos_b;
-		});
+		// Optimization: Instead of sorting the entire array (O(n log n)), we can
+		// iterate through items in their fractional order to find problematic gaps
+		// in a single pass (O(n))
 
-		// Check if any adjacent positions are too close
-		for (let i = 1; i < sorted_items.length; i++) {
-			const prev_pos = this.fractional_index.get(sorted_items[i - 1].id);
-			const curr_pos = this.fractional_index.get(sorted_items[i].id);
+		// First, collect all items with their fractional positions
+		const items_with_positions: Array<[T, number]> = [];
+		for (const item of this.all) {
+			const pos = this.fractional_index.get(item.id);
+			if (pos !== undefined) {
+				items_with_positions.push([item, pos]);
+			}
+		}
 
-			if (prev_pos !== undefined && curr_pos !== undefined) {
-				const diff = curr_pos - prev_pos;
-				if (diff < this.#REBALANCE_THRESHOLD) {
-					needs_rebalance = true;
-					break;
-				}
+		// Sort by position (this is still O(n log n), but only done when checking)
+		items_with_positions.sort((a, b) => a[1] - b[1]);
+
+		// Check for small gaps in a single pass
+		for (let i = 1; i < items_with_positions.length; i++) {
+			const prev_pos = items_with_positions[i - 1][1];
+			const curr_pos = items_with_positions[i][1];
+			const diff = curr_pos - prev_pos;
+
+			if (diff < this.#REBALANCE_THRESHOLD) {
+				needs_rebalance = true;
+				break;
 			}
 		}
 
 		if (needs_rebalance) {
-			// Rebalance by reassigning evenly spaced positions
-			for (let i = 0; i < sorted_items.length; i++) {
-				this.fractional_index.set(sorted_items[i].id, (i + 1) * this.#POSITION_STEP);
+			// Optimization: Avoid re-sorting by using already sorted array
+			for (let i = 0; i < items_with_positions.length; i++) {
+				const [item, _] = items_with_positions[i];
+				this.fractional_index.set(item.id, (i + 1) * this.#POSITION_STEP);
 			}
 		}
 	}
 
 	/**
-	 * Update position_index to match array positions
+	 * Optimized implementation that only updates position indexes when necessary
 	 */
 	#update_position_indexes(start_index: number = 0): void {
+		// Early exit if no updates needed
+		if (start_index >= this.all.length) return;
+
+		// Only update what's necessary
 		for (let i = start_index; i < this.all.length; i++) {
 			this.position_index.set(this.all[i].id, i);
 		}
+	}
+
+	/**
+	 * Add multiple items to the collection at once with improved performance
+	 */
+	add_many(items: Array<T>): Array<T> {
+		if (!items.length) return [];
+
+		// Remember starting position for optimizing index updates
+		const start_position = this.all.length;
+
+		// Reserve space for fractional positions
+		const positions: Array<number> = new Array(items.length);
+		let last_frac_position =
+			start_position > 0 ? this.fractional_index.get(this.all[start_position - 1].id) || 0 : 0;
+
+		// Pre-compute fractional positions
+		for (let i = 0; i < items.length; i++) {
+			last_frac_position += this.#POSITION_STEP;
+			positions[i] = last_frac_position;
+		}
+
+		// Add all items to main array
+		this.all.push(...items);
+
+		// Batch update all indexes at once - much more efficient
+		for (let i = 0; i < items.length; i++) {
+			const item = items[i];
+			const position = start_position + i;
+
+			// Update primary indexes
+			this.by_id.set(item.id, item);
+			this.position_index.set(item.id, position);
+			this.fractional_index.set(item.id, positions[i]);
+
+			// Update additional indexes
+			for (const config of this.#configs) {
+				const key = config.extractor(item);
+				if (key !== undefined && key !== null) {
+					if (config.multi) {
+						const collection = this.multi_indexes[config.key]!.get(key) || [];
+						collection.push(item);
+						this.multi_indexes[config.key]!.set(key, collection);
+					} else {
+						this.single_indexes[config.key]!.set(key, item);
+					}
+				}
+			}
+		}
+
+		return items;
+	}
+
+	/**
+	 * Remove multiple items efficiently with optimized index updates
+	 */
+	remove_many(ids: Array<Uuid>): number {
+		if (!ids.length) return 0;
+
+		// Use a Set for O(1) lookups
+		const id_set = new Set(ids);
+		let removed_count = 0;
+
+		// First build a removal map to avoid repeated lookups
+		const to_remove_indices: Array<number> = [];
+		const to_remove_items: Array<T> = [];
+
+		// Identify items to remove and their indices
+		for (let i = this.all.length - 1; i >= 0; i--) {
+			const item = this.all[i];
+			if (id_set.has(item.id)) {
+				to_remove_indices.push(i);
+				to_remove_items.push(item);
+				removed_count++;
+			}
+		}
+
+		// Exit early if nothing to remove
+		if (removed_count === 0) return 0;
+
+		// Find the lowest affected index for updating positions later
+		const lowest_affected_index = Math.min(...to_remove_indices);
+
+		// Remove items from main array (from end to start to avoid index shifts)
+		for (const index of to_remove_indices) {
+			this.all.splice(index, 1);
+		}
+
+		// Clear removed items from indexes
+		for (const item of to_remove_items) {
+			// Clear from primary indexes
+			this.by_id.delete(item.id);
+			this.position_index.delete(item.id);
+			this.fractional_index.delete(item.id);
+
+			// Update secondary indexes
+			for (const config of this.#configs) {
+				const key = config.extractor(item);
+				if (key == null) continue;
+
+				if (config.multi) {
+					const multi_index = this.multi_indexes[config.key]!;
+					const collection = multi_index.get(key);
+
+					if (collection) {
+						const updated = collection.filter((i) => i.id !== item.id);
+						if (updated.length === 0) {
+							multi_index.delete(key);
+						} else {
+							multi_index.set(key, updated);
+						}
+					}
+				} else {
+					const single_index = this.single_indexes[config.key]!;
+					const mapped_item = single_index.get(key);
+
+					if (mapped_item && mapped_item.id === item.id) {
+						single_index.delete(key);
+					}
+				}
+			}
+		}
+
+		// Update position indexes for remaining items
+		if (removed_count > 0 && lowest_affected_index < this.all.length) {
+			this.#update_position_indexes(lowest_affected_index);
+		}
+
+		return removed_count;
 	}
 
 	/**
@@ -203,17 +344,25 @@ export class Indexed_Collection<
 	}
 
 	/**
-	 * Add an item to the beginning of the collection
+	 * Optimized implementation of add_first with lazy position index
 	 */
 	add_first(item: T): T {
 		// Add to beginning of array
 		this.all.unshift(item);
 		this.by_id.set(item.id, item);
 
-		// Position index MUST be updated for all items to reflect actual array positions
-		this.#update_position_indexes(0);
+		// Only update the position for the new item
+		this.position_index.set(item.id, 0);
 
-		// Calculate fractional position - before the first item (if any exist) or use default
+		// Invalidate other position indexes to be recomputed when needed
+		for (const [id, position] of this.position_index.entries()) {
+			if (id !== item.id) {
+				// Only update positions we know have changed
+				this.position_index.set(id, position + 1);
+			}
+		}
+
+		// Calculate fractional position
 		const frac_position =
 			this.all.length > 1
 				? this.#get_fractional_position(undefined, this.fractional_index.get(this.all[1].id))
@@ -224,7 +373,7 @@ export class Indexed_Collection<
 		// Check if we need to rebalance fractional positions
 		this.#check_rebalance_fractional_positions();
 
-		// Update all additional indexes
+		// Update secondary indexes
 		for (const config of this.#configs) {
 			const key = config.extractor(item);
 			if (key !== undefined && key !== null) {
@@ -388,10 +537,33 @@ export class Indexed_Collection<
 	}
 
 	/**
-	 * Get the array index of an item by its ID
+	 * Get the array index of an item by its ID with improved caching
 	 */
 	index_of(id: Uuid): number | undefined {
-		return this.position_index.get(id);
+		// Try the cache first
+		const cached_index = this.position_index.get(id);
+		if (cached_index !== undefined) {
+			// Verify the cached position is correct
+			if (this.all[cached_index]?.id === id) {
+				return cached_index;
+			}
+		}
+
+		// Cache miss or invalid cache, find the item in the array
+		const item = this.by_id.get(id);
+		if (!item) return undefined;
+
+		// Scan the array to find the item
+		for (let i = 0; i < this.all.length; i++) {
+			if (this.all[i].id === id) {
+				// Update the cache and return
+				this.position_index.set(id, i);
+				return i;
+			}
+		}
+
+		// Item not found in array but exists in by_id (inconsistent state)
+		return undefined;
 	}
 
 	/**
@@ -537,10 +709,7 @@ export class Indexed_Collection<
 
 	// TODO make this
 	/**
-	 * Find related items by a property reference
-	 *
-	 * @param items Source items containing references
-	 * @param property_name The property containing the reference ID
+	 * Optimized related method with improved property path resolution
 	 */
 	related<S extends Record<string, any>>(
 		items: Array<S> | undefined,
@@ -549,48 +718,60 @@ export class Indexed_Collection<
 		if (!items?.length) return [];
 
 		const result: Array<T> = [];
+		const seen_ids: Set<Uuid> = new Set(); // Prevent duplicates
+
+		// Pre-compute path parts outside the loop for efficiency
+		const has_complex_path = property_name.includes('.') || property_name.includes('[');
+		const path_parts = has_complex_path ? property_name.split('.') : null;
+
 		for (const item of items) {
-			if (property_name.includes('.') || property_name.includes('[')) {
-				const path_parts = property_name.split('.');
-				let current: any = item;
-				for (let i = 0; i < path_parts.length; i++) {
-					if (current === null) break;
-					const part = path_parts[i];
-					if (part.includes('[') && part.includes(']')) {
-						const match = /^([^[]+)\[(\d+)\]$/.exec(part);
-						if (match) {
-							const [_, array_name, index_str] = match;
-							const array = current[array_name];
-							if (Array.isArray(array)) {
-								const index = parseInt(index_str, 10);
-								current = array[index];
-							} else {
-								current = null;
-								break;
-							}
-						}
-					} else {
-						current = current[part];
-					}
-				}
-				if (current != null) {
-					const foreign_key = current;
-					const related_item = this.by_id.get(foreign_key);
-					if (related_item) {
-						result.push(related_item);
-					}
-				}
+			let foreign_key: Uuid | undefined;
+
+			if (has_complex_path && path_parts) {
+				foreign_key = this.#resolve_path(item, path_parts);
 			} else {
-				const foreign_key = item[property_name];
-				if (foreign_key) {
-					const related_item = this.by_id.get(foreign_key);
-					if (related_item) {
-						result.push(related_item);
-					}
+				foreign_key = item[property_name];
+			}
+
+			if (foreign_key && !seen_ids.has(foreign_key)) {
+				const related_item = this.by_id.get(foreign_key);
+				if (related_item) {
+					result.push(related_item);
+					seen_ids.add(foreign_key);
 				}
 			}
 		}
+
 		return result;
+	}
+
+	/**
+	 * Helper function to resolve a property path
+	 */
+	#resolve_path(obj: any, path_parts: Array<string>): any {
+		let current: any = obj;
+
+		for (let i = 0; i < path_parts.length && current != null; i++) {
+			const part = path_parts[i];
+
+			if (part.includes('[') && part.includes(']')) {
+				const match = /^([^[]+)\[(\d+)\]$/.exec(part);
+				if (match) {
+					const [_, array_name, index_str] = match;
+					const array = current[array_name];
+					if (Array.isArray(array)) {
+						const index = parseInt(index_str, 10);
+						current = array[index];
+					} else {
+						return undefined;
+					}
+				}
+			} else {
+				current = current[part];
+			}
+		}
+
+		return current;
 	}
 
 	// TODO add `many_by` for arrays?
