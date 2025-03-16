@@ -29,17 +29,30 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 	readonly items: Indexed_Collection<Prompt> = new Indexed_Collection({
 		indexes: [
 			{
-				key: 'by_selection_status',
-				type: Index_Type.MULTI,
-				// This extractor creates categories for filtering
-				extractor: () => 'all', // All prompts go into a single index for now
+				key: 'by_name',
+				type: Index_Type.SINGLE,
+				extractor: (prompt) => prompt.name,
 			},
 			{
-				key: 'unselected_prompts',
+				key: 'recent_prompts',
 				type: Index_Type.DERIVED,
-				compute: (collection) => collection.all,
-				// This is just a placeholder - in a real implementation, this would be
-				// dynamically filtered based on the selected chat's prompts
+				compute: (collection) => {
+					// Sort by creation date (newest first)
+					return [...collection.all].sort(
+						(a, b) => new Date(b.created).getTime() - new Date(a.created).getTime(),
+					);
+				},
+				on_add: (items, item) => {
+					// Insert at the right position based on creation date
+					const index = items.findIndex(
+						(existing) => new Date(item.created).getTime() > new Date(existing.created).getTime(),
+					);
+					if (index === -1) {
+						items.push(item);
+					} else {
+						items.splice(index, 0, item);
+					}
+				},
 			},
 		],
 	});
@@ -68,14 +81,21 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 	}
 
 	/**
-	 * Get unselected prompts for a specific chat
-	 * This enables efficient filtering similar to what was done in Prompt_List.svelte
+	 * Filter prompts that aren't in the given selected IDs list
+	 * This is more efficient than keeping a derived index since the selection
+	 * is dynamic based on the current chat
 	 */
-	get_unselected_prompts_for_chat(selected_prompt_ids: Array<Uuid>): Array<Prompt> {
-		// Use the multi-index to get all prompts, then filter out those that are in the selected list
-		return this.items
-			.where('by_selection_status', 'all')
-			.filter((prompt) => !selected_prompt_ids.some((id) => id === prompt.id));
+	filter_unselected_prompts(selected_prompt_ids: Array<Uuid>): Array<Prompt> {
+		// If no IDs provided, return all prompts
+		if (!selected_prompt_ids.length) {
+			return this.items.all;
+		}
+
+		// Create a Set for O(1) lookups
+		const selected_id_set = new Set(selected_prompt_ids);
+
+		// Return prompts that aren't in the selected set
+		return this.items.all.filter((prompt) => !selected_id_set.has(prompt.id));
 	}
 
 	// TODO BLOCK this is a weird API, the UI should be doing its sorting downstream not here

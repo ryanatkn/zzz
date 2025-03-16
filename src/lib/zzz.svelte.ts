@@ -141,10 +141,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	tags: Set<string> = $derived.by(() => new Set(this.models.items.all.flatMap((m) => m.tags))); // TODO cached from indexed collection
 
 	// Runtime-only state (not serialized)
-	ping_start_times: Map<Uuid, number> = new Map();
-	ping_elapsed: SvelteMap<Uuid, number> = new SvelteMap();
 	pending_prompts: SvelteMap<Uuid, Deferred<Message_Completion_Response>> = new SvelteMap();
-	// completion_threads: Completion_Threads = $state()!;
 	capability_ollama: undefined | null | boolean = $state();
 	inited_models: boolean | undefined = $state();
 
@@ -293,8 +290,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	}
 
 	/**
-	 * Sends a ping to the server and tracks its start time
-	 * @param message The text message to include in the ping
+	 * Sends a ping to the server
 	 */
 	send_ping(): void {
 		const id = Uuid.parse(undefined);
@@ -302,27 +298,18 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 			id,
 			type: 'ping',
 		};
-
-		this.messages.send(ping); // TODO BLOCK I think this should be awaitable? or a cancelable promise?
-		this.ping_start_times.set(id, performance.now());
+		this.messages.send(ping);
 	}
 
 	/**
 	 * Handle a pong response from the server
-	 * @param pong The pong message received
 	 */
 	receive_pong(pong: Message_Pong): void {
-		const ping_id = pong.ping_id;
-		const start_time = this.ping_start_times.get(ping_id);
-
-		if (start_time === undefined) {
-			console.error('Expected start time for ping', ping_id);
-			return;
+		// The pong already includes the response time from the server
+		const pong_message = this.messages.items.by_id.get(pong.id);
+		if (pong_message) {
+			pong_message.response_time = pong.response_time;
 		}
-
-		this.ping_start_times.delete(ping_id);
-		const elapsed = performance.now() - start_time;
-		this.ping_elapsed.set(ping_id, elapsed);
 	}
 
 	// TODO API? close/open/toggle? just toggle? messages+mutations?

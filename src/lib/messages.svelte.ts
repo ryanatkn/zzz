@@ -56,25 +56,38 @@ export class Messages extends Cell<typeof Messages_Json> {
 					return undefined;
 				},
 			},
-			// Derived index for latest pongs
+			// Derived index for latest pongs - prioritize showing most recent
 			{
 				key: 'latest_pongs',
 				type: Index_Type.DERIVED,
 				compute: (collection) => {
-					const pongs = collection.where('by_type', 'pong');
-					return pongs.slice(-Math.min(PONG_DISPLAY_LIMIT, pongs.length));
+					return collection
+						.where('by_type', 'pong')
+						.sort((a, b) => b.created.localeCompare(a.created))
+						.slice(0, PONG_DISPLAY_LIMIT);
 				},
-				// Incremental update for when a pong is added
-				on_add: (collection, item, _source) => {
-					if (item.type === 'pong') {
-						collection.push(item); // Add the new pong
-						if (collection.length > PONG_DISPLAY_LIMIT) {
-							collection.shift(); // Remove oldest if over limit
-						}
+				matches: (item) => item.type === 'pong',
+				on_add: (items, item) => {
+					if (item.type !== 'pong') return;
+
+					// Insert at correct position based on created timestamp
+					const index = items.findIndex((existing) => item.created > existing.created);
+
+					if (index === -1) {
+						items.push(item);
+					} else {
+						items.splice(index, 0, item);
+					}
+
+					// Keep only the newest items
+					items.splice(PONG_DISPLAY_LIMIT);
+				},
+				on_remove: (items, item) => {
+					const index = items.findIndex((i) => i.id === item.id);
+					if (index !== -1) {
+						items.splice(index, 1);
 					}
 				},
-				// Only match pong messages
-				matches: (item) => item.type === 'pong',
 			},
 		],
 	});

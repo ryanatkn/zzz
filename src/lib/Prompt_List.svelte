@@ -17,11 +17,9 @@
 
 	const reorderable = new Reorderable();
 
-	// Use the helper method from prompts to get unselected prompts efficiently
+	// Use the new filter method to get unselected prompts efficiently
 	const unselected_prompts = $derived(
-		chat.zzz.prompts.get_unselected_prompts_for_chat(
-			chat.selected_prompts.map((prompt) => prompt.id), // TODO BLOCK looks inefficient
-		),
+		chat.zzz.prompts.filter_unselected_prompts(chat.selected_prompts.map((prompt) => prompt.id)),
 	);
 
 	// Track the selected prompt ID
@@ -33,7 +31,6 @@
 		selected_prompt_id && chat.zzz.prompts.items.by_id.get(selected_prompt_id),
 	);
 
-	// TODO can this be refactored away?
 	// Reset selection when the available prompts change
 	$effect(() => {
 		if (unselected_prompts.length && !unselected_prompts.some((p) => p.id === selected_prompt_id)) {

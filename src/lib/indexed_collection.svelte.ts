@@ -89,7 +89,8 @@ export class Indexed_Collection<T extends Indexed_Item> {
 	readonly multi_indexes: Record<string, SvelteMap<any, Array<T>>> = {};
 
 	// Derived collections that are incrementally maintained
-	readonly derived_indexes: Record<string, Array<T>> = {};
+	// Make derived_indexes reactive at the top level
+	readonly derived_indexes: Record<string, Array<T>> = $state({});
 
 	// Store all index configs for reference
 	#index_configs: Array<Index_Config<T>> = [];
@@ -535,12 +536,12 @@ export class Indexed_Collection<T extends Indexed_Item> {
 		return items.slice(-Math.min(limit, items.length));
 	}
 
+	// TODO rename?
 	/**
 	 * Get a derived index collection by its key
 	 */
 	get_derived(key: string): Array<T> {
-		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-		return this.derived_indexes[key] || [];
+		return (this.derived_indexes[key] ??= []);
 	}
 
 	/**

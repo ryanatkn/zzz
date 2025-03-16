@@ -5,6 +5,7 @@
 
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import {GLYPH_DIRECTION_CLIENT, GLYPH_DIRECTION_SERVER} from '$lib/glyphs.js';
+	import type {Uuid} from './zod_helpers.js';
 
 	interface Props {
 		children?: Snippet;
@@ -18,24 +19,36 @@
 
 	// Use the derived index directly
 	const pongs = $derived(zzz.messages.items.get_derived('latest_pongs'));
-	$inspect('pongs', pongs);
+	$inspect('[Ping_Form] pongs', pongs);
 
-	// Create paired ping-pong entries with their timing data
-	const display_items = $derived.by(() => {
-		const result: Array<{pong_id: string; ping_id: string; response_time?: number}> = [];
-		for (const pong of pongs) {
-			if (!pong.ping_id) continue;
-			const response_time = zzz.ping_elapsed.get(pong.ping_id);
-			result.push({
-				pong_id: pong.id,
-				ping_id: pong.ping_id,
-				response_time,
+	interface Display_Item {
+		pong_id?: Uuid;
+		ping_id?: Uuid | undefined;
+		server_time?: number | undefined;
+		round_trip_time?: number | undefined;
+	}
+	[];
+
+	// Create display items from pongs
+	const display_items: Array<Display_Item> = $derived.by(() => {
+		return pongs
+			.filter((pong) => pong.response_time !== undefined)
+			.map((pong) => {
+				// Get the corresponding ping message
+				const ping = zzz.messages.items.by_id.get(pong.ping_id!);
+
+				return {
+					pong_id: pong.id,
+					ping_id: pong.ping_id,
+					server_time: pong.response_time,
+					// Total round trip time - from ping send to pong receive
+					round_trip_time: ping ? pong.received_time - ping.received_time : undefined,
+				};
 			});
-		}
-		return result;
 	});
-	$inspect('display_items', display_items);
+	$inspect('[Ping_Form] display_items', display_items);
 
+	// Calculate placeholders to maintain consistent spacing
 	const remaining_placeholders = $derived(Math.max(0, HISTORY_SIZE - display_items.length));
 </script>
 
@@ -48,19 +61,20 @@
 	</div>
 
 	<ul
-		class="unstyled overflow_hidden scrollbar_width_thin column panel p_md pb_0 mb_0 shadow_inset_top_xs"
+		class="unstyled overflow_auto scrollbar_width_thin column panel p_md pb_0 mb_0 shadow_inset_top_xs"
 		style:height="150px"
+		style:min-height="150px"
 	>
 		{#each display_items as item (item.pong_id)}
 			<li transition:slide>
-				{#if item.response_time !== undefined}
-					{@render ping_item(item.response_time)}
+				{#if item.round_trip_time !== undefined}
+					{@render ping_item(item.round_trip_time)}
 				{:else}
 					<Pending_Animation />
 				{/if}
 			</li>
 		{/each}
-		{#each {length: remaining_placeholders} as _}
+		{#each {length: remaining_placeholders} as _, i (i)}
 			<li class="placeholder" transition:slide>
 				<div style:visibility="hidden">{@render ping_item(1)}</div>
 			</li>
@@ -68,7 +82,7 @@
 	</ul>
 </div>
 
-{#snippet ping_item(response_time: number)}
+{#snippet ping_item(round_trip_time: number)}
 	{GLYPH_DIRECTION_CLIENT}{GLYPH_DIRECTION_SERVER}
-	<span class="font_mono">{Math.round(response_time)}ms</span>
+	<span class="font_mono">{Math.round(round_trip_time)}ms</span>
 {/snippet}

@@ -135,6 +135,7 @@ export type Message_Ping = z.infer<typeof Message_Ping>;
 export const Message_Pong = Message_Base.extend({
 	type: z.literal('pong'),
 	ping_id: Uuid,
+	response_time: z.number(),
 }).strict();
 export type Message_Pong = z.infer<typeof Message_Pong>;
 
@@ -236,6 +237,7 @@ export const Message_Json = Cell_Json.extend({
 	created: Datetime_Now,
 	// Optional fields with proper type checking
 	ping_id: Uuid.optional(),
+	response_time: z.number().optional(),
 	completion_request: Completion_Request.optional(),
 	completion_response: Completion_Response.optional(),
 	path: Diskfile_Path.optional(),
