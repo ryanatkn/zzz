@@ -17,13 +17,11 @@
 	// Fixed history size
 	const HISTORY_SIZE = 6;
 
-	// Use the Messages collections directly with filter and limit
-	const pongs = $derived(
-		zzz.messages.items.multi_indexes.by_type?.get('pong')?.slice(-HISTORY_SIZE),
-	);
-	const pings = $derived(
-		pongs?.map((p) => zzz.messages.items.by_id.get(p.ping_id!)).filter((p) => !!p) ?? [],
-	);
+	// Get pongs
+	const pongs = $derived(zzz.messages.by('type', 'pong', HISTORY_SIZE));
+
+	// Get related ping items using the foreign key relationship with the simpler API
+	const pings = $derived(zzz.messages.items.related(pongs, 'ping_id'));
 
 	// Map of ping IDs to response times (use SvelteMap from zzz for reactivity)
 	const ping_response_times = $derived(zzz.ping_elapsed);

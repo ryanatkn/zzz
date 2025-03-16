@@ -13,7 +13,7 @@ import {reorder_list} from '$lib/list_helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {type Chat_Message, create_chat_message} from '$lib/chat_message.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
-import {HANDLED, USE_DEFAULT} from '$lib/cell_helpers.js';
+import {USE_DEFAULT} from '$lib/cell_helpers.js';
 
 const NEW_CHAT_PREFIX = 'new chat';
 
@@ -38,7 +38,12 @@ export interface Chat_Options extends Cell_Options<typeof Chat_Json> {} // eslin
 export class Chat extends Cell<typeof Chat_Json> {
 	name: string = $state()!;
 	tapes: Array<Tape> = $state([]);
-	selected_prompts: Array<Prompt> = $state([]);
+	selected_prompt_ids: Array<Uuid> = $state()!;
+
+	// TODO maybe add a derived property for the ids that are selected but missing?
+	selected_prompts: Array<Prompt> = $derived(
+		this.selected_prompt_ids.map((id) => this.zzz.prompts.items.by_id.get(id)).filter((p) => !!p), // TODO BLOCK optimize to avoid the filter
+	);
 
 	init_name_status: Async_Status = $state('initial');
 
@@ -57,19 +62,6 @@ export class Chat extends Cell<typeof Chat_Json> {
 				}
 				return USE_DEFAULT; // Explicitly use the default decoding
 			},
-			selected_prompt_ids: (value) => {
-				if (Array.isArray(value)) {
-					// Find all existing prompts with these IDs
-					const selected_prompts = value
-						.map((id) => this.zzz.prompts.items.all.find((p) => p.id === id))
-						.filter((p): p is Prompt => p !== undefined);
-
-					// Update the selected_prompts array
-					this.selected_prompts = selected_prompts;
-				}
-				// Return HANDLED to indicate we've fully processed this virtual property
-				return HANDLED;
-			},
 		};
 
 		// Initialize the instance
@@ -86,7 +78,7 @@ export class Chat extends Cell<typeof Chat_Json> {
 	}
 
 	add_tapes_by_model_tag(tag: string): void {
-		for (const model of this.zzz.models.items.filter((m) => m.tags.includes(tag))) {
+		for (const model of this.zzz.models.items.all.filter((m) => m.tags.includes(tag))) {
 			this.add_tape(model);
 		}
 	}

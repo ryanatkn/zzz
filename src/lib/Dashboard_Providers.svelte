@@ -7,8 +7,6 @@
 	import External_Link from '$lib/External_Link.svelte';
 
 	const zzz = zzz_context.get();
-
-	const models = $derived(zzz.models);
 </script>
 
 <div class="p_lg">
@@ -33,9 +31,8 @@
 						<img src={provider.icon} alt={`${provider.title} icon`} class="provider_icon" />
 					</div>
 				{/if}
-				<!-- <h3><Glyph_Icon icon={GLYPH_MODEL} /> models</h3> -->
 				<ul class="unstyled">
-					{#each models.items.filter((m) => m.provider_name === provider.name) as model (model)}
+					{#each provider.models as model (model)}
 						<li class="row flex_wrap mb_xs3">
 							<Model_Link attrs={{class: 'font_mono px_xs size_sm'}} {model} icon />
 							<!-- {#each model.tags as tag (tag)}

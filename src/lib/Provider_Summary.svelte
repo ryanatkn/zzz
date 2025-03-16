@@ -3,24 +3,18 @@
 	import {page} from '$app/state';
 	import type {SvelteHTMLElements} from 'svelte/elements';
 
-	import type {Provider_Json} from '$lib/provider.svelte.js';
+	import type {Provider} from '$lib/provider.svelte.js';
 	import Model_Summary from '$lib/Model_Summary.svelte';
-	import {zzz_context} from '$lib/zzz.svelte.js';
 	import External_Link from '$lib/External_Link.svelte';
 
-	const zzz = zzz_context.get();
-
 	interface Props {
-		provider: Provider_Json;
+		provider: Provider;
 		attrs?: SvelteHTMLElements['div'];
 	}
 
 	const {provider, attrs}: Props = $props();
 
 	const at_detail_page = $derived(page.url.pathname === `${base}/providers/${provider.name}`);
-
-	// TODO BLOCK use `provider.models`
-	const models = $derived(zzz.models.items.filter((m) => m.provider_name === provider.name));
 </script>
 
 <div {...attrs} class="panel p_lg {attrs?.class}">
@@ -43,7 +37,7 @@
 		</div>
 	</section>
 	<ul class="flex flex_wrap unstyled gap_md">
-		{#each models as model (model)}
+		{#each provider.models as model (model)}
 			<Model_Summary {model} />
 		{/each}
 	</ul>

@@ -4,7 +4,7 @@ import {test, expect} from 'vitest';
 import {Indexed_Collection, type Indexed_Item} from '$lib/indexed_collection.svelte.js';
 import {Uuid} from '$lib/zod_helpers.js';
 
-// Define uuid constants for deterministic testing.
+// Define uuid constants for deterministic testing
 const uuid_1 = Uuid.parse(undefined);
 const uuid_2 = Uuid.parse(undefined);
 const uuid_3 = Uuid.parse(undefined);
@@ -13,7 +13,6 @@ const uuid_5 = Uuid.parse(undefined);
 const uuid_99 = Uuid.parse(undefined);
 
 // Helper interfaces and fixtures
-
 interface Test_Item extends Indexed_Item {
 	id: Uuid;
 	name: string;
@@ -161,15 +160,6 @@ test('Indexed_Collection - add_first method adds items at the beginning', () => 
 	expect(collection.all[1]).toEqual(sample_items[0]);
 });
 
-test('Indexed_Collection - add_first with empty collection', () => {
-	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection();
-
-	collection.add_first(sample_items[0]);
-
-	expect(collection.all.length).toBe(1);
-	expect(collection.all[0]).toEqual(sample_items[0]);
-});
-
 test('Indexed_Collection - adding items returns the added item', () => {
 	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection();
 
@@ -180,6 +170,7 @@ test('Indexed_Collection - adding items returns the added item', () => {
 	expect(result2).toBe(sample_items[1]);
 });
 
+// Item access and checking
 test('Indexed_Collection - get method retrieves items by id', () => {
 	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
 		initial_items: [sample_items[0], sample_items[1]],
@@ -294,16 +285,6 @@ test('Indexed_Collection - reorder does nothing when indexes are invalid or equa
 	expect(collection.all[0].id).toBe(uuid_1);
 });
 
-test('Indexed_Collection - reorder with one item does nothing', () => {
-	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
-		initial_items: [sample_items[0]],
-	});
-
-	collection.reorder(0, 0);
-
-	expect(collection.all[0]).toEqual(sample_items[0]);
-});
-
 // Multi-index features
 test('Indexed_Collection - handles multi-index removal correctly when last item removed', () => {
 	const collection: Indexed_Collection<Test_Item, 'category'> = new Indexed_Collection({
@@ -405,6 +386,7 @@ test('Indexed_Collection - null/undefined extractor values are handled consisten
 	expect(collection.get(uuid_3)).toBe(item3);
 });
 
+// JSON and serialization
 test('Indexed_Collection - toJSON returns the array snapshot', () => {
 	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
 		initial_items: [sample_items[0], sample_items[1]],
@@ -496,7 +478,7 @@ test('Indexed_Collection - index configuration handles varying types', () => {
 	expect(collection.single_indexes.date?.get(new Date('2023-01-01').toISOString())).toBe(item1);
 });
 
-// State snapshot tests
+// Serialization and reconstruction
 test('Indexed_Collection - can be serialized and deserialized', () => {
 	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
 		initial_items: [sample_items[0], sample_items[1]],
@@ -517,4 +499,130 @@ test('Indexed_Collection - can be serialized and deserialized', () => {
 	expect(new_collection.size).toBe(2);
 	expect(new_collection.get(uuid_1)).toEqual(sample_items[0]);
 	expect(new_collection.get(uuid_2)).toEqual(sample_items[1]);
+});
+
+// Test where method with single value indexes
+test('Indexed_Collection - where method works with single-value indexes', () => {
+	const collection: Indexed_Collection<Test_Item, 'name'> = new Indexed_Collection({
+		indexes: [{key: 'name', extractor: (item) => item.name}],
+		initial_items: sample_items,
+	});
+
+	// Single value indexes should still return arrays for consistency
+	const apples = collection.where('name', 'apple');
+	expect(apples).toBeInstanceOf(Array);
+	expect(apples.length).toBe(1);
+	expect(apples[0].name).toBe('apple');
+
+	// Non-existent values should return empty arrays
+	const oranges = collection.where('name', 'orange');
+	expect(oranges).toBeInstanceOf(Array);
+	expect(oranges.length).toBe(0);
+});
+
+// Test the ordering of add vs add_first with multi-indexes
+test('Indexed_Collection - multi-indexes preserve insertion order', () => {
+	const collection: Indexed_Collection<Test_Item, 'category'> = new Indexed_Collection({
+		indexes: [{key: 'category', extractor: (item) => item.category, multi: true}],
+	});
+
+	// Add items in specific order
+	collection.add(sample_items[0]); // apple (fruit)
+	collection.add(sample_items[1]); // banana (fruit)
+
+	// Add a fruit at the beginning
+	const first_fruit = create_test_item(uuid_99, 'first_fruit', 'fruit', []);
+	collection.add_first(first_fruit);
+
+	// Check multi-index order
+	const fruits = collection.where('category', 'fruit');
+	expect(fruits.length).toBe(3);
+	expect(fruits[0].name).toBe('first_fruit'); // Should be first
+	expect(fruits[1].name).toBe('apple');
+	expect(fruits[2].name).toBe('banana');
+});
+
+// Test first and latest with empty indexes
+test('Indexed_Collection - first/latest methods handle empty results gracefully', () => {
+	const collection: Indexed_Collection<Test_Item, 'category'> = new Indexed_Collection({
+		indexes: [{key: 'category', extractor: (item) => item.category, multi: true}],
+	});
+
+	const empty_first = collection.first('category', 'nonexistent', 5);
+	const empty_latest = collection.latest('category', 'nonexistent', 5);
+
+	expect(empty_first).toBeInstanceOf(Array);
+	expect(empty_first.length).toBe(0);
+	expect(empty_latest).toBeInstanceOf(Array);
+	expect(empty_latest.length).toBe(0);
+});
+
+// Test behavior with circular references
+test('Indexed_Collection - handles circular references in items', () => {
+	interface Recursive_Item extends Indexed_Item {
+		id: Uuid;
+		name: string;
+		parent_id?: Uuid;
+		children: Array<Uuid>;
+	}
+
+	const item1: Recursive_Item = {id: uuid_1, name: 'parent', children: []};
+	const item2: Recursive_Item = {id: uuid_2, name: 'child', parent_id: uuid_1, children: []};
+
+	// Add child ID to parent's children array
+	item1.children.push(item2.id);
+	// Create circular reference
+	item2.children.push(item1.id);
+
+	const collection: Indexed_Collection<Recursive_Item, 'name'> = new Indexed_Collection({
+		indexes: [{key: 'name', extractor: (item) => item.name}],
+		initial_items: [item1, item2],
+	});
+
+	// Should be able to serialize and get items without issues
+	expect(collection.size).toBe(2);
+
+	// JSON serialization should work without circular reference issues
+	expect(() => JSON.stringify(collection)).not.toThrow();
+
+	// Related items should work with property access for direct IDs
+	const parent_to_child = collection.related([item1], 'children[0]');
+	const child_to_parent = collection.related([item2], 'parent_id');
+
+	expect(parent_to_child.length).toBe(1);
+	expect(parent_to_child[0].name).toBe('child');
+	expect(child_to_parent.length).toBe(1);
+	expect(child_to_parent[0].name).toBe('parent');
+});
+
+// Test handling of duplicate keys in multi-indexes
+test('Indexed_Collection - handles duplicate values in multi-indexes', () => {
+	const collection: Indexed_Collection<Test_Item, 'tag'> = new Indexed_Collection({
+		indexes: [
+			// Use a single tag extractor that returns the first tag
+			{key: 'tag', extractor: (item) => item.tags[0], multi: true},
+		],
+	});
+
+	// Create items with duplicate tag values
+	const item1 = create_test_item(uuid_1, 'item1', 'cat1', ['shared', 'unique1']);
+	const item2 = create_test_item(uuid_2, 'item2', 'cat2', ['shared', 'unique2']);
+	const item3 = create_test_item(uuid_3, 'item3', 'cat3', ['shared', 'unique3']);
+
+	collection.add(item1);
+	collection.add(item2);
+	collection.add(item3);
+
+	// The shared tag should contain all three items
+	const shared_items = collection.where('tag', 'shared');
+	expect(shared_items.length).toBe(3);
+
+	// Remove one item
+	collection.remove(uuid_2);
+
+	// The shared tag should now contain two items
+	const remaining_shared = collection.where('tag', 'shared');
+	expect(remaining_shared.length).toBe(2);
+	expect(remaining_shared[0].id).toBe(uuid_1);
+	expect(remaining_shared[1].id).toBe(uuid_3);
 });

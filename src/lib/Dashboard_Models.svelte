@@ -14,7 +14,7 @@
 <div class="p_lg">
 	<h1><Glyph_Icon icon={GLYPH_MODEL} /> models</h1>
 	<div class="models_grid">
-		{#each zzz.models.items as model (model)}
+		{#each zzz.models.items.all as model (model)}
 			<Model_Summary {model} />
 		{/each}
 	</div>

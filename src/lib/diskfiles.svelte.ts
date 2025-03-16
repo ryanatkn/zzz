@@ -3,7 +3,7 @@ import {z} from 'zod';
 import type {Message_Filer_Change} from '$lib/message_types.js';
 import {Uuid} from '$lib/zod_helpers.js';
 import {Diskfile} from '$lib/diskfile.svelte.js';
-import {Diskfile_Json, type Diskfile_Path, Source_File} from '$lib/diskfile_types.js';
+import {Diskfile_Json, type Diskfile_Path} from '$lib/diskfile_types.js';
 import {source_file_to_diskfile_json} from '$lib/diskfile_helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
@@ -56,8 +56,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 				if (Array.isArray(files)) {
 					this.items.clear();
 					for (const file_json of files) {
-						const file = new Diskfile({zzz: this.zzz, json: file_json});
-						this.items.add(file);
+						this.add(file_json);
 					}
 				}
 				return HANDLED;
@@ -72,8 +71,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 
 		switch (message.change.type) {
 			case 'add': {
-				const diskfile = this.#create_diskfile(validated_source_file);
-				this.items.add(diskfile);
+				this.add(source_file_to_diskfile_json(validated_source_file));
 				break;
 			}
 			case 'change': {
@@ -98,8 +96,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 					});
 				} else {
 					// If it doesn't exist yet, create a new one
-					const diskfile = this.#create_diskfile(validated_source_file);
-					this.items.add(diskfile);
+					this.add(source_file_to_diskfile_json(validated_source_file));
 				}
 				break;
 			}
@@ -116,11 +113,13 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 		}
 	}
 
-	#create_diskfile(source_file: Source_File): Diskfile {
-		return new Diskfile({
-			zzz: this.zzz,
-			json: source_file_to_diskfile_json(source_file),
-		});
+	add(json: Diskfile_Json): Diskfile {
+		const diskfile = new Diskfile({zzz: this.zzz, json});
+		this.items.add(diskfile);
+		if (this.selected_file_id === null) {
+			this.selected_file_id = diskfile.id;
+		}
+		return diskfile;
 	}
 
 	update(path: Diskfile_Path, contents: string): void {

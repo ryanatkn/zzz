@@ -14,7 +14,7 @@
 	const zzz = zzz_context.get();
 
 	// TODO cleanup this pattern, but using the fallback isn't reactive, right?
-	const models = $derived(prop_models ?? zzz.models.items);
+	const models = $derived(prop_models ?? zzz.models.items.all);
 </script>
 
 <div class="row">

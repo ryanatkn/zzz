@@ -3,17 +3,14 @@
 	import {page} from '$app/state';
 	import type {SvelteHTMLElements} from 'svelte/elements';
 
-	import type {Provider_Json} from '$lib/provider.svelte.js';
+	import type {Provider} from '$lib/provider.svelte.js';
 	import Model_Summary from '$lib/Model_Summary.svelte';
 	import Provider_Logo from '$lib/Provider_Logo.svelte';
-	import {zzz_context} from '$lib/zzz.svelte.js';
 	import {GLYPH_PROVIDER, GLYPH_MODEL} from '$lib/glyphs.js';
 	import External_Link from '$lib/External_Link.svelte';
 
-	const zzz = zzz_context.get();
-
 	interface Props {
-		provider: Provider_Json;
+		provider: Provider;
 		attrs?: SvelteHTMLElements['div'];
 	}
 
@@ -23,9 +20,6 @@
 
 	// TODO BLOCK add repo link for Ollama https://github.com/ollama/ollama and
 	// TODO BLOCK add repo link for Ollama https://github.com/ollama/ollama and change homepage link to show the path, and the rest not
-
-	// TODO BLOCK use `provider.models` or some cached data structure
-	const models = $derived(zzz.models.items.filter((m) => m.provider_name === provider.name));
 </script>
 
 <div {...attrs} class="panel p_lg {attrs?.class}">
@@ -53,9 +47,9 @@
 		</div>
 	</div>
 	<section>
-		<h2><span class="glyph">{GLYPH_MODEL}</span> models ‧ {models.length}</h2>
+		<h2><span class="glyph">{GLYPH_MODEL}</span> models ‧ {provider.models.length}</h2>
 		<ul class="flex flex_wrap unstyled gap_md">
-			{#each models as model (model)}
+			{#each provider.models as model (model)}
 				<Model_Summary {model} />
 			{/each}
 		</ul>

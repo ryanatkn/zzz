@@ -112,7 +112,6 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	readonly time: Time;
 	readonly ui: Ui;
 	readonly models: Models;
-	readonly bots: Zzz_Config['bots']; // TODO make this a Cell?
 	readonly chats: Chats;
 	readonly providers: Providers;
 	readonly prompts: Prompts;
@@ -120,6 +119,8 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	readonly messages: Messages;
 	readonly socket: Socket;
 	readonly url_params: Url_Params;
+
+	readonly bots: Zzz_Config['bots']; // TODO make this a Cell?
 
 	/**
 	 * The `zzz_dir` is the path to Zzz's primary directory on the server's filesystem.
@@ -137,7 +138,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	readonly is_zzz: boolean = true;
 
 	// Derived values
-	tags: Set<string> = $derived.by(() => new Set(this.models.items.flatMap((m) => m.tags)));
+	tags: Set<string> = $derived.by(() => new Set(this.models.items.all.flatMap((m) => m.tags))); // TODO cached from indexed collection
 
 	// Runtime-only state (not serialized)
 	ping_start_times: Map<Uuid, number> = new Map();
@@ -169,8 +170,9 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		// Initialize cell collections
 		this.time = new Time({zzz: this});
 		this.ui = new Ui({zzz: this});
+		console.log('[zzz] creating models');
 		this.models = new Models({zzz: this});
-		this.bots = options.bots ?? BOTS_DEFAULT;
+		console.log('[zzz] created models');
 		this.chats = new Chats({zzz: this});
 		this.providers = new Providers({zzz: this});
 		this.prompts = new Prompts({zzz: this});
@@ -178,6 +180,8 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		this.messages = new Messages({zzz: this});
 		this.socket = new Socket({zzz: this});
 		this.url_params = new Url_Params({zzz: this});
+
+		this.bots = options.bots ?? BOTS_DEFAULT;
 
 		// Set up message handlers if provided
 		if (options.onsend) {

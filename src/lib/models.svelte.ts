@@ -3,7 +3,8 @@ import {z} from 'zod';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Model, Model_Json} from '$lib/model.svelte.js';
 import type {Ollama_Model_Info} from '$lib/ollama.js';
-import {cell_array} from '$lib/cell_helpers.js';
+import {cell_array, HANDLED} from '$lib/cell_helpers.js';
+import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 
 export const Models_Json = z
 	.object({
@@ -19,26 +20,45 @@ export const Models_Json = z
 export type Models_Json = z.infer<typeof Models_Json>;
 
 export interface Models_Options extends Cell_Options<typeof Models_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
-export class Models extends Cell<typeof Models_Json> {
-	items: Array<Model> = $state([]);
 
-	items_by_name: Map<string, Model> = $derived(new Map(this.items.map((m) => [m.name, m])));
+export class Models extends Cell<typeof Models_Json> {
+	readonly items: Indexed_Collection<Model, 'name' | 'provider_name' | 'tag'> =
+		new Indexed_Collection({
+			indexes: [
+				{key: 'name', extractor: (model) => model.name},
+				{key: 'provider_name', extractor: (model) => model.provider_name, multi: true},
+				{key: 'tag', extractor: (model) => model.tags[0], multi: true}, // Index first tag for efficiency
+			],
+		});
 
 	constructor(options: Models_Options) {
 		super(Models_Json, options);
+
+		// Add custom decoder for the items property to prevent overwriting our collection
+		this.decoders = {
+			items: (items) => {
+				if (Array.isArray(items)) {
+					this.items.clear();
+					for (const item_json of items) {
+						this.add(item_json);
+					}
+				}
+				return HANDLED;
+			},
+		};
+
 		this.init();
 	}
 
 	add(model_json: Model_Json): void {
-		this.items.push(new Model({zzz: this.zzz, json: model_json}));
+		const model = new Model({zzz: this.zzz, json: model_json});
+		this.items.add(model);
 	}
 
 	add_ollama_models(model_infos: Array<Ollama_Model_Info>): void {
 		// First add the models that are installed
 		const installed_ollama_models = model_infos.map((ollama_model_info) => {
-			const model_default = this.zzz.models.items.find(
-				(m) => m.name === ollama_model_info.model.name,
-			);
+			const model_default = this.items.single_indexes.name?.get(ollama_model_info.model.name);
 			// TODO maybe clone would be cleaner?
 			return new Model({
 				zzz: this.zzz,
@@ -52,44 +72,44 @@ export class Models extends Cell<typeof Models_Json> {
 						},
 			});
 		});
-		// Then add the models from the Zzz config that are not installed
-		const uninstalled_ollama_models = this.zzz.models.items
-			.filter(
-				(m) =>
-					m.provider_name === 'ollama' && !installed_ollama_models.some((m2) => m2.name === m.name),
-			)
-			.map((m) => new Model({zzz: this.zzz, json: m}));
-		this.items = [...installed_ollama_models, ...uninstalled_ollama_models, ...this.items];
+		// Then add the models from config that are not installed
+		const uninstalled_ollama_models = this.items
+			.where('provider_name', 'ollama')
+			.filter((m) => !installed_ollama_models.some((m2) => m2.name === m.name))
+			.map((m) => new Model({zzz: this.zzz, json: m.json}));
+
+		// Clear and add all models in the desired order
+		this.items.clear();
+		for (const model of [...installed_ollama_models, ...uninstalled_ollama_models]) {
+			this.items.add(model);
+		}
+		// Add any remaining models that aren't Ollama models
+		for (const model of this.items.all.filter((m) => m.provider_name !== 'ollama')) {
+			this.items.add(model);
+		}
 	}
 
 	find_by_name(name: string): Model | undefined {
-		return this.items_by_name.get(name);
+		return this.items.by('name', name);
 	}
 
-	// TODO maybe cache this in a derived?
 	filter_by_names(names: Array<string>): Array<Model> | undefined {
-		let found: Array<Model> | undefined;
-		for (const name of names) {
-			const model = this.items_by_name.get(name);
-			if (model) {
-				(found ??= []).push(model);
-			}
-		}
-		return found;
+		const found = names.map((name) => this.items.by('name', name)).filter((m) => !!m);
+		return found.length ? found : undefined;
 	}
 
 	find_by_tag(tag: string): Array<Model> {
-		return this.items.filter((m) => m.tags.includes(tag));
+		return this.items.where('tag', tag);
 	}
 
 	remove_by_name(name: string): void {
-		const index = this.items.findIndex((m) => m.name === name);
-		if (index !== -1) {
-			this.items.splice(index, 1);
+		const model = this.items.single_indexes.name?.get(name);
+		if (model) {
+			this.items.remove(model.id);
 		}
 	}
 
 	clear(): void {
-		this.items.length = 0;
+		this.items.clear();
 	}
 }

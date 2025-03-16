@@ -740,6 +740,8 @@ export const src_json = {
 			declarations: [
 				{name: 'Indexed_Item', kind: 'type'},
 				{name: 'Index_Config', kind: 'type'},
+				{name: 'Index_Value_Types', kind: 'type'},
+				{name: 'Indexed_Collection_Options', kind: 'type'},
 				{name: 'Indexed_Collection', kind: 'class'},
 			],
 		},
@@ -801,6 +803,7 @@ export const src_json = {
 				{name: 'Messages_Json', kind: 'variable'},
 				{name: 'Messages_Options', kind: 'type'},
 				{name: 'Message_Indexes', kind: 'type'},
+				{name: 'Message_Index_Values', kind: 'type'},
 				{name: 'Messages', kind: 'class'},
 			],
 		},

@@ -40,8 +40,7 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 				if (Array.isArray(items)) {
 					this.items.clear();
 					for (const item_json of items) {
-						const prompt = new Prompt({zzz: this.zzz, json: item_json});
-						this.items.add(prompt);
+						this.add(false, item_json);
 					}
 				}
 				return HANDLED;
@@ -51,9 +50,14 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 		this.init();
 	}
 
-	add(): Prompt {
-		const prompt = new Prompt({zzz: this.zzz});
-		this.items.add_first(prompt);
+	// TODO BLOCK this is a weird API, the UI should be doing its sorting downstream not here
+	add(first = true, json?: Prompt_Json): Prompt {
+		const prompt = new Prompt({zzz: this.zzz, json});
+		if (first) {
+			this.items.add_first(prompt);
+		} else {
+			this.items.add(prompt);
+		}
 		if (this.selected_id === null) {
 			this.selected_id = prompt.id;
 		}

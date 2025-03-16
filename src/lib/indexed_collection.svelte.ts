@@ -1,5 +1,7 @@
 import {SvelteMap} from 'svelte/reactivity';
-import {Uuid} from '$lib/zod_helpers.js'; // added import
+import {Uuid} from '$lib/zod_helpers.js';
+
+// TODO need better caching
 
 /**
  * Interface for objects that can be stored in an indexed collection
@@ -17,8 +19,14 @@ export interface Index_Config<T, K extends string, V> {
 	multi?: boolean; // Whether this index maps to multiple items
 }
 
-export interface Indexed_Collection_Options<T extends Indexed_Item, K extends string> {
-	indexes?: Array<Index_Config<T, K, any>>;
+export type Index_Value_Types<K extends string> = Record<K, any>;
+
+export interface Indexed_Collection_Options<
+	T extends Indexed_Item,
+	K extends string,
+	V extends Index_Value_Types<K> = Record<K, any>,
+> {
+	indexes?: Array<Index_Config<T, K, V[K]>>;
 	initial_items?: Array<T>;
 }
 
@@ -26,9 +34,13 @@ export interface Indexed_Collection_Options<T extends Indexed_Item, K extends st
  * A helper class for managing collections that need efficient lookups
  * with automatic index maintenance
  */
-export class Indexed_Collection<T extends Indexed_Item, K extends string = never> {
+export class Indexed_Collection<
+	T extends Indexed_Item,
+	K extends string = never,
+	V extends Index_Value_Types<K> = Record<K, any>,
+> {
 	// The main collection of items
-	all: Array<T> = $state([]);
+	all: Array<T> = $state([]); // TODO BLOCK look at all usage of this for indexing opportunities (needs new features to handle some cases)
 
 	// The primary index by ID now keyed by Uuid instead of string
 	readonly by_id: SvelteMap<Uuid, T> = new SvelteMap();
@@ -41,7 +53,7 @@ export class Indexed_Collection<T extends Indexed_Item, K extends string = never
 
 	#configs: Array<Index_Config<T, K, any>> = [];
 
-	constructor(options?: Indexed_Collection_Options<T, K>) {
+	constructor(options?: Indexed_Collection_Options<T, K, V>) {
 		// Set up additional indexes
 		if (options?.indexes) {
 			this.#configs = options.indexes;
@@ -214,5 +226,120 @@ export class Indexed_Collection<T extends Indexed_Item, K extends string = never
 				this.single_indexes[config.key]!.clear();
 			}
 		}
+	}
+
+	/**
+	 * Get all items matching an indexed property value
+	 *
+	 * @param index_key The indexed property name
+	 * @param value The value to filter by
+	 */
+	where<Key extends K>(index_key: Key, value: V[Key]): Array<T> {
+		const multi_index = this.multi_indexes[index_key];
+		if (multi_index) {
+			return [...(multi_index.get(value) || [])];
+		}
+
+		const single_index = this.single_indexes[index_key];
+		if (single_index) {
+			const item = single_index.get(value);
+			return item ? [item] : [];
+		}
+
+		return [];
+	}
+
+	/**
+	 * Get the first N items matching an indexed property value
+	 *
+	 * @param index_key The indexed property name
+	 * @param value The value to filter by
+	 * @param limit Maximum number of items to return
+	 */
+	first<Key extends K>(index_key: Key, value: V[Key], limit: number): Array<T> {
+		// Handle edge cases with limit
+		if (limit <= 0) return [];
+
+		const items = this.where(index_key, value);
+		return items.slice(0, limit);
+	}
+
+	/**
+	 * Get the latest N items matching an indexed property value
+	 *
+	 * @param index_key The indexed property name
+	 * @param value The value to filter by
+	 * @param limit Maximum number of items to return
+	 */
+	latest<Key extends K>(index_key: Key, value: V[Key], limit: number): Array<T> {
+		// Handle edge cases with limit
+		if (limit <= 0) return [];
+
+		const items = this.where(index_key, value);
+		return items.slice(-Math.min(limit, items.length));
+	}
+
+	/**
+	 * Find related items by a property reference
+	 *
+	 * @param items Source items containing references
+	 * @param property_name The property containing the reference ID
+	 */
+	related<S extends Record<string, any>>(
+		items: Array<S> | undefined,
+		property_name: string,
+	): Array<T> {
+		if (!items?.length) return [];
+
+		const result: Array<T> = [];
+		for (const item of items) {
+			if (property_name.includes('.') || property_name.includes('[')) {
+				const path_parts = property_name.split('.');
+				let current: any = item;
+				for (let i = 0; i < path_parts.length; i++) {
+					if (current === null) break;
+					const part = path_parts[i];
+					if (part.includes('[') && part.includes(']')) {
+						const match = /^([^[]+)\[(\d+)\]$/.exec(part);
+						if (match) {
+							const [_, array_name, index_str] = match;
+							const array = current[array_name];
+							if (Array.isArray(array)) {
+								const index = parseInt(index_str, 10);
+								current = array[index];
+							} else {
+								current = null;
+								break;
+							}
+						}
+					} else {
+						current = current[part];
+					}
+				}
+				if (current != null) {
+					const foreign_key = current;
+					const related_item = this.by_id.get(foreign_key);
+					if (related_item) {
+						result.push(related_item);
+					}
+				}
+			} else {
+				const foreign_key = item[property_name];
+				if (foreign_key) {
+					const related_item = this.by_id.get(foreign_key);
+					if (related_item) {
+						result.push(related_item);
+					}
+				}
+			}
+		}
+		return result;
+	}
+
+	/**
+	 * Get an item by a single-value index
+	 */
+	by<Key extends K>(index_key: Key, value: V[Key]): T | undefined {
+		return this.single_indexes[index_key]?.get(value);
 	}
 }

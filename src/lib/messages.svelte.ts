@@ -7,9 +7,10 @@ import {
 	type Message_Client,
 	type Message_Server,
 	create_message_json,
+	Message_Type,
 } from '$lib/message_types.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
-import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
+import {Indexed_Collection, type Index_Value_Types} from '$lib/indexed_collection.svelte.js';
 
 export const HISTORY_LIMIT_DEFAULT = 512;
 
@@ -30,38 +31,35 @@ export interface Messages_Options extends Cell_Options<typeof Messages_Json> {
 	history_limit?: number;
 }
 
+// Define our index keys and their corresponding value types
 export type Message_Indexes = 'by_type';
+export interface Message_Index_Values extends Index_Value_Types<Message_Indexes> {
+	by_type: Message_Type;
+}
 
 export class Messages extends Cell<typeof Messages_Json> {
-	// Configure indexed collection with type-based indexing statically
-	readonly items: Indexed_Collection<Message, Message_Indexes> = new Indexed_Collection({
-		indexes: [
-			{
-				key: 'by_type',
-				extractor: (message) => message.type,
-				multi: true, // One type can map to multiple messages
-			},
-		],
-	});
+	// Configure indexed collection with type-safe indexing
+	readonly items: Indexed_Collection<Message, Message_Indexes, Message_Index_Values> =
+		new Indexed_Collection({
+			indexes: [
+				{
+					key: 'by_type',
+					extractor: (message) => message.type,
+					multi: true,
+				},
+			],
+		});
 
 	history_limit: number = $state(HISTORY_LIMIT_DEFAULT);
 
-	// Derived collections for easy access
-	pings: Array<Message> = $derived(this.items.multi_indexes.by_type?.get('ping') || []);
-	pongs: Array<Message> = $derived(this.items.multi_indexes.by_type?.get('pong') || []);
-	prompts: Array<Message> = $derived(this.items.multi_indexes.by_type?.get('send_prompt') || []);
-	completions: Array<Message> = $derived(
-		this.items.multi_indexes.by_type?.get('completion_response') || [],
-	);
-	diskfile_updates: Array<Message> = $derived(
-		this.items.multi_indexes.by_type?.get('update_diskfile') || [],
-	);
-	diskfile_deletes: Array<Message> = $derived(
-		this.items.multi_indexes.by_type?.get('delete_diskfile') || [],
-	);
-	filer_changes: Array<Message> = $derived(
-		this.items.multi_indexes.by_type?.get('filer_change') || [],
-	);
+	// Using the new, simpler API with the by() helper
+	pings: Array<Message> = $derived(this.by('type', 'ping'));
+	pongs: Array<Message> = $derived(this.by('type', 'pong'));
+	prompts: Array<Message> = $derived(this.by('type', 'send_prompt'));
+	completions: Array<Message> = $derived(this.by('type', 'completion_response'));
+	diskfile_updates: Array<Message> = $derived(this.by('type', 'update_diskfile'));
+	diskfile_deletes: Array<Message> = $derived(this.by('type', 'delete_diskfile'));
+	filer_changes: Array<Message> = $derived(this.by('type', 'filer_change'));
 
 	// Message handlers
 	onsend?: (message: Message_Client) => void;
@@ -80,8 +78,7 @@ export class Messages extends Cell<typeof Messages_Json> {
 				if (Array.isArray(items)) {
 					this.items.clear();
 					for (const item_json of items) {
-						const message = new Message({zzz: this.zzz, json: item_json});
-						this.items.add(message);
+						this.add(item_json);
 					}
 				}
 				return HANDLED;
@@ -139,6 +136,28 @@ export class Messages extends Cell<typeof Messages_Json> {
 
 		return message;
 	}
+
+	// TODO remove this, maybe move to base class
+	/**
+	 * Get messages by any property value
+	 * A generic helper that fetches messages filtered by any property
+	 *
+	 * @param property The property name to filter by (must be indexed)
+	 * @param value The value to filter for
+	 * @param limit Maximum number of messages to return (defaults to history_limit)
+	 */
+	by<K extends keyof Message>(property: K, value: Message[K], limit?: number): Array<Message> {
+		// When filtering by type, we use the special 'by_type' index
+		if (property === 'type') {
+			return this.items.latest('by_type', value as Message_Type, limit || this.history_limit);
+		}
+
+		// For other properties, we'd need to add more indexes or implement filtering
+		console.warn(`No index available for property: ${property as string}`);
+		return [];
+	}
+
+	// Remove the get_related_messages method as it's now redundant with the `related` method
 
 	/**
 	 * Trims the collection to the maximum allowed size by removing oldest messages

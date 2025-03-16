@@ -42,8 +42,7 @@ export class Chats extends Cell<typeof Chats_Json> {
 				if (Array.isArray(items)) {
 					this.items.clear();
 					for (const item_json of items) {
-						const chat = new Chat({zzz: this.zzz, json: item_json});
-						this.items.add(chat);
+						this.add(item_json);
 					}
 				}
 				return HANDLED;

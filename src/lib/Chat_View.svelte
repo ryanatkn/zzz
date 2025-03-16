@@ -91,8 +91,8 @@
 								}}
 							>
 								<span>{tag}</span>
-								{#if zzz.models.items.filter((m) => m.tags.includes(tag)).length}
-									<span>{zzz.models.items.filter((m) => m.tags.includes(tag)).length}</span>
+								{#if zzz.models.items.all.filter((m) => m.tags.includes(tag)).length}
+									<span>{zzz.models.items.all.filter((m) => m.tags.includes(tag)).length}</span>
 								{/if}
 							</button>
 						{/each}
