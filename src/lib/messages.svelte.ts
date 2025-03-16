@@ -10,9 +10,10 @@ import {
 	Message_Type,
 } from '$lib/message_types.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
-import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
+import {Indexed_Collection, Index_Type} from '$lib/indexed_collection.svelte.js';
 
 export const HISTORY_LIMIT_DEFAULT = 512;
+export const PONG_DISPLAY_LIMIT = 6;
 
 export const Messages_Json = z
 	.object({
@@ -32,27 +33,55 @@ export interface Messages_Options extends Cell_Options<typeof Messages_Json> {
 }
 
 // Define our index keys for type safety
-// No single indexes used here, so use 'never' for the first type parameter
-export type Message_Multi_Index_Keys = 'by_type';
-
-export interface Messages_Options extends Cell_Options<typeof Messages_Json> {
-	history_limit?: number;
-}
+export type Message_Multi_Index_Keys = 'by_type' | 'by_ping_id';
 
 export class Messages extends Cell<typeof Messages_Json> {
-	// Configure indexed collection with type-safe indexing using proper structure
-	readonly items: Indexed_Collection<Message, never, Message_Multi_Index_Keys> =
-		new Indexed_Collection({
-			multi_indexes: [
-				{
-					key: 'by_type',
-					extractor: (message: Message) => message.type,
+	// Configure indexed collection with unified indexing system
+	readonly items: Indexed_Collection<Message> = new Indexed_Collection({
+		indexes: [
+			// Type-based multi-index
+			{
+				key: 'by_type',
+				type: Index_Type.MULTI,
+				extractor: (message: Message) => message.type,
+			},
+			// Ping ID index for pongs
+			{
+				key: 'by_ping_id',
+				type: Index_Type.MULTI,
+				extractor: (message: Message) => {
+					if (message.type === 'pong') {
+						return message.ping_id;
+					}
+					return undefined;
 				},
-			],
-		});
+			},
+			// Derived index for latest pongs
+			{
+				key: 'latest_pongs',
+				type: Index_Type.DERIVED,
+				compute: (collection) => {
+					const pongs = collection.where('by_type', 'pong');
+					return pongs.slice(-Math.min(PONG_DISPLAY_LIMIT, pongs.length));
+				},
+				// Incremental update for when a pong is added
+				on_add: (collection, item, _source) => {
+					if (item.type === 'pong') {
+						collection.push(item); // Add the new pong
+						if (collection.length > PONG_DISPLAY_LIMIT) {
+							collection.shift(); // Remove oldest if over limit
+						}
+					}
+				},
+				// Only match pong messages
+				matches: (item) => item.type === 'pong',
+			},
+		],
+	});
 
 	history_limit: number = $state(HISTORY_LIMIT_DEFAULT);
 
+	// Derived collections using the indexed structure
 	pings: Array<Message> = $derived(this.items.where('by_type', 'ping'));
 	pongs: Array<Message> = $derived(this.items.where('by_type', 'pong'));
 	prompts: Array<Message> = $derived(this.items.where('by_type', 'send_prompt'));
@@ -154,6 +183,30 @@ export class Messages extends Cell<typeof Messages_Json> {
 		// For other properties, we'd need to add more indexes or implement filtering
 		console.warn(`No index available for property: ${property as string}`);
 		return [];
+	}
+
+	/**
+	 * Get the latest N messages of a specific type
+	 *
+	 * @param type The message type to filter by
+	 * @param limit Maximum number of messages to return (defaults to history_limit)
+	 * @returns Array of messages matching the type
+	 */
+	get_latest_by_type(type: Message_Type, limit: number = this.history_limit): Array<Message> {
+		return this.items.latest('by_type', type, limit);
+	}
+
+	/**
+	 * Find pings related to pongs using the index
+	 *
+	 * @param pongs The pong messages
+	 * @returns Array of related ping messages
+	 */
+	get_pings_for_pongs(pongs: Array<Message>): Array<Message> {
+		return pongs
+			.filter((pong) => pong.ping_id !== undefined)
+			.map((pong) => this.items.by_id.get(pong.ping_id!))
+			.filter((ping): ping is Message => ping !== undefined);
 	}
 
 	/**

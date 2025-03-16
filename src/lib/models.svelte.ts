@@ -4,7 +4,7 @@ import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Model, Model_Json} from '$lib/model.svelte.js';
 import type {Ollama_Model_Info} from '$lib/ollama.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
-import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
+import {Indexed_Collection, Index_Type} from '$lib/indexed_collection.svelte.js';
 
 export const Models_Json = z
 	.object({
@@ -21,19 +21,26 @@ export type Models_Json = z.infer<typeof Models_Json>;
 
 export interface Models_Options extends Cell_Options<typeof Models_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
-// Define the key types for single and multi indexes
-export type Model_Single_Index_Keys = 'name';
-export type Model_Multi_Index_Keys = 'provider_name' | 'tag';
-
 export class Models extends Cell<typeof Models_Json> {
-	readonly items: Indexed_Collection<Model, Model_Single_Index_Keys, Model_Multi_Index_Keys> =
-		new Indexed_Collection({
-			single_indexes: [{key: 'name', extractor: (model: Model) => model.name}],
-			multi_indexes: [
-				{key: 'provider_name', extractor: (model: Model) => model.provider_name},
-				{key: 'tag', extractor: (model: Model) => model.tags[0]}, // Index first tag for efficiency
-			],
-		});
+	readonly items: Indexed_Collection<Model> = new Indexed_Collection({
+		indexes: [
+			{
+				key: 'name',
+				type: Index_Type.SINGLE,
+				extractor: (model: Model) => model.name,
+			},
+			{
+				key: 'provider_name',
+				type: Index_Type.MULTI,
+				extractor: (model: Model) => model.provider_name,
+			},
+			{
+				key: 'tag',
+				type: Index_Type.MULTI,
+				extractor: (model: Model) => model.tags[0], // Index first tag for efficiency
+			},
+		],
+	});
 
 	constructor(options: Models_Options) {
 		super(Models_Json, options);

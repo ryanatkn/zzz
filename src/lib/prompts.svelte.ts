@@ -5,7 +5,7 @@ import {Prompt, Prompt_Json} from '$lib/prompt.svelte.js';
 import type {Uuid} from '$lib/zod_helpers.js';
 import type {Bit} from '$lib/bit.svelte.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
-import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
+import {Indexed_Collection, Index_Type} from '$lib/indexed_collection.svelte.js';
 
 export const Prompts_Json = z
 	.object({
@@ -24,18 +24,22 @@ export type Prompts_Json = z.infer<typeof Prompts_Json>;
 
 export interface Prompts_Options extends Cell_Options<typeof Prompts_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
-// Define multi index keys for prompts
-export type Prompt_Multi_Indexes = 'by_selection_status';
-
 export class Prompts extends Cell<typeof Prompts_Json> {
-	// Initialize items with proper typing and indexes
-	readonly items: Indexed_Collection<Prompt, never, Prompt_Multi_Indexes> = new Indexed_Collection({
-		multi_indexes: [
+	// Initialize items with proper typing and unified indexes
+	readonly items: Indexed_Collection<Prompt> = new Indexed_Collection({
+		indexes: [
 			{
 				key: 'by_selection_status',
-				// This extractor creates two categories: 'selected' and 'not_selected'
-				// We'll use this in combination with a chat's selected prompts to efficiently filter
+				type: Index_Type.MULTI,
+				// This extractor creates categories for filtering
 				extractor: () => 'all', // All prompts go into a single index for now
+			},
+			{
+				key: 'unselected_prompts',
+				type: Index_Type.DERIVED,
+				compute: (collection) => collection.all,
+				// This is just a placeholder - in a real implementation, this would be
+				// dynamically filtered based on the selected chat's prompts
 			},
 		],
 	});

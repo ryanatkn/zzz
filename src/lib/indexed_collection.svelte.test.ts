@@ -1,277 +1,392 @@
-// @vitest-environment jsdom
-
 import {test, expect} from 'vitest';
-import {Indexed_Collection, type Indexed_Item} from '$lib/indexed_collection.svelte.js';
+import {Indexed_Collection, Index_Type} from '$lib/indexed_collection.svelte.js';
 import {Uuid} from '$lib/zod_helpers.js';
 
-// Define uuid constants for deterministic testing
-const uuid_1 = Uuid.parse(undefined);
-const uuid_2 = Uuid.parse(undefined);
-const uuid_3 = Uuid.parse(undefined);
-const uuid_4 = Uuid.parse(undefined);
-const uuid_5 = Uuid.parse(undefined);
-
-// Helper interfaces and fixtures
-interface Test_Item extends Indexed_Item {
+// Mock item type that implements Indexed_Item
+interface Test_Item {
 	id: Uuid;
 	name: string;
 	category: string;
 	tags: Array<string>;
+	created: Date;
+	priority: number;
 }
 
+// Helper function to create test items with predictable values
 const create_test_item = (
-	id: Uuid,
 	name: string,
 	category: string,
 	tags: Array<string> = [],
-): Test_Item => {
-	return {id, name, category, tags};
-};
-
-const sample_items: Array<Test_Item> = [
-	create_test_item(uuid_1, 'apple', 'fruit', ['red', 'sweet']),
-	create_test_item(uuid_2, 'banana', 'fruit', ['yellow']),
-	create_test_item(uuid_3, 'carrot', 'vegetable', ['orange']),
-	create_test_item(uuid_4, 'daikon', 'vegetable', ['white']),
-	create_test_item(uuid_5, 'eggplant', 'vegetable', ['purple']),
-];
-
-// Basic initialization tests
-test('Indexed_Collection - initializes with empty array by default', () => {
-	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection();
-	expect(collection.all).toEqual([]);
-	expect(collection.size).toBe(0);
+	priority: number = 0,
+): Test_Item => ({
+	id: Uuid.parse(undefined),
+	name,
+	category,
+	tags,
+	created: new Date(),
+	priority,
 });
 
-test('Indexed_Collection - initializes with provided items', () => {
-	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
-		initial_items: [sample_items[0], sample_items[1]],
-	});
-
-	expect(collection.all.length).toBe(2);
-	expect(collection.by_id.get(uuid_1)).toEqual(sample_items[0]);
-	expect(collection.by_id.get(uuid_2)).toEqual(sample_items[1]);
-});
-
-test('Indexed_Collection - initializes with configured indexes', () => {
-	const collection: Indexed_Collection<Test_Item, 'name', 'category'> = new Indexed_Collection({
-		single_indexes: [{key: 'name', extractor: (item) => item.name}],
-		multi_indexes: [{key: 'category', extractor: (item) => item.category}],
-	});
-
-	expect(collection.single_indexes.name).toBeDefined();
-	expect(collection.multi_indexes.category).toBeDefined();
-});
-
-test('Indexed_Collection - initializes with multiple indexes of different types', () => {
-	const collection: Indexed_Collection<Test_Item, 'name', 'category' | 'tags'> =
-		new Indexed_Collection({
-			single_indexes: [{key: 'name', extractor: (item) => item.name}],
-			multi_indexes: [
-				{key: 'category', extractor: (item) => item.category},
-				{key: 'tags', extractor: (item) => item.tags.join(',')},
-			],
-		});
-
-	expect(collection.single_indexes.name).toBeDefined();
-	expect(collection.multi_indexes.category).toBeDefined();
-	expect(collection.multi_indexes.tags).toBeDefined();
-});
-
-// Core functionality: Adding and retrieving items
-test('Indexed_Collection - add method adds items and updates indexes', () => {
-	const collection: Indexed_Collection<Test_Item, 'name', 'category'> = new Indexed_Collection({
-		single_indexes: [{key: 'name', extractor: (item) => item.name}],
-		multi_indexes: [{key: 'category', extractor: (item) => item.category}],
-	});
-
-	collection.add(sample_items[0]);
-	collection.add(sample_items[1]);
-
-	// Check main array
-	expect(collection.all.length).toBe(2);
-
-	// Check primary index
-	expect(collection.by_id.get(uuid_1)).toEqual(sample_items[0]);
-
-	// Check single-value index
-	expect(collection.single_indexes.name.get('apple')).toEqual(sample_items[0]);
-
-	// Check multi-value index
-	expect(collection.multi_indexes.category.get('fruit')).toEqual([
-		sample_items[0],
-		sample_items[1],
-	]);
-});
-
-test('Indexed_Collection - add_first method adds items at the beginning', () => {
+test('Indexed_Collection - basic operations with no indexes', () => {
+	// Create a collection with no indexes
 	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection();
 
-	collection.add(sample_items[0]);
-	collection.add_first(sample_items[1]);
+	// Add items
+	const item1 = create_test_item('item1', 'cat1');
+	const item2 = create_test_item('item2', 'cat2');
 
-	expect(collection.all[0]).toEqual(sample_items[1]);
-	expect(collection.all[1]).toEqual(sample_items[0]);
+	collection.add(item1);
+	collection.add(item2);
+
+	// Check size and contents
+	expect(collection.size).toBe(2);
+	expect(collection.all).toContain(item1);
+	expect(collection.all).toContain(item2);
+
+	// Test retrieval by ID
+	expect(collection.get(item1.id)).toBe(item1);
+
+	// Test removal
+	expect(collection.remove(item1.id)).toBe(true);
+	expect(collection.size).toBe(1);
+	expect(collection.get(item1.id)).toBeUndefined();
+	expect(collection.get(item2.id)).toBe(item2);
 });
 
-test('Indexed_Collection - get method retrieves items by id', () => {
+test('Indexed_Collection - single index operations', () => {
 	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
-		initial_items: [sample_items[0], sample_items[1]],
+		indexes: [
+			{
+				key: 'by_name',
+				type: Index_Type.SINGLE,
+				extractor: (item) => item.name,
+			},
+		],
 	});
 
-	expect(collection.get(uuid_1)).toEqual(sample_items[0]);
-	expect(collection.get(uuid_2)).toEqual(sample_items[1]);
-	expect(collection.get(uuid_3)).toBeUndefined();
+	// Add items with unique names
+	const item1 = create_test_item('apple', 'fruit');
+	const item2 = create_test_item('banana', 'fruit');
+	const item3 = create_test_item('carrot', 'vegetable');
+
+	collection.add(item1);
+	collection.add(item2);
+	collection.add(item3);
+
+	// Test lookup by single index
+	expect(collection.by_optional('by_name', 'apple')).toBe(item1);
+	expect(collection.by_optional('by_name', 'banana')).toBe(item2);
+	expect(collection.by_optional('by_name', 'carrot')).toBe(item3);
+	expect(collection.by_optional('by_name', 'missing')).toBeUndefined();
+
+	// Test the non-optional version that throws
+	expect(() => collection.by('by_name', 'missing')).toThrow();
+	expect(collection.by('by_name', 'apple')).toBe(item1);
+
+	// Test index update on removal
+	collection.remove(item2.id);
+	expect(collection.by_optional('by_name', 'banana')).toBeUndefined();
+	expect(collection.size).toBe(2);
 });
 
-test('Indexed_Collection - has method checks if item exists by id', () => {
+test('Indexed_Collection - multi index operations', () => {
 	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
-		initial_items: [sample_items[0], sample_items[1]],
+		indexes: [
+			{
+				key: 'by_category',
+				type: Index_Type.MULTI,
+				extractor: (item) => item.category,
+			},
+		],
 	});
 
-	expect(collection.has(uuid_1)).toBe(true);
-	expect(collection.has(uuid_3)).toBe(false);
+	// Add items with shared categories
+	const item1 = create_test_item('apple', 'fruit');
+	const item2 = create_test_item('banana', 'fruit');
+	const item3 = create_test_item('carrot', 'vegetable');
+	const item4 = create_test_item('lettuce', 'vegetable');
+
+	collection.add(item1);
+	collection.add(item2);
+	collection.add(item3);
+	collection.add(item4);
+
+	// Test multi-index lookup
+	expect(collection.where('by_category', 'fruit')).toHaveLength(2);
+	expect(collection.where('by_category', 'fruit')).toContainEqual(item1);
+	expect(collection.where('by_category', 'fruit')).toContainEqual(item2);
+	expect(collection.where('by_category', 'vegetable')).toHaveLength(2);
+	expect(collection.where('by_category', 'vegetable')).toContainEqual(item3);
+	expect(collection.where('by_category', 'vegetable')).toContainEqual(item4);
+
+	// Test first/latest with limit
+	expect(collection.first('by_category', 'fruit', 1)).toHaveLength(1);
+	expect(collection.first('by_category', 'fruit', 1)[0]).toBe(item1);
+	expect(collection.latest('by_category', 'vegetable', 1)).toHaveLength(1);
+	expect(collection.latest('by_category', 'vegetable', 1)[0]).toBe(item4);
+
+	// Test index update on removal
+	collection.remove(item1.id);
+	expect(collection.where('by_category', 'fruit')).toHaveLength(1);
+	expect(collection.where('by_category', 'fruit')[0]).toBe(item2);
 });
 
-// Core functionality: Removing items
-test('Indexed_Collection - remove method removes items and updates indexes', () => {
-	const collection: Indexed_Collection<Test_Item, 'name', 'category'> = new Indexed_Collection({
-		single_indexes: [{key: 'name', extractor: (item) => item.name}],
-		multi_indexes: [{key: 'category', extractor: (item) => item.category}],
-		initial_items: [sample_items[0], sample_items[1], sample_items[2]],
-	});
-
-	const removed = collection.remove(uuid_2);
-
-	expect(removed).toBe(true);
-	expect(collection.all.length).toBe(2);
-	expect(collection.by_id.has(uuid_2)).toBe(false);
-	expect(collection.single_indexes.name.has('banana')).toBe(false);
-
-	// Check that the category index was updated properly
-	const fruit_items = collection.multi_indexes.category.get('fruit');
-	expect(fruit_items?.length).toBe(1);
-	expect(fruit_items?.[0].id).toBe(uuid_1);
-});
-
-// Core functionality: Reordering
-test('Indexed_Collection - reorder method changes item order', () => {
+test('Indexed_Collection - derived index operations', () => {
 	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
-		initial_items: [sample_items[0], sample_items[1], sample_items[2]],
+		indexes: [
+			{
+				key: 'high_priority',
+				type: Index_Type.DERIVED,
+				compute: (collection) => collection.all.filter((item) => item.priority > 5),
+				matches: (item) => item.priority > 5,
+				on_add: (items, item) => {
+					if (item.priority > 5) {
+						items.push(item);
+						// Keep sorted by priority (highest first)
+						items.sort((a, b) => b.priority - a.priority);
+					}
+				},
+				on_remove: (items, item) => {
+					const index = items.findIndex((i) => i.id === item.id);
+					if (index !== -1) {
+						items.splice(index, 1);
+					}
+				},
+			},
+		],
 	});
 
+	// Add items with various priorities
+	const item1 = create_test_item('task1', 'work', [], 8);
+	const item2 = create_test_item('task2', 'home', [], 3);
+	const item3 = create_test_item('task3', 'work', [], 10);
+	const item4 = create_test_item('task4', 'home', [], 6);
+
+	collection.add(item1);
+	collection.add(item2);
+	collection.add(item3);
+	collection.add(item4);
+
+	// Check derived index
+	const high_priority = collection.get_derived('high_priority');
+	expect(high_priority).toHaveLength(3);
+	expect(high_priority[0]).toBe(item3); // Highest priority first
+	expect(high_priority[1]).toBe(item1);
+	expect(high_priority[2]).toBe(item4);
+	expect(high_priority).not.toContain(item2); // Low priority excluded
+
+	// Test incremental update
+	const item5 = create_test_item('task5', 'work', [], 9);
+	collection.add(item5);
+
+	const updated_high_priority = collection.get_derived('high_priority');
+	expect(updated_high_priority).toHaveLength(4);
+	expect(updated_high_priority[0]).toBe(item3); // 10
+	expect(updated_high_priority[1]).toBe(item5); // 9
+	expect(updated_high_priority[2]).toBe(item1); // 8
+	expect(updated_high_priority[3]).toBe(item4); // 6
+
+	// Test removal from derived index
+	collection.remove(item3.id);
+	const after_remove = collection.get_derived('high_priority');
+	expect(after_remove).toHaveLength(3);
+	expect(after_remove[0]).toBe(item5); // Now highest priority
+});
+
+test('Indexed_Collection - combined indexing strategies', () => {
+	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		indexes: [
+			{
+				key: 'by_name',
+				type: Index_Type.SINGLE,
+				extractor: (item) => item.name,
+			},
+			{
+				key: 'by_category',
+				type: Index_Type.MULTI,
+				extractor: (item) => item.category,
+			},
+			{
+				key: 'by_tag',
+				type: Index_Type.MULTI,
+				extractor: (item) => item.tags[0], // Just the first tag
+			},
+			{
+				key: 'recent_high_priority',
+				type: Index_Type.DERIVED,
+				compute: (collection) => {
+					return collection.all
+						.filter((item) => item.priority >= 8)
+						.sort((a, b) => b.created.getTime() - a.created.getTime());
+				},
+				matches: (item) => item.priority >= 8,
+			},
+		],
+	});
+
+	// Create items with a mix of properties
+	const item1 = create_test_item('apple', 'fruit', ['red', 'sweet'], 9);
+	const item2 = create_test_item('banana', 'fruit', ['yellow', 'sweet'], 7);
+	const item3 = create_test_item('carrot', 'vegetable', ['orange', 'crunchy'], 3);
+	const item4 = create_test_item('dragonfruit', 'fruit', ['pink', 'exotic'], 10);
+
+	collection.add_many([item1, item2, item3, item4]);
+
+	// Test single index lookup
+	expect(collection.by_optional('by_name', 'apple')).toBe(item1);
+
+	// Test multi index lookup
+	expect(collection.where('by_category', 'fruit')).toHaveLength(3);
+	expect(collection.where('by_tag', 'red')).toContainEqual(item1);
+
+	// Test derived index
+	const high_priority = collection.get_derived('recent_high_priority');
+	expect(high_priority).toHaveLength(2);
+	expect(high_priority).toContain(item1);
+	expect(high_priority).toContain(item4);
+	expect(high_priority).not.toContain(item2); // Priority 7 is too low
+});
+
+test('Indexed_Collection - add_first and ordering', () => {
+	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection();
+
+	const item1 = create_test_item('first', 'test');
+	const item2 = create_test_item('second', 'test');
+	const item3 = create_test_item('third', 'test');
+
+	// Add in specific order
+	collection.add(item1);
+	collection.add_first(item2);
+	collection.add(item3);
+
+	// Check ordering
+	expect(collection.all[0]).toBe(item2);
+	expect(collection.all[1]).toBe(item1);
+	expect(collection.all[2]).toBe(item3);
+
+	// Test insert_at
+	const item4 = create_test_item('inserted', 'test');
+	collection.insert_at(item4, 1);
+
+	expect(collection.all[0]).toBe(item2);
+	expect(collection.all[1]).toBe(item4);
+	expect(collection.all[2]).toBe(item1);
+	expect(collection.all[3]).toBe(item3);
+});
+
+test('Indexed_Collection - reorder items', () => {
+	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection();
+
+	const items = [
+		create_test_item('a', 'test'),
+		create_test_item('b', 'test'),
+		create_test_item('c', 'test'),
+		create_test_item('d', 'test'),
+	];
+
+	collection.add_many(items);
+
+	// Initial order: a, b, c, d
+	expect(collection.all[0].name).toBe('a');
+	expect(collection.all[3].name).toBe('d');
+
+	// Move 'a' to position 2
 	collection.reorder(0, 2);
 
-	expect(collection.all[0].id).toBe(uuid_2);
-	expect(collection.all[1].id).toBe(uuid_3);
-	expect(collection.all[2].id).toBe(uuid_1);
+	// New order should be: b, c, a, d
+	expect(collection.all[0].name).toBe('b');
+	expect(collection.all[1].name).toBe('c');
+	expect(collection.all[2].name).toBe('a');
+	expect(collection.all[3].name).toBe('d');
 });
 
-// Core functionality: Clear
-test('Indexed_Collection - clear method resets the collection', () => {
-	const collection: Indexed_Collection<Test_Item, 'name', 'category'> = new Indexed_Collection({
-		single_indexes: [{key: 'name', extractor: (item) => item.name}],
-		multi_indexes: [{key: 'category', extractor: (item) => item.category}],
-		initial_items: [sample_items[0], sample_items[1], sample_items[2]],
-	});
-
-	collection.clear();
-
-	expect(collection.all.length).toBe(0);
-	expect(collection.by_id.size).toBe(0);
-	expect(collection.single_indexes.name.size).toBe(0);
-	expect(collection.multi_indexes.category.size).toBe(0);
-});
-
-// Core functionality: Serialization
-test('Indexed_Collection - toJSON returns the array snapshot', () => {
+test('Indexed_Collection - remove_many items efficiently', () => {
 	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
-		initial_items: [sample_items[0], sample_items[1]],
+		indexes: [
+			{
+				key: 'by_category',
+				type: Index_Type.MULTI,
+				extractor: (item) => item.category,
+			},
+		],
 	});
 
-	const json_result = collection.toJSON();
-	expect(json_result).toEqual([sample_items[0], sample_items[1]]);
-});
+	// Add items
+	const items = [
+		create_test_item('a', 'food'),
+		create_test_item('b', 'drink'),
+		create_test_item('c', 'food'),
+		create_test_item('d', 'drink'),
+		create_test_item('e', 'other'),
+	];
 
-test('Indexed_Collection - can be serialized and deserialized', () => {
-	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
-		initial_items: [sample_items[0], sample_items[1]],
-	});
-
-	// Convert to JSON string
-	const json_string = JSON.stringify(collection);
-
-	// Parse back from JSON
-	const parsed_data = JSON.parse(json_string);
-
-	// Create a new collection with the parsed data
-	const new_collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
-		initial_items: parsed_data,
-	});
-
-	// The new collection should have the same items
-	expect(new_collection.size).toBe(2);
-	expect(new_collection.get(uuid_1)).toEqual(sample_items[0]);
-	expect(new_collection.get(uuid_2)).toEqual(sample_items[1]);
-});
-
-// Testing batch operations (add_many, remove_many)
-test('Indexed_Collection - add_many adds multiple items efficiently', () => {
-	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection();
-
-	// Add multiple items at once
-	const result = collection.add_many(sample_items.slice(0, 3));
-
-	expect(result.length).toBe(3);
-	expect(collection.size).toBe(3);
-	expect(collection.all[0].name).toBe('apple');
-	expect(collection.all[2].name).toBe('carrot');
-});
-
-test('Indexed_Collection - remove_many removes multiple items efficiently', () => {
-	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
-		initial_items: sample_items,
-	});
+	collection.add_many(items);
+	expect(collection.size).toBe(5);
 
 	// Remove multiple items
-	const ids_to_remove = [uuid_1, uuid_3, uuid_5];
-	const result = collection.remove_many(ids_to_remove);
+	const removed = collection.remove_many([items[0].id, items[3].id]);
 
-	expect(result).toBe(3);
-	expect(collection.size).toBe(2);
-	expect(collection.all[0].name).toBe('banana');
-	expect(collection.all[1].name).toBe('daikon');
+	// Check removal count
+	expect(removed).toBe(2);
+	expect(collection.size).toBe(3);
+
+	// Check that indexes are updated
+	expect(collection.where('by_category', 'food')).toHaveLength(1);
+	expect(collection.where('by_category', 'food')[0]).toBe(items[2]);
+	expect(collection.where('by_category', 'drink')).toHaveLength(1);
+	expect(collection.where('by_category', 'drink')[0]).toBe(items[1]);
 });
 
-// Testing the optimized index_of method
-test('Indexed_Collection - index_of finds positions correctly', () => {
+test('Indexed_Collection - clear collection', () => {
 	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
-		initial_items: sample_items,
+		indexes: [
+			{
+				key: 'by_category',
+				type: Index_Type.MULTI,
+				extractor: (item) => item.category,
+			},
+			{
+				key: 'by_name',
+				type: Index_Type.SINGLE,
+				extractor: (item) => item.name,
+			},
+			{
+				key: 'high_priority',
+				type: Index_Type.DERIVED,
+				compute: (collection) => {
+					// Explicitly filter only items with priority > 5
+					return collection.all.filter((item) => item.priority > 5);
+				},
+				// Add matches function for incremental updates
+				matches: (item) => item.priority > 5,
+			},
+		],
 	});
 
-	expect(collection.index_of(uuid_3)).toBe(2);
-	expect(collection.index_of(uuid_4)).toBe(3);
-});
+	// Add items
+	const items = [
+		create_test_item('a', 'food', [], 10), // high priority
+		create_test_item('b', 'drink', [], 3), // NOT high priority
+		create_test_item('c', 'food', [], 8), // high priority
+	];
 
-// Testing single index by and by_optional methods
-test('Indexed_Collection - by method returns items by single-value index', () => {
-	const collection: Indexed_Collection<Test_Item, 'name', never> = new Indexed_Collection({
-		single_indexes: [{key: 'name', extractor: (item) => item.name}],
-		initial_items: [sample_items[0], sample_items[1]],
-	});
+	collection.add_many(items);
 
-	expect(() => collection.by('name', 'apple')).not.toThrow();
-	expect(collection.by('name', 'apple')).toEqual(sample_items[0]);
+	expect(collection.size).toBe(3);
+	expect(collection.where('by_category', 'food')).toHaveLength(2);
 
-	expect(() => collection.by('name', 'nonexistent')).toThrow();
-});
+	// Check the high priority items
+	const high_priority_items = collection.get_derived('high_priority');
+	expect(high_priority_items.length).toBe(2);
+	expect(high_priority_items.map((i) => i.name).sort()).toEqual(['a', 'c']);
 
-test('Indexed_Collection - by_optional method returns items or undefined', () => {
-	const collection: Indexed_Collection<Test_Item, 'name', never> = new Indexed_Collection({
-		single_indexes: [{key: 'name', extractor: (item) => item.name}],
-		initial_items: [sample_items[0], sample_items[1]],
-	});
+	// Clear the collection
+	collection.clear();
 
-	expect(collection.by_optional('name', 'apple')).toEqual(sample_items[0]);
-	expect(collection.by_optional('name', 'nonexistent')).toBeUndefined();
+	// Verify all cleared
+	expect(collection.size).toBe(0);
+	expect(collection.all).toHaveLength(0);
+	expect(collection.where('by_category', 'food')).toHaveLength(0);
+	expect(collection.get_derived('high_priority')).toHaveLength(0);
+	expect(collection.by_optional('by_name', 'a')).toBeUndefined();
 });

@@ -8,7 +8,7 @@ import {source_file_to_diskfile_json} from '$lib/diskfile_helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {strip_start} from '@ryanatkn/belt/string.js';
-import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
+import {Indexed_Collection, Index_Type} from '$lib/indexed_collection.svelte.js';
 
 export const Diskfiles_Json = z
 	.object({
@@ -27,28 +27,49 @@ export type Diskfiles_Json = z.infer<typeof Diskfiles_Json>;
 
 export interface Diskfiles_Options extends Cell_Options<typeof Diskfiles_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
-// Define single index key for Diskfile - we only have a by_path single index
-export type Diskfile_Single_Indexes = 'by_path';
-
-// Define multi index keys for Diskfile - adding by_external_status for filtering
-export type Diskfile_Multi_Indexes = 'by_external_status';
-
 export class Diskfiles extends Cell<typeof Diskfiles_Json> {
-	readonly items: Indexed_Collection<Diskfile, Diskfile_Single_Indexes, Diskfile_Multi_Indexes> =
-		new Indexed_Collection({
-			single_indexes: [
-				{
-					key: 'by_path',
-					extractor: (file: Diskfile) => file.path,
+	readonly items: Indexed_Collection<Diskfile> = new Indexed_Collection({
+		indexes: [
+			{
+				key: 'by_path',
+				type: Index_Type.SINGLE,
+				extractor: (file: Diskfile) => file.path,
+			},
+			{
+				key: 'by_external_status',
+				type: Index_Type.MULTI,
+				extractor: (file: Diskfile) => (file.external ? 'external' : 'non_external'),
+			},
+			{
+				key: 'by_extension',
+				type: Index_Type.MULTI,
+				extractor: (file: Diskfile) => {
+					const match = /\.([^.]+)$/.exec(file.path);
+					return match ? match[1].toLowerCase() : 'no_extension';
 				},
-			],
-			multi_indexes: [
-				{
-					key: 'by_external_status',
-					extractor: (file: Diskfile) => (file.external ? 'external' : 'non_external'),
+			},
+			{
+				key: 'non_external_files',
+				type: Index_Type.DERIVED,
+				compute: (collection) => collection.where('by_external_status', 'non_external'),
+				// Update a derived index incrementally when an item is added
+				on_add: (collection, item, _source) => {
+					if (!item.external) {
+						collection.push(item);
+					}
 				},
-			],
-		});
+				// Update a derived index incrementally when an item is removed
+				on_remove: (collection, item) => {
+					if (!item.external) {
+						const idx = collection.findIndex((f) => f.id === item.id);
+						if (idx !== -1) collection.splice(idx, 1);
+					}
+				},
+				// Only process items matching this condition for this derived index
+				matches: (item) => !item.external,
+			},
+		],
+	});
 
 	selected_file_id: Uuid | null = $state(null);
 
@@ -56,10 +77,8 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 		this.selected_file_id ? (this.items.by_id.get(this.selected_file_id) ?? null) : null,
 	);
 
-	// Use the multi-index query instead of filtering
-	non_external_files: Array<Diskfile> = $derived(
-		this.items.where('by_external_status', 'non_external'),
-	);
+	// Use the derived index directly
+	non_external_files: Array<Diskfile> = $derived(this.items.get_derived('non_external_files'));
 
 	onselect?: (file: Diskfile) => void;
 

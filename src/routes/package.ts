@@ -602,6 +602,8 @@ export const src_json = {
 		'./chats.svelte.js': {
 			path: 'chats.svelte.ts',
 			declarations: [
+				{name: 'Chat_Single_Indexes', kind: 'type'},
+				{name: 'Chat_Multi_Indexes', kind: 'type'},
 				{name: 'Chats_Json', kind: 'variable'},
 				{name: 'Chats_Options', kind: 'type'},
 				{name: 'Chats', kind: 'class'},
@@ -739,8 +741,11 @@ export const src_json = {
 			path: 'indexed_collection.svelte.ts',
 			declarations: [
 				{name: 'Indexed_Item', kind: 'type'},
+				{name: 'Index_Type', kind: null},
+				{name: 'Single_Index_Config', kind: 'type'},
+				{name: 'Multi_Index_Config', kind: 'type'},
+				{name: 'Derived_Index_Config', kind: 'type'},
 				{name: 'Index_Config', kind: 'type'},
-				{name: 'Index_Value_Types', kind: 'type'},
 				{name: 'Indexed_Collection_Options', kind: 'type'},
 				{name: 'Indexed_Collection', kind: 'class'},
 			],
@@ -800,10 +805,10 @@ export const src_json = {
 			path: 'messages.svelte.ts',
 			declarations: [
 				{name: 'HISTORY_LIMIT_DEFAULT', kind: 'variable'},
+				{name: 'PONG_DISPLAY_LIMIT', kind: 'variable'},
 				{name: 'Messages_Json', kind: 'variable'},
 				{name: 'Messages_Options', kind: 'type'},
-				{name: 'Message_Indexes', kind: 'type'},
-				{name: 'Message_Index_Values', kind: 'type'},
+				{name: 'Message_Multi_Index_Keys', kind: 'type'},
 				{name: 'Messages', kind: 'class'},
 			],
 		},
