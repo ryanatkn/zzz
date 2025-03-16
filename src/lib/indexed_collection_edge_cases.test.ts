@@ -233,33 +233,6 @@ test('Indexed_Collection - index_of handles item not in array', () => {
 	expect(collection.index_of(uuid_1)).toBeUndefined();
 });
 
-// Edge case with lazily updated position index
-test('Indexed_Collection - position indexes update lazily when needed', () => {
-	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection();
-	const item1 = create_test_item(uuid_1, 'apple', 'fruit', []);
-	const item2 = create_test_item(uuid_2, 'banana', 'fruit', []);
-
-	// Add items normally
-	collection.add(item1);
-	collection.add(item2);
-
-	// Position should be indexed
-	expect(collection.position_index.get(uuid_1)).toBe(0);
-	expect(collection.position_index.get(uuid_2)).toBe(1);
-
-	// Update array directly but first clear the position index to force lazy computation
-	collection.position_index.clear(); // Clear index to simulate stale indexes
-	[collection.all[0], collection.all[1]] = [collection.all[1], collection.all[0]];
-
-	// Now the array and index are inconsistent - index_of should recalculate
-	expect(collection.index_of(uuid_1)).toBe(1); // Should find in position 1
-	expect(collection.index_of(uuid_2)).toBe(0); // Should find in position 0
-
-	// Position index should be updated
-	expect(collection.position_index.get(uuid_1)).toBe(1);
-	expect(collection.position_index.get(uuid_2)).toBe(0);
-});
-
 // Test handling of duplicate keys in multi-indexes
 test('Indexed_Collection - handles duplicate values in multi-indexes', () => {
 	const collection: Indexed_Collection<Test_Item, 'tag'> = new Indexed_Collection({

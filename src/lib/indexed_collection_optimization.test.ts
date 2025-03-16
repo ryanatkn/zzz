@@ -55,19 +55,6 @@ test('Indexed_Collection - add_many efficiently adds multiple items at once', ()
 	expect(collection.by_id.get(uuid_2)).toBe(sample_items[1]);
 	expect(collection.by_id.get(uuid_3)).toBe(sample_items[2]);
 
-	// Verify position indexes
-	expect(collection.position_index.get(uuid_1)).toBe(0);
-	expect(collection.position_index.get(uuid_2)).toBe(1);
-	expect(collection.position_index.get(uuid_3)).toBe(2);
-
-	// Verify fractional indexes maintain correct order
-	const frac_pos_1 = collection.fractional_index.get(uuid_1);
-	const frac_pos_2 = collection.fractional_index.get(uuid_2);
-	const frac_pos_3 = collection.fractional_index.get(uuid_3);
-
-	expect(frac_pos_1).toBeLessThan(frac_pos_2!);
-	expect(frac_pos_2).toBeLessThan(frac_pos_3!);
-
 	// Verify secondary indexes
 	expect(collection.multi_indexes.category?.get('fruit')?.length).toBe(2);
 	expect(collection.multi_indexes.category?.get('vegetable')?.length).toBe(1);
@@ -116,15 +103,6 @@ test('Indexed_Collection - remove_many efficiently removes multiple items', () =
 	expect(collection.by_id.get(uuid_3)?.name).toBe('carrot');
 	expect(collection.by_id.get(uuid_5)?.name).toBe('eggplant');
 
-	// Verify position indexes were updated
-	expect(collection.position_index.get(uuid_1)).toBe(0);
-	expect(collection.position_index.get(uuid_3)).toBe(1);
-	expect(collection.position_index.get(uuid_5)).toBe(2);
-
-	// Verify position indexes were removed for deleted items
-	expect(collection.position_index.has(uuid_2)).toBe(false);
-	expect(collection.position_index.has(uuid_4)).toBe(false);
-
 	// Verify secondary indexes were updated
 	expect(collection.multi_indexes.category?.get('fruit')?.length).toBe(1); // Only apple remains
 	expect(collection.multi_indexes.category?.get('vegetable')?.length).toBe(2); // Carrot and eggplant
@@ -169,10 +147,6 @@ test('Indexed_Collection - remove_many handles order correctly', () => {
 	// Check resulting array - should have banana and daikon in positions 0 and 1
 	expect(collection.all[0].name).toBe('banana');
 	expect(collection.all[1].name).toBe('daikon');
-
-	// Position indexes should be updated correctly
-	expect(collection.position_index.get(uuid_2)).toBe(0);
-	expect(collection.position_index.get(uuid_4)).toBe(1);
 });
 
 // Test the optimized index_of implementation
@@ -181,17 +155,9 @@ test('Indexed_Collection - index_of efficiently finds item positions', () => {
 		initial_items: sample_items,
 	});
 
-	// First call should use cached position
+	// Should find the correct position with linear search
 	expect(collection.index_of(uuid_3)).toBe(2);
-
-	// Simulate cache miss by clearing position index
-	(collection as any).position_index.delete(uuid_4);
-
-	// Should still find the correct position
 	expect(collection.index_of(uuid_4)).toBe(3);
-
-	// Position should now be cached
-	expect(collection.position_index.get(uuid_4)).toBe(3);
 
 	// Non-existent item should return undefined
 	const nonexistent_id = Uuid.parse(undefined);
@@ -304,37 +270,6 @@ test('Indexed_Collection - related method deduplicates results', () => {
 	expect(related_items[0].id).toBe(referenced_id);
 });
 
-test('Indexed_Collection - optimized rebalancing of fractional positions', () => {
-	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection();
-
-	// Add several items
-	collection.add_many(sample_items);
-
-	// Manually set fractional positions very close together to trigger rebalancing
-	const items = [...collection.all];
-	const positions = items.map((_, i) => 10 + i * 0.01); // Very small gaps
-
-	for (let i = 0; i < items.length; i++) {
-		collection.fractional_index.set(items[i].id, positions[i]);
-	}
-
-	// Add another item which should trigger rebalancing
-	const new_item = create_test_item(Uuid.parse(undefined), 'new_item', 'category', []);
-	collection.add_first(new_item);
-
-	// After rebalancing, positions should be more evenly distributed
-	const rebalanced_positions = collection.all.map((item) =>
-		collection.fractional_index.get(item.id),
-	);
-
-	// Check that gaps between positions are larger than before
-	const MIN_GAP = 10; // After rebalancing, should be significantly larger than 0.01
-	for (let i = 1; i < rebalanced_positions.length; i++) {
-		const gap = rebalanced_positions[i]! - rebalanced_positions[i - 1]!;
-		expect(gap).toBeGreaterThan(MIN_GAP);
-	}
-});
-
 // Add timeout for this performance test
 test(
 	'Indexed_Collection - batch operations scale efficiently with large datasets',
@@ -380,28 +315,3 @@ test(
 		console.log(`Removed 200 items in ${end_remove_time - start_remove_time}ms`);
 	},
 );
-
-// Test the lazy index update behavior
-test('Indexed_Collection - position indexes update lazily when needed', () => {
-	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection();
-
-	// Add items normally
-	collection.add(sample_items[0]);
-	collection.add(sample_items[1]);
-
-	// Position should be indexed
-	expect(collection.position_index.get(uuid_1)).toBe(0);
-	expect(collection.position_index.get(uuid_2)).toBe(1);
-
-	// Update array directly but first clear the position index to force lazy computation
-	collection.position_index.clear(); // Clear index to simulate stale indexes
-	[collection.all[0], collection.all[1]] = [collection.all[1], collection.all[0]];
-
-	// Now the array and index are inconsistent - index_of should recalculate
-	expect(collection.index_of(uuid_1)).toBe(1); // Should find in position 1
-	expect(collection.index_of(uuid_2)).toBe(0); // Should find in position 0
-
-	// Position index should be updated
-	expect(collection.position_index.get(uuid_1)).toBe(1);
-	expect(collection.position_index.get(uuid_2)).toBe(0);
-});
