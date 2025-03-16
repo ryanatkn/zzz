@@ -10,7 +10,7 @@ import {
 	Message_Type,
 } from '$lib/message_types.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
-import {Indexed_Collection, type Index_Value_Types} from '$lib/indexed_collection.svelte.js';
+import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 
 export const HISTORY_LIMIT_DEFAULT = 512;
 
@@ -31,35 +31,35 @@ export interface Messages_Options extends Cell_Options<typeof Messages_Json> {
 	history_limit?: number;
 }
 
-// Define our index keys and their corresponding value types
-export type Message_Indexes = 'by_type';
-export interface Message_Index_Values extends Index_Value_Types<Message_Indexes> {
-	by_type: Message_Type;
+// Define our index keys for type safety
+// No single indexes used here, so use 'never' for the first type parameter
+export type Message_Multi_Index_Keys = 'by_type';
+
+export interface Messages_Options extends Cell_Options<typeof Messages_Json> {
+	history_limit?: number;
 }
 
 export class Messages extends Cell<typeof Messages_Json> {
-	// Configure indexed collection with type-safe indexing
-	readonly items: Indexed_Collection<Message, Message_Indexes, Message_Index_Values> =
+	// Configure indexed collection with type-safe indexing using proper structure
+	readonly items: Indexed_Collection<Message, never, Message_Multi_Index_Keys> =
 		new Indexed_Collection({
-			indexes: [
+			multi_indexes: [
 				{
 					key: 'by_type',
-					extractor: (message) => message.type,
-					multi: true,
+					extractor: (message: Message) => message.type,
 				},
 			],
 		});
 
 	history_limit: number = $state(HISTORY_LIMIT_DEFAULT);
 
-	// Using the new, simpler API with the by() helper
-	pings: Array<Message> = $derived(this.by('type', 'ping'));
-	pongs: Array<Message> = $derived(this.by('type', 'pong'));
-	prompts: Array<Message> = $derived(this.by('type', 'send_prompt'));
-	completions: Array<Message> = $derived(this.by('type', 'completion_response'));
-	diskfile_updates: Array<Message> = $derived(this.by('type', 'update_diskfile'));
-	diskfile_deletes: Array<Message> = $derived(this.by('type', 'delete_diskfile'));
-	filer_changes: Array<Message> = $derived(this.by('type', 'filer_change'));
+	pings: Array<Message> = $derived(this.items.where('by_type', 'ping'));
+	pongs: Array<Message> = $derived(this.items.where('by_type', 'pong'));
+	prompts: Array<Message> = $derived(this.items.where('by_type', 'send_prompt'));
+	completions: Array<Message> = $derived(this.items.where('by_type', 'completion_response'));
+	diskfile_updates: Array<Message> = $derived(this.items.where('by_type', 'update_diskfile'));
+	diskfile_deletes: Array<Message> = $derived(this.items.where('by_type', 'delete_diskfile'));
+	filer_changes: Array<Message> = $derived(this.items.where('by_type', 'filer_change'));
 
 	// Message handlers
 	onsend?: (message: Message_Client) => void;
@@ -137,7 +137,6 @@ export class Messages extends Cell<typeof Messages_Json> {
 		return message;
 	}
 
-	// TODO remove this, maybe move to base class
 	/**
 	 * Get messages by any property value
 	 * A generic helper that fetches messages filtered by any property
@@ -156,8 +155,6 @@ export class Messages extends Cell<typeof Messages_Json> {
 		console.warn(`No index available for property: ${property as string}`);
 		return [];
 	}
-
-	// Remove the get_related_messages method as it's now redundant with the `related` method
 
 	/**
 	 * Trims the collection to the maximum allowed size by removing oldest messages

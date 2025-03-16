@@ -54,11 +54,9 @@ test('Indexed_Collection - initializes with provided items', () => {
 });
 
 test('Indexed_Collection - initializes with configured indexes', () => {
-	const collection: Indexed_Collection<Test_Item, 'name' | 'category'> = new Indexed_Collection({
-		indexes: [
-			{key: 'name', extractor: (item) => item.name},
-			{key: 'category', extractor: (item) => item.category, multi: true},
-		],
+	const collection: Indexed_Collection<Test_Item, 'name', 'category'> = new Indexed_Collection({
+		single_indexes: [{key: 'name', extractor: (item) => item.name}],
+		multi_indexes: [{key: 'category', extractor: (item) => item.category}],
 	});
 
 	expect(collection.single_indexes.name).toBeDefined();
@@ -66,12 +64,12 @@ test('Indexed_Collection - initializes with configured indexes', () => {
 });
 
 test('Indexed_Collection - initializes with multiple indexes of different types', () => {
-	const collection: Indexed_Collection<Test_Item, 'name' | 'category' | 'tags'> =
+	const collection: Indexed_Collection<Test_Item, 'name', 'category' | 'tags'> =
 		new Indexed_Collection({
-			indexes: [
-				{key: 'name', extractor: (item) => item.name},
-				{key: 'category', extractor: (item) => item.category, multi: true},
-				{key: 'tags', extractor: (item) => item.tags.join(','), multi: true},
+			single_indexes: [{key: 'name', extractor: (item) => item.name}],
+			multi_indexes: [
+				{key: 'category', extractor: (item) => item.category},
+				{key: 'tags', extractor: (item) => item.tags.join(',')},
 			],
 		});
 
@@ -82,11 +80,9 @@ test('Indexed_Collection - initializes with multiple indexes of different types'
 
 // Core functionality: Adding and retrieving items
 test('Indexed_Collection - add method adds items and updates indexes', () => {
-	const collection: Indexed_Collection<Test_Item, 'name' | 'category'> = new Indexed_Collection({
-		indexes: [
-			{key: 'name', extractor: (item) => item.name},
-			{key: 'category', extractor: (item) => item.category, multi: true},
-		],
+	const collection: Indexed_Collection<Test_Item, 'name', 'category'> = new Indexed_Collection({
+		single_indexes: [{key: 'name', extractor: (item) => item.name}],
+		multi_indexes: [{key: 'category', extractor: (item) => item.category}],
 	});
 
 	collection.add(sample_items[0]);
@@ -99,10 +95,10 @@ test('Indexed_Collection - add method adds items and updates indexes', () => {
 	expect(collection.by_id.get(uuid_1)).toEqual(sample_items[0]);
 
 	// Check single-value index
-	expect(collection.single_indexes.name?.get('apple')).toEqual(sample_items[0]);
+	expect(collection.single_indexes.name.get('apple')).toEqual(sample_items[0]);
 
 	// Check multi-value index
-	expect(collection.multi_indexes.category?.get('fruit')).toEqual([
+	expect(collection.multi_indexes.category.get('fruit')).toEqual([
 		sample_items[0],
 		sample_items[1],
 	]);
@@ -139,11 +135,9 @@ test('Indexed_Collection - has method checks if item exists by id', () => {
 
 // Core functionality: Removing items
 test('Indexed_Collection - remove method removes items and updates indexes', () => {
-	const collection: Indexed_Collection<Test_Item, 'name' | 'category'> = new Indexed_Collection({
-		indexes: [
-			{key: 'name', extractor: (item) => item.name},
-			{key: 'category', extractor: (item) => item.category, multi: true},
-		],
+	const collection: Indexed_Collection<Test_Item, 'name', 'category'> = new Indexed_Collection({
+		single_indexes: [{key: 'name', extractor: (item) => item.name}],
+		multi_indexes: [{key: 'category', extractor: (item) => item.category}],
 		initial_items: [sample_items[0], sample_items[1], sample_items[2]],
 	});
 
@@ -152,10 +146,10 @@ test('Indexed_Collection - remove method removes items and updates indexes', () 
 	expect(removed).toBe(true);
 	expect(collection.all.length).toBe(2);
 	expect(collection.by_id.has(uuid_2)).toBe(false);
-	expect(collection.single_indexes.name?.has('banana')).toBe(false);
+	expect(collection.single_indexes.name.has('banana')).toBe(false);
 
 	// Check that the category index was updated properly
-	const fruit_items = collection.multi_indexes.category?.get('fruit');
+	const fruit_items = collection.multi_indexes.category.get('fruit');
 	expect(fruit_items?.length).toBe(1);
 	expect(fruit_items?.[0].id).toBe(uuid_1);
 });
@@ -175,11 +169,9 @@ test('Indexed_Collection - reorder method changes item order', () => {
 
 // Core functionality: Clear
 test('Indexed_Collection - clear method resets the collection', () => {
-	const collection: Indexed_Collection<Test_Item, 'name' | 'category'> = new Indexed_Collection({
-		indexes: [
-			{key: 'name', extractor: (item) => item.name},
-			{key: 'category', extractor: (item) => item.category, multi: true},
-		],
+	const collection: Indexed_Collection<Test_Item, 'name', 'category'> = new Indexed_Collection({
+		single_indexes: [{key: 'name', extractor: (item) => item.name}],
+		multi_indexes: [{key: 'category', extractor: (item) => item.category}],
 		initial_items: [sample_items[0], sample_items[1], sample_items[2]],
 	});
 
@@ -187,8 +179,8 @@ test('Indexed_Collection - clear method resets the collection', () => {
 
 	expect(collection.all.length).toBe(0);
 	expect(collection.by_id.size).toBe(0);
-	expect(collection.single_indexes.name?.size).toBe(0);
-	expect(collection.multi_indexes.category?.size).toBe(0);
+	expect(collection.single_indexes.name.size).toBe(0);
+	expect(collection.multi_indexes.category.size).toBe(0);
 });
 
 // Core functionality: Serialization
@@ -259,4 +251,27 @@ test('Indexed_Collection - index_of finds positions correctly', () => {
 
 	expect(collection.index_of(uuid_3)).toBe(2);
 	expect(collection.index_of(uuid_4)).toBe(3);
+});
+
+// Testing single index by and by_optional methods
+test('Indexed_Collection - by method returns items by single-value index', () => {
+	const collection: Indexed_Collection<Test_Item, 'name', never> = new Indexed_Collection({
+		single_indexes: [{key: 'name', extractor: (item) => item.name}],
+		initial_items: [sample_items[0], sample_items[1]],
+	});
+
+	expect(() => collection.by('name', 'apple')).not.toThrow();
+	expect(collection.by('name', 'apple')).toEqual(sample_items[0]);
+
+	expect(() => collection.by('name', 'nonexistent')).toThrow();
+});
+
+test('Indexed_Collection - by_optional method returns items or undefined', () => {
+	const collection: Indexed_Collection<Test_Item, 'name', never> = new Indexed_Collection({
+		single_indexes: [{key: 'name', extractor: (item) => item.name}],
+		initial_items: [sample_items[0], sample_items[1]],
+	});
+
+	expect(collection.by_optional('name', 'apple')).toEqual(sample_items[0]);
+	expect(collection.by_optional('name', 'nonexistent')).toBeUndefined();
 });

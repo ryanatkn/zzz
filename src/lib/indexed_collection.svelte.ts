@@ -9,22 +9,37 @@ export interface Indexed_Item {
 }
 
 /**
- * Type-safe configuration for additional indexes
+ * Type-safe configuration for single-value indexes
  */
-export interface Index_Config<T, K extends string, V> {
+export interface Single_Index_Config<T, K extends string, V> {
 	key: K;
 	extractor: (item: T) => V;
-	multi?: boolean; // Whether this index maps to multiple items
 }
 
-export type Index_Value_Types<K extends string> = Record<K, any>;
+/**
+ * Type-safe configuration for multi-value indexes
+ */
+export interface Multi_Index_Config<T, K extends string, V> {
+	key: K;
+	extractor: (item: T) => V;
+}
+
+export type Index_Value_Types<T_Key_Single extends string, T_Key_Multi extends string> = Record<
+	T_Key_Single | T_Key_Multi,
+	any
+>;
 
 export interface Indexed_Collection_Options<
 	T extends Indexed_Item,
-	K extends string,
-	V extends Index_Value_Types<K> = Record<K, any>,
+	T_Key_Single extends string = never,
+	T_Key_Multi extends string = never,
+	V extends Index_Value_Types<T_Key_Single, T_Key_Multi> = Index_Value_Types<
+		T_Key_Single,
+		T_Key_Multi
+	>,
 > {
-	indexes?: Array<Index_Config<T, K, V[K]>>;
+	single_indexes?: Array<Single_Index_Config<T, T_Key_Single, V[T_Key_Single]>>;
+	multi_indexes?: Array<Multi_Index_Config<T, T_Key_Multi, V[T_Key_Multi]>>;
 	initial_items?: Array<T>;
 }
 
@@ -34,8 +49,12 @@ export interface Indexed_Collection_Options<
  */
 export class Indexed_Collection<
 	T extends Indexed_Item,
-	K extends string = never,
-	V extends Index_Value_Types<K> = Record<K, any>,
+	T_Key_Single extends string = never,
+	T_Key_Multi extends string = never,
+	V extends Index_Value_Types<T_Key_Single, T_Key_Multi> = Index_Value_Types<
+		T_Key_Single,
+		T_Key_Multi
+	>,
 > {
 	// The main collection of items
 	all: Array<T> = $state([]);
@@ -43,26 +62,39 @@ export class Indexed_Collection<
 	// The primary index by ID keyed by Uuid
 	readonly by_id: SvelteMap<Uuid, T> = new SvelteMap();
 
-	// Additional single-value indexes (one key maps to one item)
-	readonly single_indexes: Partial<Record<K, SvelteMap<any, T>>> = {};
+	// Single-value indexes (one key maps to one item)
+	readonly single_indexes: Record<T_Key_Single, SvelteMap<any, T>> = {} as Record<
+		T_Key_Single,
+		SvelteMap<any, T>
+	>;
 
-	// Additional multi-value indexes (one key maps to many items)
-	readonly multi_indexes: Partial<Record<K, SvelteMap<any, Array<T>>>> = {};
+	// Multi-value indexes (one key maps to many items)
+	readonly multi_indexes: Record<T_Key_Multi, SvelteMap<any, Array<T>>> = {} as Record<
+		T_Key_Multi,
+		SvelteMap<any, Array<T>>
+	>;
 
-	#configs: Array<Index_Config<T, K, any>> = [];
+	#single_configs: Array<Single_Index_Config<T, T_Key_Single, any>> = [];
+	#multi_configs: Array<Multi_Index_Config<T, T_Key_Multi, any>> = [];
 
-	constructor(options?: Indexed_Collection_Options<T, K, V>) {
-		// Set up additional indexes
-		if (options?.indexes) {
-			this.#configs = options.indexes;
+	constructor(options?: Indexed_Collection_Options<T, T_Key_Single, T_Key_Multi, V>) {
+		// Set up single indexes
+		if (options?.single_indexes) {
+			this.#single_configs = options.single_indexes;
 
 			// Initialize the index maps
-			for (const config of this.#configs) {
-				if (config.multi) {
-					this.multi_indexes[config.key] = new SvelteMap();
-				} else {
-					this.single_indexes[config.key] = new SvelteMap();
-				}
+			for (const config of this.#single_configs) {
+				this.single_indexes[config.key] = new SvelteMap();
+			}
+		}
+
+		// Set up multi indexes
+		if (options?.multi_indexes) {
+			this.#multi_configs = options.multi_indexes;
+
+			// Initialize the index maps
+			for (const config of this.#multi_configs) {
+				this.multi_indexes[config.key] = new SvelteMap();
 			}
 		}
 
@@ -92,17 +124,21 @@ export class Indexed_Collection<
 			// Update primary ID index
 			this.by_id.set(item.id, item);
 
-			// Update secondary indexes
-			for (const config of this.#configs) {
+			// Update secondary single indexes
+			for (const config of this.#single_configs) {
 				const key = config.extractor(item);
 				if (key !== undefined && key !== null) {
-					if (config.multi) {
-						const collection = this.multi_indexes[config.key]!.get(key) || [];
-						collection.push(item);
-						this.multi_indexes[config.key]!.set(key, collection);
-					} else {
-						this.single_indexes[config.key]!.set(key, item);
-					}
+					this.single_indexes[config.key].set(key, item);
+				}
+			}
+
+			// Update secondary multi indexes
+			for (const config of this.#multi_configs) {
+				const key = config.extractor(item);
+				if (key !== undefined && key !== null) {
+					const collection = this.multi_indexes[config.key].get(key) || [];
+					collection.push(item);
+					this.multi_indexes[config.key].set(key, collection);
 				}
 			}
 		}
@@ -141,29 +177,33 @@ export class Indexed_Collection<
 			// Clear from primary ID index
 			this.by_id.delete(item.id);
 
-			// Update secondary indexes
-			for (const config of this.#configs) {
+			// Update secondary single indexes
+			for (const config of this.#single_configs) {
 				const key = config.extractor(item);
 				if (key == null) continue;
 
-				if (config.multi) {
-					const multi_index = this.multi_indexes[config.key]!;
-					const collection = multi_index.get(key);
+				const single_index = this.single_indexes[config.key];
+				const mapped_item = single_index.get(key);
 
-					if (collection) {
-						const updated = collection.filter((i) => i.id !== item.id);
-						if (updated.length === 0) {
-							multi_index.delete(key);
-						} else {
-							multi_index.set(key, updated);
-						}
-					}
-				} else {
-					const single_index = this.single_indexes[config.key]!;
-					const mapped_item = single_index.get(key);
+				if (mapped_item && mapped_item.id === item.id) {
+					single_index.delete(key);
+				}
+			}
 
-					if (mapped_item && mapped_item.id === item.id) {
-						single_index.delete(key);
+			// Update secondary multi indexes
+			for (const config of this.#multi_configs) {
+				const key = config.extractor(item);
+				if (key == null) continue;
+
+				const multi_index = this.multi_indexes[config.key];
+				const collection = multi_index.get(key);
+
+				if (collection) {
+					const updated = collection.filter((i) => i.id !== item.id);
+					if (updated.length === 0) {
+						multi_index.delete(key);
+					} else {
+						multi_index.set(key, updated);
 					}
 				}
 			}
@@ -180,17 +220,21 @@ export class Indexed_Collection<
 		this.all.push(item);
 		this.by_id.set(item.id, item);
 
-		// Update all additional indexes
-		for (const config of this.#configs) {
+		// Update all single indexes
+		for (const config of this.#single_configs) {
 			const key = config.extractor(item);
 			if (key !== undefined && key !== null) {
-				if (config.multi) {
-					const collection = this.multi_indexes[config.key]!.get(key) || [];
-					collection.push(item);
-					this.multi_indexes[config.key]!.set(key, collection);
-				} else {
-					this.single_indexes[config.key]!.set(key, item);
-				}
+				this.single_indexes[config.key].set(key, item);
+			}
+		}
+
+		// Update all multi indexes
+		for (const config of this.#multi_configs) {
+			const key = config.extractor(item);
+			if (key !== undefined && key !== null) {
+				const collection = this.multi_indexes[config.key].get(key) || [];
+				collection.push(item);
+				this.multi_indexes[config.key].set(key, collection);
 			}
 		}
 
@@ -205,17 +249,21 @@ export class Indexed_Collection<
 		this.all.unshift(item);
 		this.by_id.set(item.id, item);
 
-		// Update secondary indexes
-		for (const config of this.#configs) {
+		// Update single indexes
+		for (const config of this.#single_configs) {
 			const key = config.extractor(item);
 			if (key !== undefined && key !== null) {
-				if (config.multi) {
-					const collection = this.multi_indexes[config.key]!.get(key) || [];
-					collection.unshift(item);
-					this.multi_indexes[config.key]!.set(key, collection);
-				} else {
-					this.single_indexes[config.key]!.set(key, item);
-				}
+				this.single_indexes[config.key].set(key, item);
+			}
+		}
+
+		// Update multi indexes
+		for (const config of this.#multi_configs) {
+			const key = config.extractor(item);
+			if (key !== undefined && key !== null) {
+				const collection = this.multi_indexes[config.key].get(key) || [];
+				collection.unshift(item);
+				this.multi_indexes[config.key].set(key, collection);
 			}
 		}
 
@@ -244,19 +292,21 @@ export class Indexed_Collection<
 		this.all.splice(index, 0, item);
 		this.by_id.set(item.id, item);
 
-		// Update all additional indexes
-		for (const config of this.#configs) {
+		// Update single indexes
+		for (const config of this.#single_configs) {
 			const key = config.extractor(item);
 			if (key !== undefined && key !== null) {
-				if (config.multi) {
-					const collection = this.multi_indexes[config.key]!.get(key) || [];
+				this.single_indexes[config.key].set(key, item);
+			}
+		}
 
-					// Simply add item to the collection
-					collection.push(item);
-					this.multi_indexes[config.key]!.set(key, collection);
-				} else {
-					this.single_indexes[config.key]!.set(key, item);
-				}
+		// Update multi indexes
+		for (const config of this.#multi_configs) {
+			const key = config.extractor(item);
+			if (key !== undefined && key !== null) {
+				const collection = this.multi_indexes[config.key].get(key) || [];
+				collection.push(item);
+				this.multi_indexes[config.key].set(key, collection);
 			}
 		}
 
@@ -278,33 +328,36 @@ export class Indexed_Collection<
 		this.all.splice(index, 1);
 		this.by_id.delete(id);
 
-		// Update all additional indexes
-		for (const config of this.#configs) {
+		// Update single indexes
+		for (const config of this.#single_configs) {
 			const key = config.extractor(item);
 			if (key == null) continue;
 
-			if (config.multi) {
-				const multi_index = this.multi_indexes[config.key]!;
-				const collection = multi_index.get(key);
+			const single_index = this.single_indexes[config.key];
+			const mapped_item = single_index.get(key);
 
-				if (collection) {
-					// Filter out the removed item
-					const updated = collection.filter((i) => i.id !== id);
+			if (mapped_item && mapped_item.id === id) {
+				single_index.delete(key);
+			}
+		}
 
-					// If no items left with this key, remove the key from the index
-					if (updated.length === 0) {
-						multi_index.delete(key);
-					} else {
-						multi_index.set(key, updated);
-					}
-				}
-			} else {
-				// For single-value indexes, only remove if this item is mapped to this key
-				const single_index = this.single_indexes[config.key]!;
-				const mapped_item = single_index.get(key);
+		// Update multi indexes
+		for (const config of this.#multi_configs) {
+			const key = config.extractor(item);
+			if (key == null) continue;
 
-				if (mapped_item && mapped_item.id === id) {
-					single_index.delete(key);
+			const multi_index = this.multi_indexes[config.key];
+			const collection = multi_index.get(key);
+
+			if (collection) {
+				// Filter out the removed item
+				const updated = collection.filter((i) => i.id !== id);
+
+				// If no items left with this key, remove the key from the index
+				if (updated.length === 0) {
+					multi_index.delete(key);
+				} else {
+					multi_index.set(key, updated);
 				}
 			}
 		}
@@ -375,45 +428,35 @@ export class Indexed_Collection<
 		this.all.length = 0;
 		this.by_id.clear();
 
-		// Clear all additional indexes
-		for (const config of this.#configs) {
-			if (config.multi) {
-				this.multi_indexes[config.key]!.clear();
-			} else {
-				this.single_indexes[config.key]!.clear();
-			}
+		// Clear all single indexes
+		for (const config of this.#single_configs) {
+			this.single_indexes[config.key].clear();
+		}
+
+		// Clear all multi indexes
+		for (const config of this.#multi_configs) {
+			this.multi_indexes[config.key].clear();
 		}
 	}
 
 	/**
-	 * Get all items matching an indexed property value
+	 * Get all items matching a multi-indexed property value
 	 *
 	 * @param index_key The indexed property name
 	 * @param value The value to filter by
 	 */
-	where<Key extends K>(index_key: Key, value: V[Key]): Array<T> {
-		const multi_index = this.multi_indexes[index_key];
-		if (multi_index) {
-			return [...(multi_index.get(value) || [])];
-		}
-
-		const single_index = this.single_indexes[index_key];
-		if (single_index) {
-			const item = single_index.get(value);
-			return item ? [item] : [];
-		}
-
-		return [];
+	where<T_Key extends T_Key_Multi>(index_key: T_Key, value: V[T_Key]): Array<T> {
+		return [...(this.multi_indexes[index_key].get(value) || [])];
 	}
 
 	/**
-	 * Get the first N items matching an indexed property value
+	 * Get the first N items matching a multi-indexed property value
 	 *
 	 * @param index_key The indexed property name
 	 * @param value The value to filter by
 	 * @param limit Maximum number of items to return
 	 */
-	first<Key extends K>(index_key: Key, value: V[Key], limit: number): Array<T> {
+	first<T_Key extends T_Key_Multi>(index_key: T_Key, value: V[T_Key], limit: number): Array<T> {
 		// Handle edge cases with limit
 		if (limit <= 0) return [];
 
@@ -422,13 +465,13 @@ export class Indexed_Collection<
 	}
 
 	/**
-	 * Get the latest N items matching an indexed property value
+	 * Get the latest N items matching a multi-indexed property value
 	 *
 	 * @param index_key The indexed property name
 	 * @param value The value to filter by
 	 * @param limit Maximum number of items to return
 	 */
-	latest<Key extends K>(index_key: Key, value: V[Key], limit: number): Array<T> {
+	latest<T_Key extends T_Key_Multi>(index_key: T_Key, value: V[T_Key], limit: number): Array<T> {
 		// Handle edge cases with limit
 		if (limit <= 0) return [];
 
@@ -504,8 +547,20 @@ export class Indexed_Collection<
 
 	/**
 	 * Get an item by a single-value index
+	 * Returns the item or throws if no item is found
 	 */
-	by<Key extends K>(index_key: Key, value: V[Key]): T | undefined {
-		return this.single_indexes[index_key]?.get(value);
+	by<T_Key extends T_Key_Single>(index_key: T_Key, value: V[T_Key]): T {
+		const item = this.single_indexes[index_key].get(value);
+		if (!item) {
+			throw new Error(`Item not found for index ${String(index_key)} with value ${String(value)}`);
+		}
+		return item;
+	}
+
+	/**
+	 * Get an item by a single-value index, returning undefined if not found
+	 */
+	by_optional<T_Key extends T_Key_Single>(index_key: T_Key, value: V[T_Key]): T | undefined {
+		return this.single_indexes[index_key].get(value);
 	}
 }

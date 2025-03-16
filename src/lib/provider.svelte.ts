@@ -26,9 +26,9 @@ export class Provider extends Cell<typeof Provider_Json> {
 	models: Array<Model> = $derived(this.zzz.models.items.where('provider_name', this.name));
 	// TODO BLOCK this isn't a thing, each message is to an provider+model
 	selected_model_name: string | undefined = $state();
-	selected_model: Model | undefined = $derived.by(() =>
+	selected_model: Model | undefined = $derived(
 		this.selected_model_name
-			? this.zzz.models.items.by('name', this.selected_model_name)
+			? this.zzz.models.items.by_optional('name', this.selected_model_name)
 			: undefined,
 	);
 

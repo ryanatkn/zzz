@@ -21,13 +21,17 @@ export type Models_Json = z.infer<typeof Models_Json>;
 
 export interface Models_Options extends Cell_Options<typeof Models_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
+// Define the key types for single and multi indexes
+export type Model_Single_Index_Keys = 'name';
+export type Model_Multi_Index_Keys = 'provider_name' | 'tag';
+
 export class Models extends Cell<typeof Models_Json> {
-	readonly items: Indexed_Collection<Model, 'name' | 'provider_name' | 'tag'> =
+	readonly items: Indexed_Collection<Model, Model_Single_Index_Keys, Model_Multi_Index_Keys> =
 		new Indexed_Collection({
-			indexes: [
-				{key: 'name', extractor: (model) => model.name},
-				{key: 'provider_name', extractor: (model) => model.provider_name, multi: true},
-				{key: 'tag', extractor: (model) => model.tags[0], multi: true}, // Index first tag for efficiency
+			single_indexes: [{key: 'name', extractor: (model: Model) => model.name}],
+			multi_indexes: [
+				{key: 'provider_name', extractor: (model: Model) => model.provider_name},
+				{key: 'tag', extractor: (model: Model) => model.tags[0]}, // Index first tag for efficiency
 			],
 		});
 
@@ -58,7 +62,7 @@ export class Models extends Cell<typeof Models_Json> {
 	add_ollama_models(model_infos: Array<Ollama_Model_Info>): void {
 		// First add the models that are installed
 		const installed_ollama_models = model_infos.map((ollama_model_info) => {
-			const model_default = this.items.single_indexes.name?.get(ollama_model_info.model.name);
+			const model_default = this.items.by_optional('name', ollama_model_info.model.name);
 			// TODO maybe clone would be cleaner?
 			return new Model({
 				zzz: this.zzz,
@@ -90,11 +94,11 @@ export class Models extends Cell<typeof Models_Json> {
 	}
 
 	find_by_name(name: string): Model | undefined {
-		return this.items.by('name', name);
+		return this.items.by_optional('name', name);
 	}
 
 	filter_by_names(names: Array<string>): Array<Model> | undefined {
-		const found = names.map((name) => this.items.by('name', name)).filter((m) => !!m);
+		const found = names.map((name) => this.items.by_optional('name', name)).filter((m) => !!m);
 		return found.length ? found : undefined;
 	}
 
@@ -103,7 +107,7 @@ export class Models extends Cell<typeof Models_Json> {
 	}
 
 	remove_by_name(name: string): void {
-		const model = this.items.single_indexes.name?.get(name);
+		const model = this.items.by_optional('name', name);
 		if (model) {
 			this.items.remove(model.id);
 		}

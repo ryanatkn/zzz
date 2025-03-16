@@ -39,8 +39,8 @@ const sample_items: Array<Test_Item> = [
 
 // Query method tests
 test('Indexed_Collection - where returns all matching items', () => {
-	const collection: Indexed_Collection<Test_Item, 'category'> = new Indexed_Collection({
-		indexes: [{key: 'category', extractor: (item) => item.category, multi: true}],
+	const collection: Indexed_Collection<Test_Item, never, 'category'> = new Indexed_Collection({
+		multi_indexes: [{key: 'category', extractor: (item) => item.category}],
 		initial_items: sample_items,
 	});
 
@@ -56,8 +56,8 @@ test('Indexed_Collection - where returns all matching items', () => {
 });
 
 test('Indexed_Collection - where returns empty array for non-existent values', () => {
-	const collection: Indexed_Collection<Test_Item, 'category'> = new Indexed_Collection({
-		indexes: [{key: 'category', extractor: (item) => item.category, multi: true}],
+	const collection: Indexed_Collection<Test_Item, never, 'category'> = new Indexed_Collection({
+		multi_indexes: [{key: 'category', extractor: (item) => item.category}],
 		initial_items: sample_items,
 	});
 
@@ -66,8 +66,8 @@ test('Indexed_Collection - where returns empty array for non-existent values', (
 });
 
 test('Indexed_Collection - first returns the first N items', () => {
-	const collection: Indexed_Collection<Test_Item, 'category'> = new Indexed_Collection({
-		indexes: [{key: 'category', extractor: (item) => item.category, multi: true}],
+	const collection: Indexed_Collection<Test_Item, never, 'category'> = new Indexed_Collection({
+		multi_indexes: [{key: 'category', extractor: (item) => item.category}],
 		initial_items: sample_items,
 	});
 
@@ -82,8 +82,8 @@ test('Indexed_Collection - first returns the first N items', () => {
 });
 
 test('Indexed_Collection - latest returns the last N items', () => {
-	const collection: Indexed_Collection<Test_Item, 'category'> = new Indexed_Collection({
-		indexes: [{key: 'category', extractor: (item) => item.category, multi: true}],
+	const collection: Indexed_Collection<Test_Item, never, 'category'> = new Indexed_Collection({
+		multi_indexes: [{key: 'category', extractor: (item) => item.category}],
 		initial_items: sample_items,
 	});
 
@@ -147,18 +147,20 @@ test('Indexed_Collection - related handles undefined input', () => {
 });
 
 test('Indexed_Collection - works with both single and multi-indexes', () => {
-	const collection: Indexed_Collection<Test_Item, 'name' | 'category'> = new Indexed_Collection({
-		indexes: [
+	const collection: Indexed_Collection<Test_Item, 'name', 'category'> = new Indexed_Collection({
+		single_indexes: [
 			{key: 'name', extractor: (item) => item.name}, // single-value index
-			{key: 'category', extractor: (item) => item.category, multi: true}, // multi-value index
+		],
+		multi_indexes: [
+			{key: 'category', extractor: (item) => item.category}, // multi-value index
 		],
 		initial_items: sample_items,
 	});
 
-	// Test with single-value index
-	const apple = collection.where('name', 'apple');
-	expect(apple.length).toBe(1);
-	expect(apple[0].name).toBe('apple');
+	// Test with single-value index (now using by_optional)
+	const apple = collection.by_optional('name', 'apple');
+	expect(apple).toBeDefined();
+	expect(apple?.name).toBe('apple');
 
 	// Test with multi-value index
 	const vegetables = collection.where('category', 'vegetable');
@@ -179,16 +181,16 @@ test('Indexed_Collection - handles edge cases with filtering', () => {
 		{id: uuid_4, name: 'd', value: 0},
 	];
 
-	const collection: Indexed_Collection<Special_Item, 'value'> = new Indexed_Collection({
-		indexes: [{key: 'value', extractor: (item) => item.value}],
+	const collection: Indexed_Collection<Special_Item, 'value', never> = new Indexed_Collection({
+		single_indexes: [{key: 'value', extractor: (item) => item.value}],
 		initial_items: items,
 	});
 
 	// Check that null and undefined values are handled properly
-	expect(collection.where('value', 1).length).toBe(1);
-	expect(collection.where('value', 0).length).toBe(1);
-	expect(collection.where('value', null).length).toBe(0); // null values aren't indexed
-	expect(collection.where('value', undefined).length).toBe(0); // undefined values aren't indexed
+	expect(collection.by_optional('value', 1)).toBeDefined();
+	expect(collection.by_optional('value', 0)).toBeDefined();
+	expect(collection.by_optional('value', null)).toBeUndefined(); // null values aren't indexed
+	expect(collection.by_optional('value', undefined)).toBeUndefined(); // undefined values aren't indexed
 });
 
 test('Indexed_Collection - integrates well with messages use cases', () => {
@@ -205,8 +207,8 @@ test('Indexed_Collection - integrates well with messages use cases', () => {
 	const pong1 = {id: uuid_3, type: 'pong', ping_id: uuid_1, timestamp: 200};
 	const pong2 = {id: uuid_4, type: 'pong', ping_id: uuid_2, timestamp: 400};
 
-	const collection: Indexed_Collection<Message, 'type'> = new Indexed_Collection({
-		indexes: [{key: 'type', extractor: (item) => item.type, multi: true}],
+	const collection: Indexed_Collection<Message, never, 'type'> = new Indexed_Collection({
+		multi_indexes: [{key: 'type', extractor: (item) => item.type}],
 		initial_items: [ping1, ping2, pong1, pong2],
 	});
 
@@ -226,13 +228,14 @@ test('Indexed_Collection - integrates well with messages use cases', () => {
 // Test composing multiple where calls for filtering
 test('Indexed_Collection - filtering by combining multiple where calls', () => {
 	// Add items with multiple attributes to filter by
-	const collection: Indexed_Collection<Test_Item, 'category' | 'tags'> = new Indexed_Collection({
-		indexes: [
-			{key: 'category', extractor: (item) => item.category, multi: true},
-			{key: 'tags', extractor: (item) => item.tags[0], multi: true},
-		],
-		initial_items: sample_items,
-	});
+	const collection: Indexed_Collection<Test_Item, never, 'category' | 'tags'> =
+		new Indexed_Collection({
+			multi_indexes: [
+				{key: 'category', extractor: (item) => item.category},
+				{key: 'tags', extractor: (item) => item.tags[0]},
+			],
+			initial_items: sample_items,
+		});
 
 	// Filter by category first
 	const fruits = collection.where('category', 'fruit');
@@ -246,8 +249,8 @@ test('Indexed_Collection - filtering by combining multiple where calls', () => {
 
 // Test using latest/first with different limit values
 test('Indexed_Collection - latest and first methods respect different limit values', () => {
-	const collection: Indexed_Collection<Test_Item, 'category'> = new Indexed_Collection({
-		indexes: [{key: 'category', extractor: (item) => item.category, multi: true}],
+	const collection: Indexed_Collection<Test_Item, never, 'category'> = new Indexed_Collection({
+		multi_indexes: [{key: 'category', extractor: (item) => item.category}],
 		initial_items: sample_items,
 	});
 
@@ -349,11 +352,11 @@ test('Indexed_Collection - chaining operations on filtered results', () => {
 		},
 	];
 
-	const collection: Indexed_Collection<Task_Item, 'status' | 'assigned_to'> =
+	const collection: Indexed_Collection<Task_Item, never, 'status' | 'assigned_to'> =
 		new Indexed_Collection({
-			indexes: [
-				{key: 'status', extractor: (item) => item.status, multi: true},
-				{key: 'assigned_to', extractor: (item) => item.assigned_to, multi: true},
+			multi_indexes: [
+				{key: 'status', extractor: (item) => item.status},
+				{key: 'assigned_to', extractor: (item) => item.assigned_to},
 			],
 			initial_items: [user1, user2, ...tasks] as Array<Task_Item>,
 		});
@@ -382,8 +385,8 @@ test('Indexed_Collection - chaining operations on filtered results', () => {
 
 // Test for type safety of the API
 test('Indexed_Collection - ensures type safety in query methods', () => {
-	const collection: Indexed_Collection<Test_Item, 'category'> = new Indexed_Collection({
-		indexes: [{key: 'category', extractor: (item) => item.category, multi: true}],
+	const collection: Indexed_Collection<Test_Item, never, 'category'> = new Indexed_Collection({
+		multi_indexes: [{key: 'category', extractor: (item) => item.category}],
 		initial_items: sample_items,
 	});
 
@@ -400,8 +403,8 @@ test('Indexed_Collection - ensures type safety in query methods', () => {
 
 // Add tests for batch operations with querying
 test('Indexed_Collection - batch operations work correctly with querying', () => {
-	const collection: Indexed_Collection<Test_Item, 'category'> = new Indexed_Collection({
-		indexes: [{key: 'category', extractor: (item) => item.category, multi: true}],
+	const collection: Indexed_Collection<Test_Item, never, 'category'> = new Indexed_Collection({
+		multi_indexes: [{key: 'category', extractor: (item) => item.category}],
 	});
 
 	// Add multiple items at once with add_many
@@ -550,4 +553,27 @@ test('Indexed_Collection - related with array operations and filters', () => {
 	// Missing item should return empty
 	const missing_ref = collection.related([source], 'refs.2.id');
 	expect(missing_ref.length).toBe(0);
+});
+
+// Test for the updated by/by_optional methods with single indexes
+test('Indexed_Collection - by and by_optional methods with single indexes', () => {
+	const collection: Indexed_Collection<Test_Item, 'name', never> = new Indexed_Collection({
+		single_indexes: [{key: 'name', extractor: (item) => item.name}],
+		initial_items: sample_items,
+	});
+
+	// Using by to get an item that exists
+	const apple = collection.by('name', 'apple');
+	expect(apple.name).toBe('apple');
+
+	// by should throw on missing item
+	expect(() => collection.by('name', 'nonexistent')).toThrow();
+
+	// by_optional should return undefined for missing items
+	const missing = collection.by_optional('name', 'nonexistent');
+	expect(missing).toBeUndefined();
+
+	// by_optional should return the item for existing items
+	const banana = collection.by_optional('name', 'banana');
+	expect(banana?.name).toBe('banana');
 });

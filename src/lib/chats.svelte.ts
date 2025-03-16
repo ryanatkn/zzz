@@ -6,6 +6,10 @@ import type {Uuid} from '$lib/zod_helpers.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 
+// Define types for index keys
+export type Chat_Single_Indexes = never;
+export type Chat_Multi_Indexes = never;
+
 // Fix the schema definition for Chats_Json
 export const Chats_Json = z
 	.object({
@@ -24,9 +28,10 @@ export const Chats_Json = z
 export type Chats_Json = z.infer<typeof Chats_Json>;
 
 export interface Chats_Options extends Cell_Options<typeof Chats_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
+
 export class Chats extends Cell<typeof Chats_Json> {
-	// Initialize items directly at property declaration for availability to other properties
-	readonly items: Indexed_Collection<Chat> = new Indexed_Collection();
+	readonly items: Indexed_Collection<Chat, Chat_Single_Indexes, Chat_Multi_Indexes> =
+		new Indexed_Collection();
 
 	selected_id: Uuid | null = $state(null);
 	selected: Chat | undefined = $derived(
@@ -62,6 +67,22 @@ export class Chats extends Cell<typeof Chats_Json> {
 		return chat;
 	}
 
+	add_many(chats_json: Array<Chat_Json>): Array<Chat> {
+		const chats = chats_json.map((json) => new Chat({zzz: this.zzz, json}));
+
+		// Add all chats to the beginning of the collection
+		for (let i = chats.length - 1; i >= 0; i--) {
+			this.items.add_first(chats[i]);
+		}
+
+		// Select the first chat if none is currently selected
+		if (this.selected_id === null && chats.length > 0) {
+			this.selected_id = chats[0].id;
+		}
+
+		return chats;
+	}
+
 	remove(id: Uuid): void {
 		const removed = this.items.remove(id);
 		if (removed && id === this.selected_id) {
@@ -70,6 +91,23 @@ export class Chats extends Cell<typeof Chats_Json> {
 			const next_chat = remaining_items.length > 0 ? remaining_items[0] : undefined;
 			this.selected_id = next_chat ? next_chat.id : null;
 		}
+	}
+
+	remove_many(ids: Array<Uuid>): number {
+		// Store the current selected ID
+		const current_selected = this.selected_id;
+
+		// Remove the chats
+		const removed_count = this.items.remove_many(ids);
+
+		// If the selected chat was removed, select a new one
+		if (current_selected !== null && ids.includes(current_selected)) {
+			const remaining_items = this.items.all;
+			const next_chat = remaining_items.length > 0 ? remaining_items[0] : undefined;
+			this.selected_id = next_chat ? next_chat.id : null;
+		}
+
+		return removed_count;
 	}
 
 	select(chat_id: Uuid | null): void {

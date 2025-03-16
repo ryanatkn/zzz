@@ -38,8 +38,8 @@ const sample_items: Array<Test_Item> = [
 
 // Test batch operations and optimizations
 test('Indexed_Collection - add_many efficiently adds multiple items at once', () => {
-	const collection: Indexed_Collection<Test_Item, 'category'> = new Indexed_Collection({
-		indexes: [{key: 'category', extractor: (item) => item.category, multi: true}],
+	const collection: Indexed_Collection<Test_Item, never, 'category'> = new Indexed_Collection({
+		multi_indexes: [{key: 'category', extractor: (item) => item.category}],
 	});
 
 	// Add multiple items at once
@@ -56,8 +56,8 @@ test('Indexed_Collection - add_many efficiently adds multiple items at once', ()
 	expect(collection.by_id.get(uuid_3)).toBe(sample_items[2]);
 
 	// Verify secondary indexes
-	expect(collection.multi_indexes.category?.get('fruit')?.length).toBe(2);
-	expect(collection.multi_indexes.category?.get('vegetable')?.length).toBe(1);
+	expect(collection.multi_indexes.category.get('fruit')?.length).toBe(2);
+	expect(collection.multi_indexes.category.get('vegetable')?.length).toBe(1);
 });
 
 test('Indexed_Collection - add_many works with empty array', () => {
@@ -83,8 +83,8 @@ test('Indexed_Collection - add_many appends to existing items', () => {
 });
 
 test('Indexed_Collection - remove_many efficiently removes multiple items', () => {
-	const collection: Indexed_Collection<Test_Item, 'category'> = new Indexed_Collection({
-		indexes: [{key: 'category', extractor: (item) => item.category, multi: true}],
+	const collection: Indexed_Collection<Test_Item, never, 'category'> = new Indexed_Collection({
+		multi_indexes: [{key: 'category', extractor: (item) => item.category}],
 		initial_items: sample_items,
 	});
 
@@ -104,8 +104,8 @@ test('Indexed_Collection - remove_many efficiently removes multiple items', () =
 	expect(collection.by_id.get(uuid_5)?.name).toBe('eggplant');
 
 	// Verify secondary indexes were updated
-	expect(collection.multi_indexes.category?.get('fruit')?.length).toBe(1); // Only apple remains
-	expect(collection.multi_indexes.category?.get('vegetable')?.length).toBe(2); // Carrot and eggplant
+	expect(collection.multi_indexes.category.get('fruit')?.length).toBe(1); // Only apple remains
+	expect(collection.multi_indexes.category.get('vegetable')?.length).toBe(2); // Carrot and eggplant
 });
 
 test('Indexed_Collection - remove_many handles invalid IDs gracefully', () => {
@@ -275,8 +275,8 @@ test(
 	'Indexed_Collection - batch operations scale efficiently with large datasets',
 	{timeout: 10000},
 	() => {
-		const collection: Indexed_Collection<Test_Item, 'category'> = new Indexed_Collection({
-			indexes: [{key: 'category', extractor: (item) => item.category, multi: true}],
+		const collection: Indexed_Collection<Test_Item, never, 'category'> = new Indexed_Collection({
+			multi_indexes: [{key: 'category', extractor: (item) => item.category}],
 		});
 
 		// Reduce batch size to avoid timeout
@@ -296,8 +296,8 @@ test(
 
 		// Verify all items were added correctly
 		expect(collection.size).toBe(BATCH_SIZE);
-		expect(collection.multi_indexes.category?.get('even')?.length).toBe(BATCH_SIZE / 2);
-		expect(collection.multi_indexes.category?.get('odd')?.length).toBe(BATCH_SIZE / 2);
+		expect(collection.multi_indexes.category.get('even')?.length).toBe(BATCH_SIZE / 2);
+		expect(collection.multi_indexes.category.get('odd')?.length).toBe(BATCH_SIZE / 2);
 
 		// This test is more about ensuring the operation completes successfully
 		// with large datasets than about specific timing, but we can log the time
@@ -315,3 +315,26 @@ test(
 		console.log(`Removed 200 items in ${end_remove_time - start_remove_time}ms`);
 	},
 );
+
+// Test single indexes functionality
+test('Indexed_Collection - single indexes type safety', () => {
+	const collection: Indexed_Collection<Test_Item, 'name', never> = new Indexed_Collection({
+		single_indexes: [{key: 'name', extractor: (item) => item.name}],
+		initial_items: sample_items,
+	});
+
+	// Should get apple by name
+	expect(() => {
+		const item = collection.by('name', 'apple');
+		expect(item.name).toBe('apple');
+	}).not.toThrow();
+
+	// Should throw if item doesn't exist
+	expect(() => {
+		collection.by('name', 'nonexistent');
+	}).toThrow();
+
+	// Should return undefined with by_optional
+	const missing = collection.by_optional('name', 'nonexistent');
+	expect(missing).toBeUndefined();
+});

@@ -36,9 +36,10 @@ test('Indexed_Collection - initializes with empty options object', () => {
 	expect(collection.by_id.size).toBe(0);
 });
 
-test('Indexed_Collection - initializes with empty indexes array', () => {
+test('Indexed_Collection - initializes with empty index arrays', () => {
 	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
-		indexes: [],
+		single_indexes: [],
+		multi_indexes: [],
 	});
 
 	expect(collection.all).toEqual([]);
@@ -72,9 +73,9 @@ test('Indexed_Collection - handles null/undefined index values', () => {
 		optional_field?: string;
 	}
 
-	const collection: Indexed_Collection<Item_With_Optional, 'optional_field'> =
-		new Indexed_Collection<Item_With_Optional, 'optional_field'>({
-			indexes: [{key: 'optional_field', extractor: (item) => item.optional_field}],
+	const collection: Indexed_Collection<Item_With_Optional, 'optional_field', never> =
+		new Indexed_Collection<Item_With_Optional, 'optional_field', never>({
+			single_indexes: [{key: 'optional_field', extractor: (item) => item.optional_field}],
 		});
 
 	const item1 = {id: uuid_1, optional_field: 'value'};
@@ -84,9 +85,9 @@ test('Indexed_Collection - handles null/undefined index values', () => {
 	collection.add(item2);
 
 	expect(collection.all.length).toBe(2);
-	expect(collection.single_indexes.optional_field?.get('value')).toEqual(item1);
+	expect(collection.single_indexes.optional_field.get('value')).toEqual(item1);
 	// The undefined value should not be added to the index
-	expect(collection.single_indexes.optional_field?.has(undefined as any)).toBe(false);
+	expect(collection.single_indexes.optional_field.has(undefined as any)).toBe(false);
 });
 
 test('Indexed_Collection - null/undefined extractor values are handled consistently', () => {
@@ -95,8 +96,8 @@ test('Indexed_Collection - null/undefined extractor values are handled consisten
 		nullable_value: string | null | undefined;
 	}
 
-	const collection: Indexed_Collection<Nullable_Item, 'nullable'> = new Indexed_Collection({
-		indexes: [{key: 'nullable', extractor: (item) => item.nullable_value}],
+	const collection: Indexed_Collection<Nullable_Item, 'nullable', never> = new Indexed_Collection({
+		single_indexes: [{key: 'nullable', extractor: (item) => item.nullable_value}],
 	});
 
 	const item1 = {id: uuid_1, nullable_value: 'value'};
@@ -108,11 +109,11 @@ test('Indexed_Collection - null/undefined extractor values are handled consisten
 	collection.add(item3);
 
 	expect(collection.all.length).toBe(3);
-	expect(collection.single_indexes.nullable?.get('value')).toEqual(item1);
+	expect(collection.single_indexes.nullable.get('value')).toEqual(item1);
 
 	// Null and undefined values should not be added to the index
-	expect(collection.single_indexes.nullable?.has(null as any)).toBe(false);
-	expect(collection.single_indexes.nullable?.has(undefined as any)).toBe(false);
+	expect(collection.single_indexes.nullable.has(null as any)).toBe(false);
+	expect(collection.single_indexes.nullable.has(undefined as any)).toBe(false);
 
 	// But the items should still be retrievable by ID
 	expect(collection.get(uuid_2)).toBe(item2);
@@ -146,8 +147,8 @@ test('Indexed_Collection - reorder does nothing when indexes are invalid or equa
 });
 
 test('Indexed_Collection - first/latest methods handle empty results gracefully', () => {
-	const collection: Indexed_Collection<Test_Item, 'category'> = new Indexed_Collection({
-		indexes: [{key: 'category', extractor: (item) => item.category, multi: true}],
+	const collection: Indexed_Collection<Test_Item, never, 'category'> = new Indexed_Collection({
+		multi_indexes: [{key: 'category', extractor: (item) => item.category}],
 	});
 
 	const empty_first = collection.first('category', 'nonexistent', 5);
@@ -166,8 +167,8 @@ test('Indexed_Collection - latest and first methods handle edge case limit value
 		create_test_item(uuid_3, 'carrot', 'vegetable', []),
 	];
 
-	const collection: Indexed_Collection<Test_Item, 'category'> = new Indexed_Collection({
-		indexes: [{key: 'category', extractor: (item) => item.category, multi: true}],
+	const collection: Indexed_Collection<Test_Item, never, 'category'> = new Indexed_Collection({
+		multi_indexes: [{key: 'category', extractor: (item) => item.category}],
 		initial_items: test_items,
 	});
 
@@ -200,8 +201,8 @@ test('Indexed_Collection - handles circular references in items', () => {
 	// Create circular reference
 	item2.children.push(item1.id);
 
-	const collection: Indexed_Collection<Recursive_Item, 'name'> = new Indexed_Collection({
-		indexes: [{key: 'name', extractor: (item) => item.name}],
+	const collection: Indexed_Collection<Recursive_Item, 'name', never> = new Indexed_Collection({
+		single_indexes: [{key: 'name', extractor: (item) => item.name}],
 		initial_items: [item1, item2],
 	});
 
@@ -235,10 +236,10 @@ test('Indexed_Collection - index_of handles item not in array', () => {
 
 // Test handling of duplicate keys in multi-indexes
 test('Indexed_Collection - handles duplicate values in multi-indexes', () => {
-	const collection: Indexed_Collection<Test_Item, 'tag'> = new Indexed_Collection({
-		indexes: [
+	const collection: Indexed_Collection<Test_Item, never, 'tag'> = new Indexed_Collection({
+		multi_indexes: [
 			// Use a single tag extractor that returns the first tag
-			{key: 'tag', extractor: (item) => item.tags[0], multi: true},
+			{key: 'tag', extractor: (item) => item.tags[0]},
 		],
 	});
 
@@ -313,4 +314,32 @@ test('Indexed_Collection - empty collection serializes to empty array', () => {
 	// Deserialize empty collection
 	const parsed = JSON.parse(json);
 	expect(parsed).toEqual([]);
+});
+
+// Test by method edge cases
+test('Indexed_Collection - by method throws with appropriate error message', () => {
+	const collection: Indexed_Collection<Test_Item, 'name', never> = new Indexed_Collection({
+		single_indexes: [{key: 'name', extractor: (item) => item.name}],
+		initial_items: [create_test_item(uuid_1, 'apple', 'fruit', [])],
+	});
+
+	// Should throw with a message that includes the index key and value
+	expect(() => {
+		collection.by('name', 'nonexistent');
+	}).toThrow(/Item not found for index name with value nonexistent/);
+});
+
+// Test index configuration merging
+test('Indexed_Collection - handles both single and multi index configurations', () => {
+	const collection: Indexed_Collection<Test_Item, 'name', 'category'> = new Indexed_Collection({
+		single_indexes: [{key: 'name', extractor: (item) => item.name}],
+		multi_indexes: [{key: 'category', extractor: (item) => item.category}],
+	});
+
+	const item = create_test_item(uuid_1, 'apple', 'fruit', []);
+	collection.add(item);
+
+	// Should be able to query by both single and multi index
+	expect(collection.by('name', 'apple')).toBe(item);
+	expect(collection.where('category', 'fruit')).toContainEqual(item);
 });

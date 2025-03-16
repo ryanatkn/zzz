@@ -27,25 +27,40 @@ export type Diskfiles_Json = z.infer<typeof Diskfiles_Json>;
 
 export interface Diskfiles_Options extends Cell_Options<typeof Diskfiles_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
-type Diskfile_Indexes = 'by_path';
+// Define single index key for Diskfile - we only have a by_path single index
+export type Diskfile_Single_Indexes = 'by_path';
+
+// Define multi index keys for Diskfile - adding by_external_status for filtering
+export type Diskfile_Multi_Indexes = 'by_external_status';
 
 export class Diskfiles extends Cell<typeof Diskfiles_Json> {
-	readonly items: Indexed_Collection<Diskfile, Diskfile_Indexes> = new Indexed_Collection({
-		indexes: [
-			{
-				key: 'by_path',
-				extractor: (file) => file.path,
-				multi: false, // One path maps to one file
-			},
-		],
-	});
+	readonly items: Indexed_Collection<Diskfile, Diskfile_Single_Indexes, Diskfile_Multi_Indexes> =
+		new Indexed_Collection({
+			single_indexes: [
+				{
+					key: 'by_path',
+					extractor: (file: Diskfile) => file.path,
+				},
+			],
+			multi_indexes: [
+				{
+					key: 'by_external_status',
+					extractor: (file: Diskfile) => (file.external ? 'external' : 'non_external'),
+				},
+			],
+		});
 
 	selected_file_id: Uuid | null = $state(null);
 
 	selected_file: Diskfile | null = $derived(
 		this.selected_file_id ? (this.items.by_id.get(this.selected_file_id) ?? null) : null,
 	);
-	non_external_files: Array<Diskfile> = $derived(this.items.all.filter((file) => !file.external));
+
+	// Use the multi-index query instead of filtering
+	non_external_files: Array<Diskfile> = $derived(
+		this.items.where('by_external_status', 'non_external'),
+	);
+
 	onselect?: (file: Diskfile) => void;
 
 	constructor(options: Diskfiles_Options) {
@@ -76,10 +91,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 			}
 			case 'change': {
 				// Find existing diskfile by path
-				const path_index = this.items.single_indexes.by_path;
-				if (!path_index) return;
-
-				const existing_diskfile = path_index.get(validated_source_file.id);
+				const existing_diskfile = this.items.by_optional('by_path', validated_source_file.id);
 
 				if (existing_diskfile) {
 					// Update the existing diskfile, preserving its ID
@@ -101,10 +113,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 				break;
 			}
 			case 'delete': {
-				const path_index = this.items.single_indexes.by_path;
-				if (!path_index) return;
-
-				const existing_diskfile = path_index.get(validated_source_file.id);
+				const existing_diskfile = this.items.by_optional('by_path', validated_source_file.id);
 				if (existing_diskfile) {
 					this.items.remove(existing_diskfile.id);
 				}
@@ -140,7 +149,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 	}
 
 	get_by_path(path: Diskfile_Path): Diskfile | undefined {
-		return this.items.single_indexes.by_path?.get(path);
+		return this.items.by_optional('by_path', path);
 	}
 
 	/** Like `zzz.zzz_dir`, `undefined` means uninitialized, `null` means loading, `''` means none */
