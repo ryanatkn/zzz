@@ -13,6 +13,7 @@
 	import {PUBLIC_SERVER_HOSTNAME, PUBLIC_SERVER_PORT} from '$env/static/public';
 	import {BROWSER} from 'esm-env';
 	import {Unreachable_Error} from '@ryanatkn/belt/error.js';
+	import {page} from '$app/state';
 
 	import Zzz_Root from '$lib/Zzz_Root.svelte';
 	import {pkg_context} from '$routes/pkg.js';
@@ -135,6 +136,30 @@
 	if (BROWSER) {
 		zzz.messages.send({id: Uuid.parse(undefined), type: 'load_session'});
 	}
+
+	// Handle URL parameter synchronization
+	$effect.pre(() => {
+		// Re-run when URL search params change
+		page.url.search;
+
+		// Sync chat selection
+		const chat_id = zzz.url_params.get_uuid_param('chat');
+		if (chat_id && zzz.chats.items.by_id.has(chat_id)) {
+			zzz.chats.select(chat_id);
+		}
+
+		// Sync prompt selection
+		const prompt_id = zzz.url_params.get_uuid_param('prompt');
+		if (prompt_id && zzz.prompts.items.by_id.has(prompt_id)) {
+			zzz.prompts.select(prompt_id);
+		}
+
+		// Sync file selection
+		const file_id = zzz.url_params.get_uuid_param('file');
+		if (file_id && zzz.diskfiles.items.by_id.has(file_id)) {
+			zzz.diskfiles.select(file_id);
+		}
+	});
 </script>
 
 <svelte:head>

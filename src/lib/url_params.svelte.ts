@@ -17,41 +17,12 @@ export type Url_Params_Json = z.infer<typeof Url_Params_Json>;
 export interface Url_Params_Options extends Cell_Options<typeof Url_Params_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
 /**
- * Manages URL parameter synchronization for various entities
+ * Manages URL parameter synchronization
  */
 export class Url_Params extends Cell<typeof Url_Params_Json> {
-	// TODO BLOCK maybe move to a base class? `add_cleanup` that lazily instantiates an array of them? and a destroy function that's called for children?
-	cleanup: () => void;
-	// override destroy(): void {
-	// 	this.cleanup();
-	// }
-
 	constructor(options: Url_Params_Options) {
 		super(Url_Params_Json, options);
 		this.init();
-
-		// TODO this is messy but it's fine for now, ideally it's more explicit/robost than being in the constructor
-		this.cleanup = $effect.root(() => {
-			$effect(() => {
-				// TODO probably iterate over searchParams instead instead of the per-key checks below
-				page.url.search;
-
-				// Sync chat selection
-				this.#sync_param('chat', this.zzz.chats.items.by_id, (id) => {
-					this.zzz.chats.select(id);
-				});
-
-				// Sync prompt selection
-				this.#sync_param('prompt', this.zzz.prompts.items.by_id, (id) => {
-					this.zzz.prompts.select(id);
-				});
-
-				// Sync file selection
-				this.#sync_param('file', this.zzz.diskfiles.items.by_id, (id) => {
-					this.zzz.diskfiles.select(id);
-				});
-			});
-		});
 	}
 
 	/**
@@ -67,22 +38,22 @@ export class Url_Params extends Cell<typeof Url_Params_Json> {
 	}
 
 	/**
-	 * Generic method to sync a URL parameter with an entity selection
+	 * Get a parameter value from the URL
 	 * @param param_name Name of the URL parameter
-	 * @param collection Map of entities by ID
-	 * @param select_callback Callback to execute when selecting an entity
 	 */
-	#sync_param(
-		param_name: string,
-		collection: Map<Uuid, any>,
-		select_callback: (id: Uuid) => void,
-	): void {
-		const param_value = page.url.searchParams.get(param_name);
-		if (!param_value) return;
+	get_param(param_name: string): string | null {
+		return page.url.searchParams.get(param_name);
+	}
+
+	/**
+	 * Get a UUID parameter value from the URL, with validation
+	 * @param param_name Name of the URL parameter
+	 */
+	get_uuid_param(param_name: string): Uuid | null {
+		const param_value = this.get_param(param_name);
+		if (!param_value) return null;
 
 		const parsed_uuid = Uuid.safeParse(param_value);
-		if (parsed_uuid.success && collection.has(parsed_uuid.data)) {
-			select_callback(parsed_uuid.data);
-		}
+		return parsed_uuid.success ? parsed_uuid.data : null;
 	}
 }

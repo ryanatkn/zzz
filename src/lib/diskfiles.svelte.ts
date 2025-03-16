@@ -69,7 +69,6 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 
 	handle_change(message: Message_Filer_Change): void {
 		const validated_source_file = message.source_file;
-		console.log(`validated_source_file`, validated_source_file);
 
 		switch (message.change.type) {
 			case 'add': {

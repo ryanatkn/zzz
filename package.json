@@ -588,6 +588,10 @@
       "types": "./dist/ui.svelte.d.ts",
       "default": "./dist/ui.svelte.js"
     },
+    "./url_params.svelte.js": {
+      "types": "./dist/url_params.svelte.d.ts",
+      "default": "./dist/url_params.svelte.js"
+    },
     "./Xml_Attribute_Editor.svelte": {
       "types": "./dist/Xml_Attribute_Editor.svelte.d.ts",
       "svelte": "./dist/Xml_Attribute_Editor.svelte",

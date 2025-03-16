@@ -494,6 +494,10 @@ export const package_json = {
 		'./time_helpers.js': {types: './dist/time_helpers.d.ts', default: './dist/time_helpers.js'},
 		'./time.svelte.js': {types: './dist/time.svelte.d.ts', default: './dist/time.svelte.js'},
 		'./ui.svelte.js': {types: './dist/ui.svelte.d.ts', default: './dist/ui.svelte.js'},
+		'./url_params.svelte.js': {
+			types: './dist/url_params.svelte.d.ts',
+			default: './dist/url_params.svelte.js',
+		},
 		'./Xml_Attribute_Editor.svelte': {
 			types: './dist/Xml_Attribute_Editor.svelte.d.ts',
 			svelte: './dist/Xml_Attribute_Editor.svelte',
@@ -541,6 +545,7 @@ export const src_json = {
 			path: 'cell_helpers.ts',
 			declarations: [
 				{name: 'HANDLED', kind: 'variable'},
+				{name: 'USE_DEFAULT', kind: 'variable'},
 				{name: 'FILE_SHORT_DATE_FORMAT', kind: 'variable'},
 				{name: 'FILE_DATE_FORMAT', kind: 'variable'},
 				{name: 'FILE_TIME_FORMAT', kind: 'variable'},
@@ -550,7 +555,7 @@ export const src_json = {
 				{name: 'cell_class', kind: 'function'},
 				{name: 'cell_array', kind: 'function'},
 				{name: 'Value_Parser', kind: 'type'},
-				{name: 'Cell_Value_Parser', kind: 'type'},
+				{name: 'Cell_Value_Decoder', kind: 'type'},
 				{name: 'get_schema_class_info', kind: 'function'},
 			],
 		},
@@ -1068,6 +1073,14 @@ export const src_json = {
 				{name: 'Ui_Json', kind: 'variable'},
 				{name: 'Ui_Options', kind: 'type'},
 				{name: 'Ui', kind: 'class'},
+			],
+		},
+		'./url_params.svelte.js': {
+			path: 'url_params.svelte.ts',
+			declarations: [
+				{name: 'Url_Params_Json', kind: 'variable'},
+				{name: 'Url_Params_Options', kind: 'type'},
+				{name: 'Url_Params', kind: 'class'},
 			],
 		},
 		'./Xml_Attribute_Editor.svelte': {path: 'Xml_Attribute_Editor.svelte', declarations: []},
