@@ -224,10 +224,7 @@ describe('Indexed_Collection - Edge Cases', () => {
 		}
 
 		// Measure time to add all items
-		const add_start = performance.now();
 		collection.add_many(items);
-		const add_end = performance.now();
-		console.log(`Adding ${ITEM_COUNT} items took: ${add_end - add_start}ms`);
 
 		// Verify all items were added
 		expect(collection.size).toBe(ITEM_COUNT);
@@ -266,7 +263,7 @@ describe('Indexed_Collection - Edge Cases', () => {
 							})
 							.slice(0, 3);
 					},
-					output_schema: array_schema,
+					result_schema: array_schema,
 					matches: (item) => item.tags.length > 0,
 					on_add: (items: Array<Test_Item>, item: Test_Item) => {
 						// Only include items with tags

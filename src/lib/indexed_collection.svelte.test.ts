@@ -2,6 +2,7 @@
 
 import {test, expect} from 'vitest';
 import {z} from 'zod';
+
 import {Indexed_Collection, type Indexed_Item} from '$lib/indexed_collection.svelte.js';
 import {
 	create_single_index,
@@ -162,8 +163,8 @@ test('Indexed_Collection - derived index operations', () => {
 				{
 					matches: (item) => item.priority > 5,
 					sort: (a, b) => b.priority - a.priority,
-					input_schema: z.void(),
-					output_schema: item_array_schema,
+					query_schema: z.void(),
+					result_schema: item_array_schema,
 				},
 			),
 		],
@@ -227,8 +228,8 @@ test('Indexed_Collection - combined indexing strategies', () => {
 				{
 					matches: (item) => item.priority >= 8,
 					sort: (a, b) => b.created.getTime() - a.created.getTime(),
-					input_schema: z.void(),
-					output_schema: item_array_schema,
+					query_schema: z.void(),
+					result_schema: item_array_schema,
 				},
 			),
 		],
@@ -368,8 +369,8 @@ test('Indexed_Collection - complex data structures', () => {
 				categories: new Set(items.map((item: any) => item.category)),
 			};
 		},
-		input_schema: z.void(),
-		output_schema: stats_schema,
+		query_schema: z.void(),
+		result_schema: stats_schema,
 		on_add: (stats: any, item: any) => {
 			stats.count++;
 			stats.average_priority =

@@ -2,6 +2,7 @@
 
 import {test, expect, vi} from 'vitest';
 import {z} from 'zod';
+
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {
 	create_multi_index,
@@ -48,7 +49,7 @@ test('Indexed_Collection - optimization - indexes are computed only once during 
 			{
 				key: 'test_index',
 				compute: compute_spy,
-				output_schema: z.map(z.string(), item_schema),
+				result_schema: z.map(z.string(), item_schema),
 			},
 		],
 		initial_items: [create_test_item('a1', 'c1'), create_test_item('a2', 'c2')],
@@ -126,8 +127,8 @@ test('Indexed_Collection - optimization - batch operations are more efficient', 
 					}
 					return map;
 				},
-				input_schema: z.string(),
-				output_schema: z.map(z.string(), z.array(item_schema)),
+				query_schema: z.string(),
+				result_schema: z.map(z.string(), z.array(item_schema)),
 				on_add: on_add_spy,
 			},
 		],

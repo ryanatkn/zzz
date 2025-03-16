@@ -1,6 +1,7 @@
 import {SvelteMap} from 'svelte/reactivity';
-import {Uuid} from '$lib/zod_helpers.js';
 import type {z} from 'zod';
+
+import {Uuid} from '$lib/zod_helpers.js';
 
 // TODO consider a batch operations interface: "Add a transaction-like interface for batch operations to improve performance. Example: collection.batch().add(item1).remove(item2).commit()"
 
@@ -30,28 +31,28 @@ export interface Index_Definition<T extends Indexed_Item, T_Result = any, T_Quer
 	extractor?: (item: T) => any;
 
 	/** Function to compute the index value from scratch */
-	compute: (collection: Indexed_Collection<T>) => T_Result;
+	compute: (collection: Indexed_Collection<T, any>) => T_Result;
 
 	/**
 	 * Schema for validating query parameters
 	 * This also defines the type of queries this index accepts
 	 */
-	input_schema?: z.ZodType<T_Query>;
+	query_schema?: z.ZodType<T_Query>;
 
 	/**
 	 * Schema for validating the computed result
 	 * This defines the return type of the index lookups
 	 */
-	output_schema: z.ZodType<T_Result>;
+	result_schema: z.ZodType<T_Result>;
 
 	/** Optional predicate to determine if an item is relevant to this index */
 	matches?: (item: T) => boolean;
 
 	/** Optional function to update the index when an item is added */
-	on_add?: (result: T_Result, item: T, collection: Indexed_Collection<T>) => T_Result;
+	on_add?: (result: T_Result, item: T, collection: Indexed_Collection<T, any>) => T_Result;
 
 	/** Optional function to update the index when an item is removed */
-	on_remove?: (result: T_Result, item: T, collection: Indexed_Collection<T>) => T_Result;
+	on_remove?: (result: T_Result, item: T, collection: Indexed_Collection<T, any>) => T_Result;
 }
 
 export interface Indexed_Collection_Options<T extends Indexed_Item> {
@@ -63,8 +64,11 @@ export interface Indexed_Collection_Options<T extends Indexed_Item> {
 /**
  * A helper class for managing collections that need efficient lookups
  * with automatic index maintenance
+ *
+ * @param T - The type of items stored in the collection
+ * @param K - Type-safe keys for available indexes
  */
-export class Indexed_Collection<T extends Indexed_Item> {
+export class Indexed_Collection<T extends Indexed_Item, K extends string = string> {
 	// The main collection of items
 	all: Array<T> = $state([]);
 
@@ -105,25 +109,53 @@ export class Indexed_Collection<T extends Indexed_Item> {
 	}
 
 	/**
-	 * Get an index value by key with proper typing
+	 * Get a typed index value by key
 	 */
-	get_index<T_Result = any>(key: string): T_Result {
-		return this.indexes[key];
+	get_index<T_Result = any>(key: K): T_Result {
+		return this.indexes[key as string];
+	}
+
+	/**
+	 * Get a single-value index with proper typing
+	 */
+	single_index<V>(key: K): SvelteMap<any, V> {
+		return this.indexes[key as string] as SvelteMap<any, V>;
+	}
+
+	/**
+	 * Get a multi-value index with proper typing
+	 */
+	multi_index<V>(key: K): SvelteMap<any, Array<V>> {
+		return this.indexes[key as string] as SvelteMap<any, Array<V>>;
+	}
+
+	/**
+	 * Get a derived index with proper typing
+	 */
+	derived_index<V>(key: K): Array<V> {
+		return this.indexes[key as string] as Array<V>;
+	}
+
+	/**
+	 * Get a dynamic (function) index with proper typing
+	 */
+	dynamic_index<V, Q = any>(key: K): (query: Q) => V {
+		return this.indexes[key as string] as (query: Q) => V;
 	}
 
 	/**
 	 * Query an index with parameters
 	 *
-	 * This method is type-aware when the index has an input_schema that defines T_Query
+	 * This method is type-aware when the index has a query_schema that defines T_Query
 	 */
-	query<T_Result = any, T_Query = any>(key: string, query: T_Query): T_Result {
-		const index = this.indexes[key];
+	query<T_Result = any, T_Query = any>(key: K, query: T_Query): T_Result {
+		const index = this.indexes[key as string];
 		const index_def = this.#index_definitions.find((def) => def.key === key);
 
 		// Validate input if schema exists
-		if (this.#validate && index_def?.input_schema) {
+		if (this.#validate && index_def?.query_schema) {
 			try {
-				index_def.input_schema.parse(query);
+				index_def.query_schema.parse(query);
 			} catch (error) {
 				console.error(`Query validation failed for index ${key}:`, error);
 			}
@@ -177,7 +209,7 @@ export class Indexed_Collection<T extends Indexed_Item> {
 				// Validate result if needed
 				if (this.#validate) {
 					try {
-						def.output_schema.parse(result);
+						def.result_schema.parse(result);
 					} catch (error) {
 						console.error(`Index ${def.key} validation failed on add:`, error);
 					}
@@ -199,7 +231,7 @@ export class Indexed_Collection<T extends Indexed_Item> {
 				// Validate result if needed
 				if (this.#validate) {
 					try {
-						def.output_schema.parse(result);
+						def.result_schema.parse(result);
 					} catch (error) {
 						console.error(`Index ${def.key} validation failed on remove:`, error);
 					}
@@ -394,9 +426,10 @@ export class Indexed_Collection<T extends Indexed_Item> {
 
 	/**
 	 * Get all items matching a multi-indexed property value
+	 * Type-safe version that uses the K generic parameter
 	 */
-	where<K = any>(index_key: string, value: K): Array<T> {
-		const index = this.indexes[index_key];
+	where<V = any>(index_key: K, value: V): Array<T> {
+		const index = this.indexes[index_key as string];
 		if (!index) return [];
 
 		if (index instanceof Map || index instanceof SvelteMap) {
@@ -409,39 +442,43 @@ export class Indexed_Collection<T extends Indexed_Item> {
 
 	/**
 	 * Get the first N items matching a multi-indexed property value
+	 * Type-safe version that uses the K generic parameter
 	 */
-	first<K = any>(index_key: string, value: K, limit: number): Array<T> {
+	first<V = any>(index_key: K, value: V, limit: number): Array<T> {
 		// Handle edge cases with limit
 		if (limit <= 0) return [];
 
-		const items = this.where<K>(index_key, value);
+		const items = this.where<V>(index_key, value);
 		return items.slice(0, limit);
 	}
 
 	/**
 	 * Get the latest N items matching a multi-indexed property value
+	 * Type-safe version that uses the K generic parameter
 	 */
-	latest<K = any>(index_key: string, value: K, limit: number): Array<T> {
+	latest<V = any>(index_key: K, value: V, limit: number): Array<T> {
 		// Handle edge cases with limit
 		if (limit <= 0) return [];
 
-		const items = this.where<K>(index_key, value);
+		const items = this.where<V>(index_key, value);
 		return items.slice(-Math.min(limit, items.length));
 	}
 
 	/**
 	 * Get a derived collection by its key
+	 * Type-safe version that uses the K generic parameter
 	 */
-	get_derived(key: string): Array<T> {
-		return this.indexes[key] || [];
+	get_derived(key: K): Array<T> {
+		return this.indexes[key as string] || [];
 	}
 
 	/**
 	 * Get an item by a single-value index
 	 * Returns the item or throws if no item is found
+	 * Type-safe version that uses the K generic parameter
 	 */
-	by<K = any>(index_key: string, value: K): T {
-		const index = this.indexes[index_key];
+	by<V = any>(index_key: K, value: V): T {
+		const index = this.indexes[index_key as string];
 		if (!index) {
 			throw new Error(`Index not found: ${index_key}`);
 		}
@@ -456,9 +493,10 @@ export class Indexed_Collection<T extends Indexed_Item> {
 
 	/**
 	 * Get an item by a single-value index, returning undefined if not found
+	 * Type-safe version that uses the K generic parameter
 	 */
-	by_optional<K = any>(index_key: string, value: K): T | undefined {
-		const index = this.indexes[index_key];
+	by_optional<V = any>(index_key: K, value: V): T | undefined {
+		const index = this.indexes[index_key as string];
 		if (!index) return undefined;
 
 		return index instanceof Map || index instanceof SvelteMap ? index.get(value) : undefined;

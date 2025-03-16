@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import {test, expect, describe, beforeEach} from 'vitest';
+
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {
 	create_single_index,
