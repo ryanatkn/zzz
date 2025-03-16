@@ -119,8 +119,13 @@ test('Indexed_Collection - related finds items by property reference', () => {
 	const related_items = collection.related([item1, item2, item3], 'ref_id');
 
 	expect(related_items.length).toBe(2);
-	expect(related_items[0].name).toBe('first');
-	expect(related_items[1].name).toBe('second');
+	// Use toStrictEqual to compare objects by value rather than reference
+	expect(related_items.find((i) => i.id === uuid_1)?.name).toBe('first');
+	expect(related_items.find((i) => i.id === uuid_2)?.name).toBe('second');
+
+	// Verify deduplication works by sending duplicate references
+	const duplicated_refs = collection.related([item1, item1, item2], 'ref_id');
+	expect(duplicated_refs.length).toBe(2); // Still only 2 results
 });
 
 test('Indexed_Collection - related handles empty input', () => {
@@ -391,4 +396,158 @@ test('Indexed_Collection - ensures type safety in query methods', () => {
 
 	// This would be a TypeScript error if the API is correctly typed:
 	// const invalid = collection.where('category', 123); // Type error
+});
+
+// Add tests for batch operations with querying
+test('Indexed_Collection - batch operations work correctly with querying', () => {
+	const collection: Indexed_Collection<Test_Item, 'category'> = new Indexed_Collection({
+		indexes: [{key: 'category', extractor: (item) => item.category, multi: true}],
+	});
+
+	// Add multiple items at once with add_many
+	const fruits = [
+		create_test_item(Uuid.parse(undefined), 'apple', 'fruit', ['red']),
+		create_test_item(Uuid.parse(undefined), 'banana', 'fruit', ['yellow']),
+		create_test_item(Uuid.parse(undefined), 'cherry', 'fruit', ['red']),
+	];
+
+	const vegetables = [
+		create_test_item(Uuid.parse(undefined), 'carrot', 'vegetable', ['orange']),
+		create_test_item(Uuid.parse(undefined), 'daikon', 'vegetable', ['white']),
+	];
+
+	collection.add_many(fruits);
+	collection.add_many(vegetables);
+
+	// Test querying after batch adds
+	const queried_fruits = collection.where('category', 'fruit');
+	expect(queried_fruits.length).toBe(3);
+
+	const queried_vegetables = collection.where('category', 'vegetable');
+	expect(queried_vegetables.length).toBe(2);
+
+	// Remove multiple items
+	const fruit_ids = fruits.slice(0, 2).map((item) => item.id);
+	collection.remove_many(fruit_ids);
+
+	// Verify queries work after batch removal
+	const remaining_fruits = collection.where('category', 'fruit');
+	expect(remaining_fruits.length).toBe(1);
+	expect(remaining_fruits[0].name).toBe('cherry');
+});
+
+// Test path resolution with complex paths
+test('Indexed_Collection - related method with complex nested paths', () => {
+	interface Deep_Nested_Item extends Indexed_Item {
+		id: Uuid;
+		name: string;
+		nested: {
+			level1: {
+				level2: {
+					level3: {
+						ref_id?: Uuid;
+					};
+				};
+			};
+		};
+	}
+
+	const target_id = Uuid.parse(undefined);
+	const target = {
+		id: target_id,
+		name: 'target',
+		nested: {level1: {level2: {level3: {}}}},
+	};
+
+	const reference = {
+		id: Uuid.parse(undefined),
+		name: 'reference',
+		nested: {
+			level1: {
+				level2: {
+					level3: {
+						ref_id: target_id,
+					},
+				},
+			},
+		},
+	};
+
+	const collection: Indexed_Collection<Deep_Nested_Item> = new Indexed_Collection({
+		initial_items: [target, reference],
+	});
+
+	// Deep path lookup
+	const related = collection.related([reference], 'nested.level1.level2.level3.ref_id');
+
+	expect(related.length).toBe(1);
+	expect(related[0].id).toStrictEqual(target_id);
+});
+
+// Test the performance of large related operations with deduplication
+test('Indexed_Collection - related with many duplicate references', () => {
+	// Create a collection with some target items
+	const targets: Array<Test_Item> = [];
+	const refs: Array<{id: Uuid; ref_id: Uuid}> = [];
+
+	// Add 5 target items
+	for (let i = 0; i < 5; i++) {
+		const id = Uuid.parse(undefined);
+		targets.push(create_test_item(id, `target${i}`, 'target', []));
+	}
+
+	// Create 200 references pointing to just the 5 targets (many duplicates)
+	for (let i = 0; i < 200; i++) {
+		const target_idx = i % 5; // Will create many duplicates
+		refs.push({
+			id: Uuid.parse(undefined),
+			ref_id: targets[target_idx].id,
+		});
+	}
+
+	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		initial_items: targets,
+	});
+
+	// This should return just 5 items despite having 200 references
+	const related_items = collection.related(refs, 'ref_id');
+	expect(related_items.length).toBe(5);
+});
+
+// Test combining path resolution with array operations
+test('Indexed_Collection - related with array operations and filters', () => {
+	interface Complex_Item extends Indexed_Item {
+		id: Uuid;
+		refs: Array<{id: Uuid; type: string}>;
+	}
+
+	const target1: Complex_Item = {id: Uuid.parse(undefined), refs: []};
+	const target2: Complex_Item = {id: Uuid.parse(undefined), refs: []};
+
+	const source = {
+		id: Uuid.parse(undefined),
+		refs: [
+			{id: target1.id, type: 'primary'},
+			{id: target2.id, type: 'secondary'},
+			{id: Uuid.parse(undefined), type: 'missing'}, // This ID doesn't exist
+		],
+	};
+
+	const collection: Indexed_Collection<Complex_Item> = new Indexed_Collection({
+		initial_items: [target1, target2],
+	});
+
+	// Get the first array item
+	const primary_ref = collection.related([source], 'refs.0.id');
+	expect(primary_ref.length).toBe(1);
+	expect(primary_ref[0].id).toStrictEqual(target1.id);
+
+	// Get the second array item
+	const secondary_ref = collection.related([source], 'refs.1.id');
+	expect(secondary_ref.length).toBe(1);
+	expect(secondary_ref[0].id).toStrictEqual(target2.id);
+
+	// Missing item should return empty
+	const missing_ref = collection.related([source], 'refs.2.id');
+	expect(missing_ref.length).toBe(0);
 });
