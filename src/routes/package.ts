@@ -762,6 +762,10 @@ export const src_json = {
 				{name: 'Index_Type', kind: 'type'},
 				{name: 'Index_Definition', kind: 'type'},
 				{name: 'Indexed_Collection_Options', kind: 'type'},
+				{name: 'T_Key_Single', kind: 'type'},
+				{name: 'T_Key_Multi', kind: 'type'},
+				{name: 'T_Key_Derived', kind: 'type'},
+				{name: 'T_Key_Dynamic', kind: 'type'},
 				{name: 'Indexed_Collection', kind: 'class'},
 			],
 		},
@@ -1122,6 +1126,7 @@ export const src_json = {
 		'./zod_helpers.js': {
 			path: 'zod_helpers.ts',
 			declarations: [
+				{name: 'Any', kind: 'variable'},
 				{name: 'Datetime', kind: 'variable'},
 				{name: 'Datetime_Now', kind: 'variable'},
 				{name: 'Uuid_Base', kind: 'variable'},

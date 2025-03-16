@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import {test, expect, describe, beforeEach} from 'vitest';
+import {z} from 'zod';
 
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {
@@ -48,76 +49,100 @@ describe('Indexed_Collection - Query Capabilities', () => {
 		collection = new Indexed_Collection<Test_Document>({
 			indexes: [
 				// Single value indexes
-				create_single_index('by_title', (doc) => doc.title.toLowerCase()), // Case insensitive
-				create_single_index('by_author', (doc) => doc.author), // Case sensitive
+				create_single_index({
+					key: 'by_title',
+					extractor: (doc) => doc.title.toLowerCase(), // Case insensitive
+					query_schema: z.string(),
+				}),
+				create_single_index({
+					key: 'by_author',
+					extractor: (doc) => doc.author, // Case sensitive
+					query_schema: z.string(),
+				}),
 
 				// Multi value indexes
-				create_multi_index('by_category', (doc) => doc.category),
-				create_multi_index('by_tag', (doc) => doc.tags),
-				create_multi_index('by_rating', (doc) => doc.rating),
-				create_multi_index('by_featured', (doc) => (doc.featured ? 'yes' : 'no')),
-				create_multi_index('by_year', (doc) => doc.created.getFullYear()),
+				create_multi_index({
+					key: 'by_category',
+					extractor: (doc) => doc.category,
+					query_schema: z.string(),
+				}),
+				create_multi_index({
+					key: 'by_tag',
+					extractor: (doc) => doc.tags,
+					query_schema: z.string(),
+				}),
+				create_multi_index({
+					key: 'by_rating',
+					extractor: (doc) => doc.rating,
+					query_schema: z.number(),
+				}),
+				create_multi_index({
+					key: 'by_featured',
+					extractor: (doc) => (doc.featured ? 'yes' : 'no'),
+					query_schema: z.enum(['yes', 'no']),
+				}),
+				create_multi_index({
+					key: 'by_year',
+					extractor: (doc) => doc.created.getFullYear(),
+					query_schema: z.number(),
+				}),
 
 				// Derived indexes
-				create_derived_index(
-					'featured_recent',
-					(collection) => {
+				create_derived_index({
+					key: 'featured_recent',
+					compute: (collection) => {
 						return collection.all
 							.filter((doc) => doc.featured)
 							.sort((a, b) => b.created.getTime() - a.created.getTime())
 							.slice(0, 5); // Top 5 recent featured items
 					},
-					{
-						matches: (doc) => doc.featured,
-						on_add: (items, doc) => {
-							if (!doc.featured) return items;
+					matches: (doc) => doc.featured,
+					on_add: (items, doc) => {
+						if (!doc.featured) return items;
 
-							// Find the right position based on date (newer items first)
-							const index = items.findIndex(
-								(existing) => doc.created.getTime() > existing.created.getTime(),
-							);
+						// Find the right position based on date (newer items first)
+						const index = items.findIndex(
+							(existing) => doc.created.getTime() > existing.created.getTime(),
+						);
 
-							if (index === -1) {
-								items.push(doc);
-							} else {
-								items.splice(index, 0, doc);
-							}
+						if (index === -1) {
+							items.push(doc);
+						} else {
+							items.splice(index, 0, doc);
+						}
 
-							// Maintain max size
-							if (items.length > 5) {
-								items.length = 5;
-							}
-							return items;
-						},
-						on_remove: (items, doc) => {
-							const index = items.findIndex((item) => item.id === doc.id);
-							if (index !== -1) {
-								items.splice(index, 1);
-							}
-							return items;
-						},
+						// Maintain max size
+						if (items.length > 5) {
+							items.length = 5;
+						}
+						return items;
 					},
-				),
-				create_derived_index(
-					'high_rated',
-					(collection) => collection.all.filter((doc) => doc.rating >= 4),
-					{
-						matches: (doc) => doc.rating >= 4,
-						on_add: (items, doc) => {
-							if (doc.rating >= 4) {
-								items.push(doc);
-							}
-							return items;
-						},
-						on_remove: (items, doc) => {
-							const index = items.findIndex((item) => item.id === doc.id);
-							if (index !== -1) {
-								items.splice(index, 1);
-							}
-							return items;
-						},
+					on_remove: (items, doc) => {
+						const index = items.findIndex((item) => item.id === doc.id);
+						if (index !== -1) {
+							items.splice(index, 1);
+						}
+						return items;
 					},
-				),
+				}),
+				create_derived_index({
+					key: 'high_rated',
+					compute: (collection) => collection.all.filter((doc) => doc.rating >= 4),
+					matches: (doc) => doc.rating >= 4,
+					on_add: (items, doc) => {
+						if (doc.rating >= 4) {
+							items.push(doc);
+						}
+						return items;
+					},
+					on_remove: (items, doc) => {
+						const index = items.findIndex((item) => item.id === doc.id);
+						if (index !== -1) {
+							items.splice(index, 1);
+						}
+						return items;
+					},
+				}),
 			],
 		});
 
@@ -340,13 +365,21 @@ describe('Indexed_Collection - Search Patterns', () => {
 		collection = new Indexed_Collection<Test_Document>({
 			indexes: [
 				// Word-based index that splits title into words for searching
-				create_multi_index('by_word', (doc) => doc.title.toLowerCase().split(/\s+/)),
+				create_multi_index({
+					key: 'by_word',
+					extractor: (doc) => doc.title.toLowerCase().split(/\s+/),
+					query_schema: z.string(),
+				}),
 
 				// Range-based categorization
-				create_multi_index('by_rating_range', (doc) => {
-					if (doc.rating <= 2) return 'low';
-					if (doc.rating <= 4) return 'medium';
-					return 'high';
+				create_multi_index({
+					key: 'by_rating_range',
+					extractor: (doc) => {
+						if (doc.rating <= 2) return 'low';
+						if (doc.rating <= 4) return 'medium';
+						return 'high';
+					},
+					query_schema: z.enum(['low', 'medium', 'high']),
 				}),
 			],
 		});

@@ -25,18 +25,24 @@ export interface Models_Options extends Cell_Options<typeof Models_Json> {} // e
 export class Models extends Cell<typeof Models_Json> {
 	readonly items: Indexed_Collection<Model> = new Indexed_Collection({
 		indexes: [
-			create_single_index<Model, string>('name', (model: Model) => model.name),
+			create_single_index({
+				key: 'name',
+				extractor: (model: Model) => model.name,
+				query_schema: z.string(),
+			}),
 
-			create_multi_index<Model, string>('provider_name', (model: Model) => model.provider_name),
+			create_multi_index({
+				key: 'provider_name',
+				extractor: (model: Model) => model.provider_name,
+				query_schema: z.string(),
+			}),
 
-			create_multi_index<Model, string>(
-				'tag',
-				(model: Model) => model.tags[0], // Index first tag for efficiency
-				undefined,
-				{
-					matches: (model) => model.tags.length > 0,
-				},
-			),
+			create_multi_index({
+				key: 'tag',
+				extractor: (model: Model) => model.tags[0], // Index first tag for efficiency
+				query_schema: z.string(),
+				matches: (model) => model.tags.length > 0,
+			}),
 		],
 	});
 

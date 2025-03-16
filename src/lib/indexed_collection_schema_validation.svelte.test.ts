@@ -61,10 +61,17 @@ describe('Indexed_Collection - Schema Validation', () => {
 		// Create a collection with validation enabled
 		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
 			indexes: [
-				create_single_index('by_b', (item) => item.b, b_schema, {
+				create_single_index({
+					key: 'by_b',
+					extractor: (item) => item.b,
+					query_schema: b_schema,
 					result_schema: z.map(z.string().email(), item_schema),
 				}),
-				create_single_index('by_a', (item) => item.a, z.string()),
+				create_single_index({
+					key: 'by_a',
+					extractor: (item) => item.a,
+					query_schema: z.string(),
+				}),
 			],
 			validate: true, // Enable schema validation
 		});
@@ -91,16 +98,20 @@ describe('Indexed_Collection - Schema Validation', () => {
 
 		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
 			indexes: [
-				create_multi_index('by_e', (item) => item.e, e_schema),
-				create_multi_index(
-					'by_c_range',
-					(item) => {
+				create_multi_index({
+					key: 'by_e',
+					extractor: (item) => item.e,
+					query_schema: e_schema,
+				}),
+				create_multi_index({
+					key: 'by_c_range',
+					extractor: (item) => {
 						if (item.c < 20) return 'low';
 						if (item.c < 50) return 'medium';
 						return 'high';
 					},
-					z.enum(['low', 'medium', 'high']),
-				),
+					query_schema: z.enum(['low', 'medium', 'high']),
+				}),
 			],
 			validate: true,
 		});
@@ -135,15 +146,13 @@ describe('Indexed_Collection - Schema Validation', () => {
 		// Create collection with derived index using schemas
 		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
 			indexes: [
-				create_derived_index(
-					'active_adults',
-					(collection) => collection.all.filter((item) => item.d && item.c >= 18),
-					{
-						matches: (item) => item.d && item.c >= 18,
-						query_schema: z.void(),
-						result_schema: items_array_schema,
-					},
-				),
+				create_derived_index({
+					key: 'active_adults',
+					compute: (collection) => collection.all.filter((item) => item.d && item.c >= 18),
+					matches: (item) => item.d && item.c >= 18,
+					query_schema: z.void(),
+					result_schema: items_array_schema,
+				}),
 			],
 			validate: true,
 		});
@@ -180,9 +189,9 @@ describe('Indexed_Collection - Schema Validation', () => {
 		// Create a dynamic index with complex query parameters
 		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
 			indexes: [
-				create_dynamic_index<Test_Item, (query: Item_Query) => Array<Test_Item>>(
-					'item_search',
-					(collection) => {
+				create_dynamic_index<Test_Item, (query: Item_Query) => Array<Test_Item>>({
+					key: 'item_search',
+					factory: (collection) => {
 						return (query: Item_Query) => {
 							return collection.all.filter((item) => {
 								// Filter by c range if specified
@@ -204,7 +213,7 @@ describe('Indexed_Collection - Schema Validation', () => {
 					},
 					query_schema,
 					result_schema,
-				),
+				}),
 			],
 			validate: true,
 		});
@@ -249,8 +258,16 @@ describe('Indexed_Collection - Schema Validation', () => {
 		// Create collection with validation
 		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
 			indexes: [
-				create_single_index('by_b', (item) => item.b, b_schema),
-				create_single_index('by_c', (item) => item.c, c_range_schema),
+				create_single_index({
+					key: 'by_b',
+					extractor: (item) => item.b,
+					query_schema: b_schema,
+				}),
+				create_single_index({
+					key: 'by_c',
+					extractor: (item) => item.c,
+					query_schema: c_range_schema,
+				}),
 			],
 			validate: true,
 		});
@@ -282,8 +299,16 @@ describe('Indexed_Collection - Schema Validation', () => {
 		// Create collection without validation
 		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
 			indexes: [
-				create_single_index('by_b', (item) => item.b, b_schema),
-				create_single_index('by_c', (item) => item.c, c_range_schema),
+				create_single_index({
+					key: 'by_b',
+					extractor: (item) => item.b,
+					query_schema: b_schema,
+				}),
+				create_single_index({
+					key: 'by_c',
+					extractor: (item) => item.c,
+					query_schema: c_range_schema,
+				}),
 			],
 			validate: false, // Explicitly disable validation
 		});
@@ -311,15 +336,19 @@ describe('Indexed_Collection - Schema Validation', () => {
 		// Create collection with complex validation
 		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
 			indexes: [
-				create_single_index('by_f_g', (item) => item.f.g, nested_schema.shape.g),
-				create_multi_index(
-					'by_complex',
-					(item) => {
+				create_single_index({
+					key: 'by_f_g',
+					extractor: (item) => item.f.g,
+					query_schema: nested_schema.shape.g,
+				}),
+				create_multi_index({
+					key: 'by_complex',
+					extractor: (item) => {
 						// Return a compound key made from multiple fields
 						return `${item.a}-${item.f.g}`;
 					},
-					z.string().regex(/^[a-z0-9]+-[hi]$/),
-				),
+					query_schema: z.string().regex(/^[a-z0-9]+-[hi]$/),
+				}),
 			],
 			validate: true,
 		});

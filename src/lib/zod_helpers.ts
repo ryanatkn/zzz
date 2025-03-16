@@ -1,6 +1,8 @@
 import {z} from 'zod';
 import {EMPTY_ARRAY} from '@ryanatkn/belt/array.js';
 
+export const Any = z.any();
+
 // TODO move these?
 export const Datetime = z.string().datetime().brand('Datetime');
 export type Datetime = z.infer<typeof Datetime>;

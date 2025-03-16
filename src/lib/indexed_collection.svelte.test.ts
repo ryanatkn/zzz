@@ -84,7 +84,13 @@ test('Indexed_Collection - basic operations with no indexes', () => {
 
 test('Indexed_Collection - single index operations', () => {
 	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
-		indexes: [create_single_index('by_name', (item) => item.name, z.string())],
+		indexes: [
+			create_single_index({
+				key: 'by_name',
+				extractor: (item) => item.name,
+				query_schema: z.string(),
+			}),
+		],
 	});
 
 	// Add items with unique names
@@ -117,7 +123,13 @@ test('Indexed_Collection - single index operations', () => {
 
 test('Indexed_Collection - multi index operations', () => {
 	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
-		indexes: [create_multi_index('by_category', (item) => item.category, z.string())],
+		indexes: [
+			create_multi_index({
+				key: 'by_category',
+				extractor: (item) => item.category,
+				query_schema: z.string(),
+			}),
+		],
 	});
 
 	// Add items with shared categories
@@ -157,16 +169,14 @@ test('Indexed_Collection - multi index operations', () => {
 test('Indexed_Collection - derived index operations', () => {
 	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
 		indexes: [
-			create_derived_index<Test_Item>(
-				'high_priority',
-				(collection) => collection.all.filter((item) => item.priority > 5),
-				{
-					matches: (item) => item.priority > 5,
-					sort: (a, b) => b.priority - a.priority,
-					query_schema: z.void(),
-					result_schema: item_array_schema,
-				},
-			),
+			create_derived_index({
+				key: 'high_priority',
+				compute: (collection) => collection.all.filter((item) => item.priority > 5),
+				matches: (item) => item.priority > 5,
+				sort: (a, b) => b.priority - a.priority,
+				query_schema: z.void(),
+				result_schema: item_array_schema,
+			}),
 		],
 	});
 
@@ -215,23 +225,33 @@ test('Indexed_Collection - derived index operations', () => {
 test('Indexed_Collection - combined indexing strategies', () => {
 	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
 		indexes: [
-			create_single_index<Test_Item, string>('by_name', (item) => item.name, z.string()),
-			create_multi_index<Test_Item, string>('by_category', (item) => item.category, z.string()),
-			create_multi_index<Test_Item, string>('by_tag', (item) => item.tags[0], z.string()),
-			create_derived_index<Test_Item>(
-				'recent_high_priority',
-				(collection) => {
+			create_single_index({
+				key: 'by_name',
+				extractor: (item) => item.name,
+				query_schema: z.string(),
+			}),
+			create_multi_index({
+				key: 'by_category',
+				extractor: (item) => item.category,
+				query_schema: z.string(),
+			}),
+			create_multi_index({
+				key: 'by_tag',
+				extractor: (item) => item.tags[0],
+				query_schema: z.string(),
+			}),
+			create_derived_index({
+				key: 'recent_high_priority',
+				compute: (collection) => {
 					return collection.all
 						.filter((item) => item.priority >= 8)
 						.sort((a, b) => b.created.getTime() - a.created.getTime());
 				},
-				{
-					matches: (item) => item.priority >= 8,
-					sort: (a, b) => b.created.getTime() - a.created.getTime(),
-					query_schema: z.void(),
-					result_schema: item_array_schema,
-				},
-			),
+				matches: (item) => item.priority >= 8,
+				sort: (a, b) => b.created.getTime() - a.created.getTime(),
+				query_schema: z.void(),
+				result_schema: item_array_schema,
+			}),
 		],
 	});
 
@@ -315,9 +335,9 @@ test('Indexed_Collection - function indexes', () => {
 	// Test a function-based index using the new helper function
 	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
 		indexes: [
-			create_dynamic_index<Test_Item, (priority_level: string) => Array<Test_Item>>(
-				'by_priority_rank',
-				(collection) => {
+			create_dynamic_index<Test_Item, (priority_level: string) => Array<Test_Item>>({
+				key: 'by_priority_rank',
+				factory: (collection) => {
 					return (priority_level: string) => {
 						if (priority_level === 'high') {
 							return collection.all.filter((item) => item.priority >= 8);
@@ -328,9 +348,9 @@ test('Indexed_Collection - function indexes', () => {
 						}
 					};
 				},
-				z.string(),
-				dynamic_function_schema,
-			),
+				query_schema: z.string(),
+				result_schema: dynamic_function_schema,
+			}),
 		],
 	});
 

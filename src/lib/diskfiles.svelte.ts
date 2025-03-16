@@ -35,40 +35,45 @@ export interface Diskfiles_Options extends Cell_Options<typeof Diskfiles_Json> {
 export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 	readonly items: Indexed_Collection<Diskfile> = new Indexed_Collection({
 		indexes: [
-			create_single_index<Diskfile, string>('by_path', (file: Diskfile) => file.path),
-
-			create_multi_index<Diskfile, string>('by_external_status', (file: Diskfile) =>
-				file.external ? 'external' : 'non_external',
-			),
-
-			create_multi_index<Diskfile, string>('by_extension', (file: Diskfile) => {
-				const match = /\.([^.]+)$/.exec(file.path);
-				return match ? match[1].toLowerCase() : 'no_extension';
+			create_single_index({
+				key: 'by_path',
+				extractor: (file: Diskfile) => file.path,
+				query_schema: z.string(),
 			}),
 
-			create_derived_index<Diskfile>(
-				'non_external_files',
-				(collection) => collection.where('by_external_status', 'non_external'),
-				{
-					// Update a derived index incrementally when an item is added
-					on_add: (collection, item) => {
-						if (!item.external) {
-							collection.push(item);
-						}
-						return collection;
-					},
-					// Update a derived index incrementally when an item is removed
-					on_remove: (collection, item) => {
-						if (!item.external) {
-							const index = collection.findIndex((f) => f.id === item.id);
-							if (index !== -1) collection.splice(index, 1);
-						}
-						return collection;
-					},
-					// Only process items matching this condition for this derived index
-					matches: (item) => !item.external,
+			create_multi_index({
+				key: 'by_external_status',
+				extractor: (file: Diskfile) => (file.external ? 'external' : 'non_external'),
+				query_schema: z.enum(['external', 'non_external']),
+			}),
+
+			create_multi_index({
+				key: 'by_extension',
+				extractor: (file: Diskfile) => {
+					const match = /\.([^.]+)$/.exec(file.path);
+					return match ? match[1].toLowerCase() : 'no_extension';
 				},
-			),
+				query_schema: z.string(),
+			}),
+
+			create_derived_index({
+				key: 'non_external_files',
+				compute: (collection) => collection.where('by_external_status', 'non_external'),
+				matches: (item) => !item.external,
+				on_add: (collection, item) => {
+					if (!item.external) {
+						collection.push(item);
+					}
+					return collection;
+				},
+				on_remove: (collection, item) => {
+					if (!item.external) {
+						const index = collection.findIndex((f) => f.id === item.id);
+						if (index !== -1) collection.splice(index, 1);
+					}
+					return collection;
+				},
+			}),
 		],
 	});
 

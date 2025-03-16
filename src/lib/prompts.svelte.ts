@@ -29,31 +29,33 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 	// Initialize items with proper typing and unified indexes
 	readonly items: Indexed_Collection<Prompt> = new Indexed_Collection({
 		indexes: [
-			create_single_index<Prompt, string>('by_name', (prompt) => prompt.name),
+			create_single_index({
+				key: 'by_name',
+				extractor: (prompt) => prompt.name,
+				query_schema: z.string(),
+			}),
 
-			create_derived_index<Prompt>(
-				'recent_prompts',
-				(collection) => {
+			create_derived_index({
+				key: 'recent_prompts',
+				compute: (collection) => {
 					// Sort by creation date (newest first)
 					return [...collection.all].sort(
 						(a, b) => new Date(b.created).getTime() - new Date(a.created).getTime(),
 					);
 				},
-				{
-					on_add: (items, item) => {
-						// Insert at the right position based on creation date
-						const index = items.findIndex(
-							(existing) => new Date(item.created).getTime() > new Date(existing.created).getTime(),
-						);
-						if (index === -1) {
-							items.push(item);
-						} else {
-							items.splice(index, 0, item);
-						}
-						return items;
-					},
+				on_add: (items, item) => {
+					// Insert at the right position based on creation date
+					const index = items.findIndex(
+						(existing) => new Date(item.created).getTime() > new Date(existing.created).getTime(),
+					);
+					if (index === -1) {
+						items.push(item);
+					} else {
+						items.splice(index, 0, item);
+					}
+					return items;
 				},
-			),
+			}),
 		],
 	});
 

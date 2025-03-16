@@ -41,62 +41,70 @@ export class Messages extends Cell<typeof Messages_Json> {
 	readonly items: Indexed_Collection<Message> = new Indexed_Collection({
 		indexes: [
 			// Type-based multi-index
-			create_multi_index<Message, Message_Type>('by_type', (message: Message) => message.type),
+			create_multi_index({
+				key: 'by_type',
+				extractor: (message: Message) => message.type,
+				query_schema: z.enum([
+					'ping',
+					'pong',
+					'send_prompt',
+					'completion_response',
+					'update_diskfile',
+					'delete_diskfile',
+					'filer_change',
+				]),
+			}),
 
 			// Ping ID index for pongs
-			create_multi_index<Message, string>(
-				'by_ping_id',
-				(message) => {
+			create_multi_index({
+				key: 'by_ping_id',
+				extractor: (message) => {
 					if (message.type === 'pong' && message.ping_id) {
 						return message.ping_id;
 					}
 					return undefined;
 				},
-				undefined, // No input schema
-				{
-					matches: (message) => message.type === 'pong' && !!message.ping_id,
-				},
-			),
+				query_schema: z.string(),
+				matches: (message) => message.type === 'pong' && !!message.ping_id,
+			}),
 
 			// Derived index for latest pongs - prioritize showing most recent
-			create_derived_index<Message>(
-				'latest_pongs',
-				(collection) => {
+			create_derived_index({
+				key: 'latest_pongs',
+				compute: (collection) => {
 					return collection
 						.where('by_type', 'pong')
 						.sort((a, b) => b.created.localeCompare(a.created))
 						.slice(0, PONG_DISPLAY_LIMIT);
 				},
-				{
-					matches: (item) => item.type === 'pong',
-					on_add: (items, item) => {
-						if (item.type !== 'pong') return items;
+				matches: (item) => item.type === 'pong',
+				on_add: (items, item) => {
+					if (item.type !== 'pong') return items;
 
-						// Insert at correct position based on created timestamp
-						const index = items.findIndex((existing) => item.created > existing.created);
+					// Insert at correct position based on created timestamp
+					const index = items.findIndex((existing) => item.created > existing.created);
 
-						if (index === -1) {
-							items.push(item);
-						} else {
-							items.splice(index, 0, item);
-						}
+					if (index === -1) {
+						items.push(item);
+					} else {
+						items.splice(index, 0, item);
+					}
 
-						// Keep only the newest items
-						if (items.length > PONG_DISPLAY_LIMIT) {
-							return items.slice(0, PONG_DISPLAY_LIMIT);
-						}
+					// Keep only the newest items
+					if (items.length > PONG_DISPLAY_LIMIT) {
+						return items.slice(0, PONG_DISPLAY_LIMIT);
+					}
 
-						return items;
-					},
-					on_remove: (items, item) => {
-						const index = items.findIndex((i) => i.id === item.id);
-						if (index !== -1) {
-							items.splice(index, 1);
-						}
-						return items;
-					},
+					return items;
 				},
-			),
+				on_remove: (items, item) => {
+					const index = items.findIndex((i) => i.id === item.id);
+					if (index !== -1) {
+						items.splice(index, 1);
+					}
+					return items;
+				},
+			}),
 		],
 	});
 

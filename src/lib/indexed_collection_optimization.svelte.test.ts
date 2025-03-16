@@ -75,7 +75,9 @@ test('Indexed_Collection - optimization - incremental updates avoid recomputing 
 
 	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
 		indexes: [
-			create_derived_index<Test_Item>('high_value', compute_spy, {
+			create_derived_index({
+				key: 'high_value',
+				compute: compute_spy,
 				matches: (item) => item.value > 10,
 				on_add: on_add_spy,
 			}),
@@ -178,17 +180,17 @@ test('Indexed_Collection - optimization - dynamic indexes avoid redundant storag
 	// Create a collection with a dynamic index that computes on-demand
 	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
 		indexes: [
-			create_dynamic_index<Test_Item, (min_value: string) => Array<Test_Item>>(
-				'by_min_value',
-				(collection) => {
+			create_dynamic_index<Test_Item, (min_value: string) => Array<Test_Item>>({
+				key: 'by_min_value',
+				factory: (collection) => {
 					return (min_value: string) => {
 						const threshold = parseInt(min_value, 10);
 						return collection.all.filter((item) => item.value >= threshold);
 					};
 				},
-				z.string(),
-				dynamic_function_schema,
-			),
+				query_schema: z.string(),
+				result_schema: dynamic_function_schema,
+			}),
 		],
 	});
 
@@ -220,10 +222,10 @@ test('Indexed_Collection - optimization - memory usage with large datasets', () 
 	collection.add_many(large_dataset);
 
 	// Create indexes after adding data
-	collection.indexes.by_category = create_multi_index(
-		'by_category',
-		(item: any) => item.category,
-	).compute(collection);
+	collection.indexes.by_category = create_multi_index({
+		key: 'by_category',
+		extractor: (item: any) => item.category,
+	}).compute(collection);
 
 	// Verify the index contains the expected number of categories
 	const category_index = collection.get_index<Map<string, Array<Test_Item>>>('by_category');

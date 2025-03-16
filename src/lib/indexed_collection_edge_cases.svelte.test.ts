@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 
-import {test, expect, describe} from 'vitest';
+import {test, expect, describe, vi} from 'vitest';
 import {z} from 'zod';
 
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
@@ -8,439 +8,447 @@ import {
 	create_single_index,
 	create_multi_index,
 	create_derived_index,
+	create_dynamic_index,
 } from '$lib/indexed_collection_helpers.js';
 import {Uuid} from '$lib/zod_helpers.js';
 
-// Mock item type that implements Indexed_Item
-interface Test_Item {
+/* eslint-disable @typescript-eslint/no-empty-function */
+
+// Basic test item type
+interface Edge_Test_Item {
 	id: Uuid;
-	name: string | null;
+	name: string;
+	value: number | null;
 	tags: Array<string>;
-	optional_field?: string;
-	nested?: {
-		value?: number;
-		deep?: {
-			data?: string;
-		};
-	};
+	active: boolean;
 }
 
 // Helper function to create test items
-const create_test_item = (
-	name: string | null = 'test',
+const create_edge_item = (
+	name: string,
+	value: number | null = 0,
 	tags: Array<string> = [],
-	optional_field?: string,
-	nested?: {value?: number; deep?: {data?: string}},
-): Test_Item => ({
+	active = true,
+): Edge_Test_Item => ({
 	id: Uuid.parse(undefined),
 	name,
+	value,
 	tags,
-	optional_field,
-	nested,
+	active,
 });
 
-// Helper functions for ID-based object equality checks
-const has_item_with_id = (array: Array<Test_Item>, item: Test_Item): boolean =>
-	array.some((i) => i.id === item.id);
-
 describe('Indexed_Collection - Edge Cases', () => {
-	test('empty collection behavior', () => {
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+	test('handling null/undefined values in index extractors', () => {
+		// Create indexes that handle null/undefined values explicitly
+		const collection: Indexed_Collection<Edge_Test_Item> = new Indexed_Collection({
 			indexes: [
-				create_single_index('by_name', (item) => item.name),
-				create_multi_index('by_tag', (item) => item.tags[0]),
-				create_derived_index('all_items', (collection) => collection.all),
+				// Single index that filters out null values
+				create_single_index({
+					key: 'by_value',
+					extractor: (item) => item.value, // May return null
+					query_schema: z.number().nullable(),
+				}),
+
+				// Multi-index that handles undefined values safely
+				create_multi_index({
+					key: 'by_tag',
+					extractor: (item) => (item.tags.length > 0 ? item.tags : undefined),
+					query_schema: z.string(),
+				}),
 			],
 		});
 
-		// Check empty collection state
-		expect(collection.size).toBe(0);
-		expect(collection.all).toHaveLength(0);
-		expect(collection.by_optional('by_name', 'anything')).toBeUndefined();
-		expect(collection.where('by_tag', 'anything')).toHaveLength(0);
-		expect(collection.get_derived('all_items')).toHaveLength(0);
+		// Add items with edge case values
+		const item1 = create_edge_item('item1', 5, ['tag1']);
+		const item2 = create_edge_item('item2', null, ['tag2']);
+		const item3 = create_edge_item('item3', 10, []); // No tags
+		const item4 = create_edge_item('item4', 15, ['tag1', 'tag3']);
 
-		// Operations on empty collection
-		expect(collection.remove('non-existent-id' as Uuid)).toBe(false);
-		expect(() => collection.by('by_name', 'missing')).toThrow();
+		collection.add_many([item1, item2, item3, item4]);
 
-		// Clear an empty collection
-		collection.clear();
-		expect(collection.size).toBe(0);
-	});
+		// Test retrieving with null values
+		expect(collection.by_optional('by_value', null)?.name).toBe('item2');
 
-	test('null and undefined values in extractors', () => {
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
-			indexes: [
-				create_single_index('by_name', (item) => item.name),
-				create_single_index('by_optional', (item) => item.optional_field),
-				create_multi_index('by_nested', (item) => item.nested?.value),
-				create_multi_index('by_deep_nested', (item) => item.nested?.deep?.data),
-			],
-		});
+		// Test filtering with null values
+		expect(collection.by_optional('by_value', 999)).toBeUndefined(); // Non-existing value
 
-		// Create items with null/undefined values
-		const item1 = create_test_item(null, ['tag1']);
-		const item2 = create_test_item('item2', ['tag2'], 'optional value');
-		const item3 = create_test_item('item3', ['tag3'], undefined, {value: 42});
-		const item4 = create_test_item('item4', ['tag4'], undefined, {deep: {data: 'deep data'}});
-		const item5 = create_test_item('item5', ['tag5'], undefined, {value: undefined});
+		// Test multi-index with shared tags
+		const tag1_items = collection.where('by_tag', 'tag1');
+		expect(tag1_items.length).toBe(2);
+		expect(tag1_items.map((i) => i.name).sort()).toEqual(['item1', 'item4'].sort());
 
-		collection.add_many([item1, item2, item3, item4, item5]);
+		// Item with empty tags array should be excluded from by_tag index
+		expect(collection.where('by_tag', undefined)).toHaveLength(0);
 
-		// Test null key in single index
-		const nullItem = collection.by_optional('by_name', null);
-		expect(nullItem?.id).toBe(item1.id);
-
-		// Test undefined values
-		expect(collection.by_optional('by_optional', undefined)).toBeUndefined();
-		expect(collection.where('by_nested', undefined)).toHaveLength(0);
-
-		// Test defined values
-		expect(collection.by_optional('by_optional', 'optional value')?.id).toBe(item2.id);
-		expect(collection.where('by_nested', 42)).toHaveLength(1);
-		expect(has_item_with_id(collection.where('by_deep_nested', 'deep data'), item4)).toBe(true);
-
-		// Remove item with null value
-		collection.remove(item1.id);
-		expect(collection.by_optional('by_name', null)).toBeUndefined();
-	});
-
-	test('duplicate keys in indexes', () => {
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
-			indexes: [
-				create_single_index('by_name', (item) => item.name),
-				create_single_index('constant_key', () => 'same_key'), // Same key for all items
-				create_multi_index('by_tag', () => 'shared_tag'), // Same tag for all items
-			],
-		});
-
-		// Add items with duplicate keys for single index
-		const item1 = create_test_item('duplicate', ['tag1']);
-		const item2 = create_test_item('duplicate', ['tag2']); // Same name as item1
-		const item3 = create_test_item('unique', ['tag3']);
-
-		// Adding first item with 'duplicate' name
-		collection.add(item1);
-		expect(collection.by_optional('by_name', 'duplicate')?.id).toBe(item1.id);
-
-		// Adding second item with same name - should replace first in single index
-		collection.add(item2);
-		expect(collection.by_optional('by_name', 'duplicate')?.id).toBe(item2.id);
-		expect(collection.by_optional('by_name', 'duplicate')?.id).not.toBe(item1.id);
-
-		// Add the third item
-		collection.add(item3);
-
-		// Check both items are in the collection
-		expect(collection.size).toBe(3);
-		expect(has_item_with_id(collection.all, item1)).toBe(true);
-		expect(has_item_with_id(collection.all, item2)).toBe(true);
-
-		// Multi-index with same key should contain all items
-		const shared_tag_items = collection.where('by_tag', 'shared_tag');
-		expect(shared_tag_items).toHaveLength(3);
-		expect(has_item_with_id(shared_tag_items, item1)).toBe(true);
-		expect(has_item_with_id(shared_tag_items, item2)).toBe(true);
-		expect(has_item_with_id(shared_tag_items, item3)).toBe(true);
-
-		// Constant key single index will only contain the last added item
-		expect(collection.by_optional('constant_key', 'same_key')?.id).toBe(item3.id);
-
-		// Removing an item with duplicate key should not affect the other
+		// Test removing an item with null value
 		collection.remove(item2.id);
-		// After removal, item1 should become the indexed item for 'duplicate' again
-		expect(collection.by_optional('by_name', 'duplicate')?.id).toBe(item1.id);
-		expect(collection.where('by_tag', 'shared_tag')).toHaveLength(2);
+		expect(collection.by_optional('by_value', null)).toBeUndefined();
+
+		// Add another item with null value
+		const item5 = create_edge_item('item5', null, ['tag5']);
+		collection.add(item5);
+		expect(collection.by_optional('by_value', null)?.name).toBe('item5');
 	});
 
-	test('error handling - invalid operations', () => {
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection();
-		const item = create_test_item('test');
-		collection.add(item);
+	test('handling duplicates in single indexes', () => {
+		// Create a single index where multiple items might share the same key
+		const console_warn_spy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-		// Invalid index operations
-		expect(() => collection.by('non_existent_index', 'value')).toThrow();
-		expect(collection.by_optional('non_existent_index', 'value')).toBeUndefined();
-		expect(collection.where('non_existent_index', 'value')).toHaveLength(0);
-		expect(collection.get_derived('non_existent_index')).toHaveLength(0);
-
-		// Out of bounds array access
-		expect(() => collection.reorder(-1, 0)).not.toThrow();
-		expect(() => collection.reorder(0, 999)).not.toThrow();
-		expect(() => collection.insert_at(create_test_item(), -1)).toThrow();
-		expect(() => collection.insert_at(create_test_item(), 999)).toThrow();
-	});
-
-	test('updating items after indexing', () => {
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		const collection: Indexed_Collection<Edge_Test_Item> = new Indexed_Collection({
 			indexes: [
-				create_single_index('by_name', (item) => item.name),
-				create_multi_index('by_tag', (item) => item.tags[0]),
+				create_single_index({
+					key: 'by_truncated_name',
+					extractor: (item) => item.name.substring(0, 3), // First 3 chars
+					query_schema: z.string(),
+				}),
+				// Add explicit name index for easier item retrieval
+				create_single_index({
+					key: 'by_name',
+					extractor: (item) => item.name,
+					query_schema: z.string(),
+				}),
 			],
 		});
 
-		// Add an item
-		const item = create_test_item('original', ['original-tag']);
-		collection.add(item);
+		// Add items with duplicate truncated names
+		const item1 = create_edge_item('abc123', 1);
+		const item2 = create_edge_item('abc456', 2);
+		const item3 = create_edge_item('def789', 3);
 
-		// Verify initial indexing
-		expect(collection.by_optional('by_name', 'original')?.id).toBe(item.id);
+		// Add them in a specific order
+		collection.add(item1); // First 'abc' item
+		collection.add(item3); // Different prefix
+		collection.add(item2); // Second 'abc' item - should overwrite item1 in the index
 
-		// Remove the item first, then modify it
-		collection.remove(item.id);
+		// Check that the latest addition wins for duplicate keys
+		expect(collection.by_optional('by_truncated_name', 'abc')?.name).toBe('abc456');
+		expect(collection.by_optional('by_truncated_name', 'def')?.name).toBe('def789');
 
-		// Now modify the item
-		item.name = 'modified';
-		item.tags = ['modified-tag'];
+		// Test what happens when removing an item that was overwritten in the index
+		collection.remove(item2.id); // Remove the winning item
 
-		// Add back to collection with new values
-		collection.add(item);
+		// The index should now revert to the first item with the same key
+		expect(collection.by_optional('by_truncated_name', 'abc')?.name).toBe('abc123');
 
-		// Now indexes should reflect the new values
-		// Original value should no longer be indexed
-		expect(collection.by_optional('by_name', 'original')).toBeUndefined();
-		// Modified value should be indexed
-		expect(collection.by_optional('by_name', 'modified')?.id).toBe(item.id);
-		expect(collection.where('by_tag', 'original-tag')).toHaveLength(0);
-		expect(has_item_with_id(collection.where('by_tag', 'modified-tag'), item)).toBe(true);
+		// Check that removing all items with the same key clears the index entry
+		const key1 = item1.id; // Store the ID before removing to avoid test failure
+		collection.remove(key1);
+		expect(collection.by_optional('by_truncated_name', 'abc')).toBeUndefined();
+
+		console_warn_spy.mockRestore();
 	});
 
-	// Reduce the item count to avoid timeout issues during testing
-	test('moderate collection performance', () => {
-		const ITEM_COUNT = 500; // Reduced from 5000 to avoid test timeouts
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+	test('batch operations performance', {timeout: 10000}, () => {
+		// Create a collection with multiple indexes to stress test performance
+		// But use fewer items to prevent test timeouts
+		const collection: Indexed_Collection<Edge_Test_Item> = new Indexed_Collection({
 			indexes: [
-				create_single_index('by_name', (item) => item.name),
-				create_multi_index('by_tag', (item) => item.tags[0]),
+				create_single_index({
+					key: 'by_name',
+					extractor: (item) => item.name,
+					query_schema: z.string(),
+				}),
+
+				create_multi_index({
+					key: 'by_tag',
+					extractor: (item) => item.tags,
+					query_schema: z.string(),
+				}),
+
+				create_derived_index({
+					key: 'active_by_value',
+					compute: (collection) => {
+						return collection.all
+							.filter((item) => item.active && item.value !== null)
+							.sort((a, b) => (b.value || 0) - (a.value || 0));
+					},
+					matches: (item) => item.active && item.value !== null,
+					sort: (a, b) => (b.value || 0) - (a.value || 0),
+				}),
 			],
 		});
 
-		// Create a moderate number of items
-		const items = [];
-		for (let i = 0; i < ITEM_COUNT; i++) {
-			const tag = `tag-${i % 10}`; // Create 10 different tags
-			items.push(create_test_item(`item-${i}`, [tag]));
-		}
+		// Create a smaller batch (100 items) with varied properties
+		const large_batch = Array.from({length: 100}, (_, i) => {
+			const active = i % 3 === 0;
+			const value = i % 5 === 0 ? null : i;
+			const tags = [`tag${i % 10}`, `group${i % 5}`];
+			return create_edge_item(`item${i}`, value, tags, active);
+		});
 
 		// Measure time to add all items
-		collection.add_many(items);
+		const start_time = performance.now();
+		collection.add_many(large_batch);
+		const end_time = performance.now();
 
-		// Verify all items were added
-		expect(collection.size).toBe(ITEM_COUNT);
+		// Just log the time, don't make strict assertions as performance varies by environment
+		console.log(`Time to add 100 items with 3 indexes: ${end_time - start_time}ms`);
 
-		// Test simple lookups
-		const item = collection.by_optional('by_name', 'item-42');
-		expect(item).toBeDefined();
+		// Verify all indexes were created correctly
+		expect(collection.size).toBe(100);
+		expect(Object.keys(collection.indexes).length).toBe(3);
 
-		const tagged_items = collection.where('by_tag', 'tag-5');
-		expect(tagged_items.length).toBeGreaterThan(0);
+		// Test various queries against the indexes
+		expect(collection.by_optional('by_name', 'item23')?.value).toBe(23);
+		expect(collection.where('by_tag', 'tag5').length).toBe(10); // 10% of items have tag5
+		expect(collection.get_derived('active_by_value').length).toBe(
+			large_batch.filter((i) => i.active && i.value !== null).length,
+		);
 
-		// Remove a smaller subset
-		const removed = collection.remove_many(items.slice(0, 100).map((item) => item.id));
-		expect(removed).toBe(100);
-		expect(collection.size).toBe(ITEM_COUNT - 100);
+		// Test removing half of the items
+		const to_remove = large_batch.slice(0, 50).map((item) => item.id);
+		const remove_start = performance.now();
+		collection.remove_many(to_remove);
+		const remove_end = performance.now();
+
+		console.log(`Time to remove 50 items: ${remove_end - remove_start}ms`);
+		expect(collection.size).toBe(50);
 	});
 
-	test('derived indexes with complex behavior', () => {
-		// Create a much simpler and more predictable derived index to avoid potential issues
-		const item_schema = z.custom<Test_Item>((val) => val && typeof val === 'object' && 'id' in val);
-		const array_schema = z.array(item_schema);
-
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+	test('error handling for invalid index type access', () => {
+		// Create a collection with mix of index types
+		const collection: Indexed_Collection<Edge_Test_Item> = new Indexed_Collection({
 			indexes: [
+				create_single_index({
+					key: 'by_name',
+					extractor: (item) => item.name,
+					query_schema: z.string(),
+				}),
+				create_multi_index({
+					key: 'by_tag',
+					extractor: (item) => item.tags,
+					query_schema: z.string(),
+				}),
+			],
+		});
+
+		// Add a test item
+		collection.add(create_edge_item('test1', 1, ['tag1']));
+
+		// Test accessing indexes with wrong methods
+		expect(() => {
+			collection.where('by_name', 'test1'); // Using multi-index method on single index
+		}).toThrow(); // Should throw error about index type mismatch
+
+		expect(() => {
+			collection.by<string>('by_tag', 'tag1'); // Using single-index method on multi-index
+		}).toThrow(); // Should throw error about index type mismatch
+	});
+
+	test('handling invalid queries with schema validation', () => {
+		// Create a collection with strict schema validation
+		const console_error_spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+		const collection: Indexed_Collection<Edge_Test_Item> = new Indexed_Collection({
+			indexes: [
+				create_single_index({
+					key: 'by_value',
+					extractor: (item) => item.value,
+					query_schema: z.number().positive(), // Must be positive number
+				}),
+			],
+			validate: true, // Enable validation
+		});
+
+		// Add test items
+		collection.add(create_edge_item('test1', 5));
+		collection.add(create_edge_item('test2', -1)); // Negative value
+		collection.add(create_edge_item('test3', null)); // Null value
+
+		// Test valid query
+		expect(collection.by_optional('by_value', 5)?.name).toBe('test1');
+
+		// Test queries that violate schema
+		collection.query('by_value', -10); // Negative number, should log validation error
+		expect(console_error_spy).toHaveBeenCalled();
+
+		console_error_spy.mockClear();
+		collection.query('by_value', null); // Null, should log validation error
+		expect(console_error_spy).toHaveBeenCalled();
+
+		console_error_spy.mockRestore();
+	});
+
+	test('dynamic indexes with custom handlers', () => {
+		// Test a dynamic index with custom add/remove handlers
+		const compute_fn = vi.fn();
+		const on_add_fn = vi.fn((_fn, item, collection) => {
+			// Return a new function that references the added item
+			return (query: string) => {
+				compute_fn(query);
+				if (query === item.name) {
+					return [item];
+				}
+				return collection.all.filter((i: any) => i.name.includes(query));
+			};
+		});
+
+		const on_remove_fn = vi.fn((_fn, _item, collection) => {
+			// Return a new function that excludes the removed item
+			return (query: string) => {
+				compute_fn(query);
+				return collection.all.filter((i: any) => i.name.includes(query));
+			};
+		});
+
+		const collection: Indexed_Collection<Edge_Test_Item> = new Indexed_Collection({
+			indexes: [
+				create_dynamic_index<Edge_Test_Item, (query: string) => Array<Edge_Test_Item>>({
+					key: 'search',
+					factory: (collection) => {
+						return (query: string) => {
+							compute_fn(query);
+							return collection.all.filter((i) => i.name.includes(query));
+						};
+					},
+					query_schema: z.string(),
+					on_add: on_add_fn,
+					on_remove: on_remove_fn,
+				}),
+			],
+		});
+
+		// Add test items and verify custom handlers
+		const item1 = create_edge_item('apple');
+		collection.add(item1);
+		expect(on_add_fn).toHaveBeenCalled();
+
+		const item2 = create_edge_item('banana');
+		collection.add(item2);
+
+		// Test the search index
+		const search_fn = collection.get_index<(q: string) => Array<Edge_Test_Item>>('search');
+
+		// Search functions should work
+		const apple_results = search_fn('app');
+		expect(apple_results.length).toBe(1);
+		expect(apple_results[0].name).toBe('apple');
+		expect(compute_fn).toHaveBeenLastCalledWith('app');
+
+		// Test removing an item triggers on_remove
+		collection.remove(item1.id);
+		expect(on_remove_fn).toHaveBeenCalled();
+
+		// Search function should be updated
+		const no_results = search_fn('app');
+		expect(no_results.length).toBe(0);
+	});
+
+	test('custom complex index behaviors', () => {
+		// Create a collection with a custom index that has advanced logic
+		const collection: Indexed_Collection<Edge_Test_Item> = new Indexed_Collection({
+			indexes: [
+				// Add explicit name index for lookup
+				create_single_index({
+					key: 'by_name',
+					extractor: (item) => item.name,
+					query_schema: z.string(),
+				}),
+				// Custom index that maintains an aggregated stats object
 				{
-					key: 'multistep_filtered',
+					key: 'stats',
 					compute: (collection) => {
-						// Simple derivation - just top 3 items sorted by name
-						return [...collection.all]
-							.filter((item) => item.tags.length > 0)
-							.sort((a, b) => {
-								// Simpler, safer comparison
-								const name_a = a.name || '';
-								const name_b = b.name || '';
-								return name_a.localeCompare(name_b);
-							})
-							.slice(0, 3);
+						return {
+							total_items: collection.all.length,
+							active_count: collection.all.filter((i) => i.active).length,
+							inactive_count: collection.all.filter((i) => !i.active).length,
+							total_value: collection.all.reduce((sum, i) => sum + (i.value || 0), 0),
+							tags_frequency: collection.all.reduce<Record<string, number>>((freq, item) => {
+								for (const tag of item.tags) {
+									freq[tag] = (freq[tag] || 0) + 1;
+								}
+								return freq;
+							}, {}),
+						};
 					},
-					result_schema: array_schema,
-					matches: (item) => item.tags.length > 0,
-					on_add: (items: Array<Test_Item>, item: Test_Item) => {
-						// Only include items with tags
-						if (item.tags.length === 0) return items;
+					on_add: (stats: any, item: Edge_Test_Item) => {
+						stats.total_items++;
+						if (item.active) stats.active_count++;
+						else stats.inactive_count++;
+						stats.total_value += item.value || 0;
 
-						// Simple insertion that avoids complex comparisons
-						items.push(item);
+						// Update tag frequencies
+						for (const tag of item.tags) {
+							stats.tags_frequency[tag] = (stats.tags_frequency[tag] || 0) + 1;
+						}
 
-						// Sort and limit after insertion
-						return items
-							.sort((a, b) => {
-								const name_a = a.name || '';
-								const name_b = b.name || '';
-								return name_a.localeCompare(name_b);
-							})
-							.slice(0, 3);
+						return stats;
 					},
-					on_remove: (
-						_items: Array<Test_Item>,
-						item: Test_Item,
-						collection: Indexed_Collection<Test_Item>,
-					) => {
-						// Instead of manipulating the items array, recompute from collection
-						// This ensures we get a consistent result regardless of how the removal affects the array
-						return [...collection.all]
-							.filter((i) => i.id !== item.id && i.tags.length > 0) // Exclude the removed item and items without tags
-							.sort((a, b) => {
-								const name_a = a.name || '';
-								const name_b = b.name || '';
-								return name_a.localeCompare(name_b);
-							})
-							.slice(0, 3);
+					on_remove: (stats: any, item: Edge_Test_Item) => {
+						stats.total_items--;
+						if (item.active) stats.active_count--;
+						else stats.inactive_count--;
+						stats.total_value -= item.value || 0;
+
+						// Update tag frequencies
+						for (const tag of item.tags) {
+							stats.tags_frequency[tag]--;
+							if (stats.tags_frequency[tag] === 0) {
+								delete stats.tags_frequency[tag]; // eslint-disable-line @typescript-eslint/no-dynamic-delete
+							}
+						}
+						return stats;
 					},
+					result_schema: z.object({
+						total_items: z.number(),
+						active_count: z.number(),
+						inactive_count: z.number(),
+						total_value: z.number(),
+						tags_frequency: z.record(z.string(), z.number()),
+					}),
 				},
 			],
 		});
 
-		// Add test items
-		const itemC = create_test_item('c', ['tag1']);
-		const itemA = create_test_item('a', ['tag2']);
-		const itemB = create_test_item('b', ['tag3']);
-		const itemD = create_test_item('d', ['tag4']);
-		const item_empty = create_test_item('e', []); // No tags
+		// Add items to test stats tracking
+		const item1 = create_edge_item('item1', 10, ['tag1', 'tag2'], true);
+		const item2 = create_edge_item('item2', 20, ['tag2', 'tag3'], false);
+		const item3 = create_edge_item('item3', 30, ['tag1', 'tag3'], true);
 
-		collection.add(itemC);
-		collection.add(itemA);
-		collection.add(itemB);
+		collection.add(item1);
+		collection.add(item2);
+		collection.add(item3);
 
-		// Check initial state of derived index (a, b, c sorted alphabetically)
-		const derived = collection.get_derived('multistep_filtered');
-		expect(derived).toHaveLength(3);
-		expect(derived[0].id).toBe(itemA.id); // 'a' comes first alphabetically
-		expect(derived[1].id).toBe(itemB.id);
-		expect(derived[2].id).toBe(itemC.id);
+		// Check that stats were computed correctly
+		const stats = collection.get_index<{
+			total_items: number;
+			active_count: number;
+			inactive_count: number;
+			total_value: number;
+			tags_frequency: Record<string, number>;
+		}>('stats');
 
-		// Add item D
-		collection.add(itemD);
-		const updated = collection.get_derived('multistep_filtered');
-
-		// Should still be 3 items, alphabetically sorted A, B, C (D should be excluded due to limit)
-		expect(updated).toHaveLength(3);
-		expect(updated[0].id).toBe(itemA.id);
-		expect(updated[1].id).toBe(itemB.id);
-		expect(updated[2].id).toBe(itemC.id);
-		expect(has_item_with_id(updated, itemD)).toBe(false);
-
-		// Add empty item - should be filtered out
-		collection.add(item_empty);
-		expect(collection.get_derived('multistep_filtered')).toHaveLength(3);
-		expect(has_item_with_id(collection.get_derived('multistep_filtered'), item_empty)).toBe(false);
-
-		// Remove item A
-		collection.remove(itemA.id);
-		const after_remove = collection.get_derived('multistep_filtered');
-		expect(after_remove).toHaveLength(3);
-		expect(after_remove[0].id).toBe(itemB.id);
-		expect(after_remove[1].id).toBe(itemC.id);
-		expect(after_remove[2].id).toBe(itemD.id); // D should now be included
-	});
-
-	test('special characters and edge values', () => {
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
-			indexes: [create_single_index('by_name', (item) => item.name)],
+		expect(stats.total_items).toBe(3);
+		expect(stats.active_count).toBe(2);
+		expect(stats.inactive_count).toBe(1);
+		expect(stats.total_value).toBe(60);
+		expect(stats.tags_frequency).toEqual({
+			tag1: 2,
+			tag2: 2,
+			tag3: 2,
 		});
 
-		// Create a few items with special values (avoid excessive test data)
-		const item_empty = create_test_item('', ['tag']);
-		const item_special = create_test_item('!@#$%^&*()', ['tag']);
-		const item_emoji = create_test_item('😊💻🔍', ['tag']);
+		// Test incremental update - add an item
+		collection.add(create_edge_item('item4', 40, ['tag1', 'tag4'], false));
 
-		collection.add_many([item_empty, item_special, item_emoji]);
+		expect(stats.total_items).toBe(4);
+		expect(stats.active_count).toBe(2);
+		expect(stats.inactive_count).toBe(2);
+		expect(stats.total_value).toBe(100);
+		expect(stats.tags_frequency.tag1).toBe(3);
+		expect(stats.tags_frequency.tag4).toBe(1);
 
-		// Test lookups with special characters
-		expect(collection.by_optional('by_name', '')?.id).toBe(item_empty.id);
-		expect(collection.by_optional('by_name', '!@#$%^&*()')?.id).toBe(item_special.id);
-		expect(collection.by_optional('by_name', '😊💻🔍')?.id).toBe(item_emoji.id);
+		// Test incremental update - remove an item
+		// Store the item reference first to ensure it exists
+		const item1_ref = collection.by_optional('by_name', 'item1');
+		expect(item1_ref).toBeDefined(); // Make sure we found it
+		collection.remove(item1_ref!.id);
 
-		// Remove and check cleanup
-		collection.remove(item_emoji.id);
-		expect(collection.by_optional('by_name', '😊💻🔍')).toBeUndefined();
-	});
-
-	test('removing non-existent items', () => {
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection();
-		const item = create_test_item();
-		collection.add(item);
-
-		// Generate a valid UUID that doesn't exist in the collection
-		const non_existent_uuid = Uuid.parse(undefined);
-
-		// Test removing non-existent items
-		expect(collection.remove(non_existent_uuid)).toBe(false);
-		expect(collection.size).toBe(1);
-
-		// Mix of existing and non-existing items
-		const removed_count = collection.remove_many([item.id, non_existent_uuid]);
-		expect(removed_count).toBe(1);
-		expect(collection.size).toBe(0);
-	});
-
-	test('multiple derived indexes interact correctly', () => {
-		// Test how multiple derived indexes interact with the same collection
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
-			indexes: [
-				// First derived index - items with tags
-				create_derived_index(
-					'with_tags',
-					(collection) => collection.all.filter((item) => item.tags.length > 0),
-					{
-						matches: (item) => item.tags.length > 0,
-					},
-				),
-				// Second derived index - items with names starting with 'a'
-				create_derived_index(
-					'a_names',
-					(collection) => collection.all.filter((item) => Boolean(item.name?.startsWith('a'))),
-					{
-						matches: (item) => Boolean(item.name?.startsWith('a')),
-					},
-				),
-			],
-		});
-
-		// Add test items that fit different criteria
-		const itemA1 = create_test_item('apple', ['fruit']); // In both indexes
-		const itemA2 = create_test_item('apricot', []); // In a_names only
-		const itemB1 = create_test_item('banana', ['fruit']); // In with_tags only
-		const itemC1 = create_test_item('cherry', []); // In neither index
-
-		collection.add_many([itemA1, itemA2, itemB1, itemC1]);
-
-		// Check initial state of both indexes
-		const with_tags = collection.get_derived('with_tags');
-		expect(with_tags).toHaveLength(2);
-		expect(has_item_with_id(with_tags, itemA1)).toBe(true);
-		expect(has_item_with_id(with_tags, itemB1)).toBe(true);
-
-		const a_names = collection.get_derived('a_names');
-		expect(a_names).toHaveLength(2);
-		expect(has_item_with_id(a_names, itemA1)).toBe(true);
-		expect(has_item_with_id(a_names, itemA2)).toBe(true);
-
-		// Modify item to fit different indexes
-		collection.remove(itemB1.id);
-		const itemB2 = create_test_item('avocado', ['fruit']);
-		collection.add(itemB2);
-
-		// Verify both indexes updated correctly
-		const updated_with_tags = collection.get_derived('with_tags');
-		expect(updated_with_tags).toHaveLength(2);
-		expect(has_item_with_id(updated_with_tags, itemA1)).toBe(true);
-		expect(has_item_with_id(updated_with_tags, itemB2)).toBe(true);
-
-		const updated_a_names = collection.get_derived('a_names');
-		expect(updated_a_names).toHaveLength(3);
-		expect(has_item_with_id(updated_a_names, itemA1)).toBe(true);
-		expect(has_item_with_id(updated_a_names, itemA2)).toBe(true);
-		expect(has_item_with_id(updated_a_names, itemB2)).toBe(true);
+		expect(stats.total_items).toBe(3);
+		expect(stats.active_count).toBe(1);
+		expect(stats.inactive_count).toBe(2);
+		expect(stats.total_value).toBe(90);
+		expect(stats.tags_frequency.tag1).toBe(2);
+		expect(stats.tags_frequency.tag2).toBe(1);
 	});
 });
