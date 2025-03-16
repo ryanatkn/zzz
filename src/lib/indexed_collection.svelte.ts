@@ -336,6 +336,7 @@ export class Indexed_Collection<
 		return result;
 	}
 
+	// TODO add `many_by` for arrays?
 	/**
 	 * Get an item by a single-value index
 	 */
