@@ -32,7 +32,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 		indexes: [
 			{
 				key: 'by_path',
-				type: Index_Type.SINGLE,
+				type: 'single',
 				extractor: (file: Diskfile) => file.path,
 			},
 			{
@@ -61,8 +61,8 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 				// Update a derived index incrementally when an item is removed
 				on_remove: (collection, item) => {
 					if (!item.external) {
-						const idx = collection.findIndex((f) => f.id === item.id);
-						if (idx !== -1) collection.splice(idx, 1);
+						const index = collection.findIndex((f) => f.id === item.id);
+						if (index !== -1) collection.splice(index, 1);
 					}
 				},
 				// Only process items matching this condition for this derived index

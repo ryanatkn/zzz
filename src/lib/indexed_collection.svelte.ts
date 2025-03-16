@@ -1,5 +1,6 @@
 import {SvelteMap} from 'svelte/reactivity';
 import {Uuid} from '$lib/zod_helpers.js';
+import type {z} from 'zod';
 
 /**
  * Interface for objects that can be stored in an indexed collection
@@ -9,66 +10,52 @@ export interface Indexed_Item {
 }
 
 /**
- * The type of index with different behaviors
+ * String literals for index types
  */
-export enum Index_Type {
-	/** Maps a single property value to a single item */
-	SINGLE = 'single',
-	/** Maps a property value to multiple items */
-	MULTI = 'multi',
-	/** A derived collection that's updated incrementally */
-	DERIVED = 'derived',
-}
+export type Index_Type = 'single' | 'multi' | 'derived';
 
 /**
- * Base configuration for all index types
+ * Generic index definition with full flexibility
  */
-interface Index_Config_Base<K extends string> {
-	key: K;
-	type: Index_Type;
-}
+export interface Index_Definition<T extends Indexed_Item, T_Result = any, T_Query = any> {
+	/** Unique identifier for this index */
+	key: string;
 
-/**
- * Type-safe configuration for single-value indexes
- */
-export interface Single_Index_Config<T, K extends string> extends Index_Config_Base<K> {
-	type: Index_Type.SINGLE;
-	extractor: (item: T) => any;
-}
+	/** Optional index type for simpler creation */
+	type?: Index_Type;
 
-/**
- * Type-safe configuration for multi-value indexes
- */
-export interface Multi_Index_Config<T, K extends string> extends Index_Config_Base<K> {
-	type: Index_Type.MULTI;
-	extractor: (item: T) => any;
-}
+	/** Optional extractor function for single/multi indexes */
+	extractor?: (item: T) => any;
 
-/**
- * Configuration for derived collection indexes with incremental updates
- */
-export interface Derived_Index_Config<T extends Indexed_Item, K extends string>
-	extends Index_Config_Base<K> {
-	type: Index_Type.DERIVED;
-	/** Function that computes the initial collection */
-	compute: (collection: Indexed_Collection<T>) => Array<T>;
-	/** Optional function to update the collection when items are added */
-	on_add?: (collection: Array<T>, new_item: T, source: Indexed_Collection<T>) => void;
-	/** Optional function to update the collection when items are removed */
-	on_remove?: (collection: Array<T>, removed_item: T, source: Indexed_Collection<T>) => void;
-	/** Optional function to determine if an item matches this index (for efficient filtering) */
+	/** Function to compute the index value from scratch */
+	compute: (collection: Indexed_Collection<T>) => T_Result;
+
+	/**
+	 * Schema for validating query parameters
+	 * This also defines the type of queries this index accepts
+	 */
+	input_schema?: z.ZodType<T_Query>;
+
+	/**
+	 * Schema for validating the computed result
+	 * This defines the return type of the index lookups
+	 */
+	output_schema: z.ZodType<T_Result>;
+
+	/** Optional predicate to determine if an item is relevant to this index */
 	matches?: (item: T) => boolean;
-}
 
-// Union type of all index configurations
-export type Index_Config<T extends Indexed_Item> =
-	| Single_Index_Config<T, string>
-	| Multi_Index_Config<T, string>
-	| Derived_Index_Config<T, string>;
+	/** Optional function to update the index when an item is added */
+	on_add?: (result: T_Result, item: T, collection: Indexed_Collection<T>) => T_Result;
+
+	/** Optional function to update the index when an item is removed */
+	on_remove?: (result: T_Result, item: T, collection: Indexed_Collection<T>) => T_Result;
+}
 
 export interface Indexed_Collection_Options<T extends Indexed_Item> {
-	indexes?: Array<Index_Config<T>>;
+	indexes?: Array<Index_Definition<T, any, any>>;
 	initial_items?: Array<T>;
+	validate?: boolean; // Optional validation flag
 }
 
 /**
@@ -82,69 +69,78 @@ export class Indexed_Collection<T extends Indexed_Item> {
 	// The primary index by ID keyed by Uuid
 	readonly by_id: SvelteMap<Uuid, T> = new SvelteMap();
 
-	// Single-value indexes (one key maps to one item)
-	readonly single_indexes: Record<string, SvelteMap<any, T>> = {};
+	// Stores all index values (reactive)
+	readonly indexes: Record<string, any> = $state({});
 
-	// Multi-value indexes (one key maps to many items)
-	readonly multi_indexes: Record<string, SvelteMap<any, Array<T>>> = {};
+	// Store all index configs for reference - using tuple typing for better type safety
+	#index_definitions: ReadonlyArray<Index_Definition<T, any, any>> = [];
 
-	// Derived collections that are incrementally maintained
-	// Make derived_indexes reactive at the top level
-	readonly derived_indexes: Record<string, Array<T>> = $state({});
-
-	// Store all index configs for reference
-	#index_configs: Array<Index_Config<T>> = [];
+	// Whether to validate indexes
+	readonly #validate: boolean;
 
 	constructor(options?: Indexed_Collection_Options<T>) {
+		// Set validation flag (default to false)
+		this.#validate = options?.validate ?? false;
+
 		// Set up indexes based on provided configurations
 		if (options?.indexes) {
-			this.#index_configs = options.indexes;
+			this.#index_definitions = options.indexes;
 
-			// Initialize each index based on its type
-			for (const config of this.#index_configs) {
-				switch (config.type) {
-					case Index_Type.SINGLE:
-						this.single_indexes[config.key] = new SvelteMap();
-						break;
-					case Index_Type.MULTI:
-						this.multi_indexes[config.key] = new SvelteMap();
-						break;
-					case Index_Type.DERIVED:
-						// Start with empty array, will be populated after items are added
-						this.derived_indexes[config.key] = [];
-						break;
-				}
+			// Initialize each index with its compute function
+			for (const def of this.#index_definitions) {
+				this.indexes[def.key] = def.compute(this);
 			}
 		}
 
 		// Add any initial items
 		if (options?.initial_items) {
 			this.add_many(options.initial_items);
-
-			// Initialize derived indexes now that we have items
-			this.#initialize_derived_indexes();
-		}
-	}
-
-	/**
-	 * Initialize all derived indexes from scratch
-	 */
-	#initialize_derived_indexes(): void {
-		// Find all derived index configs
-		const derived_configs = this.#index_configs.filter(
-			(config): config is Derived_Index_Config<T, string> => config.type === Index_Type.DERIVED,
-		);
-
-		// Compute each derived index
-		for (const config of derived_configs) {
-			// Make sure we're creating a fresh array - the compute function
-			// must be responsible for proper filtering
-			this.derived_indexes[config.key] = config.compute(this);
 		}
 	}
 
 	toJSON(): Array<any> {
 		return $state.snapshot(this.all);
+	}
+
+	/**
+	 * Get an index value by key with proper typing
+	 */
+	get_index<T_Result = any>(key: string): T_Result {
+		return this.indexes[key];
+	}
+
+	/**
+	 * Query an index with parameters
+	 *
+	 * This method is type-aware when the index has an input_schema that defines T_Query
+	 */
+	query<T_Result = any, T_Query = any>(key: string, query: T_Query): T_Result {
+		const index = this.indexes[key];
+		const index_def = this.#index_definitions.find((def) => def.key === key);
+
+		// Validate input if schema exists
+		if (this.#validate && index_def?.input_schema) {
+			try {
+				index_def.input_schema.parse(query);
+			} catch (error) {
+				console.error(`Query validation failed for index ${key}:`, error);
+			}
+		}
+
+		// Handle different common index types
+		if (index instanceof Map) {
+			return index.get(query) as T_Result;
+		}
+		if (index instanceof SvelteMap) {
+			return index.get(query) as T_Result;
+		}
+		if (typeof index === 'function') {
+			return index(query) as T_Result;
+		}
+
+		// For array indexes or other types, return the whole index
+		// Consumers will need to filter it themselves
+		return index as T_Result;
 	}
 
 	/**
@@ -172,175 +168,42 @@ export class Indexed_Collection<T extends Indexed_Item> {
 	 * Update all indexes when an item is added
 	 */
 	#update_indexes_for_added_item(item: T): void {
-		for (const config of this.#index_configs) {
-			switch (config.type) {
-				case Index_Type.SINGLE: {
-					const key = config.extractor(item);
-					// Only index if the key isn't undefined (null is a valid key)
-					if (key !== undefined) {
-						this.single_indexes[config.key].set(key, item);
-					}
-					break;
-				}
-				case Index_Type.MULTI: {
-					const keys = config.extractor(item);
-					// Handle both single values and arrays of values
-					if (keys === undefined) break;
+		for (const def of this.#index_definitions) {
+			if (def.on_add && (!def.matches || def.matches(item))) {
+				const result = def.on_add(this.indexes[def.key], item, this);
 
-					if (Array.isArray(keys)) {
-						// Handle array of keys by adding to each one
-						for (const key of keys) {
-							if (key === undefined) continue;
-							const collection = this.multi_indexes[config.key].get(key) || [];
-							collection.push(item);
-							this.multi_indexes[config.key].set(key, collection);
-						}
-					} else {
-						// Handle single key
-						const collection = this.multi_indexes[config.key].get(keys) || [];
-						collection.push(item);
-						this.multi_indexes[config.key].set(keys, collection);
+				// Validate result if needed
+				if (this.#validate) {
+					try {
+						def.output_schema.parse(result);
+					} catch (error) {
+						console.error(`Index ${def.key} validation failed on add:`, error);
 					}
-					break;
 				}
-				case Index_Type.DERIVED: {
-					// Check if the item matches this derived index
-					if (!config.matches || config.matches(item)) {
-						const collection = this.derived_indexes[config.key];
-						if (config.on_add) {
-							// Use custom update function if provided
-							config.on_add(collection, item, this);
-						} else {
-							// Default behavior: add item to end
-							collection.push(item);
-						}
-					}
-					break;
-				}
+
+				this.indexes[def.key] = result;
 			}
 		}
-	}
-
-	/**
-	 * Remove multiple items efficiently
-	 */
-	remove_many(ids: Array<Uuid>): number {
-		if (!ids.length) return 0;
-
-		// Use a Set for O(1) lookups
-		const id_set = new Set(ids);
-		let removed_count = 0;
-
-		// First build a removal map to avoid repeated lookups
-		const to_remove_items: Array<T> = [];
-
-		// Identify items to remove
-		for (let i = this.all.length - 1; i >= 0; i--) {
-			const item = this.all[i];
-			if (id_set.has(item.id)) {
-				this.all.splice(i, 1); // Remove directly from array
-				to_remove_items.push(item);
-				removed_count++;
-			}
-		}
-
-		// Exit early if nothing to remove
-		if (removed_count === 0) return 0;
-
-		// Clear removed items from indexes
-		for (const item of to_remove_items) {
-			this.by_id.delete(item.id);
-			this.#update_indexes_for_removed_item(item);
-		}
-
-		return removed_count;
 	}
 
 	/**
 	 * Update all indexes when an item is removed
 	 */
 	#update_indexes_for_removed_item(item: T): void {
-		for (const config of this.#index_configs) {
-			switch (config.type) {
-				case Index_Type.SINGLE: {
-					// For single indexes, we need to find any keys that might be referencing this item
-					// We can't just rely on the current key from the extractor since the item may have changed
-					const single_index = this.single_indexes[config.key];
+		for (const def of this.#index_definitions) {
+			if (def.on_remove && (!def.matches || def.matches(item))) {
+				const result = def.on_remove(this.indexes[def.key], item, this);
 
-					// Find any keys in the index that point to this item
-					for (const [existing_key, mapped_item] of single_index.entries()) {
-						if (mapped_item.id === item.id) {
-							// We found a key referencing this item - now check if we should delete or update
-							// Check if there's another item with the same key still in the collection
-							const alternative_item = this.all.find(
-								(i) => i.id !== item.id && config.extractor(i) === existing_key,
-							);
-
-							if (alternative_item) {
-								// If another item with the same key exists, update the index to point to it
-								single_index.set(existing_key, alternative_item);
-							} else {
-								// Otherwise remove the mapping entirely
-								single_index.delete(existing_key);
-							}
-						}
+				// Validate result if needed
+				if (this.#validate) {
+					try {
+						def.output_schema.parse(result);
+					} catch (error) {
+						console.error(`Index ${def.key} validation failed on remove:`, error);
 					}
-					break;
 				}
-				case Index_Type.MULTI: {
-					// For multi-indexes, the logic is similar - we need to extract current keys
-					const keys = config.extractor(item);
-					if (keys === undefined) continue;
 
-					if (Array.isArray(keys)) {
-						// Handle array of keys
-						for (const key of keys) {
-							if (key === undefined) continue;
-							const multi_index = this.multi_indexes[config.key];
-							const collection = multi_index.get(key);
-
-							if (collection) {
-								const updated = collection.filter((i) => i.id !== item.id);
-								if (updated.length === 0) {
-									multi_index.delete(key);
-								} else {
-									multi_index.set(key, updated);
-								}
-							}
-						}
-					} else {
-						// Handle single key
-						const multi_index = this.multi_indexes[config.key];
-						const collection = multi_index.get(keys);
-
-						if (collection) {
-							const updated = collection.filter((i) => i.id !== item.id);
-							if (updated.length === 0) {
-								multi_index.delete(keys);
-							} else {
-								multi_index.set(keys, updated);
-							}
-						}
-					}
-					break;
-				}
-				case Index_Type.DERIVED: {
-					// Check if the item matches this derived index
-					if (!config.matches || config.matches(item)) {
-						const collection = this.derived_indexes[config.key];
-						if (config.on_remove) {
-							// Use custom update function if provided
-							config.on_remove(collection, item, this);
-						} else {
-							// Default behavior: remove by ID
-							const idx = collection.findIndex((i) => i.id === item.id);
-							if (idx !== -1) {
-								collection.splice(idx, 1);
-							}
-						}
-					}
-					break;
-				}
+				this.indexes[def.key] = result;
 			}
 		}
 	}
@@ -424,6 +287,41 @@ export class Indexed_Collection<T extends Indexed_Item> {
 	}
 
 	/**
+	 * Remove multiple items efficiently
+	 */
+	remove_many(ids: Array<Uuid>): number {
+		if (!ids.length) return 0;
+
+		// Use a Set for O(1) lookups
+		const id_set = new Set(ids);
+		let removed_count = 0;
+
+		// First build a removal map to avoid repeated lookups
+		const to_remove_items: Array<T> = [];
+
+		// Identify items to remove
+		for (let i = this.all.length - 1; i >= 0; i--) {
+			const item = this.all[i];
+			if (id_set.has(item.id)) {
+				this.all.splice(i, 1); // Remove directly from array
+				to_remove_items.push(item);
+				removed_count++;
+			}
+		}
+
+		// Exit early if nothing to remove
+		if (removed_count === 0) return 0;
+
+		// Clear removed items from indexes
+		for (const item of to_remove_items) {
+			this.by_id.delete(item.id);
+			this.#update_indexes_for_removed_item(item);
+		}
+
+		return removed_count;
+	}
+
+	/**
 	 * Get an item by its ID
 	 */
 	get(id: Uuid): T | undefined {
@@ -487,137 +385,69 @@ export class Indexed_Collection<T extends Indexed_Item> {
 		this.by_id.clear();
 
 		// Clear all indexes
-		for (const config of this.#index_configs) {
-			switch (config.type) {
-				case Index_Type.SINGLE:
-					this.single_indexes[config.key].clear();
-					break;
-				case Index_Type.MULTI:
-					this.multi_indexes[config.key].clear();
-					break;
-				case Index_Type.DERIVED:
-					this.derived_indexes[config.key] = [];
-					break;
-			}
+		for (const def of this.#index_definitions) {
+			this.indexes[def.key] = def.compute(this);
 		}
 	}
 
 	/**
 	 * Get all items matching a multi-indexed property value
 	 */
-	where(index_key: string, value: any): Array<T> {
-		// Check if the index exists
-		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-		if (!this.multi_indexes[index_key]) {
-			return [];
+	where<K = any>(index_key: string, value: K): Array<T> {
+		const index = this.indexes[index_key];
+		if (!index) return [];
+
+		if (index instanceof Map || index instanceof SvelteMap) {
+			return [...(index.get(value) || [])];
 		}
-		return [...(this.multi_indexes[index_key].get(value) || [])];
+
+		// Fallback - treat as array
+		return [];
 	}
 
 	/**
 	 * Get the first N items matching a multi-indexed property value
 	 */
-	first(index_key: string, value: any, limit: number): Array<T> {
+	first<K = any>(index_key: string, value: K, limit: number): Array<T> {
 		// Handle edge cases with limit
 		if (limit <= 0) return [];
 
-		const items = this.where(index_key, value);
+		const items = this.where<K>(index_key, value);
 		return items.slice(0, limit);
 	}
 
 	/**
 	 * Get the latest N items matching a multi-indexed property value
 	 */
-	latest(index_key: string, value: any, limit: number): Array<T> {
+	latest<K = any>(index_key: string, value: K, limit: number): Array<T> {
 		// Handle edge cases with limit
 		if (limit <= 0) return [];
 
-		const items = this.where(index_key, value);
+		const items = this.where<K>(index_key, value);
 		return items.slice(-Math.min(limit, items.length));
 	}
 
-	// TODO rename?
 	/**
-	 * Get a derived index collection by its key
+	 * Get a derived collection by its key
 	 */
 	get_derived(key: string): Array<T> {
-		return (this.derived_indexes[key] ??= []);
-	}
-
-	/**
-	 * Find items related to a collection by a property reference
-	 */
-	related<S extends Record<string, any>>(
-		items: Array<S> | undefined,
-		property_name: string,
-	): Array<T> {
-		if (!items?.length) return [];
-
-		const result: Array<T> = [];
-		const seen_ids: Set<Uuid> = new Set(); // Prevent duplicates
-
-		// Pre-compute path parts outside the loop for efficiency
-		const has_complex_path = property_name.includes('.') || property_name.includes('[');
-		const path_parts = has_complex_path ? property_name.split('.') : null;
-
-		for (const item of items) {
-			let foreign_key: Uuid | undefined;
-
-			if (has_complex_path && path_parts) {
-				foreign_key = this.#resolve_path(item, path_parts);
-			} else {
-				foreign_key = item[property_name];
-			}
-
-			if (foreign_key && !seen_ids.has(foreign_key)) {
-				const related_item = this.by_id.get(foreign_key);
-				if (related_item) {
-					result.push(related_item);
-					seen_ids.add(foreign_key);
-				}
-			}
-		}
-
-		return result;
-	}
-
-	/**
-	 * Helper function to resolve a property path
-	 */
-	#resolve_path(obj: any, path_parts: Array<string>): any {
-		let current: any = obj;
-
-		for (let i = 0; i < path_parts.length && current != null; i++) {
-			const part = path_parts[i];
-
-			if (part.includes('[') && part.includes(']')) {
-				const match = /^([^[]+)\[(\d+)\]$/.exec(part);
-				if (match) {
-					const [_, array_name, index_str] = match;
-					const array = current[array_name];
-					if (Array.isArray(array)) {
-						const index = parseInt(index_str, 10);
-						current = array[index];
-					} else {
-						return undefined;
-					}
-				}
-			} else {
-				current = current[part];
-			}
-		}
-
-		return current;
+		return this.indexes[key] || [];
 	}
 
 	/**
 	 * Get an item by a single-value index
 	 * Returns the item or throws if no item is found
 	 */
-	by<T_Key extends string>(index_key: T_Key, value: any): T {
-		const item = this.single_indexes[index_key].get(value);
+	by<K = any>(index_key: string, value: K): T {
+		const index = this.indexes[index_key];
+		if (!index) {
+			throw new Error(`Index not found: ${index_key}`);
+		}
+
+		const item = index instanceof Map || index instanceof SvelteMap ? index.get(value) : undefined;
+
 		if (!item) {
-			throw new Error(`Item not found for index ${String(index_key)} with value ${String(value)}`);
+			throw new Error(`Item not found for index ${index_key} with value ${String(value)}`);
 		}
 		return item;
 	}
@@ -625,45 +455,10 @@ export class Indexed_Collection<T extends Indexed_Item> {
 	/**
 	 * Get an item by a single-value index, returning undefined if not found
 	 */
-	by_optional<T_Key extends string>(index_key: T_Key, value: any): T | undefined {
-		// Check if the index exists first
-		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-		if (!this.single_indexes[index_key]) {
-			return undefined;
-		}
-		return this.single_indexes[index_key].get(value);
-	}
+	by_optional<K = any>(index_key: string, value: K): T | undefined {
+		const index = this.indexes[index_key];
+		if (!index) return undefined;
 
-	/**
-	 * Get items related through a foreign key relationship
-	 * This efficiently uses the index to retrieve items in a single operation
-	 *
-	 * @param key The multi-index key that contains the relationship
-	 * @param items Source items containing the IDs
-	 * @param id_extractor Function to extract the foreign key ID from each source item
-	 * @returns Array of related items
-	 */
-	related_by_index<S>(
-		key: string,
-		items: Array<S>,
-		id_extractor: (item: S) => Uuid | undefined,
-	): Array<T> {
-		if (!items.length) return [];
-
-		const result: Array<T> = [];
-		const seen_ids: Set<string> = new Set();
-
-		for (const item of items) {
-			const id = id_extractor(item);
-			if (!id || seen_ids.has(id)) continue;
-
-			const related_items = this.multi_indexes[key].get(id);
-			if (related_items?.length) {
-				result.push(...related_items);
-				seen_ids.add(id);
-			}
-		}
-
-		return result;
+		return index instanceof Map || index instanceof SvelteMap ? index.get(value) : undefined;
 	}
 }

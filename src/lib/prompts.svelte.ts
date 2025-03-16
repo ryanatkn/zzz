@@ -30,7 +30,7 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 		indexes: [
 			{
 				key: 'by_name',
-				type: Index_Type.SINGLE,
+				type: 'single',
 				extractor: (prompt) => prompt.name,
 			},
 			{

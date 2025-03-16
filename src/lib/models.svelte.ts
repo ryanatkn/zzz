@@ -26,7 +26,7 @@ export class Models extends Cell<typeof Models_Json> {
 		indexes: [
 			{
 				key: 'name',
-				type: Index_Type.SINGLE,
+				type: 'single',
 				extractor: (model: Model) => model.name,
 			},
 			{

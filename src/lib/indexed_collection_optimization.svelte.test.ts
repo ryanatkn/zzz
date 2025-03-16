@@ -1,5 +1,10 @@
+// @vitest-environment jsdom
+
 import {test, expect, vi, describe, beforeEach} from 'vitest';
-import {Indexed_Collection, Index_Type} from '$lib/indexed_collection.svelte.js';
+import {z} from 'zod';
+
+import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
+import {create_multi_index, create_derived_index} from '$lib/indexed_collection_helpers.js';
 import {Uuid} from '$lib/zod_helpers.js';
 
 // Mock item type for performance testing
@@ -36,6 +41,10 @@ const create_many_items = (count: number): Array<Performance_Item> => {
 	return items;
 };
 
+// Helper functions for ID-based object equality checks
+const has_item_with_id = (array: Array<{id: Uuid}>, item: {id: Uuid}): boolean =>
+	array.some((i) => i.id === item.id);
+
 describe('Indexed_Collection - Optimization Tests', () => {
 	// Setup common vars
 	let items: Array<Performance_Item>;
@@ -50,23 +59,26 @@ describe('Indexed_Collection - Optimization Tests', () => {
 		// Create collection with a derived index for high-value items
 		const indexed_collection: Indexed_Collection<Performance_Item> = new Indexed_Collection({
 			indexes: [
-				{
-					key: 'high_value_items',
-					type: Index_Type.DERIVED,
-					compute: (collection) => collection.all.filter((item) => item.value >= 80),
-					matches: (item) => item.value >= 80,
-					on_add: (items, item) => {
-						if (item.value >= 80) {
-							items.push(item);
-						}
+				create_derived_index(
+					'high_value_items',
+					(collection) => collection.all.filter((item) => item.value >= 80),
+					{
+						matches: (item) => item.value >= 80,
+						on_add: (items, item) => {
+							if (item.value >= 80) {
+								items.push(item);
+							}
+							return items;
+						},
+						on_remove: (items, item) => {
+							const index = items.findIndex((i) => i.id === item.id);
+							if (index !== -1) {
+								items.splice(index, 1);
+							}
+							return items;
+						},
 					},
-					on_remove: (items, item) => {
-						const index = items.findIndex((i) => i.id === item.id);
-						if (index !== -1) {
-							items.splice(index, 1);
-						}
-					},
-				},
+				),
 			],
 			initial_items: items,
 		});
@@ -109,16 +121,18 @@ describe('Indexed_Collection - Optimization Tests', () => {
 			indexes: [
 				{
 					key: 'high_value_items',
-					type: Index_Type.DERIVED,
 					compute: (collection) => {
 						compute_spy();
 						return collection.all.filter((item) => item.value >= 80);
 					},
+					output_schema: z.array(z.custom<Performance_Item>()),
 					matches: (item) => item.value >= 80,
 					on_add: (items, item) => {
 						if (item.value >= 80) {
 							items.push(item);
+							return items;
 						}
+						return items;
 					},
 				},
 			],
@@ -137,23 +151,15 @@ describe('Indexed_Collection - Optimization Tests', () => {
 
 		// But the new item should still appear in the derived index
 		const updated_derived = monitored_collection.get_derived('high_value_items');
-		expect(updated_derived).toContain(new_high_value_item);
+		expect(has_item_with_id(updated_derived, new_high_value_item)).toBe(true);
 	});
 
 	test('Multi-index lookups should be faster than filtering', () => {
 		// Create collection with multi-indexes
 		const indexed_collection: Indexed_Collection<Performance_Item> = new Indexed_Collection({
 			indexes: [
-				{
-					key: 'by_category',
-					type: Index_Type.MULTI,
-					extractor: (item) => item.category,
-				},
-				{
-					key: 'by_tag',
-					type: Index_Type.MULTI,
-					extractor: (item) => item.tags[0],
-				},
+				create_multi_index('by_category', (item) => item.category),
+				create_multi_index('by_tag', (item) => item.tags[0]),
 			],
 			initial_items: items,
 		});
@@ -210,13 +216,13 @@ describe('Indexed_Collection - Optimization Tests', () => {
 			indexes: [
 				{
 					key: 'recent_high_value',
-					type: Index_Type.DERIVED,
 					compute: (collection) => {
 						// Sort by created date (most recent first)
 						return [...collection.all]
 							.filter((item) => item.value >= 80)
 							.sort((a, b) => b.created.getTime() - a.created.getTime());
 					},
+					output_schema: z.array(z.custom<Performance_Item>()),
 					matches: (item) => item.value >= 80,
 					on_add: (items, item) => {
 						if (item.value >= 80) {
@@ -233,12 +239,14 @@ describe('Indexed_Collection - Optimization Tests', () => {
 								items.splice(insert_index, 0, item);
 							}
 						}
+						return items;
 					},
 					on_remove: (items, item) => {
 						const index = items.findIndex((i) => i.id === item.id);
 						if (index !== -1) {
 							items.splice(index, 1);
 						}
+						return items;
 					},
 				},
 			],
@@ -293,13 +301,13 @@ describe('Indexed_Collection - Optimization Tests', () => {
 			indexes: [
 				{
 					key: 'recent_high_value',
-					type: Index_Type.DERIVED,
 					compute: (collection) => {
 						compute_spy();
 						return [...collection.all]
 							.filter((item) => item.value >= 80)
 							.sort((a, b) => b.created.getTime() - a.created.getTime());
 					},
+					output_schema: z.array(z.custom<Performance_Item>()),
 					matches: (item) => item.value >= 80,
 					on_add: (items, item) => {
 						if (item.value >= 80) {
@@ -314,6 +322,7 @@ describe('Indexed_Collection - Optimization Tests', () => {
 								items.splice(insert_index, 0, item);
 							}
 						}
+						return items;
 					},
 				},
 			],
