@@ -5,12 +5,12 @@ import {Indexed_Collection, type Indexed_Item} from '$lib/indexed_collection.sve
 import {Uuid} from '$lib/zod_helpers.js';
 
 // Define uuid constants for deterministic testing.
-const uuid_1 = Uuid.parse('00000000-0000-0000-0000-000000000001');
-const uuid_2 = Uuid.parse('00000000-0000-0000-0000-000000000002');
-const uuid_3 = Uuid.parse('00000000-0000-0000-0000-000000000003');
-const uuid_4 = Uuid.parse('00000000-0000-0000-0000-000000000004');
-const uuid_5 = Uuid.parse('00000000-0000-0000-0000-000000000005');
-const uuid_99 = Uuid.parse('00000000-0000-0000-0000-000000000099');
+const uuid_1 = Uuid.parse(undefined);
+const uuid_2 = Uuid.parse(undefined);
+const uuid_3 = Uuid.parse(undefined);
+const uuid_4 = Uuid.parse(undefined);
+const uuid_5 = Uuid.parse(undefined);
+const uuid_99 = Uuid.parse(undefined);
 
 // Helper interfaces and fixtures
 
