@@ -2,6 +2,8 @@ import {SvelteMap} from 'svelte/reactivity';
 import {Uuid} from '$lib/zod_helpers.js';
 import type {z} from 'zod';
 
+// TODO consider a batch operations interface: "Add a transaction-like interface for batch operations to improve performance. Example: collection.batch().add(item1).remove(item2).commit()"
+
 /**
  * Interface for objects that can be stored in an indexed collection
  */
