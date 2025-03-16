@@ -18,7 +18,7 @@
 	const {files = null, limit = 20, selected_message_id = null, attrs, onselect}: Props = $props();
 
 	const zzz = zzz_context.get();
-	const messages = $derived(files ?? zzz.messages.items.array);
+	const messages = $derived(files ?? zzz.messages.items.all);
 
 	const limited_messages = $derived(messages.slice(0, limit));
 

@@ -42,7 +42,7 @@
 					onreorder: (from_index, to_index) => zzz.prompts.reorder_prompts(from_index, to_index),
 				}}
 			>
-				{#each zzz.prompts.items.array as prompt, i (prompt.id)}
+				{#each zzz.prompts.items.all as prompt, i (prompt.id)}
 					<li use:reorderable.item={{index: i}}>
 						<Nav_Link
 							href="?prompt={prompt.id}"
@@ -144,7 +144,7 @@
 					type="button"
 					class="inline color_f"
 					onclick={() => {
-						zzz.prompts.select(random_item(zzz.prompts.items.array).id);
+						zzz.prompts.select(random_item(zzz.prompts.items.all).id);
 					}}>random walk</button
 				>?
 			</p>

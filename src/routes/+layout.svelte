@@ -142,6 +142,8 @@
 		// Re-run when URL search params change
 		page.url.search;
 
+		// TODO should these select null if present but not found? maybe one UX is better overall? also maybe clear invalid values from the url?
+
 		// Sync chat selection
 		const chat_id = zzz.url_params.get_uuid_param('chat');
 		if (chat_id && zzz.chats.items.by_id.has(chat_id)) {

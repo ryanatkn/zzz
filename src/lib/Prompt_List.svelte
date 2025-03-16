@@ -19,7 +19,7 @@
 
 	// Create a derived that filters out already selected prompts
 	const unselected_prompts = $derived(
-		chat.zzz.prompts.items.array.filter(
+		chat.zzz.prompts.items.all.filter(
 			(p) => !chat.selected_prompts.some((selected) => selected.id === p.id),
 		),
 	);

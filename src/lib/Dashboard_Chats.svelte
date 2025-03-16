@@ -25,14 +25,14 @@
 			>
 				+ new chat
 			</button>
-			{#if zzz.chats.items.array.length}
+			{#if zzz.chats.items.all.length}
 				<menu
 					class="unstyled mt_sm"
 					use:reorderable.list={{
 						onreorder: (from_index, to_index) => zzz.chats.reorder_chats(from_index, to_index),
 					}}
 				>
-					{#each zzz.chats.items.array as chat, i (chat.id)}
+					{#each zzz.chats.items.all as chat, i (chat.id)}
 						<!-- TODO change to href from onclick -->
 						<li use:reorderable.item={{index: i}}>
 							<Nav_Link
@@ -74,7 +74,7 @@
 						type="button"
 						class="inline color_f"
 						onclick={() => {
-							zzz.chats.select(random_item(zzz.chats.items.array).id);
+							zzz.chats.select(random_item(zzz.chats.items.all).id);
 						}}>random walk</button
 					>?
 				</p>

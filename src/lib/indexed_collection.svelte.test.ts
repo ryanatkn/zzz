@@ -2,20 +2,20 @@
 
 import {test, expect} from 'vitest';
 import {Indexed_Collection, type Indexed_Item} from '$lib/indexed_collection.svelte.js';
-import {Uuid} from '$lib/zod_helpers.js'; // added import
+import {Uuid} from '$lib/zod_helpers.js';
 
 // Define uuid constants for deterministic testing.
-const uuid_1 = Uuid.parse(undefined);
-const uuid_2 = Uuid.parse(undefined);
-const uuid_3 = Uuid.parse(undefined);
-const uuid_4 = Uuid.parse(undefined);
-const uuid_5 = Uuid.parse(undefined);
-const uuid_99 = Uuid.parse(undefined);
+const uuid_1 = Uuid.parse('00000000-0000-0000-0000-000000000001');
+const uuid_2 = Uuid.parse('00000000-0000-0000-0000-000000000002');
+const uuid_3 = Uuid.parse('00000000-0000-0000-0000-000000000003');
+const uuid_4 = Uuid.parse('00000000-0000-0000-0000-000000000004');
+const uuid_5 = Uuid.parse('00000000-0000-0000-0000-000000000005');
+const uuid_99 = Uuid.parse('00000000-0000-0000-0000-000000000099');
 
 // Helper interfaces and fixtures
 
 interface Test_Item extends Indexed_Item {
-	id: Uuid; // updated to use Uuid
+	id: Uuid;
 	name: string;
 	category: string;
 	tags: Array<string>;
@@ -41,7 +41,7 @@ const sample_items: Array<Test_Item> = [
 // Basic initialization tests
 test('Indexed_Collection - initializes with empty array by default', () => {
 	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection();
-	expect(collection.array).toEqual([]);
+	expect(collection.all).toEqual([]);
 	expect(collection.size).toBe(0);
 });
 
@@ -50,7 +50,7 @@ test('Indexed_Collection - initializes with provided items', () => {
 		initial_items: [sample_items[0], sample_items[1]],
 	});
 
-	expect(collection.array.length).toBe(2);
+	expect(collection.all.length).toBe(2);
 	expect(collection.by_id.get(uuid_1)).toEqual(sample_items[0]);
 	expect(collection.by_id.get(uuid_2)).toEqual(sample_items[1]);
 });
@@ -67,6 +67,40 @@ test('Indexed_Collection - initializes with configured indexes', () => {
 	expect(collection.multi_indexes.category).toBeDefined();
 });
 
+// Test constructor edge cases
+test('Indexed_Collection - initializes with empty options object', () => {
+	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({});
+
+	expect(collection.all).toEqual([]);
+	expect(collection.size).toBe(0);
+	expect(collection.by_id.size).toBe(0);
+});
+
+test('Indexed_Collection - initializes with empty indexes array', () => {
+	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		indexes: [],
+	});
+
+	expect(collection.all).toEqual([]);
+	expect(collection.single_indexes).toEqual({});
+	expect(collection.multi_indexes).toEqual({});
+});
+
+test('Indexed_Collection - initializes with multiple indexes of different types', () => {
+	const collection: Indexed_Collection<Test_Item, 'name' | 'category' | 'tags'> =
+		new Indexed_Collection({
+			indexes: [
+				{key: 'name', extractor: (item) => item.name},
+				{key: 'category', extractor: (item) => item.category, multi: true},
+				{key: 'tags', extractor: (item) => item.tags.join(','), multi: true},
+			],
+		});
+
+	expect(collection.single_indexes.name).toBeDefined();
+	expect(collection.multi_indexes.category).toBeDefined();
+	expect(collection.multi_indexes.tags).toBeDefined();
+});
+
 // Adding and retrieving items
 test('Indexed_Collection - add method adds items and updates indexes', () => {
 	const collection: Indexed_Collection<Test_Item, 'name' | 'category'> = new Indexed_Collection({
@@ -80,7 +114,7 @@ test('Indexed_Collection - add method adds items and updates indexes', () => {
 	collection.add(sample_items[1]);
 
 	// Check main array
-	expect(collection.array.length).toBe(2);
+	expect(collection.all.length).toBe(2);
 
 	// Check primary index
 	expect(collection.by_id.get(uuid_1)).toEqual(sample_items[0]);
@@ -96,14 +130,54 @@ test('Indexed_Collection - add method adds items and updates indexes', () => {
 	]);
 });
 
+test('Indexed_Collection - add multiple items with various index values', () => {
+	const collection: Indexed_Collection<Test_Item, 'name' | 'tags'> = new Indexed_Collection({
+		indexes: [
+			{key: 'name', extractor: (item) => item.name},
+			{key: 'tags', extractor: (item) => item.tags[0], multi: true},
+		],
+	});
+
+	collection.add(sample_items[0]); // tags: ['red', 'sweet']
+	collection.add(sample_items[2]); // tags: ['orange']
+	collection.add(sample_items[3]); // tags: ['white']
+
+	// Check single-value index
+	expect(collection.single_indexes.name?.size).toBe(3);
+
+	// Check multi-value index with different values
+	expect(collection.multi_indexes.tags?.get('red')?.length).toBe(1);
+	expect(collection.multi_indexes.tags?.get('orange')?.length).toBe(1);
+	expect(collection.multi_indexes.tags?.get('white')?.length).toBe(1);
+});
+
 test('Indexed_Collection - add_first method adds items at the beginning', () => {
 	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection();
 
 	collection.add(sample_items[0]);
 	collection.add_first(sample_items[1]);
 
-	expect(collection.array[0]).toEqual(sample_items[1]);
-	expect(collection.array[1]).toEqual(sample_items[0]);
+	expect(collection.all[0]).toEqual(sample_items[1]);
+	expect(collection.all[1]).toEqual(sample_items[0]);
+});
+
+test('Indexed_Collection - add_first with empty collection', () => {
+	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection();
+
+	collection.add_first(sample_items[0]);
+
+	expect(collection.all.length).toBe(1);
+	expect(collection.all[0]).toEqual(sample_items[0]);
+});
+
+test('Indexed_Collection - adding items returns the added item', () => {
+	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection();
+
+	const result1 = collection.add(sample_items[0]);
+	const result2 = collection.add_first(sample_items[1]);
+
+	expect(result1).toBe(sample_items[0]);
+	expect(result2).toBe(sample_items[1]);
 });
 
 test('Indexed_Collection - get method retrieves items by id', () => {
@@ -138,7 +212,7 @@ test('Indexed_Collection - remove method removes items by id and updates indexes
 	const removed = collection.remove(uuid_2);
 
 	expect(removed).toBe(true);
-	expect(collection.array.length).toBe(2);
+	expect(collection.all.length).toBe(2);
 	expect(collection.by_id.has(uuid_2)).toBe(false);
 	expect(collection.single_indexes.name?.has('banana')).toBe(false);
 
@@ -155,7 +229,37 @@ test('Indexed_Collection - remove method returns false when id not found', () =>
 	const removed = collection.remove(uuid_99);
 
 	expect(removed).toBe(false);
-	expect(collection.array.length).toBe(1);
+	expect(collection.all.length).toBe(1);
+});
+
+test('Indexed_Collection - remove from empty collection', () => {
+	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection();
+
+	const removed = collection.remove(uuid_1);
+
+	expect(removed).toBe(false);
+});
+
+test('Indexed_Collection - remove affects multi-index with shared values', () => {
+	// Create items that share a tag
+	const shared_tag = 'shared';
+	const item1 = create_test_item(uuid_1, 'item1', 'category1', [shared_tag]);
+	const item2 = create_test_item(uuid_2, 'item2', 'category2', [shared_tag]);
+
+	const collection: Indexed_Collection<Test_Item, 'tags'> = new Indexed_Collection({
+		indexes: [{key: 'tags', extractor: (item) => item.tags[0], multi: true}],
+		initial_items: [item1, item2],
+	});
+
+	// Both items should share the same tag index
+	expect(collection.multi_indexes.tags?.get(shared_tag)?.length).toBe(2);
+
+	// Remove one item
+	collection.remove(uuid_1);
+
+	// Tag index should still exist with one item
+	expect(collection.multi_indexes.tags?.get(shared_tag)?.length).toBe(1);
+	expect(collection.multi_indexes.tags?.get(shared_tag)?.[0].id).toBe(uuid_2);
 });
 
 // Reordering tests
@@ -166,9 +270,9 @@ test('Indexed_Collection - reorder method changes item order', () => {
 
 	collection.reorder(0, 2);
 
-	expect(collection.array[0].id).toBe(uuid_2);
-	expect(collection.array[1].id).toBe(uuid_3);
-	expect(collection.array[2].id).toBe(uuid_1);
+	expect(collection.all[0].id).toBe(uuid_2);
+	expect(collection.all[1].id).toBe(uuid_3);
+	expect(collection.all[2].id).toBe(uuid_1);
 });
 
 test('Indexed_Collection - reorder does nothing when indexes are invalid or equal', () => {
@@ -178,16 +282,26 @@ test('Indexed_Collection - reorder does nothing when indexes are invalid or equa
 
 	// Same index
 	collection.reorder(1, 1);
-	expect(collection.array[1].id).toBe(uuid_2);
+	expect(collection.all[1].id).toBe(uuid_2);
 
 	// Negative index
 	collection.reorder(-1, 1);
-	expect(collection.array[0].id).toBe(uuid_1);
-	expect(collection.array[1].id).toBe(uuid_2);
+	expect(collection.all[0].id).toBe(uuid_1);
+	expect(collection.all[1].id).toBe(uuid_2);
 
 	// Out of bounds index
 	collection.reorder(0, 10);
-	expect(collection.array[0].id).toBe(uuid_1);
+	expect(collection.all[0].id).toBe(uuid_1);
+});
+
+test('Indexed_Collection - reorder with one item does nothing', () => {
+	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		initial_items: [sample_items[0]],
+	});
+
+	collection.reorder(0, 0);
+
+	expect(collection.all[0]).toEqual(sample_items[0]);
 });
 
 // Multi-index features
@@ -231,7 +345,7 @@ test('Indexed_Collection - clear method resets the collection', () => {
 
 	collection.clear();
 
-	expect(collection.array.length).toBe(0);
+	expect(collection.all.length).toBe(0);
 	expect(collection.by_id.size).toBe(0);
 	expect(collection.single_indexes.name?.size).toBe(0);
 	expect(collection.multi_indexes.category?.size).toBe(0);
@@ -255,10 +369,40 @@ test('Indexed_Collection - handles null/undefined index values', () => {
 	collection.add(item1);
 	collection.add(item2);
 
-	expect(collection.array.length).toBe(2);
+	expect(collection.all.length).toBe(2);
 	expect(collection.single_indexes.optional_field?.get('value')).toEqual(item1);
 	// The undefined value should not be added to the index
 	expect(collection.single_indexes.optional_field?.has(undefined as any)).toBe(false);
+});
+
+test('Indexed_Collection - null/undefined extractor values are handled consistently', () => {
+	interface Nullable_Item extends Indexed_Item {
+		id: Uuid;
+		nullable_value: string | null | undefined;
+	}
+
+	const collection: Indexed_Collection<Nullable_Item, 'nullable'> = new Indexed_Collection({
+		indexes: [{key: 'nullable', extractor: (item) => item.nullable_value}],
+	});
+
+	const item1 = {id: uuid_1, nullable_value: 'value'};
+	const item2 = {id: uuid_2, nullable_value: null};
+	const item3 = {id: uuid_3, nullable_value: undefined};
+
+	collection.add(item1);
+	collection.add(item2);
+	collection.add(item3);
+
+	expect(collection.all.length).toBe(3);
+	expect(collection.single_indexes.nullable?.get('value')).toEqual(item1);
+
+	// Null and undefined values should not be added to the index
+	expect(collection.single_indexes.nullable?.has(null as any)).toBe(false);
+	expect(collection.single_indexes.nullable?.has(undefined as any)).toBe(false);
+
+	// But the items should still be retrievable by ID
+	expect(collection.get(uuid_2)).toBe(item2);
+	expect(collection.get(uuid_3)).toBe(item3);
 });
 
 test('Indexed_Collection - toJSON returns the array snapshot', () => {
@@ -268,4 +412,109 @@ test('Indexed_Collection - toJSON returns the array snapshot', () => {
 
 	const json_result = collection.toJSON();
 	expect(json_result).toEqual([sample_items[0], sample_items[1]]);
+});
+
+test('Indexed_Collection - toJSON returns a snapshot that matches current state', () => {
+	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		initial_items: sample_items.slice(0, 3),
+	});
+
+	const snapshot = collection.toJSON();
+
+	expect(snapshot).toEqual(sample_items.slice(0, 3));
+
+	// Modify the collection after taking a snapshot
+	collection.remove(uuid_1);
+
+	// The snapshot should not be affected by the removal
+	expect(snapshot).toEqual(sample_items.slice(0, 3));
+
+	// A new snapshot should reflect the current state
+	expect(collection.toJSON()).toEqual([sample_items[1], sample_items[2]]);
+});
+
+// Performance considerations
+test('Indexed_Collection - handles large number of items efficiently', () => {
+	const collection: Indexed_Collection<Test_Item, 'category'> = new Indexed_Collection({
+		indexes: [{key: 'category', extractor: (item) => item.category, multi: true}],
+	});
+
+	const many_items: Array<Test_Item> = [];
+	for (let i = 0; i < 1000; i++) {
+		const id = Uuid.parse(`00000000-0000-0000-0000-${i.toString().padStart(12, '0')}`);
+		const category = i % 10 === 0 ? 'special' : 'normal';
+		many_items.push(create_test_item(id, `item${i}`, category, []));
+	}
+
+	// Adding many items should not throw errors
+	for (const item of many_items) {
+		collection.add(item);
+	}
+
+	expect(collection.size).toBe(1000);
+
+	// Index should contain correct groupings
+	expect(collection.multi_indexes.category?.get('special')?.length).toBe(100); // Every 10th item
+	expect(collection.multi_indexes.category?.get('normal')?.length).toBe(900);
+});
+
+// Index configuration tests
+test('Indexed_Collection - index configuration handles varying types', () => {
+	interface Complex_Item extends Indexed_Item {
+		id: Uuid;
+		number_value: number;
+		boolean_value: boolean;
+		date_value: Date;
+	}
+
+	const item1: Complex_Item = {
+		id: uuid_1,
+		number_value: 42,
+		boolean_value: true,
+		date_value: new Date('2023-01-01'),
+	};
+
+	const item2: Complex_Item = {
+		id: uuid_2,
+		number_value: 99,
+		boolean_value: false,
+		date_value: new Date('2023-02-01'),
+	};
+
+	const collection: Indexed_Collection<Complex_Item, 'number' | 'boolean' | 'date'> =
+		new Indexed_Collection({
+			indexes: [
+				{key: 'number', extractor: (item) => item.number_value},
+				{key: 'boolean', extractor: (item) => item.boolean_value},
+				{key: 'date', extractor: (item) => item.date_value.toISOString()},
+			],
+			initial_items: [item1, item2],
+		});
+
+	expect(collection.single_indexes.number?.get(42)).toBe(item1);
+	expect(collection.single_indexes.boolean?.get(true)).toBe(item1);
+	expect(collection.single_indexes.date?.get(new Date('2023-01-01').toISOString())).toBe(item1);
+});
+
+// State snapshot tests
+test('Indexed_Collection - can be serialized and deserialized', () => {
+	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		initial_items: [sample_items[0], sample_items[1]],
+	});
+
+	// Convert to JSON string
+	const json_string = JSON.stringify(collection);
+
+	// Parse back from JSON
+	const parsed_data = JSON.parse(json_string);
+
+	// Create a new collection with the parsed data
+	const new_collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		initial_items: parsed_data,
+	});
+
+	// The new collection should have the same items
+	expect(new_collection.size).toBe(2);
+	expect(new_collection.get(uuid_1)).toEqual(sample_items[0]);
+	expect(new_collection.get(uuid_2)).toEqual(sample_items[1]);
 });

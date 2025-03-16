@@ -17,13 +17,18 @@ export interface Index_Config<T, K extends string, V> {
 	multi?: boolean; // Whether this index maps to multiple items
 }
 
+export interface Indexed_Collection_Options<T extends Indexed_Item, K extends string> {
+	indexes?: Array<Index_Config<T, K, any>>;
+	initial_items?: Array<T>;
+}
+
 /**
  * A helper class for managing collections that need efficient lookups
  * with automatic index maintenance
  */
 export class Indexed_Collection<T extends Indexed_Item, K extends string = never> {
 	// The main collection of items
-	array: Array<T> = $state([]);
+	all: Array<T> = $state([]);
 
 	// The primary index by ID now keyed by Uuid instead of string
 	readonly by_id: SvelteMap<Uuid, T> = new SvelteMap();
@@ -36,7 +41,7 @@ export class Indexed_Collection<T extends Indexed_Item, K extends string = never
 
 	#configs: Array<Index_Config<T, K, any>> = [];
 
-	constructor(options?: {indexes?: Array<Index_Config<T, K, any>>; initial_items?: Array<T>}) {
+	constructor(options?: Indexed_Collection_Options<T, K>) {
 		// Set up additional indexes
 		if (options?.indexes) {
 			this.#configs = options.indexes;
@@ -59,16 +64,15 @@ export class Indexed_Collection<T extends Indexed_Item, K extends string = never
 		}
 	}
 
-	// TODO maybe make this a cell? could explicitly cleanup on destroy
 	toJSON(): Array<any> {
-		return $state.snapshot(this.array);
+		return $state.snapshot(this.all);
 	}
 
 	/**
 	 * Add an item to the collection and update all indexes
 	 */
 	add(item: T): T {
-		this.array.push(item);
+		this.all.push(item);
 		this.by_id.set(item.id, item);
 
 		// Update all additional indexes
@@ -92,7 +96,7 @@ export class Indexed_Collection<T extends Indexed_Item, K extends string = never
 	 * Add an item to the beginning of the collection
 	 */
 	add_first(item: T): T {
-		this.array.unshift(item);
+		this.all.unshift(item);
 		this.by_id.set(item.id, item);
 
 		// Update all additional indexes
@@ -120,9 +124,9 @@ export class Indexed_Collection<T extends Indexed_Item, K extends string = never
 		if (!item) return false;
 
 		// Find the index of the item in the array
-		const index = this.array.findIndex((i) => i.id === id); // TODO consider using a map for index lookup
+		const index = this.all.findIndex((i) => i.id === id); // TODO consider using a map for index lookup
 		if (index !== -1) {
-			this.array.splice(index, 1);
+			this.all.splice(index, 1);
 			this.by_id.delete(id);
 
 			// Update all additional indexes
@@ -181,25 +185,25 @@ export class Indexed_Collection<T extends Indexed_Item, K extends string = never
 	reorder(from_index: number, to_index: number): void {
 		if (from_index === to_index) return;
 		if (from_index < 0 || to_index < 0) return;
-		if (from_index >= this.array.length || to_index >= this.array.length) return;
+		if (from_index >= this.all.length || to_index >= this.all.length) return;
 
 		// Perform the reorder
-		const [item] = this.array.splice(from_index, 1);
-		this.array.splice(to_index, 0, item);
+		const [item] = this.all.splice(from_index, 1);
+		this.all.splice(to_index, 0, item);
 	}
 
 	/**
 	 * Get the current count of items
 	 */
 	get size(): number {
-		return this.array.length;
+		return this.all.length;
 	}
 
 	/**
 	 * Clear all items and reset indexes
 	 */
 	clear(): void {
-		this.array.length = 0;
+		this.all.length = 0;
 		this.by_id.clear();
 
 		// Clear all additional indexes

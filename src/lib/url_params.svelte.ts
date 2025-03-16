@@ -1,10 +1,10 @@
 import {page} from '$app/state';
 import {z} from 'zod';
 import {goto} from '$app/navigation';
+import {BROWSER} from 'esm-env';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Uuid} from '$lib/zod_helpers.js';
-import {BROWSER} from 'esm-env';
 
 /**
  * Schema for URL parameters manager

@@ -144,15 +144,15 @@ export class Messages extends Cell<typeof Messages_Json> {
 	 * Trims the collection to the maximum allowed size by removing oldest messages
 	 */
 	#trim_to_history_limit(): void {
-		if (this.items.array.length <= this.history_limit) return;
+		if (this.items.all.length <= this.history_limit) return;
 
 		// Calculate how many items to remove
-		const excess = this.items.array.length - this.history_limit;
+		const excess = this.items.all.length - this.history_limit;
 
 		// Remove oldest items one by one to properly update all indexes
 		for (let i = 0; i < excess; i++) {
-			if (this.items.array.length > 0) {
-				const oldest = this.items.array[0];
+			if (this.items.all.length > 0) {
+				const oldest = this.items.all[0];
 				this.items.remove(oldest.id);
 			}
 		}

@@ -45,7 +45,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 	selected_file: Diskfile | null = $derived(
 		this.selected_file_id ? (this.items.by_id.get(this.selected_file_id) ?? null) : null,
 	);
-	non_external_files: Array<Diskfile> = $derived(this.items.array.filter((file) => !file.external));
+	non_external_files: Array<Diskfile> = $derived(this.items.all.filter((file) => !file.external));
 	onselect?: (file: Diskfile) => void;
 
 	constructor(options: Diskfiles_Options) {

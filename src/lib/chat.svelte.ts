@@ -52,7 +52,7 @@ export class Chat extends Cell<typeof Chat_Json> {
 				if (value === undefined) {
 					return get_unique_name(
 						NEW_CHAT_PREFIX,
-						this.zzz.chats.items.array.map((c) => c.name),
+						this.zzz.chats.items.all.map((c) => c.name),
 					);
 				}
 				return USE_DEFAULT; // Explicitly use the default decoding
@@ -61,7 +61,7 @@ export class Chat extends Cell<typeof Chat_Json> {
 				if (Array.isArray(value)) {
 					// Find all existing prompts with these IDs
 					const selected_prompts = value
-						.map((id) => this.zzz.prompts.items.array.find((p) => p.id === id))
+						.map((id) => this.zzz.prompts.items.all.find((p) => p.id === id))
 						.filter((p): p is Prompt => p !== undefined);
 
 					// Update the selected_prompts array
@@ -230,7 +230,7 @@ export class Chat extends Cell<typeof Chat_Json> {
 			if (response_text !== this.name) {
 				this.name = get_unique_name(
 					response_text,
-					this.zzz.chats.items.array.map((c) => c.name),
+					this.zzz.chats.items.all.map((c) => c.name),
 				);
 			}
 		} catch (err) {
