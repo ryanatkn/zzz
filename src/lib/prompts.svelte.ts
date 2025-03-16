@@ -5,7 +5,8 @@ import {Prompt, Prompt_Json} from '$lib/prompt.svelte.js';
 import type {Uuid} from '$lib/zod_helpers.js';
 import type {Bit} from '$lib/bit.svelte.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
-import {Indexed_Collection, Index_Type} from '$lib/indexed_collection.svelte.js';
+import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
+import {create_single_index, create_derived_index} from '$lib/indexed_collection_helpers.js';
 
 export const Prompts_Json = z
 	.object({
@@ -28,32 +29,31 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 	// Initialize items with proper typing and unified indexes
 	readonly items: Indexed_Collection<Prompt> = new Indexed_Collection({
 		indexes: [
-			{
-				key: 'by_name',
-				type: 'single',
-				extractor: (prompt) => prompt.name,
-			},
-			{
-				key: 'recent_prompts',
-				type: Index_Type.DERIVED,
-				compute: (collection) => {
+			create_single_index<Prompt, string>('by_name', (prompt) => prompt.name),
+
+			create_derived_index<Prompt>(
+				'recent_prompts',
+				(collection) => {
 					// Sort by creation date (newest first)
 					return [...collection.all].sort(
 						(a, b) => new Date(b.created).getTime() - new Date(a.created).getTime(),
 					);
 				},
-				on_add: (items, item) => {
-					// Insert at the right position based on creation date
-					const index = items.findIndex(
-						(existing) => new Date(item.created).getTime() > new Date(existing.created).getTime(),
-					);
-					if (index === -1) {
-						items.push(item);
-					} else {
-						items.splice(index, 0, item);
-					}
+				{
+					on_add: (items, item) => {
+						// Insert at the right position based on creation date
+						const index = items.findIndex(
+							(existing) => new Date(item.created).getTime() > new Date(existing.created).getTime(),
+						);
+						if (index === -1) {
+							items.push(item);
+						} else {
+							items.splice(index, 0, item);
+						}
+						return items;
+					},
 				},
-			},
+			),
 		],
 	});
 

@@ -4,7 +4,8 @@ import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Chat, Chat_Json} from '$lib/chat.svelte.js';
 import type {Uuid} from '$lib/zod_helpers.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
-import {Indexed_Collection, Index_Type} from '$lib/indexed_collection.svelte.js';
+import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
+import {create_multi_index, create_derived_index} from '$lib/indexed_collection_helpers.js';
 
 // Define types for index keys
 export type Chat_Single_Indexes = never;
@@ -32,34 +33,35 @@ export interface Chats_Options extends Cell_Options<typeof Chats_Json> {} // esl
 export class Chats extends Cell<typeof Chats_Json> {
 	readonly items: Indexed_Collection<Chat> = new Indexed_Collection({
 		indexes: [
-			// Add any specialized indexes here if needed
-			{
-				key: 'by_has_tapes',
-				type: Index_Type.MULTI,
-				extractor: (chat: Chat) => (chat.tapes.length > 0 ? 'has_tapes' : 'no_tapes'),
-			},
-			{
-				key: 'recent_chats',
-				type: Index_Type.DERIVED,
-				compute: (collection) => {
+			create_multi_index<Chat, string>('by_has_tapes', (chat: Chat) =>
+				chat.tapes.length > 0 ? 'has_tapes' : 'no_tapes',
+			),
+
+			create_derived_index<Chat>(
+				'recent_chats',
+				(collection) => {
 					// Sort chats by creation date (newest first)
 					// This is just an example of a derived index
 					return [...collection.all].sort(
 						(a, b) => new Date(b.created).getTime() - new Date(a.created).getTime(),
 					);
 				},
-				on_add: (collection, item) => {
-					// Insert the new chat in the correct position based on creation date
-					const index = collection.findIndex(
-						(existing) => new Date(existing.created).getTime() <= new Date(item.created).getTime(),
-					);
-					if (index === -1) {
-						collection.push(item);
-					} else {
-						collection.splice(index, 0, item);
-					}
+				{
+					on_add: (collection, item) => {
+						// Insert the new chat in the correct position based on creation date
+						const index = collection.findIndex(
+							(existing) =>
+								new Date(existing.created).getTime() <= new Date(item.created).getTime(),
+						);
+						if (index === -1) {
+							collection.push(item);
+						} else {
+							collection.splice(index, 0, item);
+						}
+						return collection;
+					},
 				},
-			},
+			),
 		],
 	});
 

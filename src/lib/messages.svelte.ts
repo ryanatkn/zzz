@@ -10,7 +10,8 @@ import {
 	Message_Type,
 } from '$lib/message_types.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
-import {Indexed_Collection, Index_Type} from '$lib/indexed_collection.svelte.js';
+import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
+import {create_multi_index, create_derived_index} from '$lib/indexed_collection_helpers.js';
 
 export const HISTORY_LIMIT_DEFAULT = 512;
 export const PONG_DISPLAY_LIMIT = 6;
@@ -40,55 +41,62 @@ export class Messages extends Cell<typeof Messages_Json> {
 	readonly items: Indexed_Collection<Message> = new Indexed_Collection({
 		indexes: [
 			// Type-based multi-index
-			{
-				key: 'by_type',
-				type: Index_Type.MULTI,
-				extractor: (message: Message) => message.type,
-			},
+			create_multi_index<Message, Message_Type>('by_type', (message: Message) => message.type),
+
 			// Ping ID index for pongs
-			{
-				key: 'by_ping_id',
-				type: Index_Type.MULTI,
-				extractor: (message: Message) => {
-					if (message.type === 'pong') {
+			create_multi_index<Message, string>(
+				'by_ping_id',
+				(message) => {
+					if (message.type === 'pong' && message.ping_id) {
 						return message.ping_id;
 					}
 					return undefined;
 				},
-			},
+				undefined, // No input schema
+				{
+					matches: (message) => message.type === 'pong' && !!message.ping_id,
+				},
+			),
+
 			// Derived index for latest pongs - prioritize showing most recent
-			{
-				key: 'latest_pongs',
-				type: Index_Type.DERIVED,
-				compute: (collection) => {
+			create_derived_index<Message>(
+				'latest_pongs',
+				(collection) => {
 					return collection
 						.where('by_type', 'pong')
 						.sort((a, b) => b.created.localeCompare(a.created))
 						.slice(0, PONG_DISPLAY_LIMIT);
 				},
-				matches: (item) => item.type === 'pong',
-				on_add: (items, item) => {
-					if (item.type !== 'pong') return;
+				{
+					matches: (item) => item.type === 'pong',
+					on_add: (items, item) => {
+						if (item.type !== 'pong') return items;
 
-					// Insert at correct position based on created timestamp
-					const index = items.findIndex((existing) => item.created > existing.created);
+						// Insert at correct position based on created timestamp
+						const index = items.findIndex((existing) => item.created > existing.created);
 
-					if (index === -1) {
-						items.push(item);
-					} else {
-						items.splice(index, 0, item);
-					}
+						if (index === -1) {
+							items.push(item);
+						} else {
+							items.splice(index, 0, item);
+						}
 
-					// Keep only the newest items
-					items.splice(PONG_DISPLAY_LIMIT);
+						// Keep only the newest items
+						if (items.length > PONG_DISPLAY_LIMIT) {
+							return items.slice(0, PONG_DISPLAY_LIMIT);
+						}
+
+						return items;
+					},
+					on_remove: (items, item) => {
+						const index = items.findIndex((i) => i.id === item.id);
+						if (index !== -1) {
+							items.splice(index, 1);
+						}
+						return items;
+					},
 				},
-				on_remove: (items, item) => {
-					const index = items.findIndex((i) => i.id === item.id);
-					if (index !== -1) {
-						items.splice(index, 1);
-					}
-				},
-			},
+			),
 		],
 	});
 

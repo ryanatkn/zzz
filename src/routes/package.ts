@@ -262,6 +262,10 @@ export const package_json = {
 		},
 		'./glyphs.js': {types: './dist/glyphs.d.ts', default: './dist/glyphs.js'},
 		'./helpers.js': {types: './dist/helpers.d.ts', default: './dist/helpers.js'},
+		'./indexed_collection_helpers.js': {
+			types: './dist/indexed_collection_helpers.d.ts',
+			default: './dist/indexed_collection_helpers.js',
+		},
 		'./indexed_collection.svelte.js': {
 			types: './dist/indexed_collection.svelte.d.ts',
 			default: './dist/indexed_collection.svelte.js',
@@ -737,15 +741,26 @@ export const src_json = {
 			path: 'helpers.ts',
 			declarations: [{name: 'get_unique_name', kind: 'function'}],
 		},
+		'./indexed_collection_helpers.js': {
+			path: 'indexed_collection_helpers.ts',
+			declarations: [
+				{name: 'create_single_index', kind: null},
+				{name: 'create_multi_index', kind: null},
+				{name: 'create_derived_index', kind: null},
+				{name: 'create_dynamic_index', kind: null},
+				{name: 'Index_Options', kind: 'type'},
+				{name: 'Single_Index_Options', kind: 'type'},
+				{name: 'Multi_Index_Options', kind: 'type'},
+				{name: 'Derived_Index_Options', kind: 'type'},
+				{name: 'Dynamic_Index_Options', kind: 'type'},
+			],
+		},
 		'./indexed_collection.svelte.js': {
 			path: 'indexed_collection.svelte.ts',
 			declarations: [
 				{name: 'Indexed_Item', kind: 'type'},
-				{name: 'Index_Type', kind: null},
-				{name: 'Single_Index_Config', kind: 'type'},
-				{name: 'Multi_Index_Config', kind: 'type'},
-				{name: 'Derived_Index_Config', kind: 'type'},
-				{name: 'Index_Config', kind: 'type'},
+				{name: 'Index_Type', kind: 'type'},
+				{name: 'Index_Definition', kind: 'type'},
 				{name: 'Indexed_Collection_Options', kind: 'type'},
 				{name: 'Indexed_Collection', kind: 'class'},
 			],

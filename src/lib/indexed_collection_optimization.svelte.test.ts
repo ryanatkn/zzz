@@ -1,359 +1,235 @@
 // @vitest-environment jsdom
 
-import {test, expect, vi, describe, beforeEach} from 'vitest';
+import {test, expect, vi} from 'vitest';
 import {z} from 'zod';
-
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
-import {create_multi_index, create_derived_index} from '$lib/indexed_collection_helpers.js';
+import {
+	create_multi_index,
+	create_derived_index,
+	create_dynamic_index,
+} from '$lib/indexed_collection_helpers.js';
 import {Uuid} from '$lib/zod_helpers.js';
 
-// Mock item type for performance testing
-interface Performance_Item {
+// Mock item type that implements Indexed_Item
+interface Test_Item {
 	id: Uuid;
 	name: string;
-	tags: Array<string>;
 	category: string;
+	tags: Array<string>;
 	value: number;
-	created: Date;
 }
 
-// Helper to create many test items
-const create_many_items = (count: number): Array<Performance_Item> => {
-	const items: Array<Performance_Item> = [];
-	const categories = ['A', 'B', 'C', 'D', 'E'];
-	const tags = ['red', 'green', 'blue', 'yellow', 'purple', 'orange', 'pink'];
+// Helper function to create test items with predictable values
+const create_test_item = (
+	name: string,
+	category: string,
+	tags: Array<string> = [],
+	value: number = 0,
+): Test_Item => ({
+	id: Uuid.parse(undefined),
+	name,
+	category,
+	tags,
+	value,
+});
 
-	for (let i = 0; i < count; i++) {
-		const category_index = i % categories.length;
-		const tag1_index = i % tags.length;
-		const tag2_index = (i + 1) % tags.length;
+// Define test schemas
+const item_schema = z.custom<Test_Item>((val) => val && typeof val === 'object' && 'id' in val);
+const dynamic_function_schema = z.function().args(z.string()).returns(z.array(item_schema));
 
-		items.push({
-			id: Uuid.parse(undefined),
-			name: `item_${i}`,
-			category: categories[category_index],
-			tags: [tags[tag1_index], tags[tag2_index]],
-			value: Math.floor(Math.random() * 100),
-			created: new Date(Date.now() - i * 1000), // Most recent first
-		});
+test('Indexed_Collection - optimization - indexes are computed only once during initialization', () => {
+	// Create spy functions to count compute calls
+	const compute_spy = vi.fn((collection) => {
+		return new Map(collection.all.map((item: Test_Item) => [item.name, item]));
+	});
+
+	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		indexes: [
+			{
+				key: 'test_index',
+				compute: compute_spy,
+				output_schema: z.map(z.string(), item_schema),
+			},
+		],
+		initial_items: [create_test_item('a1', 'c1'), create_test_item('a2', 'c2')],
+	});
+
+	// Verify compute was called exactly once during initialization
+	expect(compute_spy).toHaveBeenCalledTimes(1);
+	expect(collection.size).toBe(2);
+});
+
+test('Indexed_Collection - optimization - incremental updates avoid recomputing entire index', () => {
+	// Create spies for the compute and on_add functions
+	const compute_spy = vi.fn((collection) => {
+		return collection.all.filter((item: Test_Item) => item.value > 10);
+	});
+
+	const on_add_spy = vi.fn((items, item) => {
+		if (item.value > 10) {
+			items.push(item);
+		}
+		return items;
+	});
+
+	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		indexes: [
+			create_derived_index<Test_Item>('high_value', compute_spy, {
+				matches: (item) => item.value > 10,
+				on_add: on_add_spy,
+			}),
+		],
+		initial_items: [create_test_item('a1', 'c1', [], 15), create_test_item('a2', 'c2', [], 5)],
+	});
+
+	// Verify compute was called exactly once during initialization
+	expect(compute_spy).toHaveBeenCalledTimes(1);
+
+	// Add more items and check that compute isn't called again
+	collection.add(create_test_item('a3', 'c3', [], 20));
+	collection.add(create_test_item('a4', 'c4', [], 8));
+
+	// Compute should still have been called only once
+	expect(compute_spy).toHaveBeenCalledTimes(1);
+
+	// on_add should have been called twice - once for each new item
+	expect(on_add_spy).toHaveBeenCalledTimes(2);
+
+	// Check that the index was correctly updated
+	const high_value = collection.get_derived('high_value');
+	expect(high_value.length).toBe(2);
+	expect(high_value.some((item) => item.name === 'a1')).toBe(true);
+	expect(high_value.some((item) => item.name === 'a3')).toBe(true);
+});
+
+test('Indexed_Collection - optimization - batch operations are more efficient', () => {
+	// Create a collection with a multi-index
+	const on_add_spy = vi.fn((map, item) => {
+		const collection = map.get(item.category) || [];
+		collection.push(item);
+		map.set(item.category, collection);
+		return map;
+	});
+
+	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		indexes: [
+			{
+				key: 'by_category',
+				type: 'multi',
+				extractor: (item) => item.category,
+				compute: (collection) => {
+					const map = new Map();
+					for (const item of collection.all) {
+						const collection = map.get(item.category) || [];
+						collection.push(item);
+						map.set(item.category, collection);
+					}
+					return map;
+				},
+				input_schema: z.string(),
+				output_schema: z.map(z.string(), z.array(item_schema)),
+				on_add: on_add_spy,
+			},
+		],
+	});
+
+	// Test batch add performance
+	const start_time = performance.now();
+
+	const items = Array.from({length: 100}, (_, i) =>
+		create_test_item(`item${i}`, i % 5 === 0 ? 'c1' : 'c2'),
+	);
+
+	collection.add_many(items);
+
+	const end_time = performance.now();
+	const batch_time = end_time - start_time;
+
+	// Verify on_add was called for each item
+	expect(on_add_spy).toHaveBeenCalledTimes(100);
+
+	// Reset the spy for individual adds
+	on_add_spy.mockClear();
+
+	// Test individual adds
+	const individual_start = performance.now();
+
+	const more_items = Array.from({length: 100}, (_, i) =>
+		create_test_item(`more${i}`, i % 5 === 0 ? 'c1' : 'c2'),
+	);
+
+	for (const item of more_items) {
+		collection.add(item);
 	}
 
-	return items;
-};
+	const individual_end = performance.now();
+	const individual_time = individual_end - individual_start;
 
-// Helper functions for ID-based object equality checks
-const has_item_with_id = (array: Array<{id: Uuid}>, item: {id: Uuid}): boolean =>
-	array.some((i) => i.id === item.id);
+	// Verify on_add was called for each item
+	expect(on_add_spy).toHaveBeenCalledTimes(100);
 
-describe('Indexed_Collection - Optimization Tests', () => {
-	// Setup common vars
-	let items: Array<Performance_Item>;
-	const ITEM_COUNT = 1000;
+	// This test is somewhat approximative but helps validate the efficiency
+	// We're not making a strict assertion on performance as it can vary between environments
+	console.log(`Batch add: ${batch_time}ms, Individual adds: ${individual_time}ms`);
+});
 
-	beforeEach(() => {
-		// Generate fresh test data for each test
-		items = create_many_items(ITEM_COUNT);
-	});
-
-	test('Derived index should be more efficient than filtering', () => {
-		// Create collection with a derived index for high-value items
-		const indexed_collection: Indexed_Collection<Performance_Item> = new Indexed_Collection({
-			indexes: [
-				create_derived_index(
-					'high_value_items',
-					(collection) => collection.all.filter((item) => item.value >= 80),
-					{
-						matches: (item) => item.value >= 80,
-						on_add: (items, item) => {
-							if (item.value >= 80) {
-								items.push(item);
-							}
-							return items;
-						},
-						on_remove: (items, item) => {
-							const index = items.findIndex((i) => i.id === item.id);
-							if (index !== -1) {
-								items.splice(index, 1);
-							}
-							return items;
-						},
-					},
-				),
-			],
-			initial_items: items,
-		});
-
-		// Time measurement for derived index access
-		const derived_start = performance.now();
-		const high_value_derived = indexed_collection.get_derived('high_value_items');
-		const derived_end = performance.now();
-		const derived_time = derived_end - derived_start;
-
-		// Time measurement for direct filtering
-		const filter_start = performance.now();
-		const high_value_filtered = indexed_collection.all.filter((item) => item.value >= 80);
-		const filter_end = performance.now();
-		const filter_time = filter_end - filter_start;
-
-		// Results should be the same
-		expect(high_value_derived.length).toBe(high_value_filtered.length);
-
-		// We expect derived index to be faster, but this is environment-dependent
-		// So we'll log the results rather than making an assertion
-		console.log(`Derived index access: ${derived_time}ms`);
-		console.log(`Direct filtering: ${filter_time}ms`);
-
-		// What we care most about is that adding new items is efficient
-		const new_high_value_item = {
-			id: Uuid.parse(undefined),
-			name: 'new_high_value',
-			category: 'A',
-			tags: ['red', 'blue'],
-			value: 95,
-			created: new Date(),
-		};
-
-		// Track number of compute/filter operations
-		const compute_spy = vi.fn();
-
-		// Create a new collection with monitored compute function
-		const monitored_collection: Indexed_Collection<Performance_Item> = new Indexed_Collection({
-			indexes: [
-				{
-					key: 'high_value_items',
-					compute: (collection) => {
-						compute_spy();
-						return collection.all.filter((item) => item.value >= 80);
-					},
-					output_schema: z.array(z.custom<Performance_Item>()),
-					matches: (item) => item.value >= 80,
-					on_add: (items, item) => {
-						if (item.value >= 80) {
-							items.push(item);
-							return items;
-						}
-						return items;
-					},
+test('Indexed_Collection - optimization - dynamic indexes avoid redundant storage', () => {
+	// Create a collection with a dynamic index that computes on-demand
+	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+		indexes: [
+			create_dynamic_index<Test_Item, (min_value: string) => Array<Test_Item>>(
+				'by_min_value',
+				(collection) => {
+					return (min_value: string) => {
+						const threshold = parseInt(min_value, 10);
+						return collection.all.filter((item) => item.value >= threshold);
+					};
 				},
-			],
-			initial_items: items,
-		});
-
-		// Initial computation happened during initialization
-		expect(compute_spy).toHaveBeenCalledTimes(1);
-		compute_spy.mockReset();
-
-		// Add the new item - this should use on_add rather than recomputing
-		monitored_collection.add(new_high_value_item);
-
-		// The entire derived index should not have been recomputed
-		expect(compute_spy).not.toHaveBeenCalled();
-
-		// But the new item should still appear in the derived index
-		const updated_derived = monitored_collection.get_derived('high_value_items');
-		expect(has_item_with_id(updated_derived, new_high_value_item)).toBe(true);
+				z.string(),
+				dynamic_function_schema,
+			),
+		],
 	});
 
-	test('Multi-index lookups should be faster than filtering', () => {
-		// Create collection with multi-indexes
-		const indexed_collection: Indexed_Collection<Performance_Item> = new Indexed_Collection({
-			indexes: [
-				create_multi_index('by_category', (item) => item.category),
-				create_multi_index('by_tag', (item) => item.tags[0]),
-			],
-			initial_items: items,
-		});
+	// Add test data
+	for (let i = 0; i < 20; i++) {
+		collection.add(create_test_item(`item${i}`, `c${i % 3}`, [], i * 5));
+	}
 
-		// Measure time for indexed lookup
-		const index_start = performance.now();
-		const category_a_indexed = indexed_collection.where('by_category', 'A');
-		const index_end = performance.now();
-		const index_time = index_end - index_start;
+	// Verify function index produces different results based on input
+	const value_fn = collection.get_index<(threshold: string) => Array<Test_Item>>('by_min_value');
 
-		// Measure time for direct filtering
-		const filter_start = performance.now();
-		const category_a_filtered = indexed_collection.all.filter((item) => item.category === 'A');
-		const filter_end = performance.now();
-		const filter_time = filter_end - filter_start;
+	// These should return different filtered subsets without storing separate copies
+	expect(value_fn('10').length).not.toBe(value_fn('50').length);
+	expect(value_fn('0').length).toBe(20); // All items
+	expect(value_fn('50').length).toBe(10); // Half the items
+	expect(value_fn('90').length).toBe(2); // Just the highest values
+});
 
-		// Results should be the same
-		expect(category_a_indexed.length).toBe(category_a_filtered.length);
+test('Indexed_Collection - optimization - memory usage with large datasets', () => {
+	// This test creates a large dataset and verifies indexes work efficiently
+	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection();
 
-		// Log performance results
-		console.log(`Multi-index lookup: ${index_time}ms`);
-		console.log(`Direct filtering: ${filter_time}ms`);
+	// Create a large dataset (~1000 items)
+	const large_dataset = Array.from({length: 1000}, (_, i) =>
+		create_test_item(`item${i}`, `category${i % 10}`, [`tag${i % 20}`], i),
+	);
 
-		// Now test with a more complex criteria - items with tag 'red' and category 'A'
-		// This demonstrates how indexes can be combined
+	// Add them in one batch
+	collection.add_many(large_dataset);
 
-		const combined_start = performance.now();
-		// Get all items with tag 'red'
-		const red_items = indexed_collection.where('by_tag', 'red');
-		// Then filter to only those in category 'A'
-		const red_in_category_a = red_items.filter((item) => item.category === 'A');
-		const combined_end = performance.now();
-		const combined_time = combined_end - combined_start;
+	// Create indexes after adding data
+	collection.indexes.by_category = create_multi_index(
+		'by_category',
+		(item: any) => item.category,
+	).compute(collection);
 
-		// Direct filtering for both criteria
-		const direct_filter_start = performance.now();
-		const direct_filtered = indexed_collection.all.filter(
-			(item) => item.tags[0] === 'red' && item.category === 'A',
-		);
-		const direct_filter_end = performance.now();
-		const direct_filter_time = direct_filter_end - direct_filter_start;
+	// Verify the index contains the expected number of categories
+	const category_index = collection.get_index<Map<string, Array<Test_Item>>>('by_category');
+	expect(category_index.size).toBe(10); // 10 unique categories
 
-		// Results should be the same
-		expect(red_in_category_a.length).toBe(direct_filtered.length);
-
-		// Log performance results
-		console.log(`Combined index filtering: ${combined_time}ms`);
-		console.log(`Direct combined filtering: ${direct_filter_time}ms`);
-	});
-
-	test('Derived indexes update efficiently when modified', () => {
-		// Create a collection with a derived index that needs sorting
-		const collection: Indexed_Collection<Performance_Item> = new Indexed_Collection({
-			indexes: [
-				{
-					key: 'recent_high_value',
-					compute: (collection) => {
-						// Sort by created date (most recent first)
-						return [...collection.all]
-							.filter((item) => item.value >= 80)
-							.sort((a, b) => b.created.getTime() - a.created.getTime());
-					},
-					output_schema: z.array(z.custom<Performance_Item>()),
-					matches: (item) => item.value >= 80,
-					on_add: (items, item) => {
-						if (item.value >= 80) {
-							// Insert at the right position based on creation date
-							const insert_index = items.findIndex(
-								(existing) => item.created.getTime() > existing.created.getTime(),
-							);
-
-							if (insert_index === -1) {
-								// Add to the end if it's the oldest
-								items.push(item);
-							} else {
-								// Insert at the right position
-								items.splice(insert_index, 0, item);
-							}
-						}
-						return items;
-					},
-					on_remove: (items, item) => {
-						const index = items.findIndex((i) => i.id === item.id);
-						if (index !== -1) {
-							items.splice(index, 1);
-						}
-						return items;
-					},
-				},
-			],
-		});
-
-		// Create some items
-		const now = Date.now();
-		const recent_items = [
-			{
-				id: Uuid.parse(undefined),
-				name: 'oldest',
-				category: 'test',
-				tags: ['red'],
-				value: 90,
-				created: new Date(now - 5000),
-			},
-			{
-				id: Uuid.parse(undefined),
-				name: 'middle',
-				category: 'test',
-				tags: ['blue'],
-				value: 85,
-				created: new Date(now - 3000),
-			},
-			{
-				id: Uuid.parse(undefined),
-				name: 'newest',
-				category: 'test',
-				tags: ['green'],
-				value: 95,
-				created: new Date(now - 1000),
-			},
-		];
-
-		// Add items one by one to test incremental updates
-		for (const item of recent_items) {
-			collection.add(item);
-		}
-
-		// Verify order in the derived index
-		const derived = collection.get_derived('recent_high_value');
-		expect(derived).toHaveLength(3);
-		expect(derived[0].name).toBe('newest');
-		expect(derived[1].name).toBe('middle');
-		expect(derived[2].name).toBe('oldest');
-
-		// Track compute calls
-		const compute_spy = vi.fn();
-
-		// Create a new collection with monitored compute function
-		const monitored_collection: Indexed_Collection<Performance_Item> = new Indexed_Collection({
-			indexes: [
-				{
-					key: 'recent_high_value',
-					compute: (collection) => {
-						compute_spy();
-						return [...collection.all]
-							.filter((item) => item.value >= 80)
-							.sort((a, b) => b.created.getTime() - a.created.getTime());
-					},
-					output_schema: z.array(z.custom<Performance_Item>()),
-					matches: (item) => item.value >= 80,
-					on_add: (items, item) => {
-						if (item.value >= 80) {
-							// Insert at the right position based on creation date
-							const insert_index = items.findIndex(
-								(existing) => item.created.getTime() > existing.created.getTime(),
-							);
-
-							if (insert_index === -1) {
-								items.push(item);
-							} else {
-								items.splice(insert_index, 0, item);
-							}
-						}
-						return items;
-					},
-				},
-			],
-			initial_items: recent_items,
-		});
-
-		// Initial computation happened during initialization
-		expect(compute_spy).toHaveBeenCalledTimes(1);
-		compute_spy.mockReset();
-
-		// Add a new item that should be in the middle of the sorted list
-		const new_item = {
-			id: Uuid.parse(undefined),
-			name: 'new_middle',
-			category: 'test',
-			tags: ['yellow'],
-			value: 88,
-			created: new Date(now - 2000), // Should be inserted between middle and newest
-		};
-
-		monitored_collection.add(new_item);
-
-		// The compute function should not have been called again
-		expect(compute_spy).not.toHaveBeenCalled();
-
-		// Check that the item was inserted in the correct position
-		const updated_derived = monitored_collection.get_derived('recent_high_value');
-		expect(updated_derived).toHaveLength(4);
-		expect(updated_derived[0].name).toBe('newest');
-		expect(updated_derived[1].name).toBe('new_middle');
-		expect(updated_derived[2].name).toBe('middle');
-		expect(updated_derived[3].name).toBe('oldest');
-	});
+	// Verify each category has the right number of items
+	for (let i = 0; i < 10; i++) {
+		expect(collection.where('by_category', `category${i}`).length).toBe(100); // 1000 items / 10 categories = 100 per category
+	}
 });

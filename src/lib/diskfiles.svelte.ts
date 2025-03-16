@@ -8,7 +8,12 @@ import {source_file_to_diskfile_json} from '$lib/diskfile_helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {strip_start} from '@ryanatkn/belt/string.js';
-import {Indexed_Collection, Index_Type} from '$lib/indexed_collection.svelte.js';
+import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
+import {
+	create_single_index,
+	create_multi_index,
+	create_derived_index,
+} from '$lib/indexed_collection_helpers.js';
 
 export const Diskfiles_Json = z
 	.object({
@@ -30,44 +35,40 @@ export interface Diskfiles_Options extends Cell_Options<typeof Diskfiles_Json> {
 export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 	readonly items: Indexed_Collection<Diskfile> = new Indexed_Collection({
 		indexes: [
-			{
-				key: 'by_path',
-				type: 'single',
-				extractor: (file: Diskfile) => file.path,
-			},
-			{
-				key: 'by_external_status',
-				type: Index_Type.MULTI,
-				extractor: (file: Diskfile) => (file.external ? 'external' : 'non_external'),
-			},
-			{
-				key: 'by_extension',
-				type: Index_Type.MULTI,
-				extractor: (file: Diskfile) => {
-					const match = /\.([^.]+)$/.exec(file.path);
-					return match ? match[1].toLowerCase() : 'no_extension';
+			create_single_index<Diskfile, string>('by_path', (file: Diskfile) => file.path),
+
+			create_multi_index<Diskfile, string>('by_external_status', (file: Diskfile) =>
+				file.external ? 'external' : 'non_external',
+			),
+
+			create_multi_index<Diskfile, string>('by_extension', (file: Diskfile) => {
+				const match = /\.([^.]+)$/.exec(file.path);
+				return match ? match[1].toLowerCase() : 'no_extension';
+			}),
+
+			create_derived_index<Diskfile>(
+				'non_external_files',
+				(collection) => collection.where('by_external_status', 'non_external'),
+				{
+					// Update a derived index incrementally when an item is added
+					on_add: (collection, item) => {
+						if (!item.external) {
+							collection.push(item);
+						}
+						return collection;
+					},
+					// Update a derived index incrementally when an item is removed
+					on_remove: (collection, item) => {
+						if (!item.external) {
+							const index = collection.findIndex((f) => f.id === item.id);
+							if (index !== -1) collection.splice(index, 1);
+						}
+						return collection;
+					},
+					// Only process items matching this condition for this derived index
+					matches: (item) => !item.external,
 				},
-			},
-			{
-				key: 'non_external_files',
-				type: Index_Type.DERIVED,
-				compute: (collection) => collection.where('by_external_status', 'non_external'),
-				// Update a derived index incrementally when an item is added
-				on_add: (collection, item, _source) => {
-					if (!item.external) {
-						collection.push(item);
-					}
-				},
-				// Update a derived index incrementally when an item is removed
-				on_remove: (collection, item) => {
-					if (!item.external) {
-						const index = collection.findIndex((f) => f.id === item.id);
-						if (index !== -1) collection.splice(index, 1);
-					}
-				},
-				// Only process items matching this condition for this derived index
-				matches: (item) => !item.external,
-			},
+			),
 		],
 	});
 

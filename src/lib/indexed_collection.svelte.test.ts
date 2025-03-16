@@ -2,10 +2,14 @@
 
 import {test, expect} from 'vitest';
 import {z} from 'zod';
-import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
-import {create_single_index, create_multi_index} from '$lib/indexed_collection_helpers.js';
+import {Indexed_Collection, type Indexed_Item} from '$lib/indexed_collection.svelte.js';
+import {
+	create_single_index,
+	create_multi_index,
+	create_derived_index,
+	create_dynamic_index,
+} from '$lib/indexed_collection_helpers.js';
 import {Uuid} from '$lib/zod_helpers.js';
-import {SvelteMap} from 'svelte/reactivity';
 
 // Mock item type that implements Indexed_Item
 interface Test_Item {
@@ -37,13 +41,26 @@ const has_item_with_id = (array: Array<Test_Item>, item: Test_Item): boolean => 
 	return array.some((i) => i.id === item.id);
 };
 
+// Define common schemas for testing
+const item_schema = z.custom<Test_Item>((val) => val && typeof val === 'object' && 'id' in val);
+const item_array_schema = z.array(item_schema);
+
+// Fix: Change function schema to properly match the expected return type
+const dynamic_function_schema = z.function().args(z.string()).returns(z.array(item_schema));
+
+const stats_schema = z.object({
+	count: z.number(),
+	average_priority: z.number(),
+	categories: z.custom<Set<string>>((val) => val instanceof Set),
+});
+
 test('Indexed_Collection - basic operations with no indexes', () => {
 	// Create a collection with no indexes
 	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection();
 
 	// Add items
-	const item1 = create_test_item('item1', 'cat1');
-	const item2 = create_test_item('item2', 'cat2');
+	const item1 = create_test_item('a1', 'c1');
+	const item2 = create_test_item('a2', 'c2');
 
 	collection.add(item1);
 	collection.add(item2);
@@ -70,30 +87,30 @@ test('Indexed_Collection - single index operations', () => {
 	});
 
 	// Add items with unique names
-	const item1 = create_test_item('apple', 'fruit');
-	const item2 = create_test_item('banana', 'fruit');
-	const item3 = create_test_item('carrot', 'vegetable');
+	const item1 = create_test_item('a1', 'c1');
+	const item2 = create_test_item('a2', 'c1');
+	const item3 = create_test_item('a3', 'c2');
 
 	collection.add(item1);
 	collection.add(item2);
 	collection.add(item3);
 
 	// Test lookup by single index
-	expect(collection.by_optional<string>('by_name', 'apple')?.id).toBe(item1.id);
-	expect(collection.by_optional<string>('by_name', 'banana')?.id).toBe(item2.id);
-	expect(collection.by_optional<string>('by_name', 'carrot')?.id).toBe(item3.id);
+	expect(collection.by_optional<string>('by_name', 'a1')?.id).toBe(item1.id);
+	expect(collection.by_optional<string>('by_name', 'a2')?.id).toBe(item2.id);
+	expect(collection.by_optional<string>('by_name', 'a3')?.id).toBe(item3.id);
 	expect(collection.by_optional<string>('by_name', 'missing')).toBeUndefined();
 
 	// Test the non-optional version that throws
 	expect(() => collection.by<string>('by_name', 'missing')).toThrow();
-	expect(collection.by<string>('by_name', 'apple').id).toBe(item1.id);
+	expect(collection.by<string>('by_name', 'a1').id).toBe(item1.id);
 
 	// Test query method
-	expect(collection.query<Test_Item, string>('by_name', 'apple').id).toBe(item1.id);
+	expect(collection.query<Test_Item, string>('by_name', 'a1').id).toBe(item1.id);
 
 	// Test index update on removal
 	collection.remove(item2.id);
-	expect(collection.by_optional<string>('by_name', 'banana')).toBeUndefined();
+	expect(collection.by_optional<string>('by_name', 'a2')).toBeUndefined();
 	expect(collection.size).toBe(2);
 });
 
@@ -103,10 +120,10 @@ test('Indexed_Collection - multi index operations', () => {
 	});
 
 	// Add items with shared categories
-	const item1 = create_test_item('apple', 'fruit');
-	const item2 = create_test_item('banana', 'fruit');
-	const item3 = create_test_item('carrot', 'vegetable');
-	const item4 = create_test_item('lettuce', 'vegetable');
+	const item1 = create_test_item('a1', 'c1');
+	const item2 = create_test_item('a2', 'c1');
+	const item3 = create_test_item('a3', 'c2');
+	const item4 = create_test_item('a4', 'c2');
 
 	collection.add(item1);
 	collection.add(item2);
@@ -114,65 +131,49 @@ test('Indexed_Collection - multi index operations', () => {
 	collection.add(item4);
 
 	// Test multi-index lookup
-	expect(collection.where<string>('by_category', 'fruit')).toHaveLength(2);
-	const fruit_items = collection.where<string>('by_category', 'fruit');
-	expect(fruit_items.some((item) => item.id === item1.id)).toBe(true);
-	expect(fruit_items.some((item) => item.id === item2.id)).toBe(true);
+	expect(collection.where<string>('by_category', 'c1')).toHaveLength(2);
+	const c1_items = collection.where<string>('by_category', 'c1');
+	expect(c1_items.some((item) => item.id === item1.id)).toBe(true);
+	expect(c1_items.some((item) => item.id === item2.id)).toBe(true);
 
-	expect(collection.where<string>('by_category', 'vegetable')).toHaveLength(2);
-	const vegetable_items = collection.where<string>('by_category', 'vegetable');
-	expect(vegetable_items.some((item) => item.id === item3.id)).toBe(true);
-	expect(vegetable_items.some((item) => item.id === item4.id)).toBe(true);
+	expect(collection.where<string>('by_category', 'c2')).toHaveLength(2);
+	const c2_items = collection.where<string>('by_category', 'c2');
+	expect(c2_items.some((item) => item.id === item3.id)).toBe(true);
+	expect(c2_items.some((item) => item.id === item4.id)).toBe(true);
 
 	// Test first/latest with limit
-	expect(collection.first<string>('by_category', 'fruit', 1)).toHaveLength(1);
-	expect(collection.first<string>('by_category', 'fruit', 1)[0].id).toBe(item1.id);
-	expect(collection.latest<string>('by_category', 'vegetable', 1)).toHaveLength(1);
-	expect(collection.latest<string>('by_category', 'vegetable', 1)[0].id).toBe(item4.id);
+	expect(collection.first<string>('by_category', 'c1', 1)).toHaveLength(1);
+	expect(collection.first<string>('by_category', 'c1', 1)[0].id).toBe(item1.id);
+	expect(collection.latest<string>('by_category', 'c2', 1)).toHaveLength(1);
+	expect(collection.latest<string>('by_category', 'c2', 1)[0].id).toBe(item4.id);
 
 	// Test index update on removal
 	collection.remove(item1.id);
-	expect(collection.where<string>('by_category', 'fruit')).toHaveLength(1);
-	expect(collection.where<string>('by_category', 'fruit')[0].id).toBe(item2.id);
+	expect(collection.where<string>('by_category', 'c1')).toHaveLength(1);
+	expect(collection.where<string>('by_category', 'c1')[0].id).toBe(item2.id);
 });
 
 test('Indexed_Collection - derived index operations', () => {
-	const item_schema = z.custom<Test_Item>((val) => val && typeof val === 'object' && 'id' in val);
-	const item_array_schema = z.array(item_schema);
-
 	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
 		indexes: [
-			{
-				key: 'high_priority',
-				type: 'derived',
-				compute: (collection) => collection.all.filter((item) => item.priority > 5),
-				output_schema: item_array_schema,
-				input_schema: z.void(),
-				matches: (item) => item.priority > 5,
-				on_add: (items, item) => {
-					if (item.priority > 5) {
-						items.push(item);
-						// Keep sorted by priority (highest first)
-						items.sort((a, b) => b.priority - a.priority);
-					}
-					return items;
+			create_derived_index<Test_Item>(
+				'high_priority',
+				(collection) => collection.all.filter((item) => item.priority > 5),
+				{
+					matches: (item) => item.priority > 5,
+					sort: (a, b) => b.priority - a.priority,
+					input_schema: z.void(),
+					output_schema: item_array_schema,
 				},
-				on_remove: (items, item) => {
-					const index = items.findIndex((i: Test_Item) => i.id === item.id);
-					if (index !== -1) {
-						items.splice(index, 1);
-					}
-					return items;
-				},
-			},
+			),
 		],
 	});
 
 	// Add items with various priorities
-	const item1 = create_test_item('task1', 'work', [], 8);
-	const item2 = create_test_item('task2', 'home', [], 3);
-	const item3 = create_test_item('task3', 'work', [], 10);
-	const item4 = create_test_item('task4', 'home', [], 6);
+	const item1 = create_test_item('a1', 'c1', [], 8);
+	const item2 = create_test_item('a2', 'c2', [], 3);
+	const item3 = create_test_item('a3', 'c1', [], 10);
+	const item4 = create_test_item('a4', 'c2', [], 6);
 
 	collection.add(item1);
 	collection.add(item2);
@@ -183,17 +184,17 @@ test('Indexed_Collection - derived index operations', () => {
 	const high_priority = collection.get_derived('high_priority');
 	expect(high_priority).toHaveLength(3);
 	// Compare by ID instead of reference
-	expect(high_priority[0].id).toBe(item3.id); // Highest priority first
-	expect(high_priority[1].id).toBe(item1.id);
-	expect(high_priority[2].id).toBe(item4.id);
-	expect(high_priority.some((item) => item.id === item2.id)).toBe(false); // Low priority excluded
+	expect(high_priority[0].id).toBe(item3.id); // Highest priority first (10)
+	expect(high_priority[1].id).toBe(item1.id); // Second priority (8)
+	expect(high_priority[2].id).toBe(item4.id); // Third priority (6)
+	expect(high_priority.some((item) => item.id === item2.id)).toBe(false); // Low priority excluded (3)
 
 	// Test direct access via get_index
 	const high_priority_via_index = collection.get_index('high_priority');
 	expect(high_priority_via_index).toEqual(high_priority);
 
 	// Test incremental update
-	const item5 = create_test_item('task5', 'work', [], 9);
+	const item5 = create_test_item('a5', 'c1', [], 9);
 	collection.add(item5);
 
 	const updated_high_priority = collection.get_derived('high_priority');
@@ -211,156 +212,42 @@ test('Indexed_Collection - derived index operations', () => {
 });
 
 test('Indexed_Collection - combined indexing strategies', () => {
-	const item_schema = z.custom<Test_Item>((val) => val && typeof val === 'object' && 'id' in val);
-	const item_array_schema = z.array(item_schema);
-
-	// Create strongly typed map schemas to ensure proper typing in callbacks
-	const name_map_schema = z.custom<SvelteMap<string, Test_Item>>((val) => val instanceof SvelteMap);
-	const category_map_schema = z.custom<SvelteMap<string, Array<Test_Item>>>(
-		(val) => val instanceof SvelteMap,
-	);
-	const tag_map_schema = z.custom<SvelteMap<string, Array<Test_Item>>>(
-		(val) => val instanceof SvelteMap,
-	);
-
 	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
 		indexes: [
-			{
-				key: 'by_name',
-				type: 'single',
-				extractor: (item) => item.name,
-				input_schema: z.string(),
-				output_schema: name_map_schema,
-				compute: (collection) => {
-					const map: SvelteMap<string, Test_Item> = new SvelteMap();
-					for (const item of collection.all) {
-						map.set(item.name, item);
-					}
-					return map;
-				},
-				on_add: (map, item) => {
-					map.set(item.name, item);
-					return map;
-				},
-				on_remove: (map, item) => {
-					if (map.get(item.name) === item) {
-						map.delete(item.name);
-					}
-					return map;
-				},
-			},
-			{
-				key: 'by_category',
-				type: 'multi',
-				extractor: (item) => item.category,
-				input_schema: z.string(),
-				output_schema: category_map_schema,
-				compute: (collection) => {
-					const map: SvelteMap<string, Array<Test_Item>> = new SvelteMap();
-					for (const item of collection.all) {
-						const items = map.get(item.category) || [];
-						items.push(item);
-						map.set(item.category, items);
-					}
-					return map;
-				},
-				on_add: (map, item) => {
-					const items = map.get(item.category) || [];
-					items.push(item);
-					map.set(item.category, items);
-					return map;
-				},
-				on_remove: (map, item) => {
-					const items = map.get(item.category);
-					if (items) {
-						const updated = items.filter((i: Test_Item) => i.id !== item.id);
-						if (updated.length === 0) {
-							map.delete(item.category);
-						} else {
-							map.set(item.category, updated);
-						}
-					}
-					return map;
-				},
-			},
-			{
-				key: 'by_tag',
-				type: 'multi',
-				extractor: (item) => item.tags[0],
-				input_schema: z.string(),
-				output_schema: tag_map_schema,
-				compute: (collection) => {
-					const map: SvelteMap<string, Array<Test_Item>> = new SvelteMap();
-					for (const item of collection.all) {
-						if (item.tags[0]) {
-							const items = map.get(item.tags[0]) || [];
-							items.push(item);
-							map.set(item.tags[0], items);
-						}
-					}
-					return map;
-				},
-				on_add: (map, item) => {
-					if (item.tags[0]) {
-						const items = map.get(item.tags[0]) || [];
-						items.push(item);
-						map.set(item.tags[0], items);
-					}
-					return map;
-				},
-				on_remove: (map, item) => {
-					if (item.tags[0]) {
-						const items = map.get(item.tags[0]);
-						if (items) {
-							const updated = items.filter((i: Test_Item) => i.id !== item.id);
-							if (updated.length === 0) {
-								map.delete(item.tags[0]);
-							} else {
-								map.set(item.tags[0], updated);
-							}
-						}
-					}
-					return map;
-				},
-			},
-			{
-				key: 'recent_high_priority',
-				type: 'derived',
-				compute: (collection) => {
+			create_single_index<Test_Item, string>('by_name', (item) => item.name, z.string()),
+			create_multi_index<Test_Item, string>('by_category', (item) => item.category, z.string()),
+			create_multi_index<Test_Item, string>('by_tag', (item) => item.tags[0], z.string()),
+			create_derived_index<Test_Item>(
+				'recent_high_priority',
+				(collection) => {
 					return collection.all
 						.filter((item) => item.priority >= 8)
 						.sort((a, b) => b.created.getTime() - a.created.getTime());
 				},
-				input_schema: z.void(),
-				output_schema: item_array_schema,
-				matches: (item) => item.priority >= 8,
-				// Add on_add handler to correctly populate the index
-				on_add: (items, item) => {
-					if (item.priority >= 8) {
-						items.push(item);
-						// Sort by creation date (newest first)
-						items.sort((a, b) => b.created.getTime() - a.created.getTime());
-					}
-					return items;
+				{
+					matches: (item) => item.priority >= 8,
+					sort: (a, b) => b.created.getTime() - a.created.getTime(),
+					input_schema: z.void(),
+					output_schema: item_array_schema,
 				},
-			},
+			),
 		],
 	});
 
 	// Create items with a mix of properties
-	const item1 = create_test_item('apple', 'fruit', ['red', 'sweet'], 9);
-	const item2 = create_test_item('banana', 'fruit', ['yellow', 'sweet'], 7);
-	const item3 = create_test_item('carrot', 'vegetable', ['orange', 'crunchy'], 3);
-	const item4 = create_test_item('dragonfruit', 'fruit', ['pink', 'exotic'], 10);
+	const item1 = create_test_item('a1', 'c1', ['t1', 't2'], 9);
+	const item2 = create_test_item('a2', 'c1', ['t3', 't4'], 7);
+	const item3 = create_test_item('a3', 'c2', ['t5', 't6'], 3);
+	const item4 = create_test_item('a4', 'c1', ['t7', 't8'], 10);
 
 	collection.add_many([item1, item2, item3, item4]);
 
 	// Test single index lookup
-	expect(collection.by_optional<string>('by_name', 'apple')?.id).toBe(item1.id);
+	expect(collection.by_optional<string>('by_name', 'a1')?.id).toBe(item1.id);
 
 	// Test multi index lookup
-	expect(collection.where<string>('by_category', 'fruit')).toHaveLength(3);
-	expect(collection.where<string>('by_tag', 'red').some((item) => item.id === item1.id)).toBe(true);
+	expect(collection.where<string>('by_category', 'c1')).toHaveLength(3);
+	expect(collection.where<string>('by_tag', 't1').some((item) => item.id === item1.id)).toBe(true);
 
 	// Test derived index
 	const high_priority = collection.get_derived('recent_high_priority');
@@ -373,9 +260,9 @@ test('Indexed_Collection - combined indexing strategies', () => {
 test('Indexed_Collection - add_first and ordering', () => {
 	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection();
 
-	const item1 = create_test_item('first', 'test');
-	const item2 = create_test_item('second', 'test');
-	const item3 = create_test_item('third', 'test');
+	const item1 = create_test_item('a1', 'c1');
+	const item2 = create_test_item('a2', 'c1');
+	const item3 = create_test_item('a3', 'c1');
 
 	// Add in specific order
 	collection.add(item1);
@@ -388,7 +275,7 @@ test('Indexed_Collection - add_first and ordering', () => {
 	expect(collection.all[2].id).toBe(item3.id);
 
 	// Test insert_at
-	const item4 = create_test_item('inserted', 'test');
+	const item4 = create_test_item('a4', 'c1');
 	collection.insert_at(item4, 1);
 
 	expect(collection.all[0].id).toBe(item2.id);
@@ -401,39 +288,35 @@ test('Indexed_Collection - reorder items', () => {
 	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection();
 
 	const items = [
-		create_test_item('a', 'test'),
-		create_test_item('b', 'test'),
-		create_test_item('c', 'test'),
-		create_test_item('d', 'test'),
+		create_test_item('a1', 'c1'),
+		create_test_item('a2', 'c1'),
+		create_test_item('a3', 'c1'),
+		create_test_item('a4', 'c1'),
 	];
 
 	collection.add_many(items);
 
-	// Initial order: a, b, c, d
-	expect(collection.all[0].name).toBe('a');
-	expect(collection.all[3].name).toBe('d');
+	// Initial order: a1, a2, a3, a4
+	expect(collection.all[0].name).toBe('a1');
+	expect(collection.all[3].name).toBe('a4');
 
-	// Move 'a' to position 2
+	// Move 'a1' to position 2
 	collection.reorder(0, 2);
 
-	// New order should be: b, c, a, d
-	expect(collection.all[0].name).toBe('b');
-	expect(collection.all[1].name).toBe('c');
-	expect(collection.all[2].name).toBe('a');
-	expect(collection.all[3].name).toBe('d');
+	// New order should be: a2, a3, a1, a4
+	expect(collection.all[0].name).toBe('a2');
+	expect(collection.all[1].name).toBe('a3');
+	expect(collection.all[2].name).toBe('a1');
+	expect(collection.all[3].name).toBe('a4');
 });
 
 test('Indexed_Collection - function indexes', () => {
-	// Define schema for a function that takes a string and returns an array of Test_Item
-	const function_schema = z.function().args(z.string()).returns(z.array(z.custom<Test_Item>()));
-
-	// Test a function-based index
+	// Test a function-based index using the new helper function
 	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
 		indexes: [
-			{
-				key: 'by_priority_rank',
-				compute: () => {
-					// Create a function that returns items by priority level
+			create_dynamic_index<Test_Item, (priority_level: string) => Array<Test_Item>>(
+				'by_priority_rank',
+				(collection) => {
 					return (priority_level: string) => {
 						if (priority_level === 'high') {
 							return collection.all.filter((item) => item.priority >= 8);
@@ -444,21 +327,19 @@ test('Indexed_Collection - function indexes', () => {
 						}
 					};
 				},
-				input_schema: z.string(),
-				output_schema: function_schema,
-				on_add: (fn) => fn, // Just keep the function as is
-				on_remove: (fn) => fn, // Just keep the function as is
-			},
+				z.string(),
+				dynamic_function_schema,
+			),
 		],
 	});
 
 	// Add items with different priorities
-	collection.add(create_test_item('high1', 'test', [], 10));
-	collection.add(create_test_item('high2', 'test', [], 8));
-	collection.add(create_test_item('medium1', 'test', [], 7));
-	collection.add(create_test_item('medium2', 'test', [], 5));
-	collection.add(create_test_item('low1', 'test', [], 3));
-	collection.add(create_test_item('low2', 'test', [], 1));
+	collection.add(create_test_item('a1', 'c1', [], 10));
+	collection.add(create_test_item('a2', 'c1', [], 8));
+	collection.add(create_test_item('a3', 'c1', [], 7));
+	collection.add(create_test_item('a4', 'c1', [], 5));
+	collection.add(create_test_item('a5', 'c1', [], 3));
+	collection.add(create_test_item('a6', 'c1', [], 1));
 
 	// The index is a function that can be queried
 	const priority_fn = collection.get_index<(level: string) => Array<Test_Item>>('by_priority_rank');
@@ -475,60 +356,53 @@ test('Indexed_Collection - function indexes', () => {
 });
 
 test('Indexed_Collection - complex data structures', () => {
-	// Define schema for stats object
-	const stats_schema = z.object({
-		count: z.number(),
-		average_priority: z.number(),
-		categories: z.custom<Set<string>>((val) => val instanceof Set),
+	// Create a custom helper function for this specialized case
+	const create_stats_index = <T extends Indexed_Item>(key: string) => ({
+		key,
+		compute: (collection: Indexed_Collection<T>) => {
+			const items = collection.all;
+			return {
+				count: items.length,
+				average_priority:
+					items.reduce((sum, item: any) => sum + item.priority, 0) / (items.length || 1),
+				categories: new Set(items.map((item: any) => item.category)),
+			};
+		},
+		input_schema: z.void(),
+		output_schema: stats_schema,
+		on_add: (stats: any, item: any) => {
+			stats.count++;
+			stats.average_priority =
+				(stats.average_priority * (stats.count - 1) + item.priority) / stats.count;
+			stats.categories.add(item.category);
+			return stats;
+		},
+		on_remove: (stats: any, item: any, collection: Indexed_Collection<T>) => {
+			stats.count--;
+			if (stats.count === 0) {
+				stats.average_priority = 0;
+			} else {
+				stats.average_priority =
+					(stats.average_priority * (stats.count + 1) - item.priority) / stats.count;
+			}
+
+			// Rebuild categories set if needed (we don't know if other items use this category)
+			const all_categories = new Set(
+				collection.all.filter((i) => i.id !== item.id).map((i: any) => i.category),
+			);
+			stats.categories = all_categories;
+
+			return stats;
+		},
 	});
 
-	// Test an index that produces a complex data structure
 	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
-		indexes: [
-			{
-				key: 'stats',
-				compute: (collection) => {
-					const items = collection.all;
-					return {
-						count: items.length,
-						average_priority:
-							items.reduce((sum, item) => sum + item.priority, 0) / (items.length || 1),
-						categories: new Set(items.map((item) => item.category)),
-					};
-				},
-				input_schema: z.void(),
-				output_schema: stats_schema,
-				on_add: (stats, item) => {
-					stats.count++;
-					stats.average_priority =
-						(stats.average_priority * (stats.count - 1) + item.priority) / stats.count;
-					stats.categories.add(item.category);
-					return stats;
-				},
-				on_remove: (stats, item) => {
-					stats.count--;
-					if (stats.count === 0) {
-						stats.average_priority = 0;
-					} else {
-						stats.average_priority =
-							(stats.average_priority * (stats.count + 1) - item.priority) / stats.count;
-					}
-
-					// Rebuild categories set if needed (we don't know if other items use this category)
-					const all_categories = new Set(
-						collection.all.filter((i) => i.id !== item.id).map((i) => i.category),
-					);
-					stats.categories = all_categories;
-
-					return stats;
-				},
-			},
-		],
+		indexes: [create_stats_index<Test_Item>('stats')],
 	});
 
 	// Add items
-	collection.add(create_test_item('item1', 'category1', [], 10));
-	collection.add(create_test_item('item2', 'category2', [], 20));
+	collection.add(create_test_item('a1', 'c1', [], 10));
+	collection.add(create_test_item('a2', 'c2', [], 20));
 
 	// Test complex index structure
 	const stats = collection.get_index<{
@@ -540,10 +414,10 @@ test('Indexed_Collection - complex data structures', () => {
 	expect(stats.count).toBe(2);
 	expect(stats.average_priority).toBe(15);
 	expect(stats.categories.size).toBe(2);
-	expect(stats.categories.has('category1')).toBe(true);
+	expect(stats.categories.has('c1')).toBe(true);
 
 	// Test updating the complex structure
-	collection.add(create_test_item('item3', 'category1', [], 30));
+	collection.add(create_test_item('a3', 'c1', [], 30));
 
 	expect(stats.count).toBe(3);
 	expect(stats.average_priority).toBe(20);

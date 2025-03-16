@@ -53,7 +53,7 @@ export interface Index_Definition<T extends Indexed_Item, T_Result = any, T_Quer
 }
 
 export interface Indexed_Collection_Options<T extends Indexed_Item> {
-	indexes?: Array<Index_Definition<T, any, any>>;
+	indexes?: Array<Index_Definition<T>>; // TODO @many should we be passing through `, T_Result = any, T_Query = any` here?
 	initial_items?: Array<T>;
 	validate?: boolean; // Optional validation flag
 }
@@ -73,7 +73,7 @@ export class Indexed_Collection<T extends Indexed_Item> {
 	readonly indexes: Record<string, any> = $state({});
 
 	// Store all index configs for reference - using tuple typing for better type safety
-	#index_definitions: ReadonlyArray<Index_Definition<T, any, any>> = [];
+	#index_definitions: ReadonlyArray<Index_Definition<T>> = []; // TODO @many should we be passing through `, T_Result = any, T_Query = any` here?
 
 	// Whether to validate indexes
 	readonly #validate: boolean;

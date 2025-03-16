@@ -4,7 +4,8 @@ import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Model, Model_Json} from '$lib/model.svelte.js';
 import type {Ollama_Model_Info} from '$lib/ollama.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
-import {Indexed_Collection, Index_Type} from '$lib/indexed_collection.svelte.js';
+import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
+import {create_single_index, create_multi_index} from '$lib/indexed_collection_helpers.js';
 
 export const Models_Json = z
 	.object({
@@ -24,21 +25,18 @@ export interface Models_Options extends Cell_Options<typeof Models_Json> {} // e
 export class Models extends Cell<typeof Models_Json> {
 	readonly items: Indexed_Collection<Model> = new Indexed_Collection({
 		indexes: [
-			{
-				key: 'name',
-				type: 'single',
-				extractor: (model: Model) => model.name,
-			},
-			{
-				key: 'provider_name',
-				type: Index_Type.MULTI,
-				extractor: (model: Model) => model.provider_name,
-			},
-			{
-				key: 'tag',
-				type: Index_Type.MULTI,
-				extractor: (model: Model) => model.tags[0], // Index first tag for efficiency
-			},
+			create_single_index<Model, string>('name', (model: Model) => model.name),
+
+			create_multi_index<Model, string>('provider_name', (model: Model) => model.provider_name),
+
+			create_multi_index<Model, string>(
+				'tag',
+				(model: Model) => model.tags[0], // Index first tag for efficiency
+				undefined,
+				{
+					matches: (model) => model.tags.length > 0,
+				},
+			),
 		],
 	});
 
