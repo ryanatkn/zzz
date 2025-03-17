@@ -19,7 +19,7 @@ interface Edge_Test_Item {
 	id: Uuid;
 	name: string;
 	value: number | null;
-	tags: Array<string>;
+	things: Array<string>;
 	active: boolean;
 }
 
@@ -27,13 +27,13 @@ interface Edge_Test_Item {
 const create_edge_item = (
 	name: string,
 	value: number | null = 0,
-	tags: Array<string> = [],
+	things: Array<string> = [],
 	active = true,
 ): Edge_Test_Item => ({
 	id: Uuid.parse(undefined),
 	name,
 	value,
-	tags,
+	things,
 	active,
 });
 
@@ -51,18 +51,18 @@ describe('Indexed_Collection - Edge Cases', () => {
 
 				// Multi-index that handles undefined values safely
 				create_multi_index({
-					key: 'by_tag',
-					extractor: (item) => (item.tags.length > 0 ? item.tags : undefined),
+					key: 'by_thing',
+					extractor: (item) => (item.things.length > 0 ? item.things : undefined),
 					query_schema: z.string(),
 				}),
 			],
 		});
 
 		// Add items with edge case values
-		const item1 = create_edge_item('item1', 5, ['tag1']);
-		const item2 = create_edge_item('item2', null, ['tag2']);
-		const item3 = create_edge_item('item3', 10, []); // No tags
-		const item4 = create_edge_item('item4', 15, ['tag1', 'tag3']);
+		const item1 = create_edge_item('item1', 5, ['thing1']);
+		const item2 = create_edge_item('item2', null, ['thing2']);
+		const item3 = create_edge_item('item3', 10, []); // No things
+		const item4 = create_edge_item('item4', 15, ['thing1', 'thing3']);
 
 		collection.add_many([item1, item2, item3, item4]);
 
@@ -72,20 +72,20 @@ describe('Indexed_Collection - Edge Cases', () => {
 		// Test filtering with null values
 		expect(collection.by_optional('by_value', 999)).toBeUndefined(); // Non-existing value
 
-		// Test multi-index with shared tags
-		const tag1_items = collection.where('by_tag', 'tag1');
-		expect(tag1_items.length).toBe(2);
-		expect(tag1_items.map((i) => i.name).sort()).toEqual(['item1', 'item4'].sort());
+		// Test multi-index with shared things
+		const thing1_items = collection.where('by_thing', 'thing1');
+		expect(thing1_items.length).toBe(2);
+		expect(thing1_items.map((i) => i.name).sort()).toEqual(['item1', 'item4'].sort());
 
-		// Item with empty tags array should be excluded from by_tag index
-		expect(collection.where('by_tag', undefined)).toHaveLength(0);
+		// Item with empty things array should be excluded from by_thing index
+		expect(collection.where('by_thing', undefined)).toHaveLength(0);
 
 		// Test removing an item with null value
 		collection.remove(item2.id);
 		expect(collection.by_optional('by_value', null)).toBeUndefined();
 
 		// Add another item with null value
-		const item5 = create_edge_item('item5', null, ['tag5']);
+		const item5 = create_edge_item('item5', null, ['thing5']);
 		collection.add(item5);
 		expect(collection.by_optional('by_value', null)?.name).toBe('item5');
 	});
@@ -150,8 +150,8 @@ describe('Indexed_Collection - Edge Cases', () => {
 				}),
 
 				create_multi_index({
-					key: 'by_tag',
-					extractor: (item) => item.tags,
+					key: 'by_thing',
+					extractor: (item) => item.things,
 					query_schema: z.string(),
 				}),
 
@@ -172,8 +172,8 @@ describe('Indexed_Collection - Edge Cases', () => {
 		const large_batch = Array.from({length: 100}, (_, i) => {
 			const active = i % 3 === 0;
 			const value = i % 5 === 0 ? null : i;
-			const tags = [`tag${i % 10}`, `group${i % 5}`];
-			return create_edge_item(`item${i}`, value, tags, active);
+			const things = [`thing${i % 10}`, `group${i % 5}`];
+			return create_edge_item(`item${i}`, value, things, active);
 		});
 
 		// Measure time to add all items
@@ -190,7 +190,7 @@ describe('Indexed_Collection - Edge Cases', () => {
 
 		// Test various queries against the indexes
 		expect(collection.by_optional('by_name', 'item23')?.value).toBe(23);
-		expect(collection.where('by_tag', 'tag5').length).toBe(10); // 10% of items have tag5
+		expect(collection.where('by_thing', 'thing5').length).toBe(10); // 10% of items have thing5
 		expect(collection.get_derived('active_by_value').length).toBe(
 			large_batch.filter((i) => i.active && i.value !== null).length,
 		);
@@ -215,15 +215,15 @@ describe('Indexed_Collection - Edge Cases', () => {
 					query_schema: z.string(),
 				}),
 				create_multi_index({
-					key: 'by_tag',
-					extractor: (item) => item.tags,
+					key: 'by_thing',
+					extractor: (item) => item.things,
 					query_schema: z.string(),
 				}),
 			],
 		});
 
 		// Add a test item
-		collection.add(create_edge_item('test1', 1, ['tag1']));
+		collection.add(create_edge_item('test1', 1, ['thing1']));
 
 		// Test accessing indexes with wrong methods
 		expect(() => {
@@ -231,7 +231,7 @@ describe('Indexed_Collection - Edge Cases', () => {
 		}).toThrow(); // Should throw error about index type mismatch
 
 		expect(() => {
-			collection.by<string>('by_tag', 'tag1'); // Using single-index method on multi-index
+			collection.by<string>('by_thing', 'thing1'); // Using single-index method on multi-index
 		}).toThrow(); // Should throw error about index type mismatch
 	});
 
@@ -353,9 +353,9 @@ describe('Indexed_Collection - Edge Cases', () => {
 							active_count: collection.all.filter((i) => i.active).length,
 							inactive_count: collection.all.filter((i) => !i.active).length,
 							total_value: collection.all.reduce((sum, i) => sum + (i.value || 0), 0),
-							tags_frequency: collection.all.reduce<Record<string, number>>((freq, item) => {
-								for (const tag of item.tags) {
-									freq[tag] = (freq[tag] || 0) + 1;
+							things_frequency: collection.all.reduce<Record<string, number>>((freq, item) => {
+								for (const thing of item.things) {
+									freq[thing] = (freq[thing] || 0) + 1;
 								}
 								return freq;
 							}, {}),
@@ -367,9 +367,9 @@ describe('Indexed_Collection - Edge Cases', () => {
 						else stats.inactive_count++;
 						stats.total_value += item.value || 0;
 
-						// Update tag frequencies
-						for (const tag of item.tags) {
-							stats.tags_frequency[tag] = (stats.tags_frequency[tag] || 0) + 1;
+						// Update thing frequencies
+						for (const thing of item.things) {
+							stats.things_frequency[thing] = (stats.things_frequency[thing] || 0) + 1;
 						}
 
 						return stats;
@@ -380,11 +380,11 @@ describe('Indexed_Collection - Edge Cases', () => {
 						else stats.inactive_count--;
 						stats.total_value -= item.value || 0;
 
-						// Update tag frequencies
-						for (const tag of item.tags) {
-							stats.tags_frequency[tag]--;
-							if (stats.tags_frequency[tag] === 0) {
-								delete stats.tags_frequency[tag]; // eslint-disable-line @typescript-eslint/no-dynamic-delete
+						// Update thing frequencies
+						for (const thing of item.things) {
+							stats.things_frequency[thing]--;
+							if (stats.things_frequency[thing] === 0) {
+								delete stats.things_frequency[thing]; // eslint-disable-line @typescript-eslint/no-dynamic-delete
 							}
 						}
 						return stats;
@@ -394,16 +394,16 @@ describe('Indexed_Collection - Edge Cases', () => {
 						active_count: z.number(),
 						inactive_count: z.number(),
 						total_value: z.number(),
-						tags_frequency: z.record(z.string(), z.number()),
+						things_frequency: z.record(z.string(), z.number()),
 					}),
 				},
 			],
 		});
 
 		// Add items to test stats tracking
-		const item1 = create_edge_item('item1', 10, ['tag1', 'tag2'], true);
-		const item2 = create_edge_item('item2', 20, ['tag2', 'tag3'], false);
-		const item3 = create_edge_item('item3', 30, ['tag1', 'tag3'], true);
+		const item1 = create_edge_item('item1', 10, ['thing1', 'thing2'], true);
+		const item2 = create_edge_item('item2', 20, ['thing2', 'thing3'], false);
+		const item3 = create_edge_item('item3', 30, ['thing1', 'thing3'], true);
 
 		collection.add(item1);
 		collection.add(item2);
@@ -415,28 +415,28 @@ describe('Indexed_Collection - Edge Cases', () => {
 			active_count: number;
 			inactive_count: number;
 			total_value: number;
-			tags_frequency: Record<string, number>;
+			things_frequency: Record<string, number>;
 		}>('stats');
 
 		expect(stats.total_items).toBe(3);
 		expect(stats.active_count).toBe(2);
 		expect(stats.inactive_count).toBe(1);
 		expect(stats.total_value).toBe(60);
-		expect(stats.tags_frequency).toEqual({
-			tag1: 2,
-			tag2: 2,
-			tag3: 2,
+		expect(stats.things_frequency).toEqual({
+			thing1: 2,
+			thing2: 2,
+			thing3: 2,
 		});
 
 		// Test incremental update - add an item
-		collection.add(create_edge_item('item4', 40, ['tag1', 'tag4'], false));
+		collection.add(create_edge_item('item4', 40, ['thing1', 'thing4'], false));
 
 		expect(stats.total_items).toBe(4);
 		expect(stats.active_count).toBe(2);
 		expect(stats.inactive_count).toBe(2);
 		expect(stats.total_value).toBe(100);
-		expect(stats.tags_frequency.tag1).toBe(3);
-		expect(stats.tags_frequency.tag4).toBe(1);
+		expect(stats.things_frequency.thing1).toBe(3);
+		expect(stats.things_frequency.thing4).toBe(1);
 
 		// Test incremental update - remove an item
 		// Store the item reference first to ensure it exists
@@ -448,7 +448,7 @@ describe('Indexed_Collection - Edge Cases', () => {
 		expect(stats.active_count).toBe(1);
 		expect(stats.inactive_count).toBe(2);
 		expect(stats.total_value).toBe(90);
-		expect(stats.tags_frequency.tag1).toBe(2);
-		expect(stats.tags_frequency.tag2).toBe(1);
+		expect(stats.things_frequency.thing1).toBe(2);
+		expect(stats.things_frequency.thing2).toBe(1);
 	});
 });

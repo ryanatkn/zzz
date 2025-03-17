@@ -16,7 +16,7 @@ interface Test_Document {
 	id: Uuid;
 	title: string;
 	author: string;
-	tags: Array<string>;
+	things: Array<string>;
 	category: string;
 	created: Date;
 	rating: number;
@@ -28,7 +28,7 @@ const create_document = (overrides: Partial<Test_Document> = {}): Test_Document 
 	id: Uuid.parse(undefined),
 	title: 'default_title',
 	author: 'default_author',
-	tags: ['tag1'],
+	things: ['thing1'],
 	category: 'category1',
 	created: new Date(),
 	rating: 3,
@@ -67,8 +67,8 @@ describe('Indexed_Collection - Query Capabilities', () => {
 					query_schema: z.string(),
 				}),
 				create_multi_index({
-					key: 'by_tag',
-					extractor: (doc) => doc.tags,
+					key: 'by_thing',
+					extractor: (doc) => doc.things,
 					query_schema: z.string(),
 				}),
 				create_multi_index({
@@ -152,7 +152,7 @@ describe('Indexed_Collection - Query Capabilities', () => {
 			create_document({
 				title: 'doc_a1',
 				author: 'author_a',
-				tags: ['tag1', 'tag2', 'tag3'],
+				things: ['thing1', 'thing2', 'thing3'],
 				category: 'category_a',
 				created: new Date(now - 1000 * 60 * 60 * 24 * 10), // 10 days ago
 				rating: 4,
@@ -161,7 +161,7 @@ describe('Indexed_Collection - Query Capabilities', () => {
 			create_document({
 				title: 'doc_a2',
 				author: 'author_b',
-				tags: ['tag1', 'tag4'],
+				things: ['thing1', 'thing4'],
 				category: 'category_a',
 				created: new Date(now - 1000 * 60 * 60 * 24 * 20), // 20 days ago
 				rating: 5,
@@ -170,7 +170,7 @@ describe('Indexed_Collection - Query Capabilities', () => {
 			create_document({
 				title: 'doc_b1',
 				author: 'author_a',
-				tags: ['tag2', 'tag5'],
+				things: ['thing2', 'thing5'],
 				category: 'category_b',
 				created: new Date(now - 1000 * 60 * 60 * 24 * 5), // 5 days ago
 				rating: 4,
@@ -179,7 +179,7 @@ describe('Indexed_Collection - Query Capabilities', () => {
 			create_document({
 				title: 'doc_c1',
 				author: 'author_c',
-				tags: ['tag3', 'tag6'],
+				things: ['thing3', 'thing6'],
 				category: 'category_c',
 				created: new Date(now - 1000 * 60 * 60 * 24 * 30), // 30 days ago
 				rating: 3,
@@ -188,7 +188,7 @@ describe('Indexed_Collection - Query Capabilities', () => {
 			create_document({
 				title: 'doc_b2',
 				author: 'author_c',
-				tags: ['tag1', 'tag5'],
+				things: ['thing1', 'thing5'],
 				category: 'category_b',
 				created: new Date(now - 1000 * 60 * 60 * 24 * 3), // 3 days ago
 				rating: 5,
@@ -241,18 +241,18 @@ describe('Indexed_Collection - Query Capabilities', () => {
 	});
 
 	test('queries with array values', () => {
-		// Query by tag (checks if any tag matches)
-		const tag1_docs = collection.where('by_tag', 'tag1');
-		expect(tag1_docs).toHaveLength(3);
-		expect(tag1_docs.map((d) => d.title)).toContain('doc_a1');
-		expect(tag1_docs.map((d) => d.title)).toContain('doc_a2');
-		expect(tag1_docs.map((d) => d.title)).toContain('doc_b2');
+		// Query by thing (checks if any thing matches)
+		const thing1_docs = collection.where('by_thing', 'thing1');
+		expect(thing1_docs).toHaveLength(3);
+		expect(thing1_docs.map((d) => d.title)).toContain('doc_a1');
+		expect(thing1_docs.map((d) => d.title)).toContain('doc_a2');
+		expect(thing1_docs.map((d) => d.title)).toContain('doc_b2');
 
-		// Multiple tag intersection (using multiple queries)
-		const tag2_docs = collection.where('by_tag', 'tag2');
-		const tag2_and_tag3_docs = tag2_docs.filter((doc) => doc.tags.includes('tag3'));
-		expect(tag2_and_tag3_docs).toHaveLength(1);
-		expect(tag2_and_tag3_docs[0].title).toBe('doc_a1');
+		// Multiple thing intersection (using multiple queries)
+		const thing2_docs = collection.where('by_thing', 'thing2');
+		const thing2_and_thing3_docs = thing2_docs.filter((doc) => doc.things.includes('thing3'));
+		expect(thing2_and_thing3_docs).toHaveLength(1);
+		expect(thing2_and_thing3_docs[0].title).toBe('doc_a1');
 	});
 
 	test('derived index queries', () => {
@@ -309,7 +309,7 @@ describe('Indexed_Collection - Query Capabilities', () => {
 		const new_doc = create_document({
 			title: 'doc_d1',
 			author: 'author_d',
-			tags: ['tag7'],
+			things: ['thing7'],
 			category: 'category_d',
 			created: new Date(), // Now (most recent)
 			rating: 5,

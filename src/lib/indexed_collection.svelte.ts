@@ -136,7 +136,7 @@ export class Indexed_Collection<
 				} else if (this.indexes[def.key] instanceof Array) {
 					this.#index_types.set(def.key, 'derived');
 				} else if (
-					this.indexes[def.key] instanceof Map && // also cover SvelteMap
+					this.indexes[def.key] instanceof Map && // also covers SvelteMap
 					Array.isArray(
 						[...this.indexes[def.key].values()].length > 0
 							? [...this.indexes[def.key].values()][0]

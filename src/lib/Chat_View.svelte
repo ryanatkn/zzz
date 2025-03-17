@@ -71,6 +71,8 @@
 	// TODO BLOCK custom buttons section - including quick local, smartest all, all, etc
 
 	// TODO BLOCK remove all tapes needs to open to the right of the button
+
+	const tags = $derived(Array.from(zzz.tags)); // TODO BLOCK refactor, maybe `zzz.tags_array`? or `zzz.tags.all`
 </script>
 
 <div class="flex_1 h_100 flex align_items_start">
@@ -81,7 +83,7 @@
 				<div class="flex_1 p_xs">
 					<header class="size_lg text_align_center mb_xs">add by tag</header>
 					<menu class="unstyled column">
-						{#each Array.from(zzz.tags) as tag (tag)}
+						{#each tags as tag (tag)}
 							<button
 								type="button"
 								class="w_100 size_sm py_xs3 justify_content_space_between plain radius_xs font_weight_600"
@@ -101,7 +103,7 @@
 				<div class="flex_1 p_xs fg_1">
 					<header class="size_lg text_align_center mb_xs">remove by tag</header>
 					<menu class="unstyled column">
-						{#each Array.from(zzz.tags) as tag (tag)}
+						{#each tags as tag (tag)}
 							{@const tapes_with_tag = chat.tapes.filter((t) => t.model.tags.includes(tag))}
 							<Confirm_Button
 								attrs={{

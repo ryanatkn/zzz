@@ -601,6 +601,7 @@ export const src_json = {
 				{name: 'Chat_Json', kind: 'variable'},
 				{name: 'Chat_Options', kind: 'type'},
 				{name: 'Chat', kind: 'class'},
+				{name: 'Chat_Schema', kind: 'variable'},
 			],
 		},
 		'./chats.svelte.js': {
@@ -685,6 +686,7 @@ export const src_json = {
 			declarations: [
 				{name: 'Diskfile_Options', kind: 'type'},
 				{name: 'Diskfile', kind: 'class'},
+				{name: 'Diskfile_Schema', kind: 'variable'},
 			],
 		},
 		'./diskfiles.svelte.js': {
@@ -748,6 +750,7 @@ export const src_json = {
 				{name: 'create_multi_index', kind: null},
 				{name: 'create_derived_index', kind: null},
 				{name: 'create_dynamic_index', kind: null},
+				{name: 'Svelte_Map_Schema', kind: 'variable'},
 				{name: 'Index_Options', kind: 'type'},
 				{name: 'Single_Index_Options', kind: 'type'},
 				{name: 'Multi_Index_Options', kind: 'type'},
@@ -762,10 +765,6 @@ export const src_json = {
 				{name: 'Index_Type', kind: 'type'},
 				{name: 'Index_Definition', kind: 'type'},
 				{name: 'Indexed_Collection_Options', kind: 'type'},
-				{name: 'T_Key_Single', kind: 'type'},
-				{name: 'T_Key_Multi', kind: 'type'},
-				{name: 'T_Key_Derived', kind: 'type'},
-				{name: 'T_Key_Dynamic', kind: 'type'},
 				{name: 'Indexed_Collection', kind: 'class'},
 			],
 		},
@@ -817,6 +816,7 @@ export const src_json = {
 				{name: 'MESSAGE_TIME_FORMAT', kind: 'variable'},
 				{name: 'Message_Options', kind: 'type'},
 				{name: 'Message', kind: 'class'},
+				{name: 'Message_Schema', kind: 'variable'},
 			],
 		},
 		'./Messages_List.svelte': {path: 'Messages_List.svelte', declarations: []},
@@ -843,6 +843,7 @@ export const src_json = {
 				{name: 'Model_Json', kind: 'variable'},
 				{name: 'Model_Options', kind: 'type'},
 				{name: 'Model', kind: 'class'},
+				{name: 'Model_Schema', kind: 'variable'},
 			],
 		},
 		'./models.svelte.js': {
@@ -905,6 +906,7 @@ export const src_json = {
 				{name: 'Prompt_Json', kind: 'variable'},
 				{name: 'Prompt_Options', kind: 'type'},
 				{name: 'Prompt', kind: 'class'},
+				{name: 'Prompt_Schema', kind: 'variable'},
 			],
 		},
 		'./prompts.svelte.js': {

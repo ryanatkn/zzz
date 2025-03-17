@@ -167,9 +167,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		// Initialize cell collections
 		this.time = new Time({zzz: this});
 		this.ui = new Ui({zzz: this});
-		console.log('[zzz] creating models');
 		this.models = new Models({zzz: this});
-		console.log('[zzz] created models');
 		this.chats = new Chats({zzz: this});
 		this.providers = new Providers({zzz: this});
 		this.prompts = new Prompts({zzz: this});

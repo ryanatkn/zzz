@@ -17,7 +17,7 @@ interface Test_Item {
 	id: Uuid;
 	name: string;
 	category: string;
-	tags: Array<string>;
+	things: Array<string>;
 	created: Date;
 	priority: number;
 }
@@ -26,13 +26,13 @@ interface Test_Item {
 const create_test_item = (
 	name: string,
 	category: string,
-	tags: Array<string> = [],
+	things: Array<string> = [],
 	priority: number = 0,
 ): Test_Item => ({
 	id: Uuid.parse(undefined),
 	name,
 	category,
-	tags,
+	things,
 	created: new Date(),
 	priority,
 });
@@ -236,8 +236,8 @@ test('Indexed_Collection - combined indexing strategies', () => {
 				query_schema: z.string(),
 			}),
 			create_multi_index({
-				key: 'by_tag',
-				extractor: (item) => item.tags[0],
+				key: 'by_thing',
+				extractor: (item) => item.things[0],
 				query_schema: z.string(),
 			}),
 			create_derived_index({
@@ -268,7 +268,9 @@ test('Indexed_Collection - combined indexing strategies', () => {
 
 	// Test multi index lookup
 	expect(collection.where<string>('by_category', 'c1')).toHaveLength(3);
-	expect(collection.where<string>('by_tag', 't1').some((item) => item.id === item1.id)).toBe(true);
+	expect(collection.where<string>('by_thing', 't1').some((item) => item.id === item1.id)).toBe(
+		true,
+	);
 
 	// Test derived index
 	const high_priority = collection.get_derived('recent_high_priority');

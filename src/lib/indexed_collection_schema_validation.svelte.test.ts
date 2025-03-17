@@ -233,12 +233,12 @@ describe('Indexed_Collection - Schema Validation', () => {
 		expect(young_adults.length).toBe(2);
 		expect(young_adults.map((item) => item.a).sort()).toEqual(['a1', 'a3']);
 
-		// Test active with specific tags
+		// Test active with specific values
 		const active_with_x1 = search_fn({d_only: true, e: ['x1']});
 		expect(active_with_x1.length).toBe(2);
 		expect(active_with_x1.map((item) => item.a).sort()).toEqual(['a1', 'a4']);
 
-		// Test items over 30 that are active with specific tags
+		// Test items over 30 that are active with specific values
 		const senior_with_x3 = search_fn({min_c: 30, d_only: true, e: ['x3']});
 		expect(senior_with_x3.length).toBe(2);
 		expect(senior_with_x3.map((item) => item.a).sort()).toEqual(['a2', 'a4']);

@@ -16,7 +16,7 @@ interface Test_Item {
 	id: Uuid;
 	name: string;
 	category: string;
-	tags: Array<string>;
+	things: Array<string>;
 	value: number;
 }
 
@@ -24,13 +24,13 @@ interface Test_Item {
 const create_test_item = (
 	name: string,
 	category: string,
-	tags: Array<string> = [],
+	things: Array<string> = [],
 	value: number = 0,
 ): Test_Item => ({
 	id: Uuid.parse(undefined),
 	name,
 	category,
-	tags,
+	things,
 	value,
 });
 
@@ -215,7 +215,7 @@ test('Indexed_Collection - optimization - memory usage with large datasets', () 
 
 	// Create a large dataset (~1000 items)
 	const large_dataset = Array.from({length: 1000}, (_, i) =>
-		create_test_item(`item${i}`, `category${i % 10}`, [`tag${i % 20}`], i),
+		create_test_item(`item${i}`, `category${i % 10}`, [`thing${i % 20}`], i),
 	);
 
 	// Add them in one batch

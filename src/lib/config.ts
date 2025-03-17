@@ -27,6 +27,8 @@ const config: Zzz_Config_Creator = async () => {
 		? merge_ollama_models(models_default, models_info.model_infos)
 		: models_default;
 
+	console.log(`models`, models);
+
 	return {
 		providers: providers_default,
 		models,
