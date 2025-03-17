@@ -17,24 +17,24 @@ import {Uuid} from '$lib/zod_helpers.js';
 // Basic test item type
 interface Edge_Test_Item {
 	id: Uuid;
-	name: string;
-	value: number | null;
-	things: Array<string>;
-	active: boolean;
+	a: string;
+	b: number | null;
+	c: Array<string>;
+	d: boolean;
 }
 
 // Helper function to create test items
 const create_edge_item = (
-	name: string,
-	value: number | null = 0,
-	things: Array<string> = [],
-	active = true,
+	a: string,
+	b: number | null = 0,
+	c: Array<string> = [],
+	d = true,
 ): Edge_Test_Item => ({
 	id: Uuid.parse(undefined),
-	name,
-	value,
-	things,
-	active,
+	a,
+	b,
+	c,
+	d,
 });
 
 describe('Indexed_Collection - Edge Cases', () => {
@@ -44,50 +44,50 @@ describe('Indexed_Collection - Edge Cases', () => {
 			indexes: [
 				// Single index that filters out null values
 				create_single_index({
-					key: 'by_value',
-					extractor: (item) => item.value, // May return null
+					key: 'by_b',
+					extractor: (item) => item.b, // May return null
 					query_schema: z.number().nullable(),
 				}),
 
 				// Multi-index that handles undefined values safely
 				create_multi_index({
-					key: 'by_thing',
-					extractor: (item) => (item.things.length > 0 ? item.things : undefined),
+					key: 'by_c',
+					extractor: (item) => (item.c.length > 0 ? item.c : undefined),
 					query_schema: z.string(),
 				}),
 			],
 		});
 
 		// Add items with edge case values
-		const item1 = create_edge_item('item1', 5, ['thing1']);
-		const item2 = create_edge_item('item2', null, ['thing2']);
-		const item3 = create_edge_item('item3', 10, []); // No things
-		const item4 = create_edge_item('item4', 15, ['thing1', 'thing3']);
+		const item1 = create_edge_item('a1', 5, ['c1']);
+		const item2 = create_edge_item('a2', null, ['c2']);
+		const item3 = create_edge_item('a3', 10, []); // No c values
+		const item4 = create_edge_item('a4', 15, ['c1', 'c3']);
 
 		collection.add_many([item1, item2, item3, item4]);
 
 		// Test retrieving with null values
-		expect(collection.by_optional('by_value', null)?.name).toBe('item2');
+		expect(collection.by_optional('by_b', null)?.a).toBe('a2');
 
 		// Test filtering with null values
-		expect(collection.by_optional('by_value', 999)).toBeUndefined(); // Non-existing value
+		expect(collection.by_optional('by_b', 999)).toBeUndefined(); // Non-existing value
 
-		// Test multi-index with shared things
-		const thing1_items = collection.where('by_thing', 'thing1');
-		expect(thing1_items.length).toBe(2);
-		expect(thing1_items.map((i) => i.name).sort()).toEqual(['item1', 'item4'].sort());
+		// Test multi-index with shared c values
+		const c1_items = collection.where('by_c', 'c1');
+		expect(c1_items.length).toBe(2);
+		expect(c1_items.map((i) => i.a).sort()).toEqual(['a1', 'a4'].sort());
 
-		// Item with empty things array should be excluded from by_thing index
-		expect(collection.where('by_thing', undefined)).toHaveLength(0);
+		// Item with empty c array should be excluded from by_c index
+		expect(collection.where('by_c', undefined)).toHaveLength(0);
 
 		// Test removing an item with null value
 		collection.remove(item2.id);
-		expect(collection.by_optional('by_value', null)).toBeUndefined();
+		expect(collection.by_optional('by_b', null)).toBeUndefined();
 
 		// Add another item with null value
-		const item5 = create_edge_item('item5', null, ['thing5']);
+		const item5 = create_edge_item('a5', null, ['c5']);
 		collection.add(item5);
-		expect(collection.by_optional('by_value', null)?.name).toBe('item5');
+		expect(collection.by_optional('by_b', null)?.a).toBe('a5');
 	});
 
 	test('handling duplicates in single indexes', () => {
@@ -97,14 +97,14 @@ describe('Indexed_Collection - Edge Cases', () => {
 		const collection: Indexed_Collection<Edge_Test_Item> = new Indexed_Collection({
 			indexes: [
 				create_single_index({
-					key: 'by_truncated_name',
-					extractor: (item) => item.name.substring(0, 3), // First 3 chars
+					key: 'by_truncated_a',
+					extractor: (item) => item.a.substring(0, 3), // First 3 chars
 					query_schema: z.string(),
 				}),
-				// Add explicit name index for easier item retrieval
+				// Add explicit a index for easier item retrieval
 				create_single_index({
-					key: 'by_name',
-					extractor: (item) => item.name,
+					key: 'by_a',
+					extractor: (item) => item.a,
 					query_schema: z.string(),
 				}),
 			],
@@ -121,19 +121,19 @@ describe('Indexed_Collection - Edge Cases', () => {
 		collection.add(item2); // Second 'abc' item - should overwrite item1 in the index
 
 		// Check that the latest addition wins for duplicate keys
-		expect(collection.by_optional('by_truncated_name', 'abc')?.name).toBe('abc456');
-		expect(collection.by_optional('by_truncated_name', 'def')?.name).toBe('def789');
+		expect(collection.by_optional('by_truncated_a', 'abc')?.a).toBe('abc456');
+		expect(collection.by_optional('by_truncated_a', 'def')?.a).toBe('def789');
 
 		// Test what happens when removing an item that was overwritten in the index
 		collection.remove(item2.id); // Remove the winning item
 
 		// The index should now revert to the first item with the same key
-		expect(collection.by_optional('by_truncated_name', 'abc')?.name).toBe('abc123');
+		expect(collection.by_optional('by_truncated_a', 'abc')?.a).toBe('abc123');
 
 		// Check that removing all items with the same key clears the index entry
 		const key1 = item1.id; // Store the ID before removing to avoid test failure
 		collection.remove(key1);
-		expect(collection.by_optional('by_truncated_name', 'abc')).toBeUndefined();
+		expect(collection.by_optional('by_truncated_a', 'abc')).toBeUndefined();
 
 		console_warn_spy.mockRestore();
 	});
@@ -144,36 +144,36 @@ describe('Indexed_Collection - Edge Cases', () => {
 		const collection: Indexed_Collection<Edge_Test_Item> = new Indexed_Collection({
 			indexes: [
 				create_single_index({
-					key: 'by_name',
-					extractor: (item) => item.name,
+					key: 'by_a',
+					extractor: (item) => item.a,
 					query_schema: z.string(),
 				}),
 
 				create_multi_index({
-					key: 'by_thing',
-					extractor: (item) => item.things,
+					key: 'by_c',
+					extractor: (item) => item.c,
 					query_schema: z.string(),
 				}),
 
 				create_derived_index({
-					key: 'active_by_value',
+					key: 'd_by_b',
 					compute: (collection) => {
 						return collection.all
-							.filter((item) => item.active && item.value !== null)
-							.sort((a, b) => (b.value || 0) - (a.value || 0));
+							.filter((item) => item.d && item.b !== null)
+							.sort((a, b) => (b.b || 0) - (a.b || 0));
 					},
-					matches: (item) => item.active && item.value !== null,
-					sort: (a, b) => (b.value || 0) - (a.value || 0),
+					matches: (item) => item.d && item.b !== null,
+					sort: (a, b) => (b.b || 0) - (a.b || 0),
 				}),
 			],
 		});
 
 		// Create a smaller batch (100 items) with varied properties
 		const large_batch = Array.from({length: 100}, (_, i) => {
-			const active = i % 3 === 0;
-			const value = i % 5 === 0 ? null : i;
-			const things = [`thing${i % 10}`, `group${i % 5}`];
-			return create_edge_item(`item${i}`, value, things, active);
+			const d = i % 3 === 0;
+			const b = i % 5 === 0 ? null : i;
+			const c = [`c${i % 10}`, `g${i % 5}`];
+			return create_edge_item(`a${i}`, b, c, d);
 		});
 
 		// Measure time to add all items
@@ -189,10 +189,10 @@ describe('Indexed_Collection - Edge Cases', () => {
 		expect(Object.keys(collection.indexes).length).toBe(3);
 
 		// Test various queries against the indexes
-		expect(collection.by_optional('by_name', 'item23')?.value).toBe(23);
-		expect(collection.where('by_thing', 'thing5').length).toBe(10); // 10% of items have thing5
-		expect(collection.get_derived('active_by_value').length).toBe(
-			large_batch.filter((i) => i.active && i.value !== null).length,
+		expect(collection.by_optional('by_a', 'a23')?.b).toBe(23);
+		expect(collection.where('by_c', 'c5').length).toBe(10); // 10% of items have c5
+		expect(collection.get_derived('d_by_b').length).toBe(
+			large_batch.filter((i) => i.d && i.b !== null).length,
 		);
 
 		// Test removing half of the items
@@ -210,28 +210,28 @@ describe('Indexed_Collection - Edge Cases', () => {
 		const collection: Indexed_Collection<Edge_Test_Item> = new Indexed_Collection({
 			indexes: [
 				create_single_index({
-					key: 'by_name',
-					extractor: (item) => item.name,
+					key: 'by_a',
+					extractor: (item) => item.a,
 					query_schema: z.string(),
 				}),
 				create_multi_index({
-					key: 'by_thing',
-					extractor: (item) => item.things,
+					key: 'by_c',
+					extractor: (item) => item.c,
 					query_schema: z.string(),
 				}),
 			],
 		});
 
 		// Add a test item
-		collection.add(create_edge_item('test1', 1, ['thing1']));
+		collection.add(create_edge_item('a1', 1, ['c1']));
 
 		// Test accessing indexes with wrong methods
 		expect(() => {
-			collection.where('by_name', 'test1'); // Using multi-index method on single index
+			collection.where('by_a', 'a1'); // Using multi-index method on single index
 		}).toThrow(); // Should throw error about index type mismatch
 
 		expect(() => {
-			collection.by<string>('by_thing', 'thing1'); // Using single-index method on multi-index
+			collection.by<string>('by_c', 'c1'); // Using single-index method on multi-index
 		}).toThrow(); // Should throw error about index type mismatch
 	});
 
@@ -242,8 +242,8 @@ describe('Indexed_Collection - Edge Cases', () => {
 		const collection: Indexed_Collection<Edge_Test_Item> = new Indexed_Collection({
 			indexes: [
 				create_single_index({
-					key: 'by_value',
-					extractor: (item) => item.value,
+					key: 'by_b',
+					extractor: (item) => item.b,
 					query_schema: z.number().positive(), // Must be positive number
 				}),
 			],
@@ -251,19 +251,19 @@ describe('Indexed_Collection - Edge Cases', () => {
 		});
 
 		// Add test items
-		collection.add(create_edge_item('test1', 5));
-		collection.add(create_edge_item('test2', -1)); // Negative value
-		collection.add(create_edge_item('test3', null)); // Null value
+		collection.add(create_edge_item('a1', 5));
+		collection.add(create_edge_item('a2', -1)); // Negative value
+		collection.add(create_edge_item('a3', null)); // Null value
 
 		// Test valid query
-		expect(collection.by_optional('by_value', 5)?.name).toBe('test1');
+		expect(collection.by_optional('by_b', 5)?.a).toBe('a1');
 
 		// Test queries that violate schema
-		collection.query('by_value', -10); // Negative number, should log validation error
+		collection.query('by_b', -10); // Negative number, should log validation error
 		expect(console_error_spy).toHaveBeenCalled();
 
 		console_error_spy.mockClear();
-		collection.query('by_value', null); // Null, should log validation error
+		collection.query('by_b', null); // Null, should log validation error
 		expect(console_error_spy).toHaveBeenCalled();
 
 		console_error_spy.mockRestore();
@@ -276,10 +276,10 @@ describe('Indexed_Collection - Edge Cases', () => {
 			// Return a new function that references the added item
 			return (query: string) => {
 				compute_fn(query);
-				if (query === item.name) {
+				if (query === item.a) {
 					return [item];
 				}
-				return collection.all.filter((i: any) => i.name.includes(query));
+				return collection.all.filter((i: any) => i.a.includes(query));
 			};
 		});
 
@@ -287,7 +287,7 @@ describe('Indexed_Collection - Edge Cases', () => {
 			// Return a new function that excludes the removed item
 			return (query: string) => {
 				compute_fn(query);
-				return collection.all.filter((i: any) => i.name.includes(query));
+				return collection.all.filter((i: any) => i.a.includes(query));
 			};
 		});
 
@@ -298,7 +298,7 @@ describe('Indexed_Collection - Edge Cases', () => {
 					factory: (collection) => {
 						return (query: string) => {
 							compute_fn(query);
-							return collection.all.filter((i) => i.name.includes(query));
+							return collection.all.filter((i) => i.a.includes(query));
 						};
 					},
 					query_schema: z.string(),
@@ -309,28 +309,28 @@ describe('Indexed_Collection - Edge Cases', () => {
 		});
 
 		// Add test items and verify custom handlers
-		const item1 = create_edge_item('apple');
+		const item1 = create_edge_item('x1');
 		collection.add(item1);
 		expect(on_add_fn).toHaveBeenCalled();
 
-		const item2 = create_edge_item('banana');
+		const item2 = create_edge_item('y2');
 		collection.add(item2);
 
 		// Test the search index
 		const search_fn = collection.get_index<(q: string) => Array<Edge_Test_Item>>('search');
 
 		// Search functions should work
-		const apple_results = search_fn('app');
-		expect(apple_results.length).toBe(1);
-		expect(apple_results[0].name).toBe('apple');
-		expect(compute_fn).toHaveBeenLastCalledWith('app');
+		const x_results = search_fn('x');
+		expect(x_results.length).toBe(1);
+		expect(x_results[0].a).toBe('x1');
+		expect(compute_fn).toHaveBeenLastCalledWith('x');
 
 		// Test removing an item triggers on_remove
 		collection.remove(item1.id);
 		expect(on_remove_fn).toHaveBeenCalled();
 
 		// Search function should be updated
-		const no_results = search_fn('app');
+		const no_results = search_fn('x');
 		expect(no_results.length).toBe(0);
 	});
 
@@ -338,10 +338,10 @@ describe('Indexed_Collection - Edge Cases', () => {
 		// Create a collection with a custom index that has advanced logic
 		const collection: Indexed_Collection<Edge_Test_Item> = new Indexed_Collection({
 			indexes: [
-				// Add explicit name index for lookup
+				// Add explicit a index for lookup
 				create_single_index({
-					key: 'by_name',
-					extractor: (item) => item.name,
+					key: 'by_a',
+					extractor: (item) => item.a,
 					query_schema: z.string(),
 				}),
 				// Custom index that maintains an aggregated stats object
@@ -349,61 +349,61 @@ describe('Indexed_Collection - Edge Cases', () => {
 					key: 'stats',
 					compute: (collection) => {
 						return {
-							total_items: collection.all.length,
-							active_count: collection.all.filter((i) => i.active).length,
-							inactive_count: collection.all.filter((i) => !i.active).length,
-							total_value: collection.all.reduce((sum, i) => sum + (i.value || 0), 0),
-							things_frequency: collection.all.reduce<Record<string, number>>((freq, item) => {
-								for (const thing of item.things) {
-									freq[thing] = (freq[thing] || 0) + 1;
+							count: collection.all.length,
+							d_true_count: collection.all.filter((i) => i.d).length,
+							d_false_count: collection.all.filter((i) => !i.d).length,
+							sum_b: collection.all.reduce((sum, i) => sum + (i.b || 0), 0),
+							c_frequency: collection.all.reduce<Record<string, number>>((freq, item) => {
+								for (const value of item.c) {
+									freq[value] = (freq[value] || 0) + 1;
 								}
 								return freq;
 							}, {}),
 						};
 					},
 					on_add: (stats: any, item: Edge_Test_Item) => {
-						stats.total_items++;
-						if (item.active) stats.active_count++;
-						else stats.inactive_count++;
-						stats.total_value += item.value || 0;
+						stats.count++;
+						if (item.d) stats.d_true_count++;
+						else stats.d_false_count++;
+						stats.sum_b += item.b || 0;
 
-						// Update thing frequencies
-						for (const thing of item.things) {
-							stats.things_frequency[thing] = (stats.things_frequency[thing] || 0) + 1;
+						// Update c frequencies
+						for (const value of item.c) {
+							stats.c_frequency[value] = (stats.c_frequency[value] || 0) + 1;
 						}
 
 						return stats;
 					},
 					on_remove: (stats: any, item: Edge_Test_Item) => {
-						stats.total_items--;
-						if (item.active) stats.active_count--;
-						else stats.inactive_count--;
-						stats.total_value -= item.value || 0;
+						stats.count--;
+						if (item.d) stats.d_true_count--;
+						else stats.d_false_count--;
+						stats.sum_b -= item.b || 0;
 
-						// Update thing frequencies
-						for (const thing of item.things) {
-							stats.things_frequency[thing]--;
-							if (stats.things_frequency[thing] === 0) {
-								delete stats.things_frequency[thing]; // eslint-disable-line @typescript-eslint/no-dynamic-delete
+						// Update c frequencies
+						for (const value of item.c) {
+							stats.c_frequency[value]--;
+							if (stats.c_frequency[value] === 0) {
+								delete stats.c_frequency[value]; // eslint-disable-line @typescript-eslint/no-dynamic-delete
 							}
 						}
 						return stats;
 					},
 					result_schema: z.object({
-						total_items: z.number(),
-						active_count: z.number(),
-						inactive_count: z.number(),
-						total_value: z.number(),
-						things_frequency: z.record(z.string(), z.number()),
+						count: z.number(),
+						d_true_count: z.number(),
+						d_false_count: z.number(),
+						sum_b: z.number(),
+						c_frequency: z.record(z.string(), z.number()),
 					}),
 				},
 			],
 		});
 
 		// Add items to test stats tracking
-		const item1 = create_edge_item('item1', 10, ['thing1', 'thing2'], true);
-		const item2 = create_edge_item('item2', 20, ['thing2', 'thing3'], false);
-		const item3 = create_edge_item('item3', 30, ['thing1', 'thing3'], true);
+		const item1 = create_edge_item('a1', 10, ['c1', 'c2'], true);
+		const item2 = create_edge_item('a2', 20, ['c2', 'c3'], false);
+		const item3 = create_edge_item('a3', 30, ['c1', 'c3'], true);
 
 		collection.add(item1);
 		collection.add(item2);
@@ -411,44 +411,44 @@ describe('Indexed_Collection - Edge Cases', () => {
 
 		// Check that stats were computed correctly
 		const stats = collection.get_index<{
-			total_items: number;
-			active_count: number;
-			inactive_count: number;
-			total_value: number;
-			things_frequency: Record<string, number>;
+			count: number;
+			d_true_count: number;
+			d_false_count: number;
+			sum_b: number;
+			c_frequency: Record<string, number>;
 		}>('stats');
 
-		expect(stats.total_items).toBe(3);
-		expect(stats.active_count).toBe(2);
-		expect(stats.inactive_count).toBe(1);
-		expect(stats.total_value).toBe(60);
-		expect(stats.things_frequency).toEqual({
-			thing1: 2,
-			thing2: 2,
-			thing3: 2,
+		expect(stats.count).toBe(3);
+		expect(stats.d_true_count).toBe(2);
+		expect(stats.d_false_count).toBe(1);
+		expect(stats.sum_b).toBe(60);
+		expect(stats.c_frequency).toEqual({
+			c1: 2,
+			c2: 2,
+			c3: 2,
 		});
 
 		// Test incremental update - add an item
-		collection.add(create_edge_item('item4', 40, ['thing1', 'thing4'], false));
+		collection.add(create_edge_item('a4', 40, ['c1', 'c4'], false));
 
-		expect(stats.total_items).toBe(4);
-		expect(stats.active_count).toBe(2);
-		expect(stats.inactive_count).toBe(2);
-		expect(stats.total_value).toBe(100);
-		expect(stats.things_frequency.thing1).toBe(3);
-		expect(stats.things_frequency.thing4).toBe(1);
+		expect(stats.count).toBe(4);
+		expect(stats.d_true_count).toBe(2);
+		expect(stats.d_false_count).toBe(2);
+		expect(stats.sum_b).toBe(100);
+		expect(stats.c_frequency.c1).toBe(3);
+		expect(stats.c_frequency.c4).toBe(1);
 
 		// Test incremental update - remove an item
 		// Store the item reference first to ensure it exists
-		const item1_ref = collection.by_optional('by_name', 'item1');
+		const item1_ref = collection.by_optional('by_a', 'a1');
 		expect(item1_ref).toBeDefined(); // Make sure we found it
 		collection.remove(item1_ref!.id);
 
-		expect(stats.total_items).toBe(3);
-		expect(stats.active_count).toBe(1);
-		expect(stats.inactive_count).toBe(2);
-		expect(stats.total_value).toBe(90);
-		expect(stats.things_frequency.thing1).toBe(2);
-		expect(stats.things_frequency.thing2).toBe(1);
+		expect(stats.count).toBe(3);
+		expect(stats.d_true_count).toBe(1);
+		expect(stats.d_false_count).toBe(2);
+		expect(stats.sum_b).toBe(90);
+		expect(stats.c_frequency.c1).toBe(2);
+		expect(stats.c_frequency.c2).toBe(1);
 	});
 });
