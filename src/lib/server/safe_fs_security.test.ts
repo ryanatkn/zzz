@@ -4,7 +4,7 @@ import * as fs_sync from 'node:fs';
 
 import {Safe_Fs, Path_Not_Allowed_Error, Symlink_Not_Allowed_Error} from '$lib/server/safe_fs.js';
 
-/* eslint-disable no-await-in-loop */
+/* eslint-disable no-await-in-loop, @typescript-eslint/no-empty-function, @typescript-eslint/require-await */
 
 // Mock fs/promises and fs modules
 vi.mock('node:fs/promises', () => ({
