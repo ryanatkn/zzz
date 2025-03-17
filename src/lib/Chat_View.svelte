@@ -27,7 +27,14 @@
 
 	// TODO BLOCK this needs to be persisted state
 	if (chat.tapes.length === 0) {
-		const initial_model_names = ['llama3.2:1b', 'llama3.2:3b', 'qwen2.5:0.5b', 'qwen2.5:1.5b'];
+		const initial_model_names = [
+			'llama3.2:1b',
+			'llama3.2:3b',
+			'gemma3:1b',
+			'gemma3:4b',
+			'qwen2.5:0.5b',
+			'qwen2.5:1.5b',
+		];
 		const initial_models = zzz.models.filter_by_names(initial_model_names);
 		if (initial_models) {
 			for (const initial_model of initial_models) {
