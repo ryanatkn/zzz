@@ -13,8 +13,8 @@ const mock_zzz = {
 	registry: {
 		instantiate: vi.fn((name, json) => {
 			// For testing instantiation logic
-			if (name === 'TestInstance' && json) {
-				return {type: 'TestInstance', ...json};
+			if (name === 'Test_Instance' && json) {
+				return {type: 'Test_Instance', ...json};
 			}
 			return null;
 		}),
@@ -72,14 +72,14 @@ test('Cell uses registry for instantiating class relationships', () => {
 
 	// We can test registry behavior directly
 	const test_data = {prop: 'test'};
-	const result = cell.test_instantiate(test_data, 'TestInstance');
+	const result = cell.test_instantiate(test_data, 'Test_Instance');
 
 	// Should call registry instantiate
-	expect(mock_zzz.registry.instantiate).toHaveBeenCalledWith('TestInstance', test_data);
-	expect(result).toEqual({type: 'TestInstance', prop: 'test'});
+	expect(mock_zzz.registry.instantiate).toHaveBeenCalledWith('Test_Instance', test_data);
+	expect(result).toEqual({type: 'Test_Instance', prop: 'test'});
 
 	// Should handle missing class gracefully
-	const null_result = cell.test_instantiate(test_data, 'NonExistentClass');
+	const null_result = cell.test_instantiate(test_data, 'Non_Existent_Class');
 	expect(null_result).toBe(null); // Registry returns null if class not found
 });
 

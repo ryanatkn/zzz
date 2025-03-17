@@ -211,7 +211,7 @@ test('Cell parsers are only applied for appropriate values', () => {
 
 test('Cell parsers work with empty JSON', () => {
 	// Create a modified test cell specifically for this test
-	class EmptyJsonTestCell extends Cell<typeof Test_Schema> {
+	class Empty_Json_Test_Cell extends Cell<typeof Test_Schema> {
 		name: string = $state()!;
 		age: number | undefined = $state();
 		roles: Array<string> = $state()!;
@@ -232,7 +232,7 @@ test('Cell parsers work with empty JSON', () => {
 	}
 
 	// Test with empty JSON - this is now valid due to schema default/optional fields
-	const cell = new EmptyJsonTestCell({
+	const cell = new Empty_Json_Test_Cell({
 		zzz: mock_zzz,
 		json: {},
 	});
@@ -246,7 +246,7 @@ test('Cell parsers work with empty JSON', () => {
 
 test('Cell with no parsers uses schema defaults', () => {
 	// Create a custom test schema with string ID for easier testing
-	const BasicTestSchema = z
+	const Basic_Test_Schema = z
 		.object({
 			id: z.string().default(''),
 			created: z
@@ -261,14 +261,14 @@ test('Cell with no parsers uses schema defaults', () => {
 		})
 		.strict();
 
-	class Basic_Cell extends Cell<typeof BasicTestSchema> {
+	class Basic_Cell extends Cell<typeof Basic_Test_Schema> {
 		name: string = $state()!;
 		age: number | undefined = $state();
 		roles: Array<string> = $state()!;
 		active: boolean = $state()!;
 
-		constructor(options: Cell_Options<typeof BasicTestSchema>) {
-			super(BasicTestSchema, options);
+		constructor(options: Cell_Options<typeof Basic_Test_Schema>) {
+			super(Basic_Test_Schema, options);
 			this.init();
 		}
 	}
@@ -369,7 +369,7 @@ test('Cell throws validation errors from schema', () => {
 
 test('Cell parsers run even with no input JSON', () => {
 	// Create a modified test cell specifically for this test
-	class NoInputJsonTestCell extends Cell<typeof Test_Schema> {
+	class No_Input_Json_Test_Cell extends Cell<typeof Test_Schema> {
 		name: string = $state()!;
 		age: number | undefined = $state();
 		roles: Array<string> = $state()!;
@@ -389,7 +389,7 @@ test('Cell parsers run even with no input JSON', () => {
 		}
 	}
 
-	const cell = new NoInputJsonTestCell({
+	const cell = new No_Input_Json_Test_Cell({
 		zzz: mock_zzz,
 		// No json provided at all
 	});
@@ -403,7 +403,7 @@ test('Cell parsers run even with no input JSON', () => {
 
 test('Cell handles undefined JSON input correctly', () => {
 	// Create a modified test cell specifically for this test
-	class UndefinedJsonTestCell extends Cell<typeof Test_Schema> {
+	class Undefined_Json_Test_Cell extends Cell<typeof Test_Schema> {
 		name: string = $state()!;
 		age: number | undefined = $state();
 		roles: Array<string> = $state()!;
@@ -424,7 +424,7 @@ test('Cell handles undefined JSON input correctly', () => {
 	}
 
 	// Test with explicitly undefined JSON
-	const cell = new UndefinedJsonTestCell({
+	const cell = new Undefined_Json_Test_Cell({
 		zzz: mock_zzz,
 		json: undefined,
 	});
@@ -486,7 +486,7 @@ test('Cell cloning creates proper copies', () => {
 });
 
 test('Cell parsers can return USE_DEFAULT sentinel to explicitly use default decoding', () => {
-	class DefaultTest_Cell extends Cell<typeof Test_Schema> {
+	class Default_Test_Cell extends Cell<typeof Test_Schema> {
 		name: string = $state()!;
 		age: number | undefined = $state();
 		roles: Array<string> = $state()!;
@@ -510,7 +510,7 @@ test('Cell parsers can return USE_DEFAULT sentinel to explicitly use default dec
 		}
 	}
 
-	const cell1 = new DefaultTest_Cell({
+	const cell1 = new Default_Test_Cell({
 		zzz: mock_zzz,
 		json: {
 			id: TEST_UUID,
@@ -520,7 +520,7 @@ test('Cell parsers can return USE_DEFAULT sentinel to explicitly use default dec
 		},
 	});
 
-	const cell2 = new DefaultTest_Cell({
+	const cell2 = new Default_Test_Cell({
 		zzz: mock_zzz,
 		json: {
 			id: SECOND_UUID,
@@ -546,7 +546,7 @@ test('Cell parsers use HANDLED sentinel for virtual properties', () => {
 
 	const console_error_spy = vi.spyOn(console, 'error');
 
-	class VirtualTest_Cell extends Cell<typeof Virtual_Schema> {
+	class Virtual_Test_Cell extends Cell<typeof Virtual_Schema> {
 		real_prop: string = $state()!;
 		// No virtual_prop property
 
@@ -570,7 +570,7 @@ test('Cell parsers use HANDLED sentinel for virtual properties', () => {
 		}
 	}
 
-	const cell = new VirtualTest_Cell({
+	const cell = new Virtual_Test_Cell({
 		zzz: mock_zzz,
 		json: {
 			id: TEST_UUID,
@@ -597,19 +597,19 @@ test('Cell parsers use HANDLED sentinel for virtual properties', () => {
 
 test("Cell logs error when virtual property parser doesn't return HANDLED", () => {
 	// Schema with virtual property
-	const BadVirtual_Schema = Cell_Json.extend({
+	const Bad_Virtual_Schema = Cell_Json.extend({
 		real_prop: z.string().default('default'),
 		virtual_prop: z.number().default(42), // This property won't exist on the class
 	});
 
 	const console_error_spy = vi.spyOn(console, 'error');
 
-	class BadVirtualTest_Cell extends Cell<typeof BadVirtual_Schema> {
+	class Bad_Virtual_Test_Cell extends Cell<typeof Bad_Virtual_Schema> {
 		real_prop: string = $state()!;
 		// No virtual_prop property
 
-		constructor(options: Cell_Options<typeof BadVirtual_Schema>) {
-			super(BadVirtual_Schema, options);
+		constructor(options: Cell_Options<typeof Bad_Virtual_Schema>) {
+			super(Bad_Virtual_Schema, options);
 
 			this.decoders = {
 				virtual_prop: (_value) => {
@@ -623,7 +623,7 @@ test("Cell logs error when virtual property parser doesn't return HANDLED", () =
 	}
 
 	// Should work but log an error
-	new BadVirtualTest_Cell({
+	new Bad_Virtual_Test_Cell({
 		zzz: mock_zzz,
 		json: {
 			id: TEST_UUID,
@@ -634,7 +634,7 @@ test("Cell logs error when virtual property parser doesn't return HANDLED", () =
 	});
 
 	// The expected error message should have been logged
-	const error_message = `Decoder for schema property "virtual_prop" in BadVirtualTest_Cell didn't return HANDLED`; // Updated to match new error message
+	const error_message = `Decoder for schema property "virtual_prop" in Bad_Virtual_Test_Cell didn't return HANDLED`; // Updated to match new error message
 	const found_error = console_error_spy.mock.calls.some((args) =>
 		args.join(' ').includes(error_message),
 	);
@@ -645,19 +645,19 @@ test("Cell logs error when virtual property parser doesn't return HANDLED", () =
 
 test('Cell does not allow USE_DEFAULT for virtual properties', () => {
 	// Schema with virtual property
-	const UseDefaultVirtual_Schema = Cell_Json.extend({
+	const Use_Default_Virtual_Schema = Cell_Json.extend({
 		real_prop: z.string().default('default'),
 		virtual_prop: z.number().default(42), // This property won't exist on the class
 	});
 
 	const console_error_spy = vi.spyOn(console, 'error');
 
-	class UseDefaultVirtualTest_Cell extends Cell<typeof UseDefaultVirtual_Schema> {
+	class Use_Default_Virtual_Test_Cell extends Cell<typeof Use_Default_Virtual_Schema> {
 		real_prop: string = $state()!;
 		// No virtual_prop property
 
-		constructor(options: Cell_Options<typeof UseDefaultVirtual_Schema>) {
-			super(UseDefaultVirtual_Schema, options);
+		constructor(options: Cell_Options<typeof Use_Default_Virtual_Schema>) {
+			super(Use_Default_Virtual_Schema, options);
 
 			this.decoders = {
 				virtual_prop: (_value) => {
@@ -671,7 +671,7 @@ test('Cell does not allow USE_DEFAULT for virtual properties', () => {
 	}
 
 	// Should work but log an error
-	new UseDefaultVirtualTest_Cell({
+	new Use_Default_Virtual_Test_Cell({
 		zzz: mock_zzz,
 		json: {
 			id: TEST_UUID,
@@ -682,7 +682,7 @@ test('Cell does not allow USE_DEFAULT for virtual properties', () => {
 	});
 
 	// The expected error message should have been logged
-	const error_message = `Decoder for "virtual_prop" in UseDefaultVirtualTest_Cell returned USE_DEFAULT but no property exists`; // Updated to match new error message
+	const error_message = `Decoder for "virtual_prop" in Use_Default_Virtual_Test_Cell returned USE_DEFAULT but no property exists`; // Updated to match new error message
 	const found_error = console_error_spy.mock.calls.some((args) =>
 		args.join(' ').includes(error_message),
 	);

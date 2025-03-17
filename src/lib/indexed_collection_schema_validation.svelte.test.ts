@@ -34,7 +34,7 @@ const create_item = (
 	b: string,
 	c: number,
 	d: boolean = true,
-	e: Array<string> = ['x'],
+	e: Array<string> = ['x1'],
 	g: 'h' | 'i' = 'h',
 ): Test_Item => ({
 	id: Uuid.parse(undefined),
@@ -107,10 +107,10 @@ describe('Indexed_Collection - Schema Validation', () => {
 					key: 'by_c_range',
 					extractor: (item) => {
 						if (item.c < 20) return 'low';
-						if (item.c < 50) return 'medium';
+						if (item.c < 50) return 'mid';
 						return 'high';
 					},
-					query_schema: z.enum(['low', 'medium', 'high']),
+					query_schema: z.enum(['low', 'mid', 'high']),
 				}),
 			],
 			validate: true,
@@ -123,9 +123,9 @@ describe('Indexed_Collection - Schema Validation', () => {
 		collection.add(create_item('a4', 'b4', 90, true, ['x3', 'x4']));
 
 		// Test range query validation
-		const medium_items = collection.query<Array<Test_Item>, string>('by_c_range', 'medium');
-		expect(medium_items.length).toBe(1);
-		expect(medium_items[0].a).toBe('a2');
+		const mid_items = collection.query<Array<Test_Item>, string>('by_c_range', 'mid');
+		expect(mid_items.length).toBe(1);
+		expect(mid_items[0].a).toBe('a2');
 
 		// Test tag index
 		const x2_items = collection.query<Array<Test_Item>, string>('by_e', 'x2');
