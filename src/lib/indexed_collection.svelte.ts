@@ -64,7 +64,7 @@ export interface Indexed_Collection_Options<
 > {
 	indexes?: Array<Index_Definition<T>>;
 	initial_items?: Array<T>;
-	validate?: boolean; // Optional validation flag
+	validate?: boolean;
 	index_types?: {
 		single?: Array<T_Key_Single>;
 		multi?: Array<T_Key_Multi>;
@@ -72,14 +72,6 @@ export interface Indexed_Collection_Options<
 		dynamic?: Array<T_Key_Dynamic>;
 	};
 }
-
-/**
- * Create specialized types for the different kinds of index keys
- */
-export type T_Key_Single<K extends string> = K;
-export type T_Key_Multi<K extends string> = K;
-export type T_Key_Derived<K extends string> = K;
-export type T_Key_Dynamic<K extends string> = K;
 
 /**
  * A helper class for managing collections that need efficient lookups
@@ -144,7 +136,7 @@ export class Indexed_Collection<
 				} else if (this.indexes[def.key] instanceof Array) {
 					this.#index_types.set(def.key, 'derived');
 				} else if (
-					(this.indexes[def.key] instanceof Map || this.indexes[def.key] instanceof SvelteMap) &&
+					this.indexes[def.key] instanceof Map && // also cover SvelteMap
 					Array.isArray(
 						[...this.indexes[def.key].values()].length > 0
 							? [...this.indexes[def.key].values()][0]
@@ -280,18 +272,15 @@ export class Indexed_Collection<
 
 		// Handle different common index types
 		if (index instanceof Map) {
-			return index.get(query) as T_Result;
-		}
-		if (index instanceof SvelteMap) {
-			return index.get(query) as T_Result;
+			return index.get(query); // also covers SvelteMap
 		}
 		if (typeof index === 'function') {
-			return index(query) as T_Result;
+			return index(query);
 		}
 
 		// For array indexes or other types, return the whole index
 		// Consumers will need to filter it themselves
-		return index as T_Result;
+		return index;
 	}
 
 	/**
@@ -554,7 +543,8 @@ export class Indexed_Collection<
 			this.#ensure_index_type(index_key, 'multi');
 		}
 
-		if (index instanceof Map || index instanceof SvelteMap) {
+		// also cover SvelteMap
+		if (index instanceof Map) {
 			return [...(index.get(value) || [])];
 		}
 
@@ -618,7 +608,7 @@ export class Indexed_Collection<
 			this.#ensure_index_type(index_key, 'single');
 		}
 
-		const item = index instanceof Map || index instanceof SvelteMap ? index.get(value) : undefined;
+		const item = index instanceof Map ? index.get(value) : undefined; // also cover SvelteMap
 
 		if (!item) {
 			throw new Error(`Item not found for index ${index_key} with value ${String(value)}`);
@@ -639,6 +629,6 @@ export class Indexed_Collection<
 			this.#ensure_index_type(index_key, 'single');
 		}
 
-		return index instanceof Map || index instanceof SvelteMap ? index.get(value) : undefined;
+		return index instanceof Map ? index.get(value) : undefined; // also cover SvelteMap
 	}
 }

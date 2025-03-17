@@ -1,7 +1,7 @@
 import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Prompt, Prompt_Json} from '$lib/prompt.svelte.js';
+import {Prompt, Prompt_Json, Prompt_Schema} from '$lib/prompt.svelte.js';
 import type {Uuid} from '$lib/zod_helpers.js';
 import type {Bit} from '$lib/bit.svelte.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
@@ -33,6 +33,7 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 				key: 'by_name',
 				extractor: (prompt) => prompt.name,
 				query_schema: z.string(),
+				result_schema: Prompt_Schema,
 			}),
 
 			create_derived_index({
@@ -43,6 +44,7 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 						(a, b) => new Date(b.created).getTime() - new Date(a.created).getTime(),
 					);
 				},
+				result_schema: Prompt_Schema,
 				on_add: (items, item) => {
 					// Insert at the right position based on creation date
 					const index = items.findIndex(

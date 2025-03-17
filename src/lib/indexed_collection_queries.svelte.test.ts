@@ -3,7 +3,7 @@
 import {test, expect, describe, beforeEach} from 'vitest';
 import {z} from 'zod';
 
-import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
+import {Indexed_Collection, type Indexed_Item} from '$lib/indexed_collection.svelte.js';
 import {
 	create_single_index,
 	create_multi_index,
@@ -37,7 +37,7 @@ const create_document = (overrides: Partial<Test_Document> = {}): Test_Document 
 });
 
 // Helper functions for ID-based object equality checks
-const has_item_with_id = (array: Array<{id: Uuid}>, item: {id: Uuid}): boolean =>
+const has_item_with_id = (array: Array<Indexed_Item>, item: Indexed_Item): boolean =>
 	array.some((i) => i.id === item.id);
 
 describe('Indexed_Collection - Query Capabilities', () => {

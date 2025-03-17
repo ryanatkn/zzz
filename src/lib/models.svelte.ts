@@ -1,7 +1,7 @@
 import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Model, Model_Json} from '$lib/model.svelte.js';
+import {Model, Model_Json, Model_Schema} from '$lib/model.svelte.js';
 import type {Ollama_Model_Info} from '$lib/ollama.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
@@ -27,21 +27,24 @@ export class Models extends Cell<typeof Models_Json> {
 		indexes: [
 			create_single_index({
 				key: 'name',
-				extractor: (model: Model) => model.name,
+				extractor: (model) => model.name,
 				query_schema: z.string(),
+				result_schema: Model_Schema,
 			}),
 
 			create_multi_index({
 				key: 'provider_name',
-				extractor: (model: Model) => model.provider_name,
+				extractor: (model) => model.provider_name,
 				query_schema: z.string(),
+				result_schema: Model_Schema,
 			}),
 
 			create_multi_index({
 				key: 'tag',
-				extractor: (model: Model) => model.tags[0], // Index first tag for efficiency
+				extractor: (model) => model.tags[0], // Index first tag for efficiency
 				query_schema: z.string(),
 				matches: (model) => model.tags.length > 0,
+				result_schema: Model_Schema,
 			}),
 		],
 	});

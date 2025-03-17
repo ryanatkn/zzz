@@ -1,4 +1,5 @@
 import {encode as tokenize} from 'gpt-tokenizer';
+import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Diskfile_Json, type Diskfile_Path, type Source_File} from '$lib/diskfile_types.js';
@@ -54,3 +55,5 @@ export class Diskfile extends Cell<typeof Diskfile_Json> {
 		this.init();
 	}
 }
+
+export const Diskfile_Schema = z.instanceof(Diskfile);

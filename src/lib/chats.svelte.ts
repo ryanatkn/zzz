@@ -1,7 +1,7 @@
 import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Chat, Chat_Json} from '$lib/chat.svelte.js';
+import {Chat, Chat_Json, Chat_Schema} from '$lib/chat.svelte.js';
 import type {Uuid} from '$lib/zod_helpers.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
@@ -35,8 +35,9 @@ export class Chats extends Cell<typeof Chats_Json> {
 		indexes: [
 			create_multi_index({
 				key: 'by_has_tapes',
-				extractor: (chat: Chat) => (chat.tapes.length > 0 ? 'has_tapes' : 'no_tapes'),
+				extractor: (chat) => (chat.tapes.length > 0 ? 'has_tapes' : 'no_tapes'),
 				query_schema: z.enum(['has_tapes', 'no_tapes']),
+				result_schema: Chat_Schema,
 			}),
 
 			create_derived_index({
@@ -48,6 +49,7 @@ export class Chats extends Cell<typeof Chats_Json> {
 						(a, b) => new Date(b.created).getTime() - new Date(a.created).getTime(),
 					);
 				},
+				result_schema: Chat_Schema,
 				on_add: (collection, item) => {
 					// Insert the new chat in the correct position based on creation date
 					const index = collection.findIndex(

@@ -1,7 +1,7 @@
 import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Message} from '$lib/message.svelte.js';
+import {Message, Message_Schema} from '$lib/message.svelte.js';
 import {
 	Message_Json,
 	type Message_Client,
@@ -43,7 +43,7 @@ export class Messages extends Cell<typeof Messages_Json> {
 			// Type-based multi-index
 			create_multi_index({
 				key: 'by_type',
-				extractor: (message: Message) => message.type,
+				extractor: (message) => message.type,
 				query_schema: z.enum([
 					'ping',
 					'pong',
@@ -53,6 +53,7 @@ export class Messages extends Cell<typeof Messages_Json> {
 					'delete_diskfile',
 					'filer_change',
 				]),
+				result_schema: Message_Schema,
 			}),
 
 			// Ping ID index for pongs
@@ -66,6 +67,7 @@ export class Messages extends Cell<typeof Messages_Json> {
 				},
 				query_schema: z.string(),
 				matches: (message) => message.type === 'pong' && !!message.ping_id,
+				result_schema: Message_Schema,
 			}),
 
 			// Derived index for latest pongs - prioritize showing most recent
@@ -78,6 +80,7 @@ export class Messages extends Cell<typeof Messages_Json> {
 						.slice(0, PONG_DISPLAY_LIMIT);
 				},
 				matches: (item) => item.type === 'pong',
+				result_schema: Message_Schema,
 				on_add: (items, item) => {
 					if (item.type !== 'pong') return items;
 

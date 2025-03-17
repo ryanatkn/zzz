@@ -117,3 +117,5 @@ export class Prompt extends Cell<typeof Prompt_Json> {
 		reorder_list(this.bits, from_index, to_index);
 	}
 }
+
+export const Prompt_Schema = z.instanceof(Prompt);

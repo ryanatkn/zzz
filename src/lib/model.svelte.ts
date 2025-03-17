@@ -59,3 +59,5 @@ export class Model extends Cell<typeof Model_Json> {
 		this.init();
 	}
 }
+
+export const Model_Schema = z.instanceof(Model);

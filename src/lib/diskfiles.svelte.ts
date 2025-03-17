@@ -2,7 +2,7 @@ import {z} from 'zod';
 
 import type {Message_Filer_Change} from '$lib/message_types.js';
 import {Uuid} from '$lib/zod_helpers.js';
-import {Diskfile} from '$lib/diskfile.svelte.js';
+import {Diskfile, Diskfile_Schema} from '$lib/diskfile.svelte.js';
 import {Diskfile_Json, type Diskfile_Path} from '$lib/diskfile_types.js';
 import {source_file_to_diskfile_json} from '$lib/diskfile_helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
@@ -37,29 +37,33 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 		indexes: [
 			create_single_index({
 				key: 'by_path',
-				extractor: (file: Diskfile) => file.path,
+				extractor: (file) => file.path,
 				query_schema: z.string(),
+				result_schema: Diskfile_Schema,
 			}),
 
 			create_multi_index({
 				key: 'by_external_status',
-				extractor: (file: Diskfile) => (file.external ? 'external' : 'non_external'),
+				extractor: (file) => (file.external ? 'external' : 'non_external'),
 				query_schema: z.enum(['external', 'non_external']),
+				result_schema: Diskfile_Schema,
 			}),
 
 			create_multi_index({
 				key: 'by_extension',
-				extractor: (file: Diskfile) => {
+				extractor: (file) => {
 					const match = /\.([^.]+)$/.exec(file.path);
 					return match ? match[1].toLowerCase() : 'no_extension';
 				},
 				query_schema: z.string(),
+				result_schema: Diskfile_Schema,
 			}),
 
 			create_derived_index({
 				key: 'non_external_files',
 				compute: (collection) => collection.where('by_external_status', 'non_external'),
 				matches: (item) => !item.external,
+				result_schema: Diskfile_Schema,
 				on_add: (collection, item) => {
 					if (!item.external) {
 						collection.push(item);

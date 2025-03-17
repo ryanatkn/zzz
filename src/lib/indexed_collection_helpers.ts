@@ -8,6 +8,8 @@ import type {
 } from '$lib/indexed_collection.svelte.js';
 import {Any} from '$lib/zod_helpers.js';
 
+export const Svelte_Map_Schema = z.custom<SvelteMap<any, any>>((val) => val instanceof SvelteMap);
+
 /**
  * Common options interface for all index types
  */
@@ -19,7 +21,7 @@ export interface Index_Options<T extends Indexed_Item> {
 	matches?: (item: T) => boolean;
 
 	/** Schema for input validation and typing */
-	query_schema?: z.ZodType;
+	query_schema?: z.ZodType; // TODO BLOCK default to string not any? then remove all of the `query_schema: z.string(),`
 
 	/** Schema for output validation */
 	result_schema?: z.ZodType;
@@ -40,8 +42,7 @@ export function create_single_index<T extends Indexed_Item, K = any>(
 	options: Single_Index_Options<T, K>,
 ): Index_Definition<T, SvelteMap<K, T>, K> {
 	// Create the default output schema if not provided
-	const result_schema =
-		options.result_schema || z.custom<SvelteMap<K, T>>((val) => val instanceof SvelteMap);
+	const result_schema = options.result_schema || Svelte_Map_Schema;
 
 	return {
 		key: options.key,
@@ -120,8 +121,7 @@ export function create_multi_index<T extends Indexed_Item, K = any>(
 	options: Multi_Index_Options<T, K>,
 ): Index_Definition<T, SvelteMap<K, Array<T>>, K> {
 	// Create the default output schema if not provided
-	const result_schema =
-		options.result_schema || z.custom<SvelteMap<K, Array<T>>>((val) => val instanceof SvelteMap);
+	const result_schema = options.result_schema || Svelte_Map_Schema;
 
 	return {
 		key: options.key,

@@ -1,3 +1,5 @@
+import {z} from 'zod';
+
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Uuid} from '$lib/zod_helpers.js';
 import {
@@ -108,3 +110,5 @@ export class Message extends Cell<typeof Message_Json> {
 		this.init();
 	}
 }
+
+export const Message_Schema = z.instanceof(Message);
