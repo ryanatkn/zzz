@@ -2,7 +2,6 @@ import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Model, Model_Json, Model_Schema} from '$lib/model.svelte.js';
-import type {Ollama_Model_Info} from '$lib/ollama.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {create_single_index, create_multi_index} from '$lib/indexed_collection_helpers.js';
@@ -41,7 +40,7 @@ export class Models extends Cell<typeof Models_Json> {
 
 			create_multi_index({
 				key: 'tag',
-				extractor: (model) => model.tags[0], // Index first tag for efficiency
+				extractor: (model) => model.tags[0], // TODO needs to work for all tags
 				query_schema: z.string(),
 				matches: (model) => model.tags.length > 0,
 				result_schema: Model_Schema,
@@ -52,7 +51,8 @@ export class Models extends Cell<typeof Models_Json> {
 	constructor(options: Models_Options) {
 		super(Models_Json, options);
 
-		// Add custom decoder for the items property to prevent overwriting our collection
+		// Add custom decoder for the items property,
+		// which also prevents it from automatically overwriting our collection
 		this.decoders = {
 			items: (items) => {
 				if (Array.isArray(items)) {
@@ -73,37 +73,10 @@ export class Models extends Cell<typeof Models_Json> {
 		this.items.add(model);
 	}
 
-	add_ollama_models(model_infos: Array<Ollama_Model_Info>): void {
-		// First add the models that are installed
-		const installed_ollama_models = model_infos.map((ollama_model_info) => {
-			const model_default = this.items.by_optional('name', ollama_model_info.model.name);
-			// TODO maybe clone would be cleaner?
-			return new Model({
-				zzz: this.zzz,
-				json: model_default
-					? {...model_default.json, ollama_model_info}
-					: {
-							name: ollama_model_info.model.name,
-							provider_name: 'ollama',
-							tags: ollama_model_info.model.details.families, // TODO maybe not this?
-							ollama_model_info,
-						},
-			});
-		});
-		// Then add the models from config that are not installed
-		const uninstalled_ollama_models = this.items
-			.where('provider_name', 'ollama')
-			.filter((m) => !installed_ollama_models.some((m2) => m2.name === m.name))
-			.map((m) => new Model({zzz: this.zzz, json: m.json}));
-
-		// Clear and add all models in the desired order
+	add_many(models_json: Array<Model_Json>): void {
 		this.items.clear();
-		for (const model of [...installed_ollama_models, ...uninstalled_ollama_models]) {
-			this.items.add(model);
-		}
-		// Add any remaining models that aren't Ollama models
-		for (const model of this.items.all.filter((m) => m.provider_name !== 'ollama')) {
-			this.items.add(model);
+		for (const model_json of models_json) {
+			this.add(model_json);
 		}
 	}
 

@@ -35,11 +35,10 @@
 	onMount(async () => {
 		const zzz_config = await create_zzz_config();
 
-		// Add providers and models from config
-		zzz.add_providers(zzz_config.providers.map((p) => Provider_Json.parse(p)));
-		zzz.add_models(zzz_config.models.map((m) => Model_Json.parse(m)));
+		// TODO note the difference between these two APIs, look at both of them and see which makes more sense
+		zzz.add_providers(zzz_config.providers.map((p) => Provider_Json.parse(p))); // TODO handle errors
+		zzz.models.add_many(zzz_config.models.map((m) => Model_Json.parse(m))); // TODO handle errors
 
-		await zzz.init_models();
 		// TODO init properly
 		zzz.chats.add();
 		zzz.chats.add();

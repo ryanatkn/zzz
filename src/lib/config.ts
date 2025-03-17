@@ -21,13 +21,14 @@ import {
 
 // TODO currently this is imported directly by client and server, but we probably only want to forward a serialized subset to the client
 const config: Zzz_Config_Creator = async () => {
-	const models_info = await ollama_list_with_metadata(); // TODO BLOCK cant do this here, maybe gen? where's the final source of truth? querying at runtime and caching in our db?
+	// Try to get Ollama models
+	const models_info = await ollama_list_with_metadata();
 
+	// Merge with default models if Ollama is available, otherwise just use defaults
+	// This preserves both Ollama models and non-Ollama models
 	const models = models_info
 		? merge_ollama_models(models_default, models_info.model_infos)
 		: models_default;
-
-	console.log(`models`, models);
 
 	return {
 		providers: providers_default,

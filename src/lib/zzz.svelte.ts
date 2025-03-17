@@ -4,6 +4,7 @@ import {create_deferred, type Deferred} from '@ryanatkn/belt/async.js';
 import type {Assignable, Class_Constructor} from '@ryanatkn/belt/types.js';
 import {z} from 'zod';
 import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
+import {strip_end} from '@ryanatkn/belt/string.js';
 
 import type {
 	Message_Send_Prompt,
@@ -16,8 +17,6 @@ import type {
 import {Provider, type Provider_Json} from '$lib/provider.svelte.js';
 import type {Provider_Name} from '$lib/provider_types.js';
 import {Uuid, Datetime_Now} from '$lib/zod_helpers.js';
-// import {Completion_Threads, type Completion_Threads_Json} from '$lib/completion_thread.svelte.js';
-import {ollama_list_with_metadata} from '$lib/ollama.js';
 import {Models} from '$lib/models.svelte.js';
 import {Chats} from '$lib/chats.svelte.js';
 import {Providers} from '$lib/providers.svelte.js';
@@ -40,9 +39,8 @@ import {Time} from '$lib/time.svelte.js';
 import type {Zzz_Config} from '$lib/config_helpers.js';
 import {BOTS_DEFAULT} from '$lib/config_defaults.js';
 import type {Diskfile_Path, Zzz_Dir} from '$lib/diskfile_types.js';
-import {strip_end} from '@ryanatkn/belt/string.js';
-import {ZZZ_DIRNAME} from './constants.js';
-import {Url_Params} from './url_params.svelte.js';
+import {ZZZ_DIRNAME} from '$lib/constants.js';
+import {Url_Params} from '$lib/url_params.svelte.js';
 
 // Define standard cell classes
 export const cell_classes = {
@@ -143,7 +141,6 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	// Runtime-only state (not serialized)
 	pending_prompts: SvelteMap<Uuid, Deferred<Message_Completion_Response>> = new SvelteMap();
 	capability_ollama: undefined | null | boolean = $state();
-	inited_models: boolean | undefined = $state();
 
 	constructor(options: Zzz_Options = EMPTY_OBJECT) {
 		// Pass this instance as its own zzz reference
@@ -193,7 +190,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 
 		// Add models if provided in options
 		if (options.models?.length) {
-			this.add_models(options.models);
+			this.models.add_many(options.models);
 		}
 
 		// Initialize socket connection if URL provided
@@ -210,30 +207,6 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	 */
 	register<T extends Cell>(cell_class: Class_Constructor<T>): void {
 		this.registry.register(cell_class);
-	}
-
-	async init_models(): Promise<void> {
-		this.inited_models = false;
-
-		// First add the ollama models
-		this.capability_ollama = null;
-		const ollama_models_response = await ollama_list_with_metadata();
-		if (!ollama_models_response) {
-			this.capability_ollama = false;
-			return;
-		}
-
-		this.capability_ollama = true;
-		this.models.add_ollama_models(ollama_models_response.model_infos);
-
-		this.inited_models = true;
-	}
-
-	add_models(models_json: Array<Model_Json>): void {
-		for (const model_json of models_json) {
-			if (model_json.provider_name === 'ollama') continue; // TODO Skip ollama models added dynamically for now, but refactor this so it doesn't have a special case
-			this.models.add(model_json);
-		}
 	}
 
 	async send_prompt(

@@ -3,7 +3,8 @@ import type {z} from 'zod';
 
 import {Uuid} from '$lib/zod_helpers.js';
 
-// TODO consider a batch operations interface: "Add a transaction-like interface for batch operations to improve performance. Example: collection.batch().add(item1).remove(item2).commit()"
+// TODO think about this from the whole graph's POV, not just individual collections, for relationships/transactions
+// consider a batch operations interface: "Add a transaction-like interface for batch operations to improve performance. Example: collection.batch().add(item1).remove(item2).commit()"
 
 /**
  * Interface for objects that can be stored in an indexed collection
@@ -362,6 +363,7 @@ export class Indexed_Collection<
 		return item;
 	}
 
+	// TODO BLOCK @many maybe delete?  for `add`
 	/**
 	 * Add an item at the beginning of the collection
 	 */

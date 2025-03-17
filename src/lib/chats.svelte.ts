@@ -93,7 +93,7 @@ export class Chats extends Cell<typeof Chats_Json> {
 
 	add(json?: Chat_Json): Chat {
 		const chat = new Chat({zzz: this.zzz, json});
-		this.items.add_first(chat);
+		this.items.add_first(chat); // TODO BLOCK @many maybe delete?  for `add`
 		if (this.selected_id === null) {
 			this.selected_id = chat.id;
 		}
@@ -105,7 +105,7 @@ export class Chats extends Cell<typeof Chats_Json> {
 
 		// Add all chats to the beginning of the collection
 		for (let i = chats.length - 1; i >= 0; i--) {
-			this.items.add_first(chats[i]);
+			this.items.add_first(chats[i]); // TODO BLOCK @many maybe delete?  for `add`
 		}
 
 		// Select the first chat if none is currently selected

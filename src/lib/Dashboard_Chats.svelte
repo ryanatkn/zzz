@@ -56,29 +56,27 @@
 		</div>
 	</div>
 	<!-- TODO select view (tabs?) -->
-	{#if zzz.inited_models}
-		{#if zzz.chats.selected}
-			<Chat_View chat={zzz.chats.selected} />
-		{:else}
-			<div class="flex align_items_center justify_content_center h_100 flex_1" in:fade>
-				<p>
-					Select a chat from the list or <button
-						type="button"
-						class="inline color_d"
-						onclick={() => {
-							zzz.chats.add();
-						}}>create one</button
-					>
-					or take a
-					<button
-						type="button"
-						class="inline color_f"
-						onclick={() => {
-							zzz.chats.select(random_item(zzz.chats.items.all).id);
-						}}>random walk</button
-					>?
-				</p>
-			</div>
-		{/if}
+	{#if zzz.chats.selected}
+		<Chat_View chat={zzz.chats.selected} />
+	{:else}
+		<div class="flex align_items_center justify_content_center h_100 flex_1" in:fade>
+			<p>
+				Select a chat from the list or <button
+					type="button"
+					class="inline color_d"
+					onclick={() => {
+						zzz.chats.add();
+					}}>create one</button
+				>
+				or take a
+				<button
+					type="button"
+					class="inline color_f"
+					onclick={() => {
+						zzz.chats.select(random_item(zzz.chats.items.all).id);
+					}}>random walk</button
+				>?
+			</p>
+		</div>
 	{/if}
 </div>

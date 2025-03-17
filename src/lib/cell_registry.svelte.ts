@@ -3,6 +3,8 @@ import type {Class_Constructor} from '@ryanatkn/belt/types.js';
 import type {Cell} from '$lib/cell.svelte.js';
 import type {Zzz, Cell_Registry_Map} from '$lib/zzz.svelte.js';
 
+// TODO BLOCK maybe rename to `Cell_Graph`? and it's similar to the `Indexed_Collection` in some ways, or composes related behavior?
+
 /**
  * Registry for managing cell classes and their instances
  */

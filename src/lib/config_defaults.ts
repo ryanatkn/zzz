@@ -79,15 +79,26 @@ export const models_default: Array<z.input<typeof Model_Json>> = [
 		training_cutoff: 'December 2023',
 	},
 	{
-		name: 'gemma:2b',
+		name: 'gemma3:1b',
 		provider_name: 'ollama',
 		tags: ['gemma', 'small'],
-		architecture: 'llama',
-		parameter_count: 2.51,
+		architecture: 'gemma3',
+		parameter_count: 1.0,
+		context_window: 32_768,
+		output_token_limit: 6_912,
+		embedding_length: 1_152,
+		filesize: 0.815,
+	},
+	{
+		name: 'gemma3:4b',
+		provider_name: 'ollama',
+		tags: ['gemma', 'small'],
+		architecture: 'gemma3',
+		parameter_count: 4.3,
 		context_window: 8_192,
-		output_token_limit: 16_384,
-		embedding_length: 2_048,
-		filesize: 1.7,
+		output_token_limit: 10_240,
+		embedding_length: 2_560,
+		filesize: 3.3,
 	},
 	{
 		name: 'qwen2.5:1.5b',
@@ -261,13 +272,5 @@ export const models_default: Array<z.input<typeof Model_Json>> = [
 		name: 'gemini-2.0-flash-thinking-exp-01-21',
 		provider_name: 'gemini',
 		tags: ['cheap', 'reasoning'],
-	},
-	{
-		name: 'gemini-1.5-pro',
-		provider_name: 'gemini',
-		tags: [],
-		context_window: 2_000_000,
-		cost_input: 2.5, // $1.25, prompts <= 128k tokens, $2.50, prompts > 128k tokens
-		cost_output: 10, // $5.00, prompts <= 128k tokens, $10.00, prompts > 128k tokens
 	},
 ];
