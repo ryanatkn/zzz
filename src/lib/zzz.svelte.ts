@@ -117,6 +117,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	readonly messages: Messages;
 	readonly socket: Socket;
 	readonly url_params: Url_Params;
+	// TODO maybe `tags` is a virtual collection for ergonomics, in that it's all on the cell table unmanaged by the class, it persists nothing on its own but interfaces to the persistent cells
 
 	readonly bots: Zzz_Config['bots']; // TODO make this a Cell?
 

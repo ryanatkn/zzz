@@ -17,21 +17,16 @@ interface Test_Item {
 	a: string;
 	b: string;
 	c: Array<string>;
-	d: number;
+	n: number;
 }
 
 // Helper function to create test items with predictable values
-const create_test_item = (
-	a: string,
-	b: string,
-	c: Array<string> = [],
-	d: number = 0,
-): Test_Item => ({
+const create_item = (a: string, b: string, c: Array<string> = [], n: number = 0): Test_Item => ({
 	id: Uuid.parse(undefined),
 	a,
 	b,
 	c,
-	d,
+	n,
 });
 
 // Define test schemas
@@ -52,7 +47,7 @@ test('Indexed_Collection - optimization - indexes are computed only once during 
 				result_schema: z.map(z.string(), item_schema),
 			},
 		],
-		initial_items: [create_test_item('a1', 'b1'), create_test_item('a2', 'b2')],
+		initial_items: [create_item('a1', 'b1'), create_item('a2', 'b2')],
 	});
 
 	// Verify compute was called exactly once during initialization
@@ -63,11 +58,11 @@ test('Indexed_Collection - optimization - indexes are computed only once during 
 test('Indexed_Collection - optimization - incremental updates avoid recomputing entire index', () => {
 	// Create spies for the compute and on_add functions
 	const compute_spy = vi.fn((collection) => {
-		return collection.all.filter((item: Test_Item) => item.d > 10);
+		return collection.all.filter((item: Test_Item) => item.n > 10);
 	});
 
 	const on_add_spy = vi.fn((items, item) => {
-		if (item.d > 10) {
+		if (item.n > 10) {
 			items.push(item);
 		}
 		return items;
@@ -76,21 +71,21 @@ test('Indexed_Collection - optimization - incremental updates avoid recomputing 
 	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
 		indexes: [
 			create_derived_index({
-				key: 'high_d',
+				key: 'high_n',
 				compute: compute_spy,
-				matches: (item) => item.d > 10,
+				matches: (item) => item.n > 10,
 				on_add: on_add_spy,
 			}),
 		],
-		initial_items: [create_test_item('a1', 'b1', [], 15), create_test_item('a2', 'b2', [], 5)],
+		initial_items: [create_item('a1', 'b1', [], 15), create_item('a2', 'b2', [], 5)],
 	});
 
 	// Verify compute was called exactly once during initialization
 	expect(compute_spy).toHaveBeenCalledTimes(1);
 
 	// Add more items and check that compute isn't called again
-	collection.add(create_test_item('a3', 'b3', [], 20));
-	collection.add(create_test_item('a4', 'b4', [], 8));
+	collection.add(create_item('a3', 'b3', [], 20));
+	collection.add(create_item('a4', 'b4', [], 8));
 
 	// Compute should still have been called only once
 	expect(compute_spy).toHaveBeenCalledTimes(1);
@@ -99,10 +94,10 @@ test('Indexed_Collection - optimization - incremental updates avoid recomputing 
 	expect(on_add_spy).toHaveBeenCalledTimes(2);
 
 	// Check that the index was correctly updated
-	const high_d = collection.get_derived('high_d');
-	expect(high_d.length).toBe(2);
-	expect(high_d.some((item) => item.a === 'a1')).toBe(true);
-	expect(high_d.some((item) => item.a === 'a3')).toBe(true);
+	const high_n = collection.get_derived('high_n');
+	expect(high_n.length).toBe(2);
+	expect(high_n.some((item) => item.a === 'a1')).toBe(true);
+	expect(high_n.some((item) => item.a === 'a3')).toBe(true);
 });
 
 test('Indexed_Collection - optimization - batch operations are more efficient', () => {
@@ -140,7 +135,7 @@ test('Indexed_Collection - optimization - batch operations are more efficient', 
 	const start_time = performance.now();
 
 	const items = Array.from({length: 100}, (_, i) =>
-		create_test_item(`a${i}`, i % 5 === 0 ? 'b1' : 'b2'),
+		create_item(`a${i}`, i % 5 === 0 ? 'b1' : 'b2'),
 	);
 
 	collection.add_many(items);
@@ -158,7 +153,7 @@ test('Indexed_Collection - optimization - batch operations are more efficient', 
 	const individual_start = performance.now();
 
 	const more_items = Array.from({length: 100}, (_, i) =>
-		create_test_item(`a${i + 100}`, i % 5 === 0 ? 'b1' : 'b2'),
+		create_item(`a${i + 100}`, i % 5 === 0 ? 'b1' : 'b2'),
 	);
 
 	for (const item of more_items) {
@@ -180,12 +175,12 @@ test('Indexed_Collection - optimization - dynamic indexes avoid redundant storag
 	// Create a collection with a dynamic index that computes on-demand
 	const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
 		indexes: [
-			create_dynamic_index<Test_Item, (min_d: string) => Array<Test_Item>>({
-				key: 'by_min_d',
+			create_dynamic_index<Test_Item, (min_n: string) => Array<Test_Item>>({
+				key: 'by_min_n',
 				factory: (collection) => {
-					return (min_d: string) => {
-						const threshold = parseInt(min_d, 10);
-						return collection.all.filter((item) => item.d >= threshold);
+					return (min_n: string) => {
+						const threshold = parseInt(min_n, 10);
+						return collection.all.filter((item) => item.n >= threshold);
 					};
 				},
 				query_schema: z.string(),
@@ -196,17 +191,17 @@ test('Indexed_Collection - optimization - dynamic indexes avoid redundant storag
 
 	// Add test data
 	for (let i = 0; i < 20; i++) {
-		collection.add(create_test_item(`a${i}`, `b${i % 3}`, [], i * 5));
+		collection.add(create_item(`a${i}`, `b${i % 3}`, [], i * 5));
 	}
 
 	// Verify function index produces different results based on input
-	const d_fn = collection.get_index<(threshold: string) => Array<Test_Item>>('by_min_d');
+	const n_fn = collection.get_index<(threshold: string) => Array<Test_Item>>('by_min_n');
 
 	// These should return different filtered subsets without storing separate copies
-	expect(d_fn('10').length).not.toBe(d_fn('50').length);
-	expect(d_fn('0').length).toBe(20); // All items
-	expect(d_fn('50').length).toBe(10); // Half the items
-	expect(d_fn('90').length).toBe(2); // Just the highest values
+	expect(n_fn('10').length).not.toBe(n_fn('50').length);
+	expect(n_fn('0').length).toBe(20); // All items
+	expect(n_fn('50').length).toBe(10); // Half the items
+	expect(n_fn('90').length).toBe(2); // Just the highest values
 });
 
 test('Indexed_Collection - optimization - memory usage with large datasets', () => {
@@ -215,7 +210,7 @@ test('Indexed_Collection - optimization - memory usage with large datasets', () 
 
 	// Create a large dataset (~1000 items)
 	const large_dataset = Array.from({length: 1000}, (_, i) =>
-		create_test_item(`a${i}`, `b${i % 10}`, [`c${i % 20}`], i),
+		create_item(`a${i}`, `b${i % 10}`, [`c${i % 20}`], i),
 	);
 
 	// Add them in one batch

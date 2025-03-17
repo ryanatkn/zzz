@@ -14,25 +14,25 @@ import {Uuid} from '$lib/zod_helpers.js';
 // Test item representing a generic item
 interface Test_Item {
 	id: Uuid;
-	a: string;
-	b: string;
-	c: Array<string>;
-	d: string;
-	e: Date;
-	f: number;
-	g: boolean;
+	text: string;
+	code: string;
+	labels: Array<string>;
+	group: string;
+	time: Date;
+	value: number;
+	flag: boolean;
 }
 
 // Helper to create items with default values that can be overridden
-const create_item = (overrides: Partial<Test_Item> = {}): Test_Item => ({
+const create_test_item = (overrides: Partial<Test_Item> = {}): Test_Item => ({
 	id: Uuid.parse(undefined),
-	a: 'a1',
-	b: 'b1',
-	c: ['c1'],
-	d: 'd1',
-	e: new Date(),
-	f: 3,
-	g: false,
+	text: 'text1',
+	code: 'code1',
+	labels: ['label1'],
+	group: 'g1',
+	time: new Date(),
+	value: 3,
+	flag: false,
 	...overrides,
 });
 
@@ -50,58 +50,60 @@ describe('Indexed_Collection - Query Capabilities', () => {
 			indexes: [
 				// Single value indexes
 				create_single_index({
-					key: 'by_a',
-					extractor: (item) => item.a.toLowerCase(), // Case insensitive
+					key: 'by_text',
+					extractor: (item) => item.text.toLowerCase(), // Case insensitive
 					query_schema: z.string(),
 				}),
 				create_single_index({
-					key: 'by_b',
-					extractor: (item) => item.b, // Case sensitive
+					key: 'by_code',
+					extractor: (item) => item.code, // Case sensitive
 					query_schema: z.string(),
 				}),
 
 				// Multi value indexes
 				create_multi_index({
-					key: 'by_d',
-					extractor: (item) => item.d,
+					key: 'by_group',
+					extractor: (item) => item.group,
 					query_schema: z.string(),
 				}),
 				create_multi_index({
-					key: 'by_c',
-					extractor: (item) => item.c,
+					key: 'by_labels',
+					extractor: (item) => item.labels,
 					query_schema: z.string(),
 				}),
 				create_multi_index({
-					key: 'by_f',
-					extractor: (item) => item.f,
+					key: 'by_value',
+					extractor: (item) => item.value,
 					query_schema: z.number(),
 				}),
 				create_multi_index({
-					key: 'by_g',
-					extractor: (item) => (item.g ? 'y' : 'n'),
+					key: 'by_flag',
+					extractor: (item) => (item.flag ? 'y' : 'n'),
 					query_schema: z.enum(['y', 'n']),
 				}),
 				create_multi_index({
 					key: 'by_year',
-					extractor: (item) => item.e.getFullYear(),
+					extractor: (item) => item.time.getFullYear(),
 					query_schema: z.number(),
 				}),
 
 				// Derived indexes
 				create_derived_index({
-					key: 'g_recent',
+					key: 'recent_flagged',
 					compute: (collection) => {
 						return collection.all
-							.filter((item) => item.g)
-							.sort((a, b) => b.e.getTime() - a.e.getTime())
-							.slice(0, 5); // Top 5 recent g=true items
+							.filter((item) => item.flag)
+							.sort((a, b) => b.time.getTime() - a.time.getTime())
+							.slice(0, 5); // Top 5 recent flag=true items
 					},
-					matches: (item) => item.g,
+					matches: (item) => item.flag,
 					on_add: (items, item) => {
-						if (!item.g) return items;
+						if (!item.flag) return items;
 
-						// Find the right position based on date (newer items first)
-						const index = items.findIndex((existing) => item.e.getTime() > existing.e.getTime());
+						// Find the right position based on time (newer items first)
+						const index = items.findIndex(
+							(existing) => item.time.getTime() > existing.time.getTime(),
+						);
 
 						if (index === -1) {
 							items.push(item);
@@ -124,11 +126,11 @@ describe('Indexed_Collection - Query Capabilities', () => {
 					},
 				}),
 				create_derived_index({
-					key: 'high_f',
-					compute: (collection) => collection.all.filter((item) => item.f >= 4),
-					matches: (item) => item.f >= 4,
+					key: 'high_value',
+					compute: (collection) => collection.all.filter((item) => item.value >= 4),
+					matches: (item) => item.value >= 4,
 					on_add: (items, item) => {
-						if (item.f >= 4) {
+						if (item.value >= 4) {
 							items.push(item);
 						}
 						return items;
@@ -147,50 +149,50 @@ describe('Indexed_Collection - Query Capabilities', () => {
 		// Create test items with simple names
 		const now = Date.now();
 		items = [
-			create_item({
-				a: 'a1',
-				b: 'b1',
-				c: ['c1', 'c2', 'c3'],
-				d: 'd1',
-				e: new Date(now - 1000 * 60 * 60 * 24 * 10), // 10 days ago
-				f: 4,
-				g: true,
+			create_test_item({
+				text: 'item1',
+				code: 'code1',
+				labels: ['label1', 'label2', 'label3'],
+				group: 'g1',
+				time: new Date(now - 1000 * 60 * 60 * 24 * 10), // 10 days ago
+				value: 4,
+				flag: true,
 			}),
-			create_item({
-				a: 'a2',
-				b: 'b2',
-				c: ['c1', 'c4'],
-				d: 'd1',
-				e: new Date(now - 1000 * 60 * 60 * 24 * 20), // 20 days ago
-				f: 5,
-				g: true,
+			create_test_item({
+				text: 'item2',
+				code: 'code2',
+				labels: ['label1', 'label4'],
+				group: 'g1',
+				time: new Date(now - 1000 * 60 * 60 * 24 * 20), // 20 days ago
+				value: 5,
+				flag: true,
 			}),
-			create_item({
-				a: 'b1',
-				b: 'b1',
-				c: ['c2', 'c5'],
-				d: 'd2',
-				e: new Date(now - 1000 * 60 * 60 * 24 * 5), // 5 days ago
-				f: 4,
-				g: false,
+			create_test_item({
+				text: 'code1',
+				code: 'code1',
+				labels: ['label2', 'label5'],
+				group: 'g2',
+				time: new Date(now - 1000 * 60 * 60 * 24 * 5), // 5 days ago
+				value: 4,
+				flag: false,
 			}),
-			create_item({
-				a: 'c1',
-				b: 'b3',
-				c: ['c3', 'c6'],
-				d: 'd3',
-				e: new Date(now - 1000 * 60 * 60 * 24 * 30), // 30 days ago
-				f: 3,
-				g: false,
+			create_test_item({
+				text: 'other',
+				code: 'code3',
+				labels: ['label3', 'label6'],
+				group: 'g3',
+				time: new Date(now - 1000 * 60 * 60 * 24 * 30), // 30 days ago
+				value: 3,
+				flag: false,
 			}),
-			create_item({
-				a: 'b2',
-				b: 'b3',
-				c: ['c1', 'c5'],
-				d: 'd2',
-				e: new Date(now - 1000 * 60 * 60 * 24 * 3), // 3 days ago
-				f: 5,
-				g: true,
+			create_test_item({
+				text: 'code2',
+				code: 'code3',
+				labels: ['label1', 'label5'],
+				group: 'g2',
+				time: new Date(now - 1000 * 60 * 60 * 24 * 3), // 3 days ago
+				value: 5,
+				flag: true,
 			}),
 		];
 
@@ -200,85 +202,87 @@ describe('Indexed_Collection - Query Capabilities', () => {
 
 	test('basic query operations', () => {
 		// Single index direct lookup
-		expect(collection.by_optional('by_a', 'a1'.toLowerCase())).toBe(items[0]);
-		expect(collection.by_optional('by_b', 'b1')).toBeDefined();
+		expect(collection.by_optional('by_text', 'item1'.toLowerCase())).toBe(items[0]);
+		expect(collection.by_optional('by_code', 'code1')).toBeDefined();
 
 		// Multi index direct lookup
-		expect(collection.where('by_d', 'd1')).toHaveLength(2);
-		expect(collection.where('by_f', 5)).toHaveLength(2);
-		expect(collection.where('by_g', 'y')).toHaveLength(3);
+		expect(collection.where('by_group', 'g1')).toHaveLength(2);
+		expect(collection.where('by_value', 5)).toHaveLength(2);
+		expect(collection.where('by_flag', 'y')).toHaveLength(3);
 
 		// Non-existent values
-		expect(collection.by_optional('by_a', 'nonexistent')).toBeUndefined();
-		expect(collection.where('by_d', 'nonexistent')).toHaveLength(0);
+		expect(collection.by_optional('by_text', 'nonexistent')).toBeUndefined();
+		expect(collection.where('by_group', 'nonexistent')).toHaveLength(0);
 	});
 
 	test('case sensitivity in queries', () => {
-		// Case insensitive a lookup (extractor converts to lowercase)
-		expect(collection.by_optional('by_a', 'a1'.toLowerCase())).toBe(items[0]);
-		expect(collection.by_optional('by_a', 'A1'.toLowerCase())).toBe(items[0]);
+		// Case insensitive text lookup (extractor converts to lowercase)
+		expect(collection.by_optional('by_text', 'item1'.toLowerCase())).toBe(items[0]);
+		expect(collection.by_optional('by_text', 'ITEM1'.toLowerCase())).toBe(items[0]);
 
-		// Case sensitive b lookup (no conversion in extractor)
-		expect(collection.by_optional('by_b', 'B1')).toBeUndefined();
-		expect(collection.by_optional('by_b', 'b1')).toBeDefined();
+		// Case sensitive code lookup (no conversion in extractor)
+		expect(collection.by_optional('by_code', 'CODE1')).toBeUndefined();
+		expect(collection.by_optional('by_code', 'code1')).toBeDefined();
 	});
 
 	test('compound queries combining indexes', () => {
-		// Find d1 items by b1
-		const d1_items = collection.where('by_d', 'd1');
-		const b1_d1_items = d1_items.filter((item) => item.b === 'b1');
-		expect(b1_d1_items).toHaveLength(1);
-		expect(b1_d1_items[0].a).toBe('a1');
+		// Find g1 items by code1
+		const g1_items = collection.where('by_group', 'g1');
+		const code1_g1_items = g1_items.filter((item) => item.code === 'code1');
+		expect(code1_g1_items).toHaveLength(1);
+		expect(code1_g1_items[0].text).toBe('item1');
 
-		// Find g=true items with f=5
-		const g_true_items = collection.where('by_g', 'y');
-		const high_f_g_true = g_true_items.filter((item) => item.f === 5);
-		expect(high_f_g_true).toHaveLength(2);
-		expect(high_f_g_true.map((i) => i.a)).toContain('a2');
-		expect(high_f_g_true.map((i) => i.a)).toContain('b2');
+		// Find flag=true items with value=5
+		const flagged_items = collection.where('by_flag', 'y');
+		const high_value_flagged = flagged_items.filter((item) => item.value === 5);
+		expect(high_value_flagged).toHaveLength(2);
+		expect(high_value_flagged.map((i) => i.text)).toContain('item2');
+		expect(high_value_flagged.map((i) => i.text)).toContain('code2');
 	});
 
 	test('queries with array values', () => {
-		// Query by c (checks if any c matches)
-		const c1_items = collection.where('by_c', 'c1');
-		expect(c1_items).toHaveLength(3);
-		expect(c1_items.map((i) => i.a)).toContain('a1');
-		expect(c1_items.map((i) => i.a)).toContain('a2');
-		expect(c1_items.map((i) => i.a)).toContain('b2');
+		// Query by labels (checks if any label matches)
+		const label1_items = collection.where('by_labels', 'label1');
+		expect(label1_items).toHaveLength(3);
+		expect(label1_items.map((i) => i.text)).toContain('item1');
+		expect(label1_items.map((i) => i.text)).toContain('item2');
+		expect(label1_items.map((i) => i.text)).toContain('code2');
 
-		// Multiple c intersection (using multiple queries)
-		const c2_items = collection.where('by_c', 'c2');
-		const c2_and_c3_items = c2_items.filter((item) => item.c.includes('c3'));
-		expect(c2_and_c3_items).toHaveLength(1);
-		expect(c2_and_c3_items[0].a).toBe('a1');
+		// Multiple labels intersection (using multiple queries)
+		const label2_items = collection.where('by_labels', 'label2');
+		const label2_and_label3_items = label2_items.filter((item) => item.labels.includes('label3'));
+		expect(label2_and_label3_items).toHaveLength(1);
+		expect(label2_and_label3_items[0].text).toBe('item1');
 	});
 
 	test('derived index queries', () => {
-		// Test the g_recent derived index
-		const recent_g = collection.get_derived('g_recent');
-		expect(recent_g).toHaveLength(3); // All g=true items
+		// Test the recent_flagged derived index
+		const recent_flagged = collection.get_derived('recent_flagged');
+		expect(recent_flagged).toHaveLength(3); // All flag=true items
 
 		// Verify order (most recent first)
-		expect(recent_g[0].a).toBe('b2'); // 3 days ago
-		expect(recent_g[1].a).toBe('a1'); // 10 days ago
-		expect(recent_g[2].a).toBe('a2'); // 20 days ago
+		expect(recent_flagged[0].text).toBe('code2'); // 3 days ago
+		expect(recent_flagged[1].text).toBe('item1'); // 10 days ago
+		expect(recent_flagged[2].text).toBe('item2'); // 20 days ago
 
-		// Test the high_f derived index which should include all items with f >= 4
-		const high_f = collection.get_derived('high_f');
-		expect(high_f).toHaveLength(4);
-		expect(high_f.map((i) => i.a).sort()).toEqual(['a1', 'a2', 'b1', 'b2'].sort());
+		// Test the high_value derived index which should include all items with value >= 4
+		const high_value = collection.get_derived('high_value');
+		expect(high_value).toHaveLength(4);
+		expect(high_value.map((i) => i.text).sort()).toEqual(
+			['item1', 'item2', 'code1', 'code2'].sort(),
+		);
 	});
 
 	test('first/latest with multi-index', () => {
-		// Get first d1 item
-		const first_d1 = collection.first('by_d', 'd1', 1);
-		expect(first_d1).toHaveLength(1);
-		expect(first_d1[0].a).toBe('a1');
+		// Get first g1 item
+		const first_g1 = collection.first('by_group', 'g1', 1);
+		expect(first_g1).toHaveLength(1);
+		expect(first_g1[0].text).toBe('item1');
 
-		// Get latest d2 item
-		const latest_d2 = collection.latest('by_d', 'd2', 1);
-		expect(latest_d2).toHaveLength(1);
-		expect(latest_d2[0].a).toBe('b2');
+		// Get latest g2 item
+		const latest_g2 = collection.latest('by_group', 'g2', 1);
+		expect(latest_g2).toHaveLength(1);
+		expect(latest_g2[0].text).toBe('code2');
 	});
 
 	test('time-based queries', () => {
@@ -287,68 +291,68 @@ describe('Indexed_Collection - Query Capabilities', () => {
 		const this_year_items = collection.where('by_year', current_year);
 
 		const items_this_year = collection.all.filter(
-			(item) => item.e.getFullYear() === current_year,
+			(item) => item.time.getFullYear() === current_year,
 		).length;
 		expect(this_year_items.length).toBe(items_this_year);
 
 		// More complex date range query - last 7 days
 		const now = Date.now();
 		const recent_items = collection.all.filter(
-			(item) => item.e.getTime() > now - 1000 * 60 * 60 * 24 * 7,
+			(item) => item.time.getTime() > now - 1000 * 60 * 60 * 24 * 7,
 		);
-		expect(recent_items.map((i) => i.a)).toContain('b1'); // 5 days ago
-		expect(recent_items.map((i) => i.a)).toContain('b2'); // 3 days ago
+		expect(recent_items.map((i) => i.text)).toContain('code1'); // 5 days ago
+		expect(recent_items.map((i) => i.text)).toContain('code2'); // 3 days ago
 	});
 
 	test('adding items affects derived queries correctly', () => {
-		// Add a new g=true item with high f
-		const new_item = create_item({
-			a: 'd1',
-			b: 'b4',
-			c: ['c7'],
-			d: 'd4',
-			e: new Date(), // Now (most recent)
-			f: 5,
-			g: true,
+		// Add a new flag=true item with high value
+		const new_item = create_test_item({
+			text: 'new',
+			code: 'code4',
+			labels: ['label7'],
+			group: 'g4',
+			time: new Date(), // Now (most recent)
+			value: 5,
+			flag: true,
 		});
 
 		collection.add(new_item);
 
-		// Check that it appears at the top of the g_recent list
-		const recent_g = collection.get_derived('g_recent');
-		expect(recent_g[0].id).toBe(new_item.id);
+		// Check that it appears at the top of the recent_flagged list
+		const recent_flagged = collection.get_derived('recent_flagged');
+		expect(recent_flagged[0].id).toBe(new_item.id);
 
-		// Check that it appears in high_f
-		const high_f = collection.get_derived('high_f');
-		expect(has_item_with_id(high_f, new_item)).toBe(true);
+		// Check that it appears in high_value
+		const high_value = collection.get_derived('high_value');
+		expect(has_item_with_id(high_value, new_item)).toBe(true);
 	});
 
 	test('removing items updates derived queries', () => {
-		// Remove the most recent g=true item
-		const item_to_remove = items[4]; // b2 (most recent g=true)
+		// Remove the most recent flag=true item
+		const item_to_remove = items[4]; // code2 (most recent flag=true)
 
 		collection.remove(item_to_remove.id);
 
-		// Check that g_recent updates correctly
-		const recent_g = collection.get_derived('g_recent');
-		expect(recent_g).toHaveLength(2);
-		expect(recent_g[0].a).toBe('a1');
-		expect(recent_g[1].a).toBe('a2');
+		// Check that recent_flagged updates correctly
+		const recent_flagged = collection.get_derived('recent_flagged');
+		expect(recent_flagged).toHaveLength(2);
+		expect(recent_flagged[0].text).toBe('item1');
+		expect(recent_flagged[1].text).toBe('item2');
 
-		// Check that high_f updates correctly
-		const high_f = collection.get_derived('high_f');
-		expect(high_f).not.toContain(item_to_remove);
-		expect(high_f).toHaveLength(3); // Started with 4, removed 1
+		// Check that high_value updates correctly
+		const high_value = collection.get_derived('high_value');
+		expect(high_value).not.toContain(item_to_remove);
+		expect(high_value).toHaveLength(3); // Started with 4, removed 1
 	});
 
 	test('dynamic ordering of query results', () => {
-		// Get all items and sort by f (highest first)
-		const sorted_by_f = [...collection.all].sort((a, b) => b.f - a.f);
-		expect(sorted_by_f[0].f).toBe(5);
+		// Get all items and sort by value (highest first)
+		const sorted_by_value = [...collection.all].sort((a, b) => b.value - a.value);
+		expect(sorted_by_value[0].value).toBe(5);
 
-		// Sort by creation date (newest first)
-		const sorted_by_date = [...collection.all].sort((a, b) => b.e.getTime() - a.e.getTime());
-		expect(sorted_by_date[0].a).toBe('b2'); // 3 days ago
+		// Sort by creation time (newest first)
+		const sorted_by_time = [...collection.all].sort((a, b) => b.time.getTime() - a.time.getTime());
+		expect(sorted_by_time[0].text).toBe('code2'); // 3 days ago
 	});
 });
 
@@ -358,19 +362,19 @@ describe('Indexed_Collection - Search Patterns', () => {
 	beforeEach(() => {
 		collection = new Indexed_Collection<Test_Item>({
 			indexes: [
-				// Word-based index that splits a into words for searching
+				// Word-based index that splits text into words for searching
 				create_multi_index({
 					key: 'by_word',
-					extractor: (item) => item.a.toLowerCase().split(/\s+/),
+					extractor: (item) => item.text.toLowerCase().split(/\s+/),
 					query_schema: z.string(),
 				}),
 
 				// Range-based categorization
 				create_multi_index({
-					key: 'by_f_range',
+					key: 'by_value_range',
 					extractor: (item) => {
-						if (item.f <= 2) return 'low';
-						if (item.f <= 4) return 'mid';
+						if (item.value <= 2) return 'low';
+						if (item.value <= 4) return 'mid';
 						return 'high';
 					},
 					query_schema: z.enum(['low', 'mid', 'high']),
@@ -379,21 +383,21 @@ describe('Indexed_Collection - Search Patterns', () => {
 		});
 
 		const test_items = [
-			create_item({
-				a: 'x y z',
-				f: 5,
+			create_test_item({
+				text: 'alpha beta gamma',
+				value: 5,
 			}),
-			create_item({
-				a: 'x w',
-				f: 4,
+			create_test_item({
+				text: 'alpha delta',
+				value: 4,
 			}),
-			create_item({
-				a: 'y v',
-				f: 3,
+			create_test_item({
+				text: 'beta epsilon',
+				value: 3,
 			}),
-			create_item({
-				a: 'z w',
-				f: 2,
+			create_test_item({
+				text: 'gamma delta',
+				value: 2,
 			}),
 		];
 
@@ -401,33 +405,33 @@ describe('Indexed_Collection - Search Patterns', () => {
 	});
 
 	test('word-based search', () => {
-		// Find items with "x" in a
-		const x_items = collection.where('by_word', 'x');
-		expect(x_items).toHaveLength(2);
+		// Find items with "alpha" in text
+		const alpha_items = collection.where('by_word', 'alpha');
+		expect(alpha_items).toHaveLength(2);
 
-		// Find items with "y" in a
-		const y_items = collection.where('by_word', 'y');
-		expect(y_items).toHaveLength(2);
+		// Find items with "beta" in text
+		const beta_items = collection.where('by_word', 'beta');
+		expect(beta_items).toHaveLength(2);
 
-		// Find items with both "x" and "y" (intersection)
-		const x_y_items = x_items.filter((item) => item.a.toLowerCase().includes('y'));
-		expect(x_y_items).toHaveLength(1);
-		expect(x_y_items[0].a).toBe('x y z');
+		// Find items with both "alpha" and "beta" (intersection)
+		const alpha_beta_items = alpha_items.filter((item) => item.text.toLowerCase().includes('beta'));
+		expect(alpha_beta_items).toHaveLength(1);
+		expect(alpha_beta_items[0].text).toBe('alpha beta gamma');
 	});
 
 	test('range-based categorization', () => {
-		// Find high-f items
-		const high_f = collection.where('by_f_range', 'high');
-		expect(high_f).toHaveLength(1);
-		expect(high_f[0].f).toBe(5);
+		// Find high-value items
+		const high_value = collection.where('by_value_range', 'high');
+		expect(high_value).toHaveLength(1);
+		expect(high_value[0].value).toBe(5);
 
-		// Find mid-f items
-		const mid_f = collection.where('by_f_range', 'mid');
-		expect(mid_f).toHaveLength(2);
+		// Find mid-value items
+		const mid_value = collection.where('by_value_range', 'mid');
+		expect(mid_value).toHaveLength(2);
 
-		// Find low-f items
-		const low_f = collection.where('by_f_range', 'low');
-		expect(low_f).toHaveLength(1);
-		expect(low_f[0].f).toBe(2);
+		// Find low-value items
+		const low_value = collection.where('by_value_range', 'low');
+		expect(low_value).toHaveLength(1);
+		expect(low_value[0].value).toBe(2);
 	});
 });

@@ -23,8 +23,8 @@ interface Test_Item {
 	d: boolean;
 	e: Array<string>;
 	f: {
-		g: 'h' | 'i';
-		j: boolean;
+		g: 'x' | 'y';
+		h: boolean;
 	};
 }
 
@@ -34,8 +34,8 @@ const create_item = (
 	b: string,
 	c: number,
 	d: boolean = true,
-	e: Array<string> = ['x1'],
-	g: 'h' | 'i' = 'h',
+	e: Array<string> = ['e1'],
+	g: 'x' | 'y' = 'x',
 ): Test_Item => ({
 	id: Uuid.parse(undefined),
 	a,
@@ -45,16 +45,16 @@ const create_item = (
 	e,
 	f: {
 		g,
-		j: true,
+		h: true,
 	},
 });
 
 // Define schemas for validation
 const item_schema = z.custom<Test_Item>((val) => val && typeof val === 'object' && 'id' in val);
 const items_array_schema = z.array(item_schema);
-const b_schema = z.string().email();
-const c_range_schema = z.number().int().min(10).max(100);
-const e_schema = z.string().min(1);
+const email_schema = z.string().email();
+const range_schema = z.number().int().min(10).max(100);
+const str_schema = z.string().min(1);
 
 describe('Indexed_Collection - Schema Validation', () => {
 	test('single index with schema validation', () => {
@@ -64,7 +64,7 @@ describe('Indexed_Collection - Schema Validation', () => {
 				create_single_index({
 					key: 'by_b',
 					extractor: (item) => item.b,
-					query_schema: b_schema,
+					query_schema: email_schema,
 					result_schema: z.map(z.string().email(), item_schema),
 				}),
 				create_single_index({
@@ -88,8 +88,8 @@ describe('Indexed_Collection - Schema Validation', () => {
 		expect(query_result.a).toBe('a1');
 
 		// Get single index and check schema validation passed
-		const b_index = collection.single_index<Test_Item>('by_b');
-		expect(b_index.size).toBe(2);
+		const email_index = collection.single_index<Test_Item>('by_b');
+		expect(email_index.size).toBe(2);
 	});
 
 	test('multi index with schema validation', () => {
@@ -101,7 +101,7 @@ describe('Indexed_Collection - Schema Validation', () => {
 				create_multi_index({
 					key: 'by_e',
 					extractor: (item) => item.e,
-					query_schema: e_schema,
+					query_schema: str_schema,
 				}),
 				create_multi_index({
 					key: 'by_c_range',
@@ -117,26 +117,26 @@ describe('Indexed_Collection - Schema Validation', () => {
 		});
 
 		// Add items across different ranges
-		collection.add(create_item('a1', 'b1', 15, true, ['x1', 'x2']));
-		collection.add(create_item('a2', 'b2', 30, true, ['x1', 'x3']));
-		collection.add(create_item('a3', 'b3', 60, true, ['x2', 'x4']));
-		collection.add(create_item('a4', 'b4', 90, true, ['x3', 'x4']));
+		collection.add(create_item('a1', 'b1@test.com', 15, true, ['e1', 'e2']));
+		collection.add(create_item('a2', 'b2@test.com', 30, true, ['e1', 'e3']));
+		collection.add(create_item('a3', 'b3@test.com', 60, true, ['e2', 'e4']));
+		collection.add(create_item('a4', 'b4@test.com', 90, true, ['e3', 'e4']));
 
 		// Test range query validation
 		const mid_items = collection.query<Array<Test_Item>, string>('by_c_range', 'mid');
 		expect(mid_items.length).toBe(1);
 		expect(mid_items[0].a).toBe('a2');
 
-		// Test tag index
-		const x2_items = collection.query<Array<Test_Item>, string>('by_e', 'x2');
-		expect(x2_items.length).toBe(2);
-		expect(x2_items.some((item) => item.a === 'a1')).toBe(true);
-		expect(x2_items.some((item) => item.a === 'a3')).toBe(true);
+		// Test e index
+		const e2_items = collection.query<Array<Test_Item>, string>('by_e', 'e2');
+		expect(e2_items.length).toBe(2);
+		expect(e2_items.some((item) => item.a === 'a1')).toBe(true);
+		expect(e2_items.some((item) => item.a === 'a3')).toBe(true);
 
-		const x3_items = collection.query<Array<Test_Item>, string>('by_e', 'x3');
-		expect(x3_items.length).toBe(2);
-		expect(x3_items.some((item) => item.a === 'a2')).toBe(true);
-		expect(x3_items.some((item) => item.a === 'a4')).toBe(true);
+		const e3_items = collection.query<Array<Test_Item>, string>('by_e', 'e3');
+		expect(e3_items.length).toBe(2);
+		expect(e3_items.some((item) => item.a === 'a2')).toBe(true);
+		expect(e3_items.some((item) => item.a === 'a4')).toBe(true);
 
 		// Restore console.error
 		console_error_spy.mockRestore();
@@ -147,7 +147,7 @@ describe('Indexed_Collection - Schema Validation', () => {
 		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
 			indexes: [
 				create_derived_index({
-					key: 'active_adults',
+					key: 'd_items',
 					compute: (collection) => collection.all.filter((item) => item.d && item.c >= 18),
 					matches: (item) => item.d && item.c >= 18,
 					query_schema: z.void(),
@@ -157,20 +157,20 @@ describe('Indexed_Collection - Schema Validation', () => {
 			validate: true,
 		});
 
-		// Add mix of active/inactive and adult/minor items
-		collection.add(create_item('a1', 'b1', 25, true)); // active adult
-		collection.add(create_item('a2', 'b2', 30, false)); // inactive adult
-		collection.add(create_item('a3', 'b3', 16, true)); // active minor
-		collection.add(create_item('a4', 'b4', 17, false)); // inactive minor
+		// Add mix of items with different d/c values
+		collection.add(create_item('a1', 'b1@test.com', 25, true)); // d=true, c>=18
+		collection.add(create_item('a2', 'b2@test.com', 30, false)); // d=false, c>=18
+		collection.add(create_item('a3', 'b3@test.com', 16, true)); // d=true, c<18
+		collection.add(create_item('a4', 'b4@test.com', 17, false)); // d=false, c<18
 
 		// Check derived index correctness
-		const active_adults = collection.get_derived('active_adults');
-		expect(active_adults.length).toBe(1);
-		expect(active_adults[0].a).toBe('a1');
+		const d_items = collection.get_derived('d_items');
+		expect(d_items.length).toBe(1);
+		expect(d_items[0].a).toBe('a1');
 
-		// Add another active adult and verify index updates
-		collection.add(create_item('a5', 'b5', 40, true));
-		expect(collection.get_derived('active_adults').length).toBe(2);
+		// Add another qualifying item and verify index updates
+		collection.add(create_item('a5', 'b5@test.com', 40, true));
+		expect(collection.get_derived('d_items').length).toBe(2);
 	});
 
 	test('dynamic index with schema validation', () => {
@@ -178,8 +178,8 @@ describe('Indexed_Collection - Schema Validation', () => {
 		const query_schema = z.object({
 			min_c: z.number().optional(),
 			max_c: z.number().optional(),
-			d_only: z.boolean().optional(),
-			e: z.array(z.string()).optional(),
+			only_d: z.boolean().optional(),
+			e_vals: z.array(z.string()).optional(),
 		});
 
 		type Item_Query = z.infer<typeof query_schema>;
@@ -199,12 +199,12 @@ describe('Indexed_Collection - Schema Validation', () => {
 								if (query.max_c !== undefined && item.c > query.max_c) return false;
 
 								// Filter by d status if specified
-								if (query.d_only !== undefined && query.d_only && !item.d) return false;
+								if (query.only_d !== undefined && query.only_d && !item.d) return false;
 
 								// Filter by e if specified
-								if (query.e !== undefined && query.e.length > 0) {
-									const has_matching_e = query.e.some((tag) => item.e.includes(tag));
-									if (!has_matching_e) return false;
+								if (query.e_vals !== undefined && query.e_vals.length > 0) {
+									const has_match = query.e_vals.some((v) => item.e.includes(v));
+									if (!has_match) return false;
 								}
 
 								return true;
@@ -219,36 +219,36 @@ describe('Indexed_Collection - Schema Validation', () => {
 		});
 
 		// Add various items
-		collection.add(create_item('a1', 'b1', 25, true, ['x1', 'x2']));
-		collection.add(create_item('a2', 'b2', 35, true, ['x3', 'x4']));
-		collection.add(create_item('a3', 'b3', 18, false, ['x2']));
-		collection.add(create_item('a4', 'b4', 45, true, ['x1', 'x3', 'x5']));
-		collection.add(create_item('a5', 'b5', 16, true, ['x4']));
+		collection.add(create_item('a1', 'b1@test.com', 25, true, ['e1', 'e2']));
+		collection.add(create_item('a2', 'b2@test.com', 35, true, ['e3', 'e4']));
+		collection.add(create_item('a3', 'b3@test.com', 18, false, ['e2']));
+		collection.add(create_item('a4', 'b4@test.com', 45, true, ['e1', 'e3', 'e5']));
+		collection.add(create_item('a5', 'b5@test.com', 16, true, ['e4']));
 
 		// Get the dynamic search function
 		const search_fn = collection.get_index<(query: Item_Query) => Array<Test_Item>>('item_search');
 
 		// Test c range query
-		const young_adults = search_fn({min_c: 18, max_c: 30});
-		expect(young_adults.length).toBe(2);
-		expect(young_adults.map((item) => item.a).sort()).toEqual(['a1', 'a3']);
+		const young_range = search_fn({min_c: 18, max_c: 30});
+		expect(young_range.length).toBe(2);
+		expect(young_range.map((item) => item.a).sort()).toEqual(['a1', 'a3']);
 
-		// Test active with specific values
-		const active_with_x1 = search_fn({d_only: true, e: ['x1']});
-		expect(active_with_x1.length).toBe(2);
-		expect(active_with_x1.map((item) => item.a).sort()).toEqual(['a1', 'a4']);
+		// Test d with specific e values
+		const d_with_e1 = search_fn({only_d: true, e_vals: ['e1']});
+		expect(d_with_e1.length).toBe(2);
+		expect(d_with_e1.map((item) => item.a).sort()).toEqual(['a1', 'a4']);
 
-		// Test items over 30 that are active with specific values
-		const senior_with_x3 = search_fn({min_c: 30, d_only: true, e: ['x3']});
-		expect(senior_with_x3.length).toBe(2);
-		expect(senior_with_x3.map((item) => item.a).sort()).toEqual(['a2', 'a4']);
+		// Test items over 30 that are d with specific e values
+		const high_c_with_e3 = search_fn({min_c: 30, only_d: true, e_vals: ['e3']});
+		expect(high_c_with_e3.length).toBe(2);
+		expect(high_c_with_e3.map((item) => item.a).sort()).toEqual(['a2', 'a4']);
 
 		// Test using query method
-		const with_x5 = collection.query<Array<Test_Item>, Item_Query>('item_search', {
-			e: ['x5'],
+		const with_e5 = collection.query<Array<Test_Item>, Item_Query>('item_search', {
+			e_vals: ['e5'],
 		});
-		expect(with_x5.length).toBe(1);
-		expect(with_x5[0].a).toBe('a4');
+		expect(with_e5.length).toBe(1);
+		expect(with_e5[0].a).toBe('a4');
 	});
 
 	test('error handling when schema validation fails', () => {
@@ -261,12 +261,12 @@ describe('Indexed_Collection - Schema Validation', () => {
 				create_single_index({
 					key: 'by_b',
 					extractor: (item) => item.b,
-					query_schema: b_schema,
+					query_schema: email_schema,
 				}),
 				create_single_index({
 					key: 'by_c',
 					extractor: (item) => item.c,
-					query_schema: c_range_schema,
+					query_schema: range_schema,
 				}),
 			],
 			validate: true,
@@ -302,12 +302,12 @@ describe('Indexed_Collection - Schema Validation', () => {
 				create_single_index({
 					key: 'by_b',
 					extractor: (item) => item.b,
-					query_schema: b_schema,
+					query_schema: email_schema,
 				}),
 				create_single_index({
 					key: 'by_c',
 					extractor: (item) => item.c,
-					query_schema: c_range_schema,
+					query_schema: range_schema,
 				}),
 			],
 			validate: false, // Explicitly disable validation
@@ -328,9 +328,9 @@ describe('Indexed_Collection - Schema Validation', () => {
 
 	test('validation with nested properties and complex types', () => {
 		// Schema for nested property validation
-		const nested_schema = z.object({
-			g: z.enum(['h', 'i']),
-			j: z.boolean(),
+		const f_schema = z.object({
+			g: z.enum(['x', 'y']),
+			h: z.boolean(),
 		});
 
 		// Create collection with complex validation
@@ -339,33 +339,33 @@ describe('Indexed_Collection - Schema Validation', () => {
 				create_single_index({
 					key: 'by_f_g',
 					extractor: (item) => item.f.g,
-					query_schema: nested_schema.shape.g,
+					query_schema: f_schema.shape.g,
 				}),
 				create_multi_index({
-					key: 'by_complex',
+					key: 'by_compound',
 					extractor: (item) => {
 						// Return a compound key made from multiple fields
 						return `${item.a}-${item.f.g}`;
 					},
-					query_schema: z.string().regex(/^[a-z0-9]+-[hi]$/),
+					query_schema: z.string().regex(/^[a-z0-9]+-[xy]$/),
 				}),
 			],
 			validate: true,
 		});
 
 		// Add items with valid nested properties
-		const item1 = create_item('a1', 'b1', 25, true, ['x1'], 'h');
-		const item2 = create_item('a2', 'b2', 35, true, ['x2'], 'i');
+		const item1 = create_item('a1', 'b1@test.com', 25, true, ['e1'], 'x');
+		const item2 = create_item('a2', 'b2@test.com', 35, true, ['e2'], 'y');
 
 		collection.add(item1);
 		collection.add(item2);
 
 		// Test lookup by nested property - use by_optional instead of where for single index
-		expect(collection.by_optional('by_f_g', 'h')?.a).toBe('a1');
-		expect(collection.by_optional('by_f_g', 'i')?.a).toBe('a2');
+		expect(collection.by_optional('by_f_g', 'x')?.a).toBe('a1');
+		expect(collection.by_optional('by_f_g', 'y')?.a).toBe('a2');
 
 		// Test compound key lookup
-		expect(collection.where('by_complex', 'a1-h').length).toBe(1);
-		expect(collection.where('by_complex', 'a2-i').length).toBe(1);
+		expect(collection.where('by_compound', 'a1-x').length).toBe(1);
+		expect(collection.where('by_compound', 'a2-y').length).toBe(1);
 	});
 });
