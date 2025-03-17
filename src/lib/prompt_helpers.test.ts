@@ -5,7 +5,7 @@ import {XML_TAG_NAME_DEFAULT} from '$lib/constants.js';
 
 // Instead of mocking modules, we'll create a simplified bit structure
 // that mirrors the interface we need for the tests
-interface SimpleBit {
+interface Simple_Bit {
 	enabled: boolean;
 	content: string;
 	has_xml_tag: boolean;
@@ -18,7 +18,7 @@ interface SimpleBit {
 }
 
 // Helper to create a bit with default values
-const create_bit = (partial: Partial<SimpleBit> = {}): SimpleBit => {
+const create_bit = (partial: Partial<Simple_Bit> = {}): Simple_Bit => {
 	return {
 		enabled: true,
 		content: '',
