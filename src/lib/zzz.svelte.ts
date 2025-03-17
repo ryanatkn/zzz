@@ -135,8 +135,16 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	// Special property to detect self-reference
 	readonly is_zzz: boolean = true;
 
-	// Derived values
-	tags: Set<string> = $derived.by(() => new Set(this.models.items.all.flatMap((m) => m.tags))); // TODO cached from indexed collection
+	// TODO think about how this could be an incremental indexed value - maybe push through indexes rather than using derived signals?
+	tags: Set<string> = $derived.by(() => {
+		const tag_set: Set<string> = new Set();
+		for (const model of this.models.items.all) {
+			for (const tag of model.tags) {
+				tag_set.add(tag);
+			}
+		}
+		return tag_set;
+	});
 
 	// Runtime-only state (not serialized)
 	pending_prompts: SvelteMap<Uuid, Deferred<Message_Completion_Response>> = new SvelteMap();
