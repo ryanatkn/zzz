@@ -14,7 +14,6 @@
 </script>
 
 <div class="p_lg">
-	<h1>home</h1>
 	<div class="sections mt_lg">
 		<section class="panel p_md mb_0">
 			<div class="mb_lg">

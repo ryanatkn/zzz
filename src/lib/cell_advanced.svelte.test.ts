@@ -2,24 +2,37 @@
 
 import {test, expect, vi, beforeEach} from 'vitest';
 import {z} from 'zod';
+import {SvelteMap} from 'svelte/reactivity';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json, type Schema_Keys} from '$lib/cell_types.js';
 import {Uuid, Datetime_Now} from '$lib/zod_helpers.js';
 import {HANDLED, USE_DEFAULT} from '$lib/cell_helpers.js';
 
+/* eslint-disable @typescript-eslint/dot-notation */
+
 // Simple mock for Zzz
-const mock_zzz = {
-	registry: {
-		instantiate: vi.fn((name, json) => {
-			// For testing instantiation logic
-			if (name === 'Test_Type' && json) {
-				return {type: 'Test_Type', ...json};
-			}
-			return null;
-		}),
-	},
-} as any;
+const create_mock_zzz = () => {
+	return {
+		cells: new SvelteMap<Uuid, Cell>(),
+		registry: {
+			instantiate: vi.fn((name, json) => {
+				// For testing instantiation logic
+				if (name === 'Test_Type' && json) {
+					return {type: 'Test_Type', ...json};
+				}
+				return null;
+			}),
+			maybe_instantiate: vi.fn((name, json) => {
+				// For testing instantiation logic
+				if (name === 'Test_Type' && json) {
+					return {type: 'Test_Type', ...json};
+				}
+				return null;
+			}),
+		},
+	} as any;
+};
 
 // Reset mocks between tests
 beforeEach(() => {
@@ -43,6 +56,8 @@ const Test_Schema = Cell_Json.extend({
 }).strict();
 
 test('Cell uses registry for instantiating class relationships', () => {
+	const mock_zzz = create_mock_zzz();
+
 	class Registry_Test_Cell extends Cell<typeof Test_Schema> {
 		text: string = $state()!;
 		number: number | undefined = $state();
@@ -55,7 +70,7 @@ test('Cell uses registry for instantiating class relationships', () => {
 		}
 
 		test_instantiate(json: any, class_name: string): unknown {
-			return this.zzz.registry.instantiate(class_name, json);
+			return this.zzz.registry.instantiate(class_name as any, json);
 		}
 	}
 
@@ -78,6 +93,8 @@ test('Cell uses registry for instantiating class relationships', () => {
 });
 
 test('Cell.encode_property uses $state.snapshot for values', () => {
+	const mock_zzz = create_mock_zzz();
+
 	class Encoding_Test_Cell extends Cell<typeof Test_Schema> {
 		text: string = $state()!;
 		number: number | undefined = $state();
@@ -115,6 +132,8 @@ test('Cell.encode_property uses $state.snapshot for values', () => {
 });
 
 test('Cell handles special types like Map and Set', () => {
+	const mock_zzz = create_mock_zzz();
+
 	const Collections_Schema = z.object({
 		id: Uuid,
 		created: Datetime_Now,
@@ -181,6 +200,7 @@ test('Cell handles special types like Map and Set', () => {
 });
 
 test('Cell logs error when property does not exist on instance', () => {
+	const mock_zzz = create_mock_zzz();
 	const Missing_Property_Schema = Cell_Json.extend({
 		existing_prop: z.string().default(''),
 		missing_prop: z.number().default(42), // Won't exist on class
@@ -218,7 +238,8 @@ test('Cell logs error when property does not exist on instance', () => {
 	console_error_spy.mockRestore();
 });
 
-test('Cell allows schema keys with no properties if a parser is provided', () => {
+test('Cell allows schema keys with no properties if a decoder is provided', () => {
+	const mock_zzz = create_mock_zzz();
 	const Virtual_Property_Schema = Cell_Json.extend({
 		real_prop: z.string().default(''),
 		virtual_prop: z.number().default(42), // Won't exist on class
@@ -236,7 +257,7 @@ test('Cell allows schema keys with no properties if a parser is provided', () =>
 			this.decoders = {
 				virtual_prop: (value) => {
 					this.captured_value = typeof value === 'number' ? value : 0;
-					return undefined;
+					return HANDLED;
 				},
 			};
 
@@ -257,6 +278,8 @@ test('Cell allows schema keys with no properties if a parser is provided', () =>
 });
 
 test('Cell supports overriding assign_property', () => {
+	const mock_zzz = create_mock_zzz();
+
 	class Custom_Assignment_Cell extends Cell<typeof Test_Schema> {
 		text: string = $state()!;
 		number: number | undefined = $state();
@@ -302,6 +325,7 @@ test('Cell supports overriding assign_property', () => {
 });
 
 test('Cell supports virtual properties with custom handling', () => {
+	const mock_zzz = create_mock_zzz();
 	const Virtual_Handler_Schema = z.object({
 		id: Uuid,
 		created: Datetime_Now,
@@ -324,7 +348,7 @@ test('Cell supports virtual properties with custom handling', () => {
 					if (typeof value === 'number') {
 						this.processed_value = value * 2;
 					}
-					return undefined;
+					return HANDLED; // Must return HANDLED for virtual properties
 				},
 			};
 
@@ -348,6 +372,8 @@ test('Cell supports virtual properties with custom handling', () => {
 });
 
 test('Cell assign_property returns after handling property correctly', () => {
+	const mock_zzz = create_mock_zzz();
+
 	class Return_Behavior_Cell extends Cell<typeof Test_Schema> {
 		text: string = $state()!;
 		number: number | undefined = $state();
@@ -400,6 +426,7 @@ test('Cell assign_property returns after handling property correctly', () => {
 });
 
 test('Cell parser defaults take precedence over schema defaults', () => {
+	const mock_zzz = create_mock_zzz();
 	const Default_Precedence_Schema = z.object({
 		id: z.string().default('schema_default_id'),
 		created: Datetime_Now,
@@ -437,6 +464,8 @@ test('Cell parser defaults take precedence over schema defaults', () => {
 });
 
 test('Cell handles inherited properties correctly', () => {
+	const mock_zzz = create_mock_zzz();
+
 	class Base_Test_Cell extends Cell<typeof Test_Schema> {
 		text: string = $state()!;
 
@@ -497,6 +526,7 @@ test('Cell handles inherited properties correctly', () => {
 });
 
 test('Cell - JSON serialization excludes undefined values correctly', () => {
+	const mock_zzz = create_mock_zzz();
 	const Serialization_Schema = Cell_Json.extend({
 		type: z.enum(['type1', 'type2']),
 		name: z.string().optional(),
@@ -579,6 +609,7 @@ test('Cell - JSON serialization excludes undefined values correctly', () => {
 });
 
 test('Cell properly handles collections with HANDLED sentinel', () => {
+	const mock_zzz = create_mock_zzz();
 	const Virtual_Collection_Schema = Cell_Json.extend({
 		collection: z.array(z.string()).default(() => []),
 		text: z.string().default(''),
@@ -632,6 +663,7 @@ test('Cell properly handles collections with HANDLED sentinel', () => {
 });
 
 test('Cell handles sentinel values with proper precedence', () => {
+	const mock_zzz = create_mock_zzz();
 	const Sentinel_Schema = Cell_Json.extend({
 		handled_field: z.string().default(''),
 		default_field: z.number().default(0),
@@ -688,4 +720,92 @@ test('Cell handles sentinel values with proper precedence', () => {
 	expect(cell.handled_field).toBe('initial_value');
 	expect(cell.default_field).toBe(42);
 	expect(cell.normal_field).toBe(true);
+});
+
+test('Cell registration and unregistration works correctly', () => {
+	const mock_zzz = create_mock_zzz();
+	const cell_id = Uuid.parse(undefined);
+
+	class Registration_Test_Cell extends Cell<typeof Test_Schema> {
+		text: string = $state()!;
+		number: number | undefined = $state();
+		list: Array<string> = $state()!;
+		flag: boolean = $state()!;
+
+		constructor(options: Cell_Options<typeof Test_Schema>) {
+			super(Test_Schema, options);
+			this.init();
+		}
+	}
+
+	const cell = new Registration_Test_Cell({
+		zzz: mock_zzz,
+		json: {
+			id: cell_id,
+			created: TEST_DATE,
+		},
+	});
+
+	// Cell should be automatically registered
+	expect(mock_zzz.cells.has(cell_id)).toBe(true);
+	expect(mock_zzz.cells.get(cell_id)).toBe(cell);
+
+	// Test manual unregistration
+	cell['unregister']();
+	expect(mock_zzz.cells.has(cell_id)).toBe(false);
+
+	// Test manual registration again
+	cell['register']();
+	expect(mock_zzz.cells.has(cell_id)).toBe(true);
+
+	// Test disposal
+	cell['dispose']();
+	expect(mock_zzz.cells.has(cell_id)).toBe(false);
+});
+
+test('Cell properly uses instantiate_class helper', () => {
+	const mock_zzz = create_mock_zzz();
+
+	class Instantiation_Test_Cell extends Cell<typeof Test_Schema> {
+		text: string = $state()!;
+		number: number | undefined = $state();
+		list: Array<string> = $state()!;
+		flag: boolean = $state()!;
+
+		constructor(options: Cell_Options<typeof Test_Schema>) {
+			super(Test_Schema, options);
+			this.init();
+		}
+
+		// Create a test method that replicates the functionality of #instantiate_class
+		test_private_instantiate(class_name?: string, json?: unknown): any {
+			if (!class_name) {
+				console.error('No class name provided for instantiation');
+				return null;
+			}
+
+			const instance = this.zzz.registry.maybe_instantiate(class_name as any, json);
+			if (!instance) console.error(`Failed to instantiate ${class_name}`);
+			return instance;
+		}
+	}
+
+	const cell = new Instantiation_Test_Cell({
+		zzz: mock_zzz,
+		json: {
+			id: TEST_ID,
+			created: TEST_DATE,
+		},
+	});
+
+	// Should call registry.maybe_instantiate
+	cell.test_private_instantiate('Test_Type', {test: true});
+	expect(mock_zzz.registry.maybe_instantiate).toHaveBeenCalledWith('Test_Type', {test: true});
+
+	// Should return null and log error for undefined class_name
+	const console_error_spy = vi.spyOn(console, 'error');
+	const result = cell.test_private_instantiate(undefined, {});
+	expect(result).toBeNull();
+	expect(console_error_spy).toHaveBeenCalled();
+	console_error_spy.mockRestore();
 });

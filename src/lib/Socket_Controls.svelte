@@ -9,7 +9,13 @@
 	import type {Socket} from '$lib/socket.svelte.js';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
-	import {GLYPH_CONNECT, GLYPH_CANCEL, GLYPH_DISCONNECT, GLYPH_RESET} from '$lib/glyphs.js';
+	import {
+		GLYPH_CONNECT,
+		GLYPH_CANCEL,
+		GLYPH_DISCONNECT,
+		GLYPH_RESET,
+		GLYPH_PLACEHOLDER,
+	} from '$lib/glyphs.js';
 	import {format_ms_to_readable, format_timestamp} from '$lib/time_helpers.js';
 	import {
 		DEFAULT_HEARTBEAT_INTERVAL,
@@ -108,7 +114,7 @@
 					<input
 						type="text"
 						class="plain flex_1"
-						placeholder="websocket url, ws:// or wss://"
+						placeholder="{GLYPH_PLACEHOLDER} websocket url, ws:// or wss://"
 						bind:value={socket.url_input}
 					/>
 					<button

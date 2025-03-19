@@ -155,15 +155,15 @@
 					<div class="font_mono word_break_break_word">{message.path}</div>
 				</div>
 			{/if}
-			{#if message.contents !== undefined}
+			{#if message.content !== undefined}
 				<div class="field_row">
 					<div class="font_weight_600 color_text_subtle">Size</div>
-					<div>{message.contents.length || 0} characters</div>
+					<div>{message.content.length || 0} characters</div>
 				</div>
 				<h4 class="mt_sm mb_xs">Contents</h4>
 				<pre
 					class="font_mono size_sm white_space_pre_wrap word_break_break_word p_sm w_100 overflow_auto scrollbar_width_thin"
-					style:max-height="300px">{message.contents || ''}</pre>
+					style:max-height="300px">{message.content || ''}</pre>
 			{/if}
 			{#if message.change}
 				<div class="field_row">
@@ -193,15 +193,15 @@
 							</tr>
 						</thead>
 						<tbody>
-							{#each Object.entries(message.data.files) as [path, fileData]}
+							{#each Object.entries(message.data.files) as [path, file_data]}
 								<tr>
 									<td class="p_xs font_mono size_sm">{path}</td>
 									<td class="p_xs"
-										>{typeof fileData === 'object' &&
-										fileData !== null &&
-										'contents' in fileData &&
-										typeof fileData.contents === 'string'
-											? fileData.contents.length
+										>{typeof file_data === 'object' &&
+										file_data !== null &&
+										'contents' in file_data &&
+										typeof file_data.contents === 'string'
+											? file_data.contents.length
 											: 0} chars</td
 									>
 								</tr>

@@ -9,12 +9,12 @@
 	import {zzz_context} from '$lib/zzz.svelte.js';
 
 	interface Props {
-		file: Diskfile;
+		diskfile: Diskfile;
 		selected: boolean;
 		onclick: (file: Diskfile) => void;
 	}
 
-	const {file, selected, onclick}: Props = $props();
+	const {diskfile, selected, onclick}: Props = $props();
 
 	const zzz = zzz_context.get();
 
@@ -27,37 +27,37 @@
 	type="button"
 	class="compact"
 	class:selected
-	onclick={() => onclick(file)}
-	title="file at {file.path}"
+	onclick={() => onclick(diskfile)}
+	title="file at {diskfile.path}"
 	use:contextmenu_action={contextmenu_entries}
 >
 	<div class="ellipsis">
 		<Glyph_Icon icon={GLYPH_FILE} />
 		<span
-			>{#if file.path_relative}{file.path_relative}{:else}<Pending_Animation />{/if}</span
+			>{#if diskfile.path_relative}{diskfile.path_relative}{:else}<Pending_Animation />{/if}</span
 		>
 	</div>
 </button>
 
 {#snippet contextmenu_entries()}
-	<!-- TODO add this contextmenu feature: disabled={!file.contents} -->
+	<!-- TODO add this contextmenu feature: disabled={!file.content} -->
 	<Contextmenu_Entry
 		run={async () => {
-			if (file.contents) {
-				await navigator.clipboard.writeText(file.contents);
+			if (diskfile.content) {
+				await navigator.clipboard.writeText(diskfile.content);
 			}
 		}}
 	>
 		{#snippet icon()}{GLYPH_COPY}{/snippet}
-		<span>Copy contents</span>
+		<span>Copy content</span>
 	</Contextmenu_Entry>
 
 	<Contextmenu_Entry
 		run={() => {
 			// TODO BLOCK better confirmation
 			// eslint-disable-next-line no-alert
-			if (confirm(`Are you sure you want to delete ${file.path_relative}?`)) {
-				zzz.diskfiles.delete(file.path);
+			if (confirm(`Are you sure you want to delete ${diskfile.path_relative}?`)) {
+				zzz.diskfiles.delete(diskfile.path);
 			}
 		}}
 	>

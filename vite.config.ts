@@ -3,7 +3,10 @@ import {sveltekit} from '@sveltejs/kit/vite';
 
 export default defineConfig({
 	plugins: [sveltekit()],
-	test: {}, // use `// @vitest-environment jsdom` in test files for Svelte tests
+	test: {
+		// use `// @vitest-environment jsdom` in test files for Svelte tests
+		// environment: 'jsdom',
+	},
 	// Tell Vitest to use the `browser` entry points in `package.json` files, even though it's running in Node
 	resolve: process.env.VITEST
 		? {

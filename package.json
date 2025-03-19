@@ -38,11 +38,11 @@
   "devDependencies": {
     "@changesets/changelog-git": "^0.2.1",
     "@ryanatkn/eslint-config": "^0.7.0",
-    "@ryanatkn/fuz": "^0.133.1",
+    "@ryanatkn/fuz": "^0.133.2",
     "@ryanatkn/gro": "^0.148.0",
     "@ryanatkn/moss": "^0.23.2",
     "@sveltejs/adapter-static": "^3.0.8",
-    "@sveltejs/kit": "^2.17.2",
+    "@sveltejs/kit": "^2.20.0",
     "@sveltejs/package": "^2.3.10",
     "@sveltejs/vite-plugin-svelte": "^4.0.0",
     "eslint": "^9.21.0",
@@ -51,12 +51,12 @@
     "ollama": "^0.5.14",
     "prettier": "^3.5.2",
     "prettier-plugin-svelte": "^3.3.3",
-    "svelte": "5.20.2",
+    "svelte": "^5.23.1",
     "svelte-check": "^4.1.4",
     "tslib": "^2.8.1",
     "typescript": "^5.7.3",
     "typescript-eslint": "^8.25.0",
-    "vitest": "^3.0.7",
+    "vitest": "^3.0.9",
     "zod": "^3.24.2"
   },
   "dependencies": {
@@ -97,10 +97,34 @@
   ],
   "exports": {
     "./package.json": "./package.json",
+    "./Bit_Editor_Diskfile.svelte": {
+      "types": "./dist/Bit_Editor_Diskfile.svelte.d.ts",
+      "svelte": "./dist/Bit_Editor_Diskfile.svelte",
+      "default": "./dist/Bit_Editor_Diskfile.svelte"
+    },
+    "./Bit_Editor_Sequence.svelte": {
+      "types": "./dist/Bit_Editor_Sequence.svelte.d.ts",
+      "svelte": "./dist/Bit_Editor_Sequence.svelte",
+      "default": "./dist/Bit_Editor_Sequence.svelte"
+    },
+    "./Bit_Editor_Text.svelte": {
+      "types": "./dist/Bit_Editor_Text.svelte.d.ts",
+      "svelte": "./dist/Bit_Editor_Text.svelte",
+      "default": "./dist/Bit_Editor_Text.svelte"
+    },
+    "./bit_helpers.js": {
+      "types": "./dist/bit_helpers.d.ts",
+      "default": "./dist/bit_helpers.js"
+    },
     "./Bit_List.svelte": {
       "types": "./dist/Bit_List.svelte.d.ts",
       "svelte": "./dist/Bit_List.svelte",
       "default": "./dist/Bit_List.svelte"
+    },
+    "./Bit_Remove_Button.svelte": {
+      "types": "./dist/Bit_Remove_Button.svelte.d.ts",
+      "svelte": "./dist/Bit_Remove_Button.svelte",
+      "default": "./dist/Bit_Remove_Button.svelte"
     },
     "./Bit_Stats.svelte": {
       "types": "./dist/Bit_Stats.svelte.d.ts",
@@ -112,6 +136,11 @@
       "svelte": "./dist/Bit_Summary.svelte",
       "default": "./dist/Bit_Summary.svelte"
     },
+    "./Bit_Toggle_Button.svelte": {
+      "types": "./dist/Bit_Toggle_Button.svelte.d.ts",
+      "svelte": "./dist/Bit_Toggle_Button.svelte",
+      "default": "./dist/Bit_Toggle_Button.svelte"
+    },
     "./Bit_View.svelte": {
       "types": "./dist/Bit_View.svelte.d.ts",
       "svelte": "./dist/Bit_View.svelte",
@@ -120,6 +149,14 @@
     "./bit.svelte.js": {
       "types": "./dist/bit.svelte.d.ts",
       "default": "./dist/bit.svelte.js"
+    },
+    "./bits.svelte.js": {
+      "types": "./dist/bits.svelte.d.ts",
+      "default": "./dist/bits.svelte.js"
+    },
+    "./cell_classes.js": {
+      "types": "./dist/cell_classes.d.ts",
+      "default": "./dist/cell_classes.js"
     },
     "./cell_helpers.js": {
       "types": "./dist/cell_helpers.d.ts",
@@ -136,15 +173,6 @@
     "./cell.svelte.js": {
       "types": "./dist/cell.svelte.d.ts",
       "default": "./dist/cell.svelte.js"
-    },
-    "./Chat_Message_Item.svelte": {
-      "types": "./dist/Chat_Message_Item.svelte.d.ts",
-      "svelte": "./dist/Chat_Message_Item.svelte",
-      "default": "./dist/Chat_Message_Item.svelte"
-    },
-    "./chat_message.svelte.js": {
-      "types": "./dist/chat_message.svelte.d.ts",
-      "default": "./dist/chat_message.svelte.js"
     },
     "./Chat_Tape.svelte": {
       "types": "./dist/Chat_Tape.svelte.d.ts",
@@ -189,6 +217,21 @@
     "./constants.js": {
       "types": "./dist/constants.d.ts",
       "default": "./dist/constants.js"
+    },
+    "./Content_Editor.svelte": {
+      "types": "./dist/Content_Editor.svelte.d.ts",
+      "svelte": "./dist/Content_Editor.svelte",
+      "default": "./dist/Content_Editor.svelte"
+    },
+    "./Content_Preview.svelte": {
+      "types": "./dist/Content_Preview.svelte.d.ts",
+      "svelte": "./dist/Content_Preview.svelte",
+      "default": "./dist/Content_Preview.svelte"
+    },
+    "./Content_Stats.svelte": {
+      "types": "./dist/Content_Stats.svelte.d.ts",
+      "svelte": "./dist/Content_Stats.svelte",
+      "default": "./dist/Content_Stats.svelte"
     },
     "./Control_Panel.svelte": {
       "types": "./dist/Control_Panel.svelte.d.ts",
@@ -245,6 +288,20 @@
       "svelte": "./dist/Dashboard.svelte",
       "default": "./dist/Dashboard.svelte"
     },
+    "./Diskfile_Actions.svelte": {
+      "types": "./dist/Diskfile_Actions.svelte.d.ts",
+      "svelte": "./dist/Diskfile_Actions.svelte",
+      "default": "./dist/Diskfile_Actions.svelte"
+    },
+    "./Diskfile_Content_Editor.svelte": {
+      "types": "./dist/Diskfile_Content_Editor.svelte.d.ts",
+      "svelte": "./dist/Diskfile_Content_Editor.svelte",
+      "default": "./dist/Diskfile_Content_Editor.svelte"
+    },
+    "./diskfile_editor_state.svelte.js": {
+      "types": "./dist/diskfile_editor_state.svelte.d.ts",
+      "default": "./dist/diskfile_editor_state.svelte.js"
+    },
     "./Diskfile_Editor.svelte": {
       "types": "./dist/Diskfile_Editor.svelte.d.ts",
       "svelte": "./dist/Diskfile_Editor.svelte",
@@ -268,6 +325,11 @@
       "types": "./dist/Diskfile_List_Item.svelte.d.ts",
       "svelte": "./dist/Diskfile_List_Item.svelte",
       "default": "./dist/Diskfile_List_Item.svelte"
+    },
+    "./Diskfile_Metrics.svelte": {
+      "types": "./dist/Diskfile_Metrics.svelte.d.ts",
+      "svelte": "./dist/Diskfile_Metrics.svelte",
+      "default": "./dist/Diskfile_Metrics.svelte"
     },
     "./diskfile_types.js": {
       "types": "./dist/diskfile_types.d.ts",
@@ -432,11 +494,6 @@
       "svelte": "./dist/Prompt_List.svelte",
       "default": "./dist/Prompt_List.svelte"
     },
-    "./Prompt_Preview.svelte": {
-      "types": "./dist/Prompt_Preview.svelte.d.ts",
-      "svelte": "./dist/Prompt_Preview.svelte",
-      "default": "./dist/Prompt_Preview.svelte"
-    },
     "./Prompt_Stats.svelte": {
       "types": "./dist/Prompt_Stats.svelte.d.ts",
       "svelte": "./dist/Prompt_Stats.svelte",
@@ -553,6 +610,15 @@
     "./socket.svelte.js": {
       "types": "./dist/socket.svelte.d.ts",
       "default": "./dist/socket.svelte.js"
+    },
+    "./Strip_Item.svelte": {
+      "types": "./dist/Strip_Item.svelte.d.ts",
+      "svelte": "./dist/Strip_Item.svelte",
+      "default": "./dist/Strip_Item.svelte"
+    },
+    "./strip.svelte.js": {
+      "types": "./dist/strip.svelte.d.ts",
+      "default": "./dist/strip.svelte.js"
     },
     "./tape_helpers.js": {
       "types": "./dist/tape_helpers.d.ts",

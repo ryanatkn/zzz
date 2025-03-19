@@ -3,7 +3,7 @@ import {z} from 'zod';
 import type {Message_Filer_Change} from '$lib/message_types.js';
 import {Uuid} from '$lib/zod_helpers.js';
 import {Diskfile, Diskfile_Schema} from '$lib/diskfile.svelte.js';
-import {Diskfile_Json, type Diskfile_Path} from '$lib/diskfile_types.js';
+import {Diskfile_Json, Diskfile_Path} from '$lib/diskfile_types.js';
 import {source_file_to_diskfile_json} from '$lib/diskfile_helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
@@ -160,12 +160,12 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 		return diskfile;
 	}
 
-	update(path: Diskfile_Path, contents: string): void {
+	update(path: Diskfile_Path, content: string): void {
 		this.zzz.messages.send({
 			id: Uuid.parse(undefined),
 			type: 'update_diskfile',
 			path,
-			contents,
+			content,
 		});
 	}
 
@@ -173,6 +173,33 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 		this.zzz.messages.send({
 			id: Uuid.parse(undefined),
 			type: 'delete_diskfile',
+			path,
+		});
+	}
+
+	create_file(filename: string, content: string = ''): void {
+		if (!this.zzz.zzz_dir) {
+			throw new Error('Cannot create file: zzz_dir is not set');
+		}
+
+		// Create full path by joining zzz_dir with the filename
+		const path = Diskfile_Path.parse(`${this.zzz.zzz_dir}${filename}`);
+
+		// Reuse the update method which creates or updates files
+		this.update(path, content);
+	}
+
+	create_directory(dirname: string): void {
+		if (!this.zzz.zzz_dir) {
+			throw new Error('Cannot create directory: zzz_dir is not set');
+		}
+
+		// Create full path by joining zzz_dir with the directory name
+		const path = Diskfile_Path.parse(`${this.zzz.zzz_dir}${dirname}`);
+
+		this.zzz.messages.send({
+			id: Uuid.parse(undefined),
+			type: 'create_directory',
 			path,
 		});
 	}
@@ -188,9 +215,10 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 	}
 
 	/**
-	 * Select a file by ID
+	 * Select a file by ID. Default to the first file if `id` is `undefined`.
+	 * If `id` is `null`, it selects no file.
 	 */
-	select(id: Uuid | null): void {
-		this.selected_file_id = id;
+	select(id: Uuid | null | undefined): void {
+		this.selected_file_id = id === undefined ? (this.items.all[0]?.id ?? null) : id;
 	}
 }

@@ -1,10 +1,10 @@
-import type {Bit} from '$lib/bit.svelte.js';
+import type {Bit_Type} from '$lib/bit.svelte.js';
 import {XML_TAG_NAME_DEFAULT} from '$lib/constants.js';
 
 /**
  * Formats a collection of bits into a prompt string, applying XML tags and attributes where specified.
  */
-export const format_prompt_content = (bits: Array<Bit>): string => {
+export const format_prompt_content = (bits: Array<Bit_Type>): string => {
 	const enabled_bits = [];
 
 	// First loop: filter enabled bits once to avoid repeated filtering
@@ -18,7 +18,7 @@ export const format_prompt_content = (bits: Array<Bit>): string => {
 
 	// Second loop: process each enabled bit
 	for (const bit of enabled_bits) {
-		const content = bit.content.trim();
+		const content = bit.content?.trim();
 		if (!content) continue;
 
 		if (!bit.has_xml_tag) {

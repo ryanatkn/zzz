@@ -14,6 +14,7 @@
 		popover_class?: string;
 		popover_attrs?: SvelteHTMLElements['div'];
 		popover_content: Snippet<[popover: Popover]>;
+		popover_container_attrs?: SvelteHTMLElements['div'];
 		attrs?: SvelteHTMLElements['button'];
 		button?: Snippet<[popover: Popover]>;
 		children?: Snippet<[popover: Popover]>;
@@ -26,6 +27,7 @@
 		popover_class,
 		popover_attrs,
 		popover_content,
+		popover_container_attrs,
 		attrs,
 		button,
 		children,
@@ -55,40 +57,41 @@
 </script>
 
 <!-- TODO these flex values fix some layout cases so that the container is laid out like the button, but this is a partial solution -->
-<!-- TODO add attrs props here? -->
-<div class="flex align_items_start align_self_start">
-	<div class="flex relative" use:popover.container>
-		{#if button}
-			{@render button(popover)}
-		{:else}
-			<button
-				type="button"
-				class="icon_button"
-				use:popover.trigger={{
-					position,
-					align,
-					disable_outside_click,
-				}}
-				{...attrs}
-			>
-				{@render children?.(popover)}
-			</button>
-		{/if}
+<div
+	{...popover_container_attrs}
+	class="relative {popover_container_attrs?.class}"
+	use:popover.container
+>
+	{#if button}
+		{@render button(popover)}
+	{:else}
+		<button
+			type="button"
+			class="icon_button"
+			use:popover.trigger={{
+				position,
+				align,
+				disable_outside_click,
+			}}
+			{...attrs}
+		>
+			{@render children?.(popover)}
+		</button>
+	{/if}
 
-		{#if popover.visible}
-			<div
-				use:popover.content={{
-					position,
-					align,
-					disable_outside_click,
-					popover_class,
-				}}
-				in:scale={{duration: 80}}
-				out:scale={{duration: 200}}
-				{...popover_attrs}
-			>
-				{@render popover_content(popover)}
-			</div>
-		{/if}
-	</div>
+	{#if popover.visible}
+		<div
+			use:popover.content={{
+				position,
+				align,
+				disable_outside_click,
+				popover_class,
+			}}
+			in:scale={{duration: 80}}
+			out:scale={{duration: 200}}
+			{...popover_attrs}
+		>
+			{@render popover_content(popover)}
+		</div>
+	{/if}
 </div>

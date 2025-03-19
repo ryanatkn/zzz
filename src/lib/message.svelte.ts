@@ -37,7 +37,7 @@ export class Message extends Cell<typeof Message_Json> {
 	completion_request: Completion_Request | undefined = $state();
 	completion_response: Completion_Response | undefined = $state();
 	path: Diskfile_Path | undefined = $state();
-	contents: string | undefined = $state(); // TODO BLOCK derived token count like with diskfiles?
+	content: string | undefined = $state(); // TODO BLOCK derived token count like with diskfiles?
 	change: any | undefined = $state(); // TODO schema types
 	source_file: any | undefined = $state(); // TODO schema types
 	/** Response time for pong messages in milliseconds */

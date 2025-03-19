@@ -12,9 +12,6 @@
 .align_items_start {
 	align-items: start;
 }
-.align_self_start {
-	align-self: start;
-}
 .b_0 {
 	bottom: 0;
 }
@@ -23,6 +20,9 @@
 }
 .bg_1 {
 	background-color: var(--bg_1);
+}
+.bg_2 {
+	background-color: var(--bg_2);
 }
 .bg_c_1 {
 	background-color: var(--color_c_1);
@@ -350,10 +350,6 @@ a.chip {
 	margin-top: var(--space_xl5);
 	margin-bottom: var(--space_xl5);
 }
-.my_xs {
-	margin-top: var(--space_xs);
-	margin-bottom: var(--space_xs);
-}
 .overflow_auto {
 	overflow: auto;
 }
@@ -413,6 +409,9 @@ a.chip {
 .pb_xl7 {
 	padding-bottom: var(--space_xl7);
 }
+.pl_0 {
+	padding-left: 0;
+}
 .pl_md {
 	padding-left: var(--space_md);
 }
@@ -436,6 +435,9 @@ a.chip {
 
 .pr_md {
 	padding-right: var(--space_md);
+}
+.pr_sm {
+	padding-right: var(--space_sm);
 }
 .pt_md {
 	padding-top: var(--space_md);
@@ -572,11 +574,11 @@ a.chip {
 .text_align_left {
 	text-align: left;
 }
-.text_align_right {
-	text-align: right;
-}
 .text_color_3 {
 	color: var(--text_color_3);
+}
+.text_color_4 {
+	color: var(--text_color_4);
 }
 .text_color_5 {
 	color: var(--text_color_5);

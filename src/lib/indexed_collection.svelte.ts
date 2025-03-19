@@ -3,6 +3,8 @@ import type {z} from 'zod';
 
 import {Uuid} from '$lib/zod_helpers.js';
 
+// TODO optimize, particular the scans of `this.all`
+
 // TODO think about this from the whole graph's POV, not just individual collections, for relationships/transactions
 // consider a batch operations interface: "Add a transaction-like interface for batch operations to improve performance. Example: collection.batch().add(item1).remove(item2).commit()"
 
@@ -230,6 +232,7 @@ export class Indexed_Collection<
 		return this.indexes[key];
 	}
 
+	// TODO this is a code smell, should have type safety
 	/**
 	 * Ensures that the index exists and is of the expected type
 	 * @throws Error if index doesn't exist or is the wrong type

@@ -1,19 +1,15 @@
 <script lang="ts">
-	import {print_number_with_separators} from '@ryanatkn/belt/print.js';
+	import type {Bit_Type} from '$lib/bit.svelte.js';
+	import Content_Stats from '$lib/Content_Stats.svelte';
 
 	interface Props {
-		length: number;
-		token_count: number;
+		bit: Bit_Type;
 	}
 
-	const {length, token_count}: Props = $props();
+	const {bit}: Props = $props();
+
+	const length = $derived(bit.length ?? 0);
+	const token_count = $derived(bit.token_count ?? 0);
 </script>
 
-<div class="flex_1 flex justify_content_space_between gap_sm font_mono">
-	<small
-		title="the token count is currently approximated using just one algorithm, when in practice models differ"
-		>≈ {print_number_with_separators(token_count + '', ',')} token{token_count === 1
-			? ''
-			: 's'}</small
-	> <small>{print_number_with_separators(length + '', ',')} char{length === 1 ? '' : 's'}</small>
-</div>
+<Content_Stats {length} {token_count} />

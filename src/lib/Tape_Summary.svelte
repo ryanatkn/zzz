@@ -11,7 +11,7 @@
 
 	const {tape, chat}: Props = $props();
 
-	const message_count = $derived(tape.chat_messages.length);
+	const message_count = $derived(tape.strips.length);
 </script>
 
 <div class="tape_summary panel p_xs">

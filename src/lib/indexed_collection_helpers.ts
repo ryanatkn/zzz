@@ -38,9 +38,9 @@ export interface Single_Index_Options<T extends Indexed_Item, K = any> extends I
 /**
  * Create a single-value index (one key maps to one item)
  */
-export function create_single_index<T extends Indexed_Item, K = any>(
+export const create_single_index = <T extends Indexed_Item, K = any>(
 	options: Single_Index_Options<T, K>,
-): Index_Definition<T, SvelteMap<K, T>, K> {
+): Index_Definition<T, SvelteMap<K, T>, K> => {
 	// Create the default output schema if not provided
 	const result_schema = options.result_schema || Svelte_Map_Schema;
 
@@ -86,13 +86,17 @@ export function create_single_index<T extends Indexed_Item, K = any>(
 			}
 
 			// Find any other items with the same key
-			const items_with_same_key = collection.all.filter(
-				(other) => other.id !== item.id && options.extractor(other) === extract_key,
-			);
+			let item_with_same_key;
+			for (const other of collection.all) {
+				if (other.id !== item.id && options.extractor(other) === extract_key) {
+					item_with_same_key = other;
+					break;
+				}
+			}
 
-			if (items_with_same_key.length > 0) {
+			if (item_with_same_key) {
 				// Found another item with the same key - use the first one
-				map.set(extract_key, items_with_same_key[0]);
+				map.set(extract_key, item_with_same_key);
 			} else {
 				// No other items with this key - delete the entry
 				map.delete(extract_key);
@@ -101,7 +105,7 @@ export function create_single_index<T extends Indexed_Item, K = any>(
 			return map;
 		},
 	};
-}
+};
 
 /**
  * Options for multi-value indexes
@@ -117,9 +121,9 @@ export interface Multi_Index_Options<T extends Indexed_Item, K = any> extends In
 /**
  * Create a multi-value index (one key maps to many items)
  */
-export function create_multi_index<T extends Indexed_Item, K = any>(
+export const create_multi_index = <T extends Indexed_Item, K = any>(
 	options: Multi_Index_Options<T, K>,
-): Index_Definition<T, SvelteMap<K, Array<T>>, K> {
+): Index_Definition<T, SvelteMap<K, Array<T>>, K> => {
 	// Create the default output schema if not provided
 	const result_schema = options.result_schema || Svelte_Map_Schema;
 
@@ -141,21 +145,21 @@ export function create_multi_index<T extends Indexed_Item, K = any>(
 				if (Array.isArray(keys)) {
 					for (const k of keys) {
 						if (k === undefined) continue;
-						const collection = map.get(k) || [];
-						collection.push(item);
-						map.set(k, collection);
+						let items = map.get(k);
+						if (!items) map.set(k, (items = []));
+						items.push(item);
 					}
 				} else {
-					const collection = map.get(keys) || [];
-					collection.push(item);
-					map.set(keys, collection);
+					let items = map.get(keys);
+					if (!items) map.set(keys, (items = []));
+					items.push(item);
 				}
 			}
 
 			// Sort item collections if a sort function was provided
 			if (options.sort) {
-				for (const [k, items] of map.entries()) {
-					map.set(k, [...items].sort(options.sort));
+				for (const items of map.values()) {
+					items.sort(options.sort);
 				}
 			}
 
@@ -170,24 +174,22 @@ export function create_multi_index<T extends Indexed_Item, K = any>(
 			if (Array.isArray(keys)) {
 				for (const k of keys) {
 					if (k === undefined) continue;
-					const collection = map.get(k) || [];
-					collection.push(item);
+					let items = map.get(k);
+					if (!items) map.set(k, (items = []));
+					items.push(item);
 
 					if (options.sort) {
-						collection.sort(options.sort);
+						items.sort(options.sort);
 					}
-
-					map.set(k, collection);
 				}
 			} else {
-				const collection = map.get(keys) || [];
-				collection.push(item);
+				let items = map.get(keys);
+				if (!items) map.set(keys, (items = []));
+				items.push(item);
 
 				if (options.sort) {
-					collection.sort(options.sort);
+					items.sort(options.sort);
 				}
-
-				map.set(keys, collection);
 			}
 			return map;
 		},
@@ -200,31 +202,39 @@ export function create_multi_index<T extends Indexed_Item, K = any>(
 			if (Array.isArray(keys)) {
 				for (const k of keys) {
 					if (k === undefined) continue;
-					const collection = map.get(k);
-					if (collection) {
-						const updated = collection.filter((i) => i.id !== item.id);
-						if (updated.length === 0) {
-							map.delete(k);
-						} else {
-							map.set(k, updated);
-						}
+					const items = map.get(k);
+					if (!items) continue;
+					// Find and remove the item by ID
+					const index = items.findIndex((i) => i.id === item.id);
+					if (index === -1) continue;
+					if (items.length === 1) {
+						// If this was the last item, remove the key entirely
+						map.delete(k);
+					} else {
+						// Remove just this item
+						items.splice(index, 1);
 					}
 				}
 			} else {
-				const collection = map.get(keys);
-				if (collection) {
-					const updated = collection.filter((i) => i.id !== item.id);
-					if (updated.length === 0) {
-						map.delete(keys);
-					} else {
-						map.set(keys, updated);
+				const items = map.get(keys);
+				if (items) {
+					// Find and remove the item by ID
+					const index = items.findIndex((i) => i.id === item.id);
+					if (index !== -1) {
+						if (items.length === 1) {
+							// If this was the last item, remove the key entirely
+							map.delete(keys);
+						} else {
+							// Remove just this item
+							items.splice(index, 1);
+						}
 					}
 				}
 			}
 			return map;
 		},
 	};
-}
+};
 
 /**
  * Options for derived indexes
@@ -246,9 +256,9 @@ export interface Derived_Index_Options<T extends Indexed_Item> extends Index_Opt
 /**
  * Create a derived collection index
  */
-export function create_derived_index<T extends Indexed_Item>(
+export const create_derived_index = <T extends Indexed_Item>(
 	options: Derived_Index_Options<T>,
-): Index_Definition<T, Array<T>, void> {
+): Index_Definition<T, Array<T>, void> => {
 	// Create the default output schema if not provided
 	const result_schema =
 		options.result_schema ||
@@ -298,7 +308,7 @@ export function create_derived_index<T extends Indexed_Item>(
 			return items;
 		},
 	};
-}
+};
 
 /**
  * Options for dynamic indexes
@@ -320,10 +330,12 @@ export interface Dynamic_Index_Options<
 /**
  * Create a dynamic index that computes results on-demand based on query parameters
  */
-export function create_dynamic_index<
+export const create_dynamic_index = <
 	T extends Indexed_Item,
 	F extends (...args: Array<any>) => any,
->(options: Dynamic_Index_Options<T, F>): Index_Definition<T, F, Parameters<F>[0]> {
+>(
+	options: Dynamic_Index_Options<T, F>,
+): Index_Definition<T, F, Parameters<F>[0]> => {
 	return {
 		key: options.key,
 		compute: options.factory,
@@ -335,4 +347,4 @@ export function create_dynamic_index<
 		on_add: options.on_add || ((fn) => fn),
 		on_remove: options.on_remove || ((fn) => fn),
 	};
-}
+};

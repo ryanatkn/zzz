@@ -1,4 +1,5 @@
 import {z} from 'zod';
+import {DEV} from 'esm-env';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Message, Message_Schema} from '$lib/message.svelte.js';
@@ -213,7 +214,8 @@ export class Messages extends Cell<typeof Messages_Json> {
 		}
 
 		// For other properties, we'd need to add more indexes or implement filtering
-		console.warn(`No index available for property: ${property as string}`);
+		if (DEV) console.error(`No index available for property: ${property}`);
+
 		return [];
 	}
 

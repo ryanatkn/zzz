@@ -49,7 +49,7 @@ export type Source_File = z.infer<typeof Source_File>;
 // Directly extend the base schema with Diskfile-specific properties
 export const Diskfile_Json = Cell_Json.extend({
 	path: Diskfile_Path.nullable().default(null),
-	contents: z.string().nullable().default(null),
+	content: z.string().nullable().default(null),
 	external: z.boolean().default(false),
 	dependents: z.array(z.tuple([Diskfile_Path, z.any()])).default(() => []),
 	dependencies: z.array(z.tuple([Diskfile_Path, z.any()])).default(() => []),

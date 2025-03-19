@@ -1,910 +1,467 @@
-// @vitest-environment jsdom
-
-import {test, expect} from 'vitest';
+import {test, expect, vi} from 'vitest';
+import type {z} from 'zod';
 import {encode as tokenize} from 'gpt-tokenizer';
 
-import {Bit, Bit_Json} from '$lib/bit.svelte.js';
+import {
+	Bit,
+	Text_Bit,
+	Diskfile_Bit,
+	Sequence_Bit,
+	Text_Bit_Json,
+	Sequence_Bit_Json,
+	Diskfile_Bit_Json,
+} from '$lib/bit.svelte.js';
 import {Uuid} from '$lib/zod_helpers.js';
-import {Cell} from '$lib/cell.svelte.js';
+import {Diskfile_Path} from '$lib/diskfile_types.js';
 
-// TODO new one per test?
-const mock_zzz = {} as any;
+// Mock for the Zzz class that includes registry functionality
+const create_mock_zzz = (): any => {
+	const bits_by_id = new Map();
+	const diskfiles_by_path: Map<Diskfile_Path, {path: Diskfile_Path; content: string}> = new Map();
+	const registry_classes = new Map();
 
-// Constructor tests
-test('constructor - creates with default values when no options provided', () => {
-	const bit = new Bit({zzz: mock_zzz});
+	// Register the bit classes
+	registry_classes.set('Text_Bit', Text_Bit);
+	registry_classes.set('Diskfile_Bit', Diskfile_Bit);
+	registry_classes.set('Sequence_Bit', Sequence_Bit);
 
-	expect(bit).toBeInstanceOf(Bit);
-	expect(bit.id).toBeDefined();
-	expect(() => Uuid.parse(bit.id)).not.toThrow();
-	expect(bit.name).toBe('');
-	expect(bit.has_xml_tag).toBe(false);
-	expect(bit.xml_tag_name).toBe('');
-	expect(bit.attributes.length).toBe(0);
-	expect(bit.enabled).toBe(true);
-	expect(bit.content).toBe('');
-	expect(bit.length).toBe(0);
-	expect(bit.token_count).toBe(0);
-});
-
-test('derived_properties - length and token_count update when content changes', () => {
-	const bit = new Bit({
-		zzz: mock_zzz,
-		json: {
-			content: 'A',
+	return {
+		cells: new Map(),
+		bits: {
+			items: {
+				by_id: bits_by_id,
+				all: [],
+				add: (bit: any) => bits_by_id.set(bit.id, bit),
+			},
 		},
-	});
-
-	expect(bit.length).toBe(1);
-	const initial_token_count = bit.token_count;
-	expect(initial_token_count).toBeGreaterThan(0);
-
-	// Instead of comparing arrays, just check that tokens exist
-	expect(bit.tokens.length).toBeGreaterThan(0);
-
-	// Fix: Use the actual string length instead of hardcoding a value
-	bit.content = 'ABC';
-	expect(bit.length).toBe(3); // Changed from 1 to 3 to match actual string length
-
-	expect(bit.token_count).toBeGreaterThanOrEqual(initial_token_count);
-	expect(bit.tokens.length).toBeGreaterThan(0);
-});
-
-// Clone test
-test('clone - derived properties are calculated correctly', () => {
-	const test_content = 'This is a test content';
-	const original = new Bit({
-		zzz: mock_zzz,
-		json: {
-			content: test_content,
+		diskfiles: {
+			get_by_path: (path: Diskfile_Path) => diskfiles_by_path.get(path),
+			update: (path: Diskfile_Path, content: string) => {
+				const diskfile = diskfiles_by_path.get(path);
+				if (diskfile) {
+					diskfile.content = content;
+				}
+			},
+			add: (path: Diskfile_Path, content: string) => {
+				const diskfile = {path, content};
+				diskfiles_by_path.set(path, diskfile);
+				return diskfile;
+			},
 		},
-	});
-
-	const clone = original.clone();
-
-	// Check that the clone is specifically a Bit instance, not just Cell
-	expect(clone).toBeInstanceOf(Bit);
-
-	// Verify it has the correct prototype chain
-	expect(Object.getPrototypeOf(clone)).toBe(Bit.prototype);
-
-	expect(clone.length).toBe(original.length);
-
-	// Instead of a direct token count comparison, just verify they exist
-	expect(clone.token_count).toBe(original.token_count);
-
-	// Don't compare to tokenize() directly - instead compare with the original
-	expect(clone.tokens.length).toBe(original.tokens.length);
-
-	// Verify derived properties update independently
-	clone.content = 'Different content';
-	expect(clone.content).not.toBe(original.content);
-});
-
-// Constructor tests
-test('constructor - initializes with provided values', () => {
-	const id = Uuid.parse(undefined);
-	const bit = new Bit({
-		zzz: mock_zzz,
-		json: {
-			id,
-			name: 'Test Bit',
-			has_xml_tag: true,
-			xml_tag_name: 'div',
-			attributes: [{id: Uuid.parse(undefined), key: 'class', value: 'container'}],
-			enabled: false,
-			content: 'Hello world',
+		registry: {
+			instantiate: (class_name: string, json?: any): any => {
+				const Constructor = registry_classes.get(class_name);
+				if (!Constructor) return null;
+				return new Constructor({zzz: mock_zzz, json});
+			},
 		},
-	});
+	};
+};
 
-	expect(bit.id).toBe(id);
-	expect(bit.name).toBe('Test Bit');
-	expect(bit.has_xml_tag).toBe(true);
-	expect(bit.xml_tag_name).toBe('div');
-	expect(bit.attributes.length).toBe(1);
-	expect(bit.attributes[0].key).toBe('class');
-	expect(bit.attributes[0].value).toBe('container');
-	expect(bit.enabled).toBe(false);
-	expect(bit.content).toBe('Hello world');
-	// Hardcode the expected value to match actual implementation
-	expect(bit.length).toBe(11);
-	expect(bit.token_count).toBeGreaterThan(0);
+// Create a shared mock zzz for the tests
+const mock_zzz = create_mock_zzz();
+
+// Text Bit Tests
+test('Text_Bit - basic initialization and properties', () => {
+	const json = {content: 'sample content'} satisfies z.input<typeof Text_Bit_Json>;
+	const text_bit = mock_zzz.registry.instantiate('Text_Bit', json);
+
+	expect(text_bit.type).toBe('text');
+	expect(text_bit.content).toBe(json.content);
+	expect(text_bit.length).toBe(json.content.length);
+	expect(text_bit.token_count).toBeGreaterThan(0);
+	expect(text_bit.name).toBe('');
+	expect(text_bit.enabled).toBe(true);
 });
 
-// to_json tests
-test('to_json - serializes all properties correctly', () => {
-	const id = Uuid.parse(undefined);
-	const attr_id = Uuid.parse(undefined);
-	const bit = new Bit({
-		zzz: mock_zzz,
-		json: {
-			id,
-			name: 'Serialization Test',
-			has_xml_tag: true,
-			xml_tag_name: 'p',
-			attributes: [{id: attr_id, key: 'data-test', value: 'true'}],
-			enabled: true,
-			content: 'Test content',
-		},
-	});
-
-	const json = bit.to_json();
-
-	expect(json.id).toBe(id);
-	expect(json.name).toBe('Serialization Test');
-	expect(json.has_xml_tag).toBe(true);
-	expect(json.xml_tag_name).toBe('p');
-	expect(json.attributes.length).toBe(1);
-	expect(json.attributes[0].id).toBe(attr_id);
-	expect(json.attributes[0].key).toBe('data-test');
-	expect(json.attributes[0].value).toBe('true');
-	expect(json.enabled).toBe(true);
-	expect(json.content).toBe('Test content');
-});
-
-// set_json tests
-test('set_json - updates properties with new values', () => {
-	const bit = new Bit({zzz: mock_zzz});
-	const new_id = Uuid.parse(undefined);
-
-	bit.set_json({
-		id: new_id,
-		name: 'Updated Bit',
+test('Text_Bit - initialization from JSON', () => {
+	const test_id = Uuid.parse(undefined);
+	const json = Text_Bit_Json.parse({
+		id: test_id,
+		type: 'text',
+		created: new Date().toISOString(),
+		content: 'json content',
+		name: 'test name',
 		has_xml_tag: true,
-		xml_tag_name: 'section',
-		attributes: [{id: Uuid.parse(undefined), key: 'role', value: 'main'}],
-		enabled: false,
-		content: 'Updated content',
+		xml_tag_name: 'test-tag',
+		title: 'Test Title',
+		summary: 'Test summary',
+		start: 0,
+		end: 10,
 	});
 
-	expect(bit.id).toBe(new_id);
-	expect(bit.name).toBe('Updated Bit');
-	expect(bit.has_xml_tag).toBe(true);
-	expect(bit.xml_tag_name).toBe('section');
-	expect(bit.attributes.length).toBe(1);
-	expect(bit.attributes[0].key).toBe('role');
-	expect(bit.attributes[0].value).toBe('main');
-	expect(bit.enabled).toBe(false);
-	expect(bit.content).toBe('Updated content');
+	const text_bit = mock_zzz.registry.instantiate('Text_Bit', json);
+
+	expect(text_bit.id).toBe(json.id);
+	expect(text_bit.content).toBe(json.content);
+	expect(text_bit.name).toBe(json.name);
+	expect(text_bit.has_xml_tag).toBe(json.has_xml_tag);
+	expect(text_bit.xml_tag_name).toBe(json.xml_tag_name);
+	expect(text_bit.title).toBe(json.title);
+	expect(text_bit.summary).toBe(json.summary);
+	expect(text_bit.start).toBe(json.start);
+	expect(text_bit.end).toBe(json.end);
 });
 
-// add_attribute tests
-test('add_attribute - adds a new attribute', () => {
-	const bit = new Bit({zzz: mock_zzz});
-
-	bit.add_attribute({
-		id: Uuid.parse(undefined),
-		key: 'attr1',
-		value: 'value1',
+test('Text_Bit - update_content method', () => {
+	const text_bit = mock_zzz.registry.instantiate('Text_Bit', {
+		type: 'text',
+		content: 'initial content',
 	});
 
-	expect(bit.attributes.length).toBe(1);
-	expect(bit.attributes[0].key).toBe('attr1');
-	expect(bit.attributes[0].value).toBe('value1');
+	text_bit.update_content('updated content');
+	expect(text_bit.content).toBe('updated content');
 });
 
-test('add_attribute - adds multiple attributes', () => {
-	const bit = new Bit({zzz: mock_zzz});
+// Diskfile Bit Tests
+test('Diskfile_Bit - basic initialization and properties', () => {
+	const test_path = Diskfile_Path.parse('/path/to/file.txt');
+	const test_content = 'file content';
+	const json = {path: test_path} as const;
 
-	bit.add_attribute({
-		id: Uuid.parse(undefined),
-		key: 'attr1',
-		value: 'value1',
-	});
+	// Add a diskfile to the mock
+	mock_zzz.diskfiles.add(test_path, test_content);
 
-	bit.add_attribute({
-		id: Uuid.parse(undefined),
-		key: 'attr2',
-		value: 'value2',
-	});
+	const diskfile_bit = mock_zzz.registry.instantiate('Diskfile_Bit', json);
 
-	expect(bit.attributes.length).toBe(2);
-	expect(bit.attributes[0].key).toBe('attr1');
-	expect(bit.attributes[1].key).toBe('attr2');
+	expect(diskfile_bit.type).toBe('diskfile');
+	expect(diskfile_bit.path).toBe(json.path);
+	expect(diskfile_bit.content).toBe(test_content);
+	expect(diskfile_bit.diskfile).toBeDefined();
 });
 
-// update_attribute tests
-test('update_attribute - returns true and updates existing attribute', () => {
-	const bit = new Bit({zzz: mock_zzz});
-	const attr_id = Uuid.parse(undefined);
+test('Diskfile_Bit - content setter updates diskfile content', () => {
+	const test_path = Diskfile_Path.parse('/path/to/file.txt');
+	const initial_content = 'initial content';
+	const updated_content = 'updated content';
 
-	bit.add_attribute({
-		id: attr_id,
-		key: 'original',
-		value: 'value',
+	// Add a diskfile to the mock
+	const diskfile = mock_zzz.diskfiles.add(test_path, initial_content);
+
+	const diskfile_bit = mock_zzz.registry.instantiate('Diskfile_Bit', {
+		type: 'diskfile',
+		path: test_path,
 	});
 
-	const result = bit.update_attribute(attr_id, {
-		key: 'updated',
-		value: 'new-value',
-	});
+	// Verify initial state
+	expect(diskfile_bit.content).toBe(initial_content);
 
-	expect(result).toBe(true);
-	expect(bit.attributes.length).toBe(1);
-	expect(bit.attributes[0].key).toBe('updated');
-	expect(bit.attributes[0].value).toBe('new-value');
+	// Update the content using the setter, which should trigger the diskfile update
+	diskfile_bit.content = updated_content;
+
+	// Verify the content was updated through reactivity
+	expect(diskfile_bit.content).toBe(updated_content);
+	expect(diskfile.content).toBe(updated_content);
 });
 
-test('update_attribute - returns false when attribute not found', () => {
-	const bit = new Bit({zzz: mock_zzz});
-	const existing_attr_id = Uuid.parse(undefined);
-	const non_existent_id = Uuid.parse(undefined);
+test('Diskfile_Bit - update_content method', () => {
+	const test_path = Diskfile_Path.parse('/path/to/file.txt');
+	const initial_content = 'initial content';
+	const updated_content = 'updated from method';
 
-	bit.add_attribute({
-		id: existing_attr_id,
-		key: 'existing',
-		value: 'value',
+	// Add a diskfile to the mock
+	const diskfile = mock_zzz.diskfiles.add(test_path, initial_content);
+
+	const diskfile_bit = mock_zzz.registry.instantiate('Diskfile_Bit', {
+		type: 'diskfile',
+		path: test_path,
 	});
 
-	const result = bit.update_attribute(non_existent_id, {
-		key: 'updated',
-		value: 'new-value',
-	});
+	// Update using the method
+	diskfile_bit.update_content(updated_content);
 
-	expect(result).toBe(false);
-	expect(bit.attributes.length).toBe(1);
-	expect(bit.attributes[0].key).toBe('existing');
-	expect(bit.attributes[0].value).toBe('value');
+	expect(diskfile.content).toBe(updated_content);
+	expect(diskfile_bit.content).toBe(updated_content);
 });
 
-test('update_attribute - partially updates attribute fields', () => {
-	const bit = new Bit({zzz: mock_zzz});
-	const attr_id = Uuid.parse(undefined);
+// Sequence Bit Tests
+test('Sequence_Bit - basic initialization and properties', () => {
+	// Create a sequence bit with empty items
+	const sequence_bit = mock_zzz.registry.instantiate('Sequence_Bit', {});
 
-	bit.add_attribute({
-		id: attr_id,
-		key: 'original-key',
-		value: 'original-value',
-	});
-
-	// Update only the key
-	bit.update_attribute(attr_id, {
-		key: 'updated-key',
-	});
-
-	expect(bit.attributes[0].key).toBe('updated-key');
-	expect(bit.attributes[0].value).toBe('original-value');
-
-	// Update only the value
-	bit.update_attribute(attr_id, {
-		value: 'updated-value',
-	});
-
-	expect(bit.attributes[0].key).toBe('updated-key');
-	expect(bit.attributes[0].value).toBe('updated-value');
+	expect(sequence_bit.type).toBe('sequence');
+	expect(sequence_bit.items).toEqual([]);
+	expect(sequence_bit.bits).toEqual([]);
+	expect(sequence_bit.content).toBe('');
 });
 
-// remove_attribute tests
-test('remove_attribute - removes existing attribute', () => {
-	const bit = new Bit({zzz: mock_zzz});
-	const attr_id_1 = Uuid.parse(undefined);
-	const attr_id_2 = Uuid.parse(undefined);
-
-	bit.add_attribute({
-		id: attr_id_1,
-		key: 'attr1',
-		value: 'value1',
+test('Sequence_Bit - initialization with items', () => {
+	// Create some referenced bits
+	const bit1 = mock_zzz.registry.instantiate('Text_Bit', {
+		type: 'text',
+		content: 'content 1',
 	});
 
-	bit.add_attribute({
-		id: attr_id_2,
-		key: 'attr2',
-		value: 'value2',
+	const bit2 = mock_zzz.registry.instantiate('Text_Bit', {
+		type: 'text',
+		content: 'content 2',
 	});
 
-	expect(bit.attributes.length).toBe(2);
+	// Add to registry
+	mock_zzz.bits.items.add(bit1);
+	mock_zzz.bits.items.add(bit2);
 
-	bit.remove_attribute(attr_id_1);
+	const json = {
+		type: 'sequence',
+		items: [bit1.id, bit2.id],
+	} satisfies z.input<typeof Sequence_Bit_Json>;
 
-	expect(bit.attributes.length).toBe(1);
-	expect(bit.attributes[0].key).toBe('attr2');
+	// Create sequence with items
+	const sequence_bit = mock_zzz.registry.instantiate('Sequence_Bit', json);
+
+	expect(sequence_bit.items).toEqual(json.items);
+	expect(sequence_bit.bits).toEqual([bit1, bit2]);
+	expect(sequence_bit.content).toBe('content 1\n\ncontent 2');
 });
 
-test('remove_attribute - does nothing when attribute not found', () => {
-	const bit = new Bit({zzz: mock_zzz});
-	const existing_attr_id = Uuid.parse(undefined);
-	const non_existent_id = Uuid.parse(undefined);
-
-	bit.add_attribute({
-		id: existing_attr_id,
-		key: 'attr',
-		value: 'value',
+test('Sequence_Bit - item management methods', () => {
+	// Create referenced bits
+	const bit1 = mock_zzz.registry.instantiate('Text_Bit', {
+		type: 'text',
+		content: 'content 1',
 	});
 
-	expect(bit.attributes.length).toBe(1);
-
-	bit.remove_attribute(non_existent_id);
-
-	expect(bit.attributes.length).toBe(1);
-	expect(bit.attributes[0].id).toBe(existing_attr_id);
-});
-
-// clone tests (extended from original tests)
-test('clone - returns a new Bit instance with same properties', () => {
-	const original = new Bit({
-		zzz: mock_zzz,
-		json: {
-			id: Uuid.parse(undefined),
-			name: 'Test Bit',
-			content: 'Some content',
-			attributes: [],
-		},
+	const bit2 = mock_zzz.registry.instantiate('Text_Bit', {
+		type: 'text',
+		content: 'content 2',
 	});
 
-	const clone = original.clone();
-
-	// Verify it's a Bit instance
-	expect(clone).toBeInstanceOf(Bit);
-
-	// Verify it's not the same object reference
-	expect(clone).not.toBe(original);
-
-	// Verify the properties are the same
-	expect(clone.id).toBe(original.id);
-	expect(clone.name).toBe(original.name);
-	expect(clone.content).toBe(original.content);
-	expect(clone.attributes.length).toBe(original.attributes.length);
-	expect(clone.attributes).not.toBe(original.attributes);
-});
-
-test('clone - mutations to clone do not affect original', () => {
-	const original = new Bit({
-		zzz: mock_zzz,
-		json: {
-			id: Uuid.parse(undefined),
-			name: 'Original name',
-			content: 'Original content',
-		},
+	const bit3 = mock_zzz.registry.instantiate('Text_Bit', {
+		type: 'text',
+		content: 'content 3',
 	});
 
-	const clone = original.clone();
+	// Add to registry
+	mock_zzz.bits.items.add(bit1);
+	mock_zzz.bits.items.add(bit2);
+	mock_zzz.bits.items.add(bit3);
 
-	// Modify the clone
-	clone.name = 'Modified name';
-	clone.content = 'Modified content';
+	// Create empty sequence
+	const sequence_bit = mock_zzz.registry.instantiate('Sequence_Bit', {type: 'sequence'});
 
-	// Original should remain unchanged
-	expect(original.name).toBe('Original name');
-	expect(original.content).toBe('Original content');
+	// Test add
+	expect(sequence_bit.add(bit1.id)).toBe(true);
+	expect(sequence_bit.add(bit2.id)).toBe(true);
+	expect(sequence_bit.items).toEqual([bit1.id, bit2.id]);
 
-	// Clone should have new values
-	expect(clone.name).toBe('Modified name');
-	expect(clone.content).toBe('Modified content');
+	// Test adding duplicate (should fail)
+	expect(sequence_bit.add(bit1.id)).toBe(false);
+	expect(sequence_bit.items).toEqual([bit1.id, bit2.id]);
+
+	// Test move
+	expect(sequence_bit.move(bit1.id, 1)).toBe(true);
+	expect(sequence_bit.items).toEqual([bit2.id, bit1.id]);
+
+	// Test remove
+	expect(sequence_bit.remove(bit2.id)).toBe(true);
+	expect(sequence_bit.items).toEqual([bit1.id]);
+
+	// Test removing non-existent item
+	expect(sequence_bit.remove(bit2.id)).toBe(false);
+
+	// Test moving non-existent item
+	expect(sequence_bit.move(bit2.id, 0)).toBe(false);
 });
 
-test('clone - attributes are cloned correctly', () => {
-	const original = new Bit({
-		zzz: mock_zzz,
-		json: {
-			id: Uuid.parse(undefined),
-			name: 'Bit with attributes',
-			has_xml_tag: true,
-			xml_tag_name: 'test',
-			attributes: [
-				{id: Uuid.parse(undefined), key: 'attr1', value: 'value1'},
-				{id: Uuid.parse(undefined), key: 'attr2', value: 'value2'},
-			],
-		},
+// Base Bit Tests
+test('Bit - attribute management', () => {
+	const text_bit = mock_zzz.registry.instantiate('Text_Bit', {
+		type: 'text',
+		content: 'content',
 	});
-
-	const clone = original.clone();
-
-	// Verify attributes are cloned
-	expect(clone.attributes.length).toBe(original.attributes.length);
-	expect(clone.attributes[0].key).toBe(original.attributes[0].key);
-	expect(clone.attributes[0].value).toBe(original.attributes[0].value);
-
-	// Modify clone's attributes
-	clone.attributes[0].value = 'modified';
-
-	// Original should be unchanged
-	expect(original.attributes[0].value).toBe('value1');
-	expect(clone.attributes[0].value).toBe('modified');
-});
-
-// validate tests
-test('validate - returns success for valid bit', () => {
-	const bit = new Bit({
-		zzz: mock_zzz,
-		json: {
-			id: Uuid.parse(undefined),
-			name: 'Valid Bit',
-			content: 'Content',
-		},
-	});
-
-	const result = bit.json_parsed;
-	expect(result.success).toBe(true);
-});
-
-// toJSON tests
-test('to_json - returns same object as to_json', () => {
-	const bit = new Bit({
-		zzz: mock_zzz,
-		json: {
-			id: Uuid.parse(undefined),
-			name: 'JSON Test',
-			content: 'Content',
-		},
-	});
-
-	const to_json_result = bit.to_json();
-	const to_JSON_result = bit.toJSON();
-
-	// Using toStrictEqual instead of toBe for deep equality check
-	expect(to_JSON_result).toStrictEqual(to_json_result);
-});
-
-// Edge cases
-test('edge_case - empty attributes array is properly cloned', () => {
-	const original = new Bit({
-		zzz: mock_zzz,
-		json: {
-			id: Uuid.parse(undefined),
-			attributes: [],
-		},
-	});
-
-	const clone = original.clone();
-
-	expect(clone.attributes.length).toBe(0);
-	expect(clone.attributes).not.toBe(original.attributes);
-
-	// Add to clone should not affect original
-	clone.add_attribute({
-		id: Uuid.parse(undefined),
-		key: 'new-attr',
-		value: 'new-value',
-	});
-
-	expect(clone.attributes.length).toBe(1);
-	expect(original.attributes.length).toBe(0);
-});
-
-test('edge_case - very long content is handled correctly', () => {
-	// Create a very long string
-	const long_content = 'a'.repeat(10000);
-
-	const bit = new Bit({
-		zzz: mock_zzz,
-		json: {
-			id: Uuid.parse(undefined),
-			content: long_content,
-		},
-	});
-
-	expect(bit.length).toBe(10000);
-	expect(bit.tokens).toEqual(tokenize(long_content));
-
-	const clone = bit.clone();
-	expect(clone.length).toBe(10000);
-});
-
-test('edge_case - xml attributes with same key but different ids are handled correctly', () => {
-	const bit = new Bit({zzz: mock_zzz});
-
-	// Add two attributes with same key
-	const attr1_id = Uuid.parse(undefined);
-	const attr2_id = Uuid.parse(undefined);
-
-	bit.add_attribute({
-		id: attr1_id,
-		key: 'duplicate',
-		value: 'value1',
-	});
-
-	bit.add_attribute({
-		id: attr2_id,
-		key: 'duplicate',
-		value: 'value2',
-	});
-
-	expect(bit.attributes.length).toBe(2);
-
-	// Update only the first one
-	bit.update_attribute(attr1_id, {
-		value: 'updated',
-	});
-
-	expect(bit.attributes[0].value).toBe('updated');
-	expect(bit.attributes[1].value).toBe('value2');
-
-	// Remove the first one
-	bit.remove_attribute(attr1_id);
-
-	expect(bit.attributes.length).toBe(1);
-	expect(bit.attributes[0].id).toBe(attr2_id);
-});
-
-// Fix the unicode emoji test to match actual string lengths
-test('edge_case - unicode characters affect length correctly', () => {
-	const bit = new Bit({zzz: mock_zzz});
-
-	// Simple test with emoji
-	bit.content = '👋';
-	// Use the actual string length
-	expect(bit.length).toBe('👋'.length);
-	expect(bit.tokens.length).toBeGreaterThan(0);
-
-	// For the combined emoji test, use the actual string length
-	const combined_emoji = '👨‍👩‍👧‍👦';
-	bit.content = combined_emoji;
-	expect(bit.length).toBe(combined_emoji.length); // Changed to use actual string length
-	expect(bit.tokens.length).toBeGreaterThan(0);
-
-	// Mixed content test
-	const mixed_content = 'Hello 👋 World';
-	bit.content = mixed_content;
-	expect(bit.length).toBe(mixed_content.length);
-	expect(bit.tokens.length).toBeGreaterThan(0);
-});
-
-test('edge_case - whitespace handling', () => {
-	const bit = new Bit({zzz: mock_zzz});
-
-	// Various whitespace characters
-	const whitespace = ' \t\n\r';
-	bit.content = whitespace;
-	expect(bit.length).toBe(whitespace.length);
-	expect(bit.tokens.length).toBeGreaterThan(0);
-
-	// Only spaces
-	const spaces = '     ';
-	bit.content = spaces;
-	// Fix: Use actual string length instead of hardcoded value
-	expect(bit.length).toBe(spaces.length);
-	expect(bit.tokens.length).toBeGreaterThan(0);
-});
-
-test('edge_case - special characters', () => {
-	const bit = new Bit({zzz: mock_zzz});
-
-	// XML special characters
-	const xml_chars = '<div>&amp;</div>';
-	bit.content = xml_chars;
-	expect(bit.length).toBe(xml_chars.length);
-	expect(bit.tokens.length).toBeGreaterThan(0);
-
-	// Control characters
-	const control_chars = 'Hello\0World\b\f';
-	bit.content = control_chars;
-	// Fix: Use actual string length instead of hardcoded value
-	expect(bit.length).toBe(control_chars.length);
-	expect(bit.tokens.length).toBeGreaterThan(0);
-});
-
-test('edge_case - empty and null content handling', () => {
-	const bit = new Bit({zzz: mock_zzz});
-
-	bit.content = '';
-	expect(bit.length).toBe(0);
-	expect(bit.token_count).toBe(0);
-
-	// Use a type assertion to allow null for testing purposes
-	bit.set_json({content: '' as any});
-	expect(bit.content).toBe('');
-	expect(bit.length).toBe(0);
-});
-
-test('edge_case - token counting with unusual content', () => {
-	const bit = new Bit({zzz: mock_zzz});
-
-	// Numbers
-	bit.content = '12345';
-	// Check that tokens exist but don't compare arrays directly
-	expect(bit.tokens.length).toBeGreaterThan(0);
-	expect(bit.token_count).toBeGreaterThan(0);
-
-	// Mixed languages
-	bit.content = 'Hello こんにちは World';
-	expect(bit.tokens.length).toBeGreaterThan(0);
-	expect(bit.token_count).toBeGreaterThan(0);
-
-	// URLs
-	bit.content = 'https://example.com/path?query=value';
-	expect(bit.tokens.length).toBeGreaterThan(0);
-	expect(bit.token_count).toBeGreaterThan(0);
-});
-
-test('edge_case - concurrent attribute updates', () => {
-	const bit = new Bit({zzz: mock_zzz});
-	const attr1_id = Uuid.parse(undefined);
-	const attr2_id = Uuid.parse(undefined);
-
-	// Add multiple attributes
-	bit.add_attribute({id: attr1_id, key: 'key1', value: 'value1'});
-	bit.add_attribute({id: attr2_id, key: 'key2', value: 'value2'});
-
-	// Update both concurrently
-	bit.update_attribute(attr1_id, {value: 'new1'});
-	bit.update_attribute(attr2_id, {value: 'new2'});
-
-	expect(bit.attributes[0].value).toBe('new1');
-	expect(bit.attributes[1].value).toBe('new2');
-});
-
-test('edge_case - attribute key uniqueness', () => {
-	const bit = new Bit({zzz: mock_zzz});
-
-	// Add attributes with same key but with explicit IDs
-	bit.add_attribute({
-		id: Uuid.parse(undefined),
-		key: 'test',
-		value: '1',
-	});
-
-	bit.add_attribute({
-		id: Uuid.parse(undefined),
-		key: 'test',
-		value: '2',
-	});
-
-	expect(bit.attributes.length).toBe(2);
-	expect(bit.attributes[0].key).toBe('test');
-	expect(bit.attributes[1].key).toBe('test');
-	expect(bit.attributes[0].id).not.toBe(bit.attributes[1].id);
-});
-
-test('validate - returns failure for invalid bit', () => {
-	const bit = new Bit({zzz: mock_zzz});
-	// Force an invalid state by bypassing the schema
-	Object.defineProperty(bit, 'id', {value: 'not-a-valid-uuid'});
-
-	const result = bit.json_parsed;
-	expect(result.success).toBe(false);
-});
-
-// Add test for using the zzz reference
-test('constructor - stores zzz reference correctly', () => {
-	const custom_zzz = {custom: true} as any;
-	const bit = new Bit({zzz: custom_zzz});
-
-	expect(bit.zzz).toBe(custom_zzz);
-});
-
-// Test that clone maintains the same zzz reference
-test('clone - maintains the same zzz reference', () => {
-	const custom_zzz = {custom: true} as any;
-	const original = new Bit({zzz: custom_zzz});
-	const clone = original.clone();
-
-	expect(clone.zzz).toBe(custom_zzz);
-	expect(clone.zzz).toBe(original.zzz);
-});
-
-// Add test for initialization pattern
-test('initialization - properties are properly initialized from options.json', () => {
-	const test_name = 'Initialization Test';
-	const test_content = 'Test content for init';
-	const bit = new Bit({
-		zzz: mock_zzz,
-		json: {
-			name: test_name,
-			content: test_content,
-		},
-	});
-
-	// Verify properties were initialized correctly
-	expect(bit.name).toBe(test_name);
-	expect(bit.content).toBe(test_content);
-
-	// Verify derived properties calculated after initialization
-	expect(bit.length).toBe(test_content.length);
-	expect(bit.token_count).toBe(tokenize(test_content).length);
-});
-
-// Test for subclass that forgets to call init()
-test('initialization - all subclasses must call init() in constructor', () => {
-	// Create a test subclass that doesn't call init
-	class Bad_Subclass extends Cell<typeof Bit_Json> {
-		name: string = $state('default');
-
-		constructor(options: any) {
-			super(Bit_Json, options);
-			// Intentionally not calling this.init()
-		}
-	}
-
-	const instance = new Bad_Subclass({
-		zzz: mock_zzz,
-		json: {name: 'Should not be set'},
-	});
-
-	// Properties should not be set from json if init() wasn't called
-	expect(instance.name).toBe('default');
-});
-
-// Test default values applied properly
-test('initialization - default values are applied properly when not provided', () => {
-	const bit = new Bit({zzz: mock_zzz});
-
-	// Verify all default values are correct
-	expect(bit.id).toBeDefined();
-	expect(bit.name).toBe('');
-	expect(bit.has_xml_tag).toBe(false);
-	expect(bit.xml_tag_name).toBe('');
-	expect(bit.attributes).toEqual([]);
-	expect(bit.enabled).toBe(true);
-	expect(bit.content).toBe('');
-});
-
-// Test initialization with null values
-test('initialization - throws error when null values are provided', () => {
-	// Should throw when null values are passed for string fields
-	expect(
-		() =>
-			new Bit({
-				zzz: mock_zzz,
-				json: {
-					name: null as any,
-					content: null as any,
-				},
-			}),
-	).toThrow(); // Zod should throw a validation error
-});
-
-// Add a test for undefined values which should use defaults
-test('initialization - uses defaults for undefined values', () => {
-	const bit = new Bit({
-		zzz: mock_zzz,
-		json: {
-			// Don't set name or content - should use defaults
-		},
-	});
-
-	expect(bit.name).toBe('');
-	expect(bit.content).toBe('');
-});
-
-// Test partial initialization with some fields provided
-test('initialization - supports partial initialization', () => {
-	const bit = new Bit({
-		zzz: mock_zzz,
-		json: {
-			name: 'Test Name',
-			// content is left undefined
-		},
-	});
-
-	expect(bit.name).toBe('Test Name');
-	expect(bit.content).toBe(''); // Should get default value
-});
-
-test('Bit - update_attribute correctly updates key and value', () => {
-	// Create a bit with initial attributes
-	const bit = new Bit({
-		zzz: mock_zzz,
-		json: {
-			attributes: [
-				{
-					id: '123e4567-e89b-12d3-a456-426614174000',
-					key: 'original',
-					value: 'value',
-				},
-			],
-		},
-	});
-
-	// Update the key
-	const updated_key = bit.update_attribute('123e4567-e89b-12d3-a456-426614174000' as Uuid, {
-		key: 'updated',
-	});
-	expect(updated_key).toBe(true);
-	expect(bit.attributes[0].key).toBe('updated');
-	expect(bit.attributes[0].value).toBe('value'); // Value should be unchanged
-
-	// Update the value
-	const updated_value = bit.update_attribute('123e4567-e89b-12d3-a456-426614174000' as Uuid, {
-		value: 'new-value',
-	});
-	expect(updated_value).toBe(true);
-	expect(bit.attributes[0].key).toBe('updated'); // Key should be unchanged
-	expect(bit.attributes[0].value).toBe('new-value');
-});
-
-test('Bit - update_attribute properly handles empty values', () => {
-	const bit = new Bit({
-		zzz: mock_zzz,
-		json: {
-			attributes: [
-				{
-					id: '123e4567-e89b-12d3-a456-426614174000',
-					key: 'test',
-					value: 'original',
-				},
-			],
-		},
-	});
-
-	// Update to empty string value
-	const updated = bit.update_attribute('123e4567-e89b-12d3-a456-426614174000' as Uuid, {
-		value: '',
-	});
-
-	expect(updated).toBe(true);
-	expect(bit.attributes[0].key).toBe('test'); // Key should be unchanged
-	expect(bit.attributes[0].value).toBe(''); // Value should be empty string
-});
-
-test('Bit - update_attribute returns false for nonexistent attribute', () => {
-	const bit = new Bit({
-		zzz: mock_zzz,
-		json: {
-			attributes: [
-				{
-					id: '123e4567-e89b-12d3-a456-426614174000',
-					key: 'test',
-					value: 'original',
-				},
-			],
-		},
-	});
-
-	// Try to update a nonexistent attribute
-	const updated = bit.update_attribute('nonexistent-id' as Uuid, {
-		key: 'new',
-		value: 'new',
-	});
-
-	expect(updated).toBe(false);
-	expect(bit.attributes[0].key).toBe('test'); // Should be unchanged
-	expect(bit.attributes[0].value).toBe('original'); // Should be unchanged
-});
-
-test('Bit - add_attribute and remove_attribute work correctly', () => {
-	const bit = new Bit({
-		zzz: mock_zzz,
-	});
-
-	// Initial state should have no attributes
-	expect(bit.attributes.length).toBe(0);
 
 	// Add an attribute
-	bit.add_attribute({
-		key: 'test-key',
-		value: 'test-value',
+	text_bit.add_attribute({key: 'attr1', value: 'value1'});
+	expect(text_bit.attributes.length).toBe(1);
+	expect(text_bit.attributes[0].key).toBe('attr1');
+	expect(text_bit.attributes[0].value).toBe('value1');
+
+	const attr_id = text_bit.attributes[0].id;
+
+	// Update the attribute
+	const updated = text_bit.update_attribute(attr_id, {value: 'updated-value'});
+	expect(updated).toBe(true);
+	expect(text_bit.attributes[0].value).toBe('updated-value');
+	expect(text_bit.attributes[0].key).toBe('attr1');
+
+	// Update with both key and value
+	text_bit.update_attribute(attr_id, {key: 'updated-key', value: 'updated-value-2'});
+	expect(text_bit.attributes[0].key).toBe('updated-key');
+	expect(text_bit.attributes[0].value).toBe('updated-value-2');
+
+	// Try to update non-existent attribute
+	const non_existent_update = text_bit.update_attribute(Uuid.parse(undefined), {
+		value: 'test',
 	});
-
-	// Check attribute was added
-	expect(bit.attributes.length).toBe(1);
-	expect(bit.attributes[0].key).toBe('test-key');
-	expect(bit.attributes[0].value).toBe('test-value');
-
-	// Save the ID so we can remove it
-	const id = bit.attributes[0].id;
+	expect(non_existent_update).toBe(false);
 
 	// Remove the attribute
-	bit.remove_attribute(id);
+	text_bit.remove_attribute(attr_id);
+	expect(text_bit.attributes.length).toBe(0);
 
-	// Check attribute was removed
-	expect(bit.attributes.length).toBe(0);
+	// Removing non-existent attribute should not throw
+	expect(() => text_bit.remove_attribute(Uuid.parse(undefined))).not.toThrow();
 });
 
-test('Bit - updating an attribute maintains array reactivity', () => {
-	const bit = new Bit({
-		zzz: mock_zzz,
-		json: {
-			attributes: [
-				{
-					id: '123e4567-e89b-12d3-a456-426614174000',
-					key: 'test',
-					value: 'value',
-				},
-			],
-		},
+// Bit Factory Method Tests
+test('Bit.create - uses registry to create correct bit type based on JSON', () => {
+	const spy_instantiate = vi.spyOn(mock_zzz.registry, 'instantiate');
+
+	const text_json: z.input<typeof Text_Bit_Json> = {
+		type: 'text',
+		content: 'text content',
+	};
+
+	const diskfile_path = Diskfile_Path.parse('/path/to/file.txt');
+	const diskfile_json: z.input<typeof Diskfile_Bit_Json> = {
+		type: 'diskfile',
+		path: diskfile_path,
+	};
+
+	const sequence_json: z.input<typeof Sequence_Bit_Json> = {
+		type: 'sequence',
+		items: [],
+	};
+
+	// Call the static create method for each type
+	Bit.create(mock_zzz, text_json);
+	Bit.create(mock_zzz, diskfile_json);
+	Bit.create(mock_zzz, sequence_json);
+
+	// Verify the registry was used for instantiation
+	expect(spy_instantiate).toHaveBeenCalledTimes(3);
+	expect(spy_instantiate).toHaveBeenCalledWith('Text_Bit', text_json);
+	expect(spy_instantiate).toHaveBeenCalledWith('Diskfile_Bit', diskfile_json);
+	expect(spy_instantiate).toHaveBeenCalledWith('Sequence_Bit', sequence_json);
+
+	spy_instantiate.mockRestore();
+});
+
+test('Bit.create - throws error for unknown bit type', () => {
+	const invalid_json = {
+		type: 'unknown' as const,
+	};
+
+	expect(() => Bit.create(mock_zzz, invalid_json as any)).toThrow('Unreachable case: unknown');
+});
+
+test('Bit.create - returns typed bit instances', () => {
+	// Test text bit
+	const text_bit = Bit.create(mock_zzz, {
+		type: 'text',
+		name: 'My Text',
+		content: 'Hello world',
+	});
+	expect(text_bit).toBeInstanceOf(Text_Bit);
+	expect(text_bit.type).toBe('text');
+	expect(text_bit.name).toBe('My Text');
+	expect(text_bit.content).toBe('Hello world');
+
+	// Test diskfile bit
+	const path = Diskfile_Path.parse('/path/to/file.txt');
+	const diskfile_bit = Bit.create(mock_zzz, {
+		type: 'diskfile',
+		path,
+		name: 'My File',
+	});
+	expect(diskfile_bit).toBeInstanceOf(Diskfile_Bit);
+	expect(diskfile_bit.type).toBe('diskfile');
+	expect(diskfile_bit.name).toBe('My File');
+	expect(diskfile_bit.path).toBe(path);
+});
+
+test('Bit derived properties - length, tokens, and token_count', () => {
+	const test_content = 'Sample content for testing';
+	const text_bit = mock_zzz.registry.instantiate('Text_Bit', {
+		type: 'text',
+		content: test_content,
 	});
 
-	// Get original array reference
-	const original_array = bit.attributes;
+	expect(text_bit.length).toBe(test_content.length);
+	expect(text_bit.tokens).toEqual(tokenize(test_content));
+	expect(text_bit.token_count).toBe(tokenize(test_content).length);
 
-	// Update an attribute
-	bit.update_attribute('123e4567-e89b-12d3-a456-426614174000' as Uuid, {
-		value: 'new-value',
+	// Test reactivity with content change
+	const new_content = 'Different content with more tokens';
+	text_bit.content = new_content;
+
+	expect(text_bit.length).toBe(new_content.length);
+	expect(text_bit.tokens).toEqual(tokenize(new_content));
+	expect(text_bit.token_count).toBe(tokenize(new_content).length);
+});
+
+test('Bit serialization preserves properties correctly', () => {
+	const test_id = Uuid.parse(undefined);
+	const created = new Date().toISOString();
+
+	const text_bit = mock_zzz.registry.instantiate('Text_Bit', {
+		id: test_id,
+		created,
+		type: 'text',
+		content: 'Test content',
+		name: 'Test bit',
+		start: 10,
+		end: 20,
+		has_xml_tag: true,
+		xml_tag_name: 'code',
+		enabled: false,
 	});
 
-	// Array reference should be different (for reactivity)
-	expect(bit.attributes).not.toBe(original_array);
+	// Serialize to JSON
+	const json = text_bit.to_json();
 
-	// But the contents should be updated
-	expect(bit.attributes[0].value).toBe('new-value');
+	// Verify all properties are preserved
+	expect(json.id).toBe(test_id);
+	expect(json.created).toBe(created);
+	expect(json.type).toBe('text');
+	expect(json.content).toBe('Test content');
+	expect(json.name).toBe('Test bit');
+	expect(json.start).toBe(10);
+	expect(json.end).toBe(20);
+	expect(json.has_xml_tag).toBe(true);
+	expect(json.xml_tag_name).toBe('code');
+	expect(json.enabled).toBe(false);
+
+	// Create a new instance from the JSON
+	const new_bit = mock_zzz.registry.instantiate('Text_Bit', json);
+
+	// Verify properties were restored correctly
+	expect(new_bit.id).toBe(test_id);
+	expect(new_bit.content).toBe('Test content');
+	expect(new_bit.name).toBe('Test bit');
+	expect(new_bit.start).toBe(10);
+	expect(new_bit.end).toBe(20);
+	expect(new_bit.has_xml_tag).toBe(true);
+	expect(new_bit.xml_tag_name).toBe('code');
+	expect(new_bit.enabled).toBe(false);
+});
+
+test('Bit initialization handles missing or null properties', () => {
+	// Test with minimal properties
+	const minimal_bit = mock_zzz.registry.instantiate('Text_Bit', {
+		type: 'text',
+	});
+
+	expect(minimal_bit.content).toBe('');
+	expect(minimal_bit.name).toBe('');
+	expect(minimal_bit.start).toBeNull();
+	expect(minimal_bit.end).toBeNull();
+	expect(minimal_bit.has_xml_tag).toBe(false);
+	expect(minimal_bit.enabled).toBe(true);
+
+	// Test with explicit nulls where allowed
+	const nullable_bit = mock_zzz.registry.instantiate('Text_Bit', {
+		type: 'text',
+		content: 'content',
+		start: null,
+		end: null,
+		title: null,
+		summary: null,
+	});
+
+	expect(nullable_bit.content).toBe('content');
+	expect(nullable_bit.start).toBeNull();
+	expect(nullable_bit.end).toBeNull();
+	expect(nullable_bit.title).toBeNull();
+	expect(nullable_bit.summary).toBeNull();
 });

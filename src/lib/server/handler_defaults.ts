@@ -209,11 +209,11 @@ export const handle_message = async (
 			return response;
 		}
 		case 'update_diskfile': {
-			const {path, contents} = message;
+			const {path, content} = message;
 
 			try {
 				// Use the server's safe_fs instance to write the file
-				await server.safe_fs.write_file(path, contents);
+				await server.safe_fs.write_file(path, content);
 				return null;
 			} catch (error) {
 				console.error(`Error writing file ${path}:`, error);
@@ -229,6 +229,18 @@ export const handle_message = async (
 				return null;
 			} catch (error) {
 				console.error(`Error deleting file ${path}:`, error);
+				throw error;
+			}
+		}
+		case 'create_directory': {
+			const {path} = message;
+
+			try {
+				// Use the server's safe_fs instance to create the directory
+				await server.safe_fs.mkdir(path, {recursive: true});
+				return null;
+			} catch (error) {
+				console.error(`Error creating directory ${path}:`, error);
 				throw error;
 			}
 		}

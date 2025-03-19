@@ -1,4 +1,8 @@
+export const GLYPH_ADD = '✛'; // + ✚ ✛ ✜
 export const GLYPH_REMOVE = '⨉'; // ⨉ ✕ 🗙 ⤫ ⤬ ✗ ✘
+export const GLYPH_DELETE = '⌧'; // ⌧ ⌫ ⨂ ⊝ ⦸
+export const GLYPH_CLEAR = '⌫';
+export const GLYPH_RESTORE = '⤻';
 export const GLYPH_CANCEL = '⦸';
 export const GLYPH_DRAG = '≡'; // ≡ ☰ ☷
 export const GLYPH_COPY = '⧉';
@@ -7,12 +11,12 @@ export const GLYPH_RESET = '⤺';
 export const GLYPH_CONNECT = '⭍'; // ⨁
 export const GLYPH_DISCONNECT = '⨂';
 export const GLYPH_RETRY = '↺'; // ⟲'; // ⟲ ⟳ ⤾ ⤼ ↻
-export const GLYPH_CLEAR = '⌫'; // ⌧ ⌫ ⨂ ⊝ ⦸
 export const GLYPH_INFO = 'ⓘ';
+export const GLYPH_PLACEHOLDER = '↳';
 
 // export const GLYPH_EDIT = '✎'; // ✎ ✏ ✐ ✑ ✒
-// export const GLYPH_ADD = '⊞'; // ⊞ ⧉ ⧈
 // export const GLYPH_MOVE = '⧈';
+// ⊞ ⧉ ⧈
 // ⎗ ⎗ ⎘ ⌖ ⌶ ⎙
 // ⎘ ⎘ ⎌ ⌫ ⊘ ⦸
 
@@ -20,7 +24,10 @@ export const GLYPH_SERVER = '🜢';
 export const GLYPH_CHAT = '⌸';
 export const GLYPH_TAPE = '☷';
 export const GLYPH_FILE = '⧈'; // ⏚ ⧈ ⊞ ⌺ ▤
+export const GLYPH_LIST = '▤'; //
 export const GLYPH_DIRECTORY = '▦'; // 🗁 ▦ ▥ 🗀
+export const GLYPH_CREATE_FILE = '🗎';
+export const GLYPH_CREATE_FOLDER = '🗁';
 export const GLYPH_PROMPT = '⌇'; // ⌇ ⍋  ⌭
 export const GLYPH_BIT = '┊'; //  ┊ ┋ ╎ ╏
 export const GLYPH_PROVIDER = '⨕';
@@ -39,6 +46,8 @@ export const GLYPH_SESSION = '⏣';
 export const GLYPH_DIRECTION_CLIENT = '⥘'; // ⤤ ⤳
 export const GLYPH_DIRECTION_SERVER = '⥙'; // ⤷
 export const GLYPH_DIRECTION_BOTH = '⤨';
+
+export const GLYPH_ARROW_RIGHT = '➝'; // → ➝ ➞ ➜ ➡ ⟶ ⭢ ⤷ ⤳ ⥅ ⮕ ⭆ ⮞ ⭆ ⭈ ⤞ ⤠
 
 export const get_icon_for_message_type = (type: string): string => {
 	switch (type) {
@@ -78,6 +87,9 @@ export const get_direction_icon = (direction: string): string => {
 // ⬎⤣
 
 // ⎗ ⎘
+
+// ⊞
+// ⊟
 
 // ⇇ ⇉  maybe use these for deps?
 
@@ -185,3 +197,7 @@ export const get_direction_icon = (direction: string): string => {
 // ⌘
 // ▄
 // ▪
+
+// ⮟
+
+// ⭉ ⭊ ⤟⮭ ⎋

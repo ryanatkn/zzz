@@ -1,5 +1,7 @@
 import {z} from 'zod';
 import {format} from 'date-fns';
+import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
+import {DEV} from 'esm-env';
 
 import {get_field_schema, zod_get_schema_keys, type Uuid, type Datetime} from '$lib/zod_helpers.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
@@ -27,7 +29,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	created: Datetime = $state()!;
 	updated: Datetime | null = $state()!;
 
-	readonly schema: T_Schema; // TODO think about making this $state - dynamic schemas? idk, not yet
+	readonly schema: T_Schema;
 
 	readonly schema_keys: Array<Schema_Keys<T_Schema>> = $derived.by(() =>
 		zod_get_schema_keys(this.schema),
@@ -53,10 +55,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 		() => this.schema.safeParse(this.json),
 	);
 
-	// Make zzz required
 	readonly zzz: Zzz;
-
-	// TODO most of the overrides for this should be replaceable with schema introspection I think
 
 	/**
 	 * Type-safe decoders for custom field decoding.
@@ -110,6 +109,47 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 		const initial_json = this.#initial_json;
 		this.#initial_json = undefined;
 		this.set_json(initial_json); // `set_json` parses with the schema, so this may be `undefined` and it's fine
+
+		// Register the cell with the global registry
+		this.register();
+	}
+
+	/**
+	 * Clean up resources when this cell is no longer needed.
+	 * Should be called before the cell is discarded.
+	 */
+	protected dispose(): void {
+		this.unregister();
+	}
+
+	/** Flag to track registration status - prevents double registration */
+	#registered = false;
+
+	/**
+	 * Register this cell in the global cell registry.
+	 * Called automatically by init().
+	 */
+	protected register(): void {
+		if (this.#registered) {
+			if (DEV) console.error(`Cell ${this.constructor.name} is already registered`);
+			return;
+		}
+
+		// Use a type assertion to handle the generic type constraint issue
+		// This is safe because we know this is a Cell instance
+		this.zzz.cells.set(this.id, this as any);
+		this.#registered = true;
+	}
+
+	/**
+	 * Unregister this cell from the global cell registry.
+	 * Called automatically by dispose().
+	 */
+	protected unregister(): void {
+		if (!this.#registered) return;
+
+		this.zzz.cells.delete(this.id);
+		this.#registered = false;
 	}
 
 	/**
@@ -136,13 +176,12 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	/**
 	 * Apply JSON data to this instance.
 	 */
-	set_json(value?: z.input<T_Schema>): void {
+	set_json(value: z.input<T_Schema> = EMPTY_OBJECT): void {
 		try {
-			// Use empty object if value is undefined to ensure schema processes defaults
-			const input = value === undefined ? {} : value;
-
-			// Parse input with schema - this will apply schema defaults for missing fields
-			const parsed = this.schema.parse(input);
+			// Parse input with schema - this will apply schema defaults for missing fields.
+			// Use empty object if value is undefined to ensure schemas
+			// without `.optional()` on their top-level object processes defaults.
+			const parsed = this.schema.parse(value);
 
 			// Process each schema key
 			for (const key of this.schema_keys) {
@@ -251,9 +290,9 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	 *    in the schema, the decoder MUST return HANDLED to indicate proper handling
 	 */
 	protected assign_property(key: Schema_Keys<T_Schema>, value: unknown): void {
-		// 1. Check if we have a decoder for this key
-		const has_decoder = key in this.decoders;
+		// 1. Check if we have a property and decoder for this key
 		const has_property = key in this;
+		const has_decoder = key in this.decoders;
 
 		// 2. If we don't have a property or decoder, log an error and bail
 		if (!has_property && !has_decoder) {
@@ -317,14 +356,14 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	/**
 	 * Instantiate a cell class using the registry.
 	 */
-	#instantiate_class(class_name: string | undefined, json: unknown): unknown {
+	#instantiate_class(class_name: string | undefined, json: unknown, options?: object): unknown {
 		if (!class_name) {
 			console.error('No class name provided for instantiation');
 			return null;
 		}
 
-		const instance = this.zzz.registry.instantiate(class_name, json);
-		if (!instance) console.error('No class name provided for instantiation');
+		const instance = this.zzz.registry.maybe_instantiate(class_name as any, json, options);
+		if (!instance) console.error(`Failed to instantiate ${class_name}`);
 		return instance;
 	}
 }

@@ -11,13 +11,14 @@ export type Message_Direction = z.infer<typeof Message_Direction>;
 export const Message_Type = z.enum([
 	'ping',
 	'pong',
-	'send_prompt',
-	'completion_response',
-	'update_diskfile',
-	'delete_diskfile',
-	'filer_change',
 	'load_session',
 	'loaded_session',
+	'send_prompt',
+	'completion_response',
+	'filer_change',
+	'update_diskfile',
+	'delete_diskfile',
+	'create_directory',
 ]);
 export type Message_Type = z.infer<typeof Message_Type>;
 
@@ -172,7 +173,7 @@ export type Message_Filer_Change = z.infer<typeof Message_Filer_Change>;
 export const Message_Update_Diskfile = Message_Base.extend({
 	type: z.literal('update_diskfile'),
 	path: Diskfile_Path,
-	contents: z.string(),
+	content: z.string(),
 }).strict();
 export type Message_Update_Diskfile = z.infer<typeof Message_Update_Diskfile>;
 
@@ -181,6 +182,12 @@ export const Message_Delete_Diskfile = Message_Base.extend({
 	path: Diskfile_Path,
 }).strict();
 export type Message_Delete_Diskfile = z.infer<typeof Message_Delete_Diskfile>;
+
+export const Message_Create_Directory = Message_Base.extend({
+	type: z.literal('create_directory'),
+	path: Diskfile_Path,
+}).strict();
+export type Message_Create_Directory = z.infer<typeof Message_Create_Directory>;
 
 // Completion related message schemas
 export const Message_Send_Prompt = Message_Base.extend({
@@ -202,6 +209,7 @@ export const Message_Client = z.discriminatedUnion('type', [
 	Message_Send_Prompt,
 	Message_Update_Diskfile,
 	Message_Delete_Diskfile,
+	Message_Create_Directory,
 ]);
 export type Message_Client = z.infer<typeof Message_Client>;
 
@@ -226,22 +234,21 @@ export const Message = z.discriminatedUnion('type', [
 	Message_Completion_Response,
 	Message_Update_Diskfile,
 	Message_Delete_Diskfile,
+	Message_Create_Directory,
 ]);
 export type Message = z.infer<typeof Message>;
 
 // Message with metadata schema
 export const Message_Json = Cell_Json.extend({
-	id: Uuid,
 	type: Message_Type,
 	direction: Message_Direction,
-	created: Datetime_Now,
 	// Optional fields with proper type checking
 	ping_id: Uuid.optional(),
 	response_time: z.number().optional(),
 	completion_request: Completion_Request.optional(),
 	completion_response: Completion_Response.optional(),
 	path: Diskfile_Path.optional(),
-	contents: z.string().optional(),
+	content: z.string().optional(),
 	change: z
 		.object({
 			type: Diskfile_Change_Type,

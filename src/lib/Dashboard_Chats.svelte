@@ -4,13 +4,15 @@
 
 	import Chat_View from '$lib/Chat_View.svelte';
 	import Nav_Link from '$lib/Nav_Link.svelte';
-	import {GLYPH_CHAT} from '$lib/glyphs.js';
+	import {GLYPH_CHAT, GLYPH_ADD} from '$lib/glyphs.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import {Reorderable} from '$lib/reorderable.svelte.js';
 
 	const zzz = zzz_context.get();
 
 	const reorderable = new Reorderable();
+
+	$inspect('zzz.chats.items.all.length', zzz.chats.items.all.length);
 </script>
 
 <div class="flex w_100 h_100">
@@ -23,7 +25,7 @@
 				type="button"
 				onclick={() => zzz.chats.add()}
 			>
-				+ new chat
+				{GLYPH_ADD} new chat
 			</button>
 			{#if zzz.chats.items.all.length}
 				<menu
@@ -68,13 +70,13 @@
 						zzz.chats.add();
 					}}>create one</button
 				>
-				or take a
+				or
 				<button
 					type="button"
 					class="inline color_f"
 					onclick={() => {
 						zzz.chats.select(random_item(zzz.chats.items.all).id);
-					}}>random walk</button
+					}}>go fish</button
 				>?
 			</p>
 		</div>

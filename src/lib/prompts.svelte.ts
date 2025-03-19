@@ -3,7 +3,6 @@ import {z} from 'zod';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Prompt, Prompt_Json, Prompt_Schema} from '$lib/prompt.svelte.js';
 import type {Uuid} from '$lib/zod_helpers.js';
-import type {Bit} from '$lib/bit.svelte.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {create_single_index, create_derived_index} from '$lib/indexed_collection_helpers.js';
@@ -169,16 +168,6 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 
 	reorder_prompts(from_index: number, to_index: number): void {
 		this.items.reorder(from_index, to_index);
-	}
-
-	add_bit(): void {
-		if (!this.selected) return;
-		this.selected.add_bit();
-	}
-
-	update_bit(bit_id: Uuid, updates: Partial<Omit<Bit, 'id'>>): void {
-		if (!this.selected) return;
-		this.selected.update_bit(bit_id, updates);
 	}
 
 	remove_bit(bit_id: Uuid): void {

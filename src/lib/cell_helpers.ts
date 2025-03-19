@@ -1,4 +1,5 @@
 import {z} from 'zod';
+import {DEV} from 'esm-env';
 
 /** Sentinel value to indicate a parser has completely handled a property */
 export const HANDLED = Symbol('HANDLED_BY_PARSER');
@@ -67,7 +68,7 @@ export const cell_array = <T extends z.ZodTypeAny>(schema: T, class_name: string
 
 	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 	if (!array_schema._def) {
-		console.warn('cell_array: Schema is not a ZodArray or ZodDefault<ZodArray>');
+		if (DEV) console.error('cell_array: Schema is not a ZodArray or ZodDefault<ZodArray>');
 		return schema;
 	}
 
@@ -78,10 +79,10 @@ export const cell_array = <T extends z.ZodTypeAny>(schema: T, class_name: string
 
 // A type helper that makes it easier to define value parsers with correct input types
 export type Value_Parser<
-	TSchema extends z.ZodType,
-	TKey extends keyof z.infer<TSchema> & string = keyof z.infer<TSchema> & string,
+	T_Schema extends z.ZodType,
+	T_Key extends keyof z.infer<T_Schema> = keyof z.infer<T_Schema>,
 > = {
-	[K in TKey]?: (value: unknown) => z.infer<TSchema>[K] | undefined;
+	[K in T_Key]?: (value: unknown) => z.infer<T_Schema>[K] | undefined;
 };
 
 /**
@@ -90,12 +91,12 @@ export type Value_Parser<
  * to properly type the base properties.
  */
 export type Cell_Value_Decoder<
-	TSchema extends z.ZodType,
-	TKey extends keyof z.infer<TSchema> & string = keyof z.infer<TSchema> & string,
+	T_Schema extends z.ZodType,
+	T_Key extends keyof z.infer<T_Schema> = keyof z.infer<T_Schema>,
 > = {
-	[K in TKey]?: (
+	[K in T_Key]?: (
 		value: unknown,
-	) => z.infer<TSchema>[K] | undefined | typeof HANDLED | typeof USE_DEFAULT;
+	) => z.infer<T_Schema>[K] | undefined | typeof HANDLED | typeof USE_DEFAULT;
 };
 
 /**
@@ -139,6 +140,12 @@ export const get_schema_class_info = (
 	const class_name = (schema as any)[ZOD_CELL_CLASS_NAME];
 	if (class_name) {
 		return {type: schema.constructor.name, class_name, is_array: false};
+	}
+
+	// Handle ZodDefault by unwrapping and checking the inner type
+	if (schema instanceof z.ZodDefault) {
+		const inner_info = get_schema_class_info(schema._def.innerType);
+		if (inner_info) return inner_info;
 	}
 
 	// Handle ZodBranded

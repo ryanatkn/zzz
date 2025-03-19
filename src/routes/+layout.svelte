@@ -20,10 +20,12 @@
 	import {package_json, src_json} from '$routes/package.js';
 	import {Uuid} from '$lib/zod_helpers.js';
 	import {Prompt_Json} from '$lib/prompt.svelte.js';
-	import {Zzz, cell_classes} from '$lib/zzz.svelte.js';
+	import {cell_classes} from '$lib/cell_classes.js';
+	import {Zzz} from '$lib/zzz.svelte.js';
 	import {Provider_Json} from '$lib/provider.svelte.js';
 	import {Model_Json} from '$lib/model.svelte.js';
 	import create_zzz_config from '$lib/config.js';
+	import {Bit} from '$lib/bit.svelte.js';
 
 	interface Props {
 		children: Snippet;
@@ -43,12 +45,23 @@
 		zzz.chats.add();
 		zzz.chats.add();
 		zzz.chats.add();
-		const prompt = zzz.prompts.add();
-		prompt.add_bit('one');
-		prompt.add_bit('2');
-		prompt.add_bit('c');
-		zzz.prompts.add().add_bit();
-		zzz.prompts.add().add_bit();
+
+		// Create prompts with bits using the new API
+		const prompt1 = zzz.prompts.add();
+		const bit1 = Bit.create(zzz, {type: 'text', content: 'one'});
+		const bit2 = Bit.create(zzz, {type: 'text', content: '2'});
+		const bit3 = Bit.create(zzz, {type: 'text', content: 'c'});
+
+		prompt1.add_bit(bit1);
+		prompt1.add_bit(bit2);
+		prompt1.add_bit(bit3);
+
+		// Create more prompts with bits
+		const prompt2 = zzz.prompts.add();
+		prompt2.add_bit(Bit.create(zzz, {type: 'text'}));
+
+		const prompt3 = zzz.prompts.add();
+		prompt3.add_bit(Bit.create(zzz, {type: 'text'}));
 	});
 
 	pkg_context.set(parse_package_meta(package_json, src_json));
@@ -58,7 +71,7 @@
 
 	// Create an instance of Zzz with socket_url
 	const zzz = new Zzz({
-		cells: cell_classes,
+		cell_classes,
 		socket_url: ws_url,
 		onsend: (message) => {
 			console.log('[page] sending message via socket', message);
@@ -136,6 +149,7 @@
 		zzz.messages.send({id: Uuid.parse(undefined), type: 'load_session'});
 	}
 
+	// TODO refactor how? schema with typesafe registration/dispatch?
 	// Handle URL parameter synchronization
 	$effect.pre(() => {
 		// Re-run when URL search params change

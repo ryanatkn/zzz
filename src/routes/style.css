@@ -11,6 +11,11 @@ h6 {
 	font-family: 'DM Serif Display', Georgia, serif; /* copying svelte's homework and taste */
 }
 
+textarea {
+	scrollbar-width: thin; /* TODO maybe upstream? */
+	border-radius: var(--radius_xs2);
+}
+
 /* TODO upstream */
 /* This is needed in places where glyphs may appear with non-sans fonts like headings. */
 .glyph {
@@ -36,9 +41,14 @@ h6 {
 
 /* TODO upstream most of this */
 .compact {
+	--size: var(--size_sm);
 	--input_height: 2.6rem;
+	--input_padding_x: var(--space_sm);
 	--min_height: 2.6rem;
-	--border_radius: var(--radius_xs);
+	--border_radius: var(--radius_xs2);
+}
+button.compact {
+	font-size: var(--size); /* ideally the base button would use `--size` I think */
 }
 input[type='checkbox'].compact {
 	height: var(--input_height);
@@ -259,4 +269,13 @@ a.chip {
 }
 .chip.color_i:not(.plain) {
 	border-color: var(--border_color_i);
+}
+
+/* TODO maybe upstream? is weird but has a consistency  */
+.h_input_height {
+	height: var(--input_height);
+}
+
+.icon_button {
+	font-weight: 400;
 }

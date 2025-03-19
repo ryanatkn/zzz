@@ -1,11 +1,11 @@
-import type {Chat_Message} from '$lib/chat_message.svelte.js';
+import type {Strip} from '$lib/strip.svelte.js';
 
 // TODO look into refactoring this to be more correct, it's only used to calculate the token count for a tape by combining all chat messages
 /**
  * Renders the tape's content by combining all chat messages
  * in a format suitable for token counting and display.
  */
-export const render_tape = (messages: Array<Chat_Message>): string => {
+export const render_tape = (messages: Array<Strip>): string => {
 	if (!messages.length) return '';
 
 	let s = '';

@@ -1,61 +1,55 @@
 <script lang="ts">
-	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
-	import Paste_From_Clipboard from '@ryanatkn/fuz/Paste_From_Clipboard.svelte';
-
-	import Confirm_Button from '$lib/Confirm_Button.svelte';
-	import type {Bit} from '$lib/bit.svelte.js';
+	import type {Bit_Type} from '$lib/bit.svelte.js';
 	import type {Prompts} from '$lib/prompts.svelte.js';
 	import Xml_Tag_Controls from '$lib/Xml_Tag_Controls.svelte';
 	import Bit_Stats from '$lib/Bit_Stats.svelte';
-	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
-	import {GLYPH_PASTE} from '$lib/glyphs.js';
+	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
+	import {get_bit_type_glyph} from '$lib/bit_helpers.js';
+	import Bit_Editor_Text from '$lib/Bit_Editor_Text.svelte';
+	import Bit_Editor_Diskfile from '$lib/Bit_Editor_Diskfile.svelte';
+	import Bit_Editor_Sequence from '$lib/Bit_Editor_Sequence.svelte';
+	import Bit_Toggle_Button from '$lib/Bit_Toggle_Button.svelte';
+	import Bit_Remove_Button from '$lib/Bit_Remove_Button.svelte';
 
 	interface Props {
-		bit: Bit;
+		bit: Bit_Type;
 		prompts: Prompts;
+		show_actions?: boolean;
 	}
 
-	const {bit, prompts}: Props = $props();
+	const {bit, prompts, show_actions = true}: Props = $props();
 
-	const bit_textareas = $state<Record<string, HTMLTextAreaElement>>({});
+	const prompt = $derived(prompts.selected);
 </script>
 
-<div class="column gap_sm" class:dormant={!bit.enabled}>
+<div class="bit_view column gap_sm" class:dormant={!bit.enabled}>
 	<div class="flex mb_0 justify_content_space_between">
-		<div class="size_lg m_0">{bit.name}</div>
-	</div>
-	<textarea
-		style:height="200px"
-		class="plain mb_0"
-		bind:this={bit_textareas[bit.id]}
-		value={bit.content}
-		oninput={(e) => prompts.update_bit(bit.id, {content: e.currentTarget.value})}
-		placeholder="content..."
-	></textarea>
-	<div class="flex justify_content_space_between">
-		<div class="flex">
-			<Copy_To_Clipboard text={bit.content} attrs={{class: 'plain'}} />
-			<Paste_From_Clipboard
-				onpaste={(text) => {
-					bit.content += text;
-					bit_textareas[bit.id].focus();
-				}}
-				attrs={{class: 'plain icon_button size_lg', title: 'paste'}}
-				>{GLYPH_PASTE}</Paste_From_Clipboard
-			>
-			<Clear_Restore_Button
-				value={bit.content}
-				onchange={(value) => {
-					bit.content = value;
-				}}
-			/>
-			<!-- TODO restore -->
+		<div class="size_lg m_0">
+			<span class="mr_xs2"><Glyph_Icon icon={get_bit_type_glyph(bit)} /></span>
+			{bit.name}
 		</div>
-		<Confirm_Button
-			onconfirm={() => prompts.remove_bit(bit.id)}
-			attrs={{title: `remove bit ${bit.id}`}}
-		/>
+		<div class="flex gap_xs">
+			<Bit_Toggle_Button {bit} />
+			<Bit_Remove_Button {bit} {prompts} />
+		</div>
 	</div>
-	<Bit_Stats length={bit.content.length} token_count={bit.token_count} />
+
+	<!-- Content section - different for each bit type -->
+	{#if bit.type === 'text'}
+		<Bit_Editor_Text text_bit={bit} {show_actions} />
+	{:else if bit.type === 'diskfile'}
+		<Bit_Editor_Diskfile diskfile_bit={bit} {show_actions} />
+	{:else if bit.type === 'sequence'}
+		<Bit_Editor_Sequence sequence_bit={bit} {prompt} />
+	{/if}
+
+	<!-- Common controls for all bit types -->
+	<Bit_Stats {bit} />
 	<Xml_Tag_Controls {bit} />
 </div>
+
+<style>
+	.dormant {
+		opacity: 0.5;
+	}
+</style>

@@ -2,6 +2,8 @@
 	import type {Snippet} from 'svelte';
 	import type {SvelteHTMLElements} from 'svelte/elements';
 
+	import {GLYPH_CLEAR, GLYPH_RESTORE} from '$lib/glyphs.js';
+
 	interface Props {
 		value: string;
 		onchange: (value: string) => void;
@@ -17,8 +19,9 @@
 
 <button
 	type="button"
-	class="plain"
+	class="plain icon_button"
 	disabled={!value && !cleared_value}
+	title="{value ? 'clear' : 'restore'} content"
 	onclick={() => {
 		if (value) {
 			cleared_value = value;
@@ -33,13 +36,13 @@
 	<span class="relative">
 		<span style:visibility="hidden" class="inline_flex flex_column"
 			><span
-				>{#if children}{@render children()}{:else}clear{/if}</span
+				>{#if children}{@render children()}{:else}{GLYPH_CLEAR}{/if}</span
 			><span
-				>{#if restore}{@render restore()}{:else}restore{/if}</span
+				>{#if restore}{@render restore()}{:else}{GLYPH_RESTORE}{/if}</span
 			></span
 		>
 		<span class="absolute inline_flex align_items_center justify_content_center" style:inset="0"
-			>{#if value || !cleared_value}{#if children}{@render children()}{:else}clear{/if}{:else if restore}{@render restore()}{:else}restore{/if}</span
+			>{#if value || !cleared_value}{#if children}{@render children()}{:else}{GLYPH_CLEAR}{/if}{:else if restore}{@render restore()}{:else}{GLYPH_RESTORE}{/if}</span
 		>
 	</span>
 </button>

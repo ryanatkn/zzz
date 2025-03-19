@@ -1,8 +1,5 @@
 <script lang="ts">
 	import Pending_Button from '@ryanatkn/fuz/Pending_Button.svelte';
-	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
-	import Paste_From_Clipboard from '@ryanatkn/fuz/Paste_From_Clipboard.svelte';
-	import {encode as tokenize} from 'gpt-tokenizer';
 	import {slide} from 'svelte/transition';
 
 	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
@@ -11,11 +8,19 @@
 	import Model_Selector from '$lib/Model_Selector.svelte';
 	import Chat_Tape from '$lib/Chat_Tape.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
-	import {GLYPH_TAPE, GLYPH_PROMPT, GLYPH_REMOVE, GLYPH_PASTE, GLYPH_CHAT} from '$lib/glyphs.js';
-	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
-	import Bit_Stats from '$lib/Bit_Stats.svelte';
+	import {
+		GLYPH_TAPE,
+		GLYPH_BIT,
+		GLYPH_PROMPT,
+		GLYPH_REMOVE,
+		GLYPH_CHAT,
+		GLYPH_PLACEHOLDER,
+		GLYPH_DELETE,
+	} from '$lib/glyphs.js';
 	import Prompt_List from '$lib/Prompt_List.svelte';
+	import Bit_List from '$lib/Bit_List.svelte';
 	import Tape_List from '$lib/Tape_List.svelte';
+	import Content_Editor from '$lib/Content_Editor.svelte';
 
 	const zzz = zzz_context.get();
 
@@ -45,10 +50,9 @@
 		}
 	}
 	let main_input = $state(''); // TODO BLOCK @many this state probably belongs on the `multichat` object
-	const main_input_tokens = $derived(tokenize(main_input));
 
 	let pending = $state(false); // TODO BLOCK @many this state probably belongs on the `multichat` object
-	let main_input_el: HTMLTextAreaElement | undefined;
+	let main_input_el: {focus: () => void} | undefined;
 
 	const send_to_all = async () => {
 		if (!count) return;
@@ -78,6 +82,10 @@
 	// TODO BLOCK custom buttons section - including quick local, smartest all, all, etc
 
 	// TODO BLOCK remove all tapes needs to open to the right of the button
+
+	const handle_main_input_change = (content: string) => {
+		main_input = content;
+	};
 
 	const tags = $derived(Array.from(zzz.tags)); // TODO BLOCK refactor, maybe `zzz.tags_array`? or `zzz.tags.all`
 </script>
@@ -145,13 +153,13 @@
 	</div>
 	<div class="column_fluid">
 		<div class="column_bg_1 p_sm">
-			<div class="flex gap_xs2 flex_1 mb_xs">
-				<textarea
-					class="plain flex_1 mb_0"
-					bind:value={main_input}
-					bind:this={main_input_el}
-					placeholder="send to all {count >= 2 ? count + ' ' : ''}tapes..."
-				></textarea>
+			<Content_Editor
+				content={main_input}
+				onchange={handle_main_input_change}
+				placeholder="{GLYPH_PLACEHOLDER} send to all"
+				show_actions
+				bind:this={main_input_el}
+			>
 				<Pending_Button
 					{pending}
 					onclick={send_to_all}
@@ -160,30 +168,13 @@
 				>
 					send to {count}
 				</Pending_Button>
-			</div>
-			<Bit_Stats length={main_input.length} token_count={main_input_tokens.length} />
-			<div class="flex mt_xs">
-				<Copy_To_Clipboard text={main_input} attrs={{class: 'plain'}} />
-				<Paste_From_Clipboard
-					onpaste={(text) => {
-						main_input += text;
-						main_input_el?.focus();
-					}}
-					attrs={{class: 'plain icon_button size_lg', title: 'paste'}}
-					>{GLYPH_PASTE}</Paste_From_Clipboard
-				>
-				<Clear_Restore_Button
-					value={main_input}
-					onchange={(value) => {
-						main_input = value;
-					}}
-				/>
-			</div>
+			</Content_Editor>
+
 			<div class="mt_lg">
 				<Confirm_Button
 					onconfirm={() => chat.remove_all_tapes()}
 					position="right"
-					attrs={{disabled: !count, class: 'plain'}}>{GLYPH_REMOVE} remove all tapes</Confirm_Button
+					attrs={{disabled: !count, class: 'plain'}}>{GLYPH_REMOVE} remove all</Confirm_Button
 				>
 			</div>
 			<ul class="tapes unstyled mt_lg">
@@ -205,24 +196,29 @@
 				<div transition:slide>
 					<div class="column p_sm">
 						<!-- TODO needs work -->
-						<div class="flex justify_content_space_between mb_md">
+						<div class="flex justify_content_space_between">
 							<div class="size_lg">
 								<Glyph_Icon icon={GLYPH_CHAT} />
 								{zzz.chats.selected.name}
 							</div>
 							<Confirm_Button
 								onconfirm={() => zzz.chats.selected_id && zzz.chats.remove(zzz.chats.selected_id)}
-								attrs={{title: `delete chat "${zzz.chats.selected.name}"`}}
-							/>
+								attrs={{title: `delete chat "${zzz.chats.selected.name}"`, class: 'plain'}}
+							>
+								{GLYPH_DELETE}
+								{#snippet popover_button_content()}{GLYPH_DELETE}{/snippet}
+							</Confirm_Button>
 						</div>
-						<small>{zzz.chats.selected.id}</small>
-						<small title={zzz.chats.selected.created_formatted_date}
-							>created {zzz.chats.selected.created_formatted_short_date}</small
-						>
-						<small>
-							{zzz.chats.selected.tapes.length}
-							tape{#if zzz.chats.selected.tapes.length !== 1}s{/if}
-						</small>
+						<div class="column font_mono">
+							<small>{zzz.chats.selected.id}</small>
+							<small title={zzz.chats.selected.created_formatted_date}
+								>created {zzz.chats.selected.created_formatted_short_date}</small
+							>
+							<small>
+								{zzz.chats.selected.tapes.length}
+								tape{#if zzz.chats.selected.tapes.length !== 1}s{/if}
+							</small>
+						</div>
 					</div>
 				</div>
 			{/if}
@@ -233,6 +229,11 @@
 			<div class="p_sm">
 				<header class="mt_0 mb_lg size_lg"><Glyph_Icon icon={GLYPH_PROMPT} /> prompts</header>
 				<Prompt_List {chat} />
+			</div>
+			<!-- TODO maybe show `Bit_List` with the `prompt bits` header here in -->
+			<div class="p_sm">
+				<header class="mt_0 mb_lg size_lg"><Glyph_Icon icon={GLYPH_BIT} /> all bits</header>
+				<Bit_List bits={chat.bits_array} />
 			</div>
 		</div>
 	</div>

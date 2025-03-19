@@ -1,9 +1,9 @@
 import {encode as tokenize} from 'gpt-tokenizer';
 import {z} from 'zod';
 
-import {Uuid, Datetime_Now} from '$lib/zod_helpers.js';
+import {Uuid} from '$lib/zod_helpers.js';
 import {get_unique_name} from '$lib/helpers.js';
-import {Bit, Bit_Json} from '$lib/bit.svelte.js';
+import {Bit_Json, type Bit_Type} from '$lib/bit.svelte.js';
 import {reorder_list} from '$lib/list_helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
@@ -21,14 +21,12 @@ export type Prompt_Message_Content = string; // TODO ?
 const prompt_names: Array<string> = [];
 
 export const Prompt_Json = Cell_Json.extend({
-	id: Uuid,
 	name: z.string().default(() => {
 		// TODO BLOCK how to do this correctly? can you make it stateful and still have a static module-scoped schema? I dont see a context object arg or anything
 		const name = get_unique_name('prompt', prompt_names);
 		prompt_names.push(name);
 		return name;
 	}),
-	created: Datetime_Now,
 	bits: z.array(Bit_Json).default(() => []),
 });
 export type Prompt_Json = z.infer<typeof Prompt_Json>;
@@ -39,7 +37,7 @@ export interface Prompt_Options extends Cell_Options<typeof Prompt_Json> {
 
 export class Prompt extends Cell<typeof Prompt_Json> {
 	name: string = $state()!;
-	bits: Array<Bit> = $state()!;
+	bits: Array<Bit_Type> = $state()!;
 
 	content: string = $derived(format_prompt_content(this.bits));
 
@@ -67,37 +65,12 @@ export class Prompt extends Cell<typeof Prompt_Json> {
 		this.init();
 	}
 
-	add_bit(content: string = '', name: string = 'new bit'): Bit {
-		const bit = new Bit({
-			zzz: this.zzz,
-			json: {
-				name: get_unique_name(
-					name,
-					this.bits.map((f) => f.name),
-				),
-				content,
-			},
-		});
+	/**
+	 * Add a bit to this prompt
+	 */
+	add_bit(bit: Bit_Type): Bit_Type {
 		this.bits.push(bit);
 		return bit;
-	}
-
-	update_bit(
-		id: Uuid,
-		updates: Partial<Pick<Bit, 'name' | 'content' | 'has_xml_tag' | 'xml_tag_name' | 'attributes'>>,
-	): void {
-		const bit = this.bits.find((f) => f.id === id);
-		if (bit) {
-			if (updates.name !== undefined) bit.name = updates.name;
-			if (updates.content !== undefined) bit.content = updates.content;
-			if (updates.has_xml_tag !== undefined) bit.has_xml_tag = updates.has_xml_tag;
-			if (updates.xml_tag_name !== undefined) bit.xml_tag_name = updates.xml_tag_name;
-
-			// If attributes are being updated directly, handle array replacement for reactivity
-			if (updates.attributes !== undefined) {
-				bit.attributes = [...updates.attributes]; // Force reactivity
-			}
-		}
 	}
 
 	remove_bit(id: Uuid): boolean {

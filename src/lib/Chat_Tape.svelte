@@ -1,20 +1,16 @@
 <script lang="ts">
 	import {scale, slide} from 'svelte/transition';
-	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
-	import Paste_From_Clipboard from '@ryanatkn/fuz/Paste_From_Clipboard.svelte';
-	import {encode as tokenize} from 'gpt-tokenizer';
 	import Pending_Button from '@ryanatkn/fuz/Pending_Button.svelte';
+	import {encode as tokenize} from 'gpt-tokenizer';
 
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import type {Tape} from '$lib/tape.svelte.js';
-	import Chat_Message_Item from '$lib/Chat_Message_Item.svelte';
+	import Strip_Item from '$lib/Strip_Item.svelte';
 	import Model_Link from '$lib/Model_Link.svelte';
 	import Provider_Link from '$lib/Provider_Link.svelte';
-	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
-	import Bit_Stats from '$lib/Bit_Stats.svelte';
-	import Error_Message from '$lib/Error_Message.svelte';
-	import {GLYPH_PASTE} from '$lib/glyphs.js';
 	import {Scrollable} from '$lib/scrollable.svelte.js';
+	import Content_Editor from '$lib/Content_Editor.svelte';
+	import {GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
 
 	interface Props {
 		tape: Tape;
@@ -26,13 +22,13 @@
 
 	let input = $state('');
 	const input_tokens = $derived(tokenize(input));
-	let input_el: HTMLTextAreaElement | undefined;
+	let content_input: {focus: () => void} | undefined;
 	let pending = $state(false);
 
 	const send = async () => {
 		const parsed = input.trim();
 		if (!parsed) {
-			input_el?.focus();
+			content_input?.focus();
 			return;
 		}
 		input = '';
@@ -41,15 +37,18 @@
 		pending = false;
 	};
 
-	const tape_messages = $derived(tape.chat_messages);
-
 	const scrollable = new Scrollable();
+
+	// Handle content change
+	const handle_input_change = (content: string) => {
+		input = content;
+	};
 
 	// TODO BLOCK add reset button
 
 	// TODO BLOCK edit individual items in the list (contextmenu too - show contextmenu target outline)
 
-	// TODO BLOCK show pending animation - it should first create the message in the pending Async_Status
+	// TODO BLOCK show pending animation - it should first create the strip in the pending Async_Status
 
 	// TODO BLOCK the link should instead be a model picker (dialog? or overlaid without a bg maybe?)
 </script>
@@ -69,51 +68,43 @@
 				/></small
 			>
 		</header>
-		<Confirm_Button onconfirm={onremove} />
+		<Confirm_Button
+			onconfirm={onremove}
+			attrs={{
+				class: 'plain compact',
+				title: `delete tape with ${tape.model_name} and ${tape.token_count} tokens`,
+			}}
+		/>
 	</div>
 
-	<div class="messages" use:scrollable.container use:scrollable.target>
-		{#if tape_messages}
-			<ul class="unstyled">
-				{#each tape_messages as message (message.id)}
-					<li transition:slide>
-						<Chat_Message_Item {message} />
-					</li>
-				{/each}
-			</ul>
-		{:else}
-			<Error_Message>something went wrong getting this tape's messages</Error_Message>
-		{/if}
+	<div class="strips" use:scrollable.container use:scrollable.target>
+		<ul class="unstyled">
+			{#each tape.strips as strip (strip.id)}
+				<li transition:slide>
+					<Strip_Item {strip} />
+				</li>
+			{/each}
+		</ul>
 	</div>
 
 	<div>
-		<div class="flex gap_xs2">
-			<textarea
-				class="plain flex_1 mb_0"
-				bind:value={input}
-				bind:this={input_el}
-				placeholder="content..."
-			></textarea>
-			<Pending_Button {pending} onclick={send} attrs={{class: 'plain'}}>send</Pending_Button>
-		</div>
-		<div class="flex my_xs">
-			<Copy_To_Clipboard text={input} attrs={{class: 'plain'}} />
-			<Paste_From_Clipboard
-				onpaste={(text) => {
-					input += text;
-					input_el?.focus();
-				}}
-				attrs={{class: 'plain icon_button size_lg', title: 'paste'}}
-				>{GLYPH_PASTE}</Paste_From_Clipboard
+		<Content_Editor
+			content={input}
+			onchange={handle_input_change}
+			placeholder={GLYPH_PLACEHOLDER}
+			show_stats
+			show_actions
+			bind:this={content_input}
+		>
+			<Pending_Button
+				{pending}
+				onclick={send}
+				attrs={{class: 'plain'}}
+				title="send {input_tokens.length} tokens to {tape.model_name}"
 			>
-			<Clear_Restore_Button
-				value={input}
-				onchange={(value) => {
-					input = value;
-				}}
-			/>
-		</div>
-		<Bit_Stats length={input.length} token_count={input_tokens.length} />
+				send
+			</Pending_Button>
+		</Content_Editor>
 	</div>
 </div>
 
@@ -126,15 +117,12 @@
 		background-color: var(--bg);
 		border-radius: var(--radius_xs);
 	}
-	.messages {
+	.strips {
 		display: flex;
 		flex-direction: column-reverse; /* makes scrolling start at the bottom */
 		gap: 0.5rem;
 		max-height: 400px;
 		overflow: auto;
 		scrollbar-width: thin;
-	}
-	textarea {
-		height: 80px;
 	}
 </style>

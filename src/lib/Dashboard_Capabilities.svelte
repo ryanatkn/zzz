@@ -16,6 +16,8 @@
 	// TODO display capabilities (like what APIs are available, including remote server (off when deployed statically), local pglite (could be disconnected, websockets?))
 	// TODO display database info/explorer
 
+	// TODO BLOCK Ollama capability
+
 	// TODO BLOCK use native popover with viewport-relative positioning
 </script>
 
@@ -25,8 +27,18 @@
 	</header>
 	<section class="width_md">
 		<aside>
-			⚠️ This is unfinished. It will show the capabilities available to the system. Zzz can run in
-			many contexts, and users can do whatever the available capabilities enable.
+			<p>⚠️ This is unfinished and needs more conceptual development.</p>
+			<p>
+				This page lets you view and control your system's current capabilities. These constrain what
+				the rest of the application can do - Zzz provides many different UIs, and some UIs depend on
+				specific capabilities to function. For example, running models locally can be done through
+				various strategies which all provide the capabilty of "get completions from local models",
+				which is a subset of "get completions from models", two related capabilities.
+			</p>
+			<p>
+				Zzz's goal is to transparently connect your intent to your machines, so it runs in many
+				contexts and users can do whatever they wish with the available capabilities.
+			</p>
 		</aside>
 		<h2>todo</h2>
 		<ul>

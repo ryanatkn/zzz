@@ -66,7 +66,7 @@ test('Indexed_Collection - basic operations with no indexes', () => {
 	collection.add(item1);
 	collection.add(item2);
 
-	// Check size and contents
+	// Check size and content
 	expect(collection.size).toBe(2);
 	// Use ID-based comparison instead of reference equality
 	expect(has_item_with_id(collection.all, item1)).toBe(true);

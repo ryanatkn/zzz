@@ -4,7 +4,7 @@ import {create_deferred, type Deferred} from '@ryanatkn/belt/async.js';
 import type {Assignable, Class_Constructor} from '@ryanatkn/belt/types.js';
 import {z} from 'zod';
 import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
-import {strip_end} from '@ryanatkn/belt/string.js';
+import {strip_end, strip_start} from '@ryanatkn/belt/string.js';
 
 import type {
 	Message_Send_Prompt,
@@ -22,51 +22,21 @@ import {Chats} from '$lib/chats.svelte.js';
 import {Providers} from '$lib/providers.svelte.js';
 import {Diskfiles} from '$lib/diskfiles.svelte.js';
 import {Messages} from '$lib/messages.svelte.js';
-import {Model, type Model_Json} from '$lib/model.svelte.js';
+import type {Model_Json} from '$lib/model.svelte.js';
 import {Cell_Registry} from '$lib/cell_registry.svelte.js';
 import {Prompts} from '$lib/prompts.svelte.js';
-import {Bit} from '$lib/bit.svelte.js';
-import {Chat} from '$lib/chat.svelte.js';
-import {Diskfile} from '$lib/diskfile.svelte.js';
-import {Message} from '$lib/message.svelte.js';
-import {Prompt} from '$lib/prompt.svelte.js';
-import {Tape} from '$lib/tape.svelte.js';
-import {Ui, Ui_Json} from '$lib/ui.svelte.js';
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Cell_Json} from '$lib/cell_types.js';
-import {Socket} from '$lib/socket.svelte.js';
+import {Bits} from '$lib/bits.svelte.js';
 import {Time} from '$lib/time.svelte.js';
 import type {Zzz_Config} from '$lib/config_helpers.js';
 import {BOTS_DEFAULT} from '$lib/config_defaults.js';
 import type {Diskfile_Path, Zzz_Dir} from '$lib/diskfile_types.js';
 import {ZZZ_DIRNAME} from '$lib/constants.js';
 import {Url_Params} from '$lib/url_params.svelte.js';
-
-// Define standard cell classes
-export const cell_classes = {
-	Bit,
-	Chat,
-	Chats,
-	Diskfile,
-	Diskfiles,
-	Message,
-	Messages,
-	Model,
-	Models,
-	Prompt,
-	Prompts,
-	Provider,
-	Providers,
-	Socket,
-	Tape,
-	Ui,
-	Url_Params,
-};
-
-// Automatically derive Cell_Registry_Map from cell_classes
-export type Cell_Registry_Map = {
-	[K in keyof typeof cell_classes]: InstanceType<(typeof cell_classes)[K]>;
-};
+import {cell_classes} from '$lib/cell_classes.js';
+import {Cell_Json} from '$lib/cell_types.js';
+import {Ui, Ui_Json} from '$lib/ui.svelte.js';
+import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
+import {Socket} from '$lib/socket.svelte.js';
 
 export const zzz_context = create_context<Zzz>();
 
@@ -86,7 +56,7 @@ export interface Zzz_Options extends Omit<Cell_Options<typeof Zzz_Json>, 'zzz'> 
 	models?: Array<Model_Json>;
 	bots?: Zzz_Config['bots'];
 	providers?: Array<Provider_Json>;
-	cells?: Record<string, Class_Constructor<Cell>>;
+	cell_classes?: Record<string, Class_Constructor<Cell>>;
 	socket_url?: string | null;
 }
 
@@ -106,17 +76,22 @@ export interface Message_With_History {
 export class Zzz extends Cell<typeof Zzz_Json> {
 	readonly registry: Cell_Registry;
 
-	// Cells - these are managed collections that contain the app state
+	// Global cell registry - maps cell ID to cell instance
+	readonly cells: SvelteMap<Uuid, Cell> = new SvelteMap();
+
+	// Cells - these are managed objects/collections that contain the app state
 	readonly time: Time;
 	readonly ui: Ui;
 	readonly models: Models;
 	readonly chats: Chats;
 	readonly providers: Providers;
 	readonly prompts: Prompts;
+	readonly bits: Bits;
 	readonly diskfiles: Diskfiles;
 	readonly messages: Messages;
 	readonly socket: Socket;
 	readonly url_params: Url_Params;
+
 	// TODO maybe `tags` is a virtual collection for ergonomics, in that it's all on the cell table unmanaged by the class, it persists nothing on its own but interfaces to the persistent cells
 
 	readonly bots: Zzz_Config['bots']; // TODO make this a Cell?
@@ -131,6 +106,11 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	/** The `zzz_dir` without the trailing `.zzz/`. Has its own trailing slash. */
 	zzz_dir_parent: Diskfile_Path | null | undefined = $derived(
 		this.zzz_dir && (strip_end(this.zzz_dir, ZZZ_DIRNAME + '/') as Diskfile_Path), // casting is safe because `Zzz_Dir` extends `Diskfile_Path`
+	);
+	zzz_dir_pathname: Diskfile_Path | null | undefined = $derived(
+		this.zzz_dir &&
+			this.zzz_dir_parent &&
+			(strip_start(this.zzz_dir, this.zzz_dir_parent) as Diskfile_Path), // casting is safe because `Zzz_Dir` extends `Diskfile_Path`
 	);
 
 	// Special property to detect self-reference
@@ -162,7 +142,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		this.registry = new Cell_Registry(this);
 
 		// Register cell classes if provided, otherwise use default cell_classes
-		const cells_to_register = options.cells || cell_classes;
+		const cells_to_register = options.cell_classes || cell_classes;
 		for (const constructor of Object.values(cells_to_register)) {
 			this.registry.register(constructor);
 		}
@@ -177,6 +157,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		this.chats = new Chats({zzz: this});
 		this.providers = new Providers({zzz: this});
 		this.prompts = new Prompts({zzz: this});
+		this.bits = new Bits({zzz: this});
 		this.diskfiles = new Diskfiles({zzz: this});
 		this.messages = new Messages({zzz: this});
 		this.socket = new Socket({zzz: this});
@@ -209,13 +190,6 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 
 		// Call init to complete initialization
 		this.init();
-	}
-
-	/**
-	 * Register a cell class with the registry
-	 */
-	register<T extends Cell>(cell_class: Class_Constructor<T>): void {
-		this.registry.register(cell_class);
 	}
 
 	async send_prompt(
@@ -299,7 +273,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 
 	add_providers(providers_json: Array<Provider_Json>): void {
 		for (const json of providers_json) {
-			const provider = this.registry.instantiate('Provider', json);
+			const provider = this.registry.maybe_instantiate('Provider', json);
 			if (provider) {
 				this.add_provider(provider);
 			}

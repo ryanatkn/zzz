@@ -7,34 +7,91 @@
 	import Nav_Link from '$lib/Nav_Link.svelte';
 	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
 	import Bit_View from '$lib/Bit_View.svelte';
-	import {GLYPH_BIT, GLYPH_PROMPT, GLYPH_REMOVE} from '$lib/glyphs.js';
+	import {
+		GLYPH_BIT,
+		GLYPH_ADD,
+		GLYPH_PROMPT,
+		GLYPH_REMOVE,
+		GLYPH_DELETE,
+		GLYPH_FILE,
+		GLYPH_LIST,
+	} from '$lib/glyphs.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import Prompt_Stats from '$lib/Prompt_Stats.svelte';
 	import Bit_List from '$lib/Bit_List.svelte';
 	import {Reorderable} from '$lib/reorderable.svelte.js';
-	import Prompt_Preview from '$lib/Prompt_Preview.svelte';
+	import Content_Preview from '$lib/Content_Preview.svelte';
+	import {Bit} from '$lib/bit.svelte.js';
 
 	const zzz = zzz_context.get();
-
 	const reorderable = new Reorderable();
 
 	// TODO BLOCK integrate with sources like the local filesystem (just the `zzz.files`?)
-
 	// TODO BLOCK the dashed pattern state isn't working for the xml tag input or attributes
+
+	// Create and add a Text bit
+	const add_text_bit = () => {
+		if (!zzz.prompts.selected) return;
+
+		const bit = Bit.create(zzz, {
+			type: 'text',
+			content: '',
+			name: 'Text bit',
+		});
+
+		zzz.prompts.selected.add_bit(bit);
+	};
+
+	// Create and add a Diskfile bit
+	const add_diskfile_bit = () => {
+		if (!zzz.prompts.selected) return;
+
+		// Get all available files
+		const files = zzz.diskfiles.items.all;
+		if (!files.length) {
+			alert('No files available. Add files first.');
+			return;
+		}
+
+		// TODO: We should show a file selector dialog here
+		// For now, just use the first file
+		const file = files[0];
+		const file_name = file.path.split('/').pop() || 'unnamed';
+
+		const bit = Bit.create(zzz, {
+			type: 'diskfile',
+			path: file.path,
+			name: `File: ${file_name}`,
+		});
+
+		zzz.prompts.selected.add_bit(bit);
+	};
+
+	// Create and add a Sequence bit
+	const add_sequence_bit = () => {
+		if (!zzz.prompts.selected) return;
+
+		const bit = Bit.create(zzz, {
+			type: 'sequence',
+			items: [],
+			name: 'Sequence bit',
+		});
+
+		zzz.prompts.selected.add_bit(bit);
+	};
 </script>
 
 <div class="flex w_100 h_100">
 	<div class="column_fixed">
-		<div class="p_sm">
+		<div class="p_sm pl_0">
 			<button
 				type="button"
 				class="plain w_100 justify_content_start"
 				onclick={() => {
-					const prompt = zzz.prompts.add();
-					prompt.add_bit();
+					zzz.prompts.add().add_bit(Bit.create(zzz, {type: 'text', name: 'Default bit'}));
 				}}
 			>
-				+ new prompt
+				{GLYPH_ADD} new prompt
 			</button>
 			<ul
 				class="unstyled mt_sm"
@@ -65,28 +122,42 @@
 	</div>
 
 	{#if zzz.prompts.selected}
-		<div class="column_fixed">
+		<div class="column_fixed pr_sm">
 			{#if zzz.prompts.selected}
 				<div class="row gap_sm p_xs sticky t_0 b_0 bg">
 					<Copy_To_Clipboard text={zzz.prompts.selected.content} attrs={{class: 'plain'}} />
 					<Prompt_Stats prompt={zzz.prompts.selected} />
 				</div>
-				<Prompt_Preview prompt={zzz.prompts.selected} />
+				<Content_Preview content={zzz.prompts.selected.content} />
 			{/if}
 		</div>
 
 		<div class="column_fluid">
 			<div class="column_bg_1 column gap_md p_sm">
 				<div class="flex justify_content_space_between">
-					<button type="button" class="plain" onclick={() => zzz.prompts.add_bit()}>
-						+ add bit
-					</button>
-					<div class="flex gap_md">
+					<div class="flex flex_wrap gap_xs">
+						<button type="button" class="plain size_sm" onclick={add_text_bit}>
+							<div class="row white_space_nowrap">
+								<span class="mr_xs2"><Glyph_Icon icon={GLYPH_BIT} /></span> add text bit
+							</div>
+						</button>
+						<button type="button" class="plain size_sm" onclick={add_diskfile_bit}>
+							<div class="row white_space_nowrap">
+								<span class="mr_xs2"><Glyph_Icon icon={GLYPH_FILE} /></span> add file bit
+							</div>
+						</button>
+						<button type="button" class="plain size_sm" onclick={add_sequence_bit}>
+							<div class="row white_space_nowrap">
+								<span class="mr_xs2"><Glyph_Icon icon={GLYPH_LIST} /></span> add sequence bit
+							</div>
+						</button>
 						<Confirm_Button
 							onconfirm={() => zzz.prompts.selected?.remove_all_bits()}
-							attrs={{disabled: !zzz.prompts.selected.bits.length, class: 'plain'}}
+							attrs={{disabled: !zzz.prompts.selected.bits.length, class: 'plain size_sm'}}
 						>
-							{GLYPH_REMOVE} remove all bits
+							<div class="row white_space_nowrap">
+								<span class="mr_xs2"><Glyph_Icon icon={GLYPH_REMOVE} /></span> remove all bits
+							</div>
 						</Confirm_Button>
 					</div>
 				</div>
@@ -114,19 +185,30 @@
 					</div>
 					<Confirm_Button
 						onconfirm={() => zzz.prompts.selected && zzz.prompts.remove(zzz.prompts.selected)}
-						attrs={{title: `remove Prompt ${zzz.prompts.selected.id}`}}
-					/>
+						attrs={{title: `remove Prompt ${zzz.prompts.selected.id}`, class: 'plain icon_button'}}
+					>
+						{GLYPH_DELETE}
+						{#snippet popover_button_content()}{GLYPH_DELETE}{/snippet}
+					</Confirm_Button>
 				</div>
-				<small>{zzz.prompts.selected.id}</small>
-				<small>
-					{zzz.prompts.selected.bits.length}
-					bit{#if zzz.prompts.selected.bits.length !== 1}s{/if}
-				</small>
-				<small>created {zzz.prompts.selected.created_formatted_short_date}</small>
+				<div class="column font_mono">
+					<small>{zzz.prompts.selected.id}</small>
+					<small>
+						{zzz.prompts.selected.bits.length}
+						bit{#if zzz.prompts.selected.bits.length !== 1}s{/if}
+					</small>
+					<small>created {zzz.prompts.selected.created_formatted_short_date}</small>
+				</div>
 			</div>
 			<div class="p_sm mt_xl3">
 				<header class="size_lg mb_lg"><Glyph_Icon icon={GLYPH_BIT} /> bits</header>
-				<Bit_List prompt={zzz.prompts.selected} />
+				<Bit_List
+					bits={zzz.prompts.selected.bits}
+					prompt={zzz.prompts.selected}
+					onreorder={(from_index, to_index) => {
+						zzz.prompts.selected?.reorder_bits(from_index, to_index);
+					}}
+				/>
 			</div>
 		</div>
 	{:else}
@@ -139,13 +221,13 @@
 						zzz.prompts.add();
 					}}>create one</button
 				>
-				or take a
+				or
 				<button
 					type="button"
 					class="inline color_f"
 					onclick={() => {
 						zzz.prompts.select(random_item(zzz.prompts.items.all).id);
-					}}>random walk</button
+					}}>go fish</button
 				>?
 			</p>
 		</div>

@@ -3,31 +3,28 @@ import type {Async_Status} from '@ryanatkn/belt/async.js';
 
 import type {Model} from '$lib/model.svelte.js';
 import {to_completion_response_text} from '$lib/response_helpers.js';
-import {Completion_Request} from '$lib/message_types.js';
-import {Uuid, Datetime_Now} from '$lib/zod_helpers.js';
+import {Uuid} from '$lib/zod_helpers.js';
 import {get_unique_name} from '$lib/helpers.js';
 import {Tape} from '$lib/tape.svelte.js';
 import {Tape_Json} from '$lib/tape_types.js';
 import type {Prompt} from '$lib/prompt.svelte.js';
 import {reorder_list} from '$lib/list_helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {type Chat_Message, create_chat_message} from '$lib/chat_message.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import {USE_DEFAULT} from '$lib/cell_helpers.js';
+import type {Bit_Type} from '$lib/bit.svelte.js';
 
-const NEW_CHAT_PREFIX = 'new chat';
+const NEW_CHAT_PREFIX = 'chat';
 
 const chat_names: Array<string> = [];
 
 export const Chat_Json = Cell_Json.extend({
-	id: Uuid,
 	name: z.string().default(() => {
 		// TODO BLOCK how to do this correctly? can you make it stateful and still have a static module-scoped schema? I dont see a context object arg or anything
 		const name = get_unique_name('chat', chat_names);
 		chat_names.push(name);
 		return name;
 	}),
-	created: Datetime_Now,
 	tapes: z.array(Tape_Json).default(() => []),
 	selected_prompt_ids: z.array(Uuid).default(() => []), // TODO consider making these refs, automatic classes (maybe as separate properties by convention, so the original is still the plain ids)
 });
@@ -44,6 +41,18 @@ export class Chat extends Cell<typeof Chat_Json> {
 	selected_prompts: Array<Prompt> = $derived(
 		this.selected_prompt_ids.map((id) => this.zzz.prompts.items.by_id.get(id)).filter((p) => !!p), // TODO BLOCK optimize to avoid the filter
 	);
+
+	// TODO `Bits` class instead? same as on zzz?
+	bits: Set<Bit_Type> = $derived.by(() => {
+		const b: Set<Bit_Type> = new Set();
+		for (const prompt of this.selected_prompts) {
+			for (const bit of prompt.bits) {
+				b.add(bit);
+			}
+		}
+		return b;
+	});
+	bits_array: Array<Bit_Type> = $derived(Array.from(this.bits));
 
 	init_name_status: Async_Status = $state('initial');
 
@@ -99,20 +108,20 @@ export class Chat extends Cell<typeof Chat_Json> {
 	}
 
 	add_selected_prompt(prompt: Prompt): void {
-		if (!this.selected_prompts.some((p) => p.id === prompt.id)) {
-			this.selected_prompts.push(prompt);
+		if (!this.selected_prompt_ids.some((id) => id === prompt.id)) {
+			this.selected_prompt_ids.push(prompt.id);
 		}
 	}
 
 	remove_selected_prompt(prompt_id: Uuid): void {
-		const index = this.selected_prompts.findIndex((p) => p.id === prompt_id);
+		const index = this.selected_prompt_ids.findIndex((id) => id === prompt_id);
 		if (index !== -1) {
-			this.selected_prompts.splice(index, 1);
+			this.selected_prompt_ids.splice(index, 1);
 		}
 	}
 
 	reorder_selected_prompts(from_index: number, to_index: number): void {
-		reorder_list(this.selected_prompts, from_index, to_index);
+		reorder_list(this.selected_prompt_ids, from_index, to_index);
 	}
 
 	async send_to_all(content: string): Promise<void> {
@@ -123,68 +132,18 @@ export class Chat extends Cell<typeof Chat_Json> {
 		const tape = this.tapes.find((s) => s.id === tape_id);
 		if (!tape) return;
 
-		const message_id = Uuid.parse(undefined);
+		const assistant_strip = await tape.send_message(content);
 
-		// Create a properly typed completion request
-		const completion_request = Completion_Request.parse({
-			created: Datetime_Now.parse(undefined),
-			request_id: message_id,
-			provider_name: tape.model.provider_name,
-			model: tape.model.name,
-			prompt: content,
-		});
-
-		// Create user message using the helper function
-		const message = create_chat_message(content, 'user', {
-			id: message_id, // Override the auto-generated ID
-			request: completion_request,
-		});
-
-		tape.add_chat_message(message);
-
-		// TODO this seems messy, probably refactor
-		// Build message history for the AI - ensure all content is a string
-		const tape_history = tape.chat_messages
-			.filter((m) => m.id !== message_id) // Exclude the current message
-			.map((m) => ({
-				role: m.role,
-				content:
-					m.role === 'assistant' && m.response
-						? to_completion_response_text(m.response) || '' // Ensure content is not null/undefined
-						: m.content,
-			}));
-
-		// Send the prompt with tape history
-		const response = await this.zzz.send_prompt(
-			content,
-			tape.model.provider_name,
-			tape.model.name,
-			tape_history,
-		);
-
-		// Find the message we just added
-		const message_updated = tape.chat_messages_by_id.get(message_id);
-		if (!message_updated) return;
-
-		// Get the response text
-		const response_text = to_completion_response_text(response.completion_response) || '';
-
-		// Add the assistant's response as a separate message
-		const assistant_message = create_chat_message(response_text, 'assistant', {
-			tape_id: message_updated.tape_id,
-		});
-
-		tape.add_chat_message(assistant_message);
-
-		// Infer a name for the chat now that we have a response.
-		void this.init_name(message_updated);
+		// Infer a name for the chat now that we have a response
+		// No more type error as strip.content now always returns a string
+		void this.init_name_from_strips(content, assistant_strip.content);
 	}
 
 	/**
-	 * Uses an LLM to name the chat based on the current messages.
+	 * Uses an LLM to name the chat based on the user input and AI response.
 	 */
-	async init_name(chat_message: Chat_Message): Promise<void> {
-		if (this.init_name_status !== 'initial') return; // TODO BLOCK what if this returned a deferred, so callers can correctly await it?
+	async init_name_from_strips(user_content: string, assistant_content: string): Promise<void> {
+		if (this.init_name_status !== 'initial') return;
 
 		this.init_name_status = 'pending';
 
@@ -193,31 +152,28 @@ export class Chat extends Cell<typeof Chat_Json> {
 			and it should be related to the content.
 			Prefer lowercase unless it's a proper noun or acronym.`;
 
-		// TODO hacky, needs better conventions
-		p += `<User_Message>${chat_message.content}</User_Message>`;
-		if (chat_message.response) {
-			const responseText = to_completion_response_text(chat_message.response) || '';
-			p += `\n<Assistant_Message>${responseText}</Assistant_Message>`;
-		}
+		p += `<User_Message>${user_content}</User_Message>`;
+		p += `\n<Assistant_Message>${assistant_content}</Assistant_Message>`;
 
 		try {
 			// TODO BLOCK configure this utility LLM (roles?), and set the output token count from config as well
 			const name_response = await this.zzz.send_prompt(p, 'ollama', 'llama3.2:3b');
 			const completion_response = name_response.completion_response;
-			// Add null check here
-			// TODO BLOCK maybe make nullable? would silence this linting issue:
+
 			if (!completion_response) {
 				console.error('No completion response received');
 				this.init_name_status = 'initial';
 				return;
 			}
+
 			const response_text = to_completion_response_text(completion_response) || '';
-			console.log(`response_text`, response_text);
+
 			if (!response_text) {
 				console.error('unknown inference failure', name_response);
 				this.init_name_status = 'initial'; // ignore failures, will retry
 				return;
 			}
+
 			this.init_name_status = 'success';
 			if (response_text !== this.name) {
 				this.name = get_unique_name(

@@ -5,7 +5,7 @@
 
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import {GLYPH_DIRECTION_CLIENT, GLYPH_DIRECTION_SERVER} from '$lib/glyphs.js';
-	import type {Uuid} from './zod_helpers.js';
+	import type {Uuid} from '$lib/zod_helpers.js';
 
 	interface Props {
 		children?: Snippet;

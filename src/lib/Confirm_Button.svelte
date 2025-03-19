@@ -15,6 +15,8 @@
 		hide_on_confirm?: boolean;
 		/** Unlike on `Popover_Button` this is optional and has a `confirm` arg */
 		popover_content?: Snippet<[popover: Popover, confirm: () => void]>;
+		/** Content for the popover button */
+		popover_button_content?: Snippet<[popover: Popover, confirm: () => void]>;
 		/** Unlike on `Popover_Button` this has a `confirm` arg */
 		children?: Snippet<[popover: Popover, confirm: () => void]>;
 	}
@@ -25,6 +27,7 @@
 		hide_on_confirm = true,
 		position = 'left',
 		popover_content: popover_content_prop,
+		popover_button_content,
 		button,
 		children,
 		...rest
@@ -35,6 +38,11 @@
 		if (popover_content_prop && popover_button_attrs) {
 			console.error(
 				'Confirm_Button has both popover_content and popover_attrs defined - popover_content takes precedence',
+			);
+		}
+		if (popover_content_prop && popover_button_content) {
+			console.error(
+				'Confirm_Button has both popover_content and popover_button_content defined - popover_content takes precedence',
 			);
 		}
 	}
@@ -54,9 +62,14 @@
 				type="button"
 				class="icon_button color_c bg_c_1"
 				onclick={() => confirm(popover)}
+				title="confirm"
 				{...popover_button_attrs}
 			>
-				<div>{GLYPH_REMOVE}</div>
+				{#if popover_button_content}
+					{@render popover_button_content(popover, () => confirm(popover))}
+				{:else}
+					<div>{GLYPH_REMOVE}</div>
+				{/if}
 			</button>
 		{/if}
 	{/snippet}

@@ -1,12 +1,15 @@
 <script lang="ts">
 	import type {Prompt} from '$lib/prompt.svelte.js';
-	import Bit_Stats from '$lib/Bit_Stats.svelte';
+	import Content_Stats from '$lib/Content_Stats.svelte';
 
 	interface Props {
 		prompt: Prompt;
 	}
 
 	const {prompt}: Props = $props();
+
+	const length = $derived(prompt.content.length);
+	const token_count = $derived(prompt.token_count);
 </script>
 
-<Bit_Stats length={prompt.length} token_count={prompt.token_count} />
+<Content_Stats {length} {token_count} />

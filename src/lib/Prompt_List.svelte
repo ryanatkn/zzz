@@ -7,7 +7,7 @@
 	import type {Chat} from '$lib/chat.svelte.js';
 	import {GLYPH_REMOVE} from '$lib/glyphs.js';
 	import {Reorderable} from '$lib/reorderable.svelte.js';
-	import type {Uuid} from '$lib/zod_helpers.js';
+	import {Bit} from '$lib/bit.svelte.js';
 
 	interface Props {
 		chat: Chat;
@@ -22,50 +22,43 @@
 		chat.zzz.prompts.filter_unselected_prompts(chat.selected_prompts.map((prompt) => prompt.id)),
 	);
 
-	// Track the selected prompt ID
-	// svelte-ignore state_referenced_locally
-	let selected_prompt_id: Uuid | null = $state(unselected_prompts[0]?.id ?? null);
+	// Function to create a new prompt
+	const create_new_prompt = async () => {
+		const prompt = chat.zzz.prompts.add();
 
-	// Derive the selected prompt object from the ID
-	const selected_prompt = $derived(
-		selected_prompt_id && chat.zzz.prompts.items.by_id.get(selected_prompt_id),
-	);
+		// Add a starter text bit to the new prompt
+		const bit = Bit.create(chat.zzz, {type: 'text'});
 
-	// Reset selection when the available prompts change
-	$effect(() => {
-		if (unselected_prompts.length && !unselected_prompts.some((p) => p.id === selected_prompt_id)) {
-			selected_prompt_id = unselected_prompts[0]?.id ?? null;
-		}
-	});
+		prompt.add_bit(bit);
 
-	const add_selected_prompt = () => {
-		if (selected_prompt) {
-			chat.add_selected_prompt(selected_prompt);
-			// Automatically select the next available prompt
-			selected_prompt_id = unselected_prompts.find((p) => p.id !== selected_prompt_id)?.id ?? null;
-		}
+		// Navigate to the prompt editor
+		await chat.zzz.url_params.update_url('prompt', prompt.id);
 	};
+
+	// TODO BLOCK thinking of the usecase here, maybe on the chats page the prompts list is shown twice,
+	// once for all and once for the selected, and the all is collapsed by default?
+	// or selected filtered out by default, so a single list
 </script>
 
 <div class="w_100 column">
-	<div class="flex gap_xs align_items_center">
-		<select
-			class="flex_1 mb_0"
-			bind:value={selected_prompt_id}
-			disabled={unselected_prompts.length === 0}
-		>
-			{#each unselected_prompts as prompt (prompt.id)}
-				<option value={prompt.id}>{prompt.name} - {prompt.content_truncated}</option>
-			{/each}
-		</select>
-		<button
-			type="button"
-			class="plain"
-			disabled={!selected_prompt || unselected_prompts.length === 0}
-			onclick={add_selected_prompt}
-		>
-			+ add
-		</button>
+	<div class="flex justify_content_start mb_xs">
+		<button type="button" class="plain" onclick={create_new_prompt}> + create new prompt </button>
+	</div>
+
+	<div class="flex flex_column">
+		<div class="overflow_auto flex_1" style:max-height="200px">
+			{#if unselected_prompts.length === 0}
+				<div class="p_xs size_sm fg_1">No prompts available</div>
+			{:else}
+				<ul class="unstyled">
+					{#each unselected_prompts as prompt (prompt.id)}
+						<li class="p_xs size_sm">
+							{prompt.name} - {prompt.content_truncated}
+						</li>
+					{/each}
+				</ul>
+			{/if}
+		</div>
 	</div>
 
 	{#if chat.selected_prompts.length > 0}
@@ -109,12 +102,6 @@
 					</li>
 				{/each}
 			</ul>
-		</div>
-	{:else}
-		<div class="flex justify_content_end text_align_right pt_xs" transition:slide>
-			<blockquote class="p_md fg_1 size_sm mb_0">
-				Add prompts from the list and<br />then use copy to add<br />their content to chats
-			</blockquote>
 		</div>
 	{/if}
 </div>

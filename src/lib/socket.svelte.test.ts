@@ -70,6 +70,7 @@ describe('Socket', () => {
 
 		// Mock zzz object with send_ping method
 		mock_zzz = {
+			cells: new Map(),
 			send_ping: vi.fn(),
 			time: {
 				now_ms: Date.now(),

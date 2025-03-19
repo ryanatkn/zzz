@@ -18,10 +18,10 @@
 
 	<div class="flex_1 column overflow_auto h_100">
 		{#if diskfiles.selected_file}
-			<Diskfile_Editor file={diskfiles.selected_file} />
+			<Diskfile_Editor diskfile={diskfiles.selected_file} />
 		{:else}
 			<div class="flex align_items_center justify_content_center h_100">
-				<p>Select a file from the list to view and edit its contents</p>
+				<p>Select a file from the list to view and edit its content</p>
 			</div>
 		{/if}
 	</div>

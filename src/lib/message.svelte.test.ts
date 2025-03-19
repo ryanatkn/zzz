@@ -6,6 +6,7 @@ import type {Zzz} from '$lib/zzz.svelte.js';
 // Mock Zzz instance
 const create_mock_zzz = () => {
 	return {
+		cells: new Map(),
 		registry: {
 			instantiate: vi.fn(),
 		},

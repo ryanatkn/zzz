@@ -7,6 +7,7 @@ import {
 	Source_File,
 	type Diskfile_Json,
 } from '$lib/diskfile_types.js';
+import type {Diskfile} from '$lib/diskfile.svelte.js';
 
 export const is_path_absolute = (path: unknown): boolean => {
 	// Guard against non-string inputs
@@ -35,7 +36,7 @@ export const source_file_to_diskfile_json = (
 ): Diskfile_Json => ({
 	id: existing_id ?? Uuid.parse(undefined), // Use existing ID if provided, otherwise generate new
 	path: source_file.id,
-	contents: source_file.contents,
+	content: source_file.contents,
 	external: source_file.external,
 	created: Datetime_Now.parse(source_file.ctime && new Date(source_file.ctime).toISOString()), // TODO seems messy
 	updated: source_file.mtime ? Datetime.parse(new Date(source_file.mtime).toISOString()) : null,
@@ -48,3 +49,10 @@ export const source_file_to_diskfile_json = (
 		s,
 	]),
 });
+
+// TODO hacky
+export const SUPPORTED_CODE_FILETYPE_MATCHER = /\.[mc]?[jt]sx?$/i;
+export const has_dependencies = (diskfile: Diskfile): boolean =>
+	diskfile.dependencies_count > 0 ||
+	diskfile.dependents_count > 0 ||
+	SUPPORTED_CODE_FILETYPE_MATCHER.test(diskfile.path);
