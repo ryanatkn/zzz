@@ -105,7 +105,9 @@
 						: socket.status === 'pending'
 							? 'connecting'
 							: 'disconnected'}
-					<small class="font_mono">{socket.url || ' '}</small>
+					<small class="font_mono"
+						>{#if socket.url}{socket.url}{:else}&nbsp;{/if}</small
+					>
 				</div>
 			</div>
 
@@ -161,7 +163,7 @@
 						<span class="size_lg font_weight_400 ml_md">
 							{#if !BROWSER}
 								<div class="inline_flex align_items_end">
-									loading <div class="relative" style:top="5px"><Pending_Animation /></div>
+									loading <div class="relative"><Pending_Animation /></div>
 								</div>
 							{:else if socket.connected}
 								{socket.url !== socket.url_input && socket.url_input !== ''
@@ -169,7 +171,7 @@
 									: 'disconnect websocket'}
 							{:else if socket.status === 'pending'}
 								<div class="inline_flex align_items_end">
-									connecting <div class="relative" style:top="5px"><Pending_Animation /></div>
+									connecting <div class="relative"><Pending_Animation /></div>
 								</div>
 							{:else}
 								connect websocket

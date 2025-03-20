@@ -1,5 +1,6 @@
-import {Text_Bit, Diskfile_Bit, Sequence_Bit} from '$lib/bit.svelte.js';
 import {Bits} from '$lib/bits.svelte.js';
+import {Text_Bit, Diskfile_Bit, Sequence_Bit} from '$lib/bit.svelte.js';
+import {Capabilities} from '$lib/capabilities.svelte.js';
 import {Chat} from '$lib/chat.svelte.js';
 import {Chats} from '$lib/chats.svelte.js';
 import {Diskfile} from '$lib/diskfile.svelte.js';
@@ -24,6 +25,7 @@ import type {Cell} from '$lib/cell.svelte.js';
  */
 export const cell_classes = {
 	Bits,
+	Capabilities,
 	Chat,
 	Chats,
 	Diskfile,

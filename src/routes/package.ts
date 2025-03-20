@@ -128,6 +128,15 @@ export const package_json = {
 		},
 		'./bit.svelte.js': {types: './dist/bit.svelte.d.ts', default: './dist/bit.svelte.js'},
 		'./bits.svelte.js': {types: './dist/bits.svelte.d.ts', default: './dist/bits.svelte.js'},
+		'./capabilities.svelte.js': {
+			types: './dist/capabilities.svelte.d.ts',
+			default: './dist/capabilities.svelte.js',
+		},
+		'./Capability_Ollama.svelte': {
+			types: './dist/Capability_Ollama.svelte.d.ts',
+			svelte: './dist/Capability_Ollama.svelte',
+			default: './dist/Capability_Ollama.svelte',
+		},
 		'./cell_classes.js': {types: './dist/cell_classes.d.ts', default: './dist/cell_classes.js'},
 		'./cell_helpers.js': {types: './dist/cell_helpers.d.ts', default: './dist/cell_helpers.js'},
 		'./cell_registry.svelte.js': {
@@ -641,6 +650,16 @@ export const src_json = {
 				{name: 'Bits', kind: 'class'},
 			],
 		},
+		'./capabilities.svelte.js': {
+			path: 'capabilities.svelte.ts',
+			declarations: [
+				{name: 'Capabilities_Json', kind: 'variable'},
+				{name: 'Capability', kind: 'type'},
+				{name: 'Ollama_Capability_Data', kind: 'type'},
+				{name: 'Capabilities', kind: 'class'},
+			],
+		},
+		'./Capability_Ollama.svelte': {path: 'Capability_Ollama.svelte', declarations: []},
 		'./cell_classes.js': {
 			path: 'cell_classes.ts',
 			declarations: [

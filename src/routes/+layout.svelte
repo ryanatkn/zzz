@@ -23,9 +23,9 @@
 	import {cell_classes} from '$lib/cell_classes.js';
 	import {Zzz} from '$lib/zzz.svelte.js';
 	import {Provider_Json} from '$lib/provider.svelte.js';
-	import {Model_Json} from '$lib/model.svelte.js';
 	import create_zzz_config from '$lib/config.js';
 	import {Bit} from '$lib/bit.svelte.js';
+	import {Model_Json} from '$lib/model.svelte.js';
 
 	interface Props {
 		children: Snippet;
@@ -34,14 +34,14 @@
 	const {children}: Props = $props();
 
 	// TODO think through initialization
-	onMount(async () => {
-		const zzz_config = await create_zzz_config();
+	onMount(() => {
+		const zzz_config = create_zzz_config();
 
 		// TODO note the difference between these two APIs, look at both of them and see which makes more sense
 		zzz.add_providers(zzz_config.providers.map((p) => Provider_Json.parse(p))); // TODO handle errors
 		zzz.models.add_many(zzz_config.models.map((m) => Model_Json.parse(m))); // TODO handle errors
 
-		// TODO init properly
+		// TODO init properly from data
 		zzz.chats.add();
 		zzz.chats.add();
 		zzz.chats.add();

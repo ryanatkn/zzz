@@ -1,5 +1,4 @@
 import type {Zzz_Config_Creator} from '$lib/config_helpers.js';
-import {merge_ollama_models, ollama_list_with_metadata} from '$lib/ollama.js';
 import {
 	models_default,
 	providers_default,
@@ -20,19 +19,10 @@ import {
 // TODO refactor - zzz.config.ts
 
 // TODO currently this is imported directly by client and server, but we probably only want to forward a serialized subset to the client
-const config: Zzz_Config_Creator = async () => {
-	// Try to get Ollama models
-	const models_info = await ollama_list_with_metadata();
-
-	// Merge with default models if Ollama is available, otherwise just use defaults
-	// This preserves both Ollama models and non-Ollama models
-	const models = models_info
-		? merge_ollama_models(models_default, models_info.model_infos)
-		: models_default;
-
+const config: Zzz_Config_Creator = () => {
 	return {
 		providers: providers_default,
-		models,
+		models: models_default,
 		system_message: SYSTEM_MESSAGE_DEFAULT,
 		output_token_max: OUTPUT_TOKEN_MAX_DEFAULT,
 		temperature: TEMPERATURE_DEFAULT,

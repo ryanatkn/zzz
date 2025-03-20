@@ -8,6 +8,7 @@ export const GLYPH_DRAG = '≡'; // ≡ ☰ ☷
 export const GLYPH_COPY = '⧉';
 export const GLYPH_PASTE = '⎌'; // ⧈ ⎗ ⎘ ⎙
 export const GLYPH_RESET = '⤺';
+export const GLYPH_REFRESH = '⟳'; //
 export const GLYPH_CONNECT = '⭍'; // ⨁
 export const GLYPH_DISCONNECT = '⨂';
 export const GLYPH_RETRY = '↺'; // ⟲'; // ⟲ ⟳ ⤾ ⤼ ↻
@@ -19,6 +20,7 @@ export const GLYPH_PLACEHOLDER = '↳';
 // ⊞ ⧉ ⧈
 // ⎗ ⎗ ⎘ ⌖ ⌶ ⎙
 // ⎘ ⎘ ⎌ ⌫ ⊘ ⦸
+// ⤺ ⤻ ⤼ ⤽ ⤾ ⤿
 
 export const GLYPH_SERVER = '🜢';
 export const GLYPH_CHAT = '⌸';

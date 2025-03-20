@@ -17,9 +17,7 @@
 
 	const HISTORY_SIZE = 6;
 
-	// Use the derived index directly
 	const pongs = $derived(zzz.messages.items.get_derived('latest_pongs'));
-	$inspect('[Ping_Form] pongs', pongs);
 
 	interface Display_Item {
 		pong_id?: Uuid;

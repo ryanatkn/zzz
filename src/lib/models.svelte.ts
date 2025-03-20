@@ -5,6 +5,7 @@ import {Model, Model_Json, Model_Schema} from '$lib/model.svelte.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {create_single_index, create_multi_index} from '$lib/indexed_collection_helpers.js';
+import {merge_ollama_models, type Ollama_Model_Info} from '$lib/ollama.js';
 
 export const Models_Json = z
 	.object({
@@ -78,6 +79,11 @@ export class Models extends Cell<typeof Models_Json> {
 		for (const model_json of models_json) {
 			this.add(model_json);
 		}
+	}
+
+	// TODO BLOCK use or delete
+	merge(model_infos: Array<Ollama_Model_Info>): void {
+		merge_ollama_models(this.items.all, model_infos);
 	}
 
 	find_by_name(name: string): Model | undefined {

@@ -4,12 +4,13 @@
 	import Zzz_Dir_View from '$lib/Zzz_Dir_View.svelte';
 	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
 	import {GLYPH_SERVER} from '$lib/glyphs.js';
+	import Capability_Ollama from '$lib/Capability_Ollama.svelte';
 
 	// interface Props {}
 
 	// const {}: Props = $props();
 
-	// TODO
+	// TODO BLOCK http ping call to query server capability, a hardcoded endpoint for now
 </script>
 
 <div class="width_md">
@@ -26,6 +27,9 @@
 		</section>
 		<section>
 			<Socket_Controls />
+		</section>
+		<section>
+			<Capability_Ollama />
 		</section>
 	</section>
 </div>

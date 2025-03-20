@@ -37,6 +37,7 @@ import {Cell_Json} from '$lib/cell_types.js';
 import {Ui, Ui_Json} from '$lib/ui.svelte.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Socket} from '$lib/socket.svelte.js';
+import {Capabilities} from '$lib/capabilities.svelte.js';
 
 export const zzz_context = create_context<Zzz>();
 
@@ -91,6 +92,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	readonly messages: Messages;
 	readonly socket: Socket;
 	readonly url_params: Url_Params;
+	readonly capabilities: Capabilities;
 
 	// TODO maybe `tags` is a virtual collection for ergonomics, in that it's all on the cell table unmanaged by the class, it persists nothing on its own but interfaces to the persistent cells
 
@@ -129,7 +131,6 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 
 	// Runtime-only state (not serialized)
 	pending_prompts: SvelteMap<Uuid, Deferred<Message_Completion_Response>> = new SvelteMap();
-	capability_ollama: undefined | null | boolean = $state();
 
 	constructor(options: Zzz_Options = EMPTY_OBJECT) {
 		// Pass this instance as its own zzz reference
@@ -162,6 +163,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		this.messages = new Messages({zzz: this});
 		this.socket = new Socket({zzz: this});
 		this.url_params = new Url_Params({zzz: this});
+		this.capabilities = new Capabilities({zzz: this});
 
 		this.bots = options.bots ?? BOTS_DEFAULT;
 

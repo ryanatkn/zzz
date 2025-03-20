@@ -154,6 +154,15 @@
       "types": "./dist/bits.svelte.d.ts",
       "default": "./dist/bits.svelte.js"
     },
+    "./capabilities.svelte.js": {
+      "types": "./dist/capabilities.svelte.d.ts",
+      "default": "./dist/capabilities.svelte.js"
+    },
+    "./Capability_Ollama.svelte": {
+      "types": "./dist/Capability_Ollama.svelte.d.ts",
+      "svelte": "./dist/Capability_Ollama.svelte",
+      "default": "./dist/Capability_Ollama.svelte"
+    },
     "./cell_classes.js": {
       "types": "./dist/cell_classes.d.ts",
       "default": "./dist/cell_classes.js"

@@ -5,7 +5,8 @@ import type {Model_Json, Model_Name} from '$lib/model.svelte.js';
 
 // TODO expand similar to gitops/gro config
 
-export type Zzz_Config_Creator = () => Zzz_Config | Promise<Zzz_Config>;
+// TODO is currently synchronous because it's imported on the client, could be made async if the client uses a different sourcing strategy
+export type Zzz_Config_Creator = () => Zzz_Config;
 
 /**
  * @json
