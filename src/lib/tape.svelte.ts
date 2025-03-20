@@ -43,7 +43,6 @@ export class Tape extends Cell<typeof Tape_Json> {
 						const strip = this.zzz.registry.instantiate('Strip', {
 							...item_json,
 							tape_id: this.id,
-							zzz: this.zzz,
 						});
 						this.strips.push(strip);
 					}

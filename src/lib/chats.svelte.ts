@@ -91,21 +91,29 @@ export class Chats extends Cell<typeof Chats_Json> {
 		this.init();
 	}
 
-	add(json?: Chat_Json): Chat {
+	add(json?: Chat_Json, first = true): Chat {
 		const chat = new Chat({zzz: this.zzz, json});
-		this.items.add_first(chat); // TODO BLOCK @many maybe delete?  for `add`
+		if (first) {
+			this.items.add_first(chat);
+		} else {
+			this.items.add(chat);
+		}
 		if (this.selected_id === null) {
 			this.selected_id = chat.id;
 		}
 		return chat;
 	}
 
-	add_many(chats_json: Array<Chat_Json>): Array<Chat> {
+	add_many(chats_json: Array<Chat_Json>, first = true): Array<Chat> {
 		const chats = chats_json.map((json) => new Chat({zzz: this.zzz, json}));
 
 		// Add all chats to the beginning of the collection
 		for (let i = chats.length - 1; i >= 0; i--) {
-			this.items.add_first(chats[i]); // TODO BLOCK @many maybe delete?  for `add`
+			if (first) {
+				this.items.add_first(chats[i]);
+			} else {
+				this.items.add(chats[i]);
+			}
 		}
 
 		// Select the first chat if none is currently selected
