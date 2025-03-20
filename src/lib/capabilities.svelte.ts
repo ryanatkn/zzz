@@ -74,6 +74,16 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	}
 
 	/**
+	 * Check Ollama availability only if it hasn't been checked before
+	 * (when status is 'initial')
+	 */
+	async init_ollama_check(): Promise<void> {
+		if (this.ollama.status === 'initial') {
+			await this.check_ollama();
+		}
+	}
+
+	/**
 	 * Check Ollama availability by connecting to its API
 	 * @returns A promise that resolves when the check is complete
 	 */

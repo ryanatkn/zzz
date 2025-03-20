@@ -15,6 +15,7 @@
 		GLYPH_RESET,
 	} from '$lib/glyphs.js';
 	import Error_Message from '$lib/Error_Message.svelte';
+	import {OLLAMA_URL} from '$lib/ollama.js';
 
 	// Get the Zzz instance from context
 	const zzz = zzz_context.get();
@@ -22,9 +23,7 @@
 
 	// Initial load when component mounts
 	onMount(() => {
-		if (capabilities.ollama.status === 'initial') {
-			void capabilities.check_ollama();
-		}
+		void capabilities.init_ollama_check();
 	});
 </script>
 
@@ -47,7 +46,7 @@
 					: capabilities.ollama.status === 'pending'
 						? 'checking'
 						: 'not checked'}
-			<small class="font_mono">http://127.0.0.1:11434/</small>
+			<small class="font_mono">{OLLAMA_URL}</small>
 		</div>
 	</div>
 
@@ -58,16 +57,6 @@
 			>
 		</div>
 	{/if}
-
-	<div>
-		Ollama (<a href="https://ollama.com/">ollama.com</a>,
-		<a href="https://github.com/ollama/ollama">GitHub</a>) is a local model server that's one of
-		Zzz's first integrations. See also the <Provider_Link
-			provider={zzz.providers.find_by_name('ollama')}
-			><Glyph_Icon icon={GLYPH_PROVIDER} /> Ollama provider</Provider_Link
-		> page. I'll add a UI to manage the models here soon.
-	</div>
-	<!-- TODO UI to manage models -->
 
 	<div class="flex justify_content_space_between gap_md">
 		<button
@@ -102,6 +91,16 @@
 			<span class="size_lg font_weight_400 ml_md"> reset </span>
 		</button>
 	</div>
+
+	<div>
+		Ollama (<a href="https://ollama.com/">ollama.com</a>,
+		<a href="https://github.com/ollama/ollama">GitHub</a>) is a local model server that's one of
+		Zzz's first integrations. See also the <Provider_Link
+			provider={zzz.providers.find_by_name('ollama')}
+			><Glyph_Icon icon={GLYPH_PROVIDER} /> Ollama provider</Provider_Link
+		> page. I'll add a UI to manage the models here soon.
+	</div>
+	<!-- TODO UI to manage models -->
 
 	{#if capabilities.ollama_models.length > 0}
 		<div class="panel p_md" transition:slide>

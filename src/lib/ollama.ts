@@ -4,6 +4,8 @@ import type {ListResponse, ModelResponse, ShowResponse} from 'ollama/browser'; /
 
 import type {Model_Json} from '$lib/model.svelte.js';
 
+export const OLLAMA_URL = 'http://127.0.0.1:11434/';
+
 export interface Ollama_Model_Info {
 	model: ModelResponse;
 	metadata: ShowResponse;

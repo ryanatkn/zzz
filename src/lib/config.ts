@@ -14,7 +14,7 @@ import {
 	BOTS_DEFAULT,
 } from '$lib/config_defaults.js';
 
-// TODO BLOCK instead of hardcoding Ollama models, pull from `http://127.0.0.1:11434/api/tags`
+// TODO build or gen step that pulls from `http://127.0.0.1:11434/api/tags`
 
 // TODO refactor - zzz.config.ts
 

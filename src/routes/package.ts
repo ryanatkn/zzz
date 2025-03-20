@@ -845,6 +845,7 @@ export const src_json = {
 				{name: 'GLYPH_COPY', kind: 'variable'},
 				{name: 'GLYPH_PASTE', kind: 'variable'},
 				{name: 'GLYPH_RESET', kind: 'variable'},
+				{name: 'GLYPH_REFRESH', kind: 'variable'},
 				{name: 'GLYPH_CONNECT', kind: 'variable'},
 				{name: 'GLYPH_DISCONNECT', kind: 'variable'},
 				{name: 'GLYPH_RETRY', kind: 'variable'},
