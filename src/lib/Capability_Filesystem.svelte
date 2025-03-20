@@ -54,12 +54,12 @@
 
 <p>
 	This is the server's filesystem directory, the <code>zzz_dir</code>. It defaults to
-	<code>.zzz</code> in the current working directory. To configure it set the .env variable
+	<code>.zzz</code> in the server's current working directory. To configure it set the .env variable
 	<code class="size_sm">PUBLIC_ZZZ_DIR</code>.
 </p>
 <p>
 	For security reasons, all filesystem operations are confined to this path's parent directory,
 	<small class="chip font_mono">{zzz.zzz_dir_parent || '[no zzz dir configured]'}</small>, and the
-	path cannot be modified after the server starts. These restrictions ensure predictability when
-	exposing sensitive resources like your local hard drive to web scripts.
+	path cannot be modified after the server starts. These restrictions help ensure predictability
+	when exposing sensitive resources like your local hard drive to web scripts.
 </p>
