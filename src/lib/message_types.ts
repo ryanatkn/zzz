@@ -66,28 +66,28 @@ export type Provider_Data =
 // Schema validation for provider data
 export const Provider_Data_Schema = z.discriminatedUnion('type', [
 	z.object({
-		type: z.literal('ollama'),
+		type: z.literal('ollama').default('ollama'),
 		value: z
 			.any()
 			.optional()
 			.transform((v) => v || {}), // Ensure value exists even if undefined
 	}),
 	z.object({
-		type: z.literal('claude'),
+		type: z.literal('claude').default('claude'),
 		value: z
 			.any()
 			.optional()
 			.transform((v) => v || {}),
 	}),
 	z.object({
-		type: z.literal('chatgpt'),
+		type: z.literal('chatgpt').default('chatgpt'),
 		value: z
 			.any()
 			.optional()
 			.transform((v) => v || {}),
 	}),
 	z.object({
-		type: z.literal('gemini'),
+		type: z.literal('gemini').default('gemini'),
 		value: z.object({
 			text: z.string(),
 			candidates: z.array(z.any()).nullable().optional(),
@@ -129,24 +129,24 @@ export type Message_Base = z.infer<typeof Message_Base>;
 
 // Ping/Pong message schemas
 export const Message_Ping = Message_Base.extend({
-	type: z.literal('ping'),
+	type: z.literal('ping').default('ping'),
 }).strict();
 export type Message_Ping = z.infer<typeof Message_Ping>;
 
 export const Message_Pong = Message_Base.extend({
-	type: z.literal('pong'),
+	type: z.literal('pong').default('pong'),
 	ping_id: Uuid,
 }).strict();
 export type Message_Pong = z.infer<typeof Message_Pong>;
 
 // Session related message schemas
 export const Message_Load_Session = Message_Base.extend({
-	type: z.literal('load_session'),
+	type: z.literal('load_session').default('load_session'),
 }).strict();
 export type Message_Load_Session = z.infer<typeof Message_Load_Session>;
 
 export const Message_Loaded_Session = Message_Base.extend({
-	type: z.literal('loaded_session'),
+	type: z.literal('loaded_session').default('loaded_session'),
 	data: z
 		.object({
 			zzz_dir: Zzz_Dir,
@@ -158,7 +158,7 @@ export type Message_Loaded_Session = z.infer<typeof Message_Loaded_Session>;
 
 // File related message schemas
 export const Message_Filer_Change = Message_Base.extend({
-	type: z.literal('filer_change'),
+	type: z.literal('filer_change').default('filer_change'),
 	change: z
 		.object({
 			type: Diskfile_Change_Type,
@@ -170,33 +170,33 @@ export const Message_Filer_Change = Message_Base.extend({
 export type Message_Filer_Change = z.infer<typeof Message_Filer_Change>;
 
 export const Message_Update_Diskfile = Message_Base.extend({
-	type: z.literal('update_diskfile'),
+	type: z.literal('update_diskfile').default('update_diskfile'),
 	path: Diskfile_Path,
 	content: z.string(),
 }).strict();
 export type Message_Update_Diskfile = z.infer<typeof Message_Update_Diskfile>;
 
 export const Message_Delete_Diskfile = Message_Base.extend({
-	type: z.literal('delete_diskfile'),
+	type: z.literal('delete_diskfile').default('delete_diskfile'),
 	path: Diskfile_Path,
 }).strict();
 export type Message_Delete_Diskfile = z.infer<typeof Message_Delete_Diskfile>;
 
 export const Message_Create_Directory = Message_Base.extend({
-	type: z.literal('create_directory'),
+	type: z.literal('create_directory').default('create_directory'),
 	path: Diskfile_Path,
 }).strict();
 export type Message_Create_Directory = z.infer<typeof Message_Create_Directory>;
 
 // Completion related message schemas
 export const Message_Send_Prompt = Message_Base.extend({
-	type: z.literal('send_prompt'),
+	type: z.literal('send_prompt').default('send_prompt'),
 	completion_request: Completion_Request,
 }).strict();
 export type Message_Send_Prompt = z.infer<typeof Message_Send_Prompt>;
 
 export const Message_Completion_Response = Message_Base.extend({
-	type: z.literal('completion_response'),
+	type: z.literal('completion_response').default('completion_response'),
 	completion_response: Completion_Response,
 }).strict();
 export type Message_Completion_Response = z.infer<typeof Message_Completion_Response>;

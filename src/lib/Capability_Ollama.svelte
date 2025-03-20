@@ -95,7 +95,7 @@
 			type="button"
 			class="flex_1 justify_content_start"
 			disabled={capabilities.ollama.status === 'initial'}
-			onclick={() => capabilities.reset_all()}
+			onclick={() => capabilities.reset_ollama()}
 		>
 			<Glyph_Icon icon={GLYPH_RESET} size="var(--size_xl)" />
 			<span class="size_lg font_weight_400 ml_md"> reset </span>

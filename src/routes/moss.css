@@ -105,6 +105,9 @@ a.chip {
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
+.fade_3 {
+	opacity: var(--fade_3);
+}
 .fg_1 {
 	background-color: var(--fg_1);
 }

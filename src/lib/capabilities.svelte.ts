@@ -1,7 +1,7 @@
 import {z} from 'zod';
 import type {ListResponse} from 'ollama/browser';
 import type {Async_Status} from '@ryanatkn/belt/async.js';
-import {SvelteMap} from 'svelte/reactivity';
+import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
@@ -19,9 +19,10 @@ export const PING_HISTORY_MAX = 6;
  */
 export interface Ping_Data {
 	ping_id: Uuid;
+	completed: boolean;
 	sent_time: number;
-	received_time: number;
-	round_trip_time: number;
+	received_time: number | null;
+	round_trip_time: number | null;
 }
 
 export const Capabilities_Json = Cell_Json.extend({});
@@ -31,6 +32,8 @@ export type Capabilities_Json = z.infer<typeof Capabilities_Json>;
  * Generic interface for a capability with standardized status tracking
  */
 export interface Capability<T> {
+	/** The capability name */
+	name: string;
 	/** The capability's status: undefined=not initialized, null=checking, otherwise available or not */
 	data: T;
 	/** Async status tracking the connection/check state */
@@ -89,6 +92,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	 * Server capability
 	 */
 	server: Capability<Server_Capability_Data | null | undefined> = $state({
+		name: 'server',
 		data: undefined,
 		status: 'initial',
 		error_message: null,
@@ -99,6 +103,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	 * Ollama capability
 	 */
 	ollama: Capability<Ollama_Capability_Data | null | undefined> = $state({
+		name: 'ollama',
 		data: undefined,
 		status: 'initial',
 		error_message: null,
@@ -126,10 +131,11 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 						last_send_time: socket.last_send_time,
 						last_receive_time: socket.last_receive_time,
 						connection_duration: socket.connection_duration,
-						pending_pings: this.pending_pings.size,
+						pending_pings: this.pending_ping_count, // Update to use new count
 					};
 
 		return {
+			name: 'websocket',
 			data,
 			status,
 			error_message: null, // Socket doesn't expose error messages directly
@@ -159,32 +165,35 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 		const data = status === 'success' ? {zzz_dir, zzz_dir_parent} : undefined;
 
 		return {
+			name: 'filesystem',
 			data,
 			status,
 			error_message: null,
-			updated: this.server.updated, // Use server update time as proxy for filesystem check
+			updated: Date.now(),
 		};
 	});
 
 	/**
-	 * Keep track of pending pings with their sent timestamps
-	 */
-	pending_pings: SvelteMap<Uuid, number> = new SvelteMap();
-
-	/**
-	 * Store recent ping measurements, newest first
+	 * Store pings - both pending and completed
 	 */
 	pings: Array<Ping_Data> = $state([]);
 
 	/**
-	 * Most recent ping round trip time in milliseconds
+	 * Most recent completed ping round trip time in milliseconds
 	 */
-	latest_ping_time: number | null = $derived(this.pings[0]?.round_trip_time ?? null);
+	latest_ping_time: number | null = $derived(
+		this.pings.find((p) => p.completed)?.round_trip_time ?? null,
+	);
+
+	/**
+	 * Completed pings (for display)
+	 */
+	completed_pings: Array<Ping_Data> = $derived(this.pings.filter((p) => p.completed));
 
 	/**
 	 * Number of pending pings
 	 */
-	pending_ping_count: number = $derived(this.pending_pings.size);
+	pending_ping_count: number = $derived(this.pings.filter((p) => !p.completed).length);
 
 	/**
 	 * Has pending pings
@@ -283,6 +292,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	 */
 	async check_server(): Promise<void> {
 		this.server = {
+			name: 'server',
 			data: null,
 			status: 'pending',
 			error_message: null,
@@ -316,6 +326,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 				// Note: we're not requiring a status field in the response
 				// since the server.ts implementation doesn't include it
 				this.server = {
+					name: 'server',
 					data: {
 						name: data.name,
 						version: data.version,
@@ -341,6 +352,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 
 		if (error_message) {
 			this.server = {
+				name: 'server',
 				data: null,
 				status: 'failure',
 				error_message,
@@ -355,6 +367,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	 */
 	async check_ollama(): Promise<void> {
 		this.ollama = {
+			name: 'ollama',
 			data: null,
 			status: 'pending',
 			error_message: null,
@@ -370,6 +383,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 			// Set the capability data
 			if (list_response) {
 				this.ollama = {
+					name: 'ollama',
 					data: {list_response},
 					status: 'success',
 					error_message: null,
@@ -385,6 +399,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 
 		if (error_message) {
 			this.ollama = {
+				name: 'ollama',
 				data: null,
 				status: 'failure',
 				error_message,
@@ -394,20 +409,29 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	}
 
 	/**
-	 * Sends a ping to the server
+	 * Sends a ping to the server over websocket
 	 * @returns The UUID of the ping message
 	 */
 	send_ping(): Uuid {
-		const ping = Message_Ping.parse(undefined);
+		const ping = Message_Ping.parse(EMPTY_OBJECT);
+		const ping_id = ping.id;
 
-		// Store the current time along with the ping ID
-		const sent_time = Date.now();
-		this.pending_pings.set(ping.id, sent_time);
+		// Create a new pending ping
+		const new_ping: Ping_Data = {
+			ping_id,
+			completed: false,
+			sent_time: Date.now(),
+			received_time: null,
+			round_trip_time: null,
+		};
+
+		// Add the new ping to the start of the array
+		this.pings = [new_ping, ...this.pings.slice(0, PING_HISTORY_MAX - 1)];
 
 		// Send the ping message via the messaging system
 		this.zzz.messages.send(ping);
 
-		return ping.id;
+		return ping_id;
 	}
 
 	/**
@@ -416,49 +440,14 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	 */
 	receive_pong(pong: Message_Pong): void {
 		const received_time = Date.now();
-		const sent_time = this.pending_pings.get(pong.ping_id);
-
-		if (sent_time !== undefined) {
-			// Add the ping data to capabilities
-			this.add_ping(pong.ping_id, sent_time, received_time);
-
-			// Clean up the pending ping
-			this.pending_pings.delete(pong.ping_id);
+		const ping_index = this.pings.findIndex((p) => p.ping_id === pong.ping_id);
+		// If we found the ping, update it
+		if (ping_index !== -1) {
+			const ping = this.pings[ping_index];
+			ping.completed = true;
+			ping.received_time = received_time;
+			ping.round_trip_time = received_time - ping.sent_time;
 		}
-	}
-
-	/**
-	 * Add a ping measurement to the history
-	 * @param ping_id The UUID of the ping message
-	 * @param sent_time The timestamp when the ping was sent
-	 * @param received_time The timestamp when the pong was received
-	 */
-	add_ping(ping_id: Uuid, sent_time: number, received_time: number): void {
-		const round_trip_time = received_time - sent_time;
-		const ping_data: Ping_Data = {
-			ping_id,
-			sent_time,
-			received_time,
-			round_trip_time,
-		};
-
-		// Add new ping data to the beginning of the array
-		this.pings = [ping_data, ...this.pings.slice(0, PING_HISTORY_MAX - 1)];
-
-		// Update server capability with the latest round-trip time if server is available
-		if (this.server.status === 'success' && this.server.data) {
-			// Mutate server data using proper technique for reactive properties
-			this.server.data.round_trip_time = round_trip_time;
-			this.server.updated = Date.now();
-		}
-	}
-
-	/**
-	 * Reset all capabilities to uninitialized state
-	 */
-	reset_all(): void {
-		this.reset_server();
-		this.reset_ollama();
 	}
 
 	/**
@@ -466,6 +455,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	 */
 	reset_server(): void {
 		this.server = {
+			name: 'server',
 			data: undefined,
 			status: 'initial',
 			error_message: null,
@@ -475,6 +465,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 
 	reset_ollama(): void {
 		this.ollama = {
+			name: 'ollama',
 			data: undefined,
 			status: 'initial',
 			error_message: null,
