@@ -25,7 +25,7 @@
 
 <button
 	type="button"
-	class="compact"
+	class="button_list_item compact"
 	class:selected
 	onclick={() => onclick(diskfile)}
 	title="file at {diskfile.path}"
@@ -65,25 +65,3 @@
 		<span>Delete file</span>
 	</Contextmenu_Entry>
 {/snippet}
-
-<style>
-	button {
-		width: 100%;
-		border-radius: 0;
-		word-break: break-all;
-		justify-content: start;
-		padding: 0 var(--space_xs);
-		box-shadow: none;
-		border: var(--border_width_1) solid transparent;
-		font-weight: 400;
-		font-size: var(--size_sm);
-	}
-
-	button.selected {
-		--button_text_color: var(--text_color_1);
-		--button_fill: var(--fg_2);
-		--button_fill_hover: var(--fg_1);
-		--button_fill_active: var(--fg_2);
-		--button_border_color: var(--border_color_a);
-	}
-</style>

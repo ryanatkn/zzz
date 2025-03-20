@@ -50,55 +50,47 @@
 	};
 </script>
 
-<div class="actions">
-	<!-- Content modification actions (copy, paste, clear) -->
-	<div class="flex gap_xs">
-		<Copy_To_Clipboard text={content} attrs={{class: 'plain'}} />
+<!-- Content modification actions (copy, paste, clear) -->
+<div class="flex gap_xs">
+	<Copy_To_Clipboard text={content} attrs={{class: 'plain'}} />
 
-		{#if !readonly}
-			<Paste_From_Clipboard onpaste={handle_paste} attrs={{class: 'plain icon_button size_lg'}}>
-				{GLYPH_PASTE}
-			</Paste_From_Clipboard>
+	{#if !readonly}
+		<Paste_From_Clipboard onpaste={handle_paste} attrs={{class: 'plain icon_button size_lg'}}>
+			{GLYPH_PASTE}
+		</Paste_From_Clipboard>
 
-			<Clear_Restore_Button value={content} onchange={handle_clear} />
-		{/if}
-
-		<!-- Delete button is always available -->
-		<Confirm_Button
-			onconfirm={() => zzz.diskfiles.delete(diskfile.path)}
-			attrs={{class: 'plain icon_button', title: `delete ${diskfile.pathname}`}}
-		>
-			{GLYPH_DELETE}
-		</Confirm_Button>
-	</div>
-
-	{#if !readonly && !auto_save}
-		<div class="mt_sm flex gap_sm" transition:slide={{duration: 120}}>
-			<Clear_Restore_Button
-				value={discarded_content ? '' : has_changes ? content : ''}
-				onchange={(value) => editor_state.discard_changes(value)}
-				attrs={{disabled: !has_changes && discarded_content === null, class: 'plain'}}
-			>
-				discard changes
-				{#snippet restore()}
-					undo discard
-				{/snippet}
-			</Clear_Restore_Button>
-
-			<button
-				class="color_a"
-				type="button"
-				disabled={!has_changes}
-				onclick={() => editor_state.save_changes()}
-			>
-				{save_button_text}
-			</button>
-		</div>
+		<Clear_Restore_Button value={content} onchange={handle_clear} />
 	{/if}
+
+	<!-- Delete button is always available -->
+	<Confirm_Button
+		onconfirm={() => zzz.diskfiles.delete(diskfile.path)}
+		attrs={{class: 'plain icon_button', title: `delete ${diskfile.pathname}`}}
+	>
+		{GLYPH_DELETE}
+	</Confirm_Button>
 </div>
 
-<style>
-	.actions {
-		padding: var(--space_sm);
-	}
-</style>
+{#if !readonly && !auto_save}
+	<div class="mt_xs flex gap_sm" transition:slide={{duration: 120}}>
+		<button
+			class="color_a"
+			type="button"
+			disabled={!has_changes}
+			onclick={() => editor_state.save_changes()}
+		>
+			{save_button_text}
+		</button>
+
+		<Clear_Restore_Button
+			value={discarded_content ? '' : has_changes ? content : ''}
+			onchange={(value) => editor_state.discard_changes(value)}
+			attrs={{disabled: !has_changes && discarded_content === null, class: 'plain'}}
+		>
+			discard changes
+			{#snippet restore()}
+				undo discard
+			{/snippet}
+		</Clear_Restore_Button>
+	</div>
+{/if}

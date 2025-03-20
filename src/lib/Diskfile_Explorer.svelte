@@ -35,37 +35,38 @@
 		}),
 	);
 
+	// TODO improve UX to not use alert/prompt
 	const create_file = () => {
 		if (!zzz.zzz_dir) {
-			alert('Cannot create file: no directory is selected');
+			alert('Cannot create file: no directory is selected'); // eslint-disable-line no-alert
 			return;
 		}
 
-		const filename = prompt('Enter file name:');
+		const filename = prompt('New file name:'); // eslint-disable-line no-alert
 		if (!filename) return;
 
 		try {
 			diskfiles.create_file(filename);
 		} catch (error) {
 			console.error('Failed to create file:', error);
-			alert(`Failed to create file: ${error}`);
+			alert(`Failed to create file: ${error}`); // eslint-disable-line no-alert
 		}
 	};
 
 	const create_folder = () => {
 		if (!zzz.zzz_dir) {
-			alert('Cannot create folder: no directory is selected');
+			alert('Cannot create folder: no directory is selected'); // eslint-disable-line no-alert
 			return;
 		}
 
-		const dirname = prompt('Enter folder name:');
+		const dirname = prompt('New folder name:'); // eslint-disable-line no-alert
 		if (!dirname) return;
 
 		try {
 			diskfiles.create_directory(dirname);
 		} catch (error) {
 			console.error('Failed to create folder:', error);
-			alert(`Failed to create folder: ${error}`);
+			alert(`Failed to create folder: ${error}`); // eslint-disable-line no-alert
 		}
 	};
 </script>

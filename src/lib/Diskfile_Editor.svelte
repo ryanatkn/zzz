@@ -23,7 +23,6 @@
 
 	// When the diskfile changes, update the editor state with the new diskfile
 	$effect.pre(() => {
-		// We need to track both the ID to ensure we detect all changes
 		diskfile.id;
 
 		untrack(() => {
@@ -32,11 +31,9 @@
 		});
 	});
 
-	// Check for disk changes when diskfile content changes
+	// Check for disk changes when diskfile changes
 	$effect.pre(() => {
-		// Watch for content changes from the diskfile
 		diskfile.content;
-		// Also watch for changes in our tracking state to ensure UI updates properly
 		diskfile.id;
 		editor_state.last_seen_disk_content;
 
@@ -79,13 +76,13 @@
 	</div>
 
 	<div class="width_sm">
-		<div class="mb_md p_sm">
-			<div class="p_xs">
-				<Diskfile_Info {diskfile} {editor_state} />
-			</div>
+		<div class="mb_md p_md">
+			<Diskfile_Info {diskfile} {editor_state} />
 		</div>
 
-		<Diskfile_Actions {diskfile} {editor_state} />
+		<div class="mb_md p_md">
+			<Diskfile_Actions {diskfile} {editor_state} />
+		</div>
 
 		{#if diskfile.dependencies_count || diskfile.dependents_count}
 			<div class="mt_md panel p_md">
@@ -119,16 +116,13 @@
 
 		{#if has_history}
 			<div transition:slide>
-				<small class="px_sm flex justify_content_space_between">
-					<div>Edit History</div>
-					<div>{editor_state.content_history.length} entries</div>
-				</small>
+				<small class="px_sm flex justify_content_space_between">history</small>
 				<menu class="unstyled flex flex_column_reverse mt_xs">
 					{#each editor_state.content_history as entry (entry.created)}
 						{@const selected = entry.content === editor_state.updated_content}
 						<button
 							type="button"
-							class="compact radius_0 justify_content_space_between size_sm py_xs3 font_weight_400"
+							class="button_list_item compact"
 							class:selected
 							class:plain={!selected}
 							onclick={() => {
