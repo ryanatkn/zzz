@@ -396,6 +396,11 @@ export const package_json = {
 			default: './dist/Nav_Link.svelte',
 		},
 		'./ollama.js': {types: './dist/ollama.d.ts', default: './dist/ollama.js'},
+		'./Pending_Animation2.svelte': {
+			types: './dist/Pending_Animation2.svelte.d.ts',
+			svelte: './dist/Pending_Animation2.svelte',
+			default: './dist/Pending_Animation2.svelte',
+		},
 		'./Ping_Form.svelte': {
 			types: './dist/Ping_Form.svelte.d.ts',
 			svelte: './dist/Ping_Form.svelte',
@@ -983,6 +988,7 @@ export const src_json = {
 				{name: 'merge_ollama_models', kind: 'function'},
 			],
 		},
+		'./Pending_Animation2.svelte': {path: 'Pending_Animation2.svelte', declarations: []},
 		'./Ping_Form.svelte': {path: 'Ping_Form.svelte', declarations: []},
 		'./Popover_Button.svelte': {path: 'Popover_Button.svelte', declarations: []},
 		'./popover.svelte.js': {

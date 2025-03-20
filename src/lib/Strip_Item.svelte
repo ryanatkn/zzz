@@ -20,7 +20,7 @@
 	class:system={strip.role === 'system'}
 >
 	<div class="white_space_pre_wrap overflow_wrap_break_word line_height_md">
-		<small class="mb_xs font_weight_600" title={strip.created}>@{strip.role}:</small>
+		<small class="mr_xs font_weight_600" title={strip.created}>@{strip.role}:</small>
 		{#if strip.is_pending}
 			<Pending_Animation attrs={{style: 'display: inline-flex !important'}} />
 		{:else if strip.is_content_loaded}

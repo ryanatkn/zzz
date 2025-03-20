@@ -7,7 +7,6 @@ import {Datetime_Now, Uuid} from '$lib/zod_helpers.js';
 import {Completion_Request, Completion_Response} from '$lib/message_types.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import type {Bit_Type} from '$lib/bit.svelte.js';
-import {HANDLED} from '$lib/cell_helpers.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 
 // Define the Strip role type
@@ -16,7 +15,6 @@ export type Strip_Role = z.infer<typeof Strip_Role>;
 
 // Define the Strip schema - bit_id is required
 export const Strip_Json = Cell_Json.extend({
-	content: z.string(), // Only used for initialization or schema compatibility
 	bit_id: Uuid, // Reference to a Bit for content (required)
 	tape_id: Uuid.nullable().optional(),
 	role: Strip_Role,
@@ -69,21 +67,6 @@ export class Strip extends Cell<typeof Strip_Json> {
 	constructor(options: Strip_Options) {
 		super(Strip_Json, options);
 
-		this.decoders = {
-			content: (value) => {
-				// Content is only used during initialization to create/update the bit
-				// After that, content always comes from the referenced bit
-				if (typeof value === 'string' && value) {
-					// If we already have a bit, update its content
-					if (this.bit) {
-						this.bit.update_content(value);
-					}
-					return HANDLED;
-				}
-				return undefined;
-			},
-		};
-
 		this.init();
 	}
 
@@ -115,7 +98,6 @@ export const create_strip = (
 	return new Strip({
 		zzz,
 		json: {
-			content, // This is still passed but won't be stored directly
 			role,
 			bit_id: bit.id,
 			id: options.id || Uuid.parse(undefined),
@@ -138,7 +120,6 @@ export const create_strip_from_bit = (
 	return new Strip({
 		zzz: bit.zzz,
 		json: {
-			content: bit.content ?? '', // Normalize content for schema compatibility
 			role,
 			bit_id: bit.id,
 			id: options.id || Uuid.parse(undefined),

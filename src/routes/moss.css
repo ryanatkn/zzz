@@ -319,6 +319,9 @@ a.chip {
 .mr_xl {
 	margin-right: var(--space_xl);
 }
+.mr_xs {
+	margin-right: var(--space_xs);
+}
 .mr_xs2 {
 	margin-right: var(--space_xs2);
 }
