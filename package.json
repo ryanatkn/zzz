@@ -316,6 +316,11 @@
       "types": "./dist/diskfile_helpers.d.ts",
       "default": "./dist/diskfile_helpers.js"
     },
+    "./Diskfile_History_Panel.svelte": {
+      "types": "./dist/Diskfile_History_Panel.svelte.d.ts",
+      "svelte": "./dist/Diskfile_History_Panel.svelte",
+      "default": "./dist/Diskfile_History_Panel.svelte"
+    },
     "./Diskfile_Info.svelte": {
       "types": "./dist/Diskfile_Info.svelte.d.ts",
       "svelte": "./dist/Diskfile_Info.svelte",
@@ -466,11 +471,6 @@
     "./ollama.js": {
       "types": "./dist/ollama.d.ts",
       "default": "./dist/ollama.js"
-    },
-    "./Pending_Animation2.svelte": {
-      "types": "./dist/Pending_Animation2.svelte.d.ts",
-      "svelte": "./dist/Pending_Animation2.svelte",
-      "default": "./dist/Pending_Animation2.svelte"
     },
     "./Ping_Form.svelte": {
       "types": "./dist/Ping_Form.svelte.d.ts",

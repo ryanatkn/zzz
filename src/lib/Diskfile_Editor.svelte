@@ -1,7 +1,7 @@
 <script lang="ts">
-	import {slide} from 'svelte/transition';
-	import {format} from 'date-fns';
 	import {untrack} from 'svelte';
+	import {format} from 'date-fns';
+	import {slide} from 'svelte/transition';
 
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import Diskfile_Info from '$lib/Diskfile_Info.svelte';
@@ -9,6 +9,7 @@
 	import Content_Editor from '$lib/Content_Editor.svelte';
 	import Diskfile_Actions from '$lib/Diskfile_Actions.svelte';
 	import {Diskfile_Editor_State} from '$lib/diskfile_editor_state.svelte.js';
+	import Diskfile_History_Panel from '$lib/Diskfile_History_Panel.svelte';
 
 	interface Props {
 		diskfile: Diskfile;
@@ -17,10 +18,9 @@
 	const {diskfile}: Props = $props();
 	const zzz = zzz_context.get();
 
-	// TODO maybe store per-diskfile editor state
 	// Create editor state once and reuse it
 	const editor_state = new Diskfile_Editor_State({zzz, diskfile});
-	// TODO could this be refactored to be cleaner/more encapsulated? maybe the Diskfile_Editor_State could take a thunk
+
 	// When the diskfile changes, update the editor state with the new diskfile
 	$effect.pre(() => {
 		// We need to track both the ID to ensure we detect all changes
@@ -32,20 +32,33 @@
 		});
 	});
 
+	// Check for disk changes when diskfile content changes
+	$effect.pre(() => {
+		// Watch for content changes from the diskfile
+		diskfile.content;
+		// Also watch for changes in our tracking state to ensure UI updates properly
+		diskfile.id;
+		editor_state.last_seen_disk_content;
+
+		untrack(() => {
+			// Check if file changed on disk
+			editor_state.check_disk_changes();
+		});
+	});
+
 	// Reference to the content editor component
 	let content_editor: {focus: () => void} | undefined = $state();
 
-	// Handle content change events
-	const handle_content_change = (content: string) => {
-		editor_state.updated_content = content;
-	};
+	const has_history = $derived(editor_state.content_history.length > 1);
 </script>
 
 <div class="flex h_100">
 	<div class="flex_1 h_100 column">
 		<Content_Editor
 			content={editor_state.updated_content}
-			onchange={handle_content_change}
+			onchange={(content) => {
+				editor_state.updated_content = content;
+			}}
 			placeholder={diskfile.pathname}
 			show_stats
 			readonly={false}
@@ -53,35 +66,16 @@
 			bind:this={content_editor}
 		/>
 
-		{#if editor_state.content_history.length > 1}
-			<div class="history mt_xs" transition:slide={{duration: 120}}>
-				<details>
-					<summary class="size_sm"
-						>Edit History ({editor_state.content_history.length} entries)</summary
-					>
-					<menu class="unstyled flex flex_column_reverse mt_xs">
-						{#each editor_state.content_history as entry (entry.created)}
-							<!-- TODO the .plain conditional is due to a bug in Moss -->
-							<!-- TODO should show two distinct states - selected, and equal to selected (not sure what visual for the latter) -->
-							{@const selected = entry.content === editor_state.updated_content}
-							<button
-								type="button"
-								class="justify_content_space_between size_sm py_xs3"
-								class:selected
-								class:plain={!selected}
-								onclick={() => {
-									editor_state.set_content_from_history(entry.created);
-									content_editor?.focus();
-								}}
-							>
-								<span>{format(new Date(entry.created), 'HH:mm:ss')}</span>
-								<span>{entry.content.length} chars</span>
-							</button>
-						{/each}
-					</menu>
-				</details>
-			</div>
-		{/if}
+		<Diskfile_History_Panel
+			{editor_state}
+			on_accept_disk_changes={() => {
+				editor_state.accept_disk_changes();
+				content_editor?.focus();
+			}}
+			on_reject_disk_changes={() => {
+				editor_state.reject_disk_changes();
+			}}
+		/>
 	</div>
 
 	<div class="width_sm">
@@ -122,19 +116,37 @@
 				{/if}
 			</div>
 		{/if}
+
+		{#if has_history}
+			<div transition:slide>
+				<small class="px_sm flex justify_content_space_between">
+					<div>Edit History</div>
+					<div>{editor_state.content_history.length} entries</div>
+				</small>
+				<menu class="unstyled flex flex_column_reverse mt_xs">
+					{#each editor_state.content_history as entry (entry.created)}
+						{@const selected = entry.content === editor_state.updated_content}
+						<button
+							type="button"
+							class="compact radius_0 justify_content_space_between size_sm py_xs3 font_weight_400"
+							class:selected
+							class:plain={!selected}
+							onclick={() => {
+								editor_state.set_content_from_history(entry.created);
+								content_editor?.focus();
+							}}
+						>
+							<span>{format(new Date(entry.created), 'HH:mm:ss')}</span>
+							<span>{entry.content.length} chars</span>
+						</button>
+					{/each}
+				</menu>
+			</div>
+		{/if}
 	</div>
 </div>
 
 <style>
-	.history {
-		border-top: 1px solid var(--border_color_1);
-		padding-top: var(--space_xs);
-	}
-
-	summary {
-		cursor: pointer;
-	}
-
 	.dep_list {
 		display: grid;
 		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
