@@ -3,6 +3,8 @@ import type {Diskfile} from '$lib/diskfile.svelte.js';
 import type {Diskfile_Path} from '$lib/diskfile_types.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 
+// TODO maybe make `Editor` or some other term a common pattern and remove the _State suffix
+
 /**
  * Manages the editor state for a diskfile
  */

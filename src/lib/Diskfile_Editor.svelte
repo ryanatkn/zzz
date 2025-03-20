@@ -61,10 +61,14 @@
 					>
 					<menu class="unstyled flex flex_column_reverse mt_xs">
 						{#each editor_state.content_history as entry (entry.created)}
+							<!-- TODO the .plain conditional is due to a bug in Moss -->
+							<!-- TODO should show two distinct states - selected, and equal to selected (not sure what visual for the latter) -->
+							{@const selected = entry.content === editor_state.updated_content}
 							<button
 								type="button"
-								class="plain justify_content_space_between size_sm py_xs3"
-								class:selected={entry.content === editor_state.updated_content}
+								class="justify_content_space_between size_sm py_xs3"
+								class:selected
+								class:plain={!selected}
 								onclick={() => {
 									editor_state.set_content_from_history(entry.created);
 									content_editor?.focus();
