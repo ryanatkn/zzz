@@ -137,6 +137,11 @@ export const package_json = {
 			svelte: './dist/Capability_Ollama.svelte',
 			default: './dist/Capability_Ollama.svelte',
 		},
+		'./Capability_Server.svelte': {
+			types: './dist/Capability_Server.svelte.d.ts',
+			svelte: './dist/Capability_Server.svelte',
+			default: './dist/Capability_Server.svelte',
+		},
 		'./cell_classes.js': {types: './dist/cell_classes.d.ts', default: './dist/cell_classes.js'},
 		'./cell_helpers.js': {types: './dist/cell_helpers.d.ts', default: './dist/cell_helpers.js'},
 		'./cell_registry.svelte.js': {
@@ -506,6 +511,7 @@ export const package_json = {
 			default: './dist/scrollable.svelte.js',
 		},
 		'./server/.env.example': {default: './dist/server/.env.example'},
+		'./server/.env.production.example': {default: './dist/server/.env.production.example'},
 		'./server/ai_provider_utils.js': {
 			types: './dist/server/ai_provider_utils.d.ts',
 			default: './dist/server/ai_provider_utils.js',
@@ -656,10 +662,12 @@ export const src_json = {
 				{name: 'Capabilities_Json', kind: 'variable'},
 				{name: 'Capability', kind: 'type'},
 				{name: 'Ollama_Capability_Data', kind: 'type'},
+				{name: 'Server_Capability_Data', kind: 'type'},
 				{name: 'Capabilities', kind: 'class'},
 			],
 		},
 		'./Capability_Ollama.svelte': {path: 'Capability_Ollama.svelte', declarations: []},
+		'./Capability_Server.svelte': {path: 'Capability_Server.svelte', declarations: []},
 		'./cell_classes.js': {
 			path: 'cell_classes.ts',
 			declarations: [
@@ -762,8 +770,11 @@ export const src_json = {
 		'./constants.js': {
 			path: 'constants.ts',
 			declarations: [
+				{name: 'SERVER_PROXIED_PORT', kind: 'variable'},
+				{name: 'SERVER_URL', kind: 'variable'},
 				{name: 'XML_TAG_NAME_DEFAULT', kind: 'variable'},
 				{name: 'ZZZ_DIRNAME', kind: 'variable'},
+				{name: 'REQUEST_TIMEOUT', kind: 'variable'},
 			],
 		},
 		'./Content_Editor.svelte': {path: 'Content_Editor.svelte', declarations: []},
@@ -1002,6 +1013,7 @@ export const src_json = {
 		'./ollama.js': {
 			path: 'ollama.ts',
 			declarations: [
+				{name: 'OLLAMA_URL', kind: 'variable'},
 				{name: 'Ollama_Model_Info', kind: 'type'},
 				{name: 'Ollama_Models_Response', kind: 'type'},
 				{name: 'ollama_list', kind: 'function'},
@@ -1137,6 +1149,7 @@ export const src_json = {
 			],
 		},
 		'./server/.env.example': {path: 'server/.env.example', declarations: []},
+		'./server/.env.production.example': {path: 'server/.env.production.example', declarations: []},
 		'./server/ai_provider_utils.js': {
 			path: 'server/ai_provider_utils.ts',
 			declarations: [

@@ -1,9 +1,9 @@
 <script lang="ts">
 	import {slide} from 'svelte/transition';
 	import {formatDuration, intervalToDuration} from 'date-fns';
-	import {BROWSER, DEV} from 'esm-env';
+	import {BROWSER} from 'esm-env';
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
-	import {PUBLIC_SERVER_HOSTNAME, PUBLIC_SERVER_PORT} from '$env/static/public';
+	import {PUBLIC_WEBSOCKET_URL} from '$env/static/public';
 
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import type {Socket} from '$lib/socket.svelte.js';
@@ -23,9 +23,6 @@
 		DEFAULT_RECONNECT_DELAY_MAX,
 	} from '$lib/socket_helpers.js';
 	import Socket_Message_Queue from '$lib/Socket_Message_Queue.svelte';
-
-	// TODO config - support multiple connections probably
-	const DEFAULT_WS_URL = `${DEV ? 'ws' : 'wss'}://${PUBLIC_SERVER_HOSTNAME}:${PUBLIC_SERVER_PORT}/ws`;
 
 	const pid = $props.id();
 
@@ -52,10 +49,10 @@
 
 	// Reset the URL to the default value
 	const reset_url = () => {
-		if (socket.url_input !== DEFAULT_WS_URL) {
+		if (socket.url_input !== PUBLIC_WEBSOCKET_URL) {
 			previous_url = socket.url_input;
 			has_undo_state = true;
-			socket.url_input = DEFAULT_WS_URL;
+			socket.url_input = PUBLIC_WEBSOCKET_URL;
 		}
 	};
 
@@ -69,7 +66,7 @@
 	};
 
 	// Check if the current URL is the default
-	const is_default_url = $derived(socket.url_input === DEFAULT_WS_URL);
+	const is_default_url = $derived(socket.url_input === PUBLIC_WEBSOCKET_URL);
 
 	// Handle the URL reset button click
 	const handle_reset_url_click = () => {

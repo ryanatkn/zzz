@@ -23,30 +23,41 @@
 
 	// Initial load when component mounts
 	onMount(() => {
-		void capabilities.init_ollama_check();
+		void capabilities.init_all();
 	});
 </script>
 
-<div class="flex flex_column gap_sm">
-	<div
-		class="chip plain flex_1 size_xl flex_column align_items_start"
-		style:display="flex !important"
-		style:align-items="flex-start"
-		style:font-weight="400 !important"
-		class:color_b={capabilities.ollama.status === 'success'}
-		class:color_c={capabilities.ollama.status === 'failure'}
-		class:color_d={capabilities.ollama.status === 'pending'}
-		class:color_e={capabilities.ollama.status === 'initial'}
-	>
-		<div class="column justify_content_center gap_xs pl_md" style:min-height="80px">
-			ollama {capabilities.ollama.status === 'success'
-				? 'available'
-				: capabilities.ollama.status === 'failure'
-					? 'unavailable'
-					: capabilities.ollama.status === 'pending'
-						? 'checking'
-						: 'not checked'}
-			<small class="font_mono">{OLLAMA_URL}</small>
+<div class="flex flex_column gap_md">
+	<div class="flex gap_sm">
+		<div
+			class="flex_1 chip plain flex_1 size_xl flex_column align_items_start"
+			style:display="flex !important"
+			style:align-items="flex-start"
+			style:font-weight="400 !important"
+			class:color_b={capabilities.ollama.status === 'success'}
+			class:color_c={capabilities.ollama.status === 'failure'}
+			class:color_d={capabilities.ollama.status === 'pending'}
+			class:color_e={capabilities.ollama.status === 'initial'}
+		>
+			<div class="column justify_content_center gap_xs pl_md" style:min-height="80px">
+				ollama {capabilities.ollama.status === 'success'
+					? 'available'
+					: capabilities.ollama.status === 'failure'
+						? 'unavailable'
+						: capabilities.ollama.status === 'pending'
+							? 'checking'
+							: 'not checked'}
+				<small class="font_mono">{OLLAMA_URL}</small>
+			</div>
+		</div>
+
+		<div class="flex_1 p_md">
+			Ollama (<a href="https://ollama.com/">ollama.com</a>,
+			<a href="https://github.com/ollama/ollama">GitHub</a>) is a local model server that's one of
+			Zzz's first integrations. See also the <Provider_Link
+				provider={zzz.providers.find_by_name('ollama')}
+				><span class="white_space_nowrap"><Glyph_Icon icon={GLYPH_PROVIDER} /> Ollama</span> provider</Provider_Link
+			> page. I'll add a UI to manage the models here soon.
 		</div>
 	</div>
 
@@ -85,21 +96,13 @@
 			type="button"
 			class="flex_1 justify_content_start"
 			disabled={capabilities.ollama.status === 'initial'}
-			onclick={() => capabilities.reset()}
+			onclick={() => capabilities.reset_all()}
 		>
 			<Glyph_Icon icon={GLYPH_RESET} size="var(--size_xl)" />
 			<span class="size_lg font_weight_400 ml_md"> reset </span>
 		</button>
 	</div>
 
-	<div>
-		Ollama (<a href="https://ollama.com/">ollama.com</a>,
-		<a href="https://github.com/ollama/ollama">GitHub</a>) is a local model server that's one of
-		Zzz's first integrations. See also the <Provider_Link
-			provider={zzz.providers.find_by_name('ollama')}
-			><Glyph_Icon icon={GLYPH_PROVIDER} /> Ollama provider</Provider_Link
-		> page. I'll add a UI to manage the models here soon.
-	</div>
 	<!-- TODO UI to manage models -->
 
 	{#if capabilities.ollama_models.length > 0}

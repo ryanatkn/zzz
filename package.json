@@ -163,6 +163,11 @@
       "svelte": "./dist/Capability_Ollama.svelte",
       "default": "./dist/Capability_Ollama.svelte"
     },
+    "./Capability_Server.svelte": {
+      "types": "./dist/Capability_Server.svelte.d.ts",
+      "svelte": "./dist/Capability_Server.svelte",
+      "default": "./dist/Capability_Server.svelte"
+    },
     "./cell_classes.js": {
       "types": "./dist/cell_classes.d.ts",
       "default": "./dist/cell_classes.js"
@@ -581,6 +586,9 @@
     },
     "./server/.env.example": {
       "default": "./dist/server/.env.example"
+    },
+    "./server/.env.production.example": {
+      "default": "./dist/server/.env.production.example"
     },
     "./server/ai_provider_utils.js": {
       "types": "./dist/server/ai_provider_utils.d.ts",

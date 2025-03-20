@@ -42,15 +42,8 @@
 		</aside>
 		<h2>todo</h2>
 		<ul>
-			<li>local Ollama API</li>
 			<li>utility models (like the first one for `namerbot`)</li>
-			<li>
-				Node server - I think a component on this page under "server" below should call an http ping
-				request if there's no socket connection
-			</li>
 			<li>AI providers (API keys)</li>
-			<li>pg db (Postgres, pglite, or some other compatible database)</li>
-			<li>ephemerally connected devices - mic, webcam, midi, etc</li>
 		</ul>
 	</section>
 	<section>

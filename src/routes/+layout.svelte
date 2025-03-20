@@ -10,10 +10,10 @@
 	import {contextmenu_action} from '@ryanatkn/fuz/contextmenu_state.svelte.js';
 	import {parse_package_meta} from '@ryanatkn/gro/package_meta.js';
 	import * as devalue from 'devalue';
-	import {PUBLIC_SERVER_HOSTNAME, PUBLIC_SERVER_PORT} from '$env/static/public';
 	import {BROWSER} from 'esm-env';
 	import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 	import {page} from '$app/state';
+	import {PUBLIC_WEBSOCKET_URL} from '$env/static/public';
 
 	import Zzz_Root from '$lib/Zzz_Root.svelte';
 	import {pkg_context} from '$routes/pkg.js';
@@ -66,13 +66,10 @@
 
 	pkg_context.set(parse_package_meta(package_json, src_json));
 
-	// Set the WebSocket URL
-	const ws_url = BROWSER ? `ws://${PUBLIC_SERVER_HOSTNAME}:${PUBLIC_SERVER_PORT}/ws` : null;
-
 	// Create an instance of Zzz with socket_url
 	const zzz = new Zzz({
 		cell_classes,
-		socket_url: ws_url,
+		socket_url: PUBLIC_WEBSOCKET_URL,
 		onsend: (message) => {
 			console.log('[page] sending message via socket', message);
 			zzz.socket.send({type: 'server_message', message});

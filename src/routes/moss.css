@@ -146,9 +146,6 @@ a.chip {
 	font-weight: 600;
 	--font_weight: 600;
 }
-.gap_lg {
-	gap: var(--space_lg);
-}
 .gap_md {
 	gap: var(--space_md);
 }
@@ -349,6 +346,10 @@ a.chip {
 .mt_xs {
 	margin-top: var(--space_xs);
 }
+.my_lg {
+	margin-top: var(--space_lg);
+	margin-bottom: var(--space_lg);
+}
 .my_xl5 {
 	margin-top: var(--space_xl5);
 	margin-bottom: var(--space_xl5);
@@ -462,6 +463,10 @@ a.chip {
 .px_sm {
 	padding-left: var(--space_sm);
 	padding-right: var(--space_sm);
+}
+.px_xl {
+	padding-left: var(--space_xl);
+	padding-right: var(--space_xl);
 }
 .px_xs {
 	padding-left: var(--space_xs);

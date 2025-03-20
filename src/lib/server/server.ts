@@ -3,18 +3,20 @@ import {serve} from '@hono/node-server';
 import {createNodeWebSocket} from '@hono/node-ws';
 import type {WSContext} from 'hono/ws';
 import * as devalue from 'devalue';
-import {PUBLIC_SERVER_HOSTNAME, PUBLIC_SERVER_PORT, PUBLIC_ZZZ_DIR} from '$env/static/public';
+import {PUBLIC_SERVER_HOSTNAME, PUBLIC_ZZZ_DIR} from '$env/static/public';
 
 import {Zzz_Server} from '$lib/server/zzz_server.js';
 import {handle_message, handle_filer_change} from '$lib/server/handler_defaults.js';
 import create_config from '$lib/config.js';
 import type {Message_Server} from '$lib/message_types.js';
+import {package_json} from '$routes/package.js';
+import {SERVER_PROXIED_PORT} from '$lib/constants.js';
 
 // Needed because some configured deployment targets in SvelteKit don't support top-level await yet
 const main = async () => {
 	console.log('creating server with zzz_dir', PUBLIC_ZZZ_DIR); // TODO better logging
 
-	const config = await create_config();
+	const config = create_config();
 
 	const sockets: Set<WSContext> = new Set();
 
@@ -72,11 +74,18 @@ const main = async () => {
 		}),
 	);
 
+	app.get('/api/ping', (c) => {
+		return c.json({
+			name: package_json.name,
+			version: package_json.version,
+		});
+	});
+
 	const hono = serve(
 		{
 			fetch: app.fetch,
 			hostname: PUBLIC_SERVER_HOSTNAME,
-			port: parseInt(PUBLIC_SERVER_PORT, 10) || 8999,
+			port: SERVER_PROXIED_PORT,
 		},
 		(info) => {
 			console.log(`[server] listening on http://${info.address}:${info.port}`);
