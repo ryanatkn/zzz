@@ -16,15 +16,18 @@
 	</header>
 	<section class="width_md">
 		<p>
-			This page lets you view and control your system's current capabilities. These constrain what
-			the rest of the application can do - Zzz provides many different UIs, and some UIs depend on
-			specific capabilities to function. For example, running models locally can be done through
-			various strategies which all provide the capabilty of "get completions from local models",
-			which is a subset of "get completions from models", two related capabilities.
+			This page lets you view and control your system's capabilities. These constrain what the rest
+			of the application can do - Zzz has many UIs and tools, and some depend on specific
+			capabilities to function.
+		</p>
+		<p>
+			For example, running models locally can be done through various strategies which all provide
+			the capabilty of "get completions from local models", which is a subset of "get completions
+			from models", two related capabilities. (this is still a work in progress)
 		</p>
 		<p>
 			Zzz's goal is to transparently connect your intent to your machines, so it runs in many
-			contexts and you can do whatever you wish with the available capabilities.
+			contexts and you can do whatever you wish with what's available.
 		</p>
 	</section>
 	<section>
