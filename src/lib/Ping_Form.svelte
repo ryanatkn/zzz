@@ -1,11 +1,12 @@
 <script lang="ts">
-	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
+	// TODO BLOCK use this to show all pending pings (see `zzz.pending_pings.size`)
+	// import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
 	import {slide} from 'svelte/transition';
 	import type {Snippet} from 'svelte';
 
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import {GLYPH_DIRECTION_CLIENT, GLYPH_DIRECTION_SERVER} from '$lib/glyphs.js';
-	import type {Uuid} from '$lib/zod_helpers.js';
+	import {PING_HISTORY_MAX} from '$lib/capabilities.svelte.js';
 
 	interface Props {
 		children?: Snippet;
@@ -15,39 +16,11 @@
 
 	const zzz = zzz_context.get();
 
-	const HISTORY_SIZE = 6;
-
-	const pongs = $derived(zzz.messages.items.get_derived('latest_pongs'));
-
-	interface Display_Item {
-		pong_id?: Uuid;
-		ping_id?: Uuid | undefined;
-		server_time?: number | undefined;
-		round_trip_time?: number | undefined;
-	}
-	[];
-
-	// Create display items from pongs
-	const display_items: Array<Display_Item> = $derived.by(() => {
-		return pongs
-			.filter((pong) => pong.response_time !== undefined)
-			.map((pong) => {
-				// Get the corresponding ping message
-				const ping = zzz.messages.items.by_id.get(pong.ping_id!);
-
-				return {
-					pong_id: pong.id,
-					ping_id: pong.ping_id,
-					server_time: pong.response_time,
-					// Total round trip time - from ping send to pong receive
-					round_trip_time: ping ? pong.received_time - ping.received_time : undefined,
-				};
-			});
-	});
-	$inspect('[Ping_Form] display_items', display_items);
+	// Use ping data from capabilities
+	const pings = $derived(zzz.capabilities.pings);
 
 	// Calculate placeholders to maintain consistent spacing
-	const remaining_placeholders = $derived(Math.max(0, HISTORY_SIZE - display_items.length));
+	const remaining_placeholders = $derived(Math.max(0, PING_HISTORY_MAX - pings.length));
 </script>
 
 <div class="column align_items_start gap_sm">
@@ -63,13 +36,9 @@
 		style:height="150px"
 		style:min-height="150px"
 	>
-		{#each display_items as item (item.pong_id)}
+		{#each pings as ping (ping.ping_id)}
 			<li transition:slide>
-				{#if item.round_trip_time !== undefined}
-					{@render ping_item(item.round_trip_time)}
-				{:else}
-					<Pending_Animation />
-				{/if}
+				{@render ping_item(ping.round_trip_time)}
 			</li>
 		{/each}
 		{#each {length: remaining_placeholders} as _, i (i)}

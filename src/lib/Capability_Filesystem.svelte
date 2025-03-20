@@ -3,8 +3,6 @@
 
 	import type {Zzz_Dir} from '$lib/diskfile_types.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
-	import {GLYPH_DIRECTORY} from '$lib/glyphs.js';
-	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
 
 	interface Props {
 		zzz_dir?: Zzz_Dir | null | undefined;
@@ -14,14 +12,13 @@
 	const {zzz_dir: zzz_dir_prop}: Props = $props();
 	const zzz = zzz_context.get();
 
-	// TODO BLOCK when server is unavailable, change the content to reflect that (see Socket_Controls for connected status style)
+	// TODO BLOCK when server is unavailable, change the content to reflect that (see Capabilities_View for connected status style)
 
 	// Fall back to the context value if not provided
 	const zzz_dir = $derived(zzz_dir_prop !== undefined ? zzz_dir_prop : zzz.zzz_dir);
 </script>
 
-<div class="flex gap_md align_items_center mb_xl size_lg">
-	<Glyph_Icon icon={GLYPH_DIRECTORY} size="var(--size_xl2)" />
+<div class="chip plain color_b flex gap_md align_items_center mb_xl size_xl font_weight_400">
 	{#if zzz_dir === undefined}
 		<div>&nbsp;</div>
 	{:else if zzz_dir === null}
@@ -35,12 +32,13 @@
 	{/if}
 </div>
 <p>
-	This is the server's filesystem directory, the <code>zzz_dir</code>.
+	This is the server's filesystem directory, the <code>zzz_dir</code>. It defaults to
+	<code>.zzz</code> in the current working directory. To configure it set the .env variable
+	<code class="size_sm">PUBLIC_ZZZ_DIR</code>.
 </p>
 <p>
-	For security reasons, all filesystem operations are confined to this path's parent {#if zzz.zzz_dir_parent}(<small
-			class="chip font_mono">{zzz.zzz_dir_parent}</small
-		>){/if}
-	and the path cannot be modified after the server starts. To configure it set the .env variable
-	<code>PUBLIC_ZZZ_DIR</code>.
+	For security reasons, all filesystem operations are confined to this path's parent{#if zzz.zzz_dir_parent},
+		<small class="chip font_mono">{zzz.zzz_dir_parent}</small>,
+	{/if} and the path cannot be modified after the server starts. These restrictions ensure predictability
+	when exposing sensitive resources like your local hard drive to web scripts.
 </p>

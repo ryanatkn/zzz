@@ -28,9 +28,6 @@ export class Message extends Cell<typeof Message_Json> {
 	type: Message_Type = $state()!;
 	direction: Message_Direction = $state()!;
 
-	/** Client-side timestamp when message was received/created (not serialized) */
-	readonly received_time: number = $state(performance.now());
-
 	// Store data based on message type
 	data: Record<string, any> | undefined = $state();
 	ping_id: Uuid | undefined = $state();
@@ -40,8 +37,6 @@ export class Message extends Cell<typeof Message_Json> {
 	content: string | undefined = $state(); // TODO BLOCK derived token count like with diskfiles?
 	change: any | undefined = $state(); // TODO schema types
 	source_file: any | undefined = $state(); // TODO schema types
-	/** Response time for pong messages in milliseconds */
-	response_time?: number = $state();
 
 	display_name: string = $derived(`${this.type} (${this.direction})`);
 

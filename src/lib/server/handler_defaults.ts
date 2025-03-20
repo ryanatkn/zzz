@@ -51,13 +51,10 @@ export const handle_message = async (
 
 	switch (message.type) {
 		case 'ping': {
-			// Calculate response time on the server side
-			const response_time = performance.now();
 			return {
 				id: Uuid.parse(undefined),
 				type: 'pong',
 				ping_id: message.id,
-				response_time,
 			};
 		}
 		case 'load_session': {

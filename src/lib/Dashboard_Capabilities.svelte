@@ -1,22 +1,11 @@
 <script lang="ts">
-	import {DEV} from 'esm-env';
-	import {base} from '$app/paths';
-	import Breadcrumb from '@ryanatkn/fuz/Breadcrumb.svelte';
-	import Library_Footer from '@ryanatkn/fuz/Library_Footer.svelte';
-	import Svg from '@ryanatkn/fuz/Svg.svelte';
-	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
-
-	import {pkg_context} from '$routes/pkg.js';
 	import {GLYPH_CAPABILITY} from '$lib/glyphs.js';
 	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
-	import Control_Panel from '$lib/Control_Panel.svelte';
-
-	const pkg = pkg_context.get();
+	import Footer from '$routes/Footer.svelte';
+	import Capabilities_View from '$lib/Capabilities_View.svelte';
 
 	// TODO display capabilities (like what APIs are available, including remote server (off when deployed statically), local pglite (could be disconnected, websockets?))
 	// TODO display database info/explorer
-
-	// TODO BLOCK Ollama capability
 
 	// TODO BLOCK use native popover with viewport-relative positioning
 </script>
@@ -40,30 +29,11 @@
 				contexts and users can do whatever they wish with the available capabilities.
 			</p>
 		</aside>
-		<h2>todo</h2>
-		<ul>
-			<li>utility models (like the first one for `namerbot`)</li>
-			<li>AI providers (API keys)</li>
-		</ul>
 	</section>
 	<section>
-		<Control_Panel />
-	</section>
-	<section class="width_sm">
-		<h2>system</h2>
-		<div>
-			<p class="font_mono">{pkg.name}@{pkg.package_json.version}</p>
-			<p class="font_mono">
-				DEV: {DEV + ''}
-			</p>
-			<p><a href="{base}/about">/about</a></p>
-		</div>
+		<Capabilities_View />
 	</section>
 	<section class="mb_xl7 flex justify_content_center">
-		<Library_Footer {pkg}>
-			<div class="mb_xl5">
-				<Breadcrumb><Svg data={zzz_logo} size="var(--icon_size_sm)" /></Breadcrumb>
-			</div>
-		</Library_Footer>
+		<Footer />
 	</section>
 </div>

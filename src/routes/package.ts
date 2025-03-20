@@ -38,7 +38,7 @@ export const package_json = {
 		'@ryanatkn/gro': '^0.148.0',
 		'@ryanatkn/moss': '^0.23.2',
 		'@sveltejs/adapter-static': '^3.0.8',
-		'@sveltejs/kit': '^2.20.0',
+		'@sveltejs/kit': '^2.20.1',
 		'@sveltejs/package': '^2.3.10',
 		'@sveltejs/vite-plugin-svelte': '^4.0.0',
 		eslint: '^9.21.0',
@@ -47,7 +47,7 @@ export const package_json = {
 		ollama: '^0.5.14',
 		prettier: '^3.5.2',
 		'prettier-plugin-svelte': '^3.3.3',
-		svelte: '^5.23.1',
+		svelte: '^5.23.2',
 		'svelte-check': '^4.1.4',
 		tslib: '^2.8.1',
 		typescript: '^5.7.3',
@@ -128,6 +128,11 @@ export const package_json = {
 		},
 		'./bit.svelte.js': {types: './dist/bit.svelte.d.ts', default: './dist/bit.svelte.js'},
 		'./bits.svelte.js': {types: './dist/bits.svelte.d.ts', default: './dist/bits.svelte.js'},
+		'./Capabilities_View.svelte': {
+			types: './dist/Capabilities_View.svelte.d.ts',
+			svelte: './dist/Capabilities_View.svelte',
+			default: './dist/Capabilities_View.svelte',
+		},
 		'./capabilities.svelte.js': {
 			types: './dist/capabilities.svelte.d.ts',
 			default: './dist/capabilities.svelte.js',
@@ -141,6 +146,11 @@ export const package_json = {
 			types: './dist/Capability_Server.svelte.d.ts',
 			svelte: './dist/Capability_Server.svelte',
 			default: './dist/Capability_Server.svelte',
+		},
+		'./Capability_Filesystem.svelte': {
+			types: './dist/Capability_Filesystem.svelte.d.ts',
+			svelte: './dist/Capability_Filesystem.svelte',
+			default: './dist/Capability_Filesystem.svelte',
 		},
 		'./cell_classes.js': {types: './dist/cell_classes.d.ts', default: './dist/cell_classes.js'},
 		'./cell_helpers.js': {types: './dist/cell_helpers.d.ts', default: './dist/cell_helpers.js'},
@@ -196,11 +206,6 @@ export const package_json = {
 			types: './dist/Content_Stats.svelte.d.ts',
 			svelte: './dist/Content_Stats.svelte',
 			default: './dist/Content_Stats.svelte',
-		},
-		'./Control_Panel.svelte': {
-			types: './dist/Control_Panel.svelte.d.ts',
-			svelte: './dist/Control_Panel.svelte',
-			default: './dist/Control_Panel.svelte',
 		},
 		'./Dashboard_Capabilities.svelte': {
 			types: './dist/Dashboard_Capabilities.svelte.d.ts',
@@ -534,10 +539,10 @@ export const package_json = {
 			svelte: './dist/Settings.svelte',
 			default: './dist/Settings.svelte',
 		},
-		'./Socket_Controls.svelte': {
-			types: './dist/Socket_Controls.svelte.d.ts',
-			svelte: './dist/Socket_Controls.svelte',
-			default: './dist/Socket_Controls.svelte',
+		'./Capability_Websocket.svelte': {
+			types: './dist/Capability_Websocket.svelte.d.ts',
+			svelte: './dist/Capability_Websocket.svelte',
+			default: './dist/Capability_Websocket.svelte',
 		},
 		'./socket_helpers.js': {
 			types: './dist/socket_helpers.d.ts',
@@ -588,11 +593,6 @@ export const package_json = {
 		},
 		'./xml.js': {types: './dist/xml.d.ts', default: './dist/xml.js'},
 		'./zod_helpers.js': {types: './dist/zod_helpers.d.ts', default: './dist/zod_helpers.js'},
-		'./Zzz_Dir_View.svelte': {
-			types: './dist/Zzz_Dir_View.svelte.d.ts',
-			svelte: './dist/Zzz_Dir_View.svelte',
-			default: './dist/Zzz_Dir_View.svelte',
-		},
 		'./Zzz_Root.svelte': {
 			types: './dist/Zzz_Root.svelte.d.ts',
 			svelte: './dist/Zzz_Root.svelte',
@@ -656,6 +656,7 @@ export const src_json = {
 				{name: 'Bits', kind: 'class'},
 			],
 		},
+		'./Capabilities_View.svelte': {path: 'Capabilities_View.svelte', declarations: []},
 		'./capabilities.svelte.js': {
 			path: 'capabilities.svelte.ts',
 			declarations: [
@@ -668,6 +669,7 @@ export const src_json = {
 		},
 		'./Capability_Ollama.svelte': {path: 'Capability_Ollama.svelte', declarations: []},
 		'./Capability_Server.svelte': {path: 'Capability_Server.svelte', declarations: []},
+		'./Capability_Filesystem.svelte': {path: 'Capability_Filesystem.svelte', declarations: []},
 		'./cell_classes.js': {
 			path: 'cell_classes.ts',
 			declarations: [
@@ -780,7 +782,6 @@ export const src_json = {
 		'./Content_Editor.svelte': {path: 'Content_Editor.svelte', declarations: []},
 		'./Content_Preview.svelte': {path: 'Content_Preview.svelte', declarations: []},
 		'./Content_Stats.svelte': {path: 'Content_Stats.svelte', declarations: []},
-		'./Control_Panel.svelte': {path: 'Control_Panel.svelte', declarations: []},
 		'./Dashboard_Capabilities.svelte': {path: 'Dashboard_Capabilities.svelte', declarations: []},
 		'./Dashboard_Chats.svelte': {path: 'Dashboard_Chats.svelte', declarations: []},
 		'./Dashboard_Files.svelte': {path: 'Dashboard_Files.svelte', declarations: []},
@@ -1187,7 +1188,7 @@ export const src_json = {
 			],
 		},
 		'./Settings.svelte': {path: 'Settings.svelte', declarations: []},
-		'./Socket_Controls.svelte': {path: 'Socket_Controls.svelte', declarations: []},
+		'./Capability_Websocket.svelte': {path: 'Capability_Websocket.svelte', declarations: []},
 		'./socket_helpers.js': {
 			path: 'socket_helpers.ts',
 			declarations: [
@@ -1306,7 +1307,6 @@ export const src_json = {
 				{name: 'maybe_get_field_schema', kind: 'function'},
 			],
 		},
-		'./Zzz_Dir_View.svelte': {path: 'Zzz_Dir_View.svelte', declarations: []},
 		'./Zzz_Root.svelte': {path: 'Zzz_Root.svelte', declarations: []},
 		'./zzz.svelte.js': {
 			path: 'zzz.svelte.ts',

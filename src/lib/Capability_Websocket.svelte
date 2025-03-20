@@ -87,7 +87,7 @@
 		<!-- URL input and connect/disconnect -->
 		<div class="flex flex_column gap_sm mb_sm">
 			<div
-				class="chip plain flex_1 size_xl flex_column align_items_start"
+				class="chip plain flex_1 size_xl px_xl flex_column align_items_start"
 				style:display="flex !important"
 				style:align-items="flex-start"
 				style:font-weight="400 !important"
@@ -96,7 +96,7 @@
 				class:color_d={socket.status === 'pending'}
 				class:color_e={socket.status === 'initial'}
 			>
-				<div class="column justify_content_center gap_xs pl_md" style:min-height="80px">
+				<div class="column justify_content_center gap_xs" style:min-height="80px">
 					websocket {socket.connected
 						? 'connected'
 						: socket.status === 'pending'

@@ -28,7 +28,7 @@
 </script>
 
 <div class="flex flex_column gap_md">
-	<div class="flex gap_sm">
+	<div class="flex gap_sm align_items_start">
 		<div
 			class="flex_1 chip plain flex_1 size_xl flex_column align_items_start"
 			style:display="flex !important"

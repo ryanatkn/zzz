@@ -6,6 +6,20 @@ import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import {ollama_list} from '$lib/ollama.js';
 import {REQUEST_TIMEOUT, SERVER_URL} from '$lib/constants.js';
+import type {Uuid} from '$lib/zod_helpers.js';
+
+// Maximum number of ping records to keep
+export const PING_HISTORY_MAX = 6;
+
+/**
+ * Data structure for ping measurements
+ */
+export interface Ping_Data {
+	ping_id: Uuid;
+	sent_time: number;
+	received_time: number;
+	round_trip_time: number;
+}
 
 export const Capabilities_Json = Cell_Json.extend({});
 export type Capabilities_Json = z.infer<typeof Capabilities_Json>;
@@ -65,6 +79,16 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 		error_message: null,
 		updated: null,
 	});
+
+	/**
+	 * Store recent ping measurements, newest first
+	 */
+	pings: Array<Ping_Data> = $state([]);
+
+	/**
+	 * Most recent ping round trip time in milliseconds
+	 */
+	latest_ping_time: number | null = $derived(this.pings[0]?.round_trip_time ?? null);
 
 	/**
 	 * Convenience accessor for server availability.
@@ -244,6 +268,32 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 				error_message,
 				updated: Date.now(),
 			};
+		}
+	}
+
+	/**
+	 * Add a ping measurement to the history
+	 * @param ping_id The UUID of the ping message
+	 * @param sent_time The timestamp when the ping was sent
+	 * @param received_time The timestamp when the pong was received
+	 */
+	add_ping(ping_id: Uuid, sent_time: number, received_time: number): void {
+		const round_trip_time = received_time - sent_time;
+		const ping_data: Ping_Data = {
+			ping_id,
+			sent_time,
+			received_time,
+			round_trip_time,
+		};
+
+		// Add new ping data to the beginning of the array
+		this.pings = [ping_data, ...this.pings.slice(0, PING_HISTORY_MAX - 1)];
+
+		// Update server capability with the latest round-trip time if server is available
+		if (this.server.status === 'success' && this.server.data) {
+			// Mutate server data using proper technique for reactive properties
+			this.server.data.round_trip_time = round_trip_time;
+			this.server.updated = Date.now();
 		}
 	}
 

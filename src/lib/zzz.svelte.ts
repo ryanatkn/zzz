@@ -132,6 +132,9 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	// Runtime-only state (not serialized)
 	pending_prompts: SvelteMap<Uuid, Deferred<Message_Completion_Response>> = new SvelteMap();
 
+	// Keep track of pending pings
+	pending_pings: SvelteMap<Uuid, number> = new SvelteMap();
+
 	constructor(options: Zzz_Options = EMPTY_OBJECT) {
 		// Pass this instance as its own zzz reference
 		super(Zzz_Json, options as Zzz_Options & {zzz: Zzz}); // Temporary type assertion, will be fixed after construction
@@ -254,6 +257,11 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 			id,
 			type: 'ping',
 		};
+
+		// Store the current time along with the ping ID
+		const sent_time = Date.now();
+		this.pending_pings.set(id, sent_time);
+
 		this.messages.send(ping);
 	}
 
@@ -261,10 +269,15 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	 * Handle a pong response from the server
 	 */
 	receive_pong(pong: Message_Pong): void {
-		// The pong already includes the response time from the server
-		const pong_message = this.messages.items.by_id.get(pong.id);
-		if (pong_message) {
-			pong_message.response_time = pong.response_time;
+		const received_time = Date.now();
+		const sent_time = this.pending_pings.get(pong.ping_id);
+
+		if (sent_time !== undefined) {
+			// Add the ping data to capabilities
+			this.capabilities.add_ping(pong.ping_id, sent_time, received_time);
+
+			// Clean up the pending ping
+			this.pending_pings.delete(pong.ping_id);
 		}
 	}
 

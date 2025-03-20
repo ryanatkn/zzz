@@ -21,8 +21,7 @@
 
 <div class="flex flex_column gap_sm">
 	<div
-		class="w_100 chip flex_1 px_xl plain justify_content_space_between"
-		style:font-weight="400 !important"
+		class="w_100 chip flex_1 px_xl plain justify_content_space_between font_weight_400"
 		style:padding="0 var(--space_xl) !important"
 		class:color_b={capabilities.server.status === 'success'}
 		class:color_c={capabilities.server.status === 'failure'}
@@ -45,8 +44,8 @@
 			</div>
 			<small class="font_mono"
 				>{SERVER_URL}/api/ping
-				{#if capabilities.server.data}<span
-						>{GLYPH_ARROW_RIGHT} {capabilities.server.data.round_trip_time}ms</span
+				{#if capabilities.latest_ping_time !== null}<span
+						>{GLYPH_ARROW_RIGHT} {Math.round(capabilities.latest_ping_time)}ms</span
 					>{/if}
 			</small>
 		</div>

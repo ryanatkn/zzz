@@ -1,13 +1,12 @@
 <script lang="ts">
-	import Library_Footer from '@ryanatkn/fuz/Library_Footer.svelte';
 	import Svg from '@ryanatkn/fuz/Svg.svelte';
 	import Package_Detail from '@ryanatkn/fuz/Package_Detail.svelte';
 	import Community_Links_Panel from '@ryanatkn/fuz/Community_Links_Panel.svelte';
-	import Breadcrumb from '@ryanatkn/fuz/Breadcrumb.svelte';
 	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
 
 	import {pkg_context} from '$routes/pkg.js';
 	import External_Link from '$lib/External_Link.svelte';
+	import Footer from '$routes/Footer.svelte';
 
 	const pkg = pkg_context.get();
 
@@ -227,10 +226,6 @@
 	</section>
 	<Community_Links_Panel />
 	<section class="mb_xl7">
-		<Library_Footer {pkg}>
-			<div class="mb_xl5">
-				<Breadcrumb><Svg data={zzz_logo} size="var(--icon_size_sm)" /></Breadcrumb>
-			</div>
-		</Library_Footer>
+		<Footer />
 	</section>
 </div>

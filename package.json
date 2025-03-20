@@ -42,7 +42,7 @@
     "@ryanatkn/gro": "^0.148.0",
     "@ryanatkn/moss": "^0.23.2",
     "@sveltejs/adapter-static": "^3.0.8",
-    "@sveltejs/kit": "^2.20.0",
+    "@sveltejs/kit": "^2.20.1",
     "@sveltejs/package": "^2.3.10",
     "@sveltejs/vite-plugin-svelte": "^4.0.0",
     "eslint": "^9.21.0",
@@ -51,7 +51,7 @@
     "ollama": "^0.5.14",
     "prettier": "^3.5.2",
     "prettier-plugin-svelte": "^3.3.3",
-    "svelte": "^5.23.1",
+    "svelte": "^5.23.2",
     "svelte-check": "^4.1.4",
     "tslib": "^2.8.1",
     "typescript": "^5.7.3",
@@ -154,6 +154,11 @@
       "types": "./dist/bits.svelte.d.ts",
       "default": "./dist/bits.svelte.js"
     },
+    "./Capabilities_View.svelte": {
+      "types": "./dist/Capabilities_View.svelte.d.ts",
+      "svelte": "./dist/Capabilities_View.svelte",
+      "default": "./dist/Capabilities_View.svelte"
+    },
     "./capabilities.svelte.js": {
       "types": "./dist/capabilities.svelte.d.ts",
       "default": "./dist/capabilities.svelte.js"
@@ -167,6 +172,11 @@
       "types": "./dist/Capability_Server.svelte.d.ts",
       "svelte": "./dist/Capability_Server.svelte",
       "default": "./dist/Capability_Server.svelte"
+    },
+    "./Capability_Filesystem.svelte": {
+      "types": "./dist/Capability_Filesystem.svelte.d.ts",
+      "svelte": "./dist/Capability_Filesystem.svelte",
+      "default": "./dist/Capability_Filesystem.svelte"
     },
     "./cell_classes.js": {
       "types": "./dist/cell_classes.d.ts",
@@ -246,11 +256,6 @@
       "types": "./dist/Content_Stats.svelte.d.ts",
       "svelte": "./dist/Content_Stats.svelte",
       "default": "./dist/Content_Stats.svelte"
-    },
-    "./Control_Panel.svelte": {
-      "types": "./dist/Control_Panel.svelte.d.ts",
-      "svelte": "./dist/Control_Panel.svelte",
-      "default": "./dist/Control_Panel.svelte"
     },
     "./Dashboard_Capabilities.svelte": {
       "types": "./dist/Dashboard_Capabilities.svelte.d.ts",
@@ -615,10 +620,10 @@
       "svelte": "./dist/Settings.svelte",
       "default": "./dist/Settings.svelte"
     },
-    "./Socket_Controls.svelte": {
-      "types": "./dist/Socket_Controls.svelte.d.ts",
-      "svelte": "./dist/Socket_Controls.svelte",
-      "default": "./dist/Socket_Controls.svelte"
+    "./Capability_Websocket.svelte": {
+      "types": "./dist/Capability_Websocket.svelte.d.ts",
+      "svelte": "./dist/Capability_Websocket.svelte",
+      "default": "./dist/Capability_Websocket.svelte"
     },
     "./socket_helpers.js": {
       "types": "./dist/socket_helpers.d.ts",
@@ -701,11 +706,6 @@
     "./zod_helpers.js": {
       "types": "./dist/zod_helpers.d.ts",
       "default": "./dist/zod_helpers.js"
-    },
-    "./Zzz_Dir_View.svelte": {
-      "types": "./dist/Zzz_Dir_View.svelte.d.ts",
-      "svelte": "./dist/Zzz_Dir_View.svelte",
-      "default": "./dist/Zzz_Dir_View.svelte"
     },
     "./Zzz_Root.svelte": {
       "types": "./dist/Zzz_Root.svelte.d.ts",
