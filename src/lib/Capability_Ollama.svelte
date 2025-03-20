@@ -17,13 +17,12 @@
 	import Error_Message from '$lib/Error_Message.svelte';
 	import {OLLAMA_URL} from '$lib/ollama.js';
 
-	// Get the Zzz instance from context
 	const zzz = zzz_context.get();
 	const {capabilities} = zzz;
 
 	// Initial load when component mounts
 	onMount(() => {
-		void capabilities.init_all();
+		void capabilities.init_ollama_check();
 	});
 </script>
 

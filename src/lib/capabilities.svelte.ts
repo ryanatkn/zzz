@@ -257,12 +257,6 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 		super(Capabilities_Json, options);
 	}
 
-	async init_all(): Promise<void> {
-		await this.init_server_check();
-		await this.init_ollama_check();
-		// not initing the websocket, it's automatic in the main layout atm
-	}
-
 	/**
 	 * Check Server availability only if it hasn't been checked before
 	 * (when status is 'initial')
