@@ -1,8 +1,7 @@
 <script lang="ts">
-	// TODO BLOCK use this to show all pending pings (see `zzz.pending_pings.size`)
-	// import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
 	import {slide} from 'svelte/transition';
 	import type {Snippet} from 'svelte';
+	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
 
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import {GLYPH_DIRECTION_CLIENT, GLYPH_DIRECTION_SERVER} from '$lib/glyphs.js';
@@ -15,9 +14,13 @@
 	const {children}: Props = $props();
 
 	const zzz = zzz_context.get();
+	const {capabilities} = zzz;
 
 	// Use ping data from capabilities
-	const pings = $derived(zzz.capabilities.pings);
+	const pings = $derived(capabilities.pings);
+
+	// Get pending ping count directly from capabilities
+	const {has_pending_pings, pending_ping_count} = $derived(capabilities);
 
 	// Calculate placeholders to maintain consistent spacing
 	const remaining_placeholders = $derived(Math.max(0, PING_HISTORY_MAX - pings.length));
@@ -25,9 +28,21 @@
 
 <div class="column align_items_start gap_sm">
 	<div>
-		<button type="button" title="ping the server" onclick={() => zzz.send_ping()} class="flex_1">
+		<button
+			type="button"
+			title="ping the server"
+			onclick={() => zzz.capabilities.send_ping()}
+			class="flex_1"
+			class:color_d={has_pending_pings}
+		>
 			{#if children}{@render children()}{:else}⚞{/if}
-			<div class="size_lg font_weight_400 pl_sm">ping the server</div>
+			<div class="size_lg font_weight_400 pl_sm">
+				ping the server
+				{#if has_pending_pings}
+					<span class="font_mono size_sm ml_xs">(pending: {pending_ping_count})</span>
+					<span class="ml_xs"><Pending_Animation /></span>
+				{/if}
+			</div>
 		</button>
 	</div>
 

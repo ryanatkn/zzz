@@ -274,7 +274,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 	 * Sends a ping message for heartbeat purposes
 	 */
 	send_heartbeat(): void {
-		this.zzz.send_ping();
+		this.zzz.capabilities.send_ping();
 	}
 
 	/**

@@ -163,6 +163,11 @@
       "types": "./dist/capabilities.svelte.d.ts",
       "default": "./dist/capabilities.svelte.js"
     },
+    "./Capability_Filesystem.svelte": {
+      "types": "./dist/Capability_Filesystem.svelte.d.ts",
+      "svelte": "./dist/Capability_Filesystem.svelte",
+      "default": "./dist/Capability_Filesystem.svelte"
+    },
     "./Capability_Ollama.svelte": {
       "types": "./dist/Capability_Ollama.svelte.d.ts",
       "svelte": "./dist/Capability_Ollama.svelte",
@@ -173,10 +178,15 @@
       "svelte": "./dist/Capability_Server.svelte",
       "default": "./dist/Capability_Server.svelte"
     },
-    "./Capability_Filesystem.svelte": {
-      "types": "./dist/Capability_Filesystem.svelte.d.ts",
-      "svelte": "./dist/Capability_Filesystem.svelte",
-      "default": "./dist/Capability_Filesystem.svelte"
+    "./Capability_System.svelte": {
+      "types": "./dist/Capability_System.svelte.d.ts",
+      "svelte": "./dist/Capability_System.svelte",
+      "default": "./dist/Capability_System.svelte"
+    },
+    "./Capability_Websocket.svelte": {
+      "types": "./dist/Capability_Websocket.svelte.d.ts",
+      "svelte": "./dist/Capability_Websocket.svelte",
+      "default": "./dist/Capability_Websocket.svelte"
     },
     "./cell_classes.js": {
       "types": "./dist/cell_classes.d.ts",
@@ -619,11 +629,6 @@
       "types": "./dist/Settings.svelte.d.ts",
       "svelte": "./dist/Settings.svelte",
       "default": "./dist/Settings.svelte"
-    },
-    "./Capability_Websocket.svelte": {
-      "types": "./dist/Capability_Websocket.svelte.d.ts",
-      "svelte": "./dist/Capability_Websocket.svelte",
-      "default": "./dist/Capability_Websocket.svelte"
     },
     "./socket_helpers.js": {
       "types": "./dist/socket_helpers.d.ts",

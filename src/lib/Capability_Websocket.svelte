@@ -35,6 +35,7 @@
 	// Get socket from props or context
 	const zzz = zzz_context.get();
 	const socket = $derived(socket_prop || zzz.socket);
+	const {capabilities} = zzz;
 
 	// Track URL state for reset/undo functionality
 	let previous_url = $state('');
@@ -87,14 +88,15 @@
 		<!-- URL input and connect/disconnect -->
 		<div class="flex flex_column gap_sm mb_sm">
 			<div
-				class="chip plain flex_1 size_xl px_xl flex_column align_items_start"
+				class="chip plain flex_1 size_xl px_xl flex_column"
 				style:display="flex !important"
-				style:align-items="flex-start"
+				style:align-items="flex-start !important"
 				style:font-weight="400 !important"
-				class:color_b={socket.status === 'success'}
-				class:color_c={socket.status === 'failure'}
-				class:color_d={socket.status === 'pending'}
-				class:color_e={socket.status === 'initial'}
+				class:color_b={capabilities.websocket.status === 'success' && socket.connected}
+				class:color_c={capabilities.websocket.status === 'failure'}
+				class:color_d={capabilities.websocket.status === 'pending'}
+				class:color_e={capabilities.websocket.status === 'initial'}
+				class:color_h={capabilities.websocket.status === 'success' && !socket.connected}
 			>
 				<div class="column justify_content_center gap_xs" style:min-height="80px">
 					websocket {socket.connected
@@ -102,6 +104,11 @@
 						: socket.status === 'pending'
 							? 'connecting'
 							: 'disconnected'}
+					{#if capabilities.has_pending_pings}
+						<span class="font_mono"
+							>(pending pings: {capabilities.pending_ping_count}) <Pending_Animation /></span
+						>
+					{/if}
 					<small class="font_mono"
 						>{#if socket.url}{socket.url}{:else}&nbsp;{/if}</small
 					>

@@ -1,12 +1,15 @@
 import {z} from 'zod';
 import type {ListResponse} from 'ollama/browser';
 import type {Async_Status} from '@ryanatkn/belt/async.js';
+import {SvelteMap} from 'svelte/reactivity';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import {ollama_list} from '$lib/ollama.js';
 import {REQUEST_TIMEOUT, SERVER_URL} from '$lib/constants.js';
-import type {Uuid} from '$lib/zod_helpers.js';
+import {Uuid} from '$lib/zod_helpers.js';
+import type {Zzz_Dir} from '$lib/diskfile_types.js';
+import {Message_Ping, type Message_Pong} from '$lib/message_types.js';
 
 // Maximum number of ping records to keep
 export const PING_HISTORY_MAX = 6;
@@ -55,6 +58,28 @@ export interface Server_Capability_Data {
 }
 
 /**
+ * Data structure for WebSocket capability
+ */
+export interface Websocket_Capability_Data {
+	url: string | null;
+	connected: boolean;
+	reconnect_count: number;
+	last_connect_time: number | null;
+	last_send_time: number | null;
+	last_receive_time: number | null;
+	connection_duration: number | null;
+	pending_pings: number;
+}
+
+/**
+ * Data structure for Filesystem capability
+ */
+export interface Filesystem_Capability_Data {
+	zzz_dir: Zzz_Dir | null | undefined;
+	zzz_dir_parent: string | null | undefined;
+}
+
+/**
  * A class that encapsulates system capabilities detection and management.
  * This is NOT generic or extensible - it contains hardcoded logic for
  * all capabilities the system supports.
@@ -81,6 +106,72 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	});
 
 	/**
+	 * WebSocket capability that derives its state from the socket
+	 */
+	websocket: Capability<Websocket_Capability_Data | null | undefined> = $derived.by(() => {
+		// Map socket status to capability status, but consider connection state
+		const {socket} = this.zzz;
+		const {status} = socket;
+
+		// Socket is available if we're connected,
+		// otherwise it's not available but we have data about its state
+		const data =
+			status === 'initial'
+				? undefined
+				: {
+						url: socket.url,
+						connected: socket.connected,
+						reconnect_count: socket.reconnect_count,
+						last_connect_time: socket.last_connect_time,
+						last_send_time: socket.last_send_time,
+						last_receive_time: socket.last_receive_time,
+						connection_duration: socket.connection_duration,
+						pending_pings: this.pending_pings.size,
+					};
+
+		return {
+			data,
+			status,
+			error_message: null, // Socket doesn't expose error messages directly
+			updated: data?.last_connect_time ?? null,
+		};
+	});
+
+	/**
+	 * Filesystem capability that derives its state from the zzz_dir
+	 */
+	filesystem: Capability<Filesystem_Capability_Data | null | undefined> = $derived.by(() => {
+		// Derive status based on zzz_dir value
+		const {zzz_dir, zzz_dir_parent} = this.zzz;
+		let status: Async_Status;
+
+		if (zzz_dir === undefined) {
+			status = 'initial';
+		} else if (zzz_dir === null) {
+			status = 'pending';
+		} else if (zzz_dir === '') {
+			status = 'failure';
+		} else {
+			status = 'success';
+		}
+
+		// Filesystem is available if we have a valid zzz_dir
+		const data = status === 'success' ? {zzz_dir, zzz_dir_parent} : undefined;
+
+		return {
+			data,
+			status,
+			error_message: null,
+			updated: this.server.updated, // Use server update time as proxy for filesystem check
+		};
+	});
+
+	/**
+	 * Keep track of pending pings with their sent timestamps
+	 */
+	pending_pings: SvelteMap<Uuid, number> = new SvelteMap();
+
+	/**
 	 * Store recent ping measurements, newest first
 	 */
 	pings: Array<Ping_Data> = $state([]);
@@ -89,6 +180,16 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	 * Most recent ping round trip time in milliseconds
 	 */
 	latest_ping_time: number | null = $derived(this.pings[0]?.round_trip_time ?? null);
+
+	/**
+	 * Number of pending pings
+	 */
+	pending_ping_count: number = $derived(this.pending_pings.size);
+
+	/**
+	 * Has pending pings
+	 */
+	has_pending_pings: boolean = $derived(this.pending_ping_count > 0);
 
 	/**
 	 * Convenience accessor for server availability.
@@ -117,6 +218,32 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	);
 
 	/**
+	 * Convenience accessor for websocket availability.
+	 * `undefined` means uninitialized, `null` means loading/checking
+	 * boolean indicates if the socket is actively connected
+	 */
+	websocket_available: boolean | null | undefined = $derived(
+		this.websocket.data === undefined
+			? undefined
+			: this.websocket.status === 'pending'
+				? null
+				: this.websocket.status === 'success',
+	);
+
+	/**
+	 * Convenience accessor for filesystem availability.
+	 * `undefined` means uninitialized, `null` means loading/checking
+	 * boolean indicates if filesystem is available
+	 */
+	filesystem_available: boolean | null | undefined = $derived(
+		this.filesystem.data === undefined
+			? undefined
+			: this.filesystem.status === 'pending'
+				? null
+				: this.filesystem.status === 'success',
+	);
+
+	/**
 	 * Latest Ollama model list response, if available
 	 */
 	ollama_models: Array<{name: string; size: number}> = $derived(
@@ -133,6 +260,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	async init_all(): Promise<void> {
 		await this.init_server_check();
 		await this.init_ollama_check();
+		// not initing the websocket, it's automatic in the main layout atm
 	}
 
 	/**
@@ -268,6 +396,40 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 				error_message,
 				updated: Date.now(),
 			};
+		}
+	}
+
+	/**
+	 * Sends a ping to the server
+	 * @returns The UUID of the ping message
+	 */
+	send_ping(): Uuid {
+		const ping = Message_Ping.parse(undefined);
+
+		// Store the current time along with the ping ID
+		const sent_time = Date.now();
+		this.pending_pings.set(ping.id, sent_time);
+
+		// Send the ping message via the messaging system
+		this.zzz.messages.send(ping);
+
+		return ping.id;
+	}
+
+	/**
+	 * Handle a pong response from the server
+	 * @param pong The pong message received from the server
+	 */
+	receive_pong(pong: Message_Pong): void {
+		const received_time = Date.now();
+		const sent_time = this.pending_pings.get(pong.ping_id);
+
+		if (sent_time !== undefined) {
+			// Add the ping data to capabilities
+			this.add_ping(pong.ping_id, sent_time, received_time);
+
+			// Clean up the pending ping
+			this.pending_pings.delete(pong.ping_id);
 		}
 	}
 

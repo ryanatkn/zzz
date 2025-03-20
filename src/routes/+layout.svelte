@@ -79,21 +79,10 @@
 			switch (message.type) {
 				case 'loaded_session': {
 					console.log(`[page] loaded_session`, message);
-					// Set the zzz_dir property from the session data
-					zzz.zzz_dir = message.data.zzz_dir;
-					// Set the files from the session data
-					for (const source_file of message.data.files) {
-						zzz.diskfiles.handle_change({
-							type: 'filer_change',
-							id: Uuid.parse(undefined), // TODO shouldnt need to fake, maybe call an internal method directly? or do we want a single path?
-							change: {type: 'add', path: source_file.id},
-							source_file,
-						});
-					}
+					zzz.receive_session(message.data);
 					break;
 				}
 				case 'completion_response': {
-					// Simply use the message directly now that types are aligned
 					zzz.receive_completion_response(message);
 					break;
 				}
@@ -102,7 +91,7 @@
 					break;
 				}
 				case 'pong': {
-					zzz.receive_pong(message);
+					zzz.capabilities.receive_pong(message);
 					break;
 				}
 				default:

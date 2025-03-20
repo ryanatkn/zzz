@@ -11,7 +11,7 @@
 Zzz, pronounced "zees" like the sound of electricity,
 is a bot and web toolkit with a focus on user power and experimentation.
 The idea is to make a digital tool that adapts to your needs on the fly
-while remaining fully in your control and open source.
+while remaining fully open, aligned, and in your control.
 More at [zzz.software/about](https://www.zzz.software/about).
 
 This is a pre-alpha and the ideas are still developing -

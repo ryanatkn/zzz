@@ -71,7 +71,7 @@ describe('Socket', () => {
 		// Mock zzz object with send_ping method
 		mock_zzz = {
 			cells: new Map(),
-			send_ping: vi.fn(),
+			capabilities: {send_ping: vi.fn()},
 			time: {
 				now_ms: Date.now(),
 				interval: 1000,
@@ -281,7 +281,7 @@ describe('Socket', () => {
 		vi.advanceTimersByTime(1000);
 
 		// Check that the send_ping method was called
-		expect(mock_zzz.send_ping).toHaveBeenCalled();
+		expect(mock_zzz.capabilities.send_ping).toHaveBeenCalled();
 	});
 
 	test('failed messages - moves message to failed when send throws error', () => {

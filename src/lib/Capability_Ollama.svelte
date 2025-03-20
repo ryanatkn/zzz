@@ -30,9 +30,9 @@
 <div class="flex flex_column gap_md">
 	<div class="flex gap_sm align_items_start">
 		<div
-			class="flex_1 chip plain flex_1 size_xl flex_column align_items_start"
+			class="flex_1 chip plain flex_1 size_xl flex_column"
 			style:display="flex !important"
-			style:align-items="flex-start"
+			style:align-items="flex-start !important"
 			style:font-weight="400 !important"
 			class:color_b={capabilities.ollama.status === 'success'}
 			class:color_c={capabilities.ollama.status === 'failure'}

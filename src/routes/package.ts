@@ -137,6 +137,11 @@ export const package_json = {
 			types: './dist/capabilities.svelte.d.ts',
 			default: './dist/capabilities.svelte.js',
 		},
+		'./Capability_Filesystem.svelte': {
+			types: './dist/Capability_Filesystem.svelte.d.ts',
+			svelte: './dist/Capability_Filesystem.svelte',
+			default: './dist/Capability_Filesystem.svelte',
+		},
 		'./Capability_Ollama.svelte': {
 			types: './dist/Capability_Ollama.svelte.d.ts',
 			svelte: './dist/Capability_Ollama.svelte',
@@ -147,10 +152,15 @@ export const package_json = {
 			svelte: './dist/Capability_Server.svelte',
 			default: './dist/Capability_Server.svelte',
 		},
-		'./Capability_Filesystem.svelte': {
-			types: './dist/Capability_Filesystem.svelte.d.ts',
-			svelte: './dist/Capability_Filesystem.svelte',
-			default: './dist/Capability_Filesystem.svelte',
+		'./Capability_System.svelte': {
+			types: './dist/Capability_System.svelte.d.ts',
+			svelte: './dist/Capability_System.svelte',
+			default: './dist/Capability_System.svelte',
+		},
+		'./Capability_Websocket.svelte': {
+			types: './dist/Capability_Websocket.svelte.d.ts',
+			svelte: './dist/Capability_Websocket.svelte',
+			default: './dist/Capability_Websocket.svelte',
 		},
 		'./cell_classes.js': {types: './dist/cell_classes.d.ts', default: './dist/cell_classes.js'},
 		'./cell_helpers.js': {types: './dist/cell_helpers.d.ts', default: './dist/cell_helpers.js'},
@@ -539,11 +549,6 @@ export const package_json = {
 			svelte: './dist/Settings.svelte',
 			default: './dist/Settings.svelte',
 		},
-		'./Capability_Websocket.svelte': {
-			types: './dist/Capability_Websocket.svelte.d.ts',
-			svelte: './dist/Capability_Websocket.svelte',
-			default: './dist/Capability_Websocket.svelte',
-		},
 		'./socket_helpers.js': {
 			types: './dist/socket_helpers.d.ts',
 			default: './dist/socket_helpers.js',
@@ -660,16 +665,22 @@ export const src_json = {
 		'./capabilities.svelte.js': {
 			path: 'capabilities.svelte.ts',
 			declarations: [
+				{name: 'PING_HISTORY_MAX', kind: 'variable'},
+				{name: 'Ping_Data', kind: 'type'},
 				{name: 'Capabilities_Json', kind: 'variable'},
 				{name: 'Capability', kind: 'type'},
 				{name: 'Ollama_Capability_Data', kind: 'type'},
 				{name: 'Server_Capability_Data', kind: 'type'},
+				{name: 'Websocket_Capability_Data', kind: 'type'},
+				{name: 'Filesystem_Capability_Data', kind: 'type'},
 				{name: 'Capabilities', kind: 'class'},
 			],
 		},
+		'./Capability_Filesystem.svelte': {path: 'Capability_Filesystem.svelte', declarations: []},
 		'./Capability_Ollama.svelte': {path: 'Capability_Ollama.svelte', declarations: []},
 		'./Capability_Server.svelte': {path: 'Capability_Server.svelte', declarations: []},
-		'./Capability_Filesystem.svelte': {path: 'Capability_Filesystem.svelte', declarations: []},
+		'./Capability_System.svelte': {path: 'Capability_System.svelte', declarations: []},
+		'./Capability_Websocket.svelte': {path: 'Capability_Websocket.svelte', declarations: []},
 		'./cell_classes.js': {
 			path: 'cell_classes.ts',
 			declarations: [
@@ -1188,7 +1199,6 @@ export const src_json = {
 			],
 		},
 		'./Settings.svelte': {path: 'Settings.svelte', declarations: []},
-		'./Capability_Websocket.svelte': {path: 'Capability_Websocket.svelte', declarations: []},
 		'./socket_helpers.js': {
 			path: 'socket_helpers.ts',
 			declarations: [

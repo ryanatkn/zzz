@@ -9,10 +9,9 @@ import {strip_end, strip_start} from '@ryanatkn/belt/string.js';
 import type {
 	Message_Send_Prompt,
 	Message_Completion_Response,
-	Message_Ping,
-	Message_Pong,
 	Message_Client,
 	Message_Server,
+	Message_Loaded_Session,
 } from '$lib/message_types.js';
 import {Provider, type Provider_Json} from '$lib/provider.svelte.js';
 import type {Provider_Name} from '$lib/provider_types.js';
@@ -132,9 +131,6 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	// Runtime-only state (not serialized)
 	pending_prompts: SvelteMap<Uuid, Deferred<Message_Completion_Response>> = new SvelteMap();
 
-	// Keep track of pending pings
-	pending_pings: SvelteMap<Uuid, number> = new SvelteMap();
-
 	constructor(options: Zzz_Options = EMPTY_OBJECT) {
 		// Pass this instance as its own zzz reference
 		super(Zzz_Json, options as Zzz_Options & {zzz: Zzz}); // Temporary type assertion, will be fixed after construction
@@ -249,35 +245,21 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	}
 
 	/**
-	 * Sends a ping to the server
+	 * Handles session data loaded from the server.
+	 * Sets the zzz_dir and adds files to diskfiles.
 	 */
-	send_ping(): void {
-		const id = Uuid.parse(undefined);
-		const ping: Message_Ping = {
-			id,
-			type: 'ping',
-		};
+	receive_session(data: Message_Loaded_Session['data']): void {
+		// Set the zzz_dir property from the session data
+		this.zzz_dir = data.zzz_dir;
 
-		// Store the current time along with the ping ID
-		const sent_time = Date.now();
-		this.pending_pings.set(id, sent_time);
-
-		this.messages.send(ping);
-	}
-
-	/**
-	 * Handle a pong response from the server
-	 */
-	receive_pong(pong: Message_Pong): void {
-		const received_time = Date.now();
-		const sent_time = this.pending_pings.get(pong.ping_id);
-
-		if (sent_time !== undefined) {
-			// Add the ping data to capabilities
-			this.capabilities.add_ping(pong.ping_id, sent_time, received_time);
-
-			// Clean up the pending ping
-			this.pending_pings.delete(pong.ping_id);
+		// Add files from the session data to diskfiles
+		for (const source_file of data.files) {
+			this.diskfiles.handle_change({
+				type: 'filer_change',
+				id: Uuid.parse(undefined), // TODO shouldnt need to fake, maybe call an internal method directly? or do we want a single path?
+				change: {type: 'add', path: source_file.id},
+				source_file,
+			});
 		}
 	}
 

@@ -11,34 +11,55 @@
 	// Get props with default to context value
 	const {zzz_dir: zzz_dir_prop}: Props = $props();
 	const zzz = zzz_context.get();
-
-	// TODO BLOCK when server is unavailable, change the content to reflect that (see Capabilities_View for connected status style)
+	const {capabilities} = zzz;
 
 	// Fall back to the context value if not provided
 	const zzz_dir = $derived(zzz_dir_prop !== undefined ? zzz_dir_prop : zzz.zzz_dir);
 </script>
 
-<div class="chip plain color_b flex gap_md align_items_center mb_xl size_xl font_weight_400">
-	{#if zzz_dir === undefined}
-		<div>&nbsp;</div>
-	{:else if zzz_dir === null}
-		<div class="row">
-			<Pending_Animation />
+<div
+	class="chip plain flex_1 size_xl px_xl flex_column mb_xl"
+	style:display="flex !important"
+	style:align-items="flex-start !important"
+	style:font-weight="400 !important"
+	class:color_b={capabilities.filesystem.status === 'success'}
+	class:color_c={capabilities.filesystem.status === 'failure'}
+	class:color_d={capabilities.filesystem.status === 'pending'}
+	class:color_e={capabilities.filesystem.status === 'initial'}
+>
+	<div class="column justify_content_center gap_xs pl_md" style:min-height="80px">
+		<div class="size_xl">
+			filesystem {capabilities.filesystem.status === 'success'
+				? 'available'
+				: capabilities.filesystem.status === 'failure'
+					? 'unavailable'
+					: capabilities.filesystem.status === 'pending'
+						? 'loading'
+						: 'not initialized'}
+			{#if capabilities.filesystem.status === 'pending'}
+				<Pending_Animation attrs={{style: 'display: inline-flex !important'}} />
+			{/if}
 		</div>
-	{:else if zzz_dir === ''}
-		<div>No server directory configured</div>
-	{:else}
-		<div>{zzz_dir}</div>
-	{/if}
+		<small class="font_mono">
+			{#if zzz_dir === undefined || zzz_dir === null}
+				&nbsp;
+			{:else if zzz_dir === ''}
+				No server directory configured
+			{:else}
+				{zzz_dir}
+			{/if}
+		</small>
+	</div>
 </div>
+
 <p>
 	This is the server's filesystem directory, the <code>zzz_dir</code>. It defaults to
 	<code>.zzz</code> in the current working directory. To configure it set the .env variable
 	<code class="size_sm">PUBLIC_ZZZ_DIR</code>.
 </p>
 <p>
-	For security reasons, all filesystem operations are confined to this path's parent{#if zzz.zzz_dir_parent},
-		<small class="chip font_mono">{zzz.zzz_dir_parent}</small>,
-	{/if} and the path cannot be modified after the server starts. These restrictions ensure predictability
-	when exposing sensitive resources like your local hard drive to web scripts.
+	For security reasons, all filesystem operations are confined to this path's parent directory,
+	<small class="chip font_mono">{zzz.zzz_dir_parent || '[no zzz dir configured]'}</small>, and the
+	path cannot be modified after the server starts. These restrictions ensure predictability when
+	exposing sensitive resources like your local hard drive to web scripts.
 </p>
