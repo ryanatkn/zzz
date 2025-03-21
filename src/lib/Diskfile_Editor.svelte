@@ -7,6 +7,7 @@
 	import Diskfile_Info from '$lib/Diskfile_Info.svelte';
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import Content_Editor from '$lib/Content_Editor.svelte';
+	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Diskfile_Actions from '$lib/Diskfile_Actions.svelte';
 	import {Diskfile_Editor_State} from '$lib/diskfile_editor_state.svelte.js';
 
@@ -109,11 +110,19 @@
 
 		{#if has_history}
 			<div transition:slide>
-				<small class="px_sm flex justify_content_space_between">history</small>
+				<small class="px_sm flex justify_content_space_between">
+					<Confirm_Button
+						onconfirm={() => editor_state.clear_history()}
+						attrs={{class: 'plain compact'}}
+					>
+						clear history
+					</Confirm_Button>
+				</small>
 				<menu class="unstyled flex flex_column_reverse mt_xs">
 					{#each editor_state.content_history as entry (entry.created)}
 						{@const selected = entry.content === editor_state.updated_content}
 						<button
+							transition:slide
 							type="button"
 							class="button_list_item compact"
 							class:selected

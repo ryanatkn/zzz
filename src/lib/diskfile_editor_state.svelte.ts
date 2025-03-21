@@ -248,4 +248,12 @@ export class Diskfile_Editor_State {
 		this.disk_changed = false;
 		this.disk_content = null;
 	}
+
+	/**
+	 * Clear content history, keeping only the current state
+	 */
+	clear_history(): void {
+		// Keep only the current state in history
+		this.content_history = [{created: Date.now(), content: this.updated_content}];
+	}
 }
