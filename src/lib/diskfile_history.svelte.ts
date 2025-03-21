@@ -9,11 +9,12 @@ import {Uuid} from '$lib/zod_helpers.js';
  * Schema for history entries
  */
 export const History_Entry = z.object({
-	id: Uuid.default(() => Uuid.parse(undefined)), // Add unique ID for each entry
+	id: Uuid.default(() => Uuid.parse(undefined)),
 	created: z.number(),
 	content: z.string(),
 	label: z.string().optional(),
 	is_disk_change: z.boolean().default(false),
+	is_unsaved_edit: z.boolean().default(false), // Indicates entries containing unsaved user edits
 });
 export type History_Entry = z.infer<typeof History_Entry>;
 
@@ -27,7 +28,7 @@ export const Diskfile_History_Json = Cell_Json.extend({
 });
 export type Diskfile_History_Json = z.infer<typeof Diskfile_History_Json>;
 
-export interface Diskfile_History_Options extends Cell_Options<typeof Diskfile_History_Json> {}
+export type Diskfile_History_Options = Cell_Options<typeof Diskfile_History_Json>;
 
 /**
  * Stores edit history for a single diskfile
@@ -56,6 +57,7 @@ export class Diskfile_History extends Cell<typeof Diskfile_History_Json> {
 		content: string,
 		options: {
 			is_disk_change?: boolean;
+			is_unsaved_edit?: boolean;
 			label?: string;
 			created?: number;
 		} = {},
@@ -70,34 +72,40 @@ export class Diskfile_History extends Cell<typeof Diskfile_History_Json> {
 			created: options.created ?? Date.now(),
 			content,
 			is_disk_change: options.is_disk_change ?? false,
+			is_unsaved_edit: options.is_unsaved_edit ?? false,
 		};
 
 		if (options.label) {
 			entry.label = options.label;
 		}
 
+		// Process the entries in a single operation
+		let new_entries = [...this.entries];
+
 		// Find the correct insertion point to maintain sort order (newest first)
 		let insertion_index = 0;
 		while (
-			insertion_index < this.entries.length &&
-			this.entries[insertion_index].created > entry.created
+			insertion_index < new_entries.length &&
+			new_entries[insertion_index].created > entry.created
 		) {
 			insertion_index++;
 		}
 
 		// Insert the entry at the correct position
-		const new_entries = [...this.entries];
 		new_entries.splice(insertion_index, 0, entry);
-		this.entries = new_entries;
 
 		// Trim history if it exceeds max size - already sorted by creation time
-		if (this.entries.length > this.max_entries) {
-			this.entries = this.entries.slice(0, this.max_entries);
+		if (new_entries.length > this.max_entries) {
+			new_entries = new_entries.slice(0, this.max_entries);
 		}
+
+		// Assign entries only once
+		this.entries = new_entries;
 
 		return entry;
 	}
 
+	// TODO maybe make a map for faster lookup?
 	/**
 	 * Find a history entry by ID
 	 */

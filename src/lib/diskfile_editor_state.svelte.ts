@@ -13,6 +13,12 @@ export class Diskfile_Editor_State {
 	zzz: Zzz;
 	diskfile: Diskfile = $state()!;
 
+	// Store the ID of the unsaved edit entry
+	unsaved_edit_entry_id: Uuid | null = $state(null);
+
+	// Track which history entry is currently selected in the UI
+	selected_history_entry_id: Uuid | null = $state(null);
+
 	// Original content derived from diskfile.content, will update when file changes on disk
 	original_content: string | null = $derived(this.diskfile.content);
 
@@ -29,12 +35,18 @@ export class Diskfile_Editor_State {
 
 	// Used to track if the user has edited the content
 	content_was_modified_by_user: boolean = $state(false);
-	discarded_content: string | null = $state(null);
 
 	// Track disk changes
 	disk_changed: boolean = $state(false);
 	last_seen_disk_content: string | null = $state(null);
 	disk_content: string | null = $state(null);
+
+	// Determines which entries content-match the current content
+	content_matching_entry_ids: Array<Uuid> = $derived(
+		this.content_history
+			.filter((entry) => entry.content === this.updated_content)
+			.map((entry) => entry.id),
+	);
 
 	// Getter/setter for updated_content
 	get updated_content(): string {
@@ -42,8 +54,18 @@ export class Diskfile_Editor_State {
 	}
 
 	set updated_content(value: string) {
+		const content_changed = value !== this.#content;
+
+		// Always update content
 		this.#content = value;
-		this.content_was_modified_by_user = true;
+
+		// Mark as modified only if different from original
+		this.content_was_modified_by_user = value !== this.original_content;
+
+		// Only update history if content actually changed
+		if (content_changed) {
+			this.#update_history_entry();
+		}
 	}
 
 	// Basic derived states
@@ -84,7 +106,17 @@ export class Diskfile_Editor_State {
 
 		// Create initial history entry if needed
 		if (this.original_content !== null) {
-			this.#ensure_history().add_entry(this.original_content);
+			const history = this.#ensure_history();
+
+			// Only add entry if needed
+			if (history.entries.length === 0) {
+				history.add_entry(this.original_content);
+			}
+
+			// Always select the current entry when initializing
+			if (history.current_entry) {
+				this.selected_history_entry_id = history.current_entry.id;
+			}
 		}
 	}
 
@@ -101,17 +133,92 @@ export class Diskfile_Editor_State {
 	}
 
 	/**
+	 * Updates existing history entry or creates a new one based on the current content
+	 */
+	#update_history_entry(): void {
+		const history = this.#ensure_history();
+		const matches_original = this.#content === this.original_content;
+
+		// If content matches original, remove any unsaved entry
+		if (matches_original) {
+			if (this.unsaved_edit_entry_id) {
+				const entry_index = history.entries.findIndex(
+					(entry) => entry.id === this.unsaved_edit_entry_id,
+				);
+				if (entry_index !== -1) {
+					history.entries.splice(entry_index, 1);
+				}
+
+				this.unsaved_edit_entry_id = null;
+
+				// Instead of clearing selection entirely, select the most recent entry
+				if (history.current_entry) {
+					this.selected_history_entry_id = history.current_entry.id;
+				} else {
+					this.selected_history_entry_id = null;
+				}
+			}
+			return;
+		}
+
+		// If we're currently editing an unsaved entry, update it
+		if (this.unsaved_edit_entry_id) {
+			const unsaved_entry = history.find_entry_by_id(this.unsaved_edit_entry_id);
+			if (unsaved_entry) {
+				unsaved_entry.content = this.#content;
+				this.selected_history_entry_id = this.unsaved_edit_entry_id;
+				return;
+			}
+		}
+
+		// Look for an existing history entry with matching content before creating a new one
+		const matching_entry = history.entries.find(
+			(entry) => entry.content === this.#content && !entry.is_unsaved_edit,
+		);
+
+		if (matching_entry) {
+			// Found a matching entry, select it instead of creating a new one
+			this.selected_history_entry_id = matching_entry.id;
+			return;
+		}
+
+		// Create a new unsaved entry
+		const new_entry = history.add_entry(this.#content, {
+			created: Date.now(),
+			label: 'Unsaved edit',
+			is_unsaved_edit: true,
+		});
+
+		this.unsaved_edit_entry_id = new_entry.id;
+		this.selected_history_entry_id = new_entry.id;
+	}
+
+	/**
 	 * Reset the editor state to match the current diskfile content
 	 */
 	reset(): void {
 		// Set content directly without marking as user-modified
 		this.#content = this.original_content ?? '';
 
-		this.discarded_content = null;
 		this.disk_changed = false;
 		this.last_seen_disk_content = this.diskfile.content;
 		this.disk_content = null;
 		this.content_was_modified_by_user = false;
+
+		// Reset the unsaved edit entry
+		if (this.unsaved_edit_entry_id) {
+			const history = this.history;
+			if (history) {
+				const existing_entry = history.find_entry_by_id(this.unsaved_edit_entry_id);
+				if (existing_entry) {
+					existing_entry.is_unsaved_edit = false;
+				}
+			}
+			this.unsaved_edit_entry_id = null;
+		}
+
+		// Clear selection
+		this.selected_history_entry_id = null;
 	}
 
 	/**
@@ -120,12 +227,19 @@ export class Diskfile_Editor_State {
 	save_changes(): boolean {
 		if (!this.has_changes) return false;
 
-		// Add to history before saving
-		this.#ensure_history().add_entry(this.updated_content);
+		const history = this.#ensure_history();
+
+		// Remove any entries that have the unsaved flag
+		if (history.entries.length > 0) {
+			const clean_entries = history.entries.filter((entry) => !entry.is_unsaved_edit);
+			history.entries = clean_entries;
+		}
+
+		// Add a new entry for the saved content
+		const entry = history.add_entry(this.updated_content);
 
 		// Save to the file
 		this.zzz.diskfiles.update(this.path, this.updated_content);
-		this.discarded_content = null;
 
 		// Update last seen content after saving
 		this.last_seen_disk_content = this.updated_content;
@@ -133,26 +247,13 @@ export class Diskfile_Editor_State {
 		this.disk_content = null;
 		this.content_was_modified_by_user = false;
 
-		return true;
-	}
+		// Clear unsaved edit reference
+		this.unsaved_edit_entry_id = null;
 
-	/**
-	 * Handle discarding or restoring changes
-	 * @param new_value If empty, discard changes. Otherwise, restore to this value.
-	 */
-	discard_changes(new_value: string): void {
-		// If we're restoring, the new value is the previously discarded content
-		// If we're discarding, the new value is empty and we set updated_content to the original file content
-		if (new_value) {
-			// Use setter to track modification
-			this.updated_content = new_value;
-			this.discarded_content = null;
-		} else {
-			this.discarded_content = this.updated_content;
-			// Set content directly without marking as user-modified
-			this.#content = this.original_content ?? '';
-			this.content_was_modified_by_user = false;
-		}
+		// Set selection to the newly saved entry
+		this.selected_history_entry_id = entry.id;
+
+		return true;
 	}
 
 	/**
@@ -163,10 +264,23 @@ export class Diskfile_Editor_State {
 		if (!history) return;
 
 		const content = history.get_content(id);
-		if (content) {
-			// Use setter to track modification
-			this.updated_content = content;
-			this.discarded_content = null;
+		// Ensure we handle empty string case properly by checking for null specifically
+		if (content !== null) {
+			// Track which history entry is selected
+			this.selected_history_entry_id = id;
+
+			// Set content directly - will be marked as modified only if edited
+			this.#content = content;
+			this.content_was_modified_by_user = content !== this.original_content;
+
+			// If we select an entry that has unsaved changes, update the unsaved entry reference
+			const selected_entry = history.find_entry_by_id(id);
+			if (selected_entry?.is_unsaved_edit) {
+				this.unsaved_edit_entry_id = id;
+			} else {
+				// Clear unsaved entry reference for non-unsaved entries
+				this.unsaved_edit_entry_id = null;
+			}
 		}
 	}
 
@@ -190,6 +304,11 @@ export class Diskfile_Editor_State {
 			// Only add an entry if there's no history yet for this file
 			if (history.entries.length === 0) {
 				history.add_entry(this.original_content);
+			}
+
+			// Always select the current entry when switching files
+			if (history.current_entry) {
+				this.selected_history_entry_id = history.current_entry.id;
 			}
 		}
 	}
@@ -221,10 +340,13 @@ export class Diskfile_Editor_State {
 			this.#content = this.diskfile.content || '';
 
 			// Add to history with disk change flag
-			this.#ensure_history().add_entry(this.updated_content, {
+			const disk_entry = this.#ensure_history().add_entry(this.updated_content, {
 				is_disk_change: true,
 				label: 'Disk change',
 			});
+
+			// Select the disk change entry
+			this.selected_history_entry_id = disk_entry.id;
 
 			// Update tracking variables
 			this.last_seen_disk_content = this.diskfile.content;
@@ -264,7 +386,7 @@ export class Diskfile_Editor_State {
 		this.#content = this.disk_content;
 
 		// Add the new content to history with incremented timestamp and special label
-		history.add_entry(this.updated_content, {
+		const disk_entry = history.add_entry(this.updated_content, {
 			created: now + 1,
 			is_disk_change: true,
 			label: 'Accepted disk change',
@@ -275,6 +397,12 @@ export class Diskfile_Editor_State {
 		this.disk_changed = false;
 		this.disk_content = null;
 		this.content_was_modified_by_user = false;
+
+		// Clear any unsaved changes
+		this.unsaved_edit_entry_id = null;
+
+		// Select the disk change entry
+		this.selected_history_entry_id = disk_entry.id;
 	}
 
 	/**
@@ -305,6 +433,10 @@ export class Diskfile_Editor_State {
 		const history = this.history;
 		if (history) {
 			history.clear_except_current();
+
+			// Clear selection since entries are gone
+			this.selected_history_entry_id = null;
+			this.unsaved_edit_entry_id = null;
 		}
 	}
 }

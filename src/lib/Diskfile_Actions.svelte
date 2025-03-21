@@ -36,7 +36,6 @@
 	// Access editor state values directly
 	const content = $derived(editor_state.updated_content);
 	const has_changes = $derived(editor_state.has_changes);
-	const discarded_content = $derived(editor_state.discarded_content);
 	const file_changed_on_disk = $derived(editor_state.disk_changed);
 
 	/**
@@ -85,7 +84,7 @@
 {/if}
 
 {#if !readonly && !auto_save}
-	<div class="mt_xs flex gap_sm" transition:slide>
+	<div class="mt_xs flex" transition:slide>
 		<button
 			class="flex_1 color_a"
 			type="button"
@@ -94,20 +93,6 @@
 		>
 			{save_button_text}
 		</button>
-
-		<Clear_Restore_Button
-			value={discarded_content ? '' : has_changes ? content : ''}
-			onchange={(value) => editor_state.discard_changes(value)}
-			attrs={{
-				disabled: !has_changes && discarded_content === null,
-				class: 'plain flex_1 white_space_nowrap', // nowrap is a hack, some weirdness with the height of the clear/restore stuff
-			}}
-		>
-			discard changes
-			{#snippet restore()}
-				undo discard
-			{/snippet}
-		</Clear_Restore_Button>
 	</div>
 {/if}
 

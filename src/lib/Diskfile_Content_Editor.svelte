@@ -68,13 +68,16 @@
 						<button
 							type="button"
 							class="plain justify_content_space_between size_sm py_xs3"
-							class:selected={entry.content === editor_state.updated_content}
+							class:selected={entry.id === editor_state.selected_history_entry_id}
 							onclick={() => {
 								editor_state.set_content_from_history(entry.id);
 								content_editor?.focus();
 							}}
 						>
 							<span>{format(new Date(entry.created), 'HH:mm:ss')}</span>
+							{#if entry.is_unsaved_edit}
+								<span class="unsaved_tag">unsaved</span>
+							{/if}
 							<span>{entry.content.length} chars</span>
 						</button>
 					{/each}
@@ -92,5 +95,10 @@
 
 	summary {
 		cursor: pointer;
+	}
+
+	.unsaved_tag {
+		color: var(--color_c);
+		font-size: 0.8em;
 	}
 </style>

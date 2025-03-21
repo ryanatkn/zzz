@@ -1,329 +1,219 @@
 // @vitest-environment jsdom
 
-import {test, expect, vi} from 'vitest';
+import {test, expect, beforeEach} from 'vitest';
 
 import {Diskfile_History} from '$lib/diskfile_history.svelte.js';
 import {Diskfile_Path} from '$lib/diskfile_types.js';
 import {Uuid} from '$lib/zod_helpers.js';
+import {Zzz} from '$lib/zzz.svelte.js';
 
-// Mock timestamp for consistent testing
-const MOCK_TIMESTAMP = 1234567890;
+// Test data
+const TEST_PATH = Diskfile_Path.parse('/path/to/file.txt');
+const TEST_CONTENT = 'Test content';
 
-// Create a mock zzz object
-const create_mock_zzz = () => {
-	return {
-		time: {
-			now: vi.fn(() => MOCK_TIMESTAMP),
-			get_date: vi.fn(() => new Date(MOCK_TIMESTAMP)),
-		},
-		registry: {
-			instantiate: vi.fn(),
-		},
-		cells: new Map(),
-	};
-};
+// Test suite
+let zzz: Zzz;
+let history: Diskfile_History;
 
-test('Diskfile_History - initialization', () => {
-	const mock_zzz = create_mock_zzz();
-	const path = Diskfile_Path.parse('/path/to/file.txt');
+beforeEach(() => {
+	// Create a real Zzz instance for each test
+	zzz = new Zzz();
 
-	const history = new Diskfile_History({
-		zzz: mock_zzz as any,
+	// Create a fresh history instance for each test with the real Zzz instance
+	history = new Diskfile_History({
+		zzz,
 		json: {
-			path,
+			path: TEST_PATH,
 			entries: [],
 		},
 	});
+});
 
-	expect(history.path).toBe(path);
+test('Diskfile_History - initialization creates empty history', () => {
+	expect(history.path).toBe(TEST_PATH);
 	expect(history.entries).toEqual([]);
 	expect(history.max_entries).toBe(100);
 	expect(history.current_entry).toBe(null);
 });
 
-test('Diskfile_History - add_entry generates UUID and uses current time', () => {
-	const mock_zzz = create_mock_zzz();
-	const path = Diskfile_Path.parse('/path/to/file.txt');
+test('Diskfile_History - add_entry creates new entry', () => {
+	const entry = history.add_entry(TEST_CONTENT);
 
-	const history = new Diskfile_History({
-		zzz: mock_zzz as any,
-		json: {
-			path,
-			entries: [],
-		},
-	});
-
-	// Add an entry without specifying a timestamp
-	const entry = history.add_entry('test content');
-
-	// Check that a UUID was generated and time.now was used
+	// Verify entry was created with proper structure
 	expect(history.entries.length).toBe(1);
-	expect(history.entries[0]).toEqual({
-		id: expect.any(String),
-		created: expect.any(Number),
-		content: 'test content',
-		is_disk_change: false,
-	});
-
-	// Verify the returned entry matches what was added
-	expect(entry).toEqual(history.entries[0]);
+	expect(entry.content).toBe(TEST_CONTENT);
+	expect(entry.id).toBeDefined();
+	expect(typeof entry.created).toBe('number');
+	expect(entry.is_disk_change).toBe(false);
+	expect(entry.is_unsaved_edit).toBe(false);
 });
 
-test('Diskfile_History - add_entry with custom timestamp', () => {
-	const mock_zzz = create_mock_zzz();
-	const path = Diskfile_Path.parse('/path/to/file.txt');
+test('Diskfile_History - add_entry with custom options', () => {
+	const custom_timestamp = Date.now() - 1000;
 
-	const history = new Diskfile_History({
-		zzz: mock_zzz as any,
-		json: {
-			path,
-			entries: [],
-		},
-	});
-
-	const custom_timestamp = 9876543210;
-
-	// Add an entry with a specific timestamp
-	const entry = history.add_entry('test content', {
+	const entry = history.add_entry(TEST_CONTENT, {
 		created: custom_timestamp,
+		is_disk_change: true,
+		is_unsaved_edit: true,
+		label: 'Custom Label',
 	});
 
-	// Check that the custom timestamp was used
-	expect(history.entries.length).toBe(1);
-	expect(history.entries[0].created).toBe(custom_timestamp);
+	// Verify all options were applied
 	expect(entry.created).toBe(custom_timestamp);
+	expect(entry.is_disk_change).toBe(true);
+	expect(entry.is_unsaved_edit).toBe(true);
+	expect(entry.label).toBe('Custom Label');
 });
 
-test('Diskfile_History - add_entry with options', () => {
-	const mock_zzz = create_mock_zzz();
-	const path = Diskfile_Path.parse('/path/to/file.txt');
+test('Diskfile_History - entries are sorted by creation time', () => {
+	// Add entries with timestamps in non-chronological order
+	const time3 = Date.now();
+	const time2 = time3 - 1000;
+	const time1 = time2 - 1000;
 
-	const history = new Diskfile_History({
-		zzz: mock_zzz as any,
+	history.add_entry('content 2', {created: time2});
+	history.add_entry('content 3', {created: time3});
+	history.add_entry('content 1', {created: time1});
+
+	// Verify entries are sorted newest first
+	expect(history.entries.length).toBe(3);
+	expect(history.entries[0].content).toBe('content 3');
+	expect(history.entries[1].content).toBe('content 2');
+	expect(history.entries[2].content).toBe('content 1');
+});
+
+test('Diskfile_History - current_entry returns most recent entry', () => {
+	// Add entries
+	history.add_entry('first entry');
+	const latest = history.add_entry('latest entry');
+
+	// Verify current_entry points to most recent
+	expect(history.current_entry).toBe(history.entries[0]);
+	expect(history.current_entry).toEqual(latest);
+});
+
+test('Diskfile_History - add_entry skips duplicate content back-to-back', () => {
+	// Add initial entry
+	const first = history.add_entry(TEST_CONTENT);
+
+	// Add duplicate entry
+	const duplicate = history.add_entry(TEST_CONTENT);
+
+	// Verify no new entry was added and original was returned
+	expect(history.entries.length).toBe(1);
+	expect(duplicate).toEqual(first);
+	expect(duplicate.id).toBe(first.id);
+});
+
+test('Diskfile_History - add_entry respects max_entries limit', () => {
+	// Create history with small limit
+	const small_history = new Diskfile_History({
+		zzz,
 		json: {
-			path,
+			path: TEST_PATH,
 			entries: [],
 		},
 	});
-
-	// Add an entry with all options
-	const entry = history.add_entry('test content', {
-		created: MOCK_TIMESTAMP,
-		is_disk_change: true,
-		label: 'Test Label',
-	});
-
-	// Check that all options were applied correctly
-	expect(history.entries.length).toBe(1);
-	expect(history.entries[0]).toEqual({
-		id: expect.any(String),
-		created: MOCK_TIMESTAMP,
-		content: 'test content',
-		is_disk_change: true,
-		label: 'Test Label',
-	});
-
-	// Verify returned entry has the label
-	expect(entry.label).toBe('Test Label');
-});
-
-test('Diskfile_History - add_entry skips duplicate back-to-back entries', () => {
-	const mock_zzz = create_mock_zzz();
-	const path = Diskfile_Path.parse('/path/to/file.txt');
-
-	// Create a UUID for our test entry
-	const entry_id = Uuid.parse(undefined);
-
-	const history = new Diskfile_History({
-		zzz: mock_zzz as any,
-		json: {
-			path,
-			entries: [
-				{
-					id: entry_id,
-					created: MOCK_TIMESTAMP - 1000,
-					content: 'test content',
-					is_disk_change: false,
-				},
-			],
-		},
-	});
-
-	// Try to add an entry with the same content
-	const duplicate_entry = history.add_entry('test content');
-
-	// Check that no new entry was added and the original entry was returned
-	expect(history.entries.length).toBe(1);
-	expect(history.entries[0].created).toBe(MOCK_TIMESTAMP - 1000);
-	expect(duplicate_entry.id).toBe(entry_id);
-});
-
-test('Diskfile_History - add_entry trims history when it exceeds max_entries', () => {
-	const mock_zzz = create_mock_zzz();
-	const path = Diskfile_Path.parse('/path/to/file.txt');
-
-	// Create history with small max_entries
-	const history = new Diskfile_History({
-		zzz: mock_zzz as any,
-		json: {
-			path,
-			entries: [],
-			max_entries: 3,
-		},
-	});
+	small_history.max_entries = 3;
 
 	// Add more entries than the maximum
-	history.add_entry('content 1', {created: 1000});
-	history.add_entry('content 2', {created: 2000});
-	history.add_entry('content 3', {created: 3000});
-	history.add_entry('content 4', {created: 4000});
+	small_history.add_entry('content 1', {created: Date.now() - 3000});
+	small_history.add_entry('content 2', {created: Date.now() - 2000});
+	small_history.add_entry('content 3', {created: Date.now() - 1000});
+	small_history.add_entry('content 4', {created: Date.now()});
 
-	// Check that only the most recent entries are kept
-	expect(history.entries.length).toBe(3);
-	expect(history.entries[0].content).toBe('content 2');
-	expect(history.entries[1].content).toBe('content 3');
-	expect(history.entries[2].content).toBe('content 4');
+	// Verify only the most recent entries were kept
+	expect(small_history.entries.length).toBe(3);
+	expect(small_history.entries[0].content).toBe('content 4');
+	expect(small_history.entries[1].content).toBe('content 3');
+	expect(small_history.entries[2].content).toBe('content 2');
 });
 
-test('Diskfile_History - find_entry_by_id returns the correct entry', () => {
-	const mock_zzz = create_mock_zzz();
-	const path = Diskfile_Path.parse('/path/to/file.txt');
+test('Diskfile_History - find_entry_by_id finds correct entry', () => {
+	// Add some entries
+	history.add_entry('content 1');
+	const entry2 = history.add_entry('content 2');
+	history.add_entry('content 3');
 
-	// Create test entries with IDs
-	const entry1_id = Uuid.parse(undefined);
-	const entry2_id = Uuid.parse(undefined);
-	const entry3_id = Uuid.parse(undefined);
+	// Find an entry by ID
+	const found = history.find_entry_by_id(entry2.id);
 
-	const entries = [
-		{id: entry1_id, created: 1000, content: 'content 1', is_disk_change: false},
-		{id: entry2_id, created: 2000, content: 'content 2', is_disk_change: true},
-		{id: entry3_id, created: 3000, content: 'content 3', is_disk_change: false},
-	];
+	// Verify the right entry was found
+	expect(found).toBeDefined();
+	expect(found!.id).toBe(entry2.id);
+	expect(found!.content).toBe('content 2');
 
-	const history = new Diskfile_History({
-		zzz: mock_zzz as any,
-		json: {
-			path,
-			entries,
-		},
-	});
-
-	// Find existing entry
-	const found = history.find_entry_by_id(entry2_id);
-
-	// Check result
-	expect(found).toEqual(entries[1]);
-	expect(found?.content).toBe('content 2');
-
-	// Try to find non-existent entry
-	const not_found = history.find_entry_by_id(Uuid.parse(undefined));
-	expect(not_found).toBeUndefined();
+	// Verify non-existent ID returns undefined
+	const unknown_id = Uuid.parse(undefined);
+	expect(history.find_entry_by_id(unknown_id)).toBeUndefined();
 });
 
 test('Diskfile_History - get_content returns content from entry', () => {
-	const mock_zzz = create_mock_zzz();
-	const path = Diskfile_Path.parse('/path/to/file.txt');
+	// Add an entry
+	const entry = history.add_entry('specific content');
 
-	// Create test entries with IDs
-	const entry1_id = Uuid.parse(undefined);
-	const entry2_id = Uuid.parse(undefined);
+	// Get content by ID
+	const content = history.get_content(entry.id);
 
-	const entries = [
-		{id: entry1_id, created: 1000, content: 'content 1', is_disk_change: false},
-		{id: entry2_id, created: 2000, content: 'content 2', is_disk_change: true},
-	];
+	// Verify content was retrieved
+	expect(content).toBe('specific content');
 
-	const history = new Diskfile_History({
-		zzz: mock_zzz as any,
-		json: {
-			path,
-			entries,
-		},
-	});
-
-	// Get content from existing entry
-	expect(history.get_content(entry1_id)).toBe('content 1');
-
-	// Try to get content from non-existent entry
-	expect(history.get_content(Uuid.parse(undefined))).toBeNull();
+	// Verify non-existent ID returns null
+	const unknown_id = Uuid.parse(undefined);
+	expect(history.get_content(unknown_id)).toBeNull();
 });
 
-test('Diskfile_History - clear_except_current keeps only most recent entry', () => {
-	const mock_zzz = create_mock_zzz();
-	const path = Diskfile_Path.parse('/path/to/file.txt');
+test('Diskfile_History - clear_except_current keeps only newest entry', () => {
+	// Add multiple entries
+	history.add_entry('old content 1');
+	history.add_entry('old content 2');
+	const newest = history.add_entry('newest content');
 
-	const entry1_id = Uuid.parse(undefined);
-	const entry2_id = Uuid.parse(undefined);
-	const entry3_id = Uuid.parse(undefined);
+	// Verify we have multiple entries
+	expect(history.entries.length).toBe(3);
 
-	const entries = [
-		{id: entry1_id, created: 1000, content: 'content 1', is_disk_change: false},
-		{id: entry2_id, created: 2000, content: 'content 2', is_disk_change: true},
-		{id: entry3_id, created: 3000, content: 'content 3', is_disk_change: false},
-	];
-
-	const history = new Diskfile_History({
-		zzz: mock_zzz as any,
-		json: {
-			path,
-			entries,
-		},
-	});
-
-	// Clear history except the most recent entry
+	// Clear all except current
 	history.clear_except_current();
 
-	// Check that only the most recent entry remains
+	// Verify only newest remains
 	expect(history.entries.length).toBe(1);
-	expect(history.entries[0].content).toBe('content 3');
-	expect(history.entries[0].id).toBe(entry3_id);
+	expect(history.entries[0].id).toBe(newest.id);
+	expect(history.entries[0].content).toBe('newest content');
 });
 
-test('Diskfile_History - clear_except_current does nothing for empty history', () => {
-	const mock_zzz = create_mock_zzz();
-	const path = Diskfile_Path.parse('/path/to/file.txt');
+test('Diskfile_History - clear_except_current handles empty history', () => {
+	// Start with empty history
+	expect(history.entries.length).toBe(0);
 
-	const history = new Diskfile_History({
-		zzz: mock_zzz as any,
-		json: {
-			path,
-			entries: [],
-		},
-	});
-
-	// Call clear on empty history
+	// Call clear - should not error
 	history.clear_except_current();
 
-	// Check that it's still empty
+	// Should still be empty
 	expect(history.entries.length).toBe(0);
 });
 
-test('Diskfile_History - current_entry provides the most recent entry', () => {
-	const mock_zzz = create_mock_zzz();
-	const path = Diskfile_Path.parse('/path/to/file.txt');
-
-	const entry1_id = Uuid.parse(undefined);
-	const entry2_id = Uuid.parse(undefined);
-
-	const entries = [
-		{id: entry1_id, created: 1000, content: 'content 1', is_disk_change: false},
-		{id: entry2_id, created: 2000, content: 'content 2', is_disk_change: true},
-	];
-
-	const history = new Diskfile_History({
-		zzz: mock_zzz as any,
-		json: {
-			path,
-			entries,
-		},
+test('Diskfile_History - add_entry handles is_unsaved_edit flag', () => {
+	// Add entry with current edit flag
+	const entry = history.add_entry(TEST_CONTENT, {
+		is_unsaved_edit: true,
 	});
 
-	// Check current entry
-	expect(history.current_entry).toEqual(entries[1]);
-	expect(history.current_entry?.id).toBe(entry2_id);
+	// Verify flag was set
+	expect(entry.is_unsaved_edit).toBe(true);
+	expect(history.entries[0].is_unsaved_edit).toBe(true);
+});
 
-	// Add a new entry and verify current_entry updates
-	const new_entry = history.add_entry('content 3');
-	expect(history.current_entry?.content).toBe('content 3');
-	expect(history.current_entry?.id).toBe(new_entry.id);
+test('Diskfile_History - add_entry maintains insertion order with single assignment', () => {
+	// Add multiple entries
+	const before_length = history.entries.length;
+
+	// Get initial entries array reference
+	const initial_entries = history.entries;
+
+	// Add an entry
+	history.add_entry(TEST_CONTENT);
+
+	// Verify entries array was replaced, not mutated in place
+	expect(history.entries).not.toBe(initial_entries);
+	expect(history.entries.length).toBe(before_length + 1);
 });

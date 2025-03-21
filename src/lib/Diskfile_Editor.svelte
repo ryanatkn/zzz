@@ -121,14 +121,16 @@
 				</small>
 				<menu class="unstyled flex flex_column">
 					{#each editor_state.content_history as entry (entry.id)}
-						{@const selected = entry.content === editor_state.updated_content}
+						{@const selected = entry.id === editor_state.selected_history_entry_id}
+						{@const content_matches = editor_state.content_matching_entry_ids.includes(entry.id)}
+						<!-- TODO `class:plain={!selected}` is a hack around a Moss bug -->
 						<button
 							transition:slide
 							type="button"
 							class="button_list_item compact"
 							class:selected
-							class:plain={!selected}
-							class:disk_change={entry.is_disk_change}
+							class:content_matches
+							class:plain={!selected && !content_matches}
 							onclick={() => {
 								editor_state.set_content_from_history(entry.id);
 								content_editor?.focus();
@@ -139,6 +141,8 @@
 							<span>{format(new Date(entry.created), FILE_TIME_FORMAT)}</span>
 							{#if entry.is_disk_change}
 								<span>disk</span>
+							{:else if entry.is_unsaved_edit}
+								<span>unsaved</span>
 							{/if}
 							<span>{entry.content.length} chars</span>
 						</button>
@@ -165,7 +169,7 @@
 		padding: var(--space_xs2);
 	}
 
-	.disk_change {
-		border-left: 2px solid var(--color_c);
+	.content_matches:not(.selected) {
+		background-color: var(--fg_1);
 	}
 </style>
