@@ -20,6 +20,7 @@
 	// Create editor state once and reuse it
 	const editor_state = new Diskfile_Editor_State({zzz, diskfile});
 
+	// TODO BLOCK try to think about restructuring this, maybe using only derived and event handlers (zzz event bus maybe?)
 	// Combined effect to handle diskfile changes and disk change detection
 	$effect.pre(() => {
 		// Track diskfile changes explicitly

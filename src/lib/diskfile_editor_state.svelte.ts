@@ -228,8 +228,21 @@ export class Diskfile_Editor_State {
 
 	/**
 	 * Reject changes from disk, keeping current editor content
+	 * but adding the disk change to history for reference
 	 */
 	reject_disk_changes(): void {
+		// Add disk content to history as a reference point, but don't apply it
+		if (this.disk_content !== null) {
+			// Create a unique timestamp
+			const now = Date.now();
+
+			// Add the ignored disk content to history
+			this.content_history.push({
+				created: now, // TODO how to get the actual created/updated from the diskfile?
+				content: this.disk_content, // preserve exact content so it can be restored as requested
+			});
+		}
+
 		// Update tracking without changing editor content
 		this.last_seen_disk_content = this.diskfile.content;
 		this.disk_changed = false;

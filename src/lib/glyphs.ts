@@ -1,3 +1,7 @@
+export const GLYPH_UNKNOWN = '⁇'; // ⍰
+export const GLYPH_IMPORTANT = '⁈';
+export const GLYPH_INFO = 'ⓘ';
+
 export const GLYPH_ADD = '✛'; // + ✚ ✛ ✜
 export const GLYPH_REMOVE = '⨉'; // ⨉ ✕ 🗙 ⤫ ⤬ ✗ ✘
 export const GLYPH_DELETE = '⌧'; // ⌧ ⌫ ⨂ ⊝ ⦸
@@ -12,8 +16,6 @@ export const GLYPH_REFRESH = '⟳'; //
 export const GLYPH_CONNECT = '⭍'; // ⨁
 export const GLYPH_DISCONNECT = '⨂';
 export const GLYPH_RETRY = '↺'; // ⟲'; // ⟲ ⟳ ⤾ ⤼ ↻
-export const GLYPH_INFO = 'ⓘ';
-export const GLYPH_IMPORTANT = '⁈';
 export const GLYPH_PLACEHOLDER = '↳';
 
 // export const GLYPH_EDIT = '✎'; // ✎ ✏ ✐ ✑ ✒
@@ -81,7 +83,7 @@ export const get_direction_icon = (direction: string): string => {
 		case 'both':
 			return GLYPH_DIRECTION_BOTH;
 		default:
-			return '?';
+			return GLYPH_UNKNOWN;
 	}
 };
 

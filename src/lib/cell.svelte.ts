@@ -100,10 +100,17 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 
 	/**
 	 * Initialize the instance with `options.json` data if provided.
-	 * Should be called by subclasses at the end of their constructor
-	 * or elsewhere before using the instance.
-	 * It can't be called automatically by the Cell's constructor because
-	 * the subclass' constructor needs to run first.
+	 * Must be called before using the instance -
+	 * the current pattern is calling it at the end of subclass constructors.
+	 *
+	 * We should investigate deferring to callers so e.g. instantiating from the registry
+	 * would init automatically, subclasses need no init logic (which can get unwieldy with inheritance),
+	 * and then callers could always do custom init patterns if they wanted.
+	 *
+	 * Can't be called automatically by the Cell's constructor because
+	 * the subclass' constructor needs to run first to support field initialization.
+	 * A design goal behind the Cell is to support normal TS and Svelte patterns
+	 * with the most power and least intrusion. (there's a balance to find from Zzz's POV)
 	 */
 	protected init(): void {
 		const initial_json = this.#initial_json;
