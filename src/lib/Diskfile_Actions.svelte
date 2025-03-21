@@ -4,6 +4,7 @@
 	import {slide} from 'svelte/transition';
 
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
+	import Diskfile_History_Panel from '$lib/Diskfile_History_Panel.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
@@ -16,6 +17,8 @@
 		save_button_text?: string;
 		readonly?: boolean;
 		auto_save?: boolean;
+		on_accept_disk_changes?: () => void;
+		on_reject_disk_changes?: () => void;
 	}
 
 	const {
@@ -24,6 +27,8 @@
 		save_button_text = 'save changes',
 		readonly = false,
 		auto_save = false,
+		on_accept_disk_changes,
+		on_reject_disk_changes,
 	}: Props = $props();
 
 	const zzz = zzz_context.get();
@@ -32,6 +37,7 @@
 	const content = $derived(editor_state.updated_content);
 	const has_changes = $derived(editor_state.has_changes);
 	const discarded_content = $derived(editor_state.discarded_content);
+	const file_changed_on_disk = $derived(editor_state.disk_changed);
 
 	/**
 	 * Handle pasting content from clipboard
@@ -71,6 +77,13 @@
 	</Confirm_Button>
 </div>
 
+<!-- File changed on disk notification -->
+{#if file_changed_on_disk}
+	<div class="disk_change_alert panel p_sm mt_sm" transition:slide={{duration: 200}}>
+		<Diskfile_History_Panel {editor_state} {on_accept_disk_changes} {on_reject_disk_changes} />
+	</div>
+{/if}
+
 {#if !readonly && !auto_save}
 	<div class="mt_xs flex gap_sm" transition:slide={{duration: 120}}>
 		<button
@@ -94,3 +107,10 @@
 		</Clear_Restore_Button>
 	</div>
 {/if}
+
+<style>
+	.disk_change_alert {
+		border-left: 3px solid var(--color_c);
+		margin-bottom: var(--space_sm);
+	}
+</style>

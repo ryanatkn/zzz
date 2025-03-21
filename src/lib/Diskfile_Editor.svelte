@@ -9,7 +9,6 @@
 	import Content_Editor from '$lib/Content_Editor.svelte';
 	import Diskfile_Actions from '$lib/Diskfile_Actions.svelte';
 	import {Diskfile_Editor_State} from '$lib/diskfile_editor_state.svelte.js';
-	import Diskfile_History_Panel from '$lib/Diskfile_History_Panel.svelte';
 
 	interface Props {
 		diskfile: Diskfile;
@@ -62,17 +61,6 @@
 			attrs={{class: 'radius_0'}}
 			bind:this={content_editor}
 		/>
-
-		<Diskfile_History_Panel
-			{editor_state}
-			on_accept_disk_changes={() => {
-				editor_state.accept_disk_changes();
-				content_editor?.focus();
-			}}
-			on_reject_disk_changes={() => {
-				editor_state.reject_disk_changes();
-			}}
-		/>
 	</div>
 
 	<div class="width_sm">
@@ -81,7 +69,14 @@
 		</div>
 
 		<div class="mb_md p_md">
-			<Diskfile_Actions {diskfile} {editor_state} />
+			<Diskfile_Actions
+				{diskfile}
+				{editor_state}
+				on_accept_disk_changes={() => {
+					editor_state.accept_disk_changes();
+					content_editor?.focus();
+				}}
+			/>
 		</div>
 
 		{#if diskfile.dependencies_count || diskfile.dependents_count}

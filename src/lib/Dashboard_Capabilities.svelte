@@ -3,11 +3,6 @@
 	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
 	import Footer from '$routes/Footer.svelte';
 	import Capabilities_View from '$lib/Capabilities_View.svelte';
-
-	// TODO display capabilities (like what APIs are available, including remote server (off when deployed statically), local pglite (could be disconnected, websockets?))
-	// TODO display database info/explorer
-
-	// TODO BLOCK use native popover with viewport-relative positioning
 </script>
 
 <div class="p_lg">

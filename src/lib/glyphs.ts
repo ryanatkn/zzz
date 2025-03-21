@@ -13,6 +13,7 @@ export const GLYPH_CONNECT = '⭍'; // ⨁
 export const GLYPH_DISCONNECT = '⨂';
 export const GLYPH_RETRY = '↺'; // ⟲'; // ⟲ ⟳ ⤾ ⤼ ↻
 export const GLYPH_INFO = 'ⓘ';
+export const GLYPH_IMPORTANT = '⁈';
 export const GLYPH_PLACEHOLDER = '↳';
 
 // export const GLYPH_EDIT = '✎'; // ✎ ✏ ✐ ✑ ✒
@@ -92,6 +93,7 @@ export const get_direction_icon = (direction: string): string => {
 
 // ⊞
 // ⊟
+// ⟁
 
 // ⇇ ⇉  maybe use these for deps?
 
