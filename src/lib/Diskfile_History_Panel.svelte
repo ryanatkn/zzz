@@ -21,13 +21,18 @@
 		<Glyph_Icon icon={GLYPH_IMPORTANT} size="var(--size_xl3)" /> file changed on disk
 	</div>
 </div>
-<div class="column gap_xs2 size_sm">
+<div class="column gap_xs2">
 	<div>The file has been modified outside of the editor.</div>
 	<div class="flex gap_sm">
-		<button type="button" class="color_g" onclick={on_accept_disk_changes}> accept changes </button>
-		<button type="button" class="color_h" onclick={on_reject_disk_changes}>
+		<button type="button" class="flex_1 color_g" onclick={on_accept_disk_changes}>
+			accept changes
+		</button>
+		<button type="button" class="flex_1 color_h" onclick={on_reject_disk_changes}>
 			ignore state on disk
 		</button>
 	</div>
-	<div>Accept to update your editor with the new content, ignore to keep your current version.</div>
+	<div>
+		Accept to update your editor with the new content, ignore to keep your current version. Saving
+		will also ignore the state on disk.
+	</div>
 </div>

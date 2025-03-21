@@ -79,15 +79,15 @@
 
 <!-- File changed on disk notification -->
 {#if file_changed_on_disk}
-	<div class="disk_change_alert panel p_sm mt_sm" transition:slide={{duration: 200}}>
+	<div class="disk_change_alert panel p_sm mt_sm shadow_inset_top_xs" transition:slide>
 		<Diskfile_History_Panel {editor_state} {on_accept_disk_changes} {on_reject_disk_changes} />
 	</div>
 {/if}
 
 {#if !readonly && !auto_save}
-	<div class="mt_xs flex gap_sm" transition:slide={{duration: 120}}>
+	<div class="mt_xs flex gap_sm" transition:slide>
 		<button
-			class="color_a"
+			class="flex_1 color_a"
 			type="button"
 			disabled={!has_changes}
 			onclick={() => editor_state.save_changes()}
@@ -98,7 +98,10 @@
 		<Clear_Restore_Button
 			value={discarded_content ? '' : has_changes ? content : ''}
 			onchange={(value) => editor_state.discard_changes(value)}
-			attrs={{disabled: !has_changes && discarded_content === null, class: 'plain'}}
+			attrs={{
+				disabled: !has_changes && discarded_content === null,
+				class: 'plain flex_1 white_space_nowrap', // nowrap is a hack, some weirdness with the height of the clear/restore stuff
+			}}
 		>
 			discard changes
 			{#snippet restore()}
