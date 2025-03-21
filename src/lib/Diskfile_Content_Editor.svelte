@@ -63,7 +63,7 @@
 				<summary class="size_sm"
 					>Edit History ({editor_state.content_history.length} entries)</summary
 				>
-				<menu class="unstyled flex flex_column_reverse mt_xs">
+				<menu class="unstyled flex flex_column mt_xs">
 					{#each editor_state.content_history as entry (entry.created)}
 						<button
 							type="button"

@@ -119,7 +119,7 @@
 						clear history
 					</Confirm_Button>
 				</small>
-				<menu class="unstyled flex flex_column_reverse">
+				<menu class="unstyled flex flex_column">
 					{#each editor_state.content_history as entry (entry.id)}
 						{@const selected = entry.content === editor_state.updated_content}
 						<button

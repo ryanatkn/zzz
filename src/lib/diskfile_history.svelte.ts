@@ -38,11 +38,11 @@ export class Diskfile_History extends Cell<typeof Diskfile_History_Json> {
 	max_entries: number = $state()!;
 
 	/**
-	 * The most recent history entry
+	 * The most recent history entry (by creation timestamp)
+	 * Since entries are always kept sorted by creation time (newest first),
+	 * the most recent is always the first element.
 	 */
-	current_entry: History_Entry | null = $derived(
-		this.entries.length > 0 ? this.entries[this.entries.length - 1] : null,
-	);
+	current_entry: History_Entry | null = $derived(this.entries.length > 0 ? this.entries[0] : null);
 
 	constructor(options: Diskfile_History_Options) {
 		super(Diskfile_History_Json, options);
@@ -76,12 +76,23 @@ export class Diskfile_History extends Cell<typeof Diskfile_History_Json> {
 			entry.label = options.label;
 		}
 
-		// Add entry to history
-		this.entries = [...this.entries, entry];
+		// Find the correct insertion point to maintain sort order (newest first)
+		let insertion_index = 0;
+		while (
+			insertion_index < this.entries.length &&
+			this.entries[insertion_index].created > entry.created
+		) {
+			insertion_index++;
+		}
 
-		// Trim history if it exceeds max size
+		// Insert the entry at the correct position
+		const new_entries = [...this.entries];
+		new_entries.splice(insertion_index, 0, entry);
+		this.entries = new_entries;
+
+		// Trim history if it exceeds max size - already sorted by creation time
 		if (this.entries.length > this.max_entries) {
-			this.entries = this.entries.slice(this.entries.length - this.max_entries);
+			this.entries = this.entries.slice(0, this.max_entries);
 		}
 
 		return entry;
@@ -103,10 +114,13 @@ export class Diskfile_History extends Cell<typeof Diskfile_History_Json> {
 	}
 
 	/**
-	 * Clear all history entries except the most recent one
+	 * Clear all history entries except the most recent one by creation time
 	 */
 	clear_except_current(): void {
 		if (this.entries.length <= 1) return;
-		this.entries = this.entries.length ? [this.entries[this.entries.length - 1]] : [];
+
+		// Since entries are sorted by creation time (newest first),
+		// we can just keep the first entry
+		this.entries = this.entries.length ? [this.entries[0]] : [];
 	}
 }
