@@ -38,63 +38,6 @@
 			will take some time for it to be featureful and reliable, but it can already do some neat
 			things.
 		</p>
-		<p>
-			Zzz is part of a growing ecosystem of open source client software that both provides a UI to
-			AI, and also uses AI to enhance the UX and runtime capabilities. I expect that in the future,
-			AI will create our UIs on demand, and I think a lot of existing software will evolve to become
-			this kind of client that does whatever you need it to do. Today most people use AI through the
-			proprietary clients of the major providers, and while that situation may continue, open
-			clients like Zzz offer custom power that closed software can't access. A user of an open
-			client may begin by comparing the outputs of two models, but the possibilities are an entire
-			social universe unavailable to closed software.
-		</p>
-		<p>
-			Clients mediate and control our interactions with AI, so they're powerful and rather
-			important, being able to gatekeep and shape the information we send and receive. Trusting
-			one's client is important for health. Fortunately, they're becoming easier and cheaper to
-			build and distribute.
-		</p>
-		<p>
-			Zzz joins many other open software projects working towards individual and collective
-			empowerment on the web. These projects operate publicly—sharing ideas, code, tools, protocols,
-			and communities—as part of what I believe is a technological design convergence on a new class
-			of software prompted by LLMs. (by design convergence I mean the genre of web app/software, not
-			everyone using Tailwind) This software genre spans the full stack, values openness and
-			interoperability, and aims to integrate all the things in one UX with uncompromising control
-			in users' hands.
-		</p>
-		<p>
-			I think over time the most fit solutions will emerge, and clients (hopefully Zzz) will
-			converge toward a smoother, more unified web-based AI-interfacing experience where consumers
-			choose among open clients according to their taste.
-		</p>
-		<p>The main ideas of Zzz include: (I'm sure I'm missing some)</p>
-		<ul>
-			<li>optimize for user agency and power</li>
-			<li>care about UX for both power users and novices</li>
-			<li>open source, permissive license, noncommercial project</li>
-			<li>
-				local-first architecture with offline functionality, user-controlled data, client
-				sovereignty, and optional cloud deployment (create websites!) and sync
-			</li>
-			<li>
-				interoperable design using standard and popular protocols (see ahead), open APIs, the web
-				and JS ecosystem, and common data formats
-			</li>
-			<li>
-				designed for plugins, scripting, and deep extensibility, and has a dev library in TypeScript
-				and Svelte
-			</li>
-			<li>
-				composable building blocks that you can configure and combine based on the available
-				capabilities, both manually and with AI, to create new experiences and tools that solve your
-				unique problems, and share them with others
-			</li>
-			<li>
-				adaptable interfaces that evolve with user needs through customization, context awareness,
-				and AI assistance
-			</li>
-		</ul>
 		<p>Integrations: (everything's a work in progress, but some basics work)</p>
 		<ul>
 			<li>
@@ -148,7 +91,7 @@
 							>TypeScript lib</External_Link
 						>
 					</li>
-					<li>more plans in my head, also I welcome feedback/requests/assistance</li>
+					<li>pls feedback/requests/assistance</li>
 				</ul>
 			</li>
 		</ul>
@@ -177,7 +120,7 @@
 			<li>
 				<External_Link href="https://wikipedia.org/wiki/Content_management_system"
 					>content management systems</External_Link
-				>, headless and traditional, see this <External_Link
+				> (CMS), headless and traditional, see this <External_Link
 					href="https://wikipedia.org/wiki/List_of_content_management_systems"
 					>list on Wikipedia</External_Link
 				>
@@ -191,31 +134,32 @@
 				<External_Link href="https://wikipedia.org/">wikis</External_Link> and other knowledge management
 				systems
 			</li>
-			<li>cloud office suites</li>
 			<li>website builders and web IDEs</li>
-			<li>local code editors (supplementing editors like VSCode, not replacing)</li>
+			<li>local code editors</li>
 			<li>social media apps</li>
+			<li>cloud office suites</li>
 			<li>learning platforms</li>
-			<li>
-				people could technically make integrations with code forges and even email, but I'm not
-				thinking that far ahead, but maybe Zzz will converge with Gmail
-			</li>
+			<li>content creation apps</li>
+			<li>while we're at it, browsers and desktop environments</li>
 		</ul>
 		<p>
-			Most features are optional through plugins, so the core experience stays minimal and
-			efficient.
+			Most features are optional through plugins, so the core experience stays efficient and
+			economical for what it offers.
 		</p>
 		<p>
-			Zzz is just one implementation of an increasingly common idea with quirks personal to its
-			author, and I expect it to evolve chaotically alongside its cohort of AI-informed web
-			software, with the goal of converging with the herd on the many specific choices that improve
-			the ecosystem's interoperability. Your input is highly valued to keep things on track and
-			fun—see the
+			Zzz is just one implementation of an increasingly common idea, and it has quirks personal to
+			its author that I'm generally open to oatmealifying. Your input is highly valued to keep
+			things on track and fun—see the
 			<External_Link href="https://github.com/ryanatkn/zzz/issues">issues</External_Link>
 			and
 			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link>
 			and find me on
 			<External_Link href="https://bsky.app/profile/ryanatkn.com">Bluesky</External_Link>.
+		</p>
+		<p>
+			I expect Zzz to evolve chaotically alongside its cohort of AI-informed web software, with the
+			goal of ongoing convergence toward ecosystem-wide interoperability as protocols fall and rise,
+			fundamentally anchored in powerful open clients and local-first software.
 		</p>
 	</section>
 	<section>

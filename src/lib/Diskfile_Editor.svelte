@@ -20,25 +20,22 @@
 	// Create editor state once and reuse it
 	const editor_state = new Diskfile_Editor_State({zzz, diskfile});
 
-	// When the diskfile changes, update the editor state with the new diskfile
+	// Combined effect to handle diskfile changes and disk change detection
 	$effect.pre(() => {
-		diskfile.id;
+		// Track diskfile changes explicitly
+		const diskfile_id = diskfile.id;
+		const diskfile_content = diskfile.content;
 
 		untrack(() => {
-			// Update the editor state with the new diskfile
-			editor_state.update_diskfile(diskfile);
-		});
-	});
-
-	// Check for disk changes when diskfile changes
-	$effect.pre(() => {
-		diskfile.content;
-		diskfile.id;
-		editor_state.last_seen_disk_content;
-
-		untrack(() => {
-			// Check if file changed on disk
-			editor_state.check_disk_changes();
+			// If the diskfile ID changed, this is a navigation to a different file
+			if (editor_state.diskfile.id !== diskfile_id) {
+				editor_state.update_diskfile(diskfile);
+			}
+			// Otherwise, if only the content changed, check for disk changes
+			else if (diskfile_content !== editor_state.last_seen_disk_content) {
+				// This handles the case where the file was updated outside the app
+				editor_state.check_disk_changes();
+			}
 		});
 	});
 

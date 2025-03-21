@@ -1,4 +1,5 @@
 import {encode as tokenize} from 'gpt-tokenizer';
+
 import type {Diskfile} from '$lib/diskfile.svelte.js';
 import type {Diskfile_Path} from '$lib/diskfile_types.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
@@ -13,8 +14,15 @@ export class Diskfile_Editor_State {
 
 	diskfile: Diskfile = $state()!;
 
+	// Original content derived from diskfile.content, will update when file changes on disk
 	original_content: string | null = $derived(this.diskfile.content);
-	updated_content: string = $state('');
+
+	// Private content property - stores the actual content being edited
+	#content: string = $state('');
+
+	// Used to track if the user has edited the content
+	content_was_modified_by_user: boolean = $state(false);
+
 	content_history: Array<{created: number; content: string}> = $state([]);
 	discarded_content: string | null = $state(null);
 
@@ -22,6 +30,16 @@ export class Diskfile_Editor_State {
 	disk_changed: boolean = $state(false);
 	last_seen_disk_content: string | null = $state(null);
 	disk_content: string | null = $state(null);
+
+	// Getter/setter for updated_content
+	get updated_content(): string {
+		return this.#content;
+	}
+
+	set updated_content(value: string) {
+		this.#content = value;
+		this.content_was_modified_by_user = true;
+	}
 
 	// Basic derived states
 	has_changes = $derived.by(() => this.updated_content !== this.original_content);
@@ -64,12 +82,14 @@ export class Diskfile_Editor_State {
 	 * Reset the editor state to match the current diskfile content
 	 */
 	reset(): void {
-		this.updated_content = this.original_content ?? '';
+		// Set content directly without marking as user-modified
+		this.#content = this.original_content ?? '';
 		this.content_history = [{created: Date.now(), content: this.updated_content}];
 		this.discarded_content = null;
 		this.disk_changed = false;
 		this.last_seen_disk_content = this.diskfile.content;
 		this.disk_content = null;
+		this.content_was_modified_by_user = false;
 	}
 
 	/**
@@ -86,6 +106,7 @@ export class Diskfile_Editor_State {
 		this.last_seen_disk_content = this.updated_content;
 		this.disk_changed = false;
 		this.disk_content = null;
+		this.content_was_modified_by_user = false;
 
 		return true;
 	}
@@ -98,11 +119,14 @@ export class Diskfile_Editor_State {
 		// If we're restoring, the new value is the previously discarded content
 		// If we're discarding, the new value is empty and we set updated_content to the original file content
 		if (new_value) {
+			// Use setter to track modification
 			this.updated_content = new_value;
 			this.discarded_content = null;
 		} else {
 			this.discarded_content = this.updated_content;
-			this.updated_content = this.original_content ?? '';
+			// Set content directly without marking as user-modified
+			this.#content = this.original_content ?? '';
+			this.content_was_modified_by_user = false;
 		}
 	}
 
@@ -112,6 +136,7 @@ export class Diskfile_Editor_State {
 	set_content_from_history(created: number): void {
 		const entry = this.content_history.find((entry) => entry.created === created);
 		if (entry) {
+			// Use setter to track modification
 			this.updated_content = entry.content;
 			this.discarded_content = null;
 		}
@@ -146,17 +171,32 @@ export class Diskfile_Editor_State {
 			return;
 		}
 
-		// If the disk content now matches what's in the editor
-		if (this.diskfile.content === this.updated_content) {
-			// File on disk now matches what we're editing - no need for notification
+		// If the editor content has not been modified by the user or matches the new content on disk,
+		// we can safely update without showing a notification
+		if (!this.content_was_modified_by_user || this.updated_content === this.diskfile.content) {
+			// Auto-update the editor content to match the new disk content without marking as user-modified
+			this.#content = this.diskfile.content || '';
+
+			// Add to history
+			this.content_history.push({
+				created: Date.now(),
+				content: this.updated_content,
+			});
+
+			// Update tracking variables
+			this.last_seen_disk_content = this.diskfile.content;
 			this.disk_changed = false;
 			this.disk_content = null;
-			// Update last seen content to match current disk content
-			this.last_seen_disk_content = this.diskfile.content;
+
 			return;
 		}
 
-		// Disk content changed to something different from both the last seen and editor content
+		// At this point we know:
+		// 1. Disk content has changed from what we last saw
+		// 2. User has made their own edits
+		// 3. User's edits don't match what's now on disk
+
+		// Show notification for user to decide
 		this.disk_changed = true;
 		this.disk_content = this.diskfile.content;
 	}
@@ -173,16 +213,17 @@ export class Diskfile_Editor_State {
 		const now = Date.now();
 		this.content_history.push({created: now, content: this.updated_content});
 
-		// Update the editor content
-		this.updated_content = this.disk_content;
+		// Update the editor content without marking as user-modified
+		this.#content = this.disk_content;
 
 		// Add the new content to history with incremented timestamp to ensure uniqueness
-		this.content_history.push({created: now + 1, content: this.disk_content});
+		this.content_history.push({created: now + 1, content: this.updated_content});
 
 		// Reset disk change tracking
 		this.last_seen_disk_content = this.disk_content;
 		this.disk_changed = false;
 		this.disk_content = null;
+		this.content_was_modified_by_user = false;
 	}
 
 	/**
