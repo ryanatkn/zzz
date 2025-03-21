@@ -16,13 +16,13 @@
 	}: Props = $props();
 </script>
 
-<div class="flex justify_content_space_between align_items_center mb_xs3">
+<div class="flex justify_content_space_between align_items_center mb_xs">
 	<div class="row gap_sm scolor_c size_lg">
-		<Glyph_Icon icon={GLYPH_IMPORTANT} size="var(--size_xl3)" /> file changed on disk
+		<Glyph_Icon icon={GLYPH_IMPORTANT} size="var(--size_xl2)" /> file changed on disk
 	</div>
 </div>
-<div class="column gap_xs2">
-	<div>The file has been modified outside of the editor.</div>
+<div class="column gap_xs">
+	<div class="size_sm">The file has been modified outside of the editor.</div>
 	<div class="flex gap_sm">
 		<button type="button" class="flex_1 color_g" onclick={on_accept_disk_changes}>
 			accept changes
@@ -31,7 +31,7 @@
 			ignore state on disk
 		</button>
 	</div>
-	<div>
+	<div class="size_sm">
 		Accept to update your editor with the new content, ignore to keep your current version. Saving
 		will also ignore the state on disk.
 	</div>
