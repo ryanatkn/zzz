@@ -5,6 +5,7 @@ import {Chat} from '$lib/chat.svelte.js';
 import {Chats} from '$lib/chats.svelte.js';
 import {Diskfile} from '$lib/diskfile.svelte.js';
 import {Diskfiles} from '$lib/diskfiles.svelte.js';
+import {Diskfile_History} from '$lib/diskfile_history.svelte.js';
 import {Message} from '$lib/message.svelte.js';
 import {Messages} from '$lib/messages.svelte.js';
 import {Model} from '$lib/model.svelte.js';
@@ -31,6 +32,7 @@ export const cell_classes = {
 	Diskfile,
 	Diskfiles,
 	Diskfile_Bit,
+	Diskfile_History,
 	Message,
 	Messages,
 	Model,

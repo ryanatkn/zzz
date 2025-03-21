@@ -1,3 +1,5 @@
+// @vitest-environment jsdom
+
 import {test, expect, vi} from 'vitest';
 import type {z} from 'zod';
 import {encode as tokenize} from 'gpt-tokenizer';

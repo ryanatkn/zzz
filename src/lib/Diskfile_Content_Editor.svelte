@@ -25,7 +25,7 @@
 		editor_state: editor_state_prop,
 		show_stats = true,
 		show_actions = false,
-		placeholder = GLYPH_PLACEHOLDER,
+		placeholder,
 		readonly = false,
 		attrs,
 	}: Props = $props();
@@ -49,7 +49,7 @@
 	<Content_Editor
 		content={editor_state.updated_content}
 		onchange={handle_content_change}
-		placeholder={placeholder ?? diskfile.pathname}
+		placeholder={placeholder ?? GLYPH_PLACEHOLDER + ' ' + diskfile.pathname}
 		{show_stats}
 		{show_actions}
 		{readonly}
@@ -70,7 +70,7 @@
 							class="plain justify_content_space_between size_sm py_xs3"
 							class:selected={entry.content === editor_state.updated_content}
 							onclick={() => {
-								editor_state.set_content_from_history(entry.created);
+								editor_state.set_content_from_history(entry.id);
 								content_editor?.focus();
 							}}
 						>

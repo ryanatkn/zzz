@@ -300,6 +300,10 @@ export const package_json = {
 			svelte: './dist/Diskfile_History_Panel.svelte',
 			default: './dist/Diskfile_History_Panel.svelte',
 		},
+		'./diskfile_history.svelte.js': {
+			types: './dist/diskfile_history.svelte.d.ts',
+			default: './dist/diskfile_history.svelte.js',
+		},
 		'./Diskfile_Info.svelte': {
 			types: './dist/Diskfile_Info.svelte.d.ts',
 			svelte: './dist/Diskfile_Info.svelte',
@@ -822,6 +826,15 @@ export const src_json = {
 			],
 		},
 		'./Diskfile_History_Panel.svelte': {path: 'Diskfile_History_Panel.svelte', declarations: []},
+		'./diskfile_history.svelte.js': {
+			path: 'diskfile_history.svelte.ts',
+			declarations: [
+				{name: 'History_Entry', kind: 'variable'},
+				{name: 'Diskfile_History_Json', kind: 'variable'},
+				{name: 'Diskfile_History_Options', kind: 'type'},
+				{name: 'Diskfile_History', kind: 'class'},
+			],
+		},
 		'./Diskfile_Info.svelte': {path: 'Diskfile_Info.svelte', declarations: []},
 		'./Diskfile_List_Item.svelte': {path: 'Diskfile_List_Item.svelte', declarations: []},
 		'./Diskfile_Metrics.svelte': {path: 'Diskfile_Metrics.svelte', declarations: []},
@@ -858,6 +871,9 @@ export const src_json = {
 		'./glyphs.js': {
 			path: 'glyphs.ts',
 			declarations: [
+				{name: 'GLYPH_UNKNOWN', kind: 'variable'},
+				{name: 'GLYPH_IMPORTANT', kind: 'variable'},
+				{name: 'GLYPH_INFO', kind: 'variable'},
 				{name: 'GLYPH_ADD', kind: 'variable'},
 				{name: 'GLYPH_REMOVE', kind: 'variable'},
 				{name: 'GLYPH_DELETE', kind: 'variable'},
@@ -872,7 +888,6 @@ export const src_json = {
 				{name: 'GLYPH_CONNECT', kind: 'variable'},
 				{name: 'GLYPH_DISCONNECT', kind: 'variable'},
 				{name: 'GLYPH_RETRY', kind: 'variable'},
-				{name: 'GLYPH_INFO', kind: 'variable'},
 				{name: 'GLYPH_PLACEHOLDER', kind: 'variable'},
 				{name: 'GLYPH_SERVER', kind: 'variable'},
 				{name: 'GLYPH_CHAT', kind: 'variable'},

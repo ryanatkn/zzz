@@ -1,7 +1,7 @@
 <script lang="ts">
-	import {untrack} from 'svelte';
 	import {format} from 'date-fns';
 	import {slide} from 'svelte/transition';
+	import {untrack} from 'svelte';
 
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import Diskfile_Info from '$lib/Diskfile_Info.svelte';
@@ -10,6 +10,7 @@
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Diskfile_Actions from '$lib/Diskfile_Actions.svelte';
 	import {Diskfile_Editor_State} from '$lib/diskfile_editor_state.svelte.js';
+	import {FILE_TIME_FORMAT} from '$lib/cell_helpers.js';
 
 	interface Props {
 		diskfile: Diskfile;
@@ -20,6 +21,11 @@
 
 	// Create editor state once and reuse it
 	const editor_state = new Diskfile_Editor_State({zzz, diskfile});
+
+	// Reference to the content editor component
+	let content_editor: {focus: () => void} | undefined = $state();
+
+	const has_history = $derived(editor_state.content_history.length > 1);
 
 	// TODO BLOCK try to think about restructuring this, maybe using only derived and event handlers (zzz event bus maybe?)
 	// Combined effect to handle diskfile changes and disk change detection
@@ -40,11 +46,6 @@
 			}
 		});
 	});
-
-	// Reference to the content editor component
-	let content_editor: {focus: () => void} | undefined = $state();
-
-	const has_history = $derived(editor_state.content_history.length > 1);
 </script>
 
 <div class="flex h_100">
@@ -110,7 +111,7 @@
 
 		{#if has_history}
 			<div transition:slide>
-				<small class="px_sm flex justify_content_space_between">
+				<small class="px_sm flex justify_content_space_between mb_sm">
 					<Confirm_Button
 						onconfirm={() => editor_state.clear_history()}
 						attrs={{class: 'plain compact'}}
@@ -118,8 +119,8 @@
 						clear history
 					</Confirm_Button>
 				</small>
-				<menu class="unstyled flex flex_column_reverse mt_xs">
-					{#each editor_state.content_history as entry (entry.created)}
+				<menu class="unstyled flex flex_column_reverse">
+					{#each editor_state.content_history as entry (entry.id)}
 						{@const selected = entry.content === editor_state.updated_content}
 						<button
 							transition:slide
@@ -127,13 +128,19 @@
 							class="button_list_item compact"
 							class:selected
 							class:plain={!selected}
+							class:disk_change={entry.is_disk_change}
 							onclick={() => {
-								editor_state.set_content_from_history(entry.created);
+								editor_state.set_content_from_history(entry.id);
 								content_editor?.focus();
 							}}
+							title={entry.label}
 						>
-							<span>{format(new Date(entry.created), 'HH:mm:ss')}</span>
+							<!-- TODO if they're made into cells, there's a derived property for this -->
+							<span>{format(new Date(entry.created), FILE_TIME_FORMAT)}</span>
 							<span>{entry.content.length} chars</span>
+							{#if entry.is_disk_change}
+								<span class="disk_change_indicator">disk</span>
+							{/if}
 						</button>
 					{/each}
 				</menu>
@@ -156,5 +163,15 @@
 		overflow: hidden;
 		text-overflow: ellipsis;
 		padding: var(--space_xs2);
+	}
+
+	.disk_change {
+		border-left: 2px solid var(--color_c);
+	}
+
+	.disk_change_indicator {
+		font-size: var(--size_xs);
+		color: var(--color_c);
+		margin-left: var(--space_xs);
 	}
 </style>

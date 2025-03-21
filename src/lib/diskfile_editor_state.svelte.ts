@@ -3,27 +3,32 @@ import {encode as tokenize} from 'gpt-tokenizer';
 import type {Diskfile} from '$lib/diskfile.svelte.js';
 import type {Diskfile_Path} from '$lib/diskfile_types.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
-
-// TODO maybe make `Editor` or some other term a common pattern and remove the _State suffix
+import type {Diskfile_History, History_Entry} from '$lib/diskfile_history.svelte.js';
+import type {Uuid} from '$lib/zod_helpers.js';
 
 /**
  * Manages the editor state for a diskfile
  */
 export class Diskfile_Editor_State {
-	zzz: Zzz; // TODO make this a cell?
-
+	zzz: Zzz;
 	diskfile: Diskfile = $state()!;
 
 	// Original content derived from diskfile.content, will update when file changes on disk
 	original_content: string | null = $derived(this.diskfile.content);
+
+	// Pure lookup of history from diskfile path - doesn't create anything
+	history: Diskfile_History | undefined = $derived.by(() =>
+		this.zzz.maybe_get_diskfile_history(this.diskfile.path),
+	);
+
+	// Provide access to history entries if history exists, otherwise empty array
+	content_history: Array<History_Entry> = $derived(this.history?.entries || []);
 
 	// Private content property - stores the actual content being edited
 	#content: string = $state('');
 
 	// Used to track if the user has edited the content
 	content_was_modified_by_user: boolean = $state(false);
-
-	content_history: Array<{created: number; content: string}> = $state([]);
 	discarded_content: string | null = $state(null);
 
 	// Track disk changes
@@ -71,11 +76,28 @@ export class Diskfile_Editor_State {
 		this.zzz = options.zzz;
 		this.diskfile = options.diskfile;
 
-		// Initialize with the current content
-		this.reset();
+		// Initialize content
+		this.#content = this.original_content ?? '';
 
 		// Set initial last_seen_disk_content
 		this.last_seen_disk_content = this.diskfile.content;
+
+		// Create initial history entry if needed
+		if (this.original_content !== null) {
+			this.#ensure_history().add_entry(this.original_content);
+		}
+	}
+
+	/**
+	 * Ensures a history object exists for the current file
+	 * @returns The existing or newly created history object
+	 */
+	#ensure_history(): Diskfile_History {
+		let history = this.zzz.maybe_get_diskfile_history(this.path);
+		if (!history) {
+			history = this.zzz.create_diskfile_history(this.path);
+		}
+		return history;
 	}
 
 	/**
@@ -84,7 +106,7 @@ export class Diskfile_Editor_State {
 	reset(): void {
 		// Set content directly without marking as user-modified
 		this.#content = this.original_content ?? '';
-		this.content_history = [{created: Date.now(), content: this.updated_content}];
+
 		this.discarded_content = null;
 		this.disk_changed = false;
 		this.last_seen_disk_content = this.diskfile.content;
@@ -98,7 +120,10 @@ export class Diskfile_Editor_State {
 	save_changes(): boolean {
 		if (!this.has_changes) return false;
 
-		this.content_history.push({created: Date.now(), content: this.updated_content});
+		// Add to history before saving
+		this.#ensure_history().add_entry(this.updated_content);
+
+		// Save to the file
 		this.zzz.diskfiles.update(this.path, this.updated_content);
 		this.discarded_content = null;
 
@@ -133,22 +158,40 @@ export class Diskfile_Editor_State {
 	/**
 	 * Set content from history entry
 	 */
-	set_content_from_history(created: number): void {
-		const entry = this.content_history.find((entry) => entry.created === created);
-		if (entry) {
+	set_content_from_history(id: Uuid): void {
+		const history = this.history;
+		if (!history) return;
+
+		const content = history.get_content(id);
+		if (content) {
 			// Use setter to track modification
-			this.updated_content = entry.content;
+			this.updated_content = content;
 			this.discarded_content = null;
 		}
 	}
 
 	/**
-	 * Update the diskfile reference and reset the state
+	 * Update the diskfile reference
 	 * This allows reusing the same editor state instance with a new diskfile
 	 */
 	update_diskfile(diskfile: Diskfile): void {
+		if (this.diskfile.id === diskfile.id) return;
+
+		// Store the new diskfile
 		this.diskfile = diskfile;
+
+		// Reset the editor state
 		this.reset();
+
+		// Ensure history is created for the new diskfile
+		if (this.original_content !== null) {
+			const history = this.#ensure_history();
+
+			// Only add an entry if there's no history yet for this file
+			if (history.entries.length === 0) {
+				history.add_entry(this.original_content);
+			}
+		}
 	}
 
 	/**
@@ -177,10 +220,10 @@ export class Diskfile_Editor_State {
 			// Auto-update the editor content to match the new disk content without marking as user-modified
 			this.#content = this.diskfile.content || '';
 
-			// Add to history
-			this.content_history.push({
-				created: Date.now(),
-				content: this.updated_content,
+			// Add to history with disk change flag
+			this.#ensure_history().add_entry(this.updated_content, {
+				is_disk_change: true,
+				label: 'Disk change',
 			});
 
 			// Update tracking variables
@@ -209,15 +252,23 @@ export class Diskfile_Editor_State {
 			return;
 		}
 
-		// Add current content to history with current timestamp
+		const history = this.#ensure_history();
 		const now = Date.now();
-		this.content_history.push({created: now, content: this.updated_content});
+
+		// Add current content to history with current timestamp
+		history.add_entry(this.updated_content, {
+			created: now,
+		});
 
 		// Update the editor content without marking as user-modified
 		this.#content = this.disk_content;
 
-		// Add the new content to history with incremented timestamp to ensure uniqueness
-		this.content_history.push({created: now + 1, content: this.updated_content});
+		// Add the new content to history with incremented timestamp and special label
+		history.add_entry(this.updated_content, {
+			created: now + 1,
+			is_disk_change: true,
+			label: 'Accepted disk change',
+		});
 
 		// Reset disk change tracking
 		this.last_seen_disk_content = this.disk_content;
@@ -233,13 +284,11 @@ export class Diskfile_Editor_State {
 	reject_disk_changes(): void {
 		// Add disk content to history as a reference point, but don't apply it
 		if (this.disk_content !== null) {
-			// Create a unique timestamp
-			const now = Date.now();
-
-			// Add the ignored disk content to history
-			this.content_history.push({
-				created: now, // TODO how to get the actual created/updated from the diskfile?
-				content: this.disk_content, // preserve exact content so it can be restored as requested
+			// Add the ignored disk content to history with special label
+			this.#ensure_history().add_entry(this.disk_content, {
+				created: Date.now(),
+				is_disk_change: true,
+				label: 'Ignored disk change',
 			});
 		}
 
@@ -253,7 +302,9 @@ export class Diskfile_Editor_State {
 	 * Clear content history, keeping only the current state
 	 */
 	clear_history(): void {
-		// Keep only the current state in history
-		this.content_history = [{created: Date.now(), content: this.updated_content}];
+		const history = this.history;
+		if (history) {
+			history.clear_except_current();
+		}
 	}
 }

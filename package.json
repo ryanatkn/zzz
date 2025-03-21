@@ -350,6 +350,10 @@
       "svelte": "./dist/Diskfile_History_Panel.svelte",
       "default": "./dist/Diskfile_History_Panel.svelte"
     },
+    "./diskfile_history.svelte.js": {
+      "types": "./dist/diskfile_history.svelte.d.ts",
+      "default": "./dist/diskfile_history.svelte.js"
+    },
     "./Diskfile_Info.svelte": {
       "types": "./dist/Diskfile_Info.svelte.d.ts",
       "svelte": "./dist/Diskfile_Info.svelte",

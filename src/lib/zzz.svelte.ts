@@ -37,6 +37,7 @@ import {Ui, Ui_Json} from '$lib/ui.svelte.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Socket} from '$lib/socket.svelte.js';
 import {Capabilities} from '$lib/capabilities.svelte.js';
+import {Diskfile_History} from '$lib/diskfile_history.svelte.js';
 
 export const zzz_context = create_context<Zzz>();
 
@@ -129,7 +130,11 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	});
 
 	// Runtime-only state (not serialized)
-	pending_prompts: SvelteMap<Uuid, Deferred<Message_Completion_Response>> = new SvelteMap();
+	readonly pending_prompts: SvelteMap<Uuid, Deferred<Message_Completion_Response>> =
+		new SvelteMap();
+
+	// Store Diskfile_History objects by file path
+	readonly diskfile_histories: SvelteMap<Diskfile_Path, Diskfile_History> = new SvelteMap();
 
 	constructor(options: Zzz_Options = EMPTY_OBJECT) {
 		// Pass this instance as its own zzz reference
@@ -279,5 +284,40 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 
 	add_provider(provider: Provider): void {
 		this.providers.add(provider);
+	}
+
+	/**
+	 * Lookup a history object for a given diskfile path without creating it
+	 * @returns The history object if it exists, undefined otherwise
+	 */
+	maybe_get_diskfile_history(path: Diskfile_Path): Diskfile_History | undefined {
+		return this.diskfile_histories.get(path);
+	}
+
+	/**
+	 * Create a new history object for a given diskfile path
+	 * @returns The newly created history object
+	 */
+	create_diskfile_history(path: Diskfile_Path): Diskfile_History {
+		const history = this.registry.instantiate('Diskfile_History', {
+			path,
+			entries: [],
+		});
+		this.diskfile_histories.set(path, history);
+		return history;
+	}
+
+	/**
+	 * Get or create a history object for a given diskfile path
+	 * @deprecated Use maybe_get_diskfile_history() and create_diskfile_history() instead
+	 */
+	get_diskfile_history(path: Diskfile_Path): Diskfile_History {
+		let history = this.diskfile_histories.get(path);
+
+		if (!history) {
+			history = this.create_diskfile_history(path);
+		}
+
+		return history;
 	}
 }
