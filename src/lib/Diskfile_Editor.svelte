@@ -137,10 +137,10 @@
 						>
 							<!-- TODO if they're made into cells, there's a derived property for this -->
 							<span>{format(new Date(entry.created), FILE_TIME_FORMAT)}</span>
-							<span>{entry.content.length} chars</span>
 							{#if entry.is_disk_change}
-								<span class="disk_change_indicator">disk</span>
+								<span>disk</span>
 							{/if}
+							<span>{entry.content.length} chars</span>
 						</button>
 					{/each}
 				</menu>
@@ -167,11 +167,5 @@
 
 	.disk_change {
 		border-left: 2px solid var(--color_c);
-	}
-
-	.disk_change_indicator {
-		font-size: var(--size_xs);
-		color: var(--color_c);
-		margin-left: var(--space_xs);
 	}
 </style>
