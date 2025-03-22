@@ -45,8 +45,8 @@ export class Strip extends Cell<typeof Strip_Json> {
 
 	// Set content updates the bit's content if not null/undefined
 	set content(value: string | null | undefined) {
-		if (value != null) {
-			this.bit?.update_content(value);
+		if (value != null && this.bit) {
+			this.bit.content = value;
 		}
 	}
 

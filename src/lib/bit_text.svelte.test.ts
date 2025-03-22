@@ -211,8 +211,8 @@ describe('Text_Bit content modification', () => {
 		// Initial state
 		expect(bit.content).toBe(TEST_CONTENT.INITIAL);
 
-		// Update content using method
-		bit.update_content(TEST_CONTENT.NEW_CONTENT);
+		// Update content using assignment
+		bit.content = TEST_CONTENT.NEW_CONTENT;
 
 		// Verify content was updated
 		expect(bit.content).toBe(TEST_CONTENT.NEW_CONTENT);

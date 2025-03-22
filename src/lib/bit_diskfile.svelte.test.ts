@@ -63,7 +63,7 @@ beforeEach(() => {
 			const test_content = TEST_CONTENT[path_key as keyof typeof TEST_CONTENT];
 			if (typeof test_content === 'string') {
 				content = test_content;
-			} else if (test_content && typeof test_content === 'object' && 'INITIAL' in test_content) {
+			} else if (typeof test_content === 'object' && 'INITIAL' in test_content) {
 				content = test_content.INITIAL;
 			}
 		}
@@ -188,7 +188,7 @@ describe('Diskfile_Bit content access', () => {
 		expect(bit.content).toBe(updated_content);
 	});
 
-	test('update_content method updates diskfile content', () => {
+	test('assigning bit content updates diskfile content', () => {
 		const path = TEST_PATHS.EDITABLE;
 		const initial_content = TEST_CONTENT.EDITABLE.INITIAL;
 		const updated_content = TEST_CONTENT.EDITABLE.UPDATED;
@@ -201,8 +201,8 @@ describe('Diskfile_Bit content access', () => {
 		// Verify initial state
 		expect(bit.content).toBe(initial_content);
 
-		// Update content using method
-		bit.update_content(updated_content);
+		// Update content using assignment
+		bit.content = updated_content;
 
 		// Verify diskfile was updated - get it fresh from zzz
 		const diskfile = zzz.diskfiles.get_by_path(path);

@@ -172,7 +172,7 @@ describe('Text_Bit specific behavior', () => {
 		expect(bit.content).toBe(TEST_CONTENT.BASIC);
 
 		// Test update method
-		bit.update_content(TEST_CONTENT.SECONDARY);
+		bit.content = TEST_CONTENT.SECONDARY;
 		expect(bit.content).toBe(TEST_CONTENT.SECONDARY);
 
 		// Test direct property assignment
@@ -280,7 +280,7 @@ describe('Diskfile_Bit specific behavior', () => {
 		expect(bit.content).toBe(TEST_CONTENT.BASIC);
 
 		// Update content through bit
-		bit.update_content(TEST_CONTENT.SECONDARY);
+		bit.content = TEST_CONTENT.SECONDARY;
 
 		// Verify both bit and diskfile were updated
 		expect(bit.content).toBe(TEST_CONTENT.SECONDARY);
@@ -427,7 +427,7 @@ describe('Sequence_Bit specific behavior', () => {
 		expect(sequence.remove(nonexistent_id)).toBe(false);
 	});
 
-	test('Sequence_Bit update_content outputs warning', () => {
+	test('Sequence_Bit content assignment outputs console error', () => {
 		const sequence = zzz.registry.instantiate('Sequence_Bit');
 
 		// Temporarily override console.error
@@ -438,8 +438,8 @@ describe('Sequence_Bit specific behavior', () => {
 			error_called = true;
 		};
 
-		// Try to update content directly, which should trigger error
-		sequence.update_content('Test content');
+		// Try to update content directly, which should trigger error logging
+		sequence.content = 'Test content';
 
 		// Restore console.error
 		console.error = original_console_error;

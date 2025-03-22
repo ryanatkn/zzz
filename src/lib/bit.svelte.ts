@@ -101,12 +101,6 @@ export abstract class Bit<T extends z.ZodType = typeof Bit_Base_Json> extends Ce
 	title: string | null = $state()!;
 	summary: string | null = $state()!;
 
-	/**
-	 * Updates content based on the specific bit type.
-	 * Each bit type handles content updates differently.
-	 */
-	abstract update_content(content: string): void;
-
 	add_attribute(partial: z.input<typeof Xml_Attribute> = EMPTY_OBJECT): void {
 		this.attributes.push(Xml_Attribute.parse(partial));
 	}
@@ -195,10 +189,6 @@ export class Text_Bit extends Bit<typeof Text_Bit_Json> {
 		super(Text_Bit_Json, options);
 		this.init();
 	}
-
-	update_content(content: string): void {
-		this.content = content;
-	}
 }
 
 export const Text_Bit_Schema = z.instanceof(Text_Bit);
@@ -230,14 +220,6 @@ export class Diskfile_Bit extends Bit<typeof Diskfile_Bit_Json> {
 		}
 	}
 
-	update_content(content: string): void {
-		if (this.path) {
-			this.zzz.diskfiles.update(this.path, content);
-		} else if (DEV) {
-			console.error('Cannot update content: no path available', '"' + content + '"');
-		}
-	}
-
 	constructor(options: Diskfile_Bit_Options) {
 		super(Diskfile_Bit_Json, options);
 		this.init();
@@ -264,18 +246,18 @@ export class Sequence_Bit extends Bit<typeof Sequence_Bit_Json> {
 		return this.bits.map((bit) => bit.content).join('\n\n');
 	}
 
-	constructor(options: Sequence_Bit_Options) {
-		super(Sequence_Bit_Json, options);
-		this.init();
-	}
-
-	update_content(content: string): void {
+	set content(value: string) {
 		if (DEV) {
 			console.error(
 				'Cannot directly update content for sequence bits as it is derived from referenced bits',
-				content,
+				value,
 			);
 		}
+	}
+
+	constructor(options: Sequence_Bit_Options) {
+		super(Sequence_Bit_Json, options);
+		this.init();
 	}
 
 	/**

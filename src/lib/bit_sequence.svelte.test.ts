@@ -251,8 +251,30 @@ describe('Sequence_Bit item management', () => {
 			error_called = true;
 		};
 
-		// Call update_content, which should log an error
-		sequence_bit.update_content('This should not work');
+		// Assign content, which should log an error
+		sequence_bit.content = 'This should not work';
+
+		// Restore console.error
+		console.error = original_console_error;
+
+		// Verify error was logged
+		expect(error_called).toBe(true);
+	});
+
+	test('update_content method logs warning in development', () => {
+		const sequence_bit = zzz.registry.instantiate('Sequence_Bit');
+
+		// Save original console.error
+		const original_console_error = console.error;
+		let error_called = false;
+
+		// Mock console.error
+		console.error = () => {
+			error_called = true;
+		};
+
+		// Call content setter, which should log an error
+		sequence_bit.content = 'This should not work';
 
 		// Restore console.error
 		console.error = original_console_error;
