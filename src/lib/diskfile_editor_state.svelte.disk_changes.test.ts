@@ -174,7 +174,7 @@ describe('disk change detection', () => {
 		expect(history.entries.length).toBe(count_after_first);
 	});
 
-	test.only('marks existing entry as disk change when content matches', () => {
+	test('marks existing entry as disk change when content matches', () => {
 		// Add an entry to history that isn't initially marked as a disk change
 		const history = zzz.get_diskfile_history(TEST_PATH)!;
 		const entry = history.add_entry('New content on disk', {
