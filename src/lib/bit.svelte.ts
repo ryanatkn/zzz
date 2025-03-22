@@ -82,22 +82,15 @@ export abstract class Bit<T extends z.ZodType = typeof Bit_Base_Json> extends Ce
 	// The type discriminator - to be set by subclasses
 	abstract readonly type: string;
 
-	abstract content: string | null | undefined;
+	abstract get content(): string | null | undefined;
 
 	start: number | null = $state()!;
 	end: number | null = $state()!;
-	// TODO BLOCK @many should be $derived but tests arent working with jsdom or something
-	get length(): number | null | undefined {
-		return this.content?.length; // TODO @many use $derived? tests may be broken with runes?
-	}
-	// TODO BLOCK @many should be $derived but tests arent working with jsdom or something
-	get tokens(): Array<number> | null | undefined {
-		return this.content == null ? this.content : tokenize(this.content);
-	}
-	// TODO BLOCK @many should be $derived but tests arent working with jsdom or something
-	get token_count(): number | null | undefined {
-		return this.tokens?.length;
-	}
+	length: number | null | undefined = $derived.by(() => this.content?.length);
+	tokens: Array<number> | null | undefined = $derived.by(() =>
+		this.content == null ? this.content : tokenize(this.content),
+	);
+	token_count: number | null | undefined = $derived(this.tokens?.length);
 
 	// Common properties for all bit types
 	name: string = $state()!;
@@ -196,7 +189,7 @@ export class Text_Bit extends Bit<typeof Text_Bit_Json> {
 	override readonly type = 'text';
 
 	// Direct content storage
-	content: string = $state()!;
+	override content: string = $state()!;
 
 	constructor(options: Text_Bit_Options) {
 		super(Text_Bit_Json, options);
@@ -222,8 +215,8 @@ export class Diskfile_Bit extends Bit<typeof Diskfile_Bit_Json> {
 		this.path && this.zzz.diskfiles.get_by_path(this.path),
 	);
 
-	get content(): string | null | undefined {
-		return this.diskfile?.content; // TODO @many use $derived? tests may be broken with runes?
+	override get content(): string | null | undefined {
+		return this.diskfile?.content;
 	}
 
 	set content(value: string | null | undefined) {
@@ -231,18 +224,17 @@ export class Diskfile_Bit extends Bit<typeof Diskfile_Bit_Json> {
 			if (DEV) console.error(`Setting content to ${value} is not allowed`);
 			return;
 		}
-		const {diskfile} = this;
-		if (diskfile?.path) {
-			this.zzz.diskfiles.update(diskfile.path, value);
+
+		if (this.path) {
+			this.zzz.diskfiles.update(this.path, value);
 		}
 	}
 
 	update_content(content: string): void {
-		const {diskfile} = this;
-		if (diskfile?.path) {
-			this.zzz.diskfiles.update(diskfile.path, content);
+		if (this.path) {
+			this.zzz.diskfiles.update(this.path, content);
 		} else if (DEV) {
-			console.error('Cannot update content: no diskfile or path available', '"' + content + '"');
+			console.error('Cannot update content: no path available', '"' + content + '"');
 		}
 	}
 
@@ -262,19 +254,13 @@ export class Sequence_Bit extends Bit<typeof Sequence_Bit_Json> {
 
 	items: Array<Uuid> = $state()!;
 
-	// TODO BLOCK @many should be $derived but tests arent working with jsdom or something
-	// bits: Array<Bit_Type> = $derived(
-	// 	this.items
-	// 		.map((id) => this.zzz.bits.items.by_id.get(id) )
-	// 		.filter((bit): bit is Bit_Type => !!bit),
-	// );
-	get bits(): Array<Bit_Type> {
-		return this.items
+	bits: Array<Bit_Type> = $derived(
+		this.items
 			.map((id) => this.zzz.bits.items.by_id.get(id))
-			.filter((bit): bit is Bit_Type => !!bit);
-	}
+			.filter((bit): bit is Bit_Type => !!bit),
+	);
 
-	get content(): string {
+	override get content(): string {
 		return this.bits.map((bit) => bit.content).join('\n\n');
 	}
 

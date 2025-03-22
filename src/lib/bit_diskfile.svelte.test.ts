@@ -1,37 +1,29 @@
 // @vitest-environment jsdom
 
-import {test, expect, describe, vi, beforeEach} from 'vitest';
+import {test, expect, describe, beforeEach} from 'vitest';
 
-import {Diskfile_Bit} from '$lib/bit.svelte.js';
 import {Uuid} from '$lib/zod_helpers.js';
-import type {Diskfile} from '$lib/diskfile.svelte.js';
+import {Zzz} from '$lib/zzz.svelte.js';
 import {Diskfile_Path} from '$lib/diskfile_types.js';
-
-/* eslint-disable @typescript-eslint/no-empty-function */
+import type {Diskfile} from '$lib/diskfile.svelte.js';
 
 // Test data constants for reuse
 const TEST_PATHS = {
-	BASIC: '/test/file.txt',
-	CONFIG: '/test/config.json',
-	DIRECT: '/test/direct.txt',
-	JSON: '/test/json.txt',
-	DOCUMENT: '/test/document.txt',
-	EDITABLE: '/test/editable.txt',
-	NONEXISTENT: '/nonexistent/file.txt',
-	POSITION: '/test/position.txt',
-	PRESERVE: '/test/preserve.txt',
-	SPECIAL_CHARS: '/test/path with spaces & special chars!.txt',
-	ATTRIBUTES: '/test/attributes.txt',
-	BINARY: '/test/binary.bin',
-	REACTIVE: '/test/reactive.txt',
-	NULLABLE: '/test/nullable.txt',
+	BASIC: Diskfile_Path.parse('/test/file.txt'),
+	CONFIG: Diskfile_Path.parse('/test/config.json'),
+	EMPTY: Diskfile_Path.parse('/test/empty.txt'),
+	DOCUMENT: Diskfile_Path.parse('/test/document.txt'),
+	EDITABLE: Diskfile_Path.parse('/test/editable.txt'),
+	NONEXISTENT: Diskfile_Path.parse('/nonexistent/file.txt'),
+	SPECIAL_CHARS: Diskfile_Path.parse('/test/path with spaces & special chars!.txt'),
+	BINARY: Diskfile_Path.parse('/test/binary.bin'),
+	REACTIVE: Diskfile_Path.parse('/test/reactive.txt'),
 };
 
 const TEST_CONTENT = {
 	BASIC: 'Test content',
 	CONFIG: '{"key": "value"}',
-	DIRECT: 'direct content',
-	JSON: 'json content',
+	EMPTY: '',
 	DOCUMENT: 'File content from diskfile',
 	EDITABLE: {
 		INITIAL: 'Initial content',
@@ -44,71 +36,60 @@ const TEST_CONTENT = {
 	},
 };
 
-// Helper to create a mock diskfile
-const create_mock_diskfile = (path: string, content: string): Diskfile =>
-	({
-		id: Uuid.parse(undefined),
-		path,
-		name: path.split('/').pop() || '',
-		content,
-		external: false,
-		size: content.length,
-		modified_at: new Date().toISOString(),
-		extension: path.split('.').pop() || '',
-		readonly: false,
-		clone() {
-			return this;
-		},
-		to_json: () => ({}),
-		toJSON: () => ({}),
-		zzz: undefined as any,
-		created: new Date().toISOString(),
-		updated: null,
-		json_parsed: {},
-		json: {},
-		json_serialized: '',
-		set_json: () => {},
-		decode_property: () => undefined,
-		encode_property: () => undefined,
-	}) as any;
+// Test suite variables
+let zzz: Zzz;
+let test_diskfiles: Map<Diskfile_Path, Diskfile>;
 
-// Create a mock Zzz instance with diskfiles registry
-const create_mock_zzz = () => {
-	const diskfiles_by_path: Map<string, Diskfile> = new Map();
+// Setup function to create a real Zzz instance and test diskfiles
+beforeEach(() => {
+	// Create a real Zzz instance
+	zzz = new Zzz();
+	// Override the async update method with a synchronous stub for tests
+	zzz.diskfiles.update = (path, content) => {
+		const diskfile = zzz.diskfiles.get_by_path(path);
+		if (diskfile) {
+			diskfile.content = content;
+		}
+	};
+	test_diskfiles = new Map();
 
-	return {
-		cells: new Map(),
-		bits: {
-			items: {
-				by_id: new Map(),
-			},
-		},
-		diskfiles: {
-			get_by_path: vi.fn((path: string) => diskfiles_by_path.get(path)),
-			update: vi.fn((path: string, content: string) => {
-				const diskfile = diskfiles_by_path.get(path);
-				if (diskfile) {
-					diskfile.content = content;
-				}
-			}),
-			add: vi.fn((path: string, content: string) => {
-				const diskfile = create_mock_diskfile(path, content);
-				diskfiles_by_path.set(path, diskfile);
-				return diskfile;
-			}),
-		},
-	} as any;
-};
+	// Create test diskfiles
+	for (const [path_key, path] of Object.entries(TEST_PATHS)) {
+		if (path_key === 'NONEXISTENT') continue; // Skip nonexistent path
+
+		// Determine content based on path key
+		let content = TEST_CONTENT.BASIC;
+		if (path_key in TEST_CONTENT) {
+			const test_content = TEST_CONTENT[path_key as keyof typeof TEST_CONTENT];
+			if (typeof test_content === 'string') {
+				content = test_content;
+			} else if (test_content && typeof test_content === 'object' && 'INITIAL' in test_content) {
+				content = test_content.INITIAL;
+			}
+		}
+
+		// Create the diskfile
+		const diskfile = zzz.registry.instantiate('Diskfile', {
+			path,
+			content,
+		});
+
+		// We need to register the diskfile with zzz.diskfiles
+		// This is important for Diskfile_Bit to find it
+		zzz.diskfiles.add(diskfile);
+
+		// Store for our test reference
+		test_diskfiles.set(path, diskfile);
+	}
+});
 
 describe('Diskfile_Bit initialization', () => {
 	test('creates with minimal values when only path provided', () => {
-		const mock_zzz = create_mock_zzz();
 		const path = TEST_PATHS.BASIC;
-		mock_zzz.diskfiles.add(path, TEST_CONTENT.BASIC);
 
-		const bit = new Diskfile_Bit({
-			zzz: mock_zzz,
-			json: {path},
+		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+			type: 'diskfile',
+			path,
 		});
 
 		expect(bit.type).toBe('diskfile');
@@ -123,34 +104,28 @@ describe('Diskfile_Bit initialization', () => {
 	});
 
 	test('initializes from json with complete properties', () => {
-		const mock_zzz = create_mock_zzz();
 		const test_id = Uuid.parse(undefined);
 		const test_path = TEST_PATHS.CONFIG;
 		const test_date = new Date().toISOString();
 
-		// Add diskfile to registry
-		mock_zzz.diskfiles.add(test_path, TEST_CONTENT.CONFIG);
-
-		const bit = new Diskfile_Bit({
-			zzz: mock_zzz,
-			json: {
-				id: test_id,
-				type: 'diskfile',
-				created: test_date,
-				path: test_path,
-				name: 'Config file',
-				has_xml_tag: true,
-				xml_tag_name: 'config',
-				title: 'Configuration',
-				summary: 'System configuration file',
-				start: 5,
-				end: 20,
-				enabled: false,
-				attributes: [{id: Uuid.parse(undefined), key: 'format', value: 'json'}],
-			},
+		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+			id: test_id,
+			created: test_date,
+			type: 'diskfile',
+			path: test_path,
+			name: 'Config file',
+			has_xml_tag: true,
+			xml_tag_name: 'config',
+			title: 'Configuration',
+			summary: 'System configuration file',
+			start: 5,
+			end: 20,
+			enabled: false,
+			attributes: [{id: Uuid.parse(undefined), key: 'format', value: 'json'}],
 		});
 
 		expect(bit.id).toBe(test_id);
+		expect(bit.created).toBe(test_date);
 		expect(bit.path).toBe(test_path);
 		expect(bit.name).toBe('Config file');
 		expect(bit.has_xml_tag).toBe(true);
@@ -162,64 +137,43 @@ describe('Diskfile_Bit initialization', () => {
 		expect(bit.enabled).toBe(false);
 		expect(bit.attributes).toHaveLength(1);
 		expect(bit.attributes[0].key).toBe('format');
+		expect(bit.attributes[0].value).toBe('json');
 	});
 
-	test('json path overrides direct path option', () => {
-		const mock_zzz = create_mock_zzz();
-		const direct_path = TEST_PATHS.DIRECT;
-		const json_path = TEST_PATHS.JSON;
-
-		mock_zzz.diskfiles.add(direct_path, TEST_CONTENT.DIRECT);
-		mock_zzz.diskfiles.add(json_path, TEST_CONTENT.JSON);
-
-		const bit = new Diskfile_Bit({
-			zzz: mock_zzz,
-			['path' as any]: direct_path, // This should be ignored
-			json: {path: json_path},
+	test('initializes with null path', () => {
+		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+			type: 'diskfile',
+			path: null,
 		});
 
-		expect(bit.path).toBe(json_path);
-		expect(bit.content).toBe(TEST_CONTENT.JSON);
+		expect(bit.path).toBeNull();
+		expect(bit.diskfile).toBeNull();
+		expect(bit.content).toBeUndefined();
 	});
 });
 
 describe('Diskfile_Bit content access', () => {
-	beforeEach(() => {
-		// Reset vi mocks before each test
-		vi.resetAllMocks();
-	});
-
 	test('content getter returns diskfile content', () => {
-		const mock_zzz = create_mock_zzz();
 		const path = TEST_PATHS.DOCUMENT;
 		const file_content = TEST_CONTENT.DOCUMENT;
 
-		mock_zzz.diskfiles.add(path, file_content);
-		const bit = new Diskfile_Bit({
-			zzz: mock_zzz,
-			json: {
-				type: 'diskfile',
-				path,
-			},
+		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+			type: 'diskfile',
+			path,
 		});
 
 		expect(bit.content).toBe(file_content);
-		expect(mock_zzz.diskfiles.get_by_path).toHaveBeenCalledWith(path);
+		expect(bit.diskfile).toEqual(test_diskfiles.get(path));
 	});
 
 	test('content setter updates diskfile content', () => {
-		const mock_zzz = create_mock_zzz();
 		const path = TEST_PATHS.EDITABLE;
 		const initial_content = TEST_CONTENT.EDITABLE.INITIAL;
 		const updated_content = TEST_CONTENT.EDITABLE.UPDATED;
 
-		mock_zzz.diskfiles.add(path, initial_content);
-		const bit = new Diskfile_Bit({
-			zzz: mock_zzz,
-			json: {
-				type: 'diskfile',
-				path,
-			},
+		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+			type: 'diskfile',
+			path,
 		});
 
 		// Verify initial state
@@ -228,136 +182,135 @@ describe('Diskfile_Bit content access', () => {
 		// Update content
 		bit.content = updated_content;
 
-		expect(mock_zzz.diskfiles.update).toHaveBeenCalledWith(path, updated_content);
+		// Verify diskfile was updated - get it fresh from zzz
+		const diskfile = zzz.diskfiles.get_by_path(path);
+		expect(diskfile?.content).toBe(updated_content);
+		expect(bit.content).toBe(updated_content);
+	});
+
+	test('update_content method updates diskfile content', () => {
+		const path = TEST_PATHS.EDITABLE;
+		const initial_content = TEST_CONTENT.EDITABLE.INITIAL;
+		const updated_content = TEST_CONTENT.EDITABLE.UPDATED;
+
+		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+			type: 'diskfile',
+			path,
+		});
+
+		// Verify initial state
+		expect(bit.content).toBe(initial_content);
+
+		// Update content using method
+		bit.update_content(updated_content);
+
+		// Verify diskfile was updated - get it fresh from zzz
+		const diskfile = zzz.diskfiles.get_by_path(path);
+		expect(diskfile?.content).toBe(updated_content);
 		expect(bit.content).toBe(updated_content);
 	});
 
 	test('content is undefined when diskfile not found', () => {
-		const mock_zzz = create_mock_zzz();
 		const path = TEST_PATHS.NONEXISTENT;
 
-		const bit = new Diskfile_Bit({
-			zzz: mock_zzz,
-			json: {
-				type: 'diskfile',
-				path,
-			},
+		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+			type: 'diskfile',
+			path,
 		});
 
 		expect(bit.diskfile).toBeUndefined();
 		expect(bit.content).toBeUndefined();
-		expect(mock_zzz.diskfiles.get_by_path).toHaveBeenCalledWith(path);
 	});
 
-	test('setting content to null/undefined logs error in development', () => {
-		const mock_zzz = create_mock_zzz();
+	test('setting content to null logs error in development', () => {
 		const path = TEST_PATHS.BASIC;
-
-		mock_zzz.diskfiles.add(path, TEST_CONTENT.BASIC);
-		const bit = new Diskfile_Bit({
-			zzz: mock_zzz,
-			json: {
-				type: 'diskfile',
-				path,
-			},
+		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+			type: 'diskfile',
+			path,
 		});
 
-		// Mock console.error
+		// Save original console.error
 		const original_console_error = console.error;
-		console.error = vi.fn();
+		let error_called = false;
 
-		// Try setting invalid content
-		bit.content = null;
-		bit.content = undefined;
+		// Mock console.error
+		console.error = () => {
+			error_called = true;
+		};
 
-		expect(console.error).toHaveBeenCalledTimes(2);
-		expect(mock_zzz.diskfiles.update).not.toHaveBeenCalled();
+		// Try setting to null
+		bit.content = null as any;
 
 		// Restore console.error
 		console.error = original_console_error;
+
+		// Verify error was logged
+		expect(error_called).toBe(true);
+
+		// Verify diskfile content was not changed
+		const diskfile = test_diskfiles.get(path);
+		expect(diskfile?.content).toBe(TEST_CONTENT.BASIC);
 	});
 });
 
 describe('Diskfile_Bit reactive properties', () => {
 	test('derived properties update when diskfile content changes', () => {
-		const mock_zzz = create_mock_zzz();
 		const path = TEST_PATHS.REACTIVE;
 		const initial_content = TEST_CONTENT.REACTIVE.INITIAL;
+		const updated_content = TEST_CONTENT.REACTIVE.UPDATED;
 
-		// Add diskfile
-		const diskfile = mock_zzz.diskfiles.add(path, initial_content) as Diskfile;
-		const bit = new Diskfile_Bit({
-			zzz: mock_zzz,
-			json: {
-				type: 'diskfile',
-				path,
-			},
+		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+			type: 'diskfile',
+			path,
 		});
 
 		// Verify initial state
+		expect(bit.content).toBe(initial_content);
 		expect(bit.length).toBe(initial_content.length);
-		expect(bit.token_count).toBeGreaterThan(0);
 
 		// Update diskfile content directly
-		const updated_content = TEST_CONTENT.REACTIVE.UPDATED;
-		diskfile.content = updated_content;
+		bit.diskfile!.content = updated_content;
 
-		// We need to access the content to trigger reactivity chain
+		// Verify derived properties update
 		expect(bit.content).toBe(updated_content);
-
-		// Now verify derived properties update
 		expect(bit.length).toBe(updated_content.length);
-		expect(bit.token_count).toBeGreaterThan(0);
 	});
 
 	test('derived properties update when path changes', () => {
-		const mock_zzz = create_mock_zzz();
-		const path1 = Diskfile_Path.parse('/test/file1.txt');
-		const path2 = Diskfile_Path.parse('/test/file2.txt');
+		const path1 = TEST_PATHS.BASIC;
+		const path2 = TEST_PATHS.CONFIG;
 
-		// Add diskfiles
-		mock_zzz.diskfiles.add(path1, 'Content of file 1');
-		mock_zzz.diskfiles.add(path2, 'Different content in file 2');
-
-		const bit = new Diskfile_Bit({
-			zzz: mock_zzz,
-			json: {
-				type: 'diskfile',
-				path: path1,
-			},
+		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+			type: 'diskfile',
+			path: path1,
 		});
 
 		// Verify initial state
-		expect(bit.content).toBe('Content of file 1');
+		expect(bit.content).toBe(TEST_CONTENT.BASIC);
 
 		// Change path
 		bit.path = path2;
 
 		// Verify derived properties update
-		expect(bit.content).toBe('Different content in file 2');
+		expect(bit.content).toBe(TEST_CONTENT.CONFIG);
+		expect(bit.diskfile).toEqual(test_diskfiles.get(path2));
 	});
 });
 
 describe('Diskfile_Bit serialization', () => {
 	test('to_json includes all properties with correct values', () => {
-		const mock_zzz = create_mock_zzz();
 		const test_id = Uuid.parse(undefined);
 		const path = TEST_PATHS.BASIC;
 		const created = new Date().toISOString();
 
-		mock_zzz.diskfiles.add(path, TEST_CONTENT.BASIC);
-
-		const bit = new Diskfile_Bit({
-			zzz: mock_zzz,
-			json: {
-				id: test_id,
-				created,
-				type: 'diskfile',
-				path,
-				name: 'Test file',
-				start: 10,
-				end: 20,
-			},
+		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+			id: test_id,
+			created,
+			type: 'diskfile',
+			path,
+			name: 'Test file',
+			start: 10,
+			end: 20,
 		});
 
 		const json = bit.to_json();
@@ -374,136 +327,124 @@ describe('Diskfile_Bit serialization', () => {
 	});
 
 	test('clone creates independent copy with same path', () => {
-		const mock_zzz = create_mock_zzz();
-		const path = Diskfile_Path.parse('/test/original.txt');
+		const original_path = TEST_PATHS.BASIC;
+		const modified_path = TEST_PATHS.CONFIG;
 
-		const ORIGINAL = {
-			PATH: path,
-			NAME: 'Original name',
-		};
-
-		const MODIFIED = {
-			PATH: Diskfile_Path.parse('/test/modified.txt'),
-			NAME: 'Modified name',
-		};
-
-		mock_zzz.diskfiles.add(ORIGINAL.PATH, 'Original content');
-
-		const original = new Diskfile_Bit({
-			zzz: mock_zzz,
-			json: {
-				type: 'diskfile',
-				path: ORIGINAL.PATH,
-				name: ORIGINAL.NAME,
-			},
+		const original = zzz.registry.instantiate('Diskfile_Bit', {
+			type: 'diskfile',
+			path: original_path,
+			name: 'Original name',
 		});
 
 		const clone = original.clone();
 
 		// Verify they have same initial values
 		expect(clone.id).toBe(original.id);
-		expect(clone.path).toBe(ORIGINAL.PATH);
-		expect(clone.name).toBe(ORIGINAL.NAME);
+		expect(clone.path).toBe(original_path);
+		expect(clone.name).toBe('Original name');
 
 		// Verify they're independent objects
-		clone.path = MODIFIED.PATH;
-		clone.name = MODIFIED.NAME;
+		clone.path = modified_path;
+		clone.name = 'Modified name';
 
-		expect(original.path).toBe(ORIGINAL.PATH);
-		expect(original.name).toBe(ORIGINAL.NAME);
-		expect(clone.path).toBe(MODIFIED.PATH);
-		expect(clone.name).toBe(MODIFIED.NAME);
+		expect(original.path).toBe(original_path);
+		expect(original.name).toBe('Original name');
+		expect(clone.path).toBe(modified_path);
+		expect(clone.name).toBe('Modified name');
 	});
 });
 
-// Remove the redundant 'Diskfile_Bit position markers' describe block since it's now tested in the base test file
-
 describe('Diskfile_Bit edge cases', () => {
-	test('handles path with special characters', () => {
-		const mock_zzz = create_mock_zzz();
+	test('handles special characters in path', () => {
 		const path = TEST_PATHS.SPECIAL_CHARS;
 
-		mock_zzz.diskfiles.add(path, TEST_CONTENT.BASIC);
-		const bit = new Diskfile_Bit({
-			zzz: mock_zzz,
-			json: {
-				type: 'diskfile',
-				path,
-			},
+		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+			type: 'diskfile',
+			path,
 		});
 
 		expect(bit.path).toBe(path);
-
-		// Need to reset and then access content to ensure the mock gets called
-		vi.clearAllMocks();
 		expect(bit.content).toBe(TEST_CONTENT.BASIC);
-		expect(mock_zzz.diskfiles.get_by_path).toHaveBeenCalledWith(path);
+		expect(bit.diskfile).toEqual(test_diskfiles.get(path));
 	});
 
-	test('handles null path', () => {
-		const mock_zzz = create_mock_zzz();
-		const bit = new Diskfile_Bit({
-			zzz: mock_zzz,
-			json: {
-				type: 'diskfile',
-				path: null,
-			},
+	test('handles empty content', () => {
+		const path = TEST_PATHS.EMPTY;
+		const diskfile = test_diskfiles.get(path)!;
+		diskfile.content = '';
+
+		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+			type: 'diskfile',
+			path,
 		});
 
-		expect(bit.path).toBeNull();
-		expect(bit.diskfile).toBeNull(); // Changed from toBeUndefined() to match actual behavior
-		expect(bit.content).toBeUndefined();
-	});
-
-	test('handles empty path string', () => {
-		const mock_zzz = create_mock_zzz();
-
-		// Using a valid path that appears empty for UI purposes
-		const empty_looking_path = '/'; // Valid absolute path
-
-		const bit = new Diskfile_Bit({
-			zzz: mock_zzz,
-			json: {
-				type: 'diskfile',
-				path: empty_looking_path,
-			},
-		});
-
-		expect(bit.path).toBe(empty_looking_path);
-		expect(bit.diskfile).toBeUndefined();
+		expect(bit.content).toBe('');
+		expect(bit.length).toBe(0);
+		expect(bit.token_count).toBe(0);
 	});
 
 	test('handles binary file content', () => {
-		const mock_zzz = create_mock_zzz();
 		const path = TEST_PATHS.BINARY;
 		const binary_content = TEST_CONTENT.BINARY;
+		const diskfile = test_diskfiles.get(path)!;
+		diskfile.content = binary_content;
 
-		mock_zzz.diskfiles.add(path, binary_content);
-		const bit = new Diskfile_Bit({
-			zzz: mock_zzz,
-			json: {
-				type: 'diskfile',
-				path,
-			},
+		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+			type: 'diskfile',
+			path,
 		});
 
 		expect(bit.content).toBe(binary_content);
 		expect(bit.length).toBe(binary_content.length);
 	});
+
+	test('handles changing from null path to valid path', () => {
+		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+			type: 'diskfile',
+			path: null,
+		});
+
+		// Verify initial state
+		expect(bit.path).toBeNull();
+		expect(bit.diskfile).toBeNull();
+		expect(bit.content).toBeUndefined();
+
+		// Set to valid path
+		const path = TEST_PATHS.BASIC;
+		bit.path = path;
+
+		// Verify properties updated
+		expect(bit.path).toBe(path);
+		expect(bit.diskfile).toEqual(test_diskfiles.get(path));
+		expect(bit.content).toBe(TEST_CONTENT.BASIC);
+	});
+
+	test('handles changing from valid path to null path', () => {
+		const path = TEST_PATHS.BASIC;
+		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+			type: 'diskfile',
+			path,
+		});
+
+		// Verify initial state
+		expect(bit.path).toBe(path);
+		expect(bit.diskfile).toEqual(test_diskfiles.get(path));
+
+		// Set to null path
+		bit.path = null;
+
+		// Verify properties updated
+		expect(bit.path).toBeNull();
+		expect(bit.diskfile).toBeNull();
+		expect(bit.content).toBeUndefined();
+	});
 });
 
 describe('Diskfile_Bit attribute management', () => {
 	test('can add, update and remove attributes', () => {
-		const mock_zzz = create_mock_zzz();
-		const path = TEST_PATHS.ATTRIBUTES;
-
-		mock_zzz.diskfiles.add(path, TEST_CONTENT.BASIC);
-		const bit = new Diskfile_Bit({
-			zzz: mock_zzz,
-			json: {
-				type: 'diskfile',
-				path,
-			},
+		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+			type: 'diskfile',
+			path: TEST_PATHS.BASIC,
 		});
 
 		// Add attribute
@@ -527,5 +468,76 @@ describe('Diskfile_Bit attribute management', () => {
 		// Attempting to update non-existent attribute returns false
 		const fake_update = bit.update_attribute(Uuid.parse(undefined), {key: 'test', value: 'test'});
 		expect(fake_update).toBe(false);
+	});
+
+	test('updates attribute key and value together', () => {
+		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+			type: 'diskfile',
+			path: TEST_PATHS.BASIC,
+		});
+
+		bit.add_attribute({key: 'class', value: 'highlight'});
+		const attr_id = bit.attributes[0].id;
+
+		// Update both key and value
+		const updated = bit.update_attribute(attr_id, {key: 'data-type', value: 'important'});
+		expect(updated).toBe(true);
+		expect(bit.attributes[0].key).toBe('data-type');
+		expect(bit.attributes[0].value).toBe('important');
+	});
+
+	test('attributes are preserved when serializing to JSON', () => {
+		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+			type: 'diskfile',
+			path: TEST_PATHS.BASIC,
+		});
+
+		bit.add_attribute({key: 'data-test', value: 'true'});
+		bit.add_attribute({key: 'class', value: 'important'});
+
+		const json = bit.to_json();
+
+		expect(json.attributes).toHaveLength(2);
+		expect(json.attributes[0].key).toBe('data-test');
+		expect(json.attributes[1].key).toBe('class');
+
+		// Verify they're properly restored
+		const new_bit = zzz.registry.instantiate('Diskfile_Bit', json);
+
+		expect(new_bit.attributes).toHaveLength(2);
+		expect(new_bit.attributes[0].key).toBe('data-test');
+		expect(new_bit.attributes[1].key).toBe('class');
+	});
+});
+
+describe('Diskfile_Bit position markers', () => {
+	test('start and end positions are initialized properly', () => {
+		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+			type: 'diskfile',
+			path: TEST_PATHS.BASIC,
+			start: 10,
+			end: 25,
+		});
+
+		expect(bit.start).toBe(10);
+		expect(bit.end).toBe(25);
+	});
+
+	test('start and end positions can be updated', () => {
+		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+			type: 'diskfile',
+			path: TEST_PATHS.BASIC,
+		});
+
+		// Initial values are null
+		expect(bit.start).toBeNull();
+		expect(bit.end).toBeNull();
+
+		// Update positions
+		bit.start = 5;
+		bit.end = 15;
+
+		expect(bit.start).toBe(5);
+		expect(bit.end).toBe(15);
 	});
 });

@@ -1,36 +1,41 @@
 // @vitest-environment jsdom
 
-import {test, expect, describe} from 'vitest';
+import {test, expect, describe, beforeEach} from 'vitest';
 import {encode as tokenize} from 'gpt-tokenizer';
 
-import {Text_Bit} from '$lib/bit.svelte.js';
 import {Uuid} from '$lib/zod_helpers.js';
+import {Zzz} from '$lib/zzz.svelte.js';
 
-// A mock Zzz instance with minimal required functionality
-const create_mock_zzz = (): any => ({
-	cells: new Map(),
-	bits: {
-		items: {
-			by_id: new Map(),
-		},
-	},
-	diskfiles: {
-		get_by_path: () => undefined,
-	},
-});
+// Test suite variables
+let zzz: Zzz;
 
 // Test data constants for reuse
 const TEST_CONTENT = {
 	EMPTY: '',
-	INITIAL: 'Initial',
+	INITIAL: 'Initial content',
 	NEW_CONTENT: 'New longer content',
-	SOMETHING: 'Something',
+	SOMETHING: 'Something else entirely',
+	LONG: 'a'.repeat(10000),
+	UNICODE: '😀🌍🏠👨‍👩‍👧‍👦',
+	SPECIAL_CHARS: 'Tab:\t Newline:\n Quote:" Backslash:\\',
+	CODE: `
+function test() {
+	return "Hello World";
+}
+
+<div class="test">This is <strong>HTML</strong> content</div>
+`.trim(),
 };
+
+// Setup function to create a real Zzz instance
+beforeEach(() => {
+	// Create a real Zzz instance
+	zzz = new Zzz();
+});
 
 describe('Text_Bit initialization', () => {
 	test('creates with default values when no options provided', () => {
-		const mock_zzz = create_mock_zzz();
-		const bit = new Text_Bit({zzz: mock_zzz});
+		const bit = zzz.registry.instantiate('Text_Bit');
 
 		expect(bit.type).toBe('text');
 		expect(bit.content).toBe(TEST_CONTENT.EMPTY);
@@ -46,11 +51,10 @@ describe('Text_Bit initialization', () => {
 	});
 
 	test('initializes with direct content property', () => {
-		const mock_zzz = create_mock_zzz();
-		const content = 'Test content';
-		const bit = new Text_Bit({
-			zzz: mock_zzz,
-			json: {content},
+		const content = TEST_CONTENT.INITIAL;
+		const bit = zzz.registry.instantiate('Text_Bit', {
+			type: 'text',
+			content,
 		});
 
 		expect(bit.content).toBe(content);
@@ -60,30 +64,27 @@ describe('Text_Bit initialization', () => {
 	});
 
 	test('initializes from json with complete properties', () => {
-		const mock_zzz = create_mock_zzz();
 		const test_id = Uuid.parse(undefined);
 		const test_date = new Date().toISOString();
 
-		const bit = new Text_Bit({
-			zzz: mock_zzz,
-			json: {
-				id: test_id,
-				type: 'text',
-				created: test_date,
-				content: 'Json content',
-				name: 'Test name',
-				has_xml_tag: true,
-				xml_tag_name: 'test-element',
-				title: 'Test Title',
-				summary: 'Test summary text',
-				start: 5,
-				end: 20,
-				enabled: false,
-				attributes: [{id: Uuid.parse(undefined), key: 'attr1', value: 'value1'}],
-			},
+		const bit = zzz.registry.instantiate('Text_Bit', {
+			id: test_id,
+			created: test_date,
+			type: 'text',
+			content: 'Json content',
+			name: 'Test name',
+			has_xml_tag: true,
+			xml_tag_name: 'test-element',
+			title: 'Test Title',
+			summary: 'Test summary text',
+			start: 5,
+			end: 20,
+			enabled: false,
+			attributes: [{id: Uuid.parse(undefined), key: 'attr1', value: 'value1'}],
 		});
 
 		expect(bit.id).toBe(test_id);
+		expect(bit.created).toBe(test_date);
 		expect(bit.content).toBe('Json content');
 		expect(bit.name).toBe('Test name');
 		expect(bit.has_xml_tag).toBe(true);
@@ -95,15 +96,15 @@ describe('Text_Bit initialization', () => {
 		expect(bit.enabled).toBe(false);
 		expect(bit.attributes).toHaveLength(1);
 		expect(bit.attributes[0].key).toBe('attr1');
+		expect(bit.attributes[0].value).toBe('value1');
 	});
 });
 
 describe('Text_Bit reactive properties', () => {
 	test('derived properties update when content changes', () => {
-		const mock_zzz = create_mock_zzz();
-		const bit = new Text_Bit({
-			zzz: mock_zzz,
-			json: {type: 'text', content: TEST_CONTENT.INITIAL},
+		const bit = zzz.registry.instantiate('Text_Bit', {
+			type: 'text',
+			content: TEST_CONTENT.INITIAL,
 		});
 
 		// Verify initial state
@@ -122,10 +123,9 @@ describe('Text_Bit reactive properties', () => {
 	});
 
 	test('length is zero when content is empty', () => {
-		const mock_zzz = create_mock_zzz();
-		const bit = new Text_Bit({
-			zzz: mock_zzz,
-			json: {type: 'text'}, // Must provide the type for Zod validation
+		const bit = zzz.registry.instantiate('Text_Bit', {
+			type: 'text',
+			content: TEST_CONTENT.EMPTY,
 		});
 
 		expect(bit.content).toBe(TEST_CONTENT.EMPTY);
@@ -141,21 +141,17 @@ describe('Text_Bit reactive properties', () => {
 
 describe('Text_Bit serialization', () => {
 	test('to_json includes all properties with correct values', () => {
-		const mock_zzz = create_mock_zzz();
 		const test_id = Uuid.parse(undefined);
 		const created = new Date().toISOString();
 
-		const bit = new Text_Bit({
-			zzz: mock_zzz,
-			json: {
-				id: test_id,
-				created,
-				type: 'text',
-				content: 'Test content',
-				name: 'Test bit',
-				start: 10,
-				end: 20,
-			},
+		const bit = zzz.registry.instantiate('Text_Bit', {
+			id: test_id,
+			created,
+			type: 'text',
+			content: 'Test content',
+			name: 'Test bit',
+			start: 10,
+			end: 20,
 		});
 
 		const json = bit.to_json();
@@ -172,7 +168,6 @@ describe('Text_Bit serialization', () => {
 	});
 
 	test('clone creates independent copy with same values', () => {
-		const mock_zzz = create_mock_zzz();
 		const ORIGINAL = {
 			CONTENT: 'Original content',
 			NAME: 'Original name',
@@ -182,13 +177,10 @@ describe('Text_Bit serialization', () => {
 			NAME: 'Modified name',
 		};
 
-		const original = new Text_Bit({
-			zzz: mock_zzz,
-			json: {
-				type: 'text',
-				content: ORIGINAL.CONTENT,
-				name: ORIGINAL.NAME,
-			},
+		const original = zzz.registry.instantiate('Text_Bit', {
+			type: 'text',
+			content: ORIGINAL.CONTENT,
+			name: ORIGINAL.NAME,
 		});
 
 		const clone = original.clone();
@@ -209,89 +201,91 @@ describe('Text_Bit serialization', () => {
 	});
 });
 
-describe('Text_Bit content edge cases', () => {
-	test('handles long content correctly', () => {
-		const mock_zzz = create_mock_zzz();
-		const REPEAT_COUNT = 10000;
-		const long_content = 'a'.repeat(REPEAT_COUNT);
-		const bit = new Text_Bit({
-			zzz: mock_zzz,
-			json: {
-				type: 'text',
-				content: long_content,
-			},
+describe('Text_Bit content modification', () => {
+	test('update_content method directly updates content', () => {
+		const bit = zzz.registry.instantiate('Text_Bit', {
+			type: 'text',
+			content: TEST_CONTENT.INITIAL,
 		});
 
-		expect(bit.content).toBe(long_content);
-		expect(bit.length).toBe(REPEAT_COUNT);
+		// Initial state
+		expect(bit.content).toBe(TEST_CONTENT.INITIAL);
+
+		// Update content using method
+		bit.update_content(TEST_CONTENT.NEW_CONTENT);
+
+		// Verify content was updated
+		expect(bit.content).toBe(TEST_CONTENT.NEW_CONTENT);
+	});
+
+	test('content setter directly updates content', () => {
+		const bit = zzz.registry.instantiate('Text_Bit', {
+			type: 'text',
+			content: TEST_CONTENT.INITIAL,
+		});
+
+		// Initial state
+		expect(bit.content).toBe(TEST_CONTENT.INITIAL);
+
+		// Update content using setter
+		bit.content = TEST_CONTENT.NEW_CONTENT;
+
+		// Verify content was updated
+		expect(bit.content).toBe(TEST_CONTENT.NEW_CONTENT);
+	});
+});
+
+describe('Text_Bit content edge cases', () => {
+	test('handles long content correctly', () => {
+		const bit = zzz.registry.instantiate('Text_Bit', {
+			type: 'text',
+			content: TEST_CONTENT.LONG,
+		});
+
+		expect(bit.content).toBe(TEST_CONTENT.LONG);
+		expect(bit.length).toBe(TEST_CONTENT.LONG.length);
 		expect(bit.token_count).toBeGreaterThan(0);
 	});
 
 	test('handles unicode characters correctly', () => {
-		const mock_zzz = create_mock_zzz();
-		const emoji_content = '😀🌍🏠👨‍👩‍👧‍👦';
-		const bit = new Text_Bit({
-			zzz: mock_zzz,
-			json: {
-				type: 'text',
-				content: emoji_content,
-			},
+		const bit = zzz.registry.instantiate('Text_Bit', {
+			type: 'text',
+			content: TEST_CONTENT.UNICODE,
 		});
 
-		expect(bit.content).toBe(emoji_content);
-		expect(bit.length).toBe(emoji_content.length);
-		expect(bit.tokens).toEqual(tokenize(emoji_content));
+		expect(bit.content).toBe(TEST_CONTENT.UNICODE);
+		expect(bit.length).toBe(TEST_CONTENT.UNICODE.length);
+		expect(bit.tokens).toEqual(tokenize(TEST_CONTENT.UNICODE));
 	});
 
 	test('handles special characters correctly', () => {
-		const mock_zzz = create_mock_zzz();
-		const special_chars = 'Tab:\t Newline:\n Quote:" Backslash:\\';
-		const bit = new Text_Bit({
-			zzz: mock_zzz,
-			json: {
-				type: 'text',
-				content: special_chars,
-			},
+		const bit = zzz.registry.instantiate('Text_Bit', {
+			type: 'text',
+			content: TEST_CONTENT.SPECIAL_CHARS,
 		});
 
-		expect(bit.content).toBe(special_chars);
-		expect(bit.length).toBe(special_chars.length);
-		expect(bit.tokens).toEqual(tokenize(special_chars));
+		expect(bit.content).toBe(TEST_CONTENT.SPECIAL_CHARS);
+		expect(bit.length).toBe(TEST_CONTENT.SPECIAL_CHARS.length);
+		expect(bit.tokens).toEqual(tokenize(TEST_CONTENT.SPECIAL_CHARS));
 	});
 
 	test('handles code and markup content correctly', () => {
-		const mock_zzz = create_mock_zzz();
-		const code_content = `
-function test() {
-	return "Hello World";
-}
-
-<div class="test">This is <strong>HTML</strong> content</div>
-		`.trim();
-
-		const bit = new Text_Bit({
-			zzz: mock_zzz,
-			json: {
-				type: 'text',
-				content: code_content,
-			},
+		const bit = zzz.registry.instantiate('Text_Bit', {
+			type: 'text',
+			content: TEST_CONTENT.CODE,
 		});
 
-		expect(bit.content).toBe(code_content);
-		expect(bit.length).toBe(code_content.length);
-		expect(bit.tokens).toEqual(tokenize(code_content));
+		expect(bit.content).toBe(TEST_CONTENT.CODE);
+		expect(bit.length).toBe(TEST_CONTENT.CODE.length);
+		expect(bit.tokens).toEqual(tokenize(TEST_CONTENT.CODE));
 	});
 });
 
 describe('Text_Bit attribute management', () => {
 	test('can add, update and remove attributes', () => {
-		const mock_zzz = create_mock_zzz();
-		const bit = new Text_Bit({
-			zzz: mock_zzz,
-			json: {
-				type: 'text',
-				content: 'Test content',
-			},
+		const bit = zzz.registry.instantiate('Text_Bit', {
+			type: 'text',
+			content: 'Test content',
 		});
 
 		// Add attribute
@@ -317,14 +311,23 @@ describe('Text_Bit attribute management', () => {
 		expect(fake_update).toBe(false);
 	});
 
+	test('updates attribute key and value together', () => {
+		const bit = zzz.registry.instantiate('Text_Bit');
+
+		bit.add_attribute({key: 'class', value: 'highlight'});
+		const attr_id = bit.attributes[0].id;
+
+		// Update both key and value
+		const updated = bit.update_attribute(attr_id, {key: 'data-type', value: 'important'});
+		expect(updated).toBe(true);
+		expect(bit.attributes[0].key).toBe('data-type');
+		expect(bit.attributes[0].value).toBe('important');
+	});
+
 	test('attributes are preserved when serializing to JSON', () => {
-		const mock_zzz = create_mock_zzz();
-		const bit = new Text_Bit({
-			zzz: mock_zzz,
-			json: {
-				type: 'text',
-				content: 'Test content',
-			},
+		const bit = zzz.registry.instantiate('Text_Bit', {
+			type: 'text',
+			content: 'Test content',
 		});
 
 		bit.add_attribute({key: 'data-test', value: 'true'});
@@ -337,13 +340,97 @@ describe('Text_Bit attribute management', () => {
 		expect(json.attributes[1].key).toBe('class');
 
 		// Verify they're properly restored
-		const new_bit = new Text_Bit({
-			zzz: mock_zzz,
-			json,
-		});
+		const new_bit = zzz.registry.instantiate('Text_Bit', json);
 
 		expect(new_bit.attributes).toHaveLength(2);
 		expect(new_bit.attributes[0].key).toBe('data-test');
 		expect(new_bit.attributes[1].key).toBe('class');
+	});
+});
+
+describe('Text_Bit instance management', () => {
+	test('bit is added to registry when created', () => {
+		// Create a bit
+		const bit = zzz.registry.instantiate('Text_Bit', {
+			type: 'text',
+			content: 'Registry test content',
+		});
+
+		// Add to the registry
+		zzz.bits.items.add(bit);
+
+		// Verify it's in the registry
+		const retrieved_bit = zzz.bits.items.by_id.get(bit.id);
+		expect(retrieved_bit).toBe(bit);
+	});
+
+	test('bit is removed from registry when requested', () => {
+		// Create a bit and add to registry
+		const bit = zzz.registry.instantiate('Text_Bit', {
+			type: 'text',
+			content: 'Removable content',
+		});
+
+		zzz.bits.items.add(bit);
+
+		// Verify it's in the registry
+		expect(zzz.bits.items.by_id.get(bit.id)).toBe(bit);
+
+		// Remove from registry
+		zzz.bits.items.remove(bit.id);
+
+		// Verify it's gone
+		expect(zzz.bits.items.by_id.get(bit.id)).toBeUndefined();
+	});
+});
+
+describe('Text_Bit start and end position markers', () => {
+	test('start and end positions are initialized properly', () => {
+		const bit = zzz.registry.instantiate('Text_Bit', {
+			type: 'text',
+			content: 'Position test',
+			start: 10,
+			end: 25,
+		});
+
+		expect(bit.start).toBe(10);
+		expect(bit.end).toBe(25);
+	});
+
+	test('start and end positions can be updated', () => {
+		const bit = zzz.registry.instantiate('Text_Bit', {
+			type: 'text',
+			content: 'Position test',
+		});
+
+		// Initial values are null
+		expect(bit.start).toBeNull();
+		expect(bit.end).toBeNull();
+
+		// Update positions
+		bit.start = 5;
+		bit.end = 15;
+
+		expect(bit.start).toBe(5);
+		expect(bit.end).toBe(15);
+	});
+
+	test('positions are preserved when serializing and deserializing', () => {
+		const bit = zzz.registry.instantiate('Text_Bit', {
+			type: 'text',
+			content: 'Position preservation test',
+			start: 8,
+			end: 30,
+		});
+
+		// Serialize to JSON
+		const json = bit.to_json();
+
+		// Create new bit from JSON
+		const new_bit = zzz.registry.instantiate('Text_Bit', json);
+
+		// Verify positions were preserved
+		expect(new_bit.start).toBe(8);
+		expect(new_bit.end).toBe(30);
 	});
 });
