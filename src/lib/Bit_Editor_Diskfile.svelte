@@ -19,6 +19,8 @@
 	const zzz = zzz_context.get();
 
 	// Create editor state reference - will be initialized in the effect
+	// TODO @many this initialization is awkward, ideally becomes refactored to mostly derived
+	// maybe this instance is created once, and it gets a thunk for the diskfile? `Dikfile_Editor_State.of(() => diskfile)`
 	let editor_state: Diskfile_Editor_State | undefined = $state();
 
 	// Keep track of the content editor for focusing
@@ -32,6 +34,7 @@
 		if (!diskfile) {
 			// Clear editor state if no diskfile is available
 			editor_state = undefined;
+			diskfile_bit.link_editor_state(null); // TODO @many this initialization is awkward, ideally becomes refactored to mostly derived
 			return;
 		}
 
@@ -41,12 +44,14 @@
 			// Create new editor state if it doesn't exist
 			if (!editor_state) {
 				editor_state = new Diskfile_Editor_State({zzz, diskfile});
+				diskfile_bit.link_editor_state(editor_state); // TODO @many this initialization is awkward, ideally becomes refactored to mostly derived
 				return;
 			}
 
 			// If diskfile ID changed, update the editor state with the new diskfile
 			if (editor_state.diskfile.id !== diskfile.id) {
 				editor_state.update_diskfile(diskfile);
+				diskfile_bit.link_editor_state(editor_state); // TODO @many this initialization is awkward, ideally becomes refactored to mostly derived
 				return;
 			}
 

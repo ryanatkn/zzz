@@ -201,12 +201,16 @@ export class Diskfile_Bit extends Bit<typeof Diskfile_Bit_Json> {
 
 	path: Diskfile_Path | null = $state()!;
 
+	// Reference to the editor state for this bit
+	#editor_state: {current_content: string} | null = $state(null); // TODO @many this initialization is awkward, ideally becomes refactored to mostly derived
+
 	diskfile: Diskfile | null | undefined = $derived(
 		this.path && this.zzz.diskfiles.get_by_path(this.path),
 	);
 
 	override get content(): string | null | undefined {
-		return this.diskfile?.content;
+		// Return editor content if available, otherwise fall back to diskfile content
+		return this.#editor_state?.current_content ?? this.diskfile?.content; // TODO @many this initialization is awkward, ideally becomes refactored to mostly derived
 	}
 
 	set content(value: string | null | undefined) {
@@ -218,6 +222,14 @@ export class Diskfile_Bit extends Bit<typeof Diskfile_Bit_Json> {
 		if (this.path) {
 			this.zzz.diskfiles.update(this.path, value);
 		}
+	}
+
+	// TODO @many this initialization is awkward, ideally becomes refactored to mostly derived
+	/**
+	 * Links this bit to an editor state
+	 */
+	link_editor_state(editor_state: {current_content: string} | null): void {
+		this.#editor_state = editor_state;
 	}
 
 	constructor(options: Diskfile_Bit_Options) {
