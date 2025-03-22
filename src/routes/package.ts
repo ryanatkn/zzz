@@ -272,11 +272,6 @@ export const package_json = {
 			svelte: './dist/Diskfile_Actions.svelte',
 			default: './dist/Diskfile_Actions.svelte',
 		},
-		'./Diskfile_Content_Editor.svelte': {
-			types: './dist/Diskfile_Content_Editor.svelte.d.ts',
-			svelte: './dist/Diskfile_Content_Editor.svelte',
-			default: './dist/Diskfile_Content_Editor.svelte',
-		},
 		'./diskfile_editor_state.svelte.js': {
 			types: './dist/diskfile_editor_state.svelte.d.ts',
 			default: './dist/diskfile_editor_state.svelte.js',
@@ -294,6 +289,11 @@ export const package_json = {
 		'./diskfile_helpers.js': {
 			types: './dist/diskfile_helpers.d.ts',
 			default: './dist/diskfile_helpers.js',
+		},
+		'./Diskfile_History_View.svelte': {
+			types: './dist/Diskfile_History_View.svelte.d.ts',
+			svelte: './dist/Diskfile_History_View.svelte',
+			default: './dist/Diskfile_History_View.svelte',
 		},
 		'./diskfile_history.svelte.js': {
 			types: './dist/diskfile_history.svelte.d.ts',
@@ -804,7 +804,6 @@ export const src_json = {
 		'./Dashboard_Settings.svelte': {path: 'Dashboard_Settings.svelte', declarations: []},
 		'./Dashboard.svelte': {path: 'Dashboard.svelte', declarations: []},
 		'./Diskfile_Actions.svelte': {path: 'Diskfile_Actions.svelte', declarations: []},
-		'./Diskfile_Content_Editor.svelte': {path: 'Diskfile_Content_Editor.svelte', declarations: []},
 		'./diskfile_editor_state.svelte.js': {
 			path: 'diskfile_editor_state.svelte.ts',
 			declarations: [{name: 'Diskfile_Editor_State', kind: 'class'}],
@@ -821,6 +820,7 @@ export const src_json = {
 				{name: 'has_dependencies', kind: 'function'},
 			],
 		},
+		'./Diskfile_History_View.svelte': {path: 'Diskfile_History_View.svelte', declarations: []},
 		'./diskfile_history.svelte.js': {
 			path: 'diskfile_history.svelte.ts',
 			declarations: [

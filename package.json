@@ -322,11 +322,6 @@
       "svelte": "./dist/Diskfile_Actions.svelte",
       "default": "./dist/Diskfile_Actions.svelte"
     },
-    "./Diskfile_Content_Editor.svelte": {
-      "types": "./dist/Diskfile_Content_Editor.svelte.d.ts",
-      "svelte": "./dist/Diskfile_Content_Editor.svelte",
-      "default": "./dist/Diskfile_Content_Editor.svelte"
-    },
     "./diskfile_editor_state.svelte.js": {
       "types": "./dist/diskfile_editor_state.svelte.d.ts",
       "default": "./dist/diskfile_editor_state.svelte.js"
@@ -344,6 +339,11 @@
     "./diskfile_helpers.js": {
       "types": "./dist/diskfile_helpers.d.ts",
       "default": "./dist/diskfile_helpers.js"
+    },
+    "./Diskfile_History_View.svelte": {
+      "types": "./dist/Diskfile_History_View.svelte.d.ts",
+      "svelte": "./dist/Diskfile_History_View.svelte",
+      "default": "./dist/Diskfile_History_View.svelte"
     },
     "./diskfile_history.svelte.js": {
       "types": "./dist/diskfile_history.svelte.d.ts",

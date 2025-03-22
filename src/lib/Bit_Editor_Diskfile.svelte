@@ -1,12 +1,14 @@
 <script lang="ts">
 	import {untrack} from 'svelte';
+	import {slide} from 'svelte/transition';
 
 	import {Diskfile_Bit} from '$lib/bit.svelte.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
-	import Diskfile_Content_Editor from '$lib/Diskfile_Content_Editor.svelte';
 	import Content_Editor from '$lib/Content_Editor.svelte';
 	import Diskfile_Actions from '$lib/Diskfile_Actions.svelte';
+	import Diskfile_Metrics from '$lib/Diskfile_Metrics.svelte';
 	import {Diskfile_Editor_State} from '$lib/diskfile_editor_state.svelte.js';
+	import Diskfile_History_View from '$lib/Diskfile_History_View.svelte';
 
 	interface Props {
 		diskfile_bit: Diskfile_Bit;
@@ -16,15 +18,47 @@
 	const {diskfile_bit, show_actions = true}: Props = $props();
 	const zzz = zzz_context.get();
 
-	// Create an editor state if we have a diskfile
-	const editor_state = $derived(
-		diskfile_bit.diskfile?.id
-			? untrack(() => new Diskfile_Editor_State({zzz, diskfile: diskfile_bit.diskfile!}))
-			: undefined,
-	);
+	// Create editor state reference - will be initialized in the effect
+	let editor_state: Diskfile_Editor_State | undefined = $state();
+
+	// Keep track of the content editor for focusing
+	let content_editor: {focus: () => void} | undefined = $state();
+
+	// Effect for managing editor state lifecycle
+	$effect.pre(() => {
+		// Track the diskfile from the bit
+		const diskfile = diskfile_bit.diskfile;
+
+		if (!diskfile) {
+			// Clear editor state if no diskfile is available
+			editor_state = undefined;
+			return;
+		}
+
+		// Here's the important part: we use untrack to avoid re-creating
+		// the editor state on every render while still updating it when needed
+		untrack(() => {
+			// Create new editor state if it doesn't exist
+			if (!editor_state) {
+				editor_state = new Diskfile_Editor_State({zzz, diskfile});
+				return;
+			}
+
+			// If diskfile ID changed, update the editor state with the new diskfile
+			if (editor_state.diskfile.id !== diskfile.id) {
+				editor_state.update_diskfile(diskfile);
+				return;
+			}
+
+			// Check for external disk changes
+			if (diskfile.content !== editor_state.last_seen_disk_content) {
+				editor_state.check_disk_changes();
+			}
+		});
+	});
 </script>
 
-<div>
+<div class="column">
 	<div class="p_xs bg_1 radius_xs mb_xs">
 		<div class="font_mono size_sm mb_xs">
 			{diskfile_bit.diskfile?.pathname || 'no file selected'}
@@ -47,18 +81,49 @@
 	</div>
 
 	{#if diskfile_bit.diskfile && editor_state}
-		<Diskfile_Content_Editor
-			diskfile={diskfile_bit.diskfile}
-			{editor_state}
-			show_stats={false}
-			readonly={!diskfile_bit.diskfile}
-		/>
+		<div>
+			<div class="column">
+				<Content_Editor
+					content={editor_state.current_content}
+					onchange={(content) => {
+						if (editor_state) {
+							editor_state.current_content = content;
+						}
+					}}
+					placeholder={diskfile_bit.diskfile.pathname}
+					show_stats={false}
+					readonly={false}
+					bind:this={content_editor}
+				/>
 
-		{#if show_actions && diskfile_bit.diskfile}
-			<div class="actions_section mt_xs">
-				<Diskfile_Actions diskfile={diskfile_bit.diskfile} {editor_state} />
+				{#if show_actions}
+					<div class="mt_xs">
+						<Diskfile_Actions diskfile={diskfile_bit.diskfile} {editor_state} />
+					</div>
+				{/if}
 			</div>
-		{/if}
+
+			<!-- Add file metadata when available -->
+			{#if editor_state}
+				<div class="my_xs size_sm">
+					<Diskfile_Metrics {editor_state} />
+				</div>
+			{/if}
+
+			{#if editor_state.has_history}
+				<div transition:slide class="max_height_sm">
+					<Diskfile_History_View
+						{editor_state}
+						on_entry_select={(entry_id) => {
+							if (editor_state) {
+								editor_state.set_content_from_history(entry_id);
+								content_editor?.focus();
+							}
+						}}
+					/>
+				</div>
+			{/if}
+		</div>
 	{:else}
 		<Content_Editor
 			content={diskfile_bit.content || ''}
