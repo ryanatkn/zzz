@@ -295,11 +295,6 @@ export const package_json = {
 			types: './dist/diskfile_helpers.d.ts',
 			default: './dist/diskfile_helpers.js',
 		},
-		'./Diskfile_History_Panel.svelte': {
-			types: './dist/Diskfile_History_Panel.svelte.d.ts',
-			svelte: './dist/Diskfile_History_Panel.svelte',
-			default: './dist/Diskfile_History_Panel.svelte',
-		},
 		'./diskfile_history.svelte.js': {
 			types: './dist/diskfile_history.svelte.d.ts',
 			default: './dist/diskfile_history.svelte.js',
@@ -582,6 +577,7 @@ export const package_json = {
 		},
 		'./tape_types.js': {types: './dist/tape_types.d.ts', default: './dist/tape_types.js'},
 		'./tape.svelte.js': {types: './dist/tape.svelte.d.ts', default: './dist/tape.svelte.js'},
+		'./test_helpers.js': {types: './dist/test_helpers.d.ts', default: './dist/test_helpers.js'},
 		'./test.task.js': {types: './dist/test.task.d.ts', default: './dist/test.task.js'},
 		'./time_helpers.js': {types: './dist/time_helpers.d.ts', default: './dist/time_helpers.js'},
 		'./time.svelte.js': {types: './dist/time.svelte.d.ts', default: './dist/time.svelte.js'},
@@ -825,7 +821,6 @@ export const src_json = {
 				{name: 'has_dependencies', kind: 'function'},
 			],
 		},
-		'./Diskfile_History_Panel.svelte': {path: 'Diskfile_History_Panel.svelte', declarations: []},
 		'./diskfile_history.svelte.js': {
 			path: 'diskfile_history.svelte.ts',
 			declarations: [
@@ -1071,10 +1066,7 @@ export const src_json = {
 		},
 		'./prompt_helpers.js': {
 			path: 'prompt_helpers.ts',
-			declarations: [
-				{name: 'format_prompt_content', kind: 'function'},
-				{name: 'render_prompt', kind: 'function'},
-			],
+			declarations: [{name: 'format_prompt_content', kind: 'function'}],
 		},
 		'./Prompt_List.svelte': {path: 'Prompt_List.svelte', declarations: []},
 		'./Prompt_Stats.svelte': {path: 'Prompt_Stats.svelte', declarations: []},
@@ -1266,6 +1258,15 @@ export const src_json = {
 			declarations: [
 				{name: 'Tape_Options', kind: 'type'},
 				{name: 'Tape', kind: 'class'},
+			],
+		},
+		'./test_helpers.js': {
+			path: 'test_helpers.ts',
+			declarations: [
+				{name: 'expect_ok', kind: 'function'},
+				{name: 'expect_defined', kind: 'function'},
+				{name: 'expect_nonnullish', kind: 'function'},
+				{name: 'monkeypatch_zzz_for_tests', kind: 'function'},
 			],
 		},
 		'./test.task.js': {

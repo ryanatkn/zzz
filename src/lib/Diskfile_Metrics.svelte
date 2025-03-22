@@ -16,10 +16,10 @@
 		<div>
 			chars
 			{editor_state.original_length}
-			{#if editor_state.original_length !== editor_state.updated_length}
+			{#if editor_state.original_length !== editor_state.current_length}
 				<span transition:fade={{duration: 80}}>
 					{GLYPH_ARROW_RIGHT}
-					{editor_state.updated_length}</span
+					{editor_state.current_length}</span
 				>{/if}
 		</div>
 		{#if editor_state.length_diff}
@@ -33,10 +33,10 @@
 		<div>
 			tokens
 			{editor_state.original_token_count}
-			{#if editor_state.original_token_count !== editor_state.updated_token_count}
+			{#if editor_state.original_token_count !== editor_state.current_token_count}
 				<span transition:fade={{duration: 80}}>
 					{GLYPH_ARROW_RIGHT}
-					{editor_state.updated_token_count}</span
+					{editor_state.current_token_count}</span
 				>{/if}
 		</div>
 		{#if editor_state.token_diff}

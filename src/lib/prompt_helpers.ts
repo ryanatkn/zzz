@@ -48,6 +48,3 @@ export const format_prompt_content = (bits: Array<Bit_Type>): string => {
 
 	return formatted_contents.join('\n\n');
 };
-
-// Rename current function but keep it for backwards compatibility
-export const render_prompt = format_prompt_content;

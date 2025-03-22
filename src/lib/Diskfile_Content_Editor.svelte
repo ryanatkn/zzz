@@ -41,13 +41,13 @@
 	let content_editor: {focus: () => void} | undefined = $state();
 
 	const handle_content_change = (content: string) => {
-		editor_state.updated_content = content;
+		editor_state.current_content = content;
 	};
 </script>
 
 <div class="h_100 column">
 	<Content_Editor
-		content={editor_state.updated_content}
+		content={editor_state.current_content}
 		onchange={handle_content_change}
 		placeholder={placeholder ?? GLYPH_PLACEHOLDER + ' ' + diskfile.pathname}
 		{show_stats}

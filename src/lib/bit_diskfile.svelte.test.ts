@@ -6,6 +6,7 @@ import {Uuid} from '$lib/zod_helpers.js';
 import {Zzz} from '$lib/zzz.svelte.js';
 import {Diskfile_Path} from '$lib/diskfile_types.js';
 import type {Diskfile} from '$lib/diskfile.svelte.js';
+import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Test data constants for reuse
 const TEST_PATHS = {
@@ -43,14 +44,7 @@ let test_diskfiles: Map<Diskfile_Path, Diskfile>;
 // Setup function to create a real Zzz instance and test diskfiles
 beforeEach(() => {
 	// Create a real Zzz instance
-	zzz = new Zzz();
-	// Override the async update method with a synchronous stub for tests
-	zzz.diskfiles.update = (path, content) => {
-		const diskfile = zzz.diskfiles.get_by_path(path);
-		if (diskfile) {
-			diskfile.content = content;
-		}
-	};
+	zzz = monkeypatch_zzz_for_tests(new Zzz());
 	test_diskfiles = new Map();
 
 	// Create test diskfiles
@@ -69,14 +63,12 @@ beforeEach(() => {
 		}
 
 		// Create the diskfile
-		const diskfile = zzz.registry.instantiate('Diskfile', {
-			path,
-			content,
-		});
-
-		// We need to register the diskfile with zzz.diskfiles
-		// This is important for Diskfile_Bit to find it
-		zzz.diskfiles.add(diskfile);
+		const diskfile = zzz.diskfiles.add(
+			zzz.registry.instantiate('Diskfile', {
+				path,
+				content,
+			}),
+		);
 
 		// Store for our test reference
 		test_diskfiles.set(path, diskfile);

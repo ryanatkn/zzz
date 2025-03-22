@@ -313,6 +313,9 @@ a.chip {
 .ml_sm {
 	margin-left: var(--space_sm);
 }
+.ml_xl {
+	margin-left: var(--space_xl);
+}
 .ml_xs {
 	margin-left: var(--space_xs);
 }
@@ -474,6 +477,10 @@ a.chip {
 .px_xs {
 	padding-left: var(--space_xs);
 	padding-right: var(--space_xs);
+}
+.py_sm {
+	padding-top: var(--space_sm);
+	padding-bottom: var(--space_sm);
 }
 .py_xl9 {
 	padding-top: var(--space_xl9);

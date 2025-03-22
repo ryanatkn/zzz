@@ -5,6 +5,7 @@ import {encode as tokenize} from 'gpt-tokenizer';
 
 import {Uuid} from '$lib/zod_helpers.js';
 import {Zzz} from '$lib/zzz.svelte.js';
+import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Test suite variables
 let zzz: Zzz;
@@ -30,7 +31,7 @@ function test() {
 // Setup function to create a real Zzz instance
 beforeEach(() => {
 	// Create a real Zzz instance
-	zzz = new Zzz();
+	zzz = monkeypatch_zzz_for_tests(new Zzz());
 });
 
 describe('Text_Bit initialization', () => {

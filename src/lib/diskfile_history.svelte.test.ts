@@ -6,6 +6,7 @@ import {Diskfile_History} from '$lib/diskfile_history.svelte.js';
 import {Diskfile_Path} from '$lib/diskfile_types.js';
 import {Uuid} from '$lib/zod_helpers.js';
 import {Zzz} from '$lib/zzz.svelte.js';
+import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Test data
 const TEST_PATH = Diskfile_Path.parse('/path/to/file.txt');
@@ -17,7 +18,7 @@ let history: Diskfile_History;
 
 beforeEach(() => {
 	// Create a real Zzz instance for each test
-	zzz = new Zzz();
+	zzz = monkeypatch_zzz_for_tests(new Zzz());
 
 	// Create a fresh history instance for each test with the real Zzz instance
 	history = new Diskfile_History({

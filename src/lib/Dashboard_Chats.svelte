@@ -19,7 +19,7 @@
 	<!-- TODO show the selected chat's info, if any -->
 	<!-- TODO, show the counts of active items for each of the model selector buttons in a snippet here -->
 	<div class="column_fixed">
-		<div class="p_sm">
+		<div class="py_sm pr_sm">
 			<button
 				class="plain w_100 justify_content_start"
 				type="button"

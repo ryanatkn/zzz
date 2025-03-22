@@ -345,11 +345,6 @@
       "types": "./dist/diskfile_helpers.d.ts",
       "default": "./dist/diskfile_helpers.js"
     },
-    "./Diskfile_History_Panel.svelte": {
-      "types": "./dist/Diskfile_History_Panel.svelte.d.ts",
-      "svelte": "./dist/Diskfile_History_Panel.svelte",
-      "default": "./dist/Diskfile_History_Panel.svelte"
-    },
     "./diskfile_history.svelte.js": {
       "types": "./dist/diskfile_history.svelte.d.ts",
       "default": "./dist/diskfile_history.svelte.js"
@@ -677,6 +672,10 @@
     "./tape.svelte.js": {
       "types": "./dist/tape.svelte.d.ts",
       "default": "./dist/tape.svelte.js"
+    },
+    "./test_helpers.js": {
+      "types": "./dist/test_helpers.d.ts",
+      "default": "./dist/test_helpers.js"
     },
     "./test.task.js": {
       "types": "./dist/test.task.d.ts",

@@ -290,7 +290,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	 * Lookup a history object for a given diskfile path without creating it
 	 * @returns The history object if it exists, undefined otherwise
 	 */
-	maybe_get_diskfile_history(path: Diskfile_Path): Diskfile_History | undefined {
+	get_diskfile_history(path: Diskfile_Path): Diskfile_History | undefined {
 		return this.diskfile_histories.get(path);
 	}
 
@@ -299,25 +299,8 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	 * @returns The newly created history object
 	 */
 	create_diskfile_history(path: Diskfile_Path): Diskfile_History {
-		const history = this.registry.instantiate('Diskfile_History', {
-			path,
-			entries: [],
-		});
+		const history = this.registry.instantiate('Diskfile_History', {path});
 		this.diskfile_histories.set(path, history);
-		return history;
-	}
-
-	/**
-	 * Get or create a history object for a given diskfile path
-	 * @deprecated Use maybe_get_diskfile_history() and create_diskfile_history() instead
-	 */
-	get_diskfile_history(path: Diskfile_Path): Diskfile_History {
-		let history = this.diskfile_histories.get(path);
-
-		if (!history) {
-			history = this.create_diskfile_history(path);
-		}
-
 		return history;
 	}
 }

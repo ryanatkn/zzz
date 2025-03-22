@@ -7,6 +7,7 @@ import {Bit, Text_Bit, Diskfile_Bit, Sequence_Bit} from '$lib/bit.svelte.js';
 import {Uuid} from '$lib/zod_helpers.js';
 import {Diskfile_Path} from '$lib/diskfile_types.js';
 import {Zzz} from '$lib/zzz.svelte.js';
+import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Test suite variables
 let zzz: Zzz;
@@ -22,14 +23,7 @@ const TEST_PATH = Diskfile_Path.parse('/path/to/test/file.txt');
 
 beforeEach(() => {
 	// Create a real Zzz instance for each test
-	zzz = new Zzz();
-	// Override async API with a synchronous stub
-	zzz.diskfiles.update = (path, content) => {
-		const diskfile = zzz.diskfiles.get_by_path(path);
-		if (diskfile) {
-			diskfile.content = content;
-		}
-	};
+	zzz = monkeypatch_zzz_for_tests(new Zzz());
 });
 
 describe('Bit base class functionality', () => {
@@ -259,13 +253,12 @@ describe('Text_Bit specific behavior', () => {
 describe('Diskfile_Bit specific behavior', () => {
 	test('Diskfile_Bit initialization and content access', () => {
 		// Create a diskfile first
-		const diskfile = zzz.registry.instantiate('Diskfile', {
-			path: TEST_PATH,
-			content: TEST_CONTENT.BASIC,
-		});
-
-		// Add to diskfiles registry
-		zzz.diskfiles.add(diskfile);
+		const diskfile = zzz.diskfiles.add(
+			zzz.registry.instantiate('Diskfile', {
+				path: TEST_PATH,
+				content: TEST_CONTENT.BASIC,
+			}),
+		);
 
 		// Create diskfile bit that references the diskfile
 		const bit = zzz.registry.instantiate('Diskfile_Bit', {
@@ -303,19 +296,19 @@ describe('Diskfile_Bit specific behavior', () => {
 		const path1 = Diskfile_Path.parse('/path/to/file1.txt');
 		const path2 = Diskfile_Path.parse('/path/to/file2.txt');
 
-		const diskfile1 = zzz.registry.instantiate('Diskfile', {
-			path: path1,
-			content: 'File 1 content',
-		});
+		zzz.diskfiles.add(
+			zzz.registry.instantiate('Diskfile', {
+				path: path1,
+				content: 'File 1 content',
+			}),
+		);
 
-		const diskfile2 = zzz.registry.instantiate('Diskfile', {
-			path: path2,
-			content: 'File 2 content',
-		});
-
-		// Add to diskfiles registry
-		zzz.diskfiles.add(diskfile1);
-		zzz.diskfiles.add(diskfile2);
+		zzz.diskfiles.add(
+			zzz.registry.instantiate('Diskfile', {
+				path: path2,
+				content: 'File 2 content',
+			}),
+		);
 
 		// Create bit referencing first file
 		const bit = zzz.registry.instantiate('Diskfile_Bit', {

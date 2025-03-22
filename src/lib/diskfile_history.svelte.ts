@@ -12,9 +12,10 @@ export const History_Entry = z.object({
 	id: Uuid.default(() => Uuid.parse(undefined)),
 	created: z.number(),
 	content: z.string(),
-	label: z.string().optional(),
+	label: z.string(),
 	is_disk_change: z.boolean().default(false),
 	is_unsaved_edit: z.boolean().default(false), // Indicates entries containing unsaved user edits
+	is_original_state: z.boolean().default(false), // Indicates if this entry represents the original disk state
 });
 export type History_Entry = z.infer<typeof History_Entry>;
 
@@ -24,7 +25,7 @@ export type History_Entry = z.infer<typeof History_Entry>;
 export const Diskfile_History_Json = Cell_Json.extend({
 	path: Diskfile_Path,
 	entries: z.array(History_Entry).default(() => []),
-	max_entries: z.number().default(100),
+	max_entries: z.number().default(100), // TODO rename? `history_size`? `max_size`? `capacity`?
 });
 export type Diskfile_History_Json = z.infer<typeof Diskfile_History_Json>;
 
@@ -58,6 +59,7 @@ export class Diskfile_History extends Cell<typeof Diskfile_History_Json> {
 		options: {
 			is_disk_change?: boolean;
 			is_unsaved_edit?: boolean;
+			is_original_state?: boolean;
 			label?: string;
 			created?: number;
 		} = {},
@@ -71,13 +73,11 @@ export class Diskfile_History extends Cell<typeof Diskfile_History_Json> {
 			id: Uuid.parse(undefined),
 			created: options.created ?? Date.now(),
 			content,
+			label: options.label ?? '',
 			is_disk_change: options.is_disk_change ?? false,
 			is_unsaved_edit: options.is_unsaved_edit ?? false,
+			is_original_state: options.is_original_state ?? false,
 		};
-
-		if (options.label) {
-			entry.label = options.label;
-		}
 
 		// Process the entries in a single operation
 		let new_entries = [...this.entries];
@@ -123,12 +123,21 @@ export class Diskfile_History extends Cell<typeof Diskfile_History_Json> {
 
 	/**
 	 * Clear all history entries except the most recent one by creation time
+	 * and any entries that match the optional keep predicate
 	 */
-	clear_except_current(): void {
+	clear_except_current(keep?: (entry: History_Entry) => boolean): void {
 		if (this.entries.length <= 1) return;
 
-		// Since entries are sorted by creation time (newest first),
-		// we can just keep the first entry
-		this.entries = this.entries.length ? [this.entries[0]] : [];
+		// Get the current (most recent) entry
+		const current = this.entries.length ? this.entries[0] : null;
+
+		// Filter entries to keep
+		this.entries = this.entries.filter((entry) => {
+			// Always keep the current entry
+			if (current && entry.id === current.id) return true;
+
+			// Keep entries that match the predicate if provided
+			return keep ? keep(entry) : false;
+		});
 	}
 }

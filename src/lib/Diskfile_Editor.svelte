@@ -25,9 +25,6 @@
 	// Reference to the content editor component
 	let content_editor: {focus: () => void} | undefined = $state();
 
-	const has_history = $derived(editor_state.content_history.length > 1);
-
-	// TODO BLOCK try to think about restructuring this, maybe using only derived and event handlers (zzz event bus maybe?)
 	// Combined effect to handle diskfile changes and disk change detection
 	$effect.pre(() => {
 		// Track diskfile changes explicitly
@@ -51,9 +48,9 @@
 <div class="flex h_100">
 	<div class="flex_1 h_100 column">
 		<Content_Editor
-			content={editor_state.updated_content}
+			content={editor_state.current_content}
 			onchange={(content) => {
-				editor_state.updated_content = content;
+				editor_state.current_content = content;
 			}}
 			placeholder={diskfile.pathname}
 			show_stats
@@ -69,14 +66,7 @@
 		</div>
 
 		<div class="mb_md p_md">
-			<Diskfile_Actions
-				{diskfile}
-				{editor_state}
-				on_accept_disk_changes={() => {
-					editor_state.accept_disk_changes();
-					content_editor?.focus();
-				}}
-			/>
+			<Diskfile_Actions {diskfile} {editor_state} />
 		</div>
 
 		{#if diskfile.dependencies_count || diskfile.dependents_count}
@@ -109,14 +99,35 @@
 			</div>
 		{/if}
 
-		{#if has_history}
+		{#if editor_state.has_history}
 			<div transition:slide>
 				<small class="px_sm flex justify_content_space_between mb_sm">
 					<Confirm_Button
 						onconfirm={() => editor_state.clear_history()}
-						attrs={{class: 'plain compact'}}
+						attrs={{
+							class: 'plain compact',
+							disabled: !editor_state.can_clear_history,
+							title: editor_state.can_clear_history
+								? 'Clear history entries except the current disk state'
+								: 'No history entries to clear',
+						}}
 					>
 						clear history
+					</Confirm_Button>
+
+					<Confirm_Button
+						onconfirm={() => {
+							editor_state.clear_unsaved_edits();
+						}}
+						attrs={{
+							class: 'plain compact',
+							disabled: !editor_state.can_clear_unsaved_edits,
+							title: editor_state.can_clear_unsaved_edits
+								? 'Remove all unsaved edit entries from history'
+								: 'No unsaved edits to clear',
+						}}
+					>
+						clear unsaved edits
 					</Confirm_Button>
 				</small>
 				<menu class="unstyled flex flex_column">
@@ -138,12 +149,14 @@
 							title={entry.label}
 						>
 							<!-- TODO if they're made into cells, there's a derived property for this -->
-							<span>{format(new Date(entry.created), FILE_TIME_FORMAT)}</span>
-							{#if entry.is_disk_change}
-								<span>disk</span>
-							{:else if entry.is_unsaved_edit}
-								<span>unsaved</span>
-							{/if}
+							<span>
+								<span>{format(new Date(entry.created), FILE_TIME_FORMAT)}</span>
+								{#if entry.is_disk_change}
+									<span class="ml_xl">from disk</span>
+								{:else if entry.is_unsaved_edit}
+									<span class="ml_xl">unsaved</span>
+								{/if}
+							</span>
 							<span>{entry.content.length} chars</span>
 						</button>
 					{/each}
