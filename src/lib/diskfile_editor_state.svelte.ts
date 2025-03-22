@@ -40,6 +40,11 @@ export class Diskfile_Editor_State {
 	history: Diskfile_History | undefined = $derived.by(() =>
 		this.zzz.get_diskfile_history(this.diskfile.path),
 	);
+	selected_history_entry = $derived.by(() =>
+		this.history && this.selected_history_entry_id
+			? this.history.find_entry_by_id(this.selected_history_entry_id)
+			: null,
+	);
 	content_history: Array<History_Entry> = $derived(this.history?.entries || []);
 	saved_history_entries: Array<History_Entry> = $derived(
 		this.content_history.filter((entry) => !entry.is_unsaved_edit),
@@ -87,11 +92,8 @@ export class Diskfile_Editor_State {
 	// Getter/setter for current_content
 	get current_content(): string {
 		// If we have a selected entry, use its content
-		if (this.selected_history_entry_id && this.history) {
-			const entry = this.history.find_entry_by_id(this.selected_history_entry_id);
-			if (entry) {
-				return entry.content;
-			}
+		if (this.selected_history_entry) {
+			return this.selected_history_entry.content;
 		}
 
 		// If no entry is selected or found, use original content or empty string
@@ -346,6 +348,7 @@ export class Diskfile_Editor_State {
 		// Track which history entry is selected
 		this.selected_history_entry_id = id;
 
+		// Get the selected entry
 		const entry = history.find_entry_by_id(id);
 		if (!entry) return;
 
@@ -429,12 +432,7 @@ export class Diskfile_Editor_State {
 		history.entries = new_entries;
 
 		// Update selection if needed
-		const selected_entry = this.selected_history_entry_id
-			? history.find_entry_by_id(this.selected_history_entry_id)
-			: null;
-
-		// If selected entry was removed, select the newest non-unsaved
-		if (!selected_entry && newest_non_unsaved) {
+		if (!this.selected_history_entry && newest_non_unsaved) {
 			this.selected_history_entry_id = newest_non_unsaved.id;
 		}
 	}
@@ -447,11 +445,7 @@ export class Diskfile_Editor_State {
 		if (!history) return;
 
 		// Track if current selection is unsaved
-		let current_selection_was_unsaved = false;
-		if (this.selected_history_entry_id) {
-			const selected_entry = history.find_entry_by_id(this.selected_history_entry_id);
-			current_selection_was_unsaved = !!selected_entry?.is_unsaved_edit;
-		}
+		const current_selection_was_unsaved = this.selected_history_entry?.is_unsaved_edit || false;
 
 		// Filter out unsaved entries
 		history.entries = history.entries.filter((entry) => !entry.is_unsaved_edit);
