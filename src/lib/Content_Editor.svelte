@@ -45,25 +45,6 @@
 	export const focus = (): void => {
 		textarea_el?.focus();
 	};
-
-	/**
-	 * Handle pasting content from clipboard
-	 */
-	const handle_paste = (text: string) => {
-		if (readonly) return;
-		const new_content = content + text;
-		onchange?.(new_content);
-		textarea_el?.focus();
-	};
-
-	/**
-	 * Handle clearing or restoring content
-	 */
-	const handle_clear = (value: string) => {
-		if (readonly) return;
-		onchange?.(value);
-		textarea_el?.focus();
-	};
 </script>
 
 <div class="column w_100 flex_1">
@@ -88,10 +69,23 @@
 	{#if show_actions && !readonly}
 		<div class="flex mt_xs">
 			<Copy_To_Clipboard text={content} attrs={{class: 'plain'}} />
-			<Paste_From_Clipboard onpaste={handle_paste} attrs={{class: 'plain icon_button size_lg'}}
-				>{GLYPH_PASTE}</Paste_From_Clipboard
+			<Paste_From_Clipboard
+				onpaste={(value) => {
+					const new_content = content + value;
+					onchange?.(new_content);
+					textarea_el?.focus();
+				}}
+				attrs={{class: 'plain icon_button size_lg'}}
 			>
-			<Clear_Restore_Button value={content} onchange={handle_clear} />
+				{GLYPH_PASTE}
+			</Paste_From_Clipboard>
+			<Clear_Restore_Button
+				value={content}
+				onchange={(value) => {
+					onchange?.(value);
+					textarea_el?.focus();
+				}}
+			/>
 		</div>
 	{/if}
 </div>

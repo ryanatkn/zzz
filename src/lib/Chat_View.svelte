@@ -156,7 +156,7 @@
 			<Content_Editor
 				content={main_input}
 				onchange={handle_main_input_change}
-				placeholder="{GLYPH_PLACEHOLDER} send to all"
+				placeholder="{GLYPH_PLACEHOLDER} to {count}"
 				show_actions
 				bind:this={main_input_el}
 			>
