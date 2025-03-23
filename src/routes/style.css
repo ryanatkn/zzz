@@ -20,6 +20,7 @@ textarea {
 /* This is needed in places where glyphs may appear with non-sans fonts like headings. */
 .glyph {
 	font-family: var(--font_sans);
+	font-weight: 400;
 }
 
 .click_effect_scale:hover {

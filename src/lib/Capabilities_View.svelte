@@ -19,15 +19,15 @@
 			<Capability_Server />
 		</section>
 		<section class="mb_xl12">
-			<h2><Glyph_Icon icon={GLYPH_DIRECTORY} /> filesystem</h2>
+			<h2><Glyph_Icon icon={GLYPH_DIRECTORY} /> server filesystem</h2>
 			<Capability_Filesystem />
 		</section>
 		<section class="mb_xl12">
-			<h2><Glyph_Icon icon={GLYPH_CONNECT} /> websocket</h2>
+			<h2><Glyph_Icon icon={GLYPH_CONNECT} /> server websocket</h2>
 			<Capability_Websocket />
 		</section>
 		<section class="mb_xl12">
-			<h2><Provider_Logo name="ollama" /> ollama</h2>
+			<h2><Provider_Logo name="ollama" /> Ollama</h2>
 			<Capability_Ollama />
 		</section>
 		<section class="mb_xl12">

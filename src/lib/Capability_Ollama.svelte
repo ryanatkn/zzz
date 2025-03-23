@@ -16,6 +16,7 @@
 	} from '$lib/glyphs.js';
 	import Error_Message from '$lib/Error_Message.svelte';
 	import {OLLAMA_URL} from '$lib/ollama.js';
+	import External_Link from '$lib/External_Link.svelte';
 
 	const zzz = zzz_context.get();
 	const {capabilities} = zzz;
@@ -51,12 +52,14 @@
 		</div>
 
 		<div class="flex_1 p_md">
-			Ollama (<a href="https://ollama.com/">ollama.com</a>,
-			<a href="https://github.com/ollama/ollama">GitHub</a>) is a local model server that's one of
-			Zzz's first integrations. See also the <Provider_Link
+			Ollama (<External_Link href="https://ollama.com/">ollama.com</External_Link>,
+			<External_Link href="https://github.com/ollama/ollama">GitHub</External_Link>) is a local
+			model server that wraps
+			<External_Link href="https://github.com/ggml-org/llama.cpp">llama.cpp</External_Link>. It's
+			one of Zzz's first integrations but will probably be swapped for llama.cpp. See also the <Provider_Link
 				provider={zzz.providers.find_by_name('ollama')}
 				><span class="white_space_nowrap"><Glyph_Icon icon={GLYPH_PROVIDER} /> Ollama</span> provider</Provider_Link
-			> page. I'll add a UI to manage the models here soon.
+			> page.
 		</div>
 	</div>
 
@@ -122,4 +125,6 @@
 			<p>No models found. You can install models using the Ollama CLI.</p>
 		</div>
 	{/if}
+
+	<div>TODO add a ui to manage models</div>
 </div>

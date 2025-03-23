@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type {SvelteHTMLElements} from 'svelte/elements';
 	import type {Snippet} from 'svelte';
-	import {github_logo} from '@ryanatkn/fuz/logos.js';
+	import {chatgpt_logo, claude_logo, gemini_logo, github_logo} from '@ryanatkn/fuz/logos.js';
 	import Svg, {type Svg_Data} from '@ryanatkn/fuz/Svg.svelte';
 
 	import External_Link_Icon from '$lib/External_Link_Icon.svelte';
@@ -16,8 +16,21 @@
 
 	const {href, open_externally = true, attrs, icon, children}: Props = $props();
 
+	const github_regex = /^https:\/\/(?:[\w-]+\.)*github\.com\//;
+	const openai_regex = /^https:\/\/(?:[\w-]+\.)*(chatgpt\.com|openai\.com)\//;
+	const anthropic_regex = /^https:\/\/(?:[\w-]+\.)*(claude\.ai|anthropic\.com)\//;
+	const google_regex = /^https:\/\/(?:[\w-]+\.)*(google\.com|google\.dev)\//;
+
 	const known_logo: Svg_Data | null = $derived(
-		href.startsWith('https://github.com/') ? github_logo : null,
+		github_regex.test(href)
+			? github_logo
+			: openai_regex.test(href)
+				? chatgpt_logo
+				: anthropic_regex.test(href)
+					? claude_logo
+					: google_regex.test(href)
+						? gemini_logo
+						: null,
 	);
 </script>
 
@@ -30,6 +43,7 @@
 		>{#snippet children(text_icon)}{#if icon}{@render icon(known_logo)}{:else if known_logo}<Svg
 					data={known_logo}
 					size="var(--size_xs)"
+					fill="var(--text_color)"
 					inline
 				/>{:else}{text_icon}{/if}{/snippet}</External_Link_Icon
 	></a
