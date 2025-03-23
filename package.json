@@ -381,10 +381,10 @@
       "svelte": "./dist/Error_Message.svelte",
       "default": "./dist/Error_Message.svelte"
     },
-    "./External_Link_Symbol.svelte": {
-      "types": "./dist/External_Link_Symbol.svelte.d.ts",
-      "svelte": "./dist/External_Link_Symbol.svelte",
-      "default": "./dist/External_Link_Symbol.svelte"
+    "./External_Link_Icon.svelte": {
+      "types": "./dist/External_Link_Icon.svelte.d.ts",
+      "svelte": "./dist/External_Link_Icon.svelte",
+      "default": "./dist/External_Link_Icon.svelte"
     },
     "./External_Link.svelte": {
       "types": "./dist/External_Link.svelte.d.ts",

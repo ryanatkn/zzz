@@ -52,6 +52,8 @@ export const GLYPH_DIRECTION_CLIENT = '⥘'; // ⤤ ⤳
 export const GLYPH_DIRECTION_SERVER = '⥙'; // ⤷
 export const GLYPH_DIRECTION_BOTH = '⤨';
 
+export const GLYPH_EXTERNAL_LINK = '🡵';
+
 export const GLYPH_ARROW_RIGHT = '➝'; // → ➝ ➞ ➜ ➡ ⟶ ⭢ ⤷ ⤳ ⥅ ⮕ ⭆ ⮞ ⭆ ⭈ ⤞ ⤠
 
 export const get_icon_for_message_type = (type: string): string => {

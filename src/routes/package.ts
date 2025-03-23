@@ -331,10 +331,10 @@ export const package_json = {
 			svelte: './dist/Error_Message.svelte',
 			default: './dist/Error_Message.svelte',
 		},
-		'./External_Link_Symbol.svelte': {
-			types: './dist/External_Link_Symbol.svelte.d.ts',
-			svelte: './dist/External_Link_Symbol.svelte',
-			default: './dist/External_Link_Symbol.svelte',
+		'./External_Link_Icon.svelte': {
+			types: './dist/External_Link_Icon.svelte.d.ts',
+			svelte: './dist/External_Link_Icon.svelte',
+			default: './dist/External_Link_Icon.svelte',
 		},
 		'./External_Link.svelte': {
 			types: './dist/External_Link.svelte.d.ts',
@@ -860,7 +860,7 @@ export const src_json = {
 			],
 		},
 		'./Error_Message.svelte': {path: 'Error_Message.svelte', declarations: []},
-		'./External_Link_Symbol.svelte': {path: 'External_Link_Symbol.svelte', declarations: []},
+		'./External_Link_Icon.svelte': {path: 'External_Link_Icon.svelte', declarations: []},
 		'./External_Link.svelte': {path: 'External_Link.svelte', declarations: []},
 		'./Glyph_Icon.svelte': {path: 'Glyph_Icon.svelte', declarations: []},
 		'./glyphs.js': {

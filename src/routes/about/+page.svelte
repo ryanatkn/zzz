@@ -41,7 +41,8 @@
 		<p>Integrations: (everything's a work in progress, but some basics work)</p>
 		<ul>
 			<li>
-				<External_Link href="https://github.com/ollama/ollama">Ollama</External_Link>
+				<External_Link href="https://github.com/ollama/ollama">Ollama</External_Link> (to be swapped
+				for <External_Link href="https://github.com/ggml-org/llama.cpp">llama.cpp</External_Link>)
 			</li>
 			<li>
 				<External_Link href="https://github.com/openai/openai-node">ChatGPT</External_Link>
