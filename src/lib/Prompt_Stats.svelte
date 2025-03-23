@@ -8,8 +8,7 @@
 
 	const {prompt}: Props = $props();
 
-	const length = $derived(prompt.content.length);
 	const token_count = $derived(prompt.token_count);
 </script>
 
-<Content_Stats {length} {token_count} />
+<Content_Stats {token_count} />

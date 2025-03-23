@@ -79,7 +79,7 @@
 	</div>
 
 	{#if show_stats}
-		<Content_Stats length={content.length} {token_count} />
+		<Content_Stats {token_count} />
 	{/if}
 
 	{@render after?.()}

@@ -8,8 +8,7 @@
 
 	const {bit}: Props = $props();
 
-	const length = $derived(bit.length ?? 0);
 	const token_count = $derived(bit.token_count ?? 0);
 </script>
 
-<Content_Stats {length} {token_count} />
+<Content_Stats {token_count} />
