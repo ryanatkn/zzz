@@ -8,16 +8,16 @@
 	import type {Position, Alignment} from '$lib/position_helpers.js';
 
 	interface Props {
-		position?: Position;
-		align?: Alignment;
-		disable_outside_click?: boolean;
-		popover_class?: string;
-		popover_attrs?: SvelteHTMLElements['div'];
+		position?: Position | undefined;
+		align?: Alignment | undefined;
+		disable_outside_click?: boolean | undefined;
+		popover_class?: string | undefined;
+		popover_attrs?: SvelteHTMLElements['div'] | undefined;
 		popover_content: Snippet<[popover: Popover]>;
-		popover_container_attrs?: SvelteHTMLElements['div'];
-		attrs?: SvelteHTMLElements['button'];
-		button?: Snippet<[popover: Popover]>;
-		children?: Snippet<[popover: Popover]>;
+		popover_container_attrs?: SvelteHTMLElements['div'] | undefined;
+		attrs?: SvelteHTMLElements['button'] | undefined;
+		button?: Snippet<[popover: Popover]> | undefined;
+		children?: Snippet<[popover: Popover]> | undefined;
 	}
 
 	const {

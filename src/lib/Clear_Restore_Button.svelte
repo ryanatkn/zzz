@@ -5,11 +5,11 @@
 	import {GLYPH_CLEAR, GLYPH_RESTORE} from '$lib/glyphs.js';
 
 	interface Props {
-		value: string;
+		value: string; // TODO change to a $bindable
 		onchange: (value: string) => void;
-		attrs?: SvelteHTMLElements['button'];
-		restore?: Snippet;
-		children?: Snippet;
+		attrs?: SvelteHTMLElements['button'] | undefined;
+		restore?: Snippet | undefined;
+		children?: Snippet | undefined;
 	}
 
 	const {value, onchange, attrs, restore, children}: Props = $props();

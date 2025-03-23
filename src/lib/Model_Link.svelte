@@ -13,9 +13,9 @@
 		/**
 		 * `true` is equivalent to `'svg'`
 		 */
-		icon?: boolean | 'svg' | 'glyph';
-		attrs?: SvelteHTMLElements['a'];
-		children?: Snippet;
+		icon?: boolean | 'svg' | 'glyph' | undefined;
+		attrs?: SvelteHTMLElements['a'] | undefined;
+		children?: Snippet | undefined;
 	}
 
 	const {model, icon, attrs, children}: Props = $props();

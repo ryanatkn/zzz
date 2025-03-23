@@ -7,9 +7,9 @@
 
 	interface Props {
 		bit: Bit_Type;
-		prompt?: Prompt;
-		prompts?: Prompts;
-		attrs?: Record<string, string>;
+		prompt?: Prompt | undefined;
+		prompts?: Prompts | undefined;
+		attrs?: Record<string, string> | undefined;
 	}
 
 	const {bit, prompt, prompts, attrs = {}}: Props = $props();

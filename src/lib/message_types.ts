@@ -29,6 +29,7 @@ export const Tape_History_Message = z.object({
 });
 export type Tape_History_Message = z.infer<typeof Tape_History_Message>;
 
+// TODO these types need work
 // Define explicit interfaces for provider-specific data
 export interface Ollama_Provider_Data {
 	type: 'ollama';
@@ -51,8 +52,8 @@ export interface Gemini_Provider_Data {
 		text: string;
 		candidates: Array<any> | null;
 		function_calls: Array<any> | null;
-		prompt_feedback: any | null;
-		usage_metadata: any | null;
+		prompt_feedback: any | null; // eslint-disable-line @typescript-eslint/no-redundant-type-constituents
+		usage_metadata: any | null; // eslint-disable-line @typescript-eslint/no-redundant-type-constituents
 	};
 }
 

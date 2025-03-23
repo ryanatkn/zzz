@@ -27,7 +27,7 @@
 	const pid = $props.id();
 
 	interface Props {
-		socket?: Socket;
+		socket?: Socket | undefined;
 	}
 
 	const {socket: socket_prop}: Props = $props();

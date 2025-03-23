@@ -8,11 +8,11 @@
 	import {get_icon_for_message_type, get_direction_icon} from '$lib/glyphs.js';
 
 	interface Props {
-		files?: Array<Message> | null;
-		limit?: number;
-		selected_message_id?: string | null;
-		attrs?: SvelteHTMLElements['menu'];
-		onselect?: (message: Message) => void;
+		files?: Array<Message> | null | undefined;
+		limit?: number | undefined;
+		selected_message_id?: string | null | undefined;
+		attrs?: SvelteHTMLElements['menu'] | undefined;
+		onselect?: ((message: Message) => void) | undefined;
 	}
 
 	const {files = null, limit = 20, selected_message_id = null, attrs, onselect}: Props = $props();

@@ -3,8 +3,8 @@
 	import {zzz_context} from '$lib/zzz.svelte.js';
 
 	interface Props {
-		models?: Array<Model>;
 		selected_model: Model; // TODO get from context?
+		models?: Array<Model> | undefined;
 	}
 
 	// I think I like this pattern of `prop_` aliasing for situations like this because

@@ -7,8 +7,8 @@
 
 	interface Props {
 		href: string;
-		selected?: boolean;
-		attrs?: SvelteHTMLElements['a'];
+		selected?: boolean | undefined;
+		attrs?: SvelteHTMLElements['a'] | undefined;
 		children: Snippet<[selected: boolean, selected_descendent: boolean]>;
 	}
 

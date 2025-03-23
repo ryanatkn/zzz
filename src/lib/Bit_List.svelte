@@ -11,12 +11,12 @@
 
 	interface Props {
 		bits: Array<Bit_Type>;
-		prompt?: Prompt;
-		onreorder?: (from_index: number, to_index: number) => void;
-		reorderable_options?: Reorderable_Options;
-		item_attrs?: SvelteHTMLElements['li'];
-		attrs?: SvelteHTMLElements['ul'];
-		empty?: Snippet;
+		prompt?: Prompt | undefined;
+		onreorder?: ((from_index: number, to_index: number) => void) | undefined;
+		reorderable_options?: Reorderable_Options | undefined;
+		item_attrs?: SvelteHTMLElements['li'] | undefined;
+		attrs?: SvelteHTMLElements['ul'] | undefined;
+		empty?: Snippet | undefined;
 	}
 
 	const {

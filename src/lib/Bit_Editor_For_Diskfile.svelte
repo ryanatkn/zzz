@@ -12,7 +12,7 @@
 
 	interface Props {
 		diskfile_bit: Diskfile_Bit;
-		show_actions?: boolean;
+		show_actions?: boolean | undefined;
 	}
 
 	const {diskfile_bit, show_actions = true}: Props = $props();

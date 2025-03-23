@@ -13,9 +13,9 @@
 	interface Props {
 		diskfile: Diskfile;
 		editor_state: Diskfile_Editor_State;
-		save_button_text?: string;
-		readonly?: boolean;
-		auto_save?: boolean;
+		save_button_text?: string | undefined;
+		readonly?: boolean | undefined;
+		auto_save?: boolean | undefined;
 	}
 
 	const {

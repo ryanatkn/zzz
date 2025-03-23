@@ -9,8 +9,8 @@
 
 	interface Props {
 		onselect: (model: Model) => void;
-		models?: Array<Model>;
-		children?: Snippet<[model: Model]>;
+		models?: Array<Model> | undefined;
+		children?: Snippet<[model: Model]> | undefined;
 	}
 
 	const {onselect, models = zzz.models.items.all, children}: Props = $props();

@@ -7,10 +7,10 @@
 
 	interface Props {
 		name: Provider_Name;
-		fill?: string | null | undefined;
-		size?: string;
-		inline?: boolean;
-		props?: ComponentProps<typeof Svg>;
+		fill?: string | null | undefined | undefined;
+		size?: string | undefined;
+		inline?: boolean | undefined;
+		props?: ComponentProps<typeof Svg> | undefined;
 	}
 
 	const {

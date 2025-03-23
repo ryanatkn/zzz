@@ -11,7 +11,7 @@
 	import {GLYPH_DIRECTORY, GLYPH_CREATE_FILE, GLYPH_CREATE_FOLDER} from '$lib/glyphs.js';
 
 	interface Props {
-		empty?: Snippet;
+		empty?: Snippet | undefined;
 	}
 
 	const {empty}: Props = $props();

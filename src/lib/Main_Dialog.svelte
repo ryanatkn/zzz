@@ -10,7 +10,7 @@
 	import Settings from '$lib/Settings.svelte';
 
 	interface Props {
-		disabled?: boolean;
+		disabled?: boolean | undefined;
 	}
 
 	const {disabled}: Props = $props();

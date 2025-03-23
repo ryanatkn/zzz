@@ -6,9 +6,9 @@
 
 	interface Props {
 		href: string;
-		open_externally?: boolean; // Set to false to disable external link behavior
-		attrs?: SvelteHTMLElements['a'];
-		children?: Snippet;
+		open_externally?: boolean | undefined; // Set to false to disable external link behavior
+		attrs?: SvelteHTMLElements['a'] | undefined;
+		children?: Snippet | undefined;
 	}
 
 	const {href, open_externally = true, attrs, children}: Props = $props();

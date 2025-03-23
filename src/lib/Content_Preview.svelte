@@ -3,10 +3,10 @@
 
 	interface Props {
 		content: string;
-		height?: string;
-		min_height?: string;
-		max_height?: string;
-		attrs?: SvelteHTMLElements['pre'];
+		height?: string | undefined;
+		min_height?: string | undefined;
+		max_height?: string | undefined;
+		attrs?: SvelteHTMLElements['pre'] | undefined;
 	}
 
 	const {

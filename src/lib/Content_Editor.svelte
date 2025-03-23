@@ -13,16 +13,16 @@
 	interface Props {
 		content: string; // TODO maybe rename to value? rethink `Content_Editor` in general when we switch to CodeMirror
 		/** `content` is tokenized to get this if not provided and `show_stats` is true. */
-		token_count?: number;
+		token_count?: number | undefined;
 		placeholder?: string | null | undefined;
-		readonly?: boolean;
-		show_stats?: boolean;
-		show_actions?: boolean;
-		textarea_height?: string;
-		attrs?: SvelteHTMLElements['textarea'];
-		after?: Snippet;
-		children?: Snippet;
-		onsave?: (value: string) => void;
+		readonly?: boolean | undefined;
+		show_stats?: boolean | undefined;
+		show_actions?: boolean | undefined;
+		textarea_height?: string | undefined;
+		attrs?: SvelteHTMLElements['textarea'] | undefined;
+		after?: Snippet | undefined;
+		children?: Snippet | undefined;
+		onsave?: ((value: string) => void) | undefined;
 	}
 
 	let {

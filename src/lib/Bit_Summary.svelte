@@ -6,7 +6,7 @@
 
 	interface Props {
 		bit: Bit_Type;
-		prompt?: Prompt;
+		prompt?: Prompt | undefined;
 	}
 	const {bit, prompt}: Props = $props();
 

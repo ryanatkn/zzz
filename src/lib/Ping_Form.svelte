@@ -8,7 +8,7 @@
 	import {PING_HISTORY_MAX, type Ping_Data} from '$lib/capabilities.svelte.js';
 
 	interface Props {
-		children?: Snippet;
+		children?: Snippet | undefined;
 	}
 
 	const {children}: Props = $props();

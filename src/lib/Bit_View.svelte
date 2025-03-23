@@ -14,7 +14,7 @@
 	interface Props {
 		bit: Bit_Type;
 		prompts: Prompts;
-		show_actions?: boolean;
+		show_actions?: boolean | undefined;
 	}
 
 	const {bit, prompts, show_actions = true}: Props = $props();

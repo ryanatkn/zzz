@@ -9,7 +9,7 @@
 
 	interface Props {
 		provider: Provider;
-		attrs?: SvelteHTMLElements['div'];
+		attrs?: SvelteHTMLElements['div'] | undefined;
 	}
 
 	const {provider, attrs}: Props = $props();

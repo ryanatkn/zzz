@@ -10,14 +10,14 @@
 
 	interface Props {
 		provider: Provider_Json | null | undefined; // TODO BLOCK Provider, not Provider_Json?
-		icon?: 'glyph' | 'svg' | Snippet<[provider: Provider_Json, glyph: string]>;
-		icon_props?: Record<string, any>;
-		row?: boolean;
-		show_name?: boolean;
-		attrs?: SvelteHTMLElements['a'];
-		fallback_attrs?: SvelteHTMLElements['span'];
-		fallback?: Snippet;
-		children?: Snippet;
+		icon?: 'glyph' | 'svg' | Snippet<[provider: Provider_Json, glyph: string]> | undefined;
+		icon_props?: Record<string, any> | undefined;
+		row?: boolean | undefined;
+		show_name?: boolean | undefined;
+		attrs?: SvelteHTMLElements['a'] | undefined;
+		fallback_attrs?: SvelteHTMLElements['span'] | undefined;
+		fallback?: Snippet | undefined;
+		children?: Snippet | undefined;
 	}
 
 	const {provider, icon, icon_props, show_name, attrs, fallback_attrs, fallback, children}: Props =

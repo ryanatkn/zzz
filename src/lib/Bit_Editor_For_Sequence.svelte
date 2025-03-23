@@ -9,7 +9,7 @@
 
 	interface Props {
 		sequence_bit: Sequence_Bit;
-		prompt?: Prompt;
+		prompt?: Prompt | undefined;
 	}
 
 	const {sequence_bit, prompt}: Props = $props();

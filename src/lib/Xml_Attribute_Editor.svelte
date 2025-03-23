@@ -5,7 +5,7 @@
 
 	interface Props {
 		attribute: Xml_Attribute;
-		dormant?: boolean;
+		dormant?: boolean | undefined;
 		onupdate: (updates: Partial<Omit<Xml_Attribute, 'id'>>) => void;
 		onremove: () => void;
 	}

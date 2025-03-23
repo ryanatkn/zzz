@@ -11,14 +11,14 @@
 	interface Props
 		extends Omit_Strict<ComponentProps<typeof Popover_Button>, 'popover_content' | 'children'> {
 		onconfirm: (popover: Popover) => void;
-		popover_button_attrs?: SvelteHTMLElements['button'];
-		hide_on_confirm?: boolean;
+		popover_button_attrs?: SvelteHTMLElements['button'] | undefined;
+		hide_on_confirm?: boolean | undefined;
 		/** Unlike on `Popover_Button` this is optional and has a `confirm` arg */
-		popover_content?: Snippet<[popover: Popover, confirm: () => void]>;
+		popover_content?: Snippet<[popover: Popover, confirm: () => void]> | undefined;
 		/** Content for the popover button */
-		popover_button_content?: Snippet<[popover: Popover, confirm: () => void]>;
+		popover_button_content?: Snippet<[popover: Popover, confirm: () => void]> | undefined;
 		/** Unlike on `Popover_Button` this has a `confirm` arg */
-		children?: Snippet<[popover: Popover, confirm: () => void]>;
+		children?: Snippet<[popover: Popover, confirm: () => void]> | undefined;
 	}
 
 	const {

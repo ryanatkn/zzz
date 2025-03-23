@@ -7,7 +7,7 @@
 	import {zzz_context} from '$lib/zzz.svelte.js';
 
 	interface Props {
-		chat?: Chat;
+		chat?: Chat | undefined;
 	}
 
 	const {chat = zzz_context.get().chats.selected}: Props = $props();

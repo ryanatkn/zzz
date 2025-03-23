@@ -6,7 +6,7 @@
 
 	interface Props {
 		model: Model;
-		attrs?: SvelteHTMLElements['div'];
+		attrs?: SvelteHTMLElements['div'] | undefined;
 	}
 
 	const {model, attrs}: Props = $props();

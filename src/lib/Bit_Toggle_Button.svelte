@@ -5,7 +5,7 @@
 
 	interface Props {
 		bit: Bit_Type;
-		attrs?: SvelteHTMLElements['input'];
+		attrs?: SvelteHTMLElements['input'] | undefined;
 	}
 
 	const {bit, attrs = {}}: Props = $props();

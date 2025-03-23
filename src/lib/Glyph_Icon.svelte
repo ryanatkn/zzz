@@ -3,8 +3,8 @@
 
 	interface Props {
 		icon: string;
-		size?: string;
-		attrs?: SvelteHTMLElements['span'];
+		size?: string | undefined;
+		attrs?: SvelteHTMLElements['span'] | undefined;
 	}
 
 	const {icon, size, attrs}: Props = $props();
