@@ -60,6 +60,7 @@
 <p>
 	For security reasons, all filesystem operations are confined to this path's parent directory,
 	<small class="chip font_mono">{zzz.zzz_dir_parent || '[no zzz dir configured]'}</small>, and the
-	path cannot be modified after the server starts. These restrictions help ensure predictability
-	when exposing sensitive resources like your local hard drive to web scripts.
+	path cannot be modified after the server starts. These restrictions may be loosened in the future,
+	but they help ensure predictability when exposing sensitive resources like your local hard drive
+	to web scripts.
 </p>
