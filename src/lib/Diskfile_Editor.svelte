@@ -53,6 +53,9 @@
 			show_stats
 			readonly={false}
 			attrs={{class: 'radius_0'}}
+			onsave={(value) => {
+				zzz.diskfiles.update(diskfile.path, value);
+			}}
 		/>
 	</div>
 

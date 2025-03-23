@@ -5,9 +5,9 @@
 	import Bit_Stats from '$lib/Bit_Stats.svelte';
 	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
 	import {get_bit_type_glyph} from '$lib/bit_helpers.js';
-	import Bit_Editor_Text from '$lib/Bit_Editor_Text.svelte';
-	import Bit_Editor_Diskfile from '$lib/Bit_Editor_Diskfile.svelte';
-	import Bit_Editor_Sequence from '$lib/Bit_Editor_Sequence.svelte';
+	import Bit_Editor_For_Text from '$lib/Bit_Editor_For_Text.svelte';
+	import Bit_Editor_For_Diskfile from '$lib/Bit_Editor_For_Diskfile.svelte';
+	import Bit_Editor_For_Sequence from '$lib/Bit_Editor_For_Sequence.svelte';
 	import Bit_Toggle_Button from '$lib/Bit_Toggle_Button.svelte';
 	import Bit_Remove_Button from '$lib/Bit_Remove_Button.svelte';
 
@@ -36,11 +36,11 @@
 
 	<!-- Content section - different for each bit type -->
 	{#if bit.type === 'text'}
-		<Bit_Editor_Text text_bit={bit} {show_actions} />
+		<Bit_Editor_For_Text text_bit={bit} {show_actions} />
 	{:else if bit.type === 'diskfile'}
-		<Bit_Editor_Diskfile diskfile_bit={bit} {show_actions} />
+		<Bit_Editor_For_Diskfile diskfile_bit={bit} {show_actions} />
 	{:else if bit.type === 'sequence'}
-		<Bit_Editor_Sequence sequence_bit={bit} {prompt} />
+		<Bit_Editor_For_Sequence sequence_bit={bit} {prompt} />
 	{/if}
 
 	<!-- Common controls for all bit types -->

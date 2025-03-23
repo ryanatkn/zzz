@@ -80,20 +80,20 @@ export const package_json = {
 	files: ['dist'],
 	exports: {
 		'./package.json': './package.json',
-		'./Bit_Editor_Diskfile.svelte': {
-			types: './dist/Bit_Editor_Diskfile.svelte.d.ts',
-			svelte: './dist/Bit_Editor_Diskfile.svelte',
-			default: './dist/Bit_Editor_Diskfile.svelte',
+		'./Bit_Editor_For_Diskfile.svelte': {
+			types: './dist/Bit_Editor_For_Diskfile.svelte.d.ts',
+			svelte: './dist/Bit_Editor_For_Diskfile.svelte',
+			default: './dist/Bit_Editor_For_Diskfile.svelte',
 		},
-		'./Bit_Editor_Sequence.svelte': {
-			types: './dist/Bit_Editor_Sequence.svelte.d.ts',
-			svelte: './dist/Bit_Editor_Sequence.svelte',
-			default: './dist/Bit_Editor_Sequence.svelte',
+		'./Bit_Editor_For_Sequence.svelte': {
+			types: './dist/Bit_Editor_For_Sequence.svelte.d.ts',
+			svelte: './dist/Bit_Editor_For_Sequence.svelte',
+			default: './dist/Bit_Editor_For_Sequence.svelte',
 		},
-		'./Bit_Editor_Text.svelte': {
-			types: './dist/Bit_Editor_Text.svelte.d.ts',
-			svelte: './dist/Bit_Editor_Text.svelte',
-			default: './dist/Bit_Editor_Text.svelte',
+		'./Bit_Editor_For_Text.svelte': {
+			types: './dist/Bit_Editor_For_Text.svelte.d.ts',
+			svelte: './dist/Bit_Editor_For_Text.svelte',
+			default: './dist/Bit_Editor_For_Text.svelte',
 		},
 		'./bit_helpers.js': {types: './dist/bit_helpers.d.ts', default: './dist/bit_helpers.js'},
 		'./Bit_List.svelte': {
@@ -612,9 +612,9 @@ export const src_json = {
 	version: '0.0.1',
 	modules: {
 		'./package.json': {path: 'package.json', declarations: []},
-		'./Bit_Editor_Diskfile.svelte': {path: 'Bit_Editor_Diskfile.svelte', declarations: []},
-		'./Bit_Editor_Sequence.svelte': {path: 'Bit_Editor_Sequence.svelte', declarations: []},
-		'./Bit_Editor_Text.svelte': {path: 'Bit_Editor_Text.svelte', declarations: []},
+		'./Bit_Editor_For_Diskfile.svelte': {path: 'Bit_Editor_For_Diskfile.svelte', declarations: []},
+		'./Bit_Editor_For_Sequence.svelte': {path: 'Bit_Editor_For_Sequence.svelte', declarations: []},
+		'./Bit_Editor_For_Text.svelte': {path: 'Bit_Editor_For_Text.svelte', declarations: []},
 		'./bit_helpers.js': {
 			path: 'bit_helpers.ts',
 			declarations: [

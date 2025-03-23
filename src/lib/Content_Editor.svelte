@@ -8,9 +8,10 @@
 	import Content_Stats from '$lib/Content_Stats.svelte';
 	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
 	import {GLYPH_PASTE, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
+	import {swallow} from '@ryanatkn/belt/dom.js';
 
 	interface Props {
-		content: string;
+		content: string; // TODO maybe rename to value? rethink `Content_Editor` in general when we switch to CodeMirror
 		/** `content` is tokenized to get this if not provided and `show_stats` is true. */
 		token_count?: number;
 		placeholder?: string | null | undefined;
@@ -21,6 +22,7 @@
 		attrs?: SvelteHTMLElements['textarea'];
 		after?: Snippet;
 		children?: Snippet;
+		onsave?: (value: string) => void;
 	}
 
 	let {
@@ -34,6 +36,7 @@
 		attrs,
 		after,
 		children,
+		onsave,
 	}: Props = $props();
 
 	let textarea_el: HTMLTextAreaElement | undefined = $state();
@@ -48,6 +51,18 @@
 		textarea_el?.focus();
 	};
 </script>
+
+<svelte:document
+	onkeydown={onsave
+		? (event) => {
+				// Check for Ctrl+S or Command+S (Mac)
+				if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+					swallow(event);
+					onsave(content);
+				}
+			}
+		: undefined}
+/>
 
 <div class="column w_100 flex_1">
 	<div class="flex flex_1 gap_xs2 w_100">

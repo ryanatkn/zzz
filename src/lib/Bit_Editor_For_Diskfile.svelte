@@ -18,6 +18,8 @@
 	const {diskfile_bit, show_actions = true}: Props = $props();
 	const zzz = zzz_context.get();
 
+	const {diskfile} = $derived(diskfile_bit);
+
 	// Create editor state reference - will be initialized in the effect
 	// TODO @many this initialization is awkward, ideally becomes refactored to mostly derived
 	// maybe this instance is created once, and it gets a thunk for the diskfile? `Dikfile_Editor_State.of(() => diskfile)`
@@ -29,8 +31,6 @@
 	// Effect for managing editor state lifecycle
 	$effect.pre(() => {
 		// Track the diskfile from the bit
-		const diskfile = diskfile_bit.diskfile;
-
 		if (!diskfile) {
 			// Clear editor state if no diskfile is available
 			editor_state = undefined;
@@ -66,15 +66,15 @@
 <div class="column">
 	<div class="p_xs bg_1 radius_xs mb_xs">
 		<div class="font_mono size_sm mb_xs">
-			{diskfile_bit.diskfile?.pathname || 'no file selected'}
+			{diskfile?.pathname || 'no file selected'}
 		</div>
-		{#if diskfile_bit.diskfile}
+		{#if diskfile}
 			<div class="mb_xs">
 				<button
 					type="button"
 					class="plain size_sm"
 					onclick={() => {
-						zzz.diskfiles.select(diskfile_bit.diskfile?.id);
+						zzz.diskfiles.select(diskfile.id);
 					}}
 				>
 					View file
@@ -85,7 +85,7 @@
 		{/if}
 	</div>
 
-	{#if diskfile_bit.diskfile && editor_state}
+	{#if diskfile && editor_state}
 		<div>
 			<div class="column">
 				<Content_Editor
@@ -99,14 +99,17 @@
 						}
 					}
 					token_count={editor_state.current_token_count}
-					placeholder={diskfile_bit.diskfile.pathname}
+					placeholder={diskfile.pathname}
 					show_stats={false}
 					readonly={false}
+					onsave={(value) => {
+						zzz.diskfiles.update(diskfile.path, value);
+					}}
 				/>
 
 				{#if show_actions}
 					<div class="mt_xs">
-						<Diskfile_Actions diskfile={diskfile_bit.diskfile} {editor_state} />
+						<Diskfile_Actions {diskfile} {editor_state} />
 					</div>
 				{/if}
 			</div>
