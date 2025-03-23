@@ -67,11 +67,11 @@ export class Socket extends Cell<typeof Socket_Json> {
 	last_send_time: number | null = $state(null);
 	last_receive_time: number | null = $state(null);
 	last_connect_time: number | null = $state(null);
-	heartbeat_timeout: number | null = $state(null);
+	heartbeat_timeout: NodeJS.Timeout | null = $state(null);
 
 	// Keep track of connection attempts
 	reconnect_count: number = $state(0);
-	reconnect_timeout: number | null = $state(null);
+	reconnect_timeout: NodeJS.Timeout | null = $state(null);
 	current_reconnect_delay: number = $state(0);
 
 	// TODO need to think about garbage cleanup
@@ -404,7 +404,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 	#schedule_next_heartbeat(): void {
 		this.#stop_heartbeat();
 
-		this.heartbeat_timeout = window.setTimeout(
+		this.heartbeat_timeout = setTimeout(
 			() => {
 				// Only send heartbeat if we need to based on last activity
 				const now = Date.now();
@@ -427,7 +427,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 
 	#stop_heartbeat(): void {
 		if (this.heartbeat_timeout !== null) {
-			window.clearTimeout(this.heartbeat_timeout);
+			clearTimeout(this.heartbeat_timeout);
 			this.heartbeat_timeout = null;
 		}
 	}
@@ -442,7 +442,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 			Math.min(this.reconnect_delay_max, this.reconnect_delay * 1.5 ** (this.reconnect_count - 1)),
 		);
 
-		this.reconnect_timeout = window.setTimeout(() => {
+		this.reconnect_timeout = setTimeout(() => {
 			this.reconnect_timeout = null;
 			this.connect();
 		}, this.current_reconnect_delay);
@@ -462,7 +462,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 
 	#cancel_reconnect(): void {
 		if (this.reconnect_timeout !== null) {
-			window.clearTimeout(this.reconnect_timeout);
+			clearTimeout(this.reconnect_timeout);
 			this.reconnect_timeout = null;
 		}
 	}

@@ -1,24 +1,16 @@
-import {test, expect, vi} from 'vitest';
+// @vitest-environment jsdom
+
+import {test, expect} from 'vitest';
 
 import {Message} from '$lib/message.svelte.js';
-import type {Zzz} from '$lib/zzz.svelte.js';
-
-// Mock Zzz instance
-const create_mock_zzz = () => {
-	return {
-		cells: new Map(),
-		registry: {
-			instantiate: vi.fn(),
-		},
-	} as unknown as Zzz;
-};
+import {Zzz} from '$lib/zzz.svelte.js';
 
 // Add a basic test that the Message class can be instantiated with minimal data
 test('Message - can be instantiated with minimal data', () => {
-	const mock_zzz = create_mock_zzz();
+	const zzz = new Zzz();
 
 	const ping_message = new Message({
-		zzz: mock_zzz,
+		zzz,
 		json: {
 			type: 'ping',
 			direction: 'client',
