@@ -80,8 +80,6 @@
 					View file
 				</button>
 			</div>
-		{:else}
-			<em class="fg_1">File not found or not selected</em>
 		{/if}
 	</div>
 

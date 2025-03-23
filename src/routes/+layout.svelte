@@ -48,13 +48,10 @@
 
 		// Create prompts with bits using the new API
 		const prompt1 = zzz.prompts.add();
-		const bit1 = Bit.create(zzz, {type: 'text', content: 'one'});
-		const bit2 = Bit.create(zzz, {type: 'text', content: '2'});
-		const bit3 = Bit.create(zzz, {type: 'text', content: 'c'});
-
-		prompt1.add_bit(bit1);
-		prompt1.add_bit(bit2);
-		prompt1.add_bit(bit3);
+		prompt1.add_bit(Bit.create(zzz, {type: 'text', content: 'one'}));
+		prompt1.add_bit(Bit.create(zzz, {type: 'text', content: '2'}));
+		prompt1.add_bit(Bit.create(zzz, {type: 'diskfile'}));
+		prompt1.add_bit(Bit.create(zzz, {type: 'sequence'}));
 
 		// Create more prompts with bits
 		const prompt2 = zzz.prompts.add();

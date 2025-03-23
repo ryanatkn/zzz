@@ -63,9 +63,7 @@
 	</div>
 
 	{#if sequence_bit.bits.length === 0}
-		<div class="p_xs bg_2 radius_xs size_sm">
-			<em>No bits in sequence</em>
-		</div>
+		<div class="p_xs bg_2 radius_xs size_sm font_mono">no bits in sequence</div>
 	{:else}
 		<Bit_List
 			bits={sequence_bit.bits}
