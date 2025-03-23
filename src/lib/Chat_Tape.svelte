@@ -50,7 +50,7 @@
 
 <!-- TODO `duration_2` is the Moss variable for 200ms and 1 for 80ms, but it's not in a usable form -->
 <div class="chat_tape" transition:scale={{duration: 200}}>
-	<div class="flex justify_content_space_between">
+	<div class="flex justify_content_space_between align_items_start">
 		<header>
 			<div class="size_lg">
 				<Model_Link model={tape.model} icon />

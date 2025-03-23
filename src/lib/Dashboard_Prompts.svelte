@@ -124,7 +124,7 @@
 	{#if zzz.prompts.selected}
 		<div class="column_fixed pr_sm">
 			{#if zzz.prompts.selected}
-				<div class="row gap_sm p_xs sticky t_0 b_0 bg">
+				<div class="row gap_sm py_xs sticky t_0 b_0 bg">
 					<Copy_To_Clipboard text={zzz.prompts.selected.content} attrs={{class: 'plain'}} />
 					<Prompt_Stats prompt={zzz.prompts.selected} />
 				</div>

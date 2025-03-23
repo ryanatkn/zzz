@@ -3,6 +3,8 @@
 	import type {Bit_Type} from '$lib/bit.svelte.js';
 	import Bit_Toggle_Button from '$lib/Bit_Toggle_Button.svelte';
 	import Bit_Remove_Button from '$lib/Bit_Remove_Button.svelte';
+	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
+	import {get_bit_type_glyph} from '$lib/bit_helpers.js';
 
 	interface Props {
 		bit: Bit_Type;
@@ -25,6 +27,7 @@
 >
 	<div class="progress_bar" style:width="{percent}%"></div>
 	<div class="flex_1 pl_sm py_xs3 ellipsis">
+		<span class="mr_xs2"><Glyph_Icon icon={get_bit_type_glyph(bit)} /></span>
 		{bit.name}
 	</div>
 	<div class="controls flex gap_xs2">

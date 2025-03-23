@@ -11,6 +11,8 @@ import {HANDLED} from '$lib/cell_helpers.js';
 import {to_completion_response_text} from '$lib/response_helpers.js';
 import {Completion_Request, type Completion_Response} from '$lib/message_types.js';
 
+// TODO add `tape.name` probably
+
 export interface Tape_Options extends Cell_Options<typeof Tape_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 /**
  * A tape is a linear sequence of strips that maintains a chronological

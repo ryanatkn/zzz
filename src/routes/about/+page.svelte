@@ -139,9 +139,8 @@
 			<li>local code editors</li>
 			<li>social media apps</li>
 			<li>cloud office suites</li>
-			<li>learning platforms</li>
 			<li>content creation apps</li>
-			<li>while we're at it, browsers and desktop environments</li>
+			<li>while we're at it, browsers and OS desktop environments</li>
 		</ul>
 		<p>
 			Most features are optional through plugins, so the core experience stays efficient and
@@ -149,8 +148,8 @@
 		</p>
 		<p>
 			Zzz is just one implementation of an increasingly common idea, and it has quirks personal to
-			its author that I'm generally open to oatmealifying. Your input is highly valued to keep
-			things on track and fun—see the
+			its author that I'm generally open to oatmealifying. Your input is valued to keep things on
+			track and fun—see the
 			<External_Link href="https://github.com/ryanatkn/zzz/issues">issues</External_Link>
 			and
 			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link>
@@ -160,7 +159,7 @@
 		<p>
 			I expect Zzz to evolve chaotically alongside its cohort of AI-informed web software, with the
 			goal of ongoing convergence toward ecosystem-wide interoperability as protocols fall and rise,
-			fundamentally anchored in powerful open clients and local-first software.
+			anchored in powerful open clients and local-first software.
 		</p>
 	</section>
 	<section>
