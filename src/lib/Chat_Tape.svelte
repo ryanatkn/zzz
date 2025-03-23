@@ -39,11 +39,6 @@
 
 	const scrollable = new Scrollable();
 
-	// Handle content change
-	const handle_input_change = (content: string) => {
-		input = content;
-	};
-
 	// TODO BLOCK add reset button
 
 	// TODO BLOCK edit individual items in the list (contextmenu too - show contextmenu target outline)
@@ -89,12 +84,12 @@
 
 	<div>
 		<Content_Editor
-			content={input}
-			onchange={handle_input_change}
+			bind:this={content_input}
+			bind:content={input}
+			token_count={input_tokens.length}
 			placeholder={GLYPH_PLACEHOLDER}
 			show_stats
 			show_actions
-			bind:this={content_input}
 		>
 			<Pending_Button
 				{pending}

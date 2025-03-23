@@ -49,19 +49,18 @@
 			console.error(`model not found: ${zzz.bots.namerbot}`);
 		}
 	}
-	let main_input = $state(''); // TODO BLOCK @many this state probably belongs on the `multichat` object
 
 	let pending = $state(false); // TODO BLOCK @many this state probably belongs on the `multichat` object
 	let main_input_el: {focus: () => void} | undefined;
 
 	const send_to_all = async () => {
 		if (!count) return;
-		const parsed = main_input.trim();
+		const parsed = chat.main_input.trim();
 		if (!parsed) {
 			main_input_el?.focus();
 			return;
 		}
-		main_input = '';
+		chat.main_input = '';
 		pending = true;
 		await chat.send_to_all(parsed);
 		pending = false;
@@ -82,10 +81,6 @@
 	// TODO BLOCK custom buttons section - including quick local, smartest all, all, etc
 
 	// TODO BLOCK remove all tapes needs to open to the right of the button
-
-	const handle_main_input_change = (content: string) => {
-		main_input = content;
-	};
 
 	const tags = $derived(Array.from(zzz.tags)); // TODO BLOCK refactor, maybe `zzz.tags_array`? or `zzz.tags.all`
 </script>
@@ -154,11 +149,12 @@
 	<div class="column_fluid">
 		<div class="column_bg_1 p_sm">
 			<Content_Editor
-				content={main_input}
-				onchange={handle_main_input_change}
+				bind:this={main_input_el}
+				bind:content={chat.main_input}
+				token_count={chat.main_input_token_count}
 				placeholder="{GLYPH_PLACEHOLDER} to {count}"
 				show_actions
-				bind:this={main_input_el}
+				show_stats
 			>
 				<Pending_Button
 					{pending}

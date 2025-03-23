@@ -46,15 +46,13 @@
 <div class="flex h_100">
 	<div class="flex_1 h_100 column">
 		<Content_Editor
-			content={editor_state.current_content}
-			onchange={(content) => {
-				editor_state.current_content = content;
-			}}
+			bind:this={content_editor}
+			bind:content={editor_state.current_content}
+			token_count={editor_state.current_token_count}
 			placeholder={diskfile.pathname}
 			show_stats
 			readonly={false}
 			attrs={{class: 'radius_0'}}
-			bind:this={content_editor}
 		/>
 	</div>
 

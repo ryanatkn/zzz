@@ -215,7 +215,7 @@ export class Diskfile_Bit extends Bit<typeof Diskfile_Bit_Json> {
 
 	set content(value: string | null | undefined) {
 		if (value == null) {
-			if (DEV) console.error(`Setting content to ${value} is not allowed`);
+			if (DEV) console.error(`Cannot set diskfile content to ${value}`);
 			return;
 		}
 

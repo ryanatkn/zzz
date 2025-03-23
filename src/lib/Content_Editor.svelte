@@ -11,33 +11,35 @@
 
 	interface Props {
 		content: string;
-		onchange?: (content: string) => void;
+		/** `content` is tokenized to get this if not provided and `show_stats` is true. */
+		token_count?: number;
 		placeholder?: string | null | undefined;
 		readonly?: boolean;
 		show_stats?: boolean;
 		show_actions?: boolean;
 		textarea_height?: string;
 		attrs?: SvelteHTMLElements['textarea'];
+		after?: Snippet;
 		children?: Snippet;
 	}
 
-	const {
-		content,
-		onchange,
+	let {
+		content = $bindable(),
+		token_count: token_count_prop,
 		placeholder = GLYPH_PLACEHOLDER,
 		readonly = false,
 		show_stats = false,
 		show_actions = false,
 		textarea_height,
 		attrs,
+		after,
 		children,
 	}: Props = $props();
 
 	let textarea_el: HTMLTextAreaElement | undefined = $state();
 
-	const content_length = $derived(content.length);
-	const content_tokens = $derived(tokenize(content)); // TODO BLOCK duplicates work, pass a class instance instead?
-	const token_count = $derived(content_tokens.length);
+	const content_tokens = $derived(tokenize(content));
+	const token_count = $derived(token_count_prop ?? content_tokens.length);
 
 	/**
 	 * Focus the textarea element - exposed for parent components
@@ -53,18 +55,19 @@
 			{...attrs}
 			class="plain mb_0 w_100 h_100 flex_1 {attrs?.class}"
 			bind:this={textarea_el}
-			value={content}
+			bind:value={content}
 			{placeholder}
 			{readonly}
 			style="{textarea_height ? `height: ${textarea_height};` : ''} {attrs?.style || ''}"
-			oninput={(e) => onchange?.(e.currentTarget.value)}
 		></textarea>
 		{@render children?.()}
 	</div>
 
 	{#if show_stats}
-		<Content_Stats length={content_length} {token_count} />
+		<Content_Stats length={content.length} {token_count} />
 	{/if}
+
+	{@render after?.()}
 
 	{#if show_actions && !readonly}
 		<div class="flex mt_xs">
@@ -72,7 +75,7 @@
 			<Paste_From_Clipboard
 				onpaste={(value) => {
 					const new_content = content + value;
-					onchange?.(new_content);
+					content = new_content;
 					textarea_el?.focus();
 				}}
 				attrs={{class: 'plain icon_button size_lg'}}
@@ -82,7 +85,7 @@
 			<Clear_Restore_Button
 				value={content}
 				onchange={(value) => {
-					onchange?.(value);
+					content = value;
 					textarea_el?.focus();
 				}}
 			/>

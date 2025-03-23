@@ -1,5 +1,6 @@
 import {z} from 'zod';
 import type {Async_Status} from '@ryanatkn/belt/async.js';
+import {encode as tokenize} from 'gpt-tokenizer';
 
 import type {Model} from '$lib/model.svelte.js';
 import {to_completion_response_text} from '$lib/response_helpers.js';
@@ -27,6 +28,7 @@ export const Chat_Json = Cell_Json.extend({
 	}),
 	tapes: z.array(Tape_Json).default(() => []),
 	selected_prompt_ids: z.array(Uuid).default(() => []), // TODO consider making these refs, automatic classes (maybe as separate properties by convention, so the original is still the plain ids)
+	main_input: z.string().default(''),
 });
 
 export type Chat_Json = z.infer<typeof Chat_Json>;
@@ -36,6 +38,11 @@ export class Chat extends Cell<typeof Chat_Json> {
 	name: string = $state()!;
 	tapes: Array<Tape> = $state([]);
 	selected_prompt_ids: Array<Uuid> = $state()!;
+
+	main_input: string = $state('');
+	main_input_length: number = $derived(this.main_input.length);
+	main_input_tokens: Array<number> = $derived(tokenize(this.main_input));
+	main_input_token_count: number = $derived(this.main_input_tokens.length);
 
 	// TODO maybe add a derived property for the ids that are selected but missing?
 	selected_prompts: Array<Prompt> = $derived(

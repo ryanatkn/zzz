@@ -89,16 +89,19 @@
 		<div>
 			<div class="column">
 				<Content_Editor
-					content={editor_state.current_content}
-					onchange={(content) => {
-						if (editor_state) {
-							editor_state.current_content = content;
+					bind:this={content_editor}
+					bind:content={
+						() => editor_state!.current_content,
+						(content) => {
+							if (editor_state) {
+								editor_state.current_content = content;
+							}
 						}
-					}}
+					}
+					token_count={editor_state.current_token_count}
 					placeholder={diskfile_bit.diskfile.pathname}
 					show_stats={false}
 					readonly={false}
-					bind:this={content_editor}
 				/>
 
 				{#if show_actions}

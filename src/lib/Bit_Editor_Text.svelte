@@ -12,11 +12,4 @@
 	const {text_bit, show_actions = true, ...rest}: Props = $props();
 </script>
 
-<Content_Editor
-	onchange={(content) => {
-		text_bit.content = content;
-	}}
-	{...rest}
-	content={text_bit.content}
-	{show_actions}
-/>
+<Content_Editor {...rest} bind:content={text_bit.content} {show_actions} />
