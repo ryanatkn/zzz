@@ -71,7 +71,7 @@ export class Bits extends Cell<typeof Bits_Json> {
 	}
 
 	/**
-	 * Remove a bit by ID
+	 * Remove a bit by id
 	 */
 	remove(id: Uuid): boolean {
 		return this.items.remove(id);

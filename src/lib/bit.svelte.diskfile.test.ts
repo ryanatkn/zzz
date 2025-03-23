@@ -330,8 +330,8 @@ describe('Diskfile_Bit serialization', () => {
 
 		const clone = original.clone();
 
-		// Verify they have same initial values
-		expect(clone.id).toBe(original.id);
+		// Verify they have same initial values except id
+		expect(clone.id).not.toBe(original.id);
 		expect(clone.path).toBe(original_path);
 		expect(clone.name).toBe('Original name');
 
@@ -407,7 +407,7 @@ describe('Diskfile_Bit edge cases', () => {
 
 		// Verify properties updated
 		expect(bit.path).toBe(path);
-		expect(bit.diskfile).toEqual(test_diskfiles.get(path));
+		expect(bit.diskfile?.id).toBe(test_diskfiles.get(path)?.id);
 		expect(bit.content).toBe(TEST_CONTENT.BASIC);
 	});
 
@@ -420,7 +420,7 @@ describe('Diskfile_Bit edge cases', () => {
 
 		// Verify initial state
 		expect(bit.path).toBe(path);
-		expect(bit.diskfile).toEqual(test_diskfiles.get(path));
+		expect(bit.diskfile?.id).toBe(test_diskfiles.get(path)?.id);
 
 		// Set to null path
 		bit.path = null;

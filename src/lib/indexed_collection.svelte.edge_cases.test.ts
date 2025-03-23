@@ -131,7 +131,7 @@ describe('Indexed_Collection - Edge Cases', () => {
 		expect(collection.by_optional('by_prefix', 'a')?.text).toBe('a123');
 
 		// Check that removing all items with the same key clears the index entry
-		const key1 = item1.id; // Store the ID before removing
+		const key1 = item1.id; // Store the id before removing
 		collection.remove(key1);
 		expect(collection.by_optional('by_prefix', 'a')).toBeUndefined();
 

@@ -231,8 +231,8 @@ describe('Text_Bit specific behavior', () => {
 		// Clone the bit
 		const clone = original.clone();
 
-		// Verify initial state is the same
-		expect(clone.id).toBe(original.id);
+		// Verify initial state is the same except id
+		expect(clone.id).not.toBe(original.id);
 		expect(clone.content).toBe(original.content);
 		expect(clone.name).toBe(original.name);
 

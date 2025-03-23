@@ -186,8 +186,8 @@ describe('Text_Bit serialization', () => {
 
 		const clone = original.clone();
 
-		// Verify they have same initial values
-		expect(clone.id).toBe(original.id);
+		// Verify they have same initial values except id
+		expect(clone.id).not.toBe(original.id);
 		expect(clone.content).toBe(ORIGINAL.CONTENT);
 		expect(clone.name).toBe(ORIGINAL.NAME);
 

@@ -1,5 +1,6 @@
 import {z} from 'zod';
 import {DEV} from 'esm-env';
+import {unwrap_schema, get_inner_array_schema} from '$lib/zod_helpers.js';
 
 /** Sentinel value to indicate a parser has completely handled a property */
 export const HANDLED = Symbol('HANDLED_BY_PARSER');
@@ -54,21 +55,15 @@ export const cell_class = <T extends z.ZodTypeAny>(schema: T, class_name: string
  * Attaches element class name metadata to an array schema for cell array instantiation.
  * This allows the cell system to know which class to instantiate for each element in the array.
  *
- * @param schema The array Zod schema to annotate (or ZodDefault containing an array)
+ * @param schema The array Zod schema to annotate (or schema containing an array)
  * @param class_name The name of the class to instantiate for each element
  * @returns The original schema with metadata attached
  */
 export const cell_array = <T extends z.ZodTypeAny>(schema: T, class_name: string): T => {
-	// Use type casting to access the inner ZodArray if this is a ZodDefault
-	// This safely handles both direct ZodArrays and ZodDefault<ZodArray>
-	const array_schema =
-		schema instanceof z.ZodDefault
-			? (schema._def.innerType as z.ZodArray<any>)
-			: (schema as unknown as z.ZodArray<any>);
+	const array_schema = get_inner_array_schema(schema);
 
-	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-	if (!array_schema._def) {
-		if (DEV) console.error('cell_array: Schema is not a ZodArray or ZodDefault<ZodArray>');
+	if (!array_schema) {
+		if (DEV) console.error('cell_array: Schema is not or does not contain a ZodArray');
 		return schema;
 	}
 
@@ -108,27 +103,15 @@ export const get_schema_class_info = (
 ): Schema_Class_Info | null => {
 	if (!schema) return null;
 
-	// Handle ZodEffects (refinement, transformation, etc.)
-	if (schema instanceof z.ZodEffects) {
-		return get_schema_class_info(schema.innerType());
-	}
-
-	// Handle ZodObject with _zMetadata property
-	if (
-		schema instanceof z.ZodObject &&
-		typeof schema._def.description === 'string' &&
-		schema._def.description.startsWith('_zMetadata:')
-	) {
-		const class_name = schema._def.description.split(':')[1];
-		return {type: 'ZodObject', class_name, is_array: false};
-	}
+	// Unwrap to get the core schema
+	const unwrapped = unwrap_schema(schema);
 
 	// Handle ZodArray
-	if (schema instanceof z.ZodArray) {
+	if (unwrapped instanceof z.ZodArray) {
 		// Get class name from schema metadata if present
 		const element_class =
-			(schema._def as any)[ZOD_ELEMENT_CLASS_NAME] ||
-			get_schema_class_info(schema.element)?.class_name;
+			(unwrapped._def as any)[ZOD_ELEMENT_CLASS_NAME] ||
+			get_schema_class_info(unwrapped.element)?.class_name;
 		return {
 			type: 'ZodArray',
 			is_array: true,
@@ -136,31 +119,33 @@ export const get_schema_class_info = (
 		};
 	}
 
-	// Get class name from schema metadata if present
+	// Get class name from schema metadata if present for any schema type
 	const class_name = (schema as any)[ZOD_CELL_CLASS_NAME];
 	if (class_name) {
-		return {type: schema.constructor.name, class_name, is_array: false};
+		return {type: unwrapped.constructor.name, class_name, is_array: false};
 	}
 
-	// Handle ZodDefault by unwrapping and checking the inner type
-	if (schema instanceof z.ZodDefault) {
-		const inner_info = get_schema_class_info(schema._def.innerType);
-		if (inner_info) return inner_info;
+	// Handle ZodObject with _zMetadata property
+	if (
+		unwrapped instanceof z.ZodObject &&
+		typeof unwrapped._def.description === 'string' &&
+		unwrapped._def.description.startsWith('_zMetadata:')
+	) {
+		const class_name = unwrapped._def.description.split(':')[1];
+		return {type: 'ZodObject', class_name, is_array: false};
 	}
 
-	// Handle ZodBranded
-	if (schema instanceof z.ZodBranded) {
+	// Handle other specific types
+	if (unwrapped instanceof z.ZodBranded) {
 		return {type: 'ZodBranded', is_array: false};
 	}
-
-	// Handle ZodMap and ZodSet
-	if (schema instanceof z.ZodMap) {
+	if (unwrapped instanceof z.ZodMap) {
 		return {type: 'ZodMap', is_array: false};
 	}
-	if (schema instanceof z.ZodSet) {
+	if (unwrapped instanceof z.ZodSet) {
 		return {type: 'ZodSet', is_array: false};
 	}
 
-	// Handle other types
-	return {type: schema.constructor.name, is_array: false};
+	// Default case for any other schema type
+	return {type: unwrapped.constructor.name, is_array: false};
 };

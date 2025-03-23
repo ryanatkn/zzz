@@ -76,3 +76,33 @@ export const maybe_get_field_schema = (
 		return undefined;
 	}
 };
+
+/**
+ * Unwraps common Zod wrapper types to get to the core schema.
+ * Returns the same schema if it's not a wrapper type.
+ */
+export const unwrap_schema = (schema: z.ZodTypeAny): z.ZodTypeAny => {
+	if (schema instanceof z.ZodDefault) return unwrap_schema(schema._def.innerType);
+	if (schema instanceof z.ZodOptional) return unwrap_schema(schema._def.innerType);
+	if (schema instanceof z.ZodEffects) return unwrap_schema(schema.innerType());
+	return schema;
+};
+
+/**
+ * Checks if a Zod schema is an array or contains an array through wrappers.
+ * Recursively unwraps common wrapper types to find the core schema.
+ */
+export const is_array_schema = (schema: z.ZodTypeAny): boolean =>
+	schema instanceof z.ZodArray ||
+	(schema instanceof z.ZodDefault && is_array_schema(schema._def.innerType)) ||
+	(schema instanceof z.ZodOptional && is_array_schema(schema._def.innerType)) ||
+	(schema instanceof z.ZodEffects && is_array_schema(schema.innerType()));
+
+/**
+ * Gets the innermost array schema from a potentially nested schema structure.
+ * Returns null if no array schema is found.
+ */
+export const get_inner_array_schema = (schema: z.ZodTypeAny): z.ZodArray<any> | null => {
+	const unwrapped = unwrap_schema(schema);
+	return unwrapped instanceof z.ZodArray ? unwrapped : null;
+};

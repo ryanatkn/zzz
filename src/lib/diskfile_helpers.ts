@@ -28,13 +28,13 @@ export const map_watcher_change_to_diskfile_change = (
 /**
  * Helper function to convert a Source_File to Diskfile_Json format
  * @param source_file The source file to convert
- * @param existing_id Optional existing UUID to preserve ID stability across updates
+ * @param existing_id Optional existing UUID to preserve id stability across updates
  */
 export const source_file_to_diskfile_json = (
 	source_file: Source_File,
 	existing_id?: Uuid,
 ): Diskfile_Json => ({
-	id: existing_id ?? Uuid.parse(undefined), // Use existing ID if provided, otherwise generate new
+	id: existing_id ?? Uuid.parse(undefined), // Use existing id if provided, otherwise generate new
 	path: source_file.id,
 	content: source_file.contents,
 	external: source_file.external,

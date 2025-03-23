@@ -13,7 +13,7 @@ export class Diskfile_Editor_State {
 	zzz: Zzz;
 	diskfile: Diskfile = $state()!; // TODO maybe should be nullable to make initialization easier?
 
-	// Store the ID of the unsaved edit entry
+	// Store the id of the unsaved edit entry
 	unsaved_edit_entry_id: Uuid | null = $state(null);
 
 	// Track which history entry is currently selected in the UI
@@ -450,7 +450,7 @@ export class Diskfile_Editor_State {
 		// Filter out unsaved entries
 		history.entries = history.entries.filter((entry) => !entry.is_unsaved_edit);
 
-		// Always clear the unsaved edit entry ID when clearing unsaved edits
+		// Always clear the unsaved edit entry id when clearing unsaved edits
 		this.unsaved_edit_entry_id = null;
 
 		// Only update selection if the selected entry was removed

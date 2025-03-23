@@ -136,7 +136,7 @@ test('Diskfile_History - find_entry_by_id finds correct entry', () => {
 	const entry2 = history.add_entry('content 2');
 	history.add_entry('content 3');
 
-	// Find an entry by ID
+	// Find an entry by id
 	const found = history.find_entry_by_id(entry2.id);
 
 	// Verify the right entry was found
@@ -144,7 +144,7 @@ test('Diskfile_History - find_entry_by_id finds correct entry', () => {
 	expect(found!.id).toBe(entry2.id);
 	expect(found!.content).toBe('content 2');
 
-	// Verify non-existent ID returns undefined
+	// Verify non-existent id returns undefined
 	const unknown_id = Uuid.parse(undefined);
 	expect(history.find_entry_by_id(unknown_id)).toBeUndefined();
 });
@@ -153,13 +153,13 @@ test('Diskfile_History - get_content returns content from entry', () => {
 	// Add an entry
 	const entry = history.add_entry('specific content');
 
-	// Get content by ID
+	// Get content by id
 	const content = history.get_content(entry.id);
 
 	// Verify content was retrieved
 	expect(content).toBe('specific content');
 
-	// Verify non-existent ID returns null
+	// Verify non-existent id returns null
 	const unknown_id = Uuid.parse(undefined);
 	expect(history.get_content(unknown_id)).toBeNull();
 });

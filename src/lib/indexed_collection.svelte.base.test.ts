@@ -72,7 +72,7 @@ test('Indexed_Collection - basic operations with no indexes', () => {
 	expect(has_item_with_id(collection.all, item1)).toBe(true);
 	expect(has_item_with_id(collection.all, item2)).toBe(true);
 
-	// Test retrieval by ID
+	// Test retrieval by id
 	expect(collection.get(item1.id)?.id).toBe(item1.id);
 
 	// Test removal
@@ -194,7 +194,7 @@ test('Indexed_Collection - derived index operations', () => {
 	// Check derived index
 	const high_scores = collection.get_derived('high_score');
 	expect(high_scores).toHaveLength(3);
-	// Compare by ID instead of reference
+	// Compare by id instead of reference
 	expect(high_scores[0].id).toBe(high_score_item.id); // Highest score first (10)
 	expect(high_scores[1].id).toBe(medium_score_item.id); // Second score (8)
 	expect(high_scores[2].id).toBe(threshold_score_item.id); // Third score (6)
@@ -292,7 +292,7 @@ test('Indexed_Collection - add_first and ordering', () => {
 	collection.add_first(prepend_item);
 	collection.add(append_item);
 
-	// Check ordering using ID comparison
+	// Check ordering using id comparison
 	expect(collection.all[0].id).toBe(prepend_item.id);
 	expect(collection.all[1].id).toBe(first_item.id);
 	expect(collection.all[2].id).toBe(append_item.id);

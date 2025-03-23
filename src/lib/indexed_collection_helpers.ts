@@ -204,7 +204,7 @@ export const create_multi_index = <T extends Indexed_Item, K = any>(
 					if (k === undefined) continue;
 					const items = map.get(k);
 					if (!items) continue;
-					// Find and remove the item by ID
+					// Find and remove the item by id
 					const index = items.findIndex((i) => i.id === item.id);
 					if (index === -1) continue;
 					if (items.length === 1) {
@@ -218,7 +218,7 @@ export const create_multi_index = <T extends Indexed_Item, K = any>(
 			} else {
 				const items = map.get(keys);
 				if (items) {
-					// Find and remove the item by ID
+					// Find and remove the item by id
 					const index = items.findIndex((i) => i.id === item.id);
 					if (index !== -1) {
 						if (items.length === 1) {
@@ -298,7 +298,7 @@ export const create_derived_index = <T extends Indexed_Item>(
 				return options.on_remove(items, item, collection);
 			}
 
-			// Default behavior: remove matching item by ID
+			// Default behavior: remove matching item by id
 			if (!options.matches || options.matches(item)) {
 				const index = items.findIndex((i) => i.id === item.id);
 				if (index !== -1) {

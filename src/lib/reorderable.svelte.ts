@@ -238,7 +238,7 @@ export class Reorderable implements Reorderable_Style_Config {
 	}
 
 	/**
-	 * Update indicator on an element by ID
+	 * Update indicator on an element by id
 	 */
 	update_indicator(
 		item_id: Reorderable_Item_Id,
@@ -626,7 +626,7 @@ export class Reorderable implements Reorderable_Style_Config {
 		// Get the current index
 		let {index} = params;
 
-		// Generate a unique item ID if not already present
+		// Generate a unique item id if not already present
 		let item_id = node.dataset.reorderableItemId as Reorderable_Item_Id | undefined;
 		if (!item_id) {
 			item_id = `i${Math.random().toString(36).substring(2, 10)}` as Reorderable_Item_Id;

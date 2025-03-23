@@ -48,7 +48,7 @@
 				return;
 			}
 
-			// If diskfile ID changed, update the editor state with the new diskfile
+			// If diskfile id changed, update the editor state with the new diskfile
 			if (editor_state.diskfile.id !== diskfile.id) {
 				editor_state.update_diskfile(diskfile);
 				diskfile_bit.link_editor_state(editor_state); // TODO @many this initialization is awkward, ideally becomes refactored to mostly derived

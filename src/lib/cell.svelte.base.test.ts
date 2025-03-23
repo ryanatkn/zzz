@@ -1,319 +1,579 @@
 // @vitest-environment jsdom
 
-import {test, expect, vi, beforeEach} from 'vitest';
+import {test, expect, vi, beforeEach, describe} from 'vitest';
 import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
-import {Uuid, Datetime_Now} from '$lib/zod_helpers.js';
-import {SvelteMap} from 'svelte/reactivity';
+import {Datetime_Now, Uuid} from '$lib/zod_helpers.js';
+import {Zzz} from '$lib/zzz.svelte.js';
+import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
-/* eslint-disable no-new */
+// Constants for testing
+const TEST_ID = 'a0000000-0000-0000-0000-000000000001' as Uuid;
+const TEST_DATE = Datetime_Now.parse(undefined);
 
-// Basic schema for testing
-const Basic_Test_Schema = Cell_Json.extend({
-	name: z.string().default(''),
-	value: z.number().default(0),
-	tags: z.array(z.string()).default([]),
-});
-
-// Mock Zzz instance with cells SvelteMap for registration testing
-const create_mock_zzz = () => {
-	return {
-		cells: new SvelteMap<Uuid, Cell>(),
-		registry: {
-			maybe_instantiate: vi.fn(),
-		},
-	} as any;
-};
+// Basic schema for testing that extends Cell_Json
+const Test_Schema = Cell_Json.extend({
+	text: z.string().default(''),
+	number: z.number().default(0),
+	items: z.array(z.string()).default(() => []),
+	flag: z.boolean().default(true),
+}).strict();
 
 // Basic test cell implementation
-class Basic_Test_Cell extends Cell<typeof Basic_Test_Schema> {
-	name: string = $state()!;
-	value: number = $state()!;
-	tags: Array<string> = $state()!;
+class Basic_Test_Cell extends Cell<typeof Test_Schema> {
+	text: string = $state()!;
+	number: number = $state()!;
+	items: Array<string> = $state()!;
+	flag: boolean = $state()!;
 
-	constructor(options: Cell_Options<typeof Basic_Test_Schema>) {
-		super(Basic_Test_Schema, options);
+	constructor(options: Cell_Options<typeof Test_Schema>) {
+		super(Test_Schema, options);
 		this.init();
 	}
 }
 
-// Setup for each test
+// Test suite variables
+let zzz: Zzz;
+
 beforeEach(() => {
+	// Create a real Zzz instance for each test
+	zzz = monkeypatch_zzz_for_tests(new Zzz());
 	vi.clearAllMocks();
 });
 
-test('Cell initialization and registration', () => {
-	const mock_zzz = create_mock_zzz();
-	const test_id = Uuid.parse(undefined);
-	const test_date = new Date().toISOString();
+describe('Cell initialization', () => {
+	test('initializes with provided json', () => {
+		const test_cell = new Basic_Test_Cell({
+			zzz,
+			json: {
+				id: TEST_ID,
+				created: TEST_DATE,
+				text: 'Sample',
+				number: 42,
+				items: ['item1', 'item2'],
+			},
+		});
 
-	const test_cell = new Basic_Test_Cell({
-		zzz: mock_zzz,
-		json: {
-			id: test_id,
-			created: test_date,
-			name: 'Test',
-			value: 42,
-			tags: ['tag1', 'tag2'],
-		},
+		// Verify basic properties
+		expect(test_cell.id).toBe(TEST_ID);
+		expect(test_cell.created).toBe(TEST_DATE);
+		expect(test_cell.updated).toBeNull();
+		expect(test_cell.text).toBe('Sample');
+		expect(test_cell.number).toBe(42);
+		expect(test_cell.items).toEqual(['item1', 'item2']);
+
+		// Verify cell was registered
+		expect(zzz.cells.has(TEST_ID)).toBe(true);
+		expect(zzz.cells.get(TEST_ID)).toBe(test_cell);
 	});
 
-	// Verify basic properties
-	expect(test_cell.id).toBe(test_id);
-	expect(test_cell.created).toBe(test_date);
-	expect(test_cell.updated).toBeNull();
-	expect(test_cell.name).toBe('Test');
-	expect(test_cell.value).toBe(42);
-	expect(test_cell.tags).toEqual(['tag1', 'tag2']);
+	test('uses default values when json is empty', () => {
+		const test_cell = new Basic_Test_Cell({
+			zzz,
+		});
 
-	// Verify cell was registered
-	expect(mock_zzz.cells.has(test_id)).toBe(true);
-	expect(mock_zzz.cells.get(test_id)).toBe(test_cell);
-});
-
-test('Cell registration is idempotent', () => {
-	const mock_zzz = create_mock_zzz();
-	const console_error_spy = vi.spyOn(console, 'error');
-
-	const test_cell = new Basic_Test_Cell({
-		zzz: mock_zzz,
-		json: {
-			id: Uuid.parse(undefined),
-		},
+		// Should use schema defaults
+		expect(test_cell.id).toBeDefined();
+		expect(test_cell.created).toBeDefined();
+		expect(test_cell.updated).toBeNull();
+		expect(test_cell.text).toBe('');
+		expect(test_cell.number).toBe(0);
+		expect(test_cell.items).toEqual([]);
+		expect(test_cell.flag).toBe(true);
 	});
 
-	// Cell should be registered automatically in init()
-	expect(mock_zzz.cells.size).toBe(1);
+	test('derived schema properties are correctly calculated', () => {
+		const test_cell = new Basic_Test_Cell({
+			zzz,
+			json: {
+				id: TEST_ID,
+			},
+		});
 
-	// Try to register again manually
-	test_cell['register'](); // Access protected method for testing
+		// Check if schema keys contain expected fields
+		expect(test_cell.schema_keys).toContain('id');
+		expect(test_cell.schema_keys).toContain('text');
+		expect(test_cell.schema_keys).toContain('number');
+		expect(test_cell.schema_keys).toContain('items');
 
-	// Should have logged an error but not changed the registry
-	expect(console_error_spy).toHaveBeenCalled();
-	expect(mock_zzz.cells.size).toBe(1);
+		// Check if field schemas are correctly mapped
+		expect(test_cell.field_schemas.size).toBeGreaterThan(0);
+		expect(test_cell.field_schemas.has('text')).toBe(true);
+		expect(test_cell.field_schemas.has('number')).toBe(true);
 
-	console_error_spy.mockRestore();
+		// Test schema info for an array type
+		const items_info = test_cell.field_schema_info.get('items');
+		expect(items_info?.is_array).toBe(true);
+		expect(items_info?.type).toBe('ZodArray');
+
+		// Test schema info for a scalar type
+		const text_info = test_cell.field_schema_info.get('text');
+		expect(text_info?.is_array).toBe(false);
+		expect(text_info?.type).toBe('ZodString');
+	});
 });
 
-test('Cell unregistration removes from registry', () => {
-	const mock_zzz = create_mock_zzz();
+describe('Cell registry lifecycle', () => {
+	test('cell is automatically registered on initialization', () => {
+		const cell_id = Uuid.parse(undefined);
 
-	const test_cell = new Basic_Test_Cell({
-		zzz: mock_zzz,
-		json: {
-			id: Uuid.parse(undefined),
-		},
+		const test_cell = new Basic_Test_Cell({
+			zzz,
+			json: {
+				id: cell_id,
+				created: TEST_DATE,
+			},
+		});
+
+		// Cell should be registered automatically in init()
+		expect(zzz.cells.has(cell_id)).toBe(true);
+		expect(zzz.cells.get(cell_id)).toBe(test_cell);
 	});
 
-	// Cell should be registered automatically
-	expect(mock_zzz.cells.size).toBe(1);
+	test('dispose removes from registry', () => {
+		const cell_id = Uuid.parse(undefined);
 
-	// Unregister cell
-	test_cell['dispose'](); // Access protected method for testing
+		const test_cell = new Basic_Test_Cell({
+			zzz,
+			json: {
+				id: cell_id,
+				created: TEST_DATE,
+			},
+		});
 
-	// Should be removed from registry
-	expect(mock_zzz.cells.size).toBe(0);
-});
+		// Verify initial registration
+		expect(zzz.cells.has(cell_id)).toBe(true);
 
-test('Cell unregistration is safe to call multiple times', () => {
-	const mock_zzz = create_mock_zzz();
+		// Dispose cell
+		test_cell.dispose();
 
-	const test_cell = new Basic_Test_Cell({
-		zzz: mock_zzz,
-		json: {
-			id: Uuid.parse(undefined),
-		},
+		// Should be removed from registry
+		expect(zzz.cells.has(cell_id)).toBe(false);
 	});
 
-	// Unregister once
-	test_cell['unregister'](); // Access protected method for testing
-	expect(mock_zzz.cells.size).toBe(0);
+	test('dispose is safe to call multiple times', () => {
+		const cell_id = Uuid.parse(undefined);
 
-	// Unregister again - should be safe
-	expect(() => test_cell['unregister']()).not.toThrow();
+		const test_cell = new Basic_Test_Cell({
+			zzz,
+			json: {
+				id: cell_id,
+			},
+		});
+
+		// First dispose
+		test_cell.dispose();
+		expect(zzz.cells.has(cell_id)).toBe(false);
+
+		// Second dispose should not throw
+		expect(() => test_cell.dispose()).not.toThrow();
+	});
 });
 
-test('Cell uses default values when json is empty', () => {
-	const mock_zzz = create_mock_zzz();
-
-	const test_cell = new Basic_Test_Cell({
-		zzz: mock_zzz,
+describe('Cell id handling', () => {
+	// Define a test schema with required type field for these tests
+	const Id_Test_Schema = z.object({
+		id: Uuid,
+		type: z.literal('test').default('test'),
+		content: z.string().default(''),
+		version: z.number().default(0),
 	});
 
-	// Should use schema defaults
-	expect(test_cell.id).toBeDefined();
-	expect(test_cell.created).toBeDefined();
-	expect(test_cell.updated).toBeNull();
-	expect(test_cell.name).toBe('');
-	expect(test_cell.value).toBe(0);
-	expect(test_cell.tags).toEqual([]);
-});
+	// Test implementation of the Cell class with ID-specific tests
+	class Id_Test_Cell extends Cell<typeof Id_Test_Schema> {
+		type: string = $state()!;
+		content: string = $state()!;
+		version: number = $state()!;
 
-test('Cell formatters handle dates correctly', () => {
-	const mock_zzz = create_mock_zzz();
-	const now = new Date();
-	const created = now.toISOString();
-	const updated = new Date(now.getTime() + 10000).toISOString();
+		constructor(options: {zzz: Zzz; json?: any}) {
+			super(Id_Test_Schema, options);
+			this.init();
+		}
+	}
 
-	const test_cell = new Basic_Test_Cell({
-		zzz: mock_zzz,
-		json: {
-			id: Uuid.parse(undefined),
-			created,
-			updated,
-		},
+	test('set_json overwrites id when provided in input', () => {
+		// Create initial cell
+		const cell = new Id_Test_Cell({zzz});
+		const initial_id = cell.id;
+
+		// Verify initial state
+		expect(cell.id).toBe(initial_id);
+
+		// Create a new id to set
+		const new_id = Uuid.parse(undefined);
+		expect(new_id).not.toBe(initial_id);
+
+		// Set new id through set_json
+		cell.set_json({
+			id: new_id,
+			type: 'test',
+			content: 'New content',
+			version: 2,
+		});
+
+		// Verify id was changed to the new value
+		expect(cell.id).toBe(new_id);
+		expect(cell.id).not.toBe(initial_id);
 	});
 
-	// Verify date formatting properties
-	expect(test_cell.created_date).toBeInstanceOf(Date);
-	expect(test_cell.created_formatted_short_date).toBeDefined();
-	expect(test_cell.created_formatted_date).toBeDefined();
-	expect(test_cell.created_formatted_time).toBeDefined();
+	test('set_json_partial updates id when included in partial update', () => {
+		// Create initial cell
+		const cell = new Id_Test_Cell({zzz});
+		const initial_id = cell.id;
 
-	expect(test_cell.updated_date).toBeInstanceOf(Date);
-	expect(test_cell.updated_formatted_short_date).toBeDefined();
-	expect(test_cell.updated_formatted_date).toBeDefined();
-	expect(test_cell.updated_formatted_time).toBeDefined();
-});
+		// Create a new id to set
+		const new_id = Uuid.parse(undefined);
 
-test('Cell to_json creates correct representation', () => {
-	const mock_zzz = create_mock_zzz();
-	const test_id = Uuid.parse(undefined);
-	const created = Datetime_Now.parse(undefined);
+		// Update only the id
+		cell.set_json_partial({
+			id: new_id,
+			version: 3,
+		});
 
-	const test_cell = new Basic_Test_Cell({
-		zzz: mock_zzz,
-		json: {
-			id: test_id,
-			created,
-			name: 'JSON Test',
-			value: 100,
-			tags: ['json', 'test'],
-		},
+		// Verify id was updated and other properties preserved
+		expect(cell.id).toBe(new_id);
+		expect(cell.id).not.toBe(initial_id);
+		expect(cell.type).toBe('test');
+		expect(cell.content).toBe('');
+		expect(cell.version).toBe(3);
 	});
 
-	const json = test_cell.to_json();
+	test('set_json_partial preserves id when not included in partial update', () => {
+		// Create initial cell
+		const cell = new Id_Test_Cell({zzz});
+		const initial_id = cell.id;
+		const initial_content = '';
 
-	expect(json.id).toBe(test_id);
-	expect(json.created).toBe(created);
-	expect(json.name).toBe('JSON Test');
-	expect(json.value).toBe(100);
-	expect(json.tags).toEqual(['json', 'test']);
-});
+		// Update content but not id
+		cell.set_json_partial({
+			content: 'Partial update content',
+		});
 
-test('Cell toJSON method works with JSON.stringify', () => {
-	const mock_zzz = create_mock_zzz();
-	const test_id = Uuid.parse(undefined);
-
-	const test_cell = new Basic_Test_Cell({
-		zzz: mock_zzz,
-		json: {
-			id: test_id,
-			name: 'Stringify Test',
-		},
+		// Verify id preserved and content updated
+		expect(cell.id).toBe(initial_id);
+		expect(cell.content).toBe('Partial update content');
+		expect(cell.content).not.toBe(initial_content);
 	});
 
-	const stringified = JSON.stringify(test_cell);
-	const parsed = JSON.parse(stringified);
+	test('schema validation rejects invalid id formats', () => {
+		// Create initial cell
+		const cell = new Id_Test_Cell({zzz});
 
-	expect(parsed.id).toBe(test_id);
-	expect(parsed.name).toBe('Stringify Test');
-});
-
-test('Cell json_serialized and json_parsed are derived correctly', () => {
-	const mock_zzz = create_mock_zzz();
-
-	const test_cell = new Basic_Test_Cell({
-		zzz: mock_zzz,
-		json: {
-			name: 'Derived Test',
-			value: 123,
-		},
+		// Attempt to set invalid id
+		expect(() => {
+			cell.set_json_partial({
+				id: 'not-a-valid-uuid' as any,
+			});
+		}).toThrow();
 	});
 
-	// Check derived properties
-	expect(test_cell.json.name).toBe('Derived Test');
-	expect(test_cell.json.value).toBe(123);
+	test('clone creates a new id instead of copying the original', () => {
+		// Create cell with initial values
+		const cell = new Id_Test_Cell({
+			zzz,
+			json: {
+				type: 'test',
+				content: 'Original content',
+				version: 1,
+			},
+		});
+		const original_id = cell.id;
 
-	const parsed = JSON.parse(test_cell.json_serialized);
-	expect(parsed.name).toBe('Derived Test');
-	expect(parsed.value).toBe(123);
+		// Clone the cell
+		const cloned_cell = cell.clone();
 
-	expect(test_cell.json_parsed.success).toBe(true);
+		// Verify clone has new id but same content
+		expect(cloned_cell.id).not.toBe(original_id);
+		expect(cloned_cell.content).toBe('Original content');
+		expect(cloned_cell.version).toBe(1);
+
+		// Verify changing clone doesn't affect original
+		cloned_cell.content = 'Changed in clone';
+		expect(cell.content).toBe('Original content');
+	});
 });
 
-test('Cell clone creates independent copy', () => {
-	const mock_zzz = create_mock_zzz();
+describe('Cell serialization', () => {
+	test('to_json creates correct representation', () => {
+		const test_cell = new Basic_Test_Cell({
+			zzz,
+			json: {
+				id: TEST_ID,
+				created: TEST_DATE,
+				text: 'JSON Test',
+				number: 100,
+				items: ['value1', 'value2'],
+			},
+		});
 
-	const original = new Basic_Test_Cell({
-		zzz: mock_zzz,
-		json: {
-			name: 'Original',
-			value: 42,
-			tags: ['tag1'],
-		},
+		const json = test_cell.to_json();
+
+		expect(json.id).toBe(TEST_ID);
+		expect(json.created).toBe(TEST_DATE);
+		expect(json.text).toBe('JSON Test');
+		expect(json.number).toBe(100);
+		expect(json.items).toEqual(['value1', 'value2']);
 	});
 
-	const clone = original.clone();
+	test('toJSON method works with JSON.stringify', () => {
+		const test_cell = new Basic_Test_Cell({
+			zzz,
+			json: {
+				id: TEST_ID,
+				text: 'Stringify Test',
+			},
+		});
 
-	// Should have same values
-	expect(clone.name).toBe('Original');
-	expect(clone.value).toBe(42);
-	expect(clone.tags).toEqual(['tag1']);
+		const stringified = JSON.stringify(test_cell);
+		const parsed = JSON.parse(stringified);
 
-	// But be a different instance
-	expect(clone).not.toBe(original);
+		expect(parsed.id).toBe(TEST_ID);
+		expect(parsed.text).toBe('Stringify Test');
+	});
 
-	// Changes to one shouldn't affect the other
-	clone.name = 'Changed';
-	clone.value = 100;
-	clone.tags.push('tag2');
+	test('derived json properties update when cell changes', () => {
+		const test_cell = new Basic_Test_Cell({
+			zzz,
+			json: {
+				id: TEST_ID,
+				text: 'Initial',
+				number: 10,
+			},
+		});
 
-	expect(original.name).toBe('Original');
-	expect(original.value).toBe(42);
-	expect(original.tags).toEqual(['tag1']);
+		// Check initial values
+		expect(test_cell.json.text).toBe('Initial');
+		expect(test_cell.json.number).toBe(10);
+
+		// Update values
+		test_cell.text = 'Updated';
+		test_cell.number = 20;
+
+		// Check derived properties updated
+		expect(test_cell.json.text).toBe('Updated');
+		expect(test_cell.json.number).toBe(20);
+
+		// Check derived serialized JSON
+		const parsed = JSON.parse(test_cell.json_serialized);
+		expect(parsed.text).toBe('Updated');
+		expect(parsed.number).toBe(20);
+	});
 });
 
-test('Cell set_json rejects invalid data', () => {
-	const mock_zzz = create_mock_zzz();
-	const test_cell = new Basic_Test_Cell({zzz: mock_zzz});
+describe('Cell modification methods', () => {
+	test('set_json updates properties', () => {
+		const test_cell = new Basic_Test_Cell({
+			zzz,
+			json: {
+				id: TEST_ID,
+				text: 'Initial',
+			},
+		});
 
-	// Should reject invalid data with a schema error
-	expect(() => test_cell.set_json({value: 'not a number' as any})).toThrow();
+		// Update using set_json
+		test_cell.set_json({
+			text: 'Updated via set_json',
+			number: 50,
+			items: ['new1', 'new2'],
+		});
+
+		expect(test_cell.text).toBe('Updated via set_json');
+		expect(test_cell.number).toBe(50);
+		expect(test_cell.items).toEqual(['new1', 'new2']);
+		expect(test_cell.id).not.toBe(TEST_ID); // id should be new
+	});
+
+	test('set_json rejects invalid data', () => {
+		const test_cell = new Basic_Test_Cell({zzz});
+
+		// Should reject invalid data with a schema error
+		expect(() => test_cell.set_json({number: 'not a number' as any})).toThrow();
+	});
+
+	test('set_json_partial updates only specified properties', () => {
+		const test_cell = new Basic_Test_Cell({
+			zzz,
+			json: {
+				id: TEST_ID,
+				text: 'Initial text',
+				number: 10,
+				items: ['item1', 'item2'],
+				flag: true,
+			},
+		});
+
+		// Update only text and number
+		test_cell.set_json_partial({
+			text: 'Updated text',
+			number: 20,
+		});
+
+		// Verify updated properties
+		expect(test_cell.text).toBe('Updated text');
+		expect(test_cell.number).toBe(20);
+
+		// Verify untouched properties
+		expect(test_cell.items).toEqual(['item1', 'item2']);
+		expect(test_cell.flag).toBe(true);
+		expect(test_cell.id).toBe(TEST_ID);
+	});
+
+	test('set_json_partial handles null or undefined input', () => {
+		const test_cell = new Basic_Test_Cell({
+			zzz,
+			json: {
+				id: TEST_ID,
+				text: 'Initial',
+			},
+		});
+
+		// These should not throw errors
+		expect(() => test_cell.set_json_partial(null!)).not.toThrow();
+		expect(() => test_cell.set_json_partial(undefined!)).not.toThrow();
+
+		// Properties should remain unchanged
+		expect(test_cell.id).toBe(TEST_ID);
+		expect(test_cell.text).toBe('Initial');
+	});
+
+	test('set_json_partial validates merged data against schema', () => {
+		const test_cell = new Basic_Test_Cell({
+			zzz,
+			json: {
+				id: TEST_ID,
+				text: 'Initial',
+			},
+		});
+
+		// Should reject invalid data with a schema error
+		expect(() => test_cell.set_json_partial({number: 'not a number' as any})).toThrow();
+
+		// Original values should remain unchanged after failed update
+		expect(test_cell.text).toBe('Initial');
+	});
 });
 
-test('Cell schema_keys and field_schemas are derived correctly', () => {
-	const mock_zzz = create_mock_zzz();
-	const test_cell = new Basic_Test_Cell({zzz: mock_zzz});
+describe('Cell date formatting', () => {
+	test('formats dates correctly', () => {
+		const now = new Date();
+		const created = now.toISOString();
+		const updated = new Date(now.getTime() + 10000).toISOString();
 
-	// Check if schema keys contain expected fields
-	expect(test_cell.schema_keys).toContain('id');
-	expect(test_cell.schema_keys).toContain('name');
-	expect(test_cell.schema_keys).toContain('value');
-	expect(test_cell.schema_keys).toContain('tags');
+		const test_cell = new Basic_Test_Cell({
+			zzz,
+			json: {
+				id: TEST_ID,
+				created,
+				updated,
+			},
+		});
 
-	// Check if field schemas are correctly mapped
-	expect(test_cell.field_schemas.size).toBeGreaterThan(0);
-	expect(test_cell.field_schemas.has('name')).toBe(true);
-	expect(test_cell.field_schemas.has('value')).toBe(true);
+		// Verify date objects
+		expect(test_cell.created_date).toBeInstanceOf(Date);
+		expect(test_cell.updated_date).toBeInstanceOf(Date);
+
+		// Verify formatted strings exist
+		expect(test_cell.created_formatted_short_date).not.toBeNull();
+		expect(test_cell.created_formatted_date).not.toBeNull();
+		expect(test_cell.created_formatted_time).not.toBeNull();
+
+		expect(test_cell.updated_formatted_short_date).not.toBeNull();
+		expect(test_cell.updated_formatted_date).not.toBeNull();
+		expect(test_cell.updated_formatted_time).not.toBeNull();
+	});
+
+	test('handles null updated date', () => {
+		const test_cell = new Basic_Test_Cell({
+			zzz,
+			json: {
+				id: TEST_ID,
+				created: TEST_DATE,
+				updated: null,
+			},
+		});
+
+		expect(test_cell.updated_date).toBeNull();
+		expect(test_cell.updated_formatted_short_date).toBeNull();
+		expect(test_cell.updated_formatted_date).toBeNull();
+		expect(test_cell.updated_formatted_time).toBeNull();
+	});
 });
 
-test('Cell schema_info provides type information', () => {
-	const mock_zzz = create_mock_zzz();
-	const test_cell = new Basic_Test_Cell({zzz: mock_zzz});
+describe('Cell cloning', () => {
+	test('clone creates independent copy', () => {
+		const original = new Basic_Test_Cell({
+			zzz,
+			json: {
+				id: TEST_ID,
+				text: 'Original',
+				number: 42,
+				items: ['value1'],
+			},
+		});
 
-	const tags_info = test_cell.field_schema_info.get('tags');
-	console.log(`tags_info`, tags_info);
-	console.log(
-		`Array.from(test_cell.field_schema_info.entries())`,
-		Array.from(test_cell.field_schema_info.entries()),
-	);
-	expect(tags_info?.is_array).toBe(true);
-	expect(tags_info?.type).toBe('ZodArray');
+		const clone = original.clone();
 
-	const name_info = test_cell.field_schema_info.get('name');
-	expect(name_info?.is_array).toBe(false);
-	expect(name_info?.type).toBe('ZodString');
+		// Should have same values
+		expect(clone.text).toBe('Original');
+		expect(clone.number).toBe(42);
+		expect(clone.items).toEqual(['value1']);
+
+		// But be a different instance
+		expect(clone).not.toBe(original);
+		expect(clone.id).not.toBe(original.id); // Should have new ID
+
+		// Changes to one shouldn't affect the other
+		clone.text = 'Changed';
+		clone.number = 100;
+		clone.items.push('value2');
+
+		expect(original.text).toBe('Original');
+		expect(original.number).toBe(42);
+		expect(original.items).toEqual(['value1']);
+	});
+
+	test('clone registers new instance in registry', () => {
+		const original = new Basic_Test_Cell({
+			zzz,
+			json: {
+				id: TEST_ID,
+			},
+		});
+
+		const clone = original.clone();
+
+		// Both instances should be registered
+		expect(zzz.cells.has(original.id)).toBe(true);
+		expect(zzz.cells.has(clone.id)).toBe(true);
+		expect(zzz.cells.get(clone.id)).toBe(clone);
+	});
+});
+
+describe('Schema validation', () => {
+	test('json_parsed validates cell state', () => {
+		const test_cell = new Basic_Test_Cell({
+			zzz,
+			json: {
+				id: TEST_ID,
+				text: 'Valid',
+			},
+		});
+
+		// Initial state should be valid
+		expect(test_cell.json_parsed.success).toBe(true);
+
+		// Invalid initialization should throw
+		expect(
+			() =>
+				new Basic_Test_Cell({
+					zzz,
+					json: {
+						id: TEST_ID,
+						text: 123 as any,
+					},
+				}),
+		).toThrow();
+	});
 });

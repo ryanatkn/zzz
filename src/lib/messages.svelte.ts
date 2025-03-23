@@ -57,7 +57,7 @@ export class Messages extends Cell<typeof Messages_Json> {
 				result_schema: Message_Schema,
 			}),
 
-			// Ping ID index for pongs
+			// Ping id index for pongs
 			create_multi_index({
 				key: 'by_ping_id',
 				extractor: (message) => {

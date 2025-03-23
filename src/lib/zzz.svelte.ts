@@ -77,7 +77,7 @@ export interface Message_With_History {
 export class Zzz extends Cell<typeof Zzz_Json> {
 	readonly registry: Cell_Registry;
 
-	// Global cell registry - maps cell ID to cell instance
+	// Global cell registry - maps cell id to cell instance
 	readonly cells: SvelteMap<Uuid, Cell> = new SvelteMap();
 
 	// Cells - these are managed objects/collections that contain the app state

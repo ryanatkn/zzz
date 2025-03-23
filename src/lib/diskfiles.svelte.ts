@@ -126,7 +126,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 					// Update the existing diskfile, preserving its ID
 					const diskfile_json = source_file_to_diskfile_json(
 						validated_source_file,
-						existing_diskfile.id, // Pass the existing ID to maintain stability
+						existing_diskfile.id, // Pass the existing id to maintain stability
 					);
 
 					// Only update changed properties, not the entire object
@@ -215,7 +215,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 	}
 
 	/**
-	 * Select a file by ID. Default to the first file if `id` is `undefined`.
+	 * Select a file by id. Default to the first file if `id` is `undefined`.
 	 * If `id` is `null`, it selects no file.
 	 */
 	select(id: Uuid | null | undefined): void {

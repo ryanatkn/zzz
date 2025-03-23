@@ -260,7 +260,7 @@ export const handle_filer_change = (
 		path: Diskfile_Path.parse(change.path),
 	};
 
-	// Ensure the ID is properly typed
+	// Ensure the id is properly typed
 	source_file.id = Diskfile_Path.parse(source_file.id);
 
 	// Include the source directory with the change notification

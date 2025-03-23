@@ -30,7 +30,7 @@
 		const diskfile_content = diskfile.content;
 
 		untrack(() => {
-			// If the diskfile ID changed, this is a navigation to a different file
+			// If the diskfile id changed, this is a navigation to a different file
 			if (editor_state.diskfile.id !== diskfile_id) {
 				editor_state.update_diskfile(diskfile);
 			}

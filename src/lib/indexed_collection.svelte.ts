@@ -96,7 +96,7 @@ export class Indexed_Collection<
 	// The main collection of items
 	all: Array<T> = $state([]);
 
-	// The primary index by ID keyed by Uuid
+	// The primary index by id keyed by Uuid
 	readonly by_id: SvelteMap<Uuid, T> = new SvelteMap();
 
 	// Stores all index values (reactive)
@@ -298,7 +298,7 @@ export class Indexed_Collection<
 
 		// Batch update indexes
 		for (const item of items) {
-			// Update primary ID index
+			// Update primary id index
 			this.by_id.set(item.id, item);
 
 			// Update all other indexes
@@ -410,7 +410,7 @@ export class Indexed_Collection<
 	}
 
 	/**
-	 * Remove an item by its ID and update all indexes
+	 * Remove an item by its id and update all indexes
 	 */
 	remove(id: Uuid): boolean {
 		const item = this.by_id.get(id);

@@ -178,7 +178,7 @@ describe('history navigation', () => {
 		// Now select the saved entry
 		editor_state.set_content_from_history(saved_entry.id);
 
-		// Verify unsaved edit ID is cleared
+		// Verify unsaved edit id is cleared
 		expect(editor_state.selected_history_entry_id).toBe(saved_entry.id);
 		expect(editor_state.unsaved_edit_entry_id).toBeNull();
 	});
@@ -310,7 +310,7 @@ describe('managing unsaved edits', () => {
 		const unsaved_after = history.entries.filter((e) => e.is_unsaved_edit);
 		expect(unsaved_after.length).toBe(0);
 
-		// Unsaved edit ID should be cleared
+		// Unsaved edit id should be cleared
 		expect(editor_state.unsaved_edit_entry_id).toBeNull();
 	});
 

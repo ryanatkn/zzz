@@ -326,8 +326,8 @@ describe('Sequence_Bit serialization', () => {
 
 		const clone = original.clone();
 
-		// Verify they have same initial values
-		expect(clone.id).toBe(original.id);
+		// Verify they have same initial values except for id
+		expect(clone.id).not.toBe(original.id);
 		expect(clone.items).toEqual([test_bits[0].id]);
 		expect(clone.name).toBe('Original sequence');
 

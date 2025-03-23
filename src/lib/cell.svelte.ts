@@ -1,7 +1,6 @@
 import {z} from 'zod';
 import {format} from 'date-fns';
 import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
-import {DEV} from 'esm-env';
 
 import {get_field_schema, zod_get_schema_keys, type Uuid, type Datetime} from '$lib/zod_helpers.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
@@ -125,7 +124,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	 * Clean up resources when this cell is no longer needed.
 	 * Should be called before the cell is discarded.
 	 */
-	protected dispose(): void {
+	dispose(): void {
 		this.unregister();
 	}
 
@@ -138,7 +137,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	 */
 	protected register(): void {
 		if (this.#registered) {
-			if (DEV) console.error(`Cell ${this.constructor.name} is already registered`);
+			console.error(`Cell ${this.constructor.name} is already registered`);
 			return;
 		}
 
@@ -182,6 +181,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 
 	/**
 	 * Apply JSON data to this instance.
+	 * Overwrites all properties including 'id'.
 	 */
 	set_json(value: z.input<T_Schema> = EMPTY_OBJECT): void {
 		try {
@@ -205,82 +205,42 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	}
 
 	/**
-	 * Encode a value during serialization. Can be overridden for custom encoding logic.
-	 * Defaults to Svelte's `$state.snapshot`,
-	 * which handles most cases and uses `toJSON` when available,
-	 * so overriding `to_json` is sufficient for most cases before overriding `encode`.
+	 * Update only the specified properties on this instance.
+	 * Preserves current values for any properties not included in the input.
 	 */
-	encode_property(value: unknown, _key: string): unknown {
-		return $state.snapshot(value);
-	}
-
-	/**
-	 * Decode a value based on its schema type information.
-	 * This handles instantiating classes, transforming arrays, and special types.
-	 *
-	 * Complex property types might require custom handling in parser functions
-	 * rather than using this general decoding mechanism.
-	 */
-	decode_property<K extends Schema_Keys<T_Schema>>(value: unknown, key: K): this[K] {
-		const schema_info = this.field_schema_info.get(key);
-		if (!schema_info) return value as this[K];
-
-		// Handle arrays of cells
-		if (schema_info.is_array && Array.isArray(value)) {
-			if (schema_info.element_class) {
-				return value.map((item) => {
-					const instance = this.#instantiate_class(schema_info.element_class, item);
-					// Return the item if instantiation returns null
-					return instance !== null ? instance : item;
-				}) as this[K];
-			}
-			return value as this[K];
-		}
-
-		// Handle individual cell
-		if (schema_info.class_name && value && typeof value === 'object') {
-			const instance = this.#instantiate_class(schema_info.class_name, value);
-			// Return the original value if instantiation returns null
-			return (instance !== null ? instance : value) as this[K];
-		}
-
-		// Handle special types
-		if (schema_info.type === 'ZodMap' && Array.isArray(value)) {
-			return new Map(value) as this[K];
-		}
-		if (schema_info.type === 'ZodSet' && Array.isArray(value)) {
-			return new Set(value) as this[K];
-		}
-		if (schema_info.type === 'ZodBranded' && value !== null && value !== undefined) {
-			try {
-				// Use the schema directly to parse branded types
-				const field_schema = this.field_schemas.get(key);
-				return (field_schema?.parse(value) ?? value) as this[K];
-			} catch (e) {
-				console.error(`Failed to parse branded type for ${key}:`, e);
-				return value as this[K];
-			}
-		}
-
-		return value as this[K];
-	}
-
-	// TODO add optional json and ctor options
-	/**
-	 * Generic clone method that works for any subclass.
-	 */
-	clone(): this {
-		const constructor = this.constructor as new (options: Cell_Options<T_Schema>) => this;
+	set_json_partial(partial_value: Partial<z.input<T_Schema>>): void {
+		if (!partial_value || typeof partial_value !== 'object') return; // eslint-disable-line @typescript-eslint/no-unnecessary-condition
 
 		try {
-			// TODO @many maybe optionally forward additional rest options?
-			return new constructor({
-				zzz: this.zzz,
-				json: structuredClone(this.json),
-			});
+			// Directly process each property in the partial update
+			for (const key of Object.keys(partial_value) as Array<Schema_Keys<T_Schema>>) {
+				// Skip empty properties
+				if (partial_value[key] === undefined) continue;
+
+				// Get the field schema for this property
+				const field_schema = this.field_schemas.get(key);
+				if (!field_schema) {
+					console.error(`Schema key "${key}" not found in schema for ${this.constructor.name}`);
+					continue;
+				}
+
+				// Parse the individual value through its field schema
+				try {
+					const parsed_value = field_schema.parse(partial_value[key]);
+
+					// Assign the parsed property
+					this.assign_property(key, parsed_value);
+				} catch (field_error) {
+					console.error(
+						`Error parsing property "${key}" for ${this.constructor.name}:`,
+						field_error,
+					);
+					throw field_error;
+				}
+			}
 		} catch (error) {
-			console.error(`Failed to clone instance of ${constructor.name}:`, error);
-			throw new Error(`Failed to clone: ${error instanceof Error ? error.message : String(error)}`);
+			console.error(`Error in partial update for ${this.constructor.name}:`, error);
+			throw error;
 		}
 	}
 
@@ -361,8 +321,87 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	}
 
 	/**
-	 * Instantiate a cell class using the registry.
+	 * Encode a value during serialization. Can be overridden for custom encoding logic.
+	 * Defaults to Svelte's `$state.snapshot`,
+	 * which handles most cases and uses `toJSON` when available,
+	 * so overriding `to_json` is sufficient for most cases before overriding `encode`.
 	 */
+	encode_property(value: unknown, _key: string): unknown {
+		return $state.snapshot(value);
+	}
+
+	/**
+	 * Decode a value based on its schema type information.
+	 * This handles instantiating classes, transforming arrays, and special types.
+	 *
+	 * Complex property types might require custom handling in parser functions
+	 * rather than using this general decoding mechanism.
+	 */
+	decode_property<K extends Schema_Keys<T_Schema>>(value: unknown, key: K): this[K] {
+		const schema_info = this.field_schema_info.get(key);
+		if (!schema_info) return value as this[K];
+
+		// Handle arrays of cells
+		if (schema_info.is_array && Array.isArray(value)) {
+			if (schema_info.element_class) {
+				return value.map((item) => {
+					const instance = this.#instantiate_class(schema_info.element_class, item);
+					// Return the item if instantiation returns null
+					return instance !== null ? instance : item;
+				}) as this[K];
+			}
+			return value as this[K];
+		}
+
+		// Handle individual cell
+		if (schema_info.class_name && value && typeof value === 'object') {
+			const instance = this.#instantiate_class(schema_info.class_name, value);
+			// Return the original value if instantiation returns null
+			return (instance !== null ? instance : value) as this[K];
+		}
+
+		// Handle special types
+		if (schema_info.type === 'ZodMap' && Array.isArray(value)) {
+			return new Map(value) as this[K];
+		}
+		if (schema_info.type === 'ZodSet' && Array.isArray(value)) {
+			return new Set(value) as this[K];
+		}
+		if (schema_info.type === 'ZodBranded' && value !== null && value !== undefined) {
+			try {
+				// Use the schema directly to parse branded types
+				const field_schema = this.field_schemas.get(key);
+				return (field_schema?.parse(value) ?? value) as this[K];
+			} catch (e) {
+				console.error(`Failed to parse branded type for ${key}:`, e);
+				return value as this[K];
+			}
+		}
+
+		return value as this[K];
+	}
+
+	/**
+	 * Generic clone method that works for any subclass.
+	 * TODO add optional json and ctor options
+	 */
+	clone(options?: Cell_Options<T_Schema>): this {
+		const constructor = this.constructor as new (options: Cell_Options<T_Schema>) => this;
+		try {
+			// Get the current json
+			const {id: _, ...json} = this.json;
+
+			return new constructor({
+				...options,
+				zzz: this.zzz,
+				json: structuredClone(json),
+			});
+		} catch (error) {
+			console.error(`Failed to clone instance of ${constructor.name}:`, error);
+			throw new Error(`Failed to clone: ${error instanceof Error ? error.message : String(error)}`);
+		}
+	}
+
 	#instantiate_class(class_name: string | undefined, json: unknown, options?: object): unknown {
 		if (!class_name) {
 			console.error('No class name provided for instantiation');

@@ -109,7 +109,7 @@ export abstract class Bit<T extends z.ZodType = typeof Bit_Base_Json> extends Ce
 	 * @returns `true` if the attribute was updated, `false` if the attribute was not found
 	 */
 	update_attribute(id: Uuid, updates: Partial<Omit<Xml_Attribute, 'id'>>): boolean {
-		// Find the attribute by ID
+		// Find the attribute by id
 		const index = this.attributes.findIndex((a) => a.id === id);
 		if (index === -1) return false;
 

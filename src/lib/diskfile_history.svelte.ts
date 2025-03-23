@@ -107,7 +107,7 @@ export class Diskfile_History extends Cell<typeof Diskfile_History_Json> {
 
 	// TODO maybe make a map for faster lookup?
 	/**
-	 * Find a history entry by ID
+	 * Find a history entry by id
 	 */
 	find_entry_by_id(id: Uuid): History_Entry | undefined {
 		return this.entries.find((entry) => entry.id === id);
