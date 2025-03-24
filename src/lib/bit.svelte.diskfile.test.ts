@@ -88,7 +88,7 @@ describe('Diskfile_Bit initialization', () => {
 		expect(bit.path).toBe(path);
 		expect(bit.name).toBe('');
 		expect(bit.enabled).toBe(true);
-		expect(bit.has_xml_tag).toBe(false);
+		expect(bit.has_xml_tag).toBe(true);
 		expect(bit.xml_tag_name).toBe('');
 		expect(bit.attributes).toEqual([]);
 		expect(bit.start).toBeNull();
@@ -314,7 +314,7 @@ describe('Diskfile_Bit serialization', () => {
 		expect(json.name).toBe('Test file');
 		expect(json.start).toBe(10);
 		expect(json.end).toBe(20);
-		expect(json.has_xml_tag).toBe(false);
+		expect(json.has_xml_tag).toBe(true);
 		expect(json.enabled).toBe(true);
 	});
 

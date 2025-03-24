@@ -36,23 +36,30 @@
 		),
 	);
 
-	// Common filtering logic
 	const filtered_items = $derived.by(() => {
-		let result = [...items.all];
+		const all_items = items.all;
 
-		// Apply id exclusion if specified
+		// Quick return for common case (no filtering or sorting needed)
+		if ((!exclude_ids || exclude_ids.length === 0) && !filter && !sortable.active_sort_fn) {
+			return all_items;
+		}
+
+		let result = all_items;
+
 		if (exclude_ids && exclude_ids.length > 0) {
 			result = result.filter((item) => !exclude_ids.includes(item.id));
 		}
 
-		// Apply custom filter if provided
 		if (filter) {
 			result = result.filter(filter);
 		}
 
-		// Apply sorting using sortable if available
 		if (sortable.active_sort_fn) {
-			result = result.sort(sortable.active_sort_fn);
+			// If result is still the original array, we need to clone to avoid mutating the source
+			if (result === all_items) {
+				result = [...result];
+			}
+			result.sort(sortable.active_sort_fn);
 		}
 
 		return result;

@@ -544,4 +544,31 @@ describe('Common bit behavior across types', () => {
 		expect(sequence_bit.has_xml_tag).toBe(false);
 		expect(sequence_bit.xml_tag_name).toBe('sequence-tag');
 	});
+
+	test('has_xml_tag defaults correctly for each bit type', () => {
+		// Create different bit types with default values
+		const text_bit = zzz.registry.instantiate('Text_Bit');
+		const diskfile_bit = zzz.registry.instantiate('Diskfile_Bit');
+		const sequence_bit = zzz.registry.instantiate('Sequence_Bit');
+
+		// Verify default has_xml_tag values
+		expect(text_bit.has_xml_tag).toBe(false); // Text bits default to false
+		expect(diskfile_bit.has_xml_tag).toBe(true); // Diskfile bits default to true
+		expect(sequence_bit.has_xml_tag).toBe(false); // Sequence bits default to false
+
+		// Verify we can override the defaults
+		const custom_text_bit = zzz.registry.instantiate('Text_Bit', {
+			has_xml_tag: true,
+		});
+		const custom_diskfile_bit = zzz.registry.instantiate('Diskfile_Bit', {
+			has_xml_tag: false,
+		});
+		const custom_sequence_bit = zzz.registry.instantiate('Sequence_Bit', {
+			has_xml_tag: true,
+		});
+
+		expect(custom_text_bit.has_xml_tag).toBe(true);
+		expect(custom_diskfile_bit.has_xml_tag).toBe(false);
+		expect(custom_sequence_bit.has_xml_tag).toBe(true);
+	});
 });

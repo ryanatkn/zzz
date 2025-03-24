@@ -48,7 +48,6 @@ export class Sortable<T> {
 	 * Sorted items based on the current active sorter.
 	 */
 	sorted_items: Array<T> = $derived.by(() => {
-		// Get current items from the reactive getter
 		const items = [...this.items];
 
 		// Return unsorted if no sort function

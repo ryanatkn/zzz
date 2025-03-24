@@ -19,7 +19,7 @@ export const Bit_Base_Json = Cell_Json.extend({
 	name: z.string().default(''),
 	start: z.number().nullable().default(null),
 	end: z.number().nullable().default(null),
-	has_xml_tag: z.boolean().default(true), // TODO @many move to the prompt somewhere
+	has_xml_tag: z.boolean().default(false),
 	xml_tag_name: z.string().default(''), // TODO @many move to the prompt somewhere
 	attributes: z.array(Xml_Attribute).default(() => []), // TODO @many move to the prompt somewhere
 	enabled: z.boolean().default(true),
@@ -39,6 +39,7 @@ export type Text_Bit_Json = z.infer<typeof Text_Bit_Json>;
 export const Diskfile_Bit_Json = Bit_Base_Json.extend({
 	type: z.literal('diskfile').default('diskfile'),
 	path: Diskfile_Path.nullable().default(null),
+	has_xml_tag: Bit_Base_Json.shape.has_xml_tag.default(true), // Override to make true only for diskfiles
 	// `content` is on disk at `path`, not in the serialized representation
 });
 export type Diskfile_Bit_Json = z.infer<typeof Diskfile_Bit_Json>;
@@ -345,7 +346,7 @@ export class Sequence_Bit extends Bit<typeof Sequence_Bit_Json> {
 	 */
 	add(bit_id: Uuid): boolean {
 		if (this.items.includes(bit_id)) return false;
-		this.items = [...this.items, bit_id];
+		this.items.push(bit_id);
 		return true;
 	}
 
@@ -357,9 +358,7 @@ export class Sequence_Bit extends Bit<typeof Sequence_Bit_Json> {
 		const index = this.items.findIndex((id) => id === bit_id);
 		if (index === -1) return false;
 
-		const new_items = [...this.items];
-		new_items.splice(index, 1);
-		this.items = new_items;
+		this.items.splice(index, 1);
 		return true;
 	}
 
@@ -371,10 +370,9 @@ export class Sequence_Bit extends Bit<typeof Sequence_Bit_Json> {
 		const current_index = this.items.findIndex((id) => id === bit_id);
 		if (current_index === -1) return false;
 
-		const new_items = [...this.items];
-		new_items.splice(current_index, 1);
-		new_items.splice(new_index, 0, bit_id);
-		this.items = new_items;
+		const item_to_move = this.items[current_index];
+		this.items.splice(current_index, 1);
+		this.items.splice(new_index, 0, item_to_move);
 		return true;
 	}
 }
