@@ -18,7 +18,7 @@
 	const zzz = zzz_context.get();
 	const {prompts} = zzz;
 
-	// Combine both filtering conditions into a single predicate
+	// TODO refactor
 	const filtered_prompts = $derived(
 		prompts.items.all
 			.filter((p) => {

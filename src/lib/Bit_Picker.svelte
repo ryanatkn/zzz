@@ -23,7 +23,7 @@
 		exclude_ids = [],
 	}: Props = $props();
 
-	// Combined filtering logic
+	// TODO refactor
 	const filtered_bits = $derived(
 		items
 			.filter((bit) => {

@@ -18,7 +18,7 @@
 	const zzz = zzz_context.get();
 	const {diskfiles} = zzz;
 
-	// Combined filtering logic
+	// TODO refactor
 	const filtered_diskfiles = $derived(
 		diskfiles.non_external_diskfiles
 			.filter((diskfile) => {
