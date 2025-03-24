@@ -578,6 +578,11 @@ export const package_json = {
 			default: './dist/Socket_Message_Queue.svelte',
 		},
 		'./socket.svelte.js': {types: './dist/socket.svelte.d.ts', default: './dist/socket.svelte.js'},
+		'./Sortable_List.svelte': {
+			types: './dist/Sortable_List.svelte.d.ts',
+			svelte: './dist/Sortable_List.svelte',
+			default: './dist/Sortable_List.svelte',
+		},
 		'./sortable.svelte.js': {
 			types: './dist/sortable.svelte.d.ts',
 			default: './dist/sortable.svelte.js',
@@ -1259,14 +1264,14 @@ export const src_json = {
 				{name: 'Socket', kind: 'class'},
 			],
 		},
+		'./Sortable_List.svelte': {path: 'Sortable_List.svelte', declarations: []},
 		'./sortable.svelte.js': {
 			path: 'sortable.svelte.ts',
 			declarations: [
 				{name: 'Sorter', kind: 'type'},
 				{name: 'Sortable', kind: 'class'},
 				{name: 'sort_by_text', kind: 'function'},
-				{name: 'sort_by_date', kind: 'function'},
-				{name: 'sort_by_number', kind: 'function'},
+				{name: 'sort_by_numeric', kind: 'function'},
 			],
 		},
 		'./Strip_Item.svelte': {path: 'Strip_Item.svelte', declarations: []},

@@ -662,6 +662,11 @@
       "types": "./dist/socket.svelte.d.ts",
       "default": "./dist/socket.svelte.js"
     },
+    "./Sortable_List.svelte": {
+      "types": "./dist/Sortable_List.svelte.d.ts",
+      "svelte": "./dist/Sortable_List.svelte",
+      "default": "./dist/Sortable_List.svelte"
+    },
     "./sortable.svelte.js": {
       "types": "./dist/sortable.svelte.d.ts",
       "default": "./dist/sortable.svelte.js"

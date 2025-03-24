@@ -8,7 +8,7 @@ import {Zzz} from '$lib/zzz.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Mock WebSocket implementation for testing
-class Mock_WebSocket {
+class Mocket {
 	listeners: Record<string, Array<(event: any) => void> | undefined> = {
 		open: [],
 		close: [],
@@ -73,7 +73,7 @@ const TEST_MESSAGE = {
 
 describe('Socket', () => {
 	let original_web_socket: typeof WebSocket;
-	let mock_socket: Mock_WebSocket;
+	let mock_socket: Mocket;
 	let zzz: Zzz;
 
 	// Setup for each test
@@ -82,7 +82,7 @@ describe('Socket', () => {
 		original_web_socket = globalThis.WebSocket;
 
 		// Create mock socket
-		mock_socket = new Mock_WebSocket(TEST_URLS.BASE);
+		mock_socket = new Mocket(TEST_URLS.BASE);
 
 		// Create real Zzz instance
 		zzz = monkeypatch_zzz_for_tests(new Zzz());
