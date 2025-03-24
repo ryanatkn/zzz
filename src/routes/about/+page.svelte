@@ -37,11 +37,17 @@
 			fly while remaining fully open, aligned, and in your control.
 		</p>
 		<p>
-			This is a pre-alpha, but it can do some neat things and points to what I think is an
-			interesting future. This first release took about 2 months of development and I have a lot of
-			things planned - it feels very early to me but I know myself and needed to ship asap! The idea
-			is something I've thought about and prototyped for more than 12 years, and I think this
-			iteration is sticking.
+			This is a pre-alpha, but it can do some neat things, and it points to what I think is an
+			interesting and desirable future. This first release took about 2 months of development and I
+			have a lot of things planned - it feels very early but knowing myself I needed to ship asap!
+			The idea is something I've thought about and prototyped for more than 12 years, and I think
+			this iteration is finally, actually sticking.
+		</p>
+		<p>
+			Questions I'm thinking about include, "How can composable computing environments transform
+			user agency in the age of AI?", and "What becomes possible when web users move from
+			service-controlled archipelagos to open and extensible user-controlled environments with
+			well-designed, unrestricted access to local and remote capabilities?
 		</p>
 		<p>Zzz is designed to be extensible to include features from many kinds of software:</p>
 		<ul>

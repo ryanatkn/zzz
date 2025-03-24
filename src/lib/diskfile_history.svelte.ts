@@ -1,4 +1,5 @@
 import {z} from 'zod';
+import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
 
 import {Diskfile_Path} from '$lib/diskfile_types.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
@@ -62,7 +63,7 @@ export class Diskfile_History extends Cell<typeof Diskfile_History_Json> {
 			is_original_state?: boolean;
 			label?: string;
 			created?: number;
-		} = {},
+		} = EMPTY_OBJECT,
 	): History_Entry {
 		// Don't add duplicate entries with the same content back-to-back
 		if (this.current_entry && this.current_entry.content === content) {

@@ -49,7 +49,7 @@
 		}}
 	>
 		{#snippet icon()}{GLYPH_COPY}{/snippet}
-		<span>Copy content</span>
+		<span>Copy file content <small class="ml_xs">{diskfile.content_preview}</small></span>
 	</Contextmenu_Entry>
 
 	<Contextmenu_Entry

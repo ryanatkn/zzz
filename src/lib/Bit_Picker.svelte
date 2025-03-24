@@ -3,6 +3,7 @@
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import type {Bit_Type} from '$lib/bit.svelte.js';
 	import type {Uuid} from '$lib/zod_helpers.js';
+	import {sort_by_text, sort_by_numeric} from '$lib/sortable.svelte.js';
 
 	const zzz = zzz_context.get();
 	const {bits} = zzz;
@@ -10,52 +11,42 @@
 	interface Props {
 		onpick: (bit: Bit_Type | undefined) => boolean | void;
 		show?: boolean | undefined;
-		items?: Array<Bit_Type> | undefined;
 		filter?: ((bit: Bit_Type) => boolean) | undefined;
 		exclude_ids?: Array<Uuid> | undefined;
 	}
 
-	let {
-		show = $bindable(false),
-		onpick,
-		items = bits.items.all,
-		filter,
-		exclude_ids = [],
-	}: Props = $props();
-
-	// TODO refactor
-	const filtered_bits = $derived(
-		items
-			.filter((bit) => {
-				// Check if the bit ID is in the exclude list
-				if (exclude_ids.includes(bit.id)) {
-					return false;
-				}
-				// Apply the custom filter if provided
-				return filter ? filter(bit) : true;
-			})
-			.sort((a, b) => a.created_date.getTime() - b.created_date.getTime()),
-	);
+	let {show = $bindable(false), onpick, filter, exclude_ids}: Props = $props();
 </script>
 
-<Picker bind:show {onpick}>
-	{#snippet children(pick)}
-		<h2 class="mt_lg text_align_center">Pick a bit</h2>
-		{#if filtered_bits.length === 0}
-			<div class="p_md">No bits available</div>
-		{:else}
-			<ul class="unstyled">
-				{#each filtered_bits as bit (bit.id)}
-					<li>
-						<button type="button" class="button_list_item compact w_100" onclick={() => pick(bit)}>
-							<div class="p_xs size_sm">
-								<span class="badge mr_xs">{bit.type}</span>
-								<span class="text ellipsis">{bit.content_preview}</span>
-							</div>
-						</button>
-					</li>
-				{/each}
-			</ul>
-		{/if}
+<Picker
+	bind:show
+	{onpick}
+	items={bits.items}
+	{filter}
+	{exclude_ids}
+	sorters={[
+		sort_by_numeric('created_newest', 'newest first', 'created_date', 'desc'),
+		sort_by_numeric('created_oldest', 'oldest first', 'created_date', 'asc'),
+		sort_by_text<Bit_Type>('type_asc', 'type (a-z)', 'type'),
+		sort_by_text<Bit_Type>('type_desc', 'type (z-a)', 'type', 'desc'),
+		sort_by_text<Bit_Type>('name_asc', 'name (a-z)', 'name'),
+		sort_by_text<Bit_Type>('name_desc', 'name (z-a)', 'name', 'desc'),
+		sort_by_numeric<Bit_Type>('token_count_highest', 'tokens (most)', 'token_count', 'desc'),
+		sort_by_numeric<Bit_Type>('token_count_lowest', 'tokens (least)', 'token_count', 'asc'),
+	]}
+	default_sort_key="created_newest"
+	show_sort_controls
+	heading="Pick a bit"
+>
+	{#snippet children(bit, pick)}
+		<button type="button" class="button_list_item compact w_100" onclick={() => pick(bit)}>
+			<div class="p_xs size_sm">
+				<span class="badge mr_xs">{bit.type}</span>
+				<span class="text ellipsis">{bit.content_preview}</span>
+				{#if bit.token_count != null}
+					<span class="size_xs ml_xs">{bit.token_count}</span>
+				{/if}
+			</div>
+		</button>
 	{/snippet}
 </Picker>

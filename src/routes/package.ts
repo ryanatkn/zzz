@@ -60,7 +60,7 @@ export const package_json = {
 		'@google/generative-ai': '^0.24.0',
 		'@hono/node-server': '^1.13.8',
 		'@hono/node-ws': '^1.1.0',
-		'@ryanatkn/belt': '^0.29.1',
+		'@ryanatkn/belt': '^0.30.0',
 		'date-fns': '^4.1.0',
 		devalue: '^5.1.1',
 		'esm-env': '^1.2.2',
@@ -578,6 +578,10 @@ export const package_json = {
 			default: './dist/Socket_Message_Queue.svelte',
 		},
 		'./socket.svelte.js': {types: './dist/socket.svelte.d.ts', default: './dist/socket.svelte.js'},
+		'./sortable.svelte.js': {
+			types: './dist/sortable.svelte.d.ts',
+			default: './dist/sortable.svelte.js',
+		},
 		'./Strip_Item.svelte': {
 			types: './dist/Strip_Item.svelte.d.ts',
 			svelte: './dist/Strip_Item.svelte',
@@ -1253,6 +1257,16 @@ export const src_json = {
 				{name: 'Queued_Message', kind: 'type'},
 				{name: 'Failed_Message', kind: 'type'},
 				{name: 'Socket', kind: 'class'},
+			],
+		},
+		'./sortable.svelte.js': {
+			path: 'sortable.svelte.ts',
+			declarations: [
+				{name: 'Sorter', kind: 'type'},
+				{name: 'Sortable', kind: 'class'},
+				{name: 'sort_by_text', kind: 'function'},
+				{name: 'sort_by_date', kind: 'function'},
+				{name: 'sort_by_number', kind: 'function'},
 			],
 		},
 		'./Strip_Item.svelte': {path: 'Strip_Item.svelte', declarations: []},

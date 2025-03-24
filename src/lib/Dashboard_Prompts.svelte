@@ -166,8 +166,11 @@
 					style:grid-template-columns="repeat(auto-fill, minmax(300px, 1fr))"
 				>
 					{#each zzz.prompts.selected.bits as bit (bit.id)}
-						<li class="bg radius_xs p_sm" transition:scale>
-							<Bit_View {bit} prompts={zzz.prompts} />
+						<li transition:scale>
+							<!-- the extra wrapper makes the grid items not stretch vertically -->
+							<div class="bg radius_xs p_sm">
+								<Bit_View {bit} prompts={zzz.prompts} />
+							</div>
 						</li>
 					{/each}
 				</ul>

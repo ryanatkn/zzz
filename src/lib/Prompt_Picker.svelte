@@ -4,6 +4,7 @@
 	import type {Prompt} from '$lib/prompt.svelte.js';
 	import Prompt_Summary from '$lib/Prompt_Summary.svelte';
 	import type {Uuid} from '$lib/zod_helpers.js';
+	import {sort_by_text, sort_by_numeric} from '$lib/sortable.svelte.js';
 
 	interface Props {
 		onpick: (prompt: Prompt | undefined) => boolean | void;
@@ -13,47 +14,38 @@
 		selected_ids?: Array<Uuid> | undefined;
 	}
 
-	let {onpick, show = $bindable(false), filter, exclude_ids = []}: Props = $props();
+	let {onpick, show = $bindable(false), filter, exclude_ids, selected_ids}: Props = $props();
 
 	const zzz = zzz_context.get();
 	const {prompts} = zzz;
-
-	// TODO refactor
-	const filtered_prompts = $derived(
-		prompts.items.all
-			.filter((p) => {
-				// First check if the prompt ID is in the exclude list
-				if (exclude_ids.includes(p.id)) {
-					return false;
-				}
-				// Then apply the custom filter if provided
-				return filter ? filter(p) : true;
-			})
-			.sort((a, b) => a.name.localeCompare(b.name)),
-	);
 </script>
 
-<Picker bind:show {onpick}>
-	{#snippet children(pick)}
-		<h2 class="mt_lg text_align_center">Pick a prompt</h2>
-		{#if filtered_prompts.length === 0}
-			<div class="p_md">No prompts available</div>
-		{:else}
-			<ul class="unstyled">
-				{#each filtered_prompts as prompt (prompt.id)}
-					<li>
-						<button
-							type="button"
-							class="button_list_item compact w_100"
-							onclick={() => pick(prompt)}
-						>
-							<div class="p_xs size_sm">
-								<Prompt_Summary {prompt} />
-							</div>
-						</button>
-					</li>
-				{/each}
-			</ul>
-		{/if}
+<Picker
+	bind:show
+	{onpick}
+	items={prompts.items}
+	{filter}
+	{exclude_ids}
+	sorters={[
+		sort_by_text<Prompt>('name_asc', 'name (a-z)', 'name'),
+		sort_by_text<Prompt>('name_desc', 'name (z-a)', 'name', 'desc'),
+		sort_by_numeric('created_newest', 'newest first', 'created_date', 'desc'),
+		sort_by_numeric('created_oldest', 'oldest first', 'created_date', 'asc'),
+	]}
+	default_sort_key="name_asc"
+	show_sort_controls
+	heading="Pick a prompt"
+>
+	{#snippet children(prompt, pick)}
+		<button
+			type="button"
+			class="button_list_item compact w_100"
+			class:selected={selected_ids?.includes(prompt.id)}
+			onclick={() => pick(prompt)}
+		>
+			<div class="p_xs size_sm">
+				<Prompt_Summary {prompt} />
+			</div>
+		</button>
 	{/snippet}
 </Picker>

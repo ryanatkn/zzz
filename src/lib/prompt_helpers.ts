@@ -4,19 +4,11 @@ import type {Bit_Type} from '$lib/bit.svelte.js';
  * Formats a collection of bits into a prompt string, applying XML tags and attributes where specified.
  */
 export const format_prompt_content = (bits: Array<Bit_Type>): string => {
-	const enabled_bits = [];
-
-	// First loop: filter enabled bits once to avoid repeated filtering
-	for (const bit of bits) {
-		if (bit.enabled) {
-			enabled_bits.push(bit);
-		}
-	}
-
 	const formatted_contents = [];
 
-	// Second loop: process each enabled bit
-	for (const bit of enabled_bits) {
+	for (const bit of bits) {
+		if (!bit.enabled) continue;
+
 		const content = bit.content?.trim();
 		if (!content) continue;
 

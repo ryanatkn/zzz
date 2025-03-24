@@ -2,11 +2,12 @@
 	import Picker from '$lib/Picker.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
-	import Diskfile_List_Item from '$lib/Diskfile_List_Item.svelte';
 	import type {Uuid} from '$lib/zod_helpers.js';
+	import {sort_by_text, sort_by_numeric} from '$lib/sortable.svelte.js';
+	import Diskfile_List_Item from '$lib/Diskfile_List_Item.svelte';
 
 	interface Props {
-		onpick: (diskfile: Diskfile | null | undefined) => boolean | void;
+		onpick: (diskfile: Diskfile | undefined) => boolean | void;
 		show?: boolean | undefined;
 		filter?: ((diskfile: Diskfile) => boolean) | undefined;
 		exclude_ids?: Array<Uuid> | undefined;
@@ -17,48 +18,33 @@
 
 	const zzz = zzz_context.get();
 	const {diskfiles} = zzz;
-
-	// TODO refactor
-	const filtered_diskfiles = $derived(
-		diskfiles.non_external_diskfiles
-			.filter((diskfile) => {
-				// Check if the file ID is in the exclude list
-				if (exclude_ids?.includes(diskfile.id)) {
-					return false;
-				}
-				// Apply the custom filter if provided
-				return filter ? filter(diskfile) : true;
-			})
-			.sort((a, b) => {
-				if (!a.path && !b.path) return 0;
-				if (!a.path) return 1;
-				if (!b.path) return -1;
-				return a.path.localeCompare(b.path);
-			}),
-	);
 </script>
 
-<Picker bind:show {onpick}>
-	{#snippet children(pick)}
-		<h2 class="mt_lg text_align_center">Pick a file</h2>
-		{#if filtered_diskfiles.length === 0}
-			<div class="p_md">No files available</div>
-		{:else}
-			<div class="row gap_sm">
-				<button type="button" onclick={() => pick(null)} class="mb_lg">pick no file</button>
-				<button type="button" onclick={() => pick(undefined)} class="mb_lg">cancel</button>
-			</div>
-			<ul class="unstyled">
-				{#each filtered_diskfiles as diskfile (diskfile.id)}
-					<li>
-						<Diskfile_List_Item
-							{diskfile}
-							selected={!!selected_ids && selected_ids.includes(diskfile.id)}
-							onclick={() => pick(diskfile)}
-						/>
-					</li>
-				{/each}
-			</ul>
-		{/if}
+<Picker
+	bind:show
+	{onpick}
+	items={diskfiles.items}
+	{filter}
+	{exclude_ids}
+	sorters={[
+		sort_by_text<Diskfile>('path_asc', 'path (a-z)', 'path'),
+		sort_by_text<Diskfile>('path_desc', 'path (z-a)', 'path', 'desc'),
+		sort_by_numeric('created_newest', 'newest first', 'created_date', 'desc'),
+		sort_by_numeric('created_oldest', 'oldest first', 'created_date', 'asc'),
+		sort_by_numeric('updated_recently', 'recently updated', 'updated_date', 'desc'),
+		sort_by_numeric('updated_oldest', 'least recently updated', 'updated_date', 'asc'),
+		sort_by_numeric<Diskfile>('size_largest', 'largest first', 'content_length', 'desc'),
+		sort_by_numeric<Diskfile>('size_smallest', 'smallest first', 'content_length', 'asc'),
+	]}
+	default_sort_key="path_asc"
+	show_sort_controls
+	heading="Pick a file"
+>
+	{#snippet children(diskfile, pick)}
+		<Diskfile_List_Item
+			{diskfile}
+			selected={!!selected_ids && selected_ids.includes(diskfile.id)}
+			onclick={pick}
+		/>
 	{/snippet}
 </Picker>
