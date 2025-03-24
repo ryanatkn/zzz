@@ -146,6 +146,13 @@ a.chip {
 	font-weight: 600;
 	--font_weight: 600;
 }
+
+/* Formats content to wrap long strings and preserve displayed whitespace. */
+.formatted {
+	overflow: hidden;
+	white-space: break-spaces;
+}
+
 .gap_md {
 	gap: var(--space_md);
 }
@@ -318,6 +325,9 @@ a.chip {
 }
 .ml_xs {
 	margin-left: var(--space_xs);
+}
+.ml_xs2 {
+	margin-left: var(--space_xs2);
 }
 .mr_xl {
 	margin-right: var(--space_xl);

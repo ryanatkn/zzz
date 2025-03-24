@@ -13,18 +13,16 @@
 	}
 
 	const {bit, prompt, prompts, attrs = {}}: Props = $props();
+</script>
 
-	const handle_remove = () => {
+<Confirm_Button
+	onconfirm={() => {
 		if (prompt) {
 			prompt.remove_bit(bit.id);
 		} else if (prompts) {
 			prompts.remove_bit(bit.id);
 		}
-	};
-</script>
-
-<Confirm_Button
-	onconfirm={handle_remove}
+	}}
 	attrs={{
 		class: `plain compact ${attrs.class || ''}`,
 		title: `remove bit "${bit.name}"`,

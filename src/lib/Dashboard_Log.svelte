@@ -6,10 +6,6 @@
 	import type {Message} from '$lib/message.svelte.js';
 
 	let selected_message: Message | null = $state(null);
-
-	const handle_select_message = (message: Message): void => {
-		selected_message = message;
-	};
 </script>
 
 <div class="column p_lg h_100">
@@ -24,7 +20,9 @@
 			<Messages_List
 				limit={100}
 				selected_message_id={selected_message?.id}
-				onselect={handle_select_message}
+				onselect={(message) => {
+					selected_message = message;
+				}}
 			/>
 		</div>
 

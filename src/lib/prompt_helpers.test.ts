@@ -1,7 +1,6 @@
 import {test, expect} from 'vitest';
 
 import {format_prompt_content} from '$lib/prompt_helpers.js';
-import {XML_TAG_NAME_DEFAULT} from '$lib/constants.js';
 
 // Instead of mocking modules, we'll create a simplified bit structure
 // that mirrors the interface we need for the tests
@@ -10,6 +9,9 @@ interface Simple_Bit {
 	content: string;
 	has_xml_tag: boolean;
 	xml_tag_name: string;
+	type: string;
+	default_xml_tag_name: string;
+	relative_path?: string; // Add this property for diskfile tests
 	attributes: Array<{
 		id: string;
 		key: string;
@@ -19,11 +21,15 @@ interface Simple_Bit {
 
 // Helper to create a bit with default values
 const create_bit = (partial: Partial<Simple_Bit> = {}): Simple_Bit => {
+	const type = partial.type || 'text';
+
 	return {
 		enabled: true,
 		content: '',
 		has_xml_tag: false,
 		xml_tag_name: '',
+		type,
+		default_xml_tag_name: type === 'diskfile' ? 'file' : 'fragment',
 		attributes: [],
 		...partial,
 	};
@@ -66,18 +72,66 @@ test('format_prompt_content - wraps content with XML tags when specified', () =>
 	expect(result).toBe('<system>\nContent with tag\n</system>');
 });
 
-test('format_prompt_content - uses default XML tag name when not provided', () => {
+test('format_prompt_content - uses default_xml_tag_name when no XML tag name is provided', () => {
 	const bits = [
 		create_bit({
 			content: 'Content with default tag',
 			has_xml_tag: true,
 			xml_tag_name: '',
+			type: 'text',
+		}),
+	];
+
+	const result = format_prompt_content(bits as any);
+	expect(result).toBe('<fragment>\nContent with default tag\n</fragment>');
+});
+
+// Test with different bit types
+test('format_prompt_content - uses different bit types as defaults', () => {
+	const bits = [
+		create_bit({
+			content: 'File content',
+			has_xml_tag: true,
+			xml_tag_name: '',
+			type: 'diskfile',
+		}),
+		create_bit({
+			content: 'Sequence content',
+			has_xml_tag: true,
+			xml_tag_name: '',
+			type: 'sequence',
+		}),
+	];
+
+	const result = format_prompt_content(bits as any);
+	expect(result).toBe('<file>\nFile content\n</file>\n\n<fragment>\nSequence content\n</fragment>');
+});
+
+test('format_prompt_content - uses different default XML tag names for different bit types', () => {
+	const bits = [
+		create_bit({
+			content: 'File content',
+			has_xml_tag: true,
+			xml_tag_name: '',
+			type: 'diskfile',
+		}),
+		create_bit({
+			content: 'Text content',
+			has_xml_tag: true,
+			xml_tag_name: '',
+			type: 'text',
+		}),
+		create_bit({
+			content: 'Sequence content',
+			has_xml_tag: true,
+			xml_tag_name: '',
+			type: 'sequence',
 		}),
 	];
 
 	const result = format_prompt_content(bits as any);
 	expect(result).toBe(
-		`<${XML_TAG_NAME_DEFAULT}>\nContent with default tag\n</${XML_TAG_NAME_DEFAULT}>`,
+		'<file>\nFile content\n</file>\n\n<fragment>\nText content\n</fragment>\n\n<fragment>\nSequence content\n</fragment>',
 	);
 });
 
@@ -266,4 +320,41 @@ test('format_prompt_content - trims whitespace from XML tag name', () => {
 
 	const result = format_prompt_content(bits as any);
 	expect(result).toBe('<system>\nTrimmed tag name\n</system>');
+});
+
+// Test that diskfile bits get the path attribute by default
+test('format_prompt_content - ensures diskfile bits have path attribute', () => {
+	// Create a mock Diskfile_Bit with a path
+	const diskfile_bit = create_bit({
+		type: 'diskfile',
+		content: 'File content with path',
+		has_xml_tag: true,
+		xml_tag_name: '',
+		relative_path: 'src/example.ts', // Add this property for the test
+		attributes: [{id: '1', key: 'path', value: 'src/example.ts'}], // Pre-set attribute for mock
+	});
+
+	const result = format_prompt_content([diskfile_bit] as any);
+	expect(result).toBe('<file path="src/example.ts">\nFile content with path\n</file>');
+});
+
+// Test for when the path attribute is combined with other attributes
+test('format_prompt_content - combines path attribute with other attributes for diskfile bits', () => {
+	const diskfile_bit = create_bit({
+		type: 'diskfile',
+		content: 'File with multiple attributes',
+		has_xml_tag: true,
+		xml_tag_name: 'code',
+		relative_path: 'src/utils.js',
+		attributes: [
+			{id: '1', key: 'path', value: 'src/utils.js'},
+			{id: '2', key: 'language', value: 'javascript'},
+			{id: '3', key: 'highlight', value: ''},
+		],
+	});
+
+	const result = format_prompt_content([diskfile_bit] as any);
+	expect(result).toBe(
+		'<code path="src/utils.js" language="javascript" highlight>\nFile with multiple attributes\n</code>',
+	);
 });

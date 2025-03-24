@@ -68,7 +68,7 @@
 	<div class="flex flex_1 gap_xs2 w_100">
 		<textarea
 			{...attrs}
-			class="plain mb_0 w_100 h_100 flex_1 {attrs?.class}"
+			class="plain mb_0 w_100 flex_1 {attrs?.class}"
 			bind:this={textarea_el}
 			bind:value={content}
 			{placeholder}

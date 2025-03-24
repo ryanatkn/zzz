@@ -5,7 +5,8 @@
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import {Uuid} from '$lib/zod_helpers.js';
 	import {Bit, type Sequence_Bit} from '$lib/bit.svelte.js';
-	import {GLYPH_ADD} from '$lib/glyphs.js';
+	import {GLYPH_ADD, GLYPH_BIT} from '$lib/glyphs.js';
+	import Bit_Picker from '$lib/Bit_Picker.svelte';
 
 	interface Props {
 		sequence_bit: Sequence_Bit;
@@ -15,12 +16,6 @@
 	const {sequence_bit, prompt}: Props = $props();
 
 	const zzz = zzz_context.get();
-
-	// Handle reordering of bits within the sequence
-	const handle_reorder = (from_index: number, to_index: number) => {
-		const bit_id = sequence_bit.items[from_index];
-		sequence_bit.move(bit_id, to_index);
-	};
 
 	// Available bits that can be added to the sequence (excluding self and already included bits)
 	const available_bits = $derived(
@@ -48,51 +43,65 @@
 		// Add to this sequence
 		sequence_bit.add(new_bit.id);
 	};
+
+	let show_bit_picker = $state(false);
 </script>
 
-<div class="sequence_bit_content p_xs bg_1 radius_xs">
-	<div class="flex justify_content_space_between mb_xs">
-		<div class="size_sm">
-			{sequence_bit.items.length} bit{sequence_bit.items.length !== 1 ? 's' : ''}
-		</div>
-		<div class="flex gap_xs">
-			<button type="button" class="plain size_sm" onclick={create_bit}>
-				{GLYPH_ADD} add bit
-			</button>
-		</div>
+<div class="row justify_content_space_between mb_xs">
+	<div class="flex gap_xs">
+		<button type="button" class="plain compact" onclick={() => (show_bit_picker = true)}>
+			{GLYPH_BIT} pick bit
+		</button>
+		<button type="button" class="plain compact" onclick={create_bit}>
+			{GLYPH_ADD} add bit
+		</button>
 	</div>
-
-	{#if sequence_bit.bits.length === 0}
-		<div class="p_xs bg_2 radius_xs size_sm font_mono">no bits in sequence</div>
-	{:else}
-		<Bit_List
-			bits={sequence_bit.bits}
-			{prompt}
-			onreorder={handle_reorder}
-			attrs={{class: 'mb_xs'}}
-			item_attrs={{class: 'bg_2'}}
-		/>
-	{/if}
-
-	{#if available_bits.length > 0}
-		<div class="mt_xs">
-			<select
-				class="w_100 mb_0"
-				onchange={(e) => {
-					const selected_bit_id = e.currentTarget.value;
-					if (selected_bit_id) {
-						add_bit_to_sequence(selected_bit_id as Uuid);
-						e.currentTarget.value = '';
-					}
-				}}
-			>
-				<option value="">Add an existing bit to sequence...</option>
-				{#each available_bits as available_bit}
-					<option value={available_bit.id}>{available_bit.name}</option>
-				{/each}
-			</select>
-		</div>
-	{/if}
-
-	<Content_Preview content={sequence_bit.content} />
+	<small class="font_mono block">
+		{sequence_bit.items.length} bit{sequence_bit.items.length !== 1 ? 's' : ''}
+	</small>
 </div>
+
+{#if sequence_bit.bits.length > 0}
+	<Bit_List
+		bits={sequence_bit.bits}
+		{prompt}
+		onreorder={(from_index, to_index) => {
+			const bit_id = sequence_bit.items[from_index];
+			sequence_bit.move(bit_id, to_index);
+		}}
+		attrs={{class: 'mb_xs'}}
+		item_attrs={{class: 'bg_2'}}
+	/>
+{/if}
+
+{#if available_bits.length > 0}
+	<div class="mt_xs">
+		<select
+			class="w_100 mb_0"
+			onchange={(e) => {
+				const selected_bit_id = e.currentTarget.value;
+				if (selected_bit_id) {
+					add_bit_to_sequence(selected_bit_id as Uuid);
+					e.currentTarget.value = '';
+				}
+			}}
+		>
+			<option value="">Add an existing bit to sequence...</option>
+			{#each available_bits as available_bit}
+				<option value={available_bit.id}>{available_bit.name}</option>
+			{/each}
+		</select>
+	</div>
+{/if}
+
+<Content_Preview content={sequence_bit.content} />
+
+<Bit_Picker
+	exclude_ids={[sequence_bit.id, ...sequence_bit.items]}
+	bind:show={show_bit_picker}
+	onpick={(bit) => {
+		if (bit) {
+			sequence_bit.add(bit.id);
+		}
+	}}
+/>

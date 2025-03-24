@@ -12,11 +12,9 @@
 	}
 	const {bit, prompt}: Props = $props();
 
-	const total_chars = $derived(bit.enabled ? bit.content?.length : 0);
+	const total_chars = $derived(bit.enabled ? bit.length : 0);
 	// TODO bug here where the xml tag is not taken into account, so they add up to less than 100% as calculated
-	const percent = $derived(
-		total_chars && prompt?.content.length ? (total_chars / prompt.content.length) * 100 : 0,
-	);
+	const percent = $derived(total_chars && prompt?.length ? (total_chars / prompt.length) * 100 : 0);
 
 	// TODO visuals are very basic
 </script>
@@ -29,6 +27,7 @@
 	<div class="flex_1 pl_sm py_xs3 ellipsis">
 		<span class="mr_xs2"><Glyph_Icon icon={get_bit_type_glyph(bit)} /></span>
 		{bit.name}
+		{bit.content_preview}
 	</div>
 	<div class="controls flex gap_xs2">
 		<Bit_Toggle_Button {bit} />

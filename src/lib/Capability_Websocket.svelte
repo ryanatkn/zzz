@@ -68,15 +68,6 @@
 
 	// Check if the current URL is the default
 	const is_default_url = $derived(socket.url_input === PUBLIC_WEBSOCKET_URL);
-
-	// Handle the URL reset button click
-	const handle_reset_url_click = () => {
-		if (has_undo_state) {
-			restore_previous_url();
-		} else {
-			reset_url();
-		}
-	};
 </script>
 
 <!-- Main control section with flex layout for wide screens -->
@@ -128,7 +119,13 @@
 						class="icon_button plain"
 						title={has_undo_state ? `undo to ${previous_url}` : 'reset url to default'}
 						disabled={is_default_url && !has_undo_state}
-						onclick={handle_reset_url_click}
+						onclick={() => {
+							if (has_undo_state) {
+								restore_previous_url();
+							} else {
+								reset_url();
+							}
+						}}
 					>
 						<div class:flip_x={has_undo_state}>{GLYPH_RESET}</div>
 					</button>

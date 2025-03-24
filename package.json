@@ -121,6 +121,11 @@
       "svelte": "./dist/Bit_List.svelte",
       "default": "./dist/Bit_List.svelte"
     },
+    "./Bit_Picker.svelte": {
+      "types": "./dist/Bit_Picker.svelte.d.ts",
+      "svelte": "./dist/Bit_Picker.svelte",
+      "default": "./dist/Bit_Picker.svelte"
+    },
     "./Bit_Remove_Button.svelte": {
       "types": "./dist/Bit_Remove_Button.svelte.d.ts",
       "svelte": "./dist/Bit_Remove_Button.svelte",
@@ -364,6 +369,11 @@
       "svelte": "./dist/Diskfile_Metrics.svelte",
       "default": "./dist/Diskfile_Metrics.svelte"
     },
+    "./Diskfile_Picker.svelte": {
+      "types": "./dist/Diskfile_Picker.svelte.d.ts",
+      "svelte": "./dist/Diskfile_Picker.svelte",
+      "default": "./dist/Diskfile_Picker.svelte"
+    },
     "./diskfile_types.js": {
       "types": "./dist/diskfile_types.d.ts",
       "default": "./dist/diskfile_types.js"
@@ -500,6 +510,11 @@
       "types": "./dist/ollama.d.ts",
       "default": "./dist/ollama.js"
     },
+    "./Picker.svelte": {
+      "types": "./dist/Picker.svelte.d.ts",
+      "svelte": "./dist/Picker.svelte",
+      "default": "./dist/Picker.svelte"
+    },
     "./Ping_Form.svelte": {
       "types": "./dist/Ping_Form.svelte.d.ts",
       "svelte": "./dist/Ping_Form.svelte",
@@ -526,6 +541,11 @@
       "types": "./dist/Prompt_List.svelte.d.ts",
       "svelte": "./dist/Prompt_List.svelte",
       "default": "./dist/Prompt_List.svelte"
+    },
+    "./Prompt_Picker.svelte": {
+      "types": "./dist/Prompt_Picker.svelte.d.ts",
+      "svelte": "./dist/Prompt_Picker.svelte",
+      "default": "./dist/Prompt_Picker.svelte"
     },
     "./Prompt_Stats.svelte": {
       "types": "./dist/Prompt_Stats.svelte.d.ts",

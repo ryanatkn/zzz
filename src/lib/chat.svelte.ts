@@ -114,9 +114,9 @@ export class Chat extends Cell<typeof Chat_Json> {
 		this.tapes.length = 0;
 	}
 
-	add_selected_prompt(prompt: Prompt): void {
-		if (!this.selected_prompt_ids.some((id) => id === prompt.id)) {
-			this.selected_prompt_ids.push(prompt.id);
+	add_selected_prompt(prompt_id: Uuid): void {
+		if (!this.selected_prompt_ids.some((id) => id === prompt_id)) {
+			this.selected_prompt_ids.push(prompt_id);
 		}
 	}
 

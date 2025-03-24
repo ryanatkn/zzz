@@ -25,7 +25,7 @@
 
 	// TODO add a select with name, name_reverse, created, created_reverse, updated, updated_reverse
 	const sorted_files: Array<Diskfile> = $derived(
-		[...diskfiles.non_external_files].sort((a, b) => {
+		[...diskfiles.non_external_diskfiles].sort((a, b) => {
 			// Handle null/undefined path values
 			if (!a.path && !b.path) return 0;
 			if (!a.path) return 1; // null paths go last

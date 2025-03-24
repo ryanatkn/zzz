@@ -26,8 +26,7 @@
 	const zzz = zzz_context.get();
 	const reorderable = new Reorderable();
 
-	// TODO BLOCK integrate with sources like the local filesystem (just the `zzz.files`?)
-	// TODO BLOCK the dashed pattern state isn't working for the xml tag input or attributes
+	// TODO BLOCK the reorderable dashed pattern state isn't working for the xml tag input or attributes
 
 	// Create and add a Text bit
 	const add_text_bit = () => {
@@ -49,6 +48,7 @@
 		// Get all available files
 		const files = zzz.diskfiles.items.all;
 		if (!files.length) {
+			// eslint-disable-next-line no-alert
 			alert('No files available. Add files first.');
 			return;
 		}
@@ -61,7 +61,7 @@
 		const bit = Bit.create(zzz, {
 			type: 'diskfile',
 			path: file.path,
-			name: `File: ${file_name}`,
+			name: file_name,
 		});
 
 		zzz.prompts.selected.add_bit(bit);
@@ -74,7 +74,7 @@
 		const bit = Bit.create(zzz, {
 			type: 'sequence',
 			items: [],
-			name: 'Sequence bit',
+			name: 'sequence bit',
 		});
 
 		zzz.prompts.selected.add_bit(bit);
@@ -166,10 +166,8 @@
 					style:grid-template-columns="repeat(auto-fill, minmax(300px, 1fr))"
 				>
 					{#each zzz.prompts.selected.bits as bit (bit.id)}
-						<li>
-							<div class="bg radius_xs p_sm" transition:scale>
-								<Bit_View {bit} prompts={zzz.prompts} />
-							</div>
+						<li class="bg radius_xs p_sm" transition:scale>
+							<Bit_View {bit} prompts={zzz.prompts} />
 						</li>
 					{/each}
 				</ul>

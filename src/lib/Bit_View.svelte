@@ -35,13 +35,15 @@
 	</div>
 
 	<!-- Content section - different for each bit type -->
-	{#if bit.type === 'text'}
-		<Bit_Editor_For_Text text_bit={bit} {show_actions} />
-	{:else if bit.type === 'diskfile'}
-		<Bit_Editor_For_Diskfile diskfile_bit={bit} {show_actions} />
-	{:else if bit.type === 'sequence'}
-		<Bit_Editor_For_Sequence sequence_bit={bit} {prompt} />
-	{/if}
+	<div>
+		{#if bit.type === 'text'}
+			<Bit_Editor_For_Text text_bit={bit} {show_actions} />
+		{:else if bit.type === 'diskfile'}
+			<Bit_Editor_For_Diskfile diskfile_bit={bit} {show_actions} />
+		{:else if bit.type === 'sequence'}
+			<Bit_Editor_For_Sequence sequence_bit={bit} {prompt} />
+		{/if}
+	</div>
 
 	<!-- Common controls for all bit types -->
 	<Bit_Stats {bit} />

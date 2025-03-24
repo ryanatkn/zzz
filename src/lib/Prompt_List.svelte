@@ -8,6 +8,7 @@
 	import {GLYPH_REMOVE} from '$lib/glyphs.js';
 	import {Reorderable} from '$lib/reorderable.svelte.js';
 	import {Bit} from '$lib/bit.svelte.js';
+	import Prompt_Picker from '$lib/Prompt_Picker.svelte';
 
 	interface Props {
 		chat: Chat;
@@ -35,6 +36,9 @@
 		await chat.zzz.url_params.update_url('prompt', prompt.id);
 	};
 
+	// Show/hide the prompt picker
+	let show_prompt_picker = $state(false);
+
 	// TODO BLOCK thinking of the usecase here, maybe on the chats page the prompts list is shown twice,
 	// once for all and once for the selected, and the all is collapsed by default?
 	// or selected filtered out by default, so a single list
@@ -43,7 +47,20 @@
 <div class="w_100 column">
 	<div class="flex justify_content_start mb_xs">
 		<button type="button" class="plain" onclick={create_new_prompt}> + create new prompt </button>
+		<button type="button" class="plain" onclick={() => (show_prompt_picker = true)}>
+			+ add existing prompt
+		</button>
 	</div>
+
+	<Prompt_Picker
+		bind:show={show_prompt_picker}
+		onpick={(prompt) => {
+			if (prompt) {
+				chat.add_selected_prompt(prompt.id);
+			}
+		}}
+		selected_ids={chat.selected_prompts.map((p) => p.id)}
+	/>
 
 	<div class="flex flex_column">
 		<div class="overflow_auto flex_1" style:max-height="200px">

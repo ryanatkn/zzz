@@ -6,19 +6,22 @@
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import type {Diskfile_Editor_State} from '$lib/diskfile_editor_state.svelte.js';
 	import type {Uuid} from '$lib/zod_helpers.js';
+	import type {SvelteHTMLElements} from 'svelte/elements';
 
 	interface Props {
 		editor_state: Diskfile_Editor_State;
 		on_entry_select: (entry_id: Uuid) => void;
+		attrs?: SvelteHTMLElements['menu'] | undefined;
 	}
 
-	const {editor_state, on_entry_select}: Props = $props();
+	const {editor_state, on_entry_select, attrs}: Props = $props();
 </script>
 
 <div>
 	<small class="px_sm flex justify_content_space_between mb_sm">
 		<Confirm_Button
 			onconfirm={() => editor_state.clear_history()}
+			position="right"
 			attrs={{
 				class: 'plain compact',
 				disabled: !editor_state.can_clear_history,
@@ -46,7 +49,7 @@
 		</Confirm_Button>
 	</small>
 
-	<menu class="unstyled flex flex_column">
+	<menu {...attrs} class="unstyled {attrs?.class ?? 'max_height_sm'}">
 		{#each editor_state.content_history as entry (entry.id)}
 			{@const selected = entry.id === editor_state.selected_history_entry_id}
 			{@const content_matches = editor_state.content_matching_entry_ids.includes(entry.id)}
@@ -87,4 +90,11 @@
 		align-items: center;
 		min-height: 0;
 	}
+
+	/* TODO this would be correct but we need an opaque bg, Moss needs the feature */
+	/* button.selected {
+		position: sticky;
+		top: 0;
+		bottom: 0;
+	} */
 </style>

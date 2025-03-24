@@ -1,5 +1,4 @@
 import type {Bit_Type} from '$lib/bit.svelte.js';
-import {XML_TAG_NAME_DEFAULT} from '$lib/constants.js';
 
 /**
  * Formats a collection of bits into a prompt string, applying XML tags and attributes where specified.
@@ -26,7 +25,7 @@ export const format_prompt_content = (bits: Array<Bit_Type>): string => {
 			continue;
 		}
 
-		const xml_tag_name = bit.xml_tag_name.trim() || XML_TAG_NAME_DEFAULT;
+		const xml_tag_name = bit.xml_tag_name.trim() || bit.default_xml_tag_name;
 
 		// Build attributes string efficiently
 		let attrs = '';

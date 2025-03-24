@@ -2,6 +2,7 @@ import {encode as tokenize} from 'gpt-tokenizer';
 import {z} from 'zod';
 import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
 import {DEV} from 'esm-env';
+import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Uuid} from '$lib/zod_helpers.js';
@@ -10,7 +11,7 @@ import {Cell_Json} from '$lib/cell_types.js';
 import type {Diskfile} from '$lib/diskfile.svelte.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 import {Diskfile_Path} from '$lib/diskfile_types.js';
-import {Unreachable_Error} from '@ryanatkn/belt/error.js';
+import {CONTENT_PREVIEW_LENGTH} from '$lib/bit_helpers.js';
 
 /** Common properties for all bit types */
 export const Bit_Base_Json = Cell_Json.extend({
@@ -18,7 +19,7 @@ export const Bit_Base_Json = Cell_Json.extend({
 	name: z.string().default(''),
 	start: z.number().nullable().default(null),
 	end: z.number().nullable().default(null),
-	has_xml_tag: z.boolean().default(false), // TODO @many move to the prompt somewhere
+	has_xml_tag: z.boolean().default(true), // TODO @many move to the prompt somewhere
 	xml_tag_name: z.string().default(''), // TODO @many move to the prompt somewhere
 	attributes: z.array(Xml_Attribute).default(() => []), // TODO @many move to the prompt somewhere
 	enabled: z.boolean().default(true),
@@ -91,6 +92,12 @@ export abstract class Bit<T extends z.ZodType = typeof Bit_Base_Json> extends Ce
 		this.content == null ? this.content : tokenize(this.content),
 	);
 	token_count: number | null | undefined = $derived(this.tokens?.length);
+	/** `content` with a max length */
+	content_preview = $derived.by(() =>
+		this.content && this.content.length > CONTENT_PREVIEW_LENGTH
+			? this.content.substring(0, CONTENT_PREVIEW_LENGTH)
+			: this.content,
+	);
 
 	// Common properties for all bit types
 	name: string = $state()!;
@@ -100,6 +107,10 @@ export abstract class Bit<T extends z.ZodType = typeof Bit_Base_Json> extends Ce
 	enabled: boolean = $state()!;
 	title: string | null = $state()!;
 	summary: string | null = $state()!;
+
+	default_xml_tag_name: string = $derived.by(() =>
+		this.type === 'diskfile' ? 'file' : 'fragment',
+	);
 
 	add_attribute(partial: z.input<typeof Xml_Attribute> = EMPTY_OBJECT): void {
 		this.attributes.push(Xml_Attribute.parse(partial));
@@ -150,10 +161,26 @@ export abstract class Bit<T extends z.ZodType = typeof Bit_Base_Json> extends Ce
 	 * 2. Default values
 	 * 3. Construction of the appropriate bit subclass via the registry
 	 */
-	static create(zzz: Zzz, json: z.input<typeof Text_Bit_Json>): Text_Bit;
-	static create(zzz: Zzz, json: z.input<typeof Diskfile_Bit_Json>): Diskfile_Bit;
-	static create(zzz: Zzz, json: z.input<typeof Sequence_Bit_Json>): Sequence_Bit;
-	static create(zzz: Zzz, json: z.input<typeof Bit_Json>): Bit_Type {
+	static create(
+		zzz: Zzz,
+		json: z.input<typeof Text_Bit_Json>,
+		options?: Text_Bit_Options,
+	): Text_Bit;
+	static create(
+		zzz: Zzz,
+		json: z.input<typeof Diskfile_Bit_Json>,
+		options?: Diskfile_Bit_Options,
+	): Diskfile_Bit;
+	static create(
+		zzz: Zzz,
+		json: z.input<typeof Sequence_Bit_Json>,
+		options?: Sequence_Bit_Options,
+	): Sequence_Bit;
+	static create(
+		zzz: Zzz,
+		json: z.input<typeof Bit_Json>,
+		options?: Bit_Options<z.ZodTypeAny>,
+	): Bit_Type {
 		if (!json.type) {
 			throw new Error('Missing required "type" field in bit JSON');
 		}
@@ -163,11 +190,11 @@ export abstract class Bit<T extends z.ZodType = typeof Bit_Base_Json> extends Ce
 		// on any programming errors rather than silently returning null
 		switch (json.type) {
 			case 'text':
-				return zzz.registry.instantiate('Text_Bit', json);
+				return zzz.registry.instantiate('Text_Bit', json, options);
 			case 'diskfile':
-				return zzz.registry.instantiate('Diskfile_Bit', json);
+				return zzz.registry.instantiate('Diskfile_Bit', json, options);
 			case 'sequence':
-				return zzz.registry.instantiate('Sequence_Bit', json);
+				return zzz.registry.instantiate('Sequence_Bit', json, options);
 			default:
 				throw new Unreachable_Error(json.type);
 		}
@@ -199,7 +226,44 @@ export const Text_Bit_Schema = z.instanceof(Text_Bit);
 export class Diskfile_Bit extends Bit<typeof Diskfile_Bit_Json> {
 	override readonly type = 'diskfile';
 
-	path: Diskfile_Path | null = $state()!;
+	/** Path property with private backing field */
+	#path: Diskfile_Path | null = $state()!;
+
+	/**
+	 * Writable value that determines `this.diskfile`.
+	 * Also includes special diskfile bit logic for attributes.
+	 */
+	get path(): Diskfile_Path | null {
+		return this.#path;
+	}
+
+	set path(value: Diskfile_Path | null) {
+		this.#path = value;
+
+		if (value === null) return;
+
+		// Update the path attribute when the path changes
+		const diskfile = this.zzz.diskfiles.get_by_path(value);
+		const relative_path = diskfile?.path_relative;
+
+		if (!relative_path) return;
+
+		// Check if a path attribute already exists
+		const path_attr_index = this.attributes.findIndex((attr) => attr.key.trim() === 'path');
+
+		if (path_attr_index >= 0) {
+			// Update existing path attribute
+			const new_attributes = [...this.attributes];
+			new_attributes[path_attr_index].value = relative_path;
+			this.attributes = new_attributes;
+		} else {
+			// Add new path attribute
+			this.add_attribute({
+				key: 'path',
+				value: relative_path,
+			});
+		}
+	}
 
 	// Reference to the editor state for this bit
 	#editor_state: {current_content: string} | null = $state(null); // TODO @many this initialization is awkward, ideally becomes refactored to mostly derived
@@ -207,6 +271,9 @@ export class Diskfile_Bit extends Bit<typeof Diskfile_Bit_Json> {
 	diskfile: Diskfile | null | undefined = $derived(
 		this.path && this.zzz.diskfiles.get_by_path(this.path),
 	);
+
+	// The current relative path value for display in the XML path attribute
+	relative_path = $derived(this.diskfile?.path_relative);
 
 	override get content(): string | null | undefined {
 		// Return editor content if available, otherwise fall back to diskfile content
@@ -224,17 +291,17 @@ export class Diskfile_Bit extends Bit<typeof Diskfile_Bit_Json> {
 		}
 	}
 
+	constructor(options: Diskfile_Bit_Options) {
+		super(Diskfile_Bit_Json, options);
+		this.init();
+	}
+
 	// TODO @many this initialization is awkward, ideally becomes refactored to mostly derived
 	/**
 	 * Links this bit to an editor state
 	 */
 	link_editor_state(editor_state: {current_content: string} | null): void {
 		this.#editor_state = editor_state;
-	}
-
-	constructor(options: Diskfile_Bit_Options) {
-		super(Diskfile_Bit_Json, options);
-		this.init();
 	}
 }
 

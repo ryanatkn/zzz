@@ -13,13 +13,6 @@
 	const {chat = zzz_context.get().chats.selected}: Props = $props();
 
 	const reorderable = new Reorderable();
-
-	// Define a shared reorder handler
-	const handle_reorder = (from_index: number, to_index: number) => {
-		if (chat) {
-			chat.reorder_tapes(from_index, to_index);
-		}
-	};
 </script>
 
 <div class="column">
@@ -27,7 +20,9 @@
 		<ul
 			class="unstyled column gap_xs5"
 			use:reorderable.list={{
-				onreorder: handle_reorder,
+				onreorder: (from_index, to_index) => {
+					chat.reorder_tapes(from_index, to_index);
+				},
 			}}
 		>
 			{#each chat.tapes as tape, i (tape.id)}

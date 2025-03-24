@@ -9,6 +9,7 @@
 	import Diskfile_Actions from '$lib/Diskfile_Actions.svelte';
 	import {Diskfile_Editor_State} from '$lib/diskfile_editor_state.svelte.js';
 	import Diskfile_History_View from '$lib/Diskfile_History_View.svelte';
+	import {GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
 
 	interface Props {
 		diskfile: Diskfile;
@@ -49,10 +50,10 @@
 			bind:this={content_editor}
 			bind:content={editor_state.current_content}
 			token_count={editor_state.current_token_count}
-			placeholder={diskfile.pathname}
+			placeholder={GLYPH_PLACEHOLDER + ' ' + diskfile.path_relative}
 			show_stats
 			readonly={false}
-			attrs={{class: 'radius_0'}}
+			attrs={{class: 'h_100 radius_0'}}
 			onsave={(value) => {
 				zzz.diskfiles.update(diskfile.path, value);
 			}}

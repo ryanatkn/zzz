@@ -3,7 +3,6 @@
 
 	import type {Bit_Type} from '$lib/bit.svelte.js';
 	import Xml_Attribute_Editor from '$lib/Xml_Attribute_Editor.svelte';
-	import {XML_TAG_NAME_DEFAULT} from '$lib/constants.js';
 	import {GLYPH_ADD, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
 
 	interface Props {
@@ -15,16 +14,15 @@
 	let input_el: HTMLInputElement | undefined;
 </script>
 
-<div class="flex align_items_start column">
+<div class="column align_items_start gap_xs">
 	<div class="flex align_items_center gap_xs2 w_100">
 		<label
 			class="row mb_0 pr_md"
-			style:height="var(--input_height)"
 			title="when enabled, the prompt's content will be wrapped with the xml tag '{bit.xml_tag_name ||
-				XML_TAG_NAME_DEFAULT}'"
+				bit.default_xml_tag_name}'"
 		>
 			<input
-				class="plain compact size_md"
+				class="plain compact"
 				type="checkbox"
 				bind:checked={
 					() => bit.has_xml_tag,
@@ -34,12 +32,12 @@
 					}
 				}
 			/>
-			xml tag
+			<small>xml tag</small>
 		</label>
 		<input
 			class="plain flex_1 compact"
 			class:dormant={!bit.has_xml_tag}
-			placeholder={bit.has_xml_tag ? GLYPH_PLACEHOLDER + ' xml tag name' : undefined}
+			placeholder={bit.has_xml_tag ? GLYPH_PLACEHOLDER + ' ' + bit.default_xml_tag_name : undefined}
 			bind:value={bit.xml_tag_name}
 			bind:this={input_el}
 		/>

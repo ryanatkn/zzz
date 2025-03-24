@@ -88,7 +88,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 	);
 
 	// Use the derived index directly
-	non_external_files: Array<Diskfile> = $derived(this.items.get_derived('non_external_files'));
+	non_external_diskfiles: Array<Diskfile> = $derived(this.items.get_derived('non_external_files'));
 
 	onselect?: (file: Diskfile) => void;
 

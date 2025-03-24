@@ -9,6 +9,9 @@
 	import Diskfile_Metrics from '$lib/Diskfile_Metrics.svelte';
 	import {Diskfile_Editor_State} from '$lib/diskfile_editor_state.svelte.js';
 	import Diskfile_History_View from '$lib/Diskfile_History_View.svelte';
+	import Diskfile_Picker from '$lib/Diskfile_Picker.svelte';
+	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
+	import {GLYPH_FILE, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
 
 	interface Props {
 		diskfile_bit: Diskfile_Bit;
@@ -27,6 +30,8 @@
 
 	// Keep track of the content editor for focusing
 	let content_editor: {focus: () => void} | undefined = $state();
+
+	let show_file_picker = $state(false);
 
 	// Effect for managing editor state lifecycle
 	$effect.pre(() => {
@@ -63,81 +68,88 @@
 	});
 </script>
 
-<div class="column">
-	<div class="p_xs bg_1 radius_xs mb_xs">
-		<div class="font_mono size_sm mb_xs">
-			{diskfile?.pathname || 'no file selected'}
+<div class="mb_xs">
+	{#if diskfile}
+		<small class="mb_xs block formatted">
+			{diskfile.path_relative}
+		</small>
+	{/if}
+	<button
+		type="button"
+		class="plain compact"
+		onclick={() => {
+			show_file_picker = true;
+		}}
+	>
+		<Glyph_Icon icon={GLYPH_FILE} />
+		<small class="ml_xs2">pick file</small>
+	</button>
+</div>
+
+{#if diskfile && editor_state}
+	<div>
+		<div class="column">
+			<Content_Editor
+				bind:this={content_editor}
+				bind:content={
+					() => editor_state!.current_content,
+					(content) => {
+						if (editor_state) {
+							editor_state.current_content = content;
+						}
+					}
+				}
+				token_count={editor_state.current_token_count}
+				placeholder={GLYPH_PLACEHOLDER + ' ' + diskfile.path_relative}
+				show_stats={false}
+				readonly={false}
+				onsave={(value) => {
+					zzz.diskfiles.update(diskfile.path, value);
+				}}
+			/>
+
+			{#if show_actions}
+				<div class="mt_xs">
+					<Diskfile_Actions {diskfile} {editor_state} />
+				</div>
+			{/if}
 		</div>
-		{#if diskfile}
-			<div class="mb_xs">
-				<button
-					type="button"
-					class="plain size_sm"
-					onclick={() => {
-						zzz.diskfiles.select(diskfile.id);
+
+		{#if editor_state}
+			<div class="my_xs size_sm">
+				<Diskfile_Metrics {editor_state} />
+			</div>
+		{/if}
+
+		{#if editor_state.has_history}
+			<div transition:slide>
+				<Diskfile_History_View
+					{editor_state}
+					on_entry_select={(entry_id) => {
+						if (editor_state) {
+							editor_state.set_content_from_history(entry_id);
+							content_editor?.focus();
+						}
 					}}
-				>
-					View file
-				</button>
+				/>
 			</div>
 		{/if}
 	</div>
+{:else}
+	<Content_Editor
+		content={diskfile_bit.content || ''}
+		readonly
+		placeholder="[no file]"
+		attrs={{disabled: true}}
+	/>
+{/if}
 
-	{#if diskfile && editor_state}
-		<div>
-			<div class="column">
-				<Content_Editor
-					bind:this={content_editor}
-					bind:content={
-						() => editor_state!.current_content,
-						(content) => {
-							if (editor_state) {
-								editor_state.current_content = content;
-							}
-						}
-					}
-					token_count={editor_state.current_token_count}
-					placeholder={diskfile.pathname}
-					show_stats={false}
-					readonly={false}
-					onsave={(value) => {
-						zzz.diskfiles.update(diskfile.path, value);
-					}}
-				/>
-
-				{#if show_actions}
-					<div class="mt_xs">
-						<Diskfile_Actions {diskfile} {editor_state} />
-					</div>
-				{/if}
-			</div>
-
-			<!-- Add file metadata when available -->
-			{#if editor_state}
-				<div class="my_xs size_sm">
-					<Diskfile_Metrics {editor_state} />
-				</div>
-			{/if}
-
-			{#if editor_state.has_history}
-				<div transition:slide class="max_height_sm">
-					<Diskfile_History_View
-						{editor_state}
-						on_entry_select={(entry_id) => {
-							if (editor_state) {
-								editor_state.set_content_from_history(entry_id);
-								content_editor?.focus();
-							}
-						}}
-					/>
-				</div>
-			{/if}
-		</div>
-	{:else}
-		<Content_Editor
-			content={diskfile_bit.content || ''}
-			readonly
-			placeholder="file not available"
-		/>
-	{/if}
-</div>
+<Diskfile_Picker
+	selected_ids={diskfile ? [diskfile.id] : []}
+	bind:show={show_file_picker}
+	onpick={(diskfile) => {
+		if (diskfile !== undefined) {
+			diskfile_bit.path = diskfile ? diskfile.path : diskfile;
+		}
+	}}
+/>

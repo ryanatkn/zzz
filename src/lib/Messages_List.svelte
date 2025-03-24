@@ -22,10 +22,6 @@
 
 	const limited_messages = $derived(messages.slice(0, limit));
 
-	const handle_select = (message: Message): void => {
-		onselect?.(message);
-	};
-
 	// TODO BLOCK use component/class for the list (they'll be Nav_Links yeah?)
 </script>
 
@@ -36,7 +32,9 @@
 			type="button"
 			class="w_100 text_align_left justify_content_start py_xs px_md radius_0 border_none box_shadow_none"
 			class:selected
-			onclick={() => handle_select(message)}
+			onclick={() => {
+				onselect?.(message);
+			}}
 			transition:slide
 		>
 			<div class="font_weight_400 flex align_items_center gap_xs w_100">
