@@ -22,9 +22,12 @@
 	import {Reorderable} from '$lib/reorderable.svelte.js';
 	import Content_Preview from '$lib/Content_Preview.svelte';
 	import {Bit} from '$lib/bit.svelte.js';
+	import Prompt_Contextmenu from '$lib/Prompt_Contextmenu.svelte';
 
 	const zzz = zzz_context.get();
 	const reorderable = new Reorderable();
+
+	// TODO BLOCK history of prompt states using cell builtins/helpers, like file state but generalized for all cells? the json-based, set_json stuff
 
 	// TODO BLOCK the reorderable dashed pattern state isn't working for the xml tag input or attributes
 
@@ -122,96 +125,101 @@
 	</div>
 
 	{#if zzz.prompts.selected}
-		<div class="column_fixed pr_sm">
-			{#if zzz.prompts.selected}
-				<div class="row gap_sm py_xs sticky t_0 b_0 bg">
-					<Copy_To_Clipboard text={zzz.prompts.selected.content} attrs={{class: 'plain'}} />
-					<Prompt_Stats prompt={zzz.prompts.selected} />
-				</div>
-				<Content_Preview content={zzz.prompts.selected.content} />
-			{/if}
-		</div>
+		<Prompt_Contextmenu prompt={zzz.prompts.selected}>
+			<div class="column_fixed pr_sm">
+				{#if zzz.prompts.selected}
+					<div class="row gap_sm py_xs sticky t_0 b_0 bg">
+						<Copy_To_Clipboard text={zzz.prompts.selected.content} attrs={{class: 'plain'}} />
+						<Prompt_Stats prompt={zzz.prompts.selected} />
+					</div>
+					<Content_Preview content={zzz.prompts.selected.content} />
+				{/if}
+			</div>
 
-		<div class="column_fluid">
-			<div class="column_bg_1 column gap_md p_sm">
-				<div class="flex justify_content_space_between">
-					<div class="flex flex_wrap gap_xs">
-						<button type="button" class="plain size_sm" onclick={add_text_bit}>
-							<div class="row white_space_nowrap">
-								<span class="mr_xs2"><Glyph_Icon icon={GLYPH_BIT} /></span> add text bit
-							</div>
-						</button>
-						<button type="button" class="plain size_sm" onclick={add_diskfile_bit}>
-							<div class="row white_space_nowrap">
-								<span class="mr_xs2"><Glyph_Icon icon={GLYPH_FILE} /></span> add file bit
-							</div>
-						</button>
-						<button type="button" class="plain size_sm" onclick={add_sequence_bit}>
-							<div class="row white_space_nowrap">
-								<span class="mr_xs2"><Glyph_Icon icon={GLYPH_LIST} /></span> add sequence bit
-							</div>
-						</button>
+			<div class="column_fluid">
+				<div class="column_bg_1 column gap_md p_sm">
+					<div class="flex justify_content_space_between">
+						<div class="flex flex_wrap gap_xs">
+							<button type="button" class="plain size_sm" onclick={add_text_bit}>
+								<div class="row white_space_nowrap">
+									<span class="mr_xs2"><Glyph_Icon icon={GLYPH_BIT} /></span> add text bit
+								</div>
+							</button>
+							<button type="button" class="plain size_sm" onclick={add_diskfile_bit}>
+								<div class="row white_space_nowrap">
+									<span class="mr_xs2"><Glyph_Icon icon={GLYPH_FILE} /></span> add file bit
+								</div>
+							</button>
+							<button type="button" class="plain size_sm" onclick={add_sequence_bit}>
+								<div class="row white_space_nowrap">
+									<span class="mr_xs2"><Glyph_Icon icon={GLYPH_LIST} /></span> add sequence bit
+								</div>
+							</button>
+							<Confirm_Button
+								onconfirm={() => zzz.prompts.selected?.remove_all_bits()}
+								attrs={{disabled: !zzz.prompts.selected.bits.length, class: 'plain size_sm'}}
+							>
+								<div class="row white_space_nowrap">
+									<span class="mr_xs2"><Glyph_Icon icon={GLYPH_REMOVE} /></span> remove all bits
+								</div>
+							</Confirm_Button>
+						</div>
+					</div>
+					<ul
+						class="unstyled grid gap_md"
+						style:grid-template-columns="repeat(auto-fill, minmax(300px, 1fr))"
+					>
+						{#each zzz.prompts.selected.bits as bit (bit.id)}
+							<li transition:scale>
+								<!-- the extra wrapper makes the grid items not stretch vertically -->
+								<div class="bg radius_xs p_sm">
+									<Bit_View {bit} prompts={zzz.prompts} />
+								</div>
+							</li>
+						{/each}
+					</ul>
+				</div>
+			</div>
+
+			<div class="column_fixed" in:slide>
+				<div class="column p_sm">
+					<div class="flex justify_content_space_between">
+						<div class="size_lg">
+							<Glyph_Icon icon={GLYPH_PROMPT} />
+							{zzz.prompts.selected.name}
+						</div>
 						<Confirm_Button
-							onconfirm={() => zzz.prompts.selected?.remove_all_bits()}
-							attrs={{disabled: !zzz.prompts.selected.bits.length, class: 'plain size_sm'}}
+							onconfirm={() => zzz.prompts.selected && zzz.prompts.remove(zzz.prompts.selected)}
+							attrs={{
+								title: `remove Prompt ${zzz.prompts.selected.id}`,
+								class: 'plain icon_button',
+							}}
 						>
-							<div class="row white_space_nowrap">
-								<span class="mr_xs2"><Glyph_Icon icon={GLYPH_REMOVE} /></span> remove all bits
-							</div>
+							{GLYPH_DELETE}
+							{#snippet popover_button_content()}{GLYPH_DELETE}{/snippet}
 						</Confirm_Button>
 					</div>
-				</div>
-				<ul
-					class="unstyled grid gap_md"
-					style:grid-template-columns="repeat(auto-fill, minmax(300px, 1fr))"
-				>
-					{#each zzz.prompts.selected.bits as bit (bit.id)}
-						<li transition:scale>
-							<!-- the extra wrapper makes the grid items not stretch vertically -->
-							<div class="bg radius_xs p_sm">
-								<Bit_View {bit} prompts={zzz.prompts} />
-							</div>
-						</li>
-					{/each}
-				</ul>
-			</div>
-		</div>
-
-		<div class="column_fixed" in:slide>
-			<div class="column p_sm">
-				<div class="flex justify_content_space_between">
-					<div class="size_lg">
-						<Glyph_Icon icon={GLYPH_PROMPT} />
-						{zzz.prompts.selected.name}
+					<div class="column font_mono">
+						<small>{zzz.prompts.selected.id}</small>
+						<small>
+							{zzz.prompts.selected.bits.length}
+							bit{#if zzz.prompts.selected.bits.length !== 1}s{/if}
+						</small>
+						<small>created {zzz.prompts.selected.created_formatted_short_date}</small>
 					</div>
-					<Confirm_Button
-						onconfirm={() => zzz.prompts.selected && zzz.prompts.remove(zzz.prompts.selected)}
-						attrs={{title: `remove Prompt ${zzz.prompts.selected.id}`, class: 'plain icon_button'}}
-					>
-						{GLYPH_DELETE}
-						{#snippet popover_button_content()}{GLYPH_DELETE}{/snippet}
-					</Confirm_Button>
 				</div>
-				<div class="column font_mono">
-					<small>{zzz.prompts.selected.id}</small>
-					<small>
-						{zzz.prompts.selected.bits.length}
-						bit{#if zzz.prompts.selected.bits.length !== 1}s{/if}
-					</small>
-					<small>created {zzz.prompts.selected.created_formatted_short_date}</small>
+				<div class="p_sm mt_xl3">
+					<header class="size_lg mb_lg"><Glyph_Icon icon={GLYPH_BIT} /> bits</header>
+					<Bit_List
+						bits={zzz.prompts.selected.bits}
+						prompt={zzz.prompts.selected}
+						onreorder={(from_index, to_index) => {
+							zzz.prompts.selected?.reorder_bits(from_index, to_index);
+						}}
+					/>
 				</div>
 			</div>
-			<div class="p_sm mt_xl3">
-				<header class="size_lg mb_lg"><Glyph_Icon icon={GLYPH_BIT} /> bits</header>
-				<Bit_List
-					bits={zzz.prompts.selected.bits}
-					prompt={zzz.prompts.selected}
-					onreorder={(from_index, to_index) => {
-						zzz.prompts.selected?.reorder_bits(from_index, to_index);
-					}}
-				/>
-			</div>
-		</div>
+		</Prompt_Contextmenu>
 	{:else}
 		<div class="flex align_items_center justify_content_center h_100 flex_1" in:fade>
 			<p>

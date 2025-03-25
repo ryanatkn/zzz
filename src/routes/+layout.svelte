@@ -169,7 +169,7 @@
 		{
 			snippet: 'text',
 			props: {
-				content: 'Settings',
+				content: 'settings',
 				icon: '?',
 				run: () => {
 					zzz.ui.show_main_dialog = true;
@@ -179,7 +179,7 @@
 		{
 			snippet: 'text',
 			props: {
-				content: 'Reload',
+				content: 'reload',
 				icon: '⟳',
 				run: () => {
 					location.reload();

@@ -362,6 +362,9 @@ a.chip {
 .mt_xs {
 	margin-top: var(--space_xs);
 }
+.mt_xs2 {
+	margin-top: var(--space_xs2);
+}
 .my_lg {
 	margin-top: var(--space_lg);
 	margin-bottom: var(--space_lg);

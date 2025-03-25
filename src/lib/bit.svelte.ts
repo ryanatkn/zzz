@@ -53,7 +53,7 @@ export type Sequence_Bit_Json = z.infer<typeof Sequence_Bit_Json>;
 
 /** Union of all bit types for deserialization */
 export const Bit_Json = z.discriminatedUnion('type', [
-	Text_Bit_Json,
+	Text_Bit_Json, // TODO consider renaming this to or adding `Resource_Bit_Json` like MCP (text+binary)
 	Diskfile_Bit_Json,
 	Sequence_Bit_Json,
 ]);

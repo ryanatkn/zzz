@@ -533,6 +533,11 @@
       "types": "./dist/position_helpers.d.ts",
       "default": "./dist/position_helpers.js"
     },
+    "./Prompt_Contextmenu.svelte": {
+      "types": "./dist/Prompt_Contextmenu.svelte.d.ts",
+      "svelte": "./dist/Prompt_Contextmenu.svelte",
+      "default": "./dist/Prompt_Contextmenu.svelte"
+    },
     "./prompt_helpers.js": {
       "types": "./dist/prompt_helpers.d.ts",
       "default": "./dist/prompt_helpers.js"

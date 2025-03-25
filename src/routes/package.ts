@@ -462,6 +462,11 @@ export const package_json = {
 			types: './dist/position_helpers.d.ts',
 			default: './dist/position_helpers.js',
 		},
+		'./Prompt_Contextmenu.svelte': {
+			types: './dist/Prompt_Contextmenu.svelte.d.ts',
+			svelte: './dist/Prompt_Contextmenu.svelte',
+			default: './dist/Prompt_Contextmenu.svelte',
+		},
 		'./prompt_helpers.js': {
 			types: './dist/prompt_helpers.d.ts',
 			default: './dist/prompt_helpers.js',
@@ -1097,6 +1102,7 @@ export const src_json = {
 				{name: 'generate_position_styles', kind: 'function'},
 			],
 		},
+		'./Prompt_Contextmenu.svelte': {path: 'Prompt_Contextmenu.svelte', declarations: []},
 		'./prompt_helpers.js': {
 			path: 'prompt_helpers.ts',
 			declarations: [{name: 'format_prompt_content', kind: 'function'}],

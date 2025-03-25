@@ -18,7 +18,7 @@ export const GLYPH_DISCONNECT = '⨂';
 export const GLYPH_RETRY = '↺'; // ⟲'; // ⟲ ⟳ ⤾ ⤼ ↻
 export const GLYPH_PLACEHOLDER = '↳';
 
-// export const GLYPH_EDIT = '✎'; // ✎ ✏ ✐ ✑ ✒
+export const GLYPH_EDIT = '✎'; // ✎ ✏ ✐ ✑ ✒
 // export const GLYPH_MOVE = '⧈';
 // ⊞ ⧉ ⧈
 // ⎗ ⎗ ⎘ ⌖ ⌶ ⎙
