@@ -17,9 +17,6 @@
 	const {provider, attrs}: Props = $props();
 
 	const at_detail_page = $derived(page.url.pathname === `${base}/providers/${provider.name}`);
-
-	// TODO BLOCK add repo link for Ollama https://github.com/ollama/ollama and
-	// TODO BLOCK add repo link for Ollama https://github.com/ollama/ollama and change homepage link to show the path, and the rest not
 </script>
 
 <div {...attrs} class="panel p_lg {attrs?.class}">

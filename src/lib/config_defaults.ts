@@ -28,7 +28,7 @@ export const providers_default: Array<z.input<typeof Provider_Json>> = [
 		name: 'ollama',
 		icon: '',
 		title: 'Ollama',
-		url: 'https://ollama.com/',
+		url: 'https://github.com/ollama/ollama',
 	},
 	{
 		name: 'claude',
