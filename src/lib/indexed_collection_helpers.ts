@@ -11,24 +11,24 @@ import {Any} from '$lib/zod_helpers.js';
 export const Svelte_Map_Schema = z.custom<SvelteMap<any, any>>((val) => val instanceof SvelteMap);
 
 /**
- * Common options interface for all index types
+ * Common options interface for all index types.
  */
 export interface Index_Options<T extends Indexed_Item> {
-	/** Unique key for this index */
+	/** Unique key for this index. */
 	key: string;
 
-	/** Optional predicate to determine if an item is relevant to this index */
+	/** Optional predicate to determine if an item is relevant to this index. */
 	matches?: (item: T) => boolean;
 
-	/** Schema for input validation and typing */
+	/** Schema for input validation and typing. */
 	query_schema?: z.ZodType; // TODO BLOCK default to string not any? then remove all of the `query_schema: z.string(),`
 
-	/** Schema for output validation */
+	/** Schema for output validation. */
 	result_schema?: z.ZodType;
 }
 
 /**
- * Options for single-value indexes
+ * Options for single-value indexes.
  */
 export interface Single_Index_Options<T extends Indexed_Item, K = any> extends Index_Options<T> {
 	/** Function that extracts the key from an item */
@@ -36,7 +36,7 @@ export interface Single_Index_Options<T extends Indexed_Item, K = any> extends I
 }
 
 /**
- * Create a single-value index (one key maps to one item)
+ * Create a single-value index (one key maps to one item).
  */
 export const create_single_index = <T extends Indexed_Item, K = any>(
 	options: Single_Index_Options<T, K>,
@@ -108,18 +108,18 @@ export const create_single_index = <T extends Indexed_Item, K = any>(
 };
 
 /**
- * Options for multi-value indexes
+ * Options for multi-value indexes.
  */
 export interface Multi_Index_Options<T extends Indexed_Item, K = any> extends Index_Options<T> {
-	/** Function that extracts the key(s) from an item */
+	/** Function that extracts the key(s) from an item. */
 	extractor: (item: T) => K | Array<K> | undefined;
 
-	/** Optional sort function for items in each bucket */
+	/** Optional sort function for items in each bucket. */
 	sort?: (a: T, b: T) => number;
 }
 
 /**
- * Create a multi-value index (one key maps to many items)
+ * Create a multi-value index (one key maps to many items).
  */
 export const create_multi_index = <T extends Indexed_Item, K = any>(
 	options: Multi_Index_Options<T, K>,
@@ -237,24 +237,24 @@ export const create_multi_index = <T extends Indexed_Item, K = any>(
 };
 
 /**
- * Options for derived indexes
+ * Options for derived indexes.
  */
 export interface Derived_Index_Options<T extends Indexed_Item> extends Index_Options<T> {
-	/** Function that computes the derived collection from the full collection */
+	/** Function that computes the derived collection from the full collection. */
 	compute: (collection: Indexed_Collection<T>) => Array<T>;
 
-	/** Optional sort function for the derived array */
+	/** Optional sort function for the derived array. */
 	sort?: (a: T, b: T) => number;
 
-	/** Optional custom add handler */
+	/** Optional custom add handler. */
 	on_add?: (items: Array<T>, item: T, collection: Indexed_Collection<T>) => Array<T>;
 
-	/** Optional custom remove handler */
+	/** Optional custom remove handler. */
 	on_remove?: (items: Array<T>, item: T, collection: Indexed_Collection<T>) => Array<T>;
 }
 
 /**
- * Create a derived collection index
+ * Create a derived collection index.
  */
 export const create_derived_index = <T extends Indexed_Item>(
 	options: Derived_Index_Options<T>,
@@ -311,7 +311,7 @@ export const create_derived_index = <T extends Indexed_Item>(
 };
 
 /**
- * Options for dynamic indexes
+ * Options for dynamic indexes.
  */
 export interface Dynamic_Index_Options<
 	T extends Indexed_Item,
@@ -328,7 +328,7 @@ export interface Dynamic_Index_Options<
 }
 
 /**
- * Create a dynamic index that computes results on-demand based on query parameters
+ * Create a dynamic index that computes results on-demand based on query parameters.
  */
 export const create_dynamic_index = <
 	T extends Indexed_Item,

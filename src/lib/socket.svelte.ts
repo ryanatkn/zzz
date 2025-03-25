@@ -14,7 +14,6 @@ import {
 	DEFAULT_CLOSE_CODE,
 } from '$lib/socket_helpers.js';
 
-// Schema for Socket cell - defines serializable state
 export const Socket_Json = Cell_Json.extend({
 	url: z.string().nullable().default(null),
 	url_input: z.string().default(''),
@@ -32,7 +31,7 @@ export type Socket_Error_Handler = (event: Event) => void;
 
 // TODO BLOCK schemas so it can be serialized (so the full state can be snapshotted, and all queued/failed messages restored)
 /**
- * Queued message that couldn't be sent immediately
+ * Queued message that couldn't be sent immediately.
  */
 export interface Queued_Message {
 	id: string;
@@ -41,7 +40,7 @@ export interface Queued_Message {
 }
 
 /**
- * Failed message that exceeded retry count
+ * Failed message that exceeded retry count.
  */
 export interface Failed_Message extends Queued_Message {
 	failed: number;
@@ -49,7 +48,7 @@ export interface Failed_Message extends Queued_Message {
 }
 
 /**
- * Socket class for WebSocket connection management with auto-reconnect and message queueing
+ * Socket class for WebSocket connection management with auto-reconnect and message queueing.
  */
 export class Socket extends Cell<typeof Socket_Json> {
 	// Private serializable state with getters/setters
@@ -156,7 +155,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 	}
 
 	/**
-	 * Connects to the WebSocket server
+	 * Connects to the WebSocket server.
 	 * @param url The WebSocket URL to connect to
 	 */
 	connect(url: string | null = null): void {
@@ -202,7 +201,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 	}
 
 	/**
-	 * Disconnects from the WebSocket server
+	 * Disconnects from the WebSocket server.
 	 * @param code The close code to use (default: 1000 - normal closure)
 	 */
 	disconnect(code: number = DEFAULT_CLOSE_CODE): void {
@@ -232,7 +231,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 	}
 
 	/**
-	 * Sends a message through the WebSocket
+	 * Sends a message through the WebSocket.
 	 * @param data The data to send
 	 * @returns True if the message was sent immediately, false if queued or failed
 	 */
@@ -254,7 +253,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 	}
 
 	/**
-	 * Updates the connection URL and reconnects if currently connected
+	 * Updates the connection URL and reconnects if currently connected.
 	 * @param url The new WebSocket URL
 	 */
 	update_url(url: string): void {
@@ -278,7 +277,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 	}
 
 	/**
-	 * Retry sending all queued messages
+	 * Retry sending all queued messages.
 	 */
 	retry_queued_messages(): void {
 		if (!this.can_send || this.message_queue.length === 0) return;
@@ -454,7 +453,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 	}
 
 	/**
-	 * Cancel any pending reconnection attempt
+	 * Cancel any pending reconnection attempt.
 	 */
 	cancel_reconnect(): void {
 		this.#cancel_reconnect();

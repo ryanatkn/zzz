@@ -15,7 +15,7 @@ import {Message_Ping, type Message_Pong} from '$lib/message_types.js';
 export const PING_HISTORY_MAX = 6;
 
 /**
- * Data structure for ping measurements
+ * Data structure for ping measurements.
  */
 export interface Ping_Data {
 	ping_id: Uuid;
@@ -29,7 +29,7 @@ export const Capabilities_Json = Cell_Json.extend({});
 export type Capabilities_Json = z.infer<typeof Capabilities_Json>;
 
 /**
- * Generic interface for a capability with standardized status tracking
+ * Generic interface for a capability with standardized status tracking.
  */
 export interface Capability<T> {
 	/** The capability name */
@@ -45,14 +45,14 @@ export interface Capability<T> {
 }
 
 /**
- * Data structure for Ollama capability
+ * Data structure for Ollama capability.
  */
 export interface Ollama_Capability_Data {
 	list_response: ListResponse | null;
 }
 
 /**
- * Data structure for Server capability
+ * Data structure for Server capability.
  */
 export interface Server_Capability_Data {
 	name: string;
@@ -61,7 +61,7 @@ export interface Server_Capability_Data {
 }
 
 /**
- * Data structure for WebSocket capability
+ * Data structure for WebSocket capability.
  */
 export interface Websocket_Capability_Data {
 	url: string | null;
@@ -75,7 +75,7 @@ export interface Websocket_Capability_Data {
 }
 
 /**
- * Data structure for Filesystem capability
+ * Data structure for Filesystem capability.
  */
 export interface Filesystem_Capability_Data {
 	zzz_dir: Zzz_Dir | null | undefined;
@@ -100,7 +100,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	});
 
 	/**
-	 * Ollama capability
+	 * Ollama capability.
 	 */
 	ollama: Capability<Ollama_Capability_Data | null | undefined> = $state({
 		name: 'ollama',
@@ -111,7 +111,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	});
 
 	/**
-	 * WebSocket capability that derives its state from the socket
+	 * WebSocket capability that derives its state from the socket.
 	 */
 	websocket: Capability<Websocket_Capability_Data | null | undefined> = $derived.by(() => {
 		// Map socket status to capability status, but consider connection state
@@ -144,7 +144,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	});
 
 	/**
-	 * Filesystem capability that derives its state from the zzz_dir
+	 * Filesystem capability that derives its state from the zzz_dir.
 	 */
 	filesystem: Capability<Filesystem_Capability_Data | null | undefined> = $derived.by(() => {
 		// Derive status based on zzz_dir value
@@ -174,36 +174,36 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	});
 
 	/**
-	 * Store pings - both pending and completed
+	 * Store pings - both pending and completed.
 	 */
 	pings: Array<Ping_Data> = $state([]);
 
 	/**
-	 * Most recent completed ping round trip time in milliseconds
+	 * Most recent completed ping round trip time in milliseconds.
 	 */
 	latest_ping_time: number | null = $derived(
 		this.pings.find((p) => p.completed)?.round_trip_time ?? null,
 	);
 
 	/**
-	 * Completed pings (for display)
+	 * Completed pings (for display).
 	 */
 	completed_pings: Array<Ping_Data> = $derived(this.pings.filter((p) => p.completed));
 
 	/**
-	 * Number of pending pings
+	 * Number of pending pings.
 	 */
 	pending_ping_count: number = $derived(this.pings.filter((p) => !p.completed).length);
 
 	/**
-	 * Has pending pings
+	 * Has pending pings.
 	 */
 	has_pending_pings: boolean = $derived(this.pending_ping_count > 0);
 
 	/**
 	 * Convenience accessor for server availability.
-	 * `undefined` means uninitialized, `null` means loading/checking
-	 * boolean indicates if available
+	 * `undefined` means uninitialized, `null` means loading/checking.
+	 * boolean indicates if available.
 	 */
 	server_available: boolean | null | undefined = $derived(
 		this.server.data === undefined
@@ -215,8 +215,8 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 
 	/**
 	 * Convenience accessor for ollama availability.
-	 * `undefined` means uninitialized, `null` means loading/checking
-	 * boolean indicates if available
+	 * `undefined` means uninitialized, `null` means loading/checking.
+	 * boolean indicates if available.
 	 */
 	ollama_available: boolean | null | undefined = $derived(
 		this.ollama.data === undefined
@@ -228,8 +228,8 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 
 	/**
 	 * Convenience accessor for websocket availability.
-	 * `undefined` means uninitialized, `null` means loading/checking
-	 * boolean indicates if the socket is actively connected
+	 * `undefined` means uninitialized, `null` means loading/checking.
+	 * boolean indicates if the socket is actively connected.
 	 */
 	websocket_available: boolean | null | undefined = $derived(
 		this.websocket.data === undefined
@@ -241,8 +241,8 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 
 	/**
 	 * Convenience accessor for filesystem availability.
-	 * `undefined` means uninitialized, `null` means loading/checking
-	 * boolean indicates if filesystem is available
+	 * `undefined` means uninitialized, `null` means loading/checking.
+	 * boolean indicates if filesystem is available.
 	 */
 	filesystem_available: boolean | null | undefined = $derived(
 		this.filesystem.data === undefined
@@ -253,7 +253,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	);
 
 	/**
-	 * Latest Ollama model list response, if available
+	 * Latest Ollama model list response, if available.
 	 */
 	ollama_models: Array<{name: string; size: number}> = $derived(
 		this.ollama.data?.list_response?.models.map((model) => ({
@@ -267,7 +267,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	}
 
 	/**
-	 * Check Server availability only if it hasn't been checked before
+	 * Check Server availability only if it hasn't been checked before.
 	 * (when status is 'initial')
 	 */
 	async init_server_check(): Promise<void> {
@@ -277,7 +277,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	}
 
 	/**
-	 * Check Ollama availability only if it hasn't been checked before
+	 * Check Ollama availability only if it hasn't been checked before.
 	 * (when status is 'initial')
 	 */
 	async init_ollama_check(): Promise<void> {
@@ -287,7 +287,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	}
 
 	/**
-	 * Check Server availability by making an HTTP GET request to its ping endpoint
+	 * Check Server availability by making an HTTP GET request to its ping endpoint.
 	 * @returns A promise that resolves when the check is complete
 	 */
 	async check_server(): Promise<void> {
@@ -409,7 +409,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	}
 
 	/**
-	 * Sends a ping to the server over websocket
+	 * Sends a ping to the server over websocket.
 	 * @returns The UUID of the ping message
 	 */
 	send_ping(): Uuid {
@@ -435,7 +435,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	}
 
 	/**
-	 * Handle a pong response from the server
+	 * Handle a pong response from the server.
 	 * @param pong The pong message received from the server
 	 */
 	receive_pong(pong: Message_Pong): void {
@@ -451,7 +451,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	}
 
 	/**
-	 * Reset just the server capability to uninitialized state
+	 * Reset just the server capability to uninitialized state.
 	 */
 	reset_server(): void {
 		this.server = {

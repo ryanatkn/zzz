@@ -26,7 +26,7 @@ export const map_watcher_change_to_diskfile_change = (
 };
 
 /**
- * Helper function to convert a Source_File to Diskfile_Json format
+ * Helper function to convert a Source_File to Diskfile_Json format.
  * @param source_file The source file to convert
  * @param existing_id Optional existing UUID to preserve id stability across updates
  */

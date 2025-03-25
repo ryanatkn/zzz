@@ -3,22 +3,22 @@ import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 // TODO zod schemas
 
 /**
- * Basic position options for UI elements (cardinal directions)
+ * Basic position options for UI elements (cardinal directions).
  */
 export type Cardinal_Position = 'left' | 'right' | 'top' | 'bottom';
 
 /**
- * Extended position options including overlay and center
+ * Extended position options including overlay and center.
  */
 export type Position = Cardinal_Position | 'overlay' | 'center';
 
 /**
- * Alignment options for positioned elements
+ * Alignment options for positioned elements.
  */
 export type Alignment = 'start' | 'center' | 'end';
 
 /**
- * Generates CSS positioning styles for UI elements
+ * Generates CSS positioning styles for UI elements.
  *
  * @param position - Where to position the element ('left', 'right', etc.)
  * @param align - Alignment along the position edge ('start', 'center', 'end')

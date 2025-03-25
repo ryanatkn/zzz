@@ -1,12 +1,10 @@
 <script lang="ts">
-	import {contextmenu_action} from '@ryanatkn/fuz/contextmenu_state.svelte.js';
-	import Contextmenu_Entry from '@ryanatkn/fuz/Contextmenu_Entry.svelte';
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
 
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
+	import Diskfile_Contextmenu from '$lib/Diskfile_Contextmenu.svelte';
 	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
-	import {GLYPH_FILE, GLYPH_COPY, GLYPH_DELETE} from '$lib/glyphs.js';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {GLYPH_FILE} from '$lib/glyphs.js';
 
 	interface Props {
 		diskfile: Diskfile;
@@ -16,52 +14,22 @@
 
 	const {diskfile, selected, onclick}: Props = $props();
 
-	const zzz = zzz_context.get();
-
-	// TODO BLOCK generic contextmenu entries for other components? so module scope export?
-
 	// TODO BLOCK change to links like the others, probably
 </script>
 
-<button
-	type="button"
-	class="button_list_item compact"
-	class:selected
-	onclick={() => onclick(diskfile)}
-	title="file at {diskfile.path}"
-	use:contextmenu_action={contextmenu_entries}
->
-	<div class="ellipsis">
-		<Glyph_Icon icon={GLYPH_FILE} />
-		<span
-			>{#if diskfile.path_relative}{diskfile.path_relative}{:else}<Pending_Animation />{/if}</span
-		>
-	</div>
-</button>
-
-{#snippet contextmenu_entries()}
-	<!-- TODO add this contextmenu feature: disabled={!file.content} -->
-	<Contextmenu_Entry
-		run={async () => {
-			if (diskfile.content) {
-				await navigator.clipboard.writeText(diskfile.content);
-			}
-		}}
+<Diskfile_Contextmenu {diskfile}>
+	<button
+		type="button"
+		class="button_list_item compact"
+		class:selected
+		onclick={() => onclick(diskfile)}
+		title="file at {diskfile.path}"
 	>
-		{#snippet icon()}{GLYPH_COPY}{/snippet}
-		<span>copy file content <small class="ml_xs">{diskfile.content_preview}</small></span>
-	</Contextmenu_Entry>
-
-	<Contextmenu_Entry
-		run={() => {
-			// TODO BLOCK better confirmation
-			// eslint-disable-next-line no-alert
-			if (confirm(`Are you sure you want to delete ${diskfile.path_relative}?`)) {
-				zzz.diskfiles.delete(diskfile.path);
-			}
-		}}
-	>
-		{#snippet icon()}{GLYPH_DELETE}{/snippet}
-		<span>delete file</span>
-	</Contextmenu_Entry>
-{/snippet}
+		<div class="ellipsis">
+			<Glyph_Icon icon={GLYPH_FILE} />
+			<span
+				>{#if diskfile.path_relative}{diskfile.path_relative}{:else}<Pending_Animation />{/if}</span
+			>
+		</div>
+	</button>
+</Diskfile_Contextmenu>

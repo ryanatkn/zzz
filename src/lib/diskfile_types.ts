@@ -4,11 +4,10 @@ import {Cell_Json} from '$lib/cell_types.js';
 import {is_path_absolute} from '$lib/diskfile_helpers.js';
 import {ensure_end} from '@ryanatkn/belt/string.js';
 
-// Define file change types
 export const Diskfile_Change_Type = z.enum(['add', 'change', 'delete']);
 export type Diskfile_Change_Type = z.infer<typeof Diskfile_Change_Type>;
 
-/** An absolute Unix-style file path */
+/** An absolute Unix-style file path. */
 export const Diskfile_Path = z
 	.string()
 	.transform((p) => p.trim())

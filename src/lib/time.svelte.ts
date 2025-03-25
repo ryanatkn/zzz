@@ -10,17 +10,17 @@ export const Time_Json = Cell_Json.extend({});
 export type Time_Json = z.infer<typeof Time_Json>;
 
 /**
- * Options for configuring a Time instance
+ * Options for configuring a Time instance.
  */
 export interface Time_Options extends Cell_Options<typeof Time_Json> {
 	/**
-	 * Interval in milliseconds for updating now
+	 * Interval in milliseconds for updating now.
 	 * @default 60_000 (1 minute)
 	 */
 	interval?: number;
 
 	/**
-	 * Whether to automatically start the timer on initialization
+	 * Whether to automatically start the timer on initialization.
 	 * @default true in browser, false otherwise
 	 */
 	autostart?: boolean;
@@ -37,19 +37,19 @@ export class Time extends Cell<typeof Time_Json> {
 	static readonly DEFAULT_INTERVAL = 60_000;
 
 	/**
-	 * Current time that updates on the configured interval
-	 * This is reactive and can be used in derived computations
+	 * Current time that updates on the configured interval.
+	 * This is reactive and can be used in derived computations.
 	 */
 	readonly now: SvelteDate = new SvelteDate();
 	readonly now_ms: number = $derived(this.now.getTime());
 
 	/**
-	 * The interval in milliseconds between time updates
+	 * The interval in milliseconds between time updates.
 	 */
 	interval: number = $state(Time.DEFAULT_INTERVAL);
 
 	/**
-	 * Whether the interval timer is currently running
+	 * Whether the interval timer is currently running.
 	 */
 	running: boolean = $state(false);
 
@@ -70,7 +70,7 @@ export class Time extends Cell<typeof Time_Json> {
 	}
 
 	/**
-	 * Starts the interval timer if it's not already running
+	 * Starts the interval timer if it's not already running.
 	 */
 	start(): boolean {
 		if (this.running) return false;
@@ -84,7 +84,7 @@ export class Time extends Cell<typeof Time_Json> {
 	}
 
 	/**
-	 * Stops the interval timer if it's running
+	 * Stops the interval timer if it's running.
 	 */
 	stop(): boolean {
 		if (!this.running) return false;
@@ -99,7 +99,7 @@ export class Time extends Cell<typeof Time_Json> {
 	}
 
 	/**
-	 * Restarts the interval timer with a new interval
+	 * Restarts the interval timer with a new interval.
 	 */
 	restart(interval?: number): void {
 		if (interval !== undefined) {
@@ -111,21 +111,21 @@ export class Time extends Cell<typeof Time_Json> {
 	}
 
 	/**
-	 * Updates the now to the current time immediately
+	 * Updates the now to the current time immediately.
 	 */
 	update_now(value = Date.now()): void {
 		this.now.setTime(value);
 	}
 
 	/**
-	 * Creates a new Date object with the current time
+	 * Creates a new Date object with the current time.
 	 */
 	get_date(): Date {
 		return new Date(this.now_ms);
 	}
 
 	/**
-	 * Override Cell's destroy method to ensure timer cleanup
+	 * Override Cell's destroy method to ensure timer cleanup.
 	 */
 	destroy(): void {
 		this.stop();

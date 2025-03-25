@@ -7,40 +7,40 @@ import type {TransitionConfig} from 'svelte/transition';
 import {type Position, type Alignment, generate_position_styles} from '$lib/position_helpers.js';
 
 /**
- * Parameters for configuring the popover
+ * Parameters for configuring the popover.
  */
 export interface Popover_Parameters {
-	/** Position of the popover relative to its trigger */
+	/** Position of the popover relative to its trigger. */
 	position?: Position;
-	/** Alignment along the position edge */
+	/** Alignment along the position edge. */
 	align?: Alignment;
-	/** Distance from the position */
+	/** Distance from the position. */
 	offset?: string;
-	/** Whether to disable closing when clicking outside */
+	/** Whether to disable closing when clicking outside. */
 	disable_outside_click?: boolean;
-	/** Custom class for the popover content */
+	/** Custom class for the popover content. */
 	popover_class?: string;
-	/** Optional callback when popover is shown */
+	/** Optional callback when popover is shown. */
 	onshow?: () => void;
-	/** Optional callback when popover is hidden */
+	/** Optional callback when popover is hidden. */
 	onhide?: () => void;
 }
 
 /**
- * Parameters for the popover trigger action
+ * Parameters for the popover trigger action.
  */
 export interface Popover_Trigger_Parameters extends Popover_Parameters {
-	/** Content to render in the popover (as a snippet) */
+	/** Content to render in the popover (as a snippet). */
 	content?: Snippet;
 }
 
 /**
- * Support both Svelte transitions and custom transitions
+ * Support both Svelte transitions and custom transitions.
  */
 export type Transition_Function = (node: HTMLElement) => TransitionConfig | {destroy?: () => void};
 
 /**
- * Parameters for the popover content action
+ * Parameters for the popover content action.
  */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface Popover_Content_Parameters extends Popover_Parameters {
@@ -48,43 +48,43 @@ export interface Popover_Content_Parameters extends Popover_Parameters {
 }
 
 /**
- * Class that manages state and provides actions for popovers
+ * Class that manages state and provides actions for popovers.
  */
 export class Popover {
-	/** Whether the popover is currently visible */
+	/** Whether the popover is currently visible. */
 	visible = $state(false);
 
-	/** Position of the popover relative to its trigger */
+	/** Position of the popover relative to its trigger. */
 	position: Position = $state('bottom');
 
-	/** Alignment along the position edge */
+	/** Alignment along the position edge. */
 	align: Alignment = $state('center');
 
-	/** Distance from the position */
+	/** Distance from the position. */
 	offset = $state('0');
 
-	/** Whether to disable closing when clicking outside */
+	/** Whether to disable closing when clicking outside. */
 	disable_outside_click = $state(false);
 
-	/** Custom class for the popover */
+	/** Custom class for the popover. */
 	popover_class = $state('');
 
-	/** Reference to the trigger element */
+	/** Reference to the trigger element. */
 	#trigger_element: HTMLElement | null = null;
 
-	/** Reference to the content element */
+	/** Reference to the content element. */
 	#content_element: HTMLElement | null = null;
 
-	/** Reference to the container element */
+	/** Reference to the container element. */
 	#container_element: HTMLElement | null = null;
 
-	/** Onshow callback */
+	/** Onshow callback. */
 	#onshow: (() => void) | undefined = undefined;
 
-	/** Onhide callback */
+	/** Onhide callback. */
 	#onhide: (() => void) | undefined = undefined;
 
-	/** Cleanup function for document click handler */
+	/** Cleanup function for document click handler. */
 	#document_click_cleanup: (() => void) | undefined = undefined;
 
 	constructor(params?: Popover_Parameters) {
@@ -94,7 +94,7 @@ export class Popover {
 	}
 
 	/**
-	 * Sets up or removes the document click handler based on current state
+	 * Sets up or removes the document click handler based on current state.
 	 */
 	#manage_outside_click(): void {
 		// If we should have an outside click handler but don't, add one
@@ -121,7 +121,7 @@ export class Popover {
 	}
 
 	/**
-	 * Updates the popover configuration
+	 * Updates the popover configuration.
 	 */
 	update(params: Popover_Parameters): void {
 		// Store the old class before updating
@@ -172,8 +172,8 @@ export class Popover {
 	}
 
 	/**
-	 * Updates ARIA attributes and state for accessibility
-	 * But does NOT directly manipulate visibility styling
+	 * Updates ARIA attributes and state for accessibility.
+	 * But does NOT directly manipulate visibility styling.
 	 */
 	#update_trigger_aria_attributes(): void {
 		if (this.#trigger_element) {
@@ -190,7 +190,7 @@ export class Popover {
 	}
 
 	/**
-	 * Shows the popover
+	 * Shows the popover.
 	 */
 	show(): void {
 		if (this.visible) return;
@@ -207,7 +207,7 @@ export class Popover {
 	}
 
 	/**
-	 * Hides the popover
+	 * Hides the popover.
 	 */
 	hide(): void {
 		if (!this.visible) return;
@@ -224,7 +224,7 @@ export class Popover {
 	}
 
 	/**
-	 * Toggles the popover visibility
+	 * Toggles the popover visibility.
 	 */
 	toggle(): void {
 		if (this.visible) {
@@ -235,7 +235,7 @@ export class Popover {
 	}
 
 	/**
-	 * Action for the container element
+	 * Action for the container element.
 	 */
 	container: Action = (node) => {
 		this.#container_element = node;
@@ -250,7 +250,7 @@ export class Popover {
 	};
 
 	/**
-	 * Action for the trigger element that shows/hides the popover
+	 * Action for the trigger element that shows/hides the popover.
 	 */
 	trigger: Action<HTMLElement, Popover_Trigger_Parameters | void> = (node, params) => {
 		this.#trigger_element = node;
@@ -285,7 +285,7 @@ export class Popover {
 	};
 
 	/**
-	 * Action for the popover content element
+	 * Action for the popover content element.
 	 */
 	content: Action<HTMLElement, Popover_Content_Parameters | void> = (node, params) => {
 		this.#content_element = node;

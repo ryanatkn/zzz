@@ -23,12 +23,12 @@ export type Reorderable_Direction = 'horizontal' | 'vertical';
 export type Reorderable_Drop_Position = 'none' | 'top' | 'bottom' | 'left' | 'right';
 
 /**
- * Valid drop positions, excluding 'none'
+ * Valid drop positions, excluding 'none'.
  */
 export type Reorderable_Valid_Drop_Position = Exclude<Reorderable_Drop_Position, 'none'>;
 
 /**
- * Styling configuration for reorderable components
+ * Styling configuration for reorderable components.
  */
 export interface Reorderable_Style_Config {
 	list_class: string;
@@ -54,7 +54,7 @@ export const DRAG_OVER_RIGHT_CLASS_DEFAULT = 'drag_over_right';
 export const INVALID_DROP_CLASS_DEFAULT = 'invalid_drop';
 
 /**
- * Parameters for list action
+ * Parameters for list action.
  */
 export interface Reorderable_List_Params {
 	onreorder: (from_index: number, to_index: number) => void;
@@ -62,14 +62,14 @@ export interface Reorderable_List_Params {
 }
 
 /**
- * Parameters for item action
+ * Parameters for item action.
  */
 export interface Reorderable_Item_Params {
 	index: number;
 }
 
 /**
- * Additional configuration options for Reorderable
+ * Additional configuration options for Reorderable.
  */
 export interface Reorderable_Options {
 	direction?: Reorderable_Direction;
@@ -132,7 +132,7 @@ export class Reorderable implements Reorderable_Style_Config {
 	}> = [];
 
 	/**
-	 * Create a new Reorderable instance
+	 * Create a new Reorderable instance.
 	 */
 	constructor(options?: Reorderable_Options) {
 		// Initialize with defaults
@@ -149,7 +149,7 @@ export class Reorderable implements Reorderable_Style_Config {
 	}
 
 	/**
-	 * Initialize the reorderable component
+	 * Initialize the reorderable component.
 	 */
 	#init(): void {
 		if (!this.list_node) return;
@@ -170,7 +170,7 @@ export class Reorderable implements Reorderable_Style_Config {
 	}
 
 	/**
-	 * Process any pending items that were registered before the list was initialized
+	 * Process any pending items that were registered before the list was initialized.
 	 */
 	#process_pending_items(): void {
 		if (this.pending_items.length === 0) return;
@@ -186,7 +186,7 @@ export class Reorderable implements Reorderable_Style_Config {
 	}
 
 	/**
-	 * Reset all drag state in one place
+	 * Reset all drag state in one place.
 	 */
 	#reset_drag_state(): void {
 		if (this.source_item_id) {
@@ -202,21 +202,21 @@ export class Reorderable implements Reorderable_Style_Config {
 
 	// TODO better way to do this?
 	/**
-	 * Meant for testing only
+	 * Meant for testing only.
 	 */
 	dangerously_reset_drag_state(): void {
 		this.#reset_drag_state();
 	}
 
 	/**
-	 * Check if a drag operation is valid
+	 * Check if a drag operation is valid.
 	 */
 	#is_valid_drag_operation(): boolean {
 		return this.source_index !== -1 && this.source_item_id !== null && !this.reordering_in_progress;
 	}
 
 	/**
-	 * Efficiently clear only the active element's indicators
+	 * Efficiently clear only the active element's indicators.
 	 */
 	clear_indicators(): void {
 		if (!this.active_indicator_item_id) return;
@@ -238,7 +238,7 @@ export class Reorderable implements Reorderable_Style_Config {
 	}
 
 	/**
-	 * Update indicator on an element by id
+	 * Update indicator on an element by id.
 	 */
 	update_indicator(
 		item_id: Reorderable_Item_Id,
@@ -301,7 +301,7 @@ export class Reorderable implements Reorderable_Style_Config {
 
 	/**
 	 * Find an item from an event target by traversing the DOM and
-	 * looking for a match in our maps
+	 * looking for a match in our maps.
 	 */
 	#find_item_from_event(event: Event): [Reorderable_Item_Id, number, HTMLElement] | null {
 		const target = event.target as HTMLElement | null;
@@ -336,7 +336,7 @@ export class Reorderable implements Reorderable_Style_Config {
 	}
 
 	/**
-	 * Set up event handlers for the list
+	 * Set up event handlers for the list.
 	 */
 	#setup_list_events(list: HTMLElement): void {
 		// Clean up any existing handlers
@@ -543,7 +543,7 @@ export class Reorderable implements Reorderable_Style_Config {
 	}
 
 	/**
-	 * Clean up event handlers
+	 * Clean up event handlers.
 	 */
 	#cleanup_events(): void {
 		for (const cleanup of this.cleanup_handlers) {
@@ -553,7 +553,7 @@ export class Reorderable implements Reorderable_Style_Config {
 	}
 
 	/**
-	 * Action for the list container
+	 * Action for the list container.
 	 */
 	list: Action<HTMLElement, Reorderable_List_Params> = (node, params) => {
 		// Check if we already have a list node
@@ -620,7 +620,7 @@ export class Reorderable implements Reorderable_Style_Config {
 	};
 
 	/**
-	 * Action for reorderable items
+	 * Action for reorderable items.
 	 */
 	item: Action<HTMLElement, Reorderable_Item_Params> = (node, params) => {
 		// Get the current index
@@ -719,7 +719,7 @@ export class Reorderable implements Reorderable_Style_Config {
 	};
 
 	/**
-	 * Update styling configuration
+	 * Update styling configuration.
 	 */
 	update_styles(styles: Partial<Reorderable_Style_Config>): void {
 		for (const key in styles) {

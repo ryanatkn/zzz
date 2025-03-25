@@ -1,6 +1,6 @@
 /**
  * Helper module for safely working with completion responses
- * and handling type compatibility issues
+ * and handling type compatibility issues.
  */
 import type {Provider_Name} from '$lib/provider_types.js';
 import type {
@@ -15,7 +15,7 @@ import type {
 import {Datetime_Now, Uuid} from '$lib/zod_helpers.js';
 
 /**
- * Extract text content from a completion response based on provider type
+ * Extract text content from a completion response based on provider type.
  */
 export const to_completion_response_text = (
 	completion_response: Completion_Response | null | undefined,
@@ -58,7 +58,7 @@ export const to_completion_response_text = (
 };
 
 /**
- * Process provider-specific data to ensure it conforms to expected schema
+ * Process provider-specific data to ensure it conforms to expected schema.
  */
 export const process_provider_data = (
 	provider_name: Provider_Name,
@@ -112,7 +112,7 @@ export const process_provider_data = (
 };
 
 /**
- * Creates a standard completion response object
+ * Creates a standard completion response object.
  */
 export const create_completion_response = (
 	request_id: string,
@@ -130,7 +130,7 @@ export const create_completion_response = (
 };
 
 /**
- * Creates a completion response message
+ * Creates a completion response message.
  */
 export const create_completion_response_message = (
 	request_id: string,

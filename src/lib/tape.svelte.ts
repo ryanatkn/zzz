@@ -58,7 +58,7 @@ export class Tape extends Cell<typeof Tape_Json> {
 	}
 
 	/**
-	 * Add a strip to this tape
+	 * Add a strip to this tape.
 	 */
 	add_strip(strip: Strip): void {
 		strip.tape_id = this.id;
@@ -66,7 +66,7 @@ export class Tape extends Cell<typeof Tape_Json> {
 	}
 
 	/**
-	 * Create and add a user strip with the given content
+	 * Create and add a user strip with the given content.
 	 */
 	add_user_strip(content: string, request?: Completion_Request): Strip {
 		const strip = create_strip(content, 'user', {tape_id: this.id, request}, this.zzz);
@@ -76,7 +76,7 @@ export class Tape extends Cell<typeof Tape_Json> {
 	}
 
 	/**
-	 * Create and add an assistant strip with the given content
+	 * Create and add an assistant strip with the given content.
 	 */
 	add_assistant_strip(content: string, response?: Completion_Response): Strip {
 		const strip = create_strip(content, 'assistant', {tape_id: this.id, response}, this.zzz);
@@ -86,7 +86,7 @@ export class Tape extends Cell<typeof Tape_Json> {
 	}
 
 	/**
-	 * Create and add a system strip with the given content
+	 * Create and add a system strip with the given content.
 	 */
 	add_system_strip(content: string): Strip {
 		const strip = create_strip(content, 'system', {tape_id: this.id}, this.zzz);
@@ -96,7 +96,7 @@ export class Tape extends Cell<typeof Tape_Json> {
 	}
 
 	/**
-	 * Create and add a strip from a bit
+	 * Create and add a strip from a bit.
 	 */
 	add_strip_from_bit(bit: Bit_Type, role: Strip_Role): Strip {
 		const strip = create_strip_from_bit(bit, role, {
@@ -108,7 +108,7 @@ export class Tape extends Cell<typeof Tape_Json> {
 	}
 
 	/**
-	 * Send a message to the AI and create corresponding strips
+	 * Send a message to the AI and create corresponding strips.
 	 */
 	async send_message(content: string): Promise<Strip> {
 		// TODO refactor/remove this mapping (if needed, make derived)

@@ -24,7 +24,7 @@
 	const TODO_create_folder_pending = false;
 
 	// TODO add a select with name, name_reverse, created, created_reverse, updated, updated_reverse
-	const sorted_files: Array<Diskfile> = $derived(
+	const sorted_diskfiles: Array<Diskfile> = $derived(
 		[...diskfiles.non_external_diskfiles].sort((a, b) => {
 			// Handle null/undefined path values
 			if (!a.path && !b.path) return 0;
@@ -98,7 +98,7 @@
 				</Pending_Button>
 			</div>
 		</div>
-		{#if sorted_files.length === 0}
+		{#if sorted_diskfiles.length === 0}
 			{#if empty}
 				{@render empty()}
 			{:else}
@@ -106,13 +106,13 @@
 			{/if}
 		{:else}
 			<ul class="unstyled">
-				{#each sorted_files as file (file.id)}
-					{@const selected = diskfiles.selected_file_id === file.id}
+				{#each sorted_diskfiles as diskfile (diskfile.id)}
+					{@const selected = diskfiles.selected_file_id === diskfile.id}
 					<li transition:slide class:selected>
 						<Diskfile_List_Item
-							diskfile={file}
+							{diskfile}
 							{selected}
-							onclick={() => zzz.url_params.update_url('file', file.id)}
+							onclick={() => zzz.url_params.update_url('file', diskfile.id)}
 						/>
 					</li>
 				{/each}

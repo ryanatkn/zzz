@@ -7,7 +7,7 @@ import {Cell_Json} from '$lib/cell_types.js';
 import {Uuid} from '$lib/zod_helpers.js';
 
 /**
- * Schema for history entries
+ * Schema for history entries.
  */
 export const History_Entry = z.object({
 	id: Uuid.default(() => Uuid.parse(undefined)),
@@ -21,7 +21,7 @@ export const History_Entry = z.object({
 export type History_Entry = z.infer<typeof History_Entry>;
 
 /**
- * Schema for the Diskfile_History cell
+ * Schema for the Diskfile_History cell.
  */
 export const Diskfile_History_Json = Cell_Json.extend({
 	path: Diskfile_Path,
@@ -33,7 +33,7 @@ export type Diskfile_History_Json = z.infer<typeof Diskfile_History_Json>;
 export type Diskfile_History_Options = Cell_Options<typeof Diskfile_History_Json>;
 
 /**
- * Stores edit history for a single diskfile
+ * Stores edit history for a single diskfile.
  */
 export class Diskfile_History extends Cell<typeof Diskfile_History_Json> {
 	path: Diskfile_Path = $state()!;
@@ -53,7 +53,7 @@ export class Diskfile_History extends Cell<typeof Diskfile_History_Json> {
 	}
 
 	/**
-	 * Add a new history entry
+	 * Add a new history entry.
 	 */
 	add_entry(
 		content: string,
@@ -108,14 +108,14 @@ export class Diskfile_History extends Cell<typeof Diskfile_History_Json> {
 
 	// TODO maybe make a map for faster lookup?
 	/**
-	 * Find a history entry by id
+	 * Find a history entry by id.
 	 */
 	find_entry_by_id(id: Uuid): History_Entry | undefined {
 		return this.entries.find((entry) => entry.id === id);
 	}
 
 	/**
-	 * Get the content of a specific history entry
+	 * Get the content of a specific history entry.
 	 */
 	get_content(id: Uuid): string | null {
 		const entry = this.find_entry_by_id(id);
@@ -124,7 +124,7 @@ export class Diskfile_History extends Cell<typeof Diskfile_History_Json> {
 
 	/**
 	 * Clear all history entries except the most recent one by creation time
-	 * and any entries that match the optional keep predicate
+	 * and any entries that match the optional keep predicate.
 	 */
 	clear_except_current(keep?: (entry: History_Entry) => boolean): void {
 		if (this.entries.length <= 1) return;

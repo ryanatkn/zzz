@@ -9,13 +9,11 @@ import {Cell_Json} from '$lib/cell_types.js';
 import type {Bit_Type} from '$lib/bit.svelte.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 
-// Define the Strip role type
 export const Strip_Role = z.enum(['user', 'assistant', 'system']);
 export type Strip_Role = z.infer<typeof Strip_Role>;
 
-// Define the Strip schema - bit_id is required
 export const Strip_Json = Cell_Json.extend({
-	bit_id: Uuid, // Reference to a Bit for content (required)
+	bit_id: Uuid,
 	tape_id: Uuid.nullable().optional(),
 	role: Strip_Role,
 	request: Completion_Request.optional(),

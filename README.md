@@ -2,7 +2,7 @@
 
 [<img src="/static/logo.svg" alt="three sleepy z's" align="right" width="192" height="192">](https://www.zzz.software/)
 
-> bot and web toolkit 💤 bot control web
+> bot and web toolkit 💤 nice web things
 
 ⚠️ early pre-release
 

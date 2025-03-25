@@ -22,7 +22,7 @@ import {Url_Params} from '$lib/url_params.svelte.js';
 import type {Cell} from '$lib/cell.svelte.js';
 
 /**
- * Flat mapping of all cell classes by name
+ * Flat mapping of all cell classes by name.
  */
 export const cell_classes = {
 	Bits,
@@ -59,7 +59,7 @@ export type Cell_Registry_Map = {
 };
 
 /**
- * Type guard to check if a cell is an instance of a specific cell class
+ * Type guard to check if a cell is an instance of a specific cell class.
  */
 export const is_cell_type = <K extends Cell_Class_Names>(
 	cell: Cell | null | undefined,
@@ -67,7 +67,7 @@ export const is_cell_type = <K extends Cell_Class_Names>(
 ): cell is Cell_Registry_Map[K] => cell?.constructor.name === class_name;
 
 /**
- * Get a list of all registered cell class names
+ * Get a list of all registered cell class names.
  */
 export const get_cell_class_names = (): Array<Cell_Class_Names> =>
 	Object.keys(cell_classes) as Array<Cell_Class_Names>;

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
+	import {strip_start} from '@ryanatkn/belt/string.js';
 
 	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
 	import {GLYPH_PROMPT, GLYPH_RESPONSE, GLYPH_FILE, GLYPH_MESSAGE} from '$lib/glyphs.js';
@@ -40,20 +41,20 @@
 </div>
 
 {#if message.is_pong}
-	<div class="mb_md pb_md border_bottom">
+	<section class="pb_md border_bottom">
 		<h3 class="mt_0 mb_sm">Ping Response</h3>
 		<div class="field_row">
 			<div class="font_weight_600 color_text_subtle">Ping id</div>
 			<div class="font_mono word_break_break_word">{message.ping_id}</div>
 		</div>
-	</div>
+	</section>
 {:else if message.is_prompt}
-	<div class="mb_md pb_md border_bottom">
+	<section class="pb_md border_bottom">
 		<h3 class="mt_0 mb_sm">Prompt</h3>
 		<pre class="font_mono size_sm white_space_pre_wrap word_break_break_word p_sm w_100">{message
 				.prompt_data?.prompt || 'No prompt'}</pre>
 
-		<h3 class="mt_md mb_sm">Request Details</h3>
+		<h3>Request Details</h3>
 		<div class="flex flex_column gap_xs">
 			<div class="field_row">
 				<div class="font_weight_600 color_text_subtle">Model</div>
@@ -80,15 +81,15 @@
 				{/each}
 			{/if}
 		</div>
-	</div>
+	</section>
 {:else if message.is_completion}
-	<div class="mb_md pb_md border_bottom">
+	<section class="pb_md border_bottom">
 		<h3 class="mt_0 mb_sm">Completion</h3>
 		<pre
 			class="font_mono size_sm white_space_pre_wrap word_break_break_word p_sm w_100">{message.completion_text ||
 				'No completion'}</pre>
 
-		<h3 class="mt_md mb_sm">Response Details</h3>
+		<h3>Response Details</h3>
 		<div class="flex flex_column gap_xs">
 			<div class="field_row">
 				<div class="font_weight_600 color_text_subtle">Request id</div>
@@ -144,10 +145,10 @@
 				{/if}
 			{/if}
 		</div>
-	</div>
+	</section>
 {:else if message.is_file_related}
-	<div class="mb_md pb_md border_bottom">
-		<h3 class="mt_0 mb_sm">File Information</h3>
+	<section class="pb_md border_bottom">
+		<h3>file information</h3>
 		<div class="flex flex_column gap_xs">
 			{#if message.path}
 				<div class="field_row">
@@ -172,30 +173,32 @@
 				</div>
 			{/if}
 		</div>
-	</div>
+	</section>
 {:else if message.is_session}
-	<div class="mb_md pb_md border_bottom">
-		<h3 class="mt_0 mb_sm">Session Information</h3>
+	<section class="pb_md border_bottom">
+		<h3>session information</h3>
 		{#if message.data}
 			{#if message.type === 'loaded_session' && message.data.files}
 				<div class="field_row">
-					<div class="font_weight_600 color_text_subtle">Files Loaded</div>
+					<div class="font_weight_600 color_text_subtle">files loaded</div>
 					<div>{Object.keys(message.data.files).length}</div>
 				</div>
 
-				<h4 class="mt_sm mb_xs">Files</h4>
+				<h4 class="mt_sm mb_xs">files</h4>
 				<div class="w_100 overflow_auto scrollbar_width_thin" style:max-height="200px">
 					<table class="w_100">
 						<thead>
 							<tr>
-								<th class="text_align_left p_xs">Path</th>
-								<th class="text_align_left p_xs">Size</th>
+								<th class="text_align_left p_xs">path</th>
+								<th class="text_align_left p_xs">size</th>
 							</tr>
 						</thead>
 						<tbody>
-							{#each Object.entries(message.data.files) as [path, file_data]}
+							{#each message.data.files as file_data}
 								<tr>
-									<td class="p_xs font_mono size_sm">{path}</td>
+									<td class="p_xs font_mono size_sm"
+										>{strip_start(file_data.id, file_data.source_dir)}</td
+									>
 									<td class="p_xs"
 										>{typeof file_data === 'object' &&
 										file_data !== null &&
@@ -217,20 +220,20 @@
 				</div>
 			{/if}
 		{:else}
-			<p>Session {message.type === 'load_session' ? 'loading request' : 'data unavailable'}</p>
+			<p>session {message.type === 'load_session' ? 'loading request' : 'data unavailable'}</p>
 		{/if}
-	</div>
+	</section>
 {/if}
 
-<div>
-	<h3 class="mt_md mb_sm">Raw Message Data</h3>
+<section>
+	<h3>raw message data</h3>
 	<pre
 		class="font_mono size_sm white_space_pre_wrap word_break_break_word p_sm w_100">{JSON.stringify(
 			message.json,
 			null,
 			2,
 		)}</pre>
-</div>
+</section>
 
 <style>
 	.field_row {

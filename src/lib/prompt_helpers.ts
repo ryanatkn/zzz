@@ -1,7 +1,8 @@
 import type {Bit_Type} from '$lib/bit.svelte.js';
 
 /**
- * Formats a collection of bits into a prompt string, applying XML tags and attributes where specified.
+ * Formats a collection of bits into a prompt string,
+ * applying XML tags and attributes where specified.
  */
 export const format_prompt_content = (bits: Array<Bit_Type>): string => {
 	const formatted_contents = [];

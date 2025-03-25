@@ -13,7 +13,7 @@ import type {Zzz} from '$lib/zzz.svelte.js';
 import {Diskfile_Path} from '$lib/diskfile_types.js';
 import {CONTENT_PREVIEW_LENGTH} from '$lib/bit_helpers.js';
 
-/** Common properties for all bit types */
+/** Common properties for all bit types. */
 export const Bit_Base_Json = Cell_Json.extend({
 	type: z.string(), // Discriminator field for the type of bit
 	name: z.string().default(''),
@@ -28,14 +28,14 @@ export const Bit_Base_Json = Cell_Json.extend({
 });
 export type Bit_Base_Json = z.infer<typeof Bit_Base_Json>;
 
-/** Text bit schema - direct content storage */
+/** Text bit schema - direct content storage. */
 export const Text_Bit_Json = Bit_Base_Json.extend({
 	type: z.literal('text').default('text'),
 	content: z.string().default(''),
 });
 export type Text_Bit_Json = z.infer<typeof Text_Bit_Json>;
 
-/** Diskfile bit schema - references a diskfile */
+/** Diskfile bit schema - references a diskfile. */
 export const Diskfile_Bit_Json = Bit_Base_Json.extend({
 	type: z.literal('diskfile').default('diskfile'),
 	path: Diskfile_Path.nullable().default(null),
@@ -44,14 +44,14 @@ export const Diskfile_Bit_Json = Bit_Base_Json.extend({
 });
 export type Diskfile_Bit_Json = z.infer<typeof Diskfile_Bit_Json>;
 
-/** Sequence bit schema - contains an ordered list of bit references */
+/** Sequence bit schema - contains an ordered list of bit references. */
 export const Sequence_Bit_Json = Bit_Base_Json.extend({
 	type: z.literal('sequence').default('sequence'),
 	items: z.array(Uuid).default(() => []),
 });
 export type Sequence_Bit_Json = z.infer<typeof Sequence_Bit_Json>;
 
-/** Union of all bit types for deserialization */
+/** Union of all bit types for deserialization. */
 export const Bit_Json = z.discriminatedUnion('type', [
 	Text_Bit_Json, // TODO consider renaming this to or adding `Resource_Bit_Json` like MCP (text+binary)
 	Diskfile_Bit_Json,
@@ -78,7 +78,7 @@ export type Sequence_Bit_Options = Bit_Options<typeof Sequence_Bit_Json>;
 export type Bit_Type_Options = Text_Bit_Options | Diskfile_Bit_Options | Sequence_Bit_Options;
 
 /**
- * Abstract base class for all bit types
+ * Abstract base class for all bit types.
  */
 export abstract class Bit<T extends z.ZodType = typeof Bit_Base_Json> extends Cell<T> {
 	// The type discriminator - to be set by subclasses
@@ -155,7 +155,7 @@ export abstract class Bit<T extends z.ZodType = typeof Bit_Base_Json> extends Ce
 
 	// TODO can this be automated with the schema somehow? probs
 	/**
-	 * Create a bit of any type
+	 * Create a bit of any type.
 	 *
 	 * This is the unified entry point for bit creation that handles:
 	 * 1. Type discrimination from JSON
@@ -205,7 +205,7 @@ export abstract class Bit<T extends z.ZodType = typeof Bit_Base_Json> extends Ce
 export const Bit_Schema = z.instanceof(Bit);
 
 /**
- * Text bit - stores content directly
+ * Text bit - stores content directly.
  */
 export class Text_Bit extends Bit<typeof Text_Bit_Json> {
 	override readonly type = 'text';
@@ -222,7 +222,7 @@ export class Text_Bit extends Bit<typeof Text_Bit_Json> {
 export const Text_Bit_Schema = z.instanceof(Text_Bit);
 
 /**
- * Diskfile bit - references content from a Diskfile
+ * Diskfile bit - references content from a Diskfile.
  */
 export class Diskfile_Bit extends Bit<typeof Diskfile_Bit_Json> {
 	override readonly type = 'diskfile';
@@ -299,7 +299,7 @@ export class Diskfile_Bit extends Bit<typeof Diskfile_Bit_Json> {
 
 	// TODO @many this initialization is awkward, ideally becomes refactored to mostly derived
 	/**
-	 * Links this bit to an editor state
+	 * Links this bit to an editor state.
 	 */
 	link_editor_state(editor_state: {current_content: string} | null): void {
 		this.#editor_state = editor_state;
@@ -309,7 +309,7 @@ export class Diskfile_Bit extends Bit<typeof Diskfile_Bit_Json> {
 export const Diskfile_Bit_Schema = z.instanceof(Diskfile_Bit);
 
 /**
- * Sequence bit - contains an ordered list of bit references
+ * Sequence bit - contains an ordered list of bit references.
  */
 export class Sequence_Bit extends Bit<typeof Sequence_Bit_Json> {
 	override readonly type = 'sequence';
@@ -341,7 +341,7 @@ export class Sequence_Bit extends Bit<typeof Sequence_Bit_Json> {
 	}
 
 	/**
-	 * Add a bit to the sequence
+	 * Add a bit to the sequence.
 	 * @returns `true` if the bit was added, `false` if it was already in the sequence
 	 */
 	add(bit_id: Uuid): boolean {
@@ -351,7 +351,7 @@ export class Sequence_Bit extends Bit<typeof Sequence_Bit_Json> {
 	}
 
 	/**
-	 * Remove a bit from the sequence
+	 * Remove a bit from the sequence.
 	 * @returns `true` if the bit was removed, `false` if it wasn't in the sequence
 	 */
 	remove(bit_id: Uuid): boolean {
@@ -363,7 +363,7 @@ export class Sequence_Bit extends Bit<typeof Sequence_Bit_Json> {
 	}
 
 	/**
-	 * Move a bit to a new position in the sequence
+	 * Move a bit to a new position in the sequence.
 	 * @returns `true` if the bit was moved, `false` if it wasn't in the sequence
 	 */
 	move(bit_id: Uuid, new_index: number): boolean {

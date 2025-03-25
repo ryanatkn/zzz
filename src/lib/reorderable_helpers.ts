@@ -6,7 +6,7 @@ import type {
 
 // TODO maybe make this a DOM helper? in Belt?
 /**
- * Detect layout direction from an element - supports flex and grid
+ * Detect layout direction from an element - supports flex and grid.
  */
 export const detect_reorderable_direction = (element: HTMLElement): Reorderable_Direction => {
 	const computed_style = window.getComputedStyle(element);
@@ -31,7 +31,7 @@ export const detect_reorderable_direction = (element: HTMLElement): Reorderable_
 };
 
 /**
- * Determine the drop position based on source and target indices and layout direction
+ * Determine the drop position based on source and target indices and layout direction.
  */
 export const get_reorderable_drop_position = (
 	direction: Reorderable_Direction,
@@ -48,7 +48,7 @@ export const get_reorderable_drop_position = (
 };
 
 /**
- * Calculate the target index based on source, current index, and position
+ * Calculate the target index based on source, current index, and position.
  */
 export const calculate_reorderable_target_index = (
 	source_index: number,
@@ -71,7 +71,7 @@ export const calculate_reorderable_target_index = (
 };
 
 /**
- * Check if reordering is allowed between two indices
+ * Check if reordering is allowed between two indices.
  */
 export const is_reorder_allowed = (
 	can_reorder: ((from_index: number, to_index: number) => boolean) | undefined,
@@ -93,7 +93,7 @@ export const validate_reorderable_target_index = (
 
 /**
  * Set up drag data transfer with consistent properties and formats
- * This centralizes the dataTransfer setup logic used in multiple places
+ * This centralizes the dataTransfer setup logic used in multiple places.
  */
 export const set_reorderable_drag_data_transfer = (
 	dataTransfer: DataTransfer,

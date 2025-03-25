@@ -7,11 +7,9 @@ import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {create_multi_index, create_derived_index} from '$lib/indexed_collection_helpers.js';
 
-// Define types for index keys
 export type Chat_Single_Indexes = never;
 export type Chat_Multi_Indexes = never;
 
-// Fix the schema definition for Chats_Json
 export const Chats_Json = z
 	.object({
 		// First create the array, then apply default, then attach metadata

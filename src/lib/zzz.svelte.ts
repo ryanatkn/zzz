@@ -41,10 +41,8 @@ import {Diskfile_History} from '$lib/diskfile_history.svelte.js';
 
 export const zzz_context = create_context<Zzz>();
 
-// Define the schema for Zzz - essential serializable state
 export const Zzz_Json = Cell_Json.extend({
 	ui: Ui_Json,
-	// completion_threads: Completion_Threads_Json,
 });
 export type Zzz_Json = z.infer<typeof Zzz_Json>;
 
@@ -53,7 +51,6 @@ export interface Zzz_Options extends Omit<Cell_Options<typeof Zzz_Json>, 'zzz'> 
 	zzz?: Zzz; // Make zzz optional for Zzz initialization
 	onsend?: (message: Message_Client) => void;
 	onreceive?: (message: Message_Server) => void;
-	// completion_threads?: Completion_Threads;
 	models?: Array<Model_Json>;
 	bots?: Zzz_Config['bots'];
 	providers?: Array<Provider_Json>;
@@ -152,9 +149,6 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 			this.registry.register(constructor);
 		}
 
-		// Initialize completion_threads - either use provided or create new
-		// this.completion_threads = options.completion_threads ?? new Completion_Threads({zzz: this});
-
 		// Initialize cell collections
 		this.time = new Time({zzz: this});
 		this.ui = new Ui({zzz: this});
@@ -221,20 +215,8 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 
 		const deferred = create_deferred<Message_Completion_Response>();
 		this.pending_prompts.set(message.id, deferred);
-		const response = await deferred.promise;
 
-		// Ensure the completion response matches the required structure
-		// if (response.completion_response) {
-		// Use safe type assertion with null check
-		// if (response.completion_response) {
-		// this.completion_threads.receive_completion_response(
-		// 	message.completion_request,
-		// 	response.completion_response,
-		// );
-		// }
-		// } else {
-		// 	console.error('Invalid completion response format:', response);
-		// }
+		const response = await deferred.promise;
 
 		return response;
 	}
@@ -287,7 +269,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	}
 
 	/**
-	 * Lookup a history object for a given diskfile path without creating it
+	 * Lookup a history object for a given diskfile path without creating it.
 	 * @returns The history object if it exists, undefined otherwise
 	 */
 	get_diskfile_history(path: Diskfile_Path): Diskfile_History | undefined {
@@ -295,7 +277,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	}
 
 	/**
-	 * Create a new history object for a given diskfile path
+	 * Create a new history object for a given diskfile path.
 	 * @returns The newly created history object
 	 */
 	create_diskfile_history(path: Diskfile_Path): Diskfile_History {

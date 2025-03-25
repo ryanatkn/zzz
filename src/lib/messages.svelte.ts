@@ -151,7 +151,7 @@ export class Messages extends Cell<typeof Messages_Json> {
 	}
 
 	/**
-	 * Override to populate the indexed collection after parsing JSON
+	 * Override to populate the indexed collection after parsing JSON.
 	 */
 	override set_json(value?: z.input<typeof Messages_Json>): void {
 		super.set_json(value);
@@ -161,7 +161,7 @@ export class Messages extends Cell<typeof Messages_Json> {
 	}
 
 	/**
-	 * Send a message using the registered handler with proper typing
+	 * Send a message using the registered handler with proper typing.
 	 */
 	send(message: Message_Client): void {
 		if (!this.onsend) {
@@ -174,7 +174,7 @@ export class Messages extends Cell<typeof Messages_Json> {
 	}
 
 	/**
-	 * Handle a received message with proper typing
+	 * Handle a received message with proper typing.
 	 */
 	receive(message: Message_Server): void {
 		if (!this.onreceive) {
@@ -187,7 +187,7 @@ export class Messages extends Cell<typeof Messages_Json> {
 	}
 
 	/**
-	 * Add a message to the collection
+	 * Add a message to the collection.
 	 */
 	add(message_json: Message_Json): Message {
 		const message = new Message({zzz: this.zzz, json: message_json});
@@ -200,8 +200,8 @@ export class Messages extends Cell<typeof Messages_Json> {
 	}
 
 	/**
-	 * Get messages by any property value
-	 * A generic helper that fetches messages filtered by any property
+	 * Get messages by any property value.
+	 * A generic helper that fetches messages filtered by any property.
 	 *
 	 * @param property The property name to filter by (must be indexed)
 	 * @param value The value to filter for
@@ -220,7 +220,7 @@ export class Messages extends Cell<typeof Messages_Json> {
 	}
 
 	/**
-	 * Get the latest N messages of a specific type
+	 * Get the latest N messages of a specific type.
 	 *
 	 * @param type The message type to filter by
 	 * @param limit Maximum number of messages to return (defaults to history_limit)
@@ -231,7 +231,7 @@ export class Messages extends Cell<typeof Messages_Json> {
 	}
 
 	/**
-	 * Find pings related to pongs using the index
+	 * Find pings related to pongs using the index.
 	 *
 	 * @param pongs The pong messages
 	 * @returns Array of related ping messages
@@ -244,7 +244,7 @@ export class Messages extends Cell<typeof Messages_Json> {
 	}
 
 	/**
-	 * Trims the collection to the maximum allowed size by removing oldest messages
+	 * Trims the collection to the maximum allowed size by removing oldest messages.
 	 */
 	#trim_to_history_limit(): void {
 		if (this.items.all.length <= this.history_limit) return;

@@ -79,7 +79,6 @@
 					prompt.add_bit(
 						Bit.create(zzz, {
 							type: 'sequence',
-							items: [],
 							name: 'sequence bit',
 						}),
 					);
@@ -107,7 +106,10 @@
 			<Contextmenu_Entry
 				run={() => {
 					// TODO confirm dialog that shows the prompt's summary
-					zzz.prompts.remove(prompt);
+					// eslint-disable-next-line no-alert
+					if (confirm('Are you sure you want to delete this prompt?')) {
+						zzz.prompts.remove(prompt);
+					}
 				}}
 			>
 				{#snippet icon()}{GLYPH_DELETE}{/snippet}

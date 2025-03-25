@@ -66,7 +66,7 @@ export class Prompt extends Cell<typeof Prompt_Json> {
 	}
 
 	/**
-	 * Add a bit to this prompt
+	 * Add a bit to this prompt.
 	 */
 	add_bit(bit: Bit_Type): Bit_Type {
 		this.bits.push(bit);

@@ -7,7 +7,7 @@ import type {Zzz} from '$lib/zzz.svelte.js';
 import type {Cell_Registry_Map} from '$lib/cell_classes.js';
 
 /**
- * Error thrown when attempting to instantiate an unregistered class
+ * Error thrown when attempting to instantiate an unregistered class.
  */
 export class Class_Not_Registered_Error extends Error {
 	readonly class_name: string;
@@ -23,7 +23,7 @@ export class Class_Not_Registered_Error extends Error {
 }
 
 /**
- * Registry for managing cell classes and their instances
+ * Registry for managing cell classes and their instances.
  */
 export class Cell_Registry {
 	readonly zzz: Zzz;
@@ -38,7 +38,7 @@ export class Cell_Registry {
 	}
 
 	/**
-	 * Register a cell class with the registry
+	 * Register a cell class with the registry.
 	 */
 	register<T extends Cell>(constructor: Class_Constructor<T>): void {
 		const class_name = constructor.name;
@@ -49,7 +49,7 @@ export class Cell_Registry {
 	}
 
 	/**
-	 * Unregister a cell class from the registry
+	 * Unregister a cell class from the registry.
 	 */
 	unregister(class_name: string): void {
 		if (DEV && !this.#constructors.has(class_name)) {

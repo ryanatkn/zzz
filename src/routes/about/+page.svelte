@@ -3,6 +3,7 @@
 	import Package_Detail from '@ryanatkn/fuz/Package_Detail.svelte';
 	import Community_Links_Panel from '@ryanatkn/fuz/Community_Links_Panel.svelte';
 	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
+	import {base} from '$app/paths';
 
 	import {pkg_context} from '$routes/pkg.js';
 	import External_Link from '$lib/External_Link.svelte';
@@ -37,18 +38,29 @@
 			fly while remaining fully open, aligned, and in your control.
 		</p>
 		<p>
-			This is a pre-alpha, but it can do some neat things, and it points to what I think is an
-			interesting and desirable future. This first release took about 2 months of development and I
-			have a lot of things planned - it feels very early but knowing myself I needed to ship asap!
-			The idea is something I've thought about and prototyped for more than 12 years, and I think
-			this iteration is finally, actually sticking.
+			This is a pre-alpha, but it can do some neat things - mostly these require the local server
+			<a href="{base}/capabilities">capability</a>, so if you're reading this on the static web,
+			you'll have a much-diminished experience, some of which I just need to spend time to improve),
+			and it points to what I think is an interesting and desirable future. This first release took
+			about 2 months of development and I have a lot of things planned - it feels very early but
+			knowing myself I needed to ship asap! I've thought about and prototyped related ideas for more
+			than 12 years, and I think this iteration is sticking.
 		</p>
 		<p>
-			Questions I'm thinking about include, "How can composable computing environments transform
-			user agency in the age of AI?", and "What becomes possible when web users move from
-			service-controlled archipelagos to open and extensible user-controlled environments with
-			well-designed, unrestricted access to local and remote capabilities?
+			Asking the right questions for the complex problems we face in technology is hard. Trying to
+			boil it down,
 		</p>
+		<blockquote>"What can software do for us, and who controls it?"</blockquote>
+		<p>More specifically,</p>
+		<blockquote>
+			"How can composable computing environments transform user agency in the age of AI?"
+		</blockquote>
+		<p>but with less true-believer energy and more detail:</p>
+		<blockquote>
+			"What becomes possible when web users move from exploitative service-controlled spaces to
+			user-controlled environments that are open, extensible, and well-designed, with unrestricted
+			access to local and remote capabilities?"
+		</blockquote>
 		<p>Zzz is designed to be extensible to include features from many kinds of software:</p>
 		<ul>
 			<li>
@@ -65,13 +77,14 @@
 				> and this
 				<External_Link href="https://www.inkandswitch.com/local-first/"
 					>Ink & Switch post</External_Link
-				>
+				> - Zzz gains huge capabilities when it has access to a server, local or remote, but it also
+				works in static apps
 			</li>
 			<li>
 				web metaframeworks – Zzz extends <External_Link href="https://svelte.dev/"
 					>SvelteKit</External_Link
-				> and <External_Link href="https://vite.dev/">Vite</External_Link> without wrapping them, giving
-				devs significant freedom to use Zzz as a library/framework/tool without changing workflows
+				> and <External_Link href="https://vite.dev/">Vite</External_Link> without wrapping them, enabling
+				devs to use Zzz as a library/framework/tool without workflow intrusion
 			</li>
 			<li>
 				<External_Link href="https://wikipedia.org/wiki/Content_management_system"
@@ -87,20 +100,25 @@
 				>
 			</li>
 			<li>
-				<External_Link href="https://wikipedia.org/">wikis</External_Link> and other knowledge management
-				systems
+				my current thinking is that Zzz's ideal form on the desktop is a forward evolution of the
+				browser, basically wrapping today's familiar browser experience with optional features like
+				the above, and then an endless list of things like website builders, web IDEs, local code
+				editors, wikis and other knowledge management systems, social media apps, cloud office
+				suites, content creation apps, and so on
 			</li>
-			<li>website builders and web IDEs</li>
-			<li>local code editors</li>
-			<li>social media apps</li>
-			<li>cloud office suites</li>
-			<li>content creation apps</li>
-			<li>while we're at it, browsers and OS desktop environments, letting js shoot its shot</li>
 		</ul>
 		<p>
 			Most features are optional through plugins, so the core experience stays efficient and
 			economical for what it offers.
 		</p>
+		<aside>
+			Does this scope looks silly? Though ambitious, I think we're going to see *many* software
+			projects aim for a scope like Zzz in large part because AI can automatically generate
+			sophisticated problem-specific UIs and software from natural language instructions, and it
+			simultaneously lowers the barrier to entry to create your own software, especially when there
+			are high quality examples available. IMO for the web, the browser must become a
+			holistically-designed data management environment to stay relevant.
+		</aside>
 		<p>Integrations: (everything's a work in progress, but some basics work)</p>
 		<ul>
 			<li>
