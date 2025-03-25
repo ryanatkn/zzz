@@ -1,5 +1,5 @@
 import type {Thunk} from '@ryanatkn/belt/function.js';
-import type {Cell} from './cell.svelte.js';
+import type {Cell} from '$lib/cell.svelte.js';
 
 export interface Sorter<T> {
 	key: string;

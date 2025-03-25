@@ -39,6 +39,8 @@ export const GLYPH_PROVIDER = '⨕';
 export const GLYPH_MODEL = '⊛'; // ⨹ ⨺ ⊛
 export const GLYPH_MESSAGE = '⍾';
 export const GLYPH_LOG = '⎙'; // ⎙ ⏚ ⌺ ⏏ ⍜
+export const GLYPH_TAB = '⛶';
+export const GLYPH_SITE = '⌬';
 export const GLYPH_CAPABILITY = '⧰'; // ⌁
 export const GLYPH_SETTINGS = '⛮'; // ⛭  ⚙  ⛮  ⛯ ⛣
 

@@ -288,4 +288,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		this.diskfile_histories.set(path, history);
 		return history;
 	}
+
+	/** See into Zzz's future. */
+	futuremode = $state(false);
 }

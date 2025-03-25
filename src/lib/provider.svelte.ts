@@ -16,7 +16,6 @@ export type Provider_Json = z.infer<typeof Provider_Json>;
 
 export interface Provider_Options extends Cell_Options<typeof Provider_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
-// TODO BLOCK `Provider` is the wrong word here, more like Model_Service
 export class Provider extends Cell<typeof Provider_Json> {
 	name: Provider_Name = $state()!;
 	icon: string = $state()!;

@@ -32,12 +32,12 @@ export class Models extends Cell<typeof Models_Json> {
 				result_schema: Model_Schema,
 			}),
 
-			// create_multi_index({
-			// 	key: 'provider_name',
-			// 	extractor: (model) => model.provider_name,
-			// 	query_schema: z.string(),
-			// 	result_schema: Model_Schema,
-			// }),
+			create_multi_index({
+				key: 'provider_name',
+				extractor: (model) => model.provider_name,
+				query_schema: z.string(),
+				result_schema: Model_Schema,
+			}),
 
 			create_multi_index({
 				key: 'tag',
