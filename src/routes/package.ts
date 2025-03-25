@@ -631,6 +631,7 @@ export const package_json = {
 		},
 		'./tape_types.js': {types: './dist/tape_types.d.ts', default: './dist/tape_types.js'},
 		'./tape.svelte.js': {types: './dist/tape.svelte.d.ts', default: './dist/tape.svelte.js'},
+		'./tapes.svelte.js': {types: './dist/tapes.svelte.d.ts', default: './dist/tapes.svelte.js'},
 		'./test_helpers.js': {types: './dist/test_helpers.d.ts', default: './dist/test_helpers.js'},
 		'./test.task.js': {types: './dist/test.task.d.ts', default: './dist/test.task.js'},
 		'./time_helpers.js': {types: './dist/time_helpers.d.ts', default: './dist/time_helpers.js'},
@@ -1336,6 +1337,16 @@ export const src_json = {
 			declarations: [
 				{name: 'Tape_Options', kind: 'type'},
 				{name: 'Tape', kind: 'class'},
+			],
+		},
+		'./tapes.svelte.js': {
+			path: 'tapes.svelte.ts',
+			declarations: [
+				{name: 'Tape_Single_Indexes', kind: 'type'},
+				{name: 'Tape_Multi_Indexes', kind: 'type'},
+				{name: 'Tapes_Json', kind: 'variable'},
+				{name: 'Tapes_Options', kind: 'type'},
+				{name: 'Tapes', kind: 'class'},
 			],
 		},
 		'./test_helpers.js': {

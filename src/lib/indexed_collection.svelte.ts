@@ -1,5 +1,6 @@
 import {SvelteMap} from 'svelte/reactivity';
 import type {z} from 'zod';
+import {DEV} from 'esm-env';
 
 import {Uuid} from '$lib/zod_helpers.js';
 
@@ -356,9 +357,17 @@ export class Indexed_Collection<
 	 * Add an item to the collection and update all indexes
 	 */
 	add(item: T): T {
+		const {by_id} = this;
+
+		if (by_id.has(item.id)) {
+			if (DEV) console.error('Item with this id already exists in the collection: ' + item.id);
+			return by_id.get(item.id)!;
+		}
+
+		by_id.set(item.id, item);
+
 		// Add to the end of the array
 		this.all.push(item);
-		this.by_id.set(item.id, item);
 
 		// Update all indexes
 		this.#update_indexes_for_added_item(item);

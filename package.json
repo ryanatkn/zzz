@@ -727,6 +727,10 @@
       "types": "./dist/tape.svelte.d.ts",
       "default": "./dist/tape.svelte.js"
     },
+    "./tapes.svelte.js": {
+      "types": "./dist/tapes.svelte.d.ts",
+      "default": "./dist/tapes.svelte.js"
+    },
     "./test_helpers.js": {
       "types": "./dist/test_helpers.d.ts",
       "default": "./dist/test_helpers.js"

@@ -10,6 +10,7 @@ import {type Bit_Type} from '$lib/bit.svelte.js';
 import {HANDLED} from '$lib/cell_helpers.js';
 import {to_completion_response_text} from '$lib/response_helpers.js';
 import {Completion_Request, type Completion_Response} from '$lib/message_types.js';
+import {to_preview} from '$lib/helpers.js';
 
 // TODO add `tape.name` probably
 
@@ -33,6 +34,7 @@ export class Tape extends Cell<typeof Tape_Json> {
 	length: number = $derived(this.content.length);
 	tokens: Array<number> = $derived(tokenize(this.content));
 	token_count: number = $derived(this.tokens.length);
+	content_preview: string = $derived(to_preview(this.content));
 
 	constructor(options: Tape_Options) {
 		super(Tape_Json, options);
@@ -105,6 +107,13 @@ export class Tape extends Cell<typeof Tape_Json> {
 
 		this.add_strip(strip);
 		return strip;
+	}
+
+	/**
+	 * Remove all strips from this tape.
+	 */
+	remove_all_strips(): void {
+		this.strips.length = 0;
 	}
 
 	/**

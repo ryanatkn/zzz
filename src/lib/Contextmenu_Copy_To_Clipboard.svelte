@@ -4,6 +4,7 @@
 	import type {Omit_Strict} from '@ryanatkn/belt/types.js';
 
 	import {GLYPH_COPY} from '$lib/glyphs.js';
+	import {to_preview} from '$lib/helpers.js';
 
 	interface Props
 		extends Omit_Strict<ComponentProps<typeof Contextmenu_Entry>, 'run' | 'children'> {
@@ -19,19 +20,15 @@
 		content,
 		label = 'copy',
 		preview,
-		preview_limit = 40,
+		preview_limit,
 		show_preview = true,
 		children,
 		...rest
 	}: Props = $props();
 
-	const final_preview: string | undefined = $derived.by(() => {
-		if (!show_preview) return undefined;
-		const p = preview ?? content;
-		if (!p) return undefined;
-		if (p.length <= preview_limit) return p;
-		return p.substring(0, preview_limit) + '...';
-	});
+	const final_preview: string | undefined = $derived(
+		show_preview ? to_preview(preview ?? content, preview_limit) : undefined,
+	);
 
 	const copy_to_clipboard = async (): Promise<void> => {
 		if (!content) return;

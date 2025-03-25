@@ -11,7 +11,7 @@ import {Cell_Json} from '$lib/cell_types.js';
 import type {Diskfile} from '$lib/diskfile.svelte.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 import {Diskfile_Path} from '$lib/diskfile_types.js';
-import {CONTENT_PREVIEW_LENGTH} from '$lib/bit_helpers.js';
+import {CONTENT_PREVIEW_LENGTH} from '$lib/constants.js';
 
 /** Common properties for all bit types. */
 export const Bit_Base_Json = Cell_Json.extend({

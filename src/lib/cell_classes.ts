@@ -17,6 +17,7 @@ import {Providers} from '$lib/providers.svelte.js';
 import {Socket} from '$lib/socket.svelte.js';
 import {Strip} from '$lib/strip.svelte.js';
 import {Tape} from '$lib/tape.svelte.js';
+import {Tapes} from '$lib/tapes.svelte.js';
 import {Ui} from '$lib/ui.svelte.js';
 import {Url_Params} from '$lib/url_params.svelte.js';
 import type {Cell} from '$lib/cell.svelte.js';
@@ -45,6 +46,7 @@ export const cell_classes = {
 	Socket,
 	Strip,
 	Tape,
+	Tapes,
 	Text_Bit,
 	Ui,
 	Url_Params,

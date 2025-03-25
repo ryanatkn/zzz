@@ -11,9 +11,9 @@ import {
 } from '$lib/message_types.js';
 import {Diskfile_Path} from '$lib/diskfile_types.js';
 import {to_completion_response_text} from '$lib/response_helpers.js';
+import {to_preview} from '$lib/helpers.js';
 
 // Constants for preview length and formatting
-export const MESSAGE_PREVIEW_MAX_LENGTH = 50;
 export const MESSAGE_DATE_FORMAT = 'MMM d, p';
 export const MESSAGE_TIME_FORMAT = 'p';
 
@@ -70,9 +70,7 @@ export class Message extends Cell<typeof Message_Json> {
 		const prompt = this.prompt_data?.prompt;
 		if (!prompt) return 'No prompt';
 
-		return prompt.length > MESSAGE_PREVIEW_MAX_LENGTH
-			? prompt.substring(0, MESSAGE_PREVIEW_MAX_LENGTH) + '...'
-			: prompt;
+		return to_preview(prompt);
 	});
 
 	completion_preview: string = $derived.by(() => {
@@ -80,9 +78,7 @@ export class Message extends Cell<typeof Message_Json> {
 
 		if (!this.completion_text) return 'No completion';
 
-		return this.completion_text.length > MESSAGE_PREVIEW_MAX_LENGTH
-			? this.completion_text.substring(0, MESSAGE_PREVIEW_MAX_LENGTH) + '...'
-			: this.completion_text;
+		return to_preview(this.completion_text);
 	});
 
 	constructor(options: Message_Options) {

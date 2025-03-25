@@ -18,6 +18,7 @@ import type {Provider_Name} from '$lib/provider_types.js';
 import {Uuid, Datetime_Now} from '$lib/zod_helpers.js';
 import {Models} from '$lib/models.svelte.js';
 import {Chats} from '$lib/chats.svelte.js';
+import {Tapes} from '$lib/tapes.svelte.js';
 import {Providers} from '$lib/providers.svelte.js';
 import {Diskfiles} from '$lib/diskfiles.svelte.js';
 import {Messages} from '$lib/messages.svelte.js';
@@ -82,6 +83,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	readonly ui: Ui;
 	readonly models: Models;
 	readonly chats: Chats;
+	readonly tapes: Tapes;
 	readonly providers: Providers;
 	readonly prompts: Prompts;
 	readonly bits: Bits;
@@ -154,6 +156,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		this.ui = new Ui({zzz: this});
 		this.models = new Models({zzz: this});
 		this.chats = new Chats({zzz: this});
+		this.tapes = new Tapes({zzz: this});
 		this.providers = new Providers({zzz: this});
 		this.prompts = new Prompts({zzz: this});
 		this.bits = new Bits({zzz: this});

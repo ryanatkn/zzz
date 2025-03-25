@@ -1,9 +1,10 @@
 import {encode as tokenize} from 'gpt-tokenizer';
 import {z} from 'zod';
+import {strip_start} from '@ryanatkn/belt/string.js';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Diskfile_Json, type Diskfile_Path, type Source_File} from '$lib/diskfile_types.js';
-import {strip_start} from '@ryanatkn/belt/string.js';
+import {to_preview} from '$lib/helpers.js';
 
 export interface Diskfile_Options extends Cell_Options<typeof Diskfile_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
@@ -38,14 +39,7 @@ export class Diskfile extends Cell<typeof Diskfile_Json> {
 		this.content === null ? null : tokenize(this.content),
 	);
 	content_token_count: number | undefined = $derived(this.content_tokens?.length);
-
-	content_preview: string = $derived(
-		this.content
-			? this.content.length > 50
-				? this.content.substring(0, 50) + '...'
-				: this.content
-			: '',
-	);
+	content_preview: string = $derived(to_preview(this.content));
 
 	has_dependencies: boolean = $derived(this.dependencies.length > 0);
 	has_dependents: boolean = $derived(this.dependents.length > 0);

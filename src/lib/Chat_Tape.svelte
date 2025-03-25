@@ -9,6 +9,7 @@
 	import Model_Link from '$lib/Model_Link.svelte';
 	import Provider_Link from '$lib/Provider_Link.svelte';
 	import {Scrollable} from '$lib/scrollable.svelte.js';
+	import Contextmenu_Tape from '$lib/Contextmenu_Tape.svelte';
 	import Content_Editor from '$lib/Content_Editor.svelte';
 	import {GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
 
@@ -49,59 +50,61 @@
 </script>
 
 <!-- TODO `duration_2` is the Moss variable for 200ms and 1 for 80ms, but it's not in a usable form -->
-<div class="chat_tape" transition:scale={{duration: 200}}>
-	<div class="flex justify_content_space_between align_items_start">
-		<header>
-			<div class="size_lg">
-				<Model_Link model={tape.model} icon />
-			</div>
-			<small
-				><Provider_Link
-					provider={tape.zzz.providers.find_by_name(tape.model.provider_name)}
-					icon="glyph"
-					show_name
-				/></small
-			>
-		</header>
-		<Confirm_Button
-			onconfirm={onremove}
-			attrs={{
-				class: 'plain compact',
-				title: `delete tape with ${tape.model_name} and ${tape.token_count} tokens`,
-			}}
-		/>
-	</div>
+<Contextmenu_Tape {tape}>
+	<div class="chat_tape" transition:scale={{duration: 200}}>
+		<div class="flex justify_content_space_between align_items_start">
+			<header>
+				<div class="size_lg">
+					<Model_Link model={tape.model} icon />
+				</div>
+				<small
+					><Provider_Link
+						provider={tape.zzz.providers.find_by_name(tape.model.provider_name)}
+						icon="glyph"
+						show_name
+					/></small
+				>
+			</header>
+			<Confirm_Button
+				onconfirm={onremove}
+				attrs={{
+					class: 'plain compact',
+					title: `delete tape with ${tape.model_name} and ${tape.token_count} tokens`,
+				}}
+			/>
+		</div>
 
-	<div class="strips" use:scrollable.container use:scrollable.target>
-		<ul class="unstyled">
-			{#each tape.strips as strip (strip.id)}
-				<li transition:slide>
-					<Strip_Item {strip} />
-				</li>
-			{/each}
-		</ul>
-	</div>
+		<div class="strips" use:scrollable.container use:scrollable.target>
+			<ul class="unstyled">
+				{#each tape.strips as strip (strip.id)}
+					<li transition:slide>
+						<Strip_Item {strip} />
+					</li>
+				{/each}
+			</ul>
+		</div>
 
-	<div>
-		<Content_Editor
-			bind:this={content_input}
-			bind:content={input}
-			token_count={input_tokens.length}
-			placeholder={GLYPH_PLACEHOLDER}
-			show_stats
-			show_actions
-		>
-			<Pending_Button
-				{pending}
-				onclick={send}
-				attrs={{class: 'plain'}}
-				title="send {input_tokens.length} tokens to {tape.model_name}"
+		<div>
+			<Content_Editor
+				bind:this={content_input}
+				bind:content={input}
+				token_count={input_tokens.length}
+				placeholder={GLYPH_PLACEHOLDER}
+				show_stats
+				show_actions
 			>
-				send
-			</Pending_Button>
-		</Content_Editor>
+				<Pending_Button
+					{pending}
+					onclick={send}
+					attrs={{class: 'plain'}}
+					title="send {input_tokens.length} tokens to {tape.model_name}"
+				>
+					send
+				</Pending_Button>
+			</Content_Editor>
+		</div>
 	</div>
-</div>
+</Contextmenu_Tape>
 
 <style>
 	.chat_tape {

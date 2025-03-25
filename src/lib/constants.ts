@@ -13,3 +13,5 @@ export const ZZZ_DIRNAME = '.zzz';
 
 /** Milliseconds before considering an http request failed */
 export const REQUEST_TIMEOUT = 6000;
+
+export const CONTENT_PREVIEW_LENGTH = 100;

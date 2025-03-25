@@ -7,7 +7,6 @@ import {to_completion_response_text} from '$lib/response_helpers.js';
 import {Uuid} from '$lib/zod_helpers.js';
 import {get_unique_name} from '$lib/helpers.js';
 import {Tape} from '$lib/tape.svelte.js';
-import {Tape_Json} from '$lib/tape_types.js';
 import type {Prompt} from '$lib/prompt.svelte.js';
 import {reorder_list} from '$lib/list_helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
@@ -26,7 +25,7 @@ export const Chat_Json = Cell_Json.extend({
 		chat_names.push(name);
 		return name;
 	}),
-	tapes: z.array(Tape_Json).default(() => []),
+	tape_ids: z.array(Uuid).default(() => []),
 	selected_prompt_ids: z.array(Uuid).default(() => []), // TODO consider making these refs, automatic classes (maybe as separate properties by convention, so the original is still the plain ids)
 	main_input: z.string().default(''),
 });
@@ -36,18 +35,43 @@ export type Chat_Json = z.infer<typeof Chat_Json>;
 export interface Chat_Options extends Cell_Options<typeof Chat_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 export class Chat extends Cell<typeof Chat_Json> {
 	name: string = $state()!;
-	tapes: Array<Tape> = $state([]);
+	tape_ids: Array<Uuid> = $state([]);
 	selected_prompt_ids: Array<Uuid> = $state()!;
-
 	main_input: string = $state('');
+
 	main_input_length: number = $derived(this.main_input.length);
 	main_input_tokens: Array<number> = $derived(tokenize(this.main_input));
 	main_input_token_count: number = $derived(this.main_input_tokens.length);
 
+	// TODO look into using an index for this, incremental from `this.tape_ids`
+	tapes: Array<Tape> = $derived.by(() => {
+		const result: Array<Tape> = [];
+		const {by_id} = this.zzz.tapes.items;
+
+		for (const id of this.tape_ids) {
+			const tape = by_id.get(id);
+			if (tape) {
+				result.push(tape);
+			}
+		}
+
+		return result;
+	});
+
 	// TODO maybe add a derived property for the ids that are selected but missing?
-	selected_prompts: Array<Prompt> = $derived(
-		this.selected_prompt_ids.map((id) => this.zzz.prompts.items.by_id.get(id)).filter((p) => !!p), // TODO BLOCK optimize to avoid the filter
-	);
+	selected_prompts: Array<Prompt> = $derived.by(() => {
+		const result: Array<Prompt> = [];
+		const {by_id} = this.zzz.prompts.items;
+
+		for (const id of this.selected_prompt_ids) {
+			const prompt = by_id.get(id);
+			if (prompt) {
+				result.push(prompt);
+			}
+		}
+
+		return result;
+	});
 
 	// TODO `Bits` class instead? same as on zzz?
 	bits: Set<Bit_Type> = $derived.by(() => {
@@ -85,12 +109,13 @@ export class Chat extends Cell<typeof Chat_Json> {
 	}
 
 	add_tape(model: Model): void {
-		this.tapes.push(
-			new Tape({
-				zzz: this.zzz,
-				json: {model_name: model.name},
-			}),
-		);
+		// TODO BLOCK use registry?
+		const tape = new Tape({
+			zzz: this.zzz,
+			json: {model_name: model.name},
+		});
+		this.zzz.tapes.add_tape(tape);
+		this.tape_ids.push(tape.id);
 	}
 
 	add_tapes_by_model_tag(tag: string): void {
@@ -100,8 +125,14 @@ export class Chat extends Cell<typeof Chat_Json> {
 	}
 
 	remove_tape(id: Uuid): void {
-		const index = this.tapes.findIndex((s) => s.id === id);
-		if (index !== -1) this.tapes.splice(index, 1);
+		const index = this.tape_ids.findIndex((tape_id) => tape_id === id);
+		if (index !== -1) {
+			this.tape_ids.splice(index, 1);
+		}
+	}
+
+	remove_tapes(ids: Array<Uuid>): void {
+		this.tape_ids = this.tape_ids.filter((t) => !ids.includes(t));
 	}
 
 	remove_tapes_by_model_tag(tag: string): void {
@@ -111,7 +142,7 @@ export class Chat extends Cell<typeof Chat_Json> {
 	}
 
 	remove_all_tapes(): void {
-		this.tapes.length = 0;
+		this.tape_ids.length = 0;
 	}
 
 	add_selected_prompt(prompt_id: Uuid): void {
@@ -141,8 +172,6 @@ export class Chat extends Cell<typeof Chat_Json> {
 
 		const assistant_strip = await tape.send_message(content);
 
-		// Infer a name for the chat now that we have a response
-		// No more type error as strip.content now always returns a string
 		void this.init_name_from_strips(content, assistant_strip.content);
 	}
 
@@ -199,10 +228,10 @@ export class Chat extends Cell<typeof Chat_Json> {
 	 */
 	reorder_tapes(from_index: number, to_index: number): void {
 		if (from_index === to_index) return;
-		if (from_index < 0 || from_index >= this.tapes.length) return;
-		if (to_index < 0 || to_index >= this.tapes.length) return;
+		if (from_index < 0 || from_index >= this.tape_ids.length) return;
+		if (to_index < 0 || to_index >= this.tape_ids.length) return;
 
-		reorder_list(this.tapes, from_index, to_index);
+		reorder_list(this.tape_ids, from_index, to_index);
 	}
 }
 

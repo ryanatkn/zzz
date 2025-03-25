@@ -11,5 +11,3 @@ export const BIT_GLYPHS = {
  * Get the appropriate glyph for a bit type.
  */
 export const get_bit_type_glyph = (bit: Bit_Type): string => BIT_GLYPHS[bit.type] ?? GLYPH_BIT; // eslint-disable-line @typescript-eslint/no-unnecessary-condition
-
-export const CONTENT_PREVIEW_LENGTH = 100;
