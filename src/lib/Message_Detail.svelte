@@ -43,7 +43,7 @@
 	<div class="mb_md pb_md border_bottom">
 		<h3 class="mt_0 mb_sm">Ping Response</h3>
 		<div class="field_row">
-			<div class="font_weight_600 color_text_subtle">Ping ID</div>
+			<div class="font_weight_600 color_text_subtle">Ping id</div>
 			<div class="font_mono word_break_break_word">{message.ping_id}</div>
 		</div>
 	</div>
@@ -68,7 +68,7 @@
 				<div>{message.prompt_data?.created || 'Unknown'}</div>
 			</div>
 			<div class="field_row">
-				<div class="font_weight_600 color_text_subtle">Request ID</div>
+				<div class="font_weight_600 color_text_subtle">Request id</div>
 				<div class="font_mono">{message.prompt_data?.request_id || 'Unknown'}</div>
 			</div>
 			{#if message.json.completion_request && 'options' in message.json.completion_request}
@@ -91,7 +91,7 @@
 		<h3 class="mt_md mb_sm">Response Details</h3>
 		<div class="flex flex_column gap_xs">
 			<div class="field_row">
-				<div class="font_weight_600 color_text_subtle">Request ID</div>
+				<div class="font_weight_600 color_text_subtle">Request id</div>
 				<div class="font_mono">{message.completion_data?.request_id || 'Unknown'}</div>
 			</div>
 			<div class="field_row">

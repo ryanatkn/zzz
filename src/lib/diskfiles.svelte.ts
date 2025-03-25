@@ -123,7 +123,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 				const existing_diskfile = this.items.by_optional('by_path', validated_source_file.id);
 
 				if (existing_diskfile) {
-					// Update the existing diskfile, preserving its ID
+					// Update the existing diskfile, preserving its id
 					const diskfile_json = source_file_to_diskfile_json(
 						validated_source_file,
 						existing_diskfile.id, // Pass the existing id to maintain stability

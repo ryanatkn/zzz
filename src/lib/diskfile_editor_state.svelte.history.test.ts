@@ -63,7 +63,7 @@ describe('unsaved edit creation', () => {
 		// Make initial edit
 		editor_state.current_content = 'First edit';
 
-		// Track the entry ID
+		// Track the entry id
 		const unsaved_id = editor_state.unsaved_edit_entry_id;
 		expect(unsaved_id).not.toBeNull();
 
@@ -161,7 +161,7 @@ describe('history navigation', () => {
 		// Select unsaved entry
 		editor_state.set_content_from_history(unsaved_entry.id);
 
-		// Verify both IDs are set correctly
+		// Verify both ids are set correctly
 		expect(editor_state.selected_history_entry_id).toBe(unsaved_entry.id);
 		expect(editor_state.unsaved_edit_entry_id).toBe(unsaved_entry.id);
 	});

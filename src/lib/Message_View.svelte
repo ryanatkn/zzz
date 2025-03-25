@@ -17,7 +17,8 @@
 
 	let show_more = $state(false);
 
-	// TODO refactor
+	// TODO BLOCK refactor, maybe delete?
+
 	let view_with: 'summary' | 'info' = $state('summary');
 
 	const Message_View_Component = $derived(view_with === 'summary' ? Message_Summary : Message_Info);
@@ -56,11 +57,11 @@
 			<!-- TODO `disabled` property to the entry -->
 			<Contextmenu_Entry run={() => (view_with = 'summary')}>
 				{#snippet icon()}{#if view_with === 'summary'}{'>'}{/if}{/snippet}
-				<span>Summary</span>
+				<span>summary</span>
 			</Contextmenu_Entry>
 			<Contextmenu_Entry run={() => (view_with = 'info')}>
 				{#snippet icon()}{#if view_with === 'info'}{'>'}{/if}{/snippet}
-				<span>Info</span>
+				<span>info</span>
 			</Contextmenu_Entry>
 		{/snippet}
 	</Contextmenu_Submenu>

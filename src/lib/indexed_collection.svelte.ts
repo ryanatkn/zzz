@@ -467,21 +467,21 @@ export class Indexed_Collection<
 	}
 
 	/**
-	 * Get an item by its ID
+	 * Get an item by its id
 	 */
 	get(id: Uuid): T | undefined {
 		return this.by_id.get(id);
 	}
 
 	/**
-	 * Check if the collection has an item with the given ID
+	 * Check if the collection has an item with the given id
 	 */
 	has(id: Uuid): boolean {
 		return this.by_id.has(id);
 	}
 
 	/**
-	 * Get the array index of an item by its ID
+	 * Get the array index of an item by its id
 	 */
 	index_of(id: Uuid): number | undefined {
 		// Find the item in the array with linear search

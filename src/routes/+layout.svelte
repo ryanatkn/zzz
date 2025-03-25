@@ -101,7 +101,7 @@
 	// Safely access Zod schema internals using type assertion
 	const prompt_json_obj = Prompt_Json as unknown as {shape?: {bits?: {_def?: {type?: any}}}};
 	if (prompt_json_obj.shape?.bits?._def?.type) {
-		// Store class name instead of schema ID
+		// Store class name instead of schema id
 		prompt_json_obj.shape.bits._def.type.class_name = 'Bit';
 	}
 
@@ -172,6 +172,7 @@
 				content: 'settings',
 				icon: '?',
 				run: () => {
+					console.log('show main dialog');
 					zzz.ui.show_main_dialog = true;
 				},
 			},

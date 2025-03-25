@@ -8,7 +8,14 @@
 	import {Bit} from '$lib/bit.svelte.js';
 	import type {Prompt} from '$lib/prompt.svelte.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
-	import {GLYPH_BIT, GLYPH_DELETE, GLYPH_FILE, GLYPH_LIST, GLYPH_PROMPT} from '$lib/glyphs.js';
+	import {
+		GLYPH_BIT,
+		GLYPH_DELETE,
+		GLYPH_FILE,
+		GLYPH_LIST,
+		GLYPH_PROMPT,
+		GLYPH_REMOVE,
+	} from '$lib/glyphs.js';
 
 	interface Props extends Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> {
 		prompt: Prompt;
@@ -83,7 +90,7 @@
 			</Contextmenu_Entry>
 			{#if prompt.bits.length}
 				<Contextmenu_Entry run={() => prompt.remove_all_bits()}>
-					{#snippet icon()}-{/snippet}
+					{#snippet icon()}{GLYPH_REMOVE}{/snippet}
 					<span>remove all bits</span>
 				</Contextmenu_Entry>
 			{/if}
@@ -97,7 +104,12 @@
 				<span>Rename prompt</span>
 			</Contextmenu_Entry> -->
 			<!-- TODO copy -->
-			<Contextmenu_Entry run={() => zzz.prompts.remove(prompt)}>
+			<Contextmenu_Entry
+				run={() => {
+					// TODO confirm dialog that shows the prompt's summary
+					zzz.prompts.remove(prompt);
+				}}
+			>
 				{#snippet icon()}{GLYPH_DELETE}{/snippet}
 				<span>delete prompt</span>
 			</Contextmenu_Entry>

@@ -247,7 +247,7 @@ describe('Reorderable', () => {
 				action_result.update({index: 5});
 			}
 
-			// Get the item ID
+			// Get the item id
 			const item_id = item.dataset.reorderableItemId as Reorderable_Item_Id;
 
 			// Check if index was updated in the appropriate storage
@@ -364,7 +364,7 @@ describe('Reorderable', () => {
 		});
 
 		test('dragstart sets up source item', () => {
-			// Get item ID
+			// Get item id
 			const item_id = items[0].dataset.reorderableItemId as Reorderable_Item_Id;
 
 			// Create mock event
@@ -454,7 +454,7 @@ describe('Reorderable', () => {
 			reorderable.list(list, {onreorder: vi.fn()});
 			const outer_action = reorderable.item(outer_item, {index: 0});
 
-			// Get outer item ID
+			// Get outer item id
 			const outer_id = outer_item.dataset.reorderableItemId as Reorderable_Item_Id;
 
 			// Force initialization

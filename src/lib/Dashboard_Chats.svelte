@@ -17,7 +17,6 @@
 
 <div class="flex w_100 h_100">
 	<!-- TODO show the selected chat's info, if any -->
-	<!-- TODO, show the counts of active items for each of the model selector buttons in a snippet here -->
 	<div class="column_fixed">
 		<div class="py_sm pr_sm">
 			<button
@@ -57,10 +56,9 @@
 			{/if}
 		</div>
 	</div>
-	<!-- TODO select view (tabs?) -->
 	{#if zzz.chats.selected}
 		<Chat_View chat={zzz.chats.selected} />
-	{:else}
+	{:else if zzz.chats.items.all.length}
 		<div class="flex align_items_center justify_content_center h_100 flex_1" in:fade>
 			<p>
 				Select a chat from the list or <button
@@ -77,6 +75,18 @@
 					onclick={() => {
 						zzz.chats.select(random_item(zzz.chats.items.all).id);
 					}}>go fish</button
+				>?
+			</p>
+		</div>
+	{:else}
+		<div class="flex align_items_center justify_content_center h_100 flex_1" in:fade>
+			<p>
+				no chats available, <button
+					type="button"
+					class="inline color_d"
+					onclick={() => {
+						zzz.chats.add();
+					}}>create one</button
 				>?
 			</p>
 		</div>

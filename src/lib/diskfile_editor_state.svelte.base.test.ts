@@ -135,7 +135,7 @@ describe('content editing', () => {
 		editor_state.current_content = 'First edit';
 		const history = zzz.get_diskfile_history(TEST_PATH)!;
 
-		// Get the selected entry ID
+		// Get the selected entry id
 		const selected_id = editor_state.selected_history_entry_id;
 		expect(selected_id).not.toBeNull();
 

@@ -181,7 +181,7 @@ describe('Cell id handling', () => {
 		version: z.number().default(0),
 	});
 
-	// Test implementation of the Cell class with ID-specific tests
+	// Test implementation of the Cell class with id-specific tests
 	class Id_Test_Cell extends Cell<typeof Id_Test_Schema> {
 		type: string = $state()!;
 		content: string = $state()!;
@@ -522,7 +522,7 @@ describe('Cell cloning', () => {
 
 		// But be a different instance
 		expect(clone).not.toBe(original);
-		expect(clone.id).not.toBe(original.id); // Should have new ID
+		expect(clone.id).not.toBe(original.id); // Should have new id
 
 		// Changes to one shouldn't affect the other
 		clone.text = 'Changed';

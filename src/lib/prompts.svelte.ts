@@ -84,12 +84,12 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 	}
 
 	/**
-	 * Filter prompts that aren't in the given selected IDs list
+	 * Filter prompts that aren't in the given selected ids list
 	 * This is more efficient than keeping a derived index since the selection
 	 * is dynamic based on the current chat
 	 */
 	filter_unselected_prompts(selected_prompt_ids: Array<Uuid>): Array<Prompt> {
-		// If no IDs provided, return all prompts
+		// If no ids provided, return all prompts
 		if (!selected_prompt_ids.length) {
 			return this.items.all;
 		}
@@ -146,7 +146,7 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 	}
 
 	remove_many(prompt_ids: Array<Uuid>): number {
-		// Store the current selected ID
+		// Store the current selected id
 		const current_selected = this.selected_id;
 
 		// Remove the prompts

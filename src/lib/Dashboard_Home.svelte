@@ -37,7 +37,7 @@
 							</span>
 						</li>
 					{:else}
-						<p>No providers configured yet.</p>
+						<p>no providers configured yet</p>
 					{/each}
 				</ul>
 			</div>

@@ -135,7 +135,7 @@ export class Chats extends Cell<typeof Chats_Json> {
 	}
 
 	remove_many(ids: Array<Uuid>): number {
-		// Store the current selected ID
+		// Store the current selected id
 		const current_selected = this.selected_id;
 
 		// Remove the chats

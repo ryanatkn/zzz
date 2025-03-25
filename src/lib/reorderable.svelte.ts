@@ -89,7 +89,7 @@ export class Reorderable implements Reorderable_Style_Config {
 	list_node: HTMLElement | null = null;
 	list_params: Reorderable_List_Params | null = null;
 
-	// Store both indices and DOM elements by item ID
+	// Store both indices and DOM elements by item id
 	indices: Map<Reorderable_Item_Id, number> = new Map();
 	elements: Map<Reorderable_Item_Id, HTMLElement> = new Map();
 
@@ -293,7 +293,7 @@ export class Reorderable implements Reorderable_Style_Config {
 					throw new Unreachable_Error(new_indicator);
 			}
 
-			// Update the active element ID
+			// Update the active element id
 			this.active_indicator_item_id = item_id;
 			this.current_indicator = new_indicator;
 		}

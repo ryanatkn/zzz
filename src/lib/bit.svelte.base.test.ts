@@ -414,7 +414,7 @@ describe('Sequence_Bit specific behavior', () => {
 		expect(sequence.items).toEqual([bit1.id]);
 		expect(sequence.bits).toEqual([bit1]);
 
-		// Test operations with non-existent ID
+		// Test operations with non-existent id
 		const nonexistent_id = Uuid.parse(undefined);
 		expect(sequence.move(nonexistent_id, 0)).toBe(false);
 		expect(sequence.remove(nonexistent_id)).toBe(false);

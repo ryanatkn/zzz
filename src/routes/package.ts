@@ -277,6 +277,11 @@ export const package_json = {
 			svelte: './dist/Diskfile_Actions.svelte',
 			default: './dist/Diskfile_Actions.svelte',
 		},
+		'./Diskfile_Bits_View.svelte': {
+			types: './dist/Diskfile_Bits_View.svelte.d.ts',
+			svelte: './dist/Diskfile_Bits_View.svelte',
+			default: './dist/Diskfile_Bits_View.svelte',
+		},
 		'./diskfile_editor_state.svelte.js': {
 			types: './dist/diskfile_editor_state.svelte.d.ts',
 			default: './dist/diskfile_editor_state.svelte.js',
@@ -839,6 +844,7 @@ export const src_json = {
 		'./Dashboard_Settings.svelte': {path: 'Dashboard_Settings.svelte', declarations: []},
 		'./Dashboard.svelte': {path: 'Dashboard.svelte', declarations: []},
 		'./Diskfile_Actions.svelte': {path: 'Diskfile_Actions.svelte', declarations: []},
+		'./Diskfile_Bits_View.svelte': {path: 'Diskfile_Bits_View.svelte', declarations: []},
 		'./diskfile_editor_state.svelte.js': {
 			path: 'diskfile_editor_state.svelte.ts',
 			declarations: [{name: 'Diskfile_Editor_State', kind: 'class'}],
@@ -920,6 +926,7 @@ export const src_json = {
 				{name: 'GLYPH_DISCONNECT', kind: 'variable'},
 				{name: 'GLYPH_RETRY', kind: 'variable'},
 				{name: 'GLYPH_PLACEHOLDER', kind: 'variable'},
+				{name: 'GLYPH_EDIT', kind: 'variable'},
 				{name: 'GLYPH_SERVER', kind: 'variable'},
 				{name: 'GLYPH_CHAT', kind: 'variable'},
 				{name: 'GLYPH_TAPE', kind: 'variable'},

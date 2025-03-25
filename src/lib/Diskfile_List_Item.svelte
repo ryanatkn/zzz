@@ -5,7 +5,7 @@
 
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
-	import {GLYPH_FILE, GLYPH_REMOVE, GLYPH_COPY} from '$lib/glyphs.js';
+	import {GLYPH_FILE, GLYPH_COPY, GLYPH_DELETE} from '$lib/glyphs.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 
 	interface Props {
@@ -49,7 +49,7 @@
 		}}
 	>
 		{#snippet icon()}{GLYPH_COPY}{/snippet}
-		<span>Copy file content <small class="ml_xs">{diskfile.content_preview}</small></span>
+		<span>copy file content <small class="ml_xs">{diskfile.content_preview}</small></span>
 	</Contextmenu_Entry>
 
 	<Contextmenu_Entry
@@ -61,7 +61,7 @@
 			}
 		}}
 	>
-		{#snippet icon()}{GLYPH_REMOVE}{/snippet}
-		<span>Delete file</span>
+		{#snippet icon()}{GLYPH_DELETE}{/snippet}
+		<span>delete file</span>
 	</Contextmenu_Entry>
 {/snippet}

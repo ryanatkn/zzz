@@ -104,20 +104,22 @@
 			>
 				{#each zzz.prompts.items.all as prompt, i (prompt.id)}
 					<li use:reorderable.item={{index: i}}>
-						<Nav_Link
-							href="?prompt={prompt.id}"
-							selected={prompt.id === zzz.prompts.selected_id}
-							attrs={{
-								class: 'justify_content_space_between',
-								style: 'min-height: 0;',
-							}}
-						>
-							<div>
-								<span class="mr_xs2">{GLYPH_PROMPT}</span>
-								<span>{prompt.name}</span>
-							</div>
-							{#if prompt.bits.length}<small>{prompt.bits.length}</small>{/if}
-						</Nav_Link>
+						<Prompt_Contextmenu {prompt}>
+							<Nav_Link
+								href="?prompt={prompt.id}"
+								selected={prompt.id === zzz.prompts.selected_id}
+								attrs={{
+									class: 'justify_content_space_between',
+									style: 'min-height: 0;',
+								}}
+							>
+								<div>
+									<span class="mr_xs2">{GLYPH_PROMPT}</span>
+									<span>{prompt.name}</span>
+								</div>
+								{#if prompt.bits.length}<small>{prompt.bits.length}</small>{/if}
+							</Nav_Link>
+						</Prompt_Contextmenu>
 					</li>
 				{/each}
 			</ul>
@@ -220,7 +222,7 @@
 				</div>
 			</div>
 		</Prompt_Contextmenu>
-	{:else}
+	{:else if zzz.prompts.items.all.length}
 		<div class="flex align_items_center justify_content_center h_100 flex_1" in:fade>
 			<p>
 				Select a prompt from the list or <button
@@ -237,6 +239,18 @@
 					onclick={() => {
 						zzz.prompts.select(random_item(zzz.prompts.items.all).id);
 					}}>go fish</button
+				>?
+			</p>
+		</div>
+	{:else}
+		<div class="flex align_items_center justify_content_center h_100 flex_1" in:fade>
+			<p>
+				no prompts available, <button
+					type="button"
+					class="inline color_d"
+					onclick={() => {
+						zzz.prompts.add();
+					}}>create one</button
 				>?
 			</p>
 		</div>

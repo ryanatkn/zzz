@@ -327,6 +327,11 @@
       "svelte": "./dist/Diskfile_Actions.svelte",
       "default": "./dist/Diskfile_Actions.svelte"
     },
+    "./Diskfile_Bits_View.svelte": {
+      "types": "./dist/Diskfile_Bits_View.svelte.d.ts",
+      "svelte": "./dist/Diskfile_Bits_View.svelte",
+      "default": "./dist/Diskfile_Bits_View.svelte"
+    },
     "./diskfile_editor_state.svelte.js": {
       "types": "./dist/diskfile_editor_state.svelte.d.ts",
       "default": "./dist/diskfile_editor_state.svelte.js"

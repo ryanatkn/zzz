@@ -36,7 +36,7 @@ const create_test_item = (overrides: Partial<Test_Item> = {}): Test_Item => ({
 	...overrides,
 });
 
-// Helper functions for ID-based object equality checks
+// Helper functions for id-based object equality checks
 const has_item_with_id = (array: Array<Indexed_Item>, item: Indexed_Item): boolean =>
 	array.some((i) => i.id === item.id);
 

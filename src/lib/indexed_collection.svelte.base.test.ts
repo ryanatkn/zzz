@@ -37,7 +37,7 @@ const create_test_item = (
 	score,
 });
 
-// Helper functions for ID-based equality checks
+// Helper functions for id-based equality checks
 const has_item_with_id = (array: Array<Test_Item>, item: Test_Item): boolean => {
 	return array.some((i) => i.id === item.id);
 };
@@ -68,7 +68,7 @@ test('Indexed_Collection - basic operations with no indexes', () => {
 
 	// Check size and content
 	expect(collection.size).toBe(2);
-	// Use ID-based comparison instead of reference equality
+	// Use id-based comparison instead of reference equality
 	expect(has_item_with_id(collection.all, item1)).toBe(true);
 	expect(has_item_with_id(collection.all, item2)).toBe(true);
 
