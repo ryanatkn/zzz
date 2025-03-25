@@ -201,8 +201,7 @@ export class Indexed_Collection<
 	 * Get a single-value index with proper typing
 	 */
 	single_index<V>(key: T_Key_Single): SvelteMap<any, V> {
-		// Runtime safety check
-		this.#ensure_index_type(key, 'single');
+		this.#ensure_index(key, 'single');
 		return this.indexes[key];
 	}
 
@@ -210,8 +209,7 @@ export class Indexed_Collection<
 	 * Get a multi-value index with proper typing
 	 */
 	multi_index<V>(key: T_Key_Multi): SvelteMap<any, Array<V>> {
-		// Runtime safety check
-		this.#ensure_index_type(key, 'multi');
+		this.#ensure_index(key, 'multi');
 		return this.indexes[key];
 	}
 
@@ -219,8 +217,7 @@ export class Indexed_Collection<
 	 * Get a derived index with proper typing
 	 */
 	derived_index<V>(key: T_Key_Derived): Array<V> {
-		// Runtime safety check
-		this.#ensure_index_type(key, 'derived');
+		this.#ensure_index(key, 'derived');
 		return this.indexes[key];
 	}
 
@@ -228,22 +225,20 @@ export class Indexed_Collection<
 	 * Get a dynamic (function) index with proper typing
 	 */
 	dynamic_index<V, Q = any>(key: T_Key_Dynamic): (query: Q) => V {
-		// Runtime safety check
-		this.#ensure_index_type(key, 'dynamic');
+		this.#ensure_index(key, 'dynamic');
 		return this.indexes[key];
 	}
 
-	// TODO this is a code smell, should have type safety
 	/**
 	 * Ensures that the index exists and is of the expected type
-	 * @throws Error if index doesn't exist or is the wrong type
+	 * @param key - The index key to check
+	 * @param expected_type - The expected type of the index
+	 * @throws Error if index doesn't exist or has wrong type
 	 */
-	#ensure_index_type(key: string, expected_type: Index_Type): void {
+	#ensure_index(key: string, expected_type: Index_Type): void {
 		const index = this.indexes[key];
 		if (index === undefined) {
-			// Don't throw for non-existent indexes in accessor methods
-			// Instead, let the method handle the undefined value appropriately
-			return;
+			throw new Error(`Index not found: ${key}`);
 		}
 
 		const actual_type = this.#index_types.get(key);
@@ -264,6 +259,8 @@ export class Indexed_Collection<
 		query: T_Query,
 	): T_Result {
 		const index = this.indexes[key];
+		if (!index) return undefined as unknown as T_Result;
+
 		const index_def = this.#index_definitions.find((def) => def.key === key);
 
 		// Validate input if schema exists
@@ -284,7 +281,6 @@ export class Indexed_Collection<
 		}
 
 		// For array indexes or other types, return the whole index
-		// Consumers will need to filter it themselves
 		return index;
 	}
 
@@ -549,21 +545,9 @@ export class Indexed_Collection<
 	 * Type-safe version that uses the T_Key_Multi generic parameter
 	 */
 	where<V = any>(index_key: T_Key_Multi, value: V): Array<T> {
+		this.#ensure_index(index_key, 'multi');
 		const index = this.indexes[index_key];
-		if (!index) return [];
-
-		// Runtime safety check - only verify type if index exists
-		if (this.#index_types.has(index_key)) {
-			this.#ensure_index_type(index_key, 'multi');
-		}
-
-		// also cover SvelteMap
-		if (index instanceof Map) {
-			return [...(index.get(value) || [])];
-		}
-
-		// Fallback - treat as array
-		return [];
+		return [...(index.get(value) || [])];
 	}
 
 	/**
@@ -595,15 +579,8 @@ export class Indexed_Collection<
 	 * Type-safe version that uses the T_Key_Derived generic parameter
 	 */
 	get_derived(key: T_Key_Derived): Array<T> {
-		const index = this.indexes[key];
-		if (!index) return [];
-
-		// Runtime safety check - only verify type if index exists
-		if (this.#index_types.has(key)) {
-			this.#ensure_index_type(key, 'derived');
-		}
-
-		return index;
+		this.#ensure_index(key, 'derived');
+		return this.indexes[key];
 	}
 
 	/**
@@ -612,17 +589,11 @@ export class Indexed_Collection<
 	 * Type-safe version that uses the T_Key_Single generic parameter
 	 */
 	by<V = any>(index_key: T_Key_Single, value: V): T {
+		// This will throw if index doesn't exist or has wrong type
+		this.#ensure_index(index_key, 'single');
+
 		const index = this.indexes[index_key];
-		if (!index) {
-			throw new Error(`Index not found: ${index_key}`);
-		}
-
-		// Runtime safety check - only verify type if index exists
-		if (this.#index_types.has(index_key)) {
-			this.#ensure_index_type(index_key, 'single');
-		}
-
-		const item = index instanceof Map ? index.get(value) : undefined; // also cover SvelteMap
+		const item = index.get(value);
 
 		if (!item) {
 			throw new Error(`Item not found for index ${index_key} with value ${String(value)}`);
@@ -635,14 +606,7 @@ export class Indexed_Collection<
 	 * Type-safe version that uses the T_Key_Single generic parameter
 	 */
 	by_optional<V = any>(index_key: T_Key_Single, value: V): T | undefined {
-		const index = this.indexes[index_key];
-		if (!index) return undefined;
-
-		// Runtime safety check - only verify type if index exists
-		if (this.#index_types.has(index_key)) {
-			this.#ensure_index_type(index_key, 'single');
-		}
-
-		return index instanceof Map ? index.get(value) : undefined; // also cover SvelteMap
+		this.#ensure_index(index_key, 'single');
+		return this.indexes[index_key].get(value);
 	}
 }

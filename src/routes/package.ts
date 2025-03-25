@@ -242,6 +242,11 @@ export const package_json = {
 			svelte: './dist/Contextmenu_Prompt.svelte',
 			default: './dist/Contextmenu_Prompt.svelte',
 		},
+		'./Contextmenu_Tape.svelte': {
+			types: './dist/Contextmenu_Tape.svelte.d.ts',
+			svelte: './dist/Contextmenu_Tape.svelte',
+			default: './dist/Contextmenu_Tape.svelte',
+		},
 		'./Dashboard_Capabilities.svelte': {
 			types: './dist/Dashboard_Capabilities.svelte.d.ts',
 			svelte: './dist/Dashboard_Capabilities.svelte',
@@ -675,7 +680,6 @@ export const src_json = {
 			declarations: [
 				{name: 'BIT_GLYPHS', kind: 'variable'},
 				{name: 'get_bit_type_glyph', kind: 'function'},
-				{name: 'CONTENT_PREVIEW_LENGTH', kind: 'variable'},
 			],
 		},
 		'./Bit_List.svelte': {path: 'Bit_List.svelte', declarations: []},
@@ -844,6 +848,7 @@ export const src_json = {
 				{name: 'SERVER_URL', kind: 'variable'},
 				{name: 'ZZZ_DIRNAME', kind: 'variable'},
 				{name: 'REQUEST_TIMEOUT', kind: 'variable'},
+				{name: 'CONTENT_PREVIEW_LENGTH', kind: 'variable'},
 			],
 		},
 		'./Content_Editor.svelte': {path: 'Content_Editor.svelte', declarations: []},
@@ -856,6 +861,7 @@ export const src_json = {
 		},
 		'./Contextmenu_Diskfile.svelte': {path: 'Contextmenu_Diskfile.svelte', declarations: []},
 		'./Contextmenu_Prompt.svelte': {path: 'Contextmenu_Prompt.svelte', declarations: []},
+		'./Contextmenu_Tape.svelte': {path: 'Contextmenu_Tape.svelte', declarations: []},
 		'./Dashboard_Capabilities.svelte': {path: 'Dashboard_Capabilities.svelte', declarations: []},
 		'./Dashboard_Chats.svelte': {path: 'Dashboard_Chats.svelte', declarations: []},
 		'./Dashboard_Files.svelte': {path: 'Dashboard_Files.svelte', declarations: []},
@@ -984,6 +990,7 @@ export const src_json = {
 			declarations: [
 				{name: 'get_unique_name', kind: 'function'},
 				{name: 'defined', kind: 'function'},
+				{name: 'to_preview', kind: 'function'},
 			],
 		},
 		'./indexed_collection_helpers.js': {
@@ -1055,7 +1062,6 @@ export const src_json = {
 		'./message.svelte.js': {
 			path: 'message.svelte.ts',
 			declarations: [
-				{name: 'MESSAGE_PREVIEW_MAX_LENGTH', kind: 'variable'},
 				{name: 'MESSAGE_DATE_FORMAT', kind: 'variable'},
 				{name: 'MESSAGE_TIME_FORMAT', kind: 'variable'},
 				{name: 'Message_Options', kind: 'type'},
@@ -1143,7 +1149,6 @@ export const src_json = {
 		'./prompt.svelte.js': {
 			path: 'prompt.svelte.ts',
 			declarations: [
-				{name: 'PROMPT_CONTENT_PREVIEW_LENGTH', kind: 'variable'},
 				{name: 'Prompt_Message', kind: 'type'},
 				{name: 'Prompt_Message_Content', kind: 'type'},
 				{name: 'Prompt_Json', kind: 'variable'},

@@ -32,14 +32,6 @@ export class Bits extends Cell<typeof Bits_Json> {
 				query_schema: z.string(),
 				result_schema: Bit_Schema,
 			}),
-
-			create_single_index({
-				key: 'by_id',
-				extractor: (bit) => bit.id,
-				query_schema: Uuid,
-				result_schema: Bit_Schema,
-			}),
-
 			// TODO BLOCK dynamic index with the rendered content? needs to be lazy, ideally just using $derived
 		],
 	});

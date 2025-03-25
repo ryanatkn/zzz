@@ -51,7 +51,7 @@
 
 <!-- TODO `duration_2` is the Moss variable for 200ms and 1 for 80ms, but it's not in a usable form -->
 <Contextmenu_Tape {tape}>
-	<div class="chat_tape" transition:scale={{duration: 200}}>
+	<div class="chat_tape" transition:scale>
 		<div class="flex justify_content_space_between align_items_start">
 			<header>
 				<div class="size_lg">

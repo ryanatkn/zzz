@@ -292,6 +292,11 @@
       "svelte": "./dist/Contextmenu_Prompt.svelte",
       "default": "./dist/Contextmenu_Prompt.svelte"
     },
+    "./Contextmenu_Tape.svelte": {
+      "types": "./dist/Contextmenu_Tape.svelte.d.ts",
+      "svelte": "./dist/Contextmenu_Tape.svelte",
+      "default": "./dist/Contextmenu_Tape.svelte"
+    },
     "./Dashboard_Capabilities.svelte": {
       "types": "./dist/Dashboard_Capabilities.svelte.d.ts",
       "svelte": "./dist/Dashboard_Capabilities.svelte",
