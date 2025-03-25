@@ -16,6 +16,7 @@
 		GLYPH_PROMPT,
 		GLYPH_REMOVE,
 	} from '$lib/glyphs.js';
+	import Contextmenu_Copy_To_Clipboard from '$lib/Contextmenu_Copy_To_Clipboard.svelte';
 
 	interface Props extends Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> {
 		prompt: Prompt;
@@ -33,6 +34,20 @@
 		{#snippet icon()}{GLYPH_PROMPT}{/snippet}
 		prompt
 		{#snippet menu()}
+			<Contextmenu_Copy_To_Clipboard
+				content={prompt.content}
+				label="copy content"
+				preview={prompt.content_preview}
+			/>
+
+			{#if prompt.name}
+				<Contextmenu_Copy_To_Clipboard
+					content={prompt.name}
+					label="copy name"
+					preview={prompt.name}
+				/>
+			{/if}
+
 			<Contextmenu_Entry
 				run={() => {
 					prompt.add_bit(
@@ -52,8 +67,7 @@
 					// Get all available files
 					const files = zzz.diskfiles.items.all;
 					if (!files.length) {
-						// eslint-disable-next-line no-alert
-						alert('No files available. Add files first.');
+						alert('No files available. Add files first.'); // eslint-disable-line no-alert
 						return;
 					}
 
@@ -102,12 +116,12 @@
 				{#snippet icon()}{GLYPH_EDIT}{/snippet}
 				<span>Rename prompt</span>
 			</Contextmenu_Entry> -->
-			<!-- TODO copy -->
 			<Contextmenu_Entry
 				run={() => {
 					// TODO confirm dialog that shows the prompt's summary
+					// TODO @many better confirmation
 					// eslint-disable-next-line no-alert
-					if (confirm('Are you sure you want to delete this prompt?')) {
+					if (confirm(`Are you sure you want to delete prompt "${prompt.name}"?`)) {
 						zzz.prompts.remove(prompt);
 					}
 				}}

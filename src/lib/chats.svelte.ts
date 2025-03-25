@@ -89,20 +89,24 @@ export class Chats extends Cell<typeof Chats_Json> {
 		this.init();
 	}
 
-	add(json?: Chat_Json, first = true): Chat {
+	add(json?: Chat_Json, first = true, select?: boolean): Chat {
 		const chat = new Chat({zzz: this.zzz, json});
+		return this.add_chat(chat, first, select);
+	}
+
+	add_chat(chat: Chat, first = true, select?: boolean): Chat {
 		if (first) {
 			this.items.add_first(chat);
 		} else {
 			this.items.add(chat);
 		}
-		if (this.selected_id === null) {
+		if (select || this.selected_id === null) {
 			this.selected_id = chat.id;
 		}
 		return chat;
 	}
 
-	add_many(chats_json: Array<Chat_Json>, first = true): Array<Chat> {
+	add_many(chats_json: Array<Chat_Json>, first = true, select?: boolean | number): Array<Chat> {
 		const chats = chats_json.map((json) => new Chat({zzz: this.zzz, json}));
 
 		// Add all chats to the beginning of the collection
@@ -114,9 +118,13 @@ export class Chats extends Cell<typeof Chats_Json> {
 			}
 		}
 
-		// Select the first chat if none is currently selected
-		if (this.selected_id === null && chats.length > 0) {
-			this.selected_id = chats[0].id;
+		// Select the first or the specified chat if none is currently selected
+		if (
+			select === true ||
+			typeof select === 'number' ||
+			(this.selected_id === null && chats.length > 0)
+		) {
+			this.selected_id = chats[typeof select === 'number' ? select : 0].id;
 		}
 
 		return chats;

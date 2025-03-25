@@ -4,6 +4,7 @@
 
 	import Chat_View from '$lib/Chat_View.svelte';
 	import Nav_Link from '$lib/Nav_Link.svelte';
+	import Contextmenu_Chat from '$lib/Contextmenu_Chat.svelte';
 	import {GLYPH_CHAT, GLYPH_ADD} from '$lib/glyphs.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import {Reorderable} from '$lib/reorderable.svelte.js';
@@ -36,20 +37,22 @@
 					{#each zzz.chats.items.all as chat, i (chat.id)}
 						<!-- TODO change to href from onclick -->
 						<li use:reorderable.item={{index: i}}>
-							<Nav_Link
-								href="?chat={chat.id}"
-								selected={chat.id === zzz.chats.selected_id}
-								attrs={{
-									class: 'justify_content_space_between',
-									style: 'min-height: 0;',
-								}}
-							>
-								<div>
-									<span class="mr_xs2">{GLYPH_CHAT}</span>
-									<span>{chat.name}</span>
-								</div>
-								{#if chat.tapes.length}<small>{chat.tapes.length}</small>{/if}
-							</Nav_Link>
+							<Contextmenu_Chat {chat}>
+								<Nav_Link
+									href="?chat={chat.id}"
+									selected={chat.id === zzz.chats.selected_id}
+									attrs={{
+										class: 'justify_content_space_between',
+										style: 'min-height: 0;',
+									}}
+								>
+									<div>
+										<span class="mr_xs2">{GLYPH_CHAT}</span>
+										<span>{chat.name}</span>
+									</div>
+									{#if chat.tapes.length}<small>{chat.tapes.length}</small>{/if}
+								</Nav_Link>
+							</Contextmenu_Chat>
 						</li>
 					{/each}
 				</menu>
@@ -57,7 +60,9 @@
 		</div>
 	</div>
 	{#if zzz.chats.selected}
-		<Chat_View chat={zzz.chats.selected} />
+		<Contextmenu_Chat chat={zzz.chats.selected}>
+			<Chat_View chat={zzz.chats.selected} />
+		</Contextmenu_Chat>
 	{:else if zzz.chats.items.all.length}
 		<div class="flex align_items_center justify_content_center h_100 flex_1" in:fade>
 			<p>

@@ -2,7 +2,7 @@
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
 
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
-	import Diskfile_Contextmenu from '$lib/Diskfile_Contextmenu.svelte';
+	import Contextmenu_Diskfile from '$lib/Contextmenu_Diskfile.svelte';
 	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
 	import {GLYPH_FILE} from '$lib/glyphs.js';
 
@@ -17,7 +17,7 @@
 	// TODO BLOCK change to links like the others, probably
 </script>
 
-<Diskfile_Contextmenu {diskfile}>
+<Contextmenu_Diskfile {diskfile}>
 	<button
 		type="button"
 		class="button_list_item compact"
@@ -32,4 +32,4 @@
 			>
 		</div>
 	</button>
-</Diskfile_Contextmenu>
+</Contextmenu_Diskfile>

@@ -22,7 +22,7 @@
 	import {Reorderable} from '$lib/reorderable.svelte.js';
 	import Content_Preview from '$lib/Content_Preview.svelte';
 	import {Bit} from '$lib/bit.svelte.js';
-	import Prompt_Contextmenu from '$lib/Prompt_Contextmenu.svelte';
+	import Contextmenu_Prompt from '$lib/Contextmenu_Prompt.svelte';
 
 	const zzz = zzz_context.get();
 	const reorderable = new Reorderable();
@@ -51,8 +51,7 @@
 		// Get all available files
 		const files = zzz.diskfiles.items.all;
 		if (!files.length) {
-			// eslint-disable-next-line no-alert
-			alert('No files available. Add files first.');
+			alert('No files available. Add files first.'); // eslint-disable-line no-alert
 			return;
 		}
 
@@ -104,7 +103,7 @@
 			>
 				{#each zzz.prompts.items.all as prompt, i (prompt.id)}
 					<li use:reorderable.item={{index: i}}>
-						<Prompt_Contextmenu {prompt}>
+						<Contextmenu_Prompt {prompt}>
 							<Nav_Link
 								href="?prompt={prompt.id}"
 								selected={prompt.id === zzz.prompts.selected_id}
@@ -119,7 +118,7 @@
 								</div>
 								{#if prompt.bits.length}<small>{prompt.bits.length}</small>{/if}
 							</Nav_Link>
-						</Prompt_Contextmenu>
+						</Contextmenu_Prompt>
 					</li>
 				{/each}
 			</ul>
@@ -127,7 +126,7 @@
 	</div>
 
 	{#if zzz.prompts.selected}
-		<Prompt_Contextmenu prompt={zzz.prompts.selected}>
+		<Contextmenu_Prompt prompt={zzz.prompts.selected}>
 			<div class="column_fixed pr_sm">
 				{#if zzz.prompts.selected}
 					<div class="row gap_sm py_xs sticky t_0 b_0 bg">
@@ -221,7 +220,7 @@
 					/>
 				</div>
 			</div>
-		</Prompt_Contextmenu>
+		</Contextmenu_Prompt>
 	{:else if zzz.prompts.items.all.length}
 		<div class="flex align_items_center justify_content_center h_100 flex_1" in:fade>
 			<p>

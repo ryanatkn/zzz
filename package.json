@@ -272,6 +272,26 @@
       "svelte": "./dist/Content_Stats.svelte",
       "default": "./dist/Content_Stats.svelte"
     },
+    "./Contextmenu_Chat.svelte": {
+      "types": "./dist/Contextmenu_Chat.svelte.d.ts",
+      "svelte": "./dist/Contextmenu_Chat.svelte",
+      "default": "./dist/Contextmenu_Chat.svelte"
+    },
+    "./Contextmenu_Copy_To_Clipboard.svelte": {
+      "types": "./dist/Contextmenu_Copy_To_Clipboard.svelte.d.ts",
+      "svelte": "./dist/Contextmenu_Copy_To_Clipboard.svelte",
+      "default": "./dist/Contextmenu_Copy_To_Clipboard.svelte"
+    },
+    "./Contextmenu_Diskfile.svelte": {
+      "types": "./dist/Contextmenu_Diskfile.svelte.d.ts",
+      "svelte": "./dist/Contextmenu_Diskfile.svelte",
+      "default": "./dist/Contextmenu_Diskfile.svelte"
+    },
+    "./Contextmenu_Prompt.svelte": {
+      "types": "./dist/Contextmenu_Prompt.svelte.d.ts",
+      "svelte": "./dist/Contextmenu_Prompt.svelte",
+      "default": "./dist/Contextmenu_Prompt.svelte"
+    },
     "./Dashboard_Capabilities.svelte": {
       "types": "./dist/Dashboard_Capabilities.svelte.d.ts",
       "svelte": "./dist/Dashboard_Capabilities.svelte",
@@ -537,11 +557,6 @@
     "./position_helpers.js": {
       "types": "./dist/position_helpers.d.ts",
       "default": "./dist/position_helpers.js"
-    },
-    "./Prompt_Contextmenu.svelte": {
-      "types": "./dist/Prompt_Contextmenu.svelte.d.ts",
-      "svelte": "./dist/Prompt_Contextmenu.svelte",
-      "default": "./dist/Prompt_Contextmenu.svelte"
     },
     "./prompt_helpers.js": {
       "types": "./dist/prompt_helpers.d.ts",

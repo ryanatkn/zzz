@@ -11,7 +11,7 @@
 	import Diskfile_History_View from '$lib/Diskfile_History_View.svelte';
 	import {GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
 	import Diskfile_Bits_View from '$lib/Diskfile_Bits_View.svelte';
-	import Diskfile_Contextmenu from '$lib/Diskfile_Contextmenu.svelte';
+	import Contextmenu_Diskfile from '$lib/Contextmenu_Diskfile.svelte';
 
 	interface Props {
 		diskfile: Diskfile;
@@ -46,7 +46,7 @@
 	});
 </script>
 
-<Diskfile_Contextmenu {diskfile}>
+<Contextmenu_Diskfile {diskfile}>
 	<div class="flex h_100">
 		<div class="flex_1 h_100 column">
 			<Content_Editor
@@ -117,7 +117,7 @@
 			<Diskfile_Bits_View {diskfile} />
 		</div>
 	</div>
-</Diskfile_Contextmenu>
+</Contextmenu_Diskfile>
 
 <style>
 	/* TODO roughed in */

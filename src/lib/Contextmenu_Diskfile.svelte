@@ -5,8 +5,9 @@
 	import type {Omit_Strict} from '@ryanatkn/belt/types.js';
 
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
-	import {GLYPH_COPY, GLYPH_DELETE} from '$lib/glyphs.js';
+	import {GLYPH_DELETE} from '$lib/glyphs.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
+	import Contextmenu_Copy_To_Clipboard from '$lib/Contextmenu_Copy_To_Clipboard.svelte';
 
 	interface Props extends Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> {
 		diskfile: Diskfile;
@@ -20,21 +21,17 @@
 <Contextmenu {...rest} {entries} />
 
 {#snippet entries()}
-	<!-- TODO add this contextmenu feature: disabled={!file.content} -->
-	<Contextmenu_Entry
-		run={async () => {
-			if (diskfile.content) {
-				await navigator.clipboard.writeText(diskfile.content);
-			}
-		}}
-	>
-		{#snippet icon()}{GLYPH_COPY}{/snippet}
-		<span>copy file content <small class="ml_xs">{diskfile.content_preview}</small></span>
-	</Contextmenu_Entry>
+	{#if diskfile.content}
+		<Contextmenu_Copy_To_Clipboard
+			content={diskfile.content}
+			label="copy file content"
+			preview={diskfile.content_preview}
+		/>
+	{/if}
 
 	<Contextmenu_Entry
 		run={() => {
-			// TODO BLOCK better confirmation
+			// TODO @many better confirmation
 			// eslint-disable-next-line no-alert
 			if (confirm(`Are you sure you want to delete ${diskfile.path_relative}?`)) {
 				zzz.diskfiles.delete(diskfile.path);

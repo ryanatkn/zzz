@@ -222,6 +222,26 @@ export const package_json = {
 			svelte: './dist/Content_Stats.svelte',
 			default: './dist/Content_Stats.svelte',
 		},
+		'./Contextmenu_Chat.svelte': {
+			types: './dist/Contextmenu_Chat.svelte.d.ts',
+			svelte: './dist/Contextmenu_Chat.svelte',
+			default: './dist/Contextmenu_Chat.svelte',
+		},
+		'./Contextmenu_Copy_To_Clipboard.svelte': {
+			types: './dist/Contextmenu_Copy_To_Clipboard.svelte.d.ts',
+			svelte: './dist/Contextmenu_Copy_To_Clipboard.svelte',
+			default: './dist/Contextmenu_Copy_To_Clipboard.svelte',
+		},
+		'./Contextmenu_Diskfile.svelte': {
+			types: './dist/Contextmenu_Diskfile.svelte.d.ts',
+			svelte: './dist/Contextmenu_Diskfile.svelte',
+			default: './dist/Contextmenu_Diskfile.svelte',
+		},
+		'./Contextmenu_Prompt.svelte': {
+			types: './dist/Contextmenu_Prompt.svelte.d.ts',
+			svelte: './dist/Contextmenu_Prompt.svelte',
+			default: './dist/Contextmenu_Prompt.svelte',
+		},
 		'./Dashboard_Capabilities.svelte': {
 			types: './dist/Dashboard_Capabilities.svelte.d.ts',
 			svelte: './dist/Dashboard_Capabilities.svelte',
@@ -466,11 +486,6 @@ export const package_json = {
 		'./position_helpers.js': {
 			types: './dist/position_helpers.d.ts',
 			default: './dist/position_helpers.js',
-		},
-		'./Prompt_Contextmenu.svelte': {
-			types: './dist/Prompt_Contextmenu.svelte.d.ts',
-			svelte: './dist/Prompt_Contextmenu.svelte',
-			default: './dist/Prompt_Contextmenu.svelte',
 		},
 		'./prompt_helpers.js': {
 			types: './dist/prompt_helpers.d.ts',
@@ -833,6 +848,13 @@ export const src_json = {
 		'./Content_Editor.svelte': {path: 'Content_Editor.svelte', declarations: []},
 		'./Content_Preview.svelte': {path: 'Content_Preview.svelte', declarations: []},
 		'./Content_Stats.svelte': {path: 'Content_Stats.svelte', declarations: []},
+		'./Contextmenu_Chat.svelte': {path: 'Contextmenu_Chat.svelte', declarations: []},
+		'./Contextmenu_Copy_To_Clipboard.svelte': {
+			path: 'Contextmenu_Copy_To_Clipboard.svelte',
+			declarations: [],
+		},
+		'./Contextmenu_Diskfile.svelte': {path: 'Contextmenu_Diskfile.svelte', declarations: []},
+		'./Contextmenu_Prompt.svelte': {path: 'Contextmenu_Prompt.svelte', declarations: []},
 		'./Dashboard_Capabilities.svelte': {path: 'Dashboard_Capabilities.svelte', declarations: []},
 		'./Dashboard_Chats.svelte': {path: 'Dashboard_Chats.svelte', declarations: []},
 		'./Dashboard_Files.svelte': {path: 'Dashboard_Files.svelte', declarations: []},
@@ -1109,7 +1131,6 @@ export const src_json = {
 				{name: 'generate_position_styles', kind: 'function'},
 			],
 		},
-		'./Prompt_Contextmenu.svelte': {path: 'Prompt_Contextmenu.svelte', declarations: []},
 		'./prompt_helpers.js': {
 			path: 'prompt_helpers.ts',
 			declarations: [{name: 'format_prompt_content', kind: 'function'}],
@@ -1121,7 +1142,7 @@ export const src_json = {
 		'./prompt.svelte.js': {
 			path: 'prompt.svelte.ts',
 			declarations: [
-				{name: 'PROMPT_CONTENT_TRUNCATED_LENGTH', kind: 'variable'},
+				{name: 'PROMPT_CONTENT_PREVIEW_LENGTH', kind: 'variable'},
 				{name: 'Prompt_Message', kind: 'type'},
 				{name: 'Prompt_Message_Content', kind: 'type'},
 				{name: 'Prompt_Json', kind: 'variable'},

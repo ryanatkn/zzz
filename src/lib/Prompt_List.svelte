@@ -70,7 +70,7 @@
 				<ul class="unstyled">
 					{#each unselected_prompts as prompt (prompt.id)}
 						<li class="p_xs size_sm">
-							{prompt.name} - {prompt.content_truncated}
+							{prompt.name} - {prompt.content_preview}
 						</li>
 					{/each}
 				</ul>

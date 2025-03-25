@@ -12,5 +12,5 @@
 	{prompt.name}
 </div>
 <div class="flex_1 ellipsis">
-	{prompt.content_truncated}
+	{prompt.content_preview}
 </div>

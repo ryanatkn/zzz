@@ -17,7 +17,7 @@
 <div class="tape_summary panel p_xs">
 	<div class="row justify_content_space_between">
 		<div class="flex_1">
-			<div class="font_weight_600">{tape.model.name}</div>
+			<div class="font_weight_600">{tape.model_name}</div>
 			<div class="flex gap_xs">
 				{#if message_count > 0}
 					<small

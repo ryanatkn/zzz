@@ -9,7 +9,7 @@ import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import {format_prompt_content} from '$lib/prompt_helpers.js';
 
-export const PROMPT_CONTENT_TRUNCATED_LENGTH = 100;
+export const PROMPT_CONTENT_PREVIEW_LENGTH = 100;
 
 export interface Prompt_Message {
 	role: 'user' | 'system';
@@ -44,9 +44,9 @@ export class Prompt extends Cell<typeof Prompt_Json> {
 	length: number = $derived(this.content.length);
 	tokens: Array<number> = $derived(tokenize(this.content)); // TODO @many eager computation in some UI cases is bad UX with large values (e.g. bottleneck typing)
 	token_count: number = $derived(this.tokens.length);
-	content_truncated: string = $derived(
-		this.content.length > PROMPT_CONTENT_TRUNCATED_LENGTH
-			? this.content.substring(0, PROMPT_CONTENT_TRUNCATED_LENGTH) + '...'
+	content_preview: string = $derived(
+		this.content.length > PROMPT_CONTENT_PREVIEW_LENGTH
+			? this.content.substring(0, PROMPT_CONTENT_PREVIEW_LENGTH) + '...'
 			: this.content,
 	);
 
