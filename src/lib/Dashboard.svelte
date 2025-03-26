@@ -18,7 +18,7 @@
 
 	const {children}: Props = $props();
 
-	const SIDEBAR_WIDTH_MAX = 200;
+	const SIDEBAR_WIDTH_MAX = 180;
 	const sidebar_width = $state(SIDEBAR_WIDTH_MAX);
 
 	// TODO dashboard should be mounted with Markdown

@@ -95,6 +95,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 		this.#initial_json = options.json;
 
 		// Don't auto-initialize here - wait for subclass to call init()
+		// so its properties initialize and constructor runs
 	}
 
 	/**

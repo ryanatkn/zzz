@@ -208,9 +208,9 @@
 	<section>
 		<h2 class="mb_lg">into the future</h2>
 		<p class="mb_md">
-			This project has a huge scope and I want to get user feedback early. What you're seeing is a
-			small fraction of the idea - especially if you're viewing this on the website not natively via
-			Node - so here's a button for seeing some of what's planned:
+			This project has a huge scope and it's early in development. What you're seeing is a small
+			fraction of the idea - especially if you're viewing this on the website not natively via Node
+			- so here's a button for seeing some of what's planned:
 		</p>
 		<button
 			type="button"

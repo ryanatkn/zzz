@@ -468,6 +468,7 @@ export const package_json = {
 			svelte: './dist/Nav_Link.svelte',
 			default: './dist/Nav_Link.svelte',
 		},
+		'./nav.js': {types: './dist/nav.d.ts', default: './dist/nav.js'},
 		'./ollama.js': {types: './dist/ollama.d.ts', default: './dist/ollama.js'},
 		'./Picker.svelte': {
 			types: './dist/Picker.svelte.d.ts',
@@ -1107,6 +1108,13 @@ export const src_json = {
 			],
 		},
 		'./Nav_Link.svelte': {path: 'Nav_Link.svelte', declarations: []},
+		'./nav.js': {
+			path: 'nav.ts',
+			declarations: [
+				{name: 'Nav_Item', kind: 'type'},
+				{name: 'main_nav_items_default', kind: 'variable'},
+			],
+		},
 		'./ollama.js': {
 			path: 'ollama.ts',
 			declarations: [

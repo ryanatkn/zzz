@@ -536,6 +536,10 @@
       "svelte": "./dist/Nav_Link.svelte",
       "default": "./dist/Nav_Link.svelte"
     },
+    "./nav.js": {
+      "types": "./dist/nav.d.ts",
+      "default": "./dist/nav.js"
+    },
     "./ollama.js": {
       "types": "./dist/ollama.d.ts",
       "default": "./dist/ollama.js"

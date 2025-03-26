@@ -118,13 +118,6 @@ export class Time extends Cell<typeof Time_Json> {
 	}
 
 	/**
-	 * Creates a new Date object with the current time.
-	 */
-	get_date(): Date {
-		return new Date(this.now_ms);
-	}
-
-	/**
 	 * Override Cell's destroy method to ensure timer cleanup.
 	 */
 	destroy(): void {
