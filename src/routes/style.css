@@ -281,7 +281,7 @@ a.chip {
 	font-weight: 400;
 }
 
-.button_list_item {
+.listitem {
 	width: 100%;
 	border-radius: 0;
 	word-break: break-all;
@@ -292,10 +292,10 @@ a.chip {
 	font-weight: 400;
 	font-size: var(--size_sm);
 }
-.button_list_item:hover {
+.listitem:hover {
 	--button_text_color: var(--text_color_2);
 }
-.button_list_item.selected {
+.listitem.selected {
 	--button_text_color: var(--text_color_1);
 	--button_fill: var(--fg_2);
 	--button_fill_hover: var(--fg_1);

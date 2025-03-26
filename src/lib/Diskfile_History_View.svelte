@@ -56,7 +56,7 @@
 			<button
 				transition:slide
 				type="button"
-				class="button_list_item compact"
+				class="listitem compact"
 				class:selected
 				class:content_matches
 				class:plain={!selected && !content_matches}
@@ -82,7 +82,7 @@
 		background-color: var(--fg_1);
 	}
 
-	.button_list_item.compact {
+	.listitem.compact {
 		padding: var(--space_xs2) var(--space_xs);
 		font-size: var(--size_sm);
 		display: flex;

@@ -39,7 +39,7 @@
 	{#snippet children(prompt, pick)}
 		<button
 			type="button"
-			class="button_list_item compact w_100"
+			class="listitem compact w_100"
 			class:selected={selected_ids?.includes(prompt.id)}
 			onclick={() => pick(prompt)}
 		>

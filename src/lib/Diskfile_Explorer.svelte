@@ -6,7 +6,7 @@
 
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
-	import Diskfile_List_Item from '$lib/Diskfile_List_Item.svelte';
+	import Diskfile_Listitem from '$lib/Diskfile_Listitem.svelte';
 	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
 	import {GLYPH_DIRECTORY, GLYPH_CREATE_FILE, GLYPH_CREATE_FOLDER} from '$lib/glyphs.js';
 
@@ -109,7 +109,7 @@
 				{#each sorted_diskfiles as diskfile (diskfile.id)}
 					{@const selected = diskfiles.selected_file_id === diskfile.id}
 					<li transition:slide class:selected>
-						<Diskfile_List_Item
+						<Diskfile_Listitem
 							{diskfile}
 							{selected}
 							onclick={() => zzz.url_params.update_url('file', diskfile.id)}

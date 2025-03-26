@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Picker from '$lib/Picker.svelte';
+	import Bit_Listitem from '$lib/Bit_Listitem.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import type {Bit_Type} from '$lib/bit.svelte.js';
 	import type {Uuid} from '$lib/zod_helpers.js';
@@ -39,14 +40,6 @@
 	heading="Pick a bit"
 >
 	{#snippet children(bit, pick)}
-		<button type="button" class="button_list_item compact w_100" onclick={() => pick(bit)}>
-			<div class="p_xs size_sm">
-				<span class="badge mr_xs">{bit.type}</span>
-				<span class="text ellipsis">{bit.content_preview}</span>
-				{#if bit.token_count != null}
-					<span class="size_xs ml_xs">{bit.token_count}</span>
-				{/if}
-			</div>
-		</button>
+		<Bit_Listitem {bit} compact onclick={() => pick(bit)} />
 	{/snippet}
 </Picker>

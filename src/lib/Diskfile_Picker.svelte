@@ -4,7 +4,7 @@
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import type {Uuid} from '$lib/zod_helpers.js';
 	import {sort_by_text, sort_by_numeric} from '$lib/sortable.svelte.js';
-	import Diskfile_List_Item from '$lib/Diskfile_List_Item.svelte';
+	import Diskfile_Listitem from '$lib/Diskfile_Listitem.svelte';
 
 	interface Props {
 		onpick: (diskfile: Diskfile | undefined) => boolean | void;
@@ -41,7 +41,7 @@
 	heading="Pick a file"
 >
 	{#snippet children(diskfile, pick)}
-		<Diskfile_List_Item
+		<Diskfile_Listitem
 			{diskfile}
 			selected={!!selected_ids && selected_ids.includes(diskfile.id)}
 			onclick={pick}

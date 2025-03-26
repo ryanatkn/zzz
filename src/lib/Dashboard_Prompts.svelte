@@ -55,8 +55,7 @@
 			return;
 		}
 
-		// TODO: We should show a file selector dialog here
-		// For now, just use the first file
+		// TODO BLOCK show diskfile pick
 		const file = files[0];
 		const file_name = file.path.split('/').pop() || 'unnamed';
 
@@ -174,7 +173,7 @@
 							<li transition:scale>
 								<!-- the extra wrapper makes the grid items not stretch vertically -->
 								<div class="bg radius_xs p_sm">
-									<Bit_View {bit} prompts={zzz.prompts} />
+									<Bit_View {bit} />
 								</div>
 							</li>
 						{/each}

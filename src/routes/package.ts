@@ -101,6 +101,11 @@ export const package_json = {
 			svelte: './dist/Bit_List.svelte',
 			default: './dist/Bit_List.svelte',
 		},
+		'./Bit_Listitem.svelte': {
+			types: './dist/Bit_Listitem.svelte.d.ts',
+			svelte: './dist/Bit_Listitem.svelte',
+			default: './dist/Bit_Listitem.svelte',
+		},
 		'./Bit_Picker.svelte': {
 			types: './dist/Bit_Picker.svelte.d.ts',
 			svelte: './dist/Bit_Picker.svelte',
@@ -222,6 +227,11 @@ export const package_json = {
 			svelte: './dist/Content_Stats.svelte',
 			default: './dist/Content_Stats.svelte',
 		},
+		'./Contextmenu_Bit.svelte': {
+			types: './dist/Contextmenu_Bit.svelte.d.ts',
+			svelte: './dist/Contextmenu_Bit.svelte',
+			default: './dist/Contextmenu_Bit.svelte',
+		},
 		'./Contextmenu_Chat.svelte': {
 			types: './dist/Contextmenu_Chat.svelte.d.ts',
 			svelte: './dist/Contextmenu_Chat.svelte',
@@ -339,10 +349,10 @@ export const package_json = {
 			svelte: './dist/Diskfile_Info.svelte',
 			default: './dist/Diskfile_Info.svelte',
 		},
-		'./Diskfile_List_Item.svelte': {
-			types: './dist/Diskfile_List_Item.svelte.d.ts',
-			svelte: './dist/Diskfile_List_Item.svelte',
-			default: './dist/Diskfile_List_Item.svelte',
+		'./Diskfile_Listitem.svelte': {
+			types: './dist/Diskfile_Listitem.svelte.d.ts',
+			svelte: './dist/Diskfile_Listitem.svelte',
+			default: './dist/Diskfile_Listitem.svelte',
 		},
 		'./Diskfile_Metrics.svelte': {
 			types: './dist/Diskfile_Metrics.svelte.d.ts',
@@ -684,6 +694,7 @@ export const src_json = {
 			],
 		},
 		'./Bit_List.svelte': {path: 'Bit_List.svelte', declarations: []},
+		'./Bit_Listitem.svelte': {path: 'Bit_Listitem.svelte', declarations: []},
 		'./Bit_Picker.svelte': {path: 'Bit_Picker.svelte', declarations: []},
 		'./Bit_Remove_Button.svelte': {path: 'Bit_Remove_Button.svelte', declarations: []},
 		'./Bit_Stats.svelte': {path: 'Bit_Stats.svelte', declarations: []},
@@ -855,6 +866,7 @@ export const src_json = {
 		'./Content_Editor.svelte': {path: 'Content_Editor.svelte', declarations: []},
 		'./Content_Preview.svelte': {path: 'Content_Preview.svelte', declarations: []},
 		'./Content_Stats.svelte': {path: 'Content_Stats.svelte', declarations: []},
+		'./Contextmenu_Bit.svelte': {path: 'Contextmenu_Bit.svelte', declarations: []},
 		'./Contextmenu_Chat.svelte': {path: 'Contextmenu_Chat.svelte', declarations: []},
 		'./Contextmenu_Copy_To_Clipboard.svelte': {
 			path: 'Contextmenu_Copy_To_Clipboard.svelte',
@@ -902,7 +914,7 @@ export const src_json = {
 			],
 		},
 		'./Diskfile_Info.svelte': {path: 'Diskfile_Info.svelte', declarations: []},
-		'./Diskfile_List_Item.svelte': {path: 'Diskfile_List_Item.svelte', declarations: []},
+		'./Diskfile_Listitem.svelte': {path: 'Diskfile_Listitem.svelte', declarations: []},
 		'./Diskfile_Metrics.svelte': {path: 'Diskfile_Metrics.svelte', declarations: []},
 		'./Diskfile_Picker.svelte': {path: 'Diskfile_Picker.svelte', declarations: []},
 		'./diskfile_types.js': {

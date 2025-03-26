@@ -30,6 +30,7 @@
 		{#snippet icon()}{GLYPH_CHAT}{/snippet}
 		chat
 		{#snippet menu()}
+			<!-- TODO @many maybe a copy submenu on this item with copy id, name, etc, leverage generic cells -->
 			<Contextmenu_Copy_To_Clipboard content={chat.name} label="copy name" />
 
 			{#if chat.tapes.length}

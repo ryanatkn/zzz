@@ -17,14 +17,14 @@ import {
 
 export const Diskfiles_Json = z
 	.object({
-		files: cell_array(
+		diskfiles: cell_array(
 			z.array(Diskfile_Json).default(() => []),
 			'Diskfile',
 		),
 		selected_file_id: Uuid.nullable().default(null),
 	})
 	.default(() => ({
-		files: [],
+		diskfiles: [],
 		selected_file_id: null,
 	}));
 
@@ -90,16 +90,16 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 	// Use the derived index directly
 	non_external_diskfiles: Array<Diskfile> = $derived(this.items.get_derived('non_external_files'));
 
-	onselect?: (file: Diskfile) => void;
+	onselect?: (diskfile: Diskfile) => void;
 
 	constructor(options: Diskfiles_Options) {
 		super(Diskfiles_Json, options);
 
 		this.decoders = {
-			files: (files) => {
-				if (Array.isArray(files)) {
+			diskfiles: (diskfiles) => {
+				if (Array.isArray(diskfiles)) {
 					this.items.clear();
-					for (const file_json of files) {
+					for (const file_json of diskfiles) {
 						this.add(file_json);
 					}
 				}
@@ -215,7 +215,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 	}
 
 	/**
-	 * Select a file by id. Default to the first file if `id` is `undefined`.
+	 * Select a diskfile by id. Default to the first file if `id` is `undefined`.
 	 * If `id` is `null`, it selects no file.
 	 */
 	select(id: Uuid | null | undefined): void {

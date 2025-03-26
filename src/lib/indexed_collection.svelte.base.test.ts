@@ -284,7 +284,7 @@ describe('Indexed_Collection - Advanced Features', () => {
 					query_schema: z.string(),
 				}),
 				create_multi_index({
-					key: 'by_list_item',
+					key: 'by_listitem',
 					extractor: (item) => item.list[0],
 					query_schema: z.string(),
 				}),
@@ -317,9 +317,7 @@ describe('Indexed_Collection - Advanced Features', () => {
 		// Test multi index lookup
 		expect(collection.where<string>('by_category', 'c1')).toHaveLength(3);
 		expect(
-			collection
-				.where<string>('by_list_item', 'l1')
-				.some((item) => item.id === high_number_item.id),
+			collection.where<string>('by_listitem', 'l1').some((item) => item.id === high_number_item.id),
 		).toBe(true);
 
 		// Test derived index

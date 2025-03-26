@@ -34,19 +34,12 @@
 		{#snippet icon()}{GLYPH_PROMPT}{/snippet}
 		prompt
 		{#snippet menu()}
+			<!-- TODO @many maybe a copy submenu on this item with copy id, name, etc, leverage generic cells -->
 			<Contextmenu_Copy_To_Clipboard
 				content={prompt.content}
 				label="copy content"
 				preview={prompt.content_preview}
 			/>
-
-			{#if prompt.name}
-				<Contextmenu_Copy_To_Clipboard
-					content={prompt.name}
-					label="copy name"
-					preview={prompt.name}
-				/>
-			{/if}
 
 			<Contextmenu_Entry
 				run={() => {
@@ -71,8 +64,7 @@
 						return;
 					}
 
-					// TODO: We should show a file selector dialog here
-					// For now, just use the first file
+					// TODO BLOCK show diskfile pick
 					const file = files[0];
 					const file_name = file.path.split('/').pop() || 'unnamed';
 

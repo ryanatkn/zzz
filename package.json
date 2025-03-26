@@ -121,6 +121,11 @@
       "svelte": "./dist/Bit_List.svelte",
       "default": "./dist/Bit_List.svelte"
     },
+    "./Bit_Listitem.svelte": {
+      "types": "./dist/Bit_Listitem.svelte.d.ts",
+      "svelte": "./dist/Bit_Listitem.svelte",
+      "default": "./dist/Bit_Listitem.svelte"
+    },
     "./Bit_Picker.svelte": {
       "types": "./dist/Bit_Picker.svelte.d.ts",
       "svelte": "./dist/Bit_Picker.svelte",
@@ -272,6 +277,11 @@
       "svelte": "./dist/Content_Stats.svelte",
       "default": "./dist/Content_Stats.svelte"
     },
+    "./Contextmenu_Bit.svelte": {
+      "types": "./dist/Contextmenu_Bit.svelte.d.ts",
+      "svelte": "./dist/Contextmenu_Bit.svelte",
+      "default": "./dist/Contextmenu_Bit.svelte"
+    },
     "./Contextmenu_Chat.svelte": {
       "types": "./dist/Contextmenu_Chat.svelte.d.ts",
       "svelte": "./dist/Contextmenu_Chat.svelte",
@@ -389,10 +399,10 @@
       "svelte": "./dist/Diskfile_Info.svelte",
       "default": "./dist/Diskfile_Info.svelte"
     },
-    "./Diskfile_List_Item.svelte": {
-      "types": "./dist/Diskfile_List_Item.svelte.d.ts",
-      "svelte": "./dist/Diskfile_List_Item.svelte",
-      "default": "./dist/Diskfile_List_Item.svelte"
+    "./Diskfile_Listitem.svelte": {
+      "types": "./dist/Diskfile_Listitem.svelte.d.ts",
+      "svelte": "./dist/Diskfile_Listitem.svelte",
+      "default": "./dist/Diskfile_Listitem.svelte"
     },
     "./Diskfile_Metrics.svelte": {
       "types": "./dist/Diskfile_Metrics.svelte.d.ts",

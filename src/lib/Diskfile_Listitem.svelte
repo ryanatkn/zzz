@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
+	import type {SvelteHTMLElements} from 'svelte/elements';
 
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import Contextmenu_Diskfile from '$lib/Contextmenu_Diskfile.svelte';
@@ -8,11 +9,13 @@
 
 	interface Props {
 		diskfile: Diskfile;
-		selected: boolean;
-		onclick: (file: Diskfile) => void;
+		selected?: boolean | undefined;
+		onclick?: ((diskfile: Diskfile) => void) | undefined;
+		compact?: boolean | undefined;
+		attrs?: SvelteHTMLElements['button'] | undefined;
 	}
 
-	const {diskfile, selected, onclick}: Props = $props();
+	const {diskfile, selected, onclick, compact = true, attrs}: Props = $props();
 
 	// TODO BLOCK change to links like the others, probably
 </script>
@@ -20,9 +23,11 @@
 <Contextmenu_Diskfile {diskfile}>
 	<button
 		type="button"
-		class="button_list_item compact"
+		class="listitem"
+		{...attrs}
 		class:selected
-		onclick={() => onclick(diskfile)}
+		class:compact
+		onclick={onclick ? () => onclick(diskfile) : undefined}
 		title="file at {diskfile.path}"
 	>
 		<div class="ellipsis">
