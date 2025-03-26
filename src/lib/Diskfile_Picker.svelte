@@ -36,7 +36,7 @@
 		sort_by_numeric<Diskfile>('size_largest', 'largest first', 'content_length', 'desc'),
 		sort_by_numeric<Diskfile>('size_smallest', 'smallest first', 'content_length', 'asc'),
 	]}
-	default_sort_key="path_asc"
+	sort_key_default="path_asc"
 	show_sort_controls
 	heading="Pick a file"
 >

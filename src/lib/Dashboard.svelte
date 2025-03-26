@@ -2,23 +2,15 @@
 	import {base} from '$app/paths';
 	import type {Snippet} from 'svelte';
 	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
-	import Svg, {type Svg_Data} from '@ryanatkn/fuz/Svg.svelte';
+	import {page} from '$app/state';
+	import {onNavigate} from '$app/navigation';
+	import Svg from '@ryanatkn/fuz/Svg.svelte';
 
 	import Nav_Link from '$lib/Nav_Link.svelte';
 	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
-	import {
-		GLYPH_CAPABILITY,
-		GLYPH_CHAT,
-		GLYPH_FILE,
-		GLYPH_LOG,
-		GLYPH_MODEL,
-		GLYPH_PROMPT,
-		GLYPH_PROVIDER,
-		GLYPH_SETTINGS,
-		GLYPH_SITE,
-		GLYPH_TAB,
-	} from '$lib/glyphs.js';
+	import {GLYPH_SITE, GLYPH_TAB} from '$lib/glyphs.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {main_nav_items_default} from '$lib/nav.js';
 
 	interface Props {
 		children: Snippet;
@@ -33,45 +25,42 @@
 
 	const zzz = zzz_context.get();
 
-	let logo_clicks = $state(0);
+	let futureclicks = $state(0);
+	const FUTURECLICKS = 3;
+	// Track if futureclicks has been activated at least once
+	let futureclicks_activated = $state(false);
+	onNavigate((navigation) => {
+		// Only reset clicks when navigating away from the root page
+		// and we're not already in activated state
+		if (
+			!futureclicks_activated &&
+			navigation.from?.route.id === '/' &&
+			navigation.to?.route.id !== '/'
+		) {
+			console.log('resetting');
+			futureclicks = 0;
+		}
+	});
 
-	interface Nav_Link_Item {
-		label: string;
-		href: string;
-		icon: string | Svg_Data;
-	}
-	interface Nav_Section {
-		group: string;
-		items: Array<Nav_Link_Item>;
-	}
-	const nav_links: Array<Nav_Section> = $derived([
-		{
-			group: 'main',
-			items: [
-				zzz.futuremode ? {label: 'tabs', href: `${base}/tabs`, icon: GLYPH_TAB} : null,
-				{label: 'chats', href: `${base}/chats`, icon: GLYPH_CHAT},
-				{label: 'prompts', href: `${base}/prompts`, icon: GLYPH_PROMPT},
-				{label: 'files', href: `${base}/files`, icon: GLYPH_FILE},
-				zzz.futuremode ? {label: 'sites', href: `${base}/sites`, icon: GLYPH_SITE} : null,
-			].filter((v) => !!v),
-		},
-		{
-			group: 'ai',
-			items: [
-				{label: 'models', href: `${base}/models`, icon: GLYPH_MODEL},
-				{label: 'providers', href: `${base}/providers`, icon: GLYPH_PROVIDER},
-			],
-		},
-		{
-			group: 'system',
-			items: [
-				{label: 'about', href: `${base}/about`, icon: zzz_logo},
-				{label: 'log', href: `${base}/log`, icon: GLYPH_LOG},
-				{label: 'capabilities', href: `${base}/capabilities`, icon: GLYPH_CAPABILITY},
-				{label: 'settings', href: `${base}/settings`, icon: GLYPH_SETTINGS},
-			],
-		},
-	]);
+	const dashboard_nav_items = $derived.by(() => {
+		const nav_items = structuredClone(main_nav_items_default);
+
+		if (zzz.futuremode) {
+			// Add tabs to main group
+			const main_group = nav_items.find((l) => l.group === 'main');
+			if (main_group) {
+				main_group.items.unshift({label: 'tabs', href: `${base}/tabs`, icon: GLYPH_TAB});
+			}
+
+			// Add sites to main group
+			const main_section = nav_items.find((section) => section.group === 'main');
+			if (main_section) {
+				main_section.items.push({label: 'sites', href: `${base}/sites`, icon: GLYPH_SITE});
+			}
+		}
+
+		return nav_items;
+	});
 </script>
 
 <!-- TODO drive with data -->
@@ -87,34 +76,42 @@
 		<div class="p_sm">
 			<!-- TODO support `max_height_100` in Moss -->
 			<nav class="size_lg">
-				<div
-					class="flex p_sm mb_sm"
-					role="none"
-					onclick={() => {
-						logo_clicks++;
-						if (logo_clicks >= 3) {
-							zzz.futuremode = !zzz.futuremode;
-						}
-					}}
-				>
-					<Nav_Link
-						href="{base}/"
-						attrs={{
-							title: 'home',
-							style: 'width: auto; background: transparent',
-							class: 'click_effect_scale',
-						}}
-					>
-						<Svg
-							data={zzz_logo}
-							size="var(--icon_size_md)"
-							fill={zzz.futuremode ? 'var(--color_h_5)' : undefined}
-						/>
-					</Nav_Link>
-				</div>
-
-				{#each nav_links as section (section.group)}
-					{#if section.group !== 'main'}
+				{#each dashboard_nav_items as section (section.group)}
+					{#if section.group === 'main'}
+						<div class="flex p_sm mb_sm">
+							<Nav_Link
+								href="{base}/"
+								attrs={{
+									title: zzz.futuremode ? 'futuremode' : 'home',
+									class: 'click_effect_scale',
+									onclick: () => {
+										if (futureclicks_activated) {
+											// If already activated once, toggle immediately when on root
+											if (page.url.pathname === base + '/') {
+												zzz.futuremode = !zzz.futuremode;
+											}
+										} else {
+											futureclicks++;
+											if (futureclicks >= FUTURECLICKS) {
+												zzz.futuremode = !zzz.futuremode;
+												futureclicks_activated = true;
+											}
+										}
+									},
+								}}
+							>
+								<Svg
+									data={zzz_logo}
+									size="var(--icon_size_md)"
+									fill={zzz.futuremode ? 'var(--color_h_5)' : undefined}
+									attrs={{
+										style: 'transition: transform 200ms ease',
+										class: zzz.futuremode ? 'flip_x' : '',
+									}}
+								/>
+							</Nav_Link>
+						</div>
+					{:else}
 						<div class="size_xl font_serif mt_xl7 mb_md text_color_3">
 							{section.group}
 						</div>

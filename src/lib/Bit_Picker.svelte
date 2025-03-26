@@ -34,7 +34,7 @@
 		sort_by_numeric<Bit_Type>('token_count_highest', 'tokens (most)', 'token_count', 'desc'),
 		sort_by_numeric<Bit_Type>('token_count_lowest', 'tokens (least)', 'token_count', 'asc'),
 	]}
-	default_sort_key="created_newest"
+	sort_key_default="created_newest"
 	show_sort_controls
 	heading="Pick a bit"
 >

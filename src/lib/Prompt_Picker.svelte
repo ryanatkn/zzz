@@ -32,7 +32,7 @@
 		sort_by_numeric('created_newest', 'newest first', 'created_date', 'desc'),
 		sort_by_numeric('created_oldest', 'oldest first', 'created_date', 'asc'),
 	]}
-	default_sort_key="name_asc"
+	sort_key_default="name_asc"
 	show_sort_controls
 	heading="Pick a prompt"
 >

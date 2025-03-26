@@ -26,8 +26,8 @@ export class Sortable<T> {
 	/**
 	 * Optional thunk to get the current default sort key reactively.
 	 */
-	#default_key_getter: Thunk<string | undefined> | undefined;
-	default_key: string | undefined = $derived.by(() => this.#default_key_getter?.());
+	#key_getter_default: Thunk<string | undefined> | undefined;
+	default_key: string | undefined = $derived.by(() => this.#key_getter_default?.());
 
 	/** Current active sort key */
 	active_key: string = $state('');
@@ -62,16 +62,16 @@ export class Sortable<T> {
 	 *
 	 * @param items_getter Function that returns the current items array
 	 * @param sorters_getter Function that returns the current sorters
-	 * @param default_key_getter Optional function that returns the current default sort key
+	 * @param key_getter_default Optional function that returns the current default sort key
 	 */
 	constructor(
 		items_getter: Thunk<Array<T>>,
 		sorters_getter: Thunk<Array<Sorter<T>>>,
-		default_key_getter?: Thunk<string | undefined>,
+		key_getter_default?: Thunk<string | undefined>,
 	) {
 		this.#items_getter = items_getter;
 		this.#sorters_getter = sorters_getter;
-		this.#default_key_getter = default_key_getter;
+		this.#key_getter_default = key_getter_default;
 
 		// Initialize active key from sorters or default
 		this.update_active_key();

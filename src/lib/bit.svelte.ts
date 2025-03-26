@@ -109,7 +109,7 @@ export abstract class Bit<T extends z.ZodType = typeof Bit_Base_Json> extends Ce
 	title: string | null = $state()!;
 	summary: string | null = $state()!;
 
-	default_xml_tag_name: string = $derived.by(() =>
+	xml_tag_name_default: string = $derived.by(() =>
 		this.type === 'diskfile' ? 'file' : 'fragment',
 	);
 

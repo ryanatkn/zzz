@@ -12,8 +12,6 @@
 	const zzz = zzz_context.get();
 
 	const reorderable = new Reorderable();
-
-	$inspect('zzz.chats.items.all.length', zzz.chats.items.all.length);
 </script>
 
 <div class="flex w_100 h_100">

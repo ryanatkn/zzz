@@ -329,6 +329,9 @@ a.chip {
 .ml_xs2 {
 	margin-left: var(--space_xs2);
 }
+.mr_md {
+	margin-right: var(--space_md);
+}
 .mr_xl {
 	margin-right: var(--space_xl);
 }
@@ -608,6 +611,9 @@ a.chip {
 }
 .text_align_left {
 	text-align: left;
+}
+.text_align_right {
+	text-align: right;
 }
 .text_color_3 {
 	color: var(--text_color_3);

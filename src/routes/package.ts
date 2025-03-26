@@ -970,6 +970,8 @@ export const src_json = {
 				{name: 'GLYPH_MODEL', kind: 'variable'},
 				{name: 'GLYPH_MESSAGE', kind: 'variable'},
 				{name: 'GLYPH_LOG', kind: 'variable'},
+				{name: 'GLYPH_TAB', kind: 'variable'},
+				{name: 'GLYPH_SITE', kind: 'variable'},
 				{name: 'GLYPH_CAPABILITY', kind: 'variable'},
 				{name: 'GLYPH_SETTINGS', kind: 'variable'},
 				{name: 'GLYPH_ECHO', kind: 'variable'},

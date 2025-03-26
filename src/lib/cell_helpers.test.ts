@@ -127,16 +127,16 @@ describe('get_schema_class_info', () => {
 	test('handles ZodDefault containing a ZodArray', () => {
 		// Create array schema and wrap in ZodDefault
 		const array_schema = z.array(z.string());
-		const default_array_schema = array_schema.default([]);
+		const array_schema_default = array_schema.default([]);
 
 		// We can see what the internal structure of ZodDefault looks like
-		expect(default_array_schema._def).toBeDefined();
-		expect(default_array_schema._def.typeName).toBe('ZodDefault');
-		expect(default_array_schema._def.innerType).toBeDefined();
-		expect(default_array_schema._def.innerType._def.typeName).toBe('ZodArray');
+		expect(array_schema_default._def).toBeDefined();
+		expect(array_schema_default._def.typeName).toBe('ZodDefault');
+		expect(array_schema_default._def.innerType).toBeDefined();
+		expect(array_schema_default._def.innerType._def.typeName).toBe('ZodArray');
 
 		// Now test the function with our default-wrapped array
-		const info = get_schema_class_info(default_array_schema);
+		const info = get_schema_class_info(array_schema_default);
 
 		// The function should see through the ZodDefault to the ZodArray inside
 		expect(info?.type).toBe('ZodArray');

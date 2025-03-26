@@ -10,7 +10,7 @@ interface Simple_Bit {
 	has_xml_tag: boolean;
 	xml_tag_name: string;
 	type: string;
-	default_xml_tag_name: string;
+	xml_tag_name_default: string;
 	relative_path?: string; // Add this property for diskfile tests
 	attributes: Array<{
 		id: string;
@@ -29,7 +29,7 @@ const create_bit = (partial: Partial<Simple_Bit> = {}): Simple_Bit => {
 		has_xml_tag: false,
 		xml_tag_name: '',
 		type,
-		default_xml_tag_name: type === 'diskfile' ? 'file' : 'fragment',
+		xml_tag_name_default: type === 'diskfile' ? 'file' : 'fragment',
 		attributes: [],
 		...partial,
 	};
@@ -72,7 +72,7 @@ test('format_prompt_content - wraps content with XML tags when specified', () =>
 	expect(result).toBe('<system>\nContent with tag\n</system>');
 });
 
-test('format_prompt_content - uses default_xml_tag_name when no XML tag name is provided', () => {
+test('format_prompt_content - uses xml_tag_name_default when no XML tag name is provided', () => {
 	const bits = [
 		create_bit({
 			content: 'Content with default tag',

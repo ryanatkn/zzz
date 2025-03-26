@@ -8,8 +8,10 @@
 	import {pkg_context} from '$routes/pkg.js';
 	import External_Link from '$lib/External_Link.svelte';
 	import Footer from '$routes/Footer.svelte';
+	import {zzz_context} from '$lib/zzz.svelte.js';
 
 	const pkg = pkg_context.get();
+	const zzz = zzz_context.get();
 
 	// TODO standardize
 </script>
@@ -202,6 +204,48 @@
 			<External_Link href="https://bsky.app/profile/ryanatkn.com">Bluesky</External_Link>.
 		</p>
 	</section>
+	<hr />
+	<section>
+		<h2 class="mb_lg">into the future</h2>
+		<p class="mb_md">
+			This project has a huge scope and I want to get user feedback early. What you're seeing is a
+			small fraction of the idea - especially if you're viewing this on the website not natively via
+			Node - so here's a button for seeing some of what's planned:
+		</p>
+		<button
+			type="button"
+			class:color_h={zzz.futuremode}
+			onclick={() => {
+				zzz.futuremode = !zzz.futuremode;
+			}}
+		>
+			<Svg
+				data={zzz_logo}
+				size="var(--icon_size_sm)"
+				fill={zzz.futuremode ? 'var(--color_h_5)' : 'var(--text_color)'}
+				attrs={{
+					class: 'mr_md' + (zzz.futuremode ? ' flip_x' : ''),
+					style: 'transition: transform 200ms ease',
+				}}
+			/>
+			<span
+				><span class="inline_block text_align_right" style:width="6ch"
+					>{zzz.futuremode ? 'disable' : 'enable'}</span
+				>
+				futuremode</span
+			>
+			<Svg
+				data={zzz_logo}
+				size="var(--icon_size_sm)"
+				fill={zzz.futuremode ? 'var(--color_h_5)' : 'var(--text_color)'}
+				attrs={{
+					class: 'ml_md' + (zzz.futuremode ? '' : ' flip_x'),
+					style: 'transition: transform 200ms ease',
+				}}
+			/>
+		</button>
+	</section>
+	<hr />
 	<section>
 		<div class="panel p_md width_md">
 			<Package_Detail {pkg} />

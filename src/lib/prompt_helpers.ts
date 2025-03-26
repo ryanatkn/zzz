@@ -18,7 +18,7 @@ export const format_prompt_content = (bits: Array<Bit_Type>): string => {
 			continue;
 		}
 
-		const xml_tag_name = bit.xml_tag_name.trim() || bit.default_xml_tag_name;
+		const xml_tag_name = bit.xml_tag_name.trim() || bit.xml_tag_name_default;
 
 		// Build attributes string efficiently
 		let attrs = '';

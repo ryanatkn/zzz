@@ -18,7 +18,7 @@
 		filter,
 		exclude_ids,
 		sorters = EMPTY_ARRAY,
-		default_sort_key,
+		sort_key_default,
 		show_sort_controls = false,
 		no_items_message = 'No items available',
 		heading = null,
@@ -35,7 +35,7 @@
 		filter?: ((item: T) => boolean) | undefined;
 		exclude_ids?: Array<Uuid> | undefined;
 		sorters?: Array<Sorter<T>> | undefined;
-		default_sort_key?: string | undefined;
+		sort_key_default?: string | undefined;
 		show_sort_controls?: boolean | undefined;
 		no_items_message?: string | undefined;
 		heading?: string | null | undefined;
@@ -70,7 +70,7 @@
 				{filter}
 				{exclude_ids}
 				{sorters}
-				{default_sort_key}
+				{sort_key_default}
 				{show_sort_controls}
 				{no_items_message}
 			>

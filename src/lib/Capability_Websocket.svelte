@@ -67,7 +67,7 @@
 	};
 
 	// Check if the current URL is the default
-	const is_default_url = $derived(socket.url_input === PUBLIC_WEBSOCKET_URL);
+	const is_default_url = $derived(socket.url_input === PUBLIC_WEBSOCKET_URL); // TODO maybe move to `socket.url_input_is_default`
 </script>
 
 <!-- Main control section with flex layout for wide screens -->

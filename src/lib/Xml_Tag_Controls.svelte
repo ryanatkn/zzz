@@ -19,7 +19,7 @@
 		<label
 			class="row mb_0 pr_md"
 			title="when enabled, the prompt's content will be wrapped with the xml tag '{bit.xml_tag_name ||
-				bit.default_xml_tag_name}'"
+				bit.xml_tag_name_default}'"
 		>
 			<input
 				class="plain compact"
@@ -37,7 +37,7 @@
 		<input
 			class="plain flex_1 compact"
 			class:dormant={!bit.has_xml_tag}
-			placeholder={bit.has_xml_tag ? GLYPH_PLACEHOLDER + ' ' + bit.default_xml_tag_name : undefined}
+			placeholder={bit.has_xml_tag ? GLYPH_PLACEHOLDER + ' ' + bit.xml_tag_name_default : undefined}
 			bind:value={bit.xml_tag_name}
 			bind:this={input_el}
 		/>
