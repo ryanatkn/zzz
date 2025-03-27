@@ -9,6 +9,8 @@
 	import Diskfile_Listitem from '$lib/Diskfile_Listitem.svelte';
 	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
 	import {GLYPH_DIRECTORY, GLYPH_CREATE_FILE, GLYPH_CREATE_FOLDER} from '$lib/glyphs.js';
+	import Sortable_List from '$lib/Sortable_List.svelte';
+	import {sort_by_text} from '$lib/sortable.svelte.js';
 
 	interface Props {
 		empty?: Snippet | undefined;
@@ -23,17 +25,8 @@
 	const TODO_create_file_pending = false;
 	const TODO_create_folder_pending = false;
 
-	// TODO add a select with name, name_reverse, created, created_reverse, updated, updated_reverse
-	const sorted_diskfiles: Array<Diskfile> = $derived(
-		[...diskfiles.non_external_diskfiles].sort((a, b) => {
-			// Handle null/undefined path values
-			if (!a.path && !b.path) return 0;
-			if (!a.path) return 1; // null paths go last
-			if (!b.path) return -1; // null paths go last
-
-			return a.path.localeCompare(b.path);
-		}),
-	);
+	// Create a filter for non-external diskfiles
+	const non_external_filter = (diskfile: Diskfile): boolean => !diskfile.external;
 
 	// TODO improve UX to not use alert/prompt
 	const create_file = () => {
@@ -98,25 +91,30 @@
 				</Pending_Button>
 			</div>
 		</div>
-		{#if sorted_diskfiles.length === 0}
-			{#if empty}
-				{@render empty()}
-			{:else}
-				<div class="p_xs font_mono">[no files available]</div>
-			{/if}
-		{:else}
-			<ul class="unstyled">
-				{#each sorted_diskfiles as diskfile (diskfile.id)}
-					{@const selected = diskfiles.selected_file_id === diskfile.id}
-					<li transition:slide class:selected>
-						<Diskfile_Listitem
-							{diskfile}
-							{selected}
-							onclick={() => zzz.url_params.update_url('file', diskfile.id)}
-						/>
-					</li>
-				{/each}
-			</ul>
+
+		<!-- TODO @many why is the cast needed? -->
+		<Sortable_List
+			items={diskfiles.items}
+			filter={non_external_filter}
+			show_sort_controls={true}
+			sorters={[sort_by_text<Diskfile>('path_asc', 'path (a-z)', 'path_relative')]}
+			sort_key_default="path_asc"
+			no_items_message={empty ? undefined : '[no files available]'}
+		>
+			{#snippet children(diskfile)}
+				{@const selected = diskfiles.selected_file_id === diskfile.id}
+				<div class:selected transition:slide>
+					<Diskfile_Listitem
+						{diskfile}
+						{selected}
+						onclick={() => zzz.url_params.update_url('file', diskfile.id)}
+					/>
+				</div>
+			{/snippet}
+		</Sortable_List>
+
+		{#if empty && diskfiles.items.all.filter(non_external_filter).length === 0}
+			{@render empty()}
 		{/if}
 	{/if}
 </div>

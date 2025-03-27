@@ -469,6 +469,9 @@ a.chip {
 .pr_sm {
 	padding-right: var(--space_sm);
 }
+.pr_xs3 {
+	padding-right: var(--space_xs3);
+}
 .pt_md {
 	padding-top: var(--space_md);
 }

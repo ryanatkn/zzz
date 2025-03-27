@@ -67,8 +67,8 @@
 </script>
 
 {#if show_sort_controls && sortable.sorters.length > 1}
-	<div class="mb_md row flex_wrap gap_xs2">
-		<div>sort by</div>
+	<div class="mb_md row gap_xs2">
+		<small class="pr_xs3 white_space_nowrap">sort by</small>
 		<menu class="unstyled flex flex_wrap justify_content_end gap_xs2">
 			{#each sortable.sorters as sorter}
 				<button
