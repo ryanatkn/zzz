@@ -17,6 +17,7 @@
 		GLYPH_REMOVE,
 	} from '$lib/glyphs.js';
 	import Contextmenu_Copy_To_Clipboard from '$lib/Contextmenu_Copy_To_Clipboard.svelte';
+	import Diskfile_Picker from '$lib/Diskfile_Picker.svelte';
 
 	interface Props extends Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> {
 		prompt: Prompt;
@@ -25,6 +26,8 @@
 	const {prompt, ...rest}: Props = $props();
 
 	const zzz = zzz_context.get();
+
+	let show_diskfile_picker = $state(false);
 </script>
 
 <Contextmenu {...rest} {entries} />
@@ -47,7 +50,6 @@
 						Bit.create(zzz, {
 							type: 'text',
 							content: '',
-							name: 'Text bit',
 						}),
 					);
 				}}
@@ -64,17 +66,7 @@
 						return;
 					}
 
-					// TODO BLOCK show diskfile pick
-					const diskfile = diskfiles[0];
-					const diskfile_name = diskfile.path.split('/').pop() || 'unnamed';
-
-					prompt.add_bit(
-						Bit.create(zzz, {
-							type: 'diskfile',
-							path: diskfile.path,
-							name: diskfile_name,
-						}),
-					);
+					show_diskfile_picker = true;
 				}}
 			>
 				{#snippet icon()}{GLYPH_FILE}{/snippet}
@@ -85,7 +77,6 @@
 					prompt.add_bit(
 						Bit.create(zzz, {
 							type: 'sequence',
-							name: 'sequence bit',
 						}),
 					);
 				}}
@@ -124,3 +115,18 @@
 		{/snippet}
 	</Contextmenu_Submenu>
 {/snippet}
+
+<Diskfile_Picker
+	bind:show={show_diskfile_picker}
+	onpick={(diskfile) => {
+		if (!diskfile) return false;
+
+		prompt.add_bit(
+			Bit.create(zzz, {
+				type: 'diskfile',
+				path: diskfile.path,
+			}),
+		);
+		return true;
+	}}
+/>

@@ -24,7 +24,6 @@
 	import {Bit} from '$lib/bit.svelte.js';
 	import Contextmenu_Prompt from '$lib/Contextmenu_Prompt.svelte';
 	import Diskfile_Picker from '$lib/Diskfile_Picker.svelte';
-	import type {Diskfile} from '$lib/diskfile.svelte.js';
 
 	const zzz = zzz_context.get();
 	const reorderable = new Reorderable();
@@ -44,7 +43,6 @@
 		const bit = Bit.create(zzz, {
 			type: 'text',
 			content: '',
-			name: 'Text bit',
 		});
 
 		zzz.prompts.selected.add_bit(bit);
@@ -65,20 +63,6 @@
 		show_diskfile_picker = true;
 	};
 
-	// Handle picking a diskfile
-	const handle_diskfile_pick = (diskfile: Diskfile | undefined) => {
-		if (!zzz.prompts.selected || !diskfile) return false;
-
-		const bit = Bit.create(zzz, {
-			type: 'diskfile',
-			path: diskfile.path,
-			name: 'name',
-		});
-
-		zzz.prompts.selected.add_bit(bit);
-		return true; // Close the picker
-	};
-
 	// Create and add a Sequence bit
 	const add_sequence_bit = () => {
 		if (!zzz.prompts.selected) return;
@@ -86,7 +70,6 @@
 		const bit = Bit.create(zzz, {
 			type: 'sequence',
 			items: [],
-			name: 'sequence bit',
 		});
 
 		zzz.prompts.selected.add_bit(bit);
@@ -100,7 +83,7 @@
 				type="button"
 				class="plain w_100 justify_content_start"
 				onclick={() => {
-					zzz.prompts.add().add_bit(Bit.create(zzz, {type: 'text', name: 'Default bit'}));
+					zzz.prompts.add().add_bit(Bit.create(zzz, {type: 'text'}));
 				}}
 			>
 				{GLYPH_ADD} new prompt
@@ -153,17 +136,17 @@
 						<div class="flex flex_wrap gap_xs">
 							<button type="button" class="plain size_sm" onclick={add_text_bit}>
 								<div class="row white_space_nowrap">
-									<span class="mr_xs2"><Glyph icon={GLYPH_BIT} /></span> add text bit
+									<span class="mr_xs2"><Glyph icon={GLYPH_BIT} /></span> add text
 								</div>
 							</button>
 							<button type="button" class="plain size_sm" onclick={add_diskfile_bit}>
 								<div class="row white_space_nowrap">
-									<span class="mr_xs2"><Glyph icon={GLYPH_FILE} /></span> add file bit
+									<span class="mr_xs2"><Glyph icon={GLYPH_FILE} /></span> add file
 								</div>
 							</button>
 							<button type="button" class="plain size_sm" onclick={add_sequence_bit}>
 								<div class="row white_space_nowrap">
-									<span class="mr_xs2"><Glyph icon={GLYPH_LIST} /></span> add sequence bit
+									<span class="mr_xs2"><Glyph icon={GLYPH_LIST} /></span> add sequence
 								</div>
 							</button>
 							<Confirm_Button
@@ -171,7 +154,7 @@
 								attrs={{disabled: !zzz.prompts.selected.bits.length, class: 'plain size_sm'}}
 							>
 								<div class="row white_space_nowrap">
-									<span class="mr_xs2"><Glyph icon={GLYPH_REMOVE} /></span> remove all bits
+									<span class="mr_xs2"><Glyph icon={GLYPH_REMOVE} /></span> remove all
 								</div>
 							</Confirm_Button>
 						</div>
@@ -266,4 +249,17 @@
 	{/if}
 </div>
 
-<Diskfile_Picker bind:show={show_diskfile_picker} onpick={handle_diskfile_pick} />
+<Diskfile_Picker
+	bind:show={show_diskfile_picker}
+	onpick={(diskfile) => {
+		if (!zzz.prompts.selected || !diskfile) return false;
+
+		const bit = Bit.create(zzz, {
+			type: 'diskfile',
+			path: diskfile.path,
+		});
+
+		zzz.prompts.selected.add_bit(bit);
+		return true;
+	}}
+/>

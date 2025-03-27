@@ -34,7 +34,6 @@
 		const new_bit = Bit.create(zzz, {
 			type: 'text',
 			content: '',
-			name: 'Sequence item',
 		});
 
 		// Add to global bits collection
