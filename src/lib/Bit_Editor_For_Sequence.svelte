@@ -4,8 +4,8 @@
 	import Content_Preview from '$lib/Content_Preview.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import {Uuid} from '$lib/zod_helpers.js';
-	import {Bit, type Sequence_Bit} from '$lib/bit.svelte.js';
-	import {GLYPH_ADD, GLYPH_BIT} from '$lib/glyphs.js';
+	import type {Sequence_Bit} from '$lib/bit.svelte.js';
+	import {GLYPH_BIT} from '$lib/glyphs.js';
 	import Bit_Picker from '$lib/Bit_Picker.svelte';
 
 	interface Props {
@@ -29,20 +29,6 @@
 		sequence_bit.add(bit_id);
 	};
 
-	// Create a new text bit and add it to the sequence
-	const create_bit = () => {
-		const new_bit = Bit.create(zzz, {
-			type: 'text',
-			content: '',
-		});
-
-		// Add to global bits collection
-		zzz.bits.add(new_bit);
-
-		// Add to this sequence
-		sequence_bit.add(new_bit.id);
-	};
-
 	let show_bit_picker = $state(false);
 </script>
 
@@ -50,9 +36,6 @@
 	<div class="flex gap_xs">
 		<button type="button" class="plain compact" onclick={() => (show_bit_picker = true)}>
 			{GLYPH_BIT} pick bit
-		</button>
-		<button type="button" class="plain compact" onclick={create_bit}>
-			{GLYPH_ADD} add bit
 		</button>
 	</div>
 	<small class="font_mono block">

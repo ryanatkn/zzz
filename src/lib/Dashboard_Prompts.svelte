@@ -1,5 +1,5 @@
 <script lang="ts">
-	import {slide, scale, fade} from 'svelte/transition';
+	import {scale, fade} from 'svelte/transition';
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
 	import {random_item} from '@ryanatkn/belt/random.js';
 
@@ -121,13 +121,47 @@
 	{#if zzz.prompts.selected}
 		<Contextmenu_Prompt prompt={zzz.prompts.selected}>
 			<div class="column_fixed pr_sm">
-				{#if zzz.prompts.selected}
-					<div class="row gap_sm py_xs sticky t_0 b_0 bg">
-						<Copy_To_Clipboard text={zzz.prompts.selected.content} attrs={{class: 'plain'}} />
-						<Prompt_Stats prompt={zzz.prompts.selected} />
+				<div class="column p_sm">
+					<div class="flex justify_content_space_between">
+						<div class="size_lg">
+							<Glyph icon={GLYPH_PROMPT} />
+							{zzz.prompts.selected.name}
+						</div>
+						<Confirm_Button
+							onconfirm={() => zzz.prompts.selected && zzz.prompts.remove(zzz.prompts.selected)}
+							attrs={{
+								title: `remove Prompt ${zzz.prompts.selected.id}`,
+								class: 'plain icon_button',
+							}}
+						>
+							{GLYPH_DELETE}
+							{#snippet popover_button_content()}{GLYPH_DELETE}{/snippet}
+						</Confirm_Button>
 					</div>
-					<Content_Preview content={zzz.prompts.selected.content} />
-				{/if}
+					<div class="column font_mono">
+						<small>{zzz.prompts.selected.id}</small>
+						<small>
+							{zzz.prompts.selected.bits.length}
+							bit{#if zzz.prompts.selected.bits.length !== 1}s{/if}
+						</small>
+						<small>created {zzz.prompts.selected.created_formatted_short_date}</small>
+					</div>
+				</div>
+				<div class="row gap_sm py_xs sticky t_0 b_0 bg">
+					<Copy_To_Clipboard text={zzz.prompts.selected.content} attrs={{class: 'plain'}} />
+					<Prompt_Stats prompt={zzz.prompts.selected} />
+				</div>
+				<Content_Preview content={zzz.prompts.selected.content} />
+				<div class="p_sm mt_xl3">
+					<header class="size_lg mb_lg"><Glyph icon={GLYPH_BIT} /> bits</header>
+					<Bit_List
+						bits={zzz.prompts.selected.bits}
+						prompt={zzz.prompts.selected}
+						onreorder={(from_index, to_index) => {
+							zzz.prompts.selected?.reorder_bits(from_index, to_index);
+						}}
+					/>
+				</div>
 			</div>
 
 			<div class="column_fluid">
@@ -172,45 +206,6 @@
 							</li>
 						{/each}
 					</ul>
-				</div>
-			</div>
-
-			<div class="column_fixed" in:slide>
-				<div class="column p_sm">
-					<div class="flex justify_content_space_between">
-						<div class="size_lg">
-							<Glyph icon={GLYPH_PROMPT} />
-							{zzz.prompts.selected.name}
-						</div>
-						<Confirm_Button
-							onconfirm={() => zzz.prompts.selected && zzz.prompts.remove(zzz.prompts.selected)}
-							attrs={{
-								title: `remove Prompt ${zzz.prompts.selected.id}`,
-								class: 'plain icon_button',
-							}}
-						>
-							{GLYPH_DELETE}
-							{#snippet popover_button_content()}{GLYPH_DELETE}{/snippet}
-						</Confirm_Button>
-					</div>
-					<div class="column font_mono">
-						<small>{zzz.prompts.selected.id}</small>
-						<small>
-							{zzz.prompts.selected.bits.length}
-							bit{#if zzz.prompts.selected.bits.length !== 1}s{/if}
-						</small>
-						<small>created {zzz.prompts.selected.created_formatted_short_date}</small>
-					</div>
-				</div>
-				<div class="p_sm mt_xl3">
-					<header class="size_lg mb_lg"><Glyph icon={GLYPH_BIT} /> bits</header>
-					<Bit_List
-						bits={zzz.prompts.selected.bits}
-						prompt={zzz.prompts.selected}
-						onreorder={(from_index, to_index) => {
-							zzz.prompts.selected?.reorder_bits(from_index, to_index);
-						}}
-					/>
 				</div>
 			</div>
 		</Contextmenu_Prompt>

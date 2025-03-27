@@ -29,6 +29,7 @@
 	<div class="column gap_sm" class:dormant={!bit.enabled}>
 		<div class="flex mb_0 justify_content_space_between">
 			<div class="size_lg m_0">
+				<!-- TODO I like the idea of making this glyph the drag handle (but we probably want dynamic tiles first) -->
 				<span class="mr_xs2"><Glyph icon={get_bit_type_glyph(bit)} /></span>
 				{bit.name}
 			</div>
