@@ -41,7 +41,7 @@ export class Models extends Cell<typeof Models_Json> {
 
 			create_multi_index({
 				key: 'tag',
-				extractor: (model) => model.tags[0], // TODO needs to work for all tags
+				extractor: (model) => model.tags[0], // TODO BLOCK needs to work for all tags
 				query_schema: z.string(),
 				matches: (model) => model.tags.length > 0,
 				result_schema: Model_Schema,

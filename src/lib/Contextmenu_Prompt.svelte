@@ -58,21 +58,21 @@
 			<Contextmenu_Entry
 				run={() => {
 					// Get all available files
-					const files = zzz.diskfiles.items.all;
-					if (!files.length) {
+					const diskfiles = zzz.diskfiles.items.all;
+					if (!diskfiles.length) {
 						alert('No files available. Add files first.'); // eslint-disable-line no-alert
 						return;
 					}
 
 					// TODO BLOCK show diskfile pick
-					const file = files[0];
-					const file_name = file.path.split('/').pop() || 'unnamed';
+					const diskfile = diskfiles[0];
+					const diskfile_name = diskfile.path.split('/').pop() || 'unnamed';
 
 					prompt.add_bit(
 						Bit.create(zzz, {
 							type: 'diskfile',
-							path: file.path,
-							name: file_name,
+							path: diskfile.path,
+							name: diskfile_name,
 						}),
 					);
 				}}

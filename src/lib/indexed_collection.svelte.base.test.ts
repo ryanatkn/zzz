@@ -448,4 +448,68 @@ describe('Indexed_Collection - Array Operations', () => {
 		expect(collection.all[2].text).toBe('a1');
 		expect(collection.all[3].text).toBe('a4');
 	});
+
+	test('remove_first_many efficiently removes items from the beginning', () => {
+		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+			indexes: [
+				create_multi_index({
+					key: 'by_category',
+					extractor: (item) => item.category,
+					query_schema: z.string(),
+				}),
+			],
+		});
+
+		// Add 10 test items
+		const items = [
+			create_item('a1', 'c1', [], 1),
+			create_item('a2', 'c1', [], 2),
+			create_item('a3', 'c1', [], 3),
+			create_item('a4', 'c2', [], 4),
+			create_item('a5', 'c2', [], 5),
+			create_item('a6', 'c2', [], 6),
+			create_item('a7', 'c3', [], 7),
+			create_item('a8', 'c3', [], 8),
+			create_item('a9', 'c3', [], 9),
+			create_item('a10', 'c3', [], 10),
+		];
+
+		collection.add_many(items);
+
+		// Verify initial state
+		expect(collection.size).toBe(10);
+		expect(collection.where('by_category', 'c1').length).toBe(3);
+		expect(collection.where('by_category', 'c2').length).toBe(3);
+		expect(collection.where('by_category', 'c3').length).toBe(4);
+
+		// Remove first 4 items
+		const removed_count = collection.remove_first_many(4);
+
+		// Verify the correct number of items were removed
+		expect(removed_count).toBe(4);
+		expect(collection.size).toBe(6);
+
+		// Verify the correct items were removed (the first 4)
+		expect(collection.all[0].text).toBe('a5');
+		expect(collection.by_id.has(items[0].id)).toBe(false);
+		expect(collection.by_id.has(items[1].id)).toBe(false);
+		expect(collection.by_id.has(items[2].id)).toBe(false);
+		expect(collection.by_id.has(items[3].id)).toBe(false);
+		expect(collection.by_id.has(items[4].id)).toBe(true);
+
+		// Verify indexes were properly updated
+		expect(collection.where('by_category', 'c1').length).toBe(0); // All c1 items removed
+		expect(collection.where('by_category', 'c2').length).toBe(2); // One c2 item removed
+		expect(collection.where('by_category', 'c3').length).toBe(4); // No c3 items removed
+
+		// Test removing more items than exist
+		const remaining_count = collection.remove_first_many(10);
+		expect(remaining_count).toBe(6);
+		expect(collection.size).toBe(0);
+		expect(collection.all).toEqual([]);
+
+		// Test removing from empty collection
+		const no_items_removed = collection.remove_first_many(5);
+		expect(no_items_removed).toBe(0);
+	});
 });

@@ -447,4 +447,56 @@ describe('Indexed_Collection - Edge Cases', () => {
 		expect(stats.array_a_frequency.tag1).toBe(2);
 		expect(stats.array_a_frequency.tag2).toBe(1);
 	});
+
+	test('remove_first_many handles edge cases correctly', () => {
+		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+			indexes: [
+				create_multi_index({
+					key: 'by_string_a',
+					extractor: (item) => item.string_a,
+					query_schema: z.string(),
+				}),
+			],
+		});
+
+		// Test on empty collection
+		expect(collection.remove_first_many(5)).toBe(0);
+		expect(collection.size).toBe(0);
+
+		// Add a few items
+		const items = [create_test_item('a1', 1), create_test_item('a2', 2), create_test_item('a3', 3)];
+		collection.add_many(items);
+		expect(collection.size).toBe(3);
+
+		// Test with zero count
+		expect(collection.remove_first_many(0)).toBe(0);
+		expect(collection.size).toBe(3);
+
+		// Test with negative count
+		expect(collection.remove_first_many(-5)).toBe(0);
+		expect(collection.size).toBe(3);
+
+		// Test removing exactly the number of items that exist
+		expect(collection.remove_first_many(3)).toBe(3);
+		expect(collection.size).toBe(0);
+
+		// Re-add items and test removing more than exist
+		collection.add_many(items);
+		expect(collection.size).toBe(3);
+		expect(collection.remove_first_many(10)).toBe(3);
+		expect(collection.size).toBe(0);
+
+		// Test that indexes are properly updated
+		collection.add_many([
+			create_test_item('a1', 1),
+			create_test_item('a1', 2), // Duplicate string_a
+			create_test_item('a2', 3),
+		]);
+		expect(collection.where('by_string_a', 'a1').length).toBe(2);
+
+		// Remove just the first item
+		collection.remove_first_many(1);
+		expect(collection.size).toBe(2);
+		expect(collection.where('by_string_a', 'a1').length).toBe(1);
+	});
 });

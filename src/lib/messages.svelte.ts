@@ -1,5 +1,4 @@
 import {z} from 'zod';
-import {DEV} from 'esm-env';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Message, Message_Schema} from '$lib/message.svelte.js';
@@ -200,26 +199,6 @@ export class Messages extends Cell<typeof Messages_Json> {
 	}
 
 	/**
-	 * Get messages by any property value.
-	 * A generic helper that fetches messages filtered by any property.
-	 *
-	 * @param property The property name to filter by (must be indexed)
-	 * @param value The value to filter for
-	 * @param limit Maximum number of messages to return (defaults to history_limit)
-	 */
-	by<K extends keyof Message>(property: K, value: Message[K], limit?: number): Array<Message> {
-		// When filtering by type, we use the special 'by_type' index
-		if (property === 'type') {
-			return this.items.latest('by_type', value as Message_Type, limit || this.history_limit);
-		}
-
-		// For other properties, we'd need to add more indexes or implement filtering
-		if (DEV) console.error(`No index available for property: ${property}`);
-
-		return [];
-	}
-
-	/**
 	 * Get the latest N messages of a specific type.
 	 *
 	 * @param type The message type to filter by
@@ -231,33 +210,12 @@ export class Messages extends Cell<typeof Messages_Json> {
 	}
 
 	/**
-	 * Find pings related to pongs using the index.
-	 *
-	 * @param pongs The pong messages
-	 * @returns Array of related ping messages
-	 */
-	get_pings_for_pongs(pongs: Array<Message>): Array<Message> {
-		return pongs
-			.filter((pong) => pong.ping_id !== undefined)
-			.map((pong) => this.items.by_id.get(pong.ping_id!))
-			.filter((ping): ping is Message => ping !== undefined);
-	}
-
-	/**
 	 * Trims the collection to the maximum allowed size by removing oldest messages.
 	 */
 	#trim_to_history_limit(): void {
-		if (this.items.all.length <= this.history_limit) return;
-
-		// Calculate how many items to remove
+		// Calculate how many items to remove and use the optimized method
 		const excess = this.items.all.length - this.history_limit;
-
-		// Remove oldest items one by one to properly update all indexes
-		for (let i = 0; i < excess; i++) {
-			if (this.items.all.length > 0) {
-				const oldest = this.items.all[0];
-				this.items.remove(oldest.id);
-			}
-		}
+		if (excess <= 0) return;
+		this.items.remove_first_many(excess);
 	}
 }

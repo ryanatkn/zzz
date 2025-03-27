@@ -153,9 +153,9 @@
 		}
 
 		// Sync file selection
-		const file_id = zzz.url_params.get_uuid_param('file');
-		if (file_id && zzz.diskfiles.items.by_id.has(file_id)) {
-			zzz.diskfiles.select(file_id);
+		const diskfile_id = zzz.url_params.get_uuid_param('file');
+		if (diskfile_id && zzz.diskfiles.items.by_id.has(diskfile_id)) {
+			zzz.diskfiles.select(diskfile_id);
 		}
 	});
 </script>

@@ -115,6 +115,7 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 		return prompt;
 	}
 
+	// TODO @many look into making these more generic, less manual bookkeeping
 	add_many(prompts_json: Array<Prompt_Json>, first = false): Array<Prompt> {
 		const prompts = prompts_json.map((json) => new Prompt({zzz: this.zzz, json}));
 
@@ -145,6 +146,7 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 		}
 	}
 
+	// TODO @many look into making these more generic, less manual bookkeeping
 	remove_many(prompt_ids: Array<Uuid>): number {
 		// Store the current selected id
 		const current_selected = this.selected_id;

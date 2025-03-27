@@ -472,6 +472,35 @@ export class Indexed_Collection<
 	}
 
 	/**
+	 * Efficiently removes the first n items from the collection.
+	 * This is optimized for trimming operations where items at the beginning
+	 * need to be removed (like in history or log trimming).
+	 *
+	 * @param count Number of items to remove from the beginning
+	 * @returns Number of items actually removed
+	 */
+	remove_first_many(count: number): number {
+		if (count <= 0 || this.all.length === 0) return 0;
+
+		// Cap at array length
+		const actual_count = Math.min(count, this.all.length);
+
+		// Get the items to remove in one go
+		const items_to_remove = this.all.slice(0, actual_count);
+
+		// Update primary collection
+		this.all.splice(0, actual_count);
+
+		// Update indexes
+		for (const item of items_to_remove) {
+			this.by_id.delete(item.id);
+			this.#update_indexes_for_removed_item(item);
+		}
+
+		return actual_count;
+	}
+
+	/**
 	 * Get an item by its id
 	 */
 	get(id: Uuid): T | undefined {

@@ -99,8 +99,8 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 			diskfiles: (diskfiles) => {
 				if (Array.isArray(diskfiles)) {
 					this.items.clear();
-					for (const file_json of diskfiles) {
-						this.add(file_json);
+					for (const diskfile_json of diskfiles) {
+						this.add(diskfile_json);
 					}
 				}
 				return HANDLED;

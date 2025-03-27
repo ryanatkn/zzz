@@ -147,14 +147,14 @@ describe('Diskfile_Bit initialization', () => {
 describe('Diskfile_Bit content access', () => {
 	test('content getter returns diskfile content', () => {
 		const path = TEST_PATHS.DOCUMENT;
-		const file_content = TEST_CONTENT.DOCUMENT;
+		const content = TEST_CONTENT.DOCUMENT;
 
 		const bit = zzz.registry.instantiate('Diskfile_Bit', {
 			type: 'diskfile',
 			path,
 		});
 
-		expect(bit.content).toBe(file_content);
+		expect(bit.content).toBe(content);
 		expect(bit.diskfile).toEqual(test_diskfiles.get(path));
 	});
 
