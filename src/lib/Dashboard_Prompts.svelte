@@ -23,13 +23,19 @@
 	import Content_Preview from '$lib/Content_Preview.svelte';
 	import {Bit} from '$lib/bit.svelte.js';
 	import Contextmenu_Prompt from '$lib/Contextmenu_Prompt.svelte';
+	import Diskfile_Picker from '$lib/Diskfile_Picker.svelte';
+	import type {Diskfile} from '$lib/diskfile.svelte.js';
 
 	const zzz = zzz_context.get();
 	const reorderable = new Reorderable();
 
+	// TODO BLOCK clicking the bits should select them
+
 	// TODO BLOCK history of prompt states using cell builtins/helpers, like file state but generalized for all cells? the json-based, set_json stuff
 
 	// TODO BLOCK the reorderable dashed pattern state isn't working for the xml tag input or attributes
+
+	let show_diskfile_picker = $state(false);
 
 	// Create and add a Text bit
 	const add_text_bit = () => {
@@ -55,17 +61,21 @@
 			return;
 		}
 
-		// TODO BLOCK show diskfile pick
-		const file = files[0];
-		const file_name = file.path.split('/').pop() || 'unnamed';
+		// Show the diskfile picker dialog
+		show_diskfile_picker = true;
+	};
+
+	// Handle picking a diskfile
+	const handle_diskfile_pick = (diskfile: Diskfile | undefined) => {
+		if (!zzz.prompts.selected || !diskfile) return false;
 
 		const bit = Bit.create(zzz, {
 			type: 'diskfile',
-			path: file.path,
-			name: file_name,
+			path: diskfile.path,
 		});
 
 		zzz.prompts.selected.add_bit(bit);
+		return true; // Close the picker
 	};
 
 	// Create and add a Sequence bit
@@ -254,3 +264,5 @@
 		</div>
 	{/if}
 </div>
+
+<Diskfile_Picker bind:show={show_diskfile_picker} onpick={handle_diskfile_pick} />
