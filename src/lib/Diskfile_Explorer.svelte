@@ -7,7 +7,7 @@
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import Diskfile_Listitem from '$lib/Diskfile_Listitem.svelte';
-	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
+	import Glyph from '$lib/Glyph.svelte';
 	import {GLYPH_DIRECTORY, GLYPH_CREATE_FILE, GLYPH_CREATE_FOLDER} from '$lib/glyphs.js';
 	import Sortable_List from '$lib/Sortable_List.svelte';
 	import {sort_by_text} from '$lib/sortable.svelte.js';
@@ -71,7 +71,7 @@
 		<div class="row h_input_height"><Pending_Animation /></div>
 	{:else}
 		<div class="row h_input_height justify_content_space_between py_xs px_xs">
-			<small class="ellipsis"><Glyph_Icon icon={GLYPH_DIRECTORY} /> {zzz.zzz_dir_pathname}</small>
+			<small class="ellipsis"><Glyph icon={GLYPH_DIRECTORY} /> {zzz.zzz_dir_pathname}</small>
 			<div class="flex gap_xs">
 				<Pending_Button
 					pending={TODO_create_file_pending}
@@ -79,7 +79,7 @@
 					title="create file in {zzz.zzz_dir_pathname}"
 					onclick={create_file}
 				>
-					<Glyph_Icon icon={GLYPH_CREATE_FILE} />
+					<Glyph icon={GLYPH_CREATE_FILE} />
 				</Pending_Button>
 				<Pending_Button
 					pending={TODO_create_folder_pending}
@@ -87,7 +87,7 @@
 					title="create folder in {zzz.zzz_dir_pathname}"
 					onclick={create_folder}
 				>
-					<Glyph_Icon icon={GLYPH_CREATE_FOLDER} />
+					<Glyph icon={GLYPH_CREATE_FOLDER} />
 				</Pending_Button>
 			</div>
 		</div>

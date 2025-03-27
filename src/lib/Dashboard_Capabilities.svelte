@@ -1,13 +1,13 @@
 <script lang="ts">
 	import {GLYPH_CAPABILITY} from '$lib/glyphs.js';
-	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
+	import Glyph from '$lib/Glyph.svelte';
 	import Footer from '$routes/Footer.svelte';
 	import Capabilities_View from '$lib/Capabilities_View.svelte';
 </script>
 
 <div class="p_lg">
 	<header>
-		<h1><Glyph_Icon icon={GLYPH_CAPABILITY} /> system capabilities</h1>
+		<h1><Glyph icon={GLYPH_CAPABILITY} /> system capabilities</h1>
 	</header>
 	<section class="width_md">
 		<p>

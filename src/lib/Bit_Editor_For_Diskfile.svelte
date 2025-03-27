@@ -10,7 +10,7 @@
 	import {Diskfile_Editor_State} from '$lib/diskfile_editor_state.svelte.js';
 	import Diskfile_History_View from '$lib/Diskfile_History_View.svelte';
 	import Diskfile_Picker from '$lib/Diskfile_Picker.svelte';
-	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
+	import Glyph from '$lib/Glyph.svelte';
 	import {GLYPH_FILE, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
 
 	interface Props {
@@ -81,7 +81,7 @@
 			show_file_picker = true;
 		}}
 	>
-		<Glyph_Icon icon={GLYPH_FILE} />
+		<Glyph icon={GLYPH_FILE} />
 		<small class="ml_xs2">pick file</small>
 	</button>
 </div>

@@ -2,7 +2,7 @@
 	import Pending_Button from '@ryanatkn/fuz/Pending_Button.svelte';
 	import {slide} from 'svelte/transition';
 
-	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
+	import Glyph from '$lib/Glyph.svelte';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import {Chat} from '$lib/chat.svelte.js';
 	import Model_Selector from '$lib/Model_Selector.svelte';
@@ -194,7 +194,7 @@
 						<!-- TODO needs work -->
 						<div class="flex justify_content_space_between">
 							<div class="size_lg">
-								<Glyph_Icon icon={GLYPH_CHAT} />
+								<Glyph icon={GLYPH_CHAT} />
 								{zzz.chats.selected.name}
 							</div>
 							<Confirm_Button
@@ -219,16 +219,16 @@
 				</div>
 			{/if}
 			<div class="p_sm">
-				<header class="mt_0 mb_lg size_lg"><Glyph_Icon icon={GLYPH_TAPE} /> tapes</header>
+				<header class="mt_0 mb_lg size_lg"><Glyph icon={GLYPH_TAPE} /> tapes</header>
 				<Tape_List {chat} />
 			</div>
 			<div class="p_sm">
-				<header class="mt_0 mb_lg size_lg"><Glyph_Icon icon={GLYPH_PROMPT} /> prompts</header>
+				<header class="mt_0 mb_lg size_lg"><Glyph icon={GLYPH_PROMPT} /> prompts</header>
 				<Prompt_List {chat} />
 			</div>
 			<!-- TODO maybe show `Bit_List` with the `prompt bits` header here in -->
 			<div class="p_sm">
-				<header class="mt_0 mb_lg size_lg"><Glyph_Icon icon={GLYPH_BIT} /> all bits</header>
+				<header class="mt_0 mb_lg size_lg"><Glyph icon={GLYPH_BIT} /> all bits</header>
 				<Bit_List bits={chat.bits_array} />
 			</div>
 		</div>

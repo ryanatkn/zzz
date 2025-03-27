@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Provider_Link from '$lib/Provider_Link.svelte';
 	import Model_Link from '$lib/Model_Link.svelte';
-	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
+	import Glyph from '$lib/Glyph.svelte';
 	import {GLYPH_PROVIDER} from '$lib/glyphs.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import External_Link from '$lib/External_Link.svelte';
@@ -10,7 +10,7 @@
 </script>
 
 <div class="p_lg">
-	<h1><Glyph_Icon icon={GLYPH_PROVIDER} /> providers</h1>
+	<h1><Glyph icon={GLYPH_PROVIDER} /> providers</h1>
 	<div class="providers_grid">
 		{#each zzz.providers.items as provider (provider)}
 			<div class="panel p_lg">

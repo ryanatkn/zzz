@@ -2,7 +2,7 @@
 	import type {Bit_Type} from '$lib/bit.svelte.js';
 	import Xml_Tag_Controls from '$lib/Xml_Tag_Controls.svelte';
 	import Bit_Stats from '$lib/Bit_Stats.svelte';
-	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
+	import Glyph from '$lib/Glyph.svelte';
 	import {get_bit_type_glyph} from '$lib/bit_helpers.js';
 	import Bit_Editor_For_Text from '$lib/Bit_Editor_For_Text.svelte';
 	import Contextmenu_Bit from '$lib/Contextmenu_Bit.svelte';
@@ -29,7 +29,7 @@
 	<div class="column gap_sm" class:dormant={!bit.enabled}>
 		<div class="flex mb_0 justify_content_space_between">
 			<div class="size_lg m_0">
-				<span class="mr_xs2"><Glyph_Icon icon={get_bit_type_glyph(bit)} /></span>
+				<span class="mr_xs2"><Glyph icon={get_bit_type_glyph(bit)} /></span>
 				{bit.name}
 			</div>
 			<div class="flex gap_xs">

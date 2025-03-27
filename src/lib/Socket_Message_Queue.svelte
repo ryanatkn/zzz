@@ -5,7 +5,7 @@
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
 
 	import type {Socket, Queued_Message, Failed_Message} from '$lib/socket.svelte.js';
-	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
+	import Glyph from '$lib/Glyph.svelte';
 	import {GLYPH_RETRY, GLYPH_REMOVE, GLYPH_INFO} from '$lib/glyphs.js';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Popover_Button from '$lib/Popover_Button.svelte';
@@ -138,7 +138,7 @@
 							onclick={retry_selected}
 							transition:slide
 						>
-							<Glyph_Icon icon={GLYPH_RETRY} />
+							<Glyph icon={GLYPH_RETRY} />
 						</button>
 					{/if}
 
@@ -147,7 +147,7 @@
 						popover_button_attrs={{class: 'icon_button color_c bg_c_1 size_sm'}}
 						attrs={{class: 'icon_button plain', title: 'remove selected messages'}}
 					>
-						<Glyph_Icon icon={GLYPH_REMOVE} />
+						<Glyph icon={GLYPH_REMOVE} />
 					</Confirm_Button>
 				</div>
 			{/if}
@@ -240,7 +240,7 @@
 								position="left"
 								attrs={{class: 'icon_button plain size_sm', title: 'view message details'}}
 							>
-								<Glyph_Icon icon={GLYPH_INFO} size="var(--size_lg)" />
+								<Glyph icon={GLYPH_INFO} size="var(--size_lg)" />
 								{#snippet popover_content(popover)}
 									<div
 										class="p_md overflow_auto bg shadow_bottom_md"
@@ -275,7 +275,7 @@
 									title="retry message"
 									onclick={() => retry_queued_message(message)}
 								>
-									<Glyph_Icon icon={GLYPH_RETRY} />
+									<Glyph icon={GLYPH_RETRY} />
 								</button>
 							{/if}
 
@@ -285,7 +285,7 @@
 								popover_button_attrs={{class: 'icon_button color_c bg_c_1 size_sm'}}
 								attrs={{class: 'icon_button plain size_sm', title: 'remove message'}}
 							>
-								<Glyph_Icon icon={GLYPH_REMOVE} />
+								<Glyph icon={GLYPH_REMOVE} />
 							</Confirm_Button>
 						</div>
 					</div>

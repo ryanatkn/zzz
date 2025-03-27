@@ -30,7 +30,7 @@ textarea {
 	transform: scale(1.14);
 }
 
-/* TODO refactor with `Glyph_Icon`*/
+/* TODO refactor with `Glyph`*/
 .icon_xs {
 	display: flex;
 	align-items: center;

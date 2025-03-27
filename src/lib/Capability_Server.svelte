@@ -4,7 +4,7 @@
 	import {onMount} from 'svelte';
 
 	import {zzz_context} from '$lib/zzz.svelte.js';
-	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
+	import Glyph from '$lib/Glyph.svelte';
 	import {GLYPH_ARROW_RIGHT, GLYPH_CONNECT, GLYPH_REFRESH, GLYPH_RESET} from '$lib/glyphs.js';
 	import Error_Message from '$lib/Error_Message.svelte';
 	import {SERVER_URL} from '$lib/constants.js';
@@ -72,7 +72,7 @@
 			disabled={capabilities.server.status === 'pending'}
 			onclick={() => capabilities.check_server()}
 		>
-			<Glyph_Icon
+			<Glyph
 				icon={capabilities.server.status === 'success' ? GLYPH_REFRESH : GLYPH_CONNECT}
 				size="var(--size_xl)"
 			/>
@@ -94,7 +94,7 @@
 			disabled={capabilities.server.status === 'initial'}
 			onclick={() => capabilities.reset_server()}
 		>
-			<Glyph_Icon icon={GLYPH_RESET} size="var(--size_xl)" />
+			<Glyph icon={GLYPH_RESET} size="var(--size_xl)" />
 			<span class="size_lg font_weight_400 ml_md"> reset </span>
 		</button>
 	</div>

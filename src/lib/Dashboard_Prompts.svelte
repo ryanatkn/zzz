@@ -5,7 +5,7 @@
 
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Nav_Link from '$lib/Nav_Link.svelte';
-	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
+	import Glyph from '$lib/Glyph.svelte';
 	import Bit_View from '$lib/Bit_View.svelte';
 	import {
 		GLYPH_BIT,
@@ -153,17 +153,17 @@
 						<div class="flex flex_wrap gap_xs">
 							<button type="button" class="plain size_sm" onclick={add_text_bit}>
 								<div class="row white_space_nowrap">
-									<span class="mr_xs2"><Glyph_Icon icon={GLYPH_BIT} /></span> add text bit
+									<span class="mr_xs2"><Glyph icon={GLYPH_BIT} /></span> add text bit
 								</div>
 							</button>
 							<button type="button" class="plain size_sm" onclick={add_diskfile_bit}>
 								<div class="row white_space_nowrap">
-									<span class="mr_xs2"><Glyph_Icon icon={GLYPH_FILE} /></span> add file bit
+									<span class="mr_xs2"><Glyph icon={GLYPH_FILE} /></span> add file bit
 								</div>
 							</button>
 							<button type="button" class="plain size_sm" onclick={add_sequence_bit}>
 								<div class="row white_space_nowrap">
-									<span class="mr_xs2"><Glyph_Icon icon={GLYPH_LIST} /></span> add sequence bit
+									<span class="mr_xs2"><Glyph icon={GLYPH_LIST} /></span> add sequence bit
 								</div>
 							</button>
 							<Confirm_Button
@@ -171,7 +171,7 @@
 								attrs={{disabled: !zzz.prompts.selected.bits.length, class: 'plain size_sm'}}
 							>
 								<div class="row white_space_nowrap">
-									<span class="mr_xs2"><Glyph_Icon icon={GLYPH_REMOVE} /></span> remove all bits
+									<span class="mr_xs2"><Glyph icon={GLYPH_REMOVE} /></span> remove all bits
 								</div>
 							</Confirm_Button>
 						</div>
@@ -196,7 +196,7 @@
 				<div class="column p_sm">
 					<div class="flex justify_content_space_between">
 						<div class="size_lg">
-							<Glyph_Icon icon={GLYPH_PROMPT} />
+							<Glyph icon={GLYPH_PROMPT} />
 							{zzz.prompts.selected.name}
 						</div>
 						<Confirm_Button
@@ -220,7 +220,7 @@
 					</div>
 				</div>
 				<div class="p_sm mt_xl3">
-					<header class="size_lg mb_lg"><Glyph_Icon icon={GLYPH_BIT} /> bits</header>
+					<header class="size_lg mb_lg"><Glyph icon={GLYPH_BIT} /> bits</header>
 					<Bit_List
 						bits={zzz.prompts.selected.bits}
 						prompt={zzz.prompts.selected}

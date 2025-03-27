@@ -2,7 +2,7 @@
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
 	import {strip_start} from '@ryanatkn/belt/string.js';
 
-	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
+	import Glyph from '$lib/Glyph.svelte';
 	import {GLYPH_PROMPT, GLYPH_RESPONSE, GLYPH_FILE, GLYPH_MESSAGE} from '$lib/glyphs.js';
 	import type {Message} from '$lib/message.svelte.js';
 
@@ -16,13 +16,13 @@
 <div class="mb_md">
 	<div class="size_lg">
 		{#if message.is_prompt}
-			<Glyph_Icon icon={GLYPH_PROMPT} /> Prompt
+			<Glyph icon={GLYPH_PROMPT} /> Prompt
 		{:else if message.is_completion}
-			<Glyph_Icon icon={GLYPH_RESPONSE} /> Response
+			<Glyph icon={GLYPH_RESPONSE} /> Response
 		{:else if message.is_file_related}
-			<Glyph_Icon icon={GLYPH_FILE} /> File {message.type}
+			<Glyph icon={GLYPH_FILE} /> File {message.type}
 		{:else}
-			<Glyph_Icon icon={GLYPH_MESSAGE} /> {message.type}
+			<Glyph icon={GLYPH_MESSAGE} /> {message.type}
 		{/if}
 		<small class="color_subtle ml_xs">{message.direction}</small>
 	</div>

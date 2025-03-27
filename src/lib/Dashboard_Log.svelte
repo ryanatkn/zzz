@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Messages_List from '$lib/Messages_List.svelte';
 	import Message_Detail from '$lib/Message_Detail.svelte';
-	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
+	import Glyph from '$lib/Glyph.svelte';
 	import {GLYPH_LOG} from '$lib/glyphs.js';
 	import type {Message} from '$lib/message.svelte.js';
 
@@ -9,7 +9,7 @@
 </script>
 
 <div class="column p_lg h_100">
-	<h1><Glyph_Icon icon={GLYPH_LOG} /> log</h1>
+	<h1><Glyph icon={GLYPH_LOG} /> log</h1>
 
 	<div
 		class="flex_1 grid mt_md overflow_hidden"

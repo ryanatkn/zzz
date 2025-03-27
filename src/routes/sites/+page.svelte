@@ -1,11 +1,11 @@
 <script lang="ts">
 	import {base} from '$app/paths';
 	import {GLYPH_SITE} from '$lib/glyphs.js';
-	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
+	import Glyph from '$lib/Glyph.svelte';
 </script>
 
 <div class="p_lg">
-	<h1><Glyph_Icon icon={GLYPH_SITE} /> sites</h1>
+	<h1><Glyph icon={GLYPH_SITE} /> sites</h1>
 
 	<section class="width_md">
 		<p>

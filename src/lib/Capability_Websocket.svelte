@@ -8,7 +8,7 @@
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import type {Socket} from '$lib/socket.svelte.js';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
-	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
+	import Glyph from '$lib/Glyph.svelte';
 	import {
 		GLYPH_CONNECT,
 		GLYPH_CANCEL,
@@ -155,7 +155,7 @@
 							}
 						}}
 					>
-						<Glyph_Icon
+						<Glyph
 							icon={socket.connected && socket.url === socket.url_input
 								? GLYPH_DISCONNECT
 								: GLYPH_CONNECT}

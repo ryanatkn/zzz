@@ -441,10 +441,10 @@
       "svelte": "./dist/External_Link.svelte",
       "default": "./dist/External_Link.svelte"
     },
-    "./Glyph_Icon.svelte": {
-      "types": "./dist/Glyph_Icon.svelte.d.ts",
-      "svelte": "./dist/Glyph_Icon.svelte",
-      "default": "./dist/Glyph_Icon.svelte"
+    "./Glyph.svelte": {
+      "types": "./dist/Glyph.svelte.d.ts",
+      "svelte": "./dist/Glyph.svelte",
+      "default": "./dist/Glyph.svelte"
     },
     "./glyphs.js": {
       "types": "./dist/glyphs.d.ts",

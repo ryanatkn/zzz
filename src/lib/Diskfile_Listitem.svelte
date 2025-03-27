@@ -4,7 +4,7 @@
 
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import Contextmenu_Diskfile from '$lib/Contextmenu_Diskfile.svelte';
-	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
+	import Glyph from '$lib/Glyph.svelte';
 	import {GLYPH_FILE} from '$lib/glyphs.js';
 
 	interface Props {
@@ -31,7 +31,7 @@
 		title="file at {diskfile.path}"
 	>
 		<div class="ellipsis">
-			<Glyph_Icon icon={GLYPH_FILE} />
+			<Glyph icon={GLYPH_FILE} />
 			<span
 				>{#if diskfile.path_relative}{diskfile.path_relative}{:else}<Pending_Animation />{/if}</span
 			>

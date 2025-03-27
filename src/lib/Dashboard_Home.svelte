@@ -3,7 +3,7 @@
 
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import Messages_List from '$lib/Messages_List.svelte';
-	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
+	import Glyph from '$lib/Glyph.svelte';
 	import Provider_Link from '$lib/Provider_Link.svelte';
 	import Model_Link from '$lib/Model_Link.svelte';
 	import {GLYPH_LOG, GLYPH_PROVIDER, GLYPH_MODEL} from '$lib/glyphs.js';
@@ -17,7 +17,7 @@
 	<div class="sections mt_lg">
 		<section class="panel p_md mb_0">
 			<div class="mb_lg">
-				<a class="size_xl font_weight_600" href="{base}/log"><Glyph_Icon icon={GLYPH_LOG} /> log</a>
+				<a class="size_xl font_weight_600" href="{base}/log"><Glyph icon={GLYPH_LOG} /> log</a>
 			</div>
 			<Messages_List limit={5} attrs={{class: 'mt_sm'}} />
 		</section>
@@ -25,7 +25,7 @@
 		<section class="panel p_md mb_0">
 			<div class="mb_lg">
 				<a class="size_xl font_weight_600" href="{base}/providers"
-					><Glyph_Icon icon={GLYPH_PROVIDER} /> providers</a
+					><Glyph icon={GLYPH_PROVIDER} /> providers</a
 				>
 			</div>
 			<div>
@@ -46,7 +46,7 @@
 		<section class="panel p_md mb_0">
 			<div class="mb_lg">
 				<a class="size_xl font_weight_600" href="{base}/models"
-					><Glyph_Icon icon={GLYPH_MODEL} /> models</a
+					><Glyph icon={GLYPH_MODEL} /> models</a
 				>
 			</div>
 			<div>

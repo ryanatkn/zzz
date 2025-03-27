@@ -9,7 +9,7 @@
 	import type {Bit_Type} from '$lib/bit.svelte.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import {GLYPH_BIT, GLYPH_DELETE, GLYPH_EDIT} from '$lib/glyphs.js';
-	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
+	import Glyph from '$lib/Glyph.svelte';
 	import Contextmenu_Copy_To_Clipboard from '$lib/Contextmenu_Copy_To_Clipboard.svelte';
 	import Bit_View from '$lib/Bit_View.svelte';
 	import {get_bit_type_glyph} from '$lib/bit_helpers.js';
@@ -67,7 +67,7 @@
 {#if show_editor}
 	<Dialog onclose={() => (show_editor = false)}>
 		<div class="bg p_md radius_sm width_md">
-			<h2 class="mt_0 mb_sm"><Glyph_Icon icon={GLYPH_BIT} /> edit bit</h2>
+			<h2 class="mt_0 mb_sm"><Glyph icon={GLYPH_BIT} /> edit bit</h2>
 			<Bit_View {bit} />
 		</div></Dialog
 	>

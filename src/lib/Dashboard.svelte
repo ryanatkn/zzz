@@ -7,7 +7,7 @@
 	import Svg from '@ryanatkn/fuz/Svg.svelte';
 
 	import Nav_Link from '$lib/Nav_Link.svelte';
-	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
+	import Glyph from '$lib/Glyph.svelte';
 	import {GLYPH_SITE, GLYPH_TAB} from '$lib/glyphs.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import {main_nav_items_default} from '$lib/nav.js';
@@ -121,7 +121,7 @@
 						<Nav_Link href={link.href}>
 							{#snippet children(selected)}
 								{#if typeof link.icon === 'string'}
-									<Glyph_Icon icon={link.icon} attrs={{class: 'icon_xs'}} /> {link.label}
+									<Glyph icon={link.icon} attrs={{class: 'icon_xs'}} /> {link.label}
 								{:else}
 									<span class="icon_xs">
 										<Svg

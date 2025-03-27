@@ -1,6 +1,6 @@
 <script lang="ts">
 	import {GLYPH_SETTINGS} from '$lib/glyphs.js';
-	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
+	import Glyph from '$lib/Glyph.svelte';
 	import Settings from '$lib/Settings.svelte';
 
 	import Footer from '$routes/Footer.svelte';
@@ -11,7 +11,7 @@
 
 <div class="p_lg">
 	<header>
-		<h1><Glyph_Icon icon={GLYPH_SETTINGS} /> system settings</h1>
+		<h1><Glyph icon={GLYPH_SETTINGS} /> system settings</h1>
 	</header>
 	<section class="width_sm">
 		<Settings />

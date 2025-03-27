@@ -3,7 +3,7 @@
 
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import {GLYPH_FILE} from '$lib/glyphs.js';
-	import Glyph_Icon from '$lib/Glyph_Icon.svelte';
+	import Glyph from '$lib/Glyph.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import type {Diskfile_Editor_State} from '$lib/diskfile_editor_state.svelte.js';
 	import Diskfile_Metrics from '$lib/Diskfile_Metrics.svelte';
@@ -21,7 +21,7 @@
 
 <div class="flex flex_column gap_xs w_100">
 	<small class="overflow_wrap_break_all w_100">
-		<Glyph_Icon icon={GLYPH_FILE} />{zzz.diskfiles.to_relative_path(diskfile.path)}
+		<Glyph icon={GLYPH_FILE} />{zzz.diskfiles.to_relative_path(diskfile.path)}
 	</small>
 
 	<small class="font_mono">
