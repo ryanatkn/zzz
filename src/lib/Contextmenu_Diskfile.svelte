@@ -21,12 +21,17 @@
 <Contextmenu {...rest} {entries} />
 
 {#snippet entries()}
+	<!-- TODO maybe show disabled versions? changing what appears isn't great -->
 	{#if diskfile.content}
 		<Contextmenu_Copy_To_Clipboard
 			content={diskfile.content}
 			label="copy file content"
 			preview={diskfile.content_preview}
 		/>
+	{/if}
+
+	{#if diskfile.path_relative}
+		<Contextmenu_Copy_To_Clipboard content={diskfile.path_relative} label="copy file path" />
 	{/if}
 
 	<Contextmenu_Entry
