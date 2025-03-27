@@ -29,7 +29,7 @@
 	const zzz = zzz_context.get();
 	const reorderable = new Reorderable();
 
-	// TODO BLOCK clicking the bits should select them, and then selected one should show its name input
+	// TODO BLOCK clicking the bits should select them, and then selected one should show its name input (or just on hover/tap? what signifier?)
 
 	// TODO BLOCK history of prompt states using cell builtins/helpers, like file state but generalized for all cells? the json-based, set_json stuff
 
