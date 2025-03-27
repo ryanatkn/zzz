@@ -5,7 +5,7 @@
 
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
-	import {GLYPH_ARROW_RIGHT, GLYPH_CONNECT, GLYPH_REFRESH, GLYPH_RESET} from '$lib/glyphs.js';
+	import {GLYPH_ARROW_RIGHT, GLYPH_CONNECT} from '$lib/glyphs.js';
 	import Error_Message from '$lib/Error_Message.svelte';
 	import {SERVER_URL} from '$lib/constants.js';
 	import Ping_Form from '$lib/Ping_Form.svelte';
