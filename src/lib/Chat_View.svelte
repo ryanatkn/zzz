@@ -68,6 +68,8 @@
 
 	const count = $derived(chat.tapes.length);
 
+	// TODO BLOCK probably put this behind a simplified chat interface with an "advanced" button
+
 	// TODO BLOCK add an enable button/state like with prompt bits
 
 	// TODO BLOCK show a list of tapes in a panel like with prompt bits
@@ -83,36 +85,40 @@
 	// TODO BLOCK remove all tapes needs to open to the right of the button
 
 	const tags = $derived(Array.from(zzz.tags)); // TODO BLOCK refactor, maybe `zzz.tags_array`? or `zzz.tags.all`
+
+	const selected_chat = $derived(zzz.chats.selected);
 </script>
 
 <div class="flex_1 h_100 flex align_items_start">
 	<div class="column_fixed column">
 		<div class="column gap_md">
-			{#if zzz.chats.selected}
+			{#if selected_chat}
 				<div transition:slide>
 					<div class="column p_sm">
 						<!-- TODO needs work -->
 						<div class="flex justify_content_space_between">
 							<div class="size_lg">
 								<Glyph icon={GLYPH_CHAT} />
-								{zzz.chats.selected.name}
+								{selected_chat.name}
 							</div>
+						</div>
+						<div class="row">
 							<Confirm_Button
 								onconfirm={() => zzz.chats.selected_id && zzz.chats.remove(zzz.chats.selected_id)}
-								attrs={{title: `delete chat "${zzz.chats.selected.name}"`, class: 'plain'}}
+								attrs={{title: `delete chat "${selected_chat.name}"`, class: 'plain'}}
 							>
 								{GLYPH_DELETE}
 								{#snippet popover_button_content()}{GLYPH_DELETE}{/snippet}
 							</Confirm_Button>
 						</div>
-						<div class="column font_mono">
-							<small>{zzz.chats.selected.id}</small>
-							<small title={zzz.chats.selected.created_formatted_date}
-								>created {zzz.chats.selected.created_formatted_short_date}</small
+						<div class="font_mono">
+							<small>{selected_chat.id}</small>
+							<small title={selected_chat.created_formatted_date}
+								>created {selected_chat.created_formatted_short_date}</small
 							>
 							<small>
-								{zzz.chats.selected.tapes.length}
-								tape{#if zzz.chats.selected.tapes.length !== 1}s{/if}
+								{selected_chat.tapes.length}
+								tape{#if selected_chat.tapes.length !== 1}s{/if}
 							</small>
 						</div>
 					</div>
@@ -225,7 +231,7 @@
 			</div>
 		</div>
 		<div class="fg_1 p_sm">
-			<header class="mb_md size_lg">add tape with model</header>
+			<header class="mb_md size_lg">add by model</header>
 			<Model_Selector onselect={(model) => chat.add_tape(model)}>
 				{#snippet children(model)}
 					<div>{chat.tapes.filter((t) => t.model.name === model.name).length}</div>
