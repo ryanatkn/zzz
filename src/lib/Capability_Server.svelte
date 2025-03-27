@@ -65,37 +65,23 @@
 		</div>
 	{/if}
 
-	<div class="flex justify_content_space_between gap_md">
+	<div>
 		<button
 			type="button"
 			class="flex_1 justify_content_start"
 			disabled={capabilities.server.status === 'pending'}
 			onclick={() => capabilities.check_server()}
 		>
-			<Glyph
-				icon={capabilities.server.status === 'success' ? GLYPH_REFRESH : GLYPH_CONNECT}
-				size="var(--size_xl)"
-			/>
+			<Glyph icon={GLYPH_CONNECT} size="var(--size_xl)" />
 			<span class="size_lg font_weight_400 ml_md">
 				{#if capabilities.server.status === 'pending'}
 					<div class="inline_flex align_items_end">
 						checking <div class="relative"><Pending_Animation /></div>
 					</div>
-				{:else if capabilities.server.status === 'success'}
-					refresh
 				{:else}
 					check connection
 				{/if}
 			</span>
-		</button>
-		<button
-			type="button"
-			class="flex_1 justify_content_start"
-			disabled={capabilities.server.status === 'initial'}
-			onclick={() => capabilities.reset_server()}
-		>
-			<Glyph icon={GLYPH_RESET} size="var(--size_xl)" />
-			<span class="size_lg font_weight_400 ml_md"> reset </span>
 		</button>
 	</div>
 
