@@ -9,9 +9,9 @@
 
 	<section class="width_md">
 		<p>
-			When installed as a native app, Zzz extends the web browser using the form factor you know
-			well - imagine your current browser, and then add a sidebar on the left like the one on this
-			page.
+			When installed as a native app, Zzz extends the web browser using the form factor you already
+			know well - imagine your current browser, and then add a sidebar on the left like the one on
+			this page.
 		</p>
 		<p>
 			This simple change reimagines the web's UX - instead of being stuck inside tabs and apps,

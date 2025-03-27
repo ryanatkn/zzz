@@ -19,9 +19,9 @@
 		</p>
 		<p>
 			Zzz tries to give us the maximum of the web's capability on all of our devices with minimal
-			dependencies and all-optional third parties. It's designed for extensibility and hackability,
-			and a primary goal is to make managing websites incredibly boring and easy, because owning
-			your web presence should be a cinch.
+			dependencies and optional third parties. It's designed for extensibility and hackability, and
+			a primary goal is to make managing websites incredibly boring and easy, because owning your
+			web presence should be a cinch.
 		</p>
 		<p>More <a href="{base}/about">about</a> Zzz.</p>
 	</section>

@@ -87,6 +87,93 @@
 
 <div class="flex_1 h_100 flex align_items_start">
 	<div class="column_fixed column">
+		<div class="column gap_md">
+			{#if zzz.chats.selected}
+				<div transition:slide>
+					<div class="column p_sm">
+						<!-- TODO needs work -->
+						<div class="flex justify_content_space_between">
+							<div class="size_lg">
+								<Glyph icon={GLYPH_CHAT} />
+								{zzz.chats.selected.name}
+							</div>
+							<Confirm_Button
+								onconfirm={() => zzz.chats.selected_id && zzz.chats.remove(zzz.chats.selected_id)}
+								attrs={{title: `delete chat "${zzz.chats.selected.name}"`, class: 'plain'}}
+							>
+								{GLYPH_DELETE}
+								{#snippet popover_button_content()}{GLYPH_DELETE}{/snippet}
+							</Confirm_Button>
+						</div>
+						<div class="column font_mono">
+							<small>{zzz.chats.selected.id}</small>
+							<small title={zzz.chats.selected.created_formatted_date}
+								>created {zzz.chats.selected.created_formatted_short_date}</small
+							>
+							<small>
+								{zzz.chats.selected.tapes.length}
+								tape{#if zzz.chats.selected.tapes.length !== 1}s{/if}
+							</small>
+						</div>
+					</div>
+				</div>
+			{/if}
+			<div class="p_sm">
+				<header class="mt_0 mb_lg size_lg"><Glyph icon={GLYPH_TAPE} /> tapes</header>
+				<Tape_List {chat} />
+			</div>
+			<div class="p_sm">
+				<header class="mt_0 mb_lg size_lg"><Glyph icon={GLYPH_PROMPT} /> prompts</header>
+				<Prompt_List {chat} />
+			</div>
+			<!-- TODO maybe show `Bit_List` with the `prompt bits` header here in -->
+			<div class="p_sm">
+				<header class="mt_0 mb_lg size_lg"><Glyph icon={GLYPH_BIT} /> all bits</header>
+				<Bit_List bits={chat.bits_array} />
+			</div>
+		</div>
+	</div>
+	<div class="column_fluid">
+		<div class="column_bg_1 p_sm">
+			<Content_Editor
+				bind:this={main_input_el}
+				bind:content={chat.main_input}
+				token_count={chat.main_input_token_count}
+				placeholder="{GLYPH_PLACEHOLDER} to {count}"
+				show_actions
+				show_stats
+			>
+				<Pending_Button
+					{pending}
+					onclick={send_to_all}
+					disabled={!count ? true : undefined}
+					attrs={{class: 'plain'}}
+				>
+					send to {count}
+				</Pending_Button>
+			</Content_Editor>
+
+			<div class="mt_lg">
+				<Confirm_Button
+					onconfirm={() => chat.remove_all_tapes()}
+					position="right"
+					attrs={{disabled: !count, class: 'plain'}}>{GLYPH_REMOVE} remove all</Confirm_Button
+				>
+			</div>
+			<ul class="tapes unstyled mt_lg">
+				{#each chat.tapes as tape (tape.id)}
+					<li>
+						<Chat_Tape
+							{tape}
+							onremove={() => chat.remove_tape(tape.id)}
+							onsend={(input: string) => chat.send_to_tape(tape.id, input)}
+						/>
+					</li>
+				{/each}
+			</ul>
+		</div>
+	</div>
+	<div class="column_fixed">
 		<div class="fg_1">
 			<!-- TODO add user-customizable sets of models -->
 			<div class="flex">
@@ -144,93 +231,6 @@
 					<div>{chat.tapes.filter((t) => t.model.name === model.name).length}</div>
 				{/snippet}
 			</Model_Selector>
-		</div>
-	</div>
-	<div class="column_fluid">
-		<div class="column_bg_1 p_sm">
-			<Content_Editor
-				bind:this={main_input_el}
-				bind:content={chat.main_input}
-				token_count={chat.main_input_token_count}
-				placeholder="{GLYPH_PLACEHOLDER} to {count}"
-				show_actions
-				show_stats
-			>
-				<Pending_Button
-					{pending}
-					onclick={send_to_all}
-					disabled={!count ? true : undefined}
-					attrs={{class: 'plain'}}
-				>
-					send to {count}
-				</Pending_Button>
-			</Content_Editor>
-
-			<div class="mt_lg">
-				<Confirm_Button
-					onconfirm={() => chat.remove_all_tapes()}
-					position="right"
-					attrs={{disabled: !count, class: 'plain'}}>{GLYPH_REMOVE} remove all</Confirm_Button
-				>
-			</div>
-			<ul class="tapes unstyled mt_lg">
-				{#each chat.tapes as tape (tape.id)}
-					<li>
-						<Chat_Tape
-							{tape}
-							onremove={() => chat.remove_tape(tape.id)}
-							onsend={(input: string) => chat.send_to_tape(tape.id, input)}
-						/>
-					</li>
-				{/each}
-			</ul>
-		</div>
-	</div>
-	<div class="column_fixed">
-		<div class="column gap_md">
-			{#if zzz.chats.selected}
-				<div transition:slide>
-					<div class="column p_sm">
-						<!-- TODO needs work -->
-						<div class="flex justify_content_space_between">
-							<div class="size_lg">
-								<Glyph icon={GLYPH_CHAT} />
-								{zzz.chats.selected.name}
-							</div>
-							<Confirm_Button
-								onconfirm={() => zzz.chats.selected_id && zzz.chats.remove(zzz.chats.selected_id)}
-								attrs={{title: `delete chat "${zzz.chats.selected.name}"`, class: 'plain'}}
-							>
-								{GLYPH_DELETE}
-								{#snippet popover_button_content()}{GLYPH_DELETE}{/snippet}
-							</Confirm_Button>
-						</div>
-						<div class="column font_mono">
-							<small>{zzz.chats.selected.id}</small>
-							<small title={zzz.chats.selected.created_formatted_date}
-								>created {zzz.chats.selected.created_formatted_short_date}</small
-							>
-							<small>
-								{zzz.chats.selected.tapes.length}
-								tape{#if zzz.chats.selected.tapes.length !== 1}s{/if}
-							</small>
-						</div>
-					</div>
-				</div>
-			{/if}
-			<div class="p_sm">
-				<header class="mt_0 mb_lg size_lg"><Glyph icon={GLYPH_TAPE} /> tapes</header>
-				<Tape_List {chat} />
-			</div>
-			<div class="p_sm">
-				<header class="mt_0 mb_lg size_lg"><Glyph icon={GLYPH_PROMPT} /> prompts</header>
-				<Prompt_List {chat} />
-			</div>
-			<!-- TODO maybe show `Bit_List` with the `prompt bits` header here in -->
-			<div class="p_sm">
-				<header class="mt_0 mb_lg size_lg"><Glyph icon={GLYPH_BIT} /> all bits</header>
-				<Bit_List bits={chat.bits_array} />
-			</div>
 		</div>
 	</div>
 </div>
