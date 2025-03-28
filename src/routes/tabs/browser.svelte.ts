@@ -56,6 +56,10 @@ export class Browser {
 	submit_edited_url(): void {
 		this.navigate_to(this.edited_url);
 	}
+
+	reorder_tab(from_index: number, to_index: number): void {
+		this.tabs.reorder(from_index, to_index);
+	}
 }
 
 // Browser tab types and interfaces
@@ -234,5 +238,23 @@ export class Browser_Tabs {
 			// Increment the refresh counter to trigger a UI refresh
 			selected_tab.refresh_counter = (selected_tab.refresh_counter || 0) + 1;
 		}
+	}
+
+	reorder(from_index: number, to_index: number): void {
+		const tabs = this.items.all;
+
+		// Bounds checking
+		if (from_index < 0 || from_index >= tabs.length || to_index < 0 || to_index > tabs.length) {
+			return;
+		}
+
+		// Get the tab that needs to be moved
+		const tab_to_move = tabs[from_index];
+
+		// Remove the tab from its current position
+		this.items.all.splice(from_index, 1);
+
+		// Insert the tab at the new position
+		this.items.all.splice(to_index, 0, tab_to_move);
 	}
 }

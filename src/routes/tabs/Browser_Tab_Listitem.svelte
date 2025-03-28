@@ -16,6 +16,7 @@
 	const {tab, index, onselect, onclose}: Props = $props();
 </script>
 
+<!-- TODO the transition is janky because it resizes the content, instead it should just hide with overflow -->
 <div class="browser_tab_container" class:selected={tab.selected} transition:slide={{axis: 'x'}}>
 	<div
 		role="button"

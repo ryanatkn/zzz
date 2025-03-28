@@ -11,6 +11,7 @@ import {
 	validate_reorderable_target_index,
 	set_reorderable_drag_data_transfer,
 } from '$lib/reorderable_helpers.js';
+import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
 
 export type Reorderable_Id = Flavored<string, 'Reorderable_Id'>;
 export type Reorderable_Item_Id = Flavored<string, 'Reorderable_Item_Id'>;
@@ -31,15 +32,15 @@ export type Reorderable_Valid_Drop_Position = Exclude<Reorderable_Drop_Position,
  * Styling configuration for reorderable components.
  */
 export interface Reorderable_Style_Config {
-	list_class: string;
-	item_class: string;
-	dragging_class: string;
-	drag_over_class: string;
-	drag_over_top_class: string;
-	drag_over_bottom_class: string;
-	drag_over_left_class: string;
-	drag_over_right_class: string;
-	invalid_drop_class: string;
+	list_class: string | null;
+	item_class: string | null;
+	dragging_class: string | null;
+	drag_over_class: string | null;
+	drag_over_top_class: string | null;
+	drag_over_bottom_class: string | null;
+	drag_over_left_class: string | null;
+	drag_over_right_class: string | null;
+	invalid_drop_class: string | null;
 }
 
 // Default CSS class names for styling
@@ -59,6 +60,7 @@ export const INVALID_DROP_CLASS_DEFAULT = 'invalid_drop';
 export interface Reorderable_List_Params {
 	onreorder: (from_index: number, to_index: number) => void;
 	can_reorder?: (from_index: number, to_index: number) => boolean;
+	direction?: Reorderable_Direction;
 }
 
 /**
@@ -73,56 +75,70 @@ export interface Reorderable_Item_Params {
  */
 export interface Reorderable_Options {
 	direction?: Reorderable_Direction;
-	list_class?: string;
-	item_class?: string;
-	dragging_class?: string;
-	drag_over_class?: string;
-	drag_over_top_class?: string;
-	drag_over_bottom_class?: string;
-	drag_over_left_class?: string;
-	drag_over_right_class?: string;
-	invalid_drop_class?: string;
+	list_class?: string | null;
+	item_class?: string | null;
+	dragging_class?: string | null;
+	drag_over_class?: string | null;
+	drag_over_top_class?: string | null;
+	drag_over_bottom_class?: string | null;
+	drag_over_left_class?: string | null;
+	drag_over_right_class?: string | null;
+	invalid_drop_class?: string | null;
 }
 
 export class Reorderable implements Reorderable_Style_Config {
-	// List reference
-	list_node: HTMLElement | null = null;
-	list_params: Reorderable_List_Params | null = null;
-
-	// Store both indices and DOM elements by item id
-	indices: Map<Reorderable_Item_Id, number> = new Map();
-	elements: Map<Reorderable_Item_Id, HTMLElement> = new Map();
-
-	cleanup_handlers: Array<() => void> = [];
-
 	// Initialization state
-	initialized = false;
+	initialized = $state(false);
 
 	// Drag state tracking
-	source_index = -1;
-	source_item_id: Reorderable_Item_Id | null = null;
-	reordering_in_progress = false;
+	source_index = $state(-1);
+	source_item_id: Reorderable_Item_Id | null = $state(null);
+	reordering_in_progress = $state(false);
 
 	// Indicator state tracking
-	active_indicator_item_id: Reorderable_Item_Id | null = null;
-	current_indicator: Reorderable_Drop_Position = 'none';
+	active_indicator_item_id: Reorderable_Item_Id | null = $state(null);
+	current_indicator: Reorderable_Drop_Position = $state('none');
 
-	// Direction for drag/drop positioning
-	direction: Reorderable_Direction;
+	// Direction for drag/drop positioning - initialized either in the constructor or list action
+	direction: Reorderable_Direction = $state()!;
 
 	// Unique identifier for this reorderable instance
 	readonly id: Reorderable_Id = `r${Math.random().toString(36).substring(2, 8)}`;
 
 	// Styling configuration
-	list_class: string;
-	item_class: string;
-	dragging_class: string;
-	drag_over_class: string;
-	drag_over_top_class: string;
-	drag_over_bottom_class: string;
-	drag_over_left_class: string;
-	drag_over_right_class: string;
-	invalid_drop_class: string;
+	readonly list_class: string | null;
+	readonly item_class: string | null;
+	readonly dragging_class: string | null;
+	readonly drag_over_class: string | null;
+	readonly drag_over_top_class: string | null;
+	readonly drag_over_bottom_class: string | null;
+	readonly drag_over_left_class: string | null;
+	readonly drag_over_right_class: string | null;
+	readonly invalid_drop_class: string | null;
+
+	readonly classes = $derived.by(() => {
+		const c = [];
+		if (this.list_class) c.push(this.list_class);
+		if (this.item_class) c.push(this.item_class);
+		if (this.dragging_class) c.push(this.dragging_class);
+		if (this.drag_over_class) c.push(this.drag_over_class);
+		if (this.drag_over_top_class) c.push(this.drag_over_top_class);
+		if (this.drag_over_bottom_class) c.push(this.drag_over_bottom_class);
+		if (this.drag_over_left_class) c.push(this.drag_over_left_class);
+		if (this.drag_over_right_class) c.push(this.drag_over_right_class);
+		if (this.invalid_drop_class) c.push(this.invalid_drop_class);
+		return c;
+	});
+
+	// List reference
+	list_node: HTMLElement | null = null;
+	list_params: Reorderable_List_Params | null = null;
+
+	// Store both indices and DOM elements by item id
+	readonly indices: Map<Reorderable_Item_Id, number> = new Map();
+	readonly elements: Map<Reorderable_Item_Id, HTMLElement> = new Map();
+
+	cleanup_handlers: Array<() => void> = [];
 
 	// Pending items collection
 	pending_items: Array<{
@@ -134,18 +150,30 @@ export class Reorderable implements Reorderable_Style_Config {
 	/**
 	 * Create a new Reorderable instance.
 	 */
-	constructor(options?: Reorderable_Options) {
-		// Initialize with defaults
-		this.list_class = options?.list_class || LIST_CLASS_DEFAULT;
-		this.item_class = options?.item_class || ITEM_CLASS_DEFAULT;
-		this.dragging_class = options?.dragging_class || DRAGGING_CLASS_DEFAULT;
-		this.drag_over_class = options?.drag_over_class || DRAG_OVER_CLASS_DEFAULT;
-		this.drag_over_top_class = options?.drag_over_top_class || DRAG_OVER_TOP_CLASS_DEFAULT;
-		this.drag_over_bottom_class = options?.drag_over_bottom_class || DRAG_OVER_BOTTOM_CLASS_DEFAULT;
-		this.drag_over_left_class = options?.drag_over_left_class || DRAG_OVER_LEFT_CLASS_DEFAULT;
-		this.drag_over_right_class = options?.drag_over_right_class || DRAG_OVER_RIGHT_CLASS_DEFAULT;
-		this.invalid_drop_class = options?.invalid_drop_class || INVALID_DROP_CLASS_DEFAULT;
-		this.direction = options?.direction || 'vertical';
+	constructor(options: Reorderable_Options = EMPTY_OBJECT) {
+		const {
+			list_class = LIST_CLASS_DEFAULT,
+			item_class = ITEM_CLASS_DEFAULT,
+			dragging_class = DRAGGING_CLASS_DEFAULT,
+			drag_over_class = DRAG_OVER_CLASS_DEFAULT,
+			drag_over_top_class = DRAG_OVER_TOP_CLASS_DEFAULT,
+			drag_over_bottom_class = DRAG_OVER_BOTTOM_CLASS_DEFAULT,
+			drag_over_left_class = DRAG_OVER_LEFT_CLASS_DEFAULT,
+			drag_over_right_class = DRAG_OVER_RIGHT_CLASS_DEFAULT,
+			invalid_drop_class = INVALID_DROP_CLASS_DEFAULT,
+			direction,
+		} = options;
+
+		this.list_class = list_class;
+		this.item_class = item_class;
+		this.dragging_class = dragging_class;
+		this.drag_over_class = drag_over_class;
+		this.drag_over_top_class = drag_over_top_class;
+		this.drag_over_bottom_class = drag_over_bottom_class;
+		this.drag_over_left_class = drag_over_left_class;
+		this.drag_over_right_class = drag_over_right_class;
+		this.invalid_drop_class = invalid_drop_class;
+		if (direction) this.direction = direction;
 	}
 
 	/**
@@ -190,9 +218,11 @@ export class Reorderable implements Reorderable_Style_Config {
 	 */
 	#reset_drag_state(): void {
 		if (this.source_item_id) {
-			const element = this.elements.get(this.source_item_id);
-			if (element) {
-				element.classList.remove(this.dragging_class);
+			if (this.dragging_class) {
+				const element = this.elements.get(this.source_item_id);
+				if (element) {
+					element.classList.remove(this.dragging_class);
+				}
 			}
 			this.source_item_id = null;
 		}
@@ -223,14 +253,7 @@ export class Reorderable implements Reorderable_Style_Config {
 
 		const element = this.elements.get(this.active_indicator_item_id);
 		if (element) {
-			element.classList.remove(
-				this.drag_over_class,
-				this.drag_over_top_class,
-				this.drag_over_bottom_class,
-				this.drag_over_left_class,
-				this.drag_over_right_class,
-				this.invalid_drop_class,
-			);
+			element.classList.remove(...this.classes);
 		}
 
 		this.active_indicator_item_id = null;
@@ -265,11 +288,11 @@ export class Reorderable implements Reorderable_Style_Config {
 
 		// Apply new indicator classes if needed
 		if (new_indicator !== 'none') {
-			element.classList.add(this.drag_over_class);
+			if (this.drag_over_class) element.classList.add(this.drag_over_class);
 
 			// Add invalid drop class if needed
 			if (!is_valid) {
-				element.classList.add(this.invalid_drop_class);
+				if (this.invalid_drop_class) element.classList.add(this.invalid_drop_class);
 				this.active_indicator_item_id = item_id;
 				this.current_indicator = new_indicator;
 				return;
@@ -278,16 +301,16 @@ export class Reorderable implements Reorderable_Style_Config {
 			// Add specific direction class
 			switch (new_indicator) {
 				case 'top':
-					element.classList.add(this.drag_over_top_class);
+					if (this.drag_over_top_class) element.classList.add(this.drag_over_top_class);
 					break;
 				case 'bottom':
-					element.classList.add(this.drag_over_bottom_class);
+					if (this.drag_over_bottom_class) element.classList.add(this.drag_over_bottom_class);
 					break;
 				case 'left':
-					element.classList.add(this.drag_over_left_class);
+					if (this.drag_over_left_class) element.classList.add(this.drag_over_left_class);
 					break;
 				case 'right':
-					element.classList.add(this.drag_over_right_class);
+					if (this.drag_over_right_class) element.classList.add(this.drag_over_right_class);
 					break;
 				default:
 					throw new Unreachable_Error(new_indicator);
@@ -372,7 +395,7 @@ export class Reorderable implements Reorderable_Style_Config {
 					this.source_item_id = item_id;
 
 					// Add dragging style
-					element.classList.add(this.dragging_class);
+					if (this.dragging_class) element.classList.add(this.dragging_class);
 
 					// Set up drag data with the helper function
 					set_reorderable_drag_data_transfer(e.dataTransfer, item_id);
@@ -568,7 +591,12 @@ export class Reorderable implements Reorderable_Style_Config {
 		}
 
 		// Update direction based on the list's layout if not manually set
-		this.direction = detect_reorderable_direction(node);
+		if (params.direction) {
+			this.direction = params.direction;
+			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+		} else if (!this.direction) {
+			this.direction = detect_reorderable_direction(node);
+		}
 
 		// Store the list params and node
 		this.list_params = params;
@@ -582,7 +610,7 @@ export class Reorderable implements Reorderable_Style_Config {
 		this.source_index = -1;
 
 		// Add the list class and identifier
-		node.classList.add(this.list_class);
+		if (this.list_class) node.classList.add(this.list_class);
 		node.setAttribute('role', 'list');
 		node.dataset.reorderableListId = this.id;
 
@@ -594,13 +622,16 @@ export class Reorderable implements Reorderable_Style_Config {
 			update: (new_params) => {
 				// Update the stored parameters
 				this.list_params = new_params;
+				if (new_params.direction) {
+					this.direction = new_params.direction;
+				}
 			},
 			destroy: () => {
 				// Clean up event handlers
 				this.#cleanup_events();
 
 				// Remove the list class and data attribute
-				node.classList.remove(this.list_class);
+				if (this.list_class) node.classList.remove(this.list_class);
 				node.removeAttribute('role');
 				delete node.dataset.reorderableListId;
 
@@ -634,7 +665,7 @@ export class Reorderable implements Reorderable_Style_Config {
 		}
 
 		node.setAttribute('draggable', 'true');
-		node.classList.add(this.item_class);
+		if (this.item_class) node.classList.add(this.item_class);
 		node.setAttribute('role', 'listitem');
 		node.dataset.reorderableListId = this.id;
 
@@ -659,7 +690,7 @@ export class Reorderable implements Reorderable_Style_Config {
 				this.source_item_id = item_id;
 
 				// Add dragging style
-				node.classList.add(this.dragging_class);
+				if (this.dragging_class) node.classList.add(this.dragging_class);
 
 				// Set up drag data with the helper function
 				set_reorderable_drag_data_transfer(e.dataTransfer, item_id);
@@ -697,7 +728,7 @@ export class Reorderable implements Reorderable_Style_Config {
 				}
 
 				// Remove classes and attributes
-				node.classList.remove(this.item_class);
+				if (this.item_class) node.classList.remove(this.item_class);
 				node.removeAttribute('role');
 				node.removeAttribute('draggable');
 				delete node.dataset.reorderableListId;

@@ -13,6 +13,7 @@
 	import type {Browser} from '$routes/tabs/browser.svelte.js';
 	import Browser_Tab_Content from '$routes/tabs/Browser_Tab_Content.svelte';
 	import Browser_Tab_Listitem from '$routes/tabs/Browser_Tab_Listitem.svelte';
+	import {Reorderable} from '$lib/reorderable.svelte.js';
 
 	interface Props {
 		browser: Browser;
@@ -20,6 +21,9 @@
 	}
 
 	const {browser, children}: Props = $props();
+
+	// Create a reorderable instance for the tabs
+	const tabs_reorderable = new Reorderable({item_class: null}); // remove the normal reorderable item styling
 </script>
 
 <svelte:window
@@ -60,15 +64,21 @@
 	<!-- Browser Chrome/Header -->
 	<div class="browser_chrome">
 		<!-- Tab Bar -->
-		<div class="browser_tab_bar flex overflow_x_auto">
+		<ul
+			class="browser_tab_bar unstyled flex overflow_x_auto"
+			use:tabs_reorderable.list={{
+				onreorder: (from_index, to_index) => browser.reorder_tab(from_index, to_index),
+			}}
+		>
 			{#each browser.tabs.all as tab, index (tab.id)}
-				<!-- TODO the transition is janky because it resizes the content, instead it should just hide with overflow -->
-				<Browser_Tab_Listitem
-					{tab}
-					{index}
-					onselect={(idx) => browser.select_tab(idx)}
-					onclose={(idx) => browser.close_tab(idx)}
-				/>
+				<li class="flex" use:tabs_reorderable.item={{index}}>
+					<Browser_Tab_Listitem
+						{tab}
+						{index}
+						onselect={(idx) => browser.select_tab(idx)}
+						onclose={(idx) => browser.close_tab(idx)}
+					/>
+				</li>
 			{/each}
 			<div class="p_sm">
 				<button
@@ -84,7 +94,7 @@
 					<Glyph icon={GLYPH_ADD} />
 				</button>
 			</div>
-		</div>
+		</ul>
 
 		<!-- Navigation Controls & Address Bar -->
 		<div class="browser_controls flex gap_sm p_xs4">

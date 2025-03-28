@@ -996,6 +996,7 @@ export const src_json = {
 				{name: 'GLYPH_DIRECTION_BOTH', kind: 'variable'},
 				{name: 'GLYPH_EXTERNAL_LINK', kind: 'variable'},
 				{name: 'GLYPH_ARROW_RIGHT', kind: 'variable'},
+				{name: 'GLYPH_ARROW_LEFT', kind: 'variable'},
 				{name: 'get_icon_for_message_type', kind: 'function'},
 				{name: 'get_direction_icon', kind: 'function'},
 			],

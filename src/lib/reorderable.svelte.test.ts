@@ -86,7 +86,7 @@ describe('Reorderable', () => {
 			expect(reorderable.list_params).toBeNull();
 			expect(reorderable.indices.size).toBe(0);
 			expect(reorderable.elements.size).toBe(0);
-			expect(reorderable.direction).toBe('vertical');
+			expect(reorderable.direction).toBe(undefined); // initialized by the list action
 			expect(reorderable.id).toMatch(/^r[a-zA-Z0-9]{6}$/);
 			expect(reorderable.list_class).toBe('reorderable_list');
 			expect(reorderable.item_class).toBe('reorderable_item');
@@ -166,7 +166,7 @@ describe('Reorderable', () => {
 
 			expect(reorderable.list_node).toBe(list);
 			expect(reorderable.list_params).toEqual({onreorder: mock_callback});
-			expect(list.classList.contains(reorderable.list_class)).toBe(true);
+			expect(list.classList.contains(reorderable.list_class!)).toBe(true);
 			expect(list.getAttribute('role')).toBe('list');
 			expect(list.dataset.reorderableListId).toBe(reorderable.id);
 		});
@@ -190,7 +190,7 @@ describe('Reorderable', () => {
 
 			// Before destroy
 			expect(reorderable.list_node).toBe(list);
-			expect(list.classList.contains(reorderable.list_class)).toBe(true);
+			expect(list.classList.contains(reorderable.list_class!)).toBe(true);
 
 			// Destroy
 			if (action_result?.destroy) action_result.destroy();
@@ -198,7 +198,7 @@ describe('Reorderable', () => {
 			// After destroy
 			expect(reorderable.list_node).toBeNull();
 			expect(reorderable.list_params).toBeNull();
-			expect(list.classList.contains(reorderable.list_class)).toBe(false);
+			expect(list.classList.contains(reorderable.list_class!)).toBe(false);
 			expect(list.hasAttribute('role')).toBe(false);
 			expect(list.dataset.reorderableListId).toBeUndefined();
 		});
@@ -224,7 +224,7 @@ describe('Reorderable', () => {
 		test('initializes correctly', () => {
 			action_result = reorderable.item(item, {index: 0});
 
-			expect(item.classList.contains(reorderable.item_class)).toBe(true);
+			expect(item.classList.contains(reorderable.item_class!)).toBe(true);
 			expect(item.getAttribute('draggable')).toBe('true');
 			expect(item.getAttribute('role')).toBe('listitem');
 			expect(item.dataset.reorderableItemId).toBeDefined();
@@ -264,13 +264,13 @@ describe('Reorderable', () => {
 			const item_id = item.dataset.reorderableItemId as Reorderable_Item_Id;
 
 			// Before destroy
-			expect(item.classList.contains(reorderable.item_class)).toBe(true);
+			expect(item.classList.contains(reorderable.item_class!)).toBe(true);
 
 			// Destroy
 			if (action_result?.destroy) action_result.destroy();
 
 			// After destroy
-			expect(item.classList.contains(reorderable.item_class)).toBe(false);
+			expect(item.classList.contains(reorderable.item_class!)).toBe(false);
 			expect(item.hasAttribute('draggable')).toBe(false);
 			expect(item.hasAttribute('role')).toBe(false);
 			expect(item.dataset.reorderableItemId).toBeUndefined();
@@ -311,29 +311,29 @@ describe('Reorderable', () => {
 		test('update_indicator applies correct classes', () => {
 			// Update indicators
 			reorderable.update_indicator(item_id, 'top');
-			expect(item.classList.contains(reorderable.drag_over_class)).toBe(true);
-			expect(item.classList.contains(reorderable.drag_over_top_class)).toBe(true);
+			expect(item.classList.contains(reorderable.drag_over_class!)).toBe(true);
+			expect(item.classList.contains(reorderable.drag_over_top_class!)).toBe(true);
 
 			// Change indicator
 			reorderable.update_indicator(item_id, 'bottom');
-			expect(item.classList.contains(reorderable.drag_over_top_class)).toBe(false);
-			expect(item.classList.contains(reorderable.drag_over_bottom_class)).toBe(true);
+			expect(item.classList.contains(reorderable.drag_over_top_class!)).toBe(false);
+			expect(item.classList.contains(reorderable.drag_over_bottom_class!)).toBe(true);
 
 			// Invalid drop
 			reorderable.update_indicator(item_id, 'left', false);
-			expect(item.classList.contains(reorderable.drag_over_left_class)).toBe(false);
-			expect(item.classList.contains(reorderable.invalid_drop_class)).toBe(true);
+			expect(item.classList.contains(reorderable.drag_over_left_class!)).toBe(false);
+			expect(item.classList.contains(reorderable.invalid_drop_class!)).toBe(true);
 		});
 
 		test('clear_indicators removes all indicator classes', () => {
 			// Add indicator
 			reorderable.update_indicator(item_id, 'right');
-			expect(item.classList.contains(reorderable.drag_over_right_class)).toBe(true);
+			expect(item.classList.contains(reorderable.drag_over_right_class!)).toBe(true);
 
 			// Clear indicators
 			reorderable.clear_indicators();
-			expect(item.classList.contains(reorderable.drag_over_class)).toBe(false);
-			expect(item.classList.contains(reorderable.drag_over_right_class)).toBe(false);
+			expect(item.classList.contains(reorderable.drag_over_class!)).toBe(false);
+			expect(item.classList.contains(reorderable.drag_over_right_class!)).toBe(false);
 		});
 	});
 
@@ -381,7 +381,7 @@ describe('Reorderable', () => {
 			// Check if drag operation was set up
 			expect(reorderable.source_index).toBe(0);
 			expect(reorderable.source_item_id).toBe(item_id);
-			expect(items[0].classList.contains(reorderable.dragging_class)).toBe(true);
+			expect(items[0].classList.contains(reorderable.dragging_class!)).toBe(true);
 			expect(mock_data_transfer.setData).toHaveBeenCalled();
 		});
 
@@ -390,7 +390,7 @@ describe('Reorderable', () => {
 			const item_id = items[0].dataset.reorderableItemId as Reorderable_Item_Id;
 			reorderable.source_index = 0;
 			reorderable.source_item_id = item_id;
-			items[0].classList.add(reorderable.dragging_class);
+			items[0].classList.add(reorderable.dragging_class!);
 
 			// Call reset directly since event might not be handling it properly
 			reorderable.dangerously_reset_drag_state();
@@ -398,7 +398,7 @@ describe('Reorderable', () => {
 			// Check if state was reset
 			expect(reorderable.source_index).toBe(-1);
 			expect(reorderable.source_item_id).toBeNull();
-			expect(items[0].classList.contains(reorderable.dragging_class)).toBe(false);
+			expect(items[0].classList.contains(reorderable.dragging_class!)).toBe(false);
 		});
 	});
 
@@ -572,13 +572,13 @@ describe('Reorderable', () => {
 			const other_id = items[1].dataset.reorderableItemId as Reorderable_Item_Id;
 			reorderable.update_indicator(other_id, 'bottom');
 
-			expect(items[1].classList.contains(reorderable.drag_over_class)).toBe(true);
+			expect(items[1].classList.contains(reorderable.drag_over_class!)).toBe(true);
 
 			// Now try to apply indicators to the source item
 			reorderable.update_indicator(source_id, 'top');
 
 			// Indicators should be cleared instead
-			expect(items[0].classList.contains(reorderable.drag_over_class)).toBe(false);
+			expect(items[0].classList.contains(reorderable.drag_over_class!)).toBe(false);
 			expect(reorderable.active_indicator_item_id).toBeNull();
 			expect(reorderable.current_indicator).toBe('none');
 
@@ -658,12 +658,12 @@ describe('Reorderable', () => {
 			expect(items[0].classList.contains('my_item')).toBe(true);
 
 			// Apply dragging class
-			items[0].classList.add(reorderable.dragging_class);
+			items[0].classList.add(reorderable.dragging_class!);
 			expect(items[0].classList.contains('my_dragging')).toBe(true);
 
 			// Apply indicator
-			items[1].classList.add(reorderable.drag_over_class);
-			items[1].classList.add(reorderable.drag_over_top_class);
+			items[1].classList.add(reorderable.drag_over_class!);
+			items[1].classList.add(reorderable.drag_over_top_class!);
 			expect(items[1].classList.contains('my_drag_over')).toBe(true);
 			expect(items[1].classList.contains('my_drag_over_top')).toBe(true);
 
