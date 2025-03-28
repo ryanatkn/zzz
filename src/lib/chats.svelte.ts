@@ -47,7 +47,7 @@ export class Chats extends Cell<typeof Chats_Json> {
 			// 		);
 			// 	},
 			// 	result_schema: Chat_Schema,
-			// 	on_add: (collection, item) => {
+			// 	onadd: (collection, item) => {
 			// 		// Insert the new chat in the correct position based on creation date
 			// 		const index = collection.findIndex(
 			// 			(existing) => new Date(existing.created).getTime() <= new Date(item.created).getTime(),

@@ -342,13 +342,13 @@ describe('Indexed_Collection - Advanced Features', () => {
 			},
 			query_schema: z.void(),
 			result_schema: stats_schema,
-			on_add: (stats: any, item: any) => {
+			onadd: (stats: any, item: any) => {
 				stats.count++;
 				stats.average = (stats.average * (stats.count - 1) + item.number) / stats.count;
 				stats.unique_values.add(item.category);
 				return stats;
 			},
-			on_remove: (stats: any, item: any, collection: Indexed_Collection<T>) => {
+			onremove: (stats: any, item: any, collection: Indexed_Collection<T>) => {
 				stats.count--;
 				if (stats.count === 0) {
 					stats.average = 0;

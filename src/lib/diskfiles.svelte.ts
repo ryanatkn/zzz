@@ -64,13 +64,13 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 				compute: (collection) => collection.where('by_external_status', 'non_external'),
 				matches: (item) => !item.external,
 				result_schema: Diskfile_Schema,
-				on_add: (collection, item) => {
+				onadd: (collection, item) => {
 					if (!item.external) {
 						collection.push(item);
 					}
 					return collection;
 				},
-				on_remove: (collection, item) => {
+				onremove: (collection, item) => {
 					if (!item.external) {
 						const index = collection.findIndex((f) => f.id === item.id);
 						if (index !== -1) collection.splice(index, 1);

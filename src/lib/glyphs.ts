@@ -12,7 +12,7 @@ export const GLYPH_DRAG = '≡'; // ≡ ☰ ☷
 export const GLYPH_COPY = '⧉';
 export const GLYPH_PASTE = '⎌'; // ⧈ ⎗ ⎘ ⎙
 export const GLYPH_RESET = '⤺';
-export const GLYPH_REFRESH = '⟳'; //
+export const GLYPH_REFRESH = '⟳'; // ↻ ⟳
 export const GLYPH_CONNECT = '⭍'; // ⨁
 export const GLYPH_DISCONNECT = '⨂';
 export const GLYPH_RETRY = '↺'; // ⟲'; // ⟲ ⟳ ⤾ ⤼ ↻
@@ -56,7 +56,8 @@ export const GLYPH_DIRECTION_BOTH = '⤨';
 
 export const GLYPH_EXTERNAL_LINK = '🡵';
 
-export const GLYPH_ARROW_RIGHT = '➝'; // → ➝ ➞ ➜ ➡ ⟶ ⭢ ⤷ ⤳ ⥅ ⮕ ⭆ ⮞ ⭆ ⭈ ⤞ ⤠
+export const GLYPH_ARROW_RIGHT = '→'; // → ➝ ➞ ➜ ➡ ⟶ ⭢ ⤷ ⤳ ⥅ ⮕ ⭆ ⮞ ⭆ ⭈ ⤞ ⤠
+export const GLYPH_ARROW_LEFT = '←'; // ← ⭠
 
 export const get_icon_for_message_type = (type: string): string => {
 	switch (type) {

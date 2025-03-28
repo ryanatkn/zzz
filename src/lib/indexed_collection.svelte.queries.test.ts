@@ -97,7 +97,7 @@ describe('Indexed_Collection - Query Capabilities', () => {
 							.slice(0, 5); // Top 5 recent boolean_a=true items
 					},
 					matches: (item) => item.boolean_a,
-					on_add: (items, item) => {
+					onadd: (items, item) => {
 						if (!item.boolean_a) return items;
 
 						// Find the right position based on date_a (newer items first)
@@ -117,7 +117,7 @@ describe('Indexed_Collection - Query Capabilities', () => {
 						}
 						return items;
 					},
-					on_remove: (items, item) => {
+					onremove: (items, item) => {
 						const index = items.findIndex((i) => i.id === item.id);
 						if (index !== -1) {
 							items.splice(index, 1);
@@ -129,13 +129,13 @@ describe('Indexed_Collection - Query Capabilities', () => {
 					key: 'high_number_a',
 					compute: (collection) => collection.all.filter((item) => item.number_a >= 4),
 					matches: (item) => item.number_a >= 4,
-					on_add: (items, item) => {
+					onadd: (items, item) => {
 						if (item.number_a >= 4) {
 							items.push(item);
 						}
 						return items;
 					},
-					on_remove: (items, item) => {
+					onremove: (items, item) => {
 						const index = items.findIndex((i) => i.id === item.id);
 						if (index !== -1) {
 							items.splice(index, 1);

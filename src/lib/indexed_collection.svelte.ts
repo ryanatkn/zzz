@@ -4,7 +4,7 @@ import {DEV} from 'esm-env';
 
 import {Uuid} from '$lib/zod_helpers.js';
 
-// TODO optimize to make `this.all` order volatile, so speeding up remove operations in particular with efficient swaps
+// TODO optimize to make `this.all` order volatile, so speeding up remove operations in particular with efficient swaps e.g. using `pop()`
 
 // TODO optimize, particular the scans of `this.all`
 
@@ -55,10 +55,10 @@ export interface Index_Definition<T extends Indexed_Item, T_Result = any, T_Quer
 	matches?: (item: T) => boolean;
 
 	/** Optional function to update the index when an item is added */
-	on_add?: (result: T_Result, item: T, collection: Indexed_Collection<T>) => T_Result;
+	onadd?: (result: T_Result, item: T, collection: Indexed_Collection<T>) => T_Result;
 
 	/** Optional function to update the index when an item is removed */
-	on_remove?: (result: T_Result, item: T, collection: Indexed_Collection<T>) => T_Result;
+	onremove?: (result: T_Result, item: T, collection: Indexed_Collection<T>) => T_Result;
 }
 
 export interface Indexed_Collection_Options<
@@ -312,8 +312,8 @@ export class Indexed_Collection<
 	 */
 	#update_indexes_for_added_item(item: T): void {
 		for (const def of this.#index_definitions) {
-			if (def.on_add && (!def.matches || def.matches(item))) {
-				const result = def.on_add(this.indexes[def.key], item, this);
+			if (def.onadd && (!def.matches || def.matches(item))) {
+				const result = def.onadd(this.indexes[def.key], item, this);
 
 				// Validate result if needed
 				if (this.#validate) {
@@ -334,8 +334,8 @@ export class Indexed_Collection<
 	 */
 	#update_indexes_for_removed_item(item: T): void {
 		for (const def of this.#index_definitions) {
-			if (def.on_remove && (!def.matches || def.matches(item))) {
-				const result = def.on_remove(this.indexes[def.key], item, this);
+			if (def.onremove && (!def.matches || def.matches(item))) {
+				const result = def.onremove(this.indexes[def.key], item, this);
 
 				// Validate result if needed
 				if (this.#validate) {

@@ -485,10 +485,10 @@ describe('Reorderable', () => {
 
 			// Create a can_reorder function that only allows moving to index 2
 			const can_reorder = (_from_index: number, to_index: number) => to_index === 2;
-			const on_reorder = vi.fn();
+			const onreorder = vi.fn();
 
 			// Initialize
-			reorderable.list(list, {onreorder: on_reorder, can_reorder});
+			reorderable.list(list, {onreorder: onreorder, can_reorder});
 			const action_results = items.map((item, i) => reorderable.item(item, {index: i}));
 
 			// Force initialization
@@ -503,13 +503,13 @@ describe('Reorderable', () => {
 			items[1].dispatchEvent(drop_event1);
 
 			// onreorder should not be called for invalid target
-			expect(on_reorder).not.toHaveBeenCalled();
+			expect(onreorder).not.toHaveBeenCalled();
 
 			// Directly call the onreorder function as the implementation would
 			reorderable.list_params?.onreorder(0, 2);
 
 			// Now the callback should have been called
-			expect(on_reorder).toHaveBeenCalledWith(0, 2);
+			expect(onreorder).toHaveBeenCalledWith(0, 2);
 
 			// Clean up
 			for (const r of action_results) r?.destroy?.();
@@ -595,11 +595,11 @@ describe('Reorderable', () => {
 			const reorderable2 = new Reorderable();
 
 			// Initialize both
-			const on_reorder1 = vi.fn();
-			const on_reorder2 = vi.fn();
+			const onreorder1 = vi.fn();
+			const onreorder2 = vi.fn();
 
-			reorderable1.list(list1, {onreorder: on_reorder1});
-			reorderable2.list(list2, {onreorder: on_reorder2});
+			reorderable1.list(list1, {onreorder: onreorder1});
+			reorderable2.list(list2, {onreorder: onreorder2});
 
 			const action_results1 = items1.map((item, i) => reorderable1.item(item, {index: i}));
 			const action_results2 = items2.map((item, i) => reorderable2.item(item, {index: i}));
@@ -622,11 +622,11 @@ describe('Reorderable', () => {
 			expect(reorderable2.source_index).toBe(-1);
 
 			// Directly call the callback instead of relying on event propagation
-			on_reorder1(0, 1);
+			onreorder1(0, 1);
 
 			// Only first callback should be called
-			expect(on_reorder1).toHaveBeenCalled();
-			expect(on_reorder2).not.toHaveBeenCalled();
+			expect(onreorder1).toHaveBeenCalled();
+			expect(onreorder2).not.toHaveBeenCalled();
 
 			// Clean up
 			for (const r of action_results1) r?.destroy?.();

@@ -389,6 +389,9 @@ a.chip {
 .overflow_wrap_break_word {
 	overflow-wrap: break-word;
 }
+.overflow_x_auto {
+	overflow-x: auto;
+}
 .p_lg {
 	padding: var(--space_lg);
 }
@@ -406,6 +409,9 @@ a.chip {
 }
 .p_xs2 {
 	padding: var(--space_xs2);
+}
+.p_xs4 {
+	padding: var(--space_xs4);
 }
 .p_xs5 {
 	padding: var(--space_xs5);
@@ -519,6 +525,12 @@ a.chip {
 }
 .radius_0 {
 	border-radius: 0;
+}
+.radius_lg {
+	border-radius: var(--radius_lg);
+}
+.radius_md {
+	border-radius: var(--radius_md);
 }
 .radius_sm {
 	border-radius: var(--radius_sm);

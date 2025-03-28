@@ -114,7 +114,7 @@
 			economical for what it offers.
 		</p>
 		<aside>
-			Does this scope looks silly? Though ambitious, I think we're going to see *many* software
+			Does this scope look silly? Though ambitious, I think we're going to see *many* software
 			projects aim for a scope like Zzz in large part because AI can automatically generate
 			sophisticated problem-specific UIs and software from natural language instructions, and it
 			simultaneously lowers the barrier to entry to create your own software, especially when there
@@ -210,7 +210,7 @@
 		<p class="mb_md">
 			This project has a huge scope and it's early in development. What you're seeing is a small
 			fraction of the idea - especially if you're viewing this on the website not natively via Node
-			- so here's a button for seeing some of what's planned:
+			- so here's a button for previewing some of what's planned:
 		</p>
 		<button
 			type="button"

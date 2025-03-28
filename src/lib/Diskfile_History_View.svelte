@@ -10,11 +10,11 @@
 
 	interface Props {
 		editor_state: Diskfile_Editor_State;
-		on_entry_select: (entry_id: Uuid) => void;
+		onselectentry: (entry_id: Uuid) => void;
 		attrs?: SvelteHTMLElements['menu'] | undefined;
 	}
 
-	const {editor_state, on_entry_select, attrs}: Props = $props();
+	const {editor_state, onselectentry, attrs}: Props = $props();
 </script>
 
 <div>
@@ -60,7 +60,7 @@
 				class:selected
 				class:content_matches
 				class:plain={!selected && !content_matches}
-				onclick={() => on_entry_select(entry.id)}
+				onclick={() => onselectentry(entry.id)}
 				title={entry.label}
 			>
 				<span>

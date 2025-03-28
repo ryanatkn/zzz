@@ -62,12 +62,12 @@ describe('Indexed_Collection - Optimization Tests', () => {
 	});
 
 	test('incremental updates avoid recomputing entire index', () => {
-		// Create spies for the compute and on_add functions
+		// Create spies for the compute and onadd functions
 		const compute_spy = vi.fn((collection) => {
 			return collection.all.filter((item: Test_Item) => item.number > 10);
 		});
 
-		const on_add_spy = vi.fn((items, item) => {
+		const onadd_spy = vi.fn((items, item) => {
 			if (item.number > 10) {
 				items.push(item);
 			}
@@ -80,7 +80,7 @@ describe('Indexed_Collection - Optimization Tests', () => {
 					key: 'high_number',
 					compute: compute_spy,
 					matches: (item) => item.number > 10,
-					on_add: on_add_spy,
+					onadd: onadd_spy,
 				}),
 			],
 			initial_items: [
@@ -99,8 +99,8 @@ describe('Indexed_Collection - Optimization Tests', () => {
 		// Compute should still have been called only once
 		expect(compute_spy).toHaveBeenCalledTimes(1);
 
-		// on_add should have been called twice - once for each new item
-		expect(on_add_spy).toHaveBeenCalledTimes(2);
+		// onadd should have been called twice - once for each new item
+		expect(onadd_spy).toHaveBeenCalledTimes(2);
 
 		// Check that the index was correctly updated
 		const high_number = collection.get_derived('high_number');
@@ -111,7 +111,7 @@ describe('Indexed_Collection - Optimization Tests', () => {
 
 	test('batch operations are more efficient', () => {
 		// Create a collection with a multi-index
-		const on_add_spy = vi.fn((map, item) => {
+		const onadd_spy = vi.fn((map, item) => {
 			const collection = map.get(item.string_b) || [];
 			collection.push(item);
 			map.set(item.string_b, collection);
@@ -135,7 +135,7 @@ describe('Indexed_Collection - Optimization Tests', () => {
 					},
 					query_schema: z.string(),
 					result_schema: z.map(z.string(), z.array(item_schema)),
-					on_add: on_add_spy,
+					onadd: onadd_spy,
 				},
 			],
 		});
@@ -152,11 +152,11 @@ describe('Indexed_Collection - Optimization Tests', () => {
 		const end_time = performance.now();
 		const batch_time = end_time - start_time;
 
-		// Verify on_add was called for each item
-		expect(on_add_spy).toHaveBeenCalledTimes(100);
+		// Verify onadd was called for each item
+		expect(onadd_spy).toHaveBeenCalledTimes(100);
 
 		// Reset the spy for individual adds
-		on_add_spy.mockClear();
+		onadd_spy.mockClear();
 
 		// Test individual adds
 		const individual_start = performance.now();
@@ -172,8 +172,8 @@ describe('Indexed_Collection - Optimization Tests', () => {
 		const individual_end = performance.now();
 		const individual_time = individual_end - individual_start;
 
-		// Verify on_add was called for each item
-		expect(on_add_spy).toHaveBeenCalledTimes(100);
+		// Verify onadd was called for each item
+		expect(onadd_spy).toHaveBeenCalledTimes(100);
 
 		// This test is somewhat approximative but helps validate the efficiency
 		// We're not making a strict assertion on performance as it can vary between environments

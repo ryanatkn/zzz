@@ -63,7 +63,7 @@ export const create_single_index = <T extends Indexed_Item, K = any>(
 			}
 			return map;
 		},
-		on_add: (map, item) => {
+		onadd: (map, item) => {
 			if (options.matches && !options.matches(item)) return map;
 
 			const extract_key = options.extractor(item);
@@ -72,7 +72,7 @@ export const create_single_index = <T extends Indexed_Item, K = any>(
 			}
 			return map;
 		},
-		on_remove: (map, item, collection) => {
+		onremove: (map, item, collection) => {
 			if (options.matches && !options.matches(item)) return map;
 
 			const extract_key = options.extractor(item);
@@ -165,7 +165,7 @@ export const create_multi_index = <T extends Indexed_Item, K = any>(
 
 			return map;
 		},
-		on_add: (map, item) => {
+		onadd: (map, item) => {
 			if (options.matches && !options.matches(item)) return map;
 
 			const keys = options.extractor(item);
@@ -193,7 +193,7 @@ export const create_multi_index = <T extends Indexed_Item, K = any>(
 			}
 			return map;
 		},
-		on_remove: (map, item) => {
+		onremove: (map, item) => {
 			if (options.matches && !options.matches(item)) return map;
 
 			const keys = options.extractor(item);
@@ -247,10 +247,10 @@ export interface Derived_Index_Options<T extends Indexed_Item> extends Index_Opt
 	sort?: (a: T, b: T) => number;
 
 	/** Optional custom add handler. */
-	on_add?: (items: Array<T>, item: T, collection: Indexed_Collection<T>) => Array<T>;
+	onadd?: (items: Array<T>, item: T, collection: Indexed_Collection<T>) => Array<T>;
 
 	/** Optional custom remove handler. */
-	on_remove?: (items: Array<T>, item: T, collection: Indexed_Collection<T>) => Array<T>;
+	onremove?: (items: Array<T>, item: T, collection: Indexed_Collection<T>) => Array<T>;
 }
 
 /**
@@ -277,10 +277,10 @@ export const create_derived_index = <T extends Indexed_Item>(
 			}
 			return result;
 		},
-		on_add: (items, item, collection) => {
+		onadd: (items, item, collection) => {
 			// Use custom handler if provided
-			if (options.on_add) {
-				return options.on_add(items, item, collection);
+			if (options.onadd) {
+				return options.onadd(items, item, collection);
 			}
 
 			// Default behavior: add item to the array if it matches, then sort if needed
@@ -292,10 +292,10 @@ export const create_derived_index = <T extends Indexed_Item>(
 			}
 			return items;
 		},
-		on_remove: (items, item, collection) => {
+		onremove: (items, item, collection) => {
 			// Use custom handler if provided
-			if (options.on_remove) {
-				return options.on_remove(items, item, collection);
+			if (options.onremove) {
+				return options.onremove(items, item, collection);
 			}
 
 			// Default behavior: remove matching item by id
@@ -321,10 +321,10 @@ export interface Dynamic_Index_Options<
 	factory: (collection: Indexed_Collection<T>) => F;
 
 	/** Optional custom add handler */
-	on_add?: (fn: F, item: T, collection: Indexed_Collection<T>) => F;
+	onadd?: (fn: F, item: T, collection: Indexed_Collection<T>) => F;
 
 	/** Optional custom remove handler */
-	on_remove?: (fn: F, item: T, collection: Indexed_Collection<T>) => F;
+	onremove?: (fn: F, item: T, collection: Indexed_Collection<T>) => F;
 }
 
 /**
@@ -344,7 +344,7 @@ export const create_dynamic_index = <
 		matches: options.matches,
 		// Dynamic indexes typically don't change as items are added/removed
 		// since they compute their results on-demand from the current collection state
-		on_add: options.on_add || ((fn) => fn),
-		on_remove: options.on_remove || ((fn) => fn),
+		onadd: options.onadd || ((fn) => fn),
+		onremove: options.onremove || ((fn) => fn),
 	};
 };

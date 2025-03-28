@@ -106,7 +106,7 @@
 				<div transition:slide>
 					<Diskfile_History_View
 						{editor_state}
-						on_entry_select={(entry_id) => {
+						onselectentry={(entry_id) => {
 							editor_state.set_content_from_history(entry_id);
 							content_editor?.focus();
 						}}

@@ -268,7 +268,7 @@ describe('Indexed_Collection - Edge Cases', () => {
 	test('dynamic indexes with custom handlers', () => {
 		// Test a dynamic index with custom add/remove handlers
 		const compute_fn = vi.fn();
-		const on_add_fn = vi.fn((_fn, item, collection) => {
+		const onadd_fn = vi.fn((_fn, item, collection) => {
 			// Return a new function that references the added item
 			return (query: string) => {
 				compute_fn(query);
@@ -279,7 +279,7 @@ describe('Indexed_Collection - Edge Cases', () => {
 			};
 		});
 
-		const on_remove_fn = vi.fn((_fn, _item, collection) => {
+		const onremove_fn = vi.fn((_fn, _item, collection) => {
 			// Return a new function that excludes the removed item
 			return (query: string) => {
 				compute_fn(query);
@@ -298,8 +298,8 @@ describe('Indexed_Collection - Edge Cases', () => {
 						};
 					},
 					query_schema: z.string(),
-					on_add: on_add_fn,
-					on_remove: on_remove_fn,
+					onadd: onadd_fn,
+					onremove: onremove_fn,
 				}),
 			],
 		});
@@ -307,7 +307,7 @@ describe('Indexed_Collection - Edge Cases', () => {
 		// Add test items and verify custom handlers
 		const item1 = create_test_item('x1');
 		collection.add(item1);
-		expect(on_add_fn).toHaveBeenCalled();
+		expect(onadd_fn).toHaveBeenCalled();
 
 		const item2 = create_test_item('y2');
 		collection.add(item2);
@@ -321,9 +321,9 @@ describe('Indexed_Collection - Edge Cases', () => {
 		expect(x_results[0].string_a).toBe('x1');
 		expect(compute_fn).toHaveBeenLastCalledWith('x');
 
-		// Test removing an item triggers on_remove
+		// Test removing an item triggers onremove
 		collection.remove(item1.id);
-		expect(on_remove_fn).toHaveBeenCalled();
+		expect(onremove_fn).toHaveBeenCalled();
 
 		// Search function should be updated
 		const no_results = search_fn('x');
@@ -357,7 +357,7 @@ describe('Indexed_Collection - Edge Cases', () => {
 							}, {}),
 						};
 					},
-					on_add: (stats: any, item: Test_Item) => {
+					onadd: (stats: any, item: Test_Item) => {
 						stats.count++;
 						if (item.boolean_a) stats.boolean_a_true_count++;
 						else stats.boolean_a_false_count++;
@@ -370,7 +370,7 @@ describe('Indexed_Collection - Edge Cases', () => {
 
 						return stats;
 					},
-					on_remove: (stats: any, item: Test_Item) => {
+					onremove: (stats: any, item: Test_Item) => {
 						stats.count--;
 						if (item.boolean_a) stats.boolean_a_true_count--;
 						else stats.boolean_a_false_count--;

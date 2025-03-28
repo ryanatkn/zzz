@@ -1,0 +1,86 @@
+<script lang="ts">
+	import {swallow} from '@ryanatkn/belt/dom.js';
+	import {slide} from 'svelte/transition';
+
+	import {GLYPH_REMOVE} from '$lib/glyphs.js';
+	import Glyph from '$lib/Glyph.svelte';
+	import type {Browser_Tab} from '$routes/tabs/browser.svelte.js';
+
+	interface Props {
+		tab: Browser_Tab;
+		index: number;
+		onselect: (index: number) => void;
+		onclose: (index: number) => void;
+	}
+
+	const {tab, index, onselect, onclose}: Props = $props();
+</script>
+
+<div class="browser_tab_container" class:selected={tab.selected} transition:slide={{axis: 'x'}}>
+	<div
+		role="button"
+		tabindex="0"
+		class="browser_tab_button radius_0 plain px_sm py_xs"
+		class:selected={tab.selected}
+		onclick={() => onselect(index)}
+		onkeydown={(e) => {
+			if (e.key === 'Enter' || e.key === ' ') {
+				swallow(e);
+				onselect(index);
+			}
+		}}
+		aria-label={`Tab ${tab.title}`}
+		aria-pressed={tab.selected}
+	>
+		<div class="ellipsis font_weight_400 flex_1">
+			<Glyph icon="⎕" />
+			<small class="ml_xs">{tab.title}</small>
+		</div>
+		<button
+			type="button"
+			class="tab_close_button plain icon_button compact radius_md ml_sm"
+			onclick={(e) => {
+				e.stopPropagation();
+				onclose(index);
+			}}
+			onkeydown={(e) => e.stopPropagation()}
+			title="close tab"
+			aria-label={`close tab ${tab.title}`}
+		>
+			{GLYPH_REMOVE}
+		</button>
+	</div>
+</div>
+
+<style>
+	.browser_tab_container {
+		display: flex;
+		align-items: center;
+		min-width: 10rem;
+		max-width: 30rem;
+	}
+
+	.browser_tab_button {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		height: 100%;
+		white-space: nowrap;
+		overflow: hidden;
+		width: 100%;
+		cursor: pointer;
+	}
+	.browser_tab_button:hover {
+		box-shadow: var(--shadow_inset_bottom_xs)
+			color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_1)), transparent);
+	}
+	.browser_tab_button:active {
+		box-shadow: var(--shadow_inset_top_xs)
+			color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_1)), transparent);
+	}
+	.browser_tab_button.selected {
+		color: var(--text_color_1);
+		box-shadow: var(--shadow_inset_top_sm)
+			color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_2)), transparent);
+	}
+</style>

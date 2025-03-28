@@ -44,7 +44,7 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 					);
 				},
 				result_schema: Prompt_Schema,
-				on_add: (items, item) => {
+				onadd: (items, item) => {
 					// Insert at the right position based on creation date
 					const index = items.findIndex(
 						(existing) => new Date(item.created).getTime() > new Date(existing.created).getTime(),

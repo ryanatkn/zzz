@@ -81,7 +81,7 @@ export class Messages extends Cell<typeof Messages_Json> {
 				},
 				matches: (item) => item.type === 'pong',
 				result_schema: Message_Schema,
-				on_add: (items, item) => {
+				onadd: (items, item) => {
 					if (item.type !== 'pong') return items;
 
 					// Insert at correct position based on created timestamp
@@ -100,7 +100,7 @@ export class Messages extends Cell<typeof Messages_Json> {
 
 					return items;
 				},
-				on_remove: (items, item) => {
+				onremove: (items, item) => {
 					const index = items.findIndex((i) => i.id === item.id);
 					if (index !== -1) {
 						items.splice(index, 1);
