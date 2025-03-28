@@ -3,46 +3,46 @@
 	import type {SvelteHTMLElements} from 'svelte/elements';
 
 	import {GLYPH_CLEAR, GLYPH_RESTORE} from '$lib/glyphs.js';
+	import Toggle_Button from '$lib/Toggle_Button.svelte';
 
 	interface Props {
-		value: string; // TODO change to a $bindable
+		value: string;
 		onchange: (value: string) => void;
 		attrs?: SvelteHTMLElements['button'] | undefined;
-		restore?: Snippet | undefined;
-		children?: Snippet | undefined;
+		restore_icon?: Snippet | string | undefined;
+		clear_icon?: Snippet | string | undefined;
 	}
 
-	const {value, onchange, attrs, restore, children}: Props = $props();
+	const {
+		value,
+		onchange,
+		attrs: attrs_prop,
+		restore_icon = GLYPH_RESTORE,
+		clear_icon = GLYPH_CLEAR,
+	}: Props = $props();
 
 	let cleared_value = $state('');
+
+	const disabled = $derived(!value && !cleared_value);
+	const attrs = $derived(attrs_prop ? {...attrs_prop, disabled} : {disabled});
+	const has_value = $derived(!!value);
 </script>
 
-<button
-	type="button"
-	class="plain icon_button"
-	disabled={!value && !cleared_value}
-	title="{value ? 'clear' : 'restore'} content"
-	onclick={() => {
-		if (value) {
+<Toggle_Button
+	active={has_value}
+	active_content={clear_icon}
+	inactive_content={restore_icon}
+	ontoggle={(active) => {
+		if (active) {
+			// Restoring
+			const restored = cleared_value;
+			cleared_value = '';
+			onchange(restored);
+		} else {
+			// Clearing
 			cleared_value = value;
 			onchange('');
-		} else {
-			onchange(cleared_value);
-			cleared_value = '';
 		}
 	}}
-	{...attrs}
->
-	<span class="relative">
-		<span style:visibility="hidden" class="inline_flex flex_column"
-			><span
-				>{#if children}{@render children()}{:else}{GLYPH_CLEAR}{/if}</span
-			><span
-				>{#if restore}{@render restore()}{:else}{GLYPH_RESTORE}{/if}</span
-			></span
-		>
-		<span class="absolute inline_flex align_items_center justify_content_center" style:inset="0"
-			>{#if value || !cleared_value}{#if children}{@render children()}{:else}{GLYPH_CLEAR}{/if}{:else if restore}{@render restore()}{:else}{GLYPH_RESTORE}{/if}</span
-		>
-	</span>
-</button>
+	{attrs}
+/>

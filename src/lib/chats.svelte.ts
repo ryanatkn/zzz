@@ -28,40 +28,7 @@ export type Chats_Json = z.infer<typeof Chats_Json>;
 export interface Chats_Options extends Cell_Options<typeof Chats_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
 export class Chats extends Cell<typeof Chats_Json> {
-	readonly items: Indexed_Collection<Chat> = new Indexed_Collection({
-		indexes: [
-			// TODO look into indexes
-			// create_multi_index({
-			// 	key: 'by_has_tapes',
-			// 	extractor: (chat) => (chat.tapes.length > 0 ? 'has_tapes' : 'no_tapes'),
-			// 	query_schema: z.enum(['has_tapes', 'no_tapes']),
-			// 	result_schema: Chat_Schema,
-			// }),
-			// create_derived_index({
-			// 	key: 'recent_chats',
-			// 	compute: (collection) => {
-			// 		// Sort chats by creation date (newest first)
-			// 		// This is just an example of a derived index
-			// 		return [...collection.all].sort(
-			// 			(a, b) => new Date(b.created).getTime() - new Date(a.created).getTime(),
-			// 		);
-			// 	},
-			// 	result_schema: Chat_Schema,
-			// 	onadd: (collection, item) => {
-			// 		// Insert the new chat in the correct position based on creation date
-			// 		const index = collection.findIndex(
-			// 			(existing) => new Date(existing.created).getTime() <= new Date(item.created).getTime(),
-			// 		);
-			// 		if (index === -1) {
-			// 			collection.push(item);
-			// 		} else {
-			// 			collection.splice(index, 0, item);
-			// 		}
-			// 		return collection;
-			// 	},
-			// }),
-		],
-	});
+	readonly items: Indexed_Collection<Chat> = new Indexed_Collection();
 
 	selected_id: Uuid | null = $state(null);
 	selected: Chat | undefined = $derived(

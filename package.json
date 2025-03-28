@@ -223,6 +223,16 @@
       "svelte": "./dist/Chat_Tape.svelte",
       "default": "./dist/Chat_Tape.svelte"
     },
+    "./Chat_View_Multi.svelte": {
+      "types": "./dist/Chat_View_Multi.svelte.d.ts",
+      "svelte": "./dist/Chat_View_Multi.svelte",
+      "default": "./dist/Chat_View_Multi.svelte"
+    },
+    "./Chat_View_Simple.svelte": {
+      "types": "./dist/Chat_View_Simple.svelte.d.ts",
+      "svelte": "./dist/Chat_View_Simple.svelte",
+      "default": "./dist/Chat_View_Simple.svelte"
+    },
     "./Chat_View.svelte": {
       "types": "./dist/Chat_View.svelte.d.ts",
       "svelte": "./dist/Chat_View.svelte",
@@ -765,6 +775,11 @@
     "./time.svelte.js": {
       "types": "./dist/time.svelte.d.ts",
       "default": "./dist/time.svelte.js"
+    },
+    "./Toggle_Button.svelte": {
+      "types": "./dist/Toggle_Button.svelte.d.ts",
+      "svelte": "./dist/Toggle_Button.svelte",
+      "default": "./dist/Toggle_Button.svelte"
     },
     "./ui.svelte.js": {
       "types": "./dist/ui.svelte.d.ts",

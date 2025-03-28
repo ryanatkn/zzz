@@ -32,6 +32,7 @@
 		{#snippet menu()}
 			<!-- TODO @many maybe a copy submenu on this item with copy id, name, etc, leverage generic cells -->
 			<Contextmenu_Copy_To_Clipboard content={chat.name} label="copy name" />
+			<Contextmenu_Copy_To_Clipboard content={chat.id} label="copy id" />
 
 			{#if chat.tapes.length}
 				<Contextmenu_Entry run={() => chat.remove_all_tapes()}>

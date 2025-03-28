@@ -45,7 +45,7 @@
 </script>
 
 <div class="w_100 column">
-	<div class="flex justify_content_start mb_xs">
+	<div class="mb_xs">
 		<button type="button" class="plain" onclick={create_new_prompt}> + create new prompt </button>
 		<button type="button" class="plain" onclick={() => (show_prompt_picker = true)}>
 			+ add existing prompt

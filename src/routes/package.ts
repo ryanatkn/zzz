@@ -185,6 +185,16 @@ export const package_json = {
 			svelte: './dist/Chat_Tape.svelte',
 			default: './dist/Chat_Tape.svelte',
 		},
+		'./Chat_View_Multi.svelte': {
+			types: './dist/Chat_View_Multi.svelte.d.ts',
+			svelte: './dist/Chat_View_Multi.svelte',
+			default: './dist/Chat_View_Multi.svelte',
+		},
+		'./Chat_View_Simple.svelte': {
+			types: './dist/Chat_View_Simple.svelte.d.ts',
+			svelte: './dist/Chat_View_Simple.svelte',
+			default: './dist/Chat_View_Simple.svelte',
+		},
 		'./Chat_View.svelte': {
 			types: './dist/Chat_View.svelte.d.ts',
 			svelte: './dist/Chat_View.svelte',
@@ -652,6 +662,11 @@ export const package_json = {
 		'./test.task.js': {types: './dist/test.task.d.ts', default: './dist/test.task.js'},
 		'./time_helpers.js': {types: './dist/time_helpers.d.ts', default: './dist/time_helpers.js'},
 		'./time.svelte.js': {types: './dist/time.svelte.d.ts', default: './dist/time.svelte.js'},
+		'./Toggle_Button.svelte': {
+			types: './dist/Toggle_Button.svelte.d.ts',
+			svelte: './dist/Toggle_Button.svelte',
+			default: './dist/Toggle_Button.svelte',
+		},
 		'./ui.svelte.js': {types: './dist/ui.svelte.d.ts', default: './dist/ui.svelte.js'},
 		'./url_params.svelte.js': {
 			types: './dist/url_params.svelte.d.ts',
@@ -806,6 +821,8 @@ export const src_json = {
 			],
 		},
 		'./Chat_Tape.svelte': {path: 'Chat_Tape.svelte', declarations: []},
+		'./Chat_View_Multi.svelte': {path: 'Chat_View_Multi.svelte', declarations: []},
+		'./Chat_View_Simple.svelte': {path: 'Chat_View_Simple.svelte', declarations: []},
 		'./Chat_View.svelte': {path: 'Chat_View.svelte', declarations: []},
 		'./chat.svelte.js': {
 			path: 'chat.svelte.ts',
@@ -1408,6 +1425,7 @@ export const src_json = {
 				{name: 'Time', kind: 'class'},
 			],
 		},
+		'./Toggle_Button.svelte': {path: 'Toggle_Button.svelte', declarations: []},
 		'./ui.svelte.js': {
 			path: 'ui.svelte.ts',
 			declarations: [

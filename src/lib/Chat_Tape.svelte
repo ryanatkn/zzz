@@ -1,5 +1,5 @@
 <script lang="ts">
-	import {scale, slide} from 'svelte/transition';
+	import {slide} from 'svelte/transition';
 	import Pending_Button from '@ryanatkn/fuz/Pending_Button.svelte';
 	import {encode as tokenize} from 'gpt-tokenizer';
 
@@ -12,14 +12,18 @@
 	import Contextmenu_Tape from '$lib/Contextmenu_Tape.svelte';
 	import Content_Editor from '$lib/Content_Editor.svelte';
 	import {GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
+	import type {SvelteHTMLElements} from 'svelte/elements';
 
 	interface Props {
 		tape: Tape;
 		onremove: () => void;
 		onsend: (input: string) => Promise<void>;
+		show_delete_button?: boolean | undefined;
+		strips_attrs?: SvelteHTMLElements['div'] | undefined;
+		attrs?: SvelteHTMLElements['div'] | undefined;
 	}
 
-	const {tape, onremove, onsend}: Props = $props();
+	const {tape, onremove, onsend, show_delete_button, strips_attrs, attrs}: Props = $props();
 
 	let input = $state('');
 	const input_tokens = $derived(tokenize(input));
@@ -33,6 +37,7 @@
 			return;
 		}
 		input = '';
+		setTimeout(() => content_input?.focus()); // timeout is maybe unnecessary, lets the input clear first to maybe avoid a frame of jank
 		pending = true;
 		await onsend(parsed);
 		pending = false;
@@ -49,9 +54,8 @@
 	// TODO BLOCK the link should instead be a model picker (dialog? or overlaid without a bg maybe?)
 </script>
 
-<!-- TODO `duration_2` is the Moss variable for 200ms and 1 for 80ms, but it's not in a usable form -->
 <Contextmenu_Tape {tape}>
-	<div class="chat_tape" transition:scale>
+	<div {...attrs} class="chat_tape {attrs?.class}">
 		<div class="flex justify_content_space_between align_items_start">
 			<header>
 				<div class="size_lg">
@@ -65,16 +69,23 @@
 					/></small
 				>
 			</header>
-			<Confirm_Button
-				onconfirm={onremove}
-				attrs={{
-					class: 'plain compact',
-					title: `delete tape with ${tape.model_name} and ${tape.token_count} tokens`,
-				}}
-			/>
+			{#if show_delete_button}
+				<Confirm_Button
+					onconfirm={onremove}
+					attrs={{
+						class: 'plain compact',
+						title: `delete tape with ${tape.model_name} and ${tape.token_count} tokens`,
+					}}
+				/>
+			{/if}
 		</div>
 
-		<div class="strips" use:scrollable.container use:scrollable.target>
+		<div
+			{...strips_attrs}
+			class="strips flex_1 {strips_attrs?.class}"
+			use:scrollable.container
+			use:scrollable.target
+		>
 			<ul class="unstyled">
 				{#each tape.strips as strip (strip.id)}
 					<li transition:slide>
@@ -108,7 +119,6 @@
 
 <style>
 	.chat_tape {
-		padding: var(--space_md);
 		display: flex;
 		flex-direction: column;
 		gap: var(--space_md);
@@ -118,8 +128,6 @@
 	.strips {
 		display: flex;
 		flex-direction: column-reverse; /* makes scrolling start at the bottom */
-		gap: 0.5rem;
-		max-height: 400px;
 		overflow: auto;
 		scrollbar-width: thin;
 	}

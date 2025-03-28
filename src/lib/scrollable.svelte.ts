@@ -1,7 +1,7 @@
 import type {Action} from 'svelte/action';
 import {on} from 'svelte/events';
 
-// TODO BLOCK upstream to Fuz, and see the global `.scrolled` style
+// TODO upstream to Fuz, and see the global `.scrolled` style
 
 // TODO maybe make this more generic than just always adding a class?
 
@@ -36,12 +36,15 @@ export class Scrollable {
 	/**
 	 * Action for the scrollable container - detects scrolling and updates state.
 	 */
-	container: Action<Element> = (node) => {
+	container: Action<Element> = (element) => {
+		const computed_style = window.getComputedStyle(element);
+
 		const onscroll = () => {
-			this.scroll_y = node.scrollTop;
+			const reversed = computed_style.flexDirection === 'column-reverse';
+			this.scroll_y = element.scrollTop * (reversed ? -1 : 1);
 		};
 
-		const cleanup = on(node, 'scroll', onscroll);
+		const cleanup = on(element, 'scroll', onscroll);
 
 		onscroll();
 
@@ -55,25 +58,25 @@ export class Scrollable {
 	/**
 	 * Action for the element that should receive the scrolled class.
 	 */
-	target: Action<Element> = (node) => {
+	target: Action<Element> = (element) => {
 		if (this.scrolled) {
-			node.classList.add(this.target_class);
+			element.classList.add(this.target_class);
 		}
 
 		// TODO better pattern without effect, maybe require a param? but then the state isn't synced
 		const cleanup = $effect.root(() => {
 			$effect(() => {
 				if (this.scrolled) {
-					node.classList.add(this.target_class);
+					element.classList.add(this.target_class);
 				} else {
-					node.classList.remove(this.target_class);
+					element.classList.remove(this.target_class);
 				}
 			});
 		});
 
 		return {
 			destroy: () => {
-				node.classList.remove(this.target_class);
+				element.classList.remove(this.target_class);
 				cleanup();
 			},
 		};

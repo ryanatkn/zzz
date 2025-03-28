@@ -48,7 +48,7 @@
 
 <Contextmenu_Diskfile {diskfile}>
 	<div class="flex h_100">
-		<div class="flex_1 h_100 column">
+		<div class="width_md min_width_sm h_100 column">
 			<Content_Editor
 				bind:this={content_editor}
 				bind:content={editor_state.current_content}
@@ -63,7 +63,7 @@
 			/>
 		</div>
 
-		<div class="width_sm">
+		<div class="width_sm min_width_sm">
 			<div class="mb_md p_md">
 				<Diskfile_Info {diskfile} {editor_state} />
 			</div>

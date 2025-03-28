@@ -74,6 +74,10 @@ export interface Reorderable_Item_Params {
  * Additional configuration options for Reorderable.
  */
 export interface Reorderable_Options {
+	/**
+	 * Forces a specific direction for the reorderable list.
+	 * Defaults to auto-detection, `'vertical'` as the fallback.
+	 */
 	direction?: Reorderable_Direction;
 	list_class?: string | null;
 	item_class?: string | null;

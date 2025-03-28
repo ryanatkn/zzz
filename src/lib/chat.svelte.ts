@@ -18,6 +18,9 @@ const NEW_CHAT_PREFIX = 'chat';
 
 const chat_names: Array<string> = [];
 
+const Chat_View_Mode = z.enum(['simple', 'multi']).default('simple');
+export type Chat_View_Mode = z.infer<typeof Chat_View_Mode>;
+
 export const Chat_Json = Cell_Json.extend({
 	name: z.string().default(() => {
 		// TODO BLOCK how to do this correctly? can you make it stateful and still have a static module-scoped schema? I dont see a context object arg or anything
@@ -28,6 +31,7 @@ export const Chat_Json = Cell_Json.extend({
 	tape_ids: z.array(Uuid).default(() => []),
 	selected_prompt_ids: z.array(Uuid).default(() => []), // TODO consider making these refs, automatic classes (maybe as separate properties by convention, so the original is still the plain ids)
 	main_input: z.string().default(''),
+	view_mode: Chat_View_Mode,
 });
 
 export type Chat_Json = z.infer<typeof Chat_Json>;
@@ -38,6 +42,7 @@ export class Chat extends Cell<typeof Chat_Json> {
 	tape_ids: Array<Uuid> = $state([]);
 	selected_prompt_ids: Array<Uuid> = $state()!;
 	main_input: string = $state('');
+	view_mode: Chat_View_Mode = $state('multi');
 
 	main_input_length: number = $derived(this.main_input.length);
 	main_input_tokens: Array<number> = $derived(tokenize(this.main_input));

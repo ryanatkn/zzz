@@ -4,7 +4,7 @@ import {DEV} from 'esm-env';
 
 import {Uuid} from '$lib/zod_helpers.js';
 
-// TODO optimize to make `this.all` order volatile, so speeding up remove operations in particular with efficient swaps e.g. using `pop()`
+// TODO optimize to make `this.all` order volatile, so speeding up remove operations in particular with efficient swaps e.g. using `pop()` and `$state.raw`
 
 // TODO optimize, particular the scans of `this.all`
 
