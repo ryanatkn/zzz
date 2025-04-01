@@ -2,7 +2,7 @@ import {CONTENT_PREVIEW_LENGTH} from '$lib/constants.js';
 
 export const get_unique_name = (
 	name: string,
-	// TODO BLOCK change to a callback fn, `is_valid`?
+	// TODO BLOCK maybe change to a callback fn, `is_valid`?
 	existing_names: Array<string> | Set<string> | Map<string, any>,
 ): string => {
 	const t = 'has' in existing_names ? 'has' : 'includes';

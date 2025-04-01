@@ -88,7 +88,7 @@ describe('Indexed_Collection - Schema Validation', () => {
 		expect(query_result.string_a).toBe('a1');
 
 		// Get single index and check schema validation passed
-		const email_index = collection.single_index<Test_Item>('by_string_b');
+		const email_index = collection.single_index('by_string_b');
 		expect(email_index.size).toBe(2);
 	});
 
@@ -148,7 +148,15 @@ describe('Indexed_Collection - Schema Validation', () => {
 			indexes: [
 				create_derived_index({
 					key: 'flagged_adults',
-					compute: (collection) => collection.all.filter((item) => item.flag && item.number >= 18),
+					compute: (collection) => {
+						const result = [];
+						for (const item of collection.by_id.values()) {
+							if (item.flag && item.number >= 18) {
+								result.push(item);
+							}
+						}
+						return result;
+					},
 					matches: (item) => item.flag && item.number >= 18,
 					query_schema: z.void(),
 					result_schema: items_array_schema,
@@ -164,13 +172,13 @@ describe('Indexed_Collection - Schema Validation', () => {
 		collection.add(create_item('a4', 'b4@test.com', 17, false)); // flag=false, number<18
 
 		// Check derived index correctness
-		const flagged_adults = collection.get_derived('flagged_adults');
+		const flagged_adults = collection.derived_index('flagged_adults');
 		expect(flagged_adults.length).toBe(1);
 		expect(flagged_adults[0].string_a).toBe('a1');
 
 		// Add another qualifying item and verify index updates
 		collection.add(create_item('a5', 'b5@test.com', 40, true));
-		expect(collection.get_derived('flagged_adults').length).toBe(2);
+		expect(collection.derived_index('flagged_adults').length).toBe(2);
 	});
 
 	test('dynamic index validates complex query parameters', () => {
@@ -193,23 +201,24 @@ describe('Indexed_Collection - Schema Validation', () => {
 					key: 'item_search',
 					factory: (collection) => {
 						return (query: Item_Query) => {
-							return collection.all.filter((item) => {
+							const result = [];
+							for (const item of collection.by_id.values()) {
 								// Filter by number range if specified
-								if (query.min_number !== undefined && item.number < query.min_number) return false;
-								if (query.max_number !== undefined && item.number > query.max_number) return false;
+								if (query.min_number !== undefined && item.number < query.min_number) continue;
+								if (query.max_number !== undefined && item.number > query.max_number) continue;
 
 								// Filter by flag status if specified
-								if (query.only_flagged !== undefined && query.only_flagged && !item.flag)
-									return false;
+								if (query.only_flagged !== undefined && query.only_flagged && !item.flag) continue;
 
 								// Filter by array if specified
 								if (query.array_values !== undefined && query.array_values.length > 0) {
 									const has_match = query.array_values.some((v) => item.array.includes(v));
-									if (!has_match) return false;
+									if (!has_match) continue;
 								}
 
-								return true;
-							});
+								result.push(item);
+							}
+							return result;
 						};
 					},
 					query_schema,

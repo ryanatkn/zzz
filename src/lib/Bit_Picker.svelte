@@ -19,10 +19,11 @@
 	let {show = $bindable(false), onpick, filter, exclude_ids}: Props = $props();
 </script>
 
+<!-- TODO @many more efficient array? maybe add `all` back to the base Indexed_Collection? -->
 <Picker
 	bind:show
+	items={Array.from(bits.items.by_id.values())}
 	{onpick}
-	items={bits.items}
 	{filter}
 	{exclude_ids}
 	sorters={[

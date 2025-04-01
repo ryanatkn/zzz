@@ -25,9 +25,6 @@
 	const TODO_create_file_pending = false;
 	const TODO_create_folder_pending = false;
 
-	// Create a filter for non-external diskfiles
-	const non_external_filter = (diskfile: Diskfile): boolean => !diskfile.external;
-
 	// TODO improve UX to not use alert/prompt
 	const create_file = () => {
 		if (!zzz.zzz_dir) {
@@ -92,10 +89,9 @@
 			</div>
 		</div>
 
-		<!-- TODO @many why is the cast needed? -->
+		<!-- TODO @many more efficient array? maybe add `all` back to the base Indexed_Collection? -->
 		<Sortable_List
-			items={diskfiles.items}
-			filter={non_external_filter}
+			items={Array.from(diskfiles.items.by_id.values())}
 			show_sort_controls={true}
 			sorters={[sort_by_text<Diskfile>('path_asc', 'path (a-z)', 'path_relative')]}
 			sort_key_default="path_asc"
@@ -113,7 +109,7 @@
 			{/snippet}
 		</Sortable_List>
 
-		{#if empty && diskfiles.items.all.filter(non_external_filter).length === 0}
+		{#if empty && diskfiles.items.size === 0}
 			{@render empty()}
 		{/if}
 	{/if}

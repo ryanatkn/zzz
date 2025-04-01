@@ -10,6 +10,9 @@ import {Any} from '$lib/zod_helpers.js';
 
 export const Svelte_Map_Schema = z.custom<SvelteMap<any, any>>((val) => val instanceof SvelteMap);
 
+// TODO I think these helpers should be on the base cell for type inference, `this.create_single_index`,
+// but the extracted logic could still be here if it made the base class cleaner, or if these are usefully reusable
+
 /**
  * Common options interface for all index types.
  */
@@ -20,11 +23,11 @@ export interface Index_Options<T extends Indexed_Item> {
 	/** Optional predicate to determine if an item is relevant to this index. */
 	matches?: (item: T) => boolean;
 
-	/** Schema for input validation and typing. */
-	query_schema?: z.ZodType; // TODO BLOCK default to string not any? then remove all of the `query_schema: z.string(),`
+	/** Schema for query input validation and typing. */
+	query_schema?: z.ZodType;
 
-	/** Schema for output validation. */
-	result_schema?: z.ZodType;
+	/** Schema for query output validation and typing. */
+	result_schema?: z.ZodType; // TODO we're currently declaring this when it should be inferrable on usage
 }
 
 /**
@@ -53,8 +56,8 @@ export const create_single_index = <T extends Indexed_Item, K = any>(
 		result_schema,
 		compute: (collection) => {
 			const map: SvelteMap<K, T> = new SvelteMap();
-			for (const item of collection.all) {
-				if (options.matches && !options.matches(item)) continue;
+			for (const item of collection.by_id.values()) {
+				if (!should_include_item(item, options.matches)) continue;
 
 				const extract_key = options.extractor(item);
 				if (extract_key !== undefined) {
@@ -64,7 +67,7 @@ export const create_single_index = <T extends Indexed_Item, K = any>(
 			return map;
 		},
 		onadd: (map, item) => {
-			if (options.matches && !options.matches(item)) return map;
+			if (!should_include_item(item, options.matches)) return map;
 
 			const extract_key = options.extractor(item);
 			if (extract_key !== undefined) {
@@ -73,7 +76,7 @@ export const create_single_index = <T extends Indexed_Item, K = any>(
 			return map;
 		},
 		onremove: (map, item, collection) => {
-			if (options.matches && !options.matches(item)) return map;
+			if (!should_include_item(item, options.matches)) return map;
 
 			const extract_key = options.extractor(item);
 			if (extract_key === undefined) return map;
@@ -87,7 +90,7 @@ export const create_single_index = <T extends Indexed_Item, K = any>(
 
 			// Find any other items with the same key
 			let item_with_same_key;
-			for (const other of collection.all) {
+			for (const other of collection.by_id.values()) {
 				if (other.id !== item.id && options.extractor(other) === extract_key) {
 					item_with_same_key = other;
 					break;
@@ -136,100 +139,50 @@ export const create_multi_index = <T extends Indexed_Item, K = any>(
 		result_schema,
 		compute: (collection) => {
 			const map: SvelteMap<K, Array<T>> = new SvelteMap();
-			for (const item of collection.all) {
-				if (options.matches && !options.matches(item)) continue;
+			for (const item of collection.by_id.values()) {
+				if (!should_include_item(item, options.matches)) continue;
 
 				const keys = options.extractor(item);
 				if (keys === undefined) continue;
 
 				if (Array.isArray(keys)) {
 					for (const k of keys) {
-						if (k === undefined) continue;
-						let items = map.get(k);
-						if (!items) map.set(k, (items = []));
-						items.push(item);
+						add_to_multi_map(map, k, item, options.sort);
 					}
 				} else {
-					let items = map.get(keys);
-					if (!items) map.set(keys, (items = []));
-					items.push(item);
-				}
-			}
-
-			// Sort item collections if a sort function was provided
-			if (options.sort) {
-				for (const items of map.values()) {
-					items.sort(options.sort);
+					add_to_multi_map(map, keys, item, options.sort);
 				}
 			}
 
 			return map;
 		},
 		onadd: (map, item) => {
-			if (options.matches && !options.matches(item)) return map;
+			if (!should_include_item(item, options.matches)) return map;
 
 			const keys = options.extractor(item);
 			if (keys === undefined) return map;
 
 			if (Array.isArray(keys)) {
 				for (const k of keys) {
-					if (k === undefined) continue;
-					let items = map.get(k);
-					if (!items) map.set(k, (items = []));
-					items.push(item);
-
-					if (options.sort) {
-						items.sort(options.sort);
-					}
+					add_to_multi_map(map, k, item, options.sort);
 				}
 			} else {
-				let items = map.get(keys);
-				if (!items) map.set(keys, (items = []));
-				items.push(item);
-
-				if (options.sort) {
-					items.sort(options.sort);
-				}
+				add_to_multi_map(map, keys, item, options.sort);
 			}
 			return map;
 		},
 		onremove: (map, item) => {
-			if (options.matches && !options.matches(item)) return map;
+			if (!should_include_item(item, options.matches)) return map;
 
 			const keys = options.extractor(item);
 			if (keys === undefined) return map;
 
 			if (Array.isArray(keys)) {
 				for (const k of keys) {
-					if (k === undefined) continue;
-					const items = map.get(k);
-					if (!items) continue;
-					// Find and remove the item by id
-					const index = items.findIndex((i) => i.id === item.id);
-					if (index === -1) continue;
-					if (items.length === 1) {
-						// If this was the last item, remove the key entirely
-						map.delete(k);
-					} else {
-						// Remove just this item
-						items.splice(index, 1);
-					}
+					remove_from_multi_map(map, k, item);
 				}
 			} else {
-				const items = map.get(keys);
-				if (items) {
-					// Find and remove the item by id
-					const index = items.findIndex((i) => i.id === item.id);
-					if (index !== -1) {
-						if (items.length === 1) {
-							// If this was the last item, remove the key entirely
-							map.delete(keys);
-						} else {
-							// Remove just this item
-							items.splice(index, 1);
-						}
-					}
-				}
+				remove_from_multi_map(map, keys, item);
 			}
 			return map;
 		},
@@ -241,7 +194,7 @@ export const create_multi_index = <T extends Indexed_Item, K = any>(
  */
 export interface Derived_Index_Options<T extends Indexed_Item> extends Index_Options<T> {
 	/** Function that computes the derived collection from the full collection. */
-	compute: (collection: Indexed_Collection<T>) => Array<T>;
+	compute: (collection: Indexed_Collection<T>) => Array<T>; // TODO BLOCK probably default this to the by_id values - `compute: (collection) => Array.from(collection.by_id.values()),`
 
 	/** Optional sort function for the derived array. */
 	sort?: (a: T, b: T) => number;
@@ -262,6 +215,7 @@ export const create_derived_index = <T extends Indexed_Item>(
 	// Create the default output schema if not provided
 	const result_schema =
 		options.result_schema ||
+		// TODO BLOCK `z.custom` looks wrong here, maybe `create_derived_index(this, ...)` should be the API for numerous reasons?
 		z.array(z.custom<T>((val) => val && typeof val === 'object' && 'id' in val));
 
 	return {
@@ -284,10 +238,10 @@ export const create_derived_index = <T extends Indexed_Item>(
 			}
 
 			// Default behavior: add item to the array if it matches, then sort if needed
-			if (!options.matches || options.matches(item)) {
+			if (should_include_item(item, options.matches)) {
 				items.push(item);
 				if (options.sort) {
-					items.sort(options.sort);
+					items.sort(options.sort); // TODO @many incremental patterns -- here, maybe instead of sorting, insert at the right index? and maybe clone the array if not pushing?
 				}
 			}
 			return items;
@@ -299,10 +253,10 @@ export const create_derived_index = <T extends Indexed_Item>(
 			}
 
 			// Default behavior: remove matching item by id
-			if (!options.matches || options.matches(item)) {
+			if (should_include_item(item, options.matches)) {
 				const index = items.findIndex((i) => i.id === item.id);
 				if (index !== -1) {
-					items.splice(index, 1);
+					items.splice(index, 1); // TODO @many incremental patterns -- here, maybe instead of splicing, remove at the right index, and clone the array if not popping?
 				}
 			}
 			return items;
@@ -347,4 +301,57 @@ export const create_dynamic_index = <
 		onadd: options.onadd || ((fn) => fn),
 		onremove: options.onremove || ((fn) => fn),
 	};
+};
+
+/**
+ * Helper function to check if an item matches the index criteria.
+ */
+const should_include_item = <T extends Indexed_Item>(
+	item: T,
+	matches?: (item: T) => boolean,
+): boolean => !matches || matches(item);
+
+/**
+ * Helper function to add an item to a multi-value map.
+ */
+const add_to_multi_map = <T extends Indexed_Item, K = any>(
+	map: SvelteMap<K, Array<T>>,
+	key: K,
+	item: T,
+	sort?: (a: T, b: T) => number,
+): void => {
+	if (key === undefined) return;
+
+	let items = map.get(key);
+	if (!items) map.set(key, (items = []));
+	items.push(item);
+
+	if (sort) {
+		items.sort(sort); // TODO instead of sorting all, maybe find the insertion index instead?
+	}
+};
+
+/**
+ * Helper function to remove an item from a multi-value map.
+ */
+const remove_from_multi_map = <T extends Indexed_Item, K = any>(
+	map: SvelteMap<K, Array<T>>,
+	key: K,
+	item: T,
+): void => {
+	if (key === undefined) return;
+
+	const items = map.get(key);
+	if (!items) return;
+
+	const index = items.findIndex((i) => i.id === item.id);
+	if (index === -1) return;
+
+	if (items.length === 1) {
+		// If this was the last item, remove the key entirely
+		map.delete(key);
+	} else {
+		// Remove just this item
+		items.splice(index, 1);
+	}
 };

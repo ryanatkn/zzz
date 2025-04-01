@@ -154,9 +154,13 @@ describe('Indexed_Collection - Edge Cases', () => {
 				create_derived_index({
 					key: 'filtered_items',
 					compute: (collection) => {
-						return collection.all
-							.filter((item) => item.boolean_a && item.number_a !== null)
-							.sort((a, b) => (b.number_a || 0) - (a.number_a || 0));
+						const result = [];
+						for (const item of collection.by_id.values()) {
+							if (item.boolean_a && item.number_a !== null) {
+								result.push(item);
+							}
+						}
+						return result.sort((a, b) => (b.number_a || 0) - (a.number_a || 0));
 					},
 					matches: (item) => item.boolean_a && item.number_a !== null,
 					sort: (a, b) => (b.number_a || 0) - (a.number_a || 0),
@@ -187,7 +191,7 @@ describe('Indexed_Collection - Edge Cases', () => {
 		// Test various queries against the indexes
 		expect(collection.by_optional('by_string_a', 'item23')?.number_a).toBe(23);
 		expect(collection.where('by_array_a', 'tag5').length).toBe(10); // 10% of items have tag5
-		expect(collection.get_derived('filtered_items').length).toBe(
+		expect(collection.derived_index('filtered_items').length).toBe(
 			test_batch.filter((i) => i.boolean_a && i.number_a !== null).length,
 		);
 
@@ -275,7 +279,14 @@ describe('Indexed_Collection - Edge Cases', () => {
 				if (query === item.string_a) {
 					return [item];
 				}
-				return collection.all.filter((i: any) => i.string_a.includes(query));
+
+				const result = [];
+				for (const i of collection.by_id.values()) {
+					if (i.string_a.includes(query)) {
+						result.push(i);
+					}
+				}
+				return result;
 			};
 		});
 
@@ -283,7 +294,14 @@ describe('Indexed_Collection - Edge Cases', () => {
 			// Return a new function that excludes the removed item
 			return (query: string) => {
 				compute_fn(query);
-				return collection.all.filter((i: any) => i.string_a.includes(query));
+
+				const result = [];
+				for (const i of collection.by_id.values()) {
+					if (i.string_a.includes(query)) {
+						result.push(i);
+					}
+				}
+				return result;
 			};
 		});
 
@@ -294,7 +312,14 @@ describe('Indexed_Collection - Edge Cases', () => {
 					factory: (collection) => {
 						return (query: string) => {
 							compute_fn(query);
-							return collection.all.filter((i) => i.string_a.includes(query));
+
+							const result = [];
+							for (const i of collection.by_id.values()) {
+								if (i.string_a.includes(query)) {
+									result.push(i);
+								}
+							}
+							return result;
 						};
 					},
 					query_schema: z.string(),
@@ -344,12 +369,13 @@ describe('Indexed_Collection - Edge Cases', () => {
 				{
 					key: 'stats',
 					compute: (collection) => {
+						const items = [...collection.by_id.values()];
 						return {
-							count: collection.all.length,
-							boolean_a_true_count: collection.all.filter((i) => i.boolean_a).length,
-							boolean_a_false_count: collection.all.filter((i) => !i.boolean_a).length,
-							sum_number_a: collection.all.reduce((sum, i) => sum + (i.number_a || 0), 0),
-							array_a_frequency: collection.all.reduce<Record<string, number>>((freq, item) => {
+							count: items.length,
+							boolean_a_true_count: items.filter((i) => i.boolean_a).length,
+							boolean_a_false_count: items.filter((i) => !i.boolean_a).length,
+							sum_number_a: items.reduce((sum, i) => sum + (i.number_a || 0), 0),
+							array_a_frequency: items.reduce<Record<string, number>>((freq, item) => {
 								for (const value of item.array_a) {
 									freq[value] = (freq[value] || 0) + 1;
 								}
@@ -446,57 +472,5 @@ describe('Indexed_Collection - Edge Cases', () => {
 		expect(stats.sum_number_a).toBe(90);
 		expect(stats.array_a_frequency.tag1).toBe(2);
 		expect(stats.array_a_frequency.tag2).toBe(1);
-	});
-
-	test('remove_first_many handles edge cases correctly', () => {
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
-			indexes: [
-				create_multi_index({
-					key: 'by_string_a',
-					extractor: (item) => item.string_a,
-					query_schema: z.string(),
-				}),
-			],
-		});
-
-		// Test on empty collection
-		expect(collection.remove_first_many(5)).toBe(0);
-		expect(collection.size).toBe(0);
-
-		// Add a few items
-		const items = [create_test_item('a1', 1), create_test_item('a2', 2), create_test_item('a3', 3)];
-		collection.add_many(items);
-		expect(collection.size).toBe(3);
-
-		// Test with zero count
-		expect(collection.remove_first_many(0)).toBe(0);
-		expect(collection.size).toBe(3);
-
-		// Test with negative count
-		expect(collection.remove_first_many(-5)).toBe(0);
-		expect(collection.size).toBe(3);
-
-		// Test removing exactly the number of items that exist
-		expect(collection.remove_first_many(3)).toBe(3);
-		expect(collection.size).toBe(0);
-
-		// Re-add items and test removing more than exist
-		collection.add_many(items);
-		expect(collection.size).toBe(3);
-		expect(collection.remove_first_many(10)).toBe(3);
-		expect(collection.size).toBe(0);
-
-		// Test that indexes are properly updated
-		collection.add_many([
-			create_test_item('a1', 1),
-			create_test_item('a1', 2), // Duplicate string_a
-			create_test_item('a2', 3),
-		]);
-		expect(collection.where('by_string_a', 'a1').length).toBe(2);
-
-		// Remove just the first item
-		collection.remove_first_many(1);
-		expect(collection.size).toBe(2);
-		expect(collection.where('by_string_a', 'a1').length).toBe(1);
 	});
 });

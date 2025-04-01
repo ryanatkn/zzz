@@ -9,11 +9,7 @@ import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {strip_start} from '@ryanatkn/belt/string.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
-import {
-	create_single_index,
-	create_multi_index,
-	create_derived_index,
-} from '$lib/indexed_collection_helpers.js';
+import {create_single_index, create_multi_index} from '$lib/indexed_collection_helpers.js';
 
 export const Diskfiles_Json = z
 	.object({
@@ -43,13 +39,6 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 			}),
 
 			create_multi_index({
-				key: 'by_external_status',
-				extractor: (file) => (file.external ? 'external' : 'non_external'),
-				query_schema: z.enum(['external', 'non_external']),
-				result_schema: Diskfile_Schema,
-			}),
-
-			create_multi_index({
 				key: 'by_extension',
 				extractor: (file) => {
 					const match = /\.([^.]+)$/.exec(file.path);
@@ -57,26 +46,6 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 				},
 				query_schema: z.string(),
 				result_schema: Diskfile_Schema,
-			}),
-
-			create_derived_index({
-				key: 'non_external_files',
-				compute: (collection) => collection.where('by_external_status', 'non_external'),
-				matches: (item) => !item.external,
-				result_schema: Diskfile_Schema,
-				onadd: (collection, item) => {
-					if (!item.external) {
-						collection.push(item);
-					}
-					return collection;
-				},
-				onremove: (collection, item) => {
-					if (!item.external) {
-						const index = collection.findIndex((f) => f.id === item.id);
-						if (index !== -1) collection.splice(index, 1);
-					}
-					return collection;
-				},
 			}),
 		],
 	});
@@ -86,9 +55,6 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 	selected_file: Diskfile | null = $derived(
 		this.selected_file_id ? (this.items.by_id.get(this.selected_file_id) ?? null) : null,
 	);
-
-	// Use the derived index directly
-	non_external_diskfiles: Array<Diskfile> = $derived(this.items.get_derived('non_external_files'));
 
 	onselect?: (diskfile: Diskfile) => void;
 
@@ -214,11 +180,22 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 		return zzz_dir && strip_start(path, zzz_dir);
 	}
 
+	// TODO @many extract a selection helper class?
 	/**
 	 * Select a diskfile by id. Default to the first file if `id` is `undefined`.
 	 * If `id` is `null`, it selects no file.
 	 */
 	select(id: Uuid | null | undefined): void {
-		this.selected_file_id = id === undefined ? (this.items.all[0]?.id ?? null) : id;
+		if (id === undefined) {
+			this.select_next();
+		} else {
+			this.selected_file_id = id;
+		}
+	}
+
+	select_next(): void {
+		const {by_id} = this.items;
+		const next = by_id.values().next();
+		this.select(next.value?.id ?? null);
 	}
 }

@@ -1,8 +1,9 @@
 import {z} from 'zod';
 
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
-import {create_single_index} from '$lib/indexed_collection_helpers.js';
+import {create_single_index, create_derived_index} from '$lib/indexed_collection_helpers.js';
 import {Uuid} from '$lib/zod_helpers.js';
+import {to_reordered_list} from '$lib/list_helpers.js';
 
 export class Browser {
 	tabs: Browser_Tabs;
@@ -58,7 +59,7 @@ export class Browser {
 	}
 
 	reorder_tab(from_index: number, to_index: number): void {
-		this.tabs.reorder(from_index, to_index);
+		this.tabs.reorder_tabs(from_index, to_index);
 	}
 }
 
@@ -131,13 +132,20 @@ export class Browser_Tabs {
 				query_schema: z.string(),
 				result_schema: z.custom<Browser_Tab>(),
 			}),
+			create_derived_index({
+				key: 'manual_order',
+				compute: (collection) => Array.from(collection.by_id.values()),
+				result_schema: z.array(z.custom<Browser_Tab>()),
+			}),
 		],
 	});
 
-	all: Array<Browser_Tab> = $derived(this.items.all);
+	/** Ordered array of tabs derived from the `manual_order` index. */
+	readonly ordered_tabs: Array<Browser_Tab> = $derived(this.items.derived_index('manual_order'));
+
 	recently_closed_tabs: Array<Browser_Tab> = $state([]);
 
-	selected_tab: Browser_Tab | undefined = $derived(this.items.all.find((t) => t.selected)); // TODO single index
+	selected_tab: Browser_Tab | undefined = $derived(this.ordered_tabs.find((t) => t.selected)); // TODO single index
 
 	selected_url: string = $derived(this.selected_tab?.url || '');
 
@@ -156,7 +164,7 @@ export class Browser_Tabs {
 
 	add_new_tab(): void {
 		// Deselect all existing tabs
-		for (const tab of this.items.all) {
+		for (const tab of this.items.by_id.values()) {
 			tab.selected = false;
 		}
 
@@ -173,7 +181,7 @@ export class Browser_Tabs {
 	}
 
 	close(index: number): void {
-		const tabs = this.items.all;
+		const tabs = this.ordered_tabs;
 		if (index >= 0 && index < tabs.length) {
 			const tab_to_close = tabs[index];
 			const was_selected = tab_to_close.selected;
@@ -188,7 +196,7 @@ export class Browser_Tabs {
 				// Try to select the tab to the right (next index), or the last tab if there's nothing to the right
 				const new_index = Math.min(tabs.length - 1, index);
 				// Select the tab at the new index
-				this.items.all[new_index].selected = true;
+				this.ordered_tabs[new_index].selected = true;
 			}
 		}
 	}
@@ -199,7 +207,7 @@ export class Browser_Tabs {
 			if (tab_to_reopen) {
 				// If the tab was previously selected, deselect all current tabs
 				if (tab_to_reopen.selected) {
-					for (const tab of this.items.all) {
+					for (const tab of this.items.by_id.values()) {
 						tab.selected = false;
 					}
 				}
@@ -209,7 +217,7 @@ export class Browser_Tabs {
 	}
 
 	select(index: number): void {
-		const tabs = this.items.all;
+		const tabs = this.ordered_tabs;
 		if (index >= 0 && index < tabs.length) {
 			for (let i = 0; i < tabs.length; i++) {
 				tabs[i].selected = i === index;
@@ -224,9 +232,9 @@ export class Browser_Tabs {
 
 			// If it's an external URL tab, force a refresh by cloning the tab
 			if (selected_tab.type === 'external_url') {
-				const index = this.items.all.indexOf(selected_tab);
+				const index = this.ordered_tabs.indexOf(selected_tab);
 				if (index >= 0) {
-					this.items.all[index] = {...selected_tab};
+					this.ordered_tabs[index] = {...selected_tab};
 				}
 			}
 		}
@@ -240,21 +248,7 @@ export class Browser_Tabs {
 		}
 	}
 
-	reorder(from_index: number, to_index: number): void {
-		const tabs = this.items.all;
-
-		// Bounds checking
-		if (from_index < 0 || from_index >= tabs.length || to_index < 0 || to_index > tabs.length) {
-			return;
-		}
-
-		// Get the tab that needs to be moved
-		const tab_to_move = tabs[from_index];
-
-		// Remove the tab from its current position
-		this.items.all.splice(from_index, 1);
-
-		// Insert the tab at the new position
-		this.items.all.splice(to_index, 0, tab_to_move);
+	reorder_tabs(from_index: number, to_index: number): void {
+		this.items.indexes.manual_order = to_reordered_list(this.ordered_tabs, from_index, to_index);
 	}
 }

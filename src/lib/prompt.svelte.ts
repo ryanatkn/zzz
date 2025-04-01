@@ -16,15 +16,8 @@ export interface Prompt_Message {
 
 export type Prompt_Message_Content = string; // TODO ?
 
-const prompt_names: Array<string> = [];
-
 export const Prompt_Json = Cell_Json.extend({
-	name: z.string().default(() => {
-		// TODO BLOCK how to do this correctly? can you make it stateful and still have a static module-scoped schema? I dont see a context object arg or anything
-		const name = get_unique_name('prompt', prompt_names);
-		prompt_names.push(name);
-		return name;
-	}),
+	name: z.string().default(''),
 	bits: z.array(Bit_Json).default(() => []),
 });
 export type Prompt_Json = z.infer<typeof Prompt_Json>;
@@ -49,10 +42,7 @@ export class Prompt extends Cell<typeof Prompt_Json> {
 
 		// If name is provided directly in options, use it
 		if (options.name) {
-			this.name = get_unique_name(
-				options.name,
-				this.zzz.prompts.items.all.map((p) => p.name),
-			);
+			this.name = get_unique_name(options.name, this.zzz.prompts.items.single_index('by_name'));
 		}
 
 		// Initialize from json

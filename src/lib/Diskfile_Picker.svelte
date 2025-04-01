@@ -20,10 +20,11 @@
 	const {diskfiles} = zzz;
 </script>
 
+<!-- TODO @many more efficient array? maybe add `all` back to the base Indexed_Collection? -->
 <Picker
 	bind:show
+	items={Array.from(diskfiles.items.by_id.values())}
 	{onpick}
-	items={diskfiles.items}
 	{filter}
 	{exclude_ids}
 	sorters={[

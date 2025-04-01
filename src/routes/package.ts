@@ -180,6 +180,11 @@ export const package_json = {
 		},
 		'./cell_types.js': {types: './dist/cell_types.d.ts', default: './dist/cell_types.js'},
 		'./cell.svelte.js': {types: './dist/cell.svelte.d.ts', default: './dist/cell.svelte.js'},
+		'./Chat_Tape_Add_By_Model.svelte': {
+			types: './dist/Chat_Tape_Add_By_Model.svelte.d.ts',
+			svelte: './dist/Chat_Tape_Add_By_Model.svelte',
+			default: './dist/Chat_Tape_Add_By_Model.svelte',
+		},
 		'./Chat_Tape.svelte': {
 			types: './dist/Chat_Tape.svelte.d.ts',
 			svelte: './dist/Chat_Tape.svelte',
@@ -322,10 +327,10 @@ export const package_json = {
 			svelte: './dist/Diskfile_Actions.svelte',
 			default: './dist/Diskfile_Actions.svelte',
 		},
-		'./Diskfile_Bits_View.svelte': {
-			types: './dist/Diskfile_Bits_View.svelte.d.ts',
-			svelte: './dist/Diskfile_Bits_View.svelte',
-			default: './dist/Diskfile_Bits_View.svelte',
+		'./Diskfile_Bit_View.svelte': {
+			types: './dist/Diskfile_Bit_View.svelte.d.ts',
+			svelte: './dist/Diskfile_Bit_View.svelte',
+			default: './dist/Diskfile_Bit_View.svelte',
 		},
 		'./diskfile_editor_state.svelte.js': {
 			types: './dist/diskfile_editor_state.svelte.d.ts',
@@ -784,7 +789,6 @@ export const src_json = {
 			path: 'cell_helpers.ts',
 			declarations: [
 				{name: 'HANDLED', kind: 'variable'},
-				{name: 'USE_DEFAULT', kind: 'variable'},
 				{name: 'FILE_SHORT_DATE_FORMAT', kind: 'variable'},
 				{name: 'FILE_DATE_FORMAT', kind: 'variable'},
 				{name: 'FILE_TIME_FORMAT', kind: 'variable'},
@@ -820,6 +824,7 @@ export const src_json = {
 				{name: 'Cell', kind: 'class'},
 			],
 		},
+		'./Chat_Tape_Add_By_Model.svelte': {path: 'Chat_Tape_Add_By_Model.svelte', declarations: []},
 		'./Chat_Tape.svelte': {path: 'Chat_Tape.svelte', declarations: []},
 		'./Chat_View_Multi.svelte': {path: 'Chat_View_Multi.svelte', declarations: []},
 		'./Chat_View_Simple.svelte': {path: 'Chat_View_Simple.svelte', declarations: []},
@@ -827,6 +832,7 @@ export const src_json = {
 		'./chat.svelte.js': {
 			path: 'chat.svelte.ts',
 			declarations: [
+				{name: 'Chat_View_Mode', kind: 'type'},
 				{name: 'Chat_Json', kind: 'variable'},
 				{name: 'Chat_Options', kind: 'type'},
 				{name: 'Chat', kind: 'class'},
@@ -836,8 +842,6 @@ export const src_json = {
 		'./chats.svelte.js': {
 			path: 'chats.svelte.ts',
 			declarations: [
-				{name: 'Chat_Single_Indexes', kind: 'type'},
-				{name: 'Chat_Multi_Indexes', kind: 'type'},
 				{name: 'Chats_Json', kind: 'variable'},
 				{name: 'Chats_Options', kind: 'type'},
 				{name: 'Chats', kind: 'class'},
@@ -903,7 +907,7 @@ export const src_json = {
 		'./Dashboard_Settings.svelte': {path: 'Dashboard_Settings.svelte', declarations: []},
 		'./Dashboard.svelte': {path: 'Dashboard.svelte', declarations: []},
 		'./Diskfile_Actions.svelte': {path: 'Diskfile_Actions.svelte', declarations: []},
-		'./Diskfile_Bits_View.svelte': {path: 'Diskfile_Bits_View.svelte', declarations: []},
+		'./Diskfile_Bit_View.svelte': {path: 'Diskfile_Bit_View.svelte', declarations: []},
 		'./diskfile_editor_state.svelte.js': {
 			path: 'diskfile_editor_state.svelte.ts',
 			declarations: [{name: 'Diskfile_Editor_State', kind: 'class'}],
@@ -1053,7 +1057,10 @@ export const src_json = {
 		},
 		'./list_helpers.js': {
 			path: 'list_helpers.ts',
-			declarations: [{name: 'reorder_list', kind: 'function'}],
+			declarations: [
+				{name: 'reorder_list', kind: 'function'},
+				{name: 'to_reordered_list', kind: 'function'},
+			],
 		},
 		'./Main_Dialog.svelte': {path: 'Main_Dialog.svelte', declarations: []},
 		'./Message_Detail.svelte': {path: 'Message_Detail.svelte', declarations: []},
@@ -1387,8 +1394,6 @@ export const src_json = {
 		'./tapes.svelte.js': {
 			path: 'tapes.svelte.ts',
 			declarations: [
-				{name: 'Tape_Single_Indexes', kind: 'type'},
-				{name: 'Tape_Multi_Indexes', kind: 'type'},
 				{name: 'Tapes_Json', kind: 'variable'},
 				{name: 'Tapes_Options', kind: 'type'},
 				{name: 'Tapes', kind: 'class'},

@@ -214,8 +214,13 @@ export class Messages extends Cell<typeof Messages_Json> {
 	 */
 	#trim_to_history_limit(): void {
 		// Calculate how many items to remove and use the optimized method
-		const excess = this.items.all.length - this.history_limit;
+		const excess = this.items.size - this.history_limit;
 		if (excess <= 0) return;
-		this.items.remove_first_many(excess);
+		const ids = [];
+		for (const message of this.items.by_id.values()) {
+			ids.push(message.id);
+			if (ids.length === excess) break;
+		}
+		this.items.remove_many(ids);
 	}
 }

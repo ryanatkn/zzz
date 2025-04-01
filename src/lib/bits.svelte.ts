@@ -32,6 +32,12 @@ export class Bits extends Cell<typeof Bits_Json> {
 				query_schema: z.string(),
 				result_schema: Bit_Schema,
 			}),
+			create_single_index({
+				key: 'by_diskfile_path',
+				extractor: (bit) => (bit.type === 'diskfile' ? bit.path : undefined),
+				query_schema: z.string(),
+				result_schema: Bit_Schema,
+			}),
 			// TODO BLOCK dynamic index with the rendered content? needs to be lazy, ideally just using $derived
 		],
 	});
@@ -67,5 +73,12 @@ export class Bits extends Cell<typeof Bits_Json> {
 	 */
 	remove(id: Uuid): boolean {
 		return this.items.remove(id);
+	}
+
+	/**
+	 * Find a bit that references a specific file path.
+	 */
+	find_bit_by_diskfile_path(path: string): Bit_Type | undefined {
+		return this.items.single_index('by_diskfile_path').get(path);
 	}
 }

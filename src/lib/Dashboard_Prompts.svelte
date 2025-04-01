@@ -52,13 +52,6 @@
 	const add_diskfile_bit = () => {
 		if (!zzz.prompts.selected) return;
 
-		// Get all available files
-		const files = zzz.diskfiles.items.all;
-		if (!files.length) {
-			alert('No files available. Add files first.'); // eslint-disable-line no-alert
-			return;
-		}
-
 		// Show the diskfile picker dialog
 		show_diskfile_picker = true;
 	};
@@ -94,7 +87,7 @@
 					onreorder: (from_index, to_index) => zzz.prompts.reorder_prompts(from_index, to_index),
 				}}
 			>
-				{#each zzz.prompts.items.all as prompt, i (prompt.id)}
+				{#each zzz.prompts.ordered_items as prompt, i (prompt.id)}
 					<li use:reorderable.item={{index: i}}>
 						<Contextmenu_Prompt {prompt}>
 							<Nav_Link
@@ -173,7 +166,12 @@
 									<span class="mr_xs2"><Glyph icon={GLYPH_BIT} /></span> add text
 								</div>
 							</button>
-							<button type="button" class="plain size_sm" onclick={add_diskfile_bit}>
+							<button
+								type="button"
+								class="plain size_sm"
+								onclick={add_diskfile_bit}
+								disabled={!zzz.diskfiles.items.size}
+							>
 								<div class="row white_space_nowrap">
 									<span class="mr_xs2"><Glyph icon={GLYPH_FILE} /></span> add file
 								</div>
@@ -209,7 +207,7 @@
 				</div>
 			</div>
 		</Contextmenu_Prompt>
-	{:else if zzz.prompts.items.all.length}
+	{:else if zzz.prompts.items.size}
 		<div class="flex align_items_center justify_content_center h_100 flex_1" in:fade>
 			<p>
 				Select a prompt from the list or <button
@@ -224,7 +222,7 @@
 					type="button"
 					class="inline color_f"
 					onclick={() => {
-						zzz.prompts.select(random_item(zzz.prompts.items.all).id);
+						zzz.prompts.select(random_item(zzz.prompts.ordered_items).id);
 					}}>go fish</button
 				>?
 			</p>

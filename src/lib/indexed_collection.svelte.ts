@@ -4,9 +4,7 @@ import {DEV} from 'esm-env';
 
 import {Uuid} from '$lib/zod_helpers.js';
 
-// TODO optimize to make `this.all` order volatile, so speeding up remove operations in particular with efficient swaps e.g. using `pop()` and `$state.raw`
-
-// TODO optimize, particular the scans of `this.all`
+// TODO optimize to make index operations more efficient, particularly for batch operations
 
 // TODO think about this from the whole graph's POV, not just individual collections, for relationships/transactions
 // consider a batch operations interface: "Add a transaction-like interface for batch operations to improve performance. Example: collection.batch().add(item1).remove(item2).commit()"
@@ -96,20 +94,21 @@ export class Indexed_Collection<
 	T_Key_Derived extends string = string,
 	T_Key_Dynamic extends string = string,
 > {
-	// The main collection of items
-	all: Array<T> = $state([]);
-
-	// The primary index by id keyed by Uuid
+	/** The full collection keyed by Uuid. */
 	readonly by_id: SvelteMap<Uuid, T> = new SvelteMap();
 
-	// Stores all index values (reactive)
+	/** Get the current count of items. */
+	readonly size: number = $derived(this.by_id.size);
+
+	// TODO ideally I think this would leverage derived? need to ensure we have the right lazy perf characteristics
+	/** Stores all index values in a reactive object. */
 	readonly indexes: Record<string, any> = $state({});
 
 	// Map of index types for type safety and runtime checks
 	readonly #index_types: Map<string, Index_Type> = new Map();
 
 	// Store all index configs for reference
-	#index_definitions: ReadonlyArray<Index_Definition<T>> = [];
+	readonly #index_definitions: ReadonlyArray<Index_Definition<T>> = [];
 
 	// Whether to validate indexes
 	readonly #validate: boolean;
@@ -187,7 +186,7 @@ export class Indexed_Collection<
 	}
 
 	toJSON(): Array<any> {
-		return $state.snapshot(this.all);
+		return $state.snapshot([...this.by_id.values()]);
 	}
 
 	/**
@@ -202,7 +201,7 @@ export class Indexed_Collection<
 	/**
 	 * Get a single-value index with proper typing
 	 */
-	single_index<V>(key: T_Key_Single): SvelteMap<any, V> {
+	single_index(key: T_Key_Single): SvelteMap<any, T> {
 		this.#ensure_index(key, 'single');
 		return this.indexes[key];
 	}
@@ -210,7 +209,7 @@ export class Indexed_Collection<
 	/**
 	 * Get a multi-value index with proper typing
 	 */
-	multi_index<V>(key: T_Key_Multi): SvelteMap<any, Array<V>> {
+	multi_index(key: T_Key_Multi): SvelteMap<any, Array<T>> {
 		this.#ensure_index(key, 'multi');
 		return this.indexes[key];
 	}
@@ -218,7 +217,7 @@ export class Indexed_Collection<
 	/**
 	 * Get a derived index with proper typing
 	 */
-	derived_index<V>(key: T_Key_Derived): Array<V> {
+	derived_index(key: T_Key_Derived): Array<T> {
 		this.#ensure_index(key, 'derived');
 		return this.indexes[key];
 	}
@@ -226,7 +225,7 @@ export class Indexed_Collection<
 	/**
 	 * Get a dynamic (function) index with proper typing
 	 */
-	dynamic_index<V, Q = any>(key: T_Key_Dynamic): (query: Q) => V {
+	dynamic_index<Q = any>(key: T_Key_Dynamic): (query: Q) => T {
 		this.#ensure_index(key, 'dynamic');
 		return this.indexes[key];
 	}
@@ -292,10 +291,7 @@ export class Indexed_Collection<
 	add_many(items: Array<T>): Array<T> {
 		if (!items.length) return [];
 
-		// Add all items to main array
-		this.all.push(...items);
-
-		// Batch update indexes
+		// Add all items to the collection
 		for (const item of items) {
 			// Update primary id index
 			this.by_id.set(item.id, item);
@@ -364,52 +360,6 @@ export class Indexed_Collection<
 
 		by_id.set(item.id, item);
 
-		// Add to the end of the array
-		this.all.push(item);
-
-		// Update all indexes
-		this.#update_indexes_for_added_item(item);
-
-		return item;
-	}
-
-	// TODO BLOCK @many maybe delete?  for `add`
-	/**
-	 * Add an item at the beginning of the collection
-	 */
-	add_first(item: T): T {
-		// Add to beginning of array
-		this.all.unshift(item);
-		this.by_id.set(item.id, item);
-
-		// Update all indexes
-		this.#update_indexes_for_added_item(item);
-
-		return item;
-	}
-
-	/**
-	 * Insert an item at a specific position
-	 */
-	insert_at(item: T, index: number): T {
-		if (index < 0 || index > this.all.length) {
-			throw new Error(
-				`Insert index ${index} out of bounds for collection of size ${this.all.length}`,
-			);
-		}
-
-		if (index === 0) {
-			return this.add_first(item);
-		}
-
-		if (index === this.all.length) {
-			return this.add(item);
-		}
-
-		// Insert into array
-		this.all.splice(index, 0, item);
-		this.by_id.set(item.id, item);
-
 		// Update all indexes
 		this.#update_indexes_for_added_item(item);
 
@@ -423,16 +373,10 @@ export class Indexed_Collection<
 		const item = this.by_id.get(id);
 		if (!item) return false;
 
-		// Find the index of the item in the array
-		const index = this.index_of(id);
-		if (index === undefined) return false;
-
-		// IMPORTANT: First update indexes, then remove from collection
-		// This order matters for correct handling of duplicate keys
+		// Update indexes first before removing the item
 		this.#update_indexes_for_removed_item(item);
 
-		// Now remove from array and by_id map
-		this.all.splice(index, 1);
+		// Now remove from by_id map
 		this.by_id.delete(id);
 
 		return true;
@@ -448,14 +392,13 @@ export class Indexed_Collection<
 		const id_set = new Set(ids);
 		let removed_count = 0;
 
-		// First build a removal map to avoid repeated lookups
+		// Build a list of items to remove
 		const to_remove_items: Array<T> = [];
 
 		// Identify items to remove
-		for (let i = this.all.length - 1; i >= 0; i--) {
-			const item = this.all[i];
-			if (id_set.has(item.id)) {
-				this.all.splice(i, 1); // Remove directly from array
+		for (const id of id_set) {
+			const item = this.by_id.get(id);
+			if (item) {
 				to_remove_items.push(item);
 				removed_count++;
 			}
@@ -464,42 +407,17 @@ export class Indexed_Collection<
 		// Exit early if nothing to remove
 		if (removed_count === 0) return 0;
 
-		// Clear removed items from indexes
+		// Clear removed items from indexes first
+		for (const item of to_remove_items) {
+			this.#update_indexes_for_removed_item(item);
+		}
+
+		// Then remove from the main collection
 		for (const item of to_remove_items) {
 			this.by_id.delete(item.id);
-			this.#update_indexes_for_removed_item(item);
 		}
 
 		return removed_count;
-	}
-
-	/**
-	 * Efficiently removes the first n items from the collection.
-	 * This is optimized for trimming operations where items at the beginning
-	 * need to be removed (like in history or log trimming).
-	 *
-	 * @param count Number of items to remove from the beginning
-	 * @returns Number of items actually removed
-	 */
-	remove_first_many(count: number): number {
-		if (count <= 0 || this.all.length === 0) return 0;
-
-		// Cap at array length
-		const actual_count = Math.min(count, this.all.length);
-
-		// Get the items to remove in one go
-		const items_to_remove = this.all.slice(0, actual_count);
-
-		// Update primary collection
-		this.all.splice(0, actual_count);
-
-		// Update indexes
-		for (const item of items_to_remove) {
-			this.by_id.delete(item.id);
-			this.#update_indexes_for_removed_item(item);
-		}
-
-		return actual_count;
 	}
 
 	/**
@@ -517,52 +435,9 @@ export class Indexed_Collection<
 	}
 
 	/**
-	 * Get the array index of an item by its id
-	 */
-	index_of(id: Uuid): number | undefined {
-		// Find the item in the array with linear search
-		const item = this.by_id.get(id);
-		if (!item) return undefined;
-
-		// Scan the array to find the item
-		for (let i = 0; i < this.all.length; i++) {
-			if (this.all[i].id === id) {
-				return i;
-			}
-		}
-
-		// Item not found in array but exists in by_id (inconsistent state)
-		return undefined;
-	}
-
-	/**
-	 * Reorder items in the collection
-	 */
-	reorder(from_index: number, to_index: number): void {
-		if (from_index === to_index) return;
-		if (from_index < 0 || to_index < 0) return;
-		if (from_index >= this.all.length || to_index >= this.all.length) return;
-
-		// Get the item to move
-		const item = this.all[from_index];
-
-		// Remove from array and reinsert at new position
-		this.all.splice(from_index, 1);
-		this.all.splice(to_index, 0, item);
-	}
-
-	/**
-	 * Get the current count of items
-	 */
-	get size(): number {
-		return this.all.length;
-	}
-
-	/**
 	 * Clear all items and reset indexes
 	 */
 	clear(): void {
-		this.all.length = 0;
 		this.by_id.clear();
 
 		// Clear all indexes
@@ -570,6 +445,8 @@ export class Indexed_Collection<
 			this.indexes[def.key] = def.compute(this);
 		}
 	}
+
+	// TODO `V = any` needs to be typesafe to the key/value pair
 
 	/**
 	 * Get all items matching a multi-indexed property value
@@ -603,15 +480,6 @@ export class Indexed_Collection<
 
 		const items = this.where<V>(index_key, value);
 		return items.slice(-Math.min(limit, items.length));
-	}
-
-	/**
-	 * Get a derived collection by its key
-	 * Type-safe version that uses the T_Key_Derived generic parameter
-	 */
-	get_derived(key: T_Key_Derived): Array<T> {
-		this.#ensure_index(key, 'derived');
-		return this.indexes[key];
 	}
 
 	/**

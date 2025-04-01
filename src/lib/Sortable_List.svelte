@@ -4,7 +4,6 @@
 
 	import type {Uuid} from '$lib/zod_helpers.js';
 	import {Sortable, type Sorter} from '$lib/sortable.svelte.js';
-	import type {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 
 	const {
 		items,
@@ -17,7 +16,7 @@
 		children,
 	}: {
 		/** The collection of items */
-		items: Indexed_Collection<T>;
+		items: Array<T>;
 		filter?: ((item: T) => boolean) | undefined;
 		exclude_ids?: Array<Uuid> | undefined;
 		sorters?: Array<Sorter<T>> | undefined;
@@ -30,21 +29,19 @@
 
 	const sortable = $state(
 		new Sortable(
-			() => items.all,
+			() => items,
 			() => sorters,
 			() => sort_key_default,
 		),
 	);
 
 	const filtered_items = $derived.by(() => {
-		const all_items = items.all;
-
 		// Quick return for common case (no filtering or sorting needed)
 		if ((!exclude_ids || exclude_ids.length === 0) && !filter && !sortable.active_sort_fn) {
-			return all_items;
+			return items;
 		}
 
-		let result = all_items;
+		let result = items;
 
 		if (exclude_ids && exclude_ids.length > 0) {
 			result = result.filter((item) => !exclude_ids.includes(item.id));
@@ -55,8 +52,8 @@
 		}
 
 		if (sortable.active_sort_fn) {
-			// If result is still the original array, we need to clone to avoid mutating the source
-			if (result === all_items) {
+			// If result is still the original array, clone to avoid mutating the source
+			if (result === items) {
 				result = [...result];
 			}
 			result.sort(sortable.active_sort_fn);

@@ -22,8 +22,8 @@
 
 <Picker
 	bind:show
+	items={prompts.ordered_items}
 	{onpick}
-	items={prompts.items}
 	{filter}
 	{exclude_ids}
 	sorters={[

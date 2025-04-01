@@ -35,7 +35,6 @@ export type Zzz_Dir = z.infer<typeof Zzz_Dir>;
 export const Source_File = z.object({
 	id: Diskfile_Path,
 	contents: z.string().nullable(),
-	external: z.boolean(),
 	ctime: z.number().nullable(),
 	mtime: z.number().nullable(),
 	// Using any for Map generics to avoid circular references
@@ -49,7 +48,6 @@ export type Source_File = z.infer<typeof Source_File>;
 export const Diskfile_Json = Cell_Json.extend({
 	path: Diskfile_Path.nullable().default(null),
 	content: z.string().nullable().default(null),
-	external: z.boolean().default(false),
 	dependents: z.array(z.tuple([Diskfile_Path, z.any()])).default(() => []),
 	dependencies: z.array(z.tuple([Diskfile_Path, z.any()])).default(() => []),
 });

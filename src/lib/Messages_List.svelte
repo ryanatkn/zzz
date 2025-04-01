@@ -22,21 +22,13 @@
 	const {messages} = zzz;
 
 	// Count total messages for the "showing X of Y" message
-	const total_messages = $derived(messages.items.all.length);
+	const total_messages = $derived(messages.items.size);
 </script>
 
 <menu {...attrs} class="flex_1 unstyled overflow_auto scrollbar_width_thin {attrs?.class}">
+	<!-- TODO @many more efficient array? maybe add `all` back to the base Indexed_Collection? -->
 	<Sortable_List
-		items={messages.items}
-		filter={(message) => {
-			// Limit filter for messages - show only the first N messages by created date (newest first)
-
-			// Get the first N items
-			const limited = messages.items.all.slice(0, limit);
-
-			// Check if the current message is in the limited set
-			return limited.some((item) => item.id === message.id);
-		}}
+		items={Array.from(messages.items.by_id.values())}
 		sorters={[
 			// TODO @many why is the cast needed?
 			sort_by_numeric<Message>('created_newest', 'newest first', 'created_date', 'desc'),

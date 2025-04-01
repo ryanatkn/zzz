@@ -34,7 +34,7 @@
 	};
 
 	const count = $derived(chat.tapes.length);
-	const tags = $derived(Array.from(zzz.tags)); // TODO BLOCK refactor, maybe `zzz.tags_array`? or `zzz.tags.all`
+	const tags = $derived(Array.from(zzz.tags)); // TODO BLOCK refactor, `Tags` may be a class, maybe with an indexed collection
 </script>
 
 <div class="column_fluid">
@@ -88,6 +88,7 @@
 				<header class="size_lg text_align_center mb_xs">add by tag</header>
 				<menu class="unstyled column">
 					{#each tags as tag (tag)}
+						{@const models_with_tag = zzz.models.filter_by_tag(tag)}
 						<button
 							type="button"
 							class="w_100 size_sm py_xs3 justify_content_space_between plain radius_xs font_weight_600"
@@ -97,8 +98,8 @@
 							}}
 						>
 							<span>{tag}</span>
-							{#if zzz.models.items.all.filter((m) => m.tags.includes(tag)).length}
-								<span>{zzz.models.items.all.filter((m) => m.tags.includes(tag)).length}</span>
+							{#if models_with_tag.length}
+								<span>{models_with_tag.length}</span>
 							{/if}
 						</button>
 					{/each}
@@ -108,6 +109,7 @@
 				<header class="size_lg text_align_center mb_xs">remove by tag</header>
 				<menu class="unstyled column">
 					{#each tags as tag (tag)}
+						<!-- TODO index this -->
 						{@const tapes_with_tag = chat.tapes.filter((t) => t.model.tags.includes(tag))}
 						<Confirm_Button
 							attrs={{

@@ -11,23 +11,15 @@ import type {Prompt} from '$lib/prompt.svelte.js';
 import {reorder_list} from '$lib/list_helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
-import {USE_DEFAULT} from '$lib/cell_helpers.js';
 import type {Bit_Type} from '$lib/bit.svelte.js';
 
 const NEW_CHAT_PREFIX = 'chat';
-
-const chat_names: Array<string> = [];
 
 const Chat_View_Mode = z.enum(['simple', 'multi']).default('simple');
 export type Chat_View_Mode = z.infer<typeof Chat_View_Mode>;
 
 export const Chat_Json = Cell_Json.extend({
-	name: z.string().default(() => {
-		// TODO BLOCK how to do this correctly? can you make it stateful and still have a static module-scoped schema? I dont see a context object arg or anything
-		const name = get_unique_name('chat', chat_names);
-		chat_names.push(name);
-		return name;
-	}),
+	name: z.string().default(''),
 	tape_ids: z.array(Uuid).default(() => []),
 	selected_prompt_ids: z.array(Uuid).default(() => []), // TODO consider making these refs, automatic classes (maybe as separate properties by convention, so the original is still the plain ids)
 	main_input: z.string().default(''),
@@ -100,12 +92,9 @@ export class Chat extends Cell<typeof Chat_Json> {
 			name: (value) => {
 				// If name is undefined, generate a unique name
 				if (value === undefined) {
-					return get_unique_name(
-						NEW_CHAT_PREFIX,
-						this.zzz.chats.items.all.map((c) => c.name),
-					);
+					return get_unique_name(NEW_CHAT_PREFIX, this.zzz.chats.items.single_index('by_name'));
 				}
-				return USE_DEFAULT; // Explicitly use the default decoding
+				return undefined; // default decoding
 			},
 		};
 
@@ -124,7 +113,7 @@ export class Chat extends Cell<typeof Chat_Json> {
 	}
 
 	add_tapes_by_model_tag(tag: string): void {
-		for (const model of this.zzz.models.items.all.filter((m) => m.tags.includes(tag))) {
+		for (const model of this.zzz.models.filter_by_tag(tag)) {
 			this.add_tape(model);
 		}
 	}
@@ -217,10 +206,7 @@ export class Chat extends Cell<typeof Chat_Json> {
 
 			this.init_name_status = 'success';
 			if (response_text !== this.name) {
-				this.name = get_unique_name(
-					response_text,
-					this.zzz.chats.items.all.map((c) => c.name),
-				);
+				this.name = get_unique_name(response_text, this.zzz.chats.items.single_index('by_name'));
 			}
 		} catch (err) {
 			this.init_name_status = 'initial'; // ignore failures, will retry
@@ -232,10 +218,6 @@ export class Chat extends Cell<typeof Chat_Json> {
 	 * Reorder tapes by moving from one index to another
 	 */
 	reorder_tapes(from_index: number, to_index: number): void {
-		if (from_index === to_index) return;
-		if (from_index < 0 || from_index >= this.tape_ids.length) return;
-		if (to_index < 0 || to_index >= this.tape_ids.length) return;
-
 		reorder_list(this.tape_ids, from_index, to_index);
 	}
 }

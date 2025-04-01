@@ -51,7 +51,7 @@
 			</div>
 			<div>
 				<ul class="unstyled">
-					{#each zzz.models.items.all as model (model.name)}
+					{#each zzz.models.ordered_by_name as model (model.name)}
 						<li class="mb_xs">
 							<span class="menu_item">
 								<Model_Link {model} icon attrs={{class: 'row gap_xs'}} />

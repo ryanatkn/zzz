@@ -8,7 +8,6 @@ import {
 	get_schema_class_info,
 	type Schema_Class_Info,
 	HANDLED,
-	USE_DEFAULT,
 	FILE_SHORT_DATE_FORMAT,
 	FILE_DATE_FORMAT,
 	FILE_TIME_FORMAT,
@@ -18,17 +17,44 @@ import type {Schema_Keys, Cell_Json} from '$lib/cell_types.js';
 
 // Base options type that all cells will extend
 export interface Cell_Options<T_Schema extends z.ZodType> {
-	zzz: Zzz;
+	zzz: Zzz; // TODO needs to be generic
 	json?: z.input<T_Schema>;
 }
 
+/**
+ * The `Cell` is the base class for schema-driven data models in Zzz.
+ * The goals are still evolving, but a main idea is to have fully reactive state
+ * that can be flexibly snapshotted and reinstantiated in a typesafe, extensible system
+ * that uses normal Svelte patterns.
+ *
+ * The design aims for:
+ *
+ * - Integration with Svelte's reactivity, encouraging single-depth inheritance
+ * 		with Svelte class patterns for both persistent and ephemeral state
+ * - Schema-driven parsing/validation and JSON serialization/deserialization via Zod
+ * 		(I plan to evaluate ArkType soon)
+ * - Custom property encoding/decoding for complex types,
+ * 		and no boilerplate for schema-inferrable properties
+ * - Lifecycle management with generic instantiation/registration and disposal
+ * - Runtime type metadata for reflection
+ *
+ * Cells are automatically registered in the global registry by `id`,
+ * making them discoverable and referenceable throughout the system.
+ * Each cell has common properties including `id` and `created`/`updated` timestamps.
+ *
+ * There are currently a lot of rough edges and missing features!
+ * My hope is that this could be generic enough to extract to a library, but it's not there yet.
+ * I assume there's a really nice design in this space that takes full advantage of Svelte runes.
+ *
+ * Many things will be possible with this pattern, but it's still a work in progress.
+ */
 export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Cell_Json {
 	// Base properties from Cell_Json
 	id: Uuid = $state()!;
 	created: Datetime = $state()!;
 	updated: Datetime | null = $state()!;
 
-	readonly schema: T_Schema;
+	readonly schema: T_Schema; // TODO currently Zod, but I'm evaluating ArkType soon - Zzz's goals may justify its runtime weight, or maybe precompilation will eventually beat Zod on that point too - https://github.com/arktypeio/arktype/issues/810
 
 	readonly schema_keys: Array<Schema_Keys<T_Schema>> = $derived.by(() =>
 		zod_get_schema_keys(this.schema),
@@ -54,6 +80,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 		() => this.schema.safeParse(this.json),
 	);
 
+	// TODO needs to be generic so users can extend it
 	readonly zzz: Zzz;
 
 	/**
@@ -62,27 +89,27 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	 *
 	 * Each decoder function takes a value of any type and should either:
 	 * 1. Return a value (including null) to be assigned to the property
-	 * 2. Return undefined or USE_DEFAULT to use the default decoding behavior
+	 * 2. Return undefined to use the default decoding behavior
 	 * 3. Return HANDLED to indicate the decoder has fully processed the property
 	 *    (virtual properties MUST return HANDLED if they exist in schema but not in class)
 	 */
 	protected decoders: Cell_Value_Decoder<T_Schema> = {};
 
-	created_date: Date = $derived(new Date(this.created));
-	created_formatted_short_date: string = $derived(
+	readonly created_date: Date = $derived(new Date(this.created));
+	readonly created_formatted_short_date: string = $derived(
 		format(this.created_date, FILE_SHORT_DATE_FORMAT),
 	);
-	created_formatted_date: string = $derived(format(this.created_date, FILE_DATE_FORMAT));
-	created_formatted_time: string = $derived(format(this.created_date, FILE_TIME_FORMAT));
+	readonly created_formatted_date: string = $derived(format(this.created_date, FILE_DATE_FORMAT));
+	readonly created_formatted_time: string = $derived(format(this.created_date, FILE_TIME_FORMAT));
 
-	updated_date: Date | null = $derived(this.updated ? new Date(this.updated) : null);
-	updated_formatted_short_date: string | null = $derived(
+	readonly updated_date: Date | null = $derived(this.updated ? new Date(this.updated) : null);
+	readonly updated_formatted_short_date: string | null = $derived(
 		this.updated_date ? format(this.updated_date, FILE_SHORT_DATE_FORMAT) : null,
 	);
-	updated_formatted_date: string | null = $derived(
+	readonly updated_formatted_date: string | null = $derived(
 		this.updated_date ? format(this.updated_date, FILE_DATE_FORMAT) : null,
 	);
-	updated_formatted_time: string | null = $derived(
+	readonly updated_formatted_time: string | null = $derived(
 		this.updated_date ? format(this.updated_date, FILE_TIME_FORMAT) : null,
 	);
 
@@ -142,9 +169,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 			return;
 		}
 
-		// Use a type assertion to handle the generic type constraint issue
-		// This is safe because we know this is a Cell instance
-		this.zzz.cells.set(this.id, this as any);
+		this.zzz.cells.set(this.id, this as any); // TODO refactor to avoid casting?
 		this.#registered = true;
 	}
 
@@ -166,6 +191,10 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 		return this.json;
 	}
 
+	/**
+	 * Encodes the cell's serializable state as JSON.
+	 * Use the derived `cell.json` if you don't need a fresh copy.
+	 */
 	to_json(): z.output<T_Schema> {
 		const result: z.output<T_Schema> = {};
 
@@ -246,82 +275,6 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	}
 
 	/**
-	 * Process a single schema property during JSON deserialization.
-	 * This method handles the workflow for mapping schema properties to instance properties.
-	 *
-	 * Flow:
-	 * 1. If a decoder exists for this property, try to use it
-	 * 2. If decoder returns HANDLED, consider the property fully handled (short circuit)
-	 * 3. If decoder returns a value other than HANDLED, USE_DEFAULT, or undefined, use that value
-	 * 4. If decoder returns USE_DEFAULT or undefined, fall through to standard decoding
-	 * 5. For properties not directly represented in the class instance but defined
-	 *    in the schema, the decoder MUST return HANDLED to indicate proper handling
-	 */
-	protected assign_property(key: Schema_Keys<T_Schema>, value: unknown): void {
-		// 1. Check if we have a property and decoder for this key
-		const has_property = key in this;
-		const has_decoder = key in this.decoders;
-
-		// 2. If we don't have a property or decoder, log an error and bail
-		if (!has_property && !has_decoder) {
-			console.error(
-				`Schema key "${key}" in ${this.constructor.name} has no matching property or decoder. ` +
-					`Consider adding the property or a decoder.`,
-			);
-			return;
-		}
-
-		// 3. Try to use the decoder if available
-		if (has_decoder) {
-			const decoder = this.decoders[key];
-			if (decoder) {
-				const decoded = decoder(value);
-
-				// 3a. If decoder returns HANDLED, it signals complete handling (short circuit)
-				if (decoded === HANDLED) {
-					return;
-				}
-
-				// 3b. For USE_DEFAULT, explicitly fall through to standard decoding
-				if (decoded === USE_DEFAULT) {
-					if (has_property) {
-						// Fallthrough to standard decoding (no break needed)
-					} else {
-						console.error(
-							`Decoder for "${key}" in ${this.constructor.name} returned USE_DEFAULT but no property exists.`,
-						);
-						return;
-					}
-				}
-				// 3c. If decoder returns a defined value AND we have a property, assign it
-				// Note: this allows null values to be assigned
-				else if (decoded !== undefined && has_property) {
-					this[key] = decoded;
-					return;
-				}
-
-				// 3d. If decoder returns undefined, fall through to standard decoding
-
-				// 3e. If we don't have a property but have a decoder that didn't return HANDLED,
-				// that's an error - virtual properties MUST be explicitly handled
-				if (!has_property) {
-					console.error(
-						`Decoder for schema property "${key}" in ${this.constructor.name} didn't return HANDLED. ` +
-							`Virtual properties (not present on class) must explicitly return HANDLED.`,
-					);
-					return;
-				}
-			}
-		}
-
-		// 4. Use standard decoding if we have a property and value
-		if (has_property && value !== undefined) {
-			const decoded = this.decode_property(value, key);
-			this[key] = decoded;
-		}
-	}
-
-	/**
 	 * Encode a value during serialization. Can be overridden for custom encoding logic.
 	 * Defaults to Svelte's `$state.snapshot`,
 	 * which handles most cases and uses `toJSON` when available,
@@ -383,19 +336,81 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	}
 
 	/**
-	 * Generic clone method that works for any subclass.
-	 * TODO add optional json and ctor options
+	 * Process a single schema property during JSON deserialization.
+	 * This method handles the workflow for mapping schema properties to instance properties.
+	 *
+	 * Flow:
+	 * 1. If a decoder exists for this property, try to use it
+	 * 2. If decoder returns HANDLED, consider the property fully handled (short circuit)
+	 * 3. If decoder returns a value other than HANDLED or undefined, use that value
+	 * 4. If decoder returns undefined, fall through to standard decoding
+	 * 5. For properties not directly represented in the class instance but defined
+	 *    in the schema, the decoder MUST return HANDLED to indicate proper handling
 	 */
-	clone(options?: Cell_Options<T_Schema>): this {
-		const constructor = this.constructor as new (options: Cell_Options<T_Schema>) => this;
-		try {
-			// Get the current json
-			const {id: _, ...json} = this.json;
+	protected assign_property(key: Schema_Keys<T_Schema>, value: unknown): void {
+		// 1. Check if we have a property and decoder for this key
+		const has_property = key in this;
+		const has_decoder = key in this.decoders;
 
+		// 2. If we don't have a property or decoder, log an error and bail
+		if (!has_property && !has_decoder) {
+			console.error(
+				`Schema key "${key}" in ${this.constructor.name} has no matching property or decoder. ` +
+					`Consider adding the property or a decoder.`,
+			);
+			return;
+		}
+
+		// 3. Try to use the decoder if available
+		if (has_decoder) {
+			const decoder = this.decoders[key];
+			if (decoder) {
+				const decoded = decoder(value);
+
+				// 3a. If decoder returns HANDLED, it signals complete handling (short circuit)
+				if (decoded === HANDLED) {
+					return;
+				}
+
+				// 3b. If decoder returns a defined value AND we have a property, assign it
+				// Note: this allows null values to be assigned
+				if (decoded !== undefined && has_property) {
+					(this as any)[key] = decoded;
+					return;
+				}
+
+				// 3c. If decoder returns undefined, fall through to standard decoding
+
+				// 3d. If we don't have a property but have a decoder that didn't return HANDLED,
+				// that's an error - virtual properties MUST be explicitly handled
+				if (!has_property) {
+					console.error(
+						`Decoder for schema property "${key}" in ${this.constructor.name} didn't return HANDLED. ` +
+							`Virtual properties (not present on class) must explicitly return HANDLED.`,
+					);
+					return;
+				}
+			}
+		}
+
+		// 4. Use standard decoding if we have a property and value
+		if (has_property && value !== undefined) {
+			const decoded = this.decode_property(value, key);
+			this[key] = decoded;
+		}
+	}
+
+	/** Generic clone method that works for any subclass. */
+	clone(json?: z.input<T_Schema>, options?: Cell_Options<T_Schema>): this {
+		const constructor = this.constructor as new (options: Cell_Options<T_Schema>) => this;
+
+		const {id: _, ...current_json} = this.json;
+
+		try {
 			return new constructor({
 				...options,
 				zzz: this.zzz,
-				json: structuredClone(json),
+				json: structuredClone(json ? {...current_json, ...json} : current_json),
 			});
 		} catch (error) {
 			console.error(`Failed to clone instance of ${constructor.name}:`, error);

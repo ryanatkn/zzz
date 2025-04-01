@@ -218,6 +218,11 @@
       "types": "./dist/cell.svelte.d.ts",
       "default": "./dist/cell.svelte.js"
     },
+    "./Chat_Tape_Add_By_Model.svelte": {
+      "types": "./dist/Chat_Tape_Add_By_Model.svelte.d.ts",
+      "svelte": "./dist/Chat_Tape_Add_By_Model.svelte",
+      "default": "./dist/Chat_Tape_Add_By_Model.svelte"
+    },
     "./Chat_Tape.svelte": {
       "types": "./dist/Chat_Tape.svelte.d.ts",
       "svelte": "./dist/Chat_Tape.svelte",
@@ -372,10 +377,10 @@
       "svelte": "./dist/Diskfile_Actions.svelte",
       "default": "./dist/Diskfile_Actions.svelte"
     },
-    "./Diskfile_Bits_View.svelte": {
-      "types": "./dist/Diskfile_Bits_View.svelte.d.ts",
-      "svelte": "./dist/Diskfile_Bits_View.svelte",
-      "default": "./dist/Diskfile_Bits_View.svelte"
+    "./Diskfile_Bit_View.svelte": {
+      "types": "./dist/Diskfile_Bit_View.svelte.d.ts",
+      "svelte": "./dist/Diskfile_Bit_View.svelte",
+      "default": "./dist/Diskfile_Bit_View.svelte"
     },
     "./diskfile_editor_state.svelte.js": {
       "types": "./dist/diskfile_editor_state.svelte.d.ts",

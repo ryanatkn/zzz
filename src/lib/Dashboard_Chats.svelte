@@ -25,14 +25,14 @@
 			>
 				{GLYPH_ADD} new chat
 			</button>
-			{#if zzz.chats.items.all.length}
+			{#if zzz.chats.items.size}
 				<menu
 					class="unstyled mt_sm"
 					use:reorderable.list={{
 						onreorder: (from_index, to_index) => zzz.chats.reorder_chats(from_index, to_index),
 					}}
 				>
-					{#each zzz.chats.items.all as chat, i (chat.id)}
+					{#each zzz.chats.ordered_items as chat, i (chat.id)}
 						<!-- TODO change to href from onclick -->
 						<li use:reorderable.item={{index: i}}>
 							<Contextmenu_Chat {chat}>
@@ -61,7 +61,7 @@
 		<Contextmenu_Chat chat={zzz.chats.selected}>
 			<Chat_View chat={zzz.chats.selected} />
 		</Contextmenu_Chat>
-	{:else if zzz.chats.items.all.length}
+	{:else if zzz.chats.items.size}
 		<div class="flex align_items_center justify_content_center h_100 flex_1" in:fade>
 			<p>
 				Select a chat from the list or <button
@@ -76,7 +76,7 @@
 					type="button"
 					class="inline color_f"
 					onclick={() => {
-						zzz.chats.select(random_item(zzz.chats.items.all).id);
+						zzz.chats.select(random_item(zzz.chats.ordered_items).id);
 					}}>go fish</button
 				>?
 			</p>

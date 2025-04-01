@@ -6,7 +6,7 @@ import {z} from 'zod';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import {Uuid, Datetime_Now} from '$lib/zod_helpers.js';
-import {HANDLED, USE_DEFAULT} from '$lib/cell_helpers.js';
+import {HANDLED} from '$lib/cell_helpers.js';
 import {Zzz} from '$lib/zzz.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
@@ -133,7 +133,7 @@ test('Cell handles sentinel values with proper precedence', () => {
 				default_field: (_value) => {
 					this.decoder_calls.push('default_field_called');
 					// Fall through to default decoding
-					return USE_DEFAULT;
+					return undefined;
 				},
 				normal_field: (_value) => {
 					this.decoder_calls.push('normal_field_called');

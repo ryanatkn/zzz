@@ -10,7 +10,7 @@
 	import {Diskfile_Editor_State} from '$lib/diskfile_editor_state.svelte.js';
 	import Diskfile_History_View from '$lib/Diskfile_History_View.svelte';
 	import {GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
-	import Diskfile_Bits_View from '$lib/Diskfile_Bits_View.svelte';
+	import Diskfile_Bit_View from '$lib/Diskfile_Bit_View.svelte';
 	import Contextmenu_Diskfile from '$lib/Contextmenu_Diskfile.svelte';
 
 	interface Props {
@@ -114,7 +114,7 @@
 				</div>
 			{/if}
 
-			<Diskfile_Bits_View {diskfile} />
+			<Diskfile_Bit_View {diskfile} />
 		</div>
 	</div>
 </Contextmenu_Diskfile>

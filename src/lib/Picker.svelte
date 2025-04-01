@@ -6,7 +6,6 @@
 
 	import type {Uuid} from '$lib/zod_helpers.js';
 	import type {Sorter} from '$lib/sortable.svelte.js';
-	import type {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 	import Sortable_List from '$lib/Sortable_List.svelte';
 
 	let {
@@ -24,7 +23,7 @@
 		heading = null,
 	}: {
 		/** The collection of items - required */
-		items: Indexed_Collection<T>;
+		items: Array<T>;
 		/**
 		 * Handle both picking an item or no item.
 		 * Return `false` to prevent closing.

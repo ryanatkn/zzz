@@ -51,7 +51,7 @@
 		// ctrl+alt+q: Close current tab
 		if (e.ctrlKey && e.altKey && !e.shiftKey && e.key === 'q') {
 			swallow(e);
-			const index = browser.tabs.all.findIndex((tab) => tab.selected);
+			const index = browser.tabs.ordered_tabs.findIndex((t) => t.selected);
 			if (index !== -1) {
 				browser.close_tab(index);
 			}
@@ -70,7 +70,7 @@
 				onreorder: (from_index, to_index) => browser.reorder_tab(from_index, to_index),
 			}}
 		>
-			{#each browser.tabs.all as tab, index (tab.id)}
+			{#each browser.tabs.ordered_tabs as tab, index (tab.id)}
 				<li class="flex" use:tabs_reorderable.item={{index}}>
 					<Browser_Tab_Listitem
 						{tab}

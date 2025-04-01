@@ -37,7 +37,6 @@ export const source_file_to_diskfile_json = (
 	id: existing_id ?? Uuid.parse(undefined), // Use existing id if provided, otherwise generate new
 	path: source_file.id,
 	content: source_file.contents,
-	external: source_file.external,
 	created: Datetime_Now.parse(source_file.ctime && new Date(source_file.ctime).toISOString()), // TODO seems messy
 	updated: source_file.mtime ? Datetime.parse(new Date(source_file.mtime).toISOString()) : null,
 	dependents: Array.from(source_file.dependents.entries()).map(([id, s]) => [

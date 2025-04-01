@@ -6,6 +6,8 @@ import type {Uuid} from '$lib/zod_helpers.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {create_single_index, create_derived_index} from '$lib/indexed_collection_helpers.js';
+import {to_reordered_list} from '$lib/list_helpers.js';
+import type {Bit_Type} from './bit.svelte.js';
 
 export const Prompts_Json = z
 	.object({
@@ -37,17 +39,15 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 
 			create_derived_index({
 				key: 'recent_prompts',
-				compute: (collection) => {
-					// Sort by creation date (newest first)
-					return [...collection.all].sort(
+				compute: (collection) =>
+					[...collection.by_id.values()].sort(
 						(a, b) => new Date(b.created).getTime() - new Date(a.created).getTime(),
-					);
-				},
-				result_schema: Prompt_Schema,
+					),
+				result_schema: z.array(Prompt_Schema),
 				onadd: (items, item) => {
 					// Insert at the right position based on creation date
 					const index = items.findIndex(
-						(existing) => new Date(item.created).getTime() > new Date(existing.created).getTime(),
+						(p) => new Date(item.created).getTime() > new Date(p.created).getTime(),
 					);
 					if (index === -1) {
 						items.push(item);
@@ -57,13 +57,22 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 					return items;
 				},
 			}),
+
+			create_derived_index({
+				key: 'manual_order',
+				compute: (collection) => Array.from(collection.by_id.values()),
+				result_schema: z.array(Prompt_Schema),
+			}),
 		],
 	});
 
 	selected_id: Uuid | null = $state(null);
-	selected: Prompt | undefined = $derived(
+	readonly selected: Prompt | undefined = $derived(
 		this.selected_id ? this.items.by_id.get(this.selected_id) : undefined,
 	);
+
+	/** Ordered array of prompts derived from the `manual_order` index. */
+	readonly ordered_items: Array<Prompt> = $derived(this.items.derived_index('manual_order'));
 
 	constructor(options: Prompts_Options) {
 		super(Prompts_Json, options);
@@ -73,7 +82,7 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 				if (Array.isArray(items)) {
 					this.items.clear();
 					for (const item_json of items) {
-						this.add(false, item_json);
+						this.add(item_json);
 					}
 				}
 				return HANDLED;
@@ -91,24 +100,25 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 	filter_unselected_prompts(selected_prompt_ids: Array<Uuid>): Array<Prompt> {
 		// If no ids provided, return all prompts
 		if (!selected_prompt_ids.length) {
-			return this.items.all;
+			return this.ordered_items;
 		}
 
 		// Create a Set for O(1) lookups
 		const selected_id_set = new Set(selected_prompt_ids);
 
 		// Return prompts that aren't in the selected set
-		return this.items.all.filter((prompt) => !selected_id_set.has(prompt.id));
+		return this.ordered_items.filter((prompt) => !selected_id_set.has(prompt.id));
+	}
+
+	filter_by_bit(bit: Bit_Type): Array<Prompt> {
+		const {id} = bit;
+		return this.ordered_items.filter((p) => p.bits.some((b) => b.id === id)); // TODO add an index?
 	}
 
 	// TODO BLOCK this is a weird API, the UI should be doing its sorting downstream not here
-	add(first = true, json?: Prompt_Json): Prompt {
+	add(json?: Prompt_Json): Prompt {
 		const prompt = new Prompt({zzz: this.zzz, json});
-		if (first) {
-			this.items.add_first(prompt);
-		} else {
-			this.items.add(prompt);
-		}
+		this.items.add(prompt);
 		if (this.selected_id === null) {
 			this.selected_id = prompt.id;
 		}
@@ -116,17 +126,10 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 	}
 
 	// TODO @many look into making these more generic, less manual bookkeeping
-	add_many(prompts_json: Array<Prompt_Json>, first = false): Array<Prompt> {
+	add_many(prompts_json: Array<Prompt_Json>): Array<Prompt> {
 		const prompts = prompts_json.map((json) => new Prompt({zzz: this.zzz, json}));
 
-		if (first) {
-			// Add each prompt to the beginning in reverse order to maintain original order
-			for (let i = prompts.length - 1; i >= 0; i--) {
-				this.items.add_first(prompts[i]);
-			}
-		} else {
-			this.items.add_many(prompts);
-		}
+		this.items.add_many(prompts);
 
 		// Set selected_id to the first prompt if none is selected
 		if (this.selected_id === null && prompts.length > 0) {
@@ -139,10 +142,7 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 	remove(prompt: Prompt): void {
 		const removed = this.items.remove(prompt.id);
 		if (removed && prompt.id === this.selected_id) {
-			// Find next prompt to select
-			const remaining_items = this.items.all;
-			const next_prompt = remaining_items.length > 0 ? remaining_items[0] : undefined;
-			this.selected_id = next_prompt ? next_prompt.id : null;
+			this.select_next();
 		}
 	}
 
@@ -156,20 +156,25 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 
 		// If the selected prompt was removed, select a new one
 		if (current_selected !== null && prompt_ids.includes(current_selected)) {
-			const remaining_items = this.items.all;
-			const next_prompt = remaining_items.length > 0 ? remaining_items[0] : undefined;
-			this.selected_id = next_prompt ? next_prompt.id : null;
+			this.select_next();
 		}
 
 		return removed_count;
 	}
 
+	// TODO @many extract a selection helper class?
 	select(prompt_id: Uuid | null): void {
 		this.selected_id = prompt_id;
 	}
 
+	select_next(): void {
+		const {by_id} = this.items;
+		const next = by_id.values().next();
+		this.select(next.value?.id ?? null);
+	}
+
 	reorder_prompts(from_index: number, to_index: number): void {
-		this.items.reorder(from_index, to_index);
+		this.items.indexes.manual_order = to_reordered_list(this.ordered_items, from_index, to_index);
 	}
 
 	remove_bit(bit_id: Uuid): void {

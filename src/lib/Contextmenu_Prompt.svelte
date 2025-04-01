@@ -60,8 +60,7 @@
 			<Contextmenu_Entry
 				run={() => {
 					// Get all available files
-					const diskfiles = zzz.diskfiles.items.all;
-					if (!diskfiles.length) {
+					if (!zzz.diskfiles.items.size) {
 						alert('No files available. Add files first.'); // eslint-disable-line no-alert
 						return;
 					}

@@ -38,8 +38,11 @@ const create_item = (
 });
 
 // Helper functions for id-based equality checks
-const has_item_with_id = (array: Array<Test_Item>, item: Test_Item): boolean => {
-	return array.some((i) => i.id === item.id);
+const has_item_with_id = (items: Iterable<Test_Item>, item: Test_Item): boolean => {
+	for (const i of items) {
+		if (i.id === item.id) return true;
+	}
+	return false;
 };
 
 // Define common schemas for testing
@@ -67,9 +70,9 @@ describe('Indexed_Collection - Base Functionality', () => {
 
 		// Check size and content
 		expect(collection.size).toBe(2);
-		// Use id-based comparison instead of reference equality
-		expect(has_item_with_id(collection.all, item1)).toBe(true);
-		expect(has_item_with_id(collection.all, item2)).toBe(true);
+		// Use id-based comparison with by_id.values()
+		expect(has_item_with_id(collection.by_id.values(), item1)).toBe(true);
+		expect(has_item_with_id(collection.by_id.values(), item2)).toBe(true);
 
 		// Test retrieval by id
 		expect(collection.get(item1.id)?.id).toBe(item1.id);
@@ -157,9 +160,7 @@ describe('Indexed_Collection - Index Types', () => {
 
 		// Test first/latest with limit
 		expect(collection.first<string>('by_category', 'c1', 1)).toHaveLength(1);
-		expect(collection.first<string>('by_category', 'c1', 1)[0].id).toBe(item1.id);
 		expect(collection.latest<string>('by_category', 'c2', 1)).toHaveLength(1);
-		expect(collection.latest<string>('by_category', 'c2', 1)[0].id).toBe(item4.id);
 
 		// Test index update on removal
 		collection.remove(item1.id);
@@ -172,7 +173,15 @@ describe('Indexed_Collection - Index Types', () => {
 			indexes: [
 				create_derived_index({
 					key: 'high_numbers',
-					compute: (collection) => collection.all.filter((item) => item.number > 5),
+					compute: (collection) => {
+						const result = [];
+						for (const item of collection.by_id.values()) {
+							if (item.number > 5) {
+								result.push(item);
+							}
+						}
+						return result;
+					},
 					matches: (item) => item.number > 5,
 					sort: (a, b) => b.number - a.number,
 					query_schema: z.void(),
@@ -193,7 +202,7 @@ describe('Indexed_Collection - Index Types', () => {
 		collection.add(threshold_item);
 
 		// Check derived index
-		const high_numbers = collection.get_derived('high_numbers');
+		const high_numbers = collection.derived_index('high_numbers');
 		expect(high_numbers).toHaveLength(3);
 		// Compare by id instead of reference
 		expect(high_numbers[0].id).toBe(high_item.id); // Highest number first (10)
@@ -209,7 +218,7 @@ describe('Indexed_Collection - Index Types', () => {
 		const new_high_item = create_item('a5', 'c1', [], 9);
 		collection.add(new_high_item);
 
-		const updated_high_numbers = collection.get_derived('high_numbers');
+		const updated_high_numbers = collection.derived_index('high_numbers');
 		expect(updated_high_numbers).toHaveLength(4);
 		expect(updated_high_numbers[0].id).toBe(high_item.id); // 10
 		expect(updated_high_numbers[1].id).toBe(new_high_item.id); // 9
@@ -218,7 +227,7 @@ describe('Indexed_Collection - Index Types', () => {
 
 		// Test removal from derived index
 		collection.remove(high_item.id);
-		const numbers_after_removal = collection.get_derived('high_numbers');
+		const numbers_after_removal = collection.derived_index('high_numbers');
 		expect(numbers_after_removal).toHaveLength(3);
 		expect(numbers_after_removal[0].id).toBe(new_high_item.id); // Now highest number
 	});
@@ -231,13 +240,17 @@ describe('Indexed_Collection - Index Types', () => {
 					key: 'by_range',
 					factory: (collection) => {
 						return (range: string) => {
-							if (range === 'high') {
-								return collection.all.filter((item) => item.number >= 8);
-							} else if (range === 'medium') {
-								return collection.all.filter((item) => item.number >= 4 && item.number < 8);
-							} else {
-								return collection.all.filter((item) => item.number < 4);
+							const result = [];
+							for (const item of collection.by_id.values()) {
+								if (range === 'high' && item.number >= 8) {
+									result.push(item);
+								} else if (range === 'medium' && item.number >= 4 && item.number < 8) {
+									result.push(item);
+								} else if (range === 'low' && item.number < 4) {
+									result.push(item);
+								}
 							}
+							return result;
 						};
 					},
 					query_schema: z.string(),
@@ -291,9 +304,13 @@ describe('Indexed_Collection - Advanced Features', () => {
 				create_derived_index({
 					key: 'recent_high_numbers',
 					compute: (collection) => {
-						return collection.all
-							.filter((item) => item.number >= 8)
-							.sort((a, b) => b.date.getTime() - a.date.getTime());
+						const result = [];
+						for (const item of collection.by_id.values()) {
+							if (item.number >= 8) {
+								result.push(item);
+							}
+						}
+						return result.sort((a, b) => b.date.getTime() - a.date.getTime());
 					},
 					matches: (item) => item.number >= 8,
 					sort: (a, b) => b.date.getTime() - a.date.getTime(),
@@ -321,7 +338,7 @@ describe('Indexed_Collection - Advanced Features', () => {
 		).toBe(true);
 
 		// Test derived index
-		const high_numbers = collection.get_derived('recent_high_numbers');
+		const high_numbers = collection.derived_index('recent_high_numbers');
 		expect(high_numbers).toHaveLength(2);
 		expect(high_numbers.some((item) => item.id === high_number_item.id)).toBe(true);
 		expect(high_numbers.some((item) => item.id === top_number_item.id)).toBe(true);
@@ -333,7 +350,7 @@ describe('Indexed_Collection - Advanced Features', () => {
 		const create_stats_index = <T extends Indexed_Item>(key: string) => ({
 			key,
 			compute: (collection: Indexed_Collection<T>) => {
-				const items = collection.all;
+				const items = [...collection.by_id.values()];
 				return {
 					count: items.length,
 					average: items.reduce((sum, item: any) => sum + item.number, 0) / (items.length || 1),
@@ -357,9 +374,12 @@ describe('Indexed_Collection - Advanced Features', () => {
 				}
 
 				// Rebuild unique_values set if needed (we don't know if other items use this category)
-				const all_unique_values = new Set(
-					collection.all.filter((i) => i.id !== item.id).map((i: any) => i.category),
-				);
+				const all_unique_values = new Set<string>();
+				for (const i of collection.by_id.values()) {
+					if (i.id !== item.id) {
+						all_unique_values.add((i as any).category);
+					}
+				}
 				stats.unique_values = all_unique_values;
 
 				return stats;
@@ -393,63 +413,8 @@ describe('Indexed_Collection - Advanced Features', () => {
 		expect(stats.average).toBe(20);
 		expect(stats.unique_values.size).toBe(2);
 	});
-});
 
-describe('Indexed_Collection - Array Operations', () => {
-	test('add_first and ordering', () => {
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection();
-
-		const first_item = create_item('a1', 'c1');
-		const prepend_item = create_item('a2', 'c1');
-		const append_item = create_item('a3', 'c1');
-
-		// Add in specific order
-		collection.add(first_item);
-		collection.add_first(prepend_item);
-		collection.add(append_item);
-
-		// Check ordering using id comparison
-		expect(collection.all[0].id).toBe(prepend_item.id);
-		expect(collection.all[1].id).toBe(first_item.id);
-		expect(collection.all[2].id).toBe(append_item.id);
-
-		// Test insert_at
-		const insert_item = create_item('a4', 'c1');
-		collection.insert_at(insert_item, 1);
-
-		expect(collection.all[0].id).toBe(prepend_item.id);
-		expect(collection.all[1].id).toBe(insert_item.id);
-		expect(collection.all[2].id).toBe(first_item.id);
-		expect(collection.all[3].id).toBe(append_item.id);
-	});
-
-	test('reorder items', () => {
-		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection();
-
-		const test_items = [
-			create_item('a1', 'c1'),
-			create_item('a2', 'c1'),
-			create_item('a3', 'c1'),
-			create_item('a4', 'c1'),
-		];
-
-		collection.add_many(test_items);
-
-		// Initial order: a1, a2, a3, a4
-		expect(collection.all[0].text).toBe('a1');
-		expect(collection.all[3].text).toBe('a4');
-
-		// Move 'a1' to position 2
-		collection.reorder(0, 2);
-
-		// New order should be: a2, a3, a1, a4
-		expect(collection.all[0].text).toBe('a2');
-		expect(collection.all[1].text).toBe('a3');
-		expect(collection.all[2].text).toBe('a1');
-		expect(collection.all[3].text).toBe('a4');
-	});
-
-	test('remove_first_many efficiently removes items from the beginning', () => {
+	test('batch operations', () => {
 		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
 			indexes: [
 				create_multi_index({
@@ -460,56 +425,39 @@ describe('Indexed_Collection - Array Operations', () => {
 			],
 		});
 
-		// Add 10 test items
+		// Create test items
 		const items = [
 			create_item('a1', 'c1', [], 1),
 			create_item('a2', 'c1', [], 2),
 			create_item('a3', 'c1', [], 3),
 			create_item('a4', 'c2', [], 4),
 			create_item('a5', 'c2', [], 5),
-			create_item('a6', 'c2', [], 6),
-			create_item('a7', 'c3', [], 7),
-			create_item('a8', 'c3', [], 8),
-			create_item('a9', 'c3', [], 9),
-			create_item('a10', 'c3', [], 10),
 		];
 
+		// Add multiple items at once
 		collection.add_many(items);
 
-		// Verify initial state
-		expect(collection.size).toBe(10);
+		// Verify all items were added
+		expect(collection.size).toBe(5);
 		expect(collection.where('by_category', 'c1').length).toBe(3);
-		expect(collection.where('by_category', 'c2').length).toBe(3);
-		expect(collection.where('by_category', 'c3').length).toBe(4);
+		expect(collection.where('by_category', 'c2').length).toBe(2);
 
-		// Remove first 4 items
-		const removed_count = collection.remove_first_many(4);
+		// Test removing multiple items at once
+		const ids_to_remove = [items[0].id, items[2].id, items[4].id];
+		const removed_count = collection.remove_many(ids_to_remove);
 
-		// Verify the correct number of items were removed
-		expect(removed_count).toBe(4);
-		expect(collection.size).toBe(6);
+		expect(removed_count).toBe(3);
+		expect(collection.size).toBe(2);
 
-		// Verify the correct items were removed (the first 4)
-		expect(collection.all[0].text).toBe('a5');
-		expect(collection.by_id.has(items[0].id)).toBe(false);
-		expect(collection.by_id.has(items[1].id)).toBe(false);
-		expect(collection.by_id.has(items[2].id)).toBe(false);
-		expect(collection.by_id.has(items[3].id)).toBe(false);
-		expect(collection.by_id.has(items[4].id)).toBe(true);
+		// Verify specific items were removed
+		expect(collection.has(items[0].id)).toBe(false);
+		expect(collection.has(items[1].id)).toBe(true);
+		expect(collection.has(items[2].id)).toBe(false);
+		expect(collection.has(items[3].id)).toBe(true);
+		expect(collection.has(items[4].id)).toBe(false);
 
 		// Verify indexes were properly updated
-		expect(collection.where('by_category', 'c1').length).toBe(0); // All c1 items removed
-		expect(collection.where('by_category', 'c2').length).toBe(2); // One c2 item removed
-		expect(collection.where('by_category', 'c3').length).toBe(4); // No c3 items removed
-
-		// Test removing more items than exist
-		const remaining_count = collection.remove_first_many(10);
-		expect(remaining_count).toBe(6);
-		expect(collection.size).toBe(0);
-		expect(collection.all).toEqual([]);
-
-		// Test removing from empty collection
-		const no_items_removed = collection.remove_first_many(5);
-		expect(no_items_removed).toBe(0);
+		expect(collection.where('by_category', 'c1').length).toBe(1);
+		expect(collection.where('by_category', 'c2').length).toBe(1);
 	});
 });

@@ -5,9 +5,6 @@ import {unwrap_schema, get_inner_array_schema} from '$lib/zod_helpers.js';
 /** Sentinel value to indicate a parser has completely handled a property */
 export const HANDLED = Symbol('HANDLED_BY_PARSER');
 
-/** Sentinel value to explicitly indicate fallback to default decoding */
-export const USE_DEFAULT = Symbol('USE_DEFAULT_DECODING'); // TODO better name?
-
 // Constants for date formatting
 export const FILE_SHORT_DATE_FORMAT = 'MMM d, p';
 export const FILE_DATE_FORMAT = 'MMM d, yyyy h:mm:ss a';
@@ -89,9 +86,7 @@ export type Cell_Value_Decoder<
 	T_Schema extends z.ZodType,
 	T_Key extends keyof z.infer<T_Schema> = keyof z.infer<T_Schema>,
 > = {
-	[K in T_Key]?: (
-		value: unknown,
-	) => z.infer<T_Schema>[K] | undefined | typeof HANDLED | typeof USE_DEFAULT;
+	[K in T_Key]?: (value: unknown) => z.infer<T_Schema>[K] | undefined | typeof HANDLED;
 };
 
 /**

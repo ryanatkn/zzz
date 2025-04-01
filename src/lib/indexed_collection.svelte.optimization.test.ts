@@ -42,7 +42,11 @@ describe('Indexed_Collection - Optimization Tests', () => {
 	test('indexes are computed only once during initialization', () => {
 		// Create spy functions to count compute calls
 		const compute_spy = vi.fn((collection) => {
-			return new Map(collection.all.map((item: Test_Item) => [item.string_a, item]));
+			const map = new Map();
+			for (const item of collection.by_id.values()) {
+				map.set(item.string_a, item);
+			}
+			return map;
 		});
 
 		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
@@ -64,7 +68,13 @@ describe('Indexed_Collection - Optimization Tests', () => {
 	test('incremental updates avoid recomputing entire index', () => {
 		// Create spies for the compute and onadd functions
 		const compute_spy = vi.fn((collection) => {
-			return collection.all.filter((item: Test_Item) => item.number > 10);
+			const result = [];
+			for (const item of collection.by_id.values()) {
+				if (item.number > 10) {
+					result.push(item);
+				}
+			}
+			return result;
 		});
 
 		const onadd_spy = vi.fn((items, item) => {
@@ -103,7 +113,7 @@ describe('Indexed_Collection - Optimization Tests', () => {
 		expect(onadd_spy).toHaveBeenCalledTimes(2);
 
 		// Check that the index was correctly updated
-		const high_number = collection.get_derived('high_number');
+		const high_number = collection.derived_index('high_number');
 		expect(high_number.length).toBe(2);
 		expect(high_number.some((item) => item.string_a === 'string_a1')).toBe(true);
 		expect(high_number.some((item) => item.string_a === 'string_a3')).toBe(true);
@@ -126,7 +136,7 @@ describe('Indexed_Collection - Optimization Tests', () => {
 					extractor: (item) => item.string_b,
 					compute: (collection) => {
 						const map = new Map();
-						for (const item of collection.all) {
+						for (const item of collection.by_id.values()) {
 							const collection = map.get(item.string_b) || [];
 							collection.push(item);
 							map.set(item.string_b, collection);
@@ -189,7 +199,13 @@ describe('Indexed_Collection - Optimization Tests', () => {
 					factory: (collection) => {
 						return (min_n: string) => {
 							const threshold = parseInt(min_n, 10);
-							return collection.all.filter((item) => item.number >= threshold);
+							const result = [];
+							for (const item of collection.by_id.values()) {
+								if (item.number >= threshold) {
+									result.push(item);
+								}
+							}
+							return result;
 						};
 					},
 					query_schema: z.string(),

@@ -6,11 +6,9 @@ import {Tape_Json} from '$lib/tape_types.js';
 import type {Uuid} from '$lib/zod_helpers.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
-import {create_multi_index} from '$lib/indexed_collection_helpers.js';
+import {create_multi_index, create_derived_index} from '$lib/indexed_collection_helpers.js';
 import {Model_Name} from '$lib/model.svelte.js';
-
-export type Tape_Single_Indexes = never;
-export type Tape_Multi_Indexes = 'by_model_name';
+import {to_reordered_list} from '$lib/list_helpers.js';
 
 export const Tapes_Json = z
 	.object({
@@ -38,14 +36,24 @@ export class Tapes extends Cell<typeof Tapes_Json> {
 				query_schema: Model_Name,
 				result_schema: z.instanceof(Tape),
 			}),
+			create_derived_index({
+				key: 'manual_order',
+				compute: (collection) => Array.from(collection.by_id.values()),
+				result_schema: z.array(z.instanceof(Tape)),
+			}),
 		],
 	});
 
 	selected_id: Uuid | null = $state(null);
-	selected: Tape | undefined = $derived(
+	readonly selected: Tape | undefined = $derived(
 		this.selected_id ? this.items.by_id.get(this.selected_id) : undefined,
 	);
-	selected_id_error: boolean = $derived(this.selected_id !== null && this.selected === undefined);
+	readonly selected_id_error: boolean = $derived(
+		this.selected_id !== null && this.selected === undefined,
+	);
+
+	/** Ordered array of tapes derived from the `manual_order` index. */
+	readonly ordered_items: Array<Tape> = $derived(this.items.derived_index('manual_order'));
 
 	constructor(options: Tapes_Options) {
 		super(Tapes_Json, options);
@@ -66,34 +74,27 @@ export class Tapes extends Cell<typeof Tapes_Json> {
 		this.init();
 	}
 
-	add(json?: z.input<typeof Tape_Json>, first = true, select?: boolean): Tape {
+	add(json?: z.input<typeof Tape_Json>, select?: boolean): Tape {
 		const tape = new Tape({zzz: this.zzz, json});
-		return this.add_tape(tape, first, select);
+		return this.add_tape(tape, select);
 	}
 
 	// Consistent method signature with other collection classes
-	add_tape(tape: Tape, first = true, select?: boolean): Tape {
-		if (first) {
-			this.items.add_first(tape);
-		} else {
-			this.items.add(tape);
-		}
+	add_tape(tape: Tape, select?: boolean): Tape {
+		this.items.add(tape);
+
 		if (select || this.selected_id === null) {
 			this.selected_id = tape.id;
 		}
 		return tape;
 	}
 
-	add_many(
-		tapes_json: Array<z.input<typeof Tape_Json>>,
-		first = true,
-		select?: boolean | number,
-	): Array<Tape> {
+	add_many(tapes_json: Array<z.input<typeof Tape_Json>>, select?: boolean | number): Array<Tape> {
 		const tapes = tapes_json.map((json) => new Tape({zzz: this.zzz, json}));
 
-		// Add all tapes to the collection - we can simplify this loop
-		for (const tape of first ? tapes.toReversed() : tapes) {
-			this.items.add_first(first ? tape : tape);
+		// Add all tapes to the collection
+		for (const tape of tapes) {
+			this.items.add(tape);
 		}
 
 		// Select the first or the specified tape if none is currently selected
@@ -114,7 +115,7 @@ export class Tapes extends Cell<typeof Tapes_Json> {
 
 		const removed = this.items.remove(id);
 		if (removed && id === this.selected_id) {
-			this.#select_next_available_tape();
+			this.select_next();
 		}
 	}
 
@@ -130,24 +131,15 @@ export class Tapes extends Cell<typeof Tapes_Json> {
 
 		// If the selected tape was removed, select a new one
 		if (current_selected !== null && ids.includes(current_selected)) {
-			this.#select_next_available_tape();
+			this.select_next();
 		}
 
 		return removed_count;
 	}
 
-	/**
-	 * Selects the next available tape, if any exist.
-	 */
-	#select_next_available_tape(): void {
-		const remaining_items = this.items.all;
-		const next_tape = remaining_items.length > 0 ? remaining_items[0] : undefined;
-		this.selected_id = next_tape ? next_tape.id : null;
-	}
-
 	// TODO these two methods feel like a code smell, should maintain the collections more automatically
 	#remove_reference_from_chats(tape_id: Uuid): void {
-		for (const chat of this.zzz.chats.items.all) {
+		for (const chat of this.zzz.chats.items.by_id.values()) {
 			chat.remove_tape(tape_id);
 		}
 	}
@@ -158,16 +150,23 @@ export class Tapes extends Cell<typeof Tapes_Json> {
 			return;
 		}
 
-		for (const chat of this.zzz.chats.items.all) {
+		for (const chat of this.zzz.chats.items.by_id.values()) {
 			chat.remove_tapes(tape_ids);
 		}
 	}
 
+	// TODO @many extract a selection helper class?
 	select(tape_id: Uuid | null): void {
 		this.selected_id = tape_id;
 	}
 
+	select_next(): void {
+		const {by_id} = this.items;
+		const next = by_id.values().next();
+		this.select(next.value?.id ?? null);
+	}
+
 	reorder_tapes(from_index: number, to_index: number): void {
-		this.items.reorder(from_index, to_index);
+		this.items.indexes.manual_order = to_reordered_list(this.ordered_items, from_index, to_index);
 	}
 }

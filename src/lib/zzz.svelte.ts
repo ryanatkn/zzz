@@ -120,7 +120,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	// TODO think about how this could be an incremental indexed value - maybe push through indexes rather than using derived signals?
 	tags: Set<string> = $derived.by(() => {
 		const tag_set: Set<string> = new Set();
-		for (const model of this.models.items.all) {
+		for (const model of this.models.items.by_id.values()) {
 			for (const tag of model.tags) {
 				tag_set.add(tag);
 			}
