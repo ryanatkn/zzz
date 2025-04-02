@@ -34,7 +34,7 @@
 			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link> 💤
 		</aside>
 		<!-- <p>
-			Zzz, pronounced "zees" like the sound of electricity, is a bot and web toolkit focused on user
+			Zzz, pronounced "zees" like bees, is a bot and web toolkit focused on user
 			power and experimentation. The idea is to make a digital tool that adapts to your needs on the
 			fly while remaining fully open, aligned, and in your control.
 		</p>

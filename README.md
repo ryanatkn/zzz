@@ -8,7 +8,7 @@
 
 **[zzz.software](https://www.zzz.software/)**
 
-Zzz, pronounced "zees" like the sound of electricity,
+Zzz, pronounced "zees" like bees,
 is a bot and web toolkit with a focus on user power and experimentation.
 The idea is to make a digital tool that adapts to your needs on the fly
 while remaining fully open, aligned, and in your control.
