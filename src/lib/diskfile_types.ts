@@ -37,10 +37,8 @@ export const Source_File = z.object({
 	contents: z.string().nullable(),
 	ctime: z.number().nullable(),
 	mtime: z.number().nullable(),
-	// Using any for Map generics to avoid circular references
-	// but still preserve the Map instance type
-	dependents: z.instanceof(Map) as z.ZodType<Map<any, any>>,
-	dependencies: z.instanceof(Map) as z.ZodType<Map<any, any>>,
+	dependents: z.map(Diskfile_Path, z.any()), // TODO @many these can't be circular refs, how to rewrite?
+	dependencies: z.map(Diskfile_Path, z.any()), // TODO @many these can't be circular refs, how to rewrite?
 });
 export type Source_File = z.infer<typeof Source_File>;
 
@@ -48,8 +46,14 @@ export type Source_File = z.infer<typeof Source_File>;
 export const Diskfile_Json = Cell_Json.extend({
 	path: Diskfile_Path.nullable().default(null),
 	content: z.string().nullable().default(null),
-	dependents: z.array(z.tuple([Diskfile_Path, z.any()])).default(() => []), // TODO @many these need to be null for unknown file types (support JS modules, etc)
-	dependencies: z.array(z.tuple([Diskfile_Path, z.any()])).default(() => []), // TODO @many these need to be null for unknown file types (support JS modules, etc)
+	dependents: z
+		.array(z.tuple([Diskfile_Path, Source_File]))
+		.nullable()
+		.default(null),
+	dependencies: z
+		.array(z.tuple([Diskfile_Path, Source_File]))
+		.nullable()
+		.default(null),
 });
 
 export type Diskfile_Json = z.infer<typeof Diskfile_Json>;

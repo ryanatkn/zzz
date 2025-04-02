@@ -302,3 +302,9 @@ a.chip {
 	--button_fill_active: var(--fg_2);
 	--button_border_color: var(--border_color_a);
 }
+
+/* Column sections use padding instead of margin so they can transition in/out without layout jank. */
+.column_section {
+	padding: var(--space_sm) var(--space_sm) var(--space_xl7);
+	margin-bottom: 0;
+}

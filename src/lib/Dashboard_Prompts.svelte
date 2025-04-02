@@ -114,7 +114,7 @@
 	{#if zzz.prompts.selected}
 		<Contextmenu_Prompt prompt={zzz.prompts.selected}>
 			<div class="column_fixed pr_sm">
-				<div class="column p_sm">
+				<section class="column_section">
 					<div class="flex justify_content_space_between">
 						<div class="size_lg">
 							<Glyph icon={GLYPH_PROMPT} />
@@ -139,13 +139,13 @@
 						</small>
 						<small>created {zzz.prompts.selected.created_formatted_short_date}</small>
 					</div>
-				</div>
-				<div class="row gap_sm py_xs sticky t_0 b_0 bg">
-					<Copy_To_Clipboard text={zzz.prompts.selected.content} attrs={{class: 'plain'}} />
-					<Prompt_Stats prompt={zzz.prompts.selected} />
-				</div>
-				<Content_Preview content={zzz.prompts.selected.content} />
-				<div class="p_sm mt_xl3">
+					<div class="row gap_sm py_xs sticky t_0 b_0 bg">
+						<Copy_To_Clipboard text={zzz.prompts.selected.content} attrs={{class: 'plain'}} />
+						<Prompt_Stats prompt={zzz.prompts.selected} />
+					</div>
+					<Content_Preview content={zzz.prompts.selected.content} />
+				</section>
+				<section class="column_section">
 					<header class="size_lg mb_lg"><Glyph icon={GLYPH_BIT} /> bits</header>
 					<Bit_List
 						bits={zzz.prompts.selected.bits}
@@ -154,7 +154,7 @@
 							zzz.prompts.selected?.reorder_bits(from_index, to_index);
 						}}
 					/>
-				</div>
+				</section>
 			</div>
 
 			<div class="column_fluid">
