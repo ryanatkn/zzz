@@ -48,8 +48,8 @@ export type Source_File = z.infer<typeof Source_File>;
 export const Diskfile_Json = Cell_Json.extend({
 	path: Diskfile_Path.nullable().default(null),
 	content: z.string().nullable().default(null),
-	dependents: z.array(z.tuple([Diskfile_Path, z.any()])).default(() => []),
-	dependencies: z.array(z.tuple([Diskfile_Path, z.any()])).default(() => []),
+	dependents: z.array(z.tuple([Diskfile_Path, z.any()])).default(() => []), // TODO @many these need to be null for unknown file types (support JS modules, etc)
+	dependencies: z.array(z.tuple([Diskfile_Path, z.any()])).default(() => []), // TODO @many these need to be null for unknown file types (support JS modules, etc)
 });
 
 export type Diskfile_Json = z.infer<typeof Diskfile_Json>;

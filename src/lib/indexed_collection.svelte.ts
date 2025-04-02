@@ -4,10 +4,9 @@ import {DEV} from 'esm-env';
 
 import {Uuid} from '$lib/zod_helpers.js';
 
-// TODO optimize to make index operations more efficient, particularly for batch operations
+// TODO the API is nowhere near done, this is just a proof of concept
 
 // TODO think about this from the whole graph's POV, not just individual collections, for relationships/transactions
-// consider a batch operations interface: "Add a transaction-like interface for batch operations to improve performance. Example: collection.batch().add(item1).remove(item2).commit()"
 
 /**
  * Interface for objects that can be stored in an indexed collection

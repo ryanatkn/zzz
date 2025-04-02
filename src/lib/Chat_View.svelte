@@ -56,65 +56,63 @@
 </script>
 
 <div class="flex_1 h_100 flex align_items_start">
-	<div class="column_fixed column">
-		<div class="column gap_md">
-			{#if selected_chat}
-				<div transition:slide>
-					<div class="column p_sm">
-						<!-- TODO needs work -->
-						<div class="flex justify_content_space_between">
-							<div class="size_lg">
-								<Glyph icon={GLYPH_CHAT} />
-								{selected_chat.name}
-							</div>
-						</div>
-						<div class="column font_mono">
-							<small title={selected_chat.created_formatted_date}
-								>created {selected_chat.created_formatted_short_date}</small
-							>
-							<small>
-								{selected_chat.tapes.length}
-								tape{#if selected_chat.tapes.length !== 1}s{/if}
-							</small>
-						</div>
-						<div class="row">
-							<Confirm_Button
-								onconfirm={() => zzz.chats.selected_id && zzz.chats.remove(zzz.chats.selected_id)}
-								position="right"
-								attrs={{title: `delete chat "${selected_chat.name}"`, class: 'plain'}}
-							>
-								{GLYPH_DELETE}
-								{#snippet popover_button_content()}{GLYPH_DELETE}{/snippet}
-							</Confirm_Button>
-							<Toggle_Button
-								active={chat.view_mode === 'simple'}
-								active_content="simple"
-								inactive_content="multi"
-								ontoggle={(active) => (chat.view_mode = active ? 'simple' : 'multi')}
-								attrs={{
-									class: 'plain',
-									title: `toggle to ${chat.view_mode === 'multi' ? 'simple' : 'multi'} view`,
-								}}
-							/>
+	<div class="column_fixed">
+		{#if selected_chat}
+			<div transition:slide>
+				<div class="p_sm">
+					<!-- TODO needs work -->
+					<div class="flex justify_content_space_between">
+						<div class="size_lg">
+							<Glyph icon={GLYPH_CHAT} />
+							{selected_chat.name}
 						</div>
 					</div>
+					<div class="column font_mono">
+						<small title={selected_chat.created_formatted_date}
+							>created {selected_chat.created_formatted_short_date}</small
+						>
+						<small>
+							{selected_chat.tapes.length}
+							tape{#if selected_chat.tapes.length !== 1}s{/if}
+						</small>
+					</div>
+					<div class="row">
+						<Confirm_Button
+							onconfirm={() => zzz.chats.selected_id && zzz.chats.remove(zzz.chats.selected_id)}
+							position="right"
+							attrs={{title: `delete chat "${selected_chat.name}"`, class: 'plain'}}
+						>
+							{GLYPH_DELETE}
+							{#snippet popover_button_content()}{GLYPH_DELETE}{/snippet}
+						</Confirm_Button>
+						<Toggle_Button
+							active={chat.view_mode === 'simple'}
+							active_content="simple"
+							inactive_content="multi"
+							ontoggle={(active) => (chat.view_mode = active ? 'simple' : 'multi')}
+							attrs={{
+								class: 'plain',
+								title: `toggle to ${chat.view_mode === 'multi' ? 'simple' : 'multi'} view`,
+							}}
+						/>
+					</div>
 				</div>
-			{/if}
-			{#if chat.view_mode !== 'simple'}
-				<div class="p_sm">
-					<header class="mt_0 mb_lg size_lg"><Glyph icon={GLYPH_TAPE} /> tapes</header>
-					<Tape_List {chat} />
-				</div>
-			{/if}
-			<div class="p_sm">
-				<header class="mt_0 mb_lg size_lg"><Glyph icon={GLYPH_PROMPT} /> prompts</header>
-				<Prompt_List {chat} />
 			</div>
-			<!-- TODO maybe show `Bit_List` with the `prompt bits` header here in -->
+		{/if}
+		{#if chat.view_mode !== 'simple'}
 			<div class="p_sm">
-				<header class="mt_0 mb_lg size_lg"><Glyph icon={GLYPH_BIT} /> all bits</header>
-				<Bit_List bits={chat.bits_array} />
+				<header class="mt_0 mb_lg size_lg"><Glyph icon={GLYPH_TAPE} /> tapes</header>
+				<Tape_List {chat} />
 			</div>
+		{/if}
+		<div class="p_sm">
+			<header class="mt_0 mb_lg size_lg"><Glyph icon={GLYPH_PROMPT} /> prompts</header>
+			<Prompt_List {chat} />
+		</div>
+		<!-- TODO maybe show `Bit_List` with the `prompt bits` header here in -->
+		<div class="p_sm">
+			<header class="mt_0 mb_lg size_lg"><Glyph icon={GLYPH_BIT} /> all bits</header>
+			<Bit_List bits={chat.bits_array} />
 		</div>
 	</div>
 

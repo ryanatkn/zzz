@@ -14,12 +14,12 @@
 </script>
 
 <div
-	class="p_sm"
+	class="px_sm py_xl"
 	class:user={strip.role === 'user'}
 	class:assistant={strip.role === 'assistant'}
 	class:system={strip.role === 'system'}
 >
-	<div class="white_space_pre_wrap overflow_wrap_break_word line_height_md">
+	<div class="white_space_pre_wrap overflow_wrap_break_word">
 		<small class="mr_xs font_weight_600" title={strip.created}>@{strip.role}:</small>
 		{#if strip.is_pending}
 			<!-- TODO @many Pending_Animation `inline` prop -->

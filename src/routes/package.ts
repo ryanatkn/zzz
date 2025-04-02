@@ -655,10 +655,10 @@ export const package_json = {
 			svelte: './dist/Tape_List.svelte',
 			default: './dist/Tape_List.svelte',
 		},
-		'./Tape_Summary.svelte': {
-			types: './dist/Tape_Summary.svelte.d.ts',
-			svelte: './dist/Tape_Summary.svelte',
-			default: './dist/Tape_Summary.svelte',
+		'./Tape_Listitem.svelte': {
+			types: './dist/Tape_Listitem.svelte.d.ts',
+			svelte: './dist/Tape_Listitem.svelte',
+			default: './dist/Tape_Listitem.svelte',
 		},
 		'./tape_types.js': {types: './dist/tape_types.d.ts', default: './dist/tape_types.js'},
 		'./tape.svelte.js': {types: './dist/tape.svelte.d.ts', default: './dist/tape.svelte.js'},
@@ -1380,7 +1380,7 @@ export const src_json = {
 			declarations: [{name: 'render_tape', kind: 'function'}],
 		},
 		'./Tape_List.svelte': {path: 'Tape_List.svelte', declarations: []},
-		'./Tape_Summary.svelte': {path: 'Tape_Summary.svelte', declarations: []},
+		'./Tape_Listitem.svelte': {path: 'Tape_Listitem.svelte', declarations: []},
 		'./tape_types.js': {
 			path: 'tape_types.ts',
 			declarations: [{name: 'Tape_Json', kind: 'variable'}],

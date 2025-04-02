@@ -48,7 +48,7 @@
 
 <Contextmenu_Diskfile {diskfile}>
 	<div class="flex h_100">
-		<div class="width_md min_width_sm h_100 column">
+		<div class="flex_1 min_width_sm h_100 column">
 			<Content_Editor
 				bind:this={content_editor}
 				bind:content={editor_state.current_content}
@@ -72,7 +72,8 @@
 				<Diskfile_Actions {diskfile} {editor_state} />
 			</div>
 
-			{#if diskfile.dependencies_count || diskfile.dependents_count}
+			<!-- TODO @many add support for deps for module diskfiles (TS, Svelte, etc) -->
+			<!-- {#if diskfile.dependencies_count || diskfile.dependents_count}
 				<div class="mt_md panel p_md">
 					{#if diskfile.dependencies_count}
 						<div class="mb_md">
@@ -100,7 +101,22 @@
 						</div>
 					{/if}
 				</div>
-			{/if}
+				<style>
+					.dep_list {
+						display: grid;
+						grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+						gap: var(--space_xs);
+					}
+					.dep_item {
+						font-family: monospace;
+						font-size: var(--size_sm);
+						white-space: nowrap;
+						overflow: hidden;
+						text-overflow: ellipsis;
+						padding: var(--space_xs2);
+					}
+				</style>
+			{/if} -->
 
 			{#if editor_state.has_history}
 				<div transition:slide>
@@ -118,20 +134,3 @@
 		</div>
 	</div>
 </Contextmenu_Diskfile>
-
-<style>
-	/* TODO roughed in */
-	.dep_list {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-		gap: var(--space_xs);
-	}
-	.dep_item {
-		font-family: monospace;
-		font-size: var(--size_sm);
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		padding: var(--space_xs2);
-	}
-</style>

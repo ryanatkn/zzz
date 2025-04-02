@@ -748,10 +748,10 @@
       "svelte": "./dist/Tape_List.svelte",
       "default": "./dist/Tape_List.svelte"
     },
-    "./Tape_Summary.svelte": {
-      "types": "./dist/Tape_Summary.svelte.d.ts",
-      "svelte": "./dist/Tape_Summary.svelte",
-      "default": "./dist/Tape_Summary.svelte"
+    "./Tape_Listitem.svelte": {
+      "types": "./dist/Tape_Listitem.svelte.d.ts",
+      "svelte": "./dist/Tape_Listitem.svelte",
+      "default": "./dist/Tape_Listitem.svelte"
     },
     "./tape_types.js": {
       "types": "./dist/tape_types.d.ts",

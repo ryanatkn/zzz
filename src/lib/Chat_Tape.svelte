@@ -45,7 +45,8 @@
 
 	const scrollable = new Scrollable();
 
-	// TODO BLOCK add reset button
+	const {strips} = $derived(tape);
+	const strip_count = $derived(strips.length);
 
 	// TODO BLOCK edit individual items in the list (contextmenu too - show contextmenu target outline)
 
@@ -55,7 +56,7 @@
 </script>
 
 <Contextmenu_Tape {tape}>
-	<div {...attrs} class="chat_tape {attrs?.class}">
+	<div {...attrs} class="chat_tape {attrs?.class}" class:empty={!strip_count}>
 		<div class="flex justify_content_space_between align_items_start">
 			<header>
 				<div class="size_lg">
@@ -80,20 +81,22 @@
 			{/if}
 		</div>
 
-		<div
-			{...strips_attrs}
-			class="strips flex_1 {strips_attrs?.class}"
-			use:scrollable.container
-			use:scrollable.target
-		>
-			<ul class="unstyled">
-				{#each tape.strips as strip (strip.id)}
-					<li transition:slide>
-						<Strip_Item {strip} />
-					</li>
-				{/each}
-			</ul>
-		</div>
+		{#if strip_count}
+			<div
+				{...strips_attrs}
+				class="strips flex_1 radius_xs2 {strips_attrs?.class}"
+				use:scrollable.container
+				use:scrollable.target
+			>
+				<ul class="unstyled">
+					{#each strips as strip (strip.id)}
+						<li transition:slide>
+							<Strip_Item {strip} />
+						</li>
+					{/each}
+				</ul>
+			</div>
+		{/if}
 
 		<div>
 			<Content_Editor
@@ -125,6 +128,11 @@
 		background-color: var(--bg);
 		border-radius: var(--radius_xs);
 	}
+
+	.chat_tape.empty {
+		justify-content: center;
+	}
+
 	.strips {
 		display: flex;
 		flex-direction: column-reverse; /* makes scrolling start at the bottom */

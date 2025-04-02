@@ -222,9 +222,6 @@ a.chip {
 .line_height_1 {
 	line-height: 1;
 }
-.line_height_md {
-	line-height: var(--line_height_md);
-}
 .m_0 {
 	margin: 0;
 }
@@ -511,6 +508,10 @@ a.chip {
 	padding-top: var(--space_sm);
 	padding-bottom: var(--space_sm);
 }
+.py_xl {
+	padding-top: var(--space_xl);
+	padding-bottom: var(--space_xl);
+}
 .py_xl9 {
 	padding-top: var(--space_xl9);
 	padding-bottom: var(--space_xl9);
@@ -537,6 +538,9 @@ a.chip {
 }
 .radius_xs {
 	border-radius: var(--radius_xs);
+}
+.radius_xs2 {
+	border-radius: var(--radius_xs2);
 }
 .relative {
 	position: relative;
