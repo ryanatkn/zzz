@@ -1025,6 +1025,7 @@ export const src_json = {
 		'./helpers.js': {
 			path: 'helpers.ts',
 			declarations: [
+				{name: 'create_client_id', kind: 'function'},
 				{name: 'get_unique_name', kind: 'function'},
 				{name: 'defined', kind: 'function'},
 				{name: 'to_preview', kind: 'function'},

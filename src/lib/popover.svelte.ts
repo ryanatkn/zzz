@@ -5,6 +5,7 @@ import {swallow} from '@ryanatkn/belt/dom.js';
 import type {TransitionConfig} from 'svelte/transition';
 
 import {type Position, type Alignment, generate_position_styles} from '$lib/position_helpers.js';
+import {create_client_id} from '$lib/helpers.js';
 
 /**
  * Parameters for configuring the popover.
@@ -181,8 +182,7 @@ export class Popover {
 
 			// If we have a content element, establish the relationship
 			if (this.#content_element) {
-				const content_id =
-					this.#content_element.id || `popover-content-${Math.random().toString(36).slice(2, 11)}`;
+				const content_id = this.#content_element.id || `popover-content-${create_client_id()}`;
 				this.#content_element.id = content_id;
 				this.#trigger_element.setAttribute('aria-controls', content_id);
 			}

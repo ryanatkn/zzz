@@ -1,5 +1,8 @@
 import {CONTENT_PREVIEW_LENGTH} from '$lib/constants.js';
 
+/** Creates an id suitable for insecure use on a single client, like for element ids. */
+export const create_client_id = (): string => Math.random().toString(36).substring(2);
+
 export const get_unique_name = (
 	name: string,
 	// TODO BLOCK maybe change to a callback fn, `is_valid`?

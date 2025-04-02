@@ -2,6 +2,7 @@ import type {Action} from 'svelte/action';
 import {on} from 'svelte/events';
 import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 import type {Flavored} from '@ryanatkn/belt/types.js';
+import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
 
 import {
 	detect_reorderable_direction,
@@ -11,7 +12,7 @@ import {
 	validate_reorderable_target_index,
 	set_reorderable_drag_data_transfer,
 } from '$lib/reorderable_helpers.js';
-import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
+import {create_client_id} from '$lib/helpers.js';
 
 export type Reorderable_Id = Flavored<string, 'Reorderable_Id'>;
 export type Reorderable_Item_Id = Flavored<string, 'Reorderable_Item_Id'>;
@@ -107,7 +108,7 @@ export class Reorderable implements Reorderable_Style_Config {
 	direction: Reorderable_Direction = $state()!;
 
 	// Unique identifier for this reorderable instance
-	readonly id: Reorderable_Id = `r${Math.random().toString(36).substring(2, 8)}`;
+	readonly id: Reorderable_Id = `r${create_client_id()}`;
 
 	// Styling configuration
 	readonly list_class: string | null;
@@ -664,7 +665,7 @@ export class Reorderable implements Reorderable_Style_Config {
 		// Generate a unique item id if not already present
 		let item_id = node.dataset.reorderableItemId as Reorderable_Item_Id | undefined;
 		if (!item_id) {
-			item_id = `i${Math.random().toString(36).substring(2, 10)}` as Reorderable_Item_Id;
+			item_id = `i${create_client_id()}`;
 			node.dataset.reorderableItemId = item_id;
 		}
 
