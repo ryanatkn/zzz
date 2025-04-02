@@ -59,7 +59,7 @@
 
 {#if show}
 	<Dialog {...dialog_props} onclose={cancel}>
-		<div class="pane p_lg">
+		<div class="pane p_lg width_md mx_auto">
 			{#if heading}
 				<h2 class="mt_lg text_align_center">{heading}</h2>
 			{/if}

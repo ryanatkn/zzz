@@ -35,8 +35,7 @@
 
 {#if show_more}
 	<Dialog onclose={() => (show_more = false)}>
-		<!-- TODO expand width, might need to change `Dialog` -->
-		<div class="bg p_md radius_sm width_md">
+		<div class="pane p_md width_md mx_auto">
 			<!-- TODO should this be a `Message_Editor`? -->
 			<Message_Info {message} />
 			<button type="button" onclick={() => (show_more = false)}>close</button>
