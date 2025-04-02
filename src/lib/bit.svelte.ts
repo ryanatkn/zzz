@@ -110,7 +110,7 @@ export abstract class Bit<T extends z.ZodType = typeof Bit_Base_Json> extends Ce
 	summary: string | null = $state()!;
 
 	xml_tag_name_default: string = $derived.by(() =>
-		this.type === 'diskfile' ? 'file' : 'fragment',
+		this.type === 'diskfile' ? 'File' : 'Fragment',
 	);
 
 	add_attribute(partial: z.input<typeof Xml_Attribute> = EMPTY_OBJECT): void {

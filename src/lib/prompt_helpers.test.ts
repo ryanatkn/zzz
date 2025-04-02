@@ -29,7 +29,7 @@ const create_bit = (partial: Partial<Simple_Bit> = {}): Simple_Bit => {
 		has_xml_tag: false,
 		xml_tag_name: '',
 		type,
-		xml_tag_name_default: type === 'diskfile' ? 'file' : 'fragment',
+		xml_tag_name_default: type === 'diskfile' ? 'File' : 'Fragment',
 		attributes: [],
 		...partial,
 	};

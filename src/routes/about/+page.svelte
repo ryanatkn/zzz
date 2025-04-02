@@ -3,7 +3,6 @@
 	import Package_Detail from '@ryanatkn/fuz/Package_Detail.svelte';
 	import Community_Links_Panel from '@ryanatkn/fuz/Community_Links_Panel.svelte';
 	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
-	import {base} from '$app/paths';
 
 	import {pkg_context} from '$routes/pkg.js';
 	import External_Link from '$lib/External_Link.svelte';
@@ -13,7 +12,7 @@
 	const pkg = pkg_context.get();
 	const zzz = zzz_context.get();
 
-	// TODO standardize
+	// TODO rewrite prose
 </script>
 
 <div class="width_md p_lg">
@@ -34,7 +33,7 @@
 			and
 			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link> 💤
 		</aside>
-		<p>
+		<!-- <p>
 			Zzz, pronounced "zees" like the sound of electricity, is a bot and web toolkit focused on user
 			power and experimentation. The idea is to make a digital tool that adapts to your needs on the
 			fly while remaining fully open, aligned, and in your control.
@@ -202,7 +201,7 @@
 			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link>
 			and find me on
 			<External_Link href="https://bsky.app/profile/ryanatkn.com">Bluesky</External_Link>.
-		</p>
+		</p> -->
 	</section>
 	<hr />
 	<section>
