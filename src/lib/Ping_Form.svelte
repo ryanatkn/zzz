@@ -68,7 +68,7 @@
 	{GLYPH_DIRECTION_CLIENT}<span class:fade_3={!ping.completed}>{GLYPH_DIRECTION_SERVER}</span>
 	{#if !ping.completed}
 		<span class="font_mono">
-			<Pending_Animation attrs={{style: 'display: inline-flex !important'}} />
+			<Pending_Animation inline />
 		</span>
 	{:else}
 		<span class="font_mono">{Math.round(ping.round_trip_time ?? 0)}ms</span>

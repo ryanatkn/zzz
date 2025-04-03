@@ -39,7 +39,7 @@
 							: 'not checked'}
 				{#if capabilities.server.status === 'pending'}
 					<!-- TODO @many Pending_Animation `inline` prop -->
-					<Pending_Animation attrs={{style: 'display: inline-flex !important'}} />
+					<Pending_Animation inline />
 				{/if}
 			</div>
 			<small class="font_mono"

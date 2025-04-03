@@ -37,7 +37,7 @@
 						? 'loading'
 						: 'not initialized'}
 			{#if capabilities.filesystem.status === 'pending'}
-				<Pending_Animation attrs={{style: 'display: inline-flex !important'}} />
+				<Pending_Animation inline />
 			{/if}
 		</div>
 		<small class="font_mono">
