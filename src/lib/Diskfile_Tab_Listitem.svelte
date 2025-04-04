@@ -1,0 +1,100 @@
+<script lang="ts">
+	import {swallow} from '@ryanatkn/belt/dom.js';
+
+	import {GLYPH_REMOVE} from '$lib/glyphs.js';
+	import type {Diskfile_Tab} from '$lib/diskfile_tab.svelte.js';
+
+	interface Props {
+		tab: Diskfile_Tab;
+		onselect: (tab: Diskfile_Tab) => void;
+		onclose: (tab: Diskfile_Tab) => void;
+		onopen: (tab: Diskfile_Tab) => void;
+	}
+
+	const {tab, onselect, onclose, onopen}: Props = $props();
+
+	const path = $derived(tab.diskfile?.path_relative ?? '[no diskfile found]'); // TODO ?
+</script>
+
+<div class="diskfile_tab_container" class:selected={tab.is_selected} class:preview={tab.is_preview}>
+	<div
+		role="button"
+		tabindex="0"
+		class="diskfile_tab_button radius_0 plain px_sm py_xs"
+		class:selected={tab.is_selected}
+		class:preview={tab.is_preview}
+		onclick={(e) => {
+			swallow(e);
+			// If it's a preview tab and it's double-clicked, promote it to permanent
+			if (tab.is_preview && e.detail === 2) {
+				onopen(tab);
+			} else {
+				onselect(tab);
+			}
+		}}
+		onkeydown={(e) => {
+			if (e.key === 'Enter' || e.key === ' ') {
+				swallow(e);
+				onselect(tab);
+			}
+		}}
+		aria-label={`Tab ${path}`}
+		aria-pressed={tab.is_selected}
+	>
+		<div class="ellipsis font_weight_400 flex_1">
+			<small class="ml_xs">{path}</small>
+		</div>
+		<button
+			type="button"
+			class="tab_close_button plain icon_button compact radius_md ml_sm"
+			onclick={(e) => {
+				swallow(e);
+				onclose(tab);
+			}}
+			title="close tab"
+			aria-label={`close tab ${path}`}
+		>
+			{GLYPH_REMOVE}
+		</button>
+	</div>
+</div>
+
+<style>
+	.diskfile_tab_container {
+		display: flex;
+		align-items: center;
+		min-width: 10rem;
+		max-width: 30rem;
+	}
+
+	.diskfile_tab_button {
+		flex: 1;
+		display: flex;
+		align-items: center;
+		white-space: nowrap;
+		overflow: hidden;
+		width: 100%;
+		cursor: pointer;
+	}
+
+	.diskfile_tab_button:hover {
+		box-shadow: var(--shadow_inset_bottom_xs)
+			color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_1)), transparent);
+	}
+
+	.diskfile_tab_button:active {
+		box-shadow: var(--shadow_inset_top_xs)
+			color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_1)), transparent);
+	}
+
+	.diskfile_tab_button.selected {
+		box-shadow: var(--shadow_inset_top_sm)
+			color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_2)), transparent);
+	}
+
+	.diskfile_tab_button.preview {
+		font-style: italic;
+		box-shadow: var(--shadow_bottom_sm)
+			color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_2)), transparent);
+	}
+</style>

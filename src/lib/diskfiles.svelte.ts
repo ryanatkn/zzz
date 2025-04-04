@@ -10,6 +10,7 @@ import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {strip_start} from '@ryanatkn/belt/string.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {create_single_index, create_multi_index} from '$lib/indexed_collection_helpers.js';
+import {Diskfiles_Editor} from '$lib/diskfiles_editor.svelte.js';
 
 export const Diskfiles_Json = z
 	.object({
@@ -56,10 +57,14 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 		this.selected_file_id ? (this.items.by_id.get(this.selected_file_id) ?? null) : null,
 	);
 
-	onselect?: (diskfile: Diskfile) => void;
+	/** The editor for managing diskfiles editing state. */
+	readonly editor: Diskfiles_Editor;
 
 	constructor(options: Diskfiles_Options) {
 		super(Diskfiles_Json, options);
+
+		// Create the editor instance
+		this.editor = new Diskfiles_Editor(this.zzz);
 
 		this.decoders = {
 			diskfiles: (diskfiles) => {
@@ -120,9 +125,12 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 	add(json: Diskfile_Json): Diskfile {
 		const diskfile = new Diskfile({zzz: this.zzz, json});
 		this.items.add(diskfile);
+
+		// If no file is selected, select this one
 		if (this.selected_file_id === null) {
-			this.selected_file_id = diskfile.id;
+			this.select(diskfile.id);
 		}
+
 		return diskfile;
 	}
 
@@ -180,16 +188,26 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 		return zzz_dir && strip_start(path, zzz_dir);
 	}
 
-	// TODO @many extract a selection helper class?
 	/**
-	 * Select a diskfile by id. Default to the first file if `id` is `undefined`.
+	 * Select a diskfile by id and also update the editor tabs.
+	 * Default to the first file if `id` is `undefined`.
 	 * If `id` is `null`, it selects no file.
+	 * If `hard` is `true`, opens as a permanent tab, otherwise previews.
 	 */
-	select(id: Uuid | null | undefined): void {
+	select(id: Uuid | null | undefined, hard: boolean = false): void {
 		if (id === undefined) {
 			this.select_next();
 		} else {
 			this.selected_file_id = id;
+
+			// Update the editor if a file is selected
+			if (id !== null) {
+				if (hard) {
+					this.editor.open_diskfile(id);
+				} else {
+					this.editor.preview_diskfile(id);
+				}
+			}
 		}
 	}
 

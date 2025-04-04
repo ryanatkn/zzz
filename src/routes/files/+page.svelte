@@ -1,5 +1,5 @@
 <script lang="ts">
-	import Dashboard_Files from '$lib/Dashboard_Files.svelte';
+	import Dashboard_Diskfiles from '$lib/Dashboard_Diskfiles.svelte';
 </script>
 
-<Dashboard_Files />
+<Dashboard_Diskfiles />

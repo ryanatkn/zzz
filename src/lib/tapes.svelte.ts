@@ -110,7 +110,7 @@ export class Tapes extends Cell<typeof Tapes_Json> {
 	}
 
 	remove(id: Uuid): void {
-		// For a single ID, use a direct approach rather than creating an array
+		// For a single id, use a direct approach rather than creating an array
 		this.#remove_reference_from_chats(id);
 
 		const removed = this.items.remove(id);

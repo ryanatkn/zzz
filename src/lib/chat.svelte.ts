@@ -25,10 +25,10 @@ export const Chat_Json = Cell_Json.extend({
 	main_input: z.string().default(''),
 	view_mode: Chat_View_Mode,
 });
-
 export type Chat_Json = z.infer<typeof Chat_Json>;
 
 export interface Chat_Options extends Cell_Options<typeof Chat_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
+
 export class Chat extends Cell<typeof Chat_Json> {
 	name: string = $state()!;
 	tape_ids: Array<Uuid> = $state([]);

@@ -132,7 +132,7 @@
 		zzz.messages.send({id: Uuid.parse(undefined), type: 'load_session'});
 	}
 
-	// TODO refactor how? schema with typesafe registration/dispatch?
+	// TODO refactor, try to remove - how? schema with typesafe registration/dispatch?
 	// Handle URL parameter synchronization
 	$effect.pre(() => {
 		// Re-run when URL search params change

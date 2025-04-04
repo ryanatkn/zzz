@@ -6,8 +6,8 @@ import type {Src_Json} from '@ryanatkn/gro/src_json.js';
 export const package_json = {
 	name: '@ryanatkn/zzz',
 	version: '0.0.1',
-	description: 'bot and web toolkit',
-	motto: 'nice web things',
+	description: 'webtool',
+	motto: 'nice web things, yawn',
 	glyph: '💤',
 	logo: 'logo.svg',
 	logo_alt: "three sleepy z's",
@@ -36,7 +36,7 @@ export const package_json = {
 		'@ryanatkn/eslint-config': '^0.7.0',
 		'@ryanatkn/fuz': '^0.135.0',
 		'@ryanatkn/gro': '^0.148.0',
-		'@ryanatkn/moss': '^0.23.2',
+		'@ryanatkn/moss': '^0.24.2',
 		'@sveltejs/adapter-static': '^3.0.8',
 		'@sveltejs/kit': '^2.20.1',
 		'@sveltejs/package': '^2.3.10',
@@ -282,10 +282,10 @@ export const package_json = {
 			svelte: './dist/Dashboard_Chats.svelte',
 			default: './dist/Dashboard_Chats.svelte',
 		},
-		'./Dashboard_Files.svelte': {
-			types: './dist/Dashboard_Files.svelte.d.ts',
-			svelte: './dist/Dashboard_Files.svelte',
-			default: './dist/Dashboard_Files.svelte',
+		'./Dashboard_Diskfiles.svelte': {
+			types: './dist/Dashboard_Diskfiles.svelte.d.ts',
+			svelte: './dist/Dashboard_Diskfiles.svelte',
+			default: './dist/Dashboard_Diskfiles.svelte',
 		},
 		'./Dashboard_Home.svelte': {
 			types: './dist/Dashboard_Home.svelte.d.ts',
@@ -336,10 +336,10 @@ export const package_json = {
 			types: './dist/diskfile_editor_state.svelte.d.ts',
 			default: './dist/diskfile_editor_state.svelte.js',
 		},
-		'./Diskfile_Editor.svelte': {
-			types: './dist/Diskfile_Editor.svelte.d.ts',
-			svelte: './dist/Diskfile_Editor.svelte',
-			default: './dist/Diskfile_Editor.svelte',
+		'./Diskfile_Editor_View.svelte': {
+			types: './dist/Diskfile_Editor_View.svelte.d.ts',
+			svelte: './dist/Diskfile_Editor_View.svelte',
+			default: './dist/Diskfile_Editor_View.svelte',
 		},
 		'./Diskfile_Explorer.svelte': {
 			types: './dist/Diskfile_Explorer.svelte.d.ts',
@@ -379,6 +379,19 @@ export const package_json = {
 			svelte: './dist/Diskfile_Picker.svelte',
 			default: './dist/Diskfile_Picker.svelte',
 		},
+		'./Diskfile_Tab_Listitem.svelte': {
+			types: './dist/Diskfile_Tab_Listitem.svelte.d.ts',
+			svelte: './dist/Diskfile_Tab_Listitem.svelte',
+			default: './dist/Diskfile_Tab_Listitem.svelte',
+		},
+		'./diskfile_tab.svelte.js': {
+			types: './dist/diskfile_tab.svelte.d.ts',
+			default: './dist/diskfile_tab.svelte.js',
+		},
+		'./diskfile_tabs.svelte.js': {
+			types: './dist/diskfile_tabs.svelte.d.ts',
+			default: './dist/diskfile_tabs.svelte.js',
+		},
 		'./diskfile_types.js': {
 			types: './dist/diskfile_types.d.ts',
 			default: './dist/diskfile_types.js',
@@ -386,6 +399,10 @@ export const package_json = {
 		'./diskfile.svelte.js': {
 			types: './dist/diskfile.svelte.d.ts',
 			default: './dist/diskfile.svelte.js',
+		},
+		'./diskfiles_editor.svelte.js': {
+			types: './dist/diskfiles_editor.svelte.d.ts',
+			default: './dist/diskfiles_editor.svelte.js',
 		},
 		'./diskfiles.svelte.js': {
 			types: './dist/diskfiles.svelte.d.ts',
@@ -845,6 +862,7 @@ export const src_json = {
 				{name: 'Chats_Json', kind: 'variable'},
 				{name: 'Chats_Options', kind: 'type'},
 				{name: 'Chats', kind: 'class'},
+				{name: 'Chats_Schema', kind: 'variable'},
 			],
 		},
 		'./Clear_Restore_Button.svelte': {path: 'Clear_Restore_Button.svelte', declarations: []},
@@ -898,7 +916,7 @@ export const src_json = {
 		'./Contextmenu_Tape.svelte': {path: 'Contextmenu_Tape.svelte', declarations: []},
 		'./Dashboard_Capabilities.svelte': {path: 'Dashboard_Capabilities.svelte', declarations: []},
 		'./Dashboard_Chats.svelte': {path: 'Dashboard_Chats.svelte', declarations: []},
-		'./Dashboard_Files.svelte': {path: 'Dashboard_Files.svelte', declarations: []},
+		'./Dashboard_Diskfiles.svelte': {path: 'Dashboard_Diskfiles.svelte', declarations: []},
 		'./Dashboard_Home.svelte': {path: 'Dashboard_Home.svelte', declarations: []},
 		'./Dashboard_Log.svelte': {path: 'Dashboard_Log.svelte', declarations: []},
 		'./Dashboard_Models.svelte': {path: 'Dashboard_Models.svelte', declarations: []},
@@ -912,7 +930,7 @@ export const src_json = {
 			path: 'diskfile_editor_state.svelte.ts',
 			declarations: [{name: 'Diskfile_Editor_State', kind: 'class'}],
 		},
-		'./Diskfile_Editor.svelte': {path: 'Diskfile_Editor.svelte', declarations: []},
+		'./Diskfile_Editor_View.svelte': {path: 'Diskfile_Editor_View.svelte', declarations: []},
 		'./Diskfile_Explorer.svelte': {path: 'Diskfile_Explorer.svelte', declarations: []},
 		'./diskfile_helpers.js': {
 			path: 'diskfile_helpers.ts',
@@ -938,6 +956,25 @@ export const src_json = {
 		'./Diskfile_Listitem.svelte': {path: 'Diskfile_Listitem.svelte', declarations: []},
 		'./Diskfile_Metrics.svelte': {path: 'Diskfile_Metrics.svelte', declarations: []},
 		'./Diskfile_Picker.svelte': {path: 'Diskfile_Picker.svelte', declarations: []},
+		'./Diskfile_Tab_Listitem.svelte': {path: 'Diskfile_Tab_Listitem.svelte', declarations: []},
+		'./diskfile_tab.svelte.js': {
+			path: 'diskfile_tab.svelte.ts',
+			declarations: [
+				{name: 'Diskfile_Tab_Json', kind: 'variable'},
+				{name: 'Diskfile_Tab_Options', kind: 'type'},
+				{name: 'Diskfile_Tab', kind: 'class'},
+				{name: 'Diskfile_Tab_Schema', kind: 'variable'},
+			],
+		},
+		'./diskfile_tabs.svelte.js': {
+			path: 'diskfile_tabs.svelte.ts',
+			declarations: [
+				{name: 'Diskfile_Tabs_Json', kind: 'variable'},
+				{name: 'Diskfile_Tabs_Options', kind: 'type'},
+				{name: 'Diskfile_Tabs', kind: 'class'},
+				{name: 'Diskfile_Tabs_Schema', kind: 'variable'},
+			],
+		},
 		'./diskfile_types.js': {
 			path: 'diskfile_types.ts',
 			declarations: [
@@ -954,6 +991,15 @@ export const src_json = {
 				{name: 'Diskfile_Options', kind: 'type'},
 				{name: 'Diskfile', kind: 'class'},
 				{name: 'Diskfile_Schema', kind: 'variable'},
+			],
+		},
+		'./diskfiles_editor.svelte.js': {
+			path: 'diskfiles_editor.svelte.ts',
+			declarations: [
+				{name: 'Diskfiles_Editor_Json', kind: 'variable'},
+				{name: 'Diskfiles_Editor_Options', kind: 'type'},
+				{name: 'Diskfiles_Editor', kind: 'class'},
+				{name: 'Diskfiles_Editor_Schema', kind: 'variable'},
 			],
 		},
 		'./diskfiles.svelte.js': {

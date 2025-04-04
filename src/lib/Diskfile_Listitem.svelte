@@ -1,6 +1,5 @@
 <script lang="ts">
-	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
-	import type {SvelteHTMLElements} from 'svelte/elements';
+	import {swallow} from '@ryanatkn/belt/dom.js';
 
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import Contextmenu_Diskfile from '$lib/Contextmenu_Diskfile.svelte';
@@ -9,32 +8,44 @@
 
 	interface Props {
 		diskfile: Diskfile;
-		selected?: boolean | undefined;
-		onclick?: ((diskfile: Diskfile) => void) | undefined;
-		compact?: boolean | undefined;
-		attrs?: SvelteHTMLElements['button'] | undefined;
+		selected?: boolean;
+		attrs?: Record<string, unknown>;
+		/**
+		 * `hard` indicates a "hard select" like a doubleclick or enter keypress.
+		 */
+		onselect?: (diskfile: Diskfile, hard: boolean) => void;
 	}
 
-	const {diskfile, selected, onclick, compact = true, attrs}: Props = $props();
-
-	// TODO BLOCK change to links like the others, probably
+	const {diskfile, selected = false, attrs, onselect}: Props = $props();
 </script>
 
 <Contextmenu_Diskfile {diskfile}>
-	<button
-		type="button"
-		class="listitem"
-		{...attrs}
+	<div
+		role="button"
+		tabindex="0"
+		class="menu_item compact ellipsis cursor_pointer"
 		class:selected
-		class:compact
-		onclick={onclick ? () => onclick(diskfile) : undefined}
-		title="file at {diskfile.path}"
+		{...attrs}
+		onclick={onselect
+			? (e) => {
+					swallow(e);
+					onselect(diskfile, e.detail === 2);
+				}
+			: undefined}
+		onkeydown={onselect
+			? (e) => {
+					if (e.key === 'Enter' || e.key === ' ') {
+						swallow(e);
+						onselect(diskfile, true);
+					}
+				}
+			: undefined}
+		aria-label={diskfile.path_relative ?? undefined}
+		aria-pressed={selected}
 	>
-		<div class="ellipsis">
+		<small class="ellipsis">
 			<Glyph icon={GLYPH_FILE} />
-			<span
-				>{#if diskfile.path_relative}{diskfile.path_relative}{:else}<Pending_Animation />{/if}</span
-			>
-		</div>
-	</button>
+			<span class="ml_xs">{diskfile.path_relative}</span>
+		</small>
+	</div>
 </Contextmenu_Diskfile>

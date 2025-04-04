@@ -10,6 +10,7 @@
 	}
 
 	const {diskfile}: Props = $props();
+
 	const zzz = zzz_context.get();
 
 	const bit = $derived(diskfile.bit);

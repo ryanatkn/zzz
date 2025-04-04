@@ -51,6 +51,7 @@ textarea {
 button.compact {
 	font-size: var(--size); /* ideally the base button would use `--size` I think */
 }
+
 input[type='checkbox'].compact {
 	height: var(--input_height);
 	min-height: var(--input_height);

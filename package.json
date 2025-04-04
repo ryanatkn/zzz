@@ -1,8 +1,8 @@
 {
   "name": "@ryanatkn/zzz",
   "version": "0.0.1",
-  "description": "bot and web toolkit",
-  "motto": "nice web things",
+  "description": "webtool",
+  "motto": "nice web things, yawn",
   "glyph": "💤",
   "logo": "logo.svg",
   "logo_alt": "three sleepy z's",
@@ -40,7 +40,7 @@
     "@ryanatkn/eslint-config": "^0.7.0",
     "@ryanatkn/fuz": "^0.135.0",
     "@ryanatkn/gro": "^0.148.0",
-    "@ryanatkn/moss": "^0.23.2",
+    "@ryanatkn/moss": "^0.24.2",
     "@sveltejs/adapter-static": "^3.0.8",
     "@sveltejs/kit": "^2.20.1",
     "@sveltejs/package": "^2.3.10",
@@ -332,10 +332,10 @@
       "svelte": "./dist/Dashboard_Chats.svelte",
       "default": "./dist/Dashboard_Chats.svelte"
     },
-    "./Dashboard_Files.svelte": {
-      "types": "./dist/Dashboard_Files.svelte.d.ts",
-      "svelte": "./dist/Dashboard_Files.svelte",
-      "default": "./dist/Dashboard_Files.svelte"
+    "./Dashboard_Diskfiles.svelte": {
+      "types": "./dist/Dashboard_Diskfiles.svelte.d.ts",
+      "svelte": "./dist/Dashboard_Diskfiles.svelte",
+      "default": "./dist/Dashboard_Diskfiles.svelte"
     },
     "./Dashboard_Home.svelte": {
       "types": "./dist/Dashboard_Home.svelte.d.ts",
@@ -386,10 +386,10 @@
       "types": "./dist/diskfile_editor_state.svelte.d.ts",
       "default": "./dist/diskfile_editor_state.svelte.js"
     },
-    "./Diskfile_Editor.svelte": {
-      "types": "./dist/Diskfile_Editor.svelte.d.ts",
-      "svelte": "./dist/Diskfile_Editor.svelte",
-      "default": "./dist/Diskfile_Editor.svelte"
+    "./Diskfile_Editor_View.svelte": {
+      "types": "./dist/Diskfile_Editor_View.svelte.d.ts",
+      "svelte": "./dist/Diskfile_Editor_View.svelte",
+      "default": "./dist/Diskfile_Editor_View.svelte"
     },
     "./Diskfile_Explorer.svelte": {
       "types": "./dist/Diskfile_Explorer.svelte.d.ts",
@@ -429,6 +429,19 @@
       "svelte": "./dist/Diskfile_Picker.svelte",
       "default": "./dist/Diskfile_Picker.svelte"
     },
+    "./Diskfile_Tab_Listitem.svelte": {
+      "types": "./dist/Diskfile_Tab_Listitem.svelte.d.ts",
+      "svelte": "./dist/Diskfile_Tab_Listitem.svelte",
+      "default": "./dist/Diskfile_Tab_Listitem.svelte"
+    },
+    "./diskfile_tab.svelte.js": {
+      "types": "./dist/diskfile_tab.svelte.d.ts",
+      "default": "./dist/diskfile_tab.svelte.js"
+    },
+    "./diskfile_tabs.svelte.js": {
+      "types": "./dist/diskfile_tabs.svelte.d.ts",
+      "default": "./dist/diskfile_tabs.svelte.js"
+    },
     "./diskfile_types.js": {
       "types": "./dist/diskfile_types.d.ts",
       "default": "./dist/diskfile_types.js"
@@ -436,6 +449,10 @@
     "./diskfile.svelte.js": {
       "types": "./dist/diskfile.svelte.d.ts",
       "default": "./dist/diskfile.svelte.js"
+    },
+    "./diskfiles_editor.svelte.js": {
+      "types": "./dist/diskfiles_editor.svelte.d.ts",
+      "default": "./dist/diskfiles_editor.svelte.js"
     },
     "./diskfiles.svelte.js": {
       "types": "./dist/diskfiles.svelte.d.ts",

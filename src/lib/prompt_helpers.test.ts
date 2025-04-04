@@ -83,7 +83,7 @@ test('format_prompt_content - uses xml_tag_name_default when no XML tag name is 
 	];
 
 	const result = format_prompt_content(bits as any);
-	expect(result).toBe('<fragment>\nContent with default tag\n</fragment>');
+	expect(result).toBe('<Fragment>\nContent with default tag\n</Fragment>');
 });
 
 // Test with different bit types
@@ -104,7 +104,7 @@ test('format_prompt_content - uses different bit types as defaults', () => {
 	];
 
 	const result = format_prompt_content(bits as any);
-	expect(result).toBe('<file>\nFile content\n</file>\n\n<fragment>\nSequence content\n</fragment>');
+	expect(result).toBe('<File>\nFile content\n</File>\n\n<Fragment>\nSequence content\n</Fragment>');
 });
 
 test('format_prompt_content - uses different default XML tag names for different bit types', () => {
@@ -131,7 +131,7 @@ test('format_prompt_content - uses different default XML tag names for different
 
 	const result = format_prompt_content(bits as any);
 	expect(result).toBe(
-		'<file>\nFile content\n</file>\n\n<fragment>\nText content\n</fragment>\n\n<fragment>\nSequence content\n</fragment>',
+		'<File>\nFile content\n</File>\n\n<Fragment>\nText content\n</Fragment>\n\n<Fragment>\nSequence content\n</Fragment>',
 	);
 });
 
@@ -335,7 +335,7 @@ test('format_prompt_content - ensures diskfile bits have path attribute', () => 
 	});
 
 	const result = format_prompt_content([diskfile_bit] as any);
-	expect(result).toBe('<file path="src/example.ts">\nFile content with path\n</file>');
+	expect(result).toBe('<File path="src/example.ts">\nFile content with path\n</File>');
 });
 
 // Test for when the path attribute is combined with other attributes

@@ -2,14 +2,14 @@
 
 [<img src="/static/logo.svg" alt="three sleepy z's" align="right" width="192" height="192">](https://www.zzz.software/)
 
-> bot and web toolkit 💤 nice web things
+> webtool 💤 nice web things, yawn
 
 ⚠️ early pre-release
 
 **[zzz.software](https://www.zzz.software/)**
 
 Zzz, pronounced "zees" like bees,
-is a bot and web toolkit with a focus on user power and experimentation.
+is a webtool with a focus on user power and experimentation.
 The idea is to make a digital tool that adapts to your needs on the fly
 while remaining fully open, aligned, and in your control.
 More at [zzz.software/about](https://www.zzz.software/about).

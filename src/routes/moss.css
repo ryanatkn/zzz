@@ -264,6 +264,7 @@ a.chip {
 	--border_color: var(--border_color_3);
 	position: relative;
 	z-index: 2;
+	cursor: pointer;
 	width: 100%;
 	min-height: var(--min_height, var(--icon_size_sm));
 	display: flex;
@@ -276,6 +277,19 @@ a.chip {
 	--border_color: var(--color_a_5);
 	background-color: var(--fg_1);
 	z-index: 1;
+	cursor: default;
+}
+.menu_item.selected.deselectable:not(:disabled) {
+	cursor: pointer;
+}
+.menu_item:hover {
+	--border_color: var(--border_color_3);
+	background-color: var(--fg_0);
+}
+.menu_item:active,
+.menu_item.selected:hover {
+	--border_color: var(--border_color_3);
+	background-color: var(--fg_2);
 }
 .menu_item.plain {
 	border: none;
@@ -393,6 +407,9 @@ a.chip {
 .overflow_x_auto {
 	overflow-x: auto;
 }
+.overflow_y_hidden {
+	overflow-y: hidden;
+}
 .p_lg {
 	padding: var(--space_lg);
 }
@@ -507,6 +524,10 @@ a.chip {
 .px_xs {
 	padding-left: var(--space_xs);
 	padding-right: var(--space_xs);
+}
+.px_xs4 {
+	padding-left: var(--space_xs4);
+	padding-right: var(--space_xs4);
 }
 .py_sm {
 	padding-top: var(--space_sm);

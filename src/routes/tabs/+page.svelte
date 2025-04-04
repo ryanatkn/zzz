@@ -34,17 +34,17 @@
 		// Example of a real external URL that will load in an iframe
 		{
 			id: Uuid.parse(undefined),
-			title: 'Fuz',
+			title: 'Moss',
 			selected: false,
-			url: 'https://fuz.dev/',
+			url: 'https://moss.ryanatkn.com/',
 			type: 'external_url',
 			refresh_counter: 0,
 		},
 		{
 			id: Uuid.parse(undefined),
-			title: 'Moss',
+			title: 'Fuz',
 			selected: false,
-			url: 'https://moss.ryanatkn.com/',
+			url: 'https://fuz.dev/',
 			type: 'external_url',
 			refresh_counter: 0,
 		},

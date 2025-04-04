@@ -18,8 +18,8 @@
 
 	const reorderable = new Reorderable();
 
-	// Use the new filter method to get unselected prompts efficiently
 	const unselected_prompts = $derived(
+		// TODO hacky, refactor - index/derived
 		chat.zzz.prompts.filter_unselected_prompts(chat.selected_prompts.map((prompt) => prompt.id)),
 	);
 

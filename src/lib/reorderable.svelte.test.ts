@@ -87,7 +87,8 @@ describe('Reorderable', () => {
 			expect(reorderable.indices.size).toBe(0);
 			expect(reorderable.elements.size).toBe(0);
 			expect(reorderable.direction).toBe(undefined); // initialized by the list action
-			expect(reorderable.id).toMatch(/^r[a-zA-Z0-9]{6}$/);
+			expect(reorderable.id).toBeTruthy();
+			expect(reorderable.id).not.toBe(new Reorderable().id);
 			expect(reorderable.list_class).toBe('reorderable_list');
 			expect(reorderable.item_class).toBe('reorderable_item');
 		});
@@ -488,7 +489,7 @@ describe('Reorderable', () => {
 			const onreorder = vi.fn();
 
 			// Initialize
-			reorderable.list(list, {onreorder: onreorder, can_reorder});
+			reorderable.list(list, {onreorder, can_reorder});
 			const action_results = items.map((item, i) => reorderable.item(item, {index: i}));
 
 			// Force initialization

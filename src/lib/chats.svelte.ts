@@ -21,7 +21,6 @@ export const Chats_Json = z
 		items: [],
 		selected_id: null,
 	}));
-
 export type Chats_Json = z.infer<typeof Chats_Json>;
 
 export interface Chats_Options extends Cell_Options<typeof Chats_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
@@ -144,3 +143,5 @@ export class Chats extends Cell<typeof Chats_Json> {
 		this.items.indexes.manual_order = to_reordered_list(this.ordered_items, from_index, to_index);
 	}
 }
+
+export const Chats_Schema = z.instanceof(Chats);

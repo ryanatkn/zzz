@@ -1,5 +1,4 @@
 <script lang="ts">
-	import {slide} from 'svelte/transition';
 	import {untrack} from 'svelte';
 
 	import {zzz_context} from '$lib/zzz.svelte.js';
@@ -12,12 +11,16 @@
 	import {GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
 	import Diskfile_Bit_View from '$lib/Diskfile_Bit_View.svelte';
 	import Contextmenu_Diskfile from '$lib/Contextmenu_Diskfile.svelte';
+	import type {Uuid} from '$lib/zod_helpers.js';
+	import Diskfile_Editor_Nav from '$lib/Diskfile_Editor_Nav.svelte';
 
 	interface Props {
 		diskfile: Diskfile;
+		onmodified?: (diskfile_id: Uuid) => void;
 	}
 
-	const {diskfile}: Props = $props();
+	const {diskfile, onmodified}: Props = $props();
+
 	const zzz = zzz_context.get();
 
 	// Create editor state once and reuse it
@@ -26,7 +29,14 @@
 	// Reference to the content editor component
 	let content_editor: {focus: () => void} | undefined = $state();
 
-	// Combined effect to handle diskfile changes and disk change detection
+	// TODO refactor, try to remove
+	$effect(() => {
+		if (editor_state.content_was_modified_by_user) {
+			onmodified?.(diskfile.id);
+		}
+	});
+
+	// TODO refactor, try to remove
 	$effect.pre(() => {
 		// Track diskfile changes explicitly
 		const diskfile_id = diskfile.id;
@@ -65,6 +75,10 @@
 
 		<div class="width_sm min_width_sm">
 			<div class="mb_md p_md">
+				<Diskfile_Editor_Nav {editor_state} />
+			</div>
+
+			<div class="mb_md p_md">
 				<Diskfile_Info {diskfile} {editor_state} />
 			</div>
 
@@ -72,54 +86,8 @@
 				<Diskfile_Actions {diskfile} {editor_state} />
 			</div>
 
-			<!-- TODO @many add support for deps for module diskfiles (TS, Svelte, etc) -->
-			<!-- {#if diskfile.dependencies_count || diskfile.dependents_count}
-				<div class="mt_md panel p_md">
-					{#if diskfile.dependencies_count}
-						<div class="mb_md">
-							<h3 class="mt_0 mb_sm">
-								Dependencies ({diskfile.dependencies_count})
-							</h3>
-							<div class="dep_list">
-								{#each diskfile.dependency_ids as dependency_id (dependency_id)}
-									<div class="dep_item">{zzz.diskfiles.to_relative_path(dependency_id)}</div>
-								{/each}
-							</div>
-						</div>
-					{/if}
-
-					{#if diskfile.dependents_count}
-						<div>
-							<h3 class="mt_0 mb_sm">
-								Dependents ({diskfile.dependents_count})
-							</h3>
-							<div class="dep_list">
-								{#each diskfile.dependent_ids as dependent_id (dependent_id)}
-									<div class="dep_item">{zzz.diskfiles.to_relative_path(dependent_id)}</div>
-								{/each}
-							</div>
-						</div>
-					{/if}
-				</div>
-				<style>
-					.dep_list {
-						display: grid;
-						grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-						gap: var(--space_xs);
-					}
-					.dep_item {
-						font-family: monospace;
-						font-size: var(--size_sm);
-						white-space: nowrap;
-						overflow: hidden;
-						text-overflow: ellipsis;
-						padding: var(--space_xs2);
-					}
-				</style>
-			{/if} -->
-
 			{#if editor_state.has_history}
-				<div transition:slide>
+				<div class="slide_container">
 					<Diskfile_History_View
 						{editor_state}
 						onselectentry={(entry_id) => {
@@ -134,3 +102,20 @@
 		</div>
 	</div>
 </Contextmenu_Diskfile>
+
+<style>
+	.slide_container {
+		animation: slide-down 0.2s ease-out;
+	}
+
+	@keyframes slide-down {
+		0% {
+			opacity: 0;
+			transform: translateY(-10px);
+		}
+		100% {
+			opacity: 1;
+			transform: translateY(0);
+		}
+	}
+</style>

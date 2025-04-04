@@ -10,7 +10,7 @@ import {Uuid} from '$lib/zod_helpers.js';
  * Schema for history entries.
  */
 export const History_Entry = z.object({
-	id: Uuid.default(() => Uuid.parse(undefined)),
+	id: Uuid,
 	created: z.number(),
 	content: z.string(),
 	label: z.string(),
@@ -65,8 +65,12 @@ export class Diskfile_History extends Cell<typeof Diskfile_History_Json> {
 			created?: number;
 		} = EMPTY_OBJECT,
 	): History_Entry {
-		// Don't add duplicate entries with the same content back-to-back
-		if (this.current_entry && this.current_entry.content === content) {
+		// Don't add duplicate entries with the same content and metadata back-to-back
+		if (
+			this.current_entry &&
+			this.current_entry.content === content &&
+			this.#has_same_metadata(this.current_entry, options)
+		) {
 			return this.current_entry;
 		}
 
@@ -104,6 +108,26 @@ export class Diskfile_History extends Cell<typeof Diskfile_History_Json> {
 		this.entries = new_entries;
 
 		return entry;
+	}
+
+	/**
+	 * Compare entry metadata flags with options
+	 */
+	#has_same_metadata(
+		entry: History_Entry,
+		options: {
+			is_disk_change?: boolean;
+			is_unsaved_edit?: boolean;
+			is_original_state?: boolean;
+			label?: string;
+		},
+	): boolean {
+		return (
+			entry.is_disk_change === (options.is_disk_change ?? entry.is_disk_change) &&
+			entry.is_unsaved_edit === (options.is_unsaved_edit ?? entry.is_unsaved_edit) &&
+			entry.is_original_state === (options.is_original_state ?? entry.is_original_state) &&
+			entry.label === (options.label ?? entry.label)
+		);
 	}
 
 	// TODO maybe make a map for faster lookup?

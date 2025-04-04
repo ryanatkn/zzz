@@ -6,9 +6,6 @@ import {BROWSER} from 'esm-env';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Uuid} from '$lib/zod_helpers.js';
 
-/**
- * Schema for URL parameters manager
- */
 export const Url_Params_Json = z.object({
 	// No persisted state needed
 });
@@ -17,7 +14,7 @@ export type Url_Params_Json = z.infer<typeof Url_Params_Json>;
 export interface Url_Params_Options extends Cell_Options<typeof Url_Params_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
 /**
- * Manages URL parameter synchronization
+ * Manages URL parameter synchronization.
  */
 export class Url_Params extends Cell<typeof Url_Params_Json> {
 	constructor(options: Url_Params_Options) {
@@ -26,20 +23,21 @@ export class Url_Params extends Cell<typeof Url_Params_Json> {
 	}
 
 	/**
-	 * Update URL with parameter for the selected entity
-	 * @param param_name Name of the URL parameter
-	 * @param id UUID of the selected entity
+	 * Update URL with parameter for the selected entity.
 	 */
-	async update_url(param_name: string, id: Uuid): Promise<void> {
+	async update_url(param_name: string, value: string | null | undefined): Promise<void> {
 		if (!BROWSER) return;
 		const url = new URL(window.location.href);
-		url.searchParams.set(param_name, id);
+		if (value == null) {
+			url.searchParams.delete(param_name);
+		} else {
+			url.searchParams.set(param_name, value);
+		}
 		return goto(url);
 	}
 
 	/**
-	 * Get a parameter value from the URL
-	 * @param param_name Name of the URL parameter
+	 * Get a parameter value from the URL.
 	 */
 	get_param(param_name: string): string | null {
 		return page.url.searchParams.get(param_name);

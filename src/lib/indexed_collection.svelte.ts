@@ -4,6 +4,8 @@ import {DEV} from 'esm-env';
 
 import {Uuid} from '$lib/zod_helpers.js';
 
+// TODO there's a big problem here where indexes aren't reactive
+
 // TODO the API is nowhere near done, this is just a proof of concept
 
 // TODO think about this from the whole graph's POV, not just individual collections, for relationships/transactions
@@ -101,7 +103,7 @@ export class Indexed_Collection<
 
 	// TODO ideally I think this would leverage derived? need to ensure we have the right lazy perf characteristics
 	/** Stores all index values in a reactive object. */
-	readonly indexes: Record<string, any> = $state({});
+	readonly indexes: Record<string, any> = $state({}); // TODO should this be `$state.raw`?
 
 	// Map of index types for type safety and runtime checks
 	readonly #index_types: Map<string, Index_Type> = new Map();
@@ -296,7 +298,7 @@ export class Indexed_Collection<
 			this.by_id.set(item.id, item);
 
 			// Update all other indexes
-			this.#update_indexes_for_added_item(item);
+			this.#update_indexes_for_added_item(item); // TODO update afterwards instead? in a batch?
 		}
 
 		return items;
@@ -387,18 +389,16 @@ export class Indexed_Collection<
 	remove_many(ids: Array<Uuid>): number {
 		if (!ids.length) return 0;
 
-		// Use a Set for O(1) lookups
-		const id_set = new Set(ids);
 		let removed_count = 0;
 
 		// Build a list of items to remove
-		const to_remove_items: Array<T> = [];
+		const items_to_remove: Array<T> = [];
 
 		// Identify items to remove
-		for (const id of id_set) {
+		for (const id of ids) {
 			const item = this.by_id.get(id);
 			if (item) {
-				to_remove_items.push(item);
+				items_to_remove.push(item);
 				removed_count++;
 			}
 		}
@@ -407,12 +407,12 @@ export class Indexed_Collection<
 		if (removed_count === 0) return 0;
 
 		// Clear removed items from indexes first
-		for (const item of to_remove_items) {
+		for (const item of items_to_remove) {
 			this.#update_indexes_for_removed_item(item);
 		}
 
 		// Then remove from the main collection
-		for (const item of to_remove_items) {
+		for (const item of items_to_remove) {
 			this.by_id.delete(item.id);
 		}
 

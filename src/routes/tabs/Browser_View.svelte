@@ -22,7 +22,6 @@
 
 	const {browser, children}: Props = $props();
 
-	// Create a reorderable instance for the tabs
 	const tabs_reorderable = new Reorderable({item_class: null}); // remove the normal reorderable item styling
 </script>
 
@@ -65,7 +64,7 @@
 	<div class="browser_chrome">
 		<!-- Tab Bar -->
 		<ul
-			class="browser_tab_bar unstyled flex overflow_x_auto"
+			class="browser_tab_bar unstyled flex overflow_x_auto overflow_y_hidden scrollbar_width_thin"
 			use:tabs_reorderable.list={{
 				onreorder: (from_index, to_index) => browser.reorder_tab(from_index, to_index),
 			}}
@@ -75,8 +74,8 @@
 					<Browser_Tab_Listitem
 						{tab}
 						{index}
-						onselect={(idx) => browser.select_tab(idx)}
-						onclose={(idx) => browser.close_tab(idx)}
+						onselect={(index) => browser.select_tab(index)}
+						onclose={(index) => browser.close_tab(index)}
 					/>
 				</li>
 			{/each}

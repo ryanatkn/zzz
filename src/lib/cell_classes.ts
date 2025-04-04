@@ -4,8 +4,11 @@ import {Capabilities} from '$lib/capabilities.svelte.js';
 import {Chat} from '$lib/chat.svelte.js';
 import {Chats} from '$lib/chats.svelte.js';
 import {Diskfile} from '$lib/diskfile.svelte.js';
-import {Diskfiles} from '$lib/diskfiles.svelte.js';
+import {Diskfile_Tab} from '$lib/diskfile_tab.svelte.js';
+import {Diskfile_Tabs} from '$lib/diskfile_tabs.svelte.js';
 import {Diskfile_History} from '$lib/diskfile_history.svelte.js';
+import {Diskfiles} from '$lib/diskfiles.svelte.js';
+import {Diskfiles_Editor} from '$lib/diskfiles_editor.svelte.js';
 import {Message} from '$lib/message.svelte.js';
 import {Messages} from '$lib/messages.svelte.js';
 import {Model} from '$lib/model.svelte.js';
@@ -18,6 +21,7 @@ import {Socket} from '$lib/socket.svelte.js';
 import {Strip} from '$lib/strip.svelte.js';
 import {Tape} from '$lib/tape.svelte.js';
 import {Tapes} from '$lib/tapes.svelte.js';
+import {Time} from '$lib/time.svelte.js';
 import {Ui} from '$lib/ui.svelte.js';
 import {Url_Params} from '$lib/url_params.svelte.js';
 import type {Cell} from '$lib/cell.svelte.js';
@@ -31,9 +35,12 @@ export const cell_classes = {
 	Chat,
 	Chats,
 	Diskfile,
-	Diskfiles,
+	Diskfile_Tab,
+	Diskfile_Tabs,
 	Diskfile_Bit,
 	Diskfile_History,
+	Diskfiles,
+	Diskfiles_Editor,
 	Message,
 	Messages,
 	Model,
@@ -47,6 +54,7 @@ export const cell_classes = {
 	Strip,
 	Tape,
 	Tapes,
+	Time,
 	Text_Bit,
 	Ui,
 	Url_Params,

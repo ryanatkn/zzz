@@ -48,6 +48,7 @@
 	// Create a popover instance
 	const popover = new Popover();
 
+	// TODO refactor, try to remove
 	// This hides the popover when the button is disabled
 	$effect.pre(() => {
 		if (attrs?.disabled) {

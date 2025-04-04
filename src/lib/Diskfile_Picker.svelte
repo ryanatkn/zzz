@@ -46,7 +46,7 @@
 		<Diskfile_Listitem
 			{diskfile}
 			selected={!!selected_ids && selected_ids.includes(diskfile.id)}
-			onclick={pick}
+			onselect={pick}
 		/>
 	{/snippet}
 </Picker>

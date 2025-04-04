@@ -10,6 +10,7 @@
 
 	// Get props with default to context value
 	const {zzz_dir: zzz_dir_prop}: Props = $props();
+
 	const zzz = zzz_context.get();
 	const {capabilities} = zzz;
 

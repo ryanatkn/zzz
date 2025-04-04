@@ -7,7 +7,7 @@ import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {create_single_index, create_derived_index} from '$lib/indexed_collection_helpers.js';
 import {to_reordered_list} from '$lib/list_helpers.js';
-import type {Bit_Type} from './bit.svelte.js';
+import type {Bit_Type} from '$lib/bit.svelte.js';
 
 export const Prompts_Json = z
 	.object({
@@ -103,11 +103,8 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 			return this.ordered_items;
 		}
 
-		// Create a Set for O(1) lookups
-		const selected_id_set = new Set(selected_prompt_ids);
-
 		// Return prompts that aren't in the selected set
-		return this.ordered_items.filter((prompt) => !selected_id_set.has(prompt.id));
+		return this.ordered_items.filter((prompt) => !selected_prompt_ids.includes(prompt.id));
 	}
 
 	filter_by_bit(bit: Bit_Type): Array<Prompt> {

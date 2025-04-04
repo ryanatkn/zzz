@@ -12,7 +12,7 @@
 		attrs?: Record<string, string> | undefined;
 	}
 
-	const {bit, prompt, prompts, attrs = {}}: Props = $props();
+	const {bit, prompt, prompts, attrs}: Props = $props();
 </script>
 
 <Confirm_Button
@@ -24,7 +24,7 @@
 		}
 	}}
 	attrs={{
-		class: `plain compact ${attrs.class || ''}`,
+		class: 'plain compact',
 		title: `remove bit "${bit.name}"`,
 		...attrs,
 	}}

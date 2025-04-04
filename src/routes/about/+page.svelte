@@ -33,11 +33,12 @@
 			and
 			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link> 💤
 		</aside>
-		<!-- <p>
-			Zzz, pronounced "zees" like bees, is a bot and web toolkit focused on user
-			power and experimentation. The idea is to make a digital tool that adapts to your needs on the
-			fly while remaining fully open, aligned, and in your control.
+		<p>
+			Zzz, pronounced "zees" like bees, is a webtool focused on user power and experimentation. The
+			idea is to make a digital tool that adapts to your needs on the fly while remaining fully
+			open, aligned, and in your control.
 		</p>
+		<!-- 
 		<p>
 			This is a pre-alpha, but it can do some neat things - mostly these require the local server
 			<a href="{base}/capabilities">capability</a>, so if you're reading this on the static web,

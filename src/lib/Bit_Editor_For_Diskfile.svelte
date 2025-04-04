@@ -19,6 +19,7 @@
 	}
 
 	const {diskfile_bit, show_actions = true}: Props = $props();
+
 	const zzz = zzz_context.get();
 
 	const {diskfile} = $derived(diskfile_bit);
@@ -33,6 +34,7 @@
 
 	let show_file_picker = $state(false);
 
+	// TODO refactor, try to remove
 	// Effect for managing editor state lifecycle
 	$effect.pre(() => {
 		// Track the diskfile from the bit

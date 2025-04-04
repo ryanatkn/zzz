@@ -168,11 +168,11 @@
 	{#if queued_messages_count > 0}
 		<div class="message_list shadow_inset_top_sm">
 			{#each queued_messages as message (message.id)}
-				{@const is_selected = selected_queued_messages.has(message.id)}
+				{@const selected = selected_queued_messages.has(message.id)}
 				{@const message_type = message.data?.type || 'unknown'}
 				{@const message_data_serialized = JSON.stringify(message.data, null, 2)}
 				<div
-					class="message_item p_sm {is_selected ? 'selected bg_2' : ''} {queued_messages.indexOf(
+					class="message_item p_sm {selected ? 'selected bg_2' : ''} {queued_messages.indexOf(
 						message,
 					) > 0
 						? 'border_top border_solid border_color_3'
@@ -183,7 +183,7 @@
 						<input
 							type="checkbox"
 							class="m_0 plain compact size_md"
-							checked={is_selected}
+							checked={selected}
 							onclick={(e) => toggle_queued_message_selection(message.id, e.currentTarget.checked)}
 						/>
 

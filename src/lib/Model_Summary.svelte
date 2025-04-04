@@ -10,6 +10,7 @@
 	}
 
 	const {model, attrs}: Props = $props();
+
 	const provider = $derived(model.zzz.providers.find_by_name(model.provider_name));
 </script>
 

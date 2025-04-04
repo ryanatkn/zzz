@@ -17,7 +17,6 @@ export const Bits_Json = z
 	.default(() => ({
 		items: [],
 	}));
-
 export type Bits_Json = z.infer<typeof Bits_Json>;
 
 export interface Bits_Options extends Cell_Options<typeof Bits_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type

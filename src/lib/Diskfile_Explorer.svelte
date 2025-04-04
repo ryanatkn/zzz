@@ -103,7 +103,9 @@
 					<Diskfile_Listitem
 						{diskfile}
 						{selected}
-						onclick={() => zzz.url_params.update_url('file', diskfile.id)}
+						onselect={(diskfile, hard) => {
+							diskfiles.select(diskfile.id, hard);
+						}}
 					/>
 				</div>
 			{/snippet}

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import {swallow} from '@ryanatkn/belt/dom.js';
-	import {slide} from 'svelte/transition';
 
 	import {GLYPH_REMOVE} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
@@ -17,7 +16,7 @@
 </script>
 
 <!-- TODO the transition is janky because it resizes the content, instead it should just hide with overflow -->
-<div class="browser_tab_container" class:selected={tab.selected} transition:slide={{axis: 'x'}}>
+<div class="browser_tab_container" class:selected={tab.selected}>
 	<div
 		role="button"
 		tabindex="0"
@@ -41,10 +40,9 @@
 			type="button"
 			class="tab_close_button plain icon_button compact radius_md ml_sm"
 			onclick={(e) => {
-				e.stopPropagation();
+				swallow(e);
 				onclose(index);
 			}}
-			onkeydown={(e) => e.stopPropagation()}
 			title="close tab"
 			aria-label={`close tab ${tab.title}`}
 		>

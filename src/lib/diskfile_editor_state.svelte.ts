@@ -113,7 +113,7 @@ export class Diskfile_Editor_State {
 	}
 
 	constructor(options: {zzz: Zzz; diskfile: Diskfile}) {
-		this.zzz = options.zzz;
+		this.zzz = options.zzz; // TODO make this a Cell
 		this.diskfile = options.diskfile;
 
 		// Set initial last_seen_disk_content
