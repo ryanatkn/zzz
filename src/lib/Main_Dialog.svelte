@@ -6,7 +6,6 @@
 	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
 
 	import {zzz_context} from '$lib/zzz.svelte.js';
-	import Settings from '$lib/Settings.svelte';
 
 	interface Props {
 		disabled?: boolean | undefined;
@@ -23,18 +22,20 @@
 
 {#if !disabled && zzz.ui.show_main_dialog}
 	<Dialog onclose={() => zzz.ui.toggle_main_menu(false)} layout="page">
-		<div class="pane">
-			<section class="p_xl box">
-				<Settings />
-			</section>
-			<section class="box pb_xl7">
-				<footer>
-					<a class="row p_md" href="{base}/about"
-						><Svg data={zzz_logo} size="var(--icon_size_md)" />
-						<span class="size_lg ml_md">about</span></a
-					>
-				</footer>
-			</section>
+		<div class="box">
+			<div class="pane p_xl3">
+				<section class="box mb_xl3">
+					<h1 class="mb_0">work in progress</h1>
+				</section>
+				<section class="box pb_xl3">
+					<footer>
+						<a class="row p_md" href="{base}/about">
+							<span class="size_lg mr_md">about</span>
+							<Svg data={zzz_logo} size="var(--icon_size_md)" />
+						</a>
+					</footer>
+				</section>
+			</div>
 		</div>
 	</Dialog>
 {/if}

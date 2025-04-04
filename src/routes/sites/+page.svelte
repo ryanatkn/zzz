@@ -15,7 +15,7 @@
 		</p>
 		<p>
 			For developers, Zzz is also an npm library for TypeScript, Svelte, SvelteKit, and Vite that
-			can be used with your current workflows.
+			can be used to make websites and servers with your current workflows.
 		</p>
 		<p>
 			Zzz tries to give us the maximum of the web's capability on all of our devices with minimal

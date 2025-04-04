@@ -46,9 +46,9 @@
 			This simple change recontextualizes the web's UX - instead of being stuck inside tabs and
 			apps, users can compose tabs in a larger system that's open and extensible by design. As a
 			simple example, picture a "social media dashboard" you can create in a few seconds with two or
-			more feeds from different sites side-by-side, where posting to all sites is a single click.
-			The best usecases are unknown, but today's browsers don't let us experiment. And users don't
-			have to buy in, either - the basic browser UX is unchanged.
+			more feeds from different sites side-by-side, where posting to all sites is a single click
+			with no 3rd party service needed. The best usecases are unknown, but today's browsers don't
+			let us experiment. And users don't have to buy in, either - the basic browser UX is unchanged.
 		</p>
 		<p>
 			I believe the optimal architecture - local-first, client-sovereign - both respects individual

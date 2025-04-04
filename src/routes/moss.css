@@ -243,6 +243,9 @@ a.chip {
 .mb_xl12 {
 	margin-bottom: var(--space_xl12);
 }
+.mb_xl3 {
+	margin-bottom: var(--space_xl3);
+}
 .mb_xl5 {
 	margin-bottom: var(--space_xl5);
 }
@@ -423,8 +426,8 @@ a.chip {
 .p_sm {
 	padding: var(--space_sm);
 }
-.p_xl {
-	padding: var(--space_xl);
+.p_xl3 {
+	padding: var(--space_xl3);
 }
 .p_xs {
 	padding: var(--space_xs);
@@ -464,8 +467,8 @@ a.chip {
 .pb_md {
 	padding-bottom: var(--space_md);
 }
-.pb_xl7 {
-	padding-bottom: var(--space_xl7);
+.pb_xl3 {
+	padding-bottom: var(--space_xl3);
 }
 .pl_0 {
 	padding-left: 0;

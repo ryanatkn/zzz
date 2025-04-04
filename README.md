@@ -10,7 +10,7 @@
 
 Zzz, pronounced "zees" like bees,
 is a webtool with a focus on user power and experimentation.
-The idea is to make a digital tool that adapts to your needs on the fly
+The idea is to make fullstack software that adapts to your needs on the fly
 while remaining fully open, aligned, and in your control.
 More at [zzz.software/about](https://www.zzz.software/about).
 
