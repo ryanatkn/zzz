@@ -4,7 +4,7 @@
 	import {GLYPH_TAB} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
 	import {Browser} from '$routes/tabs/browser.svelte.js';
-	import {sample_tabs} from '$routes/tabs/browser_fake_sites.js';
+	import {sample_tabs} from '$routes/tabs/sample_tabs.js';
 	import Browser_View from '$routes/tabs/Browser_View.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 

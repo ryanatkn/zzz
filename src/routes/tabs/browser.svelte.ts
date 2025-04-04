@@ -106,7 +106,7 @@ export class Browser extends Cell<typeof Browser_Json> {
 export const Browser_Schema = z.instanceof(Browser);
 
 // Re-export for convenience
-export {fake_sites, sample_tabs} from '$routes/tabs/browser_fake_sites.js';
+export {fake_sites, sample_tabs} from '$routes/tabs/sample_tabs.js';
 export {Browser_Tab} from '$routes/tabs/browser_tab.svelte.js';
 export type {Browser_Tab_Json} from '$routes/tabs/browser_tab.svelte.js';
 export {Browser_Tabs} from '$routes/tabs/browser_tabs.svelte.js';

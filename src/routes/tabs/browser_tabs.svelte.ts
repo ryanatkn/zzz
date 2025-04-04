@@ -12,7 +12,7 @@ import {
 } from '$routes/tabs/browser_tab.svelte.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {to_reordered_list} from '$lib/list_helpers.js';
-import {fake_sites} from '$routes/tabs/browser_fake_sites.js';
+import {fake_sites} from '$routes/tabs/sample_tabs.js';
 
 export const Browser_Tabs_Json = Cell_Json.extend({
 	tabs: cell_array(
