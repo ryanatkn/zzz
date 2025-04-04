@@ -67,8 +67,8 @@
 	<section class="width_md">
 		<aside>
 			Thinking more abstractly,<br /> web browsers are already embedded in operating systems,<br />
-			so Zzz shares perspectives with operating system desktop environments<br /> like Windows, OSX,
-			and the many Linux distros,<br /> but Zzz sits way up high on a tower of web abstraction,<br
+			so Zzz shares perspectives with operating system desktop environments—<br />—like Windows,
+			OSX, and the many Linux distros,<br /> but Zzz sits way up high on a tower of web abstraction,<br
 			/>
 			gazing longingly at the metal below,<br /> and excitedly merges everything into a universal
 			system runtime,<br />
