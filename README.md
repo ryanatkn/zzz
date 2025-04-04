@@ -47,6 +47,11 @@ npm run dev
 
 Browse to the location is says, probably `localhost:5173`.
 
+## Roadmap
+
+- [#7 integrate database](https://github.com/ryanatkn/zzz/issues/7)
+- input welcome
+
 ## Credits 🐢<sub>🐢</sub><sub><sub>🐢</sub></sub>
 
 Zzz builds on a great deal of software.
