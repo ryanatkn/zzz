@@ -8,8 +8,9 @@ import {
 	Completion_Request,
 	type Message_Direction,
 	type Message_Type,
+	type Diskfile_Change,
 } from '$lib/message_types.js';
-import {Diskfile_Path} from '$lib/diskfile_types.js';
+import {Diskfile_Path, Source_File} from '$lib/diskfile_types.js';
 import {to_completion_response_text} from '$lib/response_helpers.js';
 import {to_preview} from '$lib/helpers.js';
 
@@ -18,6 +19,7 @@ export const MESSAGE_DATE_FORMAT = 'MMM d, p';
 export const MESSAGE_TIME_FORMAT = 'p';
 
 export interface Message_Options extends Cell_Options<typeof Message_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
+
 // TODO BLOCK `Message` is not a good user-facing term - what else?
 
 // TODO think about splitting out a different non-reactive version
@@ -35,8 +37,8 @@ export class Message extends Cell<typeof Message_Json> {
 	completion_response: Completion_Response | undefined = $state();
 	path: Diskfile_Path | undefined = $state();
 	content: string | undefined = $state(); // TODO BLOCK derived token count like with diskfiles?
-	change: any | undefined = $state(); // TODO schema types
-	source_file: any | undefined = $state(); // TODO schema types
+	change: Diskfile_Change | undefined = $state();
+	source_file: Source_File | undefined = $state();
 
 	display_name: string = $derived(`${this.type} (${this.direction})`);
 

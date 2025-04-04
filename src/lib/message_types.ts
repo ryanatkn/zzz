@@ -157,15 +157,19 @@ export const Message_Loaded_Session = Message_Base.extend({
 }).strict();
 export type Message_Loaded_Session = z.infer<typeof Message_Loaded_Session>;
 
+// Define schema for diskfile change
+export const Diskfile_Change = z
+	.object({
+		type: Diskfile_Change_Type,
+		path: Diskfile_Path,
+	})
+	.strict();
+export type Diskfile_Change = z.infer<typeof Diskfile_Change>;
+
 // File related message schemas
 export const Message_Filer_Change = Message_Base.extend({
 	type: z.literal('filer_change').default('filer_change'),
-	change: z
-		.object({
-			type: Diskfile_Change_Type,
-			path: Diskfile_Path,
-		})
-		.strict(),
+	change: Diskfile_Change,
 	source_file: Source_File,
 }).strict();
 export type Message_Filer_Change = z.infer<typeof Message_Filer_Change>;
@@ -248,13 +252,7 @@ export const Message_Json = Cell_Json.extend({
 	completion_response: Completion_Response.optional(),
 	path: Diskfile_Path.optional(),
 	content: z.string().optional(),
-	change: z
-		.object({
-			type: Diskfile_Change_Type,
-			path: Diskfile_Path,
-		})
-		.strict()
-		.optional(),
+	change: Diskfile_Change.optional(),
 	source_file: Source_File.optional(),
 	data: z.record(z.string(), z.any()).optional(),
 }).strict();
