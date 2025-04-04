@@ -72,7 +72,7 @@
 			/>
 			gazing longingly at the metal below,<br />and gives a take on universal computing,<br />
 			exposing capabilities to apps that share not just language but context,<br />
-			unifying code and data and namespaces across deployment targets and runtime environments,<br
+			unifying code, data, namespaces, and semantics across deployment targets and runtime environments,<br
 			/>
 			leveraging the web and universal JS to their logical conclusions,<br /> hopefully so capable
 			that you forget about your OS most of the time,<br />so aligned you forget about
