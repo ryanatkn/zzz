@@ -387,6 +387,10 @@ a.chip {
 	margin-top: var(--space_lg);
 	margin-bottom: var(--space_lg);
 }
+.my_md {
+	margin-top: var(--space_md);
+	margin-bottom: var(--space_md);
+}
 .my_xl5 {
 	margin-top: var(--space_xl5);
 	margin-bottom: var(--space_xl5);
