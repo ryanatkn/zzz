@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type {Snippet} from 'svelte';
-	import type {Browser_Tab} from '$routes/tabs/browser.svelte.js';
+
+	import type {Browser_Tab} from '$routes/tabs/browser_tab.svelte.js';
 
 	interface Props {
 		tab: Browser_Tab;

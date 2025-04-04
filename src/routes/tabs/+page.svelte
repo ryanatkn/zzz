@@ -3,52 +3,20 @@
 
 	import {GLYPH_TAB} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
-	import {Browser, fake_sites, type Browser_Tab} from '$routes/tabs/browser.svelte.js';
-	import {Uuid} from '$lib/zod_helpers.js';
+	import {Browser} from '$routes/tabs/browser.svelte.js';
+	import {sample_tabs} from '$routes/tabs/browser_fake_sites.js';
 	import Browser_View from '$routes/tabs/Browser_View.svelte';
+	import {zzz_context} from '$lib/zzz.svelte.js';
 
 	let browserified = $state(false);
 
-	// Original content as a tab
-	const original_content: Browser_Tab = {
-		id: Uuid.parse(undefined),
-		title: 'Zzz is a browser',
-		url: 'https://www.zzz.software/tabs',
-		type: 'raw',
-		selected: true,
-		refresh_counter: 0,
-	};
+	const zzz = zzz_context.get();
 
-	// Initialize browser with sample tabs
-	const browser = new Browser([
-		original_content,
-		{
-			id: Uuid.parse(undefined),
-			title: fake_sites.future.title,
-			selected: false,
-			url: fake_sites.future.url,
-			type: 'embedded_html',
-			content: fake_sites.future.content,
-			refresh_counter: 0,
-		},
-		// Example of a real external URL that will load in an iframe
-		{
-			id: Uuid.parse(undefined),
-			title: 'Moss',
-			selected: false,
-			url: 'https://moss.ryanatkn.com/',
-			type: 'external_url',
-			refresh_counter: 0,
-		},
-		{
-			id: Uuid.parse(undefined),
-			title: 'Fuz',
-			selected: false,
-			url: 'https://fuz.dev/',
-			type: 'external_url',
-			refresh_counter: 0,
-		},
-	]);
+	// Initialize browser with the sample tabs and Zzz instance
+	const browser = new Browser({
+		zzz,
+		json: {tabs: sample_tabs},
+	});
 </script>
 
 {#if browserified}

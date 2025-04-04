@@ -1,6 +1,6 @@
 import {z} from 'zod';
 
-import {Uuid, Uuid_Base} from '$lib/zod_helpers.js';
+import {Uuid, Uuid_Required} from '$lib/zod_helpers.js';
 
 // Base schema enforces minimum length to reject empty strings
 // Use transform to trim whitespace before validation, then apply the min constraint
@@ -23,7 +23,7 @@ export type Xml_Attribute_Value = z.infer<typeof Xml_Attribute_Value>;
 // Base attribute requires all fields with no defaults
 export const Xml_Attribute_Base = z
 	.object({
-		id: Uuid_Base,
+		id: Uuid_Required,
 		key: Xml_Attribute_Key_Base,
 		value: Xml_Attribute_Value_Base,
 	})

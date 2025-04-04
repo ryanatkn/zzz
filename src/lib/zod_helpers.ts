@@ -10,10 +10,10 @@ export const Datetime_Now = Datetime.default(() => new Date().toISOString());
 export type Datetime_Now = z.infer<typeof Datetime_Now>;
 
 /** Same as `Uuid` but without a default value. */
-export const Uuid_Base = z.string().uuid().brand('Uuid');
-export type Uuid_Base = z.infer<typeof Uuid_Base>;
-/** Same as `Uuid_Base` but with a default value. */
-export const Uuid = Uuid_Base.default(() => globalThis.crypto.randomUUID());
+export const Uuid_Required = z.string().uuid().brand('Uuid');
+export type Uuid_Required = z.infer<typeof Uuid_Required>;
+/** Same as `Uuid_Required` but with a default value. */
+export const Uuid = Uuid_Required.default(() => globalThis.crypto.randomUUID());
 export type Uuid = z.infer<typeof Uuid>;
 
 /**

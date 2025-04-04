@@ -332,6 +332,11 @@ export const package_json = {
 			svelte: './dist/Diskfile_Bit_View.svelte',
 			default: './dist/Diskfile_Bit_View.svelte',
 		},
+		'./Diskfile_Editor_Nav.svelte': {
+			types: './dist/Diskfile_Editor_Nav.svelte.d.ts',
+			svelte: './dist/Diskfile_Editor_Nav.svelte',
+			default: './dist/Diskfile_Editor_Nav.svelte',
+		},
 		'./diskfile_editor_state.svelte.js': {
 			types: './dist/diskfile_editor_state.svelte.d.ts',
 			default: './dist/diskfile_editor_state.svelte.js',
@@ -926,6 +931,7 @@ export const src_json = {
 		'./Dashboard.svelte': {path: 'Dashboard.svelte', declarations: []},
 		'./Diskfile_Actions.svelte': {path: 'Diskfile_Actions.svelte', declarations: []},
 		'./Diskfile_Bit_View.svelte': {path: 'Diskfile_Bit_View.svelte', declarations: []},
+		'./Diskfile_Editor_Nav.svelte': {path: 'Diskfile_Editor_Nav.svelte', declarations: []},
 		'./diskfile_editor_state.svelte.js': {
 			path: 'diskfile_editor_state.svelte.ts',
 			declarations: [{name: 'Diskfile_Editor_State', kind: 'class'}],
@@ -1513,7 +1519,7 @@ export const src_json = {
 				{name: 'Any', kind: 'variable'},
 				{name: 'Datetime', kind: 'variable'},
 				{name: 'Datetime_Now', kind: 'variable'},
-				{name: 'Uuid_Base', kind: 'variable'},
+				{name: 'Uuid_Required', kind: 'variable'},
 				{name: 'Uuid', kind: 'variable'},
 				{name: 'zod_get_schema_keys', kind: 'function'},
 				{name: 'get_field_schema', kind: 'function'},
