@@ -70,9 +70,8 @@
 			so Zzz shares perspectives with operating system desktop environments—<br />—like Windows,
 			OSX, and the many Linux distros—<br />—but Zzz sits way up high on a tower of web abstraction,<br
 			/>
-			gazing longingly at the metal below,<br /> and excitedly merges everything into a universal
-			system runtime,<br />
-			exposing capabilities to apps that share not just language but <em>context</em>,<br />
+			gazing longingly at the metal below,<br />and gives a take on universal computing,<br />
+			exposing capabilities to apps that share not just language but context,<br />
 			unifying code and data and namespaces across deployment targets and runtime environments,<br
 			/>
 			leveraging the web and universal JS to their logical conclusions,<br /> hopefully so capable
