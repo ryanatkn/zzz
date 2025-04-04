@@ -50,23 +50,32 @@
 			As a simple example, picture a "social media dashboard" that an AI can create in a few seconds
 			from a few words. The UI puts two or more feeds from different social sites/apps side-by-side,
 			where posting to all takes a single click, and no 3rd party service is needed. The best
-			usecases are unknown, but today's browsers don't let us experiment. And users don't have to
-			buy in, either - the basic browser UX is unchanged.
+			usecases are unknown, but today's browsers don't let us experiment.
 		</p>
+		<aside>
+			<p>And users don't have to buy in, either - the basic browser UX is unchanged.</p>
+			<p>Just press <code>[backtick `]</code> to pretend it's all a dream.</p>
+		</aside>
 		<p>
-			I believe the optimal architecture - local-first, client-sovereign - both respects individual
-			rights while unlocking capabilities like
+			I believe the optimal architecture - local-first, malleable, client-sovereign - both respects
+			individual rights while unlocking the full capabilities of web tech, including
 			<a href="{base}/sites">website creation</a> and adaptive UI. And we can build it today, it's not
 			that hard with the web's amazing tools.
 		</p>
-		<p>
-			Thinking more abstractly, web browsers are already embedded in operating systems, so Zzz
-			shares perspectives with operating system desktop environments like Windows, OSX, and the many
-			Linux distros, but Zzz merges everything into the system runtime and exposes capabilities to
-			apps, unifying code and data and namespaces across deployment targets, leveraging the web and
-			universal JS to their logical conclusion, hopefully so capable that you forget about your OS
-			most of the time, and ideally lose track of Zzz even being a thing.
-		</p>
 		<p>More <a href="{base}/about">about</a> Zzz.</p>
+	</section>
+	<section class="width_md">
+		<aside>
+			Thinking more abstractly,<br /> web browsers are already embedded in operating systems,<br />
+			so Zzz shares perspectives with operating system desktop environments<br /> like Windows, OSX,
+			and the many Linux distros,<br /> but Zzz sits way up high on a tower of web abstraction,<br
+			/>
+			gazing longingly at the metal below,<br /> and excitedly merges everything into a universal
+			system runtime,<br />
+			exposing capabilities to apps,<br /> unifying code and data and namespaces across deployment
+			targets and runtime environments,<br /> leveraging the web and universal JS to their logical
+			conclusions,<br /> hopefully so capable that you forget about your OS most of the time,<br /> and
+			ideally lose track of Zzz even being a thing.
+		</aside>
 	</section>
 {/snippet}
