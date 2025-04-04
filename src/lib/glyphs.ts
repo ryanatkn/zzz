@@ -214,3 +214,4 @@ export const get_direction_icon = (direction: string): string => {
 // ⭉ ⭊ ⤟⮭ ⎋
 
 // —
+// –
