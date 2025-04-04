@@ -39,7 +39,9 @@
 			this page, then <button
 				type="button"
 				onclick={() => (browserified = !browserified)}
-				class="inline compact color_i">browserify!</button
+				class:color_i={!browserified}
+				class:color_h={browserified}
+				class="inline compact">{browserified ? 'un' : ''}browserify!</button
 			>
 		</p>
 		<p>
@@ -54,7 +56,22 @@
 		</p>
 		<aside>
 			<p>And users don't have to buy in, either - the basic browser UX is unchanged.</p>
-			<p>Just press <code>[backtick `]</code> to pretend it's all a dream.</p>
+			<p>
+				Just press <code>[backtick `]</code> to
+				<button
+					type="button"
+					class="inline compact color_d"
+					disabled={browserified && !zzz.ui.show_sidebar}
+					onclick={() => {
+						if (zzz.ui.show_sidebar) {
+							zzz.ui.toggle_sidebar();
+						}
+						if (!browserified) {
+							browserified = true;
+						}
+					}}>pretend it's all a dream</button
+				>.
+			</p>
 		</aside>
 		<p>
 			I believe the optimal architecture - local-first, malleable, client-sovereign - both respects
