@@ -4,7 +4,6 @@
 	import Svg from '@ryanatkn/fuz/Svg.svelte';
 	import {base} from '$app/paths';
 	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
-	import {is_editable, swallow} from '@ryanatkn/belt/dom.js';
 
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import Settings from '$lib/Settings.svelte';
@@ -18,23 +17,12 @@
 	const zzz = zzz_context.get();
 
 	onNavigate(() => {
-		if (zzz.ui.show_main_dialog) zzz.toggle_main_menu(false);
+		if (zzz.ui.show_main_dialog) zzz.ui.toggle_main_menu(false);
 	});
 </script>
 
-<svelte:window
-	onkeydowncapture={disabled
-		? undefined
-		: (e) => {
-				if (e.key === '`' && !is_editable(e.target)) {
-					zzz.toggle_main_menu();
-					swallow(e);
-				}
-			}}
-/>
-
 {#if !disabled && zzz.ui.show_main_dialog}
-	<Dialog onclose={() => zzz.toggle_main_menu(false)} layout="page">
+	<Dialog onclose={() => zzz.ui.toggle_main_menu(false)} layout="page">
 		<div class="pane">
 			<section class="p_xl box">
 				<Settings />

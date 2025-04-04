@@ -39,6 +39,7 @@ import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Socket} from '$lib/socket.svelte.js';
 import {Capabilities} from '$lib/capabilities.svelte.js';
 import {Diskfile_History} from '$lib/diskfile_history.svelte.js';
+import {HANDLED} from '$lib/cell_helpers.js';
 
 export const zzz_context = create_context<Zzz>();
 
@@ -168,6 +169,19 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 
 		this.bots = options.bots ?? BOTS_DEFAULT;
 
+		// Set up decoders
+		this.decoders = {
+			// TODO do this automatically from the schema?
+			ui: (value) => {
+				// If ui data is provided, update the existing ui instance
+				if (value && typeof value === 'object') {
+					this.ui.set_json(value);
+				}
+				// Always return HANDLED since we manage the ui instance directly
+				return HANDLED;
+			},
+		};
+
 		// Set up message handlers if provided
 		if (options.onsend) {
 			this.messages.onsend = options.onsend;
@@ -251,11 +265,6 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 				source_file,
 			});
 		}
-	}
-
-	// TODO API? close/open/toggle? just toggle? messages+mutations?
-	toggle_main_menu(value = !this.ui.show_main_dialog): void {
-		this.ui.show_main_dialog = value;
 	}
 
 	add_providers(providers_json: Array<Provider_Json>): void {

@@ -5,12 +5,15 @@
 	import {page} from '$app/state';
 	import {onNavigate} from '$app/navigation';
 	import Svg from '@ryanatkn/fuz/Svg.svelte';
+	import {is_editable, swallow} from '@ryanatkn/belt/dom.js';
 
 	import Nav_Link from '$lib/Nav_Link.svelte';
 	import Glyph from '$lib/Glyph.svelte';
-	import {GLYPH_SITE, GLYPH_TAB} from '$lib/glyphs.js';
+	import {GLYPH_ARROW_LEFT, GLYPH_ARROW_RIGHT, GLYPH_SITE, GLYPH_TAB} from '$lib/glyphs.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import {main_nav_items_default} from '$lib/nav.js';
+
+	// TODO dashboard should be mounted with Markdown
 
 	interface Props {
 		children: Snippet;
@@ -18,12 +21,10 @@
 
 	const {children}: Props = $props();
 
-	const SIDEBAR_WIDTH_MAX = 180;
-	const sidebar_width = $state(SIDEBAR_WIDTH_MAX);
-
-	// TODO dashboard should be mounted with Markdown
-
 	const zzz = zzz_context.get();
+
+	const SIDEBAR_WIDTH_MAX = 180;
+	const sidebar_width = $derived(zzz.ui.show_sidebar ? SIDEBAR_WIDTH_MAX : 0);
 
 	let futureclicks = $state(0);
 	const FUTURECLICKS = 3;
@@ -61,7 +62,18 @@
 
 		return nav_items;
 	});
+
+	const sidebar_button_title = $derived(zzz.ui.show_sidebar ? 'hide sidebar' : 'show sidebar');
 </script>
+
+<svelte:window
+	onkeydowncapture={(e) => {
+		if (e.key === '`' && !is_editable(e.target)) {
+			zzz.ui.toggle_sidebar();
+			swallow(e);
+		}
+	}}
+/>
 
 <!-- TODO drive with data -->
 <div class="dashboard" style:--sidebar_width="{sidebar_width}px">
@@ -139,4 +151,17 @@
 			</nav>
 		</div>
 	</div>
+
+	<!-- Sidebar toggle button -->
+	<!-- TODO shortcut key -->
+	<button
+		type="button"
+		class="fixed b_0 l_0 icon_button plain radius_xs"
+		style:border-bottom-left-radius="0"
+		aria-label={sidebar_button_title}
+		title={sidebar_button_title}
+		onclick={() => zzz.ui.toggle_sidebar()}
+	>
+		<Glyph icon={zzz.ui.show_sidebar ? GLYPH_ARROW_LEFT : GLYPH_ARROW_RIGHT} />
+	</button>
 </div>
