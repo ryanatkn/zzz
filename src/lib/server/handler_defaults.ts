@@ -63,7 +63,8 @@ export const handle_message = async (
 
 			// Iterate through all filers and collect their files
 			for (const f of server.filers.values()) {
-				f.filer.files.forEach((file, id) => {
+				// TODO fix type
+				f.filer.files.forEach((file: any, id) => {
 					files_array.push({
 						...file,
 						id: Diskfile_Path.parse(id),
