@@ -713,7 +713,7 @@ describe('Diskfile_Tabs', () => {
 			expect(new_tab?.diskfile_id).toBe(TEST_DISKFILE_ID_1);
 		});
 
-		test.only('navigate_to_tab creates a new preview tab for closed tab', () => {
+		test('navigate_to_tab creates a new preview tab for closed tab', () => {
 			// Create a tab and a preview tab
 			tabs.open_diskfile(TEST_DISKFILE_ID_1);
 			const preview_tab = tabs.preview_diskfile(TEST_DISKFILE_ID_2);
