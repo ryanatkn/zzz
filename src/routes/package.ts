@@ -7,7 +7,7 @@ export const package_json = {
 	name: '@ryanatkn/zzz',
 	version: '0.0.1',
 	description: 'webtool',
-	motto: 'nice web things, yawn',
+	motto: 'nice web things for the tired',
 	glyph: '💤',
 	logo: 'logo.svg',
 	logo_alt: "three sleepy z's",
