@@ -20,7 +20,7 @@ export const MESSAGE_TIME_FORMAT = 'p';
 
 export interface Message_Options extends Cell_Options<typeof Message_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
-// TODO BLOCK `Message` is not a good user-facing term - what else?
+// TODO BLOCK `Message` -> `Payload`
 
 // TODO think about splitting out a different non-reactive version
 // that only handles the static expectation,
