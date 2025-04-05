@@ -1,14 +1,14 @@
 import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Message, Message_Schema} from '$lib/message.svelte.js';
+import {Payload, Payload_Schema} from '$lib/payload.svelte.js';
 import {
-	Message_Json,
-	type Message_Client,
-	type Message_Server,
-	create_message_json,
-	Message_Type,
-} from '$lib/message_types.js';
+	Payload_Json,
+	type Payload_Client,
+	type Payload_Server,
+	create_payload_json,
+	Payload_Type,
+} from '$lib/payload_types.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {create_multi_index, create_derived_index} from '$lib/indexed_collection_helpers.js';
@@ -16,34 +16,34 @@ import {create_multi_index, create_derived_index} from '$lib/indexed_collection_
 export const HISTORY_LIMIT_DEFAULT = 512;
 export const PONG_DISPLAY_LIMIT = 6;
 
-export const Messages_Json = z
+export const Payloads_Json = z
 	.object({
 		items: cell_array(
-			z.array(Message_Json).default(() => []),
-			'Message',
+			z.array(Payload_Json).default(() => []),
+			'Payload',
 		),
 	})
 	.default(() => ({
 		items: [],
 	}));
 
-export type Messages_Json = z.infer<typeof Messages_Json>;
+export type Payloads_Json = z.infer<typeof Payloads_Json>;
 
-export interface Messages_Options extends Cell_Options<typeof Messages_Json> {
+export interface Payloads_Options extends Cell_Options<typeof Payloads_Json> {
 	history_limit?: number;
 }
 
 // Define our index keys for type safety
-export type Message_Multi_Index_Keys = 'by_type' | 'by_ping_id';
+export type Payload_Multi_Index_Keys = 'by_type' | 'by_ping_id';
 
-export class Messages extends Cell<typeof Messages_Json> {
+export class Payloads extends Cell<typeof Payloads_Json> {
 	// Configure indexed collection with unified indexing system
-	readonly items: Indexed_Collection<Message> = new Indexed_Collection({
+	readonly items: Indexed_Collection<Payload> = new Indexed_Collection({
 		indexes: [
 			// Type-based multi-index
 			create_multi_index({
 				key: 'by_type',
-				extractor: (message) => message.type,
+				extractor: (payload) => payload.type,
 				query_schema: z.enum([
 					'ping',
 					'pong',
@@ -53,21 +53,21 @@ export class Messages extends Cell<typeof Messages_Json> {
 					'delete_diskfile',
 					'filer_change',
 				]),
-				result_schema: Message_Schema,
+				result_schema: Payload_Schema,
 			}),
 
 			// Ping id index for pongs
 			create_multi_index({
 				key: 'by_ping_id',
-				extractor: (message) => {
-					if (message.type === 'pong' && message.ping_id) {
-						return message.ping_id;
+				extractor: (payload) => {
+					if (payload.type === 'pong' && payload.ping_id) {
+						return payload.ping_id;
 					}
 					return undefined;
 				},
 				query_schema: z.string(),
-				matches: (message) => message.type === 'pong' && !!message.ping_id,
-				result_schema: Message_Schema,
+				matches: (payload) => payload.type === 'pong' && !!payload.ping_id,
+				result_schema: Payload_Schema,
 			}),
 
 			// Derived index for latest pongs - prioritize showing most recent
@@ -80,7 +80,7 @@ export class Messages extends Cell<typeof Messages_Json> {
 						.slice(0, PONG_DISPLAY_LIMIT);
 				},
 				matches: (item) => item.type === 'pong',
-				result_schema: Message_Schema,
+				result_schema: Payload_Schema,
 				onadd: (items, item) => {
 					if (item.type !== 'pong') return items;
 
@@ -114,20 +114,20 @@ export class Messages extends Cell<typeof Messages_Json> {
 	history_limit: number = $state(HISTORY_LIMIT_DEFAULT);
 
 	// Derived collections using the indexed structure
-	pings: Array<Message> = $derived(this.items.where('by_type', 'ping'));
-	pongs: Array<Message> = $derived(this.items.where('by_type', 'pong'));
-	prompts: Array<Message> = $derived(this.items.where('by_type', 'send_prompt'));
-	completions: Array<Message> = $derived(this.items.where('by_type', 'completion_response'));
-	diskfile_updates: Array<Message> = $derived(this.items.where('by_type', 'update_diskfile'));
-	diskfile_deletes: Array<Message> = $derived(this.items.where('by_type', 'delete_diskfile'));
-	filer_changes: Array<Message> = $derived(this.items.where('by_type', 'filer_change'));
+	pings: Array<Payload> = $derived(this.items.where('by_type', 'ping'));
+	pongs: Array<Payload> = $derived(this.items.where('by_type', 'pong'));
+	prompts: Array<Payload> = $derived(this.items.where('by_type', 'send_prompt'));
+	completions: Array<Payload> = $derived(this.items.where('by_type', 'completion_response'));
+	diskfile_updates: Array<Payload> = $derived(this.items.where('by_type', 'update_diskfile'));
+	diskfile_deletes: Array<Payload> = $derived(this.items.where('by_type', 'delete_diskfile'));
+	filer_changes: Array<Payload> = $derived(this.items.where('by_type', 'filer_change'));
 
-	// Message handlers
-	onsend?: (message: Message_Client) => void;
-	onreceive?: (message: Message_Server) => void;
+	// Payload handlers
+	onsend?: (payload: Payload_Client) => void;
+	onreceive?: (payload: Payload_Server) => void;
 
-	constructor(options: Messages_Options) {
-		super(Messages_Json, options);
+	constructor(options: Payloads_Options) {
+		super(Payloads_Json, options);
 
 		// Set history limit if provided
 		if (options.history_limit !== undefined) {
@@ -152,7 +152,7 @@ export class Messages extends Cell<typeof Messages_Json> {
 	/**
 	 * Override to populate the indexed collection after parsing JSON.
 	 */
-	override set_json(value?: z.input<typeof Messages_Json>): void {
+	override set_json(value?: z.input<typeof Payloads_Json>): void {
 		super.set_json(value);
 
 		// Trim to history limit after loading
@@ -160,65 +160,65 @@ export class Messages extends Cell<typeof Messages_Json> {
 	}
 
 	/**
-	 * Send a message using the registered handler with proper typing.
+	 * Send a payload using the registered handler with proper typing.
 	 */
-	send(message: Message_Client): void {
+	send(payload: Payload_Client): void {
 		if (!this.onsend) {
-			console.error('No send handler registered', message);
+			console.error('No send handler registered', payload);
 			return;
 		}
 
-		this.add(create_message_json(message, 'client'));
-		this.onsend(message);
+		this.add(create_payload_json(payload, 'client'));
+		this.onsend(payload);
 	}
 
 	/**
-	 * Handle a received message with proper typing.
+	 * Handle a received payload with proper typing.
 	 */
-	receive(message: Message_Server): void {
+	receive(payload: Payload_Server): void {
 		if (!this.onreceive) {
 			console.error('No receive handler registered');
 			return;
 		}
 
-		this.add(create_message_json(message, 'server'));
-		this.onreceive(message);
+		this.add(create_payload_json(payload, 'server'));
+		this.onreceive(payload);
 	}
 
 	/**
-	 * Add a message to the collection.
+	 * Add a payload to the collection.
 	 */
-	add(message_json: Message_Json): Message {
-		const message = new Message({zzz: this.zzz, json: message_json});
-		this.items.add(message);
+	add(payload_json: Payload_Json): Payload {
+		const payload = new Payload({zzz: this.zzz, json: payload_json});
+		this.items.add(payload);
 
 		// Trim collection if it exceeds history limit
 		this.#trim_to_history_limit();
 
-		return message;
+		return payload;
 	}
 
 	/**
-	 * Get the latest N messages of a specific type.
+	 * Get the latest N payloads of a specific type.
 	 *
-	 * @param type The message type to filter by
-	 * @param limit Maximum number of messages to return (defaults to history_limit)
-	 * @returns Array of messages matching the type
+	 * @param type The payload type to filter by
+	 * @param limit Maximum number of payloads to return (defaults to history_limit)
+	 * @returns Array of payloads matching the type
 	 */
-	get_latest_by_type(type: Message_Type, limit: number = this.history_limit): Array<Message> {
+	get_latest_by_type(type: Payload_Type, limit: number = this.history_limit): Array<Payload> {
 		return this.items.latest('by_type', type, limit);
 	}
 
 	/**
-	 * Trims the collection to the maximum allowed size by removing oldest messages.
+	 * Trims the collection to the maximum allowed size by removing oldest payloads.
 	 */
 	#trim_to_history_limit(): void {
 		// Calculate how many items to remove and use the optimized method
 		const excess = this.items.size - this.history_limit;
 		if (excess <= 0) return;
 		const ids = [];
-		for (const message of this.items.by_id.values()) {
-			ids.push(message.id);
+		for (const payload of this.items.by_id.values()) {
+			ids.push(payload.id);
 			if (ids.length === excess) break;
 		}
 		this.items.remove_many(ids);

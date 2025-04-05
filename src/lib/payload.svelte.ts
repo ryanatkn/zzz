@@ -3,34 +3,32 @@ import {z} from 'zod';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Uuid} from '$lib/zod_helpers.js';
 import {
-	Message_Json,
+	Payload_Json,
 	Completion_Response,
 	Completion_Request,
-	type Message_Direction,
-	type Message_Type,
+	type Payload_Direction,
+	type Payload_Type,
 	type Diskfile_Change,
-} from '$lib/message_types.js';
+} from '$lib/payload_types.js';
 import {Diskfile_Path, Source_File} from '$lib/diskfile_types.js';
 import {to_completion_response_text} from '$lib/response_helpers.js';
 import {to_preview} from '$lib/helpers.js';
 
 // Constants for preview length and formatting
-export const MESSAGE_DATE_FORMAT = 'MMM d, p';
-export const MESSAGE_TIME_FORMAT = 'p';
+export const PAYLOAD_DATE_FORMAT = 'MMM d, p';
+export const PAYLOAD_TIME_FORMAT = 'p';
 
-export interface Message_Options extends Cell_Options<typeof Message_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
-
-// TODO BLOCK `Message` -> `Payload`
+export interface Payload_Options extends Cell_Options<typeof Payload_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
 // TODO think about splitting out a different non-reactive version
 // that only handles the static expectation,
-// but then another for dynamic usage? is there even such a thing of a message changing?
+// but then another for dynamic usage? is there even such a thing of a payload changing?
 // if not shouldn't we just remove the $state below?
-export class Message extends Cell<typeof Message_Json> {
-	type: Message_Type = $state()!;
-	direction: Message_Direction = $state()!;
+export class Payload extends Cell<typeof Payload_Json> {
+	type: Payload_Type = $state()!;
+	direction: Payload_Direction = $state()!;
 
-	// Store data based on message type
+	// Store data based on payload type
 	data: Record<string, any> | undefined = $state();
 	ping_id: Uuid | undefined = $state();
 	completion_request: Completion_Request | undefined = $state();
@@ -42,7 +40,7 @@ export class Message extends Cell<typeof Message_Json> {
 
 	display_name: string = $derived(`${this.type} (${this.direction})`);
 
-	// TODO maybe change these to be located on `this.type` as a `Message_Type_Name` class which JSON serializes to the string `Message_Type` but at runtime has properties like these:
+	// TODO maybe change these to be located on `this.type` as a `Payload_Type_Name` class which JSON serializes to the string `Payload_Type` but at runtime has properties like these:
 	is_ping: boolean = $derived(this.type === 'ping');
 	is_pong: boolean = $derived(this.type === 'pong');
 	is_prompt: boolean = $derived(this.type === 'send_prompt');
@@ -67,7 +65,7 @@ export class Message extends Cell<typeof Message_Json> {
 	);
 
 	prompt_preview: string = $derived.by(() => {
-		if (!this.is_prompt) return 'Not a prompt message';
+		if (!this.is_prompt) return 'Not a prompt payload';
 
 		const prompt = this.prompt_data?.prompt;
 		if (!prompt) return 'No prompt';
@@ -76,15 +74,15 @@ export class Message extends Cell<typeof Message_Json> {
 	});
 
 	completion_preview: string = $derived.by(() => {
-		if (!this.is_completion) return 'Not a completion message';
+		if (!this.is_completion) return 'Not a completion payload';
 
 		if (!this.completion_text) return 'No completion';
 
 		return to_preview(this.completion_text);
 	});
 
-	constructor(options: Message_Options) {
-		super(Message_Json, options);
+	constructor(options: Payload_Options) {
+		super(Payload_Json, options);
 
 		// Initialize decoders with type-specific handlers
 		this.decoders = {
@@ -104,4 +102,4 @@ export class Message extends Cell<typeof Message_Json> {
 	}
 }
 
-export const Message_Schema = z.instanceof(Message);
+export const Payload_Schema = z.instanceof(Payload);

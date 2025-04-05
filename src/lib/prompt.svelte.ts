@@ -11,10 +11,10 @@ import {format_prompt_content} from '$lib/prompt_helpers.js';
 
 export interface Prompt_Message {
 	role: 'user' | 'system';
-	content: Array<Prompt_Message_Content>;
+	content: Array<Prompt_Payload_Content>;
 }
 
-export type Prompt_Message_Content = string; // TODO ?
+export type Prompt_Payload_Content = string; // TODO ?
 
 export const Prompt_Json = Cell_Json.extend({
 	name: z.string().default(''),

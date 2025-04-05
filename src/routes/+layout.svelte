@@ -113,7 +113,7 @@
 				const data = devalue.parse(event.data);
 				console.log('[page] socket message received', data);
 				if (data.type === 'server_message') {
-					zzz.messages.receive(data.message);
+					zzz.payloads.receive(data.message);
 				} else {
 					console.error('unknown message', data);
 				}
@@ -129,7 +129,7 @@
 
 	// Initialize the session
 	if (BROWSER) {
-		zzz.messages.send({id: Uuid.parse(undefined), type: 'load_session'});
+		zzz.payloads.send({id: Uuid.parse(undefined), type: 'load_session'});
 	}
 
 	// TODO refactor, try to remove - how? schema with typesafe registration/dispatch?

@@ -1,11 +1,11 @@
 <script lang="ts">
-	import Messages_List from '$lib/Messages_List.svelte';
-	import Message_Detail from '$lib/Message_Detail.svelte';
+	import Payload_List from '$lib/Payload_List.svelte';
+	import Payload_Detail from '$lib/Payload_Detail.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 	import {GLYPH_LOG} from '$lib/glyphs.js';
-	import type {Message} from '$lib/message.svelte.js';
+	import type {Payload} from '$lib/payload.svelte.js';
 
-	let selected_message: Message | null = $state(null);
+	let selected_payload: Payload | null = $state(null);
 </script>
 
 <div class="column p_lg h_100">
@@ -17,21 +17,21 @@
 		style:gap="var(--space_md)"
 	>
 		<div class="overflow_auto border_right">
-			<Messages_List
+			<Payload_List
 				limit={100}
-				selected_message_id={selected_message?.id}
-				onselect={(message) => {
-					selected_message = message;
+				selected_payload_id={selected_payload?.id}
+				onselect={(payload) => {
+					selected_payload = payload;
 				}}
 			/>
 		</div>
 
 		<div class="panel p_md overflow_auto h_100">
-			{#if selected_message}
-				<Message_Detail message={selected_message} />
+			{#if selected_payload}
+				<Payload_Detail payload={selected_payload} />
 			{:else}
 				<div class="flex align_items_center justify_content_center h_100">
-					<p>Select a message from the list to view its details</p>
+					<p>Select a payload from the list to view its details</p>
 				</div>
 			{/if}
 		</div>

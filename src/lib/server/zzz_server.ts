@@ -2,7 +2,7 @@ import {Filer, type Cleanup_Watch} from '@ryanatkn/gro/filer.js';
 import type {Watcher_Change} from '@ryanatkn/gro/watch_dir.js';
 import {resolve} from 'node:path';
 
-import {type Message_Client, type Message_Server} from '$lib/message_types.js';
+import {type Payload_Client, type Payload_Server} from '$lib/payload_types.js';
 import type {Zzz_Config} from '$lib/config_helpers.js';
 import {Zzz_Dir} from '$lib/diskfile_types.js';
 import {Safe_Fs} from '$lib/server/safe_fs.js';
@@ -10,10 +10,10 @@ import {Safe_Fs} from '$lib/server/safe_fs.js';
 /**
  * Function type for handling client messages
  */
-export type Message_Handler = (
-	message: Message_Client,
+export type Payload_Handler = (
+	message: Payload_Client,
 	server: Zzz_Server,
-) => Promise<Message_Server | null>;
+) => Promise<Payload_Server | null>;
 
 /**
  * Function type for handling file system changes
@@ -45,11 +45,11 @@ export interface Zzz_Server_Options {
 	/**
 	 * Send a message to all connected websocket clients
 	 */
-	send_to_all_clients: (message: Message_Server) => void;
+	send_to_all_clients: (message: Payload_Server) => void;
 	/**
 	 * Handler function for processing client messages
 	 */
-	handle_message: Message_Handler;
+	handle_message: Payload_Handler;
 	/**
 	 * Handler function for file system changes
 	 */
@@ -65,8 +65,8 @@ export class Zzz_Server {
 
 	readonly config: Zzz_Config;
 
-	readonly #send_to_all_clients: (message: Message_Server) => void;
-	readonly #handle_message: Message_Handler;
+	readonly #send_to_all_clients: (message: Payload_Server) => void;
+	readonly #handle_message: Payload_Handler;
 	readonly #handle_filer_change: Filer_Change_Handler;
 
 	/**
@@ -102,14 +102,14 @@ export class Zzz_Server {
 	/**
 	 * Send a message to all connected clients
 	 */
-	send(message: Message_Server): void {
+	send(message: Payload_Server): void {
 		this.#send_to_all_clients(message);
 	}
 
 	/**
 	 * Handle incoming client messages by delegating to the configured handler
 	 */
-	async receive(message: Message_Client): Promise<Message_Server | null> {
+	async receive(message: Payload_Client): Promise<Payload_Server | null> {
 		console.log(`[zzz_server.receive] message`, message.id, message.type);
 		return this.#handle_message(message, this);
 	}

@@ -5,15 +5,15 @@
 	import {contextmenu_action} from '@ryanatkn/fuz/contextmenu_state.svelte.js';
 	import {slide} from 'svelte/transition';
 
-	import Message_Info from '$lib/Message_Info.svelte';
-	import Message_Summary from '$lib/Message_Summary.svelte';
-	import type {Message} from '$lib/message_types.js';
+	import Payload_Info from '$lib/Payload_Info.svelte';
+	import Payload_Summary from '$lib/Payload_Summary.svelte';
+	import type {Payload} from '$lib/payload_types.js';
 
 	interface Props {
-		message: Message;
+		payload: Payload;
 	}
 
-	const {message}: Props = $props();
+	const {payload}: Props = $props();
 
 	let show_more = $state(false);
 
@@ -21,14 +21,14 @@
 
 	let view_with: 'summary' | 'info' = $state('summary');
 
-	const Message_View_Component = $derived(view_with === 'summary' ? Message_Summary : Message_Info);
+	const Payload_View_Component = $derived(view_with === 'summary' ? Payload_Summary : Payload_Info);
 </script>
 
 .
-<div class="message_view" use:contextmenu_action={contextmenu_entries}>
-	{#key Message_View_Component}
+<div class="payload_view" use:contextmenu_action={contextmenu_entries}>
+	{#key Payload_View_Component}
 		<div transition:slide>
-			<Message_View_Component {message} />
+			<Payload_View_Component {payload} />
 		</div>
 	{/key}
 </div>
@@ -36,8 +36,8 @@
 {#if show_more}
 	<Dialog onclose={() => (show_more = false)}>
 		<div class="pane p_md width_md mx_auto">
-			<!-- TODO should this be a `Message_Editor`? -->
-			<Message_Info {message} />
+			<!-- TODO should this be a `Payload_Editor`? -->
+			<Payload_Info {payload} />
 			<button type="button" onclick={() => (show_more = false)}>close</button>
 		</div>
 	</Dialog>
@@ -47,19 +47,19 @@
 	<!-- TODO maybe show disabled? -->
 	<Contextmenu_Entry run={() => (show_more = true)}>
 		{#snippet icon()}⚡{/snippet}
-		<span>View message details</span>
+		<span>View payload details</span>
 	</Contextmenu_Entry>
 	<Contextmenu_Submenu>
-		{#snippet icon()}>{/snippet}
-		View message with
+		{#snippet icon()}&gt;{/snippet}
+		View payload with
 		{#snippet menu()}
 			<!-- TODO `disabled` property to the entry -->
 			<Contextmenu_Entry run={() => (view_with = 'summary')}>
-				{#snippet icon()}{#if view_with === 'summary'}{'>'}{/if}{/snippet}
+				{#snippet icon()}{#if view_with === 'summary'}&gt;{/if}{/snippet}
 				<span>summary</span>
 			</Contextmenu_Entry>
 			<Contextmenu_Entry run={() => (view_with = 'info')}>
-				{#snippet icon()}{#if view_with === 'info'}{'>'}{/if}{/snippet}
+				{#snippet icon()}{#if view_with === 'info'}&gt;{/if}{/snippet}
 				<span>info</span>
 			</Contextmenu_Entry>
 		{/snippet}

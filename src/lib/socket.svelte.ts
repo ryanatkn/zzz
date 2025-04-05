@@ -26,15 +26,16 @@ export type Socket_Json = z.infer<typeof Socket_Json>;
 
 export interface Socket_Options extends Cell_Options<typeof Socket_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
-export type Socket_Message_Handler = (event: MessageEvent) => void;
+export type Socket_Payload_Handler = (event: MessageEvent) => void;
 export type Socket_Error_Handler = (event: Event) => void;
 
-// TODO BLOCK schemas so it can be serialized (so the full state can be snapshotted, and all queued/failed messages restored)
+// TODO add schemas following the other cell patterns so it can be serialized (so the full state can be snapshotted, and all queued/failed messages restored)
+
 /**
  * Queued message that couldn't be sent immediately.
  */
 export interface Queued_Message {
-	id: string;
+	id: Uuid;
 	data: any;
 	created: number;
 }
@@ -79,7 +80,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 	failed_messages: SvelteMap<string, Failed_Message> = new SvelteMap();
 
 	// Event handlers - can be assigned by consumers
-	onmessage: Socket_Message_Handler | null = $state(null);
+	onmessage: Socket_Payload_Handler | null = $state(null);
 	onerror: Socket_Error_Handler | null = $state(null);
 
 	// Derived properties

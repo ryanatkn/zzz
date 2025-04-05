@@ -6,12 +6,12 @@ import type {Provider_Name} from '$lib/provider_types.js';
 import type {
 	Provider_Data,
 	Completion_Response,
-	Ollama_Provider_Data,
-	Claude_Provider_Data,
-	Chatgpt_Provider_Data,
-	Gemini_Provider_Data,
-	Message_Completion_Response,
-} from '$lib/message_types.js';
+	Provider_Data_Ollama,
+	Provider_Data_Claude,
+	Provider_Data_Chatgpt,
+	Provider_Data_Gemini,
+	Payload_Completion_Response,
+} from '$lib/payload_types.js';
 import {Datetime_Now, Uuid} from '$lib/zod_helpers.js';
 
 /**
@@ -40,16 +40,16 @@ export const to_completion_response_text = (
 	// TODO avoid casting
 	switch (provider) {
 		case 'ollama':
-			return (data as Ollama_Provider_Data).value?.message?.content || null;
+			return (data as Provider_Data_Ollama).value?.message?.content || null;
 
 		case 'claude':
-			return (data as Claude_Provider_Data).value?.content?.[0]?.text || null;
+			return (data as Provider_Data_Claude).value?.content?.[0]?.text || null;
 
 		case 'chatgpt':
-			return (data as Chatgpt_Provider_Data).value?.choices?.[0]?.message?.content || null;
+			return (data as Provider_Data_Chatgpt).value?.choices?.[0]?.message?.content || null;
 
 		case 'gemini':
-			return (data as Gemini_Provider_Data).value.text || null;
+			return (data as Provider_Data_Gemini).value.text || null;
 
 		default:
 			console.error('Unknown provider', provider);
@@ -137,7 +137,7 @@ export const create_completion_response_message = (
 	provider_name: Provider_Name,
 	model: string,
 	api_response: any,
-): Message_Completion_Response => {
+): Payload_Completion_Response => {
 	return {
 		id: Uuid.parse(undefined),
 		type: 'completion_response',

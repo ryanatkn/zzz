@@ -14,11 +14,11 @@ import type {Watcher_Change} from '@ryanatkn/gro/watch_dir.js';
 import {DEV} from 'esm-env';
 
 import {
-	type Message_Client,
-	type Message_Completion_Response,
-	type Message_Server,
-	type Message_Send_Prompt,
-} from '$lib/message_types.js';
+	type Payload_Client,
+	type Payload_Completion_Response,
+	type Payload_Server,
+	type Payload_Send_Prompt,
+} from '$lib/payload_types.js';
 import {Uuid} from '$lib/zod_helpers.js';
 import {Diskfile_Path, Source_File, type Zzz_Dir} from '$lib/diskfile_types.js';
 import {map_watcher_change_to_diskfile_change} from '$lib/diskfile_helpers.js';
@@ -44,9 +44,9 @@ const google = new GoogleGenerativeAI(SECRET_GOOGLE_API_KEY);
  * A stateless function that uses the zzz_server for access to state and configuration
  */
 export const handle_message = async (
-	message: Message_Client,
+	message: Payload_Client,
 	server: Zzz_Server,
-): Promise<Message_Server | null> => {
+): Promise<Payload_Server | null> => {
 	console.log(`[handle_message] message`, message.id, message.type);
 
 	switch (message.type) {
@@ -85,7 +85,7 @@ export const handle_message = async (
 			const {prompt, provider_name, model, tape_history} = message.completion_request;
 			const config = server.config;
 
-			let response: Message_Completion_Response;
+			let response: Payload_Completion_Response;
 
 			console.log(`texting ${provider_name}:`, prompt.substring(0, 1000));
 
@@ -289,8 +289,8 @@ export const handle_filer_change = (
 
 // Helper function to save the response to disk
 const save_response = async (
-	request: Message_Send_Prompt,
-	response: Message_Completion_Response,
+	request: Payload_Send_Prompt,
+	response: Payload_Completion_Response,
 	dir: string,
 	safe_fs: Safe_Fs,
 ): Promise<void> => {

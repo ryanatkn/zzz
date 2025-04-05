@@ -59,7 +59,7 @@ export const GLYPH_EXTERNAL_LINK = '🡵';
 export const GLYPH_ARROW_RIGHT = '→'; // → ➝ ➞ ➜ ➡ ⟶ ⭢ ⤷ ⤳ ⥅ ⮕ ⭆ ⮞ ⭆ ⭈ ⤞ ⤠
 export const GLYPH_ARROW_LEFT = '←'; // ← ⭠
 
-export const get_icon_for_message_type = (type: string): string => {
+export const get_icon_for_payload_type = (type: string): string => {
 	switch (type) {
 		case 'echo':
 			return GLYPH_ECHO;

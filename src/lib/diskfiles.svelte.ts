@@ -1,6 +1,6 @@
 import {z} from 'zod';
 
-import type {Message_Filer_Change} from '$lib/message_types.js';
+import type {Payload_Filer_Change} from '$lib/payload_types.js';
 import {Uuid} from '$lib/zod_helpers.js';
 import {Diskfile, Diskfile_Schema} from '$lib/diskfile.svelte.js';
 import {Diskfile_Json, Diskfile_Path} from '$lib/diskfile_types.js';
@@ -81,10 +81,10 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 		this.init();
 	}
 
-	handle_change(message: Message_Filer_Change): void {
-		const validated_source_file = message.source_file;
+	handle_change(payload: Payload_Filer_Change): void {
+		const validated_source_file = payload.source_file;
 
-		switch (message.change.type) {
+		switch (payload.change.type) {
 			case 'add': {
 				this.add(source_file_to_diskfile_json(validated_source_file));
 				break;
@@ -135,7 +135,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 	}
 
 	update(path: Diskfile_Path, content: string): void {
-		this.zzz.messages.send({
+		this.zzz.payloads.send({
 			id: Uuid.parse(undefined),
 			type: 'update_diskfile',
 			path,
@@ -144,7 +144,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 	}
 
 	delete(path: Diskfile_Path): void {
-		this.zzz.messages.send({
+		this.zzz.payloads.send({
 			id: Uuid.parse(undefined),
 			type: 'delete_diskfile',
 			path,
@@ -171,7 +171,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 		// Create full path by joining zzz_dir with the directory name
 		const path = Diskfile_Path.parse(`${this.zzz.zzz_dir}${dirname}`);
 
-		this.zzz.messages.send({
+		this.zzz.payloads.send({
 			id: Uuid.parse(undefined),
 			type: 'create_directory',
 			path,

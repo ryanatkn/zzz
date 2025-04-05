@@ -8,7 +8,7 @@ import {PUBLIC_SERVER_HOSTNAME, PUBLIC_ZZZ_DIR} from '$env/static/public';
 import {Zzz_Server} from '$lib/server/zzz_server.js';
 import {handle_message, handle_filer_change} from '$lib/server/handler_defaults.js';
 import create_config from '$lib/config.js';
-import type {Message_Server} from '$lib/message_types.js';
+import type {Payload_Server} from '$lib/payload_types.js';
 import {package_json} from '$routes/package.js';
 import {SERVER_PROXIED_PORT} from '$lib/constants.js';
 
@@ -51,7 +51,7 @@ const main = async () => {
 					}
 					// console.log(`[server] handling message`, data);
 					if (data.type === 'server_message') {
-						let message: Message_Server | null;
+						let message: Payload_Server | null;
 						try {
 							message = await zzz_server.receive(data.message);
 						} catch (err) {

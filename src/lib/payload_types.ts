@@ -5,10 +5,10 @@ import {Datetime_Now, Uuid} from '$lib/zod_helpers.js';
 import type {Provider_Name} from '$lib/provider_types.js';
 import {Cell_Json} from '$lib/cell_types.js';
 
-export const Message_Direction = z.enum(['client', 'server', 'both']);
-export type Message_Direction = z.infer<typeof Message_Direction>;
+export const Payload_Direction = z.enum(['client', 'server', 'both']);
+export type Payload_Direction = z.infer<typeof Payload_Direction>;
 
-export const Message_Type = z.enum([
+export const Payload_Type = z.enum([
 	'ping',
 	'pong',
 	'load_session',
@@ -20,33 +20,33 @@ export const Message_Type = z.enum([
 	'delete_diskfile',
 	'create_directory',
 ]);
-export type Message_Type = z.infer<typeof Message_Type>;
+export type Payload_Type = z.infer<typeof Payload_Type>;
 
-// Define schema for tape history message
-export const Tape_History_Message = z.object({
+// Define schema for tape history payload
+export const Payload_Tape_History = z.object({
 	role: z.enum(['user', 'system', 'assistant']),
 	content: z.string(),
 });
-export type Tape_History_Message = z.infer<typeof Tape_History_Message>;
+export type Payload_Tape_History = z.infer<typeof Payload_Tape_History>;
 
 // TODO these types need work
 // Define explicit interfaces for provider-specific data
-export interface Ollama_Provider_Data {
+export interface Provider_Data_Ollama {
 	type: 'ollama';
 	value: any; // ChatResponse from ollama - must be required
 }
 
-export interface Claude_Provider_Data {
+export interface Provider_Data_Claude {
 	type: 'claude';
-	value: any; // Message from Anthropic - must be required
+	value: any; // Payload from Anthropic - must be required
 }
 
-export interface Chatgpt_Provider_Data {
+export interface Provider_Data_Chatgpt {
 	type: 'chatgpt';
 	value: any; // ChatCompletion from OpenAI - must be required
 }
 
-export interface Gemini_Provider_Data {
+export interface Provider_Data_Gemini {
 	type: 'gemini';
 	value: {
 		text: string;
@@ -59,10 +59,10 @@ export interface Gemini_Provider_Data {
 
 // Union type of all provider data types
 export type Provider_Data =
-	| Ollama_Provider_Data
-	| Claude_Provider_Data
-	| Chatgpt_Provider_Data
-	| Gemini_Provider_Data;
+	| Provider_Data_Ollama
+	| Provider_Data_Claude
+	| Provider_Data_Chatgpt
+	| Provider_Data_Gemini;
 
 // Schema validation for provider data
 export const Provider_Data_Schema = z.discriminatedUnion('type', [
@@ -106,7 +106,7 @@ export const Completion_Request = z.object({
 	provider_name: z.string() as z.ZodType<Provider_Name>,
 	model: z.string(),
 	prompt: z.string(),
-	tape_history: z.array(Tape_History_Message).optional(),
+	tape_history: z.array(Payload_Tape_History).optional(),
 });
 export type Completion_Request = z.infer<typeof Completion_Request>;
 
@@ -119,34 +119,34 @@ export const Completion_Response = z.object({
 });
 export type Completion_Response = z.infer<typeof Completion_Response>;
 
-// Base message schema
-export const Message_Base = z
+// Base payload schema
+export const Payload_Base = z
 	.object({
 		id: Uuid,
-		type: Message_Type,
+		type: Payload_Type,
 	})
 	.strict();
-export type Message_Base = z.infer<typeof Message_Base>;
+export type Payload_Base = z.infer<typeof Payload_Base>;
 
-// Ping/Pong message schemas
-export const Message_Ping = Message_Base.extend({
+// Ping/Pong payload schemas
+export const Payload_Ping = Payload_Base.extend({
 	type: z.literal('ping').default('ping'),
 }).strict();
-export type Message_Ping = z.infer<typeof Message_Ping>;
+export type Payload_Ping = z.infer<typeof Payload_Ping>;
 
-export const Message_Pong = Message_Base.extend({
+export const Payload_Pong = Payload_Base.extend({
 	type: z.literal('pong').default('pong'),
 	ping_id: Uuid,
 }).strict();
-export type Message_Pong = z.infer<typeof Message_Pong>;
+export type Payload_Pong = z.infer<typeof Payload_Pong>;
 
-// Session related message schemas
-export const Message_Load_Session = Message_Base.extend({
+// Session related payload schemas
+export const Payload_Load_Session = Payload_Base.extend({
 	type: z.literal('load_session').default('load_session'),
 }).strict();
-export type Message_Load_Session = z.infer<typeof Message_Load_Session>;
+export type Payload_Load_Session = z.infer<typeof Payload_Load_Session>;
 
-export const Message_Loaded_Session = Message_Base.extend({
+export const Payload_Loaded_Session = Payload_Base.extend({
 	type: z.literal('loaded_session').default('loaded_session'),
 	data: z
 		.object({
@@ -155,7 +155,7 @@ export const Message_Loaded_Session = Message_Base.extend({
 		})
 		.strict(),
 }).strict();
-export type Message_Loaded_Session = z.infer<typeof Message_Loaded_Session>;
+export type Payload_Loaded_Session = z.infer<typeof Payload_Loaded_Session>;
 
 // Define schema for diskfile change
 export const Diskfile_Change = z
@@ -166,86 +166,85 @@ export const Diskfile_Change = z
 	.strict();
 export type Diskfile_Change = z.infer<typeof Diskfile_Change>;
 
-// File related message schemas
-export const Message_Filer_Change = Message_Base.extend({
+// File related payload schemas
+export const Payload_Filer_Change = Payload_Base.extend({
 	type: z.literal('filer_change').default('filer_change'),
 	change: Diskfile_Change,
 	source_file: Source_File,
 }).strict();
-export type Message_Filer_Change = z.infer<typeof Message_Filer_Change>;
+export type Payload_Filer_Change = z.infer<typeof Payload_Filer_Change>;
 
-export const Message_Update_Diskfile = Message_Base.extend({
+export const Payload_Update_Diskfile = Payload_Base.extend({
 	type: z.literal('update_diskfile').default('update_diskfile'),
 	path: Diskfile_Path,
 	content: z.string(),
 }).strict();
-export type Message_Update_Diskfile = z.infer<typeof Message_Update_Diskfile>;
+export type Payload_Update_Diskfile = z.infer<typeof Payload_Update_Diskfile>;
 
-export const Message_Delete_Diskfile = Message_Base.extend({
+export const Payload_Delete_Diskfile = Payload_Base.extend({
 	type: z.literal('delete_diskfile').default('delete_diskfile'),
 	path: Diskfile_Path,
 }).strict();
-export type Message_Delete_Diskfile = z.infer<typeof Message_Delete_Diskfile>;
+export type Payload_Delete_Diskfile = z.infer<typeof Payload_Delete_Diskfile>;
 
-export const Message_Create_Directory = Message_Base.extend({
+export const Payload_Create_Directory = Payload_Base.extend({
 	type: z.literal('create_directory').default('create_directory'),
 	path: Diskfile_Path,
 }).strict();
-export type Message_Create_Directory = z.infer<typeof Message_Create_Directory>;
+export type Payload_Create_Directory = z.infer<typeof Payload_Create_Directory>;
 
-// Completion related message schemas
-export const Message_Send_Prompt = Message_Base.extend({
+// Completion related payload schemas
+export const Payload_Send_Prompt = Payload_Base.extend({
 	type: z.literal('send_prompt').default('send_prompt'),
 	completion_request: Completion_Request,
 }).strict();
-export type Message_Send_Prompt = z.infer<typeof Message_Send_Prompt>;
+export type Payload_Send_Prompt = z.infer<typeof Payload_Send_Prompt>;
 
-export const Message_Completion_Response = Message_Base.extend({
+export const Payload_Completion_Response = Payload_Base.extend({
 	type: z.literal('completion_response').default('completion_response'),
 	completion_response: Completion_Response,
 }).strict();
-export type Message_Completion_Response = z.infer<typeof Message_Completion_Response>;
+export type Payload_Completion_Response = z.infer<typeof Payload_Completion_Response>;
 
-// Union of all client message types
-export const Message_Client = z.discriminatedUnion('type', [
-	Message_Ping,
-	Message_Load_Session,
-	Message_Send_Prompt,
-	Message_Update_Diskfile,
-	Message_Delete_Diskfile,
-	Message_Create_Directory,
+// Union of all client payload types
+export const Payload_Client = z.discriminatedUnion('type', [
+	Payload_Ping,
+	Payload_Load_Session,
+	Payload_Send_Prompt,
+	Payload_Update_Diskfile,
+	Payload_Delete_Diskfile,
+	Payload_Create_Directory,
 ]);
-export type Message_Client = z.infer<typeof Message_Client>;
+export type Payload_Client = z.infer<typeof Payload_Client>;
 
-// Union of all server message types
-export const Message_Server = z.discriminatedUnion('type', [
-	Message_Pong,
-	Message_Loaded_Session,
-	Message_Filer_Change,
-	Message_Completion_Response,
+// Union of all server payload types
+export const Payload_Server = z.discriminatedUnion('type', [
+	Payload_Pong,
+	Payload_Loaded_Session,
+	Payload_Filer_Change,
+	Payload_Completion_Response,
 ]);
-export type Message_Server = z.infer<typeof Message_Server>;
+export type Payload_Server = z.infer<typeof Payload_Server>;
 
-// TODO BLOCK this name conflicts with the other Message
-// Union of all message types
-export const Message = z.discriminatedUnion('type', [
-	Message_Ping,
-	Message_Pong,
-	Message_Load_Session,
-	Message_Loaded_Session,
-	Message_Filer_Change,
-	Message_Send_Prompt,
-	Message_Completion_Response,
-	Message_Update_Diskfile,
-	Message_Delete_Diskfile,
-	Message_Create_Directory,
+// Union of all payload types
+export const Payload = z.discriminatedUnion('type', [
+	Payload_Ping,
+	Payload_Pong,
+	Payload_Load_Session,
+	Payload_Loaded_Session,
+	Payload_Filer_Change,
+	Payload_Send_Prompt,
+	Payload_Completion_Response,
+	Payload_Update_Diskfile,
+	Payload_Delete_Diskfile,
+	Payload_Create_Directory,
 ]);
-export type Message = z.infer<typeof Message>;
+export type Payload = z.infer<typeof Payload>;
 
-// Message with metadata schema
-export const Message_Json = Cell_Json.extend({
-	type: Message_Type,
-	direction: Message_Direction,
+// Payload with metadata schema
+export const Payload_Json = Cell_Json.extend({
+	type: Payload_Type,
+	direction: Payload_Direction,
 	// Optional fields with proper type checking
 	ping_id: Uuid.optional(),
 	completion_request: Completion_Request.optional(),
@@ -256,16 +255,16 @@ export const Message_Json = Cell_Json.extend({
 	source_file: Source_File.optional(),
 	data: z.record(z.string(), z.any()).optional(),
 }).strict();
-export type Message_Json = z.infer<typeof Message_Json>;
+export type Payload_Json = z.infer<typeof Payload_Json>;
 
-// Helper function to create a message with json representation
-export const create_message_json = (
-	message: Message,
-	direction: Message_Direction,
-): Message_Json => {
+// Helper function to create a payload with json representation
+export const create_payload_json = (
+	payload: Payload,
+	direction: Payload_Direction,
+): Payload_Json => {
 	return {
-		...message,
+		...payload,
 		direction,
 		created: Datetime_Now.parse(undefined),
-	} as Message_Json;
+	} as Payload_Json;
 };

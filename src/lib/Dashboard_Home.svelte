@@ -2,15 +2,13 @@
 	import {base} from '$app/paths';
 
 	import {zzz_context} from '$lib/zzz.svelte.js';
-	import Messages_List from '$lib/Messages_List.svelte';
+	import Payloads_List from '$lib/Payload_List.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 	import Provider_Link from '$lib/Provider_Link.svelte';
 	import Model_Link from '$lib/Model_Link.svelte';
 	import {GLYPH_LOG, GLYPH_PROVIDER, GLYPH_MODEL} from '$lib/glyphs.js';
 
 	const zzz = zzz_context.get();
-
-	// TODO BLOCK the messages list below should be links to the /messages?id=... page (or whatever URL structure)
 </script>
 
 <div class="p_lg">
@@ -19,7 +17,7 @@
 			<div class="mb_lg">
 				<a class="size_xl font_weight_600" href="{base}/log"><Glyph icon={GLYPH_LOG} /> log</a>
 			</div>
-			<Messages_List limit={5} attrs={{class: 'mt_sm'}} />
+			<Payloads_List limit={5} attrs={{class: 'mt_sm'}} />
 		</section>
 
 		<section class="panel p_md mb_0">
