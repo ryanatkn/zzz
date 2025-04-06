@@ -45,7 +45,6 @@
 	const first_tape = $derived(chat.tapes[0] as Tape | undefined);
 	const selected_chat = $derived(zzz.chats.selected);
 
-	// TODO BLOCK probably put this behind a simplified chat interface with an "advanced" button
 	// TODO BLOCK add an enable button/state like with prompt bits
 	// TODO BLOCK show a list of tapes in a panel like with prompt bits
 	// TODO BLOCK prompts in a column on the right - custom buttons to do common things, compose them with a textarea with buttons like "fill all" or "fill with tag" or at least drag
@@ -102,16 +101,16 @@
 				<header class="mt_0 mb_lg size_lg"><Glyph icon={GLYPH_TAPE} /> tapes</header>
 				<Tape_List {chat} />
 			</section>
+			<section class="column_section">
+				<header class="mt_0 mb_lg size_lg"><Glyph icon={GLYPH_PROMPT} /> prompts</header>
+				<Prompt_List {chat} />
+			</section>
+			<!-- TODO maybe show `Bit_List` with the `prompt bits` header here in -->
+			<section class="column_section">
+				<header class="mt_0 mb_lg size_lg"><Glyph icon={GLYPH_BIT} /> all bits</header>
+				<Bit_List bits={chat.bits_array} />
+			</section>
 		{/if}
-		<section class="column_section">
-			<header class="mt_0 mb_lg size_lg"><Glyph icon={GLYPH_PROMPT} /> prompts</header>
-			<Prompt_List {chat} />
-		</section>
-		<!-- TODO maybe show `Bit_List` with the `prompt bits` header here in -->
-		<section class="column_section">
-			<header class="mt_0 mb_lg size_lg"><Glyph icon={GLYPH_BIT} /> all bits</header>
-			<Bit_List bits={chat.bits_array} />
-		</section>
 	</div>
 
 	{#if chat.view_mode === 'simple'}

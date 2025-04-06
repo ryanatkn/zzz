@@ -313,6 +313,9 @@ a.chip {
 .justify_content_center {
 	justify-content: center;
 }
+.pl_md {
+	padding-left: var(--space_md);
+}
 .gap_md {
 	gap: var(--space_md);
 }
@@ -377,9 +380,6 @@ a.chip {
 }
 .mb_xl {
 	margin-bottom: var(--space_xl);
-}
-.pl_md {
-	padding-left: var(--space_md);
 }
 .my_lg {
 	margin-top: var(--space_lg);

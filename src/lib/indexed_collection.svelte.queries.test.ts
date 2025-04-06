@@ -3,11 +3,12 @@
 import {test, expect, describe, beforeEach} from 'vitest';
 import {z} from 'zod';
 
-import {Indexed_Collection, type Indexed_Item} from '$lib/indexed_collection.svelte.js';
+import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {
 	create_single_index,
 	create_multi_index,
 	create_derived_index,
+	type Indexed_Item,
 } from '$lib/indexed_collection_helpers.js';
 import {Uuid} from '$lib/zod_helpers.js';
 

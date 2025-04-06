@@ -1,7 +1,10 @@
 import {z} from 'zod';
 import {EMPTY_ARRAY} from '@ryanatkn/belt/array.js';
+import {SvelteMap} from 'svelte/reactivity';
 
 export const Any = z.any();
+
+export const Svelte_Map_Schema = z.custom<SvelteMap<any, any>>((val) => val instanceof SvelteMap);
 
 // TODO move these? helpers at least
 export const Datetime = z.string().datetime().brand('Datetime');

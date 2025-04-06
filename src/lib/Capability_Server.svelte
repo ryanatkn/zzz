@@ -21,8 +21,9 @@
 
 <div class="flex flex_column gap_sm">
 	<div
-		class="w_100 chip flex_1 px_xl plain justify_content_space_between font_weight_400"
+		class="w_100 chip flex_1 px_xl plain justify_content_space_between"
 		style:padding="0 var(--space_xl) !important"
+		style:font-weight="400 !important"
 		class:color_b={capabilities.server.status === 'success'}
 		class:color_c={capabilities.server.status === 'failure'}
 		class:color_d={capabilities.server.status === 'pending'}

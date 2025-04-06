@@ -26,7 +26,7 @@ export const package_json = {
 		test: 'gro test',
 		preview: 'vite preview',
 		deploy: 'gro deploy',
-		serve: 'gro build && npm run preview & node ',
+		serve: 'gro build && npm run preview & node dist_server/server/server.js',
 	},
 	type: 'module',
 	engines: {node: '>=22.11'},
@@ -1087,6 +1087,7 @@ export const src_json = {
 			path: 'indexed_collection_helpers.ts',
 			declarations: [
 				{name: 'Svelte_Map_Schema', kind: 'variable'},
+				{name: 'Indexed_Item', kind: 'variable'},
 				{name: 'Index_Options', kind: 'type'},
 				{name: 'Single_Index_Options', kind: 'type'},
 				{name: 'create_single_index', kind: 'function'},
@@ -1101,7 +1102,6 @@ export const src_json = {
 		'./indexed_collection.svelte.js': {
 			path: 'indexed_collection.svelte.ts',
 			declarations: [
-				{name: 'Indexed_Item', kind: 'type'},
 				{name: 'Index_Type', kind: 'type'},
 				{name: 'Index_Definition', kind: 'type'},
 				{name: 'Indexed_Collection_Options', kind: 'type'},
@@ -1518,6 +1518,7 @@ export const src_json = {
 			path: 'zod_helpers.ts',
 			declarations: [
 				{name: 'Any', kind: 'variable'},
+				{name: 'Svelte_Map_Schema', kind: 'variable'},
 				{name: 'Datetime', kind: 'variable'},
 				{name: 'Datetime_Now', kind: 'variable'},
 				{name: 'Uuid_Required', kind: 'variable'},

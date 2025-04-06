@@ -67,7 +67,7 @@
 	<div class="mb_md row gap_xs2">
 		<small class="pr_xs3 white_space_nowrap">sort by</small>
 		<menu class="unstyled flex flex_wrap justify_content_end gap_xs2">
-			{#each sortable.sorters as sorter}
+			{#each sortable.sorters as sorter (sorter.key)}
 				<button
 					type="button"
 					class="compact font_weight_400"

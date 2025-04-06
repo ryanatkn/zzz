@@ -1,14 +1,18 @@
 import {SvelteMap} from 'svelte/reactivity';
 import {z} from 'zod';
 
-import type {
-	Indexed_Item,
-	Index_Definition,
-	Indexed_Collection,
-} from '$lib/indexed_collection.svelte.js';
-import {Any} from '$lib/zod_helpers.js';
+import type {Index_Definition, Indexed_Collection} from '$lib/indexed_collection.svelte.js';
+import {Any, Uuid} from '$lib/zod_helpers.js';
 
 export const Svelte_Map_Schema = z.custom<SvelteMap<any, any>>((val) => val instanceof SvelteMap);
+
+/**
+ * Interface for objects that can be stored in an indexed collection
+ */
+export const Indexed_Item = z.object({
+	id: Uuid,
+});
+export type Indexed_Item = z.infer<typeof Indexed_Item>;
 
 // TODO I think these helpers should be on the base cell for type inference, `this.create_single_index`,
 // but the extracted logic could still be here if it made the base class cleaner, or if these are usefully reusable
@@ -44,16 +48,13 @@ export interface Single_Index_Options<T extends Indexed_Item, K = any> extends I
 export const create_single_index = <T extends Indexed_Item, K = any>(
 	options: Single_Index_Options<T, K>,
 ): Index_Definition<T, SvelteMap<K, T>, K> => {
-	// Create the default output schema if not provided
-	const result_schema = options.result_schema || Svelte_Map_Schema;
-
 	return {
 		key: options.key,
 		type: 'single',
 		extractor: options.extractor,
 		query_schema: options.query_schema || (z.any() as z.ZodType<K>),
 		matches: options.matches,
-		result_schema,
+		result_schema: options.result_schema ?? Svelte_Map_Schema,
 		compute: (collection) => {
 			const map: SvelteMap<K, T> = new SvelteMap();
 			for (const item of collection.by_id.values()) {
@@ -127,16 +128,13 @@ export interface Multi_Index_Options<T extends Indexed_Item, K = any> extends In
 export const create_multi_index = <T extends Indexed_Item, K = any>(
 	options: Multi_Index_Options<T, K>,
 ): Index_Definition<T, SvelteMap<K, Array<T>>, K> => {
-	// Create the default output schema if not provided
-	const result_schema = options.result_schema || Svelte_Map_Schema;
-
 	return {
 		key: options.key,
 		type: 'multi',
 		extractor: options.extractor,
 		query_schema: options.query_schema || (z.any() as z.ZodType<K>),
 		matches: options.matches,
-		result_schema,
+		result_schema: options.result_schema ?? Svelte_Map_Schema,
 		compute: (collection) => {
 			const map: SvelteMap<K, Array<T>> = new SvelteMap();
 			for (const item of collection.by_id.values()) {
@@ -212,18 +210,12 @@ export interface Derived_Index_Options<T extends Indexed_Item> extends Index_Opt
 export const create_derived_index = <T extends Indexed_Item>(
 	options: Derived_Index_Options<T>,
 ): Index_Definition<T, Array<T>, void> => {
-	// Create the default output schema if not provided
-	const result_schema =
-		options.result_schema ||
-		// TODO BLOCK `z.custom` looks wrong here, maybe `create_derived_index(this, ...)` should be the API for numerous reasons?
-		z.array(z.custom<T>((val) => val && typeof val === 'object' && 'id' in val));
-
 	return {
 		key: options.key,
 		type: 'derived',
 		matches: options.matches,
 		query_schema: options.query_schema,
-		result_schema,
+		result_schema: options.result_schema ?? Indexed_Item,
 		compute: (collection) => {
 			const result = options.compute(collection);
 			if (options.sort) {

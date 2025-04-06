@@ -2,7 +2,7 @@ import {z} from 'zod';
 
 import {Diskfile_Change_Type, Source_File, Diskfile_Path, Zzz_Dir} from '$lib/diskfile_types.js';
 import {Datetime_Now, Uuid} from '$lib/zod_helpers.js';
-import type {Provider_Name} from '$lib/provider_types.js';
+import {Provider_Name} from '$lib/provider_types.js';
 import {Cell_Json} from '$lib/cell_types.js';
 
 export const Payload_Direction = z.enum(['client', 'server', 'both']);
@@ -103,7 +103,7 @@ export const Provider_Data_Schema = z.discriminatedUnion('type', [
 export const Completion_Request = z.object({
 	created: Datetime_Now,
 	request_id: Uuid,
-	provider_name: z.string() as z.ZodType<Provider_Name>,
+	provider_name: Provider_Name,
 	model: z.string(),
 	prompt: z.string(),
 	tape_history: z.array(Payload_Tape_History).optional(),
@@ -113,7 +113,7 @@ export type Completion_Request = z.infer<typeof Completion_Request>;
 export const Completion_Response = z.object({
 	created: Datetime_Now,
 	request_id: Uuid,
-	provider_name: z.string() as z.ZodType<Provider_Name>,
+	provider_name: Provider_Name,
 	model: z.string(),
 	data: Provider_Data_Schema,
 });

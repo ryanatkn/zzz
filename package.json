@@ -25,7 +25,7 @@
     "test": "gro test",
     "preview": "vite preview",
     "deploy": "gro deploy",
-    "serve": "gro build && npm run preview & node "
+    "serve": "gro build && npm run preview & node dist_server/server/server.js"
   },
   "type": "module",
   "engines": {

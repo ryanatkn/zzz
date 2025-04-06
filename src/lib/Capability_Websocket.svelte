@@ -89,7 +89,7 @@
 				class:color_e={capabilities.websocket.status === 'initial'}
 				class:color_h={capabilities.websocket.status === 'success' && !socket.connected}
 			>
-				<div class="column justify_content_center gap_xs" style:min-height="80px">
+				<div class="column justify_content_center gap_xs pl_md" style:min-height="80px">
 					websocket {socket.connected
 						? 'connected'
 						: socket.status === 'pending'
