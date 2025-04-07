@@ -18,7 +18,7 @@
 
 	const zzz = zzz_context.get();
 	let content_input: {focus: () => void} | undefined;
-	let pending = $state(false);
+	let pending = $state(false); // TODO refactor request state
 
 	const send_to_all = async () => {
 		if (!count) return;
@@ -33,7 +33,7 @@
 		pending = false;
 	};
 
-	const count = $derived(chat.tapes.length);
+	const count = $derived(chat.enabled_tapes.length);
 	const tags = $derived(Array.from(zzz.tags)); // TODO BLOCK refactor, `Tags` may be a class, maybe with an indexed collection
 </script>
 
@@ -69,9 +69,7 @@
 				<li transition:slide>
 					<Chat_Tape
 						{tape}
-						onremove={() => chat.remove_tape(tape.id)}
 						onsend={(input) => chat.send_to_tape(tape.id, input)}
-						show_delete_button
 						strips_attrs={{class: 'max_height_sm'}}
 						attrs={{class: 'p_md'}}
 					/>

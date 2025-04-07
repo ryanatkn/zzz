@@ -53,12 +53,12 @@ export interface Failed_Message extends Queued_Message {
  */
 export class Socket extends Cell<typeof Socket_Json> {
 	// Private serializable state with getters/setters
-	#url: string | null = $state(null);
-	#url_input: string = $state('');
-	#heartbeat_interval: number = $state(DEFAULT_HEARTBEAT_INTERVAL);
-	#reconnect_delay: number = $state(DEFAULT_RECONNECT_DELAY);
-	#reconnect_delay_max: number = $state(DEFAULT_RECONNECT_DELAY_MAX);
-	#auto_reconnect: boolean = $state(true);
+	#url: string | null = $state()!;
+	#url_input: string = $state()!;
+	#heartbeat_interval: number = $state()!;
+	#reconnect_delay: number = $state()!;
+	#reconnect_delay_max: number = $state()!;
+	#auto_reconnect: boolean = $state()!;
 
 	// Runtime-only state (not serialized)
 	ws: WebSocket | null = $state(null);

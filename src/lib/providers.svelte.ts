@@ -19,7 +19,7 @@ export type Providers_Json = z.infer<typeof Providers_Json>;
 
 export interface Providers_Options extends Cell_Options<typeof Providers_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 export class Providers extends Cell<typeof Providers_Json> {
-	items: Array<Provider> = $state([]);
+	items: Array<Provider> = $state()!; // TODO probably make an indexed collection for convenient querying, despite small N
 
 	constructor(options: Providers_Options) {
 		super(Providers_Json, options);

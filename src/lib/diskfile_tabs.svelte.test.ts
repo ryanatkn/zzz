@@ -608,13 +608,13 @@ describe('Diskfile_Tabs', () => {
 			const tab3 = tabs.open_diskfile(TEST_DISKFILE_ID_3);
 
 			// Clear history
-			tabs.recent_tabs = [];
+			tabs.recent_tab_ids = [];
 
 			// Select the middle tab
 			tabs.select_tab(tab2.id);
 
 			// Clear history again (since select_tab would have added to it)
-			tabs.recent_tabs = [];
+			tabs.recent_tab_ids = [];
 
 			// Close the selected tab
 			tabs.close_tab(tab2.id);

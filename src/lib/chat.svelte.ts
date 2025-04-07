@@ -29,10 +29,10 @@ export interface Chat_Options extends Cell_Options<typeof Chat_Json> {} // eslin
 
 export class Chat extends Cell<typeof Chat_Json> {
 	name: string = $state()!;
-	tape_ids: Array<Uuid> = $state([]);
+	tape_ids: Array<Uuid> = $state()!;
 	selected_prompt_ids: Array<Uuid> = $state()!;
-	main_input: string = $state('');
-	view_mode: Chat_View_Mode = $state('multi');
+	main_input: string = $state()!;
+	view_mode: Chat_View_Mode = $state()!;
 
 	readonly main_input_length: number = $derived(this.main_input.length);
 	readonly main_input_tokens: Array<number> = $derived(tokenize(this.main_input));
@@ -52,6 +52,8 @@ export class Chat extends Cell<typeof Chat_Json> {
 
 		return result;
 	});
+
+	readonly enabled_tapes = $derived(this.tapes.filter((t) => t.enabled)); // TODO indexed collection, also disabled variant?
 
 	// TODO maybe add a derived property for the ids that are selected but missing?
 	readonly selected_prompts: Array<Prompt> = $derived.by(() => {
@@ -138,7 +140,10 @@ export class Chat extends Cell<typeof Chat_Json> {
 	}
 
 	async send_to_all(content: string): Promise<void> {
-		await Promise.all(this.tapes.map((tape) => this.send_to_tape(tape.id, content)));
+		await Promise.all(
+			// TODO batch endpoint
+			this.enabled_tapes.map((tape) => this.send_to_tape(tape.id, content)),
+		);
 	}
 
 	async send_to_tape(tape_id: Uuid, content: string): Promise<void> {

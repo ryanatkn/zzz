@@ -11,6 +11,8 @@ import {Uuid} from '$lib/zod_helpers.js';
 import type {Zzz_Dir} from '$lib/diskfile_types.js';
 import {Payload_Ping, type Payload_Pong} from '$lib/payload_types.js';
 
+// TODO hacky/hardcoded for now, this should be an extensible system, the point is to give users a good interface to the concept of capabilities
+
 // Maximum number of ping records to keep
 export const PING_HISTORY_MAX = 6;
 
@@ -25,6 +27,7 @@ export interface Ping_Data {
 	round_trip_time: number | null;
 }
 
+// TODO which state?
 export const Capabilities_Json = Cell_Json.extend({});
 export type Capabilities_Json = z.infer<typeof Capabilities_Json>;
 

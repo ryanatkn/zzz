@@ -3,7 +3,6 @@
 	import Pending_Button from '@ryanatkn/fuz/Pending_Button.svelte';
 	import {encode as tokenize} from 'gpt-tokenizer';
 
-	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import type {Tape} from '$lib/tape.svelte.js';
 	import Strip_Item from '$lib/Strip_Item.svelte';
 	import Model_Link from '$lib/Model_Link.svelte';
@@ -13,17 +12,16 @@
 	import Content_Editor from '$lib/Content_Editor.svelte';
 	import {GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
 	import type {SvelteHTMLElements} from 'svelte/elements';
+	import Tape_Toggle_Button from '$lib/Tape_Toggle_Button.svelte';
 
 	interface Props {
 		tape: Tape;
-		onremove: () => void;
 		onsend: (input: string) => Promise<void>;
-		show_delete_button?: boolean | undefined;
 		strips_attrs?: SvelteHTMLElements['div'] | undefined;
 		attrs?: SvelteHTMLElements['div'] | undefined;
 	}
 
-	const {tape, onremove, onsend, show_delete_button, strips_attrs, attrs}: Props = $props();
+	const {tape, onsend, strips_attrs, attrs}: Props = $props();
 
 	let input = $state('');
 	const input_tokens = $derived(tokenize(input));
@@ -56,7 +54,12 @@
 </script>
 
 <Contextmenu_Tape {tape}>
-	<div {...attrs} class="chat_tape {attrs?.class}" class:empty={!strip_count}>
+	<div
+		{...attrs}
+		class="chat_tape {attrs?.class}"
+		class:empty={!strip_count}
+		class:dormant={!tape.enabled}
+	>
 		<div class="flex justify_content_space_between align_items_start">
 			<header>
 				<div class="size_lg">
@@ -70,15 +73,9 @@
 					/></small
 				>
 			</header>
-			{#if show_delete_button}
-				<Confirm_Button
-					onconfirm={onremove}
-					attrs={{
-						class: 'plain compact',
-						title: `delete tape with ${tape.model_name} and ${tape.token_count} tokens`,
-					}}
-				/>
-			{/if}
+			<div class="flex gap_xs">
+				<Tape_Toggle_Button {tape} />
+			</div>
 		</div>
 
 		{#if strip_count}

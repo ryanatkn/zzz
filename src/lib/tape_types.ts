@@ -11,5 +11,6 @@ export const Tape_Json = Cell_Json.extend({
 		z.array(Strip_Json).default(() => []),
 		'Strip',
 	),
+	enabled: z.boolean().default(true),
 });
 export type Tape_Json = z.infer<typeof Tape_Json>;

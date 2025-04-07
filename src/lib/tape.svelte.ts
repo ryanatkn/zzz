@@ -27,8 +27,10 @@ export class Tape extends Cell<typeof Tape_Json> {
 		return model;
 	});
 
-	strips: Array<Strip> = $state([]);
+	strips: Array<Strip> = $state()!;
 	readonly strips_by_id: Map<Uuid, Strip> = $derived(new Map(this.strips.map((s) => [s.id, s])));
+
+	enabled: boolean = $state()!;
 
 	readonly content: string = $derived(render_tape(this.strips));
 	readonly length: number = $derived(this.content.length);

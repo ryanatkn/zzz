@@ -6,7 +6,6 @@ import {Uuid} from '$lib/zod_helpers.js';
 import {to_reordered_list} from '$lib/list_helpers.js';
 import {Diskfile_Tab} from '$lib/diskfile_tab.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
-import {HANDLED} from '$lib/cell_helpers.js';
 
 export const Diskfile_Tabs_Json = Cell_Json.extend({
 	selected_tab_id: Uuid.nullable().default(null),
@@ -29,10 +28,8 @@ export class Diskfile_Tabs extends Cell<typeof Diskfile_Tabs_Json> {
 	selected_tab_id: Uuid | null = $state()!;
 	preview_tab_id: Uuid | null = $state()!;
 	tab_order: Array<Uuid> = $state()!;
+	recent_tab_ids: Array<Uuid> = $state()!;
 	max_tab_history: number = $state()!;
-
-	// Changed from storing ids to storing actual tab references
-	recent_tabs: Array<Diskfile_Tab> = $state([]);
 
 	items: Indexed_Collection<Diskfile_Tab> = new Indexed_Collection();
 
@@ -89,8 +86,14 @@ export class Diskfile_Tabs extends Cell<typeof Diskfile_Tabs_Json> {
 		this.preview_tab_id ? this.items.by_id.get(this.preview_tab_id) : undefined,
 	);
 
-	// For compatibility with existing code using recent_tab_ids
-	readonly recent_tab_ids: Array<Uuid> = $derived(this.recent_tabs.map((tab) => tab.id));
+	readonly recent_tabs: Array<Diskfile_Tab> = $derived.by(() => {
+		const result: Array<Diskfile_Tab> = [];
+		for (const tab_id of this.recent_tab_ids) {
+			const tab = this.items.by_id.get(tab_id);
+			if (tab) result.push(tab); // for now just ignore missing tabs
+		}
+		return result;
+	});
 
 	/** Recently closed tabs for potential reopening. */
 	recently_closed_tabs: Array<Diskfile_Tab> = $state([]);
@@ -100,23 +103,6 @@ export class Diskfile_Tabs extends Cell<typeof Diskfile_Tabs_Json> {
 
 	constructor(options: Diskfile_Tabs_Options) {
 		super(Diskfile_Tabs_Json, options);
-
-		this.decoders = {
-			recent_tab_ids: (ids) => {
-				if (Array.isArray(ids)) {
-					// Convert ids to tab references if they exist
-					this.recent_tabs = [];
-					for (const id of ids) {
-						const tab = this.items.by_id.get(id);
-						if (tab) {
-							this.recent_tabs.push(tab);
-						}
-					}
-				}
-				return HANDLED;
-			},
-		};
-
 		this.init();
 	}
 
@@ -129,17 +115,17 @@ export class Diskfile_Tabs extends Cell<typeof Diskfile_Tabs_Json> {
 		if (!tab) return;
 
 		// Remove the tab from its current position in history if it exists
-		const updated_history = this.recent_tabs.filter((t) => t.id !== tab_id);
+		const updated_history = this.recent_tab_ids.filter((id) => id !== tab_id);
 
 		// Add the tab to the front of the history
-		updated_history.unshift(tab);
+		updated_history.unshift(tab.id);
 
 		// Trim the history to the maximum length
 		if (updated_history.length > this.max_tab_history) {
 			updated_history.length = this.max_tab_history;
 		}
 
-		this.recent_tabs = updated_history;
+		this.recent_tab_ids = updated_history;
 	}
 
 	/**
@@ -360,7 +346,7 @@ export class Diskfile_Tabs extends Cell<typeof Diskfile_Tabs_Json> {
 		this.items.remove(tab_id);
 
 		// Remove from access history
-		this.recent_tabs = this.recent_tabs.filter((tab) => tab.id !== tab_id);
+		this.recent_tab_ids = this.recent_tab_ids.filter((id) => id !== tab_id);
 
 		// Update state flags
 		if (was_preview) {
@@ -450,7 +436,7 @@ export class Diskfile_Tabs extends Cell<typeof Diskfile_Tabs_Json> {
 		this.selected_tab_id = null;
 		this.preview_tab_id = null;
 		this.tab_order = [];
-		this.recent_tabs = [];
+		this.recent_tab_ids = [];
 
 		// Clear all tabs
 		this.items.clear();

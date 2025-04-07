@@ -17,8 +17,8 @@ export class Diskfile extends Cell<typeof Diskfile_Json> {
 	readonly bit: Bit_Type | undefined = $derived(this.zzz.bits.find_bit_by_diskfile_path(this.path));
 
 	// TODO @many add UI support for deps for module diskfiles (TS, Svelte, etc)
-	dependents: Array<[Diskfile_Path, Source_File]> = $state([]); // TODO @many these need to be null for unknown file types (support JS modules, etc)
-	dependencies: Array<[Diskfile_Path, Source_File]> = $state([]); // TODO @many these need to be null for unknown file types (support JS modules, etc)
+	dependents: Array<[Diskfile_Path, Source_File]> = $state()!; // TODO @many these need to be null for unknown file types (support JS modules, etc)
+	dependencies: Array<[Diskfile_Path, Source_File]> = $state()!; // TODO @many these need to be null for unknown file types (support JS modules, etc)
 
 	readonly dependencies_by_id: Map<Diskfile_Path, Source_File> = $derived(
 		new Map(this.dependencies),
