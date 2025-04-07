@@ -64,7 +64,6 @@ export class Strip extends Cell<typeof Strip_Json> {
 
 	constructor(options: Strip_Options) {
 		super(Strip_Json, options);
-
 		this.init();
 	}
 
@@ -87,23 +86,17 @@ export const create_strip = (
 	zzz: Zzz,
 ): Strip => {
 	// Create a new bit for this content
-	const bit = zzz.registry.instantiate('Text_Bit', {
-		name: `strip_${Uuid.parse(undefined).slice(0, 8)}`,
-		content,
-	});
+	const bit = zzz.registry.instantiate('Text_Bit', {content});
 	zzz.bits.add(bit);
 
-	return new Strip({
-		zzz,
-		json: {
-			role,
-			bit_id: bit.id,
-			id: options.id || Uuid.parse(undefined),
-			created: options.created || Datetime_Now.parse(undefined),
-			tape_id: options.tape_id,
-			request: options.request,
-			response: options.response,
-		},
+	return zzz.registry.instantiate('Strip', {
+		role,
+		bit_id: bit.id,
+		id: options.id || Uuid.parse(undefined),
+		created: options.created || Datetime_Now.parse(undefined),
+		tape_id: options.tape_id,
+		request: options.request,
+		response: options.response,
 	});
 };
 

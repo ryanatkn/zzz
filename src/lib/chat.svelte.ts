@@ -5,15 +5,13 @@ import {encode as tokenize} from 'gpt-tokenizer';
 import type {Model} from '$lib/model.svelte.js';
 import {to_completion_response_text} from '$lib/response_helpers.js';
 import {Uuid} from '$lib/zod_helpers.js';
-import {get_unique_name} from '$lib/helpers.js';
 import {Tape} from '$lib/tape.svelte.js';
 import type {Prompt} from '$lib/prompt.svelte.js';
 import {reorder_list} from '$lib/list_helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import type {Bit_Type} from '$lib/bit.svelte.js';
-
-const NEW_CHAT_PREFIX = 'chat';
+import {get_unique_name} from '$lib/helpers.js';
 
 const Chat_View_Mode = z.enum(['simple', 'multi']).default('simple');
 export type Chat_View_Mode = z.infer<typeof Chat_View_Mode>;
@@ -86,28 +84,11 @@ export class Chat extends Cell<typeof Chat_Json> {
 
 	constructor(options: Chat_Options) {
 		super(Chat_Json, options);
-
-		// Initialize decoders with type-specific handlers
-		this.decoders = {
-			name: (value) => {
-				// If name is undefined, generate a unique name
-				if (value === undefined) {
-					return get_unique_name(NEW_CHAT_PREFIX, this.zzz.chats.items.single_index('by_name'));
-				}
-				return undefined; // default decoding
-			},
-		};
-
-		// Initialize the instance
 		this.init();
 	}
 
 	add_tape(model: Model): void {
-		// TODO BLOCK use registry?
-		const tape = new Tape({
-			zzz: this.zzz,
-			json: {model_name: model.name},
-		});
+		const tape = this.zzz.registry.instantiate('Tape', {model_name: model.name});
 		this.zzz.tapes.add_tape(tape);
 		this.tape_ids.push(tape.id);
 	}
@@ -186,15 +167,9 @@ export class Chat extends Cell<typeof Chat_Json> {
 		p += `\n<Assistant_Message>${assistant_content}</Assistant_Message>`;
 
 		try {
-			// TODO BLOCK configure this utility LLM (roles?), and set the output token count from config as well
+			// TODO configure this utility LLM (roles?), and set the output token count from config as well
 			const name_response = await this.zzz.send_prompt(p, 'ollama', 'llama3.2:3b');
-			const completion_response = name_response.completion_response;
-
-			if (!completion_response) {
-				console.error('No completion response received');
-				this.init_name_status = 'initial';
-				return;
-			}
+			const {completion_response} = name_response;
 
 			const response_text = to_completion_response_text(completion_response) || '';
 

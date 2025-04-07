@@ -2,7 +2,7 @@ import {encode as tokenize} from 'gpt-tokenizer';
 import {z} from 'zod';
 
 import {Uuid} from '$lib/zod_helpers.js';
-import {get_unique_name, to_preview} from '$lib/helpers.js';
+import {to_preview} from '$lib/helpers.js';
 import {Bit_Json, type Bit_Type} from '$lib/bit.svelte.js';
 import {reorder_list} from '$lib/list_helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
@@ -39,13 +39,6 @@ export class Prompt extends Cell<typeof Prompt_Json> {
 
 	constructor(options: Prompt_Options) {
 		super(Prompt_Json, options);
-
-		// If name is provided directly in options, use it
-		if (options.name) {
-			this.name = get_unique_name(options.name, this.zzz.prompts.items.single_index('by_name'));
-		}
-
-		// Initialize from json
 		this.init();
 	}
 

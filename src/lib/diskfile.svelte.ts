@@ -55,7 +55,6 @@ export class Diskfile extends Cell<typeof Diskfile_Json> {
 
 	constructor(options: Diskfile_Options) {
 		super(Diskfile_Json, options);
-
 		this.init();
 	}
 }

@@ -5,13 +5,14 @@ export const create_client_id = (): string => Math.random().toString(36).substri
 
 export const get_unique_name = (
 	name: string,
-	// TODO BLOCK maybe change to a callback fn, `is_valid`?
-	existing_names: Array<string> | Set<string> | Map<string, any>,
+	existing_names: {has: (name: string) => boolean} | {includes: (name: string) => boolean},
 ): string => {
-	const t = 'has' in existing_names ? 'has' : 'includes';
+	const check = (existing_names as any)['has' in existing_names ? 'has' : 'includes'].bind(
+		existing_names,
+	);
 	let result = name;
 	let i = 2;
-	while ((existing_names as any)[t](result)) {
+	while (check(result)) {
 		result = `${name} ${i++}`;
 	}
 	return result;
