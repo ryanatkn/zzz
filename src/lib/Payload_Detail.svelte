@@ -3,7 +3,7 @@
 	import {strip_start} from '@ryanatkn/belt/string.js';
 
 	import Glyph from '$lib/Glyph.svelte';
-	import {GLYPH_PROMPT, GLYPH_RESPONSE, GLYPH_FILE, GLYPH_MESSAGE} from '$lib/glyphs.js';
+	import {GLYPH_PROMPT, GLYPH_RESPONSE, GLYPH_FILE, GLYPH_PAYLOAD} from '$lib/glyphs.js';
 	import type {Payload} from '$lib/payload.svelte.js';
 
 	interface Props {
@@ -22,7 +22,7 @@
 		{:else if payload.is_file_related}
 			<Glyph icon={GLYPH_FILE} /> File {payload.type}
 		{:else}
-			<Glyph icon={GLYPH_MESSAGE} /> {payload.type}
+			<Glyph icon={GLYPH_PAYLOAD} /> {payload.type}
 		{/if}
 		<small class="color_subtle ml_xs">{payload.direction}</small>
 	</div>

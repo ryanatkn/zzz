@@ -13,6 +13,7 @@
 	import Contextmenu_Copy_To_Clipboard from '$lib/Contextmenu_Copy_To_Clipboard.svelte';
 	import Bit_View from '$lib/Bit_View.svelte';
 	import {get_bit_type_glyph} from '$lib/bit_helpers.js';
+	import Contextmenu_Toggle from '$lib/Contextmenu_Toggle.svelte';
 
 	interface Props extends Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> {
 		bit: Bit_Type;
@@ -42,6 +43,8 @@
 					preview={bit.content_preview ?? undefined}
 				/>
 			{/if}
+
+			<Contextmenu_Toggle bind:enabled={bit.enabled} />
 
 			<Contextmenu_Entry run={() => (show_editor = true)}>
 				{#snippet icon()}{GLYPH_EDIT}{/snippet}

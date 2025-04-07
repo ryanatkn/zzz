@@ -18,6 +18,8 @@ export const GLYPH_DISCONNECT = '⨂';
 export const GLYPH_RETRY = '↺'; // ⟲'; // ⟲ ⟳ ⤾ ⤼ ↻
 export const GLYPH_PLACEHOLDER = '↳';
 
+export const GLYPH_CHECKMARK = '✓'; // ✓ ✔ ✗ ✖ ✕ ✘
+
 export const GLYPH_EDIT = '✎'; // ✎ ✏ ✐ ✑ ✒
 // export const GLYPH_MOVE = '⧈';
 // ⊞ ⧉ ⧈
@@ -37,7 +39,8 @@ export const GLYPH_PROMPT = '⌇'; // ⌇ ⍋  ⌭
 export const GLYPH_BIT = '┊'; //  ┊ ┋ ╎ ╏
 export const GLYPH_PROVIDER = '⨕';
 export const GLYPH_MODEL = '⊛'; // ⨹ ⨺ ⊛
-export const GLYPH_MESSAGE = '⍾';
+export const GLYPH_PAYLOAD = '⍾';
+export const GLYPH_VIEW = '⍜'; // ⦿ ⦾ ⦽ ⦼ ◉
 export const GLYPH_LOG = '⎙'; // ⎙ ⏚ ⌺ ⏏ ⍜
 export const GLYPH_TAB = '⛶';
 export const GLYPH_SITE = '⌬';
@@ -75,7 +78,7 @@ export const get_icon_for_payload_type = (type: string): string => {
 		case 'filer_change':
 			return GLYPH_FILE;
 		default:
-			return GLYPH_MESSAGE;
+			return GLYPH_PAYLOAD;
 	}
 };
 

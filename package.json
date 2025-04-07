@@ -326,6 +326,11 @@
       "svelte": "./dist/Contextmenu_Tape.svelte",
       "default": "./dist/Contextmenu_Tape.svelte"
     },
+    "./Contextmenu_Toggle.svelte": {
+      "types": "./dist/Contextmenu_Toggle.svelte.d.ts",
+      "svelte": "./dist/Contextmenu_Toggle.svelte",
+      "default": "./dist/Contextmenu_Toggle.svelte"
+    },
     "./Dashboard_Capabilities.svelte": {
       "types": "./dist/Dashboard_Capabilities.svelte.d.ts",
       "svelte": "./dist/Dashboard_Capabilities.svelte",
@@ -778,6 +783,11 @@
       "types": "./dist/Tape_Listitem.svelte.d.ts",
       "svelte": "./dist/Tape_Listitem.svelte",
       "default": "./dist/Tape_Listitem.svelte"
+    },
+    "./Tape_Toggle_Button.svelte": {
+      "types": "./dist/Tape_Toggle_Button.svelte.d.ts",
+      "svelte": "./dist/Tape_Toggle_Button.svelte",
+      "default": "./dist/Tape_Toggle_Button.svelte"
     },
     "./tape_types.js": {
       "types": "./dist/tape_types.d.ts",

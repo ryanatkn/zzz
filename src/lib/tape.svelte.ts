@@ -28,7 +28,7 @@ export class Tape extends Cell<typeof Tape_Json> {
 	});
 
 	strips: Array<Strip> = $state()!;
-	readonly strips_by_id: Map<Uuid, Strip> = $derived(new Map(this.strips.map((s) => [s.id, s])));
+	readonly strips_by_id: Map<Uuid, Strip> = $derived(new Map(this.strips.map((s) => [s.id, s]))); // TODO indexed collection
 
 	enabled: boolean = $state()!;
 

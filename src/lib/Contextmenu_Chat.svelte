@@ -7,7 +7,14 @@
 
 	import type {Chat} from '$lib/chat.svelte.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
-	import {GLYPH_CHAT, GLYPH_DELETE, GLYPH_EDIT, GLYPH_PROMPT, GLYPH_REMOVE} from '$lib/glyphs.js';
+	import {
+		GLYPH_CHAT,
+		GLYPH_DELETE,
+		GLYPH_EDIT,
+		GLYPH_PROMPT,
+		GLYPH_REMOVE,
+		GLYPH_VIEW,
+	} from '$lib/glyphs.js';
 	import Contextmenu_Copy_To_Clipboard from '$lib/Contextmenu_Copy_To_Clipboard.svelte';
 
 	interface Props extends Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> {
@@ -81,6 +88,15 @@
 			>
 				{#snippet icon()}{GLYPH_EDIT}{/snippet}
 				<span>rename chat</span>
+			</Contextmenu_Entry>
+
+			<Contextmenu_Entry
+				run={() => {
+					chat.view_mode = chat.view_mode === 'simple' ? 'multi' : 'simple';
+				}}
+			>
+				{#snippet icon()}{GLYPH_VIEW}{/snippet}
+				<span>{chat.view_mode === 'simple' ? 'multi' : 'simple'} view</span>
 			</Contextmenu_Entry>
 
 			<Contextmenu_Entry
