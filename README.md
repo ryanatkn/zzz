@@ -50,6 +50,7 @@ Browse to the location is says, probably `localhost:5173`.
 ## Roadmap
 
 - [#7 integrate database](https://github.com/ryanatkn/zzz/issues/7)
+- [#8 undo/history system](https://github.com/ryanatkn/zzz/issues/8)
 - input welcome
 
 ## Credits 🐢<sub>🐢</sub><sub><sub>🐢</sub></sub>

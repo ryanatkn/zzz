@@ -1,14 +1,14 @@
 import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Payload, Payload_Schema} from '$lib/payload.svelte.js';
+import {Action, Action_Schema} from '$lib/action.svelte.js';
 import {
-	Payload_Json,
-	type Payload_Client,
-	type Payload_Server,
-	create_payload_json,
-	Payload_Type,
-} from '$lib/payload_types.js';
+	Action_Json,
+	type Action_Client,
+	type Action_Server,
+	create_action_json,
+	Action_Type,
+} from '$lib/action_types.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {create_multi_index, create_derived_index} from '$lib/indexed_collection_helpers.js';
@@ -16,34 +16,34 @@ import {create_multi_index, create_derived_index} from '$lib/indexed_collection_
 export const HISTORY_LIMIT_DEFAULT = 512;
 export const PONG_DISPLAY_LIMIT = 6;
 
-export const Payloads_Json = z
+export const Actions_Json = z
 	.object({
 		items: cell_array(
-			z.array(Payload_Json).default(() => []),
-			'Payload',
+			z.array(Action_Json).default(() => []),
+			'Action',
 		),
 	})
 	.default(() => ({
 		items: [],
 	}));
 
-export type Payloads_Json = z.infer<typeof Payloads_Json>;
+export type Actions_Json = z.infer<typeof Actions_Json>;
 
-export interface Payloads_Options extends Cell_Options<typeof Payloads_Json> {
+export interface Actions_Options extends Cell_Options<typeof Actions_Json> {
 	history_limit?: number;
 }
 
 // Define our index keys for type safety
-export type Payload_Multi_Index_Keys = 'by_type' | 'by_ping_id';
+export type Action_Multi_Index_Keys = 'by_type' | 'by_ping_id';
 
-export class Payloads extends Cell<typeof Payloads_Json> {
+export class Actions extends Cell<typeof Actions_Json> {
 	// Configure indexed collection with unified indexing system
-	readonly items: Indexed_Collection<Payload> = new Indexed_Collection({
+	readonly items: Indexed_Collection<Action> = new Indexed_Collection({
 		indexes: [
 			// Type-based multi-index
 			create_multi_index({
 				key: 'by_type',
-				extractor: (payload) => payload.type,
+				extractor: (action) => action.type,
 				query_schema: z.enum([
 					'ping',
 					'pong',
@@ -53,21 +53,21 @@ export class Payloads extends Cell<typeof Payloads_Json> {
 					'delete_diskfile',
 					'filer_change',
 				]),
-				result_schema: Payload_Schema,
+				result_schema: Action_Schema,
 			}),
 
 			// Ping id index for pongs
 			create_multi_index({
 				key: 'by_ping_id',
-				extractor: (payload) => {
-					if (payload.type === 'pong' && payload.ping_id) {
-						return payload.ping_id;
+				extractor: (action) => {
+					if (action.type === 'pong' && action.ping_id) {
+						return action.ping_id;
 					}
 					return undefined;
 				},
 				query_schema: z.string(),
-				matches: (payload) => payload.type === 'pong' && !!payload.ping_id,
-				result_schema: Payload_Schema,
+				matches: (action) => action.type === 'pong' && !!action.ping_id,
+				result_schema: Action_Schema,
 			}),
 
 			// Derived index for latest pongs - prioritize showing most recent
@@ -80,7 +80,7 @@ export class Payloads extends Cell<typeof Payloads_Json> {
 						.slice(0, PONG_DISPLAY_LIMIT);
 				},
 				matches: (item) => item.type === 'pong',
-				result_schema: Payload_Schema,
+				result_schema: Action_Schema,
 				onadd: (items, item) => {
 					if (item.type !== 'pong') return items;
 
@@ -114,26 +114,26 @@ export class Payloads extends Cell<typeof Payloads_Json> {
 	history_limit: number = $state(HISTORY_LIMIT_DEFAULT);
 
 	// Derived collections using the indexed structure
-	readonly pings: Array<Payload> = $derived(this.items.where('by_type', 'ping'));
-	readonly pongs: Array<Payload> = $derived(this.items.where('by_type', 'pong'));
-	readonly prompts: Array<Payload> = $derived(this.items.where('by_type', 'send_prompt'));
-	readonly completions: Array<Payload> = $derived(
+	readonly pings: Array<Action> = $derived(this.items.where('by_type', 'ping'));
+	readonly pongs: Array<Action> = $derived(this.items.where('by_type', 'pong'));
+	readonly prompts: Array<Action> = $derived(this.items.where('by_type', 'send_prompt'));
+	readonly completions: Array<Action> = $derived(
 		this.items.where('by_type', 'completion_response'),
 	);
-	readonly diskfile_updates: Array<Payload> = $derived(
+	readonly diskfile_updates: Array<Action> = $derived(
 		this.items.where('by_type', 'update_diskfile'),
 	);
-	readonly diskfile_deletes: Array<Payload> = $derived(
+	readonly diskfile_deletes: Array<Action> = $derived(
 		this.items.where('by_type', 'delete_diskfile'),
 	);
-	readonly filer_changes: Array<Payload> = $derived(this.items.where('by_type', 'filer_change'));
+	readonly filer_changes: Array<Action> = $derived(this.items.where('by_type', 'filer_change'));
 
-	// Payload handlers
-	onsend?: (payload: Payload_Client) => void;
-	onreceive?: (payload: Payload_Server) => void;
+	// Action handlers
+	onsend?: (action: Action_Client) => void;
+	onreceive?: (action: Action_Server) => void;
 
-	constructor(options: Payloads_Options) {
-		super(Payloads_Json, options);
+	constructor(options: Actions_Options) {
+		super(Actions_Json, options);
 
 		// Set history limit if provided
 		if (options.history_limit !== undefined) {
@@ -158,7 +158,7 @@ export class Payloads extends Cell<typeof Payloads_Json> {
 	/**
 	 * Override to populate the indexed collection after parsing JSON.
 	 */
-	override set_json(value?: z.input<typeof Payloads_Json>): void {
+	override set_json(value?: z.input<typeof Actions_Json>): void {
 		super.set_json(value);
 
 		// Trim to history limit after loading
@@ -166,65 +166,65 @@ export class Payloads extends Cell<typeof Payloads_Json> {
 	}
 
 	/**
-	 * Send a payload using the registered handler with proper typing.
+	 * Send a action using the registered handler with proper typing.
 	 */
-	send(payload: Payload_Client): void {
+	send(action: Action_Client): void {
 		if (!this.onsend) {
-			console.error('No send handler registered', payload);
+			console.error('No send handler registered', action);
 			return;
 		}
 
-		this.add(create_payload_json(payload, 'client'));
-		this.onsend(payload);
+		this.add(create_action_json(action, 'client'));
+		this.onsend(action);
 	}
 
 	/**
-	 * Handle a received payload with proper typing.
+	 * Handle a received action with proper typing.
 	 */
-	receive(payload: Payload_Server): void {
+	receive(action: Action_Server): void {
 		if (!this.onreceive) {
 			console.error('No receive handler registered');
 			return;
 		}
 
-		this.add(create_payload_json(payload, 'server'));
-		this.onreceive(payload);
+		this.add(create_action_json(action, 'server'));
+		this.onreceive(action);
 	}
 
 	/**
-	 * Add a payload to the collection.
+	 * Add a action to the collection.
 	 */
-	add(payload_json: Payload_Json): Payload {
-		const payload = new Payload({zzz: this.zzz, json: payload_json});
-		this.items.add(payload);
+	add(action_json: Action_Json): Action {
+		const action = new Action({zzz: this.zzz, json: action_json});
+		this.items.add(action);
 
 		// Trim collection if it exceeds history limit
 		this.#trim_to_history_limit();
 
-		return payload;
+		return action;
 	}
 
 	/**
-	 * Get the latest N payloads of a specific type.
+	 * Get the latest N actions of a specific type.
 	 *
-	 * @param type The payload type to filter by
-	 * @param limit Maximum number of payloads to return (defaults to history_limit)
-	 * @returns Array of payloads matching the type
+	 * @param type The action type to filter by
+	 * @param limit Maximum number of actions to return (defaults to history_limit)
+	 * @returns Array of actions matching the type
 	 */
-	get_latest_by_type(type: Payload_Type, limit: number = this.history_limit): Array<Payload> {
+	get_latest_by_type(type: Action_Type, limit: number = this.history_limit): Array<Action> {
 		return this.items.latest('by_type', type, limit);
 	}
 
 	/**
-	 * Trims the collection to the maximum allowed size by removing oldest payloads.
+	 * Trims the collection to the maximum allowed size by removing oldest actions.
 	 */
 	#trim_to_history_limit(): void {
 		// Calculate how many items to remove and use the optimized method
 		const excess = this.items.size - this.history_limit;
 		if (excess <= 0) return;
 		const ids = [];
-		for (const payload of this.items.by_id.values()) {
-			ids.push(payload.id);
+		for (const action of this.items.by_id.values()) {
+			ids.push(action.id);
 			if (ids.length === excess) break;
 		}
 		this.items.remove_many(ids);

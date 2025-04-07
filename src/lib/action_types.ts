@@ -5,10 +5,10 @@ import {Datetime_Now, Uuid} from '$lib/zod_helpers.js';
 import {Provider_Name} from '$lib/provider_types.js';
 import {Cell_Json} from '$lib/cell_types.js';
 
-export const Payload_Direction = z.enum(['client', 'server', 'both']);
-export type Payload_Direction = z.infer<typeof Payload_Direction>;
+export const Action_Direction = z.enum(['client', 'server', 'both']);
+export type Action_Direction = z.infer<typeof Action_Direction>;
 
-export const Payload_Type = z.enum([
+export const Action_Type = z.enum([
 	'ping',
 	'pong',
 	'load_session',
@@ -20,14 +20,14 @@ export const Payload_Type = z.enum([
 	'delete_diskfile',
 	'create_directory',
 ]);
-export type Payload_Type = z.infer<typeof Payload_Type>;
+export type Action_Type = z.infer<typeof Action_Type>;
 
-// Define schema for tape history payload
-export const Payload_Tape_History = z.object({
+// Define schema for tape history action
+export const Action_Tape_History = z.object({
 	role: z.enum(['user', 'system', 'assistant']),
 	content: z.string(),
 });
-export type Payload_Tape_History = z.infer<typeof Payload_Tape_History>;
+export type Action_Tape_History = z.infer<typeof Action_Tape_History>;
 
 // TODO these types need work
 // Define explicit interfaces for provider-specific data
@@ -38,7 +38,7 @@ export interface Provider_Data_Ollama {
 
 export interface Provider_Data_Claude {
 	type: 'claude';
-	value: any; // Payload from Anthropic - must be required
+	value: any; // Action from Anthropic - must be required
 }
 
 export interface Provider_Data_Chatgpt {
@@ -106,7 +106,7 @@ export const Completion_Request = z.object({
 	provider_name: Provider_Name,
 	model: z.string(),
 	prompt: z.string(),
-	tape_history: z.array(Payload_Tape_History).optional(),
+	tape_history: z.array(Action_Tape_History).optional(),
 });
 export type Completion_Request = z.infer<typeof Completion_Request>;
 
@@ -119,34 +119,34 @@ export const Completion_Response = z.object({
 });
 export type Completion_Response = z.infer<typeof Completion_Response>;
 
-// Base payload schema
-export const Payload_Base = z
+// Base action schema
+export const Action_Base = z
 	.object({
 		id: Uuid,
-		type: Payload_Type,
+		type: Action_Type,
 	})
 	.strict();
-export type Payload_Base = z.infer<typeof Payload_Base>;
+export type Action_Base = z.infer<typeof Action_Base>;
 
-// Ping/Pong payload schemas
-export const Payload_Ping = Payload_Base.extend({
+// Ping/Pong action schemas
+export const Action_Ping = Action_Base.extend({
 	type: z.literal('ping').default('ping'),
 }).strict();
-export type Payload_Ping = z.infer<typeof Payload_Ping>;
+export type Action_Ping = z.infer<typeof Action_Ping>;
 
-export const Payload_Pong = Payload_Base.extend({
+export const Action_Pong = Action_Base.extend({
 	type: z.literal('pong').default('pong'),
 	ping_id: Uuid,
 }).strict();
-export type Payload_Pong = z.infer<typeof Payload_Pong>;
+export type Action_Pong = z.infer<typeof Action_Pong>;
 
-// Session related payload schemas
-export const Payload_Load_Session = Payload_Base.extend({
+// Session related action schemas
+export const Action_Load_Session = Action_Base.extend({
 	type: z.literal('load_session').default('load_session'),
 }).strict();
-export type Payload_Load_Session = z.infer<typeof Payload_Load_Session>;
+export type Action_Load_Session = z.infer<typeof Action_Load_Session>;
 
-export const Payload_Loaded_Session = Payload_Base.extend({
+export const Action_Loaded_Session = Action_Base.extend({
 	type: z.literal('loaded_session').default('loaded_session'),
 	data: z
 		.object({
@@ -155,7 +155,7 @@ export const Payload_Loaded_Session = Payload_Base.extend({
 		})
 		.strict(),
 }).strict();
-export type Payload_Loaded_Session = z.infer<typeof Payload_Loaded_Session>;
+export type Action_Loaded_Session = z.infer<typeof Action_Loaded_Session>;
 
 // Define schema for diskfile change
 export const Diskfile_Change = z
@@ -166,85 +166,85 @@ export const Diskfile_Change = z
 	.strict();
 export type Diskfile_Change = z.infer<typeof Diskfile_Change>;
 
-// File related payload schemas
-export const Payload_Filer_Change = Payload_Base.extend({
+// File related action schemas
+export const Action_Filer_Change = Action_Base.extend({
 	type: z.literal('filer_change').default('filer_change'),
 	change: Diskfile_Change,
 	source_file: Source_File,
 }).strict();
-export type Payload_Filer_Change = z.infer<typeof Payload_Filer_Change>;
+export type Action_Filer_Change = z.infer<typeof Action_Filer_Change>;
 
-export const Payload_Update_Diskfile = Payload_Base.extend({
+export const Action_Update_Diskfile = Action_Base.extend({
 	type: z.literal('update_diskfile').default('update_diskfile'),
 	path: Diskfile_Path,
 	content: z.string(),
 }).strict();
-export type Payload_Update_Diskfile = z.infer<typeof Payload_Update_Diskfile>;
+export type Action_Update_Diskfile = z.infer<typeof Action_Update_Diskfile>;
 
-export const Payload_Delete_Diskfile = Payload_Base.extend({
+export const Action_Delete_Diskfile = Action_Base.extend({
 	type: z.literal('delete_diskfile').default('delete_diskfile'),
 	path: Diskfile_Path,
 }).strict();
-export type Payload_Delete_Diskfile = z.infer<typeof Payload_Delete_Diskfile>;
+export type Action_Delete_Diskfile = z.infer<typeof Action_Delete_Diskfile>;
 
-export const Payload_Create_Directory = Payload_Base.extend({
+export const Action_Create_Directory = Action_Base.extend({
 	type: z.literal('create_directory').default('create_directory'),
 	path: Diskfile_Path,
 }).strict();
-export type Payload_Create_Directory = z.infer<typeof Payload_Create_Directory>;
+export type Action_Create_Directory = z.infer<typeof Action_Create_Directory>;
 
-// Completion related payload schemas
-export const Payload_Send_Prompt = Payload_Base.extend({
+// Completion related action schemas
+export const Action_Send_Prompt = Action_Base.extend({
 	type: z.literal('send_prompt').default('send_prompt'),
 	completion_request: Completion_Request,
 }).strict();
-export type Payload_Send_Prompt = z.infer<typeof Payload_Send_Prompt>;
+export type Action_Send_Prompt = z.infer<typeof Action_Send_Prompt>;
 
-export const Payload_Completion_Response = Payload_Base.extend({
+export const Action_Completion_Response = Action_Base.extend({
 	type: z.literal('completion_response').default('completion_response'),
 	completion_response: Completion_Response,
 }).strict();
-export type Payload_Completion_Response = z.infer<typeof Payload_Completion_Response>;
+export type Action_Completion_Response = z.infer<typeof Action_Completion_Response>;
 
-// Union of all client payload types
-export const Payload_Client = z.discriminatedUnion('type', [
-	Payload_Ping,
-	Payload_Load_Session,
-	Payload_Send_Prompt,
-	Payload_Update_Diskfile,
-	Payload_Delete_Diskfile,
-	Payload_Create_Directory,
+// Union of all client action types
+export const Action_Client = z.discriminatedUnion('type', [
+	Action_Ping,
+	Action_Load_Session,
+	Action_Send_Prompt,
+	Action_Update_Diskfile,
+	Action_Delete_Diskfile,
+	Action_Create_Directory,
 ]);
-export type Payload_Client = z.infer<typeof Payload_Client>;
+export type Action_Client = z.infer<typeof Action_Client>;
 
-// Union of all server payload types
-export const Payload_Server = z.discriminatedUnion('type', [
-	Payload_Pong,
-	Payload_Loaded_Session,
-	Payload_Filer_Change,
-	Payload_Completion_Response,
+// Union of all server action types
+export const Action_Server = z.discriminatedUnion('type', [
+	Action_Pong,
+	Action_Loaded_Session,
+	Action_Filer_Change,
+	Action_Completion_Response,
 ]);
-export type Payload_Server = z.infer<typeof Payload_Server>;
+export type Action_Server = z.infer<typeof Action_Server>;
 
-// Union of all payload types
-export const Payload = z.discriminatedUnion('type', [
-	Payload_Ping,
-	Payload_Pong,
-	Payload_Load_Session,
-	Payload_Loaded_Session,
-	Payload_Filer_Change,
-	Payload_Send_Prompt,
-	Payload_Completion_Response,
-	Payload_Update_Diskfile,
-	Payload_Delete_Diskfile,
-	Payload_Create_Directory,
+// Union of all action types
+export const Action = z.discriminatedUnion('type', [
+	Action_Ping,
+	Action_Pong,
+	Action_Load_Session,
+	Action_Loaded_Session,
+	Action_Filer_Change,
+	Action_Send_Prompt,
+	Action_Completion_Response,
+	Action_Update_Diskfile,
+	Action_Delete_Diskfile,
+	Action_Create_Directory,
 ]);
-export type Payload = z.infer<typeof Payload>;
+export type Action = z.infer<typeof Action>;
 
-// Payload with metadata schema
-export const Payload_Json = Cell_Json.extend({
-	type: Payload_Type,
-	direction: Payload_Direction,
+// Action with metadata schema
+export const Action_Json = Cell_Json.extend({
+	type: Action_Type,
+	direction: Action_Direction,
 	// Optional fields with proper type checking
 	ping_id: Uuid.optional(),
 	completion_request: Completion_Request.optional(),
@@ -255,16 +255,13 @@ export const Payload_Json = Cell_Json.extend({
 	source_file: Source_File.optional(),
 	data: z.record(z.string(), z.any()).optional(),
 }).strict();
-export type Payload_Json = z.infer<typeof Payload_Json>;
+export type Action_Json = z.infer<typeof Action_Json>;
 
-// Helper function to create a payload with json representation
-export const create_payload_json = (
-	payload: Payload,
-	direction: Payload_Direction,
-): Payload_Json => {
+// Helper function to create a action with json representation
+export const create_action_json = (action: Action, direction: Action_Direction): Action_Json => {
 	return {
-		...payload,
+		...action,
 		direction,
 		created: Datetime_Now.parse(undefined),
-	} as Payload_Json;
+	} as Action_Json;
 };

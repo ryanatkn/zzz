@@ -4,7 +4,7 @@ import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Datetime_Now, Uuid} from '$lib/zod_helpers.js';
-import {Completion_Request, Completion_Response} from '$lib/payload_types.js';
+import {Completion_Request, Completion_Response} from '$lib/action_types.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import type {Bit_Type} from '$lib/bit.svelte.js';
 import type {Zzz} from '$lib/zzz.svelte.js';

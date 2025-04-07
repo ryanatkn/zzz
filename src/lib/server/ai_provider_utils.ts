@@ -1,11 +1,11 @@
-import type {Payload_Tape_History} from '$lib/payload_types.js';
+import type {Action_Tape_History} from '$lib/action_types.js';
 
 /**
  * Format messages for the Ollama API.
  */
 export const format_ollama_messages = (
 	system_message: string,
-	tape_history: Array<Payload_Tape_History> | undefined,
+	tape_history: Array<Action_Tape_History> | undefined,
 	prompt: string,
 ): Array<{role: string; content: string}> => {
 	return [
@@ -19,7 +19,7 @@ export const format_ollama_messages = (
  * Format messages for the Claude API.
  */
 export const format_claude_messages = (
-	tape_history: Array<Payload_Tape_History> | undefined,
+	tape_history: Array<Action_Tape_History> | undefined,
 	prompt: string,
 ): Array<{role: 'user' | 'assistant'; content: Array<{type: 'text'; text: string}>}> => {
 	const claude_messages = [];
@@ -51,7 +51,7 @@ export const format_claude_messages = (
  */
 export const format_openai_messages = (
 	system_message: string,
-	tape_history: Array<Payload_Tape_History> | undefined,
+	tape_history: Array<Action_Tape_History> | undefined,
 	prompt: string,
 	model: string,
 ): Array<{role: 'system' | 'user' | 'assistant'; content: string}> => {
@@ -89,7 +89,7 @@ export const format_openai_messages = (
  * Format messages for the Gemini API.
  */
 export const format_gemini_messages = (
-	tape_history: Array<Payload_Tape_History> | undefined,
+	tape_history: Array<Action_Tape_History> | undefined,
 	prompt: string,
 ): string => {
 	// For Gemini, format history as a string if available

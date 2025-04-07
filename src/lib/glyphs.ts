@@ -39,7 +39,7 @@ export const GLYPH_PROMPT = '⌇'; // ⌇ ⍋  ⌭
 export const GLYPH_BIT = '┊'; //  ┊ ┋ ╎ ╏
 export const GLYPH_PROVIDER = '⨕';
 export const GLYPH_MODEL = '⊛'; // ⨹ ⨺ ⊛
-export const GLYPH_PAYLOAD = '⍾';
+export const GLYPH_ACTION = '⍾';
 export const GLYPH_VIEW = '⍜'; // ⦿ ⦾ ⦽ ⦼ ◉
 export const GLYPH_LOG = '⎙'; // ⎙ ⏚ ⌺ ⏏ ⍜
 export const GLYPH_TAB = '⛶';
@@ -62,7 +62,7 @@ export const GLYPH_EXTERNAL_LINK = '🡵';
 export const GLYPH_ARROW_RIGHT = '→'; // → ➝ ➞ ➜ ➡ ⟶ ⭢ ⤷ ⤳ ⥅ ⮕ ⭆ ⮞ ⭆ ⭈ ⤞ ⤠
 export const GLYPH_ARROW_LEFT = '←'; // ← ⭠
 
-export const get_icon_for_payload_type = (type: string): string => {
+export const get_icon_for_action_type = (type: string): string => {
 	switch (type) {
 		case 'echo':
 			return GLYPH_ECHO;
@@ -78,7 +78,7 @@ export const get_icon_for_payload_type = (type: string): string => {
 		case 'filer_change':
 			return GLYPH_FILE;
 		default:
-			return GLYPH_PAYLOAD;
+			return GLYPH_ACTION;
 	}
 };
 

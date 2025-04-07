@@ -563,42 +563,42 @@
       "types": "./dist/ollama.d.ts",
       "default": "./dist/ollama.js"
     },
-    "./Payload_Detail.svelte": {
-      "types": "./dist/Payload_Detail.svelte.d.ts",
-      "svelte": "./dist/Payload_Detail.svelte",
-      "default": "./dist/Payload_Detail.svelte"
+    "./Action_Detail.svelte": {
+      "types": "./dist/Action_Detail.svelte.d.ts",
+      "svelte": "./dist/Action_Detail.svelte",
+      "default": "./dist/Action_Detail.svelte"
     },
-    "./Payload_Info.svelte": {
-      "types": "./dist/Payload_Info.svelte.d.ts",
-      "svelte": "./dist/Payload_Info.svelte",
-      "default": "./dist/Payload_Info.svelte"
+    "./Action_Info.svelte": {
+      "types": "./dist/Action_Info.svelte.d.ts",
+      "svelte": "./dist/Action_Info.svelte",
+      "default": "./dist/Action_Info.svelte"
     },
-    "./Payload_List.svelte": {
-      "types": "./dist/Payload_List.svelte.d.ts",
-      "svelte": "./dist/Payload_List.svelte",
-      "default": "./dist/Payload_List.svelte"
+    "./Action_List.svelte": {
+      "types": "./dist/Action_List.svelte.d.ts",
+      "svelte": "./dist/Action_List.svelte",
+      "default": "./dist/Action_List.svelte"
     },
-    "./Payload_Summary.svelte": {
-      "types": "./dist/Payload_Summary.svelte.d.ts",
-      "svelte": "./dist/Payload_Summary.svelte",
-      "default": "./dist/Payload_Summary.svelte"
+    "./Action_Summary.svelte": {
+      "types": "./dist/Action_Summary.svelte.d.ts",
+      "svelte": "./dist/Action_Summary.svelte",
+      "default": "./dist/Action_Summary.svelte"
     },
-    "./payload_types.js": {
-      "types": "./dist/payload_types.d.ts",
-      "default": "./dist/payload_types.js"
+    "./action_types.js": {
+      "types": "./dist/action_types.d.ts",
+      "default": "./dist/action_types.js"
     },
-    "./Payload_View.svelte": {
-      "types": "./dist/Payload_View.svelte.d.ts",
-      "svelte": "./dist/Payload_View.svelte",
-      "default": "./dist/Payload_View.svelte"
+    "./Action_View.svelte": {
+      "types": "./dist/Action_View.svelte.d.ts",
+      "svelte": "./dist/Action_View.svelte",
+      "default": "./dist/Action_View.svelte"
     },
-    "./payload.svelte.js": {
-      "types": "./dist/payload.svelte.d.ts",
-      "default": "./dist/payload.svelte.js"
+    "./action.svelte.js": {
+      "types": "./dist/action.svelte.d.ts",
+      "default": "./dist/action.svelte.js"
     },
-    "./payloads.svelte.js": {
-      "types": "./dist/payloads.svelte.d.ts",
-      "default": "./dist/payloads.svelte.js"
+    "./actions.svelte.js": {
+      "types": "./dist/actions.svelte.d.ts",
+      "default": "./dist/actions.svelte.js"
     },
     "./Picker.svelte": {
       "types": "./dist/Picker.svelte.d.ts",

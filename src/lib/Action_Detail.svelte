@@ -3,77 +3,77 @@
 	import {strip_start} from '@ryanatkn/belt/string.js';
 
 	import Glyph from '$lib/Glyph.svelte';
-	import {GLYPH_PROMPT, GLYPH_RESPONSE, GLYPH_FILE, GLYPH_PAYLOAD} from '$lib/glyphs.js';
-	import type {Payload} from '$lib/payload.svelte.js';
+	import {GLYPH_PROMPT, GLYPH_RESPONSE, GLYPH_FILE, GLYPH_ACTION} from '$lib/glyphs.js';
+	import type {Action} from '$lib/action.svelte.js';
 
 	interface Props {
-		payload: Payload;
+		action: Action;
 	}
 
-	const {payload}: Props = $props();
+	const {action}: Props = $props();
 </script>
 
 <div class="mb_md">
 	<div class="size_lg">
-		{#if payload.is_prompt}
+		{#if action.is_prompt}
 			<Glyph icon={GLYPH_PROMPT} /> Prompt
-		{:else if payload.is_completion}
+		{:else if action.is_completion}
 			<Glyph icon={GLYPH_RESPONSE} /> Response
-		{:else if payload.is_file_related}
-			<Glyph icon={GLYPH_FILE} /> File {payload.type}
+		{:else if action.is_file_related}
+			<Glyph icon={GLYPH_FILE} /> File {action.type}
 		{:else}
-			<Glyph icon={GLYPH_PAYLOAD} /> {payload.type}
+			<Glyph icon={GLYPH_ACTION} /> {action.type}
 		{/if}
-		<small class="color_subtle ml_xs">{payload.direction}</small>
+		<small class="color_subtle ml_xs">{action.direction}</small>
 	</div>
 	<div class="flex flex_column gap_xs mt_sm">
-		<small class="font_mono">ID: {payload.id}</small>
+		<small class="font_mono">ID: {action.id}</small>
 		<small class="font_mono"
-			>created {payload.created_formatted_date} {payload.created_formatted_time}</small
+			>created {action.created_formatted_date} {action.created_formatted_time}</small
 		>
-		<small class="font_mono">type: {payload.type}</small>
-		<small class="font_mono">direction: {payload.direction}</small>
+		<small class="font_mono">type: {action.type}</small>
+		<small class="font_mono">direction: {action.direction}</small>
 	</div>
 </div>
 
 <div class="flex gap_md mb_sm">
-	<Copy_To_Clipboard text={JSON.stringify(payload.json, null, 2)} attrs={{class: 'plain'}} />
+	<Copy_To_Clipboard text={JSON.stringify(action.json, null, 2)} attrs={{class: 'plain'}} />
 </div>
 
-{#if payload.is_pong}
+{#if action.is_pong}
 	<section class="pb_md border_bottom">
 		<h3 class="mt_0 mb_sm">Ping Response</h3>
 		<div class="field_row">
 			<div class="font_weight_600 color_text_subtle">Ping id</div>
-			<div class="font_mono word_break_break_word">{payload.ping_id}</div>
+			<div class="font_mono word_break_break_word">{action.ping_id}</div>
 		</div>
 	</section>
-{:else if payload.is_prompt}
+{:else if action.is_prompt}
 	<section class="pb_md border_bottom">
 		<h3 class="mt_0 mb_sm">Prompt</h3>
-		<pre class="font_mono size_sm white_space_pre_wrap word_break_break_word p_sm w_100">{payload
+		<pre class="font_mono size_sm white_space_pre_wrap word_break_break_word p_sm w_100">{action
 				.prompt_data?.prompt || 'No prompt'}</pre>
 
 		<h3>Request Details</h3>
 		<div class="flex flex_column gap_xs">
 			<div class="field_row">
 				<div class="font_weight_600 color_text_subtle">Model</div>
-				<div>{payload.prompt_data?.model || 'Unknown'}</div>
+				<div>{action.prompt_data?.model || 'Unknown'}</div>
 			</div>
 			<div class="field_row">
 				<div class="font_weight_600 color_text_subtle">Provider</div>
-				<div>{payload.prompt_data?.provider_name || 'Unknown'}</div>
+				<div>{action.prompt_data?.provider_name || 'Unknown'}</div>
 			</div>
 			<div class="field_row">
 				<div class="font_weight_600 color_text_subtle">Created</div>
-				<div>{payload.prompt_data?.created || 'Unknown'}</div>
+				<div>{action.prompt_data?.created || 'Unknown'}</div>
 			</div>
 			<div class="field_row">
 				<div class="font_weight_600 color_text_subtle">Request id</div>
-				<div class="font_mono">{payload.prompt_data?.request_id || 'Unknown'}</div>
+				<div class="font_mono">{action.prompt_data?.request_id || 'Unknown'}</div>
 			</div>
-			{#if payload.json.completion_request && 'options' in payload.json.completion_request}
-				{#each Object.entries(payload.json.completion_request.options || {}) as [key, value]}
+			{#if action.json.completion_request && 'options' in action.json.completion_request}
+				{#each Object.entries(action.json.completion_request.options || {}) as [key, value]}
 					<div class="field_row">
 						<div class="font_weight_600 color_text_subtle">{key}</div>
 						<div>{JSON.stringify(value)}</div>
@@ -82,106 +82,106 @@
 			{/if}
 		</div>
 	</section>
-{:else if payload.is_completion}
+{:else if action.is_completion}
 	<section class="pb_md border_bottom">
 		<h3 class="mt_0 mb_sm">Completion</h3>
 		<pre
-			class="font_mono size_sm white_space_pre_wrap word_break_break_word p_sm w_100">{payload.completion_text ||
+			class="font_mono size_sm white_space_pre_wrap word_break_break_word p_sm w_100">{action.completion_text ||
 				'No completion'}</pre>
 
 		<h3>Response Details</h3>
 		<div class="flex flex_column gap_xs">
 			<div class="field_row">
 				<div class="font_weight_600 color_text_subtle">Request id</div>
-				<div class="font_mono">{payload.completion_data?.request_id || 'Unknown'}</div>
+				<div class="font_mono">{action.completion_data?.request_id || 'Unknown'}</div>
 			</div>
 			<div class="field_row">
 				<div class="font_weight_600 color_text_subtle">Created</div>
-				<div>{payload.completion_data?.created || 'Unknown'}</div>
+				<div>{action.completion_data?.created || 'Unknown'}</div>
 			</div>
 			<div class="field_row">
 				<div class="font_weight_600 color_text_subtle">Model</div>
-				<div>{payload.completion_data?.model || 'Unknown'}</div>
+				<div>{action.completion_data?.model || 'Unknown'}</div>
 			</div>
 			<div class="field_row">
 				<div class="font_weight_600 color_text_subtle">Provider</div>
-				<div>{payload.completion_data?.provider_name || 'Unknown'}</div>
+				<div>{action.completion_data?.provider_name || 'Unknown'}</div>
 			</div>
-			{#if payload.json.completion_response?.data}
-				{#if payload.json.completion_response.data.type === 'ollama'}
+			{#if action.json.completion_response?.data}
+				{#if action.json.completion_response.data.type === 'ollama'}
 					<div class="field_row">
 						<div class="font_weight_600 color_text_subtle">Total Duration</div>
-						<div>{payload.json.completion_response.data.value.total_duration || 'Unknown'}</div>
+						<div>{action.json.completion_response.data.value.total_duration || 'Unknown'}</div>
 					</div>
-				{:else if payload.json.completion_response.data.type === 'claude' && payload.json.completion_response.data.value.usage}
+				{:else if action.json.completion_response.data.type === 'claude' && action.json.completion_response.data.value.usage}
 					<div class="field_row">
 						<div class="font_weight_600 color_text_subtle">Input Tokens</div>
-						<div>{payload.json.completion_response.data.value.usage.input_tokens || 0}</div>
+						<div>{action.json.completion_response.data.value.usage.input_tokens || 0}</div>
 					</div>
 					<div class="field_row">
 						<div class="font_weight_600 color_text_subtle">Output Tokens</div>
-						<div>{payload.json.completion_response.data.value.usage.output_tokens || 0}</div>
+						<div>{action.json.completion_response.data.value.usage.output_tokens || 0}</div>
 					</div>
-				{:else if payload.json.completion_response.data.type === 'chatgpt' && payload.json.completion_response.data.value.usage}
+				{:else if action.json.completion_response.data.type === 'chatgpt' && action.json.completion_response.data.value.usage}
 					<div class="field_row">
 						<div class="font_weight_600 color_text_subtle">Prompt Tokens</div>
-						<div>{payload.json.completion_response.data.value.usage.prompt_tokens || 0}</div>
+						<div>{action.json.completion_response.data.value.usage.prompt_tokens || 0}</div>
 					</div>
 					<div class="field_row">
 						<div class="font_weight_600 color_text_subtle">Completion Tokens</div>
-						<div>{payload.json.completion_response.data.value.usage.completion_tokens || 0}</div>
+						<div>{action.json.completion_response.data.value.usage.completion_tokens || 0}</div>
 					</div>
 					<div class="field_row">
 						<div class="font_weight_600 color_text_subtle">Total Tokens</div>
-						<div>{payload.json.completion_response.data.value.usage.total_tokens || 0}</div>
+						<div>{action.json.completion_response.data.value.usage.total_tokens || 0}</div>
 					</div>
-				{:else if payload.json.completion_response.data.type === 'gemini'}
+				{:else if action.json.completion_response.data.type === 'gemini'}
 					<div class="field_row">
 						<div class="font_weight_600 color_text_subtle">Total Tokens</div>
 						<div>
-							{payload.json.completion_response.data.value.usage_metadata?.totalTokenCount || 0}
+							{action.json.completion_response.data.value.usage_metadata?.totalTokenCount || 0}
 						</div>
 					</div>
 				{/if}
 			{/if}
 		</div>
 	</section>
-{:else if payload.is_file_related}
+{:else if action.is_file_related}
 	<section class="pb_md border_bottom">
 		<h3>file information</h3>
 		<div class="flex flex_column gap_xs">
-			{#if payload.path}
+			{#if action.path}
 				<div class="field_row">
 					<div class="font_weight_600 color_text_subtle">Path</div>
-					<div class="font_mono word_break_break_word">{payload.path}</div>
+					<div class="font_mono word_break_break_word">{action.path}</div>
 				</div>
 			{/if}
-			{#if payload.content !== undefined}
+			{#if action.content !== undefined}
 				<div class="field_row">
 					<div class="font_weight_600 color_text_subtle">Size</div>
-					<div>{payload.content.length || 0} characters</div>
+					<div>{action.content.length || 0} characters</div>
 				</div>
 				<h4 class="mt_sm mb_xs">Contents</h4>
 				<pre
 					class="font_mono size_sm white_space_pre_wrap word_break_break_word p_sm w_100 overflow_auto scrollbar_width_thin"
-					style:max-height="300px">{payload.content || ''}</pre>
+					style:max-height="300px">{action.content || ''}</pre>
 			{/if}
-			{#if payload.change}
+			{#if action.change}
 				<div class="field_row">
 					<div class="font_weight_600 color_text_subtle">Change Type</div>
-					<div>{payload.change.type || 'Unknown'}</div>
+					<div>{action.change.type || 'Unknown'}</div>
 				</div>
 			{/if}
 		</div>
 	</section>
-{:else if payload.is_session}
+{:else if action.is_session}
 	<section class="pb_md border_bottom">
 		<h3>session information</h3>
-		{#if payload.data}
-			{#if payload.type === 'loaded_session' && payload.data.files}
+		{#if action.data}
+			{#if action.type === 'loaded_session' && action.data.files}
 				<div class="field_row">
 					<div class="font_weight_600 color_text_subtle">files loaded</div>
-					<div>{Object.keys(payload.data.files).length}</div>
+					<div>{Object.keys(action.data.files).length}</div>
 				</div>
 
 				<h4 class="mt_sm mb_xs">files</h4>
@@ -194,7 +194,7 @@
 							</tr>
 						</thead>
 						<tbody>
-							{#each payload.data.files as file_data}
+							{#each action.data.files as file_data}
 								<tr>
 									<td class="p_xs font_mono size_sm"
 										>{strip_start(file_data.id, file_data.source_dir)}</td
@@ -216,20 +216,20 @@
 				<div class="w_100">
 					<pre
 						class="font_mono size_sm white_space_pre_wrap word_break_break_word p_sm w_100 overflow_auto scrollbar_width_thin"
-						style:max-height="300px">{JSON.stringify(payload.data, null, 2)}</pre>
+						style:max-height="300px">{JSON.stringify(action.data, null, 2)}</pre>
 				</div>
 			{/if}
 		{:else}
-			<p>session {payload.type === 'load_session' ? 'loading request' : 'data unavailable'}</p>
+			<p>session {action.type === 'load_session' ? 'loading request' : 'data unavailable'}</p>
 		{/if}
 	</section>
 {/if}
 
 <section>
-	<h3>raw payload data</h3>
+	<h3>raw action data</h3>
 	<pre
 		class="font_mono size_sm white_space_pre_wrap word_break_break_word p_sm w_100">{JSON.stringify(
-			payload.json,
+			action.json,
 			null,
 			2,
 		)}</pre>

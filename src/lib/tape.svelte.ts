@@ -9,7 +9,7 @@ import {render_tape} from '$lib/tape_helpers.js';
 import {type Bit_Type} from '$lib/bit.svelte.js';
 import {HANDLED} from '$lib/cell_helpers.js';
 import {to_completion_response_text} from '$lib/response_helpers.js';
-import {Completion_Request, type Completion_Response} from '$lib/payload_types.js';
+import {Completion_Request, type Completion_Response} from '$lib/action_types.js';
 import {to_preview} from '$lib/helpers.js';
 
 // TODO add `tape.name` probably

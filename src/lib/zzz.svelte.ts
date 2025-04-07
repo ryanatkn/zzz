@@ -7,12 +7,12 @@ import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
 import {strip_end, strip_start} from '@ryanatkn/belt/string.js';
 
 import type {
-	Payload_Send_Prompt,
-	Payload_Completion_Response,
-	Payload_Client,
-	Payload_Server,
-	Payload_Loaded_Session,
-} from '$lib/payload_types.js';
+	Action_Send_Prompt,
+	Action_Completion_Response,
+	Action_Client,
+	Action_Server,
+	Action_Loaded_Session,
+} from '$lib/action_types.js';
 import {Provider, type Provider_Json} from '$lib/provider.svelte.js';
 import type {Provider_Name} from '$lib/provider_types.js';
 import {Uuid, Datetime_Now} from '$lib/zod_helpers.js';
@@ -21,7 +21,7 @@ import {Chats} from '$lib/chats.svelte.js';
 import {Tapes} from '$lib/tapes.svelte.js';
 import {Providers} from '$lib/providers.svelte.js';
 import {Diskfiles} from '$lib/diskfiles.svelte.js';
-import {Payloads} from '$lib/payloads.svelte.js';
+import {Actions} from '$lib/actions.svelte.js';
 import type {Model_Json} from '$lib/model.svelte.js';
 import {Cell_Registry} from '$lib/cell_registry.svelte.js';
 import {Prompts} from '$lib/prompts.svelte.js';
@@ -51,8 +51,8 @@ export type Zzz_Json = z.infer<typeof Zzz_Json>;
 // Special options type for Zzz to handle circular reference
 export interface Zzz_Options extends Omit<Cell_Options<typeof Zzz_Json>, 'zzz'> {
 	zzz?: Zzz; // Make zzz optional for Zzz initialization
-	onsend?: (message: Payload_Client) => void;
-	onreceive?: (message: Payload_Server) => void;
+	onsend?: (message: Action_Client) => void;
+	onreceive?: (message: Action_Server) => void;
 	models?: Array<Model_Json>;
 	bots?: Zzz_Config['bots'];
 	providers?: Array<Provider_Json>;
@@ -61,10 +61,10 @@ export interface Zzz_Options extends Omit<Cell_Options<typeof Zzz_Json>, 'zzz'> 
 }
 
 /**
- * Payload with history structure for conversation context.
+ * Action with history structure for conversation context.
  * Use explicit union type rather than string to match the expected role values.
  */
-export interface Payload_With_History {
+export interface Action_With_History {
 	role: 'user' | 'system' | 'assistant';
 	content: string;
 }
@@ -89,7 +89,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	readonly prompts: Prompts;
 	readonly bits: Bits;
 	readonly diskfiles: Diskfiles;
-	readonly payloads: Payloads;
+	readonly actions: Actions;
 	readonly socket: Socket;
 	readonly url_params: Url_Params;
 	readonly capabilities: Capabilities;
@@ -130,8 +130,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	});
 
 	// Runtime-only state (not serialized)
-	readonly pending_prompts: SvelteMap<Uuid, Deferred<Payload_Completion_Response>> =
-		new SvelteMap();
+	readonly pending_prompts: SvelteMap<Uuid, Deferred<Action_Completion_Response>> = new SvelteMap();
 
 	// Store Diskfile_History objects by file path
 	readonly diskfile_histories: SvelteMap<Diskfile_Path, Diskfile_History> = new SvelteMap();
@@ -162,7 +161,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		this.prompts = new Prompts({zzz: this});
 		this.bits = new Bits({zzz: this});
 		this.diskfiles = new Diskfiles({zzz: this});
-		this.payloads = new Payloads({zzz: this});
+		this.actions = new Actions({zzz: this});
 		this.socket = new Socket({zzz: this});
 		this.url_params = new Url_Params({zzz: this});
 		this.capabilities = new Capabilities({zzz: this});
@@ -184,10 +183,10 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 
 		// Set up message handlers if provided
 		if (options.onsend) {
-			this.payloads.onsend = options.onsend;
+			this.actions.onsend = options.onsend;
 		}
 		if (options.onreceive) {
-			this.payloads.onreceive = options.onreceive;
+			this.actions.onreceive = options.onreceive;
 		}
 
 		// Add providers if provided in options
@@ -213,10 +212,10 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		prompt: string,
 		provider_name: Provider_Name,
 		model: string,
-		tape_history?: Array<Payload_With_History>,
-	): Promise<Payload_Completion_Response> {
+		tape_history?: Array<Action_With_History>,
+	): Promise<Action_Completion_Response> {
 		const request_id = Uuid.parse(undefined);
-		const message: Payload_Send_Prompt = {
+		const message: Action_Send_Prompt = {
 			id: request_id,
 			type: 'send_prompt',
 			completion_request: {
@@ -228,9 +227,9 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 				tape_history,
 			},
 		};
-		this.payloads.send(message);
+		this.actions.send(message);
 
-		const deferred = create_deferred<Payload_Completion_Response>();
+		const deferred = create_deferred<Action_Completion_Response>();
 		this.pending_prompts.set(message.id, deferred);
 
 		const response = await deferred.promise;
@@ -238,7 +237,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		return response;
 	}
 
-	receive_completion_response(message: Payload_Completion_Response): void {
+	receive_completion_response(message: Action_Completion_Response): void {
 		const deferred = this.pending_prompts.get(message.completion_response.request_id);
 		if (!deferred) {
 			console.error('expected pending', message);
@@ -252,7 +251,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	 * Handles session data loaded from the server.
 	 * Sets the zzz_dir and adds files to diskfiles.
 	 */
-	receive_session(data: Payload_Loaded_Session['data']): void {
+	receive_session(data: Action_Loaded_Session['data']): void {
 		// Set the zzz_dir property from the session data
 		this.zzz_dir = data.zzz_dir;
 

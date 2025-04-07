@@ -9,7 +9,7 @@ import {ollama_list} from '$lib/ollama.js';
 import {REQUEST_TIMEOUT, SERVER_URL} from '$lib/constants.js';
 import {Uuid} from '$lib/zod_helpers.js';
 import type {Zzz_Dir} from '$lib/diskfile_types.js';
-import {Payload_Ping, type Payload_Pong} from '$lib/payload_types.js';
+import {Action_Ping, type Action_Pong} from '$lib/action_types.js';
 
 // TODO hacky/hardcoded for now, this should be an extensible system, the point is to give users a good interface to the concept of capabilities
 
@@ -418,7 +418,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	 * @returns The UUID of the ping message
 	 */
 	send_ping(): Uuid {
-		const ping = Payload_Ping.parse(EMPTY_OBJECT);
+		const ping = Action_Ping.parse(EMPTY_OBJECT);
 		const ping_id = ping.id;
 
 		// Create a new pending ping
@@ -434,7 +434,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 		this.pings = [new_ping, ...this.pings.slice(0, PING_HISTORY_MAX - 1)];
 
 		// Send the ping message via the messaging system
-		this.zzz.payloads.send(ping);
+		this.zzz.actions.send(ping);
 
 		return ping_id;
 	}
@@ -443,7 +443,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	 * Handle a pong response from the server.
 	 * @param pong The pong message received from the server
 	 */
-	receive_pong(pong: Payload_Pong): void {
+	receive_pong(pong: Action_Pong): void {
 		const received_time = Date.now();
 		const ping_index = this.pings.findIndex((p) => p.ping_id === pong.ping_id);
 		// If we found the ping, update it

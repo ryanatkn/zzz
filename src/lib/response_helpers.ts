@@ -10,8 +10,8 @@ import type {
 	Provider_Data_Claude,
 	Provider_Data_Chatgpt,
 	Provider_Data_Gemini,
-	Payload_Completion_Response,
-} from '$lib/payload_types.js';
+	Action_Completion_Response,
+} from '$lib/action_types.js';
 import {Datetime_Now, Uuid} from '$lib/zod_helpers.js';
 
 /**
@@ -137,7 +137,7 @@ export const create_completion_response_message = (
 	provider_name: Provider_Name,
 	model: string,
 	api_response: any,
-): Payload_Completion_Response => {
+): Action_Completion_Response => {
 	return {
 		id: Uuid.parse(undefined),
 		type: 'completion_response',

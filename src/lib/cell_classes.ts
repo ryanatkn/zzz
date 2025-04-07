@@ -11,8 +11,8 @@ import {Diskfiles} from '$lib/diskfiles.svelte.js';
 import {Diskfiles_Editor} from '$lib/diskfiles_editor.svelte.js';
 import {Model} from '$lib/model.svelte.js';
 import {Models} from '$lib/models.svelte.js';
-import {Payload} from '$lib/payload.svelte.js';
-import {Payloads} from '$lib/payloads.svelte.js';
+import {Action} from '$lib/action.svelte.js';
+import {Actions} from '$lib/actions.svelte.js';
 import {Prompt} from '$lib/prompt.svelte.js';
 import {Prompts} from '$lib/prompts.svelte.js';
 import {Provider} from '$lib/provider.svelte.js';
@@ -43,8 +43,8 @@ export const cell_classes = {
 	Diskfiles_Editor,
 	Model,
 	Models,
-	Payload,
-	Payloads,
+	Action,
+	Actions,
 	Prompt,
 	Prompts,
 	Provider,

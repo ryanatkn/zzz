@@ -3,32 +3,32 @@ import {z} from 'zod';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Uuid} from '$lib/zod_helpers.js';
 import {
-	Payload_Json,
+	Action_Json,
 	Completion_Response,
 	Completion_Request,
-	type Payload_Direction,
-	type Payload_Type,
+	type Action_Direction,
+	type Action_Type,
 	type Diskfile_Change,
-} from '$lib/payload_types.js';
+} from '$lib/action_types.js';
 import {Diskfile_Path, Source_File} from '$lib/diskfile_types.js';
 import {to_completion_response_text} from '$lib/response_helpers.js';
 import {to_preview} from '$lib/helpers.js';
 
 // Constants for preview length and formatting
-export const PAYLOAD_DATE_FORMAT = 'MMM d, p';
-export const PAYLOAD_TIME_FORMAT = 'p';
+export const ACTION_DATE_FORMAT = 'MMM d, p';
+export const ACTION_TIME_FORMAT = 'p';
 
-export interface Payload_Options extends Cell_Options<typeof Payload_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
+export interface Action_Options extends Cell_Options<typeof Action_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
 // TODO think about splitting out a different non-reactive version
 // that only handles the static expectation,
-// but then another for dynamic usage? is there even such a thing of a payload changing?
+// but then another for dynamic usage? is there even such a thing of a action changing?
 // if not shouldn't we just remove the $state below?
-export class Payload extends Cell<typeof Payload_Json> {
-	type: Payload_Type = $state()!;
-	direction: Payload_Direction = $state()!;
+export class Action extends Cell<typeof Action_Json> {
+	type: Action_Type = $state()!;
+	direction: Action_Direction = $state()!;
 
-	// Store data based on payload type
+	// Store data based on action type
 	data: Record<string, any> | undefined = $state();
 	ping_id: Uuid | undefined = $state();
 	completion_request: Completion_Request | undefined = $state();
@@ -40,7 +40,7 @@ export class Payload extends Cell<typeof Payload_Json> {
 
 	readonly display_name: string = $derived(`${this.type} (${this.direction})`);
 
-	// TODO maybe change these to be located on `this.type` as a `Payload_Type_Name` class which JSON serializes to the string `Payload_Type` but at runtime has properties like these:
+	// TODO maybe change these to be located on `this.type` as a `Action_Type_Name` class which JSON serializes to the string `Action_Type` but at runtime has properties like these:
 	readonly is_ping: boolean = $derived(this.type === 'ping');
 	readonly is_pong: boolean = $derived(this.type === 'pong');
 	readonly is_prompt: boolean = $derived(this.type === 'send_prompt');
@@ -67,7 +67,7 @@ export class Payload extends Cell<typeof Payload_Json> {
 	);
 
 	readonly prompt_preview: string = $derived.by(() => {
-		if (!this.is_prompt) return 'Not a prompt payload';
+		if (!this.is_prompt) return 'Not a prompt action';
 
 		const prompt = this.prompt_data?.prompt;
 		if (!prompt) return 'No prompt';
@@ -76,15 +76,15 @@ export class Payload extends Cell<typeof Payload_Json> {
 	});
 
 	readonly completion_preview: string = $derived.by(() => {
-		if (!this.is_completion) return 'Not a completion payload';
+		if (!this.is_completion) return 'Not a completion action';
 
 		if (!this.completion_text) return 'No completion';
 
 		return to_preview(this.completion_text);
 	});
 
-	constructor(options: Payload_Options) {
-		super(Payload_Json, options);
+	constructor(options: Action_Options) {
+		super(Action_Json, options);
 
 		// Initialize decoders with type-specific handlers
 		this.decoders = {
@@ -104,4 +104,4 @@ export class Payload extends Cell<typeof Payload_Json> {
 	}
 }
 
-export const Payload_Schema = z.instanceof(Payload);
+export const Action_Schema = z.instanceof(Action);

@@ -1,11 +1,11 @@
 <script lang="ts">
-	import Payload_List from '$lib/Payload_List.svelte';
-	import Payload_Detail from '$lib/Payload_Detail.svelte';
+	import Action_List from '$lib/Action_List.svelte';
+	import Action_Detail from '$lib/Action_Detail.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 	import {GLYPH_LOG} from '$lib/glyphs.js';
-	import type {Payload} from '$lib/payload.svelte.js';
+	import type {Action} from '$lib/action.svelte.js';
 
-	let selected_payload: Payload | null = $state(null);
+	let selected_action: Action | null = $state(null);
 </script>
 
 <div class="column p_lg h_100">
@@ -17,21 +17,21 @@
 		style:gap="var(--space_md)"
 	>
 		<div class="overflow_auto border_right">
-			<Payload_List
+			<Action_List
 				limit={100}
-				selected_payload_id={selected_payload?.id}
-				onselect={(payload) => {
-					selected_payload = payload;
+				selected_action_id={selected_action?.id}
+				onselect={(action) => {
+					selected_action = action;
 				}}
 			/>
 		</div>
 
 		<div class="panel p_md overflow_auto h_100">
-			{#if selected_payload}
-				<Payload_Detail payload={selected_payload} />
+			{#if selected_action}
+				<Action_Detail action={selected_action} />
 			{:else}
 				<div class="flex align_items_center justify_content_center h_100">
-					<p>Select a payload from the list to view its details</p>
+					<p>Select a action from the list to view its details</p>
 				</div>
 			{/if}
 		</div>

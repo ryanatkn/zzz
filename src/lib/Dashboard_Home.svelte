@@ -2,7 +2,7 @@
 	import {base} from '$app/paths';
 
 	import {zzz_context} from '$lib/zzz.svelte.js';
-	import Payloads_List from '$lib/Payload_List.svelte';
+	import Actions_List from '$lib/Action_List.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 	import Provider_Link from '$lib/Provider_Link.svelte';
 	import Model_Link from '$lib/Model_Link.svelte';
@@ -17,7 +17,7 @@
 			<div class="mb_lg">
 				<a class="size_xl font_weight_600" href="{base}/log"><Glyph icon={GLYPH_LOG} /> log</a>
 			</div>
-			<Payloads_List limit={5} attrs={{class: 'mt_sm'}} />
+			<Actions_List limit={5} attrs={{class: 'mt_sm'}} />
 		</section>
 
 		<section class="panel p_md mb_0">
