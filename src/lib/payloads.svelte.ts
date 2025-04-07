@@ -114,13 +114,19 @@ export class Payloads extends Cell<typeof Payloads_Json> {
 	history_limit: number = $state(HISTORY_LIMIT_DEFAULT);
 
 	// Derived collections using the indexed structure
-	pings: Array<Payload> = $derived(this.items.where('by_type', 'ping'));
-	pongs: Array<Payload> = $derived(this.items.where('by_type', 'pong'));
-	prompts: Array<Payload> = $derived(this.items.where('by_type', 'send_prompt'));
-	completions: Array<Payload> = $derived(this.items.where('by_type', 'completion_response'));
-	diskfile_updates: Array<Payload> = $derived(this.items.where('by_type', 'update_diskfile'));
-	diskfile_deletes: Array<Payload> = $derived(this.items.where('by_type', 'delete_diskfile'));
-	filer_changes: Array<Payload> = $derived(this.items.where('by_type', 'filer_change'));
+	readonly pings: Array<Payload> = $derived(this.items.where('by_type', 'ping'));
+	readonly pongs: Array<Payload> = $derived(this.items.where('by_type', 'pong'));
+	readonly prompts: Array<Payload> = $derived(this.items.where('by_type', 'send_prompt'));
+	readonly completions: Array<Payload> = $derived(
+		this.items.where('by_type', 'completion_response'),
+	);
+	readonly diskfile_updates: Array<Payload> = $derived(
+		this.items.where('by_type', 'update_diskfile'),
+	);
+	readonly diskfile_deletes: Array<Payload> = $derived(
+		this.items.where('by_type', 'delete_diskfile'),
+	);
+	readonly filer_changes: Array<Payload> = $derived(this.items.where('by_type', 'filer_change'));
 
 	// Payload handlers
 	onsend?: (payload: Payload_Client) => void;

@@ -26,7 +26,7 @@ export class Scrollable {
 	scroll_y: number = $state(0);
 
 	/** Whether element is scrolled past threshold. */
-	scrolled: boolean = $derived(this.scroll_y > this.threshold);
+	readonly scrolled: boolean = $derived(this.scroll_y > this.threshold);
 
 	constructor(params?: Scrollable_Parameters) {
 		this.target_class = params?.target_class ?? 'scrolled';

@@ -31,12 +31,14 @@ export class Diskfile_Tab extends Cell<typeof Diskfile_Tab_Json> {
 	readonly tabs: Diskfile_Tabs;
 
 	/** Derived from parent collection's state */
-	is_preview: boolean = $derived.by(() => this.tabs.preview_tab_id === this.id);
+	readonly is_preview: boolean = $derived.by(() => this.tabs.preview_tab_id === this.id);
 
 	/** Derived from parent collection's state */
-	is_selected: boolean = $derived.by(() => this.tabs.selected_tab_id === this.id);
+	readonly is_selected: boolean = $derived.by(() => this.tabs.selected_tab_id === this.id);
 
-	diskfile: Diskfile | undefined = $derived(this.zzz.diskfiles.items.by_id.get(this.diskfile_id));
+	readonly diskfile: Diskfile | undefined = $derived(
+		this.zzz.diskfiles.items.by_id.get(this.diskfile_id),
+	);
 
 	constructor(options: Diskfile_Tab_Options) {
 		super(Diskfile_Tab_Json, options);

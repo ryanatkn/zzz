@@ -84,19 +84,19 @@ export class Socket extends Cell<typeof Socket_Json> {
 	onerror: Socket_Error_Handler | null = $state(null);
 
 	// Derived properties
-	connected: boolean = $derived(this.open && this.status === 'success');
-	can_send: boolean = $derived(this.connected && this.ws !== null);
-	has_queued_messages: boolean = $derived(this.message_queue.length > 0);
-	queued_message_count: number = $derived(this.message_queue.length);
-	failed_message_count: number = $derived(this.failed_messages.size);
+	readonly connected: boolean = $derived(this.open && this.status === 'success');
+	readonly can_send: boolean = $derived(this.connected && this.ws !== null);
+	readonly has_queued_messages: boolean = $derived(this.message_queue.length > 0);
+	readonly queued_message_count: number = $derived(this.message_queue.length);
+	readonly failed_message_count: number = $derived(this.failed_messages.size);
 
 	// Time tracking and formatting
-	connection_duration: number | null = $derived(
+	readonly connection_duration: number | null = $derived(
 		this.connected && this.last_connect_time
 			? Math.max(0, this.zzz.time.now_ms - this.last_connect_time) // `Math.max` is needed to avoid negative values with the coarse value of `now_ms`
 			: null,
 	);
-	connection_duration_rounded: number | null = $derived(
+	readonly connection_duration_rounded: number | null = $derived(
 		this.connection_duration !== null
 			? Math.round(this.connection_duration / this.zzz.time.interval) * this.zzz.time.interval
 			: null,

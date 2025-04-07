@@ -26,9 +26,9 @@ export class Diskfile_Editor_State {
 	last_seen_disk_content: string | null = $state(null);
 
 	// Basic derived states
-	original_content: string | null = $derived(this.diskfile.content);
-	path: Diskfile_Path = $derived.by(() => this.diskfile.path);
-	has_changes = $derived.by(() => {
+	readonly original_content: string | null = $derived(this.diskfile.content);
+	readonly path: Diskfile_Path = $derived.by(() => this.diskfile.path);
+	readonly has_changes = $derived.by(() => {
 		// For null content files, empty content is the baseline so we shouldn't show changes
 		if (this.original_content === null) {
 			return this.current_content !== '';
@@ -37,53 +37,53 @@ export class Diskfile_Editor_State {
 	});
 
 	// History-related derived states
-	history: Diskfile_History | undefined = $derived.by(() =>
+	readonly history: Diskfile_History | undefined = $derived.by(() =>
 		this.zzz.get_diskfile_history(this.diskfile.path),
 	);
-	selected_history_entry = $derived.by(() =>
+	readonly selected_history_entry = $derived.by(() =>
 		this.history && this.selected_history_entry_id
 			? this.history.find_entry_by_id(this.selected_history_entry_id)
 			: null,
 	);
-	content_history: Array<History_Entry> = $derived(this.history?.entries || []);
-	saved_history_entries: Array<History_Entry> = $derived(
+	readonly content_history: Array<History_Entry> = $derived(this.history?.entries || []);
+	readonly saved_history_entries: Array<History_Entry> = $derived(
 		this.content_history.filter((entry) => !entry.is_unsaved_edit),
 	);
-	unsaved_history_entries: Array<History_Entry> = $derived(
+	readonly unsaved_history_entries: Array<History_Entry> = $derived(
 		this.content_history.filter((entry) => entry.is_unsaved_edit),
 	);
 
-	has_history = $derived(this.content_history.length > 1);
-	has_unsaved_edits = $derived(this.unsaved_history_entries.length > 0);
+	readonly has_history = $derived(this.content_history.length > 1);
+	readonly has_unsaved_edits = $derived(this.unsaved_history_entries.length > 0);
 
 	// Derived properties for UI state management
-	can_clear_history = $derived(this.saved_history_entries.length > 1);
-	can_clear_unsaved_edits = $derived(this.unsaved_history_entries.length > 0);
+	readonly can_clear_history = $derived(this.saved_history_entries.length > 1);
+	readonly can_clear_unsaved_edits = $derived(this.unsaved_history_entries.length > 0);
 
-	unsaved_entry_ids = $derived(this.unsaved_history_entries.map((entry) => entry.id));
-	content_matching_entry_ids: Array<Uuid> = $derived(
+	readonly unsaved_entry_ids = $derived(this.unsaved_history_entries.map((entry) => entry.id));
+	readonly content_matching_entry_ids: Array<Uuid> = $derived(
 		this.content_history
 			.filter((entry) => entry.content === this.current_content)
 			.map((entry) => entry.id),
 	);
 
 	// Length-related calculations
-	original_length = $derived.by(() => this.original_content?.length ?? 0);
-	current_length = $derived(this.current_content.length);
-	length_diff = $derived(this.current_length - this.original_length);
-	length_diff_percent = $derived(
+	readonly original_length = $derived.by(() => this.original_content?.length ?? 0);
+	readonly current_length = $derived(this.current_content.length);
+	readonly length_diff = $derived(this.current_length - this.original_length);
+	readonly length_diff_percent = $derived(
 		this.original_length > 0 ? Math.round((this.length_diff / this.original_length) * 100) : 100,
 	);
 
 	// Token-related calculations
-	original_tokens = $derived.by(() =>
+	readonly original_tokens = $derived.by(() =>
 		this.original_content ? tokenize(this.original_content) : [],
 	);
-	current_tokens = $derived(tokenize(this.current_content));
-	original_token_count = $derived(this.original_tokens.length);
-	current_token_count = $derived(this.current_tokens.length);
-	token_diff = $derived(this.current_token_count - this.original_token_count);
-	token_diff_percent = $derived(
+	readonly current_tokens = $derived(tokenize(this.current_content));
+	readonly original_token_count = $derived(this.original_tokens.length);
+	readonly current_token_count = $derived(this.current_tokens.length);
+	readonly token_diff = $derived(this.current_token_count - this.original_token_count);
+	readonly token_diff_percent = $derived(
 		this.original_token_count > 0
 			? Math.round((this.token_diff / this.original_token_count) * 100)
 			: 100,

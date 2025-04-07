@@ -15,7 +15,7 @@ import {CONTENT_PREVIEW_LENGTH} from '$lib/constants.js';
 
 /** Common properties for all bit types. */
 export const Bit_Base_Json = Cell_Json.extend({
-	type: z.string(), // Discriminator field for the type of bit
+	type: z.string(),
 	name: z.string().default(''),
 	start: z.number().nullable().default(null),
 	end: z.number().nullable().default(null),
@@ -88,13 +88,13 @@ export abstract class Bit<T extends z.ZodType = typeof Bit_Base_Json> extends Ce
 
 	start: number | null = $state()!;
 	end: number | null = $state()!;
-	length: number | null | undefined = $derived.by(() => this.content?.length);
-	tokens: Array<number> | null | undefined = $derived.by(() =>
+	readonly length: number | null | undefined = $derived.by(() => this.content?.length);
+	readonly tokens: Array<number> | null | undefined = $derived.by(() =>
 		this.content == null ? this.content : tokenize(this.content),
 	);
-	token_count: number | null | undefined = $derived(this.tokens?.length);
+	readonly token_count: number | null | undefined = $derived(this.tokens?.length);
 	/** `content` with a max length */
-	content_preview = $derived.by(() =>
+	readonly content_preview = $derived.by(() =>
 		this.content && this.content.length > CONTENT_PREVIEW_LENGTH
 			? this.content.substring(0, CONTENT_PREVIEW_LENGTH)
 			: this.content,
@@ -109,7 +109,7 @@ export abstract class Bit<T extends z.ZodType = typeof Bit_Base_Json> extends Ce
 	title: string | null = $state()!;
 	summary: string | null = $state()!;
 
-	xml_tag_name_default: string = $derived.by(() =>
+	readonly xml_tag_name_default: string = $derived.by(() =>
 		this.type === 'diskfile' ? 'File' : 'Fragment',
 	);
 
@@ -269,12 +269,12 @@ export class Diskfile_Bit extends Bit<typeof Diskfile_Bit_Json> {
 	// Reference to the editor state for this bit
 	#editor_state: {current_content: string} | null = $state(null); // TODO @many this initialization is awkward, ideally becomes refactored to mostly derived
 
-	diskfile: Diskfile | null | undefined = $derived(
+	readonly diskfile: Diskfile | null | undefined = $derived(
 		this.path && this.zzz.diskfiles.get_by_path(this.path),
 	);
 
 	// The current relative path value for display in the XML path attribute
-	relative_path = $derived(this.diskfile?.path_relative);
+	readonly relative_path = $derived(this.diskfile?.path_relative);
 
 	override get content(): string | null | undefined {
 		// Return editor content if available, otherwise fall back to diskfile content
@@ -316,7 +316,7 @@ export class Sequence_Bit extends Bit<typeof Sequence_Bit_Json> {
 
 	items: Array<Uuid> = $state()!;
 
-	bits: Array<Bit_Type> = $derived(
+	readonly bits: Array<Bit_Type> = $derived(
 		this.items
 			.map((id) => this.zzz.bits.items.by_id.get(id))
 			.filter((bit): bit is Bit_Type => !!bit),

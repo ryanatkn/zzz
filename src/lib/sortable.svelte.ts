@@ -15,19 +15,19 @@ export class Sortable<T> {
 	 * Thunk to get the current items array reactively.
 	 */
 	#items_getter: Thunk<Array<T>>;
-	items: Array<T> = $derived.by(() => this.#items_getter());
+	readonly items: Array<T> = $derived.by(() => this.#items_getter());
 
 	/**
 	 * Thunk to get the current sorters reactively.
 	 */
 	#sorters_getter: Thunk<Array<Sorter<T>>>;
-	sorters: Array<Sorter<T>> = $derived.by(() => this.#sorters_getter());
+	readonly sorters: Array<Sorter<T>> = $derived.by(() => this.#sorters_getter());
 
 	/**
 	 * Optional thunk to get the current default sort key reactively.
 	 */
 	#key_getter_default: Thunk<string | undefined> | undefined;
-	default_key: string | undefined = $derived.by(() => this.#key_getter_default?.());
+	readonly default_key: string | undefined = $derived.by(() => this.#key_getter_default?.());
 
 	/** Current active sort key */
 	active_key: string = $state('');
@@ -35,19 +35,19 @@ export class Sortable<T> {
 	/**
 	 * The currently active sorter.
 	 */
-	active_sorter: Sorter<T> | undefined = $derived(
+	readonly active_sorter: Sorter<T> | undefined = $derived(
 		this.sorters.find((s) => s.key === this.active_key),
 	);
 
 	/**
 	 * The sort function from the active sorter.
 	 */
-	active_sort_fn: ((a: T, b: T) => number) | undefined = $derived(this.active_sorter?.fn);
+	readonly active_sort_fn: ((a: T, b: T) => number) | undefined = $derived(this.active_sorter?.fn);
 
 	/**
 	 * Sorted items based on the current active sorter.
 	 */
-	sorted_items: Array<T> = $derived.by(() => {
+	readonly sorted_items: Array<T> = $derived.by(() => {
 		const items = [...this.items];
 
 		// Return unsorted if no sort function
@@ -81,7 +81,7 @@ export class Sortable<T> {
 	 * Updates the active key based on sorters and default key.
 	 * Called automatically on initialization and when sorters change.
 	 */
-	update_active_key = $derived(() => {
+	update_active_key(): void {
 		const sorters = this.sorters;
 		const default_key = this.default_key;
 
@@ -101,7 +101,7 @@ export class Sortable<T> {
 		if (!sorters.some((sorter) => sorter.key === this.active_key)) {
 			this.active_key = sorters[0].key;
 		}
-	});
+	}
 
 	/**
 	 * Set the active sorter by key.

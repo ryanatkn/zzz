@@ -21,20 +21,20 @@ export interface Tape_Options extends Cell_Options<typeof Tape_Json> {} // eslin
  */
 export class Tape extends Cell<typeof Tape_Json> {
 	model_name: string = $state()!;
-	model: Model = $derived.by(() => {
+	readonly model: Model = $derived.by(() => {
 		const model = this.zzz.models.find_by_name(this.model_name);
 		if (!model) throw Error(`Model "${this.model_name}" not found`); // TODO do this differently?
 		return model;
 	});
 
 	strips: Array<Strip> = $state([]);
-	strips_by_id: Map<Uuid, Strip> = $derived(new Map(this.strips.map((s) => [s.id, s])));
+	readonly strips_by_id: Map<Uuid, Strip> = $derived(new Map(this.strips.map((s) => [s.id, s])));
 
-	content: string = $derived(render_tape(this.strips));
-	length: number = $derived(this.content.length);
-	tokens: Array<number> = $derived(tokenize(this.content));
-	token_count: number = $derived(this.tokens.length);
-	content_preview: string = $derived(to_preview(this.content));
+	readonly content: string = $derived(render_tape(this.strips));
+	readonly length: number = $derived(this.content.length);
+	readonly tokens: Array<number> = $derived(tokenize(this.content));
+	readonly token_count: number = $derived(this.tokens.length);
+	readonly content_preview: string = $derived(to_preview(this.content));
 
 	constructor(options: Tape_Options) {
 		super(Tape_Json, options);

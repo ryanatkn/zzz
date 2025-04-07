@@ -30,12 +30,12 @@ export class Prompt extends Cell<typeof Prompt_Json> {
 	name: string = $state()!;
 	bits: Array<Bit_Type> = $state()!;
 
-	content: string = $derived(format_prompt_content(this.bits));
+	readonly content: string = $derived(format_prompt_content(this.bits));
 
-	length: number = $derived(this.content.length);
-	tokens: Array<number> = $derived(tokenize(this.content)); // TODO @many eager computation in some UI cases is bad UX with large values (e.g. bottleneck typing)
-	token_count: number = $derived(this.tokens.length);
-	content_preview: string = $derived(to_preview(this.content));
+	readonly length: number = $derived(this.content.length);
+	readonly tokens: Array<number> = $derived(tokenize(this.content)); // TODO @many eager computation in some UI cases is bad UX with large values (e.g. bottleneck typing)
+	readonly token_count: number = $derived(this.tokens.length);
+	readonly content_preview: string = $derived(to_preview(this.content));
 
 	constructor(options: Prompt_Options) {
 		super(Prompt_Json, options);

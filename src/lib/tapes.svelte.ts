@@ -91,11 +91,7 @@ export class Tapes extends Cell<typeof Tapes_Json> {
 
 	add_many(tapes_json: Array<z.input<typeof Tape_Json>>, select?: boolean | number): Array<Tape> {
 		const tapes = tapes_json.map((json) => new Tape({zzz: this.zzz, json}));
-
-		// Add all tapes to the collection
-		for (const tape of tapes) {
-			this.items.add(tape);
-		}
+		this.items.add_many(tapes);
 
 		// Select the first or the specified tape if none is currently selected
 		if (

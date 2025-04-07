@@ -61,7 +61,7 @@ export class Models extends Cell<typeof Models_Json> {
 	});
 
 	/** Get all models ordered alphabetically by name. */
-	ordered_by_name: Array<Model> = $derived(this.items.derived_index('ordered_by_name'));
+	readonly ordered_by_name: Array<Model> = $derived(this.items.derived_index('ordered_by_name'));
 
 	constructor(options: Models_Options) {
 		super(Models_Json, options);
@@ -89,10 +89,8 @@ export class Models extends Cell<typeof Models_Json> {
 	}
 
 	add_many(models_json: Array<Model_Json>): void {
-		this.items.clear();
-		for (const model_json of models_json) {
-			this.add(model_json);
-		}
+		const models = models_json.map((json) => new Model({zzz: this.zzz, json}));
+		this.items.add_many(models);
 	}
 
 	// TODO BLOCK use or delete

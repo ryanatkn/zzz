@@ -47,7 +47,7 @@ export class Model extends Cell<typeof Model_Json> {
 	 * For models that run locally, this is a boolean indicating if the model is downloaded.
 	 * Is `undefined` for non-local models.
 	 */
-	downloaded: boolean | undefined = $derived(
+	readonly downloaded: boolean | undefined = $derived(
 		this.provider_name === 'ollama' ? !!this.ollama_model_info : undefined,
 	);
 

@@ -34,12 +34,12 @@ export class Chat extends Cell<typeof Chat_Json> {
 	main_input: string = $state('');
 	view_mode: Chat_View_Mode = $state('multi');
 
-	main_input_length: number = $derived(this.main_input.length);
-	main_input_tokens: Array<number> = $derived(tokenize(this.main_input));
-	main_input_token_count: number = $derived(this.main_input_tokens.length);
+	readonly main_input_length: number = $derived(this.main_input.length);
+	readonly main_input_tokens: Array<number> = $derived(tokenize(this.main_input));
+	readonly main_input_token_count: number = $derived(this.main_input_tokens.length);
 
 	// TODO look into using an index for this, incremental from `this.tape_ids`
-	tapes: Array<Tape> = $derived.by(() => {
+	readonly tapes: Array<Tape> = $derived.by(() => {
 		const result: Array<Tape> = [];
 		const {by_id} = this.zzz.tapes.items;
 
@@ -54,7 +54,7 @@ export class Chat extends Cell<typeof Chat_Json> {
 	});
 
 	// TODO maybe add a derived property for the ids that are selected but missing?
-	selected_prompts: Array<Prompt> = $derived.by(() => {
+	readonly selected_prompts: Array<Prompt> = $derived.by(() => {
 		const result: Array<Prompt> = [];
 		const {by_id} = this.zzz.prompts.items;
 
@@ -69,7 +69,7 @@ export class Chat extends Cell<typeof Chat_Json> {
 	});
 
 	// TODO `Bits` class instead? same as on zzz?
-	bits: Set<Bit_Type> = $derived.by(() => {
+	readonly bits: Set<Bit_Type> = $derived.by(() => {
 		const b: Set<Bit_Type> = new Set();
 		for (const prompt of this.selected_prompts) {
 			for (const bit of prompt.bits) {
@@ -78,7 +78,7 @@ export class Chat extends Cell<typeof Chat_Json> {
 		}
 		return b;
 	});
-	bits_array: Array<Bit_Type> = $derived(Array.from(this.bits));
+	readonly bits_array: Array<Bit_Type> = $derived(Array.from(this.bits));
 
 	init_name_status: Async_Status = $state('initial');
 

@@ -32,7 +32,7 @@ export class Strip extends Cell<typeof Strip_Json> {
 	response?: Completion_Response = $state();
 
 	// Get the referenced bit - handle case where bit might not exist in registry
-	bit: Bit_Type | null = $derived(
+	readonly bit: Bit_Type | null = $derived(
 		this.bit_id ? (this.zzz.bits.items.by_id.get(this.bit_id) ?? null) : null,
 	);
 
@@ -49,16 +49,18 @@ export class Strip extends Cell<typeof Strip_Json> {
 	}
 
 	// Derived properties based on normalized content
-	length: number = $derived(this.content.length);
-	tokens: Array<number> = $derived(tokenize(this.content));
-	token_count: number = $derived(this.tokens.length);
+	readonly length: number = $derived(this.content.length);
+	readonly tokens: Array<number> = $derived(tokenize(this.content));
+	readonly token_count: number = $derived(this.tokens.length);
 
-	raw_content: string | null | undefined = $derived(this.bit?.content);
-	is_content_loaded: boolean = $derived(this.bit !== null && this.bit.content !== undefined);
-	is_content_empty: boolean = $derived(
+	readonly raw_content: string | null | undefined = $derived(this.bit?.content);
+	readonly is_content_loaded: boolean = $derived(
+		this.bit !== null && this.bit.content !== undefined,
+	);
+	readonly is_content_empty: boolean = $derived(
 		this.bit === null || this.bit.content === null || this.bit.content === '',
 	);
-	is_pending: boolean = $derived(
+	readonly is_pending: boolean = $derived(
 		this.role === 'assistant' && this.is_content_loaded && this.is_content_empty && !this.response,
 	);
 

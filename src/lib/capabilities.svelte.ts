@@ -113,7 +113,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	/**
 	 * WebSocket capability that derives its state from the socket.
 	 */
-	websocket: Capability<Websocket_Capability_Data | null | undefined> = $derived.by(() => {
+	readonly websocket: Capability<Websocket_Capability_Data | null | undefined> = $derived.by(() => {
 		// Map socket status to capability status, but consider connection state
 		const {socket} = this.zzz;
 		const {status} = socket;
@@ -146,32 +146,34 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	/**
 	 * Filesystem capability that derives its state from the zzz_dir.
 	 */
-	filesystem: Capability<Filesystem_Capability_Data | null | undefined> = $derived.by(() => {
-		// Derive status based on zzz_dir value
-		const {zzz_dir, zzz_dir_parent} = this.zzz;
-		let status: Async_Status;
+	readonly filesystem: Capability<Filesystem_Capability_Data | null | undefined> = $derived.by(
+		() => {
+			// Derive status based on zzz_dir value
+			const {zzz_dir, zzz_dir_parent} = this.zzz;
+			let status: Async_Status;
 
-		if (zzz_dir === undefined) {
-			status = 'initial';
-		} else if (zzz_dir === null) {
-			status = 'pending';
-		} else if (zzz_dir === '') {
-			status = 'failure';
-		} else {
-			status = 'success';
-		}
+			if (zzz_dir === undefined) {
+				status = 'initial';
+			} else if (zzz_dir === null) {
+				status = 'pending';
+			} else if (zzz_dir === '') {
+				status = 'failure';
+			} else {
+				status = 'success';
+			}
 
-		// Filesystem is available if we have a valid zzz_dir
-		const data = status === 'success' ? {zzz_dir, zzz_dir_parent} : undefined;
+			// Filesystem is available if we have a valid zzz_dir
+			const data = status === 'success' ? {zzz_dir, zzz_dir_parent} : undefined;
 
-		return {
-			name: 'filesystem',
-			data,
-			status,
-			error_message: null,
-			updated: Date.now(),
-		};
-	});
+			return {
+				name: 'filesystem',
+				data,
+				status,
+				error_message: null,
+				updated: Date.now(),
+			};
+		},
+	);
 
 	/**
 	 * Store pings - both pending and completed.
@@ -181,31 +183,31 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	/**
 	 * Most recent completed ping round trip time in milliseconds.
 	 */
-	latest_ping_time: number | null = $derived(
+	readonly latest_ping_time: number | null = $derived(
 		this.pings.find((p) => p.completed)?.round_trip_time ?? null,
 	);
 
 	/**
 	 * Completed pings (for display).
 	 */
-	completed_pings: Array<Ping_Data> = $derived(this.pings.filter((p) => p.completed));
+	readonly completed_pings: Array<Ping_Data> = $derived(this.pings.filter((p) => p.completed));
 
 	/**
 	 * Number of pending pings.
 	 */
-	pending_ping_count: number = $derived(this.pings.filter((p) => !p.completed).length);
+	readonly pending_ping_count: number = $derived(this.pings.filter((p) => !p.completed).length);
 
 	/**
 	 * Has pending pings.
 	 */
-	has_pending_pings: boolean = $derived(this.pending_ping_count > 0);
+	readonly has_pending_pings: boolean = $derived(this.pending_ping_count > 0);
 
 	/**
 	 * Convenience accessor for server availability.
 	 * `undefined` means uninitialized, `null` means loading/checking.
 	 * boolean indicates if available.
 	 */
-	server_available: boolean | null | undefined = $derived(
+	readonly server_available: boolean | null | undefined = $derived(
 		this.server.data === undefined
 			? undefined
 			: this.server.status === 'pending'
@@ -218,7 +220,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	 * `undefined` means uninitialized, `null` means loading/checking.
 	 * boolean indicates if available.
 	 */
-	ollama_available: boolean | null | undefined = $derived(
+	readonly ollama_available: boolean | null | undefined = $derived(
 		this.ollama.data === undefined
 			? undefined
 			: this.ollama.status === 'pending'
@@ -231,7 +233,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	 * `undefined` means uninitialized, `null` means loading/checking.
 	 * boolean indicates if the socket is actively connected.
 	 */
-	websocket_available: boolean | null | undefined = $derived(
+	readonly websocket_available: boolean | null | undefined = $derived(
 		this.websocket.data === undefined
 			? undefined
 			: this.websocket.status === 'pending'
@@ -244,7 +246,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	 * `undefined` means uninitialized, `null` means loading/checking.
 	 * boolean indicates if filesystem is available.
 	 */
-	filesystem_available: boolean | null | undefined = $derived(
+	readonly filesystem_available: boolean | null | undefined = $derived(
 		this.filesystem.data === undefined
 			? undefined
 			: this.filesystem.status === 'pending'
@@ -255,7 +257,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	/**
 	 * Latest Ollama model list response, if available.
 	 */
-	ollama_models: Array<{name: string; size: number}> = $derived(
+	readonly ollama_models: Array<{name: string; size: number}> = $derived(
 		this.ollama.data?.list_response?.models.map((model) => ({
 			name: model.name,
 			size: Math.round(model.size / (1024 * 1024)), // Size in MB

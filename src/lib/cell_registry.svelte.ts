@@ -31,7 +31,7 @@ export class Cell_Registry {
 	// Store constructors
 	readonly #constructors: Map<string, Class_Constructor<any>> = new Map();
 
-	class_names: Array<string> = $derived(Array.from(this.#constructors.keys()));
+	readonly class_names: Array<string> = $derived(Array.from(this.#constructors.keys()));
 
 	constructor(zzz: Zzz) {
 		this.zzz = zzz;

@@ -38,33 +38,35 @@ export class Payload extends Cell<typeof Payload_Json> {
 	change: Diskfile_Change | undefined = $state();
 	source_file: Source_File | undefined = $state();
 
-	display_name: string = $derived(`${this.type} (${this.direction})`);
+	readonly display_name: string = $derived(`${this.type} (${this.direction})`);
 
 	// TODO maybe change these to be located on `this.type` as a `Payload_Type_Name` class which JSON serializes to the string `Payload_Type` but at runtime has properties like these:
-	is_ping: boolean = $derived(this.type === 'ping');
-	is_pong: boolean = $derived(this.type === 'pong');
-	is_prompt: boolean = $derived(this.type === 'send_prompt');
-	is_completion: boolean = $derived(this.type === 'completion_response');
-	is_session: boolean = $derived(this.type === 'load_session' || this.type === 'loaded_session');
-	is_file_related: boolean = $derived(
+	readonly is_ping: boolean = $derived(this.type === 'ping');
+	readonly is_pong: boolean = $derived(this.type === 'pong');
+	readonly is_prompt: boolean = $derived(this.type === 'send_prompt');
+	readonly is_completion: boolean = $derived(this.type === 'completion_response');
+	readonly is_session: boolean = $derived(
+		this.type === 'load_session' || this.type === 'loaded_session',
+	);
+	readonly is_file_related: boolean = $derived(
 		this.type === 'update_diskfile' ||
 			this.type === 'delete_diskfile' ||
 			this.type === 'filer_change',
 	);
 
-	prompt_data: Completion_Request | null = $derived(
+	readonly prompt_data: Completion_Request | null = $derived(
 		this.is_prompt && this.completion_request ? this.completion_request : null,
 	);
 
-	completion_data: Completion_Response | null = $derived(
+	readonly completion_data: Completion_Response | null = $derived(
 		this.is_completion && this.completion_response ? this.completion_response : null,
 	);
 
-	completion_text: string | null | undefined = $derived(
+	readonly completion_text: string | null | undefined = $derived(
 		this.completion_data ? to_completion_response_text(this.completion_data) : null,
 	);
 
-	prompt_preview: string = $derived.by(() => {
+	readonly prompt_preview: string = $derived.by(() => {
 		if (!this.is_prompt) return 'Not a prompt payload';
 
 		const prompt = this.prompt_data?.prompt;
@@ -73,7 +75,7 @@ export class Payload extends Cell<typeof Payload_Json> {
 		return to_preview(prompt);
 	});
 
-	completion_preview: string = $derived.by(() => {
+	readonly completion_preview: string = $derived.by(() => {
 		if (!this.is_completion) return 'Not a completion payload';
 
 		if (!this.completion_text) return 'No completion';

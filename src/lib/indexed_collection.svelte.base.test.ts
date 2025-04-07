@@ -3,12 +3,13 @@
 import {test, expect, describe} from 'vitest';
 import {z} from 'zod';
 
-import {Indexed_Collection, type Indexed_Item} from '$lib/indexed_collection.svelte.js';
+import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {
 	create_single_index,
 	create_multi_index,
 	create_derived_index,
 	create_dynamic_index,
+	type Indexed_Item,
 } from '$lib/indexed_collection_helpers.js';
 import {Uuid} from '$lib/zod_helpers.js';
 
@@ -374,7 +375,7 @@ describe('Indexed_Collection - Advanced Features', () => {
 				}
 
 				// Rebuild unique_values set if needed (we don't know if other items use this category)
-				const all_unique_values = new Set<string>();
+				const all_unique_values: Set<string> = new Set();
 				for (const i of collection.by_id.values()) {
 					if (i.id !== item.id) {
 						all_unique_values.add((i as any).category);

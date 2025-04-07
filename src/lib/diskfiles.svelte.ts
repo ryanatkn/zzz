@@ -53,7 +53,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 
 	selected_file_id: Uuid | null = $state(null);
 
-	selected_file: Diskfile | null = $derived(
+	readonly selected_file: Diskfile | null = $derived(
 		this.selected_file_id ? (this.items.by_id.get(this.selected_file_id) ?? null) : null,
 	);
 

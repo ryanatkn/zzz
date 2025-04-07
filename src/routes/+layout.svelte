@@ -15,13 +15,13 @@
 	import {page} from '$app/state';
 	import {PUBLIC_WEBSOCKET_URL} from '$env/static/public';
 
+	import {App} from '$lib/app.svelte.js';
 	import Zzz_Root from '$lib/Zzz_Root.svelte';
 	import {pkg_context} from '$routes/pkg.js';
 	import {package_json, src_json} from '$routes/package.js';
 	import {Uuid} from '$lib/zod_helpers.js';
 	import {Prompt_Json} from '$lib/prompt.svelte.js';
 	import {cell_classes} from '$lib/cell_classes.js';
-	import {Zzz} from '$lib/zzz.svelte.js';
 	import {Provider_Json} from '$lib/provider.svelte.js';
 	import create_zzz_config from '$lib/config.js';
 	import {Bit} from '$lib/bit.svelte.js';
@@ -64,7 +64,7 @@
 	pkg_context.set(parse_package_meta(package_json, src_json));
 
 	// Create an instance of Zzz with socket_url
-	const zzz = new Zzz({
+	const zzz = new App({
 		cell_classes,
 		socket_url: PUBLIC_WEBSOCKET_URL,
 		onsend: (message) => {
@@ -123,9 +123,7 @@
 		};
 	}
 
-	if (BROWSER) (window as any).zzz = zzz; // no types for this, just for runtime convenience
-
-	if (BROWSER) $inspect('providers', zzz.providers);
+	if (BROWSER) (window as any).app = (window as any).zzz = zzz; // no types for this, just for runtime convenience
 
 	// Initialize the session
 	if (BROWSER) {
