@@ -33,17 +33,33 @@
 .mb_lg {
 	margin-bottom: var(--space_lg);
 }
-.mb_xs {
-	margin-bottom: var(--space_xs);
+.mb_md {
+	margin-bottom: var(--space_md);
 }
-.block {
-	display: block;
+.size_lg {
+	font-size: var(--size_lg);
+	--size: var(--size_lg);
 }
-
-/* Formats content to wrap long strings and preserve displayed whitespace. */
-.formatted {
-	overflow: hidden;
-	white-space: break-spaces;
+.ml_xs {
+	margin-left: var(--space_xs);
+}
+.flex {
+	display: flex;
+}
+.flex_column {
+	flex-direction: column;
+}
+.gap_xs {
+	gap: var(--space_xs);
+}
+.mt_sm {
+	margin-top: var(--space_sm);
+}
+.font_mono {
+	font-family: var(--font_mono);
+}
+.gap_md {
+	gap: var(--space_md);
 }
 
 /* TODO maybe this belongs with the reset, like `selected`? or does `selected` belong here? */
@@ -57,38 +73,40 @@
 	--border_color: transparent;
 }
 
-.ml_xs2 {
-	margin-left: var(--space_xs2);
+.pb_md {
+	padding-bottom: var(--space_md);
 }
-
-/* like `.box` but uncentered */
-.column {
-	display: flex;
-	flex-direction: column;
+.mt_0 {
+	margin-top: 0;
 }
-
-.mt_xs {
-	margin-top: var(--space_xs);
-}
-.my_xs {
-	margin-top: var(--space_xs);
-	margin-bottom: var(--space_xs);
+.font_weight_600 {
+	font-weight: 600;
+	--font_weight: 600;
 }
 .size_sm {
 	font-size: var(--size_sm);
 	--size: var(--size_sm);
 }
-.flex_1 {
-	flex: 1;
+.white_space_pre_wrap {
+	white-space: pre-wrap;
 }
-.flex {
-	display: flex;
+.p_sm {
+	padding: var(--space_sm);
 }
-.gap_xs2 {
-	gap: var(--space_xs2);
+.mb_xs {
+	margin-bottom: var(--space_xs);
 }
-.mb_0 {
-	margin-bottom: 0;
+.overflow_auto {
+	overflow: auto;
+}
+.scrollbar_width_thin {
+	scrollbar-width: thin;
+}
+.text_align_left {
+	text-align: left;
+}
+.p_xs {
+	padding: var(--space_xs);
 }
 
 /* TODO other button variants? */
@@ -105,29 +123,6 @@
 	padding: 0;
 }
 
-.size_lg {
-	font-size: var(--size_lg);
-	--size: var(--size_lg);
-}
-.gap_xs {
-	gap: var(--space_xs);
-}
-.font_mono {
-	font-family: var(--font_mono);
-}
-.justify_content_space_between {
-	justify-content: space-between;
-}
-.white_space_nowrap {
-	white-space: nowrap;
-}
-.px_sm {
-	padding-left: var(--space_sm);
-	padding-right: var(--space_sm);
-}
-.ml_xl {
-	margin-left: var(--space_xl);
-}
 .inline_block {
 	display: inline-block;
 }
@@ -137,77 +132,82 @@
 .line_height_1 {
 	line-height: 1;
 }
+.white_space_nowrap {
+	white-space: nowrap;
+}
 .font_weight_400 {
 	font-weight: 400;
 	--font_weight: 400;
 }
-.bg_2 {
-	background-color: var(--bg_2);
+.flex_1 {
+	flex: 1;
 }
-.gap_xs5 {
-	gap: var(--space_xs5);
-}
-.radius_xs {
-	border-radius: var(--radius_xs);
-}
-.overflow_auto {
-	overflow: auto;
-}
-.scrollbar_width_thin {
-	scrollbar-width: thin;
-}
-.font_sans {
-	font-family: var(--font_sans);
-}
-.fg_1 {
-	background-color: var(--fg_1);
-}
-.px_md {
-	padding-left: var(--space_md);
-	padding-right: var(--space_md);
+.justify_content_start {
+	justify-content: start;
 }
 .py_xs {
 	padding-top: var(--space_xs);
 	padding-bottom: var(--space_xs);
 }
-.relative {
-	position: relative;
+.px_md {
+	padding-left: var(--space_md);
+	padding-right: var(--space_md);
 }
-
-/* A panel is a box embedded into the page, useful for visually isolating content. */
-.panel {
-	border-radius: var(--radius_xs);
-	background-color: var(--panel_bg, var(--fg_1));
+.radius_0 {
+	border-radius: 0;
 }
-
-.pl_sm {
-	padding-left: var(--space_sm);
+.border_none {
+	border-style: none;
 }
-.py_xs3 {
-	padding-top: var(--space_xs3);
-	padding-bottom: var(--space_xs3);
+.align_items_center {
+	align-items: center;
+}
+.ml_auto {
+	margin-left: auto;
+}
+.mt_xs {
+	margin-top: var(--space_xs);
+}
+.mb_xs2 {
+	margin-bottom: var(--space_xs2);
+}
+.block {
+	display: block;
+}
+.size_xs {
+	font-size: var(--size_xs);
+	--size: var(--size_xs);
+}
+.m_0 {
+	margin: 0;
+}
+.p_xs2 {
+	padding: var(--space_xs2);
+}
+.gap_xs2 {
+	gap: var(--space_xs2);
+}
+.pr_xs3 {
+	padding-right: var(--space_xs3);
+}
+.flex_wrap {
+	flex-wrap: wrap;
+}
+.justify_content_end {
+	justify-content: end;
+}
+.size_md {
+	font-size: var(--size_md);
+	--size: var(--size_md);
+}
+.p_md {
+	padding: var(--space_md);
 }
 .ellipsis {
 	display: block;
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
-}
-.mr_xs2 {
-	margin-right: var(--space_xs2);
-}
-.p_xs {
-	padding: var(--space_xs);
-}
-.mr_xs {
-	margin-right: var(--space_xs);
-}
-.size_xs {
-	font-size: var(--size_xs);
-	--size: var(--size_xs);
-}
-.ml_xs {
-	margin-left: var(--space_xs);
 }
 
 /* A pane is a box floating over the page, like for dialogs.
@@ -223,10 +223,6 @@
 	border-radius: var(--radius_xs);
 }
 
-.p_md {
-	padding: var(--space_md);
-}
-
 .width_md {
 	width: 100%;
 	max-width: var(--width_md);
@@ -235,168 +231,6 @@
 .mx_auto {
 	margin-left: auto;
 	margin-right: auto;
-}
-.mt_0 {
-	margin-top: 0;
-}
-.p_lg {
-	padding: var(--space_lg);
-}
-.mt_lg {
-	margin-top: var(--space_lg);
-}
-.bg_c_1 {
-	background-color: var(--color_c_1);
-}
-.gap_sm {
-	gap: var(--space_sm);
-}
-.px_xs {
-	padding-left: var(--space_xs);
-	padding-right: var(--space_xs);
-}
-.m_0 {
-	margin: 0;
-}
-.align_items_start {
-	align-items: start;
-}
-.align_items_center {
-	align-items: center;
-}
-.pr_md {
-	padding-right: var(--space_md);
-}
-.mb_xl12 {
-	margin-bottom: var(--space_xl12);
-}
-.flip_x {
-	transform: scaleX(-1);
-}
-.flex_wrap {
-	flex-wrap: wrap;
-}
-.gap_xl {
-	gap: var(--space_xl);
-}
-.mb_md {
-	margin-bottom: var(--space_md);
-}
-
-.min_width_sm {
-	width: 100%;
-	min-width: var(--width_sm);
-}
-
-.flex_column {
-	flex-direction: column;
-}
-
-.chip {
-	font-weight: 600;
-	padding: var(--space_xs5) var(--space_sm); /* maybe different inside `p`? using `calc` with `--size`? */
-	background-color: var(--fg_1);
-	border-radius: var(--radius_xs);
-}
-a.chip {
-	font-weight: 700;
-}
-
-.size_xl {
-	font-size: var(--size_xl);
-	--size: var(--size_xl);
-}
-.px_xl {
-	padding-left: var(--space_xl);
-	padding-right: var(--space_xl);
-}
-.justify_content_center {
-	justify-content: center;
-}
-.pl_md {
-	padding-left: var(--space_md);
-}
-.gap_md {
-	gap: var(--space_md);
-}
-.justify_content_start {
-	justify-content: start;
-}
-.ml_md {
-	margin-left: var(--space_md);
-}
-.inline_flex {
-	display: inline-flex;
-}
-.align_items_end {
-	align-items: end;
-}
-.mt_sm {
-	margin-top: var(--space_sm);
-}
-.overflow_hidden {
-	overflow: hidden;
-}
-.bg_d_1 {
-	background-color: var(--color_d_1);
-}
-.absolute {
-	position: absolute;
-}
-.h_100 {
-	height: 100%;
-}
-.px_lg {
-	padding-left: var(--space_lg);
-	padding-right: var(--space_lg);
-}
-.bg_d_2 {
-	background-color: var(--color_d_2);
-}
-.p_sm {
-	padding: var(--space_sm);
-}
-.justify_content_end {
-	justify-content: end;
-}
-.font_weight_600 {
-	font-weight: 600;
-	--font_weight: 600;
-}
-.gap_xl5 {
-	gap: var(--space_xl5);
-}
-
-.width_xs {
-	width: 100%;
-	max-width: var(--width_xs);
-}
-
-.mt_md {
-	margin-top: var(--space_md);
-}
-.pt_md {
-	padding-top: var(--space_md);
-}
-.mb_xl {
-	margin-bottom: var(--space_xl);
-}
-.my_lg {
-	margin-top: var(--space_lg);
-	margin-bottom: var(--space_lg);
-}
-.color_c_5 {
-	color: var(--color_c_5);
-}
-.fade_3 {
-	opacity: var(--fade_3);
-}
-.pb_0 {
-	padding-bottom: 0;
-}
-.shadow_inset_top_xs {
-	box-shadow: var(--shadow_inset_top_xs)
-		color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_1)), transparent);
 }
 
 .menu_item {
@@ -483,6 +317,117 @@ a.chip {
 	cursor: pointer;
 }
 
+.chevron {
+	position: relative;
+	height: 8px;
+}
+.chevron::before {
+	display: block;
+	content: '';
+	border: 4px solid transparent;
+	border-left-color: var(--text_color_3);
+}
+
+.inline_flex {
+	display: inline-flex;
+}
+
+/* Formats content to wrap long strings and preserve displayed whitespace. */
+.formatted {
+	overflow: hidden;
+	white-space: break-spaces;
+}
+
+.ml_xs2 {
+	margin-left: var(--space_xs2);
+}
+
+/* like `.box` but uncentered */
+.column {
+	display: flex;
+	flex-direction: column;
+}
+
+.my_xs {
+	margin-top: var(--space_xs);
+	margin-bottom: var(--space_xs);
+}
+.mb_0 {
+	margin-bottom: 0;
+}
+.justify_content_space_between {
+	justify-content: space-between;
+}
+.px_sm {
+	padding-left: var(--space_sm);
+	padding-right: var(--space_sm);
+}
+.ml_xl {
+	margin-left: var(--space_xl);
+}
+.bg_2 {
+	background-color: var(--bg_2);
+}
+.gap_xs5 {
+	gap: var(--space_xs5);
+}
+.radius_xs {
+	border-radius: var(--radius_xs);
+}
+.font_sans {
+	font-family: var(--font_sans);
+}
+.fg_1 {
+	background-color: var(--fg_1);
+}
+.relative {
+	position: relative;
+}
+
+/* A panel is a box embedded into the page, useful for visually isolating content. */
+.panel {
+	border-radius: var(--radius_xs);
+	background-color: var(--panel_bg, var(--fg_1));
+}
+
+.pl_sm {
+	padding-left: var(--space_sm);
+}
+.py_xs3 {
+	padding-top: var(--space_xs3);
+	padding-bottom: var(--space_xs3);
+}
+.mr_xs2 {
+	margin-right: var(--space_xs2);
+}
+.mr_xs {
+	margin-right: var(--space_xs);
+}
+.p_lg {
+	padding: var(--space_lg);
+}
+.mt_lg {
+	margin-top: var(--space_lg);
+}
+.bg_c_1 {
+	background-color: var(--color_c_1);
+}
+.gap_sm {
+	gap: var(--space_sm);
+}
+.px_xs {
+	padding-left: var(--space_xs);
+	padding-right: var(--space_xs);
+}
+.align_items_start {
+	align-items: start;
+}
+.pr_md {
+	padding-right: var(--space_md);
+}
+.h_100 {
+	height: 100%;
+}
 .my_xl5 {
 	margin-top: var(--space_xl5);
 	margin-bottom: var(--space_xl5);
@@ -497,17 +442,109 @@ a.chip {
 .mb_xl5 {
 	margin-bottom: var(--space_xl5);
 }
+.size_xl {
+	font-size: var(--size_xl);
+	--size: var(--size_xl);
+}
 .shadow_inset_xs {
 	box-shadow: var(--shadow_inset_xs)
+		color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_1)), transparent);
+}
+.mb_xl12 {
+	margin-bottom: var(--space_xl12);
+}
+.flip_x {
+	transform: scaleX(-1);
+}
+.gap_xl {
+	gap: var(--space_xl);
+}
+
+.min_width_sm {
+	width: 100%;
+	min-width: var(--width_sm);
+}
+
+.chip {
+	font-weight: 600;
+	padding: var(--space_xs5) var(--space_sm); /* maybe different inside `p`? using `calc` with `--size`? */
+	background-color: var(--fg_1);
+	border-radius: var(--radius_xs);
+}
+a.chip {
+	font-weight: 700;
+}
+
+.px_xl {
+	padding-left: var(--space_xl);
+	padding-right: var(--space_xl);
+}
+.justify_content_center {
+	justify-content: center;
+}
+.pl_md {
+	padding-left: var(--space_md);
+}
+.ml_md {
+	margin-left: var(--space_md);
+}
+.align_items_end {
+	align-items: end;
+}
+.overflow_hidden {
+	overflow: hidden;
+}
+.bg_d_1 {
+	background-color: var(--color_d_1);
+}
+.absolute {
+	position: absolute;
+}
+.px_lg {
+	padding-left: var(--space_lg);
+	padding-right: var(--space_lg);
+}
+.bg_d_2 {
+	background-color: var(--color_d_2);
+}
+.gap_xl5 {
+	gap: var(--space_xl5);
+}
+
+.width_xs {
+	width: 100%;
+	max-width: var(--width_xs);
+}
+
+.mt_md {
+	margin-top: var(--space_md);
+}
+.pt_md {
+	padding-top: var(--space_md);
+}
+.mb_xl {
+	margin-bottom: var(--space_xl);
+}
+.my_lg {
+	margin-top: var(--space_lg);
+	margin-bottom: var(--space_lg);
+}
+.color_c_5 {
+	color: var(--color_c_5);
+}
+.fade_3 {
+	opacity: var(--fade_3);
+}
+.pb_0 {
+	padding-bottom: 0;
+}
+.shadow_inset_top_xs {
+	box-shadow: var(--shadow_inset_top_xs)
 		color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_1)), transparent);
 }
 .shadow_inset_top_sm {
 	box-shadow: var(--shadow_inset_top_sm)
 		color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_2)), transparent);
-}
-.size_md {
-	font-size: var(--size_md);
-	--size: var(--size_md);
 }
 .text_color_5 {
 	color: var(--text_color_5);
@@ -521,9 +558,6 @@ a.chip {
 }
 .border_color_2 {
 	border-color: var(--border_color_2);
-}
-.white_space_pre_wrap {
-	white-space: pre-wrap;
 }
 .border_dashed {
 	border-style: dashed;
@@ -553,27 +587,12 @@ a.chip {
 .display_contents {
 	display: contents;
 }
-.text_align_left {
-	text-align: left;
-}
 .pt_xs {
 	padding-top: var(--space_xs);
 }
 .p_xs5 {
 	padding: var(--space_xs5);
 }
-
-.chevron {
-	position: relative;
-	height: 8px;
-}
-.chevron::before {
-	display: block;
-	content: '';
-	border: 4px solid transparent;
-	border-left-color: var(--text_color_3);
-}
-
 .fixed {
 	position: fixed;
 }
@@ -621,29 +640,11 @@ a.chip {
 	padding-left: var(--space_xs4);
 	padding-right: var(--space_xs4);
 }
-.radius_0 {
-	border-radius: 0;
-}
 .radius_md {
 	border-radius: var(--radius_md);
 }
-.border_none {
-	border-style: none;
-}
-.ml_auto {
-	margin-left: auto;
-}
-.mb_xs2 {
-	margin-bottom: var(--space_xs2);
-}
-.p_xs2 {
-	padding: var(--space_xs2);
-}
 .grid {
 	display: grid;
-}
-.pb_md {
-	padding-bottom: var(--space_md);
 }
 .bg_e_1 {
 	background-color: var(--color_e_1);
@@ -666,9 +667,6 @@ a.chip {
 }
 .radius_lg {
 	border-radius: var(--radius_lg);
-}
-.pr_xs3 {
-	padding-right: var(--space_xs3);
 }
 .p_xl3 {
 	padding: var(--space_xl3);
