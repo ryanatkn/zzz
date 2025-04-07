@@ -18,7 +18,7 @@
 			<Chat_Tape
 				{tape}
 				onremove={() => chat.remove_tape(tape.id)}
-				onsend={(input: string) => chat.send_to_tape(tape.id, input)}
+				onsend={(input) => chat.send_to_tape(tape.id, input)}
 				attrs={{class: 'h_100'}}
 			/>
 		{:else}

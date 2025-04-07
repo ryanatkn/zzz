@@ -70,7 +70,7 @@
 					<Chat_Tape
 						{tape}
 						onremove={() => chat.remove_tape(tape.id)}
-						onsend={(input: string) => chat.send_to_tape(tape.id, input)}
+						onsend={(input) => chat.send_to_tape(tape.id, input)}
 						show_delete_button
 						strips_attrs={{class: 'max_height_sm'}}
 						attrs={{class: 'p_md'}}
@@ -80,7 +80,7 @@
 		</ul>
 	</div>
 </div>
-<div class="column_fixed fg_1">
+<div class="column_fixed">
 	<div>
 		<!-- TODO add user-customizable sets of models -->
 		<div class="flex">
