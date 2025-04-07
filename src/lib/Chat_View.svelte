@@ -45,6 +45,7 @@
 	const first_tape = $derived(chat.tapes[0] as Tape | undefined);
 	const selected_chat = $derived(zzz.chats.selected);
 
+	// TODO BLOCK for the Prompt_List, probably want per-chat lists of prompts (indexed collection)
 	// TODO BLOCK add an enable button/state like with prompt bits
 	// TODO BLOCK show a list of tapes in a panel like with prompt bits
 	// TODO BLOCK prompts in a column on the right - custom buttons to do common things, compose them with a textarea with buttons like "fill all" or "fill with tag" or at least drag
