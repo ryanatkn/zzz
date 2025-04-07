@@ -153,7 +153,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 
 	create_file(filename: string, content: string = ''): void {
 		if (!this.zzz.zzz_dir) {
-			throw new Error('Cannot create file: zzz_dir is not set');
+			throw Error('Cannot create file: zzz_dir is not set');
 		}
 
 		// Create full path by joining zzz_dir with the filename
@@ -165,7 +165,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 
 	create_directory(dirname: string): void {
 		if (!this.zzz.zzz_dir) {
-			throw new Error('Cannot create directory: zzz_dir is not set');
+			throw Error('Cannot create directory: zzz_dir is not set');
 		}
 
 		// Create full path by joining zzz_dir with the directory name

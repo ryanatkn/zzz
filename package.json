@@ -97,6 +97,10 @@
   ],
   "exports": {
     "./package.json": "./package.json",
+    "./app.svelte.js": {
+      "types": "./dist/app.svelte.d.ts",
+      "default": "./dist/app.svelte.js"
+    },
     "./Bit_Editor_For_Diskfile.svelte": {
       "types": "./dist/Bit_Editor_For_Diskfile.svelte.d.ts",
       "svelte": "./dist/Bit_Editor_For_Diskfile.svelte",

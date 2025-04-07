@@ -234,12 +234,12 @@ export class Indexed_Collection<
 	#ensure_index(key: string, expected_type: Index_Type): void {
 		const index = this.indexes[key];
 		if (index === undefined) {
-			throw new Error(`Index not found: ${key}`);
+			throw Error(`Index not found: ${key}`);
 		}
 
 		const actual_type = this.#index_types.get(key);
 		if (actual_type !== expected_type) {
-			throw new Error(
+			throw Error(
 				`Index type mismatch: ${key} is a ${actual_type || 'unknown'} index, not a ${expected_type} index`,
 			);
 		}
@@ -488,7 +488,7 @@ export class Indexed_Collection<
 		const item = index.get(value);
 
 		if (!item) {
-			throw new Error(`Item not found for index ${index_key} with value ${String(value)}`);
+			throw Error(`Item not found for index ${index_key} with value ${String(value)}`);
 		}
 		return item;
 	}

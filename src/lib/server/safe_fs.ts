@@ -44,7 +44,7 @@ export class Safe_Fs {
 			);
 		} catch (error) {
 			if (error instanceof z.ZodError) {
-				throw new Error(`Invalid path in allowed_paths: ${error.message}`);
+				throw Error(`Invalid path in allowed_paths: ${error.message}`);
 			}
 			throw error;
 		}

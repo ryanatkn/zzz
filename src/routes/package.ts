@@ -80,6 +80,7 @@ export const package_json = {
 	files: ['dist'],
 	exports: {
 		'./package.json': './package.json',
+		'./app.svelte.js': {types: './dist/app.svelte.d.ts', default: './dist/app.svelte.js'},
 		'./Bit_Editor_For_Diskfile.svelte': {
 			types: './dist/Bit_Editor_For_Diskfile.svelte.d.ts',
 			svelte: './dist/Bit_Editor_For_Diskfile.svelte',
@@ -725,6 +726,7 @@ export const src_json = {
 	version: '0.0.1',
 	modules: {
 		'./package.json': {path: 'package.json', declarations: []},
+		'./app.svelte.js': {path: 'app.svelte.ts', declarations: [{name: 'App', kind: 'class'}]},
 		'./Bit_Editor_For_Diskfile.svelte': {path: 'Bit_Editor_For_Diskfile.svelte', declarations: []},
 		'./Bit_Editor_For_Sequence.svelte': {path: 'Bit_Editor_For_Sequence.svelte', declarations: []},
 		'./Bit_Editor_For_Text.svelte': {path: 'Bit_Editor_For_Text.svelte', declarations: []},

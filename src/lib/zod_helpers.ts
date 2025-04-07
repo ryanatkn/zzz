@@ -48,7 +48,7 @@ export const zod_get_schema_keys = <T extends z.ZodTypeAny>(schema: T): Array<st
 export const get_field_schema = (schema: z.ZodTypeAny, key: string): z.ZodTypeAny => {
 	const field = maybe_get_field_schema(schema, key);
 	if (!field) {
-		throw new Error(`Field "${key}" not found in schema`);
+		throw Error(`Field "${key}" not found in schema`);
 	}
 	return field;
 };

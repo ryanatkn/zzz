@@ -586,7 +586,7 @@ export class Reorderable implements Reorderable_Style_Config {
 	list: Action<HTMLElement, Reorderable_List_Params> = (node, params) => {
 		// Check if we already have a list node
 		if (this.list_node && this.list_node !== node) {
-			throw new Error('This Reorderable instance is already attached to a different list element.');
+			throw Error('This Reorderable instance is already attached to a different list element.');
 		}
 
 		// Clean up previous state if this is a re-initialization
