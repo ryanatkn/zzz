@@ -5,11 +5,9 @@ import {DEV} from 'esm-env';
 import {Uuid} from '$lib/zod_helpers.js';
 import type {Indexed_Item} from '$lib/indexed_collection_helpers.js';
 
-// TODO there's a big problem here where indexes aren't reactive
-
-// TODO the API is nowhere near done, this is just a proof of concept
-
-// TODO think about this from the whole graph's POV, not just individual collections, for relationships/transactions
+// TODO @many rethink the indexed collection API -
+// particularly type safety, performance, and integration with Svelte patterns -
+// consider the whole graph's POV, not just individual collections, for relationships/transactions
 
 /**
  * String literals for index types.

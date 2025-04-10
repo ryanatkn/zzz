@@ -788,7 +788,6 @@ export const src_json = {
 				{name: 'PONG_DISPLAY_LIMIT', kind: 'variable'},
 				{name: 'Actions_Json', kind: 'variable'},
 				{name: 'Actions_Options', kind: 'type'},
-				{name: 'Action_Multi_Index_Keys', kind: 'type'},
 				{name: 'Actions', kind: 'class'},
 			],
 		},
@@ -814,7 +813,7 @@ export const src_json = {
 		'./bit.svelte.js': {
 			path: 'bit.svelte.ts',
 			declarations: [
-				{name: 'Bit_Base_Json', kind: 'variable'},
+				{name: 'Bit_Json_Base', kind: 'variable'},
 				{name: 'Text_Bit_Json', kind: 'variable'},
 				{name: 'Diskfile_Bit_Json', kind: 'variable'},
 				{name: 'Sequence_Bit_Json', kind: 'variable'},

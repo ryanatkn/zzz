@@ -69,6 +69,7 @@ export class Models extends Cell<typeof Models_Json> {
 		// Add custom decoder for the items property,
 		// which also prevents it from automatically overwriting our collection
 		this.decoders = {
+			// TODO @many maybe infer or create a helper for this, duplicated many places
 			items: (items) => {
 				if (Array.isArray(items)) {
 					this.items.clear();

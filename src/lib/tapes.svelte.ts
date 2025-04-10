@@ -59,6 +59,7 @@ export class Tapes extends Cell<typeof Tapes_Json> {
 		super(Tapes_Json, options);
 
 		this.decoders = {
+			// TODO @many maybe infer or create a helper for this, duplicated many places
 			items: (items) => {
 				if (Array.isArray(items)) {
 					this.items.clear();

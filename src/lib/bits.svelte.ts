@@ -45,11 +45,12 @@ export class Bits extends Cell<typeof Bits_Json> {
 		super(Bits_Json, options);
 
 		this.decoders = {
+			// TODO @many maybe infer or create a helper for this, duplicated many places
 			items: (items) => {
 				if (Array.isArray(items)) {
 					this.items.clear();
 					for (const item_json of items) {
-						this.add(Bit.create(this.zzz, item_json)); // TODO ideally this is automatic through the registry+schema
+						this.add(item_json);
 					}
 				}
 				return HANDLED;
@@ -60,15 +61,17 @@ export class Bits extends Cell<typeof Bits_Json> {
 	}
 
 	/**
-	 * Add a bit to the collection
+	 * Add a bit to the collection.
 	 */
-	add(bit: Bit_Type): Bit_Type {
+	add(json: z.input<typeof Bit_Json>): Bit_Type {
+		// TODO isn't typesafe
+		const bit = Bit.create(this.zzz, json);
 		this.items.add(bit);
 		return bit;
 	}
 
 	/**
-	 * Remove a bit by id
+	 * Remove a bit by id.
 	 */
 	remove(id: Uuid): boolean {
 		return this.items.remove(id);

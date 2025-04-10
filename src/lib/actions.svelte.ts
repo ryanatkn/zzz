@@ -11,7 +11,7 @@ import {
 } from '$lib/action_types.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
-import {create_multi_index, create_derived_index} from '$lib/indexed_collection_helpers.js';
+import {create_multi_index} from '$lib/indexed_collection_helpers.js';
 
 export const HISTORY_LIMIT_DEFAULT = 512;
 export const PONG_DISPLAY_LIMIT = 6;
@@ -33,80 +33,14 @@ export interface Actions_Options extends Cell_Options<typeof Actions_Json> {
 	history_limit?: number;
 }
 
-// Define our index keys for type safety
-export type Action_Multi_Index_Keys = 'by_type' | 'by_ping_id';
-
 export class Actions extends Cell<typeof Actions_Json> {
-	// Configure indexed collection with unified indexing system
 	readonly items: Indexed_Collection<Action> = new Indexed_Collection({
 		indexes: [
-			// Type-based multi-index
 			create_multi_index({
 				key: 'by_type',
 				extractor: (action) => action.type,
-				query_schema: z.enum([
-					'ping',
-					'pong',
-					'send_prompt',
-					'completion_response',
-					'update_diskfile',
-					'delete_diskfile',
-					'filer_change',
-				]),
+				query_schema: Action_Type,
 				result_schema: Action_Schema,
-			}),
-
-			// Ping id index for pongs
-			create_multi_index({
-				key: 'by_ping_id',
-				extractor: (action) => {
-					if (action.type === 'pong' && action.ping_id) {
-						return action.ping_id;
-					}
-					return undefined;
-				},
-				query_schema: z.string(),
-				matches: (action) => action.type === 'pong' && !!action.ping_id,
-				result_schema: Action_Schema,
-			}),
-
-			// Derived index for latest pongs - prioritize showing most recent
-			create_derived_index({
-				key: 'latest_pongs',
-				compute: (collection) => {
-					return collection
-						.where('by_type', 'pong')
-						.sort((a, b) => b.created.localeCompare(a.created))
-						.slice(0, PONG_DISPLAY_LIMIT);
-				},
-				matches: (item) => item.type === 'pong',
-				result_schema: Action_Schema,
-				onadd: (items, item) => {
-					if (item.type !== 'pong') return items;
-
-					// Insert at correct position based on created timestamp
-					const index = items.findIndex((existing) => item.created > existing.created);
-
-					if (index === -1) {
-						items.push(item);
-					} else {
-						items.splice(index, 0, item);
-					}
-
-					// Keep only the newest items
-					if (items.length > PONG_DISPLAY_LIMIT) {
-						return items.slice(0, PONG_DISPLAY_LIMIT);
-					}
-
-					return items;
-				},
-				onremove: (items, item) => {
-					const index = items.findIndex((i) => i.id === item.id);
-					if (index !== -1) {
-						items.splice(index, 1);
-					}
-					return items;
-				},
 			}),
 		],
 	});
@@ -141,6 +75,7 @@ export class Actions extends Cell<typeof Actions_Json> {
 		}
 
 		this.decoders = {
+			// TODO @many maybe infer or create a helper for this, duplicated many places
 			items: (items) => {
 				if (Array.isArray(items)) {
 					this.items.clear();

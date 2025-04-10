@@ -87,9 +87,7 @@ export const create_strip = (
 	options: Partial<Omit<Strip_Json, 'content' | 'role' | 'bit_id'>> = EMPTY_OBJECT,
 	zzz: Zzz,
 ): Strip => {
-	// Create a new bit for this content
-	const bit = zzz.registry.instantiate('Text_Bit', {content});
-	zzz.bits.add(bit);
+	const bit = zzz.bits.add({type: 'text', content});
 
 	return zzz.registry.instantiate('Strip', {
 		role,

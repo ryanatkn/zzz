@@ -35,7 +35,7 @@
 				/>
 			{/if}
 
-			{#if tape.strips.length > 0}
+			{#if tape.strips.size > 0}
 				<Contextmenu_Entry
 					run={() => {
 						tape.remove_all_strips();

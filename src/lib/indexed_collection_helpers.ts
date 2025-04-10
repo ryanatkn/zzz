@@ -4,10 +4,14 @@ import {z} from 'zod';
 import type {Index_Definition, Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {Any, Uuid} from '$lib/zod_helpers.js';
 
+// TODO @many rethink the indexed collection API -
+// particularly type safety, performance, and integration with Svelte patterns -
+// consider the whole graph's POV, not just individual collections, for relationships/transactions
+
 export const Svelte_Map_Schema = z.custom<SvelteMap<any, any>>((val) => val instanceof SvelteMap);
 
 /**
- * Interface for objects that can be stored in an indexed collection
+ * Interface for objects that can be stored in an indexed collection.
  */
 export const Indexed_Item = z.object({
 	id: Uuid,
@@ -37,7 +41,7 @@ export interface Index_Options<T extends Indexed_Item> {
 /**
  * Options for single-value indexes.
  */
-export interface Single_Index_Options<T extends Indexed_Item, K = any> extends Index_Options<T> {
+export interface Single_Index_Options<T extends Indexed_Item, K> extends Index_Options<T> {
 	/** Function that extracts the key from an item */
 	extractor: (item: T) => K;
 }
@@ -45,7 +49,7 @@ export interface Single_Index_Options<T extends Indexed_Item, K = any> extends I
 /**
  * Create a single-value index (one key maps to one item).
  */
-export const create_single_index = <T extends Indexed_Item, K = any>(
+export const create_single_index = <T extends Indexed_Item, K>(
 	options: Single_Index_Options<T, K>,
 ): Index_Definition<T, SvelteMap<K, T>, K> => {
 	return {
@@ -114,7 +118,7 @@ export const create_single_index = <T extends Indexed_Item, K = any>(
 /**
  * Options for multi-value indexes.
  */
-export interface Multi_Index_Options<T extends Indexed_Item, K = any> extends Index_Options<T> {
+export interface Multi_Index_Options<T extends Indexed_Item, K> extends Index_Options<T> {
 	/** Function that extracts the key(s) from an item. */
 	extractor: (item: T) => K | Array<K> | undefined;
 
@@ -125,7 +129,7 @@ export interface Multi_Index_Options<T extends Indexed_Item, K = any> extends In
 /**
  * Create a multi-value index (one key maps to many items).
  */
-export const create_multi_index = <T extends Indexed_Item, K = any>(
+export const create_multi_index = <T extends Indexed_Item, K>(
 	options: Multi_Index_Options<T, K>,
 ): Index_Definition<T, SvelteMap<K, Array<T>>, K> => {
 	return {
@@ -205,7 +209,7 @@ export interface Derived_Index_Options<T extends Indexed_Item> extends Index_Opt
 }
 
 /**
- * Create a derived collection index.
+ * Create an incremental derived collection index.
  */
 export const create_derived_index = <T extends Indexed_Item>(
 	options: Derived_Index_Options<T>,
@@ -306,7 +310,7 @@ const should_include_item = <T extends Indexed_Item>(
 /**
  * Helper function to add an item to a multi-value map.
  */
-const add_to_multi_map = <T extends Indexed_Item, K = any>(
+const add_to_multi_map = <T extends Indexed_Item, K>(
 	map: SvelteMap<K, Array<T>>,
 	key: K,
 	item: T,
@@ -326,7 +330,7 @@ const add_to_multi_map = <T extends Indexed_Item, K = any>(
 /**
  * Helper function to remove an item from a multi-value map.
  */
-const remove_from_multi_map = <T extends Indexed_Item, K = any>(
+const remove_from_multi_map = <T extends Indexed_Item, K>(
 	map: SvelteMap<K, Array<T>>,
 	key: K,
 	item: T,

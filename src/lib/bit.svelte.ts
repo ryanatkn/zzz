@@ -14,7 +14,7 @@ import {Diskfile_Path} from '$lib/diskfile_types.js';
 import {CONTENT_PREVIEW_LENGTH} from '$lib/constants.js';
 
 /** Common properties for all bit types. */
-export const Bit_Base_Json = Cell_Json.extend({
+export const Bit_Json_Base = Cell_Json.extend({
 	type: z.string(),
 	name: z.string().default(''),
 	start: z.number().nullable().default(null),
@@ -26,26 +26,26 @@ export const Bit_Base_Json = Cell_Json.extend({
 	title: z.string().nullable().default(null),
 	summary: z.string().nullable().default(null),
 });
-export type Bit_Base_Json = z.infer<typeof Bit_Base_Json>;
+export type Bit_Json_Base = z.infer<typeof Bit_Json_Base>;
 
 /** Text bit schema - direct content storage. */
-export const Text_Bit_Json = Bit_Base_Json.extend({
+export const Text_Bit_Json = Bit_Json_Base.extend({
 	type: z.literal('text').default('text'),
 	content: z.string().default(''),
 });
 export type Text_Bit_Json = z.infer<typeof Text_Bit_Json>;
 
 /** Diskfile bit schema - references a diskfile. */
-export const Diskfile_Bit_Json = Bit_Base_Json.extend({
+export const Diskfile_Bit_Json = Bit_Json_Base.extend({
 	type: z.literal('diskfile').default('diskfile'),
 	path: Diskfile_Path.nullable().default(null),
-	has_xml_tag: Bit_Base_Json.shape.has_xml_tag.default(true), // Override to make true only for diskfiles
+	has_xml_tag: Bit_Json_Base.shape.has_xml_tag.default(true), // Override to make true only for diskfiles
 	// `content` is on disk at `path`, not in the serialized representation
 });
 export type Diskfile_Bit_Json = z.infer<typeof Diskfile_Bit_Json>;
 
 /** Sequence bit schema - contains an ordered list of bit references. */
-export const Sequence_Bit_Json = Bit_Base_Json.extend({
+export const Sequence_Bit_Json = Bit_Json_Base.extend({
 	type: z.literal('sequence').default('sequence'),
 	items: z.array(Uuid).default(() => []),
 });
@@ -64,7 +64,7 @@ export type Bit_Type = Text_Bit | Diskfile_Bit | Sequence_Bit;
 export type Bit_Json_Type = Text_Bit_Json | Diskfile_Bit_Json | Sequence_Bit_Json;
 
 // Base options interface - fixed to properly constrain the type parameter
-export interface Bit_Options<T extends z.ZodType = typeof Bit_Base_Json> extends Cell_Options<T> {
+export interface Bit_Options<T extends z.ZodType = typeof Bit_Json_Base> extends Cell_Options<T> {
 	json?: z.input<T>;
 }
 
@@ -80,7 +80,7 @@ export type Bit_Type_Options = Text_Bit_Options | Diskfile_Bit_Options | Sequenc
 /**
  * Abstract base class for all bit types.
  */
-export abstract class Bit<T extends z.ZodType = typeof Bit_Base_Json> extends Cell<T> {
+export abstract class Bit<T extends z.ZodType = typeof Bit_Json_Base> extends Cell<T> {
 	// The type discriminator - to be set by subclasses
 	abstract readonly type: string;
 
@@ -153,7 +153,6 @@ export abstract class Bit<T extends z.ZodType = typeof Bit_Base_Json> extends Ce
 		}
 	}
 
-	// TODO can this be automated with the schema somehow? probs
 	/**
 	 * Create a bit of any type.
 	 *
@@ -177,11 +176,8 @@ export abstract class Bit<T extends z.ZodType = typeof Bit_Base_Json> extends Ce
 		json: z.input<typeof Sequence_Bit_Json>,
 		options?: Sequence_Bit_Options,
 	): Sequence_Bit;
-	static create(
-		zzz: Zzz,
-		json: z.input<typeof Bit_Json>,
-		options?: Bit_Options<z.ZodTypeAny>,
-	): Bit_Type {
+	static create(zzz: Zzz, json: z.input<typeof Bit_Json>, options?: Bit_Type_Options): Bit_Type;
+	static create(zzz: Zzz, json: z.input<typeof Bit_Json>, options?: Bit_Type_Options): Bit_Type {
 		if (!json.type) {
 			throw Error('Missing required "type" field in bit JSON');
 		}

@@ -54,10 +54,13 @@ export class Chats extends Cell<typeof Chats_Json> {
 	/** Ordered array of chats derived from the `manual_order` index. */
 	readonly ordered_items: Array<Chat> = $derived(this.items.derived_index('manual_order'));
 
+	readonly items_by_name = $derived(this.items.single_index('by_name'));
+
 	constructor(options: Chats_Options) {
 		super(Chats_Json, options);
 
 		this.decoders = {
+			// TODO @many maybe infer or create a helper for this, duplicated many places
 			items: (items) => {
 				if (Array.isArray(items)) {
 					this.items.clear();
