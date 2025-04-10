@@ -313,6 +313,6 @@ const write_json = async (path: string, json: unknown, safe_fs: Safe_Fs): Promis
 	const formatted = await format_file(JSON.stringify(json), {parser: 'json'});
 
 	// Use Safe_Fs for writing the file
-	console.log('WRITING JSON', path, typeof formatted);
+	console.log('writing json', path, formatted.length);
 	await safe_fs.write_file(path, formatted);
 };

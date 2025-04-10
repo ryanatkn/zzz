@@ -13,7 +13,7 @@
 
 	const {tape, chat}: Props = $props();
 
-	const message_count = $derived(tape.strips.length);
+	const strip_count = $derived(tape.strips.size);
 </script>
 
 <Contextmenu_Tape {tape}>
@@ -22,9 +22,9 @@
 			<div class="flex_1">
 				<div class="font_weight_600">{tape.model_name}</div>
 				<div class="flex gap_xs">
-					{#if message_count > 0}
+					{#if strip_count > 0}
 						<small
-							>{message_count} message{message_count !== 1 ? 's' : ''}, {tape.token_count} token{tape.token_count !==
+							>{strip_count} message{strip_count !== 1 ? 's' : ''}, {tape.token_count} token{tape.token_count !==
 							1
 								? 's'
 								: ''}</small
