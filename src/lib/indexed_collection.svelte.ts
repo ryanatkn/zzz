@@ -12,45 +12,43 @@ import type {Indexed_Item} from '$lib/indexed_collection_helpers.js';
 // TODO think about this from the whole graph's POV, not just individual collections, for relationships/transactions
 
 /**
- * String literals for index types
+ * String literals for index types.
  */
 export type Index_Type = 'single' | 'multi' | 'derived' | 'dynamic';
 
 /**
- * Generic index definition with full flexibility
+ * Generic index definition with full flexibility.
  */
 export interface Index_Definition<T extends Indexed_Item, T_Result = any, T_Query = any> {
-	/** Unique identifier for this index */
+	/** Unique identifier for this index. */
 	key: string;
 
-	/** Optional index type for simpler creation */
+	/** Optional index type for simpler creation. */
 	type?: Index_Type;
 
-	/** Optional extractor function for single/multi indexes */
+	/** Optional extractor function for single/multi indexes. */
 	extractor?: (item: T) => any;
 
-	/** Function to compute the index value from scratch */
+	/** Function to compute the index value from scratch. */
 	compute: (collection: Indexed_Collection<T>) => T_Result;
 
 	/**
-	 * Schema for validating query parameters
-	 * This also defines the type of queries this index accepts
+	 * Schema for validating query parameters.
 	 */
-	query_schema?: z.ZodType<T_Query>;
+	query_schema?: z.ZodType<T_Query>; // TODO @many should query/result schemas be optional or required? helpers could make required schemas easier to work with
 
 	/**
-	 * Schema for validating the computed result
-	 * This defines the return type of the index lookups
+	 * Schema for validating the computed result.
 	 */
-	result_schema: z.ZodType<T_Result>;
+	result_schema: z.ZodType<T_Result>; // TODO @many should query/result schemas be optional or required? helpers could make required schemas easier to work with
 
-	/** Optional predicate to determine if an item is relevant to this index */
+	/** Optional predicate to determine if an item is relevant to this index. */
 	matches?: (item: T) => boolean;
 
-	/** Optional function to update the index when an item is added */
+	/** Optional function to update the index when an item is added. */
 	onadd?: (result: T_Result, item: T, collection: Indexed_Collection<T>) => T_Result;
 
-	/** Optional function to update the index when an item is removed */
+	/** Optional function to update the index when an item is removed. */
 	onremove?: (result: T_Result, item: T, collection: Indexed_Collection<T>) => T_Result;
 }
 
@@ -74,7 +72,7 @@ export interface Indexed_Collection_Options<
 
 /**
  * A helper class for managing collections that need efficient lookups
- * with automatic index maintenance
+ * with automatic index maintenance.
  *
  * @param T - The type of items stored in the collection
  * @param T_Key_Single - Type-safe keys for single value indexes
@@ -185,7 +183,7 @@ export class Indexed_Collection<
 	}
 
 	/**
-	 * Get a typed index value by key
+	 * Get a typed index value by key.
 	 */
 	get_index<T_Result = any>(
 		key: T_Key_Single | T_Key_Multi | T_Key_Derived | T_Key_Dynamic,
@@ -194,7 +192,7 @@ export class Indexed_Collection<
 	}
 
 	/**
-	 * Get a single-value index with proper typing
+	 * Get a single-value index with proper typing.
 	 */
 	single_index(key: T_Key_Single): SvelteMap<any, T> {
 		this.#ensure_index(key, 'single');
@@ -202,7 +200,7 @@ export class Indexed_Collection<
 	}
 
 	/**
-	 * Get a multi-value index with proper typing
+	 * Get a multi-value index with proper typing.
 	 */
 	multi_index(key: T_Key_Multi): SvelteMap<any, Array<T>> {
 		this.#ensure_index(key, 'multi');
@@ -210,7 +208,7 @@ export class Indexed_Collection<
 	}
 
 	/**
-	 * Get a derived index with proper typing
+	 * Get a derived index with proper typing.
 	 */
 	derived_index(key: T_Key_Derived): Array<T> {
 		this.#ensure_index(key, 'derived');
@@ -218,7 +216,7 @@ export class Indexed_Collection<
 	}
 
 	/**
-	 * Get a dynamic (function) index with proper typing
+	 * Get a dynamic (function) index with proper typing.
 	 */
 	dynamic_index<Q = any>(key: T_Key_Dynamic): (query: Q) => T {
 		this.#ensure_index(key, 'dynamic');
@@ -226,7 +224,7 @@ export class Indexed_Collection<
 	}
 
 	/**
-	 * Ensures that the index exists and is of the expected type
+	 * Ensures that the index exists and is of the expected type.
 	 * @param key - The index key to check
 	 * @param expected_type - The expected type of the index
 	 * @throws Error if index doesn't exist or has wrong type
@@ -246,9 +244,9 @@ export class Indexed_Collection<
 	}
 
 	/**
-	 * Query an index with parameters
+	 * Query an index with parameters.
 	 *
-	 * This method is type-aware when the index has a query_schema that defines T_Query
+	 * This method is type-aware when the index has a `query_schema` that defines `T_Query`.
 	 */
 	query<T_Result = any, T_Query = any>(
 		key: T_Key_Single | T_Key_Multi | T_Key_Derived | T_Key_Dynamic,
@@ -281,7 +279,7 @@ export class Indexed_Collection<
 	}
 
 	/**
-	 * Add multiple items to the collection at once with improved performance
+	 * Add multiple items to the collection at once with improved performance.
 	 */
 	add_many(items: Array<T>): Array<T> {
 		if (!items.length) return [];
@@ -299,7 +297,7 @@ export class Indexed_Collection<
 	}
 
 	/**
-	 * Update all indexes when an item is added
+	 * Update all indexes when an item is added.
 	 */
 	#update_indexes_for_added_item(item: T): void {
 		for (const def of this.#index_definitions) {
@@ -321,7 +319,7 @@ export class Indexed_Collection<
 	}
 
 	/**
-	 * Update all indexes when an item is removed
+	 * Update all indexes when an item is removed.
 	 */
 	#update_indexes_for_removed_item(item: T): void {
 		for (const def of this.#index_definitions) {
@@ -343,7 +341,7 @@ export class Indexed_Collection<
 	}
 
 	/**
-	 * Add an item to the collection and update all indexes
+	 * Add an item to the collection and update all indexes.
 	 */
 	add(item: T): T {
 		const {by_id} = this;
@@ -362,7 +360,7 @@ export class Indexed_Collection<
 	}
 
 	/**
-	 * Remove an item by its id and update all indexes
+	 * Remove an item by its id and update all indexes.
 	 */
 	remove(id: Uuid): boolean {
 		const item = this.by_id.get(id);
@@ -378,7 +376,7 @@ export class Indexed_Collection<
 	}
 
 	/**
-	 * Remove multiple items efficiently
+	 * Remove multiple items efficiently.
 	 */
 	remove_many(ids: Array<Uuid>): number {
 		if (!ids.length) return 0;
@@ -414,21 +412,21 @@ export class Indexed_Collection<
 	}
 
 	/**
-	 * Get an item by its id
+	 * Get an item by its id.
 	 */
 	get(id: Uuid): T | undefined {
 		return this.by_id.get(id);
 	}
 
 	/**
-	 * Check if the collection has an item with the given id
+	 * Check if the collection has an item with the given id.
 	 */
 	has(id: Uuid): boolean {
 		return this.by_id.has(id);
 	}
 
 	/**
-	 * Clear all items and reset indexes
+	 * Clear all items and reset indexes.
 	 */
 	clear(): void {
 		this.by_id.clear();
@@ -442,8 +440,8 @@ export class Indexed_Collection<
 	// TODO `V = any` needs to be typesafe to the key/value pair
 
 	/**
-	 * Get all items matching a multi-indexed property value
-	 * Type-safe version that uses the T_Key_Multi generic parameter
+	 * Get all items matching a multi-indexed property value.
+	 * Type-safe version that uses the T_Key_Multi generic parameter.
 	 */
 	where<V = any>(index_key: T_Key_Multi, value: V): Array<T> {
 		this.#ensure_index(index_key, 'multi');
@@ -452,8 +450,8 @@ export class Indexed_Collection<
 	}
 
 	/**
-	 * Get the first N items matching a multi-indexed property value
-	 * Type-safe version that uses the T_Key_Multi generic parameter
+	 * Get the first N items matching a multi-indexed property value.
+	 * Type-safe version that uses the T_Key_Multi generic parameter.
 	 */
 	first<V = any>(index_key: T_Key_Multi, value: V, limit: number): Array<T> {
 		// Handle edge cases with limit
@@ -464,8 +462,8 @@ export class Indexed_Collection<
 	}
 
 	/**
-	 * Get the latest N items matching a multi-indexed property value
-	 * Type-safe version that uses the T_Key_Multi generic parameter
+	 * Get the latest N items matching a multi-indexed property value.
+	 * Type-safe version that uses the T_Key_Multi generic parameter.
 	 */
 	latest<V = any>(index_key: T_Key_Multi, value: V, limit: number): Array<T> {
 		// Handle edge cases with limit
@@ -476,9 +474,9 @@ export class Indexed_Collection<
 	}
 
 	/**
-	 * Get an item by a single-value index
-	 * Returns the item or throws if no item is found
-	 * Type-safe version that uses the T_Key_Single generic parameter
+	 * Get an item by a single-value index.
+	 * Returns the item or throws if no item is found.
+	 * Type-safe version that uses the T_Key_Single generic parameter.
 	 */
 	by<V = any>(index_key: T_Key_Single, value: V): T {
 		// This will throw if index doesn't exist or has wrong type
@@ -494,8 +492,8 @@ export class Indexed_Collection<
 	}
 
 	/**
-	 * Get an item by a single-value index, returning undefined if not found
-	 * Type-safe version that uses the T_Key_Single generic parameter
+	 * Get an item by a single-value index, returning undefined if not found.
+	 * Type-safe version that uses the T_Key_Single generic parameter.
 	 */
 	by_optional<V = any>(index_key: T_Key_Single, value: V): T | undefined {
 		this.#ensure_index(index_key, 'single');

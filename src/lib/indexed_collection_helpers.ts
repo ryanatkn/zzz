@@ -52,7 +52,7 @@ export const create_single_index = <T extends Indexed_Item, K = any>(
 		key: options.key,
 		type: 'single',
 		extractor: options.extractor,
-		query_schema: options.query_schema || (z.any() as z.ZodType<K>),
+		query_schema: options.query_schema,
 		matches: options.matches,
 		result_schema: options.result_schema ?? Svelte_Map_Schema,
 		compute: (collection) => {
@@ -132,7 +132,7 @@ export const create_multi_index = <T extends Indexed_Item, K = any>(
 		key: options.key,
 		type: 'multi',
 		extractor: options.extractor,
-		query_schema: options.query_schema || (z.any() as z.ZodType<K>),
+		query_schema: options.query_schema,
 		matches: options.matches,
 		result_schema: options.result_schema ?? Svelte_Map_Schema,
 		compute: (collection) => {
@@ -281,7 +281,7 @@ export const create_dynamic_index = <
 	F extends (...args: Array<any>) => any,
 >(
 	options: Dynamic_Index_Options<T, F>,
-): Index_Definition<T, F, Parameters<F>[0]> => {
+): Index_Definition<T, F, Parameters<F>[number]> => {
 	return {
 		key: options.key,
 		compute: options.factory,

@@ -34,7 +34,7 @@
 	};
 
 	const count = $derived(chat.enabled_tapes.length);
-	const tags = $derived(Array.from(zzz.tags)); // TODO BLOCK refactor, `Tags` may be a class, maybe with an indexed collection
+	const tags = $derived(Array.from(zzz.tags)); // TODO refactor, `Tags` may be a class, maybe with an indexed collection
 </script>
 
 <div class="column_fluid">

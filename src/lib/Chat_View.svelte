@@ -45,14 +45,8 @@
 	const first_tape = $derived(chat.tapes[0] as Tape | undefined);
 	const selected_chat = $derived(zzz.chats.selected);
 
-	// TODO BLOCK for the Prompt_List, probably want per-chat lists of prompts (indexed collection)
-	// TODO BLOCK add an enable button/state like with prompt bits
-	// TODO BLOCK show a list of tapes in a panel like with prompt bits
-	// TODO BLOCK prompts in a column on the right - custom buttons to do common things, compose them with a textarea with buttons like "fill all" or "fill with tag" or at least drag
-	// TODO BLOCK add `presets`  section to the top with the custom buttons/sets (accessible via contextmenu)
-	// TODO BLOCK maybe a mode that allows duplicates by holding a key like shift, but otherwise only setting up 1 tape per model?
-	// TODO BLOCK custom buttons section - including quick local, smartest all, all, etc
-	// TODO BLOCK remove all tapes needs to open to the right of the button
+	// TODO add `presets`  section to the top with the custom buttons/sets (accessible via contextmenu)
+	// TODO custom buttons section - including quick local, smartest all, all, etc - custom buttons to do common things, compose them with a textarea with buttons like "fill all" or "fill with tag" or at least drag
 </script>
 
 <div class="flex_1 h_100 flex align_items_start">
