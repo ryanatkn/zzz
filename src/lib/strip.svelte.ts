@@ -90,14 +90,17 @@ export const create_strip = (
 ): Strip => {
 	const bit = zzz.bits.add({type: 'text', content});
 
-	return zzz.registry.instantiate('Strip', {
-		role,
-		bit_id: bit.id,
-		id: options.id || Uuid.parse(undefined),
-		created: options.created || Datetime_Now.parse(undefined),
-		tape_id: options.tape_id,
-		request: options.request,
-		response: options.response,
+	return new Strip({
+		zzz,
+		json: {
+			role,
+			bit_id: bit.id,
+			id: options.id || Uuid.parse(undefined),
+			created: options.created || Datetime_Now.parse(undefined),
+			tape_id: options.tape_id,
+			request: options.request,
+			response: options.response,
+		},
 	});
 };
 

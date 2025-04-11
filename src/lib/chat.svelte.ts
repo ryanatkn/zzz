@@ -91,7 +91,7 @@ export class Chat extends Cell<typeof Chat_Json> {
 	}
 
 	add_tape(model: Model): void {
-		const tape = this.zzz.registry.instantiate('Tape', {model_name: model.name});
+		const tape = new Tape({zzz: this.zzz, json: {model_name: model.name}});
 		this.zzz.tapes.add_tape(tape);
 		this.tape_ids.push(tape.id);
 	}

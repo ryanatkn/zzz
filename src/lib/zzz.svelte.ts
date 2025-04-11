@@ -293,7 +293,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	 * @returns The newly created history object
 	 */
 	create_diskfile_history(path: Diskfile_Path): Diskfile_History {
-		const history = this.registry.instantiate('Diskfile_History', {path});
+		const history = new Diskfile_History({zzz: this.zzz, json: {path}});
 		this.diskfile_histories.set(path, history);
 		return history;
 	}

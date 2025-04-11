@@ -186,11 +186,11 @@ export abstract class Bit<T extends z.ZodType = typeof Bit_Json_Base> extends Ce
 		// Throws if the class isn't registered.
 		switch (json.type) {
 			case 'text':
-				return zzz.registry.instantiate('Text_Bit', json, options);
+				return new Text_Bit({...options, zzz, json});
 			case 'diskfile':
-				return zzz.registry.instantiate('Diskfile_Bit', json, options);
+				return new Diskfile_Bit({...options, zzz, json});
 			case 'sequence':
-				return zzz.registry.instantiate('Sequence_Bit', json, options);
+				return new Sequence_Bit({...options, zzz, json});
 			default:
 				throw new Unreachable_Error(json.type);
 		}

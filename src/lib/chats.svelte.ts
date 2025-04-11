@@ -82,7 +82,7 @@ export class Chats extends Cell<typeof Chats_Json> {
 		if (!json?.name) {
 			json = {...json, name: this.generate_unique_name('new chat')};
 		}
-		const chat = this.zzz.registry.instantiate('Chat', json);
+		const chat = new Chat({zzz: this.zzz, json});
 		return this.add_chat(chat, select);
 	}
 
@@ -99,7 +99,7 @@ export class Chats extends Cell<typeof Chats_Json> {
 	}
 
 	add_many(chats_json: Array<Chat_Json_Input>, select?: boolean | number): Array<Chat> {
-		const chats = chats_json.map((json) => this.zzz.registry.instantiate('Chat', json));
+		const chats = chats_json.map((json) => new Chat({zzz: this.zzz, json}));
 		this.items.add_many(chats);
 
 		// Select the first or the specified chat if none is currently selected
