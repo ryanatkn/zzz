@@ -39,7 +39,7 @@ export class Bits extends Cell<typeof Bits_Json> {
 				query_schema: z.string(),
 				result_schema: Bit_Schema,
 			}),
-			// TODO BLOCK dynamic index with the rendered content? needs to be lazy, ideally just using $derived
+			// TODO dynamic index with the rendered content? needs to be lazy, ideally just using $derived
 		],
 	});
 
@@ -62,14 +62,13 @@ export class Bits extends Cell<typeof Bits_Json> {
 		this.init();
 	}
 
+	// TODO this json type is incorrect, it should have `json.type` as required
 	/**
 	 * Add a bit to the collection.
 	 */
 	add(json: Bit_Json_Input): Bit_Type {
-		if (!json.name) {
-			json = {...json, name: this.generate_unique_name('new bit')};
-		}
-		const bit = Bit.create(this.zzz, json);
+		const j = !json.name ? {...json, name: this.generate_unique_name('new bit')} : json;
+		const bit = Bit.create(this.zzz, j);
 		this.items.add(bit);
 		return bit;
 	}

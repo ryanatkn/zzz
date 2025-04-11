@@ -27,7 +27,7 @@
 	{filter}
 	{exclude_ids}
 	sorters={[
-		// TODO @many why is the cast needed?
+		// TODO @many rework API to avoid casting
 		sort_by_numeric('created_newest', 'newest first', 'created_date', 'desc'),
 		sort_by_numeric('created_oldest', 'oldest first', 'created_date', 'asc'),
 		sort_by_text<Bit_Type>('type_asc', 'type (a-z)', 'type'),

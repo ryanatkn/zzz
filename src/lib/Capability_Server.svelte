@@ -13,7 +13,6 @@
 	const zzz = zzz_context.get();
 	const {capabilities} = zzz;
 
-	// Initial load when component mounts
 	onMount(() => {
 		void capabilities.init_server_check();
 	});

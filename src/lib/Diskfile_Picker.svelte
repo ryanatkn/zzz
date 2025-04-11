@@ -28,7 +28,7 @@
 	{filter}
 	{exclude_ids}
 	sorters={[
-		// TODO @many why is the cast needed?
+		// TODO @many rework API to avoid casting
 		sort_by_text<Diskfile>('path_asc', 'path (a-z)', 'path'),
 		sort_by_text<Diskfile>('path_desc', 'path (z-a)', 'path', 'desc'),
 		sort_by_numeric('created_newest', 'newest first', 'created_date', 'desc'),

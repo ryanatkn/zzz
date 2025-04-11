@@ -11,6 +11,8 @@
 	}
 
 	const {action}: Props = $props();
+
+	// TODO this is all hacky, just proof of concept stuff
 </script>
 
 <div class="mb_md">
@@ -72,8 +74,8 @@
 				<div class="font_weight_600 color_text_subtle">Request id</div>
 				<div class="font_mono">{action.prompt_data?.request_id || 'Unknown'}</div>
 			</div>
-			{#if action.json.completion_request && 'options' in action.json.completion_request}
-				{#each Object.entries(action.json.completion_request.options || {}) as [key, value]}
+			{#if action.json.completion_request && 'options' in action.json.completion_request && action.json.completion_request.options}
+				{#each Object.entries(action.json.completion_request.options) as [key, value] (key)}
 					<div class="field_row">
 						<div class="font_weight_600 color_text_subtle">{key}</div>
 						<div>{JSON.stringify(value)}</div>
@@ -169,7 +171,7 @@
 			{#if action.change}
 				<div class="field_row">
 					<div class="font_weight_600 color_text_subtle">Change Type</div>
-					<div>{action.change.type || 'Unknown'}</div>
+					<div>{action.change.type}</div>
 				</div>
 			{/if}
 		</div>
@@ -194,7 +196,7 @@
 							</tr>
 						</thead>
 						<tbody>
-							{#each action.data.files as file_data}
+							{#each action.data.files as file_data (file_data.id)}
 								<tr>
 									<td class="p_xs font_mono size_sm"
 										>{strip_start(file_data.id, file_data.source_dir)}</td

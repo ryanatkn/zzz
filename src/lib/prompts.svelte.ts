@@ -115,10 +115,8 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 	}
 
 	add(json?: Prompt_Json_Input): Prompt {
-		if (!json?.name) {
-			json = {...json, name: this.generate_unique_name('new prompt')};
-		}
-		const prompt = new Prompt({zzz: this.zzz, json});
+		const j = !json?.name ? {...json, name: this.generate_unique_name('new prompt')} : json;
+		const prompt = new Prompt({zzz: this.zzz, json: j});
 		this.items.add(prompt);
 		if (this.selected_id === null) {
 			this.selected_id = prompt.id;

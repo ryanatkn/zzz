@@ -27,7 +27,7 @@
 	{filter}
 	{exclude_ids}
 	sorters={[
-		// TODO @many why is the cast needed?
+		// TODO @many rework API to avoid casting
 		sort_by_text<Prompt>('name_asc', 'name (a-z)', 'name'),
 		sort_by_text<Prompt>('name_desc', 'name (z-a)', 'name', 'desc'),
 		sort_by_numeric('created_newest', 'newest first', 'created_date', 'desc'),

@@ -71,7 +71,7 @@ export class Chat extends Cell<typeof Chat_Json> {
 		return result;
 	});
 
-	// TODO `Bits` class instead? same as on zzz?
+	// TODO `Bits` class instead? same as on zzz or different?
 	readonly bits: Set<Bit_Type> = $derived.by(() => {
 		const b: Set<Bit_Type> = new Set();
 		for (const prompt of this.selected_prompts) {

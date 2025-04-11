@@ -4,15 +4,14 @@
 	import type {SvelteHTMLElements} from 'svelte/elements';
 	import {page} from '$app/state';
 
-	import type {Provider_Json} from '$lib/provider.svelte.js';
+	import type {Provider} from '$lib/provider.svelte.js';
 	import {GLYPH_PROVIDER} from '$lib/glyphs.js';
 	import Provider_Logo from '$lib/Provider_Logo.svelte';
 
 	interface Props {
-		provider: Provider_Json | null | undefined; // TODO BLOCK Provider, not Provider_Json?
-		icon?: 'glyph' | 'svg' | Snippet<[provider: Provider_Json, glyph: string]> | undefined;
+		provider: Provider | null | undefined;
+		icon?: 'glyph' | 'svg' | Snippet<[provider: Provider, glyph: string]> | undefined;
 		icon_props?: Record<string, any> | undefined;
-		row?: boolean | undefined;
 		show_name?: boolean | undefined;
 		attrs?: SvelteHTMLElements['a'] | undefined;
 		fallback_attrs?: SvelteHTMLElements['span'] | undefined;

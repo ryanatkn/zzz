@@ -203,35 +203,6 @@
 .p_md {
 	padding: var(--space_md);
 }
-.ellipsis {
-	display: block;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
-}
-
-/* A pane is a box floating over the page, like for dialogs.
-			By default it's opaque, resetting the background to the initial depth. */
-.pane {
-	background-color: var(--pane_bg, var(--bg));
-	box-shadow: var(
-		--pane_shadow,
-		/* TODO this is terrible, maybe add all the variables? should be culled anyway? */
-			var(--shadow_bottom_md)
-			color-mix(in hsl, var(--shadow_color) var(--shadow_alpha_3), transparent)
-	);
-	border-radius: var(--radius_xs);
-}
-
-.width_md {
-	width: 100%;
-	max-width: var(--width_md);
-}
-
-.mx_auto {
-	margin-left: auto;
-	margin-right: auto;
-}
 
 .menu_item {
 	--border_radius: 0;
@@ -328,6 +299,19 @@
 	border-left-color: var(--text_color_3);
 }
 
+/* A pane is a box floating over the page, like for dialogs.
+			By default it's opaque, resetting the background to the initial depth. */
+.pane {
+	background-color: var(--pane_bg, var(--bg));
+	box-shadow: var(
+		--pane_shadow,
+		/* TODO this is terrible, maybe add all the variables? should be culled anyway? */
+			var(--shadow_bottom_md)
+			color-mix(in hsl, var(--shadow_color) var(--shadow_alpha_3), transparent)
+	);
+	border-radius: var(--radius_xs);
+}
+
 .inline_flex {
 	display: inline-flex;
 }
@@ -397,11 +381,27 @@
 	padding-top: var(--space_xs3);
 	padding-bottom: var(--space_xs3);
 }
+.ellipsis {
+	display: block;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
 .mr_xs2 {
 	margin-right: var(--space_xs2);
 }
 .mr_xs {
 	margin-right: var(--space_xs);
+}
+
+.width_md {
+	width: 100%;
+	max-width: var(--width_md);
+}
+
+.mx_auto {
+	margin-left: auto;
+	margin-right: auto;
 }
 .p_lg {
 	padding: var(--space_lg);

@@ -22,7 +22,7 @@
 
 	const {chat}: Props = $props();
 
-	// TODO BLOCK this needs to be persisted state
+	// TODO BLOCK this needs to be configurable and persisted state, and tapes should not be added here
 	if (chat.tapes.length === 0) {
 		const initial_model_names = [
 			'llama3.2:1b',

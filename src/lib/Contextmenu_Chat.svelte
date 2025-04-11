@@ -25,8 +25,6 @@
 
 	const zzz = zzz_context.get();
 
-	// TODO BLOCK duplicate has a bug on selected chat?
-
 	// TODO BLOCK `add tape` button that uses a new Tape_Picker
 </script>
 
@@ -101,7 +99,7 @@
 
 			<Contextmenu_Entry
 				run={() => {
-					// TODO clone/registry
+					// TODO BLOCK this is broken bc we need a unique name, and adding tapes looks hacky, maybe add a `chats/chat.duplicate` method
 					// Create a duplicate of this chat
 					const new_chat = zzz.chats.add_chat(chat.clone());
 

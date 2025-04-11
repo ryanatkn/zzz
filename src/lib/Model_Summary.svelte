@@ -12,6 +12,8 @@
 	const {model, attrs}: Props = $props();
 
 	const provider = $derived(model.zzz.providers.find_by_name(model.provider_name));
+
+	// TODO maybe rename to Model_Listitem, particularly if we add a `Model_List` for the parent usage
 </script>
 
 <div {...attrs} class="panel p_lg {attrs?.class}">

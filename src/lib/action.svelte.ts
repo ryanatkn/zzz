@@ -34,7 +34,7 @@ export class Action extends Cell<typeof Action_Json> {
 	completion_request: Completion_Request | undefined = $state();
 	completion_response: Completion_Response | undefined = $state();
 	path: Diskfile_Path | undefined = $state();
-	content: string | undefined = $state(); // TODO BLOCK derived token count like with diskfiles?
+	content: string | undefined = $state();
 	change: Diskfile_Change | undefined = $state();
 	source_file: Source_File | undefined = $state();
 

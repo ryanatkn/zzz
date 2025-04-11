@@ -30,7 +30,7 @@
 	<Sortable_List
 		items={Array.from(actions.items.by_id.values())}
 		sorters={[
-			// TODO @many why is the cast needed?
+			// TODO @many rework API to avoid casting
 			sort_by_numeric<Action>('created_newest', 'newest first', 'created_date', 'desc'),
 			sort_by_numeric<Action>('created_oldest', 'oldest first', 'created_date', 'asc'),
 			sort_by_text<Action>('type_asc', 'type (a-z)', 'type'),

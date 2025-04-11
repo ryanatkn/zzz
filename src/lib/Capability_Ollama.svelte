@@ -111,7 +111,7 @@
 		<div class="panel p_md" transition:slide>
 			<h4 class="mt_0 mb_sm"><Glyph icon={GLYPH_MODEL} /> models installed locally</h4>
 			<ul class="unstyled">
-				{#each capabilities.ollama_models as ollama_model}
+				{#each capabilities.ollama_models as ollama_model (ollama_model.name)}
 					{@const model = zzz.models.find_by_name(ollama_model.name)}
 					<li class="p_xs">
 						{#if model}<Model_Link {model} />{:else}{ollama_model.name}{/if}

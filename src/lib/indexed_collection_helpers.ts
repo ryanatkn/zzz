@@ -191,6 +191,9 @@ export const create_multi_index = <T extends Indexed_Item, K>(
 	};
 };
 
+// TODO maybe renamed? obviously overlaps with Svelte derived and doesn't use it -
+// the goal is the be incremental, but that's the right API here?
+// see the comment at the top of the file too
 /**
  * Options for derived indexes.
  */
@@ -223,7 +226,7 @@ export const create_derived_index = <T extends Indexed_Item>(
 		compute: (collection) => {
 			const result = options.compute(collection);
 			if (options.sort) {
-				return [...result].sort(options.sort);
+				return result.sort(options.sort);
 			}
 			return result;
 		},

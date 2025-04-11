@@ -10,7 +10,7 @@
 
 	const {strip}: Props = $props();
 
-	// TODO BLOCK link to the bit maybe? require right clicking probably
+	// TODO BLOCKcontextmenu options, maybe including a way to get the bit in a dialog?
 </script>
 
 <div

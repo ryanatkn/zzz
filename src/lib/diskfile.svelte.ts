@@ -43,9 +43,6 @@ export class Diskfile extends Cell<typeof Diskfile_Json> {
 		this.zzz.diskfiles.to_relative_path(this.path),
 	);
 
-	readonly size: number | null = $derived(this.content?.length ?? null);
-
-	// TODO BLOCK maybe have a Bit for this? just for text files?
 	readonly content_length: number = $derived(this.content?.length ?? 0);
 	readonly content_tokens: Array<number> | null = $derived(
 		this.content === null ? null : tokenize(this.content),

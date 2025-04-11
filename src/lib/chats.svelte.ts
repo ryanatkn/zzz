@@ -79,10 +79,8 @@ export class Chats extends Cell<typeof Chats_Json> {
 	}
 
 	add(json?: Chat_Json_Input, select?: boolean): Chat {
-		if (!json?.name) {
-			json = {...json, name: this.generate_unique_name('new chat')};
-		}
-		const chat = new Chat({zzz: this.zzz, json});
+		const j = !json?.name ? {...json, name: this.generate_unique_name('new chat')} : json;
+		const chat = new Chat({zzz: this.zzz, json: j});
 		return this.add_chat(chat, select);
 	}
 

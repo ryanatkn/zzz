@@ -14,6 +14,8 @@ import {
 	DEFAULT_CLOSE_CODE,
 } from '$lib/socket_helpers.js';
 
+// TODO the plan here is to make websockets one of multiple transports, this just gets the proof of concept working
+
 export const Socket_Json = Cell_Json.extend({
 	url: z.string().nullable().default(null),
 	url_input: z.string().default(''),
@@ -378,7 +380,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 		}
 
 		try {
-			// TODO BLOCK need the round-trip protocol
+			// TODO need the round-trip protocol, this is a hack
 			this.ws!.send(JSON.stringify(message.data));
 			this.last_send_time = Date.now();
 		} catch (err) {

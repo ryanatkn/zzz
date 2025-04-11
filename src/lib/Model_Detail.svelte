@@ -18,8 +18,6 @@
 
 	const zzz = zzz_context.get();
 
-	// TODO BLOCK link the providers below to a page per provider (lookup from provider_default/context)
-
 	const at_detail_page = $derived(page.url.pathname === `${base}/models/${model.name}`);
 	const provider = $derived(zzz.providers.find_by_name(model.provider_name));
 </script>

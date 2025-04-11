@@ -6,8 +6,6 @@
 
 	const zzz = zzz_context.get();
 
-	// TODO BLOCK link the providers below to a page per provider (lookup from provider_default/context)
-
 	// TODO add search/filtering
 </script>
 

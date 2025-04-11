@@ -292,6 +292,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 		}
 	}
 
+	// TODO replace this with an action once the system is more developed, just manually pinging here
 	/**
 	 * Check Server availability by making an HTTP GET request to its ping endpoint.
 	 * @returns A promise that resolves when the check is complete
