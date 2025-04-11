@@ -21,6 +21,7 @@ export const Prompt_Json = Cell_Json.extend({
 	bits: z.array(Bit_Json).default(() => []),
 });
 export type Prompt_Json = z.infer<typeof Prompt_Json>;
+export type Prompt_Json_Input = z.input<typeof Prompt_Json>;
 
 export interface Prompt_Options extends Cell_Options<typeof Prompt_Json> {
 	name?: string;

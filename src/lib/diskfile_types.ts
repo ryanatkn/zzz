@@ -55,5 +55,5 @@ export const Diskfile_Json = Cell_Json.extend({
 		.nullable()
 		.default(null),
 });
-
 export type Diskfile_Json = z.infer<typeof Diskfile_Json>;
+export type Diskfile_Json_Input = z.input<typeof Diskfile_Json>;

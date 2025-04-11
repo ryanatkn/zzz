@@ -47,6 +47,7 @@ export const Zzz_Json = Cell_Json.extend({
 	ui: Ui_Json,
 });
 export type Zzz_Json = z.infer<typeof Zzz_Json>;
+export type Zzz_Json_Input = z.input<typeof Zzz_Json>;
 
 // Special options type for Zzz to handle circular reference
 export interface Zzz_Options extends Omit<Cell_Options<typeof Zzz_Json>, 'zzz'> {
@@ -96,7 +97,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 
 	// TODO maybe `tags` is a virtual collection for ergonomics, in that it's all on the cell table unmanaged by the class, it persists nothing on its own but interfaces to the persistent cells
 
-	readonly bots: Zzz_Config['bots']; // TODO make this a Cell?
+	readonly bots: Zzz_Config['bots']; // TODO @many hacky, rework the bots interface (currently just copies over the config) - the provider should be on the model object, but should models be able to have multiple providers, or do they need unique names? and another field for canonical model name?
 
 	/**
 	 * The `zzz_dir` is the path to Zzz's primary directory on the server's filesystem.

@@ -7,6 +7,7 @@ import {Cell_Json} from '$lib/cell_types.js';
 
 export const Diskfiles_Editor_Json = Cell_Json.extend({});
 export type Diskfiles_Editor_Json = z.infer<typeof Diskfiles_Editor_Json>;
+export type Diskfiles_Editor_Json_Input = z.input<typeof Diskfiles_Editor_Json>;
 
 export type Diskfiles_Editor_Options = Cell_Options<typeof Diskfiles_Editor_Json>;
 

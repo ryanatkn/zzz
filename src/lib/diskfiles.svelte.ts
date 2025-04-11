@@ -24,8 +24,8 @@ export const Diskfiles_Json = z
 		diskfiles: [],
 		selected_file_id: null,
 	}));
-
 export type Diskfiles_Json = z.infer<typeof Diskfiles_Json>;
+export type Diskfiles_Json_Input = z.input<typeof Diskfiles_Json>;
 
 export interface Diskfiles_Options extends Cell_Options<typeof Diskfiles_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 

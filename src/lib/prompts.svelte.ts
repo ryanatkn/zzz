@@ -1,13 +1,14 @@
 import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Prompt, Prompt_Json, Prompt_Schema} from '$lib/prompt.svelte.js';
+import {Prompt, Prompt_Json, Prompt_Schema, type Prompt_Json_Input} from '$lib/prompt.svelte.js';
 import type {Uuid} from '$lib/zod_helpers.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {create_single_index, create_derived_index} from '$lib/indexed_collection_helpers.js';
 import {to_reordered_list} from '$lib/list_helpers.js';
 import type {Bit_Type} from '$lib/bit.svelte.js';
+import {get_unique_name} from '$lib/helpers.js';
 
 export const Prompts_Json = z
 	.object({
@@ -21,8 +22,8 @@ export const Prompts_Json = z
 		items: [],
 		selected_id: null,
 	}));
-
 export type Prompts_Json = z.infer<typeof Prompts_Json>;
+export type Prompts_Json_Input = z.input<typeof Prompts_Json>;
 
 export interface Prompts_Options extends Cell_Options<typeof Prompts_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
@@ -113,8 +114,10 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 		return this.ordered_items.filter((p) => p.bits.some((b) => b.id === id)); // TODO add an index?
 	}
 
-	// TODO BLOCK this is a weird API, the UI should be doing its sorting downstream not here
-	add(json?: Prompt_Json): Prompt {
+	add(json?: Prompt_Json_Input): Prompt {
+		if (!json?.name) {
+			json = {...json, name: this.generate_unique_name('new prompt')};
+		}
 		const prompt = new Prompt({zzz: this.zzz, json});
 		this.items.add(prompt);
 		if (this.selected_id === null) {
@@ -123,8 +126,12 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 		return prompt;
 	}
 
+	generate_unique_name(base_name: string = 'new prompt'): string {
+		return get_unique_name(base_name, this.items.single_index('by_name'));
+	}
+
 	// TODO @many look into making these more generic, less manual bookkeeping
-	add_many(prompts_json: Array<Prompt_Json>): Array<Prompt> {
+	add_many(prompts_json: Array<Prompt_Json_Input>): Array<Prompt> {
 		const prompts = prompts_json.map((json) => new Prompt({zzz: this.zzz, json}));
 		this.items.add_many(prompts);
 

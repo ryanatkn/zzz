@@ -24,6 +24,7 @@ export const Model_Json = Cell_Json.extend({
 	ollama_model_info: z.any().optional(),
 });
 export type Model_Json = z.infer<typeof Model_Json>;
+export type Model_Json_Input = z.input<typeof Model_Json>;
 
 export interface Model_Options extends Cell_Options<typeof Model_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 

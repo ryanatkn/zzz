@@ -34,6 +34,7 @@ export const Text_Bit_Json = Bit_Json_Base.extend({
 	content: z.string().default(''),
 });
 export type Text_Bit_Json = z.infer<typeof Text_Bit_Json>;
+export type Text_Bit_Json_Input = z.input<typeof Text_Bit_Json>;
 
 /** Diskfile bit schema - references a diskfile. */
 export const Diskfile_Bit_Json = Bit_Json_Base.extend({
@@ -43,6 +44,7 @@ export const Diskfile_Bit_Json = Bit_Json_Base.extend({
 	// `content` is on disk at `path`, not in the serialized representation
 });
 export type Diskfile_Bit_Json = z.infer<typeof Diskfile_Bit_Json>;
+export type Diskfile_Bit_Json_Input = z.input<typeof Diskfile_Bit_Json>;
 
 /** Sequence bit schema - contains an ordered list of bit references. */
 export const Sequence_Bit_Json = Bit_Json_Base.extend({
@@ -50,6 +52,7 @@ export const Sequence_Bit_Json = Bit_Json_Base.extend({
 	items: z.array(Uuid).default(() => []),
 });
 export type Sequence_Bit_Json = z.infer<typeof Sequence_Bit_Json>;
+export type Sequence_Bit_Json_Input = z.input<typeof Sequence_Bit_Json>;
 
 /** Union of all bit types for deserialization. */
 export const Bit_Json = z.discriminatedUnion('type', [
@@ -58,6 +61,7 @@ export const Bit_Json = z.discriminatedUnion('type', [
 	Sequence_Bit_Json,
 ]);
 export type Bit_Json = z.infer<typeof Bit_Json>;
+export type Bit_Json_Input = z.input<typeof Bit_Json>;
 
 // Define a type union of all concrete bit classes
 export type Bit_Type = Text_Bit | Diskfile_Bit | Sequence_Bit;
@@ -161,30 +165,25 @@ export abstract class Bit<T extends z.ZodType = typeof Bit_Json_Base> extends Ce
 	 * 2. Default values
 	 * 3. Construction of the appropriate bit subclass via the registry
 	 */
+	static create(zzz: Zzz, json: Text_Bit_Json_Input, options?: Text_Bit_Options): Text_Bit;
 	static create(
 		zzz: Zzz,
-		json: z.input<typeof Text_Bit_Json>,
-		options?: Text_Bit_Options,
-	): Text_Bit;
-	static create(
-		zzz: Zzz,
-		json: z.input<typeof Diskfile_Bit_Json>,
+		json: Diskfile_Bit_Json_Input,
 		options?: Diskfile_Bit_Options,
 	): Diskfile_Bit;
 	static create(
 		zzz: Zzz,
-		json: z.input<typeof Sequence_Bit_Json>,
+		json: Sequence_Bit_Json_Input,
 		options?: Sequence_Bit_Options,
 	): Sequence_Bit;
-	static create(zzz: Zzz, json: z.input<typeof Bit_Json>, options?: Bit_Type_Options): Bit_Type;
-	static create(zzz: Zzz, json: z.input<typeof Bit_Json>, options?: Bit_Type_Options): Bit_Type {
+	static create(zzz: Zzz, json: Bit_Json_Input, options?: Bit_Type_Options): Bit_Type;
+	static create(zzz: Zzz, json: Bit_Json_Input, options?: Bit_Type_Options): Bit_Type {
 		if (!json.type) {
 			throw Error('Missing required "type" field in bit JSON');
 		}
 
 		// Create the appropriate bit class based on type using the registry
-		// This throws if the class isn't registered, ensuring we fail fast
-		// on any programming errors rather than silently returning null
+		// Throws if the class isn't registered.
 		switch (json.type) {
 			case 'text':
 				return zzz.registry.instantiate('Text_Bit', json, options);

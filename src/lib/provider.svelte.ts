@@ -13,6 +13,7 @@ export const Provider_Json = Cell_Json.extend({
 	url: z.string(),
 });
 export type Provider_Json = z.infer<typeof Provider_Json>;
+export type Provider_Json_Input = z.input<typeof Provider_Json>;
 
 export interface Provider_Options extends Cell_Options<typeof Provider_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 

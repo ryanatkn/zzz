@@ -17,6 +17,7 @@ export const Diskfile_Tabs_Json = Cell_Json.extend({
 	max_tab_history: z.number().default(20),
 });
 export type Diskfile_Tabs_Json = z.infer<typeof Diskfile_Tabs_Json>;
+export type Diskfile_Tabs_Json_Input = z.input<typeof Diskfile_Tabs_Json>;
 
 export type Diskfile_Tabs_Options = Cell_Options<typeof Diskfile_Tabs_Json>;
 

@@ -14,3 +14,4 @@ export const Tape_Json = Cell_Json.extend({
 	enabled: z.boolean().default(true),
 });
 export type Tape_Json = z.infer<typeof Tape_Json>;
+export type Tape_Json_Input = z.input<typeof Tape_Json>;

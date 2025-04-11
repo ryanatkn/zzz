@@ -23,6 +23,7 @@ export const Socket_Json = Cell_Json.extend({
 	auto_reconnect: z.boolean().default(DEFAULT_AUTO_RECONNECT),
 });
 export type Socket_Json = z.infer<typeof Socket_Json>;
+export type Socket_Json_Input = z.input<typeof Socket_Json>;
 
 export interface Socket_Options extends Cell_Options<typeof Socket_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 

@@ -10,6 +10,7 @@ export const Diskfile_Tab_Json = Cell_Json.extend({
 	diskfile_id: Uuid_Required,
 });
 export type Diskfile_Tab_Json = z.infer<typeof Diskfile_Tab_Json>;
+export type Diskfile_Tab_Json_Input = z.input<typeof Diskfile_Tab_Json>;
 
 export interface Diskfile_Tab_Options extends Cell_Options<typeof Diskfile_Tab_Json> {
 	tabs: Diskfile_Tabs;

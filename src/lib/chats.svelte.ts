@@ -1,12 +1,13 @@
 import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Chat, Chat_Json, Chat_Schema} from '$lib/chat.svelte.js';
+import {Chat, Chat_Json, Chat_Schema, type Chat_Json_Input} from '$lib/chat.svelte.js';
 import type {Uuid} from '$lib/zod_helpers.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {create_single_index, create_derived_index} from '$lib/indexed_collection_helpers.js';
 import {to_reordered_list} from '$lib/list_helpers.js';
+import {get_unique_name} from '$lib/helpers.js';
 
 export const Chats_Json = z
 	.object({
@@ -22,6 +23,7 @@ export const Chats_Json = z
 		selected_id: null,
 	}));
 export type Chats_Json = z.infer<typeof Chats_Json>;
+export type Chats_Json_Input = z.input<typeof Chats_Json>;
 
 export interface Chats_Options extends Cell_Options<typeof Chats_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
@@ -76,9 +78,16 @@ export class Chats extends Cell<typeof Chats_Json> {
 		this.init();
 	}
 
-	add(json?: Chat_Json, select?: boolean): Chat {
+	add(json?: Chat_Json_Input, select?: boolean): Chat {
+		if (!json?.name) {
+			json = {...json, name: this.generate_unique_name('new chat')};
+		}
 		const chat = this.zzz.registry.instantiate('Chat', json);
 		return this.add_chat(chat, select);
+	}
+
+	generate_unique_name(base_name: string = 'new chat'): string {
+		return get_unique_name(base_name, this.items_by_name);
 	}
 
 	add_chat(chat: Chat, select?: boolean): Chat {
@@ -89,7 +98,7 @@ export class Chats extends Cell<typeof Chats_Json> {
 		return chat;
 	}
 
-	add_many(chats_json: Array<Chat_Json>, select?: boolean | number): Array<Chat> {
+	add_many(chats_json: Array<Chat_Json_Input>, select?: boolean | number): Array<Chat> {
 		const chats = chats_json.map((json) => this.zzz.registry.instantiate('Chat', json));
 		this.items.add_many(chats);
 

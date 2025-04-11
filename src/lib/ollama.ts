@@ -1,10 +1,9 @@
-import type {z} from 'zod';
 import ollama from 'ollama/browser';
 import type {ListResponse, ModelResponse, ShowResponse} from 'ollama/browser'; // eslint-disable-line no-duplicate-imports
 
-import type {Model_Json} from '$lib/model.svelte.js';
+import type {Model_Json_Input} from '$lib/model.svelte.js';
 
-export const OLLAMA_URL = 'http://127.0.0.1:11434/';
+export const OLLAMA_URL = 'http://127.0.0.1:11434/'; // TODO config
 
 export interface Ollama_Model_Info {
 	model: ModelResponse;
@@ -56,9 +55,9 @@ export const ollama_list_with_metadata = async (): Promise<Ollama_Models_Respons
  * Mutates `models` with the Ollama model metadata.
  */
 export const merge_ollama_models = (
-	models: Array<z.input<typeof Model_Json>>,
+	models: Array<Model_Json_Input>,
 	model_infos: Array<Ollama_Model_Info>,
-): Array<z.input<typeof Model_Json>> => {
+): Array<Model_Json_Input> => {
 	for (const ollama_model_info of model_infos) {
 		const {model} = ollama_model_info;
 		const existing_index = models.findIndex((m) => m.name === model.name);

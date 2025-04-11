@@ -1,11 +1,12 @@
 import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Bit, Bit_Json, Bit_Schema, type Bit_Type} from '$lib/bit.svelte.js';
+import {Bit, Bit_Json, Bit_Schema, type Bit_Json_Input, type Bit_Type} from '$lib/bit.svelte.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {create_single_index} from '$lib/indexed_collection_helpers.js';
 import {Uuid} from '$lib/zod_helpers.js';
+import {get_unique_name} from '$lib/helpers.js';
 
 export const Bits_Json = z
 	.object({
@@ -18,6 +19,7 @@ export const Bits_Json = z
 		items: [],
 	}));
 export type Bits_Json = z.infer<typeof Bits_Json>;
+export type Bits_Json_Input = z.input<typeof Bits_Json>;
 
 export interface Bits_Options extends Cell_Options<typeof Bits_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
@@ -63,11 +65,20 @@ export class Bits extends Cell<typeof Bits_Json> {
 	/**
 	 * Add a bit to the collection.
 	 */
-	add(json: z.input<typeof Bit_Json>): Bit_Type {
-		// TODO isn't typesafe
+	add(json: Bit_Json_Input): Bit_Type {
+		if (!json.name) {
+			json = {...json, name: this.generate_unique_name('new bit')};
+		}
 		const bit = Bit.create(this.zzz, json);
 		this.items.add(bit);
 		return bit;
+	}
+
+	/**
+	 * Generate a unique name for a bit.
+	 */
+	generate_unique_name(base_name: string = 'new bit'): string {
+		return get_unique_name(base_name, this.items.single_index('by_name'));
 	}
 
 	/**

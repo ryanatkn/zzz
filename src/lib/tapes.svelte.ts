@@ -2,7 +2,7 @@ import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Tape} from '$lib/tape.svelte.js';
-import {Tape_Json} from '$lib/tape_types.js';
+import {Tape_Json, type Tape_Json_Input} from '$lib/tape_types.js';
 import type {Uuid} from '$lib/zod_helpers.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
@@ -22,8 +22,8 @@ export const Tapes_Json = z
 		items: [],
 		selected_id: null,
 	}));
-
 export type Tapes_Json = z.infer<typeof Tapes_Json>;
+export type Tapes_Json_Input = z.input<typeof Tapes_Json>;
 
 export interface Tapes_Options extends Cell_Options<typeof Tapes_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
@@ -75,7 +75,7 @@ export class Tapes extends Cell<typeof Tapes_Json> {
 		this.init();
 	}
 
-	add(json?: z.input<typeof Tape_Json>, select?: boolean): Tape {
+	add(json?: Tape_Json_Input, select?: boolean): Tape {
 		const tape = new Tape({zzz: this.zzz, json});
 		return this.add_tape(tape, select);
 	}
@@ -90,7 +90,7 @@ export class Tapes extends Cell<typeof Tapes_Json> {
 		return tape;
 	}
 
-	add_many(tapes_json: Array<z.input<typeof Tape_Json>>, select?: boolean | number): Array<Tape> {
+	add_many(tapes_json: Array<Tape_Json_Input>, select?: boolean | number): Array<Tape> {
 		const tapes = tapes_json.map((json) => new Tape({zzz: this.zzz, json}));
 		this.items.add_many(tapes);
 

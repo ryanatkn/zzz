@@ -24,6 +24,7 @@ export const Chat_Json = Cell_Json.extend({
 	view_mode: Chat_View_Mode,
 });
 export type Chat_Json = z.infer<typeof Chat_Json>;
+export type Chat_Json_Input = z.input<typeof Chat_Json>;
 
 export interface Chat_Options extends Cell_Options<typeof Chat_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
@@ -173,7 +174,12 @@ export class Chat extends Cell<typeof Chat_Json> {
 
 		try {
 			// TODO configure this utility LLM (roles?), and set the output token count from config as well
-			const name_response = await this.zzz.send_prompt(p, 'ollama', 'llama3.2:3b');
+			const name_response = await this.zzz.send_prompt(
+				p,
+				// TODO @many hacky, rework the bots interface (currently just copies over the config) - the provider should be on the model object, but should models be able to have multiple providers, or do they need unique names? and another field for canonical model name?
+				this.zzz.models.find_by_name(this.zzz.bots.namerbot)!.provider_name,
+				this.zzz.bots.namerbot,
+			);
 			const {completion_response} = name_response;
 
 			const response_text = to_completion_response_text(completion_response) || '';

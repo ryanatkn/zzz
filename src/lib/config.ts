@@ -14,11 +14,8 @@ import {
 	BOTS_DEFAULT,
 } from '$lib/config_defaults.js';
 
-// TODO build or gen step that pulls from `http://127.0.0.1:11434/api/tags`
-
-// TODO refactor - zzz.config.ts
-
-// TODO currently this is imported directly by client and server, but we probably only want to forward a serialized subset to the client
+// TODO refactor currently this is imported directly by client and server, but we probably only want to forward a serialized subset to the client -
+// maybe move to zzz.config.ts in the repo root, and genfile for the client config
 const config: Zzz_Config_Creator = () => {
 	return {
 		providers: providers_default,

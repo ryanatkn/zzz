@@ -4,7 +4,9 @@ import {dirname, normalize} from 'node:path';
 import {ensure_end} from '@ryanatkn/belt/string.js';
 import {z} from 'zod';
 
-// TODO BLOCK add `filter` option, by default ignore at least .env,  maybe all of .gitignore - what should be readable/writable?
+// TODO probably need configuration to e.g. allow symlinks, this starting point prioritizes locking things down
+
+// TODO add `filter` option, by default ignore at least .env,  maybe all of .gitignore - what should be readable/writable?
 
 /**
  * A branded type for representing safely normalized filesystem paths

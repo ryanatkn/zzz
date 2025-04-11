@@ -1,6 +1,6 @@
 import type {z} from 'zod';
 
-import type {Provider_Json} from '$lib/provider.svelte.js';
+import type {Provider_Json_Input} from '$lib/provider.svelte.js';
 import type {Model_Json} from '$lib/model.svelte.js';
 
 // Configuration defaults
@@ -23,7 +23,7 @@ export const BOTS_DEFAULT = {
 
 // TODO add WebLLM ? https://github.com/mlc-ai/web-llm - others?
 
-export const providers_default: Array<z.input<typeof Provider_Json>> = [
+export const providers_default: Array<Provider_Json_Input> = [
 	{
 		name: 'ollama',
 		icon: '',
@@ -50,10 +50,8 @@ export const providers_default: Array<z.input<typeof Provider_Json>> = [
 	},
 ];
 
-// TODO BLOCK show these on /chats if present here but not in Ollama data -- just have the buttons be disabled
-// TODO BLOCK use these defaults to extend the ones added by ollama, `map_to_zzz_model`
+// TODO duplicating this data isn't great, it's just temporary measures for UX
 export const models_default: Array<z.input<typeof Model_Json>> = [
-	// TODO import/map these directly when possible
 	{
 		name: 'llama3.2:3b',
 		provider_name: 'ollama',

@@ -21,8 +21,8 @@ export const Models_Json = z
 	.default(() => ({
 		items: [],
 	}));
-
 export type Models_Json = z.infer<typeof Models_Json>;
+export type Models_Json_Input = z.input<typeof Models_Json>;
 
 export interface Models_Options extends Cell_Options<typeof Models_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 

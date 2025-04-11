@@ -14,8 +14,8 @@ export const Providers_Json = z
 	.default(() => ({
 		items: [],
 	}));
-
 export type Providers_Json = z.infer<typeof Providers_Json>;
+export type Providers_Json_Input = z.input<typeof Providers_Json>;
 
 export interface Providers_Options extends Cell_Options<typeof Providers_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 export class Providers extends Cell<typeof Providers_Json> {

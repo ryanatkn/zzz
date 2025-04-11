@@ -26,8 +26,8 @@ export const Actions_Json = z
 	.default(() => ({
 		items: [],
 	}));
-
 export type Actions_Json = z.infer<typeof Actions_Json>;
+export type Actions_Json_Input = z.input<typeof Actions_Json>;
 
 export interface Actions_Options extends Cell_Options<typeof Actions_Json> {
 	history_limit?: number;
@@ -93,7 +93,7 @@ export class Actions extends Cell<typeof Actions_Json> {
 	/**
 	 * Override to populate the indexed collection after parsing JSON.
 	 */
-	override set_json(value?: z.input<typeof Actions_Json>): void {
+	override set_json(value?: Actions_Json_Input): void {
 		super.set_json(value);
 
 		// Trim to history limit after loading

@@ -10,6 +10,7 @@ export const Url_Params_Json = z.object({
 	// No persisted state needed
 });
 export type Url_Params_Json = z.infer<typeof Url_Params_Json>;
+export type Url_Params_Json_Input = z.input<typeof Url_Params_Json>;
 
 export interface Url_Params_Options extends Cell_Options<typeof Url_Params_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 

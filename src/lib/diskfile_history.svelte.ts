@@ -29,6 +29,7 @@ export const Diskfile_History_Json = Cell_Json.extend({
 	max_entries: z.number().default(100), // TODO rename? `history_size`? `max_size`? `capacity`?
 });
 export type Diskfile_History_Json = z.infer<typeof Diskfile_History_Json>;
+export type Diskfile_History_Json_Input = z.input<typeof Diskfile_History_Json>;
 
 export type Diskfile_History_Options = Cell_Options<typeof Diskfile_History_Json>;
 

@@ -20,3 +20,4 @@ export const Cell_Json = z.object({
 	updated: Datetime.nullable().default(null),
 });
 export type Cell_Json = z.infer<typeof Cell_Json>;
+export type Cell_Json_Input = z.input<typeof Cell_Json>;

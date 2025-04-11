@@ -13,8 +13,8 @@ export const Browser_Json = Cell_Json.extend({
 		'Browser_Tab',
 	),
 });
-
 export type Browser_Json = z.infer<typeof Browser_Json>;
+export type Browser_Json_Input = z.input<typeof Browser_Json>;
 
 export type Browser_Options = Cell_Options<typeof Browser_Json>;
 

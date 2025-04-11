@@ -20,6 +20,7 @@ export const Strip_Json = Cell_Json.extend({
 	response: Completion_Response.optional(),
 });
 export type Strip_Json = z.infer<typeof Strip_Json>;
+export type Strip_Json_Input = z.input<typeof Strip_Json>;
 
 export const Strip_Schema = z.instanceof(Cell);
 

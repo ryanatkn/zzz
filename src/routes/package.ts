@@ -767,6 +767,7 @@ export const src_json = {
 				{name: 'Action_Server', kind: 'variable'},
 				{name: 'Action', kind: 'variable'},
 				{name: 'Action_Json', kind: 'variable'},
+				{name: 'Action_Json_Input', kind: 'type'},
 				{name: 'create_action_json', kind: 'function'},
 			],
 		},
@@ -787,6 +788,7 @@ export const src_json = {
 				{name: 'HISTORY_LIMIT_DEFAULT', kind: 'variable'},
 				{name: 'PONG_DISPLAY_LIMIT', kind: 'variable'},
 				{name: 'Actions_Json', kind: 'variable'},
+				{name: 'Actions_Json_Input', kind: 'type'},
 				{name: 'Actions_Options', kind: 'type'},
 				{name: 'Actions', kind: 'class'},
 			],
@@ -815,9 +817,13 @@ export const src_json = {
 			declarations: [
 				{name: 'Bit_Json_Base', kind: 'variable'},
 				{name: 'Text_Bit_Json', kind: 'variable'},
+				{name: 'Text_Bit_Json_Input', kind: 'type'},
 				{name: 'Diskfile_Bit_Json', kind: 'variable'},
+				{name: 'Diskfile_Bit_Json_Input', kind: 'type'},
 				{name: 'Sequence_Bit_Json', kind: 'variable'},
+				{name: 'Sequence_Bit_Json_Input', kind: 'type'},
 				{name: 'Bit_Json', kind: 'variable'},
+				{name: 'Bit_Json_Input', kind: 'type'},
 				{name: 'Bit_Type', kind: 'type'},
 				{name: 'Bit_Json_Type', kind: 'type'},
 				{name: 'Bit_Options', kind: 'type'},
@@ -839,6 +845,7 @@ export const src_json = {
 			path: 'bits.svelte.ts',
 			declarations: [
 				{name: 'Bits_Json', kind: 'variable'},
+				{name: 'Bits_Json_Input', kind: 'type'},
 				{name: 'Bits_Options', kind: 'type'},
 				{name: 'Bits', kind: 'class'},
 			],
@@ -850,6 +857,7 @@ export const src_json = {
 				{name: 'PING_HISTORY_MAX', kind: 'variable'},
 				{name: 'Ping_Data', kind: 'type'},
 				{name: 'Capabilities_Json', kind: 'variable'},
+				{name: 'Capabilities_Json_Input', kind: 'type'},
 				{name: 'Capability', kind: 'type'},
 				{name: 'Ollama_Capability_Data', kind: 'type'},
 				{name: 'Server_Capability_Data', kind: 'type'},
@@ -904,6 +912,7 @@ export const src_json = {
 				{name: 'Schema_Keys', kind: 'type'},
 				{name: 'Schema_Value', kind: 'type'},
 				{name: 'Cell_Json', kind: 'variable'},
+				{name: 'Cell_Json_Input', kind: 'type'},
 			],
 		},
 		'./cell.svelte.js': {
@@ -923,6 +932,7 @@ export const src_json = {
 			declarations: [
 				{name: 'Chat_View_Mode', kind: 'type'},
 				{name: 'Chat_Json', kind: 'variable'},
+				{name: 'Chat_Json_Input', kind: 'type'},
 				{name: 'Chat_Options', kind: 'type'},
 				{name: 'Chat', kind: 'class'},
 				{name: 'Chat_Schema', kind: 'variable'},
@@ -932,6 +942,7 @@ export const src_json = {
 			path: 'chats.svelte.ts',
 			declarations: [
 				{name: 'Chats_Json', kind: 'variable'},
+				{name: 'Chats_Json_Input', kind: 'type'},
 				{name: 'Chats_Options', kind: 'type'},
 				{name: 'Chats', kind: 'class'},
 				{name: 'Chats_Schema', kind: 'variable'},
@@ -1022,6 +1033,7 @@ export const src_json = {
 			declarations: [
 				{name: 'History_Entry', kind: 'variable'},
 				{name: 'Diskfile_History_Json', kind: 'variable'},
+				{name: 'Diskfile_History_Json_Input', kind: 'type'},
 				{name: 'Diskfile_History_Options', kind: 'type'},
 				{name: 'Diskfile_History', kind: 'class'},
 			],
@@ -1035,6 +1047,7 @@ export const src_json = {
 			path: 'diskfile_tab.svelte.ts',
 			declarations: [
 				{name: 'Diskfile_Tab_Json', kind: 'variable'},
+				{name: 'Diskfile_Tab_Json_Input', kind: 'type'},
 				{name: 'Diskfile_Tab_Options', kind: 'type'},
 				{name: 'Diskfile_Tab', kind: 'class'},
 				{name: 'Diskfile_Tab_Schema', kind: 'variable'},
@@ -1044,6 +1057,7 @@ export const src_json = {
 			path: 'diskfile_tabs.svelte.ts',
 			declarations: [
 				{name: 'Diskfile_Tabs_Json', kind: 'variable'},
+				{name: 'Diskfile_Tabs_Json_Input', kind: 'type'},
 				{name: 'Diskfile_Tabs_Options', kind: 'type'},
 				{name: 'Diskfile_Tabs', kind: 'class'},
 				{name: 'Diskfile_Tabs_Schema', kind: 'variable'},
@@ -1057,6 +1071,7 @@ export const src_json = {
 				{name: 'Zzz_Dir', kind: 'variable'},
 				{name: 'Source_File', kind: 'variable'},
 				{name: 'Diskfile_Json', kind: 'variable'},
+				{name: 'Diskfile_Json_Input', kind: 'type'},
 			],
 		},
 		'./diskfile.svelte.js': {
@@ -1071,6 +1086,7 @@ export const src_json = {
 			path: 'diskfiles_editor.svelte.ts',
 			declarations: [
 				{name: 'Diskfiles_Editor_Json', kind: 'variable'},
+				{name: 'Diskfiles_Editor_Json_Input', kind: 'type'},
 				{name: 'Diskfiles_Editor_Options', kind: 'type'},
 				{name: 'Diskfiles_Editor', kind: 'class'},
 				{name: 'Diskfiles_Editor_Schema', kind: 'variable'},
@@ -1080,6 +1096,7 @@ export const src_json = {
 			path: 'diskfiles.svelte.ts',
 			declarations: [
 				{name: 'Diskfiles_Json', kind: 'variable'},
+				{name: 'Diskfiles_Json_Input', kind: 'type'},
 				{name: 'Diskfiles_Options', kind: 'type'},
 				{name: 'Diskfiles', kind: 'class'},
 			],
@@ -1196,6 +1213,7 @@ export const src_json = {
 			declarations: [
 				{name: 'Model_Name', kind: 'variable'},
 				{name: 'Model_Json', kind: 'variable'},
+				{name: 'Model_Json_Input', kind: 'type'},
 				{name: 'Model_Options', kind: 'type'},
 				{name: 'Model', kind: 'class'},
 				{name: 'Model_Schema', kind: 'variable'},
@@ -1205,6 +1223,7 @@ export const src_json = {
 			path: 'models.svelte.ts',
 			declarations: [
 				{name: 'Models_Json', kind: 'variable'},
+				{name: 'Models_Json_Input', kind: 'type'},
 				{name: 'Models_Options', kind: 'type'},
 				{name: 'Models', kind: 'class'},
 			],
@@ -1264,6 +1283,7 @@ export const src_json = {
 				{name: 'Prompt_Message', kind: 'type'},
 				{name: 'Prompt_Action_Content', kind: 'type'},
 				{name: 'Prompt_Json', kind: 'variable'},
+				{name: 'Prompt_Json_Input', kind: 'type'},
 				{name: 'Prompt_Options', kind: 'type'},
 				{name: 'Prompt', kind: 'class'},
 				{name: 'Prompt_Schema', kind: 'variable'},
@@ -1273,6 +1293,7 @@ export const src_json = {
 			path: 'prompts.svelte.ts',
 			declarations: [
 				{name: 'Prompts_Json', kind: 'variable'},
+				{name: 'Prompts_Json_Input', kind: 'type'},
 				{name: 'Prompts_Options', kind: 'type'},
 				{name: 'Prompts', kind: 'class'},
 			],
@@ -1290,6 +1311,7 @@ export const src_json = {
 			path: 'provider.svelte.ts',
 			declarations: [
 				{name: 'Provider_Json', kind: 'variable'},
+				{name: 'Provider_Json_Input', kind: 'type'},
 				{name: 'Provider_Options', kind: 'type'},
 				{name: 'Provider', kind: 'class'},
 			],
@@ -1298,6 +1320,7 @@ export const src_json = {
 			path: 'providers.svelte.ts',
 			declarations: [
 				{name: 'Providers_Json', kind: 'variable'},
+				{name: 'Providers_Json_Input', kind: 'type'},
 				{name: 'Providers_Options', kind: 'type'},
 				{name: 'Providers', kind: 'class'},
 			],
@@ -1408,6 +1431,7 @@ export const src_json = {
 			path: 'socket.svelte.ts',
 			declarations: [
 				{name: 'Socket_Json', kind: 'variable'},
+				{name: 'Socket_Json_Input', kind: 'type'},
 				{name: 'Socket_Options', kind: 'type'},
 				{name: 'Socket_Action_Handler', kind: 'type'},
 				{name: 'Socket_Error_Handler', kind: 'type'},
@@ -1432,6 +1456,7 @@ export const src_json = {
 			declarations: [
 				{name: 'Strip_Role', kind: 'variable'},
 				{name: 'Strip_Json', kind: 'variable'},
+				{name: 'Strip_Json_Input', kind: 'type'},
 				{name: 'Strip_Schema', kind: 'variable'},
 				{name: 'Strip_Options', kind: 'type'},
 				{name: 'Strip', kind: 'class'},
@@ -1448,7 +1473,10 @@ export const src_json = {
 		'./Tape_Toggle_Button.svelte': {path: 'Tape_Toggle_Button.svelte', declarations: []},
 		'./tape_types.js': {
 			path: 'tape_types.ts',
-			declarations: [{name: 'Tape_Json', kind: 'variable'}],
+			declarations: [
+				{name: 'Tape_Json', kind: 'variable'},
+				{name: 'Tape_Json_Input', kind: 'type'},
+			],
 		},
 		'./tape.svelte.js': {
 			path: 'tape.svelte.ts',
@@ -1461,6 +1489,7 @@ export const src_json = {
 			path: 'tapes.svelte.ts',
 			declarations: [
 				{name: 'Tapes_Json', kind: 'variable'},
+				{name: 'Tapes_Json_Input', kind: 'type'},
 				{name: 'Tapes_Options', kind: 'type'},
 				{name: 'Tapes', kind: 'class'},
 			],
@@ -1492,6 +1521,7 @@ export const src_json = {
 			path: 'time.svelte.ts',
 			declarations: [
 				{name: 'Time_Json', kind: 'variable'},
+				{name: 'Time_Json_Input', kind: 'type'},
 				{name: 'Time_Options', kind: 'type'},
 				{name: 'Time', kind: 'class'},
 			],
@@ -1501,6 +1531,7 @@ export const src_json = {
 			path: 'ui.svelte.ts',
 			declarations: [
 				{name: 'Ui_Json', kind: 'variable'},
+				{name: 'Ui_Json_Input', kind: 'type'},
 				{name: 'Ui_Options', kind: 'type'},
 				{name: 'Ui', kind: 'class'},
 			],
@@ -1509,6 +1540,7 @@ export const src_json = {
 			path: 'url_params.svelte.ts',
 			declarations: [
 				{name: 'Url_Params_Json', kind: 'variable'},
+				{name: 'Url_Params_Json_Input', kind: 'type'},
 				{name: 'Url_Params_Options', kind: 'type'},
 				{name: 'Url_Params', kind: 'class'},
 			],
@@ -1549,6 +1581,7 @@ export const src_json = {
 			declarations: [
 				{name: 'zzz_context', kind: 'variable'},
 				{name: 'Zzz_Json', kind: 'variable'},
+				{name: 'Zzz_Json_Input', kind: 'type'},
 				{name: 'Zzz_Options', kind: 'type'},
 				{name: 'Action_With_History', kind: 'type'},
 				{name: 'Zzz', kind: 'class'},

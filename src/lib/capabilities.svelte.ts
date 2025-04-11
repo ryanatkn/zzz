@@ -30,6 +30,7 @@ export interface Ping_Data {
 // TODO which state?
 export const Capabilities_Json = Cell_Json.extend({});
 export type Capabilities_Json = z.infer<typeof Capabilities_Json>;
+export type Capabilities_Json_Input = z.input<typeof Capabilities_Json>;
 
 /**
  * Generic interface for a capability with standardized status tracking.
