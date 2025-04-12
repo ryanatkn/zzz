@@ -23,6 +23,7 @@
 
 	const zzz = zzz_context.get();
 
+	// TODO @many refactor, maybe move a collection on `zzz.diskfiles`?
 	const editor_state = new Diskfile_Editor_State({zzz, diskfile});
 
 	// Reference to the content editor component

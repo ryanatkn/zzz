@@ -34,7 +34,7 @@
 
 	let show_file_picker = $state(false);
 
-	// TODO refactor, try to remove
+	// TODO probably refactor to avoid the effect, look also at `TODO @many refactor, maybe move a collection on `zzz.diskfiles`?`
 	// Effect for managing editor state lifecycle
 	$effect.pre(() => {
 		// Track the diskfile from the bit
@@ -50,7 +50,7 @@
 		untrack(() => {
 			// Create new editor state if it doesn't exist
 			if (!editor_state) {
-				editor_state = new Diskfile_Editor_State({zzz, diskfile});
+				editor_state = new Diskfile_Editor_State({zzz, diskfile}); // TODO @many refactor, maybe move a collection on `zzz.diskfiles`?
 				diskfile_bit.link_editor_state(editor_state); // TODO @many this initialization is awkward, ideally becomes refactored to mostly derived
 				return;
 			}

@@ -5,9 +5,7 @@
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import {Chat} from '$lib/chat.svelte.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
-	import {GLYPH_TAPE, GLYPH_BIT, GLYPH_PROMPT, GLYPH_CHAT, GLYPH_DELETE} from '$lib/glyphs.js';
-	import Prompt_List from '$lib/Prompt_List.svelte';
-	import Bit_List from '$lib/Bit_List.svelte';
+	import {GLYPH_TAPE, GLYPH_CHAT, GLYPH_DELETE} from '$lib/glyphs.js';
 	import Tape_List from '$lib/Tape_List.svelte';
 	import Chat_View_Simple from '$lib/Chat_View_Simple.svelte';
 	import Chat_View_Multi from '$lib/Chat_View_Multi.svelte';
@@ -96,15 +94,11 @@
 				<header class="mt_0 mb_lg size_lg"><Glyph icon={GLYPH_TAPE} /> tapes</header>
 				<Tape_List {chat} />
 			</section>
-			<section class="column_section">
-				<header class="mt_0 mb_lg size_lg"><Glyph icon={GLYPH_PROMPT} /> prompts</header>
-				<Prompt_List {chat} />
-			</section>
-			<!-- TODO maybe show `Bit_List` with the `prompt bits` header here in -->
-			<section class="column_section">
+			<!-- TODO consider a UX that lets users pin arbitrary prompts/bits/etc to each chat -->
+			<!-- <section class="column_section">
 				<header class="mt_0 mb_lg size_lg"><Glyph icon={GLYPH_BIT} /> all bits</header>
 				<Bit_List bits={chat.bits_array} />
-			</section>
+			</section> -->
 		{/if}
 	</div>
 

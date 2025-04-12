@@ -1105,6 +1105,7 @@ export const src_json = {
 				{name: 'GLYPH_PLACEHOLDER', kind: 'variable'},
 				{name: 'GLYPH_CHECKMARK', kind: 'variable'},
 				{name: 'GLYPH_EDIT', kind: 'variable'},
+				{name: 'GLYPH_SORT', kind: 'variable'},
 				{name: 'GLYPH_SERVER', kind: 'variable'},
 				{name: 'GLYPH_CHAT', kind: 'variable'},
 				{name: 'GLYPH_TAPE', kind: 'variable'},

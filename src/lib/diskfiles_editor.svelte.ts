@@ -5,7 +5,9 @@ import {Diskfile_Tabs} from '$lib/diskfile_tabs.svelte.js';
 import {Uuid} from '$lib/zod_helpers.js';
 import {Cell_Json} from '$lib/cell_types.js';
 
-export const Diskfiles_Editor_Json = Cell_Json.extend({});
+export const Diskfiles_Editor_Json = Cell_Json.extend({
+	show_sort_controls: z.boolean().default(false),
+});
 export type Diskfiles_Editor_Json = z.infer<typeof Diskfiles_Editor_Json>;
 export type Diskfiles_Editor_Json_Input = z.input<typeof Diskfiles_Editor_Json>;
 
@@ -15,6 +17,9 @@ export type Diskfiles_Editor_Options = Cell_Options<typeof Diskfiles_Editor_Json
  * Editor state management for diskfiles.
  */
 export class Diskfiles_Editor extends Cell<typeof Diskfiles_Editor_Json> {
+	/** Controls visibility of sort controls in the file explorer. */
+	show_sort_controls: boolean = $state(false);
+
 	/** Tabs for managing the open diskfiles. */
 	readonly tabs: Diskfile_Tabs = new Diskfile_Tabs({
 		zzz: this.zzz,
@@ -22,9 +27,6 @@ export class Diskfiles_Editor extends Cell<typeof Diskfiles_Editor_Json> {
 			id: Uuid.parse(undefined),
 		},
 	});
-
-	/** Controls visibility of sort controls in the file explorer. */
-	show_sort_controls: boolean = $state(false);
 
 	constructor(options: Diskfiles_Editor_Options) {
 		super(Diskfiles_Editor_Json, options);

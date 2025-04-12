@@ -16,7 +16,6 @@
 		no_items_message = '[no items available]',
 		children,
 	}: {
-		/** The collection of items */
 		items: Array<T>;
 		filter?: ((item: T) => boolean) | undefined;
 		exclude_ids?: Array<Uuid> | undefined;
@@ -24,16 +23,14 @@
 		sort_key_default?: string | undefined;
 		show_sort_controls?: boolean | undefined;
 		no_items_message?: string | undefined;
-		/** Called once per item */
+		/** Called once per item. */
 		children: Snippet<[item: T]>;
 	} = $props();
 
-	const sortable = $state(
-		new Sortable(
-			() => items,
-			() => sorters,
-			() => sort_key_default,
-		),
+	const sortable = new Sortable(
+		() => items,
+		() => sorters,
+		() => sort_key_default,
 	);
 
 	const filtered_items = $derived.by(() => {

@@ -4,7 +4,6 @@
 	import {random_item} from '@ryanatkn/belt/random.js';
 
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
-	import Nav_Link from '$lib/Nav_Link.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 	import Bit_View from '$lib/Bit_View.svelte';
 	import {
@@ -19,14 +18,13 @@
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import Prompt_Stats from '$lib/Prompt_Stats.svelte';
 	import Bit_List from '$lib/Bit_List.svelte';
-	import {Reorderable} from '$lib/reorderable.svelte.js';
 	import Content_Preview from '$lib/Content_Preview.svelte';
 	import {Bit} from '$lib/bit.svelte.js';
 	import Contextmenu_Prompt from '$lib/Contextmenu_Prompt.svelte';
 	import Diskfile_Picker from '$lib/Diskfile_Picker.svelte';
+	import Prompt_List from '$lib/Prompt_List.svelte';
 
 	const zzz = zzz_context.get();
-	const reorderable = new Reorderable();
 
 	// TODO BLOCK clicking the bits should select them, and then selected one should show its name input (or just on hover/tap? what signifier?)
 
@@ -81,33 +79,7 @@
 			>
 				{GLYPH_ADD} new prompt
 			</button>
-			<ul
-				class="unstyled mt_sm"
-				use:reorderable.list={{
-					onreorder: (from_index, to_index) => zzz.prompts.reorder_prompts(from_index, to_index),
-				}}
-			>
-				{#each zzz.prompts.ordered_items as prompt, i (prompt.id)}
-					<li use:reorderable.item={{index: i}}>
-						<Contextmenu_Prompt {prompt}>
-							<Nav_Link
-								href="?prompt={prompt.id}"
-								selected={prompt.id === zzz.prompts.selected_id}
-								attrs={{
-									class: 'justify_content_space_between',
-									style: 'min-height: 0;',
-								}}
-							>
-								<div>
-									<span class="mr_xs2">{GLYPH_PROMPT}</span>
-									<span>{prompt.name}</span>
-								</div>
-								{#if prompt.bits.length}<small>{prompt.bits.length}</small>{/if}
-							</Nav_Link>
-						</Contextmenu_Prompt>
-					</li>
-				{/each}
-			</ul>
+			<Prompt_List />
 		</div>
 	</div>
 

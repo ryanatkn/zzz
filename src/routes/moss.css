@@ -576,12 +576,6 @@ a.chip {
 .display_contents {
 	display: contents;
 }
-.pt_xs {
-	padding-top: var(--space_xs);
-}
-.p_xs5 {
-	padding: var(--space_xs5);
-}
 
 .chevron {
 	position: relative;

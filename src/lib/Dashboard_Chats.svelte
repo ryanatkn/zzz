@@ -2,58 +2,30 @@
 	import {random_item} from '@ryanatkn/belt/random.js';
 	import {fade} from 'svelte/transition';
 
+	import Chats_List from '$lib/Chat_List.svelte';
 	import Chat_View from '$lib/Chat_View.svelte';
-	import Nav_Link from '$lib/Nav_Link.svelte';
 	import Contextmenu_Chat from '$lib/Contextmenu_Chat.svelte';
-	import {GLYPH_CHAT, GLYPH_ADD} from '$lib/glyphs.js';
+	import {GLYPH_ADD} from '$lib/glyphs.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
-	import {Reorderable} from '$lib/reorderable.svelte.js';
 
 	const zzz = zzz_context.get();
-
-	const reorderable = new Reorderable();
 </script>
 
 <div class="flex w_100 h_100">
 	<!-- TODO show the selected chat's info, if any -->
 	<div class="column_fixed">
 		<div class="py_sm pr_sm">
-			<button
-				class="plain w_100 justify_content_start"
-				type="button"
-				onclick={() => zzz.chats.add()}
-			>
-				{GLYPH_ADD} new chat
-			</button>
-			{#if zzz.chats.items.size}
-				<menu
-					class="unstyled mt_sm"
-					use:reorderable.list={{
-						onreorder: (from_index, to_index) => zzz.chats.reorder_chats(from_index, to_index),
-					}}
+			<div class="row">
+				<button
+					class="plain w_100 justify_content_start"
+					type="button"
+					onclick={() => zzz.chats.add()}
 				>
-					{#each zzz.chats.ordered_items as chat, i (chat.id)}
-						<!-- TODO change to href from onclick -->
-						<li use:reorderable.item={{index: i}}>
-							<Contextmenu_Chat {chat}>
-								<Nav_Link
-									href="?chat={chat.id}"
-									selected={chat.id === zzz.chats.selected_id}
-									attrs={{
-										class: 'justify_content_space_between',
-										style: 'min-height: 0;',
-									}}
-								>
-									<div>
-										<span class="mr_xs2">{GLYPH_CHAT}</span>
-										<span>{chat.name}</span>
-									</div>
-									{#if chat.tapes.length}<small>{chat.tapes.length}</small>{/if}
-								</Nav_Link>
-							</Contextmenu_Chat>
-						</li>
-					{/each}
-				</menu>
+					{GLYPH_ADD} new chat
+				</button>
+			</div>
+			{#if zzz.chats.items.size}
+				<Chats_List />
 			{/if}
 		</div>
 	</div>

@@ -1,0 +1,30 @@
+<script lang="ts">
+	import Nav_Link from '$lib/Nav_Link.svelte';
+	import Contextmenu_Chat from '$lib/Contextmenu_Chat.svelte';
+	import {GLYPH_CHAT} from '$lib/glyphs.js';
+	import type {Chat} from '$lib/chat.svelte.js';
+
+	interface Props {
+		chat: Chat;
+		selected?: boolean;
+	}
+
+	const {chat, selected}: Props = $props();
+</script>
+
+<Contextmenu_Chat {chat}>
+	<Nav_Link
+		href="?chat={chat.id}"
+		{selected}
+		attrs={{
+			class: 'justify_content_space_between',
+			style: 'min-height: 0;',
+		}}
+	>
+		<div>
+			<span class="mr_xs2">{GLYPH_CHAT}</span>
+			<span>{chat.name}</span>
+		</div>
+		{#if chat.tapes.length}<small>{chat.tapes.length}</small>{/if}
+	</Nav_Link>
+</Contextmenu_Chat>
