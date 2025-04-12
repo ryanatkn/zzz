@@ -69,8 +69,8 @@ export interface Indexed_Collection_Options<
 }
 
 /**
- * A helper class for managing collections that need efficient lookups
- * with automatic index maintenance.
+ * A helper class for managing collections with incremental updates,
+ * efficient querying, and automatic index maintenance.
  *
  * @param T - The type of items stored in the collection
  * @param T_Key_Single - Type-safe keys for single value indexes

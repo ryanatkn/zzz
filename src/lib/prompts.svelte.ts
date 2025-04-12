@@ -17,10 +17,12 @@ export const Prompts_Json = z
 			'Prompt',
 		),
 		selected_id: z.string().nullable().default(null),
+		show_sort_controls: z.boolean().default(false),
 	})
 	.default(() => ({
 		items: [],
 		selected_id: null,
+		show_sort_controls: false,
 	}));
 export type Prompts_Json = z.infer<typeof Prompts_Json>;
 export type Prompts_Json_Input = z.input<typeof Prompts_Json>;
@@ -71,6 +73,9 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 	readonly selected: Prompt | undefined = $derived(
 		this.selected_id ? this.items.by_id.get(this.selected_id) : undefined,
 	);
+
+	/** Controls visibility of sort controls in the prompts list. */
+	show_sort_controls: boolean = $state(false);
 
 	/** Ordered array of prompts derived from the `manual_order` index. */
 	readonly ordered_items: Array<Prompt> = $derived(this.items.derived_index('manual_order'));
@@ -183,4 +188,13 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 		if (!this.selected) return;
 		this.selected.remove_bit(bit_id);
 	}
+
+	/**
+	 * Toggles the visibility of sort controls in the prompts list.
+	 */
+	toggle_sort_controls(value = !this.show_sort_controls): void {
+		this.show_sort_controls = value;
+	}
 }
+
+export const Prompts_Schema = z.instanceof(Prompts);

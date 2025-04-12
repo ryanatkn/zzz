@@ -5,8 +5,9 @@
 	import Chats_List from '$lib/Chat_List.svelte';
 	import Chat_View from '$lib/Chat_View.svelte';
 	import Contextmenu_Chat from '$lib/Contextmenu_Chat.svelte';
-	import {GLYPH_ADD} from '$lib/glyphs.js';
+	import {GLYPH_ADD, GLYPH_SORT} from '$lib/glyphs.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
+	import Glyph from '$lib/Glyph.svelte';
 
 	const zzz = zzz_context.get();
 </script>
@@ -17,11 +18,20 @@
 		<div class="py_sm pr_sm">
 			<div class="row">
 				<button
-					class="plain w_100 justify_content_start"
+					class="plain flex_1 justify_content_start"
 					type="button"
 					onclick={() => zzz.chats.add()}
 				>
 					{GLYPH_ADD} new chat
+				</button>
+				<button
+					type="button"
+					class="plain compact selectable deselectable"
+					class:selected={zzz.chats.show_sort_controls}
+					title="toggle sort controls"
+					onclick={() => zzz.chats.toggle_sort_controls()}
+				>
+					<Glyph icon={GLYPH_SORT} />
 				</button>
 			</div>
 			{#if zzz.chats.items.size}

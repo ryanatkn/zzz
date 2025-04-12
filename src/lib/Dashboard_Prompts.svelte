@@ -14,6 +14,7 @@
 		GLYPH_DELETE,
 		GLYPH_FILE,
 		GLYPH_LIST,
+		GLYPH_SORT,
 	} from '$lib/glyphs.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import Prompt_Stats from '$lib/Prompt_Stats.svelte';
@@ -70,15 +71,26 @@
 <div class="flex w_100 h_100">
 	<div class="column_fixed">
 		<div class="p_sm pl_0">
-			<button
-				type="button"
-				class="plain w_100 justify_content_start"
-				onclick={() => {
-					zzz.prompts.add().add_bit(Bit.create(zzz, {type: 'text'}));
-				}}
-			>
-				{GLYPH_ADD} new prompt
-			</button>
+			<div class="row justify_content_space_between">
+				<button
+					type="button"
+					class="plain w_100 justify_content_start"
+					onclick={() => {
+						zzz.prompts.add().add_bit(Bit.create(zzz, {type: 'text'}));
+					}}
+				>
+					{GLYPH_ADD} new prompt
+				</button>
+				<button
+					type="button"
+					class="plain compact selectable deselectable"
+					class:selected={zzz.prompts.show_sort_controls}
+					title="toggle sort controls"
+					onclick={() => zzz.prompts.toggle_sort_controls()}
+				>
+					<Glyph icon={GLYPH_SORT} />
+				</button>
+			</div>
 			<Prompt_List />
 		</div>
 	</div>

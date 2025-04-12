@@ -3,24 +3,33 @@
 
 	import Chat_Listitem from '$lib/Chat_Listitem.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
-	import {Reorderable} from '$lib/reorderable.svelte.js';
+	import {sort_by_text, sort_by_numeric} from '$lib/sortable.svelte.js';
+	import type {Chat} from '$lib/chat.svelte.js';
+	import Sortable_List from '$lib/Sortable_List.svelte';
 
 	const zzz = zzz_context.get();
 	const {chats} = zzz;
 	const selected_chat_id = $derived(chats.selected_id);
 
-	const reorderable = new Reorderable();
+	// TODO BLOCK updated isn't being updated when stuff changes in the prompt, and `created` is also broken somehow?
 </script>
 
-<menu
-	class="unstyled mt_sm"
-	use:reorderable.list={{
-		onreorder: (from_index, to_index) => chats.reorder_chats(from_index, to_index),
-	}}
+<Sortable_List
+	items={chats.ordered_items}
+	show_sort_controls={chats.show_sort_controls}
+	sorters={[
+		sort_by_numeric<Chat>('updated_newest', 'updated (newest)', 'updated', 'desc'),
+		sort_by_numeric<Chat>('updated_oldest', 'updated (oldest)', 'updated', 'asc'),
+		sort_by_numeric<Chat>('created_newest', 'created (newest)', 'created', 'desc'),
+		sort_by_numeric<Chat>('created_oldest', 'created (oldest)', 'created', 'asc'),
+		sort_by_text<Chat>('name_asc', 'name (a-z)', 'name'),
+		sort_by_text<Chat>('name_desc', 'name (z-a)', 'name', 'desc'),
+	]}
+	sort_key_default="updated_newest"
 >
-	{#each chats.ordered_items as chat, index (chat.id)}
-		<li use:reorderable.item={{index}} transition:slide>
+	{#snippet children(chat)}
+		<div transition:slide>
 			<Chat_Listitem {chat} selected={chat.id === selected_chat_id} />
-		</li>
-	{/each}
-</menu>
+		</div>
+	{/snippet}
+</Sortable_List>

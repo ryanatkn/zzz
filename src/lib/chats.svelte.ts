@@ -17,10 +17,12 @@ export const Chats_Json = z
 			'Chat',
 		),
 		selected_id: z.string().nullable().default(null),
+		show_sort_controls: z.boolean().default(false),
 	})
 	.default(() => ({
 		items: [],
 		selected_id: null,
+		show_sort_controls: false,
 	}));
 export type Chats_Json = z.infer<typeof Chats_Json>;
 export type Chats_Json_Input = z.input<typeof Chats_Json>;
@@ -52,6 +54,9 @@ export class Chats extends Cell<typeof Chats_Json> {
 	readonly selected_id_error: boolean = $derived(
 		this.selected_id !== null && this.selected === undefined,
 	);
+
+	/** Controls visibility of sort controls in the chats list. */
+	show_sort_controls: boolean = $state(false);
 
 	/** Ordered array of chats derived from the `manual_order` index. */
 	readonly ordered_items: Array<Chat> = $derived(this.items.derived_index('manual_order'));
@@ -147,6 +152,13 @@ export class Chats extends Cell<typeof Chats_Json> {
 
 	reorder_chats(from_index: number, to_index: number): void {
 		this.items.indexes.manual_order = to_reordered_list(this.ordered_items, from_index, to_index);
+	}
+
+	/**
+	 * Toggles the visibility of sort controls in the chats list.
+	 */
+	toggle_sort_controls(value = !this.show_sort_controls): void {
+		this.show_sort_controls = value;
 	}
 }
 

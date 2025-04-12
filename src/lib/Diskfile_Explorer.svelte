@@ -104,7 +104,7 @@
 			</div>
 		</div>
 
-		<!-- TODO @many more efficient array? maybe add `all` back to the base Indexed_Collection? -->
+		<!-- TODO @many improve efficiency - maybe add `all` back to the base Indexed_Collection, or add an incremental index for this case? -->
 		<Sortable_List
 			items={Array.from(diskfiles.items.by_id.values())}
 			show_sort_controls={editor.show_sort_controls}
