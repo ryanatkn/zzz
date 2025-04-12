@@ -23,6 +23,9 @@ export class Diskfiles_Editor extends Cell<typeof Diskfiles_Editor_Json> {
 		},
 	});
 
+	/** Controls visibility of sort controls in the file explorer. */
+	show_sort_controls: boolean = $state(false);
+
 	constructor(options: Diskfiles_Editor_Options) {
 		super(Diskfiles_Editor_Json, options);
 		this.init();
@@ -113,6 +116,13 @@ export class Diskfiles_Editor extends Cell<typeof Diskfiles_Editor_Json> {
 		if (selected_diskfile_id) {
 			this.zzz.diskfiles.selected_file_id = selected_diskfile_id;
 		}
+	}
+
+	/**
+	 * Toggles the visibility of sort controls in the file explorer.
+	 */
+	toggle_sort_controls(value = !this.show_sort_controls): void {
+		this.show_sort_controls = value;
 	}
 }
 

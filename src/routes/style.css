@@ -309,3 +309,21 @@ a.chip {
 	padding: var(--space_sm) var(--space_sm) var(--space_xl7);
 	margin-bottom: 0;
 }
+
+/* TODO this is a hack because .plain doesn't compose with .selectable and .deselectable in Moss */
+.plain.selectable.deselectable {
+	border: none;
+	color: var(--text_color);
+}
+.plain.selectable.deselectable.selected {
+	box-shadow: var(--shadow_inset_top_xs)
+		color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_1)), transparent);
+}
+.plain.selectable.deselectable.selected:hover {
+	box-shadow: var(--shadow_inset_top_sm)
+		color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_1)), transparent);
+}
+.plain.selectable.deselectable.selected:active {
+	box-shadow: var(--shadow_inset_bottom_xs)
+		color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_1)), transparent);
+}

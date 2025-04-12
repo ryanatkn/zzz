@@ -1,6 +1,7 @@
 <script lang="ts" generics="T extends {id: Uuid}">
 	import type {Snippet} from 'svelte';
 	import {EMPTY_ARRAY} from '@ryanatkn/belt/array.js';
+	import {slide} from 'svelte/transition';
 
 	import type {Uuid} from '$lib/zod_helpers.js';
 	import {Sortable, type Sorter} from '$lib/sortable.svelte.js';
@@ -64,23 +65,16 @@
 </script>
 
 {#if show_sort_controls && sortable.sorters.length > 1}
-	<div class="mb_md row gap_xs2">
+	<label class="p_sm row gap_xs2 mb_0" transition:slide>
 		<small class="pr_xs3 white_space_nowrap">sort by</small>
-		<menu class="unstyled flex flex_wrap justify_content_end gap_xs2">
+		<select bind:value={sortable.active_key} class="compact plain size_sm">
 			{#each sortable.sorters as sorter (sorter.key)}
-				<button
-					type="button"
-					class="compact font_weight_400"
-					class:selected={sortable.active_key === sorter.key}
-					onclick={() => sortable.set_sort(sorter.key)}
-				>
-					<div class="size_md">
-						{sorter.label}
-					</div>
-				</button>
+				<option value={sorter.key}>
+					{sorter.label}
+				</option>
 			{/each}
-		</menu>
-	</div>
+		</select>
+	</label>
 {/if}
 
 {#if filtered_items.length === 0}

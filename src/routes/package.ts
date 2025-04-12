@@ -85,27 +85,12 @@ export const package_json = {
 			svelte: './dist/Action_Detail.svelte',
 			default: './dist/Action_Detail.svelte',
 		},
-		'./Action_Info.svelte': {
-			types: './dist/Action_Info.svelte.d.ts',
-			svelte: './dist/Action_Info.svelte',
-			default: './dist/Action_Info.svelte',
-		},
 		'./Action_List.svelte': {
 			types: './dist/Action_List.svelte.d.ts',
 			svelte: './dist/Action_List.svelte',
 			default: './dist/Action_List.svelte',
 		},
-		'./Action_Summary.svelte': {
-			types: './dist/Action_Summary.svelte.d.ts',
-			svelte: './dist/Action_Summary.svelte',
-			default: './dist/Action_Summary.svelte',
-		},
 		'./action_types.js': {types: './dist/action_types.d.ts', default: './dist/action_types.js'},
-		'./Action_View.svelte': {
-			types: './dist/Action_View.svelte.d.ts',
-			svelte: './dist/Action_View.svelte',
-			default: './dist/Action_View.svelte',
-		},
 		'./action.svelte.js': {types: './dist/action.svelte.d.ts', default: './dist/action.svelte.js'},
 		'./actions.svelte.js': {
 			types: './dist/actions.svelte.d.ts',
@@ -587,11 +572,6 @@ export const package_json = {
 			svelte: './dist/Provider_Logo.svelte',
 			default: './dist/Provider_Logo.svelte',
 		},
-		'./Provider_Select.svelte': {
-			types: './dist/Provider_Select.svelte.d.ts',
-			svelte: './dist/Provider_Select.svelte',
-			default: './dist/Provider_Select.svelte',
-		},
 		'./Provider_Summary.svelte': {
 			types: './dist/Provider_Summary.svelte.d.ts',
 			svelte: './dist/Provider_Summary.svelte',
@@ -734,9 +714,7 @@ export const src_json = {
 	modules: {
 		'./package.json': {path: 'package.json', declarations: []},
 		'./Action_Detail.svelte': {path: 'Action_Detail.svelte', declarations: []},
-		'./Action_Info.svelte': {path: 'Action_Info.svelte', declarations: []},
 		'./Action_List.svelte': {path: 'Action_List.svelte', declarations: []},
-		'./Action_Summary.svelte': {path: 'Action_Summary.svelte', declarations: []},
 		'./action_types.js': {
 			path: 'action_types.ts',
 			declarations: [
@@ -771,7 +749,6 @@ export const src_json = {
 				{name: 'create_action_json', kind: 'function'},
 			],
 		},
-		'./Action_View.svelte': {path: 'Action_View.svelte', declarations: []},
 		'./action.svelte.js': {
 			path: 'action.svelte.ts',
 			declarations: [
@@ -1301,7 +1278,6 @@ export const src_json = {
 		'./Provider_Detail.svelte': {path: 'Provider_Detail.svelte', declarations: []},
 		'./Provider_Link.svelte': {path: 'Provider_Link.svelte', declarations: []},
 		'./Provider_Logo.svelte': {path: 'Provider_Logo.svelte', declarations: []},
-		'./Provider_Select.svelte': {path: 'Provider_Select.svelte', declarations: []},
 		'./Provider_Summary.svelte': {path: 'Provider_Summary.svelte', declarations: []},
 		'./provider_types.js': {
 			path: 'provider_types.ts',

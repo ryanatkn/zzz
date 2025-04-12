@@ -26,6 +26,7 @@ export const GLYPH_EDIT = '✎'; // ✎ ✏ ✐ ✑ ✒
 // ⎗ ⎗ ⎘ ⌖ ⌶ ⎙
 // ⎘ ⎘ ⎌ ⌫ ⊘ ⦸
 // ⤺ ⤻ ⤼ ⤽ ⤾ ⤿
+export const GLYPH_SORT = '⇅'; // ⇅ ⇵ ⥮ ⮃
 
 export const GLYPH_SERVER = '🜢';
 export const GLYPH_CHAT = '⌸';
@@ -52,7 +53,6 @@ export const GLYPH_HEARTBEAT = '∽'; // ∿ ≋ 〰 ∽ ~
 export const GLYPH_RESPONSE = '⮑';
 export const GLYPH_SESSION = '⏣';
 
-// Direction icons
 export const GLYPH_DIRECTION_CLIENT = '⥘'; // ⤤ ⤳
 export const GLYPH_DIRECTION_SERVER = '⥙'; // ⤷
 export const GLYPH_DIRECTION_BOTH = '⤨';

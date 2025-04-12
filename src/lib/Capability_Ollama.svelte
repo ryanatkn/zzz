@@ -54,9 +54,9 @@
 		<div class="flex_1 p_md">
 			Ollama (<External_Link href="https://ollama.com/">ollama.com</External_Link>,
 			<External_Link href="https://github.com/ollama/ollama">GitHub</External_Link>) is a local
-			model server that wraps
+			model server that forks
 			<External_Link href="https://github.com/ggml-org/llama.cpp">llama.cpp</External_Link>. It's
-			one of Zzz's first integrations but will probably be swapped for llama.cpp. See also the <Provider_Link
+			one of Zzz's first integrations but will be one of many supported local backends. See also the <Provider_Link
 				provider={zzz.providers.find_by_name('ollama')}
 				><span class="white_space_nowrap"><Glyph icon={GLYPH_PROVIDER} /> Ollama</span> provider</Provider_Link
 			> page.

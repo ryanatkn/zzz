@@ -8,9 +8,14 @@
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import Diskfile_Listitem from '$lib/Diskfile_Listitem.svelte';
 	import Glyph from '$lib/Glyph.svelte';
-	import {GLYPH_DIRECTORY, GLYPH_CREATE_FILE, GLYPH_CREATE_FOLDER} from '$lib/glyphs.js';
+	import {
+		GLYPH_DIRECTORY,
+		GLYPH_CREATE_FILE,
+		GLYPH_CREATE_FOLDER,
+		GLYPH_SORT,
+	} from '$lib/glyphs.js';
 	import Sortable_List from '$lib/Sortable_List.svelte';
-	import {sort_by_text} from '$lib/sortable.svelte.js';
+	import {sort_by_text, sort_by_numeric} from '$lib/sortable.svelte.js';
 
 	interface Props {
 		empty?: Snippet | undefined;
@@ -20,6 +25,7 @@
 
 	const zzz = zzz_context.get();
 	const {diskfiles} = zzz;
+	const {editor} = diskfiles;
 
 	// TODO need awaitable websocket calls?
 	const TODO_create_file_pending = false;
@@ -70,6 +76,15 @@
 		<div class="row h_input_height justify_content_space_between py_xs px_xs">
 			<small class="ellipsis"><Glyph icon={GLYPH_DIRECTORY} /> {zzz.zzz_dir_pathname}</small>
 			<div class="flex gap_xs">
+				<button
+					type="button"
+					class="plain compact selectable deselectable"
+					class:selected={editor.show_sort_controls}
+					title="toggle sort controls"
+					onclick={() => editor.toggle_sort_controls()}
+				>
+					<Glyph icon={GLYPH_SORT} />
+				</button>
 				<Pending_Button
 					pending={TODO_create_file_pending}
 					attrs={{class: 'plain compact'}}
@@ -92,8 +107,16 @@
 		<!-- TODO @many more efficient array? maybe add `all` back to the base Indexed_Collection? -->
 		<Sortable_List
 			items={Array.from(diskfiles.items.by_id.values())}
-			show_sort_controls={true}
-			sorters={[sort_by_text<Diskfile>('path_asc', 'path (a-z)', 'path_relative')]}
+			show_sort_controls={editor.show_sort_controls}
+			sorters={[
+				// TODO @many rework API to avoid casting
+				sort_by_text<Diskfile>('path_asc', 'path (a-z)', 'path_relative'),
+				sort_by_text<Diskfile>('path_desc', 'path (z-a)', 'path_relative', 'desc'),
+				sort_by_numeric<Diskfile>('updated_newest', 'updated (newest)', 'updated', 'desc'),
+				sort_by_numeric<Diskfile>('updated_oldest', 'updated (oldest)', 'updated', 'asc'),
+				sort_by_numeric<Diskfile>('created_newest', 'created (newest)', 'created', 'desc'),
+				sort_by_numeric<Diskfile>('created_oldest', 'created (oldest)', 'created', 'asc'),
+			]}
 			sort_key_default="path_asc"
 			no_items_message={empty ? undefined : '[no files available]'}
 		>

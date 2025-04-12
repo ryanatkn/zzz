@@ -23,7 +23,6 @@
 
 	const zzz = zzz_context.get();
 
-	// Create editor state once and reuse it
 	const editor_state = new Diskfile_Editor_State({zzz, diskfile});
 
 	// Reference to the content editor component

@@ -102,18 +102,6 @@ export class Sortable<T> {
 			this.active_key = sorters[0].key;
 		}
 	}
-
-	/**
-	 * Set the active sorter by key.
-	 * @returns true if successful, false if the key doesn't exist
-	 */
-	set_sort(key: string): boolean {
-		if (this.sorters.some((sorter) => sorter.key === key)) {
-			this.active_key = key;
-			return true;
-		}
-		return false;
-	}
 }
 
 // TODO @many these arent used in a typesafe way, asserting cell subtypes, maybe require the cell?
