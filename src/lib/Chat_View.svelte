@@ -67,7 +67,7 @@
 						tape{#if selected_chat.tapes.length !== 1}s{/if}
 					</small>
 				</div>
-				<div class="row">
+				<div class="row gap_xs2">
 					<Confirm_Button
 						onconfirm={() => zzz.chats.selected_id && zzz.chats.remove(zzz.chats.selected_id)}
 						position="right"

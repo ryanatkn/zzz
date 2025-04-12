@@ -6,7 +6,7 @@
 
 	interface Props {
 		chat: Chat;
-		selected?: boolean;
+		selected?: boolean | undefined;
 	}
 
 	const {chat, selected}: Props = $props();

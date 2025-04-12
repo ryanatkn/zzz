@@ -75,16 +75,7 @@
 	{:else}
 		<div class="row h_input_height justify_content_space_between py_xs px_xs">
 			<small class="ellipsis"><Glyph icon={GLYPH_DIRECTORY} /> {zzz.zzz_dir_pathname}</small>
-			<div class="flex gap_xs">
-				<button
-					type="button"
-					class="plain compact selectable deselectable"
-					class:selected={editor.show_sort_controls}
-					title="toggle sort controls"
-					onclick={() => editor.toggle_sort_controls()}
-				>
-					<Glyph icon={GLYPH_SORT} />
-				</button>
+			<div class="flex gap_xs2">
 				<Pending_Button
 					pending={TODO_create_file_pending}
 					attrs={{class: 'plain compact'}}
@@ -101,6 +92,15 @@
 				>
 					<Glyph icon={GLYPH_CREATE_FOLDER} />
 				</Pending_Button>
+				<button
+					type="button"
+					class="plain compact selectable deselectable"
+					class:selected={editor.show_sort_controls}
+					title="toggle sort controls"
+					onclick={() => editor.toggle_sort_controls()}
+				>
+					<Glyph icon={GLYPH_SORT} />
+				</button>
 			</div>
 		</div>
 
@@ -112,17 +112,17 @@
 				// TODO @many rework API to avoid casting
 				sort_by_text<Diskfile>('path_asc', 'path (a-z)', 'path_relative'),
 				sort_by_text<Diskfile>('path_desc', 'path (z-a)', 'path_relative', 'desc'),
-				sort_by_numeric<Diskfile>('updated_newest', 'updated (newest)', 'updated', 'desc'),
-				sort_by_numeric<Diskfile>('updated_oldest', 'updated (oldest)', 'updated', 'asc'),
+				sort_by_numeric<Diskfile>('updated_newest', 'updated (latest)', 'updated', 'desc'),
+				sort_by_numeric<Diskfile>('updated_oldest', 'updated (past)', 'updated', 'asc'),
 				sort_by_numeric<Diskfile>('created_newest', 'created (newest)', 'created', 'desc'),
 				sort_by_numeric<Diskfile>('created_oldest', 'created (oldest)', 'created', 'asc'),
 			]}
 			sort_key_default="path_asc"
-			no_items_message={empty ? undefined : '[no files available]'}
+			no_items={empty ? undefined : '[no files available]'}
 		>
 			{#snippet children(diskfile)}
 				{@const selected = diskfiles.selected_file_id === diskfile.id}
-				<div class:selected transition:slide>
+				<div class="diskfile_listitem_wrapper" class:selected transition:slide>
 					<Diskfile_Listitem
 						{diskfile}
 						{selected}
@@ -141,7 +141,7 @@
 </div>
 
 <style>
-	.selected {
+	.diskfile_listitem_wrapper {
 		position: sticky;
 		top: 0;
 		bottom: 0;

@@ -244,6 +244,16 @@
       "types": "./dist/cell.svelte.d.ts",
       "default": "./dist/cell.svelte.js"
     },
+    "./Chat_List.svelte": {
+      "types": "./dist/Chat_List.svelte.d.ts",
+      "svelte": "./dist/Chat_List.svelte",
+      "default": "./dist/Chat_List.svelte"
+    },
+    "./Chat_Listitem.svelte": {
+      "types": "./dist/Chat_Listitem.svelte.d.ts",
+      "svelte": "./dist/Chat_Listitem.svelte",
+      "default": "./dist/Chat_Listitem.svelte"
+    },
     "./Chat_Tape_Add_By_Model.svelte": {
       "types": "./dist/Chat_Tape_Add_By_Model.svelte.d.ts",
       "svelte": "./dist/Chat_Tape_Add_By_Model.svelte",
@@ -616,6 +626,11 @@
       "types": "./dist/Prompt_List.svelte.d.ts",
       "svelte": "./dist/Prompt_List.svelte",
       "default": "./dist/Prompt_List.svelte"
+    },
+    "./Prompt_Listitem.svelte": {
+      "types": "./dist/Prompt_Listitem.svelte.d.ts",
+      "svelte": "./dist/Prompt_Listitem.svelte",
+      "default": "./dist/Prompt_Listitem.svelte"
     },
     "./Prompt_Picker.svelte": {
       "types": "./dist/Prompt_Picker.svelte.d.ts",

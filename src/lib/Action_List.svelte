@@ -38,7 +38,7 @@
 		]}
 		sort_key_default="created_newest"
 		show_sort_controls={true}
-		no_items_message="[no actions yet]"
+		no_items="[no actions yet]"
 	>
 		{#snippet children(action)}
 			{@const selected = action.id === selected_action_id}

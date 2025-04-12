@@ -11,15 +11,15 @@
 	const {chats} = zzz;
 	const selected_chat_id = $derived(chats.selected_id);
 
-	// TODO BLOCK updated isn't being updated when stuff changes in the prompt, and `created` is also broken somehow?
+	// TODO BLOCK @many updated isn't being bumped when stuff changes in the chat/prompt
 </script>
 
 <Sortable_List
 	items={chats.ordered_items}
 	show_sort_controls={chats.show_sort_controls}
 	sorters={[
-		sort_by_numeric<Chat>('updated_newest', 'updated (newest)', 'updated', 'desc'),
-		sort_by_numeric<Chat>('updated_oldest', 'updated (oldest)', 'updated', 'asc'),
+		sort_by_numeric<Chat>('updated_newest', 'updated (latest)', 'updated', 'desc'),
+		sort_by_numeric<Chat>('updated_oldest', 'updated (past)', 'updated', 'asc'),
 		sort_by_numeric<Chat>('created_newest', 'created (newest)', 'created', 'desc'),
 		sort_by_numeric<Chat>('created_oldest', 'created (oldest)', 'created', 'asc'),
 		sort_by_text<Chat>('name_asc', 'name (a-z)', 'name'),

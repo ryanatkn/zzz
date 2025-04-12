@@ -19,7 +19,7 @@
 		sorters = EMPTY_ARRAY,
 		sort_key_default,
 		show_sort_controls = false,
-		no_items_message = 'No items available',
+		no_items,
 		heading = null,
 	}: {
 		/** The collection of items - required */
@@ -36,7 +36,7 @@
 		sorters?: Array<Sorter<T>> | undefined;
 		sort_key_default?: string | undefined;
 		show_sort_controls?: boolean | undefined;
-		no_items_message?: string | undefined;
+		no_items?: Snippet | string | undefined;
 		heading?: string | null | undefined;
 		/** Called once per item */
 		children: Snippet<[item: T, pick: (item: T) => void]>;
@@ -71,7 +71,7 @@
 				{sorters}
 				{sort_key_default}
 				{show_sort_controls}
-				{no_items_message}
+				{no_items}
 			>
 				{#snippet children(item)}
 					{@render children_prop(item, pick)}

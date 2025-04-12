@@ -71,7 +71,7 @@
 <div class="flex w_100 h_100">
 	<div class="column_fixed">
 		<div class="p_sm pl_0">
-			<div class="row justify_content_space_between">
+			<div class="row gap_xs2 mb_xs">
 				<button
 					type="button"
 					class="plain w_100 justify_content_start"

@@ -16,7 +16,7 @@
 	<!-- TODO show the selected chat's info, if any -->
 	<div class="column_fixed">
 		<div class="py_sm pr_sm">
-			<div class="row">
+			<div class="row gap_xs2 mb_xs">
 				<button
 					class="plain flex_1 justify_content_start"
 					type="button"

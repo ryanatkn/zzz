@@ -8,7 +8,7 @@
 
 	interface Props {
 		diskfile: Diskfile;
-		selected?: boolean;
+		selected?: boolean | undefined;
 		attrs?: Record<string, unknown>;
 		/**
 		 * `hard` indicates a "hard select" like a doubleclick or enter keypress.

@@ -6,7 +6,7 @@
 
 	interface Props {
 		prompt: Prompt;
-		selected?: boolean;
+		selected?: boolean | undefined;
 	}
 
 	const {prompt, selected}: Props = $props();

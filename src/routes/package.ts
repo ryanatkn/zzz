@@ -197,6 +197,16 @@ export const package_json = {
 		},
 		'./cell_types.js': {types: './dist/cell_types.d.ts', default: './dist/cell_types.js'},
 		'./cell.svelte.js': {types: './dist/cell.svelte.d.ts', default: './dist/cell.svelte.js'},
+		'./Chat_List.svelte': {
+			types: './dist/Chat_List.svelte.d.ts',
+			svelte: './dist/Chat_List.svelte',
+			default: './dist/Chat_List.svelte',
+		},
+		'./Chat_Listitem.svelte': {
+			types: './dist/Chat_Listitem.svelte.d.ts',
+			svelte: './dist/Chat_Listitem.svelte',
+			default: './dist/Chat_Listitem.svelte',
+		},
 		'./Chat_Tape_Add_By_Model.svelte': {
 			types: './dist/Chat_Tape_Add_By_Model.svelte.d.ts',
 			svelte: './dist/Chat_Tape_Add_By_Model.svelte',
@@ -536,6 +546,11 @@ export const package_json = {
 			types: './dist/Prompt_List.svelte.d.ts',
 			svelte: './dist/Prompt_List.svelte',
 			default: './dist/Prompt_List.svelte',
+		},
+		'./Prompt_Listitem.svelte': {
+			types: './dist/Prompt_Listitem.svelte.d.ts',
+			svelte: './dist/Prompt_Listitem.svelte',
+			default: './dist/Prompt_Listitem.svelte',
 		},
 		'./Prompt_Picker.svelte': {
 			types: './dist/Prompt_Picker.svelte.d.ts',
@@ -899,6 +914,8 @@ export const src_json = {
 				{name: 'Cell', kind: 'class'},
 			],
 		},
+		'./Chat_List.svelte': {path: 'Chat_List.svelte', declarations: []},
+		'./Chat_Listitem.svelte': {path: 'Chat_Listitem.svelte', declarations: []},
 		'./Chat_Tape_Add_By_Model.svelte': {path: 'Chat_Tape_Add_By_Model.svelte', declarations: []},
 		'./Chat_Tape.svelte': {path: 'Chat_Tape.svelte', declarations: []},
 		'./Chat_View_Multi.svelte': {path: 'Chat_View_Multi.svelte', declarations: []},
@@ -1252,6 +1269,7 @@ export const src_json = {
 			declarations: [{name: 'format_prompt_content', kind: 'function'}],
 		},
 		'./Prompt_List.svelte': {path: 'Prompt_List.svelte', declarations: []},
+		'./Prompt_Listitem.svelte': {path: 'Prompt_Listitem.svelte', declarations: []},
 		'./Prompt_Picker.svelte': {path: 'Prompt_Picker.svelte', declarations: []},
 		'./Prompt_Stats.svelte': {path: 'Prompt_Stats.svelte', declarations: []},
 		'./Prompt_Summary.svelte': {path: 'Prompt_Summary.svelte', declarations: []},
@@ -1274,6 +1292,7 @@ export const src_json = {
 				{name: 'Prompts_Json_Input', kind: 'type'},
 				{name: 'Prompts_Options', kind: 'type'},
 				{name: 'Prompts', kind: 'class'},
+				{name: 'Prompts_Schema', kind: 'variable'},
 			],
 		},
 		'./Provider_Detail.svelte': {path: 'Provider_Detail.svelte', declarations: []},

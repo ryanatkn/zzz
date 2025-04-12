@@ -2,6 +2,7 @@
 	import type {Snippet} from 'svelte';
 	import {EMPTY_ARRAY} from '@ryanatkn/belt/array.js';
 	import {slide} from 'svelte/transition';
+	import type {SvelteHTMLElements} from 'svelte/elements';
 
 	import type {Uuid} from '$lib/zod_helpers.js';
 	import {Sortable, type Sorter} from '$lib/sortable.svelte.js';
@@ -13,7 +14,9 @@
 		sorters = EMPTY_ARRAY,
 		sort_key_default,
 		show_sort_controls = false,
-		no_items_message = '[no items available]',
+		no_items = '[no items available]',
+		item_attrs,
+		list_attrs,
 		children,
 	}: {
 		items: Array<T>;
@@ -22,7 +25,9 @@
 		sorters?: Array<Sorter<T>> | undefined;
 		sort_key_default?: string | undefined;
 		show_sort_controls?: boolean | undefined;
-		no_items_message?: string | undefined;
+		no_items?: Snippet | string | undefined;
+		list_attrs?: SvelteHTMLElements['ul'] | undefined;
+		item_attrs?: SvelteHTMLElements['li'] | undefined;
 		/** Called once per item. */
 		children: Snippet<[item: T]>;
 	} = $props();
@@ -62,7 +67,7 @@
 </script>
 
 {#if show_sort_controls && sortable.sorters.length > 1}
-	<label class="p_sm row gap_xs2 mb_0" transition:slide>
+	<label class="p_xs row gap_xs2 mb_0" transition:slide>
 		<small class="pr_xs3 white_space_nowrap">sort by</small>
 		<select bind:value={sortable.active_key} class="compact plain size_sm">
 			{#each sortable.sorters as sorter (sorter.key)}
@@ -75,11 +80,15 @@
 {/if}
 
 {#if filtered_items.length === 0}
-	<div class="p_md">{no_items_message}</div>
+	{#if typeof no_items === 'string'}
+		<div class="p_md">{no_items}</div>
+	{:else}
+		{@render no_items()}
+	{/if}
 {:else}
-	<ul class="unstyled">
+	<ul class="unstyled" {...list_attrs}>
 		{#each filtered_items as item (item.id)}
-			<li>
+			<li {...item_attrs}>
 				{@render children(item)}
 			</li>
 		{/each}
