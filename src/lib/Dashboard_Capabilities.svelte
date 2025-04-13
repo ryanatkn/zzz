@@ -11,13 +11,13 @@
 	</header>
 	<section class="width_md">
 		<p>
-			This page lets you view and control your system's capabilities. These constrain what Zzz can
-			do - some UIs, tools, and experiences depend on specific capabilities to function.
+			This page lets you view and configure your system's capabilities. These constrain what Zzz can
+			do - some tools and experiences depend on specific capabilities to function.
 		</p>
 		<p>
-			For example, running models locally can be done through various strategies which all provide
-			the capabilty of "chat with an AI" i.e. "get completions from local models", which is a subset
-			of "get completions from models". (this is still a work in progress)
+			For example, running AI models locally can be done through various strategies which all
+			provide the capabilty of "chat with an AI" i.e. "get completions from local models", which is
+			a subset of "get completions from models". (this is still a work in progress)
 		</p>
 		<p>
 			Zzz's goal is to transparently connect your intent to the world through your machines, so it

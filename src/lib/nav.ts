@@ -32,18 +32,18 @@ export const main_nav_items_default: Array<Nav_Item> = [
 		],
 	},
 	{
-		group: 'ai',
+		group: 'AI',
 		items: [
 			{label: 'models', href: `${base}/models`, icon: GLYPH_MODEL},
 			{label: 'providers', href: `${base}/providers`, icon: GLYPH_PROVIDER},
 		],
 	},
 	{
-		group: 'system',
+		group: 'System',
 		items: [
 			{label: 'about', href: `${base}/about`, icon: zzz_logo},
-			{label: 'log', href: `${base}/log`, icon: GLYPH_LOG},
 			{label: 'capabilities', href: `${base}/capabilities`, icon: GLYPH_CAPABILITY},
+			{label: 'log', href: `${base}/log`, icon: GLYPH_LOG},
 			{label: 'settings', href: `${base}/settings`, icon: GLYPH_SETTINGS},
 		],
 	},
