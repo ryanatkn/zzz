@@ -4,7 +4,7 @@ import {test, expect, beforeEach, describe} from 'vitest';
 
 import {Diskfile_History} from '$lib/diskfile_history.svelte.js';
 import {Diskfile_Path} from '$lib/diskfile_types.js';
-import {Uuid} from '$lib/zod_helpers.js';
+import {create_uuid} from '$lib/zod_helpers.js';
 import {Zzz} from '$lib/zzz.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
@@ -195,7 +195,7 @@ describe('Diskfile_History', () => {
 			history.add_entry('content 2');
 
 			// Try to find entry with non-existent id
-			const unknown_id = Uuid.parse(undefined);
+			const unknown_id = create_uuid();
 			const result = history.find_entry_by_id(unknown_id);
 
 			// Verify undefined is returned
@@ -218,7 +218,7 @@ describe('Diskfile_History', () => {
 			history.add_entry('content 1');
 
 			// Try to get content with non-existent id
-			const unknown_id = Uuid.parse(undefined);
+			const unknown_id = create_uuid();
 			const content = history.get_content(unknown_id);
 
 			// Verify null is returned

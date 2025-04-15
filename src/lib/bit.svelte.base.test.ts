@@ -4,7 +4,7 @@ import {test, expect, describe, beforeEach} from 'vitest';
 import {encode as tokenize} from 'gpt-tokenizer';
 
 import {Bit, Text_Bit, Diskfile_Bit, Sequence_Bit} from '$lib/bit.svelte.js';
-import {Uuid} from '$lib/zod_helpers.js';
+import {create_uuid} from '$lib/zod_helpers.js';
 import {Diskfile_Path} from '$lib/diskfile_types.js';
 import {Zzz} from '$lib/zzz.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
@@ -69,7 +69,7 @@ describe('Bit base class functionality', () => {
 			expect(bit.attributes).toHaveLength(0);
 
 			// Try to update non-existent attribute
-			const non_existent_update = bit.update_attribute(Uuid.parse(undefined), {
+			const non_existent_update = bit.update_attribute(create_uuid(), {
 				value: 'test',
 			});
 			expect(non_existent_update).toBe(false);
@@ -175,7 +175,7 @@ describe('Text_Bit specific behavior', () => {
 	});
 
 	test('Text_Bit serialization and deserialization', () => {
-		const test_id = Uuid.parse(undefined);
+		const test_id = create_uuid();
 		const test_date = new Date().toISOString();
 
 		// Create bit with all properties
@@ -415,7 +415,7 @@ describe('Sequence_Bit specific behavior', () => {
 		expect(sequence.bits).toEqual([bit1]);
 
 		// Test operations with non-existent id
-		const nonexistent_id = Uuid.parse(undefined);
+		const nonexistent_id = create_uuid();
 		expect(sequence.move(nonexistent_id, 0)).toBe(false);
 		expect(sequence.remove(nonexistent_id)).toBe(false);
 	});

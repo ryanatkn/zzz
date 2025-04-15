@@ -2,7 +2,7 @@ import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Diskfile_Tabs} from '$lib/diskfile_tabs.svelte.js';
-import {Uuid} from '$lib/zod_helpers.js';
+import {create_uuid, Uuid} from '$lib/zod_helpers.js';
 import {Cell_Json} from '$lib/cell_types.js';
 
 export const Diskfiles_Editor_Json = Cell_Json.extend({
@@ -24,7 +24,7 @@ export class Diskfiles_Editor extends Cell<typeof Diskfiles_Editor_Json> {
 	readonly tabs: Diskfile_Tabs = new Diskfile_Tabs({
 		zzz: this.zzz,
 		json: {
-			id: Uuid.parse(undefined),
+			id: create_uuid(),
 		},
 	});
 

@@ -15,7 +15,7 @@ import type {
 } from '$lib/action_types.js';
 import {Provider, type Provider_Json} from '$lib/provider.svelte.js';
 import type {Provider_Name} from '$lib/provider_types.js';
-import {Uuid, get_datetime_now} from '$lib/zod_helpers.js';
+import {Uuid, create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
 import {Models} from '$lib/models.svelte.js';
 import {Chats} from '$lib/chats.svelte.js';
 import {Tapes} from '$lib/tapes.svelte.js';
@@ -215,7 +215,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		model: string,
 		tape_history?: Array<Action_With_History>,
 	): Promise<Action_Completion_Response> {
-		const request_id = Uuid.parse(undefined);
+		const request_id = create_uuid();
 		const message: Action_Send_Prompt = {
 			id: request_id,
 			type: 'send_prompt',
@@ -260,7 +260,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		for (const source_file of data.files) {
 			this.diskfiles.handle_change({
 				type: 'filer_change',
-				id: Uuid.parse(undefined), // TODO shouldnt need to fake, maybe call an internal method directly? or do we want a single path?
+				id: create_uuid(), // TODO shouldnt need to fake, maybe call an internal method directly? or do we want a single path?
 				change: {type: 'add', path: source_file.id},
 				source_file,
 			});

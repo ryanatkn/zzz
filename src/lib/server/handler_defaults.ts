@@ -19,7 +19,7 @@ import {
 	type Action_Server,
 	type Action_Send_Prompt,
 } from '$lib/action_types.js';
-import {Uuid} from '$lib/zod_helpers.js';
+import {create_uuid} from '$lib/zod_helpers.js';
 import {Diskfile_Path, Source_File, type Zzz_Dir} from '$lib/diskfile_types.js';
 import {map_watcher_change_to_diskfile_change} from '$lib/diskfile_helpers.js';
 import {
@@ -52,7 +52,7 @@ export const handle_message = async (
 	switch (message.type) {
 		case 'ping': {
 			return {
-				id: Uuid.parse(undefined),
+				id: create_uuid(),
 				type: 'pong',
 				ping_id: message.id,
 			};
@@ -74,7 +74,7 @@ export const handle_message = async (
 			}
 
 			return {
-				id: Uuid.parse(undefined),
+				id: create_uuid(),
 				type: 'loaded_session',
 				data: {
 					files: files_array,
@@ -281,7 +281,7 @@ export const handle_filer_change = (
 	}
 
 	server.send({
-		id: Uuid.parse(undefined),
+		id: create_uuid(),
 		type: 'filer_change',
 		change: api_change,
 		source_file: parsed_source_file,

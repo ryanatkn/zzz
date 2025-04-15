@@ -10,7 +10,9 @@ import {
 	create_derived_index,
 	create_dynamic_index,
 } from '$lib/indexed_collection_helpers.js';
-import {Uuid} from '$lib/zod_helpers.js';
+import {create_uuid, Uuid} from '$lib/zod_helpers.js';
+
+/* eslint-disable @typescript-eslint/no-empty-function */
 
 // Mock item type that implements Indexed_Item
 interface Test_Item {
@@ -28,7 +30,7 @@ const create_test_item = (
 	array_a: Array<string> = [],
 	boolean_a = true,
 ): Test_Item => ({
-	id: Uuid.parse(undefined),
+	id: create_uuid(),
 	string_a,
 	number_a,
 	array_a,

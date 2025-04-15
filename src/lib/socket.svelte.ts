@@ -5,7 +5,7 @@ import {BROWSER} from 'esm-env';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
-import {Uuid} from '$lib/zod_helpers.js';
+import {create_uuid, Uuid} from '$lib/zod_helpers.js';
 import {
 	DEFAULT_HEARTBEAT_INTERVAL,
 	DEFAULT_RECONNECT_DELAY,
@@ -360,7 +360,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 
 	#queue_message(data: object): void {
 		const message: Queued_Message = {
-			id: Uuid.parse(undefined),
+			id: create_uuid(),
 			data,
 			created: Date.now(),
 		};

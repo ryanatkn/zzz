@@ -5,13 +5,13 @@ import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
-import {Uuid, Datetime_Now, get_datetime_now} from '$lib/zod_helpers.js';
+import {Datetime_Now, get_datetime_now, create_uuid, Uuid_With_Default} from '$lib/zod_helpers.js';
 import {HANDLED} from '$lib/cell_helpers.js';
 import {Zzz} from '$lib/zzz.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Constants for testing
-const TEST_ID = 'a0000000-0000-0000-0000-000000000001' as Uuid;
+const TEST_ID = create_uuid();
 const TEST_DATETIME = get_datetime_now();
 
 // Test suite variables
@@ -63,7 +63,7 @@ test('Cell allows schema keys with no properties if a decoder is provided', () =
 
 test('Cell supports virtual properties with custom handling', () => {
 	const Virtual_Handler_Schema = z.object({
-		id: Uuid,
+		id: Uuid_With_Default,
 		created: Datetime_Now,
 		updated: z.string().nullable().default(null),
 		visible_prop: z.string(),
@@ -183,9 +183,9 @@ test('Cell parser defaults take precedence over schema defaults', () => {
 			this.decoders = {
 				id: (value) => {
 					if (typeof value === 'string' && value !== 'schema_default_id') {
-						return value as Uuid;
+						return value;
 					}
-					return 'parser_default_id' as Uuid;
+					return 'parser_default_id';
 				},
 				// No decoder for text - schema default should be used
 			};

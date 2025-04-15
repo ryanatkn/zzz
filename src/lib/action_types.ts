@@ -1,7 +1,7 @@
 import {z} from 'zod';
 
 import {Diskfile_Change_Type, Source_File, Diskfile_Path, Zzz_Dir} from '$lib/diskfile_types.js';
-import {Datetime_Now, get_datetime_now, Uuid} from '$lib/zod_helpers.js';
+import {Datetime_Now, get_datetime_now, Uuid, Uuid_With_Default} from '$lib/zod_helpers.js';
 import {Provider_Name} from '$lib/provider_types.js';
 import {Cell_Json} from '$lib/cell_types.js';
 
@@ -102,7 +102,7 @@ export const Provider_Data_Schema = z.discriminatedUnion('type', [
 // Define Completion Request and Response schemas
 export const Completion_Request = z.object({
 	created: Datetime_Now,
-	request_id: Uuid,
+	request_id: Uuid_With_Default,
 	provider_name: Provider_Name,
 	model: z.string(),
 	prompt: z.string(),
@@ -112,7 +112,7 @@ export type Completion_Request = z.infer<typeof Completion_Request>;
 
 export const Completion_Response = z.object({
 	created: Datetime_Now,
-	request_id: Uuid,
+	request_id: Uuid_With_Default,
 	provider_name: Provider_Name,
 	model: z.string(),
 	data: Provider_Data_Schema,
@@ -122,7 +122,7 @@ export type Completion_Response = z.infer<typeof Completion_Response>;
 // Base action schema
 export const Action_Base = z
 	.object({
-		id: Uuid,
+		id: Uuid_With_Default,
 		type: Action_Type,
 	})
 	.strict();
@@ -136,7 +136,7 @@ export type Action_Ping = z.infer<typeof Action_Ping>;
 
 export const Action_Pong = Action_Base.extend({
 	type: z.literal('pong').default('pong'),
-	ping_id: Uuid,
+	ping_id: Uuid_With_Default,
 }).strict();
 export type Action_Pong = z.infer<typeof Action_Pong>;
 

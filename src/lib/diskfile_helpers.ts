@@ -1,6 +1,6 @@
 import type {Watcher_Change_Type} from '@ryanatkn/gro/watch_dir.js';
 
-import {Uuid, Datetime, Datetime_Now} from '$lib/zod_helpers.js';
+import {Uuid, Datetime, Datetime_Now, create_uuid} from '$lib/zod_helpers.js';
 import {
 	Diskfile_Change_Type,
 	Diskfile_Path,
@@ -34,7 +34,7 @@ export const source_file_to_diskfile_json = (
 	source_file: Source_File,
 	existing_id?: Uuid,
 ): Diskfile_Json => ({
-	id: existing_id ?? Uuid.parse(undefined),
+	id: existing_id ?? create_uuid(),
 	path: source_file.id,
 	content: source_file.contents,
 	created: Datetime_Now.parse(source_file.ctime && new Date(source_file.ctime).toISOString()), // TODO seems messy

@@ -5,12 +5,12 @@ import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json, type Schema_Keys} from '$lib/cell_types.js';
-import {Uuid, Datetime_Now, get_datetime_now} from '$lib/zod_helpers.js';
+import {Datetime_Now, get_datetime_now, create_uuid, Uuid_With_Default} from '$lib/zod_helpers.js';
 import {Zzz} from '$lib/zzz.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Constants for testing
-const TEST_ID = 'a0000000-0000-0000-0000-000000000001' as Uuid;
+const TEST_ID = create_uuid();
 const TEST_DATETIME = get_datetime_now();
 const TEST_YEAR = 2022;
 
@@ -109,7 +109,7 @@ test('Cell.encode_property uses $state.snapshot for values', () => {
 
 test('Cell handles special types like Map and Set', () => {
 	const Collections_Schema = z.object({
-		id: Uuid,
+		id: Uuid_With_Default,
 		created: Datetime_Now,
 		updated: z.string().nullable().default(null),
 		// Test map collection

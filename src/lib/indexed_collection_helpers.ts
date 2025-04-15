@@ -2,7 +2,7 @@ import {SvelteMap} from 'svelte/reactivity';
 import {z} from 'zod';
 
 import type {Index_Definition, Indexed_Collection} from '$lib/indexed_collection.svelte.js';
-import {Any, Uuid} from '$lib/zod_helpers.js';
+import {Any, Uuid_With_Default} from '$lib/zod_helpers.js';
 
 // TODO @many rethink the indexed collection API -
 // particularly type safety, performance, and integration with Svelte patterns -
@@ -14,7 +14,7 @@ export const Svelte_Map_Schema = z.custom<SvelteMap<any, any>>((val) => val inst
  * Interface for objects that can be stored in an indexed collection.
  */
 export const Indexed_Item = z.object({
-	id: Uuid,
+	id: Uuid_With_Default,
 });
 export type Indexed_Item = z.infer<typeof Indexed_Item>;
 

@@ -1,5 +1,5 @@
 import {z} from 'zod';
-import {Datetime, Datetime_Now, Uuid} from '$lib/zod_helpers.js';
+import {Datetime, Datetime_Now, Uuid_With_Default} from '$lib/zod_helpers.js';
 
 /**
  * Get keys from a Zod schema object.
@@ -15,7 +15,7 @@ export type Schema_Value<T extends z.ZodType, K extends Schema_Keys<T>> = z.infe
  * Base schema that defines common properties for all cells.
  */
 export const Cell_Json = z.object({
-	id: Uuid,
+	id: Uuid_With_Default,
 	created: Datetime_Now,
 	updated: Datetime.nullable().default(null),
 });

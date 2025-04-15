@@ -1,4 +1,4 @@
-import {get_datetime_now, Uuid} from '$lib/zod_helpers.js';
+import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
 import type {Browser_Tab_Json} from '$routes/tabs/browser_tab.svelte.js';
 
 // Fake site content for embedded HTML tabs
@@ -39,7 +39,7 @@ export const fake_sites = {
 // Sample tabs for browser initialization
 export const sample_tabs: Array<Browser_Tab_Json> = [
 	{
-		id: Uuid.parse(undefined),
+		id: create_uuid(),
 		title: 'Zzz is a browser',
 		url: 'https://www.zzz.software/tabs',
 		type: 'raw',
@@ -49,7 +49,7 @@ export const sample_tabs: Array<Browser_Tab_Json> = [
 		updated: null,
 	},
 	{
-		id: Uuid.parse(undefined),
+		id: create_uuid(),
 		title: fake_sites.future.title,
 		selected: false,
 		url: fake_sites.future.url,
@@ -60,7 +60,7 @@ export const sample_tabs: Array<Browser_Tab_Json> = [
 		updated: null,
 	},
 	{
-		id: Uuid.parse(undefined),
+		id: create_uuid(),
 		title: 'Moss',
 		selected: false,
 		url: 'https://moss.ryanatkn.com/',
@@ -70,7 +70,7 @@ export const sample_tabs: Array<Browser_Tab_Json> = [
 		updated: null,
 	},
 	{
-		id: Uuid.parse(undefined),
+		id: create_uuid(),
 		title: 'Fuz',
 		selected: false,
 		url: 'https://fuz.dev/',

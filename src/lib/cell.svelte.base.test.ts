@@ -5,12 +5,12 @@ import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
-import {get_datetime_now, Uuid} from '$lib/zod_helpers.js';
+import {create_uuid, get_datetime_now, Uuid_With_Default} from '$lib/zod_helpers.js';
 import {Zzz} from '$lib/zzz.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Constants for testing
-const TEST_ID = 'a0000000-0000-0000-0000-000000000001' as Uuid;
+const TEST_ID = create_uuid();
 const TEST_DATETIME = get_datetime_now();
 
 // Basic schema for testing that extends Cell_Json
@@ -117,7 +117,7 @@ describe('Cell initialization', () => {
 
 describe('Cell registry lifecycle', () => {
 	test('cell is automatically registered on initialization', () => {
-		const cell_id = Uuid.parse(undefined);
+		const cell_id = create_uuid();
 
 		const test_cell = new Basic_Test_Cell({
 			zzz,
@@ -133,7 +133,7 @@ describe('Cell registry lifecycle', () => {
 	});
 
 	test('dispose removes from registry', () => {
-		const cell_id = Uuid.parse(undefined);
+		const cell_id = create_uuid();
 
 		const test_cell = new Basic_Test_Cell({
 			zzz,
@@ -154,7 +154,7 @@ describe('Cell registry lifecycle', () => {
 	});
 
 	test('dispose is safe to call multiple times', () => {
-		const cell_id = Uuid.parse(undefined);
+		const cell_id = create_uuid();
 
 		const test_cell = new Basic_Test_Cell({
 			zzz,
@@ -175,7 +175,7 @@ describe('Cell registry lifecycle', () => {
 describe('Cell id handling', () => {
 	// Define a test schema with required type field for these tests
 	const Id_Test_Schema = z.object({
-		id: Uuid,
+		id: Uuid_With_Default,
 		type: z.literal('test').default('test'),
 		content: z.string().default(''),
 		version: z.number().default(0),
@@ -202,7 +202,7 @@ describe('Cell id handling', () => {
 		expect(cell.id).toBe(initial_id);
 
 		// Create a new id to set
-		const new_id = Uuid.parse(undefined);
+		const new_id = create_uuid();
 		expect(new_id).not.toBe(initial_id);
 
 		// Set new id through set_json
@@ -224,7 +224,7 @@ describe('Cell id handling', () => {
 		const initial_id = cell.id;
 
 		// Create a new id to set
-		const new_id = Uuid.parse(undefined);
+		const new_id = create_uuid();
 
 		// Update only the id
 		cell.set_json_partial({

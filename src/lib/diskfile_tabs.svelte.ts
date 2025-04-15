@@ -2,7 +2,7 @@ import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
-import {Uuid} from '$lib/zod_helpers.js';
+import {create_uuid, Uuid} from '$lib/zod_helpers.js';
 import {to_reordered_list} from '$lib/list_helpers.js';
 import {Diskfile_Tab} from '$lib/diskfile_tab.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
@@ -186,7 +186,7 @@ export class Diskfile_Tabs extends Cell<typeof Diskfile_Tabs_Json> {
 			zzz: this.zzz,
 			tabs: this,
 			json: {
-				id: Uuid.parse(undefined),
+				id: create_uuid(),
 				diskfile_id,
 			},
 		});

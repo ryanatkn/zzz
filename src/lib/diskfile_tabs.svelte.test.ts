@@ -4,7 +4,7 @@ import {test, expect, beforeEach, describe} from 'vitest';
 
 import {Diskfile_Tabs} from '$lib/diskfile_tabs.svelte.js';
 import {Diskfile_Tab} from '$lib/diskfile_tab.svelte.js';
-import {Uuid} from '$lib/zod_helpers.js';
+import {create_uuid, Uuid} from '$lib/zod_helpers.js';
 import {Zzz} from '$lib/zzz.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
@@ -26,7 +26,7 @@ describe('Diskfile_Tabs', () => {
 		tabs = new Diskfile_Tabs({
 			zzz,
 			json: {
-				id: Uuid.parse(undefined),
+				id: create_uuid(),
 			},
 		});
 	});
@@ -289,7 +289,7 @@ describe('Diskfile_Tabs', () => {
 			const initial_selected = tabs.selected_tab_id;
 
 			// Close non-existent tab
-			tabs.close_tab(Uuid.parse(undefined));
+			tabs.close_tab(create_uuid());
 
 			// State should be unchanged
 			expect(tabs.items.size).toBe(initial_size);

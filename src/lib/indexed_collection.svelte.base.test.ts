@@ -11,7 +11,7 @@ import {
 	create_dynamic_index,
 	type Indexed_Item,
 } from '$lib/indexed_collection_helpers.js';
-import {Uuid} from '$lib/zod_helpers.js';
+import {create_uuid, Uuid} from '$lib/zod_helpers.js';
 
 // Mock item type that implements Indexed_Item
 interface Test_Item {
@@ -30,7 +30,7 @@ const create_item = (
 	list: Array<string> = [],
 	number: number = 0,
 ): Test_Item => ({
-	id: Uuid.parse(undefined),
+	id: create_uuid(),
 	text,
 	category,
 	list,

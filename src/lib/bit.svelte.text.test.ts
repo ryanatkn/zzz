@@ -3,7 +3,7 @@
 import {test, expect, describe, beforeEach} from 'vitest';
 import {encode as tokenize} from 'gpt-tokenizer';
 
-import {Uuid} from '$lib/zod_helpers.js';
+import {create_uuid} from '$lib/zod_helpers.js';
 import {Zzz} from '$lib/zzz.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
@@ -65,7 +65,7 @@ describe('Text_Bit initialization', () => {
 	});
 
 	test('initializes from json with complete properties', () => {
-		const test_id = Uuid.parse(undefined);
+		const test_id = create_uuid();
 		const test_date = new Date().toISOString();
 
 		const bit = zzz.registry.instantiate('Text_Bit', {
@@ -81,7 +81,7 @@ describe('Text_Bit initialization', () => {
 			start: 5,
 			end: 20,
 			enabled: false,
-			attributes: [{id: Uuid.parse(undefined), key: 'attr1', value: 'value1'}],
+			attributes: [{id: create_uuid(), key: 'attr1', value: 'value1'}],
 		});
 
 		expect(bit.id).toBe(test_id);
@@ -142,7 +142,7 @@ describe('Text_Bit reactive properties', () => {
 
 describe('Text_Bit serialization', () => {
 	test('to_json includes all properties with correct values', () => {
-		const test_id = Uuid.parse(undefined);
+		const test_id = create_uuid();
 		const created = new Date().toISOString();
 
 		const bit = zzz.registry.instantiate('Text_Bit', {
@@ -308,7 +308,7 @@ describe('Text_Bit attribute management', () => {
 		expect(bit.attributes).toHaveLength(0);
 
 		// Attempting to update non-existent attribute returns false
-		const fake_update = bit.update_attribute(Uuid.parse(undefined), {key: 'test', value: 'test'});
+		const fake_update = bit.update_attribute(create_uuid(), {key: 'test', value: 'test'});
 		expect(fake_update).toBe(false);
 	});
 

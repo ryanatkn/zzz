@@ -3,7 +3,7 @@ import {z} from 'zod';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {create_single_index, create_derived_index} from '$lib/indexed_collection_helpers.js';
-import {get_datetime_now, Uuid} from '$lib/zod_helpers.js';
+import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import {
 	Browser_Tab,
@@ -108,7 +108,7 @@ export class Browser_Tabs extends Cell<typeof Browser_Tabs_Json> {
 
 		// Create new tab with embedded content
 		this.add({
-			id: Uuid.parse(undefined),
+			id: create_uuid(),
 			title: 'new tab',
 			selected: true,
 			url: '~newtab',

@@ -4,13 +4,13 @@ import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
 import {Diskfile_Path} from '$lib/diskfile_types.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
-import {Uuid} from '$lib/zod_helpers.js';
+import {create_uuid, Uuid, Uuid_With_Default} from '$lib/zod_helpers.js';
 
 /**
  * Schema for history entries.
  */
 export const History_Entry = z.object({
-	id: Uuid,
+	id: Uuid_With_Default,
 	created: z.number(),
 	content: z.string(),
 	label: z.string(),
@@ -78,7 +78,7 @@ export class Diskfile_History extends Cell<typeof Diskfile_History_Json> {
 		}
 
 		const entry: History_Entry = {
-			id: Uuid.parse(undefined),
+			id: create_uuid(),
 			created: options.created ?? Date.now(),
 			content,
 			label: options.label ?? '',

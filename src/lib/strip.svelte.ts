@@ -3,7 +3,7 @@ import {encode as tokenize} from 'gpt-tokenizer';
 import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {get_datetime_now, Uuid} from '$lib/zod_helpers.js';
+import {create_uuid, get_datetime_now, Uuid, Uuid_With_Default} from '$lib/zod_helpers.js';
 import {Completion_Request, Completion_Response} from '$lib/action_types.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import type {Bit_Type} from '$lib/bit.svelte.js';
@@ -13,7 +13,7 @@ export const Strip_Role = z.enum(['user', 'assistant', 'system']);
 export type Strip_Role = z.infer<typeof Strip_Role>;
 
 export const Strip_Json = Cell_Json.extend({
-	bit_id: Uuid,
+	bit_id: Uuid_With_Default,
 	tape_id: Uuid.nullable().optional(),
 	role: Strip_Role,
 	request: Completion_Request.optional(),
@@ -93,7 +93,7 @@ export const create_strip = (
 		json: {
 			role,
 			bit_id: bit.id,
-			id: options.id || Uuid.parse(undefined),
+			id: options.id || create_uuid(),
 			created: options.created || get_datetime_now(),
 			tape_id: options.tape_id,
 			request: options.request,
@@ -115,7 +115,7 @@ export const create_strip_from_bit = (
 		json: {
 			role,
 			bit_id: bit.id,
-			id: options.id || Uuid.parse(undefined),
+			id: options.id || create_uuid(),
 			created: options.created || get_datetime_now(),
 			tape_id: options.tape_id,
 			request: options.request,

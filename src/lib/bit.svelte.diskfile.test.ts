@@ -2,7 +2,7 @@
 
 import {test, expect, describe, beforeEach} from 'vitest';
 
-import {Uuid} from '$lib/zod_helpers.js';
+import {create_uuid} from '$lib/zod_helpers.js';
 import {Zzz} from '$lib/zzz.svelte.js';
 import {Diskfile_Path} from '$lib/diskfile_types.js';
 import type {Diskfile} from '$lib/diskfile.svelte.js';
@@ -96,7 +96,7 @@ describe('Diskfile_Bit initialization', () => {
 	});
 
 	test('initializes from json with complete properties', () => {
-		const test_id = Uuid.parse(undefined);
+		const test_id = create_uuid();
 		const test_path = TEST_PATHS.CONFIG;
 		const test_date = new Date().toISOString();
 
@@ -113,7 +113,7 @@ describe('Diskfile_Bit initialization', () => {
 			start: 5,
 			end: 20,
 			enabled: false,
-			attributes: [{id: Uuid.parse(undefined), key: 'format', value: 'json'}],
+			attributes: [{id: create_uuid(), key: 'format', value: 'json'}],
 		});
 
 		expect(bit.id).toBe(test_id);
@@ -291,7 +291,7 @@ describe('Diskfile_Bit reactive properties', () => {
 
 describe('Diskfile_Bit serialization', () => {
 	test('to_json includes all properties with correct values', () => {
-		const test_id = Uuid.parse(undefined);
+		const test_id = create_uuid();
 		const path = TEST_PATHS.BASIC;
 		const created = new Date().toISOString();
 
@@ -458,7 +458,7 @@ describe('Diskfile_Bit attribute management', () => {
 		expect(bit.attributes).toHaveLength(0);
 
 		// Attempting to update non-existent attribute returns false
-		const fake_update = bit.update_attribute(Uuid.parse(undefined), {key: 'test', value: 'test'});
+		const fake_update = bit.update_attribute(create_uuid(), {key: 'test', value: 'test'});
 		expect(fake_update).toBe(false);
 	});
 

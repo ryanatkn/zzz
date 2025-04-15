@@ -3,7 +3,7 @@
 import {test, expect, describe, beforeEach} from 'vitest';
 
 import {Text_Bit} from '$lib/bit.svelte.js';
-import {Uuid} from '$lib/zod_helpers.js';
+import {create_uuid} from '$lib/zod_helpers.js';
 import {Zzz} from '$lib/zzz.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
@@ -46,7 +46,7 @@ describe('Sequence_Bit initialization', () => {
 	});
 
 	test('initializes from json with items', () => {
-		const test_id = Uuid.parse(undefined);
+		const test_id = create_uuid();
 		const test_date = new Date().toISOString();
 
 		const bit = zzz.registry.instantiate('Sequence_Bit', {
@@ -58,7 +58,7 @@ describe('Sequence_Bit initialization', () => {
 			has_xml_tag: true,
 			xml_tag_name: 'sequence',
 			enabled: false,
-			attributes: [{id: Uuid.parse(undefined), key: 'data-order', value: 'important'}],
+			attributes: [{id: create_uuid(), key: 'data-order', value: 'important'}],
 		});
 
 		expect(bit.id).toBe(test_id);
@@ -110,7 +110,7 @@ describe('Sequence_Bit content derivation', () => {
 	});
 
 	test('content handles missing referenced bits', () => {
-		const nonexistent_id = Uuid.parse(undefined);
+		const nonexistent_id = create_uuid();
 
 		const sequence_bit = zzz.registry.instantiate('Sequence_Bit', {
 			type: 'sequence',
@@ -186,7 +186,7 @@ describe('Sequence_Bit item management', () => {
 	});
 
 	test('remove method returns false for non-existent items', () => {
-		const nonexistent_id = Uuid.parse(undefined);
+		const nonexistent_id = create_uuid();
 		const sequence_bit = zzz.registry.instantiate('Sequence_Bit', {
 			type: 'sequence',
 			items: [test_bits[0].id],
@@ -223,7 +223,7 @@ describe('Sequence_Bit item management', () => {
 	});
 
 	test('move method returns false for non-existent items', () => {
-		const nonexistent_id = Uuid.parse(undefined);
+		const nonexistent_id = create_uuid();
 		const sequence_bit = zzz.registry.instantiate('Sequence_Bit', {
 			type: 'sequence',
 			items: [test_bits[0].id, test_bits[1].id],
@@ -287,7 +287,7 @@ describe('Sequence_Bit item management', () => {
 
 describe('Sequence_Bit serialization', () => {
 	test('to_json includes all properties with correct values', () => {
-		const test_id = Uuid.parse(undefined);
+		const test_id = create_uuid();
 		const created = new Date().toISOString();
 
 		const sequence_bit = zzz.registry.instantiate('Sequence_Bit', {
@@ -365,7 +365,7 @@ describe('Sequence_Bit attribute management', () => {
 		expect(bit.attributes).toHaveLength(0);
 
 		// Attempting to update non-existent attribute returns false
-		const fake_update = bit.update_attribute(Uuid.parse(undefined), {key: 'test', value: 'test'});
+		const fake_update = bit.update_attribute(create_uuid(), {key: 'test', value: 'test'});
 		expect(fake_update).toBe(false);
 	});
 

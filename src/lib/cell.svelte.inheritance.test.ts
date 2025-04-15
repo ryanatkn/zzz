@@ -5,13 +5,13 @@ import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json, type Schema_Keys} from '$lib/cell_types.js';
-import {get_datetime_now, Uuid} from '$lib/zod_helpers.js';
+import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
 import {HANDLED} from '$lib/cell_helpers.js';
 import {Zzz} from '$lib/zzz.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Constants for testing
-const TEST_ID = 'a0000000-0000-0000-0000-000000000001' as Uuid;
+const TEST_ID = create_uuid();
 const TEST_DATETIME = get_datetime_now();
 
 // Test suite variables
@@ -245,7 +245,7 @@ test('Cell properly handles collections with HANDLED sentinel', () => {
 });
 
 test('Cell registration and unregistration works correctly', () => {
-	const cell_id = Uuid.parse(undefined);
+	const cell_id = create_uuid();
 
 	class Registration_Test_Cell extends Cell<typeof Test_Schema> {
 		text: string = $state()!;

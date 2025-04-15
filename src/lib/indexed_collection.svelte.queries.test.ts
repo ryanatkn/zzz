@@ -10,7 +10,7 @@ import {
 	create_derived_index,
 	type Indexed_Item,
 } from '$lib/indexed_collection_helpers.js';
-import {Uuid} from '$lib/zod_helpers.js';
+import {create_uuid, Uuid} from '$lib/zod_helpers.js';
 
 // Test item representing a generic item
 interface Test_Item {
@@ -26,7 +26,7 @@ interface Test_Item {
 
 // Helper to create items with default values that can be overridden
 const create_test_item = (overrides: Partial<Test_Item> = {}): Test_Item => ({
-	id: Uuid.parse(undefined),
+	id: create_uuid(),
 	string_a: 'a1',
 	string_b: 'b1',
 	array_a: ['tag1'],

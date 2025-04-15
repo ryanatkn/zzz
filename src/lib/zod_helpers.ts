@@ -15,11 +15,12 @@ export type Datetime = z.infer<typeof Datetime>;
 export const Datetime_Now = Datetime.default(get_datetime_now); // TODO this API may be a bit too magic in some cases by defaulting to now
 export type Datetime_Now = z.infer<typeof Datetime_Now>;
 
-// TODO this is awkward and looks wrong with the `_Required`, maybe rename to `Uuid` and `Uuid_With_Default`?
-export const Uuid_Required = z.string().uuid().brand('Uuid');
-export type Uuid_Required = z.infer<typeof Uuid_Required>;
-export const Uuid = Uuid_Required.default(() => globalThis.crypto.randomUUID());
+export const create_uuid = (): Uuid => crypto.randomUUID() as Uuid;
+
+export const Uuid = z.string().uuid().brand('Uuid');
 export type Uuid = z.infer<typeof Uuid>;
+export const Uuid_With_Default = Uuid.default(create_uuid);
+export type Uuid_With_Default = z.infer<typeof Uuid_With_Default>;
 
 /**
  * Gets all property keys from a Zod object schema.

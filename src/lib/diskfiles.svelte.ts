@@ -1,7 +1,7 @@
 import {z} from 'zod';
 
 import type {Action_Filer_Change} from '$lib/action_types.js';
-import {get_datetime_now, Uuid} from '$lib/zod_helpers.js';
+import {create_uuid, get_datetime_now, Uuid} from '$lib/zod_helpers.js';
 import {Diskfile, Diskfile_Schema} from '$lib/diskfile.svelte.js';
 import {Diskfile_Json, Diskfile_Path} from '$lib/diskfile_types.js';
 import {source_file_to_diskfile_json} from '$lib/diskfile_helpers.js';
@@ -137,7 +137,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 
 	update(path: Diskfile_Path, content: string): void {
 		this.zzz.actions.send({
-			id: Uuid.parse(undefined),
+			id: create_uuid(),
 			type: 'update_diskfile',
 			path,
 			content,
@@ -146,7 +146,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 
 	delete(path: Diskfile_Path): void {
 		this.zzz.actions.send({
-			id: Uuid.parse(undefined),
+			id: create_uuid(),
 			type: 'delete_diskfile',
 			path,
 		});
@@ -173,7 +173,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 		const path = Diskfile_Path.parse(`${this.zzz.zzz_dir}${dirname}`);
 
 		this.zzz.actions.send({
-			id: Uuid.parse(undefined),
+			id: create_uuid(),
 			type: 'create_directory',
 			path,
 		});

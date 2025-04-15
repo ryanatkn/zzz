@@ -1561,7 +1561,7 @@ export const src_json = {
 				{name: 'Svelte_Map_Schema', kind: 'variable'},
 				{name: 'Datetime', kind: 'variable'},
 				{name: 'Datetime_Now', kind: 'variable'},
-				{name: 'Uuid_Required', kind: 'variable'},
+				{name: 'Uuid', kind: 'variable'},
 				{name: 'Uuid', kind: 'variable'},
 				{name: 'zod_get_schema_keys', kind: 'function'},
 				{name: 'get_field_schema', kind: 'function'},
