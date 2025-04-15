@@ -52,7 +52,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	// Base properties from Cell_Json
 	id: Uuid = $state()!;
 	created: Datetime = $state()!;
-	updated: Datetime | null = $state()!;
+	updated: Datetime | null = $state()!; // TODO BLOCK remove `null` from this to more closely match typical patterns
 
 	readonly schema: T_Schema; // TODO currently Zod, but I'm evaluating ArkType soon - Zzz's goals may justify its runtime weight, or maybe precompilation will eventually beat Zod on that point too - https://github.com/arktypeio/arktype/issues/810
 

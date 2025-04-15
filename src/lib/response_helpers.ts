@@ -12,7 +12,7 @@ import type {
 	Provider_Data_Gemini,
 	Action_Completion_Response,
 } from '$lib/action_types.js';
-import {Datetime_Now, Uuid} from '$lib/zod_helpers.js';
+import {get_datetime_now, Uuid} from '$lib/zod_helpers.js';
 
 /**
  * Extract text content from a completion response based on provider type.
@@ -121,7 +121,7 @@ export const create_completion_response = (
 	api_response: any,
 ): Completion_Response => {
 	return {
-		created: Datetime_Now.parse(undefined),
+		created: get_datetime_now(),
 		request_id: Uuid.parse(request_id),
 		provider_name,
 		model,

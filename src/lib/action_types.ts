@@ -1,7 +1,7 @@
 import {z} from 'zod';
 
 import {Diskfile_Change_Type, Source_File, Diskfile_Path, Zzz_Dir} from '$lib/diskfile_types.js';
-import {Datetime_Now, Uuid} from '$lib/zod_helpers.js';
+import {Datetime_Now, get_datetime_now, Uuid} from '$lib/zod_helpers.js';
 import {Provider_Name} from '$lib/provider_types.js';
 import {Cell_Json} from '$lib/cell_types.js';
 
@@ -263,6 +263,6 @@ export const create_action_json = (action: Action, direction: Action_Direction):
 	return {
 		...action,
 		direction,
-		created: Datetime_Now.parse(undefined),
+		created: get_datetime_now(),
 	} as Action_Json;
 };

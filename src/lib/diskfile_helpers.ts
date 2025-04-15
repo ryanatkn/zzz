@@ -34,7 +34,7 @@ export const source_file_to_diskfile_json = (
 	source_file: Source_File,
 	existing_id?: Uuid,
 ): Diskfile_Json => ({
-	id: existing_id ?? Uuid.parse(undefined), // Use existing id if provided, otherwise generate new
+	id: existing_id ?? Uuid.parse(undefined),
 	path: source_file.id,
 	content: source_file.contents,
 	created: Datetime_Now.parse(source_file.ctime && new Date(source_file.ctime).toISOString()), // TODO seems messy

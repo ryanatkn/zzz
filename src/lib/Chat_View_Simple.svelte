@@ -16,6 +16,7 @@
 	<div class="column width_md min_width_sm h_100 p_sm">
 		{#if tape}
 			<Chat_Tape
+				{chat}
 				{tape}
 				onsend={(input) => chat.send_to_tape(tape.id, input)}
 				attrs={{class: 'h_100'}}

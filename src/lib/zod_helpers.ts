@@ -6,16 +6,18 @@ export const Any = z.any();
 
 export const Svelte_Map_Schema = z.custom<SvelteMap<any, any>>((val) => val instanceof SvelteMap);
 
+// TODO BLOCK make this monotonic to fix the problem where we have the same values? maybe increment a `Date.now()` value if it is the same
+export const get_datetime_now = (): Datetime => new Date().toISOString() as Datetime;
+
 // TODO move these? helpers at least
 export const Datetime = z.string().datetime().brand('Datetime');
 export type Datetime = z.infer<typeof Datetime>;
-export const Datetime_Now = Datetime.default(() => new Date().toISOString());
+export const Datetime_Now = Datetime.default(get_datetime_now); // TODO this API may be a bit too magic in some cases by defaulting to now
 export type Datetime_Now = z.infer<typeof Datetime_Now>;
 
-/** Same as `Uuid` but without a default value. */
+// TODO this is awkward and looks wrong with the `_Required`, maybe rename to `Uuid` and `Uuid_With_Default`?
 export const Uuid_Required = z.string().uuid().brand('Uuid');
 export type Uuid_Required = z.infer<typeof Uuid_Required>;
-/** Same as `Uuid_Required` but with a default value. */
 export const Uuid = Uuid_Required.default(() => globalThis.crypto.randomUUID());
 export type Uuid = z.infer<typeof Uuid>;
 

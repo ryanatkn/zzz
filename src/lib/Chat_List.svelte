@@ -10,8 +10,6 @@
 	const zzz = zzz_context.get();
 	const {chats} = zzz;
 	const selected_chat_id = $derived(chats.selected_id);
-
-	// TODO BLOCK @many updated isn't being bumped when stuff changes in the chat/prompt
 </script>
 
 <Sortable_List

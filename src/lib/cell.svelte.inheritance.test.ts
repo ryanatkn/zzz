@@ -5,14 +5,14 @@ import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json, type Schema_Keys} from '$lib/cell_types.js';
-import {Uuid, Datetime_Now} from '$lib/zod_helpers.js';
+import {get_datetime_now, Uuid} from '$lib/zod_helpers.js';
 import {HANDLED} from '$lib/cell_helpers.js';
 import {Zzz} from '$lib/zzz.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Constants for testing
 const TEST_ID = 'a0000000-0000-0000-0000-000000000001' as Uuid;
-const TEST_DATE = Datetime_Now.parse(undefined);
+const TEST_DATETIME = get_datetime_now();
 
 // Test suite variables
 let zzz: Zzz;
@@ -67,7 +67,7 @@ test('Cell supports overriding assign_property', () => {
 		zzz,
 		json: {
 			id: TEST_ID,
-			created: TEST_DATE,
+			created: TEST_DATETIME,
 			text: 'original',
 			list: ['item'],
 		},
@@ -114,7 +114,7 @@ test('Cell assign_property returns after handling property correctly', () => {
 		zzz,
 		json: {
 			id: TEST_ID,
-			created: TEST_DATE,
+			created: TEST_DATETIME,
 			text: 'sample',
 			number: 42,
 		},
@@ -168,7 +168,7 @@ test('Cell handles inherited properties correctly', () => {
 		zzz,
 		json: {
 			id: TEST_ID,
-			created: TEST_DATE,
+			created: TEST_DATETIME,
 			text: 'base_property',
 			number: 30,
 			list: ['derived_item'],
@@ -234,7 +234,7 @@ test('Cell properly handles collections with HANDLED sentinel', () => {
 		zzz,
 		json: {
 			id: TEST_ID,
-			created: TEST_DATE,
+			created: TEST_DATETIME,
 			collection: ['one', 'two', 'three'],
 			text: 'sample',
 		},
@@ -263,7 +263,7 @@ test('Cell registration and unregistration works correctly', () => {
 		zzz,
 		json: {
 			id: cell_id,
-			created: TEST_DATE,
+			created: TEST_DATETIME,
 		},
 	});
 

@@ -68,6 +68,7 @@
 			{#each chat.tapes as tape (tape.id)}
 				<li transition:slide>
 					<Chat_Tape
+						{chat}
 						{tape}
 						onsend={(input) => chat.send_to_tape(tape.id, input)}
 						strips_attrs={{class: 'max_height_sm'}}

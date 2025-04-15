@@ -1,7 +1,7 @@
 import {z} from 'zod';
 
 import type {Action_Filer_Change} from '$lib/action_types.js';
-import {Uuid} from '$lib/zod_helpers.js';
+import {get_datetime_now, Uuid} from '$lib/zod_helpers.js';
 import {Diskfile, Diskfile_Schema} from '$lib/diskfile.svelte.js';
 import {Diskfile_Json, Diskfile_Path} from '$lib/diskfile_types.js';
 import {source_file_to_diskfile_json} from '$lib/diskfile_helpers.js';
@@ -105,6 +105,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 						...diskfile_json,
 						// TODO hacky, should be handled more cleanly elsewhere
 						created: existing_diskfile.created, // Preserve original creation date
+						updated: get_datetime_now(), // TODO @many probably rely on the db to bump `updated`
 					});
 				} else {
 					// If it doesn't exist yet, create a new one

@@ -13,15 +13,17 @@
 	import {GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
 	import type {SvelteHTMLElements} from 'svelte/elements';
 	import Tape_Toggle_Button from '$lib/Tape_Toggle_Button.svelte';
+	import type {Chat} from '$lib/chat.svelte.js';
 
 	interface Props {
+		chat: Chat;
 		tape: Tape;
 		onsend: (input: string) => Promise<void>;
 		strips_attrs?: SvelteHTMLElements['div'] | undefined;
 		attrs?: SvelteHTMLElements['div'] | undefined;
 	}
 
-	const {tape, onsend, strips_attrs, attrs}: Props = $props();
+	const {chat, tape, onsend, strips_attrs, attrs}: Props = $props();
 
 	let input = $state('');
 	const input_tokens = $derived(tokenize(input));
@@ -73,9 +75,11 @@
 					/></small
 				>
 			</header>
-			<div class="flex gap_xs">
-				<Tape_Toggle_Button {tape} />
-			</div>
+			{#if chat.view_mode !== 'simple'}
+				<div class="flex gap_xs">
+					<Tape_Toggle_Button {tape} />
+				</div>
+			{/if}
 		</div>
 
 		{#if strip_count}

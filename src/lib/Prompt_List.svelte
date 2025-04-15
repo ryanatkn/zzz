@@ -10,16 +10,16 @@
 	const zzz = zzz_context.get();
 	const {prompts} = zzz;
 	const selected_prompt_id = $derived(prompts.selected_id);
-
-	// TODO BLOCK @many updated isn't being bumped when stuff changes in the chat/prompt
 </script>
 
 <Sortable_List
 	items={prompts.ordered_items}
 	show_sort_controls={prompts.show_sort_controls}
 	sorters={[
-		sort_by_numeric<Prompt>('updated_newest', 'updated (latest)', 'updated', 'desc'),
-		sort_by_numeric<Prompt>('updated_oldest', 'updated (past)', 'updated', 'asc'),
+		// TODO the better UX probably uses updated here, but what about changes to to the objects that make up the prompt?
+		// TODO @many probably rely on the db to bump `updated`
+		// sort_by_numeric<Prompt>('updated_newest', 'updated (latest)', 'updated', 'desc'),
+		// sort_by_numeric<Prompt>('updated_oldest', 'updated (past)', 'updated', 'asc'),
 		sort_by_numeric<Prompt>('created_newest', 'created (newest)', 'created', 'desc'),
 		sort_by_numeric<Prompt>('created_oldest', 'created (oldest)', 'created', 'asc'),
 		sort_by_text<Prompt>('name_asc', 'name (a-z)', 'name'),

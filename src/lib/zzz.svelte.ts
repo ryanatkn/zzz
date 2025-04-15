@@ -15,7 +15,7 @@ import type {
 } from '$lib/action_types.js';
 import {Provider, type Provider_Json} from '$lib/provider.svelte.js';
 import type {Provider_Name} from '$lib/provider_types.js';
-import {Uuid, Datetime_Now} from '$lib/zod_helpers.js';
+import {Uuid, get_datetime_now} from '$lib/zod_helpers.js';
 import {Models} from '$lib/models.svelte.js';
 import {Chats} from '$lib/chats.svelte.js';
 import {Tapes} from '$lib/tapes.svelte.js';
@@ -220,7 +220,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 			id: request_id,
 			type: 'send_prompt',
 			completion_request: {
-				created: Datetime_Now.parse(undefined),
+				created: get_datetime_now(),
 				request_id,
 				provider_name,
 				model,

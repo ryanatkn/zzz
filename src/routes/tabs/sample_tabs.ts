@@ -1,4 +1,4 @@
-import {Datetime_Now, Uuid} from '$lib/zod_helpers.js';
+import {get_datetime_now, Uuid} from '$lib/zod_helpers.js';
 import type {Browser_Tab_Json} from '$routes/tabs/browser_tab.svelte.js';
 
 // Fake site content for embedded HTML tabs
@@ -45,7 +45,7 @@ export const sample_tabs: Array<Browser_Tab_Json> = [
 		type: 'raw',
 		selected: true,
 		refresh_counter: 0,
-		created: Datetime_Now.parse(undefined),
+		created: get_datetime_now(),
 		updated: null,
 	},
 	{
@@ -56,7 +56,7 @@ export const sample_tabs: Array<Browser_Tab_Json> = [
 		type: 'embedded_html',
 		content: fake_sites.future.content,
 		refresh_counter: 0,
-		created: Datetime_Now.parse(undefined),
+		created: get_datetime_now(),
 		updated: null,
 	},
 	{
@@ -66,7 +66,7 @@ export const sample_tabs: Array<Browser_Tab_Json> = [
 		url: 'https://moss.ryanatkn.com/',
 		type: 'external_url',
 		refresh_counter: 0,
-		created: Datetime_Now.parse(undefined),
+		created: get_datetime_now(),
 		updated: null,
 	},
 	{
@@ -76,7 +76,7 @@ export const sample_tabs: Array<Browser_Tab_Json> = [
 		url: 'https://fuz.dev/',
 		type: 'external_url',
 		refresh_counter: 0,
-		created: Datetime_Now.parse(undefined),
+		created: get_datetime_now(),
 		updated: null,
 	},
 ];

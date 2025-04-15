@@ -4,7 +4,7 @@ import {encode as tokenize} from 'gpt-tokenizer';
 
 import type {Model} from '$lib/model.svelte.js';
 import {to_completion_response_text} from '$lib/response_helpers.js';
-import {Uuid} from '$lib/zod_helpers.js';
+import {get_datetime_now, Uuid} from '$lib/zod_helpers.js';
 import {Tape} from '$lib/tape.svelte.js';
 import type {Prompt} from '$lib/prompt.svelte.js';
 import {reorder_list} from '$lib/list_helpers.js';
@@ -151,11 +151,14 @@ export class Chat extends Cell<typeof Chat_Json> {
 		const tape = this.tapes.find((s) => s.id === tape_id);
 		if (!tape) return;
 
+		this.updated = get_datetime_now(); // TODO @many probably rely on the db to bump `updated`
+
 		const assistant_strip = await tape.send_message(content);
 
 		void this.init_name_from_strips(content, assistant_strip.content);
 	}
 
+	// TODO needs to be reworked, also shouldn't clobber any user-assigned names
 	/**
 	 * Uses an LLM to name the chat based on the user input and AI response.
 	 */

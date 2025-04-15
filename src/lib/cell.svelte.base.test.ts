@@ -5,13 +5,13 @@ import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
-import {Datetime_Now, Uuid} from '$lib/zod_helpers.js';
+import {get_datetime_now, Uuid} from '$lib/zod_helpers.js';
 import {Zzz} from '$lib/zzz.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Constants for testing
 const TEST_ID = 'a0000000-0000-0000-0000-000000000001' as Uuid;
-const TEST_DATE = Datetime_Now.parse(undefined);
+const TEST_DATETIME = get_datetime_now();
 
 // Basic schema for testing that extends Cell_Json
 const Test_Schema = Cell_Json.extend({
@@ -49,7 +49,7 @@ describe('Cell initialization', () => {
 			zzz,
 			json: {
 				id: TEST_ID,
-				created: TEST_DATE,
+				created: TEST_DATETIME,
 				text: 'Sample',
 				number: 42,
 				items: ['item1', 'item2'],
@@ -58,7 +58,7 @@ describe('Cell initialization', () => {
 
 		// Verify basic properties
 		expect(test_cell.id).toBe(TEST_ID);
-		expect(test_cell.created).toBe(TEST_DATE);
+		expect(test_cell.created).toBe(TEST_DATETIME);
 		expect(test_cell.updated).toBeNull();
 		expect(test_cell.text).toBe('Sample');
 		expect(test_cell.number).toBe(42);
@@ -123,7 +123,7 @@ describe('Cell registry lifecycle', () => {
 			zzz,
 			json: {
 				id: cell_id,
-				created: TEST_DATE,
+				created: TEST_DATETIME,
 			},
 		});
 
@@ -139,7 +139,7 @@ describe('Cell registry lifecycle', () => {
 			zzz,
 			json: {
 				id: cell_id,
-				created: TEST_DATE,
+				created: TEST_DATETIME,
 			},
 		});
 
@@ -301,7 +301,7 @@ describe('Cell serialization', () => {
 			zzz,
 			json: {
 				id: TEST_ID,
-				created: TEST_DATE,
+				created: TEST_DATETIME,
 				text: 'JSON Test',
 				number: 100,
 				items: ['value1', 'value2'],
@@ -311,7 +311,7 @@ describe('Cell serialization', () => {
 		const json = test_cell.to_json();
 
 		expect(json.id).toBe(TEST_ID);
-		expect(json.created).toBe(TEST_DATE);
+		expect(json.created).toBe(TEST_DATETIME);
 		expect(json.text).toBe('JSON Test');
 		expect(json.number).toBe(100);
 		expect(json.items).toEqual(['value1', 'value2']);
@@ -489,7 +489,7 @@ describe('Cell date formatting', () => {
 			zzz,
 			json: {
 				id: TEST_ID,
-				created: TEST_DATE,
+				created: TEST_DATETIME,
 				updated: null,
 			},
 		});

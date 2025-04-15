@@ -5,13 +5,13 @@ import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json, type Schema_Keys} from '$lib/cell_types.js';
-import {Uuid, Datetime_Now} from '$lib/zod_helpers.js';
+import {Uuid, Datetime_Now, get_datetime_now} from '$lib/zod_helpers.js';
 import {Zzz} from '$lib/zzz.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Constants for testing
 const TEST_ID = 'a0000000-0000-0000-0000-000000000001' as Uuid;
-const TEST_DATE = Datetime_Now.parse(undefined);
+const TEST_DATETIME = get_datetime_now();
 const TEST_YEAR = 2022;
 
 // Test suite variables
@@ -45,7 +45,7 @@ test('Cell uses registry for instantiating class relationships', () => {
 		zzz,
 		json: {
 			id: TEST_ID,
-			created: TEST_DATE,
+			created: TEST_DATETIME,
 		},
 	});
 
@@ -91,7 +91,7 @@ test('Cell.encode_property uses $state.snapshot for values', () => {
 		zzz,
 		json: {
 			id: TEST_ID,
-			created: TEST_DATE,
+			created: TEST_DATETIME,
 		},
 	});
 
@@ -142,7 +142,7 @@ test('Cell handles special types like Map and Set', () => {
 		zzz,
 		json: {
 			id: TEST_ID,
-			created: TEST_DATE,
+			created: TEST_DATETIME,
 			map_field: [
 				['key1', 1],
 				['key2', 2],
@@ -205,7 +205,7 @@ test('Cell - JSON serialization excludes undefined values correctly', () => {
 		zzz,
 		json: {
 			id: TEST_ID,
-			created: TEST_DATE,
+			created: TEST_DATETIME,
 			type: 'type1',
 		},
 	});
@@ -215,7 +215,7 @@ test('Cell - JSON serialization excludes undefined values correctly', () => {
 		zzz,
 		json: {
 			id: TEST_ID,
-			created: TEST_DATE,
+			created: TEST_DATETIME,
 			type: 'type2',
 			name: 'test_name',
 			data: {code: 'test_code'},

@@ -5,14 +5,14 @@ import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
-import {Uuid, Datetime_Now} from '$lib/zod_helpers.js';
+import {Uuid, Datetime_Now, get_datetime_now} from '$lib/zod_helpers.js';
 import {HANDLED} from '$lib/cell_helpers.js';
 import {Zzz} from '$lib/zzz.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Constants for testing
 const TEST_ID = 'a0000000-0000-0000-0000-000000000001' as Uuid;
-const TEST_DATE = Datetime_Now.parse(undefined);
+const TEST_DATETIME = get_datetime_now();
 
 // Test suite variables
 let zzz: Zzz;
@@ -53,7 +53,7 @@ test('Cell allows schema keys with no properties if a decoder is provided', () =
 		zzz,
 		json: {
 			id: TEST_ID,
-			created: TEST_DATE,
+			created: TEST_DATETIME,
 			virtual_prop: 99,
 		},
 	});
@@ -96,7 +96,7 @@ test('Cell supports virtual properties with custom handling', () => {
 		zzz,
 		json: {
 			id: TEST_ID,
-			created: TEST_DATE,
+			created: TEST_DATETIME,
 			visible_prop: 'visible',
 			hidden_prop: 42,
 		},
@@ -150,7 +150,7 @@ test('Cell handles sentinel values with proper precedence', () => {
 		zzz,
 		json: {
 			id: TEST_ID,
-			created: TEST_DATE,
+			created: TEST_DATETIME,
 			handled_field: 'input_value',
 			default_field: 42,
 			normal_field: false,

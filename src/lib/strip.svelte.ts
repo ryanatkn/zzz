@@ -3,7 +3,7 @@ import {encode as tokenize} from 'gpt-tokenizer';
 import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Datetime_Now, Uuid} from '$lib/zod_helpers.js';
+import {get_datetime_now, Uuid} from '$lib/zod_helpers.js';
 import {Completion_Request, Completion_Response} from '$lib/action_types.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import type {Bit_Type} from '$lib/bit.svelte.js';
@@ -33,9 +33,7 @@ export class Strip extends Cell<typeof Strip_Json> {
 	response?: Completion_Response = $state();
 
 	// Get the referenced bit - handle case where bit might not exist in registry
-	readonly bit: Bit_Type | null = $derived(
-		this.bit_id ? (this.zzz.bits.items.by_id.get(this.bit_id) ?? null) : null,
-	);
+	readonly bit: Bit_Type | null = $derived(this.zzz.bits.items.by_id.get(this.bit_id) ?? null);
 
 	// Content always returns a string, normalizing null/undefined to empty string
 	get content(): string {
@@ -96,7 +94,7 @@ export const create_strip = (
 			role,
 			bit_id: bit.id,
 			id: options.id || Uuid.parse(undefined),
-			created: options.created || Datetime_Now.parse(undefined),
+			created: options.created || get_datetime_now(),
 			tape_id: options.tape_id,
 			request: options.request,
 			response: options.response,
@@ -118,7 +116,7 @@ export const create_strip_from_bit = (
 			role,
 			bit_id: bit.id,
 			id: options.id || Uuid.parse(undefined),
-			created: options.created || Datetime_Now.parse(undefined),
+			created: options.created || get_datetime_now(),
 			tape_id: options.tape_id,
 			request: options.request,
 			response: options.response,
