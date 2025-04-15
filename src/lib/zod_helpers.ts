@@ -6,8 +6,18 @@ export const Any = z.any();
 
 export const Svelte_Map_Schema = z.custom<SvelteMap<any, any>>((val) => val instanceof SvelteMap);
 
-// TODO BLOCK make this monotonic to fix the problem where we have the same values? maybe increment a `Date.now()` value if it is the same
-export const get_datetime_now = (): Datetime => new Date().toISOString() as Datetime;
+let last_datetime_ms = -1;
+
+/**
+ * Returns an ISO datetime string that is guaranteed to be monotonically increasing.
+ * If called multiple times within the same millisecond, it increments the value
+ * by one millisecond to ensure uniqueness and order preservation.
+ */
+export const get_datetime_now = (): Datetime => {
+	const current_ms = Date.now();
+	last_datetime_ms = Math.max(current_ms, last_datetime_ms + 1);
+	return new Date(last_datetime_ms).toISOString() as Datetime;
+};
 
 // TODO move these? helpers at least
 export const Datetime = z.string().datetime().brand('Datetime');
