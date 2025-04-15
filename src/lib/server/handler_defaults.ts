@@ -58,6 +58,7 @@ export const handle_message = async (
 			};
 		}
 		case 'load_session': {
+			// TODO change so this only returns metadata, not file contents
 			// Access filers through server and collect all files
 			const files_array: Array<Source_File> = [];
 

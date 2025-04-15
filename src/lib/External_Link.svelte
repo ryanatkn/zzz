@@ -6,6 +6,8 @@
 
 	import External_Link_Icon from '$lib/External_Link_Icon.svelte';
 
+	// TODO maybe make this `Link` and infer optional prop `external`?
+
 	interface Props {
 		href: string;
 		open_externally?: boolean | undefined; // Set to false to disable external link behavior

@@ -7,6 +7,7 @@
 	import {sample_tabs} from '$routes/tabs/sample_tabs.js';
 	import Browser_View from '$routes/tabs/Browser_View.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
+	import External_Link from '$lib/External_Link.svelte';
 
 	let browserified = $state(false);
 
@@ -72,18 +73,22 @@
 			>.
 		</p>
 		<p>
-			This simple change recontextualizes the web's UX - instead of being stuck inside tabs and
-			apps, users can compose tabs in a larger system that's open and extensible by design.
+			This simple change recontextualizes the web's UX - instead of the browser being its own silo,
+			users can compose tabs in a larger system that's open and extensible by design.
 		</p>
 		<p>
-			As a simple example, picture a "social media dashboard" that an AI can create in a few seconds
-			from a few words. The UI puts two or more feeds from different social sites side-by-side,
-			where posting to all takes a single click, and no 3rd party service is needed. The best
-			usecases are unknown, but today's browsers don't let us experiment.
+			As a simple example, picture adding arbitrary metadata like tags to both your tabs and local
+			files, and then making UI to leverage that data for your specific needs, without any technical
+			knowledge, third parties, or unnecessary friction. The best usecases are unknown, but today's
+			browsers don't let us experiment.
 		</p>
 		<p>
-			I believe the optimal architecture - local-first, malleable, client-sovereign - both respects
-			individual rights while unlocking the full capabilities of web tech, including
+			I believe the optimal architecture - <External_Link
+				href="https://www.inkandswitch.com/local-first/">local-first</External_Link
+			>, <External_Link href="https://www.inkandswitch.com/malleable-software/"
+				>malleable</External_Link
+			>, client-sovereign - both respects individual rights while unlocking the full capabilities of
+			web tech, including
 			<a href="{base}/sites">website creation</a> and adaptive UI. And we can build it today, the web's
 			tools are ready.
 		</p>

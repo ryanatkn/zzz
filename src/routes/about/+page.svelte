@@ -35,11 +35,31 @@
 			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link> 💤
 		</aside>
 		<p>
-			Zzz, pronounced "zees" like bees, is a webtool focused on user power and experimentation. The
-			idea is to make fullstack software that adapts to your needs on the fly while remaining fully
-			open, aligned, and in your control.
+			Zzz, pronounced "zees" like bees, is a software project focused on user power and
+			experimentation. The idea is to make fullstack software that adapts to your needs on the fly
+			while remaining fully open, aligned, and in your control.
 		</p>
-		<p>Zzz is designed to be extensible to include features from many kinds of software:</p>
+		<p>
+			Zzz conceptual starting point is the user interface. In the mottled technology landscape of
+			2025, it asks:
+		</p>
+		<blockquote>
+			"How can composable computing environments transform user agency in the age of AI?"
+		</blockquote>
+		<p>or with less true-believer energy and more detail:</p>
+		<blockquote>
+			"What becomes possible when web users move from exploitative service-controlled spaces to
+			user-controlled environments that are open, extensible, and well-designed, with unrestricted
+			access to local and remote capabilities?"
+		</blockquote>
+		<p>
+			The software I personally want as an answer to these questions is cross-platform so it runs
+			everywhere, and for that we have the web with HTML, CSS, and JS. Zzz leverages JS to glue
+			software and machines together precisely the way you want, maximizing its utility on any
+			device across the full stack. It can run locally on your machine using any of your available
+			capabilities, or it can deploy anywhere that supports JS and play whatever role you need.
+		</p>
+		<p>Zzz takes ideas from many kinds of software:</p>
 		<ul>
 			<li>
 				AI UIs like <External_Link href="https://github.com/Mintplex-Labs/anything-llm"
@@ -50,71 +70,39 @@
 				>
 			</li>
 			<li>
-				local-first apps - see <External_Link href="https://localfirstweb.dev/"
-					>localfirstweb.dev</External_Link
-				> and this
-				<External_Link href="https://www.inkandswitch.com/local-first/"
-					>Ink & Switch post</External_Link
+				IDEs like <External_Link href="https://code.visualstudio.com/">VSCode</External_Link> for open-ended
+				high-powered tooling
+			</li>
+			<li>
+				<External_Link href="https://wikipedia.org/wiki/Content_management_system"
+					>content management systems</External_Link
+				>, see also <External_Link
+					href="https://wikipedia.org/wiki/List_of_content_management_systems"
+					>this list</External_Link
 				>
+			</li>
+			<li>
+				web browsers - first with Chromium via Electron, hopefully with swappable browser engines
+				one day
 			</li>
 			<li>
 				web metaframeworks - Zzz extends <External_Link href="https://svelte.dev/"
 					>SvelteKit</External_Link
 				> and <External_Link href="https://vite.dev/">Vite</External_Link> without wrapping them, enabling
-				devs to use Zzz as a library with changing workflows
-			</li>
-			<li>
-				<External_Link href="https://wikipedia.org/wiki/Content_management_system"
-					>content management systems</External_Link
-				>, headless and traditional - <External_Link
-					href="https://wikipedia.org/wiki/List_of_content_management_systems"
-					>Wikipedia list of CMSes</External_Link
-				>
+				devs to use Zzz as a library with existing workflows
 			</li>
 		</ul>
 		<p>
-			This is a pre-alpha, but it can do some neat things - mostly these require the local server
-			<a href="{base}/capabilities">capability</a>, so if you're reading this on the static web,
-			you'll have a much-diminished experience, some of which I just need to spend time to improve),
-			and it points to what I think is an interesting and desirable future. This first release took
-			about 2 months of development and I have a lot of things planned - it feels very early but
-			knowing myself I needed to ship asap! I've thought about and prototyped related ideas for more
-			than 12 years, and I think this iteration is sticking.
+			The scope may look far-fetched, but an integrated and extensible computing environment is
+			something that I quite obviously want to use myself. This is an early proof of concept that
+			took about 3 months to build. I've thought about and prototyped related ideas for more than 13
+			years, and I think this iteration is sticking.
 		</p>
-		<p>
-			Asking the right questions for the complex problems we face in technology is hard. Trying to
-			boil it down,
-		</p>
-		<blockquote>"What can software do for us, and who controls it?"</blockquote>
-		<p>More specifically,</p>
-		<blockquote>
-			"How can composable computing environments transform user agency in the age of AI?"
-		</blockquote>
-		<p>but with less true-believer energy and more detail:</p>
-		<blockquote>
-			"What becomes possible when web users move from exploitative service-controlled spaces to
-			user-controlled environments that are open, extensible, and well-designed, with unrestricted
-			access to local and remote capabilities?"
-		</blockquote>
-		<p>
-			Most features are optional through plugins, so the core experience stays efficient and
-			economical for what it offers.
-		</p>
-		<aside>
-			Does this scope look silly? Though ambitious, I think we're going to see *many* software
-			projects aim for a scope like Zzz in large part because AI can automatically generate
-			sophisticated problem-specific UIs and software from natural language instructions, and it
-			simultaneously lowers the barrier to entry to create your own software, especially when there
-			are high quality examples available. IMO for the web, the browser must become a
-			holistically-designed data management environment to stay relevant.
-		</aside>
-		<p>Integrations: (everything's a work in progress, but some basics work)</p>
+		<p>Everything's a work in progress, but some basic integrations include:</p>
 		<ul>
 			<li>
-				<External_Link href="https://github.com/ollama/ollama">Ollama</External_Link> (runs AI models
-				locally, probably will swap for <External_Link href="https://github.com/ggml-org/llama.cpp"
-					>llama.cpp</External_Link
-				> which Ollama wraps)
+				<External_Link href="https://github.com/ollama/ollama">Ollama</External_Link> runs AI models
+				locally - this is just the first supported backend, more to come
 			</li>
 			<li>
 				<External_Link href="https://github.com/openai/openai-node">ChatGPT</External_Link>,
@@ -122,13 +110,13 @@
 					>Claude</External_Link
 				>, and <External_Link href="https://github.com/google-gemini/generative-ai-js"
 					>Gemini</External_Link
-				> (requires API keys)
+				> - requires API keys
 			</li>
 			<li>
 				<External_Link href="https://hono.dev/">Hono</External_Link> as the web server with
 				<External_Link href="https://svelte.dev/">SvelteKit</External_Link> and <External_Link
 					href="https://vite.dev/">Vite</External_Link
-				>
+				>, providing filesystem and other local capabilities
 			</li>
 			<li>
 				Planned:
@@ -136,7 +124,8 @@
 					<li>
 						<External_Link href="https://github.com/electric-sql/pglite">pglite</External_Link> via
 						<External_Link href="https://github.com/drizzle-team/drizzle-orm">Drizzle</External_Link
-						> to make the UX nice with persisted data
+						> and full <External_Link href="https://www.postgresql.org/">Postgres</External_Link> when
+						desired
 					</li>
 					<li>
 						<External_Link href="https://wikipedia.org/wiki/RSS">RSS</External_Link> and <External_Link
@@ -151,27 +140,27 @@
 						<External_Link href="https://atproto.com/">AT Protocol</External_Link>
 					</li>
 					<li>
-						<External_Link href="https://modelcontextprotocol.io/"
+						probably <External_Link href="https://modelcontextprotocol.io/"
 							>Model Context Protocol</External_Link
 						>
-						via its
-						<External_Link href="https://github.com/modelcontextprotocol/typescript-sdk"
-							>TypeScript lib</External_Link
+						and <External_Link href="https://github.com/google/A2A"
+							>Agent2Agent (A2A) protocol</External_Link
 						>
 					</li>
-					<li>the unplanned-but-maybe? list is endless, pls feedback/requests/assistance</li>
+					<li>more, please send feedback/requests/help</li>
 				</ul>
 			</li>
 		</ul>
 		<p>
-			Zzz is just one implementation of an increasingly common idea that leverages web tech with
-			local-first software and powerful open clients, and it has quirks personal to its author that
-			I'm eager to smooth out. Your input is appreciated to keep things on track and fun—see the
+			Zzz is just one implementation of an increasingly common idea that combines web tech and AI
+			with powerful open clients, and it has quirks personal to its author that I'm eager to smooth
+			out. Your input would be appreciated to help make it work for you—see the
 			<External_Link href="https://github.com/ryanatkn/zzz/issues">issues</External_Link>
 			and
 			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link>
 			and find me on
-			<External_Link href="https://bsky.app/profile/ryanatkn.com">Bluesky</External_Link>.
+			<External_Link href="https://bsky.app/profile/ryanatkn.com">Bluesky</External_Link>. I'll make
+			a Discord if someone asks.
 		</p>
 	</section>
 	<hr />
@@ -180,12 +169,12 @@
 		<ul>
 			<li>Zzz is a noncommercial project and its only official domain is zzz.software</li>
 			<li>
-				it's permissively licensed open source and forking is encouraged (for less investment you
-				can use it as a TypeScript/Svelte library (currently just npm))
+				it's open source, permissively licensed, and forking is encouraged - for less investment you
+				can use it as a TypeScript/Svelte library (currently just npm)
 			</li>
 			<li>
-				the Zzz name is owned by the community, just don't falsely represent yourself as the
-				official Zzz project or zzz.software
+				the Zzz name is community property, just don't falsely represent the official Zzz project or
+				zzz.software
 			</li>
 			<li>
 				I'm looking for <a href="https://www.ryanatkn.com/funding">funding</a> to make my continued full-time
