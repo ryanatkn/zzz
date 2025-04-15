@@ -20,7 +20,7 @@
 		<p>
 			Zzz tries to give us the maximum of the web's capabilities on all of our devices with minimal
 			dependencies and optional third parties. It's designed for extensibility and a primary goal is
-			to make managing websites super boring and easy, because owning your web presence should be a
+			to make managing websites routine and easy, because owning your web presence should be a
 			cinch.
 		</p>
 		<p>More <a href="{base}/about">about</a> Zzz.</p>

@@ -3,7 +3,6 @@
 	import Package_Detail from '@ryanatkn/fuz/Package_Detail.svelte';
 	import Community_Links_Panel from '@ryanatkn/fuz/Community_Links_Panel.svelte';
 	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
-	import {base} from '$app/paths';
 
 	import {pkg_context} from '$routes/pkg.js';
 	import External_Link from '$lib/External_Link.svelte';
@@ -40,8 +39,9 @@
 			while remaining fully open, aligned, and in your control.
 		</p>
 		<p>
-			Zzz conceptual starting point is the user interface. In the mottled technology landscape of
-			2025, it asks:
+			In the technology landscape of 2025, where LLMs are upending societal assumptions and <External_Link
+				href="https://en.wikipedia.org/wiki/Enshittification">enshittification</External_Link
+			> is a widely-understood phenomenon, Zzz asks:
 		</p>
 		<blockquote>
 			"How can composable computing environments transform user agency in the age of AI?"
@@ -53,11 +53,12 @@
 			access to local and remote capabilities?"
 		</blockquote>
 		<p>
-			The software I personally want as an answer to these questions is cross-platform so it runs
-			everywhere, and for that we have the web with HTML, CSS, and JS. Zzz leverages JS to glue
-			software and machines together precisely the way you want, maximizing its utility on any
-			device across the full stack. It can run locally on your machine using any of your available
-			capabilities, or it can deploy anywhere that supports JS and play whatever role you need.
+			Zzz conceptual starting point is the user interface. The software I personally want as an
+			answer to these questions is cross-platform so it runs everywhere, and for that we have the
+			web with HTML, CSS, and JS. Zzz leverages JS to glue software and machines together precisely
+			the way you want, maximizing its utility on any device across the full stack. It can run
+			locally on your machine using any of your available capabilities, or it can deploy anywhere
+			that supports JS and play whatever role you need.
 		</p>
 		<p>Zzz takes ideas from many kinds of software:</p>
 		<ul>
@@ -71,14 +72,13 @@
 			</li>
 			<li>
 				IDEs like <External_Link href="https://code.visualstudio.com/">VSCode</External_Link> for open-ended
-				high-powered tooling
+				tooling and system access
 			</li>
 			<li>
 				<External_Link href="https://wikipedia.org/wiki/Content_management_system"
 					>content management systems</External_Link
-				>, see also <External_Link
-					href="https://wikipedia.org/wiki/List_of_content_management_systems"
-					>this list</External_Link
+				>, see this <External_Link
+					href="https://wikipedia.org/wiki/List_of_content_management_systems">list</External_Link
 				>
 			</li>
 			<li>
@@ -93,10 +93,10 @@
 			</li>
 		</ul>
 		<p>
-			The scope may look far-fetched, but an integrated and extensible computing environment is
-			something that I quite obviously want to use myself. This is an early proof of concept that
-			took about 3 months to build. I've thought about and prototyped related ideas for more than 13
-			years, and I think this iteration is sticking.
+			The scope may look far-fetched but I'm just building the tools I know I want to use on the
+			best foundations I can assemble. This is an early proof of concept that took about 3 months to
+			build. I've thought about and prototyped related ideas for more than 13 years, and I think
+			this iteration is sticking.
 		</p>
 		<p>Everything's a work in progress, but some basic integrations include:</p>
 		<ul>
@@ -116,7 +116,7 @@
 				<External_Link href="https://hono.dev/">Hono</External_Link> as the web server with
 				<External_Link href="https://svelte.dev/">SvelteKit</External_Link> and <External_Link
 					href="https://vite.dev/">Vite</External_Link
-				>, providing filesystem and other local capabilities
+				> for coordination with system access
 			</li>
 			<li>
 				Planned:
