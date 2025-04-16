@@ -9,7 +9,7 @@
 </script>
 
 <div class="column p_lg h_100">
-	<h1><Glyph icon={GLYPH_LOG} /> log</h1>
+	<h1><Glyph icon={GLYPH_LOG} /> system log</h1>
 
 	<div
 		class="flex_1 grid mt_md overflow_hidden"

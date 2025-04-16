@@ -68,6 +68,16 @@
 	}
 
 	.diskfile_tab_button {
+		--tab_hover_shadow: var(--shadow_inset_bottom_xs)
+			color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_1)), transparent);
+		--tab_active_shadow: var(--shadow_inset_top_xs)
+			color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_1)), transparent);
+		--tab_preview_shadow: var(--shadow_bottom_sm)
+			color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_2)), transparent);
+		--tab_selected_shadow: var(--shadow_inset_top_sm)
+			color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_2)), transparent);
+		--tab_selected_preview_shadow: var(--shadow_inset_top_xs)
+			color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_1)), transparent);
 		flex: 1;
 		display: flex;
 		align-items: center;
@@ -78,23 +88,28 @@
 	}
 
 	.diskfile_tab_button:hover {
-		box-shadow: var(--shadow_inset_bottom_xs)
-			color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_1)), transparent);
+		box-shadow: var(--tab_hover_shadow);
 	}
 
 	.diskfile_tab_button:active {
-		box-shadow: var(--shadow_inset_top_xs)
-			color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_1)), transparent);
+		box-shadow: var(--tab_active_shadow);
 	}
 
 	.diskfile_tab_button.selected {
-		box-shadow: var(--shadow_inset_top_sm)
-			color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_2)), transparent);
+		box-shadow: var(--tab_selected_shadow);
 	}
 
 	.diskfile_tab_button.preview {
 		font-style: italic;
-		box-shadow: var(--shadow_bottom_sm)
-			color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_2)), transparent);
+		box-shadow: var(--tab_preview_shadow);
+	}
+	.diskfile_tab_button.preview:hover {
+		box-shadow: var(--tab_preview_shadow), var(--tab_hover_shadow);
+	}
+	.diskfile_tab_button.preview:active {
+		box-shadow: var(--tab_preview_shadow), var(--tab_active_shadow);
+	}
+	.diskfile_tab_button.preview.selected {
+		box-shadow: var(--tab_preview_shadow), var(--tab_selected_preview_shadow);
 	}
 </style>
