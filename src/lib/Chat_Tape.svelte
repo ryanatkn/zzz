@@ -48,6 +48,8 @@
 	const strips = $derived(Array.from(tape.strips.by_id.values()));
 	const strip_count = $derived(strips.length);
 
+	// TODO BLOCK extract List and rename Item to Listitem
+
 	// TODO BLOCK edit individual items in the list (contextmenu too - show contextmenu target outline)
 
 	// TODO BLOCK the link should instead be a model picker (dialog? or overlaid without a bg maybe?)

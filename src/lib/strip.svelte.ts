@@ -35,6 +35,8 @@ export class Strip extends Cell<typeof Strip_Json> {
 	// Get the referenced bit - handle case where bit might not exist in registry
 	readonly bit: Bit_Type | null = $derived(this.zzz.bits.items.by_id.get(this.bit_id) ?? null);
 
+	// TODO BLOCK bit.enabled isn't excluding this from the tape
+
 	// Content always returns a string, normalizing null/undefined to empty string
 	get content(): string {
 		return this.bit?.content ?? '';

@@ -43,9 +43,9 @@
 			</aside>
 		{/if}
 		<p>
-			When installed as a native app, Zzz extends the web browser using the form factor you already
-			know well - imagine your current browser, and then add a sidebar on the left like the one on
-			this page, then <button
+			When installed as a native app instead of running in a browser tab, Zzz extends the web
+			browser using the form factor you already know well - imagine your current browser, and then
+			add a sidebar on the left like the one on this page, then <button
 				type="button"
 				onclick={() => (browserified = !browserified)}
 				class:color_i={!browserified}

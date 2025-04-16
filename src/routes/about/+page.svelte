@@ -151,6 +151,15 @@
 							>Agent2Agent (A2A) protocol</External_Link
 						>
 					</li>
+					<li>
+						I think it makes sense to prioritize a few high-utility integrations that provide
+						capabilities for manipulating media files, like <External_Link
+							href="https://pandoc.org/">Pandoc</External_Link
+						>,
+						<External_Link href="https://ffmpeg.org/">ffmpeg</External_Link>, and <External_Link
+							href="https://imagemagick.org/">ImageMagick</External_Link
+						>
+					</li>
 					<li>more, please send feedback/requests/help</li>
 				</ul>
 			</li>

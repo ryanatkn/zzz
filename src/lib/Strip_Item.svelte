@@ -20,6 +20,7 @@
 		class:user={strip.role === 'user'}
 		class:assistant={strip.role === 'assistant'}
 		class:system={strip.role === 'system'}
+		class:dormant={strip.bit && !strip.bit.enabled}
 	>
 		<div class="white_space_pre_wrap overflow_wrap_break_word">
 			<small class="mr_xs font_weight_600" title={strip.created}>@{strip.role}:</small>

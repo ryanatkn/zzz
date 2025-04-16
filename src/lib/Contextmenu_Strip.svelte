@@ -9,7 +9,7 @@
 	import type {Strip} from '$lib/strip.svelte.js';
 	import {GLYPH_EDIT, GLYPH_STRIP} from '$lib/glyphs.js';
 	import Contextmenu_Copy_To_Clipboard from '$lib/Contextmenu_Copy_To_Clipboard.svelte';
-	import Bit_View from '$lib/Bit_View.svelte';
+	import Strip_View from '$lib/Strip_View.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 
 	interface Props extends Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> {
@@ -17,8 +17,6 @@
 	}
 
 	const {strip, ...rest}: Props = $props();
-
-	const {bit} = $derived(strip);
 
 	let show_editor = $state(false);
 </script>
@@ -66,11 +64,7 @@
 	<Dialog onclose={() => (show_editor = false)}>
 		<div class="pane p_md width_md mx_auto">
 			<h2 class="mt_0 mb_sm"><Glyph icon={GLYPH_STRIP} /> edit strip</h2>
-			{#if bit}
-				<Bit_View {bit} />
-			{:else}
-				bit not found
-			{/if}
+			<Strip_View {strip} />
 		</div>
 	</Dialog>
 {/if}

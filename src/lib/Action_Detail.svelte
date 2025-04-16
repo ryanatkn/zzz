@@ -29,7 +29,7 @@
 		<small class="color_subtle ml_xs">{action.direction}</small>
 	</div>
 	<div class="flex flex_column gap_xs mt_sm">
-		<small class="font_mono">ID: {action.id}</small>
+		<small class="font_mono">id: {action.id}</small>
 		<small class="font_mono"
 			>created {action.created_formatted_date} {action.created_formatted_time}</small
 		>
@@ -44,7 +44,7 @@
 
 {#if action.is_pong}
 	<section class="pb_md border_bottom">
-		<h3 class="mt_0 mb_sm">Ping Response</h3>
+		<h3 class="mt_0 mb_sm">Ping response</h3>
 		<div class="field_row">
 			<div class="font_weight_600 color_text_subtle">Ping id</div>
 			<div class="font_mono word_break_break_word">{action.ping_id}</div>
@@ -52,11 +52,11 @@
 	</section>
 {:else if action.is_prompt}
 	<section class="pb_md border_bottom">
-		<h3 class="mt_0 mb_sm">Prompt</h3>
+		<h3 class="mt_0 mb_sm">prompt</h3>
 		<pre class="font_mono size_sm white_space_pre_wrap word_break_break_word p_sm w_100">{action
 				.prompt_data?.prompt || 'No prompt'}</pre>
 
-		<h3>Request Details</h3>
+		<h3>Request details</h3>
 		<div class="flex flex_column gap_xs">
 			<div class="field_row">
 				<div class="font_weight_600 color_text_subtle">Model</div>
@@ -86,12 +86,12 @@
 	</section>
 {:else if action.is_completion}
 	<section class="pb_md border_bottom">
-		<h3 class="mt_0 mb_sm">Completion</h3>
+		<h3 class="mt_0 mb_sm">completion</h3>
 		<pre
 			class="font_mono size_sm white_space_pre_wrap word_break_break_word p_sm w_100">{action.completion_text ||
 				'No completion'}</pre>
 
-		<h3>Response Details</h3>
+		<h3>Response details</h3>
 		<div class="flex flex_column gap_xs">
 			<div class="field_row">
 				<div class="font_weight_600 color_text_subtle">Request id</div>
@@ -112,34 +112,34 @@
 			{#if action.json.completion_response?.data}
 				{#if action.json.completion_response.data.type === 'ollama'}
 					<div class="field_row">
-						<div class="font_weight_600 color_text_subtle">Total Duration</div>
+						<div class="font_weight_600 color_text_subtle">Total duration</div>
 						<div>{action.json.completion_response.data.value.total_duration || 'Unknown'}</div>
 					</div>
 				{:else if action.json.completion_response.data.type === 'claude' && action.json.completion_response.data.value.usage}
 					<div class="field_row">
-						<div class="font_weight_600 color_text_subtle">Input Tokens</div>
+						<div class="font_weight_600 color_text_subtle">Input tokens</div>
 						<div>{action.json.completion_response.data.value.usage.input_tokens || 0}</div>
 					</div>
 					<div class="field_row">
-						<div class="font_weight_600 color_text_subtle">Output Tokens</div>
+						<div class="font_weight_600 color_text_subtle">Output tokens</div>
 						<div>{action.json.completion_response.data.value.usage.output_tokens || 0}</div>
 					</div>
 				{:else if action.json.completion_response.data.type === 'chatgpt' && action.json.completion_response.data.value.usage}
 					<div class="field_row">
-						<div class="font_weight_600 color_text_subtle">Prompt Tokens</div>
+						<div class="font_weight_600 color_text_subtle">Prompt tokens</div>
 						<div>{action.json.completion_response.data.value.usage.prompt_tokens || 0}</div>
 					</div>
 					<div class="field_row">
-						<div class="font_weight_600 color_text_subtle">Completion Tokens</div>
+						<div class="font_weight_600 color_text_subtle">Completion tokens</div>
 						<div>{action.json.completion_response.data.value.usage.completion_tokens || 0}</div>
 					</div>
 					<div class="field_row">
-						<div class="font_weight_600 color_text_subtle">Total Tokens</div>
+						<div class="font_weight_600 color_text_subtle">Total tokens</div>
 						<div>{action.json.completion_response.data.value.usage.total_tokens || 0}</div>
 					</div>
 				{:else if action.json.completion_response.data.type === 'gemini'}
 					<div class="field_row">
-						<div class="font_weight_600 color_text_subtle">Total Tokens</div>
+						<div class="font_weight_600 color_text_subtle">Total tokens</div>
 						<div>
 							{action.json.completion_response.data.value.usage_metadata?.totalTokenCount || 0}
 						</div>
