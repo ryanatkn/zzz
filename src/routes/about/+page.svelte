@@ -39,7 +39,7 @@
 			while remaining fully open, aligned, and in your control.
 		</p>
 		<p>
-			In the technology landscape of 2025, where LLMs are upending longheld assumptions and <External_Link
+			In the technology landscape of 2025, where LLM-based AI is upending longheld assumptions, and <External_Link
 				href="https://wikipedia.org/wiki/Enshittification">enshittification</External_Link
 			> is a widely-understood phenomenon among the very-online, Zzz asks:
 		</p>
