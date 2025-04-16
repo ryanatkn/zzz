@@ -61,11 +61,8 @@
 			<button
 				type="button"
 				class="inline compact color_d"
-				disabled={browserified && !zzz.ui.show_sidebar}
 				onclick={() => {
-					if (zzz.ui.show_sidebar) {
-						zzz.ui.toggle_sidebar();
-					}
+					zzz.ui.toggle_sidebar();
 					if (!browserified) {
 						browserified = true;
 					}
@@ -78,9 +75,9 @@
 		</p>
 		<p>
 			As a simple example, picture adding arbitrary metadata like tags to both your tabs and local
-			files, and then making UI to leverage that data for your specific needs, without any technical
-			knowledge, third parties, or unnecessary friction. The best usecases are unknown, but today's
-			browsers don't let us experiment.
+			files, and then summoning UI that leverages that data for your specific needs in every
+			context, without any technical knowledge, third parties, or unnecessary friction. The best
+			usecases are unknown, but today's browsers don't let us experiment.
 		</p>
 		<p>
 			I believe the optimal architecture - <External_Link

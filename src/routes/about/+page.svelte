@@ -179,7 +179,7 @@
 			</li>
 			<li>
 				I'm looking for <a href="https://www.ryanatkn.com/funding">funding</a> to make my continued full-time
-				work on Zzz sustainable
+				work on it sustainable
 			</li>
 		</ul>
 	</section>
