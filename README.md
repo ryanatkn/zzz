@@ -25,10 +25,9 @@ or @ me on [Bluesky](https://bsky.app/profile/ryanatkn.com).
 ## Setup
 
 Zzz uses SvelteKit and Vite and currently requires Node.
-(or at least, that's the only one I've tested)
-The goal is to make it support many deployment targets and all the JS runtimes,
-including a desktop installation and npm library,
-but it's not there yet - for now you'll need Node 20.17+ and git to clone the repo.
+(Node is the only one I've tested, YMMV with Deno/Bun/etc)
+Eventually there will be an installable desktop app and npm library,
+but it's not there yet - for now you'll need Node 22.11+ and git to clone the repo.
 
 > Windows probably doesn't work but will be supported - help is appreciated.
 > For now I recommend [WSL](https://learn.microsoft.com/en-us/windows/wsl/install).

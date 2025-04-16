@@ -95,7 +95,7 @@
 		<p>
 			The scope may look far-fetched but I'm just building tools I want to use on the best
 			foundations I can assemble. This is an early proof of concept that took about 3 months of
-			fulltime work to build. (<External_Link href="https://github.com/ryanatkn/zzz/pull/6"
+			full-time work to build. (<External_Link href="https://github.com/ryanatkn/zzz/pull/6"
 				>PR #6</External_Link
 			>) I've been thinking about and prototyping related ideas for more than 13 years, and I think
 			this iteration is sticking.
