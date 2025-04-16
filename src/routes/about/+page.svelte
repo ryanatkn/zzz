@@ -39,9 +39,9 @@
 			while remaining fully open, aligned, and in your control.
 		</p>
 		<p>
-			In the technology landscape of 2025, where LLMs are upending societal assumptions and <External_Link
+			In the technology landscape of 2025, where LLMs are upending longheld assumptions and <External_Link
 				href="https://en.wikipedia.org/wiki/Enshittification">enshittification</External_Link
-			> is a widely-understood phenomenon, Zzz asks:
+			> is a widely-understood phenomenon among the very-online, Zzz asks:
 		</p>
 		<blockquote>
 			"How can composable computing environments transform user agency in the age of AI?"
@@ -53,12 +53,12 @@
 			access to local and remote capabilities?"
 		</blockquote>
 		<p>
-			Zzz conceptual starting point is the user interface. The software I personally want as an
-			answer to these questions is cross-platform so it runs everywhere, and for that we have the
-			web with HTML, CSS, and JS. Zzz leverages JS to glue software and machines together precisely
-			the way you want, maximizing its utility on any device across the full stack. It can run
-			locally on your machine using any of your available capabilities, or it can deploy anywhere
-			that supports JS and play whatever role you need.
+			The software I imagine wanting to answer these questions is cross-platform so it runs
+			everywhere, and for that we have the web with HTML, CSS, and JS. Zzz conceptual starting point
+			is the user interface. I'm a user, and I need to inferface with machines. Zzz leverages JS to
+			glue software and machines together precisely the way you want, maximizing its utility on any
+			device across the full stack. It can run locally on your machine using any of your available
+			capabilities, or it can deploy anywhere that supports JS and play whatever role you need.
 		</p>
 		<p>Zzz takes ideas from many kinds of software:</p>
 		<ul>
