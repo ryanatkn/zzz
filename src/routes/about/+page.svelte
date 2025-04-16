@@ -95,8 +95,10 @@
 		<p>
 			The scope may look far-fetched but I'm just building tools I want to use on the best
 			foundations I can assemble. This is an early proof of concept that took about 3 months of
-			fulltime work to build. I've been thinking about and prototyping related ideas for more than
-			13 years, and I think this iteration is sticking.
+			fulltime work to build. (<External_Link href="https://github.com/ryanatkn/zzz/pull/6"
+				>PR #6</External_Link
+			>) I've been thinking about and prototyping related ideas for more than 13 years, and I think
+			this iteration is sticking.
 		</p>
 		<p>Everything's a work in progress, but some basic integrations include:</p>
 		<ul>
@@ -125,7 +127,9 @@
 						<External_Link href="https://github.com/electric-sql/pglite">pglite</External_Link> via
 						<External_Link href="https://github.com/drizzle-team/drizzle-orm">Drizzle</External_Link
 						> and full <External_Link href="https://www.postgresql.org/">Postgres</External_Link> when
-						desired
+						desired, see <External_Link href="https://github.com/ryanatkn/zzz/issues/7"
+							>issue #7</External_Link
+						>
 					</li>
 					<li>
 						<External_Link href="https://wikipedia.org/wiki/RSS">RSS</External_Link> and <External_Link
