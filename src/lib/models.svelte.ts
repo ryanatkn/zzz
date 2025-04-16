@@ -9,7 +9,6 @@ import {
 	create_multi_index,
 	create_derived_index,
 } from '$lib/indexed_collection_helpers.js';
-import {merge_ollama_models, type Ollama_Model_Info} from '$lib/ollama.js';
 
 export const Models_Json = z
 	.object({
@@ -92,11 +91,6 @@ export class Models extends Cell<typeof Models_Json> {
 	add_many(models_json: Array<Model_Json>): void {
 		const models = models_json.map((json) => new Model({zzz: this.zzz, json}));
 		this.items.add_many(models);
-	}
-
-	// TODO BLOCK use or delete
-	merge(model_infos: Array<Ollama_Model_Info>): void {
-		merge_ollama_models(Array.from(this.items.by_id.values()), model_infos); // TODO @many should `items.by_id.values()` be a derived even if often inefficient? still better than constructing it multiple times? or should this be an index?
 	}
 
 	find_by_name(name: string): Model | undefined {

@@ -10,7 +10,7 @@
 
 	const {strip}: Props = $props();
 
-	// TODO BLOCKcontextmenu options, maybe including a way to get the bit in a dialog?
+	// TODO BLOCK contextmenu options, maybe including a way to get the bit in a dialog?
 </script>
 
 <div
