@@ -1,5 +1,5 @@
 import {z} from 'zod';
-import {Datetime, Datetime_Now, Uuid_With_Default} from '$lib/zod_helpers.js';
+import {Datetime_Now, Uuid_With_Default} from '$lib/zod_helpers.js';
 
 /**
  * Get keys from a Zod schema object.
@@ -17,7 +17,7 @@ export type Schema_Value<T extends z.ZodType, K extends Schema_Keys<T>> = z.infe
 export const Cell_Json = z.object({
 	id: Uuid_With_Default,
 	created: Datetime_Now,
-	updated: Datetime.nullable().default(null),
+	updated: Datetime_Now,
 });
 export type Cell_Json = z.infer<typeof Cell_Json>;
 export type Cell_Json_Input = z.input<typeof Cell_Json>;

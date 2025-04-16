@@ -25,6 +25,7 @@ export const map_watcher_change_to_diskfile_change = (
 	return type as Diskfile_Change_Type;
 };
 
+// TODO messy, needs upstream work
 /**
  * Helper function to convert a Source_File to Diskfile_Json format.
  * @param source_file The source file to convert
@@ -33,21 +34,29 @@ export const map_watcher_change_to_diskfile_change = (
 export const source_file_to_diskfile_json = (
 	source_file: Source_File,
 	existing_id?: Uuid,
-): Diskfile_Json => ({
-	id: existing_id ?? create_uuid(),
-	path: source_file.id,
-	content: source_file.contents,
-	created: Datetime_Now.parse(source_file.ctime && new Date(source_file.ctime).toISOString()), // TODO seems messy
-	updated: source_file.mtime ? Datetime.parse(new Date(source_file.mtime).toISOString()) : null,
-	dependents: Array.from(source_file.dependents.entries()).map(([id, s]) => [
-		Diskfile_Path.parse(id),
-		s,
-	]),
-	dependencies: Array.from(source_file.dependencies.entries()).map(([id, s]) => [
-		Diskfile_Path.parse(id),
-		s,
-	]),
-});
+): Diskfile_Json => {
+	const created = Datetime_Now.parse(
+		source_file.ctime == null ? undefined : new Date(source_file.ctime).toISOString(),
+	);
+	return {
+		id: existing_id ?? create_uuid(),
+		path: source_file.id,
+		content: source_file.contents,
+		created,
+		updated:
+			source_file.mtime == null
+				? created
+				: Datetime.parse(new Date(source_file.mtime).toISOString()),
+		dependents: Array.from(source_file.dependents.entries()).map(([id, s]) => [
+			Diskfile_Path.parse(id),
+			s,
+		]),
+		dependencies: Array.from(source_file.dependencies.entries()).map(([id, s]) => [
+			Diskfile_Path.parse(id),
+			s,
+		]),
+	};
+};
 
 // TODO hacky
 export const SUPPORTED_CODE_FILETYPE_MATCHER = /\.[mc]?[jt]sx?$/i;

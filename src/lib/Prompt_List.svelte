@@ -1,7 +1,7 @@
 <script lang="ts">
 	import {slide} from 'svelte/transition';
 
-	import Prompt_Listitem from './Prompt_Listitem.svelte';
+	import Prompt_Listitem from '$lib/Prompt_Listitem.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import {sort_by_text, sort_by_numeric} from '$lib/sortable.svelte.js';
 	import type {Prompt} from '$lib/prompt.svelte.js';

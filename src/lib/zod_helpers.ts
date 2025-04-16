@@ -6,23 +6,17 @@ export const Any = z.any();
 
 export const Svelte_Map_Schema = z.custom<SvelteMap<any, any>>((val) => val instanceof SvelteMap);
 
-let last_datetime_ms = -1;
-
 /**
  * Returns an ISO datetime string that is guaranteed to be monotonically increasing.
  * If called multiple times within the same millisecond, it increments the value
  * by one millisecond to ensure uniqueness and order preservation.
  */
-export const get_datetime_now = (): Datetime => {
-	const current_ms = Date.now();
-	last_datetime_ms = Math.max(current_ms, last_datetime_ms + 1);
-	return new Date(last_datetime_ms).toISOString() as Datetime;
-};
+export const get_datetime_now = (): Datetime => new Date().toISOString() as Datetime; // TODO maybe memoize one by `Date.now()`? or is the overhead not worth it?
 
 // TODO move these? helpers at least
 export const Datetime = z.string().datetime().brand('Datetime');
 export type Datetime = z.infer<typeof Datetime>;
-export const Datetime_Now = Datetime.default(get_datetime_now); // TODO this API may be a bit too magic in some cases by defaulting to now
+export const Datetime_Now = Datetime.default(get_datetime_now);
 export type Datetime_Now = z.infer<typeof Datetime_Now>;
 
 export const create_uuid = (): Uuid => crypto.randomUUID() as Uuid;

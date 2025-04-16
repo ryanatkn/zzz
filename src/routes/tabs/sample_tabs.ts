@@ -37,6 +37,7 @@ export const fake_sites = {
 };
 
 // Sample tabs for browser initialization
+const created = get_datetime_now();
 export const sample_tabs: Array<Browser_Tab_Json> = [
 	{
 		id: create_uuid(),
@@ -45,8 +46,8 @@ export const sample_tabs: Array<Browser_Tab_Json> = [
 		type: 'raw',
 		selected: true,
 		refresh_counter: 0,
-		created: get_datetime_now(),
-		updated: null,
+		created,
+		updated: created,
 	},
 	{
 		id: create_uuid(),
@@ -56,8 +57,8 @@ export const sample_tabs: Array<Browser_Tab_Json> = [
 		type: 'embedded_html',
 		content: fake_sites.future.content,
 		refresh_counter: 0,
-		created: get_datetime_now(),
-		updated: null,
+		created,
+		updated: created,
 	},
 	{
 		id: create_uuid(),
@@ -66,8 +67,8 @@ export const sample_tabs: Array<Browser_Tab_Json> = [
 		url: 'https://moss.ryanatkn.com/',
 		type: 'external_url',
 		refresh_counter: 0,
-		created: get_datetime_now(),
-		updated: null,
+		created,
+		updated: created,
 	},
 	{
 		id: create_uuid(),
@@ -76,7 +77,7 @@ export const sample_tabs: Array<Browser_Tab_Json> = [
 		url: 'https://fuz.dev/',
 		type: 'external_url',
 		refresh_counter: 0,
-		created: get_datetime_now(),
-		updated: null,
+		created,
+		updated: created,
 	},
 ];

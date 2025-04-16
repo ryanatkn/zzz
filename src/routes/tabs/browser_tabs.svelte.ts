@@ -107,6 +107,7 @@ export class Browser_Tabs extends Cell<typeof Browser_Tabs_Json> {
 		}
 
 		// Create new tab with embedded content
+		const created = get_datetime_now();
 		this.add({
 			id: create_uuid(),
 			title: 'new tab',
@@ -115,8 +116,8 @@ export class Browser_Tabs extends Cell<typeof Browser_Tabs_Json> {
 			type: 'embedded_html',
 			content: fake_sites.new_tab.content,
 			refresh_counter: 0,
-			created: get_datetime_now(),
-			updated: null,
+			created,
+			updated: created,
 		});
 	}
 

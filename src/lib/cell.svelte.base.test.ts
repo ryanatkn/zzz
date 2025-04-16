@@ -59,7 +59,7 @@ describe('Cell initialization', () => {
 		// Verify basic properties
 		expect(test_cell.id).toBe(TEST_ID);
 		expect(test_cell.created).toBe(TEST_DATETIME);
-		expect(test_cell.updated).toBeNull();
+		expect(test_cell.updated).toBe(test_cell.created);
 		expect(test_cell.text).toBe('Sample');
 		expect(test_cell.number).toBe(42);
 		expect(test_cell.items).toEqual(['item1', 'item2']);
@@ -77,7 +77,7 @@ describe('Cell initialization', () => {
 		// Should use schema defaults
 		expect(test_cell.id).toBeDefined();
 		expect(test_cell.created).toBeDefined();
-		expect(test_cell.updated).toBeNull();
+		expect(test_cell.updated).toBe(test_cell.created);
 		expect(test_cell.text).toBe('');
 		expect(test_cell.number).toBe(0);
 		expect(test_cell.items).toEqual([]);
@@ -490,14 +490,14 @@ describe('Cell date formatting', () => {
 			json: {
 				id: TEST_ID,
 				created: TEST_DATETIME,
-				updated: null,
+				updated: TEST_DATETIME,
 			},
 		});
 
-		expect(test_cell.updated_date).toBeNull();
-		expect(test_cell.updated_formatted_short_date).toBeNull();
-		expect(test_cell.updated_formatted_date).toBeNull();
-		expect(test_cell.updated_formatted_time).toBeNull();
+		expect(test_cell.updated_date).not.toBeNull();
+		expect(test_cell.updated_formatted_short_date).not.toBeNull();
+		expect(test_cell.updated_formatted_date).not.toBeNull();
+		expect(test_cell.updated_formatted_time).not.toBeNull();
 	});
 });
 

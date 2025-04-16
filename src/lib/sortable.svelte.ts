@@ -107,6 +107,7 @@ export class Sortable<T> {
 // TODO @many these arent used in a typesafe way, asserting cell subtypes, maybe require the cell?
 /**
  * Create a text sorter with optional direction.
+ * Falls back to cell's cid for equal values.
  */
 export const sort_by_text = <T extends Cell>(
 	key: string,
@@ -118,13 +119,18 @@ export const sort_by_text = <T extends Cell>(
 	return {
 		key,
 		label,
-		fn: (a: T, b: T) => multiplier * String(a[field]).localeCompare(String(b[field])),
+		fn: (a: T, b: T) => {
+			const result = multiplier * String(a[field]).localeCompare(String(b[field]));
+			// If values are equal, sort by cid for stable ordering
+			return result !== 0 ? result : b.cid - a.cid;
+		},
 	};
 };
 
 // TODO @many these arent used in a typesafe way, asserting cell subtypes, maybe require the cell?
 /**
  * Create a numeric sorter with optional direction.
+ * Falls back to cell's cid for equal values.
  */
 export const sort_by_numeric = <T extends Cell>(
 	key: string,
@@ -138,7 +144,10 @@ export const sort_by_numeric = <T extends Cell>(
 		fn: (cell_a: T, cell_b: T) => {
 			const a = cell_a[field];
 			const b = cell_b[field];
-			return direction === 'asc' ? (a < b ? -1 : a > b ? 1 : 0) : a > b ? -1 : a < b ? 1 : 0;
+			const result =
+				direction === 'asc' ? (a < b ? -1 : a > b ? 1 : 0) : a > b ? -1 : a < b ? 1 : 0;
+			// If values are equal, sort by cid for stable ordering
+			return result !== 0 ? result : cell_b.cid - cell_a.cid;
 		},
 	};
 };

@@ -1,8 +1,13 @@
 import {z} from 'zod';
 import {format} from 'date-fns';
-import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
 
-import {get_field_schema, zod_get_schema_keys, type Uuid, type Datetime} from '$lib/zod_helpers.js';
+import {
+	get_field_schema,
+	zod_get_schema_keys,
+	type Uuid,
+	type Datetime,
+	get_datetime_now,
+} from '$lib/zod_helpers.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 import {
 	get_schema_class_info,
@@ -13,13 +18,25 @@ import {
 	FILE_TIME_FORMAT,
 	type Cell_Value_Decoder,
 } from '$lib/cell_helpers.js';
-import type {Schema_Keys, Cell_Json} from '$lib/cell_types.js';
+import type {Schema_Keys, Cell_Json, Cell_Json_Input} from '$lib/cell_types.js';
 
 // Base options type that all cells will extend
 export interface Cell_Options<T_Schema extends z.ZodType> {
 	zzz: Zzz; // TODO needs to be generic
 	json?: z.input<T_Schema>;
 }
+
+/**
+ * A monotonic id for cell instances on the client.
+ * This is not reactive and never changes on the instance,
+ * whereas `id` can change. It's useful for ordering -
+ * the motivating usecase was correctly sorting objects with the same `created` millisecond.
+ *
+ * This may cause issues based on how data gets queried, but at least it's stable once loaded.
+ * However we may need to revisit this if it causes problems.
+ */
+export const get_global_cell_count = (): number => global_cell_count;
+let global_cell_count = 0;
 
 /**
  * The `Cell` is the base class for schema-driven data models in Zzz.
@@ -49,10 +66,12 @@ export interface Cell_Options<T_Schema extends z.ZodType> {
  * Many things will be possible with this pattern, but it's still a work in progress.
  */
 export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Cell_Json {
+	cid = ++global_cell_count;
+
 	// Base properties from Cell_Json
 	id: Uuid = $state()!;
 	created: Datetime = $state()!;
-	updated: Datetime | null = $state()!; // TODO BLOCK remove `null` from this to more closely match typical patterns
+	updated: Datetime = $state()!;
 
 	readonly schema: T_Schema; // TODO currently Zod, but I'm evaluating ArkType soon - Zzz's goals may justify its runtime weight, or maybe precompilation will eventually beat Zod on that point too - https://github.com/arktypeio/arktype/issues/810
 
@@ -212,13 +231,25 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	/**
 	 * Apply JSON data to this instance.
 	 * Overwrites all properties including 'id'.
+	 * Special-cases `created` and `updated` for synchronization.
 	 */
-	set_json(value: z.input<T_Schema> = EMPTY_OBJECT): void {
+	set_json(value: z.input<T_Schema> | undefined): void {
 		try {
-			// Parse input with schema - this will apply schema defaults for missing fields.
-			// Use empty object if value is undefined to ensure schemas
-			// without `.optional()` on their top-level object processes defaults.
-			const parsed = this.schema.parse(value);
+			// Prepare the input by ensuring `created`/`updated` are in sync when using defaults
+			let v: z.input<T_Schema> | undefined = value;
+			if (!v || !v.created) {
+				v = {...v};
+				v.created = get_datetime_now();
+			}
+			if (!v.updated) {
+				if (v === value) {
+					v = {...v};
+				}
+				v!.updated = v!.created; // TODO why are these casts needed?
+			}
+
+			// Parse with schema to apply defaults and validation
+			const parsed = this.schema.parse(v);
 
 			// Process each schema key
 			for (const key of this.schema_keys) {
@@ -242,10 +273,18 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 		if (!partial_value || typeof partial_value !== 'object') return; // eslint-disable-line @typescript-eslint/no-unnecessary-condition
 
 		try {
+			let v: z.input<T_Schema> = partial_value;
+
+			// Special handling for `created`/`updated` synchronization
+			if ('created' in v && !('updated' in v)) {
+				v = {...v};
+				(v as Cell_Json_Input).updated = v.created;
+			}
+
 			// Directly process each property in the partial update
-			for (const key of Object.keys(partial_value) as Array<Schema_Keys<T_Schema>>) {
+			for (const key of Object.keys(v) as Array<Schema_Keys<T_Schema>>) {
 				// Skip empty properties
-				if (partial_value[key] === undefined) continue;
+				if (v[key] === undefined) continue;
 
 				// Get the field schema for this property
 				const field_schema = this.field_schemas.get(key);
@@ -256,7 +295,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 
 				// Parse the individual value through its field schema
 				try {
-					const parsed_value = field_schema.parse(partial_value[key]);
+					const parsed_value = field_schema.parse(v[key]);
 
 					// Assign the parsed property
 					this.assign_property(key, parsed_value);
