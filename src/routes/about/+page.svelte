@@ -40,7 +40,7 @@
 		</p>
 		<p>
 			In the technology landscape of 2025, where LLMs are upending longheld assumptions and <External_Link
-				href="https://en.wikipedia.org/wiki/Enshittification">enshittification</External_Link
+				href="https://wikipedia.org/wiki/Enshittification">enshittification</External_Link
 			> is a widely-understood phenomenon among the very-online, Zzz asks:
 		</p>
 		<blockquote>
@@ -53,14 +53,14 @@
 			access to local and remote capabilities?"
 		</blockquote>
 		<p>
-			The software I imagine wanting to answer these questions is cross-platform so it runs
-			everywhere, and for that we have the web with HTML, CSS, and JS. Zzz conceptual starting point
-			is the user interface. I'm a user, and I need to inferface with machines. Zzz leverages JS to
-			glue software and machines together precisely the way you want, maximizing its utility on any
+			The software I imagine answering these questions is cross-platform so it runs everywhere, and
+			for that we have the web with HTML, CSS, and JS. My conceptual starting point is the user
+			interface. I'm a user, and I need to inferface with machines. Zzz leverages JS to glue
+			software and machines together precisely the way you want, maximizing its utility on any
 			device across the full stack. It can run locally on your machine using any of your available
 			capabilities, or it can deploy anywhere that supports JS and play whatever role you need.
 		</p>
-		<p>Zzz takes ideas from many kinds of software:</p>
+		<p>Zzz is based on many kinds of software:</p>
 		<ul>
 			<li>
 				AI UIs like <External_Link href="https://github.com/Mintplex-Labs/anything-llm"
@@ -93,10 +93,10 @@
 			</li>
 		</ul>
 		<p>
-			The scope may look far-fetched but I'm just building the tools I know I want to use on the
-			best foundations I can assemble. This is an early proof of concept that took about 3 months to
-			build. I've thought about and prototyped related ideas for more than 13 years, and I think
-			this iteration is sticking.
+			The scope may look far-fetched but I'm just building tools I want to use on the best
+			foundations I can assemble. This is an early proof of concept that took about 3 months of
+			fulltime work to build. I've been thinking about and prototyping related ideas for more than
+			13 years, and I think this iteration is sticking.
 		</p>
 		<p>Everything's a work in progress, but some basic integrations include:</p>
 		<ul>
@@ -154,13 +154,14 @@
 		<p>
 			Zzz is just one implementation of an increasingly common idea that combines web tech and AI
 			with powerful open clients, and it has quirks personal to its author that I'm eager to smooth
-			out. Your input would be appreciated to help make it work for you—see the
-			<External_Link href="https://github.com/ryanatkn/zzz/issues">issues</External_Link>
-			and
-			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link>
+			out. Your input would be appreciated to help make it work for you—see the <External_Link
+				href="https://github.com/ryanatkn/zzz">code</External_Link
+			>,
+			<External_Link href="https://github.com/ryanatkn/zzz/issues">issues</External_Link>, and
+			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link>,
 			and find me on
 			<External_Link href="https://bsky.app/profile/ryanatkn.com">Bluesky</External_Link>. I'll make
-			a Discord if someone asks.
+			a Discord if someone asks, and I'm planning to make a community site using Zzz at zzzbot.dev.
 		</p>
 	</section>
 	<hr />
