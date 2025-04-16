@@ -29,8 +29,8 @@ export class Strip extends Cell<typeof Strip_Json> {
 	bit_id: Uuid = $state()!;
 	tape_id: Uuid | null | undefined = $state();
 	role: Strip_Role = $state()!;
-	request?: Completion_Request = $state();
-	response?: Completion_Response = $state();
+	request: Completion_Request | undefined = $state();
+	response: Completion_Response | undefined = $state();
 
 	// Get the referenced bit - handle case where bit might not exist in registry
 	readonly bit: Bit_Type | null = $derived(this.zzz.bits.items.by_id.get(this.bit_id) ?? null);
@@ -59,7 +59,8 @@ export class Strip extends Cell<typeof Strip_Json> {
 	readonly is_content_empty: boolean = $derived(
 		this.bit === null || this.bit.content === null || this.bit.content === '',
 	);
-	readonly is_pending: boolean = $derived(
+
+	readonly pending: boolean = $derived(
 		this.role === 'assistant' && this.is_content_loaded && this.is_content_empty && !this.response,
 	);
 

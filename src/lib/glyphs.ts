@@ -31,6 +31,7 @@ export const GLYPH_SORT = '⇅'; // ⇅ ⇵ ⥮ ⮃
 export const GLYPH_SERVER = '🜢';
 export const GLYPH_CHAT = '⌸';
 export const GLYPH_TAPE = '☷';
+export const GLYPH_STRIP = '⎍'; // ⎎ ⎍
 export const GLYPH_FILE = '⧈'; // ⏚ ⧈ ⊞ ⌺ ▤
 export const GLYPH_LIST = '▤'; //
 export const GLYPH_DIRECTORY = '▦'; // 🗁 ▦ ▥ 🗀

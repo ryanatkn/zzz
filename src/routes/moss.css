@@ -492,6 +492,9 @@ a.chip {
 .pl_0 {
 	padding-left: 0;
 }
+.pl_xs2 {
+	padding-left: var(--space_xs2);
+}
 .pl_sm {
 	padding-left: var(--space_sm);
 }

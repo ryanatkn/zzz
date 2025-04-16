@@ -58,9 +58,9 @@
 {/if}
 
 {#if available_bits.length > 0}
-	<div class="mt_xs">
+	<div class="mb_xs">
 		<select
-			class="w_100 mb_0"
+			class="w_100 mb_0 compact"
 			onchange={(e) => {
 				const selected_bit_id = e.currentTarget.value;
 				if (selected_bit_id) {
@@ -69,8 +69,8 @@
 				}
 			}}
 		>
-			<option value="">Add an existing bit to sequence...</option>
-			{#each available_bits as available_bit}
+			<option value="">add existing bit to sequence...</option>
+			{#each available_bits as available_bit (available_bit.id)}
 				<option value={available_bit.id}>{available_bit.name}</option>
 			{/each}
 		</select>

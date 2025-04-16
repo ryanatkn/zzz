@@ -353,6 +353,11 @@
       "svelte": "./dist/Contextmenu_Prompt.svelte",
       "default": "./dist/Contextmenu_Prompt.svelte"
     },
+    "./Contextmenu_Strip.svelte": {
+      "types": "./dist/Contextmenu_Strip.svelte.d.ts",
+      "svelte": "./dist/Contextmenu_Strip.svelte",
+      "default": "./dist/Contextmenu_Strip.svelte"
+    },
     "./Contextmenu_Tape.svelte": {
       "types": "./dist/Contextmenu_Tape.svelte.d.ts",
       "svelte": "./dist/Contextmenu_Tape.svelte",

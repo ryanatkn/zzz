@@ -66,7 +66,7 @@ let global_cell_count = 0;
  * Many things will be possible with this pattern, but it's still a work in progress.
  */
 export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Cell_Json {
-	cid = ++global_cell_count;
+	readonly cid = ++global_cell_count;
 
 	// Base properties from Cell_Json
 	id: Uuid = $state()!;

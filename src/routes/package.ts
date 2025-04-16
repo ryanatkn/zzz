@@ -294,6 +294,11 @@ export const package_json = {
 			svelte: './dist/Contextmenu_Prompt.svelte',
 			default: './dist/Contextmenu_Prompt.svelte',
 		},
+		'./Contextmenu_Strip.svelte': {
+			types: './dist/Contextmenu_Strip.svelte.d.ts',
+			svelte: './dist/Contextmenu_Strip.svelte',
+			default: './dist/Contextmenu_Strip.svelte',
+		},
 		'./Contextmenu_Tape.svelte': {
 			types: './dist/Contextmenu_Tape.svelte.d.ts',
 			svelte: './dist/Contextmenu_Tape.svelte',
@@ -911,6 +916,7 @@ export const src_json = {
 			path: 'cell.svelte.ts',
 			declarations: [
 				{name: 'Cell_Options', kind: 'type'},
+				{name: 'get_global_cell_count', kind: 'function'},
 				{name: 'Cell', kind: 'class'},
 			],
 		},
@@ -990,6 +996,7 @@ export const src_json = {
 		},
 		'./Contextmenu_Diskfile.svelte': {path: 'Contextmenu_Diskfile.svelte', declarations: []},
 		'./Contextmenu_Prompt.svelte': {path: 'Contextmenu_Prompt.svelte', declarations: []},
+		'./Contextmenu_Strip.svelte': {path: 'Contextmenu_Strip.svelte', declarations: []},
 		'./Contextmenu_Tape.svelte': {path: 'Contextmenu_Tape.svelte', declarations: []},
 		'./Contextmenu_Toggle.svelte': {path: 'Contextmenu_Toggle.svelte', declarations: []},
 		'./Dashboard_Capabilities.svelte': {path: 'Dashboard_Capabilities.svelte', declarations: []},
@@ -1126,6 +1133,7 @@ export const src_json = {
 				{name: 'GLYPH_SERVER', kind: 'variable'},
 				{name: 'GLYPH_CHAT', kind: 'variable'},
 				{name: 'GLYPH_TAPE', kind: 'variable'},
+				{name: 'GLYPH_STRIP', kind: 'variable'},
 				{name: 'GLYPH_FILE', kind: 'variable'},
 				{name: 'GLYPH_LIST', kind: 'variable'},
 				{name: 'GLYPH_DIRECTORY', kind: 'variable'},
@@ -1239,7 +1247,6 @@ export const src_json = {
 				{name: 'Ollama_Models_Response', kind: 'type'},
 				{name: 'ollama_list', kind: 'function'},
 				{name: 'ollama_list_with_metadata', kind: 'function'},
-				{name: 'merge_ollama_models', kind: 'function'},
 			],
 		},
 		'./Picker.svelte': {path: 'Picker.svelte', declarations: []},

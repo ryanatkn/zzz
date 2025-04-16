@@ -5,10 +5,11 @@
 
 	import {GLYPH_COPY} from '$lib/glyphs.js';
 	import {to_preview} from '$lib/helpers.js';
+	import type {Thunk} from '@ryanatkn/belt/function.js';
 
 	interface Props
 		extends Omit_Strict<ComponentProps<typeof Contextmenu_Entry>, 'run' | 'children'> {
-		content: string | undefined;
+		content: string | Thunk<string> | undefined;
 		label?: string | undefined;
 		preview?: string | undefined;
 		preview_limit?: number | undefined;
@@ -26,14 +27,17 @@
 		...rest
 	}: Props = $props();
 
+	const read_content = () => (typeof content === 'function' ? content() : content);
+
 	const final_preview: string | undefined = $derived(
-		show_preview ? to_preview(preview ?? content, preview_limit) : undefined,
+		show_preview ? to_preview(preview ?? read_content(), preview_limit) : undefined,
 	);
 
 	const copy_to_clipboard = async (): Promise<void> => {
-		if (!content) return;
+		const c = read_content();
+		if (!c) return;
 		try {
-			await navigator.clipboard.writeText(content);
+			await navigator.clipboard.writeText(c);
 		} catch (error) {
 			console.error('Failed to copy text: ', error);
 		}

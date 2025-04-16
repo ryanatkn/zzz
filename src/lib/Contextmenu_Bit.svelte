@@ -23,7 +23,6 @@
 
 	const zzz = zzz_context.get();
 
-	// Dialog state
 	let show_editor = $state(false);
 </script>
 
