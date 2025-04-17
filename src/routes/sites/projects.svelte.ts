@@ -1,6 +1,5 @@
 import {create_context} from '@ryanatkn/fuz/context_helpers.js';
 import {goto} from '$app/navigation';
-import {SvelteMap} from 'svelte/reactivity';
 
 import {Project_Controller} from './project_controller.svelte.js';
 import {Page_Editor} from './page_editor.svelte.js';
@@ -13,6 +12,8 @@ export interface Domain {
 	name: string;
 	status: 'active' | 'pending' | 'inactive';
 	ssl: boolean;
+	created: string;
+	updated: string;
 }
 
 export interface Page {
@@ -48,12 +49,16 @@ const sample_projects: Array<Project> = [
 				name: 'zzz.software',
 				status: 'active',
 				ssl: true,
+				created: '2023-01-15T12:00:00Z',
+				updated: '2023-04-20T15:30:00Z',
 			},
 			{
 				id: 'dom_2',
 				name: 'www.zzz.software',
 				status: 'active',
 				ssl: true,
+				created: '2023-01-15T12:00:00Z',
+				updated: '2023-04-20T15:30:00Z',
 			},
 		],
 		pages: [
@@ -88,12 +93,16 @@ const sample_projects: Array<Project> = [
 				name: 'dealt.dev',
 				status: 'active',
 				ssl: true,
+				created: '2023-02-10T09:15:00Z',
+				updated: '2023-03-05T16:45:00Z',
 			},
 			{
 				id: 'dom_4',
 				name: 'tarot.dealt.dev',
 				status: 'active',
 				ssl: true,
+				created: '2023-02-10T09:15:00Z',
+				updated: '2023-03-05T16:45:00Z',
 			},
 		],
 		pages: [
@@ -152,19 +161,58 @@ export class Projects {
 		this.current_project?.domains.find((d) => d.id === this.current_domain_id) || null,
 	);
 
-	/** Cache of controller instances. */
-	#controllers: Map<string, Project_Controller> = new SvelteMap();
+	/** Cache of project controllers. */
+	#controllers: Map<string, Project_Controller> = new Map();
 
-	/** Cache of page editor instances. */
-	#page_editors: Map<string, Page_Editor> = new SvelteMap();
+	/** Cache of page editors. */
+	#page_editors: Map<string, Page_Editor> = new Map();
 
-	/** Cache of domains controller instances. */
-	#domains_controllers: Map<string, Domains_Controller> = new SvelteMap();
+	/** Cache of domain controllers. */
+	#domains_controllers: Map<string, Domains_Controller> = new Map();
+
+	/** Current project controller derived from current_project_id. */
+	current_project_controller = $derived.by(() => {
+		if (!this.current_project_id) return null;
+
+		let controller = this.#controllers.get(this.current_project_id);
+		if (!controller) {
+			controller = new Project_Controller(this.current_project_id, this);
+			this.#controllers.set(this.current_project_id, controller);
+		}
+		return controller;
+	});
+
+	/** Current page editor derived from current project and page IDs. */
+	current_page_editor = $derived.by(() => {
+		if (!this.current_project_id || !this.current_page_id) return null;
+
+		const key = `${this.current_project_id}_${this.current_page_id}`;
+		let editor = this.#page_editors.get(key);
+		if (!editor) {
+			editor = new Page_Editor(this.current_project_id, this.current_page_id, this);
+			this.#page_editors.set(key, editor);
+		}
+		return editor;
+	});
+
+	/** Current domains controller derived from current project and domain IDs. */
+	current_domains_controller = $derived.by(() => {
+		if (!this.current_project_id) return null;
+
+		const key = `${this.current_project_id}_${this.current_domain_id || 'new'}`;
+		let controller = this.#domains_controllers.get(key);
+		if (!controller) {
+			controller = new Domains_Controller(this.current_project_id, this.current_domain_id, this);
+			this.#domains_controllers.set(key, controller);
+		}
+		return controller;
+	});
 
 	/**
 	 * Sets the current project ID.
 	 */
 	set_current_project(project_id: string): void {
+		console.log(`set_current_project`, project_id);
 		this.current_project_id = project_id;
 	}
 
@@ -172,6 +220,7 @@ export class Projects {
 	 * Sets the current page ID.
 	 */
 	set_current_page(page_id: string): void {
+		console.log(`set_current_page`, page_id);
 		this.current_page_id = page_id;
 	}
 
@@ -179,6 +228,7 @@ export class Projects {
 	 * Sets the current domain ID.
 	 */
 	set_current_domain(domain_id: string): void {
+		console.log(`set_current_domain`, domain_id);
 		this.current_domain_id = domain_id;
 	}
 
@@ -187,14 +237,14 @@ export class Projects {
 	 */
 	create_new_project(): void {
 		const id = 'proj_' + Date.now();
-		const timestamp = new Date().toISOString();
+		const created = new Date().toISOString();
 
 		const new_project: Project = {
 			id,
 			name: 'New Project',
 			description: '',
-			created: timestamp,
-			updated: timestamp,
+			created,
+			updated: created,
 			domains: [],
 			pages: [
 				{
@@ -202,58 +252,14 @@ export class Projects {
 					path: '/',
 					title: 'Home',
 					content: '# Welcome\n\nThis is the home page of your new project.',
-					created: timestamp,
-					updated: timestamp,
+					created,
+					updated: created,
 				},
 			],
 		};
 
 		this.add_project(new_project);
 		void goto(`/sites/${id}`);
-	}
-
-	/**
-	 * Gets or creates a project controller for the given project ID.
-	 */
-	get_project_controller(project_id = this.current_project_id): Project_Controller {
-		let controller = this.#controllers.get(project_id);
-		if (!controller) {
-			this.#controllers.set(project_id, (controller = new Project_Controller(project_id, this)));
-		}
-		return controller;
-	}
-
-	/**
-	 * Gets or creates a page editor for the given project ID and page ID.
-	 */
-	get_page_editor(
-		project_id = this.current_project_id,
-		page_id = this.current_page_id,
-	): Page_Editor {
-		const key = `${project_id}_${page_id}`;
-		let editor = this.#page_editors.get(key);
-		if (!editor) {
-			this.#page_editors.set(key, (editor = new Page_Editor(project_id, page_id, this)));
-		}
-		return editor;
-	}
-
-	/**
-	 * Gets or creates a domains controller for the given project ID and domain ID.
-	 */
-	get_domains_controller(
-		project_id = this.current_project_id,
-		domain_id = this.current_domain_id,
-	): Domains_Controller {
-		const key = `${project_id}_${domain_id || 'new'}`;
-		let controller = this.#domains_controllers.get(key);
-		if (!controller) {
-			this.#domains_controllers.set(
-				key,
-				(controller = new Domains_Controller(project_id, domain_id, this)),
-			);
-		}
-		return controller;
 	}
 
 	/**

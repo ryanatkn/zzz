@@ -5,7 +5,9 @@
 	import Domains_Sidebar from '../../Domains_Sidebar.svelte';
 
 	const projects = projects_context.get();
-	const controller = projects.get_project_controller();
+
+	// Use the reactive current_project_controller instead of get_project_controller
+	const controller = $derived(projects.current_project_controller);
 </script>
 
 <div class="project_layout">
@@ -14,7 +16,7 @@
 	<Domains_Sidebar />
 
 	<div class="project_content">
-		{#if controller.project}
+		{#if controller?.project}
 			<div class="p_lg">
 				<h1 class="mb_lg">Domains</h1>
 
@@ -34,6 +36,8 @@
 								<th>domain name</th>
 								<th>status</th>
 								<th>SSL</th>
+								<th>created</th>
+								<th>updated</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -73,7 +77,6 @@
 		{:else}
 			<div class="p_lg text_align_center">
 				<p>Project not found.</p>
-				<a href="/sites">Back to Sites</a>
 			</div>
 		{/if}
 	</div>

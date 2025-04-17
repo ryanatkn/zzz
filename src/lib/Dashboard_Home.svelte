@@ -80,18 +80,4 @@
 		max-width: var(--width_md);
 		width: 100%;
 	}
-
-	.menu_item {
-		display: flex;
-		justify-content: space-between;
-		align-items: center;
-		width: 100%;
-		text-decoration: none;
-		color: inherit;
-		padding: var(--size_xs) 0;
-	}
-
-	.menu_item:hover {
-		background-color: var(--bg_1);
-	}
 </style>

@@ -2,9 +2,12 @@
 	import {projects_context} from '../../projects.svelte.js';
 	import Project_Sidebar from '../../Project_Sidebar.svelte';
 	import Section_Sidebar from '../../Section_Sidebar.svelte';
+	import {GLYPH_DELETE} from '$lib/glyphs.js';
 
 	const projects = projects_context.get();
-	const controller = projects.get_project_controller();
+
+	// Use the reactive current_project_controller instead of get_project_controller
+	const controller = $derived(projects.current_project_controller);
 </script>
 
 <div class="project_layout">
@@ -12,16 +15,16 @@
 	<Section_Sidebar section="settings" />
 
 	<div class="project_content">
-		{#if controller.project}
+		{#if controller?.project}
 			<div class="p_lg">
-				<h1>Settings</h1>
+				<h1>Project settings</h1>
 
 				<div class="panel p_md width_lg mt_md">
 					<h2 class="mt_0 mb_md">Project</h2>
 
 					<div class="mb_md">
 						<label>
-							Project Name
+							Project name
 							<input
 								type="text"
 								bind:value={controller.edited_name}
@@ -58,14 +61,13 @@
 					<p class="mb_md">These actions cannot be undone.</p>
 
 					<button type="button" class="color_c" onclick={() => controller.delete_current_project()}>
-						Delete Project
+						{GLYPH_DELETE} delete project
 					</button>
 				</div>
 			</div>
 		{:else}
 			<div class="p_lg text_align_center">
 				<p>Project not found.</p>
-				<a href="/sites">Back to Sites</a>
 			</div>
 		{/if}
 	</div>

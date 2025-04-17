@@ -4,46 +4,50 @@
 	import {slide} from 'svelte/transition';
 
 	const projects = projects_context.get();
-	const controller = projects.get_project_controller();
+
+	// Use the reactive current_project_controller instead of get_project_controller
+	const controller = $derived(projects.current_project_controller);
 </script>
 
 <aside class="h_100 overflow_y_auto unstyled width_xs p_xs">
-	<div class="flex">
-		<button
-			type="button"
-			class="plain justify_content_start flex_1"
-			onclick={() => controller.create_new_domain()}
-		>
-			+ new domain
-		</button>
-	</div>
+	{#if controller}
+		<div class="flex">
+			<button
+				type="button"
+				class="plain justify_content_start flex_1"
+				onclick={() => controller.create_new_domain()}
+			>
+				+ new domain
+			</button>
+		</div>
 
-	<nav>
-		<ul class="unstyled">
-			{#if controller.project}
-				{#each controller.project.domains as domain (domain.id)}
-					<li transition:slide>
-						<Nav_Link
-							href="/sites/{controller.project_id}/domains/{domain.id}"
-							selected={domain.id === projects.current_domain_id}
-							attrs={{title: domain.name}}
-						>
-							<div class="ellipsis domain_item">
-								<span
-									class="status_dot {domain.status === 'active'
-										? 'status_active'
-										: domain.status === 'pending'
-											? 'status_pending'
-											: 'status_inactive'}"
-								></span>
-								<span>{domain.name || '<Unnamed Domain>'}</span>
-							</div>
-						</Nav_Link>
-					</li>
-				{/each}
-			{/if}
-		</ul>
-	</nav>
+		<nav>
+			<ul class="unstyled">
+				{#if controller.project}
+					{#each controller.project.domains as domain (domain.id)}
+						<li transition:slide>
+							<Nav_Link
+								href="/sites/{controller.project_id}/domains/{domain.id}"
+								selected={domain.id === projects.current_domain_id}
+								attrs={{title: domain.name}}
+							>
+								<div class="ellipsis domain_item">
+									<span
+										class="status_dot {domain.status === 'active'
+											? 'status_active'
+											: domain.status === 'pending'
+												? 'status_pending'
+												: 'status_inactive'}"
+									></span>
+									<span>{domain.name || '<Unnamed Domain>'}</span>
+								</div>
+							</Nav_Link>
+						</li>
+					{/each}
+				{/if}
+			</ul>
+		</nav>
+	{/if}
 </aside>
 
 <style>

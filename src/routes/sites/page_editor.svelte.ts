@@ -83,13 +83,17 @@ export class Page_Editor {
 	/** Page content form field. */
 	content: string = $state('# New Page\n\nAdd your content here.');
 
+	/** Whether the form has been initialized. */
+	#initialized: boolean = $state(false);
+
 	/** Whether the form has unsaved changes. */
 	has_changes = $derived(
-		this.is_new_page ||
-			(this.current_page &&
-				(this.title !== this.current_page.title ||
-					this.path !== this.current_page.path ||
-					this.content !== this.current_page.content)),
+		this.#initialized &&
+			(this.is_new_page ||
+				(this.current_page &&
+					(this.title !== this.current_page.title ||
+						this.path !== this.current_page.path ||
+						this.content !== this.current_page.content))),
 	);
 
 	/** Whether this is a new page. */
@@ -121,7 +125,11 @@ export class Page_Editor {
 		projects?: Projects,
 	) {
 		this.projects = projects || projects_context.get();
-		this.init_form();
+
+		if ((this.project || this.is_new_page) && !this.#initialized) {
+			this.init_form();
+			this.#initialized = true;
+		}
 	}
 
 	/**
@@ -153,7 +161,7 @@ export class Page_Editor {
 
 		// Ensure path starts with /
 		const formatted_path = this.path.startsWith('/') ? this.path : `/${this.path}`;
-		const timestamp = new Date().toISOString();
+		const created = new Date().toISOString();
 
 		if (this.is_new_page) {
 			// Create new page
@@ -162,8 +170,8 @@ export class Page_Editor {
 				title: this.title,
 				path: formatted_path,
 				content: this.content,
-				created: timestamp,
-				updated: timestamp,
+				created,
+				updated: created,
 			};
 
 			this.projects.add_page(this.project_id, new_page);
@@ -175,7 +183,7 @@ export class Page_Editor {
 				title: this.title,
 				path: formatted_path,
 				content: this.content,
-				updated: timestamp,
+				updated: created,
 			});
 			void goto(`/sites/${this.project_id}/pages`);
 		}

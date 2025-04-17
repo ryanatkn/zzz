@@ -5,16 +5,20 @@
 	import Pages_Sidebar from '../../../Pages_Sidebar.svelte';
 
 	const projects = projects_context.get();
-	const editor = projects.get_page_editor();
+
+	// Use the reactive current_page_editor instead of get_page_editor
+	const editor = $derived(projects.current_page_editor);
 
 	// TODO refactor with proper state/API
 	/** Delete the current page and navigate back to pages list. */
 	const delete_page = () => {
-		if (!editor.project || !editor.current_page) return;
+		const controller = projects.current_project_controller;
+		if (!editor?.project || !editor.current_page || !controller) {
+			return;
+		}
 
 		// eslint-disable-next-line no-alert
 		if (confirm('Are you sure you want to delete this page? This action cannot be undone.')) {
-			const controller = projects.get_project_controller();
 			controller.delete_project_page(editor.page_id);
 
 			// Navigate back to pages list
@@ -29,7 +33,7 @@
 	<Pages_Sidebar />
 
 	<div class="editor_content">
-		{#if editor.project}
+		{#if editor?.project}
 			<div class="p_lg">
 				<div>
 					<div class="flex gap_sm align_items_center">
@@ -101,7 +105,6 @@
 		{:else}
 			<div class="p_lg text_align_center">
 				<p>Project not found.</p>
-				<a href="/sites">Back to Sites</a>
 			</div>
 		{/if}
 	</div>

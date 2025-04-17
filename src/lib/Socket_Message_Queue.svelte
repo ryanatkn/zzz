@@ -268,6 +268,7 @@
 								{/snippet}
 							</Popover_Button>
 
+							<!-- eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -->
 							{#if type === 'queued' || (type === 'failed' && socket.connected)}
 								<button
 									type="button"

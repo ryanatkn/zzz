@@ -8,6 +8,9 @@ export class Domains_Controller {
 	/** The project ID. */
 	readonly project_id: string;
 
+	/** The domain ID being edited. */
+	readonly domain_id: string;
+
 	/** Projects service instance. */
 	readonly projects: Projects;
 
@@ -20,12 +23,16 @@ export class Domains_Controller {
 	/** SSL enabled form field. */
 	ssl_enabled: boolean = $state(false);
 
+	/** Whether the form has been initialized. */
+	#initialized: boolean = $state(false);
+
 	/** Whether the form has unsaved changes. */
 	has_changes = $derived(
-		!this.domain ||
-			this.domain_name !== this.domain.name ||
-			this.domain_status !== this.domain.status ||
-			this.ssl_enabled !== this.domain.ssl,
+		this.#initialized &&
+			(!this.domain ||
+				this.domain_name !== this.domain.name ||
+				this.domain_status !== this.domain.status ||
+				this.ssl_enabled !== this.domain.ssl),
 	);
 
 	/** The current project. */
@@ -38,38 +45,38 @@ export class Domains_Controller {
 		return this.projects.current_domain;
 	}
 
-	/** The domain ID being edited. */
-	get domain_id(): string {
-		return this.projects.current_domain_id;
-	}
-
 	/**
 	 * Constructor for the domains controller.
+	 * Does not initialize form values in the constructor to avoid reactivity issues.
 	 */
 	constructor(project_id: string, domain_id?: string, projects?: Projects) {
 		this.project_id = project_id;
+		this.domain_id = domain_id || '';
 		this.projects = projects || projects_context.get();
 
-		// Initialize form values based on domain ID
-		if (domain_id && domain_id !== 'new') {
-			this.projects.set_current_domain(domain_id);
-			this.init_form();
-		} else {
-			// Default values for new domains
-			this.domain_name = '';
-			this.domain_status = 'pending';
-			this.ssl_enabled = false;
-		}
+		// Init occurs after construction in the first derived computation
+		$effect(() => {
+			if (this.project && !this.#initialized) {
+				this.init_form();
+				this.#initialized = true;
+			}
+		});
 	}
 
 	/**
-	 * Initialize form values from current domain.
+	 * Initialize form values from current domain or with defaults.
 	 */
 	init_form(): void {
 		if (this.domain) {
+			// Existing domain - use its values
 			this.domain_name = this.domain.name;
 			this.domain_status = this.domain.status;
 			this.ssl_enabled = this.domain.ssl;
+		} else {
+			// New domain - use default values
+			this.domain_name = '';
+			this.domain_status = 'pending';
+			this.ssl_enabled = false;
 		}
 	}
 
@@ -91,6 +98,7 @@ export class Domains_Controller {
 			name: this.domain_name,
 			status: this.domain_status,
 			ssl: this.ssl_enabled,
+			updated: new Date().toISOString(),
 		});
 
 		void goto(`/sites/${this.project_id}/domains`);
@@ -122,11 +130,14 @@ export class Domains_Controller {
 			return;
 		}
 
+		const created = new Date().toISOString();
 		const new_domain: Domain = {
 			id: 'dom_' + Date.now(),
 			name: this.domain_name,
 			status: this.domain_status,
 			ssl: this.ssl_enabled,
+			created,
+			updated: created,
 		};
 
 		this.projects.add_domain(this.project_id, new_domain);

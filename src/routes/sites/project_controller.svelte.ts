@@ -129,7 +129,7 @@ export class Project_Controller {
 	create_new_page(): void {
 		if (!this.project) return;
 
-		const timestamp = new Date().toISOString();
+		const created = new Date().toISOString();
 		const page_id = 'page_' + Date.now();
 
 		this.projects.add_page(this.project_id, {
@@ -137,8 +137,8 @@ export class Project_Controller {
 			title: 'New Page',
 			path: '/new-page',
 			content: '# New Page\n\nAdd your content here.',
-			created: timestamp,
-			updated: timestamp,
+			created,
+			updated: created,
 		});
 
 		void goto(`/sites/${this.project_id}/pages/${page_id}`);
@@ -151,12 +151,15 @@ export class Project_Controller {
 		if (!this.project) return;
 
 		const domain_id = 'dom_' + Date.now();
+		const created = new Date().toISOString();
 
 		this.projects.add_domain(this.project_id, {
 			id: domain_id,
 			name: '',
 			status: 'pending',
 			ssl: false,
+			created,
+			updated: created,
 		});
 
 		void goto(`/sites/${this.project_id}/domains/${domain_id}`);

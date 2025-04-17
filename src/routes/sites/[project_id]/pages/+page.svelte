@@ -5,7 +5,9 @@
 	import Pages_Sidebar from '../../Pages_Sidebar.svelte';
 
 	const projects = projects_context.get();
-	const controller = projects.get_project_controller();
+
+	// Use the reactive current_project_controller instead of get_project_controller
+	const controller = $derived(projects.current_project_controller);
 </script>
 
 <div class="project_layout">
@@ -14,7 +16,7 @@
 	<Pages_Sidebar />
 
 	<div class="project_content">
-		{#if controller.project}
+		{#if controller?.project}
 			<div class="p_lg">
 				<h1 class="mb_lg">Pages</h1>
 

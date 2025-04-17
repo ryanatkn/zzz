@@ -5,7 +5,9 @@
 	import Domains_Sidebar from '../../../Domains_Sidebar.svelte';
 
 	const projects = projects_context.get();
-	const domains_controller = projects.get_domains_controller();
+
+	// Use the reactive current_domains_controller instead of get_domains_controller
+	const domains_controller = $derived(projects.current_domains_controller);
 </script>
 
 <div class="domain_layout">
@@ -14,11 +16,11 @@
 	<Domains_Sidebar />
 
 	<div class="domain_content">
-		{#if domains_controller.project}
+		{#if domains_controller?.project}
 			<div class="p_lg">
 				<div>
 					<h1>{domains_controller.domain ? 'Edit Domain' : 'New Domain'}</h1>
-					<a href="/sites/{domains_controller.project_id}/domains">← Back to Domains</a>
+					<a href="/sites/{domains_controller.project_id}/domains">← back to domains</a>
 				</div>
 
 				<div class="panel p_md width_md">
@@ -81,6 +83,22 @@
 							<p class="text_color_5 mt_xs">Configure SSL certificate for this domain.</p>
 						</div>
 
+						{#if domains_controller.domain}
+							<div class="mb_md panel p_md bg_2">
+								<h3 class="mb_sm mt_0">Domain Information</h3>
+								<div class="flex gap_md">
+									<div>
+										<strong>Created:</strong>
+										<div>{new Date(domains_controller.domain.created).toLocaleString()}</div>
+									</div>
+									<div>
+										<strong>Last Updated:</strong>
+										<div>{new Date(domains_controller.domain.updated).toLocaleString()}</div>
+									</div>
+								</div>
+							</div>
+						{/if}
+
 						<div class="panel p_md bg_2 mb_lg">
 							<h3 class="mb_sm">DNS Configuration</h3>
 							<p class="mb_sm">Make sure your domain has these DNS records:</p>
@@ -138,7 +156,6 @@
 		{:else}
 			<div class="p_lg text_align_center">
 				<p>Project not found.</p>
-				<a href="/sites">Back to Sites</a>
 			</div>
 		{/if}
 	</div>
