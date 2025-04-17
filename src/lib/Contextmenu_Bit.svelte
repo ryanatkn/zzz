@@ -43,7 +43,7 @@
 				/>
 			{/if}
 
-			<Contextmenu_Entry_Toggle bind:enabled={bit.enabled} />
+			<Contextmenu_Entry_Toggle bind:enabled={bit.enabled} label="bit" />
 
 			<Contextmenu_Entry run={() => (show_editor = true)}>
 				{#snippet icon()}{GLYPH_EDIT}{/snippet}

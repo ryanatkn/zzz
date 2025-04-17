@@ -46,7 +46,7 @@
 				</Contextmenu_Entry>
 			{/if}
 
-			<Contextmenu_Entry_Toggle bind:enabled={tape.enabled} />
+			<Contextmenu_Entry_Toggle bind:enabled={tape.enabled} label="tape" />
 
 			<Contextmenu_Entry
 				run={() => {
