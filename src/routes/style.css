@@ -312,20 +312,25 @@ a.chip {
 }
 
 /* TODO this is a hack because .plain doesn't compose with .selectable and .deselectable in Moss */
-.plain.selectable.deselectable {
+.plain.selectable.deselectable:not(.menu_item) {
 	border: none;
 	color: var(--text_color);
 }
-.plain.selectable.deselectable.selected {
+.plain.selectable.deselectable:not(.menu_item).selected {
 	background-color: transparent;
 	box-shadow: var(--shadow_inset_top_xs)
 		color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_1)), transparent);
 }
-.plain.selectable.deselectable.selected:hover {
+.plain.selectable.deselectable:not(.menu_item).selected:hover {
 	box-shadow: var(--shadow_inset_top_sm)
 		color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_1)), transparent);
 }
-.plain.selectable.deselectable.selected:active {
+.plain.selectable.deselectable:not(.menu_item).selected:active {
 	box-shadow: var(--shadow_inset_bottom_xs)
 		color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_1)), transparent);
+}
+
+/* TODO upstream but maybe not exactly like this, fixes the contextmenu active state */
+.plain.selectable.deselectable.menu_item.selected:active {
+	background-color: var(--fg_3);
 }
