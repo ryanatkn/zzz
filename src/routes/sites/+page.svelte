@@ -23,6 +23,12 @@
 			to make managing websites routine and easy, because owning your web presence should be a
 			cinch.
 		</p>
+		<p>
+			Zzz doesn't try to be everything to everybody. That's what open standardized protocols are
+			for! The goal here is to provide a streamlined and extensible UX that includes CMS and IDE
+			features while leveraging the rest of Zzz. Because it's the web, anything you make in Zzz can
+			be used by other browsers and tools, and vice versa, like magic.
+		</p>
 		<p>More <a href="{base}/about">about</a> Zzz.</p>
 	</section>
 </div>
