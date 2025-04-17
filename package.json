@@ -338,15 +338,20 @@
       "svelte": "./dist/Contextmenu_Chat.svelte",
       "default": "./dist/Contextmenu_Chat.svelte"
     },
-    "./Contextmenu_Copy_To_Clipboard.svelte": {
-      "types": "./dist/Contextmenu_Copy_To_Clipboard.svelte.d.ts",
-      "svelte": "./dist/Contextmenu_Copy_To_Clipboard.svelte",
-      "default": "./dist/Contextmenu_Copy_To_Clipboard.svelte"
-    },
     "./Contextmenu_Diskfile.svelte": {
       "types": "./dist/Contextmenu_Diskfile.svelte.d.ts",
       "svelte": "./dist/Contextmenu_Diskfile.svelte",
       "default": "./dist/Contextmenu_Diskfile.svelte"
+    },
+    "./Contextmenu_Entry_Copy_To_Clipboard.svelte": {
+      "types": "./dist/Contextmenu_Entry_Copy_To_Clipboard.svelte.d.ts",
+      "svelte": "./dist/Contextmenu_Entry_Copy_To_Clipboard.svelte",
+      "default": "./dist/Contextmenu_Entry_Copy_To_Clipboard.svelte"
+    },
+    "./Contextmenu_Entry_Toggle.svelte": {
+      "types": "./dist/Contextmenu_Entry_Toggle.svelte.d.ts",
+      "svelte": "./dist/Contextmenu_Entry_Toggle.svelte",
+      "default": "./dist/Contextmenu_Entry_Toggle.svelte"
     },
     "./Contextmenu_Prompt.svelte": {
       "types": "./dist/Contextmenu_Prompt.svelte.d.ts",
@@ -362,11 +367,6 @@
       "types": "./dist/Contextmenu_Tape.svelte.d.ts",
       "svelte": "./dist/Contextmenu_Tape.svelte",
       "default": "./dist/Contextmenu_Tape.svelte"
-    },
-    "./Contextmenu_Toggle.svelte": {
-      "types": "./dist/Contextmenu_Toggle.svelte.d.ts",
-      "svelte": "./dist/Contextmenu_Toggle.svelte",
-      "default": "./dist/Contextmenu_Toggle.svelte"
     },
     "./Dashboard_Capabilities.svelte": {
       "types": "./dist/Dashboard_Capabilities.svelte.d.ts",
@@ -761,10 +761,20 @@
       "types": "./dist/sortable.svelte.d.ts",
       "default": "./dist/sortable.svelte.js"
     },
-    "./Strip_Item.svelte": {
-      "types": "./dist/Strip_Item.svelte.d.ts",
-      "svelte": "./dist/Strip_Item.svelte",
-      "default": "./dist/Strip_Item.svelte"
+    "./Strip_List.svelte": {
+      "types": "./dist/Strip_List.svelte.d.ts",
+      "svelte": "./dist/Strip_List.svelte",
+      "default": "./dist/Strip_List.svelte"
+    },
+    "./Strip_Listitem.svelte": {
+      "types": "./dist/Strip_Listitem.svelte.d.ts",
+      "svelte": "./dist/Strip_Listitem.svelte",
+      "default": "./dist/Strip_Listitem.svelte"
+    },
+    "./Strip_View.svelte": {
+      "types": "./dist/Strip_View.svelte.d.ts",
+      "svelte": "./dist/Strip_View.svelte",
+      "default": "./dist/Strip_View.svelte"
     },
     "./strip.svelte.js": {
       "types": "./dist/strip.svelte.d.ts",

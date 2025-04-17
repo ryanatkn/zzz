@@ -1,4 +1,6 @@
 <script lang="ts">
+	import type {Omit_Strict} from '@ryanatkn/belt/types.js';
+
 	import type {Xml_Attribute} from '$lib/xml.js';
 	import {GLYPH_REMOVE} from '$lib/glyphs.js';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
@@ -6,7 +8,7 @@
 	interface Props {
 		attribute: Xml_Attribute;
 		dormant?: boolean | undefined;
-		onupdate: (updates: Partial<Omit<Xml_Attribute, 'id'>>) => void;
+		onupdate: (updates: Partial<Omit_Strict<Xml_Attribute, 'id'>>) => void;
 		onremove: () => void;
 	}
 

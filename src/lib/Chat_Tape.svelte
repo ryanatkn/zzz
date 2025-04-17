@@ -1,13 +1,11 @@
 <script lang="ts">
-	import {slide} from 'svelte/transition';
 	import Pending_Button from '@ryanatkn/fuz/Pending_Button.svelte';
 	import {encode as tokenize} from 'gpt-tokenizer';
 
 	import type {Tape} from '$lib/tape.svelte.js';
-	import Strip_Item from '$lib/Strip_Item.svelte';
 	import Model_Link from '$lib/Model_Link.svelte';
+	import Strip_List from '$lib/Strip_List.svelte';
 	import Provider_Link from '$lib/Provider_Link.svelte';
-	import {Scrollable} from '$lib/scrollable.svelte.js';
 	import Contextmenu_Tape from '$lib/Contextmenu_Tape.svelte';
 	import Content_Editor from '$lib/Content_Editor.svelte';
 	import {GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
@@ -43,14 +41,8 @@
 		pending = false;
 	};
 
-	const scrollable = new Scrollable();
-
 	const strips = $derived(Array.from(tape.strips.by_id.values()));
 	const strip_count = $derived(strips.length);
-
-	// TODO BLOCK extract List and rename Item to Listitem
-
-	// TODO BLOCK edit individual items in the list (contextmenu too - show contextmenu target outline)
 
 	// TODO BLOCK the link should instead be a model picker (dialog? or overlaid without a bg maybe?)
 </script>
@@ -83,20 +75,7 @@
 		</div>
 
 		{#if strip_count}
-			<div
-				{...strips_attrs}
-				class="strips flex_1 radius_xs2 {strips_attrs?.class}"
-				use:scrollable.container
-				use:scrollable.target
-			>
-				<ul class="unstyled">
-					{#each strips as strip (strip.id)}
-						<li transition:slide>
-							<Strip_Item {strip} />
-						</li>
-					{/each}
-				</ul>
-			</div>
+			<Strip_List {tape} attrs={strips_attrs} />
 		{/if}
 
 		<div>
@@ -132,12 +111,5 @@
 
 	.chat_tape.empty {
 		justify-content: center;
-	}
-
-	.strips {
-		display: flex;
-		flex-direction: column-reverse; /* makes scrolling start at the bottom */
-		overflow: auto;
-		scrollbar-width: thin;
 	}
 </style>

@@ -10,8 +10,6 @@
 	}
 
 	const {strip}: Props = $props();
-
-	// TODO BLOCK contextmenu options e.g. edit strip, maybe including a way to get the bit in a dialog?
 </script>
 
 <Contextmenu_Strip {strip}>

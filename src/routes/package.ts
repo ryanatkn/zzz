@@ -279,15 +279,20 @@ export const package_json = {
 			svelte: './dist/Contextmenu_Chat.svelte',
 			default: './dist/Contextmenu_Chat.svelte',
 		},
-		'./Contextmenu_Copy_To_Clipboard.svelte': {
-			types: './dist/Contextmenu_Copy_To_Clipboard.svelte.d.ts',
-			svelte: './dist/Contextmenu_Copy_To_Clipboard.svelte',
-			default: './dist/Contextmenu_Copy_To_Clipboard.svelte',
-		},
 		'./Contextmenu_Diskfile.svelte': {
 			types: './dist/Contextmenu_Diskfile.svelte.d.ts',
 			svelte: './dist/Contextmenu_Diskfile.svelte',
 			default: './dist/Contextmenu_Diskfile.svelte',
+		},
+		'./Contextmenu_Entry_Copy_To_Clipboard.svelte': {
+			types: './dist/Contextmenu_Entry_Copy_To_Clipboard.svelte.d.ts',
+			svelte: './dist/Contextmenu_Entry_Copy_To_Clipboard.svelte',
+			default: './dist/Contextmenu_Entry_Copy_To_Clipboard.svelte',
+		},
+		'./Contextmenu_Entry_Toggle.svelte': {
+			types: './dist/Contextmenu_Entry_Toggle.svelte.d.ts',
+			svelte: './dist/Contextmenu_Entry_Toggle.svelte',
+			default: './dist/Contextmenu_Entry_Toggle.svelte',
 		},
 		'./Contextmenu_Prompt.svelte': {
 			types: './dist/Contextmenu_Prompt.svelte.d.ts',
@@ -303,11 +308,6 @@ export const package_json = {
 			types: './dist/Contextmenu_Tape.svelte.d.ts',
 			svelte: './dist/Contextmenu_Tape.svelte',
 			default: './dist/Contextmenu_Tape.svelte',
-		},
-		'./Contextmenu_Toggle.svelte': {
-			types: './dist/Contextmenu_Toggle.svelte.d.ts',
-			svelte: './dist/Contextmenu_Toggle.svelte',
-			default: './dist/Contextmenu_Toggle.svelte',
 		},
 		'./Dashboard_Capabilities.svelte': {
 			types: './dist/Dashboard_Capabilities.svelte.d.ts',
@@ -668,10 +668,20 @@ export const package_json = {
 			types: './dist/sortable.svelte.d.ts',
 			default: './dist/sortable.svelte.js',
 		},
-		'./Strip_Item.svelte': {
-			types: './dist/Strip_Item.svelte.d.ts',
-			svelte: './dist/Strip_Item.svelte',
-			default: './dist/Strip_Item.svelte',
+		'./Strip_List.svelte': {
+			types: './dist/Strip_List.svelte.d.ts',
+			svelte: './dist/Strip_List.svelte',
+			default: './dist/Strip_List.svelte',
+		},
+		'./Strip_Listitem.svelte': {
+			types: './dist/Strip_Listitem.svelte.d.ts',
+			svelte: './dist/Strip_Listitem.svelte',
+			default: './dist/Strip_Listitem.svelte',
+		},
+		'./Strip_View.svelte': {
+			types: './dist/Strip_View.svelte.d.ts',
+			svelte: './dist/Strip_View.svelte',
+			default: './dist/Strip_View.svelte',
 		},
 		'./strip.svelte.js': {types: './dist/strip.svelte.d.ts', default: './dist/strip.svelte.js'},
 		'./tape_helpers.js': {types: './dist/tape_helpers.d.ts', default: './dist/tape_helpers.js'},
@@ -990,15 +1000,18 @@ export const src_json = {
 		'./Content_Stats.svelte': {path: 'Content_Stats.svelte', declarations: []},
 		'./Contextmenu_Bit.svelte': {path: 'Contextmenu_Bit.svelte', declarations: []},
 		'./Contextmenu_Chat.svelte': {path: 'Contextmenu_Chat.svelte', declarations: []},
-		'./Contextmenu_Copy_To_Clipboard.svelte': {
-			path: 'Contextmenu_Copy_To_Clipboard.svelte',
+		'./Contextmenu_Diskfile.svelte': {path: 'Contextmenu_Diskfile.svelte', declarations: []},
+		'./Contextmenu_Entry_Copy_To_Clipboard.svelte': {
+			path: 'Contextmenu_Entry_Copy_To_Clipboard.svelte',
 			declarations: [],
 		},
-		'./Contextmenu_Diskfile.svelte': {path: 'Contextmenu_Diskfile.svelte', declarations: []},
+		'./Contextmenu_Entry_Toggle.svelte': {
+			path: 'Contextmenu_Entry_Toggle.svelte',
+			declarations: [],
+		},
 		'./Contextmenu_Prompt.svelte': {path: 'Contextmenu_Prompt.svelte', declarations: []},
 		'./Contextmenu_Strip.svelte': {path: 'Contextmenu_Strip.svelte', declarations: []},
 		'./Contextmenu_Tape.svelte': {path: 'Contextmenu_Tape.svelte', declarations: []},
-		'./Contextmenu_Toggle.svelte': {path: 'Contextmenu_Toggle.svelte', declarations: []},
 		'./Dashboard_Capabilities.svelte': {path: 'Dashboard_Capabilities.svelte', declarations: []},
 		'./Dashboard_Chats.svelte': {path: 'Dashboard_Chats.svelte', declarations: []},
 		'./Dashboard_Diskfiles.svelte': {path: 'Dashboard_Diskfiles.svelte', declarations: []},
@@ -1453,7 +1466,9 @@ export const src_json = {
 				{name: 'sort_by_numeric', kind: 'function'},
 			],
 		},
-		'./Strip_Item.svelte': {path: 'Strip_Item.svelte', declarations: []},
+		'./Strip_List.svelte': {path: 'Strip_List.svelte', declarations: []},
+		'./Strip_Listitem.svelte': {path: 'Strip_Listitem.svelte', declarations: []},
+		'./Strip_View.svelte': {path: 'Strip_View.svelte', declarations: []},
 		'./strip.svelte.js': {
 			path: 'strip.svelte.ts',
 			declarations: [
@@ -1463,8 +1478,8 @@ export const src_json = {
 				{name: 'Strip_Schema', kind: 'variable'},
 				{name: 'Strip_Options', kind: 'type'},
 				{name: 'Strip', kind: 'class'},
-				{name: 'create_strip', kind: 'function'},
 				{name: 'create_strip_from_bit', kind: 'function'},
+				{name: 'create_strip_from_text', kind: 'function'},
 			],
 		},
 		'./tape_helpers.js': {

@@ -8,8 +8,8 @@
 	import type {Tape} from '$lib/tape.svelte.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import {GLYPH_DELETE, GLYPH_REMOVE, GLYPH_TAPE} from '$lib/glyphs.js';
-	import Contextmenu_Toggle from '$lib/Contextmenu_Toggle.svelte';
-	import Contextmenu_Copy_To_Clipboard from '$lib/Contextmenu_Copy_To_Clipboard.svelte';
+	import Contextmenu_Entry_Toggle from '$lib/Contextmenu_Entry_Toggle.svelte';
+	import Contextmenu_Entry_Copy_To_Clipboard from '$lib/Contextmenu_Entry_Copy_To_Clipboard.svelte';
 
 	interface Props extends Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> {
 		tape: Tape;
@@ -28,7 +28,7 @@
 		tape
 		{#snippet menu()}
 			{#if tape.content}
-				<Contextmenu_Copy_To_Clipboard
+				<Contextmenu_Entry_Copy_To_Clipboard
 					content={tape.content}
 					label="copy conversation"
 					preview={tape.content_preview}
@@ -46,7 +46,7 @@
 				</Contextmenu_Entry>
 			{/if}
 
-			<Contextmenu_Toggle bind:enabled={tape.enabled} />
+			<Contextmenu_Entry_Toggle bind:enabled={tape.enabled} />
 
 			<Contextmenu_Entry
 				run={() => {

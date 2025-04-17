@@ -1,7 +1,7 @@
 import {create_context} from '@ryanatkn/fuz/context_helpers.js';
 import {SvelteMap} from 'svelte/reactivity';
 import {create_deferred, type Deferred} from '@ryanatkn/belt/async.js';
-import type {Assignable, Class_Constructor} from '@ryanatkn/belt/types.js';
+import type {Assignable, Class_Constructor, Omit_Strict} from '@ryanatkn/belt/types.js';
 import {z} from 'zod';
 import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
 import {strip_end, strip_start} from '@ryanatkn/belt/string.js';
@@ -50,7 +50,7 @@ export type Zzz_Json = z.infer<typeof Zzz_Json>;
 export type Zzz_Json_Input = z.input<typeof Zzz_Json>;
 
 // Special options type for Zzz to handle circular reference
-export interface Zzz_Options extends Omit<Cell_Options<typeof Zzz_Json>, 'zzz'> {
+export interface Zzz_Options extends Omit_Strict<Cell_Options<typeof Zzz_Json>, 'zzz'> {
 	zzz?: Zzz; // Make zzz optional for Zzz initialization
 	onsend?: (message: Action_Client) => void;
 	onreceive?: (message: Action_Server) => void;

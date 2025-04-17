@@ -1,7 +1,12 @@
 import {encode as tokenize} from 'gpt-tokenizer';
 
 import {type Model} from '$lib/model.svelte.js';
-import {Strip, Strip_Role, create_strip, create_strip_from_bit} from '$lib/strip.svelte.js';
+import {
+	Strip,
+	Strip_Role,
+	create_strip_from_text,
+	create_strip_from_bit,
+} from '$lib/strip.svelte.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Tape_Json} from '$lib/tape_types.js';
 import {render_tape} from '$lib/tape_helpers.js';
@@ -27,11 +32,11 @@ export class Tape extends Cell<typeof Tape_Json> {
 		return model;
 	});
 
-	strips: Indexed_Collection<Strip> = new Indexed_Collection();
+	readonly strips: Indexed_Collection<Strip> = new Indexed_Collection();
 
 	enabled: boolean = $state()!;
 
-	readonly content: string = $derived(render_tape([...this.strips.by_id.values()]));
+	readonly content: string = $derived(render_tape(this.strips.by_id.values()));
 	readonly length: number = $derived(this.content.length);
 	readonly tokens: Array<number> = $derived(tokenize(this.content));
 	readonly token_count: number = $derived(this.tokens.length);
@@ -67,7 +72,7 @@ export class Tape extends Cell<typeof Tape_Json> {
 	 * Create and add a user strip with the given content.
 	 */
 	add_user_strip(content: string, request?: Completion_Request): Strip {
-		const strip = create_strip(content, 'user', {tape_id: this.id, request}, this.zzz);
+		const strip = create_strip_from_text(content, 'user', {tape_id: this.id, request}, this.zzz);
 		this.add_strip(strip);
 		return strip;
 	}
@@ -76,7 +81,12 @@ export class Tape extends Cell<typeof Tape_Json> {
 	 * Create and add an assistant strip with the given content.
 	 */
 	add_assistant_strip(content: string, response?: Completion_Response): Strip {
-		const strip = create_strip(content, 'assistant', {tape_id: this.id, response}, this.zzz);
+		const strip = create_strip_from_text(
+			content,
+			'assistant',
+			{tape_id: this.id, response},
+			this.zzz,
+		);
 		this.add_strip(strip);
 		return strip;
 	}
@@ -85,7 +95,7 @@ export class Tape extends Cell<typeof Tape_Json> {
 	 * Create and add a system strip with the given content.
 	 */
 	add_system_strip(content: string): Strip {
-		const strip = create_strip(content, 'system', {tape_id: this.id}, this.zzz);
+		const strip = create_strip_from_text(content, 'system', {tape_id: this.id}, this.zzz);
 		this.add_strip(strip);
 		return strip;
 	}

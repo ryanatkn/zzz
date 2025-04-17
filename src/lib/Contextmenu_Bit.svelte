@@ -10,10 +10,10 @@
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import {GLYPH_BIT, GLYPH_DELETE, GLYPH_EDIT} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
-	import Contextmenu_Copy_To_Clipboard from '$lib/Contextmenu_Copy_To_Clipboard.svelte';
+	import Contextmenu_Entry_Copy_To_Clipboard from '$lib/Contextmenu_Entry_Copy_To_Clipboard.svelte';
 	import Bit_View from '$lib/Bit_View.svelte';
 	import {get_bit_type_glyph} from '$lib/bit_helpers.js';
-	import Contextmenu_Toggle from '$lib/Contextmenu_Toggle.svelte';
+	import Contextmenu_Entry_Toggle from '$lib/Contextmenu_Entry_Toggle.svelte';
 
 	interface Props extends Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> {
 		bit: Bit_Type;
@@ -36,14 +36,14 @@
 		{#snippet menu()}
 			<!-- TODO @many maybe a copy submenu on this item with copy id, name, etc, leverage generic cells -->
 			{#if bit.content !== null && bit.content !== undefined}
-				<Contextmenu_Copy_To_Clipboard
+				<Contextmenu_Entry_Copy_To_Clipboard
 					content={bit.content}
 					label="copy content"
 					preview={bit.content_preview ?? undefined}
 				/>
 			{/if}
 
-			<Contextmenu_Toggle bind:enabled={bit.enabled} />
+			<Contextmenu_Entry_Toggle bind:enabled={bit.enabled} />
 
 			<Contextmenu_Entry run={() => (show_editor = true)}>
 				{#snippet icon()}{GLYPH_EDIT}{/snippet}

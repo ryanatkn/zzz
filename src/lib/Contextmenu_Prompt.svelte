@@ -16,7 +16,7 @@
 		GLYPH_PROMPT,
 		GLYPH_REMOVE,
 	} from '$lib/glyphs.js';
-	import Contextmenu_Copy_To_Clipboard from '$lib/Contextmenu_Copy_To_Clipboard.svelte';
+	import Contextmenu_Entry_Copy_To_Clipboard from '$lib/Contextmenu_Entry_Copy_To_Clipboard.svelte';
 	import Diskfile_Picker from '$lib/Diskfile_Picker.svelte';
 
 	interface Props extends Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> {
@@ -38,7 +38,7 @@
 		prompt
 		{#snippet menu()}
 			<!-- TODO @many maybe a copy submenu on this item with copy id, name, etc, leverage generic cells -->
-			<Contextmenu_Copy_To_Clipboard
+			<Contextmenu_Entry_Copy_To_Clipboard
 				content={prompt.content}
 				label="copy content"
 				preview={prompt.content_preview}

@@ -7,7 +7,7 @@
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import {GLYPH_DELETE} from '$lib/glyphs.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
-	import Contextmenu_Copy_To_Clipboard from '$lib/Contextmenu_Copy_To_Clipboard.svelte';
+	import Contextmenu_Entry_Copy_To_Clipboard from '$lib/Contextmenu_Entry_Copy_To_Clipboard.svelte';
 
 	interface Props extends Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> {
 		diskfile: Diskfile;
@@ -23,7 +23,7 @@
 {#snippet entries()}
 	<!-- TODO maybe show disabled versions? changing what appears isn't great -->
 	{#if diskfile.content}
-		<Contextmenu_Copy_To_Clipboard
+		<Contextmenu_Entry_Copy_To_Clipboard
 			content={diskfile.content}
 			label="copy file content"
 			preview={diskfile.content_preview}
@@ -31,7 +31,7 @@
 	{/if}
 
 	{#if diskfile.path_relative}
-		<Contextmenu_Copy_To_Clipboard content={diskfile.path_relative} label="copy file path" />
+		<Contextmenu_Entry_Copy_To_Clipboard content={diskfile.path_relative} label="copy file path" />
 	{/if}
 
 	<Contextmenu_Entry

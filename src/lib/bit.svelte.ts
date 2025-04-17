@@ -3,6 +3,7 @@ import {z} from 'zod';
 import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
 import {DEV} from 'esm-env';
 import {Unreachable_Error} from '@ryanatkn/belt/error.js';
+import type {Omit_Strict} from '@ryanatkn/belt/types.js';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Uuid} from '$lib/zod_helpers.js';
@@ -124,7 +125,7 @@ export abstract class Bit<T extends z.ZodType = typeof Bit_Json_Base> extends Ce
 	/**
 	 * @returns `true` if the attribute was updated, `false` if the attribute was not found
 	 */
-	update_attribute(id: Uuid, updates: Partial<Omit<Xml_Attribute, 'id'>>): boolean {
+	update_attribute(id: Uuid, updates: Partial<Omit_Strict<Xml_Attribute, 'id'>>): boolean {
 		// Find the attribute by id
 		const index = this.attributes.findIndex((a) => a.id === id);
 		if (index === -1) return false;

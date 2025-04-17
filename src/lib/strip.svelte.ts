@@ -1,9 +1,9 @@
 import {z} from 'zod';
 import {encode as tokenize} from 'gpt-tokenizer';
-import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
+import type {Omit_Strict} from '@ryanatkn/belt/types.js';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {create_uuid, get_datetime_now, Uuid, Uuid_With_Default} from '$lib/zod_helpers.js';
+import {Uuid, Uuid_With_Default} from '$lib/zod_helpers.js';
 import {Completion_Request, Completion_Response} from '$lib/action_types.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import type {Bit_Type} from '$lib/bit.svelte.js';
@@ -35,13 +35,19 @@ export class Strip extends Cell<typeof Strip_Json> {
 	// Get the referenced bit - handle case where bit might not exist in registry
 	readonly bit: Bit_Type | null = $derived(this.zzz.bits.items.by_id.get(this.bit_id) ?? null);
 
-	// TODO BLOCK bit.enabled isn't excluding this from the tape
+	get enabled(): boolean {
+		return this.bit?.enabled ?? false;
+	}
+	set enabled(value: boolean) {
+		if (this.bit) {
+			this.bit.enabled = value;
+		}
+	}
 
 	// Content always returns a string, normalizing null/undefined to empty string
 	get content(): string {
 		return this.bit?.content ?? '';
 	}
-
 	// Set content updates the bit's content if not null/undefined
 	set content(value: string | null | undefined) {
 		if (value != null && this.bit) {
@@ -80,13 +86,31 @@ export class Strip extends Cell<typeof Strip_Json> {
 }
 
 /**
+ * Create a strip that references an existing bit for its content
+ */
+export const create_strip_from_bit = (
+	bit: Bit_Type,
+	role: Strip_Role,
+	json: Partial<Omit_Strict<Strip_Json, 'role' | 'bit_id'>>,
+): Strip => {
+	return new Strip({
+		zzz: bit.zzz,
+		json: {
+			...json,
+			role,
+			bit_id: bit.id,
+		},
+	});
+};
+
+/**
  * Create a strip with the provided content and role.
  * This creates a new bit to store the content.
  */
-export const create_strip = (
+export const create_strip_from_text = (
 	content: string,
 	role: Strip_Role,
-	options: Partial<Omit<Strip_Json, 'content' | 'role' | 'bit_id'>> = EMPTY_OBJECT,
+	json: Partial<Omit_Strict<Strip_Json, 'role' | 'bit_id'>>,
 	zzz: Zzz,
 ): Strip => {
 	const bit = zzz.bits.add({type: 'text', content});
@@ -94,35 +118,9 @@ export const create_strip = (
 	return new Strip({
 		zzz,
 		json: {
+			...json,
 			role,
 			bit_id: bit.id,
-			id: options.id || create_uuid(),
-			created: options.created || get_datetime_now(),
-			tape_id: options.tape_id,
-			request: options.request,
-			response: options.response,
-		},
-	});
-};
-
-/**
- * Create a strip that references an existing bit for its content
- */
-export const create_strip_from_bit = (
-	bit: Bit_Type,
-	role: Strip_Role,
-	options: Partial<Omit<Strip_Json, 'content' | 'role' | 'bit_id'>> = EMPTY_OBJECT,
-): Strip => {
-	return new Strip({
-		zzz: bit.zzz,
-		json: {
-			role,
-			bit_id: bit.id,
-			id: options.id || create_uuid(),
-			created: options.created || get_datetime_now(),
-			tape_id: options.tape_id,
-			request: options.request,
-			response: options.response,
 		},
 	});
 };

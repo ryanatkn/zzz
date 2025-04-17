@@ -8,7 +8,7 @@
 
 	import type {Strip} from '$lib/strip.svelte.js';
 	import {GLYPH_EDIT, GLYPH_STRIP} from '$lib/glyphs.js';
-	import Contextmenu_Copy_To_Clipboard from '$lib/Contextmenu_Copy_To_Clipboard.svelte';
+	import Contextmenu_Entry_Copy_To_Clipboard from '$lib/Contextmenu_Entry_Copy_To_Clipboard.svelte';
 	import Strip_View from '$lib/Strip_View.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 
@@ -29,7 +29,7 @@
 		strip
 		{#snippet menu()}
 			{#if strip.content}
-				<Contextmenu_Copy_To_Clipboard
+				<Contextmenu_Entry_Copy_To_Clipboard
 					content={strip.content}
 					label="copy content"
 					preview={strip.content}
@@ -42,7 +42,7 @@
 			</Contextmenu_Entry>
 
 			{#if strip.request}
-				<Contextmenu_Copy_To_Clipboard
+				<Contextmenu_Entry_Copy_To_Clipboard
 					content={() => JSON.stringify(strip.request, null, 2)}
 					label="copy request data"
 					preview=""
@@ -50,7 +50,7 @@
 			{/if}
 
 			{#if strip.response}
-				<Contextmenu_Copy_To_Clipboard
+				<Contextmenu_Entry_Copy_To_Clipboard
 					content={() => JSON.stringify(strip.response, null, 2)}
 					label="copy response data"
 					preview=""

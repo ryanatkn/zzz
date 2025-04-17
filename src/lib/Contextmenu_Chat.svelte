@@ -15,7 +15,7 @@
 		GLYPH_REMOVE,
 		GLYPH_VIEW,
 	} from '$lib/glyphs.js';
-	import Contextmenu_Copy_To_Clipboard from '$lib/Contextmenu_Copy_To_Clipboard.svelte';
+	import Contextmenu_Entry_Copy_To_Clipboard from '$lib/Contextmenu_Entry_Copy_To_Clipboard.svelte';
 
 	interface Props extends Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> {
 		chat: Chat;
@@ -36,8 +36,8 @@
 		chat
 		{#snippet menu()}
 			<!-- TODO @many maybe a copy submenu on this item with copy id, name, etc, leverage generic cells -->
-			<Contextmenu_Copy_To_Clipboard content={chat.name} label="copy name" />
-			<Contextmenu_Copy_To_Clipboard content={chat.id} label="copy id" />
+			<Contextmenu_Entry_Copy_To_Clipboard content={chat.name} label="copy name" />
+			<Contextmenu_Entry_Copy_To_Clipboard content={chat.id} label="copy id" />
 
 			{#if chat.tapes.length}
 				<Contextmenu_Entry run={() => chat.remove_all_tapes()}>
@@ -58,7 +58,7 @@
 			{/if}
 
 			{#if chat.main_input}
-				<Contextmenu_Copy_To_Clipboard
+				<Contextmenu_Entry_Copy_To_Clipboard
 					content={chat.main_input}
 					label="copy input"
 					preview_limit={30}
