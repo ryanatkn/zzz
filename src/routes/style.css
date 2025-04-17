@@ -278,6 +278,7 @@ a.chip {
 	height: var(--input_height);
 }
 
+/* TODO remove after switching to svg icons */
 .icon_button {
 	font-weight: 400;
 }

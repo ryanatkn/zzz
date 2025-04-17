@@ -79,7 +79,7 @@
 						zzz.prompts.add().add_bit(Bit.create(zzz, {type: 'text'}));
 					}}
 				>
-					{GLYPH_ADD} new prompt
+					<Glyph icon={GLYPH_ADD} /> new prompt
 				</button>
 				{#if zzz.prompts.items.size > 1}
 					<button

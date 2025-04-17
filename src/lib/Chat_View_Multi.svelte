@@ -10,6 +10,7 @@
 	import Content_Editor from '$lib/Content_Editor.svelte';
 	import Chat_Tape_Add_By_Model from '$lib/Chat_Tape_Add_By_Model.svelte';
 	import Model_Picker_Dialog from '$lib/Model_Picker_Dialog.svelte';
+	import Glyph from '$lib/Glyph.svelte';
 
 	interface Props {
 		chat: Chat;
@@ -62,7 +63,7 @@
 
 		<div class="flex mt_lg">
 			<button type="button" class="plain" onclick={() => (show_model_picker = true)}>
-				{GLYPH_ADD} add tape
+				<Glyph icon={GLYPH_ADD} /> add tape
 			</button>
 			<Confirm_Button
 				onconfirm={() => chat.remove_all_tapes()}

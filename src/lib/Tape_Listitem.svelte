@@ -37,7 +37,10 @@
 				<Tape_Toggle_Button {tape} />
 				<Confirm_Button
 					onconfirm={() => chat.remove_tape(tape.id)}
-					attrs={{class: 'icon_button plain', title: 'delete tape'}}
+					attrs={{
+						class: 'icon_button plain',
+						title: 'delete tape',
+					}}
 				>
 					{GLYPH_REMOVE}
 				</Confirm_Button>

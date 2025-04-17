@@ -7,6 +7,7 @@
 	import type {Sequence_Bit} from '$lib/bit.svelte.js';
 	import {GLYPH_BIT} from '$lib/glyphs.js';
 	import Bit_Picker from '$lib/Bit_Picker.svelte';
+	import Glyph from '$lib/Glyph.svelte';
 
 	interface Props {
 		sequence_bit: Sequence_Bit;
@@ -36,7 +37,7 @@
 <div class="row justify_content_space_between mb_xs">
 	<div class="flex gap_xs">
 		<button type="button" class="plain compact" onclick={() => (show_bit_picker = true)}>
-			{GLYPH_BIT} add bit
+			<Glyph icon={GLYPH_BIT} /> add bit
 		</button>
 	</div>
 	<small class="font_mono block">

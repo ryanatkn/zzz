@@ -22,7 +22,7 @@
 					type="button"
 					onclick={() => zzz.chats.add()}
 				>
-					{GLYPH_ADD} new chat
+					<Glyph icon={GLYPH_ADD} /> new chat
 				</button>
 				{#if zzz.chats.items.size > 1}
 					<button
