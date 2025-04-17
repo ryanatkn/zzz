@@ -1178,6 +1178,8 @@ export const src_json = {
 				{name: 'GLYPH_SITE', kind: 'variable'},
 				{name: 'GLYPH_CAPABILITY', kind: 'variable'},
 				{name: 'GLYPH_SETTINGS', kind: 'variable'},
+				{name: 'GLYPH_DOMAIN', kind: 'variable'},
+				{name: 'GLYPH_PAGE', kind: 'variable'},
 				{name: 'GLYPH_ECHO', kind: 'variable'},
 				{name: 'GLYPH_HEARTBEAT', kind: 'variable'},
 				{name: 'GLYPH_RESPONSE', kind: 'variable'},

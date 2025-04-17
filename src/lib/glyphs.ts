@@ -48,6 +48,8 @@ export const GLYPH_TAB = '⛶';
 export const GLYPH_SITE = '⌬';
 export const GLYPH_CAPABILITY = '⧰'; // ⌁
 export const GLYPH_SETTINGS = '⛮'; // ⛭  ⚙  ⛮  ⛯ ⛣
+export const GLYPH_DOMAIN = '⟡'; // ⟡ ⏥
+export const GLYPH_PAGE = '⌺'; // ⌺ ⎚
 
 export const GLYPH_ECHO = '⥀';
 export const GLYPH_HEARTBEAT = '∽'; // ∿ ≋ 〰 ∽ ~

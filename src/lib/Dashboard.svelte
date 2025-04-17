@@ -63,7 +63,9 @@
 		return nav_items;
 	});
 
-	const sidebar_button_title = $derived(zzz.ui.show_sidebar ? 'hide sidebar' : 'show sidebar');
+	const sidebar_button_title = $derived(
+		(zzz.ui.show_sidebar ? 'hide sidebar' : 'show sidebar') + ' [backtick `]',
+	);
 </script>
 
 <svelte:window

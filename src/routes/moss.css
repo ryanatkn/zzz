@@ -33,6 +33,11 @@
 	text-overflow: ellipsis;
 }
 
+.width_lg {
+	width: 100%;
+	max-width: var(--width_lg);
+}
+
 .width_md {
 	width: 100%;
 	max-width: var(--width_md);
@@ -315,6 +320,9 @@ a.chip {
 	font-size: var(--size_xl);
 	--size: var(--size_xl);
 }
+.text_align_start {
+	text-align: start;
+}
 .text_align_left {
 	text-align: left;
 }
@@ -383,6 +391,9 @@ a.chip {
 .border_color_3 {
 	border-color: var(--border_color_3);
 }
+.border_width_0 {
+	border-width: 0;
+}
 .border_width_1 {
 	border-width: var(--border_width_1);
 }
@@ -391,6 +402,9 @@ a.chip {
 }
 .border_dashed {
 	border-style: dashed;
+}
+.border_solid {
+	border-style: solid;
 }
 .radius_0 {
 	border-radius: 0;
@@ -568,6 +582,9 @@ a.chip {
 }
 .mt_lg {
 	margin-top: var(--space_lg);
+}
+.mt_xl {
+	margin-top: var(--space_xl);
 }
 .mt_xl3 {
 	margin-top: var(--space_xl3);
