@@ -292,6 +292,7 @@ a.chip {
 	border: var(--border_width_1) solid transparent;
 	font-weight: 400;
 	font-size: var(--size_sm);
+	text-align: left;
 }
 .listitem:hover {
 	--button_text_color: var(--text_color_2);

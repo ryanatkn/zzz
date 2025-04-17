@@ -22,28 +22,27 @@ export const Action_Type = z.enum([
 ]);
 export type Action_Type = z.infer<typeof Action_Type>;
 
-// Define schema for tape history action
-export const Action_Tape_History = z.object({
+export const Tape_Message = z.object({
 	role: z.enum(['user', 'system', 'assistant']),
 	content: z.string(),
 });
-export type Action_Tape_History = z.infer<typeof Action_Tape_History>;
+export type Tape_Message = z.infer<typeof Tape_Message>;
 
 // TODO these types need work
 // Define explicit interfaces for provider-specific data
 export interface Provider_Data_Ollama {
 	type: 'ollama';
-	value: any; // ChatResponse from ollama - must be required
+	value: any; // TODO ChatResponse from ollama
 }
 
 export interface Provider_Data_Claude {
 	type: 'claude';
-	value: any; // Action from Anthropic - must be required
+	value: any; // TODO Action from Anthropic
 }
 
 export interface Provider_Data_Chatgpt {
 	type: 'chatgpt';
-	value: any; // ChatCompletion from OpenAI - must be required
+	value: any; // TODO ChatCompletion from OpenAI
 }
 
 export interface Provider_Data_Gemini {
@@ -57,7 +56,6 @@ export interface Provider_Data_Gemini {
 	};
 }
 
-// Union type of all provider data types
 export type Provider_Data =
 	| Provider_Data_Ollama
 	| Provider_Data_Claude
@@ -99,17 +97,18 @@ export const Provider_Data_Schema = z.discriminatedUnion('type', [
 	}),
 ]);
 
-// Define Completion Request and Response schemas
+// TODO @many rethink this API with the completion request/response (see OpenAI/MCP/A2A)
 export const Completion_Request = z.object({
 	created: Datetime_Now,
 	request_id: Uuid_With_Default,
 	provider_name: Provider_Name,
 	model: z.string(),
 	prompt: z.string(),
-	tape_history: z.array(Action_Tape_History).optional(),
+	tape_messages: z.array(Tape_Message).optional(),
 });
 export type Completion_Request = z.infer<typeof Completion_Request>;
 
+// TODO @many rethink this API with the completion request/response (see OpenAI/MCP/A2A)
 export const Completion_Response = z.object({
 	created: Datetime_Now,
 	request_id: Uuid_With_Default,

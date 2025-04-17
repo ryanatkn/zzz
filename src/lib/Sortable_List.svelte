@@ -17,6 +17,7 @@
 		no_items = '[no items available]',
 		item_attrs,
 		list_attrs,
+		label_attrs,
 		children,
 	}: {
 		items: Array<T>;
@@ -28,6 +29,7 @@
 		no_items?: Snippet | string | undefined;
 		list_attrs?: SvelteHTMLElements['ul'] | undefined;
 		item_attrs?: SvelteHTMLElements['li'] | undefined;
+		label_attrs?: SvelteHTMLElements['label'] | undefined;
 		/** Called once per item. */
 		children: Snippet<[item: T]>;
 	} = $props();
@@ -67,7 +69,7 @@
 </script>
 
 {#if show_sort_controls && sortable.sorters.length > 1}
-	<label class="p_xs row gap_xs2 mb_0" transition:slide>
+	<label transition:slide {...label_attrs} class="p_xs row gap_xs2 mb_0 {label_attrs?.class}">
 		<small class="pr_xs3 white_space_nowrap">sort by</small>
 		<select bind:value={sortable.active_key} class="compact plain size_sm">
 			{#each sortable.sorters as sorter (sorter.key)}
@@ -86,7 +88,7 @@
 		{@render no_items()}
 	{/if}
 {:else}
-	<ul class="unstyled" {...list_attrs}>
+	<ul {...list_attrs} class="unstyled {list_attrs?.class}">
 		{#each filtered_items as item (item.id)}
 			<li {...item_attrs}>
 				{@render children(item)}

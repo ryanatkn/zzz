@@ -9,7 +9,7 @@ import {
 } from '$lib/strip.svelte.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Tape_Json} from '$lib/tape_types.js';
-import {render_tape} from '$lib/tape_helpers.js';
+import {render_tape_to_string, render_tape_messages} from '$lib/tape_helpers.js';
 import {type Bit_Type} from '$lib/bit.svelte.js';
 import {HANDLED} from '$lib/cell_helpers.js';
 import {to_completion_response_text} from '$lib/response_helpers.js';
@@ -36,7 +36,7 @@ export class Tape extends Cell<typeof Tape_Json> {
 
 	enabled: boolean = $state()!;
 
-	readonly content: string = $derived(render_tape(this.strips.by_id.values()));
+	readonly content: string = $derived(render_tape_to_string(this.strips.by_id.values()));
 	readonly length: number = $derived(this.content.length);
 	readonly tokens: Array<number> = $derived(tokenize(this.content));
 	readonly token_count: number = $derived(this.tokens.length);
@@ -122,18 +122,8 @@ export class Tape extends Cell<typeof Tape_Json> {
 	 * Send a message to the AI and create corresponding strips.
 	 */
 	async send_message(content: string): Promise<Strip> {
-		// TODO hacky, rethink these interfaces, and this method API
-		// Build message history for the model with normalized content
-		const tape_history: Completion_Request['tape_history'] = [];
-		for (const s of this.strips.by_id.values()) {
-			tape_history.push({
-				role: s.role,
-				content:
-					s.role === 'assistant' && s.response
-						? to_completion_response_text(s.response) || ''
-						: s.content,
-			});
-		}
+		// TODO @many rethink this API with the completion request/response (see OpenAI/MCP/A2A)
+		const tape_messages = render_tape_messages(this.strips.by_id.values());
 
 		const user_strip = this.add_user_strip(content);
 
@@ -144,7 +134,7 @@ export class Tape extends Cell<typeof Tape_Json> {
 			provider_name: this.model.provider_name,
 			model: this.model.name,
 			prompt: content,
-			tape_history,
+			tape_messages,
 		});
 
 		// Update the user strip with the request
@@ -159,7 +149,7 @@ export class Tape extends Cell<typeof Tape_Json> {
 			content,
 			this.model.provider_name,
 			this.model.name,
-			tape_history,
+			tape_messages,
 		);
 
 		// Get the response text

@@ -50,15 +50,16 @@
 			show = false;
 		}
 	};
-
-	const cancel = (): void => {
-		onpick(undefined);
-		show = false;
-	};
 </script>
 
 {#if show}
-	<Dialog {...dialog_props} onclose={cancel}>
+	<Dialog
+		{...dialog_props}
+		onclose={() => {
+			onpick(undefined);
+			show = false;
+		}}
+	>
 		<div class="pane p_lg width_md mx_auto">
 			{#if heading}
 				<h2 class="mt_lg text_align_center">{heading}</h2>

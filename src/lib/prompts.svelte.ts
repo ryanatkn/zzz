@@ -99,21 +99,6 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 		this.init();
 	}
 
-	/**
-	 * Filter prompts that aren't in the given selected ids list.
-	 * This is more efficient than keeping a derived index since the selection
-	 * is dynamic based on the current chat.
-	 */
-	filter_unselected_prompts(selected_prompt_ids: Array<Uuid>): Array<Prompt> {
-		// If no ids provided, return all prompts
-		if (!selected_prompt_ids.length) {
-			return this.ordered_items;
-		}
-
-		// Return prompts that aren't in the selected set
-		return this.ordered_items.filter((prompt) => !selected_prompt_ids.includes(prompt.id));
-	}
-
 	filter_by_bit(bit: Bit_Type): Array<Prompt> {
 		const {id} = bit;
 		return this.ordered_items.filter((p) => p.bits.some((b) => b.id === id)); // TODO add an index?

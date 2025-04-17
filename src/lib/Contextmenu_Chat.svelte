@@ -11,11 +11,12 @@
 		GLYPH_CHAT,
 		GLYPH_DELETE,
 		GLYPH_EDIT,
-		GLYPH_PROMPT,
 		GLYPH_REMOVE,
 		GLYPH_VIEW,
+		GLYPH_ADD,
 	} from '$lib/glyphs.js';
 	import Contextmenu_Entry_Copy_To_Clipboard from '$lib/Contextmenu_Entry_Copy_To_Clipboard.svelte';
+	import Model_Picker_Dialog from '$lib/Model_Picker_Dialog.svelte';
 
 	interface Props extends Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> {
 		chat: Chat;
@@ -25,7 +26,7 @@
 
 	const zzz = zzz_context.get();
 
-	// TODO BLOCK `add tape` button that uses a new Tape_Picker
+	let show_model_picker = $state(false);
 </script>
 
 <Contextmenu {...rest} {entries} />
@@ -35,25 +36,27 @@
 		{#snippet icon()}{GLYPH_CHAT}{/snippet}
 		chat
 		{#snippet menu()}
+			<Contextmenu_Entry run={() => (show_model_picker = true)}>
+				{#snippet icon()}{GLYPH_ADD}{/snippet}
+				<span>add tape</span>
+			</Contextmenu_Entry>
+
+			<Contextmenu_Entry
+				run={() => {
+					chat.view_mode = chat.view_mode === 'simple' ? 'multi' : 'simple';
+				}}
+			>
+				{#snippet icon()}{GLYPH_VIEW}{/snippet}
+				<span>{chat.view_mode === 'simple' ? 'multi' : 'simple'} view</span>
+			</Contextmenu_Entry>
+
 			<!-- TODO @many maybe a copy submenu on this item with copy id, name, etc, leverage generic cells -->
-			<Contextmenu_Entry_Copy_To_Clipboard content={chat.name} label="copy name" />
 			<Contextmenu_Entry_Copy_To_Clipboard content={chat.id} label="copy id" />
 
 			{#if chat.tapes.length}
 				<Contextmenu_Entry run={() => chat.remove_all_tapes()}>
 					{#snippet icon()}{GLYPH_REMOVE}{/snippet}
 					<span>remove all tapes</span>
-				</Contextmenu_Entry>
-			{/if}
-
-			{#if chat.selected_prompt_ids.length}
-				<Contextmenu_Entry
-					run={() => {
-						chat.selected_prompt_ids = [];
-					}}
-				>
-					{#snippet icon()}{GLYPH_PROMPT}{/snippet}
-					<span>clear selected prompts</span>
 				</Contextmenu_Entry>
 			{/if}
 
@@ -90,15 +93,6 @@
 
 			<Contextmenu_Entry
 				run={() => {
-					chat.view_mode = chat.view_mode === 'simple' ? 'multi' : 'simple';
-				}}
-			>
-				{#snippet icon()}{GLYPH_VIEW}{/snippet}
-				<span>{chat.view_mode === 'simple' ? 'multi' : 'simple'} view</span>
-			</Contextmenu_Entry>
-
-			<Contextmenu_Entry
-				run={() => {
 					// TODO BLOCK this is broken bc we need a unique name, and adding tapes looks hacky, maybe add a `chats/chat.duplicate` method
 					// Create a duplicate of this chat
 					const new_chat = zzz.chats.add_chat(chat.clone());
@@ -131,3 +125,13 @@
 		{/snippet}
 	</Contextmenu_Submenu>
 {/snippet}
+
+<Model_Picker_Dialog
+	bind:show={show_model_picker}
+	onclose={() => (show_model_picker = false)}
+	onpick={(model) => {
+		if (model) {
+			chat.add_tape(model); // TODO @many insert at an index via a range input
+		}
+	}}
+/>

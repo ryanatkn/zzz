@@ -213,7 +213,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		prompt: string,
 		provider_name: Provider_Name,
 		model: string,
-		tape_history?: Array<Action_With_History>,
+		tape_messages?: Array<Action_With_History>,
 	): Promise<Action_Completion_Response> {
 		const request_id = create_uuid();
 		const message: Action_Send_Prompt = {
@@ -225,7 +225,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 				provider_name,
 				model,
 				prompt,
-				tape_history,
+				tape_messages,
 			},
 		};
 		this.actions.send(message);

@@ -750,7 +750,7 @@ export const src_json = {
 			declarations: [
 				{name: 'Action_Direction', kind: 'variable'},
 				{name: 'Action_Type', kind: 'variable'},
-				{name: 'Action_Tape_History', kind: 'variable'},
+				{name: 'Tape_Message', kind: 'variable'},
 				{name: 'Provider_Data_Ollama', kind: 'type'},
 				{name: 'Provider_Data_Claude', kind: 'type'},
 				{name: 'Provider_Data_Chatgpt', kind: 'type'},
@@ -1484,7 +1484,7 @@ export const src_json = {
 		},
 		'./tape_helpers.js': {
 			path: 'tape_helpers.ts',
-			declarations: [{name: 'render_tape', kind: 'function'}],
+			declarations: [{name: 'render_tape_to_string', kind: 'function'}],
 		},
 		'./Tape_List.svelte': {path: 'Tape_List.svelte', declarations: []},
 		'./Tape_Listitem.svelte': {path: 'Tape_Listitem.svelte', declarations: []},

@@ -5,7 +5,7 @@
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import {Chat} from '$lib/chat.svelte.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
-	import {GLYPH_TAPE, GLYPH_CHAT, GLYPH_DELETE} from '$lib/glyphs.js';
+	import {GLYPH_TAPE, GLYPH_CHAT, GLYPH_DELETE, GLYPH_VIEW} from '$lib/glyphs.js';
 	import Tape_List from '$lib/Tape_List.svelte';
 	import Chat_View_Simple from '$lib/Chat_View_Simple.svelte';
 	import Chat_View_Multi from '$lib/Chat_View_Multi.svelte';
@@ -58,7 +58,7 @@
 						{selected_chat.name}
 					</div>
 				</div>
-				<div class="column font_mono">
+				<div class="column">
 					<small title={selected_chat.created_formatted_date}
 						>created {selected_chat.created_formatted_short_date}</small
 					>
@@ -67,25 +67,30 @@
 						tape{#if selected_chat.tapes.length !== 1}s{/if}
 					</small>
 				</div>
-				<div class="row gap_xs2">
+				<div class="row gap_xs py_xs">
 					<Confirm_Button
 						onconfirm={() => zzz.chats.selected_id && zzz.chats.remove(zzz.chats.selected_id)}
-						position="right"
-						attrs={{title: `delete chat "${selected_chat.name}"`, class: 'plain'}}
+						position="bottom"
+						attrs={{
+							title: `delete chat "${selected_chat.name}"`,
+							class: 'plain icon_button',
+						}}
 					>
 						{GLYPH_DELETE}
 						{#snippet popover_button_content()}{GLYPH_DELETE}{/snippet}
 					</Confirm_Button>
 					<Toggle_Button
 						active={chat.view_mode === 'simple'}
-						active_content="simple"
-						inactive_content="multi"
+						active_content="multi"
+						inactive_content="simple"
 						ontoggle={(active) => (chat.view_mode = active ? 'simple' : 'multi')}
 						attrs={{
-							class: 'plain',
-							title: `toggle to ${chat.view_mode === 'multi' ? 'simple' : 'multi'} view`,
+							class: 'plain compact',
+							title: `toggle chat to ${chat.view_mode === 'multi' ? 'simple' : 'multi'} view`,
 						}}
-					/>
+					>
+						<span class="mr_xs">{GLYPH_VIEW}</span>
+					</Toggle_Button>
 				</div>
 			</section>
 		{/if}

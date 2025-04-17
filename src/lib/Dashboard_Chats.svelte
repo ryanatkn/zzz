@@ -24,15 +24,17 @@
 				>
 					{GLYPH_ADD} new chat
 				</button>
-				<button
-					type="button"
-					class="plain compact selectable deselectable"
-					class:selected={zzz.chats.show_sort_controls}
-					title="toggle sort controls"
-					onclick={() => zzz.chats.toggle_sort_controls()}
-				>
-					<Glyph icon={GLYPH_SORT} />
-				</button>
+				{#if zzz.chats.items.size > 1}
+					<button
+						type="button"
+						class="plain compact selectable deselectable"
+						class:selected={zzz.chats.show_sort_controls}
+						title="toggle sort controls"
+						onclick={() => zzz.chats.toggle_sort_controls()}
+					>
+						<Glyph icon={GLYPH_SORT} />
+					</button>
+				{/if}
 			</div>
 			{#if zzz.chats.items.size}
 				<Chats_List />

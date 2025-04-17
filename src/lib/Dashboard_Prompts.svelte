@@ -81,15 +81,17 @@
 				>
 					{GLYPH_ADD} new prompt
 				</button>
-				<button
-					type="button"
-					class="plain compact selectable deselectable"
-					class:selected={zzz.prompts.show_sort_controls}
-					title="toggle sort controls"
-					onclick={() => zzz.prompts.toggle_sort_controls()}
-				>
-					<Glyph icon={GLYPH_SORT} />
-				</button>
+				{#if zzz.prompts.items.size > 1}
+					<button
+						type="button"
+						class="plain compact selectable deselectable"
+						class:selected={zzz.prompts.show_sort_controls}
+						title="toggle sort controls"
+						onclick={() => zzz.prompts.toggle_sort_controls()}
+					>
+						<Glyph icon={GLYPH_SORT} />
+					</button>
+				{/if}
 			</div>
 			<Prompt_List />
 		</div>
@@ -99,31 +101,29 @@
 		<Contextmenu_Prompt prompt={zzz.prompts.selected}>
 			<div class="column_fixed pr_sm">
 				<section class="column_section">
-					<div class="flex justify_content_space_between">
-						<div class="size_lg">
-							<Glyph icon={GLYPH_PROMPT} />
-							{zzz.prompts.selected.name}
-						</div>
+					<div class="size_lg">
+						<Glyph icon={GLYPH_PROMPT} />
+						{zzz.prompts.selected.name}
+					</div>
+					<div class="column">
+						<small>created {zzz.prompts.selected.created_formatted_short_date}</small>
+						<small>
+							{zzz.prompts.selected.bits.length}
+							bit{#if zzz.prompts.selected.bits.length !== 1}s{/if}
+						</small>
+					</div>
+					<div class="row gap_xs py_xs">
 						<Confirm_Button
 							onconfirm={() => zzz.prompts.selected && zzz.prompts.remove(zzz.prompts.selected)}
+							position="bottom"
 							attrs={{
-								title: `remove Prompt ${zzz.prompts.selected.id}`,
+								title: `delete prompt ${zzz.prompts.selected.id}`,
 								class: 'plain icon_button',
 							}}
 						>
 							{GLYPH_DELETE}
 							{#snippet popover_button_content()}{GLYPH_DELETE}{/snippet}
 						</Confirm_Button>
-					</div>
-					<div class="column font_mono">
-						<small>{zzz.prompts.selected.id}</small>
-						<small>
-							{zzz.prompts.selected.bits.length}
-							bit{#if zzz.prompts.selected.bits.length !== 1}s{/if}
-						</small>
-						<small>created {zzz.prompts.selected.created_formatted_short_date}</small>
-					</div>
-					<div class="row gap_sm py_xs sticky t_0 b_0 bg">
 						<Copy_To_Clipboard text={zzz.prompts.selected.content} attrs={{class: 'plain'}} />
 						<Prompt_Stats prompt={zzz.prompts.selected} />
 					</div>

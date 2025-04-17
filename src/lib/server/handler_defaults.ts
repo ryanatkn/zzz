@@ -83,7 +83,7 @@ export const handle_message = async (
 			};
 		}
 		case 'send_prompt': {
-			const {prompt, provider_name, model, tape_history} = message.completion_request;
+			const {prompt, provider_name, model, tape_messages} = message.completion_request;
 			const config = server.config;
 
 			let response: Action_Completion_Response;
@@ -110,7 +110,7 @@ export const handle_message = async (
 							presence_penalty: config.presence_penalty,
 							stop: config.stop_sequences,
 						},
-						messages: format_ollama_messages(config.system_message, tape_history, prompt),
+						messages: format_ollama_messages(config.system_message, tape_messages, prompt),
 					});
 					console.log(`ollama api_response`, api_response);
 					response = create_completion_response_message(
@@ -131,7 +131,7 @@ export const handle_message = async (
 						top_p: config.top_p,
 						stop_sequences: config.stop_sequences,
 						system: config.system_message,
-						messages: format_claude_messages(tape_history, prompt),
+						messages: format_claude_messages(tape_messages, prompt),
 					});
 					console.log(`claude api_response`, api_response);
 					response = create_completion_response_message(
@@ -153,7 +153,7 @@ export const handle_message = async (
 						frequency_penalty: config.frequency_penalty,
 						presence_penalty: config.presence_penalty,
 						stop: config.stop_sequences,
-						messages: format_openai_messages(config.system_message, tape_history, prompt, model),
+						messages: format_openai_messages(config.system_message, tape_messages, prompt, model),
 					});
 					console.log(`openai api_response`, api_response);
 					response = create_completion_response_message(
@@ -184,7 +184,7 @@ export const handle_message = async (
 						},
 					});
 
-					const content = format_gemini_messages(tape_history, prompt);
+					const content = format_gemini_messages(tape_messages, prompt);
 					const api_response = await google_model.generateContent(content);
 					console.log(`gemini api_response`, api_response);
 					response = create_completion_response_message(

@@ -6,9 +6,10 @@
 	import {Chat} from '$lib/chat.svelte.js';
 	import Chat_Tape from '$lib/Chat_Tape.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
-	import {GLYPH_PLACEHOLDER, GLYPH_REMOVE} from '$lib/glyphs.js';
+	import {GLYPH_ADD, GLYPH_PLACEHOLDER, GLYPH_REMOVE} from '$lib/glyphs.js';
 	import Content_Editor from '$lib/Content_Editor.svelte';
 	import Chat_Tape_Add_By_Model from '$lib/Chat_Tape_Add_By_Model.svelte';
+	import Model_Picker_Dialog from '$lib/Model_Picker_Dialog.svelte';
 
 	interface Props {
 		chat: Chat;
@@ -35,6 +36,8 @@
 
 	const count = $derived(chat.enabled_tapes.length);
 	const tags = $derived(Array.from(zzz.tags)); // TODO refactor, `Tags` may be a class, maybe with an indexed collection
+
+	let show_model_picker = $state(false);
 </script>
 
 <div class="column_fluid">
@@ -58,6 +61,9 @@
 		</Content_Editor>
 
 		<div class="flex mt_lg">
+			<button type="button" class="plain" onclick={() => (show_model_picker = true)}>
+				{GLYPH_ADD} add tape
+			</button>
 			<Confirm_Button
 				onconfirm={() => chat.remove_all_tapes()}
 				position="right"
@@ -134,6 +140,16 @@
 	</div>
 	<Chat_Tape_Add_By_Model {chat} />
 </div>
+
+<Model_Picker_Dialog
+	bind:show={show_model_picker}
+	onclose={() => (show_model_picker = false)}
+	onpick={(model) => {
+		if (model) {
+			chat.add_tape(model); // TODO @many insert at an index via a range input
+		}
+	}}
+/>
 
 <style>
 	.tapes {

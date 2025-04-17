@@ -92,15 +92,17 @@
 				>
 					<Glyph icon={GLYPH_CREATE_FOLDER} />
 				</Pending_Button>
-				<button
-					type="button"
-					class="plain compact selectable deselectable"
-					class:selected={editor.show_sort_controls}
-					title="toggle sort controls"
-					onclick={() => editor.toggle_sort_controls()}
-				>
-					<Glyph icon={GLYPH_SORT} />
-				</button>
+				{#if zzz.diskfiles.items.size > 1}
+					<button
+						type="button"
+						class="plain compact selectable deselectable"
+						class:selected={editor.show_sort_controls}
+						title="toggle sort controls"
+						onclick={() => editor.toggle_sort_controls()}
+					>
+						<Glyph icon={GLYPH_SORT} />
+					</button>
+				{/if}
 			</div>
 		</div>
 

@@ -6,11 +6,9 @@ import type {Model} from '$lib/model.svelte.js';
 import {to_completion_response_text} from '$lib/response_helpers.js';
 import {get_datetime_now, Uuid} from '$lib/zod_helpers.js';
 import {Tape} from '$lib/tape.svelte.js';
-import type {Prompt} from '$lib/prompt.svelte.js';
 import {reorder_list} from '$lib/list_helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
-import type {Bit_Type} from '$lib/bit.svelte.js';
 import {get_unique_name} from '$lib/helpers.js';
 
 const Chat_View_Mode = z.enum(['simple', 'multi']).default('simple');
@@ -19,7 +17,6 @@ export type Chat_View_Mode = z.infer<typeof Chat_View_Mode>;
 export const Chat_Json = Cell_Json.extend({
 	name: z.string().default(''),
 	tape_ids: z.array(Uuid).default(() => []),
-	selected_prompt_ids: z.array(Uuid).default(() => []), // TODO consider making these refs, automatic classes (maybe as separate properties by convention, so the original is still the plain ids)
 	main_input: z.string().default(''),
 	view_mode: Chat_View_Mode,
 });
@@ -31,7 +28,6 @@ export interface Chat_Options extends Cell_Options<typeof Chat_Json> {} // eslin
 export class Chat extends Cell<typeof Chat_Json> {
 	name: string = $state()!;
 	tape_ids: Array<Uuid> = $state()!;
-	selected_prompt_ids: Array<Uuid> = $state()!;
 	main_input: string = $state()!;
 	view_mode: Chat_View_Mode = $state()!;
 
@@ -55,33 +51,6 @@ export class Chat extends Cell<typeof Chat_Json> {
 	});
 
 	readonly enabled_tapes = $derived(this.tapes.filter((t) => t.enabled)); // TODO indexed collection, also disabled variant?
-
-	// TODO maybe add a derived property for the ids that are selected but missing?
-	readonly selected_prompts: Array<Prompt> = $derived.by(() => {
-		const result: Array<Prompt> = [];
-		const {by_id} = this.zzz.prompts.items;
-
-		for (const id of this.selected_prompt_ids) {
-			const prompt = by_id.get(id);
-			if (prompt) {
-				result.push(prompt);
-			}
-		}
-
-		return result;
-	});
-
-	// TODO `Bits` class instead? same as on zzz or different?
-	readonly bits: Set<Bit_Type> = $derived.by(() => {
-		const b: Set<Bit_Type> = new Set();
-		for (const prompt of this.selected_prompts) {
-			for (const bit of prompt.bits) {
-				b.add(bit);
-			}
-		}
-		return b;
-	});
-	readonly bits_array: Array<Bit_Type> = $derived(Array.from(this.bits));
 
 	init_name_status: Async_Status = $state('initial');
 
@@ -121,23 +90,6 @@ export class Chat extends Cell<typeof Chat_Json> {
 
 	remove_all_tapes(): void {
 		this.tape_ids.length = 0;
-	}
-
-	add_selected_prompt(prompt_id: Uuid): void {
-		if (!this.selected_prompt_ids.some((id) => id === prompt_id)) {
-			this.selected_prompt_ids.push(prompt_id);
-		}
-	}
-
-	remove_selected_prompt(prompt_id: Uuid): void {
-		const index = this.selected_prompt_ids.findIndex((id) => id === prompt_id);
-		if (index !== -1) {
-			this.selected_prompt_ids.splice(index, 1);
-		}
-	}
-
-	reorder_selected_prompts(from_index: number, to_index: number): void {
-		reorder_list(this.selected_prompt_ids, from_index, to_index);
 	}
 
 	async send_to_all(content: string): Promise<void> {

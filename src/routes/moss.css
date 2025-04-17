@@ -211,9 +211,6 @@ a.chip {
 .fixed {
 	position: fixed;
 }
-.sticky {
-	position: sticky;
-}
 .overflow_auto {
 	overflow: auto;
 }
@@ -431,6 +428,9 @@ a.chip {
 }
 .w_100 {
 	width: 100%;
+}
+.h_0 {
+	height: 0;
 }
 .h_100 {
 	height: 100%;

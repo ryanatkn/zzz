@@ -20,14 +20,16 @@
 		 */
 		ontoggle: (active: boolean) => void;
 		attrs?: SvelteHTMLElements['button'] | undefined;
+		children?: Snippet | undefined;
 	}
 
-	const {active, active_content, inactive_content, ontoggle, attrs}: Props = $props();
+	const {active, active_content, inactive_content, ontoggle, attrs, children}: Props = $props();
 </script>
 
 <button type="button" class="plain icon_button" {...attrs} onclick={() => ontoggle(!active)}>
+	{@render children?.()}
 	<span class="relative">
-		<span style:visibility="hidden" class="inline_flex flex_column">
+		<span style:visibility="hidden" class="inline_flex flex_column h_0">
 			<span>
 				{#if typeof active_content === 'string'}{active_content}{:else}{@render active_content()}{/if}
 			</span>
@@ -35,7 +37,7 @@
 				{#if typeof inactive_content === 'string'}{inactive_content}{:else}{@render inactive_content()}{/if}
 			</span>
 		</span>
-		<span class="absolute inline_flex align_items_center justify_content_center" style:inset="0">
+		<span class="absolute inline_flex align_items_center" style:inset="0">
 			{#if active}
 				{#if typeof active_content === 'string'}{active_content}{:else}{@render active_content()}{/if}
 			{:else if typeof inactive_content === 'string'}

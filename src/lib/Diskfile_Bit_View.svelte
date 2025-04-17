@@ -31,7 +31,7 @@
 						<span class="text_color_5"
 							>In prompt{referenced_by_prompts.length !== 1 ? 's' : ''}:</span
 						>
-						{#each referenced_by_prompts as prompt}
+						{#each referenced_by_prompts as prompt (prompt.id)}
 							<a href="?prompt={prompt.id}" class="prompt_ref">
 								{prompt.name}
 							</a>
