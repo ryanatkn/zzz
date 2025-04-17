@@ -79,7 +79,7 @@
 						zzz.prompts.add().add_bit(Bit.create(zzz, {type: 'text'}));
 					}}
 				>
-					<Glyph icon={GLYPH_ADD} /> new prompt
+					<Glyph icon={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new prompt
 				</button>
 				{#if zzz.prompts.items.size > 1}
 					<button
@@ -147,7 +147,7 @@
 						<div class="flex flex_wrap gap_xs">
 							<button type="button" class="plain size_sm" onclick={add_text_bit}>
 								<div class="row white_space_nowrap">
-									<span class="mr_xs2"><Glyph icon={GLYPH_BIT} /></span> add text
+									<Glyph icon={GLYPH_BIT} attrs={{class: 'mr_xs2'}} /> add text
 								</div>
 							</button>
 							<button
@@ -157,12 +157,12 @@
 								disabled={!zzz.diskfiles.items.size}
 							>
 								<div class="row white_space_nowrap">
-									<span class="mr_xs2"><Glyph icon={GLYPH_FILE} /></span> add file
+									<Glyph icon={GLYPH_FILE} attrs={{class: 'mr_xs2'}} /> add file
 								</div>
 							</button>
 							<button type="button" class="plain size_sm" onclick={add_sequence_bit}>
 								<div class="row white_space_nowrap">
-									<span class="mr_xs2"><Glyph icon={GLYPH_LIST} /></span> add sequence
+									<Glyph icon={GLYPH_LIST} attrs={{class: 'mr_xs2'}} /> add sequence
 								</div>
 							</button>
 							<Confirm_Button
@@ -170,7 +170,7 @@
 								attrs={{disabled: !zzz.prompts.selected.bits.length, class: 'plain size_sm'}}
 							>
 								<div class="row white_space_nowrap">
-									<span class="mr_xs2"><Glyph icon={GLYPH_REMOVE} /></span> remove all
+									<Glyph icon={GLYPH_REMOVE} attrs={{class: 'mr_xs2'}} /> remove all
 								</div>
 							</Confirm_Button>
 						</div>

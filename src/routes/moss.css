@@ -225,6 +225,9 @@ a.chip {
 .overflow_x_auto {
 	overflow-x: auto;
 }
+.overflow_y_auto {
+	overflow-y: auto;
+}
 .overflow_y_hidden {
 	overflow-y: hidden;
 }
@@ -320,9 +323,6 @@ a.chip {
 	font-size: var(--size_xl);
 	--size: var(--size_xl);
 }
-.text_align_start {
-	text-align: start;
-}
 .text_align_left {
 	text-align: left;
 }
@@ -391,9 +391,6 @@ a.chip {
 .border_color_3 {
 	border-color: var(--border_color_3);
 }
-.border_width_0 {
-	border-width: 0;
-}
 .border_width_1 {
 	border-width: var(--border_width_1);
 }
@@ -402,9 +399,6 @@ a.chip {
 }
 .border_dashed {
 	border-style: dashed;
-}
-.border_solid {
-	border-style: solid;
 }
 .radius_0 {
 	border-radius: 0;

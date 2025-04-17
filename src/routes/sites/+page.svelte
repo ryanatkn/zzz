@@ -2,11 +2,10 @@
 	import {base} from '$app/paths';
 	import {GLYPH_SITE} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
-	import Project_List from './_components/Project_List.svelte';
-	import Project_Sidebar from './_components/Project_Sidebar.svelte';
+	import Project_List from './Project_List.svelte';
+	import Project_Sidebar from './Project_Sidebar.svelte';
 	import {projects_context} from './projects.svelte.js';
 
-	// Get projects instance from context
 	const projects = projects_context.get();
 </script>
 
@@ -19,7 +18,9 @@
 		</main>
 	</div>
 {:else}
-	{@render content()}
+	<div class="p_lg">
+		{@render content()}
+	</div>
 {/if}
 
 {#snippet content()}

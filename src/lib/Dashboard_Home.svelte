@@ -30,9 +30,11 @@
 				<ul class="unstyled">
 					{#each zzz.providers.items as provider (provider.name)}
 						<li class="mb_xs">
-							<span class="menu_item">
-								<Provider_Link {provider} icon="svg" attrs={{class: 'row gap_xs'}} />
-							</span>
+							<Provider_Link
+								{provider}
+								icon="svg"
+								attrs={{class: 'menu_item row justify_content_start gap_xs'}}
+							/>
 						</li>
 					{:else}
 						<p>no providers configured yet</p>
@@ -51,9 +53,11 @@
 				<ul class="unstyled">
 					{#each zzz.models.ordered_by_name as model (model.name)}
 						<li class="mb_xs">
-							<span class="menu_item">
-								<Model_Link {model} icon attrs={{class: 'row gap_xs'}} />
-							</span>
+							<Model_Link
+								{model}
+								icon
+								attrs={{class: 'menu_item row justify_content_start gap_xs'}}
+							/>
 						</li>
 					{:else}
 						<p>No models available yet.</p>
@@ -82,5 +86,12 @@
 		justify-content: space-between;
 		align-items: center;
 		width: 100%;
+		text-decoration: none;
+		color: inherit;
+		padding: var(--size_xs) 0;
+	}
+
+	.menu_item:hover {
+		background-color: var(--bg_1);
 	}
 </style>

@@ -1,6 +1,6 @@
 import {goto} from '$app/navigation';
 
-import {projects_context, type Page, type Project} from '../../projects.svelte.js';
+import {projects_context, type Page, type Project, type Projects} from './projects.svelte.js';
 
 /**
  * Simple sanitization function to prevent XSS attacks.
@@ -18,7 +18,7 @@ const sanitize_html = (html: string): string => {
 /**
  * Simple markdown parser for basic formatting.
  */
-const parse_markdown = (text: string): string => {
+const render_markdown = (text: string): string => {
 	// Split content by double newlines to identify paragraphs
 	const paragraphs = text.split(/\n\n+/);
 
@@ -71,27 +71,8 @@ const parse_markdown = (text: string): string => {
  * Manages page editor functionality.
  */
 export class Page_Editor {
-	/** Project ID being edited. */
-	readonly project_id: string;
-
-	/** Page ID being edited. */
-	readonly page_id: string;
-
-	/** Whether this is a new page. */
-	readonly is_new_page: boolean;
-
-	/** Get the projects instance from context */
-	readonly projects = projects_context.get();
-
-	/** The current project. */
-	readonly project: Project | null = $derived(
-		this.projects.projects.find((p) => p.id === this.project_id) || null,
-	);
-
-	/** The current page. */
-	readonly current_page: Page | null = $derived.by(() =>
-		!this.is_new_page ? this.project?.pages.find((p) => p.id === this.page_id) || null : null,
-	);
+	/** Projects service instance. */
+	readonly projects: Projects;
 
 	/** Page title form field. */
 	title: string = $state('');
@@ -102,32 +83,60 @@ export class Page_Editor {
 	/** Page content form field. */
 	content: string = $state('# New Page\n\nAdd your content here.');
 
-	/** UI state for sidebar visibility. */
-	sidebar_visible: boolean = $state(true);
+	/** Whether the form has unsaved changes. */
+	has_changes = $derived(
+		this.is_new_page ||
+			(this.current_page &&
+				(this.title !== this.current_page.title ||
+					this.path !== this.current_page.path ||
+					this.content !== this.current_page.content)),
+	);
 
-	/** UI state for view mode. */
-	view_mode: 'split' | 'fullscreen' = $state('split');
+	/** Whether this is a new page. */
+	get is_new_page(): boolean {
+		return this.page_id === 'new';
+	}
+
+	/** The current project. */
+	get project(): Project | null {
+		return this.projects.current_project;
+	}
+
+	/** The current page. */
+	get current_page(): Page | null {
+		return !this.is_new_page ? this.projects.current_page : null;
+	}
 
 	/** Safely formatted content for preview. */
-	readonly formatted_content = $derived.by(() => {
-		return parse_markdown(this.content);
-	});
+	get formatted_content(): string {
+		return render_markdown(this.content);
+	}
 
 	/**
 	 * Creates a new Page_Editor instance.
 	 */
-	constructor(project_id: string, page_id: string) {
-		this.project_id = project_id;
-		this.page_id = page_id;
-		this.is_new_page = page_id === 'new';
+	constructor(
+		public project_id: string,
+		public page_id: string,
+		projects?: Projects,
+	) {
+		this.projects = projects || projects_context.get();
+		this.init_form();
+	}
 
-		$effect(() => {
-			if (this.current_page) {
-				this.title = this.current_page.title;
-				this.path = this.current_page.path;
-				this.content = this.current_page.content;
-			}
-		});
+	/**
+	 * Initialize form fields based on current page or default values
+	 */
+	init_form(): void {
+		if (this.current_page) {
+			this.title = this.current_page.title;
+			this.path = this.current_page.path;
+			this.content = this.current_page.content;
+		} else {
+			this.title = '';
+			this.path = '/';
+			this.content = '# New Page\n\nAdd your content here.';
+		}
 	}
 
 	/**
@@ -153,12 +162,12 @@ export class Page_Editor {
 				title: this.title,
 				path: formatted_path,
 				content: this.content,
-				created_at: timestamp,
-				updated_at: timestamp,
+				created: timestamp,
+				updated: timestamp,
 			};
 
 			this.projects.add_page(this.project_id, new_page);
-			void goto(`/sites/${this.project_id}`);
+			void goto(`/sites/${this.project_id}/pages`);
 		} else if (this.current_page) {
 			// Update existing page
 			this.projects.update_page(this.project_id, {
@@ -166,23 +175,9 @@ export class Page_Editor {
 				title: this.title,
 				path: formatted_path,
 				content: this.content,
-				updated_at: timestamp,
+				updated: timestamp,
 			});
-			void goto(`/sites/${this.project_id}`);
+			void goto(`/sites/${this.project_id}/pages`);
 		}
-	}
-
-	/**
-	 * Toggle sidebar visibility.
-	 */
-	toggle_sidebar(): void {
-		this.sidebar_visible = !this.sidebar_visible;
-	}
-
-	/**
-	 * Toggle view mode between split and fullscreen.
-	 */
-	toggle_view_mode(): void {
-		this.view_mode = this.view_mode === 'split' ? 'fullscreen' : 'split';
 	}
 }

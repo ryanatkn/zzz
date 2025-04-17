@@ -17,7 +17,7 @@
 		{#if domains_controller.project}
 			<div class="p_lg">
 				<div>
-					<h1>{domains_controller.domain ? 'Edit Domain' : 'New Domain'}</h1>
+					<h1>Add Domain</h1>
 					<a href="/sites/{domains_controller.project_id}/domains">← Back to Domains</a>
 				</div>
 
@@ -25,9 +25,7 @@
 					<form
 						onsubmit={(e) => {
 							e.preventDefault();
-							domains_controller.domain
-								? domains_controller.save_domain_settings()
-								: domains_controller.add_new_domain();
+							domains_controller.add_new_domain();
 						}}
 					>
 						<div class="mb_md">
@@ -78,12 +76,11 @@
 								<input type="checkbox" bind:checked={domains_controller.ssl_enabled} />
 								<span class="ml_xs">Enable SSL</span>
 							</label>
-							<p class="text_color_5 mt_xs">Configure SSL certificate for this domain.</p>
 						</div>
 
 						<div class="panel p_md bg_2 mb_lg">
 							<h3 class="mb_sm">DNS Configuration</h3>
-							<p class="mb_sm">Make sure your domain has these DNS records:</p>
+							<p class="mb_sm">After adding your domain, you'll need to configure DNS records:</p>
 
 							<div class="mb_sm">
 								<h4>A Record</h4>
@@ -91,46 +88,18 @@
 							</div>
 
 							<div class="mb_sm">
-								<h4>CNAME Record (for www subdomain)</h4>
+								<h4>CNAME Record (for subdomains)</h4>
 								<code
 									>www → {domains_controller.project.name
 										.toLowerCase()
 										.replace(/\s+/g, '-')}.zzz.software</code
 								>
 							</div>
-
-							{#if domains_controller.ssl_enabled}
-								<div class="mb_sm">
-									<h4>SSL Verification</h4>
-									<p>To complete SSL setup, add this TXT record:</p>
-									<code
-										>_zzz-verify → verify-{domains_controller.domain_id || 'your-domain-id'}</code
-									>
-								</div>
-							{/if}
 						</div>
 
-						<div class="flex justify_content_between">
-							<div>
-								<button
-									type="submit"
-									class="color_b"
-									disabled={domains_controller.domain && !domains_controller.has_changes}
-								>
-									{domains_controller.domain ? 'save changes' : 'add domain'}
-								</button>
-								<a href="/sites/{domains_controller.project_id}/domains">cancel</a>
-							</div>
-
-							{#if domains_controller.domain}
-								<button
-									type="button"
-									class="color_c"
-									onclick={() => domains_controller.remove_domain()}
-								>
-									remove domain
-								</button>
-							{/if}
+						<div>
+							<button type="submit" class="color_b">+ add domain</button>
+							<a href="/sites/{domains_controller.project_id}/domains">cancel</a>
 						</div>
 					</form>
 				</div>

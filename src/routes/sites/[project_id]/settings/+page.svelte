@@ -1,0 +1,85 @@
+<script lang="ts">
+	import {projects_context} from '../../projects.svelte.js';
+	import Project_Sidebar from '../../Project_Sidebar.svelte';
+	import Section_Sidebar from '../../Section_Sidebar.svelte';
+
+	const projects = projects_context.get();
+	const controller = projects.get_project_controller();
+</script>
+
+<div class="project_layout">
+	<Project_Sidebar />
+	<Section_Sidebar section="settings" />
+
+	<div class="project_content">
+		{#if controller.project}
+			<div class="p_lg">
+				<h1>Settings</h1>
+
+				<div class="panel p_md width_lg mt_md">
+					<h2 class="mt_0 mb_md">Project</h2>
+
+					<div class="mb_md">
+						<label>
+							Project Name
+							<input
+								type="text"
+								bind:value={controller.edited_name}
+								class="w_100"
+								placeholder={controller.project.name}
+							/>
+						</label>
+					</div>
+
+					<div class="mb_md">
+						<label>
+							Description
+							<textarea
+								bind:value={controller.edited_description}
+								class="w_100"
+								rows="3"
+								placeholder={controller.project.description || 'No description'}
+							></textarea>
+						</label>
+					</div>
+
+					<button
+						type="button"
+						onclick={() => controller.save_project_details()}
+						class="color_b"
+						disabled={!controller.has_changes}
+					>
+						save changes
+					</button>
+				</div>
+
+				<div class="panel p_md width_lg mt_xl color_c_bg_1">
+					<h2 class="mt_0 mb_md">Danger Zone</h2>
+					<p class="mb_md">These actions cannot be undone.</p>
+
+					<button type="button" class="color_c" onclick={() => controller.delete_current_project()}>
+						Delete Project
+					</button>
+				</div>
+			</div>
+		{:else}
+			<div class="p_lg text_align_center">
+				<p>Project not found.</p>
+				<a href="/sites">Back to Sites</a>
+			</div>
+		{/if}
+	</div>
+</div>
+
+<style>
+	.project_layout {
+		display: flex;
+		height: 100vh;
+		overflow: hidden;
+	}
+
+	.project_content {
+		flex: 1;
+		overflow: auto;
+	}
+</style>

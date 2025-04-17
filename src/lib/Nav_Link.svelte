@@ -3,32 +3,40 @@
 	import type {SvelteHTMLElements} from 'svelte/elements';
 	import type {Snippet} from 'svelte';
 	import {base} from '$app/paths';
-	import {slide} from 'svelte/transition';
+	import {ensure_end} from '@ryanatkn/belt/string.js';
 
 	interface Props {
 		href: string;
 		selected?: boolean | undefined;
+		show_selected_descendent?: boolean | undefined;
 		attrs?: SvelteHTMLElements['a'] | undefined;
 		children: Snippet<[selected: boolean, selected_descendent: boolean]>;
 	}
 
-	const {href, selected: prop_selected, attrs, children}: Props = $props();
+	const {
+		href: href_prop,
+		selected: selected_prop,
+		show_selected_descendent = true,
+		attrs,
+		children,
+	}: Props = $props();
 
-	const selected = $derived(prop_selected ?? page.url.pathname === href);
+	const href = $derived(ensure_end(href_prop, '/'));
+	const pathname = $derived(ensure_end(page.url.pathname, '/'));
+
+	const selected = $derived(selected_prop ?? pathname === href);
 	const selected_descendent = $derived(
-		selected || href === base + '/' ? false : page.url.pathname.startsWith(href),
+		show_selected_descendent &&
+			(selected || href === base + '/' ? false : pathname.startsWith(href)),
 	);
 
 	// TODO link styles should have focus always be blue, and active should be thicker
 </script>
 
-<a
-	{...attrs}
-	{href}
-	class="nav_link {attrs?.class}"
-	class:selected
-	class:selected_descendent
-	transition:slide>{@render children(selected, selected_descendent)}</a
+<!-- 
+	transition:slide -->
+<a {...attrs} {href} class="nav_link {attrs?.class}" class:selected class:selected_descendent
+	>{@render children(selected, selected_descendent)}</a
 >
 
 <style>
@@ -43,7 +51,6 @@
 		white-space: nowrap;
 	}
 	.nav_link:hover {
-		/* TODO probably add up to `border_color_5` */
 		border-color: var(--border_color_5);
 	}
 	.nav_link:active {

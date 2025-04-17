@@ -11,6 +11,7 @@
 
 <div class="p_lg">
 	<h1><Glyph icon={GLYPH_MODEL} /> models</h1>
+	<aside>⚠️ This information is incomplete and may be incorrect or outdated.</aside>
 	<div class="models_grid">
 		{#each zzz.models.ordered_by_name as model (model)}
 			<Model_Summary {model} />

@@ -1,225 +1,145 @@
 <script lang="ts">
-	import {page} from '$app/state';
-	import {goto} from '$app/navigation';
-	import {Project_Controller} from './project_controller.svelte.js';
-	import Project_Sidebar from '../_components/Project_Sidebar.svelte';
+	import {projects_context} from '../projects.svelte.js';
+	import Project_Sidebar from '../Project_Sidebar.svelte';
+	import Section_Sidebar from '../Section_Sidebar.svelte';
 
-	const project_id = page.params.project_id;
-	const controller = new Project_Controller(project_id);
+	const projects = projects_context.get();
+	const controller = projects.get_project_controller();
 </script>
 
 <div class="project_layout">
 	<Project_Sidebar />
+	<Section_Sidebar section="project" />
 
 	<div class="project_content">
 		{#if controller.project}
 			<div class="p_lg">
-				<div class="flex justify_content_between align_items_center">
-					<div>
-						{#if !controller.editing_project}
-							<h1>{controller.project.name}</h1>
-							<p class="text_color_5">{controller.project.description || 'No description'}</p>
-						{:else}
-							<div class="panel p_md mb_md">
-								<div class="mb_sm">
-									<label for="project_name">Project Name</label>
-									<input
-										type="text"
-										id="project_name"
-										bind:value={controller.edited_name}
-										class="w_100"
-									/>
-								</div>
-								<div class="mb_md">
-									<label for="project_description">Description</label>
-									<textarea
-										id="project_description"
-										bind:value={controller.edited_description}
-										class="w_100"
-										rows="3"
-									></textarea>
-								</div>
-								<div class="flex gap_sm">
-									<button type="button" onclick={controller.save_project_details} class="color_b"
-										>Save</button
-									>
-									<button
-										type="button"
-										onclick={() => (controller.editing_project = false)}
-										class="plain">Cancel</button
-									>
-								</div>
-							</div>
-						{/if}
-					</div>
-
-					<div>
-						{#if !controller.editing_project}
+				<h1 class="mb_0">{controller.project.name}</h1>
+				<div>
+					{#if controller.editing_project}
+						<div class="flex gap_sm">
+							<button
+								type="button"
+								class="color_b"
+								onclick={() => controller.save_project_details()}
+								disabled={!controller.has_changes}>Save</button
+							>
 							<button
 								type="button"
 								class="plain"
-								onclick={() => (controller.editing_project = true)}>Edit</button
+								onclick={() => {
+									controller.editing_project = false;
+									controller.reset_form();
+								}}>Cancel</button
 							>
-						{/if}
-					</div>
+						</div>
+					{:else}
+						<button type="button" class="plain" onclick={() => (controller.editing_project = true)}
+							>Edit</button
+						>
+					{/if}
 				</div>
 
-				<!-- Project Navigation -->
-				<div class="flex border_solid border_width_0 border_bottom_1 mb_lg">
-					<button
-						type="button"
-						class="tab_button plain p_sm"
-						class:active={controller.active_tab === 'pages'}
-						onclick={() => (controller.active_tab = 'pages')}
-					>
-						Pages
-					</button>
-					<button
-						type="button"
-						class="tab_button plain p_sm"
-						class:active={controller.active_tab === 'domains'}
-						onclick={() => (controller.active_tab = 'domains')}
-					>
-						Domains
-					</button>
-					<button
-						type="button"
-						class="tab_button plain p_sm"
-						class:active={controller.active_tab === 'settings'}
-						onclick={() => (controller.active_tab = 'settings')}
-					>
-						Settings
-					</button>
-				</div>
-
-				<!-- Tab Content -->
-				{#if controller.active_tab === 'pages'}
-					<div>
-						<div class="flex justify_content_between mb_md">
-							<h2>Pages</h2>
-							<button
-								type="button"
-								class="color_b"
-								onclick={() => goto(`/sites/${project_id}/editor/new`)}>+ New Page</button
-							>
+				{#if controller.editing_project}
+					<div class="panel p_md width_lg mb_lg">
+						<div class="mb_md">
+							<label>
+								Project Name
+								<input type="text" bind:value={controller.edited_name} class="w_100" />
+							</label>
 						</div>
-
-						{#if controller.project.pages.length === 0}
-							<div class="panel p_md text_align_center">
-								<p>This project doesn't have any pages yet.</p>
-							</div>
-						{:else}
-							<div class="panel">
-								<table class="w_100">
-									<thead>
-										<tr>
-											<th class="text_align_start p_xs">Title</th>
-											<th class="text_align_start p_xs">Path</th>
-											<th class="text_align_start p_xs">Updated</th>
-											<th class="text_align_start p_xs">Actions</th>
-										</tr>
-									</thead>
-									<tbody>
-										{#each controller.project.pages as page (page.id)}
-											<tr>
-												<td class="p_xs">{page.title}</td>
-												<td class="p_xs"><code>{page.path}</code></td>
-												<td class="p_xs">{new Date(page.updated_at).toLocaleDateString()}</td>
-												<td class="p_xs">
-													<div class="flex gap_xs">
-														<a href={`/sites/${project_id}/editor/${page.id}`} class="plain">Edit</a
-														>
-														<button
-															type="button"
-															class="plain color_c"
-															onclick={() => controller.delete_project_page(page.id)}
-														>
-															Delete
-														</button>
-													</div>
-												</td>
-											</tr>
-										{/each}
-									</tbody>
-								</table>
-							</div>
-						{/if}
-					</div>
-				{:else if controller.active_tab === 'domains'}
-					<div>
-						<div class="flex justify_content_between mb_md">
-							<h2>Domains</h2>
-							<button
-								type="button"
-								class="color_b"
-								onclick={() => goto(`/sites/${project_id}/domains`)}>+ Add Domain</button
-							>
-						</div>
-
-						{#if controller.project.domains.length === 0}
-							<div class="panel p_md text_align_center">
-								<p>This project doesn't have any domains yet.</p>
-							</div>
-						{:else}
-							<div class="panel">
-								<table class="w_100">
-									<thead>
-										<tr>
-											<th class="text_align_start p_xs">Domain</th>
-											<th class="text_align_start p_xs">Status</th>
-											<th class="text_align_start p_xs">SSL</th>
-											<th class="text_align_start p_xs">Actions</th>
-										</tr>
-									</thead>
-									<tbody>
-										{#each controller.project.domains as domain (domain.id)}
-											<tr>
-												<td class="p_xs">{domain.name}</td>
-												<td class="p_xs">
-													<span
-														class="chip {domain.status === 'active'
-															? 'color_a'
-															: domain.status === 'pending'
-																? 'color_e'
-																: 'color_5'}"
-													>
-														{domain.status}
-													</span>
-												</td>
-												<td class="p_xs">{domain.ssl ? '✓' : '✗'}</td>
-												<td class="p_xs">
-													<div class="flex gap_xs">
-														<a href={`/sites/${project_id}/domains/${domain.id}`} class="plain"
-															>Settings</a
-														>
-														<button type="button" class="plain color_c">Remove</button>
-													</div>
-												</td>
-											</tr>
-										{/each}
-									</tbody>
-								</table>
-							</div>
-						{/if}
-					</div>
-				{:else if controller.active_tab === 'settings'}
-					<div>
-						<h2>Settings</h2>
-						<div class="panel p_md">
-							<div class="mb_md">
-								<h3 class="mb_xs">Danger Zone</h3>
-								<p class="mb_sm">These actions cannot be undone.</p>
-								<button type="button" class="color_c" onclick={controller.delete_current_project}>
-									Delete Project
-								</button>
-							</div>
+						<div>
+							<label>
+								Description
+								<textarea bind:value={controller.edited_description} class="w_100" rows="3"
+								></textarea>
+							</label>
 						</div>
 					</div>
+				{:else if controller.project.description}
+					<p class="mb_lg text_color_5 width_lg">{controller.project.description}</p>
 				{/if}
+
+				<div class="flex gap_md mb_lg">
+					<span class="chip"
+						>{controller.project.pages.length}
+						{controller.project.pages.length === 1 ? 'page' : 'pages'}</span
+					>
+					<span class="chip"
+						>{controller.project.domains.length}
+						{controller.project.domains.length === 1 ? 'domain' : 'domains'}</span
+					>
+					<span class="chip"
+						>created {new Date(controller.project.created).toLocaleDateString()}</span
+					>
+					<span class="chip"
+						>updated {new Date(controller.project.updated).toLocaleDateString()}</span
+					>
+				</div>
+
+				<div class="projects_grid">
+					<div class="panel p_md">
+						<h2 class="mt_0 mb_lg"><a href="/sites/{controller.project_id}/pages">Pages</a></h2>
+						{#if controller.project.pages.length === 0}
+							<p class="text_color_5">No pages created yet.</p>
+						{:else}
+							<ul class="pages_list">
+								{#each controller.project.pages as page (page.id)}
+									<li>
+										<a href="/sites/{controller.project_id}/pages/{page.id}">{page.title}</a>
+										<span class="text_color_5">{page.path}</span>
+									</li>
+								{/each}
+							</ul>
+						{/if}
+						<div class="mt_md">
+							<button type="button" onclick={() => controller.create_new_page()} class="color_b"
+								>+ add page</button
+							>
+						</div>
+					</div>
+
+					<div class="panel p_md">
+						<h2 class="mt_0 mb_lg"><a href="/sites/{controller.project_id}/domains">Domains</a></h2>
+						{#if controller.project.domains.length === 0}
+							<p class="text_color_5">No domains configured yet.</p>
+						{:else}
+							<ul class="domains_list">
+								{#each controller.project.domains as domain (domain.id)}
+									<li>
+										<a href="/sites/{controller.project_id}/domains/{domain.id}">
+											<span class="domain_name">{domain.name}</span>
+										</a>
+										<div class="domain_details">
+											<span
+												class="status_badge {domain.status === 'active'
+													? 'status_active'
+													: domain.status === 'pending'
+														? 'status_pending'
+														: 'status_inactive'}"
+											>
+												{domain.status}
+											</span>
+											{#if domain.ssl}
+												<span class="ssl_badge">SSL</span>
+											{/if}
+										</div>
+									</li>
+								{/each}
+							</ul>
+						{/if}
+						<div class="mt_md">
+							<button type="button" onclick={() => controller.create_new_domain()} class="color_b"
+								>+ add domain</button
+							>
+						</div>
+					</div>
+				</div>
 			</div>
 		{:else}
 			<div class="p_lg text_align_center">
-				<p>Loading project...</p>
+				<p>Project not found.</p>
+				<a href="/sites">Back to Sites</a>
 			</div>
 		{/if}
 	</div>
@@ -237,19 +157,65 @@
 		overflow: auto;
 	}
 
-	.tab_button {
-		border-bottom: 2px solid transparent;
+	.projects_grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+		gap: var(--size_md);
 	}
 
-	.tab_button.active {
-		border-bottom: 2px solid var(--color_b_5);
-		font-weight: bold;
+	.pages_list,
+	.domains_list {
+		list-style: none;
+		padding: 0;
+		margin: var(--size_md) 0;
 	}
 
-	.chip {
+	.pages_list li,
+	.domains_list li {
+		padding: var(--size_xs) 0;
+		border-bottom: 1px solid var(--border_color_1);
+		display: flex;
+		flex-direction: column;
+	}
+
+	.domain_name {
+		font-family: var(--font_mono);
+		font-weight: 500;
+	}
+
+	.domain_details {
+		display: flex;
+		gap: var(--size_xs);
+		margin-top: 4px;
+	}
+
+	.status_badge {
 		display: inline-block;
-		padding: 2px 8px;
-		border-radius: 12px;
-		font-size: 0.85em;
+		padding: 2px 6px;
+		border-radius: 10px;
+		font-size: 0.75em;
+	}
+
+	.ssl_badge {
+		display: inline-block;
+		padding: 2px 6px;
+		border-radius: 10px;
+		font-size: 0.75em;
+		background-color: var(--bg_2);
+	}
+
+	.status_active {
+		background-color: var(--color_b_2);
+		color: var(--color_b_9);
+	}
+
+	.status_pending {
+		background-color: var(--color_e_2);
+		color: var(--color_e_9);
+	}
+
+	.status_inactive {
+		background-color: var(--bg_2);
+		color: var(--text_color_5);
 	}
 </style>

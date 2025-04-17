@@ -6,6 +6,7 @@
 	import {onNavigate} from '$app/navigation';
 	import Svg from '@ryanatkn/fuz/Svg.svelte';
 	import {is_editable, swallow} from '@ryanatkn/belt/dom.js';
+	import {slide} from 'svelte/transition';
 
 	import Nav_Link from '$lib/Nav_Link.svelte';
 	import Glyph from '$lib/Glyph.svelte';
@@ -132,22 +133,24 @@
 					{/if}
 
 					{#each section.items as link (link.label)}
-						<Nav_Link href={link.href}>
-							{#snippet children(selected)}
-								{#if typeof link.icon === 'string'}
-									<Glyph icon={link.icon} attrs={{class: 'icon_xs'}} /> {link.label}
-								{:else}
-									<span class="icon_xs">
-										<Svg
-											data={link.icon}
-											fill={selected ? 'var(--link_color)' : 'var(--text_color_1)'}
-											size="var(--icon_size_xs)"
-										/>
-									</span>
-									{link.label}
-								{/if}
-							{/snippet}
-						</Nav_Link>
+						<div transition:slide>
+							<Nav_Link href={link.href}>
+								{#snippet children(selected)}
+									{#if typeof link.icon === 'string'}
+										<Glyph icon={link.icon} attrs={{class: 'icon_xs'}} /> {link.label}
+									{:else}
+										<span class="icon_xs">
+											<Svg
+												data={link.icon}
+												fill={selected ? 'var(--link_color)' : 'var(--text_color_1)'}
+												size="var(--icon_size_xs)"
+											/>
+										</span>
+										{link.label}
+									{/if}
+								{/snippet}
+							</Nav_Link>
+						</div>
 					{/each}
 				{/each}
 			</nav>
