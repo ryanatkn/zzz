@@ -19,8 +19,8 @@
 		<div class="editor_container">
 			<!-- Editor Header -->
 			<header class="editor_header">
-				<div class="flex justify_content_between align_items_center p_md">
-					<h1>{editor.is_new_page ? 'Create New Page' : 'Edit Page'}</h1>
+				<div class="p_md">
+					<h1 class="mb_lg">{editor.is_new_page ? 'Create new page' : 'Edit page'}</h1>
 					<div class="flex gap_sm">
 						<button type="button" class="plain" onclick={editor.toggle_view_mode}>
 							{editor.view_mode === 'split' ? 'Full Preview' : 'Split View'}
@@ -88,7 +88,7 @@
 					<div class="preview_header p_sm border_solid border_width_0 border_bottom_1">
 						<div class="flex justify_content_between">
 							<span class="text_color_5">{editor.path}</span>
-							<span class="chip bg_1 p_xs radius_xs">{editor.title}</span>
+							<span class="chip">{editor.title}</span>
 						</div>
 					</div>
 					<div class="preview_content p_lg">

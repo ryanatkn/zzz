@@ -19,9 +19,6 @@
 		{#if controller.project && controller.domain}
 			<div class="p_lg">
 				<div class="flex gap_sm align_items_center mb_lg">
-					<button type="button" class="plain" onclick={() => goto(`/sites/${project_id}`)}
-						>← Back</button
-					>
 					<h1>Domain Settings</h1>
 				</div>
 
@@ -168,12 +165,5 @@
 	.domain_content {
 		flex: 1;
 		overflow: auto;
-	}
-
-	.chip {
-		display: inline-block;
-		padding: 2px 8px;
-		border-radius: 12px;
-		font-size: 0.85em;
 	}
 </style>

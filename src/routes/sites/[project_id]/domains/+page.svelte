@@ -199,11 +199,4 @@
 		flex: 1;
 		overflow: auto;
 	}
-
-	.chip {
-		display: inline-block;
-		padding: 2px 8px;
-		border-radius: 12px;
-		font-size: 0.85em;
-	}
 </style>

@@ -178,7 +178,7 @@
 												<td class="p_xs">
 													<span
 														class="chip {domain.status === 'active'
-															? 'color_b'
+															? 'color_a'
 															: domain.status === 'pending'
 																? 'color_e'
 																: 'color_5'}"
