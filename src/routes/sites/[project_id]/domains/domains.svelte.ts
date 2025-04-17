@@ -1,11 +1,5 @@
 import {goto} from '$app/navigation';
-import {
-	projects_store,
-	update_domain,
-	delete_domain,
-	type Domain,
-	type Project,
-} from '../../sites.svelte.js';
+import {projects_context, type Domain, type Project} from '../../projects.svelte.js';
 
 /**
  * Controller for domain management functionality.
@@ -14,9 +8,12 @@ export class Domains_Controller {
 	/** The project ID. */
 	readonly project_id: string;
 
+	/** Get the projects instance from context */
+	readonly projects = projects_context.get();
+
 	/** The current project. */
 	readonly project: Project | null = $derived(
-		projects_store.projects.find((p) => p.id === this.project_id) || null,
+		this.projects.projects.find((p) => p.id === this.project_id) || null,
 	);
 
 	/** The domain being edited. */
@@ -68,7 +65,7 @@ export class Domains_Controller {
 			return;
 		}
 
-		update_domain(this.project_id, {
+		this.projects.update_domain(this.project_id, {
 			...this.domain,
 			name: this.domain_name,
 			status: this.domain_status,
@@ -87,7 +84,7 @@ export class Domains_Controller {
 
 		// eslint-disable-next-line no-alert
 		if (confirm('Are you sure you want to remove this domain? This action cannot be undone.')) {
-			delete_domain(this.project_id, this.domain_id);
+			this.projects.delete_domain(this.project_id, this.domain_id);
 			void goto(`/sites/${this.project_id}`);
 		}
 	}

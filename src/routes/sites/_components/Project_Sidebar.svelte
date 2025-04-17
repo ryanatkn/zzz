@@ -1,28 +1,18 @@
 <script lang="ts">
-	import {page} from '$app/stores';
-	import {GLYPH_SITE, GLYPH_PAGE, GLYPH_DOMAIN} from '$lib/glyphs.js';
+	import {page} from '$app/state';
+
+	import {GLYPH_PAGE, GLYPH_DOMAIN} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
-	import type {Project} from '../sites.svelte.js';
+	import {projects_context} from '../projects.svelte.js';
 
-	interface Props {
-		projects: Array<Project>;
-	}
-
-	const {projects}: Props = $props();
+	// Get projects from context
+	const projects = projects_context.get();
 
 	// Current path segments for determining active state
-	const current_project_id = $derived($page.params.project_id);
-	const current_page_id = $derived($page.params.page_id);
-	const current_domain_id = $derived($page.params.domain_id);
-	const current_path = $derived($page.url.pathname);
-
-	// Project expanded states
-	const expanded_projects: Record<string, boolean> = $state({});
-
-	// Toggle project expansion
-	const toggle_project = (project_id: string) => {
-		expanded_projects[project_id] = !expanded_projects[project_id];
-	};
+	const current_project_id = $derived(page.params.project_id);
+	const current_page_id = $derived(page.params.page_id);
+	const current_domain_id = $derived(page.params.domain_id);
+	const current_path = $derived(page.url.pathname);
 
 	// Check if current path matches section
 	const is_active_section = (path: string): boolean => {
@@ -31,31 +21,24 @@
 </script>
 
 <nav class="project_sidebar">
-	<div class="sidebar_header p_sm flex align_items_center justify_content_between">
-		<h2 class="flex align_items_center gap_xs2">
-			<Glyph icon={GLYPH_SITE} />
-			<span>Sites</span>
-		</h2>
-	</div>
-
 	<ul class="sidebar_nav">
 		<li class:active={current_path === '/sites'}>
 			<a href="/sites" class="nav_item p_xs">All Projects</a>
 		</li>
 
-		{#each projects as project (project.id)}
+		{#each projects.projects as project (project.id)}
 			<li class="project_item" class:active={project.id === current_project_id}>
 				<!-- svelte-ignore a11y_click_events_have_key_events -->
 				<!-- svelte-ignore a11y_no_static_element_interactions -->
 				<div
 					class="nav_item p_xs flex align_items_center justify_content_between"
-					onclick={() => toggle_project(project.id)}
+					onclick={() => projects.toggle_project_expanded(project.id)}
 				>
 					<span class="truncate">{project.name}</span>
-					<span class="size_sm">{expanded_projects[project.id] ? '▾' : '▸'}</span>
+					<span class="size_sm">{projects.expanded_projects[project.id] ? '▾' : '▸'}</span>
 				</div>
 
-				{#if expanded_projects[project.id] || project.id === current_project_id}
+				{#if projects.expanded_projects[project.id] || project.id === current_project_id}
 					<ul class="sidebar_subnav">
 						<li class:active={current_path === `/sites/${project.id}`}>
 							<a href="/sites/{project.id}" class="nav_subitem p_xs">Overview</a>
@@ -133,10 +116,6 @@
 		flex-direction: column;
 		height: 100%;
 		overflow-y: auto;
-	}
-
-	.sidebar_header {
-		border-bottom: 1px solid var(--border_color_1);
 	}
 
 	.sidebar_nav {

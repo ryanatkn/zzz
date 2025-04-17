@@ -1,17 +1,14 @@
 <script lang="ts">
-	import {page} from '$app/stores';
+	import {page} from '$app/state';
 	import {goto} from '$app/navigation';
-	import {add_domain, projects_store, type Domain} from '../../sites.svelte.js';
+	import type {Domain} from '../../projects.svelte.js';
 	import {Domains_Controller} from './domains.svelte.js';
 	import Project_Sidebar from '../../_components/Project_Sidebar.svelte';
 
-	const project_id = $page.params.project_id;
+	const project_id = page.params.project_id;
 
 	// Create controller instance
 	const controller = new Domains_Controller(project_id);
-
-	// Get all projects for the sidebar
-	const projects = $derived(projects_store.projects);
 
 	/**
 	 * Computed full domain name based on input and domain type.
@@ -41,26 +38,26 @@
 			custom_domain: controller.custom_domain,
 		};
 
-		add_domain(project_id, new_domain);
+		controller.projects.add_domain(project_id, new_domain);
 		void goto(`/sites/${project_id}`);
 	};
 </script>
 
 <div class="domains_layout">
-	<Project_Sidebar {projects} />
+	<Project_Sidebar />
 
 	<div class="domains_content">
 		{#if controller.project}
 			<div class="p_lg">
 				<div class="flex gap_sm align_items_center mb_lg">
 					<button type="button" class="plain" onclick={() => goto(`/sites/${project_id}`)}
-						>← Back</button
+						>← back</button
 					>
-					<h1>Add Domain</h1>
+					<h1>Add domain</h1>
 				</div>
 
 				<div class="panel p_md width_lg">
-					<h2 class="mb_md">New Domain</h2>
+					<h2 class="mb_md">New domain</h2>
 
 					<div class="mb_md">
 						<label class="flex align_items_center">
@@ -71,7 +68,7 @@
 
 					{#if controller.custom_domain}
 						<div class="mb_md">
-							<label for="domain_name">Custom Domain Name</label>
+							<label for="domain_name">Custom domain name</label>
 							<input
 								type="text"
 								id="domain_name"
@@ -132,10 +129,10 @@
 				</div>
 
 				<div class="mt_xl">
-					<h2 class="mb_md">Domain Management</h2>
+					<h2 class="mb_md">Domain management</h2>
 
 					<div class="panel p_md">
-						<h3 class="mb_sm">Current Domains</h3>
+						<h3 class="mb_sm">Current domains</h3>
 
 						{#if controller.project.domains.length === 0}
 							<p class="text_color_5">No domains configured yet.</p>

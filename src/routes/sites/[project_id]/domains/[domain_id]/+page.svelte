@@ -1,23 +1,19 @@
 <script lang="ts">
-	import {page} from '$app/stores';
+	import {page} from '$app/state';
 	import {goto} from '$app/navigation';
 
 	import {Domains_Controller} from '../domains.svelte.js';
 	import Project_Sidebar from '../../../_components/Project_Sidebar.svelte';
-	import {projects_store} from '../../../sites.svelte.js';
 
-	const project_id = $page.params.project_id;
-	const domain_id = $page.params.domain_id;
+	const project_id = page.params.project_id;
+	const domain_id = page.params.domain_id;
 
 	// Create controller instance
 	const controller = new Domains_Controller(project_id, domain_id);
-
-	// Get all projects for the sidebar
-	const projects = $derived(projects_store.projects);
 </script>
 
 <div class="domain_layout">
-	<Project_Sidebar {projects} />
+	<Project_Sidebar />
 
 	<div class="domain_content">
 		{#if controller.project && controller.domain}
@@ -30,7 +26,7 @@
 				</div>
 
 				<div class="panel p_md width_lg">
-					<h2 class="mb_md">{controller.domain.name}</h2>
+					<h2 class="mt_0 mb_md">{controller.domain.name}</h2>
 
 					<div class="flex gap_md mb_lg">
 						<span

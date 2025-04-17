@@ -1,23 +1,19 @@
 <script lang="ts">
-	import {page} from '$app/stores';
+	import {page} from '$app/state';
 	import {goto} from '$app/navigation';
 
 	import {Page_Editor} from '../page_editor.svelte.js';
 	import Project_Sidebar from '../../../_components/Project_Sidebar.svelte';
-	import {projects_store} from '../../../sites.svelte.js';
 
-	const project_id = $page.params.project_id;
-	const page_id = $page.params.page_id;
+	const project_id = page.params.project_id;
+	const page_id = page.params.page_id;
 
 	// Create the editor instance
 	const editor = new Page_Editor(project_id, page_id);
-
-	// Get all projects for the sidebar
-	const projects = $derived(projects_store.projects);
 </script>
 
 <div class="editor_layout">
-	<Project_Sidebar {projects} />
+	<Project_Sidebar />
 
 	{#if editor.project}
 		<div class="editor_container">

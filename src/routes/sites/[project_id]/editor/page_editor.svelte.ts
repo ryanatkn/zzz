@@ -1,12 +1,71 @@
 import {goto} from '$app/navigation';
 
-import {
-	projects_store,
-	add_page,
-	update_page,
-	type Page,
-	type Project,
-} from '../../sites.svelte.js';
+import {projects_context, type Page, type Project} from '../../projects.svelte.js';
+
+/**
+ * Simple sanitization function to prevent XSS attacks.
+ * This is a basic implementation and should be replaced with a proper sanitization library in production.
+ */
+const sanitize_html = (html: string): string => {
+	// Remove script tags and inline event handlers
+	return html
+		.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+		.replace(/on\w+="[^"]*"/gi, '')
+		.replace(/on\w+='[^']*'/gi, '')
+		.replace(/on\w+=\S+/gi, '');
+};
+
+/**
+ * Simple markdown parser for basic formatting.
+ */
+const parse_markdown = (text: string): string => {
+	// Split content by double newlines to identify paragraphs
+	const paragraphs = text.split(/\n\n+/);
+
+	// Process each paragraph
+	const formatted = paragraphs
+		.map((paragraph) => {
+			// Trim the paragraph
+			let p = paragraph.trim();
+			if (!p) return '';
+
+			// Basic heading detection
+			if (p.startsWith('# ')) {
+				return `<h1>${sanitize_html(p.substring(2))}</h1>`;
+			} else if (p.startsWith('## ')) {
+				return `<h2>${sanitize_html(p.substring(3))}</h2>`;
+			} else if (p.startsWith('### ')) {
+				return `<h3>${sanitize_html(p.substring(4))}</h3>`;
+			}
+
+			// Basic list detection
+			if (p.includes('\n- ')) {
+				const items = p.split('\n- ');
+				const list_items = items
+					.slice(1)
+					.map((item) => `<li>${sanitize_html(item)}</li>`)
+					.join('');
+
+				if (items[0].trim() === '') {
+					return `<ul>${list_items}</ul>`;
+				} else {
+					return `<p>${sanitize_html(items[0])}</p><ul>${list_items}</ul>`;
+				}
+			}
+
+			// Bold text
+			p = p.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+
+			// Italic text
+			p = p.replace(/\*(.*?)\*/g, '<em>$1</em>');
+
+			// Regular paragraph
+			return `<p>${sanitize_html(p)}</p>`;
+		})
+		.join('');
+
+	return formatted;
+};
 
 /**
  * Manages page editor functionality.
@@ -21,9 +80,12 @@ export class Page_Editor {
 	/** Whether this is a new page. */
 	readonly is_new_page: boolean;
 
+	/** Get the projects instance from context */
+	readonly projects = projects_context.get();
+
 	/** The current project. */
 	readonly project: Project | null = $derived(
-		projects_store.projects.find((p) => p.id === this.project_id) || null,
+		this.projects.projects.find((p) => p.id === this.project_id) || null,
 	);
 
 	/** The current page. */
@@ -46,27 +108,9 @@ export class Page_Editor {
 	/** UI state for view mode. */
 	view_mode: 'split' | 'fullscreen' = $state('split');
 
-	/** Simple content formatter for preview. */
-	readonly formatted_content = $derived(() => {
-		// Split content by double newlines to identify paragraphs
-		const paragraphs = this.content.split(/\n\n+/);
-
-		// Process each paragraph
-		return paragraphs
-			.map((paragraph) => {
-				// Basic heading detection
-				if (paragraph.startsWith('# ')) {
-					return `<h1>${paragraph.substring(2)}</h1>`;
-				} else if (paragraph.startsWith('## ')) {
-					return `<h2>${paragraph.substring(3)}</h2>`;
-				} else if (paragraph.startsWith('### ')) {
-					return `<h3>${paragraph.substring(4)}</h3>`;
-				}
-
-				// Regular paragraph
-				return `<p>${paragraph}</p>`;
-			})
-			.join('');
+	/** Safely formatted content for preview. */
+	readonly formatted_content = $derived.by(() => {
+		return parse_markdown(this.content);
 	});
 
 	/**
@@ -113,11 +157,11 @@ export class Page_Editor {
 				updated_at: timestamp,
 			};
 
-			add_page(this.project_id, new_page);
+			this.projects.add_page(this.project_id, new_page);
 			void goto(`/sites/${this.project_id}`);
 		} else if (this.current_page) {
 			// Update existing page
-			update_page(this.project_id, {
+			this.projects.update_page(this.project_id, {
 				...this.current_page,
 				title: this.title,
 				path: formatted_path,

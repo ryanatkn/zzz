@@ -815,7 +815,13 @@ export const src_json = {
 				{name: 'Actions', kind: 'class'},
 			],
 		},
-		'./app.svelte.js': {path: 'app.svelte.ts', declarations: [{name: 'App', kind: 'class'}]},
+		'./app.svelte.js': {
+			path: 'app.svelte.ts',
+			declarations: [
+				{name: 'app_context', kind: 'variable'},
+				{name: 'App', kind: 'class'},
+			],
+		},
 		'./Bit_Editor_For_Diskfile.svelte': {path: 'Bit_Editor_For_Diskfile.svelte', declarations: []},
 		'./Bit_Editor_For_Sequence.svelte': {path: 'Bit_Editor_For_Sequence.svelte', declarations: []},
 		'./Bit_Editor_For_Text.svelte': {path: 'Bit_Editor_For_Text.svelte', declarations: []},

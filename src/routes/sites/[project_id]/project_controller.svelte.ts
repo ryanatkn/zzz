@@ -1,11 +1,5 @@
 import {goto} from '$app/navigation';
-import {
-	projects_store,
-	update_project,
-	delete_page,
-	delete_project,
-	type Project,
-} from '../sites.svelte.js';
+import {projects_context, type Project} from '../projects.svelte.js';
 
 /**
  * Controls project management functionality.
@@ -14,9 +8,12 @@ export class Project_Controller {
 	/** Project ID. */
 	readonly project_id: string;
 
+	/** Get the projects instance from context */
+	readonly projects = projects_context.get();
+
 	/** Current project data. */
 	readonly project: Project | null = $derived(
-		projects_store.projects.find((p) => p.id === this.project_id) || null,
+		this.projects.projects.find((p) => p.id === this.project_id) || null,
 	);
 
 	/** Active tab in the project interface. */
@@ -58,7 +55,7 @@ export class Project_Controller {
 	 */
 	save_project_details(): void {
 		if (this.project && this.edited_name.trim()) {
-			update_project({
+			this.projects.update_project({
 				...this.project,
 				name: this.edited_name,
 				description: this.edited_description,
@@ -74,7 +71,7 @@ export class Project_Controller {
 	delete_project_page(page_id: string): void {
 		// eslint-disable-next-line no-alert
 		if (confirm('Are you sure you want to delete this page? This action cannot be undone.')) {
-			delete_page(this.project_id, page_id);
+			this.projects.delete_page(this.project_id, page_id);
 		}
 	}
 
@@ -86,7 +83,7 @@ export class Project_Controller {
 			// eslint-disable-next-line no-alert
 			confirm('Are you sure you want to delete this project? All pages and settings will be lost.')
 		) {
-			delete_project(this.project_id);
+			this.projects.delete_project(this.project_id);
 			void goto('/sites');
 		}
 	}

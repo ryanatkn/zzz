@@ -115,6 +115,19 @@ export class Projects {
 	/** Collection of all projects. */
 	projects: Array<Project> = $state(sample_projects);
 
+	/** UI state for preview mode in the sites view. */
+	previewing: boolean = $state(false);
+
+	/** UI state for tracking expanded projects in the sidebar. */
+	expanded_projects: Record<string, boolean> = $state({});
+
+	/**
+	 * Toggles project expansion in the sidebar.
+	 */
+	toggle_project_expanded(project_id: string): void {
+		this.expanded_projects[project_id] = !this.expanded_projects[project_id];
+	}
+
 	/**
 	 * Adds a new project.
 	 */
@@ -291,44 +304,3 @@ export class Projects {
 		];
 	}
 }
-
-// Create singleton instance of the store
-export const projects_store = new Projects();
-
-// For backward compatibility, exposing the previous function interfaces
-// that delegate to the class methods
-export const add_project = (project: Project): void => {
-	projects_store.add_project(project);
-};
-
-export const update_project = (project: Project): void => {
-	projects_store.update_project(project);
-};
-
-export const delete_project = (project_id: string): void => {
-	projects_store.delete_project(project_id);
-};
-
-export const add_page = (project_id: string, page: Page): void => {
-	projects_store.add_page(project_id, page);
-};
-
-export const update_page = (project_id: string, page: Page): void => {
-	projects_store.update_page(project_id, page);
-};
-
-export const delete_page = (project_id: string, page_id: string): void => {
-	projects_store.delete_page(project_id, page_id);
-};
-
-export const add_domain = (project_id: string, domain: Domain): void => {
-	projects_store.add_domain(project_id, domain);
-};
-
-export const update_domain = (project_id: string, domain: Domain): void => {
-	projects_store.update_domain(project_id, domain);
-};
-
-export const delete_domain = (project_id: string, domain_id: string): void => {
-	projects_store.delete_domain(project_id, domain_id);
-};

@@ -4,20 +4,18 @@
 	import Glyph from '$lib/Glyph.svelte';
 	import Project_List from './_components/Project_List.svelte';
 	import Project_Sidebar from './_components/Project_Sidebar.svelte';
-	import {projects_store} from './sites.svelte.js';
+	import {projects_context} from './projects.svelte.js';
 
-	// TODO add to context or pass as prop
-	const projects = $derived(projects_store.projects);
-
-	let previewing = $state(false);
+	// Get projects instance from context
+	const projects = projects_context.get();
 </script>
 
-{#if previewing}
+{#if projects.previewing}
 	<div class="flex">
-		<Project_Sidebar {projects} />
+		<Project_Sidebar />
 		<main class="flex_1 p_md overflow_auto">
 			{@render content()}
-			<Project_List {projects} />
+			<Project_List />
 		</main>
 	</div>
 {:else}
@@ -49,7 +47,7 @@
 				type="button"
 				class="inline compact color_g"
 				onclick={() => {
-					previewing = !previewing;
+					projects.previewing = !projects.previewing;
 				}}>what it could look like</button
 			>.
 		</p>

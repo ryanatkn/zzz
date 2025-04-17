@@ -1,19 +1,15 @@
 <script lang="ts">
-	import {page} from '$app/stores';
+	import {page} from '$app/state';
 	import {goto} from '$app/navigation';
 	import {Project_Controller} from './project_controller.svelte.js';
 	import Project_Sidebar from '../_components/Project_Sidebar.svelte';
-	import {projects_store} from '../sites.svelte.js';
 
-	const project_id = $page.params.project_id;
+	const project_id = page.params.project_id;
 	const controller = new Project_Controller(project_id);
-
-	// Get all projects for the sidebar
-	const projects = $derived(projects_store.projects);
 </script>
 
 <div class="project_layout">
-	<Project_Sidebar {projects} />
+	<Project_Sidebar />
 
 	<div class="project_content">
 		{#if controller.project}
