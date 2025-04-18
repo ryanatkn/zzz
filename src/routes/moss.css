@@ -452,6 +452,9 @@ a.chip {
 .l_0 {
 	left: 0;
 }
+.r_0 {
+	right: 0;
+}
 .p_xs4 {
 	padding: var(--space_xs4);
 }

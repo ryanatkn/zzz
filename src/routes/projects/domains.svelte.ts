@@ -1,5 +1,6 @@
 import {goto} from '$app/navigation';
 
+import {get_datetime_now} from '$lib/zod_helpers.js';
 import {projects_context, type Domain, type Project, type Projects} from './projects.svelte.js';
 
 /**
@@ -93,7 +94,7 @@ export class Domains_Controller {
 			name: this.domain_name,
 			status: this.domain_status,
 			ssl: this.ssl_enabled,
-			updated: new Date().toISOString(),
+			updated: get_datetime_now(),
 		});
 
 		void goto(`/projects/${this.project_id}/domains`);
@@ -118,7 +119,7 @@ export class Domains_Controller {
 	add_new_domain(): void {
 		if (!this.project || !this.domain_name.trim()) return;
 
-		const created = new Date().toISOString();
+		const created = get_datetime_now();
 		const new_domain: Domain = {
 			id: 'dom_' + Date.now(),
 			name: this.domain_name,

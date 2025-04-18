@@ -1,5 +1,6 @@
 import {goto} from '$app/navigation';
 
+import {get_datetime_now} from '$lib/zod_helpers.js';
 import {projects_context, type Project, type Projects} from './projects.svelte.js';
 
 /**
@@ -69,7 +70,7 @@ export class Project_Controller {
 			...this.project,
 			name: this.edited_name,
 			description: this.edited_description,
-			updated: new Date().toISOString(),
+			updated: get_datetime_now(),
 		});
 
 		this.editing_project = false;
@@ -130,7 +131,7 @@ export class Project_Controller {
 	create_new_page(): void {
 		if (!this.project) return;
 
-		const created = new Date().toISOString();
+		const created = get_datetime_now();
 		const page_id = 'page_' + Date.now();
 
 		this.projects.add_page(this.project_id, {
@@ -152,7 +153,7 @@ export class Project_Controller {
 		if (!this.project) return;
 
 		const domain_id = 'dom_' + Date.now();
-		const created = new Date().toISOString();
+		const created = get_datetime_now();
 
 		this.projects.add_domain(this.project_id, {
 			id: domain_id,

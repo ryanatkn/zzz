@@ -275,7 +275,6 @@ test('format_prompt_content - removes attributes with empty keys but preserves o
 	expect(result).toBe('<div class="container" data-valid="true">\nMixed attributes\n</div>');
 });
 
-// Update this test to use empty string instead of null
 test('format_prompt_content - filters out attributes with empty keys', () => {
 	const bits = [
 		create_bit({

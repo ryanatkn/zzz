@@ -2,7 +2,7 @@
 
 import {test, expect, describe, beforeEach} from 'vitest';
 
-import {create_uuid} from '$lib/zod_helpers.js';
+import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
 import {Zzz} from '$lib/zzz.svelte.js';
 import {Diskfile_Path} from '$lib/diskfile_types.js';
 import type {Diskfile} from '$lib/diskfile.svelte.js';
@@ -98,7 +98,7 @@ describe('Diskfile_Bit initialization', () => {
 	test('initializes from json with complete properties', () => {
 		const test_id = create_uuid();
 		const test_path = TEST_PATHS.CONFIG;
-		const test_date = new Date().toISOString();
+		const test_date = get_datetime_now();
 
 		const bit = zzz.registry.instantiate('Diskfile_Bit', {
 			id: test_id,
@@ -293,7 +293,7 @@ describe('Diskfile_Bit serialization', () => {
 	test('to_json includes all properties with correct values', () => {
 		const test_id = create_uuid();
 		const path = TEST_PATHS.BASIC;
-		const created = new Date().toISOString();
+		const created = get_datetime_now();
 
 		const bit = zzz.registry.instantiate('Diskfile_Bit', {
 			id: test_id,

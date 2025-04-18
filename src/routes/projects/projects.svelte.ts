@@ -4,6 +4,7 @@ import {goto} from '$app/navigation';
 import {Project_Controller} from './project_controller.svelte.js';
 import {Page_Editor} from './page_editor.svelte.js';
 import {Domains_Controller} from './domains.svelte.js';
+import {get_datetime_now} from '$lib/zod_helpers.js';
 
 export const projects_context = create_context<Projects>();
 
@@ -54,7 +55,7 @@ const sample_projects: Array<Project> = [
 			},
 			{
 				id: 'dom_2',
-				name: 'www.zzz.software',
+				name: 'zzz.zzz.software',
 				status: 'active',
 				ssl: true,
 				created: '2023-01-15T12:00:00Z',
@@ -110,15 +111,17 @@ const sample_projects: Array<Project> = [
 				id: 'page_3',
 				path: '/',
 				title: 'Dealt',
-				content: '# Dealt\n\nA modern approach to tarot card reading.',
+				content:
+					'# Dealt\n\ntoy 2D web game engine with a focus on topdown action RPGs 🔮 <a href="https://www.dealt.dev/">dealt.dev</a>',
 				created: '2023-02-10T10:00:00Z',
 				updated: '2023-03-01T14:20:00Z',
 			},
 			{
 				id: 'page_4',
-				path: '/readings',
-				title: 'Readings',
-				content: '# Tarot Readings\n\nExplore different card spreads and their meanings.',
+				path: '/tarot',
+				title: 'Dealt: Tarot',
+				content:
+					'# Tarot\n\ngiving meaning a chance 🔮 <a href="https://tarot.dealt.dev/">tarot.dealt.dev</a>',
 				created: '2023-02-11T11:30:00Z',
 				updated: '2023-02-15T09:45:00Z',
 			},
@@ -149,29 +152,31 @@ export class Projects {
 	current_domain_id: string | null = $state(null);
 
 	/** Current project derived from current_project_id. */
-	current_project = $derived(this.projects.find((p) => p.id === this.current_project_id) || null);
+	readonly current_project = $derived(
+		this.projects.find((p) => p.id === this.current_project_id) || null,
+	);
 
 	/** Current page derived from current_project and current_page_id. */
-	current_page = $derived(
+	readonly current_page = $derived(
 		this.current_project?.pages.find((p) => p.id === this.current_page_id) || null,
 	);
 
 	/** Current domain derived from current_project and current_domain_id. */
-	current_domain = $derived(
+	readonly current_domain = $derived(
 		this.current_project?.domains.find((d) => d.id === this.current_domain_id) || null,
 	);
 
 	/** Cache of project controllers. */
-	#controllers: Map<string, Project_Controller> = new Map();
+	readonly #controllers: Map<string, Project_Controller> = new Map();
 
 	/** Cache of page editors. */
-	#page_editors: Map<string, Page_Editor> = new Map();
+	readonly #page_editors: Map<string, Page_Editor> = new Map();
 
 	/** Cache of domain controllers. */
-	#domains_controllers: Map<string, Domains_Controller> = new Map();
+	readonly #domains_controllers: Map<string, Domains_Controller> = new Map();
 
 	/** Current project controller derived from current_project_id. */
-	current_project_controller = $derived.by(() => {
+	readonly current_project_controller = $derived.by(() => {
 		if (!this.current_project_id) return null;
 
 		let controller = this.#controllers.get(this.current_project_id);
@@ -183,7 +188,7 @@ export class Projects {
 	});
 
 	/** Current page editor derived from current project and page IDs. */
-	current_page_editor = $derived.by(() => {
+	readonly current_page_editor = $derived.by(() => {
 		if (!this.current_project_id || !this.current_page_id) return null;
 
 		const key = `${this.current_project_id}_${this.current_page_id}`;
@@ -196,7 +201,7 @@ export class Projects {
 	});
 
 	/** Current domains controller derived from current project and domain IDs. */
-	current_domains_controller = $derived.by(() => {
+	readonly current_domains_controller = $derived.by(() => {
 		if (!this.current_project_id) return null;
 
 		const key = `${this.current_project_id}_${this.current_domain_id || 'new'}`;
@@ -237,7 +242,7 @@ export class Projects {
 	 */
 	create_new_project(): void {
 		const id = 'proj_' + Date.now();
-		const created = new Date().toISOString();
+		const created = get_datetime_now();
 
 		const new_project: Project = {
 			id,
@@ -304,7 +309,7 @@ export class Projects {
 		if (!project) return;
 
 		project.pages.push(page);
-		project.updated = new Date().toISOString();
+		project.updated = get_datetime_now();
 	}
 
 	/**
@@ -318,7 +323,7 @@ export class Projects {
 		if (page_index === -1) return;
 
 		project.pages[page_index] = page;
-		project.updated = new Date().toISOString();
+		project.updated = get_datetime_now();
 	}
 
 	/**
@@ -332,7 +337,7 @@ export class Projects {
 		if (page_index === -1) return;
 
 		project.pages.splice(page_index, 1);
-		project.updated = new Date().toISOString();
+		project.updated = get_datetime_now();
 	}
 
 	/**
@@ -343,7 +348,7 @@ export class Projects {
 		if (!project) return;
 
 		project.domains.push(domain);
-		project.updated = new Date().toISOString();
+		project.updated = get_datetime_now();
 	}
 
 	/**
@@ -357,7 +362,7 @@ export class Projects {
 		if (domain_index === -1) return;
 
 		project.domains[domain_index] = domain;
-		project.updated = new Date().toISOString();
+		project.updated = get_datetime_now();
 	}
 
 	/**
@@ -371,6 +376,6 @@ export class Projects {
 		if (domain_index === -1) return;
 
 		project.domains.splice(domain_index, 1);
-		project.updated = new Date().toISOString();
+		project.updated = get_datetime_now();
 	}
 }

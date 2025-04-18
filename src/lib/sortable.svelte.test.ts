@@ -4,7 +4,13 @@ import {z} from 'zod';
 
 import {Sortable, type Sorter, sort_by_text, sort_by_numeric} from '$lib/sortable.svelte.js';
 import {Cell} from '$lib/cell.svelte.js';
-import {Uuid_With_Default, type Uuid, Datetime_Now, create_uuid} from '$lib/zod_helpers.js';
+import {
+	Uuid_With_Default,
+	type Uuid,
+	Datetime_Now,
+	create_uuid,
+	get_datetime_now,
+} from '$lib/zod_helpers.js';
 import {Zzz} from '$lib/zzz.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
@@ -27,8 +33,8 @@ class Test_Cell extends Cell<typeof Test_Cell_Schema> {
 			zzz,
 			json: {
 				id,
-				created: new Date().toISOString(),
-				updated: new Date().toISOString(),
+				created: get_datetime_now(),
+				updated: get_datetime_now(),
 				name,
 				value,
 			},

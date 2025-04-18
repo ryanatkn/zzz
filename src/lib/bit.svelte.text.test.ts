@@ -3,7 +3,7 @@
 import {test, expect, describe, beforeEach} from 'vitest';
 import {encode as tokenize} from 'gpt-tokenizer';
 
-import {create_uuid} from '$lib/zod_helpers.js';
+import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
 import {Zzz} from '$lib/zzz.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
@@ -66,7 +66,7 @@ describe('Text_Bit initialization', () => {
 
 	test('initializes from json with complete properties', () => {
 		const test_id = create_uuid();
-		const test_date = new Date().toISOString();
+		const test_date = get_datetime_now();
 
 		const bit = zzz.registry.instantiate('Text_Bit', {
 			id: test_id,
@@ -143,7 +143,7 @@ describe('Text_Bit reactive properties', () => {
 describe('Text_Bit serialization', () => {
 	test('to_json includes all properties with correct values', () => {
 		const test_id = create_uuid();
-		const created = new Date().toISOString();
+		const created = get_datetime_now();
 
 		const bit = zzz.registry.instantiate('Text_Bit', {
 			id: test_id,

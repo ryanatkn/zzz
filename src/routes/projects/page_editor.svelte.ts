@@ -1,5 +1,6 @@
 import {goto} from '$app/navigation';
 
+import {get_datetime_now} from '$lib/zod_helpers.js';
 import {projects_context, type Page, type Project, type Projects} from './projects.svelte.js';
 
 /**
@@ -161,7 +162,7 @@ export class Page_Editor {
 
 		// Ensure path starts with /
 		const formatted_path = this.path.startsWith('/') ? this.path : `/${this.path}`;
-		const created = new Date().toISOString();
+		const created = get_datetime_now();
 
 		if (this.is_new_page) {
 			// Create new page

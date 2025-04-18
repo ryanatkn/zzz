@@ -4,7 +4,7 @@ import {test, expect, describe, beforeEach} from 'vitest';
 import {encode as tokenize} from 'gpt-tokenizer';
 
 import {Bit, Text_Bit, Diskfile_Bit, Sequence_Bit} from '$lib/bit.svelte.js';
-import {create_uuid} from '$lib/zod_helpers.js';
+import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
 import {Diskfile_Path} from '$lib/diskfile_types.js';
 import {Zzz} from '$lib/zzz.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
@@ -176,7 +176,7 @@ describe('Text_Bit specific behavior', () => {
 
 	test('Text_Bit serialization and deserialization', () => {
 		const test_id = create_uuid();
-		const test_date = new Date().toISOString();
+		const test_date = get_datetime_now();
 
 		// Create bit with all properties
 		const original = zzz.registry.instantiate('Text_Bit', {
