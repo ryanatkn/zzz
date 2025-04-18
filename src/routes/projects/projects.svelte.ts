@@ -1,173 +1,164 @@
+import {z} from 'zod';
 import {create_context} from '@ryanatkn/fuz/context_helpers.js';
-import {goto} from '$app/navigation';
 
+import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
+import {Projects_Json} from './projects_schema.js';
+import {Project} from './project.svelte.js';
+import {Page} from './page.svelte.js';
+import {Domain} from './domain.svelte.js';
 import {Project_Controller} from './project_controller.svelte.js';
 import {Page_Editor} from './page_editor.svelte.js';
-import {Domains_Controller} from './domains.svelte.js';
-import {get_datetime_now} from '$lib/zod_helpers.js';
+import {Domain_Controller} from './domains.svelte.js';
+import {get_datetime_now, create_uuid, Uuid} from '$lib/zod_helpers.js';
+import {HANDLED} from '$lib/cell_helpers.js';
+import {get_unique_name} from '$lib/helpers.js';
+import type {Zzz} from '$lib/zzz.svelte.js';
 
 export const projects_context = create_context<Projects>();
 
-export interface Domain {
-	id: string;
-	name: string;
-	status: 'active' | 'pending' | 'inactive';
-	ssl: boolean;
-	created: string;
-	updated: string;
-}
+export type Projects_Options = Cell_Options<typeof Projects_Json>;
 
-export interface Page {
-	id: string;
-	path: string;
-	title: string;
-	content: string;
-	created: string;
-	updated: string;
-}
-
-export interface Project {
-	id: string;
-	name: string;
-	description: string;
-	created: string;
-	updated: string;
-	domains: Array<Domain>;
-	pages: Array<Page>;
-}
-
-// Sample data
-const sample_projects: Array<Project> = [
-	{
-		id: 'proj_1',
-		name: 'Zzz',
-		description: 'webtool 💤 nice web things for the tired',
-		created: '2023-01-15T12:00:00Z',
-		updated: '2023-04-20T15:30:00Z',
-		domains: [
-			{
-				id: 'dom_1',
-				name: 'zzz.software',
-				status: 'active',
-				ssl: true,
+// Sample data for initial projects
+const create_sample_projects = (zzz: Zzz): Array<Project> => {
+	return [
+		new Project({
+			zzz,
+			json: {
+				id: 'proj_1',
+				name: 'Zzz',
+				description: 'webtool 💤 nice web things for the tired',
 				created: '2023-01-15T12:00:00Z',
 				updated: '2023-04-20T15:30:00Z',
+				domains: [
+					{
+						id: 'dom_1',
+						name: 'zzz.software',
+						status: 'active',
+						ssl: true,
+						created: '2023-01-15T12:00:00Z',
+						updated: '2023-04-20T15:30:00Z',
+					},
+					{
+						id: 'dom_2',
+						name: 'zzz.zzz.software',
+						status: 'active',
+						ssl: true,
+						created: '2023-01-15T12:00:00Z',
+						updated: '2023-04-20T15:30:00Z',
+					},
+				],
+				pages: [
+					{
+						id: 'page_1',
+						path: '/',
+						title: 'Home',
+						content: '# Welcome to Zzz\n\nZzz is both a browser and editor for the read-write web.',
+						created: '2023-01-15T12:05:00Z',
+						updated: '2023-01-16T09:30:00Z',
+					},
+					{
+						id: 'page_2',
+						path: '/about',
+						title: 'About',
+						content:
+							'# About Zzz\n\nZzz is a project that aims to make managing websites routine and easy.',
+						created: '2023-01-15T14:20:00Z',
+						updated: '2023-02-01T11:15:00Z',
+					},
+				],
 			},
-			{
-				id: 'dom_2',
-				name: 'zzz.zzz.software',
-				status: 'active',
-				ssl: true,
-				created: '2023-01-15T12:00:00Z',
-				updated: '2023-04-20T15:30:00Z',
-			},
-		],
-		pages: [
-			{
-				id: 'page_1',
-				path: '/',
-				title: 'Home',
-				content: '# Welcome to Zzz\n\nZzz is both a browser and editor for the read-write web.',
-				created: '2023-01-15T12:05:00Z',
-				updated: '2023-01-16T09:30:00Z',
-			},
-			{
-				id: 'page_2',
-				path: '/about',
-				title: 'About',
-				content:
-					'# About Zzz\n\nZzz is a project that aims to make managing websites routine and easy.',
-				created: '2023-01-15T14:20:00Z',
-				updated: '2023-02-01T11:15:00Z',
-			},
-		],
-	},
-	{
-		id: 'proj_2',
-		name: 'Dealt',
-		description: 'toy 2D web game engine with a focus on topdown action RPGs 🔮',
-		created: '2023-02-10T09:15:00Z',
-		updated: '2023-03-05T16:45:00Z',
-		domains: [
-			{
-				id: 'dom_3',
-				name: 'dealt.dev',
-				status: 'active',
-				ssl: true,
+		}),
+		new Project({
+			zzz,
+			json: {
+				id: 'proj_2',
+				name: 'Dealt',
+				description: 'toy 2D web game engine with a focus on topdown action RPGs 🔮',
 				created: '2023-02-10T09:15:00Z',
 				updated: '2023-03-05T16:45:00Z',
+				domains: [
+					{
+						id: 'dom_3',
+						name: 'dealt.dev',
+						status: 'active',
+						ssl: true,
+						created: '2023-02-10T09:15:00Z',
+						updated: '2023-03-05T16:45:00Z',
+					},
+					{
+						id: 'dom_4',
+						name: 'tarot.dealt.dev',
+						status: 'active',
+						ssl: true,
+						created: '2023-02-10T09:15:00Z',
+						updated: '2023-03-05T16:45:00Z',
+					},
+				],
+				pages: [
+					{
+						id: 'page_3',
+						path: '/',
+						title: 'Dealt',
+						content:
+							'# Dealt\n\ntoy 2D web game engine with a focus on topdown action RPGs 🔮 <a href="https://www.dealt.dev/">dealt.dev</a>',
+						created: '2023-02-10T10:00:00Z',
+						updated: '2023-03-01T14:20:00Z',
+					},
+					{
+						id: 'page_4',
+						path: '/tarot',
+						title: 'Dealt: tarot',
+						content:
+							'# Tarot\n\ngiving meaning a chance 🔮 <a href="https://tarot.dealt.dev/">tarot.dealt.dev</a>',
+						created: '2023-02-11T11:30:00Z',
+						updated: '2023-02-15T09:45:00Z',
+					},
+				],
 			},
-			{
-				id: 'dom_4',
-				name: 'tarot.dealt.dev',
-				status: 'active',
-				ssl: true,
-				created: '2023-02-10T09:15:00Z',
-				updated: '2023-03-05T16:45:00Z',
-			},
-		],
-		pages: [
-			{
-				id: 'page_3',
-				path: '/',
-				title: 'Dealt',
-				content:
-					'# Dealt\n\ntoy 2D web game engine with a focus on topdown action RPGs 🔮 <a href="https://www.dealt.dev/">dealt.dev</a>',
-				created: '2023-02-10T10:00:00Z',
-				updated: '2023-03-01T14:20:00Z',
-			},
-			{
-				id: 'page_4',
-				path: '/tarot',
-				title: 'Dealt: tarot',
-				content:
-					'# Tarot\n\ngiving meaning a chance 🔮 <a href="https://tarot.dealt.dev/">tarot.dealt.dev</a>',
-				created: '2023-02-11T11:30:00Z',
-				updated: '2023-02-15T09:45:00Z',
-			},
-		],
-	},
-	{
-		id: 'proj_3',
-		name: 'cosmicplayground',
-		description: 'tools and toys for expanding minds 🌌',
-		created: '2023-05-15T08:00:00Z',
-		updated: '2023-06-20T14:15:00Z',
-		domains: [
-			{
-				id: 'dom_5',
-				name: 'cosmicplayground.org',
-				status: 'active',
-				ssl: true,
+		}),
+		new Project({
+			zzz,
+			json: {
+				id: 'proj_3',
+				name: 'cosmicplayground',
+				description: 'tools and toys for expanding minds 🌌',
 				created: '2023-05-15T08:00:00Z',
 				updated: '2023-06-20T14:15:00Z',
+				domains: [
+					{
+						id: 'dom_5',
+						name: 'cosmicplayground.org',
+						status: 'active',
+						ssl: true,
+						created: '2023-05-15T08:00:00Z',
+						updated: '2023-06-20T14:15:00Z',
+					},
+				],
+				pages: [],
 			},
-		],
-		pages: [],
-	},
-];
+		}),
+	];
+};
 
 /**
- * Manages projects, pages, and domains using Svelte 5 runes.
+ * Manages projects, pages, and domains using Svelte 5 runes and Cell patterns.
  */
-export class Projects {
-	/** Collection of all projects. */
-	projects: Array<Project> = $state(sample_projects);
-
-	/** UI state for preview mode in the sites view. */
+export class Projects extends Cell<typeof Projects_Json> {
+	projects: Array<Project> = $state([]);
+	current_project_id: Uuid | null = $state(null);
+	current_page_id: Uuid | null = $state(null);
+	current_domain_id: Uuid | null = $state(null);
+	expanded_projects: Record<string, boolean> = $state({});
 	previewing: boolean = $state(false);
 
-	/** UI state for tracking expanded projects in the sidebar. */
-	expanded_projects: Record<string, boolean> = $state({});
-
-	/** Current project ID from URL params. */
-	current_project_id: string | null = $state(null);
-
-	/** Current page ID from URL params. */
-	current_page_id: string | null = $state(null);
-
-	/** Current domain ID from URL params. */
-	current_domain_id: string | null = $state(null);
+	/** Map of project name to project for checking uniqueness */
+	readonly items_by_name = $derived.by(() => {
+		const result: Map<string, Project> = new Map();
+		for (const project of this.projects) {
+			result.set(project.name, project);
+		}
+		return result;
+	});
 
 	/** Current project derived from current_project_id. */
 	readonly current_project = $derived(
@@ -185,13 +176,13 @@ export class Projects {
 	);
 
 	/** Cache of project controllers. */
-	readonly #controllers: Map<string, Project_Controller> = new Map();
+	#controllers: Map<string, Project_Controller> = new Map();
 
 	/** Cache of page editors. */
-	readonly #page_editors: Map<string, Page_Editor> = new Map();
+	#page_editors: Map<string, Page_Editor> = new Map();
 
 	/** Cache of domain controllers. */
-	readonly #domains_controllers: Map<string, Domains_Controller> = new Map();
+	#domains_controllers: Map<string, Domain_Controller> = new Map();
 
 	/** Current project controller derived from current_project_id. */
 	readonly current_project_controller = $derived.by(() => {
@@ -199,7 +190,13 @@ export class Projects {
 
 		let controller = this.#controllers.get(this.current_project_id);
 		if (!controller) {
-			controller = new Project_Controller(this.current_project_id, this);
+			controller = new Project_Controller({
+				projects: this,
+				zzz: this.zzz,
+				json: {
+					project_id: this.current_project_id,
+				},
+			});
 			this.#controllers.set(this.current_project_id, controller);
 		}
 		return controller;
@@ -212,7 +209,14 @@ export class Projects {
 		const key = `${this.current_project_id}_${this.current_page_id}`;
 		let editor = this.#page_editors.get(key);
 		if (!editor) {
-			editor = new Page_Editor(this.current_project_id, this.current_page_id, this);
+			editor = new Page_Editor({
+				projects: this,
+				zzz: this.zzz,
+				json: {
+					project_id: this.current_project_id,
+					page_id: this.current_page_id,
+				},
+			});
 			this.#page_editors.set(key, editor);
 		}
 		return editor;
@@ -225,16 +229,49 @@ export class Projects {
 		const key = `${this.current_project_id}_${this.current_domain_id || 'new'}`;
 		let controller = this.#domains_controllers.get(key);
 		if (!controller) {
-			controller = new Domains_Controller(this.current_project_id, this.current_domain_id, this);
+			controller = new Domain_Controller({
+				projects: this,
+				zzz: this.zzz,
+				json: {
+					project_id: this.current_project_id,
+					domain_id: this.current_domain_id,
+				},
+			});
 			this.#domains_controllers.set(key, controller);
 		}
 		return controller;
 	});
 
+	constructor(options: Projects_Options) {
+		super(Projects_Json, options);
+
+		this.decoders = {
+			// TODO hacky
+			projects: (projects_data) => {
+				if (Array.isArray(projects_data)) {
+					this.projects = projects_data.map(
+						(project_data) => new Project({zzz: this.zzz, json: project_data}),
+					);
+					return HANDLED;
+				}
+
+				// If no projects provided, initialize with sample data
+				if (!projects_data || !Array.isArray(projects_data) || projects_data.length === 0) {
+					this.projects = create_sample_projects(this.zzz);
+					return HANDLED;
+				}
+
+				return undefined;
+			},
+		};
+
+		this.init();
+	}
+
 	/**
 	 * Sets the current project ID.
 	 */
-	set_current_project(project_id: string | null): void {
+	set_current_project(project_id: Uuid | null): void {
 		console.log(`set_current_project`, project_id);
 		this.current_project_id = project_id;
 	}
@@ -242,7 +279,7 @@ export class Projects {
 	/**
 	 * Sets the current page ID.
 	 */
-	set_current_page(page_id: string | null): void {
+	set_current_page(page_id: Uuid | null): void {
 		console.log(`set_current_page`, page_id);
 		this.current_page_id = page_id;
 	}
@@ -250,7 +287,7 @@ export class Projects {
 	/**
 	 * Sets the current domain ID.
 	 */
-	set_current_domain(domain_id: string | null): void {
+	set_current_domain(domain_id: Uuid | null): void {
 		console.log(`set_current_domain`, domain_id);
 		this.current_domain_id = domain_id;
 	}
@@ -258,37 +295,42 @@ export class Projects {
 	/**
 	 * Creates a new project with default values and navigates to it.
 	 */
-	create_new_project(): void {
-		const id = 'proj_' + Date.now();
+	create_new_project(): Project {
+		const base_name = 'new project';
+		const name = get_unique_name(base_name, this.items_by_name);
+
+		const id = create_uuid();
 		const created = get_datetime_now();
 
-		const new_project: Project = {
-			id,
-			name: 'new project',
-			description: '',
-			created,
-			updated: created,
-			domains: [],
-			pages: [
-				{
-					id: 'page_' + Date.now(),
-					path: '/',
-					title: 'Home',
-					content: '# Welcome\n\nThis is the home page of your new project.',
-					created,
-					updated: created,
-				},
-			],
-		};
+		const new_project = new Project({
+			zzz: this.zzz,
+			json: {
+				id,
+				name,
+				created,
+				updated: created,
+				pages: [
+					{
+						id: create_uuid(),
+						path: '/',
+						title: 'Home',
+						content: '# Welcome\n\nThis is the home page of your new project.',
+						created,
+						updated: created,
+					},
+				],
+			},
+		});
 
 		this.add_project(new_project);
-		void goto(`/projects/${id}`);
+
+		return new_project;
 	}
 
 	/**
 	 * Toggles project expansion in the sidebar.
 	 */
-	toggle_project_expanded(project_id: string): void {
+	toggle_project_expanded(project_id: Uuid): void {
 		this.expanded_projects[project_id] = !this.expanded_projects[project_id];
 	}
 
@@ -300,19 +342,9 @@ export class Projects {
 	}
 
 	/**
-	 * Updates an existing project.
-	 */
-	update_project(project: Project): void {
-		const index = this.projects.findIndex((p) => p.id === project.id);
-		if (index !== -1) {
-			this.projects[index] = project;
-		}
-	}
-
-	/**
 	 * Deletes a project by ID.
 	 */
-	delete_project(project_id: string): void {
+	delete_project(project_id: Uuid): void {
 		const index = this.projects.findIndex((p) => p.id === project_id);
 		if (index !== -1) {
 			this.projects.splice(index, 1);
@@ -322,78 +354,52 @@ export class Projects {
 	/**
 	 * Adds a new page to a project.
 	 */
-	add_page(project_id: string, page: Page): void {
+	add_page(project_id: Uuid, page: Page): void {
 		const project = this.projects.find((p) => p.id === project_id);
 		if (!project) return;
 
-		project.pages.push(page);
-		project.updated = get_datetime_now();
-	}
-
-	/**
-	 * Updates an existing page.
-	 */
-	update_page(project_id: string, page: Page): void {
-		const project = this.projects.find((p) => p.id === project_id);
-		if (!project) return;
-
-		const page_index = project.pages.findIndex((p) => p.id === page.id);
-		if (page_index === -1) return;
-
-		project.pages[page_index] = page;
-		project.updated = get_datetime_now();
+		project.add_page(page);
 	}
 
 	/**
 	 * Deletes a page from a project.
 	 */
-	delete_page(project_id: string, page_id: string): void {
+	delete_page(project_id: Uuid, page_id: Uuid): void {
 		const project = this.projects.find((p) => p.id === project_id);
 		if (!project) return;
 
-		const page_index = project.pages.findIndex((p) => p.id === page_id);
-		if (page_index === -1) return;
-
-		project.pages.splice(page_index, 1);
-		project.updated = get_datetime_now();
+		project.delete_page(page_id);
 	}
 
 	/**
 	 * Adds a new domain to a project.
 	 */
-	add_domain(project_id: string, domain: Domain): void {
+	add_domain(project_id: Uuid, domain: Domain): void {
 		const project = this.projects.find((p) => p.id === project_id);
 		if (!project) return;
 
-		project.domains.push(domain);
-		project.updated = get_datetime_now();
+		project.add_domain(domain);
 	}
 
 	/**
 	 * Updates an existing domain.
 	 */
-	update_domain(project_id: string, domain: Domain): void {
+	update_domain(project_id: Uuid, domain: Domain): void {
 		const project = this.projects.find((p) => p.id === project_id);
 		if (!project) return;
 
-		const domain_index = project.domains.findIndex((d) => d.id === domain.id);
-		if (domain_index === -1) return;
-
-		project.domains[domain_index] = domain;
-		project.updated = get_datetime_now();
+		project.update_domain(domain);
 	}
 
 	/**
 	 * Deletes a domain from a project.
 	 */
-	delete_domain(project_id: string, domain_id: string): void {
+	delete_domain(project_id: Uuid, domain_id: Uuid): void {
 		const project = this.projects.find((p) => p.id === project_id);
 		if (!project) return;
 
-		const domain_index = project.domains.findIndex((d) => d.id === domain_id);
-		if (domain_index === -1) return;
-
-		project.domains.splice(domain_index, 1);
-		project.updated = get_datetime_now();
+		project.delete_domain(domain_id);
 	}
 }
+
+export const Projects_Schema = z.instanceof(Projects);

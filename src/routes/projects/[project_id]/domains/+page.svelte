@@ -1,4 +1,6 @@
 <script lang="ts">
+	import {base} from '$app/paths';
+
 	import {projects_context} from '../../projects.svelte.js';
 	import Project_Sidebar from '../../Project_Sidebar.svelte';
 	import Section_Sidebar from '../../Section_Sidebar.svelte';
@@ -8,7 +10,6 @@
 
 	const projects = projects_context.get();
 
-	// Use the reactive current_project_controller instead of get_project_controller
 	const controller = $derived(projects.current_project_controller);
 </script>
 
@@ -46,7 +47,7 @@
 							{#each controller.project.domains as domain (domain.id)}
 								<tr>
 									<td>
-										<a href="/projects/{controller.project_id}/domains/{domain.id}">
+										<a href="{base}/projects/{controller.project_id}/domains/{domain.id}">
 											{domain.name || '[new domain]'}
 										</a>
 									</td>

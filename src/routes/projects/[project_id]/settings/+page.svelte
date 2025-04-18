@@ -6,7 +6,6 @@
 
 	const projects = projects_context.get();
 
-	// Use the reactive current_project_controller instead of get_project_controller
 	const controller = $derived(projects.current_project_controller);
 </script>
 

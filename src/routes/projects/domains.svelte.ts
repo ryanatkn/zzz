@@ -1,69 +1,66 @@
+import {z} from 'zod';
 import {goto} from '$app/navigation';
+import {base} from '$app/paths';
 
-import {get_datetime_now} from '$lib/zod_helpers.js';
-import {projects_context, type Domain, type Project, type Projects} from './projects.svelte.js';
+import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
+import {Domain_Controller_Json} from './projects_schema.js';
+import {get_datetime_now, type Uuid} from '$lib/zod_helpers.js';
+import {Domain} from './domain.svelte.js';
+import type {Projects} from './projects.svelte.js';
+
+export interface Domain_Controller_Options extends Cell_Options<typeof Domain_Controller_Json> {
+	projects: Projects;
+}
 
 /**
  * Controller for domain management functionality.
  */
-export class Domains_Controller {
-	/** The project ID. */
-	readonly project_id: string;
-
-	/** The domain ID being edited. */
-	readonly domain_id: string;
+export class Domain_Controller extends Cell<typeof Domain_Controller_Json> {
+	project_id: Uuid = $state()!;
+	domain_id?: Uuid = $state();
+	domain_name: string = $state()!;
+	domain_status: 'active' | 'pending' | 'inactive' = $state()!;
+	ssl_enabled: boolean = $state()!;
+	is_initialized: boolean = $state()!;
 
 	/** Projects service instance. */
 	readonly projects: Projects;
 
-	/** Domain name form field. */
-	domain_name: string = $state('');
-
-	/** Domain status form field. */
-	domain_status: 'active' | 'pending' | 'inactive' = $state('pending');
-
-	/** SSL enabled form field. */
-	ssl_enabled: boolean = $state(false);
-
-	/** Whether the form has been initialized. */
-	#initialized: boolean = $state(false);
-
 	/** Whether the form has unsaved changes. */
-	has_changes = $derived(
-		this.#initialized &&
-			(!this.domain ||
+	has_changes = $derived.by(
+		() =>
+			this.is_initialized &&
+			(this.domain === null ||
 				this.domain_name !== this.domain.name ||
 				this.domain_status !== this.domain.status ||
 				this.ssl_enabled !== this.domain.ssl),
 	);
 
 	/** The current project. */
-	get project(): Project | null {
-		return this.projects.current_project;
-	}
+	readonly project = $derived.by(() => this.projects.current_project);
 
 	/** The domain being edited. */
-	get domain(): Domain | null {
-		return this.projects.current_domain;
-	}
+	readonly domain = $derived.by(() => {
+		if (!this.domain_id) return null;
+		return this.project?.domains.find((d) => d.id === this.domain_id) || null;
+	});
 
 	/**
-	 * Constructor for the domains controller.
-	 * Does not initialize form values in the constructor to avoid reactivity issues.
+	 * Creates a new Domain_Controller instance.
 	 */
-	constructor(project_id: string, domain_id?: string | null, projects?: Projects) {
-		this.project_id = project_id;
-		this.domain_id = domain_id || '';
-		this.projects = projects || projects_context.get();
+	constructor(options: Domain_Controller_Options) {
+		super(Domain_Controller_Json, options);
+
+		this.projects = options.projects;
+
+		this.init();
 
 		// TODO BLOCK remove/refactor
-		// Init occurs after construction in the first derived computation
-		$effect(() => {
-			if (this.project && !this.#initialized) {
-				this.init_form();
-				this.#initialized = true;
-			}
-		});
+		// Initialize form values after construction
+		if (!this.is_initialized) {
+			this.init_form();
+			this.is_initialized = true;
+		}
 	}
 
 	/**
@@ -84,52 +81,50 @@ export class Domains_Controller {
 	}
 
 	/**
-	 * Saves domain settings.
+	 * Save domain settings.
 	 */
 	save_domain_settings(): void {
-		if (!this.project || !this.domain) return;
+		if (!this.project) return;
 
-		this.projects.update_domain(this.project_id, {
-			...this.domain,
-			name: this.domain_name,
-			status: this.domain_status,
-			ssl: this.ssl_enabled,
-			updated: get_datetime_now(),
-		});
+		const now = get_datetime_now();
 
-		void goto(`/projects/${this.project_id}/domains`);
+		if (this.domain) {
+			// Update existing domain
+			this.domain.name = this.domain_name;
+			this.domain.status = this.domain_status;
+			this.domain.ssl = this.ssl_enabled;
+			this.domain.updated = now;
+		} else {
+			// Create new domain
+			const domain = new Domain({
+				zzz: this.zzz,
+				json: {
+					name: this.domain_name,
+					status: this.domain_status,
+					ssl: this.ssl_enabled,
+					created: now,
+					updated: now,
+				},
+			});
+
+			this.projects.add_domain(this.project_id, domain);
+		}
+
+		void goto(`${base}/projects/${this.project_id}/domains`);
 	}
 
 	/**
-	 * Removes a domain.
+	 * Remove a domain.
 	 */
 	remove_domain(): void {
-		if (!this.project || !this.domain || !this.domain_id) return;
+		if (!this.project || !this.domain_id) return;
 
 		// eslint-disable-next-line no-alert
 		if (confirm('Are you sure you want to remove this domain? This action cannot be undone.')) {
 			this.projects.delete_domain(this.project_id, this.domain_id);
-			void goto(`/projects/${this.project_id}/domains`);
+			void goto(`${base}/projects/${this.project_id}/domains`);
 		}
 	}
-
-	/**
-	 * Adds a new domain to the project.
-	 */
-	add_new_domain(): void {
-		if (!this.project || !this.domain_name.trim()) return;
-
-		const created = get_datetime_now();
-		const new_domain: Domain = {
-			id: 'dom_' + Date.now(),
-			name: this.domain_name,
-			status: this.domain_status,
-			ssl: this.ssl_enabled,
-			created,
-			updated: created,
-		};
-
-		this.projects.add_domain(this.project_id, new_domain);
-		void goto(`/projects/${this.project_id}/domains`);
-	}
 }
+
+export const Domain_Controller_Schema = z.instanceof(Domain_Controller);

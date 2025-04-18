@@ -1,5 +1,6 @@
 <script lang="ts">
 	import {slide} from 'svelte/transition';
+	import {base} from '$app/paths';
 
 	import Nav_Link from '$lib/Nav_Link.svelte';
 	import {projects_context} from './projects.svelte.js';
@@ -8,7 +9,6 @@
 
 	const projects = projects_context.get();
 
-	// Use the reactive current_project_controller instead of get_project_controller
 	const controller = $derived(projects.current_project_controller);
 </script>
 
@@ -30,7 +30,7 @@
 					{#each controller.project.pages as page (page.id)}
 						<li transition:slide>
 							<Nav_Link
-								href="/projects/{controller.project_id}/pages/{page.id}"
+								href="{base}/projects/{controller.project_id}/pages/{page.id}"
 								selected={page.id === projects.current_page_id}
 								attrs={{title: page.title}}
 							>

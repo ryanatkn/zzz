@@ -1,4 +1,6 @@
 <script lang="ts">
+	import {base} from '$app/paths';
+
 	import Nav_Link from '$lib/Nav_Link.svelte';
 	import {GLYPH_PROMPT} from '$lib/glyphs.js';
 	import Contextmenu_Prompt from '$lib/Contextmenu_Prompt.svelte';
@@ -14,7 +16,7 @@
 
 <Contextmenu_Prompt {prompt}>
 	<Nav_Link
-		href="?prompt={prompt.id}"
+		href="{base}/prompts/{prompt.id}"
 		{selected}
 		attrs={{
 			class: 'justify_content_space_between',

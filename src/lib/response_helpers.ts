@@ -115,7 +115,7 @@ export const process_provider_data = (
  * Creates a standard completion response object.
  */
 export const create_completion_response = (
-	request_id: string,
+	request_id: Uuid,
 	provider_name: Provider_Name,
 	model: string,
 	api_response: any,
@@ -133,7 +133,7 @@ export const create_completion_response = (
  * Creates a completion response message.
  */
 export const create_completion_response_message = (
-	request_id: string,
+	request_id: Uuid,
 	provider_name: Provider_Name,
 	model: string,
 	api_response: any,

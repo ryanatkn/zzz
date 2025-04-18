@@ -1,5 +1,6 @@
 <script lang="ts">
 	import {page} from '$app/state';
+	import {base} from '$app/paths';
 
 	import Nav_Link from '$lib/Nav_Link.svelte';
 
@@ -17,7 +18,7 @@
 		<ul class="unstyled">
 			<li>
 				<Nav_Link
-					href="/projects/{project_id}"
+					href="{base}/projects/{project_id}"
 					selected={section === 'project'}
 					show_selected_descendent={false}
 				>
@@ -25,16 +26,17 @@
 				</Nav_Link>
 			</li>
 			<li>
-				<Nav_Link href="/projects/{project_id}/pages" selected={section === 'pages'}>pages</Nav_Link
+				<Nav_Link href="{base}/projects/{project_id}/pages" selected={section === 'pages'}
+					>pages</Nav_Link
 				>
 			</li>
 			<li>
-				<Nav_Link href="/projects/{project_id}/domains" selected={section === 'domains'}>
+				<Nav_Link href="{base}/projects/{project_id}/domains" selected={section === 'domains'}>
 					domains
 				</Nav_Link>
 			</li>
 			<li>
-				<Nav_Link href="/projects/{project_id}/settings" selected={section === 'settings'}>
+				<Nav_Link href="{base}/projects/{project_id}/settings" selected={section === 'settings'}>
 					settings
 				</Nav_Link>
 			</li>

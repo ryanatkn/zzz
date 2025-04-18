@@ -1,4 +1,5 @@
 <script module lang="ts">
+	// svelte-ignore non_reactive_update
 	let browser: Browser;
 </script>
 

@@ -1,4 +1,6 @@
 <script lang="ts">
+	import {base} from '$app/paths';
+
 	import {projects_context} from './projects.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
 	import {GLYPH_ADD} from '$lib/glyphs.js';
@@ -10,13 +12,13 @@
 	<h2 class="mt_0 mb_lg">Projects</h2>
 
 	{#if projects.projects.length === 0}
-		<div class="panel p_lg text_align_center">
+		<div class="panel p_lg text_align_center width_md">
 			<p>You don't have any projects yet.</p>
 		</div>
 	{:else}
 		<div class="projects_grid">
 			{#each projects.projects as project (project.id)}
-				<a href="/projects/{project.id}" class="project_card panel p_md font_weight_400">
+				<a href="{base}/projects/{project.id}" class="project_card panel p_md font_weight_400">
 					<h3 class="mt_0 mb_sm">{project.name}</h3>
 					<p class="mb_md">{project.description}</p>
 					<div class="domains_list mb_md">
@@ -93,11 +95,11 @@
 	}
 
 	.status_active {
-		background-color: var(--color_b_6);
+		background-color: var(--color_b_5);
 	}
 
 	.status_pending {
-		background-color: var(--color_e_6);
+		background-color: var(--color_e_5);
 	}
 
 	.status_inactive {

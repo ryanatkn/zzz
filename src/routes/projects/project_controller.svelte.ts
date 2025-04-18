@@ -1,46 +1,53 @@
+import {z} from 'zod';
 import {goto} from '$app/navigation';
+import {base} from '$app/paths';
 
-import {get_datetime_now} from '$lib/zod_helpers.js';
-import {projects_context, type Project, type Projects} from './projects.svelte.js';
+import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
+import {Project_Controller_Json} from './projects_schema.js';
+import {get_datetime_now, create_uuid, type Uuid} from '$lib/zod_helpers.js';
+import {Domain} from './domain.svelte.js';
+import {Page} from './page.svelte.js';
+import {Projects} from './projects.svelte.js';
+import {get_unique_name} from '$lib/helpers.js';
+
+export interface Project_Controller_Options extends Cell_Options<typeof Project_Controller_Json> {
+	projects: Projects;
+}
 
 /**
- * Controller for managing a specific project and its state.
+ * Controller for managing project details and operations.
  */
-export class Project_Controller {
+export class Project_Controller extends Cell<typeof Project_Controller_Json> {
+	project_id: Uuid = $state()!;
+	edited_name: string = $state()!;
+	edited_description: string = $state()!;
+	editing_project: boolean = $state()!;
+
 	/** Projects service instance. */
 	readonly projects: Projects;
 
-	/** Edited project name for the form. */
-	edited_name = $state('');
-
-	/** Edited project description for the form. */
-	edited_description = $state('');
-
-	/** State for project editing UI. */
-	editing_project = $state(false);
-
 	/** Whether the form has unsaved changes. */
-	has_changes = $derived(
-		this.project &&
+	has_changes = $derived.by(
+		() =>
+			this.project &&
 			(this.edited_name !== this.project.name ||
 				this.edited_description !== this.project.description),
 	);
 
-	/**
-	 * The current project derived from the projects service.
-	 */
-	get project(): Project | null {
-		return this.projects.current_project;
-	}
+	/** The current project. */
+	readonly project = $derived.by(() => this.projects.current_project);
 
 	/**
-	 * Creates a new Project_Controller.
+	 * Creates a new Project_Controller instance.
 	 */
-	constructor(
-		public project_id: string,
-		projects?: Projects,
-	) {
-		this.projects = projects || projects_context.get();
+	constructor(options: Project_Controller_Options) {
+		super(Project_Controller_Json, options);
+
+		this.projects = options.projects;
+
+		this.init();
+
+		// TODO BLOCK remove/refactor
 		this.reset_form();
 	}
 
@@ -66,12 +73,9 @@ export class Project_Controller {
 			return;
 		}
 
-		this.projects.update_project({
-			...this.project,
-			name: this.edited_name,
-			description: this.edited_description,
-			updated: get_datetime_now(),
-		});
+		this.project.name = this.edited_name;
+		this.project.description = this.edited_description;
+		this.project.updated = get_datetime_now();
 
 		this.editing_project = false;
 	}
@@ -87,8 +91,8 @@ export class Project_Controller {
 			'Are you sure you want to delete this project? This action cannot be undone.',
 		);
 
-		if (confirmed && this.projects.current_project_id) {
-			this.projects.delete_project(this.projects.current_project_id);
+		if (confirmed) {
+			this.projects.delete_project(this.project_id);
 			void goto('/projects');
 		}
 	}
@@ -96,8 +100,8 @@ export class Project_Controller {
 	/**
 	 * Delete a page from the current project.
 	 */
-	delete_project_page(page_id: string): void {
-		if (!this.projects.current_project_id) return;
+	delete_project_page(page_id: Uuid): void {
+		if (!this.project) return;
 
 		// eslint-disable-next-line no-alert
 		const confirmed = confirm(
@@ -105,23 +109,7 @@ export class Project_Controller {
 		);
 
 		if (confirmed) {
-			this.projects.delete_page(this.projects.current_project_id, page_id);
-		}
-	}
-
-	/**
-	 * Delete a domain from the current project.
-	 */
-	delete_project_domain(domain_id: string): void {
-		if (!this.projects.current_project_id) return;
-
-		// eslint-disable-next-line no-alert
-		const confirmed = confirm(
-			'Are you sure you want to delete this domain? This action cannot be undone.',
-		);
-
-		if (confirmed) {
-			this.projects.delete_domain(this.projects.current_project_id, domain_id);
+			this.project.delete_page(page_id);
 		}
 	}
 
@@ -131,19 +119,28 @@ export class Project_Controller {
 	create_new_page(): void {
 		if (!this.project) return;
 
-		const created = get_datetime_now();
-		const page_id = 'page_' + Date.now();
+		// Generate a unique page name within this project
+		const base_title = 'New Page';
+		const existing_titles = this.project.pages.map((p) => p.title);
+		const unique_title = get_unique_name(base_title, new Set(existing_titles));
 
-		this.projects.add_page(this.project_id, {
-			id: page_id,
-			title: 'New Page',
-			path: '/new-page',
-			content: '# New Page\n\nAdd your content here.',
-			created,
-			updated: created,
+		const page_id = create_uuid();
+		const created = get_datetime_now();
+
+		const page = new Page({
+			zzz: this.zzz,
+			json: {
+				id: page_id,
+				title: unique_title,
+				path: '/new-page',
+				content: `# ${unique_title}\n\nAdd your content here.`,
+				created,
+				updated: created,
+			},
 		});
 
-		void goto(`/projects/${this.project_id}/pages/${page_id}`);
+		this.project.add_page(page);
+		void goto(`${base}/projects/${this.project_id}/pages/${page_id}`);
 	}
 
 	/**
@@ -152,18 +149,24 @@ export class Project_Controller {
 	create_new_domain(): void {
 		if (!this.project) return;
 
-		const domain_id = 'dom_' + Date.now();
+		const domain_id = create_uuid();
 		const created = get_datetime_now();
 
-		this.projects.add_domain(this.project_id, {
-			id: domain_id,
-			name: '',
-			status: 'pending',
-			ssl: false,
-			created,
-			updated: created,
+		const domain = new Domain({
+			zzz: this.zzz,
+			json: {
+				id: domain_id,
+				name: '',
+				status: 'pending',
+				ssl: false,
+				created,
+				updated: created,
+			},
 		});
 
-		void goto(`/projects/${this.project_id}/domains/${domain_id}`);
+		this.project.add_domain(domain);
+		void goto(`${base}/projects/${this.project_id}/domains/${domain_id}`);
 	}
 }
+
+export const Project_Controller_Schema = z.instanceof(Project_Controller);

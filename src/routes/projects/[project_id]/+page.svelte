@@ -1,11 +1,12 @@
 <script lang="ts">
+	import {base} from '$app/paths';
+
 	import {projects_context} from '../projects.svelte.js';
 	import Project_Sidebar from '../Project_Sidebar.svelte';
 	import Section_Sidebar from '../Section_Sidebar.svelte';
 
 	const projects = projects_context.get();
 
-	// Use the reactive current_project_controller instead of get_project_controller
 	const controller = $derived(projects.current_project_controller);
 </script>
 
@@ -24,7 +25,7 @@
 								type="button"
 								class="color_a"
 								onclick={() => controller.save_project_details()}
-								disabled={!controller.has_changes}>Save</button
+								disabled={!controller.has_changes}>save</button
 							>
 							<button
 								type="button"
@@ -32,12 +33,12 @@
 								onclick={() => {
 									controller.editing_project = false;
 									controller.reset_form();
-								}}>Cancel</button
+								}}>cancel</button
 							>
 						</div>
 					{:else}
 						<button type="button" class="plain" onclick={() => (controller.editing_project = true)}
-							>Edit</button
+							>edit</button
 						>
 					{/if}
 				</div>
@@ -46,7 +47,7 @@
 					<div class="panel p_md width_md mb_lg">
 						<div class="mb_md">
 							<label>
-								Project Name
+								Project name
 								<input type="text" bind:value={controller.edited_name} class="w_100" />
 							</label>
 						</div>
@@ -81,14 +82,18 @@
 
 				<div class="projects_grid">
 					<div class="panel p_md">
-						<h2 class="mt_0 mb_lg"><a href="/projects/{controller.project_id}/pages">Pages</a></h2>
+						<h2 class="mt_0 mb_lg">
+							<a href="{base}/projects/{controller.project_id}/pages">Pages</a>
+						</h2>
 						{#if controller.project.pages.length === 0}
 							<p class="text_color_5">No pages created yet.</p>
 						{:else}
 							<ul class="pages_list">
 								{#each controller.project.pages as page (page.id)}
 									<li>
-										<a href="/projects/{controller.project_id}/pages/{page.id}">{page.title}</a>
+										<a href="{base}/projects/{controller.project_id}/pages/{page.id}"
+											>{page.title}</a
+										>
 										<span class="text_color_5">{page.path}</span>
 									</li>
 								{/each}
@@ -103,7 +108,7 @@
 
 					<div class="panel p_md">
 						<h2 class="mt_0 mb_lg">
-							<a href="/projects/{controller.project_id}/domains">Domains</a>
+							<a href="{base}/projects/{controller.project_id}/domains">Domains</a>
 						</h2>
 						{#if controller.project.domains.length === 0}
 							<p class="text_color_5">No domains configured yet.</p>
@@ -111,7 +116,7 @@
 							<ul class="domains_list">
 								{#each controller.project.domains as domain (domain.id)}
 									<li>
-										<a href="/projects/{controller.project_id}/domains/{domain.id}">
+										<a href="{base}/projects/{controller.project_id}/domains/{domain.id}">
 											<span class="domain_name">{domain.name}</span>
 										</a>
 										<div class="domain_details">

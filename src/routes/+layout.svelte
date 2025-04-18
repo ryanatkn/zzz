@@ -12,7 +12,6 @@
 	import * as devalue from 'devalue';
 	import {BROWSER} from 'esm-env';
 	import {Unreachable_Error} from '@ryanatkn/belt/error.js';
-	import {page} from '$app/state';
 	import {PUBLIC_WEBSOCKET_URL} from '$env/static/public';
 
 	import {App} from '$lib/app.svelte.js';
@@ -130,31 +129,11 @@
 		zzz.actions.send({id: create_uuid(), type: 'load_session'});
 	}
 
-	// TODO BLOCK refactor, try to remove - how? schema with typesafe registration/dispatch?
+	// TODO refactor, maybe per route?
 	// Handle URL parameter synchronization
 	$effect.pre(() => {
-		// Re-run when URL search params change
-		page.url.search;
-
-		// TODO BLOCK should these select null if present but not found? maybe one UX is better overall? also maybe clear invalid values from the url?
-
-		// Sync chat selection
-		const chat_id = zzz.url_params.get_uuid_param('chat');
-		if (chat_id && zzz.chats.items.by_id.has(chat_id)) {
-			zzz.chats.select(chat_id);
-		}
-
-		// Sync prompt selection
-		const prompt_id = zzz.url_params.get_uuid_param('prompt');
-		if (prompt_id && zzz.prompts.items.by_id.has(prompt_id)) {
-			zzz.prompts.select(prompt_id);
-		}
-
-		// Sync file selection
-		const diskfile_id = zzz.url_params.get_uuid_param('file');
-		if (diskfile_id && zzz.diskfiles.items.by_id.has(diskfile_id)) {
-			zzz.diskfiles.select(diskfile_id);
-		}
+		zzz.chats.select(zzz.url_params.get_uuid_param('chat_id'));
+		zzz.prompts.select(zzz.url_params.get_uuid_param('prompt_id'));
 	});
 </script>
 

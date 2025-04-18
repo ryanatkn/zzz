@@ -1,7 +1,16 @@
+import {z} from 'zod';
 import {goto} from '$app/navigation';
 
-import {get_datetime_now} from '$lib/zod_helpers.js';
-import {projects_context, type Page, type Project, type Projects} from './projects.svelte.js';
+import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
+import {Page_Editor_Json} from './projects_schema.js';
+import {get_datetime_now, type Uuid} from '$lib/zod_helpers.js';
+import {Page} from './page.svelte.js';
+import type {Projects} from './projects.svelte.js';
+import {base} from '$app/paths';
+
+export interface Page_Editor_Options extends Cell_Options<typeof Page_Editor_Json> {
+	projects: Projects;
+}
 
 /**
  * Simple sanitization function to prevent XSS attacks.
@@ -71,25 +80,21 @@ const render_markdown = (text: string): string => {
 /**
  * Manages page editor functionality.
  */
-export class Page_Editor {
+export class Page_Editor extends Cell<typeof Page_Editor_Json> {
+	project_id: Uuid = $state()!;
+	page_id: Uuid = $state()!;
+	title: string = $state()!;
+	path: string = $state()!;
+	content: string = $state()!;
+	is_initialized: boolean = $state()!;
+
 	/** Projects service instance. */
 	readonly projects: Projects;
 
-	/** Page title form field. */
-	title: string = $state('');
-
-	/** Page path form field. */
-	path: string = $state('/');
-
-	/** Page content form field. */
-	content: string = $state('# New Page\n\nAdd your content here.');
-
-	/** Whether the form has been initialized. */
-	#initialized: boolean = $state(false);
-
 	/** Whether the form has unsaved changes. */
-	has_changes = $derived(
-		this.#initialized &&
+	has_changes = $derived.by(
+		() =>
+			this.is_initialized &&
 			(this.is_new_page ||
 				(this.current_page &&
 					(this.title !== this.current_page.title ||
@@ -98,38 +103,35 @@ export class Page_Editor {
 	);
 
 	/** Whether this is a new page. */
-	get is_new_page(): boolean {
-		return this.page_id === 'new';
-	}
+	readonly is_new_page = $derived(this.page_id === 'new');
 
 	/** The current project. */
-	get project(): Project | null {
-		return this.projects.current_project;
-	}
+	readonly project = $derived.by(() => this.projects.current_project);
 
 	/** The current page. */
-	get current_page(): Page | null {
-		return !this.is_new_page ? this.projects.current_page : null;
-	}
+	readonly current_page = $derived.by(() => {
+		if (this.is_new_page) return null;
+		return this.project?.pages.find((p) => p.id === this.page_id) || null;
+	});
 
 	/** Safely formatted content for preview. */
-	get formatted_content(): string {
-		return render_markdown(this.content);
-	}
+	readonly formatted_content = $derived(render_markdown(this.content));
 
 	/**
 	 * Creates a new Page_Editor instance.
 	 */
-	constructor(
-		public project_id: string,
-		public page_id: string,
-		projects?: Projects,
-	) {
-		this.projects = projects || projects_context.get();
+	constructor(options: Page_Editor_Options) {
+		super(Page_Editor_Json, options);
 
-		if ((this.project || this.is_new_page) && !this.#initialized) {
+		this.projects = options.projects;
+
+		this.init();
+
+		// TODO BLOCK remove/refactor
+		// Initialize form values after construction
+		if (!this.is_initialized) {
 			this.init_form();
-			this.#initialized = true;
+			this.is_initialized = true;
 		}
 	}
 
@@ -142,7 +144,8 @@ export class Page_Editor {
 			this.path = this.current_page.path;
 			this.content = this.current_page.content;
 		} else {
-			this.title = '';
+			// Handle default values for new pages
+			this.title = 'New Page';
 			this.path = '/';
 			this.content = '# New Page\n\nAdd your content here.';
 		}
@@ -162,31 +165,33 @@ export class Page_Editor {
 
 		// Ensure path starts with /
 		const formatted_path = this.path.startsWith('/') ? this.path : `/${this.path}`;
-		const created = get_datetime_now();
+		const now = get_datetime_now();
 
 		if (this.is_new_page) {
 			// Create new page
-			const new_page: Page = {
-				id: 'page_' + Date.now(),
-				title: this.title,
-				path: formatted_path,
-				content: this.content,
-				created,
-				updated: created,
-			};
+			const page = new Page({
+				zzz: this.zzz,
+				json: {
+					title: this.title,
+					path: formatted_path,
+					content: this.content,
+					created: now,
+					updated: now,
+				},
+			});
 
-			this.projects.add_page(this.project_id, new_page);
-			void goto(`/projects/${this.project_id}/pages`);
+			this.projects.add_page(this.project_id, page);
+			void goto(`${base}/projects/${this.project_id}/pages`);
 		} else if (this.current_page) {
 			// Update existing page
-			this.projects.update_page(this.project_id, {
-				...this.current_page,
-				title: this.title,
-				path: formatted_path,
-				content: this.content,
-				updated: created,
-			});
-			void goto(`/projects/${this.project_id}/pages`);
+			this.current_page.title = this.title;
+			this.current_page.path = formatted_path;
+			this.current_page.content = this.content;
+			this.current_page.updated = now;
+
+			void goto(`${base}/projects/${this.project_id}/pages`);
 		}
 	}
 }
+
+export const Page_Editor_Schema = z.instanceof(Page_Editor);

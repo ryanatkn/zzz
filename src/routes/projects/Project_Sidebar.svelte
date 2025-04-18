@@ -1,5 +1,7 @@
 <script lang="ts">
 	import {slide} from 'svelte/transition';
+	import {goto} from '$app/navigation';
+	import {base} from '$app/paths';
 
 	import Nav_Link from '$lib/Nav_Link.svelte';
 	import {projects_context} from './projects.svelte.js';
@@ -14,7 +16,10 @@
 		<button
 			type="button"
 			class="plain justify_content_start flex_1"
-			onclick={() => projects.create_new_project()}
+			onclick={() => {
+				const project = projects.create_new_project();
+				void goto(`${base}/projects/${project.id}`);
+			}}
 		>
 			<Glyph text={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new project
 		</button>
@@ -25,7 +30,7 @@
 			{#each projects.projects as project (project.id)}
 				<li transition:slide>
 					<Nav_Link
-						href="/projects/{project.id}"
+						href="{base}/projects/{project.id}"
 						selected={project.id === projects.current_project_id}
 						attrs={{title: project.name}}
 					>

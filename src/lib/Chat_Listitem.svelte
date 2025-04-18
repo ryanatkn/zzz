@@ -1,4 +1,6 @@
 <script lang="ts">
+	import {base} from '$app/paths';
+
 	import Nav_Link from '$lib/Nav_Link.svelte';
 	import Contextmenu_Chat from '$lib/Contextmenu_Chat.svelte';
 	import Glyph from '$lib/Glyph.svelte';
@@ -15,7 +17,7 @@
 
 <Contextmenu_Chat {chat}>
 	<Nav_Link
-		href="?chat={chat.id}"
+		href="{base}/chats/{chat.id}"
 		{selected}
 		attrs={{
 			class: 'justify_content_space_between',

@@ -8,7 +8,6 @@
 
 	const projects = projects_context.get();
 
-	// Use the reactive current_domains_controller instead of get_domains_controller
 	const domains_controller = $derived(projects.current_domains_controller);
 </script>
 

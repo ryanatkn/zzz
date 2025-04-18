@@ -3,7 +3,7 @@
 	import type {SvelteHTMLElements} from 'svelte/elements';
 	import type {Snippet} from 'svelte';
 	import {base} from '$app/paths';
-	import {ensure_end} from '@ryanatkn/belt/string.js';
+	import {strip_end} from '@ryanatkn/belt/string.js';
 
 	interface Props {
 		href: string;
@@ -14,20 +14,22 @@
 	}
 
 	const {
-		href: href_prop,
+		href,
 		selected: selected_prop,
 		show_selected_descendent = true,
 		attrs,
 		children,
 	}: Props = $props();
 
-	const href = $derived(ensure_end(href_prop, '/'));
-	const pathname = $derived(ensure_end(page.url.pathname, '/'));
+	const href_normalized = $derived(strip_end(href, '/'));
+	const pathname_normalized = $derived(strip_end(page.url.pathname, '/'));
 
-	const selected = $derived(selected_prop ?? pathname === href);
+	const selected = $derived(selected_prop ?? pathname_normalized === href_normalized);
 	const selected_descendent = $derived(
 		show_selected_descendent &&
-			(selected || href === base + '/' ? false : pathname.startsWith(href)),
+			(selected || href_normalized === base
+				? false
+				: (pathname_normalized + '/').startsWith(href + '/')),
 	);
 
 	// TODO link styles should have focus always be blue, and active should be thicker

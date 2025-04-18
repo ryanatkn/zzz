@@ -1,5 +1,6 @@
 <script lang="ts">
 	import {slide} from 'svelte/transition';
+	import {base} from '$app/paths';
 
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
@@ -32,7 +33,7 @@
 							>In prompt{referenced_by_prompts.length !== 1 ? 's' : ''}:</span
 						>
 						{#each referenced_by_prompts as prompt (prompt.id)}
-							<a href="?prompt={prompt.id}" class="prompt_ref">
+							<a href="{base}/prompts/{prompt.id}" class="prompt_ref">
 								{prompt.name}
 							</a>
 						{/each}

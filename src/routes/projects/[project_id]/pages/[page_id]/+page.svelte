@@ -1,5 +1,6 @@
 <script lang="ts">
 	import {goto} from '$app/navigation';
+	import {base} from '$app/paths';
 
 	import {projects_context} from '../../../projects.svelte.js';
 	import Project_Sidebar from '../../../Project_Sidebar.svelte';
@@ -35,7 +36,7 @@
 			controller.delete_project_page(editor.page_id);
 
 			// Navigate back to pages list
-			void goto(`/projects/${editor.project_id}/pages`);
+			void goto(`${base}/projects/${editor.project_id}/pages`);
 		}
 	};
 </script>

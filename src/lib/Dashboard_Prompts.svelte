@@ -2,6 +2,8 @@
 	import {scale, fade} from 'svelte/transition';
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
 	import {random_item} from '@ryanatkn/belt/random.js';
+	import {goto} from '$app/navigation';
+	import {base} from '$app/paths';
 
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Glyph from '$lib/Glyph.svelte';
@@ -76,7 +78,9 @@
 					type="button"
 					class="plain w_100 justify_content_start"
 					onclick={() => {
-						zzz.prompts.add().add_bit(Bit.create(zzz, {type: 'text'}));
+						const prompt = zzz.prompts.add();
+						prompt.add_bit(Bit.create(zzz, {type: 'text'}));
+						void goto(`${base}/prompts/${prompt.id}`);
 					}}
 				>
 					<Glyph text={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new prompt

@@ -362,7 +362,6 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 		}
 		if (schema_info.type === 'ZodBranded' && value !== null && value !== undefined) {
 			try {
-				// Use the schema directly to parse branded types
 				const field_schema = this.field_schemas.get(key);
 				return (field_schema?.parse(value) ?? value) as this[K];
 			} catch (e) {

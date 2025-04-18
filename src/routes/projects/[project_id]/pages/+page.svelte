@@ -1,4 +1,6 @@
 <script lang="ts">
+	import {base} from '$app/paths';
+
 	import {projects_context} from '../../projects.svelte.js';
 	import Project_Sidebar from '../../Project_Sidebar.svelte';
 	import Section_Sidebar from '../../Section_Sidebar.svelte';
@@ -8,7 +10,6 @@
 
 	const projects = projects_context.get();
 
-	// Use the reactive current_project_controller instead of get_project_controller
 	const controller = $derived(projects.current_project_controller);
 
 	const page_count = $derived(controller?.project?.pages.length);
@@ -45,7 +46,9 @@
 							{#each controller.project.pages as page (page.id)}
 								<tr>
 									<td>
-										<a href="/projects/{controller.project_id}/pages/{page.id}">{page.title}</a>
+										<a href="{base}/projects/{controller.project_id}/pages/{page.id}"
+											>{page.title}</a
+										>
 									</td>
 									<td>{page.path}</td>
 									<td>{new Date(page.created).toLocaleString()}</td>
@@ -65,7 +68,6 @@
 		{:else}
 			<div class="p_lg text_align_center">
 				<p>Project not found.</p>
-				<a href="/projects">back to sites</a>
 			</div>
 		{/if}
 	</div>
