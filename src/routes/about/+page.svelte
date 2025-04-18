@@ -39,7 +39,7 @@
 			while remaining fully open, aligned, and in your control.
 		</p>
 		<p>
-			In the technology landscape of 2025, where LLM-based AI is upending longheld assumptions, and <External_Link
+			In the technology landscape of 2025, where LLM-based AI is upending long held assumptions, and <External_Link
 				href="https://wikipedia.org/wiki/Enshittification">enshittification</External_Link
 			> is a widely-understood phenomenon among the very-online, Zzz asks:
 		</p>
@@ -55,10 +55,10 @@
 		<p>
 			The software I imagine answering these questions is cross-platform so it runs everywhere, and
 			for that we have the web with HTML, CSS, and JS. My conceptual starting point is the user
-			interface. I'm a user, and I need to inferface with machines. Zzz leverages JS to glue
+			interface, because we're all users interfacing with machines. Zzz leverages JS to glue
 			software and machines together precisely the way you want, maximizing its utility on any
 			device across the full stack. It can run locally on your machine using any of your available
-			capabilities, or it can deploy anywhere that supports JS and play whatever role you need.
+			capabilities, or it can deploy anywhere JS runs and play whatever role you need.
 		</p>
 		<p>Zzz is based on many kinds of software:</p>
 		<ul>
@@ -82,8 +82,7 @@
 				>
 			</li>
 			<li>
-				web browsers - first with Chromium via Electron, hopefully with swappable browser engines
-				one day
+				web browsers - first with Chromium via Electron, ideally with swappable browser engines
 			</li>
 			<li>
 				web metaframeworks - Zzz extends <External_Link href="https://svelte.dev/"
@@ -93,18 +92,25 @@
 			</li>
 		</ul>
 		<p>
-			The scope may look far-fetched but I'm just building tools I want to use on the best
-			foundations I can assemble. This is an early proof of concept that took about 3 months of
-			full-time work to build. (<External_Link href="https://github.com/ryanatkn/zzz/pull/6"
-				>PR #6</External_Link
-			>) I've been thinking about and prototyping related ideas for more than 13 years, and I think
-			this iteration is sticking.
+			This scope may look far-fetched, but I'm just making tools I want to use now on the best
+			foundations I can assemble. And Zzz doesn't need or want to appeal to every user—thanks to the
+			magic of standards-based interoperability, Zzz works with all websites, and anything you make
+			with Zzz works with other browsers and web technologies. It offers one take on the web, and it
+			would best flourish in a lively <External_Link href="https://vite.dev/"
+				>pluralistic</External_Link
+			> ecosystem.
 		</p>
-		<p>Everything's a work in progress, but some basic integrations include:</p>
+		<p>
+			This is an early proof of concept that took about 3 months of full-time work to build. (<External_Link
+				href="https://github.com/ryanatkn/zzz/pull/6">PR #6</External_Link
+			>) I've been thinking about and prototyping related ideas for more than 13 years, and I think
+			this iteration is sticking. Everything's a work in progress, but some basic integrations
+			include:
+		</p>
 		<ul>
 			<li>
 				<External_Link href="https://github.com/ollama/ollama">Ollama</External_Link> runs AI models
-				locally - this is just the first supported backend, more to come
+				locally - more local backends will be supported
 			</li>
 			<li>
 				<External_Link href="https://github.com/openai/openai-node">ChatGPT</External_Link>,
@@ -118,7 +124,8 @@
 				<External_Link href="https://hono.dev/">Hono</External_Link> as the web server with
 				<External_Link href="https://svelte.dev/">SvelteKit</External_Link> and <External_Link
 					href="https://vite.dev/">Vite</External_Link
-				> for coordination with system access
+				>, plays a key coordinating role - Hono bases itself on web standards and supports all JS
+				runtimes
 			</li>
 			<li>
 				Planned:
@@ -152,10 +159,8 @@
 						>
 					</li>
 					<li>
-						I think it makes sense to prioritize a few high-utility integrations that provide
-						capabilities for manipulating media files, like <External_Link
-							href="https://pandoc.org/">Pandoc</External_Link
-						>,
+						I think it makes sense to prioritize a few high-utility integrations for manipulating
+						media files, like <External_Link href="https://pandoc.org/">Pandoc</External_Link>,
 						<External_Link href="https://ffmpeg.org/">ffmpeg</External_Link>, and <External_Link
 							href="https://imagemagick.org/">ImageMagick</External_Link
 						>
@@ -167,7 +172,7 @@
 		<p>
 			Zzz is just one implementation of an increasingly common idea that combines web tech and AI
 			with powerful open clients, and it has quirks personal to its author that I'm eager to smooth
-			out. Your input would be appreciated to help make it work for you—see the <External_Link
+			out. Your input is appreciated to help make it work for you—see the <External_Link
 				href="https://github.com/ryanatkn/zzz">code</External_Link
 			>,
 			<External_Link href="https://github.com/ryanatkn/zzz/issues">issues</External_Link>, and
