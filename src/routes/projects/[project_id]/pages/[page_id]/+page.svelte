@@ -38,8 +38,8 @@
 			<div class="h_100 column p_lg">
 				<div>
 					<div class="flex gap_sm align_items_center">
-						<h1 class="m_0">
-							{editor.is_new_page ? 'New Page' : `Edit: ${editor.current_page?.title || ''}`}
+						<h1 class="mb_lg">
+							{editor.is_new_page ? 'New page' : editor.current_page?.title || 'Page'}
 						</h1>
 					</div>
 
@@ -65,18 +65,18 @@
 					<div class="flex gap_sm">
 						<div class="flex_1">
 							<label>
-								Page Title
+								Page title
 								<input
 									type="text"
 									bind:value={editor.title}
 									class="w_100"
-									placeholder="Page Title"
+									placeholder="Page title"
 								/>
 							</label>
 						</div>
 						<div class="flex_1">
 							<label>
-								Page Path
+								Page path
 								<input
 									type="text"
 									bind:value={editor.path}
