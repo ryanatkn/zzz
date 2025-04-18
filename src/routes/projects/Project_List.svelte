@@ -16,7 +16,7 @@
 			{#each projects.projects as project (project.id)}
 				<a href="/projects/{project.id}" class="project_card panel p_md font_weight_400">
 					<h3 class="mt_0 mb_sm">{project.name}</h3>
-					<p class="mb_md text_color_5">{project.description || 'No description'}</p>
+					<p class="mb_md">{project.description}</p>
 					<div class="domains_list mb_md">
 						{#each project.domains as domain (domain.id)}
 							<div class="domain_chip">
@@ -28,17 +28,17 @@
 											: 'status_inactive'}"
 								></span>
 								{domain.name}
-								{#if domain.ssl}
-									<span class="ssl_badge">SSL</span>
+								{#if !domain.ssl}
+									<span class="no_ssl_badge">no SSL</span>
 								{/if}
 							</div>
 						{/each}
 					</div>
 					<div class="flex gap_md">
-						<span class="chip"
-							>{project.pages.length} {project.pages.length === 1 ? 'page' : 'pages'}</span
+						<small class="chip"
+							>{project.pages.length} {project.pages.length === 1 ? 'page' : 'pages'}</small
 						>
-						<span class="chip">Updated: {new Date(project.updated).toLocaleDateString()}</span>
+						<small class="chip">updated {new Date(project.updated).toLocaleDateString()}</small>
 					</div>
 				</a>
 			{/each}
@@ -46,7 +46,7 @@
 	{/if}
 
 	<div class="flex justify_content_between mt_lg">
-		<button type="button" class="color_b" onclick={() => projects.create_new_project()}>
+		<button type="button" class="color_a" onclick={() => projects.create_new_project()}>
 			+ new project
 		</button>
 	</div>
@@ -81,7 +81,6 @@
 		align-items: center;
 		gap: var(--size_xs);
 		font-family: var(--font_mono);
-		font-size: 0.9em;
 	}
 
 	.status_dot {
@@ -103,7 +102,7 @@
 		background-color: var(--text_color_5);
 	}
 
-	.ssl_badge {
+	.no_ssl_badge {
 		font-size: 0.8em;
 		background-color: var(--bg_2);
 		padding: 1px 4px;

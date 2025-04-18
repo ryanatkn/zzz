@@ -3,6 +3,7 @@
 	import Project_Sidebar from '../../Project_Sidebar.svelte';
 	import Section_Sidebar from '../../Section_Sidebar.svelte';
 	import Domains_Sidebar from '../../Domains_Sidebar.svelte';
+	import {GLYPH_CHECKMARK} from '$lib/glyphs.js';
 
 	const projects = projects_context.get();
 
@@ -59,7 +60,7 @@
 											{domain.status}
 										</span>
 									</td>
-									<td>{domain.ssl ? 'Enabled' : 'Disabled'}</td>
+									<td>{domain.ssl ? GLYPH_CHECKMARK : ''}</td>
 									<td>{new Date(domain.created).toLocaleString()}</td>
 									<td>{new Date(domain.updated).toLocaleString()}</td>
 								</tr>

@@ -4,6 +4,7 @@
 	import Section_Sidebar from '../../../Section_Sidebar.svelte';
 	import Domains_Sidebar from '../../../Domains_Sidebar.svelte';
 	import {GLYPH_DELETE} from '$lib/glyphs.js';
+	import External_Link from '$lib/External_Link.svelte';
 
 	const projects = projects_context.get();
 
@@ -21,6 +22,16 @@
 			<div class="p_lg">
 				<h1 class="mb_lg">Edit domain</h1>
 
+				<p>
+					{#if domains_controller.domain_name}
+						<External_Link href={`https://${domains_controller.domain_name}`}>
+							{domains_controller.domain_name}
+						</External_Link>
+					{:else}
+						[no domain name]
+					{/if}
+				</p>
+
 				<div class="panel p_md width_md">
 					<form
 						onsubmit={(e) => {
@@ -37,20 +48,13 @@
 						</div>
 
 						{#if domains_controller.domain}
-							<div class="mb_lg">
-								<div>
-									<small
-										>created
-										{new Date(domains_controller.domain.created).toLocaleString()}</small
-									>
-								</div>
-								<div>
-									<small
-										>updated
-										{new Date(domains_controller.domain.updated).toLocaleString()}</small
-									>
-								</div>
-							</div>
+							<p>
+								<small>created {new Date(domains_controller.domain.created).toLocaleString()}</small
+								>
+								<br />
+								<small>updated {new Date(domains_controller.domain.updated).toLocaleString()}</small
+								>
+							</p>
 						{/if}
 
 						<div class="mb_lg">

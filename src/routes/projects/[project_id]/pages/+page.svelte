@@ -8,6 +8,8 @@
 
 	// Use the reactive current_project_controller instead of get_project_controller
 	const controller = $derived(projects.current_project_controller);
+
+	const page_count = $derived(controller?.project?.pages.length);
 </script>
 
 <div class="project_layout">
@@ -20,15 +22,13 @@
 			<div class="p_lg">
 				<h1 class="mb_lg">Pages</h1>
 
-				{#if controller.project.pages.length === 0}
-					<div class="panel p_lg text_align_center mb_lg">
-						<p>This project doesn't have any pages yet.</p>
-						<p>
-							<button type="button" class="color_a" onclick={() => controller.create_new_page()}>
-								Create your first page
-							</button>
-						</p>
-					</div>
+				{#if !page_count}
+					<p>This project doesn't have any web pages yet.</p>
+					<p>
+						<button type="button" class="color_a" onclick={() => controller.create_new_page()}>
+							+ create your first page
+						</button>
+					</p>
 				{:else}
 					<table class="w_100">
 						<thead>
@@ -52,13 +52,13 @@
 							{/each}
 						</tbody>
 					</table>
-				{/if}
 
-				<div class="mb_lg">
-					<button type="button" class="color_a" onclick={() => controller.create_new_page()}>
-						+ new page
-					</button>
-				</div>
+					<div class="mb_lg">
+						<button type="button" class="color_a" onclick={() => controller.create_new_page()}>
+							+ new page
+						</button>
+					</div>
+				{/if}
 			</div>
 		{:else}
 			<div class="p_lg text_align_center">

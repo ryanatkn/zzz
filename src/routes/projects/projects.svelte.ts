@@ -85,7 +85,7 @@ const sample_projects: Array<Project> = [
 	{
 		id: 'proj_2',
 		name: 'Dealt',
-		description: 'toy 2D web game engine with a focus on topdown action RPGs',
+		description: 'toy 2D web game engine with a focus on topdown action RPGs 🔮',
 		created: '2023-02-10T09:15:00Z',
 		updated: '2023-03-05T16:45:00Z',
 		domains: [
@@ -126,6 +126,24 @@ const sample_projects: Array<Project> = [
 				updated: '2023-02-15T09:45:00Z',
 			},
 		],
+	},
+	{
+		id: 'proj_3',
+		name: 'cosmicplayground',
+		description: 'tools and toys for expanding minds 🌌',
+		created: '2023-05-15T08:00:00Z',
+		updated: '2023-06-20T14:15:00Z',
+		domains: [
+			{
+				id: 'dom_5',
+				name: 'cosmicplayground.org',
+				status: 'active',
+				ssl: true,
+				created: '2023-05-15T08:00:00Z',
+				updated: '2023-06-20T14:15:00Z',
+			},
+		],
+		pages: [],
 	},
 ];
 
