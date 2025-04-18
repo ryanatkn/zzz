@@ -41,7 +41,7 @@ const sample_projects: Array<Project> = [
 	{
 		id: 'proj_1',
 		name: 'Zzz',
-		description: 'The Zzz project website',
+		description: 'webtool 💤 nice web things for the tired',
 		created: '2023-01-15T12:00:00Z',
 		updated: '2023-04-20T15:30:00Z',
 		domains: [
