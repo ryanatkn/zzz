@@ -1,0 +1,22 @@
+<script lang="ts">
+	import type {SvelteHTMLElements} from 'svelte/elements';
+
+	interface Props {
+		text: string;
+		size?: string | undefined;
+		attrs?: SvelteHTMLElements['span'] | undefined;
+	}
+
+	const {text, size, attrs}: Props = $props();
+
+	const DEFAULT_SIZE = 'var(--size, 1em)';
+	const DEFAULT_FONT_SIZE = 'var(--size, inherit)';
+</script>
+
+<span
+	{...attrs}
+	class="glyph inline_block text_align_center line_height_1 white_space_nowrap font_weight_400 {attrs?.class}"
+	style:width={size ?? DEFAULT_SIZE}
+	style:height={size ?? DEFAULT_SIZE}
+	style:font-size={size ?? DEFAULT_FONT_SIZE}>{text}</span
+>
