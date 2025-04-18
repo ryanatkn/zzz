@@ -28,16 +28,33 @@
 							domains_controller.save_domain_settings();
 						}}
 					>
-						<div class="mb_md">
+						<div class="mb_lg">
 							<label>
-								<h3 class="mt_0">Domain name</h3>
+								<h3 class="mt_0 mb_sm">Domain name</h3>
 								<input type="text" bind:value={domains_controller.domain_name} class="w_100" />
 							</label>
 							<p>Enter the full domain name, like example.com or blog.example.com</p>
 						</div>
 
-						<div class="mb_md">
-							<h3>Status</h3>
+						{#if domains_controller.domain}
+							<div class="mb_lg">
+								<div>
+									<small
+										>created
+										{new Date(domains_controller.domain.created).toLocaleString()}</small
+									>
+								</div>
+								<div>
+									<small
+										>updated
+										{new Date(domains_controller.domain.updated).toLocaleString()}</small
+									>
+								</div>
+							</div>
+						{/if}
+
+						<div class="mb_lg">
+							<h3 class="mt_0 mb_sm">Status</h3>
 							<div class="flex gap_xl3">
 								<label class="flex align_items_center mb_0">
 									<input
@@ -74,23 +91,7 @@
 								<input type="checkbox" bind:checked={domains_controller.ssl_enabled} />
 								<span class="ml_xs">enable SSL</span>
 							</label>
-							<p class="mt_xs">Configure SSL certificate for this domain.</p>
 						</div>
-
-						{#if domains_controller.domain}
-							<div class="mb_md p_md">
-								<div class="column gap_md">
-									<div>
-										<strong>created</strong>
-										<span>{new Date(domains_controller.domain.created).toLocaleString()}</span>
-									</div>
-									<div>
-										<strong>updated</strong>
-										<span>{new Date(domains_controller.domain.updated).toLocaleString()}</span>
-									</div>
-								</div>
-							</div>
-						{/if}
 
 						<div class="mb_lg">
 							<h3 class="mb_sm">DNS</h3>

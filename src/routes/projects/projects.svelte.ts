@@ -85,7 +85,7 @@ const sample_projects: Array<Project> = [
 	{
 		id: 'proj_2',
 		name: 'Dealt',
-		description: 'Tarot card reading and interpretation',
+		description: 'toy 2D web game engine with a focus on topdown action RPGs',
 		created: '2023-02-10T09:15:00Z',
 		updated: '2023-03-05T16:45:00Z',
 		domains: [

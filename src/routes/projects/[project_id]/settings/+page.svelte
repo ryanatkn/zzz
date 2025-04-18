@@ -17,11 +17,9 @@
 	<div class="project_content">
 		{#if controller?.project}
 			<div class="p_lg">
-				<h1>Project settings</h1>
+				<h1 class="mb_lg">Project settings</h1>
 
 				<div class="panel p_md width_lg mt_md">
-					<h2 class="mt_0 mb_md">Project</h2>
-
 					<div class="mb_md">
 						<label>
 							Project name
