@@ -20,7 +20,7 @@
 			<div class="p_lg">
 				<div>
 					<h1>Add Domain</h1>
-					<a href="/sites/{domains_controller.project_id}/domains">← Back to Domains</a>
+					<a href="/projects/{domains_controller.project_id}/domains">← Back to Domains</a>
 				</div>
 
 				<div class="panel p_md width_md">
@@ -101,7 +101,7 @@
 
 						<div>
 							<button type="submit" class="color_b">+ add domain</button>
-							<a href="/sites/{domains_controller.project_id}/domains">cancel</a>
+							<a href="/projects/{domains_controller.project_id}/domains">cancel</a>
 						</div>
 					</form>
 				</div>

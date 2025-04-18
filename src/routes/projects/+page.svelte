@@ -1,6 +1,7 @@
 <script lang="ts">
 	import {base} from '$app/paths';
-	import {GLYPH_SITE} from '$lib/glyphs.js';
+
+	import {GLYPH_PROJECT} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
 	import Project_List from './Project_List.svelte';
 	import Project_Sidebar from './Project_Sidebar.svelte';
@@ -24,13 +25,13 @@
 {/if}
 
 {#snippet content()}
-	<h1><Glyph icon={GLYPH_SITE} /> sites</h1>
+	<h1><Glyph icon={GLYPH_PROJECT} /> projects</h1>
 
 	<section class="width_md">
 		<p>
 			When it's ready, Zzz will let you both <a href="{base}/tabs">browse websites</a> and also create
 			them, so Zzz is both a browser and editor for the read-write web, and it can be used as a desktop
-			app to deploy and manage sites.
+			app to deploy and manage sites, content, and other data and systems.
 		</p>
 		<p>
 			Zzz tries to give us the maximum of the web's capabilities on all of our devices with minimal
@@ -49,7 +50,7 @@
 				class="inline compact color_g"
 				onclick={() => {
 					projects.previewing = !projects.previewing;
-				}}>what it could look like</button
+				}}>what projects could look like</button
 			>.
 		</p>
 		<p>

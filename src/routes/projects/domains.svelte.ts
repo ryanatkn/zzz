@@ -1,4 +1,5 @@
 import {goto} from '$app/navigation';
+
 import {projects_context, type Domain, type Project, type Projects} from './projects.svelte.js';
 
 /**
@@ -101,7 +102,7 @@ export class Domains_Controller {
 			updated: new Date().toISOString(),
 		});
 
-		void goto(`/sites/${this.project_id}/domains`);
+		void goto(`/projects/${this.project_id}/domains`);
 	}
 
 	/**
@@ -113,7 +114,7 @@ export class Domains_Controller {
 		// eslint-disable-next-line no-alert
 		if (confirm('Are you sure you want to remove this domain? This action cannot be undone.')) {
 			this.projects.delete_domain(this.project_id, this.domain_id);
-			void goto(`/sites/${this.project_id}/domains`);
+			void goto(`/projects/${this.project_id}/domains`);
 		}
 	}
 
@@ -141,6 +142,6 @@ export class Domains_Controller {
 		};
 
 		this.projects.add_domain(this.project_id, new_domain);
-		void goto(`/sites/${this.project_id}/domains`);
+		void goto(`/projects/${this.project_id}/domains`);
 	}
 }

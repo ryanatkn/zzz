@@ -44,7 +44,7 @@
 							{#each controller.project.domains as domain (domain.id)}
 								<tr>
 									<td>
-										<a href="/sites/{controller.project_id}/domains/{domain.id}">
+										<a href="/projects/{controller.project_id}/domains/{domain.id}">
 											{domain.name || '<Unnamed Domain>'}
 										</a>
 									</td>

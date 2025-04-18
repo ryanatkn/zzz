@@ -10,7 +10,7 @@
 
 	import Nav_Link from '$lib/Nav_Link.svelte';
 	import Glyph from '$lib/Glyph.svelte';
-	import {GLYPH_ARROW_LEFT, GLYPH_ARROW_RIGHT, GLYPH_SITE, GLYPH_TAB} from '$lib/glyphs.js';
+	import {GLYPH_ARROW_LEFT, GLYPH_ARROW_RIGHT, GLYPH_PROJECT, GLYPH_TAB} from '$lib/glyphs.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import {main_nav_items_default} from '$lib/nav.js';
 
@@ -54,10 +54,10 @@
 				main_group.items.unshift({label: 'tabs', href: `${base}/tabs`, icon: GLYPH_TAB});
 			}
 
-			// Add sites to main group
+			// Add projects to main group
 			const main_section = nav_items.find((section) => section.group === 'main');
 			if (main_section) {
-				main_section.items.push({label: 'sites', href: `${base}/sites`, icon: GLYPH_SITE});
+				main_section.items.push({label: 'projects', href: `${base}/projects`, icon: GLYPH_PROJECT});
 			}
 		}
 

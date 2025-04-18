@@ -1,4 +1,5 @@
 import {goto} from '$app/navigation';
+
 import {projects_context, type Project, type Projects} from './projects.svelte.js';
 
 /**
@@ -87,7 +88,7 @@ export class Project_Controller {
 
 		if (confirmed) {
 			this.projects.delete_project(this.projects.current_project_id);
-			void goto('/sites');
+			void goto('/projects');
 		}
 	}
 
@@ -141,7 +142,7 @@ export class Project_Controller {
 			updated: created,
 		});
 
-		void goto(`/sites/${this.project_id}/pages/${page_id}`);
+		void goto(`/projects/${this.project_id}/pages/${page_id}`);
 	}
 
 	/**
@@ -162,6 +163,6 @@ export class Project_Controller {
 			updated: created,
 		});
 
-		void goto(`/sites/${this.project_id}/domains/${domain_id}`);
+		void goto(`/projects/${this.project_id}/domains/${domain_id}`);
 	}
 }

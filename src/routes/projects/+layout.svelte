@@ -1,5 +1,6 @@
 <script lang="ts">
 	import {type Snippet} from 'svelte';
+
 	import {projects_context, Projects} from './projects.svelte.js';
 
 	interface Props {

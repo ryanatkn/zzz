@@ -1,7 +1,8 @@
 <script lang="ts">
+	import {slide} from 'svelte/transition';
+
 	import Nav_Link from '$lib/Nav_Link.svelte';
 	import {projects_context} from './projects.svelte.js';
-	import {slide} from 'svelte/transition';
 
 	const projects = projects_context.get();
 
@@ -27,7 +28,7 @@
 					{#each controller.project.pages as page (page.id)}
 						<li transition:slide>
 							<Nav_Link
-								href="/sites/{controller.project_id}/pages/{page.id}"
+								href="/projects/{controller.project_id}/pages/{page.id}"
 								selected={page.id === projects.current_page_id}
 								attrs={{title: page.title}}
 							>

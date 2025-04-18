@@ -20,7 +20,7 @@
 			<div class="p_lg">
 				<div>
 					<h1>{domains_controller.domain ? 'Edit Domain' : 'New Domain'}</h1>
-					<a href="/sites/{domains_controller.project_id}/domains">← back to domains</a>
+					<a href="/projects/{domains_controller.project_id}/domains">← back to domains</a>
 				</div>
 
 				<div class="panel p_md width_md">
@@ -137,7 +137,7 @@
 								>
 									{domains_controller.domain ? 'save changes' : 'add domain'}
 								</button>
-								<a href="/sites/{domains_controller.project_id}/domains">cancel</a>
+								<a href="/projects/{domains_controller.project_id}/domains">cancel</a>
 							</div>
 
 							{#if domains_controller.domain}

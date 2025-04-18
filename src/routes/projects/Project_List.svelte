@@ -13,7 +13,7 @@
 		</div>
 		<div>
 			<button type="button" class="color_b" onclick={() => projects.create_new_project()}>
-				+ New Project
+				+ new project
 			</button>
 		</div>
 	</div>
@@ -25,7 +25,7 @@
 	{:else}
 		<div class="projects_grid">
 			{#each projects.projects as project (project.id)}
-				<a href="/sites/{project.id}" class="project_card panel p_md font_weight_400">
+				<a href="/projects/{project.id}" class="project_card panel p_md font_weight_400">
 					<h3 class="mt_0 mb_sm">{project.name}</h3>
 					<p class="mb_md text_color_5">{project.description || 'No description'}</p>
 					<div class="domains_list mb_md">

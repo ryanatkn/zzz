@@ -43,7 +43,7 @@
 							{#each controller.project.pages as page (page.id)}
 								<tr>
 									<td>
-										<a href="/sites/{controller.project_id}/pages/{page.id}">{page.title}</a>
+										<a href="/projects/{controller.project_id}/pages/{page.id}">{page.title}</a>
 									</td>
 									<td>{page.path}</td>
 									<td>{new Date(page.created).toLocaleString()}</td>
@@ -63,7 +63,7 @@
 		{:else}
 			<div class="p_lg text_align_center">
 				<p>Project not found.</p>
-				<a href="/sites">back to sites</a>
+				<a href="/projects">back to sites</a>
 			</div>
 		{/if}
 	</div>

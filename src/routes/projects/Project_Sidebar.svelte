@@ -1,6 +1,7 @@
 <script lang="ts">
-	import Nav_Link from '$lib/Nav_Link.svelte';
 	import {slide} from 'svelte/transition';
+
+	import Nav_Link from '$lib/Nav_Link.svelte';
 	import {projects_context} from './projects.svelte.js';
 
 	const projects = projects_context.get();
@@ -22,7 +23,7 @@
 			{#each projects.projects as project (project.id)}
 				<li transition:slide>
 					<Nav_Link
-						href="/sites/{project.id}"
+						href="/projects/{project.id}"
 						selected={project.id === projects.current_project_id}
 						attrs={{title: project.name}}
 					>

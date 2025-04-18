@@ -81,14 +81,14 @@
 
 				<div class="projects_grid">
 					<div class="panel p_md">
-						<h2 class="mt_0 mb_lg"><a href="/sites/{controller.project_id}/pages">Pages</a></h2>
+						<h2 class="mt_0 mb_lg"><a href="/projects/{controller.project_id}/pages">Pages</a></h2>
 						{#if controller.project.pages.length === 0}
 							<p class="text_color_5">No pages created yet.</p>
 						{:else}
 							<ul class="pages_list">
 								{#each controller.project.pages as page (page.id)}
 									<li>
-										<a href="/sites/{controller.project_id}/pages/{page.id}">{page.title}</a>
+										<a href="/projects/{controller.project_id}/pages/{page.id}">{page.title}</a>
 										<span class="text_color_5">{page.path}</span>
 									</li>
 								{/each}
@@ -102,14 +102,16 @@
 					</div>
 
 					<div class="panel p_md">
-						<h2 class="mt_0 mb_lg"><a href="/sites/{controller.project_id}/domains">Domains</a></h2>
+						<h2 class="mt_0 mb_lg">
+							<a href="/projects/{controller.project_id}/domains">Domains</a>
+						</h2>
 						{#if controller.project.domains.length === 0}
 							<p class="text_color_5">No domains configured yet.</p>
 						{:else}
 							<ul class="domains_list">
 								{#each controller.project.domains as domain (domain.id)}
 									<li>
-										<a href="/sites/{controller.project_id}/domains/{domain.id}">
+										<a href="/projects/{controller.project_id}/domains/{domain.id}">
 											<span class="domain_name">{domain.name}</span>
 										</a>
 										<div class="domain_details">

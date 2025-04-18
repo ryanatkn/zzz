@@ -22,7 +22,7 @@
 			controller.delete_project_page(editor.page_id);
 
 			// Navigate back to pages list
-			window.location.href = `/sites/${editor.project_id}/pages`;
+			window.location.href = `/projects/${editor.project_id}/pages`;
 		}
 	};
 </script>
@@ -51,7 +51,7 @@
 						>
 							Save
 						</button>
-						<a href="/sites/{editor.project_id}/pages" class="plain">Cancel</a>
+						<a href="/projects/{editor.project_id}/pages" class="plain">Cancel</a>
 
 						{#if !editor.is_new_page}
 							<button type="button" onclick={delete_page} class="color_c">Delete</button>

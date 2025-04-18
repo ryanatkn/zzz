@@ -259,7 +259,7 @@ export class Projects {
 		};
 
 		this.add_project(new_project);
-		void goto(`/sites/${id}`);
+		void goto(`/projects/${id}`);
 	}
 
 	/**

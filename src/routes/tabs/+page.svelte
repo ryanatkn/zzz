@@ -86,8 +86,8 @@
 				>malleable</External_Link
 			>, client-sovereign - both respects individual rights while unlocking the full capabilities of
 			web tech, including
-			<a href="{base}/sites">website creation</a> and adaptive UI. And we can build it today, the web's
-			tools are ready.
+			<a href="{base}/projects">website creation</a> and adaptive UI. And we can build it today, the
+			web's tools are ready.
 		</p>
 		<p>More <a href="{base}/about">about</a> Zzz.</p>
 	</section>

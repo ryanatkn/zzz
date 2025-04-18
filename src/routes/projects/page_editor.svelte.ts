@@ -175,7 +175,7 @@ export class Page_Editor {
 			};
 
 			this.projects.add_page(this.project_id, new_page);
-			void goto(`/sites/${this.project_id}/pages`);
+			void goto(`/projects/${this.project_id}/pages`);
 		} else if (this.current_page) {
 			// Update existing page
 			this.projects.update_page(this.project_id, {
@@ -185,7 +185,7 @@ export class Page_Editor {
 				content: this.content,
 				updated: created,
 			});
-			void goto(`/sites/${this.project_id}/pages`);
+			void goto(`/projects/${this.project_id}/pages`);
 		}
 	}
 }
