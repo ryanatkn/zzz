@@ -1,3 +1,7 @@
+<script module lang="ts">
+	let projects: Projects;
+</script>
+
 <script lang="ts">
 	import {type Snippet} from 'svelte';
 
@@ -10,7 +14,8 @@
 	const {children}: Props = $props();
 
 	// Initialize the Projects instance and set it in context
-	const projects = new Projects();
+	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+	projects ??= new Projects();
 	projects_context.set(projects);
 </script>
 

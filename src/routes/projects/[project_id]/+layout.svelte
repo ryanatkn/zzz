@@ -14,20 +14,10 @@
 
 	// Use $effect.pre to synchronize URL params to project state
 	$effect.pre(() => {
-		const project_id = page.params.project_id;
-		const page_id = page.params.page_id;
-		const domain_id = page.params.domain_id;
-
 		// Set current IDs from URL params
-		projects.set_current_project(project_id);
-
-		if (page_id) {
-			projects.set_current_page(page_id);
-		}
-
-		if (domain_id) {
-			projects.set_current_domain(domain_id);
-		}
+		projects.set_current_project(page.params.project_id || null);
+		projects.set_current_page(page.params.page_id || null);
+		projects.set_current_domain(page.params.domain_id || null);
 	});
 </script>
 

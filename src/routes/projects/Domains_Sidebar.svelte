@@ -32,16 +32,14 @@
 								selected={domain.id === projects.current_domain_id}
 								attrs={{title: domain.name}}
 							>
-								<div class="ellipsis domain_item">
-									<span
-										class="status_dot {domain.status === 'active'
-											? 'status_active'
-											: domain.status === 'pending'
-												? 'status_pending'
-												: 'status_inactive'}"
-									></span>
-									<span>{domain.name || '<Unnamed Domain>'}</span>
-								</div>
+								<div class="ellipsis row flex_1 pr_xs">{domain.name || '[new domain]'}</div>
+								<span
+									class="status_dot {domain.status === 'active'
+										? 'status_active'
+										: domain.status === 'pending'
+											? 'status_pending'
+											: 'status_inactive'}"
+								></span>
 							</Nav_Link>
 						</li>
 					{/each}
@@ -52,12 +50,6 @@
 </aside>
 
 <style>
-	.domain_item {
-		display: flex;
-		align-items: center;
-		gap: var(--size_xs);
-	}
-
 	.status_dot {
 		display: inline-block;
 		width: 6px;

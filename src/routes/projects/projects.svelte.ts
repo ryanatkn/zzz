@@ -140,13 +140,13 @@ export class Projects {
 	expanded_projects: Record<string, boolean> = $state({});
 
 	/** Current project ID from URL params. */
-	current_project_id: string = $state('');
+	current_project_id: string | null = $state(null);
 
 	/** Current page ID from URL params. */
-	current_page_id: string = $state('');
+	current_page_id: string | null = $state(null);
 
 	/** Current domain ID from URL params. */
-	current_domain_id: string = $state('');
+	current_domain_id: string | null = $state(null);
 
 	/** Current project derived from current_project_id. */
 	current_project = $derived(this.projects.find((p) => p.id === this.current_project_id) || null);
@@ -211,7 +211,7 @@ export class Projects {
 	/**
 	 * Sets the current project ID.
 	 */
-	set_current_project(project_id: string): void {
+	set_current_project(project_id: string | null): void {
 		console.log(`set_current_project`, project_id);
 		this.current_project_id = project_id;
 	}
@@ -219,7 +219,7 @@ export class Projects {
 	/**
 	 * Sets the current page ID.
 	 */
-	set_current_page(page_id: string): void {
+	set_current_page(page_id: string | null): void {
 		console.log(`set_current_page`, page_id);
 		this.current_page_id = page_id;
 	}
@@ -227,7 +227,7 @@ export class Projects {
 	/**
 	 * Sets the current domain ID.
 	 */
-	set_current_domain(domain_id: string): void {
+	set_current_domain(domain_id: string | null): void {
 		console.log(`set_current_domain`, domain_id);
 		this.current_domain_id = domain_id;
 	}
@@ -241,7 +241,7 @@ export class Projects {
 
 		const new_project: Project = {
 			id,
-			name: 'New Project',
+			name: 'new project',
 			description: '',
 			created,
 			updated: created,

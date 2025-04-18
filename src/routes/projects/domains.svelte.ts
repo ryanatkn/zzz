@@ -50,11 +50,12 @@ export class Domains_Controller {
 	 * Constructor for the domains controller.
 	 * Does not initialize form values in the constructor to avoid reactivity issues.
 	 */
-	constructor(project_id: string, domain_id?: string, projects?: Projects) {
+	constructor(project_id: string, domain_id?: string | null, projects?: Projects) {
 		this.project_id = project_id;
 		this.domain_id = domain_id || '';
 		this.projects = projects || projects_context.get();
 
+		// TODO BLOCK remove/refactor
 		// Init occurs after construction in the first derived computation
 		$effect(() => {
 			if (this.project && !this.#initialized) {
@@ -87,13 +88,6 @@ export class Domains_Controller {
 	save_domain_settings(): void {
 		if (!this.project || !this.domain) return;
 
-		// Basic validation
-		if (!this.domain_name.trim() || !this.domain_name.includes('.')) {
-			// eslint-disable-next-line no-alert
-			alert('Please enter a valid domain name.');
-			return;
-		}
-
 		this.projects.update_domain(this.project_id, {
 			...this.domain,
 			name: this.domain_name,
@@ -123,13 +117,6 @@ export class Domains_Controller {
 	 */
 	add_new_domain(): void {
 		if (!this.project || !this.domain_name.trim()) return;
-
-		// Basic validation
-		if (!this.domain_name.includes('.')) {
-			// eslint-disable-next-line no-alert
-			alert('Please enter a valid domain name.');
-			return;
-		}
 
 		const created = new Date().toISOString();
 		const new_domain: Domain = {

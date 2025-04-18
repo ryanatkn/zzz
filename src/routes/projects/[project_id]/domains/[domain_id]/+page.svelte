@@ -3,6 +3,7 @@
 	import Project_Sidebar from '../../../Project_Sidebar.svelte';
 	import Section_Sidebar from '../../../Section_Sidebar.svelte';
 	import Domains_Sidebar from '../../../Domains_Sidebar.svelte';
+	import {GLYPH_DELETE} from '$lib/glyphs.js';
 
 	const projects = projects_context.get();
 
@@ -18,10 +19,7 @@
 	<div class="domain_content">
 		{#if domains_controller?.project}
 			<div class="p_lg">
-				<div>
-					<h1>{domains_controller.domain ? 'Edit Domain' : 'New Domain'}</h1>
-					<a href="/projects/{domains_controller.project_id}/domains">← back to domains</a>
-				</div>
+				<h1 class="mb_lg">{domains_controller.domain ? 'Edit Domain' : 'New Domain'}</h1>
 
 				<div class="panel p_md width_md">
 					<form
@@ -44,8 +42,8 @@
 
 						<div class="mb_md">
 							<div>Status</div>
-							<div class="flex gap_md">
-								<label class="flex align_items_center">
+							<div class="flex gap_xl3">
+								<label class="flex align_items_center mb_0">
 									<input
 										type="radio"
 										name="status"
@@ -54,7 +52,7 @@
 									/>
 									<span class="ml_xs">Active</span>
 								</label>
-								<label class="flex align_items_center">
+								<label class="flex align_items_center mb_0">
 									<input
 										type="radio"
 										name="status"
@@ -63,7 +61,7 @@
 									/>
 									<span class="ml_xs">Pending</span>
 								</label>
-								<label class="flex align_items_center">
+								<label class="flex align_items_center mb_0">
 									<input
 										type="radio"
 										name="status"
@@ -128,16 +126,15 @@
 							{/if}
 						</div>
 
-						<div class="flex justify_content_between">
+						<div class="w_100 flex justify_content_space_between gap_sm">
 							<div>
 								<button
 									type="submit"
-									class="color_b"
+									class="color_a"
 									disabled={domains_controller.domain && !domains_controller.has_changes}
 								>
 									{domains_controller.domain ? 'save changes' : 'add domain'}
 								</button>
-								<a href="/projects/{domains_controller.project_id}/domains">cancel</a>
 							</div>
 
 							{#if domains_controller.domain}
@@ -146,7 +143,7 @@
 									class="color_c"
 									onclick={() => domains_controller.remove_domain()}
 								>
-									remove domain
+									{GLYPH_DELETE} delete domain
 								</button>
 							{/if}
 						</div>

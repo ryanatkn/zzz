@@ -482,6 +482,9 @@ a.chip {
 .pr_xs3 {
 	padding-right: var(--space_xs3);
 }
+.pr_xs {
+	padding-right: var(--space_xs);
+}
 .pr_sm {
 	padding-right: var(--space_sm);
 }
@@ -692,6 +695,9 @@ a.chip {
 }
 .gap_xl {
 	gap: var(--space_xl);
+}
+.gap_xl3 {
+	gap: var(--space_xl3);
 }
 .gap_xl5 {
 	gap: var(--space_xl5);

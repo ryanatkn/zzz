@@ -19,7 +19,7 @@
 				<h1 class="mb_0">{controller.project.name}</h1>
 				<div>
 					{#if controller.editing_project}
-						<div class="flex gap_sm">
+						<div class="flex gap_sm mb_sm">
 							<button
 								type="button"
 								class="color_b"
@@ -59,7 +59,7 @@
 						</div>
 					</div>
 				{:else if controller.project.description}
-					<p class="mb_lg text_color_5 width_lg">{controller.project.description}</p>
+					<p class="mb_lg width_md">{controller.project.description}</p>
 				{/if}
 
 				<div class="flex gap_md mb_lg">

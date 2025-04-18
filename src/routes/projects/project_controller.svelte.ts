@@ -86,7 +86,7 @@ export class Project_Controller {
 			'Are you sure you want to delete this project? This action cannot be undone.',
 		);
 
-		if (confirmed) {
+		if (confirmed && this.projects.current_project_id) {
 			this.projects.delete_project(this.projects.current_project_id);
 			void goto('/projects');
 		}
@@ -96,7 +96,7 @@ export class Project_Controller {
 	 * Delete a page from the current project.
 	 */
 	delete_project_page(page_id: string): void {
-		if (!this.project) return;
+		if (!this.projects.current_project_id) return;
 
 		// eslint-disable-next-line no-alert
 		const confirmed = confirm(
@@ -112,7 +112,7 @@ export class Project_Controller {
 	 * Delete a domain from the current project.
 	 */
 	delete_project_domain(domain_id: string): void {
-		if (!this.project) return;
+		if (!this.projects.current_project_id) return;
 
 		// eslint-disable-next-line no-alert
 		const confirmed = confirm(

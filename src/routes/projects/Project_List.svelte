@@ -7,17 +7,6 @@
 <section class="project_list">
 	<h2 class="mt_0 mb_lg">Projects</h2>
 
-	<div class="flex justify_content_between mb_lg">
-		<div>
-			<span class="text_color_5">{projects.projects.length} projects</span>
-		</div>
-		<div>
-			<button type="button" class="color_b" onclick={() => projects.create_new_project()}>
-				+ new project
-			</button>
-		</div>
-	</div>
-
 	{#if projects.projects.length === 0}
 		<div class="panel p_lg text_align_center">
 			<p>You don't have any projects yet.</p>
@@ -55,6 +44,12 @@
 			{/each}
 		</div>
 	{/if}
+
+	<div class="flex justify_content_between mt_lg">
+		<button type="button" class="color_b" onclick={() => projects.create_new_project()}>
+			+ new project
+		</button>
+	</div>
 </section>
 
 <style>
