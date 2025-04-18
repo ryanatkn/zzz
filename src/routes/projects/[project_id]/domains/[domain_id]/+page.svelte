@@ -95,7 +95,7 @@
 
 						<div class="mb_lg">
 							<h3 class="mb_sm">DNS</h3>
-							<p class="mb_sm">TODO records</p>
+							<p class="mb_sm">TODO many things</p>
 
 							{#if domains_controller.ssl_enabled}
 								<div class="mb_sm">

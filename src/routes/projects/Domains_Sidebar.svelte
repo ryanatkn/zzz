@@ -52,8 +52,8 @@
 <style>
 	.status_dot {
 		display: inline-block;
-		width: 6px;
-		height: 6px;
+		width: 7px;
+		height: 7px;
 		border-radius: 50%;
 		flex-shrink: 0;
 	}
