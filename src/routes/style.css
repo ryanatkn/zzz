@@ -335,3 +335,14 @@ a.chip {
 .plain.selectable.deselectable.menu_item.selected:active {
 	background-color: var(--fg_3);
 }
+
+/* TODO hacky */
+.floating {
+	--shadow_alpha: 14%;
+	width: 100%;
+	box-shadow:
+		var(--shadow_bottom_xl)
+			color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_1)), transparent),
+		var(--shadow_bottom_xs)
+			color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_1)), transparent);
+}

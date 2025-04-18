@@ -94,7 +94,7 @@
 				</div>
 			</section>
 		{/if}
-		{#if chat.view_mode !== 'simple'}
+		{#if chat.view_mode !== 'simple' || chat.tapes.length > 1}
 			<section class="column_section">
 				<header class="mt_0 mb_lg size_lg"><Glyph icon={GLYPH_TAPE} /> tapes</header>
 				<Tape_List {chat} />
