@@ -70,7 +70,7 @@
 				<div class="row gap_xs py_xs">
 					<Confirm_Button
 						onconfirm={() => zzz.chats.selected_id && zzz.chats.remove(zzz.chats.selected_id)}
-						position="bottom"
+						position="right"
 						attrs={{
 							title: `delete chat "${selected_chat.name}"`,
 							class: 'plain icon_button',

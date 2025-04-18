@@ -73,7 +73,7 @@
 		</div>
 		<ul class="tapes unstyled mt_lg">
 			{#each chat.tapes as tape (tape.id)}
-				<li transition:slide>
+				<li in:slide>
 					<Chat_Tape
 						{chat}
 						{tape}

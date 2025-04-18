@@ -132,6 +132,9 @@
 	// TODO refactor, maybe per route?
 	// Handle URL parameter synchronization
 	$effect.pre(() => {
+		// TODO BLOCK if it's null but there's an in-memory value,
+		// don't overwrite it, but we probably need a state that says it's decoupled -
+		// this will let us have the chats/prompts nav be sticky without using URL params, but is that the best design?
 		zzz.chats.select(zzz.url_params.get_uuid_param('chat_id'));
 		zzz.prompts.select(zzz.url_params.get_uuid_param('prompt_id'));
 	});

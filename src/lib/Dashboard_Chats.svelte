@@ -1,6 +1,8 @@
 <script lang="ts">
 	import {random_item} from '@ryanatkn/belt/random.js';
 	import {fade} from 'svelte/transition';
+	import {base} from '$app/paths';
+	import {goto} from '$app/navigation';
 
 	import Chats_List from '$lib/Chat_List.svelte';
 	import Chat_View from '$lib/Chat_View.svelte';
@@ -10,6 +12,12 @@
 	import Glyph from '$lib/Glyph.svelte';
 
 	const zzz = zzz_context.get();
+	const {chats} = zzz;
+
+	const create_and_select_chat = () => {
+		const chat = chats.add();
+		void goto(`${base}/chats/${chat.id}`);
+	};
 </script>
 
 <div class="flex w_100 h_100">
@@ -20,47 +28,46 @@
 				<button
 					class="plain flex_1 justify_content_start"
 					type="button"
-					onclick={() => zzz.chats.add()}
+					onclick={create_and_select_chat}
 				>
 					<Glyph text={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new chat
 				</button>
-				{#if zzz.chats.items.size > 1}
+				{#if chats.items.size > 1}
 					<button
 						type="button"
 						class="plain compact selectable deselectable"
-						class:selected={zzz.chats.show_sort_controls}
+						class:selected={chats.show_sort_controls}
 						title="toggle sort controls"
-						onclick={() => zzz.chats.toggle_sort_controls()}
+						onclick={() => chats.toggle_sort_controls()}
 					>
 						<Glyph text={GLYPH_SORT} />
 					</button>
 				{/if}
 			</div>
-			{#if zzz.chats.items.size}
+			{#if chats.items.size}
 				<Chats_List />
 			{/if}
 		</div>
 	</div>
-	{#if zzz.chats.selected}
-		<Contextmenu_Chat chat={zzz.chats.selected}>
-			<Chat_View chat={zzz.chats.selected} />
+	{#if chats.selected}
+		<Contextmenu_Chat chat={chats.selected}>
+			<Chat_View chat={chats.selected} />
 		</Contextmenu_Chat>
-	{:else if zzz.chats.items.size}
+	{:else if chats.items.size}
 		<div class="flex align_items_center justify_content_center h_100 flex_1" in:fade>
 			<p>
 				Select a chat from the list or <button
 					type="button"
 					class="inline color_d"
-					onclick={() => {
-						zzz.chats.add();
-					}}>create one</button
+					onclick={create_and_select_chat}>create one</button
 				>
 				or
 				<button
 					type="button"
 					class="inline color_f"
 					onclick={() => {
-						zzz.chats.select(random_item(zzz.chats.ordered_items).id);
+						const chat = random_item(chats.ordered_items);
+						void goto(`${base}/chats/${chat.id}`);
 					}}>go fish</button
 				>?
 			</p>
@@ -71,9 +78,7 @@
 				no chats available, <button
 					type="button"
 					class="inline color_d"
-					onclick={() => {
-						zzz.chats.add();
-					}}>create one</button
+					onclick={create_and_select_chat}>create one</button
 				>?
 			</p>
 		</div>

@@ -17,6 +17,8 @@
 	} from '$lib/glyphs.js';
 	import Contextmenu_Entry_Copy_To_Clipboard from '$lib/Contextmenu_Entry_Copy_To_Clipboard.svelte';
 	import Model_Picker_Dialog from '$lib/Model_Picker_Dialog.svelte';
+	import {base} from '$app/paths';
+	import {goto} from '$app/navigation';
 
 	interface Props extends Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> {
 		chat: Chat;
@@ -103,7 +105,7 @@
 					}
 
 					// Select the new chat
-					zzz.chats.select(new_chat.id);
+					void goto(`${base}/chats/${new_chat.id}`);
 				}}
 			>
 				{#snippet icon()}{GLYPH_CHAT}{/snippet}

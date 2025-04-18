@@ -119,7 +119,7 @@
 					<div class="row gap_xs py_xs">
 						<Confirm_Button
 							onconfirm={() => zzz.prompts.selected && zzz.prompts.remove(zzz.prompts.selected)}
-							position="bottom"
+							position="right"
 							attrs={{
 								title: `delete prompt ${zzz.prompts.selected.id}`,
 								class: 'plain icon_button',
@@ -184,7 +184,7 @@
 						style:grid-template-columns="repeat(auto-fill, minmax(300px, 1fr))"
 					>
 						{#each zzz.prompts.selected.bits as bit (bit.id)}
-							<li transition:scale>
+							<li in:scale>
 								<!-- the extra wrapper makes the grid items not stretch vertically -->
 								<div class="bg radius_xs p_sm">
 									<Bit_View {bit} />
@@ -210,7 +210,8 @@
 					type="button"
 					class="inline color_f"
 					onclick={() => {
-						zzz.prompts.select(random_item(zzz.prompts.ordered_items).id);
+						const prompt = random_item(zzz.prompts.ordered_items);
+						void goto(`${base}/prompts/${prompt.id}`);
 					}}>go fish</button
 				>?
 			</p>
