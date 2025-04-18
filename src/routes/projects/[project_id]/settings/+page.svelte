@@ -49,7 +49,7 @@
 					<button
 						type="button"
 						onclick={() => controller.save_project_details()}
-						class="color_b"
+						class="color_a"
 						disabled={!controller.has_changes}
 					>
 						save changes
@@ -76,7 +76,7 @@
 <style>
 	.project_layout {
 		display: flex;
-		height: 100vh;
+		height: 100%;
 		overflow: hidden;
 	}
 

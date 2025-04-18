@@ -22,7 +22,7 @@
 						<div class="flex gap_sm mb_sm">
 							<button
 								type="button"
-								class="color_b"
+								class="color_a"
 								onclick={() => controller.save_project_details()}
 								disabled={!controller.has_changes}>Save</button
 							>
@@ -95,7 +95,7 @@
 							</ul>
 						{/if}
 						<div class="mt_md">
-							<button type="button" onclick={() => controller.create_new_page()} class="color_b"
+							<button type="button" onclick={() => controller.create_new_page()} class="color_a"
 								>+ add page</button
 							>
 						</div>
@@ -133,7 +133,7 @@
 							</ul>
 						{/if}
 						<div class="mt_md">
-							<button type="button" onclick={() => controller.create_new_domain()} class="color_b"
+							<button type="button" onclick={() => controller.create_new_domain()} class="color_a"
 								>+ add domain</button
 							>
 						</div>
@@ -151,7 +151,7 @@
 <style>
 	.project_layout {
 		display: flex;
-		height: 100vh;
+		height: 100%;
 		overflow: hidden;
 	}
 

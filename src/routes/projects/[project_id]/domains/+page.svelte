@@ -24,7 +24,7 @@
 					<div class="panel p_lg text_align_center mb_lg">
 						<p>This project doesn't have any domains configured yet.</p>
 						<p>
-							<button type="button" class="color_b" onclick={() => controller.create_new_domain()}>
+							<button type="button" class="color_a" onclick={() => controller.create_new_domain()}>
 								+ add your first domain
 							</button>
 						</p>
@@ -45,7 +45,7 @@
 								<tr>
 									<td>
 										<a href="/projects/{controller.project_id}/domains/{domain.id}">
-											{domain.name || '<Unnamed Domain>'}
+											{domain.name || '[new domain]'}
 										</a>
 									</td>
 									<td>
@@ -69,7 +69,7 @@
 				{/if}
 
 				<div>
-					<button type="button" class="color_b" onclick={() => controller.create_new_domain()}>
+					<button type="button" class="color_a" onclick={() => controller.create_new_domain()}>
 						+ new domain
 					</button>
 				</div>
@@ -85,7 +85,7 @@
 <style>
 	.project_layout {
 		display: flex;
-		height: 100vh;
+		height: 100%;
 		overflow: hidden;
 	}
 

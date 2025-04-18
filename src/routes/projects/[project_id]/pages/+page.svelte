@@ -24,7 +24,7 @@
 					<div class="panel p_lg text_align_center mb_lg">
 						<p>This project doesn't have any pages yet.</p>
 						<p>
-							<button type="button" class="color_b" onclick={() => controller.create_new_page()}>
+							<button type="button" class="color_a" onclick={() => controller.create_new_page()}>
 								Create your first page
 							</button>
 						</p>
@@ -55,7 +55,7 @@
 				{/if}
 
 				<div class="mb_lg">
-					<button type="button" class="color_b" onclick={() => controller.create_new_page()}>
+					<button type="button" class="color_a" onclick={() => controller.create_new_page()}>
 						+ new page
 					</button>
 				</div>
@@ -72,7 +72,7 @@
 <style>
 	.project_layout {
 		display: flex;
-		height: 100vh;
+		height: 100%;
 		overflow: hidden;
 	}
 

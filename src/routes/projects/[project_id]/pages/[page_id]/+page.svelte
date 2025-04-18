@@ -3,6 +3,7 @@
 	import Project_Sidebar from '../../../Project_Sidebar.svelte';
 	import Section_Sidebar from '../../../Section_Sidebar.svelte';
 	import Pages_Sidebar from '../../../Pages_Sidebar.svelte';
+	import {GLYPH_DELETE} from '$lib/glyphs.js';
 
 	const projects = projects_context.get();
 
@@ -34,7 +35,7 @@
 
 	<div class="editor_content">
 		{#if editor?.project}
-			<div class="p_lg">
+			<div class="h_100 column p_lg">
 				<div>
 					<div class="flex gap_sm align_items_center">
 						<h1 class="m_0">
@@ -42,19 +43,20 @@
 						</h1>
 					</div>
 
-					<div class="flex gap_sm">
+					<div class="flex w_100 justify_content_space_between gap_sm mb_lg">
 						<button
 							type="button"
 							onclick={() => editor.save_page()}
-							class="color_b"
+							class="color_a"
 							disabled={!editor.has_changes}
 						>
-							Save
+							save
 						</button>
-						<a href="/projects/{editor.project_id}/pages" class="plain">Cancel</a>
 
 						{#if !editor.is_new_page}
-							<button type="button" onclick={delete_page} class="color_c">Delete</button>
+							<button type="button" onclick={delete_page} class="color_c"
+								>{GLYPH_DELETE} delete</button
+							>
 						{/if}
 					</div>
 				</div>
@@ -113,11 +115,12 @@
 <style>
 	.editor_layout {
 		display: flex;
-		height: 100vh;
+		height: 100%;
 		overflow: hidden;
 	}
 
 	.editor_content {
+		height: 100%;
 		flex: 1;
 		overflow: auto;
 	}
@@ -125,17 +128,13 @@
 	.editor_area {
 		display: flex;
 		gap: var(--size_md);
-		height: calc(100vh - 200px);
+		flex: 1;
 	}
 
 	.content_area,
 	.preview_area {
 		width: 50%;
 		overflow: auto;
-	}
-
-	.content_area {
-		width: 100%;
 	}
 
 	.markdown_editor {

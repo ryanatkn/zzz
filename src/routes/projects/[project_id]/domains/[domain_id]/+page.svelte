@@ -19,29 +19,25 @@
 	<div class="domain_content">
 		{#if domains_controller?.project}
 			<div class="p_lg">
-				<h1 class="mb_lg">{domains_controller.domain ? 'Edit Domain' : 'New Domain'}</h1>
+				<h1 class="mb_lg">Edit domain</h1>
 
 				<div class="panel p_md width_md">
 					<form
 						onsubmit={(e) => {
 							e.preventDefault();
-							domains_controller.domain
-								? domains_controller.save_domain_settings()
-								: domains_controller.add_new_domain();
+							domains_controller.save_domain_settings();
 						}}
 					>
 						<div class="mb_md">
 							<label>
-								Domain Name
+								<h3 class="mt_0">Domain name</h3>
 								<input type="text" bind:value={domains_controller.domain_name} class="w_100" />
 							</label>
-							<p class="text_color_5 mt_xs">
-								Enter the full domain name, like example.com or blog.example.com
-							</p>
+							<p>Enter the full domain name, like example.com or blog.example.com</p>
 						</div>
 
 						<div class="mb_md">
-							<div>Status</div>
+							<h3>Status</h3>
 							<div class="flex gap_xl3">
 								<label class="flex align_items_center mb_0">
 									<input
@@ -50,7 +46,7 @@
 										value="active"
 										bind:group={domains_controller.domain_status}
 									/>
-									<span class="ml_xs">Active</span>
+									<span class="ml_xs">active</span>
 								</label>
 								<label class="flex align_items_center mb_0">
 									<input
@@ -59,7 +55,7 @@
 										value="pending"
 										bind:group={domains_controller.domain_status}
 									/>
-									<span class="ml_xs">Pending</span>
+									<span class="ml_xs">pending</span>
 								</label>
 								<label class="flex align_items_center mb_0">
 									<input
@@ -68,7 +64,7 @@
 										value="inactive"
 										bind:group={domains_controller.domain_status}
 									/>
-									<span class="ml_xs">Inactive</span>
+									<span class="ml_xs">inactive</span>
 								</label>
 							</div>
 						</div>
@@ -76,44 +72,29 @@
 						<div class="mb_md">
 							<label class="flex align_items_center">
 								<input type="checkbox" bind:checked={domains_controller.ssl_enabled} />
-								<span class="ml_xs">Enable SSL</span>
+								<span class="ml_xs">enable SSL</span>
 							</label>
-							<p class="text_color_5 mt_xs">Configure SSL certificate for this domain.</p>
+							<p class="mt_xs">Configure SSL certificate for this domain.</p>
 						</div>
 
 						{#if domains_controller.domain}
-							<div class="mb_md panel p_md bg_2">
-								<h3 class="mb_sm mt_0">Domain Information</h3>
-								<div class="flex gap_md">
+							<div class="mb_md p_md">
+								<div class="column gap_md">
 									<div>
-										<strong>Created:</strong>
-										<div>{new Date(domains_controller.domain.created).toLocaleString()}</div>
+										<strong>created</strong>
+										<span>{new Date(domains_controller.domain.created).toLocaleString()}</span>
 									</div>
 									<div>
-										<strong>Last Updated:</strong>
-										<div>{new Date(domains_controller.domain.updated).toLocaleString()}</div>
+										<strong>updated</strong>
+										<span>{new Date(domains_controller.domain.updated).toLocaleString()}</span>
 									</div>
 								</div>
 							</div>
 						{/if}
 
-						<div class="panel p_md bg_2 mb_lg">
-							<h3 class="mb_sm">DNS Configuration</h3>
-							<p class="mb_sm">Make sure your domain has these DNS records:</p>
-
-							<div class="mb_sm">
-								<h4>A Record</h4>
-								<code>@ → 192.0.2.1</code>
-							</div>
-
-							<div class="mb_sm">
-								<h4>CNAME Record (for www subdomain)</h4>
-								<code
-									>www → {domains_controller.project.name
-										.toLowerCase()
-										.replace(/\s+/g, '-')}.zzz.software</code
-								>
-							</div>
+						<div class="mb_lg">
+							<h3 class="mb_sm">DNS</h3>
+							<p class="mb_sm">TODO records</p>
 
 							{#if domains_controller.ssl_enabled}
 								<div class="mb_sm">
@@ -161,7 +142,7 @@
 <style>
 	.domain_layout {
 		display: flex;
-		height: 100vh;
+		height: 100%;
 		overflow: hidden;
 	}
 
