@@ -3,6 +3,8 @@
 	import Project_Sidebar from '../../Project_Sidebar.svelte';
 	import Section_Sidebar from '../../Section_Sidebar.svelte';
 	import Pages_Sidebar from '../../Pages_Sidebar.svelte';
+	import Glyph from '$lib/Glyph.svelte';
+	import {GLYPH_ADD} from '$lib/glyphs.js';
 
 	const projects = projects_context.get();
 
@@ -26,7 +28,7 @@
 					<p>This project doesn't have any web pages yet.</p>
 					<p>
 						<button type="button" class="color_a" onclick={() => controller.create_new_page()}>
-							+ create your first page
+							<Glyph text={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> create your first page
 						</button>
 					</p>
 				{:else}
@@ -55,7 +57,7 @@
 
 					<div class="mb_lg">
 						<button type="button" class="color_a" onclick={() => controller.create_new_page()}>
-							+ new page
+							<Glyph text={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new page
 						</button>
 					</div>
 				{/if}

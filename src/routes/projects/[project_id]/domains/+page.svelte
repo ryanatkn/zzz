@@ -3,7 +3,8 @@
 	import Project_Sidebar from '../../Project_Sidebar.svelte';
 	import Section_Sidebar from '../../Section_Sidebar.svelte';
 	import Domains_Sidebar from '../../Domains_Sidebar.svelte';
-	import {GLYPH_CHECKMARK} from '$lib/glyphs.js';
+	import {GLYPH_ADD, GLYPH_CHECKMARK} from '$lib/glyphs.js';
+	import Glyph from '$lib/Glyph.svelte';
 
 	const projects = projects_context.get();
 
@@ -26,7 +27,7 @@
 						<p>This project doesn't have any domains configured yet.</p>
 						<p>
 							<button type="button" class="color_a" onclick={() => controller.create_new_domain()}>
-								+ add your first domain
+								<Glyph text={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> add your first domain
 							</button>
 						</p>
 					</div>
@@ -71,7 +72,7 @@
 
 				<div>
 					<button type="button" class="color_a" onclick={() => controller.create_new_domain()}>
-						+ new domain
+						<Glyph text={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new domain
 					</button>
 				</div>
 			</div>

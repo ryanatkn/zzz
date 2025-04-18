@@ -188,16 +188,18 @@
 		<ul>
 			<li>Zzz is a noncommercial project and its only official domain is zzz.software</li>
 			<li>
-				it's open source, permissively licensed, and forking is encouraged - for less investment you
-				can use it as a TypeScript/Svelte library (currently just npm)
+				it's open source, permissively licensed, and forking is encouraged - you can also use it as
+				a TypeScript/Svelte library (currently just npm)
 			</li>
 			<li>
-				the Zzz name is community property, just don't falsely represent the official Zzz project or
-				zzz.software
+				the Zzz name and logos are community property, just don't falsely represent the official Zzz
+				project or zzz.software
 			</li>
 			<li>
-				I'm looking for <a href="https://www.ryanatkn.com/funding">funding</a> to make my continued full-time
-				work on it sustainable
+				I'm looking for <a href="https://www.ryanatkn.com/funding">funding</a> to make my continued
+				full-time work on it sustainable - if successful, others will join <External_Link
+					href="https://www.ryanatkn.com/">me</External_Link
+				> in various capacities, and I think Zzz would end up stewarded by some kind of nonprofit
 			</li>
 		</ul>
 	</section>
@@ -206,8 +208,8 @@
 		<h2 class="mb_lg">Into the future</h2>
 		<p class="mb_md">
 			This project has a huge scope and it's early in development. What you're seeing is a small
-			fraction of the idea - especially if you're viewing this on the website not natively via Node
-			- so here's a button for previewing some of what's planned:
+			fraction of the idea—especially if you're viewing this on the website not natively via Node—so
+			here's a button for previewing some of what's planned:
 		</p>
 		<button
 			type="button"

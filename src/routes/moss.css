@@ -33,11 +33,6 @@
 	text-overflow: ellipsis;
 }
 
-.width_lg {
-	width: 100%;
-	max-width: var(--width_lg);
-}
-
 .width_md {
 	width: 100%;
 	max-width: var(--width_md);
@@ -493,6 +488,9 @@ a.chip {
 }
 .pr_md {
 	padding-right: var(--space_md);
+}
+.pr_xl {
+	padding-right: var(--space_xl);
 }
 .pb_0 {
 	padding-bottom: 0;

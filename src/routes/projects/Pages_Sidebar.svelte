@@ -3,6 +3,8 @@
 
 	import Nav_Link from '$lib/Nav_Link.svelte';
 	import {projects_context} from './projects.svelte.js';
+	import {GLYPH_ADD} from '$lib/glyphs.js';
+	import Glyph from '$lib/Glyph.svelte';
 
 	const projects = projects_context.get();
 
@@ -18,7 +20,7 @@
 				class="plain justify_content_start flex_1"
 				onclick={() => controller.create_new_page()}
 			>
-				+ new page
+				<Glyph text={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new page
 			</button>
 		</div>
 

@@ -43,7 +43,7 @@
 				</div>
 
 				{#if controller.editing_project}
-					<div class="panel p_md width_lg mb_lg">
+					<div class="panel p_md width_md mb_lg">
 						<div class="mb_md">
 							<label>
 								Project Name

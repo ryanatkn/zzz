@@ -16,9 +16,10 @@
 	const empty = $derived(!strip_count);
 </script>
 
-<!-- TODO the overflow change is hacky, allows the shadow to overlap the sidebar, but maybe that should be fixed -->
+<!-- TODO the overflow change is hacky, allows the shadow to overlap the sidebar -->
 <div
 	class="column_fluid column flex_1"
+	class:pr_xl={empty}
 	style:overflow={empty ? 'visible' : undefined}
 	style:justify-content={empty ? 'center' : undefined}
 >

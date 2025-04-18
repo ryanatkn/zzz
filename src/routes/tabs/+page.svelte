@@ -1,5 +1,4 @@
 <script module lang="ts">
-	// svelte-ignore non_reactive_update
 	let browser: Browser;
 </script>
 
@@ -78,18 +77,19 @@
 			users can compose tabs in a larger system that's open and extensible by design.
 		</p>
 		<p>
-			As a simple example, picture adding arbitrary metadata like tags to both your tabs and local
-			files, and then summoning UI that leverages that data for your specific needs in every
-			context, without any technical knowledge, third parties, or unnecessary friction. The best
-			usecases are unknown, but today's browsers don't let us experiment.
+			As a simple example, picture adding arbitrary metadata like tags to both your browser tabs and
+			files, both local and in the cloud, and then summoning UI that leverages that data for your
+			specific needs in whatever context—without any technical knowledge, third parties, or
+			unnecessary friction. The best usecases are still unknown because today's browsers don't let
+			us experiment.
 		</p>
 		<p>
-			I believe the optimal architecture - <External_Link
+			I believe the optimal architecture—<External_Link
 				href="https://www.inkandswitch.com/local-first/">local-first</External_Link
 			>, <External_Link href="https://www.inkandswitch.com/malleable-software/"
 				>malleable</External_Link
-			>, client-sovereign - both respects individual rights while unlocking the full capabilities of
-			web tech, including
+			>, client-sovereign—both respects individual rights and unlocks the full capabilities of web
+			tech, including
 			<a href="{base}/projects">website creation</a> and adaptive UI. And we can build it today, the
 			web's tools are ready.
 		</p>
