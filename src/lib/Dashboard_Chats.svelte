@@ -1,8 +1,6 @@
 <script lang="ts">
 	import {random_item} from '@ryanatkn/belt/random.js';
 	import {fade} from 'svelte/transition';
-	import {base} from '$app/paths';
-	import {goto} from '$app/navigation';
 
 	import Chats_List from '$lib/Chat_List.svelte';
 	import Chat_View from '$lib/Chat_View.svelte';
@@ -14,9 +12,9 @@
 	const zzz = zzz_context.get();
 	const {chats} = zzz;
 
-	const create_and_select_chat = () => {
+	const create_and_select_chat = async () => {
 		const chat = chats.add();
-		void goto(`${base}/chats/${chat.id}`);
+		return chats.navigate_to(chat.id);
 	};
 </script>
 
@@ -67,7 +65,7 @@
 					class="inline color_f"
 					onclick={() => {
 						const chat = random_item(chats.ordered_items);
-						void goto(`${base}/chats/${chat.id}`);
+						void chats.navigate_to(chat.id);
 					}}>go fish</button
 				>?
 			</p>

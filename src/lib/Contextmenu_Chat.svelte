@@ -17,8 +17,6 @@
 	} from '$lib/glyphs.js';
 	import Contextmenu_Entry_Copy_To_Clipboard from '$lib/Contextmenu_Entry_Copy_To_Clipboard.svelte';
 	import Model_Picker_Dialog from '$lib/Model_Picker_Dialog.svelte';
-	import {base} from '$app/paths';
-	import {goto} from '$app/navigation';
 
 	interface Props extends Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> {
 		chat: Chat;
@@ -94,7 +92,7 @@
 			</Contextmenu_Entry>
 
 			<Contextmenu_Entry
-				run={() => {
+				run={async () => {
 					// TODO BLOCK this is broken bc we need a unique name, and adding tapes looks hacky, maybe add a `chats/chat.duplicate` method
 					// Create a duplicate of this chat
 					const new_chat = zzz.chats.add_chat(chat.clone());
@@ -105,7 +103,7 @@
 					}
 
 					// Select the new chat
-					void goto(`${base}/chats/${new_chat.id}`);
+					await zzz.chats.navigate_to(new_chat.id);
 				}}
 			>
 				{#snippet icon()}{GLYPH_CHAT}{/snippet}

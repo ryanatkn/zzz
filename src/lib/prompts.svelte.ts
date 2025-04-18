@@ -1,4 +1,5 @@
 import {z} from 'zod';
+import {goto} from '$app/navigation';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Prompt, Prompt_Json, Prompt_Schema, type Prompt_Json_Input} from '$lib/prompt.svelte.js';
@@ -9,6 +10,7 @@ import {create_single_index, create_derived_index} from '$lib/indexed_collection
 import {to_reordered_list} from '$lib/list_helpers.js';
 import type {Bit_Type} from '$lib/bit.svelte.js';
 import {get_unique_name} from '$lib/helpers.js';
+import {to_prompts_url} from '$lib/nav_helpers.js';
 
 export const Prompts_Json = z
 	.object({
@@ -148,7 +150,7 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 
 		// If the selected prompt was removed, select a new one
 		if (current_selected !== null && prompt_ids.includes(current_selected)) {
-			this.select_next();
+			void this.select_next();
 		}
 
 		return removed_count;
@@ -159,10 +161,14 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 		this.selected_id = prompt_id;
 	}
 
-	select_next(): void {
+	select_next(): Promise<void> {
 		const {by_id} = this.items;
 		const next = by_id.values().next();
-		this.select(next.value?.id ?? null);
+		return this.navigate_to(next.value?.id ?? null);
+	}
+
+	navigate_to(prompt_id: Uuid | null): Promise<void> {
+		return goto(to_prompts_url(prompt_id));
 	}
 
 	reorder_prompts(from_index: number, to_index: number): void {

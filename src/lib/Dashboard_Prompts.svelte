@@ -2,8 +2,6 @@
 	import {scale, fade} from 'svelte/transition';
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
 	import {random_item} from '@ryanatkn/belt/random.js';
-	import {goto} from '$app/navigation';
-	import {base} from '$app/paths';
 
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Glyph from '$lib/Glyph.svelte';
@@ -77,10 +75,10 @@
 				<button
 					type="button"
 					class="plain w_100 justify_content_start"
-					onclick={() => {
+					onclick={async () => {
 						const prompt = zzz.prompts.add();
 						prompt.add_bit(Bit.create(zzz, {type: 'text'}));
-						void goto(`${base}/prompts/${prompt.id}`);
+						await zzz.prompts.navigate_to(prompt.id);
 					}}
 				>
 					<Glyph text={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new prompt
@@ -209,9 +207,9 @@
 				<button
 					type="button"
 					class="inline color_f"
-					onclick={() => {
+					onclick={async () => {
 						const prompt = random_item(zzz.prompts.ordered_items);
-						void goto(`${base}/prompts/${prompt.id}`);
+						await zzz.prompts.navigate_to(prompt.id);
 					}}>go fish</button
 				>?
 			</p>

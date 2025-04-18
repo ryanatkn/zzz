@@ -1,4 +1,5 @@
 import {z} from 'zod';
+import {goto} from '$app/navigation';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Chat, Chat_Json, Chat_Schema, type Chat_Json_Input} from '$lib/chat.svelte.js';
@@ -8,6 +9,7 @@ import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {create_single_index, create_derived_index} from '$lib/indexed_collection_helpers.js';
 import {to_reordered_list} from '$lib/list_helpers.js';
 import {get_unique_name} from '$lib/helpers.js';
+import {to_chats_url} from '$lib/nav_helpers.js';
 
 export const Chats_Json = z
 	.object({
@@ -120,7 +122,7 @@ export class Chats extends Cell<typeof Chats_Json> {
 	remove(id: Uuid): void {
 		const removed = this.items.remove(id);
 		if (removed && id === this.selected_id) {
-			this.select_next();
+			void this.select_next();
 		}
 	}
 
@@ -133,7 +135,7 @@ export class Chats extends Cell<typeof Chats_Json> {
 
 		// If the selected chat was removed, select a new one
 		if (current_selected !== null && ids.includes(current_selected)) {
-			this.select_next();
+			void this.select_next();
 		}
 
 		return removed_count;
@@ -144,10 +146,14 @@ export class Chats extends Cell<typeof Chats_Json> {
 		this.selected_id = chat_id;
 	}
 
-	select_next(): void {
+	select_next(): Promise<void> {
 		const {by_id} = this.items;
 		const next = by_id.values().next();
-		this.select(next.value?.id ?? null);
+		return this.navigate_to(next.value?.id ?? null);
+	}
+
+	navigate_to(chat_id: Uuid | null): Promise<void> {
+		return goto(to_chats_url(chat_id));
 	}
 
 	reorder_chats(from_index: number, to_index: number): void {
