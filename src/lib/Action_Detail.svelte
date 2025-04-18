@@ -18,13 +18,13 @@
 <div class="mb_md">
 	<div class="size_lg">
 		{#if action.is_prompt}
-			<Glyph icon={GLYPH_PROMPT} /> Prompt
+			<Glyph text={GLYPH_PROMPT} /> Prompt
 		{:else if action.is_completion}
-			<Glyph icon={GLYPH_RESPONSE} /> Response
+			<Glyph text={GLYPH_RESPONSE} /> Response
 		{:else if action.is_file_related}
-			<Glyph icon={GLYPH_FILE} /> File {action.type}
+			<Glyph text={GLYPH_FILE} /> File {action.type}
 		{:else}
-			<Glyph icon={GLYPH_ACTION} /> {action.type}
+			<Glyph text={GLYPH_ACTION} /> {action.type}
 		{/if}
 		<small class="color_subtle ml_xs">{action.direction}</small>
 	</div>

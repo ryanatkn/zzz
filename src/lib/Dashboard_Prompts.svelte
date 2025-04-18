@@ -79,7 +79,7 @@
 						zzz.prompts.add().add_bit(Bit.create(zzz, {type: 'text'}));
 					}}
 				>
-					<Glyph icon={GLYPH_ADD} /> new prompt
+					<Glyph text={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new prompt
 				</button>
 				{#if zzz.prompts.items.size > 1}
 					<button
@@ -89,7 +89,7 @@
 						title="toggle sort controls"
 						onclick={() => zzz.prompts.toggle_sort_controls()}
 					>
-						<Glyph icon={GLYPH_SORT} />
+						<Glyph text={GLYPH_SORT} />
 					</button>
 				{/if}
 			</div>
@@ -102,7 +102,7 @@
 			<div class="column_fixed pr_sm">
 				<section class="column_section">
 					<div class="size_lg">
-						<Glyph icon={GLYPH_PROMPT} />
+						<Glyph text={GLYPH_PROMPT} />
 						{zzz.prompts.selected.name}
 					</div>
 					<div class="column">
@@ -130,7 +130,7 @@
 					<Content_Preview content={zzz.prompts.selected.content} />
 				</section>
 				<section class="column_section">
-					<header class="size_lg mb_lg"><Glyph icon={GLYPH_BIT} /> bits</header>
+					<header class="size_lg mb_lg"><Glyph text={GLYPH_BIT} /> bits</header>
 					<Bit_List
 						bits={zzz.prompts.selected.bits}
 						prompt={zzz.prompts.selected}
@@ -147,7 +147,7 @@
 						<div class="flex flex_wrap gap_xs">
 							<button type="button" class="plain size_sm" onclick={add_text_bit}>
 								<div class="row white_space_nowrap">
-									<span class="mr_xs2"><Glyph icon={GLYPH_BIT} /></span> add text
+									<Glyph text={GLYPH_BIT} attrs={{class: 'mr_xs2'}} /> add text
 								</div>
 							</button>
 							<button
@@ -157,12 +157,12 @@
 								disabled={!zzz.diskfiles.items.size}
 							>
 								<div class="row white_space_nowrap">
-									<span class="mr_xs2"><Glyph icon={GLYPH_FILE} /></span> add file
+									<Glyph text={GLYPH_FILE} attrs={{class: 'mr_xs2'}} /> add file
 								</div>
 							</button>
 							<button type="button" class="plain size_sm" onclick={add_sequence_bit}>
 								<div class="row white_space_nowrap">
-									<span class="mr_xs2"><Glyph icon={GLYPH_LIST} /></span> add sequence
+									<Glyph text={GLYPH_LIST} attrs={{class: 'mr_xs2'}} /> add sequence
 								</div>
 							</button>
 							<Confirm_Button
@@ -170,7 +170,7 @@
 								attrs={{disabled: !zzz.prompts.selected.bits.length, class: 'plain size_sm'}}
 							>
 								<div class="row white_space_nowrap">
-									<span class="mr_xs2"><Glyph icon={GLYPH_REMOVE} /></span> remove all
+									<Glyph text={GLYPH_REMOVE} attrs={{class: 'mr_xs2'}} /> remove all
 								</div>
 							</Confirm_Button>
 						</div>

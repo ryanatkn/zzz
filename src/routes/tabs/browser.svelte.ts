@@ -7,11 +7,12 @@ import {Browser_Tab_Json} from '$routes/tabs/browser_tab.svelte.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 
 export const Browser_Json = Cell_Json.extend({
-	edited_url: z.string().default(''),
 	tabs: cell_array(
 		z.array(Browser_Tab_Json).default(() => []),
 		'Browser_Tab',
 	),
+	edited_url: z.string().default(''),
+	browserified: z.boolean().default(false),
 });
 export type Browser_Json = z.infer<typeof Browser_Json>;
 export type Browser_Json_Input = z.input<typeof Browser_Json>;
@@ -19,16 +20,12 @@ export type Browser_Json_Input = z.input<typeof Browser_Json>;
 export type Browser_Options = Cell_Options<typeof Browser_Json>;
 
 export class Browser extends Cell<typeof Browser_Json> {
-	tabs: Browser_Tabs;
+	tabs: Browser_Tabs = new Browser_Tabs({zzz: this.zzz});
 	edited_url: string = $state()!;
+	browserified: boolean = $state()!;
 
 	constructor(options: Browser_Options) {
 		super(Browser_Json, options);
-
-		// Create the tabs instance
-		this.tabs = new Browser_Tabs({
-			zzz: this.zzz,
-		});
 
 		this.decoders = {
 			tabs: (tabs) => {

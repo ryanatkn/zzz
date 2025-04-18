@@ -54,7 +54,7 @@
 				<!-- TODO needs work -->
 				<div class="flex justify_content_space_between">
 					<div class="size_lg">
-						<Glyph icon={GLYPH_CHAT} />
+						<Glyph text={GLYPH_CHAT} />
 						{selected_chat.name}
 					</div>
 				</div>
@@ -94,9 +94,9 @@
 				</div>
 			</section>
 		{/if}
-		{#if chat.view_mode !== 'simple'}
+		{#if chat.view_mode !== 'simple' || chat.tapes.length > 1}
 			<section class="column_section">
-				<header class="mt_0 mb_lg size_lg"><Glyph icon={GLYPH_TAPE} /> tapes</header>
+				<header class="mt_0 mb_lg size_lg"><Glyph text={GLYPH_TAPE} /> tapes</header>
 				<Tape_List {chat} />
 			</section>
 			<!-- TODO consider a UX that lets users pin arbitrary prompts/bits/etc to each chat -->

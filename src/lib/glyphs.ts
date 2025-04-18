@@ -42,12 +42,15 @@ export const GLYPH_BIT = '┊'; //  ┊ ┋ ╎ ╏
 export const GLYPH_PROVIDER = '⨕';
 export const GLYPH_MODEL = '⊛'; // ⨹ ⨺ ⊛
 export const GLYPH_ACTION = '⍾';
-export const GLYPH_VIEW = '⍜'; // ⦿ ⦾ ⦽ ⦼ ◉
+export const GLYPH_VIEW = '⍜'; // ⦿ ⦾ ⦽ ⦼
+export const GLYPH_PREVIEW = '⦾'; // ⦾
 export const GLYPH_LOG = '⎙'; // ⎙ ⏚ ⌺ ⏏ ⍜
 export const GLYPH_TAB = '⛶';
-export const GLYPH_SITE = '⌬';
+export const GLYPH_PROJECT = '⌬';
 export const GLYPH_CAPABILITY = '⧰'; // ⌁
 export const GLYPH_SETTINGS = '⛮'; // ⛭  ⚙  ⛮  ⛯ ⛣
+export const GLYPH_DOMAIN = '⟡'; // ⟡ ⏥
+export const GLYPH_PAGE = '⌺'; // ⌺ ⎚
 
 export const GLYPH_ECHO = '⥀';
 export const GLYPH_HEARTBEAT = '∽'; // ∿ ≋ 〰 ∽ ~

@@ -193,7 +193,7 @@ export const ollama_list_with_metadata = async (): Promise<Ollama_Models_Respons
 // }
 // interface GenerateResponse {
 //     model: string;
-//     created_at: Date;
+//     created: Date;
 //     response: string;
 //     done: boolean;
 //     done_reason: string;
@@ -207,7 +207,7 @@ export const ollama_list_with_metadata = async (): Promise<Ollama_Models_Respons
 // }
 // interface ChatResponse {
 //     model: string;
-//     created_at: Date;
+//     created: Date;
 //     message: Message;
 //     done: boolean;
 //     done_reason: string;

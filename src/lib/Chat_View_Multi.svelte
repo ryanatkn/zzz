@@ -63,7 +63,7 @@
 
 		<div class="flex mt_lg">
 			<button type="button" class="plain" onclick={() => (show_model_picker = true)}>
-				<Glyph icon={GLYPH_ADD} /> add tape
+				<Glyph text={GLYPH_ADD} /> add tape
 			</button>
 			<Confirm_Button
 				onconfirm={() => chat.remove_all_tapes()}

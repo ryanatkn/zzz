@@ -156,7 +156,7 @@
 						}}
 					>
 						<Glyph
-							icon={socket.connected && socket.url === socket.url_input
+							text={socket.connected && socket.url === socket.url_input
 								? GLYPH_DISCONNECT
 								: GLYPH_CONNECT}
 							size="var(--size_xl)"

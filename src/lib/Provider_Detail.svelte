@@ -6,7 +6,7 @@
 	import type {Provider} from '$lib/provider.svelte.js';
 	import Model_Summary from '$lib/Model_Summary.svelte';
 	import Provider_Logo from '$lib/Provider_Logo.svelte';
-	import {GLYPH_PROVIDER, GLYPH_MODEL} from '$lib/glyphs.js';
+	import {GLYPH_PROVIDER} from '$lib/glyphs.js';
 	import External_Link from '$lib/External_Link.svelte';
 
 	interface Props {
@@ -20,7 +20,7 @@
 </script>
 
 <div {...attrs} class="panel p_lg {attrs?.class}">
-	<div class="flex">
+	<div class="flex mb_lg">
 		<Provider_Logo name={provider.name} size="var(--icon_size_xl)" fill={null} />
 		<div class="pl_xl">
 			{#if at_detail_page}
@@ -44,7 +44,6 @@
 		</div>
 	</div>
 	<section>
-		<h2><span class="glyph">{GLYPH_MODEL}</span> models ‧ {provider.models.length}</h2>
 		<ul class="flex flex_wrap unstyled gap_md">
 			{#each provider.models as model (model)}
 				<Model_Summary {model} />

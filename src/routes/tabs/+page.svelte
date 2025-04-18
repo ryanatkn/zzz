@@ -1,3 +1,8 @@
+<script module lang="ts">
+	// svelte-ignore non_reactive_update
+	let browser: Browser;
+</script>
+
 <script lang="ts">
 	import {base} from '$app/paths';
 
@@ -9,18 +14,17 @@
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import External_Link from '$lib/External_Link.svelte';
 
-	let browserified = $state(false);
-
 	const zzz = zzz_context.get();
 
 	// Initialize browser with the sample tabs and Zzz instance
-	const browser = new Browser({
+	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+	browser ??= new Browser({
 		zzz,
 		json: {tabs: sample_tabs},
 	});
 </script>
 
-{#if browserified}
+{#if browser.browserified}
 	<Browser_View {browser}>
 		{@render content()}
 	</Browser_View>
@@ -31,10 +35,10 @@
 {/if}
 
 {#snippet content()}
-	<h1><Glyph icon={GLYPH_TAB} /> tabs</h1>
+	<h1><Glyph text={GLYPH_TAB} /> tabs</h1>
 
 	<section class="width_md">
-		{#if browserified}
+		{#if browser.browserified}
 			<aside>
 				⚠️⚠️ This is just a demo of planned functionality, nothing works like it should. Zzz will
 				need a native installation to function like a real browser. The initial version will use
@@ -47,10 +51,10 @@
 			browser using the form factor you already know well - imagine your current browser, and then
 			add a sidebar on the left like the one on this page, then <button
 				type="button"
-				onclick={() => (browserified = !browserified)}
-				class:color_i={!browserified}
-				class:color_h={browserified}
-				class="inline compact">{browserified ? 'un' : ''}browserify!</button
+				onclick={() => (browser.browserified = !browser.browserified)}
+				class:color_i={!browser.browserified}
+				class:color_h={browser.browserified}
+				class="inline compact">{browser.browserified ? 'un' : ''}browserify!</button
 			>
 		</p>
 		<p>
@@ -63,8 +67,8 @@
 				class="inline compact color_d"
 				onclick={() => {
 					zzz.ui.toggle_sidebar();
-					if (!browserified) {
-						browserified = true;
+					if (!browser.browserified) {
+						browser.browserified = true;
 					}
 				}}>pretend it's all a dream</button
 			>.
@@ -86,8 +90,8 @@
 				>malleable</External_Link
 			>, client-sovereign - both respects individual rights while unlocking the full capabilities of
 			web tech, including
-			<a href="{base}/sites">website creation</a> and adaptive UI. And we can build it today, the web's
-			tools are ready.
+			<a href="{base}/projects">website creation</a> and adaptive UI. And we can build it today, the
+			web's tools are ready.
 		</p>
 		<p>More <a href="{base}/about">about</a> Zzz.</p>
 	</section>

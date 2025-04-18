@@ -124,7 +124,7 @@
 		onclick={go_back}
 		disabled={!can_go_back}
 	>
-		<Glyph icon={GLYPH_ARROW_LEFT} />
+		<Glyph text={GLYPH_ARROW_LEFT} />
 	</button>
 	<button
 		type="button"
@@ -133,7 +133,7 @@
 		onclick={go_forward}
 		disabled={!can_go_forward}
 	>
-		<Glyph icon={GLYPH_ARROW_RIGHT} />
+		<Glyph text={GLYPH_ARROW_RIGHT} />
 	</button>
 	<button
 		type="button"
@@ -145,7 +145,7 @@
 		}}
 		disabled
 	>
-		<Glyph icon={GLYPH_REFRESH} />
+		<Glyph text={GLYPH_REFRESH} />
 	</button>
 </div>
 

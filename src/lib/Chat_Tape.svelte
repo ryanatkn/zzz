@@ -41,19 +41,15 @@
 		pending = false;
 	};
 
-	const strips = $derived(Array.from(tape.strips.by_id.values()));
-	const strip_count = $derived(strips.length);
+	const strip_count = $derived(tape.strips.size);
 
 	// TODO BLOCK the link should instead be a model picker (dialog? or overlaid without a bg maybe?)
+
+	const empty = $derived(!strip_count);
 </script>
 
 <Contextmenu_Tape {tape}>
-	<div
-		{...attrs}
-		class="chat_tape {attrs?.class}"
-		class:empty={!strip_count}
-		class:dormant={!tape.enabled}
-	>
+	<div {...attrs} class="chat_tape {attrs?.class}" class:empty class:dormant={!tape.enabled}>
 		<div class="flex justify_content_space_between align_items_start">
 			<header>
 				<div class="size_lg">

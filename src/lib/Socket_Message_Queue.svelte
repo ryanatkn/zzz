@@ -138,7 +138,7 @@
 							onclick={retry_selected}
 							transition:slide
 						>
-							<Glyph icon={GLYPH_RETRY} />
+							<Glyph text={GLYPH_RETRY} />
 						</button>
 					{/if}
 
@@ -147,7 +147,7 @@
 						popover_button_attrs={{class: 'icon_button color_c bg_c_1 size_sm'}}
 						attrs={{class: 'icon_button plain', title: 'remove selected messages'}}
 					>
-						<Glyph icon={GLYPH_REMOVE} />
+						<Glyph text={GLYPH_REMOVE} />
 					</Confirm_Button>
 				</div>
 			{/if}
@@ -240,7 +240,7 @@
 								position="left"
 								attrs={{class: 'icon_button plain size_sm', title: 'view message details'}}
 							>
-								<Glyph icon={GLYPH_INFO} size="var(--size_lg)" />
+								<Glyph text={GLYPH_INFO} size="var(--size_lg)" />
 								{#snippet popover_content(popover)}
 									<div
 										class="p_md overflow_auto bg shadow_bottom_md"
@@ -268,6 +268,7 @@
 								{/snippet}
 							</Popover_Button>
 
+							<!-- eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -->
 							{#if type === 'queued' || (type === 'failed' && socket.connected)}
 								<button
 									type="button"
@@ -275,7 +276,7 @@
 									title="retry message"
 									onclick={() => retry_queued_message(message)}
 								>
-									<Glyph icon={GLYPH_RETRY} />
+									<Glyph text={GLYPH_RETRY} />
 								</button>
 							{/if}
 
@@ -285,7 +286,7 @@
 								popover_button_attrs={{class: 'icon_button color_c bg_c_1 size_sm'}}
 								attrs={{class: 'icon_button plain size_sm', title: 'remove message'}}
 							>
-								<Glyph icon={GLYPH_REMOVE} />
+								<Glyph text={GLYPH_REMOVE} />
 							</Confirm_Button>
 						</div>
 					</div>

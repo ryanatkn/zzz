@@ -90,7 +90,7 @@
 					onclick={() => browser.add_new_tab()}
 					title="new tab"
 				>
-					<Glyph icon={GLYPH_ADD} />
+					<Glyph text={GLYPH_ADD} />
 				</button>
 			</div>
 		</ul>

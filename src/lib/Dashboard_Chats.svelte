@@ -22,7 +22,7 @@
 					type="button"
 					onclick={() => zzz.chats.add()}
 				>
-					<Glyph icon={GLYPH_ADD} /> new chat
+					<Glyph text={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new chat
 				</button>
 				{#if zzz.chats.items.size > 1}
 					<button
@@ -32,7 +32,7 @@
 						title="toggle sort controls"
 						onclick={() => zzz.chats.toggle_sort_controls()}
 					>
-						<Glyph icon={GLYPH_SORT} />
+						<Glyph text={GLYPH_SORT} />
 					</button>
 				{/if}
 			</div>

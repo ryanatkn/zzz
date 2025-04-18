@@ -58,7 +58,7 @@
 			<External_Link href="https://github.com/ggml-org/llama.cpp">llama.cpp</External_Link>. It's
 			one of Zzz's first integrations but will be one of many supported local backends. See also the <Provider_Link
 				provider={zzz.providers.find_by_name('ollama')}
-				><span class="white_space_nowrap"><Glyph icon={GLYPH_PROVIDER} /> Ollama</span> provider</Provider_Link
+				><span class="white_space_nowrap"><Glyph text={GLYPH_PROVIDER} /> Ollama</span> provider</Provider_Link
 			> page.
 		</div>
 	</div>
@@ -79,7 +79,7 @@
 			onclick={() => capabilities.check_ollama()}
 		>
 			<Glyph
-				icon={capabilities.ollama.status === 'success' ? GLYPH_REFRESH : GLYPH_CONNECT}
+				text={capabilities.ollama.status === 'success' ? GLYPH_REFRESH : GLYPH_CONNECT}
 				size="var(--size_xl)"
 			/>
 			<span class="size_lg font_weight_400 ml_md">
@@ -100,7 +100,7 @@
 			disabled={capabilities.ollama.status === 'initial'}
 			onclick={() => capabilities.reset_ollama()}
 		>
-			<Glyph icon={GLYPH_RESET} size="var(--size_xl)" />
+			<Glyph text={GLYPH_RESET} size="var(--size_xl)" />
 			<span class="size_lg font_weight_400 ml_md"> reset </span>
 		</button>
 	</div>
@@ -109,7 +109,7 @@
 
 	{#if capabilities.ollama_models.length > 0}
 		<div class="panel p_md" transition:slide>
-			<h4 class="mt_0 mb_sm"><Glyph icon={GLYPH_MODEL} /> models installed locally</h4>
+			<h4 class="mt_0 mb_sm"><Glyph text={GLYPH_MODEL} /> models installed locally</h4>
 			<ul class="unstyled">
 				{#each capabilities.ollama_models as ollama_model (ollama_model.name)}
 					{@const model = zzz.models.find_by_name(ollama_model.name)}

@@ -51,47 +51,47 @@
 	</div>
 
 	<section>
-		<h2>Model specifications</h2>
+		<h2>Specs</h2>
 		<div class="specs_grid">
 			{#if model.context_window}
 				<div>
-					<strong>Context window:</strong>
+					<strong>context window:</strong>
 					{model.context_window.toLocaleString()} tokens
 				</div>
 			{/if}
 			{#if model.output_token_limit}
 				<div>
-					<strong>Output limit:</strong>
+					<strong>output limit:</strong>
 					{model.output_token_limit.toLocaleString()} tokens
 				</div>
 			{/if}
 			{#if model.parameter_count}
 				<div>
-					<strong>Parameters:</strong>
+					<strong>parameters:</strong>
 					{model.parameter_count.toLocaleString()}B
 				</div>
 			{/if}
 			{#if model.filesize}
 				<div>
-					<strong>File size:</strong>
+					<strong>file size:</strong>
 					{model.filesize}GB
 				</div>
 			{/if}
 			{#if model.architecture}
 				<div>
-					<strong>Architecture:</strong>
+					<strong>architecture:</strong>
 					{model.architecture}
 				</div>
 			{/if}
 			{#if model.embedding_length}
 				<div>
-					<strong>Embedding length:</strong>
+					<strong>embedding length:</strong>
 					{model.embedding_length}
 				</div>
 			{/if}
 			{#if model.training_cutoff}
 				<div>
-					<strong>Training cutoff:</strong>
+					<strong>training cutoff:</strong>
 					{model.training_cutoff}
 				</div>
 			{/if}
@@ -100,14 +100,12 @@
 		{#if model.cost_input || model.cost_output}
 			<section>
 				<h3>Pricing</h3>
-				<div class="specs_grid">
-					{#if model.cost_input}
-						<div><strong>Input:</strong> ${model.cost_input.toFixed(2)} / 1M tokens</div>
-					{/if}
-					{#if model.cost_output}
-						<div><strong>Output:</strong> ${model.cost_output.toFixed(2)} / 1M tokens</div>
-					{/if}
-				</div>
+				{#if model.cost_input}
+					<div><strong>input:</strong> ${model.cost_input.toFixed(2)} / 1M tokens</div>
+				{/if}
+				{#if model.cost_output}
+					<div><strong>output:</strong> ${model.cost_output.toFixed(2)} / 1M tokens</div>
+				{/if}
 			</section>
 		{/if}
 
@@ -137,12 +135,7 @@
 		min-width: var(--icon_size_xl);
 		line-height: 1;
 	}
-	.specs_grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-		gap: var(--space_md);
-		margin-bottom: var(--space_md);
-	}
+
 	section {
 		margin-top: var(--space_lg);
 	}

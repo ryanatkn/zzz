@@ -6,10 +6,11 @@
 	import {onNavigate} from '$app/navigation';
 	import Svg from '@ryanatkn/fuz/Svg.svelte';
 	import {is_editable, swallow} from '@ryanatkn/belt/dom.js';
+	import {slide} from 'svelte/transition';
 
 	import Nav_Link from '$lib/Nav_Link.svelte';
 	import Glyph from '$lib/Glyph.svelte';
-	import {GLYPH_ARROW_LEFT, GLYPH_ARROW_RIGHT, GLYPH_SITE, GLYPH_TAB} from '$lib/glyphs.js';
+	import {GLYPH_ARROW_LEFT, GLYPH_ARROW_RIGHT, GLYPH_PROJECT, GLYPH_TAB} from '$lib/glyphs.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import {main_nav_items_default} from '$lib/nav.js';
 
@@ -53,17 +54,19 @@
 				main_group.items.unshift({label: 'tabs', href: `${base}/tabs`, icon: GLYPH_TAB});
 			}
 
-			// Add sites to main group
+			// Add projects to main group
 			const main_section = nav_items.find((section) => section.group === 'main');
 			if (main_section) {
-				main_section.items.push({label: 'sites', href: `${base}/sites`, icon: GLYPH_SITE});
+				main_section.items.push({label: 'projects', href: `${base}/projects`, icon: GLYPH_PROJECT});
 			}
 		}
 
 		return nav_items;
 	});
 
-	const sidebar_button_title = $derived(zzz.ui.show_sidebar ? 'hide sidebar' : 'show sidebar');
+	const sidebar_button_title = $derived(
+		(zzz.ui.show_sidebar ? 'hide sidebar' : 'show sidebar') + ' [backtick `]',
+	);
 </script>
 
 <svelte:window
@@ -130,22 +133,24 @@
 					{/if}
 
 					{#each section.items as link (link.label)}
-						<Nav_Link href={link.href}>
-							{#snippet children(selected)}
-								{#if typeof link.icon === 'string'}
-									<Glyph icon={link.icon} attrs={{class: 'icon_xs'}} /> {link.label}
-								{:else}
-									<span class="icon_xs">
-										<Svg
-											data={link.icon}
-											fill={selected ? 'var(--link_color)' : 'var(--text_color_1)'}
-											size="var(--icon_size_xs)"
-										/>
-									</span>
-									{link.label}
-								{/if}
-							{/snippet}
-						</Nav_Link>
+						<div transition:slide>
+							<Nav_Link href={link.href}>
+								{#snippet children(selected)}
+									{#if typeof link.icon === 'string'}
+										<Glyph text={link.icon} attrs={{class: 'icon_xs'}} /> {link.label}
+									{:else}
+										<span class="icon_xs">
+											<Svg
+												data={link.icon}
+												fill={selected ? 'var(--link_color)' : 'var(--text_color_1)'}
+												size="var(--icon_size_xs)"
+											/>
+										</span>
+										{link.label}
+									{/if}
+								{/snippet}
+							</Nav_Link>
+						</div>
 					{/each}
 				{/each}
 			</nav>
@@ -163,6 +168,6 @@
 		title={sidebar_button_title}
 		onclick={() => zzz.ui.toggle_sidebar()}
 	>
-		<Glyph icon={zzz.ui.show_sidebar ? GLYPH_ARROW_LEFT : GLYPH_ARROW_RIGHT} />
+		<Glyph text={zzz.ui.show_sidebar ? GLYPH_ARROW_LEFT : GLYPH_ARROW_RIGHT} />
 	</button>
 </div>

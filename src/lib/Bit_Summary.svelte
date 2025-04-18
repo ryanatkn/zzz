@@ -27,7 +27,7 @@
 	>
 		<div class="progress_bar" style:width="{percent}%"></div>
 		<div class="flex_1 pl_sm py_xs3 ellipsis">
-			<span class="mr_xs2"><Glyph icon={get_bit_type_glyph(bit)} /></span>
+			<Glyph text={get_bit_type_glyph(bit)} attrs={{class: 'mr_xs2'}} />
 			{bit.name}
 			{bit.content_preview}
 		</div>

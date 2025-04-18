@@ -3,7 +3,7 @@
 import {test, expect, describe, beforeEach} from 'vitest';
 
 import {Text_Bit} from '$lib/bit.svelte.js';
-import {create_uuid} from '$lib/zod_helpers.js';
+import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
 import {Zzz} from '$lib/zzz.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
@@ -47,7 +47,7 @@ describe('Sequence_Bit initialization', () => {
 
 	test('initializes from json with items', () => {
 		const test_id = create_uuid();
-		const test_date = new Date().toISOString();
+		const test_date = get_datetime_now();
 
 		const bit = zzz.registry.instantiate('Sequence_Bit', {
 			id: test_id,
@@ -288,7 +288,7 @@ describe('Sequence_Bit item management', () => {
 describe('Sequence_Bit serialization', () => {
 	test('to_json includes all properties with correct values', () => {
 		const test_id = create_uuid();
-		const created = new Date().toISOString();
+		const created = get_datetime_now();
 
 		const sequence_bit = zzz.registry.instantiate('Sequence_Bit', {
 			id: test_id,

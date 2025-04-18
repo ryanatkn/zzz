@@ -10,7 +10,8 @@
 </script>
 
 <div class="p_lg">
-	<h1><Glyph icon={GLYPH_PROVIDER} /> providers</h1>
+	<h1><Glyph text={GLYPH_PROVIDER} /> providers</h1>
+	<aside>⚠️ This information is incomplete and may be incorrect or outdated.</aside>
 	<div class="providers_grid">
 		{#each zzz.providers.items as provider (provider)}
 			<div class="panel p_lg">

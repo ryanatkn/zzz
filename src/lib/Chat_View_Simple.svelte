@@ -10,16 +10,26 @@
 	}
 
 	const {chat, tape}: Props = $props();
+
+	const strip_count = $derived(tape?.strips.size);
+
+	const empty = $derived(!strip_count);
 </script>
 
-<div class="column_fluid flex_1">
-	<div class="column width_md min_width_sm h_100 p_sm">
+<!-- TODO the overflow change is hacky, allows the shadow to overlap the sidebar, but maybe that should be fixed -->
+<div
+	class="column_fluid column flex_1"
+	style:overflow={empty ? 'visible' : undefined}
+	style:justify-content={empty ? 'center' : undefined}
+>
+	<!-- the two `p_sm` are expected to stay in sync so the size is the same regardless of presentation style -->
+	<div class="column width_md min_width_sm" class:h_100={!empty} class:p_sm={!empty}>
 		{#if tape}
 			<Chat_Tape
 				{chat}
 				{tape}
 				onsend={(input) => chat.send_to_tape(tape.id, input)}
-				attrs={{class: 'h_100'}}
+				attrs={{class: empty ? 'floating p_sm' : 'h_100'}}
 			/>
 		{:else}
 			<Chat_Tape_Add_By_Model {chat} />
