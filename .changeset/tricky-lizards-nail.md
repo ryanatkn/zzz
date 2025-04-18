@@ -2,4 +2,4 @@
 '@ryanatkn/zzz': minor
 ---
 
-www.zzzbot.dev
+www.zzz.software
