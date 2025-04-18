@@ -119,7 +119,7 @@ const sample_projects: Array<Project> = [
 			{
 				id: 'page_4',
 				path: '/tarot',
-				title: 'Dealt: Tarot',
+				title: 'Dealt: tarot',
 				content:
 					'# Tarot\n\ngiving meaning a chance 🔮 <a href="https://tarot.dealt.dev/">tarot.dealt.dev</a>',
 				created: '2023-02-11T11:30:00Z',
