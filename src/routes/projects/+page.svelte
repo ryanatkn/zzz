@@ -25,7 +25,7 @@
 {/if}
 
 {#snippet content()}
-	<h1><Glyph icon={GLYPH_PROJECT} /> projects</h1>
+	<h1><Glyph text={GLYPH_PROJECT} /> projects</h1>
 
 	<section class="width_md">
 		<p>

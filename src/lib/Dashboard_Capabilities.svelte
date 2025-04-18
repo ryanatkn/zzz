@@ -7,7 +7,7 @@
 
 <div class="p_lg">
 	<header>
-		<h1><Glyph icon={GLYPH_CAPABILITY} /> system capabilities</h1>
+		<h1><Glyph text={GLYPH_CAPABILITY} /> system capabilities</h1>
 	</header>
 	<section class="width_md">
 		<p>

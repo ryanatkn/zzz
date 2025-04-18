@@ -1,6 +1,7 @@
 <script lang="ts">
 	import Nav_Link from '$lib/Nav_Link.svelte';
 	import Contextmenu_Chat from '$lib/Contextmenu_Chat.svelte';
+	import Glyph from '$lib/Glyph.svelte';
 	import {GLYPH_CHAT} from '$lib/glyphs.js';
 	import type {Chat} from '$lib/chat.svelte.js';
 
@@ -22,7 +23,7 @@
 		}}
 	>
 		<div>
-			<span class="mr_xs2">{GLYPH_CHAT}</span>
+			<Glyph attrs={{class: 'mr_xs2'}} text={GLYPH_CHAT} />
 			<span>{chat.name}</span>
 		</div>
 		{#if chat.tapes.length}<small>{chat.tapes.length}</small>{/if}

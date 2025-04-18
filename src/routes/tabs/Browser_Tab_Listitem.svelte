@@ -33,7 +33,7 @@
 		aria-pressed={tab.selected}
 	>
 		<div class="ellipsis font_weight_400 flex_1">
-			<Glyph icon="⎕" />
+			<Glyph text="⎕" />
 			<small class="ml_xs">{tab.title}</small>
 		</div>
 		<button

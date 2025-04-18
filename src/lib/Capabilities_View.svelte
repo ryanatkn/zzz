@@ -15,15 +15,15 @@
 <div class="width_md">
 	<section>
 		<section class="mb_xl12">
-			<h2><Glyph icon={GLYPH_SERVER} /> server</h2>
+			<h2><Glyph text={GLYPH_SERVER} /> server</h2>
 			<Capability_Server />
 		</section>
 		<section class="mb_xl12">
-			<h2><Glyph icon={GLYPH_DIRECTORY} /> server filesystem</h2>
+			<h2><Glyph text={GLYPH_DIRECTORY} /> server filesystem</h2>
 			<Capability_Filesystem />
 		</section>
 		<section class="mb_xl12">
-			<h2><Glyph icon={GLYPH_CONNECT} /> server websocket</h2>
+			<h2><Glyph text={GLYPH_CONNECT} /> server websocket</h2>
 			<Capability_Websocket />
 		</section>
 		<section class="mb_xl12">

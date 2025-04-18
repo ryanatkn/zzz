@@ -137,7 +137,7 @@
 							<Nav_Link href={link.href}>
 								{#snippet children(selected)}
 									{#if typeof link.icon === 'string'}
-										<Glyph icon={link.icon} attrs={{class: 'icon_xs'}} /> {link.label}
+										<Glyph text={link.icon} attrs={{class: 'icon_xs'}} /> {link.label}
 									{:else}
 										<span class="icon_xs">
 											<Svg
@@ -168,6 +168,6 @@
 		title={sidebar_button_title}
 		onclick={() => zzz.ui.toggle_sidebar()}
 	>
-		<Glyph icon={zzz.ui.show_sidebar ? GLYPH_ARROW_LEFT : GLYPH_ARROW_RIGHT} />
+		<Glyph text={zzz.ui.show_sidebar ? GLYPH_ARROW_LEFT : GLYPH_ARROW_RIGHT} />
 	</button>
 </div>

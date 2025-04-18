@@ -69,7 +69,7 @@
 {#if show_editor}
 	<Dialog onclose={() => (show_editor = false)}>
 		<div class="pane p_md width_md mx_auto">
-			<h2 class="mt_0 mb_sm"><Glyph icon={GLYPH_BIT} /> edit bit</h2>
+			<h2 class="mt_0 mb_sm"><Glyph text={GLYPH_BIT} /> edit bit</h2>
 			<Bit_View {bit} />
 		</div>
 	</Dialog>

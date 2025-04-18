@@ -72,7 +72,7 @@
 			disabled={capabilities.server.status === 'pending'}
 			onclick={() => capabilities.check_server()}
 		>
-			<Glyph icon={GLYPH_CONNECT} size="var(--size_xl)" />
+			<Glyph text={GLYPH_CONNECT} size="var(--size_xl)" />
 			<span class="size_lg font_weight_400 ml_md">
 				{#if capabilities.server.status === 'pending'}
 					<div class="inline_flex align_items_end">

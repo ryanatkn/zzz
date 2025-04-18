@@ -57,7 +57,7 @@
 			title="Close preview"
 			onclick={toggle_preview}
 		>
-			<Glyph icon={GLYPH_PREVIEW} />
+			<Glyph text={GLYPH_PREVIEW} />
 		</button>
 	</div>
 {:else}

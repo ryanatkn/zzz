@@ -44,7 +44,7 @@
 		aria-pressed={selected}
 	>
 		<small class="ellipsis">
-			<Glyph icon={GLYPH_FILE} />
+			<Glyph text={GLYPH_FILE} />
 			<span class="ml_xs">{diskfile.path_relative}</span>
 		</small>
 	</div>
