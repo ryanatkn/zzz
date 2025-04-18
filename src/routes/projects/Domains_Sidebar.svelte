@@ -9,16 +9,16 @@
 
 	const projects = projects_context.get();
 
-	const controller = $derived(projects.current_project_controller);
+	const project_viewmodel = $derived(projects.current_project_viewmodel);
 </script>
 
 <aside class="h_100 overflow_y_auto unstyled width_xs p_xs">
-	{#if controller}
+	{#if project_viewmodel}
 		<div class="flex">
 			<button
 				type="button"
 				class="plain justify_content_start flex_1"
-				onclick={() => controller.create_new_domain()}
+				onclick={() => project_viewmodel.create_new_domain()}
 			>
 				<Glyph text={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new domain
 			</button>
@@ -26,11 +26,11 @@
 
 		<nav>
 			<ul class="unstyled">
-				{#if controller.project}
-					{#each controller.project.domains as domain (domain.id)}
+				{#if project_viewmodel.project}
+					{#each project_viewmodel.project.domains as domain (domain.id)}
 						<li transition:slide>
 							<Nav_Link
-								href="{base}/projects/{controller.project_id}/domains/{domain.id}"
+								href="{base}/projects/{project_viewmodel.project_id}/domains/{domain.id}"
 								selected={domain.id === projects.current_domain_id}
 								attrs={{title: domain.name}}
 							>

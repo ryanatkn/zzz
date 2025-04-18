@@ -2,29 +2,29 @@ import {z} from 'zod';
 import {goto} from '$app/navigation';
 import {base} from '$app/paths';
 
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Project_Controller_Json} from './projects_schema.js';
 import {get_datetime_now, create_uuid, type Uuid} from '$lib/zod_helpers.js';
 import {Domain} from './domain.svelte.js';
 import {Page} from './page.svelte.js';
 import {Projects} from './projects.svelte.js';
 import {get_unique_name} from '$lib/helpers.js';
 
-export interface Project_Controller_Options extends Cell_Options<typeof Project_Controller_Json> {
+export interface Project_Viewmodel_Options {
 	projects: Projects;
+	project_id: Uuid;
 }
 
 /**
  * Controller for managing project details and operations.
  */
-export class Project_Controller extends Cell<typeof Project_Controller_Json> {
+export class Project_Viewmodel {
+	readonly projects: Projects;
+
 	project_id: Uuid = $state()!;
+
 	edited_name: string = $state()!;
 	edited_description: string = $state()!;
-	editing_project: boolean = $state()!;
 
-	/** Projects service instance. */
-	readonly projects: Projects;
+	editing_project: boolean = $state(false);
 
 	/** Whether the form has unsaved changes. */
 	has_changes = $derived.by(
@@ -38,26 +38,24 @@ export class Project_Controller extends Cell<typeof Project_Controller_Json> {
 	readonly project = $derived.by(() => this.projects.current_project);
 
 	/**
-	 * Creates a new Project_Controller instance.
+	 * Creates a new Project_Viewmodel instance.
 	 */
-	constructor(options: Project_Controller_Options) {
-		super(Project_Controller_Json, options);
-
+	constructor(options: Project_Viewmodel_Options) {
 		this.projects = options.projects;
 
-		this.init();
+		this.project_id = options.project_id;
 
-		// TODO BLOCK remove/refactor
 		this.reset_form();
 	}
 
-	/**
-	 * Reset form to match current project values.
-	 */
+	// TODO @many maybe a more generic name for these like ephemeral/mirrored/viewmodel properties?
 	reset_form(): void {
 		if (this.project) {
 			this.edited_name = this.project.name;
 			this.edited_description = this.project.description;
+		} else {
+			this.edited_name = '';
+			this.edited_description = '';
 		}
 	}
 
@@ -128,7 +126,7 @@ export class Project_Controller extends Cell<typeof Project_Controller_Json> {
 		const created = get_datetime_now();
 
 		const page = new Page({
-			zzz: this.zzz,
+			zzz: this.projects.zzz,
 			json: {
 				id: page_id,
 				title: unique_title,
@@ -153,7 +151,7 @@ export class Project_Controller extends Cell<typeof Project_Controller_Json> {
 		const created = get_datetime_now();
 
 		const domain = new Domain({
-			zzz: this.zzz,
+			zzz: this.projects.zzz,
 			json: {
 				id: domain_id,
 				name: '',
@@ -169,4 +167,4 @@ export class Project_Controller extends Cell<typeof Project_Controller_Json> {
 	}
 }
 
-export const Project_Controller_Schema = z.instanceof(Project_Controller);
+export const Project_Viewmodel_Schema = z.instanceof(Project_Viewmodel);

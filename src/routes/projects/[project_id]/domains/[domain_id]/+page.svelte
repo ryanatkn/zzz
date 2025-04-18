@@ -8,7 +8,7 @@
 
 	const projects = projects_context.get();
 
-	const domains_controller = $derived(projects.current_domains_controller);
+	const domains_viewmodel = $derived(projects.current_domains_viewmodel);
 </script>
 
 <div class="domain_layout">
@@ -17,14 +17,14 @@
 	<Domains_Sidebar />
 
 	<div class="domain_content">
-		{#if domains_controller?.project}
+		{#if domains_viewmodel?.project}
 			<div class="p_lg">
 				<h1 class="mb_lg">Edit domain</h1>
 
 				<p>
-					{#if domains_controller.domain_name}
-						<External_Link href={`https://${domains_controller.domain_name}`}>
-							{domains_controller.domain_name}
+					{#if domains_viewmodel.domain_name}
+						<External_Link href={`https://${domains_viewmodel.domain_name}`}>
+							{domains_viewmodel.domain_name}
 						</External_Link>
 					{:else}
 						[no domain name]
@@ -35,24 +35,22 @@
 					<form
 						onsubmit={(e) => {
 							e.preventDefault();
-							domains_controller.save_domain_settings();
+							domains_viewmodel.save_domain_settings();
 						}}
 					>
 						<div class="mb_lg">
 							<label>
 								<h3 class="mt_0 mb_sm">Domain name</h3>
-								<input type="text" bind:value={domains_controller.domain_name} class="w_100" />
+								<input type="text" bind:value={domains_viewmodel.domain_name} class="w_100" />
 							</label>
 							<p>Enter the full domain name, like example.com or blog.example.com</p>
 						</div>
 
-						{#if domains_controller.domain}
+						{#if domains_viewmodel.domain}
 							<p>
-								<small>created {new Date(domains_controller.domain.created).toLocaleString()}</small
-								>
+								<small>created {new Date(domains_viewmodel.domain.created).toLocaleString()}</small>
 								<br />
-								<small>updated {new Date(domains_controller.domain.updated).toLocaleString()}</small
-								>
+								<small>updated {new Date(domains_viewmodel.domain.updated).toLocaleString()}</small>
 							</p>
 						{/if}
 
@@ -64,7 +62,7 @@
 										type="radio"
 										name="status"
 										value="active"
-										bind:group={domains_controller.domain_status}
+										bind:group={domains_viewmodel.domain_status}
 									/>
 									<span class="ml_xs">active</span>
 								</label>
@@ -73,7 +71,7 @@
 										type="radio"
 										name="status"
 										value="pending"
-										bind:group={domains_controller.domain_status}
+										bind:group={domains_viewmodel.domain_status}
 									/>
 									<span class="ml_xs">pending</span>
 								</label>
@@ -82,7 +80,7 @@
 										type="radio"
 										name="status"
 										value="inactive"
-										bind:group={domains_controller.domain_status}
+										bind:group={domains_viewmodel.domain_status}
 									/>
 									<span class="ml_xs">inactive</span>
 								</label>
@@ -91,7 +89,7 @@
 
 						<div class="mb_md">
 							<label class="flex align_items_center">
-								<input type="checkbox" bind:checked={domains_controller.ssl_enabled} />
+								<input type="checkbox" bind:checked={domains_viewmodel.ssl_enabled} />
 								<span class="ml_xs">enable SSL</span>
 							</label>
 						</div>
@@ -100,12 +98,11 @@
 							<h3 class="mb_sm">DNS</h3>
 							<p class="mb_sm">TODO many things</p>
 
-							{#if domains_controller.ssl_enabled}
+							{#if domains_viewmodel.ssl_enabled}
 								<div class="mb_sm">
 									<h4>SSL Verification</h4>
 									<p>To complete SSL setup, add this TXT record:</p>
-									<code
-										>_zzz-verify → verify-{domains_controller.domain_id || 'your-domain-id'}</code
+									<code>_zzz-verify → verify-{domains_viewmodel.domain_id || 'your-domain-id'}</code
 									>
 								</div>
 							{/if}
@@ -116,17 +113,17 @@
 								<button
 									type="submit"
 									class="color_a"
-									disabled={domains_controller.domain && !domains_controller.has_changes}
+									disabled={domains_viewmodel.domain && !domains_viewmodel.has_changes}
 								>
-									{domains_controller.domain ? 'save changes' : 'add domain'}
+									{domains_viewmodel.domain ? 'save changes' : 'add domain'}
 								</button>
 							</div>
 
-							{#if domains_controller.domain}
+							{#if domains_viewmodel.domain}
 								<button
 									type="button"
 									class="color_c"
-									onclick={() => domains_controller.remove_domain()}
+									onclick={() => domains_viewmodel.remove_domain()}
 								>
 									{GLYPH_DELETE} delete domain
 								</button>

@@ -6,7 +6,7 @@
 
 	const projects = projects_context.get();
 
-	const controller = $derived(projects.current_project_controller);
+	const project_viewmodel = $derived(projects.current_project_viewmodel);
 </script>
 
 <div class="project_layout">
@@ -14,40 +14,40 @@
 	<Section_Sidebar section="settings" />
 
 	<div class="project_content">
-		{#if controller?.project}
+		{#if project_viewmodel?.project}
 			<div class="p_lg">
 				<h1 class="mb_lg">Project settings</h1>
 
 				<div class="panel p_md width_md my_lg">
 					<div class="mb_md">
 						<label>
-							Project name
+							<div class="title">Project name</div>
 							<input
 								type="text"
-								bind:value={controller.edited_name}
+								bind:value={project_viewmodel.edited_name}
 								class="w_100"
-								placeholder={controller.project.name}
+								placeholder={project_viewmodel.project.name}
 							/>
 						</label>
 					</div>
 
 					<div class="mb_md">
 						<label>
-							Description
+							<div class="title">Description</div>
 							<textarea
-								bind:value={controller.edited_description}
+								bind:value={project_viewmodel.edited_description}
 								class="w_100"
 								rows="3"
-								placeholder={controller.project.description || 'No description'}
+								placeholder={project_viewmodel.project.description || 'No description'}
 							></textarea>
 						</label>
 					</div>
 
 					<button
 						type="button"
-						onclick={() => controller.save_project_details()}
+						onclick={() => project_viewmodel.save_project_details()}
 						class="color_a"
-						disabled={!controller.has_changes}
+						disabled={!project_viewmodel.has_changes}
 					>
 						save changes
 					</button>
@@ -57,7 +57,11 @@
 					<h2 class="mt_0 mb_md">Danger zone</h2>
 					<p class="mb_md">These actions cannot be undone.</p>
 
-					<button type="button" class="color_c" onclick={() => controller.delete_current_project()}>
+					<button
+						type="button"
+						class="color_c"
+						onclick={() => project_viewmodel.delete_current_project()}
+					>
 						{GLYPH_DELETE} delete project
 					</button>
 				</div>

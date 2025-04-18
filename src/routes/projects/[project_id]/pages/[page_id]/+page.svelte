@@ -26,7 +26,7 @@
 	// TODO refactor with proper state/API
 	/** Delete the current page and navigate back to pages list. */
 	const delete_page = () => {
-		const controller = projects.current_project_controller;
+		const controller = projects.current_project_viewmodel;
 		if (!editor?.project || !editor.current_page || !controller) {
 			return;
 		}
@@ -73,7 +73,7 @@
 					<div>
 						<div class="flex gap_sm align_items_center">
 							<h1 class="mb_lg">
-								{editor.is_new_page ? 'New page' : editor.current_page?.title || 'Page'}
+								{editor.current_page?.title || 'Page'}
 							</h1>
 						</div>
 
@@ -93,11 +93,9 @@
 								</button>
 							</div>
 
-							{#if !editor.is_new_page}
-								<button type="button" onclick={delete_page} class="color_c"
-									>{GLYPH_DELETE} delete</button
-								>
-							{/if}
+							<button type="button" onclick={delete_page} class="color_c"
+								>{GLYPH_DELETE} delete</button
+							>
 						</div>
 					</div>
 

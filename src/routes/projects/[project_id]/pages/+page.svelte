@@ -10,9 +10,9 @@
 
 	const projects = projects_context.get();
 
-	const controller = $derived(projects.current_project_controller);
+	const project_viewmodel = $derived(projects.current_project_viewmodel);
 
-	const page_count = $derived(controller?.project?.pages.length);
+	const page_count = $derived(project_viewmodel?.project?.pages.length);
 </script>
 
 <div class="project_layout">
@@ -21,14 +21,18 @@
 	<Pages_Sidebar />
 
 	<div class="project_content">
-		{#if controller?.project}
+		{#if project_viewmodel?.project}
 			<div class="p_lg">
 				<h1 class="mb_lg">Pages</h1>
 
 				{#if !page_count}
 					<p>This project doesn't have any web pages yet.</p>
 					<p>
-						<button type="button" class="color_a" onclick={() => controller.create_new_page()}>
+						<button
+							type="button"
+							class="color_a"
+							onclick={() => project_viewmodel.create_new_page()}
+						>
 							<Glyph text={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> create your first page
 						</button>
 					</p>
@@ -43,10 +47,10 @@
 							</tr>
 						</thead>
 						<tbody>
-							{#each controller.project.pages as page (page.id)}
+							{#each project_viewmodel.project.pages as page (page.id)}
 								<tr>
 									<td>
-										<a href="{base}/projects/{controller.project_id}/pages/{page.id}"
+										<a href="{base}/projects/{project_viewmodel.project_id}/pages/{page.id}"
 											>{page.title}</a
 										>
 									</td>
@@ -59,7 +63,11 @@
 					</table>
 
 					<div class="mb_lg">
-						<button type="button" class="color_a" onclick={() => controller.create_new_page()}>
+						<button
+							type="button"
+							class="color_a"
+							onclick={() => project_viewmodel.create_new_page()}
+						>
 							<Glyph text={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new page
 						</button>
 					</div>

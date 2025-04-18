@@ -10,7 +10,7 @@
 
 	const projects = projects_context.get();
 
-	const controller = $derived(projects.current_project_controller);
+	const project_viewmodel = $derived(projects.current_project_viewmodel);
 </script>
 
 <div class="project_layout">
@@ -19,15 +19,19 @@
 	<Domains_Sidebar />
 
 	<div class="project_content">
-		{#if controller?.project}
+		{#if project_viewmodel?.project}
 			<div class="p_lg">
 				<h1 class="mb_lg">Domains</h1>
 
-				{#if controller.project.domains.length === 0}
+				{#if project_viewmodel.project.domains.length === 0}
 					<div class="panel p_lg text_align_center mb_lg">
 						<p>This project doesn't have any domains configured yet.</p>
 						<p>
-							<button type="button" class="color_a" onclick={() => controller.create_new_domain()}>
+							<button
+								type="button"
+								class="color_a"
+								onclick={() => project_viewmodel.create_new_domain()}
+							>
 								<Glyph text={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> add your first domain
 							</button>
 						</p>
@@ -44,10 +48,10 @@
 							</tr>
 						</thead>
 						<tbody>
-							{#each controller.project.domains as domain (domain.id)}
+							{#each project_viewmodel.project.domains as domain (domain.id)}
 								<tr>
 									<td>
-										<a href="{base}/projects/{controller.project_id}/domains/{domain.id}">
+										<a href="{base}/projects/{project_viewmodel.project_id}/domains/{domain.id}">
 											{domain.name || '[new domain]'}
 										</a>
 									</td>
@@ -72,7 +76,11 @@
 				{/if}
 
 				<div>
-					<button type="button" class="color_a" onclick={() => controller.create_new_domain()}>
+					<button
+						type="button"
+						class="color_a"
+						onclick={() => project_viewmodel.create_new_domain()}
+					>
 						<Glyph text={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new domain
 					</button>
 				</div>

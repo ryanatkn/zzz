@@ -53,7 +53,6 @@
 		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 		gap: var(--space_lg);
 		width: 100%;
-		padding: var(--space_md);
 	}
 
 	.provider_icon {

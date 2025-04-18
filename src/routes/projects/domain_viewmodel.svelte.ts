@@ -2,38 +2,36 @@ import {z} from 'zod';
 import {goto} from '$app/navigation';
 import {base} from '$app/paths';
 
-import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Domain_Controller_Json} from './projects_schema.js';
 import {get_datetime_now, type Uuid} from '$lib/zod_helpers.js';
 import {Domain} from './domain.svelte.js';
 import type {Projects} from './projects.svelte.js';
 
-export interface Domain_Controller_Options extends Cell_Options<typeof Domain_Controller_Json> {
+export interface Domain_Viewmodel_Options {
 	projects: Projects;
+	project_id: Uuid;
+	domain_id: Uuid | null;
 }
 
 /**
  * Controller for domain management functionality.
  */
-export class Domain_Controller extends Cell<typeof Domain_Controller_Json> {
+export class Domain_Viewmodel {
+	readonly projects: Projects;
+
 	project_id: Uuid = $state()!;
-	domain_id?: Uuid = $state();
+	domain_id: Uuid | null = $state()!;
+
 	domain_name: string = $state()!;
 	domain_status: 'active' | 'pending' | 'inactive' = $state()!;
 	ssl_enabled: boolean = $state()!;
-	is_initialized: boolean = $state()!;
-
-	/** Projects service instance. */
-	readonly projects: Projects;
 
 	/** Whether the form has unsaved changes. */
 	has_changes = $derived.by(
 		() =>
-			this.is_initialized &&
-			(this.domain === null ||
-				this.domain_name !== this.domain.name ||
-				this.domain_status !== this.domain.status ||
-				this.ssl_enabled !== this.domain.ssl),
+			this.domain === null ||
+			this.domain_name !== this.domain.name ||
+			this.domain_status !== this.domain.status ||
+			this.ssl_enabled !== this.domain.ssl,
 	);
 
 	/** The current project. */
@@ -41,32 +39,25 @@ export class Domain_Controller extends Cell<typeof Domain_Controller_Json> {
 
 	/** The domain being edited. */
 	readonly domain = $derived.by(() => {
-		if (!this.domain_id) return null;
-		return this.project?.domains.find((d) => d.id === this.domain_id) || null;
+		const {domain_id} = this;
+		if (!domain_id) return null;
+		return this.project?.domains.find((d) => d.id === domain_id) || null;
 	});
 
 	/**
-	 * Creates a new Domain_Controller instance.
+	 * Creates a new Domain_Viewmodel instance.
 	 */
-	constructor(options: Domain_Controller_Options) {
-		super(Domain_Controller_Json, options);
-
+	constructor(options: Domain_Viewmodel_Options) {
 		this.projects = options.projects;
 
-		this.init();
+		this.project_id = options.project_id;
+		this.domain_id = options.domain_id;
 
-		// TODO BLOCK remove/refactor
-		// Initialize form values after construction
-		if (!this.is_initialized) {
-			this.init_form();
-			this.is_initialized = true;
-		}
+		this.reset_form();
 	}
 
-	/**
-	 * Initialize form values from current domain or with defaults.
-	 */
-	init_form(): void {
+	// TODO @many maybe a more generic name for these like ephemeral/mirrored/viewmodel properties?
+	reset_form(): void {
 		if (this.domain) {
 			// Existing domain - use its values
 			this.domain_name = this.domain.name;
@@ -97,7 +88,7 @@ export class Domain_Controller extends Cell<typeof Domain_Controller_Json> {
 		} else {
 			// Create new domain
 			const domain = new Domain({
-				zzz: this.zzz,
+				zzz: this.projects.zzz,
 				json: {
 					name: this.domain_name,
 					status: this.domain_status,
@@ -127,4 +118,4 @@ export class Domain_Controller extends Cell<typeof Domain_Controller_Json> {
 	}
 }
 
-export const Domain_Controller_Schema = z.instanceof(Domain_Controller);
+export const Domain_Viewmodel_Schema = z.instanceof(Domain_Viewmodel);
