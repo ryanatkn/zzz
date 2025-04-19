@@ -257,7 +257,7 @@ export const Action_Json = Cell_Json.extend({
 export type Action_Json = z.infer<typeof Action_Json>;
 export type Action_Json_Input = z.input<typeof Action_Json>;
 
-// Helper function to create a action with json representation
+// Helper function to create an action with json representation
 export const create_action_json = (action: Action, direction: Action_Direction): Action_Json => {
 	return {
 		...action,

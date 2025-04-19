@@ -5,6 +5,7 @@
 	import {GLYPH_PROMPT} from '$lib/glyphs.js';
 	import Contextmenu_Prompt from '$lib/Contextmenu_Prompt.svelte';
 	import type {Prompt} from '$lib/prompt.svelte.js';
+	import Glyph from '$lib/Glyph.svelte';
 
 	interface Props {
 		prompt: Prompt;
@@ -24,7 +25,7 @@
 		}}
 	>
 		<div>
-			<span class="mr_xs2">{GLYPH_PROMPT}</span>
+			<Glyph text={GLYPH_PROMPT} attrs={{class: 'mr_xs2'}} />
 			<span>{prompt.name}</span>
 		</div>
 		{#if prompt.bits.length}<small>{prompt.bits.length}</small>{/if}

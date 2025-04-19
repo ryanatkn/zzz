@@ -4,6 +4,7 @@
 	import type {Bit_Type} from '$lib/bit.svelte.js';
 	import Xml_Attribute_Editor from '$lib/Xml_Attribute_Editor.svelte';
 	import {GLYPH_ADD, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
+	import Glyph from '$lib/Glyph.svelte';
 
 	interface Props {
 		bit: Bit_Type;
@@ -47,7 +48,7 @@
 			title="add xml attribute"
 			onclick={() => bit.add_attribute()}
 		>
-			{GLYPH_ADD}
+			<Glyph text={GLYPH_ADD} />
 		</button>
 	</div>
 

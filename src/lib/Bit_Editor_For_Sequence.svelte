@@ -6,7 +6,7 @@
 	import {Uuid} from '$lib/zod_helpers.js';
 	import type {Sequence_Bit} from '$lib/bit.svelte.js';
 	import {GLYPH_BIT} from '$lib/glyphs.js';
-	import Bit_Picker from '$lib/Bit_Picker.svelte';
+	import Bit_Picker_Dialog from '$lib/Bit_Picker_Dialog.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 
 	interface Props {
@@ -80,7 +80,7 @@
 
 <Content_Preview content={sequence_bit.content} />
 
-<Bit_Picker
+<Bit_Picker_Dialog
 	exclude_ids={[sequence_bit.id, ...sequence_bit.items]}
 	bind:show={show_bit_picker}
 	onpick={(bit) => {

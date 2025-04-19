@@ -63,12 +63,13 @@
 
 		<div class="flex mt_lg">
 			<button type="button" class="plain" onclick={() => (show_model_picker = true)}>
-				<Glyph text={GLYPH_ADD} /> add tape
+				<Glyph text={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> add tape
 			</button>
 			<Confirm_Button
 				onconfirm={() => chat.remove_all_tapes()}
 				position="right"
-				attrs={{disabled: !count, class: 'plain'}}>{GLYPH_REMOVE} remove all</Confirm_Button
+				attrs={{disabled: !count, class: 'plain'}}
+				><Glyph text={GLYPH_REMOVE} attrs={{class: 'mr_xs2'}} /> remove all</Confirm_Button
 			>
 		</div>
 		<ul class="tapes unstyled mt_lg">
@@ -144,7 +145,6 @@
 
 <Model_Picker_Dialog
 	bind:show={show_model_picker}
-	onclose={() => (show_model_picker = false)}
 	onpick={(model) => {
 		if (model) {
 			chat.add_tape(model); // TODO @many insert at an index via a range input

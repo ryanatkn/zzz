@@ -17,7 +17,7 @@
 		GLYPH_REMOVE,
 	} from '$lib/glyphs.js';
 	import Contextmenu_Entry_Copy_To_Clipboard from '$lib/Contextmenu_Entry_Copy_To_Clipboard.svelte';
-	import Diskfile_Picker from '$lib/Diskfile_Picker.svelte';
+	import Diskfile_Picker_Dialog from '$lib/Diskfile_Picker_Dialog.svelte';
 
 	interface Props extends Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> {
 		prompt: Prompt;
@@ -115,7 +115,7 @@
 	</Contextmenu_Submenu>
 {/snippet}
 
-<Diskfile_Picker
+<Diskfile_Picker_Dialog
 	bind:show={show_diskfile_picker}
 	onpick={(diskfile) => {
 		if (!diskfile) return false;

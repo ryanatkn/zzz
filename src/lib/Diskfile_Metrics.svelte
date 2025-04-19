@@ -3,6 +3,7 @@
 
 	import {GLYPH_ARROW_RIGHT} from '$lib/glyphs.js';
 	import type {Diskfile_Editor_State} from '$lib/diskfile_editor_state.svelte.js';
+	import Glyph from '$lib/Glyph.svelte';
 
 	interface Props {
 		editor_state: Diskfile_Editor_State;
@@ -18,7 +19,7 @@
 			{editor_state.original_length}
 			{#if editor_state.original_length !== editor_state.current_length}
 				<span transition:fade={{duration: 80}}>
-					{GLYPH_ARROW_RIGHT}
+					<Glyph text={GLYPH_ARROW_RIGHT} />
 					{editor_state.current_length}</span
 				>{/if}
 		</div>
@@ -35,7 +36,7 @@
 			{editor_state.original_token_count}
 			{#if editor_state.original_token_count !== editor_state.current_token_count}
 				<span transition:fade={{duration: 80}}>
-					{GLYPH_ARROW_RIGHT}
+					<Glyph text={GLYPH_ARROW_RIGHT} />
 					{editor_state.current_token_count}</span
 				>{/if}
 		</div>

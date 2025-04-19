@@ -410,9 +410,6 @@ a.chip {
 .radius_lg {
 	border-radius: var(--radius_lg);
 }
-.fade_3 {
-	opacity: var(--fade_3);
-}
 .shadow_bottom_md {
 	box-shadow: var(--shadow_bottom_md)
 		color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_3)), transparent);

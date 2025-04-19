@@ -152,6 +152,11 @@
       "svelte": "./dist/Bit_Listitem.svelte",
       "default": "./dist/Bit_Listitem.svelte"
     },
+    "./Bit_Picker_Dialog.svelte": {
+      "types": "./dist/Bit_Picker_Dialog.svelte.d.ts",
+      "svelte": "./dist/Bit_Picker_Dialog.svelte",
+      "default": "./dist/Bit_Picker_Dialog.svelte"
+    },
     "./Bit_Picker.svelte": {
       "types": "./dist/Bit_Picker.svelte.d.ts",
       "svelte": "./dist/Bit_Picker.svelte",
@@ -475,6 +480,11 @@
       "svelte": "./dist/Diskfile_Metrics.svelte",
       "default": "./dist/Diskfile_Metrics.svelte"
     },
+    "./Diskfile_Picker_Dialog.svelte": {
+      "types": "./dist/Diskfile_Picker_Dialog.svelte.d.ts",
+      "svelte": "./dist/Diskfile_Picker_Dialog.svelte",
+      "default": "./dist/Diskfile_Picker_Dialog.svelte"
+    },
     "./Diskfile_Picker.svelte": {
       "types": "./dist/Diskfile_Picker.svelte.d.ts",
       "svelte": "./dist/Diskfile_Picker.svelte",
@@ -584,11 +594,6 @@
       "svelte": "./dist/Model_Select.svelte",
       "default": "./dist/Model_Select.svelte"
     },
-    "./Model_Selector.svelte": {
-      "types": "./dist/Model_Selector.svelte.d.ts",
-      "svelte": "./dist/Model_Selector.svelte",
-      "default": "./dist/Model_Selector.svelte"
-    },
     "./Model_Summary.svelte": {
       "types": "./dist/Model_Summary.svelte.d.ts",
       "svelte": "./dist/Model_Summary.svelte",
@@ -602,6 +607,10 @@
       "types": "./dist/models.svelte.d.ts",
       "default": "./dist/models.svelte.js"
     },
+    "./nav_helpers.js": {
+      "types": "./dist/nav_helpers.d.ts",
+      "default": "./dist/nav_helpers.js"
+    },
     "./Nav_Link.svelte": {
       "types": "./dist/Nav_Link.svelte.d.ts",
       "svelte": "./dist/Nav_Link.svelte",
@@ -614,6 +623,11 @@
     "./ollama.js": {
       "types": "./dist/ollama.d.ts",
       "default": "./dist/ollama.js"
+    },
+    "./Picker_Dialog.svelte": {
+      "types": "./dist/Picker_Dialog.svelte.d.ts",
+      "svelte": "./dist/Picker_Dialog.svelte",
+      "default": "./dist/Picker_Dialog.svelte"
     },
     "./Picker.svelte": {
       "types": "./dist/Picker.svelte.d.ts",
@@ -651,6 +665,11 @@
       "types": "./dist/Prompt_Listitem.svelte.d.ts",
       "svelte": "./dist/Prompt_Listitem.svelte",
       "default": "./dist/Prompt_Listitem.svelte"
+    },
+    "./Prompt_Picker_Dialog.svelte": {
+      "types": "./dist/Prompt_Picker_Dialog.svelte.d.ts",
+      "svelte": "./dist/Prompt_Picker_Dialog.svelte",
+      "default": "./dist/Prompt_Picker_Dialog.svelte"
     },
     "./Prompt_Picker.svelte": {
       "types": "./dist/Prompt_Picker.svelte.d.ts",

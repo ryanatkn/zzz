@@ -5,6 +5,7 @@
 	import {DEV} from 'esm-env';
 
 	import {GLYPH_CHECKMARK} from '$lib/glyphs.js';
+	import Glyph from '$lib/Glyph.svelte';
 
 	interface Props
 		extends Omit_Strict<Partial<ComponentProps<typeof Contextmenu_Entry>>, 'children'> {
@@ -39,5 +40,5 @@
 {/snippet}
 
 {#snippet icon_default()}
-	<span class:dormant={enabled} class:size_xs={enabled}>{GLYPH_CHECKMARK}</span>
+	<span class:dormant={enabled} class:size_xs={enabled}><Glyph text={GLYPH_CHECKMARK} /></span>
 {/snippet}

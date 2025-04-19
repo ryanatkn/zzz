@@ -1,19 +1,14 @@
 <script lang="ts" generics="T extends {id: Uuid}">
-	import type {Omit_Strict} from '@ryanatkn/belt/types.js';
 	import {EMPTY_ARRAY} from '@ryanatkn/belt/array.js';
-	import Dialog from '@ryanatkn/fuz/Dialog.svelte';
-	import type {ComponentProps, Snippet} from 'svelte';
+	import type {Snippet} from 'svelte';
 
 	import type {Uuid} from '$lib/zod_helpers.js';
 	import type {Sorter} from '$lib/sortable.svelte.js';
 	import Sortable_List from '$lib/Sortable_List.svelte';
 
-	let {
+	const {
 		items,
 		onpick,
-		show = $bindable(false),
-		dialog_props,
-		children: children_prop,
 		filter,
 		exclude_ids,
 		sorters = EMPTY_ARRAY,
@@ -21,6 +16,7 @@
 		show_sort_controls = false,
 		no_items,
 		heading = null,
+		children: children_prop,
 	}: {
 		/** The collection of items - required */
 		items: Array<T>;
@@ -29,8 +25,6 @@
 		 * Return `false` to prevent closing.
 		 */
 		onpick: (item: T | undefined) => boolean | void;
-		show?: boolean | undefined;
-		dialog_props?: Omit_Strict<ComponentProps<typeof Dialog>, 'children'> | undefined;
 		filter?: ((item: T) => boolean) | undefined;
 		exclude_ids?: Array<Uuid> | undefined;
 		sorters?: Array<Sorter<T>> | undefined;
@@ -42,42 +36,26 @@
 		children: Snippet<[item: T, pick: (item: T) => void]>;
 	} = $props();
 
-	// Internal pick handler to manage show state
+	// Internal pick handler to manage selections
 	const pick = (item: T): void => {
-		// If onpick returns false explicitly, don't close the picker
-		const should_close = onpick(item) !== false;
-		if (should_close) {
-			show = false;
-		}
+		onpick(item);
 	};
 </script>
 
-{#if show}
-	<Dialog
-		{...dialog_props}
-		onclose={() => {
-			onpick(undefined);
-			show = false;
-		}}
-	>
-		<div class="pane p_lg width_md mx_auto">
-			{#if heading}
-				<h2 class="mt_lg text_align_center">{heading}</h2>
-			{/if}
-
-			<Sortable_List
-				{items}
-				{filter}
-				{exclude_ids}
-				{sorters}
-				{sort_key_default}
-				{show_sort_controls}
-				{no_items}
-			>
-				{#snippet children(item)}
-					{@render children_prop(item, pick)}
-				{/snippet}
-			</Sortable_List>
-		</div>
-	</Dialog>
+{#if heading}
+	<h2 class="mt_lg text_align_center">{heading}</h2>
 {/if}
+
+<Sortable_List
+	{items}
+	{filter}
+	{exclude_ids}
+	{sorters}
+	{sort_key_default}
+	{show_sort_controls}
+	{no_items}
+>
+	{#snippet children(item)}
+		{@render children_prop(item, pick)}
+	{/snippet}
+</Sortable_List>

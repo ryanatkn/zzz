@@ -171,8 +171,15 @@
 		</ul>
 		<p>
 			Zzz is just one implementation of an increasingly common idea that combines web tech and AI
-			with powerful open clients, and it has quirks personal to its author that I'm eager to smooth
-			out. Your input is appreciated to help make it work for you—see the <External_Link
+			with powerful open clients. Because of the endless scope I've been referring to it as a
+			webtool. Some related projects call themselves web UIs or even operating systems. Whatever the
+			name, this class of app is something that I've been wanting for a long time.
+		</p>
+		<p>
+			I intend to continue working on Zzz full-time for the foreseeable future, but I know I need to
+			find people and organizations to work with. Some of the responsibilities are too big for me.
+			This project has quirks personal to its author that I'm eager to smooth out. Your input is
+			appreciated to help make it work for you—see the <External_Link
 				href="https://github.com/ryanatkn/zzz">code</External_Link
 			>,
 			<External_Link href="https://github.com/ryanatkn/zzz/issues">issues</External_Link>, and

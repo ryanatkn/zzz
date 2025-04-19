@@ -3,6 +3,7 @@
 
 	import {GLYPH_REMOVE} from '$lib/glyphs.js';
 	import type {Diskfile_Tab} from '$lib/diskfile_tab.svelte.js';
+	import Glyph from '$lib/Glyph.svelte';
 
 	interface Props {
 		tab: Diskfile_Tab;
@@ -54,7 +55,7 @@
 			title="close tab"
 			aria-label={`close tab ${path}`}
 		>
-			{GLYPH_REMOVE}
+			<Glyph text={GLYPH_REMOVE} />
 		</button>
 	</div>
 </div>

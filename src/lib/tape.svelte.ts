@@ -16,6 +16,7 @@ import {to_completion_response_text} from '$lib/response_helpers.js';
 import {Completion_Request, type Completion_Response} from '$lib/action_types.js';
 import {to_preview} from '$lib/helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
+import type {Uuid} from './zod_helpers.js';
 
 // TODO add `tape.name` probably
 
@@ -160,5 +161,14 @@ export class Tape extends Cell<typeof Tape_Json> {
 		assistant_strip.response = response.completion_response;
 
 		return assistant_strip;
+	}
+
+	switch_model(model_id: Uuid): void {
+		const model = this.zzz.models.items.by_id.get(model_id);
+		if (model) {
+			this.model_name = model.name; // TODO @many probably should be id
+		} else {
+			console.error(`model with id ${model_id} not found`);
+		}
 	}
 }

@@ -3,6 +3,7 @@
 	import Project_Sidebar from '../../Project_Sidebar.svelte';
 	import Section_Sidebar from '../../Section_Sidebar.svelte';
 	import {GLYPH_DELETE} from '$lib/glyphs.js';
+	import Glyph from '$lib/Glyph.svelte';
 
 	const projects = projects_context.get();
 
@@ -62,7 +63,7 @@
 						class="color_c"
 						onclick={() => project_viewmodel.delete_current_project()}
 					>
-						{GLYPH_DELETE} delete project
+						<Glyph text={GLYPH_DELETE} attrs={{class: 'mr_xs2'}} /> delete project
 					</button>
 				</div>
 			</div>

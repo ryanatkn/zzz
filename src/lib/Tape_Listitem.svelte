@@ -5,6 +5,7 @@
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Contextmenu_Tape from '$lib/Contextmenu_Tape.svelte';
 	import Tape_Toggle_Button from '$lib/Tape_Toggle_Button.svelte';
+	import Glyph from '$lib/Glyph.svelte';
 
 	interface Props {
 		tape: Tape;
@@ -42,7 +43,7 @@
 						title: 'delete tape',
 					}}
 				>
-					{GLYPH_REMOVE}
+					<Glyph text={GLYPH_REMOVE} />
 				</Confirm_Button>
 			</div>
 		</div>

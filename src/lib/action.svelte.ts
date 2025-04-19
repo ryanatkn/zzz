@@ -22,7 +22,7 @@ export interface Action_Options extends Cell_Options<typeof Action_Json> {} // e
 
 // TODO think about splitting out a different non-reactive version
 // that only handles the static expectation,
-// but then another for dynamic usage? is there even such a thing of a action changing?
+// but then another for dynamic usage? is there even such a thing of an action changing?
 // if not shouldn't we just remove the $state below?
 export class Action extends Cell<typeof Action_Json> {
 	type: Action_Type = $state()!;

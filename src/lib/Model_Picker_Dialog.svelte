@@ -1,26 +1,58 @@
 <script lang="ts">
-	import Dialog from '@ryanatkn/fuz/Dialog.svelte';
 	import type {ComponentProps, Snippet} from 'svelte';
 	import type {Omit_Strict} from '@ryanatkn/belt/types.js';
+	import Dialog from '@ryanatkn/fuz/Dialog.svelte';
 
-	import Model_Picker from '$lib/Model_Picker.svelte';
+	import Picker_Dialog from '$lib/Picker_Dialog.svelte';
+	import Model_Listitem from '$lib/Model_Listitem.svelte';
+	import {zzz_context} from '$lib/zzz.svelte.js';
 	import type {Model} from '$lib/model.svelte.js';
+	import {sort_by_text} from '$lib/sortable.svelte.js';
 
-	interface Props extends Omit_Strict<ComponentProps<typeof Dialog>, 'children'> {
+	const zzz = zzz_context.get();
+	const {models} = zzz;
+
+	interface Props {
 		show: boolean;
 		onpick: (model: Model | undefined) => boolean | void;
 		filter?: ((model: Model) => boolean) | undefined;
+		dialog_props?: Omit_Strict<ComponentProps<typeof Dialog>, 'children'> | undefined;
 		children?: Snippet | undefined;
 	}
 
-	let {show = $bindable(false), onpick, filter, children, ...rest}: Props = $props();
+	let {
+		show = $bindable(false),
+		onpick,
+		filter,
+		dialog_props,
+		children: children_prop,
+	}: Props = $props();
 </script>
 
 {#if show}
-	<Dialog {...rest}>
-		<div class="pane p_md width_md mx_auto">
-			{@render children?.()}
-			<Model_Picker bind:show {onpick} {filter} />
-		</div>
-	</Dialog>
+	<Picker_Dialog
+		show={true}
+		items={models.ordered_by_name}
+		{onpick}
+		{filter}
+		{dialog_props}
+		sorters={[
+			sort_by_text<Model>('name_asc', 'name (a-z)', 'name'),
+			sort_by_text<Model>('name_desc', 'name (z-a)', 'name', 'desc'),
+			sort_by_text<Model>('provider_asc', 'provider (a-z)', 'provider_name'),
+			sort_by_text<Model>('provider_desc', 'provider (z-a)', 'provider_name', 'desc'),
+		]}
+		sort_key_default="name_asc"
+		show_sort_controls
+		heading="Pick a model"
+	>
+		{#snippet children(model, pick)}
+			{#if children_prop}
+				{@render children_prop()}
+			{/if}
+			<button type="button" class="listitem compact w_100" onclick={() => pick(model)}>
+				<Model_Listitem {model} />
+			</button>
+		{/snippet}
+	</Picker_Dialog>
 {/if}

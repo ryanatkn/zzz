@@ -7,6 +7,7 @@
 	import type {Model} from '$lib/model.svelte.js';
 	import Provider_Logo from '$lib/Provider_Logo.svelte';
 	import {GLYPH_MODEL} from '$lib/glyphs.js';
+	import Glyph from '$lib/Glyph.svelte';
 
 	interface Props {
 		model: Model;
@@ -30,7 +31,7 @@
 		{#if icon === 'svg' || icon === true}
 			<Provider_Logo name={model.provider_name} />
 		{:else if icon === 'glyph'}
-			<span class="glyph">{GLYPH_MODEL}</span>
+			<Glyph text={GLYPH_MODEL} />
 		{/if}
 		{model.name}
 	{/if}</a

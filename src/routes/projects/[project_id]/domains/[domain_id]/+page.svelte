@@ -5,6 +5,7 @@
 	import Domains_Sidebar from '../../../Domains_Sidebar.svelte';
 	import {GLYPH_DELETE} from '$lib/glyphs.js';
 	import External_Link from '$lib/External_Link.svelte';
+	import Glyph from '$lib/Glyph.svelte';
 
 	const projects = projects_context.get();
 
@@ -125,7 +126,7 @@
 									class="color_c"
 									onclick={() => domains_viewmodel.remove_domain()}
 								>
-									{GLYPH_DELETE} delete domain
+									<Glyph text={GLYPH_DELETE} attrs={{class: 'mr_xs2'}} /> delete domain
 								</button>
 							{/if}
 						</div>

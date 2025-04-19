@@ -6,6 +6,7 @@
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import {GLYPH_DIRECTION_CLIENT, GLYPH_DIRECTION_SERVER} from '$lib/glyphs.js';
 	import {PING_HISTORY_MAX, type Ping_Data} from '$lib/capabilities.svelte.js';
+	import Glyph from './Glyph.svelte';
 
 	interface Props {
 		children?: Snippet | undefined;
@@ -65,7 +66,10 @@
 </div>
 
 {#snippet ping_item(ping: Ping_Data)}
-	{GLYPH_DIRECTION_CLIENT}<span class:fade_3={!ping.completed}>{GLYPH_DIRECTION_SERVER}</span>
+	<Glyph text={GLYPH_DIRECTION_CLIENT} /><Glyph
+		text={GLYPH_DIRECTION_SERVER}
+		attrs={{class: ping.completed ? '' : 'fade_3'}}
+	/>
 	{#if !ping.completed}
 		<span class="font_mono">
 			<Pending_Animation inline />

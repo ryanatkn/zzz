@@ -76,7 +76,7 @@
 							class: 'plain icon_button',
 						}}
 					>
-						{GLYPH_DELETE}
+						<Glyph text={GLYPH_DELETE} />
 						{#snippet popover_button_content()}{GLYPH_DELETE}{/snippet}
 					</Confirm_Button>
 					<Toggle_Button
@@ -89,7 +89,7 @@
 							title: `toggle chat to ${chat.view_mode === 'multi' ? 'simple' : 'multi'} view`,
 						}}
 					>
-						<span class="mr_xs">{GLYPH_VIEW}</span>
+						<Glyph text={GLYPH_VIEW} attrs={{class: 'mr_xs'}} />
 					</Toggle_Button>
 				</div>
 			</section>

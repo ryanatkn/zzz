@@ -4,6 +4,7 @@
 	import type {Xml_Attribute} from '$lib/xml.js';
 	import {GLYPH_REMOVE} from '$lib/glyphs.js';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
+	import Glyph from '$lib/Glyph.svelte';
 
 	interface Props {
 		attribute: Xml_Attribute;
@@ -36,6 +37,6 @@
 		onconfirm={onremove}
 		attrs={{title: `remove attribute ${attribute.key || ''}`, class: 'plain compact'}}
 	>
-		{GLYPH_REMOVE}
+		<Glyph text={GLYPH_REMOVE} />
 	</Confirm_Button>
 </div>

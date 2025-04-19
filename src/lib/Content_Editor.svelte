@@ -4,11 +4,12 @@
 	import type {Snippet} from 'svelte';
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
 	import Paste_From_Clipboard from '@ryanatkn/fuz/Paste_From_Clipboard.svelte';
+	import {swallow} from '@ryanatkn/belt/dom.js';
 
 	import Content_Stats from '$lib/Content_Stats.svelte';
 	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
 	import {GLYPH_PASTE, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
-	import {swallow} from '@ryanatkn/belt/dom.js';
+	import Glyph from '$lib/Glyph.svelte';
 
 	interface Props {
 		content: string; // TODO maybe rename to value? rethink `Content_Editor` in general when we switch to CodeMirror
@@ -95,7 +96,8 @@
 				}}
 				attrs={{class: 'plain icon_button size_lg'}}
 			>
-				{GLYPH_PASTE}
+				<!-- TODO should be default -->
+				<Glyph text={GLYPH_PASTE} />
 			</Paste_From_Clipboard>
 			<Clear_Restore_Button
 				value={content}

@@ -19,7 +19,7 @@
 					<Provider_Link {provider} icon="svg" />
 				</div>
 				<div class="mb_sm font_mono">
-					<span class="glyph">{GLYPH_PROVIDER}</span>
+					<Glyph text={GLYPH_PROVIDER} />
 					{provider.name}
 				</div>
 				{#if provider.url}

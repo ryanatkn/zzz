@@ -4,6 +4,7 @@
 	import type {Prompts} from '$lib/prompts.svelte.js';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import {GLYPH_REMOVE} from '$lib/glyphs.js';
+	import Glyph from '$lib/Glyph.svelte';
 
 	interface Props {
 		bit: Bit_Type;
@@ -29,5 +30,5 @@
 		...attrs,
 	}}
 >
-	{GLYPH_REMOVE}
+	<Glyph text={GLYPH_REMOVE} />
 </Confirm_Button>

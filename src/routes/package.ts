@@ -123,6 +123,11 @@ export const package_json = {
 			svelte: './dist/Bit_Listitem.svelte',
 			default: './dist/Bit_Listitem.svelte',
 		},
+		'./Bit_Picker_Dialog.svelte': {
+			types: './dist/Bit_Picker_Dialog.svelte.d.ts',
+			svelte: './dist/Bit_Picker_Dialog.svelte',
+			default: './dist/Bit_Picker_Dialog.svelte',
+		},
 		'./Bit_Picker.svelte': {
 			types: './dist/Bit_Picker.svelte.d.ts',
 			svelte: './dist/Bit_Picker.svelte',
@@ -416,6 +421,11 @@ export const package_json = {
 			svelte: './dist/Diskfile_Metrics.svelte',
 			default: './dist/Diskfile_Metrics.svelte',
 		},
+		'./Diskfile_Picker_Dialog.svelte': {
+			types: './dist/Diskfile_Picker_Dialog.svelte.d.ts',
+			svelte: './dist/Diskfile_Picker_Dialog.svelte',
+			default: './dist/Diskfile_Picker_Dialog.svelte',
+		},
 		'./Diskfile_Picker.svelte': {
 			types: './dist/Diskfile_Picker.svelte.d.ts',
 			svelte: './dist/Diskfile_Picker.svelte',
@@ -516,11 +526,6 @@ export const package_json = {
 			svelte: './dist/Model_Select.svelte',
 			default: './dist/Model_Select.svelte',
 		},
-		'./Model_Selector.svelte': {
-			types: './dist/Model_Selector.svelte.d.ts',
-			svelte: './dist/Model_Selector.svelte',
-			default: './dist/Model_Selector.svelte',
-		},
 		'./Model_Summary.svelte': {
 			types: './dist/Model_Summary.svelte.d.ts',
 			svelte: './dist/Model_Summary.svelte',
@@ -528,6 +533,7 @@ export const package_json = {
 		},
 		'./model.svelte.js': {types: './dist/model.svelte.d.ts', default: './dist/model.svelte.js'},
 		'./models.svelte.js': {types: './dist/models.svelte.d.ts', default: './dist/models.svelte.js'},
+		'./nav_helpers.js': {types: './dist/nav_helpers.d.ts', default: './dist/nav_helpers.js'},
 		'./Nav_Link.svelte': {
 			types: './dist/Nav_Link.svelte.d.ts',
 			svelte: './dist/Nav_Link.svelte',
@@ -535,6 +541,11 @@ export const package_json = {
 		},
 		'./nav.js': {types: './dist/nav.d.ts', default: './dist/nav.js'},
 		'./ollama.js': {types: './dist/ollama.d.ts', default: './dist/ollama.js'},
+		'./Picker_Dialog.svelte': {
+			types: './dist/Picker_Dialog.svelte.d.ts',
+			svelte: './dist/Picker_Dialog.svelte',
+			default: './dist/Picker_Dialog.svelte',
+		},
 		'./Picker.svelte': {
 			types: './dist/Picker.svelte.d.ts',
 			svelte: './dist/Picker.svelte',
@@ -571,6 +582,11 @@ export const package_json = {
 			types: './dist/Prompt_Listitem.svelte.d.ts',
 			svelte: './dist/Prompt_Listitem.svelte',
 			default: './dist/Prompt_Listitem.svelte',
+		},
+		'./Prompt_Picker_Dialog.svelte': {
+			types: './dist/Prompt_Picker_Dialog.svelte.d.ts',
+			svelte: './dist/Prompt_Picker_Dialog.svelte',
+			default: './dist/Prompt_Picker_Dialog.svelte',
 		},
 		'./Prompt_Picker.svelte': {
 			types: './dist/Prompt_Picker.svelte.d.ts',
@@ -834,6 +850,7 @@ export const src_json = {
 		},
 		'./Bit_List.svelte': {path: 'Bit_List.svelte', declarations: []},
 		'./Bit_Listitem.svelte': {path: 'Bit_Listitem.svelte', declarations: []},
+		'./Bit_Picker_Dialog.svelte': {path: 'Bit_Picker_Dialog.svelte', declarations: []},
 		'./Bit_Picker.svelte': {path: 'Bit_Picker.svelte', declarations: []},
 		'./Bit_Remove_Button.svelte': {path: 'Bit_Remove_Button.svelte', declarations: []},
 		'./Bit_Stats.svelte': {path: 'Bit_Stats.svelte', declarations: []},
@@ -1076,6 +1093,7 @@ export const src_json = {
 		'./Diskfile_Info.svelte': {path: 'Diskfile_Info.svelte', declarations: []},
 		'./Diskfile_Listitem.svelte': {path: 'Diskfile_Listitem.svelte', declarations: []},
 		'./Diskfile_Metrics.svelte': {path: 'Diskfile_Metrics.svelte', declarations: []},
+		'./Diskfile_Picker_Dialog.svelte': {path: 'Diskfile_Picker_Dialog.svelte', declarations: []},
 		'./Diskfile_Picker.svelte': {path: 'Diskfile_Picker.svelte', declarations: []},
 		'./Diskfile_Tab_Listitem.svelte': {path: 'Diskfile_Tab_Listitem.svelte', declarations: []},
 		'./diskfile_tab.svelte.js': {
@@ -1249,7 +1267,6 @@ export const src_json = {
 		'./Model_Picker_Dialog.svelte': {path: 'Model_Picker_Dialog.svelte', declarations: []},
 		'./Model_Picker.svelte': {path: 'Model_Picker.svelte', declarations: []},
 		'./Model_Select.svelte': {path: 'Model_Select.svelte', declarations: []},
-		'./Model_Selector.svelte': {path: 'Model_Selector.svelte', declarations: []},
 		'./Model_Summary.svelte': {path: 'Model_Summary.svelte', declarations: []},
 		'./model.svelte.js': {
 			path: 'model.svelte.ts',
@@ -1271,6 +1288,13 @@ export const src_json = {
 				{name: 'Models', kind: 'class'},
 			],
 		},
+		'./nav_helpers.js': {
+			path: 'nav_helpers.ts',
+			declarations: [
+				{name: 'to_chats_url', kind: 'function'},
+				{name: 'to_prompts_url', kind: 'function'},
+			],
+		},
 		'./Nav_Link.svelte': {path: 'Nav_Link.svelte', declarations: []},
 		'./nav.js': {
 			path: 'nav.ts',
@@ -1289,6 +1313,7 @@ export const src_json = {
 				{name: 'ollama_list_with_metadata', kind: 'function'},
 			],
 		},
+		'./Picker_Dialog.svelte': {path: 'Picker_Dialog.svelte', declarations: []},
 		'./Picker.svelte': {path: 'Picker.svelte', declarations: []},
 		'./Ping_Form.svelte': {path: 'Ping_Form.svelte', declarations: []},
 		'./Popover_Button.svelte': {path: 'Popover_Button.svelte', declarations: []},
@@ -1317,6 +1342,7 @@ export const src_json = {
 		},
 		'./Prompt_List.svelte': {path: 'Prompt_List.svelte', declarations: []},
 		'./Prompt_Listitem.svelte': {path: 'Prompt_Listitem.svelte', declarations: []},
+		'./Prompt_Picker_Dialog.svelte': {path: 'Prompt_Picker_Dialog.svelte', declarations: []},
 		'./Prompt_Picker.svelte': {path: 'Prompt_Picker.svelte', declarations: []},
 		'./Prompt_Stats.svelte': {path: 'Prompt_Stats.svelte', declarations: []},
 		'./Prompt_Summary.svelte': {path: 'Prompt_Summary.svelte', declarations: []},

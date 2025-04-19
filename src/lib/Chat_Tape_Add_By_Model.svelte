@@ -1,7 +1,6 @@
 <script lang="ts">
-	import Model_Selector from '$lib/Model_Selector.svelte';
+	import Model_Picker from '$lib/Model_Picker.svelte';
 	import type {Chat} from '$lib/chat.svelte.js';
-	import type {Model} from '$lib/model.svelte.js';
 	import type {Snippet} from 'svelte';
 	import type {SvelteHTMLElements} from 'svelte/elements';
 
@@ -18,5 +17,12 @@
 
 <div {...attrs} class="p_sm ${attrs?.class}">
 	<header class="mb_md size_lg">add by model</header>
-	<Model_Selector onselect={(model: Model) => chat.add_tape(model)} {children} />
+	<Model_Picker
+		onpick={(model) => {
+			if (model) {
+				chat.add_tape(model);
+			}
+		}}
+	/>
+	{@render children?.()}
 </div>

@@ -11,17 +11,14 @@
 
 	interface Props {
 		onpick: (bit: Bit_Type | undefined) => boolean | void;
-		show?: boolean | undefined;
 		filter?: ((bit: Bit_Type) => boolean) | undefined;
 		exclude_ids?: Array<Uuid> | undefined;
 	}
 
-	let {show = $bindable(false), onpick, filter, exclude_ids}: Props = $props();
+	const {onpick, filter, exclude_ids}: Props = $props();
 </script>
 
-<!-- TODO @many more efficient array? maybe add `all` back to the base Indexed_Collection? -->
 <Picker
-	bind:show
 	items={Array.from(bits.items.by_id.values())}
 	{onpick}
 	{filter}

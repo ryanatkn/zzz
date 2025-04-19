@@ -7,6 +7,7 @@
 	import Popover_Button from '$lib/Popover_Button.svelte';
 	import {GLYPH_REMOVE} from '$lib/glyphs.js';
 	import type {Popover} from '$lib/popover.svelte.js';
+	import Glyph from '$lib/Glyph.svelte';
 
 	interface Props
 		extends Omit_Strict<ComponentProps<typeof Popover_Button>, 'popover_content' | 'children'> {
@@ -68,7 +69,7 @@
 				{#if popover_button_content}
 					{@render popover_button_content(popover, () => confirm(popover))}
 				{:else}
-					<div>{GLYPH_REMOVE}</div>
+					<Glyph text={GLYPH_REMOVE} />
 				{/if}
 			</button>
 		{/if}
@@ -79,6 +80,6 @@
 	{#if children}
 		{@render children(popover, () => confirm(popover))}
 	{:else}
-		{GLYPH_REMOVE}
+		<Glyph text={GLYPH_REMOVE} />
 	{/if}
 {/snippet}

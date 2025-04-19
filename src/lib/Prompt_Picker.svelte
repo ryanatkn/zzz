@@ -8,20 +8,18 @@
 
 	interface Props {
 		onpick: (prompt: Prompt | undefined) => boolean | void;
-		show?: boolean | undefined;
 		filter?: ((prompt: Prompt) => boolean) | undefined;
 		exclude_ids?: Array<Uuid> | undefined;
 		selected_ids?: Array<Uuid> | undefined;
 	}
 
-	let {onpick, show = $bindable(false), filter, exclude_ids, selected_ids}: Props = $props();
+	const {onpick, filter, exclude_ids, selected_ids}: Props = $props();
 
 	const zzz = zzz_context.get();
 	const {prompts} = zzz;
 </script>
 
 <Picker
-	bind:show
 	items={prompts.ordered_items}
 	{onpick}
 	{filter}

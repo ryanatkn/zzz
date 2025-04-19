@@ -8,6 +8,7 @@
 	import type {Model} from '$lib/model.svelte.js';
 	import {GLYPH_MODEL} from '$lib/glyphs.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
+	import Glyph from '$lib/Glyph.svelte';
 
 	interface Props {
 		model: Model;
@@ -25,7 +26,7 @@
 <div {...attrs} class="panel p_lg {attrs?.class}">
 	<div class="row">
 		<div class="glyph_container">
-			<span class="glyph" style:font-size="var(--icon_size_xl)">{GLYPH_MODEL}</span>
+			<Glyph text={GLYPH_MODEL} size="var(--icon_size_xl)" />
 		</div>
 		<div class="pl_xl">
 			{#if at_detail_page}

@@ -22,7 +22,7 @@
 	import Content_Preview from '$lib/Content_Preview.svelte';
 	import {Bit} from '$lib/bit.svelte.js';
 	import Contextmenu_Prompt from '$lib/Contextmenu_Prompt.svelte';
-	import Diskfile_Picker from '$lib/Diskfile_Picker.svelte';
+	import Diskfile_Picker_Dialog from '$lib/Diskfile_Picker_Dialog.svelte';
 	import Prompt_List from '$lib/Prompt_List.svelte';
 
 	const zzz = zzz_context.get();
@@ -123,7 +123,7 @@
 								class: 'plain icon_button',
 							}}
 						>
-							{GLYPH_DELETE}
+							<Glyph text={GLYPH_DELETE} />
 							{#snippet popover_button_content()}{GLYPH_DELETE}{/snippet}
 						</Confirm_Button>
 						<Copy_To_Clipboard text={zzz.prompts.selected.content} attrs={{class: 'plain'}} />
@@ -196,7 +196,7 @@
 	{:else if zzz.prompts.items.size}
 		<div class="flex align_items_center justify_content_center h_100 flex_1" in:fade>
 			<p>
-				Select a prompt from the list or <button
+				select a prompt from the list or <button
 					type="button"
 					class="inline color_d"
 					onclick={() => {
@@ -229,7 +229,7 @@
 	{/if}
 </div>
 
-<Diskfile_Picker
+<Diskfile_Picker_Dialog
 	bind:show={show_diskfile_picker}
 	onpick={(diskfile) => {
 		if (!zzz.prompts.selected || !diskfile) return false;

@@ -105,7 +105,7 @@
 					onclick={() => browser.go_back()}
 					disabled
 				>
-					{GLYPH_ARROW_LEFT}
+					<Glyph text={GLYPH_ARROW_LEFT} />
 				</button>
 				<button
 					type="button"
@@ -114,7 +114,7 @@
 					onclick={() => browser.go_forward()}
 					disabled
 				>
-					{GLYPH_ARROW_RIGHT}
+					<Glyph text={GLYPH_ARROW_RIGHT} />
 				</button>
 				<button
 					type="button"
@@ -122,7 +122,7 @@
 					title="refresh"
 					onclick={() => browser.refresh()}
 				>
-					{GLYPH_REFRESH}
+					<Glyph text={GLYPH_REFRESH} />
 				</button>
 			</div>
 

@@ -9,6 +9,7 @@
 	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
 	import type {Diskfile_Editor_State} from '$lib/diskfile_editor_state.svelte.js';
 	import {GLYPH_PASTE, GLYPH_DELETE} from '$lib/glyphs.js';
+	import Glyph from '$lib/Glyph.svelte';
 
 	interface Props {
 		diskfile: Diskfile;
@@ -43,7 +44,7 @@
 			}}
 			attrs={{class: 'plain icon_button size_lg'}}
 		>
-			{GLYPH_PASTE}
+			<Glyph text={GLYPH_PASTE} />
 		</Paste_From_Clipboard>
 
 		<Clear_Restore_Button
@@ -59,7 +60,7 @@
 		onconfirm={() => zzz.diskfiles.delete(diskfile.path)}
 		attrs={{class: 'plain icon_button', title: `delete ${diskfile.pathname}`}}
 	>
-		{GLYPH_DELETE}
+		<Glyph text={GLYPH_DELETE} />
 	</Confirm_Button>
 </div>
 

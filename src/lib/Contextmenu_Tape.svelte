@@ -7,9 +7,10 @@
 
 	import type {Tape} from '$lib/tape.svelte.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
-	import {GLYPH_DELETE, GLYPH_REMOVE, GLYPH_TAPE} from '$lib/glyphs.js';
+	import {GLYPH_DELETE, GLYPH_REMOVE, GLYPH_TAPE, GLYPH_MODEL} from '$lib/glyphs.js';
 	import Contextmenu_Entry_Toggle from '$lib/Contextmenu_Entry_Toggle.svelte';
 	import Contextmenu_Entry_Copy_To_Clipboard from '$lib/Contextmenu_Entry_Copy_To_Clipboard.svelte';
+	import Model_Picker_Dialog from '$lib/Model_Picker_Dialog.svelte';
 
 	interface Props extends Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> {
 		tape: Tape;
@@ -18,9 +19,24 @@
 	const {tape, ...rest}: Props = $props();
 
 	const zzz = zzz_context.get();
+
+	let show_model_picker = $state(false);
+
+	const switch_model = () => {
+		show_model_picker = true;
+	};
 </script>
 
 <Contextmenu {...rest} {entries} />
+
+<Model_Picker_Dialog
+	bind:show={show_model_picker}
+	onpick={(model) => {
+		if (model) {
+			tape.switch_model(model.id);
+		}
+	}}
+/>
 
 {#snippet entries()}
 	<Contextmenu_Submenu>
@@ -47,6 +63,11 @@
 			{/if}
 
 			<Contextmenu_Entry_Toggle bind:enabled={tape.enabled} label="tape" />
+
+			<Contextmenu_Entry run={switch_model}>
+				{#snippet icon()}{GLYPH_MODEL}{/snippet}
+				<span>switch model</span>
+			</Contextmenu_Entry>
 
 			<Contextmenu_Entry
 				run={() => {

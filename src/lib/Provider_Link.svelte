@@ -7,6 +7,7 @@
 	import type {Provider} from '$lib/provider.svelte.js';
 	import {GLYPH_PROVIDER} from '$lib/glyphs.js';
 	import Provider_Logo from '$lib/Provider_Logo.svelte';
+	import Glyph from '$lib/Glyph.svelte';
 
 	interface Props {
 		provider: Provider | null | undefined;
@@ -40,7 +41,7 @@
 			{@render children()}
 		{:else}
 			{#if icon === 'glyph'}
-				<span class="glyph">{GLYPH_PROVIDER}</span>
+				<Glyph text={GLYPH_PROVIDER} />
 			{:else if icon === 'svg'}
 				<Provider_Logo name={provider.name} {...icon_props} />
 			{:else if icon}
@@ -57,7 +58,7 @@
 	{@render fallback()}
 {:else}
 	<small {...fallback_attrs} class="font_mono color_c_5 {fallback_attrs?.class}"
-		>{GLYPH_PROVIDER} missing provider</small
+		><Glyph text={GLYPH_PROVIDER} /> missing provider</small
 	>
 {/if}
 

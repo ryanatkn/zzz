@@ -6,7 +6,7 @@
 	import Diskfile_Editor_View from '$lib/Diskfile_Editor_View.svelte';
 	import Diskfile_Tab_Listitem from '$lib/Diskfile_Tab_Listitem.svelte';
 	import {Reorderable} from '$lib/reorderable.svelte.js';
-	import Diskfile_Picker from '$lib/Diskfile_Picker.svelte';
+	import Diskfile_Picker_Dialog from '$lib/Diskfile_Picker_Dialog.svelte';
 
 	const zzz = zzz_context.get();
 	const {diskfiles} = zzz;
@@ -101,7 +101,7 @@
 	</div>
 </div>
 
-<Diskfile_Picker
+<Diskfile_Picker_Dialog
 	bind:show={show_diskfile_picker}
 	onpick={(diskfile) => {
 		if (!diskfile) return false;

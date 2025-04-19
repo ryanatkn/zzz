@@ -10,15 +10,13 @@
 
 	interface Props {
 		onpick: (model: Model | undefined) => boolean | void;
-		show?: boolean | undefined;
 		filter?: ((model: Model) => boolean) | undefined;
 	}
 
-	let {onpick, show = $bindable(false), filter}: Props = $props();
+	const {onpick, filter}: Props = $props();
 </script>
 
 <Picker
-	bind:show
 	items={models.ordered_by_name}
 	{onpick}
 	{filter}

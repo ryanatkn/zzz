@@ -54,7 +54,7 @@
 	{:else if chats.items.size}
 		<div class="flex align_items_center justify_content_center h_100 flex_1" in:fade>
 			<p>
-				Select a chat from the list or <button
+				select a chat from the list or <button
 					type="button"
 					class="inline color_d"
 					onclick={create_and_select_chat}>create one</button

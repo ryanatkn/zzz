@@ -31,7 +31,7 @@
 				<Action_Detail action={selected_action} />
 			{:else}
 				<div class="flex align_items_center justify_content_center h_100">
-					<p>Select a action from the list to view its details</p>
+					<p>select an action from the list to view its details</p>
 				</div>
 			{/if}
 		</div>

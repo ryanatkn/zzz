@@ -45,7 +45,7 @@
 			<small class="font_mono"
 				>{SERVER_URL}/api/ping
 				{#if capabilities.latest_ping_time !== null}<span
-						>{GLYPH_ARROW_RIGHT} {Math.round(capabilities.latest_ping_time)}ms</span
+						><Glyph text={GLYPH_ARROW_RIGHT} /> {Math.round(capabilities.latest_ping_time)}ms</span
 					>{/if}
 			</small>
 		</div>

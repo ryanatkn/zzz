@@ -89,12 +89,12 @@
 								</button>
 
 								<button type="button" onclick={toggle_preview} class="plain" title="Preview page">
-									{GLYPH_PREVIEW} preview
+									<Glyph text={GLYPH_PREVIEW} attrs={{class: 'mr_xs2'}} /> preview
 								</button>
 							</div>
 
 							<button type="button" onclick={delete_page} class="color_c"
-								>{GLYPH_DELETE} delete</button
+								><Glyph text={GLYPH_DELETE} attrs={{class: 'mr_xs2'}} /> delete</button
 							>
 						</div>
 					</div>

@@ -8,21 +8,18 @@
 
 	interface Props {
 		onpick: (diskfile: Diskfile | undefined) => boolean | void;
-		show?: boolean | undefined;
 		filter?: ((diskfile: Diskfile) => boolean) | undefined;
 		exclude_ids?: Array<Uuid> | undefined;
 		selected_ids?: Array<Uuid> | undefined;
 	}
 
-	let {onpick, show = $bindable(false), filter, exclude_ids, selected_ids}: Props = $props();
+	const {onpick, filter, exclude_ids, selected_ids}: Props = $props();
 
 	const zzz = zzz_context.get();
 	const {diskfiles} = zzz;
 </script>
 
-<!-- TODO @many more efficient array? maybe add `all` back to the base Indexed_Collection? -->
 <Picker
-	bind:show
 	items={Array.from(diskfiles.items.by_id.values())}
 	{onpick}
 	{filter}

@@ -128,7 +128,6 @@
 
 <Model_Picker_Dialog
 	bind:show={show_model_picker}
-	onclose={() => (show_model_picker = false)}
 	onpick={(model) => {
 		if (model) {
 			chat.add_tape(model); // TODO @many insert at an index via a range input

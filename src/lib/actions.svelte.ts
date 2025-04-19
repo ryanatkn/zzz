@@ -101,7 +101,7 @@ export class Actions extends Cell<typeof Actions_Json> {
 	}
 
 	/**
-	 * Send a action using the registered handler with proper typing.
+	 * Send an action using the registered handler with proper typing.
 	 */
 	send(action: Action_Client): void {
 		if (!this.onsend) {
@@ -127,7 +127,7 @@ export class Actions extends Cell<typeof Actions_Json> {
 	}
 
 	/**
-	 * Add a action to the collection.
+	 * Add an action to the collection.
 	 */
 	add(action_json: Action_Json): Action {
 		const action = new Action({zzz: this.zzz, json: action_json});

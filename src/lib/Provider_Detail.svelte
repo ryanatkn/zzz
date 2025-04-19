@@ -8,6 +8,7 @@
 	import Provider_Logo from '$lib/Provider_Logo.svelte';
 	import {GLYPH_PROVIDER} from '$lib/glyphs.js';
 	import External_Link from '$lib/External_Link.svelte';
+	import Glyph from '$lib/Glyph.svelte';
 
 	interface Props {
 		provider: Provider;
@@ -36,7 +37,10 @@
 				<div>{provider.icon}</div>
 			{/if}
 			<div>
-				<div class="mb_md font_mono">{GLYPH_PROVIDER} {provider.name}</div>
+				<div class="mb_md font_mono">
+					<Glyph text={GLYPH_PROVIDER} />
+					{provider.name}
+				</div>
 				<div>
 					<External_Link href={provider.url}>docs</External_Link>
 				</div>
