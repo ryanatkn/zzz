@@ -336,7 +336,7 @@ a.chip {
 	background-color: var(--fg_3);
 }
 
-/* TODO hacky */
+/* TODO hacky, is like `.pane` but softer and without the semantics for dialogs, maybe these styles should replace .pane upstream? */
 .floating {
 	--shadow_alpha: 14%;
 	width: 100%;

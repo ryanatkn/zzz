@@ -1,8 +1,8 @@
 import {z} from 'zod';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Project_Json} from './projects_schema.js';
-import {Domain} from './domain.svelte.js';
-import {Page} from './page.svelte.js';
+import {Project_Json} from '$routes/projects/projects_schema.js';
+import {Domain} from '$routes/projects/domain.svelte.js';
+import {Page} from '$routes/projects/page.svelte.js';
 import {HANDLED} from '$lib/cell_helpers.js';
 import {get_datetime_now, Uuid} from '$lib/zod_helpers.js';
 

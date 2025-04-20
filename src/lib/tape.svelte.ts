@@ -16,7 +16,7 @@ import {to_completion_response_text} from '$lib/response_helpers.js';
 import {Completion_Request, type Completion_Response} from '$lib/action_types.js';
 import {to_preview} from '$lib/helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
-import type {Uuid} from './zod_helpers.js';
+import type {Uuid} from '$lib/zod_helpers.js';
 
 // TODO add `tape.name` probably
 

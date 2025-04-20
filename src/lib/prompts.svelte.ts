@@ -1,5 +1,6 @@
 import {z} from 'zod';
 import {goto} from '$app/navigation';
+import {page} from '$app/state';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Prompt, Prompt_Json, Prompt_Schema, type Prompt_Json_Input} from '$lib/prompt.svelte.js';
@@ -136,7 +137,7 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 	remove(prompt: Prompt): void {
 		const removed = this.items.remove(prompt.id);
 		if (removed && prompt.id === this.selected_id) {
-			this.select_next();
+			void this.select_next();
 		}
 	}
 
@@ -157,8 +158,8 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 	}
 
 	// TODO @many extract a selection helper class?
-	select(prompt_id: Uuid | null): void {
-		this.selected_id = prompt_id;
+	select(prompt_id: Uuid | null): Promise<void> {
+		return this.navigate_to(prompt_id);
 	}
 
 	select_next(): Promise<void> {
@@ -167,8 +168,10 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 		return this.navigate_to(next.value?.id ?? null);
 	}
 
-	navigate_to(prompt_id: Uuid | null): Promise<void> {
-		return goto(to_prompts_url(prompt_id));
+	async navigate_to(prompt_id: Uuid | null, force = false): Promise<void> {
+		const url = to_prompts_url(prompt_id);
+		if (!force && page.url.pathname === url) return;
+		return goto(url);
 	}
 
 	reorder_prompts(from_index: number, to_index: number): void {

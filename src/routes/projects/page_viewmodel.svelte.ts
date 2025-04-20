@@ -2,8 +2,8 @@ import {z} from 'zod';
 import {goto} from '$app/navigation';
 
 import {get_datetime_now, type Uuid} from '$lib/zod_helpers.js';
-import {Page} from './page.svelte.js';
-import type {Projects} from './projects.svelte.js';
+import {Page} from '$routes/projects/page.svelte.js';
+import type {Projects} from '$routes/projects/projects.svelte.js';
 import {base} from '$app/paths';
 
 export interface Page_Viewmodel_Options {

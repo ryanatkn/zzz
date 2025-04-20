@@ -2,10 +2,10 @@
 	import {goto} from '$app/navigation';
 	import {base} from '$app/paths';
 
-	import {projects_context} from '../../../projects.svelte.js';
-	import Project_Sidebar from '../../../Project_Sidebar.svelte';
-	import Section_Sidebar from '../../../Section_Sidebar.svelte';
-	import Pages_Sidebar from '../../../Pages_Sidebar.svelte';
+	import {projects_context} from '$routes/projects/projects.svelte.js';
+	import Project_Sidebar from '$routes/projects/Project_Sidebar.svelte';
+	import Section_Sidebar from '$routes/projects/Section_Sidebar.svelte';
+	import Pages_Sidebar from '$routes/projects/Pages_Sidebar.svelte';
 	import {GLYPH_DELETE, GLYPH_PREVIEW, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';

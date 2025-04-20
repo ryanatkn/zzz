@@ -6,7 +6,7 @@
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import {GLYPH_DIRECTION_CLIENT, GLYPH_DIRECTION_SERVER} from '$lib/glyphs.js';
 	import {PING_HISTORY_MAX, type Ping_Data} from '$lib/capabilities.svelte.js';
-	import Glyph from './Glyph.svelte';
+	import Glyph from '$lib/Glyph.svelte';
 
 	interface Props {
 		children?: Snippet | undefined;

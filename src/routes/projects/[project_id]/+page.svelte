@@ -1,9 +1,9 @@
 <script lang="ts">
 	import {base} from '$app/paths';
 
-	import {projects_context} from '../projects.svelte.js';
-	import Project_Sidebar from '../Project_Sidebar.svelte';
-	import Section_Sidebar from '../Section_Sidebar.svelte';
+	import {projects_context} from '$routes/projects/projects.svelte.js';
+	import Project_Sidebar from '$routes/projects/Project_Sidebar.svelte';
+	import Section_Sidebar from '$routes/projects/Section_Sidebar.svelte';
 
 	const projects = projects_context.get();
 

@@ -1,5 +1,5 @@
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Page_Json} from './projects_schema.js';
+import {Page_Json} from '$routes/projects/projects_schema.js';
 
 export type Page_Options = Cell_Options<typeof Page_Json>;
 

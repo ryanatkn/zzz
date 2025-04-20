@@ -12,22 +12,21 @@ Zzz, pronounced "zees" like bees,
 is a software project with a focus on user power and experimentation.
 The idea is to make fullstack software that adapts to your needs on the fly
 while remaining fully open, aligned, and in your control.
-More at [zzz.software/about](https://www.zzz.software/about).
 
 This is a pre-alpha and the ideas are still developing -
 see the issues and [discussions](https://github.com/ryanatkn/zzz/discussions)
 or @ me on [Bluesky](https://bsky.app/profile/ryanatkn.com).
 
-## Motivation
-
-1. control botz
+More at [zzz.software/about](https://www.zzz.software/about).
 
 ## Setup
 
 Zzz uses SvelteKit and Vite and currently requires Node.
-(Node is the only one I've tested, YMMV with Deno/Bun/etc)
+(Node is the only runtime I've tested, YMMV with Deno/Bun/etc)
 Eventually there will be an installable desktop app and npm library,
-but it's not there yet - for now you'll need Node 22.11+ and git to clone the repo.
+but it's not there yet - for now you'll need `node` 22.11+ and `git` to clone the repo.
+
+It can be deployed via SvelteKit's static adapter with diminished capabilities.
 
 > Windows probably doesn't work but will be supported - help is appreciated.
 > For now I recommend [WSL](https://learn.microsoft.com/en-us/windows/wsl/install).

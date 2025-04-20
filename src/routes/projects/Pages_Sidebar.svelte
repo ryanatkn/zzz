@@ -3,7 +3,7 @@
 	import {base} from '$app/paths';
 
 	import Nav_Link from '$lib/Nav_Link.svelte';
-	import {projects_context} from './projects.svelte.js';
+	import {projects_context} from '$routes/projects/projects.svelte.js';
 	import {GLYPH_ADD} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
 

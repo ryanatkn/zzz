@@ -26,6 +26,7 @@
 		sort_by_text<Prompt>('name_desc', 'name (z-a)', 'name', 'desc'),
 	]}
 	sort_key_default="updated_newest"
+	no_items=""
 >
 	{#snippet children(prompt)}
 		<div transition:slide>

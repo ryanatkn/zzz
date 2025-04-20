@@ -3,9 +3,9 @@ import {goto} from '$app/navigation';
 import {base} from '$app/paths';
 
 import {get_datetime_now, create_uuid, type Uuid} from '$lib/zod_helpers.js';
-import {Domain} from './domain.svelte.js';
-import {Page} from './page.svelte.js';
-import {Projects} from './projects.svelte.js';
+import {Domain} from '$routes/projects/domain.svelte.js';
+import {Page} from '$routes/projects/page.svelte.js';
+import {Projects} from '$routes/projects/projects.svelte.js';
 import {get_unique_name} from '$lib/helpers.js';
 
 export interface Project_Viewmodel_Options {

@@ -26,6 +26,8 @@ import {Ui} from '$lib/ui.svelte.js';
 import {Url_Params} from '$lib/url_params.svelte.js';
 import type {Cell} from '$lib/cell.svelte.js';
 
+// TODO lazy loading, bundling everything at the root is not ideal
+
 /**
  * Flat mapping of all cell classes by name.
  */

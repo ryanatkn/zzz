@@ -10,14 +10,21 @@
 
 	interface Props {
 		onpick: (model: Model | undefined) => boolean | void;
+		items?: Array<Model>;
 		filter?: ((model: Model) => boolean) | undefined;
+		heading?: string;
 	}
 
-	const {onpick, filter}: Props = $props();
+	const {
+		items = models.ordered_by_name,
+		onpick,
+		filter,
+		heading = 'pick a model',
+	}: Props = $props();
 </script>
 
 <Picker
-	items={models.ordered_by_name}
+	{items}
 	{onpick}
 	{filter}
 	sorters={[
@@ -28,7 +35,7 @@
 	]}
 	sort_key_default="name_asc"
 	show_sort_controls
-	heading="Pick a model"
+	{heading}
 >
 	{#snippet children(model, pick)}
 		<button type="button" class="listitem compact w_100" onclick={() => pick(model)}>

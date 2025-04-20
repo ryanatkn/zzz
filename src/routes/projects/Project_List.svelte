@@ -1,7 +1,7 @@
 <script lang="ts">
 	import {base} from '$app/paths';
 
-	import {projects_context} from './projects.svelte.js';
+	import {projects_context} from '$routes/projects/projects.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
 	import {GLYPH_ADD} from '$lib/glyphs.js';
 

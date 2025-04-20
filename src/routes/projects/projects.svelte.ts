@@ -2,17 +2,17 @@ import {z} from 'zod';
 import {create_context} from '@ryanatkn/fuz/context_helpers.js';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Projects_Json} from './projects_schema.js';
-import {Project} from './project.svelte.js';
-import {Page} from './page.svelte.js';
-import {Domain} from './domain.svelte.js';
-import {Project_Viewmodel} from './project_viewmodel.svelte.js';
-import {Page_Viewmodel} from './page_viewmodel.svelte.js';
-import {Domain_Viewmodel} from './domain_viewmodel.svelte.js';
+import {Projects_Json} from '$routes/projects/projects_schema.js';
+import {Project} from '$routes/projects/project.svelte.js';
+import {Page} from '$routes/projects/page.svelte.js';
+import {Domain} from '$routes/projects/domain.svelte.js';
+import {Project_Viewmodel} from '$routes/projects/project_viewmodel.svelte.js';
+import {Page_Viewmodel} from '$routes/projects/page_viewmodel.svelte.js';
+import {Domain_Viewmodel} from '$routes/projects/domain_viewmodel.svelte.js';
 import {get_datetime_now, create_uuid, Uuid} from '$lib/zod_helpers.js';
 import {HANDLED} from '$lib/cell_helpers.js';
 import {get_unique_name} from '$lib/helpers.js';
-import {create_sample_projects as create_example_projects} from './example_projects.js';
+import {create_sample_projects as create_example_projects} from '$routes/projects/example_projects.js';
 
 export const projects_context = create_context<Projects>();
 

@@ -3,9 +3,9 @@
 
 	import {GLYPH_PROJECT} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
-	import Project_List from './Project_List.svelte';
-	import Project_Sidebar from './Project_Sidebar.svelte';
-	import {projects_context} from './projects.svelte.js';
+	import Project_List from '$routes/projects/Project_List.svelte';
+	import Project_Sidebar from '$routes/projects/Project_Sidebar.svelte';
+	import {projects_context} from '$routes/projects/projects.svelte.js';
 
 	const projects = projects_context.get();
 </script>

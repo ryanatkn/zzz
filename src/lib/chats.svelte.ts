@@ -1,5 +1,6 @@
 import {z} from 'zod';
 import {goto} from '$app/navigation';
+import {page} from '$app/state';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Chat, Chat_Json, Chat_Schema, type Chat_Json_Input} from '$lib/chat.svelte.js';
@@ -10,6 +11,8 @@ import {create_single_index, create_derived_index} from '$lib/indexed_collection
 import {to_reordered_list} from '$lib/list_helpers.js';
 import {get_unique_name} from '$lib/helpers.js';
 import {to_chats_url} from '$lib/nav_helpers.js';
+import {chat_template_defaults} from '$lib/config_defaults.js';
+import type {Chat_Template} from '$lib/chat_template.js';
 
 export const Chats_Json = z
 	.object({
@@ -97,8 +100,8 @@ export class Chats extends Cell<typeof Chats_Json> {
 
 	add_chat(chat: Chat, select?: boolean): Chat {
 		this.items.add(chat);
-		if (select || this.selected_id === null) {
-			this.selected_id = chat.id;
+		if (select) {
+			void this.select(chat.id);
 		}
 		return chat;
 	}
@@ -113,7 +116,7 @@ export class Chats extends Cell<typeof Chats_Json> {
 			typeof select === 'number' ||
 			(this.selected_id === null && chats.length > 0)
 		) {
-			this.selected_id = chats[typeof select === 'number' ? select : 0].id;
+			void this.select(chats[typeof select === 'number' ? select : 0].id);
 		}
 
 		return chats;
@@ -127,14 +130,13 @@ export class Chats extends Cell<typeof Chats_Json> {
 	}
 
 	remove_many(ids: Array<Uuid>): number {
-		// Store the current selected id
-		const current_selected = this.selected_id;
+		const {selected_id} = this;
 
 		// Remove the chats
 		const removed_count = this.items.remove_many(ids);
 
 		// If the selected chat was removed, select a new one
-		if (current_selected !== null && ids.includes(current_selected)) {
+		if (selected_id !== null && ids.includes(selected_id)) {
 			void this.select_next();
 		}
 
@@ -142,8 +144,8 @@ export class Chats extends Cell<typeof Chats_Json> {
 	}
 
 	// TODO @many extract a selection helper class?
-	select(chat_id: Uuid | null): void {
-		this.selected_id = chat_id;
+	select(chat_id: Uuid | null): Promise<void> {
+		return this.navigate_to(chat_id);
 	}
 
 	select_next(): Promise<void> {
@@ -152,8 +154,10 @@ export class Chats extends Cell<typeof Chats_Json> {
 		return this.navigate_to(next.value?.id ?? null);
 	}
 
-	navigate_to(chat_id: Uuid | null): Promise<void> {
-		return goto(to_chats_url(chat_id));
+	async navigate_to(chat_id: Uuid | null, force = false): Promise<void> {
+		const url = to_chats_url(chat_id);
+		if (!force && page.url.pathname === url) return;
+		return goto(url);
 	}
 
 	reorder_chats(from_index: number, to_index: number): void {
@@ -165,6 +169,15 @@ export class Chats extends Cell<typeof Chats_Json> {
 	 */
 	toggle_sort_controls(value = !this.show_sort_controls): void {
 		this.show_sort_controls = value;
+	}
+
+	// TODO @many refactor with db
+	chat_templates = $state.raw(chat_template_defaults);
+	get_template_by_id(id: string): Chat_Template | undefined {
+		return this.chat_templates.find((t) => t.id === id);
+	}
+	get_default_template(): Chat_Template {
+		return this.chat_templates[0];
 	}
 }
 

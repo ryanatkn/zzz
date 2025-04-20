@@ -2,6 +2,10 @@ import type {z} from 'zod';
 
 import type {Provider_Json_Input} from '$lib/provider.svelte.js';
 import type {Model_Json} from '$lib/model.svelte.js';
+import type {Chat_Template} from '$lib/chat_template.js';
+import {create_uuid} from '$lib/zod_helpers.js';
+
+// TODO @many refactor with db
 
 // Configuration defaults
 export const SYSTEM_MESSAGE_DEFAULT = 'You are a helpful assistant that responds succintly.'; // TODO without the succintly part? I dont think splitting it for DEV makes sense
@@ -270,5 +274,33 @@ export const models_default: Array<z.input<typeof Model_Json>> = [
 		name: 'gemini-2.0-flash-thinking-exp-01-21',
 		provider_name: 'gemini',
 		tags: ['cheap', 'reasoning'],
+	},
+];
+
+/**
+ * Default chat templates available in the application
+ */
+export const chat_template_defaults: Array<Chat_Template> = [
+	{
+		id: create_uuid(),
+		name: 'small and local',
+		model_names: ['llama3.2:1b', 'gemma3:1b', 'qwen2.5:0.5b'],
+	},
+	{
+		id: create_uuid(),
+		name: 'frontier',
+		model_names: ['claude-3-7-sonnet-20250219', 'chatgpt-4o-latest', 'gemini-2.0-pro-exp-02-05'],
+	},
+	{
+		id: create_uuid(),
+		name: 'local comparison',
+		model_names: [
+			'llama3.2:1b',
+			'llama3.2:3b',
+			'gemma3:1b',
+			'gemma3:4b',
+			'qwen2.5:0.5b',
+			'qwen2.5:1.5b',
+		],
 	},
 ];

@@ -39,25 +39,25 @@
     "@changesets/changelog-git": "^0.2.1",
     "@ryanatkn/eslint-config": "^0.8.0",
     "@ryanatkn/fuz": "^0.136.1",
-    "@ryanatkn/gro": "^0.150.1",
-    "@ryanatkn/moss": "^0.24.3",
+    "@ryanatkn/gro": "^0.151.0",
+    "@ryanatkn/moss": "^0.25.0",
     "@sveltejs/adapter-static": "^3.0.8",
     "@sveltejs/kit": "^2.20.7",
     "@sveltejs/package": "^2.3.11",
     "@sveltejs/vite-plugin-svelte": "^5.0.3",
-    "eslint": "^9.24.0",
+    "eslint": "^9.25.0",
     "eslint-plugin-svelte": "^3.5.1",
     "jsdom": "^26.1.0",
-    "ollama": "^0.5.14",
+    "ollama": "^0.5.15",
     "prettier": "^3.5.3",
     "prettier-plugin-svelte": "^3.3.3",
-    "svelte": "^5.27.0",
+    "svelte": "5.27.0",
     "svelte-check": "^4.1.6",
     "tslib": "^2.8.1",
     "typescript": "^5.8.3",
     "typescript-eslint": "^8.30.1",
     "vitest": "^3.1.1",
-    "zod": "^3.24.2"
+    "zod": "^3.24.3"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
@@ -70,7 +70,7 @@
     "esm-env": "^1.2.2",
     "gpt-tokenizer": "^2.9.0",
     "hono": "^4.7.7",
-    "openai": "^4.94.0"
+    "openai": "^4.95.1"
   },
   "prettier": {
     "plugins": [
@@ -249,6 +249,11 @@
       "types": "./dist/cell.svelte.d.ts",
       "default": "./dist/cell.svelte.js"
     },
+    "./Chat_Initializer.svelte": {
+      "types": "./dist/Chat_Initializer.svelte.d.ts",
+      "svelte": "./dist/Chat_Initializer.svelte",
+      "default": "./dist/Chat_Initializer.svelte"
+    },
     "./Chat_List.svelte": {
       "types": "./dist/Chat_List.svelte.d.ts",
       "svelte": "./dist/Chat_List.svelte",
@@ -268,6 +273,10 @@
       "types": "./dist/Chat_Tape.svelte.d.ts",
       "svelte": "./dist/Chat_Tape.svelte",
       "default": "./dist/Chat_Tape.svelte"
+    },
+    "./chat_template.js": {
+      "types": "./dist/chat_template.d.ts",
+      "default": "./dist/chat_template.js"
     },
     "./Chat_View_Multi.svelte": {
       "types": "./dist/Chat_View_Multi.svelte.d.ts",
@@ -342,6 +351,11 @@
       "types": "./dist/Contextmenu_Chat.svelte.d.ts",
       "svelte": "./dist/Contextmenu_Chat.svelte",
       "default": "./dist/Contextmenu_Chat.svelte"
+    },
+    "./Contextmenu_Chats.svelte": {
+      "types": "./dist/Contextmenu_Chats.svelte.d.ts",
+      "svelte": "./dist/Contextmenu_Chats.svelte",
+      "default": "./dist/Contextmenu_Chats.svelte"
     },
     "./Contextmenu_Diskfile.svelte": {
       "types": "./dist/Contextmenu_Diskfile.svelte.d.ts",

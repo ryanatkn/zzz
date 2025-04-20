@@ -1,7 +1,7 @@
 <script lang="ts">
-	import {projects_context} from '../../projects.svelte.js';
-	import Project_Sidebar from '../../Project_Sidebar.svelte';
-	import Section_Sidebar from '../../Section_Sidebar.svelte';
+	import {projects_context} from '$routes/projects/projects.svelte.js';
+	import Project_Sidebar from '$routes/projects/Project_Sidebar.svelte';
+	import Section_Sidebar from '$routes/projects/Section_Sidebar.svelte';
 	import {GLYPH_DELETE} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
 
@@ -55,7 +55,7 @@
 				</div>
 
 				<div class="panel p_md width_md">
-					<h2 class="mt_0 mb_md">Danger zone</h2>
+					<h2 class="mt_0 mb_lg">Danger zone</h2>
 					<p class="mb_md">These actions cannot be undone.</p>
 
 					<button

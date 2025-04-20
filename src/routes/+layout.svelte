@@ -41,23 +41,12 @@
 		zzz.models.add_many(zzz_config.models.map((m) => Model_Json.parse(m))); // TODO handle errors
 
 		// TODO init properly from data
-		zzz.chats.add();
-		zzz.chats.add();
-		zzz.chats.add();
 
-		// Create prompts with bits using the new API
-		const prompt1 = zzz.prompts.add();
-		prompt1.add_bit(Bit.create(zzz, {type: 'text', content: 'one'}));
-		prompt1.add_bit(Bit.create(zzz, {type: 'text', content: '2'}));
-		prompt1.add_bit(Bit.create(zzz, {type: 'diskfile'}));
-		prompt1.add_bit(Bit.create(zzz, {type: 'sequence'}));
-
-		// Create more prompts with bits
-		const prompt2 = zzz.prompts.add();
-		prompt2.add_bit(Bit.create(zzz, {type: 'text'}));
-
-		const prompt3 = zzz.prompts.add();
-		prompt3.add_bit(Bit.create(zzz, {type: 'text'}));
+		// const prompt1 = zzz.prompts.add();
+		// prompt1.add_bit(Bit.create(zzz, {type: 'text', content: 'one'}));
+		// prompt1.add_bit(Bit.create(zzz, {type: 'text', content: '2'}));
+		// prompt1.add_bit(Bit.create(zzz, {type: 'diskfile'}));
+		// prompt1.add_bit(Bit.create(zzz, {type: 'sequence'}));
 	});
 
 	pkg_context.set(parse_package_meta(package_json, src_json));
@@ -135,8 +124,9 @@
 		// TODO BLOCK if it's null but there's an in-memory value,
 		// don't overwrite it, but we probably need a state that says it's decoupled -
 		// this will let us have the chats/prompts nav be sticky without using URL params, but is that the best design?
-		zzz.chats.select(zzz.url_params.get_uuid_param('chat_id'));
-		zzz.prompts.select(zzz.url_params.get_uuid_param('prompt_id'));
+		// I think we want a different state value for this, so that we can render links to the "selected_id_recent" or something
+		zzz.chats.selected_id = zzz.url_params.get_uuid_param('chat_id');
+		zzz.prompts.selected_id = zzz.url_params.get_uuid_param('prompt_id');
 	});
 </script>
 

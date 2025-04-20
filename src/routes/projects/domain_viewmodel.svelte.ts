@@ -3,8 +3,8 @@ import {goto} from '$app/navigation';
 import {base} from '$app/paths';
 
 import {get_datetime_now, type Uuid} from '$lib/zod_helpers.js';
-import {Domain} from './domain.svelte.js';
-import type {Projects} from './projects.svelte.js';
+import {Domain} from '$routes/projects/domain.svelte.js';
+import type {Projects} from '$routes/projects/projects.svelte.js';
 
 export interface Domain_Viewmodel_Options {
 	projects: Projects;

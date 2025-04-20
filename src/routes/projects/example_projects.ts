@@ -1,6 +1,6 @@
 import {create_uuid} from '$lib/zod_helpers.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
-import {Project} from './project.svelte.js';
+import {Project} from '$routes/projects/project.svelte.js';
 
 export const create_sample_projects = (zzz: Zzz): Array<Project> => {
 	return [

@@ -1,10 +1,10 @@
 <script lang="ts">
 	import {base} from '$app/paths';
 
-	import {projects_context} from '../../projects.svelte.js';
-	import Project_Sidebar from '../../Project_Sidebar.svelte';
-	import Section_Sidebar from '../../Section_Sidebar.svelte';
-	import Domains_Sidebar from '../../Domains_Sidebar.svelte';
+	import {projects_context} from '$routes/projects/projects.svelte.js';
+	import Project_Sidebar from '$routes/projects/Project_Sidebar.svelte';
+	import Section_Sidebar from '$routes/projects/Section_Sidebar.svelte';
+	import Domains_Sidebar from '$routes/projects/Domains_Sidebar.svelte';
 	import {GLYPH_ADD, GLYPH_CHECKMARK} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
 
