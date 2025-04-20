@@ -83,7 +83,7 @@
 			show_file_picker = true;
 		}}
 	>
-		<Glyph text={GLYPH_FILE} />
+		<Glyph glyph={GLYPH_FILE} />
 		<small class="ml_xs2">pick file</small>
 	</button>
 </div>

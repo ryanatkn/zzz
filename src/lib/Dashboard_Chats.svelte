@@ -28,7 +28,7 @@
 					type="button"
 					onclick={create_and_select_chat}
 				>
-					<Glyph text={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new chat
+					<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new chat
 				</button>
 				{#if chats.items.size > 1}
 					<button
@@ -38,7 +38,7 @@
 						title="toggle sort controls"
 						onclick={() => chats.toggle_sort_controls()}
 					>
-						<Glyph text={GLYPH_SORT} />
+						<Glyph glyph={GLYPH_SORT} />
 					</button>
 				{/if}
 			</div>

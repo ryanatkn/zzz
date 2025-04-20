@@ -44,7 +44,7 @@
 			}}
 			attrs={{class: 'plain icon_button size_lg'}}
 		>
-			<Glyph text={GLYPH_PASTE} />
+			<Glyph glyph={GLYPH_PASTE} />
 		</Paste_From_Clipboard>
 
 		<Clear_Restore_Button
@@ -60,7 +60,7 @@
 		onconfirm={() => zzz.diskfiles.delete(diskfile.path)}
 		attrs={{class: 'plain icon_button', title: `delete ${diskfile.pathname}`}}
 	>
-		<Glyph text={GLYPH_DELETE} />
+		<Glyph glyph={GLYPH_DELETE} />
 	</Confirm_Button>
 </div>
 

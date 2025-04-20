@@ -20,7 +20,7 @@
 				class="plain justify_content_start flex_1"
 				onclick={() => project_viewmodel.create_new_page()}
 			>
-				<Glyph text={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new page
+				<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new page
 			</button>
 		</div>
 

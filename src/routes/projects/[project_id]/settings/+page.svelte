@@ -63,7 +63,7 @@
 						class="color_c"
 						onclick={() => project_viewmodel.delete_current_project()}
 					>
-						<Glyph text={GLYPH_DELETE} attrs={{class: 'mr_xs2'}} /> delete project
+						<Glyph glyph={GLYPH_DELETE} attrs={{class: 'mr_xs2'}} /> delete project
 					</button>
 				</div>
 			</div>

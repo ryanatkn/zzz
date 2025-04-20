@@ -66,8 +66,8 @@
 </div>
 
 {#snippet ping_item(ping: Ping_Data)}
-	<Glyph text={GLYPH_DIRECTION_CLIENT} /><Glyph
-		text={GLYPH_DIRECTION_SERVER}
+	<Glyph glyph={GLYPH_DIRECTION_CLIENT} /><Glyph
+		glyph={GLYPH_DIRECTION_SERVER}
 		attrs={{class: ping.completed ? '' : 'fade_3'}}
 	/>
 	{#if !ping.completed}

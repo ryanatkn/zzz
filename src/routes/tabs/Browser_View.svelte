@@ -90,7 +90,7 @@
 					onclick={() => browser.add_new_tab()}
 					title="new tab"
 				>
-					<Glyph text={GLYPH_ADD} />
+					<Glyph glyph={GLYPH_ADD} />
 				</button>
 			</div>
 		</ul>
@@ -105,7 +105,7 @@
 					onclick={() => browser.go_back()}
 					disabled
 				>
-					<Glyph text={GLYPH_ARROW_LEFT} />
+					<Glyph glyph={GLYPH_ARROW_LEFT} />
 				</button>
 				<button
 					type="button"
@@ -114,7 +114,7 @@
 					onclick={() => browser.go_forward()}
 					disabled
 				>
-					<Glyph text={GLYPH_ARROW_RIGHT} />
+					<Glyph glyph={GLYPH_ARROW_RIGHT} />
 				</button>
 				<button
 					type="button"
@@ -122,7 +122,7 @@
 					title="refresh"
 					onclick={() => browser.refresh()}
 				>
-					<Glyph text={GLYPH_REFRESH} />
+					<Glyph glyph={GLYPH_REFRESH} />
 				</button>
 			</div>
 

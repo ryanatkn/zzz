@@ -30,5 +30,5 @@
 		...attrs,
 	}}
 >
-	<Glyph text={GLYPH_REMOVE} />
+	<Glyph glyph={GLYPH_REMOVE} />
 </Confirm_Button>

@@ -21,7 +21,7 @@
 
 <div class="flex flex_column gap_xs w_100">
 	<small class="overflow_wrap_break_all w_100">
-		<Glyph text={GLYPH_FILE} />{zzz.diskfiles.to_relative_path(diskfile.path)}
+		<Glyph glyph={GLYPH_FILE} />{zzz.diskfiles.to_relative_path(diskfile.path)}
 	</small>
 
 	<small class="font_mono">

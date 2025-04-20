@@ -48,7 +48,7 @@
 			title="add xml attribute"
 			onclick={() => bit.add_attribute()}
 		>
-			<Glyph text={GLYPH_ADD} />
+			<Glyph glyph={GLYPH_ADD} />
 		</button>
 	</div>
 

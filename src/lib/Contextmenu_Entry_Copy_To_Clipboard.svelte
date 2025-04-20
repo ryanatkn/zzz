@@ -1,11 +1,12 @@
 <script lang="ts">
 	import type {ComponentProps, Snippet} from 'svelte';
 	import Contextmenu_Entry from '@ryanatkn/fuz/Contextmenu_Entry.svelte';
+	import type {Thunk} from '@ryanatkn/belt/function.js';
 	import type {Omit_Strict} from '@ryanatkn/belt/types.js';
 
 	import {GLYPH_COPY} from '$lib/glyphs.js';
 	import {to_preview} from '$lib/helpers.js';
-	import type {Thunk} from '@ryanatkn/belt/function.js';
+	import Glyph from '$lib/Glyph.svelte';
 
 	interface Props
 		extends Omit_Strict<ComponentProps<typeof Contextmenu_Entry>, 'run' | 'children'> {
@@ -45,7 +46,7 @@
 </script>
 
 <Contextmenu_Entry run={copy_to_clipboard} {...rest}>
-	{#snippet icon()}{GLYPH_COPY}{/snippet}
+	{#snippet icon()}<Glyph glyph={GLYPH_COPY} />{/snippet}
 	{#if children}
 		{@render children()}
 	{:else}

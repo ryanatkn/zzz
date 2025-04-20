@@ -51,7 +51,7 @@
 
 	<div class="flex justify_content_between mt_lg">
 		<button type="button" class="color_a" onclick={() => projects.create_new_project()}>
-			<Glyph text={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new project
+			<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new project
 		</button>
 	</div>
 </section>

@@ -38,7 +38,7 @@
 			{/if}
 			<div>
 				<div class="mb_md font_mono">
-					<Glyph text={GLYPH_PROVIDER} />
+					<Glyph glyph={GLYPH_PROVIDER} />
 					{provider.name}
 				</div>
 				<div>

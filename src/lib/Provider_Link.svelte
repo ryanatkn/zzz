@@ -41,7 +41,7 @@
 			{@render children()}
 		{:else}
 			{#if icon === 'glyph'}
-				<Glyph text={GLYPH_PROVIDER} />
+				<Glyph glyph={GLYPH_PROVIDER} />
 			{:else if icon === 'svg'}
 				<Provider_Logo name={provider.name} {...icon_props} />
 			{:else if icon}
@@ -58,7 +58,7 @@
 	{@render fallback()}
 {:else}
 	<small {...fallback_attrs} class="font_mono color_c_5 {fallback_attrs?.class}"
-		><Glyph text={GLYPH_PROVIDER} /> missing provider</small
+		><Glyph glyph={GLYPH_PROVIDER} /> missing provider</small
 	>
 {/if}
 

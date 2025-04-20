@@ -126,7 +126,7 @@
 									class="color_c"
 									onclick={() => domains_viewmodel.remove_domain()}
 								>
-									<Glyph text={GLYPH_DELETE} attrs={{class: 'mr_xs2'}} /> delete domain
+									<Glyph glyph={GLYPH_DELETE} attrs={{class: 'mr_xs2'}} /> delete domain
 								</button>
 							{/if}
 						</div>

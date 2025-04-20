@@ -25,7 +25,7 @@
 
 {#snippet entries()}
 	<Contextmenu_Submenu>
-		{#snippet icon()}{GLYPH_STRIP}{/snippet}
+		{#snippet icon()}<Glyph glyph={GLYPH_STRIP} />{/snippet}
 		strip
 		{#snippet menu()}
 			{#if strip.content}
@@ -37,7 +37,7 @@
 			{/if}
 
 			<Contextmenu_Entry run={() => (show_editor = true)}>
-				{#snippet icon()}{GLYPH_EDIT}{/snippet}
+				{#snippet icon()}<Glyph glyph={GLYPH_EDIT} />{/snippet}
 				<span>edit content</span>
 			</Contextmenu_Entry>
 
@@ -63,7 +63,7 @@
 {#if show_editor}
 	<Dialog onclose={() => (show_editor = false)}>
 		<div class="pane p_md width_md mx_auto">
-			<h2 class="mt_0 mb_sm"><Glyph text={GLYPH_STRIP} /> edit strip</h2>
+			<h2 class="mt_0 mb_sm"><Glyph glyph={GLYPH_STRIP} /> edit strip</h2>
 			<Strip_View {strip} />
 		</div>
 	</Dialog>

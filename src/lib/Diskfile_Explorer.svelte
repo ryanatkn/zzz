@@ -74,7 +74,7 @@
 		<div class="row h_input_height"><Pending_Animation /></div>
 	{:else}
 		<div class="row h_input_height justify_content_space_between py_xs px_xs">
-			<small class="ellipsis"><Glyph text={GLYPH_DIRECTORY} /> {zzz.zzz_dir_pathname}</small>
+			<small class="ellipsis"><Glyph glyph={GLYPH_DIRECTORY} /> {zzz.zzz_dir_pathname}</small>
 			<div class="flex gap_xs2">
 				<Pending_Button
 					pending={TODO_create_file_pending}
@@ -82,7 +82,7 @@
 					title="create file in {zzz.zzz_dir_pathname}"
 					onclick={create_file}
 				>
-					<Glyph text={GLYPH_CREATE_FILE} />
+					<Glyph glyph={GLYPH_CREATE_FILE} />
 				</Pending_Button>
 				<Pending_Button
 					pending={TODO_create_folder_pending}
@@ -90,7 +90,7 @@
 					title="create folder in {zzz.zzz_dir_pathname}"
 					onclick={create_folder}
 				>
-					<Glyph text={GLYPH_CREATE_FOLDER} />
+					<Glyph glyph={GLYPH_CREATE_FOLDER} />
 				</Pending_Button>
 				{#if zzz.diskfiles.items.size > 1}
 					<button
@@ -100,7 +100,7 @@
 						title="toggle sort controls"
 						onclick={() => editor.toggle_sort_controls()}
 					>
-						<Glyph text={GLYPH_SORT} />
+						<Glyph glyph={GLYPH_SORT} />
 					</button>
 				{/if}
 			</div>

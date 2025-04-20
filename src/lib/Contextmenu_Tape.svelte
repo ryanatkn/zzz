@@ -11,6 +11,7 @@
 	import Contextmenu_Entry_Toggle from '$lib/Contextmenu_Entry_Toggle.svelte';
 	import Contextmenu_Entry_Copy_To_Clipboard from '$lib/Contextmenu_Entry_Copy_To_Clipboard.svelte';
 	import Model_Picker_Dialog from '$lib/Model_Picker_Dialog.svelte';
+	import Glyph from '$lib/Glyph.svelte';
 
 	interface Props extends Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> {
 		tape: Tape;
@@ -40,7 +41,7 @@
 
 {#snippet entries()}
 	<Contextmenu_Submenu>
-		{#snippet icon()}{GLYPH_TAPE}{/snippet}
+		{#snippet icon()}<Glyph glyph={GLYPH_TAPE} />{/snippet}
 		tape
 		{#snippet menu()}
 			{#if tape.content}
@@ -57,7 +58,7 @@
 						tape.remove_all_strips();
 					}}
 				>
-					{#snippet icon()}{GLYPH_REMOVE}{/snippet}
+					{#snippet icon()}<Glyph glyph={GLYPH_REMOVE} />{/snippet}
 					<span>clear conversation</span>
 				</Contextmenu_Entry>
 			{/if}
@@ -65,7 +66,7 @@
 			<Contextmenu_Entry_Toggle bind:enabled={tape.enabled} label="tape" />
 
 			<Contextmenu_Entry run={switch_model}>
-				{#snippet icon()}{GLYPH_MODEL}{/snippet}
+				{#snippet icon()}<Glyph glyph={GLYPH_MODEL} />{/snippet}
 				<span>switch model</span>
 			</Contextmenu_Entry>
 
@@ -78,7 +79,7 @@
 					}
 				}}
 			>
-				{#snippet icon()}{GLYPH_DELETE}{/snippet}
+				{#snippet icon()}<Glyph glyph={GLYPH_DELETE} />{/snippet}
 				<span>delete tape</span>
 			</Contextmenu_Entry>
 		{/snippet}

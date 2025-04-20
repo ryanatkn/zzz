@@ -54,7 +54,7 @@
 				<!-- TODO needs work -->
 				<div class="flex justify_content_space_between">
 					<div class="size_lg">
-						<Glyph text={GLYPH_CHAT} />
+						<Glyph glyph={GLYPH_CHAT} />
 						{selected_chat.name}
 					</div>
 				</div>
@@ -76,8 +76,8 @@
 							class: 'plain icon_button',
 						}}
 					>
-						<Glyph text={GLYPH_DELETE} />
-						{#snippet popover_button_content()}{GLYPH_DELETE}{/snippet}
+						<Glyph glyph={GLYPH_DELETE} />
+						{#snippet popover_button_content()}<Glyph glyph={GLYPH_DELETE} />{/snippet}
 					</Confirm_Button>
 					<Toggle_Button
 						active={chat.view_mode === 'simple'}
@@ -89,14 +89,14 @@
 							title: `toggle chat to ${chat.view_mode === 'multi' ? 'simple' : 'multi'} view`,
 						}}
 					>
-						<Glyph text={GLYPH_VIEW} attrs={{class: 'mr_xs'}} />
+						<Glyph glyph={GLYPH_VIEW} attrs={{class: 'mr_xs'}} />
 					</Toggle_Button>
 				</div>
 			</section>
 		{/if}
 		{#if chat.view_mode !== 'simple' || chat.tapes.length > 1}
 			<section class="column_section">
-				<header class="mt_0 mb_lg size_lg"><Glyph text={GLYPH_TAPE} /> tapes</header>
+				<header class="mt_0 mb_lg size_lg"><Glyph glyph={GLYPH_TAPE} /> tapes</header>
 				<Tape_List {chat} />
 			</section>
 			<!-- TODO consider a UX that lets users pin arbitrary prompts/bits/etc to each chat -->

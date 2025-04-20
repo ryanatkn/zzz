@@ -81,7 +81,7 @@
 						await zzz.prompts.navigate_to(prompt.id);
 					}}
 				>
-					<Glyph text={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new prompt
+					<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new prompt
 				</button>
 				{#if zzz.prompts.items.size > 1}
 					<button
@@ -91,7 +91,7 @@
 						title="toggle sort controls"
 						onclick={() => zzz.prompts.toggle_sort_controls()}
 					>
-						<Glyph text={GLYPH_SORT} />
+						<Glyph glyph={GLYPH_SORT} />
 					</button>
 				{/if}
 			</div>
@@ -104,7 +104,7 @@
 			<div class="column_fixed pr_sm">
 				<section class="column_section">
 					<div class="size_lg">
-						<Glyph text={GLYPH_PROMPT} />
+						<Glyph glyph={GLYPH_PROMPT} />
 						{zzz.prompts.selected.name}
 					</div>
 					<div class="column">
@@ -123,8 +123,8 @@
 								class: 'plain icon_button',
 							}}
 						>
-							<Glyph text={GLYPH_DELETE} />
-							{#snippet popover_button_content()}{GLYPH_DELETE}{/snippet}
+							<Glyph glyph={GLYPH_DELETE} />
+							{#snippet popover_button_content()}<Glyph glyph={GLYPH_DELETE} />{/snippet}
 						</Confirm_Button>
 						<Copy_To_Clipboard text={zzz.prompts.selected.content} attrs={{class: 'plain'}} />
 						<Prompt_Stats prompt={zzz.prompts.selected} />
@@ -132,7 +132,7 @@
 					<Content_Preview content={zzz.prompts.selected.content} />
 				</section>
 				<section class="column_section">
-					<header class="size_lg mb_lg"><Glyph text={GLYPH_BIT} /> bits</header>
+					<header class="size_lg mb_lg"><Glyph glyph={GLYPH_BIT} /> bits</header>
 					<Bit_List
 						bits={zzz.prompts.selected.bits}
 						prompt={zzz.prompts.selected}
@@ -149,7 +149,7 @@
 						<div class="flex flex_wrap gap_xs">
 							<button type="button" class="plain size_sm" onclick={add_text_bit}>
 								<div class="row white_space_nowrap">
-									<Glyph text={GLYPH_BIT} attrs={{class: 'mr_xs2'}} /> add text
+									<Glyph glyph={GLYPH_BIT} attrs={{class: 'mr_xs2'}} /> add text
 								</div>
 							</button>
 							<button
@@ -159,12 +159,12 @@
 								disabled={!zzz.diskfiles.items.size}
 							>
 								<div class="row white_space_nowrap">
-									<Glyph text={GLYPH_FILE} attrs={{class: 'mr_xs2'}} /> add file
+									<Glyph glyph={GLYPH_FILE} attrs={{class: 'mr_xs2'}} /> add file
 								</div>
 							</button>
 							<button type="button" class="plain size_sm" onclick={add_sequence_bit}>
 								<div class="row white_space_nowrap">
-									<Glyph text={GLYPH_LIST} attrs={{class: 'mr_xs2'}} /> add sequence
+									<Glyph glyph={GLYPH_LIST} attrs={{class: 'mr_xs2'}} /> add sequence
 								</div>
 							</button>
 							<Confirm_Button
@@ -172,7 +172,7 @@
 								attrs={{disabled: !zzz.prompts.selected.bits.length, class: 'plain size_sm'}}
 							>
 								<div class="row white_space_nowrap">
-									<Glyph text={GLYPH_REMOVE} attrs={{class: 'mr_xs2'}} /> remove all
+									<Glyph glyph={GLYPH_REMOVE} attrs={{class: 'mr_xs2'}} /> remove all
 								</div>
 							</Confirm_Button>
 						</div>

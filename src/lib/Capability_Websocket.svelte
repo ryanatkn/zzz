@@ -128,7 +128,7 @@
 						}}
 					>
 						<div class:flip_x={has_undo_state}>
-							<Glyph text={GLYPH_RESET} attrs={{class: 'mr_xs2'}} />
+							<Glyph glyph={GLYPH_RESET} attrs={{class: 'mr_xs2'}} />
 						</div>
 					</button>
 				</div>
@@ -158,7 +158,7 @@
 						}}
 					>
 						<Glyph
-							text={socket.connected && socket.url === socket.url_input
+							glyph={socket.connected && socket.url === socket.url_input
 								? GLYPH_DISCONNECT
 								: GLYPH_CONNECT}
 							size="var(--size_xl)"
@@ -218,7 +218,7 @@
 								socket.cancel_reconnect();
 							}}
 						>
-							<Glyph text={GLYPH_CANCEL} />
+							<Glyph glyph={GLYPH_CANCEL} />
 						</button>
 						<div class="w_100 radius_xs relative overflow_hidden bg_d_1" style:height="24px">
 							<div class="absolute w_100 h_100 row px_lg font_mono" style:z-index="2">
@@ -341,7 +341,7 @@
 								popover.hide();
 							}}
 						>
-							<Glyph text={GLYPH_RESET} attrs={{class: 'mr_xs2'}} />
+							<Glyph glyph={GLYPH_RESET} attrs={{class: 'mr_xs2'}} />
 						</button>
 					{/snippet}
 				</Confirm_Button>

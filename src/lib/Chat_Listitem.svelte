@@ -25,7 +25,7 @@
 		}}
 	>
 		<div>
-			<Glyph attrs={{class: 'mr_xs2'}} text={GLYPH_CHAT} />
+			<Glyph attrs={{class: 'mr_xs2'}} glyph={GLYPH_CHAT} />
 			<span>{chat.name}</span>
 		</div>
 		{#if chat.tapes.length}<small>{chat.tapes.length}</small>{/if}

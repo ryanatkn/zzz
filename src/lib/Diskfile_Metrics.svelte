@@ -19,7 +19,7 @@
 			{editor_state.original_length}
 			{#if editor_state.original_length !== editor_state.current_length}
 				<span transition:fade={{duration: 80}}>
-					<Glyph text={GLYPH_ARROW_RIGHT} />
+					<Glyph glyph={GLYPH_ARROW_RIGHT} />
 					{editor_state.current_length}</span
 				>{/if}
 		</div>
@@ -36,7 +36,7 @@
 			{editor_state.original_token_count}
 			{#if editor_state.original_token_count !== editor_state.current_token_count}
 				<span transition:fade={{duration: 80}}>
-					<Glyph text={GLYPH_ARROW_RIGHT} />
+					<Glyph glyph={GLYPH_ARROW_RIGHT} />
 					{editor_state.current_token_count}</span
 				>{/if}
 		</div>

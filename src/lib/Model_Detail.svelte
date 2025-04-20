@@ -26,7 +26,7 @@
 <div {...attrs} class="panel p_lg {attrs?.class}">
 	<div class="row">
 		<div class="glyph_container">
-			<Glyph text={GLYPH_MODEL} size="var(--icon_size_xl)" />
+			<Glyph glyph={GLYPH_MODEL} size="var(--icon_size_xl)" />
 		</div>
 		<div class="pl_xl">
 			{#if at_detail_page}

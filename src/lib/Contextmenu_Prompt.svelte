@@ -18,6 +18,7 @@
 	} from '$lib/glyphs.js';
 	import Contextmenu_Entry_Copy_To_Clipboard from '$lib/Contextmenu_Entry_Copy_To_Clipboard.svelte';
 	import Diskfile_Picker_Dialog from '$lib/Diskfile_Picker_Dialog.svelte';
+	import Glyph from '$lib/Glyph.svelte';
 
 	interface Props extends Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> {
 		prompt: Prompt;
@@ -34,7 +35,7 @@
 
 {#snippet entries()}
 	<Contextmenu_Submenu>
-		{#snippet icon()}{GLYPH_PROMPT}{/snippet}
+		{#snippet icon()}<Glyph glyph={GLYPH_PROMPT} />{/snippet}
 		prompt
 		{#snippet menu()}
 			<!-- TODO @many maybe a copy submenu on this item with copy id, name, etc, leverage generic cells -->
@@ -54,7 +55,7 @@
 					);
 				}}
 			>
-				{#snippet icon()}{GLYPH_BIT}{/snippet}
+				{#snippet icon()}<Glyph glyph={GLYPH_BIT} />{/snippet}
 				<span>add text bit</span>
 			</Contextmenu_Entry>
 			<Contextmenu_Entry
@@ -68,7 +69,7 @@
 					show_diskfile_picker = true;
 				}}
 			>
-				{#snippet icon()}{GLYPH_FILE}{/snippet}
+				{#snippet icon()}<Glyph glyph={GLYPH_FILE} />{/snippet}
 				<span>add file bit</span>
 			</Contextmenu_Entry>
 			<Contextmenu_Entry
@@ -80,12 +81,12 @@
 					);
 				}}
 			>
-				{#snippet icon()}{GLYPH_LIST}{/snippet}
+				{#snippet icon()}<Glyph glyph={GLYPH_LIST} />{/snippet}
 				<span>add sequence bit</span>
 			</Contextmenu_Entry>
 			{#if prompt.bits.length}
 				<Contextmenu_Entry run={() => prompt.remove_all_bits()}>
-					{#snippet icon()}{GLYPH_REMOVE}{/snippet}
+					{#snippet icon()}<Glyph glyph={GLYPH_REMOVE} />{/snippet}
 					<span>remove all bits</span>
 				</Contextmenu_Entry>
 			{/if}
@@ -95,7 +96,7 @@
 					// prompt.rename() after bit name picker
 				}}
 			>
-				{#snippet icon()}{GLYPH_EDIT}{/snippet}
+				{#snippet icon()}<Glyph text={GLYPH_EDIT} />{/snippet}
 				<span>Rename prompt</span>
 			</Contextmenu_Entry> -->
 			<Contextmenu_Entry
@@ -108,7 +109,7 @@
 					}
 				}}
 			>
-				{#snippet icon()}{GLYPH_DELETE}{/snippet}
+				{#snippet icon()}<Glyph glyph={GLYPH_DELETE} />{/snippet}
 				<span>delete prompt</span>
 			</Contextmenu_Entry>
 		{/snippet}

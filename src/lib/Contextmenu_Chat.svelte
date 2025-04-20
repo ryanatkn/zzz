@@ -17,6 +17,7 @@
 	} from '$lib/glyphs.js';
 	import Contextmenu_Entry_Copy_To_Clipboard from '$lib/Contextmenu_Entry_Copy_To_Clipboard.svelte';
 	import Model_Picker_Dialog from '$lib/Model_Picker_Dialog.svelte';
+	import Glyph from '$lib/Glyph.svelte';
 
 	interface Props extends Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> {
 		chat: Chat;
@@ -33,11 +34,11 @@
 
 {#snippet entries()}
 	<Contextmenu_Submenu>
-		{#snippet icon()}{GLYPH_CHAT}{/snippet}
+		{#snippet icon()}<Glyph glyph={GLYPH_CHAT} />{/snippet}
 		chat
 		{#snippet menu()}
 			<Contextmenu_Entry run={() => (show_model_picker = true)}>
-				{#snippet icon()}{GLYPH_ADD}{/snippet}
+				{#snippet icon()}<Glyph glyph={GLYPH_ADD} />{/snippet}
 				<span>add tape</span>
 			</Contextmenu_Entry>
 
@@ -46,7 +47,7 @@
 					chat.view_mode = chat.view_mode === 'simple' ? 'multi' : 'simple';
 				}}
 			>
-				{#snippet icon()}{GLYPH_VIEW}{/snippet}
+				{#snippet icon()}<Glyph glyph={GLYPH_VIEW} />{/snippet}
 				<span>{chat.view_mode === 'simple' ? 'multi' : 'simple'} view</span>
 			</Contextmenu_Entry>
 
@@ -55,7 +56,7 @@
 
 			{#if chat.tapes.length}
 				<Contextmenu_Entry run={() => chat.remove_all_tapes()}>
-					{#snippet icon()}{GLYPH_REMOVE}{/snippet}
+					{#snippet icon()}<Glyph glyph={GLYPH_REMOVE} />{/snippet}
 					<span>remove all tapes</span>
 				</Contextmenu_Entry>
 			{/if}
@@ -72,7 +73,7 @@
 						chat.main_input = '';
 					}}
 				>
-					{#snippet icon()}{GLYPH_REMOVE}{/snippet}
+					{#snippet icon()}<Glyph glyph={GLYPH_REMOVE} />{/snippet}
 					<span>clear input</span>
 				</Contextmenu_Entry>
 			{/if}
@@ -87,7 +88,7 @@
 					}
 				}}
 			>
-				{#snippet icon()}{GLYPH_EDIT}{/snippet}
+				{#snippet icon()}<Glyph glyph={GLYPH_EDIT} />{/snippet}
 				<span>rename chat</span>
 			</Contextmenu_Entry>
 
@@ -106,7 +107,7 @@
 					await zzz.chats.navigate_to(new_chat.id);
 				}}
 			>
-				{#snippet icon()}{GLYPH_CHAT}{/snippet}
+				{#snippet icon()}<Glyph glyph={GLYPH_CHAT} />{/snippet}
 				<span>duplicate chat</span>
 			</Contextmenu_Entry>
 
@@ -119,7 +120,7 @@
 					}
 				}}
 			>
-				{#snippet icon()}{GLYPH_DELETE}{/snippet}
+				{#snippet icon()}<Glyph glyph={GLYPH_DELETE} />{/snippet}
 				<span>delete chat</span>
 			</Contextmenu_Entry>
 		{/snippet}

@@ -15,7 +15,7 @@
 	<div class="sections mt_lg">
 		<section class="panel p_md mb_0">
 			<div class="mb_lg">
-				<a class="size_xl font_weight_600" href="{base}/log"><Glyph text={GLYPH_LOG} /> log</a>
+				<a class="size_xl font_weight_600" href="{base}/log"><Glyph glyph={GLYPH_LOG} /> log</a>
 			</div>
 			<Actions_List limit={5} attrs={{class: 'mt_sm'}} />
 		</section>
@@ -23,7 +23,7 @@
 		<section class="panel p_md mb_0">
 			<div class="mb_lg">
 				<a class="size_xl font_weight_600" href="{base}/providers"
-					><Glyph text={GLYPH_PROVIDER} /> providers</a
+					><Glyph glyph={GLYPH_PROVIDER} /> providers</a
 				>
 			</div>
 			<div>
@@ -46,7 +46,7 @@
 		<section class="panel p_md mb_0">
 			<div class="mb_lg">
 				<a class="size_xl font_weight_600" href="{base}/models"
-					><Glyph text={GLYPH_MODEL} /> models</a
+					><Glyph glyph={GLYPH_MODEL} /> models</a
 				>
 			</div>
 			<div>

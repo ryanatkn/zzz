@@ -14,7 +14,7 @@
 
 <div class="p_lg">
 	<header>
-		<h1><Glyph text={GLYPH_SETTINGS} /> system settings</h1>
+		<h1><Glyph glyph={GLYPH_SETTINGS} /> system settings</h1>
 	</header>
 	<section class="width_sm">
 		<Settings />

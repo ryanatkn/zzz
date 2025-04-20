@@ -10,7 +10,7 @@
 </script>
 
 <div class="p_lg">
-	<h1><Glyph text={GLYPH_PROVIDER} /> providers</h1>
+	<h1><Glyph glyph={GLYPH_PROVIDER} /> providers</h1>
 	<aside>⚠️ This information is incomplete and may be incorrect or outdated.</aside>
 	<div class="providers_grid">
 		{#each zzz.providers.items as provider (provider)}
@@ -19,7 +19,7 @@
 					<Provider_Link {provider} icon="svg" />
 				</div>
 				<div class="mb_sm font_mono">
-					<Glyph text={GLYPH_PROVIDER} />
+					<Glyph glyph={GLYPH_PROVIDER} />
 					{provider.name}
 				</div>
 				{#if provider.url}

@@ -64,7 +64,6 @@
 				bind:content={editor_state.current_content}
 				token_count={editor_state.current_token_count}
 				placeholder={GLYPH_PLACEHOLDER + ' ' + diskfile.path_relative}
-				show_stats
 				readonly={false}
 				attrs={{class: 'h_100 radius_0'}}
 				onsave={(value) => {
@@ -73,17 +72,17 @@
 			/>
 		</div>
 
-		<div class="width_sm min_width_sm">
-			<div class="mb_md p_md">
+		<div class="width_sm min_width_sm py_md">
+			<div class="px_md mb_lg">
+				<Diskfile_Actions {diskfile} {editor_state} />
+			</div>
+
+			<div class="px_md mb_lg">
 				<Diskfile_Editor_Nav {editor_state} />
 			</div>
 
-			<div class="mb_md p_md">
+			<div class="px_md mb_lg">
 				<Diskfile_Info {diskfile} {editor_state} />
-			</div>
-
-			<div class="mb_md p_md">
-				<Diskfile_Actions {diskfile} {editor_state} />
 			</div>
 
 			{#if editor_state.has_history}

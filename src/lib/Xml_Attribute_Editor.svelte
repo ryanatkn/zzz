@@ -37,6 +37,6 @@
 		onconfirm={onremove}
 		attrs={{title: `remove attribute ${attribute.key || ''}`, class: 'plain compact'}}
 	>
-		<Glyph text={GLYPH_REMOVE} />
+		<Glyph glyph={GLYPH_REMOVE} />
 	</Confirm_Button>
 </div>

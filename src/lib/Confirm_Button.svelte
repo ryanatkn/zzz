@@ -69,7 +69,7 @@
 				{#if popover_button_content}
 					{@render popover_button_content(popover, () => confirm(popover))}
 				{:else}
-					<Glyph text={GLYPH_REMOVE} />
+					<Glyph glyph={GLYPH_REMOVE} />
 				{/if}
 			</button>
 		{/if}
@@ -80,6 +80,6 @@
 	{#if children}
 		{@render children(popover, () => confirm(popover))}
 	{:else}
-		<Glyph text={GLYPH_REMOVE} />
+		<Glyph glyph={GLYPH_REMOVE} />
 	{/if}
 {/snippet}

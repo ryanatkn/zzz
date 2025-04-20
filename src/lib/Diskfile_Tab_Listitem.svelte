@@ -55,7 +55,7 @@
 			title="close tab"
 			aria-label={`close tab ${path}`}
 		>
-			<Glyph text={GLYPH_REMOVE} />
+			<Glyph glyph={GLYPH_REMOVE} />
 		</button>
 	</div>
 </div>

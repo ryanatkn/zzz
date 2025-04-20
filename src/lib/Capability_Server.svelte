@@ -45,7 +45,7 @@
 			<small class="font_mono"
 				>{SERVER_URL}/api/ping
 				{#if capabilities.latest_ping_time !== null}<span
-						><Glyph text={GLYPH_ARROW_RIGHT} /> {Math.round(capabilities.latest_ping_time)}ms</span
+						><Glyph glyph={GLYPH_ARROW_RIGHT} /> {Math.round(capabilities.latest_ping_time)}ms</span
 					>{/if}
 			</small>
 		</div>
@@ -72,7 +72,7 @@
 			disabled={capabilities.server.status === 'pending'}
 			onclick={() => capabilities.check_server()}
 		>
-			<Glyph text={GLYPH_CONNECT} size="var(--size_xl)" />
+			<Glyph glyph={GLYPH_CONNECT} size="var(--size_xl)" />
 			<span class="size_lg font_weight_400 ml_md">
 				{#if capabilities.server.status === 'pending'}
 					<div class="inline_flex align_items_end">

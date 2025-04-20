@@ -37,7 +37,7 @@
 <div class="row justify_content_space_between mb_xs">
 	<div class="flex gap_xs">
 		<button type="button" class="plain compact" onclick={() => (show_bit_picker = true)}>
-			<Glyph text={GLYPH_BIT} /> add bit
+			<Glyph glyph={GLYPH_BIT} /> add bit
 		</button>
 	</div>
 	<small class="font_mono block">

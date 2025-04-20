@@ -25,7 +25,7 @@
 		}}
 	>
 		<div>
-			<Glyph text={GLYPH_PROMPT} attrs={{class: 'mr_xs2'}} />
+			<Glyph glyph={GLYPH_PROMPT} attrs={{class: 'mr_xs2'}} />
 			<span>{prompt.name}</span>
 		</div>
 		{#if prompt.bits.length}<small>{prompt.bits.length}</small>{/if}

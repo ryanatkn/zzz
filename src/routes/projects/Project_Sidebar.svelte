@@ -21,7 +21,7 @@
 				void goto(`${base}/projects/${project.id}`);
 			}}
 		>
-			<Glyph text={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new project
+			<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new project
 		</button>
 	</div>
 

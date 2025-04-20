@@ -17,6 +17,8 @@
 	}
 
 	const {diskfile, selected = false, attrs, onselect}: Props = $props();
+
+	// TODO add a visible status when open in a tab
 </script>
 
 <Contextmenu_Diskfile {diskfile}>
@@ -44,7 +46,7 @@
 		aria-pressed={selected}
 	>
 		<small class="ellipsis">
-			<Glyph text={GLYPH_FILE} />
+			<Glyph glyph={GLYPH_FILE} />
 			<span class="ml_xs">{diskfile.path_relative}</span>
 		</small>
 	</div>

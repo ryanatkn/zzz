@@ -97,7 +97,7 @@
 				attrs={{class: 'plain icon_button size_lg'}}
 			>
 				<!-- TODO should be default -->
-				<Glyph text={GLYPH_PASTE} />
+				<Glyph glyph={GLYPH_PASTE} />
 			</Paste_From_Clipboard>
 			<Clear_Restore_Button
 				value={content}

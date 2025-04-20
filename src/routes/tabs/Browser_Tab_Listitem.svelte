@@ -33,7 +33,7 @@
 		aria-pressed={tab.selected}
 	>
 		<div class="ellipsis font_weight_400 flex_1">
-			<Glyph text="⎕" />
+			<Glyph glyph="⎕" />
 			<small class="ml_xs">{tab.title}</small>
 		</div>
 		<button
@@ -46,7 +46,7 @@
 			title="close tab"
 			aria-label={`close tab ${tab.title}`}
 		>
-			<Glyph text={GLYPH_REMOVE} />
+			<Glyph glyph={GLYPH_REMOVE} />
 		</button>
 	</div>
 </div>

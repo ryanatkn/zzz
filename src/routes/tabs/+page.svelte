@@ -35,7 +35,7 @@
 {/if}
 
 {#snippet content()}
-	<h1><Glyph text={GLYPH_TAB} /> tabs</h1>
+	<h1><Glyph glyph={GLYPH_TAB} /> tabs</h1>
 
 	<section class="width_md">
 		{#if browser.browserified}

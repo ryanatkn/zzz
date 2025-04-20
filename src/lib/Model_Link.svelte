@@ -31,7 +31,7 @@
 		{#if icon === 'svg' || icon === true}
 			<Provider_Logo name={model.provider_name} />
 		{:else if icon === 'glyph'}
-			<Glyph text={GLYPH_MODEL} />
+			<Glyph glyph={GLYPH_MODEL} />
 		{/if}
 		{model.name}
 	{/if}</a
