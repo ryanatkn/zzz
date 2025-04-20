@@ -23,7 +23,6 @@
 	import {cell_classes} from '$lib/cell_classes.js';
 	import {Provider_Json} from '$lib/provider.svelte.js';
 	import create_zzz_config from '$lib/config.js';
-	import {Bit} from '$lib/bit.svelte.js';
 	import {Model_Json} from '$lib/model.svelte.js';
 
 	interface Props {
@@ -34,19 +33,12 @@
 
 	// TODO think through initialization
 	onMount(() => {
+		// TODO init properly from data
 		const zzz_config = create_zzz_config();
 
 		// TODO note the difference between these two APIs, look at both of them and see which makes more sense
 		zzz.add_providers(zzz_config.providers.map((p) => Provider_Json.parse(p))); // TODO handle errors
 		zzz.models.add_many(zzz_config.models.map((m) => Model_Json.parse(m))); // TODO handle errors
-
-		// TODO init properly from data
-
-		// const prompt1 = zzz.prompts.add();
-		// prompt1.add_bit(Bit.create(zzz, {type: 'text', content: 'one'}));
-		// prompt1.add_bit(Bit.create(zzz, {type: 'text', content: '2'}));
-		// prompt1.add_bit(Bit.create(zzz, {type: 'diskfile'}));
-		// prompt1.add_bit(Bit.create(zzz, {type: 'sequence'}));
 	});
 
 	pkg_context.set(parse_package_meta(package_json, src_json));
@@ -121,10 +113,7 @@
 	// TODO refactor, maybe per route?
 	// Handle URL parameter synchronization
 	$effect.pre(() => {
-		// TODO BLOCK if it's null but there's an in-memory value,
-		// don't overwrite it, but we probably need a state that says it's decoupled -
-		// this will let us have the chats/prompts nav be sticky without using URL params, but is that the best design?
-		// I think we want a different state value for this, so that we can render links to the "selected_id_recent" or something
+		// TODO I think we want a different state value for this, so that we can render links to the "selected_id_recent" or something
 		zzz.chats.selected_id = zzz.url_params.get_uuid_param('chat_id');
 		zzz.prompts.selected_id = zzz.url_params.get_uuid_param('prompt_id');
 	});
