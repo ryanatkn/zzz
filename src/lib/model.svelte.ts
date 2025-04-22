@@ -52,6 +52,10 @@ export class Model extends Cell<typeof Model_Json> {
 		this.provider_name === 'ollama' ? !!this.ollama_model_info : undefined,
 	);
 
+	readonly context_window_formatted: string | null = $derived(
+		this.context_window ? (this.context_window / 1000).toFixed(0) + 'k' : null,
+	);
+
 	constructor(options: Model_Options) {
 		// Pass schema and options to base constructor
 		super(Model_Json, options);

@@ -14,6 +14,7 @@
 	import Chat_Initializer from '$lib/Chat_Initializer.svelte';
 
 	const zzz = zzz_context.get();
+	const {chats} = zzz;
 
 	interface Props {
 		chat: Chat;
@@ -22,7 +23,7 @@
 	const {chat}: Props = $props();
 
 	const first_tape = $derived(chat.tapes[0] as Tape | undefined);
-	const selected_chat = $derived(zzz.chats.selected);
+	const selected_chat = $derived(chats.selected);
 	const empty_chat = $derived(chat.tapes.length === 0);
 
 	// TODO BLOCK clicking tapes should select them, if none selected then default to the first
@@ -53,7 +54,7 @@
 				</div>
 				<div class="row gap_xs py_xs">
 					<Confirm_Button
-						onconfirm={() => zzz.chats.selected_id && zzz.chats.remove(zzz.chats.selected_id)}
+						onconfirm={() => chats.selected_id && chats.remove(chats.selected_id)}
 						position="right"
 						attrs={{
 							title: `delete chat "${selected_chat.name}"`,
@@ -91,10 +92,8 @@
 	</div>
 
 	{#if empty_chat}
-		<div class="flex_1 flex align_items_center justify_content_center">
-			<div class="p_md width_md">
-				<Chat_Initializer {chat} oninit={(chat_id) => zzz.chats.navigate_to(chat_id)} />
-			</div>
+		<div class="column_fluid p_md">
+			<Chat_Initializer {chat} oninit={(chat_id) => chats.navigate_to(chat_id)} />
 		</div>
 	{:else if chat.view_mode === 'simple'}
 		<Chat_View_Simple {chat} tape={first_tape} />

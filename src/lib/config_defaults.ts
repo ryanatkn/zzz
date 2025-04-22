@@ -5,6 +5,7 @@ import type {Model_Json} from '$lib/model.svelte.js';
 import type {Chat_Template} from '$lib/chat_template.js';
 import {create_uuid} from '$lib/zod_helpers.js';
 
+// TODO this is a temporary source of truth, use APIs instead
 // TODO @many refactor with db
 
 // Configuration defaults

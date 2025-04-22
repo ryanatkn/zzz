@@ -22,6 +22,7 @@ export const Chats_Json = z
 			'Chat',
 		),
 		selected_id: z.string().nullable().default(null),
+		selected_id_last_non_null: z.string().nullable().default(null),
 		show_sort_controls: z.boolean().default(false),
 	})
 	.default(() => ({
@@ -52,16 +53,25 @@ export class Chats extends Cell<typeof Chats_Json> {
 		],
 	});
 
-	selected_id: Uuid | null = $state(null);
+	#selected_id: Uuid | null = $state()!;
+	selected_id_last_non_null: Uuid | null = $state()!; // TODO better name? is clear at least, maybe the pattern should be more common, and part of a selection API
+	get selected_id(): Uuid | null {
+		return this.#selected_id;
+	}
+	set selected_id(value: Uuid | null) {
+		this.#selected_id = value;
+		if (value !== null) this.selected_id_last_non_null = value;
+	}
+
 	readonly selected: Chat | undefined = $derived(
-		this.selected_id ? this.items.by_id.get(this.selected_id) : undefined,
+		this.#selected_id ? this.items.by_id.get(this.#selected_id) : undefined,
 	);
 	readonly selected_id_error: boolean = $derived(
-		this.selected_id !== null && this.selected === undefined,
+		this.#selected_id !== null && this.selected === undefined,
 	);
 
 	/** Controls visibility of sort controls in the chats list. */
-	show_sort_controls: boolean = $state(false);
+	show_sort_controls: boolean = $state()!;
 
 	/** Ordered array of chats derived from the `manual_order` index. */
 	readonly ordered_items: Array<Chat> = $derived(this.items.derived_index('manual_order'));
@@ -114,7 +124,7 @@ export class Chats extends Cell<typeof Chats_Json> {
 		if (
 			select === true ||
 			typeof select === 'number' ||
-			(this.selected_id === null && chats.length > 0)
+			(this.#selected_id === null && chats.length > 0)
 		) {
 			void this.select(chats[typeof select === 'number' ? select : 0].id);
 		}
@@ -124,19 +134,17 @@ export class Chats extends Cell<typeof Chats_Json> {
 
 	remove(id: Uuid): void {
 		const removed = this.items.remove(id);
-		if (removed && id === this.selected_id) {
+		if (removed && id === this.#selected_id) {
 			void this.select_next();
 		}
 	}
 
 	remove_many(ids: Array<Uuid>): number {
-		const {selected_id} = this;
-
 		// Remove the chats
 		const removed_count = this.items.remove_many(ids);
 
 		// If the selected chat was removed, select a new one
-		if (selected_id !== null && ids.includes(selected_id)) {
+		if (this.#selected_id !== null && ids.includes(this.#selected_id)) {
 			void this.select_next();
 		}
 

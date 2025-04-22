@@ -7,7 +7,6 @@
 	import {GLYPH_ADD, GLYPH_SORT} from '$lib/glyphs.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
-	import Chat_Initializer from '$lib/Chat_Initializer.svelte';
 	import Contextmenu_Chats from '$lib/Contextmenu_Chats.svelte';
 
 	const zzz = zzz_context.get();
@@ -71,9 +70,14 @@
 					</div>
 				</div>
 			{:else}
-				<section>
-					<Chat_Initializer oninit={(chat_id) => zzz.chats.navigate_to(chat_id)} />
-				</section>
+				<div class="box h_100">
+					<p>
+						no chats yet,
+						<button type="button" class="inline color_d" onclick={() => chats.add(undefined, true)}
+							>create a new chat</button
+						>?
+					</p>
+				</div>
 			{/if}
 		</div>
 	</div>

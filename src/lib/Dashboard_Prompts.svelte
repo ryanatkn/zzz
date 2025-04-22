@@ -217,12 +217,12 @@
 	{:else}
 		<div class="flex align_items_center justify_content_center h_100 flex_1" in:fade>
 			<p>
-				no prompts available, <button
+				no prompts yet, <button
 					type="button"
 					class="inline color_d"
 					onclick={() => {
 						zzz.prompts.add();
-					}}>create one</button
+					}}>create a new prompt</button
 				>?
 			</p>
 		</div>

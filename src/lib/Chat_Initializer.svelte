@@ -50,7 +50,7 @@
 {/if}
 
 <div class="flex">
-	<section class="min_width_sm">
+	<section class="width_md min_width_sm">
 		<h3 class="mt_0 mb_lg">with model</h3>
 		<Model_Picker
 			onpick={(model) => {
@@ -63,7 +63,7 @@
 		/>
 	</section>
 
-	<section class="min_width_sm">
+	<section class="width_md min_width_sm">
 		<h3 class="mt_0 mb_lg px_md">from template</h3>
 		<menu class="unstyled column gap_xs px_md">
 			{#each zzz.chats.chat_templates as chat_template (chat_template.id)}

@@ -133,8 +133,22 @@
 					{/if}
 
 					{#each section.items as link (link.label)}
+						<!-- TODO generalize this pattern (probably dont remove?),
+							it's a hack for the chats link to show the last selected id, if any, when not on the route directly.
+							There's also a quirk in the UX where navigating away from the root (no selected id)
+							still uses the last selected one, so perhaps it should clear the state in that case.
+							IDK, it's a mess of an implementation and
+							screwing with links like this could make the UX unpredictable and bad overall,
+							but the UX is significantly better for moving around the UI in the normal case.
+						-->
+						{@const href =
+							link.label === 'chats' &&
+							zzz.chats.selected_id_last_non_null &&
+							!(page.url.pathname === link.href || page.url.pathname.startsWith(link.href + '/'))
+								? link.href + '/' + zzz.chats.selected_id_last_non_null
+								: link.href}
 						<div transition:slide>
-							<Nav_Link href={link.href}>
+							<Nav_Link {href}>
 								{#snippet children(selected)}
 									{#if typeof link.icon === 'string'}
 										<Glyph glyph={link.icon} attrs={{class: 'icon_xs'}} /> {link.label}
