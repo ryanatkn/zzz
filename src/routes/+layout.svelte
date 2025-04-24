@@ -13,6 +13,9 @@
 	import {BROWSER} from 'esm-env';
 	import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 	import {PUBLIC_WEBSOCKET_URL} from '$env/static/public';
+	import {page} from '$app/state';
+	import {onNavigate} from '$app/navigation';
+	import {base} from '$app/paths';
 
 	import {App} from '$lib/app.svelte.js';
 	import Zzz_Root from '$lib/Zzz_Root.svelte';
@@ -116,6 +119,16 @@
 		// TODO I think we want a different state value for this, so that we can render links to the "selected_id_recent" or something
 		zzz.chats.selected_id = zzz.url_params.get_uuid_param('chat_id');
 		zzz.prompts.selected_id = zzz.url_params.get_uuid_param('prompt_id');
+	});
+
+	// TODO refactor this, doesn't belong here - see the comment at `to_nav_link_href`
+	onNavigate(() => {
+		const {pathname} = page.url;
+		if (pathname === `${base}/chats`) {
+			zzz.chats.selected_id_last_non_null = null;
+		} else if (pathname === `${base}/prompts`) {
+			zzz.prompts.selected_id_last_non_null = null;
+		}
 	});
 </script>
 

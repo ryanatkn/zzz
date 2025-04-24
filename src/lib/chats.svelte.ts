@@ -54,7 +54,7 @@ export class Chats extends Cell<typeof Chats_Json> {
 	});
 
 	#selected_id: Uuid | null = $state()!;
-	selected_id_last_non_null: Uuid | null = $state()!; // TODO better name? is clear at least, maybe the pattern should be more common, and part of a selection API
+	selected_id_last_non_null: Uuid | null = $state()!;
 	get selected_id(): Uuid | null {
 		return this.#selected_id;
 	}

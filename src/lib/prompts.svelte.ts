@@ -72,7 +72,16 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 		],
 	});
 
-	selected_id: Uuid | null = $state(null);
+	#selected_id: Uuid | null = $state()!;
+	selected_id_last_non_null: Uuid | null = $state()!;
+	get selected_id(): Uuid | null {
+		return this.#selected_id;
+	}
+	set selected_id(value: Uuid | null) {
+		this.#selected_id = value;
+		if (value !== null) this.selected_id_last_non_null = value;
+	}
+
 	readonly selected: Prompt | undefined = $derived(
 		this.selected_id ? this.items.by_id.get(this.selected_id) : undefined,
 	);

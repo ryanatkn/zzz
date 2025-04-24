@@ -1,5 +1,8 @@
 import type {Svg_Data} from '@ryanatkn/fuz/Svg.svelte';
 import {base} from '$app/paths';
+import {zzz_logo} from '@ryanatkn/fuz/logos.js';
+import {page} from '$app/state';
+
 import {
 	GLYPH_CAPABILITY,
 	GLYPH_CHAT,
@@ -10,17 +13,41 @@ import {
 	GLYPH_PROVIDER,
 	GLYPH_SETTINGS,
 } from '$lib/glyphs.js';
-import {zzz_logo} from '@ryanatkn/fuz/logos.js';
+import type {Zzz} from '$lib/zzz.svelte.js';
+
+export interface Nav_Link_Item {
+	label: string;
+	href: string;
+	icon: string | Svg_Data;
+}
 
 // TODO fuz api for this in its library nav? look into it at the library -> docs rename
 export interface Nav_Item {
 	group: string;
-	items: Array<{
-		label: string;
-		href: string;
-		icon: string | Svg_Data;
-	}>;
+	items: Array<Nav_Link_Item>;
 }
+
+// TODO generalize this pattern, it's one part of a hacky fix
+// for the chats/prompts links to show the last selected id,
+// if any, when not on the route directly.
+// See also the `onNavigate` fix in the root layout for nulling out the value
+// when navigating directly to the base route.
+export const to_nav_link_href = (zzz: Zzz, link: Nav_Link_Item): string => {
+	if (
+		link.label === 'chats' &&
+		zzz.chats.selected_id_last_non_null &&
+		!(page.url.pathname === link.href || page.url.pathname.startsWith(link.href + '/'))
+	) {
+		return link.href + '/' + zzz.chats.selected_id_last_non_null;
+	} else if (
+		link.label === 'prompts' &&
+		zzz.prompts.selected_id_last_non_null &&
+		!(page.url.pathname === link.href || page.url.pathname.startsWith(link.href + '/'))
+	) {
+		return link.href + '/' + zzz.prompts.selected_id_last_non_null;
+	}
+	return link.href;
+};
 
 export const main_nav_items_default: Array<Nav_Item> = [
 	{

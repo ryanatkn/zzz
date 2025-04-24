@@ -12,7 +12,7 @@
 	import Glyph from '$lib/Glyph.svelte';
 	import {GLYPH_ARROW_LEFT, GLYPH_ARROW_RIGHT, GLYPH_PROJECT, GLYPH_TAB} from '$lib/glyphs.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';
-	import {main_nav_items_default} from '$lib/nav.js';
+	import {main_nav_items_default, to_nav_link_href} from '$lib/nav.js';
 
 	// TODO dashboard should be mounted with Markdown
 
@@ -133,20 +133,7 @@
 					{/if}
 
 					{#each section.items as link (link.label)}
-						<!-- TODO generalize this pattern (probably dont remove?),
-							it's a hack for the chats link to show the last selected id, if any, when not on the route directly.
-							There's also a quirk in the UX where navigating away from the root (no selected id)
-							still uses the last selected one, so perhaps it should clear the state in that case.
-							IDK, it's a mess of an implementation and
-							screwing with links like this could make the UX unpredictable and bad overall,
-							but the UX is significantly better for moving around the UI in the normal case.
-						-->
-						{@const href =
-							link.label === 'chats' &&
-							zzz.chats.selected_id_last_non_null &&
-							!(page.url.pathname === link.href || page.url.pathname.startsWith(link.href + '/'))
-								? link.href + '/' + zzz.chats.selected_id_last_non_null
-								: link.href}
+						{@const href = to_nav_link_href(zzz, link)}
 						<div transition:slide>
 							<Nav_Link {href}>
 								{#snippet children(selected)}
