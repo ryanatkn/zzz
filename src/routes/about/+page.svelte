@@ -185,8 +185,10 @@
 			<External_Link href="https://github.com/ryanatkn/zzz/issues">issues</External_Link>, and
 			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link>,
 			and find me on
-			<External_Link href="https://bsky.app/profile/ryanatkn.com">Bluesky</External_Link>. I'll make
-			a Discord if someone asks, and I'm planning to make a community site using Zzz at zzzbot.dev.
+			<External_Link href="https://bsky.app/profile/ryanatkn.com">Bluesky</External_Link>. I'm
+			planning to make a community site using Zzz at zzzbot.dev - there won't be a Discord because
+			the writing is
+			<a href="https://discord.com/blog/discord-appoints-new-ceo-humam-sakhnini">on the wall</a>.
 		</p>
 	</section>
 	<hr />
