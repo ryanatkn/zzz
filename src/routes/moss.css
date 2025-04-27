@@ -17,9 +17,6 @@ a.chip {
 	font-weight: 700;
 }
 
-.color_a_5 {
-	color: var(--color_a_5);
-}
 .flex {
 	display: flex;
 }
@@ -57,9 +54,6 @@ a.chip {
 }
 .mb_lg {
 	margin-bottom: var(--space_lg);
-}
-.mb_sm {
-	margin-bottom: var(--space_sm);
 }
 .mb_xl5 {
 	margin-bottom: var(--space_xl5);
@@ -112,9 +106,6 @@ a.chip {
 	line-height: var(--line_height_lg); /* prevents the bottom of g's and others from being cut off */
 }
 
-.ml_sm {
-	margin-left: var(--space_sm);
-}
 .mt_0 {
 	margin-top: 0;
 }
@@ -167,9 +158,6 @@ a.chip {
 	--button_fill: transparent;
 }
 
-.pt_xl2 {
-	padding-top: var(--space_xl2);
-}
 .pt_xl3 {
 	padding-top: var(--space_xl3);
 }
@@ -220,9 +208,6 @@ a.chip {
 }
 .size_xl3 {
 	font-size: var(--size_xl3);
-}
-.w_100 {
-	width: 100%;
 }
 
 /* TODO rename these? use to be columns, maybe should be? */
