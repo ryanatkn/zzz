@@ -1317,7 +1317,9 @@ export const src_json = {
 		'./nav.js': {
 			path: 'nav.ts',
 			declarations: [
+				{name: 'Nav_Link_Item', kind: 'type'},
 				{name: 'Nav_Item', kind: 'type'},
+				{name: 'to_nav_link_href', kind: 'function'},
 				{name: 'main_nav_items_default', kind: 'variable'},
 			],
 		},
