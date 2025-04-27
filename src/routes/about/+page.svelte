@@ -171,9 +171,9 @@
 		</ul>
 		<p>
 			Zzz is just one implementation of an increasingly common idea that combines web tech and AI
-			with powerful open clients. Because of the endless scope I've been referring to it as a
-			webtool. Some related projects call themselves web UIs or even operating systems. Whatever the
-			name, this class of app is something that I've been wanting for a long time.
+			with powerful open clients. Because of the endless scope I've been referring to it as a web
+			environment. Some related projects call themselves web UIs or even operating systems. Whatever
+			the name, this class of app is something that I've been wanting for a long time.
 		</p>
 		<p>
 			I intend to continue working on Zzz full-time for the foreseeable future, but I know I need to

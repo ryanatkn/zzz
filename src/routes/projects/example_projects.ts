@@ -9,7 +9,7 @@ export const create_sample_projects = (zzz: Zzz): Array<Project> => {
 			json: {
 				id: create_uuid(),
 				name: 'Zzz',
-				description: 'webtool 💤 nice web things for the tired',
+				description: 'web environment 💤 nice web things for the tired',
 				created: '2023-01-15T12:00:00Z',
 				updated: '2023-04-20T15:30:00Z',
 				domains: [

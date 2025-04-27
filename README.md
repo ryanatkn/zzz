@@ -2,7 +2,7 @@
 
 [<img src="/static/logo.svg" alt="three sleepy z's" align="right" width="192" height="192">](https://www.zzz.software/)
 
-> webtool 💤 nice web things for the tired
+> web environment 💤 nice web things for the tired
 
 ⚠️ early pre-release
 
