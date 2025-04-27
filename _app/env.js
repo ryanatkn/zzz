@@ -1,1 +1,1 @@
-export const env={"PUBLIC_ZZZ_DIR":"./.zzz","PUBLIC_SERVER_PROTOCOL":"https","PUBLIC_SERVER_HOSTNAME":"zzz.zzz.software","PUBLIC_SERVER_PORT":"","PUBLIC_WEBSOCKET_URL":"ws://localhost:8999/ws","PUBLIC_SERVER_PROXIED_PORT":"8999"}
+export const env={}
