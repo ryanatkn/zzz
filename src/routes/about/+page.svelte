@@ -85,8 +85,8 @@
 				web browsers - first with Chromium via Electron, ideally with swappable browser engines
 			</li>
 			<li>
-				web metaframeworks - Zzz extends <External_Link href="https://svelte.dev/"
-					>SvelteKit</External_Link
+				code libraries and web metaframeworks - Zzz extends <External_Link
+					href="https://svelte.dev/">SvelteKit</External_Link
 				> and <External_Link href="https://vite.dev/">Vite</External_Link> without wrapping them, enabling
 				devs to use Zzz as a library with existing workflows
 			</li>
@@ -95,22 +95,19 @@
 			This scope may look far-fetched, but I'm just making tools I want to use now on the best
 			foundations I can assemble. And Zzz doesn't need or want to appeal to every user—thanks to the
 			magic of standards-based interoperability, Zzz works with all websites, and anything you make
-			with Zzz works with other browsers and web technologies. It offers one take on the web, and it
-			would best flourish in a lively <External_Link href="https://vite.dev/"
-				>pluralistic</External_Link
-			> ecosystem.
+			with Zzz works with other browsers and web technologies. It's just one more optional take on
+			the web.
 		</p>
 		<p>
 			This is an early proof of concept that took about 3 months of full-time work to build. (<External_Link
 				href="https://github.com/ryanatkn/zzz/pull/6">PR #6</External_Link
 			>) I've been thinking about and prototyping related ideas for more than 13 years, and I think
-			this iteration is sticking. Everything's a work in progress, but some basic integrations
-			include:
+			this iteration is sticking. It's a work in progress but some basic integrations include:
 		</p>
 		<ul>
 			<li>
 				<External_Link href="https://github.com/ollama/ollama">Ollama</External_Link> runs AI models
-				locally - more local backends will be supported
+				locally - more local LLM backends will be supported
 			</li>
 			<li>
 				<External_Link href="https://github.com/openai/openai-node">ChatGPT</External_Link>,
@@ -171,24 +168,20 @@
 		</ul>
 		<p>
 			Zzz is just one implementation of an increasingly common idea that combines web tech and AI
-			with powerful open clients. Because of the endless scope I've been referring to it as a web
-			environment. Some related projects call themselves web UIs or even operating systems. Whatever
-			the name, this class of app is something that I've been wanting for a long time.
+			with powerful open clients. Because of the endless scope I currently like the name "web
+			environment". Some related projects call themselves web UIs or even operating systems.
+			Whatever the name, this class of app is something that I've been wanting for a long time.
 		</p>
 		<p>
 			I intend to continue working on Zzz full-time for the foreseeable future, but I know I need to
-			find people and organizations to work with. Some of the responsibilities are too big for me.
-			This project has quirks personal to its author that I'm eager to smooth out. Your input is
-			appreciated to help make it work for you—see the <External_Link
+			find people and organizations to work with. It also has some personal quirks that I'm eager to
+			smooth out. Your input is appreciated to help make it work for you—see the <External_Link
 				href="https://github.com/ryanatkn/zzz">code</External_Link
 			>,
 			<External_Link href="https://github.com/ryanatkn/zzz/issues">issues</External_Link>, and
 			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link>,
 			and find me on
-			<External_Link href="https://bsky.app/profile/ryanatkn.com">Bluesky</External_Link>. I'm
-			planning to make a community site using Zzz at zzzbot.dev - there won't be a Discord because
-			the writing is
-			<a href="https://discord.com/blog/discord-appoints-new-ceo-humam-sakhnini">on the wall</a>.
+			<External_Link href="https://bsky.app/profile/ryanatkn.com">Bluesky</External_Link>.
 		</p>
 	</section>
 	<hr />
@@ -196,19 +189,14 @@
 		<h2 class="mb_lg">More details</h2>
 		<ul>
 			<li>Zzz is a noncommercial project and its only official domain is zzz.software</li>
-			<li>
-				it's open source, permissively licensed, and forking is encouraged - you can also use it as
-				a TypeScript/Svelte library (currently just npm)
-			</li>
+			<li>it's open source, permissively licensed, and forking is encouraged</li>
 			<li>
 				the Zzz name and logos are community property, just don't falsely represent the official Zzz
 				project or zzz.software
 			</li>
 			<li>
-				I'm looking for <a href="https://www.ryanatkn.com/funding">funding</a> to make my continued
-				full-time work on it sustainable - if successful, others will join <External_Link
-					href="https://www.ryanatkn.com/">me</External_Link
-				> in various capacities, and I think Zzz would end up stewarded by some kind of nonprofit
+				I'm looking for <a href="https://www.ryanatkn.com/funding">funding</a> to make my continued full-time
+				work on it sustainable - if successful, I think Zzz would end up stewarded by some kind of nonprofit
 			</li>
 		</ul>
 	</section>
