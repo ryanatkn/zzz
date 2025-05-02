@@ -167,8 +167,8 @@ input.input_xs {
 
 /* Layout classes */
 .column_fixed {
-	width: var(--column_width, var(--width_sm));
-	min-width: var(--column_width, var(--width_sm));
+	width: var(--column_width, var(--distance_sm));
+	min-width: var(--column_width, var(--distance_sm));
 	height: 100%;
 	overflow: auto;
 	scrollbar-width: thin;
@@ -176,7 +176,7 @@ input.input_xs {
 .column_fluid {
 	flex: 1;
 	height: 100%;
-	min-width: var(--column_width, var(--width_sm));
+	min-width: var(--column_width, var(--distance_sm));
 	overflow: auto;
 	scrollbar-width: thin;
 }
@@ -188,7 +188,7 @@ input.input_xs {
 
 /* TODO upstream */
 .max_height_sm {
-	max-height: var(--width_sm);
+	max-height: var(--distance_sm);
 	overflow: auto;
 	scrollbar-width: thin;
 }

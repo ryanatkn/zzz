@@ -71,12 +71,12 @@
 <style>
 	.sections {
 		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(var(--width_sm), 1fr));
+		grid-template-columns: repeat(auto-fit, minmax(var(--distance_sm), 1fr));
 		gap: var(--space_lg);
 	}
 
 	.panel {
-		min-width: var(--width_sm);
+		min-width: var(--distance_sm);
 		max-width: var(--width_md);
 		width: 100%;
 	}
