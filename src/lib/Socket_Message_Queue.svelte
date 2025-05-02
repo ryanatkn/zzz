@@ -175,7 +175,7 @@
 					class="message_item p_sm {selected ? 'selected bg_2' : ''} {queued_messages.indexOf(
 						message,
 					) > 0
-						? 'border_top border_solid border_color_3'
+						? 'border_top border_style_solid border_color_3'
 						: ''}"
 				>
 					<!-- Message header with metadata and actions -->
@@ -248,7 +248,7 @@
 										style:max-width="500px"
 										style:min-width="300px"
 										style:border="1px solid var(--border_color_3)"
-										style:border-radius="var(--radius_xs)"
+										style:border-radius="var(--border_radius_xs)"
 										style:z-index="100"
 									>
 										<div class="flex justify_content_space_between mb_xs">
@@ -262,7 +262,7 @@
 											</button>
 										</div>
 										<pre
-											class="fg_1 radius_xs border_width border_style border_color_2 font_mono size_xs white_space_pre_wrap word_break_break_word p_md">{message_data_serialized}</pre>
+											class="fg_1 border_radius_xs border_width border_style border_color_2 font_mono size_xs white_space_pre_wrap word_break_break_word p_md">{message_data_serialized}</pre>
 										<Copy_To_Clipboard text={message_data_serialized} />
 									</div>
 								{/snippet}
@@ -309,7 +309,9 @@
 			{/each}
 		</div>
 	{:else}
-		<div class="p_md text_align_center border_dashed border_width_1 border_color_3 radius_xs bg_1">
+		<div
+			class="p_md text_align_center border_style_dashed border_width_1 border_color_3 border_radius_xs bg_1"
+		>
 			No {type} messages
 		</div>
 	{/if}

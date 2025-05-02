@@ -2,17 +2,23 @@
 	import {projects_context} from '$routes/projects/projects.svelte.js';
 	import Project_Sidebar from '$routes/projects/Project_Sidebar.svelte';
 	import Section_Sidebar from '$routes/projects/Section_Sidebar.svelte';
+	import Project_Not_Found from '$routes/projects/Project_Not_Found.svelte';
 	import {GLYPH_DELETE} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
 
 	const projects = projects_context.get();
 
 	const project_viewmodel = $derived(projects.current_project_viewmodel);
+
+	const project = $derived(projects.current_project);
 </script>
 
 <div class="project_layout">
+	<!-- TODO @many refactor for better component instance stability for e.g. transitions -->
 	<Project_Sidebar />
-	<Section_Sidebar section="settings" />
+	{#if project}
+		<Section_Sidebar {project} section="settings" />
+	{/if}
 
 	<div class="project_content">
 		{#if project_viewmodel?.project}
@@ -68,9 +74,7 @@
 				</div>
 			</div>
 		{:else}
-			<div class="p_lg text_align_center">
-				<p>Project not found.</p>
-			</div>
+			<Project_Not_Found />
 		{/if}
 	</div>
 </div>

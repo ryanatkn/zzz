@@ -51,7 +51,7 @@
 		{#each bits as bit, i (bit.id)}
 			<li
 				{...item_attrs}
-				class="radius_xs {item_attrs?.class}"
+				class="border_radius_xs {item_attrs?.class}"
 				use:reorderable.item={{index: i}}
 				transition:slide
 			>
@@ -62,7 +62,7 @@
 {:else}
 	<ul {...attrs} class="unstyled column gap_xs5 {attrs?.class}">
 		{#each bits as bit (bit.id)}
-			<li {...item_attrs} class="radius_xs {item_attrs?.class}" transition:slide>
+			<li {...item_attrs} class="border_radius_xs {item_attrs?.class}" transition:slide>
 				<Bit_Summary {bit} {prompt} />
 			</li>
 		{/each}

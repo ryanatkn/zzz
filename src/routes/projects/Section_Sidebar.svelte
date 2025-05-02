@@ -1,16 +1,15 @@
 <script lang="ts">
-	import {page} from '$app/state';
 	import {base} from '$app/paths';
 
 	import Nav_Link from '$lib/Nav_Link.svelte';
+	import type {Project, Project_Section} from '$routes/projects/project.svelte.js';
 
 	interface Props {
-		section: 'project' | 'pages' | 'domains' | 'settings';
+		project: Project;
+		section: Project_Section;
 	}
 
-	const {section}: Props = $props();
-
-	const project_id = $derived(page.params.project_id);
+	const {project, section}: Props = $props();
 </script>
 
 <aside class="overflow_y_auto unstyled width_xs p_xs">
@@ -18,7 +17,7 @@
 		<ul class="unstyled">
 			<li>
 				<Nav_Link
-					href="{base}/projects/{project_id}"
+					href="{base}/projects/{project.id}"
 					selected={section === 'project'}
 					show_selected_descendent={false}
 				>
@@ -26,17 +25,22 @@
 				</Nav_Link>
 			</li>
 			<li>
-				<Nav_Link href="{base}/projects/{project_id}/pages" selected={section === 'pages'}
+				<Nav_Link href="{base}/projects/{project.id}/pages" selected={section === 'pages'}
 					>pages</Nav_Link
 				>
 			</li>
 			<li>
-				<Nav_Link href="{base}/projects/{project_id}/domains" selected={section === 'domains'}>
+				<Nav_Link href="{base}/projects/{project.id}/domains" selected={section === 'domains'}>
 					domains
 				</Nav_Link>
 			</li>
 			<li>
-				<Nav_Link href="{base}/projects/{project_id}/settings" selected={section === 'settings'}>
+				<Nav_Link href="{base}/projects/{project.id}/repos" selected={section === 'repos'}>
+					repos
+				</Nav_Link>
+			</li>
+			<li>
+				<Nav_Link href="{base}/projects/{project.id}/settings" selected={section === 'settings'}>
 					settings
 				</Nav_Link>
 			</li>

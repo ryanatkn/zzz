@@ -47,7 +47,7 @@
 		background: var(--fg_5);
 		opacity: var(--fade_6);
 		transition: width var(--duration_3) ease-in-out;
-		border-radius: var(--radius_xs);
+		border-radius: var(--border_radius_xs);
 	}
 
 	.controls {

@@ -65,7 +65,7 @@
 				token_count={editor_state.current_token_count}
 				placeholder={GLYPH_PLACEHOLDER + ' ' + diskfile.path_relative}
 				readonly={false}
-				attrs={{class: 'h_100 radius_0'}}
+				attrs={{class: 'h_100 border_radius_0'}}
 				onsave={(value) => {
 					zzz.diskfiles.update(diskfile.path, value);
 				}}

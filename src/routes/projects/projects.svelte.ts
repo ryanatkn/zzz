@@ -1,14 +1,17 @@
 import {z} from 'zod';
 import {create_context} from '@ryanatkn/fuz/context_helpers.js';
+import {page} from '$app/state';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Projects_Json} from '$routes/projects/projects_schema.js';
 import {Project} from '$routes/projects/project.svelte.js';
 import {Page} from '$routes/projects/page.svelte.js';
 import {Domain} from '$routes/projects/domain.svelte.js';
+import {Repo} from '$routes/projects/repo.svelte.js';
 import {Project_Viewmodel} from '$routes/projects/project_viewmodel.svelte.js';
 import {Page_Viewmodel} from '$routes/projects/page_viewmodel.svelte.js';
 import {Domain_Viewmodel} from '$routes/projects/domain_viewmodel.svelte.js';
+import {Repo_Viewmodel} from '$routes/projects/repo_viewmodel.svelte.js';
 import {get_datetime_now, create_uuid, Uuid} from '$lib/zod_helpers.js';
 import {HANDLED} from '$lib/cell_helpers.js';
 import {get_unique_name} from '$lib/helpers.js';
@@ -38,6 +41,9 @@ export class Projects extends Cell<typeof Projects_Json> {
 		return result;
 	});
 
+	/** Current page route matches from $app/state */
+	readonly page_matches = $derived(page);
+
 	/** Current project derived from current_project_id. */
 	readonly current_project = $derived(
 		this.projects.find((p) => p.id === this.current_project_id) || null,
@@ -52,6 +58,24 @@ export class Projects extends Cell<typeof Projects_Json> {
 	readonly current_domain = $derived(
 		this.current_project?.domains.find((d) => d.id === this.current_domain_id) || null,
 	);
+
+	readonly current_repo_id = $derived.by(() => {
+		const repo_id = this.page_matches.params.repo_id;
+		return repo_id ? Uuid.parse(repo_id) : null;
+	});
+
+	readonly current_repo = $derived.by(() => {
+		return this.current_project?.repos.find((r) => r.id === this.current_repo_id) || null;
+	});
+
+	readonly current_repos_viewmodel = $derived.by(() => {
+		if (!this.current_project_id) return null;
+		return new Repo_Viewmodel({
+			projects: this,
+			project_id: this.current_project_id,
+			repo_id: this.current_repo_id,
+		});
+	});
 
 	/** Cache of project viewmodels. */
 	#project_viewmodels: Map<string, Project_Viewmodel> = new Map();
@@ -271,6 +295,43 @@ export class Projects extends Cell<typeof Projects_Json> {
 		if (!project) return;
 
 		project.delete_domain(domain_id);
+	}
+
+	/**
+	 * Find a project by ID.
+	 */
+	find_project(project_id: Uuid): Project | null {
+		return this.projects.find((p) => p.id === project_id) || null;
+	}
+
+	/**
+	 * Saves the current state.
+	 */
+	save(): void {
+		// Trigger persistence by updating cell
+		this.updated = get_datetime_now();
+	}
+
+	/**
+	 * Add a repo to a project.
+	 */
+	add_repo(project_id: Uuid, repo: Repo): void {
+		const project = this.find_project(project_id);
+		if (project) {
+			project.add_repo(repo);
+			this.save();
+		}
+	}
+
+	/**
+	 * Delete a repo from a project.
+	 */
+	delete_repo(project_id: Uuid, repo_id: Uuid): void {
+		const project = this.find_project(project_id);
+		if (project) {
+			project.delete_repo(repo_id);
+			this.save();
+		}
 	}
 }
 

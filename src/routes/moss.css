@@ -390,27 +390,6 @@ a.chip {
 .border_width_1 {
 	border-width: var(--border_width_1);
 }
-.border_none {
-	border-style: none;
-}
-.border_dashed {
-	border-style: dashed;
-}
-.radius_0 {
-	border-radius: 0;
-}
-.radius_xs2 {
-	border-radius: var(--radius_xs2);
-}
-.radius_xs {
-	border-radius: var(--radius_xs);
-}
-.radius_md {
-	border-radius: var(--radius_md);
-}
-.radius_lg {
-	border-radius: var(--radius_lg);
-}
 .shadow_bottom_md {
 	box-shadow: var(--shadow_bottom_md)
 		color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_3)), transparent);

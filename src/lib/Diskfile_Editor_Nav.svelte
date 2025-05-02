@@ -119,7 +119,7 @@
 <div class="browser_nav flex gap_xs">
 	<button
 		type="button"
-		class="icon_button plain p_xs radius_lg"
+		class="icon_button plain p_xs border_radius_lg"
 		title="previous diskfile"
 		onclick={go_back}
 		disabled={!can_go_back}
@@ -128,7 +128,7 @@
 	</button>
 	<button
 		type="button"
-		class="icon_button plain p_xs radius_lg"
+		class="icon_button plain p_xs border_radius_lg"
 		title="next diskfile"
 		onclick={go_forward}
 		disabled={!can_go_forward}
@@ -137,7 +137,7 @@
 	</button>
 	<button
 		type="button"
-		class="icon_button plain p_xs radius_lg"
+		class="icon_button plain p_xs border_radius_lg"
 		title="refresh from disk"
 		onclick={() => {
 			// TODO need to implement the server action to refresh the content from disk

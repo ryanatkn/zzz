@@ -6,6 +6,7 @@ import {get_datetime_now, create_uuid, type Uuid} from '$lib/zod_helpers.js';
 import {Domain} from '$routes/projects/domain.svelte.js';
 import {Page} from '$routes/projects/page.svelte.js';
 import {Projects} from '$routes/projects/projects.svelte.js';
+import {Repo} from '$routes/projects/repo.svelte.js';
 import {get_unique_name} from '$lib/helpers.js';
 
 export interface Project_Viewmodel_Options {
@@ -164,6 +165,34 @@ export class Project_Viewmodel {
 
 		this.project.add_domain(domain);
 		void goto(`${base}/projects/${this.project_id}/domains/${domain_id}`);
+	}
+
+	/**
+	 * Creates a new repo and navigates to it.
+	 */
+	create_new_repo(): void {
+		if (!this.project) return;
+
+		const repo_id = create_uuid();
+
+		// Create a new repo
+		const repo = new Repo({
+			zzz: this.projects.zzz,
+			// TODO parse with schema
+			json: {
+				id: repo_id,
+				git_url: '',
+				checkouts: [],
+				created: get_datetime_now(),
+				updated: get_datetime_now(),
+			},
+		});
+
+		// Add to project
+		this.project.add_repo(repo);
+
+		// Navigate to the repo
+		void goto(`${base}/projects/${this.project_id}/repos/${repo_id}`);
 	}
 }
 

@@ -21,7 +21,7 @@
 	<div
 		role="button"
 		tabindex="0"
-		class="diskfile_tab_button radius_0 plain px_sm py_xs"
+		class="diskfile_tab_button border_radius_0 plain px_sm py_xs"
 		class:selected={tab.is_selected}
 		class:preview={tab.is_preview}
 		onclick={(e) => {
@@ -47,7 +47,7 @@
 		</div>
 		<button
 			type="button"
-			class="tab_close_button plain icon_button compact radius_md ml_sm"
+			class="tab_close_button plain icon_button compact border_radius_md ml_sm"
 			onclick={(e) => {
 				swallow(e);
 				onclose(tab);

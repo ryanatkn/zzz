@@ -21,6 +21,22 @@ export const Page_Json = Cell_Json.extend({
 export type Page_Json = z.infer<typeof Page_Json>;
 export type Page_Json_Input = z.input<typeof Page_Json>;
 
+// Repo schema
+export const Repo_Json = Cell_Json.extend({
+	git_url: z.string(),
+	checkouts: z
+		.array(
+			z.object({
+				path: z.string(),
+				label: z.string(),
+				tags: z.array(z.string()),
+			}),
+		)
+		.default([]),
+});
+export type Repo_Json = z.infer<typeof Repo_Json>;
+export type Repo_Json_Input = z.input<typeof Repo_Json>;
+
 // Project schema
 export const Project_Json = Cell_Json.extend({
 	name: z.string().default('new project'),
@@ -33,6 +49,7 @@ export const Project_Json = Cell_Json.extend({
 		z.array(Domain_Json).default(() => []),
 		'Domain',
 	),
+	repos: z.array(Repo_Json).default([]),
 });
 export type Project_Json = z.infer<typeof Project_Json>;
 export type Project_Json_Input = z.input<typeof Project_Json>;

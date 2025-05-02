@@ -7,6 +7,7 @@
 	import Domains_Sidebar from '$routes/projects/Domains_Sidebar.svelte';
 	import {GLYPH_ADD, GLYPH_CHECKMARK} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
+	import Project_Not_Found from '$routes/projects/Project_Not_Found.svelte';
 
 	const projects = projects_context.get();
 
@@ -14,9 +15,12 @@
 </script>
 
 <div class="project_layout">
+	<!-- TODO @many refactor for better component instance stability for e.g. transitions -->
 	<Project_Sidebar />
-	<Section_Sidebar section="domains" />
-	<Domains_Sidebar />
+	{#if projects.current_project}
+		<Section_Sidebar project={projects.current_project} section="domains" />
+		<Domains_Sidebar />
+	{/if}
 
 	<div class="project_content">
 		{#if project_viewmodel?.project}
@@ -24,8 +28,8 @@
 				<h1 class="mb_lg">Domains</h1>
 
 				{#if project_viewmodel.project.domains.length === 0}
-					<div class="panel p_lg text_align_center mb_lg">
-						<p>This project doesn't have any domains configured yet.</p>
+					<div class="panel p_lg mb_lg">
+						<p>no domains yet</p>
 						<p>
 							<button
 								type="button"
@@ -86,9 +90,7 @@
 				</div>
 			</div>
 		{:else}
-			<div class="p_lg text_align_center">
-				<p>Project not found.</p>
-			</div>
+			<Project_Not_Found />
 		{/if}
 	</div>
 </div>

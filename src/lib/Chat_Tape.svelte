@@ -102,7 +102,7 @@
 		flex-direction: column;
 		gap: var(--space_md);
 		background-color: var(--bg);
-		border-radius: var(--radius_xs);
+		border-radius: var(--border_radius_xs);
 	}
 
 	.chat_tape.empty {

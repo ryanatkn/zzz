@@ -6,19 +6,25 @@
 	import {GLYPH_DELETE} from '$lib/glyphs.js';
 	import External_Link from '$lib/External_Link.svelte';
 	import Glyph from '$lib/Glyph.svelte';
+	import Project_Not_Found from '$routes/projects/Project_Not_Found.svelte';
 
 	const projects = projects_context.get();
 
 	const domains_viewmodel = $derived(projects.current_domains_viewmodel);
+
+	const project = $derived(projects.current_project);
 </script>
 
 <div class="domain_layout">
+	<!-- TODO @many refactor for better component instance stability for e.g. transitions -->
 	<Project_Sidebar />
-	<Section_Sidebar section="domains" />
-	<Domains_Sidebar />
+	{#if project}
+		<Section_Sidebar {project} section="domains" />
+		<Domains_Sidebar />
+	{/if}
 
 	<div class="domain_content">
-		{#if domains_viewmodel?.project}
+		{#if project && domains_viewmodel}
 			<div class="p_lg">
 				<h1 class="mb_lg">Edit domain</h1>
 
@@ -134,9 +140,7 @@
 				</div>
 			</div>
 		{:else}
-			<div class="p_lg text_align_center">
-				<p>Project not found.</p>
-			</div>
+			<Project_Not_Found />
 		{/if}
 	</div>
 </div>

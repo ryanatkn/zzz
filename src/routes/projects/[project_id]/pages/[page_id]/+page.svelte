@@ -6,6 +6,7 @@
 	import Project_Sidebar from '$routes/projects/Project_Sidebar.svelte';
 	import Section_Sidebar from '$routes/projects/Section_Sidebar.svelte';
 	import Pages_Sidebar from '$routes/projects/Pages_Sidebar.svelte';
+	import Project_Not_Found from '$routes/projects/Project_Not_Found.svelte';
 	import {GLYPH_DELETE, GLYPH_PREVIEW, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
@@ -39,6 +40,8 @@
 			void goto(`${base}/projects/${editor.project_id}/pages`);
 		}
 	};
+
+	const project = $derived(projects.current_project);
 </script>
 
 {#if preview_mode}
@@ -51,9 +54,9 @@
 		<!-- Close preview button in top-right corner -->
 		<button
 			type="button"
-			class="fixed t_0 r_0 icon_button plain radius_xs2"
+			class="fixed t_0 r_0 icon_button plain border_radius_xs2"
 			style:border-top-right-radius="0"
-			style:border-bottom-left-radius="var(--radius_lg)"
+			style:border-bottom-left-radius="var(--border_radius_lg)"
 			aria-label="Close preview"
 			title="Close preview"
 			onclick={toggle_preview}
@@ -63,12 +66,15 @@
 	</div>
 {:else}
 	<div class="editor_layout">
+		<!-- TODO @many refactor for better component instance stability for e.g. transitions -->
 		<Project_Sidebar />
-		<Section_Sidebar section="pages" />
-		<Pages_Sidebar />
+		{#if project}
+			<Section_Sidebar {project} section="pages" />
+			<Pages_Sidebar />
+		{/if}
 
 		<div class="editor_content">
-			{#if editor?.project}
+			{#if editor && project}
 				<div class="h_100 column p_lg">
 					<div>
 						<div class="flex gap_sm align_items_center">
@@ -143,9 +149,7 @@
 					</div>
 				</div>
 			{:else}
-				<div class="p_lg text_align_center">
-					<p>Project not found.</p>
-				</div>
+				<Project_Not_Found />
 			{/if}
 		</div>
 	</div>

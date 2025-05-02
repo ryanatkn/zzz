@@ -220,7 +220,7 @@
 						>
 							<Glyph glyph={GLYPH_CANCEL} />
 						</button>
-						<div class="w_100 radius_xs relative overflow_hidden bg_d_1" style:height="24px">
+						<div class="w_100 border_radius_xs relative overflow_hidden bg_d_1" style:height="24px">
 							<div class="absolute w_100 h_100 row px_lg font_mono" style:z-index="2">
 								reconnecting in...
 							</div>
@@ -238,7 +238,7 @@
 	</div>
 
 	<!-- Right column: Config sliders -->
-	<div class="flex_1 min_width_sm p_sm radius_xs">
+	<div class="flex_1 min_width_sm p_sm border_radius_xs">
 		<div class="flex flex_column gap_sm">
 			<div class="row">
 				<label

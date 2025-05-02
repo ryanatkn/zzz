@@ -35,6 +35,6 @@
 		overflow: auto;
 		scrollbar-width: thin;
 		flex: 1;
-		border-radius: var(--radius_xs2);
+		border-radius: var(--border_radius_xs2);
 	}
 </style>

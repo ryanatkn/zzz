@@ -48,7 +48,7 @@
 	.bit_reference {
 		padding: var(--space_xs2);
 		background: var(--bg_2);
-		border-radius: var(--radius_xs);
+		border-radius: var(--border_radius_xs);
 	}
 
 	.prompt_refs {
@@ -61,7 +61,7 @@
 	.prompt_ref {
 		padding: var(--space_xs3) var(--space_xs2);
 		background: var(--bg_3);
-		border-radius: var(--radius_xs);
+		border-radius: var(--border_radius_xs);
 		text-decoration: none;
 		color: inherit;
 	}

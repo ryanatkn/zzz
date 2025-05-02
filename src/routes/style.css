@@ -13,7 +13,7 @@ h6 {
 
 textarea {
 	scrollbar-width: thin; /* TODO maybe upstream? */
-	border-radius: var(--radius_xs2);
+	border-radius: var(--border_radius_xs2);
 }
 
 /* TODO upstream */
@@ -46,7 +46,7 @@ textarea {
 	--input_height: 2.6rem;
 	--input_padding_x: var(--space_sm);
 	--min_height: 2.6rem;
-	--border_radius: var(--radius_xs2);
+	--border_radius: var(--border_radius_xs2);
 }
 button.compact {
 	font-size: var(--size); /* ideally the base button would use `--size` I think */
@@ -198,7 +198,7 @@ input.input_xs {
 .chip {
 	padding: var(--space_xs5) var(--space_sm);
 	background-color: var(--fg_1);
-	border-radius: var(--radius_xs);
+	border-radius: var(--border_radius_xs);
 	display: inline-flex;
 	align-items: center;
 }

@@ -184,7 +184,7 @@
 						{#each zzz.prompts.selected.bits as bit (bit.id)}
 							<li in:scale>
 								<!-- the extra wrapper makes the grid items not stretch vertically -->
-								<div class="bg radius_xs p_sm">
+								<div class="bg border_radius_xs p_sm">
 									<Bit_View {bit} />
 								</div>
 							</li>

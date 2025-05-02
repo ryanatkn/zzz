@@ -25,7 +25,7 @@
 		}}
 	>
 		{#each chat.tapes as tape, i (tape.id)}
-			<li class="radius_xs" use:reorderable.item={{index: i}} transition:slide>
+			<li class="border_radius_xs" use:reorderable.item={{index: i}} transition:slide>
 				<Tape_Listitem {tape} {chat} />
 			</li>
 		{/each}

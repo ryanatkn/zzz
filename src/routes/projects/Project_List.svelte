@@ -12,8 +12,8 @@
 	<h2 class="mt_0 mb_lg">Projects</h2>
 
 	{#if projects.projects.length === 0}
-		<div class="panel p_lg text_align_center width_md">
-			<p>You don't have any projects yet.</p>
+		<div class="panel p_lg width_md">
+			<p>no projects yet</p>
 		</div>
 	{:else}
 		<div class="projects_grid">
@@ -110,6 +110,6 @@
 		font-size: 0.8em;
 		background-color: var(--bg_2);
 		padding: 1px 4px;
-		border-radius: var(--radius_xs);
+		border-radius: var(--border_radius_xs);
 	}
 </style>

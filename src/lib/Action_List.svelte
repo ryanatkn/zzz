@@ -44,7 +44,7 @@
 			{@const selected = action.id === selected_action_id}
 			<button
 				type="button"
-				class="w_100 text_align_left justify_content_start py_xs px_md radius_0 border_none box_shadow_none"
+				class="w_100 text_align_left justify_content_start py_xs px_md border_radius_0 border_style_none box_shadow_none"
 				class:selected
 				onclick={() => {
 					onselect?.(action);

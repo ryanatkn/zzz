@@ -15,6 +15,9 @@ export default {
 		csp: {
 			directives: create_csp_directives({
 				trusted_sources: csp_trusted_sources_of_ryanatkn,
+				directives: {
+					'connect-src': ['self', 'ws://localhost:8999', 'wss://localhost:8999'],
+				},
 			}),
 		},
 	},

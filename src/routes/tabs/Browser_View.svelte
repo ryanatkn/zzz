@@ -82,7 +82,7 @@
 			<div class="p_sm">
 				<button
 					type="button"
-					class="plain ml_xs radius_md"
+					class="plain ml_xs border_radius_md"
 					style:width="32px"
 					style:min-width="32px"
 					style:height="32px"
@@ -100,7 +100,7 @@
 			<div class="browser_nav_buttons flex gap_xs">
 				<button
 					type="button"
-					class="icon_button plain p_xs radius_lg"
+					class="icon_button plain p_xs border_radius_lg"
 					title="back"
 					onclick={() => browser.go_back()}
 					disabled
@@ -109,7 +109,7 @@
 				</button>
 				<button
 					type="button"
-					class="icon_button plain p_xs radius_lg"
+					class="icon_button plain p_xs border_radius_lg"
 					title="forward"
 					onclick={() => browser.go_forward()}
 					disabled
@@ -118,7 +118,7 @@
 				</button>
 				<button
 					type="button"
-					class="icon_button plain p_xs radius_lg"
+					class="icon_button plain p_xs border_radius_lg"
 					title="refresh"
 					onclick={() => browser.refresh()}
 				>
@@ -131,7 +131,7 @@
 				<input
 					type="text"
 					bind:value={browser.edited_url}
-					class="w_100 plain radius_lg"
+					class="w_100 plain border_radius_lg"
 					onkeypress={(e) => {
 						if (e.key === 'Enter') {
 							browser.submit_edited_url();

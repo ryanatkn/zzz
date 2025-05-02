@@ -98,7 +98,7 @@
 						{@const models_with_tag = zzz.models.filter_by_tag(tag)}
 						<button
 							type="button"
-							class="w_100 size_sm py_xs3 justify_content_space_between plain radius_xs font_weight_600"
+							class="w_100 size_sm py_xs3 justify_content_space_between plain border_radius_xs font_weight_600"
 							style:min-height="0"
 							onclick={() => {
 								chat.add_tapes_by_model_tag(tag);
@@ -122,7 +122,7 @@
 							attrs={{
 								disabled: !tapes_with_tag.length,
 								class:
-									'w_100 size_sm py_xs3 justify_content_space_between plain radius_xs font_weight_600',
+									'w_100 size_sm py_xs3 justify_content_space_between plain border_radius_xs font_weight_600',
 								style: 'min-height: 0;',
 							}}
 							onconfirm={() => {

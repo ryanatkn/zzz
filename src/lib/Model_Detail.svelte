@@ -119,7 +119,7 @@
 						></pre>
 				{:else}
 					<p>
-						<small class="bg_e_1 px_sm radius_xs">not downloaded</small>
+						<small class="bg_e_1 px_sm border_radius_xs">not downloaded</small>
 						<!-- TODO add a button to download it -->
 					</p>
 				{/if}

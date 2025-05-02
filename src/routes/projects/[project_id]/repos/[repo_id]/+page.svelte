@@ -1,0 +1,142 @@
+<script lang="ts">
+	import {swallow} from '@ryanatkn/belt/dom.js';
+
+	import {projects_context} from '$routes/projects/projects.svelte.js';
+	import Project_Sidebar from '$routes/projects/Project_Sidebar.svelte';
+	import Section_Sidebar from '$routes/projects/Section_Sidebar.svelte';
+	import Repos_Sidebar from '$routes/projects/Repos_Sidebar.svelte';
+	import {GLYPH_DELETE, GLYPH_ADD} from '$lib/glyphs.js';
+	import Glyph from '$lib/Glyph.svelte';
+	import Project_Not_Found from '$routes/projects/Project_Not_Found.svelte';
+	import Repo_Checkout_Item from '$routes/projects/Repo_Checkout_Item.svelte';
+
+	const projects = projects_context.get();
+
+	const repos_viewmodel = $derived(projects.current_repos_viewmodel);
+
+	const add_tag = (dir_index: number, tag: string) => {
+		if (!repos_viewmodel || !tag.trim()) return;
+		const checkout_dir = repos_viewmodel.checkouts[dir_index];
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+		if (checkout_dir && !checkout_dir.tags.includes(tag)) {
+			checkout_dir.tags.push(tag);
+		}
+	};
+
+	const remove_tag = (dir_index: number, tag_index: number) => {
+		if (!repos_viewmodel) return;
+		const checkout_dir = repos_viewmodel.checkouts[dir_index];
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+		if (checkout_dir) {
+			checkout_dir.tags.splice(tag_index, 1);
+		}
+	};
+
+	const project = $derived(projects.current_project);
+</script>
+
+<div class="repo_layout">
+	<!-- TODO @many refactor for better component instance stability for e.g. transitions -->
+	<Project_Sidebar />
+	{#if project}
+		<Section_Sidebar {project} section="repos" />
+		<Repos_Sidebar />
+	{/if}
+
+	<div class="repo_content">
+		{#if project && repos_viewmodel}
+			<div class="p_lg">
+				<h1 class="mb_lg">Edit repo</h1>
+
+				<div class="panel p_md width_md">
+					<form
+						onsubmit={(e) => {
+							swallow(e);
+							repos_viewmodel.save_repo_settings();
+						}}
+					>
+						<div class="mb_lg">
+							<label>
+								<h3 class="mt_0 mb_sm">Git url</h3>
+								<input type="text" bind:value={repos_viewmodel.git_url} class="w_100" />
+							</label>
+							<p>
+								Enter the git URL, e.g. https://github.com/username/repo or
+								git@github.com:username/repo.git
+							</p>
+						</div>
+
+						{#if repos_viewmodel.repo}
+							<p>
+								<small>created {new Date(repos_viewmodel.repo.created).toLocaleString()}</small>
+								<br />
+								<small>updated {new Date(repos_viewmodel.repo.updated).toLocaleString()}</small>
+							</p>
+						{/if}
+
+						<div class="mb_lg">
+							<h3 class="mt_0 mb_sm">Checkouts</h3>
+
+							{#if repos_viewmodel.checkouts.length === 0}
+								<p class="mb_md">no checkouts yet</p>
+							{:else}
+								{#each repos_viewmodel.checkouts as checkout, i (checkout.id)}
+									<Repo_Checkout_Item
+										{checkout}
+										index={i}
+										on_remove={(index) => repos_viewmodel.remove_checkout_dir(index)}
+										on_add_tag={add_tag}
+										on_remove_tag={remove_tag}
+									/>
+								{/each}
+							{/if}
+
+							<div class="mt_md">
+								<button
+									type="button"
+									class="color_b"
+									onclick={() => repos_viewmodel.add_checkout_dir()}
+								>
+									<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> add checkout
+								</button>
+							</div>
+						</div>
+
+						<div class="w_100 flex justify_content_space_between gap_sm">
+							<div>
+								<button
+									type="submit"
+									class="color_a"
+									disabled={repos_viewmodel.repo && !repos_viewmodel.has_changes}
+								>
+									{repos_viewmodel.repo ? 'save changes' : 'add repo'}
+								</button>
+							</div>
+
+							{#if repos_viewmodel.repo}
+								<button type="button" class="color_c" onclick={() => repos_viewmodel.remove_repo()}>
+									<Glyph glyph={GLYPH_DELETE} attrs={{class: 'mr_xs2'}} /> delete repo
+								</button>
+							{/if}
+						</div>
+					</form>
+				</div>
+			</div>
+		{:else}
+			<Project_Not_Found />
+		{/if}
+	</div>
+</div>
+
+<style>
+	.repo_layout {
+		display: flex;
+		height: 100%;
+		overflow: hidden;
+	}
+
+	.repo_content {
+		flex: 1;
+		overflow: auto;
+	}
+</style>

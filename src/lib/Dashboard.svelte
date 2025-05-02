@@ -162,9 +162,9 @@
 	<!-- TODO shortcut key -->
 	<button
 		type="button"
-		class="fixed b_0 l_0 icon_button plain radius_xs2"
+		class="fixed b_0 l_0 icon_button plain border_radius_xs2"
 		style:border-bottom-left-radius="0"
-		style:border-top-right-radius="var(--radius_lg)"
+		style:border-top-right-radius="var(--border_radius_lg)"
 		aria-label={sidebar_button_title}
 		title={sidebar_button_title}
 		onclick={() => zzz.ui.toggle_sidebar()}

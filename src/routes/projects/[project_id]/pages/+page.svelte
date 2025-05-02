@@ -7,6 +7,7 @@
 	import Pages_Sidebar from '$routes/projects/Pages_Sidebar.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 	import {GLYPH_ADD} from '$lib/glyphs.js';
+	import Project_Not_Found from '$routes/projects/Project_Not_Found.svelte';
 
 	const projects = projects_context.get();
 
@@ -16,9 +17,12 @@
 </script>
 
 <div class="project_layout">
+	<!-- TODO @many refactor for better component instance stability for e.g. transitions -->
 	<Project_Sidebar />
-	<Section_Sidebar section="pages" />
-	<Pages_Sidebar />
+	{#if projects.current_project}
+		<Section_Sidebar project={projects.current_project} section="pages" />
+		<Pages_Sidebar />
+	{/if}
 
 	<div class="project_content">
 		{#if project_viewmodel?.project}
@@ -74,9 +78,7 @@
 				{/if}
 			</div>
 		{:else}
-			<div class="p_lg text_align_center">
-				<p>Project not found.</p>
-			</div>
+			<Project_Not_Found />
 		{/if}
 	</div>
 </div>

@@ -49,6 +49,21 @@ export const create_sample_projects = (zzz: Zzz): Array<Project> => {
 						updated: '2023-02-01T11:15:00Z',
 					},
 				],
+				repos: [
+					{
+						id: create_uuid(),
+						git_url: 'https://github.com/ryanatkn/zzz.git',
+						checkouts: [
+							{
+								path: './zzz/',
+								label: 'Development',
+								tags: ['main', 'dev'],
+							},
+						],
+						created: '2023-01-15T12:05:00Z',
+						updated: '2023-01-16T09:30:00Z',
+					},
+				],
 			},
 		}),
 		new Project({
@@ -97,6 +112,26 @@ export const create_sample_projects = (zzz: Zzz): Array<Project> => {
 						updated: '2023-02-15T09:45:00Z',
 					},
 				],
+				repos: [
+					{
+						id: create_uuid(),
+						git_url: 'https://github.com/ryanatkn/dealt.git',
+						checkouts: [
+							{
+								path: './dealt/',
+								label: 'Development',
+								tags: ['main', 'dev'],
+							},
+							{
+								path: './dealt_prod/',
+								label: 'Production',
+								tags: ['deploy', 'prod'],
+							},
+						],
+						created: '2023-02-10T10:00:00Z',
+						updated: '2023-03-01T14:20:00Z',
+					},
+				],
 			},
 		}),
 		new Project({
@@ -118,6 +153,7 @@ export const create_sample_projects = (zzz: Zzz): Array<Project> => {
 					},
 				],
 				pages: [],
+				repos: [],
 			},
 		}),
 	];

@@ -4,20 +4,26 @@
 	import {projects_context} from '$routes/projects/projects.svelte.js';
 	import Project_Sidebar from '$routes/projects/Project_Sidebar.svelte';
 	import Section_Sidebar from '$routes/projects/Section_Sidebar.svelte';
+	import Project_Not_Found from '$routes/projects/Project_Not_Found.svelte';
 
 	const projects = projects_context.get();
 
 	const project_viewmodel = $derived(projects.current_project_viewmodel);
+
+	const project = $derived(projects.current_project);
 </script>
 
 <div class="project_layout">
+	<!-- TODO @many refactor for better component instance stability for e.g. transitions -->
 	<Project_Sidebar />
-	<Section_Sidebar section="project" />
+	{#if project}
+		<Section_Sidebar {project} section="project" />
+	{/if}
 
 	<div class="project_content">
-		{#if project_viewmodel?.project}
+		{#if project && project_viewmodel}
 			<div class="p_lg">
-				<h1 class="mb_0">{project_viewmodel.project.name}</h1>
+				<h1 class="mb_0">{project.name}</h1>
 				<div>
 					{#if project_viewmodel.editing_project}
 						<div class="flex gap_sm mb_sm">
@@ -61,41 +67,39 @@
 							</label>
 						</div>
 					</div>
-				{:else if project_viewmodel.project.description}
-					<p class="mb_lg width_md">{project_viewmodel.project.description}</p>
+				{:else if project.description}
+					<p class="mb_lg width_md">{project.description}</p>
 				{/if}
 
 				<div class="flex gap_md mb_lg">
 					<span class="chip"
-						>{project_viewmodel.project.pages.length}
-						{project_viewmodel.project.pages.length === 1 ? 'page' : 'pages'}</span
+						>{project.pages.length}
+						{project.pages.length === 1 ? 'page' : 'pages'}</span
 					>
 					<span class="chip"
-						>{project_viewmodel.project.domains.length}
-						{project_viewmodel.project.domains.length === 1 ? 'domain' : 'domains'}</span
+						>{project.domains.length}
+						{project.domains.length === 1 ? 'domain' : 'domains'}</span
 					>
 					<span class="chip"
-						>created {new Date(project_viewmodel.project.created).toLocaleDateString()}</span
+						>{project.repos.length}
+						{project.repos.length === 1 ? 'repo' : 'repos'}</span
 					>
-					<span class="chip"
-						>updated {new Date(project_viewmodel.project.updated).toLocaleDateString()}</span
-					>
+					<span class="chip">created {new Date(project.created).toLocaleDateString()}</span>
+					<span class="chip">updated {new Date(project.updated).toLocaleDateString()}</span>
 				</div>
 
 				<div class="projects_grid">
 					<div class="panel p_md">
 						<h2 class="mt_0 mb_lg">
-							<a href="{base}/projects/{project_viewmodel.project_id}/pages">Pages</a>
+							<a href="{base}/projects/{project.id}/pages">Pages</a>
 						</h2>
-						{#if project_viewmodel.project.pages.length === 0}
+						{#if project.pages.length === 0}
 							<p class="text_color_5">No pages created yet.</p>
 						{:else}
 							<ul class="pages_list">
-								{#each project_viewmodel.project.pages as page (page.id)}
+								{#each project.pages as page (page.id)}
 									<li>
-										<a href="{base}/projects/{project_viewmodel.project_id}/pages/{page.id}"
-											>{page.title}</a
-										>
+										<a href="{base}/projects/{project.id}/pages/{page.id}">{page.title}</a>
 										<span class="text_color_5">{page.path}</span>
 									</li>
 								{/each}
@@ -112,15 +116,15 @@
 
 					<div class="panel p_md">
 						<h2 class="mt_0 mb_lg">
-							<a href="{base}/projects/{project_viewmodel.project_id}/domains">Domains</a>
+							<a href="{base}/projects/{project.id}/domains">Domains</a>
 						</h2>
-						{#if project_viewmodel.project.domains.length === 0}
+						{#if project.domains.length === 0}
 							<p class="text_color_5">No domains configured yet.</p>
 						{:else}
 							<ul class="domains_list">
-								{#each project_viewmodel.project.domains as domain (domain.id)}
+								{#each project.domains as domain (domain.id)}
 									<li>
-										<a href="{base}/projects/{project_viewmodel.project_id}/domains/{domain.id}">
+										<a href="{base}/projects/{project.id}/domains/{domain.id}">
 											<span class="domain_name">{domain.name}</span>
 										</a>
 										<div class="domain_details">
@@ -149,12 +153,42 @@
 							>
 						</div>
 					</div>
+
+					<div class="panel p_md">
+						<h2 class="mt_0 mb_lg">
+							<a href="{base}/projects/{project.id}/repos">Repositories</a>
+						</h2>
+						{#if project.repos.length === 0}
+							<p class="text_color_5">No repositories configured yet.</p>
+						{:else}
+							<ul class="repos_list">
+								{#each project.repos as repo (repo.id)}
+									<li>
+										<a href="{base}/projects/{project.id}/repos/{repo.id}">
+											<span class="repo_url">{repo.git_url || '[new repo]'}</span>
+										</a>
+										<div class="repo_details">
+											<span class="checkout_badge">
+												{repo.checkouts.length}
+												checkout dir{repo.checkouts.length === 1 ? '' : 's'}
+											</span>
+										</div>
+									</li>
+								{/each}
+							</ul>
+						{/if}
+						<div class="mt_md">
+							<button
+								type="button"
+								onclick={() => project_viewmodel.create_new_repo()}
+								class="color_a">+ add repo</button
+							>
+						</div>
+					</div>
 				</div>
 			</div>
 		{:else}
-			<div class="p_lg text_align_center">
-				<p>Project not found.</p>
-			</div>
+			<Project_Not_Found />
 		{/if}
 	</div>
 </div>
@@ -178,36 +212,48 @@
 	}
 
 	.pages_list,
-	.domains_list {
+	.domains_list,
+	.repos_list {
 		list-style: none;
 		padding: 0;
 		margin: var(--size_md) 0;
 	}
 
 	.pages_list li,
-	.domains_list li {
+	.domains_list li,
+	.repos_list li {
 		padding: var(--size_xs) 0;
 		border-bottom: 1px solid var(--border_color_1);
 		display: flex;
 		flex-direction: column;
 	}
 
-	.domain_name {
+	.domain_name,
+	.repo_url {
 		font-family: var(--font_mono);
 		font-weight: 500;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 
-	.domain_details {
+	.domain_details,
+	.repo_details {
 		display: flex;
 		gap: var(--size_xs);
 		margin-top: 4px;
 	}
 
-	.status_badge {
+	.status_badge,
+	.checkout_badge {
 		display: inline-block;
 		padding: 2px 6px;
 		border-radius: 10px;
 		font-size: 0.75em;
+	}
+
+	.checkout_badge {
+		background-color: var(--bg_2);
+		color: var(--text_color_5);
 	}
 
 	.ssl_badge {
