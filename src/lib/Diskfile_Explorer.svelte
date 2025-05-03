@@ -75,7 +75,7 @@
 	{:else}
 		<div class="row h_input_height justify_content_space_between py_xs px_xs">
 			<small class="ellipsis"><Glyph glyph={GLYPH_DIRECTORY} /> {zzz.zzz_dir_pathname}</small>
-			<div class="flex gap_xs2">
+			<div class="display_flex gap_xs2">
 				<Pending_Button
 					pending={TODO_create_file_pending}
 					attrs={{class: 'plain compact'}}

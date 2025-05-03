@@ -25,7 +25,7 @@
 	</div>
 
 	{#if model.tags.length}
-		<ul class="unstyled flex flex_wrap gap_xs mb_md mt_sm">
+		<ul class="unstyled display_flex flex_wrap gap_xs mb_md mt_sm">
 			{#each model.tags as tag (tag)}
 				<small class="chip font_weight_400">{tag}</small>
 			{/each}

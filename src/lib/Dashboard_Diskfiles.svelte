@@ -45,7 +45,7 @@
 	}}
 />
 
-<div class="h_100 flex">
+<div class="h_100 display_flex">
 	<div class="h_100 overflow_hidden width_sm">
 		<Diskfile_Explorer />
 	</div>
@@ -53,14 +53,14 @@
 	<div class="flex_1 column overflow_auto h_100">
 		<!-- Tab Bar -->
 		<ul
-			class="unstyled flex overflow_x_auto scrollbar_width_thin"
+			class="unstyled display_flex overflow_x_auto scrollbar_width_thin"
 			use:tabs_reorderable.list={{
 				onreorder: (from_index, to_index) => editor.reorder_tabs(from_index, to_index),
 			}}
 		>
 			{#each editor.tabs.ordered_tabs as tab, index (tab.id)}
-				<li class="flex py_xs3 px_xs4">
-					<div class="flex" use:tabs_reorderable.item={{index}}>
+				<li class="display_flex py_xs3 px_xs4">
+					<div class="display_flex" use:tabs_reorderable.item={{index}}>
 						<Diskfile_Tab_Listitem
 							{tab}
 							onselect={(tab) => editor.select_tab(tab.id)}
@@ -81,12 +81,12 @@
 				/>
 			{:else}
 				<!-- TODO think this through - maybe the tabs should be more flexible than 1:1 with a diskfile? maybe `Diskfile_Editor_View` should have UI to create a file if there is none? -->
-				<div class="flex align_items_center justify_content_center h_100">
+				<div class="display_flex align_items_center justify_content_center h_100">
 					<p>Something went wrong, this tab has no diskfile</p>
 				</div>
 			{/if}
 		{:else}
-			<div class="flex align_items_center justify_content_center h_100">
+			<div class="display_flex align_items_center justify_content_center h_100">
 				<p>
 					<button
 						type="button"

@@ -64,13 +64,13 @@
 	<div class="browser_chrome">
 		<!-- Tab Bar -->
 		<ul
-			class="browser_tab_bar unstyled flex overflow_x_auto overflow_y_hidden scrollbar_width_thin"
+			class="browser_tab_bar unstyled display_flex overflow_x_auto overflow_y_hidden scrollbar_width_thin"
 			use:tabs_reorderable.list={{
 				onreorder: (from_index, to_index) => browser.reorder_tab(from_index, to_index),
 			}}
 		>
 			{#each browser.tabs.ordered_tabs as tab, index (tab.id)}
-				<li class="flex" use:tabs_reorderable.item={{index}}>
+				<li class="display_flex" use:tabs_reorderable.item={{index}}>
 					<Browser_Tab_Listitem
 						{tab}
 						{index}
@@ -96,8 +96,8 @@
 		</ul>
 
 		<!-- Navigation Controls & Address Bar -->
-		<div class="browser_controls flex gap_sm p_xs4">
-			<div class="browser_nav_buttons flex gap_xs">
+		<div class="browser_controls display_flex gap_sm p_xs4">
+			<div class="browser_nav_buttons display_flex gap_xs">
 				<button
 					type="button"
 					class="icon_button plain p_xs border_radius_lg"
@@ -142,7 +142,7 @@
 			</div>
 
 			<!-- Main Menu -->
-			<div class="flex gap_xs">
+			<div class="display_flex gap_xs">
 				<button
 					type="button"
 					class="icon_button plain p_xs"

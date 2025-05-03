@@ -66,7 +66,7 @@
 />
 
 <div class="column w_100 flex_1">
-	<div class="flex flex_1 gap_xs2 w_100">
+	<div class="display_flex flex_1 gap_xs2 w_100">
 		<textarea
 			{...attrs}
 			class="plain mb_0 w_100 flex_1 {attrs?.class}"
@@ -86,7 +86,7 @@
 	{@render after?.()}
 
 	{#if show_actions && !readonly}
-		<div class="flex mt_xs">
+		<div class="display_flex mt_xs">
 			<Copy_To_Clipboard text={content} attrs={{class: 'plain'}} />
 			<Paste_From_Clipboard
 				onpaste={(value) => {

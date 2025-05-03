@@ -68,7 +68,7 @@
 	};
 </script>
 
-<div class="flex w_100 h_100">
+<div class="display_flex w_100 h_100">
 	<div class="column_fixed">
 		<div class="p_sm pl_0">
 			<div class="row gap_xs2 mb_xs pl_xs2">
@@ -145,8 +145,8 @@
 
 			<div class="column_fluid">
 				<div class="column_bg_1 column gap_md p_sm">
-					<div class="flex justify_content_space_between">
-						<div class="flex flex_wrap gap_xs">
+					<div class="display_flex justify_content_space_between">
+						<div class="display_flex flex_wrap gap_xs">
 							<button type="button" class="plain font_size_sm" onclick={add_text_bit}>
 								<div class="row white_space_nowrap">
 									<Glyph glyph={GLYPH_BIT} attrs={{class: 'mr_xs2'}} /> add text
@@ -178,7 +178,7 @@
 						</div>
 					</div>
 					<ul
-						class="unstyled grid gap_md"
+						class="unstyled display_grid gap_md"
 						style:grid-template-columns="repeat(auto-fill, minmax(300px, 1fr))"
 					>
 						{#each zzz.prompts.selected.bits as bit (bit.id)}
@@ -194,7 +194,7 @@
 			</div>
 		</Contextmenu_Prompt>
 	{:else if zzz.prompts.items.size}
-		<div class="flex align_items_center justify_content_center h_100 flex_1" in:fade>
+		<div class="display_flex align_items_center justify_content_center h_100 flex_1" in:fade>
 			<p>
 				select a prompt from the list or <button
 					type="button"
@@ -215,7 +215,7 @@
 			</p>
 		</div>
 	{:else}
-		<div class="flex align_items_center justify_content_center h_100 flex_1" in:fade>
+		<div class="display_flex align_items_center justify_content_center h_100 flex_1" in:fade>
 			<p>
 				no prompts yet, <button
 					type="button"

@@ -27,7 +27,7 @@
 	<section>
 		<Capabilities_View />
 	</section>
-	<section class="mb_xl7 flex justify_content_center">
+	<section class="mb_xl7 display_flex justify_content_center">
 		<Footer />
 	</section>
 </div>

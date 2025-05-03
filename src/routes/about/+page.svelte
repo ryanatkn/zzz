@@ -22,7 +22,7 @@
 				<Svg
 					data={zzz_logo}
 					fill="var(--text_color)"
-					size="var(--icon_font_size_sm)"
+					size="var(--icon_size_sm)"
 					attrs={{class: 'ml_xs mr_xl'}}
 				/> about
 			</h1>
@@ -225,7 +225,7 @@
 		>
 			<Svg
 				data={zzz_logo}
-				size="var(--icon_font_size_sm)"
+				size="var(--icon_size_sm)"
 				fill={zzz.futuremode ? 'var(--color_h_5)' : 'var(--text_color)'}
 				attrs={{
 					class: 'mr_md' + (zzz.futuremode ? ' flip_x' : ''),
@@ -233,14 +233,14 @@
 				}}
 			/>
 			<span
-				><span class="inline_block text_align_right" style:width="6ch"
+				><span class="display_inline_block text_align_right" style:width="6ch"
 					>{zzz.futuremode ? 'disable' : 'enable'}</span
 				>
 				futuremode</span
 			>
 			<Svg
 				data={zzz_logo}
-				size="var(--icon_font_size_sm)"
+				size="var(--icon_size_sm)"
 				fill={zzz.futuremode ? 'var(--color_h_5)' : 'var(--text_color)'}
 				attrs={{
 					class: 'ml_md' + (zzz.futuremode ? '' : ' flip_x'),

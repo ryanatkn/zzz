@@ -22,7 +22,7 @@
 
 <Contextmenu_Bit {bit}>
 	<div
-		class="bit_summary flex justify_content_space_between gap_xs2 font_size_sm relative panel"
+		class="bit_summary display_flex justify_content_space_between gap_xs2 font_size_sm relative panel"
 		class:dormant={!bit.enabled}
 	>
 		<div class="progress_bar" style:width="{percent}%"></div>
@@ -31,7 +31,7 @@
 			{bit.name}
 			{bit.content_preview}
 		</div>
-		<div class="controls flex gap_xs2">
+		<div class="controls display_flex gap_xs2">
 			<Bit_Toggle_Button {bit} />
 			<Bit_Remove_Button {bit} {prompt} />
 		</div>

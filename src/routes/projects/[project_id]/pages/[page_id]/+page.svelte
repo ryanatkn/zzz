@@ -77,14 +77,14 @@
 			{#if editor && project}
 				<div class="h_100 column p_lg">
 					<div>
-						<div class="flex gap_sm align_items_center">
+						<div class="display_flex gap_sm align_items_center">
 							<h1 class="mb_lg">
 								{editor.current_page?.title || 'Page'}
 							</h1>
 						</div>
 
-						<div class="flex w_100 justify_content_space_between gap_sm mb_lg">
-							<div class="flex gap_sm">
+						<div class="display_flex w_100 justify_content_space_between gap_sm mb_lg">
+							<div class="display_flex gap_sm">
 								<button
 									type="button"
 									onclick={() => editor.save_page()}
@@ -106,7 +106,7 @@
 					</div>
 
 					<div class="panel p_md mb_md">
-						<div class="flex gap_sm">
+						<div class="display_flex gap_sm">
 							<div class="flex_1">
 								<label>
 									Page title

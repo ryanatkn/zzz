@@ -22,7 +22,7 @@
 		<div class="row justify_content_space_between">
 			<div class="flex_1">
 				<div class="font_weight_600">{tape.model_name}</div>
-				<div class="flex gap_xs">
+				<div class="display_flex gap_xs">
 					{#if strip_count > 0}
 						<small
 							>{strip_count} message{strip_count !== 1 ? 's' : ''}, {tape.token_count} token{tape.token_count !==
@@ -34,7 +34,7 @@
 					{/if}
 				</div>
 			</div>
-			<div class="flex gap_xs">
+			<div class="display_flex gap_xs">
 				<Tape_Toggle_Button {tape} />
 				<Confirm_Button
 					onconfirm={() => chat.remove_tape(tape.id)}

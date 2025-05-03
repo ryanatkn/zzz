@@ -50,7 +50,7 @@
 
 <Contextmenu_Tape {tape}>
 	<div {...attrs} class="chat_tape {attrs?.class}" class:empty class:dormant={!tape.enabled}>
-		<div class="flex justify_content_space_between align_items_start">
+		<div class="display_flex justify_content_space_between align_items_start">
 			<header>
 				<div class="font_size_lg">
 					<Model_Link model={tape.model} icon />
@@ -64,7 +64,7 @@
 				>
 			</header>
 			{#if chat.view_mode !== 'simple'}
-				<div class="flex gap_xs">
+				<div class="display_flex gap_xs">
 					<Tape_Toggle_Button {tape} />
 				</div>
 			{/if}

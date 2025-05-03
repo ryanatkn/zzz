@@ -16,7 +16,7 @@
 </script>
 
 <div class="column align_items_start gap_xs">
-	<div class="flex align_items_center gap_xs2 w_100">
+	<div class="display_flex align_items_center gap_xs2 w_100">
 		<label
 			class="row mb_0 pr_md"
 			title="when enabled, the prompt's content will be wrapped with the xml tag '{bit.xml_tag_name ||

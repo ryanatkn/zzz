@@ -120,14 +120,14 @@
 
 <div class="message_queue_container">
 	<!-- Header with message count and action buttons -->
-	<div class="flex justify_content_space_between align_items_center mb_sm">
+	<div class="display_flex justify_content_space_between align_items_center mb_sm">
 		<span class="chip {type === 'queued' ? 'color_e' : 'color_c'}">
 			{type}: {queued_messages_count}
 		</span>
 
-		<div class="flex gap_xs">
+		<div class="display_flex gap_xs">
 			{#if selected_count > 0}
-				<div class="flex gap_xs align_items_center">
+				<div class="display_flex gap_xs align_items_center">
 					<span class="chip font_size_sm">{selected_count} selected</span>
 
 					{#if socket.connected}
@@ -179,7 +179,7 @@
 						: ''}"
 				>
 					<!-- Message header with metadata and actions -->
-					<div class="flex gap_xs align_items_center flex_wrap">
+					<div class="display_flex gap_xs align_items_center flex_wrap">
 						<input
 							type="checkbox"
 							class="m_0 plain compact font_size_md"
@@ -188,7 +188,7 @@
 						/>
 
 						<!-- Message type information -->
-						<div class="font_family_mono flex_1 flex flex_wrap align_items_center gap_xs">
+						<div class="font_family_mono flex_1 display_flex flex_wrap align_items_center gap_xs">
 							<small class="chip">{message_type}</small>
 
 							<Copy_To_Clipboard
@@ -234,7 +234,7 @@
 
 						<span class="font_size_sm">{format_timestamp(message.created)}</span>
 
-						<div class="flex gap_xs">
+						<div class="display_flex gap_xs">
 							<!-- Message details in popover -->
 							<Popover_Button
 								position="left"
@@ -251,7 +251,7 @@
 										style:border-radius="var(--border_radius_xs)"
 										style:z-index="100"
 									>
-										<div class="flex justify_content_space_between mb_xs">
+										<div class="display_flex justify_content_space_between mb_xs">
 											<h3 class="mt_xs">message details</h3>
 											<button
 												type="button"
@@ -294,12 +294,12 @@
 					<!-- Failed message details -->
 					{#if type === 'failed'}
 						{@const failed_message = message as Failed_Message}
-						<div class="flex flex_column font_size_xs mt_xs">
-							<div class="flex justify_content_space_between mb_xs">
+						<div class="display_flex flex_column font_size_xs mt_xs">
+							<div class="display_flex justify_content_space_between mb_xs">
 								<span>Failed at:</span>
 								<span class="font_family_mono">{format(failed_message.failed, 'HH:mm:ss')}</span>
 							</div>
-							<div class="flex justify_content_space_between">
+							<div class="display_flex justify_content_space_between">
 								<span>Reason:</span>
 								<span class="font_family_mono color_c">{failed_message.reason}</span>
 							</div>

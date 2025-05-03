@@ -72,7 +72,7 @@
 
 <div class="mb_xs">
 	{#if diskfile}
-		<small class="mb_xs block formatted">
+		<small class="mb_xs display_block formatted">
 			{diskfile.path_relative}
 		</small>
 	{/if}

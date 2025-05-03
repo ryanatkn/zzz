@@ -20,7 +20,7 @@
 
 <div
 	class="chip plain flex_1 font_size_xl px_xl flex_column mb_xl"
-	style:display="flex !important"
+	style:display="display_flex !important"
 	style:align-items="flex-start !important"
 	style:font-weight="400 !important"
 	class:color_b={capabilities.filesystem.status === 'success'}

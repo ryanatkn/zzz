@@ -38,7 +38,7 @@
 							</div>
 						{/each}
 					</div>
-					<div class="flex gap_md">
+					<div class="display_flex gap_md">
 						<small class="chip"
 							>{project.pages.length} {project.pages.length === 1 ? 'page' : 'pages'}</small
 						>
@@ -49,7 +49,7 @@
 		</div>
 	{/if}
 
-	<div class="flex justify_content_between mt_lg">
+	<div class="display_flex justify_content_between mt_lg">
 		<button type="button" class="color_a" onclick={() => projects.create_new_project()}>
 			<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new project
 		</button>

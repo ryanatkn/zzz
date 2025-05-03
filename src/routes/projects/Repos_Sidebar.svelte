@@ -14,7 +14,7 @@
 
 <aside class="h_100 overflow_y_auto unstyled width_xs p_xs">
 	{#if project_viewmodel}
-		<div class="flex">
+		<div class="display_flex">
 			<button
 				type="button"
 				class="plain justify_content_start flex_1"

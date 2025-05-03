@@ -57,7 +57,7 @@
 </script>
 
 <Contextmenu_Diskfile {diskfile}>
-	<div class="flex h_100">
+	<div class="display_flex h_100">
 		<div class="flex_1 min_width_sm h_100 column">
 			<Content_Editor
 				bind:this={content_editor}

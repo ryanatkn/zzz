@@ -93,7 +93,7 @@
 			<nav class="font_size_lg">
 				{#each dashboard_nav_items as section (section.group)}
 					{#if section.group === 'main'}
-						<div class="flex p_sm mb_sm">
+						<div class="display_flex p_sm mb_sm">
 							<Nav_Link
 								href="{base}/"
 								attrs={{
@@ -117,7 +117,7 @@
 							>
 								<Svg
 									data={zzz_logo}
-									size="var(--icon_font_size_md)"
+									size="var(--icon_size_md)"
 									fill={zzz.futuremode ? 'var(--color_h_5)' : undefined}
 									attrs={{
 										style: 'transition: transform 200ms ease',
@@ -144,7 +144,7 @@
 											<Svg
 												data={link.icon}
 												fill={selected ? 'var(--link_color)' : 'var(--text_color_1)'}
-												size="var(--icon_font_size_xs)"
+												size="var(--icon_size_xs)"
 											/>
 										</span>
 										{link.label}

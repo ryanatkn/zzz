@@ -13,7 +13,7 @@
 </script>
 
 <div class="font_family_mono font_size_sm">
-	<div class="flex justify_content_space_between">
+	<div class="display_flex justify_content_space_between">
 		<div>
 			chars
 			{editor_state.original_length}
@@ -30,7 +30,7 @@
 			</div>
 		{/if}
 	</div>
-	<div class="flex justify_content_space_between">
+	<div class="display_flex justify_content_space_between">
 		<div>
 			tokens
 			{editor_state.original_token_count}

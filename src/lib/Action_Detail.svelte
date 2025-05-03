@@ -28,7 +28,7 @@
 		{/if}
 		<small class="color_subtle ml_xs">{action.direction}</small>
 	</div>
-	<div class="flex flex_column gap_xs mt_sm">
+	<div class="display_flex flex_column gap_xs mt_sm">
 		<small class="font_family_mono">id: {action.id}</small>
 		<small class="font_family_mono"
 			>created {action.created_formatted_date} {action.created_formatted_time}</small
@@ -38,7 +38,7 @@
 	</div>
 </div>
 
-<div class="flex gap_md mb_sm">
+<div class="display_flex gap_md mb_sm">
 	<Copy_To_Clipboard text={JSON.stringify(action.json, null, 2)} attrs={{class: 'plain'}} />
 </div>
 
@@ -58,7 +58,7 @@
 				.prompt_data?.prompt || 'No prompt'}</pre>
 
 		<h3>Request details</h3>
-		<div class="flex flex_column gap_xs">
+		<div class="display_flex flex_column gap_xs">
 			<div class="field_row">
 				<div class="font_weight_600 color_text_subtle">Model</div>
 				<div>{action.prompt_data?.model || 'Unknown'}</div>
@@ -93,7 +93,7 @@
 				'No completion'}</pre>
 
 		<h3>Response details</h3>
-		<div class="flex flex_column gap_xs">
+		<div class="display_flex flex_column gap_xs">
 			<div class="field_row">
 				<div class="font_weight_600 color_text_subtle">Request id</div>
 				<div class="font_family_mono">{action.completion_data?.request_id || 'Unknown'}</div>
@@ -152,7 +152,7 @@
 {:else if action.is_file_related}
 	<section class="pb_md border_bottom">
 		<h3>file information</h3>
-		<div class="flex flex_column gap_xs">
+		<div class="display_flex flex_column gap_xs">
 			{#if action.path}
 				<div class="field_row">
 					<div class="font_weight_600 color_text_subtle">Path</div>

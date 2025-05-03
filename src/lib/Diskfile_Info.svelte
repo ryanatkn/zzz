@@ -19,7 +19,7 @@
 	const zzz = zzz_context.get();
 </script>
 
-<div class="flex flex_column gap_xs w_100">
+<div class="display_flex flex_column gap_xs w_100">
 	<small class="overflow_wrap_break_all w_100">
 		<Glyph glyph={GLYPH_FILE} />{zzz.diskfiles.to_relative_path(diskfile.path)}
 	</small>

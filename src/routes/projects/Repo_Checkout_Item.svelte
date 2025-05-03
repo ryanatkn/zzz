@@ -20,7 +20,7 @@
 <div class="panel p_sm mb_md">
 	<div class="mb_sm">
 		<label>
-			<span class="block mb_xs">Path</span>
+			<span class="display_block mb_xs">Path</span>
 			<input
 				type="text"
 				bind:value={checkout.path}
@@ -32,7 +32,7 @@
 
 	<div class="mb_sm">
 		<label>
-			<span class="block mb_xs">Label</span>
+			<span class="display_block mb_xs">Label</span>
 			<input
 				type="text"
 				bind:value={checkout.label}
@@ -43,10 +43,10 @@
 	</div>
 
 	<div class="mb_sm">
-		<span class="block mb_xs">Tags</span>
-		<div class="flex flex_wrap gap_xs mb_xs">
+		<span class="display_block mb_xs">Tags</span>
+		<div class="display_flex flex_wrap gap_xs mb_xs">
 			{#each checkout.tags as tag, tag_index (tag_index)}
-				<span class="chip color_e flex align_items_center">
+				<span class="chip color_e display_flex align_items_center">
 					{tag}
 					<button
 						type="button"
@@ -57,7 +57,7 @@
 				</span>
 			{/each}
 		</div>
-		<div class="flex gap_xs">
+		<div class="display_flex gap_xs">
 			<input
 				type="text"
 				bind:value={tag_input}
@@ -81,7 +81,7 @@
 		</div>
 	</div>
 
-	<div class="flex justify_content_end">
+	<div class="display_flex justify_content_end">
 		<button type="button" class="color_c" onclick={() => on_remove(index)}>
 			<Glyph glyph={GLYPH_DELETE} attrs={{class: 'mr_xs2'}} /> delete checkout
 		</button>

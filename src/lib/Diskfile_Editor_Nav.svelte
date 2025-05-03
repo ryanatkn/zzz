@@ -116,7 +116,7 @@
 	};
 </script>
 
-<div class="browser_nav flex gap_xs">
+<div class="browser_nav display_flex gap_xs">
 	<button
 		type="button"
 		class="icon_button plain p_xs border_radius_lg"

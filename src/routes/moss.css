@@ -239,14 +239,8 @@ a.chip {
 .inline {
 	display: inline;
 }
-.inline_block {
-	display: inline-block;
-}
 .inline_flex {
 	display: inline-flex;
-}
-.block {
-	display: block;
 }
 .flex {
 	display: flex;
@@ -280,9 +274,6 @@ a.chip {
 }
 .justify_content_space_between {
 	justify-content: space-between;
-}
-.grid {
-	display: grid;
 }
 .flip_x {
 	transform: scaleX(-1);

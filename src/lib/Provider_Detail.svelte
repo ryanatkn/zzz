@@ -21,8 +21,8 @@
 </script>
 
 <div {...attrs} class="panel p_lg {attrs?.class}">
-	<div class="flex mb_lg">
-		<Provider_Logo name={provider.name} size="var(--icon_font_size_xl)" fill={null} />
+	<div class="display_flex mb_lg">
+		<Provider_Logo name={provider.name} size="var(--icon_size_xl)" fill={null} />
 		<div class="pl_xl">
 			{#if at_detail_page}
 				<h1 class="mb_md">
@@ -48,7 +48,7 @@
 		</div>
 	</div>
 	<section>
-		<ul class="flex flex_wrap unstyled gap_md">
+		<ul class="display_flex flex_wrap unstyled gap_md">
 			{#each provider.models as model (model)}
 				<Model_Summary {model} />
 			{/each}

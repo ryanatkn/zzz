@@ -31,7 +31,7 @@
 					<footer>
 						<a class="row p_md" href="{base}/about">
 							<span class="font_size_lg mr_md">about</span>
-							<Svg data={zzz_logo} size="var(--icon_font_size_md)" />
+							<Svg data={zzz_logo} size="var(--icon_size_md)" />
 						</a>
 					</footer>
 				</section>

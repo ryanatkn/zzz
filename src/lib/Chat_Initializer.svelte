@@ -49,7 +49,7 @@
 	<h2 class="mt_0 mb_lg">{heading}</h2>
 {/if}
 
-<div class="flex">
+<div class="display_flex">
 	<section class="width_md min_width_sm">
 		<h3 class="mt_0 mb_lg">with model</h3>
 		<Model_Picker
@@ -74,7 +74,7 @@
 				>
 					<div>
 						<div class="font_size_lg mb_sm">{chat_template.name}</div>
-						<div class="flex flex_wrap gap_xs2">
+						<div class="display_flex flex_wrap gap_xs2">
 							{#each chat_template.model_names as model_name (model_name)}
 								<small class="chip">{model_name}</small>
 							{/each}

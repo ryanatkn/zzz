@@ -15,7 +15,7 @@
 
 <span
 	{...attrs}
-	class="glyph inline_block text_align_center line_height_1 white_space_nowrap font_weight_400 {attrs?.class}"
+	class="glyph display_inline_block text_align_center line_height_1 white_space_nowrap font_weight_400 {attrs?.class}"
 	style:width={size ?? DEFAULT_SIZE}
 	style:height={size ?? DEFAULT_SIZE}
 	style:font-size={size ?? DEFAULT_FONT_SIZE}>{glyph}</span

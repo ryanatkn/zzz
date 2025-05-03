@@ -32,12 +32,12 @@
 	// TODO custom buttons section - including quick local, smartest all, all, etc - custom buttons to do common things, compose them with buttons like "fill all" or "fill with tag" or at least drag
 </script>
 
-<div class="flex_1 h_100 flex align_items_start">
+<div class="flex_1 h_100 display_flex align_items_start">
 	<div class="column_fixed">
 		{#if selected_chat}
 			<section class="column_section" transition:slide>
 				<!-- TODO needs work -->
-				<div class="flex justify_content_space_between">
+				<div class="display_flex justify_content_space_between">
 					<div class="font_size_lg">
 						<Glyph glyph={GLYPH_CHAT} />
 						{selected_chat.name}

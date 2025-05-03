@@ -12,7 +12,7 @@
 	<h1><Glyph glyph={GLYPH_LOG} /> system log</h1>
 
 	<div
-		class="flex_1 grid mt_md overflow_hidden"
+		class="flex_1 display_grid mt_md overflow_hidden"
 		style:grid-template-columns="320px 1fr"
 		style:gap="var(--space_md)"
 	>
@@ -30,7 +30,7 @@
 			{#if selected_action}
 				<Action_Detail action={selected_action} />
 			{:else}
-				<div class="flex align_items_center justify_content_center h_100">
+				<div class="display_flex align_items_center justify_content_center h_100">
 					<p>select an action from the list to view its details</p>
 				</div>
 			{/if}

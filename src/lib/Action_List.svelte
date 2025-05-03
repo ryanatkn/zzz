@@ -51,7 +51,7 @@
 				}}
 				transition:slide
 			>
-				<div class="font_weight_400 flex align_items_center gap_xs w_100">
+				<div class="font_weight_400 display_flex align_items_center gap_xs w_100">
 					<Glyph glyph={get_icon_for_action_type(action.type)} />
 					<Glyph glyph={get_direction_icon(action.direction)} />
 					<span class="font_family_mono flex_1">{action.type}</span>
@@ -61,11 +61,11 @@
 				{#if selected && action.data}
 					<div class="mt_xs">
 						{#if action.is_prompt}
-							<small class="mb_xs2 block">Prompt:</small>
+							<small class="mb_xs2 display_block">Prompt:</small>
 							<pre
 								class="font_family_mono font_size_xs white_space_pre_wrap word_break_break_word m_0 p_xs2">{action.prompt_preview}</pre>
 						{:else if action.is_completion}
-							<small class="mb_xs2 block">Response:</small>
+							<small class="mb_xs2 display_block">Response:</small>
 							<pre
 								class="font_family_mono font_size_xs white_space_pre_wrap word_break_break_word m_0 p_xs2">{action.completion_preview}</pre>
 						{/if}

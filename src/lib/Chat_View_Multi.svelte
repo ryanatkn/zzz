@@ -61,7 +61,7 @@
 			</Pending_Button>
 		</Content_Editor>
 
-		<div class="flex mt_lg">
+		<div class="display_flex mt_lg">
 			<button type="button" class="plain" onclick={() => (show_model_picker = true)}>
 				<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> add tape
 			</button>
@@ -90,7 +90,7 @@
 <div class="column_fixed">
 	<div>
 		<!-- TODO add user-customizable sets of models -->
-		<div class="flex">
+		<div class="display_flex">
 			<div class="flex_1 p_xs">
 				<header class="font_size_lg text_align_center mb_xs">add by tag</header>
 				<menu class="unstyled column">

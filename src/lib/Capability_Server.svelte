@@ -18,7 +18,7 @@
 	});
 </script>
 
-<div class="flex flex_column gap_sm">
+<div class="display_flex flex_column gap_sm">
 	<div
 		class="w_100 chip flex_1 px_xl plain justify_content_space_between"
 		style:padding="0 var(--space_xl) !important"
@@ -75,7 +75,7 @@
 			<Glyph glyph={GLYPH_CONNECT} size="var(--font_size_xl)" />
 			<span class="font_size_lg font_weight_400 ml_md">
 				{#if capabilities.server.status === 'pending'}
-					<div class="inline_flex align_items_end">
+					<div class="display_inline_flex align_items_end">
 						checking <div class="relative"><Pending_Animation /></div>
 					</div>
 				{:else}

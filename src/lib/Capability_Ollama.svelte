@@ -27,11 +27,11 @@
 	});
 </script>
 
-<div class="flex flex_column gap_md">
-	<div class="flex gap_sm align_items_start">
+<div class="display_flex flex_column gap_md">
+	<div class="display_flex gap_sm align_items_start">
 		<div
 			class="flex_1 chip plain flex_1 font_size_xl flex_column"
-			style:display="flex !important"
+			style:display="display_flex !important"
 			style:align-items="flex-start !important"
 			style:font-weight="400 !important"
 			class:color_b={capabilities.ollama.status === 'success'}
@@ -71,7 +71,7 @@
 		</div>
 	{/if}
 
-	<div class="flex justify_content_space_between gap_md">
+	<div class="display_flex justify_content_space_between gap_md">
 		<button
 			type="button"
 			class="flex_1 justify_content_start"
@@ -84,7 +84,7 @@
 			/>
 			<span class="font_size_lg font_weight_400 ml_md">
 				{#if capabilities.ollama.status === 'pending'}
-					<div class="inline_flex align_items_end">
+					<div class="display_inline_flex align_items_end">
 						checking <div class="relative"><Pending_Animation /></div>
 					</div>
 				{:else if capabilities.ollama.status === 'success'}

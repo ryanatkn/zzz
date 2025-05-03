@@ -35,12 +35,12 @@
 </script>
 
 <div class="row justify_content_space_between mb_xs">
-	<div class="flex gap_xs">
+	<div class="display_flex gap_xs">
 		<button type="button" class="plain compact" onclick={() => (show_bit_picker = true)}>
 			<Glyph glyph={GLYPH_BIT} /> add bit
 		</button>
 	</div>
-	<small class="font_family_mono block">
+	<small class="font_family_mono display_block">
 		{sequence_bit.items.length} bit{sequence_bit.items.length !== 1 ? 's' : ''}
 	</small>
 </div>

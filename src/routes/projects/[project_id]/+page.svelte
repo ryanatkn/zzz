@@ -26,7 +26,7 @@
 				<h1 class="mb_0">{project.name}</h1>
 				<div>
 					{#if project_viewmodel.editing_project}
-						<div class="flex gap_sm mb_sm">
+						<div class="display_flex gap_sm mb_sm">
 							<button
 								type="button"
 								class="color_a"
@@ -71,7 +71,7 @@
 					<p class="mb_lg width_md">{project.description}</p>
 				{/if}
 
-				<div class="flex gap_md mb_lg">
+				<div class="display_flex gap_md mb_lg">
 					<span class="chip"
 						>{project.pages.length}
 						{project.pages.length === 1 ? 'page' : 'pages'}</span

@@ -71,16 +71,16 @@
 </script>
 
 <!-- Main control section with flex layout for wide screens -->
-<div class="flex flex_wrap gap_xl mb_md">
+<div class="display_flex flex_wrap gap_xl mb_md">
 	<!-- Left column: Connection status and controls -->
 	<div class="flex_1 min_width_sm">
 		<!-- Status display -->
 
 		<!-- URL input and connect/disconnect -->
-		<div class="flex flex_column gap_sm mb_sm">
+		<div class="display_flex flex_column gap_sm mb_sm">
 			<div
 				class="chip plain flex_1 font_size_xl px_xl flex_column"
-				style:display="flex !important"
+				style:display="display_flex !important"
 				style:align-items="flex-start !important"
 				style:font-weight="400 !important"
 				class:color_b={capabilities.websocket.status === 'success' && socket.connected}
@@ -107,7 +107,7 @@
 			</div>
 
 			<fieldset class="mb_0">
-				<div class="flex gap_xs mb_sm">
+				<div class="display_flex gap_xs mb_sm">
 					<input
 						type="text"
 						class="plain flex_1"
@@ -133,7 +133,7 @@
 					</button>
 				</div>
 
-				<div class="flex justify_content_space_between gap_md">
+				<div class="display_flex justify_content_space_between gap_md">
 					<button
 						type="button"
 						class="flex_1 justify_content_start"
@@ -165,7 +165,7 @@
 						/>
 						<span class="font_size_lg font_weight_400 ml_md">
 							{#if !BROWSER}
-								<div class="inline_flex align_items_end">
+								<div class="display_inline_flex align_items_end">
 									loading <div class="relative"><Pending_Animation /></div>
 								</div>
 							{:else if socket.connected}
@@ -173,7 +173,7 @@
 									? 'reconnect websocket'
 									: 'disconnect websocket'}
 							{:else if socket.status === 'pending'}
-								<div class="inline_flex align_items_end">
+								<div class="display_inline_flex align_items_end">
 									connecting <div class="relative"><Pending_Animation /></div>
 								</div>
 							{:else}
@@ -186,7 +186,7 @@
 
 			<div>
 				<div class="column align_items_start">
-					<label class="flex gap_xs align_items_center">
+					<label class="display_flex gap_xs align_items_center">
 						<input
 							type="checkbox"
 							class="compact font_size_sm"
@@ -239,18 +239,18 @@
 
 	<!-- Right column: Config sliders -->
 	<div class="flex_1 min_width_sm p_sm border_radius_xs">
-		<div class="flex flex_column gap_sm">
+		<div class="display_flex flex_column gap_sm">
 			<div class="row">
 				<label
 					for="heartbeat_interval_{pid}"
-					class="block white_space_nowrap mb_xs"
+					class="display_block white_space_nowrap mb_xs"
 					style:width="170px"
 					style:min-width="170px"
 				>
 					<div>heartbeat interval</div>
 					<small>{format_ms_to_readable(socket.heartbeat_interval)}</small>
 				</label>
-				<div class="flex gap_xs">
+				<div class="display_flex gap_xs">
 					<input
 						type="range"
 						min="10000"
@@ -271,14 +271,14 @@
 			<div class="row">
 				<label
 					for="reconnect_delay_{pid}"
-					class="block white_space_nowrap mb_xs"
+					class="display_block white_space_nowrap mb_xs"
 					style:width="170px"
 					style:min-width="170px"
 				>
 					<div>reconnect delay</div>
 					<small>{format_ms_to_readable(socket.reconnect_delay, 1)}</small>
 				</label>
-				<div class="flex gap_xs">
+				<div class="display_flex gap_xs">
 					<input
 						type="range"
 						min="100"
@@ -299,14 +299,14 @@
 			<div class="row">
 				<label
 					for="reconnect_delay_max_{pid}"
-					class="block white_space_nowrap mb_xs"
+					class="display_block white_space_nowrap mb_xs"
 					style:width="170px"
 					style:min-width="170px"
 				>
 					<div>max reconnect delay</div>
 					<small>{format_ms_to_readable(socket.reconnect_delay_max)}</small>
 				</label>
-				<div class="flex gap_xs">
+				<div class="display_flex gap_xs">
 					<input
 						type="range"
 						min="1000"
@@ -324,7 +324,7 @@
 				</div>
 			</div>
 
-			<div class="flex justify_content_end">
+			<div class="display_flex justify_content_end">
 				<Confirm_Button
 					onconfirm={reset_to_defaults}
 					attrs={{class: 'plain font_size_sm compact font_weight_600'}}
@@ -350,22 +350,22 @@
 	</div>
 </div>
 
-<div class="flex gap_xl5">
+<div class="display_flex gap_xl5">
 	<!-- Connection Stats with retries included -->
 	<div class="width_xs mt_md border_top pt_md">
-		<div class="flex flex_column gap_sm mb_sm">
+		<div class="display_flex flex_column gap_sm mb_sm">
 			{#if socket.reconnect_count > 0}
-				<div class="flex justify_content_space_between" transition:slide>
+				<div class="display_flex justify_content_space_between" transition:slide>
 					<small>reconnection attempts:</small>
 					<span class="font_weight_600">{socket.reconnect_count}</span>
 				</div>
-				<div class="flex justify_content_space_between" transition:slide>
+				<div class="display_flex justify_content_space_between" transition:slide>
 					<small>current reconnect delay:</small>
 					<span class="font_weight_600">{socket.current_reconnect_delay}</span>
 				</div>
 			{/if}
 
-			<div class="flex justify_content_space_between">
+			<div class="display_flex justify_content_space_between">
 				<small>connected for:</small>
 				<small>
 					{socket.connection_duration_rounded
@@ -375,15 +375,15 @@
 						: '-'}
 				</small>
 			</div>
-			<div class="flex justify_content_space_between">
+			<div class="display_flex justify_content_space_between">
 				<small>connected:</small>
 				<small>{format_timestamp(socket.last_connect_time)}</small>
 			</div>
-			<div class="flex justify_content_space_between">
+			<div class="display_flex justify_content_space_between">
 				<small>last send:</small>
 				<small>{format_timestamp(socket.last_send_time)}</small>
 			</div>
-			<div class="flex justify_content_space_between">
+			<div class="display_flex justify_content_space_between">
 				<small>last receive:</small>
 				<small>{format_timestamp(socket.last_receive_time)}</small>
 			</div>
@@ -396,7 +396,7 @@
 	<div class="mt_md border_top pt_md" transition:slide>
 		<h4 class="mt_0 mb_sm">message queue</h4>
 
-		<div class="flex flex_column gap_md mb_sm">
+		<div class="display_flex flex_column gap_md mb_sm">
 			{#if socket.queued_message_count > 0}
 				<Socket_Message_Queue {socket} type="queued" />
 			{/if}

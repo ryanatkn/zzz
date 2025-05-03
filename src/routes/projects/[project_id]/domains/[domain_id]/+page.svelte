@@ -63,8 +63,8 @@
 
 						<div class="mb_lg">
 							<h3 class="mt_0 mb_sm">Status</h3>
-							<div class="flex gap_xl3">
-								<label class="flex align_items_center mb_0">
+							<div class="display_flex gap_xl3">
+								<label class="display_flex align_items_center mb_0">
 									<input
 										type="radio"
 										name="status"
@@ -73,7 +73,7 @@
 									/>
 									<span class="ml_xs">active</span>
 								</label>
-								<label class="flex align_items_center mb_0">
+								<label class="display_flex align_items_center mb_0">
 									<input
 										type="radio"
 										name="status"
@@ -82,7 +82,7 @@
 									/>
 									<span class="ml_xs">pending</span>
 								</label>
-								<label class="flex align_items_center mb_0">
+								<label class="display_flex align_items_center mb_0">
 									<input
 										type="radio"
 										name="status"
@@ -95,7 +95,7 @@
 						</div>
 
 						<div class="mb_md">
-							<label class="flex align_items_center">
+							<label class="display_flex align_items_center">
 								<input type="checkbox" bind:checked={domains_viewmodel.ssl_enabled} />
 								<span class="ml_xs">enable SSL</span>
 							</label>
@@ -115,7 +115,7 @@
 							{/if}
 						</div>
 
-						<div class="w_100 flex justify_content_space_between gap_sm">
+						<div class="w_100 display_flex justify_content_space_between gap_sm">
 							<div>
 								<button
 									type="submit"

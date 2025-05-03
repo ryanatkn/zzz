@@ -34,7 +34,7 @@
 </script>
 
 <!-- Content modification actions (copy, paste, clear) -->
-<div class="flex gap_xs">
+<div class="display_flex gap_xs">
 	<Copy_To_Clipboard text={content} attrs={{class: 'plain'}} />
 
 	{#if !readonly}
@@ -65,7 +65,7 @@
 </div>
 
 {#if !readonly && !auto_save}
-	<div class="mt_xs flex" transition:slide>
+	<div class="mt_xs display_flex" transition:slide>
 		<button
 			class="flex_1 color_a"
 			type="button"

@@ -14,7 +14,7 @@
 </script>
 
 <Contextmenu_Chats>
-	<div class="flex w_100 h_100">
+	<div class="display_flex w_100 h_100">
 		<div class="column_fixed">
 			<div class="py_sm pr_sm">
 				<div class="row gap_xs2 mb_xs pl_xs2">
@@ -49,7 +49,7 @@
 					<Chat_View chat={chats.selected} />
 				</Contextmenu_Chat>
 			{:else if chats.items.size}
-				<div class="flex align_items_center justify_content_center h_100 flex_1">
+				<div class="display_flex align_items_center justify_content_center h_100 flex_1">
 					<div class="p_md text_align_center">
 						<p>
 							select a chat from the list,

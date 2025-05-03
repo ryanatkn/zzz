@@ -32,7 +32,7 @@
 		</section>
 		<section class="mb_xl12">
 			<h2>
-				<Svg data={zzz_logo} size="var(--icon_font_size_sm)" fill="var(--text_color)" inline /> system
+				<Svg data={zzz_logo} size="var(--icon_size_sm)" fill="var(--text_color)" inline /> system
 			</h2>
 			<Capability_System />
 		</section>
