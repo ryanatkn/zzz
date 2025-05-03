@@ -31,7 +31,7 @@
 		<div>{provider.icon}</div>
 	{/if}
 	<section>
-		<div class="mb_md font_mono">{provider.name}</div>
+		<div class="mb_md font_family_mono">{provider.name}</div>
 		<div>
 			<External_Link href={provider.url}>docs</External_Link>
 		</div>

@@ -170,7 +170,7 @@
 
 	.editor_area {
 		display: flex;
-		gap: var(--size_md);
+		gap: var(--font_size_md);
 		flex: 1;
 	}
 
@@ -186,15 +186,15 @@
 		resize: none;
 		border: none;
 		background: transparent;
-		font-family: var(--font_mono);
+		font-family: var(--font_family_mono);
 		font-size: 1em;
 		line-height: 1.5;
-		padding: var(--size_xs);
+		padding: var(--font_size_xs);
 		outline: none;
 	}
 
 	.markdown_preview {
-		padding: var(--size_xs);
+		padding: var(--font_size_xs);
 	}
 
 	.preview_fullscreen {

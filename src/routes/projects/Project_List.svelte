@@ -60,7 +60,7 @@
 	.projects_grid {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-		gap: var(--size_md);
+		gap: var(--font_size_md);
 	}
 
 	.project_card {
@@ -77,14 +77,14 @@
 	.domains_list {
 		display: flex;
 		flex-direction: column;
-		gap: var(--size_xs);
+		gap: var(--font_size_xs);
 	}
 
 	.domain_chip {
 		display: inline-flex;
 		align-items: center;
-		gap: var(--size_xs);
-		font-family: var(--font_mono);
+		gap: var(--font_size_xs);
+		font-family: var(--font_family_mono);
 	}
 
 	.status_dot {

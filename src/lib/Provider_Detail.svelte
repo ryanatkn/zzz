@@ -22,7 +22,7 @@
 
 <div {...attrs} class="panel p_lg {attrs?.class}">
 	<div class="flex mb_lg">
-		<Provider_Logo name={provider.name} size="var(--icon_size_xl)" fill={null} />
+		<Provider_Logo name={provider.name} size="var(--icon_font_size_xl)" fill={null} />
 		<div class="pl_xl">
 			{#if at_detail_page}
 				<h1 class="mb_md">
@@ -37,7 +37,7 @@
 				<div>{provider.icon}</div>
 			{/if}
 			<div>
-				<div class="mb_md font_mono">
+				<div class="mb_md font_family_mono">
 					<Glyph glyph={GLYPH_PROVIDER} />
 					{provider.name}
 				</div>

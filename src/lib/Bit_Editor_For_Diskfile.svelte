@@ -118,7 +118,7 @@
 		</div>
 
 		{#if editor_state}
-			<div class="my_xs size_sm">
+			<div class="my_xs font_size_sm">
 				<Diskfile_Metrics {editor_state} />
 			</div>
 		{/if}

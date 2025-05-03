@@ -29,7 +29,7 @@
 		class:color_e={capabilities.server.status === 'initial'}
 	>
 		<div class="flex_1 column justify_content_center gap_xs" style:min-height="80px">
-			<div class="size_xl">
+			<div class="font_size_xl">
 				server {capabilities.server.status === 'success'
 					? 'available'
 					: capabilities.server.status === 'failure'
@@ -42,7 +42,7 @@
 					<Pending_Animation inline />
 				{/if}
 			</div>
-			<small class="font_mono"
+			<small class="font_family_mono"
 				>{SERVER_URL}/api/ping
 				{#if capabilities.latest_ping_time !== null}<span
 						><Glyph glyph={GLYPH_ARROW_RIGHT} /> {Math.round(capabilities.latest_ping_time)}ms</span
@@ -50,7 +50,7 @@
 			</small>
 		</div>
 		{#if capabilities.server.data}
-			<div class="column align_items_end font_mono">
+			<div class="column align_items_end font_family_mono">
 				<div>{capabilities.server.data.name}</div>
 				<small>v{capabilities.server.data.version}</small>
 			</div>
@@ -60,7 +60,7 @@
 	{#if capabilities.server.error_message}
 		<div transition:slide>
 			<Error_Message
-				><small class="font_mono">{capabilities.server.error_message}</small></Error_Message
+				><small class="font_family_mono">{capabilities.server.error_message}</small></Error_Message
 			>
 		</div>
 	{/if}
@@ -72,8 +72,8 @@
 			disabled={capabilities.server.status === 'pending'}
 			onclick={() => capabilities.check_server()}
 		>
-			<Glyph glyph={GLYPH_CONNECT} size="var(--size_xl)" />
-			<span class="size_lg font_weight_400 ml_md">
+			<Glyph glyph={GLYPH_CONNECT} size="var(--font_size_xl)" />
+			<span class="font_size_lg font_weight_400 ml_md">
 				{#if capabilities.server.status === 'pending'}
 					<div class="inline_flex align_items_end">
 						checking <div class="relative"><Pending_Animation /></div>

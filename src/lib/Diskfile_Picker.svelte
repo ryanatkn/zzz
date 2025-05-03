@@ -32,8 +32,8 @@
 		sort_by_numeric('created_oldest', 'oldest first', 'created_date', 'asc'),
 		sort_by_numeric('updated_recently', 'recently updated', 'updated_date', 'desc'),
 		sort_by_numeric('updated_oldest', 'least recently updated', 'updated_date', 'asc'),
-		sort_by_numeric<Diskfile>('size_largest', 'largest first', 'content_length', 'desc'),
-		sort_by_numeric<Diskfile>('size_smallest', 'smallest first', 'content_length', 'asc'),
+		sort_by_numeric<Diskfile>('font_size_largest', 'largest first', 'content_length', 'desc'),
+		sort_by_numeric<Diskfile>('font_size_smallest', 'smallest first', 'content_length', 'asc'),
 	]}
 	sort_key_default="path_asc"
 	show_sort_controls

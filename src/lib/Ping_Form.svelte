@@ -32,7 +32,7 @@
 			class="flex_1"
 		>
 			{#if children}{@render children()}{:else}⚞{/if}
-			<div class="size_lg font_weight_400 pl_sm">ping the server</div>
+			<div class="font_size_lg font_weight_400 pl_sm">ping the server</div>
 		</button>
 	</div>
 
@@ -71,10 +71,10 @@
 		attrs={{class: ping.completed ? '' : 'fade_3'}}
 	/>
 	{#if !ping.completed}
-		<span class="font_mono">
+		<span class="font_family_mono">
 			<Pending_Animation inline />
 		</span>
 	{:else}
-		<span class="font_mono">{Math.round(ping.round_trip_time ?? 0)}ms</span>
+		<span class="font_family_mono">{Math.round(ping.round_trip_time ?? 0)}ms</span>
 	{/if}
 {/snippet}

@@ -84,7 +84,7 @@
 
 	.listitem.compact {
 		padding: var(--space_xs2) var(--space_xs);
-		font-size: var(--size_sm);
+		font-size: var(--font_size_sm);
 		display: flex;
 		justify-content: space-between;
 		align-items: center;

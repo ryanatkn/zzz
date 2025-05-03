@@ -239,7 +239,7 @@ export const ollama_list_with_metadata = async (): Promise<Ollama_Models_Respons
 //     digest: string;
 //     details: ModelDetails;
 //     expires_at: Date;
-//     size_vram: number;
+//     font_size_vram: number;
 // }
 // interface ModelDetails {
 //     parent_model: string;

@@ -208,7 +208,7 @@
 	.projects_grid {
 		display: grid;
 		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-		gap: var(--size_md);
+		gap: var(--font_size_md);
 	}
 
 	.pages_list,
@@ -216,13 +216,13 @@
 	.repos_list {
 		list-style: none;
 		padding: 0;
-		margin: var(--size_md) 0;
+		margin: var(--font_size_md) 0;
 	}
 
 	.pages_list li,
 	.domains_list li,
 	.repos_list li {
-		padding: var(--size_xs) 0;
+		padding: var(--font_size_xs) 0;
 		border-bottom: 1px solid var(--border_color_1);
 		display: flex;
 		flex-direction: column;
@@ -230,7 +230,7 @@
 
 	.domain_name,
 	.repo_url {
-		font-family: var(--font_mono);
+		font-family: var(--font_family_mono);
 		font-weight: 500;
 		overflow: hidden;
 		text-overflow: ellipsis;
@@ -239,7 +239,7 @@
 	.domain_details,
 	.repo_details {
 		display: flex;
-		gap: var(--size_xs);
+		gap: var(--font_size_xs);
 		margin-top: 4px;
 	}
 

@@ -73,7 +73,7 @@
 					onclick={() => init_from_template(chat_template)}
 				>
 					<div>
-						<div class="size_lg mb_sm">{chat_template.name}</div>
+						<div class="font_size_lg mb_sm">{chat_template.name}</div>
 						<div class="flex flex_wrap gap_xs2">
 							{#each chat_template.model_names as model_name (model_name)}
 								<small class="chip">{model_name}</small>

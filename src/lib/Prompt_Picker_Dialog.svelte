@@ -58,7 +58,7 @@
 				class:selected={selected_ids?.includes(prompt.id)}
 				onclick={() => pick(prompt)}
 			>
-				<div class="p_xs size_sm">
+				<div class="p_xs font_size_sm">
 					<Prompt_Summary {prompt} />
 				</div>
 			</button>

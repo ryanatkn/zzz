@@ -24,11 +24,11 @@
 		class:compact
 		onclick={onclick ? () => onclick(bit) : undefined}
 	>
-		<div class="p_xs size_sm">
+		<div class="p_xs font_size_sm">
 			<span class="mr_xs">{bit.type}</span>
 			<span class="ellipsis">{bit.content_preview}</span>
 			{#if bit.token_count != null}
-				<span class="size_xs ml_xs">{bit.token_count}</span>
+				<span class="font_size_xs ml_xs">{bit.token_count}</span>
 			{/if}
 		</div>
 	</button>

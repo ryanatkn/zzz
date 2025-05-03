@@ -19,7 +19,7 @@
 </script>
 
 <div
-	class="chip plain flex_1 size_xl px_xl flex_column mb_xl"
+	class="chip plain flex_1 font_size_xl px_xl flex_column mb_xl"
 	style:display="flex !important"
 	style:align-items="flex-start !important"
 	style:font-weight="400 !important"
@@ -29,7 +29,7 @@
 	class:color_e={capabilities.filesystem.status === 'initial'}
 >
 	<div class="column justify_content_center gap_xs pl_md" style:min-height="80px">
-		<div class="size_xl">
+		<div class="font_size_xl">
 			filesystem {capabilities.filesystem.status === 'success'
 				? 'available'
 				: capabilities.filesystem.status === 'failure'
@@ -41,7 +41,7 @@
 				<Pending_Animation inline />
 			{/if}
 		</div>
-		<small class="font_mono">
+		<small class="font_family_mono">
 			{#if zzz_dir === undefined || zzz_dir === null}
 				&nbsp;
 			{:else if zzz_dir === ''}
@@ -56,12 +56,12 @@
 <p>
 	This is the server's filesystem directory, the <code>zzz_dir</code>. It defaults to
 	<code>.zzz</code> in the server's current working directory. To configure it set the .env variable
-	<code class="size_sm">PUBLIC_ZZZ_DIR</code>.
+	<code class="font_size_sm">PUBLIC_ZZZ_DIR</code>.
 </p>
 <p>
 	For security reasons, all filesystem operations are confined to this path's parent directory,
-	<small class="chip font_mono">{zzz.zzz_dir_parent || '[no zzz dir configured]'}</small>, and the
-	path cannot be modified after the server starts. These restrictions may be loosened in the future,
-	but they help ensure predictability when exposing sensitive resources like your local hard drive
-	to web scripts.
+	<small class="chip font_family_mono">{zzz.zzz_dir_parent || '[no zzz dir configured]'}</small>,
+	and the path cannot be modified after the server starts. These restrictions may be loosened in the
+	future, but they help ensure predictability when exposing sensitive resources like your local hard
+	drive to web scripts.
 </p>

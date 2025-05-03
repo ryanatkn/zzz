@@ -40,9 +40,10 @@
 		</p>
 		<p>
 			Zzz doesn't try to be everything to everybody. That's what open standardized protocols are
-			for! The goal here is to provide a streamlined extensible UX with one take on the web, with
-			CMS and IDE features that leverage the rest of Zzz. Because it's the web, anything you make in
-			Zzz can be used by other browsers and tools, and vice versa, like magic.
+			for! The goal of this "projects" design is to provide a streamlined extensible UX with one
+			take on building for the web, with CMS and IDE features that integrate with the rest of Zzz.
+			Because it's the web, anything you make in Zzz can be used by other browsers and tools, and
+			vice versa, like magic.
 		</p>
 		<p>
 			Here's a very rough sketch of <button
@@ -54,8 +55,8 @@
 			>.
 		</p>
 		<p>
-			For developers, Zzz is also an npm library for TypeScript, Svelte, SvelteKit, and Vite that
-			can be used to make websites and servers with your current workflows.
+			For developers, Zzz is also an npm library for TypeScript/Svelte/SvelteKit/Vite that can be
+			used to make websites and servers with your current workflows.
 		</p>
 		<p>More <a href="{base}/about">about</a> Zzz.</p>
 	</section>

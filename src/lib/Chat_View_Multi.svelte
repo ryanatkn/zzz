@@ -92,13 +92,13 @@
 		<!-- TODO add user-customizable sets of models -->
 		<div class="flex">
 			<div class="flex_1 p_xs">
-				<header class="size_lg text_align_center mb_xs">add by tag</header>
+				<header class="font_size_lg text_align_center mb_xs">add by tag</header>
 				<menu class="unstyled column">
 					{#each tags as tag (tag)}
 						{@const models_with_tag = zzz.models.filter_by_tag(tag)}
 						<button
 							type="button"
-							class="w_100 size_sm py_xs3 justify_content_space_between plain border_radius_xs font_weight_600"
+							class="w_100 font_size_sm py_xs3 justify_content_space_between plain border_radius_xs font_weight_600"
 							style:min-height="0"
 							onclick={() => {
 								chat.add_tapes_by_model_tag(tag);
@@ -113,7 +113,7 @@
 				</menu>
 			</div>
 			<div class="flex_1 p_xs fg_1">
-				<header class="size_lg text_align_center mb_xs">remove by tag</header>
+				<header class="font_size_lg text_align_center mb_xs">remove by tag</header>
 				<menu class="unstyled column">
 					{#each tags as tag (tag)}
 						<!-- TODO index this -->
@@ -122,7 +122,7 @@
 							attrs={{
 								disabled: !tapes_with_tag.length,
 								class:
-									'w_100 size_sm py_xs3 justify_content_space_between plain border_radius_xs font_weight_600',
+									'w_100 font_size_sm py_xs3 justify_content_space_between plain border_radius_xs font_weight_600',
 								style: 'min-height: 0;',
 							}}
 							onconfirm={() => {

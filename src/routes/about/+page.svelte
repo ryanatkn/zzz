@@ -17,12 +17,12 @@
 
 <div class="width_md p_lg">
 	<section>
-		<header style:--size="var(--size_xl)">
+		<header style:--font_size="var(--font_size_xl)">
 			<h1 class="row">
 				<Svg
 					data={zzz_logo}
 					fill="var(--text_color)"
-					size="var(--icon_size_sm)"
+					size="var(--icon_font_size_sm)"
 					attrs={{class: 'ml_xs mr_xl'}}
 				/> about
 			</h1>
@@ -54,11 +54,18 @@
 		</blockquote>
 		<p>
 			The software I imagine answering these questions is cross-platform so it runs everywhere, and
-			for that we have the web with HTML, CSS, and JS. My conceptual starting point is the user
-			interface, because we're all users interfacing with machines. Zzz leverages JS to glue
-			software and machines together precisely the way you want, maximizing its utility on any
-			device across the full stack. It can run locally on your machine using any of your available
-			capabilities, or it can deploy anywhere JS runs and play whatever role you need.
+			for that we have the web with HTML, CSS, and JS. We want to solve problems once and have
+			supported features work consistently whether you're on Windows, macOS, iOS, Android, Linux, or
+			any other OS. For all its quirks and flaws, the web is our digital commons, the one we have,
+			and when used with craft and care, it's capable of delivering a great UX.
+		</p>
+		<p>
+			My starting point is the user experience in the user interface, because we're all users
+			interfacing with machines. If this part isn't up to par, we're sunk before we sail. This means
+			using JS, the language understood by the browser. Zzz leverages JS to glue software and
+			machines together precisely the way you want, maximizing its utility on any device across the
+			full stack. It can run locally on your machine using any of your available capabilities, or it
+			can deploy anywhere JS runs to play whatever role you need.
 		</p>
 		<p>Zzz is based on many kinds of software:</p>
 		<ul>
@@ -82,10 +89,10 @@
 				>
 			</li>
 			<li>
-				web browsers - first with Chromium via Electron, ideally with swappable browser engines
+				web browsers - planned with Chromium via Electron, ideally with swappable browser engines
 			</li>
 			<li>
-				code libraries and web metaframeworks - Zzz extends <External_Link
+				code libraries and web metaframeworks using TypeScript and Svelte - Zzz extends <External_Link
 					href="https://svelte.dev/">SvelteKit</External_Link
 				> and <External_Link href="https://vite.dev/">Vite</External_Link> without wrapping them, enabling
 				devs to use Zzz as a library with existing workflows
@@ -170,12 +177,13 @@
 			Zzz is just one implementation of an increasingly common idea that combines web tech and AI
 			with powerful open clients. Because of the endless scope I currently like the name "web
 			environment". Some related projects call themselves web UIs or even operating systems.
-			Whatever the name, this class of app is something that I've been wanting for a long time.
+			Whatever the name, this class of app is something that I've been wanting for a long time, and
+			this iteration seems to have legs.
 		</p>
 		<p>
 			I intend to continue working on Zzz full-time for the foreseeable future, but I know I need to
-			find people and organizations to work with. It also has some personal quirks that I'm eager to
-			smooth out. Your input is appreciated to help make it work for you—see the <External_Link
+			find people and organizations to work with if it's going to reach its goal of supporting Real
+			Users. Your input is appreciated to help make it work for you—see the <External_Link
 				href="https://github.com/ryanatkn/zzz">code</External_Link
 			>,
 			<External_Link href="https://github.com/ryanatkn/zzz/issues">issues</External_Link>, and
@@ -188,8 +196,8 @@
 	<section>
 		<h2 class="mb_lg">More details</h2>
 		<ul>
-			<li>Zzz is a noncommercial project and its only official domain is zzz.software</li>
-			<li>it's open source, permissively licensed, and forking is encouraged</li>
+			<li>Zzz is open source, permissively licensed, and forking is encouraged</li>
+			<li>it's a noncommercial project and its only official domain is zzz.software</li>
 			<li>
 				the Zzz name and logos are community property, just don't falsely represent the official Zzz
 				project or zzz.software
@@ -217,7 +225,7 @@
 		>
 			<Svg
 				data={zzz_logo}
-				size="var(--icon_size_sm)"
+				size="var(--icon_font_size_sm)"
 				fill={zzz.futuremode ? 'var(--color_h_5)' : 'var(--text_color)'}
 				attrs={{
 					class: 'mr_md' + (zzz.futuremode ? ' flip_x' : ''),
@@ -232,7 +240,7 @@
 			>
 			<Svg
 				data={zzz_logo}
-				size="var(--icon_size_sm)"
+				size="var(--icon_font_size_sm)"
 				fill={zzz.futuremode ? 'var(--color_h_5)' : 'var(--text_color)'}
 				attrs={{
 					class: 'ml_md' + (zzz.futuremode ? '' : ' flip_x'),

@@ -10,8 +10,8 @@
 </script>
 
 <div>
-	<p class="font_mono">{pkg.name}@{pkg.package_json.version}</p>
-	<p class="font_mono">
+	<p class="font_family_mono">{pkg.name}@{pkg.package_json.version}</p>
+	<p class="font_family_mono">
 		DEV: {DEV + ''}
 	</p>
 	<p><External_Link href={pkg.repo_url}>{format_url(pkg.repo_url)}</External_Link></p>

@@ -44,7 +44,7 @@
 	>{#if children}{@render children()}{:else}{href}{/if}<External_Link_Icon
 		>{#snippet children(text_icon)}{#if icon}{@render icon(known_logo)}{:else if known_logo}<Svg
 					data={known_logo}
-					size="var(--size_xs)"
+					size="var(--font_size_xs)"
 					fill="var(--text_color)"
 					inline
 				/>{:else}{text_icon}{/if}{/snippet}</External_Link_Icon

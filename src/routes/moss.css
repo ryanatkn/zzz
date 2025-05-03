@@ -287,37 +287,8 @@ a.chip {
 .flip_x {
 	transform: scaleX(-1);
 }
-.font_sans {
-	font-family: var(--font_sans);
-}
-.font_serif {
-	font-family: var(--font_serif);
-}
-.font_mono {
-	font-family: var(--font_mono);
-}
 .line_height_1 {
 	line-height: 1;
-}
-.size_xs {
-	font-size: var(--size_xs);
-	--size: var(--size_xs);
-}
-.size_sm {
-	font-size: var(--size_sm);
-	--size: var(--size_sm);
-}
-.size_md {
-	font-size: var(--size_md);
-	--size: var(--size_md);
-}
-.size_lg {
-	font-size: var(--size_lg);
-	--size: var(--size_lg);
-}
-.size_xl {
-	font-size: var(--size_xl);
-	--size: var(--size_xl);
 }
 .text_align_left {
 	text-align: left;

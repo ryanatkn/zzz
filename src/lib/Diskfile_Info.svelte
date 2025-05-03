@@ -24,7 +24,7 @@
 		<Glyph glyph={GLYPH_FILE} />{zzz.diskfiles.to_relative_path(diskfile.path)}
 	</small>
 
-	<small class="font_mono">
+	<small class="font_family_mono">
 		<div>created {diskfile.created_formatted_date}</div>
 		<div>updated {diskfile.updated_formatted_date}</div>
 	</small>
@@ -32,11 +32,11 @@
 	<Diskfile_Metrics {editor_state} />
 
 	{#if has_dependencies(diskfile)}
-		<small class="font_mono" transition:slide>
+		<small class="font_family_mono" transition:slide>
 			<div>{diskfile.dependencies_count} dependencies</div>
 			<div>{diskfile.dependents_count} dependents</div>
 		</small>
 	{/if}
 
-	<small class="font_mono">{diskfile.id}</small>
+	<small class="font_family_mono">{diskfile.id}</small>
 </div>

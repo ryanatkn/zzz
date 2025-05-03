@@ -16,7 +16,7 @@
 </script>
 
 <div class="mb_md">
-	<div class="size_lg">
+	<div class="font_size_lg">
 		{#if action.is_prompt}
 			<Glyph glyph={GLYPH_PROMPT} /> Prompt
 		{:else if action.is_completion}
@@ -29,12 +29,12 @@
 		<small class="color_subtle ml_xs">{action.direction}</small>
 	</div>
 	<div class="flex flex_column gap_xs mt_sm">
-		<small class="font_mono">id: {action.id}</small>
-		<small class="font_mono"
+		<small class="font_family_mono">id: {action.id}</small>
+		<small class="font_family_mono"
 			>created {action.created_formatted_date} {action.created_formatted_time}</small
 		>
-		<small class="font_mono">type: {action.type}</small>
-		<small class="font_mono">direction: {action.direction}</small>
+		<small class="font_family_mono">type: {action.type}</small>
+		<small class="font_family_mono">direction: {action.direction}</small>
 	</div>
 </div>
 
@@ -47,13 +47,14 @@
 		<h3 class="mt_0 mb_sm">Ping response</h3>
 		<div class="field_row">
 			<div class="font_weight_600 color_text_subtle">Ping id</div>
-			<div class="font_mono word_break_break_word">{action.ping_id}</div>
+			<div class="font_family_mono word_break_break_word">{action.ping_id}</div>
 		</div>
 	</section>
 {:else if action.is_prompt}
 	<section class="pb_md border_bottom">
 		<h3 class="mt_0 mb_sm">prompt</h3>
-		<pre class="font_mono size_sm white_space_pre_wrap word_break_break_word p_sm w_100">{action
+		<pre
+			class="font_family_mono font_size_sm white_space_pre_wrap word_break_break_word p_sm w_100">{action
 				.prompt_data?.prompt || 'No prompt'}</pre>
 
 		<h3>Request details</h3>
@@ -72,7 +73,7 @@
 			</div>
 			<div class="field_row">
 				<div class="font_weight_600 color_text_subtle">Request id</div>
-				<div class="font_mono">{action.prompt_data?.request_id || 'Unknown'}</div>
+				<div class="font_family_mono">{action.prompt_data?.request_id || 'Unknown'}</div>
 			</div>
 			{#if action.json.completion_request && 'options' in action.json.completion_request && action.json.completion_request.options}
 				{#each Object.entries(action.json.completion_request.options) as [key, value] (key)}
@@ -88,14 +89,14 @@
 	<section class="pb_md border_bottom">
 		<h3 class="mt_0 mb_sm">completion</h3>
 		<pre
-			class="font_mono size_sm white_space_pre_wrap word_break_break_word p_sm w_100">{action.completion_text ||
+			class="font_family_mono font_size_sm white_space_pre_wrap word_break_break_word p_sm w_100">{action.completion_text ||
 				'No completion'}</pre>
 
 		<h3>Response details</h3>
 		<div class="flex flex_column gap_xs">
 			<div class="field_row">
 				<div class="font_weight_600 color_text_subtle">Request id</div>
-				<div class="font_mono">{action.completion_data?.request_id || 'Unknown'}</div>
+				<div class="font_family_mono">{action.completion_data?.request_id || 'Unknown'}</div>
 			</div>
 			<div class="field_row">
 				<div class="font_weight_600 color_text_subtle">Created</div>
@@ -155,7 +156,7 @@
 			{#if action.path}
 				<div class="field_row">
 					<div class="font_weight_600 color_text_subtle">Path</div>
-					<div class="font_mono word_break_break_word">{action.path}</div>
+					<div class="font_family_mono word_break_break_word">{action.path}</div>
 				</div>
 			{/if}
 			{#if action.content !== undefined}
@@ -165,7 +166,7 @@
 				</div>
 				<h4 class="mt_sm mb_xs">Contents</h4>
 				<pre
-					class="font_mono size_sm white_space_pre_wrap word_break_break_word p_sm w_100 overflow_auto scrollbar_width_thin"
+					class="font_family_mono font_size_sm white_space_pre_wrap word_break_break_word p_sm w_100 overflow_auto scrollbar_width_thin"
 					style:max-height="300px">{action.content || ''}</pre>
 			{/if}
 			{#if action.change}
@@ -198,7 +199,7 @@
 						<tbody>
 							{#each action.data.files as file_data (file_data.id)}
 								<tr>
-									<td class="p_xs font_mono size_sm"
+									<td class="p_xs font_family_mono font_size_sm"
 										>{strip_start(file_data.id, file_data.source_dir)}</td
 									>
 									<td class="p_xs"
@@ -217,7 +218,7 @@
 			{:else}
 				<div class="w_100">
 					<pre
-						class="font_mono size_sm white_space_pre_wrap word_break_break_word p_sm w_100 overflow_auto scrollbar_width_thin"
+						class="font_family_mono font_size_sm white_space_pre_wrap word_break_break_word p_sm w_100 overflow_auto scrollbar_width_thin"
 						style:max-height="300px">{JSON.stringify(action.data, null, 2)}</pre>
 				</div>
 			{/if}
@@ -230,7 +231,7 @@
 <section>
 	<h3>raw action data</h3>
 	<pre
-		class="font_mono size_sm white_space_pre_wrap word_break_break_word p_sm w_100">{JSON.stringify(
+		class="font_family_mono font_size_sm white_space_pre_wrap word_break_break_word p_sm w_100">{JSON.stringify(
 			action.json,
 			null,
 			2,

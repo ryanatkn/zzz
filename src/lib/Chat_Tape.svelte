@@ -52,7 +52,7 @@
 	<div {...attrs} class="chat_tape {attrs?.class}" class:empty class:dormant={!tape.enabled}>
 		<div class="flex justify_content_space_between align_items_start">
 			<header>
-				<div class="size_lg">
+				<div class="font_size_lg">
 					<Model_Link model={tape.model} icon />
 				</div>
 				<small

@@ -26,7 +26,7 @@
 <div {...attrs} class="panel p_lg {attrs?.class}">
 	<div class="row">
 		<div class="glyph_container">
-			<Glyph glyph={GLYPH_MODEL} size="var(--icon_size_xl)" />
+			<Glyph glyph={GLYPH_MODEL} size="var(--icon_font_size_xl)" />
 		</div>
 		<div class="pl_xl">
 			{#if at_detail_page}
@@ -38,7 +38,7 @@
 					<Model_Link {model} />
 				</h2>
 			{/if}
-			<div class="flex font_mono ml_sm mb_md size_lg">
+			<div class="flex font_family_mono ml_sm mb_md font_size_lg">
 				<Provider_Link {provider} attrs={{class: 'row gap_sm'}} icon="svg" />
 			</div>
 			{#if model.tags.length}
@@ -133,7 +133,7 @@
 		display: flex;
 		align-items: center;
 		justify-content: center;
-		min-width: var(--icon_size_xl);
+		min-width: var(--icon_font_size_xl);
 		line-height: 1;
 	}
 

@@ -13,7 +13,7 @@
 
 <!-- TODO add Contextmenu_Model -->
 <div class="w_100 py_sm">
-	<div class="size_md">
+	<div class="font_size_md">
 		{model.name}
 	</div>
 	<div class="row justify_content_space_between">

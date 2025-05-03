@@ -22,7 +22,7 @@
 
 <Contextmenu_Bit {bit}>
 	<div
-		class="bit_summary flex justify_content_space_between gap_xs2 size_sm relative panel"
+		class="bit_summary flex justify_content_space_between gap_xs2 font_size_sm relative panel"
 		class:dormant={!bit.enabled}
 	>
 		<div class="progress_bar" style:width="{percent}%"></div>

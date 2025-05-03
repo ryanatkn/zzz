@@ -15,10 +15,10 @@
 	<div class="providers_grid">
 		{#each zzz.providers.items as provider (provider)}
 			<div class="panel p_lg">
-				<div class="size_xl mb_lg">
+				<div class="font_size_xl mb_lg">
 					<Provider_Link {provider} icon="svg" />
 				</div>
-				<div class="mb_sm font_mono">
+				<div class="mb_sm font_family_mono">
 					<Glyph glyph={GLYPH_PROVIDER} />
 					{provider.name}
 				</div>
@@ -35,7 +35,7 @@
 				<ul class="unstyled">
 					{#each provider.models as model (model)}
 						<li class="row flex_wrap mb_xs3">
-							<Model_Link attrs={{class: 'font_mono px_xs size_sm'}} {model} icon />
+							<Model_Link attrs={{class: 'font_family_mono px_xs font_size_sm'}} {model} icon />
 							<!-- {#each model.tags as tag (tag)}
 								<small class="chip">{tag}</small>
 							{/each} -->

@@ -28,7 +28,7 @@
 			{:else if strip.is_content_loaded}
 				{strip.content}
 			{:else if strip.bit === null}
-				<span class="text_color_4 font_mono">missing bit: {strip.bit_id}</span>
+				<span class="text_color_4 font_family_mono">missing bit: {strip.bit_id}</span>
 			{:else}
 				<Error_Message>unknown error</Error_Message>
 			{/if}

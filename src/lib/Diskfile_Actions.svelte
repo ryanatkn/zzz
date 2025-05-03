@@ -42,7 +42,7 @@
 			onpaste={(text) => {
 				editor_state.current_content += text;
 			}}
-			attrs={{class: 'plain icon_button size_lg'}}
+			attrs={{class: 'plain icon_button font_size_lg'}}
 		>
 			<Glyph glyph={GLYPH_PASTE} />
 		</Paste_From_Clipboard>

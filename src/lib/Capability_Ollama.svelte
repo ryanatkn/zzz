@@ -30,7 +30,7 @@
 <div class="flex flex_column gap_md">
 	<div class="flex gap_sm align_items_start">
 		<div
-			class="flex_1 chip plain flex_1 size_xl flex_column"
+			class="flex_1 chip plain flex_1 font_size_xl flex_column"
 			style:display="flex !important"
 			style:align-items="flex-start !important"
 			style:font-weight="400 !important"
@@ -47,7 +47,7 @@
 						: capabilities.ollama.status === 'pending'
 							? 'checking'
 							: 'not checked'}
-				<small class="font_mono">{OLLAMA_URL}</small>
+				<small class="font_family_mono">{OLLAMA_URL}</small>
 			</div>
 		</div>
 
@@ -66,7 +66,7 @@
 	{#if capabilities.ollama.error_message}
 		<div transition:slide>
 			<Error_Message
-				><small class="font_mono">{capabilities.ollama.error_message}</small></Error_Message
+				><small class="font_family_mono">{capabilities.ollama.error_message}</small></Error_Message
 			>
 		</div>
 	{/if}
@@ -80,9 +80,9 @@
 		>
 			<Glyph
 				glyph={capabilities.ollama.status === 'success' ? GLYPH_REFRESH : GLYPH_CONNECT}
-				size="var(--size_xl)"
+				size="var(--font_size_xl)"
 			/>
-			<span class="size_lg font_weight_400 ml_md">
+			<span class="font_size_lg font_weight_400 ml_md">
 				{#if capabilities.ollama.status === 'pending'}
 					<div class="inline_flex align_items_end">
 						checking <div class="relative"><Pending_Animation /></div>
@@ -100,8 +100,8 @@
 			disabled={capabilities.ollama.status === 'initial'}
 			onclick={() => capabilities.reset_ollama()}
 		>
-			<Glyph glyph={GLYPH_RESET} size="var(--size_xl)" />
-			<span class="size_lg font_weight_400 ml_md"> reset </span>
+			<Glyph glyph={GLYPH_RESET} size="var(--font_size_xl)" />
+			<span class="font_size_lg font_weight_400 ml_md"> reset </span>
 		</button>
 	</div>
 
@@ -115,7 +115,7 @@
 					{@const model = zzz.models.find_by_name(ollama_model.name)}
 					<li class="p_xs">
 						{#if model}<Model_Link {model} />{:else}{ollama_model.name}{/if}
-						<div class="font_mono size_sm">{ollama_model.size} MB</div>
+						<div class="font_family_mono font_size_sm">{ollama_model.size} MB</div>
 					</li>
 				{/each}
 			</ul>

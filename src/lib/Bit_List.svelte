@@ -70,5 +70,5 @@
 {/if}
 
 {#snippet empty_default()}
-	<small class="font_mono">[no bits yet]</small>
+	<small class="font_family_mono">[no bits yet]</small>
 {/snippet}

@@ -94,7 +94,7 @@
 					content = new_content;
 					textarea_el?.focus();
 				}}
-				attrs={{class: 'plain icon_button size_lg'}}
+				attrs={{class: 'plain icon_button font_size_lg'}}
 			>
 				<!-- TODO should be default -->
 				<Glyph glyph={GLYPH_PASTE} />

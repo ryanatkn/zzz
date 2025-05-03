@@ -19,7 +19,7 @@ textarea {
 /* TODO upstream */
 /* This is needed in places where glyphs may appear with non-sans fonts like headings. */
 .glyph {
-	font-family: var(--font_sans);
+	font-family: var(--font_family_sans);
 	font-weight: 400;
 }
 
@@ -42,14 +42,11 @@ textarea {
 
 /* TODO upstream most of this */
 .compact {
-	--size: var(--size_sm);
+	--font_size: var(--font_size_sm);
 	--input_height: 2.6rem;
 	--input_padding_x: var(--space_sm);
 	--min_height: 2.6rem;
 	--border_radius: var(--border_radius_xs2);
-}
-button.compact {
-	font-size: var(--size); /* ideally the base button would use `--size` I think */
 }
 
 input[type='checkbox'].compact {
@@ -292,7 +289,7 @@ a.chip {
 	box-shadow: none;
 	border: var(--border_width_1) solid transparent;
 	font-weight: 400;
-	font-size: var(--size_sm);
+	font-size: var(--font_size_sm);
 	text-align: left;
 }
 .listitem:hover {

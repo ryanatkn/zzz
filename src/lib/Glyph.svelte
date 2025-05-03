@@ -9,8 +9,8 @@
 
 	const {glyph, size, attrs}: Props = $props();
 
-	const DEFAULT_SIZE = 'var(--size, 1em)';
-	const DEFAULT_FONT_SIZE = 'var(--size, inherit)';
+	const DEFAULT_SIZE = 'var(--font_size, 1em)';
+	const DEFAULT_FONT_SIZE = 'var(--font_size, inherit)';
 </script>
 
 <span

@@ -40,7 +40,7 @@
 			<Glyph glyph={GLYPH_BIT} /> add bit
 		</button>
 	</div>
-	<small class="font_mono block">
+	<small class="font_family_mono block">
 		{sequence_bit.items.length} bit{sequence_bit.items.length !== 1 ? 's' : ''}
 	</small>
 </div>

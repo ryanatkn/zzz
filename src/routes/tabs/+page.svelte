@@ -75,14 +75,14 @@
 		</p>
 		<p>
 			This simple change recontextualizes the web's UX - instead of the browser being its own silo,
-			users can compose tabs in a larger system that's open and extensible by design.
+			users can compose tabs in a larger integrated system that's open and extensible by design.
 		</p>
 		<p>
 			As a simple example, picture adding arbitrary metadata like tags to both your browser tabs and
-			files, both local and in the cloud, and then summoning UI that leverages that data for your
-			specific needs in whatever context—without any technical knowledge, third parties, or
-			unnecessary friction. The best usecases are still unknown because today's browsers don't let
-			us experiment.
+			files, both local and in the cloud, so you can find things no matter their type. Maybe you
+			want to summon UI that leverages that data for specific needs in specific contexts—without any
+			technical knowledge, third parties, or unnecessary friction. The best usecases are still
+			unknown because today's browsers weren't designed for this kind of experimentation.
 		</p>
 		<p>
 			I believe the optimal architecture—<External_Link

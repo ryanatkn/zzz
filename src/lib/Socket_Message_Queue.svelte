@@ -128,12 +128,12 @@
 		<div class="flex gap_xs">
 			{#if selected_count > 0}
 				<div class="flex gap_xs align_items_center">
-					<span class="chip size_sm">{selected_count} selected</span>
+					<span class="chip font_size_sm">{selected_count} selected</span>
 
 					{#if socket.connected}
 						<button
 							type="button"
-							class="icon_button plain size_sm"
+							class="icon_button plain font_size_sm"
 							title="retry selected messages"
 							onclick={retry_selected}
 							transition:slide
@@ -144,7 +144,7 @@
 
 					<Confirm_Button
 						onconfirm={remove_selected}
-						popover_button_attrs={{class: 'icon_button color_c bg_c_1 size_sm'}}
+						popover_button_attrs={{class: 'icon_button color_c bg_c_1 font_size_sm'}}
 						attrs={{class: 'icon_button plain', title: 'remove selected messages'}}
 					>
 						<Glyph glyph={GLYPH_REMOVE} />
@@ -154,7 +154,7 @@
 
 			<button
 				type="button"
-				class="plain size_sm"
+				class="plain font_size_sm"
 				title="{all_selected ? 'deselect' : 'select'} all {type} messages"
 				disabled={queued_messages_count === 0}
 				onclick={all_selected ? deselect_all : select_all}
@@ -182,19 +182,19 @@
 					<div class="flex gap_xs align_items_center flex_wrap">
 						<input
 							type="checkbox"
-							class="m_0 plain compact size_md"
+							class="m_0 plain compact font_size_md"
 							checked={selected}
 							onclick={(e) => toggle_queued_message_selection(message.id, e.currentTarget.checked)}
 						/>
 
 						<!-- Message type information -->
-						<div class="font_mono flex_1 flex flex_wrap align_items_center gap_xs">
+						<div class="font_family_mono flex_1 flex flex_wrap align_items_center gap_xs">
 							<small class="chip">{message_type}</small>
 
 							<Copy_To_Clipboard
 								text={message.id}
 								attrs={{
-									class: 'plain size_xs text_color_5',
+									class: 'plain font_size_xs text_color_5',
 									style: 'width: 120px;',
 									title: 'copy message id to clipboard',
 								}}
@@ -202,10 +202,10 @@
 							>
 								{#snippet children(copied)}
 									{#if copied}
-										<div><small class="size_xs">{message.id}</small></div>
+										<div><small class="font_size_xs">{message.id}</small></div>
 									{:else}
 										<div in:slide={{duration: 200}}>
-											<small class="size_xs">{message.id}</small>
+											<small class="font_size_xs">{message.id}</small>
 										</div>
 									{/if}
 								{/snippet}
@@ -214,7 +214,7 @@
 							<Copy_To_Clipboard
 								text={message.data.message.id}
 								attrs={{
-									class: 'plain size_xs text_color_5',
+									class: 'plain font_size_xs text_color_5',
 									style: 'width: 120px;',
 									title: 'copy message id to clipboard',
 								}}
@@ -222,25 +222,25 @@
 							>
 								{#snippet children(copied)}
 									{#if copied}
-										<div><small class="size_xs">{message.data.message.id}</small></div>
+										<div><small class="font_size_xs">{message.data.message.id}</small></div>
 									{:else}
 										<div in:slide={{duration: 200}}>
-											<small class="size_xs">{message.data.message.id}</small>
+											<small class="font_size_xs">{message.data.message.id}</small>
 										</div>
 									{/if}
 								{/snippet}
 							</Copy_To_Clipboard>
 						</div>
 
-						<span class="size_sm">{format_timestamp(message.created)}</span>
+						<span class="font_size_sm">{format_timestamp(message.created)}</span>
 
 						<div class="flex gap_xs">
 							<!-- Message details in popover -->
 							<Popover_Button
 								position="left"
-								attrs={{class: 'icon_button plain size_sm', title: 'view message details'}}
+								attrs={{class: 'icon_button plain font_size_sm', title: 'view message details'}}
 							>
-								<Glyph glyph={GLYPH_INFO} size="var(--size_lg)" />
+								<Glyph glyph={GLYPH_INFO} size="var(--font_size_lg)" />
 								{#snippet popover_content(popover)}
 									<div
 										class="p_md overflow_auto bg shadow_bottom_md"
@@ -255,14 +255,14 @@
 											<h3 class="mt_xs">message details</h3>
 											<button
 												type="button"
-												class="icon_button plain size_xs"
+												class="icon_button plain font_size_xs"
 												onclick={() => popover.hide()}
 											>
 												✕
 											</button>
 										</div>
 										<pre
-											class="fg_1 border_radius_xs border_width border_style border_color_2 font_mono size_xs white_space_pre_wrap word_break_break_word p_md">{message_data_serialized}</pre>
+											class="fg_1 border_radius_xs border_width border_style border_color_2 font_family_mono font_size_xs white_space_pre_wrap word_break_break_word p_md">{message_data_serialized}</pre>
 										<Copy_To_Clipboard text={message_data_serialized} />
 									</div>
 								{/snippet}
@@ -272,7 +272,7 @@
 							{#if type === 'queued' || (type === 'failed' && socket.connected)}
 								<button
 									type="button"
-									class="icon_button plain size_sm"
+									class="icon_button plain font_size_sm"
 									title="retry message"
 									onclick={() => retry_queued_message(message)}
 								>
@@ -283,8 +283,8 @@
 							<Confirm_Button
 								onconfirm={() => remove_message(message.id)}
 								position="center"
-								popover_button_attrs={{class: 'icon_button color_c bg_c_1 size_sm'}}
-								attrs={{class: 'icon_button plain size_sm', title: 'remove message'}}
+								popover_button_attrs={{class: 'icon_button color_c bg_c_1 font_size_sm'}}
+								attrs={{class: 'icon_button plain font_size_sm', title: 'remove message'}}
 							>
 								<Glyph glyph={GLYPH_REMOVE} />
 							</Confirm_Button>
@@ -294,14 +294,14 @@
 					<!-- Failed message details -->
 					{#if type === 'failed'}
 						{@const failed_message = message as Failed_Message}
-						<div class="flex flex_column size_xs mt_xs">
+						<div class="flex flex_column font_size_xs mt_xs">
 							<div class="flex justify_content_space_between mb_xs">
 								<span>Failed at:</span>
-								<span class="font_mono">{format(failed_message.failed, 'HH:mm:ss')}</span>
+								<span class="font_family_mono">{format(failed_message.failed, 'HH:mm:ss')}</span>
 							</div>
 							<div class="flex justify_content_space_between">
 								<span>Reason:</span>
-								<span class="font_mono color_c">{failed_message.reason}</span>
+								<span class="font_family_mono color_c">{failed_message.reason}</span>
 							</div>
 						</div>
 					{/if}
@@ -319,7 +319,7 @@
 
 <style>
 	.message_queue_container {
-		margin-bottom: var(--size_md);
+		margin-bottom: var(--font_size_md);
 	}
 
 	.message_list {

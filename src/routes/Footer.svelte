@@ -11,6 +11,6 @@
 
 <Docs_Footer {pkg}>
 	<div class="mb_xl5">
-		<Breadcrumb><Svg data={zzz_logo} size="var(--icon_size_sm)" /></Breadcrumb>
+		<Breadcrumb><Svg data={zzz_logo} size="var(--icon_font_size_sm)" /></Breadcrumb>
 	</div>
 </Docs_Footer>

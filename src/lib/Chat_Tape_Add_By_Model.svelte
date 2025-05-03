@@ -16,7 +16,7 @@
 </script>
 
 <div {...attrs} class="p_sm ${attrs?.class}">
-	<header class="mb_md size_lg">add by model</header>
+	<header class="mb_md font_size_lg">add by model</header>
 	<Model_Picker
 		onpick={(model) => {
 			if (model) {

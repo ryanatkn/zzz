@@ -103,7 +103,7 @@
 		<Contextmenu_Prompt prompt={zzz.prompts.selected}>
 			<div class="column_fixed pr_sm">
 				<section class="column_section">
-					<div class="size_lg">
+					<div class="font_size_lg">
 						<Glyph glyph={GLYPH_PROMPT} />
 						{zzz.prompts.selected.name}
 					</div>
@@ -132,7 +132,7 @@
 					<Content_Preview content={zzz.prompts.selected.content} />
 				</section>
 				<section class="column_section">
-					<header class="size_lg mb_lg"><Glyph glyph={GLYPH_BIT} /> bits</header>
+					<header class="font_size_lg mb_lg"><Glyph glyph={GLYPH_BIT} /> bits</header>
 					<Bit_List
 						bits={zzz.prompts.selected.bits}
 						prompt={zzz.prompts.selected}
@@ -147,14 +147,14 @@
 				<div class="column_bg_1 column gap_md p_sm">
 					<div class="flex justify_content_space_between">
 						<div class="flex flex_wrap gap_xs">
-							<button type="button" class="plain size_sm" onclick={add_text_bit}>
+							<button type="button" class="plain font_size_sm" onclick={add_text_bit}>
 								<div class="row white_space_nowrap">
 									<Glyph glyph={GLYPH_BIT} attrs={{class: 'mr_xs2'}} /> add text
 								</div>
 							</button>
 							<button
 								type="button"
-								class="plain size_sm"
+								class="plain font_size_sm"
 								onclick={add_diskfile_bit}
 								disabled={!zzz.diskfiles.items.size}
 							>
@@ -162,14 +162,14 @@
 									<Glyph glyph={GLYPH_FILE} attrs={{class: 'mr_xs2'}} /> add file
 								</div>
 							</button>
-							<button type="button" class="plain size_sm" onclick={add_sequence_bit}>
+							<button type="button" class="plain font_size_sm" onclick={add_sequence_bit}>
 								<div class="row white_space_nowrap">
 									<Glyph glyph={GLYPH_LIST} attrs={{class: 'mr_xs2'}} /> add sequence
 								</div>
 							</button>
 							<Confirm_Button
 								onconfirm={() => zzz.prompts.selected?.remove_all_bits()}
-								attrs={{disabled: !zzz.prompts.selected.bits.length, class: 'plain size_sm'}}
+								attrs={{disabled: !zzz.prompts.selected.bits.length, class: 'plain font_size_sm'}}
 							>
 								<div class="row white_space_nowrap">
 									<Glyph glyph={GLYPH_REMOVE} attrs={{class: 'mr_xs2'}} /> remove all

@@ -12,7 +12,7 @@
 	const {editor_state}: Props = $props();
 </script>
 
-<div class="font_mono size_sm">
+<div class="font_family_mono font_size_sm">
 	<div class="flex justify_content_space_between">
 		<div>
 			chars

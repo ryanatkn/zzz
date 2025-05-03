@@ -79,7 +79,7 @@
 		<!-- URL input and connect/disconnect -->
 		<div class="flex flex_column gap_sm mb_sm">
 			<div
-				class="chip plain flex_1 size_xl px_xl flex_column"
+				class="chip plain flex_1 font_size_xl px_xl flex_column"
 				style:display="flex !important"
 				style:align-items="flex-start !important"
 				style:font-weight="400 !important"
@@ -96,11 +96,11 @@
 							? 'connecting'
 							: 'disconnected'}
 					{#if capabilities.has_pending_pings}
-						<span class="font_mono"
+						<span class="font_family_mono"
 							>(pending pings: {capabilities.pending_ping_count}) <Pending_Animation /></span
 						>
 					{/if}
-					<small class="font_mono"
+					<small class="font_family_mono"
 						>{#if socket.url}{socket.url}{:else}&nbsp;{/if}</small
 					>
 				</div>
@@ -161,9 +161,9 @@
 							glyph={socket.connected && socket.url === socket.url_input
 								? GLYPH_DISCONNECT
 								: GLYPH_CONNECT}
-							size="var(--size_xl)"
+							size="var(--font_size_xl)"
 						/>
-						<span class="size_lg font_weight_400 ml_md">
+						<span class="font_size_lg font_weight_400 ml_md">
 							{#if !BROWSER}
 								<div class="inline_flex align_items_end">
 									loading <div class="relative"><Pending_Animation /></div>
@@ -189,7 +189,7 @@
 					<label class="flex gap_xs align_items_center">
 						<input
 							type="checkbox"
-							class="compact size_sm"
+							class="compact font_size_sm"
 							bind:checked={
 								() => socket.auto_reconnect,
 								(v) => {
@@ -212,7 +212,7 @@
 					<div class="row mt_sm gap_xs" transition:slide>
 						<button
 							type="button"
-							class="color_d size_xl icon_button plain"
+							class="color_d font_size_xl icon_button plain"
 							title="cancel reconnection attempt"
 							onclick={() => {
 								socket.cancel_reconnect();
@@ -221,7 +221,7 @@
 							<Glyph glyph={GLYPH_CANCEL} />
 						</button>
 						<div class="w_100 border_radius_xs relative overflow_hidden bg_d_1" style:height="24px">
-							<div class="absolute w_100 h_100 row px_lg font_mono" style:z-index="2">
+							<div class="absolute w_100 h_100 row px_lg font_family_mono" style:z-index="2">
 								reconnecting in...
 							</div>
 							{#key socket.current_reconnect_delay}
@@ -327,7 +327,7 @@
 			<div class="flex justify_content_end">
 				<Confirm_Button
 					onconfirm={reset_to_defaults}
-					attrs={{class: 'plain size_sm compact font_weight_600'}}
+					attrs={{class: 'plain font_size_sm compact font_weight_600'}}
 				>
 					reset to defaults
 

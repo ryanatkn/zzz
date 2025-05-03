@@ -28,7 +28,7 @@
 				<Bit_Summary {bit} />
 
 				{#if referenced_by_prompts?.length}
-					<div class="prompt_refs size_xs mt_xs2">
+					<div class="prompt_refs font_size_xs mt_xs2">
 						<span class="text_color_5"
 							>In prompt{referenced_by_prompts.length !== 1 ? 's' : ''}:</span
 						>

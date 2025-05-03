@@ -17,7 +17,7 @@
 </script>
 
 <div {...attrs} class="panel p_lg {attrs?.class}">
-	<div class="size_xl mb_lg">
+	<div class="font_size_xl mb_lg">
 		<Model_Link {model} icon="glyph" />
 	</div>
 	<div class="mb_lg">
@@ -70,7 +70,7 @@
 		display: flex;
 		flex-wrap: wrap;
 		gap: var(--space_xs);
-		font-size: var(--size_sm);
+		font-size: var(--font_size_sm);
 	}
 	.spec_label {
 		color: var(--color_text_2);

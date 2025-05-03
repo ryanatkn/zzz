@@ -90,7 +90,7 @@
 		<!-- TODO refactor -->
 		<div class="p_sm">
 			<!-- TODO support `max_height_100` in Moss -->
-			<nav class="size_lg">
+			<nav class="font_size_lg">
 				{#each dashboard_nav_items as section (section.group)}
 					{#if section.group === 'main'}
 						<div class="flex p_sm mb_sm">
@@ -117,7 +117,7 @@
 							>
 								<Svg
 									data={zzz_logo}
-									size="var(--icon_size_md)"
+									size="var(--icon_font_size_md)"
 									fill={zzz.futuremode ? 'var(--color_h_5)' : undefined}
 									attrs={{
 										style: 'transition: transform 200ms ease',
@@ -127,7 +127,7 @@
 							</Nav_Link>
 						</div>
 					{:else}
-						<div class="size_xl font_serif mt_xl7 mb_md text_color_3">
+						<div class="font_size_xl font_family_serif mt_xl7 mb_md text_color_3">
 							{section.group}
 						</div>
 					{/if}
@@ -144,7 +144,7 @@
 											<Svg
 												data={link.icon}
 												fill={selected ? 'var(--link_color)' : 'var(--text_color_1)'}
-												size="var(--icon_size_xs)"
+												size="var(--icon_font_size_xs)"
 											/>
 										</span>
 										{link.label}
