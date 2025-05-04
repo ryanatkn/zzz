@@ -1,4 +1,5 @@
 import {z} from 'zod';
+import {SvelteMap} from 'svelte/reactivity';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
@@ -99,8 +100,8 @@ export class Diskfile_Tabs extends Cell<typeof Diskfile_Tabs_Json> {
 	/** Recently closed tabs for potential reopening. */
 	recently_closed_tabs: Array<Diskfile_Tab> = $state([]);
 
-	/** Map of closed tab ids to their diskfile ids - used for browser navigation */
-	closed_tab_diskfiles: Map<Uuid, Uuid> = $state(new Map());
+	/** Map of closed tab ids to their diskfile ids - used for browser navigation. */
+	readonly closed_tab_diskfiles: SvelteMap<Uuid, Uuid> = new SvelteMap();
 
 	constructor(options: Diskfile_Tabs_Options) {
 		super(Diskfile_Tabs_Json, options);
