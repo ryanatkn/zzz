@@ -89,12 +89,12 @@
 			var(--shadow_bottom_md)
 			color-mix(in hsl, var(--shadow_color) var(--shadow_alpha_3), transparent)
 	);
-	border-radius: var(--radius_xs);
+	border-radius: var(--border_radius_xs);
 }
 
 /* A panel is a box embedded into the page, useful for visually isolating content. */
 .panel {
-	border-radius: var(--radius_xs);
+	border-radius: var(--border_radius_xs);
 	background-color: var(--panel_bg, var(--fg_1));
 }
 
@@ -197,7 +197,7 @@
 	padding-left: var(--space_xs);
 	padding-right: var(--space_xs);
 	background-color: var(--fg_1);
-	border-radius: var(--radius_xs);
+	border-radius: var(--border_radius_xs);
 }
 a.chip {
 	font-weight: 700;
@@ -236,11 +236,25 @@ a.chip {
 .display_contents {
 	display: contents;
 }
-.inline {
-	display: inline;
+/** Same as `display: block flow`. */
+.display_block {
+	display: block;
 }
-.flex {
+/** Same as `display: inline flow-root`. */
+.display_inline_block {
+	display: inline-block;
+}
+/** Same as `display: block flex`. */
+.display_flex {
 	display: flex;
+}
+/** Same as `display: inline flex`. */
+.display_inline_flex {
+	display: inline-flex;
+}
+/** Same as `display: block grid`. */
+.display_grid {
+	display: grid;
 }
 .flex_1 {
 	flex: 1;
@@ -275,8 +289,37 @@ a.chip {
 .flip_x {
 	transform: scaleX(-1);
 }
+.font_family_sans {
+	font-family: var(--font_family_sans);
+}
+.font_family_serif {
+	font-family: var(--font_family_serif);
+}
+.font_family_mono {
+	font-family: var(--font_family_mono);
+}
 .line_height_1 {
 	line-height: 1;
+}
+.font_size_xs {
+	font-size: var(--font_size_xs);
+	--font_size: var(--font_size_xs);
+}
+.font_size_sm {
+	font-size: var(--font_size_sm);
+	--font_size: var(--font_size_sm);
+}
+.font_size_md {
+	font-size: var(--font_size_md);
+	--font_size: var(--font_size_md);
+}
+.font_size_lg {
+	font-size: var(--font_size_lg);
+	--font_size: var(--font_size_lg);
+}
+.font_size_xl {
+	font-size: var(--font_size_xl);
+	--font_size: var(--font_size_xl);
 }
 .text_align_left {
 	text-align: left;
@@ -348,6 +391,27 @@ a.chip {
 }
 .border_width_1 {
 	border-width: var(--border_width_1);
+}
+.border_style_none {
+	border-style: none;
+}
+.border_style_dashed {
+	border-style: dashed;
+}
+.border_radius_0 {
+	border-radius: 0;
+}
+.border_radius_xs2 {
+	border-radius: var(--border_radius_xs2);
+}
+.border_radius_xs {
+	border-radius: var(--border_radius_xs);
+}
+.border_radius_md {
+	border-radius: var(--border_radius_md);
+}
+.border_radius_lg {
+	border-radius: var(--border_radius_lg);
 }
 .shadow_bottom_md {
 	box-shadow: var(--shadow_bottom_md)

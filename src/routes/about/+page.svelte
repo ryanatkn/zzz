@@ -72,8 +72,8 @@
 			<li>
 				AI UIs like <External_Link href="https://github.com/Mintplex-Labs/anything-llm"
 					>AnythingLLM</External_Link
-				>, <External_Link href="https://github.com/open-webui/open-webui">Open WebUI</External_Link
-				>, and <External_Link href="https://github.com/oobabooga/text-generation-webui"
+				>, <External_Link href="https://github.com/danny-avila/LibreChat">LibreChat</External_Link>,
+				and <External_Link href="https://github.com/oobabooga/text-generation-webui"
 					>Text generation web UI</External_Link
 				>
 			</li>

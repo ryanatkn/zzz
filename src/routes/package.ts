@@ -34,9 +34,9 @@ export const package_json = {
 	devDependencies: {
 		'@changesets/changelog-git': '^0.2.1',
 		'@ryanatkn/eslint-config': '^0.8.0',
-		'@ryanatkn/fuz': '^0.141.1',
-		'@ryanatkn/gro': '^0.156.0',
-		'@ryanatkn/moss': '^0.28.0',
+		'@ryanatkn/fuz': '^0.142.1',
+		'@ryanatkn/gro': '^0.157.1',
+		'@ryanatkn/moss': '^0.29.0',
 		'@sveltejs/adapter-static': '^3.0.8',
 		'@sveltejs/kit': '^2.20.8',
 		'@sveltejs/package': '^2.3.11',
@@ -784,9 +784,15 @@ export const src_json = {
 	name: '@ryanatkn/zzz',
 	version: '0.0.1',
 	modules: {
-		'./package.json': {path: 'package.json', declarations: []},
-		'./Action_Detail.svelte': {path: 'Action_Detail.svelte', declarations: []},
-		'./Action_List.svelte': {path: 'Action_List.svelte', declarations: []},
+		'./package.json': {path: 'package.json', declarations: [{name: 'default', kind: 'json'}]},
+		'./Action_Detail.svelte': {
+			path: 'Action_Detail.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Action_List.svelte': {
+			path: 'Action_List.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./action_types.js': {
 			path: 'action_types.ts',
 			declarations: [
@@ -849,9 +855,18 @@ export const src_json = {
 				{name: 'App', kind: 'class'},
 			],
 		},
-		'./Bit_Editor_For_Diskfile.svelte': {path: 'Bit_Editor_For_Diskfile.svelte', declarations: []},
-		'./Bit_Editor_For_Sequence.svelte': {path: 'Bit_Editor_For_Sequence.svelte', declarations: []},
-		'./Bit_Editor_For_Text.svelte': {path: 'Bit_Editor_For_Text.svelte', declarations: []},
+		'./Bit_Editor_For_Diskfile.svelte': {
+			path: 'Bit_Editor_For_Diskfile.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Bit_Editor_For_Sequence.svelte': {
+			path: 'Bit_Editor_For_Sequence.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Bit_Editor_For_Text.svelte': {
+			path: 'Bit_Editor_For_Text.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./bit_helpers.js': {
 			path: 'bit_helpers.ts',
 			declarations: [
@@ -859,15 +874,42 @@ export const src_json = {
 				{name: 'get_bit_type_glyph', kind: 'function'},
 			],
 		},
-		'./Bit_List.svelte': {path: 'Bit_List.svelte', declarations: []},
-		'./Bit_Listitem.svelte': {path: 'Bit_Listitem.svelte', declarations: []},
-		'./Bit_Picker_Dialog.svelte': {path: 'Bit_Picker_Dialog.svelte', declarations: []},
-		'./Bit_Picker.svelte': {path: 'Bit_Picker.svelte', declarations: []},
-		'./Bit_Remove_Button.svelte': {path: 'Bit_Remove_Button.svelte', declarations: []},
-		'./Bit_Stats.svelte': {path: 'Bit_Stats.svelte', declarations: []},
-		'./Bit_Summary.svelte': {path: 'Bit_Summary.svelte', declarations: []},
-		'./Bit_Toggle_Button.svelte': {path: 'Bit_Toggle_Button.svelte', declarations: []},
-		'./Bit_View.svelte': {path: 'Bit_View.svelte', declarations: []},
+		'./Bit_List.svelte': {
+			path: 'Bit_List.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Bit_Listitem.svelte': {
+			path: 'Bit_Listitem.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Bit_Picker_Dialog.svelte': {
+			path: 'Bit_Picker_Dialog.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Bit_Picker.svelte': {
+			path: 'Bit_Picker.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Bit_Remove_Button.svelte': {
+			path: 'Bit_Remove_Button.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Bit_Stats.svelte': {
+			path: 'Bit_Stats.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Bit_Summary.svelte': {
+			path: 'Bit_Summary.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Bit_Toggle_Button.svelte': {
+			path: 'Bit_Toggle_Button.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Bit_View.svelte': {
+			path: 'Bit_View.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./bit.svelte.js': {
 			path: 'bit.svelte.ts',
 			declarations: [
@@ -906,7 +948,10 @@ export const src_json = {
 				{name: 'Bits', kind: 'class'},
 			],
 		},
-		'./Capabilities_View.svelte': {path: 'Capabilities_View.svelte', declarations: []},
+		'./Capabilities_View.svelte': {
+			path: 'Capabilities_View.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./capabilities.svelte.js': {
 			path: 'capabilities.svelte.ts',
 			declarations: [
@@ -922,11 +967,26 @@ export const src_json = {
 				{name: 'Capabilities', kind: 'class'},
 			],
 		},
-		'./Capability_Filesystem.svelte': {path: 'Capability_Filesystem.svelte', declarations: []},
-		'./Capability_Ollama.svelte': {path: 'Capability_Ollama.svelte', declarations: []},
-		'./Capability_Server.svelte': {path: 'Capability_Server.svelte', declarations: []},
-		'./Capability_System.svelte': {path: 'Capability_System.svelte', declarations: []},
-		'./Capability_Websocket.svelte': {path: 'Capability_Websocket.svelte', declarations: []},
+		'./Capability_Filesystem.svelte': {
+			path: 'Capability_Filesystem.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Capability_Ollama.svelte': {
+			path: 'Capability_Ollama.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Capability_Server.svelte': {
+			path: 'Capability_Server.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Capability_System.svelte': {
+			path: 'Capability_System.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Capability_Websocket.svelte': {
+			path: 'Capability_Websocket.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./cell_classes.js': {
 			path: 'cell_classes.ts',
 			declarations: [
@@ -979,18 +1039,42 @@ export const src_json = {
 				{name: 'Cell', kind: 'class'},
 			],
 		},
-		'./Chat_Initializer.svelte': {path: 'Chat_Initializer.svelte', declarations: []},
-		'./Chat_List.svelte': {path: 'Chat_List.svelte', declarations: []},
-		'./Chat_Listitem.svelte': {path: 'Chat_Listitem.svelte', declarations: []},
-		'./Chat_Tape_Add_By_Model.svelte': {path: 'Chat_Tape_Add_By_Model.svelte', declarations: []},
-		'./Chat_Tape.svelte': {path: 'Chat_Tape.svelte', declarations: []},
+		'./Chat_Initializer.svelte': {
+			path: 'Chat_Initializer.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Chat_List.svelte': {
+			path: 'Chat_List.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Chat_Listitem.svelte': {
+			path: 'Chat_Listitem.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Chat_Tape_Add_By_Model.svelte': {
+			path: 'Chat_Tape_Add_By_Model.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Chat_Tape.svelte': {
+			path: 'Chat_Tape.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./chat_template.js': {
 			path: 'chat_template.ts',
 			declarations: [{name: 'Chat_Template', kind: 'type'}],
 		},
-		'./Chat_View_Multi.svelte': {path: 'Chat_View_Multi.svelte', declarations: []},
-		'./Chat_View_Simple.svelte': {path: 'Chat_View_Simple.svelte', declarations: []},
-		'./Chat_View.svelte': {path: 'Chat_View.svelte', declarations: []},
+		'./Chat_View_Multi.svelte': {
+			path: 'Chat_View_Multi.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Chat_View_Simple.svelte': {
+			path: 'Chat_View_Simple.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Chat_View.svelte': {
+			path: 'Chat_View.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./chat.svelte.js': {
 			path: 'chat.svelte.ts',
 			declarations: [
@@ -1012,7 +1096,10 @@ export const src_json = {
 				{name: 'Chats_Schema', kind: 'variable'},
 			],
 		},
-		'./Clear_Restore_Button.svelte': {path: 'Clear_Restore_Button.svelte', declarations: []},
+		'./Clear_Restore_Button.svelte': {
+			path: 'Clear_Restore_Button.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./config_defaults.js': {
 			path: 'config_defaults.ts',
 			declarations: [
@@ -1038,8 +1125,11 @@ export const src_json = {
 				{name: 'Zzz_Config', kind: 'type'},
 			],
 		},
-		'./config.js': {path: 'config.ts', declarations: [{name: 'default', kind: 'variable'}]},
-		'./Confirm_Button.svelte': {path: 'Confirm_Button.svelte', declarations: []},
+		'./config.js': {path: 'config.ts', declarations: [{name: 'default', kind: 'function'}]},
+		'./Confirm_Button.svelte': {
+			path: 'Confirm_Button.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./constants.js': {
 			path: 'constants.ts',
 			declarations: [
@@ -1050,43 +1140,118 @@ export const src_json = {
 				{name: 'CONTENT_PREVIEW_LENGTH', kind: 'variable'},
 			],
 		},
-		'./Content_Editor.svelte': {path: 'Content_Editor.svelte', declarations: []},
-		'./Content_Preview.svelte': {path: 'Content_Preview.svelte', declarations: []},
-		'./Content_Stats.svelte': {path: 'Content_Stats.svelte', declarations: []},
-		'./Contextmenu_Bit.svelte': {path: 'Contextmenu_Bit.svelte', declarations: []},
-		'./Contextmenu_Chat.svelte': {path: 'Contextmenu_Chat.svelte', declarations: []},
-		'./Contextmenu_Chats.svelte': {path: 'Contextmenu_Chats.svelte', declarations: []},
-		'./Contextmenu_Diskfile.svelte': {path: 'Contextmenu_Diskfile.svelte', declarations: []},
+		'./Content_Editor.svelte': {
+			path: 'Content_Editor.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Content_Preview.svelte': {
+			path: 'Content_Preview.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Content_Stats.svelte': {
+			path: 'Content_Stats.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Contextmenu_Bit.svelte': {
+			path: 'Contextmenu_Bit.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Contextmenu_Chat.svelte': {
+			path: 'Contextmenu_Chat.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Contextmenu_Chats.svelte': {
+			path: 'Contextmenu_Chats.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Contextmenu_Diskfile.svelte': {
+			path: 'Contextmenu_Diskfile.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./Contextmenu_Entry_Copy_To_Clipboard.svelte': {
 			path: 'Contextmenu_Entry_Copy_To_Clipboard.svelte',
-			declarations: [],
+			declarations: [{name: 'default', kind: 'component'}],
 		},
 		'./Contextmenu_Entry_Toggle.svelte': {
 			path: 'Contextmenu_Entry_Toggle.svelte',
-			declarations: [],
+			declarations: [{name: 'default', kind: 'component'}],
 		},
-		'./Contextmenu_Prompt.svelte': {path: 'Contextmenu_Prompt.svelte', declarations: []},
-		'./Contextmenu_Strip.svelte': {path: 'Contextmenu_Strip.svelte', declarations: []},
-		'./Contextmenu_Tape.svelte': {path: 'Contextmenu_Tape.svelte', declarations: []},
-		'./Dashboard_Capabilities.svelte': {path: 'Dashboard_Capabilities.svelte', declarations: []},
-		'./Dashboard_Chats.svelte': {path: 'Dashboard_Chats.svelte', declarations: []},
-		'./Dashboard_Diskfiles.svelte': {path: 'Dashboard_Diskfiles.svelte', declarations: []},
-		'./Dashboard_Home.svelte': {path: 'Dashboard_Home.svelte', declarations: []},
-		'./Dashboard_Log.svelte': {path: 'Dashboard_Log.svelte', declarations: []},
-		'./Dashboard_Models.svelte': {path: 'Dashboard_Models.svelte', declarations: []},
-		'./Dashboard_Prompts.svelte': {path: 'Dashboard_Prompts.svelte', declarations: []},
-		'./Dashboard_Providers.svelte': {path: 'Dashboard_Providers.svelte', declarations: []},
-		'./Dashboard_Settings.svelte': {path: 'Dashboard_Settings.svelte', declarations: []},
-		'./Dashboard.svelte': {path: 'Dashboard.svelte', declarations: []},
-		'./Diskfile_Actions.svelte': {path: 'Diskfile_Actions.svelte', declarations: []},
-		'./Diskfile_Bit_View.svelte': {path: 'Diskfile_Bit_View.svelte', declarations: []},
-		'./Diskfile_Editor_Nav.svelte': {path: 'Diskfile_Editor_Nav.svelte', declarations: []},
+		'./Contextmenu_Prompt.svelte': {
+			path: 'Contextmenu_Prompt.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Contextmenu_Strip.svelte': {
+			path: 'Contextmenu_Strip.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Contextmenu_Tape.svelte': {
+			path: 'Contextmenu_Tape.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Dashboard_Capabilities.svelte': {
+			path: 'Dashboard_Capabilities.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Dashboard_Chats.svelte': {
+			path: 'Dashboard_Chats.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Dashboard_Diskfiles.svelte': {
+			path: 'Dashboard_Diskfiles.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Dashboard_Home.svelte': {
+			path: 'Dashboard_Home.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Dashboard_Log.svelte': {
+			path: 'Dashboard_Log.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Dashboard_Models.svelte': {
+			path: 'Dashboard_Models.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Dashboard_Prompts.svelte': {
+			path: 'Dashboard_Prompts.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Dashboard_Providers.svelte': {
+			path: 'Dashboard_Providers.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Dashboard_Settings.svelte': {
+			path: 'Dashboard_Settings.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Dashboard.svelte': {
+			path: 'Dashboard.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Diskfile_Actions.svelte': {
+			path: 'Diskfile_Actions.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Diskfile_Bit_View.svelte': {
+			path: 'Diskfile_Bit_View.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Diskfile_Editor_Nav.svelte': {
+			path: 'Diskfile_Editor_Nav.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./diskfile_editor_state.svelte.js': {
 			path: 'diskfile_editor_state.svelte.ts',
 			declarations: [{name: 'Diskfile_Editor_State', kind: 'class'}],
 		},
-		'./Diskfile_Editor_View.svelte': {path: 'Diskfile_Editor_View.svelte', declarations: []},
-		'./Diskfile_Explorer.svelte': {path: 'Diskfile_Explorer.svelte', declarations: []},
+		'./Diskfile_Editor_View.svelte': {
+			path: 'Diskfile_Editor_View.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Diskfile_Explorer.svelte': {
+			path: 'Diskfile_Explorer.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./diskfile_helpers.js': {
 			path: 'diskfile_helpers.ts',
 			declarations: [
@@ -1097,7 +1262,10 @@ export const src_json = {
 				{name: 'has_dependencies', kind: 'function'},
 			],
 		},
-		'./Diskfile_History_View.svelte': {path: 'Diskfile_History_View.svelte', declarations: []},
+		'./Diskfile_History_View.svelte': {
+			path: 'Diskfile_History_View.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./diskfile_history.svelte.js': {
 			path: 'diskfile_history.svelte.ts',
 			declarations: [
@@ -1108,12 +1276,30 @@ export const src_json = {
 				{name: 'Diskfile_History', kind: 'class'},
 			],
 		},
-		'./Diskfile_Info.svelte': {path: 'Diskfile_Info.svelte', declarations: []},
-		'./Diskfile_Listitem.svelte': {path: 'Diskfile_Listitem.svelte', declarations: []},
-		'./Diskfile_Metrics.svelte': {path: 'Diskfile_Metrics.svelte', declarations: []},
-		'./Diskfile_Picker_Dialog.svelte': {path: 'Diskfile_Picker_Dialog.svelte', declarations: []},
-		'./Diskfile_Picker.svelte': {path: 'Diskfile_Picker.svelte', declarations: []},
-		'./Diskfile_Tab_Listitem.svelte': {path: 'Diskfile_Tab_Listitem.svelte', declarations: []},
+		'./Diskfile_Info.svelte': {
+			path: 'Diskfile_Info.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Diskfile_Listitem.svelte': {
+			path: 'Diskfile_Listitem.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Diskfile_Metrics.svelte': {
+			path: 'Diskfile_Metrics.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Diskfile_Picker_Dialog.svelte': {
+			path: 'Diskfile_Picker_Dialog.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Diskfile_Picker.svelte': {
+			path: 'Diskfile_Picker.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Diskfile_Tab_Listitem.svelte': {
+			path: 'Diskfile_Tab_Listitem.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./diskfile_tab.svelte.js': {
 			path: 'diskfile_tab.svelte.ts',
 			declarations: [
@@ -1172,10 +1358,19 @@ export const src_json = {
 				{name: 'Diskfiles', kind: 'class'},
 			],
 		},
-		'./Error_Message.svelte': {path: 'Error_Message.svelte', declarations: []},
-		'./External_Link_Icon.svelte': {path: 'External_Link_Icon.svelte', declarations: []},
-		'./External_Link.svelte': {path: 'External_Link.svelte', declarations: []},
-		'./Glyph.svelte': {path: 'Glyph.svelte', declarations: []},
+		'./Error_Message.svelte': {
+			path: 'Error_Message.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./External_Link_Icon.svelte': {
+			path: 'External_Link_Icon.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./External_Link.svelte': {
+			path: 'External_Link.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Glyph.svelte': {path: 'Glyph.svelte', declarations: [{name: 'default', kind: 'component'}]},
 		'./glyphs.js': {
 			path: 'glyphs.ts',
 			declarations: [
@@ -1278,14 +1473,38 @@ export const src_json = {
 				{name: 'to_reordered_list', kind: 'function'},
 			],
 		},
-		'./Main_Dialog.svelte': {path: 'Main_Dialog.svelte', declarations: []},
-		'./Model_Detail.svelte': {path: 'Model_Detail.svelte', declarations: []},
-		'./Model_Link.svelte': {path: 'Model_Link.svelte', declarations: []},
-		'./Model_Listitem.svelte': {path: 'Model_Listitem.svelte', declarations: []},
-		'./Model_Picker_Dialog.svelte': {path: 'Model_Picker_Dialog.svelte', declarations: []},
-		'./Model_Picker.svelte': {path: 'Model_Picker.svelte', declarations: []},
-		'./Model_Select.svelte': {path: 'Model_Select.svelte', declarations: []},
-		'./Model_Summary.svelte': {path: 'Model_Summary.svelte', declarations: []},
+		'./Main_Dialog.svelte': {
+			path: 'Main_Dialog.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Model_Detail.svelte': {
+			path: 'Model_Detail.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Model_Link.svelte': {
+			path: 'Model_Link.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Model_Listitem.svelte': {
+			path: 'Model_Listitem.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Model_Picker_Dialog.svelte': {
+			path: 'Model_Picker_Dialog.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Model_Picker.svelte': {
+			path: 'Model_Picker.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Model_Select.svelte': {
+			path: 'Model_Select.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Model_Summary.svelte': {
+			path: 'Model_Summary.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./model.svelte.js': {
 			path: 'model.svelte.ts',
 			declarations: [
@@ -1313,7 +1532,10 @@ export const src_json = {
 				{name: 'to_prompts_url', kind: 'function'},
 			],
 		},
-		'./Nav_Link.svelte': {path: 'Nav_Link.svelte', declarations: []},
+		'./Nav_Link.svelte': {
+			path: 'Nav_Link.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./nav.js': {
 			path: 'nav.ts',
 			declarations: [
@@ -1333,10 +1555,22 @@ export const src_json = {
 				{name: 'ollama_list_with_metadata', kind: 'function'},
 			],
 		},
-		'./Picker_Dialog.svelte': {path: 'Picker_Dialog.svelte', declarations: []},
-		'./Picker.svelte': {path: 'Picker.svelte', declarations: []},
-		'./Ping_Form.svelte': {path: 'Ping_Form.svelte', declarations: []},
-		'./Popover_Button.svelte': {path: 'Popover_Button.svelte', declarations: []},
+		'./Picker_Dialog.svelte': {
+			path: 'Picker_Dialog.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Picker.svelte': {
+			path: 'Picker.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Ping_Form.svelte': {
+			path: 'Ping_Form.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Popover_Button.svelte': {
+			path: 'Popover_Button.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./popover.svelte.js': {
 			path: 'popover.svelte.ts',
 			declarations: [
@@ -1360,12 +1594,30 @@ export const src_json = {
 			path: 'prompt_helpers.ts',
 			declarations: [{name: 'format_prompt_content', kind: 'function'}],
 		},
-		'./Prompt_List.svelte': {path: 'Prompt_List.svelte', declarations: []},
-		'./Prompt_Listitem.svelte': {path: 'Prompt_Listitem.svelte', declarations: []},
-		'./Prompt_Picker_Dialog.svelte': {path: 'Prompt_Picker_Dialog.svelte', declarations: []},
-		'./Prompt_Picker.svelte': {path: 'Prompt_Picker.svelte', declarations: []},
-		'./Prompt_Stats.svelte': {path: 'Prompt_Stats.svelte', declarations: []},
-		'./Prompt_Summary.svelte': {path: 'Prompt_Summary.svelte', declarations: []},
+		'./Prompt_List.svelte': {
+			path: 'Prompt_List.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Prompt_Listitem.svelte': {
+			path: 'Prompt_Listitem.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Prompt_Picker_Dialog.svelte': {
+			path: 'Prompt_Picker_Dialog.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Prompt_Picker.svelte': {
+			path: 'Prompt_Picker.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Prompt_Stats.svelte': {
+			path: 'Prompt_Stats.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Prompt_Summary.svelte': {
+			path: 'Prompt_Summary.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./prompt.svelte.js': {
 			path: 'prompt.svelte.ts',
 			declarations: [
@@ -1388,10 +1640,22 @@ export const src_json = {
 				{name: 'Prompts_Schema', kind: 'variable'},
 			],
 		},
-		'./Provider_Detail.svelte': {path: 'Provider_Detail.svelte', declarations: []},
-		'./Provider_Link.svelte': {path: 'Provider_Link.svelte', declarations: []},
-		'./Provider_Logo.svelte': {path: 'Provider_Logo.svelte', declarations: []},
-		'./Provider_Summary.svelte': {path: 'Provider_Summary.svelte', declarations: []},
+		'./Provider_Detail.svelte': {
+			path: 'Provider_Detail.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Provider_Link.svelte': {
+			path: 'Provider_Link.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Provider_Logo.svelte': {
+			path: 'Provider_Logo.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Provider_Summary.svelte': {
+			path: 'Provider_Summary.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./provider_types.js': {
 			path: 'provider_types.ts',
 			declarations: [{name: 'Provider_Name', kind: 'variable'}],
@@ -1503,7 +1767,10 @@ export const src_json = {
 				{name: 'Zzz_Server', kind: 'class'},
 			],
 		},
-		'./Settings.svelte': {path: 'Settings.svelte', declarations: []},
+		'./Settings.svelte': {
+			path: 'Settings.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./socket_helpers.js': {
 			path: 'socket_helpers.ts',
 			declarations: [
@@ -1515,7 +1782,10 @@ export const src_json = {
 				{name: 'DEFAULT_CLOSE_CODE', kind: 'variable'},
 			],
 		},
-		'./Socket_Message_Queue.svelte': {path: 'Socket_Message_Queue.svelte', declarations: []},
+		'./Socket_Message_Queue.svelte': {
+			path: 'Socket_Message_Queue.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./socket.svelte.js': {
 			path: 'socket.svelte.ts',
 			declarations: [
@@ -1529,7 +1799,10 @@ export const src_json = {
 				{name: 'Socket', kind: 'class'},
 			],
 		},
-		'./Sortable_List.svelte': {path: 'Sortable_List.svelte', declarations: []},
+		'./Sortable_List.svelte': {
+			path: 'Sortable_List.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./sortable.svelte.js': {
 			path: 'sortable.svelte.ts',
 			declarations: [
@@ -1539,9 +1812,18 @@ export const src_json = {
 				{name: 'sort_by_numeric', kind: 'function'},
 			],
 		},
-		'./Strip_List.svelte': {path: 'Strip_List.svelte', declarations: []},
-		'./Strip_Listitem.svelte': {path: 'Strip_Listitem.svelte', declarations: []},
-		'./Strip_View.svelte': {path: 'Strip_View.svelte', declarations: []},
+		'./Strip_List.svelte': {
+			path: 'Strip_List.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Strip_Listitem.svelte': {
+			path: 'Strip_Listitem.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Strip_View.svelte': {
+			path: 'Strip_View.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./strip.svelte.js': {
 			path: 'strip.svelte.ts',
 			declarations: [
@@ -1562,9 +1844,18 @@ export const src_json = {
 				{name: 'render_tape_messages', kind: 'function'},
 			],
 		},
-		'./Tape_List.svelte': {path: 'Tape_List.svelte', declarations: []},
-		'./Tape_Listitem.svelte': {path: 'Tape_Listitem.svelte', declarations: []},
-		'./Tape_Toggle_Button.svelte': {path: 'Tape_Toggle_Button.svelte', declarations: []},
+		'./Tape_List.svelte': {
+			path: 'Tape_List.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Tape_Listitem.svelte': {
+			path: 'Tape_Listitem.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Tape_Toggle_Button.svelte': {
+			path: 'Tape_Toggle_Button.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./tape_types.js': {
 			path: 'tape_types.ts',
 			declarations: [
@@ -1620,7 +1911,10 @@ export const src_json = {
 				{name: 'Time', kind: 'class'},
 			],
 		},
-		'./Toggle_Button.svelte': {path: 'Toggle_Button.svelte', declarations: []},
+		'./Toggle_Button.svelte': {
+			path: 'Toggle_Button.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./ui.svelte.js': {
 			path: 'ui.svelte.ts',
 			declarations: [
@@ -1639,8 +1933,14 @@ export const src_json = {
 				{name: 'Url_Params', kind: 'class'},
 			],
 		},
-		'./Xml_Attribute_Editor.svelte': {path: 'Xml_Attribute_Editor.svelte', declarations: []},
-		'./Xml_Tag_Controls.svelte': {path: 'Xml_Tag_Controls.svelte', declarations: []},
+		'./Xml_Attribute_Editor.svelte': {
+			path: 'Xml_Attribute_Editor.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Xml_Tag_Controls.svelte': {
+			path: 'Xml_Tag_Controls.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./xml.js': {
 			path: 'xml.ts',
 			declarations: [
@@ -1671,7 +1971,10 @@ export const src_json = {
 				{name: 'get_inner_array_schema', kind: 'function'},
 			],
 		},
-		'./Zzz_Root.svelte': {path: 'Zzz_Root.svelte', declarations: []},
+		'./Zzz_Root.svelte': {
+			path: 'Zzz_Root.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./zzz.svelte.js': {
 			path: 'zzz.svelte.ts',
 			declarations: [
