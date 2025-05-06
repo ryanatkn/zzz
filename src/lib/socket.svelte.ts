@@ -57,7 +57,7 @@ export interface Failed_Message extends Queued_Message {
 export class Socket extends Cell<typeof Socket_Json> {
 	// Private serializable state with getters/setters
 	#url: string | null = $state()!;
-	#url_input: string = $state()!;
+	#url_input: string = $state()!; // TODO better name? is ambiguous, it's un-applied (not quite unsaved/temporary)
 	#heartbeat_interval: number = $state()!;
 	#reconnect_delay: number = $state()!;
 	#reconnect_delay_max: number = $state()!;

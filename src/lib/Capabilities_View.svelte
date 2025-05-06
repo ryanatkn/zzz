@@ -24,6 +24,10 @@
 		</section>
 		<section class="mb_xl12">
 			<h2><Glyph glyph={GLYPH_CONNECT} /> server websocket</h2>
+			<p>
+				Zzz currently relies on websockets for updates like filesystem changes. This will be made
+				optional in the future and SSE will be supported too.
+			</p>
 			<Capability_Websocket />
 		</section>
 		<section class="mb_xl12">

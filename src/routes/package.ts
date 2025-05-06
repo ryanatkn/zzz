@@ -34,8 +34,8 @@ export const package_json = {
 	devDependencies: {
 		'@changesets/changelog-git': '^0.2.1',
 		'@ryanatkn/eslint-config': '^0.8.0',
-		'@ryanatkn/fuz': '^0.142.1',
-		'@ryanatkn/gro': '^0.157.1',
+		'@ryanatkn/fuz': '^0.143.0',
+		'@ryanatkn/gro': '^0.158.0',
 		'@ryanatkn/moss': '^0.29.0',
 		'@sveltejs/adapter-static': '^3.0.8',
 		'@sveltejs/kit': '^2.20.8',
@@ -1729,8 +1729,8 @@ export const src_json = {
 				{name: 'Scrollable', kind: 'class'},
 			],
 		},
-		'./server/.env.example': {path: 'server/.env.example', declarations: []},
-		'./server/.env.production.example': {path: 'server/.env.production.example', declarations: []},
+		'./server/.env.example': {path: 'server/.env.example'},
+		'./server/.env.production.example': {path: 'server/.env.production.example'},
 		'./server/ai_provider_utils.js': {
 			path: 'server/ai_provider_utils.ts',
 			declarations: [
@@ -1756,7 +1756,7 @@ export const src_json = {
 				{name: 'Symlink_Not_Allowed_Error', kind: 'class'},
 			],
 		},
-		'./server/server.js': {path: 'server/server.ts', declarations: []},
+		'./server/server.js': {path: 'server/server.ts'},
 		'./server/zzz_server.js': {
 			path: 'server/zzz_server.ts',
 			declarations: [

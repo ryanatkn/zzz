@@ -5,6 +5,8 @@ import {Datetime_Now, get_datetime_now, Uuid, Uuid_With_Default} from '$lib/zod_
 import {Provider_Name} from '$lib/provider_types.js';
 import {Cell_Json} from '$lib/cell_types.js';
 
+// TODO rewrite this to MCP (and probably ArkType)
+
 export const Action_Direction = z.enum(['client', 'server', 'both']);
 export type Action_Direction = z.infer<typeof Action_Direction>;
 
@@ -118,7 +120,6 @@ export const Completion_Response = z.object({
 });
 export type Completion_Response = z.infer<typeof Completion_Response>;
 
-// Base action schema
 export const Action_Base = z
 	.object({
 		id: Uuid_With_Default,
@@ -127,7 +128,6 @@ export const Action_Base = z
 	.strict();
 export type Action_Base = z.infer<typeof Action_Base>;
 
-// Ping/Pong action schemas
 export const Action_Ping = Action_Base.extend({
 	type: z.literal('ping').default('ping'),
 }).strict();
@@ -139,7 +139,6 @@ export const Action_Pong = Action_Base.extend({
 }).strict();
 export type Action_Pong = z.infer<typeof Action_Pong>;
 
-// Session related action schemas
 export const Action_Load_Session = Action_Base.extend({
 	type: z.literal('load_session').default('load_session'),
 }).strict();
@@ -156,7 +155,6 @@ export const Action_Loaded_Session = Action_Base.extend({
 }).strict();
 export type Action_Loaded_Session = z.infer<typeof Action_Loaded_Session>;
 
-// Define schema for diskfile change
 export const Diskfile_Change = z
 	.object({
 		type: Diskfile_Change_Type,
@@ -165,7 +163,6 @@ export const Diskfile_Change = z
 	.strict();
 export type Diskfile_Change = z.infer<typeof Diskfile_Change>;
 
-// File related action schemas
 export const Action_Filer_Change = Action_Base.extend({
 	type: z.literal('filer_change').default('filer_change'),
 	change: Diskfile_Change,
@@ -192,7 +189,6 @@ export const Action_Create_Directory = Action_Base.extend({
 }).strict();
 export type Action_Create_Directory = z.infer<typeof Action_Create_Directory>;
 
-// Completion related action schemas
 export const Action_Send_Prompt = Action_Base.extend({
 	type: z.literal('send_prompt').default('send_prompt'),
 	completion_request: Completion_Request,
@@ -205,7 +201,6 @@ export const Action_Completion_Response = Action_Base.extend({
 }).strict();
 export type Action_Completion_Response = z.infer<typeof Action_Completion_Response>;
 
-// Union of all client action types
 export const Action_Client = z.discriminatedUnion('type', [
 	Action_Ping,
 	Action_Load_Session,
@@ -216,7 +211,6 @@ export const Action_Client = z.discriminatedUnion('type', [
 ]);
 export type Action_Client = z.infer<typeof Action_Client>;
 
-// Union of all server action types
 export const Action_Server = z.discriminatedUnion('type', [
 	Action_Pong,
 	Action_Loaded_Session,
@@ -225,7 +219,6 @@ export const Action_Server = z.discriminatedUnion('type', [
 ]);
 export type Action_Server = z.infer<typeof Action_Server>;
 
-// Union of all action types
 export const Action = z.discriminatedUnion('type', [
 	Action_Ping,
 	Action_Pong,
@@ -240,7 +233,6 @@ export const Action = z.discriminatedUnion('type', [
 ]);
 export type Action = z.infer<typeof Action>;
 
-// Action with metadata schema
 export const Action_Json = Cell_Json.extend({
 	type: Action_Type,
 	direction: Action_Direction,

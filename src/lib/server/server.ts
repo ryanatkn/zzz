@@ -24,12 +24,6 @@ const main = async () => {
 
 	const {injectWebSocket, upgradeWebSocket} = createNodeWebSocket({app});
 
-	app.get('/', (c) => {
-		const r = c.text('hello world');
-		console.log(`r`, r);
-		return r;
-	});
-
 	app.get(
 		'/ws',
 		/**
