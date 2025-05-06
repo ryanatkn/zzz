@@ -16,7 +16,13 @@ export default {
 			directives: create_csp_directives({
 				trusted_sources: csp_trusted_sources_of_ryanatkn,
 				directives: {
-					'connect-src': ['self', 'ws://localhost:8999', 'wss://localhost:8999'],
+					'connect-src': [
+						'self',
+						// TODO switch these to use env vars
+						'ws://localhost:8999',
+						'wss://localhost:8999',
+						'http://127.0.0.1:11434', // for Ollama
+					],
 				},
 			}),
 		},
