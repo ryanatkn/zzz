@@ -102,20 +102,20 @@ export class Projects extends Cell<typeof Projects_Json> {
 	});
 
 	/** Current page editor derived from current project and page IDs. */
-	readonly current_page_editor = $derived.by(() => {
+	readonly current_page_viewmodel = $derived.by(() => {
 		if (!this.current_project_id || !this.current_page_id) return null;
 
 		const key = `${this.current_project_id}_${this.current_page_id}`;
-		let editor = this.#page_viewmodels.get(key);
-		if (!editor) {
-			editor = new Page_Viewmodel({
+		let viewmodel = this.#page_viewmodels.get(key);
+		if (!viewmodel) {
+			viewmodel = new Page_Viewmodel({
 				projects: this,
 				project_id: this.current_project_id,
 				page_id: this.current_page_id,
 			});
-			this.#page_viewmodels.set(key, editor);
+			this.#page_viewmodels.set(key, viewmodel);
 		}
-		return editor;
+		return viewmodel;
 	});
 
 	/** Current domains viewmodel derived from current project and domain IDs. */

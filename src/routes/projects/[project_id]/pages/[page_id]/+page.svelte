@@ -14,7 +14,7 @@
 	const projects = projects_context.get();
 	const zzz = zzz_context.get();
 
-	const editor = $derived(projects.current_page_editor);
+	const page_viewmodel = $derived(projects.current_page_viewmodel);
 
 	// Preview mode state
 	let preview_mode = $state(false);
@@ -28,16 +28,16 @@
 	/** Delete the current page and navigate back to pages list. */
 	const delete_page = () => {
 		const controller = projects.current_project_viewmodel;
-		if (!editor?.project || !editor.current_page || !controller) {
+		if (!page_viewmodel?.project || !page_viewmodel.current_page || !controller) {
 			return;
 		}
 
 		// eslint-disable-next-line no-alert
 		if (confirm('Are you sure you want to delete this page? This action cannot be undone.')) {
-			controller.delete_project_page(editor.page_id);
+			controller.delete_project_page(page_viewmodel.page_id);
 
 			// Navigate back to pages list
-			void goto(`${base}/projects/${editor.project_id}/pages`);
+			void goto(`${base}/projects/${page_viewmodel.project_id}/pages`);
 		}
 	};
 
@@ -48,7 +48,7 @@
 	<div class="preview_fullscreen" class:offset_for_sidebar={zzz.ui.toggle_main_menu}>
 		<div class="markdown_preview p_lg">
 			<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-			{@html editor?.formatted_content}
+			{@html page_viewmodel?.formatted_content}
 		</div>
 
 		<!-- Close preview button in top-right corner -->
@@ -74,12 +74,12 @@
 		{/if}
 
 		<div class="editor_content">
-			{#if editor && project}
+			{#if page_viewmodel && project}
 				<div class="h_100 column p_lg">
 					<div>
 						<div class="display_flex gap_sm align_items_center">
 							<h1 class="mb_lg">
-								{editor.current_page?.title || 'Page'}
+								{page_viewmodel.current_page?.title || 'Page'}
 							</h1>
 						</div>
 
@@ -87,9 +87,9 @@
 							<div class="display_flex gap_sm">
 								<button
 									type="button"
-									onclick={() => editor.save_page()}
+									onclick={() => page_viewmodel.save_page()}
 									class="color_a"
-									disabled={!editor.has_changes}
+									disabled={!page_viewmodel.has_changes}
 								>
 									save
 								</button>
@@ -112,7 +112,7 @@
 									Page title
 									<input
 										type="text"
-										bind:value={editor.title}
+										bind:value={page_viewmodel.title}
 										class="w_100"
 										placeholder="Page title"
 									/>
@@ -123,7 +123,7 @@
 									Page path
 									<input
 										type="text"
-										bind:value={editor.path}
+										bind:value={page_viewmodel.path}
 										class="w_100"
 										placeholder="/page-path"
 									/>
@@ -135,7 +135,7 @@
 					<div class="editor_area">
 						<div class="panel p_md content_area">
 							<textarea
-								bind:value={editor.content}
+								bind:value={page_viewmodel.content}
 								class="w_100 h_100 markdown_editor"
 								placeholder="{GLYPH_PLACEHOLDER} markup"
 							></textarea>
@@ -144,7 +144,7 @@
 						<div class="panel p_md preview_area">
 							<!-- TODO hacky, replace with safe markdown -->
 							<!-- eslint-disable-next-line svelte/no-at-html-tags -->
-							<div class="markdown_preview">{@html editor.formatted_content}</div>
+							<div class="markdown_preview">{@html page_viewmodel.formatted_content}</div>
 						</div>
 					</div>
 				</div>
