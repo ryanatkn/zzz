@@ -3,7 +3,7 @@
 	import {base} from '$app/paths';
 	import {format_url} from '@ryanatkn/belt/url.js';
 
-	import {pkg_context} from '$routes/pkg.js';
+	import {pkg_context} from '$lib/pkg.js';
 	import External_Link from '$lib/External_Link.svelte';
 
 	const pkg = pkg_context.get();

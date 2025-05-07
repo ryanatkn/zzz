@@ -4,7 +4,7 @@
 	import Svg from '@ryanatkn/fuz/Svg.svelte';
 	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
 
-	import {pkg_context} from '$routes/pkg.js';
+	import {pkg_context} from '$lib/pkg.js';
 
 	const pkg = pkg_context.get();
 </script>

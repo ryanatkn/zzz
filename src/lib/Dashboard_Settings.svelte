@@ -4,7 +4,7 @@
 	import Settings from '$lib/Settings.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 
-	import Footer from '$routes/Footer.svelte';
+	import Footer from '$lib/Footer.svelte';
 
 	const zzz = zzz_context.get();
 

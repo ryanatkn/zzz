@@ -3,7 +3,7 @@
 	import Svg from '@ryanatkn/fuz/Svg.svelte';
 	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
 
-	import Footer from '$routes/Footer.svelte';
+	import Footer from '$lib/Footer.svelte';
 
 	// TODO remove this after fixing
 	// class:row

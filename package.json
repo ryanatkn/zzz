@@ -548,6 +548,11 @@
       "svelte": "./dist/External_Link.svelte",
       "default": "./dist/External_Link.svelte"
     },
+    "./Footer.svelte": {
+      "types": "./dist/Footer.svelte.d.ts",
+      "svelte": "./dist/Footer.svelte",
+      "default": "./dist/Footer.svelte"
+    },
     "./Glyph.svelte": {
       "types": "./dist/Glyph.svelte.d.ts",
       "svelte": "./dist/Glyph.svelte",
@@ -638,6 +643,14 @@
       "types": "./dist/ollama.d.ts",
       "default": "./dist/ollama.js"
     },
+    "./package.gen.js": {
+      "types": "./dist/package.gen.d.ts",
+      "default": "./dist/package.gen.js"
+    },
+    "./package.js": {
+      "types": "./dist/package.d.ts",
+      "default": "./dist/package.js"
+    },
     "./Picker_Dialog.svelte": {
       "types": "./dist/Picker_Dialog.svelte.d.ts",
       "svelte": "./dist/Picker_Dialog.svelte",
@@ -652,6 +665,10 @@
       "types": "./dist/Ping_Form.svelte.d.ts",
       "svelte": "./dist/Ping_Form.svelte",
       "default": "./dist/Ping_Form.svelte"
+    },
+    "./pkg.js": {
+      "types": "./dist/pkg.d.ts",
+      "default": "./dist/pkg.js"
     },
     "./Popover_Button.svelte": {
       "types": "./dist/Popover_Button.svelte.d.ts",

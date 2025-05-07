@@ -4,9 +4,9 @@
 	import Community_Links_Panel from '@ryanatkn/fuz/Community_Links_Panel.svelte';
 	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
 
-	import {pkg_context} from '$routes/pkg.js';
+	import {pkg_context} from '$lib/pkg.js';
 	import External_Link from '$lib/External_Link.svelte';
-	import Footer from '$routes/Footer.svelte';
+	import Footer from '$lib/Footer.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 
 	const pkg = pkg_context.get();

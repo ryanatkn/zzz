@@ -9,7 +9,7 @@ import {Zzz_Server} from '$lib/server/zzz_server.js';
 import {handle_message, handle_filer_change} from '$lib/server/handler_defaults.js';
 import create_config from '$lib/config.js';
 import type {Action_Server} from '$lib/action_types.js';
-import {package_json} from '$routes/package.js';
+import {package_json} from '$lib/package.js';
 import {SERVER_PROXIED_PORT} from '$lib/constants.js';
 
 // Needed because some configured deployment targets in SvelteKit don't support top-level await yet

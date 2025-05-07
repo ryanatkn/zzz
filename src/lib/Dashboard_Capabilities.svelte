@@ -1,7 +1,7 @@
 <script lang="ts">
 	import {GLYPH_CAPABILITY} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
-	import Footer from '$routes/Footer.svelte';
+	import Footer from '$lib/Footer.svelte';
 	import Capabilities_View from '$lib/Capabilities_View.svelte';
 </script>
 
