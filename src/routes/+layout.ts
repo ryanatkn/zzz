@@ -1,4 +1,4 @@
 import {DEV} from 'esm-env';
 
-export const prerender = true;
+export const prerender = false; // currently disabled to support dyanmic routes with the static adapter
 export const ssr = DEV;
