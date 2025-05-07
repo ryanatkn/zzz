@@ -1,13 +1,13 @@
 // @vitest-environment jsdom
 
 import {test, expect, describe, beforeEach} from 'vitest';
-import {encode as tokenize} from 'gpt-tokenizer';
 
 import {Bit, Text_Bit, Diskfile_Bit, Sequence_Bit} from '$lib/bit.svelte.js';
 import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
 import {Diskfile_Path} from '$lib/diskfile_types.js';
 import {Zzz} from '$lib/zzz.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
+import {estimate_token_count} from '$lib/helpers.js';
 
 // Test suite variables
 let zzz: Zzz;
@@ -85,15 +85,13 @@ describe('Bit base class functionality', () => {
 
 		// Test initial derivations
 		expect(text_bit.length).toBe(TEST_CONTENT.BASIC.length);
-		expect(text_bit.tokens).toEqual(tokenize(TEST_CONTENT.BASIC));
-		expect(text_bit.token_count).toBe(tokenize(TEST_CONTENT.BASIC).length);
+		expect(text_bit.token_count).toBe(estimate_token_count(TEST_CONTENT.BASIC));
 
 		// Test derivations after content change
 		text_bit.content = TEST_CONTENT.SECONDARY;
 
 		expect(text_bit.length).toBe(TEST_CONTENT.SECONDARY.length);
-		expect(text_bit.tokens).toEqual(tokenize(TEST_CONTENT.SECONDARY));
-		expect(text_bit.token_count).toBe(tokenize(TEST_CONTENT.SECONDARY).length);
+		expect(text_bit.token_count).toBe(estimate_token_count(TEST_CONTENT.SECONDARY));
 	});
 });
 

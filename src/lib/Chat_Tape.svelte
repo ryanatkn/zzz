@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Pending_Button from '@ryanatkn/fuz/Pending_Button.svelte';
-	import {encode as tokenize} from 'gpt-tokenizer';
 
+	import {estimate_token_count} from '$lib/helpers.js';
 	import type {Tape} from '$lib/tape.svelte.js';
 	import Model_Link from '$lib/Model_Link.svelte';
 	import Strip_List from '$lib/Strip_List.svelte';
@@ -24,7 +24,7 @@
 	const {chat, tape, onsend, strips_attrs, attrs}: Props = $props();
 
 	let input = $state('');
-	const input_tokens = $derived(tokenize(input));
+	const input_token_count = $derived(estimate_token_count(input));
 	let content_input: {focus: () => void} | undefined;
 	let pending = $state(false);
 
@@ -78,7 +78,7 @@
 			<Content_Editor
 				bind:this={content_input}
 				bind:content={input}
-				token_count={input_tokens.length}
+				token_count={input_token_count}
 				placeholder={GLYPH_PLACEHOLDER}
 				show_stats
 				show_actions
@@ -87,7 +87,7 @@
 					{pending}
 					onclick={send}
 					attrs={{class: 'plain'}}
-					title="send {input_tokens.length} tokens to {tape.model_name}"
+					title="send {input_token_count} tokens to {tape.model_name}"
 				>
 					send
 				</Pending_Button>

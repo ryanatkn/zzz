@@ -460,8 +460,8 @@ describe('Sequence_Bit edge cases', () => {
 		expect(sequence_bit.length).toBe(expected_content.length);
 
 		// Check tokens
-		expect(sequence_bit.tokens?.length).toBeGreaterThan(0);
-		expect(sequence_bit.token_count).toBe(sequence_bit.tokens?.length);
+		expect(sequence_bit.token_count).toBeGreaterThan(0);
+		expect(sequence_bit.token_count).toBe(sequence_bit.token_count);
 
 		// Update content and verify properties update
 		test_bits[0].content = 'New shorter text';

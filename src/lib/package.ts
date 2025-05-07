@@ -64,7 +64,6 @@ export const package_json = {
 		'date-fns': '^4.1.0',
 		devalue: '^5.1.1',
 		'esm-env': '^1.2.2',
-		'gpt-tokenizer': '^2.9.0',
 		hono: '^4.7.8',
 		openai: '^4.96.2',
 	},
@@ -1447,6 +1446,8 @@ export const src_json = {
 		'./helpers.js': {
 			path: 'helpers.ts',
 			declarations: [
+				{name: 'ESTIMATED_CHARS_PER_TOKEN', kind: 'variable'},
+				{name: 'estimate_token_count', kind: 'function'},
 				{name: 'create_client_id', kind: 'function'},
 				{name: 'get_unique_name', kind: 'function'},
 				{name: 'defined', kind: 'function'},

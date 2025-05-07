@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
 
 import {test, expect, describe, beforeEach} from 'vitest';
-import {encode as tokenize} from 'gpt-tokenizer';
 
+import {estimate_token_count} from '$lib/helpers.js';
 import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
 import {Zzz} from '$lib/zzz.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
@@ -14,7 +14,7 @@ let zzz: Zzz;
 const TEST_CONTENT = {
 	EMPTY: '',
 	INITIAL: 'Initial content',
-	NEW_CONTENT: 'New longer content',
+	NEW_CONTENT: 'New and longer content',
 	SOMETHING: 'Something else entirely',
 	LONG: 'a'.repeat(10000),
 	UNICODE: '😀🌍🏠👨‍👩‍👧‍👦',
@@ -60,8 +60,7 @@ describe('Text_Bit initialization', () => {
 
 		expect(bit.content).toBe(content);
 		expect(bit.length).toBe(content.length);
-		expect(bit.tokens).toEqual(tokenize(content));
-		expect(bit.token_count).toBe(tokenize(content).length);
+		expect(bit.token_count).toBe(estimate_token_count(content));
 	});
 
 	test('initializes from json with complete properties', () => {
@@ -120,7 +119,7 @@ describe('Text_Bit reactive properties', () => {
 		expect(bit.content).toBe(TEST_CONTENT.NEW_CONTENT);
 		expect(bit.length).toBe(TEST_CONTENT.NEW_CONTENT.length);
 		expect(bit.token_count).not.toBe(initial_token_count);
-		expect(bit.tokens).toEqual(tokenize(TEST_CONTENT.NEW_CONTENT));
+		expect(bit.token_count).toEqual(estimate_token_count(TEST_CONTENT.NEW_CONTENT));
 	});
 
 	test('length is zero when content is empty', () => {
@@ -256,7 +255,7 @@ describe('Text_Bit content edge cases', () => {
 
 		expect(bit.content).toBe(TEST_CONTENT.UNICODE);
 		expect(bit.length).toBe(TEST_CONTENT.UNICODE.length);
-		expect(bit.tokens).toEqual(tokenize(TEST_CONTENT.UNICODE));
+		expect(bit.token_count).toEqual(estimate_token_count(TEST_CONTENT.UNICODE));
 	});
 
 	test('handles special characters correctly', () => {
@@ -267,7 +266,7 @@ describe('Text_Bit content edge cases', () => {
 
 		expect(bit.content).toBe(TEST_CONTENT.SPECIAL_CHARS);
 		expect(bit.length).toBe(TEST_CONTENT.SPECIAL_CHARS.length);
-		expect(bit.tokens).toEqual(tokenize(TEST_CONTENT.SPECIAL_CHARS));
+		expect(bit.token_count).toEqual(estimate_token_count(TEST_CONTENT.SPECIAL_CHARS));
 	});
 
 	test('handles code and markup content correctly', () => {
@@ -278,7 +277,7 @@ describe('Text_Bit content edge cases', () => {
 
 		expect(bit.content).toBe(TEST_CONTENT.CODE);
 		expect(bit.length).toBe(TEST_CONTENT.CODE.length);
-		expect(bit.tokens).toEqual(tokenize(TEST_CONTENT.CODE));
+		expect(bit.token_count).toEqual(estimate_token_count(TEST_CONTENT.CODE));
 	});
 });
 

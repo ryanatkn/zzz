@@ -1,7 +1,7 @@
 import {z} from 'zod';
-import {encode as tokenize} from 'gpt-tokenizer';
 import type {Omit_Strict} from '@ryanatkn/belt/types.js';
 
+import {estimate_token_count} from '$lib/helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Uuid, Uuid_With_Default} from '$lib/zod_helpers.js';
 import {Completion_Request, Completion_Response} from '$lib/action_types.js';
@@ -57,8 +57,7 @@ export class Strip extends Cell<typeof Strip_Json> {
 
 	// Derived properties based on normalized content
 	readonly length: number = $derived(this.content.length);
-	readonly tokens: Array<number> = $derived(tokenize(this.content));
-	readonly token_count: number = $derived(this.tokens.length);
+	readonly token_count: number = $derived(estimate_token_count(this.content));
 
 	readonly raw_content: string | null | undefined = $derived(this.bit?.content);
 	readonly is_content_loaded: boolean = $derived(

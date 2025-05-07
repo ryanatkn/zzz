@@ -1,6 +1,5 @@
 import {z} from 'zod';
 import type {Async_Status} from '@ryanatkn/belt/async.js';
-import {encode as tokenize} from 'gpt-tokenizer';
 
 import type {Model} from '$lib/model.svelte.js';
 import {to_completion_response_text} from '$lib/response_helpers.js';
@@ -9,7 +8,7 @@ import {Tape} from '$lib/tape.svelte.js';
 import {reorder_list} from '$lib/list_helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
-import {get_unique_name} from '$lib/helpers.js';
+import {get_unique_name, estimate_token_count} from '$lib/helpers.js';
 
 const Chat_View_Mode = z.enum(['simple', 'multi']).default('simple');
 export type Chat_View_Mode = z.infer<typeof Chat_View_Mode>;
@@ -32,8 +31,7 @@ export class Chat extends Cell<typeof Chat_Json> {
 	view_mode: Chat_View_Mode = $state()!;
 
 	readonly main_input_length: number = $derived(this.main_input.length);
-	readonly main_input_tokens: Array<number> = $derived(tokenize(this.main_input));
-	readonly main_input_token_count: number = $derived(this.main_input_tokens.length);
+	readonly main_input_token_count: number = $derived(estimate_token_count(this.main_input));
 
 	// TODO look into using an index for this, incremental from `this.tape_ids`
 	readonly tapes: Array<Tape> = $derived.by(() => {

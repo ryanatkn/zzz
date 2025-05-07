@@ -1,5 +1,4 @@
-import {encode as tokenize} from 'gpt-tokenizer';
-
+import {estimate_token_count} from '$lib/helpers.js';
 import type {Diskfile} from '$lib/diskfile.svelte.js';
 import type {Diskfile_Path} from '$lib/diskfile_types.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
@@ -76,12 +75,10 @@ export class Diskfile_Editor_State {
 	);
 
 	// Token-related calculations
-	readonly original_tokens = $derived.by(() =>
-		this.original_content ? tokenize(this.original_content) : [],
+	readonly original_token_count = $derived.by(() =>
+		this.original_content == null ? 0 : estimate_token_count(this.original_content),
 	);
-	readonly current_tokens = $derived(tokenize(this.current_content));
-	readonly original_token_count = $derived(this.original_tokens.length);
-	readonly current_token_count = $derived(this.current_tokens.length);
+	readonly current_token_count = $derived(estimate_token_count(this.current_content));
 	readonly token_diff = $derived(this.current_token_count - this.original_token_count);
 	readonly token_diff_percent = $derived(
 		this.original_token_count > 0

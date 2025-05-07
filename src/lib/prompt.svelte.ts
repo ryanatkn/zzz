@@ -1,8 +1,7 @@
-import {encode as tokenize} from 'gpt-tokenizer';
 import {z} from 'zod';
 
 import {Uuid} from '$lib/zod_helpers.js';
-import {to_preview} from '$lib/helpers.js';
+import {to_preview, estimate_token_count} from '$lib/helpers.js';
 import {Bit_Json, type Bit_Type} from '$lib/bit.svelte.js';
 import {reorder_list} from '$lib/list_helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
@@ -34,8 +33,7 @@ export class Prompt extends Cell<typeof Prompt_Json> {
 	readonly content: string = $derived(format_prompt_content(this.bits));
 
 	readonly length: number = $derived(this.content.length);
-	readonly tokens: Array<number> = $derived(tokenize(this.content)); // TODO @many eager computation in some UI cases is bad UX with large values (e.g. bottleneck typing)
-	readonly token_count: number = $derived(this.tokens.length);
+	readonly token_count: number = $derived(estimate_token_count(this.content));
 	readonly content_preview: string = $derived(to_preview(this.content));
 
 	constructor(options: Prompt_Options) {

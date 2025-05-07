@@ -1,10 +1,10 @@
-import {encode as tokenize} from 'gpt-tokenizer';
 import {z} from 'zod';
 import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
 import {DEV} from 'esm-env';
 import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 import type {Omit_Strict} from '@ryanatkn/belt/types.js';
 
+import {estimate_token_count} from '$lib/helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Uuid} from '$lib/zod_helpers.js';
 import {Xml_Attribute} from '$lib/xml.js';
@@ -94,10 +94,9 @@ export abstract class Bit<T extends z.ZodType = typeof Bit_Json_Base> extends Ce
 	start: number | null = $state()!;
 	end: number | null = $state()!;
 	readonly length: number | null | undefined = $derived.by(() => this.content?.length);
-	readonly tokens: Array<number> | null | undefined = $derived.by(() =>
-		this.content == null ? this.content : tokenize(this.content),
+	readonly token_count: number | null | undefined = $derived.by(() =>
+		this.content == null ? this.content : estimate_token_count(this.content),
 	);
-	readonly token_count: number | null | undefined = $derived(this.tokens?.length);
 	/** `content` with a max length */
 	readonly content_preview = $derived.by(() =>
 		this.content && this.content.length > CONTENT_PREVIEW_LENGTH

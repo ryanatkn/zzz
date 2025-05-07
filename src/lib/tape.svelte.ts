@@ -1,5 +1,3 @@
-import {encode as tokenize} from 'gpt-tokenizer';
-
 import {type Model} from '$lib/model.svelte.js';
 import {
 	Strip,
@@ -14,7 +12,7 @@ import {type Bit_Type} from '$lib/bit.svelte.js';
 import {HANDLED} from '$lib/cell_helpers.js';
 import {to_completion_response_text} from '$lib/response_helpers.js';
 import {Completion_Request, type Completion_Response} from '$lib/action_types.js';
-import {to_preview} from '$lib/helpers.js';
+import {to_preview, estimate_token_count} from '$lib/helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import type {Uuid} from '$lib/zod_helpers.js';
 
@@ -39,8 +37,7 @@ export class Tape extends Cell<typeof Tape_Json> {
 
 	readonly content: string = $derived(render_tape_to_string(this.strips.by_id.values()));
 	readonly length: number = $derived(this.content.length);
-	readonly tokens: Array<number> = $derived(tokenize(this.content));
-	readonly token_count: number = $derived(this.tokens.length);
+	readonly token_count: number = $derived(estimate_token_count(this.content));
 	readonly content_preview: string = $derived(to_preview(this.content));
 
 	constructor(options: Tape_Options) {

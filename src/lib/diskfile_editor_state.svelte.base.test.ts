@@ -195,8 +195,8 @@ describe('content metrics', () => {
 		editor_state.current_content = token_test_content;
 
 		// Verify token calculations
-		expect(editor_state.current_tokens.length).toBeGreaterThan(0);
-		expect(editor_state.current_token_count).toBe(editor_state.current_tokens.length);
+		expect(editor_state.current_token_count).toBeGreaterThan(0);
+		expect(editor_state.current_token_count).toBe(editor_state.current_token_count);
 		expect(editor_state.token_diff).toBe(
 			editor_state.current_token_count - editor_state.original_token_count,
 		);
@@ -220,7 +220,7 @@ describe('content metrics', () => {
 		expect(editor_state.length_diff_percent).toBe(-100);
 
 		// Check token metrics
-		expect(editor_state.current_tokens.length).toBe(0);
+		expect(editor_state.current_token_count).toBe(0);
 		expect(editor_state.current_token_count).toBe(0);
 		expect(editor_state.token_diff).toBe(-editor_state.original_token_count);
 		expect(editor_state.token_diff_percent).toBe(-100);

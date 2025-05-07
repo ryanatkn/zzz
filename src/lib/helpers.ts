@@ -1,5 +1,15 @@
 import {CONTENT_PREVIEW_LENGTH} from '$lib/constants.js';
 
+export const ESTIMATED_CHARS_PER_TOKEN = 3.8; // guesstimate
+
+/**
+ * Quick and dirty token count estimate using `ESTIMATED_CHARS_PER_TOKEN`.
+ * Real tokenizers are heavy and little benefit for our cases right now,
+ * especially because each LLM may tokenize differently!
+ */
+export const estimate_token_count = (text: string): number =>
+	Math.ceil(text.length / ESTIMATED_CHARS_PER_TOKEN);
+
 /** Creates an id suitable for insecure use on a single client, like for element ids. */
 export const create_client_id = (): string => Math.random().toString(36).substring(2);
 

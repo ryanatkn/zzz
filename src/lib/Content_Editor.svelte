@@ -1,11 +1,11 @@
 <script lang="ts">
-	import {encode as tokenize} from 'gpt-tokenizer';
 	import type {SvelteHTMLElements} from 'svelte/elements';
 	import type {Snippet} from 'svelte';
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
 	import Paste_From_Clipboard from '@ryanatkn/fuz/Paste_From_Clipboard.svelte';
 	import {swallow} from '@ryanatkn/belt/dom.js';
 
+	import {estimate_token_count} from '$lib/helpers.js';
 	import Content_Stats from '$lib/Content_Stats.svelte';
 	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
 	import {GLYPH_PASTE, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
@@ -13,7 +13,7 @@
 
 	interface Props {
 		content: string; // TODO maybe rename to value? rethink `Content_Editor` in general when we switch to CodeMirror
-		/** `content` is tokenized to get this if not provided and `show_stats` is true. */
+		/** Estimated if not provided and `show_stats` is true. */
 		token_count?: number | undefined;
 		placeholder?: string | null | undefined;
 		readonly?: boolean | undefined;
@@ -42,8 +42,7 @@
 
 	let textarea_el: HTMLTextAreaElement | undefined = $state();
 
-	const content_tokens = $derived(tokenize(content));
-	const token_count = $derived(token_count_prop ?? content_tokens.length);
+	const token_count = $derived(token_count_prop ?? estimate_token_count(content));
 
 	/**
 	 * Focus the textarea element - exposed for parent components
