@@ -77,7 +77,7 @@ const main = async () => {
 							ws.send(devalue.stringify({type: 'server_message', message}));
 						}
 					} else {
-						ws.send(devalue.stringify('hi'));
+						console.error('unknown message type', data.type);
 					}
 				},
 				onClose: (event, ws) => {

@@ -3,7 +3,9 @@ import {
 	PUBLIC_SERVER_PORT,
 	PUBLIC_SERVER_PROTOCOL,
 	PUBLIC_SERVER_PROXIED_PORT,
+	PUBLIC_SERVER_API_PATH,
 } from '$env/static/public';
+import {ensure_start} from '@ryanatkn/belt/string.js';
 
 // TODO a lot of these need to be moved to env or config etc
 
@@ -19,4 +21,5 @@ export const REQUEST_TIMEOUT = 10_000;
 export const CONTENT_PREVIEW_LENGTH = 100;
 
 /** @leading_slash */
-export const API_ROUTE = '/api'; // no v1
+export const API_ROUTE =
+	(PUBLIC_SERVER_API_PATH && ensure_start(PUBLIC_SERVER_API_PATH, '/')) || '/api';

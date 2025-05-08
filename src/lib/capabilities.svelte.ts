@@ -6,7 +6,7 @@ import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import {ollama_list} from '$lib/ollama.js';
-import {REQUEST_TIMEOUT, SERVER_URL} from '$lib/constants.js';
+import {API_ROUTE, REQUEST_TIMEOUT, SERVER_URL} from '$lib/constants.js';
 import {Uuid} from '$lib/zod_helpers.js';
 import type {Zzz_Dir} from '$lib/diskfile_types.js';
 import {Action_Ping, type Action_Pong} from '$lib/schemas.js';
@@ -306,7 +306,8 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 			updated: Date.now(),
 		};
 
-		const server_api_url = SERVER_URL + '/api/ping';
+		// TODO BLOCK @many refactor for type safety with the action schemas, the goal is to be able to choose transports granularly with configurable fallbacks
+		const server_api_url = SERVER_URL + API_ROUTE + '/ping';
 
 		let error_message: string | undefined;
 		let timeout_id;

@@ -4,9 +4,7 @@ import {z} from 'zod';
 import type {Zzz_Server} from '$lib/server/zzz_server.js';
 import type {Action_Schema} from '$lib/schemas.js';
 import {service_return_to_api_result} from '$lib/server/service.js';
-
-// Default API route base path
-export const API_ROUTE = '/api/v1';
+import {API_ROUTE} from '$lib/constants.js';
 
 export interface Register_Actions_Options {
 	app: Hono;
@@ -32,6 +30,7 @@ export const register_http_actions = ({
 		if (!schema.websockets) continue;
 
 		// Handle authentication and parameter validation
+		// TODO BLOCK @many refactor for type safety with the action schemas, the goal is to be able to choose transports granularly with configurable fallbacks
 		const path = `${base_path}/${schema.name}`;
 		console.log(`path`, path);
 		app.post(path, async (c) => {
