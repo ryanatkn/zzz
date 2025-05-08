@@ -1,7 +1,22 @@
 import {Result_Error, type Result} from '@ryanatkn/belt/result.js';
 import type {Flavored} from '@ryanatkn/belt/types.js';
+import {z} from 'zod';
 
-export type Http_Status = Flavored<number, 'Http_Status'>;
+export const Http_Status = z.number().int();
+export type Http_Status = Flavored<z.infer<typeof Http_Status>, 'Http_Status'>;
+
+export const Http_Method = z.enum([
+	'CONNECT',
+	'DELETE',
+	'GET',
+	'HEAD',
+	'OPTIONS',
+	'PATCH',
+	'POST',
+	'PUT',
+	'TRACE',
+]);
+export type Http_Method = z.infer<typeof Http_Method>;
 
 export interface Error_Response {
 	message: string;

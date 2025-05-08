@@ -11,7 +11,6 @@
 	import {parse_package_meta} from '@ryanatkn/gro/package_meta.js';
 	import * as devalue from 'devalue';
 	import {BROWSER} from 'esm-env';
-	import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 	import {PUBLIC_WEBSOCKET_URL} from '$env/static/public';
 	import {page} from '$app/state';
 	import {onNavigate} from '$app/navigation';
@@ -27,12 +26,10 @@
 	import {Provider_Json} from '$lib/provider.svelte.js';
 	import create_zzz_config from '$lib/config.js';
 	import {Model_Json} from '$lib/model.svelte.js';
-	import {
-		send_mutations,
-		receive_mutations,
-		create_action_mutation_context,
-	} from '$lib/mutations.js';
+	import {send_mutations, receive_mutations} from '$lib/mutations.js';
 	import type {Action_Client, Action_Server} from '$lib/schemas.js';
+	import {create_mutation_context} from '$lib/mutation.js';
+	import type {Actions} from '$lib/action_types.js';
 
 	interface Props {
 		children: Snippet;
@@ -52,69 +49,67 @@
 
 	pkg_context.set(parse_package_meta(package_json, src_json));
 
+	// TODO BLOCK temp hack, just logs anything and returns `{}` for any `get()`
+	const actions: Actions = new Proxy(
+		{},
+		{
+			get: (_target, prop) => {
+				console.log('get action', prop);
+				return {};
+			},
+		},
+	) as any;
+
 	// Create an instance of Zzz with socket_url
 	const zzz = new App({
 		cell_classes,
 		socket_url: PUBLIC_WEBSOCKET_URL,
-		onsend: (message: Action_Client) => {
+		onsend: async (message: Action_Client) => {
 			console.log('[page] sending message via socket', message);
 			zzz.socket.send({type: 'server_message', message});
 
 			const mutation = send_mutations[message.type];
-			if (mutation) {
-				// Create proper mutation context for sending actions
-				const ctx = create_action_mutation_context(
-					zzz,
-					message.type,
-					message, // For client actions, params are the full message
-					undefined, // Result is undefined for sending
-				);
-
-				mutation(ctx);
+			if (!mutation) {
+				console.error('unknown message type, ignoring:', message.type, message);
+				return;
 			}
+			// Create proper mutation context for sending actions
+			const mutation_context = create_mutation_context(
+				zzz,
+				message.type,
+				message, // For client actions, params are the full message
+				undefined, // Result is undefined for sending
+				actions,
+			);
+
+			mutation(mutation_context.ctx);
+			await mutation_context.flush_after_mutation();
 		},
-		onreceive: (message: Action_Server) => {
+		onreceive: async (message: Action_Server) => {
 			console.log(`[page] received message`, message);
 
 			const mutation = receive_mutations[message.type];
-			if (mutation) {
-				// Create proper mutation context for received actions
-				const ctx = create_action_mutation_context(
+			if (!mutation) {
+				console.error('unknown message type, ignoring:', message.type, message);
+				return;
+			}
+			// Create proper mutation context for received actions
+			const mutation_context = create_mutation_context(
+				zzz,
+				message.type,
+				message, // For received actions, params are the full message
+				// TODO BLOCK delete this?
+				{
+					ok: true,
+					status: 200, // TODO BLOCK need to forward status, use JSON RPC like MCP
+					value: message,
 					zzz,
-					message.type,
-					message, // For received actions, params are the full message
-					{
-						ok: true,
-						status: 200, // TODO need to forward status, use JSON RPC like MCP
-						value: message,
-						zzz,
-					},
-				);
+				},
+				actions,
+			);
 
-				mutation(ctx);
-			}
-
-			// Handle specific actions after mutation
-			switch (message.type) {
-				case 'loaded_session': {
-					zzz.receive_session(message.data);
-					break;
-				}
-				case 'completion_response': {
-					zzz.receive_completion_response(message);
-					break;
-				}
-				case 'filer_change': {
-					zzz.diskfiles.handle_change(message);
-					break;
-				}
-				case 'pong': {
-					zzz.capabilities.receive_pong(message);
-					break;
-				}
-				default:
-					throw new Unreachable_Error(message);
-			}
+			mutation(mutation_context.ctx);
+			await mutation_context.flush_after_mutation();
 		},
 	});
 

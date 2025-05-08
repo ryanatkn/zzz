@@ -4,6 +4,7 @@ import {Diskfile_Change_Type, Source_File, Diskfile_Path, Zzz_Dir} from '$lib/di
 import {Datetime_Now, get_datetime_now, Uuid, Uuid_With_Default} from '$lib/zod_helpers.js';
 import {Provider_Name} from '$lib/provider_types.js';
 import {Cell_Json} from '$lib/cell_types.js';
+import type {Http_Method} from './api.js';
 
 // Action types and schemas following Model Context Protocol patterns
 
@@ -135,6 +136,7 @@ export interface Client_Action_Schema extends Action_Schema_Base {
  */
 export interface Service_Action_Schema extends Action_Schema_Base {
 	type: 'Service_Action';
+	method: Http_Method | null;
 	auth: null | 'authenticate' | 'authorize';
 	response: z.ZodTypeAny;
 }
@@ -241,15 +243,18 @@ export type Action_Completion_Response_Response = z.infer<
 export const Action_Ping_Schema: Service_Action_Schema = {
 	type: 'Service_Action',
 	name: 'Action_Ping',
+	method: 'GET',
 	auth: null,
 	params: Action_Ping_Params,
 	response: Action_Ping_Response,
 	returns: 'Api_Result<Action_Ping_Response>',
 };
 
+// TODO BLOCK see mcp for how this should be modeled compared to ping, the method makes no sense, but maybe null is fine, or maybe we need a type union
 export const Action_Pong_Schema: Service_Action_Schema = {
 	type: 'Service_Action',
 	name: 'Action_Pong',
+	method: null,
 	auth: null,
 	params: Action_Pong_Params,
 	response: Action_Pong_Response,
@@ -259,6 +264,7 @@ export const Action_Pong_Schema: Service_Action_Schema = {
 export const Action_Load_Session_Schema: Service_Action_Schema = {
 	type: 'Service_Action',
 	name: 'Action_Load_Session',
+	method: 'GET',
 	auth: null,
 	params: Action_Load_Session_Params,
 	response: Action_Load_Session_Response,
@@ -268,6 +274,7 @@ export const Action_Load_Session_Schema: Service_Action_Schema = {
 export const Action_Loaded_Session_Schema: Service_Action_Schema = {
 	type: 'Service_Action',
 	name: 'Action_Loaded_Session',
+	method: null,
 	auth: null,
 	params: Action_Loaded_Session_Params,
 	response: Action_Loaded_Session_Response,
@@ -277,6 +284,7 @@ export const Action_Loaded_Session_Schema: Service_Action_Schema = {
 export const Action_Filer_Change_Schema: Service_Action_Schema = {
 	type: 'Service_Action',
 	name: 'Action_Filer_Change',
+	method: null,
 	auth: null,
 	params: Action_Filer_Change_Params,
 	response: Action_Filer_Change_Response,
@@ -314,6 +322,7 @@ export const Action_Send_Prompt_Schema: Client_Action_Schema = {
 export const Action_Completion_Response_Schema: Service_Action_Schema = {
 	type: 'Service_Action',
 	name: 'Action_Completion_Response',
+	method: 'GET',
 	auth: null,
 	params: Action_Completion_Response_Params,
 	response: Action_Completion_Response_Response,

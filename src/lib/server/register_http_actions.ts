@@ -1,5 +1,6 @@
-import {Hono} from 'hono';
+import {Hono, type Handler} from 'hono';
 import {z} from 'zod';
+import {unreachable} from '@ryanatkn/belt/error.js';
 
 import type {Zzz_Server} from '$lib/server/zzz_server.js';
 import type {Action_Schema} from '$lib/schemas.js';
@@ -27,27 +28,40 @@ export const register_http_actions = ({
 		// Skip client-only actions
 		if (schema.type !== 'Service_Action') continue;
 
+		const {name, method} = schema;
+
 		// Generate lowercase API path
-		const action_path = to_api_path(schema.name);
+		const action_path = to_api_path(name);
 		const path = `${base_path}/${action_path}`;
 
-		console.log(`Registering API handler: ${path}`);
+		// Default to POST if no method specified
+		if (!method) continue;
 
-		app.post(path, async (c) => {
+		console.log(`Registering API handler: ${method} ${path}`);
+
+		// Create handler based on method
+		const handler: Handler = async (c) => {
 			try {
-				// Parse request body
-				const body = await c.req.json();
+				let params;
 
-				// Validate parameters
-				const params = schema.params.parse(body);
+				// Extract parameters based on HTTP method
+				if (method === 'GET') {
+					// For GET requests, use query parameters
+					const query = c.req.query();
+					params = schema.params.parse(query);
+				} else {
+					// For other methods, use JSON body
+					const body = await c.req.json();
+					params = schema.params.parse(body);
+				}
 
 				// Process the action
-				const result = await zzz_server.process_action(schema.name, params);
+				const result = await zzz_server.process_action(name, params);
 
 				// Return API result
 				return c.json(service_return_to_api_result(result));
 			} catch (error) {
-				console.error(`Error processing ${schema.name}:`, error);
+				console.error(`Error processing ${name}:`, error);
 
 				// Return appropriate error response
 				if (error instanceof z.ZodError) {
@@ -55,7 +69,7 @@ export const register_http_actions = ({
 						{
 							ok: false,
 							status: 400,
-							error: `Invalid parameters for ${schema.name}`,
+							error: `Invalid parameters for ${name}`,
 							details: error.errors,
 						},
 						400,
@@ -66,12 +80,33 @@ export const register_http_actions = ({
 					{
 						ok: false,
 						status: 500,
-						error: `Error processing ${schema.name}`,
+						error: `Error processing ${name}`,
 						details: error instanceof Error ? error.message : String(error),
 					},
 					500,
 				);
 			}
-		});
+		};
+
+		// Register the appropriate handler based on HTTP method
+		switch (method) {
+			case 'GET':
+				app.get(path, handler);
+				break;
+			case 'POST':
+				app.post(path, handler);
+				break;
+			case 'PUT':
+				app.put(path, handler);
+				break;
+			case 'DELETE':
+				app.delete(path, handler);
+				break;
+			case 'PATCH':
+				app.patch(path, handler);
+				break;
+			default:
+				unreachable(method);
+		}
 	}
 };
