@@ -1,5 +1,5 @@
 import type {Strip} from '$lib/strip.svelte.js';
-import type {Tape_Message} from '$lib/action_types.js';
+import type {Tape_Message} from '$lib/schemas.js';
 import {to_completion_response_text} from '$lib/response_helpers.js';
 
 // TODO look into refactoring this to be more correct, it's only used to calculate the token count for a tape by combining all chat strips

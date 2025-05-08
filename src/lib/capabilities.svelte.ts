@@ -9,7 +9,7 @@ import {ollama_list} from '$lib/ollama.js';
 import {REQUEST_TIMEOUT, SERVER_URL} from '$lib/constants.js';
 import {Uuid} from '$lib/zod_helpers.js';
 import type {Zzz_Dir} from '$lib/diskfile_types.js';
-import {Action_Ping, type Action_Pong} from '$lib/action_types.js';
+import {Action_Ping, type Action_Pong} from '$lib/schemas.js';
 
 // TODO hacky/hardcoded for now, this should be an extensible system, the point is to give users a good interface to the concept of capabilities
 

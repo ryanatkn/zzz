@@ -9,7 +9,7 @@ import {
 	type Action_Direction,
 	type Action_Type,
 	type Diskfile_Change,
-} from '$lib/action_types.js';
+} from '$lib/schemas.js';
 import {Diskfile_Path, Source_File} from '$lib/diskfile_types.js';
 import {to_completion_response_text} from '$lib/response_helpers.js';
 import {to_preview} from '$lib/helpers.js';

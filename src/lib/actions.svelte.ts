@@ -8,7 +8,7 @@ import {
 	type Action_Server,
 	create_action_json,
 	Action_Type,
-} from '$lib/action_types.js';
+} from '$lib/schemas.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {create_multi_index} from '$lib/indexed_collection_helpers.js';

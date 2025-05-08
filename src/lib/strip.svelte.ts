@@ -4,7 +4,7 @@ import type {Omit_Strict} from '@ryanatkn/belt/types.js';
 import {estimate_token_count} from '$lib/helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Uuid, Uuid_With_Default} from '$lib/zod_helpers.js';
-import {Completion_Request, Completion_Response} from '$lib/action_types.js';
+import {Completion_Request, Completion_Response} from '$lib/schemas.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import type {Bit_Type} from '$lib/bit.svelte.js';
 import type {Zzz} from '$lib/zzz.svelte.js';

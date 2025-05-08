@@ -12,7 +12,7 @@ import type {
 	Action_Client,
 	Action_Server,
 	Action_Loaded_Session,
-} from '$lib/action_types.js';
+} from '$lib/schemas.js';
 import {Provider, type Provider_Json} from '$lib/provider.svelte.js';
 import type {Provider_Name} from '$lib/provider_types.js';
 import {Uuid, create_uuid, get_datetime_now} from '$lib/zod_helpers.js';

@@ -18,7 +18,7 @@ import {
 	type Action_Completion_Response,
 	type Action_Server,
 	type Action_Send_Prompt,
-} from '$lib/action_types.js';
+} from '$lib/schemas.js';
 import {create_uuid} from '$lib/zod_helpers.js';
 import {Diskfile_Path, Source_File, type Zzz_Dir} from '$lib/diskfile_types.js';
 import {map_watcher_change_to_diskfile_change} from '$lib/diskfile_helpers.js';

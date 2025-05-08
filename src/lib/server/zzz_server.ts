@@ -2,10 +2,17 @@ import {Filer, type Cleanup_Watch} from '@ryanatkn/gro/filer.js';
 import type {Watcher_Change} from '@ryanatkn/gro/watch_dir.js';
 import {resolve} from 'node:path';
 
-import {type Action_Client, type Action_Server} from '$lib/action_types.js';
+import {
+	Action_Client,
+	type Action_Server,
+	type Action_Schema,
+	action_schemas_registry,
+} from '$lib/schemas.js';
 import type {Zzz_Config} from '$lib/config_helpers.js';
 import {Zzz_Dir} from '$lib/diskfile_types.js';
 import {Safe_Fs} from '$lib/server/safe_fs.js';
+import type {Service_Return} from '$lib/server/service.js';
+import {Api_Error} from '$lib/api.js';
 
 /**
  * Function type for handling client messages
@@ -74,8 +81,12 @@ export class Zzz_Server {
 	 */
 	readonly safe_fs: Safe_Fs;
 
+	// TODO probably extract a `Filers` class to manage these
 	// Map of directory paths to their respective Filer instances
 	readonly filers: Map<string, Filer_Instance> = new Map();
+
+	/** Registry of action schemas */
+	readonly action_schemas: Array<Action_Schema> = action_schemas_registry;
 
 	constructor(options: Zzz_Server_Options) {
 		// Parse the allowed filesystem directories
@@ -89,6 +100,7 @@ export class Zzz_Server {
 		// Create the safe filesystem interface with the allowed directories
 		this.safe_fs = new Safe_Fs([this.zzz_dir]); // TODO pass filter through on options
 
+		// TODO maybe do this in an `init` method
 		// Set up the filer watcher for the zzz_dir
 		console.log(`this.zzz_dir`, this.zzz_dir);
 		const filer = new Filer({watch_dir_options: {dir: this.zzz_dir}}); // TODO maybe filter out the db directory at this level? think about this when db is added
@@ -107,11 +119,38 @@ export class Zzz_Server {
 	}
 
 	/**
-	 * Handle incoming client messages by delegating to the configured handler
+	 * Handle incoming client messages for all transports
+	 * by delegating to the configured handler.
 	 */
 	async receive(message: Action_Client): Promise<Action_Server | null> {
+		// Sanity check
+		if (!message) throw new Api_Error(400, 'invalid message'); // eslint-disable-line @typescript-eslint/no-unnecessary-condition
+
 		console.log(`[zzz_server.receive] message`, message.id, message.type);
+
 		return this.#handle_message(message, this);
+	}
+
+	/**
+	 * Process an action by name with parameters
+	 */
+	async process_action(action_name: string, params: any): Promise<Service_Return> {
+		const schema = this.action_schemas.find((s) => s.name === action_name);
+		if (!schema) {
+			throw new Api_Error(400, `unknown action: ${action_name}`);
+		}
+
+		const parsed = Action_Client.safeParse(params);
+		if (!parsed.success) {
+			throw new Api_Error(400, `invalid action params ${action_name}: ${parsed.error}`);
+		}
+
+		const response = await this.receive(parsed.data);
+
+		return {
+			status: 200,
+			value: response,
+		};
 	}
 
 	/**

@@ -101,10 +101,18 @@
       "svelte": "./dist/Action_Detail.svelte",
       "default": "./dist/Action_Detail.svelte"
     },
+    "./action_helpers.js": {
+      "types": "./dist/action_helpers.d.ts",
+      "default": "./dist/action_helpers.js"
+    },
     "./Action_List.svelte": {
       "types": "./dist/Action_List.svelte.d.ts",
       "svelte": "./dist/Action_List.svelte",
       "default": "./dist/Action_List.svelte"
+    },
+    "./action_types.gen.js": {
+      "types": "./dist/action_types.gen.d.ts",
+      "default": "./dist/action_types.gen.js"
     },
     "./action_types.js": {
       "types": "./dist/action_types.d.ts",
@@ -117,6 +125,10 @@
     "./actions.svelte.js": {
       "types": "./dist/actions.svelte.d.ts",
       "default": "./dist/actions.svelte.js"
+    },
+    "./api.js": {
+      "types": "./dist/api.d.ts",
+      "default": "./dist/api.js"
     },
     "./app.svelte.js": {
       "types": "./dist/app.svelte.d.ts",
@@ -625,6 +637,14 @@
       "types": "./dist/models.svelte.d.ts",
       "default": "./dist/models.svelte.js"
     },
+    "./mutation.js": {
+      "types": "./dist/mutation.d.ts",
+      "default": "./dist/mutation.js"
+    },
+    "./mutations.js": {
+      "types": "./dist/mutations.d.ts",
+      "default": "./dist/mutations.js"
+    },
     "./nav_helpers.js": {
       "types": "./dist/nav_helpers.d.ts",
       "default": "./dist/nav_helpers.js"
@@ -768,6 +788,18 @@
       "types": "./dist/response_helpers.d.ts",
       "default": "./dist/response_helpers.js"
     },
+    "./schema_helpers.js": {
+      "types": "./dist/schema_helpers.d.ts",
+      "default": "./dist/schema_helpers.js"
+    },
+    "./schema_metadata.js": {
+      "types": "./dist/schema_metadata.d.ts",
+      "default": "./dist/schema_metadata.js"
+    },
+    "./schemas.js": {
+      "types": "./dist/schemas.d.ts",
+      "default": "./dist/schemas.js"
+    },
     "./scrollable.svelte.js": {
       "types": "./dist/scrollable.svelte.d.ts",
       "default": "./dist/scrollable.svelte.js"
@@ -786,13 +818,25 @@
       "types": "./dist/server/handler_defaults.d.ts",
       "default": "./dist/server/handler_defaults.js"
     },
+    "./server/register_http_actions.js": {
+      "types": "./dist/server/register_http_actions.d.ts",
+      "default": "./dist/server/register_http_actions.js"
+    },
     "./server/safe_fs.js": {
       "types": "./dist/server/safe_fs.d.ts",
       "default": "./dist/server/safe_fs.js"
     },
+    "./server/security.js": {
+      "types": "./dist/server/security.d.ts",
+      "default": "./dist/server/security.js"
+    },
     "./server/server.js": {
       "types": "./dist/server/server.d.ts",
       "default": "./dist/server/server.js"
+    },
+    "./server/service.js": {
+      "types": "./dist/server/service.d.ts",
+      "default": "./dist/server/service.js"
     },
     "./server/zzz_server.js": {
       "types": "./dist/server/zzz_server.d.ts",

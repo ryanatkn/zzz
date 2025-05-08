@@ -159,7 +159,6 @@
 	</div>
 
 	<!-- Sidebar toggle button -->
-	<!-- TODO shortcut key -->
 	<button
 		type="button"
 		class="position_fixed b_0 l_0 icon_button plain border_radius_xs2"

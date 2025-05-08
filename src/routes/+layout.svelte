@@ -27,6 +27,12 @@
 	import {Provider_Json} from '$lib/provider.svelte.js';
 	import create_zzz_config from '$lib/config.js';
 	import {Model_Json} from '$lib/model.svelte.js';
+	import {
+		send_mutations,
+		receive_mutations,
+		create_action_mutation_context,
+	} from '$lib/mutations.js';
+	import type {Action_Client, Action_Server} from '$lib/schemas.js';
 
 	interface Props {
 		children: Snippet;
@@ -50,15 +56,46 @@
 	const zzz = new App({
 		cell_classes,
 		socket_url: PUBLIC_WEBSOCKET_URL,
-		onsend: (message) => {
+		onsend: (message: Action_Client) => {
 			console.log('[page] sending message via socket', message);
 			zzz.socket.send({type: 'server_message', message});
+
+			// Apply client-side mutation for the action when sending
+			const mutation = send_mutations[message.type];
+			if (mutation) {
+				// Create proper mutation context for sending actions
+				const ctx = create_action_mutation_context(
+					message.type,
+					message, // For client actions, params are the full message
+					undefined, // Result is undefined for sending
+				);
+
+				mutation(ctx);
+			}
 		},
-		onreceive: (message) => {
+		onreceive: (message: Action_Server) => {
 			console.log(`[page] received message`, message);
+
+			// Apply server-side action mutation using receive_mutations
+			const mutation = receive_mutations[message.type];
+			if (mutation) {
+				// Create proper mutation context for received actions
+				const ctx = create_action_mutation_context(
+					message.type,
+					message, // For server actions, params are the full message
+					{
+						ok: true,
+						status: 200,
+						value: message,
+					},
+				);
+
+				mutation(ctx);
+			}
+
+			// Handle specific actions after mutation
 			switch (message.type) {
 				case 'loaded_session': {
-					console.log(`[page] loaded_session`, message);
 					zzz.receive_session(message.data);
 					break;
 				}
@@ -93,7 +130,7 @@
 		// Configure socket message handler
 		zzz.socket.onmessage = (event) => {
 			try {
-				const data = devalue.parse(event.data);
+				const data = devalue.parse(event.data.toString());
 				console.log('[page] socket message received', data);
 				if (data.type === 'server_message') {
 					zzz.actions.receive(data.message);

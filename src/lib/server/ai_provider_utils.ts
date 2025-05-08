@@ -1,4 +1,4 @@
-import type {Tape_Message} from '$lib/action_types.js';
+import type {Tape_Message} from '$lib/schemas.js';
 
 /**
  * Format messages for the Ollama API.
