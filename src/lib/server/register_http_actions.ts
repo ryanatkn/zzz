@@ -7,6 +7,7 @@ import type {Action_Schema} from '$lib/schemas.js';
 import {service_return_to_api_result} from '$lib/server/service.js';
 import {API_ROUTE} from '$lib/constants.js';
 import {to_api_path} from '$lib/schema_helpers.js';
+import {Api_Error} from '$lib/api.js';
 
 export interface Register_Actions_Options {
 	app: Hono;
@@ -105,6 +106,11 @@ export const register_http_actions = ({
 			case 'PATCH':
 				app.patch(path, handler);
 				break;
+			case 'CONNECT':
+			case 'HEAD':
+			case 'OPTIONS':
+			case 'TRACE':
+				throw new Api_Error(500, `Unsupported HTTP method ${method} for action ${name}`);
 			default:
 				unreachable(method);
 		}

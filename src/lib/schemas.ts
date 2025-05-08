@@ -116,35 +116,42 @@ export const Diskfile_Change = z
 export type Diskfile_Change = z.infer<typeof Diskfile_Change>;
 
 /**
- * Base schema for all action schemas
+ * Base schema for all action schemas.
  */
-export interface Action_Schema_Base {
-	name: string;
-	params: z.ZodTypeAny;
-	returns: string;
-}
+export const Action_Schema_Base = z.object({
+	name: z.string(),
+	params: z.any(),
+	returns: z.string(),
+});
+export type Action_Schema_Base = z.infer<typeof Action_Schema_Base>;
 
 /**
- * Schema for client-only actions
+ * Schema for client-only actions.
  */
-export interface Client_Action_Schema extends Action_Schema_Base {
-	type: 'Client_Action';
-}
+export const Client_Action_Schema = Action_Schema_Base.extend({
+	type: z.literal('Client_Action'),
+});
+export type Client_Action_Schema = z.infer<typeof Client_Action_Schema>;
 
 /**
- * Schema for service actions that can be called from client or server
+ * Schema for service actions that can be called from client or server.
  */
-export interface Service_Action_Schema extends Action_Schema_Base {
-	type: 'Service_Action';
-	method: Http_Method | null;
-	auth: null | 'authenticate' | 'authorize';
-	response: z.ZodTypeAny;
-}
+export const Service_Action_Schema = Action_Schema_Base.extend({
+	type: z.literal('Service_Action'),
+	method: z.union([z.nativeEnum({} as Record<Http_Method, Http_Method>), z.null()]),
+	auth: z.union([z.literal('authenticate'), z.literal('authorize'), z.null()]),
+	response: z.any(),
+});
+export type Service_Action_Schema = z.infer<typeof Service_Action_Schema>;
 
 /**
- * Union type of all action schemas
+ * Union type of all action schemas.
  */
-export type Action_Schema = Client_Action_Schema | Service_Action_Schema;
+export const Action_Schema = z.discriminatedUnion('type', [
+	Client_Action_Schema,
+	Service_Action_Schema,
+]);
+export type Action_Schema = z.infer<typeof Action_Schema>;
 
 /**
  * Type for action schema names
