@@ -103,7 +103,7 @@ export class Diskfiles_Editor extends Cell<typeof Diskfiles_Editor_Json> {
 	handle_file_modified(diskfile_id: Uuid): void {
 		console.log('Diskfiles_Editor.handle_file_modified', {diskfile_id});
 		// If the modified file is in a preview tab, promote it to permanent
-		const tab = this.tabs.items.by_optional('by_diskfile_id', diskfile_id);
+		const tab = this.tabs.by_diskfile_id.get(diskfile_id);
 		if (tab?.id === this.tabs.preview_tab_id) {
 			this.tabs.preview_tab_id = null; // Convert to permanent by removing preview status
 		}

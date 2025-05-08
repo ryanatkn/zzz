@@ -164,10 +164,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 	 */
 	connect(url: string | null = null): void {
 		// Skip connection attempt on the server side
-		if (!BROWSER) {
-			console.debug('WebSocket connection attempted on server, ignoring');
-			return;
-		}
+		if (!BROWSER) return;
 
 		// Disconnect existing connection if any
 		this.disconnect();
