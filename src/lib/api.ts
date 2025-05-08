@@ -9,19 +9,6 @@ export interface Error_Response {
 
 export const ERROR_MESSAGE_UNKNOWN = 'unknown error';
 
-// TODO probably move these, but where?
-export interface Broadcast_Message {
-	type: 'broadcast';
-	method: string;
-	result: Api_Result;
-	params: any;
-}
-export interface Status_Message {
-	type: 'status';
-	status: Http_Status;
-	message: string;
-}
-
 export type Api_Result<T_Value = any> = Result<
 	{status: Http_Status; value: T_Value},
 	{status: Http_Status} & Error_Response

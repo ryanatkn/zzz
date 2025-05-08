@@ -14,12 +14,12 @@ import {action_schemas} from '$lib/schema_metadata.js';
 import {SERVER_PROXIED_PORT} from '$lib/constants.js';
 import {should_allow_origin} from '$lib/server/security.js';
 
-// Needed because some configured deployment targets in SvelteKit don't support top-level await yet
-const main = async () => {
+const main = (): void => {
 	console.log('creating server with zzz_dir', PUBLIC_ZZZ_DIR); // TODO better logging
 
 	const config = create_config();
 
+	// TODO refactor, this is quick and dirty
 	const sockets: Set<WSContext> = new Set();
 
 	const app = new Hono();
@@ -122,6 +122,10 @@ const main = async () => {
 	injectWebSocket(hono);
 };
 
-void main().catch((err) => {
-	console.error('uncaught error in main', err);
-});
+// Some configured deployment targets in SvelteKit don't support top-level await yet but this is sync atm
+try {
+	main();
+} catch (err) {
+	console.error('error starting server:', err);
+	throw err;
+}

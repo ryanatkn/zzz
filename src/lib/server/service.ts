@@ -1,12 +1,12 @@
 import type {Zzz_Server} from '$lib/server/zzz_server.js';
 import type {Action_Client, Action_Server} from '$lib/schemas.js';
-import type {Successful_Api_Result} from '$lib/api.js';
+import type {Http_Status, Successful_Api_Result} from '$lib/api.js';
 
 /**
- * Return type for services, with value and optional broadcast
+ * Return type for services.
  */
 export interface Service_Return<T_Value = any> {
-	status?: number;
+	status?: Http_Status;
 	value: T_Value;
 }
 

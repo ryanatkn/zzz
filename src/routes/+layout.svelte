@@ -60,11 +60,11 @@
 			console.log('[page] sending message via socket', message);
 			zzz.socket.send({type: 'server_message', message});
 
-			// Apply client-side mutation for the action when sending
 			const mutation = send_mutations[message.type];
 			if (mutation) {
 				// Create proper mutation context for sending actions
 				const ctx = create_action_mutation_context(
+					zzz,
 					message.type,
 					message, // For client actions, params are the full message
 					undefined, // Result is undefined for sending
@@ -76,17 +76,18 @@
 		onreceive: (message: Action_Server) => {
 			console.log(`[page] received message`, message);
 
-			// Apply server-side action mutation using receive_mutations
 			const mutation = receive_mutations[message.type];
 			if (mutation) {
 				// Create proper mutation context for received actions
 				const ctx = create_action_mutation_context(
+					zzz,
 					message.type,
-					message, // For server actions, params are the full message
+					message, // For received actions, params are the full message
 					{
 						ok: true,
-						status: 200,
+						status: 200, // TODO need to forward status, use JSON RPC like MCP
 						value: message,
+						zzz,
 					},
 				);
 

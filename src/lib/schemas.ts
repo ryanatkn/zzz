@@ -136,8 +136,6 @@ export interface Client_Action_Schema extends Action_Schema_Base {
 export interface Service_Action_Schema extends Action_Schema_Base {
 	type: 'Service_Action';
 	auth: null | 'authenticate' | 'authorize';
-	websockets: boolean;
-	broadcast: boolean;
 	response: z.ZodTypeAny;
 }
 
@@ -151,16 +149,12 @@ export type Action_Schema = Client_Action_Schema | Service_Action_Schema;
  */
 export type Action_Schema_Name = string;
 
-// Parameter and Response types for Actions
-
-// Ping
 export const Action_Ping_Params = z.null();
 export type Action_Ping_Params = z.infer<typeof Action_Ping_Params>;
 
 export const Action_Ping_Response = z.null();
 export type Action_Ping_Response = z.infer<typeof Action_Ping_Response>;
 
-// Pong
 export const Action_Pong_Params = z
 	.object({
 		ping_id: Uuid,
@@ -171,14 +165,12 @@ export type Action_Pong_Params = z.infer<typeof Action_Pong_Params>;
 export const Action_Pong_Response = z.null();
 export type Action_Pong_Response = z.infer<typeof Action_Pong_Response>;
 
-// Load Session
 export const Action_Load_Session_Params = z.null();
 export type Action_Load_Session_Params = z.infer<typeof Action_Load_Session_Params>;
 
 export const Action_Load_Session_Response = z.null();
 export type Action_Load_Session_Response = z.infer<typeof Action_Load_Session_Response>;
 
-// Loaded Session
 export const Action_Loaded_Session_Params = z
 	.object({
 		data: z
@@ -194,7 +186,6 @@ export type Action_Loaded_Session_Params = z.infer<typeof Action_Loaded_Session_
 export const Action_Loaded_Session_Response = z.null();
 export type Action_Loaded_Session_Response = z.infer<typeof Action_Loaded_Session_Response>;
 
-// Filer Change
 export const Action_Filer_Change_Params = z
 	.object({
 		change: Diskfile_Change,
@@ -206,7 +197,6 @@ export type Action_Filer_Change_Params = z.infer<typeof Action_Filer_Change_Para
 export const Action_Filer_Change_Response = z.null();
 export type Action_Filer_Change_Response = z.infer<typeof Action_Filer_Change_Response>;
 
-// Update Diskfile
 export const Action_Update_Diskfile_Params = z
 	.object({
 		path: Diskfile_Path,
@@ -215,7 +205,6 @@ export const Action_Update_Diskfile_Params = z
 	.strict();
 export type Action_Update_Diskfile_Params = z.infer<typeof Action_Update_Diskfile_Params>;
 
-// Delete Diskfile
 export const Action_Delete_Diskfile_Params = z
 	.object({
 		path: Diskfile_Path,
@@ -223,7 +212,6 @@ export const Action_Delete_Diskfile_Params = z
 	.strict();
 export type Action_Delete_Diskfile_Params = z.infer<typeof Action_Delete_Diskfile_Params>;
 
-// Create Directory
 export const Action_Create_Directory_Params = z
 	.object({
 		path: Diskfile_Path,
@@ -231,7 +219,6 @@ export const Action_Create_Directory_Params = z
 	.strict();
 export type Action_Create_Directory_Params = z.infer<typeof Action_Create_Directory_Params>;
 
-// Send Prompt
 export const Action_Send_Prompt_Params = z
 	.object({
 		completion_request: Completion_Request,
@@ -239,7 +226,6 @@ export const Action_Send_Prompt_Params = z
 	.strict();
 export type Action_Send_Prompt_Params = z.infer<typeof Action_Send_Prompt_Params>;
 
-// Completion Response
 export const Action_Completion_Response_Params = z
 	.object({
 		completion_response: Completion_Response,
@@ -252,14 +238,10 @@ export type Action_Completion_Response_Response = z.infer<
 	typeof Action_Completion_Response_Response
 >;
 
-// Action Schema Definitions
-
 export const Action_Ping_Schema: Service_Action_Schema = {
 	type: 'Service_Action',
 	name: 'Action_Ping',
 	auth: null,
-	websockets: true,
-	broadcast: false,
 	params: Action_Ping_Params,
 	response: Action_Ping_Response,
 	returns: 'Api_Result<Action_Ping_Response>',
@@ -269,8 +251,6 @@ export const Action_Pong_Schema: Service_Action_Schema = {
 	type: 'Service_Action',
 	name: 'Action_Pong',
 	auth: null,
-	websockets: true,
-	broadcast: false,
 	params: Action_Pong_Params,
 	response: Action_Pong_Response,
 	returns: 'Api_Result<Action_Pong_Response>',
@@ -280,8 +260,6 @@ export const Action_Load_Session_Schema: Service_Action_Schema = {
 	type: 'Service_Action',
 	name: 'Action_Load_Session',
 	auth: null,
-	websockets: true,
-	broadcast: false,
 	params: Action_Load_Session_Params,
 	response: Action_Load_Session_Response,
 	returns: 'Api_Result<Action_Load_Session_Response>',
@@ -291,8 +269,6 @@ export const Action_Loaded_Session_Schema: Service_Action_Schema = {
 	type: 'Service_Action',
 	name: 'Action_Loaded_Session',
 	auth: null,
-	websockets: true,
-	broadcast: false,
 	params: Action_Loaded_Session_Params,
 	response: Action_Loaded_Session_Response,
 	returns: 'Api_Result<Action_Loaded_Session_Response>',
@@ -302,8 +278,6 @@ export const Action_Filer_Change_Schema: Service_Action_Schema = {
 	type: 'Service_Action',
 	name: 'Action_Filer_Change',
 	auth: null,
-	websockets: true,
-	broadcast: true,
 	params: Action_Filer_Change_Params,
 	response: Action_Filer_Change_Response,
 	returns: 'Api_Result<Action_Filer_Change_Response>',
@@ -341,14 +315,11 @@ export const Action_Completion_Response_Schema: Service_Action_Schema = {
 	type: 'Service_Action',
 	name: 'Action_Completion_Response',
 	auth: null,
-	websockets: true,
-	broadcast: false,
 	params: Action_Completion_Response_Params,
 	response: Action_Completion_Response_Response,
 	returns: 'Api_Result<Action_Completion_Response_Response>',
 };
 
-// Concrete action types
 export const Action_Ping = Action_Base.extend({
 	type: z.literal('ping').default('ping'),
 }).strict();

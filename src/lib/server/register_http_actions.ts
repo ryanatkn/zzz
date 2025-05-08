@@ -5,10 +5,11 @@ import type {Zzz_Server} from '$lib/server/zzz_server.js';
 import type {Action_Schema} from '$lib/schemas.js';
 import {service_return_to_api_result} from '$lib/server/service.js';
 import {API_ROUTE} from '$lib/constants.js';
+import {to_api_path} from '$lib/schema_helpers.js';
 
 export interface Register_Actions_Options {
 	app: Hono;
-	zzz_server: Zzz_Server;
+	zzz_server: Zzz_Server; // TODO this is decoupled from the `app` atm but maybe that's unwieldy
 	action_schemas: Array<Action_Schema>;
 	base_path?: string;
 }
@@ -26,13 +27,12 @@ export const register_http_actions = ({
 		// Skip client-only actions
 		if (schema.type !== 'Service_Action') continue;
 
-		// Skip websocket-only actions
-		if (!schema.websockets) continue;
+		// Generate lowercase API path
+		const action_path = to_api_path(schema.name);
+		const path = `${base_path}/${action_path}`;
 
-		// Handle authentication and parameter validation
-		// TODO BLOCK @many refactor for type safety with the action schemas, the goal is to be able to choose transports granularly with configurable fallbacks
-		const path = `${base_path}/${schema.name}`;
-		console.log(`path`, path);
+		console.log(`Registering API handler: ${path}`);
+
 		app.post(path, async (c) => {
 			try {
 				// Parse request body

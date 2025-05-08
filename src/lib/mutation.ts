@@ -1,5 +1,6 @@
 import type {Api_Result} from '$lib/api.js';
 import type {Actions} from '$lib/action_types.js';
+import type {App} from '$lib/app.svelte.js';
 
 /**
  * Client-side mutation system for handling action responses.
@@ -12,6 +13,8 @@ export interface Mutation_Context<
 	T_Params = unknown,
 	T_Result extends Api_Result<unknown> | void = any,
 > {
+	/** Reference to the main application instance. */
+	zzz: App;
 	/** Name of the action being performed. */
 	action_name: string;
 	/** Parameters passed to the action. */
@@ -26,12 +29,11 @@ export interface Mutation_Context<
 
 /**
  * Mutation handler function type.
+ * Returns void or Promise<void> to support async operations.
  */
-export type Mutation<
-	T_Params = unknown,
-	T_Result extends Api_Result<unknown> | void = any,
-	T_Return = any,
-> = (ctx: Mutation_Context<T_Params, T_Result>) => T_Return;
+export type Mutation<T_Params = any, T_Result extends Api_Result<unknown> | void = any> = (
+	ctx: Mutation_Context<T_Params, T_Result>,
+) => void;
 
 /**
  * Type for registering callbacks to run after mutation completes
@@ -51,6 +53,7 @@ export const create_mutation_context = <
 	T_Params = unknown,
 	T_Result extends Api_Result<unknown> | void = any,
 >(
+	zzz: App,
 	action_name: string,
 	params: T_Params,
 	result: T_Result,
@@ -72,6 +75,7 @@ export const create_mutation_context = <
 	};
 
 	const ctx: Mutation_Context<T_Params, T_Result> = {
+		zzz,
 		action_name,
 		params,
 		result,

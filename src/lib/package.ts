@@ -882,8 +882,6 @@ export const src_json = {
 				{name: 'Http_Status', kind: 'type'},
 				{name: 'Error_Response', kind: 'type'},
 				{name: 'ERROR_MESSAGE_UNKNOWN', kind: 'variable'},
-				{name: 'Broadcast_Message', kind: 'type'},
-				{name: 'Status_Message', kind: 'type'},
 				{name: 'Api_Result', kind: 'type'},
 				{name: 'Successful_Api_Result', kind: 'type'},
 				{name: 'Api_Params', kind: 'type'},
@@ -1597,7 +1595,6 @@ export const src_json = {
 			declarations: [
 				{name: 'send_mutations', kind: 'variable'},
 				{name: 'receive_mutations', kind: 'variable'},
-				{name: 'mutations', kind: 'variable'},
 				{name: 'create_action_mutation_context', kind: 'function'},
 			],
 		},
@@ -1813,6 +1810,7 @@ export const src_json = {
 				{name: 'get_schema_params', kind: 'function'},
 				{name: 'to_action_params_name', kind: 'function'},
 				{name: 'to_action_response_name', kind: 'function'},
+				{name: 'to_api_path', kind: 'function'},
 				{name: 'extract_action_name', kind: 'function'},
 				{name: 'is_action_params_name', kind: 'function'},
 				{name: 'is_action_response_name', kind: 'function'},
@@ -1938,7 +1936,6 @@ export const src_json = {
 		'./server/register_http_actions.js': {
 			path: 'server/register_http_actions.ts',
 			declarations: [
-				{name: 'API_ROUTE', kind: 'variable'},
 				{name: 'Register_Actions_Options', kind: 'type'},
 				{name: 'register_http_actions', kind: 'function'},
 			],
@@ -2174,13 +2171,12 @@ export const src_json = {
 				{name: 'create_uuid', kind: 'function'},
 				{name: 'Uuid', kind: 'variable'},
 				{name: 'Uuid_With_Default', kind: 'variable'},
+				{name: 'get_innermost_type', kind: 'function'},
 				{name: 'zod_get_schema_keys', kind: 'function'},
 				{name: 'get_field_schema', kind: 'function'},
 				{name: 'maybe_get_field_schema', kind: 'function'},
-				{name: 'unwrap_schema', kind: 'function'},
 				{name: 'is_array_schema', kind: 'function'},
 				{name: 'get_inner_array_schema', kind: 'function'},
-				{name: 'get_innermost_type', kind: 'function'},
 			],
 		},
 		'./Zzz_Root.svelte': {
