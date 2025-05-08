@@ -216,11 +216,13 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		tape_messages?: Array<Action_With_History>,
 	): Promise<Action_Completion_Response> {
 		const request_id = create_uuid();
+		const created = get_datetime_now();
 		const message: Action_Send_Prompt = {
 			id: request_id,
+			created,
 			type: 'send_prompt',
 			completion_request: {
-				created: get_datetime_now(),
+				created,
 				request_id,
 				provider_name,
 				model,
@@ -259,8 +261,9 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		// Add files from the session data to diskfiles
 		for (const source_file of data.files) {
 			this.diskfiles.handle_change({
-				type: 'filer_change',
 				id: create_uuid(), // TODO shouldnt need to fake, maybe call an internal method directly? or do we want a single path?
+				created: get_datetime_now(),
+				type: 'filer_change',
 				change: {type: 'add', path: source_file.id},
 				source_file,
 			});

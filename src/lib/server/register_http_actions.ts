@@ -1,9 +1,8 @@
 import {Hono, type Handler} from 'hono';
-import {z} from 'zod';
 import {unreachable} from '@ryanatkn/belt/error.js';
 
 import type {Zzz_Server} from '$lib/server/zzz_server.js';
-import type {Action_Schema} from '$lib/schemas.js';
+import type {Action_Spec} from '$lib/schemas.js';
 import {service_return_to_api_result} from '$lib/server/service.js';
 import {API_ROUTE} from '$lib/constants.js';
 import {to_api_path} from '$lib/schema_helpers.js';
@@ -12,7 +11,7 @@ import {Api_Error} from '$lib/api.js';
 export interface Register_Actions_Options {
 	app: Hono;
 	zzz_server: Zzz_Server; // TODO this is decoupled from the `app` atm but maybe that's unwieldy
-	action_schemas: Array<Action_Schema>;
+	action_specs: Array<Action_Spec>;
 	base_path?: string;
 }
 
@@ -22,11 +21,11 @@ export interface Register_Actions_Options {
 export const register_http_actions = ({
 	app,
 	zzz_server,
-	action_schemas,
+	action_specs,
 	base_path = API_ROUTE,
 }: Register_Actions_Options): void => {
-	for (const schema of action_schemas) {
-		// Skip client-only actions
+	for (const schema of action_specs) {
+		// Register only service actions
 		if (schema.type !== 'Service_Action') continue;
 
 		const {name, method} = schema;
@@ -35,54 +34,52 @@ export const register_http_actions = ({
 		const action_path = to_api_path(name);
 		const path = `${base_path}/${action_path}`;
 
-		// Default to POST if no method specified
 		if (!method) continue;
 
 		console.log(`Registering API handler: ${method} ${path}`);
 
-		// Create handler based on method
 		const handler: Handler = async (c) => {
+			console.log(`HANDLER c`, c);
 			try {
-				let params;
+				let params: unknown;
 
+				// TODO const query = c.req.query();
 				// Extract parameters based on HTTP method
-				if (method === 'GET') {
-					// For GET requests, use query parameters
-					const query = c.req.query();
-					params = schema.params.parse(query);
-				} else {
-					// For other methods, use JSON body
+				if (method === 'POST' || method === 'PUT' || method === 'PATCH') {
 					const body = await c.req.json();
-					params = schema.params.parse(body);
+					const parsed = schema.params.safeParse(body);
+					if (!parsed.success) {
+						throw new Api_Error(400, `Invalid action params ${name}: ${parsed.error}`);
+					}
+					params = parsed.data;
 				}
 
-				// Process the action
-				const result = await zzz_server.process_action(name, params);
+				const service_result = await zzz_server.process_action(name, params);
 
-				// Return API result
-				return c.json(service_return_to_api_result(result));
+				const api_result = service_return_to_api_result(service_result);
+
+				return c.json(api_result);
 			} catch (error) {
 				console.error(`Error processing ${name}:`, error);
 
-				// Return appropriate error response
-				if (error instanceof z.ZodError) {
+				if (error instanceof Api_Error) {
 					return c.json(
+						// TODO @many JSON RPC types and parsing in DEV
 						{
 							ok: false,
-							status: 400,
-							error: `Invalid parameters for ${name}`,
-							details: error.errors,
+							status: error.status,
+							error: error.message,
 						},
 						400,
 					);
 				}
 
 				return c.json(
+					// TODO @many JSON RPC types and parsing in DEV
 					{
 						ok: false,
 						status: 500,
-						error: `Error processing ${name}`,
-						details: error instanceof Error ? error.message : String(error),
+						error: `Unknownn error processing ${name}`,
 					},
 					500,
 				);

@@ -20,7 +20,7 @@
 	import Zzz_Root from '$lib/Zzz_Root.svelte';
 	import {pkg_context} from '$lib/pkg.js';
 	import {package_json, src_json} from '$lib/package.js';
-	import {create_uuid} from '$lib/zod_helpers.js';
+	import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
 	import {Prompt_Json} from '$lib/prompt.svelte.js';
 	import {cell_classes} from '$lib/cell_classes.js';
 	import {Provider_Json} from '$lib/provider.svelte.js';
@@ -143,7 +143,7 @@
 
 	// Initialize the session
 	if (BROWSER) {
-		zzz.actions.send({id: create_uuid(), type: 'load_session'});
+		zzz.actions.send({id: create_uuid(), created: get_datetime_now(), type: 'load_session'});
 	}
 
 	// TODO refactor, maybe per route?

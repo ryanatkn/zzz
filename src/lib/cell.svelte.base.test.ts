@@ -476,7 +476,7 @@ describe('Cell date formatting', () => {
 
 		// Verify formatted strings exist
 		expect(test_cell.created_formatted_short_date).not.toBeNull();
-		expect(test_cell.created_formatted_date).not.toBeNull();
+		expect(test_cell.created_formatted_datetime).not.toBeNull();
 		expect(test_cell.created_formatted_time).not.toBeNull();
 
 		expect(test_cell.updated_formatted_short_date).not.toBeNull();

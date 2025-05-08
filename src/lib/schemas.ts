@@ -1,10 +1,9 @@
 import {z} from 'zod';
 
-import {Diskfile_Change_Type, Source_File, Diskfile_Path, Zzz_Dir} from '$lib/diskfile_types.js';
-import {Datetime_Now, get_datetime_now, Uuid, Uuid_With_Default} from '$lib/zod_helpers.js';
+import {Source_File, Diskfile_Path, Zzz_Dir, Diskfile_Change} from '$lib/diskfile_types.js';
+import {Datetime_Now, Uuid, Uuid_With_Default} from '$lib/zod_helpers.js';
 import {Provider_Name} from '$lib/provider_types.js';
-import {Cell_Json} from '$lib/cell_types.js';
-import type {Http_Method} from './api.js';
+import type {Http_Method} from '$lib/api.js';
 
 // Action types and schemas following Model Context Protocol patterns
 
@@ -101,62 +100,37 @@ export type Completion_Response = z.infer<typeof Completion_Response>;
 export const Action_Base = z
 	.object({
 		id: Uuid_With_Default,
+		created: Datetime_Now,
 		type: Action_Type,
 	})
 	.strict();
 export type Action_Base = z.infer<typeof Action_Base>;
 
-// Diskfile change schema
-export const Diskfile_Change = z
-	.object({
-		type: Diskfile_Change_Type,
-		path: Diskfile_Path,
-	})
-	.strict();
-export type Diskfile_Change = z.infer<typeof Diskfile_Change>;
-
-/**
- * Base schema for all action schemas.
- */
-export const Action_Schema_Base = z.object({
+export const Action_Spec_Base_Schema = z.object({
 	name: z.string(),
-	params: z.any(),
+	params: z.instanceof(z.ZodType),
 	returns: z.string(),
 });
-export type Action_Schema_Base = z.infer<typeof Action_Schema_Base>;
+export type Action_Spec_Base = z.infer<typeof Action_Spec_Base_Schema>;
 
-/**
- * Schema for client-only actions.
- */
-export const Client_Action_Schema = Action_Schema_Base.extend({
+export const Client_Action_Spec_Schema = Action_Spec_Base_Schema.extend({
 	type: z.literal('Client_Action'),
 });
-export type Client_Action_Schema = z.infer<typeof Client_Action_Schema>;
+export type Client_Action_Spec = z.infer<typeof Client_Action_Spec_Schema>;
 
-/**
- * Schema for service actions that can be called from client or server.
- */
-export const Service_Action_Schema = Action_Schema_Base.extend({
+export const Service_Action_Spec_Schema = Action_Spec_Base_Schema.extend({
 	type: z.literal('Service_Action'),
-	method: z.union([z.nativeEnum({} as Record<Http_Method, Http_Method>), z.null()]),
+	method: z.union([z.custom<Http_Method>(), z.null()]),
 	auth: z.union([z.literal('authenticate'), z.literal('authorize'), z.null()]),
-	response: z.any(),
+	response: z.instanceof(z.ZodType),
 });
-export type Service_Action_Schema = z.infer<typeof Service_Action_Schema>;
+export type Service_Action_Spec = z.infer<typeof Service_Action_Spec_Schema>;
 
-/**
- * Union type of all action schemas.
- */
-export const Action_Schema = z.discriminatedUnion('type', [
-	Client_Action_Schema,
-	Service_Action_Schema,
-]);
-export type Action_Schema = z.infer<typeof Action_Schema>;
+export const Action_Spec_Schema = z.union([Client_Action_Spec_Schema, Service_Action_Spec_Schema]);
+export type Action_Spec = z.infer<typeof Action_Spec_Schema>;
+export type Action_Spec_Name = string; // TODO ? Flavored<string, 'Action_Spec_Name'>;
 
-/**
- * Type for action schema names
- */
-export type Action_Schema_Name = string;
+// Action parameters and response schemas
 
 export const Action_Ping_Params = z.null();
 export type Action_Ping_Params = z.infer<typeof Action_Ping_Params>;
@@ -247,7 +221,7 @@ export type Action_Completion_Response_Response = z.infer<
 	typeof Action_Completion_Response_Response
 >;
 
-export const Action_Ping_Schema: Service_Action_Schema = {
+export const Action_Ping_Spec = {
 	type: 'Service_Action',
 	name: 'Action_Ping',
 	method: 'GET',
@@ -255,10 +229,9 @@ export const Action_Ping_Schema: Service_Action_Schema = {
 	params: Action_Ping_Params,
 	response: Action_Ping_Response,
 	returns: 'Api_Result<Action_Ping_Response>',
-};
+} satisfies Service_Action_Spec;
 
-// TODO BLOCK see mcp for how this should be modeled compared to ping, the method makes no sense, but maybe null is fine, or maybe we need a type union
-export const Action_Pong_Schema: Service_Action_Schema = {
+export const Action_Pong_Spec = {
 	type: 'Service_Action',
 	name: 'Action_Pong',
 	method: null,
@@ -266,9 +239,9 @@ export const Action_Pong_Schema: Service_Action_Schema = {
 	params: Action_Pong_Params,
 	response: Action_Pong_Response,
 	returns: 'Api_Result<Action_Pong_Response>',
-};
+} satisfies Service_Action_Spec;
 
-export const Action_Load_Session_Schema: Service_Action_Schema = {
+export const Action_Load_Session_Spec = {
 	type: 'Service_Action',
 	name: 'Action_Load_Session',
 	method: 'GET',
@@ -276,9 +249,9 @@ export const Action_Load_Session_Schema: Service_Action_Schema = {
 	params: Action_Load_Session_Params,
 	response: Action_Load_Session_Response,
 	returns: 'Api_Result<Action_Load_Session_Response>',
-};
+} satisfies Service_Action_Spec;
 
-export const Action_Loaded_Session_Schema: Service_Action_Schema = {
+export const Action_Loaded_Session_Spec = {
 	type: 'Service_Action',
 	name: 'Action_Loaded_Session',
 	method: null,
@@ -286,9 +259,9 @@ export const Action_Loaded_Session_Schema: Service_Action_Schema = {
 	params: Action_Loaded_Session_Params,
 	response: Action_Loaded_Session_Response,
 	returns: 'Api_Result<Action_Loaded_Session_Response>',
-};
+} satisfies Service_Action_Spec;
 
-export const Action_Filer_Change_Schema: Service_Action_Schema = {
+export const Action_Filer_Change_Spec = {
 	type: 'Service_Action',
 	name: 'Action_Filer_Change',
 	method: null,
@@ -296,37 +269,37 @@ export const Action_Filer_Change_Schema: Service_Action_Schema = {
 	params: Action_Filer_Change_Params,
 	response: Action_Filer_Change_Response,
 	returns: 'Api_Result<Action_Filer_Change_Response>',
-};
+} satisfies Service_Action_Spec;
 
-export const Action_Update_Diskfile_Schema: Client_Action_Schema = {
+export const Action_Update_Diskfile_Spec = {
 	type: 'Client_Action',
 	name: 'Action_Update_Diskfile',
 	params: Action_Update_Diskfile_Params,
 	returns: 'string',
-};
+} satisfies Client_Action_Spec;
 
-export const Action_Delete_Diskfile_Schema: Client_Action_Schema = {
+export const Action_Delete_Diskfile_Spec = {
 	type: 'Client_Action',
 	name: 'Action_Delete_Diskfile',
 	params: Action_Delete_Diskfile_Params,
 	returns: 'string',
-};
+} satisfies Client_Action_Spec;
 
-export const Action_Create_Directory_Schema: Client_Action_Schema = {
+export const Action_Create_Directory_Spec = {
 	type: 'Client_Action',
 	name: 'Action_Create_Directory',
 	params: Action_Create_Directory_Params,
 	returns: 'string',
-};
+} satisfies Client_Action_Spec;
 
-export const Action_Send_Prompt_Schema: Client_Action_Schema = {
+export const Action_Send_Prompt_Spec = {
 	type: 'Client_Action',
 	name: 'Action_Send_Prompt',
 	params: Action_Send_Prompt_Params,
 	returns: 'string',
-};
+} satisfies Client_Action_Spec;
 
-export const Action_Completion_Response_Schema: Service_Action_Schema = {
+export const Action_Completion_Response_Spec = {
 	type: 'Service_Action',
 	name: 'Action_Completion_Response',
 	method: 'GET',
@@ -334,7 +307,7 @@ export const Action_Completion_Response_Schema: Service_Action_Schema = {
 	params: Action_Completion_Response_Params,
 	response: Action_Completion_Response_Response,
 	returns: 'Api_Result<Action_Completion_Response_Response>',
-};
+} satisfies Service_Action_Spec;
 
 export const Action_Ping = Action_Base.extend({
 	type: z.literal('ping').default('ping'),
@@ -401,7 +374,7 @@ export const Action_Completion_Response = Action_Base.extend({
 }).strict();
 export type Action_Completion_Response = z.infer<typeof Action_Completion_Response>;
 
-// Action unions by direction
+// TODO BLOCK generate? registry?
 export const Action_Client = z.discriminatedUnion('type', [
 	Action_Ping,
 	Action_Load_Session,
@@ -420,7 +393,7 @@ export const Action_Server = z.discriminatedUnion('type', [
 ]);
 export type Action_Server = z.infer<typeof Action_Server>;
 
-export const Action = z.discriminatedUnion('type', [
+export const Action_Any = z.discriminatedUnion('type', [
 	Action_Ping,
 	Action_Pong,
 	Action_Load_Session,
@@ -432,62 +405,4 @@ export const Action = z.discriminatedUnion('type', [
 	Action_Delete_Diskfile,
 	Action_Create_Directory,
 ]);
-export type Action = z.infer<typeof Action>;
-
-// Mapping for action directions
-export const action_directions: Record<string, Action_Direction> = {
-	ping: 'client',
-	pong: 'server',
-	load_session: 'client',
-	loaded_session: 'server',
-	send_prompt: 'client',
-	completion_response: 'server',
-	filer_change: 'server',
-	update_diskfile: 'client',
-	delete_diskfile: 'client',
-	create_directory: 'client',
-};
-
-export const Action_Json = Cell_Json.extend({
-	type: Action_Type,
-	direction: Action_Direction,
-	// Optional fields with proper type checking
-	ping_id: Uuid.optional(),
-	completion_request: Completion_Request.optional(),
-	completion_response: Completion_Response.optional(),
-	path: Diskfile_Path.optional(),
-	content: z.string().optional(),
-	change: Diskfile_Change.optional(),
-	source_file: Source_File.optional(),
-	data: z.record(z.string(), z.any()).optional(),
-}).strict();
-export type Action_Json = z.infer<typeof Action_Json>;
-export type Action_Json_Input = z.input<typeof Action_Json>;
-
-// Helper function to create an action with json representation
-export const create_action_json = (action: Action, direction: Action_Direction): Action_Json => {
-	return {
-		...action,
-		direction,
-		created: get_datetime_now(),
-	} as Action_Json;
-};
-
-// Helper to get the direction for an action
-export const get_action_direction = (type: Action_Type): Action_Direction => {
-	return action_directions[type];
-};
-
-// Export the action schemas for registration
-export const action_schemas_registry: Array<Action_Schema> = [
-	Action_Ping_Schema,
-	Action_Pong_Schema,
-	Action_Load_Session_Schema,
-	Action_Loaded_Session_Schema,
-	Action_Filer_Change_Schema,
-	Action_Update_Diskfile_Schema,
-	Action_Delete_Diskfile_Schema,
-	Action_Create_Directory_Schema,
-	Action_Send_Prompt_Schema,
-	Action_Completion_Response_Schema,
-];
+export type Action_Any = z.infer<typeof Action_Any>;

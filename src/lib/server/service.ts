@@ -1,6 +1,7 @@
 import type {Zzz_Server} from '$lib/server/zzz_server.js';
-import type {Action_Client, Action_Server} from '$lib/schemas.js';
-import type {Http_Status, Successful_Api_Result} from '$lib/api.js';
+import type {Action_Client, Action_Server, Service_Action_Spec} from '$lib/schemas.js';
+import {Api_Error, type Http_Status, type Successful_Api_Result} from '$lib/api.js';
+import type {Logger} from '@ryanatkn/belt/log.js';
 
 /**
  * Return type for services.
@@ -58,3 +59,29 @@ export const service_return_to_api_result = <T_Value>(
 	status: result.status ?? 200,
 	value: result.value,
 });
+
+export const validate_service_params = (
+	action: Service_Action_Spec,
+	params: any,
+	log?: Logger,
+): void => {
+	const parsed = action.params.safeParse(params);
+	if (!parsed.success) {
+		log?.error('failed to validate service params', action.name, params, parsed.error.issues);
+		throw new Api_Error(400, `invalid params to ${action.name}: ${parsed.error.issues[0].message}`); // TODO @many handle multiple errors instead of just the first
+	}
+};
+
+export const validate_service_response = (
+	action: Service_Action_Spec,
+	response: any,
+	log?: Logger,
+): void => {
+	const parsed = action.response.safeParse(response);
+	if (!parsed.success) {
+		log?.error('failed to validate service response', action.name, response, parsed.error.issues);
+		throw Error(
+			`service response validation failed for ${action.name}: ${parsed.error.issues[0].message}`,
+		); // TODO @many handle multiple errors instead of just the first
+	}
+};

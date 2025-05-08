@@ -10,7 +10,7 @@ import {handle_message, handle_filer_change} from '$lib/server/handler_defaults.
 import {register_http_actions} from '$lib/server/register_http_actions.js';
 import create_config from '$lib/config.js';
 import {Action_Client, type Action_Server} from '$lib/schemas.js';
-import {action_schemas} from '$lib/schema_metadata.js';
+import {action_specs} from '$lib/schema_metadata.js';
 import {SERVER_PROXIED_PORT} from '$lib/constants.js';
 import {should_allow_origin} from '$lib/server/security.js';
 
@@ -57,7 +57,7 @@ const main = (): void => {
 						console.error(`received non-json message`, event.data);
 						return;
 					}
-					// console.log(`[server] handling message`, data);
+					console.log(`[server] handling message`, data);
 					if (data.type === 'server_message') {
 						const parsed = Action_Client.safeParse(data.message);
 						if (!parsed.success) {
@@ -105,7 +105,7 @@ const main = (): void => {
 	register_http_actions({
 		app,
 		zzz_server,
-		action_schemas, // Pass the action schemas from metadata
+		action_specs, // Pass the action schemas from metadata
 	});
 
 	const hono = serve(

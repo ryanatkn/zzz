@@ -44,7 +44,7 @@
 					</div>
 				</div>
 				<div class="column">
-					<small title={selected_chat.created_formatted_date}
+					<small title={selected_chat.created_formatted_datetime}
 						>created {selected_chat.created_formatted_short_date}</small
 					>
 					<small>

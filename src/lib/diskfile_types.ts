@@ -15,6 +15,14 @@ export const Diskfile_Path = z
 	.brand('Diskfile_Path');
 export type Diskfile_Path = z.infer<typeof Diskfile_Path>;
 
+export const Diskfile_Change = z
+	.object({
+		type: Diskfile_Change_Type,
+		path: Diskfile_Path,
+	})
+	.strict();
+export type Diskfile_Change = z.infer<typeof Diskfile_Change>;
+
 /**
  * The Zzz server has a special filesystem directory that contains the app's data at `/.zzz`.
  * Zzz also provides an API for reading and writing to `.zzz`'s parent directory.

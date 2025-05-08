@@ -1,13 +1,4 @@
-import type {z} from 'zod';
-
-import type {Action_Schema, Service_Action_Schema, Client_Action_Schema} from '$lib/schemas.js';
-
-// TODO refactor, the Schema vs Action_Schema is confused
-export const get_schema_name = (schema: Action_Schema): string => schema.name;
-
-export const get_schema_type = (schema: Action_Schema): string => schema.type;
-
-export const get_schema_params = (schema: Action_Schema): z.ZodTypeAny => schema.params;
+import {type Action_Spec, type Client_Action_Spec, type Service_Action_Spec} from '$lib/schemas.js';
 
 export const to_action_params_name = (action_name: string): string => `${action_name}_Params`;
 
@@ -50,13 +41,13 @@ export const is_action_response_name = (name: string): boolean => name.endsWith(
 /**
  * Check if the schema is for a service action
  */
-export const is_service_action = (schema: Action_Schema): schema is Service_Action_Schema =>
+export const is_service_action = (schema: Action_Spec): schema is Service_Action_Spec =>
 	schema.type === 'Service_Action';
 
 /**
  * Check if the schema is for a client action
  */
-export const is_client_action = (schema: Action_Schema): schema is Client_Action_Schema =>
+export const is_client_action = (schema: Action_Spec): schema is Client_Action_Spec =>
 	schema.type === 'Client_Action';
 
 /**
@@ -81,7 +72,7 @@ export const to_snake_case = (str: string): string => {
 /**
  * Get import list for schemas
  */
-export const get_schema_imports = (schemas: Array<Action_Schema>): Array<string> => {
+export const get_schema_imports = (schemas: Array<Action_Spec>): Array<string> => {
 	const types: Set<string> = new Set();
 
 	for (const schema of schemas) {

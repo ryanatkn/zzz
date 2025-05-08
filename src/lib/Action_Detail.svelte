@@ -31,7 +31,7 @@
 	<div class="display_flex flex_column gap_xs mt_sm">
 		<small class="font_family_mono">id: {action.id}</small>
 		<small class="font_family_mono"
-			>created {action.created_formatted_date} {action.created_formatted_time}</small
+			>created {action.created_formatted_datetime} {action.created_formatted_time}</small
 		>
 		<small class="font_family_mono">type: {action.type}</small>
 		<small class="font_family_mono">direction: {action.direction}</small>

@@ -137,6 +137,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 
 	update(path: Diskfile_Path, content: string): void {
 		this.zzz.actions.send({
+			created: get_datetime_now(),
 			id: create_uuid(),
 			type: 'update_diskfile',
 			path,
@@ -146,6 +147,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 
 	delete(path: Diskfile_Path): void {
 		this.zzz.actions.send({
+			created: get_datetime_now(),
 			id: create_uuid(),
 			type: 'delete_diskfile',
 			path,
@@ -174,6 +176,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 
 		this.zzz.actions.send({
 			id: create_uuid(),
+			created: get_datetime_now(),
 			type: 'create_directory',
 			path,
 		});

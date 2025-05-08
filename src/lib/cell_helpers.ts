@@ -7,7 +7,7 @@ export const HANDLED = Symbol('HANDLED_BY_PARSER');
 
 // Constants for date formatting
 export const FILE_SHORT_DATE_FORMAT = 'MMM d, p';
-export const FILE_DATE_FORMAT = 'MMM d, yyyy h:mm:ss a';
+export const FILE_DATETIME_FORMAT = 'MMM d, yyyy h:mm:ss a';
 export const FILE_TIME_FORMAT = 'HH:mm:ss';
 
 // Metadata properties for Zod schemas.

@@ -1,22 +1,71 @@
 import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Uuid} from '$lib/zod_helpers.js';
+import {get_datetime_now, Uuid} from '$lib/zod_helpers.js';
 import {
-	Action_Json,
+	Action_Direction,
+	Action_Type,
 	Completion_Response,
 	Completion_Request,
-	type Action_Direction,
-	type Action_Type,
-	type Diskfile_Change,
+	type Action_Any,
 } from '$lib/schemas.js';
-import {Diskfile_Path, Source_File} from '$lib/diskfile_types.js';
+import {Diskfile_Change, Diskfile_Path, Source_File} from '$lib/diskfile_types.js';
 import {to_completion_response_text} from '$lib/response_helpers.js';
 import {to_preview} from '$lib/helpers.js';
+import {Cell_Json} from '$lib/cell_types.js';
 
 // Constants for preview length and formatting
 export const ACTION_DATE_FORMAT = 'MMM d, p';
 export const ACTION_TIME_FORMAT = 'p';
+
+// TODO BLOCK maybe generate from the registry? `schemas` instance maybe, instead of `* as schemas`?
+// Mapping for action directions
+export const action_directions: Record<string, Action_Direction> = {
+	ping: 'client',
+	pong: 'server',
+	load_session: 'client',
+	loaded_session: 'server',
+	send_prompt: 'client',
+	completion_response: 'server',
+	filer_change: 'server',
+	update_diskfile: 'client',
+	delete_diskfile: 'client',
+	create_directory: 'client',
+};
+
+// TODO BLOCK  this is the wrong kind of action?
+// Helper function to create an action with json representation
+export const create_action_json = (
+	action: Action_Any,
+	direction: Action_Direction,
+): Action_Json => {
+	return {
+		...action,
+		direction,
+		created: get_datetime_now(),
+	} as Action_Json;
+};
+
+// TODO remove?
+// Helper to get the direction for an action
+export const get_action_direction = (type: Action_Type): Action_Direction =>
+	action_directions[type];
+
+export const Action_Json = Cell_Json.extend({
+	type: Action_Type,
+	direction: Action_Direction,
+	// Optional fields with proper type checking
+	ping_id: Uuid.optional(),
+	completion_request: Completion_Request.optional(),
+	completion_response: Completion_Response.optional(),
+	path: Diskfile_Path.optional(),
+	content: z.string().optional(),
+	change: Diskfile_Change.optional(),
+	source_file: Source_File.optional(),
+	data: z.record(z.string(), z.any()).optional(),
+}).strict();
+export type Action_Json = z.infer<typeof Action_Json>;
+export type Action_Json_Input = z.input<typeof Action_Json>;
 
 export interface Action_Options extends Cell_Options<typeof Action_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 

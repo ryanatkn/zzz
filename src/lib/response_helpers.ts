@@ -78,11 +78,14 @@ export const create_completion_response_message = (
 			throw new Error(`Unsupported provider: ${provider_name}`);
 	}
 
+	const created = get_datetime_now();
+
 	return {
 		id: create_uuid(),
+		created,
 		type: 'completion_response',
 		completion_response: {
-			created: get_datetime_now(),
+			created,
 			request_id,
 			provider_name,
 			model,

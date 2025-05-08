@@ -31,56 +31,62 @@ import type {
  * Names of all service actions
  */
 export type Service_Action_Name =
-	| 'Action_Ping'
-	| 'Action_Pong'
+	| 'Action_Completion_Response'
+	| 'Action_Filer_Change'
 	| 'Action_Load_Session'
 	| 'Action_Loaded_Session'
-	| 'Action_Filer_Change'
-	| 'Action_Completion_Response';
+	| 'Action_Ping'
+	| 'Action_Pong';
 
 /**
  * Names of all client-only actions
  */
 export type Client_Action_Name =
-	| 'Action_Update_Diskfile'
-	| 'Action_Delete_Diskfile'
 	| 'Action_Create_Directory'
-	| 'Action_Send_Prompt';
+	| 'Action_Delete_Diskfile'
+	| 'Action_Send_Prompt'
+	| 'Action_Update_Diskfile';
 
 /**
  * Maps action names to their parameter types
  */
 export interface Action_Params_By_Name {
-	Action_Ping: Action_Ping_Params;
-	Action_Pong: Action_Pong_Params;
+	Action_Completion_Response: Action_Completion_Response_Params;
+	Action_Create_Directory: Action_Create_Directory_Params;
+	Action_Delete_Diskfile: Action_Delete_Diskfile_Params;
+	Action_Filer_Change: Action_Filer_Change_Params;
 	Action_Load_Session: Action_Load_Session_Params;
 	Action_Loaded_Session: Action_Loaded_Session_Params;
-	Action_Filer_Change: Action_Filer_Change_Params;
-	Action_Update_Diskfile: Action_Update_Diskfile_Params;
-	Action_Delete_Diskfile: Action_Delete_Diskfile_Params;
-	Action_Create_Directory: Action_Create_Directory_Params;
+	Action_Ping: Action_Ping_Params;
+	Action_Pong: Action_Pong_Params;
 	Action_Send_Prompt: Action_Send_Prompt_Params;
-	Action_Completion_Response: Action_Completion_Response_Params;
+	Action_Update_Diskfile: Action_Update_Diskfile_Params;
 }
 
 /**
  * Maps action names to their response types (server actions only)
  */
 export interface Action_Response_By_Name {
-	Action_Ping: Action_Ping_Response;
-	Action_Pong: Action_Pong_Response;
+	Action_Completion_Response: Action_Completion_Response_Response;
+	Action_Filer_Change: Action_Filer_Change_Response;
 	Action_Load_Session: Action_Load_Session_Response;
 	Action_Loaded_Session: Action_Loaded_Session_Response;
-	Action_Filer_Change: Action_Filer_Change_Response;
-	Action_Completion_Response: Action_Completion_Response_Response;
+	Action_Ping: Action_Ping_Response;
+	Action_Pong: Action_Pong_Response;
 }
 
 /**
  * Maps action names to their service implementations
  */
 export interface Service_By_Name {
-	Action_Ping: Non_Authenticated_Service<Action_Ping_Params, Service_Return<Action_Ping_Response>>;
-	Action_Pong: Non_Authenticated_Service<Action_Pong_Params, Service_Return<Action_Pong_Response>>;
+	Action_Completion_Response: Non_Authenticated_Service<
+		Action_Completion_Response_Params,
+		Service_Return<Action_Completion_Response_Response>
+	>;
+	Action_Filer_Change: Non_Authenticated_Service<
+		Action_Filer_Change_Params,
+		Service_Return<Action_Filer_Change_Response>
+	>;
 	Action_Load_Session: Non_Authenticated_Service<
 		Action_Load_Session_Params,
 		Service_Return<Action_Load_Session_Response>
@@ -89,36 +95,30 @@ export interface Service_By_Name {
 		Action_Loaded_Session_Params,
 		Service_Return<Action_Loaded_Session_Response>
 	>;
-	Action_Filer_Change: Non_Authenticated_Service<
-		Action_Filer_Change_Params,
-		Service_Return<Action_Filer_Change_Response>
-	>;
-	Action_Completion_Response: Non_Authenticated_Service<
-		Action_Completion_Response_Params,
-		Service_Return<Action_Completion_Response_Response>
-	>;
+	Action_Ping: Non_Authenticated_Service<Action_Ping_Params, Service_Return<Action_Ping_Response>>;
+	Action_Pong: Non_Authenticated_Service<Action_Pong_Params, Service_Return<Action_Pong_Response>>;
 }
 
 /**
  * Interface for action dispatch functions
  */
 export interface Actions {
-	Action_Ping: () => Promise<Api_Result<Action_Ping_Response>>;
-	Action_Pong: (params: Action_Pong_Params) => Promise<Api_Result<Action_Pong_Response>>;
+	Action_Completion_Response: (
+		params: Action_Completion_Response_Params,
+	) => Promise<Api_Result<Action_Completion_Response_Response>>;
+	Action_Create_Directory: (params: Action_Create_Directory_Params) => Promise<string>;
+	Action_Delete_Diskfile: (params: Action_Delete_Diskfile_Params) => Promise<string>;
+	Action_Filer_Change: (
+		params: Action_Filer_Change_Params,
+	) => Promise<Api_Result<Action_Filer_Change_Response>>;
 	Action_Load_Session: () => Promise<Api_Result<Action_Load_Session_Response>>;
 	Action_Loaded_Session: (
 		params: Action_Loaded_Session_Params,
 	) => Promise<Api_Result<Action_Loaded_Session_Response>>;
-	Action_Filer_Change: (
-		params: Action_Filer_Change_Params,
-	) => Promise<Api_Result<Action_Filer_Change_Response>>;
-	Action_Update_Diskfile: (params: Action_Update_Diskfile_Params) => Promise<string>;
-	Action_Delete_Diskfile: (params: Action_Delete_Diskfile_Params) => Promise<string>;
-	Action_Create_Directory: (params: Action_Create_Directory_Params) => Promise<string>;
+	Action_Ping: () => Promise<Api_Result<Action_Ping_Response>>;
+	Action_Pong: (params: Action_Pong_Params) => Promise<Api_Result<Action_Pong_Response>>;
 	Action_Send_Prompt: (params: Action_Send_Prompt_Params) => Promise<string>;
-	Action_Completion_Response: (
-		params: Action_Completion_Response_Params,
-	) => Promise<Api_Result<Action_Completion_Response_Response>>;
+	Action_Update_Diskfile: (params: Action_Update_Diskfile_Params) => Promise<string>;
 }
 
 /**
@@ -126,8 +126,16 @@ export interface Actions {
  */
 export interface Mutations {
 	[key: string]: Mutation | undefined;
-	Action_Ping?: Mutation<Action_Ping_Params, Api_Result<Action_Ping_Response>>;
-	Action_Pong?: Mutation<Action_Pong_Params, Api_Result<Action_Pong_Response>>;
+	Action_Completion_Response?: Mutation<
+		Action_Completion_Response_Params,
+		Api_Result<Action_Completion_Response_Response>
+	>;
+	Action_Create_Directory?: Mutation<Action_Create_Directory_Params, void>;
+	Action_Delete_Diskfile?: Mutation<Action_Delete_Diskfile_Params, void>;
+	Action_Filer_Change?: Mutation<
+		Action_Filer_Change_Params,
+		Api_Result<Action_Filer_Change_Response>
+	>;
 	Action_Load_Session?: Mutation<
 		Action_Load_Session_Params,
 		Api_Result<Action_Load_Session_Response>
@@ -136,18 +144,10 @@ export interface Mutations {
 		Action_Loaded_Session_Params,
 		Api_Result<Action_Loaded_Session_Response>
 	>;
-	Action_Filer_Change?: Mutation<
-		Action_Filer_Change_Params,
-		Api_Result<Action_Filer_Change_Response>
-	>;
-	Action_Update_Diskfile?: Mutation<Action_Update_Diskfile_Params, void>;
-	Action_Delete_Diskfile?: Mutation<Action_Delete_Diskfile_Params, void>;
-	Action_Create_Directory?: Mutation<Action_Create_Directory_Params, void>;
+	Action_Ping?: Mutation<Action_Ping_Params, Api_Result<Action_Ping_Response>>;
+	Action_Pong?: Mutation<Action_Pong_Params, Api_Result<Action_Pong_Response>>;
 	Action_Send_Prompt?: Mutation<Action_Send_Prompt_Params, void>;
-	Action_Completion_Response?: Mutation<
-		Action_Completion_Response_Params,
-		Api_Result<Action_Completion_Response_Response>
-	>;
+	Action_Update_Diskfile?: Mutation<Action_Update_Diskfile_Params, void>;
 }
 
 // generated by src/lib/action_types.gen.ts - DO NOT EDIT OR RISK LOST DATA

@@ -25,7 +25,7 @@
 	</small>
 
 	<small class="font_family_mono">
-		<div>created {diskfile.created_formatted_date}</div>
+		<div>created {diskfile.created_formatted_datetime}</div>
 		<div>updated {diskfile.updated_formatted_date}</div>
 	</small>
 

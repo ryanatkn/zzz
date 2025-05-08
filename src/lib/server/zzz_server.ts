@@ -2,20 +2,17 @@ import {Filer, type Cleanup_Watch} from '@ryanatkn/gro/filer.js';
 import type {Watcher_Change} from '@ryanatkn/gro/watch_dir.js';
 import {resolve} from 'node:path';
 
-import {
-	Action_Client,
-	type Action_Server,
-	type Action_Schema,
-	action_schemas_registry,
-} from '$lib/schemas.js';
+import {Action_Client, type Action_Server, type Action_Spec} from '$lib/schemas.js';
 import type {Zzz_Config} from '$lib/config_helpers.js';
 import {Zzz_Dir} from '$lib/diskfile_types.js';
 import {Safe_Fs} from '$lib/server/safe_fs.js';
 import type {Service_Return} from '$lib/server/service.js';
 import {Api_Error} from '$lib/api.js';
+import {action_specs} from '$lib/schema_metadata.js';
+import {Logger} from '@ryanatkn/belt/log.js';
 
 /**
- * Function type for handling client messages
+ * Function type for handling client messages.
  */
 export type Action_Handler = (
 	message: Action_Client,
@@ -23,7 +20,7 @@ export type Action_Handler = (
 ) => Promise<Action_Server | null>;
 
 /**
- * Function type for handling file system changes
+ * Function type for handling file system changes.
  */
 export type Filer_Change_Handler = (
 	change: Watcher_Change,
@@ -33,7 +30,7 @@ export type Filer_Change_Handler = (
 ) => void;
 
 /**
- * Structure to hold a Filer and its cleanup function
+ * Structure to hold a Filer and its cleanup function.
  */
 export interface Filer_Instance {
 	filer: Filer;
@@ -42,32 +39,37 @@ export interface Filer_Instance {
 
 export interface Zzz_Server_Options {
 	/**
-	 * Directories that Zzz is allowed to read from and write to
+	 * Directories that Zzz is allowed to read from and write to.
 	 */
 	zzz_dir: string;
 	/**
-	 * Configuration for the server and AI providers
+	 * Configuration for the server and AI providers.
 	 */
 	config: Zzz_Config;
 	/**
-	 * Send a message to all connected websocket clients
+	 * Send a message to all connected websocket clients.
 	 */
 	send_to_all_clients: (message: Action_Server) => void;
 	/**
-	 * Handler function for processing client messages
+	 * Handler function for processing client messages.
 	 */
 	handle_message: Action_Handler;
 	/**
-	 * Handler function for file system changes
+	 * Handler function for file system changes.
 	 */
 	handle_filer_change: Filer_Change_Handler;
+	/**
+	 * Optional logger instance.
+	 * Disabled when `null`, and `undefined` falls back to a new `Logger` instance.
+	 */
+	log?: Logger | null | undefined;
 }
 
 /**
- * Server for managing the Zzz application state and handling client messages
+ * Server for managing the Zzz application state and handling client messages.
  */
 export class Zzz_Server {
-	/** The root Zzz directory on the server's filesystem */
+	/** The root Zzz directory on the server's filesystem. */
 	readonly zzz_dir: Zzz_Dir;
 
 	readonly config: Zzz_Config;
@@ -77,16 +79,17 @@ export class Zzz_Server {
 	readonly #handle_filer_change: Filer_Change_Handler;
 
 	/**
-	 * Safe filesystem interface that restricts operations to allowed directories
+	 * Safe filesystem interface that restricts operations to allowed directories.
 	 */
 	readonly safe_fs: Safe_Fs;
+
+	readonly log: Logger | null;
 
 	// TODO probably extract a `Filers` class to manage these
 	// Map of directory paths to their respective Filer instances
 	readonly filers: Map<string, Filer_Instance> = new Map();
 
-	/** Registry of action schemas */
-	readonly action_schemas: Array<Action_Schema> = action_schemas_registry;
+	readonly action_specs: Array<Action_Spec> = action_specs; // TODO BLOCK option and/or registry class
 
 	constructor(options: Zzz_Server_Options) {
 		// Parse the allowed filesystem directories
@@ -100,6 +103,8 @@ export class Zzz_Server {
 		// Create the safe filesystem interface with the allowed directories
 		this.safe_fs = new Safe_Fs([this.zzz_dir]); // TODO pass filter through on options
 
+		this.log = options.log === undefined ? new Logger('[zzz_server]') : options.log;
+
 		// TODO maybe do this in an `init` method
 		// Set up the filer watcher for the zzz_dir
 		console.log(`this.zzz_dir`, this.zzz_dir);
@@ -112,9 +117,11 @@ export class Zzz_Server {
 	}
 
 	/**
-	 * Send a message to all connected clients
+	 * Send a message to all connected clients.
 	 */
 	send(message: Action_Server): void {
+		this.#check_destroyed();
+
 		this.#send_to_all_clients(message);
 	}
 
@@ -123,6 +130,8 @@ export class Zzz_Server {
 	 * by delegating to the configured handler.
 	 */
 	async receive(message: Action_Client): Promise<Action_Server | null> {
+		this.#check_destroyed();
+
 		// Sanity check
 		if (!message) throw new Api_Error(400, 'invalid message'); // eslint-disable-line @typescript-eslint/no-unnecessary-condition
 
@@ -132,20 +141,27 @@ export class Zzz_Server {
 	}
 
 	/**
-	 * Process an action by name with parameters
+	 * Process an action by name with parameters.
 	 */
 	async process_action(action_name: string, params: any): Promise<Service_Return> {
-		const schema = this.action_schemas.find((s) => s.name === action_name);
-		if (!schema) {
+		this.#check_destroyed();
+
+		// TODO BLOCK lookup O(1), probably a registry class?
+		const spec = this.action_specs.find((s) => s.name === action_name);
+		if (!spec) {
 			throw new Api_Error(400, `unknown action: ${action_name}`);
 		}
 
-		const parsed = Action_Client.safeParse(params);
+		if (spec.type !== 'Client_Action') {
+			throw new Api_Error(400, `action is not a client action: ${action_name}`);
+		}
+
+		const parsed = spec.params.safeParse(params); // @many TODO typesafe, maybe with generated code?
 		if (!parsed.success) {
 			throw new Api_Error(400, `invalid action params ${action_name}: ${parsed.error}`);
 		}
 
-		const response = await this.receive(parsed.data);
+		const response = await this.receive(parsed.data as any); // @many TODO typesafe, maybe with generated code?
 
 		return {
 			status: 200,
@@ -153,10 +169,28 @@ export class Zzz_Server {
 		};
 	}
 
+	#destroyed = false;
+	get destroyed(): boolean {
+		return this.#destroyed;
+	}
+
+	// TODO maybe use a decorator for this?
+	/** Throws if the server has been destroyed. */
+	#check_destroyed(): void {
+		if (this.#destroyed) {
+			throw new Error('Server has been destroyed');
+		}
+	}
+
 	/**
-	 * Clean up resources when server is shutting down
+	 * Server teardown and cleanup.
 	 */
 	async destroy(): Promise<void> {
+		if (this.#destroyed) {
+			this.log?.warn('Server already destroyed');
+			return; // no-op, but maybe should throw?
+		}
+
 		// Clean up all filer watchers
 		const cleanup_promises: Array<Promise<void>> = [];
 
