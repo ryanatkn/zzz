@@ -52,6 +52,8 @@ export const GLYPH_SETTINGS = '⛮'; // ⛭  ⚙  ⛮  ⛯ ⛣
 export const GLYPH_DOMAIN = '⟡'; // ⟡ ⏥
 export const GLYPH_PAGE = '⌺'; // ⌺ ⎚
 
+export const GLYPH_IDEA = '⌆'; // TODO use
+
 export const GLYPH_ECHO = '⥀';
 export const GLYPH_HEARTBEAT = '∽'; // ∿ ≋ 〰 ∽ ~
 export const GLYPH_RESPONSE = '⮑';
@@ -107,7 +109,9 @@ export const get_direction_icon = (direction: string): string => {
 
 // ⊞
 // ⊟
+// ⍈
 // ⟁
+// ⍟ ✴ ✧
 
 // ⇇ ⇉  maybe use these for deps?
 

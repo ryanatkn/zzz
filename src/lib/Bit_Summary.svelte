@@ -22,7 +22,7 @@
 
 <Contextmenu_Bit {bit}>
 	<div
-		class="bit_summary display_flex justify_content_space_between gap_xs2 font_size_sm relative panel"
+		class="bit_summary display_flex justify_content_space_between gap_xs2 font_size_sm position_relative panel"
 		class:dormant={!bit.enabled}
 	>
 		<div class="progress_bar" style:width="{percent}%"></div>
@@ -45,7 +45,7 @@
 		top: 0;
 		height: 100%;
 		background: var(--fg_5);
-		opacity: var(--fade_6);
+		opacity: 10%;
 		transition: width var(--duration_3) ease-in-out;
 		border-radius: var(--border_radius_xs);
 	}

@@ -166,7 +166,7 @@
 						<span class="font_size_lg font_weight_400 ml_md">
 							{#if !BROWSER}
 								<div class="display_inline_flex align_items_end">
-									loading <div class="relative"><Pending_Animation /></div>
+									loading <div class="position_relative"><Pending_Animation /></div>
 								</div>
 							{:else if socket.connected}
 								{socket.url !== socket.url_input && socket.url_input !== ''
@@ -174,7 +174,7 @@
 									: 'disconnect websocket'}
 							{:else if socket.status === 'pending'}
 								<div class="display_inline_flex align_items_end">
-									connecting <div class="relative"><Pending_Animation /></div>
+									connecting <div class="position_relative"><Pending_Animation /></div>
 								</div>
 							{:else}
 								connect websocket
@@ -220,8 +220,14 @@
 						>
 							<Glyph glyph={GLYPH_CANCEL} />
 						</button>
-						<div class="w_100 border_radius_xs relative overflow_hidden bg_d_1" style:height="24px">
-							<div class="absolute w_100 h_100 row px_lg font_family_mono" style:z-index="2">
+						<div
+							class="w_100 border_radius_xs position_relative overflow_hidden bg_d_1"
+							style:height="24px"
+						>
+							<div
+								class="position_absolute w_100 h_100 row px_lg font_family_mono"
+								style:z-index="2"
+							>
 								reconnecting in...
 							</div>
 							{#key socket.current_reconnect_delay}

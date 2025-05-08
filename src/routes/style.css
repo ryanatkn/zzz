@@ -99,7 +99,7 @@ input.input_xs {
 	outline-color: var(--outline_color);
 }
 .reorderable_item.dragging {
-	opacity: var(--fade_3);
+	opacity: 40%;
 	outline-width: var(--border_width_2);
 }
 

@@ -80,11 +80,11 @@
 
 <!-- TODO drive with data -->
 <div class="dashboard" style:--sidebar_width="{sidebar_width}px">
-	<div class="h_100 w_100 fixed t_0 l_0" style:padding-left="var(--sidebar_width)">
+	<div class="h_100 w_100 position_fixed t_0 l_0" style:padding-left="var(--sidebar_width)">
 		{@render children()}
 	</div>
 	<div
-		class="h_100 fixed t_0 l_0 overflow_auto scrollbar_width_thin"
+		class="h_100 position_fixed t_0 l_0 overflow_auto scrollbar_width_thin"
 		style:width="var(--sidebar_width)"
 	>
 		<!-- TODO refactor -->
@@ -162,7 +162,7 @@
 	<!-- TODO shortcut key -->
 	<button
 		type="button"
-		class="fixed b_0 l_0 icon_button plain border_radius_xs2"
+		class="position_fixed b_0 l_0 icon_button plain border_radius_xs2"
 		style:border-bottom-left-radius="0"
 		style:border-top-right-radius="var(--border_radius_lg)"
 		aria-label={sidebar_button_title}

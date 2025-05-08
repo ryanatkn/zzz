@@ -54,7 +54,7 @@
 		<!-- Close preview button in top-right corner -->
 		<button
 			type="button"
-			class="fixed t_0 r_0 icon_button plain border_radius_xs2"
+			class="position_fixed t_0 r_0 icon_button plain border_radius_xs2"
 			style:border-top-right-radius="0"
 			style:border-bottom-left-radius="var(--border_radius_lg)"
 			aria-label="Close preview"

@@ -68,7 +68,7 @@
 {#snippet ping_item(ping: Ping_Data)}
 	<Glyph glyph={GLYPH_DIRECTION_CLIENT} /><Glyph
 		glyph={GLYPH_DIRECTION_SERVER}
-		attrs={{class: ping.completed ? '' : 'fade_3'}}
+		attrs={{class: ping.completed ? '' : 'opacity_40'}}
 	/>
 	{#if !ping.completed}
 		<span class="font_family_mono">

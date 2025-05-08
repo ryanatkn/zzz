@@ -60,7 +60,7 @@
 <!-- TODO these flex values fix some layout cases so that the container is laid out like the button, but this is a partial solution -->
 <div
 	{...popover_container_attrs}
-	class="relative {popover_container_attrs?.class}"
+	class="position_relative {popover_container_attrs?.class}"
 	use:popover.container
 >
 	{#if button}

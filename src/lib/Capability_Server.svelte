@@ -76,7 +76,7 @@
 			<span class="font_size_lg font_weight_400 ml_md">
 				{#if capabilities.server.status === 'pending'}
 					<div class="display_inline_flex align_items_end">
-						checking <div class="relative"><Pending_Animation /></div>
+						checking <div class="position_relative"><Pending_Animation /></div>
 					</div>
 				{:else}
 					check connection

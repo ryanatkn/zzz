@@ -106,15 +106,15 @@
 			the web.
 		</p>
 		<p>
-			This is an early proof of concept that took about 3 months of full-time work to build. (<External_Link
-				href="https://github.com/ryanatkn/zzz/pull/6">PR #6</External_Link
-			>) I've been thinking about and prototyping related ideas for more than 13 years, and I think
-			this iteration is sticking. It's a work in progress but some basic integrations include:
+			I've been thinking about and prototyping related ideas for more than 13 years, so there's a
+			lot of thought and plans already formulated, but from here I'm prioritizing user feedback and
+			just shipping a continuously-improving proof-of-concept that's only interesting to
+			enthusiasts. Some early (rough) integrations include:
 		</p>
 		<ul>
 			<li>
 				<External_Link href="https://github.com/ollama/ollama">Ollama</External_Link> runs AI models
-				locally - more local LLM backends will be supported
+				locally - more local LLM backends will be supported, this choice was an easy first step
 			</li>
 			<li>
 				<External_Link href="https://github.com/openai/openai-node">ChatGPT</External_Link>,

@@ -28,7 +28,7 @@
 
 <button type="button" class="plain icon_button" {...attrs} onclick={() => ontoggle(!active)}>
 	{@render children?.()}
-	<span class="relative">
+	<span class="position_relative">
 		<span style:visibility="hidden" class="display_inline_flex flex_column h_0">
 			<span>
 				{#if typeof active_content === 'string'}{active_content}{:else}{@render active_content()}{/if}
@@ -37,7 +37,7 @@
 				{#if typeof inactive_content === 'string'}{inactive_content}{:else}{@render inactive_content()}{/if}
 			</span>
 		</span>
-		<span class="absolute display_inline_flex align_items_center" style:inset="0">
+		<span class="position_absolute display_inline_flex align_items_center" style:inset="0">
 			{#if active}
 				{#if typeof active_content === 'string'}{active_content}{:else}{@render active_content()}{/if}
 			{:else if typeof inactive_content === 'string'}
