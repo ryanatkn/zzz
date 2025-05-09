@@ -57,7 +57,7 @@ Zzz builds on a great deal of software.
 
 - see the deps in [package.json](package.json)
 - [Claude](https://claude.ai/) wrote a lot of code after the initial version
-  under my sometimes-flawed direction,
+  under my often-flawed but usually detailed direction,
   and continues to contribute a lot to varying but sufficient success
   - some oofs let's be clear, there is a lot to be concerned about here,
     but Zzz was designed to better leverage it for our benefit,
