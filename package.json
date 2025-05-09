@@ -812,10 +812,6 @@
       "types": "./dist/schema_metadata.d.ts",
       "default": "./dist/schema_metadata.js"
     },
-    "./schema_registry.svelte.js": {
-      "types": "./dist/schema_registry.svelte.d.ts",
-      "default": "./dist/schema_registry.svelte.js"
-    },
     "./schemas.js": {
       "types": "./dist/schemas.d.ts",
       "default": "./dist/schemas.js"

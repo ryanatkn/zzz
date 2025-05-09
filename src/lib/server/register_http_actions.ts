@@ -21,12 +21,12 @@ export interface Register_Actions_Options {
 export const register_http_actions = ({
 	app,
 	zzz_server,
-	action_specs,
+	action_specs = zzz_server.action_specs,
 	base_path = API_ROUTE,
 }: Register_Actions_Options): void => {
 	for (const spec of action_specs) {
-		// Register only service actions
-		if (spec.type !== 'Service_Action') continue;
+		// Select only actions with an HTTP method
+		if (!('http_method' in spec)) continue;
 
 		const {method, http_method} = spec;
 
@@ -34,8 +34,7 @@ export const register_http_actions = ({
 
 		const path = parsed_base_path + method;
 
-		if (!http_method) continue;
-
+		// TODO BLOCK remove logging
 		console.log(`Registering API handler: ${http_method} ${path}`);
 
 		const handler: Handler = async (c) => {

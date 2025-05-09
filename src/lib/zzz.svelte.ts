@@ -39,6 +39,7 @@ import {Socket} from '$lib/socket.svelte.js';
 import {Capabilities} from '$lib/capabilities.svelte.js';
 import {Diskfile_History} from '$lib/diskfile_history.svelte.js';
 import {HANDLED} from '$lib/cell_helpers.js';
+import {create_action_registry} from '$lib/action_specs.js';
 
 export const zzz_context = create_context<Zzz>();
 
@@ -97,6 +98,11 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	// TODO maybe `tags` is a virtual collection for ergonomics, in that it's all on the cell table unmanaged by the class, it persists nothing on its own but interfaces to the persistent cells
 
 	readonly bots: Zzz_Config['bots']; // TODO @many hacky, rework the bots interface (currently just copies over the config) - the provider should be on the model object, but should models be able to have multiple providers, or do they need unique names? and another field for canonical model name?
+
+	/**
+	 * Action registry for centralized action specification access.
+	 */
+	readonly action_registry = create_action_registry();
 
 	/**
 	 * The `zzz_dir` is the path to Zzz's primary directory on the server's filesystem.
@@ -219,7 +225,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		const message: Action_Send_Prompt = {
 			id: request_id,
 			created,
-			name: 'send_prompt',
+			method: 'send_prompt',
 			completion_request: {
 				created,
 				request_id,

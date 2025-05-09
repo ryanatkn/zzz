@@ -43,16 +43,16 @@ export const handle_message = async (
 	message: Action_Client,
 	server: Zzz_Server,
 ): Promise<Service_Return> => {
-	console.log(`[handle_message] message`, message.id, message.name);
+	console.log(`[handle_message] message`, message.id, message.method);
 
 	// TODO service registration in zzz_server with plugin system
-	switch (message.name) {
+	switch (message.method) {
 		case 'ping': {
 			return {
 				value: {
 					id: create_uuid(),
 					created: get_datetime_now(),
-					name: 'pong',
+					method: 'pong',
 					ping_id: message.id,
 				},
 			};
@@ -77,7 +77,7 @@ export const handle_message = async (
 				value: {
 					id: create_uuid(),
 					created: get_datetime_now(),
-					name: 'loaded_session',
+					method: 'loaded_session',
 					data: {
 						files: files_array,
 						zzz_dir: server.zzz_dir,

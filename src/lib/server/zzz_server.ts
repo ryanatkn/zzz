@@ -9,6 +9,7 @@ import {Action_Client, type Action_Server} from '$lib/action_collections.js';
 import type {Zzz_Config} from '$lib/config_helpers.js';
 import {Zzz_Dir} from '$lib/diskfile_types.js';
 import {Safe_Fs} from '$lib/server/safe_fs.js';
+import {create_action_registry} from '$lib/action_specs.js';
 import {
 	validate_service_params,
 	validate_service_response as validate_service_return,
@@ -96,7 +97,17 @@ export class Zzz_Server {
 	// Map of directory paths to their respective Filer instances
 	readonly filers: Map<string, Filer_Instance> = new Map();
 
-	readonly action_specs: Array<Action_Spec> = action_specs; // TODO BLOCK option and/or registry class
+	/**
+	 * Action registry for centralized action specification access.
+	 */
+	readonly action_registry = create_action_registry();
+
+	/**
+	 * Access to all action specifications.
+	 */
+	get action_specs(): Array<Action_Spec> {
+		return this.action_registry.specs;
+	}
 
 	constructor(options: Zzz_Server_Options) {
 		// Parse the allowed filesystem directories
@@ -156,6 +167,7 @@ export class Zzz_Server {
 	 * @param params - Parameters if method_or_message is a string, ignored if method_or_message is an Action_Client
 	 */
 	async process_action(
+		// TODO BLOCK make this function monomorphic
 		method_or_message: Action_Method | Action_Client,
 		params?: unknown,
 	): Promise<Service_Return> {
@@ -164,19 +176,17 @@ export class Zzz_Server {
 		let method: Action_Method;
 		let action_params: unknown;
 
-		// TODO BLOCK make this function monomorphic
 		// Determine if we're processing by name or full message
 		if (typeof method_or_message === 'string') {
-			method = method_or_message;
+			method = method_or_message as Action_Method;
 			action_params = params;
 		} else {
-			method = method_or_message.name;
+			method = method_or_message.method;
 			action_params = method_or_message; // The full message is the params
 		}
 
-		// Find the action spec
-		// TODO BLOCK lookup O(1), probably a registry class?
-		const spec = this.action_specs.find((s) => s.name === method);
+		// Find the action spec using the registry
+		const spec = this.action_registry.get_spec(method);
 		if (!spec) {
 			throw new Api_Error(400, `unknown action: ${method}`);
 		}

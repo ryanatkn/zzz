@@ -100,10 +100,10 @@ export const validate_service_response = (
 ): z.infer<Service_Action_Spec['response']> => {
 	const parsed = action.response.safeParse(response);
 	if (!parsed.success) {
-		log?.error('failed to validate service response', action.name, response, parsed.error.issues);
+		log?.error('failed to validate service response', action.method, response, parsed.error.issues);
 		throw new Api_Error(
 			500,
-			`service response validation failed for ${action.name}: ${stringify_zod_error(parsed.error)}`, // TODO @many handle multiple errors instead of just the first
+			`service response validation failed for ${action.method}: ${stringify_zod_error(parsed.error)}`, // TODO @many handle multiple errors instead of just the first
 		);
 	}
 	return parsed.data;

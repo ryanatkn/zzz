@@ -20,10 +20,10 @@ import {
  * Set of client-only actions.
  */
 export const Action_Client = z.discriminatedUnion('method', [
-	create_directory_action_spec,
-	delete_diskfile_action_spec,
-	send_prompt_action_spec,
-	update_diskfile_action_spec,
+	create_directory_action_spec.schema,
+	delete_diskfile_action_spec.schema,
+	send_prompt_action_spec.schema,
+	update_diskfile_action_spec.schema,
 ]);
 export type Action_Client = z.infer<typeof Action_Client>;
 
@@ -31,12 +31,12 @@ export type Action_Client = z.infer<typeof Action_Client>;
  * Set of server-only actions.
  */
 export const Action_Server = z.discriminatedUnion('method', [
-	completion_response_action_spec,
-	filer_change_action_spec,
-	load_session_action_spec,
-	loaded_session_action_spec,
-	ping_action_spec,
-	pong_action_spec,
+	completion_response_action_spec.schema,
+	filer_change_action_spec.schema,
+	load_session_action_spec.schema,
+	loaded_session_action_spec.schema,
+	ping_action_spec.schema,
+	pong_action_spec.schema,
 ]);
 export type Action_Server = z.infer<typeof Action_Server>;
 
@@ -44,16 +44,16 @@ export type Action_Server = z.infer<typeof Action_Server>;
  * All action types combined.
  */
 export const Action_Any = z.discriminatedUnion('method', [
-	create_directory_action_spec,
-	delete_diskfile_action_spec,
-	send_prompt_action_spec,
-	update_diskfile_action_spec,
-	completion_response_action_spec,
-	filer_change_action_spec,
-	load_session_action_spec,
-	loaded_session_action_spec,
-	ping_action_spec,
-	pong_action_spec,
+	create_directory_action_spec.schema,
+	delete_diskfile_action_spec.schema,
+	send_prompt_action_spec.schema,
+	update_diskfile_action_spec.schema,
+	completion_response_action_spec.schema,
+	filer_change_action_spec.schema,
+	load_session_action_spec.schema,
+	loaded_session_action_spec.schema,
+	ping_action_spec.schema,
+	pong_action_spec.schema,
 ]);
 export type Action_Any = z.infer<typeof Action_Any>;
 

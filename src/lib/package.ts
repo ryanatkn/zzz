@@ -699,10 +699,6 @@ export const package_json = {
 			types: './dist/schema_metadata.d.ts',
 			default: './dist/schema_metadata.js',
 		},
-		'./schema_registry.svelte.js': {
-			types: './dist/schema_registry.svelte.d.ts',
-			default: './dist/schema_registry.svelte.js',
-		},
 		'./schemas.js': {types: './dist/schemas.d.ts', default: './dist/schemas.js'},
 		'./scrollable.svelte.js': {
 			types: './dist/scrollable.svelte.d.ts',
@@ -1875,16 +1871,6 @@ export const src_json = {
 				{name: 'name_by_schema', kind: 'variable'},
 				{name: 'lookup_schema_name', kind: 'function'},
 				{name: 'add_schema', kind: 'function'},
-			],
-		},
-		'./schema_registry.svelte.js': {
-			path: 'schema_registry.svelte.ts',
-			declarations: [
-				{name: 'Schema_Name', kind: 'type'},
-				{name: 'Schema_Group', kind: 'type'},
-				{name: 'Schema_Registry', kind: 'class'},
-				{name: 'Action_Registry', kind: 'class'},
-				{name: 'Zzz_Registry', kind: 'class'},
 			],
 		},
 		'./schemas.js': {

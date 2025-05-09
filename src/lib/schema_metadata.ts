@@ -6,8 +6,6 @@ import * as schemas from '$lib/schemas.js';
 import type {Action_Spec, Client_Action_Spec, Service_Action_Spec} from '$lib/schemas.js';
 import type {Action_Method} from '$lib/action_types.js';
 
-// TODO BLOCK refactor with `schema_registry.ts`
-
 export type Vocab_Name = Flavored<string, 'Vocab_Name'>;
 
 /**

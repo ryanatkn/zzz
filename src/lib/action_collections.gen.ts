@@ -1,21 +1,18 @@
 import type {Gen} from '@ryanatkn/gro/gen.js';
 
-import {action_specs} from '$lib/schema_metadata.js';
-import {is_service_action, is_client_action} from '$lib/schema_helpers.js';
+import {global_action_registry} from '$lib/action_specs.js';
 
 /**
  * Outputs a file with action collection types that can be imported by schemas.ts.
  * This is separate from action_types.gen.ts to avoid circular dependencies.
  */
 export const gen: Gen = ({origin_path}) => {
-	// Group action schemas by direction (client/server)
-	const client_actions = action_specs
-		.filter(is_client_action)
-		.map((spec) => `${spec.method}_action_spec`);
+	const registry = global_action_registry;
 
-	const server_actions = action_specs
-		.filter(is_service_action)
-		.map((spec) => `${spec.method}_action_spec`);
+	// Group action schemas by direction (client/server)
+	const client_actions = registry.client_specs.map((spec) => `${spec.method}_action_spec`);
+
+	const server_actions = registry.service_specs.map((spec) => `${spec.method}_action_spec`);
 
 	// Combined action types for Action_Any
 	const all_actions = [...client_actions, ...server_actions];
@@ -37,7 +34,7 @@ import {
  * Set of client-only actions.
  */
 export const Action_Client = z.discriminatedUnion('method', [
-	${client_actions.join(',\n\t')}
+	${client_actions.map((spec) => `${spec}.schema`).join(',\n\t')}
 ]);
 export type Action_Client = z.infer<typeof Action_Client>;
 
@@ -45,7 +42,7 @@ export type Action_Client = z.infer<typeof Action_Client>;
  * Set of server-only actions.
  */
 export const Action_Server = z.discriminatedUnion('method', [
-	${server_actions.join(',\n\t')}
+	${server_actions.map((spec) => `${spec}.schema`).join(',\n\t')}
 ]);
 export type Action_Server = z.infer<typeof Action_Server>;
 
@@ -53,21 +50,15 @@ export type Action_Server = z.infer<typeof Action_Server>;
  * All action types combined.
  */
 export const Action_Any = z.discriminatedUnion('method', [
-	${all_actions.join(',\n\t')}
+	${all_actions.map((spec) => `${spec}.schema`).join(',\n\t')}
 ]);
 export type Action_Any = z.infer<typeof Action_Any>;
 
 // TODO maybe remove and have the spec lookup or a runtime class using deriveds (including their laziness)
 // Maps action methods to their directions ('client', 'server', or 'both')
 export const action_directions: Record<string, 'client' | 'server' | 'both'> = {
-	${action_specs
-		.filter(is_client_action)
-		.map((spec) => `${spec.method}: 'client'`)
-		.join(',\n\t')},
-	${action_specs
-		.filter(is_service_action)
-		.map((spec) => `${spec.method}: 'server'`)
-		.join(',\n\t')},
+	${registry.client_specs.map((spec) => `${spec.method}: 'client'`).join(',\n\t')},
+	${registry.service_specs.map((spec) => `${spec.method}: 'server'`).join(',\n\t')},
 };
 
 // ${banner}
