@@ -1,7 +1,7 @@
 import {z} from 'zod';
 
 import {Uuid} from '$lib/zod_helpers.js';
-import {Completion_Response, Completion_Request} from '$lib/tape_types.js';
+import {Completion_Response, Completion_Request} from '$lib/completion_types.js';
 import {Action_Method} from '$lib/action_metatypes.js';
 import {Diskfile_Change, Diskfile_Path, Source_File} from '$lib/diskfile_types.js';
 import {Cell_Json} from '$lib/cell_types.js';

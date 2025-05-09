@@ -2005,7 +2005,7 @@ export const src_json = {
 			path: 'tape_helpers.ts',
 			declarations: [
 				{name: 'render_tape_to_string', kind: 'function'},
-				{name: 'render_tape_messages', kind: 'function'},
+				{name: 'render_completion_messages', kind: 'function'},
 			],
 		},
 		'./Tape_List.svelte': {
@@ -2025,10 +2025,6 @@ export const src_json = {
 			declarations: [
 				{name: 'Tape_Json', kind: 'variable'},
 				{name: 'Tape_Json_Input', kind: 'type'},
-				{name: 'Tape_Role', kind: 'variable'},
-				{name: 'Tape_Message', kind: 'variable'},
-				{name: 'Completion_Request', kind: 'variable'},
-				{name: 'Completion_Response', kind: 'variable'},
 			],
 		},
 		'./tape.svelte.js': {

@@ -216,7 +216,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		prompt: string,
 		provider_name: Provider_Name,
 		model: string,
-		tape_messages?: Array<Action_With_History>,
+		completion_messages?: Array<Action_With_History>,
 	): Promise<Action_Message['completion_response']> {
 		const request_id = create_uuid();
 		const created = get_datetime_now();
@@ -231,7 +231,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 					provider_name,
 					model,
 					prompt,
-					tape_messages,
+					completion_messages,
 				},
 			},
 		};

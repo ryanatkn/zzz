@@ -1,8 +1,9 @@
 import {type Model} from '$lib/model.svelte.js';
 import {Strip, create_strip_from_text, create_strip_from_bit} from '$lib/strip.svelte.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Tape_Json, Completion_Request} from '$lib/tape_types.js';
-import {render_tape_to_string, render_tape_messages} from '$lib/tape_helpers.js';
+import {Tape_Json} from '$lib/tape_types.js';
+import {Completion_Request} from '$lib/completion_types.js';
+import {render_tape_to_string, render_completion_messages} from '$lib/tape_helpers.js';
 import {type Bit_Type} from '$lib/bit.svelte.js';
 import {HANDLED} from '$lib/cell_helpers.js';
 import {to_completion_response_text} from '$lib/response_helpers.js';
@@ -117,7 +118,7 @@ export class Tape extends Cell<typeof Tape_Json> {
 	 */
 	async send_message(content: string): Promise<Strip> {
 		// TODO @many rethink this API with the completion request/response (see OpenAI/MCP/A2A)
-		const tape_messages = render_tape_messages(this.strips.by_id.values());
+		const completion_messages = render_completion_messages(this.strips.by_id.values());
 
 		const user_strip = this.add_user_strip(content);
 
@@ -128,7 +129,7 @@ export class Tape extends Cell<typeof Tape_Json> {
 			provider_name: this.model.provider_name,
 			model: this.model.name,
 			prompt: content,
-			tape_messages,
+			completion_messages,
 		});
 
 		// Update the user strip with the request
@@ -143,7 +144,7 @@ export class Tape extends Cell<typeof Tape_Json> {
 			content,
 			this.model.provider_name,
 			this.model.name,
-			tape_messages,
+			completion_messages,
 		);
 
 		// Get the response text
