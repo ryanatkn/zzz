@@ -33,8 +33,8 @@
 			// TODO @many rework API to avoid casting
 			sort_by_numeric<Action>('created_newest', 'newest first', 'created_date', 'desc'),
 			sort_by_numeric<Action>('created_oldest', 'oldest first', 'created_date', 'asc'),
-			sort_by_text<Action>('name_asc', 'name (a-z)', 'name'),
-			sort_by_text<Action>('name_desc', 'name (z-a)', 'name', 'desc'),
+			sort_by_text<Action>('method_asc', 'method (a-z)', 'method'),
+			sort_by_text<Action>('method_desc', 'method (z-a)', 'method', 'desc'),
 		]}
 		sort_key_default="created_newest"
 		show_sort_controls={true}
@@ -52,9 +52,9 @@
 				transition:slide
 			>
 				<div class="font_weight_400 display_flex align_items_center gap_xs w_100">
-					<Glyph glyph={get_icon_for_action_type(action.name)} />
+					<Glyph glyph={get_icon_for_action_type(action.method)} />
 					<Glyph glyph={get_direction_icon(action.direction)} />
-					<span class="font_family_mono flex_1">{action.name}</span>
+					<span class="font_family_mono flex_1">{action.method}</span>
 					<small class="font_family_mono ml_auto">{action.created_formatted_time}</small>
 				</div>
 

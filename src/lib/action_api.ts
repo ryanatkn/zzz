@@ -1,7 +1,7 @@
 import {Logger} from '@ryanatkn/belt/log.js';
 import {DEV, BROWSER} from 'esm-env';
 
-import type {Action_Name, Actions, Mutations} from '$lib/action_types.js';
+import type {Action_Method, Actions, Mutations} from '$lib/action_types.js';
 import {create_mutation_context} from '$lib/mutation.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 import type {Api_Client} from '$lib/api_client.js';
@@ -10,7 +10,7 @@ import type {Api_Client} from '$lib/api_client.js';
 
 const log = new Logger();
 
-export type Create_Actions_Client = (action_name: string) => Api_Client | null;
+export type Create_Actions_Client = (method: Action_Method) => Api_Client | null;
 
 /**
  * Creates an Actions interface implementation using mutations and an API client.
@@ -26,24 +26,24 @@ export const create_actions = (
 	create_client: Create_Actions_Client,
 ): Actions => {
 	const actions: Actions = new Proxy(Object.create(null), {
-		get: (_target, action_name: Action_Name) => async (params: unknown) => {
-			log.debug(...to_logged_args(action_name, params));
+		get: (_target, method: Action_Method) => async (params: unknown) => {
+			log.debug(...to_logged_args(method, params));
 
-			const client = create_client(action_name);
+			const client = create_client(method);
 
-			const mutation = mutations[action_name];
+			const mutation = mutations[method];
 
 			if (!mutation) {
 				if (DEV) {
-					throw Error(`missing mutation for action '${action_name}'`);
+					throw Error(`missing mutation for action '${method}'`);
 				}
-				log.warn('invoking action with no mutation', action_name, params);
-				return client?.invoke(action_name, params);
+				log.warn('invoking action with no mutation', method, params);
+				return client?.invoke(method, params);
 			}
-			const result = client ? await client.invoke(action_name, params) : undefined;
+			const result = client ? await client.invoke(method, params) : undefined;
 			const {ctx, flush_after_mutation} = create_mutation_context(
 				zzz,
-				action_name,
+				method,
 				params,
 				result,
 				actions,
@@ -59,8 +59,8 @@ export const create_actions = (
 /**
  * Formats an action name and params for logging.
  */
-const to_logged_args = (action_name: string, params: unknown): any[] => {
-	const args = to_logged_action_name(action_name);
+const to_logged_args = (method: Action_Method, params: unknown): Array<any> => {
+	const args = to_logged_method(method);
 	if (params !== undefined) args.push(params); // print null but not undefined
 	return args;
 };
@@ -68,12 +68,12 @@ const to_logged_args = (action_name: string, params: unknown): any[] => {
 /**
  * Formats an action name for logging with color in browsers.
  */
-const to_logged_action_name = (action_name: string): any[] =>
+const to_logged_method = (method: Action_Method): Array<any> =>
 	BROWSER && DEV
 		? [
-				'%c[actions.%c' + action_name + '%c]',
+				'%c[actions.%c' + method + '%c]',
 				'color: gray',
 				'color: magenta; font-weight: bold',
 				'color: gray',
 			]
-		: ['[actions.' + action_name + ']'];
+		: ['[actions.' + method + ']'];

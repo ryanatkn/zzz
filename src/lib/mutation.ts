@@ -1,5 +1,5 @@
 import type {Api_Result} from '$lib/api.js';
-import type {Action_Name, Actions} from '$lib/action_types.js';
+import type {Action_Method, Actions} from '$lib/action_types.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 
 /**
@@ -17,7 +17,7 @@ export interface Mutation_Context<
 	/** Reference to the main application instance. */
 	zzz: Zzz;
 	/** Name of the action being performed. */
-	action_name: Action_Name;
+	method: Action_Method;
 	/** Parameters passed to the action. */
 	params: T_Params;
 	/** Result returned from the server. */
@@ -55,7 +55,7 @@ export const create_mutation_context = <
 	T_Result extends Api_Result<unknown> | void = any,
 >(
 	zzz: Zzz,
-	action_name: Action_Name,
+	method: Action_Method,
 	params: T_Params,
 	result: T_Result,
 	actions: Actions, // TODO @many generic probably
@@ -77,7 +77,7 @@ export const create_mutation_context = <
 
 	const ctx = {
 		zzz,
-		action_name,
+		method,
 		params,
 		result,
 		actions,

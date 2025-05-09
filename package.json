@@ -96,6 +96,18 @@
   ],
   "exports": {
     "./package.json": "./package.json",
+    "./action_api.js": {
+      "types": "./dist/action_api.d.ts",
+      "default": "./dist/action_api.js"
+    },
+    "./action_collections.gen.js": {
+      "types": "./dist/action_collections.gen.d.ts",
+      "default": "./dist/action_collections.gen.js"
+    },
+    "./action_collections.js": {
+      "types": "./dist/action_collections.d.ts",
+      "default": "./dist/action_collections.js"
+    },
     "./Action_Detail.svelte": {
       "types": "./dist/Action_Detail.svelte.d.ts",
       "svelte": "./dist/Action_Detail.svelte",
@@ -125,6 +137,10 @@
     "./actions.svelte.js": {
       "types": "./dist/actions.svelte.d.ts",
       "default": "./dist/actions.svelte.js"
+    },
+    "./api_client.js": {
+      "types": "./dist/api_client.d.ts",
+      "default": "./dist/api_client.js"
     },
     "./api.js": {
       "types": "./dist/api.d.ts",
@@ -795,6 +811,10 @@
     "./schema_metadata.js": {
       "types": "./dist/schema_metadata.d.ts",
       "default": "./dist/schema_metadata.js"
+    },
+    "./schema_registry.svelte.js": {
+      "types": "./dist/schema_registry.svelte.d.ts",
+      "default": "./dist/schema_registry.svelte.js"
     },
     "./schemas.js": {
       "types": "./dist/schemas.d.ts",

@@ -79,6 +79,15 @@ export const package_json = {
 	files: ['dist'],
 	exports: {
 		'./package.json': './package.json',
+		'./action_api.js': {types: './dist/action_api.d.ts', default: './dist/action_api.js'},
+		'./action_collections.gen.js': {
+			types: './dist/action_collections.gen.d.ts',
+			default: './dist/action_collections.gen.js',
+		},
+		'./action_collections.js': {
+			types: './dist/action_collections.d.ts',
+			default: './dist/action_collections.js',
+		},
 		'./Action_Detail.svelte': {
 			types: './dist/Action_Detail.svelte.d.ts',
 			svelte: './dist/Action_Detail.svelte',
@@ -103,6 +112,7 @@ export const package_json = {
 			types: './dist/actions.svelte.d.ts',
 			default: './dist/actions.svelte.js',
 		},
+		'./api_client.js': {types: './dist/api_client.d.ts', default: './dist/api_client.js'},
 		'./api.js': {types: './dist/api.d.ts', default: './dist/api.js'},
 		'./app.svelte.js': {types: './dist/app.svelte.d.ts', default: './dist/app.svelte.js'},
 		'./Bit_Editor_For_Diskfile.svelte': {
@@ -689,6 +699,10 @@ export const package_json = {
 			types: './dist/schema_metadata.d.ts',
 			default: './dist/schema_metadata.js',
 		},
+		'./schema_registry.svelte.js': {
+			types: './dist/schema_registry.svelte.d.ts',
+			default: './dist/schema_registry.svelte.js',
+		},
 		'./schemas.js': {types: './dist/schemas.d.ts', default: './dist/schemas.js'},
 		'./scrollable.svelte.js': {
 			types: './dist/scrollable.svelte.d.ts',
@@ -828,6 +842,26 @@ export const src_json = {
 	version: '0.0.1',
 	modules: {
 		'./package.json': {path: 'package.json', declarations: [{name: 'default', kind: 'json'}]},
+		'./action_api.js': {
+			path: 'action_api.ts',
+			declarations: [
+				{name: 'Create_Actions_Client', kind: 'type'},
+				{name: 'create_actions', kind: 'function'},
+			],
+		},
+		'./action_collections.gen.js': {
+			path: 'action_collections.gen.ts',
+			declarations: [{name: 'gen', kind: 'function'}],
+		},
+		'./action_collections.js': {
+			path: 'action_collections.ts',
+			declarations: [
+				{name: 'Action_Client', kind: 'variable'},
+				{name: 'Action_Server', kind: 'variable'},
+				{name: 'Action_Any', kind: 'variable'},
+				{name: 'action_directions', kind: 'variable'},
+			],
+		},
 		'./Action_Detail.svelte': {
 			path: 'Action_Detail.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
@@ -850,9 +884,9 @@ export const src_json = {
 		'./action_types.js': {
 			path: 'action_types.ts',
 			declarations: [
-				{name: 'Action_Name', kind: 'variable'},
-				{name: 'Service_Action_Name', kind: 'type'},
-				{name: 'Client_Action_Name', kind: 'type'},
+				{name: 'Action_Method', kind: 'variable'},
+				{name: 'Service_Action_Method', kind: 'type'},
+				{name: 'Client_Action_Method', kind: 'type'},
 				{name: 'Action_Params_By_Name', kind: 'type'},
 				{name: 'Action_Response_By_Name', kind: 'type'},
 				{name: 'Service_By_Name', kind: 'type'},
@@ -884,6 +918,7 @@ export const src_json = {
 				{name: 'Actions', kind: 'class'},
 			],
 		},
+		'./api_client.js': {path: 'api_client.ts', declarations: [{name: 'Api_Client', kind: 'type'}]},
 		'./api.js': {
 			path: 'api.ts',
 			declarations: [
@@ -1820,8 +1855,6 @@ export const src_json = {
 				{name: 'is_service_action', kind: 'function'},
 				{name: 'is_client_action', kind: 'function'},
 				{name: 'camel_to_snake_case', kind: 'function'},
-				{name: 'to_snake_case', kind: 'function'},
-				{name: 'to_uppersnake_case', kind: 'function'},
 				{name: 'to_pascalsnake_case', kind: 'function'},
 				{name: 'get_schema_imports', kind: 'function'},
 			],
@@ -1844,6 +1877,16 @@ export const src_json = {
 				{name: 'add_schema', kind: 'function'},
 			],
 		},
+		'./schema_registry.svelte.js': {
+			path: 'schema_registry.svelte.ts',
+			declarations: [
+				{name: 'Schema_Name', kind: 'type'},
+				{name: 'Schema_Group', kind: 'type'},
+				{name: 'Schema_Registry', kind: 'class'},
+				{name: 'Action_Registry', kind: 'class'},
+				{name: 'Zzz_Registry', kind: 'class'},
+			],
+		},
 		'./schemas.js': {
 			path: 'schemas.ts',
 			declarations: [
@@ -1864,16 +1907,6 @@ export const src_json = {
 				{name: 'Client_Action_Spec', kind: 'variable'},
 				{name: 'Service_Action_Spec', kind: 'variable'},
 				{name: 'Action_Spec', kind: 'variable'},
-				{name: 'Action_Ping', kind: 'variable'},
-				{name: 'Action_Pong', kind: 'variable'},
-				{name: 'Action_Load_Session', kind: 'variable'},
-				{name: 'Action_Loaded_Session', kind: 'variable'},
-				{name: 'Action_Filer_Change', kind: 'variable'},
-				{name: 'Action_Update_Diskfile', kind: 'variable'},
-				{name: 'Action_Delete_Diskfile', kind: 'variable'},
-				{name: 'Action_Create_Directory', kind: 'variable'},
-				{name: 'Action_Send_Prompt', kind: 'variable'},
-				{name: 'Action_Completion_Response', kind: 'variable'},
 				{name: 'Ping_Action_Params', kind: 'variable'},
 				{name: 'Ping_Action_Response', kind: 'variable'},
 				{name: 'Pong_Action_Params', kind: 'variable'},

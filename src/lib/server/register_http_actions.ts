@@ -28,15 +28,15 @@ export const register_http_actions = ({
 		// Register only service actions
 		if (spec.type !== 'Service_Action') continue;
 
-		const {name, method} = spec;
+		const {method, http_method} = spec;
 
 		const parsed_base_path = Path_With_Trailing_Slash.parse(base_path); // let it fail right?
 
-		const path = parsed_base_path + name;
+		const path = parsed_base_path + method;
 
-		if (!method) continue;
+		if (!http_method) continue;
 
-		console.log(`Registering API handler: ${method} ${path}`);
+		console.log(`Registering API handler: ${http_method} ${path}`);
 
 		const handler: Handler = async (c) => {
 			console.log(`[http] <${c.req.url}>`);
@@ -45,26 +45,26 @@ export const register_http_actions = ({
 				let params: unknown = null;
 
 				// Extract parameters based on HTTP method
-				if (method === 'POST' || method === 'PUT' || method === 'PATCH') {
+				if (http_method === 'POST' || http_method === 'PUT' || http_method === 'PATCH') {
 					params = await c.req.json();
 				}
 
 				// Process the action using the unified method
-				const service_result = await zzz_server.process_action(name, params);
+				const service_result = await zzz_server.process_action(method, params);
 
 				// Convert to API result format and return JSON response
 				const api_result = service_return_to_api_result(service_result);
 				console.log(`api_result`, api_result);
 				return c.json(api_result);
 			} catch (error) {
-				console.error(`Error processing ${name}:`, error);
+				console.error(`Error processing ${method}:`, error);
 				const failed_result = to_failed_api_result(error);
 				return c.json(failed_result, failed_result.status);
 			}
 		};
 
 		// Register the appropriate handler based on HTTP method
-		switch (method) {
+		switch (http_method) {
 			case 'GET':
 				app.get(path, handler);
 				break;
@@ -84,9 +84,9 @@ export const register_http_actions = ({
 			case 'HEAD':
 			case 'OPTIONS':
 			case 'TRACE':
-				throw new Api_Error(500, `Unsupported HTTP method ${method} for action ${name}`);
+				throw new Api_Error(500, `Unsupported HTTP method ${http_method} for action ${method}`);
 			default:
-				throw new Unreachable_Error(method);
+				throw new Unreachable_Error(http_method);
 		}
 	}
 };

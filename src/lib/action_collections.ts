@@ -4,60 +4,61 @@ import {z} from 'zod';
 
 // Import action schemas - this file is intended to be imported by schemas.ts
 import {
-	Action_Create_Directory,
-	Action_Delete_Diskfile,
-	Action_Send_Prompt,
-	Action_Update_Diskfile,
-	Action_Completion_Response,
-	Action_Filer_Change,
-	Action_Load_Session,
-	Action_Loaded_Session,
-	Action_Ping,
-	Action_Pong,
+	create_directory_action_spec,
+	delete_diskfile_action_spec,
+	send_prompt_action_spec,
+	update_diskfile_action_spec,
+	completion_response_action_spec,
+	filer_change_action_spec,
+	load_session_action_spec,
+	loaded_session_action_spec,
+	ping_action_spec,
+	pong_action_spec,
 } from '$lib/schemas.js';
 
 /**
  * Set of client-only actions.
  */
-export const Action_Client = z.discriminatedUnion('name', [
-	Action_Create_Directory,
-	Action_Delete_Diskfile,
-	Action_Send_Prompt,
-	Action_Update_Diskfile,
+export const Action_Client = z.discriminatedUnion('method', [
+	create_directory_action_spec,
+	delete_diskfile_action_spec,
+	send_prompt_action_spec,
+	update_diskfile_action_spec,
 ]);
 export type Action_Client = z.infer<typeof Action_Client>;
 
 /**
  * Set of server-only actions.
  */
-export const Action_Server = z.discriminatedUnion('name', [
-	Action_Completion_Response,
-	Action_Filer_Change,
-	Action_Load_Session,
-	Action_Loaded_Session,
-	Action_Ping,
-	Action_Pong,
+export const Action_Server = z.discriminatedUnion('method', [
+	completion_response_action_spec,
+	filer_change_action_spec,
+	load_session_action_spec,
+	loaded_session_action_spec,
+	ping_action_spec,
+	pong_action_spec,
 ]);
 export type Action_Server = z.infer<typeof Action_Server>;
 
 /**
  * All action types combined.
  */
-export const Action_Any = z.discriminatedUnion('name', [
-	Action_Create_Directory,
-	Action_Delete_Diskfile,
-	Action_Send_Prompt,
-	Action_Update_Diskfile,
-	Action_Completion_Response,
-	Action_Filer_Change,
-	Action_Load_Session,
-	Action_Loaded_Session,
-	Action_Ping,
-	Action_Pong,
+export const Action_Any = z.discriminatedUnion('method', [
+	create_directory_action_spec,
+	delete_diskfile_action_spec,
+	send_prompt_action_spec,
+	update_diskfile_action_spec,
+	completion_response_action_spec,
+	filer_change_action_spec,
+	load_session_action_spec,
+	loaded_session_action_spec,
+	ping_action_spec,
+	pong_action_spec,
 ]);
 export type Action_Any = z.infer<typeof Action_Any>;
 
-// Maps action names to their directions ('client', 'server', or 'both')
+// TODO maybe remove and have the spec lookup or a runtime class using deriveds (including their laziness)
+// Maps action methods to their directions ('client', 'server', or 'both')
 export const action_directions: Record<string, 'client' | 'server' | 'both'> = {
 	create_directory: 'client',
 	delete_diskfile: 'client',

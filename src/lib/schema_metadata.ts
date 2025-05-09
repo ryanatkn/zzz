@@ -4,7 +4,7 @@ import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 
 import * as schemas from '$lib/schemas.js';
 import type {Action_Spec, Client_Action_Spec, Service_Action_Spec} from '$lib/schemas.js';
-import type {Action_Name} from '$lib/action_types.js';
+import type {Action_Method} from '$lib/action_types.js';
 
 // TODO BLOCK refactor with `schema_registry.ts`
 
@@ -37,7 +37,7 @@ export const service_action_specs: Array<Service_Action_Spec> = [];
 /**
  * Map of action spec names to action specs
  */
-export const action_spec_by_name: Map<Action_Name, Action_Spec> = new Map();
+export const action_spec_by_name: Map<Action_Method, Action_Spec> = new Map();
 
 /**
  * Collection of action parameter schemas
@@ -94,7 +94,7 @@ export const add_schema = (name: Vocab_Name, schema: Action_Spec | z.ZodTypeAny)
 		}
 	} else if ('type' in schema) {
 		action_specs.push(schema);
-		action_spec_by_name.set(schema.name, schema);
+		action_spec_by_name.set(schema.method, schema);
 		switch (schema.type) {
 			case 'Service_Action':
 				service_action_specs.push(schema);
@@ -134,13 +134,13 @@ for (const name in schemas) {
 // /**
 //  * Map of action spec names to action specs
 //  */
-// export const action_spec_by_name: Map<Action_Name, Action_Spec> = new Map();
+// export const action_spec_by_name: Map<Action_Method, Action_Spec> = new Map();
 
 // /**
 //  * Initialize the registries with action specs
 //  */
 // for (const spec of action_specs) {
-// 	action_spec_by_name.set(spec.name, spec);
+// 	action_spec_by_name.set(spec.method, spec);
 // 	switch (spec.type) {
 // 		case 'Service_Action':
 // 			break;

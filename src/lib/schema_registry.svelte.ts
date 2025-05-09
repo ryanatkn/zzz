@@ -2,8 +2,10 @@ import {z} from 'zod';
 import type {Flavored} from '@ryanatkn/belt/types.js';
 import {SvelteMap} from 'svelte/reactivity';
 
-import type {Action_Name} from '$lib/action_types.js';
+import type {Action_Method} from '$lib/action_types.js';
 import type {Action_Spec, Client_Action_Spec, Service_Action_Spec} from '$lib/schemas.js';
+
+// TODO BLOCK refactor and use
 
 export type Schema_Name = Flavored<string, 'Schema_Name'>;
 export type Schema_Group = 'action' | 'model' | 'request' | 'response' | 'other';
@@ -109,59 +111,59 @@ export class Action_Registry {
 	/**
 	 * Map of action names to specifications.
 	 */
-	readonly #action_specs: Map<Action_Name, Action_Spec> = new SvelteMap();
+	readonly #action_specs: Map<Action_Method, Action_Spec> = new SvelteMap();
 
 	/**
 	 * Set of client action names.
 	 */
-	readonly #client_actions: Set<Action_Name> = new Set();
+	readonly #client_actions: Set<Action_Method> = new Set();
 
 	/**
 	 * Set of server action names.
 	 */
-	readonly #server_actions: Set<Action_Name> = new Set();
+	readonly #server_actions: Set<Action_Method> = new Set();
 
 	/**
 	 * Register a client action specification.
 	 */
 	register_client_action(spec: Client_Action_Spec): void {
-		this.#action_specs.set(spec.name, spec);
-		this.#client_actions.add(spec.name);
+		this.#action_specs.set(spec.method, spec);
+		this.#client_actions.add(spec.method);
 	}
 
 	/**
 	 * Register a server action specification.
 	 */
 	register_server_action(spec: Service_Action_Spec): void {
-		this.#action_specs.set(spec.name, spec);
-		this.#server_actions.add(spec.name);
+		this.#action_specs.set(spec.method, spec);
+		this.#server_actions.add(spec.method);
 	}
 
 	/**
 	 * Get an action specification by name.
 	 */
-	get_spec(name: Action_Name): Action_Spec | undefined {
+	get_spec(name: Action_Method): Action_Spec | undefined {
 		return this.#action_specs.get(name);
 	}
 
 	/**
 	 * Check if an action is a client action.
 	 */
-	is_client_action(name: Action_Name): boolean {
+	is_client_action(name: Action_Method): boolean {
 		return this.#client_actions.has(name);
 	}
 
 	/**
 	 * Check if an action is a server action.
 	 */
-	is_server_action(name: Action_Name): boolean {
+	is_server_action(name: Action_Method): boolean {
 		return this.#server_actions.has(name);
 	}
 
 	/**
 	 * Get the direction of an action ('client', 'server', or 'both').
 	 */
-	get_action_direction(name: Action_Name): 'client' | 'server' | 'both' {
+	get_action_direction(name: Action_Method): 'client' | 'server' | 'both' {
 		const is_client = this.is_client_action(name);
 		const is_server = this.is_server_action(name);
 
@@ -186,14 +188,14 @@ export class Action_Registry {
 	/**
 	 * Get all client action names.
 	 */
-	get client_action_names(): Array<Action_Name> {
+	get client_methods(): Array<Action_Method> {
 		return Array.from(this.#client_actions);
 	}
 
 	/**
 	 * Get all server action names.
 	 */
-	get server_action_names(): Array<Action_Name> {
+	get server_methods(): Array<Action_Method> {
 		return Array.from(this.#server_actions);
 	}
 
@@ -201,7 +203,7 @@ export class Action_Registry {
 	 * Get all client action specs.
 	 */
 	get client_specs(): Array<Client_Action_Spec> {
-		return this.client_action_names
+		return this.client_methods
 			.map((name) => this.#action_specs.get(name))
 			.filter(
 				(spec): spec is Client_Action_Spec => spec !== undefined && spec.type === 'Client_Action',
@@ -212,7 +214,7 @@ export class Action_Registry {
 	 * Get all server action specs.
 	 */
 	get server_specs(): Array<Service_Action_Spec> {
-		return this.server_action_names
+		return this.server_methods
 			.map((name) => this.#action_specs.get(name))
 			.filter(
 				(spec): spec is Service_Action_Spec => spec !== undefined && spec.type === 'Service_Action',
@@ -260,16 +262,4 @@ export class Zzz_Registry {
 			}
 		}
 	}
-}
-
-/**
- * Create a Svelte context key for Zzz Registry.
- */
-export const ZZZ_REGISTRY_KEY = Symbol('zzz_registry');
-
-/**
- * Type for getContext with Zzz Registry.
- */
-export interface Zzz_Registry_Context {
-	registry: Zzz_Registry;
 }

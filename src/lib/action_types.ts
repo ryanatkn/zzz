@@ -31,7 +31,7 @@ import type {
 /**
  * All action names.
  */
-export const Action_Name = z.enum([
+export const Action_Method = z.enum([
 	'completion_response',
 	'create_directory',
 	'delete_diskfile',
@@ -43,12 +43,12 @@ export const Action_Name = z.enum([
 	'send_prompt',
 	'update_diskfile',
 ]);
-export type Action_Name = z.infer<typeof Action_Name>;
+export type Action_Method = z.infer<typeof Action_Method>;
 
 /**
  * Names of all service actions.
  */
-export type Service_Action_Name =
+export type Service_Action_Method =
 	| 'completion_response'
 	| 'filer_change'
 	| 'load_session'
@@ -59,7 +59,7 @@ export type Service_Action_Name =
 /**
  * Names of all client-only actions.
  */
-export type Client_Action_Name =
+export type Client_Action_Method =
 	| 'create_directory'
 	| 'delete_diskfile'
 	| 'send_prompt'
@@ -139,6 +139,7 @@ export interface Actions {
 	update_diskfile: (params: Update_Diskfile_Action_Params) => Promise<string>;
 }
 
+// TODO maybe extract to $lib/mutation_types.ts or similar, decoupled
 /**
  * Interface for client-side mutation handlers.
  */

@@ -4,7 +4,7 @@ import {Source_File, Diskfile_Path, Zzz_Dir, Diskfile_Change} from '$lib/diskfil
 import {Datetime_Now, Uuid, Uuid_With_Default} from '$lib/zod_helpers.js';
 import {Provider_Name} from '$lib/provider_types.js';
 import type {Http_Method} from '$lib/api.js';
-import {Action_Name} from '$lib/action_types.js';
+import {Action_Method} from '$lib/action_types.js';
 
 // Action types and schemas following Model Context Protocol patterns
 
@@ -88,13 +88,13 @@ export const Action_Base = z
 	.object({
 		id: Uuid_With_Default,
 		created: Datetime_Now,
-		name: Action_Name,
+		method: Action_Method, // Changed from 'name' to 'method'
 	})
 	.strict();
 export type Action_Base = z.infer<typeof Action_Base>;
 
 export const Action_Spec_Base_Schema = z.object({
-	name: Action_Name,
+	method: Action_Method, // Changed from 'name' to 'method'
 	type: z.enum(['Client_Action', 'Service_Action']),
 	params: z.instanceof(z.ZodType),
 	returns: z.string(),
@@ -109,7 +109,7 @@ export type Client_Action_Spec = z.infer<typeof Client_Action_Spec>;
 
 export const Service_Action_Spec = Action_Spec_Base_Schema.extend({
 	type: z.literal('Service_Action'),
-	method: z.union([z.custom<Http_Method>(), z.null()]),
+	http_method: z.union([z.custom<Http_Method>(), z.null()]), // TODO maybe `http: {method: Http_Method, [...other http-specific config]}`
 	auth: z.union([z.literal('authenticate'), z.literal('authorize'), z.null()]),
 	response: z.instanceof(z.ZodType),
 	// TODO some things like cant/shouldnt be done over websockets,
@@ -121,72 +121,7 @@ export type Service_Action_Spec = z.infer<typeof Service_Action_Spec>;
 export const Action_Spec = z.union([Client_Action_Spec, Service_Action_Spec]);
 export type Action_Spec = z.infer<typeof Action_Spec>;
 
-// TODO BLOCK I think `Action_Message` is the right name here? So `Ping_Action_Message`, and then the specs have a new `message` property
-export const Action_Ping = Action_Base.extend({
-	name: z.literal('ping').default('ping'),
-}).strict();
-export type Action_Ping = z.infer<typeof Action_Ping>;
-
-export const Action_Pong = Action_Base.extend({
-	name: z.literal('pong').default('pong'),
-	ping_id: Uuid_With_Default,
-}).strict();
-export type Action_Pong = z.infer<typeof Action_Pong>;
-
-export const Action_Load_Session = Action_Base.extend({
-	name: z.literal('load_session').default('load_session'),
-}).strict();
-export type Action_Load_Session = z.infer<typeof Action_Load_Session>;
-
-export const Action_Loaded_Session = Action_Base.extend({
-	name: z.literal('loaded_session').default('loaded_session'),
-	data: z
-		.object({
-			zzz_dir: Zzz_Dir,
-			files: z.array(Source_File),
-		})
-		.strict(),
-}).strict();
-export type Action_Loaded_Session = z.infer<typeof Action_Loaded_Session>;
-
-export const Action_Filer_Change = Action_Base.extend({
-	name: z.literal('filer_change').default('filer_change'),
-	change: Diskfile_Change,
-	source_file: Source_File,
-}).strict();
-export type Action_Filer_Change = z.infer<typeof Action_Filer_Change>;
-
-export const Action_Update_Diskfile = Action_Base.extend({
-	name: z.literal('update_diskfile').default('update_diskfile'),
-	path: Diskfile_Path,
-	content: z.string(),
-}).strict();
-export type Action_Update_Diskfile = z.infer<typeof Action_Update_Diskfile>;
-
-export const Action_Delete_Diskfile = Action_Base.extend({
-	name: z.literal('delete_diskfile').default('delete_diskfile'),
-	path: Diskfile_Path,
-}).strict();
-export type Action_Delete_Diskfile = z.infer<typeof Action_Delete_Diskfile>;
-
-export const Action_Create_Directory = Action_Base.extend({
-	name: z.literal('create_directory').default('create_directory'),
-	path: Diskfile_Path,
-}).strict();
-export type Action_Create_Directory = z.infer<typeof Action_Create_Directory>;
-
-export const Action_Send_Prompt = Action_Base.extend({
-	name: z.literal('send_prompt').default('send_prompt'),
-	completion_request: Completion_Request,
-}).strict();
-export type Action_Send_Prompt = z.infer<typeof Action_Send_Prompt>;
-
-export const Action_Completion_Response = Action_Base.extend({
-	name: z.literal('completion_response').default('completion_response'),
-	completion_response: Completion_Response,
-}).strict();
-export type Action_Completion_Response = z.infer<typeof Action_Completion_Response>;
-
+// TODO MCP calls these `Result`
 // Action parameters and response schemas
 
 export const Ping_Action_Params = z.null();
@@ -279,10 +214,10 @@ export type Completion_Response_Action_Response = z.infer<
 >;
 
 export const ping_action_spec = {
-	name: 'ping',
+	method: 'ping',
 	direction: 'client',
 	type: 'Service_Action',
-	method: 'GET',
+	http_method: 'GET',
 	auth: null,
 	params: Ping_Action_Params,
 	response: Ping_Action_Response,
@@ -290,10 +225,10 @@ export const ping_action_spec = {
 } satisfies Service_Action_Spec;
 
 export const pong_action_spec = {
-	name: 'pong',
+	method: 'pong',
 	direction: 'server',
 	type: 'Service_Action',
-	method: null,
+	http_method: null,
 	auth: null,
 	params: Pong_Action_Params,
 	response: Pong_Action_Response,
@@ -301,10 +236,10 @@ export const pong_action_spec = {
 } satisfies Service_Action_Spec;
 
 export const load_session_action_spec = {
-	name: 'load_session',
+	method: 'load_session',
 	direction: 'client',
 	type: 'Service_Action',
-	method: 'GET',
+	http_method: 'GET',
 	auth: null,
 	params: Load_Session_Action_Params,
 	response: Load_Session_Action_Response,
@@ -312,10 +247,10 @@ export const load_session_action_spec = {
 } satisfies Service_Action_Spec;
 
 export const loaded_session_action_spec = {
-	name: 'loaded_session',
+	method: 'loaded_session',
 	direction: 'server',
 	type: 'Service_Action',
-	method: null,
+	http_method: null,
 	auth: null,
 	params: Loaded_Session_Action_Params,
 	response: Loaded_Session_Action_Response,
@@ -323,10 +258,10 @@ export const loaded_session_action_spec = {
 } satisfies Service_Action_Spec;
 
 export const filer_change_action_spec = {
-	name: 'filer_change',
+	method: 'filer_change',
 	direction: 'server',
 	type: 'Service_Action',
-	method: null,
+	http_method: null,
 	auth: null,
 	params: Filer_Change_Action_Params,
 	response: Filer_Change_Action_Response,
@@ -334,7 +269,7 @@ export const filer_change_action_spec = {
 } satisfies Service_Action_Spec;
 
 export const update_diskfile_action_spec = {
-	name: 'update_diskfile',
+	method: 'update_diskfile',
 	direction: 'client',
 	type: 'Client_Action',
 	params: Update_Diskfile_Action_Params,
@@ -342,7 +277,7 @@ export const update_diskfile_action_spec = {
 } satisfies Client_Action_Spec;
 
 export const delete_diskfile_action_spec = {
-	name: 'delete_diskfile',
+	method: 'delete_diskfile',
 	direction: 'client',
 	type: 'Client_Action',
 	params: Delete_Diskfile_Action_Params,
@@ -350,7 +285,7 @@ export const delete_diskfile_action_spec = {
 } satisfies Client_Action_Spec;
 
 export const create_directory_action_spec = {
-	name: 'create_directory',
+	method: 'create_directory',
 	direction: 'client',
 	type: 'Client_Action',
 	params: Create_Directory_Action_Params,
@@ -358,7 +293,7 @@ export const create_directory_action_spec = {
 } satisfies Client_Action_Spec;
 
 export const send_prompt_action_spec = {
-	name: 'send_prompt',
+	method: 'send_prompt',
 	direction: 'client',
 	type: 'Client_Action',
 	params: Send_Prompt_Action_Params,
@@ -366,10 +301,10 @@ export const send_prompt_action_spec = {
 } satisfies Client_Action_Spec;
 
 export const completion_response_action_spec = {
-	name: 'completion_response',
+	method: 'completion_response',
 	direction: 'server',
 	type: 'Service_Action',
-	method: 'GET',
+	http_method: 'GET',
 	auth: null,
 	params: Completion_Response_Action_Params,
 	response: Completion_Response_Action_Response,

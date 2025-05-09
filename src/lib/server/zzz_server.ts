@@ -16,7 +16,7 @@ import {
 } from '$lib/server/service.js';
 import {Api_Error} from '$lib/api.js';
 import {action_specs} from '$lib/schema_metadata.js';
-import type {Action_Name} from '$lib/action_types.js';
+import type {Action_Method} from '$lib/action_types.js';
 
 /**
  * Function type for handling client messages.
@@ -152,37 +152,37 @@ export class Zzz_Server {
 	 * Process an action by name with parameters.
 	 * This is the unified entry point for both HTTP and WebSocket actions.
 	 *
-	 * @param action_name_or_message - Either the action name as a string or the full Action_Client object
-	 * @param params - Parameters if action_name_or_message is a string, ignored if action_name_or_message is an Action_Client
+	 * @param method_or_message - Either the action name as a string or the full Action_Client object
+	 * @param params - Parameters if method_or_message is a string, ignored if method_or_message is an Action_Client
 	 */
 	async process_action(
-		action_name_or_message: Action_Name | Action_Client,
+		method_or_message: Action_Method | Action_Client,
 		params?: unknown,
 	): Promise<Service_Return> {
 		this.#check_destroyed();
 
-		let action_name: Action_Name;
+		let method: Action_Method;
 		let action_params: unknown;
 
 		// TODO BLOCK make this function monomorphic
 		// Determine if we're processing by name or full message
-		if (typeof action_name_or_message === 'string') {
-			action_name = action_name_or_message;
+		if (typeof method_or_message === 'string') {
+			method = method_or_message;
 			action_params = params;
 		} else {
-			action_name = action_name_or_message.name;
-			action_params = action_name_or_message; // The full message is the params
+			method = method_or_message.name;
+			action_params = method_or_message; // The full message is the params
 		}
 
 		// Find the action spec
 		// TODO BLOCK lookup O(1), probably a registry class?
-		const spec = this.action_specs.find((s) => s.name === action_name);
+		const spec = this.action_specs.find((s) => s.name === method);
 		if (!spec) {
-			throw new Api_Error(400, `unknown action: ${action_name}`);
+			throw new Api_Error(400, `unknown action: ${method}`);
 		}
 
 		if (spec.type !== 'Service_Action') {
-			throw new Api_Error(400, `action is not a service action: ${action_name}`);
+			throw new Api_Error(400, `action is not a service action: ${method}`);
 		}
 
 		// Validate parameters based on the schema

@@ -1,7 +1,7 @@
 import type {Gen} from '@ryanatkn/gro/gen.js';
 
 import {action_specs} from '$lib/schema_metadata.js';
-import {is_service_action, is_client_action, to_pascalsnake_case} from '$lib/schema_helpers.js';
+import {is_service_action, is_client_action} from '$lib/schema_helpers.js';
 
 /**
  * Outputs a file with action collection types that can be imported by schemas.ts.
@@ -11,11 +11,11 @@ export const gen: Gen = ({origin_path}) => {
 	// Group action schemas by direction (client/server)
 	const client_actions = action_specs
 		.filter(is_client_action)
-		.map((spec) => `Action_${to_pascalsnake_case(spec.name)}`);
+		.map((spec) => `${spec.method}_action_spec`);
 
 	const server_actions = action_specs
 		.filter(is_service_action)
-		.map((spec) => `Action_${to_pascalsnake_case(spec.name)}`);
+		.map((spec) => `${spec.method}_action_spec`);
 
 	// Combined action types for Action_Any
 	const all_actions = [...client_actions, ...server_actions];
@@ -36,7 +36,7 @@ import {
 /**
  * Set of client-only actions.
  */
-export const Action_Client = z.discriminatedUnion('name', [
+export const Action_Client = z.discriminatedUnion('method', [
 	${client_actions.join(',\n\t')}
 ]);
 export type Action_Client = z.infer<typeof Action_Client>;
@@ -44,7 +44,7 @@ export type Action_Client = z.infer<typeof Action_Client>;
 /**
  * Set of server-only actions.
  */
-export const Action_Server = z.discriminatedUnion('name', [
+export const Action_Server = z.discriminatedUnion('method', [
 	${server_actions.join(',\n\t')}
 ]);
 export type Action_Server = z.infer<typeof Action_Server>;
@@ -52,20 +52,21 @@ export type Action_Server = z.infer<typeof Action_Server>;
 /**
  * All action types combined.
  */
-export const Action_Any = z.discriminatedUnion('name', [
+export const Action_Any = z.discriminatedUnion('method', [
 	${all_actions.join(',\n\t')}
 ]);
 export type Action_Any = z.infer<typeof Action_Any>;
 
-// Maps action names to their directions ('client', 'server', or 'both')
+// TODO maybe remove and have the spec lookup or a runtime class using deriveds (including their laziness)
+// Maps action methods to their directions ('client', 'server', or 'both')
 export const action_directions: Record<string, 'client' | 'server' | 'both'> = {
 	${action_specs
 		.filter(is_client_action)
-		.map((spec) => `${spec.name}: 'client'`)
+		.map((spec) => `${spec.method}: 'client'`)
 		.join(',\n\t')},
 	${action_specs
 		.filter(is_service_action)
-		.map((spec) => `${spec.name}: 'server'`)
+		.map((spec) => `${spec.method}: 'server'`)
 		.join(',\n\t')},
 };
 

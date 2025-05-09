@@ -12,12 +12,12 @@ test('Action - can be instantiated with minimal data', () => {
 	const ping_action = new Action({
 		zzz,
 		json: {
-			name: 'ping',
+			method: 'ping',
 			direction: 'client',
 		},
 	});
 
-	expect(ping_action.name).toBe('ping');
+	expect(ping_action.method).toBe('ping');
 	expect(ping_action.direction).toBe('client');
 	expect(ping_action.is_ping).toBe(true);
 	expect(ping_action.is_pong).toBe(false);

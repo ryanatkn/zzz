@@ -3,7 +3,7 @@ import {z} from 'zod';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {get_datetime_now, Uuid} from '$lib/zod_helpers.js';
 import {Action_Direction, Completion_Response, Completion_Request} from '$lib/schemas.js';
-import {Action_Name} from '$lib/action_types.js';
+import {Action_Method} from '$lib/action_types.js';
 import type {Action_Client, Action_Server} from '$lib/action_collections.js';
 import {Diskfile_Change, Diskfile_Path, Source_File} from '$lib/diskfile_types.js';
 import {to_completion_response_text} from '$lib/response_helpers.js';
@@ -28,7 +28,7 @@ export const create_action_json = (
 };
 
 export const Action_Json = Cell_Json.extend({
-	name: Action_Name,
+	method: Action_Method,
 	direction: Action_Direction,
 	// Optional fields with proper type checking
 	ping_id: Uuid.optional(),
@@ -50,7 +50,7 @@ export interface Action_Options extends Cell_Options<typeof Action_Json> {} // e
 // but then another for dynamic usage? is there even such a thing of an action changing?
 // if not shouldn't we just remove the $state below?
 export class Action extends Cell<typeof Action_Json> {
-	name: Action_Name = $state()!;
+	method: Action_Method = $state()!;
 	direction: Action_Direction = $state()!;
 
 	// Store data based on action type
@@ -63,22 +63,20 @@ export class Action extends Cell<typeof Action_Json> {
 	change: Diskfile_Change | undefined = $state();
 	source_file: Source_File | undefined = $state();
 
-	readonly display_name: string = $derived(`${this.name} (${this.direction})`);
+	readonly display_name: string = $derived(`${this.method} (${this.direction})`);
 
-	// TODO maybe change these to be located on `this.name` as a `Action_Name_Name` class
-	// which JSON serializes to the string `Action_Name`
-	// but at runtime has properties like these:
-	readonly is_ping: boolean = $derived(this.name === 'ping');
-	readonly is_pong: boolean = $derived(this.name === 'pong');
-	readonly is_prompt: boolean = $derived(this.name === 'send_prompt');
-	readonly is_completion: boolean = $derived(this.name === 'completion_response');
+	// TODO hacky, refactor
+	readonly is_ping: boolean = $derived(this.method === 'ping');
+	readonly is_pong: boolean = $derived(this.method === 'pong');
+	readonly is_prompt: boolean = $derived(this.method === 'send_prompt');
+	readonly is_completion: boolean = $derived(this.method === 'completion_response');
 	readonly is_session: boolean = $derived(
-		this.name === 'load_session' || this.name === 'loaded_session',
+		this.method === 'load_session' || this.method === 'loaded_session',
 	);
 	readonly is_file_related: boolean = $derived(
-		this.name === 'update_diskfile' ||
-			this.name === 'delete_diskfile' ||
-			this.name === 'filer_change',
+		this.method === 'update_diskfile' ||
+			this.method === 'delete_diskfile' ||
+			this.method === 'filer_change',
 	);
 
 	readonly prompt_data: Completion_Request | null = $derived(
@@ -116,12 +114,12 @@ export class Action extends Cell<typeof Action_Json> {
 		// Initialize decoders with type-specific handlers
 		this.decoders = {
 			completion_request: (value) =>
-				this.name === 'send_prompt' ? Completion_Request.parse(value) : undefined,
+				this.method === 'send_prompt' ? Completion_Request.parse(value) : undefined,
 			completion_response: (value) =>
-				this.name === 'completion_response' ? Completion_Response.parse(value) : undefined,
-			ping_id: (value) => (this.name === 'pong' ? Uuid.parse(value) : undefined),
+				this.method === 'completion_response' ? Completion_Response.parse(value) : undefined,
+			ping_id: (value) => (this.method === 'pong' ? Uuid.parse(value) : undefined),
 			path: (value) =>
-				this.name === 'update_diskfile' || this.name === 'delete_diskfile'
+				this.method === 'update_diskfile' || this.method === 'delete_diskfile'
 					? Diskfile_Path.parse(value)
 					: undefined,
 		};

@@ -2,7 +2,7 @@ import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Action, Action_Json, Action_Schema, create_action_json} from '$lib/action.svelte.js';
-import {Action_Name} from '$lib/action_types.js';
+import {Action_Method} from '$lib/action_types.js';
 import type {Action_Client, Action_Server} from '$lib/action_collections.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
@@ -32,9 +32,9 @@ export class Actions extends Cell<typeof Actions_Json> {
 	readonly items: Indexed_Collection<Action> = new Indexed_Collection({
 		indexes: [
 			create_multi_index({
-				key: 'by_type',
-				extractor: (action) => action.name,
-				query_schema: Action_Name,
+				key: 'by_method',
+				extractor: (action) => action.method,
+				query_schema: Action_Method,
 				result_schema: Action_Schema,
 			}),
 		],
@@ -43,19 +43,19 @@ export class Actions extends Cell<typeof Actions_Json> {
 	history_limit: number = $state(HISTORY_LIMIT_DEFAULT);
 
 	// Derived collections using the indexed structure
-	readonly pings: Array<Action> = $derived(this.items.where('by_type', 'ping'));
-	readonly pongs: Array<Action> = $derived(this.items.where('by_type', 'pong'));
-	readonly prompts: Array<Action> = $derived(this.items.where('by_type', 'send_prompt'));
+	readonly pings: Array<Action> = $derived(this.items.where('by_method', 'ping'));
+	readonly pongs: Array<Action> = $derived(this.items.where('by_method', 'pong'));
+	readonly prompts: Array<Action> = $derived(this.items.where('by_method', 'send_prompt'));
 	readonly completions: Array<Action> = $derived(
-		this.items.where('by_type', 'completion_response'),
+		this.items.where('by_method', 'completion_response'),
 	);
 	readonly diskfile_updates: Array<Action> = $derived(
-		this.items.where('by_type', 'update_diskfile'),
+		this.items.where('by_method', 'update_diskfile'),
 	);
 	readonly diskfile_deletes: Array<Action> = $derived(
-		this.items.where('by_type', 'delete_diskfile'),
+		this.items.where('by_method', 'delete_diskfile'),
 	);
-	readonly filer_changes: Array<Action> = $derived(this.items.where('by_type', 'filer_change'));
+	readonly filer_changes: Array<Action> = $derived(this.items.where('by_method', 'filer_change'));
 
 	// Action handlers
 	onsend?: (action: Action_Client) => void; // TODO these names are confused, they need to be about direction
@@ -141,8 +141,8 @@ export class Actions extends Cell<typeof Actions_Json> {
 	 * @param limit Maximum number of actions to return (defaults to history_limit)
 	 * @returns Array of actions matching the type
 	 */
-	get_latest_by_type(type: Action_Name, limit: number = this.history_limit): Array<Action> {
-		return this.items.latest('by_type', type, limit);
+	get_latest_by_method(type: Action_Method, limit: number = this.history_limit): Array<Action> {
+		return this.items.latest('by_method', type, limit);
 	}
 
 	/**

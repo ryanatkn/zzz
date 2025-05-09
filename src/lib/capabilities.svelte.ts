@@ -421,7 +421,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	 * @returns The UUID of the ping message
 	 */
 	send_ping(): Uuid {
-		const ping = Action_Ping.parse(EMPTY_OBJECT);
+		const ping = Action_Ping.parse(undefined);
 		const ping_id = ping.id;
 
 		// Create a new pending ping

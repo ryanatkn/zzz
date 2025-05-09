@@ -22,9 +22,9 @@
 		{:else if action.is_completion}
 			<Glyph glyph={GLYPH_RESPONSE} /> Response
 		{:else if action.is_file_related}
-			<Glyph glyph={GLYPH_FILE} /> File {action.name}
+			<Glyph glyph={GLYPH_FILE} /> File {action.method}
 		{:else}
-			<Glyph glyph={GLYPH_ACTION} /> {action.name}
+			<Glyph glyph={GLYPH_ACTION} /> {action.method}
 		{/if}
 		<small class="color_subtle ml_xs">{action.direction}</small>
 	</div>
@@ -33,7 +33,7 @@
 		<small class="font_family_mono"
 			>created {action.created_formatted_datetime} {action.created_formatted_time}</small
 		>
-		<small class="font_family_mono">type: {action.name}</small>
+		<small class="font_family_mono">type: {action.method}</small>
 		<small class="font_family_mono">direction: {action.direction}</small>
 	</div>
 </div>
@@ -181,7 +181,7 @@
 	<section class="pb_md border_bottom">
 		<h3>session information</h3>
 		{#if action.data}
-			{#if action.name === 'loaded_session' && action.data.files}
+			{#if action.method === 'loaded_session' && action.data.files}
 				<div class="field_row">
 					<div class="font_weight_600 color_text_subtle">files loaded</div>
 					<div>{Object.keys(action.data.files).length}</div>
@@ -223,7 +223,7 @@
 				</div>
 			{/if}
 		{:else}
-			<p>session {action.name === 'load_session' ? 'loading request' : 'data unavailable'}</p>
+			<p>session {action.method === 'load_session' ? 'loading request' : 'data unavailable'}</p>
 		{/if}
 	</section>
 {/if}

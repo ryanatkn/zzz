@@ -83,10 +83,10 @@ export const validate_service_params = (
 ): z.infer<Service_Action_Spec['params']> => {
 	const parsed = spec.params.safeParse(params === undefined ? null : params);
 	if (!parsed.success) {
-		log?.error('failed to validate service params', spec.name, params, parsed.error.issues);
+		log?.error('failed to validate service params', spec.method, params, parsed.error.issues);
 		throw new Api_Error(
 			400,
-			`invalid params to ${spec.name}: ${stringify_zod_error(parsed.error)}`,
+			`invalid params to ${spec.method}: ${stringify_zod_error(parsed.error)}`,
 		); // TODO @many handle multiple errors instead of just the first
 	}
 	return parsed.data;
