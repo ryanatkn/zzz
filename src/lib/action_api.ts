@@ -1,12 +1,12 @@
 import {Logger} from '@ryanatkn/belt/log.js';
 import {DEV, BROWSER} from 'esm-env';
 
-import type {Action_Method, Actions, Mutations} from '$lib/action_types.js';
+import type {Action_Method, Actions, Mutations} from '$lib/action_metatypes.js';
 import {create_mutation_context} from '$lib/mutation.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 import type {Api_Client} from '$lib/api_client.js';
 
-// TODO BLOCK EXTENSIONS
+// TODO extensible
 
 const log = new Logger();
 

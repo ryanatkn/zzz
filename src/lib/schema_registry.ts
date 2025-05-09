@@ -2,7 +2,7 @@ import type {z} from 'zod';
 import type {Flavored} from '@ryanatkn/belt/types.js';
 
 import type {Action_Spec, Client_Action_Spec, Service_Action_Spec} from '$lib/action_spec.js';
-import type {Action_Method} from '$lib/action_types.js';
+import type {Action_Method} from '$lib/action_metatypes.js';
 
 export type Vocab_Name = Flavored<string, 'Vocab_Name'>;
 

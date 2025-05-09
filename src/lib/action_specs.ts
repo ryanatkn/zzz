@@ -3,7 +3,11 @@ import {z} from 'zod';
 import type {Action_Spec, Service_Action_Spec, Client_Action_Spec} from '$lib/action_spec.js';
 import {Diskfile_Change, Diskfile_Path, Source_File, Zzz_Dir} from '$lib/diskfile_types.js';
 import {Uuid} from '$lib/zod_helpers.js';
-import {Completion_Request, Completion_Response} from '$lib/action_helpers.js';
+// TODO BLOCK circular dependency
+// import {Completion_Request, Completion_Response} from '$lib/tape_types.js';
+
+const Completion_Request = {} as any;
+const Completion_Response = {} as any;
 
 /**
  * Centralized definitions for all action specifications.

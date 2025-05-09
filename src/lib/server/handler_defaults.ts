@@ -13,7 +13,7 @@ import {format_file} from '@ryanatkn/gro/format_file.js';
 import type {Watcher_Change} from '@ryanatkn/gro/watch_dir.js';
 import {DEV} from 'esm-env';
 
-import {type Action_Completion_Response, type Action_Send_Prompt} from '$lib/schemas.js';
+import {Action_Message} from '$lib/action_messages.js';
 import {type Action_Client} from '$lib/action_collections.js';
 import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
 import {Diskfile_Path, Source_File, type Zzz_Dir} from '$lib/diskfile_types.js';
@@ -91,7 +91,7 @@ export const handle_message = async (
 			const {prompt, provider_name, model, tape_messages} = message.params.completion_request;
 			const config = server.config;
 
-			let response: Action_Completion_Response;
+			let response: Action_Message['completion_response'];
 
 			console.log(`texting ${provider_name}:`, prompt.substring(0, 1000));
 
@@ -208,7 +208,7 @@ export const handle_message = async (
 			// We don't need to wait for this to finish
 			void save_response(message, response, server.zzz_dir, server.safe_fs);
 
-			console.log(`got ${provider_name} message`, response.completion_response.data);
+			console.log(`got ${provider_name} message`, response.params.completion_response.data);
 
 			return {value: response};
 		}
@@ -304,13 +304,13 @@ export const handle_filer_change = (
 
 // TODO refactor
 const save_response = async (
-	request: Action_Send_Prompt,
-	response: Action_Completion_Response,
+	request: Action_Message['send_prompt'],
+	response: Action_Message['completion_response'],
 	dir: string,
 	safe_fs: Safe_Fs,
 ): Promise<void> => {
 	// includes `Date.now()` for sorting purposes
-	const filename = `${request.completion_request.provider_name}__${Date.now()}__${request.completion_request.model}__${response.id}.json`; // TODO include model data in these
+	const filename = `${request.params.completion_request.provider_name}__${Date.now()}__${request.params.completion_request.model}__${response.id}.json`; // TODO include model data in these
 
 	const path = join(dir, filename);
 

@@ -1,7 +1,6 @@
 import {z} from 'zod';
 import type {ListResponse} from 'ollama/browser';
 import type {Async_Status} from '@ryanatkn/belt/async.js';
-import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
@@ -9,7 +8,7 @@ import {ollama_list} from '$lib/ollama.js';
 import {API_ROUTE, REQUEST_TIMEOUT, SERVER_URL} from '$lib/constants.js';
 import {Uuid} from '$lib/zod_helpers.js';
 import type {Zzz_Dir} from '$lib/diskfile_types.js';
-import {Action_Ping, type Action_Pong} from '$lib/schemas.js';
+import {Action_Message} from '$lib/action_messages.js';
 
 // TODO hacky/hardcoded for now, this should be an extensible system, the point is to give users a good interface to the concept of capabilities
 
@@ -421,7 +420,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	 * @returns The UUID of the ping message
 	 */
 	send_ping(): Uuid {
-		const ping = Action_Ping.parse(undefined);
+		const ping = Action_Message.ping.parse(undefined);
 		const ping_id = ping.id;
 
 		// Create a new pending ping
@@ -446,9 +445,9 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	 * Handle a pong response from the server.
 	 * @param pong The pong message received from the server
 	 */
-	receive_pong(pong: Action_Pong): void {
+	receive_pong(pong: Action_Message['pong']): void {
 		const received_time = Date.now();
-		const ping_index = this.pings.findIndex((p) => p.ping_id === pong.ping_id);
+		const ping_index = this.pings.findIndex((p) => p.ping_id === pong.params.ping_id);
 		// If we found the ping, update it
 		if (ping_index !== -1) {
 			const ping = this.pings[ping_index];

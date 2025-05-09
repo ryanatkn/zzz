@@ -133,7 +133,7 @@ export class Chat extends Cell<typeof Chat_Json> {
 				this.zzz.models.find_by_name(this.zzz.bots.namerbot)!.provider_name,
 				this.zzz.bots.namerbot,
 			);
-			const {completion_response} = name_response;
+			const {completion_response} = name_response.params;
 
 			const response_text = to_completion_response_text(completion_response) || '';
 

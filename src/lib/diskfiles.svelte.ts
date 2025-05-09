@@ -1,6 +1,6 @@
 import {z} from 'zod';
 
-import type {Action_Filer_Change} from '$lib/schemas.js';
+import type {Action_Message} from '$lib/action_messages.js';
 import {create_uuid, get_datetime_now, Uuid} from '$lib/zod_helpers.js';
 import {Diskfile, Diskfile_Schema} from '$lib/diskfile.svelte.js';
 import {Diskfile_Json, Diskfile_Path} from '$lib/diskfile_types.js';
@@ -81,10 +81,10 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 		this.init();
 	}
 
-	handle_change(action: Action_Filer_Change): void {
-		const validated_source_file = action.source_file;
+	handle_change(message: Action_Message['filer_change']): void {
+		const validated_source_file = message.params.source_file;
 
-		switch (action.change.type) {
+		switch (message.params.change.type) {
 			case 'add': {
 				this.add(source_file_to_diskfile_json(validated_source_file));
 				break;
@@ -139,9 +139,8 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 		this.zzz.actions.send({
 			id: create_uuid(),
 			created: get_datetime_now(),
-			name: 'update_diskfile',
-			path,
-			content,
+			method: 'update_diskfile',
+			params: {path, content},
 		});
 	}
 
@@ -149,8 +148,8 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 		this.zzz.actions.send({
 			id: create_uuid(),
 			created: get_datetime_now(),
-			name: 'delete_diskfile',
-			path,
+			method: 'delete_diskfile',
+			params: {path},
 		});
 	}
 
@@ -177,8 +176,8 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 		this.zzz.actions.send({
 			id: create_uuid(),
 			created: get_datetime_now(),
-			name: 'create_directory',
-			path,
+			method: 'create_directory',
+			params: {path},
 		});
 	}
 

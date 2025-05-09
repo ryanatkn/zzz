@@ -102,11 +102,14 @@ export const package_json = {
 			svelte: './dist/Action_List.svelte',
 			default: './dist/Action_List.svelte',
 		},
-		'./action_types.gen.js': {
-			types: './dist/action_types.gen.d.ts',
-			default: './dist/action_types.gen.js',
+		'./action_metatypes.gen.js': {
+			types: './dist/action_metatypes.gen.d.ts',
+			default: './dist/action_metatypes.gen.js',
 		},
-		'./action_types.js': {types: './dist/action_types.d.ts', default: './dist/action_types.js'},
+		'./action_metatypes.js': {
+			types: './dist/action_metatypes.d.ts',
+			default: './dist/action_metatypes.js',
+		},
 		'./action.svelte.js': {types: './dist/action.svelte.d.ts', default: './dist/action.svelte.js'},
 		'./actions.svelte.js': {
 			types: './dist/actions.svelte.d.ts',
@@ -695,7 +698,6 @@ export const package_json = {
 			types: './dist/schema_helpers.d.ts',
 			default: './dist/schema_helpers.js',
 		},
-		'./schemas.js': {types: './dist/schemas.d.ts', default: './dist/schemas.js'},
 		'./scrollable.svelte.js': {
 			types: './dist/scrollable.svelte.d.ts',
 			default: './dist/scrollable.svelte.js',
@@ -851,7 +853,6 @@ export const src_json = {
 				{name: 'Action_Client', kind: 'variable'},
 				{name: 'Action_Server', kind: 'variable'},
 				{name: 'Action_Any', kind: 'variable'},
-				{name: 'action_directions', kind: 'variable'},
 			],
 		},
 		'./Action_Detail.svelte': {
@@ -861,26 +862,28 @@ export const src_json = {
 		'./action_helpers.js': {
 			path: 'action_helpers.ts',
 			declarations: [
-				{name: 'to_action_params_name', kind: 'function'},
-				{name: 'to_action_response_name', kind: 'function'},
+				{name: 'ACTION_DATE_FORMAT', kind: 'variable'},
+				{name: 'ACTION_TIME_FORMAT', kind: 'variable'},
+				{name: 'create_action_json', kind: 'function'},
 			],
 		},
 		'./Action_List.svelte': {
 			path: 'Action_List.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
 		},
-		'./action_types.gen.js': {
-			path: 'action_types.gen.ts',
+		'./action_metatypes.gen.js': {
+			path: 'action_metatypes.gen.ts',
 			declarations: [{name: 'gen', kind: 'function'}],
 		},
-		'./action_types.js': {
-			path: 'action_types.ts',
+		'./action_metatypes.js': {
+			path: 'action_metatypes.ts',
 			declarations: [
 				{name: 'Action_Method', kind: 'variable'},
 				{name: 'Service_Action_Method', kind: 'type'},
 				{name: 'Client_Action_Method', kind: 'type'},
 				{name: 'Action_Params_By_Name', kind: 'type'},
 				{name: 'Action_Response_By_Name', kind: 'type'},
+				{name: 'Action_Response_Schema_By_Name', kind: 'type'},
 				{name: 'Service_By_Name', kind: 'type'},
 				{name: 'Actions', kind: 'type'},
 				{name: 'Mutations', kind: 'type'},
@@ -889,11 +892,6 @@ export const src_json = {
 		'./action.svelte.js': {
 			path: 'action.svelte.ts',
 			declarations: [
-				{name: 'ACTION_DATE_FORMAT', kind: 'variable'},
-				{name: 'ACTION_TIME_FORMAT', kind: 'variable'},
-				{name: 'create_action_json', kind: 'function'},
-				{name: 'Action_Json', kind: 'variable'},
-				{name: 'Action_Json_Input', kind: 'type'},
 				{name: 'Action_Options', kind: 'type'},
 				{name: 'Action', kind: 'class'},
 				{name: 'Action_Schema', kind: 'variable'},
@@ -1777,7 +1775,15 @@ export const src_json = {
 		},
 		'./provider_types.js': {
 			path: 'provider_types.ts',
-			declarations: [{name: 'Provider_Name', kind: 'variable'}],
+			declarations: [
+				{name: 'Provider_Name', kind: 'variable'},
+				{name: 'Provider_Data_Ollama', kind: 'variable'},
+				{name: 'Provider_Data_Claude', kind: 'variable'},
+				{name: 'Provider_Data_Chatgpt', kind: 'variable'},
+				{name: 'Provider_Data_Gemini', kind: 'variable'},
+				{name: 'Provider_Data_Schema', kind: 'variable'},
+				{name: 'Provider_Data', kind: 'type'},
+			],
 		},
 		'./provider.svelte.js': {
 			path: 'provider.svelte.ts',
@@ -1842,61 +1848,13 @@ export const src_json = {
 		'./schema_helpers.js': {
 			path: 'schema_helpers.ts',
 			declarations: [
-				{name: 'to_action_params_name', kind: 'function'},
-				{name: 'to_action_response_name', kind: 'function'},
+				{name: 'to_action_spec_identifier', kind: 'function'},
+				{name: 'to_action_spec_params_identifier', kind: 'function'},
+				{name: 'to_action_spec_response_identifier', kind: 'function'},
 				{name: 'is_service_action', kind: 'function'},
 				{name: 'is_client_action', kind: 'function'},
 				{name: 'camel_to_snake_case', kind: 'function'},
 				{name: 'to_pascalsnake_case', kind: 'function'},
-				{name: 'get_schema_imports', kind: 'function'},
-			],
-		},
-		'./schemas.js': {
-			path: 'schemas.ts',
-			declarations: [
-				{name: 'Action_Direction', kind: 'variable'},
-				{name: 'Tape_Role', kind: 'variable'},
-				{name: 'Tape_Message', kind: 'variable'},
-				{name: 'Provider_Data_Ollama', kind: 'variable'},
-				{name: 'Provider_Data_Claude', kind: 'variable'},
-				{name: 'Provider_Data_Chatgpt', kind: 'variable'},
-				{name: 'Provider_Data_Gemini', kind: 'variable'},
-				{name: 'Provider_Data_Schema', kind: 'variable'},
-				{name: 'Provider_Data', kind: 'type'},
-				{name: 'Completion_Request', kind: 'variable'},
-				{name: 'Completion_Response', kind: 'variable'},
-				{name: 'Action_Base', kind: 'variable'},
-				{name: 'Action_Spec_Base_Schema', kind: 'variable'},
-				{name: 'Action_Spec_Base', kind: 'type'},
-				{name: 'Client_Action_Spec', kind: 'variable'},
-				{name: 'Service_Action_Spec', kind: 'variable'},
-				{name: 'Action_Spec', kind: 'variable'},
-				{name: 'Ping_Action_Params', kind: 'variable'},
-				{name: 'Ping_Action_Response', kind: 'variable'},
-				{name: 'Pong_Action_Params', kind: 'variable'},
-				{name: 'Pong_Action_Response', kind: 'variable'},
-				{name: 'Load_Session_Action_Params', kind: 'variable'},
-				{name: 'Load_Session_Action_Response', kind: 'variable'},
-				{name: 'Loaded_Session_Action_Params', kind: 'variable'},
-				{name: 'Loaded_Session_Action_Response', kind: 'variable'},
-				{name: 'Filer_Change_Action_Params', kind: 'variable'},
-				{name: 'Filer_Change_Action_Response', kind: 'variable'},
-				{name: 'Update_Diskfile_Action_Params', kind: 'variable'},
-				{name: 'Delete_Diskfile_Action_Params', kind: 'variable'},
-				{name: 'Create_Directory_Action_Params', kind: 'variable'},
-				{name: 'Send_Prompt_Action_Params', kind: 'variable'},
-				{name: 'Completion_Response_Action_Params', kind: 'variable'},
-				{name: 'Completion_Response_Action_Response', kind: 'variable'},
-				{name: 'ping_action_spec', kind: 'variable'},
-				{name: 'pong_action_spec', kind: 'variable'},
-				{name: 'load_session_action_spec', kind: 'variable'},
-				{name: 'loaded_session_action_spec', kind: 'variable'},
-				{name: 'filer_change_action_spec', kind: 'variable'},
-				{name: 'update_diskfile_action_spec', kind: 'variable'},
-				{name: 'delete_diskfile_action_spec', kind: 'variable'},
-				{name: 'create_directory_action_spec', kind: 'variable'},
-				{name: 'send_prompt_action_spec', kind: 'variable'},
-				{name: 'completion_response_action_spec', kind: 'variable'},
 			],
 		},
 		'./scrollable.svelte.js': {
@@ -2036,10 +1994,6 @@ export const src_json = {
 		'./strip.svelte.js': {
 			path: 'strip.svelte.ts',
 			declarations: [
-				{name: 'Strip_Role', kind: 'variable'},
-				{name: 'Strip_Json', kind: 'variable'},
-				{name: 'Strip_Json_Input', kind: 'type'},
-				{name: 'Strip_Schema', kind: 'variable'},
 				{name: 'Strip_Options', kind: 'type'},
 				{name: 'Strip', kind: 'class'},
 				{name: 'create_strip_from_bit', kind: 'function'},
@@ -2070,6 +2024,10 @@ export const src_json = {
 			declarations: [
 				{name: 'Tape_Json', kind: 'variable'},
 				{name: 'Tape_Json_Input', kind: 'type'},
+				{name: 'Tape_Role', kind: 'variable'},
+				{name: 'Tape_Message', kind: 'variable'},
+				{name: 'Completion_Request', kind: 'variable'},
+				{name: 'Completion_Response', kind: 'variable'},
 			],
 		},
 		'./tape.svelte.js': {

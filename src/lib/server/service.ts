@@ -76,7 +76,7 @@ export const service_return_to_api_result = <T_Value>(
 };
 
 export const validate_service_params = (
-	spec: Service_Action_Spec,
+	spec: Service_Action_Spec, // TODO generic type on method probably
 	params: unknown,
 	log?: Logger | null,
 	// TODO BLOCK this return type needs to be based on the `Service_Action_Spec` type, maybe using a typed `name` instead of the `spec`?

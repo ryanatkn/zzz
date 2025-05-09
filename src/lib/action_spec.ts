@@ -2,10 +2,10 @@ import {z} from 'zod';
 
 import {Uuid_With_Default, Datetime_Now} from '$lib/zod_helpers.js';
 import type {Http_Method} from '$lib/api.js';
-import {Action_Method} from '$lib/action_types.js';
-import {Action_Direction} from '$lib/action_helpers.js';
+import {Action_Method} from '$lib/action_metatypes.js';
 
-// TODO BLOCK refactor with schemas.ts
+export const Action_Direction = z.enum(['client', 'server', 'both']);
+export type Action_Direction = z.infer<typeof Action_Direction>;
 
 /**
  * Centralized definitions for core action structures.

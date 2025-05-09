@@ -67,7 +67,7 @@ const TEST_URLS = {
 };
 
 const TEST_MESSAGE = {
-	BASIC: {method: 'test_action', data: 'test_data'},
+	BASIC: {method: 'test_action', params: 'test_data'},
 	PING: {method: 'ping', timestamp: 123456789},
 };
 
@@ -213,7 +213,7 @@ describe('Socket', () => {
 			mock_socket.connect();
 
 			// Create request promise
-			const request_promise = socket.request<{method: string; request_id: string; data: string}>(
+			const request_promise = socket.request<{method: string; request_id: string; params: string}>(
 				{method: 'query_a', id: 'req_a'},
 				(message) => {
 					if (message.method === 'response_a' && message.request_id === 'req_a') {
@@ -229,12 +229,12 @@ describe('Socket', () => {
 
 			// Simulate response
 			mock_socket.dispatchEvent('message', {
-				data: JSON.stringify({method: 'response_a', request_id: 'req_a', data: 'result_a'}),
+				params: JSON.stringify({method: 'response_a', request_id: 'req_a', params: 'result_a'}),
 			});
 
 			const result = await request_promise;
 			expect(result.method).toBe('response_a');
-			expect(result.data).toBe('result_a');
+			expect(result.params).toBe('result_a');
 		});
 	});
 

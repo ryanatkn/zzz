@@ -28,7 +28,7 @@
 	import {Model_Json} from '$lib/model.svelte.js';
 	import {send_mutations, receive_mutations} from '$lib/mutations.js';
 	import type {Action_Client, Action_Server} from '$lib/action_collections.js';
-	import type {Actions} from '$lib/action_types.js';
+	import type {Actions} from '$lib/action_metatypes.js';
 	import {create_mutation_context} from '$lib/mutation.js';
 
 	interface Props {

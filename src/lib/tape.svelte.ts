@@ -1,20 +1,16 @@
 import {type Model} from '$lib/model.svelte.js';
-import {
-	Strip,
-	Strip_Role,
-	create_strip_from_text,
-	create_strip_from_bit,
-} from '$lib/strip.svelte.js';
+import {Strip, create_strip_from_text, create_strip_from_bit} from '$lib/strip.svelte.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Tape_Json} from '$lib/tape_types.js';
+import {Tape_Json, Completion_Request} from '$lib/tape_types.js';
 import {render_tape_to_string, render_tape_messages} from '$lib/tape_helpers.js';
 import {type Bit_Type} from '$lib/bit.svelte.js';
 import {HANDLED} from '$lib/cell_helpers.js';
 import {to_completion_response_text} from '$lib/response_helpers.js';
-import {Completion_Request, type Completion_Response} from '$lib/schemas.js';
+import {Action_Message} from '$lib/action_messages.js';
 import {to_preview, estimate_token_count} from '$lib/helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import type {Uuid} from '$lib/zod_helpers.js';
+import type {Strip_Role} from '$lib/strip_types.js';
 
 // TODO add `tape.name` probably
 
@@ -69,7 +65,7 @@ export class Tape extends Cell<typeof Tape_Json> {
 	/**
 	 * Create and add a user strip with the given content.
 	 */
-	add_user_strip(content: string, request?: Completion_Request): Strip {
+	add_user_strip(content: string, request?: Action_Message['send_prompt']): Strip {
 		const strip = create_strip_from_text(content, 'user', {tape_id: this.id, request}, this.zzz);
 		this.add_strip(strip);
 		return strip;
@@ -78,7 +74,7 @@ export class Tape extends Cell<typeof Tape_Json> {
 	/**
 	 * Create and add an assistant strip with the given content.
 	 */
-	add_assistant_strip(content: string, response?: Completion_Response): Strip {
+	add_assistant_strip(content: string, response?: Action_Message['completion_response']): Strip {
 		const strip = create_strip_from_text(
 			content,
 			'assistant',
@@ -151,11 +147,11 @@ export class Tape extends Cell<typeof Tape_Json> {
 		);
 
 		// Get the response text
-		const response_text = to_completion_response_text(response.completion_response) || '';
+		const response_text = to_completion_response_text(response.params.completion_response) || '';
 
 		// Update the assistant strip with the response content and metadata
 		assistant_strip.content = response_text;
-		assistant_strip.response = response.completion_response;
+		assistant_strip.response = response.params.completion_response;
 
 		return assistant_strip;
 	}

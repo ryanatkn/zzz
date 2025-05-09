@@ -1,5 +1,5 @@
 import type {Api_Result} from '$lib/api.js';
-import type {Action_Method, Actions} from '$lib/action_types.js';
+import type {Action_Method, Actions} from '$lib/action_metatypes.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 
 /**

@@ -122,13 +122,13 @@
       "svelte": "./dist/Action_List.svelte",
       "default": "./dist/Action_List.svelte"
     },
-    "./action_types.gen.js": {
-      "types": "./dist/action_types.gen.d.ts",
-      "default": "./dist/action_types.gen.js"
+    "./action_metatypes.gen.js": {
+      "types": "./dist/action_metatypes.gen.d.ts",
+      "default": "./dist/action_metatypes.gen.js"
     },
-    "./action_types.js": {
-      "types": "./dist/action_types.d.ts",
-      "default": "./dist/action_types.js"
+    "./action_metatypes.js": {
+      "types": "./dist/action_metatypes.d.ts",
+      "default": "./dist/action_metatypes.js"
     },
     "./action.svelte.js": {
       "types": "./dist/action.svelte.d.ts",
@@ -807,10 +807,6 @@
     "./schema_helpers.js": {
       "types": "./dist/schema_helpers.d.ts",
       "default": "./dist/schema_helpers.js"
-    },
-    "./schemas.js": {
-      "types": "./dist/schemas.d.ts",
-      "default": "./dist/schemas.js"
     },
     "./scrollable.svelte.js": {
       "types": "./dist/scrollable.svelte.d.ts",

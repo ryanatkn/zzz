@@ -1,36 +1,22 @@
-import {z} from 'zod';
 import type {Omit_Strict} from '@ryanatkn/belt/types.js';
 
 import {estimate_token_count} from '$lib/helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Uuid, Uuid_With_Default} from '$lib/zod_helpers.js';
-import {Completion_Request, Completion_Response} from '$lib/schemas.js';
-import {Cell_Json} from '$lib/cell_types.js';
+import {Uuid} from '$lib/zod_helpers.js';
+import {Action_Message} from '$lib/action_messages.js';
 import type {Bit_Type} from '$lib/bit.svelte.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
-
-export const Strip_Role = z.enum(['user', 'assistant', 'system']);
-export type Strip_Role = z.infer<typeof Strip_Role>;
-
-export const Strip_Json = Cell_Json.extend({
-	bit_id: Uuid_With_Default,
-	tape_id: Uuid.nullable().optional(),
-	role: Strip_Role,
-	request: Completion_Request.optional(),
-	response: Completion_Response.optional(),
-});
-export type Strip_Json = z.infer<typeof Strip_Json>;
-export type Strip_Json_Input = z.input<typeof Strip_Json>;
-
-export const Strip_Schema = z.instanceof(Cell);
+import {Strip_Json, type Strip_Role} from '$lib/strip_types.js';
+import type {Completion_Request} from '$lib/tape_types.js';
 
 export interface Strip_Options extends Cell_Options<typeof Strip_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
+
 export class Strip extends Cell<typeof Strip_Json> {
 	bit_id: Uuid = $state()!;
 	tape_id: Uuid | null | undefined = $state();
 	role: Strip_Role = $state()!;
 	request: Completion_Request | undefined = $state();
-	response: Completion_Response | undefined = $state();
+	response: Action_Message['completion_response'] | undefined = $state();
 
 	// Get the referenced bit - handle case where bit might not exist in registry
 	readonly bit: Bit_Type | null = $derived(this.zzz.bits.items.by_id.get(this.bit_id) ?? null);

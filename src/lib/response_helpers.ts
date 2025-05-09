@@ -3,14 +3,17 @@
  * and handling type compatibility issues.
  */
 import {create_uuid, get_datetime_now, Uuid} from '$lib/zod_helpers.js';
-import type {Completion_Response, Provider_Data, Action_Completion_Response} from '$lib/schemas.js';
-import type {Provider_Name} from '$lib/provider_types.js';
+import type {Action_Message, Action_Message_Params} from '$lib/action_messages.js';
+import type {Provider_Name, Provider_Data} from '$lib/provider_types.js';
 
 /**
  * Extracts the text content from a completion response
  */
 export const to_completion_response_text = (
-	completion_response: Completion_Response | null | undefined,
+	completion_response:
+		| Action_Message_Params['completion_response']['completion_response']
+		| null
+		| undefined,
 ): string | null => {
 	if (!completion_response) return null;
 
@@ -39,7 +42,7 @@ export const create_completion_response_message = (
 	provider_name: Provider_Name,
 	model: string,
 	api_response: unknown,
-): Action_Completion_Response => {
+): Action_Message['completion_response'] => {
 	let provider_data: Provider_Data;
 
 	// Convert provider-specific response format to our standard format
@@ -84,12 +87,14 @@ export const create_completion_response_message = (
 		id: create_uuid(),
 		created,
 		method: 'completion_response',
-		completion_response: {
-			created,
-			request_id,
-			provider_name,
-			model,
-			data: provider_data,
+		params: {
+			completion_response: {
+				created,
+				request_id,
+				provider_name,
+				model,
+				data: provider_data,
+			},
 		},
 	};
 };

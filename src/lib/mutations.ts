@@ -1,4 +1,4 @@
-import type {Mutations} from '$lib/action_types.js';
+import type {Mutations} from '$lib/action_metatypes.js';
 
 /**
  * Client-side mutations for handling action responses

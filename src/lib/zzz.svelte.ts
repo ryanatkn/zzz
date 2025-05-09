@@ -6,11 +6,7 @@ import {z} from 'zod';
 import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
 import {strip_end, strip_start} from '@ryanatkn/belt/string.js';
 
-import type {
-	Action_Send_Prompt,
-	Action_Completion_Response,
-	Action_Loaded_Session,
-} from '$lib/schemas.js';
+import type {Action_Message, Action_Message_Params} from '$lib/action_messages.js';
 import type {Action_Client, Action_Server} from '$lib/action_collections.js';
 import {Provider, type Provider_Json} from '$lib/provider.svelte.js';
 import type {Provider_Name} from '$lib/provider_types.js';
@@ -137,7 +133,8 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	});
 
 	// Runtime-only state (not serialized)
-	readonly pending_prompts: SvelteMap<Uuid, Deferred<Action_Completion_Response>> = new SvelteMap();
+	readonly pending_prompts: SvelteMap<Uuid, Deferred<Action_Message['completion_response']>> =
+		new SvelteMap();
 
 	// Store Diskfile_History objects by file path
 	readonly diskfile_histories: SvelteMap<Diskfile_Path, Diskfile_History> = new SvelteMap();
@@ -220,25 +217,27 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		provider_name: Provider_Name,
 		model: string,
 		tape_messages?: Array<Action_With_History>,
-	): Promise<Action_Completion_Response> {
+	): Promise<Action_Message['completion_response']> {
 		const request_id = create_uuid();
 		const created = get_datetime_now();
-		const message: Action_Send_Prompt = {
+		const message: Action_Message['send_prompt'] = {
 			id: request_id,
 			created,
 			method: 'send_prompt',
-			completion_request: {
-				created,
-				request_id,
-				provider_name,
-				model,
-				prompt,
-				tape_messages,
+			params: {
+				completion_request: {
+					created,
+					request_id,
+					provider_name,
+					model,
+					prompt,
+					tape_messages,
+				},
 			},
 		};
 		this.actions.send(message);
 
-		const deferred = create_deferred<Action_Completion_Response>();
+		const deferred = create_deferred<Action_Message['completion_response']>();
 		this.pending_prompts.set(message.id, deferred);
 
 		const response = await deferred.promise;
@@ -246,21 +245,21 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		return response;
 	}
 
-	receive_completion_response(message: Action_Completion_Response): void {
-		const deferred = this.pending_prompts.get(message.completion_response.request_id);
+	receive_completion_response(message: Action_Message['completion_response']): void {
+		const deferred = this.pending_prompts.get(message.params.completion_response.request_id);
 		if (!deferred) {
 			console.error('expected pending', message);
 			return;
 		}
 		deferred.resolve(message);
-		this.pending_prompts.delete(message.completion_response.request_id); // deleting intentionally after resolving to maybe avoid a corner case loop of sending the same prompt again
+		this.pending_prompts.delete(message.params.completion_response.request_id); // deleting intentionally after resolving to maybe avoid a corner case loop of sending the same prompt again
 	}
 
 	/**
 	 * Handles session data loaded from the server.
 	 * Sets the zzz_dir and adds files to diskfiles.
 	 */
-	receive_session(data: Action_Loaded_Session['data']): void {
+	receive_session(data: Action_Message_Params['loaded_session']['data']): void {
 		// Set the zzz_dir property from the session data
 		this.zzz_dir = data.zzz_dir;
 
@@ -270,8 +269,10 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 				id: create_uuid(), // TODO shouldnt need to fake, maybe call an internal method directly? or do we want a single path?
 				created: get_datetime_now(),
 				method: 'filer_change',
-				change: {type: 'add', path: source_file.id},
-				source_file,
+				params: {
+					change: {type: 'add', path: source_file.id},
+					source_file,
+				},
 			});
 		}
 	}

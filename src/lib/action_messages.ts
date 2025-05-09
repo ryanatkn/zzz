@@ -15,64 +15,72 @@ import {
 	completion_response_action_spec,
 } from '$lib/action_specs.js';
 
-export const ping_action_message = Action_Base.extend({
-	method: z.literal('ping'),
-	params: ping_action_spec.params,
-});
-export type ping_action_message = z.infer<typeof ping_action_message>;
+export const Action_Message = {
+	ping: Action_Base.extend({
+		method: z.literal('ping'),
+		params: ping_action_spec.params,
+	}),
+	pong: Action_Base.extend({
+		method: z.literal('pong'),
+		params: pong_action_spec.params,
+	}),
+	load_session: Action_Base.extend({
+		method: z.literal('load_session'),
+		params: load_session_action_spec.params,
+	}),
+	loaded_session: Action_Base.extend({
+		method: z.literal('loaded_session'),
+		params: loaded_session_action_spec.params,
+	}),
+	filer_change: Action_Base.extend({
+		method: z.literal('filer_change'),
+		params: filer_change_action_spec.params,
+	}),
+	update_diskfile: Action_Base.extend({
+		method: z.literal('update_diskfile'),
+		params: update_diskfile_action_spec.params,
+	}),
+	delete_diskfile: Action_Base.extend({
+		method: z.literal('delete_diskfile'),
+		params: delete_diskfile_action_spec.params,
+	}),
+	create_directory: Action_Base.extend({
+		method: z.literal('create_directory'),
+		params: create_directory_action_spec.params,
+	}),
+	send_prompt: Action_Base.extend({
+		method: z.literal('send_prompt'),
+		params: send_prompt_action_spec.params,
+	}),
+	completion_response: Action_Base.extend({
+		method: z.literal('completion_response'),
+		params: completion_response_action_spec.params,
+	}),
+};
+export interface Action_Message {
+	ping: z.infer<typeof Action_Message.ping>;
+	pong: z.infer<typeof Action_Message.pong>;
+	load_session: z.infer<typeof Action_Message.load_session>;
+	loaded_session: z.infer<typeof Action_Message.loaded_session>;
+	filer_change: z.infer<typeof Action_Message.filer_change>;
+	update_diskfile: z.infer<typeof Action_Message.update_diskfile>;
+	delete_diskfile: z.infer<typeof Action_Message.delete_diskfile>;
+	create_directory: z.infer<typeof Action_Message.create_directory>;
+	send_prompt: z.infer<typeof Action_Message.send_prompt>;
+	completion_response: z.infer<typeof Action_Message.completion_response>;
+}
 
-export const pong_action_message = Action_Base.extend({
-	method: z.literal('pong'),
-	params: pong_action_spec.params,
-});
-export type pong_action_message = z.infer<typeof pong_action_message>;
-
-export const load_session_action_message = Action_Base.extend({
-	method: z.literal('load_session'),
-	params: load_session_action_spec.params,
-});
-export type load_session_action_message = z.infer<typeof load_session_action_message>;
-
-export const loaded_session_action_message = Action_Base.extend({
-	method: z.literal('loaded_session'),
-	params: loaded_session_action_spec.params,
-});
-export type loaded_session_action_message = z.infer<typeof loaded_session_action_message>;
-
-export const filer_change_action_message = Action_Base.extend({
-	method: z.literal('filer_change'),
-	params: filer_change_action_spec.params,
-});
-export type filer_change_action_message = z.infer<typeof filer_change_action_message>;
-
-export const update_diskfile_action_message = Action_Base.extend({
-	method: z.literal('update_diskfile'),
-	params: update_diskfile_action_spec.params,
-});
-export type update_diskfile_action_message = z.infer<typeof update_diskfile_action_message>;
-
-export const delete_diskfile_action_message = Action_Base.extend({
-	method: z.literal('delete_diskfile'),
-	params: delete_diskfile_action_spec.params,
-});
-export type delete_diskfile_action_message = z.infer<typeof delete_diskfile_action_message>;
-
-export const create_directory_action_message = Action_Base.extend({
-	method: z.literal('create_directory'),
-	params: create_directory_action_spec.params,
-});
-export type create_directory_action_message = z.infer<typeof create_directory_action_message>;
-
-export const send_prompt_action_message = Action_Base.extend({
-	method: z.literal('send_prompt'),
-	params: send_prompt_action_spec.params,
-});
-export type send_prompt_action_message = z.infer<typeof send_prompt_action_message>;
-
-export const completion_response_action_message = Action_Base.extend({
-	method: z.literal('completion_response'),
-	params: completion_response_action_spec.params,
-});
-export type completion_response_action_message = z.infer<typeof completion_response_action_message>;
+export interface Action_Message_Params {
+	ping: z.infer<typeof ping_action_spec.params>;
+	pong: z.infer<typeof pong_action_spec.params>;
+	load_session: z.infer<typeof load_session_action_spec.params>;
+	loaded_session: z.infer<typeof loaded_session_action_spec.params>;
+	filer_change: z.infer<typeof filer_change_action_spec.params>;
+	update_diskfile: z.infer<typeof update_diskfile_action_spec.params>;
+	delete_diskfile: z.infer<typeof delete_diskfile_action_spec.params>;
+	create_directory: z.infer<typeof create_directory_action_spec.params>;
+	send_prompt: z.infer<typeof send_prompt_action_spec.params>;
+	completion_response: z.infer<typeof completion_response_action_spec.params>;
+}
 
 // generated by src/lib/action_messages.gen.ts - DO NOT EDIT OR RISK LOST DATA

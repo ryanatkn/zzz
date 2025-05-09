@@ -1,16 +1,10 @@
 import type {Action_Spec, Client_Action_Spec, Service_Action_Spec} from '$lib/action_spec.js';
-import type {Action_Method} from '$lib/action_types.js';
+import type {Action_Method} from '$lib/action_metatypes.js';
 
 /**
  * Convert an action name to its type name.
  */
 export const to_action_spec_identifier = (method: Action_Method): string => `${method}_action_spec`;
-
-/**
- * Convert an action name to its response schema identifier.
- */
-export const to_action_message_identifier = (method: Action_Method): string =>
-	`${method}_action_message`;
 
 /**
  * Convert an action name to its params type name.

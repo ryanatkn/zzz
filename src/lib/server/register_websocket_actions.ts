@@ -101,7 +101,7 @@ export const handle_websocket_message = async (
 
 	let api_result: Api_Result;
 	try {
-		const service_return = await zzz_server.process_action(message.data.name, message.data);
+		const service_return = await zzz_server.process_action(message.data.method, message.data);
 		api_result = service_return_to_api_result(service_return);
 	} catch (error) {
 		console.error('Error processing action:', error);

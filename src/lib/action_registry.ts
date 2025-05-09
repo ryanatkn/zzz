@@ -2,12 +2,12 @@ import {DEV} from 'esm-env';
 import {SvelteMap} from 'svelte/reactivity';
 
 import type {Action_Spec, Service_Action_Spec, Client_Action_Spec} from '$lib/action_spec.js';
-import {Action_Method} from '$lib/action_types.js';
+import {Action_Method} from '$lib/action_metatypes.js';
 import {to_action_spec_identifier} from '$lib/schema_helpers.js';
 
 /**
- * Registry for action specifications that serves as the single source of truth.
- * This provides a centralized registry that can be used both on the client and server.
+ * Lightweight nonreactive class that may be deleted or changed to be reactive.
+ * Inefficiently recalculates with getters.
  */
 export class Action_Registry {
 	/**

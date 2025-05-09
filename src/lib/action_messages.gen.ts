@@ -1,10 +1,6 @@
 import type {Gen} from '@ryanatkn/gro/gen.js';
 
-import {
-	to_action_message_identifier,
-	to_action_spec_identifier,
-	to_action_spec_params_identifier,
-} from '$lib/schema_helpers.js';
+import {to_action_spec_identifier, to_action_spec_params_identifier} from '$lib/schema_helpers.js';
 import {action_specs} from '$lib/action_specs.js';
 import {Action_Registry} from '$lib/action_registry.js';
 
@@ -23,22 +19,38 @@ export const gen: Gen = ({origin_path}) => {
 		import {z} from 'zod';
 		import {Action_Base} from '$lib/action_spec.js';
 		import {${registry.specs
+			// TODO maybe change to `import * as specs`
 			.map((spec) => to_action_spec_identifier(spec.method))
 			.join(', ')}} from '$lib/action_specs.js';
 
-		${registry.specs
-			.map((spec) => {
-				const {method} = spec;
-				const identifier = to_action_message_identifier(method);
-				return `
-					export const ${identifier} = Action_Base.extend({
+		export const Action_Message = {
+			${registry.specs
+				.map((spec) => {
+					const {method} = spec;
+					return `${method}: Action_Base.extend({
 						method: z.literal('${method}'),
 						params: ${to_action_spec_params_identifier(method)},
-					});
-					export type ${identifier} = z.infer<typeof ${identifier}>;
-				`;
-			})
-			.join('\n\n')}
+					})`;
+				})
+				.join(',\n\t\t\t')}
+		};
+		export interface Action_Message {
+			${registry.specs
+				.map((spec) => {
+					const {method} = spec;
+					return `${method}: z.infer<typeof Action_Message.${method}>`;
+				})
+				.join(',\n\t\t\t')}
+		}
+
+		export interface Action_Message_Params {
+			${registry.specs
+				.map((spec) => {
+					const {method} = spec;
+					return `${method}: z.infer<typeof ${to_action_spec_params_identifier(method)}>`;
+				})
+				.join(',\n\t\t\t')}
+		}
 
 		// ${banner}
 	`;

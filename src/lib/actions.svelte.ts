@@ -1,8 +1,10 @@
 import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Action, Action_Json, Action_Schema, create_action_json} from '$lib/action.svelte.js';
-import {Action_Method} from '$lib/action_types.js';
+import {Action, Action_Schema} from '$lib/action.svelte.js';
+import {Action_Json} from '$lib/action_types.js';
+import {create_action_json} from '$lib/action_helpers.js';
+import {Action_Method} from '$lib/action_metatypes.js';
 import type {Action_Client, Action_Server} from '$lib/action_collections.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
