@@ -4,7 +4,8 @@ import {resolve} from 'node:path';
 import {Logger} from '@ryanatkn/belt/log.js';
 import {DEV} from 'esm-env';
 
-import {Action_Client, type Action_Server, type Action_Spec} from '$lib/schemas.js';
+import type {Action_Spec} from '$lib/schemas.js';
+import {Action_Client, type Action_Server} from '$lib/action_collections.js';
 import type {Zzz_Config} from '$lib/config_helpers.js';
 import {Zzz_Dir} from '$lib/diskfile_types.js';
 import {Safe_Fs} from '$lib/server/safe_fs.js';
@@ -15,12 +16,12 @@ import {
 } from '$lib/server/service.js';
 import {Api_Error} from '$lib/api.js';
 import {action_specs} from '$lib/schema_metadata.js';
+import type {Action_Name} from '$lib/action_types.js';
 
 /**
  * Function type for handling client messages.
  */
 export type Action_Handler = (
-	// TODO BLOCK this needs to be fixed
 	message: Action_Client,
 	server: Zzz_Server,
 ) => Promise<Service_Return>;
@@ -155,12 +156,12 @@ export class Zzz_Server {
 	 * @param params - Parameters if action_name_or_message is a string, ignored if action_name_or_message is an Action_Client
 	 */
 	async process_action(
-		action_name_or_message: string | Action_Client,
+		action_name_or_message: Action_Name | Action_Client,
 		params?: unknown,
 	): Promise<Service_Return> {
 		this.#check_destroyed();
 
-		let action_name: string;
+		let action_name: Action_Name;
 		let action_params: unknown;
 
 		// TODO BLOCK make this function monomorphic
@@ -169,7 +170,7 @@ export class Zzz_Server {
 			action_name = action_name_or_message;
 			action_params = params;
 		} else {
-			action_name = action_name_or_message.type;
+			action_name = action_name_or_message.name;
 			action_params = action_name_or_message; // The full message is the params
 		}
 

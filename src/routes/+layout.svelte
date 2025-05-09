@@ -27,9 +27,9 @@
 	import create_zzz_config from '$lib/config.js';
 	import {Model_Json} from '$lib/model.svelte.js';
 	import {send_mutations, receive_mutations} from '$lib/mutations.js';
-	import type {Action_Client, Action_Server} from '$lib/schemas.js';
-	import {create_mutation_context} from '$lib/mutation.js';
+	import type {Action_Client, Action_Server} from '$lib/action_collections.js';
 	import type {Actions} from '$lib/action_types.js';
+	import {create_mutation_context} from '$lib/mutation.js';
 
 	interface Props {
 		children: Snippet;
@@ -66,19 +66,19 @@
 		socket_url: PUBLIC_WEBSOCKET_URL,
 		onsend: async (message: Action_Client) => {
 			console.log('[ws] sending message', message);
-			zzz.socket.send({type: 'server_message', message});
+			zzz.socket.send({type: 'server_message', message}); // TODO JSON-RPC
 
 			// TODO dynamic registry?
-			const mutation = send_mutations[message.type]; // TODO think about before/after
+			const mutation = send_mutations[message.name]; // TODO think about before/after
 			if (!mutation) {
 				// Ignore messages with no mutations
-				// console.warn('unknown message type, ignoring:', message.type, message);
+				// console.warn('unknown message name, ignoring:', message.name, message);
 				return;
 			}
 
 			const mutation_context = create_mutation_context(
 				zzz,
-				message.type,
+				message.name,
 				message, // For client actions, params are the full message
 				undefined, // Result is undefined for sending
 				actions,
@@ -90,7 +90,7 @@
 		onreceive: async (message: Action_Server) => {
 			console.log(`[ws] received message`, message);
 
-			const mutation = receive_mutations[message.type];
+			const mutation = receive_mutations[message.name];
 			if (!mutation) {
 				// Ignore messages with no mutations
 				// console.warn('unknown message type, ignoring:', message.type, message);
@@ -99,7 +99,7 @@
 
 			const mutation_context = create_mutation_context(
 				zzz,
-				message.type,
+				message.name,
 				message, // For received actions, params are the full message
 				// TODO BLOCK delete this?
 				{
@@ -146,7 +146,7 @@
 
 	// Initialize the session
 	if (BROWSER) {
-		zzz.actions.send({id: create_uuid(), created: get_datetime_now(), type: 'load_session'});
+		zzz.actions.send({id: create_uuid(), created: get_datetime_now(), name: 'load_session'});
 	}
 
 	// TODO refactor, maybe per route?

@@ -2,14 +2,9 @@ import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {get_datetime_now, Uuid} from '$lib/zod_helpers.js';
-import {
-	Action_Direction,
-	Action_Name,
-	Completion_Response,
-	Completion_Request,
-	Action_Client,
-	Action_Server,
-} from '$lib/schemas.js';
+import {Action_Direction, Completion_Response, Completion_Request} from '$lib/schemas.js';
+import {Action_Name} from '$lib/action_types.js';
+import type {Action_Client, Action_Server} from '$lib/action_collections.js';
 import {Diskfile_Change, Diskfile_Path, Source_File} from '$lib/diskfile_types.js';
 import {to_completion_response_text} from '$lib/response_helpers.js';
 import {to_preview} from '$lib/helpers.js';
@@ -34,7 +29,7 @@ export const action_directions: Record<string, Action_Direction> = {
 	create_directory: 'client',
 };
 
-// TODO BLOCK  this is the wrong kind of action?
+// TODO BLOCK replace with the actions proxy
 // Helper function to create an action with json representation
 export const create_action_json = (
 	action: Action_Client | Action_Server,
@@ -90,7 +85,9 @@ export class Action extends Cell<typeof Action_Json> {
 
 	readonly display_name: string = $derived(`${this.name} (${this.direction})`);
 
-	// TODO maybe change these to be located on `this.type` as a `Action_Name_Name` class which JSON serializes to the string `Action_Name` but at runtime has properties like these:
+	// TODO maybe change these to be located on `this.name` as a `Action_Name_Name` class
+	// which JSON serializes to the string `Action_Name`
+	// but at runtime has properties like these:
 	readonly is_ping: boolean = $derived(this.name === 'ping');
 	readonly is_pong: boolean = $derived(this.name === 'pong');
 	readonly is_prompt: boolean = $derived(this.name === 'send_prompt');

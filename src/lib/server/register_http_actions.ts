@@ -1,5 +1,5 @@
 import {Hono, type Handler} from 'hono';
-import {unreachable} from '@ryanatkn/belt/error.js';
+import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 
 import type {Zzz_Server} from '$lib/server/zzz_server.js';
 import type {Action_Spec} from '$lib/schemas.js';
@@ -86,7 +86,7 @@ export const register_http_actions = ({
 			case 'TRACE':
 				throw new Api_Error(500, `Unsupported HTTP method ${method} for action ${name}`);
 			default:
-				unreachable(method);
+				throw new Unreachable_Error(method);
 		}
 	}
 };

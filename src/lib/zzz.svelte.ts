@@ -9,10 +9,9 @@ import {strip_end, strip_start} from '@ryanatkn/belt/string.js';
 import type {
 	Action_Send_Prompt,
 	Action_Completion_Response,
-	Action_Client,
-	Action_Server,
 	Action_Loaded_Session,
 } from '$lib/schemas.js';
+import type {Action_Client, Action_Server} from '$lib/action_collections.js';
 import {Provider, type Provider_Json} from '$lib/provider.svelte.js';
 import type {Provider_Name} from '$lib/provider_types.js';
 import {Uuid, create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
@@ -220,7 +219,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		const message: Action_Send_Prompt = {
 			id: request_id,
 			created,
-			type: 'send_prompt',
+			name: 'send_prompt',
 			completion_request: {
 				created,
 				request_id,
@@ -263,7 +262,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 			this.diskfiles.handle_change({
 				id: create_uuid(), // TODO shouldnt need to fake, maybe call an internal method directly? or do we want a single path?
 				created: get_datetime_now(),
-				type: 'filer_change',
+				name: 'filer_change',
 				change: {type: 'add', path: source_file.id},
 				source_file,
 			});

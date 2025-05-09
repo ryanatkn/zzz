@@ -10,22 +10,22 @@ import type {
 } from '$lib/server/service.js';
 import type {Mutation} from '$lib/mutation.js';
 import type {
-	completion_response_Params,
-	completion_response_Response,
-	create_directory_Params,
-	delete_diskfile_Params,
-	filer_change_Params,
-	filer_change_Response,
-	load_session_Params,
-	load_session_Response,
-	loaded_session_Params,
-	loaded_session_Response,
-	ping_Params,
-	ping_Response,
-	pong_Params,
-	pong_Response,
-	send_prompt_Params,
-	update_diskfile_Params,
+	Completion_Response_Action_Params,
+	Completion_Response_Action_Response,
+	Create_Directory_Action_Params,
+	Delete_Diskfile_Action_Params,
+	Filer_Change_Action_Params,
+	Filer_Change_Action_Response,
+	Load_Session_Action_Params,
+	Load_Session_Action_Response,
+	Loaded_Session_Action_Params,
+	Loaded_Session_Action_Response,
+	Ping_Action_Params,
+	Ping_Action_Response,
+	Pong_Action_Params,
+	Pong_Action_Response,
+	Send_Prompt_Action_Params,
+	Update_Diskfile_Action_Params,
 } from '$lib/schemas.js';
 
 /**
@@ -57,7 +57,7 @@ export type Service_Action_Name =
 	| 'pong';
 
 /**
- * Names of all client-only actions
+ * Names of all client-only actions.
  */
 export type Client_Action_Name =
 	| 'create_directory'
@@ -66,136 +66,100 @@ export type Client_Action_Name =
 	| 'update_diskfile';
 
 /**
- * Maps action names to their parameter types
+ * Maps action names to their parameter types.
  */
 export interface Action_Params_By_Name {
-	completion_response: completion_response_Params;
-	create_directory: create_directory_Params;
-	delete_diskfile: delete_diskfile_Params;
-	filer_change: filer_change_Params;
-	load_session: load_session_Params;
-	loaded_session: loaded_session_Params;
-	ping: ping_Params;
-	pong: pong_Params;
-	send_prompt: send_prompt_Params;
-	update_diskfile: update_diskfile_Params;
+	completion_response: Completion_Response_Action_Params;
+	create_directory: Create_Directory_Action_Params;
+	delete_diskfile: Delete_Diskfile_Action_Params;
+	filer_change: Filer_Change_Action_Params;
+	load_session: Load_Session_Action_Params;
+	loaded_session: Loaded_Session_Action_Params;
+	ping: Ping_Action_Params;
+	pong: Pong_Action_Params;
+	send_prompt: Send_Prompt_Action_Params;
+	update_diskfile: Update_Diskfile_Action_Params;
 }
 
 /**
- * Maps action names to their response types (server actions only)
+ * Maps action names to their response types (server actions only).
  */
 export interface Action_Response_By_Name {
-	completion_response: completion_response_Response;
-	filer_change: filer_change_Response;
-	load_session: load_session_Response;
-	loaded_session: loaded_session_Response;
-	ping: ping_Response;
-	pong: pong_Response;
+	completion_response: Completion_Response_Action_Response;
+	filer_change: Filer_Change_Action_Response;
+	load_session: Load_Session_Action_Response;
+	loaded_session: Loaded_Session_Action_Response;
+	ping: Ping_Action_Response;
+	pong: Pong_Action_Response;
 }
 
 /**
- * Maps action names to their service implementations
+ * Maps action names to their service implementations.
  */
 export interface Service_By_Name {
 	completion_response: Non_Authenticated_Service<
-		completion_response_Params,
-		Service_Return<completion_response_Response>
+		Completion_Response_Action_Params,
+		Service_Return<Completion_Response_Action_Response>
 	>;
 	filer_change: Non_Authenticated_Service<
-		filer_change_Params,
-		Service_Return<filer_change_Response>
+		Filer_Change_Action_Params,
+		Service_Return<Filer_Change_Action_Response>
 	>;
 	load_session: Non_Authenticated_Service<
-		load_session_Params,
-		Service_Return<load_session_Response>
+		Load_Session_Action_Params,
+		Service_Return<Load_Session_Action_Response>
 	>;
 	loaded_session: Non_Authenticated_Service<
-		loaded_session_Params,
-		Service_Return<loaded_session_Response>
+		Loaded_Session_Action_Params,
+		Service_Return<Loaded_Session_Action_Response>
 	>;
-	ping: Non_Authenticated_Service<ping_Params, Service_Return<ping_Response>>;
-	pong: Non_Authenticated_Service<pong_Params, Service_Return<pong_Response>>;
+	ping: Non_Authenticated_Service<Ping_Action_Params, Service_Return<Ping_Action_Response>>;
+	pong: Non_Authenticated_Service<Pong_Action_Params, Service_Return<Pong_Action_Response>>;
 }
 
 /**
- * Interface for action dispatch functions
+ * Interface for action dispatch functions.
  */
 export interface Actions {
 	completion_response: (
-		params: completion_response_Params,
-	) => Promise<Api_Result<Action_Completion_Response_Response>>;
-	create_directory: (params: create_directory_Params) => Promise<string>;
-	delete_diskfile: (params: delete_diskfile_Params) => Promise<string>;
-	filer_change: (params: filer_change_Params) => Promise<Api_Result<Filer_Change_Action_Response>>;
+		params: Completion_Response_Action_Params,
+	) => Promise<Api_Result<Completion_Response_Action_Response>>;
+	create_directory: (params: Create_Directory_Action_Params) => Promise<string>;
+	delete_diskfile: (params: Delete_Diskfile_Action_Params) => Promise<string>;
+	filer_change: (
+		params: Filer_Change_Action_Params,
+	) => Promise<Api_Result<Filer_Change_Action_Response>>;
 	load_session: () => Promise<Api_Result<Load_Session_Action_Response>>;
 	loaded_session: (
-		params: loaded_session_Params,
+		params: Loaded_Session_Action_Params,
 	) => Promise<Api_Result<Loaded_Session_Action_Response>>;
 	ping: () => Promise<Api_Result<Ping_Action_Response>>;
-	pong: (params: pong_Params) => Promise<Api_Result<Pong_Action_Response>>;
-	send_prompt: (params: send_prompt_Params) => Promise<string>;
-	update_diskfile: (params: update_diskfile_Params) => Promise<string>;
+	pong: (params: Pong_Action_Params) => Promise<Api_Result<Pong_Action_Response>>;
+	send_prompt: (params: Send_Prompt_Action_Params) => Promise<string>;
+	update_diskfile: (params: Update_Diskfile_Action_Params) => Promise<string>;
 }
 
 /**
- * Interface for client-side mutation handlers
+ * Interface for client-side mutation handlers.
  */
 export interface Mutations {
 	[key: string]: Mutation | undefined;
 	completion_response?: Mutation<
-		completion_response_Params,
-		Api_Result<completion_response_Response>
+		Completion_Response_Action_Params,
+		Api_Result<Completion_Response_Action_Response>
 	>;
-	create_directory?: Mutation<create_directory_Params, void>;
-	delete_diskfile?: Mutation<delete_diskfile_Params, void>;
-	filer_change?: Mutation<filer_change_Params, Api_Result<filer_change_Response>>;
-	load_session?: Mutation<load_session_Params, Api_Result<load_session_Response>>;
-	loaded_session?: Mutation<loaded_session_Params, Api_Result<loaded_session_Response>>;
-	ping?: Mutation<ping_Params, Api_Result<ping_Response>>;
-	pong?: Mutation<pong_Params, Api_Result<pong_Response>>;
-	send_prompt?: Mutation<send_prompt_Params, void>;
-	update_diskfile?: Mutation<update_diskfile_Params, void>;
+	create_directory?: Mutation<Create_Directory_Action_Params, void>;
+	delete_diskfile?: Mutation<Delete_Diskfile_Action_Params, void>;
+	filer_change?: Mutation<Filer_Change_Action_Params, Api_Result<Filer_Change_Action_Response>>;
+	load_session?: Mutation<Load_Session_Action_Params, Api_Result<Load_Session_Action_Response>>;
+	loaded_session?: Mutation<
+		Loaded_Session_Action_Params,
+		Api_Result<Loaded_Session_Action_Response>
+	>;
+	ping?: Mutation<Ping_Action_Params, Api_Result<Ping_Action_Response>>;
+	pong?: Mutation<Pong_Action_Params, Api_Result<Pong_Action_Response>>;
+	send_prompt?: Mutation<Send_Prompt_Action_Params, void>;
+	update_diskfile?: Mutation<Update_Diskfile_Action_Params, void>;
 }
-
-/**
- * Client-only actions for discriminated union
- */
-export const Action_Client = z.discriminatedUnion('type', [
-	Action_Create_directory,
-	Action_Delete_diskfile,
-	Action_Send_prompt,
-	Action_Update_diskfile,
-]);
-export type Action_Client = z.infer<typeof Action_Client>;
-
-/**
- * Server-only actions for discriminated union
- */
-export const Action_Server = z.discriminatedUnion('type', [
-	Action_Completion_response,
-	Action_Filer_change,
-	Action_Load_session,
-	Action_Loaded_session,
-	Action_Ping,
-	Action_Pong,
-]);
-export type Action_Server = z.infer<typeof Action_Server>;
-
-/**
- * All action types combined for discriminated union
- */
-export const Action_Any = z.discriminatedUnion('type', [
-	Action_Create_directory,
-	Action_Delete_diskfile,
-	Action_Send_prompt,
-	Action_Update_diskfile,
-	Action_Completion_response,
-	Action_Filer_change,
-	Action_Load_session,
-	Action_Loaded_session,
-	Action_Ping,
-	Action_Pong,
-]);
-export type Action_Any = z.infer<typeof Action_Any>;
 
 // generated by src/lib/action_types.gen.ts - DO NOT EDIT OR RISK LOST DATA

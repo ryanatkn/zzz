@@ -33,8 +33,8 @@
 			// TODO @many rework API to avoid casting
 			sort_by_numeric<Action>('created_newest', 'newest first', 'created_date', 'desc'),
 			sort_by_numeric<Action>('created_oldest', 'oldest first', 'created_date', 'asc'),
-			sort_by_text<Action>('type_asc', 'type (a-z)', 'type'),
-			sort_by_text<Action>('type_desc', 'type (z-a)', 'type', 'desc'),
+			sort_by_text<Action>('name_asc', 'name (a-z)', 'name'),
+			sort_by_text<Action>('name_desc', 'name (z-a)', 'name', 'desc'),
 		]}
 		sort_key_default="created_newest"
 		show_sort_controls={true}

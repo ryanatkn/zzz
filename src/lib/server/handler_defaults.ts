@@ -13,11 +13,8 @@ import {format_file} from '@ryanatkn/gro/format_file.js';
 import type {Watcher_Change} from '@ryanatkn/gro/watch_dir.js';
 import {DEV} from 'esm-env';
 
-import {
-	type Action_Client,
-	type Action_Completion_Response,
-	type Action_Send_Prompt,
-} from '$lib/schemas.js';
+import {type Action_Completion_Response, type Action_Send_Prompt} from '$lib/schemas.js';
+import {type Action_Client} from '$lib/action_types.js';
 import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
 import {Diskfile_Path, Source_File, type Zzz_Dir} from '$lib/diskfile_types.js';
 import {map_watcher_change_to_diskfile_change} from '$lib/diskfile_helpers.js';
@@ -289,7 +286,7 @@ export const handle_filer_change = (
 	server.send({
 		id: create_uuid(),
 		created: get_datetime_now(),
-		type: 'filer_change',
+		name: 'filer_change',
 		change: api_change,
 		source_file: parsed_source_file,
 	});

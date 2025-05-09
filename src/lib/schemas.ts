@@ -88,7 +88,7 @@ export const Action_Base = z
 	.object({
 		id: Uuid_With_Default,
 		created: Datetime_Now,
-		type: Action_Name,
+		name: Action_Name,
 	})
 	.strict();
 export type Action_Base = z.infer<typeof Action_Base>;
@@ -110,6 +110,9 @@ export const Service_Action_Spec = Action_Spec_Base_Schema.extend({
 	method: z.union([z.custom<Http_Method>(), z.null()]),
 	auth: z.union([z.literal('authenticate'), z.literal('authorize'), z.null()]),
 	response: z.instanceof(z.ZodType),
+	// TODO some things like cant/shouldnt be done over websockets,
+	// e.g. login/logout for cookies, but then maybe cookies should be the declarative property?
+	// websockets: z.boolean().optional().default(false),
 });
 export type Service_Action_Spec = z.infer<typeof Service_Action_Spec>;
 
@@ -202,9 +205,9 @@ export const Completion_Response_Action_Params = z
 	.strict();
 export type Completion_Response_Action_Params = z.infer<typeof Completion_Response_Action_Params>;
 
-export const Action_Completion_Response_Response = z.null();
-export type Action_Completion_Response_Response = z.infer<
-	typeof Action_Completion_Response_Response
+export const Completion_Response_Action_Response = z.null();
+export type Completion_Response_Action_Response = z.infer<
+	typeof Completion_Response_Action_Response
 >;
 
 export const ping_action_spec = {
@@ -291,28 +294,28 @@ export const completion_response_action_spec = {
 	method: 'GET',
 	auth: null,
 	params: Completion_Response_Action_Params,
-	response: Action_Completion_Response_Response,
-	returns: 'Api_Result<Action_Completion_Response_Response>',
+	response: Completion_Response_Action_Response,
+	returns: 'Api_Result<Completion_Response_Action_Response>',
 } satisfies Service_Action_Spec;
 
 export const Action_Ping = Action_Base.extend({
-	type: z.literal('ping').default('ping'),
+	name: z.literal('ping').default('ping'),
 }).strict();
 export type Action_Ping = z.infer<typeof Action_Ping>;
 
 export const Action_Pong = Action_Base.extend({
-	type: z.literal('pong').default('pong'),
+	name: z.literal('pong').default('pong'),
 	ping_id: Uuid_With_Default,
 }).strict();
 export type Action_Pong = z.infer<typeof Action_Pong>;
 
 export const Action_Load_Session = Action_Base.extend({
-	type: z.literal('load_session').default('load_session'),
+	name: z.literal('load_session').default('load_session'),
 }).strict();
 export type Action_Load_Session = z.infer<typeof Action_Load_Session>;
 
 export const Action_Loaded_Session = Action_Base.extend({
-	type: z.literal('loaded_session').default('loaded_session'),
+	name: z.literal('loaded_session').default('loaded_session'),
 	data: z
 		.object({
 			zzz_dir: Zzz_Dir,
@@ -323,39 +326,39 @@ export const Action_Loaded_Session = Action_Base.extend({
 export type Action_Loaded_Session = z.infer<typeof Action_Loaded_Session>;
 
 export const Action_Filer_Change = Action_Base.extend({
-	type: z.literal('filer_change').default('filer_change'),
+	name: z.literal('filer_change').default('filer_change'),
 	change: Diskfile_Change,
 	source_file: Source_File,
 }).strict();
 export type Action_Filer_Change = z.infer<typeof Action_Filer_Change>;
 
 export const Action_Update_Diskfile = Action_Base.extend({
-	type: z.literal('update_diskfile').default('update_diskfile'),
+	name: z.literal('update_diskfile').default('update_diskfile'),
 	path: Diskfile_Path,
 	content: z.string(),
 }).strict();
 export type Action_Update_Diskfile = z.infer<typeof Action_Update_Diskfile>;
 
 export const Action_Delete_Diskfile = Action_Base.extend({
-	type: z.literal('delete_diskfile').default('delete_diskfile'),
+	name: z.literal('delete_diskfile').default('delete_diskfile'),
 	path: Diskfile_Path,
 }).strict();
 export type Action_Delete_Diskfile = z.infer<typeof Action_Delete_Diskfile>;
 
 export const Action_Create_Directory = Action_Base.extend({
-	type: z.literal('create_directory').default('create_directory'),
+	name: z.literal('create_directory').default('create_directory'),
 	path: Diskfile_Path,
 }).strict();
 export type Action_Create_Directory = z.infer<typeof Action_Create_Directory>;
 
 export const Action_Send_Prompt = Action_Base.extend({
-	type: z.literal('send_prompt').default('send_prompt'),
+	name: z.literal('send_prompt').default('send_prompt'),
 	completion_request: Completion_Request,
 }).strict();
 export type Action_Send_Prompt = z.infer<typeof Action_Send_Prompt>;
 
 export const Action_Completion_Response = Action_Base.extend({
-	type: z.literal('completion_response').default('completion_response'),
+	name: z.literal('completion_response').default('completion_response'),
 	completion_response: Completion_Response,
 }).strict();
 export type Action_Completion_Response = z.infer<typeof Action_Completion_Response>;

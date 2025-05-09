@@ -1,6 +1,6 @@
 import type {Api_Result} from '$lib/api.js';
-import type {Actions} from '$lib/action_types.js';
-import type {App} from '$lib/app.svelte.js';
+import type {Action_Name, Actions} from '$lib/action_types.js';
+import type {Zzz} from '$lib/zzz.svelte.js';
 
 /**
  * Client-side mutation system for handling action responses.
@@ -12,11 +12,12 @@ import type {App} from '$lib/app.svelte.js';
 export interface Mutation_Context<
 	T_Params = unknown,
 	T_Result extends Api_Result<unknown> | void = any,
+	// T_App = Zzz,  // TODO think about extending this everywhere
 > {
 	/** Reference to the main application instance. */
-	zzz: App;
+	zzz: Zzz;
 	/** Name of the action being performed. */
-	action_name: string;
+	action_name: Action_Name;
 	/** Parameters passed to the action. */
 	params: T_Params;
 	/** Result returned from the server. */
@@ -54,8 +55,8 @@ export const create_mutation_context = <
 	T_Params = unknown,
 	T_Result extends Api_Result<unknown> | void = any,
 >(
-	zzz: App,
-	action_name: string,
+	zzz: Zzz,
+	action_name: Action_Name,
 	params: T_Params,
 	result: T_Result,
 	actions: Actions, // TODO @many generic probably

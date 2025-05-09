@@ -139,7 +139,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 		this.zzz.actions.send({
 			created: get_datetime_now(),
 			id: create_uuid(),
-			type: 'update_diskfile',
+			name: 'update_diskfile',
 			path,
 			content,
 		});
@@ -149,7 +149,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 		this.zzz.actions.send({
 			created: get_datetime_now(),
 			id: create_uuid(),
-			type: 'delete_diskfile',
+			name: 'delete_diskfile',
 			path,
 		});
 	}
@@ -177,7 +177,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 		this.zzz.actions.send({
 			id: create_uuid(),
 			created: get_datetime_now(),
-			type: 'create_directory',
+			name: 'create_directory',
 			path,
 		});
 	}

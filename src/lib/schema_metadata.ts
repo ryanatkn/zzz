@@ -1,14 +1,12 @@
 import type {z} from 'zod';
 import type {Flavored} from '@ryanatkn/belt/types.js';
-import {unreachable} from '@ryanatkn/belt/error.js';
+import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 
 import * as schemas from '$lib/schemas.js';
-import type {
-	Action_Spec,
-	Action_Name,
-	Client_Action_Spec,
-	Service_Action_Spec,
-} from '$lib/schemas.js';
+import type {Action_Spec, Client_Action_Spec, Service_Action_Spec} from '$lib/schemas.js';
+import type {Action_Name} from '$lib/action_types.js';
+
+// TODO BLOCK refactor with `schema_registry.ts`
 
 export type Vocab_Name = Flavored<string, 'Vocab_Name'>;
 
@@ -105,7 +103,7 @@ export const add_schema = (name: Vocab_Name, schema: Action_Spec | z.ZodTypeAny)
 				client_action_specs.push(schema);
 				break;
 			default:
-				unreachable(schema, `Unknown action type: ${(schema as any).type}`);
+				throw new Unreachable_Error(schema, `Unknown action type: ${(schema as any).type}`);
 		}
 	} // else some other value exported from the module, intentionally not encoded in the helper type
 };
@@ -149,6 +147,6 @@ for (const name in schemas) {
 // 		case 'Client_Action':
 // 			break;
 // 		default:
-// 			unreachable(spec, `Unknown action type: ${(spec as any).type}`);
+// 			throw new Unreachable_Error(spec, `Unknown action type: ${(spec as any).type}`);
 // 	}
 // }
