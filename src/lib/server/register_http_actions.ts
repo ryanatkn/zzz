@@ -5,8 +5,8 @@ import type {Zzz_Server} from '$lib/server/zzz_server.js';
 import type {Action_Spec} from '$lib/schemas.js';
 import {service_return_to_api_result} from '$lib/server/service.js';
 import {API_ROUTE} from '$lib/constants.js';
-import {to_api_path} from '$lib/schema_helpers.js';
 import {Api_Error, to_failed_api_result} from '$lib/api.js';
+import {Path_With_Trailing_Slash} from '$lib/zod_helpers.js';
 
 export interface Register_Actions_Options {
 	app: Hono;
@@ -30,9 +30,9 @@ export const register_http_actions = ({
 
 		const {name, method} = spec;
 
-		// Generate lowercase API path
-		const action_path = to_api_path(name);
-		const path = `${base_path}/${action_path}`;
+		const parsed_base_path = Path_With_Trailing_Slash.parse(base_path); // let it fail right?
+
+		const path = parsed_base_path + name;
 
 		if (!method) continue;
 

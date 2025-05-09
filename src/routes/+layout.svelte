@@ -68,6 +68,7 @@
 			console.log('[ws] sending message', message);
 			zzz.socket.send({type: 'server_message', message});
 
+			// TODO dynamic registry?
 			const mutation = send_mutations[message.type]; // TODO think about before/after
 			if (!mutation) {
 				// Ignore messages with no mutations

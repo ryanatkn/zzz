@@ -52,9 +52,9 @@
 				transition:slide
 			>
 				<div class="font_weight_400 display_flex align_items_center gap_xs w_100">
-					<Glyph glyph={get_icon_for_action_type(action.type)} />
+					<Glyph glyph={get_icon_for_action_type(action.name)} />
 					<Glyph glyph={get_direction_icon(action.direction)} />
-					<span class="font_family_mono flex_1">{action.type}</span>
+					<span class="font_family_mono flex_1">{action.name}</span>
 					<small class="font_family_mono ml_auto">{action.created_formatted_time}</small>
 				</div>
 

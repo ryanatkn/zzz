@@ -1,13 +1,13 @@
 /**
  * Converts an action name to its params type name
- * Example: "Action_Ping" -> "Action_Ping_Params"
+ * Example: "Action_Ping" -> "Ping_Action_Params"
  */
 export const to_action_params_name = (name: string): string =>
 	capitalize_identifier(name) + '_Params';
 
 /**
  * Converts an action name to its response type name
- * Example: "Action_Ping" -> "Action_Ping_Response"
+ * Example: "Action_Ping" -> "Ping_Action_Response"
  */
 export const to_action_response_name = (name: string): string =>
 	capitalize_identifier(name) + '_Response';

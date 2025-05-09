@@ -175,8 +175,7 @@ export class Zzz_Server {
 
 		// Find the action spec
 		// TODO BLOCK lookup O(1), probably a registry class?
-		const spec_name = action_name === 'ping' ? 'Action_Ping' : action_name; //to_api_path(action_name);
-		const spec = this.action_specs.find((s) => s.name === spec_name);
+		const spec = this.action_specs.find((s) => s.name === action_name);
 		if (!spec) {
 			throw new Api_Error(400, `unknown action: ${action_name}`);
 		}

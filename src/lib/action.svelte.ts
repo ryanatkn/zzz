@@ -4,10 +4,11 @@ import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {get_datetime_now, Uuid} from '$lib/zod_helpers.js';
 import {
 	Action_Direction,
-	Action_Type,
+	Action_Name,
 	Completion_Response,
 	Completion_Request,
-	type Action_Any,
+	Action_Client,
+	Action_Server,
 } from '$lib/schemas.js';
 import {Diskfile_Change, Diskfile_Path, Source_File} from '$lib/diskfile_types.js';
 import {to_completion_response_text} from '$lib/response_helpers.js';
@@ -36,7 +37,7 @@ export const action_directions: Record<string, Action_Direction> = {
 // TODO BLOCK  this is the wrong kind of action?
 // Helper function to create an action with json representation
 export const create_action_json = (
-	action: Action_Any,
+	action: Action_Client | Action_Server,
 	direction: Action_Direction,
 ): Action_Json => {
 	return {
@@ -48,11 +49,11 @@ export const create_action_json = (
 
 // TODO remove?
 // Helper to get the direction for an action
-export const get_action_direction = (type: Action_Type): Action_Direction =>
+export const get_action_direction = (type: Action_Name): Action_Direction =>
 	action_directions[type];
 
 export const Action_Json = Cell_Json.extend({
-	type: Action_Type,
+	name: Action_Name,
 	direction: Action_Direction,
 	// Optional fields with proper type checking
 	ping_id: Uuid.optional(),
@@ -74,7 +75,7 @@ export interface Action_Options extends Cell_Options<typeof Action_Json> {} // e
 // but then another for dynamic usage? is there even such a thing of an action changing?
 // if not shouldn't we just remove the $state below?
 export class Action extends Cell<typeof Action_Json> {
-	type: Action_Type = $state()!;
+	name: Action_Name = $state()!;
 	direction: Action_Direction = $state()!;
 
 	// Store data based on action type
@@ -87,20 +88,20 @@ export class Action extends Cell<typeof Action_Json> {
 	change: Diskfile_Change | undefined = $state();
 	source_file: Source_File | undefined = $state();
 
-	readonly display_name: string = $derived(`${this.type} (${this.direction})`);
+	readonly display_name: string = $derived(`${this.name} (${this.direction})`);
 
-	// TODO maybe change these to be located on `this.type` as a `Action_Type_Name` class which JSON serializes to the string `Action_Type` but at runtime has properties like these:
-	readonly is_ping: boolean = $derived(this.type === 'ping');
-	readonly is_pong: boolean = $derived(this.type === 'pong');
-	readonly is_prompt: boolean = $derived(this.type === 'send_prompt');
-	readonly is_completion: boolean = $derived(this.type === 'completion_response');
+	// TODO maybe change these to be located on `this.type` as a `Action_Name_Name` class which JSON serializes to the string `Action_Name` but at runtime has properties like these:
+	readonly is_ping: boolean = $derived(this.name === 'ping');
+	readonly is_pong: boolean = $derived(this.name === 'pong');
+	readonly is_prompt: boolean = $derived(this.name === 'send_prompt');
+	readonly is_completion: boolean = $derived(this.name === 'completion_response');
 	readonly is_session: boolean = $derived(
-		this.type === 'load_session' || this.type === 'loaded_session',
+		this.name === 'load_session' || this.name === 'loaded_session',
 	);
 	readonly is_file_related: boolean = $derived(
-		this.type === 'update_diskfile' ||
-			this.type === 'delete_diskfile' ||
-			this.type === 'filer_change',
+		this.name === 'update_diskfile' ||
+			this.name === 'delete_diskfile' ||
+			this.name === 'filer_change',
 	);
 
 	readonly prompt_data: Completion_Request | null = $derived(
@@ -138,12 +139,12 @@ export class Action extends Cell<typeof Action_Json> {
 		// Initialize decoders with type-specific handlers
 		this.decoders = {
 			completion_request: (value) =>
-				this.type === 'send_prompt' ? Completion_Request.parse(value) : undefined,
+				this.name === 'send_prompt' ? Completion_Request.parse(value) : undefined,
 			completion_response: (value) =>
-				this.type === 'completion_response' ? Completion_Response.parse(value) : undefined,
-			ping_id: (value) => (this.type === 'pong' ? Uuid.parse(value) : undefined),
+				this.name === 'completion_response' ? Completion_Response.parse(value) : undefined,
+			ping_id: (value) => (this.name === 'pong' ? Uuid.parse(value) : undefined),
 			path: (value) =>
-				this.type === 'update_diskfile' || this.type === 'delete_diskfile'
+				this.name === 'update_diskfile' || this.name === 'delete_diskfile'
 					? Diskfile_Path.parse(value)
 					: undefined,
 		};

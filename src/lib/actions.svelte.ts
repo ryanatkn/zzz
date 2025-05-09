@@ -2,7 +2,7 @@ import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Action, Action_Json, Action_Schema, create_action_json} from '$lib/action.svelte.js';
-import {type Action_Client, type Action_Server, Action_Type} from '$lib/schemas.js';
+import {type Action_Client, type Action_Server, Action_Name} from '$lib/schemas.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {create_multi_index} from '$lib/indexed_collection_helpers.js';
@@ -32,8 +32,8 @@ export class Actions extends Cell<typeof Actions_Json> {
 		indexes: [
 			create_multi_index({
 				key: 'by_type',
-				extractor: (action) => action.type,
-				query_schema: Action_Type,
+				extractor: (action) => action.name,
+				query_schema: Action_Name,
 				result_schema: Action_Schema,
 			}),
 		],
@@ -140,7 +140,7 @@ export class Actions extends Cell<typeof Actions_Json> {
 	 * @param limit Maximum number of actions to return (defaults to history_limit)
 	 * @returns Array of actions matching the type
 	 */
-	get_latest_by_type(type: Action_Type, limit: number = this.history_limit): Array<Action> {
+	get_latest_by_type(type: Action_Name, limit: number = this.history_limit): Array<Action> {
 		return this.items.latest('by_type', type, limit);
 	}
 

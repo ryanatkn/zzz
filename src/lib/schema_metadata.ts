@@ -5,7 +5,7 @@ import {unreachable} from '@ryanatkn/belt/error.js';
 import * as schemas from '$lib/schemas.js';
 import type {
 	Action_Spec,
-	Action_Spec_Name,
+	Action_Name,
 	Client_Action_Spec,
 	Service_Action_Spec,
 } from '$lib/schemas.js';
@@ -39,7 +39,7 @@ export const service_action_specs: Array<Service_Action_Spec> = [];
 /**
  * Map of action spec names to action specs
  */
-export const action_spec_by_name: Map<Action_Spec_Name, Action_Spec> = new Map();
+export const action_spec_by_name: Map<Action_Name, Action_Spec> = new Map();
 
 /**
  * Collection of action parameter schemas
@@ -136,7 +136,7 @@ for (const name in schemas) {
 // /**
 //  * Map of action spec names to action specs
 //  */
-// export const action_spec_by_name: Map<Action_Spec_Name, Action_Spec> = new Map();
+// export const action_spec_by_name: Map<Action_Name, Action_Spec> = new Map();
 
 // /**
 //  * Initialize the registries with action specs

@@ -1,8 +1,22 @@
 import {z} from 'zod';
 import {EMPTY_ARRAY} from '@ryanatkn/belt/array.js';
 import {SvelteMap} from 'svelte/reactivity';
+import {ensure_end, ensure_start, strip_end, strip_start} from '@ryanatkn/belt/string.js';
 
 export const Any = z.any();
+
+// TODO upstream, belt?
+export const Path_With_Trailing_Slash = z.string().transform((v) => ensure_end(v, '/'));
+export type Path_With_Trailing_Slash = z.infer<typeof Path_With_Trailing_Slash>;
+
+export const Path_Without_Trailing_Slash = z.string().transform((v) => strip_end(v, '/'));
+export type Path_Without_Trailing_Slash = z.infer<typeof Path_Without_Trailing_Slash>;
+
+export const Path_With_Leading_Slash = z.string().transform((v) => ensure_start(v, '/'));
+export type Path_With_Leading_Slash = z.infer<typeof Path_With_Leading_Slash>;
+
+export const Path_Without_Leading_Slash = z.string().transform((v) => strip_start(v, '/'));
+export type Path_Without_Leading_Slash = z.infer<typeof Path_Without_Leading_Slash>;
 
 export const Svelte_Map_Schema = z.custom<SvelteMap<any, any>>((val) => val instanceof SvelteMap);
 
