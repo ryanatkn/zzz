@@ -155,11 +155,11 @@ export class Project_Viewmodel {
 			zzz: this.projects.zzz,
 			json: {
 				id: domain_id,
+				created,
+				updated: created,
 				name: '',
 				status: 'pending',
 				ssl: false,
-				created,
-				updated: created,
 			},
 		});
 

@@ -30,6 +30,8 @@ export const register_http_actions = ({
 
 		const {method, http_method} = spec;
 
+		if (!http_method) continue;
+
 		const parsed_base_path = Path_With_Trailing_Slash.parse(base_path); // let it fail right?
 
 		const path = parsed_base_path + method;

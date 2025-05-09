@@ -695,10 +695,6 @@ export const package_json = {
 			types: './dist/schema_helpers.d.ts',
 			default: './dist/schema_helpers.js',
 		},
-		'./schema_metadata.js': {
-			types: './dist/schema_metadata.d.ts',
-			default: './dist/schema_metadata.js',
-		},
 		'./schemas.js': {types: './dist/schemas.d.ts', default: './dist/schemas.js'},
 		'./scrollable.svelte.js': {
 			types: './dist/scrollable.svelte.d.ts',
@@ -1853,24 +1849,6 @@ export const src_json = {
 				{name: 'camel_to_snake_case', kind: 'function'},
 				{name: 'to_pascalsnake_case', kind: 'function'},
 				{name: 'get_schema_imports', kind: 'function'},
-			],
-		},
-		'./schema_metadata.js': {
-			path: 'schema_metadata.ts',
-			declarations: [
-				{name: 'Vocab_Name', kind: 'type'},
-				{name: 'model_schemas', kind: 'variable'},
-				{name: 'action_specs', kind: 'variable'},
-				{name: 'client_action_specs', kind: 'variable'},
-				{name: 'service_action_specs', kind: 'variable'},
-				{name: 'action_spec_by_name', kind: 'variable'},
-				{name: 'action_params_schemas', kind: 'variable'},
-				{name: 'action_response_schemas', kind: 'variable'},
-				{name: 'schemas_registry', kind: 'variable'},
-				{name: 'schema_by_name', kind: 'variable'},
-				{name: 'name_by_schema', kind: 'variable'},
-				{name: 'lookup_schema_name', kind: 'function'},
-				{name: 'add_schema', kind: 'function'},
 			],
 		},
 		'./schemas.js': {

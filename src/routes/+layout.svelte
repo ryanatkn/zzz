@@ -148,7 +148,7 @@
 
 	// Initialize the session
 	if (BROWSER) {
-		zzz.actions.send({id: create_uuid(), created: get_datetime_now(), name: 'load_session'});
+		zzz.actions.send({id: create_uuid(), created: get_datetime_now(), method: 'load_session'});
 	}
 
 	// TODO refactor, maybe per route?

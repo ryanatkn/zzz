@@ -39,7 +39,7 @@ import {Socket} from '$lib/socket.svelte.js';
 import {Capabilities} from '$lib/capabilities.svelte.js';
 import {Diskfile_History} from '$lib/diskfile_history.svelte.js';
 import {HANDLED} from '$lib/cell_helpers.js';
-import {create_action_registry} from '$lib/action_specs.js';
+import {create_action_registry} from '$lib/action_registry_global.js';
 
 export const zzz_context = create_context<Zzz>();
 
@@ -268,7 +268,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 			this.diskfiles.handle_change({
 				id: create_uuid(), // TODO shouldnt need to fake, maybe call an internal method directly? or do we want a single path?
 				created: get_datetime_now(),
-				name: 'filer_change',
+				method: 'filer_change',
 				change: {type: 'add', path: source_file.id},
 				source_file,
 			});

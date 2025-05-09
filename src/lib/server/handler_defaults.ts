@@ -53,7 +53,9 @@ export const handle_message = async (
 					id: create_uuid(),
 					created: get_datetime_now(),
 					method: 'pong',
-					ping_id: message.id,
+					params: {
+						ping_id: message.id,
+					},
 				},
 			};
 		}
@@ -86,7 +88,7 @@ export const handle_message = async (
 			};
 		}
 		case 'send_prompt': {
-			const {prompt, provider_name, model, tape_messages} = message.completion_request;
+			const {prompt, provider_name, model, tape_messages} = message.params.completion_request;
 			const config = server.config;
 
 			let response: Action_Completion_Response;
@@ -211,7 +213,9 @@ export const handle_message = async (
 			return {value: response};
 		}
 		case 'update_diskfile': {
-			const {path, content} = message;
+			const {
+				params: {path, content},
+			} = message;
 
 			try {
 				// Use the server's safe_fs instance to write the file
@@ -223,7 +227,9 @@ export const handle_message = async (
 			}
 		}
 		case 'delete_diskfile': {
-			const {path} = message;
+			const {
+				params: {path},
+			} = message;
 
 			try {
 				// Use the server's safe_fs instance to delete the file
@@ -235,7 +241,9 @@ export const handle_message = async (
 			}
 		}
 		case 'create_directory': {
-			const {path} = message;
+			const {
+				params: {path},
+			} = message;
 
 			try {
 				// Use the server's safe_fs instance to create the directory
@@ -286,9 +294,11 @@ export const handle_filer_change = (
 	server.send({
 		id: create_uuid(),
 		created: get_datetime_now(),
-		name: 'filer_change',
-		change: api_change,
-		source_file: parsed_source_file,
+		method: 'filer_change',
+		params: {
+			change: api_change,
+			source_file: parsed_source_file,
+		},
 	});
 };
 

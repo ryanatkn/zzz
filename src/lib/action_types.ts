@@ -32,16 +32,16 @@ import type {
  * All action names.
  */
 export const Action_Method = z.enum([
-	'completion_response',
-	'create_directory',
-	'delete_diskfile',
-	'filer_change',
-	'load_session',
-	'loaded_session',
 	'ping',
 	'pong',
-	'send_prompt',
+	'load_session',
+	'loaded_session',
+	'filer_change',
 	'update_diskfile',
+	'delete_diskfile',
+	'create_directory',
+	'send_prompt',
+	'completion_response',
 ]);
 export type Action_Method = z.infer<typeof Action_Method>;
 
@@ -49,62 +49,56 @@ export type Action_Method = z.infer<typeof Action_Method>;
  * Names of all service actions.
  */
 export type Service_Action_Method =
-	| 'completion_response'
-	| 'filer_change'
+	| 'ping'
+	| 'pong'
 	| 'load_session'
 	| 'loaded_session'
-	| 'ping'
-	| 'pong';
+	| 'filer_change'
+	| 'completion_response';
 
 /**
  * Names of all client-only actions.
  */
 export type Client_Action_Method =
-	| 'create_directory'
+	| 'update_diskfile'
 	| 'delete_diskfile'
-	| 'send_prompt'
-	| 'update_diskfile';
+	| 'create_directory'
+	| 'send_prompt';
 
 /**
  * Maps action names to their parameter types.
  */
 export interface Action_Params_By_Name {
-	completion_response: Completion_Response_Action_Params;
-	create_directory: Create_Directory_Action_Params;
-	delete_diskfile: Delete_Diskfile_Action_Params;
-	filer_change: Filer_Change_Action_Params;
-	load_session: Load_Session_Action_Params;
-	loaded_session: Loaded_Session_Action_Params;
 	ping: Ping_Action_Params;
 	pong: Pong_Action_Params;
-	send_prompt: Send_Prompt_Action_Params;
+	load_session: Load_Session_Action_Params;
+	loaded_session: Loaded_Session_Action_Params;
+	filer_change: Filer_Change_Action_Params;
 	update_diskfile: Update_Diskfile_Action_Params;
+	delete_diskfile: Delete_Diskfile_Action_Params;
+	create_directory: Create_Directory_Action_Params;
+	send_prompt: Send_Prompt_Action_Params;
+	completion_response: Completion_Response_Action_Params;
 }
 
 /**
  * Maps action names to their response types (server actions only).
  */
 export interface Action_Response_By_Name {
-	completion_response: Completion_Response_Action_Response;
-	filer_change: Filer_Change_Action_Response;
-	load_session: Load_Session_Action_Response;
-	loaded_session: Loaded_Session_Action_Response;
 	ping: Ping_Action_Response;
 	pong: Pong_Action_Response;
+	load_session: Load_Session_Action_Response;
+	loaded_session: Loaded_Session_Action_Response;
+	filer_change: Filer_Change_Action_Response;
+	completion_response: Completion_Response_Action_Response;
 }
 
 /**
  * Maps action names to their service implementations.
  */
 export interface Service_By_Name {
-	completion_response: Non_Authenticated_Service<
-		Completion_Response_Action_Params,
-		Service_Return<Completion_Response_Action_Response>
-	>;
-	filer_change: Non_Authenticated_Service<
-		Filer_Change_Action_Params,
-		Service_Return<Filer_Change_Action_Response>
-	>;
+	ping: Non_Authenticated_Service<Ping_Action_Params, Service_Return<Ping_Action_Response>>;
+	pong: Non_Authenticated_Service<Pong_Action_Params, Service_Return<Pong_Action_Response>>;
 	load_session: Non_Authenticated_Service<
 		Load_Session_Action_Params,
 		Service_Return<Load_Session_Action_Response>
@@ -113,30 +107,36 @@ export interface Service_By_Name {
 		Loaded_Session_Action_Params,
 		Service_Return<Loaded_Session_Action_Response>
 	>;
-	ping: Non_Authenticated_Service<Ping_Action_Params, Service_Return<Ping_Action_Response>>;
-	pong: Non_Authenticated_Service<Pong_Action_Params, Service_Return<Pong_Action_Response>>;
+	filer_change: Non_Authenticated_Service<
+		Filer_Change_Action_Params,
+		Service_Return<Filer_Change_Action_Response>
+	>;
+	completion_response: Non_Authenticated_Service<
+		Completion_Response_Action_Params,
+		Service_Return<Completion_Response_Action_Response>
+	>;
 }
 
 /**
  * Interface for action dispatch functions.
  */
 export interface Actions {
-	completion_response: (
-		params: Completion_Response_Action_Params,
-	) => Promise<Api_Result<Completion_Response_Action_Response>>;
-	create_directory: (params: Create_Directory_Action_Params) => Promise<string>;
-	delete_diskfile: (params: Delete_Diskfile_Action_Params) => Promise<string>;
-	filer_change: (
-		params: Filer_Change_Action_Params,
-	) => Promise<Api_Result<Filer_Change_Action_Response>>;
+	ping: () => Promise<Api_Result<Ping_Action_Response>>;
+	pong: (params: Pong_Action_Params) => Promise<Api_Result<Pong_Action_Response>>;
 	load_session: () => Promise<Api_Result<Load_Session_Action_Response>>;
 	loaded_session: (
 		params: Loaded_Session_Action_Params,
 	) => Promise<Api_Result<Loaded_Session_Action_Response>>;
-	ping: () => Promise<Api_Result<Ping_Action_Response>>;
-	pong: (params: Pong_Action_Params) => Promise<Api_Result<Pong_Action_Response>>;
-	send_prompt: (params: Send_Prompt_Action_Params) => Promise<string>;
+	filer_change: (
+		params: Filer_Change_Action_Params,
+	) => Promise<Api_Result<Filer_Change_Action_Response>>;
 	update_diskfile: (params: Update_Diskfile_Action_Params) => Promise<string>;
+	delete_diskfile: (params: Delete_Diskfile_Action_Params) => Promise<string>;
+	create_directory: (params: Create_Directory_Action_Params) => Promise<string>;
+	send_prompt: (params: Send_Prompt_Action_Params) => Promise<string>;
+	completion_response: (
+		params: Completion_Response_Action_Params,
+	) => Promise<Api_Result<Completion_Response_Action_Response>>;
 }
 
 // TODO maybe extract to $lib/mutation_types.ts or similar, decoupled
@@ -145,22 +145,22 @@ export interface Actions {
  */
 export interface Mutations {
 	[key: string]: Mutation | undefined;
-	completion_response?: Mutation<
-		Completion_Response_Action_Params,
-		Api_Result<Completion_Response_Action_Response>
-	>;
-	create_directory?: Mutation<Create_Directory_Action_Params, void>;
-	delete_diskfile?: Mutation<Delete_Diskfile_Action_Params, void>;
-	filer_change?: Mutation<Filer_Change_Action_Params, Api_Result<Filer_Change_Action_Response>>;
+	ping?: Mutation<Ping_Action_Params, Api_Result<Ping_Action_Response>>;
+	pong?: Mutation<Pong_Action_Params, Api_Result<Pong_Action_Response>>;
 	load_session?: Mutation<Load_Session_Action_Params, Api_Result<Load_Session_Action_Response>>;
 	loaded_session?: Mutation<
 		Loaded_Session_Action_Params,
 		Api_Result<Loaded_Session_Action_Response>
 	>;
-	ping?: Mutation<Ping_Action_Params, Api_Result<Ping_Action_Response>>;
-	pong?: Mutation<Pong_Action_Params, Api_Result<Pong_Action_Response>>;
-	send_prompt?: Mutation<Send_Prompt_Action_Params, void>;
+	filer_change?: Mutation<Filer_Change_Action_Params, Api_Result<Filer_Change_Action_Response>>;
 	update_diskfile?: Mutation<Update_Diskfile_Action_Params, void>;
+	delete_diskfile?: Mutation<Delete_Diskfile_Action_Params, void>;
+	create_directory?: Mutation<Create_Directory_Action_Params, void>;
+	send_prompt?: Mutation<Send_Prompt_Action_Params, void>;
+	completion_response?: Mutation<
+		Completion_Response_Action_Params,
+		Api_Result<Completion_Response_Action_Response>
+	>;
 }
 
 // generated by src/lib/action_types.gen.ts - DO NOT EDIT OR RISK LOST DATA

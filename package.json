@@ -808,10 +808,6 @@
       "types": "./dist/schema_helpers.d.ts",
       "default": "./dist/schema_helpers.js"
     },
-    "./schema_metadata.js": {
-      "types": "./dist/schema_metadata.d.ts",
-      "default": "./dist/schema_metadata.js"
-    },
     "./schemas.js": {
       "types": "./dist/schemas.d.ts",
       "default": "./dist/schemas.js"

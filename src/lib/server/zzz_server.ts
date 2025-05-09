@@ -9,14 +9,14 @@ import {Action_Client, type Action_Server} from '$lib/action_collections.js';
 import type {Zzz_Config} from '$lib/config_helpers.js';
 import {Zzz_Dir} from '$lib/diskfile_types.js';
 import {Safe_Fs} from '$lib/server/safe_fs.js';
-import {create_action_registry} from '$lib/action_specs.js';
+import {create_action_registry} from '$lib/action_registry_global.js';
 import {
 	validate_service_params,
 	validate_service_response as validate_service_return,
 	type Service_Return,
 } from '$lib/server/service.js';
 import {Api_Error} from '$lib/api.js';
-import {action_specs} from '$lib/schema_metadata.js';
+import {action_specs} from '$lib/action_specs.js';
 import type {Action_Method} from '$lib/action_types.js';
 
 /**

@@ -9,7 +9,7 @@ import {handle_message, handle_filer_change} from '$lib/server/handler_defaults.
 import {register_http_actions} from '$lib/server/register_http_actions.js';
 import {register_websocket_actions} from '$lib/server/register_websocket_actions.js';
 import create_config from '$lib/config.js';
-import {action_specs} from '$lib/schema_metadata.js';
+import {action_specs} from '$lib/action_specs.js';
 import {SERVER_PROXIED_PORT} from '$lib/constants.js';
 
 // TODO proper logging everywhere on the server

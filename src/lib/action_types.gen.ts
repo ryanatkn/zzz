@@ -1,7 +1,7 @@
 import type {Gen} from '@ryanatkn/gro/gen.js';
 import {z} from 'zod';
 
-import {global_action_registry} from '$lib/action_specs.js';
+import {global_action_registry} from '$lib/action_registry_global.js';
 import {to_action_params_name, to_action_response_name} from '$lib/schema_helpers.js';
 import {get_innermost_type} from '$lib/zod_helpers.js';
 
