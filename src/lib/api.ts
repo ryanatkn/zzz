@@ -1,9 +1,10 @@
 import {Result_Error, type Result} from '@ryanatkn/belt/result.js';
 import type {Flavored} from '@ryanatkn/belt/types.js';
+import type {ContentfulStatusCode} from 'hono/utils/http-status';
 import {z} from 'zod';
 
 export const Http_Status = z.number().int();
-export type Http_Status = Flavored<z.infer<typeof Http_Status>, 'Http_Status'>;
+export type Http_Status = ContentfulStatusCode;
 
 export const is_http_status_ok = (status: Http_Status): boolean => status < 300; // TODO maybe >= 200? idk, informational responses -- are they ok??
 
@@ -24,7 +25,7 @@ export interface Error_Response {
 	message: string;
 }
 
-export const ERROR_MESSAGE_UNKNOWN = 'unknown error';
+export const ERROR_MESSAGE_UNKNOWN = Result_Error.DEFAULT_MESSAGE;
 
 export type Api_Result<T_Value = any> = Result<
 	{status: Http_Status; value: T_Value},
@@ -62,9 +63,7 @@ export const to_failed_api_result = (err: any): Failed_Api_Result =>
 		? {ok: false, status: err.status, message: err.message}
 		: err instanceof Result_Error
 			? {ok: false, status: (err.result as any).status || 500, message: err.message}
-			: {ok: false, status: 500, message: Result_Error.DEFAULT_MESSAGE};
-
-// TODO BLOCK is now generic, maybe refactor in mind with `Http_Status`, perhaps into util for future a API tool library?
+			: {ok: false, status: 500, message: ERROR_MESSAGE_UNKNOWN}; // // safe generic fallback
 
 export type Api_Error_Name = Flavored<string, 'Api_Error_Name'>;
 export type Api_Error_Message = Flavored<string, 'Api_Error_Message'>;

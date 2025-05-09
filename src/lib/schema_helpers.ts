@@ -5,7 +5,7 @@ export const to_action_params_name = (action_name: string): string => `${action_
 export const to_action_response_name = (action_name: string): string => `${action_name}_Response`;
 
 /**
- * Converts an action name to a lowercase API path fragment
+ * Converts an action name to a lowercase API path fragment.
  * Example: "Action_Ping" -> "ping"
  * Handles both "Action_Name" and just "Name" formats
  */

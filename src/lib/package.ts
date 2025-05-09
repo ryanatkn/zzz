@@ -708,6 +708,10 @@ export const package_json = {
 			types: './dist/server/register_http_actions.d.ts',
 			default: './dist/server/register_http_actions.js',
 		},
+		'./server/register_websocket_actions.js': {
+			types: './dist/server/register_websocket_actions.d.ts',
+			default: './dist/server/register_websocket_actions.js',
+		},
 		'./server/safe_fs.js': {
 			types: './dist/server/safe_fs.d.ts',
 			default: './dist/server/safe_fs.js',
@@ -885,13 +889,14 @@ export const src_json = {
 			path: 'api.ts',
 			declarations: [
 				{name: 'Http_Status', kind: 'variable'},
+				{name: 'is_http_status_ok', kind: 'function'},
 				{name: 'Http_Method', kind: 'variable'},
 				{name: 'Error_Response', kind: 'type'},
 				{name: 'ERROR_MESSAGE_UNKNOWN', kind: 'variable'},
 				{name: 'Api_Result', kind: 'type'},
 				{name: 'Successful_Api_Result', kind: 'type'},
-				{name: 'Api_Params', kind: 'type'},
 				{name: 'Failed_Api_Result', kind: 'type'},
+				{name: 'Api_Params', kind: 'type'},
 				{name: 'to_failed_api_result', kind: 'function'},
 				{name: 'Api_Error_Name', kind: 'type'},
 				{name: 'Api_Error_Message', kind: 'type'},
@@ -1860,12 +1865,9 @@ export const src_json = {
 				{name: 'Action_Base', kind: 'variable'},
 				{name: 'Action_Spec_Base_Schema', kind: 'variable'},
 				{name: 'Action_Spec_Base', kind: 'type'},
-				{name: 'Client_Action_Spec_Schema', kind: 'variable'},
-				{name: 'Client_Action_Spec', kind: 'type'},
-				{name: 'Service_Action_Spec_Schema', kind: 'variable'},
-				{name: 'Service_Action_Spec', kind: 'type'},
-				{name: 'Action_Spec_Schema', kind: 'variable'},
-				{name: 'Action_Spec', kind: 'type'},
+				{name: 'Client_Action_Spec', kind: 'variable'},
+				{name: 'Service_Action_Spec', kind: 'variable'},
+				{name: 'Action_Spec', kind: 'variable'},
 				{name: 'Action_Spec_Name', kind: 'type'},
 				{name: 'Action_Ping_Params', kind: 'variable'},
 				{name: 'Action_Ping_Response', kind: 'variable'},
@@ -1938,6 +1940,14 @@ export const src_json = {
 			declarations: [
 				{name: 'Register_Actions_Options', kind: 'type'},
 				{name: 'register_http_actions', kind: 'function'},
+			],
+		},
+		'./server/register_websocket_actions.js': {
+			path: 'server/register_websocket_actions.ts',
+			declarations: [
+				{name: 'Register_Websocket_Actions_Options', kind: 'type'},
+				{name: 'register_websocket_actions', kind: 'function'},
+				{name: 'handle_websocket_message', kind: 'function'},
 			],
 		},
 		'./server/safe_fs.js': {
@@ -2179,6 +2189,7 @@ export const src_json = {
 				{name: 'maybe_get_field_schema', kind: 'function'},
 				{name: 'is_array_schema', kind: 'function'},
 				{name: 'get_inner_array_schema', kind: 'function'},
+				{name: 'stringify_zod_error', kind: 'function'},
 			],
 		},
 		'./Zzz_Root.svelte': {

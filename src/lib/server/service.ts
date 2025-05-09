@@ -77,7 +77,7 @@ export const service_return_to_api_result = <T_Value>(
 export const validate_service_params = (
 	spec: Service_Action_Spec,
 	params: unknown,
-	log?: Logger,
+	log?: Logger | null,
 	// TODO BLOCK this return type needs to be based on the `Service_Action_Spec` type, maybe using a typed `name` instead of the `spec`?
 ): z.infer<Service_Action_Spec['params']> => {
 	const parsed = spec.params.safeParse(params === undefined ? null : params);
@@ -94,7 +94,7 @@ export const validate_service_params = (
 export const validate_service_response = (
 	action: Service_Action_Spec,
 	response: unknown,
-	log?: Logger,
+	log?: Logger | null,
 	// TODO BLOCK this return type needs to be based on the `Service_Action_Spec` type, maybe using a typed `name` instead of the `spec`?
 ): z.infer<Service_Action_Spec['response']> => {
 	const parsed = action.response.safeParse(response);

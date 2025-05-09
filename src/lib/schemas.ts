@@ -113,21 +113,21 @@ export const Action_Spec_Base_Schema = z.object({
 });
 export type Action_Spec_Base = z.infer<typeof Action_Spec_Base_Schema>;
 
-export const Client_Action_Spec_Schema = Action_Spec_Base_Schema.extend({
+export const Client_Action_Spec = Action_Spec_Base_Schema.extend({
 	type: z.literal('Client_Action'),
 });
-export type Client_Action_Spec = z.infer<typeof Client_Action_Spec_Schema>;
+export type Client_Action_Spec = z.infer<typeof Client_Action_Spec>;
 
-export const Service_Action_Spec_Schema = Action_Spec_Base_Schema.extend({
+export const Service_Action_Spec = Action_Spec_Base_Schema.extend({
 	type: z.literal('Service_Action'),
 	method: z.union([z.custom<Http_Method>(), z.null()]),
 	auth: z.union([z.literal('authenticate'), z.literal('authorize'), z.null()]),
 	response: z.instanceof(z.ZodType),
 });
-export type Service_Action_Spec = z.infer<typeof Service_Action_Spec_Schema>;
+export type Service_Action_Spec = z.infer<typeof Service_Action_Spec>;
 
-export const Action_Spec_Schema = z.union([Client_Action_Spec_Schema, Service_Action_Spec_Schema]);
-export type Action_Spec = z.infer<typeof Action_Spec_Schema>;
+export const Action_Spec = z.union([Client_Action_Spec, Service_Action_Spec]);
+export type Action_Spec = z.infer<typeof Action_Spec>;
 export type Action_Spec_Name = string; // TODO ? Flavored<string, 'Action_Spec_Name'>;
 
 // Action parameters and response schemas

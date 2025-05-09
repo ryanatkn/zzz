@@ -20,6 +20,7 @@ import {action_specs} from '$lib/schema_metadata.js';
  * Function type for handling client messages.
  */
 export type Action_Handler = (
+	// TODO BLOCK this needs to be fixed
 	message: Action_Client,
 	server: Zzz_Server,
 ) => Promise<Service_Return>;
@@ -131,6 +132,7 @@ export class Zzz_Server {
 	}
 
 	/**
+	 * Prefer `process_action` instead of this unless you intend to bypass validation.
 	 * Handle incoming client messages for all transports
 	 * by delegating to the configured handler.
 	 */
@@ -140,19 +142,41 @@ export class Zzz_Server {
 		// Sanity check
 		if (!message) throw new Api_Error(400, 'invalid message'); // eslint-disable-line @typescript-eslint/no-unnecessary-condition
 
-		console.log(`[zzz_server.receive] message`, message.id, message.type);
+		this.log?.debug(`receive message`, message.id, message.type);
 
 		return this.#handle_message(message, this);
 	}
 
 	/**
 	 * Process an action by name with parameters.
+	 * This is the unified entry point for both HTTP and WebSocket actions.
+	 *
+	 * @param action_name_or_message - Either the action name as a string or the full Action_Client object
+	 * @param params - Parameters if action_name_or_message is a string, ignored if action_name_or_message is an Action_Client
 	 */
-	async process_action(action_name: string, params: unknown): Promise<Service_Return> {
+	async process_action(
+		action_name_or_message: string | Action_Client,
+		params?: unknown,
+	): Promise<Service_Return> {
 		this.#check_destroyed();
 
+		let action_name: string;
+		let action_params: unknown;
+
+		// TODO BLOCK make this function monomorphic
+		// Determine if we're processing by name or full message
+		if (typeof action_name_or_message === 'string') {
+			action_name = action_name_or_message;
+			action_params = params;
+		} else {
+			action_name = action_name_or_message.type;
+			action_params = action_name_or_message; // The full message is the params
+		}
+
+		// Find the action spec
 		// TODO BLOCK lookup O(1), probably a registry class?
-		const spec = this.action_specs.find((s) => s.name === action_name);
+		const spec_name = action_name === 'ping' ? 'Action_Ping' : action_name; //to_api_path(action_name);
+		const spec = this.action_specs.find((s) => s.name === spec_name);
 		if (!spec) {
 			throw new Api_Error(400, `unknown action: ${action_name}`);
 		}
@@ -161,12 +185,16 @@ export class Zzz_Server {
 			throw new Api_Error(400, `action is not a service action: ${action_name}`);
 		}
 
-		const parsed = validate_service_params(spec, params);
+		// Validate parameters based on the schema
+		const parsed = validate_service_params(spec, action_params, this.log);
+		console.log(`parsed`, parsed);
 
+		// Process the action with validated parameters
 		const returned = await this.receive(parsed as any); // TODO typesafe, see `validate_service_params`, probably generated code
 
+		// In development, validate the response
 		if (DEV) {
-			validate_service_return(spec, returned);
+			validate_service_return(spec, returned, this.log);
 		}
 
 		return returned;
@@ -193,6 +221,9 @@ export class Zzz_Server {
 			this.log?.warn('Server already destroyed');
 			return; // no-op, but maybe should throw?
 		}
+		this.#destroyed = true;
+
+		this.log?.info('Destroying server');
 
 		// Clean up all filer watchers
 		const cleanup_promises: Array<Promise<void>> = [];

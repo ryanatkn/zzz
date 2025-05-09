@@ -6,7 +6,7 @@ import type {Action_Spec} from '$lib/schemas.js';
 import {service_return_to_api_result} from '$lib/server/service.js';
 import {API_ROUTE} from '$lib/constants.js';
 import {to_api_path} from '$lib/schema_helpers.js';
-import {Api_Error} from '$lib/api.js';
+import {Api_Error, to_failed_api_result} from '$lib/api.js';
 
 export interface Register_Actions_Options {
 	app: Hono;
@@ -39,45 +39,27 @@ export const register_http_actions = ({
 		console.log(`Registering API handler: ${method} ${path}`);
 
 		const handler: Handler = async (c) => {
-			console.log(`HANDLER c`, c);
-			try {
-				let params: unknown;
+			console.log(`[http] <${c.req.url}>`);
 
-				// TODO this too for get? `const query = c.req.query();`
+			try {
+				let params: unknown = null;
+
 				// Extract parameters based on HTTP method
 				if (method === 'POST' || method === 'PUT' || method === 'PATCH') {
 					params = await c.req.json();
 				}
 
+				// Process the action using the unified method
 				const service_result = await zzz_server.process_action(name, params);
 
+				// Convert to API result format and return JSON response
 				const api_result = service_return_to_api_result(service_result);
-
+				console.log(`api_result`, api_result);
 				return c.json(api_result);
 			} catch (error) {
 				console.error(`Error processing ${name}:`, error);
-
-				if (error instanceof Api_Error) {
-					return c.json(
-						// TODO @many JSON-RPC types and parsing in DEV
-						{
-							ok: false,
-							status: error.status,
-							error: error.message,
-						},
-						400,
-					);
-				}
-
-				return c.json(
-					// TODO @many JSON-RPC types and parsing in DEV
-					{
-						ok: false,
-						status: 500,
-						error: `Unknownn error processing ${name}`,
-					},
-					500,
-				);
+				const failed_result = to_failed_api_result(error);
+				return c.json(failed_result, failed_result.status);
 			}
 		};
 

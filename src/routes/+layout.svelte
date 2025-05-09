@@ -65,15 +65,16 @@
 		cell_classes,
 		socket_url: PUBLIC_WEBSOCKET_URL,
 		onsend: async (message: Action_Client) => {
-			console.log('[page] sending message via socket', message);
+			console.log('[ws] sending message', message);
 			zzz.socket.send({type: 'server_message', message});
 
-			const mutation = send_mutations[message.type];
+			const mutation = send_mutations[message.type]; // TODO think about before/after
 			if (!mutation) {
-				console.error('unknown message type, ignoring:', message.type, message);
+				// Ignore messages with no mutations
+				// console.warn('unknown message type, ignoring:', message.type, message);
 				return;
 			}
-			// Create proper mutation context for sending actions
+
 			const mutation_context = create_mutation_context(
 				zzz,
 				message.type,
@@ -82,18 +83,19 @@
 				actions,
 			);
 
-			mutation(mutation_context.ctx);
+			mutation(mutation_context.ctx); // TODO @many try/catch?
 			await mutation_context.flush_after_mutation();
 		},
 		onreceive: async (message: Action_Server) => {
-			console.log(`[page] received message`, message);
+			console.log(`[ws] received message`, message);
 
 			const mutation = receive_mutations[message.type];
 			if (!mutation) {
-				console.error('unknown message type, ignoring:', message.type, message);
+				// Ignore messages with no mutations
+				// console.warn('unknown message type, ignoring:', message.type, message);
 				return;
 			}
-			// Create proper mutation context for received actions
+
 			const mutation_context = create_mutation_context(
 				zzz,
 				message.type,
@@ -108,7 +110,7 @@
 				actions,
 			);
 
-			mutation(mutation_context.ctx);
+			mutation(mutation_context.ctx); // TODO @many try/catch?
 			await mutation_context.flush_after_mutation();
 		},
 	});
