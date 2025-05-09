@@ -25,8 +25,6 @@ export const model_schemas: Array<z.ZodTypeAny> = [];
 export const action_specs: Array<Action_Spec> = [];
 
 // TODO BLOCK think about a `Schema_Registry` class because this operates on module globals unnecessarily, then `app_registry` exports a Svelte context interface?
-// service_action_specs.push(spec);
-// client_action_specs.push(spec);
 
 /**
  * Collection of client-only action specs
@@ -117,6 +115,7 @@ for (const name in schemas) {
 	add_schema(name as Vocab_Name, (schemas as any)[name]);
 }
 
+// TODO BLOCK cleanup with registry stuff
 // /**
 //  * Registry utilities for action specifications.
 //  */

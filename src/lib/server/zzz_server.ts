@@ -1,15 +1,20 @@
 import {Filer, type Cleanup_Watch} from '@ryanatkn/gro/filer.js';
 import type {Watcher_Change} from '@ryanatkn/gro/watch_dir.js';
 import {resolve} from 'node:path';
+import {Logger} from '@ryanatkn/belt/log.js';
+import {DEV} from 'esm-env';
 
 import {Action_Client, type Action_Server, type Action_Spec} from '$lib/schemas.js';
 import type {Zzz_Config} from '$lib/config_helpers.js';
 import {Zzz_Dir} from '$lib/diskfile_types.js';
 import {Safe_Fs} from '$lib/server/safe_fs.js';
-import type {Service_Return} from '$lib/server/service.js';
+import {
+	validate_service_params,
+	validate_service_response as validate_service_return,
+	type Service_Return,
+} from '$lib/server/service.js';
 import {Api_Error} from '$lib/api.js';
 import {action_specs} from '$lib/schema_metadata.js';
-import {Logger} from '@ryanatkn/belt/log.js';
 
 /**
  * Function type for handling client messages.
@@ -17,7 +22,7 @@ import {Logger} from '@ryanatkn/belt/log.js';
 export type Action_Handler = (
 	message: Action_Client,
 	server: Zzz_Server,
-) => Promise<Action_Server | null>;
+) => Promise<Service_Return>;
 
 /**
  * Function type for handling file system changes.
@@ -129,7 +134,7 @@ export class Zzz_Server {
 	 * Handle incoming client messages for all transports
 	 * by delegating to the configured handler.
 	 */
-	async receive(message: Action_Client): Promise<Action_Server | null> {
+	async receive(message: Action_Client): Promise<Service_Return> {
 		this.#check_destroyed();
 
 		// Sanity check
@@ -143,7 +148,7 @@ export class Zzz_Server {
 	/**
 	 * Process an action by name with parameters.
 	 */
-	async process_action(action_name: string, params: any): Promise<Service_Return> {
+	async process_action(action_name: string, params: unknown): Promise<Service_Return> {
 		this.#check_destroyed();
 
 		// TODO BLOCK lookup O(1), probably a registry class?
@@ -152,21 +157,19 @@ export class Zzz_Server {
 			throw new Api_Error(400, `unknown action: ${action_name}`);
 		}
 
-		if (spec.type !== 'Client_Action') {
-			throw new Api_Error(400, `action is not a client action: ${action_name}`);
+		if (spec.type !== 'Service_Action') {
+			throw new Api_Error(400, `action is not a service action: ${action_name}`);
 		}
 
-		const parsed = spec.params.safeParse(params); // @many TODO typesafe, maybe with generated code?
-		if (!parsed.success) {
-			throw new Api_Error(400, `invalid action params ${action_name}: ${parsed.error}`);
+		const parsed = validate_service_params(spec, params);
+
+		const returned = await this.receive(parsed as any); // TODO typesafe, see `validate_service_params`, probably generated code
+
+		if (DEV) {
+			validate_service_return(spec, returned);
 		}
 
-		const response = await this.receive(parsed.data as any); // @many TODO typesafe, maybe with generated code?
-
-		return {
-			status: 200,
-			value: response,
-		};
+		return returned;
 	}
 
 	#destroyed = false;

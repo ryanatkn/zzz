@@ -5,6 +5,8 @@ import {z} from 'zod';
 export const Http_Status = z.number().int();
 export type Http_Status = Flavored<z.infer<typeof Http_Status>, 'Http_Status'>;
 
+export const is_http_status_ok = (status: Http_Status): boolean => status < 300; // TODO maybe >= 200? idk, informational responses -- are they ok??
+
 export const Http_Method = z.enum([
 	'CONNECT',
 	'DELETE',
@@ -35,17 +37,17 @@ export interface Successful_Api_Result<T_Value = any> {
 	value: T_Value;
 }
 
-export type Api_Params<T_Spec = unknown> =
-	| ({
-			spec?: T_Spec;
-	  } & Record<string, any>)
-	| null;
-
 export interface Failed_Api_Result {
 	ok: false;
 	status: Http_Status;
 	message: string;
 }
+
+export type Api_Params<T_Spec = unknown> =
+	| ({
+			spec?: T_Spec;
+	  } & Record<string, any>)
+	| null;
 
 /**
  * Converts an `Error` object that may or may not

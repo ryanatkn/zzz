@@ -117,3 +117,6 @@ export const get_inner_array_schema = (schema: z.ZodTypeAny): z.ZodArray<any> | 
 	const innerType = get_innermost_type(schema);
 	return innerType instanceof z.ZodArray ? innerType : null;
 };
+
+export const stringify_zod_error = (error: z.ZodError): string =>
+	error.issues.map((issue) => issue.message).join(', ');

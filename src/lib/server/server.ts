@@ -9,10 +9,12 @@ import {Zzz_Server} from '$lib/server/zzz_server.js';
 import {handle_message, handle_filer_change} from '$lib/server/handler_defaults.js';
 import {register_http_actions} from '$lib/server/register_http_actions.js';
 import create_config from '$lib/config.js';
-import {Action_Client, type Action_Server} from '$lib/schemas.js';
+import {Action_Client} from '$lib/schemas.js';
 import {action_specs} from '$lib/schema_metadata.js';
 import {SERVER_PROXIED_PORT} from '$lib/constants.js';
 import {should_allow_origin} from '$lib/server/security.js';
+import {service_return_to_api_result} from './service.js';
+import {to_failed_api_result, type Api_Result} from '$lib/api.js';
 
 const main = (): void => {
 	console.log('creating server with zzz_dir', PUBLIC_ZZZ_DIR); // TODO better logging
@@ -65,17 +67,19 @@ const main = (): void => {
 							// TODO @many send error back with `data.message.id`
 							return;
 						}
-						let message: Action_Server | null;
+						let api_result: Api_Result | null | undefined;
 						try {
-							message = await zzz_server.receive(parsed.data);
-						} catch (err) {
-							console.error('error in `receive` handler', err);
+							// TODO BLOCK `process_action` ? instead of this? need to handle `message` in the http router as well on the response
+							const service_return = await zzz_server.receive(parsed.data);
+							// TODO BLOCK support JSON-RPC with batching and proper detection
+							api_result = service_return_to_api_result(service_return);
+						} catch (error) {
+							console.error('error in `receive` handler', error);
 							// TODO @many send error back with `data.message.id`
-							return;
+							api_result = to_failed_api_result(error);
 						}
-						if (message) {
-							ws.send(devalue.stringify({type: 'server_message', message}));
-						}
+						// TODO @many JSON-RPC
+						ws.send(devalue.stringify({type: 'server_message', message: api_result}));
 					} else {
 						console.error('unknown message type', data.type);
 					}

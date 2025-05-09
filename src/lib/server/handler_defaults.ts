@@ -16,7 +16,6 @@ import {DEV} from 'esm-env';
 import {
 	type Action_Client,
 	type Action_Completion_Response,
-	type Action_Server,
 	type Action_Send_Prompt,
 } from '$lib/schemas.js';
 import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
@@ -31,6 +30,7 @@ import {
 import {create_completion_response_message} from '$lib/response_helpers.js';
 import type {Zzz_Server} from '$lib/server/zzz_server.js';
 import {Safe_Fs} from '$lib/server/safe_fs.js';
+import type {Service_Return} from '$lib/server/service.js';
 
 // TODO refactor to a plugin architecture
 
@@ -40,22 +40,24 @@ const openai = new OpenAI({apiKey: SECRET_OPENAI_API_KEY});
 const google = new GoogleGenerativeAI(SECRET_GOOGLE_API_KEY);
 
 /**
- * Handle client messages and produce appropriate server responses
- * A stateless function that uses the zzz_server for access to state and configuration
+ * Handle client messages and produce appropriate server responses.
  */
 export const handle_message = async (
 	message: Action_Client,
 	server: Zzz_Server,
-): Promise<Action_Server | null> => {
+): Promise<Service_Return> => {
 	console.log(`[handle_message] message`, message.id, message.type);
 
+	// TODO service registration in zzz_server with plugin system
 	switch (message.type) {
 		case 'ping': {
 			return {
-				id: create_uuid(),
-				created: get_datetime_now(),
-				type: 'pong',
-				ping_id: message.id,
+				value: {
+					id: create_uuid(),
+					created: get_datetime_now(),
+					type: 'pong',
+					ping_id: message.id,
+				},
 			};
 		}
 		case 'load_session': {
@@ -75,12 +77,14 @@ export const handle_message = async (
 			}
 
 			return {
-				id: create_uuid(),
-				created: get_datetime_now(),
-				type: 'loaded_session',
-				data: {
-					files: files_array,
-					zzz_dir: server.zzz_dir,
+				value: {
+					id: create_uuid(),
+					created: get_datetime_now(),
+					type: 'loaded_session',
+					data: {
+						files: files_array,
+						zzz_dir: server.zzz_dir,
+					},
 				},
 			};
 		}
@@ -207,7 +211,7 @@ export const handle_message = async (
 
 			console.log(`got ${provider_name} message`, response.completion_response.data);
 
-			return response;
+			return {value: response};
 		}
 		case 'update_diskfile': {
 			const {path, content} = message;
@@ -215,7 +219,7 @@ export const handle_message = async (
 			try {
 				// Use the server's safe_fs instance to write the file
 				await server.safe_fs.write_file(path, content);
-				return null;
+				return {value: null};
 			} catch (error) {
 				console.error(`Error writing file ${path}:`, error);
 				throw error;
@@ -227,7 +231,7 @@ export const handle_message = async (
 			try {
 				// Use the server's safe_fs instance to delete the file
 				await server.safe_fs.rm(path);
-				return null;
+				return {value: null};
 			} catch (error) {
 				console.error(`Error deleting file ${path}:`, error);
 				throw error;
@@ -239,7 +243,7 @@ export const handle_message = async (
 			try {
 				// Use the server's safe_fs instance to create the directory
 				await server.safe_fs.mkdir(path, {recursive: true});
-				return null;
+				return {value: null};
 			} catch (error) {
 				console.error(`Error creating directory ${path}:`, error);
 				throw error;
@@ -251,7 +255,7 @@ export const handle_message = async (
 };
 
 /**
- * Handle file system changes and notify clients
+ * Handle file system changes and notify clients.
  */
 export const handle_filer_change = (
 	change: Watcher_Change,
@@ -291,7 +295,7 @@ export const handle_filer_change = (
 	});
 };
 
-// Helper function to save the response to disk
+// TODO refactor
 const save_response = async (
 	request: Action_Send_Prompt,
 	response: Action_Completion_Response,
@@ -307,7 +311,7 @@ const save_response = async (
 
 	await write_json(path, json, safe_fs);
 };
-
+// TODO refactor
 const write_json = async (path: string, json: unknown, safe_fs: Safe_Fs): Promise<void> => {
 	// Check if directory exists and create it if needed
 	if (!(await safe_fs.exists(path))) {

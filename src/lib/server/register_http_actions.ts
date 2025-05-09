@@ -24,11 +24,11 @@ export const register_http_actions = ({
 	action_specs,
 	base_path = API_ROUTE,
 }: Register_Actions_Options): void => {
-	for (const schema of action_specs) {
+	for (const spec of action_specs) {
 		// Register only service actions
-		if (schema.type !== 'Service_Action') continue;
+		if (spec.type !== 'Service_Action') continue;
 
-		const {name, method} = schema;
+		const {name, method} = spec;
 
 		// Generate lowercase API path
 		const action_path = to_api_path(name);
@@ -43,15 +43,10 @@ export const register_http_actions = ({
 			try {
 				let params: unknown;
 
-				// TODO const query = c.req.query();
+				// TODO this too for get? `const query = c.req.query();`
 				// Extract parameters based on HTTP method
 				if (method === 'POST' || method === 'PUT' || method === 'PATCH') {
-					const body = await c.req.json();
-					const parsed = schema.params.safeParse(body);
-					if (!parsed.success) {
-						throw new Api_Error(400, `Invalid action params ${name}: ${parsed.error}`);
-					}
-					params = parsed.data;
+					params = await c.req.json();
 				}
 
 				const service_result = await zzz_server.process_action(name, params);
@@ -64,7 +59,7 @@ export const register_http_actions = ({
 
 				if (error instanceof Api_Error) {
 					return c.json(
-						// TODO @many JSON RPC types and parsing in DEV
+						// TODO @many JSON-RPC types and parsing in DEV
 						{
 							ok: false,
 							status: error.status,
@@ -75,7 +70,7 @@ export const register_http_actions = ({
 				}
 
 				return c.json(
-					// TODO @many JSON RPC types and parsing in DEV
+					// TODO @many JSON-RPC types and parsing in DEV
 					{
 						ok: false,
 						status: 500,

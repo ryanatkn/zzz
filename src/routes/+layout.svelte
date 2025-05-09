@@ -101,7 +101,7 @@
 				// TODO BLOCK delete this?
 				{
 					ok: true,
-					status: 200, // TODO BLOCK need to forward status, use JSON RPC like MCP
+					status: 200, // TODO BLOCK @many JSON-RPC need to forward status, use JSON-RPC like MCP
 					value: message,
 					zzz,
 				},

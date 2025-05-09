@@ -1056,7 +1056,7 @@ export const src_json = {
 			declarations: [
 				{name: 'HANDLED', kind: 'variable'},
 				{name: 'FILE_SHORT_DATE_FORMAT', kind: 'variable'},
-				{name: 'FILE_DATE_FORMAT', kind: 'variable'},
+				{name: 'FILE_DATETIME_FORMAT', kind: 'variable'},
 				{name: 'FILE_TIME_FORMAT', kind: 'variable'},
 				{name: 'ZOD_CELL_CLASS_NAME', kind: 'variable'},
 				{name: 'ZOD_ELEMENT_CLASS_NAME', kind: 'variable'},

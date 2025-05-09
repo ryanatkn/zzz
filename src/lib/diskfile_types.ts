@@ -45,6 +45,7 @@ export const Source_File = z.object({
 	contents: z.string().nullable(),
 	ctime: z.number().nullable(),
 	mtime: z.number().nullable(),
+	// TODO BLOCK remove devalue and change to use zod for serialization
 	dependents: z.map(Diskfile_Path, z.any()), // TODO @many these can't be circular refs, how to rewrite?
 	dependencies: z.map(Diskfile_Path, z.any()), // TODO @many these can't be circular refs, how to rewrite?
 });
