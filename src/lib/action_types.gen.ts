@@ -3,8 +3,8 @@ import {z} from 'zod';
 
 import {
 	to_action_spec_identifier,
-	to_action_response_name,
 	to_action_spec_params_identifier,
+	to_action_spec_response_identifier,
 } from '$lib/schema_helpers.js';
 import {get_innermost_type} from '$lib/zod_helpers.js';
 import {action_specs} from '$lib/action_specs.js';
@@ -60,7 +60,7 @@ export const gen: Gen = ({origin_path}) => {
 		 * Maps action names to their parameter types.
 		 */
 		export interface Action_Params_By_Name {
-			${registry.specs.map((spec) => `${spec.method}: ${to_action_spec_params_identifier(spec.method)};`).join('\n\t')}
+			${registry.specs.map((spec) => `${spec.method}: typeof ${to_action_spec_params_identifier(spec.method)};`).join('\n\t')}
 		}
 
 		/**
@@ -68,7 +68,16 @@ export const gen: Gen = ({origin_path}) => {
 		 */
 		export interface Action_Response_By_Name {
 			${registry.service_specs
-				.map((spec) => `${spec.method}: ${to_action_response_name(spec.method)};`)
+				.map((spec) => `${spec.method}: typeof ${to_action_spec_response_identifier(spec.method)};`)
+				.join('\n\t')}
+		}
+
+		/**
+		 * Maps action names to their response schema types (server actions only).
+		 */
+		export interface Action_Response_Schema_By_Name {
+			${registry.service_specs
+				.map((spec) => `${spec.method}: typeof ${to_action_spec_response_identifier(spec.method)};`)
 				.join('\n\t')}
 		}
 
@@ -79,7 +88,7 @@ export const gen: Gen = ({origin_path}) => {
 			${registry.service_specs
 				.map(
 					(spec) =>
-						`${spec.method}: Non_Authenticated_Service<${to_action_spec_identifier(spec.method)}, Service_Return<${to_action_response_name(spec.method)}>>;`,
+						`${spec.method}: Non_Authenticated_Service<typeof ${to_action_spec_identifier(spec.method)}, Service_Return<typeof ${to_action_spec_response_identifier(spec.method)}>>;`,
 				)
 				.join('\n\t')}
 		}
@@ -92,7 +101,7 @@ export const gen: Gen = ({origin_path}) => {
 				.map((spec) => {
 					const hasParams =
 						get_innermost_type(spec.params)._def.typeName !== z.ZodFirstPartyTypeKind.ZodNull;
-					return `${spec.method}: (${hasParams ? `params: ${to_action_spec_params_identifier(spec.method)}` : ''}) => Promise<${spec.returns}>;`;
+					return `${spec.method}: (${hasParams ? `params: typeof ${to_action_spec_params_identifier(spec.method)}` : ''}) => Promise<${spec.returns}>;`;
 				})
 				.join('\n\t')}
 		}
@@ -107,9 +116,9 @@ export const gen: Gen = ({origin_path}) => {
 				.map((spec) => {
 					const responseType =
 						spec.type === 'Service_Action'
-							? `Api_Result<${to_action_response_name(spec.method)}>`
+							? `Api_Result<typeof ${to_action_spec_response_identifier(spec.method)}>`
 							: 'void';
-					return `${spec.method}?: Mutation<${to_action_spec_identifier(spec.method)}, ${responseType}>;`;
+					return `${spec.method}?: Mutation<typeof ${to_action_spec_params_identifier(spec.method)}, ${responseType}>;`;
 				})
 				.join('\n\t')}
 		}

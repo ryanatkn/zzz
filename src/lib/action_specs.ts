@@ -19,7 +19,7 @@ export const ping_action_spec = {
 	auth: null,
 	params: z.null(),
 	response: z.null(),
-	returns: 'Api_Result<Ping_Action_Response>',
+	returns: 'Api_Result<typeof ping_action_spec.response>', // TODO `Ping_Action_Response`
 } satisfies Service_Action_Spec;
 
 export const pong_action_spec = {
@@ -34,7 +34,7 @@ export const pong_action_spec = {
 		})
 		.strict(),
 	response: z.null(),
-	returns: 'Api_Result<Pong_Action_Response>',
+	returns: 'Api_Result<typeof pong_action_spec.response>', // TODO @many maybe add type aliases - `Action.Pong.Response` or `Pong_Action_Response`
 } satisfies Service_Action_Spec;
 
 export const load_session_action_spec = {
@@ -48,7 +48,7 @@ export const load_session_action_spec = {
 	// and the `response` here is the `params` currently there
 	params: z.null(),
 	response: z.null(),
-	returns: 'Api_Result<Load_Session_Action_Response>',
+	returns: 'Api_Result<typeof load_session_action_spec.response>', // TODO @many maybe add type aliases - `Action.Load_Session.Response` or `Load_Session_Action_Response`
 } satisfies Service_Action_Spec;
 
 export const loaded_session_action_spec = {
@@ -68,7 +68,7 @@ export const loaded_session_action_spec = {
 		})
 		.strict(),
 	response: z.null(),
-	returns: 'Api_Result<Loaded_Session_Action_Response>',
+	returns: 'Api_Result<typeof loaded_session_action_spec.response>', // TODO @many maybe add type aliases - `Action.Loaded_Session.Response` or `Loaded_Session_Action_Response`
 } satisfies Service_Action_Spec;
 
 export const filer_change_action_spec = {
@@ -84,7 +84,7 @@ export const filer_change_action_spec = {
 		})
 		.strict(),
 	response: z.null(),
-	returns: 'Api_Result<Filer_Change_Action_Response>',
+	returns: 'Api_Result<typeof filer_change_action_spec.response>', // TODO @many maybe add type aliases - `Action.Filer_Change.Response` or `Filer_Change_Action_Response`
 } satisfies Service_Action_Spec;
 
 export const update_diskfile_action_spec = {
@@ -148,7 +148,7 @@ export const completion_response_action_spec = {
 		})
 		.strict(),
 	response: z.null(),
-	returns: 'Api_Result<Completion_Response_Action_Response>',
+	returns: 'Api_Result<typeof completion_response_action_spec.response>', // TODO @many maybe add type aliases - `Action.Completion_Response.Response` or `Completion_Response_Action_Response`
 } satisfies Service_Action_Spec;
 
 // TODO BLOCK generate programmatically

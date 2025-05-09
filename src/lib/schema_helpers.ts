@@ -7,16 +7,22 @@ import type {Action_Method} from '$lib/action_types.js';
 export const to_action_spec_identifier = (method: Action_Method): string => `${method}_action_spec`;
 
 /**
+ * Convert an action name to its response schema identifier.
+ */
+export const to_action_message_identifier = (method: Action_Method): string =>
+	`${method}_action_message`;
+
+/**
  * Convert an action name to its params type name.
  */
 export const to_action_spec_params_identifier = (method: Action_Method): string =>
 	`${to_action_spec_identifier(method)}.params`;
 
 /**
- * Convert an action name to its response type name.
+ * Convert an action name to its response schema identifier.
  */
-export const to_action_response_name = (method: Action_Method): string =>
-	`${to_pascalsnake_case(method)}_Action_Response`;
+export const to_action_spec_response_identifier = (method: Action_Method): string =>
+	`${to_action_spec_identifier(method)}.response`;
 
 /**
  * Check if the spec is for a service action.

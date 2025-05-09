@@ -1,6 +1,10 @@
 import type {Gen} from '@ryanatkn/gro/gen.js';
 
-import {to_action_spec_identifier, to_action_spec_params_identifier} from '$lib/schema_helpers.js';
+import {
+	to_action_message_identifier,
+	to_action_spec_identifier,
+	to_action_spec_params_identifier,
+} from '$lib/schema_helpers.js';
 import {action_specs} from '$lib/action_specs.js';
 import {Action_Registry} from '$lib/action_registry.js';
 
@@ -25,11 +29,12 @@ export const gen: Gen = ({origin_path}) => {
 		${registry.specs
 			.map((spec) => {
 				const {method} = spec;
-				const identifier = to_action_spec_identifier(method);
+				const identifier = to_action_message_identifier(method);
 				return `
 					export const ${identifier} = Action_Base.extend({
 						method: z.literal('${method}'),
-						params: ${to_action_spec_params_identifier(method)};
+						params: ${to_action_spec_params_identifier(method)},
+					});
 					export type ${identifier} = z.infer<typeof ${identifier}>;
 				`;
 			})

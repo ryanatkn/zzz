@@ -64,51 +64,69 @@ export type Client_Action_Method =
  * Maps action names to their parameter types.
  */
 export interface Action_Params_By_Name {
-	ping: ping_action_spec.params;
-	pong: pong_action_spec.params;
-	load_session: load_session_action_spec.params;
-	loaded_session: loaded_session_action_spec.params;
-	filer_change: filer_change_action_spec.params;
-	update_diskfile: update_diskfile_action_spec.params;
-	delete_diskfile: delete_diskfile_action_spec.params;
-	create_directory: create_directory_action_spec.params;
-	send_prompt: send_prompt_action_spec.params;
-	completion_response: completion_response_action_spec.params;
+	ping: typeof ping_action_spec.params;
+	pong: typeof pong_action_spec.params;
+	load_session: typeof load_session_action_spec.params;
+	loaded_session: typeof loaded_session_action_spec.params;
+	filer_change: typeof filer_change_action_spec.params;
+	update_diskfile: typeof update_diskfile_action_spec.params;
+	delete_diskfile: typeof delete_diskfile_action_spec.params;
+	create_directory: typeof create_directory_action_spec.params;
+	send_prompt: typeof send_prompt_action_spec.params;
+	completion_response: typeof completion_response_action_spec.params;
 }
 
 /**
  * Maps action names to their response types (server actions only).
  */
 export interface Action_Response_By_Name {
-	ping: Ping_Action_Response;
-	pong: Pong_Action_Response;
-	load_session: Load_Session_Action_Response;
-	loaded_session: Loaded_Session_Action_Response;
-	filer_change: Filer_Change_Action_Response;
-	completion_response: Completion_Response_Action_Response;
+	ping: typeof ping_action_spec.response;
+	pong: typeof pong_action_spec.response;
+	load_session: typeof load_session_action_spec.response;
+	loaded_session: typeof loaded_session_action_spec.response;
+	filer_change: typeof filer_change_action_spec.response;
+	completion_response: typeof completion_response_action_spec.response;
+}
+
+/**
+ * Maps action names to their response schema types (server actions only).
+ */
+export interface Action_Response_Schema_By_Name {
+	ping: typeof ping_action_spec.response;
+	pong: typeof pong_action_spec.response;
+	load_session: typeof load_session_action_spec.response;
+	loaded_session: typeof loaded_session_action_spec.response;
+	filer_change: typeof filer_change_action_spec.response;
+	completion_response: typeof completion_response_action_spec.response;
 }
 
 /**
  * Maps action names to their service implementations.
  */
 export interface Service_By_Name {
-	ping: Non_Authenticated_Service<ping_action_spec, Service_Return<Ping_Action_Response>>;
-	pong: Non_Authenticated_Service<pong_action_spec, Service_Return<Pong_Action_Response>>;
+	ping: Non_Authenticated_Service<
+		typeof ping_action_spec,
+		Service_Return<typeof ping_action_spec.response>
+	>;
+	pong: Non_Authenticated_Service<
+		typeof pong_action_spec,
+		Service_Return<typeof pong_action_spec.response>
+	>;
 	load_session: Non_Authenticated_Service<
-		load_session_action_spec,
-		Service_Return<Load_Session_Action_Response>
+		typeof load_session_action_spec,
+		Service_Return<typeof load_session_action_spec.response>
 	>;
 	loaded_session: Non_Authenticated_Service<
-		loaded_session_action_spec,
-		Service_Return<Loaded_Session_Action_Response>
+		typeof loaded_session_action_spec,
+		Service_Return<typeof loaded_session_action_spec.response>
 	>;
 	filer_change: Non_Authenticated_Service<
-		filer_change_action_spec,
-		Service_Return<Filer_Change_Action_Response>
+		typeof filer_change_action_spec,
+		Service_Return<typeof filer_change_action_spec.response>
 	>;
 	completion_response: Non_Authenticated_Service<
-		completion_response_action_spec,
-		Service_Return<Completion_Response_Action_Response>
+		typeof completion_response_action_spec,
+		Service_Return<typeof completion_response_action_spec.response>
 	>;
 }
 
@@ -116,22 +134,24 @@ export interface Service_By_Name {
  * Interface for action dispatch functions.
  */
 export interface Actions {
-	ping: () => Promise<Api_Result<Ping_Action_Response>>;
-	pong: (params: pong_action_spec.params) => Promise<Api_Result<Pong_Action_Response>>;
-	load_session: () => Promise<Api_Result<Load_Session_Action_Response>>;
+	ping: () => Promise<Api_Result<typeof ping_action_spec.response>>;
+	pong: (
+		params: typeof pong_action_spec.params,
+	) => Promise<Api_Result<typeof pong_action_spec.response>>;
+	load_session: () => Promise<Api_Result<typeof load_session_action_spec.response>>;
 	loaded_session: (
-		params: loaded_session_action_spec.params,
-	) => Promise<Api_Result<Loaded_Session_Action_Response>>;
+		params: typeof loaded_session_action_spec.params,
+	) => Promise<Api_Result<typeof loaded_session_action_spec.response>>;
 	filer_change: (
-		params: filer_change_action_spec.params,
-	) => Promise<Api_Result<Filer_Change_Action_Response>>;
-	update_diskfile: (params: update_diskfile_action_spec.params) => Promise<string>;
-	delete_diskfile: (params: delete_diskfile_action_spec.params) => Promise<string>;
-	create_directory: (params: create_directory_action_spec.params) => Promise<string>;
-	send_prompt: (params: send_prompt_action_spec.params) => Promise<string>;
+		params: typeof filer_change_action_spec.params,
+	) => Promise<Api_Result<typeof filer_change_action_spec.response>>;
+	update_diskfile: (params: typeof update_diskfile_action_spec.params) => Promise<string>;
+	delete_diskfile: (params: typeof delete_diskfile_action_spec.params) => Promise<string>;
+	create_directory: (params: typeof create_directory_action_spec.params) => Promise<string>;
+	send_prompt: (params: typeof send_prompt_action_spec.params) => Promise<string>;
 	completion_response: (
-		params: completion_response_action_spec.params,
-	) => Promise<Api_Result<Completion_Response_Action_Response>>;
+		params: typeof completion_response_action_spec.params,
+	) => Promise<Api_Result<typeof completion_response_action_spec.response>>;
 }
 
 // TODO maybe extract to $lib/mutation_types.ts or similar, decoupled
@@ -140,18 +160,27 @@ export interface Actions {
  */
 export interface Mutations {
 	[key: string]: Mutation | undefined;
-	ping?: Mutation<ping_action_spec, Api_Result<Ping_Action_Response>>;
-	pong?: Mutation<pong_action_spec, Api_Result<Pong_Action_Response>>;
-	load_session?: Mutation<load_session_action_spec, Api_Result<Load_Session_Action_Response>>;
-	loaded_session?: Mutation<loaded_session_action_spec, Api_Result<Loaded_Session_Action_Response>>;
-	filer_change?: Mutation<filer_change_action_spec, Api_Result<Filer_Change_Action_Response>>;
-	update_diskfile?: Mutation<update_diskfile_action_spec, void>;
-	delete_diskfile?: Mutation<delete_diskfile_action_spec, void>;
-	create_directory?: Mutation<create_directory_action_spec, void>;
-	send_prompt?: Mutation<send_prompt_action_spec, void>;
+	ping?: Mutation<typeof ping_action_spec.params, Api_Result<typeof ping_action_spec.response>>;
+	pong?: Mutation<typeof pong_action_spec.params, Api_Result<typeof pong_action_spec.response>>;
+	load_session?: Mutation<
+		typeof load_session_action_spec.params,
+		Api_Result<typeof load_session_action_spec.response>
+	>;
+	loaded_session?: Mutation<
+		typeof loaded_session_action_spec.params,
+		Api_Result<typeof loaded_session_action_spec.response>
+	>;
+	filer_change?: Mutation<
+		typeof filer_change_action_spec.params,
+		Api_Result<typeof filer_change_action_spec.response>
+	>;
+	update_diskfile?: Mutation<typeof update_diskfile_action_spec.params, void>;
+	delete_diskfile?: Mutation<typeof delete_diskfile_action_spec.params, void>;
+	create_directory?: Mutation<typeof create_directory_action_spec.params, void>;
+	send_prompt?: Mutation<typeof send_prompt_action_spec.params, void>;
 	completion_response?: Mutation<
-		completion_response_action_spec,
-		Api_Result<Completion_Response_Action_Response>
+		typeof completion_response_action_spec.params,
+		Api_Result<typeof completion_response_action_spec.response>
 	>;
 }
 

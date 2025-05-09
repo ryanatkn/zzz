@@ -3,7 +3,7 @@ import {SvelteMap} from 'svelte/reactivity';
 
 import type {Action_Spec, Service_Action_Spec, Client_Action_Spec} from '$lib/action_spec.js';
 import {Action_Method} from '$lib/action_types.js';
-import {to_action_response_name, to_action_spec_identifier} from '$lib/schema_helpers.js';
+import {to_action_spec_identifier} from '$lib/schema_helpers.js';
 
 /**
  * Registry for action specifications that serves as the single source of truth.
