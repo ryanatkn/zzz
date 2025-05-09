@@ -57,7 +57,11 @@ Zzz builds on a great deal of software.
 
 - see the deps in [package.json](package.json)
 - [Claude](https://claude.ai/) wrote a lot of code after the initial version
-  and is the main writer these days
+  under my sometimes-flawed direction,
+  and continues to contribute a lot to varying but sufficient success (some oofs let's be clear),
+  especially in parts that can be a
+  bit sloppy like the UI in "futuremode"
+  (sometimes with input from other gen AI)
 
 ## License 🐦
 

@@ -1,11 +1,11 @@
 import {action_specs} from '$lib/action_specs.js';
 import {Action_Registry} from '$lib/action_registry.js';
+const registry = new Action_Registry(action_specs);
 
 /**
  * Create and populate a registry with all defined actions.
  */
 export const create_action_registry = (): Action_Registry => {
-	const registry = new Action_Registry();
 	registry.register_many(action_specs);
 	return registry;
 };

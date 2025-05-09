@@ -10,26 +10,21 @@ import type {
 } from '$lib/server/service.js';
 import type {Mutation} from '$lib/mutation.js';
 import type {
-	Completion_Response_Action_Params,
-	Completion_Response_Action_Response,
-	Create_Directory_Action_Params,
-	Delete_Diskfile_Action_Params,
-	Filer_Change_Action_Params,
-	Filer_Change_Action_Response,
-	Load_Session_Action_Params,
-	Load_Session_Action_Response,
-	Loaded_Session_Action_Params,
-	Loaded_Session_Action_Response,
-	Ping_Action_Params,
-	Ping_Action_Response,
-	Pong_Action_Params,
-	Pong_Action_Response,
-	Send_Prompt_Action_Params,
-	Update_Diskfile_Action_Params,
-} from '$lib/schemas.js';
+	completion_response_action_spec,
+	create_directory_action_spec,
+	delete_diskfile_action_spec,
+	filer_change_action_spec,
+	load_session_action_spec,
+	loaded_session_action_spec,
+	ping_action_spec,
+	pong_action_spec,
+	send_prompt_action_spec,
+	update_diskfile_action_spec,
+} from '$lib/action_specs.js';
 
 /**
- * All action names.
+ * All action names. May have '/' separators for namespacing.
+ * TODO maybe any relative url-encoded path is valid? add to schema defs
  */
 export const Action_Method = z.enum([
 	'ping',
@@ -69,16 +64,16 @@ export type Client_Action_Method =
  * Maps action names to their parameter types.
  */
 export interface Action_Params_By_Name {
-	ping: Ping_Action_Params;
-	pong: Pong_Action_Params;
-	load_session: Load_Session_Action_Params;
-	loaded_session: Loaded_Session_Action_Params;
-	filer_change: Filer_Change_Action_Params;
-	update_diskfile: Update_Diskfile_Action_Params;
-	delete_diskfile: Delete_Diskfile_Action_Params;
-	create_directory: Create_Directory_Action_Params;
-	send_prompt: Send_Prompt_Action_Params;
-	completion_response: Completion_Response_Action_Params;
+	ping: ping_action_spec.params;
+	pong: pong_action_spec.params;
+	load_session: load_session_action_spec.params;
+	loaded_session: loaded_session_action_spec.params;
+	filer_change: filer_change_action_spec.params;
+	update_diskfile: update_diskfile_action_spec.params;
+	delete_diskfile: delete_diskfile_action_spec.params;
+	create_directory: create_directory_action_spec.params;
+	send_prompt: send_prompt_action_spec.params;
+	completion_response: completion_response_action_spec.params;
 }
 
 /**
@@ -97,22 +92,22 @@ export interface Action_Response_By_Name {
  * Maps action names to their service implementations.
  */
 export interface Service_By_Name {
-	ping: Non_Authenticated_Service<Ping_Action_Params, Service_Return<Ping_Action_Response>>;
-	pong: Non_Authenticated_Service<Pong_Action_Params, Service_Return<Pong_Action_Response>>;
+	ping: Non_Authenticated_Service<ping_action_spec, Service_Return<Ping_Action_Response>>;
+	pong: Non_Authenticated_Service<pong_action_spec, Service_Return<Pong_Action_Response>>;
 	load_session: Non_Authenticated_Service<
-		Load_Session_Action_Params,
+		load_session_action_spec,
 		Service_Return<Load_Session_Action_Response>
 	>;
 	loaded_session: Non_Authenticated_Service<
-		Loaded_Session_Action_Params,
+		loaded_session_action_spec,
 		Service_Return<Loaded_Session_Action_Response>
 	>;
 	filer_change: Non_Authenticated_Service<
-		Filer_Change_Action_Params,
+		filer_change_action_spec,
 		Service_Return<Filer_Change_Action_Response>
 	>;
 	completion_response: Non_Authenticated_Service<
-		Completion_Response_Action_Params,
+		completion_response_action_spec,
 		Service_Return<Completion_Response_Action_Response>
 	>;
 }
@@ -122,20 +117,20 @@ export interface Service_By_Name {
  */
 export interface Actions {
 	ping: () => Promise<Api_Result<Ping_Action_Response>>;
-	pong: (params: Pong_Action_Params) => Promise<Api_Result<Pong_Action_Response>>;
+	pong: (params: pong_action_spec.params) => Promise<Api_Result<Pong_Action_Response>>;
 	load_session: () => Promise<Api_Result<Load_Session_Action_Response>>;
 	loaded_session: (
-		params: Loaded_Session_Action_Params,
+		params: loaded_session_action_spec.params,
 	) => Promise<Api_Result<Loaded_Session_Action_Response>>;
 	filer_change: (
-		params: Filer_Change_Action_Params,
+		params: filer_change_action_spec.params,
 	) => Promise<Api_Result<Filer_Change_Action_Response>>;
-	update_diskfile: (params: Update_Diskfile_Action_Params) => Promise<string>;
-	delete_diskfile: (params: Delete_Diskfile_Action_Params) => Promise<string>;
-	create_directory: (params: Create_Directory_Action_Params) => Promise<string>;
-	send_prompt: (params: Send_Prompt_Action_Params) => Promise<string>;
+	update_diskfile: (params: update_diskfile_action_spec.params) => Promise<string>;
+	delete_diskfile: (params: delete_diskfile_action_spec.params) => Promise<string>;
+	create_directory: (params: create_directory_action_spec.params) => Promise<string>;
+	send_prompt: (params: send_prompt_action_spec.params) => Promise<string>;
 	completion_response: (
-		params: Completion_Response_Action_Params,
+		params: completion_response_action_spec.params,
 	) => Promise<Api_Result<Completion_Response_Action_Response>>;
 }
 
@@ -145,20 +140,17 @@ export interface Actions {
  */
 export interface Mutations {
 	[key: string]: Mutation | undefined;
-	ping?: Mutation<Ping_Action_Params, Api_Result<Ping_Action_Response>>;
-	pong?: Mutation<Pong_Action_Params, Api_Result<Pong_Action_Response>>;
-	load_session?: Mutation<Load_Session_Action_Params, Api_Result<Load_Session_Action_Response>>;
-	loaded_session?: Mutation<
-		Loaded_Session_Action_Params,
-		Api_Result<Loaded_Session_Action_Response>
-	>;
-	filer_change?: Mutation<Filer_Change_Action_Params, Api_Result<Filer_Change_Action_Response>>;
-	update_diskfile?: Mutation<Update_Diskfile_Action_Params, void>;
-	delete_diskfile?: Mutation<Delete_Diskfile_Action_Params, void>;
-	create_directory?: Mutation<Create_Directory_Action_Params, void>;
-	send_prompt?: Mutation<Send_Prompt_Action_Params, void>;
+	ping?: Mutation<ping_action_spec, Api_Result<Ping_Action_Response>>;
+	pong?: Mutation<pong_action_spec, Api_Result<Pong_Action_Response>>;
+	load_session?: Mutation<load_session_action_spec, Api_Result<Load_Session_Action_Response>>;
+	loaded_session?: Mutation<loaded_session_action_spec, Api_Result<Loaded_Session_Action_Response>>;
+	filer_change?: Mutation<filer_change_action_spec, Api_Result<Filer_Change_Action_Response>>;
+	update_diskfile?: Mutation<update_diskfile_action_spec, void>;
+	delete_diskfile?: Mutation<delete_diskfile_action_spec, void>;
+	create_directory?: Mutation<create_directory_action_spec, void>;
+	send_prompt?: Mutation<send_prompt_action_spec, void>;
 	completion_response?: Mutation<
-		Completion_Response_Action_Params,
+		completion_response_action_spec,
 		Api_Result<Completion_Response_Action_Response>
 	>;
 }

@@ -2,7 +2,7 @@ import type {Logger} from '@ryanatkn/belt/log.js';
 import type {z} from 'zod';
 
 import type {Zzz_Server} from '$lib/server/zzz_server.js';
-import type {Service_Action_Spec} from '$lib/schemas.js';
+import type {Service_Action_Spec} from '$lib/action_spec.js';
 import type {Action_Client, Action_Server} from '$lib/action_collections.js';
 import {Api_Error, is_http_status_ok, type Api_Result, type Http_Status} from '$lib/api.js';
 import {stringify_zod_error} from '$lib/zod_helpers.js';

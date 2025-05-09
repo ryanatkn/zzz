@@ -1,11 +1,16 @@
-import type {Action_Spec, Client_Action_Spec, Service_Action_Spec} from '$lib/schemas.js';
+import type {Action_Spec, Client_Action_Spec, Service_Action_Spec} from '$lib/action_spec.js';
 import type {Action_Method} from '$lib/action_types.js';
+
+/**
+ * Convert an action name to its type name.
+ */
+export const to_action_spec_identifier = (method: Action_Method): string => `${method}_action_spec`;
 
 /**
  * Convert an action name to its params type name.
  */
-export const to_action_params_name = (method: Action_Method): string =>
-	`${to_pascalsnake_case(method)}_Action_Params`;
+export const to_action_spec_params_identifier = (method: Action_Method): string =>
+	`${to_action_spec_identifier(method)}.params`;
 
 /**
  * Convert an action name to its response type name.
@@ -47,21 +52,4 @@ export const to_pascalsnake_case = (str: string, from_camel = false): string => 
 		.split('_')
 		.map((s) => s.charAt(0).toUpperCase() + s.slice(1))
 		.join('_');
-};
-
-/**
- * Get import list for specs based on action specifications
- */
-export const get_schema_imports = (specs: Array<Action_Spec>): Array<string> => {
-	const types: Set<string> = new Set();
-
-	for (const spec of specs) {
-		// Add param and response type names
-		types.add(to_action_params_name(spec.method));
-		if (is_service_action(spec)) {
-			types.add(to_action_response_name(spec.method));
-		}
-	}
-
-	return Array.from(types).sort();
 };
