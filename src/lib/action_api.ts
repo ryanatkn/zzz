@@ -2,8 +2,9 @@ import {Logger} from '@ryanatkn/belt/log.js';
 import {DEV, BROWSER} from 'esm-env';
 
 import type {Action_Name, Actions, Mutations} from '$lib/action_types.js';
-import {create_mutation_context, type Mutation} from '$lib/mutation.js';
+import {create_mutation_context} from '$lib/mutation.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
+import type {Api_Client} from '$lib/api_client.js';
 
 // TODO BLOCK EXTENSIONS
 
@@ -39,7 +40,7 @@ export const create_actions = (
 				log.warn('invoking action with no mutation', action_name, params);
 				return client?.invoke(action_name, params);
 			}
-			const result = client ? await client.invoke(action_name, params) : null;
+			const result = client ? await client.invoke(action_name, params) : undefined;
 			const {ctx, flush_after_mutation} = create_mutation_context(
 				zzz,
 				action_name,

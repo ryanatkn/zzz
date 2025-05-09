@@ -14,7 +14,7 @@ import type {Watcher_Change} from '@ryanatkn/gro/watch_dir.js';
 import {DEV} from 'esm-env';
 
 import {type Action_Completion_Response, type Action_Send_Prompt} from '$lib/schemas.js';
-import {type Action_Client} from '$lib/action_types.js';
+import {type Action_Client} from '$lib/action_collections.js';
 import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
 import {Diskfile_Path, Source_File, type Zzz_Dir} from '$lib/diskfile_types.js';
 import {map_watcher_change_to_diskfile_change} from '$lib/diskfile_helpers.js';
@@ -43,16 +43,16 @@ export const handle_message = async (
 	message: Action_Client,
 	server: Zzz_Server,
 ): Promise<Service_Return> => {
-	console.log(`[handle_message] message`, message.id, message.type);
+	console.log(`[handle_message] message`, message.id, message.name);
 
 	// TODO service registration in zzz_server with plugin system
-	switch (message.type) {
+	switch (message.name) {
 		case 'ping': {
 			return {
 				value: {
 					id: create_uuid(),
 					created: get_datetime_now(),
-					type: 'pong',
+					name: 'pong',
 					ping_id: message.id,
 				},
 			};
@@ -64,7 +64,7 @@ export const handle_message = async (
 
 			// Iterate through all filers and collect their files
 			for (const f of server.filers.values()) {
-				// TODO fix type
+				// TODO fix name
 				f.filer.files.forEach((file: any, id) => {
 					files_array.push({
 						...file,
@@ -77,7 +77,7 @@ export const handle_message = async (
 				value: {
 					id: create_uuid(),
 					created: get_datetime_now(),
-					type: 'loaded_session',
+					name: 'loaded_session',
 					data: {
 						files: files_array,
 						zzz_dir: server.zzz_dir,

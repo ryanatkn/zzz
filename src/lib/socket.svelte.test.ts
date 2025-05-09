@@ -216,7 +216,7 @@ describe('Socket', () => {
 			const request_promise = socket.request<{type: string; request_id: string; data: string}>(
 				{type: 'query_a', id: 'req_a'},
 				(message) => {
-					if (message.type === 'response_a' && message.request_id === 'req_a') {
+					if (message.name === 'response_a' && message.request_id === 'req_a') {
 						return message;
 					}
 					return false;

@@ -34,7 +34,7 @@ export interface Mutation_Context<
  */
 export type Mutation<T_Params = any, T_Result extends Api_Result<unknown> | void = any> = (
 	ctx: Mutation_Context<T_Params, T_Result>,
-) => void;
+) => any;
 
 /**
  * Type for registering callbacks to run after mutation completes.
@@ -51,7 +51,6 @@ export type After_Mutation_Callback = () => void | Promise<void>;
  * a function to flush after-mutation callbacks.
  */
 export const create_mutation_context = <
-	T_Context extends Mutation_Context<T_Params, T_Result>,
 	T_Params = unknown,
 	T_Result extends Api_Result<unknown> | void = any,
 >(
@@ -60,7 +59,7 @@ export const create_mutation_context = <
 	params: T_Params,
 	result: T_Result,
 	actions: Actions, // TODO @many generic probably
-): {ctx: T_Context; flush_after_mutation: () => Promise<void>} => {
+): {ctx: Mutation_Context<T_Params, T_Result>; flush_after_mutation: () => Promise<void>} => {
 	const cbs: Array<After_Mutation_Callback> = [];
 
 	const after_mutation: After_Mutation = (cb) => {
@@ -83,7 +82,7 @@ export const create_mutation_context = <
 		result,
 		actions,
 		after_mutation,
-	} satisfies Mutation_Context<T_Params, T_Result> as T_Context;
+	} satisfies Mutation_Context<T_Params, T_Result>;
 
 	return {ctx, flush_after_mutation};
 };

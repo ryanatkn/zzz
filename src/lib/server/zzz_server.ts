@@ -143,7 +143,7 @@ export class Zzz_Server {
 		// Sanity check
 		if (!message) throw new Api_Error(400, 'invalid message'); // eslint-disable-line @typescript-eslint/no-unnecessary-condition
 
-		this.log?.debug(`receive message`, message.id, message.type);
+		this.log?.debug(`receive message`, message.id, message.name);
 
 		return this.#handle_message(message, this);
 	}

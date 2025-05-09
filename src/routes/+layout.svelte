@@ -84,8 +84,9 @@
 				actions,
 			);
 
-			mutation(mutation_context.ctx); // TODO @many try/catch?
+			const result = mutation(mutation_context.ctx); // TODO @many try/catch?
 			await mutation_context.flush_after_mutation();
+			return result;
 		},
 		onreceive: async (message: Action_Server) => {
 			console.log(`[ws] received message`, message);
@@ -111,8 +112,9 @@
 				actions,
 			);
 
-			mutation(mutation_context.ctx); // TODO @many try/catch?
+			const result = mutation(mutation_context.ctx); // TODO @many try/catch?
 			await mutation_context.flush_after_mutation();
+			return result;
 		},
 	});
 
