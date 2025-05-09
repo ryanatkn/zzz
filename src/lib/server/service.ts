@@ -18,7 +18,7 @@ export interface Service_Return<T_Value = any> {
 /**
  * Base service interface with no authentication.
  */
-export interface Non_Authenticated_Service<
+export interface Nonauthenticated_Service<
 	T_Params extends object | null = any,
 	T_Returned extends Service_Return = Service_Return,
 > {
@@ -28,7 +28,7 @@ export interface Non_Authenticated_Service<
 /**
  * Service interface with authentication but no authorization.
  */
-export interface Non_Authorized_Service<
+export interface Nonauthorized_Service<
 	T_Params extends object | null = any,
 	T_Returned extends Service_Return = Service_Return,
 > {

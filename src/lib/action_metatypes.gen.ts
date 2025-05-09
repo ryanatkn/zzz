@@ -29,7 +29,7 @@ export const gen: Gen = ({origin_path}) => {
 
 		import {z} from 'zod';
 		import type {Api_Result} from '$lib/api.js';
-		import type {Service_Return, Non_Authenticated_Service, Non_Authorized_Service, Authorized_Service} from '$lib/server/service.js';
+		import type {Service_Return, Nonauthenticated_Service, Nonauthorized_Service, Authorized_Service} from '$lib/server/service.js';
 		import type {Mutation} from '$lib/mutation.js';
 		import type {${schema_imports.join(', ')}} from '$lib/action_specs.js';
 
@@ -88,7 +88,7 @@ export const gen: Gen = ({origin_path}) => {
 			${registry.service_specs
 				.map(
 					(spec) =>
-						`${spec.method}: Non_Authenticated_Service<typeof ${to_action_spec_identifier(spec.method)}, Service_Return<typeof ${to_action_spec_response_identifier(spec.method)}>>;`,
+						`${spec.method}: Nonauthenticated_Service<typeof ${to_action_spec_identifier(spec.method)}, Service_Return<typeof ${to_action_spec_response_identifier(spec.method)}>>;`,
 				)
 				.join('\n\t')}
 		}

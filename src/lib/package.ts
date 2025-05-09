@@ -853,6 +853,7 @@ export const src_json = {
 				{name: 'Action_Client', kind: 'variable'},
 				{name: 'Action_Server', kind: 'variable'},
 				{name: 'Action_Any', kind: 'variable'},
+				{name: 'action_spec_by_method', kind: 'variable'},
 			],
 		},
 		'./Action_Detail.svelte': {
@@ -1915,8 +1916,8 @@ export const src_json = {
 			path: 'server/service.ts',
 			declarations: [
 				{name: 'Service_Return', kind: 'type'},
-				{name: 'Non_Authenticated_Service', kind: 'type'},
-				{name: 'Non_Authorized_Service', kind: 'type'},
+				{name: 'Nonauthenticated_Service', kind: 'type'},
+				{name: 'Nonauthorized_Service', kind: 'type'},
 				{name: 'Authorized_Service', kind: 'type'},
 				{name: 'Service_Map', kind: 'type'},
 				{name: 'service_return_to_api_result', kind: 'function'},

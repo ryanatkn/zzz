@@ -4,8 +4,8 @@ import {z} from 'zod';
 import type {Api_Result} from '$lib/api.js';
 import type {
 	Service_Return,
-	Non_Authenticated_Service,
-	Non_Authorized_Service,
+	Nonauthenticated_Service,
+	Nonauthorized_Service,
 	Authorized_Service,
 } from '$lib/server/service.js';
 import type {Mutation} from '$lib/mutation.js';
@@ -104,27 +104,27 @@ export interface Action_Response_Schema_By_Name {
  * Maps action names to their service implementations.
  */
 export interface Service_By_Name {
-	ping: Non_Authenticated_Service<
+	ping: Nonauthenticated_Service<
 		typeof ping_action_spec,
 		Service_Return<typeof ping_action_spec.response>
 	>;
-	pong: Non_Authenticated_Service<
+	pong: Nonauthenticated_Service<
 		typeof pong_action_spec,
 		Service_Return<typeof pong_action_spec.response>
 	>;
-	load_session: Non_Authenticated_Service<
+	load_session: Nonauthenticated_Service<
 		typeof load_session_action_spec,
 		Service_Return<typeof load_session_action_spec.response>
 	>;
-	loaded_session: Non_Authenticated_Service<
+	loaded_session: Nonauthenticated_Service<
 		typeof loaded_session_action_spec,
 		Service_Return<typeof loaded_session_action_spec.response>
 	>;
-	filer_change: Non_Authenticated_Service<
+	filer_change: Nonauthenticated_Service<
 		typeof filer_change_action_spec,
 		Service_Return<typeof filer_change_action_spec.response>
 	>;
-	completion_response: Non_Authenticated_Service<
+	completion_response: Nonauthenticated_Service<
 		typeof completion_response_action_spec,
 		Service_Return<typeof completion_response_action_spec.response>
 	>;
