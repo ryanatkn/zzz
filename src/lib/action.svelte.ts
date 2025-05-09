@@ -14,21 +14,6 @@ import {Cell_Json} from '$lib/cell_types.js';
 export const ACTION_DATE_FORMAT = 'MMM d, p';
 export const ACTION_TIME_FORMAT = 'p';
 
-// TODO BLOCK maybe generate from the registry? `schemas` instance maybe, instead of `* as schemas`?
-// Mapping for action directions
-export const action_directions: Record<string, Action_Direction> = {
-	ping: 'client',
-	pong: 'server',
-	load_session: 'client',
-	loaded_session: 'server',
-	send_prompt: 'client',
-	completion_response: 'server',
-	filer_change: 'server',
-	update_diskfile: 'client',
-	delete_diskfile: 'client',
-	create_directory: 'client',
-};
-
 // TODO BLOCK replace with the actions proxy
 // Helper function to create an action with json representation
 export const create_action_json = (
@@ -41,11 +26,6 @@ export const create_action_json = (
 		created: get_datetime_now(),
 	} as Action_Json;
 };
-
-// TODO remove?
-// Helper to get the direction for an action
-export const get_action_direction = (type: Action_Name): Action_Direction =>
-	action_directions[type];
 
 export const Action_Json = Cell_Json.extend({
 	name: Action_Name,

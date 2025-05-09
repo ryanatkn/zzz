@@ -95,8 +95,10 @@ export type Action_Base = z.infer<typeof Action_Base>;
 
 export const Action_Spec_Base_Schema = z.object({
 	name: Action_Name,
+	type: z.enum(['Client_Action', 'Service_Action']),
 	params: z.instanceof(z.ZodType),
 	returns: z.string(),
+	direction: Action_Direction,
 });
 export type Action_Spec_Base = z.infer<typeof Action_Spec_Base_Schema>;
 
@@ -278,6 +280,7 @@ export type Completion_Response_Action_Response = z.infer<
 
 export const ping_action_spec = {
 	name: 'ping',
+	direction: 'client',
 	type: 'Service_Action',
 	method: 'GET',
 	auth: null,
@@ -288,6 +291,7 @@ export const ping_action_spec = {
 
 export const pong_action_spec = {
 	name: 'pong',
+	direction: 'server',
 	type: 'Service_Action',
 	method: null,
 	auth: null,
@@ -298,6 +302,7 @@ export const pong_action_spec = {
 
 export const load_session_action_spec = {
 	name: 'load_session',
+	direction: 'client',
 	type: 'Service_Action',
 	method: 'GET',
 	auth: null,
@@ -308,6 +313,7 @@ export const load_session_action_spec = {
 
 export const loaded_session_action_spec = {
 	name: 'loaded_session',
+	direction: 'server',
 	type: 'Service_Action',
 	method: null,
 	auth: null,
@@ -318,6 +324,7 @@ export const loaded_session_action_spec = {
 
 export const filer_change_action_spec = {
 	name: 'filer_change',
+	direction: 'server',
 	type: 'Service_Action',
 	method: null,
 	auth: null,
@@ -328,6 +335,7 @@ export const filer_change_action_spec = {
 
 export const update_diskfile_action_spec = {
 	name: 'update_diskfile',
+	direction: 'client',
 	type: 'Client_Action',
 	params: Update_Diskfile_Action_Params,
 	returns: 'string',
@@ -335,6 +343,7 @@ export const update_diskfile_action_spec = {
 
 export const delete_diskfile_action_spec = {
 	name: 'delete_diskfile',
+	direction: 'client',
 	type: 'Client_Action',
 	params: Delete_Diskfile_Action_Params,
 	returns: 'string',
@@ -342,6 +351,7 @@ export const delete_diskfile_action_spec = {
 
 export const create_directory_action_spec = {
 	name: 'create_directory',
+	direction: 'client',
 	type: 'Client_Action',
 	params: Create_Directory_Action_Params,
 	returns: 'string',
@@ -349,6 +359,7 @@ export const create_directory_action_spec = {
 
 export const send_prompt_action_spec = {
 	name: 'send_prompt',
+	direction: 'client',
 	type: 'Client_Action',
 	params: Send_Prompt_Action_Params,
 	returns: 'string',
@@ -356,6 +367,7 @@ export const send_prompt_action_spec = {
 
 export const completion_response_action_spec = {
 	name: 'completion_response',
+	direction: 'server',
 	type: 'Service_Action',
 	method: 'GET',
 	auth: null,

@@ -58,8 +58,8 @@ export class Actions extends Cell<typeof Actions_Json> {
 	readonly filer_changes: Array<Action> = $derived(this.items.where('by_type', 'filer_change'));
 
 	// Action handlers
-	onsend?: (action: Action_Client) => void;
-	onreceive?: (action: Action_Server) => void;
+	onsend?: (action: Action_Client) => void; // TODO these names are confused, they need to be about direction
+	onreceive?: (action: Action_Server) => void; // TODO these names are confused, they need to be about direction
 
 	constructor(options: Actions_Options) {
 		super(Actions_Json, options);
