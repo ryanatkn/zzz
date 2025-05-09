@@ -2,7 +2,7 @@ import {Hono, type Handler} from 'hono';
 import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 
 import type {Zzz_Server} from '$lib/server/zzz_server.js';
-import type {Action_Spec} from '$lib/schemas.js';
+import type {Action_Spec} from '$lib/action_spec.js';
 import {service_return_to_api_result} from '$lib/server/service.js';
 import {API_ROUTE} from '$lib/constants.js';
 import {Api_Error, to_failed_api_result} from '$lib/api.js';

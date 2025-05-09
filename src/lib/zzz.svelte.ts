@@ -39,7 +39,8 @@ import {Socket} from '$lib/socket.svelte.js';
 import {Capabilities} from '$lib/capabilities.svelte.js';
 import {Diskfile_History} from '$lib/diskfile_history.svelte.js';
 import {HANDLED} from '$lib/cell_helpers.js';
-import {create_action_registry} from '$lib/action_registry_global.js';
+import {action_specs} from '$lib/action_specs.js';
+import {Action_Registry} from '$lib/action_registry.js';
 
 export const zzz_context = create_context<Zzz>();
 
@@ -102,7 +103,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	/**
 	 * Action registry for centralized action specification access.
 	 */
-	readonly action_registry = create_action_registry();
+	readonly action_registry = new Action_Registry(action_specs);
 
 	/**
 	 * The `zzz_dir` is the path to Zzz's primary directory on the server's filesystem.

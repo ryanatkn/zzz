@@ -1,5 +1,5 @@
 import type {Api_Result} from '$lib/api.js';
-import type {Action_Spec} from '$lib/schemas.js';
+import type {Action_Spec} from '$lib/action_spec.js';
 
 export interface Api_Client<
 	T_Params_Map extends Record<string, any> = any, // TODO default and value types?

@@ -8,15 +8,6 @@ import {Provider_Name} from '$lib/provider_types.js';
 export const Action_Direction = z.enum(['client', 'server', 'both']);
 export type Action_Direction = z.infer<typeof Action_Direction>;
 
-export const Tape_Role = z.enum(['user', 'system', 'assistant']);
-export type Tape_Role = z.infer<typeof Tape_Role>;
-
-export const Tape_Message = z.object({
-	role: Tape_Role,
-	content: z.string(),
-});
-export type Tape_Message = z.infer<typeof Tape_Message>;
-
 // Provider-specific data schemas
 export const Provider_Data_Ollama = z.object({
 	type: z.literal('ollama'),

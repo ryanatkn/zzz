@@ -16,3 +16,12 @@ export const Tape_Json = Cell_Json.extend({
 });
 export type Tape_Json = z.infer<typeof Tape_Json>;
 export type Tape_Json_Input = z.input<typeof Tape_Json>;
+
+export const Tape_Role = z.enum(['user', 'system', 'assistant']);
+export type Tape_Role = z.infer<typeof Tape_Role>;
+
+export const Tape_Message = z.object({
+	role: Tape_Role,
+	content: z.string(),
+});
+export type Tape_Message = z.infer<typeof Tape_Message>;

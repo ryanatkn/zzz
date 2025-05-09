@@ -4,19 +4,19 @@ import {resolve} from 'node:path';
 import {Logger} from '@ryanatkn/belt/log.js';
 import {DEV} from 'esm-env';
 
-import type {Action_Spec} from '$lib/schemas.js';
+import type {Action_Spec} from '$lib/action_spec.js';
 import {Action_Client, type Action_Server} from '$lib/action_collections.js';
 import type {Zzz_Config} from '$lib/config_helpers.js';
 import {Zzz_Dir} from '$lib/diskfile_types.js';
 import {Safe_Fs} from '$lib/server/safe_fs.js';
-import {create_action_registry} from '$lib/action_registry_global.js';
+import {action_specs} from '$lib/action_specs.js';
+import {Action_Registry} from '$lib/action_registry.js';
 import {
 	validate_service_params,
 	validate_service_response as validate_service_return,
 	type Service_Return,
 } from '$lib/server/service.js';
 import {Api_Error} from '$lib/api.js';
-import {action_specs} from '$lib/action_specs.js';
 import type {Action_Method} from '$lib/action_types.js';
 
 /**
@@ -100,8 +100,7 @@ export class Zzz_Server {
 	/**
 	 * Action registry for centralized action specification access.
 	 */
-	readonly action_registry = create_action_registry();
-
+	readonly action_registry = new Action_Registry(action_specs);
 	/**
 	 * Access to all action specifications.
 	 */

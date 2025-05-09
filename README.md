@@ -62,7 +62,9 @@ Zzz builds on a great deal of software.
   - some oofs let's be clear, there is a lot to be concerned about here,
     but Zzz was designed to better leverage it for our benefit,
     so I'm choosing to go with the grain here and also
-    constantly revisit my old ways of doing things
+    constantly revisit my old ways of doing things -
+    I'm currently quite happy with the quality and productivity
+    but there is endless room to improve
 
 ## License 🐦
 
