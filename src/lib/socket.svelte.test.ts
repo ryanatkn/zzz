@@ -24,21 +24,21 @@ class Mocket {
 		this.url = url;
 	}
 
-	addEventListener(type: string, listener: (event: any) => void) {
-		if (!this.listeners[type]) {
-			this.listeners[type] = [];
+	addEventListener(method: string, listener: (event: any) => void) {
+		if (!this.listeners[method]) {
+			this.listeners[method] = [];
 		}
-		this.listeners[type].push(listener);
+		this.listeners[method].push(listener);
 	}
 
-	removeEventListener(type: string, listener: (event: any) => void) {
-		if (!this.listeners[type]) return;
-		this.listeners[type] = this.listeners[type].filter((l) => l !== listener);
+	removeEventListener(method: string, listener: (event: any) => void) {
+		if (!this.listeners[method]) return;
+		this.listeners[method] = this.listeners[method].filter((l) => l !== listener);
 	}
 
-	dispatchEvent(type: string, event: any = {}) {
-		if (!this.listeners[type]) return;
-		for (const listener of this.listeners[type]) {
+	dispatchEvent(method: string, event: any = {}) {
+		if (!this.listeners[method]) return;
+		for (const listener of this.listeners[method]) {
 			listener(event);
 		}
 	}
@@ -67,8 +67,8 @@ const TEST_URLS = {
 };
 
 const TEST_MESSAGE = {
-	BASIC: {type: 'test_action', data: 'test_data'},
-	PING: {type: 'ping', timestamp: 123456789},
+	BASIC: {method: 'test_action', data: 'test_data'},
+	PING: {method: 'ping', timestamp: 123456789},
 };
 
 describe('Socket', () => {
@@ -193,8 +193,8 @@ describe('Socket', () => {
 			const socket = new Socket({zzz});
 
 			// Queue messages while disconnected
-			socket.send({type: 'message_a'});
-			socket.send({type: 'message_b'});
+			socket.send({method: 'message_a'});
+			socket.send({method: 'message_b'});
 
 			expect(socket.queued_message_count).toBe(2);
 
@@ -213,10 +213,10 @@ describe('Socket', () => {
 			mock_socket.connect();
 
 			// Create request promise
-			const request_promise = socket.request<{type: string; request_id: string; data: string}>(
-				{type: 'query_a', id: 'req_a'},
+			const request_promise = socket.request<{method: string; request_id: string; data: string}>(
+				{method: 'query_a', id: 'req_a'},
 				(message) => {
-					if (message.name === 'response_a' && message.request_id === 'req_a') {
+					if (message.method === 'response_a' && message.request_id === 'req_a') {
 						return message;
 					}
 					return false;
@@ -229,11 +229,11 @@ describe('Socket', () => {
 
 			// Simulate response
 			mock_socket.dispatchEvent('message', {
-				data: JSON.stringify({type: 'response_a', request_id: 'req_a', data: 'result_a'}),
+				data: JSON.stringify({method: 'response_a', request_id: 'req_a', data: 'result_a'}),
 			});
 
 			const result = await request_promise;
-			expect(result.type).toBe('response_a');
+			expect(result.method).toBe('response_a');
 			expect(result.data).toBe('result_a');
 		});
 	});

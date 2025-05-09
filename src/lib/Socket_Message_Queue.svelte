@@ -210,7 +210,7 @@
 									{/if}
 								{/snippet}
 							</Copy_To_Clipboard>
-							<small class="chip">{message.data.message.name}</small>
+							<small class="chip">{message.data.message.method}</small>
 							<Copy_To_Clipboard
 								text={message.data.message.id}
 								attrs={{
