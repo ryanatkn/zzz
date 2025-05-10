@@ -122,7 +122,7 @@
 		</div>
 	{:else if capabilities.ollama.status === 'success' && capabilities.ollama.data?.list_response?.models.length === 0}
 		<div class="panel p_md" transition:slide>
-			<p>No models found. You can install models using the Ollama CLI.</p>
+			<p>no models found - for now you can install models using the Ollama CLI</p>
 		</div>
 	{/if}
 

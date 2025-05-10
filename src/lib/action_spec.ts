@@ -84,3 +84,18 @@ export const is_action_spec = (value: unknown): value is Action_Spec => {
 			(value as Action_Spec).kind === 'client_local')
 	);
 };
+
+export const collect_action_specs_by_method = (
+	obj: Record<string, Action_Spec>,
+): Array<Action_Spec> => {
+	const specs: Array<Action_Spec> = [];
+
+	// Filter module exports for action specs
+	for (const value of Object.values(obj)) {
+		if (is_action_spec(value)) {
+			specs.push(value);
+		}
+	}
+
+	return specs;
+};

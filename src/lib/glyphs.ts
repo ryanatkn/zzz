@@ -29,7 +29,7 @@ export const GLYPH_EDIT = '✎'; // ✎ ✏ ✐ ✑ ✒
 // ⎗ ⎗ ⎘ ⌖ ⌶ ⎙
 // ⎘ ⎘ ⎌ ⌫ ⊘ ⦸
 // ⤺ ⤻ ⤼ ⤽ ⤾ ⤿
-export const GLYPH_SORT = '⇅'; // ⇅ ⇵ ⥮ ⮃
+export const GLYPH_SORT = '⇅'; // ⇅ ⇵ ⮃ ⮁
 
 export const GLYPH_SERVER = '🜢';
 export const GLYPH_CHAT = '⌸';
@@ -64,7 +64,7 @@ export const GLYPH_SESSION = '⏣';
 
 export const GLYPH_ACTION_TYPE_CLIENT_LOCAL = '⤳'; // ⤤ ⤳
 export const GLYPH_ACTION_TYPE_NOTIFICATION = '⥙'; // ⤷
-export const GLYPH_ACTION_TYPE_REQUEST_RESPONSE = '⤨';
+export const GLYPH_ACTION_TYPE_REQUEST_RESPONSE = '⥮'; // ⤨ ⥮ ⥯
 
 export const GLYPH_EXTERNAL_LINK = '🡵';
 
@@ -102,7 +102,7 @@ export const get_glyph_for_action_kind = (kind: Action_Kind): string => {
 };
 
 // ⭍ ⏻
-//⥘ ⥙
+//⥘ ⥙ ⇅ ⇵ ⇳ ⇊ ⇈  ⮃
 // ⬎⤣
 
 // ⎗ ⎘

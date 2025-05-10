@@ -3,7 +3,7 @@
 </script>
 
 <script lang="ts">
-	import {type Snippet} from 'svelte';
+	import type {Snippet} from 'svelte';
 
 	import {projects_context, Projects} from '$routes/projects/projects.svelte.js';
 	import {zzz_context} from '$lib/zzz.svelte.js';

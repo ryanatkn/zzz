@@ -42,63 +42,50 @@ export const gen: Gen = ({origin_path}) => {
 
 		import {z} from 'zod';
 
+		import {type Action_Spec, collect_action_specs_by_method} from '$lib/action_spec.js';
 		import {Action_Message} from '$lib/action_messages.js';
 		import * as action_spec_module from '$lib/action_specs.js';
-		import {type Action_Spec, is_action_spec} from '$lib/action_spec.js';
 		import type {Action_Method} from '$lib/action_metatypes.js';
 
 		/**
 		 * Set of actions with "from_client" direction (originating from client).
 		 */
-		export const Action_From_Client = z.discriminatedUnion('method', [
+		export const Action_Message_From_Client = z.discriminatedUnion('method', [
 			${get_action_messages(from_client_methods)}
 		]);
-		export type Action_From_Client = z.infer<typeof Action_From_Client>;
+		export type Action_Message_From_Client = z.infer<typeof Action_Message_From_Client>;
 
 		/**
 		 * Set of actions with "from_server" direction (originating from server).
 		 */
-		export const Action_From_Server = z.discriminatedUnion('method', [
+		export const Action_Message_From_Server = z.discriminatedUnion('method', [
 			${get_action_messages(from_server_methods)}
 		]);
-		export type Action_From_Server = z.infer<typeof Action_From_Server>;
+		export type Action_Message_From_Server = z.infer<typeof Action_Message_From_Server>;
 
 		/**
 		 * All action types combined.
 		 */
-		export const Action_Any = z.discriminatedUnion('method', [
+		export const Action_Message_Any = z.discriminatedUnion('method', [
 			${get_action_messages(all_methods)}
 		]);
-		export type Action_Any = z.infer<typeof Action_Any>;
+		export type Action_Message_Any = z.infer<typeof Action_Message_Any>;
 
 		/**
 		 * Service actions with HTTP endpoints (networked).
 		 */
-		export const Action_Networked = z.discriminatedUnion('method', [
+		export const Action_Message_Networked = z.discriminatedUnion('method', [
 			${get_action_messages(networked_methods)}
 		]);
-		export type Action_Networked = z.infer<typeof Action_Networked>;
+		export type Action_Message_Networked = z.infer<typeof Action_Message_Networked>;
 
 		/**
 		 * Service actions without HTTP endpoints (non-networked).
 		 */
-		export const Action_Nonnetworked = z.discriminatedUnion('method', [
+		export const Action_Message_Nonnetworked = z.discriminatedUnion('method', [
 			${get_action_messages(nonnetworked_methods)}
 		]);
-		export type Action_Nonnetworked = z.infer<typeof Action_Nonnetworked>;
-
-		const collect_action_specs_by_method = (obj: Record<string, Action_Spec>): Array<Action_Spec> => {
-			const specs: Array<Action_Spec> = [];
-
-			// Filter module exports for action specs
-			for (const value of Object.values(obj)) {
-				if (is_action_spec(value)) {
-					specs.push(value);
-				}
-			}
-
-			return specs;
-		};
+		export type Action_Message_Nonnetworked = z.infer<typeof Action_Message_Nonnetworked>;
 
 		export const action_specs: Array<Action_Spec> = collect_action_specs_by_method(action_spec_module);
 		

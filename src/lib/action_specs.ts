@@ -5,12 +5,9 @@ import {Diskfile_Change, Diskfile_Path, Source_File, Zzz_Dir} from '$lib/diskfil
 import {Type_Literal, Uuid} from '$lib/zod_helpers.js';
 import {Completion_Request, Completion_Response} from '$lib/completion_types.js';
 
-/**
- * Centralized definitions for all action specifications.
- * This file serves as the single source of truth for action specifications.
- */
+// Specs are the source of truth for many things including generated code -
+// the goal is to make the system extensible for users but it's not there yet.
 
-// Define all action specifications with proper typing
 export const ping_action_spec = {
 	method: 'ping',
 	kind: 'request_response',

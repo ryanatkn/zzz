@@ -6,9 +6,9 @@ import {DEV} from 'esm-env';
 
 import type {Action_Spec} from '$lib/action_spec.js';
 import {
-	Action_From_Client,
+	Action_Message_From_Client,
 	action_spec_by_method,
-	type Action_From_Server,
+	type Action_Message_From_Server,
 	action_specs,
 } from '$lib/action_collections.js';
 import type {Zzz_Config} from '$lib/config_helpers.js';
@@ -28,7 +28,7 @@ import {is_request_response_action} from '$lib/schema_helpers.js';
  * Function type for handling client messages.
  */
 export type Action_Handler = (
-	message: Action_From_Client,
+	message: Action_Message_From_Client,
 	server: Zzz_Server,
 ) => Promise<Service_Return>;
 
@@ -62,7 +62,7 @@ export interface Zzz_Server_Options {
 	/**
 	 * Send a message to all connected websocket clients.
 	 */
-	send_to_all_clients: (message: Action_From_Server) => void;
+	send_to_all_clients: (message: Action_Message_From_Server) => void;
 	/**
 	 * Handler function for processing client messages.
 	 */
@@ -87,7 +87,7 @@ export class Zzz_Server {
 
 	readonly config: Zzz_Config;
 
-	readonly #send_to_all_clients: (message: Action_From_Server) => void;
+	readonly #send_to_all_clients: (message: Action_Message_From_Server) => void;
 	readonly #handle_message: Action_Handler;
 	readonly #handle_filer_change: Filer_Change_Handler;
 
@@ -141,40 +141,19 @@ export class Zzz_Server {
 	/**
 	 * Send a message to all connected clients.
 	 */
-	send(message: Action_From_Server): void {
+	send(message: Action_Message_From_Server): void {
 		this.#check_destroyed();
 
 		this.#send_to_all_clients(message);
 	}
 
-	/**
-	 * Prefer `process_action` instead of this unless you intend to bypass validation.
-	 * Handle incoming client messages for all transports
-	 * by delegating to the configured handler.
-	 */
-	async receive(message: Action_From_Client): Promise<Service_Return> {
-		this.#check_destroyed();
-
-		// Sanity check
-		if (!message) throw new Api_Error(400, 'invalid message'); // eslint-disable-line @typescript-eslint/no-unnecessary-condition
-
-		this.log?.debug(`receive message`, message.id, message.method);
-
-		return this.#handle_message(message, this);
-	}
-
+	// TODO consider extracting a service helper, maybe an abstraction for the Service_Request
 	/**
 	 * Process an action by name with parameters.
 	 * This is the unified entry point for both HTTP and WebSocket actions.
-	 *
-	 * @param method_or_message - Either the action name as a string or the full Action_From_Client object
-	 * @param params - Parameters if method_or_message is a string, ignored if method_or_message is an Action_From_Client
 	 */
-	async process_action(
-		// TODO BLOCK make this function monomorphic
-		method: Action_Method,
-		params: unknown,
-	): Promise<Service_Return> {
+	async receive(method: Action_Method, params: unknown): Promise<Service_Return> {
+		console.log(`received message`, method, params);
 		this.#check_destroyed();
 
 		// Find the action spec using the registry
@@ -192,7 +171,7 @@ export class Zzz_Server {
 		console.log(`parsed`, parsed);
 
 		// Process the action with validated parameters
-		const returned = await this.receive(parsed as any); // TODO typesafe, see `validate_service_params`, probably generated code
+		const returned = await this.perform_action(parsed as any); // TODO typesafe, see `validate_service_params`, probably generated code
 
 		// In development, validate the response
 		if (DEV) {
@@ -200,6 +179,18 @@ export class Zzz_Server {
 		}
 
 		return returned;
+	}
+
+	async perform_action(message: Action_Message_From_Client): Promise<Service_Return> {
+		console.log(`perform_action message`, message);
+		this.#check_destroyed();
+
+		// Do a simple fast sanity check because validation is an upstream concern
+		if (!message) throw new Api_Error(400, 'invalid message'); // eslint-disable-line @typescript-eslint/no-unnecessary-condition
+
+		this.log?.debug(`receive message`, message.id, message.method);
+
+		return this.#handle_message(message, this);
 	}
 
 	#destroyed = false;

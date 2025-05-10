@@ -61,7 +61,7 @@
 							/>
 						</li>
 					{:else}
-						<p>No models available yet.</p>
+						<p>no models available yet</p>
 					{/each}
 				</ul>
 			</div>

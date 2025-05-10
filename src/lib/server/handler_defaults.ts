@@ -14,7 +14,7 @@ import type {Watcher_Change} from '@ryanatkn/gro/watch_dir.js';
 import {DEV} from 'esm-env';
 
 import {Action_Message} from '$lib/action_messages.js';
-import {type Action_From_Client} from '$lib/action_collections.js';
+import type {Action_Message_From_Client} from '$lib/action_collections.js';
 import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
 import {Diskfile_Path, Source_File, type Zzz_Dir} from '$lib/diskfile_types.js';
 import {map_watcher_change_to_diskfile_change} from '$lib/diskfile_helpers.js';
@@ -40,7 +40,7 @@ const google = new GoogleGenerativeAI(SECRET_GOOGLE_API_KEY);
  * Handle client messages and produce appropriate server responses.
  */
 export const handle_message = async (
-	message: Action_From_Client, // TODO BLOCK needs to include only Request_Response messages (request side?)
+	message: Action_Message_From_Client, // TODO BLOCK needs to include only Request_Response messages (request side?)
 	server: Zzz_Server,
 ): Promise<Service_Return> => {
 	console.log(`[handle_message] message`, message.id, message.method);

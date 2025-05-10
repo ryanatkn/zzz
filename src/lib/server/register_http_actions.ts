@@ -51,7 +51,7 @@ export const register_http_actions = ({
 				}
 
 				// Process the action using the unified method
-				const service_result = await zzz_server.process_action(method, params);
+				const service_result = await zzz_server.receive(method, params);
 
 				// Convert to API result format and return JSON response
 				const api_result = service_return_to_api_result(service_result);

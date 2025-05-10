@@ -883,13 +883,13 @@ export const src_json = {
 		'./action_collections.js': {
 			path: 'action_collections.ts',
 			declarations: [
-				{name: 'Action_From_Client', kind: 'variable'},
-				{name: 'Action_From_Server', kind: 'variable'},
-				{name: 'Action_Any', kind: 'variable'},
-				{name: 'Action_Networked', kind: 'variable'},
-				{name: 'Action_Nonnetworked', kind: 'variable'},
-				{name: 'action_spec_by_method', kind: 'variable'},
+				{name: 'Action_Message_From_Client', kind: 'variable'},
+				{name: 'Action_Message_From_Server', kind: 'variable'},
+				{name: 'Action_Message_Any', kind: 'variable'},
+				{name: 'Action_Message_Networked', kind: 'variable'},
+				{name: 'Action_Message_Nonnetworked', kind: 'variable'},
 				{name: 'action_specs', kind: 'variable'},
+				{name: 'action_spec_by_method', kind: 'variable'},
 			],
 		},
 		'./Action_Detail.svelte': {
@@ -2026,7 +2026,6 @@ export const src_json = {
 				{name: 'Nonauthenticated_Service', kind: 'type'},
 				{name: 'Nonauthorized_Service', kind: 'type'},
 				{name: 'Authorized_Service', kind: 'type'},
-				{name: 'Service_Map', kind: 'type'},
 				{name: 'service_return_to_api_result', kind: 'function'},
 				{name: 'validate_service_params', kind: 'function'},
 				{name: 'validate_service_response', kind: 'function'},

@@ -1,10 +1,10 @@
-import {type Model} from '$lib/model.svelte.js';
+import type {Model} from '$lib/model.svelte.js';
 import {Strip, create_strip_from_text, create_strip_from_bit} from '$lib/strip.svelte.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Tape_Json} from '$lib/tape_types.js';
 import {Completion_Request} from '$lib/completion_types.js';
 import {render_tape_to_string, render_completion_messages} from '$lib/tape_helpers.js';
-import {type Bit_Type} from '$lib/bit.svelte.js';
+import type {Bit_Type} from '$lib/bit.svelte.js';
 import {HANDLED} from '$lib/cell_helpers.js';
 import {to_completion_response_text} from '$lib/response_helpers.js';
 import {Action_Message} from '$lib/action_messages.js';

@@ -3,7 +3,10 @@ import type {z} from 'zod';
 
 import type {Zzz_Server} from '$lib/server/zzz_server.js';
 import type {Request_Response_Action_Spec} from '$lib/action_spec.js';
-import type {Action_From_Client, Action_From_Server} from '$lib/action_collections.js';
+import type {
+	Action_Message_From_Client,
+	Action_Message_From_Server,
+} from '$lib/action_collections.js';
 import {Api_Error, is_http_status_ok, type Api_Result, type Http_Status} from '$lib/api.js';
 import {stringify_zod_error} from '$lib/zod_helpers.js';
 
@@ -44,14 +47,6 @@ export interface Authorized_Service<
 > {
 	perform: (params: T_Params, server: Zzz_Server) => Promise<T_Returned>;
 }
-
-/**
- * Maps action types to service handlers.
- */
-export type Service_Map = Map<
-	string,
-	(message: Action_From_Client, server: Zzz_Server) => Promise<Action_From_Server | null>
->;
 
 /**
  * Converts a service result to a standard API result.

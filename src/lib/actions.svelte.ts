@@ -5,7 +5,10 @@ import {Action, Action_Schema} from '$lib/action.svelte.js';
 import {Action_Json} from '$lib/action_types.js';
 import {create_action_json} from '$lib/action_helpers.js';
 import {Action_Method} from '$lib/action_metatypes.js';
-import type {Action_From_Client, Action_From_Server} from '$lib/action_collections.js';
+import type {
+	Action_Message_From_Client,
+	Action_Message_From_Server,
+} from '$lib/action_collections.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {create_multi_index} from '$lib/indexed_collection_helpers.js';
@@ -60,8 +63,8 @@ export class Actions extends Cell<typeof Actions_Json> {
 	readonly filer_changes: Array<Action> = $derived(this.items.where('by_method', 'filer_change'));
 
 	// Action handlers
-	onsend?: (action: Action_From_Client) => void; // TODO these names are confused, they need to be about direction
-	onreceive?: (action: Action_From_Server) => void; // TODO these names are confused, they need to be about direction
+	onsend?: (action: Action_Message_From_Client) => void; // TODO these names are confused, they need to be about direction
+	onreceive?: (action: Action_Message_From_Server) => void; // TODO these names are confused, they need to be about direction
 
 	constructor(options: Actions_Options) {
 		super(Actions_Json, options);
@@ -100,7 +103,7 @@ export class Actions extends Cell<typeof Actions_Json> {
 	/**
 	 * Send an action using the registered handler with proper typing.
 	 */
-	send(action: Action_From_Client): void {
+	send(action: Action_Message_From_Client): void {
 		if (!this.onsend) {
 			console.error('No send handler registered', action);
 			return;
@@ -115,7 +118,7 @@ export class Actions extends Cell<typeof Actions_Json> {
 	/**
 	 * Handle a received action with proper typing.
 	 */
-	receive(action: Action_From_Server): void {
+	receive(action: Action_Message_From_Server): void {
 		if (!this.onreceive) {
 			console.error('No receive handler registered');
 			return;

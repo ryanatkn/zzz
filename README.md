@@ -60,11 +60,13 @@ Zzz builds on a great deal of software.
   under my often-flawed but usually detailed direction,
   and continues to contribute a lot to varying but sufficient success
   - some oofs let's be clear, there is a lot to be concerned about here,
-    but Zzz was designed to better leverage it for our benefit,
-    so I'm choosing to go with the grain here and also
-    constantly revisit my old ways of doing things -
-    I'm currently quite happy with the quality and productivity
-    but there is endless room to improve
+    but these are powerful tools
+    that I try to use skillfully and thoughtfully at least some of the time,
+    so like, I try to do important parts carefully by hand,
+    and Zzz was designed to better leverage tools for our benefit,
+    and so I'm choosing to go with the grain here -
+    I'll regularly revisit my old workflows,
+    and there's endless room to improve with new ones
 
 ## License 🐦
 

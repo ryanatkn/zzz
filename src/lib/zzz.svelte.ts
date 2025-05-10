@@ -8,8 +8,8 @@ import {strip_end, strip_start} from '@ryanatkn/belt/string.js';
 
 import type {Action_Message, Action_Message_Params} from '$lib/action_messages.js';
 import {
-	type Action_From_Client,
-	type Action_From_Server,
+	type Action_Message_From_Client,
+	type Action_Message_From_Server,
 	action_specs,
 } from '$lib/action_collections.js';
 import {Provider, type Provider_Json} from '$lib/provider.svelte.js';
@@ -52,8 +52,8 @@ export type Zzz_Json_Input = z.input<typeof Zzz_Json>;
 // Special options type for Zzz to handle circular reference
 export interface Zzz_Options extends Omit_Strict<Cell_Options<typeof Zzz_Json>, 'zzz'> {
 	zzz?: Zzz; // Make zzz optional for Zzz initialization
-	onsend?: (message: Action_From_Client) => void;
-	onreceive?: (message: Action_From_Server) => void;
+	onsend?: (message: Action_Message_From_Client) => void;
+	onreceive?: (message: Action_Message_From_Server) => void;
 	models?: Array<Model_Json>;
 	bots?: Zzz_Config['bots'];
 	providers?: Array<Provider_Json>;
