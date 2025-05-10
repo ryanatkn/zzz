@@ -86,32 +86,18 @@ export const handle_websocket_message = async (
 		return;
 	}
 
-	const parsed = Action_Message_Base.safeParse(data.message); // validated more later
-	console.log(`message`, parsed);
-	if (!parsed.success) {
-		// TODO BLOCK remove logging
-		console.error('invalid message', data.message, parsed.error.issues);
-		// Send error back with message id if available
-		const error_result: Api_Result = {
-			ok: false,
-			status: 400,
-			message: 'Invalid message format',
-		};
-		ws.send(devalue.stringify({type: 'server_message', message: error_result}));
-		return;
-	}
-
 	let api_result: Api_Result;
 	try {
-		const service_return = await zzz_server.receive(
-			parsed.data.method,
-			'params' in parsed.data ? parsed.data.params : undefined, // explicitly undefined if not present
-		);
+		const message = Action_Message_Base.parse(data.message); // validated more later
+		console.log(`parrsed message`, message);
+
+		const service_return = await zzz_server.receive(message);
+
 		api_result = service_return_to_api_result(service_return);
 	} catch (error) {
 		console.error('Error processing action:', error);
 		api_result = to_failed_api_result(error);
 	}
 
-	ws.send(devalue.stringify({type: 'server_message', message: api_result}));
+	ws.send(devalue.stringify({type: 'server_message', message: api_result})); // TODO JSON-RPC
 };

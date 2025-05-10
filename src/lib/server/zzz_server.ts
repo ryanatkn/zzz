@@ -4,26 +4,22 @@ import {resolve} from 'node:path';
 import {Logger} from '@ryanatkn/belt/log.js';
 import {DEV} from 'esm-env';
 
-import type {Action_Spec} from '$lib/action_spec.js';
+import type {Action_Message_Base, Action_Spec} from '$lib/action_spec.js';
 import {
 	Action_Message_From_Client,
 	action_spec_by_method,
 	type Action_Message_From_Server,
 	action_specs,
-	Action_Message_Any,
 } from '$lib/action_collections.js';
 import type {Zzz_Config} from '$lib/config_helpers.js';
 import {Zzz_Dir} from '$lib/diskfile_types.js';
 import {Safe_Fs} from '$lib/server/safe_fs.js';
 import {Action_Registry} from '$lib/action_registry.js';
-import {
-	validate_service_params,
-	validate_service_response_params as validate_service_return,
-	type Service_Return,
-} from '$lib/server/service.js';
+import type {Service_Return} from '$lib/server/service.js';
 import {Api_Error} from '$lib/api.js';
 import {is_request_response_action} from '$lib/schema_helpers.js';
-import type {Action_Method} from '$lib/action_metatypes.js';
+import {stringify_zod_error} from '$lib/zod_helpers.js';
+import {lookup_request_action_schema, lookup_response_action_schema} from '$lib/action_helpers.js';
 
 /**
  * Function type for handling client messages.
@@ -153,9 +149,15 @@ export class Zzz_Server {
 	 * Process an action by name with parameters.
 	 * This is the unified entry point for both HTTP and WebSocket actions.
 	 */
-	async receive(method: Action_Method, params: unknown): Promise<Service_Return> {
-		console.log(`received method with params`, method, params);
+	async receive(message: Action_Message_Base): Promise<Service_Return> {
 		this.#check_destroyed();
+
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+		if (!message) {
+			throw new Api_Error(400, 'invalid message');
+		}
+
+		const {method} = message;
 
 		const spec = action_spec_by_method.get(method);
 		if (!spec) {
@@ -166,13 +168,49 @@ export class Zzz_Server {
 			throw new Api_Error(400, `invalid action: ${method}`);
 		}
 
-		const parsed = validate_service_params(spec, params, this.log);
-		console.log(`parsed`, parsed);
+		const request_schema = lookup_request_action_schema(method);
+		if (!request_schema) {
+			throw new Api_Error(400, `unknown message schema: ${method}`);
+		}
 
-		const returned = await this.perform_action(parsed as any); // TODO typesafe, see `validate_service_params`, probably generated code
+		const parsed_request = request_schema.safeParse(message);
+		if (!parsed_request.success) {
+			this.log?.error('failed to validate service params', method, parsed_request.error.issues);
+			throw new Api_Error(
+				400,
+				`invalid params to ${method}: ${stringify_zod_error(parsed_request.error)}`,
+			);
+		}
+		console.log(`params`, parsed_request.data);
 
+		// TODO BLOCK hacky, need to parse the whole message
+		const updated_message = {...(message as any), params: parsed_request.data};
+
+		// forwad the validated params which may have defaults -- we don't parse the other fields here
+		const returned = await this.perform_action(updated_message);
+		if (!returned.ok) {
+			return returned;
+		}
+
+		// in dev mode, expensively validate the response
 		if (DEV) {
-			validate_service_return(spec, returned, this.log);
+			const response_schema = lookup_response_action_schema(method);
+			if (!response_schema) {
+				throw new Api_Error(400, `unknown message schema: ${method}`);
+			}
+			const parsed_response = response_schema.safeParse(returned.value);
+			if (!parsed_response.success) {
+				this.log?.error(
+					'failed to validate service response params',
+					spec.method,
+					returned.value,
+					parsed_response.error.issues,
+				);
+				throw new Api_Error(
+					500,
+					`service response validation failed for ${spec.method}: ${stringify_zod_error(parsed_response.error)}`,
+				);
+			}
 		}
 
 		return returned;

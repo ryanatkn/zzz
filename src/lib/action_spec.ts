@@ -20,7 +20,7 @@ export const Action_Message_Base = z
 		created: Datetime_Now,
 		method: Action_Method,
 	})
-	.strict();
+	.passthrough(); // TODO is this a good/safe pattern for base schemas? we're doing this so we can parse loosely sometimes, but see too how the Uuid has a fallback
 export type Action_Message_Base = z.infer<typeof Action_Message_Base>;
 
 export const Action_Kind = z.enum(['request_response', 'server_notification', 'client_local']);

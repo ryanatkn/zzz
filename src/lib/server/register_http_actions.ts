@@ -3,7 +3,7 @@ import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 import {DEV} from 'esm-env';
 
 import type {Zzz_Server} from '$lib/server/zzz_server.js';
-import {Action_Spec} from '$lib/action_spec.js';
+import {Action_Message_Base, Action_Spec} from '$lib/action_spec.js';
 import {service_return_to_api_result} from '$lib/server/service.js';
 import {API_ROUTE} from '$lib/constants.js';
 import {Api_Error, to_failed_api_result} from '$lib/api.js';
@@ -50,9 +50,15 @@ export const register_http_actions = ({
 				if (http_method === 'POST' || http_method === 'PUT' || http_method === 'PATCH') {
 					params = await c.req.json();
 				}
-				// TODO query params for GET probably, but how to get compatible JSON? maybe a `params` JSON string
+				// TODO query params for GET, probably a `params`/`json` JSON string
 
-				const service_result = await zzz_server.receive(method, params);
+				const message = Action_Message_Base.parse({
+					id: c.req.header('x-request-id'),
+					method,
+					params,
+				});
+
+				const service_result = await zzz_server.receive(message);
 
 				const api_result = service_return_to_api_result(service_result);
 				console.log(`api_result`, api_result);

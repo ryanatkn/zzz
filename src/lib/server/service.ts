@@ -1,18 +1,38 @@
-import type {Logger} from '@ryanatkn/belt/log.js';
-import type {z} from 'zod';
-
 import type {Zzz_Server} from '$lib/server/zzz_server.js';
-import type {Request_Response_Action_Spec} from '$lib/action_spec.js';
-import {Api_Error, is_http_status_ok, type Api_Result, type Http_Status} from '$lib/api.js';
-import {stringify_zod_error} from '$lib/zod_helpers.js';
+import {
+	API_RESULT_UNKNOWN_ERROR,
+	is_http_status_ok,
+	type Api_Result,
+	type Error_Response,
+	type Http_Status,
+} from '$lib/api.js';
 
 /**
  * Return type for services.
  */
-export interface Service_Return<T_Value = any> {
+export type Service_Return<T_Value = any> =
+	| Service_Return_Success<T_Value>
+	| Service_Return_Failure;
+
+export interface Service_Return_Success<T_Value = any> {
+	/**
+	 * This is slightly tricky bc it's optional for ergonomics but I think it's good.
+	 *
+	 * @default true
+	 */
+	ok?: true | undefined; //
+	/** @default 200 */
 	status?: Http_Status;
 	value: T_Value;
 }
+export interface Service_Return_Failure extends Error_Response {
+	ok: false;
+	status?: Http_Status;
+}
+
+export const is_service_return_success = (
+	result: Service_Return,
+): result is Service_Return_Success => result.ok !== false;
 
 /**
  * Base service interface with no authentication.
@@ -50,57 +70,27 @@ export interface Authorized_Service<
 export const service_return_to_api_result = <T_Value>(
 	result: Service_Return<T_Value>,
 ): Api_Result<T_Value> => {
-	// TODO hacky check here
-	if (result.status == null || is_http_status_ok(result.status)) {
+	if (is_service_return_success(result)) {
+		// validate the status for the expected success
+		if (result.status && !is_http_status_ok(result.status)) {
+			return API_RESULT_UNKNOWN_ERROR;
+		}
 		return {
 			ok: true,
 			status: result.status ?? 200,
 			value: result.value,
 		};
 	} else {
+		// validate the status for the expected failure
+		if (result.status && is_http_status_ok(result.status)) {
+			return API_RESULT_UNKNOWN_ERROR;
+		}
 		return {
 			ok: false,
-			status: result.status,
-			message: result.value as string, // TODO hack, needs better error handling
+			status: result.status ?? 500,
+			// TODO hack, needs better error handling
+			message:
+				typeof result.message === 'string' ? result.message : API_RESULT_UNKNOWN_ERROR.message,
 		};
 	}
-};
-
-export const validate_service_params = <T_Action_Spec extends Request_Response_Action_Spec>(
-	spec: T_Action_Spec,
-	params: unknown,
-	log?: Logger | null,
-): z.infer<T_Action_Spec['params']> => {
-	const parsed = spec.params.safeParse(params);
-	if (!parsed.success) {
-		log?.error('failed to validate service params', spec.method, params, parsed.error.issues);
-		throw new Api_Error(
-			400,
-			`invalid params to ${spec.method}: ${stringify_zod_error(parsed.error)}`,
-		);
-	}
-	return parsed.data;
-};
-
-export const validate_service_response_params = <
-	T_Action_Spec extends Request_Response_Action_Spec,
->(
-	spec: T_Action_Spec,
-	response_params: unknown,
-	log?: Logger | null,
-): z.infer<T_Action_Spec['response_params']> => {
-	const parsed = spec.response_params.safeParse(response_params);
-	if (!parsed.success) {
-		log?.error(
-			'failed to validate service response params',
-			spec.method,
-			response_params,
-			parsed.error.issues,
-		);
-		throw new Api_Error(
-			500,
-			`service response validation failed for ${spec.method}: ${stringify_zod_error(parsed.error)}`,
-		);
-	}
-	return parsed.data;
 };

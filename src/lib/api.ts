@@ -32,6 +32,12 @@ export type Api_Result<T_Value = any> = Result<
 	{status: Http_Status} & Error_Response
 >;
 
+export const API_RESULT_UNKNOWN_ERROR = {
+	ok: false as const,
+	status: 500 as const,
+	message: 'unknown error',
+};
+
 export interface Successful_Api_Result<T_Value = any> {
 	ok: true;
 	status: Http_Status;

@@ -2,7 +2,8 @@ import type {Gen} from '@ryanatkn/gro/gen.js';
 
 import {action_specs} from '$lib/action_collections.js';
 import {Action_Registry} from '$lib/action_registry.js';
-import type {Action_Method} from './action_metatypes.js';
+import type {Action_Method} from '$lib/action_metatypes.js';
+import {to_action_request_message_name} from '$lib/action_helpers.js';
 
 /**
  * Outputs a file with action collection types that can be imported by schemas.ts.
@@ -31,7 +32,7 @@ export const gen: Gen = ({origin_path}) => {
 					(spec) => spec.method === method,
 				);
 				return is_request_response
-					? `Action_Message.${method}_request`
+					? `Action_Message.${to_action_request_message_name(method)}`
 					: `Action_Message.${method}`;
 			})
 			.join(',\n\t');

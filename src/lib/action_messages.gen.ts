@@ -62,8 +62,10 @@ export const gen: Gen = ({origin_path}) => {
 						return `${method}: z.infer<typeof Action_Message.${method}>`;
 					}
 				})
-				.join(',\n\t\t\t')}
+				.join(';\n\t\t\t')}
 		}
+
+		export type Action_Message_Name = keyof Action_Message;
 
 		export interface Action_Message_Params {
 			${registry.specs
