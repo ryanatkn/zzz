@@ -4,9 +4,6 @@ import {Uuid_With_Default, Datetime_Now} from '$lib/zod_helpers.js';
 import type {Http_Method} from '$lib/api.js';
 import {Action_Method} from '$lib/action_metatypes.js';
 
-export const Action_Direction = z.enum(['from_client', 'from_server', 'from_either']);
-export type Action_Direction = z.infer<typeof Action_Direction>;
-
 /**
  * Centralized definitions for core action structures.
  * This module defines the core types and structures for the action system.
@@ -24,30 +21,45 @@ export const Action_Base = z
 	.strict();
 export type Action_Base = z.infer<typeof Action_Base>;
 
+export const Action_Type = z.enum(['request_response', 'notification', 'client_local']);
+export type Action_Type = z.infer<typeof Action_Type>;
+
 export const Action_Spec_Base = z.object({
 	method: Action_Method,
-	type: z.enum(['Client_Action', 'Service_Action']),
+	type: Action_Type,
 	params: z.instanceof(z.ZodType),
 	returns: z.string(),
-	direction: Action_Direction,
 });
 export type Action_Spec_Base = z.infer<typeof Action_Spec_Base>;
 
-export const Client_Action_Spec = Action_Spec_Base.extend({
-	type: z.literal('Client_Action'),
-});
-export type Client_Action_Spec = z.infer<typeof Client_Action_Spec>;
-
-export const Service_Action_Spec = Action_Spec_Base.extend({
-	type: z.literal('Service_Action'),
-	http_method: z.union([z.custom<Http_Method>(), z.null()]), // TODO maybe `http: {method: Http_Method, [...other http-specific config]}`
+// Type for request_response actions (client requests, server responds)
+export const Request_Response_Action_Spec = Action_Spec_Base.extend({
+	type: z.literal('request_response'),
+	http_method: z.custom<Http_Method>(),
 	auth: z.union([z.literal('authenticate'), z.literal('authorize'), z.null()]),
 	response: z.instanceof(z.ZodType),
-	// TODO some things like cant/shouldnt be done over websockets,
-	// e.g. login/logout for cookies, but then maybe cookies should be the declarative property?
-	// websockets: z.boolean().optional().default(false),
 });
-export type Service_Action_Spec = z.infer<typeof Service_Action_Spec>;
+export type Request_Response_Action_Spec = z.infer<typeof Request_Response_Action_Spec>;
 
-export const Action_Spec = z.union([Client_Action_Spec, Service_Action_Spec]);
+// Type for notification actions (server sends without a request)
+export const Notification_Action_Spec = Action_Spec_Base.extend({
+	type: z.literal('notification'),
+	http_method: z.null(),
+	auth: z.null(),
+	response: z.instanceof(z.ZodType),
+});
+export type Notification_Action_Spec = z.infer<typeof Notification_Action_Spec>;
+
+// Type for client_local actions (never leave the client)
+export const Client_Local_Action_Spec = Action_Spec_Base.extend({
+	type: z.literal('client_local'),
+});
+export type Client_Local_Action_Spec = z.infer<typeof Client_Local_Action_Spec>;
+
+// Union of all action spec types
+export const Action_Spec = z.union([
+	Request_Response_Action_Spec,
+	Notification_Action_Spec,
+	Client_Local_Action_Spec,
+]);
 export type Action_Spec = z.infer<typeof Action_Spec>;

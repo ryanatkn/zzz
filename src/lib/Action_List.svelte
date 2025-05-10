@@ -5,7 +5,7 @@
 	import Glyph from '$lib/Glyph.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import type {Action} from '$lib/action.svelte.js';
-	import {get_icon_for_action_type, get_direction_icon} from '$lib/glyphs.js';
+	import {get_glyph_for_action_method, get_glyph_for_action_type} from '$lib/glyphs.js';
 	import Sortable_List from '$lib/Sortable_List.svelte';
 	import {sort_by_numeric, sort_by_text} from '$lib/sortable.svelte.js';
 
@@ -52,8 +52,8 @@
 				transition:slide
 			>
 				<div class="font_weight_400 display_flex align_items_center gap_xs w_100">
-					<Glyph glyph={get_icon_for_action_type(action.method)} />
-					<Glyph glyph={get_direction_icon(action.direction)} />
+					<Glyph glyph={get_glyph_for_action_method(action.method)} />
+					<Glyph glyph={get_glyph_for_action_type(action.type)} />
 					<span class="font_family_mono flex_1">{action.method}</span>
 					<small class="font_family_mono ml_auto">{action.created_formatted_time}</small>
 				</div>
@@ -64,8 +64,6 @@
 							<small class="mb_xs2 display_block">Prompt:</small>
 							<pre
 								class="font_family_mono font_size_xs white_space_pre_wrap word_break_break_word m_0 p_xs2">{action.prompt_preview}</pre>
-						{:else if action.is_completion}
-							<small class="mb_xs2 display_block">Response:</small>
 							<pre
 								class="font_family_mono font_size_xs white_space_pre_wrap word_break_break_word m_0 p_xs2">{action.completion_preview}</pre>
 						{/if}

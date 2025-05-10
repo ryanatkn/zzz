@@ -1,206 +1,104 @@
-import {DEV} from 'esm-env';
-
-import type {Action_Spec, Service_Action_Spec, Client_Action_Spec} from '$lib/action_spec.js';
-import {Action_Method} from '$lib/action_metatypes.js';
+import type {
+	Action_Spec,
+	Request_Response_Action_Spec,
+	Notification_Action_Spec,
+	Client_Local_Action_Spec,
+} from '$lib/action_spec.js';
 import {to_action_spec_identifier} from '$lib/schema_helpers.js';
 
 /**
- * Lightweight nonreactive class that may be deleted or changed to be reactive.
- * Inefficiently recalculates with getters.
+ * Utility class to manage and query action specifications.
+ * Provides helper methods to get actions by various criteria.
  */
 export class Action_Registry {
-	/**
-	 * Map of action methods to their specifications.
-	 */
-	readonly #specs: Map<string, Action_Spec> = new Map();
+	specs: Array<Action_Spec>;
 
-	/**
-	 * Map of client action methods to their specifications.
-	 */
-	readonly #client_specs: Map<string, Client_Action_Spec> = new Map();
-
-	/**
-	 * Map of service action methods to their specifications.
-	 */
-	readonly #service_specs: Map<string, Service_Action_Spec> = new Map();
-
-	constructor(action_specs?: Array<Action_Spec>) {
-		if (action_specs) {
-			this.register_many(action_specs);
-		}
+	constructor(specs: Array<Action_Spec>) {
+		this.specs = specs;
 	}
 
-	/**
-	 * Register an action specification with the registry.
-	 */
-	register(spec: Action_Spec): void {
-		this.#specs.set(spec.method, spec);
-
-		if (spec.type === 'Client_Action') {
-			this.#client_specs.set(spec.method, spec);
-		} else {
-			this.#service_specs.set(spec.method, spec);
-		}
-
-		if (DEV) {
-			// Validate that method matches enum
-			try {
-				Action_Method.parse(spec.method);
-			} catch (error) {
-				console.error(
-					`Error registering action '${spec.method}': not found in Action_Method enum`,
-					error,
-				);
-				throw error;
-			}
-		}
+	// Methods to get actions by type with proper typing
+	get request_response_specs(): Array<Request_Response_Action_Spec> {
+		return this.specs.filter(
+			(spec) => spec.type === 'request_response',
+		) as Array<Request_Response_Action_Spec>;
 	}
 
-	/**
-	 * Register multiple action specifications at once.
-	 */
-	register_many(specs: Array<Action_Spec>): void {
-		for (const spec of specs) {
-			this.register(spec);
-		}
+	get notification_specs(): Array<Notification_Action_Spec> {
+		return this.specs.filter(
+			(spec) => spec.type === 'notification',
+		) as Array<Notification_Action_Spec>;
 	}
 
-	/**
-	 * Get an action specification by method name.
-	 */
-	get_spec(method: string): Action_Spec | undefined {
-		return this.#specs.get(method);
+	get client_local_specs(): Array<Client_Local_Action_Spec> {
+		return this.specs.filter(
+			(spec) => spec.type === 'client_local',
+		) as Array<Client_Local_Action_Spec>;
 	}
 
-	/**
-	 * Get all registered action specifications.
-	 */
-	get specs(): Array<Action_Spec> {
-		return Array.from(this.#specs.values());
+	// For backward compatibility with existing code
+	get service_specs(): Array<Action_Spec> {
+		// Service actions include both request_response and notification actions
+		return this.specs.filter(
+			(spec) => spec.type === 'request_response' || spec.type === 'notification',
+		);
 	}
 
-	/**
-	 * Get all client-only action specifications.
-	 */
-	get client_specs(): Array<Client_Action_Spec> {
-		return Array.from(this.#client_specs.values());
+	get client_specs(): Array<Action_Spec> {
+		// Client actions are just client_local actions in the new system
+		return this.client_local_specs;
 	}
 
-	/**
-	 * Get all service action specifications.
-	 */
-	get service_specs(): Array<Service_Action_Spec> {
-		return Array.from(this.#service_specs.values());
+	// Methods for deriving lists of action methods
+	get request_response_methods(): Array<string> {
+		return this.request_response_specs.map((spec) => spec.method);
 	}
 
-	/**
-	 * Get all client action method names.
-	 */
-	get client_methods(): Array<string> {
-		return Array.from(this.#client_specs.keys());
+	get notification_methods(): Array<string> {
+		return this.notification_specs.map((spec) => spec.method);
 	}
 
-	/**
-	 * Get all service action method names.
-	 */
-	get service_methods(): Array<string> {
-		return Array.from(this.#service_specs.keys());
+	get client_local_methods(): Array<string> {
+		return this.client_local_specs.map((spec) => spec.method);
 	}
 
-	/**
-	 * Get all networked service action specifications (those with non-null http_method).
-	 */
-	get networked_specs(): Array<Service_Action_Spec> {
-		return this.service_specs.filter((spec) => spec.http_method !== null);
-	}
-
-	/**
-	 * Get all non-networked service action specifications (those with null http_method).
-	 */
-	get nonnetworked_specs(): Array<Service_Action_Spec> {
-		return this.service_specs.filter((spec) => spec.http_method === null);
-	}
-
-	/**
-	 * Get all networked service action method names.
-	 */
 	get networked_methods(): Array<string> {
-		return this.networked_specs.map((spec) => spec.method);
+		// Networked actions are request_response actions
+		return this.request_response_specs.map((spec) => spec.method);
 	}
 
-	/**
-	 * Get all non-networked service action method names.
-	 */
 	get nonnetworked_methods(): Array<string> {
-		return this.nonnetworked_specs.map((spec) => spec.method);
+		// Non-networked actions are notifications
+		return this.notification_specs.map((spec) => spec.method);
 	}
 
-	/**
-	 * Get all action specifications with "from_client" direction.
-	 */
-	get from_client_specs(): Array<Action_Spec> {
-		return this.specs.filter((spec) => spec.direction === 'from_client');
+	get service_methods(): Array<string> {
+		return this.service_specs.map((spec) => spec.method);
 	}
 
-	/**
-	 * Get all action specifications with "from_server" direction.
-	 */
-	get from_server_specs(): Array<Action_Spec> {
-		return this.specs.filter((spec) => spec.direction === 'from_server');
+	get client_methods(): Array<string> {
+		return this.client_specs.map((spec) => spec.method);
 	}
 
-	/**
-	 * Get all action specifications with "from_either" direction.
-	 */
-	get from_either_specs(): Array<Action_Spec> {
-		return this.specs.filter((spec) => spec.direction === 'from_either');
-	}
-
-	/**
-	 * Get all action method names with "from_client" direction.
-	 */
+	// Methods for determining action direction
+	// (maintained for compatibility with existing generators)
 	get from_client_methods(): Array<string> {
-		return this.from_client_specs.map((spec) => spec.method);
+		// In the new system, client-originated actions include request_response and client_local
+		return [...this.request_response_methods, ...this.client_local_methods];
 	}
 
-	/**
-	 * Get all action method names with "from_server" direction.
-	 */
 	get from_server_methods(): Array<string> {
-		return this.from_server_specs.map((spec) => spec.method);
+		// In the new system, server-originated actions are notifications
+		return this.notification_methods;
 	}
 
-	/**
-	 * Get all action method names with "from_either" direction.
-	 */
 	get from_either_methods(): Array<string> {
-		return this.from_either_specs.map((spec) => spec.method);
+		// No actions are from_either in the new system
+		return [];
 	}
 
-	/**
-	 * Check if an action is a client action.
-	 */
-	is_client_action(method: string): boolean {
-		return this.#client_specs.has(method);
-	}
-
-	/**
-	 * Check if an action is a service action.
-	 */
-	is_service_action(method: string): boolean {
-		return this.#service_specs.has(method);
-	}
-
-	/**
-	 * Get schema imports needed for all registered actions.
-	 */
+	// Utility to get imports needed by generators
 	get_schema_imports(): Array<string> {
-		const imports: Set<string> = new Set();
-
-		for (const spec of this.specs) {
-			imports.add(to_action_spec_identifier(spec.method));
-		}
-
-		return Array.from(imports).sort();
+		return this.specs.map((spec) => to_action_spec_identifier(spec.method));
 	}
 }

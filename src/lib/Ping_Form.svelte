@@ -4,7 +4,7 @@
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
 
 	import {zzz_context} from '$lib/zzz.svelte.js';
-	import {GLYPH_DIRECTION_CLIENT, GLYPH_DIRECTION_SERVER} from '$lib/glyphs.js';
+	import {GLYPH_ACTION_TYPE_CLIENT_LOCAL, GLYPH_ACTION_TYPE_NOTIFICATION} from '$lib/glyphs.js';
 	import {PING_HISTORY_MAX, type Ping_Data} from '$lib/capabilities.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
 
@@ -66,8 +66,8 @@
 </div>
 
 {#snippet ping_item(ping: Ping_Data)}
-	<Glyph glyph={GLYPH_DIRECTION_CLIENT} /><Glyph
-		glyph={GLYPH_DIRECTION_SERVER}
+	<Glyph glyph={GLYPH_ACTION_TYPE_CLIENT_LOCAL} /><Glyph
+		glyph={GLYPH_ACTION_TYPE_NOTIFICATION}
 		attrs={{class: ping.completed ? '' : 'opacity_40'}}
 	/>
 	{#if !ping.completed}

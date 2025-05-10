@@ -5,11 +5,11 @@ import {Completion_Response, Completion_Request} from '$lib/completion_types.js'
 import {Action_Method} from '$lib/action_metatypes.js';
 import {Diskfile_Change, Diskfile_Path, Source_File} from '$lib/diskfile_types.js';
 import {Cell_Json} from '$lib/cell_types.js';
-import {Action_Direction} from '$lib/action_spec.js';
+import {Action_Type} from '$lib/action_spec.js';
 
 export const Action_Json = Cell_Json.extend({
 	method: Action_Method,
-	direction: Action_Direction,
+	type: Action_Type,
 	// Optional fields with proper type checking
 	ping_id: Uuid.optional(),
 	completion_request: Completion_Request.optional(),

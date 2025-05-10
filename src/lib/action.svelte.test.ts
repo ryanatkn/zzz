@@ -13,7 +13,7 @@ test('Action - can be instantiated with minimal data', () => {
 		zzz,
 		json: {
 			method: 'ping',
-			direction: 'client',
+			direction: 'from_client',
 		},
 	});
 

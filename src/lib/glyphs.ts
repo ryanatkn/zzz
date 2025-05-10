@@ -1,3 +1,6 @@
+import type {Action_Method} from './action_metatypes.js';
+import type {Action_Type} from './action_spec.js';
+
 export const GLYPH_UNKNOWN = '⁇'; // ⍰
 export const GLYPH_IMPORTANT = '⁈';
 export const GLYPH_INFO = 'ⓘ';
@@ -54,30 +57,27 @@ export const GLYPH_PAGE = '⌺'; // ⌺ ⎚
 
 export const GLYPH_IDEA = '⌆'; // TODO use
 
-export const GLYPH_ECHO = '⥀';
+export const GLYPH_PING = '⥀';
 export const GLYPH_HEARTBEAT = '∽'; // ∿ ≋ 〰 ∽ ~
 export const GLYPH_RESPONSE = '⮑';
 export const GLYPH_SESSION = '⏣';
 
-export const GLYPH_DIRECTION_CLIENT = '⥘'; // ⤤ ⤳
-export const GLYPH_DIRECTION_SERVER = '⥙'; // ⤷
-export const GLYPH_DIRECTION_EITHER = '⤨';
+export const GLYPH_ACTION_TYPE_CLIENT_LOCAL = '⤳'; // ⤤ ⤳
+export const GLYPH_ACTION_TYPE_NOTIFICATION = '⥙'; // ⤷
+export const GLYPH_ACTION_TYPE_REQUEST_RESPONSE = '⤨';
 
 export const GLYPH_EXTERNAL_LINK = '🡵';
 
 export const GLYPH_ARROW_RIGHT = '→'; // → ➝ ➞ ➜ ➡ ⟶ ⭢ ⤷ ⤳ ⥅ ⮕ ⭆ ⮞ ⭆ ⭈ ⤞ ⤠
 export const GLYPH_ARROW_LEFT = '←'; // ← ⭠
 
-export const get_icon_for_action_type = (type: string): string => {
-	switch (type) {
-		case 'echo':
-			return GLYPH_ECHO;
+export const get_glyph_for_action_method = (method: Action_Method): string => {
+	switch (method) {
+		case 'ping':
+			return GLYPH_PING;
 		case 'send_prompt':
-			return GLYPH_PROMPT;
-		case 'completion_response':
 			return GLYPH_RESPONSE;
 		case 'load_session':
-		case 'loaded_session':
 			return GLYPH_SESSION;
 		case 'update_diskfile':
 		case 'delete_diskfile':
@@ -88,14 +88,14 @@ export const get_icon_for_action_type = (type: string): string => {
 	}
 };
 
-export const get_direction_icon = (direction: string): string => {
-	switch (direction) {
-		case 'from_client':
-			return GLYPH_DIRECTION_CLIENT;
-		case 'from_server':
-			return GLYPH_DIRECTION_SERVER;
-		case 'from_either':
-			return GLYPH_DIRECTION_EITHER;
+export const get_glyph_for_action_type = (type: Action_Type): string => {
+	switch (type) {
+		case 'client_local':
+			return GLYPH_ACTION_TYPE_CLIENT_LOCAL;
+		case 'request_response':
+			return GLYPH_ACTION_TYPE_REQUEST_RESPONSE;
+		case 'notification':
+			return GLYPH_ACTION_TYPE_NOTIFICATION;
 		default:
 			return GLYPH_UNKNOWN;
 	}

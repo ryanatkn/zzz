@@ -1,6 +1,6 @@
 import {z} from 'zod';
 
-import type {Action_Spec, Service_Action_Spec, Client_Action_Spec} from '$lib/action_spec.js';
+import type {Action_Spec} from '$lib/action_spec.js';
 import {Diskfile_Change, Diskfile_Path, Source_File, Zzz_Dir} from '$lib/diskfile_types.js';
 import {Uuid} from '$lib/zod_helpers.js';
 import {Completion_Request, Completion_Response} from '$lib/completion_types.js';
@@ -13,51 +13,25 @@ import {Completion_Request, Completion_Response} from '$lib/completion_types.js'
 // Define all action specifications with proper typing
 export const ping_action_spec = {
 	method: 'ping',
-	direction: 'from_client',
-	type: 'Service_Action',
+	type: 'request_response',
 	http_method: 'GET',
 	auth: null,
 	params: z.void(),
-	response: z.null(),
-	returns: 'Api_Result<typeof ping_action_spec.response>', // TODO `Ping_Action_Response`
-} satisfies Service_Action_Spec;
-
-export const pong_action_spec = {
-	method: 'pong',
-	direction: 'from_server',
-	type: 'Service_Action',
-	http_method: null,
-	auth: null,
-	params: z
+	response: z
 		.object({
 			ping_id: Uuid,
 		})
 		.strict(),
-	response: z.null(),
-	returns: 'Api_Result<typeof pong_action_spec.response>', // TODO @many maybe add type aliases - `Action.Pong.Response` or `Pong_Action_Response`
-} satisfies Service_Action_Spec;
+	returns: 'Api_Result<typeof ping_action_spec.response>',
+} satisfies Action_Spec;
 
 export const load_session_action_spec = {
 	method: 'load_session',
-	direction: 'from_client',
-	type: 'Service_Action',
+	type: 'request_response',
 	http_method: 'GET',
 	auth: null,
-	// TODO rethink these for actions as a whole,
-	// `loaded_session_action_spec` needs to be rolled into this one
-	// and the `response` here is the `params` currently there
 	params: z.void(),
-	response: z.null(),
-	returns: 'Api_Result<typeof load_session_action_spec.response>', // TODO @many maybe add type aliases - `Action.Load_Session.Response` or `Load_Session_Action_Response`
-} satisfies Service_Action_Spec;
-
-export const loaded_session_action_spec = {
-	method: 'loaded_session',
-	direction: 'from_server',
-	type: 'Service_Action',
-	http_method: null,
-	auth: null,
-	params: z
+	response: z
 		.object({
 			data: z
 				.object({
@@ -67,14 +41,12 @@ export const loaded_session_action_spec = {
 				.strict(),
 		})
 		.strict(),
-	response: z.null(),
-	returns: 'Api_Result<typeof loaded_session_action_spec.response>', // TODO @many maybe add type aliases - `Action.Loaded_Session.Response` or `Loaded_Session_Action_Response`
-} satisfies Service_Action_Spec;
+	returns: 'Api_Result<typeof load_session_action_spec.response>',
+} satisfies Action_Spec;
 
 export const filer_change_action_spec = {
 	method: 'filer_change',
-	direction: 'from_server',
-	type: 'Service_Action',
+	type: 'notification',
 	http_method: null,
 	auth: null,
 	params: z
@@ -84,13 +56,12 @@ export const filer_change_action_spec = {
 		})
 		.strict(),
 	response: z.null(),
-	returns: 'Api_Result<typeof filer_change_action_spec.response>', // TODO @many maybe add type aliases - `Action.Filer_Change.Response` or `Filer_Change_Action_Response`
-} satisfies Service_Action_Spec;
+	returns: 'Api_Result<typeof filer_change_action_spec.response>',
+} satisfies Action_Spec;
 
 export const update_diskfile_action_spec = {
 	method: 'update_diskfile',
-	direction: 'from_client',
-	type: 'Client_Action',
+	type: 'client_local',
 	params: z
 		.object({
 			path: Diskfile_Path,
@@ -98,71 +69,65 @@ export const update_diskfile_action_spec = {
 		})
 		.strict(),
 	returns: 'string',
-} satisfies Client_Action_Spec;
+} satisfies Action_Spec;
 
 export const delete_diskfile_action_spec = {
 	method: 'delete_diskfile',
-	direction: 'from_client',
-	type: 'Client_Action',
+	type: 'client_local',
 	params: z
 		.object({
 			path: Diskfile_Path,
 		})
 		.strict(),
 	returns: 'string',
-} satisfies Client_Action_Spec;
+} satisfies Action_Spec;
 
 export const create_directory_action_spec = {
 	method: 'create_directory',
-	direction: 'from_client',
-	type: 'Client_Action',
+	type: 'client_local',
 	params: z
 		.object({
 			path: Diskfile_Path,
 		})
 		.strict(),
 	returns: 'string',
-} satisfies Client_Action_Spec;
+} satisfies Action_Spec;
 
 export const send_prompt_action_spec = {
 	method: 'send_prompt',
-	direction: 'from_client',
-	type: 'Client_Action',
+	type: 'request_response',
+	http_method: 'POST',
+	auth: null,
 	params: z
 		.object({
 			completion_request: Completion_Request,
 		})
 		.strict(),
-	returns: 'string',
-} satisfies Client_Action_Spec;
-
-export const completion_response_action_spec = {
-	method: 'completion_response',
-	direction: 'from_server',
-	type: 'Service_Action',
-	http_method: 'GET',
-	auth: null,
-	params: z
+	response: z
 		.object({
 			completion_response: Completion_Response,
 		})
 		.strict(),
-	response: z.null(),
-	returns: 'Api_Result<typeof completion_response_action_spec.response>', // TODO @many maybe add type aliases - `Action.Completion_Response.Response` or `Completion_Response_Action_Response`
-} satisfies Service_Action_Spec;
+	returns: 'Api_Result<typeof send_prompt_action_spec.response>',
+} satisfies Action_Spec;
+
+export const toggle_main_menu_action_spec = {
+	method: 'toggle_main_menu',
+	type: 'client_local',
+	params: z.void(),
+	returns: 'string',
+} satisfies Action_Spec;
 
 // TODO BLOCK generate programmatically
 
 // Collect all action specs in an array for registry population
 export const action_specs: Array<Action_Spec> = [
 	ping_action_spec,
-	pong_action_spec,
 	load_session_action_spec,
-	loaded_session_action_spec,
 	filer_change_action_spec,
 	update_diskfile_action_spec,
 	delete_diskfile_action_spec,
 	create_directory_action_spec,
 	send_prompt_action_spec,
-	completion_response_action_spec,
+	toggle_main_menu_action_spec,
 ];
