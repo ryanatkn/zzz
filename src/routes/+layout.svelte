@@ -28,7 +28,6 @@
 	import {Model_Json} from '$lib/model.svelte.js';
 	import {send_mutations, receive_mutations} from '$lib/mutations.js';
 	import type {Action_From_Client, Action_From_Server} from '$lib/action_collections.js';
-	import type {Actions} from '$lib/action_metatypes.js';
 	import {create_mutation_context} from '$lib/mutation.js';
 
 	interface Props {
@@ -51,22 +50,11 @@
 
 	pkg_context.set(parse_package_meta(package_json, src_json));
 
-	// TODO BLOCK temp hack, just logs anything and returns `{}` for any `get()`
-	const actions: Actions = new Proxy(
-		{},
-		{
-			get: (_target, prop) => {
-				console.log('get action', prop);
-				return {};
-			},
-		},
-	) as any;
-
 	// Create an instance of Zzz with socket_url
 	const zzz = new App({
 		cell_classes,
 		socket_url: PUBLIC_WEBSOCKET_URL,
-		onsend: async (message: Action_From_Client) => {
+		onsend: (message: Action_From_Client) => {
 			console.log('[ws] sending message', message);
 			zzz.socket.send({type: 'server_message', message}); // TODO JSON-RPC
 
@@ -83,14 +71,14 @@
 				message.method,
 				message, // For client actions, params are the full message
 				undefined, // Result is undefined for sending
-				actions,
 			);
 
-			const result = mutation(mutation_context.ctx); // TODO @many try/catch?
-			await mutation_context.flush_after_mutation();
+			// TODO @many try/catch?
+			const result = mutation(mutation_context.ctx as unknown as any); // TODO type ?
+			mutation_context.flush_after_mutation();
 			return result;
 		},
-		onreceive: async (message: Action_From_Server) => {
+		onreceive: (message: Action_From_Server) => {
 			console.log(`[ws] received message`, message);
 
 			const mutation = receive_mutations[message.method];
@@ -111,11 +99,11 @@
 					value: message,
 					zzz,
 				},
-				actions,
 			);
 
-			const result = mutation(mutation_context.ctx); // TODO @many try/catch?
-			await mutation_context.flush_after_mutation();
+			// TODO @many try/catch?
+			const result = mutation(mutation_context.ctx as unknown as any); // TODO type ?
+			mutation_context.flush_after_mutation();
 			return result;
 		},
 	});

@@ -178,7 +178,7 @@ export class Zzz_Server {
 		this.#check_destroyed();
 
 		// Find the action spec using the registry
-		const spec = action_spec_by_method[method] as Action_Spec | undefined;
+		const spec = action_spec_by_method.get(method);
 		if (!spec) {
 			throw new Api_Error(400, `unknown action: ${method}`);
 		}

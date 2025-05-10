@@ -753,6 +753,14 @@ export const package_json = {
 			default: './dist/server/security.js',
 		},
 		'./server/server.js': {types: './dist/server/server.d.ts', default: './dist/server/server.js'},
+		'./server/service_metatypes.gen.js': {
+			types: './dist/server/service_metatypes.gen.d.ts',
+			default: './dist/server/service_metatypes.gen.js',
+		},
+		'./server/service_metatypes.js': {
+			types: './dist/server/service_metatypes.d.ts',
+			default: './dist/server/service_metatypes.js',
+		},
 		'./server/service.js': {
 			types: './dist/server/service.d.ts',
 			default: './dist/server/service.js',
@@ -922,8 +930,6 @@ export const src_json = {
 				{name: 'Request_Response_Action_Method', kind: 'type'},
 				{name: 'Server_Notification_Action_Method', kind: 'type'},
 				{name: 'Client_Local_Action_Method', kind: 'type'},
-				{name: 'Action_Params_By_Method', kind: 'type'},
-				{name: 'Action_Response_Params_By_Method', kind: 'type'},
 				{name: 'Actions', kind: 'type'},
 				{name: 'Mutations', kind: 'type'},
 			],
@@ -2005,6 +2011,14 @@ export const src_json = {
 			declarations: [{name: 'should_allow_origin', kind: 'function'}],
 		},
 		'./server/server.js': {path: 'server/server.ts'},
+		'./server/service_metatypes.gen.js': {
+			path: 'server/service_metatypes.gen.ts',
+			declarations: [{name: 'gen', kind: 'function'}],
+		},
+		'./server/service_metatypes.js': {
+			path: 'server/service_metatypes.ts',
+			declarations: [{name: 'Service_By_Name', kind: 'type'}],
+		},
 		'./server/service.js': {
 			path: 'server/service.ts',
 			declarations: [

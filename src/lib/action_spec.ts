@@ -35,7 +35,7 @@ export type Action_Spec_Base = z.infer<typeof Action_Spec_Base>;
 
 // Type for request_response actions (client requests, server responds)
 export const Request_Response_Action_Spec = Action_Spec_Base.extend({
-	kind: z.literal('request_response'),
+	kind: z.literal('request_response').default('request_response'),
 	http_method: z.custom<Http_Method>(),
 	auth: z.union([z.literal('authenticate'), z.literal('authorize'), z.null()]),
 	/**
@@ -48,13 +48,13 @@ export type Request_Response_Action_Spec = z.infer<typeof Request_Response_Actio
 
 // Type for server_notification actions (server sends without a request)
 export const Server_Notification_Action_Spec = Action_Spec_Base.extend({
-	kind: z.literal('server_notification'),
+	kind: z.literal('server_notification').default('server_notification'),
 });
 export type Server_Notification_Action_Spec = z.infer<typeof Server_Notification_Action_Spec>;
 
 // Type for client_local actions (that never leave the client)
 export const Client_Local_Action_Spec = Action_Spec_Base.extend({
-	kind: z.literal('client_local'),
+	kind: z.literal('client_local').default('client_local'),
 	/**
 	 * This needs to be watched closely, so the friction from the branded type is desired.
 	 */

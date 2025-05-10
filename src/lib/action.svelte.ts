@@ -73,18 +73,6 @@ export class Action extends Cell<typeof Action_Json> {
 
 	constructor(options: Action_Options) {
 		super(Action_Json, options);
-
-		// TODO remove these
-		this.decoders = {
-			completion_request: (value) =>
-				this.method === 'submit_completion' ? Completion_Request.parse(value) : undefined,
-			path: (value) =>
-				this.method === 'update_diskfile' || this.method === 'delete_diskfile'
-					? Diskfile_Path.parse(value)
-					: undefined,
-		};
-
-		// Initialize base properties
 		this.init();
 	}
 }

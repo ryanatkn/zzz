@@ -12,6 +12,8 @@ const log = new Logger();
 
 export type Create_Actions_Client = (method: Action_Method) => Api_Client | null;
 
+// TODO BLOCK use this
+
 /**
  * Creates an Actions interface implementation using mutations and an API client.
  *
@@ -41,15 +43,9 @@ export const create_actions = (
 				return client?.invoke(method, params);
 			}
 			const result = client ? await client.invoke(method, params) : undefined;
-			const {ctx, flush_after_mutation} = create_mutation_context(
-				zzz,
-				method,
-				params,
-				result,
-				actions,
-			);
-			const returned = mutation(ctx);
-			void flush_after_mutation(); // TODO sequence across multiple mutations?
+			const {ctx, flush_after_mutation} = create_mutation_context(zzz, method, params, result);
+			const returned = mutation(ctx as any); // TODO fix type with generics probably
+			flush_after_mutation(); // TODO sequence across multiple mutations?
 			return returned;
 		},
 	});

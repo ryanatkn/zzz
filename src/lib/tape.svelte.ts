@@ -66,7 +66,7 @@ export class Tape extends Cell<typeof Tape_Json> {
 	/**
 	 * Create and add a user strip with the given content.
 	 */
-	add_user_strip(content: string, request?: Action_Message['submit_completion']): Strip {
+	add_user_strip(content: string, request?: Action_Message['submit_completion_request']): Strip {
 		const strip = create_strip_from_text(content, 'user', {tape_id: this.id, request}, this.zzz);
 		this.add_strip(strip);
 		return strip;
@@ -75,7 +75,10 @@ export class Tape extends Cell<typeof Tape_Json> {
 	/**
 	 * Create and add an assistant strip with the given content.
 	 */
-	add_assistant_strip(content: string, response?: Action_Message['submit_completion']): Strip {
+	add_assistant_strip(
+		content: string,
+		response?: Action_Message['submit_completion_response'],
+	): Strip {
 		const strip = create_strip_from_text(
 			content,
 			'assistant',

@@ -879,6 +879,14 @@
       "types": "./dist/server/server.d.ts",
       "default": "./dist/server/server.js"
     },
+    "./server/service_metatypes.gen.js": {
+      "types": "./dist/server/service_metatypes.gen.d.ts",
+      "default": "./dist/server/service_metatypes.gen.js"
+    },
+    "./server/service_metatypes.js": {
+      "types": "./dist/server/service_metatypes.d.ts",
+      "default": "./dist/server/service_metatypes.js"
+    },
     "./server/service.js": {
       "types": "./dist/server/service.d.ts",
       "default": "./dist/server/service.js"

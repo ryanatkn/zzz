@@ -72,16 +72,12 @@ export class Action_Registry {
 		return this.client_specs.map((spec) => spec.method);
 	}
 
-	// Methods for determining action direction
-	// (maintained for compatibility with existing generators)
-	get from_client_methods(): Array<Action_Method> {
-		// Client-originated actions include request_response and client_local
-		return [...this.request_response_methods, ...this.client_local_methods];
+	get client_to_server_methods(): Array<Action_Method> {
+		return this.request_response_methods;
 	}
 
-	get from_server_methods(): Array<Action_Method> {
-		// Server-originated actions are server_notifications
-		return this.server_notification_methods;
+	get server_to_client_methods(): Array<Action_Method> {
+		return [...this.request_response_methods, ...this.server_notification_methods];
 	}
 
 	// Utility to get imports needed by generators

@@ -106,7 +106,9 @@ export class Actions extends Cell<typeof Actions_Json> {
 			return;
 		}
 
-		this.add(create_action_json(action));
+		const action_json = create_action_json(action);
+		if (action_json) this.add(action_json);
+
 		this.onsend(action);
 	}
 
@@ -119,7 +121,9 @@ export class Actions extends Cell<typeof Actions_Json> {
 			return;
 		}
 
-		this.add(create_action_json(action));
+		const action_json = create_action_json(action);
+		if (action_json) this.add(action_json);
+
 		this.onreceive(action);
 	}
 

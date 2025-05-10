@@ -1,5 +1,5 @@
 import type {Api_Result} from '$lib/api.js';
-import type {Action_Method, Actions} from '$lib/action_metatypes.js';
+import type {Action_Method} from '$lib/action_metatypes.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 
 /**
@@ -22,8 +22,6 @@ export interface Mutation_Context<
 	params: T_Params;
 	/** Result returned from the server. */
 	result: T_Result;
-	/** Actions dispatcher for triggering additional actions. */
-	actions: Actions; // TODO @many generic probably
 	/** Adds a callback hook that runs after mutation finishes. */
 	after_mutation: After_Mutation | undefined;
 }
@@ -58,19 +56,18 @@ export const create_mutation_context = <
 	method: Action_Method,
 	params: T_Params,
 	result: T_Result,
-	actions: Actions, // TODO @many generic probably
-): {ctx: Mutation_Context<T_Params, T_Result>; flush_after_mutation: () => Promise<void>} => {
+): {ctx: Mutation_Context<T_Params, T_Result>; flush_after_mutation: () => void} => {
 	const cbs: Array<After_Mutation_Callback> = [];
 
 	const after_mutation: After_Mutation = (cb) => {
 		cbs.push(cb);
 	};
 
-	const flush_after_mutation = async (): Promise<void> => {
+	const flush_after_mutation = (): void => {
 		for (const cb of cbs) {
 			const returned = cb();
 			if (returned && 'then' in returned) {
-				await returned; // eslint-disable-line no-await-in-loop
+				void returned;
 			}
 		}
 	};
@@ -80,7 +77,6 @@ export const create_mutation_context = <
 		method,
 		params,
 		result,
-		actions,
 		after_mutation,
 	} satisfies Mutation_Context<T_Params, T_Result>;
 
