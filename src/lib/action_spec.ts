@@ -1,6 +1,6 @@
 import {z} from 'zod';
 
-import {Uuid_With_Default, Datetime_Now} from '$lib/zod_helpers.js';
+import {Uuid_With_Default, Datetime_Now, Type_Literal} from '$lib/zod_helpers.js';
 import type {Http_Method} from '$lib/api.js';
 import {Action_Method} from '$lib/action_metatypes.js';
 
@@ -11,6 +11,8 @@ import {Action_Method} from '$lib/action_metatypes.js';
 
 /**
  * Base schema for all actions with common properties.
+ *
+ * Similar to `Cell` but omits `updated` because they're typically immutable.
  */
 export const Action_Base = z
 	.object({
@@ -26,9 +28,8 @@ export type Action_Kind = z.infer<typeof Action_Kind>;
 
 export const Action_Spec_Base = z.object({
 	method: Action_Method,
-	kind: Action_Kind,
-	// TODO BLOCK maybe `response_params`? not request_params tho? or some other way to handle req/res?
 	params: z.instanceof(z.ZodType),
+	kind: Action_Kind,
 });
 export type Action_Spec_Base = z.infer<typeof Action_Spec_Base>;
 
@@ -37,8 +38,15 @@ export const Request_Response_Action_Spec = Action_Spec_Base.extend({
 	kind: z.literal('request_response'),
 	http_method: z.custom<Http_Method>(),
 	auth: z.union([z.literal('authenticate'), z.literal('authorize'), z.null()]),
-	response: z.instanceof(z.ZodType),
-	returns: z.string(),
+	/**
+	 * For the request_response the base action `params` are the request params,
+	 * and we mirror the name here for the response message payload.
+	 */
+	response_params: z.instanceof(z.ZodType),
+	/**
+	 * This needs to be watched closely, so the friction from the branded type is desired.
+	 */
+	returns: Type_Literal,
 });
 export type Request_Response_Action_Spec = z.infer<typeof Request_Response_Action_Spec>;
 
@@ -51,7 +59,10 @@ export type Server_Notification_Action_Spec = z.infer<typeof Server_Notification
 // Type for client_local actions (that never leave the client)
 export const Client_Local_Action_Spec = Action_Spec_Base.extend({
 	kind: z.literal('client_local'),
-	returns: z.string(),
+	/**
+	 * This needs to be watched closely, so the friction from the branded type is desired.
+	 */
+	returns: Type_Literal,
 });
 export type Client_Local_Action_Spec = z.infer<typeof Client_Local_Action_Spec>;
 
@@ -62,3 +73,18 @@ export const Action_Spec = z.union([
 	Client_Local_Action_Spec,
 ]);
 export type Action_Spec = z.infer<typeof Action_Spec>;
+
+/**
+ * Type guard to validate if a value is an Action_Spec
+ */
+export const is_action_spec = (value: unknown): value is Action_Spec => {
+	return (
+		value !== null &&
+		typeof value === 'object' &&
+		'method' in value &&
+		'kind' in value &&
+		((value as Action_Spec).kind === 'request_response' ||
+			(value as Action_Spec).kind === 'server_notification' ||
+			(value as Action_Spec).kind === 'client_local')
+	);
+};

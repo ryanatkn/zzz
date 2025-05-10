@@ -2,7 +2,7 @@ import {z} from 'zod';
 
 import type {Action_Spec} from '$lib/action_spec.js';
 import {Diskfile_Change, Diskfile_Path, Source_File, Zzz_Dir} from '$lib/diskfile_types.js';
-import {Uuid} from '$lib/zod_helpers.js';
+import {Type_Literal, Uuid} from '$lib/zod_helpers.js';
 import {Completion_Request, Completion_Response} from '$lib/completion_types.js';
 
 /**
@@ -17,12 +17,12 @@ export const ping_action_spec = {
 	http_method: 'GET',
 	auth: null,
 	params: z.void(),
-	response: z
+	response_params: z
 		.object({
 			ping_id: Uuid,
 		})
 		.strict(),
-	returns: 'Api_Result<typeof ping_action_spec.response>',
+	returns: Type_Literal.parse('Api_Result<typeof ping_action_spec.response>'),
 } satisfies Action_Spec;
 
 export const load_session_action_spec = {
@@ -31,7 +31,7 @@ export const load_session_action_spec = {
 	http_method: 'GET',
 	auth: null,
 	params: z.void(),
-	response: z
+	response_params: z
 		.object({
 			data: z
 				// TODO extract this schema to diskfile_types or something
@@ -42,7 +42,7 @@ export const load_session_action_spec = {
 				.strict(),
 		})
 		.strict(),
-	returns: 'Api_Result<typeof load_session_action_spec.response>',
+	returns: Type_Literal.parse('Api_Result<typeof load_session_action_spec.response>'),
 } satisfies Action_Spec;
 
 export const filer_change_action_spec = {
@@ -67,8 +67,8 @@ export const update_diskfile_action_spec = {
 			content: z.string(),
 		})
 		.strict(),
-	response: z.null(),
-	returns: 'Api_Result<typeof update_diskfile_action_spec.response>',
+	response_params: z.null(),
+	returns: Type_Literal.parse('Api_Result<typeof update_diskfile_action_spec.response>'),
 } satisfies Action_Spec;
 
 export const delete_diskfile_action_spec = {
@@ -81,8 +81,8 @@ export const delete_diskfile_action_spec = {
 			path: Diskfile_Path,
 		})
 		.strict(),
-	response: z.null(),
-	returns: 'Api_Result<typeof delete_diskfile_action_spec.response>',
+	response_params: z.null(),
+	returns: Type_Literal.parse('Api_Result<typeof delete_diskfile_action_spec.response>'),
 } satisfies Action_Spec;
 
 export const create_directory_action_spec = {
@@ -95,8 +95,8 @@ export const create_directory_action_spec = {
 			path: Diskfile_Path,
 		})
 		.strict(),
-	response: z.null(),
-	returns: 'Api_Result<typeof create_directory_action_spec.response>',
+	response_params: z.null(),
+	returns: Type_Literal.parse('Api_Result<typeof create_directory_action_spec.response>'),
 } satisfies Action_Spec;
 
 export const send_prompt_action_spec = {
@@ -109,31 +109,17 @@ export const send_prompt_action_spec = {
 			completion_request: Completion_Request,
 		})
 		.strict(),
-	response: z
+	response_params: z
 		.object({
 			completion_response: Completion_Response,
 		})
 		.strict(),
-	returns: 'Api_Result<typeof send_prompt_action_spec.response>',
+	returns: Type_Literal.parse('Api_Result<typeof send_prompt_action_spec.response>'),
 } satisfies Action_Spec;
 
 export const toggle_main_menu_action_spec = {
 	method: 'toggle_main_menu',
 	kind: 'client_local',
 	params: z.void(),
-	returns: 'void',
+	returns: Type_Literal.parse('void'),
 } satisfies Action_Spec;
-
-// TODO BLOCK generate programmatically
-
-// Collect all action specs in an array for registry population
-export const action_specs: Array<Action_Spec> = [
-	ping_action_spec,
-	load_session_action_spec,
-	filer_change_action_spec,
-	update_diskfile_action_spec,
-	delete_diskfile_action_spec,
-	create_directory_action_spec,
-	send_prompt_action_spec,
-	toggle_main_menu_action_spec,
-];

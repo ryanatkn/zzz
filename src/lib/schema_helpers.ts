@@ -20,8 +20,8 @@ export const to_action_spec_params_identifier = (method: Action_Method): string 
 /**
  * Convert an action name to its response schema identifier.
  */
-export const to_action_spec_response_identifier = (method: Action_Method): string =>
-	`${to_action_spec_identifier(method)}.response`;
+export const to_action_spec_response_params_identifier = (method: Action_Method): string =>
+	`${to_action_spec_identifier(method)}.response_params`;
 
 export const is_request_response_action = (
 	spec: Action_Spec,

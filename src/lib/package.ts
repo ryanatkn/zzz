@@ -103,6 +103,14 @@ export const package_json = {
 			svelte: './dist/Action_List.svelte',
 			default: './dist/Action_List.svelte',
 		},
+		'./action_messages.gen.js': {
+			types: './dist/action_messages.gen.d.ts',
+			default: './dist/action_messages.gen.js',
+		},
+		'./action_messages.js': {
+			types: './dist/action_messages.d.ts',
+			default: './dist/action_messages.js',
+		},
 		'./action_metatypes.gen.js': {
 			types: './dist/action_metatypes.gen.d.ts',
 			default: './dist/action_metatypes.gen.js',
@@ -111,6 +119,13 @@ export const package_json = {
 			types: './dist/action_metatypes.d.ts',
 			default: './dist/action_metatypes.js',
 		},
+		'./action_registry.js': {
+			types: './dist/action_registry.d.ts',
+			default: './dist/action_registry.js',
+		},
+		'./action_spec.js': {types: './dist/action_spec.d.ts', default: './dist/action_spec.js'},
+		'./action_specs.js': {types: './dist/action_specs.d.ts', default: './dist/action_specs.js'},
+		'./action_types.js': {types: './dist/action_types.d.ts', default: './dist/action_types.js'},
 		'./action.svelte.js': {types: './dist/action.svelte.d.ts', default: './dist/action.svelte.js'},
 		'./actions.svelte.js': {
 			types: './dist/actions.svelte.d.ts',
@@ -271,6 +286,10 @@ export const package_json = {
 			types: './dist/Clear_Restore_Button.svelte.d.ts',
 			svelte: './dist/Clear_Restore_Button.svelte',
 			default: './dist/Clear_Restore_Button.svelte',
+		},
+		'./completion_types.js': {
+			types: './dist/completion_types.d.ts',
+			default: './dist/completion_types.js',
 		},
 		'./config_defaults.js': {
 			types: './dist/config_defaults.d.ts',
@@ -699,6 +718,10 @@ export const package_json = {
 			types: './dist/schema_helpers.d.ts',
 			default: './dist/schema_helpers.js',
 		},
+		'./schema_registry.js': {
+			types: './dist/schema_registry.d.ts',
+			default: './dist/schema_registry.js',
+		},
 		'./scrollable.svelte.js': {
 			types: './dist/scrollable.svelte.d.ts',
 			default: './dist/scrollable.svelte.js',
@@ -772,6 +795,7 @@ export const package_json = {
 			svelte: './dist/Strip_Listitem.svelte',
 			default: './dist/Strip_Listitem.svelte',
 		},
+		'./strip_types.js': {types: './dist/strip_types.d.ts', default: './dist/strip_types.js'},
 		'./Strip_View.svelte': {
 			types: './dist/Strip_View.svelte.d.ts',
 			svelte: './dist/Strip_View.svelte',
@@ -857,6 +881,7 @@ export const src_json = {
 				{name: 'Action_Networked', kind: 'variable'},
 				{name: 'Action_Nonnetworked', kind: 'variable'},
 				{name: 'action_spec_by_method', kind: 'variable'},
+				{name: 'action_specs', kind: 'variable'},
 			],
 		},
 		'./Action_Detail.svelte': {
@@ -875,6 +900,17 @@ export const src_json = {
 			path: 'Action_List.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
 		},
+		'./action_messages.gen.js': {
+			path: 'action_messages.gen.ts',
+			declarations: [{name: 'gen', kind: 'function'}],
+		},
+		'./action_messages.js': {
+			path: 'action_messages.ts',
+			declarations: [
+				{name: 'Action_Message', kind: 'variable'},
+				{name: 'Action_Message_Params', kind: 'type'},
+			],
+		},
 		'./action_metatypes.gen.js': {
 			path: 'action_metatypes.gen.ts',
 			declarations: [{name: 'gen', kind: 'function'}],
@@ -891,6 +927,43 @@ export const src_json = {
 				{name: 'Service_By_Name', kind: 'type'},
 				{name: 'Actions', kind: 'type'},
 				{name: 'Mutations', kind: 'type'},
+			],
+		},
+		'./action_registry.js': {
+			path: 'action_registry.ts',
+			declarations: [{name: 'Action_Registry', kind: 'class'}],
+		},
+		'./action_spec.js': {
+			path: 'action_spec.ts',
+			declarations: [
+				{name: 'Action_Base', kind: 'variable'},
+				{name: 'Action_Kind', kind: 'variable'},
+				{name: 'Action_Spec_Base', kind: 'variable'},
+				{name: 'Request_Response_Action_Spec', kind: 'variable'},
+				{name: 'Server_Notification_Action_Spec', kind: 'variable'},
+				{name: 'Client_Local_Action_Spec', kind: 'variable'},
+				{name: 'Action_Spec', kind: 'variable'},
+				{name: 'is_action_spec', kind: 'function'},
+			],
+		},
+		'./action_specs.js': {
+			path: 'action_specs.ts',
+			declarations: [
+				{name: 'ping_action_spec', kind: 'variable'},
+				{name: 'load_session_action_spec', kind: 'variable'},
+				{name: 'filer_change_action_spec', kind: 'variable'},
+				{name: 'update_diskfile_action_spec', kind: 'variable'},
+				{name: 'delete_diskfile_action_spec', kind: 'variable'},
+				{name: 'create_directory_action_spec', kind: 'variable'},
+				{name: 'send_prompt_action_spec', kind: 'variable'},
+				{name: 'toggle_main_menu_action_spec', kind: 'variable'},
+			],
+		},
+		'./action_types.js': {
+			path: 'action_types.ts',
+			declarations: [
+				{name: 'Action_Json', kind: 'variable'},
+				{name: 'Action_Json_Input', kind: 'type'},
 			],
 		},
 		'./action.svelte.js': {
@@ -1185,6 +1258,15 @@ export const src_json = {
 		'./Clear_Restore_Button.svelte': {
 			path: 'Clear_Restore_Button.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./completion_types.js': {
+			path: 'completion_types.ts',
+			declarations: [
+				{name: 'Completion_Role', kind: 'variable'},
+				{name: 'Completion_Message', kind: 'variable'},
+				{name: 'Completion_Request', kind: 'variable'},
+				{name: 'Completion_Response', kind: 'variable'},
+			],
 		},
 		'./config_defaults.js': {
 			path: 'config_defaults.ts',
@@ -1854,12 +1936,20 @@ export const src_json = {
 			declarations: [
 				{name: 'to_action_spec_identifier', kind: 'function'},
 				{name: 'to_action_spec_params_identifier', kind: 'function'},
-				{name: 'to_action_spec_response_identifier', kind: 'function'},
+				{name: 'to_action_spec_response_params_identifier', kind: 'function'},
 				{name: 'is_request_response_action', kind: 'function'},
 				{name: 'is_server_notification_action', kind: 'function'},
 				{name: 'is_client_local_action', kind: 'function'},
 				{name: 'camel_to_snake_case', kind: 'function'},
 				{name: 'to_pascalsnake_case', kind: 'function'},
+			],
+		},
+		'./schema_registry.js': {
+			path: 'schema_registry.ts',
+			declarations: [
+				{name: 'Vocab_Name', kind: 'type'},
+				{name: 'Schema_Registry', kind: 'class'},
+				{name: 'global_schema_registry', kind: 'variable'},
 			],
 		},
 		'./scrollable.svelte.js': {
@@ -1991,6 +2081,15 @@ export const src_json = {
 		'./Strip_Listitem.svelte': {
 			path: 'Strip_Listitem.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./strip_types.js': {
+			path: 'strip_types.ts',
+			declarations: [
+				{name: 'Strip_Role', kind: 'variable'},
+				{name: 'Strip_Json', kind: 'variable'},
+				{name: 'Strip_Json_Input', kind: 'type'},
+				{name: 'Strip_Schema', kind: 'variable'},
+			],
 		},
 		'./Strip_View.svelte': {
 			path: 'Strip_View.svelte',
@@ -2124,6 +2223,7 @@ export const src_json = {
 			path: 'zod_helpers.ts',
 			declarations: [
 				{name: 'Any', kind: 'variable'},
+				{name: 'Type_Literal', kind: 'variable'},
 				{name: 'Path_With_Trailing_Slash', kind: 'variable'},
 				{name: 'Path_Without_Trailing_Slash', kind: 'variable'},
 				{name: 'Path_With_Leading_Slash', kind: 'variable'},

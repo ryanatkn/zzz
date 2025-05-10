@@ -39,7 +39,7 @@ export const send_mutations: Mutations = {
 export const receive_mutations: Mutations = {
 	Action_Pong: (ctx) => {
 		console.log('Pong received', ctx.params);
-		ctx.zzz.capabilities.receive_pong(ctx.params);
+		ctx.zzz.capabilities.receive_ping(ctx.params);
 	},
 
 	Action_Loaded_Session: (ctx) => {

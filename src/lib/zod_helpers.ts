@@ -5,6 +5,9 @@ import {ensure_end, ensure_start, strip_end, strip_start} from '@ryanatkn/belt/s
 
 export const Any = z.any();
 
+export const Type_Literal = z.string().min(1).brand('Type_Literal');
+export type Type_Literal = z.infer<typeof Type_Literal>;
+
 // TODO upstream, belt?
 export const Path_With_Trailing_Slash = z.string().transform((v) => ensure_end(v, '/'));
 export type Path_With_Trailing_Slash = z.infer<typeof Path_With_Trailing_Slash>;

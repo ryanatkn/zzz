@@ -5,6 +5,7 @@ import type {
 	Client_Local_Action_Spec,
 } from '$lib/action_spec.js';
 import {to_action_spec_identifier} from '$lib/schema_helpers.js';
+import type {Action_Method} from '$lib/action_metatypes.js';
 
 /**
  * Utility class to manage and query action specifications.
@@ -17,7 +18,7 @@ export class Action_Registry {
 		this.specs = specs;
 	}
 
-	// Methods to get actions by type with proper typing
+	// TODO add maps
 	get request_response_specs(): Array<Request_Response_Action_Spec> {
 		return this.specs.filter((spec) => spec.kind === 'request_response');
 	}
@@ -41,44 +42,44 @@ export class Action_Registry {
 	}
 
 	// Methods for deriving lists of action methods
-	get request_response_methods(): Array<string> {
+	get request_response_methods(): Array<Action_Method> {
 		return this.request_response_specs.map((spec) => spec.method);
 	}
 
-	get server_notification_methods(): Array<string> {
+	get server_notification_methods(): Array<Action_Method> {
 		return this.server_notification_specs.map((spec) => spec.method);
 	}
 
-	get client_local_methods(): Array<string> {
+	get client_local_methods(): Array<Action_Method> {
 		return this.client_local_specs.map((spec) => spec.method);
 	}
 
-	get networked_methods(): Array<string> {
+	get networked_methods(): Array<Action_Method> {
 		// Networked actions are request_response actions
 		return this.request_response_specs.map((spec) => spec.method);
 	}
 
-	get nonnetworked_methods(): Array<string> {
+	get nonnetworked_methods(): Array<Action_Method> {
 		// Non-networked actions are server_notifications
 		return this.server_notification_specs.map((spec) => spec.method);
 	}
 
-	get service_methods(): Array<string> {
+	get service_methods(): Array<Action_Method> {
 		return this.service_specs.map((spec) => spec.method);
 	}
 
-	get client_methods(): Array<string> {
+	get client_methods(): Array<Action_Method> {
 		return this.client_specs.map((spec) => spec.method);
 	}
 
 	// Methods for determining action direction
 	// (maintained for compatibility with existing generators)
-	get from_client_methods(): Array<string> {
+	get from_client_methods(): Array<Action_Method> {
 		// Client-originated actions include request_response and client_local
 		return [...this.request_response_methods, ...this.client_local_methods];
 	}
 
-	get from_server_methods(): Array<string> {
+	get from_server_methods(): Array<Action_Method> {
 		// Server-originated actions are server_notifications
 		return this.server_notification_methods;
 	}

@@ -3,80 +3,106 @@
 import {z} from 'zod';
 import {Action_Base} from '$lib/action_spec.js';
 import {
-	ping_action_spec,
-	load_session_action_spec,
-	filer_change_action_spec,
-	update_diskfile_action_spec,
-	delete_diskfile_action_spec,
 	create_directory_action_spec,
+	delete_diskfile_action_spec,
+	filer_change_action_spec,
+	load_session_action_spec,
+	ping_action_spec,
 	send_prompt_action_spec,
 	toggle_main_menu_action_spec,
+	update_diskfile_action_spec,
 } from '$lib/action_specs.js';
 
-// TODO BLOCK Request vs Response?
 export const Action_Message = {
-	ping: Action_Base.extend({
-		method: z.literal('ping'),
-		params: ping_action_spec.params,
+	create_directory_request: Action_Base.extend({
+		method: z.literal('create_directory'),
+		params: create_directory_action_spec.params,
 	}),
-	load_session: Action_Base.extend({
-		method: z.literal('load_session'),
-		params: load_session_action_spec.params,
+	create_directory_response: Action_Base.extend({
+		method: z.literal('create_directory'),
+		params: create_directory_action_spec.response_params,
+	}),
+	delete_diskfile_request: Action_Base.extend({
+		method: z.literal('delete_diskfile'),
+		params: delete_diskfile_action_spec.params,
+	}),
+	delete_diskfile_response: Action_Base.extend({
+		method: z.literal('delete_diskfile'),
+		params: delete_diskfile_action_spec.response_params,
 	}),
 	filer_change: Action_Base.extend({
 		method: z.literal('filer_change'),
 		params: filer_change_action_spec.params,
 	}),
-	update_diskfile: Action_Base.extend({
-		method: z.literal('update_diskfile'),
-		params: update_diskfile_action_spec.params,
+	load_session_request: Action_Base.extend({
+		method: z.literal('load_session'),
+		params: load_session_action_spec.params,
 	}),
-	delete_diskfile: Action_Base.extend({
-		method: z.literal('delete_diskfile'),
-		params: delete_diskfile_action_spec.params,
+	load_session_response: Action_Base.extend({
+		method: z.literal('load_session'),
+		params: load_session_action_spec.response_params,
 	}),
-	create_directory: Action_Base.extend({
-		method: z.literal('create_directory'),
-		params: create_directory_action_spec.params,
+	ping_request: Action_Base.extend({
+		method: z.literal('ping'),
+		params: ping_action_spec.params,
 	}),
-	send_prompt: Action_Base.extend({
+	ping_response: Action_Base.extend({
+		method: z.literal('ping'),
+		params: ping_action_spec.response_params,
+	}),
+	send_prompt_request: Action_Base.extend({
 		method: z.literal('send_prompt'),
 		params: send_prompt_action_spec.params,
+	}),
+	send_prompt_response: Action_Base.extend({
+		method: z.literal('send_prompt'),
+		params: send_prompt_action_spec.response_params,
 	}),
 	toggle_main_menu: Action_Base.extend({
 		method: z.literal('toggle_main_menu'),
 		params: toggle_main_menu_action_spec.params,
 	}),
+	update_diskfile_request: Action_Base.extend({
+		method: z.literal('update_diskfile'),
+		params: update_diskfile_action_spec.params,
+	}),
+	update_diskfile_response: Action_Base.extend({
+		method: z.literal('update_diskfile'),
+		params: update_diskfile_action_spec.response_params,
+	}),
 };
 export interface Action_Message {
-	ping: z.infer<typeof Action_Message.ping>;
-	load_session: z.infer<typeof Action_Message.load_session>;
+	create_directory_request: z.infer<typeof Action_Message.create_directory_request>;
+	create_directory_response: z.infer<typeof Action_Message.create_directory_response>;
+	delete_diskfile_request: z.infer<typeof Action_Message.delete_diskfile_request>;
+	delete_diskfile_response: z.infer<typeof Action_Message.delete_diskfile_response>;
 	filer_change: z.infer<typeof Action_Message.filer_change>;
-	update_diskfile: z.infer<typeof Action_Message.update_diskfile>;
-	delete_diskfile: z.infer<typeof Action_Message.delete_diskfile>;
-	create_directory: z.infer<typeof Action_Message.create_directory>;
-	send_prompt: z.infer<typeof Action_Message.send_prompt>;
+	load_session_request: z.infer<typeof Action_Message.load_session_request>;
+	load_session_response: z.infer<typeof Action_Message.load_session_response>;
+	ping_request: z.infer<typeof Action_Message.ping_request>;
+	ping_response: z.infer<typeof Action_Message.ping_response>;
+	send_prompt_request: z.infer<typeof Action_Message.send_prompt_request>;
+	send_prompt_response: z.infer<typeof Action_Message.send_prompt_response>;
 	toggle_main_menu: z.infer<typeof Action_Message.toggle_main_menu>;
+	update_diskfile_request: z.infer<typeof Action_Message.update_diskfile_request>;
+	update_diskfile_response: z.infer<typeof Action_Message.update_diskfile_response>;
 }
 
 export interface Action_Message_Params {
-	ping: z.infer<typeof ping_action_spec.params>;
-	load_session: z.infer<typeof load_session_action_spec.params>;
+	create_directory_request: z.infer<typeof create_directory_action_spec.params>;
+	create_directory_response: z.infer<typeof create_directory_action_spec.response_params>;
+	delete_diskfile_request: z.infer<typeof delete_diskfile_action_spec.params>;
+	delete_diskfile_response: z.infer<typeof delete_diskfile_action_spec.response_params>;
 	filer_change: z.infer<typeof filer_change_action_spec.params>;
-	update_diskfile: z.infer<typeof update_diskfile_action_spec.params>;
-	delete_diskfile: z.infer<typeof delete_diskfile_action_spec.params>;
-	create_directory: z.infer<typeof create_directory_action_spec.params>;
-	send_prompt: z.infer<typeof send_prompt_action_spec.params>;
+	load_session_request: z.infer<typeof load_session_action_spec.params>;
+	load_session_response: z.infer<typeof load_session_action_spec.response_params>;
+	ping_request: z.infer<typeof ping_action_spec.params>;
+	ping_response: z.infer<typeof ping_action_spec.response_params>;
+	send_prompt_request: z.infer<typeof send_prompt_action_spec.params>;
+	send_prompt_response: z.infer<typeof send_prompt_action_spec.response_params>;
 	toggle_main_menu: z.infer<typeof toggle_main_menu_action_spec.params>;
-}
-
-export interface Action_Message_Response {
-	ping: z.infer<typeof ping_action_spec.response>;
-	load_session: z.infer<typeof load_session_action_spec.response>;
-	update_diskfile: z.infer<typeof update_diskfile_action_spec.response>;
-	delete_diskfile: z.infer<typeof delete_diskfile_action_spec.response>;
-	create_directory: z.infer<typeof create_directory_action_spec.response>;
-	send_prompt: z.infer<typeof send_prompt_action_spec.response>;
+	update_diskfile_request: z.infer<typeof update_diskfile_action_spec.params>;
+	update_diskfile_response: z.infer<typeof update_diskfile_action_spec.response_params>;
 }
 
 // generated by src/lib/action_messages.gen.ts - DO NOT EDIT OR RISK LOST DATA

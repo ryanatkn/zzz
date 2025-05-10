@@ -7,7 +7,11 @@ import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
 import {strip_end, strip_start} from '@ryanatkn/belt/string.js';
 
 import type {Action_Message, Action_Message_Params} from '$lib/action_messages.js';
-import type {Action_From_Client, Action_From_Server} from '$lib/action_collections.js';
+import {
+	type Action_From_Client,
+	type Action_From_Server,
+	action_specs,
+} from '$lib/action_collections.js';
 import {Provider, type Provider_Json} from '$lib/provider.svelte.js';
 import type {Provider_Name} from '$lib/provider_types.js';
 import {Uuid, create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
@@ -35,7 +39,6 @@ import {Socket} from '$lib/socket.svelte.js';
 import {Capabilities} from '$lib/capabilities.svelte.js';
 import {Diskfile_History} from '$lib/diskfile_history.svelte.js';
 import {HANDLED} from '$lib/cell_helpers.js';
-import {action_specs} from '$lib/action_specs.js';
 import {Action_Registry} from '$lib/action_registry.js';
 
 export const zzz_context = create_context<Zzz>();
@@ -217,10 +220,10 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		provider_name: Provider_Name,
 		model: string,
 		completion_messages?: Array<Action_With_History>,
-	): Promise<Action_Message['send_prompt']> {
+	): Promise<Action_Message['send_prompt_request']> {
 		const request_id = create_uuid();
 		const created = get_datetime_now();
-		const message: Action_Message['send_prompt'] = {
+		const message: Action_Message['send_prompt_request'] = {
 			id: request_id,
 			created,
 			method: 'send_prompt',
@@ -237,7 +240,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		};
 		this.actions.send(message);
 
-		const deferred = create_deferred<Action_Message['send_prompt']>();
+		const deferred = create_deferred<Action_Message['send_prompt_request']>();
 		this.pending_prompts.set(message.id, deferred);
 
 		const response = await deferred.promise;
@@ -245,7 +248,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		return response;
 	}
 
-	receive_completion_response(message: Action_Message['send_prompt']): void {
+	receive_completion_response(message: Action_Message['send_prompt_response']): void {
 		const deferred = this.pending_prompts.get(message.params.completion_response.request_id);
 		if (!deferred) {
 			console.error('expected pending', message);

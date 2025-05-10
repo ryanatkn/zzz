@@ -10,14 +10,14 @@ import type {
 } from '$lib/server/service.js';
 import type {Mutation} from '$lib/mutation.js';
 import type {
-	ping_action_spec,
-	load_session_action_spec,
-	filer_change_action_spec,
-	update_diskfile_action_spec,
-	delete_diskfile_action_spec,
 	create_directory_action_spec,
+	delete_diskfile_action_spec,
+	filer_change_action_spec,
+	load_session_action_spec,
+	ping_action_spec,
 	send_prompt_action_spec,
 	toggle_main_menu_action_spec,
+	update_diskfile_action_spec,
 } from '$lib/action_specs.js';
 
 /**
@@ -25,14 +25,14 @@ import type {
  * TODO maybe any relative url-encoded path is valid? add to schema defs
  */
 export const Action_Method = z.enum([
-	'ping',
-	'load_session',
-	'filer_change',
-	'update_diskfile',
-	'delete_diskfile',
 	'create_directory',
+	'delete_diskfile',
+	'filer_change',
+	'load_session',
+	'ping',
 	'send_prompt',
 	'toggle_main_menu',
+	'update_diskfile',
 ]);
 export type Action_Method = z.infer<typeof Action_Method>;
 
@@ -40,12 +40,12 @@ export type Action_Method = z.infer<typeof Action_Method>;
  * Names of all request_response actions.
  */
 export type Request_Response_Action_Method =
-	| 'ping'
-	| 'load_session'
-	| 'update_diskfile'
-	| 'delete_diskfile'
 	| 'create_directory'
-	| 'send_prompt';
+	| 'delete_diskfile'
+	| 'load_session'
+	| 'ping'
+	| 'send_prompt'
+	| 'update_diskfile';
 
 /**
  * Names of all server_notification actions.
@@ -61,55 +61,55 @@ export type Client_Local_Action_Method = 'toggle_main_menu';
  * Maps action names to their parameter types.
  */
 export interface Action_Params_By_Name {
-	ping: typeof ping_action_spec.params;
-	load_session: typeof load_session_action_spec.params;
-	filer_change: typeof filer_change_action_spec.params;
-	update_diskfile: typeof update_diskfile_action_spec.params;
-	delete_diskfile: typeof delete_diskfile_action_spec.params;
 	create_directory: typeof create_directory_action_spec.params;
+	delete_diskfile: typeof delete_diskfile_action_spec.params;
+	filer_change: typeof filer_change_action_spec.params;
+	load_session: typeof load_session_action_spec.params;
+	ping: typeof ping_action_spec.params;
 	send_prompt: typeof send_prompt_action_spec.params;
 	toggle_main_menu: typeof toggle_main_menu_action_spec.params;
+	update_diskfile: typeof update_diskfile_action_spec.params;
 }
 
 /**
  * Maps action names to their response types (request_response and server_notification actions only).
  */
 export interface Action_Response_By_Name {
-	ping: typeof ping_action_spec.response;
-	load_session: typeof load_session_action_spec.response;
-	update_diskfile: typeof update_diskfile_action_spec.response;
-	delete_diskfile: typeof delete_diskfile_action_spec.response;
-	create_directory: typeof create_directory_action_spec.response;
-	send_prompt: typeof send_prompt_action_spec.response;
+	create_directory: typeof create_directory_action_spec.response_params;
+	delete_diskfile: typeof delete_diskfile_action_spec.response_params;
+	load_session: typeof load_session_action_spec.response_params;
+	ping: typeof ping_action_spec.response_params;
+	send_prompt: typeof send_prompt_action_spec.response_params;
+	update_diskfile: typeof update_diskfile_action_spec.response_params;
 }
 
 /**
  * Maps action names to their service implementations.
  */
 export interface Service_By_Name {
-	ping: Nonauthenticated_Service<
-		typeof ping_action_spec,
-		Service_Return<typeof ping_action_spec.response>
-	>;
-	load_session: Nonauthenticated_Service<
-		typeof load_session_action_spec,
-		Service_Return<typeof load_session_action_spec.response>
-	>;
-	update_diskfile: Nonauthenticated_Service<
-		typeof update_diskfile_action_spec,
-		Service_Return<typeof update_diskfile_action_spec.response>
+	create_directory: Nonauthenticated_Service<
+		typeof create_directory_action_spec,
+		Service_Return<typeof create_directory_action_spec.response_params>
 	>;
 	delete_diskfile: Nonauthenticated_Service<
 		typeof delete_diskfile_action_spec,
-		Service_Return<typeof delete_diskfile_action_spec.response>
+		Service_Return<typeof delete_diskfile_action_spec.response_params>
 	>;
-	create_directory: Nonauthenticated_Service<
-		typeof create_directory_action_spec,
-		Service_Return<typeof create_directory_action_spec.response>
+	load_session: Nonauthenticated_Service<
+		typeof load_session_action_spec,
+		Service_Return<typeof load_session_action_spec.response_params>
+	>;
+	ping: Nonauthenticated_Service<
+		typeof ping_action_spec,
+		Service_Return<typeof ping_action_spec.response_params>
 	>;
 	send_prompt: Nonauthenticated_Service<
 		typeof send_prompt_action_spec,
-		Service_Return<typeof send_prompt_action_spec.response>
+		Service_Return<typeof send_prompt_action_spec.response_params>
+	>;
+	update_diskfile: Nonauthenticated_Service<
+		typeof update_diskfile_action_spec,
+		Service_Return<typeof update_diskfile_action_spec.response_params>
 	>;
 }
 
@@ -117,26 +117,26 @@ export interface Service_By_Name {
  * Interface for action dispatch functions.
  */
 export interface Actions {
-	ping: (
-		params: typeof ping_action_spec.params,
-	) => Promise<Api_Result<typeof ping_action_spec.response>>;
-	load_session: (
-		params: typeof load_session_action_spec.params,
-	) => Promise<Api_Result<typeof load_session_action_spec.response>>;
-	filer_change: (params: typeof filer_change_action_spec.params) => void;
-	update_diskfile: (
-		params: typeof update_diskfile_action_spec.params,
-	) => Promise<Api_Result<typeof update_diskfile_action_spec.response>>;
-	delete_diskfile: (
-		params: typeof delete_diskfile_action_spec.params,
-	) => Promise<Api_Result<typeof delete_diskfile_action_spec.response>>;
 	create_directory: (
 		params: typeof create_directory_action_spec.params,
 	) => Promise<Api_Result<typeof create_directory_action_spec.response>>;
+	delete_diskfile: (
+		params: typeof delete_diskfile_action_spec.params,
+	) => Promise<Api_Result<typeof delete_diskfile_action_spec.response>>;
+	filer_change: (params: typeof filer_change_action_spec.params) => void;
+	load_session: (
+		params: typeof load_session_action_spec.params,
+	) => Promise<Api_Result<typeof load_session_action_spec.response>>;
+	ping: (
+		params: typeof ping_action_spec.params,
+	) => Promise<Api_Result<typeof ping_action_spec.response>>;
 	send_prompt: (
 		params: typeof send_prompt_action_spec.params,
 	) => Promise<Api_Result<typeof send_prompt_action_spec.response>>;
 	toggle_main_menu: (params: typeof toggle_main_menu_action_spec.params) => void;
+	update_diskfile: (
+		params: typeof update_diskfile_action_spec.params,
+	) => Promise<Api_Result<typeof update_diskfile_action_spec.response>>;
 }
 
 // TODO maybe extract to $lib/mutation_types.ts or similar, decoupled
@@ -145,29 +145,32 @@ export interface Actions {
  */
 export interface Mutations {
 	[key: string]: Mutation | undefined;
-	ping?: Mutation<typeof ping_action_spec.params, Api_Result<typeof ping_action_spec.response>>;
-	load_session?: Mutation<
-		typeof load_session_action_spec.params,
-		Api_Result<typeof load_session_action_spec.response>
-	>;
-	filer_change?: Mutation<typeof filer_change_action_spec.params, void>;
-	update_diskfile?: Mutation<
-		typeof update_diskfile_action_spec.params,
-		Api_Result<typeof update_diskfile_action_spec.response>
+	create_directory?: Mutation<
+		typeof create_directory_action_spec.params,
+		Api_Result<typeof create_directory_action_spec.response_params>
 	>;
 	delete_diskfile?: Mutation<
 		typeof delete_diskfile_action_spec.params,
-		Api_Result<typeof delete_diskfile_action_spec.response>
+		Api_Result<typeof delete_diskfile_action_spec.response_params>
 	>;
-	create_directory?: Mutation<
-		typeof create_directory_action_spec.params,
-		Api_Result<typeof create_directory_action_spec.response>
+	filer_change?: Mutation<typeof filer_change_action_spec.params, void>;
+	load_session?: Mutation<
+		typeof load_session_action_spec.params,
+		Api_Result<typeof load_session_action_spec.response_params>
+	>;
+	ping?: Mutation<
+		typeof ping_action_spec.params,
+		Api_Result<typeof ping_action_spec.response_params>
 	>;
 	send_prompt?: Mutation<
 		typeof send_prompt_action_spec.params,
-		Api_Result<typeof send_prompt_action_spec.response>
+		Api_Result<typeof send_prompt_action_spec.response_params>
 	>;
 	toggle_main_menu?: Mutation<typeof toggle_main_menu_action_spec.params, void>;
+	update_diskfile?: Mutation<
+		typeof update_diskfile_action_spec.params,
+		Api_Result<typeof update_diskfile_action_spec.response_params>
+	>;
 }
 
 // generated by src/lib/action_metatypes.gen.ts - DO NOT EDIT OR RISK LOST DATA

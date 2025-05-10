@@ -9,11 +9,11 @@ import {
 	Action_From_Client,
 	action_spec_by_method,
 	type Action_From_Server,
+	action_specs,
 } from '$lib/action_collections.js';
 import type {Zzz_Config} from '$lib/config_helpers.js';
 import {Zzz_Dir} from '$lib/diskfile_types.js';
 import {Safe_Fs} from '$lib/server/safe_fs.js';
-import {action_specs} from '$lib/action_specs.js';
 import {Action_Registry} from '$lib/action_registry.js';
 import {
 	validate_service_params,

@@ -3,9 +3,10 @@ import type {Gen} from '@ryanatkn/gro/gen.js';
 import {
 	to_action_spec_identifier,
 	to_action_spec_params_identifier,
-	to_action_spec_response_identifier,
+	to_action_spec_response_params_identifier,
+	is_request_response_action,
 } from '$lib/schema_helpers.js';
-import {action_specs} from '$lib/action_specs.js';
+import {action_specs} from '$lib/action_collections.js';
 import {Action_Registry} from '$lib/action_registry.js';
 
 /**
@@ -31,10 +32,21 @@ export const gen: Gen = ({origin_path}) => {
 			${registry.specs
 				.map((spec) => {
 					const {method} = spec;
-					return `${method}: Action_Base.extend({
-						method: z.literal('${method}'),
-						params: ${to_action_spec_params_identifier(method)},
-					})`;
+					if (is_request_response_action(spec)) {
+						return `${method}_request: Action_Base.extend({
+							method: z.literal('${method}'),
+							params: ${to_action_spec_params_identifier(method)},
+						}),
+						${method}_response: Action_Base.extend({
+							method: z.literal('${method}'),
+							params: ${to_action_spec_response_params_identifier(method)},
+						})`;
+					} else {
+						return `${method}: Action_Base.extend({
+							method: z.literal('${method}'),
+							params: ${to_action_spec_params_identifier(method)},
+						})`;
+					}
 				})
 				.join(',\n\t\t\t')}
 		};
@@ -42,7 +54,12 @@ export const gen: Gen = ({origin_path}) => {
 			${registry.specs
 				.map((spec) => {
 					const {method} = spec;
-					return `${method}: z.infer<typeof Action_Message.${method}>`;
+					if (is_request_response_action(spec)) {
+						return `${method}_request: z.infer<typeof Action_Message.${method}_request>,
+						${method}_response: z.infer<typeof Action_Message.${method}_response>`;
+					} else {
+						return `${method}: z.infer<typeof Action_Message.${method}>`;
+					}
 				})
 				.join(',\n\t\t\t')}
 		}
@@ -51,17 +68,12 @@ export const gen: Gen = ({origin_path}) => {
 			${registry.specs
 				.map((spec) => {
 					const {method} = spec;
-					return `${method}: z.infer<typeof ${to_action_spec_params_identifier(method)}>`;
-				})
-				.join(',\n\t\t\t')}
-		}
-
-		export interface Action_Message_Response {
-			${registry.specs
-				.filter((s) => 'response' in s)
-				.map((spec) => {
-					const {method} = spec;
-					return `${method}: z.infer<typeof ${to_action_spec_response_identifier(method)}>`;
+					if (is_request_response_action(spec)) {
+						return `${method}_request: z.infer<typeof ${to_action_spec_params_identifier(method)}>,
+						${method}_response: z.infer<typeof ${to_action_spec_response_params_identifier(method)}>`;
+					} else {
+						return `${method}: z.infer<typeof ${to_action_spec_params_identifier(method)}>`;
+					}
 				})
 				.join(',\n\t\t\t')}
 		}

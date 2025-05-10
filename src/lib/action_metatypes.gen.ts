@@ -5,10 +5,10 @@ import {
 	is_request_response_action,
 	to_action_spec_identifier,
 	to_action_spec_params_identifier,
-	to_action_spec_response_identifier,
+	to_action_spec_response_params_identifier,
 } from '$lib/schema_helpers.js';
 import {get_innermost_type} from '$lib/zod_helpers.js';
-import {action_specs} from '$lib/action_specs.js';
+import {action_specs} from '$lib/action_collections.js';
 import {Action_Registry} from '$lib/action_registry.js';
 
 /**
@@ -76,7 +76,10 @@ export const gen: Gen = ({origin_path}) => {
 		 */
 		export interface Action_Response_By_Name {
 			${registry.request_response_specs
-				.map((spec) => `${spec.method}: typeof ${to_action_spec_response_identifier(spec.method)};`)
+				.map(
+					(spec) =>
+						`${spec.method}: typeof ${to_action_spec_response_params_identifier(spec.method)};`,
+				)
 				.join('\n\t')}
 		}
 
@@ -87,7 +90,7 @@ export const gen: Gen = ({origin_path}) => {
 			${registry.request_response_specs
 				.map(
 					(spec) =>
-						`${spec.method}: Nonauthenticated_Service<typeof ${to_action_spec_identifier(spec.method)}, Service_Return<typeof ${to_action_spec_response_identifier(spec.method)}>>;`,
+						`${spec.method}: Nonauthenticated_Service<typeof ${to_action_spec_identifier(spec.method)}, Service_Return<typeof ${to_action_spec_response_params_identifier(spec.method)}>>;`,
 				)
 				.join('\n\t')}
 		}
@@ -124,7 +127,7 @@ export const gen: Gen = ({origin_path}) => {
 					(spec) =>
 						`${spec.method}?: Mutation<typeof ${to_action_spec_params_identifier(spec.method)}, ${
 							is_request_response_action(spec)
-								? `Api_Result<typeof ${to_action_spec_response_identifier(spec.method)}>`
+								? `Api_Result<typeof ${to_action_spec_response_params_identifier(spec.method)}>`
 								: 'void'
 						}>;`,
 				)

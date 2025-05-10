@@ -123,6 +123,14 @@
       "svelte": "./dist/Action_List.svelte",
       "default": "./dist/Action_List.svelte"
     },
+    "./action_messages.gen.js": {
+      "types": "./dist/action_messages.gen.d.ts",
+      "default": "./dist/action_messages.gen.js"
+    },
+    "./action_messages.js": {
+      "types": "./dist/action_messages.d.ts",
+      "default": "./dist/action_messages.js"
+    },
     "./action_metatypes.gen.js": {
       "types": "./dist/action_metatypes.gen.d.ts",
       "default": "./dist/action_metatypes.gen.js"
@@ -130,6 +138,22 @@
     "./action_metatypes.js": {
       "types": "./dist/action_metatypes.d.ts",
       "default": "./dist/action_metatypes.js"
+    },
+    "./action_registry.js": {
+      "types": "./dist/action_registry.d.ts",
+      "default": "./dist/action_registry.js"
+    },
+    "./action_spec.js": {
+      "types": "./dist/action_spec.d.ts",
+      "default": "./dist/action_spec.js"
+    },
+    "./action_specs.js": {
+      "types": "./dist/action_specs.d.ts",
+      "default": "./dist/action_specs.js"
+    },
+    "./action_types.js": {
+      "types": "./dist/action_types.d.ts",
+      "default": "./dist/action_types.js"
     },
     "./action.svelte.js": {
       "types": "./dist/action.svelte.d.ts",
@@ -333,6 +357,10 @@
       "types": "./dist/Clear_Restore_Button.svelte.d.ts",
       "svelte": "./dist/Clear_Restore_Button.svelte",
       "default": "./dist/Clear_Restore_Button.svelte"
+    },
+    "./completion_types.js": {
+      "types": "./dist/completion_types.d.ts",
+      "default": "./dist/completion_types.js"
     },
     "./config_defaults.js": {
       "types": "./dist/config_defaults.d.ts",
@@ -809,6 +837,10 @@
       "types": "./dist/schema_helpers.d.ts",
       "default": "./dist/schema_helpers.js"
     },
+    "./schema_registry.js": {
+      "types": "./dist/schema_registry.d.ts",
+      "default": "./dist/schema_registry.js"
+    },
     "./scrollable.svelte.js": {
       "types": "./dist/scrollable.svelte.d.ts",
       "default": "./dist/scrollable.svelte.js"
@@ -891,6 +923,10 @@
       "types": "./dist/Strip_Listitem.svelte.d.ts",
       "svelte": "./dist/Strip_Listitem.svelte",
       "default": "./dist/Strip_Listitem.svelte"
+    },
+    "./strip_types.js": {
+      "types": "./dist/strip_types.d.ts",
+      "default": "./dist/strip_types.js"
     },
     "./Strip_View.svelte": {
       "types": "./dist/Strip_View.svelte.d.ts",
