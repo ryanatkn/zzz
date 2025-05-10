@@ -1522,7 +1522,7 @@ export const src_json = {
 				{name: 'GLYPH_ARROW_RIGHT', kind: 'variable'},
 				{name: 'GLYPH_ARROW_LEFT', kind: 'variable'},
 				{name: 'get_glyph_for_action_method', kind: 'function'},
-				{name: 'get_glyph_for_action_type', kind: 'function'},
+				{name: 'get_glyph_for_action_kind', kind: 'function'},
 			],
 		},
 		'./helpers.js': {

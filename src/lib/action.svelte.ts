@@ -7,7 +7,7 @@ import {Action_Method} from '$lib/action_metatypes.js';
 import {Diskfile_Change, Diskfile_Path, Source_File} from '$lib/diskfile_types.js';
 import {to_completion_response_text} from '$lib/response_helpers.js';
 import {to_preview} from '$lib/helpers.js';
-import {Action_Type} from '$lib/action_spec.js';
+import {Action_Kind} from '$lib/action_spec.js';
 import {Action_Json} from '$lib/action_types.js';
 
 export interface Action_Options extends Cell_Options<typeof Action_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
@@ -18,7 +18,7 @@ export interface Action_Options extends Cell_Options<typeof Action_Json> {} // e
 // if not shouldn't we just remove the $state below?
 export class Action extends Cell<typeof Action_Json> {
 	method: Action_Method = $state()!;
-	type: Action_Type = $state()!;
+	kind: Action_Kind = $state()!;
 
 	// Store data based on action type
 	data: Record<string, any> | undefined = $state();
@@ -30,7 +30,7 @@ export class Action extends Cell<typeof Action_Json> {
 	change: Diskfile_Change | undefined = $state();
 	source_file: Source_File | undefined = $state();
 
-	readonly display_name: string = $derived(`${this.method} (${this.type})`);
+	readonly display_name: string = $derived(`${this.method} (${this.kind})`);
 
 	// TODO hacky, refactor
 	readonly is_ping: boolean = $derived(this.method === 'ping');

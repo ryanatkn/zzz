@@ -5,7 +5,7 @@
 	import Glyph from '$lib/Glyph.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import type {Action} from '$lib/action.svelte.js';
-	import {get_glyph_for_action_method, get_glyph_for_action_type} from '$lib/glyphs.js';
+	import {get_glyph_for_action_method, get_glyph_for_action_kind} from '$lib/glyphs.js';
 	import Sortable_List from '$lib/Sortable_List.svelte';
 	import {sort_by_numeric, sort_by_text} from '$lib/sortable.svelte.js';
 
@@ -53,7 +53,7 @@
 			>
 				<div class="font_weight_400 display_flex align_items_center gap_xs w_100">
 					<Glyph glyph={get_glyph_for_action_method(action.method)} />
-					<Glyph glyph={get_glyph_for_action_type(action.type)} />
+					<Glyph glyph={get_glyph_for_action_kind(action.kind)} />
 					<span class="font_family_mono flex_1">{action.method}</span>
 					<small class="font_family_mono ml_auto">{action.created_formatted_time}</small>
 				</div>

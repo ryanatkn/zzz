@@ -3,7 +3,7 @@
 	import {strip_start} from '@ryanatkn/belt/string.js';
 
 	import Glyph from '$lib/Glyph.svelte';
-	import {GLYPH_PROMPT, GLYPH_RESPONSE, GLYPH_FILE, GLYPH_ACTION} from '$lib/glyphs.js';
+	import {get_glyph_for_action_kind} from '$lib/glyphs.js';
 	import type {Action} from '$lib/action.svelte.js';
 
 	interface Props {
@@ -17,24 +17,24 @@
 
 <div class="mb_md">
 	<div class="font_size_lg">
+		<Glyph glyph={get_glyph_for_action_kind(action.kind)} />
 		{#if action.is_prompt}
-			<Glyph glyph={GLYPH_PROMPT} /> Prompt
-		{:else if action.is_completion}
-			<Glyph glyph={GLYPH_RESPONSE} /> Response
+			Prompt
+		{:else if action.is_session}
+			Response
 		{:else if action.is_file_related}
-			<Glyph glyph={GLYPH_FILE} /> File {action.method}
+			File {action.method}
 		{:else}
-			<Glyph glyph={GLYPH_ACTION} /> {action.method}
+			{action.method}
 		{/if}
-		<small class="color_subtle ml_xs">{action.direction}</small>
 	</div>
 	<div class="display_flex flex_column gap_xs mt_sm">
 		<small class="font_family_mono">id: {action.id}</small>
 		<small class="font_family_mono"
 			>created {action.created_formatted_datetime} {action.created_formatted_time}</small
 		>
-		<small class="font_family_mono">type: {action.method}</small>
-		<small class="font_family_mono">direction: {action.direction}</small>
+		<small class="font_family_mono">method: {action.method}</small>
+		<small class="font_family_mono">kind: {action.kind}</small>
 	</div>
 </div>
 
@@ -42,7 +42,7 @@
 	<Copy_To_Clipboard text={JSON.stringify(action.json, null, 2)} attrs={{class: 'plain'}} />
 </div>
 
-{#if action.is_pong}
+{#if action.is_ping}
 	<section class="pb_md border_bottom">
 		<h3 class="mt_0 mb_sm">Ping response</h3>
 		<div class="field_row">
@@ -85,7 +85,6 @@
 			{/if}
 		</div>
 	</section>
-{:else if action.is_completion}
 	<section class="pb_md border_bottom">
 		<h3 class="mt_0 mb_sm">completion</h3>
 		<pre
@@ -181,7 +180,7 @@
 	<section class="pb_md border_bottom">
 		<h3>session information</h3>
 		{#if action.data}
-			{#if action.method === 'loaded_session' && action.data.files}
+			{#if action.data.files}
 				<div class="field_row">
 					<div class="font_weight_600 color_text_subtle">files loaded</div>
 					<div>{Object.keys(action.data.files).length}</div>

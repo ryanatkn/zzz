@@ -13,6 +13,7 @@ import {
 	toggle_main_menu_action_spec,
 } from '$lib/action_specs.js';
 
+// TODO BLOCK Request vs Response?
 export const Action_Message = {
 	ping: Action_Base.extend({
 		method: z.literal('ping'),
@@ -72,7 +73,6 @@ export interface Action_Message_Params {
 export interface Action_Message_Response {
 	ping: z.infer<typeof ping_action_spec.response>;
 	load_session: z.infer<typeof load_session_action_spec.response>;
-	filer_change: z.infer<typeof filer_change_action_spec.response>;
 	update_diskfile: z.infer<typeof update_diskfile_action_spec.response>;
 	delete_diskfile: z.infer<typeof delete_diskfile_action_spec.response>;
 	create_directory: z.infer<typeof create_directory_action_spec.response>;

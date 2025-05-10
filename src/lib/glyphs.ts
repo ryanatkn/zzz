@@ -1,5 +1,5 @@
 import type {Action_Method} from './action_metatypes.js';
-import type {Action_Type} from './action_spec.js';
+import type {Action_Kind} from './action_spec.js';
 
 export const GLYPH_UNKNOWN = '⁇'; // ⍰
 export const GLYPH_IMPORTANT = '⁈';
@@ -88,8 +88,8 @@ export const get_glyph_for_action_method = (method: Action_Method): string => {
 	}
 };
 
-export const get_glyph_for_action_type = (type: Action_Type): string => {
-	switch (type) {
+export const get_glyph_for_action_kind = (kind: Action_Kind): string => {
+	switch (kind) {
 		case 'client_local':
 			return GLYPH_ACTION_TYPE_CLIENT_LOCAL;
 		case 'request_response':
@@ -97,7 +97,7 @@ export const get_glyph_for_action_type = (type: Action_Type): string => {
 		case 'server_notification':
 			return GLYPH_ACTION_TYPE_NOTIFICATION;
 		default:
-			return GLYPH_UNKNOWN;
+			return GLYPH_ACTION;
 	}
 };
 

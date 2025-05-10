@@ -13,7 +13,7 @@ import {Completion_Request, Completion_Response} from '$lib/completion_types.js'
 // Define all action specifications with proper typing
 export const ping_action_spec = {
 	method: 'ping',
-	type: 'request_response',
+	kind: 'request_response',
 	http_method: 'GET',
 	auth: null,
 	params: z.void(),
@@ -27,13 +27,14 @@ export const ping_action_spec = {
 
 export const load_session_action_spec = {
 	method: 'load_session',
-	type: 'request_response',
+	kind: 'request_response',
 	http_method: 'GET',
 	auth: null,
 	params: z.void(),
 	response: z
 		.object({
 			data: z
+				// TODO extract this schema to diskfile_types or something
 				.object({
 					zzz_dir: Zzz_Dir,
 					files: z.array(Source_File),
@@ -46,22 +47,20 @@ export const load_session_action_spec = {
 
 export const filer_change_action_spec = {
 	method: 'filer_change',
-	type: 'server_notification',
-	http_method: null,
-	auth: null,
+	kind: 'server_notification',
 	params: z
 		.object({
 			change: Diskfile_Change,
 			source_file: Source_File,
 		})
 		.strict(),
-	response: z.null(),
-	returns: 'Api_Result<typeof filer_change_action_spec.response>',
 } satisfies Action_Spec;
 
 export const update_diskfile_action_spec = {
 	method: 'update_diskfile',
-	type: 'request_response',
+	kind: 'request_response',
+	http_method: 'POST',
+	auth: null,
 	params: z
 		.object({
 			path: Diskfile_Path,
@@ -69,36 +68,40 @@ export const update_diskfile_action_spec = {
 		})
 		.strict(),
 	response: z.null(),
-	returns: 'string',
+	returns: 'Api_Result<typeof update_diskfile_action_spec.response>',
 } satisfies Action_Spec;
 
 export const delete_diskfile_action_spec = {
 	method: 'delete_diskfile',
-	type: 'request_response',
+	kind: 'request_response',
+	http_method: 'POST',
+	auth: null,
 	params: z
 		.object({
 			path: Diskfile_Path,
 		})
 		.strict(),
 	response: z.null(),
-	returns: 'string',
+	returns: 'Api_Result<typeof delete_diskfile_action_spec.response>',
 } satisfies Action_Spec;
 
 export const create_directory_action_spec = {
 	method: 'create_directory',
-	type: 'request_response',
+	kind: 'request_response',
+	http_method: 'POST',
+	auth: null,
 	params: z
 		.object({
 			path: Diskfile_Path,
 		})
 		.strict(),
 	response: z.null(),
-	returns: 'string',
+	returns: 'Api_Result<typeof create_directory_action_spec.response>',
 } satisfies Action_Spec;
 
 export const send_prompt_action_spec = {
 	method: 'send_prompt',
-	type: 'request_response',
+	kind: 'request_response',
 	http_method: 'POST',
 	auth: null,
 	params: z
@@ -116,9 +119,9 @@ export const send_prompt_action_spec = {
 
 export const toggle_main_menu_action_spec = {
 	method: 'toggle_main_menu',
-	type: 'client_local',
+	kind: 'client_local',
 	params: z.void(),
-	returns: 'string',
+	returns: 'void',
 } satisfies Action_Spec;
 
 // TODO BLOCK generate programmatically

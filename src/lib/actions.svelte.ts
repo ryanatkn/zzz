@@ -106,7 +106,7 @@ export class Actions extends Cell<typeof Actions_Json> {
 			return;
 		}
 
-		this.add(create_action_json(action, 'from_client'));
+		this.add(create_action_json(action));
 		this.onsend(action);
 	}
 
@@ -119,7 +119,7 @@ export class Actions extends Cell<typeof Actions_Json> {
 			return;
 		}
 
-		this.add(create_action_json(action, 'from_server'));
+		this.add(create_action_json(action));
 		this.onreceive(action);
 	}
 
@@ -137,14 +137,14 @@ export class Actions extends Cell<typeof Actions_Json> {
 	}
 
 	/**
-	 * Get the latest N actions of a specific type.
+	 * Get the latest N actions of a specific method.
 	 *
-	 * @param type The action type to filter by
+	 * @param method The action method to filter by
 	 * @param limit Maximum number of actions to return (defaults to history_limit)
 	 * @returns Array of actions matching the type
 	 */
-	get_latest_by_method(type: Action_Method, limit: number = this.history_limit): Array<Action> {
-		return this.items.latest('by_method', type, limit);
+	get_latest_by_method(method: Action_Method, limit: number = this.history_limit): Array<Action> {
+		return this.items.latest('by_method', method, limit);
 	}
 
 	/**

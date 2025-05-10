@@ -133,7 +133,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	});
 
 	// Runtime-only state (not serialized)
-	readonly pending_prompts: SvelteMap<Uuid, Deferred<Action_Message['completion_response']>> =
+	readonly pending_prompts: SvelteMap<Uuid, Deferred<Action_Message['send_prompt']>> =
 		new SvelteMap();
 
 	// Store Diskfile_History objects by file path
@@ -217,7 +217,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		provider_name: Provider_Name,
 		model: string,
 		completion_messages?: Array<Action_With_History>,
-	): Promise<Action_Message['completion_response']> {
+	): Promise<Action_Message['send_prompt']> {
 		const request_id = create_uuid();
 		const created = get_datetime_now();
 		const message: Action_Message['send_prompt'] = {
@@ -237,7 +237,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		};
 		this.actions.send(message);
 
-		const deferred = create_deferred<Action_Message['completion_response']>();
+		const deferred = create_deferred<Action_Message['send_prompt']>();
 		this.pending_prompts.set(message.id, deferred);
 
 		const response = await deferred.promise;
@@ -245,7 +245,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		return response;
 	}
 
-	receive_completion_response(message: Action_Message['completion_response']): void {
+	receive_completion_response(message: Action_Message['send_prompt']): void {
 		const deferred = this.pending_prompts.get(message.params.completion_response.request_id);
 		if (!deferred) {
 			console.error('expected pending', message);

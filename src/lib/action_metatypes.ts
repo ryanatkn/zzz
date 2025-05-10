@@ -81,7 +81,6 @@ export interface Action_Response_By_Name {
 	delete_diskfile: typeof delete_diskfile_action_spec.response;
 	create_directory: typeof create_directory_action_spec.response;
 	send_prompt: typeof send_prompt_action_spec.response;
-	filer_change: typeof filer_change_action_spec.response;
 }
 
 /**
@@ -112,10 +111,6 @@ export interface Service_By_Name {
 		typeof send_prompt_action_spec,
 		Service_Return<typeof send_prompt_action_spec.response>
 	>;
-	filer_change: Nonauthenticated_Service<
-		typeof filer_change_action_spec,
-		Service_Return<typeof filer_change_action_spec.response>
-	>;
 }
 
 /**
@@ -128,16 +123,20 @@ export interface Actions {
 	load_session: (
 		params: typeof load_session_action_spec.params,
 	) => Promise<Api_Result<typeof load_session_action_spec.response>>;
-	filer_change: (
-		params: typeof filer_change_action_spec.params,
-	) => Promise<Api_Result<typeof filer_change_action_spec.response>>;
-	update_diskfile: (params: typeof update_diskfile_action_spec.params) => Promise<string>;
-	delete_diskfile: (params: typeof delete_diskfile_action_spec.params) => Promise<string>;
-	create_directory: (params: typeof create_directory_action_spec.params) => Promise<string>;
+	filer_change: (params: typeof filer_change_action_spec.params) => void;
+	update_diskfile: (
+		params: typeof update_diskfile_action_spec.params,
+	) => Promise<Api_Result<typeof update_diskfile_action_spec.response>>;
+	delete_diskfile: (
+		params: typeof delete_diskfile_action_spec.params,
+	) => Promise<Api_Result<typeof delete_diskfile_action_spec.response>>;
+	create_directory: (
+		params: typeof create_directory_action_spec.params,
+	) => Promise<Api_Result<typeof create_directory_action_spec.response>>;
 	send_prompt: (
 		params: typeof send_prompt_action_spec.params,
 	) => Promise<Api_Result<typeof send_prompt_action_spec.response>>;
-	toggle_main_menu: (params: typeof toggle_main_menu_action_spec.params) => Promise<string>;
+	toggle_main_menu: (params: typeof toggle_main_menu_action_spec.params) => void;
 }
 
 // TODO maybe extract to $lib/mutation_types.ts or similar, decoupled

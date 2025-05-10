@@ -2,7 +2,7 @@ import type {Logger} from '@ryanatkn/belt/log.js';
 import type {z} from 'zod';
 
 import type {Zzz_Server} from '$lib/server/zzz_server.js';
-import type {Service_Action_Spec} from '$lib/action_spec.js';
+import type {Request_Response_Action_Spec} from '$lib/action_spec.js';
 import type {Action_From_Client, Action_From_Server} from '$lib/action_collections.js';
 import {Api_Error, is_http_status_ok, type Api_Result, type Http_Status} from '$lib/api.js';
 import {stringify_zod_error} from '$lib/zod_helpers.js';
@@ -76,11 +76,11 @@ export const service_return_to_api_result = <T_Value>(
 };
 
 export const validate_service_params = (
-	spec: Service_Action_Spec, // TODO generic type on method probably
+	spec: Request_Response_Action_Spec, // TODO generic type on method probably
 	params: unknown,
 	log?: Logger | null,
-	// TODO BLOCK this return type needs to be based on the `Service_Action_Spec` type, maybe using a typed `name` instead of the `spec`?
-): z.infer<Service_Action_Spec['params']> => {
+	// TODO BLOCK this return type needs to be based on the `Request_Response_Action_Spec` type, maybe using a typed `method` instead of the `spec`?
+): z.infer<Request_Response_Action_Spec['params']> => {
 	const parsed = spec.params.safeParse(params === undefined ? null : params);
 	if (!parsed.success) {
 		log?.error('failed to validate service params', spec.method, params, parsed.error.issues);
@@ -93,11 +93,11 @@ export const validate_service_params = (
 };
 
 export const validate_service_response = (
-	action: Service_Action_Spec,
+	action: Request_Response_Action_Spec,
 	response: unknown,
 	log?: Logger | null,
-	// TODO BLOCK this return type needs to be based on the `Service_Action_Spec` type, maybe using a typed `name` instead of the `spec`?
-): z.infer<Service_Action_Spec['response']> => {
+	// TODO BLOCK this return type needs to be based on the `Request_Response_Action_Spec` type, maybe using a typed `method` instead of the `spec`?
+): z.infer<Request_Response_Action_Spec['response']> => {
 	const parsed = action.response.safeParse(response);
 	if (!parsed.success) {
 		log?.error('failed to validate service response', action.method, response, parsed.error.issues);

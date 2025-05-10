@@ -75,7 +75,7 @@ export const gen: Gen = ({origin_path}) => {
 		 * Maps action names to their response types (request_response and server_notification actions only).
 		 */
 		export interface Action_Response_By_Name {
-			${registry.service_specs
+			${registry.request_response_specs
 				.map((spec) => `${spec.method}: typeof ${to_action_spec_response_identifier(spec.method)};`)
 				.join('\n\t')}
 		}
@@ -84,7 +84,7 @@ export const gen: Gen = ({origin_path}) => {
 		 * Maps action names to their service implementations.
 		 */
 		export interface Service_By_Name {
-			${registry.service_specs
+			${registry.request_response_specs
 				.map(
 					(spec) =>
 						`${spec.method}: Nonauthenticated_Service<typeof ${to_action_spec_identifier(spec.method)}, Service_Return<typeof ${to_action_spec_response_identifier(spec.method)}>>;`,
@@ -98,9 +98,17 @@ export const gen: Gen = ({origin_path}) => {
 		export interface Actions {
 			${registry.specs
 				.map((spec) => {
-					const hasParams =
+					const has_params =
 						get_innermost_type(spec.params)._def.typeName !== z.ZodFirstPartyTypeKind.ZodNull;
-					return `${spec.method}: (${hasParams ? `params: typeof ${to_action_spec_params_identifier(spec.method)}` : ''}) => Promise<${spec.returns}>;`;
+					return `${spec.method}: (${
+						has_params ? `params: typeof ${to_action_spec_params_identifier(spec.method)}` : ''
+					}) => ${
+						spec.kind === 'request_response'
+							? `Promise<${spec.returns}>`
+							: spec.kind === 'client_local'
+								? spec.returns
+								: 'void'
+					};`;
 				})
 				.join('\n\t')}
 		}
@@ -112,12 +120,14 @@ export const gen: Gen = ({origin_path}) => {
 		export interface Mutations {
 			[key: string]: Mutation | undefined;
 			${registry.specs
-				.map((spec) => {
-					const responseType = is_request_response_action(spec)
-						? `Api_Result<typeof ${to_action_spec_response_identifier(spec.method)}>`
-						: 'void';
-					return `${spec.method}?: Mutation<typeof ${to_action_spec_params_identifier(spec.method)}, ${responseType}>;`;
-				})
+				.map(
+					(spec) =>
+						`${spec.method}?: Mutation<typeof ${to_action_spec_params_identifier(spec.method)}, ${
+							is_request_response_action(spec)
+								? `Api_Result<typeof ${to_action_spec_response_identifier(spec.method)}>`
+								: 'void'
+						}>;`,
+				)
 				.join('\n\t')}
 		}
 

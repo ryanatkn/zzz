@@ -16,6 +16,7 @@ import {
 /**
  * Set of actions with "from_client" direction (originating from client).
  */
+// TODO BLOCK name? `Action_Response`?
 export const Action_From_Client = z.discriminatedUnion('method', [
 	Action_Message.ping,
 	Action_Message.load_session,

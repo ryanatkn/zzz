@@ -13,7 +13,7 @@ import {format_file} from '@ryanatkn/gro/format_file.js';
 import type {Watcher_Change} from '@ryanatkn/gro/watch_dir.js';
 import {DEV} from 'esm-env';
 
-import {Action_Message} from '$lib/action_messages.js';
+import {Action_Message, type Action_Message_Response} from '$lib/action_messages.js';
 import {type Action_From_Client} from '$lib/action_collections.js';
 import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
 import {Diskfile_Path, Source_File, type Zzz_Dir} from '$lib/diskfile_types.js';
@@ -40,7 +40,7 @@ const google = new GoogleGenerativeAI(SECRET_GOOGLE_API_KEY);
  * Handle client messages and produce appropriate server responses.
  */
 export const handle_message = async (
-	message: Action_From_Client,
+	message: Action_From_Client, // TODO BLOCK needs to include only Request_Response messages (request side?)
 	server: Zzz_Server,
 ): Promise<Service_Return> => {
 	console.log(`[handle_message] message`, message.id, message.method);
@@ -91,7 +91,7 @@ export const handle_message = async (
 			const {prompt, provider_name, model, completion_messages} = message.params.completion_request;
 			const config = server.config;
 
-			let response: Action_Message['completion_response'];
+			let response: Action_Message_Response['send_prompt'];
 
 			console.log(`texting ${provider_name}:`, prompt.substring(0, 1000));
 
@@ -213,7 +213,7 @@ export const handle_message = async (
 			// We don't need to wait for this to finish
 			void save_response(message, response, server.zzz_dir, server.safe_fs);
 
-			console.log(`got ${provider_name} message`, response.params.completion_response.data);
+			console.log(`got ${provider_name} message`, response.completion_response.data);
 
 			return {value: response};
 		}
@@ -310,7 +310,7 @@ export const handle_filer_change = (
 // TODO refactor
 const save_response = async (
 	request: Action_Message['send_prompt'],
-	response: Action_Message['completion_response'],
+	response: Action_Message_Response['send_prompt'], // TODO BLOCK full message not response type?
 	dir: string,
 	safe_fs: Safe_Fs,
 ): Promise<void> => {

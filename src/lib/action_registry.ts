@@ -19,21 +19,15 @@ export class Action_Registry {
 
 	// Methods to get actions by type with proper typing
 	get request_response_specs(): Array<Request_Response_Action_Spec> {
-		return this.specs.filter(
-			(spec) => spec.type === 'request_response',
-		) as Array<Request_Response_Action_Spec>;
+		return this.specs.filter((spec) => spec.kind === 'request_response');
 	}
 
 	get server_notification_specs(): Array<Server_Notification_Action_Spec> {
-		return this.specs.filter(
-			(spec) => spec.type === 'server_notification',
-		) as Array<Server_Notification_Action_Spec>;
+		return this.specs.filter((spec) => spec.kind === 'server_notification');
 	}
 
 	get client_local_specs(): Array<Client_Local_Action_Spec> {
-		return this.specs.filter(
-			(spec) => spec.type === 'client_local',
-		) as Array<Client_Local_Action_Spec>;
+		return this.specs.filter((spec) => spec.kind === 'client_local');
 	}
 
 	get service_specs(): Array<Action_Spec> {
@@ -87,11 +81,6 @@ export class Action_Registry {
 	get from_server_methods(): Array<string> {
 		// Server-originated actions are server_notifications
 		return this.server_notification_methods;
-	}
-
-	get from_either_methods(): Array<string> {
-		// No actions are from_either in the new system
-		return [];
 	}
 
 	// Utility to get imports needed by generators

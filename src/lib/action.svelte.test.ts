@@ -13,12 +13,12 @@ test('Action - can be instantiated with minimal data', () => {
 		zzz,
 		json: {
 			method: 'ping',
-			direction: 'from_client',
+			kind: 'request_response',
 		},
 	});
 
 	expect(ping_action.method).toBe('ping');
-	expect(ping_action.direction).toBe('client');
+	expect(ping_action.kind).toBe('request_response');
 	expect(ping_action.is_ping).toBe(true);
-	expect(ping_action.is_pong).toBe(false);
+	expect(ping_action.is_file_related).toBe(false);
 });

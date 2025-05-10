@@ -3,7 +3,7 @@
  * and handling type compatibility issues.
  */
 import {create_uuid, get_datetime_now, Uuid} from '$lib/zod_helpers.js';
-import type {Action_Message, Action_Message_Params} from '$lib/action_messages.js';
+import type {Action_Message_Response} from '$lib/action_messages.js';
 import type {Provider_Name, Provider_Data} from '$lib/provider_types.js';
 
 /**
@@ -11,7 +11,7 @@ import type {Provider_Name, Provider_Data} from '$lib/provider_types.js';
  */
 export const to_completion_response_text = (
 	completion_response:
-		| Action_Message_Params['completion_response']['completion_response']
+		| Action_Message_Response['send_prompt']['completion_response']
 		| null
 		| undefined,
 ): string | null => {
@@ -42,7 +42,7 @@ export const create_completion_response_message = (
 	provider_name: Provider_Name,
 	model: string,
 	api_response: unknown,
-): Action_Message['completion_response'] => {
+): Action_Message_Response['send_prompt'] => {
 	let provider_data: Provider_Data;
 
 	// Convert provider-specific response format to our standard format
@@ -86,7 +86,7 @@ export const create_completion_response_message = (
 	return {
 		id: create_uuid(),
 		created,
-		method: 'completion_response',
+		method: 'send_prompt',
 		params: {
 			completion_response: {
 				created,

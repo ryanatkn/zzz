@@ -1,7 +1,6 @@
 import type {Gen} from '@ryanatkn/gro/gen.js';
 
 import {
-	is_client_local_action,
 	to_action_spec_identifier,
 	to_action_spec_params_identifier,
 	to_action_spec_response_identifier,

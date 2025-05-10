@@ -75,7 +75,7 @@ export class Tape extends Cell<typeof Tape_Json> {
 	/**
 	 * Create and add an assistant strip with the given content.
 	 */
-	add_assistant_strip(content: string, response?: Action_Message['completion_response']): Strip {
+	add_assistant_strip(content: string, response?: Action_Message['send_prompt']): Strip {
 		const strip = create_strip_from_text(
 			content,
 			'assistant',
