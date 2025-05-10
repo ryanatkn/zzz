@@ -902,6 +902,10 @@ export const src_json = {
 				{name: 'ACTION_DATE_FORMAT', kind: 'variable'},
 				{name: 'ACTION_TIME_FORMAT', kind: 'variable'},
 				{name: 'create_action_json', kind: 'function'},
+				{name: 'lookup_request_action_schema', kind: 'function'},
+				{name: 'lookup_response_action_schema', kind: 'function'},
+				{name: 'to_action_request_message_name', kind: 'function'},
+				{name: 'to_action_response_message_name', kind: 'function'},
 			],
 		},
 		'./Action_List.svelte': {
@@ -916,6 +920,7 @@ export const src_json = {
 			path: 'action_messages.ts',
 			declarations: [
 				{name: 'Action_Message', kind: 'variable'},
+				{name: 'Action_Message_Name', kind: 'type'},
 				{name: 'Action_Message_Params', kind: 'type'},
 			],
 		},
@@ -1001,6 +1006,7 @@ export const src_json = {
 				{name: 'Error_Response', kind: 'type'},
 				{name: 'ERROR_MESSAGE_UNKNOWN', kind: 'variable'},
 				{name: 'Api_Result', kind: 'type'},
+				{name: 'API_RESULT_UNKNOWN_ERROR', kind: 'variable'},
 				{name: 'Successful_Api_Result', kind: 'type'},
 				{name: 'Failed_Api_Result', kind: 'type'},
 				{name: 'Api_Params', kind: 'type'},
@@ -2024,12 +2030,13 @@ export const src_json = {
 			path: 'server/service.ts',
 			declarations: [
 				{name: 'Service_Return', kind: 'type'},
+				{name: 'Service_Return_Success', kind: 'type'},
+				{name: 'Service_Return_Failure', kind: 'type'},
+				{name: 'is_service_return_success', kind: 'function'},
 				{name: 'Nonauthenticated_Service', kind: 'type'},
 				{name: 'Nonauthorized_Service', kind: 'type'},
 				{name: 'Authorized_Service', kind: 'type'},
 				{name: 'service_return_to_api_result', kind: 'function'},
-				{name: 'validate_service_params', kind: 'function'},
-				{name: 'validate_service_response', kind: 'function'},
 			],
 		},
 		'./server/zzz_server.js': {

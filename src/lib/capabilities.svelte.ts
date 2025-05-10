@@ -6,7 +6,7 @@ import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import {ollama_list} from '$lib/ollama.js';
 import {API_ROUTE, REQUEST_TIMEOUT, SERVER_URL} from '$lib/constants.js';
-import {create_uuid, Uuid} from '$lib/zod_helpers.js';
+import {Uuid} from '$lib/zod_helpers.js';
 import type {Zzz_Dir} from '$lib/diskfile_types.js';
 import {Action_Message, type Action_Message_Params} from '$lib/action_messages.js';
 
