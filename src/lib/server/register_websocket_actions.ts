@@ -3,11 +3,11 @@ import type {WSContext} from 'hono/ws';
 import * as devalue from 'devalue';
 
 import type {Zzz_Server} from '$lib/server/zzz_server.js';
-import {Action_Message_From_Client} from '$lib/action_collections.js';
 import {service_return_to_api_result} from '$lib/server/service.js';
 import {to_failed_api_result, type Api_Result} from '$lib/api.js';
 import {should_allow_origin} from '$lib/server/security.js';
 import type {createNodeWebSocket} from '@hono/node-ws';
+import {Action_Message_Base} from '$lib/action_spec.js';
 
 export interface Register_Websocket_Actions_Options {
 	app: Hono;
@@ -86,9 +86,11 @@ export const handle_websocket_message = async (
 		return;
 	}
 
-	const message = Action_Message_From_Client.safeParse(data.message);
-	if (!message.success) {
-		console.error('invalid message', data.message);
+	const parsed = Action_Message_Base.safeParse(data.message); // validated more later
+	console.log(`message`, parsed);
+	if (!parsed.success) {
+		// TODO BLOCK remove logging
+		console.error('invalid message', data.message, parsed.error.issues);
 		// Send error back with message id if available
 		const error_result: Api_Result = {
 			ok: false,
@@ -101,7 +103,10 @@ export const handle_websocket_message = async (
 
 	let api_result: Api_Result;
 	try {
-		const service_return = await zzz_server.receive(message.data.method, message.data);
+		const service_return = await zzz_server.receive(
+			parsed.data.method,
+			'params' in parsed.data ? parsed.data.params : undefined, // explicitly undefined if not present
+		);
 		api_result = service_return_to_api_result(service_return);
 	} catch (error) {
 		console.error('Error processing action:', error);

@@ -22,7 +22,8 @@ export const gen: Gen = ({origin_path}) => {
 		// ${banner}
 
 		import {z} from 'zod';
-		import {Action_Base} from '$lib/action_spec.js';
+		
+		import {Action_Message_Base} from '$lib/action_spec.js';
 		import {${registry.specs
 			// TODO maybe change to `import * as specs`
 			.map((spec) => to_action_spec_identifier(spec.method))
@@ -33,16 +34,16 @@ export const gen: Gen = ({origin_path}) => {
 				.map((spec) => {
 					const {method} = spec;
 					if (is_request_response_action(spec)) {
-						return `${method}_request: Action_Base.extend({
+						return `${method}_request: Action_Message_Base.extend({
 							method: z.literal('${method}'),
 							params: ${to_action_spec_params_identifier(method)},
 						}),
-						${method}_response: Action_Base.extend({
+						${method}_response: Action_Message_Base.extend({
 							method: z.literal('${method}'),
 							params: ${to_action_spec_response_params_identifier(method)},
 						})`;
 					} else {
-						return `${method}: Action_Base.extend({
+						return `${method}: Action_Message_Base.extend({
 							method: z.literal('${method}'),
 							params: ${to_action_spec_params_identifier(method)},
 						})`;

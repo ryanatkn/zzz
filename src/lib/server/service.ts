@@ -3,10 +3,6 @@ import type {z} from 'zod';
 
 import type {Zzz_Server} from '$lib/server/zzz_server.js';
 import type {Request_Response_Action_Spec} from '$lib/action_spec.js';
-import type {
-	Action_Message_From_Client,
-	Action_Message_From_Server,
-} from '$lib/action_collections.js';
 import {Api_Error, is_http_status_ok, type Api_Result, type Http_Status} from '$lib/api.js';
 import {stringify_zod_error} from '$lib/zod_helpers.js';
 
@@ -70,35 +66,40 @@ export const service_return_to_api_result = <T_Value>(
 	}
 };
 
-export const validate_service_params = (
-	spec: Request_Response_Action_Spec, // TODO generic type on method probably
+export const validate_service_params = <T_Action_Spec extends Request_Response_Action_Spec>(
+	spec: T_Action_Spec,
 	params: unknown,
 	log?: Logger | null,
-	// TODO BLOCK this return type needs to be based on the `Request_Response_Action_Spec` type, maybe using a typed `method` instead of the `spec`?
-): z.infer<Request_Response_Action_Spec['params']> => {
-	const parsed = spec.params.safeParse(params === undefined ? null : params);
+): z.infer<T_Action_Spec['params']> => {
+	const parsed = spec.params.safeParse(params);
 	if (!parsed.success) {
 		log?.error('failed to validate service params', spec.method, params, parsed.error.issues);
 		throw new Api_Error(
 			400,
 			`invalid params to ${spec.method}: ${stringify_zod_error(parsed.error)}`,
-		); // TODO @many handle multiple errors instead of just the first
+		);
 	}
 	return parsed.data;
 };
 
-export const validate_service_response = (
-	action: Request_Response_Action_Spec,
-	response: unknown,
+export const validate_service_response_params = <
+	T_Action_Spec extends Request_Response_Action_Spec,
+>(
+	spec: T_Action_Spec,
+	response_params: unknown,
 	log?: Logger | null,
-	// TODO BLOCK this return type needs to be based on the `Request_Response_Action_Spec` type, maybe using a typed `method` instead of the `spec`?
-): z.infer<Request_Response_Action_Spec['response_params']> => {
-	const parsed = action.response_params.safeParse(response);
+): z.infer<T_Action_Spec['response_params']> => {
+	const parsed = spec.response_params.safeParse(response_params);
 	if (!parsed.success) {
-		log?.error('failed to validate service response', action.method, response, parsed.error.issues);
+		log?.error(
+			'failed to validate service response params',
+			spec.method,
+			response_params,
+			parsed.error.issues,
+		);
 		throw new Api_Error(
 			500,
-			`service response validation failed for ${action.method}: ${stringify_zod_error(parsed.error)}`, // TODO @many handle multiple errors instead of just the first
+			`service response validation failed for ${spec.method}: ${stringify_zod_error(parsed.error)}`,
 		);
 	}
 	return parsed.data;

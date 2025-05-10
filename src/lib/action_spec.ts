@@ -14,14 +14,14 @@ import {Action_Method} from '$lib/action_metatypes.js';
  *
  * Similar to `Cell` but omits `updated` because they're typically immutable.
  */
-export const Action_Base = z
+export const Action_Message_Base = z
 	.object({
-		id: Uuid_With_Default,
+		id: Uuid_With_Default, // TODO this means we're trusting client ids, revisit
 		created: Datetime_Now,
 		method: Action_Method,
 	})
 	.strict();
-export type Action_Base = z.infer<typeof Action_Base>;
+export type Action_Message_Base = z.infer<typeof Action_Message_Base>;
 
 export const Action_Kind = z.enum(['request_response', 'server_notification', 'client_local']);
 export type Action_Kind = z.infer<typeof Action_Kind>;

@@ -6,11 +6,9 @@ import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import {ollama_list} from '$lib/ollama.js';
 import {API_ROUTE, REQUEST_TIMEOUT, SERVER_URL} from '$lib/constants.js';
-import {Uuid} from '$lib/zod_helpers.js';
+import {create_uuid, Uuid} from '$lib/zod_helpers.js';
 import type {Zzz_Dir} from '$lib/diskfile_types.js';
 import {Action_Message, type Action_Message_Params} from '$lib/action_messages.js';
-
-// TODO hacky/hardcoded for now, this should be an extensible system, the point is to give users a good interface to the concept of capabilities
 
 // Maximum number of ping records to keep
 export const PING_HISTORY_MAX = 6;
@@ -26,7 +24,6 @@ export interface Ping_Data {
 	round_trip_time: number | null;
 }
 
-// TODO which state?
 export const Capabilities_Json = Cell_Json.extend({});
 export type Capabilities_Json = z.infer<typeof Capabilities_Json>;
 export type Capabilities_Json_Input = z.input<typeof Capabilities_Json>;
@@ -291,7 +288,6 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 		}
 	}
 
-	// TODO replace this with an action once the system is more developed, just manually pinging here
 	/**
 	 * Check Server availability by making an HTTP GET request to its ping endpoint.
 	 * @returns A promise that resolves when the check is complete
@@ -305,7 +301,6 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 			updated: Date.now(),
 		};
 
-		// TODO BLOCK @many refactor for type safety with the action schemas, the goal is to be able to choose transports granularly with configurable fallbacks
 		const server_api_url = SERVER_URL + API_ROUTE + '/ping';
 
 		let error_message: string | undefined;

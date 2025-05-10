@@ -136,4 +136,4 @@ export const get_inner_array_schema = (schema: z.ZodTypeAny): z.ZodArray<any> | 
 };
 
 export const stringify_zod_error = (error: z.ZodError): string =>
-	error.issues.map((issue) => issue.message).join(', ');
+	error.issues.map((issue) => issue.message).join(', '); // TODO improve

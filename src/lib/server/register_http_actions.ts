@@ -1,8 +1,9 @@
 import {Hono, type Handler} from 'hono';
 import {Unreachable_Error} from '@ryanatkn/belt/error.js';
+import {DEV} from 'esm-env';
 
 import type {Zzz_Server} from '$lib/server/zzz_server.js';
-import type {Action_Spec} from '$lib/action_spec.js';
+import {Action_Spec} from '$lib/action_spec.js';
 import {service_return_to_api_result} from '$lib/server/service.js';
 import {API_ROUTE} from '$lib/constants.js';
 import {Api_Error, to_failed_api_result} from '$lib/api.js';
@@ -25,12 +26,12 @@ export const register_http_actions = ({
 	base_path = API_ROUTE,
 }: Register_Actions_Options): void => {
 	for (const spec of action_specs) {
+		if (DEV) Action_Spec.parse(spec);
+
 		// Select only actions with an HTTP method
 		if (!('http_method' in spec)) continue;
 
 		const {method, http_method} = spec;
-
-		if (!http_method) continue;
 
 		const parsed_base_path = Path_With_Trailing_Slash.parse(base_path); // let it fail right?
 
@@ -43,19 +44,19 @@ export const register_http_actions = ({
 			console.log(`[http] <${c.req.url}>`);
 
 			try {
-				let params: unknown = null;
+				let params: unknown;
 
 				// Extract parameters based on HTTP method
 				if (http_method === 'POST' || http_method === 'PUT' || http_method === 'PATCH') {
 					params = await c.req.json();
 				}
+				// TODO query params for GET probably, but how to get compatible JSON? maybe a `params` JSON string
 
-				// Process the action using the unified method
 				const service_result = await zzz_server.receive(method, params);
 
-				// Convert to API result format and return JSON response
 				const api_result = service_return_to_api_result(service_result);
 				console.log(`api_result`, api_result);
+
 				return c.json(api_result);
 			} catch (error) {
 				console.error(`Error processing ${method}:`, error);

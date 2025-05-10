@@ -60,8 +60,11 @@ export class Action_Registry {
 	}
 
 	get nonnetworked_methods(): Array<Action_Method> {
+		const {networked_methods} = this;
 		// Non-networked actions are server_notifications
-		return this.server_notification_specs.map((spec) => spec.method);
+		return this.server_notification_specs
+			.map((spec) => spec.method)
+			.filter((method) => !networked_methods.includes(method));
 	}
 
 	get service_methods(): Array<Action_Method> {

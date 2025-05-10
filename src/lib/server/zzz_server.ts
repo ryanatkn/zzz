@@ -10,6 +10,7 @@ import {
 	action_spec_by_method,
 	type Action_Message_From_Server,
 	action_specs,
+	Action_Message_Any,
 } from '$lib/action_collections.js';
 import type {Zzz_Config} from '$lib/config_helpers.js';
 import {Zzz_Dir} from '$lib/diskfile_types.js';
@@ -17,12 +18,12 @@ import {Safe_Fs} from '$lib/server/safe_fs.js';
 import {Action_Registry} from '$lib/action_registry.js';
 import {
 	validate_service_params,
-	validate_service_response as validate_service_return,
+	validate_service_response_params as validate_service_return,
 	type Service_Return,
 } from '$lib/server/service.js';
 import {Api_Error} from '$lib/api.js';
-import type {Action_Method} from '$lib/action_metatypes.js';
 import {is_request_response_action} from '$lib/schema_helpers.js';
+import type {Action_Method} from '$lib/action_metatypes.js';
 
 /**
  * Function type for handling client messages.
@@ -153,10 +154,9 @@ export class Zzz_Server {
 	 * This is the unified entry point for both HTTP and WebSocket actions.
 	 */
 	async receive(method: Action_Method, params: unknown): Promise<Service_Return> {
-		console.log(`received message`, method, params);
+		console.log(`received method with params`, method, params);
 		this.#check_destroyed();
 
-		// Find the action spec using the registry
 		const spec = action_spec_by_method.get(method);
 		if (!spec) {
 			throw new Api_Error(400, `unknown action: ${method}`);
@@ -166,14 +166,11 @@ export class Zzz_Server {
 			throw new Api_Error(400, `invalid action: ${method}`);
 		}
 
-		// Validate parameters based on the schema
 		const parsed = validate_service_params(spec, params, this.log);
 		console.log(`parsed`, parsed);
 
-		// Process the action with validated parameters
 		const returned = await this.perform_action(parsed as any); // TODO typesafe, see `validate_service_params`, probably generated code
 
-		// In development, validate the response
 		if (DEV) {
 			validate_service_return(spec, returned, this.log);
 		}

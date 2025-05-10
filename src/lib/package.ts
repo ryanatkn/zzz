@@ -941,7 +941,7 @@ export const src_json = {
 		'./action_spec.js': {
 			path: 'action_spec.ts',
 			declarations: [
-				{name: 'Action_Base', kind: 'variable'},
+				{name: 'Action_Message_Base', kind: 'variable'},
 				{name: 'Action_Kind', kind: 'variable'},
 				{name: 'Action_Spec_Base', kind: 'variable'},
 				{name: 'Request_Response_Action_Spec', kind: 'variable'},
@@ -949,6 +949,7 @@ export const src_json = {
 				{name: 'Client_Local_Action_Spec', kind: 'variable'},
 				{name: 'Action_Spec', kind: 'variable'},
 				{name: 'is_action_spec', kind: 'function'},
+				{name: 'collect_action_specs_by_method', kind: 'function'},
 			],
 		},
 		'./action_specs.js': {
