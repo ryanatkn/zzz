@@ -80,7 +80,6 @@ export const package_json = {
 	files: ['dist'],
 	exports: {
 		'./package.json': './package.json',
-		'./action_api.js': {types: './dist/action_api.d.ts', default: './dist/action_api.js'},
 		'./action_collections.gen.js': {
 			types: './dist/action_collections.gen.d.ts',
 			default: './dist/action_collections.gen.js',
@@ -131,7 +130,6 @@ export const package_json = {
 			types: './dist/actions.svelte.d.ts',
 			default: './dist/actions.svelte.js',
 		},
-		'./api_client.js': {types: './dist/api_client.d.ts', default: './dist/api_client.js'},
 		'./api.js': {types: './dist/api.d.ts', default: './dist/api.js'},
 		'./app.svelte.js': {types: './dist/app.svelte.d.ts', default: './dist/app.svelte.js'},
 		'./Bit_Editor_For_Diskfile.svelte': {
@@ -547,6 +545,7 @@ export const package_json = {
 			types: './dist/indexed_collection.svelte.d.ts',
 			default: './dist/indexed_collection.svelte.js',
 		},
+		'./json_rpc.js': {types: './dist/json_rpc.d.ts', default: './dist/json_rpc.js'},
 		'./list_helpers.js': {types: './dist/list_helpers.d.ts', default: './dist/list_helpers.js'},
 		'./Main_Dialog.svelte': {
 			types: './dist/Main_Dialog.svelte.d.ts',
@@ -869,13 +868,6 @@ export const src_json = {
 	version: '0.0.1',
 	modules: {
 		'./package.json': {path: 'package.json', declarations: [{name: 'default', kind: 'json'}]},
-		'./action_api.js': {
-			path: 'action_api.ts',
-			declarations: [
-				{name: 'Create_Actions_Client', kind: 'type'},
-				{name: 'create_actions', kind: 'function'},
-			],
-		},
 		'./action_collections.gen.js': {
 			path: 'action_collections.gen.ts',
 			declarations: [{name: 'gen', kind: 'function'}],
@@ -996,7 +988,6 @@ export const src_json = {
 				{name: 'Actions', kind: 'class'},
 			],
 		},
-		'./api_client.js': {path: 'api_client.ts', declarations: [{name: 'Api_Client', kind: 'type'}]},
 		'./api.js': {
 			path: 'api.ts',
 			declarations: [
@@ -1653,6 +1644,30 @@ export const src_json = {
 				{name: 'Index_Definition', kind: 'type'},
 				{name: 'Indexed_Collection_Options', kind: 'type'},
 				{name: 'Indexed_Collection', kind: 'class'},
+			],
+		},
+		'./json_rpc.js': {
+			path: 'json_rpc.ts',
+			declarations: [
+				{name: 'JSONRPC_VERSION', kind: 'variable'},
+				{name: 'JSONRPC_LATEST_PROTOCOL_VERSION', kind: 'variable'},
+				{name: 'JSONRPC_PARSE_ERROR', kind: 'variable'},
+				{name: 'JSONRPC_INVALID_REQUEST', kind: 'variable'},
+				{name: 'JSONRPC_METHOD_NOT_FOUND', kind: 'variable'},
+				{name: 'JSONRPC_INVALID_PARAMS', kind: 'variable'},
+				{name: 'JSONRPC_INTERNAL_ERROR', kind: 'variable'},
+				{name: 'JSONRPCProgressToken', kind: 'variable'},
+				{name: 'RequestId', kind: 'variable'},
+				{name: 'JSONRPCBaseRequest', kind: 'variable'},
+				{name: 'JSONRPCBaseNotification', kind: 'variable'},
+				{name: 'JSONRPCResult', kind: 'variable'},
+				{name: 'JSONRPCRequest', kind: 'variable'},
+				{name: 'JSONRPCNotification', kind: 'variable'},
+				{name: 'JSONRPCResponse', kind: 'variable'},
+				{name: 'JSONRPCError', kind: 'variable'},
+				{name: 'JSONRPCBatchRequest', kind: 'variable'},
+				{name: 'JSONRPCBatchResponse', kind: 'variable'},
+				{name: 'JSONRPCMessage', kind: 'variable'},
 			],
 		},
 		'./list_helpers.js': {

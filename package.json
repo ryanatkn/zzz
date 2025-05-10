@@ -97,10 +97,6 @@
   ],
   "exports": {
     "./package.json": "./package.json",
-    "./action_api.js": {
-      "types": "./dist/action_api.d.ts",
-      "default": "./dist/action_api.js"
-    },
     "./action_collections.gen.js": {
       "types": "./dist/action_collections.gen.d.ts",
       "default": "./dist/action_collections.gen.js"
@@ -162,10 +158,6 @@
     "./actions.svelte.js": {
       "types": "./dist/actions.svelte.d.ts",
       "default": "./dist/actions.svelte.js"
-    },
-    "./api_client.js": {
-      "types": "./dist/api_client.d.ts",
-      "default": "./dist/api_client.js"
     },
     "./api.js": {
       "types": "./dist/api.d.ts",
@@ -629,6 +621,10 @@
     "./indexed_collection.svelte.js": {
       "types": "./dist/indexed_collection.svelte.d.ts",
       "default": "./dist/indexed_collection.svelte.js"
+    },
+    "./json_rpc.js": {
+      "types": "./dist/json_rpc.d.ts",
+      "default": "./dist/json_rpc.js"
     },
     "./list_helpers.js": {
       "types": "./dist/list_helpers.d.ts",
