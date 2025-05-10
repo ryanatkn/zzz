@@ -8,7 +8,7 @@ import {
 	filer_change_action_spec,
 	load_session_action_spec,
 	ping_action_spec,
-	send_prompt_action_spec,
+	submit_completion_action_spec,
 	toggle_main_menu_action_spec,
 	update_diskfile_action_spec,
 } from '$lib/action_specs.js';
@@ -50,13 +50,13 @@ export const Action_Message = {
 		method: z.literal('ping'),
 		params: ping_action_spec.response_params,
 	}),
-	send_prompt_request: Action_Base.extend({
-		method: z.literal('send_prompt'),
-		params: send_prompt_action_spec.params,
+	submit_completion_request: Action_Base.extend({
+		method: z.literal('submit_completion'),
+		params: submit_completion_action_spec.params,
 	}),
-	send_prompt_response: Action_Base.extend({
-		method: z.literal('send_prompt'),
-		params: send_prompt_action_spec.response_params,
+	submit_completion_response: Action_Base.extend({
+		method: z.literal('submit_completion'),
+		params: submit_completion_action_spec.response_params,
 	}),
 	toggle_main_menu: Action_Base.extend({
 		method: z.literal('toggle_main_menu'),
@@ -81,8 +81,8 @@ export interface Action_Message {
 	load_session_response: z.infer<typeof Action_Message.load_session_response>;
 	ping_request: z.infer<typeof Action_Message.ping_request>;
 	ping_response: z.infer<typeof Action_Message.ping_response>;
-	send_prompt_request: z.infer<typeof Action_Message.send_prompt_request>;
-	send_prompt_response: z.infer<typeof Action_Message.send_prompt_response>;
+	submit_completion_request: z.infer<typeof Action_Message.submit_completion_request>;
+	submit_completion_response: z.infer<typeof Action_Message.submit_completion_response>;
 	toggle_main_menu: z.infer<typeof Action_Message.toggle_main_menu>;
 	update_diskfile_request: z.infer<typeof Action_Message.update_diskfile_request>;
 	update_diskfile_response: z.infer<typeof Action_Message.update_diskfile_response>;
@@ -98,8 +98,8 @@ export interface Action_Message_Params {
 	load_session_response: z.infer<typeof load_session_action_spec.response_params>;
 	ping_request: z.infer<typeof ping_action_spec.params>;
 	ping_response: z.infer<typeof ping_action_spec.response_params>;
-	send_prompt_request: z.infer<typeof send_prompt_action_spec.params>;
-	send_prompt_response: z.infer<typeof send_prompt_action_spec.response_params>;
+	submit_completion_request: z.infer<typeof submit_completion_action_spec.params>;
+	submit_completion_response: z.infer<typeof submit_completion_action_spec.response_params>;
 	toggle_main_menu: z.infer<typeof toggle_main_menu_action_spec.params>;
 	update_diskfile_request: z.infer<typeof update_diskfile_action_spec.params>;
 	update_diskfile_response: z.infer<typeof update_diskfile_action_spec.response_params>;

@@ -43,10 +43,6 @@ export const Request_Response_Action_Spec = Action_Spec_Base.extend({
 	 * and we mirror the name here for the response message payload.
 	 */
 	response_params: z.instanceof(z.ZodType),
-	/**
-	 * This needs to be watched closely, so the friction from the branded type is desired.
-	 */
-	returns: Type_Literal,
 });
 export type Request_Response_Action_Spec = z.infer<typeof Request_Response_Action_Spec>;
 

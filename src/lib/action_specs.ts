@@ -22,7 +22,6 @@ export const ping_action_spec = {
 			ping_id: Uuid,
 		})
 		.strict(),
-	returns: Type_Literal.parse('Api_Result<typeof ping_action_spec.response>'),
 } satisfies Action_Spec;
 
 export const load_session_action_spec = {
@@ -42,7 +41,6 @@ export const load_session_action_spec = {
 				.strict(),
 		})
 		.strict(),
-	returns: Type_Literal.parse('Api_Result<typeof load_session_action_spec.response>'),
 } satisfies Action_Spec;
 
 export const filer_change_action_spec = {
@@ -68,7 +66,6 @@ export const update_diskfile_action_spec = {
 		})
 		.strict(),
 	response_params: z.null(),
-	returns: Type_Literal.parse('Api_Result<typeof update_diskfile_action_spec.response>'),
 } satisfies Action_Spec;
 
 export const delete_diskfile_action_spec = {
@@ -82,7 +79,6 @@ export const delete_diskfile_action_spec = {
 		})
 		.strict(),
 	response_params: z.null(),
-	returns: Type_Literal.parse('Api_Result<typeof delete_diskfile_action_spec.response>'),
 } satisfies Action_Spec;
 
 export const create_directory_action_spec = {
@@ -96,11 +92,10 @@ export const create_directory_action_spec = {
 		})
 		.strict(),
 	response_params: z.null(),
-	returns: Type_Literal.parse('Api_Result<typeof create_directory_action_spec.response>'),
 } satisfies Action_Spec;
 
-export const send_prompt_action_spec = {
-	method: 'send_prompt',
+export const submit_completion_action_spec = {
+	method: 'submit_completion',
 	kind: 'request_response',
 	http_method: 'POST',
 	auth: null,
@@ -114,7 +109,6 @@ export const send_prompt_action_spec = {
 			completion_response: Completion_Response,
 		})
 		.strict(),
-	returns: Type_Literal.parse('Api_Result<typeof send_prompt_action_spec.response>'),
 } satisfies Action_Spec;
 
 export const toggle_main_menu_action_spec = {

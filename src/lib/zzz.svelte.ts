@@ -136,7 +136,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	});
 
 	// Runtime-only state (not serialized)
-	readonly pending_prompts: SvelteMap<Uuid, Deferred<Action_Message['send_prompt']>> =
+	readonly pending_prompts: SvelteMap<Uuid, Deferred<Action_Message['submit_completion_request']>> =
 		new SvelteMap();
 
 	// Store Diskfile_History objects by file path
@@ -215,18 +215,18 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		this.init();
 	}
 
-	async send_prompt(
+	async submit_completion(
 		prompt: string,
 		provider_name: Provider_Name,
 		model: string,
 		completion_messages?: Array<Action_With_History>,
-	): Promise<Action_Message['send_prompt_request']> {
+	): Promise<Action_Message['submit_completion_request']> {
 		const request_id = create_uuid();
 		const created = get_datetime_now();
-		const message: Action_Message['send_prompt_request'] = {
+		const message: Action_Message['submit_completion_request'] = {
 			id: request_id,
 			created,
-			method: 'send_prompt',
+			method: 'submit_completion',
 			params: {
 				completion_request: {
 					created,
@@ -240,7 +240,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		};
 		this.actions.send(message);
 
-		const deferred = create_deferred<Action_Message['send_prompt_request']>();
+		const deferred = create_deferred<Action_Message['submit_completion_request']>();
 		this.pending_prompts.set(message.id, deferred);
 
 		const response = await deferred.promise;
@@ -248,7 +248,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		return response;
 	}
 
-	receive_completion_response(message: Action_Message['send_prompt_response']): void {
+	receive_completion_response(message: Action_Message['submit_completion_response']): void {
 		const deferred = this.pending_prompts.get(message.params.completion_response.request_id);
 		if (!deferred) {
 			console.error('expected pending', message);
@@ -262,7 +262,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	 * Handles session data loaded from the server.
 	 * Sets the zzz_dir and adds files to diskfiles.
 	 */
-	receive_session(data: Action_Message_Params['loaded_session']['data']): void {
+	receive_session(data: Action_Message_Params['load_session_response']['data']): void {
 		// Set the zzz_dir property from the session data
 		this.zzz_dir = data.zzz_dir;
 

@@ -97,8 +97,8 @@ export const validate_service_response = (
 	response: unknown,
 	log?: Logger | null,
 	// TODO BLOCK this return type needs to be based on the `Request_Response_Action_Spec` type, maybe using a typed `method` instead of the `spec`?
-): z.infer<Request_Response_Action_Spec['response']> => {
-	const parsed = action.response.safeParse(response);
+): z.infer<Request_Response_Action_Spec['response_params']> => {
+	const parsed = action.response_params.safeParse(response);
 	if (!parsed.success) {
 		log?.error('failed to validate service response', action.method, response, parsed.error.issues);
 		throw new Api_Error(

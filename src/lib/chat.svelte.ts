@@ -127,7 +127,7 @@ export class Chat extends Cell<typeof Chat_Json> {
 
 		try {
 			// TODO configure this utility LLM (roles?), and set the output token count from config as well
-			const name_response = await this.zzz.send_prompt(
+			const name_response = await this.zzz.submit_completion(
 				p,
 				// TODO @many hacky, rework the bots interface (currently just copies over the config) - the provider should be on the model object, but should models be able to have multiple providers, or do they need unique names? and another field for canonical model name?
 				this.zzz.models.find_by_name(this.zzz.bots.namerbot)!.provider_name,

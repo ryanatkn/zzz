@@ -2,7 +2,6 @@ import type {Gen} from '@ryanatkn/gro/gen.js';
 
 import {action_specs} from '$lib/action_collections.js';
 import {Action_Registry} from '$lib/action_registry.js';
-import {to_action_spec_identifier} from '$lib/schema_helpers.js';
 import type {Action_Method} from './action_metatypes.js';
 
 /**
@@ -42,7 +41,7 @@ export const gen: Gen = ({origin_path}) => {
 		// ${banner}
 
 		import {z} from 'zod';
-		
+
 		import {Action_Message} from '$lib/action_messages.js';
 		import * as action_spec_module from '$lib/action_specs.js';
 		import {type Action_Spec, is_action_spec} from '$lib/action_spec.js';

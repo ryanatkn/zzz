@@ -3,7 +3,6 @@ import {z} from 'zod';
 
 import {
 	is_request_response_action,
-	to_action_spec_identifier,
 	to_action_spec_params_identifier,
 	to_action_spec_response_params_identifier,
 } from '$lib/schema_helpers.js';
@@ -30,7 +29,6 @@ export const gen: Gen = ({origin_path}) => {
 
 		import {z} from 'zod';
 		import type {Api_Result} from '$lib/api.js';
-		import type {Service_Return, Nonauthenticated_Service, Nonauthorized_Service, Authorized_Service} from '$lib/server/service.js';
 		import type {Mutation} from '$lib/mutation.js';
 		import type {${schema_imports.join(', ')}} from '$lib/action_specs.js';
 
@@ -64,33 +62,23 @@ export const gen: Gen = ({origin_path}) => {
 			registry.client_local_specs.map((spec) => `'${spec.method}'`).join(' | ') || 'never'
 		};
 
+		// TODO @many keep or delete?
 		/**
 		 * Maps action names to their parameter types.
 		 */
-		export interface Action_Params_By_Name {
+		export interface Action_Params_By_Method {
 			${registry.specs.map((spec) => `${spec.method}: typeof ${to_action_spec_params_identifier(spec.method)};`).join('\n\t')}
 		}
 
+		// TODO @many keep or delete?
 		/**
 		 * Maps action names to their response types (request_response and server_notification actions only).
 		 */
-		export interface Action_Response_By_Name {
+		export interface Action_Response_Params_By_Method {
 			${registry.request_response_specs
 				.map(
 					(spec) =>
 						`${spec.method}: typeof ${to_action_spec_response_params_identifier(spec.method)};`,
-				)
-				.join('\n\t')}
-		}
-
-		/**
-		 * Maps action names to their service implementations.
-		 */
-		export interface Service_By_Name {
-			${registry.request_response_specs
-				.map(
-					(spec) =>
-						`${spec.method}: Nonauthenticated_Service<typeof ${to_action_spec_identifier(spec.method)}, Service_Return<typeof ${to_action_spec_response_params_identifier(spec.method)}>>;`,
 				)
 				.join('\n\t')}
 		}
@@ -107,7 +95,7 @@ export const gen: Gen = ({origin_path}) => {
 						has_params ? `params: typeof ${to_action_spec_params_identifier(spec.method)}` : ''
 					}) => ${
 						spec.kind === 'request_response'
-							? `Promise<${spec.returns}>`
+							? `Promise<Api_Result<typeof ${to_action_spec_response_params_identifier(spec.method)}>>`
 							: spec.kind === 'client_local'
 								? spec.returns
 								: 'void'

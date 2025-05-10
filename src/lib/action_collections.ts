@@ -15,7 +15,7 @@ export const Action_From_Client = z.discriminatedUnion('method', [
 	Action_Message.delete_diskfile_request,
 	Action_Message.load_session_request,
 	Action_Message.ping_request,
-	Action_Message.send_prompt_request,
+	Action_Message.submit_completion_request,
 	Action_Message.update_diskfile_request,
 	Action_Message.toggle_main_menu,
 ]);
@@ -36,7 +36,7 @@ export const Action_Any = z.discriminatedUnion('method', [
 	Action_Message.delete_diskfile_request,
 	Action_Message.load_session_request,
 	Action_Message.ping_request,
-	Action_Message.send_prompt_request,
+	Action_Message.submit_completion_request,
 	Action_Message.update_diskfile_request,
 	Action_Message.filer_change,
 ]);
@@ -50,7 +50,7 @@ export const Action_Networked = z.discriminatedUnion('method', [
 	Action_Message.delete_diskfile_request,
 	Action_Message.load_session_request,
 	Action_Message.ping_request,
-	Action_Message.send_prompt_request,
+	Action_Message.submit_completion_request,
 	Action_Message.update_diskfile_request,
 ]);
 export type Action_Networked = z.infer<typeof Action_Networked>;

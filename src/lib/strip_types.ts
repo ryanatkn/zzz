@@ -12,8 +12,8 @@ export const Strip_Json = Cell_Json.extend({
 	bit_id: Uuid_With_Default,
 	tape_id: Uuid.nullable().optional(),
 	role: Strip_Role,
-	request: Action_Message.send_prompt.optional(),
-	response: Action_Message.completion_response.optional(),
+	request: Action_Message.submit_completion_request.optional(),
+	response: Action_Message.submit_completion_response.optional(),
 });
 export type Strip_Json = z.infer<typeof Strip_Json>;
 export type Strip_Json_Input = z.input<typeof Strip_Json>;

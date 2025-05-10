@@ -34,7 +34,7 @@ export class Action extends Cell<typeof Action_Json> {
 
 	// TODO hacky, refactor
 	readonly is_ping: boolean = $derived(this.method === 'ping');
-	readonly is_prompt: boolean = $derived(this.method === 'send_prompt');
+	readonly is_prompt: boolean = $derived(this.method === 'submit_completion');
 	readonly is_session: boolean = $derived(this.method === 'load_session');
 	readonly is_file_related: boolean = $derived(
 		this.method === 'update_diskfile' ||
@@ -77,7 +77,7 @@ export class Action extends Cell<typeof Action_Json> {
 		// TODO remove these
 		this.decoders = {
 			completion_request: (value) =>
-				this.method === 'send_prompt' ? Completion_Request.parse(value) : undefined,
+				this.method === 'submit_completion' ? Completion_Request.parse(value) : undefined,
 			path: (value) =>
 				this.method === 'update_diskfile' || this.method === 'delete_diskfile'
 					? Diskfile_Path.parse(value)

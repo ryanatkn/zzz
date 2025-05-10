@@ -2,12 +2,6 @@
 
 import {z} from 'zod';
 import type {Api_Result} from '$lib/api.js';
-import type {
-	Service_Return,
-	Nonauthenticated_Service,
-	Nonauthorized_Service,
-	Authorized_Service,
-} from '$lib/server/service.js';
 import type {Mutation} from '$lib/mutation.js';
 import type {
 	create_directory_action_spec,
@@ -15,7 +9,7 @@ import type {
 	filer_change_action_spec,
 	load_session_action_spec,
 	ping_action_spec,
-	send_prompt_action_spec,
+	submit_completion_action_spec,
 	toggle_main_menu_action_spec,
 	update_diskfile_action_spec,
 } from '$lib/action_specs.js';
@@ -30,7 +24,7 @@ export const Action_Method = z.enum([
 	'filer_change',
 	'load_session',
 	'ping',
-	'send_prompt',
+	'submit_completion',
 	'toggle_main_menu',
 	'update_diskfile',
 ]);
@@ -44,7 +38,7 @@ export type Request_Response_Action_Method =
 	| 'delete_diskfile'
 	| 'load_session'
 	| 'ping'
-	| 'send_prompt'
+	| 'submit_completion'
 	| 'update_diskfile';
 
 /**
@@ -60,13 +54,13 @@ export type Client_Local_Action_Method = 'toggle_main_menu';
 /**
  * Maps action names to their parameter types.
  */
-export interface Action_Params_By_Name {
+export interface Action_Params_By_Method {
 	create_directory: typeof create_directory_action_spec.params;
 	delete_diskfile: typeof delete_diskfile_action_spec.params;
 	filer_change: typeof filer_change_action_spec.params;
 	load_session: typeof load_session_action_spec.params;
 	ping: typeof ping_action_spec.params;
-	send_prompt: typeof send_prompt_action_spec.params;
+	submit_completion: typeof submit_completion_action_spec.params;
 	toggle_main_menu: typeof toggle_main_menu_action_spec.params;
 	update_diskfile: typeof update_diskfile_action_spec.params;
 }
@@ -74,43 +68,13 @@ export interface Action_Params_By_Name {
 /**
  * Maps action names to their response types (request_response and server_notification actions only).
  */
-export interface Action_Response_By_Name {
+export interface Action_Response_Params_By_Method {
 	create_directory: typeof create_directory_action_spec.response_params;
 	delete_diskfile: typeof delete_diskfile_action_spec.response_params;
 	load_session: typeof load_session_action_spec.response_params;
 	ping: typeof ping_action_spec.response_params;
-	send_prompt: typeof send_prompt_action_spec.response_params;
+	submit_completion: typeof submit_completion_action_spec.response_params;
 	update_diskfile: typeof update_diskfile_action_spec.response_params;
-}
-
-/**
- * Maps action names to their service implementations.
- */
-export interface Service_By_Name {
-	create_directory: Nonauthenticated_Service<
-		typeof create_directory_action_spec,
-		Service_Return<typeof create_directory_action_spec.response_params>
-	>;
-	delete_diskfile: Nonauthenticated_Service<
-		typeof delete_diskfile_action_spec,
-		Service_Return<typeof delete_diskfile_action_spec.response_params>
-	>;
-	load_session: Nonauthenticated_Service<
-		typeof load_session_action_spec,
-		Service_Return<typeof load_session_action_spec.response_params>
-	>;
-	ping: Nonauthenticated_Service<
-		typeof ping_action_spec,
-		Service_Return<typeof ping_action_spec.response_params>
-	>;
-	send_prompt: Nonauthenticated_Service<
-		typeof send_prompt_action_spec,
-		Service_Return<typeof send_prompt_action_spec.response_params>
-	>;
-	update_diskfile: Nonauthenticated_Service<
-		typeof update_diskfile_action_spec,
-		Service_Return<typeof update_diskfile_action_spec.response_params>
-	>;
 }
 
 /**
@@ -119,24 +83,24 @@ export interface Service_By_Name {
 export interface Actions {
 	create_directory: (
 		params: typeof create_directory_action_spec.params,
-	) => Promise<Api_Result<typeof create_directory_action_spec.response>>;
+	) => Promise<Api_Result<typeof create_directory_action_spec.response_params>>;
 	delete_diskfile: (
 		params: typeof delete_diskfile_action_spec.params,
-	) => Promise<Api_Result<typeof delete_diskfile_action_spec.response>>;
+	) => Promise<Api_Result<typeof delete_diskfile_action_spec.response_params>>;
 	filer_change: (params: typeof filer_change_action_spec.params) => void;
 	load_session: (
 		params: typeof load_session_action_spec.params,
-	) => Promise<Api_Result<typeof load_session_action_spec.response>>;
+	) => Promise<Api_Result<typeof load_session_action_spec.response_params>>;
 	ping: (
 		params: typeof ping_action_spec.params,
-	) => Promise<Api_Result<typeof ping_action_spec.response>>;
-	send_prompt: (
-		params: typeof send_prompt_action_spec.params,
-	) => Promise<Api_Result<typeof send_prompt_action_spec.response>>;
+	) => Promise<Api_Result<typeof ping_action_spec.response_params>>;
+	submit_completion: (
+		params: typeof submit_completion_action_spec.params,
+	) => Promise<Api_Result<typeof submit_completion_action_spec.response_params>>;
 	toggle_main_menu: (params: typeof toggle_main_menu_action_spec.params) => void;
 	update_diskfile: (
 		params: typeof update_diskfile_action_spec.params,
-	) => Promise<Api_Result<typeof update_diskfile_action_spec.response>>;
+	) => Promise<Api_Result<typeof update_diskfile_action_spec.response_params>>;
 }
 
 // TODO maybe extract to $lib/mutation_types.ts or similar, decoupled
@@ -162,9 +126,9 @@ export interface Mutations {
 		typeof ping_action_spec.params,
 		Api_Result<typeof ping_action_spec.response_params>
 	>;
-	send_prompt?: Mutation<
-		typeof send_prompt_action_spec.params,
-		Api_Result<typeof send_prompt_action_spec.response_params>
+	submit_completion?: Mutation<
+		typeof submit_completion_action_spec.params,
+		Api_Result<typeof submit_completion_action_spec.response_params>
 	>;
 	toggle_main_menu?: Mutation<typeof toggle_main_menu_action_spec.params, void>;
 	update_diskfile?: Mutation<

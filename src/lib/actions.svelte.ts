@@ -47,7 +47,7 @@ export class Actions extends Cell<typeof Actions_Json> {
 	// Derived collections using the indexed structure
 	readonly pings: Array<Action> = $derived(this.items.where('by_method', 'ping'));
 	readonly pongs: Array<Action> = $derived(this.items.where('by_method', 'pong'));
-	readonly prompts: Array<Action> = $derived(this.items.where('by_method', 'send_prompt'));
+	readonly prompts: Array<Action> = $derived(this.items.where('by_method', 'submit_completion'));
 	readonly completions: Array<Action> = $derived(
 		this.items.where('by_method', 'completion_response'),
 	);
