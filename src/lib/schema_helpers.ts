@@ -1,4 +1,9 @@
-import type {Action_Spec, Client_Action_Spec, Service_Action_Spec} from '$lib/action_spec.js';
+import type {
+	Action_Spec,
+	Client_Local_Action_Spec,
+	Server_Notification_Action_Spec,
+	Request_Response_Action_Spec,
+} from '$lib/action_spec.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
 
 /**
@@ -18,17 +23,16 @@ export const to_action_spec_params_identifier = (method: Action_Method): string 
 export const to_action_spec_response_identifier = (method: Action_Method): string =>
 	`${to_action_spec_identifier(method)}.response`;
 
-/**
- * Check if the spec is for a service action.
- */
-export const is_service_action = (spec: Action_Spec): spec is Service_Action_Spec =>
-	spec.type === 'Service_Action';
+export const is_request_response_action = (
+	spec: Action_Spec,
+): spec is Request_Response_Action_Spec => spec.type === 'request_response';
 
-/**
- * Check if the spec is for a client action.
- */
-export const is_client_action = (spec: Action_Spec): spec is Client_Action_Spec =>
-	spec.type === 'Client_Action';
+export const is_server_notification_action = (
+	spec: Action_Spec,
+): spec is Server_Notification_Action_Spec => spec.type === 'server_notification';
+
+export const is_client_local_action = (spec: Action_Spec): spec is Client_Local_Action_Spec =>
+	spec.type === 'client_local';
 
 /**
  * Convert a string from camelCase to snake_case.

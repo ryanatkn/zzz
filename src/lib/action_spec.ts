@@ -21,7 +21,7 @@ export const Action_Base = z
 	.strict();
 export type Action_Base = z.infer<typeof Action_Base>;
 
-export const Action_Type = z.enum(['request_response', 'notification', 'client_local']);
+export const Action_Type = z.enum(['request_response', 'server_notification', 'client_local']);
 export type Action_Type = z.infer<typeof Action_Type>;
 
 export const Action_Spec_Base = z.object({
@@ -41,14 +41,14 @@ export const Request_Response_Action_Spec = Action_Spec_Base.extend({
 });
 export type Request_Response_Action_Spec = z.infer<typeof Request_Response_Action_Spec>;
 
-// Type for notification actions (server sends without a request)
-export const Notification_Action_Spec = Action_Spec_Base.extend({
-	type: z.literal('notification'),
+// Type for server_notification actions (server sends without a request)
+export const Server_Notification_Action_Spec = Action_Spec_Base.extend({
+	type: z.literal('server_notification'),
 	http_method: z.null(),
 	auth: z.null(),
 	response: z.instanceof(z.ZodType),
 });
-export type Notification_Action_Spec = z.infer<typeof Notification_Action_Spec>;
+export type Server_Notification_Action_Spec = z.infer<typeof Server_Notification_Action_Spec>;
 
 // Type for client_local actions (never leave the client)
 export const Client_Local_Action_Spec = Action_Spec_Base.extend({
@@ -59,7 +59,7 @@ export type Client_Local_Action_Spec = z.infer<typeof Client_Local_Action_Spec>;
 // Union of all action spec types
 export const Action_Spec = z.union([
 	Request_Response_Action_Spec,
-	Notification_Action_Spec,
+	Server_Notification_Action_Spec,
 	Client_Local_Action_Spec,
 ]);
 export type Action_Spec = z.infer<typeof Action_Spec>;

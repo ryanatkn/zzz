@@ -19,10 +19,10 @@ import {
 export const Action_From_Client = z.discriminatedUnion('method', [
 	Action_Message.ping,
 	Action_Message.load_session,
-	Action_Message.send_prompt,
 	Action_Message.update_diskfile,
 	Action_Message.delete_diskfile,
 	Action_Message.create_directory,
+	Action_Message.send_prompt,
 	Action_Message.toggle_main_menu,
 ]);
 export type Action_From_Client = z.infer<typeof Action_From_Client>;
@@ -34,23 +34,17 @@ export const Action_From_Server = z.discriminatedUnion('method', [Action_Message
 export type Action_From_Server = z.infer<typeof Action_From_Server>;
 
 /**
- * Set of actions with "from_either" direction (can originate from either).
- */
-export const Action_From_Either = z.discriminatedUnion('method', []);
-export type Action_From_Either = z.infer<typeof Action_From_Either>;
-
-/**
  * All action types combined.
  */
 export const Action_Any = z.discriminatedUnion('method', [
-	Action_Message.update_diskfile,
-	Action_Message.delete_diskfile,
-	Action_Message.create_directory,
 	Action_Message.toggle_main_menu,
 	Action_Message.ping,
 	Action_Message.load_session,
-	Action_Message.filer_change,
+	Action_Message.update_diskfile,
+	Action_Message.delete_diskfile,
+	Action_Message.create_directory,
 	Action_Message.send_prompt,
+	Action_Message.filer_change,
 ]);
 export type Action_Any = z.infer<typeof Action_Any>;
 
@@ -60,6 +54,9 @@ export type Action_Any = z.infer<typeof Action_Any>;
 export const Action_Networked = z.discriminatedUnion('method', [
 	Action_Message.ping,
 	Action_Message.load_session,
+	Action_Message.update_diskfile,
+	Action_Message.delete_diskfile,
+	Action_Message.create_directory,
 	Action_Message.send_prompt,
 ]);
 export type Action_Networked = z.infer<typeof Action_Networked>;

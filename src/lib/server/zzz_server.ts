@@ -22,6 +22,7 @@ import {
 } from '$lib/server/service.js';
 import {Api_Error} from '$lib/api.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
+import {is_request_response_action} from '$lib/schema_helpers.js';
 
 /**
  * Function type for handling client messages.
@@ -171,35 +172,23 @@ export class Zzz_Server {
 	 */
 	async process_action(
 		// TODO BLOCK make this function monomorphic
-		method_or_message: Action_Method | Action_From_Client,
-		params?: unknown,
+		method: Action_Method,
+		params: unknown,
 	): Promise<Service_Return> {
 		this.#check_destroyed();
 
-		let method: Action_Method;
-		let action_params: unknown;
-
-		// Determine if we're processing by name or full message
-		if (typeof method_or_message === 'string') {
-			method = method_or_message as Action_Method;
-			action_params = params;
-		} else {
-			method = method_or_message.method;
-			action_params = method_or_message; // The full message is the params
-		}
-
 		// Find the action spec using the registry
-		const spec = action_spec_by_method[method];
+		const spec = action_spec_by_method[method] as Action_Spec | undefined;
 		if (!spec) {
 			throw new Api_Error(400, `unknown action: ${method}`);
 		}
 
-		if (spec.type !== 'Service_Action') {
-			throw new Api_Error(400, `action is not a service action: ${method}`);
+		if (!is_request_response_action(spec)) {
+			throw new Api_Error(400, `invalid action: ${method}`);
 		}
 
 		// Validate parameters based on the schema
-		const parsed = validate_service_params(spec, action_params, this.log);
+		const parsed = validate_service_params(spec, params, this.log);
 		console.log(`parsed`, parsed);
 
 		// Process the action with validated parameters

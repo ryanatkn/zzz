@@ -2,6 +2,7 @@ import type {Gen} from '@ryanatkn/gro/gen.js';
 import {z} from 'zod';
 
 import {
+	is_request_response_action,
 	to_action_spec_identifier,
 	to_action_spec_params_identifier,
 	to_action_spec_response_identifier,
@@ -43,17 +44,24 @@ export const gen: Gen = ({origin_path}) => {
 		export type Action_Method = z.infer<typeof Action_Method>;
 
 		/**
-		 * Names of all service actions.
+		 * Names of all request_response actions.
 		 */
-		export type Service_Action_Method = ${
-			registry.service_specs.map((spec) => `'${spec.method}'`).join(' | ') || 'never'
+		export type Request_Response_Action_Method = ${
+			registry.request_response_specs.map((spec) => `'${spec.method}'`).join(' | ') || 'never'
 		};
 
 		/**
-		 * Names of all client-only actions.
+		 * Names of all server_notification actions.
 		 */
-		export type Client_Action_Method = ${
-			registry.client_specs.map((spec) => `'${spec.method}'`).join(' | ') || 'never'
+		export type Server_Notification_Action_Method = ${
+			registry.server_notification_specs.map((spec) => `'${spec.method}'`).join(' | ') || 'never'
+		};
+
+		/**
+		 * Names of all client_local actions.
+		 */
+		export type Client_Local_Action_Method = ${
+			registry.client_local_specs.map((spec) => `'${spec.method}'`).join(' | ') || 'never'
 		};
 
 		/**
@@ -64,18 +72,9 @@ export const gen: Gen = ({origin_path}) => {
 		}
 
 		/**
-		 * Maps action names to their response types (server actions only).
+		 * Maps action names to their response types (request_response and server_notification actions only).
 		 */
 		export interface Action_Response_By_Name {
-			${registry.service_specs
-				.map((spec) => `${spec.method}: typeof ${to_action_spec_response_identifier(spec.method)};`)
-				.join('\n\t')}
-		}
-
-		/**
-		 * Maps action names to their response schema types (server actions only).
-		 */
-		export interface Action_Response_Schema_By_Name {
 			${registry.service_specs
 				.map((spec) => `${spec.method}: typeof ${to_action_spec_response_identifier(spec.method)};`)
 				.join('\n\t')}
@@ -114,10 +113,9 @@ export const gen: Gen = ({origin_path}) => {
 			[key: string]: Mutation | undefined;
 			${registry.specs
 				.map((spec) => {
-					const responseType =
-						spec.type === 'Service_Action'
-							? `Api_Result<typeof ${to_action_spec_response_identifier(spec.method)}>`
-							: 'void';
+					const responseType = is_request_response_action(spec)
+						? `Api_Result<typeof ${to_action_spec_response_identifier(spec.method)}>`
+						: 'void';
 					return `${spec.method}?: Mutation<typeof ${to_action_spec_params_identifier(spec.method)}, ${responseType}>;`;
 				})
 				.join('\n\t')}

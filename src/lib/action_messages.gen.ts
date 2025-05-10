@@ -1,6 +1,11 @@
 import type {Gen} from '@ryanatkn/gro/gen.js';
 
-import {to_action_spec_identifier, to_action_spec_params_identifier} from '$lib/schema_helpers.js';
+import {
+	is_client_local_action,
+	to_action_spec_identifier,
+	to_action_spec_params_identifier,
+	to_action_spec_response_identifier,
+} from '$lib/schema_helpers.js';
 import {action_specs} from '$lib/action_specs.js';
 import {Action_Registry} from '$lib/action_registry.js';
 
@@ -48,6 +53,16 @@ export const gen: Gen = ({origin_path}) => {
 				.map((spec) => {
 					const {method} = spec;
 					return `${method}: z.infer<typeof ${to_action_spec_params_identifier(method)}>`;
+				})
+				.join(',\n\t\t\t')}
+		}
+
+		export interface Action_Message_Response {
+			${registry.specs
+				.filter((s) => 'response' in s)
+				.map((spec) => {
+					const {method} = spec;
+					return `${method}: z.infer<typeof ${to_action_spec_response_identifier(method)}>`;
 				})
 				.join(',\n\t\t\t')}
 		}

@@ -46,7 +46,7 @@ export const load_session_action_spec = {
 
 export const filer_change_action_spec = {
 	method: 'filer_change',
-	type: 'notification',
+	type: 'server_notification',
 	http_method: null,
 	auth: null,
 	params: z
@@ -61,35 +61,38 @@ export const filer_change_action_spec = {
 
 export const update_diskfile_action_spec = {
 	method: 'update_diskfile',
-	type: 'client_local',
+	type: 'request_response',
 	params: z
 		.object({
 			path: Diskfile_Path,
 			content: z.string(),
 		})
 		.strict(),
+	response: z.null(),
 	returns: 'string',
 } satisfies Action_Spec;
 
 export const delete_diskfile_action_spec = {
 	method: 'delete_diskfile',
-	type: 'client_local',
+	type: 'request_response',
 	params: z
 		.object({
 			path: Diskfile_Path,
 		})
 		.strict(),
+	response: z.null(),
 	returns: 'string',
 } satisfies Action_Spec;
 
 export const create_directory_action_spec = {
 	method: 'create_directory',
-	type: 'client_local',
+	type: 'request_response',
 	params: z
 		.object({
 			path: Diskfile_Path,
 		})
 		.strict(),
+	response: z.null(),
 	returns: 'string',
 } satisfies Action_Spec;
 

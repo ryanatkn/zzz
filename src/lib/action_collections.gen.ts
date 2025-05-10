@@ -49,14 +49,6 @@ export const gen: Gen = ({origin_path}) => {
 		export type Action_From_Server = z.infer<typeof Action_From_Server>;
 
 		/**
-		 * Set of actions with "from_either" direction (can originate from either).
-		 */
-		export const Action_From_Either = z.discriminatedUnion('method', [
-			${from_either_methods.map((method) => `Action_Message.${method}`).join(',\n\t')}
-		]);
-		export type Action_From_Either = z.infer<typeof Action_From_Either>;
-
-		/**
 		 * All action types combined.
 		 */
 		export const Action_Any = z.discriminatedUnion('method', [

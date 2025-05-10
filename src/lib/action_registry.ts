@@ -1,7 +1,7 @@
 import type {
 	Action_Spec,
 	Request_Response_Action_Spec,
-	Notification_Action_Spec,
+	Server_Notification_Action_Spec,
 	Client_Local_Action_Spec,
 } from '$lib/action_spec.js';
 import {to_action_spec_identifier} from '$lib/schema_helpers.js';
@@ -24,10 +24,10 @@ export class Action_Registry {
 		) as Array<Request_Response_Action_Spec>;
 	}
 
-	get notification_specs(): Array<Notification_Action_Spec> {
+	get server_notification_specs(): Array<Server_Notification_Action_Spec> {
 		return this.specs.filter(
-			(spec) => spec.type === 'notification',
-		) as Array<Notification_Action_Spec>;
+			(spec) => spec.type === 'server_notification',
+		) as Array<Server_Notification_Action_Spec>;
 	}
 
 	get client_local_specs(): Array<Client_Local_Action_Spec> {
@@ -36,12 +36,9 @@ export class Action_Registry {
 		) as Array<Client_Local_Action_Spec>;
 	}
 
-	// For backward compatibility with existing code
 	get service_specs(): Array<Action_Spec> {
-		// Service actions include both request_response and notification actions
-		return this.specs.filter(
-			(spec) => spec.type === 'request_response' || spec.type === 'notification',
-		);
+		// Service actions include both request_response and server_notification actions
+		return [...this.request_response_specs, ...this.server_notification_specs];
 	}
 
 	get client_specs(): Array<Action_Spec> {
@@ -54,8 +51,8 @@ export class Action_Registry {
 		return this.request_response_specs.map((spec) => spec.method);
 	}
 
-	get notification_methods(): Array<string> {
-		return this.notification_specs.map((spec) => spec.method);
+	get server_notification_methods(): Array<string> {
+		return this.server_notification_specs.map((spec) => spec.method);
 	}
 
 	get client_local_methods(): Array<string> {
@@ -68,8 +65,8 @@ export class Action_Registry {
 	}
 
 	get nonnetworked_methods(): Array<string> {
-		// Non-networked actions are notifications
-		return this.notification_specs.map((spec) => spec.method);
+		// Non-networked actions are server_notifications
+		return this.server_notification_specs.map((spec) => spec.method);
 	}
 
 	get service_methods(): Array<string> {
@@ -83,13 +80,13 @@ export class Action_Registry {
 	// Methods for determining action direction
 	// (maintained for compatibility with existing generators)
 	get from_client_methods(): Array<string> {
-		// In the new system, client-originated actions include request_response and client_local
+		// Client-originated actions include request_response and client_local
 		return [...this.request_response_methods, ...this.client_local_methods];
 	}
 
 	get from_server_methods(): Array<string> {
-		// In the new system, server-originated actions are notifications
-		return this.notification_methods;
+		// Server-originated actions are server_notifications
+		return this.server_notification_methods;
 	}
 
 	get from_either_methods(): Array<string> {

@@ -37,18 +37,25 @@ export const Action_Method = z.enum([
 export type Action_Method = z.infer<typeof Action_Method>;
 
 /**
- * Names of all service actions.
+ * Names of all request_response actions.
  */
-export type Service_Action_Method = 'ping' | 'load_session' | 'filer_change' | 'send_prompt';
-
-/**
- * Names of all client-only actions.
- */
-export type Client_Action_Method =
+export type Request_Response_Action_Method =
+	| 'ping'
+	| 'load_session'
 	| 'update_diskfile'
 	| 'delete_diskfile'
 	| 'create_directory'
-	| 'toggle_main_menu';
+	| 'send_prompt';
+
+/**
+ * Names of all server_notification actions.
+ */
+export type Server_Notification_Action_Method = 'filer_change';
+
+/**
+ * Names of all client_local actions.
+ */
+export type Client_Local_Action_Method = 'toggle_main_menu';
 
 /**
  * Maps action names to their parameter types.
@@ -65,23 +72,16 @@ export interface Action_Params_By_Name {
 }
 
 /**
- * Maps action names to their response types (server actions only).
+ * Maps action names to their response types (request_response and server_notification actions only).
  */
 export interface Action_Response_By_Name {
 	ping: typeof ping_action_spec.response;
 	load_session: typeof load_session_action_spec.response;
-	filer_change: typeof filer_change_action_spec.response;
+	update_diskfile: typeof update_diskfile_action_spec.response;
+	delete_diskfile: typeof delete_diskfile_action_spec.response;
+	create_directory: typeof create_directory_action_spec.response;
 	send_prompt: typeof send_prompt_action_spec.response;
-}
-
-/**
- * Maps action names to their response schema types (server actions only).
- */
-export interface Action_Response_Schema_By_Name {
-	ping: typeof ping_action_spec.response;
-	load_session: typeof load_session_action_spec.response;
 	filer_change: typeof filer_change_action_spec.response;
-	send_prompt: typeof send_prompt_action_spec.response;
 }
 
 /**
@@ -96,13 +96,25 @@ export interface Service_By_Name {
 		typeof load_session_action_spec,
 		Service_Return<typeof load_session_action_spec.response>
 	>;
-	filer_change: Nonauthenticated_Service<
-		typeof filer_change_action_spec,
-		Service_Return<typeof filer_change_action_spec.response>
+	update_diskfile: Nonauthenticated_Service<
+		typeof update_diskfile_action_spec,
+		Service_Return<typeof update_diskfile_action_spec.response>
+	>;
+	delete_diskfile: Nonauthenticated_Service<
+		typeof delete_diskfile_action_spec,
+		Service_Return<typeof delete_diskfile_action_spec.response>
+	>;
+	create_directory: Nonauthenticated_Service<
+		typeof create_directory_action_spec,
+		Service_Return<typeof create_directory_action_spec.response>
 	>;
 	send_prompt: Nonauthenticated_Service<
 		typeof send_prompt_action_spec,
 		Service_Return<typeof send_prompt_action_spec.response>
+	>;
+	filer_change: Nonauthenticated_Service<
+		typeof filer_change_action_spec,
+		Service_Return<typeof filer_change_action_spec.response>
 	>;
 }
 
@@ -134,13 +146,28 @@ export interface Actions {
  */
 export interface Mutations {
 	[key: string]: Mutation | undefined;
-	ping?: Mutation<typeof ping_action_spec.params, void>;
-	load_session?: Mutation<typeof load_session_action_spec.params, void>;
+	ping?: Mutation<typeof ping_action_spec.params, Api_Result<typeof ping_action_spec.response>>;
+	load_session?: Mutation<
+		typeof load_session_action_spec.params,
+		Api_Result<typeof load_session_action_spec.response>
+	>;
 	filer_change?: Mutation<typeof filer_change_action_spec.params, void>;
-	update_diskfile?: Mutation<typeof update_diskfile_action_spec.params, void>;
-	delete_diskfile?: Mutation<typeof delete_diskfile_action_spec.params, void>;
-	create_directory?: Mutation<typeof create_directory_action_spec.params, void>;
-	send_prompt?: Mutation<typeof send_prompt_action_spec.params, void>;
+	update_diskfile?: Mutation<
+		typeof update_diskfile_action_spec.params,
+		Api_Result<typeof update_diskfile_action_spec.response>
+	>;
+	delete_diskfile?: Mutation<
+		typeof delete_diskfile_action_spec.params,
+		Api_Result<typeof delete_diskfile_action_spec.response>
+	>;
+	create_directory?: Mutation<
+		typeof create_directory_action_spec.params,
+		Api_Result<typeof create_directory_action_spec.response>
+	>;
+	send_prompt?: Mutation<
+		typeof send_prompt_action_spec.params,
+		Api_Result<typeof send_prompt_action_spec.response>
+	>;
 	toggle_main_menu?: Mutation<typeof toggle_main_menu_action_spec.params, void>;
 }
 
