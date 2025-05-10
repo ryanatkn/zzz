@@ -62,27 +62,6 @@ export const gen: Gen = ({origin_path}) => {
 			registry.client_local_specs.map((spec) => `'${spec.method}'`).join(' | ') || 'never'
 		};
 
-		// TODO @many keep or delete?
-		/**
-		 * Maps action names to their parameter types.
-		 */
-		export interface Action_Params_By_Method {
-			${registry.specs.map((spec) => `${spec.method}: typeof ${to_action_spec_params_identifier(spec.method)};`).join('\n\t')}
-		}
-
-		// TODO @many keep or delete?
-		/**
-		 * Maps action names to their response types (request_response and server_notification actions only).
-		 */
-		export interface Action_Response_Params_By_Method {
-			${registry.request_response_specs
-				.map(
-					(spec) =>
-						`${spec.method}: typeof ${to_action_spec_response_params_identifier(spec.method)};`,
-				)
-				.join('\n\t')}
-		}
-
 		/**
 		 * Interface for action dispatch functions.
 		 */

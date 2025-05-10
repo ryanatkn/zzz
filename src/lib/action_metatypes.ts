@@ -52,32 +52,6 @@ export type Server_Notification_Action_Method = 'filer_change';
 export type Client_Local_Action_Method = 'toggle_main_menu';
 
 /**
- * Maps action names to their parameter types.
- */
-export interface Action_Params_By_Method {
-	create_directory: typeof create_directory_action_spec.params;
-	delete_diskfile: typeof delete_diskfile_action_spec.params;
-	filer_change: typeof filer_change_action_spec.params;
-	load_session: typeof load_session_action_spec.params;
-	ping: typeof ping_action_spec.params;
-	submit_completion: typeof submit_completion_action_spec.params;
-	toggle_main_menu: typeof toggle_main_menu_action_spec.params;
-	update_diskfile: typeof update_diskfile_action_spec.params;
-}
-
-/**
- * Maps action names to their response types (request_response and server_notification actions only).
- */
-export interface Action_Response_Params_By_Method {
-	create_directory: typeof create_directory_action_spec.response_params;
-	delete_diskfile: typeof delete_diskfile_action_spec.response_params;
-	load_session: typeof load_session_action_spec.response_params;
-	ping: typeof ping_action_spec.response_params;
-	submit_completion: typeof submit_completion_action_spec.response_params;
-	update_diskfile: typeof update_diskfile_action_spec.response_params;
-}
-
-/**
  * Interface for action dispatch functions.
  */
 export interface Actions {

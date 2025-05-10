@@ -924,7 +924,6 @@ export const src_json = {
 				{name: 'Client_Local_Action_Method', kind: 'type'},
 				{name: 'Action_Params_By_Method', kind: 'type'},
 				{name: 'Action_Response_Params_By_Method', kind: 'type'},
-				{name: 'Service_By_Name', kind: 'type'},
 				{name: 'Actions', kind: 'type'},
 				{name: 'Mutations', kind: 'type'},
 			],
