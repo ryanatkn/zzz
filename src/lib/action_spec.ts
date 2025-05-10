@@ -4,7 +4,7 @@ import {Uuid_With_Default, Datetime_Now} from '$lib/zod_helpers.js';
 import type {Http_Method} from '$lib/api.js';
 import {Action_Method} from '$lib/action_metatypes.js';
 
-export const Action_Direction = z.enum(['client', 'server', 'both']);
+export const Action_Direction = z.enum(['from_client', 'from_server', 'from_either']);
 export type Action_Direction = z.infer<typeof Action_Direction>;
 
 /**

@@ -134,11 +134,15 @@ export interface Service_By_Name {
  * Interface for action dispatch functions.
  */
 export interface Actions {
-	ping: () => Promise<Api_Result<typeof ping_action_spec.response>>;
+	ping: (
+		params: typeof ping_action_spec.params,
+	) => Promise<Api_Result<typeof ping_action_spec.response>>;
 	pong: (
 		params: typeof pong_action_spec.params,
 	) => Promise<Api_Result<typeof pong_action_spec.response>>;
-	load_session: () => Promise<Api_Result<typeof load_session_action_spec.response>>;
+	load_session: (
+		params: typeof load_session_action_spec.params,
+	) => Promise<Api_Result<typeof load_session_action_spec.response>>;
 	loaded_session: (
 		params: typeof loaded_session_action_spec.params,
 	) => Promise<Api_Result<typeof loaded_session_action_spec.response>>;

@@ -27,7 +27,7 @@
 	import create_zzz_config from '$lib/config.js';
 	import {Model_Json} from '$lib/model.svelte.js';
 	import {send_mutations, receive_mutations} from '$lib/mutations.js';
-	import type {Action_Client, Action_Server} from '$lib/action_collections.js';
+	import type {Action_From_Client, Action_From_Server} from '$lib/action_collections.js';
 	import type {Actions} from '$lib/action_metatypes.js';
 	import {create_mutation_context} from '$lib/mutation.js';
 
@@ -66,7 +66,7 @@
 	const zzz = new App({
 		cell_classes,
 		socket_url: PUBLIC_WEBSOCKET_URL,
-		onsend: async (message: Action_Client) => {
+		onsend: async (message: Action_From_Client) => {
 			console.log('[ws] sending message', message);
 			zzz.socket.send({type: 'server_message', message}); // TODO JSON-RPC
 
@@ -90,7 +90,7 @@
 			await mutation_context.flush_after_mutation();
 			return result;
 		},
-		onreceive: async (message: Action_Server) => {
+		onreceive: async (message: Action_From_Server) => {
 			console.log(`[ws] received message`, message);
 
 			const mutation = receive_mutations[message.method];

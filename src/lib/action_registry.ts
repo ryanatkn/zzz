@@ -1,5 +1,4 @@
 import {DEV} from 'esm-env';
-import {SvelteMap} from 'svelte/reactivity';
 
 import type {Action_Spec, Service_Action_Spec, Client_Action_Spec} from '$lib/action_spec.js';
 import {Action_Method} from '$lib/action_metatypes.js';
@@ -13,17 +12,17 @@ export class Action_Registry {
 	/**
 	 * Map of action methods to their specifications.
 	 */
-	readonly #specs: SvelteMap<string, Action_Spec> = new SvelteMap();
+	readonly #specs: Map<string, Action_Spec> = new Map();
 
 	/**
 	 * Map of client action methods to their specifications.
 	 */
-	readonly #client_specs: SvelteMap<string, Client_Action_Spec> = new SvelteMap();
+	readonly #client_specs: Map<string, Client_Action_Spec> = new Map();
 
 	/**
 	 * Map of service action methods to their specifications.
 	 */
-	readonly #service_specs: SvelteMap<string, Service_Action_Spec> = new SvelteMap();
+	readonly #service_specs: Map<string, Service_Action_Spec> = new Map();
 
 	constructor(action_specs?: Array<Action_Spec>) {
 		if (action_specs) {
@@ -109,21 +108,73 @@ export class Action_Registry {
 	}
 
 	/**
-	 * Get the direction of an action ('client', 'server', or 'both').
+	 * Get all networked service action specifications (those with non-null http_method).
 	 */
-	get_direction(method: string): 'client' | 'server' | 'both' {
-		const is_client = this.#client_specs.has(method);
-		const is_server = this.#service_specs.has(method);
+	get networked_specs(): Array<Service_Action_Spec> {
+		return this.service_specs.filter((spec) => spec.http_method !== null);
+	}
 
-		if (is_client && is_server) {
-			return 'both';
-		} else if (is_client) {
-			return 'client';
-		} else if (is_server) {
-			return 'server';
-		}
+	/**
+	 * Get all non-networked service action specifications (those with null http_method).
+	 */
+	get nonnetworked_specs(): Array<Service_Action_Spec> {
+		return this.service_specs.filter((spec) => spec.http_method === null);
+	}
 
-		throw new Error(`Unknown action method: ${method}`);
+	/**
+	 * Get all networked service action method names.
+	 */
+	get networked_methods(): Array<string> {
+		return this.networked_specs.map((spec) => spec.method);
+	}
+
+	/**
+	 * Get all non-networked service action method names.
+	 */
+	get nonnetworked_methods(): Array<string> {
+		return this.nonnetworked_specs.map((spec) => spec.method);
+	}
+
+	/**
+	 * Get all action specifications with "from_client" direction.
+	 */
+	get from_client_specs(): Array<Action_Spec> {
+		return this.specs.filter((spec) => spec.direction === 'from_client');
+	}
+
+	/**
+	 * Get all action specifications with "from_server" direction.
+	 */
+	get from_server_specs(): Array<Action_Spec> {
+		return this.specs.filter((spec) => spec.direction === 'from_server');
+	}
+
+	/**
+	 * Get all action specifications with "from_either" direction.
+	 */
+	get from_either_specs(): Array<Action_Spec> {
+		return this.specs.filter((spec) => spec.direction === 'from_either');
+	}
+
+	/**
+	 * Get all action method names with "from_client" direction.
+	 */
+	get from_client_methods(): Array<string> {
+		return this.from_client_specs.map((spec) => spec.method);
+	}
+
+	/**
+	 * Get all action method names with "from_server" direction.
+	 */
+	get from_server_methods(): Array<string> {
+		return this.from_server_specs.map((spec) => spec.method);
+	}
+
+	/**
+	 * Get all action method names with "from_either" direction.
+	 */
+	get from_either_methods(): Array<string> {
+		return this.from_either_specs.map((spec) => spec.method);
 	}
 
 	/**

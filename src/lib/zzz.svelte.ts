@@ -7,7 +7,7 @@ import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
 import {strip_end, strip_start} from '@ryanatkn/belt/string.js';
 
 import type {Action_Message, Action_Message_Params} from '$lib/action_messages.js';
-import type {Action_Client, Action_Server} from '$lib/action_collections.js';
+import type {Action_From_Client, Action_From_Server} from '$lib/action_collections.js';
 import {Provider, type Provider_Json} from '$lib/provider.svelte.js';
 import type {Provider_Name} from '$lib/provider_types.js';
 import {Uuid, create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
@@ -49,8 +49,8 @@ export type Zzz_Json_Input = z.input<typeof Zzz_Json>;
 // Special options type for Zzz to handle circular reference
 export interface Zzz_Options extends Omit_Strict<Cell_Options<typeof Zzz_Json>, 'zzz'> {
 	zzz?: Zzz; // Make zzz optional for Zzz initialization
-	onsend?: (message: Action_Client) => void;
-	onreceive?: (message: Action_Server) => void;
+	onsend?: (message: Action_From_Client) => void;
+	onreceive?: (message: Action_From_Server) => void;
 	models?: Array<Model_Json>;
 	bots?: Zzz_Config['bots'];
 	providers?: Array<Provider_Json>;

@@ -5,7 +5,11 @@ import {Logger} from '@ryanatkn/belt/log.js';
 import {DEV} from 'esm-env';
 
 import type {Action_Spec} from '$lib/action_spec.js';
-import {Action_Client, action_spec_by_method, type Action_Server} from '$lib/action_collections.js';
+import {
+	Action_From_Client,
+	action_spec_by_method,
+	type Action_From_Server,
+} from '$lib/action_collections.js';
 import type {Zzz_Config} from '$lib/config_helpers.js';
 import {Zzz_Dir} from '$lib/diskfile_types.js';
 import {Safe_Fs} from '$lib/server/safe_fs.js';
@@ -23,7 +27,7 @@ import type {Action_Method} from '$lib/action_metatypes.js';
  * Function type for handling client messages.
  */
 export type Action_Handler = (
-	message: Action_Client,
+	message: Action_From_Client,
 	server: Zzz_Server,
 ) => Promise<Service_Return>;
 
@@ -57,7 +61,7 @@ export interface Zzz_Server_Options {
 	/**
 	 * Send a message to all connected websocket clients.
 	 */
-	send_to_all_clients: (message: Action_Server) => void;
+	send_to_all_clients: (message: Action_From_Server) => void;
 	/**
 	 * Handler function for processing client messages.
 	 */
@@ -82,7 +86,7 @@ export class Zzz_Server {
 
 	readonly config: Zzz_Config;
 
-	readonly #send_to_all_clients: (message: Action_Server) => void;
+	readonly #send_to_all_clients: (message: Action_From_Server) => void;
 	readonly #handle_message: Action_Handler;
 	readonly #handle_filer_change: Filer_Change_Handler;
 
@@ -136,7 +140,7 @@ export class Zzz_Server {
 	/**
 	 * Send a message to all connected clients.
 	 */
-	send(message: Action_Server): void {
+	send(message: Action_From_Server): void {
 		this.#check_destroyed();
 
 		this.#send_to_all_clients(message);
@@ -147,7 +151,7 @@ export class Zzz_Server {
 	 * Handle incoming client messages for all transports
 	 * by delegating to the configured handler.
 	 */
-	async receive(message: Action_Client): Promise<Service_Return> {
+	async receive(message: Action_From_Client): Promise<Service_Return> {
 		this.#check_destroyed();
 
 		// Sanity check
@@ -162,12 +166,12 @@ export class Zzz_Server {
 	 * Process an action by name with parameters.
 	 * This is the unified entry point for both HTTP and WebSocket actions.
 	 *
-	 * @param method_or_message - Either the action name as a string or the full Action_Client object
-	 * @param params - Parameters if method_or_message is a string, ignored if method_or_message is an Action_Client
+	 * @param method_or_message - Either the action name as a string or the full Action_From_Client object
+	 * @param params - Parameters if method_or_message is a string, ignored if method_or_message is an Action_From_Client
 	 */
 	async process_action(
 		// TODO BLOCK make this function monomorphic
-		method_or_message: Action_Method | Action_Client,
+		method_or_message: Action_Method | Action_From_Client,
 		params?: unknown,
 	): Promise<Service_Return> {
 		this.#check_destroyed();

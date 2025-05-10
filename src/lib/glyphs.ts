@@ -61,7 +61,7 @@ export const GLYPH_SESSION = '⏣';
 
 export const GLYPH_DIRECTION_CLIENT = '⥘'; // ⤤ ⤳
 export const GLYPH_DIRECTION_SERVER = '⥙'; // ⤷
-export const GLYPH_DIRECTION_BOTH = '⤨';
+export const GLYPH_DIRECTION_EITHER = '⤨';
 
 export const GLYPH_EXTERNAL_LINK = '🡵';
 
@@ -90,12 +90,12 @@ export const get_icon_for_action_type = (type: string): string => {
 
 export const get_direction_icon = (direction: string): string => {
 	switch (direction) {
-		case 'client':
+		case 'from_client':
 			return GLYPH_DIRECTION_CLIENT;
-		case 'server':
+		case 'from_server':
 			return GLYPH_DIRECTION_SERVER;
-		case 'both':
-			return GLYPH_DIRECTION_BOTH;
+		case 'from_either':
+			return GLYPH_DIRECTION_EITHER;
 		default:
 			return GLYPH_UNKNOWN;
 	}

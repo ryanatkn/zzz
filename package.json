@@ -22,6 +22,7 @@
     "dev": "gro dev",
     "build": "gro build",
     "check": "gro check",
+    "typecheck": "gro typecheck",
     "test": "gro test",
     "preview": "vite preview",
     "deploy": "gro deploy",

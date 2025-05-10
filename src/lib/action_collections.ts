@@ -16,28 +16,34 @@ import {
 } from '$lib/action_specs.js';
 
 /**
- * Set of client-only actions.
+ * Set of actions with "from_client" direction (originating from client).
  */
-export const Action_Client = z.discriminatedUnion('method', [
+export const Action_From_Client = z.discriminatedUnion('method', [
+	Action_Message.ping,
+	Action_Message.load_session,
 	Action_Message.update_diskfile,
 	Action_Message.delete_diskfile,
 	Action_Message.create_directory,
 	Action_Message.send_prompt,
 ]);
-export type Action_Client = z.infer<typeof Action_Client>;
+export type Action_From_Client = z.infer<typeof Action_From_Client>;
 
 /**
- * Set of server-only actions.
+ * Set of actions with "from_server" direction (originating from server).
  */
-export const Action_Server = z.discriminatedUnion('method', [
-	Action_Message.ping,
+export const Action_From_Server = z.discriminatedUnion('method', [
 	Action_Message.pong,
-	Action_Message.load_session,
 	Action_Message.loaded_session,
 	Action_Message.filer_change,
 	Action_Message.completion_response,
 ]);
-export type Action_Server = z.infer<typeof Action_Server>;
+export type Action_From_Server = z.infer<typeof Action_From_Server>;
+
+/**
+ * Set of actions with "from_either" direction (can originate from either).
+ */
+export const Action_From_Either = z.discriminatedUnion('method', []);
+export type Action_From_Either = z.infer<typeof Action_From_Either>;
 
 /**
  * All action types combined.
@@ -55,6 +61,26 @@ export const Action_Any = z.discriminatedUnion('method', [
 	Action_Message.completion_response,
 ]);
 export type Action_Any = z.infer<typeof Action_Any>;
+
+/**
+ * Service actions with HTTP endpoints (networked).
+ */
+export const Action_Networked = z.discriminatedUnion('method', [
+	Action_Message.ping,
+	Action_Message.load_session,
+	Action_Message.completion_response,
+]);
+export type Action_Networked = z.infer<typeof Action_Networked>;
+
+/**
+ * Service actions without HTTP endpoints (non-networked).
+ */
+export const Action_Nonnetworked = z.discriminatedUnion('method', [
+	Action_Message.pong,
+	Action_Message.loaded_session,
+	Action_Message.filer_change,
+]);
+export type Action_Nonnetworked = z.infer<typeof Action_Nonnetworked>;
 
 /**
  * Lookup map for action specifications by method name.

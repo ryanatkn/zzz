@@ -13,18 +13,18 @@ import {Completion_Request, Completion_Response} from '$lib/completion_types.js'
 // Define all action specifications with proper typing
 export const ping_action_spec = {
 	method: 'ping',
-	direction: 'client',
+	direction: 'from_client',
 	type: 'Service_Action',
 	http_method: 'GET',
 	auth: null,
-	params: z.null(),
+	params: z.void(),
 	response: z.null(),
 	returns: 'Api_Result<typeof ping_action_spec.response>', // TODO `Ping_Action_Response`
 } satisfies Service_Action_Spec;
 
 export const pong_action_spec = {
 	method: 'pong',
-	direction: 'server',
+	direction: 'from_server',
 	type: 'Service_Action',
 	http_method: null,
 	auth: null,
@@ -39,21 +39,21 @@ export const pong_action_spec = {
 
 export const load_session_action_spec = {
 	method: 'load_session',
-	direction: 'client',
+	direction: 'from_client',
 	type: 'Service_Action',
 	http_method: 'GET',
 	auth: null,
 	// TODO rethink these for actions as a whole,
 	// `loaded_session_action_spec` needs to be rolled into this one
 	// and the `response` here is the `params` currently there
-	params: z.null(),
+	params: z.void(),
 	response: z.null(),
 	returns: 'Api_Result<typeof load_session_action_spec.response>', // TODO @many maybe add type aliases - `Action.Load_Session.Response` or `Load_Session_Action_Response`
 } satisfies Service_Action_Spec;
 
 export const loaded_session_action_spec = {
 	method: 'loaded_session',
-	direction: 'server',
+	direction: 'from_server',
 	type: 'Service_Action',
 	http_method: null,
 	auth: null,
@@ -73,7 +73,7 @@ export const loaded_session_action_spec = {
 
 export const filer_change_action_spec = {
 	method: 'filer_change',
-	direction: 'server',
+	direction: 'from_server',
 	type: 'Service_Action',
 	http_method: null,
 	auth: null,
@@ -89,7 +89,7 @@ export const filer_change_action_spec = {
 
 export const update_diskfile_action_spec = {
 	method: 'update_diskfile',
-	direction: 'client',
+	direction: 'from_client',
 	type: 'Client_Action',
 	params: z
 		.object({
@@ -102,7 +102,7 @@ export const update_diskfile_action_spec = {
 
 export const delete_diskfile_action_spec = {
 	method: 'delete_diskfile',
-	direction: 'client',
+	direction: 'from_client',
 	type: 'Client_Action',
 	params: z
 		.object({
@@ -114,7 +114,7 @@ export const delete_diskfile_action_spec = {
 
 export const create_directory_action_spec = {
 	method: 'create_directory',
-	direction: 'client',
+	direction: 'from_client',
 	type: 'Client_Action',
 	params: z
 		.object({
@@ -126,7 +126,7 @@ export const create_directory_action_spec = {
 
 export const send_prompt_action_spec = {
 	method: 'send_prompt',
-	direction: 'client',
+	direction: 'from_client',
 	type: 'Client_Action',
 	params: z
 		.object({
@@ -138,7 +138,7 @@ export const send_prompt_action_spec = {
 
 export const completion_response_action_spec = {
 	method: 'completion_response',
-	direction: 'server',
+	direction: 'from_server',
 	type: 'Service_Action',
 	http_method: 'GET',
 	auth: null,

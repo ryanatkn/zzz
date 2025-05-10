@@ -3,7 +3,7 @@ import type {WSContext} from 'hono/ws';
 import * as devalue from 'devalue';
 
 import type {Zzz_Server} from '$lib/server/zzz_server.js';
-import {Action_Client} from '$lib/action_collections.js';
+import {Action_From_Client} from '$lib/action_collections.js';
 import {service_return_to_api_result} from '$lib/server/service.js';
 import {to_failed_api_result, type Api_Result} from '$lib/api.js';
 import {should_allow_origin} from '$lib/server/security.js';
@@ -86,7 +86,7 @@ export const handle_websocket_message = async (
 		return;
 	}
 
-	const message = Action_Client.safeParse(data.message);
+	const message = Action_From_Client.safeParse(data.message);
 	if (!message.success) {
 		console.error('invalid message', data.message);
 		// Send error back with message id if available
