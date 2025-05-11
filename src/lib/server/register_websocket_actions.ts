@@ -4,9 +4,6 @@ import type {createNodeWebSocket} from '@hono/node-ws';
 
 import type {Zzz_Server} from '$lib/server/zzz_server.js';
 import {should_allow_origin} from '$lib/server/security.js';
-import type {Action_Message_From_Server} from '$lib/action_collections.js';
-import {JSONRPCRequest} from '$lib/jsonrpc.js';
-import {Api_Error} from '$lib/api.js';
 
 export interface Register_Websocket_Actions_Options {
 	app: Hono;
@@ -79,27 +76,10 @@ export const handle_websocket_message = async (
 
 	console.log(`[ws] handling message`, data);
 
-	const response = await zzz_server.jsonrpc_server.process_request(data);
+	const response = await zzz_server.handle_request(data);
 
 	// Only send a response if it's not a notification (which doesn't expect a response)
 	if (response) {
 		ws.send(JSON.stringify(response));
-	}
-};
-
-/**
- * Send a message to WebSocket clients
- */
-export const send_to_websocket_clients = (
-	sockets: Set<WSContext>,
-	message: Action_Message_From_Server,
-	zzz_server: Zzz_Server,
-): void => {
-	// Create a JSON-RPC notification
-	const notification = zzz_server.jsonrpc_server.create_notification(message.method, message);
-
-	// Send to all connected clients
-	for (const socket of sockets) {
-		socket.send(JSON.stringify(notification));
 	}
 };

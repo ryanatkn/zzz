@@ -26,10 +26,11 @@ const main = (): void => {
 	const zzz_server = new Zzz_Server({
 		zzz_dir: PUBLIC_ZZZ_DIR,
 		config,
+		action_specs,
 		send_to_all_clients: (message) => {
 			// Send messages to all connected websocket clients
 			for (const ws of sockets) {
-				ws.send(devalue.stringify({type: 'server_message', message}));
+				ws.send(devalue.stringify(message));
 			}
 		},
 		handle_message,
@@ -48,7 +49,6 @@ const main = (): void => {
 	register_http_actions({
 		app,
 		zzz_server,
-		action_specs, // Pass the action schemas from metadata
 	});
 
 	const hono = serve(

@@ -9,7 +9,6 @@ import {
 	Action_Message_From_Client,
 	action_spec_by_method,
 	type Action_Message_From_Server,
-	action_specs,
 } from '$lib/action_collections.js';
 import type {Zzz_Config} from '$lib/config_helpers.js';
 import {Zzz_Dir} from '$lib/diskfile_types.js';
@@ -65,6 +64,11 @@ export interface Zzz_Server_Options {
 	 */
 	config: Zzz_Config;
 	/**
+	 * Action specifications that determine what the server can do.
+	 */
+	action_specs: Array<Action_Spec>;
+	// TODO rethink these
+	/**
 	 * Send a message to all connected websocket clients.
 	 */
 	send_to_all_clients: (message: Action_Message_From_Server) => void;
@@ -110,7 +114,7 @@ export class Zzz_Server {
 	/**
 	 * Action registry for centralized action specification access.
 	 */
-	readonly action_registry = new Action_Registry(action_specs);
+	readonly action_registry;
 	/**
 	 * Access to all action specifications.
 	 */
@@ -128,6 +132,7 @@ export class Zzz_Server {
 		this.zzz_dir = Zzz_Dir.parse(resolve(options.zzz_dir)); // TODO if the class get more paths to deal with, add a `cwd` option - for now callers can just resolve to absolute themselves
 
 		this.config = options.config;
+		this.action_registry = new Action_Registry(options.action_specs);
 		this.#send_to_all_clients = options.send_to_all_clients;
 		this.#handle_message = options.handle_message;
 		this.#handle_filer_change = options.handle_filer_change;
@@ -153,6 +158,12 @@ export class Zzz_Server {
 			this.#handle_filer_change(change, source_file, this, this.zzz_dir);
 		});
 		this.filers.set(this.zzz_dir, {filer, cleanup_promise});
+	}
+
+	async handle_request(data: unknown): Promise<JSONRPCResponse | JSONRPCError | null> {
+		const request = this.jsonrpc_server.process_request(data);
+		// TODO anything here? are the various concerns all handled in callbacks?
+		return request;
 	}
 
 	/**
@@ -263,7 +274,7 @@ export class Zzz_Server {
 		const updated_message = {...(message as any), params: parsed_request.data};
 
 		// forwad the validated params which may have defaults -- we don't parse the other fields here
-		const returned = await this.perform_action(updated_message);
+		const returned = await this.#perform_action(updated_message);
 		if (!returned.ok) {
 			return returned;
 		}
@@ -292,7 +303,7 @@ export class Zzz_Server {
 		return returned;
 	}
 
-	async perform_action(message: Action_Message_From_Client): Promise<Service_Return> {
+	async #perform_action(message: Action_Message_From_Client): Promise<Service_Return> {
 		console.log(`perform_action message`, message);
 		this.#check_destroyed();
 

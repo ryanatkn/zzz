@@ -315,6 +315,8 @@ export class Socket_Api_Transport_Provider implements Api_Transport_Provider {
  * HTTP transport provider for REST API calls
  */
 export class Http_Api_Transport_Provider implements Api_Transport_Provider {
+	readonly type = 'http' as const;
+
 	#url: string;
 	#on_message: (data: any) => void;
 	#headers: Record<string, string>;

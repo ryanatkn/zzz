@@ -120,12 +120,29 @@ export class Jsonrpc_Server {
 			if (parse_result.success) {
 				const request = parse_result.data;
 				// Check if we have a method handler for this request
-				return await this.#process_valid_request(request);
+				try {
+					// Process with request handler
+					return await this.#onrequest(request);
+				} catch (error) {
+					this.#log?.error(`Error processing JSON-RPC request:`, error);
+					return create_jsonrpc_error(request.id, error);
+				}
 			} else {
 				// If it's not a valid request, check if it's a notification
 				const notification_parse = JSONRPCNotification.safeParse(request_data);
 				if (notification_parse.success) {
-					await this.process_notification(notification_parse.data);
+					const notification = notification_parse.data;
+					try {
+						// If a notification handler was provided, use it
+						if (this.#onnotification) {
+							await this.#onnotification(notification);
+						} else {
+							this.#log?.debug(`No notification handler for method: ${notification.method}`);
+						}
+					} catch (error) {
+						this.#log?.error(`Error processing JSON-RPC notification:`, error);
+						// No response for notifications, so just log the error
+					}
 					return null; // No response for notifications
 				}
 
@@ -150,36 +167,6 @@ export class Jsonrpc_Server {
 					message: 'Parse error',
 				},
 			};
-		}
-	}
-
-	/**
-	 * Process a validated JSON-RPC request.
-	 */
-	async #process_valid_request(request: JSONRPCRequest): Promise<JSONRPCResponse | JSONRPCError> {
-		try {
-			// Process with request handler
-			return await this.#onrequest(request);
-		} catch (error) {
-			this.#log?.error(`Error processing JSON-RPC request:`, error);
-			return create_jsonrpc_error(request.id, error);
-		}
-	}
-
-	/**
-	 * Process a JSON-RPC notification (no response).
-	 */
-	async process_notification(notification: JSONRPCNotification): Promise<void> {
-		try {
-			// If a notification handler was provided, use it
-			if (this.#onnotification) {
-				await this.#onnotification(notification);
-			} else {
-				this.#log?.debug(`No notification handler for method: ${notification.method}`);
-			}
-		} catch (error) {
-			this.#log?.error(`Error processing JSON-RPC notification:`, error);
-			// No response for notifications, so just log the error
 		}
 	}
 
