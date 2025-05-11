@@ -21,7 +21,7 @@ export const Http_Method = z.enum([
 ]);
 export type Http_Method = z.infer<typeof Http_Method>;
 
-// TODO support configurable transports
+// TODO support configurable/extensible transports
 export const Api_Transport = z.enum(['http', 'websocket']);
 export type Api_Transport = z.infer<typeof Api_Transport>;
 

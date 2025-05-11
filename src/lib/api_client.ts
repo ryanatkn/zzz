@@ -9,23 +9,12 @@ import type {JSONRPCMessage} from '$lib/jsonrpc.js';
 import type {Api_Transport} from '$lib/api.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 
-/**
- * Interface for transport providers.
- */
-export interface Transport_Provider {
-	/** Send data through the transport */
+export interface Api_Transport_Provider {
+	type: Api_Transport;
 	send: (data: JSONRPCMessage) => void;
-
-	/** Check if the transport is ready for use */
 	is_ready: () => boolean;
-
-	/** Get the transport method type */
-	get_type: () => Api_Transport;
 }
 
-/**
- * API client options
- */
 export interface Api_Client_Options<T_Zzz extends Zzz = Zzz> {
 	zzz: T_Zzz;
 
@@ -45,9 +34,6 @@ export interface Api_Client_Options<T_Zzz extends Zzz = Zzz> {
 	onsend?: (method: string, params: Record<string, any> | void, id?: string) => void;
 }
 
-/**
- * Request tracking information
- */
 export interface Request_Tracker<T> {
 	/** Deferred promise that will be resolved when the response is received */
 	deferred: Deferred<T>;
@@ -66,89 +52,6 @@ export interface Request_Tracker<T> {
 }
 
 /**
- * WebSocket transport provider that uses the Socket class
- */
-export class Socket_Transport_Provider implements Transport_Provider {
-	#socket: Socket;
-	#on_message: (data: any) => void;
-
-	constructor(socket: Socket, on_message: (data: any) => void) {
-		this.#socket = socket;
-		this.#on_message = on_message;
-
-		// Set up the message handler
-		socket.onmessage = (event) => {
-			try {
-				const data = JSON.parse(event.data);
-				this.#on_message(data);
-			} catch (error) {
-				console.error('Error parsing WebSocket message:', error);
-			}
-		};
-	}
-
-	send(data: JSONRPCMessage): void {
-		if (!this.is_ready()) {
-			throw new Error('WebSocket not connected');
-		}
-		this.#socket.send(data);
-	}
-
-	is_ready(): boolean {
-		return this.#socket.connected;
-	}
-
-	get_type(): Api_Transport {
-		return 'websocket';
-	}
-}
-
-/**
- * HTTP transport provider for REST API calls
- */
-export class Http_Transport_Provider implements Transport_Provider {
-	#url: string;
-	#on_message: (data: any) => void;
-	#headers: Record<string, string>;
-
-	constructor(url: string, on_message: (data: any) => void) {
-		this.#url = url;
-		this.#on_message = on_message;
-		this.#headers = {
-			'Content-Type': 'application/json',
-		};
-	}
-
-	async send(data: JSONRPCMessage): Promise<void> {
-		try {
-			const response = await fetch(this.#url, {
-				method: 'POST',
-				headers: this.#headers,
-				body: JSON.stringify(data),
-			});
-
-			if (!response.ok) {
-				throw new Error(`HTTP error: ${response.status}`);
-			}
-
-			const result = await response.json();
-			this.#on_message(result);
-		} catch (error) {
-			console.error('Error sending HTTP request:', error);
-			throw error;
-		}
-	}
-
-	is_ready(): boolean {
-		return true; // HTTP is always ready
-	}
-
-	get_type(): Api_Transport {
-		return 'http';
-	}
-}
-
-/**
  * Client for communicating with the Zzz server.
  * Uses JSON-RPC for both HTTP and WebSocket communication.
  */
@@ -156,7 +59,7 @@ export class Api_Client<T_Zzz extends Zzz = Zzz> {
 	readonly zzz: T_Zzz;
 
 	/** JSON-RPC client for communication */
-	readonly jsonrpc_client: Jsonrpc_Client;
+	readonly jsonrpc_client = new Jsonrpc_Client();
 
 	/** Socket instance for WebSocket transport */
 	readonly #socket?: Socket;
@@ -167,10 +70,8 @@ export class Api_Client<T_Zzz extends Zzz = Zzz> {
 	/** Callback triggered before sending a message */
 	readonly #onsend?: (method: string, params: Record<string, any> | void, id?: string) => void;
 
-	/** Map of pending requests by request ID */
 	readonly #pending_requests: Map<string, Request_Tracker<any>> = new Map();
 
-	/** Default request timeout in milliseconds */
 	readonly #request_timeout_ms = 30000;
 
 	constructor(options: Api_Client_Options<T_Zzz>) {
@@ -179,12 +80,9 @@ export class Api_Client<T_Zzz extends Zzz = Zzz> {
 		this.#onreceive = options.onreceive;
 		this.#onsend = options.onsend;
 
-		// Create the JSON-RPC client
-		this.jsonrpc_client = new Jsonrpc_Client(options.default_transport || 'http');
-
 		// Set up HTTP transport if URL is provided
 		if (options.http_url) {
-			const http_transport = new Http_Transport_Provider(
+			const http_transport = new Http_Api_Transport_Provider(
 				options.http_url,
 				this.#handle_incoming_message.bind(this),
 			);
@@ -269,12 +167,15 @@ export class Api_Client<T_Zzz extends Zzz = Zzz> {
 	/**
 	 * Create a WebSocket transport provider that uses the Socket class
 	 */
-	#create_socket_transport(): Transport_Provider | null {
+	#create_socket_transport(): Api_Transport_Provider | null {
 		if (!this.#socket) {
 			return null;
 		}
 
-		return new Socket_Transport_Provider(this.#socket, this.#handle_incoming_message.bind(this));
+		return new Socket_Api_Transport_Provider(
+			this.#socket,
+			this.#handle_incoming_message.bind(this),
+		);
 	}
 
 	/**
@@ -323,14 +224,9 @@ export class Api_Client<T_Zzz extends Zzz = Zzz> {
 		// Create a deferred promise to track this request
 		const deferred = this.#track_request<T>(id, method);
 
-		// Change transport if specified
-		if (transport && transport !== this.jsonrpc_client.get_transport_type()) {
-			this.jsonrpc_client.set_transport(transport);
-		}
-
 		// Send the request
 		try {
-			this.jsonrpc_client.send(method, params, id);
+			this.jsonrpc_client.send(method, params, id, transport);
 		} catch (error) {
 			// Remove the pending request and reject the promise
 			this.#reject_pending_request(id, error);
@@ -376,5 +272,86 @@ export class Api_Client<T_Zzz extends Zzz = Zzz> {
 		if (this.#onreceive) {
 			this.#onreceive(method, params, id);
 		}
+	}
+}
+
+/**
+ * WebSocket transport provider that uses the Socket class
+ */
+export class Socket_Api_Transport_Provider implements Api_Transport_Provider {
+	readonly type = 'websocket' as const;
+
+	#socket: Socket;
+	#on_message: (data: any) => void;
+
+	constructor(socket: Socket, on_message: (data: any) => void) {
+		this.#socket = socket;
+		this.#on_message = on_message;
+
+		// Set up the message handler
+		socket.onmessage = (event) => {
+			try {
+				const data = JSON.parse(event.data);
+				this.#on_message(data);
+			} catch (error) {
+				console.error('Error parsing WebSocket message:', error);
+			}
+		};
+	}
+
+	send(data: JSONRPCMessage): void {
+		if (!this.is_ready()) {
+			throw new Error('WebSocket not connected');
+		}
+		this.#socket.send(data);
+	}
+
+	is_ready(): boolean {
+		return this.#socket.connected;
+	}
+}
+
+/**
+ * HTTP transport provider for REST API calls
+ */
+export class Http_Api_Transport_Provider implements Api_Transport_Provider {
+	#url: string;
+	#on_message: (data: any) => void;
+	#headers: Record<string, string>;
+
+	constructor(url: string, on_message: (data: any) => void) {
+		this.#url = url;
+		this.#on_message = on_message;
+		this.#headers = {
+			'Content-Type': 'application/json',
+		};
+	}
+
+	async send(data: JSONRPCMessage): Promise<void> {
+		try {
+			const response = await fetch(this.#url, {
+				method: 'POST',
+				headers: this.#headers,
+				body: JSON.stringify(data),
+			});
+
+			if (!response.ok) {
+				throw new Error(`HTTP error: ${response.status}`);
+			}
+
+			const result = await response.json();
+			this.#on_message(result);
+		} catch (error) {
+			console.error('Error sending HTTP request:', error);
+			throw error;
+		}
+	}
+
+	is_ready(): boolean {
+		return true; // HTTP is always ready
+	}
+
+	get_type(): Api_Transport {
+		return 'http';
 	}
 }

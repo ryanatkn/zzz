@@ -256,24 +256,6 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	}
 
 	/**
-	 * Send an action to the server and get a response
-	 */
-	async send_action<T = any>(
-		method: Action_Method,
-		params: Record<string, any> = {},
-		id: string = create_uuid(),
-	): Promise<T> {
-		return this.api_client.send_action<T>(method, params, id);
-	}
-
-	/**
-	 * Notify the server of an event (no response expected)
-	 */
-	notify(method: Action_Method, params: Record<string, any> = {}): void {
-		this.api_client.notify(method, params);
-	}
-
-	/**
 	 * Submit a completion request to an AI provider and return a promise for the response
 	 */
 	async submit_completion<T = any>(

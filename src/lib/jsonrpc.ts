@@ -17,55 +17,86 @@ export const JSONRPC_VERSION = '2.0';
 export const JSONRPC_LATEST_PROTOCOL_VERSION = 'DRAFT-2025-v2';
 
 /**
- * A progress token, used to associate progress notifications with the original request.
- */
-export const JSONRPCProgressToken = z.union([z.string(), z.number()]);
-export type JSONRPCProgressToken = z.infer<typeof JSONRPCProgressToken>;
-
-export const JSONRPCBaseRequest = z.object({
-	method: z.string(),
-	params: z
-		.object({
-			_meta: z
-				.object({
-					/**
-					 * If specified, the caller is requesting out-of-band progress notifications
-					 * for this request (as represented by notifications/progress).
-					 * The value of this parameter is an opaque token that will be attached
-					 * to any subsequent notifications.
-					 * The receiver is not obligated to provide these notifications.
-					 */
-					progressToken: JSONRPCProgressToken.optional(),
-				})
-				.optional(),
-		})
-		.passthrough()
-		.optional(),
-});
-export type JSONRPCBaseRequest = z.infer<typeof JSONRPCBaseRequest>;
-
-export const JSONRPCBaseNotification = z.object({
-	method: z.string(),
-	params: z
-		.object({
-			/**
-			 * This parameter name is reserved by MCP to allow clients and servers
-			 * to attach additional metadata to their notifications.
-			 */
-			_meta: z.record(z.string(), z.unknown()).optional(),
-		})
-		.passthrough()
-		.optional(),
-});
-export type JSONRPCBaseNotification = z.infer<typeof JSONRPCBaseNotification>;
-
-/**
  * A uniquely identifying ID for a request in JSON-RPC.
  *
  * Like MCP but unlike JSON-RPC, the type excludes null.
  */
 export const JSONRPCRequestId = z.union([z.string(), z.number()]);
 export type JSONRPCRequestId = z.infer<typeof JSONRPCRequestId>;
+
+/**
+ * A JSON-RPC method name, a string with no constraints.
+ */
+export const JSONRPCMethod = z.string();
+export type JSONRPCMethod = z.infer<typeof JSONRPCMethod>;
+
+/**
+ * A progress token, used to associate progress notifications with the original request.
+ */
+export const JSONRPCProgressToken = z.union([z.string(), z.number()]);
+export type JSONRPCProgressToken = z.infer<typeof JSONRPCProgressToken>;
+
+export const JSONRPCMCPMeta = z.object({}).passthrough(); // uses object over record to be able to use the better `.merge`
+export type JSONRPCMCPMeta = z.infer<typeof JSONRPCMCPMeta>;
+
+export const JSONRPCRequestParamsMeta = JSONRPCMCPMeta.merge(
+	z
+		.object({
+			/**
+			 * If specified, the caller is requesting out-of-band progress notifications
+			 * for this request (as represented by notifications/progress).
+			 * The value of this parameter is an opaque token that will be attached
+			 * to any subsequent notifications.
+			 * The receiver is not obligated to provide these notifications.
+			 */
+			progressToken: JSONRPCProgressToken.optional(),
+		})
+		.passthrough(),
+);
+export type JSONRPCRequestParamsMeta = z.infer<typeof JSONRPCRequestParamsMeta>;
+
+export const JSONRPCRequestParams = z
+	.object({
+		_meta: JSONRPCRequestParamsMeta.optional(),
+	})
+	.passthrough();
+export type JSONRPCRequestParams = z.infer<typeof JSONRPCRequestParams>;
+
+export const JSONRPCNotificationParams = z
+	.object({
+		/**
+		 * This parameter name is reserved by MCP to allow clients and servers
+		 * to attach additional metadata to their responses and notifications.
+		 */
+		_meta: JSONRPCMCPMeta.optional(),
+	})
+	.passthrough();
+export type JSONRPCNotificationParams = z.infer<typeof JSONRPCNotificationParams>;
+
+export const JSONRPCResult = z
+	.object({
+		/**
+		 * This result property is reserved by the protocol to allow clients and servers
+		 * to attach additional metadata to their responses.
+		 */
+		_meta: JSONRPCMCPMeta.optional(),
+	})
+	.passthrough();
+export type JSONRPCResult = z.infer<typeof JSONRPCResult>;
+
+/** Called `Request` in the MCP types. */
+export const JSONRPCBaseRequest = z.object({
+	method: z.string(),
+	params: JSONRPCRequestParams.optional(),
+});
+export type JSONRPCBaseRequest = z.infer<typeof JSONRPCBaseRequest>;
+
+/** Called `Notification` in the MCP types. */
+export const JSONRPCBaseNotification = z.object({
+	method: z.string(),
+	params: JSONRPCNotificationParams.optional(),
+});
+export type JSONRPCBaseNotification = z.infer<typeof JSONRPCBaseNotification>;
 
 /**
  * A request that expects a response.
@@ -83,17 +114,6 @@ export const JSONRPCNotification = JSONRPCBaseNotification.extend({
 	jsonrpc: z.literal(JSONRPC_VERSION),
 });
 export type JSONRPCNotification = z.infer<typeof JSONRPCNotification>;
-
-export const JSONRPCResult = z
-	.object({
-		/**
-		 * This result property is reserved by the protocol to allow clients and servers
-		 * to attach additional metadata to their responses.
-		 */
-		_meta: z.record(z.string(), z.unknown()).optional(),
-	})
-	.passthrough();
-export type JSONRPCResult = z.infer<typeof JSONRPCResult>;
 
 /**
  * A successful (non-error) response to a request.
@@ -135,6 +155,7 @@ export const JSONRPC_INVALID_REQUEST = -32600;
 export const JSONRPC_METHOD_NOT_FOUND = -32601;
 export const JSONRPC_INVALID_PARAMS = -32602;
 export const JSONRPC_INTERNAL_ERROR = -32603;
+// -32000 to -32099 - Server error - Reserved for implementation-defined server-errors.
 
 /**
  * A JSON-RPC batch request, as described in https://www.jsonrpc.org/specification#batch.
