@@ -36,23 +36,19 @@ export type JSONRPCMethod = z.infer<typeof JSONRPCMethod>;
 export const JSONRPCProgressToken = z.union([z.string(), z.number()]);
 export type JSONRPCProgressToken = z.infer<typeof JSONRPCProgressToken>;
 
-export const JSONRPCMCPMeta = z.object({}).passthrough(); // uses object over record to be able to use the better `.merge`
+export const JSONRPCMCPMeta = z.object({}).passthrough(); // uses object over record to be able to use the better `.extend`
 export type JSONRPCMCPMeta = z.infer<typeof JSONRPCMCPMeta>;
 
-export const JSONRPCRequestParamsMeta = JSONRPCMCPMeta.merge(
-	z
-		.object({
-			/**
-			 * If specified, the caller is requesting out-of-band progress notifications
-			 * for this request (as represented by notifications/progress).
-			 * The value of this parameter is an opaque token that will be attached
-			 * to any subsequent notifications.
-			 * The receiver is not obligated to provide these notifications.
-			 */
-			progressToken: JSONRPCProgressToken.optional(),
-		})
-		.passthrough(),
-);
+export const JSONRPCRequestParamsMeta = JSONRPCMCPMeta.extend({
+	/**
+	 * If specified, the caller is requesting out-of-band progress notifications
+	 * for this request (as represented by notifications/progress).
+	 * The value of this parameter is an opaque token that will be attached
+	 * to any subsequent notifications.
+	 * The receiver is not obligated to provide these notifications.
+	 */
+	progressToken: JSONRPCProgressToken.optional(),
+});
 export type JSONRPCRequestParamsMeta = z.infer<typeof JSONRPCRequestParamsMeta>;
 
 export const JSONRPCRequestParams = z
