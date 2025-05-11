@@ -41,7 +41,6 @@ import {Action_Registry} from '$lib/action_registry.js';
 import {Api_Client, type Api_Client_Options} from '$lib/api_client.js';
 import type {Completion_Message} from '$lib/completion_types.js';
 import type {JSONRPCMessage} from '$lib/jsonrpc.js';
-import type {Action_Method} from '$lib/action_metatypes.js';
 
 export const zzz_context = create_context<Zzz>();
 
@@ -178,7 +177,6 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 
 		// Initialize the API client with the socket instance and message handlers
 		this.api_client = new Api_Client({
-			zzz: this,
 			...options.api_client_options,
 			http_url: options.api_url,
 			socket: this.socket,

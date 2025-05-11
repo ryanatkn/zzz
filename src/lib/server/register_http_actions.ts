@@ -1,33 +1,23 @@
 import {Hono} from 'hono';
 
 import type {Zzz_Server} from '$lib/server/zzz_server.js';
-import {Action_Spec} from '$lib/action_spec.js';
-import {API_ROUTE} from '$lib/constants.js';
 import {Path_With_Trailing_Slash} from '$lib/zod_helpers.js';
 import {JSONRPC_VERSION} from '$lib/jsonrpc.js';
 
 export interface Register_Actions_Options {
 	app: Hono;
 	zzz_server: Zzz_Server;
-	action_specs?: Array<Action_Spec>;
-	base_path?: string;
+	path: string;
 }
 
 /**
  * Registers HTTP endpoints for all service actions in the schema registry.
  */
-export const register_http_actions = ({
-	app,
-	zzz_server,
-	base_path = API_ROUTE,
-}: Register_Actions_Options): void => {
+export const register_http_actions = ({app, zzz_server, path}: Register_Actions_Options): void => {
 	// Register a single JSON-RPC endpoint that handles all methods
-	const parsed_base_path = Path_With_Trailing_Slash.parse(base_path);
-	const jsonrpc_path = parsed_base_path + 'jsonrpc';
+	const final_path = Path_With_Trailing_Slash.parse(path);
 
-	console.log(`Registering JSON-RPC endpoint: POST ${jsonrpc_path}`);
-
-	app.post(jsonrpc_path, async (c) => {
+	app.post(final_path, async (c) => {
 		console.log(`[http] <${c.req.url}>`);
 		try {
 			const request_data = await c.req.json();
@@ -36,7 +26,7 @@ export const register_http_actions = ({
 
 			// If it's a notification, there's no response
 			if (!response) {
-				return c.json({ok: true});
+				return c.json(null);
 			}
 
 			return c.json(response);
@@ -65,7 +55,7 @@ export const register_http_actions = ({
 
 	// 	const {method, http_method} = spec;
 
-	// 	const path = parsed_base_path + method;
+	// 	const path = parsed_path + method;
 
 	// 	console.log(`Registering API handler: ${http_method} ${path}`);
 

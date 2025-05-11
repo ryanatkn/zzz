@@ -10,7 +10,7 @@ import {register_http_actions} from '$lib/server/register_http_actions.js';
 import {register_websocket_actions} from '$lib/server/register_websocket_actions.js';
 import create_config from '$lib/config.js';
 import {action_specs} from '$lib/action_collections.js';
-import {SERVER_PROXIED_PORT} from '$lib/constants.js';
+import {API_PATH, SERVER_PROXIED_PORT} from '$lib/constants.js';
 
 // TODO proper logging everywhere on the server
 
@@ -49,6 +49,7 @@ const main = (): void => {
 	register_http_actions({
 		app,
 		zzz_server,
+		path: API_PATH,
 	});
 
 	const hono = serve(

@@ -5,7 +5,7 @@ import type {Async_Status} from '@ryanatkn/belt/async.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import {ollama_list} from '$lib/ollama.js';
-import {API_ROUTE, REQUEST_TIMEOUT, SERVER_URL} from '$lib/constants.js';
+import {API_PATH, REQUEST_TIMEOUT, SERVER_URL} from '$lib/constants.js';
 import {Uuid} from '$lib/zod_helpers.js';
 import type {Zzz_Dir} from '$lib/diskfile_types.js';
 import {Action_Message, type Action_Message_Params} from '$lib/action_messages.js';
@@ -301,7 +301,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 			updated: Date.now(),
 		};
 
-		const server_api_url = SERVER_URL + API_ROUTE + '/ping';
+		const server_api_url = SERVER_URL + API_PATH + '/ping';
 
 		let error_message: string | undefined;
 		let timeout_id;

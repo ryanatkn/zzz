@@ -53,7 +53,7 @@ export interface Jsonrpc_Server_Options {
 	log?: Logger | null;
 }
 
-// TODO BLOCK this is probably wrong, causes a back and forth, rethink the module's abstraction
+// TODO BLOCK this is probably wrong, causes a back and forth, rethink the module's abstraction, users should be able to interface with any Api_Result
 export const create_jsonrpc_error = (id: JSONRPCRequestId, error: any): JSONRPCError => {
 	let code = JSONRPC_INTERNAL_ERROR;
 	let message = 'Internal server error';

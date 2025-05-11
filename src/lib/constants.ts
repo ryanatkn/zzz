@@ -26,14 +26,14 @@ export const REQUEST_TIMEOUT = 10_000;
 export const CONTENT_PREVIEW_LENGTH = 100;
 
 /** @leading_slash */
-export const API_ROUTE =
+export const API_PATH =
 	(PUBLIC_SERVER_API_PATH && ensure_start(PUBLIC_SERVER_API_PATH, '/')) || '/api';
 
 /**
  * @absolute
  * @no_trailing_slash
  */
-export const API_URL = SERVER_URL + API_ROUTE;
+export const API_URL = SERVER_URL + API_PATH;
 
 /**
  * @absolute

@@ -60,7 +60,7 @@
 		cell_classes,
 		onsend: (message: Action_Message_From_Client) => {
 			console.log('[ws] sending message', message);
-			zzz.socket.send({type: 'server_message', message}); // TODO JSON-RPC
+			zzz.socket.send(message); // TODO JSON-RPC
 
 			// TODO dynamic registry?
 			const mutation = send_mutations[message.method]; // TODO think about before/after
@@ -127,11 +127,7 @@
 			try {
 				const data = devalue.parse(event.data.toString());
 				console.log('[page] socket message received', data);
-				if (data.type === 'server_message') {
-					zzz.actions.receive(data.message);
-				} else {
-					console.error('unknown message', data);
-				}
+				zzz.actions.receive(data);
 			} catch (err) {
 				console.error('Error processing message', err);
 			}

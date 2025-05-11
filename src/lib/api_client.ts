@@ -7,7 +7,8 @@ import type {Socket} from '$lib/socket.svelte.js';
 import {Jsonrpc_Client} from '$lib/jsonrpc_client.js';
 import type {JSONRPCMessage} from '$lib/jsonrpc.js';
 import type {Api_Transport} from '$lib/api.js';
-import type {Zzz} from '$lib/zzz.svelte.js';
+
+// TODO support canceling
 
 export interface Api_Transport_Provider {
 	type: Api_Transport;
@@ -15,9 +16,7 @@ export interface Api_Transport_Provider {
 	is_ready: () => boolean;
 }
 
-export interface Api_Client_Options<T_Zzz extends Zzz = Zzz> {
-	zzz: T_Zzz;
-
+export interface Api_Client_Options {
 	/** Endpoint for http transport. */
 	http_url?: string;
 
@@ -55,9 +54,7 @@ export interface Request_Tracker<T> {
  * Client for communicating with the Zzz server.
  * Uses JSON-RPC for both HTTP and WebSocket communication.
  */
-export class Api_Client<T_Zzz extends Zzz = Zzz> {
-	readonly zzz: T_Zzz;
-
+export class Api_Client {
 	/** JSON-RPC client for communication */
 	readonly jsonrpc_client = new Jsonrpc_Client();
 
@@ -74,8 +71,7 @@ export class Api_Client<T_Zzz extends Zzz = Zzz> {
 
 	readonly #request_timeout_ms = 30000;
 
-	constructor(options: Api_Client_Options<T_Zzz>) {
-		this.zzz = options.zzz;
+	constructor(options: Api_Client_Options) {
 		this.#socket = options.socket;
 		this.#onreceive = options.onreceive;
 		this.#onsend = options.onsend;
