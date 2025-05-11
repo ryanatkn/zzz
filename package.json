@@ -159,6 +159,10 @@
       "types": "./dist/actions.svelte.d.ts",
       "default": "./dist/actions.svelte.js"
     },
+    "./api_client.js": {
+      "types": "./dist/api_client.d.ts",
+      "default": "./dist/api_client.js"
+    },
     "./api.js": {
       "types": "./dist/api.d.ts",
       "default": "./dist/api.js"
@@ -622,9 +626,13 @@
       "types": "./dist/indexed_collection.svelte.d.ts",
       "default": "./dist/indexed_collection.svelte.js"
     },
-    "./json_rpc.js": {
-      "types": "./dist/json_rpc.d.ts",
-      "default": "./dist/json_rpc.js"
+    "./jsonrpc_client.js": {
+      "types": "./dist/jsonrpc_client.d.ts",
+      "default": "./dist/jsonrpc_client.js"
+    },
+    "./jsonrpc.js": {
+      "types": "./dist/jsonrpc.d.ts",
+      "default": "./dist/jsonrpc.js"
     },
     "./list_helpers.js": {
       "types": "./dist/list_helpers.d.ts",
@@ -854,6 +862,10 @@
     "./server/handler_defaults.js": {
       "types": "./dist/server/handler_defaults.d.ts",
       "default": "./dist/server/handler_defaults.js"
+    },
+    "./server/jsonrpc_server.js": {
+      "types": "./dist/server/jsonrpc_server.d.ts",
+      "default": "./dist/server/jsonrpc_server.js"
     },
     "./server/register_http_actions.js": {
       "types": "./dist/server/register_http_actions.d.ts",

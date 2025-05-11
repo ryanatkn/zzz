@@ -8,6 +8,82 @@ import * as action_spec_module from '$lib/action_specs.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
 
 /**
+ * All method types combined.
+ */
+export const Action_Method_Any = z.enum([
+	'toggle_main_menu',
+	'create_directory',
+	'delete_diskfile',
+	'load_session',
+	'ping',
+	'submit_completion',
+	'update_diskfile',
+	'filer_change',
+]);
+export type Action_Method_Any = z.infer<typeof Action_Method_Any>;
+
+/**
+ * Method types that can be sent from client to server.
+ */
+export const Action_Method_From_Client = z.enum([
+	'create_directory',
+	'delete_diskfile',
+	'load_session',
+	'ping',
+	'submit_completion',
+	'update_diskfile',
+]);
+export type Action_Method_From_Client = z.infer<typeof Action_Method_From_Client>;
+
+/**
+ * Method types that can be sent from server to client.
+ */
+export const Action_Method_From_Server = z.enum([
+	'create_directory',
+	'delete_diskfile',
+	'load_session',
+	'ping',
+	'submit_completion',
+	'update_diskfile',
+	'filer_change',
+]);
+export type Action_Method_From_Server = z.infer<typeof Action_Method_From_Server>;
+
+/**
+ * Method types with network endpoints.
+ */
+export const Action_Method_Networked = z.enum([
+	'create_directory',
+	'delete_diskfile',
+	'load_session',
+	'ping',
+	'submit_completion',
+	'update_diskfile',
+]);
+export type Action_Method_Networked = z.infer<typeof Action_Method_Networked>;
+
+/**
+ * Method types without network endpoints.
+ */
+export const Action_Method_Nonnetworked = z.enum(['filer_change']);
+export type Action_Method_Nonnetworked = z.infer<typeof Action_Method_Nonnetworked>;
+
+/**
+ * All action types combined.
+ */
+export const Action_Message_Any = z.discriminatedUnion('method', [
+	Action_Message.toggle_main_menu,
+	Action_Message.create_directory_request,
+	Action_Message.delete_diskfile_request,
+	Action_Message.load_session_request,
+	Action_Message.ping_request,
+	Action_Message.submit_completion_request,
+	Action_Message.update_diskfile_request,
+	Action_Message.filer_change,
+]);
+export type Action_Message_Any = z.infer<typeof Action_Message_Any>;
+
+/**
  * Set of actions with "from_client" direction (originating from client).
  */
 export const Action_Message_From_Client = z.discriminatedUnion('method', [
@@ -33,21 +109,6 @@ export const Action_Message_From_Server = z.discriminatedUnion('method', [
 	Action_Message.filer_change,
 ]);
 export type Action_Message_From_Server = z.infer<typeof Action_Message_From_Server>;
-
-/**
- * All action types combined.
- */
-export const Action_Message_Any = z.discriminatedUnion('method', [
-	Action_Message.toggle_main_menu,
-	Action_Message.create_directory_request,
-	Action_Message.delete_diskfile_request,
-	Action_Message.load_session_request,
-	Action_Message.ping_request,
-	Action_Message.submit_completion_request,
-	Action_Message.update_diskfile_request,
-	Action_Message.filer_change,
-]);
-export type Action_Message_Any = z.infer<typeof Action_Message_Any>;
 
 /**
  * Service actions with HTTP endpoints (networked).

@@ -4,18 +4,20 @@ import type {Zzz} from '$lib/zzz.svelte.js';
 
 /**
  * Client-side mutation system for handling action responses.
+ * Mutations are synchronous functions that apply state changes to the client app
+ * based on action requests or responses.
  */
 
 /**
  * Context provided to mutation handlers.
  */
 export interface Mutation_Context<
+	T_App extends Zzz = Zzz,
 	T_Params = unknown,
 	T_Result extends Api_Result<unknown> | void = any,
-	// T_App = Zzz,  // TODO think about extending this everywhere
 > {
 	/** Reference to the main application instance. */
-	zzz: Zzz;
+	zzz: T_App;
 	/** Name of the action being performed. */
 	method: Action_Method;
 	/** Parameters passed to the action. */
@@ -28,11 +30,13 @@ export interface Mutation_Context<
 
 /**
  * Mutation handler function type.
- * Returns void or Promise<void> to support async operations.
+ * Must be synchronous.
  */
-export type Mutation<T_Params = any, T_Result extends Api_Result<unknown> | void = any> = (
-	ctx: Mutation_Context<T_Params, T_Result>,
-) => any;
+export type Mutation<
+	T_App extends Zzz = Zzz,
+	T_Params = any,
+	T_Result extends Api_Result<unknown> | void = any,
+> = (ctx: Mutation_Context<T_App, T_Params, T_Result>) => any;
 
 /**
  * Type for registering callbacks to run after mutation completes.
@@ -49,14 +53,15 @@ export type After_Mutation_Callback = () => void | Promise<void>;
  * a function to flush after-mutation callbacks.
  */
 export const create_mutation_context = <
+	T_App extends Zzz = Zzz,
 	T_Params = unknown,
 	T_Result extends Api_Result<unknown> | void = any,
 >(
-	zzz: Zzz,
+	zzz: T_App,
 	method: Action_Method,
 	params: T_Params,
 	result: T_Result,
-): {ctx: Mutation_Context<T_Params, T_Result>; flush_after_mutation: () => void} => {
+): {ctx: Mutation_Context<T_App, T_Params, T_Result>; flush_after_mutation: () => void} => {
 	const cbs: Array<After_Mutation_Callback> = [];
 
 	const after_mutation: After_Mutation = (cb) => {
@@ -78,7 +83,7 @@ export const create_mutation_context = <
 		params,
 		result,
 		after_mutation,
-	} satisfies Mutation_Context<T_Params, T_Result>;
+	} satisfies Mutation_Context<T_App, T_Params, T_Result>;
 
 	return {ctx, flush_after_mutation};
 };

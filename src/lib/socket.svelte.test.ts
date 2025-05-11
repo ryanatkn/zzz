@@ -62,8 +62,8 @@ class Mocket {
 
 // Test constants
 const TEST_URLS = {
-	BASE: 'ws://test.example.com',
-	ALTERNATE: 'ws://alternate.example.com',
+	BASE: 'ws://test.zzz.software',
+	ALTERNATE: 'ws://alternate.zzz.software',
 };
 
 const TEST_MESSAGE = {

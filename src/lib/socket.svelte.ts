@@ -335,6 +335,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 		// Store original handler to restore it later
 		const original_handler = this.onmessage;
 
+		// TODO BLOCK hacky
 		// Set up our handler that calls both the temp handler and the original one
 		this.onmessage = (event) => {
 			temp_handler(event);

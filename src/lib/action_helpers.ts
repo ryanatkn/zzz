@@ -8,7 +8,9 @@ import {
 } from '$lib/action_collections.js';
 import type {Action_Json} from '$lib/action_types.js';
 import {Action_Message, type Action_Message_Name} from '$lib/action_messages.js';
-import type {Action_Method} from '$lib/action_metatypes.js';
+import {Action_Method} from '$lib/action_metatypes.js';
+import type {JSONRPCRequest} from '$lib/jsonrpc.js';
+import {Uuid} from './zod_helpers.js';
 
 // Constants for preview length and formatting
 export const ACTION_DATE_FORMAT = 'MMM d, p';
@@ -60,4 +62,15 @@ export const to_action_response_message_name = (
 	// TODO BLOCK validate it's a request/response action
 	const name = method + '_response';
 	return name in Action_Message ? (name as Action_Message_Name) : undefined;
+};
+
+/**
+ * Convert JSON-RPC request to Action_Message format
+ */
+export const jsonrpc_to_action_message = (request: JSONRPCRequest): Action_Message_Any => {
+	return Action_Message_Any.parse({
+		id: Uuid.parse(request.id),
+		method: Action_Method.parse(request.method),
+		params: request.params,
+	});
 };

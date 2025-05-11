@@ -4,7 +4,7 @@ import {resolve} from 'node:path';
 import {Logger} from '@ryanatkn/belt/log.js';
 import {DEV} from 'esm-env';
 
-import type {Action_Message_Base, Action_Spec} from '$lib/action_spec.js';
+import {Action_Message_Base, type Action_Spec} from '$lib/action_spec.js';
 import {
 	Action_Message_From_Client,
 	action_spec_by_method,
@@ -20,6 +20,14 @@ import {Api_Error} from '$lib/api.js';
 import {is_request_response_action} from '$lib/schema_helpers.js';
 import {stringify_zod_error} from '$lib/zod_helpers.js';
 import {lookup_request_action_schema, lookup_response_action_schema} from '$lib/action_helpers.js';
+import {
+	type JSONRPCRequest,
+	type JSONRPCResponse,
+	type JSONRPCError,
+	type JSONRPCNotification,
+	JSONRPC_VERSION,
+} from '$lib/jsonrpc.js';
+import {Jsonrpc_Server, create_jsonrpc_error} from '$lib/server/jsonrpc_server.js';
 
 /**
  * Function type for handling client messages.
@@ -110,6 +118,11 @@ export class Zzz_Server {
 		return this.action_registry.specs;
 	}
 
+	/**
+	 * JSON-RPC server for handling JSON-RPC requests.
+	 */
+	readonly jsonrpc_server: Jsonrpc_Server;
+
 	constructor(options: Zzz_Server_Options) {
 		// Parse the allowed filesystem directories
 		this.zzz_dir = Zzz_Dir.parse(resolve(options.zzz_dir)); // TODO if the class get more paths to deal with, add a `cwd` option - for now callers can just resolve to absolute themselves
@@ -124,6 +137,13 @@ export class Zzz_Server {
 
 		this.log = options.log === undefined ? new Logger('[zzz_server]') : options.log;
 
+		// Initialize the JSON-RPC server with handlers
+		this.jsonrpc_server = new Jsonrpc_Server({
+			onrequest: this.#handle_jsonrpc_request,
+			onnotification: this.#handle_jsonrpc_notification,
+			log: this.log,
+		});
+
 		// TODO maybe do this in an `init` method
 		// Set up the filer watcher for the zzz_dir
 		console.log(`this.zzz_dir`, this.zzz_dir);
@@ -136,11 +156,66 @@ export class Zzz_Server {
 	}
 
 	/**
+	 * Handler for JSON-RPC requests - converts to Zzz message format
+	 */
+	#handle_jsonrpc_request = async (
+		request: JSONRPCRequest,
+	): Promise<JSONRPCResponse | JSONRPCError> => {
+		try {
+			// Parse the request into an Action_Message_Base using schema
+			const action_message = Action_Message_Base.parse({
+				id: request.id,
+				method: request.method,
+				params: request.params,
+			});
+
+			// Process with the standard receive method
+			const service_return = await this.#receive(action_message);
+
+			// Convert the service return to JSON-RPC format
+			if (service_return.ok !== false) {
+				return {
+					jsonrpc: JSONRPC_VERSION,
+					id: request.id,
+					result: service_return.value,
+				};
+			} else {
+				return create_jsonrpc_error(request.id, {
+					status: service_return.status || 500,
+					message: service_return.message,
+				});
+			}
+		} catch (error) {
+			this.log?.error(`Error processing JSON-RPC request:`, error);
+			return create_jsonrpc_error(request.id, error);
+		}
+	};
+
+	/**
+	 * Handler for JSON-RPC notifications - converts to Zzz message format
+	 */
+	#handle_jsonrpc_notification = async (notification: JSONRPCNotification): Promise<void> => {
+		try {
+			// Parse the notification into an Action_Message_Base using schema
+			const action_message = Action_Message_Base.parse({
+				id: 'notification', // Placeholder ID for notifications
+				method: notification.method,
+				params: notification.params,
+			});
+
+			// Process with the standard receive method
+			await this.#receive(action_message);
+		} catch (error) {
+			this.log?.error(`Error processing JSON-RPC notification:`, error);
+			// No response for notifications, so just log the error
+		}
+	};
+
+	/**
 	 * Send a message to all connected clients.
 	 */
 	send(message: Action_Message_From_Server): void {
 		this.#check_destroyed();
-
 		this.#send_to_all_clients(message);
 	}
 
@@ -149,7 +224,7 @@ export class Zzz_Server {
 	 * Process an action by name with parameters.
 	 * This is the unified entry point for both HTTP and WebSocket actions.
 	 */
-	async receive(message: Action_Message_Base): Promise<Service_Return> {
+	async #receive(message: Action_Message_Base): Promise<Service_Return> {
 		this.#check_destroyed();
 
 		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -173,6 +248,7 @@ export class Zzz_Server {
 			throw new Api_Error(400, `unknown message schema: ${method}`);
 		}
 
+		console.log(`message`, message);
 		const parsed_request = request_schema.safeParse(message);
 		if (!parsed_request.success) {
 			this.log?.error('failed to validate service params', method, parsed_request.error.issues);

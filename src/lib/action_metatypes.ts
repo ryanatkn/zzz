@@ -13,6 +13,7 @@ import type {
 	toggle_main_menu_action_spec,
 	update_diskfile_action_spec,
 } from '$lib/action_specs.js';
+import type {Zzz} from '$lib/zzz.svelte.js';
 
 /**
  * All action names. May have '/' separators for namespacing.
@@ -54,7 +55,7 @@ export type Client_Local_Action_Method = 'toggle_main_menu';
 /**
  * Interface for action dispatch functions.
  */
-export interface Actions {
+export interface Actions_Api {
 	create_directory: (
 		params: typeof create_directory_action_spec.params,
 	) => Promise<Api_Result<typeof create_directory_action_spec.response_params>>;
@@ -81,31 +82,37 @@ export interface Actions {
 /**
  * Interface for client-side mutation handlers.
  */
-export interface Mutations {
-	[key: string]: Mutation | undefined;
+export interface Mutations<T_App extends Zzz = Zzz> {
+	[key: string]: Mutation<T_App> | undefined;
 	create_directory?: Mutation<
+		T_App,
 		typeof create_directory_action_spec.params,
 		Api_Result<typeof create_directory_action_spec.response_params>
 	>;
 	delete_diskfile?: Mutation<
+		T_App,
 		typeof delete_diskfile_action_spec.params,
 		Api_Result<typeof delete_diskfile_action_spec.response_params>
 	>;
-	filer_change?: Mutation<typeof filer_change_action_spec.params, void>;
+	filer_change?: Mutation<T_App, typeof filer_change_action_spec.params, void>;
 	load_session?: Mutation<
+		T_App,
 		typeof load_session_action_spec.params,
 		Api_Result<typeof load_session_action_spec.response_params>
 	>;
 	ping?: Mutation<
+		T_App,
 		typeof ping_action_spec.params,
 		Api_Result<typeof ping_action_spec.response_params>
 	>;
 	submit_completion?: Mutation<
+		T_App,
 		typeof submit_completion_action_spec.params,
 		Api_Result<typeof submit_completion_action_spec.response_params>
 	>;
-	toggle_main_menu?: Mutation<typeof toggle_main_menu_action_spec.params, void>;
+	toggle_main_menu?: Mutation<T_App, typeof toggle_main_menu_action_spec.params, void>;
 	update_diskfile?: Mutation<
+		T_App,
 		typeof update_diskfile_action_spec.params,
 		Api_Result<typeof update_diskfile_action_spec.response_params>
 	>;

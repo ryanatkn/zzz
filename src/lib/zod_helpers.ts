@@ -21,7 +21,8 @@ export type Path_With_Leading_Slash = z.infer<typeof Path_With_Leading_Slash>;
 export const Path_Without_Leading_Slash = z.string().transform((v) => strip_start(v, '/'));
 export type Path_Without_Leading_Slash = z.infer<typeof Path_Without_Leading_Slash>;
 
-export const Svelte_Map_Schema = z.custom<SvelteMap<any, any>>((val) => val instanceof SvelteMap);
+export const Svelte_Map_Schema = z.instanceof(SvelteMap);
+export type Svelte_Map_Schema = z.infer<typeof Svelte_Map_Schema>;
 
 /**
  * Returns an ISO datetime string that is guaranteed to be monotonically increasing.

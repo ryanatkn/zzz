@@ -77,14 +77,14 @@ describe('Indexed_Collection - Schema Validation', () => {
 		});
 
 		// Add valid items
-		const item1 = create_item('a1', 'a1@example.com', 25);
-		const item2 = create_item('a2', 'a2@example.com', 30);
+		const item1 = create_item('a1', 'a1@zzz.software', 25);
+		const item2 = create_item('a2', 'a2@zzz.software', 30);
 
 		collection.add(item1);
 		collection.add(item2);
 
 		// Test query with valid email
-		const query_result = collection.query<Test_Item, string>('by_string_b', 'a1@example.com');
+		const query_result = collection.query<Test_Item, string>('by_string_b', 'a1@zzz.software');
 		expect(query_result.string_a).toBe('a1');
 
 		// Get single index and check schema validation passed
@@ -287,7 +287,7 @@ describe('Indexed_Collection - Schema Validation', () => {
 		});
 
 		// Add items with valid data
-		collection.add(create_item('a1', 'valid@example.com', 25));
+		collection.add(create_item('a1', 'valid@zzz.software', 25));
 
 		// Try querying with invalid email format
 		collection.query('by_string_b', 'not-an-email');
@@ -328,7 +328,7 @@ describe('Indexed_Collection - Schema Validation', () => {
 		});
 
 		// Add items
-		collection.add(create_item('a1', 'valid@example.com', 25));
+		collection.add(create_item('a1', 'valid@zzz.software', 25));
 
 		// These queries would fail validation, but should not trigger console errors
 		collection.query('by_string_b', 'not-an-email');

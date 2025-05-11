@@ -31,6 +31,7 @@ export const gen: Gen = ({origin_path}) => {
 		import type {Api_Result} from '$lib/api.js';
 		import type {Mutation} from '$lib/mutation.js';
 		import type {${schema_imports.join(', ')}} from '$lib/action_specs.js';
+		import type { Zzz } from '$lib/zzz.svelte.js';
 
 		/**
 		 * All action names. May have '/' separators for namespacing.
@@ -65,7 +66,7 @@ export const gen: Gen = ({origin_path}) => {
 		/**
 		 * Interface for action dispatch functions.
 		 */
-		export interface Actions {
+		export interface Actions_Api {
 			${registry.specs
 				.map((spec) => {
 					const has_params =
@@ -87,12 +88,12 @@ export const gen: Gen = ({origin_path}) => {
 		/**
 		 * Interface for client-side mutation handlers.
 		 */
-		export interface Mutations {
-			[key: string]: Mutation | undefined;
+		export interface Mutations<T_App extends Zzz = Zzz> {
+			[key: string]: Mutation<T_App> | undefined;
 			${registry.specs
 				.map(
 					(spec) =>
-						`${spec.method}?: Mutation<typeof ${to_action_spec_params_identifier(spec.method)}, ${
+						`${spec.method}?: Mutation<T_App, typeof ${to_action_spec_params_identifier(spec.method)}, ${
 							is_request_response_action(spec)
 								? `Api_Result<typeof ${to_action_spec_response_params_identifier(spec.method)}>`
 								: 'void'

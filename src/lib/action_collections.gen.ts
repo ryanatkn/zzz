@@ -49,6 +49,54 @@ export const gen: Gen = ({origin_path}) => {
 		import type {Action_Method} from '$lib/action_metatypes.js';
 
 		/**
+		 * All method types combined.
+		 */
+		export const Action_Method_Any = z.enum([
+			${all_methods.map((method) => `'${method}'`).join(',\n\t\t\t')}
+		]);
+		export type Action_Method_Any = z.infer<typeof Action_Method_Any>;
+
+		/**
+		 * Method types that can be sent from client to server.
+		 */
+		export const Action_Method_From_Client = z.enum([
+			${from_client_methods.map((method) => `'${method}'`).join(',\n\t\t\t')}
+		]);
+		export type Action_Method_From_Client = z.infer<typeof Action_Method_From_Client>;
+
+		/**
+		 * Method types that can be sent from server to client.
+		 */
+		export const Action_Method_From_Server = z.enum([
+			${from_server_methods.map((method) => `'${method}'`).join(',\n\t\t\t')}
+		]);
+		export type Action_Method_From_Server = z.infer<typeof Action_Method_From_Server>;
+
+		/**
+		 * Method types with network endpoints.
+		 */
+		export const Action_Method_Networked = z.enum([
+			${networked_methods.map((method) => `'${method}'`).join(',\n\t\t\t')}
+		]);
+		export type Action_Method_Networked = z.infer<typeof Action_Method_Networked>;
+
+		/**
+		 * Method types without network endpoints.
+		 */
+		export const Action_Method_Nonnetworked = z.enum([
+			${nonnetworked_methods.map((method) => `'${method}'`).join(',\n\t\t\t')}
+		]);
+		export type Action_Method_Nonnetworked = z.infer<typeof Action_Method_Nonnetworked>;
+
+		/**
+		 * All action types combined.
+		 */
+		export const Action_Message_Any = z.discriminatedUnion('method', [
+			${get_action_messages(all_methods)}
+		]);
+		export type Action_Message_Any = z.infer<typeof Action_Message_Any>;
+
+		/**
 		 * Set of actions with "from_client" direction (originating from client).
 		 */
 		export const Action_Message_From_Client = z.discriminatedUnion('method', [
@@ -63,14 +111,6 @@ export const gen: Gen = ({origin_path}) => {
 			${get_action_messages(from_server_methods)}
 		]);
 		export type Action_Message_From_Server = z.infer<typeof Action_Message_From_Server>;
-
-		/**
-		 * All action types combined.
-		 */
-		export const Action_Message_Any = z.discriminatedUnion('method', [
-			${get_action_messages(all_methods)}
-		]);
-		export type Action_Message_Any = z.infer<typeof Action_Message_Any>;
 
 		/**
 		 * Service actions with HTTP endpoints (networked).

@@ -14,8 +14,11 @@ import type {Action_Method} from '$lib/action_metatypes.js';
 export class Action_Registry {
 	specs: Array<Action_Spec>;
 
+	by_method: Map<string, Action_Spec>;
+
 	constructor(specs: Array<Action_Spec>) {
 		this.specs = specs;
+		this.by_method = new Map(specs.map((spec) => [spec.method, spec]));
 	}
 
 	// TODO add maps

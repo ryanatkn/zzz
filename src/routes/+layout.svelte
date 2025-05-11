@@ -11,7 +11,6 @@
 	import {parse_package_meta} from '@ryanatkn/gro/package_meta.js';
 	import * as devalue from 'devalue';
 	import {BROWSER} from 'esm-env';
-	import {PUBLIC_WEBSOCKET_URL} from '$env/static/public';
 	import {page} from '$app/state';
 	import {onNavigate} from '$app/navigation';
 	import {base} from '$app/paths';
@@ -32,6 +31,7 @@
 		Action_Message_From_Server,
 	} from '$lib/action_collections.js';
 	import {create_mutation_context} from '$lib/mutation.js';
+	import {WEBSOCKET_URL, API_URL} from '$lib/constants.js';
 
 	interface Props {
 		children: Snippet;
@@ -55,8 +55,9 @@
 
 	// Create an instance of Zzz with socket_url
 	const zzz = new App({
+		api_url: API_URL,
+		socket_url: WEBSOCKET_URL,
 		cell_classes,
-		socket_url: PUBLIC_WEBSOCKET_URL,
 		onsend: (message: Action_Message_From_Client) => {
 			console.log('[ws] sending message', message);
 			zzz.socket.send({type: 'server_message', message}); // TODO JSON-RPC

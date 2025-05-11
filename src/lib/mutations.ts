@@ -1,34 +1,34 @@
 import type {Mutations} from '$lib/action_metatypes.js';
 
 /**
- * Client-side mutations for handling action responses
+ * Client-side mutations for handling action responses.
  */
 
 /**
  * Client-side mutations for outgoing messages.
  */
 export const send_mutations: Mutations = {
-	Action_Ping: (ctx) => {
+	ping: (ctx) => {
 		console.log('Ping sent', ctx.params);
 	},
 
-	Action_Load_Session: () => {
+	load_session: (ctx) => {
 		console.log('Loading session...');
 	},
 
-	Action_Send_Prompt: (ctx) => {
-		console.log('Sending prompt', ctx.params.completion_request.prompt);
+	submit_completion: (ctx) => {
+		console.log('Sending prompt', ctx.params.completion_request?.prompt);
 	},
 
-	Action_Update_Diskfile: (ctx) => {
+	update_diskfile: (ctx) => {
 		console.log('Updating file', ctx.params.path);
 	},
 
-	Action_Delete_Diskfile: (ctx) => {
+	delete_diskfile: (ctx) => {
 		console.log('Deleting file', ctx.params.path);
 	},
 
-	Action_Create_Directory: (ctx) => {
+	create_directory: (ctx) => {
 		console.log('Creating directory', ctx.params.path);
 	},
 };
@@ -37,22 +37,22 @@ export const send_mutations: Mutations = {
  * Client-side mutations for incoming server messages.
  */
 export const receive_mutations: Mutations = {
-	Action_Pong: (ctx) => {
+	ping: (ctx) => {
 		console.log('Pong received', ctx.params);
 		ctx.zzz.capabilities.receive_ping(ctx.params);
 	},
 
-	Action_Loaded_Session: (ctx) => {
+	load_session: (ctx) => {
 		console.log('Session loaded');
 		ctx.zzz.receive_session(ctx.params.data);
 	},
 
-	Action_Completion_Response: (ctx) => {
+	submit_completion: (ctx) => {
 		console.log('Received completion', ctx.params.completion_response);
 		ctx.zzz.receive_completion_response(ctx.params);
 	},
 
-	Action_Filer_Change: (ctx) => {
+	filer_change: (ctx) => {
 		console.log('File changed', ctx.params.change);
 		ctx.zzz.diskfiles.handle_change(ctx.params);
 	},

@@ -1,13 +1,12 @@
 import type {Hono} from 'hono';
 import type {WSContext} from 'hono/ws';
-import * as devalue from 'devalue';
+import type {createNodeWebSocket} from '@hono/node-ws';
 
 import type {Zzz_Server} from '$lib/server/zzz_server.js';
-import {service_return_to_api_result} from '$lib/server/service.js';
-import {to_failed_api_result, type Api_Result} from '$lib/api.js';
 import {should_allow_origin} from '$lib/server/security.js';
-import type {createNodeWebSocket} from '@hono/node-ws';
-import {Action_Message_Base} from '$lib/action_spec.js';
+import type {Action_Message_From_Server} from '$lib/action_collections.js';
+import {JSONRPCRequest} from '$lib/jsonrpc.js';
+import {Api_Error} from '$lib/api.js';
 
 export interface Register_Websocket_Actions_Options {
 	app: Hono;
@@ -35,7 +34,7 @@ export const register_websocket_actions = ({
 			const origin = c.req.header('origin');
 			console.log(`c.req origin`, origin);
 
-			if (!should_allow_origin(origin + 'sd')) {
+			if (!should_allow_origin(origin)) {
 				c.status(403);
 			}
 
@@ -80,24 +79,33 @@ export const handle_websocket_message = async (
 
 	console.log(`[ws] handling message`, data);
 
-	// Only handle server_message type messages
-	if (data.type !== 'server_message') {
-		console.error('unknown message type', data.type);
-		return;
+	const jsonrpc_request = JSONRPCRequest.safeParse(data);
+	if (!jsonrpc_request.success) {
+		throw new Api_Error(400, 'Invalid JSON-RPC request');
 	}
 
-	let api_result: Api_Result;
-	try {
-		const message = Action_Message_Base.parse(data.message); // validated more later
-		console.log(`parrsed message`, message);
+	// Process with the jsonrpc_server
+	const response = await zzz_server.jsonrpc_server.process_request(data);
 
-		const service_return = await zzz_server.receive(message);
-
-		api_result = service_return_to_api_result(service_return);
-	} catch (error) {
-		console.error('Error processing action:', error);
-		api_result = to_failed_api_result(error);
+	// Only send a response if it's not a notification (which doesn't expect a response)
+	if (response) {
+		ws.send(JSON.stringify(response));
 	}
+};
 
-	ws.send(devalue.stringify({type: 'server_message', message: api_result})); // TODO JSON-RPC
+/**
+ * Send a message to WebSocket clients
+ */
+export const send_to_websocket_clients = (
+	sockets: Set<WSContext>,
+	message: Action_Message_From_Server,
+	zzz_server: Zzz_Server,
+): void => {
+	// Create a JSON-RPC notification
+	const notification = zzz_server.jsonrpc_server.create_notification(message.method, message);
+
+	// Send to all connected clients
+	for (const socket of sockets) {
+		socket.send(JSON.stringify(notification));
+	}
 };

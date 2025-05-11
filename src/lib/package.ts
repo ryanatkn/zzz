@@ -130,6 +130,7 @@ export const package_json = {
 			types: './dist/actions.svelte.d.ts',
 			default: './dist/actions.svelte.js',
 		},
+		'./api_client.js': {types: './dist/api_client.d.ts', default: './dist/api_client.js'},
 		'./api.js': {types: './dist/api.d.ts', default: './dist/api.js'},
 		'./app.svelte.js': {types: './dist/app.svelte.d.ts', default: './dist/app.svelte.js'},
 		'./Bit_Editor_For_Diskfile.svelte': {
@@ -545,7 +546,11 @@ export const package_json = {
 			types: './dist/indexed_collection.svelte.d.ts',
 			default: './dist/indexed_collection.svelte.js',
 		},
-		'./json_rpc.js': {types: './dist/json_rpc.d.ts', default: './dist/json_rpc.js'},
+		'./jsonrpc_client.js': {
+			types: './dist/jsonrpc_client.d.ts',
+			default: './dist/jsonrpc_client.js',
+		},
+		'./jsonrpc.js': {types: './dist/jsonrpc.d.ts', default: './dist/jsonrpc.js'},
 		'./list_helpers.js': {types: './dist/list_helpers.d.ts', default: './dist/list_helpers.js'},
 		'./Main_Dialog.svelte': {
 			types: './dist/Main_Dialog.svelte.d.ts',
@@ -735,6 +740,10 @@ export const package_json = {
 			types: './dist/server/handler_defaults.d.ts',
 			default: './dist/server/handler_defaults.js',
 		},
+		'./server/jsonrpc_server.js': {
+			types: './dist/server/jsonrpc_server.d.ts',
+			default: './dist/server/jsonrpc_server.js',
+		},
 		'./server/register_http_actions.js': {
 			types: './dist/server/register_http_actions.d.ts',
 			default: './dist/server/register_http_actions.js',
@@ -875,9 +884,14 @@ export const src_json = {
 		'./action_collections.js': {
 			path: 'action_collections.ts',
 			declarations: [
+				{name: 'Action_Method_Any', kind: 'variable'},
+				{name: 'Action_Method_From_Client', kind: 'variable'},
+				{name: 'Action_Method_From_Server', kind: 'variable'},
+				{name: 'Action_Method_Networked', kind: 'variable'},
+				{name: 'Action_Method_Nonnetworked', kind: 'variable'},
+				{name: 'Action_Message_Any', kind: 'variable'},
 				{name: 'Action_Message_From_Client', kind: 'variable'},
 				{name: 'Action_Message_From_Server', kind: 'variable'},
-				{name: 'Action_Message_Any', kind: 'variable'},
 				{name: 'Action_Message_Networked', kind: 'variable'},
 				{name: 'Action_Message_Nonnetworked', kind: 'variable'},
 				{name: 'action_specs', kind: 'variable'},
@@ -898,6 +912,7 @@ export const src_json = {
 				{name: 'lookup_response_action_schema', kind: 'function'},
 				{name: 'to_action_request_message_name', kind: 'function'},
 				{name: 'to_action_response_message_name', kind: 'function'},
+				{name: 'jsonrpc_to_action_message', kind: 'function'},
 			],
 		},
 		'./Action_List.svelte': {
@@ -927,7 +942,7 @@ export const src_json = {
 				{name: 'Request_Response_Action_Method', kind: 'type'},
 				{name: 'Server_Notification_Action_Method', kind: 'type'},
 				{name: 'Client_Local_Action_Method', kind: 'type'},
-				{name: 'Actions', kind: 'type'},
+				{name: 'Actions_Api', kind: 'type'},
 				{name: 'Mutations', kind: 'type'},
 			],
 		},
@@ -988,12 +1003,24 @@ export const src_json = {
 				{name: 'Actions', kind: 'class'},
 			],
 		},
+		'./api_client.js': {
+			path: 'api_client.ts',
+			declarations: [
+				{name: 'Transport_Provider', kind: 'type'},
+				{name: 'Api_Client_Options', kind: 'type'},
+				{name: 'Request_Tracker', kind: 'type'},
+				{name: 'Socket_Transport_Provider', kind: 'class'},
+				{name: 'Http_Transport_Provider', kind: 'class'},
+				{name: 'Api_Client', kind: 'class'},
+			],
+		},
 		'./api.js': {
 			path: 'api.ts',
 			declarations: [
 				{name: 'Http_Status', kind: 'variable'},
 				{name: 'is_http_status_ok', kind: 'function'},
 				{name: 'Http_Method', kind: 'variable'},
+				{name: 'Api_Transport', kind: 'variable'},
 				{name: 'Error_Response', kind: 'type'},
 				{name: 'ERROR_MESSAGE_UNKNOWN', kind: 'variable'},
 				{name: 'Api_Result', kind: 'type'},
@@ -1310,6 +1337,8 @@ export const src_json = {
 				{name: 'REQUEST_TIMEOUT', kind: 'variable'},
 				{name: 'CONTENT_PREVIEW_LENGTH', kind: 'variable'},
 				{name: 'API_ROUTE', kind: 'variable'},
+				{name: 'API_URL', kind: 'variable'},
+				{name: 'WEBSOCKET_URL', kind: 'variable'},
 			],
 		},
 		'./Content_Editor.svelte': {
@@ -1624,7 +1653,6 @@ export const src_json = {
 		'./indexed_collection_helpers.js': {
 			path: 'indexed_collection_helpers.ts',
 			declarations: [
-				{name: 'Svelte_Map_Schema', kind: 'variable'},
 				{name: 'Indexed_Item', kind: 'variable'},
 				{name: 'Index_Options', kind: 'type'},
 				{name: 'Single_Index_Options', kind: 'type'},
@@ -1646,25 +1674,29 @@ export const src_json = {
 				{name: 'Indexed_Collection', kind: 'class'},
 			],
 		},
-		'./json_rpc.js': {
-			path: 'json_rpc.ts',
+		'./jsonrpc_client.js': {
+			path: 'jsonrpc_client.ts',
+			declarations: [{name: 'Jsonrpc_Client', kind: 'class'}],
+		},
+		'./jsonrpc.js': {
+			path: 'jsonrpc.ts',
 			declarations: [
 				{name: 'JSONRPC_VERSION', kind: 'variable'},
 				{name: 'JSONRPC_LATEST_PROTOCOL_VERSION', kind: 'variable'},
+				{name: 'JSONRPCProgressToken', kind: 'variable'},
+				{name: 'JSONRPCBaseRequest', kind: 'variable'},
+				{name: 'JSONRPCBaseNotification', kind: 'variable'},
+				{name: 'JSONRPCRequestId', kind: 'variable'},
+				{name: 'JSONRPCRequest', kind: 'variable'},
+				{name: 'JSONRPCNotification', kind: 'variable'},
+				{name: 'JSONRPCResult', kind: 'variable'},
+				{name: 'JSONRPCResponse', kind: 'variable'},
+				{name: 'JSONRPCError', kind: 'variable'},
 				{name: 'JSONRPC_PARSE_ERROR', kind: 'variable'},
 				{name: 'JSONRPC_INVALID_REQUEST', kind: 'variable'},
 				{name: 'JSONRPC_METHOD_NOT_FOUND', kind: 'variable'},
 				{name: 'JSONRPC_INVALID_PARAMS', kind: 'variable'},
 				{name: 'JSONRPC_INTERNAL_ERROR', kind: 'variable'},
-				{name: 'JSONRPCProgressToken', kind: 'variable'},
-				{name: 'RequestId', kind: 'variable'},
-				{name: 'JSONRPCBaseRequest', kind: 'variable'},
-				{name: 'JSONRPCBaseNotification', kind: 'variable'},
-				{name: 'JSONRPCResult', kind: 'variable'},
-				{name: 'JSONRPCRequest', kind: 'variable'},
-				{name: 'JSONRPCNotification', kind: 'variable'},
-				{name: 'JSONRPCResponse', kind: 'variable'},
-				{name: 'JSONRPCError', kind: 'variable'},
 				{name: 'JSONRPCBatchRequest', kind: 'variable'},
 				{name: 'JSONRPCBatchResponse', kind: 'variable'},
 				{name: 'JSONRPCMessage', kind: 'variable'},
@@ -2004,6 +2036,17 @@ export const src_json = {
 				{name: 'handle_filer_change', kind: 'function'},
 			],
 		},
+		'./server/jsonrpc_server.js': {
+			path: 'server/jsonrpc_server.ts',
+			declarations: [
+				{name: 'Jsonrpc_Method_Handler', kind: 'type'},
+				{name: 'Jsonrpc_Request_Handler', kind: 'type'},
+				{name: 'Jsonrpc_Notification_Handler', kind: 'type'},
+				{name: 'Jsonrpc_Server_Options', kind: 'type'},
+				{name: 'create_jsonrpc_error', kind: 'function'},
+				{name: 'Jsonrpc_Server', kind: 'class'},
+			],
+		},
 		'./server/register_http_actions.js': {
 			path: 'server/register_http_actions.ts',
 			declarations: [
@@ -2017,6 +2060,7 @@ export const src_json = {
 				{name: 'Register_Websocket_Actions_Options', kind: 'type'},
 				{name: 'register_websocket_actions', kind: 'function'},
 				{name: 'handle_websocket_message', kind: 'function'},
+				{name: 'send_to_websocket_clients', kind: 'function'},
 			],
 		},
 		'./server/safe_fs.js': {
@@ -2290,7 +2334,6 @@ export const src_json = {
 				{name: 'Zzz_Json', kind: 'variable'},
 				{name: 'Zzz_Json_Input', kind: 'type'},
 				{name: 'Zzz_Options', kind: 'type'},
-				{name: 'Action_With_History', kind: 'type'},
 				{name: 'Zzz', kind: 'class'},
 			],
 		},

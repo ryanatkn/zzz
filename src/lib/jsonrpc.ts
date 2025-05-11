@@ -1,6 +1,10 @@
 /**
+ * Following MCP and A2A, Zzz supports JSON-RPC 2.0 as its message format.
+ * This can be used by multiple transports including http and websocket.
+ *
  * These are the JSON-RPC types from the MCP draft in May 2025,
  * changed to include the `JSONRPC` prefix on all identifiers.
+ * It's also defined with Zod schemas instead of MCP's plain TS.
  *
  * @source https://github.com/modelcontextprotocol/typescript-sdk
  * @see https://modelcontextprotocol.io/
@@ -17,12 +21,6 @@ export const JSONRPC_LATEST_PROTOCOL_VERSION = 'DRAFT-2025-v2';
  */
 export const JSONRPCProgressToken = z.union([z.string(), z.number()]);
 export type JSONRPCProgressToken = z.infer<typeof JSONRPCProgressToken>;
-
-/**
- * A uniquely identifying ID for a request in JSON-RPC.
- */
-export const JSONRPCRequestId = z.union([z.string(), z.number()]);
-export type JSONRPCRequestId = z.infer<typeof JSONRPCRequestId>;
 
 export const JSONRPCBaseRequest = z.object({
 	method: z.string(),
@@ -61,16 +59,13 @@ export const JSONRPCBaseNotification = z.object({
 });
 export type JSONRPCBaseNotification = z.infer<typeof JSONRPCBaseNotification>;
 
-export const JSONRPCResult = z
-	.object({
-		/**
-		 * This result property is reserved by the protocol to allow clients and servers
-		 * to attach additional metadata to their responses.
-		 */
-		_meta: z.record(z.string(), z.unknown()).optional(),
-	})
-	.passthrough();
-export type JSONRPCResult = z.infer<typeof JSONRPCResult>;
+/**
+ * A uniquely identifying ID for a request in JSON-RPC.
+ *
+ * Like MCP but unlike JSON-RPC, the type excludes null.
+ */
+export const JSONRPCRequestId = z.union([z.string(), z.number()]);
+export type JSONRPCRequestId = z.infer<typeof JSONRPCRequestId>;
 
 /**
  * A request that expects a response.
@@ -89,6 +84,17 @@ export const JSONRPCNotification = JSONRPCBaseNotification.extend({
 });
 export type JSONRPCNotification = z.infer<typeof JSONRPCNotification>;
 
+export const JSONRPCResult = z
+	.object({
+		/**
+		 * This result property is reserved by the protocol to allow clients and servers
+		 * to attach additional metadata to their responses.
+		 */
+		_meta: z.record(z.string(), z.unknown()).optional(),
+	})
+	.passthrough();
+export type JSONRPCResult = z.infer<typeof JSONRPCResult>;
+
 /**
  * A successful (non-error) response to a request.
  */
@@ -98,13 +104,6 @@ export const JSONRPCResponse = z.object({
 	result: JSONRPCResult,
 });
 export type JSONRPCResponse = z.infer<typeof JSONRPCResponse>;
-
-// Standard JSON-RPC error codes
-export const JSONRPC_PARSE_ERROR = -32700;
-export const JSONRPC_INVALID_REQUEST = -32600;
-export const JSONRPC_METHOD_NOT_FOUND = -32601;
-export const JSONRPC_INVALID_PARAMS = -32602;
-export const JSONRPC_INTERNAL_ERROR = -32603;
 
 /**
  * A response to a request that indicates an error occurred.
@@ -129,6 +128,13 @@ export const JSONRPCError = z.object({
 	}),
 });
 export type JSONRPCError = z.infer<typeof JSONRPCError>;
+
+// Standard JSON-RPC error codes
+export const JSONRPC_PARSE_ERROR = -32700;
+export const JSONRPC_INVALID_REQUEST = -32600;
+export const JSONRPC_METHOD_NOT_FOUND = -32601;
+export const JSONRPC_INVALID_PARAMS = -32602;
+export const JSONRPC_INTERNAL_ERROR = -32603;
 
 /**
  * A JSON-RPC batch request, as described in https://www.jsonrpc.org/specification#batch.
