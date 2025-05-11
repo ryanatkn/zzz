@@ -12,7 +12,7 @@ import {
 	is_client_local_action,
 	is_server_notification_action,
 	is_request_response_action,
-} from './schema_helpers.js';
+} from '$lib/schema_helpers.js';
 
 export type Vocab_Name = Flavored<string, 'Vocab_Name'>;
 

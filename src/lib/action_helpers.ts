@@ -10,7 +10,7 @@ import type {Action_Json} from '$lib/action_types.js';
 import {Action_Message, type Action_Message_Name} from '$lib/action_messages.js';
 import {Action_Method} from '$lib/action_metatypes.js';
 import type {JSONRPCRequest} from '$lib/jsonrpc.js';
-import {Uuid} from './zod_helpers.js';
+import {Uuid} from '$lib/zod_helpers.js';
 
 // Constants for preview length and formatting
 export const ACTION_DATE_FORMAT = 'MMM d, p';

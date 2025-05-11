@@ -41,6 +41,12 @@ import {Action_Registry} from '$lib/action_registry.js';
 import {Api_Client, type Api_Client_Options} from '$lib/api_client.js';
 import type {Completion_Message} from '$lib/completion_types.js';
 import type {JSONRPCMessage} from '$lib/jsonrpc.js';
+import {create_mutation_context} from '$lib/mutation.js';
+import type {Mutations} from '$lib/action_metatypes.js';
+import {
+	send_mutations as send_mutations_default,
+	receive_mutations as receive_mutations_default,
+} from '$lib/mutations.js';
 
 export const zzz_context = create_context<Zzz>();
 
@@ -53,12 +59,12 @@ export type Zzz_Json_Input = z.input<typeof Zzz_Json>;
 // Special options type for Zzz to handle circular reference
 export interface Zzz_Options extends Omit_Strict<Cell_Options<typeof Zzz_Json>, 'zzz'> {
 	zzz?: Zzz;
-	onsend?: (message: Action_Message_From_Client) => void;
-	onreceive?: (message: Action_Message_From_Server) => void;
 	models?: Array<Model_Json>;
 	bots?: Zzz_Config['bots'];
 	providers?: Array<Provider_Json>;
 	cell_classes?: Record<string, Class_Constructor<Cell>>;
+	send_mutations?: Mutations;
+	receive_mutations?: Mutations;
 
 	/** URL for server communication */
 	api_url?: string;
@@ -168,48 +174,108 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		this.prompts = new Prompts({zzz: this});
 		this.bits = new Bits({zzz: this});
 		this.diskfiles = new Diskfiles({zzz: this});
-		this.actions = new Actions({zzz: this});
+		this.actions = new Actions({
+			zzz: this,
+			onreceive: (action) => {
+				// this.api_client.receive_action(action.method, action.params, action.id);
+			},
+			onsend: (action) => {
+				this.api_client.send_action(action.method, action.params, action.id);
+			},
+		});
 		this.socket = new Socket({zzz: this});
 		this.url_params = new Url_Params({zzz: this});
 		this.capabilities = new Capabilities({zzz: this});
 
 		this.bots = options.bots ?? BOTS_DEFAULT;
 
+		// TODO refactor these, tension between full configurability and good defaults
+		const send_mutations = options.send_mutations || send_mutations_default;
+		const receive_mutations = options.receive_mutations || receive_mutations_default;
+
+		// TODO BLOCK Api_Client design with `Actions` --
+		// maybe create `Actions` this `this.#onsendaction` and `this.#onreceiveaction`?
+		// this.actions.onsend = options.onsend;
+		// this.actions.onreceive = options.onreceive;
+
 		// Initialize the API client with the socket instance and message handlers
 		this.api_client = new Api_Client({
 			...options.api_client_options,
 			http_url: options.api_url,
 			socket: this.socket,
-			onreceive: (method, params, id) => {
-				// TODO BLOCK Action_Message_From_Server ? parse in dev?
-				const message: JSONRPCMessage = {
-					id,
+			// TODO BLOCK @many shouldnt this be a JSONRPCMessage?
+			onsend: (message: Action_Message_From_Client) => {
+				console.log('[ws] sending message', message);
+				// TODO BLOCK Action_Message_From_Client ? parse in dev?
+				const m: JSONRPCMessage = {
+					id: message.id || create_uuid(),
 					created: get_datetime_now(),
-					method,
-					params,
+					method: message.method,
+					params: message.params as any,
+				};
+
+				console.log(`constructed m`, m);
+				this.socket.send(m); // TODO JSON-RPC
+
+				// TODO dynamic registry?
+				const mutation = send_mutations[message.method]; // TODO think about before/after
+				if (!mutation) {
+					// Ignore messages with no mutations
+					// console.warn('unknown message name, ignoring:', message.method, message);
+					return;
+				}
+
+				const mutation_context = create_mutation_context(
+					this,
+					message.method,
+					message, // For client actions, params are the full message
+					undefined, // Result is undefined for sending
+				);
+
+				// TODO @many try/catch?
+				const result = mutation(mutation_context.ctx as unknown as any); // TODO type ?
+				mutation_context.flush_after_mutation();
+				return result;
+			},
+			// TODO BLOCK @many shouldnt this be a JSONRPCMessage?
+			onreceive: (message: Action_Message_From_Server) => {
+				console.log(`[ws] received message`, message);
+
+				// TODO BLOCK Action_Message_From_Server ? parse in dev?
+				const m: JSONRPCMessage = {
+					id: message.id,
+					created: get_datetime_now(),
+					method: message.method,
+					params: message.params,
 				};
 
 				// Handle the message based on its method
 				this.api_client.handle_incoming_message(message);
 
-				// Call the provided onreceive handler if available
-				if (options.onreceive) {
-					options.onreceive(message);
+				const mutation = receive_mutations[message.method];
+				if (!mutation) {
+					// Ignore messages with no mutations
+					// console.warn('unknown message type, ignoring:', message.type, message);
+					return;
 				}
-			},
-			onsend: (method, params, id) => {
-				// TODO BLOCK Action_Message_From_Client ? parse in dev?
-				const message: JSONRPCMessage = {
-					id: id || create_uuid(),
-					created: get_datetime_now(),
-					method,
-					params: params as any,
-				};
 
-				// Call the provided onsend handler if available
-				if (options.onsend) {
-					options.onsend(message);
-				}
+				const mutation_context = create_mutation_context(
+					this,
+					message.method,
+					message, // For received actions, params are the full message
+					// TODO BLOCK delete this?
+					{
+						ok: true,
+						status: 200, // TODO BLOCK @many JSON-RPC need to forward status, use JSON-RPC like MCP
+						value: message,
+						zzz: this,
+					},
+				);
+
+				// TODO @many try/catch?
+				const result = mutation(mutation_context.ctx as unknown as any); // TODO type ?
+				mutation_context.flush_after_mutation();
+				return result;
 			},
 		});
 
@@ -225,14 +291,6 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 				return HANDLED;
 			},
 		};
-
-		// Set up message handlers if provided
-		if (options.onsend) {
-			this.actions.onsend = options.onsend;
-		}
-		if (options.onreceive) {
-			this.actions.onreceive = options.onreceive;
-		}
 
 		// Add providers if provided in options
 		if (options.providers?.length) {
@@ -264,6 +322,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	): Promise<T> {
 		const request_id = create_uuid();
 
+		// TODO BLOCK `this.actions.send()` vs this
 		return this.api_client.send_action<T>(
 			'submit_completion',
 			{

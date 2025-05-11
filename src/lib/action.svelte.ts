@@ -12,10 +12,7 @@ import {Action_Json} from '$lib/action_types.js';
 
 export interface Action_Options extends Cell_Options<typeof Action_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
-// TODO think about splitting out a different non-reactive version
-// that only handles the static expectation,
-// but then another for dynamic usage? is there even such a thing of an action changing?
-// if not shouldn't we just remove the $state below?
+// TODO this class is a mess, probably refactor all of this to have generic immutable data
 export class Action extends Cell<typeof Action_Json> {
 	method: Action_Method = $state()!;
 	kind: Action_Kind = $state()!;

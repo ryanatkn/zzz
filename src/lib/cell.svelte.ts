@@ -169,6 +169,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 		this.register();
 	}
 
+	// TODO handle disposing a subtree?
 	/**
 	 * Clean up resources when this cell is no longer needed.
 	 * Should be called before the cell is discarded.

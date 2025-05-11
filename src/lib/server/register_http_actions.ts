@@ -1,7 +1,7 @@
 import {Hono} from 'hono';
 
 import type {Zzz_Server} from '$lib/server/zzz_server.js';
-import {Path_With_Trailing_Slash} from '$lib/zod_helpers.js';
+import {Path_Without_Trailing_Slash} from '$lib/zod_helpers.js';
 import {JSONRPC_VERSION} from '$lib/jsonrpc.js';
 
 export interface Register_Actions_Options {
@@ -15,7 +15,7 @@ export interface Register_Actions_Options {
  */
 export const register_http_actions = ({app, zzz_server, path}: Register_Actions_Options): void => {
 	// Register a single JSON-RPC endpoint that handles all methods
-	const final_path = Path_With_Trailing_Slash.parse(path);
+	const final_path = Path_Without_Trailing_Slash.parse(path);
 
 	app.post(final_path, async (c) => {
 		console.log(`[http] <${c.req.url}>`);

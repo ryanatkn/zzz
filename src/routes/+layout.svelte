@@ -24,13 +24,8 @@
 	import {Provider_Json} from '$lib/provider.svelte.js';
 	import create_zzz_config from '$lib/config.js';
 	import {Model_Json} from '$lib/model.svelte.js';
-	import {send_mutations, receive_mutations} from '$lib/mutations.js';
-	import type {
-		Action_Message_From_Client,
-		Action_Message_From_Server,
-	} from '$lib/action_collections.js';
-	import {create_mutation_context} from '$lib/mutation.js';
 	import {WEBSOCKET_URL, API_URL} from '$lib/constants.js';
+	import {receive_mutations, send_mutations} from '$lib/mutations.js';
 
 	interface Props {
 		children: Snippet;
@@ -57,58 +52,8 @@
 		api_url: API_URL,
 		socket_url: WEBSOCKET_URL,
 		cell_classes,
-		onsend: (message: Action_Message_From_Client) => {
-			console.log('[ws] sending message', message);
-			zzz.socket.send(message); // TODO JSON-RPC
-
-			// TODO dynamic registry?
-			const mutation = send_mutations[message.method]; // TODO think about before/after
-			if (!mutation) {
-				// Ignore messages with no mutations
-				// console.warn('unknown message name, ignoring:', message.method, message);
-				return;
-			}
-
-			const mutation_context = create_mutation_context(
-				zzz,
-				message.method,
-				message, // For client actions, params are the full message
-				undefined, // Result is undefined for sending
-			);
-
-			// TODO @many try/catch?
-			const result = mutation(mutation_context.ctx as unknown as any); // TODO type ?
-			mutation_context.flush_after_mutation();
-			return result;
-		},
-		onreceive: (message: Action_Message_From_Server) => {
-			console.log(`[ws] received message`, message);
-
-			const mutation = receive_mutations[message.method];
-			if (!mutation) {
-				// Ignore messages with no mutations
-				// console.warn('unknown message type, ignoring:', message.type, message);
-				return;
-			}
-
-			const mutation_context = create_mutation_context(
-				zzz,
-				message.method,
-				message, // For received actions, params are the full message
-				// TODO BLOCK delete this?
-				{
-					ok: true,
-					status: 200, // TODO BLOCK @many JSON-RPC need to forward status, use JSON-RPC like MCP
-					value: message,
-					zzz,
-				},
-			);
-
-			// TODO @many try/catch?
-			const result = mutation(mutation_context.ctx as unknown as any); // TODO type ?
-			mutation_context.flush_after_mutation();
-			return result;
-		},
+		receive_mutations,
+		send_mutations,
 	});
 
 	// Enhance schemas with metadata for deserialization - use class names
@@ -123,6 +68,7 @@
 
 	// Initialize the session
 	if (BROWSER) {
+		// TODO BLOCK entrypoint to refactor actions
 		zzz.actions.send({id: create_uuid(), created: get_datetime_now(), method: 'load_session'});
 	}
 

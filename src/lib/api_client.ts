@@ -106,6 +106,7 @@ export class Api_Client {
 			} else {
 				this.#resolve_pending_request(id, message.result);
 			}
+			// TODO BLOCK this doesn't seem right, need to clarify api_client vs zzz vs actions
 			return;
 		}
 

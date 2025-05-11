@@ -30,6 +30,8 @@ export type Actions_Json = z.infer<typeof Actions_Json>;
 export type Actions_Json_Input = z.input<typeof Actions_Json>;
 
 export interface Actions_Options extends Cell_Options<typeof Actions_Json> {
+	onsend: (action: Action_Message_From_Client) => void; // TODO these names are confused, they need to be about direction
+	onreceive: (action: Action_Message_From_Server) => void; // TODO these names are confused, they need to be about direction
 	history_limit?: number;
 }
 
@@ -63,11 +65,14 @@ export class Actions extends Cell<typeof Actions_Json> {
 	readonly filer_changes: Array<Action> = $derived(this.items.where('by_method', 'filer_change'));
 
 	// Action handlers
-	onsend?: (action: Action_Message_From_Client) => void; // TODO these names are confused, they need to be about direction
-	onreceive?: (action: Action_Message_From_Server) => void; // TODO these names are confused, they need to be about direction
+	onsend: (action: Action_Message_From_Client) => void; // TODO these names are confused, they need to be about direction
+	onreceive: (action: Action_Message_From_Server) => void; // TODO these names are confused, they need to be about direction
 
 	constructor(options: Actions_Options) {
 		super(Actions_Json, options);
+
+		this.onsend = options.onsend;
+		this.onreceive = options.onreceive;
 
 		// Set history limit if provided
 		if (options.history_limit !== undefined) {
@@ -104,13 +109,9 @@ export class Actions extends Cell<typeof Actions_Json> {
 	 * Send an action using the registered handler with proper typing.
 	 */
 	send(action: Action_Message_From_Client): void {
-		if (!this.onsend) {
-			console.error('No send handler registered', action);
-			return;
-		}
-
 		const action_json = create_action_json(action);
-		if (action_json) this.add(action_json);
+		if (!action_json) throw new Error(`Invalid action: ${action.method}`);
+		this.add(action_json); // TODO BLOCK maybe the only concern here is history? in which case zzz can do this?
 
 		this.onsend(action);
 	}
@@ -119,13 +120,9 @@ export class Actions extends Cell<typeof Actions_Json> {
 	 * Handle a received action with proper typing.
 	 */
 	receive(action: Action_Message_From_Server): void {
-		if (!this.onreceive) {
-			console.error('No receive handler registered');
-			return;
-		}
-
 		const action_json = create_action_json(action);
-		if (action_json) this.add(action_json);
+		if (!action_json) throw new Error(`Invalid action: ${action.method}`);
+		this.add(action_json); // TODO BLOCK maybe the only concern here is history? in which case zzz can do this?
 
 		this.onreceive(action);
 	}
