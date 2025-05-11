@@ -9,7 +9,6 @@
 	import Contextmenu_Root from '@ryanatkn/fuz/Contextmenu_Root.svelte';
 	import {contextmenu_action} from '@ryanatkn/fuz/contextmenu_state.svelte.js';
 	import {parse_package_meta} from '@ryanatkn/gro/package_meta.js';
-	import * as devalue from 'devalue';
 	import {BROWSER} from 'esm-env';
 	import {page} from '$app/state';
 	import {onNavigate} from '$app/navigation';
@@ -118,20 +117,6 @@
 	if (prompt_json_obj.shape?.bits?._def?.type) {
 		// Store class name instead of schema id
 		prompt_json_obj.shape.bits._def.type.class_name = 'Bit';
-	}
-
-	// Set up the socket message handler
-	if (BROWSER) {
-		// Configure socket message handler
-		zzz.socket.onmessage = (event) => {
-			try {
-				const data = devalue.parse(event.data.toString());
-				console.log('[page] socket message received', data);
-				zzz.actions.receive(data);
-			} catch (err) {
-				console.error('Error processing message', err);
-			}
-		};
 	}
 
 	if (BROWSER) (window as any).app = (window as any).zzz = zzz; // no types for this, just for runtime convenience
