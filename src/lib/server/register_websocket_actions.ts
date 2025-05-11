@@ -79,12 +79,6 @@ export const handle_websocket_message = async (
 
 	console.log(`[ws] handling message`, data);
 
-	const jsonrpc_request = JSONRPCRequest.safeParse(data);
-	if (!jsonrpc_request.success) {
-		throw new Api_Error(400, 'Invalid JSON-RPC request');
-	}
-
-	// Process with the jsonrpc_server
 	const response = await zzz_server.jsonrpc_server.process_request(data);
 
 	// Only send a response if it's not a notification (which doesn't expect a response)
