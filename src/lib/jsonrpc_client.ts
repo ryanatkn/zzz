@@ -14,28 +14,30 @@ import type {
  * JSON-RPC client tbat supports multiple transports with flexible usage.
  */
 export class Jsonrpc_Client {
-	#transport: Api_Transport_Provider | null = null;
-	#transports: Map<Api_Transport, Api_Transport_Provider> = new Map();
+	#current_provider: Api_Transport_Provider | null = null;
+	#provider_by_transport: Map<Api_Transport, Api_Transport_Provider> = new Map();
 
 	/**
 	 * Sends a JSON-RPC request.
 	 */
 	send(
 		method: JSONRPCMethod,
-		params: JSONRPCRequestParams,
-		id?: JSONRPCRequestId,
-		transport_type?: Api_Transport,
+		params: JSONRPCRequestParams | undefined,
+		id: JSONRPCRequestId = create_uuid(),
+		transport?: Api_Transport,
 	): void {
-		const transport = this.#get_transport_or_throw(transport_type);
+		const provider = this.#get_transport_or_throw(transport);
 
 		const message: JSONRPCRequest = {
 			jsonrpc: '2.0',
-			id: id ?? create_uuid(),
+			id,
 			method,
-			params,
 		};
+		if (params !== undefined) {
+			message.params = params;
+		}
 
-		transport.send(message);
+		provider.send(message);
 	}
 
 	/**
@@ -43,7 +45,7 @@ export class Jsonrpc_Client {
 	 */
 	notify(
 		method: JSONRPCMethod,
-		params: JSONRPCNotificationParams,
+		params: JSONRPCNotificationParams | undefined,
 		transport?: Api_Transport,
 	): void {
 		const provider = this.#get_transport_or_throw(transport);
@@ -51,8 +53,10 @@ export class Jsonrpc_Client {
 		const message: JSONRPCNotification = {
 			jsonrpc: '2.0',
 			method,
-			params,
 		};
+		if (params !== undefined) {
+			message.params = params;
+		}
 
 		provider.send(message);
 	}
@@ -63,7 +67,9 @@ export class Jsonrpc_Client {
 	 * @throws when no transport available or ready
 	 */
 	#get_transport_or_throw(transport?: Api_Transport): Api_Transport_Provider {
-		const provider = transport ? this.#transports.get(transport) : this.#transport;
+		const provider = transport
+			? this.#provider_by_transport.get(transport)
+			: this.#current_provider;
 
 		if (!provider) {
 			throw new Error('No transport available');
@@ -79,38 +85,38 @@ export class Jsonrpc_Client {
 	 * Registers a provider for a specific transport.
 	 */
 	register_transport(transport: Api_Transport, provider: Api_Transport_Provider): void {
-		this.#transports.set(transport, provider);
+		this.#provider_by_transport.set(transport, provider);
 
 		// Set current transport if not already set
-		if (!this.#transport) {
-			this.#transport = provider;
+		if (!this.#current_provider) {
+			this.#current_provider = provider;
 		}
 	}
 
 	get_current_transport(): Api_Transport_Provider | null {
-		return this.#transport ?? null;
+		return this.#current_provider ?? null;
 	}
 
 	set_current_transport(transport: Api_Transport): boolean {
-		const provider = this.#transports.get(transport);
+		const provider = this.#provider_by_transport.get(transport);
 		if (!provider) {
 			return false;
 		}
-		this.#transport = provider;
+		this.#current_provider = provider;
 		return true;
 	}
 
 	is_ready(): boolean | null {
-		const provider = this.#transport;
+		const provider = this.#current_provider;
 		if (!provider) return null;
 		return provider.is_ready();
 	}
 
 	get_transport(transport: Api_Transport): Api_Transport_Provider | null {
-		return this.#transports.get(transport) ?? null;
+		return this.#provider_by_transport.get(transport) ?? null;
 	}
 
 	get_transport_type(): Api_Transport | null {
-		return this.#transport?.type ?? null;
+		return this.#current_provider?.type ?? null;
 	}
 }
