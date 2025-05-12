@@ -147,9 +147,9 @@ export class Chat extends Cell<typeof Chat_Json> {
 			if (response_text !== this.name) {
 				this.name = get_unique_name(response_text, this.zzz.chats.items_by_name);
 			}
-		} catch (err) {
+		} catch (error) {
 			this.init_name_status = 'initial'; // ignore failures, will retry
-			console.error('failed to infer a name for a chat', err);
+			console.error('failed to infer a name for a chat', error);
 		}
 	}
 

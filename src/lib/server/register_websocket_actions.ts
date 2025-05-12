@@ -3,7 +3,8 @@ import type {WSContext} from 'hono/ws';
 import type {createNodeWebSocket} from '@hono/node-ws';
 
 import type {Zzz_Server} from '$lib/server/zzz_server.js';
-import {should_allow_origin} from '$lib/server/security.js';
+import {verify_origin} from '$lib/server/security.js';
+import {SERVER_URL} from '$lib/constants.js';
 
 export interface Register_Websocket_Actions_Options {
 	app: Hono;
@@ -23,20 +24,10 @@ export const register_websocket_actions = ({
 }: Register_Websocket_Actions_Options): Set<WSContext> => {
 	app.get(
 		'/ws',
+		verify_origin(SERVER_URL),
 		/**
 		 * @see https://hono.dev/helpers/websocket
 		 */
-		(c, next) => {
-			console.log(`c.req`, c.req.url);
-			const origin = c.req.header('origin');
-			console.log(`c.req origin`, origin);
-
-			if (!should_allow_origin(origin)) {
-				c.status(403);
-			}
-
-			return next();
-		},
 		upgradeWebSocket(() => {
 			return {
 				onOpen(event, ws) {

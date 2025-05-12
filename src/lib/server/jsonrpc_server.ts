@@ -64,15 +64,15 @@ export const create_jsonrpc_error = (id: JSONRPCRequestId, error: any): JSONRPCE
 		switch (error.status) {
 			case 400:
 				code = JSONRPC_INVALID_PARAMS;
-				message = error.message || 'Invalid params';
+				message = error.message || 'invalid params';
 				break;
 			case 404:
 				code = JSONRPC_METHOD_NOT_FOUND;
-				message = error.message || 'Method not found';
+				message = error.message || 'method not found';
 				break;
 			default:
 				code = JSONRPC_INTERNAL_ERROR;
-				message = error.message || 'Internal server error';
+				message = error.message || 'internal server error';
 		}
 	} else if (error instanceof Error) {
 		message = error.message;
@@ -152,7 +152,7 @@ export class Jsonrpc_Server {
 					id,
 					error: {
 						code: JSONRPC_INVALID_REQUEST,
-						message: 'Invalid Request',
+						message: 'invalid request',
 					},
 				};
 			}
@@ -164,7 +164,7 @@ export class Jsonrpc_Server {
 				id,
 				error: {
 					code: JSONRPC_PARSE_ERROR,
-					message: 'Parse error',
+					message: 'parse error',
 				},
 			};
 		}

@@ -12,21 +12,16 @@ import {to_reordered_list} from '$lib/list_helpers.js';
 import type {Bit_Type} from '$lib/bit.svelte.js';
 import {get_unique_name} from '$lib/helpers.js';
 import {to_prompts_url} from '$lib/nav_helpers.js';
+import {Cell_Json} from '$lib/cell_types.js';
 
-export const Prompts_Json = z
-	.object({
-		items: cell_array(
-			z.array(Prompt_Json).default(() => []),
-			'Prompt',
-		),
-		selected_id: z.string().nullable().default(null),
-		show_sort_controls: z.boolean().default(false),
-	})
-	.default(() => ({
-		items: [],
-		selected_id: null,
-		show_sort_controls: false,
-	}));
+export const Prompts_Json = Cell_Json.extend({
+	items: cell_array(
+		z.array(Prompt_Json).default(() => []),
+		'Prompt',
+	),
+	selected_id: z.string().nullable().default(null),
+	show_sort_controls: z.boolean().default(false),
+});
 export type Prompts_Json = z.infer<typeof Prompts_Json>;
 export type Prompts_Json_Input = z.input<typeof Prompts_Json>;
 

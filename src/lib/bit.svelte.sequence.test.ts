@@ -19,7 +19,7 @@ beforeEach(() => {
 	// Create real Text_Bit instances using the registry
 	test_bits = [];
 	for (let i = 0; i < 3; i++) {
-		const bit = zzz.registry.instantiate('Text_Bit', {
+		const bit = zzz.cell_registry.instantiate('Text_Bit', {
 			type: 'text',
 			content: `Content of bit ${i + 1}`,
 			name: `Bit ${i + 1}`,
@@ -32,7 +32,7 @@ beforeEach(() => {
 
 describe('Sequence_Bit initialization', () => {
 	test('creates with empty items when no options provided', () => {
-		const bit = zzz.registry.instantiate('Sequence_Bit');
+		const bit = zzz.cell_registry.instantiate('Sequence_Bit');
 
 		expect(bit.type).toBe('sequence');
 		expect(bit.items).toEqual([]);
@@ -49,7 +49,7 @@ describe('Sequence_Bit initialization', () => {
 		const test_id = create_uuid();
 		const test_date = get_datetime_now();
 
-		const bit = zzz.registry.instantiate('Sequence_Bit', {
+		const bit = zzz.cell_registry.instantiate('Sequence_Bit', {
 			id: test_id,
 			created: test_date,
 			type: 'sequence',
@@ -79,7 +79,7 @@ describe('Sequence_Bit initialization', () => {
 
 describe('Sequence_Bit content derivation', () => {
 	test('content combines referenced bits with double newlines', () => {
-		const sequence_bit = zzz.registry.instantiate('Sequence_Bit', {
+		const sequence_bit = zzz.cell_registry.instantiate('Sequence_Bit', {
 			type: 'sequence',
 			items: test_bits.map((b) => b.id),
 		});
@@ -89,7 +89,7 @@ describe('Sequence_Bit content derivation', () => {
 	});
 
 	test('content updates when referenced bits change', () => {
-		const sequence_bit = zzz.registry.instantiate('Sequence_Bit', {
+		const sequence_bit = zzz.cell_registry.instantiate('Sequence_Bit', {
 			type: 'sequence',
 			items: [test_bits[0].id, test_bits[1].id],
 		});
@@ -105,14 +105,14 @@ describe('Sequence_Bit content derivation', () => {
 	});
 
 	test('content handles empty sequences', () => {
-		const sequence_bit = zzz.registry.instantiate('Sequence_Bit');
+		const sequence_bit = zzz.cell_registry.instantiate('Sequence_Bit');
 		expect(sequence_bit.content).toBe('');
 	});
 
 	test('content handles missing referenced bits', () => {
 		const nonexistent_id = create_uuid();
 
-		const sequence_bit = zzz.registry.instantiate('Sequence_Bit', {
+		const sequence_bit = zzz.cell_registry.instantiate('Sequence_Bit', {
 			type: 'sequence',
 			items: [nonexistent_id],
 		});
@@ -126,7 +126,7 @@ describe('Sequence_Bit content derivation', () => {
 
 describe('Sequence_Bit item management', () => {
 	test('add method adds items to sequence', () => {
-		const sequence_bit = zzz.registry.instantiate('Sequence_Bit');
+		const sequence_bit = zzz.cell_registry.instantiate('Sequence_Bit');
 
 		// Initially empty
 		expect(sequence_bit.items).toEqual([]);
@@ -146,7 +146,7 @@ describe('Sequence_Bit item management', () => {
 	});
 
 	test('add method prevents duplicates', () => {
-		const sequence_bit = zzz.registry.instantiate('Sequence_Bit');
+		const sequence_bit = zzz.cell_registry.instantiate('Sequence_Bit');
 
 		// Add item once
 		const result1 = sequence_bit.add(test_bits[0].id);
@@ -163,7 +163,7 @@ describe('Sequence_Bit item management', () => {
 	});
 
 	test('remove method removes items from sequence', () => {
-		const sequence_bit = zzz.registry.instantiate('Sequence_Bit', {
+		const sequence_bit = zzz.cell_registry.instantiate('Sequence_Bit', {
 			type: 'sequence',
 			items: [test_bits[0].id, test_bits[1].id, test_bits[2].id],
 		});
@@ -187,7 +187,7 @@ describe('Sequence_Bit item management', () => {
 
 	test('remove method returns false for non-existent items', () => {
 		const nonexistent_id = create_uuid();
-		const sequence_bit = zzz.registry.instantiate('Sequence_Bit', {
+		const sequence_bit = zzz.cell_registry.instantiate('Sequence_Bit', {
 			type: 'sequence',
 			items: [test_bits[0].id],
 		});
@@ -200,7 +200,7 @@ describe('Sequence_Bit item management', () => {
 	});
 
 	test('move method changes item position', () => {
-		const sequence_bit = zzz.registry.instantiate('Sequence_Bit', {
+		const sequence_bit = zzz.cell_registry.instantiate('Sequence_Bit', {
 			type: 'sequence',
 			items: [test_bits[0].id, test_bits[1].id, test_bits[2].id],
 		});
@@ -224,7 +224,7 @@ describe('Sequence_Bit item management', () => {
 
 	test('move method returns false for non-existent items', () => {
 		const nonexistent_id = create_uuid();
-		const sequence_bit = zzz.registry.instantiate('Sequence_Bit', {
+		const sequence_bit = zzz.cell_registry.instantiate('Sequence_Bit', {
 			type: 'sequence',
 			items: [test_bits[0].id, test_bits[1].id],
 		});
@@ -241,7 +241,7 @@ describe('Sequence_Bit item management', () => {
 	});
 
 	test('update_content method logs warning in development', () => {
-		const sequence_bit = zzz.registry.instantiate('Sequence_Bit');
+		const sequence_bit = zzz.cell_registry.instantiate('Sequence_Bit');
 
 		// Save original console.error
 		const original_console_error = console.error;
@@ -263,7 +263,7 @@ describe('Sequence_Bit item management', () => {
 	});
 
 	test('update_content method logs warning in development', () => {
-		const sequence_bit = zzz.registry.instantiate('Sequence_Bit');
+		const sequence_bit = zzz.cell_registry.instantiate('Sequence_Bit');
 
 		// Save original console.error
 		const original_console_error = console.error;
@@ -290,7 +290,7 @@ describe('Sequence_Bit serialization', () => {
 		const test_id = create_uuid();
 		const created = get_datetime_now();
 
-		const sequence_bit = zzz.registry.instantiate('Sequence_Bit', {
+		const sequence_bit = zzz.cell_registry.instantiate('Sequence_Bit', {
 			id: test_id,
 			created,
 			type: 'sequence',
@@ -318,7 +318,7 @@ describe('Sequence_Bit serialization', () => {
 	});
 
 	test('clone creates independent copy with same values', () => {
-		const original = zzz.registry.instantiate('Sequence_Bit', {
+		const original = zzz.cell_registry.instantiate('Sequence_Bit', {
 			type: 'sequence',
 			name: 'Original sequence',
 			items: [test_bits[0].id],
@@ -344,7 +344,7 @@ describe('Sequence_Bit serialization', () => {
 
 describe('Sequence_Bit attribute management', () => {
 	test('can add, update and remove attributes', () => {
-		const bit = zzz.registry.instantiate('Sequence_Bit');
+		const bit = zzz.cell_registry.instantiate('Sequence_Bit');
 
 		// Add attribute
 		bit.add_attribute({key: 'role', value: 'container'});
@@ -370,7 +370,7 @@ describe('Sequence_Bit attribute management', () => {
 	});
 
 	test('updates attribute key and value together', () => {
-		const bit = zzz.registry.instantiate('Sequence_Bit');
+		const bit = zzz.cell_registry.instantiate('Sequence_Bit');
 
 		bit.add_attribute({key: 'class', value: 'highlight'});
 		const attr_id = bit.attributes[0].id;
@@ -385,7 +385,7 @@ describe('Sequence_Bit attribute management', () => {
 
 describe('Sequence_Bit edge cases', () => {
 	test('handles removal of bits from registry', () => {
-		const sequence_bit = zzz.registry.instantiate('Sequence_Bit', {
+		const sequence_bit = zzz.cell_registry.instantiate('Sequence_Bit', {
 			type: 'sequence',
 			items: [test_bits[0].id, test_bits[1].id, test_bits[2].id],
 		});
@@ -409,7 +409,7 @@ describe('Sequence_Bit edge cases', () => {
 
 	test('content handles nested sequences', () => {
 		// Create a nested sequence
-		const inner_sequence = zzz.registry.instantiate('Sequence_Bit', {
+		const inner_sequence = zzz.cell_registry.instantiate('Sequence_Bit', {
 			type: 'sequence',
 			name: 'Inner sequence',
 			items: [test_bits[0].id],
@@ -418,7 +418,7 @@ describe('Sequence_Bit edge cases', () => {
 		zzz.bits.items.add(inner_sequence);
 
 		// Create outer sequence that references the inner sequence
-		const outer_sequence = zzz.registry.instantiate('Sequence_Bit', {
+		const outer_sequence = zzz.cell_registry.instantiate('Sequence_Bit', {
 			type: 'sequence',
 			name: 'Outer sequence',
 			items: [inner_sequence.id, test_bits[1].id],
@@ -430,7 +430,7 @@ describe('Sequence_Bit edge cases', () => {
 
 	test('handles empty string content in referenced bits', () => {
 		// Create a bit with empty content
-		const empty_bit = zzz.registry.instantiate('Text_Bit', {
+		const empty_bit = zzz.cell_registry.instantiate('Text_Bit', {
 			type: 'text',
 			content: '',
 			name: 'Empty bit',
@@ -438,7 +438,7 @@ describe('Sequence_Bit edge cases', () => {
 		zzz.bits.items.add(empty_bit);
 
 		// Create sequence with normal and empty bits
-		const sequence_bit = zzz.registry.instantiate('Sequence_Bit', {
+		const sequence_bit = zzz.cell_registry.instantiate('Sequence_Bit', {
 			type: 'sequence',
 			items: [test_bits[0].id, empty_bit.id, test_bits[1].id],
 		});
@@ -448,7 +448,7 @@ describe('Sequence_Bit edge cases', () => {
 	});
 
 	test('length, tokens and token_count properties are derived from content', () => {
-		const sequence_bit = zzz.registry.instantiate('Sequence_Bit', {
+		const sequence_bit = zzz.cell_registry.instantiate('Sequence_Bit', {
 			type: 'sequence',
 			items: [test_bits[0].id, test_bits[1].id],
 		});

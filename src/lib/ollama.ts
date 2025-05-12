@@ -24,8 +24,8 @@ export const ollama_list = async (): Promise<ListResponse | null> => {
 	let model_list: ListResponse | null = null;
 	try {
 		model_list = await ollama.list();
-	} catch (err) {
-		console.log(`failed to call \`ollama.list()\``, err);
+	} catch (error) {
+		console.log(`failed to call \`ollama.list()\``, error);
 	}
 	return model_list;
 };
@@ -43,8 +43,8 @@ export const ollama_list_with_metadata = async (): Promise<Ollama_Models_Respons
 		);
 
 		return {model_list, model_infos};
-	} catch (err) {
-		console.error(err);
+	} catch (error) {
+		console.error(error);
 		return null;
 	}
 };

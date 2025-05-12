@@ -12,6 +12,7 @@ import type {
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {create_multi_index} from '$lib/indexed_collection_helpers.js';
+import {Cell_Json} from '$lib/cell_types.js';
 
 // TODO BLOCK so is this like our "dispatch context"? for each action,
 // we may have one or more messages,
@@ -20,16 +21,12 @@ import {create_multi_index} from '$lib/indexed_collection_helpers.js';
 export const HISTORY_LIMIT_DEFAULT = 512;
 export const PONG_DISPLAY_LIMIT = 6;
 
-export const Actions_Json = z
-	.object({
-		items: cell_array(
-			z.array(Action_Json).default(() => []),
-			'Action',
-		),
-	})
-	.default(() => ({
-		items: [],
-	}));
+export const Actions_Json = Cell_Json.extend({
+	items: cell_array(
+		z.array(Action_Json).default(() => []),
+		'Action',
+	),
+});
 export type Actions_Json = z.infer<typeof Actions_Json>;
 export type Actions_Json_Input = z.input<typeof Actions_Json>;
 

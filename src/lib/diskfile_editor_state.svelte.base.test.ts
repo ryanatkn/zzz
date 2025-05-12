@@ -23,7 +23,7 @@ beforeEach(() => {
 
 	// Create a real diskfile through the registry
 	test_diskfile = zzz.diskfiles.add(
-		zzz.registry.instantiate('Diskfile', {
+		zzz.cell_registry.instantiate('Diskfile', {
 			path: TEST_PATH,
 			content: TEST_CONTENT,
 		}),
@@ -69,7 +69,7 @@ describe('initialization', () => {
 	test('editor_state handles initialization with null content', () => {
 		// Create a diskfile with null content
 		const null_diskfile = zzz.diskfiles.add(
-			zzz.registry.instantiate('Diskfile', {
+			zzz.cell_registry.instantiate('Diskfile', {
 				path: Diskfile_Path.parse('/null/content.txt'),
 				content: null,
 			}),
@@ -229,7 +229,7 @@ describe('content metrics', () => {
 	test('length_diff_percent handles zero original length correctly', () => {
 		// Create a diskfile with empty content
 		const empty_diskfile = zzz.diskfiles.add(
-			zzz.registry.instantiate('Diskfile', {
+			zzz.cell_registry.instantiate('Diskfile', {
 				path: Diskfile_Path.parse('/empty/file.txt'),
 				content: '',
 			}),
@@ -260,7 +260,7 @@ describe('file management', () => {
 		const another_path = Diskfile_Path.parse('/different/file.txt');
 		const another_content = 'Different file content';
 		const another_diskfile = zzz.diskfiles.add(
-			zzz.registry.instantiate('Diskfile', {
+			zzz.cell_registry.instantiate('Diskfile', {
 				path: another_path,
 				content: another_content,
 			}),

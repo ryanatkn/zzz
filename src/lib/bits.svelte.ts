@@ -7,17 +7,14 @@ import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {create_single_index} from '$lib/indexed_collection_helpers.js';
 import {Uuid} from '$lib/zod_helpers.js';
 import {get_unique_name} from '$lib/helpers.js';
+import {Cell_Json} from '$lib/cell_types.js';
 
-export const Bits_Json = z
-	.object({
-		items: cell_array(
-			z.array(Bit_Json).default(() => []),
-			'Bit',
-		),
-	})
-	.default(() => ({
-		items: [],
-	}));
+export const Bits_Json = Cell_Json.extend({
+	items: cell_array(
+		z.array(Bit_Json).default(() => []),
+		'Bit',
+	),
+});
 export type Bits_Json = z.infer<typeof Bits_Json>;
 export type Bits_Json_Input = z.input<typeof Bits_Json>;
 

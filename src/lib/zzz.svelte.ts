@@ -47,7 +47,8 @@ import type {Action_Spec} from '$lib/action_spec.js';
 export const zzz_context = create_context<Zzz>();
 
 export const Zzz_Json = Cell_Json.extend({
-	ui: Ui_Json,
+	ui: Ui_Json.default(() => Ui_Json.parse({})),
+	// TODO other state?
 });
 export type Zzz_Json = z.infer<typeof Zzz_Json>;
 export type Zzz_Json_Input = z.input<typeof Zzz_Json>;
@@ -80,7 +81,7 @@ export interface Zzz_Options extends Omit_Strict<Cell_Options<typeof Zzz_Json>, 
  */
 export class Zzz extends Cell<typeof Zzz_Json> {
 	// App-wide cell registry - maps class name to constructor and tracks registered instances
-	readonly registry: Cell_Registry;
+	readonly cell_registry: Cell_Registry;
 
 	/**
 	 * Action registry for centralized action specification access.
@@ -150,14 +151,14 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		// Set the circular reference now that the object is constructed
 		(this as Assignable<typeof this, 'zzz'>).zzz = this;
 
-		this.registry = new Cell_Registry(this);
+		this.cell_registry = new Cell_Registry(this);
 
 		this.action_registry = new Action_Registry(options.action_specs || []); // making this optional for now, the app will just have no actions
 
-		// Register cell classes if provided, otherwise use default cell_classes
+		// Register cell classes if provided, otherwise use the default
 		const cells_to_register = options.cell_classes || cell_classes;
 		for (const constructor of Object.values(cells_to_register)) {
-			this.registry.register(constructor);
+			this.cell_registry.register(constructor);
 		}
 
 		// Initialize cell collections

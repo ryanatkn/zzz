@@ -64,7 +64,7 @@ beforeEach(() => {
 
 		// Create the diskfile
 		const diskfile = zzz.diskfiles.add(
-			zzz.registry.instantiate('Diskfile', {
+			zzz.cell_registry.instantiate('Diskfile', {
 				path,
 				content,
 			}),
@@ -79,7 +79,7 @@ describe('Diskfile_Bit initialization', () => {
 	test('creates with minimal values when only path provided', () => {
 		const path = TEST_PATHS.BASIC;
 
-		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+		const bit = zzz.cell_registry.instantiate('Diskfile_Bit', {
 			type: 'diskfile',
 			path,
 		});
@@ -100,7 +100,7 @@ describe('Diskfile_Bit initialization', () => {
 		const test_path = TEST_PATHS.CONFIG;
 		const test_date = get_datetime_now();
 
-		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+		const bit = zzz.cell_registry.instantiate('Diskfile_Bit', {
 			id: test_id,
 			created: test_date,
 			type: 'diskfile',
@@ -133,7 +133,7 @@ describe('Diskfile_Bit initialization', () => {
 	});
 
 	test('initializes with null path', () => {
-		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+		const bit = zzz.cell_registry.instantiate('Diskfile_Bit', {
 			type: 'diskfile',
 			path: null,
 		});
@@ -149,7 +149,7 @@ describe('Diskfile_Bit content access', () => {
 		const path = TEST_PATHS.DOCUMENT;
 		const content = TEST_CONTENT.DOCUMENT;
 
-		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+		const bit = zzz.cell_registry.instantiate('Diskfile_Bit', {
 			type: 'diskfile',
 			path,
 		});
@@ -163,7 +163,7 @@ describe('Diskfile_Bit content access', () => {
 		const initial_content = TEST_CONTENT.EDITABLE.INITIAL;
 		const updated_content = TEST_CONTENT.EDITABLE.UPDATED;
 
-		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+		const bit = zzz.cell_registry.instantiate('Diskfile_Bit', {
 			type: 'diskfile',
 			path,
 		});
@@ -185,7 +185,7 @@ describe('Diskfile_Bit content access', () => {
 		const initial_content = TEST_CONTENT.EDITABLE.INITIAL;
 		const updated_content = TEST_CONTENT.EDITABLE.UPDATED;
 
-		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+		const bit = zzz.cell_registry.instantiate('Diskfile_Bit', {
 			type: 'diskfile',
 			path,
 		});
@@ -205,7 +205,7 @@ describe('Diskfile_Bit content access', () => {
 	test('content is undefined when diskfile not found', () => {
 		const path = TEST_PATHS.NONEXISTENT;
 
-		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+		const bit = zzz.cell_registry.instantiate('Diskfile_Bit', {
 			type: 'diskfile',
 			path,
 		});
@@ -216,7 +216,7 @@ describe('Diskfile_Bit content access', () => {
 
 	test('setting content to null logs error in development', () => {
 		const path = TEST_PATHS.BASIC;
-		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+		const bit = zzz.cell_registry.instantiate('Diskfile_Bit', {
 			type: 'diskfile',
 			path,
 		});
@@ -251,7 +251,7 @@ describe('Diskfile_Bit reactive properties', () => {
 		const initial_content = TEST_CONTENT.REACTIVE.INITIAL;
 		const updated_content = TEST_CONTENT.REACTIVE.UPDATED;
 
-		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+		const bit = zzz.cell_registry.instantiate('Diskfile_Bit', {
 			type: 'diskfile',
 			path,
 		});
@@ -272,7 +272,7 @@ describe('Diskfile_Bit reactive properties', () => {
 		const path1 = TEST_PATHS.BASIC;
 		const path2 = TEST_PATHS.CONFIG;
 
-		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+		const bit = zzz.cell_registry.instantiate('Diskfile_Bit', {
 			type: 'diskfile',
 			path: path1,
 		});
@@ -295,7 +295,7 @@ describe('Diskfile_Bit serialization', () => {
 		const path = TEST_PATHS.BASIC;
 		const created = get_datetime_now();
 
-		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+		const bit = zzz.cell_registry.instantiate('Diskfile_Bit', {
 			id: test_id,
 			created,
 			type: 'diskfile',
@@ -322,7 +322,7 @@ describe('Diskfile_Bit serialization', () => {
 		const original_path = TEST_PATHS.BASIC;
 		const modified_path = TEST_PATHS.CONFIG;
 
-		const original = zzz.registry.instantiate('Diskfile_Bit', {
+		const original = zzz.cell_registry.instantiate('Diskfile_Bit', {
 			type: 'diskfile',
 			path: original_path,
 			name: 'Original name',
@@ -350,7 +350,7 @@ describe('Diskfile_Bit edge cases', () => {
 	test('handles special characters in path', () => {
 		const path = TEST_PATHS.SPECIAL_CHARS;
 
-		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+		const bit = zzz.cell_registry.instantiate('Diskfile_Bit', {
 			type: 'diskfile',
 			path,
 		});
@@ -365,7 +365,7 @@ describe('Diskfile_Bit edge cases', () => {
 		const diskfile = test_diskfiles.get(path)!;
 		diskfile.content = '';
 
-		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+		const bit = zzz.cell_registry.instantiate('Diskfile_Bit', {
 			type: 'diskfile',
 			path,
 		});
@@ -381,7 +381,7 @@ describe('Diskfile_Bit edge cases', () => {
 		const diskfile = test_diskfiles.get(path)!;
 		diskfile.content = binary_content;
 
-		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+		const bit = zzz.cell_registry.instantiate('Diskfile_Bit', {
 			type: 'diskfile',
 			path,
 		});
@@ -391,7 +391,7 @@ describe('Diskfile_Bit edge cases', () => {
 	});
 
 	test('handles changing from null path to valid path', () => {
-		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+		const bit = zzz.cell_registry.instantiate('Diskfile_Bit', {
 			type: 'diskfile',
 			path: null,
 		});
@@ -413,7 +413,7 @@ describe('Diskfile_Bit edge cases', () => {
 
 	test('handles changing from valid path to null path', () => {
 		const path = TEST_PATHS.BASIC;
-		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+		const bit = zzz.cell_registry.instantiate('Diskfile_Bit', {
 			type: 'diskfile',
 			path,
 		});
@@ -434,7 +434,7 @@ describe('Diskfile_Bit edge cases', () => {
 
 describe('Diskfile_Bit attribute management', () => {
 	test('can add, update and remove attributes', () => {
-		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+		const bit = zzz.cell_registry.instantiate('Diskfile_Bit', {
 			type: 'diskfile',
 			path: TEST_PATHS.BASIC,
 		});
@@ -463,7 +463,7 @@ describe('Diskfile_Bit attribute management', () => {
 	});
 
 	test('updates attribute key and value together', () => {
-		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+		const bit = zzz.cell_registry.instantiate('Diskfile_Bit', {
 			type: 'diskfile',
 			path: TEST_PATHS.BASIC,
 		});
@@ -479,7 +479,7 @@ describe('Diskfile_Bit attribute management', () => {
 	});
 
 	test('attributes are preserved when serializing to JSON', () => {
-		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+		const bit = zzz.cell_registry.instantiate('Diskfile_Bit', {
 			type: 'diskfile',
 			path: TEST_PATHS.BASIC,
 		});
@@ -494,7 +494,7 @@ describe('Diskfile_Bit attribute management', () => {
 		expect(json.attributes[1].key).toBe('class');
 
 		// Verify they're properly restored
-		const new_bit = zzz.registry.instantiate('Diskfile_Bit', json);
+		const new_bit = zzz.cell_registry.instantiate('Diskfile_Bit', json);
 
 		expect(new_bit.attributes).toHaveLength(2);
 		expect(new_bit.attributes[0].key).toBe('data-test');
@@ -504,7 +504,7 @@ describe('Diskfile_Bit attribute management', () => {
 
 describe('Diskfile_Bit position markers', () => {
 	test('start and end positions are initialized properly', () => {
-		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+		const bit = zzz.cell_registry.instantiate('Diskfile_Bit', {
 			type: 'diskfile',
 			path: TEST_PATHS.BASIC,
 			start: 10,
@@ -516,7 +516,7 @@ describe('Diskfile_Bit position markers', () => {
 	});
 
 	test('start and end positions can be updated', () => {
-		const bit = zzz.registry.instantiate('Diskfile_Bit', {
+		const bit = zzz.cell_registry.instantiate('Diskfile_Bit', {
 			type: 'diskfile',
 			path: TEST_PATHS.BASIC,
 		});

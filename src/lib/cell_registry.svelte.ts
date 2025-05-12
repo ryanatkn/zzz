@@ -5,8 +5,7 @@ import {DEV} from 'esm-env';
 import type {Cell} from '$lib/cell.svelte.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 import type {Cell_Registry_Map} from '$lib/cell_classes.js';
-import {SvelteMap} from 'svelte/reactivity';
-import type {Uuid} from './zod_helpers.js';
+import type {Uuid} from '$lib/zod_helpers.js';
 
 /**
  * Error thrown when attempting to instantiate an unregistered class.
@@ -37,8 +36,11 @@ export class Cell_Registry {
 
 	readonly class_names: Array<string> = $derived(Array.from(this.#constructors.keys()));
 
-	// TODO is this overhead acceptable? maybe not reactive?
-	readonly all: SvelteMap<Uuid, Cell> = new SvelteMap();
+	// TODO maybe make this a reactive SvelteMap? or delete this feature completely?
+	// currently not using except it logs some errors on mistakes, but I think there's a lot of potential,
+	// the idea being total knowledge of the full cell graph in memory,
+	// and we could potentially make the collection itself reactive
+	readonly all: Map<Uuid, Cell> = new Map();
 
 	constructor(zzz: Zzz) {
 		this.zzz = zzz;

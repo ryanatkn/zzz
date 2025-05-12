@@ -216,10 +216,10 @@ export class Safe_Fs {
 			if (stats.isSymbolicLink()) {
 				throw new Symlink_Not_Allowed_Error(normalized_path);
 			}
-		} catch (err) {
+		} catch (error) {
 			// If error is due to non-existence, ignore
-			if (!(err instanceof Error && err.message.includes('ENOENT'))) {
-				throw err;
+			if (!(error instanceof Error && error.message.includes('ENOENT'))) {
+				throw error;
 			}
 		}
 
@@ -234,9 +234,9 @@ export class Safe_Fs {
 				if (stats.isSymbolicLink()) {
 					throw new Symlink_Not_Allowed_Error(parent);
 				}
-			} catch (err) {
-				if (!(err instanceof Error && err.message.includes('ENOENT'))) {
-					throw err;
+			} catch (error) {
+				if (!(error instanceof Error && error.message.includes('ENOENT'))) {
+					throw error;
 				}
 			}
 			current = parent;

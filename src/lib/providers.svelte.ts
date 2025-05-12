@@ -3,17 +3,14 @@ import {z} from 'zod';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Provider, Provider_Json} from '$lib/provider.svelte.js';
 import {cell_array} from '$lib/cell_helpers.js';
+import {Cell_Json} from '$lib/cell_types.js';
 
-export const Providers_Json = z
-	.object({
-		items: cell_array(
-			z.array(Provider_Json).default(() => []),
-			'Provider',
-		),
-	})
-	.default(() => ({
-		items: [],
-	}));
+export const Providers_Json = Cell_Json.extend({
+	items: cell_array(
+		z.array(Provider_Json).default(() => []),
+		'Provider',
+	),
+});
 export type Providers_Json = z.infer<typeof Providers_Json>;
 export type Providers_Json_Input = z.input<typeof Providers_Json>;
 

@@ -23,7 +23,7 @@ beforeEach(() => {
 
 	// Create a real diskfile through the registry
 	test_diskfile = zzz.diskfiles.add(
-		zzz.registry.instantiate('Diskfile', {
+		zzz.cell_registry.instantiate('Diskfile', {
 			path: TEST_PATH,
 			content: TEST_CONTENT,
 		}),
@@ -107,7 +107,7 @@ describe('disk change detection', () => {
 	test('handles first-time initialization correctly', () => {
 		// Create a new diskfile with uninitialized last_seen_disk_content
 		const new_diskfile = zzz.diskfiles.add(
-			zzz.registry.instantiate('Diskfile', {
+			zzz.cell_registry.instantiate('Diskfile', {
 				path: Diskfile_Path.parse('/new/file.txt'),
 				content: 'Initial content',
 			}),
@@ -323,7 +323,7 @@ describe('edge cases', () => {
 		// Create a new diskfile with a custom path
 		const empty_history_path = Diskfile_Path.parse('/empty/history.txt');
 		const empty_history_diskfile = zzz.diskfiles.add(
-			zzz.registry.instantiate('Diskfile', {
+			zzz.cell_registry.instantiate('Diskfile', {
 				path: empty_history_path,
 				content: 'Initial',
 			}),

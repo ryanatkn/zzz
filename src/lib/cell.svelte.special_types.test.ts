@@ -37,7 +37,7 @@ test('Cell uses registry for instantiating class relationships', () => {
 		}
 
 		test_instantiate(json: any, class_name: string): unknown {
-			return this.zzz.registry.instantiate(class_name as any, json);
+			return this.zzz.cell_registry.instantiate(class_name as any, json);
 		}
 	}
 
@@ -51,7 +51,7 @@ test('Cell uses registry for instantiating class relationships', () => {
 
 	// Mock the registry instantiate method for this specific test
 	const mock_instantiate = vi
-		.spyOn(zzz.registry, 'instantiate')
+		.spyOn(zzz.cell_registry, 'instantiate')
 		.mockImplementation((name: any, json) => {
 			if (name === 'Test_Type') {
 				return {type: 'Test_Type', ...((json as any) || {})};

@@ -1334,7 +1334,6 @@ export const src_json = {
 				{name: 'SERVER_PROXIED_PORT', kind: 'variable'},
 				{name: 'SERVER_URL', kind: 'variable'},
 				{name: 'ZZZ_DIRNAME', kind: 'variable'},
-				{name: 'REQUEST_TIMEOUT', kind: 'variable'},
 				{name: 'CONTENT_PREVIEW_LENGTH', kind: 'variable'},
 				{name: 'API_PATH', kind: 'variable'},
 				{name: 'API_URL', kind: 'variable'},

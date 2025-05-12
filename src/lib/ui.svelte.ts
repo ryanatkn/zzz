@@ -1,16 +1,12 @@
 import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
+import {Cell_Json} from '$lib/cell_types.js';
 
-export const Ui_Json = z
-	.object({
-		show_main_dialog: z.boolean().default(false),
-		show_sidebar: z.boolean().default(true),
-	})
-	.default(() => ({
-		show_main_dialog: false,
-		show_sidebar: true,
-	}));
+export const Ui_Json = Cell_Json.extend({
+	show_main_dialog: z.boolean().default(false),
+	show_sidebar: z.boolean().default(true),
+});
 export type Ui_Json = z.infer<typeof Ui_Json>;
 export type Ui_Json_Input = z.input<typeof Ui_Json>;
 

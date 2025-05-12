@@ -306,19 +306,16 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 		const server_api_url = SERVER_URL + API_PATH + '/ping';
 
 		let error_message: string | undefined;
-		let timeout_id;
 
 		try {
 			const start_time = Date.now();
 
-			// TODO BLOCK use a normal ping action (.send_ping below if it remains, also forward the signal)
+			// TODO BLOCK use a normal ping action (.send_ping below if it remains but needs to return a promise, also forward the signal)
 			const response = await fetch(server_api_url, {
 				signal: AbortSignal.timeout(REQUEST_TIMEOUT),
 				method: 'GET',
-				headers: {accept: 'application/json', 'content-type': 'application/json'},
+				headers: {'content-type': 'application/json', accept: 'application/json'},
 			});
-
-			clearTimeout(timeout_id);
 
 			if (response.ok) {
 				const data = await response.json();
@@ -339,14 +336,13 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 			} else {
 				error_message = `Server responded with status ${response.status}: ${response.statusText}`;
 			}
-		} catch (err) {
-			clearTimeout(timeout_id);
-
-			console.error('Failed to connect to server:', err);
-			if (err instanceof DOMException && err.name === 'AbortError') {
+		} catch (error) {
+			console.error('Failed to connect to server:', error);
+			if (error instanceof DOMException && error.name === 'AbortError') {
 				error_message = 'Request timed out';
 			} else {
-				error_message = err instanceof Error ? err.message : 'Unknown error connecting to server';
+				error_message =
+					error instanceof Error ? error.message : 'Unknown error connecting to server';
 			}
 		}
 
@@ -392,9 +388,9 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 			} else {
 				error_message = 'No response from Ollama API';
 			}
-		} catch (err) {
-			console.error('Failed to connect to Ollama API:', err);
-			error_message = err instanceof Error ? err.message : 'Unknown error connecting to Ollama';
+		} catch (error) {
+			console.error('Failed to connect to Ollama API:', error);
+			error_message = error instanceof Error ? error.message : 'Unknown error connecting to Ollama';
 		}
 
 		if (error_message) {

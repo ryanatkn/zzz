@@ -13,23 +13,18 @@ import {get_unique_name} from '$lib/helpers.js';
 import {to_chats_url} from '$lib/nav_helpers.js';
 import {chat_template_defaults} from '$lib/config_defaults.js';
 import type {Chat_Template} from '$lib/chat_template.js';
+import {Cell_Json} from '$lib/cell_types.js';
 
-export const Chats_Json = z
-	.object({
-		// First create the array, then apply default, then attach metadata
-		items: cell_array(
-			z.array(Chat_Json).default(() => []),
-			'Chat',
-		),
-		selected_id: z.string().nullable().default(null),
-		selected_id_last_non_null: z.string().nullable().default(null),
-		show_sort_controls: z.boolean().default(false),
-	})
-	.default(() => ({
-		items: [],
-		selected_id: null,
-		show_sort_controls: false,
-	}));
+export const Chats_Json = Cell_Json.extend({
+	// First create the array, then apply default, then attach metadata
+	items: cell_array(
+		z.array(Chat_Json).default(() => []),
+		'Chat',
+	),
+	selected_id: z.string().nullable().default(null),
+	selected_id_last_non_null: z.string().nullable().default(null),
+	show_sort_controls: z.boolean().default(false),
+});
 export type Chats_Json = z.infer<typeof Chats_Json>;
 export type Chats_Json_Input = z.input<typeof Chats_Json>;
 

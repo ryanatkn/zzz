@@ -23,7 +23,7 @@ beforeEach(() => {
 
 	// Create a real diskfile through the registry
 	test_diskfile = zzz.diskfiles.add(
-		zzz.registry.instantiate('Diskfile', {
+		zzz.cell_registry.instantiate('Diskfile', {
 			path: TEST_PATH,
 			content: TEST_CONTENT,
 		}),

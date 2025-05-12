@@ -69,7 +69,7 @@ const main = (): void => {
 // Some configured deployment targets in SvelteKit don't support top-level await yet but this is sync atm
 try {
 	main(); // TODO BLOCK change this to be `main.ts` and `create_server.ts`
-} catch (err) {
-	console.error('error starting server:', err);
-	throw err;
+} catch (error) {
+	console.error('error starting server:', error);
+	throw error;
 }

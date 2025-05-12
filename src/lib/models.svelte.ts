@@ -9,17 +9,14 @@ import {
 	create_multi_index,
 	create_derived_index,
 } from '$lib/indexed_collection_helpers.js';
+import {Cell_Json} from '$lib/cell_types.js';
 
-export const Models_Json = z
-	.object({
-		items: cell_array(
-			z.array(Model_Json).default(() => []),
-			'Model',
-		),
-	})
-	.default(() => ({
-		items: [],
-	}));
+export const Models_Json = Cell_Json.extend({
+	items: cell_array(
+		z.array(Model_Json).default(() => []),
+		'Model',
+	),
+});
 export type Models_Json = z.infer<typeof Models_Json>;
 export type Models_Json_Input = z.input<typeof Models_Json>;
 

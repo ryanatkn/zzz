@@ -192,8 +192,8 @@ export class Socket extends Cell<typeof Socket_Json> {
 			ws.addEventListener('close', this.#handle_close);
 			ws.addEventListener('error', this.#handle_error);
 			ws.addEventListener('message', this.#handle_message);
-		} catch (err) {
-			console.error('Failed to create WebSocket:', err);
+		} catch (error) {
+			console.error('Failed to create WebSocket:', error);
 			this.ws = null;
 			this.open = false;
 			this.status = 'failure';
@@ -219,8 +219,8 @@ export class Socket extends Cell<typeof Socket_Json> {
 			if (this.open) {
 				try {
 					this.ws.close(code);
-				} catch (err) {
-					console.error('Error closing WebSocket:', err);
+				} catch (error) {
+					console.error('Error closing WebSocket:', error);
 				}
 			}
 
@@ -242,8 +242,8 @@ export class Socket extends Cell<typeof Socket_Json> {
 				this.ws!.send(JSON.stringify(data));
 				this.last_send_time = Date.now();
 				return true;
-			} catch (err) {
-				console.error('Error sending message:', err);
+			} catch (error) {
+				console.error('Error sending message:', error);
 				this.#queue_message(data);
 				return false;
 			}
@@ -381,12 +381,12 @@ export class Socket extends Cell<typeof Socket_Json> {
 			// TODO need the round-trip protocol, this is a hack
 			this.ws!.send(JSON.stringify(message.data));
 			this.last_send_time = Date.now();
-		} catch (err) {
+		} catch (error) {
 			// Mark as failed immediately since we don't have retry count anymore
 			const failed_message: Failed_Message = {
 				...message,
 				failed: Date.now(),
-				reason: err instanceof Error ? err.message : 'Unknown error',
+				reason: error instanceof Error ? error.message : 'Unknown error',
 			};
 			this.failed_messages.set(message.id, failed_message);
 		}

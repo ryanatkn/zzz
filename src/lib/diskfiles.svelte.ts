@@ -11,19 +11,15 @@ import {strip_start} from '@ryanatkn/belt/string.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {create_single_index, create_multi_index} from '$lib/indexed_collection_helpers.js';
 import {Diskfiles_Editor} from '$lib/diskfiles_editor.svelte.js';
+import {Cell_Json} from '$lib/cell_types.js';
 
-export const Diskfiles_Json = z
-	.object({
-		diskfiles: cell_array(
-			z.array(Diskfile_Json).default(() => []),
-			'Diskfile',
-		),
-		selected_file_id: Uuid.nullable().default(null),
-	})
-	.default(() => ({
-		diskfiles: [],
-		selected_file_id: null,
-	}));
+export const Diskfiles_Json = Cell_Json.extend({
+	diskfiles: cell_array(
+		z.array(Diskfile_Json).default(() => []),
+		'Diskfile',
+	),
+	selected_file_id: Uuid.nullable().default(null),
+});
 export type Diskfiles_Json = z.infer<typeof Diskfiles_Json>;
 export type Diskfiles_Json_Input = z.input<typeof Diskfiles_Json>;
 

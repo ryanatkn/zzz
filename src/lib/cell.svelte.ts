@@ -194,7 +194,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 			return;
 		}
 
-		this.zzz.registry.add_cell(this);
+		this.zzz.cell_registry.add_cell(this);
 		this.#registered = true;
 	}
 
@@ -205,7 +205,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	protected unregister(): void {
 		if (!this.#registered) return;
 
-		this.zzz.registry.remove_cell(this.id);
+		this.zzz.cell_registry.remove_cell(this.id);
 		this.#registered = false;
 	}
 
@@ -468,7 +468,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 			return null;
 		}
 
-		const instance = this.zzz.registry.maybe_instantiate(class_name as any, json, options);
+		const instance = this.zzz.cell_registry.maybe_instantiate(class_name as any, json, options);
 		if (!instance) console.error(`Failed to instantiate ${class_name}`);
 		return instance;
 	}
