@@ -1,28 +1,22 @@
 import {create_deferred, type Deferred, type Async_Status} from '@ryanatkn/belt/async.js';
 
-import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
+import {create_uuid, get_datetime_now, Uuid} from '$lib/zod_helpers.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
 import type {Action_Message_From_Server} from '$lib/action_collections.js';
 import type {Socket} from '$lib/socket.svelte.js';
 import {Jsonrpc_Client} from '$lib/jsonrpc_client.js';
 import type {JSONRPCMessage} from '$lib/jsonrpc.js';
-import type {Api_Transport} from '$lib/api.js';
+import type {Api_Params, Api_Transport, Api_Transport_Provider} from '$lib/api.js';
 
 // TODO support canceling
-
-export interface Api_Transport_Provider {
-	type: Api_Transport;
-	send: (data: JSONRPCMessage) => void;
-	is_ready: () => boolean;
-}
 
 export interface Api_Client_Options {
 	http_url?: string;
 	http_headers?: Record<string, string>;
 	socket?: Socket;
 	default_transport?: Api_Transport;
-	onreceive: (method: string, params: Record<string, any> | void, id?: string) => void;
-	onsend: (method: string, params: Record<string, any> | void, id?: string) => void;
+	onreceive: (method: string, params: Api_Params, id?: Uuid) => void;
+	onsend: (method: string, params: Api_Params, id?: Uuid) => void;
 }
 
 export interface Request_Tracker<T> {
@@ -45,10 +39,10 @@ export class Api_Client {
 	readonly #socket?: Socket;
 
 	/** Callback triggered when receiving a message from the server. */
-	#onreceive: (method: string, params: Record<string, any> | void, id?: string) => void;
+	#onreceive: (method: string, params: Api_Params, id?: Uuid) => void;
 
 	/** Callback triggered before sending a message. */
-	readonly #onsend: (method: string, params: Record<string, any> | void, id?: string) => void;
+	readonly #onsend: (method: string, params: Api_Params, id?: Uuid) => void;
 
 	readonly #pending_requests: Map<string, Request_Tracker<any>> = new Map();
 
@@ -63,7 +57,7 @@ export class Api_Client {
 		if (options.http_url) {
 			const http_transport = new Http_Api_Transport_Provider(
 				options.http_url,
-				this.#handle_incoming_message.bind(this),
+				this.#handle_incoming_message,
 				options.http_headers,
 			);
 			this.jsonrpc_client.register_transport('http', http_transport);
@@ -71,10 +65,12 @@ export class Api_Client {
 
 		// Set up WebSocket transport if socket is provided
 		if (this.#socket) {
-			const socket_transport = this.#create_socket_transport();
-			if (socket_transport) {
-				this.jsonrpc_client.register_transport('websocket', socket_transport);
-			}
+			const socket_transport = new Socket_Api_Transport_Provider(
+				this.#socket,
+				this.#handle_incoming_message,
+			);
+			this.jsonrpc_client.register_transport('websocket', socket_transport);
+			this.jsonrpc_client.set_current_transport('websocket'); // prefer if available
 		}
 	}
 
@@ -83,8 +79,8 @@ export class Api_Client {
 	 */
 	async send_action<T = any>(
 		method: Action_Method,
-		params: Record<string, any> = {},
-		id: string = create_uuid(),
+		params: Api_Params,
+		id: Uuid = create_uuid(),
 		transport?: Api_Transport,
 	): Promise<T> {
 		this.#onsend(method, params, id);
@@ -108,7 +104,7 @@ export class Api_Client {
 	/**
 	 * Send a notification to the server (no response expected).
 	 */
-	notify(method: Action_Method, params: Record<string, any> = {}): void {
+	notify(method: Action_Method, params: Api_Params): void {
 		this.#onsend(method, params);
 
 		try {
@@ -138,7 +134,7 @@ export class Api_Client {
 		this.#onreceive(method, params, id);
 	}
 
-	#handle_incoming_message(message: any): void {
+	#handle_incoming_message = (message: any): void => {
 		// JSON-RPC response
 		if (message.id && (message.result !== undefined || message.error !== undefined)) {
 			const id = message.id;
@@ -157,7 +153,7 @@ export class Api_Client {
 
 			this.#onreceive(method, params, id);
 		}
-	}
+	};
 
 	#resolve_pending_request(id: string, response: any): void {
 		const request = this.#pending_requests.get(id);
@@ -191,17 +187,6 @@ export class Api_Client {
 		request.status = 'failure';
 		request.deferred.reject(error);
 		this.#pending_requests.delete(id);
-	}
-
-	#create_socket_transport(): Api_Transport_Provider | null {
-		if (!this.#socket) {
-			return null;
-		}
-
-		return new Socket_Api_Transport_Provider(
-			this.#socket,
-			this.#handle_incoming_message.bind(this),
-		);
 	}
 
 	#track_request<T>(id: string, method: string): Deferred<T> {

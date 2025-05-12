@@ -169,15 +169,4 @@ export class Jsonrpc_Server {
 			};
 		}
 	}
-
-	/**
-	 * Create a JSON-RPC notification object.
-	 */
-	create_notification(method: string, params: Record<string, any> = {}): JSONRPCNotification {
-		return {
-			jsonrpc: JSONRPC_VERSION,
-			method,
-			params,
-		};
-	}
 }
