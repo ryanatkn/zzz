@@ -57,10 +57,7 @@ export class Model extends Cell<typeof Model_Json> {
 	);
 
 	constructor(options: Model_Options) {
-		// Pass schema and options to base constructor
 		super(Model_Json, options);
-
-		// Call init after instance properties are defined
 		this.init();
 	}
 }

@@ -20,12 +20,9 @@
 	import {package_json, src_json} from '$lib/package.js';
 	import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
 	import {Prompt_Json} from '$lib/prompt.svelte.js';
-	import {cell_classes} from '$lib/cell_classes.js';
 	import {Provider_Json} from '$lib/provider.svelte.js';
 	import create_zzz_config from '$lib/config.js';
 	import {Model_Json} from '$lib/model.svelte.js';
-	import {WEBSOCKET_URL, API_URL} from '$lib/constants.js';
-	import {receive_mutations, send_mutations} from '$lib/mutations.js';
 
 	interface Props {
 		children: Snippet;
@@ -48,13 +45,7 @@
 	pkg_context.set(parse_package_meta(package_json, src_json));
 
 	// Create an instance of Zzz with socket_url
-	const zzz = new App({
-		api_url: API_URL,
-		socket_url: WEBSOCKET_URL,
-		cell_classes,
-		receive_mutations,
-		send_mutations,
-	});
+	const zzz = new App();
 
 	// Enhance schemas with metadata for deserialization - use class names
 	// Safely access Zod schema internals using type assertion

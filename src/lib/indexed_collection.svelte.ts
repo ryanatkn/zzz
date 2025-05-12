@@ -277,6 +277,25 @@ export class Indexed_Collection<
 	}
 
 	/**
+	 * Add an item to the collection and update all indexes.
+	 */
+	add(item: T): T {
+		const {by_id} = this;
+
+		if (by_id.has(item.id)) {
+			if (DEV) console.error('Item with this id already exists in the collection: ' + item.id);
+			return by_id.get(item.id)!;
+		}
+
+		by_id.set(item.id, item);
+
+		// Update all indexes
+		this.#update_indexes_for_added_item(item);
+
+		return item;
+	}
+
+	/**
 	 * Add multiple items to the collection at once with improved performance.
 	 */
 	add_many(items: Array<T>): Array<T> {
@@ -336,25 +355,6 @@ export class Indexed_Collection<
 				this.indexes[def.key] = result;
 			}
 		}
-	}
-
-	/**
-	 * Add an item to the collection and update all indexes.
-	 */
-	add(item: T): T {
-		const {by_id} = this;
-
-		if (by_id.has(item.id)) {
-			if (DEV) console.error('Item with this id already exists in the collection: ' + item.id);
-			return by_id.get(item.id)!;
-		}
-
-		by_id.set(item.id, item);
-
-		// Update all indexes
-		this.#update_indexes_for_added_item(item);
-
-		return item;
 	}
 
 	/**

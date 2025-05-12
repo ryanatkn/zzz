@@ -1336,7 +1336,7 @@ export const src_json = {
 				{name: 'ZZZ_DIRNAME', kind: 'variable'},
 				{name: 'REQUEST_TIMEOUT', kind: 'variable'},
 				{name: 'CONTENT_PREVIEW_LENGTH', kind: 'variable'},
-				{name: 'API_ROUTE', kind: 'variable'},
+				{name: 'API_PATH', kind: 'variable'},
 				{name: 'API_URL', kind: 'variable'},
 				{name: 'WEBSOCKET_URL', kind: 'variable'},
 			],
@@ -2065,7 +2065,6 @@ export const src_json = {
 				{name: 'Register_Websocket_Actions_Options', kind: 'type'},
 				{name: 'register_websocket_actions', kind: 'function'},
 				{name: 'handle_websocket_message', kind: 'function'},
-				{name: 'send_to_websocket_clients', kind: 'function'},
 			],
 		},
 		'./server/safe_fs.js': {

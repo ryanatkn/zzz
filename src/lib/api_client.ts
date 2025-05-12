@@ -17,36 +17,19 @@ export interface Api_Transport_Provider {
 }
 
 export interface Api_Client_Options {
-	/** Endpoint for http transport. */
 	http_url?: string;
-
-	/** Socket instance for websocket transport. */
+	http_headers?: Record<string, string>;
 	socket?: Socket;
-
-	/** Default transport method to use */
 	default_transport?: Api_Transport;
-
-	/** Callback for handling server messages */
-	onreceive?: (method: string, params: Record<string, any> | void, id?: string) => void;
-
-	/** Callback triggered before sending a message */
-	onsend?: (method: string, params: Record<string, any> | void, id?: string) => void;
+	onreceive: (method: string, params: Record<string, any> | void, id?: string) => void;
+	onsend: (method: string, params: Record<string, any> | void, id?: string) => void;
 }
 
 export interface Request_Tracker<T> {
-	/** Deferred promise that will be resolved when the response is received */
 	deferred: Deferred<T>;
-
-	/** Method that was called */
 	method: string;
-
-	/** When the request was created */
 	created: string;
-
-	/** Request status */
 	status: Async_Status;
-
-	/** Timeout for request expiration */
 	timeout?: NodeJS.Timeout;
 }
 
@@ -55,17 +38,17 @@ export interface Request_Tracker<T> {
  * Uses JSON-RPC for both HTTP and WebSocket communication.
  */
 export class Api_Client {
-	/** JSON-RPC client for communication */
+	/** JSON-RPC client for encapsulating the message format. */
 	readonly jsonrpc_client = new Jsonrpc_Client();
 
-	/** Socket instance for WebSocket transport */
+	/** Socket instance for WebSocket transport. */
 	readonly #socket?: Socket;
 
-	/** Callback triggered when receiving a message from the server */
-	#onreceive?: (method: string, params: Record<string, any> | void, id?: string) => void;
+	/** Callback triggered when receiving a message from the server. */
+	#onreceive: (method: string, params: Record<string, any> | void, id?: string) => void;
 
-	/** Callback triggered before sending a message */
-	readonly #onsend?: (method: string, params: Record<string, any> | void, id?: string) => void;
+	/** Callback triggered before sending a message. */
+	readonly #onsend: (method: string, params: Record<string, any> | void, id?: string) => void;
 
 	readonly #pending_requests: Map<string, Request_Tracker<any>> = new Map();
 
@@ -81,6 +64,7 @@ export class Api_Client {
 			const http_transport = new Http_Api_Transport_Provider(
 				options.http_url,
 				this.#handle_incoming_message.bind(this),
+				options.http_headers,
 			);
 			this.jsonrpc_client.register_transport('http', http_transport);
 		}
@@ -95,8 +79,65 @@ export class Api_Client {
 	}
 
 	/**
-	 * Handle incoming messages from the server
+	 * Send an action to the server and get a response.
 	 */
+	async send_action<T = any>(
+		method: Action_Method,
+		params: Record<string, any> = {},
+		id: string = create_uuid(),
+		transport?: Api_Transport,
+	): Promise<T> {
+		this.#onsend(method, params, id);
+
+		// Create a deferred promise to track this request
+		const deferred = this.#track_request<T>(id, method);
+
+		// Send the request
+		try {
+			this.jsonrpc_client.send(method, params, id, transport);
+		} catch (error) {
+			// Remove the pending request and reject the promise
+			this.#reject_pending_request(id, error);
+			throw error;
+		}
+
+		// Return the promise that will be resolved when the response is received
+		return deferred.promise;
+	}
+
+	/**
+	 * Send a notification to the server (no response expected).
+	 */
+	notify(method: Action_Method, params: Record<string, any> = {}): void {
+		this.#onsend(method, params);
+
+		try {
+			this.jsonrpc_client.notify(method, params);
+		} catch (error) {
+			console.error('Error sending notification:', error);
+			throw error;
+		}
+	}
+
+	/**
+	 * Processes a received action message from server.
+	 * This is the primary entry point for handling incoming server messages.
+	 */
+	handle_incoming_message(message: Action_Message_From_Server): void {
+		const {id, method, params} = message;
+
+		// First check if this is a response to a pending request
+		const pending_request = id ? this.#pending_requests.get(id) : undefined;
+		if (pending_request) {
+			this.#resolve_pending_request(id, message);
+			return;
+		}
+
+		// TODO BLOCK hacky, need to clarify the role of this class
+		// Otherwise, it's a server-initiated message, pass to onreceive
+		this.#onreceive(method, params, id);
+	}
+
 	#handle_incoming_message(message: any): void {
 		// JSON-RPC response
 		if (message.id && (message.result !== undefined || message.error !== undefined)) {
@@ -114,16 +155,10 @@ export class Api_Client {
 		if (message.method) {
 			const {id, method, params} = message;
 
-			// Call the onreceive handler if provided
-			if (this.#onreceive) {
-				this.#onreceive(method, params, id);
-			}
+			this.#onreceive(method, params, id);
 		}
 	}
 
-	/**
-	 * Resolve a pending request with a response
-	 */
 	#resolve_pending_request(id: string, response: any): void {
 		const request = this.#pending_requests.get(id);
 		if (!request) {
@@ -141,9 +176,6 @@ export class Api_Client {
 		this.#pending_requests.delete(id);
 	}
 
-	/**
-	 * Reject a pending request with an error
-	 */
 	#reject_pending_request(id: string, error: any): void {
 		const request = this.#pending_requests.get(id);
 		if (!request) {
@@ -161,9 +193,6 @@ export class Api_Client {
 		this.#pending_requests.delete(id);
 	}
 
-	/**
-	 * Create a WebSocket transport provider that uses the Socket class
-	 */
 	#create_socket_transport(): Api_Transport_Provider | null {
 		if (!this.#socket) {
 			return null;
@@ -175,9 +204,6 @@ export class Api_Client {
 		);
 	}
 
-	/**
-	 * Track a new request with timeout
-	 */
 	#track_request<T>(id: string, method: string): Deferred<T> {
 		const deferred = create_deferred<T>();
 		const created = get_datetime_now();
@@ -203,77 +229,10 @@ export class Api_Client {
 
 		return deferred;
 	}
-
-	/**
-	 * Send an action to the server and get a response
-	 */
-	async send_action<T = any>(
-		method: Action_Method,
-		params: Record<string, any> = {},
-		id: string = create_uuid(),
-		transport?: Api_Transport,
-	): Promise<T> {
-		// Call the onsend handler if provided
-		if (this.#onsend) {
-			this.#onsend(method, params, id);
-		}
-
-		// Create a deferred promise to track this request
-		const deferred = this.#track_request<T>(id, method);
-
-		// Send the request
-		try {
-			this.jsonrpc_client.send(method, params, id, transport);
-		} catch (error) {
-			// Remove the pending request and reject the promise
-			this.#reject_pending_request(id, error);
-			throw error;
-		}
-
-		// Return the promise that will be resolved when the response is received
-		return deferred.promise;
-	}
-
-	/**
-	 * Send a notification to the server (no response expected)
-	 */
-	notify(method: Action_Method, params: Record<string, any> = {}): void {
-		// Call the onsend handler if provided
-		if (this.#onsend) {
-			this.#onsend(method, params);
-		}
-
-		try {
-			this.jsonrpc_client.notify(method, params);
-		} catch (error) {
-			console.error('Error sending notification:', error);
-			throw error;
-		}
-	}
-
-	/**
-	 * Processes a received action message from server.
-	 * This is the primary entry point for handling incoming server messages.
-	 */
-	handle_incoming_message(message: Action_Message_From_Server): void {
-		const {id, method, params} = message;
-
-		// First check if this is a response to a pending request
-		const pending_request = id ? this.#pending_requests.get(id) : undefined;
-		if (pending_request) {
-			this.#resolve_pending_request(id, message);
-			return;
-		}
-
-		// Otherwise, it's a server-initiated message, pass to onreceive
-		if (this.#onreceive) {
-			this.#onreceive(method, params, id);
-		}
-	}
 }
 
 /**
- * WebSocket transport provider that uses the Socket class
+ * WebSocket transport provider that uses the Socket class.
  */
 export class Socket_Api_Transport_Provider implements Api_Transport_Provider {
 	readonly type = 'websocket' as const;
@@ -309,7 +268,7 @@ export class Socket_Api_Transport_Provider implements Api_Transport_Provider {
 }
 
 /**
- * HTTP transport provider for REST API calls
+ * HTTP transport provider for REST API calls.
  */
 export class Http_Api_Transport_Provider implements Api_Transport_Provider {
 	readonly type = 'http' as const;
@@ -318,12 +277,10 @@ export class Http_Api_Transport_Provider implements Api_Transport_Provider {
 	#on_message: (data: any) => void;
 	#headers: Record<string, string>;
 
-	constructor(url: string, on_message: (data: any) => void) {
+	constructor(url: string, on_message: (data: any) => void, headers?: Record<string, string>) {
 		this.#url = url;
 		this.#on_message = on_message;
-		this.#headers = {
-			'Content-Type': 'application/json',
-		};
+		this.#headers = headers ?? {'content-type': 'application/json', accept: 'application/json'};
 	}
 
 	async send(data: JSONRPCMessage): Promise<void> {

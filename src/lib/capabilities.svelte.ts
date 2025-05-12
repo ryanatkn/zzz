@@ -5,13 +5,15 @@ import type {Async_Status} from '@ryanatkn/belt/async.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import {ollama_list} from '$lib/ollama.js';
-import {API_PATH, REQUEST_TIMEOUT, SERVER_URL} from '$lib/constants.js';
+import {API_PATH, SERVER_URL} from '$lib/constants.js';
 import {Uuid} from '$lib/zod_helpers.js';
 import type {Zzz_Dir} from '$lib/diskfile_types.js';
 import {Action_Message, type Action_Message_Params} from '$lib/action_messages.js';
 
-// Maximum number of ping records to keep
+/** Maximum number of ping records to keep. */
 export const PING_HISTORY_MAX = 6;
+
+const REQUEST_TIMEOUT = 6_000; // should be fast for our purposes here
 
 /**
  * Data structure for ping measurements.
@@ -91,7 +93,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	/**
 	 * Server capability
 	 */
-	server: Capability<Server_Capability_Data | null | undefined> = $state({
+	server: Capability<Server_Capability_Data | null | undefined> = $state.raw({
 		name: 'server',
 		data: undefined,
 		status: 'initial',
@@ -102,7 +104,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	/**
 	 * Ollama capability.
 	 */
-	ollama: Capability<Ollama_Capability_Data | null | undefined> = $state({
+	ollama: Capability<Ollama_Capability_Data | null | undefined> = $state.raw({
 		name: 'ollama',
 		data: undefined,
 		status: 'initial',
@@ -307,17 +309,13 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 		let timeout_id;
 
 		try {
-			// Track request start time
 			const start_time = Date.now();
 
-			// Make the request with a timeout
-			const controller = new AbortController();
-			timeout_id = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
-
+			// TODO BLOCK use a normal ping action (.send_ping below if it remains, also forward the signal)
 			const response = await fetch(server_api_url, {
-				signal: controller.signal,
+				signal: AbortSignal.timeout(REQUEST_TIMEOUT),
 				method: 'GET',
-				headers: {Accept: 'application/json'},
+				headers: {accept: 'application/json', 'content-type': 'application/json'},
 			});
 
 			clearTimeout(timeout_id);
@@ -364,7 +362,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	}
 
 	/**
-	 * Check Ollama availability by connecting to its API
+	 * Check Ollama availability by connecting to its API.
 	 * @returns A promise that resolves when the check is complete
 	 */
 	async check_ollama(): Promise<void> {
@@ -412,7 +410,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 
 	/**
 	 * Sends a ping to the server over websocket.
-	 * @returns The UUID of the ping message
+	 * @returns The id of the ping message
 	 */
 	send_ping(): Uuid {
 		const ping = Action_Message.ping_request.parse(undefined);
@@ -437,7 +435,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	}
 
 	/**
-	 * Handle a pong response from the server.
+	 * Handle a ping response from the server.
 	 */
 	receive_ping(response: Action_Message_Params['ping_response']): void {
 		const received_time = Date.now();

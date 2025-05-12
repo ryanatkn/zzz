@@ -20,9 +20,6 @@ export const SERVER_URL = `${PUBLIC_SERVER_PROTOCOL}://${PUBLIC_SERVER_HOSTNAME}
 
 export const ZZZ_DIRNAME = '.zzz';
 
-/** Milliseconds before considering an http request failed */
-export const REQUEST_TIMEOUT = 10_000;
-
 export const CONTENT_PREVIEW_LENGTH = 100;
 
 /** @leading_slash */

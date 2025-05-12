@@ -43,10 +43,6 @@ import type {Completion_Message} from '$lib/completion_types.js';
 import type {JSONRPCMessage} from '$lib/jsonrpc.js';
 import {create_mutation_context} from '$lib/mutation.js';
 import type {Mutations} from '$lib/action_metatypes.js';
-import {
-	send_mutations as send_mutations_default,
-	receive_mutations as receive_mutations_default,
-} from '$lib/mutations.js';
 
 export const zzz_context = create_context<Zzz>();
 
@@ -58,6 +54,7 @@ export type Zzz_Json_Input = z.input<typeof Zzz_Json>;
 
 // Special options type for Zzz to handle circular reference
 export interface Zzz_Options extends Omit_Strict<Cell_Options<typeof Zzz_Json>, 'zzz'> {
+	/** Do not use - optional to avoid circular reference problem. */
 	zzz?: Zzz;
 	models?: Array<Model_Json>;
 	bots?: Zzz_Config['bots'];
@@ -148,9 +145,8 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	futuremode = $state(false);
 
 	constructor(options: Zzz_Options = EMPTY_OBJECT) {
-		const {socket_url, ...rest} = options; // TODO the socket_url made this API awkward
 		// Pass this instance as its own zzz reference - casting hacks around the circular reference
-		super(Zzz_Json, rest as Zzz_Options & {zzz: Zzz});
+		super(Zzz_Json, options as Zzz_Options & {zzz: Zzz});
 
 		// Set the circular reference now that the object is constructed
 		(this as Assignable<typeof this, 'zzz'>).zzz = this;
@@ -180,6 +176,9 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 				// this.api_client.receive_action(action.method, action.params, action.id);
 			},
 			onsend: (action) => {
+				// TODO BLOCK so, "dispatching" an action is probably something we need a concept around,
+				// maybe this right here calls into it, the idea being that not all actions are sent to the server,
+				// we have local mutations for many of them -- and mutations for now can be centrally defined
 				this.api_client.send_action(action.method, action.params, action.id);
 			},
 		});
@@ -189,16 +188,8 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 
 		this.bots = options.bots ?? BOTS_DEFAULT;
 
-		// TODO refactor these, tension between full configurability and good defaults
-		const send_mutations = options.send_mutations || send_mutations_default;
-		const receive_mutations = options.receive_mutations || receive_mutations_default;
+		const {send_mutations, receive_mutations} = options;
 
-		// TODO BLOCK Api_Client design with `Actions` --
-		// maybe create `Actions` this `this.#onsendaction` and `this.#onreceiveaction`?
-		// this.actions.onsend = options.onsend;
-		// this.actions.onreceive = options.onreceive;
-
-		// Initialize the API client with the socket instance and message handlers
 		this.api_client = new Api_Client({
 			...options.api_client_options,
 			http_url: options.api_url,
@@ -217,12 +208,11 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 				console.log(`constructed m`, m);
 				this.socket.send(m); // TODO JSON-RPC
 
-				// TODO dynamic registry?
-				const mutation = send_mutations[message.method]; // TODO think about before/after
+				// TODO dynamic registry? maybe with an API not a plain object?
+				const mutation = send_mutations?.[message.method]; // TODO think about before/after
 				if (!mutation) {
-					// Ignore messages with no mutations
 					// console.warn('unknown message name, ignoring:', message.method, message);
-					return;
+					return; // Ignore messages with no mutations
 				}
 
 				const mutation_context = create_mutation_context(
@@ -252,11 +242,10 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 				// Handle the message based on its method
 				this.api_client.handle_incoming_message(message);
 
-				const mutation = receive_mutations[message.method];
+				const mutation = receive_mutations?.[message.method];
 				if (!mutation) {
-					// Ignore messages with no mutations
 					// console.warn('unknown message type, ignoring:', message.type, message);
-					return;
+					return; // Ignore messages with no mutations
 				}
 
 				const mutation_context = create_mutation_context(
@@ -268,7 +257,6 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 						ok: true,
 						status: 200, // TODO BLOCK @many JSON-RPC need to forward status, use JSON-RPC like MCP
 						value: message,
-						zzz: this,
 					},
 				);
 
@@ -279,7 +267,6 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 			},
 		});
 
-		// Set up decoders
 		this.decoders = {
 			// TODO do this automatically from the schema?
 			ui: (value) => {
@@ -292,22 +279,18 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 			},
 		};
 
-		// Add providers if provided in options
 		if (options.providers?.length) {
 			this.add_providers(options.providers);
 		}
 
-		// Add models if provided in options
 		if (options.models?.length) {
 			this.models.add_many(options.models);
 		}
 
-		// Initialize socket connection if URL provided
 		if (options.socket_url) {
 			this.socket.connect(options.socket_url);
 		}
 
-		// Call init to complete initialization
 		this.init();
 	}
 

@@ -20,7 +20,10 @@ import {
 } from '$lib/cell_helpers.js';
 import type {Schema_Keys, Cell_Json, Cell_Json_Input} from '$lib/cell_types.js';
 
-// Base options type that all cells will extend
+/**
+ * Any options besides these declared ones are ignored,
+ * so they're safe to forward when subclassing without needing to extract the rest options.
+ */
 export interface Cell_Options<T_Schema extends z.ZodType> {
 	zzz: Zzz; // TODO needs to be generic
 	json?: z.input<T_Schema>;

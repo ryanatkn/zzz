@@ -44,9 +44,9 @@ export class Jsonrpc_Client {
 	notify(
 		method: JSONRPCMethod,
 		params: JSONRPCNotificationParams,
-		transport_type?: Api_Transport,
+		transport?: Api_Transport,
 	): void {
-		const transport = this.#get_transport_or_throw(transport_type);
+		const provider = this.#get_transport_or_throw(transport);
 
 		const message: JSONRPCNotification = {
 			jsonrpc: '2.0',
@@ -54,32 +54,32 @@ export class Jsonrpc_Client {
 			params,
 		};
 
-		transport.send(message);
+		provider.send(message);
 	}
 
 	/**
 	 * Gets the appropriate transport or throws an error.
-	 * @param transport_type Optional transport type to use instead of the current
+	 * @param transport Optional transport type to use instead of the current
 	 * @throws when no transport available or ready
 	 */
-	#get_transport_or_throw(transport_type?: Api_Transport): Api_Transport_Provider {
-		const transport = transport_type ? this.#transports.get(transport_type) : this.#transport;
+	#get_transport_or_throw(transport?: Api_Transport): Api_Transport_Provider {
+		const provider = transport ? this.#transports.get(transport) : this.#transport;
 
-		if (!transport) {
+		if (!provider) {
 			throw new Error('No transport available');
 		}
-		if (!transport.is_ready()) {
+		if (!provider.is_ready()) {
 			throw new Error('Transport not ready');
 		}
 
-		return transport;
+		return provider;
 	}
 
 	/**
-	 * Registers a transport provider for a specific method.
+	 * Registers a provider for a specific transport.
 	 */
-	register_transport(method: Api_Transport, provider: Api_Transport_Provider): void {
-		this.#transports.set(method, provider);
+	register_transport(transport: Api_Transport, provider: Api_Transport_Provider): void {
+		this.#transports.set(transport, provider);
 
 		// Set current transport if not already set
 		if (!this.#transport) {
@@ -87,35 +87,29 @@ export class Jsonrpc_Client {
 		}
 	}
 
-	/**
-	 * Sets the current transport method.
-	 */
-	set_transport(method: Api_Transport): boolean {
-		const transport = this.#transports.get(method);
-		if (!transport) {
-			return false;
-		}
-		this.#transport = transport;
-		return true;
-	}
-
-	/**
-	 * Checks if the client is ready to send messages.
-	 */
-	is_ready(): boolean {
-		return !!this.#transport?.is_ready();
-	}
-
-	/**
-	 * Gets the current transport, if any.
-	 */
 	get_current_transport(): Api_Transport_Provider | null {
 		return this.#transport ?? null;
 	}
 
-	/**
-	 * Gets the current transport type, if any.
-	 */
+	set_current_transport(transport: Api_Transport): boolean {
+		const provider = this.#transports.get(transport);
+		if (!provider) {
+			return false;
+		}
+		this.#transport = provider;
+		return true;
+	}
+
+	is_ready(): boolean | null {
+		const provider = this.#transport;
+		if (!provider) return null;
+		return provider.is_ready();
+	}
+
+	get_transport(transport: Api_Transport): Api_Transport_Provider | null {
+		return this.#transports.get(transport) ?? null;
+	}
+
 	get_transport_type(): Api_Transport | null {
 		return this.#transport?.type ?? null;
 	}

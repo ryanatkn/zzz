@@ -13,6 +13,10 @@ import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {create_multi_index} from '$lib/indexed_collection_helpers.js';
 
+// TODO BLOCK so is this like our "dispatch context"? for each action,
+// we may have one or more messages,
+// created locally and sent for some kinds or processed locally for others, or received
+
 export const HISTORY_LIMIT_DEFAULT = 512;
 export const PONG_DISPLAY_LIMIT = 6;
 
@@ -30,8 +34,10 @@ export type Actions_Json = z.infer<typeof Actions_Json>;
 export type Actions_Json_Input = z.input<typeof Actions_Json>;
 
 export interface Actions_Options extends Cell_Options<typeof Actions_Json> {
-	onsend: (action: Action_Message_From_Client) => void; // TODO these names are confused, they need to be about direction
-	onreceive: (action: Action_Message_From_Server) => void; // TODO these names are confused, they need to be about direction
+	// TODO BLOCK maybe this class's data structure needs to change
+	// so a single action can have multiple messages e.g. for those with kind request_response
+	onsend: (action: Action_Message_From_Client) => void;
+	onreceive: (action: Action_Message_From_Server) => void;
 	history_limit?: number;
 }
 
@@ -47,9 +53,14 @@ export class Actions extends Cell<typeof Actions_Json> {
 		],
 	});
 
+	// These customize the class's behavior.
+	// By default it just tracks actions in a collection when sent or received.
+	onsend: (action: Action_Message_From_Client) => void;
+	onreceive: (action: Action_Message_From_Server) => void;
+
+	// TODO @many refactor this into the Indexed_Collection -- if this state remains we can have a setter that forwards the value
 	history_limit: number = $state(HISTORY_LIMIT_DEFAULT);
 
-	// Derived collections using the indexed structure
 	readonly pings: Array<Action> = $derived(this.items.where('by_method', 'ping'));
 	readonly pongs: Array<Action> = $derived(this.items.where('by_method', 'pong'));
 	readonly prompts: Array<Action> = $derived(this.items.where('by_method', 'submit_completion'));
@@ -63,10 +74,6 @@ export class Actions extends Cell<typeof Actions_Json> {
 		this.items.where('by_method', 'delete_diskfile'),
 	);
 	readonly filer_changes: Array<Action> = $derived(this.items.where('by_method', 'filer_change'));
-
-	// Action handlers
-	onsend: (action: Action_Message_From_Client) => void; // TODO these names are confused, they need to be about direction
-	onreceive: (action: Action_Message_From_Server) => void; // TODO these names are confused, they need to be about direction
 
 	constructor(options: Actions_Options) {
 		super(Actions_Json, options);
@@ -108,23 +115,23 @@ export class Actions extends Cell<typeof Actions_Json> {
 	/**
 	 * Send an action using the registered handler with proper typing.
 	 */
-	send(action: Action_Message_From_Client): void {
-		const action_json = create_action_json(action);
-		if (!action_json) throw new Error(`Invalid action: ${action.method}`);
+	send(message: Action_Message_From_Client): void {
+		const action_json = create_action_json(message);
+		if (!action_json) throw new Error(`Invalid action: ${message.method}`);
 		this.add(action_json); // TODO BLOCK maybe the only concern here is history? in which case zzz can do this?
 
-		this.onsend(action);
+		this.onsend(message);
 	}
 
 	/**
 	 * Handle a received action with proper typing.
 	 */
-	receive(action: Action_Message_From_Server): void {
-		const action_json = create_action_json(action);
-		if (!action_json) throw new Error(`Invalid action: ${action.method}`);
+	receive(message: Action_Message_From_Server): void {
+		const action_json = create_action_json(message);
+		if (!action_json) throw new Error(`Invalid action: ${message.method}`);
 		this.add(action_json); // TODO BLOCK maybe the only concern here is history? in which case zzz can do this?
 
-		this.onreceive(action);
+		this.onreceive(message);
 	}
 
 	/**
@@ -151,8 +158,9 @@ export class Actions extends Cell<typeof Actions_Json> {
 		return this.items.latest('by_method', method, limit);
 	}
 
+	// TODO @many refactor this into the Indexed_Collection -- need to test the new behavior
 	/**
-	 * Trims the collection to the maximum allowed size by removing oldest actions.
+	 * Trims the collection to the maximum allowed size by removing oldest actions. (FIFO)
 	 */
 	#trim_to_history_limit(): void {
 		// Calculate how many items to remove and use the optimized method

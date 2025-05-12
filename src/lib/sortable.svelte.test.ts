@@ -54,7 +54,6 @@ describe('Sortable', () => {
 	let sorters: Array<Sorter<Test_Cell>>;
 	let zzz: Zzz;
 
-	// Create test UUIDs - using proper UUIDs instead of simple strings
 	const id1 = create_uuid();
 	const id2 = create_uuid();
 	const id3 = create_uuid();

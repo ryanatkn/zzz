@@ -4,6 +4,8 @@ import type {Mutations} from '$lib/action_metatypes.js';
  * Client-side mutations for handling action responses.
  */
 
+// TODO BLOCK should use the message type instead of the action method and have a single `Mutations`
+
 /**
  * Client-side mutations for outgoing messages.
  */
