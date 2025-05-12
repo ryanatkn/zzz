@@ -28,8 +28,10 @@ export interface Time_Options extends Cell_Options<typeof Time_Json> {
 }
 
 /**
- * Reactive time management class that provides time-related utilities
- * with configurable update interval to minimize unnecessary reactivity.
+ * Reactive time management class that provides time-related utilities.
+ * Has a configurable update interval that defaults to
+ * a full minute to minimize wasteful reactivity,
+ * so it's suitable for any cases that need at best 1-minute precision, unless reconfigured.
  */
 export class Time extends Cell<typeof Time_Json> {
 	/**

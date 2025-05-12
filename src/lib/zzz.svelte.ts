@@ -80,7 +80,9 @@ export interface Zzz_Options extends Omit_Strict<Cell_Options<typeof Zzz_Json>, 
  * Gettable with `zzz_context.get()` inside a `<Zzz_Root>`.
  */
 export class Zzz extends Cell<typeof Zzz_Json> {
-	// App-wide cell registry - maps class name to constructor and tracks registered instances
+	/**
+	 * App-wide cell registry, maps class names to constructor and tracks registered instances.
+	 */
 	readonly cell_registry: Cell_Registry;
 
 	/**
