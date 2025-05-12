@@ -28,11 +28,11 @@ export const Api_Params = z.union([JSONRPCRequestParams, JSONRPCNotificationPara
 export type Api_Params = z.infer<typeof Api_Params>;
 
 // TODO support configurable/extensible transports
-export const Api_Transport = z.enum(['http', 'websocket']);
-export type Api_Transport = z.infer<typeof Api_Transport>;
+export const Api_Transport_Type = z.enum(['http', 'websocket']);
+export type Api_Transport_Type = z.infer<typeof Api_Transport_Type>;
 
-export interface Api_Transport_Provider {
-	type: Api_Transport;
+export interface Api_Transport {
+	type: Api_Transport_Type;
 	send: (data: JSONRPCMessage) => void;
 	is_ready: () => boolean;
 }

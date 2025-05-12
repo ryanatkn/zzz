@@ -1010,8 +1010,8 @@ export const src_json = {
 				{name: 'Api_Client_Options', kind: 'type'},
 				{name: 'Request_Tracker', kind: 'type'},
 				{name: 'Api_Client', kind: 'class'},
-				{name: 'Socket_Api_Transport_Provider', kind: 'class'},
-				{name: 'Http_Api_Transport_Provider', kind: 'class'},
+				{name: 'Socket_Api_Transport', kind: 'class'},
+				{name: 'Http_Api_Transport', kind: 'class'},
 			],
 		},
 		'./api.js': {

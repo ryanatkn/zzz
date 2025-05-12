@@ -6,7 +6,7 @@ import type {Action_Message_From_Server} from '$lib/action_collections.js';
 import type {Socket} from '$lib/socket.svelte.js';
 import {Jsonrpc_Client} from '$lib/jsonrpc_client.js';
 import type {JSONRPCMessage} from '$lib/jsonrpc.js';
-import type {Api_Params, Api_Transport, Api_Transport_Provider} from '$lib/api.js';
+import type {Api_Params, Api_Transport_Type, Api_Transport} from '$lib/api.js';
 
 // TODO support canceling
 
@@ -14,7 +14,7 @@ export interface Api_Client_Options {
 	http_url?: string;
 	http_headers?: Record<string, string>;
 	socket?: Socket;
-	default_transport?: Api_Transport;
+	default_transport_type?: Api_Transport_Type;
 	onreceive: (method: string, params: Api_Params, id?: Uuid) => void;
 	onsend: (method: string, params: Api_Params, id?: Uuid) => void;
 }
@@ -35,9 +35,6 @@ export class Api_Client {
 	/** JSON-RPC client for encapsulating the message format. */
 	readonly jsonrpc_client = new Jsonrpc_Client();
 
-	/** Socket instance for WebSocket transport. */
-	readonly #socket?: Socket;
-
 	/** Callback triggered when receiving a message from the server. */
 	#onreceive: (method: string, params: Api_Params, id?: Uuid) => void;
 
@@ -49,28 +46,31 @@ export class Api_Client {
 	readonly #request_timeout_ms = 30000;
 
 	constructor(options: Api_Client_Options) {
-		this.#socket = options.socket;
 		this.#onreceive = options.onreceive;
 		this.#onsend = options.onsend;
 
 		// Set up HTTP transport if URL is provided
 		if (options.http_url) {
-			const http_transport = new Http_Api_Transport_Provider(
+			const http_transport = new Http_Api_Transport(
 				options.http_url,
 				this.#handle_incoming_message,
 				options.http_headers,
 			);
-			this.jsonrpc_client.register_transport('http', http_transport);
+			this.jsonrpc_client.register_transport(http_transport);
 		}
 
 		// Set up WebSocket transport if socket is provided
-		if (this.#socket) {
-			const socket_transport = new Socket_Api_Transport_Provider(
-				this.#socket,
+		if (options.socket) {
+			const socket_transport = new Socket_Api_Transport(
+				options.socket,
 				this.#handle_incoming_message,
 			);
-			this.jsonrpc_client.register_transport('websocket', socket_transport);
+			this.jsonrpc_client.register_transport(socket_transport);
 			this.jsonrpc_client.set_current_transport('websocket'); // prefer if available
+		}
+
+		if (options.default_transport_type) {
+			this.jsonrpc_client.set_current_transport(options.default_transport_type);
 		}
 	}
 
@@ -81,7 +81,7 @@ export class Api_Client {
 		method: Action_Method,
 		params: Api_Params,
 		id: Uuid = create_uuid(),
-		transport?: Api_Transport,
+		transport_type?: Api_Transport_Type,
 	): Promise<T> {
 		this.#onsend(method, params, id);
 
@@ -90,7 +90,7 @@ export class Api_Client {
 
 		// Send the request
 		try {
-			this.jsonrpc_client.send(method, params, id, transport);
+			this.jsonrpc_client.send(method, params, id, transport_type);
 		} catch (error) {
 			// Remove the pending request and reject the promise
 			this.#reject_pending_request(id, error);
@@ -219,7 +219,7 @@ export class Api_Client {
 /**
  * WebSocket transport provider that uses the Socket class.
  */
-export class Socket_Api_Transport_Provider implements Api_Transport_Provider {
+export class Socket_Api_Transport implements Api_Transport {
 	readonly type = 'websocket' as const;
 
 	#socket: Socket;
@@ -255,7 +255,7 @@ export class Socket_Api_Transport_Provider implements Api_Transport_Provider {
 /**
  * HTTP transport provider for REST API calls.
  */
-export class Http_Api_Transport_Provider implements Api_Transport_Provider {
+export class Http_Api_Transport implements Api_Transport {
 	readonly type = 'http' as const;
 
 	#url: string;
@@ -292,7 +292,7 @@ export class Http_Api_Transport_Provider implements Api_Transport_Provider {
 		return true; // HTTP is always ready
 	}
 
-	get_type(): Api_Transport {
+	get_type(): Api_Transport_Type {
 		return 'http';
 	}
 }
