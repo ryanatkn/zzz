@@ -268,12 +268,12 @@ test('Cell registration and unregistration works correctly', () => {
 	});
 
 	// Cell should be automatically registered
-	expect(zzz.cells.has(cell_id)).toBe(true);
-	expect(zzz.cells.get(cell_id)).toBe(cell);
+	expect(zzz.registry.all.has(cell_id)).toBe(true);
+	expect(zzz.registry.all.get(cell_id)).toBe(cell);
 
 	// Test disposal
 	cell.dispose();
-	expect(zzz.cells.has(cell_id)).toBe(false);
+	expect(zzz.registry.all.has(cell_id)).toBe(false);
 
 	// Test that disposing again is safe
 	expect(() => cell.dispose()).not.toThrow();

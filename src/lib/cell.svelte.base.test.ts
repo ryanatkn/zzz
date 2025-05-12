@@ -65,8 +65,8 @@ describe('Cell initialization', () => {
 		expect(test_cell.items).toEqual(['item1', 'item2']);
 
 		// Verify cell was registered
-		expect(zzz.cells.has(TEST_ID)).toBe(true);
-		expect(zzz.cells.get(TEST_ID)).toBe(test_cell);
+		expect(zzz.registry.all.has(TEST_ID)).toBe(true);
+		expect(zzz.registry.all.get(TEST_ID)).toBe(test_cell);
 	});
 
 	test('uses default values when json is empty', () => {
@@ -128,8 +128,8 @@ describe('Cell registry lifecycle', () => {
 		});
 
 		// Cell should be registered automatically in init()
-		expect(zzz.cells.has(cell_id)).toBe(true);
-		expect(zzz.cells.get(cell_id)).toBe(test_cell);
+		expect(zzz.registry.all.has(cell_id)).toBe(true);
+		expect(zzz.registry.all.get(cell_id)).toBe(test_cell);
 	});
 
 	test('dispose removes from registry', () => {
@@ -144,13 +144,13 @@ describe('Cell registry lifecycle', () => {
 		});
 
 		// Verify initial registration
-		expect(zzz.cells.has(cell_id)).toBe(true);
+		expect(zzz.registry.all.has(cell_id)).toBe(true);
 
 		// Dispose cell
 		test_cell.dispose();
 
 		// Should be removed from registry
-		expect(zzz.cells.has(cell_id)).toBe(false);
+		expect(zzz.registry.all.has(cell_id)).toBe(false);
 	});
 
 	test('dispose is safe to call multiple times', () => {
@@ -165,7 +165,7 @@ describe('Cell registry lifecycle', () => {
 
 		// First dispose
 		test_cell.dispose();
-		expect(zzz.cells.has(cell_id)).toBe(false);
+		expect(zzz.registry.all.has(cell_id)).toBe(false);
 
 		// Second dispose should not throw
 		expect(() => test_cell.dispose()).not.toThrow();
@@ -545,9 +545,9 @@ describe('Cell cloning', () => {
 		const clone = original.clone();
 
 		// Both instances should be registered
-		expect(zzz.cells.has(original.id)).toBe(true);
-		expect(zzz.cells.has(clone.id)).toBe(true);
-		expect(zzz.cells.get(clone.id)).toBe(clone);
+		expect(zzz.registry.all.has(original.id)).toBe(true);
+		expect(zzz.registry.all.has(clone.id)).toBe(true);
+		expect(zzz.registry.all.get(clone.id)).toBe(clone);
 	});
 });
 

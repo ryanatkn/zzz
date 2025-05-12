@@ -5,14 +5,13 @@ import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
 import {strip_end, strip_start} from '@ryanatkn/belt/string.js';
 import type {Assignable, Class_Constructor, Omit_Strict} from '@ryanatkn/belt/types.js';
 
-import {
-	type Action_Message_From_Client,
-	type Action_Message_From_Server,
-	action_specs,
+import type {
+	Action_Message_From_Client,
+	Action_Message_From_Server,
 } from '$lib/action_collections.js';
 import {Provider, type Provider_Json} from '$lib/provider.svelte.js';
 import type {Provider_Name} from '$lib/provider_types.js';
-import {Uuid, create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
+import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
 import {Models} from '$lib/models.svelte.js';
 import {Chats} from '$lib/chats.svelte.js';
 import {Tapes} from '$lib/tapes.svelte.js';
@@ -43,6 +42,7 @@ import type {Completion_Message} from '$lib/completion_types.js';
 import type {JSONRPCMessage} from '$lib/jsonrpc.js';
 import {create_mutation_context} from '$lib/mutation.js';
 import type {Mutations} from '$lib/action_metatypes.js';
+import type {Action_Spec} from '$lib/action_spec.js';
 
 export const zzz_context = create_context<Zzz>();
 
@@ -60,6 +60,7 @@ export interface Zzz_Options extends Omit_Strict<Cell_Options<typeof Zzz_Json>, 
 	bots?: Zzz_Config['bots'];
 	providers?: Array<Provider_Json>;
 	cell_classes?: Record<string, Class_Constructor<Cell>>;
+	action_specs?: Array<Action_Spec>;
 	send_mutations?: Mutations;
 	receive_mutations?: Mutations;
 
@@ -74,14 +75,17 @@ export interface Zzz_Options extends Omit_Strict<Cell_Options<typeof Zzz_Json>, 
 }
 
 /**
- * The main client. Like a site-wide `app` instance for Zzz.
+ * The main client, typically used by creating your own `App extends Zzz`.
  * Gettable with `zzz_context.get()` inside a `<Zzz_Root>`.
  */
 export class Zzz extends Cell<typeof Zzz_Json> {
+	// App-wide cell registry - maps class name to constructor and tracks registered instances
 	readonly registry: Cell_Registry;
 
-	// Global cell registry - maps cell id to cell instance
-	readonly cells: SvelteMap<Uuid, Cell> = new SvelteMap();
+	/**
+	 * Action registry for centralized action specification access.
+	 */
+	readonly action_registry: Action_Registry;
 
 	// Cells - these are managed objects/collections that contain the app state
 	readonly time: Time;
@@ -102,11 +106,6 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	readonly api_client: Api_Client;
 
 	readonly bots: Zzz_Config['bots'];
-
-	/**
-	 * Action registry for centralized action specification access.
-	 */
-	readonly action_registry = new Action_Registry(action_specs);
 
 	/**
 	 * The `zzz_dir` is the path to Zzz's primary directory on the server's filesystem.
@@ -151,8 +150,9 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		// Set the circular reference now that the object is constructed
 		(this as Assignable<typeof this, 'zzz'>).zzz = this;
 
-		// Initialize the registry
 		this.registry = new Cell_Registry(this);
+
+		this.action_registry = new Action_Registry(options.action_specs || []); // making this optional for now, the app will just have no actions
 
 		// Register cell classes if provided, otherwise use default cell_classes
 		const cells_to_register = options.cell_classes || cell_classes;
@@ -359,15 +359,12 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	 */
 	add_providers(providers_json: Array<Provider_Json>): void {
 		for (const json of providers_json) {
-			const provider = this.registry.maybe_instantiate('Provider', json);
-			if (provider) {
-				this.add_provider(provider);
-			}
+			this.add_provider(json);
 		}
 	}
 
-	add_provider(provider: Provider): void {
-		this.providers.add(provider);
+	add_provider(provider_json: Provider_Json): void {
+		this.providers.add(new Provider({zzz: this, json: provider_json}));
 	}
 
 	/**

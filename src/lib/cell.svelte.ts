@@ -194,7 +194,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 			return;
 		}
 
-		this.zzz.cells.set(this.id, this as any); // TODO refactor to avoid casting?
+		this.zzz.registry.add_cell(this);
 		this.#registered = true;
 	}
 
@@ -205,7 +205,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	protected unregister(): void {
 		if (!this.#registered) return;
 
-		this.zzz.cells.delete(this.id);
+		this.zzz.registry.remove_cell(this.id);
 		this.#registered = false;
 	}
 

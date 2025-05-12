@@ -5,6 +5,8 @@ import {DEV} from 'esm-env';
 import type {Cell} from '$lib/cell.svelte.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 import type {Cell_Registry_Map} from '$lib/cell_classes.js';
+import {SvelteMap} from 'svelte/reactivity';
+import type {Uuid} from './zod_helpers.js';
 
 /**
  * Error thrown when attempting to instantiate an unregistered class.
@@ -24,14 +26,19 @@ export class Class_Not_Registered_Error extends Error {
 
 /**
  * Registry for managing cell classes and their instances.
+ * The goal is to allow dynamic instantiation of all cells from serializable JSON.
+ * This class does not currently justify its weight/complexity and may be removed in the future,
+ * but I want to continue exploring the ideas behind it until we get fully snapshottable UI.
  */
 export class Cell_Registry {
 	readonly zzz: Zzz;
 
-	// Store constructors
-	readonly #constructors: Map<string, Class_Constructor<any>> = new Map();
+	readonly #constructors: Map<string, Class_Constructor<Cell>> = new Map();
 
 	readonly class_names: Array<string> = $derived(Array.from(this.#constructors.keys()));
+
+	// TODO is this overhead acceptable? maybe not reactive?
+	readonly all: SvelteMap<Uuid, Cell> = new SvelteMap();
 
 	constructor(zzz: Zzz) {
 		this.zzz = zzz;
@@ -40,7 +47,7 @@ export class Cell_Registry {
 	/**
 	 * Register a cell class with the registry.
 	 */
-	register<T extends Cell>(constructor: Class_Constructor<T>): void {
+	register(constructor: Class_Constructor<Cell>): void {
 		const class_name = constructor.name;
 		if (DEV && this.#constructors.has(class_name)) {
 			console.error(`Class "${class_name}" is already registered, overwriting.`);
@@ -51,11 +58,11 @@ export class Cell_Registry {
 	/**
 	 * Unregister a cell class from the registry.
 	 */
-	unregister(class_name: string): void {
+	unregister(class_name: string): boolean {
 		if (DEV && !this.#constructors.has(class_name)) {
 			console.error(`Cannot unregister "${class_name}": class not found in registry`);
 		}
-		this.#constructors.delete(class_name);
+		return this.#constructors.delete(class_name);
 	}
 
 	/**
@@ -99,5 +106,19 @@ export class Cell_Registry {
 
 		// Create a new instance with the provided options and cast to the specific type
 		return new constructor({...options, zzz: this.zzz, json}) as Cell_Registry_Map[K];
+	}
+
+	add_cell(cell: Cell<any>): void {
+		if (DEV && this.all.has(cell.id)) {
+			console.error(`cell already exists in registry: ${cell.id}`);
+		}
+		this.all.set(cell.id, cell);
+	}
+
+	remove_cell(id: Uuid): void {
+		if (DEV && !this.all.has(id)) {
+			console.error(`cell not found in registry: ${id}`);
+		}
+		this.all.delete(id);
 	}
 }
