@@ -1005,6 +1005,10 @@
       "svelte": "./dist/Toggle_Button.svelte",
       "default": "./dist/Toggle_Button.svelte"
     },
+    "./transport.js": {
+      "types": "./dist/transport.d.ts",
+      "default": "./dist/transport.js"
+    },
     "./ui.svelte.js": {
       "types": "./dist/ui.svelte.d.ts",
       "default": "./dist/ui.svelte.js"

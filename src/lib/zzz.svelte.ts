@@ -202,8 +202,9 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 				console.log('[ws] sending message', message);
 				// TODO BLOCK Action_Message_From_Client ? parse in dev?
 				const m: JSONRPCMessage = {
+					// TODO use helpers
+					// jsonrpc: '2.0',
 					id: message.id || create_uuid(),
-					created: get_datetime_now(),
 					method: message.method,
 					params: message.params as any,
 				};

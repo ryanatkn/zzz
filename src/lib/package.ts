@@ -846,6 +846,7 @@ export const package_json = {
 			svelte: './dist/Toggle_Button.svelte',
 			default: './dist/Toggle_Button.svelte',
 		},
+		'./transport.js': {types: './dist/transport.d.ts', default: './dist/transport.js'},
 		'./ui.svelte.js': {types: './dist/ui.svelte.d.ts', default: './dist/ui.svelte.js'},
 		'./url_params.svelte.js': {
 			types: './dist/url_params.svelte.d.ts',
@@ -1006,12 +1007,9 @@ export const src_json = {
 		'./api_client.js': {
 			path: 'api_client.ts',
 			declarations: [
-				{name: 'Api_Transport_Provider', kind: 'type'},
 				{name: 'Api_Client_Options', kind: 'type'},
 				{name: 'Request_Tracker', kind: 'type'},
 				{name: 'Api_Client', kind: 'class'},
-				{name: 'Socket_Api_Transport', kind: 'class'},
-				{name: 'Http_Api_Transport', kind: 'class'},
 			],
 		},
 		'./api.js': {
@@ -1020,14 +1018,13 @@ export const src_json = {
 				{name: 'Http_Status', kind: 'variable'},
 				{name: 'is_http_status_ok', kind: 'function'},
 				{name: 'Http_Method', kind: 'variable'},
-				{name: 'Api_Transport', kind: 'variable'},
+				{name: 'Api_Params', kind: 'variable'},
 				{name: 'Error_Response', kind: 'type'},
 				{name: 'ERROR_MESSAGE_UNKNOWN', kind: 'variable'},
 				{name: 'Api_Result', kind: 'type'},
 				{name: 'API_RESULT_UNKNOWN_ERROR', kind: 'variable'},
 				{name: 'Successful_Api_Result', kind: 'type'},
 				{name: 'Failed_Api_Result', kind: 'type'},
-				{name: 'Api_Params', kind: 'type'},
 				{name: 'to_failed_api_result', kind: 'function'},
 				{name: 'Api_Error_Name', kind: 'type'},
 				{name: 'Api_Error_Message', kind: 'type'},
@@ -1675,7 +1672,10 @@ export const src_json = {
 		},
 		'./jsonrpc_client.js': {
 			path: 'jsonrpc_client.ts',
-			declarations: [{name: 'Jsonrpc_Client', kind: 'class'}],
+			declarations: [
+				{name: 'Jsonrpc_Client_Options', kind: 'type'},
+				{name: 'Jsonrpc_Client', kind: 'class'},
+			],
 		},
 		'./jsonrpc.js': {
 			path: 'jsonrpc.ts',
@@ -2077,7 +2077,11 @@ export const src_json = {
 		},
 		'./server/security.js': {
 			path: 'server/security.ts',
-			declarations: [{name: 'should_allow_origin', kind: 'function'}],
+			declarations: [
+				{name: 'Allowed_Origins', kind: 'type'},
+				{name: 'verify_origin', kind: 'function'},
+				{name: 'should_allow_origin', kind: 'function'},
+			],
 		},
 		'./server/server.js': {path: 'server/server.ts'},
 		'./server/service_metatypes.gen.js': {
@@ -2263,6 +2267,16 @@ export const src_json = {
 		'./Toggle_Button.svelte': {
 			path: 'Toggle_Button.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./transport.js': {
+			path: 'transport.ts',
+			declarations: [
+				{name: 'Transport_Type', kind: 'variable'},
+				{name: 'Transport', kind: 'type'},
+				{name: 'Transports', kind: 'class'},
+				{name: 'Websocket_Rpc_Transport', kind: 'class'},
+				{name: 'Http_Rpc_Transport', kind: 'class'},
+			],
 		},
 		'./ui.svelte.js': {
 			path: 'ui.svelte.ts',

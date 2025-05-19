@@ -1,5 +1,5 @@
 import {z} from 'zod';
-import type {ListResponse} from 'ollama/browser';
+import type {ListResponse, ModelResponse} from 'ollama/browser';
 import type {Async_Status} from '@ryanatkn/belt/async.js';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
@@ -12,8 +12,6 @@ import {Action_Message, type Action_Message_Params} from '$lib/action_messages.j
 
 /** Maximum number of ping records to keep. */
 export const PING_HISTORY_MAX = 6;
-
-const REQUEST_TIMEOUT = 6_000; // should be fast for our purposes here
 
 /**
  * Data structure for ping measurements.
@@ -259,12 +257,15 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	/**
 	 * Latest Ollama model list response, if available.
 	 */
-	readonly ollama_models: Array<{name: string; size: number}> = $derived(
-		this.ollama.data?.list_response?.models.map((model) => ({
-			name: model.name,
-			size: Math.round(model.size / (1024 * 1024)), // Size in MB
-		})) || [],
-	);
+	readonly ollama_models: Array<{name: string; size: number; model_response: ModelResponse}> =
+		$derived(
+			// TODO hacky
+			this.ollama.data?.list_response?.models.map((m) => ({
+				name: m.name,
+				size: Math.round(m.size / (1024 * 1024)), // Size in MB
+				model_response: m,
+			})) || [],
+		);
 
 	constructor(options: Cell_Options<typeof Capabilities_Json>) {
 		super(Capabilities_Json, options);
@@ -290,6 +291,8 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 		}
 	}
 
+	// TODO BLOCK instead of this, we want to hook into the `ping` action,
+	// maybe through a mutation set up in the constructor?
 	/**
 	 * Check Server availability by making an HTTP GET request to its ping endpoint.
 	 * @returns A promise that resolves when the check is complete
@@ -312,7 +315,6 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 
 			// TODO BLOCK use a normal ping action (.send_ping below if it remains but needs to return a promise, also forward the signal)
 			const response = await fetch(server_api_url, {
-				signal: AbortSignal.timeout(REQUEST_TIMEOUT),
 				method: 'GET',
 				headers: {'content-type': 'application/json', accept: 'application/json'},
 			});

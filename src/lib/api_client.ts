@@ -5,8 +5,13 @@ import type {Action_Method} from '$lib/action_metatypes.js';
 import type {Action_Message_From_Server} from '$lib/action_collections.js';
 import type {Socket} from '$lib/socket.svelte.js';
 import {Jsonrpc_Client} from '$lib/jsonrpc_client.js';
-import type {JSONRPCMessage} from '$lib/jsonrpc.js';
-import type {Api_Params, Api_Transport_Type, Api_Transport} from '$lib/api.js';
+import type {Api_Params} from '$lib/api.js';
+import {
+	Http_Rpc_Transport,
+	Transports,
+	Websocket_Rpc_Transport,
+	type Transport_Type,
+} from '$lib/transport.js';
 
 // TODO support canceling
 
@@ -14,7 +19,7 @@ export interface Api_Client_Options {
 	http_url?: string;
 	http_headers?: Record<string, string>;
 	socket?: Socket;
-	default_transport_type?: Api_Transport_Type;
+	default_transport_type?: Transport_Type;
 	onreceive: (method: string, params: Api_Params, id?: Uuid) => void;
 	onsend: (method: string, params: Api_Params, id?: Uuid) => void;
 }
@@ -32,8 +37,8 @@ export interface Request_Tracker<T> {
  * Uses JSON-RPC for both HTTP and WebSocket communication.
  */
 export class Api_Client {
-	/** JSON-RPC client for encapsulating the message format. */
-	readonly jsonrpc_client = new Jsonrpc_Client();
+	readonly transports = new Transports();
+	readonly jsonrpc_client = new Jsonrpc_Client({transports: this.transports});
 
 	/** Callback triggered when receiving a message from the server. */
 	#onreceive: (method: string, params: Api_Params, id?: Uuid) => void;
@@ -51,26 +56,25 @@ export class Api_Client {
 
 		// Set up HTTP transport if URL is provided
 		if (options.http_url) {
-			const http_transport = new Http_Api_Transport(
-				options.http_url,
-				this.#handle_incoming_message,
-				options.http_headers,
+			this.transports.register_transport(
+				new Http_Rpc_Transport(
+					options.http_url,
+					this.#handle_incoming_message,
+					options.http_headers,
+				),
 			);
-			this.jsonrpc_client.register_transport(http_transport);
 		}
 
 		// Set up WebSocket transport if socket is provided
 		if (options.socket) {
-			const socket_transport = new Socket_Api_Transport(
-				options.socket,
-				this.#handle_incoming_message,
+			this.transports.register_transport(
+				new Websocket_Rpc_Transport(options.socket, this.#handle_incoming_message),
 			);
-			this.jsonrpc_client.register_transport(socket_transport);
-			this.jsonrpc_client.set_current_transport('websocket'); // prefer if available
+			this.transports.set_current_transport('websocket_rpc'); // prefer if available
 		}
 
 		if (options.default_transport_type) {
-			this.jsonrpc_client.set_current_transport(options.default_transport_type);
+			this.transports.set_current_transport(options.default_transport_type);
 		}
 	}
 
@@ -81,7 +85,7 @@ export class Api_Client {
 		method: Action_Method,
 		params: Api_Params,
 		id: Uuid = create_uuid(),
-		transport_type?: Api_Transport_Type,
+		transport_type?: Transport_Type,
 	): Promise<T> {
 		this.#onsend(method, params, id);
 
@@ -213,86 +217,5 @@ export class Api_Client {
 		});
 
 		return deferred;
-	}
-}
-
-/**
- * WebSocket transport provider that uses the Socket class.
- */
-export class Socket_Api_Transport implements Api_Transport {
-	readonly type = 'websocket' as const;
-
-	#socket: Socket;
-	#on_message: (data: any) => void;
-
-	constructor(socket: Socket, on_message: (data: any) => void) {
-		this.#socket = socket;
-		this.#on_message = on_message;
-
-		// Set up the message handler
-		socket.onmessage = (event) => {
-			try {
-				const data = JSON.parse(event.data);
-				this.#on_message(data);
-			} catch (error) {
-				console.error('Error parsing WebSocket message:', error);
-			}
-		};
-	}
-
-	send(data: JSONRPCMessage): void {
-		if (!this.is_ready()) {
-			throw new Error('WebSocket not connected');
-		}
-		this.#socket.send(data);
-	}
-
-	is_ready(): boolean {
-		return this.#socket.connected;
-	}
-}
-
-/**
- * HTTP transport provider for REST API calls.
- */
-export class Http_Api_Transport implements Api_Transport {
-	readonly type = 'http' as const;
-
-	#url: string;
-	#on_message: (data: any) => void;
-	#headers: Record<string, string>;
-
-	constructor(url: string, on_message: (data: any) => void, headers?: Record<string, string>) {
-		this.#url = url;
-		this.#on_message = on_message;
-		this.#headers = headers ?? {'content-type': 'application/json', accept: 'application/json'};
-	}
-
-	async send(data: JSONRPCMessage): Promise<void> {
-		try {
-			const response = await fetch(this.#url, {
-				method: 'POST',
-				headers: this.#headers,
-				body: JSON.stringify(data),
-			});
-
-			if (!response.ok) {
-				throw new Error(`HTTP error: ${response.status}`);
-			}
-
-			const result = await response.json();
-			this.#on_message(result);
-		} catch (error) {
-			console.error('Error sending HTTP request:', error);
-			throw error;
-		}
-	}
-
-	is_ready(): boolean {
-		return true; // HTTP is always ready
-	}
-
-	get_type(): Api_Transport_Type {
-		return 'http';
 	}
 }

@@ -3,7 +3,7 @@ import type {Flavored} from '@ryanatkn/belt/types.js';
 import type {ContentfulStatusCode} from 'hono/utils/http-status';
 import {z} from 'zod';
 
-import {JSONRPCMessage, JSONRPCNotificationParams, JSONRPCRequestParams} from '$lib/jsonrpc.js';
+import {JSONRPCNotificationParams, JSONRPCRequestParams} from '$lib/jsonrpc.js';
 
 export const Http_Status = z.number().int();
 export type Http_Status = ContentfulStatusCode;
@@ -26,16 +26,6 @@ export type Http_Method = z.infer<typeof Http_Method>;
 /** The JSON-RPC `params` types. */
 export const Api_Params = z.union([JSONRPCRequestParams, JSONRPCNotificationParams, z.void()]);
 export type Api_Params = z.infer<typeof Api_Params>;
-
-// TODO support configurable/extensible transports
-export const Api_Transport_Type = z.enum(['http', 'websocket']);
-export type Api_Transport_Type = z.infer<typeof Api_Transport_Type>;
-
-export interface Api_Transport {
-	type: Api_Transport_Type;
-	send: (data: JSONRPCMessage) => void;
-	is_ready: () => boolean;
-}
 
 export interface Error_Response {
 	message: string;

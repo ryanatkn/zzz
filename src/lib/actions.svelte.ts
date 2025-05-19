@@ -117,6 +117,7 @@ export class Actions extends Cell<typeof Actions_Json> {
 		if (!action_json) throw new Error(`Invalid action: ${message.method}`);
 		this.add(action_json); // TODO BLOCK maybe the only concern here is history? in which case zzz can do this?
 
+		// TODO BLOCK maybe this should be a `dispatcher` that's deferred to? or is the decomposed function callback API better?
 		this.onsend(message);
 	}
 

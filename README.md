@@ -57,16 +57,15 @@ Zzz builds on a great deal of software.
 
 - see the deps in [package.json](package.json)
 - [Claude](https://claude.ai/) wrote a lot of code after the initial version
-  under my often-flawed but usually detailed direction,
+  under my often-flawed but usually detailed and patient direction,
   and continues to contribute a lot to varying but sufficient success
-  - some oofs let's be clear, there is a lot to be concerned about here,
-    but these are powerful tools
-    that I try to use skillfully and thoughtfully at least some of the time,
-    so like, I try to do important parts carefully by hand,
-    and Zzz was designed to better leverage tools for our benefit,
-    and so I'm choosing to go with the grain here -
-    I'll regularly revisit my old workflows,
-    and there's endless room to improve with new ones
+  - there's some slop in low-prioritity areas like tests for client code,
+    but I consider the code quality up to par with my norm
+    (like [Fuz](https://github.com/ryanatkn/fuz),
+    [Moss](https://github.com/ryanatkn/moss), and [Gro](https://github.com/ryanatkn/gro)),
+    with the caveat that the initial proof of concept
+    was intentionally slapdash in places for speed,
+    and LLMs make this mindset easy to indulge
 
 ## License 🐦
 
