@@ -1,13 +1,29 @@
 import {create_deferred, type Deferred, type Async_Status} from '@ryanatkn/belt/async.js';
+import {SvelteMap} from 'svelte/reactivity';
 
 import {Datetime, get_datetime_now} from '$lib/zod_helpers.js';
 import type {JSONRPCRequestId} from '$lib/jsonrpc.js';
 
-export interface Request_Tracker_Item<T = any> {
-	deferred: Deferred<T>;
-	created: Datetime;
-	status: Async_Status;
-	timeout?: NodeJS.Timeout;
+/**
+ * Represents a pending request with its associated state.
+ */
+export class Request_Tracker_Item<T = any> {
+	deferred: Deferred<T> = $state()!;
+	created: Datetime = $state()!;
+	status: Async_Status = $state()!;
+	timeout: NodeJS.Timeout | undefined = $state();
+
+	constructor(
+		deferred: Deferred<T>,
+		created: Datetime,
+		status: Async_Status,
+		timeout: NodeJS.Timeout | undefined,
+	) {
+		this.deferred = deferred;
+		this.created = created;
+		this.status = status;
+		this.timeout = timeout;
+	}
 }
 
 /**
@@ -15,7 +31,7 @@ export interface Request_Tracker_Item<T = any> {
  * Used by transports to handle the request-response lifecycle.
  */
 export class Request_Tracker<T = any> {
-	readonly pending_requests: Map<JSONRPCRequestId, Request_Tracker_Item<T>> = new Map();
+	readonly pending_requests: SvelteMap<JSONRPCRequestId, Request_Tracker_Item<T>> = new SvelteMap();
 	readonly request_timeout_ms: number;
 
 	constructor(request_timeout_ms = 15000) {
@@ -42,13 +58,8 @@ export class Request_Tracker<T = any> {
 			this.reject_request(id, new Error(`Request timed out: ${id}`));
 		}, this.request_timeout_ms);
 
-		// Store the request tracker
-		this.pending_requests.set(id, {
-			deferred,
-			created,
-			status: 'pending',
-			timeout,
-		});
+		// Store the request tracker using the new class
+		this.pending_requests.set(id, new Request_Tracker_Item(deferred, created, 'pending', timeout));
 
 		return deferred;
 	}
