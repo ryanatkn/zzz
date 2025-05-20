@@ -5,7 +5,7 @@ import type {Async_Status} from '@ryanatkn/belt/async.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import {ollama_list} from '$lib/ollama.js';
-import {Uuid} from '$lib/zod_helpers.js';
+import {create_uuid, Uuid} from '$lib/zod_helpers.js';
 import type {Zzz_Dir} from '$lib/diskfile_types.js';
 
 /** Maximum number of ping records to keep. */
@@ -19,15 +19,17 @@ export type Capabilities_Json_Input = z.input<typeof Capabilities_Json>;
  * Generic interface for a capability with standardized status tracking.
  */
 export interface Capability<T> {
-	/** The capability name */
+	/** The capability name. */
 	name: string;
-	/** The capability's status: undefined=not initialized, null=checking, otherwise available or not */
+	/** The capability's status: undefined=not initialized, null=checking, otherwise available or not. */
 	data: T;
-	/** Async status tracking the connection/check state */
+	/** Async status tracking the connection/check state. */
 	status: Async_Status;
+	/** Message id of the last request for this capability's info, if any. */
+	message_id: Uuid | null;
 	/** Error message if any */
 	error_message: string | null;
-	/** Timestamp when the capability was last checked */
+	/** Timestamp when the capability was last checked. */
 	updated: number | null;
 }
 
@@ -63,7 +65,7 @@ export interface Filesystem_Capability_Data {
 }
 
 export interface Ollama_Capability_Data {
-	list_response: ListResponse | null;
+	list_response: ListResponse | null; // TODO add `round_trip_time` here or generically to all capabilities
 }
 
 /**
@@ -76,6 +78,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 		name: 'server',
 		data: undefined,
 		status: 'initial',
+		message_id: null,
 		error_message: null,
 		updated: null,
 	});
@@ -108,6 +111,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 			name: 'websocket',
 			data,
 			status,
+			message_id: null,
 			error_message: null, // Socket doesn't expose error messages directly
 			updated: data?.last_connect_time ?? null,
 		};
@@ -139,6 +143,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 				name: 'filesystem',
 				data,
 				status,
+				message_id: null,
 				error_message: null,
 				updated: Date.now(),
 			};
@@ -149,6 +154,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 		name: 'ollama',
 		data: undefined,
 		status: 'initial',
+		message_id: null,
 		error_message: null,
 		updated: null,
 	});
@@ -274,10 +280,13 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	 * @returns A promise that resolves when the check is complete
 	 */
 	async check_ollama(): Promise<void> {
+		const message_id = create_uuid();
+
 		this.ollama = {
 			name: 'ollama',
 			data: null,
 			status: 'pending',
+			message_id,
 			error_message: null,
 			updated: Date.now(),
 		};
@@ -289,11 +298,12 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 			const list_response = await ollama_list();
 
 			// Set the capability data
-			if (list_response) {
+			if (list_response && this.ollama.message_id === message_id) {
 				this.ollama = {
 					name: 'ollama',
 					data: {list_response},
 					status: 'success',
+					message_id,
 					error_message: null,
 					updated: Date.now(),
 				};
@@ -305,11 +315,12 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 			error_message = error instanceof Error ? error.message : 'Unknown error connecting to Ollama';
 		}
 
-		if (error_message) {
+		if (error_message && this.ollama.message_id === message_id) {
 			this.ollama = {
 				name: 'ollama',
 				data: null,
 				status: 'failure',
+				message_id: null,
 				error_message,
 				updated: Date.now(),
 			};
@@ -332,10 +343,12 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 		this.pings = [new_ping, ...this.pings.slice(0, PING_HISTORY_MAX - 1)];
 
 		// TODO @many maybe refactor to middleware or more sophisticated hooks? is spread across 3 methods called from 2 mutations
+		// Reset the server state only if it hasn't connected yet, to avoid flickering
 		this.server = {
 			name: 'server',
 			data: null,
 			status: 'pending',
+			message_id: request_id,
 			error_message: null,
 			updated: Date.now(),
 		};
@@ -345,50 +358,45 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	handle_received_ping(ping_id: Uuid): void {
 		console.log(`[handle_received_ping] ping_id`, ping_id);
 		const ping = this.pings.find((p) => p.ping_id === ping_id);
-		// If we found the ping, update it
+		// If we can't find the ping, we can safely ignore it
 		if (!ping) {
-			// TODO refactor
-			console.error(`[handle_received_ping] ping_id`, ping_id, 'not found');
 			return;
 		}
+
 		const received_time = Date.now();
+
 		ping.completed = true;
 		ping.received_time = received_time;
 		ping.round_trip_time = received_time - ping.sent_time;
 
 		// TODO @many maybe refactor to middleware or more sophisticated hooks? is spread across 3 methods called from 2 mutations
-		this.server = {
-			name: 'server',
-			data: {
-				round_trip_time: ping.round_trip_time,
-			},
-			status: 'success',
-			error_message: null,
-			updated: Date.now(),
-		};
+		if (this.server.message_id === ping_id) {
+			this.server = {
+				name: 'server',
+				data: {
+					round_trip_time: ping.round_trip_time,
+				},
+				status: 'success',
+				message_id: ping_id,
+				error_message: null,
+				updated: Date.now(),
+			};
+		}
 	}
 
 	handle_ping_error(ping_id: Uuid, error_message: string): void {
 		console.error(`[handle_ping_error] ping_id`, ping_id, error_message);
 		// TODO @many maybe refactor to middleware or more sophisticated hooks? is spread across 3 methods called from 2 mutations
-		this.server = {
-			name: 'server',
-			data: null,
-			status: 'failure',
-			error_message,
-			updated: Date.now(),
-		};
-		// TODO BLOCK @api better errors?
-		// 		error_message = `Server responded with status ${response.status}: ${response.statusText}`;
-		// 	}
-		// } catch (error) {
-		// 	console.error('Failed to connect to server:', error);
-		// 	if (error instanceof DOMException && error.name === 'AbortError') {
-		// 		error_message = 'Request timed out';
-		// 	} else {
-		// 		error_message =
-		// 			error instanceof Error ? error.message : 'Unknown error connecting to server';
-		// 	}
+		if (this.server.message_id === ping_id) {
+			this.server = {
+				name: 'server',
+				data: null,
+				status: 'failure',
+				message_id: ping_id,
+				error_message,
+				updated: Date.now(),
+			};
+		}
 	}
 
 	/**
@@ -399,6 +407,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 			name: 'server',
 			data: undefined,
 			status: 'initial',
+			message_id: null,
 			error_message: null,
 			updated: null,
 		};
@@ -409,6 +418,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 			name: 'ollama',
 			data: undefined,
 			status: 'initial',
+			message_id: null,
 			error_message: null,
 			updated: null,
 		};

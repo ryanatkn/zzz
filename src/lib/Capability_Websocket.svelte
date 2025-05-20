@@ -90,16 +90,14 @@
 				class:color_h={capabilities.websocket.status === 'success' && !socket.connected}
 			>
 				<div class="column justify_content_center gap_xs pl_md" style:min-height="80px">
-					websocket {socket.connected
-						? 'connected'
-						: socket.status === 'pending'
-							? 'connecting'
-							: 'disconnected'}
-					{#if capabilities.has_pending_pings}
-						<span class="font_family_mono"
-							>(pending pings: {capabilities.pending_ping_count}) <Pending_Animation /></span
-						>
-					{/if}
+					<span
+						>websocket {socket.connected
+							? 'connected'
+							: socket.status === 'pending'
+								? 'connecting'
+								: 'disconnected'}{#if socket.status === 'pending'}
+							<Pending_Animation inline attrs={{class: 'ml_sm'}} />{/if}</span
+					>
 					<small class="font_family_mono"
 						>{#if socket.url}{socket.url}{:else}&nbsp;{/if}</small
 					>
