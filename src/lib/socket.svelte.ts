@@ -1,6 +1,6 @@
 import {z} from 'zod';
 import {SvelteMap} from 'svelte/reactivity';
-import {create_deferred, type Async_Status} from '@ryanatkn/belt/async.js';
+import type {Async_Status} from '@ryanatkn/belt/async.js';
 import {BROWSER} from 'esm-env';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
@@ -274,8 +274,8 @@ export class Socket extends Cell<typeof Socket_Json> {
 	/**
 	 * Sends a ping message for heartbeat purposes
 	 */
-	send_heartbeat(): void {
-		this.zzz.api.ping();
+	async send_heartbeat(): Promise<void> {
+		await this.zzz.api.ping();
 	}
 
 	/**
@@ -298,61 +298,6 @@ export class Socket extends Cell<typeof Socket_Json> {
 	 */
 	clear_failed_messages(): void {
 		this.failed_messages.clear();
-	}
-
-	/**
-	 * Create a promise that resolves when a specific response is received
-	 * @param send_data Data to send immediately
-	 * @param predicate Function to determine if a message is the expected response
-	 * @param timeout Optional timeout in milliseconds
-	 */
-	async request<T>(
-		send_data: object,
-		predicate: (message: any) => boolean | T,
-		timeout: number = 10000,
-	): Promise<T> {
-		const deferred = create_deferred<T>();
-
-		// Set up timeout
-		const timeout_id = setTimeout(() => {
-			cleanup();
-			deferred.reject(new Error('Request timed out'));
-		}, timeout);
-
-		// Create temp handler that listens for the response
-		const temp_handler = (event: MessageEvent) => {
-			try {
-				const data = JSON.parse(event.data);
-				const result = predicate(data);
-				if (result !== false) {
-					cleanup();
-					deferred.resolve(result === true ? data : result);
-				}
-			} catch (_err) {
-				// Ignore parsing errors
-			}
-		};
-
-		// Store original handler to restore it later
-		const original_handler = this.onmessage;
-
-		// TODO BLOCK hacky
-		// Set up our handler that calls both the temp handler and the original one
-		this.onmessage = (event) => {
-			temp_handler(event);
-			if (original_handler) original_handler(event);
-		};
-
-		// Send the request
-		this.send(send_data);
-
-		// Cleanup function to restore original state
-		const cleanup = () => {
-			clearTimeout(timeout_id);
-			this.onmessage = original_handler;
-		};
-
-		return deferred.promise;
 	}
 
 	// Private methods
@@ -413,7 +358,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 				const next_timeout_time = this.#get_next_heartbeat_time();
 
 				if (next_timeout_time <= now) {
-					this.send_heartbeat();
+					void this.send_heartbeat();
 				}
 
 				this.#schedule_next_heartbeat();

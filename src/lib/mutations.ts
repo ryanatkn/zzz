@@ -7,7 +7,7 @@ import type {Mutations} from '$lib/action_metatypes.js';
 export const mutations: Mutations = {
 	ping_request: (ctx) => {
 		console.log('Ping sent', ctx);
-		ctx.zzz.capabilities.handle_sent_ping(ctx.params);
+		ctx.zzz.capabilities.handle_sent_ping(ctx.jsonrpc_message.id); // TODO BLOCK @api type safety
 	},
 
 	ping_response: (ctx) => {
@@ -21,7 +21,7 @@ export const mutations: Mutations = {
 
 	load_session_response: (ctx) => {
 		console.log('Session loaded', ctx.result);
-		ctx.zzz.receive_session(ctx.result.data);
+		ctx.zzz.receive_session(ctx.result.result.data);
 	},
 
 	submit_completion_request: (ctx) => {

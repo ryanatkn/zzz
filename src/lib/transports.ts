@@ -3,6 +3,7 @@ import {z} from 'zod';
 import type {JSONRPCMessage} from '$lib/jsonrpc.js';
 import type {Socket} from '$lib/socket.svelte.js';
 import {API_RESULT_UNKNOWN_ERROR, type Api_Result, type Http_Status} from '$lib/api.js';
+import {Request_Tracker} from '$lib/request_tracker.svelte.js';
 
 // TODO probably add reactivity?
 
@@ -144,17 +145,18 @@ export class Websocket_Rpc_Transport implements Transport {
 	readonly type = 'websocket_rpc' as const;
 
 	#socket: Socket;
-	#on_message: (data: any) => void;
+	#request_tracker: Request_Tracker;
 
-	constructor(socket: Socket, on_message: (data: any) => void) {
+	constructor(socket: Socket, request_timeout_ms?: number) {
 		this.#socket = socket;
-		this.#on_message = on_message;
+		this.#request_tracker = new Request_Tracker(request_timeout_ms);
 
 		// Set up the message handler
 		socket.onmessage = (event) => {
 			try {
 				const data = JSON.parse(event.data);
-				this.#on_message(data);
+				console.log(`PARSED data`, data);
+				this.#request_tracker.handle_message(data);
 			} catch (error) {
 				console.error('[websocket transport] Error parsing WebSocket message:', error);
 			}
@@ -166,8 +168,32 @@ export class Websocket_Rpc_Transport implements Transport {
 		if (!this.is_ready()) {
 			throw new Error('WebSocket not connected');
 		}
-		this.#socket.send(data);
-		// TODO BLOCK probably do the request tracking here, except for notifications
+
+		try {
+			// If this is a JSON-RPC request with an id (not a notification),
+			// set up request tracking.
+			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+			if ('id' in data && data.id != null) {
+				// TODO track the whole request?
+				const deferred = this.#request_tracker.track_request(data.id);
+				this.#socket.send(data);
+
+				// Return the promise that will resolve when the response is received
+				return await deferred.promise;
+			} else {
+				// For notifications, just send without tracking
+				// TODO if we want retries at this abstraction level we'll need to add a way to track them
+				this.#socket.send(data);
+				return {ok: true, status: 200, value: null};
+			}
+		} catch (error) {
+			console.error('[websocket transport] Error sending message:', error);
+			return {
+				ok: false,
+				status: 500,
+				message: error instanceof Error ? error.message : 'Unknown error sending WebSocket message',
+			};
+		}
 	}
 
 	is_ready(): boolean {
@@ -182,12 +208,10 @@ export class Http_Rpc_Transport implements Transport {
 	readonly type = 'http_rpc' as const;
 
 	#url: string;
-	#on_message: (data: any) => void;
 	#headers: Record<string, string>;
 
-	constructor(url: string, on_message: (data: any) => void, headers?: Record<string, string>) {
+	constructor(url: string, headers?: Record<string, string>) {
 		this.#url = url;
-		this.#on_message = on_message;
 		this.#headers = headers ?? {'content-type': 'application/json', accept: 'application/json'};
 	}
 
@@ -212,7 +236,6 @@ export class Http_Rpc_Transport implements Transport {
 
 			const result = await response.json();
 			console.log(`[http transport] result`, result, response.status);
-			this.#on_message(result);
 			return {
 				ok: true,
 				status: response.status as Http_Status,

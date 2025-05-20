@@ -17,7 +17,7 @@ export const JSONRPC_VERSION = '2.0';
 export const JSONRPC_LATEST_PROTOCOL_VERSION = 'DRAFT-2025-v2';
 
 /**
- * A uniquely identifying ID for a request in JSON-RPC.
+ * A uniquely identifying id for a request in JSON-RPC.
  *
  * Like MCP but unlike JSON-RPC, the type excludes null.
  */

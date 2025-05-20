@@ -206,36 +206,6 @@ describe('Socket', () => {
 			expect(mock_socket.sent_messages.length).toBe(2);
 			expect(socket.queued_message_count).toBe(0);
 		});
-
-		test('request resolves when matching response received', async () => {
-			const socket = new Socket({zzz});
-			socket.connect(TEST_URLS.BASE);
-			mock_socket.connect();
-
-			// Create request promise
-			const request_promise = socket.request<{method: string; request_id: string; params: string}>(
-				{method: 'query_a', id: 'req_a'},
-				(message) => {
-					if (message.method === 'response_a' && message.request_id === 'req_a') {
-						return message;
-					}
-					return false;
-				},
-				1000,
-			);
-
-			// Verify request sent
-			expect(mock_socket.sent_messages.length).toBe(1);
-
-			// Simulate response
-			mock_socket.dispatchEvent('message', {
-				params: JSON.stringify({method: 'response_a', request_id: 'req_a', params: 'result_a'}),
-			});
-
-			const result = await request_promise;
-			expect(result.method).toBe('response_a');
-			expect(result.params).toBe('result_a');
-		});
 	});
 
 	describe('Error handling', () => {

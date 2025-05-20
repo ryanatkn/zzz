@@ -8,7 +8,6 @@ import {ollama_list} from '$lib/ollama.js';
 import {API_PATH, SERVER_URL} from '$lib/constants.js';
 import {Uuid} from '$lib/zod_helpers.js';
 import type {Zzz_Dir} from '$lib/diskfile_types.js';
-import {Action_Message, type Action_Message_Params} from '$lib/action_messages.js';
 
 /** Maximum number of ping records to keep. */
 export const PING_HISTORY_MAX = 6;
@@ -386,10 +385,10 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	}
 
 	// TODO @many refactor mutations
-	handle_sent_ping(request: Action_Message['ping_request']): void {
+	handle_sent_ping(request_id: Uuid): void {
 		// Create a new pending ping
 		const new_ping: Ping_Data = {
-			ping_id: request.id,
+			ping_id: request_id,
 			completed: false,
 			sent_time: Date.now(),
 			received_time: null,
@@ -401,9 +400,9 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	}
 
 	// TODO @many refactor mutations
-	handle_received_ping(response: Action_Message_Params['ping_response']): void {
+	handle_received_ping(ping_id: Uuid): void {
 		const received_time = Date.now();
-		const ping_index = this.pings.findIndex((p) => p.ping_id === response.ping_id);
+		const ping_index = this.pings.findIndex((p) => p.ping_id === ping_id);
 		// If we found the ping, update it
 		if (ping_index !== -1) {
 			const ping = this.pings[ping_index];

@@ -101,7 +101,7 @@ export class Projects extends Cell<typeof Projects_Json> {
 		return viewmodel;
 	});
 
-	/** Current page editor derived from current project and page IDs. */
+	/** Current page editor derived from current project and page ids. */
 	readonly current_page_viewmodel = $derived.by(() => {
 		if (!this.current_project_id || !this.current_page_id) return null;
 
@@ -118,7 +118,7 @@ export class Projects extends Cell<typeof Projects_Json> {
 		return viewmodel;
 	});
 
-	/** Current domains viewmodel derived from current project and domain IDs. */
+	/** Current domains viewmodel derived from current project and domain ids. */
 	readonly current_domains_viewmodel = $derived.by(() => {
 		if (!this.current_project_id) return null;
 
@@ -165,7 +165,7 @@ export class Projects extends Cell<typeof Projects_Json> {
 	}
 
 	/**
-	 * Sets the current project ID.
+	 * Sets the current project id.
 	 */
 	set_current_project(project_id: Uuid | null): void {
 		console.log(`set_current_project`, project_id);
@@ -173,7 +173,7 @@ export class Projects extends Cell<typeof Projects_Json> {
 	}
 
 	/**
-	 * Sets the current page ID.
+	 * Sets the current page id.
 	 */
 	set_current_page(page_id: Uuid | null): void {
 		console.log(`set_current_page`, page_id);
@@ -181,7 +181,7 @@ export class Projects extends Cell<typeof Projects_Json> {
 	}
 
 	/**
-	 * Sets the current domain ID.
+	 * Sets the current domain id.
 	 */
 	set_current_domain(domain_id: Uuid | null): void {
 		console.log(`set_current_domain`, domain_id);
@@ -238,7 +238,7 @@ export class Projects extends Cell<typeof Projects_Json> {
 	}
 
 	/**
-	 * Deletes a project by ID.
+	 * Deletes a project by id.
 	 */
 	delete_project(project_id: Uuid): void {
 		const index = this.projects.findIndex((p) => p.id === project_id);
@@ -298,7 +298,7 @@ export class Projects extends Cell<typeof Projects_Json> {
 	}
 
 	/**
-	 * Find a project by ID.
+	 * Find a project by id.
 	 */
 	find_project(project_id: Uuid): Project | null {
 		return this.projects.find((p) => p.id === project_id) || null;
