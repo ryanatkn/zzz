@@ -41,8 +41,9 @@ export interface Ping_Data {
 }
 
 export interface Server_Capability_Data {
-	name: string;
-	version: string;
+	// TODO think about a special endpoint that isn't `ping` with more info, maybe in .well-known as a json file - server.json?
+	// name: string;
+	// version: string;
 	round_trip_time: number;
 }
 
@@ -298,15 +299,11 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 			});
 
 			if (response.ok) {
-				const data = await response.json();
-
 				// Note: we're not requiring a status field in the response
 				// since the server.ts implementation doesn't include it
 				this.server = {
 					name: 'server',
 					data: {
-						name: data.name,
-						version: data.version,
 						round_trip_time: Date.now() - start_time,
 					},
 					status: 'success',
@@ -386,6 +383,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 
 	// TODO @many refactor mutations
 	handle_sent_ping(request_id: Uuid): void {
+		console.log(`[handle_sent_ping] request_id`, request_id);
 		// Create a new pending ping
 		const new_ping: Ping_Data = {
 			ping_id: request_id,
@@ -401,6 +399,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 
 	// TODO @many refactor mutations
 	handle_received_ping(ping_id: Uuid): void {
+		console.log(`[handle_received_ping] ping_id`, ping_id);
 		const received_time = Date.now();
 		const ping_index = this.pings.findIndex((p) => p.ping_id === ping_id);
 		// If we found the ping, update it
