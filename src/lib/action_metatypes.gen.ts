@@ -93,7 +93,7 @@ export const gen: Gen = ({origin_path}) => {
 						innermost_type_name !== z.ZodFirstPartyTypeKind.ZodVoid;
 					return `${spec.method}: (${
 						has_params
-							? `params: z.infer<typeof ${to_action_spec_params_identifier(spec.method)}>`
+							? `params${spec.params.isOptional() ? '?' : ''}: z.infer<typeof ${to_action_spec_params_identifier(spec.method)}>`
 							: 'params?: void'
 					}) => ${
 						spec.kind === 'request_response'

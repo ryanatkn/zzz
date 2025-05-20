@@ -16,12 +16,12 @@
 	const zzz = zzz_context.get();
 
 	onNavigate(() => {
-		if (zzz.ui.show_main_dialog) zzz.ui.toggle_main_menu(false);
+		if (zzz.ui.show_main_dialog) zzz.api.toggle_main_menu(false);
 	});
 </script>
 
 {#if !disabled && zzz.ui.show_main_dialog}
-	<Dialog onclose={() => zzz.ui.toggle_main_menu(false)} layout="page">
+	<Dialog onclose={() => zzz.api.toggle_main_menu(false)} layout="page">
 		<div class="box">
 			<div class="pane p_xl3">
 				<section class="box mb_xl3">

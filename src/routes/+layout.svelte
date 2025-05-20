@@ -93,7 +93,7 @@
 				icon: '?',
 				run: () => {
 					console.log('show main dialog');
-					zzz.ui.show_main_dialog = true;
+					zzz.api.toggle_main_menu(true);
 				},
 			},
 		},

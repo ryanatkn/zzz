@@ -33,6 +33,7 @@ export interface Error_Response {
 
 export const ERROR_MESSAGE_UNKNOWN = Result_Error.DEFAULT_MESSAGE;
 
+/** Wraps an API call for any transport. */
 export type Api_Result<T_Value = any> = Result<
 	{status: Http_Status; value: T_Value},
 	{status: Http_Status} & Error_Response

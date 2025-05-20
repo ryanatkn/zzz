@@ -45,7 +45,7 @@
 </script>
 
 {#if preview_mode}
-	<div class="preview_fullscreen" class:offset_for_sidebar={zzz.ui.toggle_main_menu}>
+	<div class="preview_fullscreen" class:offset_for_sidebar={zzz.ui.show_sidebar}>
 		<div class="markdown_preview p_lg">
 			<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 			{@html page_viewmodel?.formatted_content}

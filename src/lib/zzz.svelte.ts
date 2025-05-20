@@ -35,10 +35,11 @@ import {HANDLED} from '$lib/cell_helpers.js';
 import {Action_Registry} from '$lib/action_registry.js';
 import {Api_Client, type Api_Client_Options} from '$lib/api_client.js';
 import type {Completion_Message} from '$lib/completion_types.js';
-import type {Actions_Api, Mutations} from '$lib/action_metatypes.js';
+import type {Action_Message_Type, Actions_Api, Mutations} from '$lib/action_metatypes.js';
 import type {Action_Spec} from '$lib/action_spec.js';
 import {action_specs} from '$lib/action_collections.js';
 import {create_actions_api} from '$lib/actions_api.js';
+import type {Mutation} from '$lib/mutation.js';
 
 export const zzz_context = create_context<Zzz>();
 
@@ -81,7 +82,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	readonly cell_registry: Cell_Registry;
 
 	readonly action_registry: Action_Registry;
-	readonly mutations: Mutations;
+	readonly mutations: Mutations & Partial<Record<Action_Message_Type, Mutation<typeof this>>>;
 	readonly api: Actions_Api;
 	readonly api_client: Api_Client;
 

@@ -116,6 +116,6 @@ export const submit_completion_action_spec = {
 export const toggle_main_menu_action_spec = {
 	method: 'toggle_main_menu',
 	kind: 'client_local',
-	params: z.void(),
-	returns: Type_Literal.parse('void'),
+	params: z.boolean().or(z.void()),
+	returns: Type_Literal.parse('boolean'),
 } satisfies Action_Spec;

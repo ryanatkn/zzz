@@ -56,10 +56,7 @@ export type Server_Notification_Action_Spec = z.infer<typeof Server_Notification
 // Type for client_local actions (that never leave the client)
 export const Client_Local_Action_Spec = Action_Spec_Base.extend({
 	kind: z.literal('client_local').default('client_local'),
-	/**
-	 * This needs to be watched closely, so the friction from the branded type is desired.
-	 */
-	returns: Type_Literal,
+	returns: Type_Literal, // TODO BLOCK make this a schema, maybe an optional `returns_type`
 });
 export type Client_Local_Action_Spec = z.infer<typeof Client_Local_Action_Spec>;
 

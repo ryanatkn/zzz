@@ -1,8 +1,12 @@
 import type {Mutations} from '$lib/action_metatypes.js';
 
+// TODO we may also want method-based or middleware-like APIs
+/**
+ * These map to message types, not action methods.
+ */
 export const mutations: Mutations = {
 	ping_request: (ctx) => {
-		console.log('Ping sent', ctx.params);
+		console.log('Ping sent', ctx);
 		ctx.zzz.capabilities.handle_sent_ping(ctx.params);
 	},
 
@@ -11,7 +15,7 @@ export const mutations: Mutations = {
 		ctx.zzz.capabilities.handle_received_ping(ctx.result.data);
 	},
 
-	load_session_request: (ctx) => {
+	load_session_request: () => {
 		console.log('Loading session...');
 	},
 
@@ -48,5 +52,10 @@ export const mutations: Mutations = {
 	filer_change: (ctx) => {
 		console.log('File changed', ctx.params.change, ctx.result);
 		ctx.zzz.diskfiles.handle_change(ctx.params);
+	},
+
+	toggle_main_menu: (ctx) => {
+		console.log('Toggling main menu', ctx.params);
+		return ctx.zzz.ui.toggle_main_menu(ctx.params);
 	},
 };

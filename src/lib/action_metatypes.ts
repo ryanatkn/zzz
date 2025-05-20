@@ -91,7 +91,7 @@ export interface Actions_Api {
 	submit_completion: (
 		params: z.infer<typeof submit_completion_action_spec.params>,
 	) => Promise<Api_Result<z.infer<typeof submit_completion_action_spec.response_params>>>;
-	toggle_main_menu: (params?: void) => void;
+	toggle_main_menu: (params?: z.infer<typeof toggle_main_menu_action_spec.params>) => boolean;
 	update_diskfile: (
 		params: z.infer<typeof update_diskfile_action_spec.params>,
 	) => Promise<Api_Result<z.infer<typeof update_diskfile_action_spec.response_params>>>;

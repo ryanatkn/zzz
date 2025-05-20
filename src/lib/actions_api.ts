@@ -13,7 +13,7 @@ const log = new Logger();
 
 export const create_actions_api = (zzz: Zzz): Actions_Api =>
 	new Proxy(Object.create(null), {
-		get: (_target, method: keyof Actions_Api) => (params: unknown) => {
+		get: (_target, method: keyof Actions_Api) => (params: any) => {
 			// TODO BLOCK `log.debug` isn't formatting the output correctly, shouldn't use console here
 			console.log(...to_logged_args(method, params));
 
