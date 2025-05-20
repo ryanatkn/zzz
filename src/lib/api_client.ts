@@ -10,7 +10,7 @@ import {
 	Transports,
 	Websocket_Rpc_Transport,
 	type Transport_Type,
-} from '$lib/transport.js';
+} from '$lib/transports.js';
 
 // TODO support canceling
 

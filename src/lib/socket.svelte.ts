@@ -13,6 +13,7 @@ import {
 	DEFAULT_AUTO_RECONNECT,
 	DEFAULT_CLOSE_CODE,
 } from '$lib/socket_helpers.js';
+import {API_RESULT_UNKNOWN_ERROR} from '$lib/api.js';
 
 // TODO the plan here is to make websockets one of multiple transports, this just gets the proof of concept working
 
@@ -386,7 +387,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 			const failed_message: Failed_Message = {
 				...message,
 				failed: Date.now(),
-				reason: error instanceof Error ? error.message : 'Unknown error',
+				reason: error instanceof Error ? error.message : API_RESULT_UNKNOWN_ERROR.message,
 			};
 			this.failed_messages.set(message.id, failed_message);
 		}

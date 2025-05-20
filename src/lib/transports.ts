@@ -2,7 +2,9 @@ import {z} from 'zod';
 
 import type {JSONRPCMessage} from '$lib/jsonrpc.js';
 import type {Socket} from '$lib/socket.svelte.js';
-import type {Api_Result} from '$lib/api.js';
+import {API_RESULT_UNKNOWN_ERROR, type Api_Result, type Http_Status} from '$lib/api.js';
+
+// TODO probably add reactivity?
 
 // TODO support configurable/extensible transports
 export const Transport_Type = z.enum(['http_rpc', 'websocket_rpc']);
@@ -154,12 +156,13 @@ export class Websocket_Rpc_Transport implements Transport {
 				const data = JSON.parse(event.data);
 				this.#on_message(data);
 			} catch (error) {
-				console.error('Error parsing WebSocket message:', error);
+				console.error('[websocket transport] Error parsing WebSocket message:', error);
 			}
 		};
 	}
 
 	async send(data: JSONRPCMessage): Promise<Api_Result> {
+		console.log(`[websocket transport] data`, data);
 		if (!this.is_ready()) {
 			throw new Error('WebSocket not connected');
 		}
@@ -189,6 +192,7 @@ export class Http_Rpc_Transport implements Transport {
 	}
 
 	async send(data: JSONRPCMessage): Promise<Api_Result> {
+		console.log(`[http transport] data`, data);
 		try {
 			const response = await fetch(this.#url, {
 				method: 'POST', // TODO support GET
@@ -199,14 +203,24 @@ export class Http_Rpc_Transport implements Transport {
 			});
 
 			if (!response.ok) {
-				throw new Error(`HTTP error: ${response.status}`);
+				return {
+					ok: false,
+					status: response.status as Http_Status,
+					message: (await response.text()) || API_RESULT_UNKNOWN_ERROR.message,
+				};
 			}
 
 			const result = await response.json();
+			console.log(`[http transport] result`, result, response.status);
 			this.#on_message(result);
+			return {ok: true, status: response.status as Http_Status, value: result};
 		} catch (error) {
-			console.error('Error sending HTTP request:', error);
-			throw error;
+			console.error('[http transport] Error sending HTTP request:', error);
+			return {
+				ok: false,
+				status: 500, // TODO BLOCK @api
+				message: 'Error sending HTTP request', // TODO BLOCK @api
+			};
 		}
 	}
 

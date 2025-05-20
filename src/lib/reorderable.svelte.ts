@@ -92,7 +92,6 @@ export interface Reorderable_Options {
 }
 
 export class Reorderable implements Reorderable_Style_Config {
-	// Initialization state
 	initialized = $state(false);
 
 	// Drag state tracking
@@ -157,6 +156,7 @@ export class Reorderable implements Reorderable_Style_Config {
 	 */
 	constructor(options: Reorderable_Options = EMPTY_OBJECT) {
 		const {
+			// preserve nulls
 			list_class = LIST_CLASS_DEFAULT,
 			item_class = ITEM_CLASS_DEFAULT,
 			dragging_class = DRAGGING_CLASS_DEFAULT,
