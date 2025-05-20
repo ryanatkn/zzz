@@ -213,7 +213,11 @@ export class Http_Rpc_Transport implements Transport {
 			const result = await response.json();
 			console.log(`[http transport] result`, result, response.status);
 			this.#on_message(result);
-			return {ok: true, status: response.status as Http_Status, value: result};
+			return {
+				ok: true,
+				status: response.status as Http_Status,
+				value: result,
+			};
 		} catch (error) {
 			console.error('[http transport] Error sending HTTP request:', error);
 			return {
