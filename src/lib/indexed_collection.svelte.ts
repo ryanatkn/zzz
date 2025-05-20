@@ -33,11 +33,13 @@ export interface Index_Definition<T extends Indexed_Item, T_Result = any, T_Quer
 	/**
 	 * Schema for validating query parameters.
 	 */
+	// TODO @many loses type info in the schema
 	query_schema?: z.ZodType<T_Query>; // TODO @many should query/result schemas be optional or required? helpers could make required schemas easier to work with
 
 	/**
 	 * Schema for validating the computed result.
 	 */
+	// TODO @many loses type info in the schema
 	result_schema: z.ZodType<T_Result>; // TODO @many should query/result schemas be optional or required? helpers could make required schemas easier to work with
 
 	/** Optional predicate to determine if an item is relevant to this index. */

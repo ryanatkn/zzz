@@ -126,6 +126,7 @@ export const package_json = {
 		'./action_specs.js': {types: './dist/action_specs.d.ts', default: './dist/action_specs.js'},
 		'./action_types.js': {types: './dist/action_types.d.ts', default: './dist/action_types.js'},
 		'./action.svelte.js': {types: './dist/action.svelte.d.ts', default: './dist/action.svelte.js'},
+		'./actions_api.js': {types: './dist/actions_api.d.ts', default: './dist/actions_api.js'},
 		'./actions.svelte.js': {
 			types: './dist/actions.svelte.d.ts',
 			default: './dist/actions.svelte.js',
@@ -913,7 +914,6 @@ export const src_json = {
 				{name: 'lookup_response_action_schema', kind: 'function'},
 				{name: 'to_action_request_message_type', kind: 'function'},
 				{name: 'to_action_response_message_type', kind: 'function'},
-				{name: 'jsonrpc_to_action_message', kind: 'function'},
 			],
 		},
 		'./Action_List.svelte': {
@@ -993,6 +993,10 @@ export const src_json = {
 				{name: 'Action_Schema', kind: 'variable'},
 			],
 		},
+		'./actions_api.js': {
+			path: 'actions_api.ts',
+			declarations: [{name: 'create_actions_api', kind: 'function'}],
+		},
 		'./actions.svelte.js': {
 			path: 'actions.svelte.ts',
 			declarations: [
@@ -1032,6 +1036,7 @@ export const src_json = {
 				{name: 'Api_Errors', kind: 'type'},
 				{name: 'assert_api_error', kind: 'function'},
 				{name: 'create_api_errors', kind: 'function'},
+				{name: 'Api_Request_Response_Flag', kind: 'type'},
 			],
 		},
 		'./app.svelte.js': {

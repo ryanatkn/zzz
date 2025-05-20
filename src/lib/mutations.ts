@@ -21,12 +21,12 @@ export const mutations: Mutations = {
 	},
 
 	submit_completion_request: (ctx) => {
-		console.log('Sending prompt', ctx.params.completion_request?.prompt);
+		console.log('Sending prompt', ctx.params.completion_request.prompt);
 	},
 
 	submit_completion_response: (ctx) => {
 		console.log('Received completion', ctx.params.completion_request, ctx.result);
-		ctx.zzz.receive_completion_response(ctx.params);
+		ctx.zzz.receive_completion_response(ctx.result.data);
 	},
 
 	update_diskfile_request: (ctx) => {
@@ -39,6 +39,10 @@ export const mutations: Mutations = {
 
 	create_directory_request: (ctx) => {
 		console.log('Creating directory', ctx.params.path);
+	},
+
+	create_directory_response: (ctx) => {
+		console.log('Created directory', ctx.result.data);
 	},
 
 	filer_change: (ctx) => {

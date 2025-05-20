@@ -40,3 +40,9 @@ export const to_action_request_message_type = (method: Action_Method): Action_Me
 
 export const to_action_response_message_type = (method: Action_Method): Action_Message_Type =>
 	Action_Message_Type.parse(method + '_response');
+
+export const to_response_type = (type: Action_Message_Type): Action_Message_Type => {
+	return type.endsWith('_request')
+		? Action_Message_Type.parse(type.slice(0, -7) + 'response')
+		: type;
+};

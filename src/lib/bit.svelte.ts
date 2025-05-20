@@ -7,7 +7,7 @@ import type {Omit_Strict} from '@ryanatkn/belt/types.js';
 import {estimate_token_count} from '$lib/helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Uuid} from '$lib/zod_helpers.js';
-import {Xml_Attribute} from '$lib/xml.js';
+import {Xml_Attribute_With_Defaults} from '$lib/xml.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import type {Diskfile} from '$lib/diskfile.svelte.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
@@ -22,7 +22,7 @@ export const Bit_Json_Base = Cell_Json.extend({
 	end: z.number().nullable().default(null),
 	has_xml_tag: z.boolean().default(false),
 	xml_tag_name: z.string().default(''), // TODO @many move to the prompt somewhere
-	attributes: z.array(Xml_Attribute).default(() => []), // TODO @many move to the prompt somewhere
+	attributes: z.array(Xml_Attribute_With_Defaults).default(() => []), // TODO @many move to the prompt somewhere
 	enabled: z.boolean().default(true),
 	title: z.string().nullable().default(null),
 	summary: z.string().nullable().default(null),
@@ -117,8 +117,8 @@ export abstract class Bit<T extends z.ZodType = typeof Bit_Json_Base> extends Ce
 		this.type === 'diskfile' ? 'File' : 'Fragment',
 	);
 
-	add_attribute(partial: z.input<typeof Xml_Attribute> = EMPTY_OBJECT): void {
-		this.attributes.push(Xml_Attribute.parse(partial));
+	add_attribute(partial: z.input<typeof Xml_Attribute_With_Defaults> = EMPTY_OBJECT): void {
+		this.attributes.push(Xml_Attribute_With_Defaults.parse(partial));
 	}
 
 	/**

@@ -18,7 +18,11 @@ import type {Service_Return} from '$lib/server/service.js';
 import {Api_Error} from '$lib/api.js';
 import {is_request_response_action} from '$lib/schema_helpers.js';
 import {stringify_zod_error} from '$lib/zod_helpers.js';
-import {lookup_request_action_schema, lookup_response_action_schema} from '$lib/action_helpers.js';
+import {
+	lookup_request_action_schema,
+	lookup_response_action_schema,
+	to_response_type,
+} from '$lib/action_helpers.js';
 import {
 	type JSONRPCRequest,
 	type JSONRPCResponse,
@@ -26,7 +30,8 @@ import {
 	type JSONRPCNotification,
 	JSONRPC_VERSION,
 } from '$lib/jsonrpc.js';
-import {Jsonrpc_Server, create_jsonrpc_error} from '$lib/server/jsonrpc_server.js';
+import {handle_jsonrpc_request, create_jsonrpc_error} from '$lib/server/jsonrpc_server_helpers.js';
+import {Action_Message_Type} from '$lib/action_metatypes.js';
 
 /**
  * Function type for handling client messages.
@@ -122,11 +127,6 @@ export class Zzz_Server {
 		return this.action_registry.specs;
 	}
 
-	/**
-	 * JSON-RPC server for handling JSON-RPC requests.
-	 */
-	readonly jsonrpc_server: Jsonrpc_Server;
-
 	constructor(options: Zzz_Server_Options) {
 		// Parse the allowed filesystem directories
 		this.zzz_dir = Zzz_Dir.parse(resolve(options.zzz_dir)); // TODO if the class get more paths to deal with, add a `cwd` option - for now callers can just resolve to absolute themselves
@@ -142,13 +142,6 @@ export class Zzz_Server {
 
 		this.log = options.log === undefined ? new Logger('[zzz_server]') : options.log;
 
-		// Initialize the JSON-RPC server with handlers
-		this.jsonrpc_server = new Jsonrpc_Server({
-			onrequest: this.#handle_jsonrpc_request,
-			onnotification: this.#handle_jsonrpc_notification,
-			log: this.log,
-		});
-
 		// TODO maybe do this in an `init` method
 		// Set up the filer watcher for the zzz_dir
 		console.log(`this.zzz_dir`, this.zzz_dir);
@@ -161,7 +154,12 @@ export class Zzz_Server {
 	}
 
 	async handle_request(data: unknown): Promise<JSONRPCResponse | JSONRPCError | null> {
-		const request = this.jsonrpc_server.process_request(data);
+		const request = handle_jsonrpc_request({
+			data,
+			onrequest: this.#handle_jsonrpc_request,
+			onnotification: this.#handle_jsonrpc_notification,
+			log: this.log,
+		});
 		// TODO anything here? are the various concerns all handled in callbacks?
 		return request;
 	}
@@ -176,6 +174,7 @@ export class Zzz_Server {
 			// Parse the request into an Action_Message_Base using schema
 			const action_message = Action_Message_Base.parse({
 				id: request.id,
+				type: to_response_type(Action_Message_Type.parse(request.method)),
 				method: request.method,
 				params: request.params,
 			});
@@ -209,7 +208,7 @@ export class Zzz_Server {
 		try {
 			// Parse the notification into an Action_Message_Base using schema
 			const action_message = Action_Message_Base.parse({
-				id: 'notification', // Placeholder ID for notifications
+				type: to_response_type(Action_Message_Type.parse(notification.method)),
 				method: notification.method,
 				params: notification.params,
 			});

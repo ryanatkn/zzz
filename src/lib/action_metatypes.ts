@@ -102,7 +102,6 @@ export interface Actions_Api {
  * Interface for client-side mutation handlers.
  */
 export interface Mutations<T_App extends Zzz = Zzz> {
-	[key: string]: Mutation<T_App> | undefined;
 	create_directory_request?: Mutation<
 		T_App,
 		z.infer<typeof create_directory_action_spec.params>,

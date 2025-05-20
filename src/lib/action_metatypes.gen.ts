@@ -114,7 +114,6 @@ export const gen: Gen = ({origin_path}) => {
 		 * Interface for client-side mutation handlers.
 		 */
 		export interface Mutations<T_App extends Zzz = Zzz> {
-			[key: string]: Mutation<T_App> | undefined;
 			${registry.specs
 				.map((spec) => {
 					const v = (m: Action_Method, request_response: Api_Request_Response_Flag) =>

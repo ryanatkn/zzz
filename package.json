@@ -155,6 +155,10 @@
       "types": "./dist/action.svelte.d.ts",
       "default": "./dist/action.svelte.js"
     },
+    "./actions_api.js": {
+      "types": "./dist/actions_api.d.ts",
+      "default": "./dist/actions_api.js"
+    },
     "./actions.svelte.js": {
       "types": "./dist/actions.svelte.d.ts",
       "default": "./dist/actions.svelte.js"

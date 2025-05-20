@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type {Omit_Strict} from '@ryanatkn/belt/types.js';
 
-	import type {Xml_Attribute} from '$lib/xml.js';
+	import type {Xml_Attribute_With_Defaults} from '$lib/xml.js';
 	import {GLYPH_REMOVE} from '$lib/glyphs.js';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Glyph from '$lib/Glyph.svelte';

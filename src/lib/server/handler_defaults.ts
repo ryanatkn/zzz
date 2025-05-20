@@ -40,7 +40,7 @@ const google = new GoogleGenerativeAI(SECRET_GOOGLE_API_KEY);
  * Handle client messages and produce appropriate server responses.
  */
 export const handle_message = async (
-	message: Action_Message_From_Client, // TODO BLOCK needs to include only Request_Response messages (request side?)
+	message: Action_Message_From_Client,
 	server: Zzz_Server,
 ): Promise<Service_Return> => {
 	console.log(`[handle_message] message`, message.id, message.method);
@@ -299,6 +299,7 @@ export const handle_filer_change = (
 	server.send({
 		id: create_uuid(),
 		created: get_datetime_now(),
+		type: 'filer_change', // TODO hacky
 		method: 'filer_change',
 		params: {
 			change: api_change,
