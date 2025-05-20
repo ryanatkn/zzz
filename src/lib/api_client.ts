@@ -106,7 +106,7 @@ export class Api_Client {
 		return deferred.promise;
 	}
 
-	// TODO BLOCK @api is this a transport concern?
+	// TODO BLOCK @api is this a transport concern? maybe called through a callback? (plain function api)
 	/**
 	 * Processes a received action message from server.
 	 * This is the primary entry point for handling incoming server messages.

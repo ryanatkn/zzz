@@ -14,6 +14,7 @@ import {
 	to_action_response_message_type,
 } from '$lib/action_helpers.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
+import type {Api_Request_Response_Flag} from '$lib/api.js';
 
 /**
  * Outputs a file with action types that can be imported from anywhere with no runtime cost.
@@ -112,7 +113,7 @@ export const gen: Gen = ({origin_path}) => {
 			[key: string]: Mutation<T_App> | undefined;
 			${registry.specs
 				.map((spec) => {
-					const v = (m: Action_Method, request_response: 'request' | 'response' | null) =>
+					const v = (m: Action_Method, request_response: Api_Request_Response_Flag) =>
 						`${
 							request_response === 'request'
 								? to_action_request_message_type(m)

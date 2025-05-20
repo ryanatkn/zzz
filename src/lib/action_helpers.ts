@@ -28,26 +28,20 @@ export const create_action_json = (action: Action_Message_Any): Action_Json | nu
 // TODO some hacky types but looks correct
 export const lookup_request_action_schema = (
 	method: Action_Method,
-): z.ZodType<Action_Message_Any> | undefined => {
-	const key = to_action_request_message_type(method);
-	return key && (Action_Message[key] as any);
-};
+): z.ZodType<Action_Message_Any> | undefined =>
+	Action_Message[to_action_request_message_type(method)] as any;
 
 // TODO some hacky types but looks correct
 export const lookup_response_action_schema = (
 	method: Action_Method,
-): z.ZodType<Action_Message_Any> | undefined => {
-	const key = to_action_response_message_type(method);
-	return key && (Action_Message[key] as any);
-};
+): z.ZodType<Action_Message_Any> | undefined =>
+	Action_Message[to_action_response_message_type(method)] as any;
 
-export const to_action_request_message_type = (
-	method: Action_Method,
-): Action_Message_Type | undefined => Action_Message_Type.parse(method + '_request');
+export const to_action_request_message_type = (method: Action_Method): Action_Message_Type =>
+	Action_Message_Type.parse(method + '_request');
 
-export const to_action_response_message_type = (
-	method: Action_Method,
-): Action_Message_Type | undefined => Action_Message_Type.parse(method + '_response');
+export const to_action_response_message_type = (method: Action_Method): Action_Message_Type =>
+	Action_Message_Type.parse(method + '_response');
 
 /**
  * Convert JSON-RPC request to Action_Message format

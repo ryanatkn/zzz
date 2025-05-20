@@ -117,3 +117,5 @@ export const create_api_errors = <T extends Api_Errors>(
 			};
 		},
 	});
+
+export type Api_Request_Response_Flag = 'request' | 'response' | null;
