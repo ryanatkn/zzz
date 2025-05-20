@@ -51,8 +51,7 @@
 		</div>
 		{#if capabilities.server.data}
 			<div class="column align_items_end font_family_mono">
-				<div>{capabilities.server.data.name}</div>
-				<small>v{capabilities.server.data.version}</small>
+				<div>{Math.round(capabilities.server.data.round_trip_time)}ms</div>
 			</div>
 		{/if}
 	</div>
@@ -70,7 +69,7 @@
 			type="button"
 			class="flex_1 justify_content_start"
 			disabled={capabilities.server.status === 'pending'}
-			onclick={() => capabilities.check_server()}
+			onclick={() => zzz.api.ping()}
 		>
 			<Glyph glyph={GLYPH_CONNECT} size="var(--font_size_xl)" />
 			<span class="font_size_lg font_weight_400 ml_md">
@@ -79,7 +78,7 @@
 						checking <div class="position_relative"><Pending_Animation /></div>
 					</div>
 				{:else}
-					check connection
+					check the server
 				{/if}
 			</span>
 		</button>

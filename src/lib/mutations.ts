@@ -6,13 +6,17 @@ import type {Mutations} from '$lib/action_metatypes.js';
  */
 export const mutations: Mutations = {
 	ping_request: (ctx) => {
-		console.log('Ping sent', ctx);
+		console.log('Ping request sent', ctx);
 		ctx.zzz.capabilities.handle_sent_ping(ctx.jsonrpc_message.id); // TODO BLOCK @api type safety
 	},
 
 	ping_response: (ctx) => {
-		console.log('Pong received', ctx.result);
-		ctx.zzz.capabilities.handle_received_ping(ctx.result.data);
+		console.log('Ping response received', ctx.result);
+		if (ctx.result.ok) {
+			ctx.zzz.capabilities.handle_received_ping(ctx.result.data);
+		} else {
+			ctx.zzz.capabilities.handle_ping_error(ctx.jsonrpc_message.id, ctx.result.message);
+		}
 	},
 
 	load_session_request: () => {

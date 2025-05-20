@@ -5,7 +5,6 @@ import type {Async_Status} from '@ryanatkn/belt/async.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import {ollama_list} from '$lib/ollama.js';
-import {API_PATH, SERVER_URL} from '$lib/constants.js';
 import {Uuid} from '$lib/zod_helpers.js';
 import type {Zzz_Dir} from '$lib/diskfile_types.js';
 
@@ -256,7 +255,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	 */
 	async init_server_check(): Promise<void> {
 		if (this.server.status === 'initial') {
-			await this.check_server();
+			await this.zzz.api.ping();
 		}
 	}
 
@@ -267,70 +266,6 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	async init_ollama_check(): Promise<void> {
 		if (this.ollama.status === 'initial') {
 			await this.check_ollama();
-		}
-	}
-
-	// TODO BLOCK instead of this, we want to hook into the `ping` action,
-	// maybe through a mutation set up in the constructor?
-	/**
-	 * Check Server availability by making an HTTP GET request to its ping endpoint.
-	 * @returns A promise that resolves when the check is complete
-	 */
-	async check_server(): Promise<void> {
-		this.server = {
-			name: 'server',
-			data: null,
-			status: 'pending',
-			error_message: null,
-			updated: Date.now(),
-		};
-
-		const server_api_url = SERVER_URL + API_PATH + '/ping';
-
-		let error_message: string | undefined;
-
-		try {
-			const start_time = Date.now();
-
-			// TODO BLOCK use a normal ping action (.send_ping below if it remains but needs to return a promise, also forward the signal)
-			const response = await fetch(server_api_url, {
-				method: 'GET',
-				headers: {'content-type': 'application/json', accept: 'application/json'},
-			});
-
-			if (response.ok) {
-				// Note: we're not requiring a status field in the response
-				// since the server.ts implementation doesn't include it
-				this.server = {
-					name: 'server',
-					data: {
-						round_trip_time: Date.now() - start_time,
-					},
-					status: 'success',
-					error_message: null,
-					updated: Date.now(),
-				};
-			} else {
-				error_message = `Server responded with status ${response.status}: ${response.statusText}`;
-			}
-		} catch (error) {
-			console.error('Failed to connect to server:', error);
-			if (error instanceof DOMException && error.name === 'AbortError') {
-				error_message = 'Request timed out';
-			} else {
-				error_message =
-					error instanceof Error ? error.message : 'Unknown error connecting to server';
-			}
-		}
-
-		if (error_message) {
-			this.server = {
-				name: 'server',
-				data: null,
-				status: 'failure',
-				error_message,
-				updated: Date.now(),
-			};
 		}
 	}
 
@@ -395,20 +330,65 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 
 		// Add the new ping to the start of the array
 		this.pings = [new_ping, ...this.pings.slice(0, PING_HISTORY_MAX - 1)];
+
+		// TODO @many maybe refactor to middleware or more sophisticated hooks? is spread across 3 methods called from 2 mutations
+		this.server = {
+			name: 'server',
+			data: null,
+			status: 'pending',
+			error_message: null,
+			updated: Date.now(),
+		};
 	}
 
 	// TODO @many refactor mutations
 	handle_received_ping(ping_id: Uuid): void {
 		console.log(`[handle_received_ping] ping_id`, ping_id);
-		const received_time = Date.now();
-		const ping_index = this.pings.findIndex((p) => p.ping_id === ping_id);
+		const ping = this.pings.find((p) => p.ping_id === ping_id);
 		// If we found the ping, update it
-		if (ping_index !== -1) {
-			const ping = this.pings[ping_index];
-			ping.completed = true;
-			ping.received_time = received_time;
-			ping.round_trip_time = received_time - ping.sent_time;
+		if (!ping) {
+			// TODO refactor
+			console.error(`[handle_received_ping] ping_id`, ping_id, 'not found');
+			return;
 		}
+		const received_time = Date.now();
+		ping.completed = true;
+		ping.received_time = received_time;
+		ping.round_trip_time = received_time - ping.sent_time;
+
+		// TODO @many maybe refactor to middleware or more sophisticated hooks? is spread across 3 methods called from 2 mutations
+		this.server = {
+			name: 'server',
+			data: {
+				round_trip_time: ping.round_trip_time,
+			},
+			status: 'success',
+			error_message: null,
+			updated: Date.now(),
+		};
+	}
+
+	handle_ping_error(ping_id: Uuid, error_message: string): void {
+		console.error(`[handle_ping_error] ping_id`, ping_id, error_message);
+		// TODO @many maybe refactor to middleware or more sophisticated hooks? is spread across 3 methods called from 2 mutations
+		this.server = {
+			name: 'server',
+			data: null,
+			status: 'failure',
+			error_message,
+			updated: Date.now(),
+		};
+		// TODO BLOCK @api better errors?
+		// 		error_message = `Server responded with status ${response.status}: ${response.statusText}`;
+		// 	}
+		// } catch (error) {
+		// 	console.error('Failed to connect to server:', error);
+		// 	if (error instanceof DOMException && error.name === 'AbortError') {
+		// 		error_message = 'Request timed out';
+		// 	} else {
+		// 		error_message =
+		// 			error instanceof Error ? error.message : 'Unknown error connecting to server';
+		// 	}
 	}
 
 	/**
