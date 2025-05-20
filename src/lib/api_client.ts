@@ -2,7 +2,6 @@ import {create_deferred, type Deferred, type Async_Status} from '@ryanatkn/belt/
 
 import {create_uuid, get_datetime_now, Uuid} from '$lib/zod_helpers.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
-import type {Action_Message_From_Server} from '$lib/action_collections.js';
 import type {Socket} from '$lib/socket.svelte.js';
 import {create_jsonrpc_request} from '$lib/jsonrpc_helpers.js';
 import type {Api_Params} from '$lib/api.js';
@@ -20,8 +19,6 @@ export interface Api_Client_Options {
 	http_headers?: Record<string, string>; // TODO optional thunk?
 	socket?: Socket | null;
 	default_transport_type?: Transport_Type; // TODO optional thunk?
-	onreceive: (method: string, params: Api_Params, id?: Uuid) => void;
-	onsend: (method: string, params: Api_Params, id?: Uuid) => void;
 }
 
 export interface Request_Tracker<T> {
@@ -39,20 +36,11 @@ export interface Request_Tracker<T> {
 export class Api_Client {
 	readonly transports = new Transports();
 
-	/** Callback triggered when receiving a message from the server. */
-	#onreceive: (method: string, params: Api_Params, id?: Uuid) => void;
-
-	/** Callback triggered before sending a message. */
-	readonly #onsend: (method: string, params: Api_Params, id?: Uuid) => void;
-
 	readonly #pending_requests: Map<string, Request_Tracker<any>> = new Map();
 
 	readonly #request_timeout_ms = 30000;
 
 	constructor(options: Api_Client_Options) {
-		this.#onreceive = options.onreceive;
-		this.#onsend = options.onsend;
-
 		// Set up HTTP transport if URL is provided
 		if (options.http_url) {
 			this.transports.register_transport(
@@ -86,8 +74,6 @@ export class Api_Client {
 		id: Uuid = create_uuid(),
 		transport_type?: Transport_Type,
 	): Promise<T> {
-		this.#onsend(method, params, id);
-
 		// Create a deferred promise to track this request
 		const deferred = this.#track_request<T>(id, method);
 
@@ -106,44 +92,15 @@ export class Api_Client {
 		return deferred.promise;
 	}
 
-	// TODO BLOCK @api is this a transport concern? maybe called through a callback? (plain function api)
-	/**
-	 * Processes a received action message from server.
-	 * This is the primary entry point for handling incoming server messages.
-	 */
-	receive_incoming_message(message: Action_Message_From_Server): void {
-		const {id, method, params} = message;
-
-		// First check if this is a response to a pending request
-		const pending_request = id ? this.#pending_requests.get(id) : undefined;
-		if (pending_request) {
-			this.#resolve_pending_request(id, message);
-			return;
-		}
-
-		// TODO BLOCK hacky, need to clarify the role of this class
-		// Otherwise, it's a server-initiated message, pass to onreceive
-		this.#onreceive(method, params, id);
-	}
-
 	#handle_incoming_message = (message: any): void => {
-		// JSON-RPC response
-		if (message.id && (message.result !== undefined || message.error !== undefined)) {
-			const id = message.id;
+		// JSON-RPC response - ignore notifications and unknown messages
+		const {id} = message;
+		if (id) {
 			if (message.error) {
 				this.#reject_pending_request(id, message.error);
 			} else {
 				this.#resolve_pending_request(id, message.result);
 			}
-			// TODO BLOCK this doesn't seem right, need to clarify api_client vs zzz vs actions
-			return;
-		}
-
-		// JSON-RPC request/notification from server
-		if (message.method) {
-			const {id, method, params} = message;
-
-			this.#onreceive(method, params, id);
 		}
 	};
 
