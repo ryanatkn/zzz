@@ -7,8 +7,8 @@ export const mutations: Mutations = {
 	},
 
 	ping_response: (ctx) => {
-		console.log('Pong received', ctx.params);
-		ctx.zzz.capabilities.handle_received_ping(ctx.params);
+		console.log('Pong received', ctx.result);
+		ctx.zzz.capabilities.handle_received_ping(ctx.result.data);
 	},
 
 	load_session_request: (ctx) => {
@@ -16,8 +16,8 @@ export const mutations: Mutations = {
 	},
 
 	load_session_response: (ctx) => {
-		console.log('Session loaded');
-		ctx.zzz.receive_session(ctx.params.data);
+		console.log('Session loaded', ctx.result);
+		ctx.zzz.receive_session(ctx.result.data);
 	},
 
 	submit_completion_request: (ctx) => {
@@ -25,7 +25,7 @@ export const mutations: Mutations = {
 	},
 
 	submit_completion_response: (ctx) => {
-		console.log('Received completion', ctx.params.completion_response);
+		console.log('Received completion', ctx.params.completion_request, ctx.result);
 		ctx.zzz.receive_completion_response(ctx.params);
 	},
 
@@ -42,7 +42,7 @@ export const mutations: Mutations = {
 	},
 
 	filer_change: (ctx) => {
-		console.log('File changed', ctx.params.change);
+		console.log('File changed', ctx.params.change, ctx.result);
 		ctx.zzz.diskfiles.handle_change(ctx.params);
 	},
 };
