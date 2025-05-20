@@ -96,11 +96,11 @@ export const gen: Gen = ({origin_path}) => {
 						innermost_type_name !== z.ZodFirstPartyTypeKind.ZodVoid;
 					return `${spec.method}: (${
 						has_params
-							? `params: typeof ${to_action_spec_params_identifier(spec.method)}`
+							? `params: z.infer<typeof ${to_action_spec_params_identifier(spec.method)}>`
 							: 'params?: void'
 					}) => ${
 						spec.kind === 'request_response'
-							? `Promise<Api_Result<typeof ${to_action_spec_response_params_identifier(spec.method)}>>`
+							? `Promise<Api_Result<z.infer<typeof ${to_action_spec_response_params_identifier(spec.method)}>>>`
 							: spec.kind === 'client_local'
 								? spec.returns
 								: 'void'
@@ -124,9 +124,9 @@ export const gen: Gen = ({origin_path}) => {
 								: request_response === 'response'
 									? to_action_response_message_type(m)
 									: m
-						}?: Mutation<T_App, typeof ${to_action_spec_params_identifier(m)}, ${
+						}?: Mutation<T_App, z.infer<typeof ${to_action_spec_params_identifier(m)}>, ${
 							request_response === 'response'
-								? `Api_Result<typeof ${to_action_spec_response_params_identifier(m)}>`
+								? `Api_Result<z.infer<typeof ${to_action_spec_response_params_identifier(m)}>>`
 								: 'void'
 						}>;`;
 					return is_request_response_action(spec)

@@ -166,18 +166,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		this.prompts = new Prompts({zzz: this});
 		this.bits = new Bits({zzz: this});
 		this.diskfiles = new Diskfiles({zzz: this});
-		this.actions = new Actions({
-			zzz: this,
-			onreceive: (action) => {
-				this.api_client.receive_action(action.method, action.params, action.id);
-			},
-			onsend: (action) => {
-				// TODO BLOCK so, "dispatching" an action is probably something we need a concept around,
-				// maybe this right here calls into it, the idea being that not all actions are sent to the server,
-				// we have local mutations for many of them -- and mutations for now can be centrally defined
-				this.api_client.send_action(action.method, action.params, action.id);
-			},
-		});
+		this.actions = new Actions({zzz: this});
 		this.socket = new Socket({zzz: this});
 		this.url_params = new Url_Params({zzz: this});
 		this.capabilities = new Capabilities({zzz: this});
@@ -222,29 +211,24 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	/**
 	 * Submit a completion request to an AI provider and return a promise for the response
 	 */
-	async submit_completion<T = any>(
+	async submit_completion(
 		prompt: string,
 		provider_name: Provider_Name,
 		model: string,
 		completion_messages?: Array<Completion_Message>,
-	): Promise<T> {
+	): Promise<any> {
 		const request_id = create_uuid();
 
-		// TODO BLOCK `this.actions.send()` vs this
-		return this.api_client.send_action<T>(
-			'submit_completion',
-			{
-				completion_request: {
-					created: get_datetime_now(),
-					request_id,
-					provider_name,
-					model,
-					prompt,
-					completion_messages,
-				},
+		return this.api.submit_completion({
+			completion_request: {
+				created: get_datetime_now(),
+				request_id,
+				provider_name,
+				model,
+				prompt,
+				completion_messages,
 			},
-			request_id,
-		);
+		});
 	}
 
 	/**

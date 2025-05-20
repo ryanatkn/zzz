@@ -78,23 +78,23 @@ export type Action_Message_Type = z.infer<typeof Action_Message_Type>;
  */
 export interface Actions_Api {
 	create_directory: (
-		params: typeof create_directory_action_spec.params,
-	) => Promise<Api_Result<typeof create_directory_action_spec.response_params>>;
+		params: z.infer<typeof create_directory_action_spec.params>,
+	) => Promise<Api_Result<z.infer<typeof create_directory_action_spec.response_params>>>;
 	delete_diskfile: (
-		params: typeof delete_diskfile_action_spec.params,
-	) => Promise<Api_Result<typeof delete_diskfile_action_spec.response_params>>;
-	filer_change: (params: typeof filer_change_action_spec.params) => void;
+		params: z.infer<typeof delete_diskfile_action_spec.params>,
+	) => Promise<Api_Result<z.infer<typeof delete_diskfile_action_spec.response_params>>>;
+	filer_change: (params: z.infer<typeof filer_change_action_spec.params>) => void;
 	load_session: (
 		params?: void,
-	) => Promise<Api_Result<typeof load_session_action_spec.response_params>>;
-	ping: (params?: void) => Promise<Api_Result<typeof ping_action_spec.response_params>>;
+	) => Promise<Api_Result<z.infer<typeof load_session_action_spec.response_params>>>;
+	ping: (params?: void) => Promise<Api_Result<z.infer<typeof ping_action_spec.response_params>>>;
 	submit_completion: (
-		params: typeof submit_completion_action_spec.params,
-	) => Promise<Api_Result<typeof submit_completion_action_spec.response_params>>;
+		params: z.infer<typeof submit_completion_action_spec.params>,
+	) => Promise<Api_Result<z.infer<typeof submit_completion_action_spec.response_params>>>;
 	toggle_main_menu: (params?: void) => void;
 	update_diskfile: (
-		params: typeof update_diskfile_action_spec.params,
-	) => Promise<Api_Result<typeof update_diskfile_action_spec.response_params>>;
+		params: z.infer<typeof update_diskfile_action_spec.params>,
+	) => Promise<Api_Result<z.infer<typeof update_diskfile_action_spec.response_params>>>;
 }
 
 // TODO maybe extract to $lib/mutation_types.ts or similar, decoupled
@@ -103,43 +103,59 @@ export interface Actions_Api {
  */
 export interface Mutations<T_App extends Zzz = Zzz> {
 	[key: string]: Mutation<T_App> | undefined;
-	create_directory_request?: Mutation<T_App, typeof create_directory_action_spec.params, void>;
+	create_directory_request?: Mutation<
+		T_App,
+		z.infer<typeof create_directory_action_spec.params>,
+		void
+	>;
 	create_directory_response?: Mutation<
 		T_App,
-		typeof create_directory_action_spec.params,
-		Api_Result<typeof create_directory_action_spec.response_params>
+		z.infer<typeof create_directory_action_spec.params>,
+		Api_Result<z.infer<typeof create_directory_action_spec.response_params>>
 	>;
-	delete_diskfile_request?: Mutation<T_App, typeof delete_diskfile_action_spec.params, void>;
+	delete_diskfile_request?: Mutation<
+		T_App,
+		z.infer<typeof delete_diskfile_action_spec.params>,
+		void
+	>;
 	delete_diskfile_response?: Mutation<
 		T_App,
-		typeof delete_diskfile_action_spec.params,
-		Api_Result<typeof delete_diskfile_action_spec.response_params>
+		z.infer<typeof delete_diskfile_action_spec.params>,
+		Api_Result<z.infer<typeof delete_diskfile_action_spec.response_params>>
 	>;
-	filer_change?: Mutation<T_App, typeof filer_change_action_spec.params, void>;
-	load_session_request?: Mutation<T_App, typeof load_session_action_spec.params, void>;
+	filer_change?: Mutation<T_App, z.infer<typeof filer_change_action_spec.params>, void>;
+	load_session_request?: Mutation<T_App, z.infer<typeof load_session_action_spec.params>, void>;
 	load_session_response?: Mutation<
 		T_App,
-		typeof load_session_action_spec.params,
-		Api_Result<typeof load_session_action_spec.response_params>
+		z.infer<typeof load_session_action_spec.params>,
+		Api_Result<z.infer<typeof load_session_action_spec.response_params>>
 	>;
-	ping_request?: Mutation<T_App, typeof ping_action_spec.params, void>;
+	ping_request?: Mutation<T_App, z.infer<typeof ping_action_spec.params>, void>;
 	ping_response?: Mutation<
 		T_App,
-		typeof ping_action_spec.params,
-		Api_Result<typeof ping_action_spec.response_params>
+		z.infer<typeof ping_action_spec.params>,
+		Api_Result<z.infer<typeof ping_action_spec.response_params>>
 	>;
-	submit_completion_request?: Mutation<T_App, typeof submit_completion_action_spec.params, void>;
+	submit_completion_request?: Mutation<
+		T_App,
+		z.infer<typeof submit_completion_action_spec.params>,
+		void
+	>;
 	submit_completion_response?: Mutation<
 		T_App,
-		typeof submit_completion_action_spec.params,
-		Api_Result<typeof submit_completion_action_spec.response_params>
+		z.infer<typeof submit_completion_action_spec.params>,
+		Api_Result<z.infer<typeof submit_completion_action_spec.response_params>>
 	>;
-	toggle_main_menu?: Mutation<T_App, typeof toggle_main_menu_action_spec.params, void>;
-	update_diskfile_request?: Mutation<T_App, typeof update_diskfile_action_spec.params, void>;
+	toggle_main_menu?: Mutation<T_App, z.infer<typeof toggle_main_menu_action_spec.params>, void>;
+	update_diskfile_request?: Mutation<
+		T_App,
+		z.infer<typeof update_diskfile_action_spec.params>,
+		void
+	>;
 	update_diskfile_response?: Mutation<
 		T_App,
-		typeof update_diskfile_action_spec.params,
-		Api_Result<typeof update_diskfile_action_spec.response_params>
+		z.infer<typeof update_diskfile_action_spec.params>,
+		Api_Result<z.infer<typeof update_diskfile_action_spec.response_params>>
 	>;
 }
 
