@@ -5,10 +5,6 @@ import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
 import {strip_end, strip_start} from '@ryanatkn/belt/string.js';
 import type {Assignable, Class_Constructor, Omit_Strict} from '@ryanatkn/belt/types.js';
 
-import type {
-	Action_Message_From_Client,
-	Action_Message_From_Server,
-} from '$lib/action_collections.js';
 import {Provider, type Provider_Json} from '$lib/provider.svelte.js';
 import type {Provider_Name} from '$lib/provider_types.js';
 import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
@@ -39,10 +35,9 @@ import {HANDLED} from '$lib/cell_helpers.js';
 import {Action_Registry} from '$lib/action_registry.js';
 import {Api_Client, type Api_Client_Options} from '$lib/api_client.js';
 import type {Completion_Message} from '$lib/completion_types.js';
-import type {JSONRPCMessage} from '$lib/jsonrpc.js';
-import {create_mutation_context} from '$lib/mutation.js';
 import type {Actions_Api, Mutations} from '$lib/action_metatypes.js';
 import type {Action_Spec} from '$lib/action_spec.js';
+import {action_specs} from '$lib/action_collections.js';
 import {create_actions_api} from '$lib/actions_api.js';
 
 export const zzz_context = create_context<Zzz>();
@@ -152,7 +147,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 
 		this.cell_registry = new Cell_Registry(this);
 
-		this.action_registry = new Action_Registry(options.action_specs || []); // making this optional for now, the app will just have no actions
+		this.action_registry = new Action_Registry(options.action_specs || action_specs);
 		this.mutations = options.mutations || {};
 
 		// Register cell classes if provided, otherwise use the default
