@@ -4,21 +4,23 @@ import {test, expect, describe, beforeEach} from 'vitest';
 
 import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
 import {Zzz} from '$lib/zzz.svelte.js';
-import {Diskfile_Path} from '$lib/diskfile_types.js';
+import {Diskfile_Path, Serializable_Source_File} from '$lib/diskfile_types.js';
 import type {Diskfile} from '$lib/diskfile.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
+const TEST_DIR = Serializable_Source_File.shape.source_dir.parse('/test/');
+
 // Test data constants for reuse
 const TEST_PATHS = {
-	BASIC: Diskfile_Path.parse('/test/file.txt'),
-	CONFIG: Diskfile_Path.parse('/test/config.json'),
-	EMPTY: Diskfile_Path.parse('/test/empty.txt'),
-	DOCUMENT: Diskfile_Path.parse('/test/document.txt'),
-	EDITABLE: Diskfile_Path.parse('/test/editable.txt'),
+	BASIC: Diskfile_Path.parse(TEST_DIR + 'file.txt'),
+	CONFIG: Diskfile_Path.parse(TEST_DIR + 'config.json'),
+	EMPTY: Diskfile_Path.parse(TEST_DIR + 'empty.txt'),
+	DOCUMENT: Diskfile_Path.parse(TEST_DIR + 'document.txt'),
+	EDITABLE: Diskfile_Path.parse(TEST_DIR + 'editable.txt'),
 	NONEXISTENT: Diskfile_Path.parse('/nonexistent/file.txt'),
-	SPECIAL_CHARS: Diskfile_Path.parse('/test/path with spaces & special chars!.txt'),
-	BINARY: Diskfile_Path.parse('/test/binary.bin'),
-	REACTIVE: Diskfile_Path.parse('/test/reactive.txt'),
+	SPECIAL_CHARS: Diskfile_Path.parse(TEST_DIR + 'path with spaces & special chars!.txt'),
+	BINARY: Diskfile_Path.parse(TEST_DIR + 'binary.bin'),
+	REACTIVE: Diskfile_Path.parse(TEST_DIR + 'reactive.txt'),
 };
 
 const TEST_CONTENT = {
@@ -66,6 +68,7 @@ beforeEach(() => {
 		const diskfile = zzz.diskfiles.add(
 			zzz.cell_registry.instantiate('Diskfile', {
 				path,
+				source_dir: TEST_DIR,
 				content,
 			}),
 		);

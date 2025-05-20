@@ -8,6 +8,7 @@ import {
 } from '$lib/diskfile_types.js';
 import type {Diskfile} from '$lib/diskfile.svelte.js';
 
+// TODO probably extract to `@ryanatkn/belt/path.js`
 export const is_path_absolute = (path: unknown): boolean => {
 	// Guard against non-string inputs
 	if (typeof path !== 'string') return false;

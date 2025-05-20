@@ -81,7 +81,8 @@ export class Api_Client {
 		try {
 			const message = create_jsonrpc_request(method, params, id);
 			const transport = this.transports.get_or_throw(transport_type);
-			await transport.send(message);
+			const result = await transport.send(message);
+			console.log(`API CLIENT result`, result);
 		} catch (error) {
 			// Remove the pending request and reject the promise
 			this.#reject_pending_request(id, error);

@@ -1,6 +1,6 @@
 import type {Action_Method} from '$lib/action_metatypes.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
-import type {Api_Request_Response_Flag} from './api.js';
+import type {Api_Request_Response_Flag} from '$lib/api.js';
 
 /**
  * Client-side mutation system for handling action responses.

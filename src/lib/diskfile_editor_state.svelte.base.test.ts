@@ -3,13 +3,14 @@
 import {test, expect, beforeEach, describe} from 'vitest';
 
 import {Diskfile_Editor_State} from '$lib/diskfile_editor_state.svelte.js';
-import {Diskfile_Path} from '$lib/diskfile_types.js';
+import {Diskfile_Path, Serializable_Source_File} from '$lib/diskfile_types.js';
 import {Zzz} from '$lib/zzz.svelte.js';
 import {Diskfile} from '$lib/diskfile.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Constants for testing
 const TEST_PATH = Diskfile_Path.parse('/path/to/test.txt');
+const TEST_DIR = Serializable_Source_File.shape.source_dir.parse('/path/');
 const TEST_CONTENT = 'This is test content';
 
 // Test suite variables
@@ -25,6 +26,7 @@ beforeEach(() => {
 	test_diskfile = zzz.diskfiles.add(
 		zzz.cell_registry.instantiate('Diskfile', {
 			path: TEST_PATH,
+			source_dir: TEST_DIR,
 			content: TEST_CONTENT,
 		}),
 	);
@@ -71,6 +73,7 @@ describe('initialization', () => {
 		const null_diskfile = zzz.diskfiles.add(
 			zzz.cell_registry.instantiate('Diskfile', {
 				path: Diskfile_Path.parse('/null/content.txt'),
+				source_dir: Serializable_Source_File.shape.source_dir.parse('/null/'),
 				content: null,
 			}),
 		);
@@ -231,6 +234,7 @@ describe('content metrics', () => {
 		const empty_diskfile = zzz.diskfiles.add(
 			zzz.cell_registry.instantiate('Diskfile', {
 				path: Diskfile_Path.parse('/empty/file.txt'),
+				source_dir: Serializable_Source_File.shape.source_dir.parse('/empty/'),
 				content: '',
 			}),
 		);
@@ -262,6 +266,7 @@ describe('file management', () => {
 		const another_diskfile = zzz.diskfiles.add(
 			zzz.cell_registry.instantiate('Diskfile', {
 				path: another_path,
+				source_dir: Serializable_Source_File.shape.source_dir.parse('/different/'),
 				content: another_content,
 			}),
 		);
