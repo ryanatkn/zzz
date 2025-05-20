@@ -21,7 +21,7 @@ import {stringify_zod_error} from '$lib/zod_helpers.js';
 import {
 	lookup_request_action_schema,
 	lookup_response_action_schema,
-	to_response_type,
+	to_action_message_type,
 } from '$lib/action_helpers.js';
 import {
 	type JSONRPCRequest,
@@ -31,7 +31,7 @@ import {
 	JSONRPC_VERSION,
 } from '$lib/jsonrpc.js';
 import {handle_jsonrpc_request, create_jsonrpc_error} from '$lib/server/jsonrpc_server_helpers.js';
-import {Action_Message_Type} from '$lib/action_metatypes.js';
+import {Action_Method} from '$lib/action_metatypes.js';
 
 /**
  * Function type for handling client messages.
@@ -174,7 +174,7 @@ export class Zzz_Server {
 			// Parse the request into an Action_Message_Base using schema
 			const action_message = Action_Message_Base.parse({
 				id: request.id,
-				type: to_response_type(Action_Message_Type.parse(request.method)),
+				type: to_action_message_type(Action_Method.parse(request.method), 'request'),
 				method: request.method,
 				params: request.params,
 			});
@@ -208,7 +208,7 @@ export class Zzz_Server {
 		try {
 			// Parse the notification into an Action_Message_Base using schema
 			const action_message = Action_Message_Base.parse({
-				type: to_response_type(Action_Message_Type.parse(notification.method)),
+				type: to_action_message_type(Action_Method.parse(notification.method), 'request'),
 				method: notification.method,
 				params: notification.params,
 			});

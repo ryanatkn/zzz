@@ -9,10 +9,7 @@ import {
 import {get_innermost_type} from '$lib/zod_helpers.js';
 import {action_specs} from '$lib/action_collections.js';
 import {Action_Registry} from '$lib/action_registry.js';
-import {
-	to_action_request_message_type,
-	to_action_response_message_type,
-} from '$lib/action_helpers.js';
+import {to_action_message_type} from '$lib/action_helpers.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
 import type {Api_Request_Response_Flag} from '$lib/api.js';
 
@@ -74,8 +71,8 @@ export const gen: Gen = ({origin_path}) => {
 				.map((spec) =>
 					spec.kind === 'request_response'
 						? [
-								`'${to_action_request_message_type(spec.method)}'`,
-								`'${to_action_response_message_type(spec.method)}'`,
+								`'${to_action_message_type(spec.method, 'request')}'`,
+								`'${to_action_message_type(spec.method, 'response')}'`,
 							]
 						: `'${spec.method}'`,
 				)
@@ -113,17 +110,14 @@ export const gen: Gen = ({origin_path}) => {
 		/**
 		 * Interface for client-side mutation handlers.
 		 */
-		export interface Mutations<T_App extends Zzz = Zzz> {
+		export interface Mutations<T_App extends Zzz = Zzz> extends Partial<Record<Action_Message_Type, Mutation<T_App>>> {
 			${registry.specs
 				.map((spec) => {
 					const v = (m: Action_Method, request_response: Api_Request_Response_Flag) =>
-						`${
-							request_response === 'request'
-								? to_action_request_message_type(m)
-								: request_response === 'response'
-									? to_action_response_message_type(m)
-									: m
-						}?: Mutation<T_App, z.infer<typeof ${to_action_spec_params_identifier(m)}>, ${
+						`${to_action_message_type(
+							m,
+							request_response,
+						)}?: Mutation<T_App, z.infer<typeof ${to_action_spec_params_identifier(m)}>, ${
 							request_response === 'response'
 								? `Api_Result<z.infer<typeof ${to_action_spec_response_params_identifier(m)}>>`
 								: 'void'

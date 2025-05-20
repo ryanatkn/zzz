@@ -101,7 +101,8 @@ export interface Actions_Api {
 /**
  * Interface for client-side mutation handlers.
  */
-export interface Mutations<T_App extends Zzz = Zzz> {
+export interface Mutations<T_App extends Zzz = Zzz>
+	extends Partial<Record<Action_Message_Type, Mutation<T_App>>> {
 	create_directory_request?: Mutation<
 		T_App,
 		z.infer<typeof create_directory_action_spec.params>,

@@ -4,6 +4,7 @@ import {Action_Message_Any, action_spec_by_method} from '$lib/action_collections
 import type {Action_Json} from '$lib/action_types.js';
 import {Action_Message} from '$lib/action_messages.js';
 import {Action_Message_Type, Action_Method} from '$lib/action_metatypes.js';
+import type {Api_Request_Response_Flag} from '$lib/api.js';
 
 // Constants for preview length and formatting
 export const ACTION_DATE_FORMAT = 'MMM d, p';
@@ -35,14 +36,20 @@ export const lookup_response_action_schema = (
 ): z.ZodType<Action_Message_Any> | undefined =>
 	Action_Message[to_action_response_message_type(method)] as any;
 
+export const to_action_message_type = (
+	method: Action_Method,
+	request_response: Api_Request_Response_Flag,
+): Action_Message_Type =>
+	Action_Message_Type.parse(
+		request_response === 'request'
+			? to_action_request_message_type(method)
+			: request_response === 'response'
+				? to_action_response_message_type(method)
+				: method,
+	);
+
 export const to_action_request_message_type = (method: Action_Method): Action_Message_Type =>
 	Action_Message_Type.parse(method + '_request');
 
 export const to_action_response_message_type = (method: Action_Method): Action_Message_Type =>
 	Action_Message_Type.parse(method + '_response');
-
-export const to_response_type = (type: Action_Message_Type): Action_Message_Type => {
-	return type.endsWith('_request')
-		? Action_Message_Type.parse(type.slice(0, -7) + 'response')
-		: type;
-};

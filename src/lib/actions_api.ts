@@ -4,7 +4,7 @@ import {BROWSER, DEV} from 'esm-env';
 import type {Actions_Api} from '$lib/action_metatypes.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 import {create_mutation_context} from '$lib/mutation.js';
-import {to_action_request_message_type} from '$lib/action_helpers.js';
+import {to_action_message_type} from '$lib/action_helpers.js';
 import type {Api_Request_Response_Flag} from '$lib/api.js';
 
 const log = new Logger();
@@ -22,6 +22,7 @@ export const create_actions_api = (zzz: Zzz): Actions_Api =>
 			}
 
 			const mutate = (result: unknown, request_response: Api_Request_Response_Flag) => {
+				console.log(`mutate`, method, result, request_response);
 				const {ctx, flush_after_mutation} = create_mutation_context(
 					zzz,
 					method,
@@ -29,7 +30,8 @@ export const create_actions_api = (zzz: Zzz): Actions_Api =>
 					result,
 					request_response,
 				);
-				const message_type = request_response ? to_action_request_message_type(method) : method;
+				const message_type = to_action_message_type(method, request_response);
+				console.log(`message_type`, message_type);
 				const mutation = zzz.mutations[message_type];
 				if (!mutation) {
 					log.warn(`missing mutation for action '${method}'`);
@@ -61,11 +63,12 @@ const to_logged_args = (method: string, params: unknown): Array<any> => {
 };
 
 const to_logged_method = (method: string): Array<any> =>
-	BROWSER && DEV
-		? [
-				'%c[api.%c' + method + '%c]',
-				'color: gray',
-				'color: magenta; font-weight: bold',
-				'color: gray',
-			]
-		: ['[api.' + method + ']'];
+	// BROWSER && DEV
+	// ? [
+	// 		'%c[api.%c' + method + '%c]',
+	// 		'color: gray',
+	// 		'color: magenta; font-weight: bold',
+	// 		'color: gray',
+	// 	]
+	// :
+	['[api.' + method + ']'];
