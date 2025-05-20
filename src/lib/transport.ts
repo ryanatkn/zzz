@@ -2,6 +2,7 @@ import {z} from 'zod';
 
 import type {JSONRPCMessage} from '$lib/jsonrpc.js';
 import type {Socket} from '$lib/socket.svelte.js';
+import type {Api_Result} from '$lib/api.js';
 
 // TODO support configurable/extensible transports
 export const Transport_Type = z.enum(['http_rpc', 'websocket_rpc']);
@@ -9,7 +10,7 @@ export type Transport_Type = z.infer<typeof Transport_Type>;
 
 export interface Transport {
 	type: Transport_Type;
-	send: (data: JSONRPCMessage) => void;
+	send: (data: JSONRPCMessage) => Promise<Api_Result>;
 	is_ready: () => boolean;
 }
 
@@ -158,7 +159,7 @@ export class Websocket_Rpc_Transport implements Transport {
 		};
 	}
 
-	send(data: JSONRPCMessage): void {
+	async send(data: JSONRPCMessage): Promise<Api_Result> {
 		if (!this.is_ready()) {
 			throw new Error('WebSocket not connected');
 		}
@@ -187,7 +188,7 @@ export class Http_Rpc_Transport implements Transport {
 		this.#headers = headers ?? {'content-type': 'application/json', accept: 'application/json'};
 	}
 
-	async send(data: JSONRPCMessage): Promise<void> {
+	async send(data: JSONRPCMessage): Promise<Api_Result> {
 		try {
 			const response = await fetch(this.#url, {
 				method: 'POST', // TODO support GET

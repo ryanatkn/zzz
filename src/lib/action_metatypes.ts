@@ -16,8 +16,7 @@ import type {
 import type {Zzz} from '$lib/zzz.svelte.js';
 
 /**
- * All action names. May have '/' separators for namespacing.
- * TODO maybe any relative url-encoded path is valid? add to schema defs
+ * All action method names. Request/response actions have two types per method.
  */
 export const Action_Method = z.enum([
 	'create_directory',
@@ -51,6 +50,28 @@ export type Server_Notification_Action_Method = 'filer_change';
  * Names of all client_local actions.
  */
 export type Client_Local_Action_Method = 'toggle_main_menu';
+
+/**
+ * All action types. May have '/' separators for namespacing.
+ * TODO maybe any relative url-encoded path is valid? add to schema defs
+ */
+export const Action_Message_Type = z.enum([
+	'create_directory_request',
+	'create_directory_response',
+	'delete_diskfile_request',
+	'delete_diskfile_response',
+	'filer_change',
+	'load_session_request',
+	'load_session_response',
+	'ping_request',
+	'ping_response',
+	'submit_completion_request',
+	'submit_completion_response',
+	'toggle_main_menu',
+	'update_diskfile_request',
+	'update_diskfile_response',
+]);
+export type Action_Message_Type = z.infer<typeof Action_Message_Type>;
 
 /**
  * Interface for action dispatch functions.

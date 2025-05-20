@@ -12,6 +12,7 @@ import type {Mutations} from '$lib/action_metatypes.js';
 export const send_mutations: Mutations = {
 	ping: (ctx) => {
 		console.log('Ping sent', ctx.params);
+		ctx.zzz.capabilities.handle_sent_ping(ctx.params);
 	},
 
 	load_session: (ctx) => {
@@ -41,7 +42,7 @@ export const send_mutations: Mutations = {
 export const receive_mutations: Mutations = {
 	ping: (ctx) => {
 		console.log('Pong received', ctx.params);
-		ctx.zzz.capabilities.receive_ping(ctx.params);
+		ctx.zzz.capabilities.handle_received_ping(ctx.params);
 	},
 
 	load_session: (ctx) => {

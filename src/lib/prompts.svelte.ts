@@ -91,7 +91,7 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 		super(Prompts_Json, options);
 
 		this.decoders = {
-			// TODO @many maybe infer or create a helper for this, duplicated many places
+			// TODO @many improve this API, maybe infer or create a helper, duplicated many places
 			items: (items) => {
 				if (Array.isArray(items)) {
 					this.items.clear();

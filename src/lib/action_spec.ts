@@ -2,7 +2,7 @@ import {z} from 'zod';
 
 import {Uuid_With_Default, Datetime_Now, Type_Literal} from '$lib/zod_helpers.js';
 import type {Http_Method} from '$lib/api.js';
-import {Action_Method} from '$lib/action_metatypes.js';
+import {Action_Method, Action_Message_Type} from '$lib/action_metatypes.js';
 
 /**
  * Centralized definitions for core action structures.
@@ -18,6 +18,7 @@ export const Action_Message_Base = z
 	.object({
 		id: Uuid_With_Default, // TODO this means we're trusting client ids, revisit
 		created: Datetime_Now,
+		type: Action_Message_Type,
 		method: Action_Method,
 	})
 	.passthrough(); // TODO is this a good/safe pattern for base schemas? we're doing this so we can parse loosely sometimes, but see too how the Uuid has a fallback

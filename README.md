@@ -64,7 +64,7 @@ Zzz builds on a great deal of software.
     (like [Fuz](https://github.com/ryanatkn/fuz),
     [Moss](https://github.com/ryanatkn/moss), and [Gro](https://github.com/ryanatkn/gro)),
     with the caveat that the initial proof of concept
-    was intentionally slapdash in places for speed,
+    was intentionally slapdash in places for speed and to experiment,
     and LLMs make this mindset easy to indulge
 
 ## License 🐦

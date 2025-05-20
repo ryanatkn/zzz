@@ -4,7 +4,7 @@ import {create_uuid, get_datetime_now, Uuid} from '$lib/zod_helpers.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
 import type {Action_Message_From_Server} from '$lib/action_collections.js';
 import type {Socket} from '$lib/socket.svelte.js';
-import {Jsonrpc_Client} from '$lib/jsonrpc_client.js';
+import {create_jsonrpc_request} from '$lib/jsonrpc_helpers.js';
 import type {Api_Params} from '$lib/api.js';
 import {
 	Http_Rpc_Transport,
@@ -16,10 +16,10 @@ import {
 // TODO support canceling
 
 export interface Api_Client_Options {
-	http_url?: string;
-	http_headers?: Record<string, string>;
-	socket?: Socket;
-	default_transport_type?: Transport_Type;
+	http_url?: string | null; // TODO optional thunk?
+	http_headers?: Record<string, string>; // TODO optional thunk?
+	socket?: Socket | null;
+	default_transport_type?: Transport_Type; // TODO optional thunk?
 	onreceive: (method: string, params: Api_Params, id?: Uuid) => void;
 	onsend: (method: string, params: Api_Params, id?: Uuid) => void;
 }
@@ -38,7 +38,6 @@ export interface Request_Tracker<T> {
  */
 export class Api_Client {
 	readonly transports = new Transports();
-	readonly jsonrpc_client = new Jsonrpc_Client({transports: this.transports});
 
 	/** Callback triggered when receiving a message from the server. */
 	#onreceive: (method: string, params: Api_Params, id?: Uuid) => void;
@@ -94,7 +93,9 @@ export class Api_Client {
 
 		// Send the request
 		try {
-			this.jsonrpc_client.send(method, params, id, transport_type);
+			const message = create_jsonrpc_request(method, params, id);
+			const transport = this.transports.get_or_throw(transport_type);
+			await transport.send(message);
 		} catch (error) {
 			// Remove the pending request and reject the promise
 			this.#reject_pending_request(id, error);
@@ -103,20 +104,6 @@ export class Api_Client {
 
 		// Return the promise that will be resolved when the response is received
 		return deferred.promise;
-	}
-
-	/**
-	 * Send a notification to the server (no response expected).
-	 */
-	notify(method: Action_Method, params: Api_Params): void {
-		this.#onsend(method, params);
-
-		try {
-			this.jsonrpc_client.notify(method, params);
-		} catch (error) {
-			console.error('Error sending notification:', error);
-			throw error;
-		}
 	}
 
 	/**

@@ -132,7 +132,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 	}
 
 	update(path: Diskfile_Path, content: string): void {
-		this.zzz.actions.send({
+		this.zzz.actions.add_message({
 			id: create_uuid(),
 			created: get_datetime_now(),
 			method: 'update_diskfile',
@@ -141,7 +141,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 	}
 
 	delete(path: Diskfile_Path): void {
-		this.zzz.actions.send({
+		this.zzz.actions.add_message({
 			id: create_uuid(),
 			created: get_datetime_now(),
 			method: 'delete_diskfile',
@@ -169,7 +169,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 		// Create full path by joining zzz_dir with the directory name
 		const path = Diskfile_Path.parse(`${this.zzz.zzz_dir}${dirname}`);
 
-		this.zzz.actions.send({
+		this.zzz.actions.add_message({
 			id: create_uuid(),
 			created: get_datetime_now(),
 			method: 'create_directory',

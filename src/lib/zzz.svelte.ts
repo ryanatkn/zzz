@@ -66,7 +66,7 @@ export interface Zzz_Options extends Omit_Strict<Cell_Options<typeof Zzz_Json>, 
 	receive_mutations?: Mutations;
 
 	/** URL for server communication */
-	api_url?: string;
+	api_url?: string | null;
 
 	/** Websocket URL as an optional transport. */
 	socket_url?: string | null;
@@ -85,9 +85,6 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	 */
 	readonly cell_registry: Cell_Registry;
 
-	/**
-	 * Action registry for centralized action specification access.
-	 */
 	readonly action_registry: Action_Registry;
 
 	// Cells - these are managed objects/collections that contain the app state
@@ -105,7 +102,11 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	readonly url_params: Url_Params;
 	readonly capabilities: Capabilities;
 
-	// API client for server communication
+	// TODO implement this, using a proxy with the registry
+	// readonly api: Actions_Api = create_actions_api(this);
+	// create_actions = (): Actions => {
+	// 	const actions: Actions = new Proxy(Object.create(null), {
+	//    get: (_target, action_method: Action_Method) => async (params: unknown) => {
 	readonly api_client: Api_Client;
 
 	readonly bots: Zzz_Config['bots'];
@@ -176,7 +177,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		this.actions = new Actions({
 			zzz: this,
 			onreceive: (action) => {
-				// this.api_client.receive_action(action.method, action.params, action.id);
+				this.api_client.receive_action(action.method, action.params, action.id);
 			},
 			onsend: (action) => {
 				// TODO BLOCK so, "dispatching" an action is probably something we need a concept around,
@@ -194,7 +195,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		const {send_mutations, receive_mutations} = options;
 
 		this.api_client = new Api_Client({
-			...options.api_client_options,
+			...options.api_client_options, // TODO think about more flexible extension of `Api_Client`
 			http_url: options.api_url,
 			socket: this.socket,
 			// TODO BLOCK @many shouldnt this be a JSONRPCMessage?

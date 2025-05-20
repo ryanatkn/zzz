@@ -406,17 +406,15 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 		}
 	}
 
-	/**
-	 * Sends a ping to the server over websocket.
-	 * @returns The id of the ping message
-	 */
-	send_ping(): Uuid {
-		const ping = Action_Message.ping_request.parse(undefined);
-		const ping_id = ping.id;
+	send_ping(): void {
+		this.zzz.actions.add_message(Action_Message.ping_request.parse(undefined));
+	}
 
+	// TODO @many refactor mutations
+	handle_sent_ping(request: Action_Message['ping_request']): void {
 		// Create a new pending ping
 		const new_ping: Ping_Data = {
-			ping_id,
+			ping_id: request.id,
 			completed: false,
 			sent_time: Date.now(),
 			received_time: null,
@@ -425,17 +423,10 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 
 		// Add the new ping to the start of the array
 		this.pings = [new_ping, ...this.pings.slice(0, PING_HISTORY_MAX - 1)];
-
-		// Send the ping message via the messaging system
-		this.zzz.actions.send(ping);
-
-		return ping_id;
 	}
 
-	/**
-	 * Handle a ping response from the server.
-	 */
-	receive_ping(response: Action_Message_Params['ping_response']): void {
+	// TODO @many refactor mutations
+	handle_received_ping(response: Action_Message_Params['ping_response']): void {
 		const received_time = Date.now();
 		const ping_index = this.pings.findIndex((p) => p.ping_id === response.ping_id);
 		// If we found the ping, update it

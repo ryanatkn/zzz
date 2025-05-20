@@ -44,7 +44,7 @@
 
 	pkg_context.set(parse_package_meta(package_json, src_json));
 
-	// Create an instance of Zzz with socket_url
+	// Create our client App, which extends the Zzz class
 	const zzz = new App();
 
 	// Enhance schemas with metadata for deserialization - use class names
@@ -60,7 +60,11 @@
 	// Initialize the session
 	if (BROWSER) {
 		// TODO BLOCK entrypoint to refactor actions
-		zzz.actions.send({id: create_uuid(), created: get_datetime_now(), method: 'load_session'});
+		zzz.actions.add_message({
+			id: create_uuid(),
+			created: get_datetime_now(),
+			method: 'load_session',
+		});
 	}
 
 	// TODO refactor, maybe per route?

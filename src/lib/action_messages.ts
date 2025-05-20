@@ -16,58 +16,72 @@ import {
 
 export const Action_Message = {
 	create_directory_request: Action_Message_Base.extend({
+		type: z.literal('create_directory_request'),
 		method: z.literal('create_directory'),
 		params: create_directory_action_spec.params,
 	}),
 	create_directory_response: Action_Message_Base.extend({
+		type: z.literal('create_directory_response'),
 		method: z.literal('create_directory'),
 		params: create_directory_action_spec.response_params,
 	}),
 	delete_diskfile_request: Action_Message_Base.extend({
+		type: z.literal('delete_diskfile_request'),
 		method: z.literal('delete_diskfile'),
 		params: delete_diskfile_action_spec.params,
 	}),
 	delete_diskfile_response: Action_Message_Base.extend({
+		type: z.literal('delete_diskfile_response'),
 		method: z.literal('delete_diskfile'),
 		params: delete_diskfile_action_spec.response_params,
 	}),
 	filer_change: Action_Message_Base.extend({
+		type: z.literal('filer_change'),
 		method: z.literal('filer_change'),
 		params: filer_change_action_spec.params,
 	}),
 	load_session_request: Action_Message_Base.extend({
+		type: z.literal('load_session_request'),
 		method: z.literal('load_session'),
 		params: load_session_action_spec.params,
 	}),
 	load_session_response: Action_Message_Base.extend({
+		type: z.literal('load_session_response'),
 		method: z.literal('load_session'),
 		params: load_session_action_spec.response_params,
 	}),
 	ping_request: Action_Message_Base.extend({
+		type: z.literal('ping_request'),
 		method: z.literal('ping'),
 		params: ping_action_spec.params,
 	}),
 	ping_response: Action_Message_Base.extend({
+		type: z.literal('ping_response'),
 		method: z.literal('ping'),
 		params: ping_action_spec.response_params,
 	}),
 	submit_completion_request: Action_Message_Base.extend({
+		type: z.literal('submit_completion_request'),
 		method: z.literal('submit_completion'),
 		params: submit_completion_action_spec.params,
 	}),
 	submit_completion_response: Action_Message_Base.extend({
+		type: z.literal('submit_completion_response'),
 		method: z.literal('submit_completion'),
 		params: submit_completion_action_spec.response_params,
 	}),
 	toggle_main_menu: Action_Message_Base.extend({
+		type: z.literal('toggle_main_menu'),
 		method: z.literal('toggle_main_menu'),
 		params: toggle_main_menu_action_spec.params,
 	}),
 	update_diskfile_request: Action_Message_Base.extend({
+		type: z.literal('update_diskfile_request'),
 		method: z.literal('update_diskfile'),
 		params: update_diskfile_action_spec.params,
 	}),
 	update_diskfile_response: Action_Message_Base.extend({
+		type: z.literal('update_diskfile_response'),
 		method: z.literal('update_diskfile'),
 		params: update_diskfile_action_spec.response_params,
 	}),

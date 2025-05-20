@@ -71,14 +71,20 @@ export type Action_Method_Nonnetworked = z.infer<typeof Action_Method_Nonnetwork
 /**
  * All action types combined.
  */
-export const Action_Message_Any = z.discriminatedUnion('method', [
+export const Action_Message_Any = z.discriminatedUnion('type', [
 	Action_Message.toggle_main_menu,
 	Action_Message.create_directory_request,
+	Action_Message.create_directory_response,
 	Action_Message.delete_diskfile_request,
+	Action_Message.delete_diskfile_response,
 	Action_Message.load_session_request,
+	Action_Message.load_session_response,
 	Action_Message.ping_request,
+	Action_Message.ping_response,
 	Action_Message.submit_completion_request,
+	Action_Message.submit_completion_response,
 	Action_Message.update_diskfile_request,
+	Action_Message.update_diskfile_response,
 	Action_Message.filer_change,
 ]);
 export type Action_Message_Any = z.infer<typeof Action_Message_Any>;
@@ -86,7 +92,7 @@ export type Action_Message_Any = z.infer<typeof Action_Message_Any>;
 /**
  * Set of actions with "from_client" direction (originating from client).
  */
-export const Action_Message_From_Client = z.discriminatedUnion('method', [
+export const Action_Message_From_Client = z.discriminatedUnion('type', [
 	Action_Message.create_directory_request,
 	Action_Message.delete_diskfile_request,
 	Action_Message.load_session_request,
@@ -99,13 +105,13 @@ export type Action_Message_From_Client = z.infer<typeof Action_Message_From_Clie
 /**
  * Set of actions with "from_server" direction (originating from server).
  */
-export const Action_Message_From_Server = z.discriminatedUnion('method', [
-	Action_Message.create_directory_request,
-	Action_Message.delete_diskfile_request,
-	Action_Message.load_session_request,
-	Action_Message.ping_request,
-	Action_Message.submit_completion_request,
-	Action_Message.update_diskfile_request,
+export const Action_Message_From_Server = z.discriminatedUnion('type', [
+	Action_Message.create_directory_response,
+	Action_Message.delete_diskfile_response,
+	Action_Message.load_session_response,
+	Action_Message.ping_response,
+	Action_Message.submit_completion_response,
+	Action_Message.update_diskfile_response,
 	Action_Message.filer_change,
 ]);
 export type Action_Message_From_Server = z.infer<typeof Action_Message_From_Server>;
@@ -113,20 +119,26 @@ export type Action_Message_From_Server = z.infer<typeof Action_Message_From_Serv
 /**
  * Service actions with HTTP endpoints (networked).
  */
-export const Action_Message_Networked = z.discriminatedUnion('method', [
+export const Action_Message_Networked = z.discriminatedUnion('type', [
 	Action_Message.create_directory_request,
+	Action_Message.create_directory_response,
 	Action_Message.delete_diskfile_request,
+	Action_Message.delete_diskfile_response,
 	Action_Message.load_session_request,
+	Action_Message.load_session_response,
 	Action_Message.ping_request,
+	Action_Message.ping_response,
 	Action_Message.submit_completion_request,
+	Action_Message.submit_completion_response,
 	Action_Message.update_diskfile_request,
+	Action_Message.update_diskfile_response,
 ]);
 export type Action_Message_Networked = z.infer<typeof Action_Message_Networked>;
 
 /**
  * Service actions without HTTP endpoints (non-networked).
  */
-export const Action_Message_Nonnetworked = z.discriminatedUnion('method', [
+export const Action_Message_Nonnetworked = z.discriminatedUnion('type', [
 	Action_Message.filer_change,
 ]);
 export type Action_Message_Nonnetworked = z.infer<typeof Action_Message_Nonnetworked>;

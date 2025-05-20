@@ -1,12 +1,14 @@
 import {create_context} from '@ryanatkn/fuz/context_helpers.js';
 
-import {Zzz, type Zzz_Options} from '$lib/zzz.svelte.js';
+import {Zzz, zzz_context, type Zzz_Options} from '$lib/zzz.svelte.js';
 import {cell_classes} from '$lib/cell_classes.js';
 import {receive_mutations, send_mutations} from '$lib/mutations.js';
 import {WEBSOCKET_URL, API_URL} from '$lib/constants.js';
 
-// TODO use this instead of `zzz_context` in non-core usages
-export const app_context = create_context<App>();
+// TODO use this instead of `zzz_context` in non-core usages for type safety
+export const app_context: ReturnType<typeof create_context<App>> = zzz_context;
+
+export interface App_Options extends Zzz_Options {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
 /**
  * The `App` is the user's implementation of the Zzz client app.
@@ -14,7 +16,7 @@ export const app_context = create_context<App>();
  * including both behaviors and types. (both a work in progress)
  */
 export class App extends Zzz {
-	constructor(options?: Zzz_Options) {
+	constructor(options?: App_Options) {
 		const o = {...options};
 		if (!o.api_url) o.api_url = API_URL;
 		if (!o.socket_url) o.socket_url = WEBSOCKET_URL;

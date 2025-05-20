@@ -39,7 +39,7 @@ export const package_json = {
 		'@ryanatkn/gro': '^0.159.0',
 		'@ryanatkn/moss': '^0.31.0',
 		'@sveltejs/adapter-static': '^3.0.8',
-		'@sveltejs/kit': '^2.20.8',
+		'@sveltejs/kit': '^2.21.1',
 		'@sveltejs/package': '^2.3.11',
 		'@sveltejs/vite-plugin-svelte': '^5.0.3',
 		eslint: '^9.25.1',
@@ -48,7 +48,7 @@ export const package_json = {
 		ollama: '^0.5.15',
 		prettier: '^3.5.3',
 		'prettier-plugin-svelte': '^3.3.3',
-		svelte: '^5.28.2',
+		svelte: '^5.31.1',
 		'svelte-check': '^4.1.6',
 		tslib: '^2.8.1',
 		typescript: '^5.8.3',
@@ -546,9 +546,9 @@ export const package_json = {
 			types: './dist/indexed_collection.svelte.d.ts',
 			default: './dist/indexed_collection.svelte.js',
 		},
-		'./jsonrpc_client.js': {
-			types: './dist/jsonrpc_client.d.ts',
-			default: './dist/jsonrpc_client.js',
+		'./jsonrpc_helpers.js': {
+			types: './dist/jsonrpc_helpers.d.ts',
+			default: './dist/jsonrpc_helpers.js',
 		},
 		'./jsonrpc.js': {types: './dist/jsonrpc.d.ts', default: './dist/jsonrpc.js'},
 		'./list_helpers.js': {types: './dist/list_helpers.d.ts', default: './dist/list_helpers.js'},
@@ -943,6 +943,7 @@ export const src_json = {
 				{name: 'Request_Response_Action_Method', kind: 'type'},
 				{name: 'Server_Notification_Action_Method', kind: 'type'},
 				{name: 'Client_Local_Action_Method', kind: 'type'},
+				{name: 'Action_Message_Type', kind: 'variable'},
 				{name: 'Actions_Api', kind: 'type'},
 				{name: 'Mutations', kind: 'type'},
 			],
@@ -1038,6 +1039,7 @@ export const src_json = {
 			path: 'app.svelte.ts',
 			declarations: [
 				{name: 'app_context', kind: 'variable'},
+				{name: 'App_Options', kind: 'type'},
 				{name: 'App', kind: 'class'},
 			],
 		},
@@ -1670,11 +1672,11 @@ export const src_json = {
 				{name: 'Indexed_Collection', kind: 'class'},
 			],
 		},
-		'./jsonrpc_client.js': {
-			path: 'jsonrpc_client.ts',
+		'./jsonrpc_helpers.js': {
+			path: 'jsonrpc_helpers.ts',
 			declarations: [
-				{name: 'Jsonrpc_Client_Options', kind: 'type'},
-				{name: 'Jsonrpc_Client', kind: 'class'},
+				{name: 'create_jsonrpc_request', kind: 'function'},
+				{name: 'create_jsonrpc_notification', kind: 'function'},
 			],
 		},
 		'./jsonrpc.js': {
