@@ -99,16 +99,16 @@
 			</li>
 		</ul>
 		<p>
-			This scope may look far-fetched, but I'm just making tools I want to use now on the best
+			This scope may look far-fetched, but I'm just making tools that I want to use now on the best
 			foundations I can assemble. And Zzz doesn't need or want to appeal to every user—thanks to the
 			magic of standards-based interoperability, Zzz works with all websites, and anything you make
-			with Zzz works with other browsers and web technologies. It's just one more optional take on
+			with Zzz works with other browsers and web technologies. It's just one way to interface with
 			the web.
 		</p>
 		<p>
 			I've been thinking about and prototyping related ideas for more than 13 years, so there's a
 			lot of thought and plans already formulated, but from here I'm prioritizing user feedback and
-			just shipping a continuously-improving proof-of-concept that's only interesting to
+			just shipping a continuously-improving proof-of-concept that's probably only interesting to
 			enthusiasts. Some early (rough) integrations include:
 		</p>
 		<ul>
