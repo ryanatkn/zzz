@@ -13,17 +13,6 @@ import {Action_Message, type Action_Message_Params} from '$lib/action_messages.j
 /** Maximum number of ping records to keep. */
 export const PING_HISTORY_MAX = 6;
 
-/**
- * Data structure for ping measurements.
- */
-export interface Ping_Data {
-	ping_id: Uuid;
-	completed: boolean;
-	sent_time: number;
-	received_time: number | null;
-	round_trip_time: number | null;
-}
-
 export const Capabilities_Json = Cell_Json.extend({});
 export type Capabilities_Json = z.infer<typeof Capabilities_Json>;
 export type Capabilities_Json_Input = z.input<typeof Capabilities_Json>;
@@ -44,25 +33,20 @@ export interface Capability<T> {
 	updated: number | null;
 }
 
-/**
- * Data structure for Ollama capability.
- */
-export interface Ollama_Capability_Data {
-	list_response: ListResponse | null;
+export interface Ping_Data {
+	ping_id: Uuid;
+	completed: boolean;
+	sent_time: number;
+	received_time: number | null;
+	round_trip_time: number | null;
 }
 
-/**
- * Data structure for Server capability.
- */
 export interface Server_Capability_Data {
 	name: string;
 	version: string;
 	round_trip_time: number;
 }
 
-/**
- * Data structure for WebSocket capability.
- */
 export interface Websocket_Capability_Data {
 	url: string | null;
 	connected: boolean;
@@ -74,12 +58,13 @@ export interface Websocket_Capability_Data {
 	pending_pings: number;
 }
 
-/**
- * Data structure for Filesystem capability.
- */
 export interface Filesystem_Capability_Data {
 	zzz_dir: Zzz_Dir | null | undefined;
 	zzz_dir_parent: string | null | undefined;
+}
+
+export interface Ollama_Capability_Data {
+	list_response: ListResponse | null;
 }
 
 /**
@@ -88,22 +73,8 @@ export interface Filesystem_Capability_Data {
  * all capabilities the system supports.
  */
 export class Capabilities extends Cell<typeof Capabilities_Json> {
-	/**
-	 * Server capability
-	 */
 	server: Capability<Server_Capability_Data | null | undefined> = $state.raw({
 		name: 'server',
-		data: undefined,
-		status: 'initial',
-		error_message: null,
-		updated: null,
-	});
-
-	/**
-	 * Ollama capability.
-	 */
-	ollama: Capability<Ollama_Capability_Data | null | undefined> = $state.raw({
-		name: 'ollama',
 		data: undefined,
 		status: 'initial',
 		error_message: null,
@@ -174,6 +145,14 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 			};
 		},
 	);
+
+	ollama: Capability<Ollama_Capability_Data | null | undefined> = $state.raw({
+		name: 'ollama',
+		data: undefined,
+		status: 'initial',
+		error_message: null,
+		updated: null,
+	});
 
 	/**
 	 * Store pings - both pending and completed.
