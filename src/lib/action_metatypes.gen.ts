@@ -90,10 +90,14 @@ export const gen: Gen = ({origin_path}) => {
 		export interface Actions_Api {
 			${registry.specs
 				.map((spec) => {
+					const innermost_type_name = get_innermost_type(spec.params)._def.typeName;
 					const has_params =
-						get_innermost_type(spec.params)._def.typeName !== z.ZodFirstPartyTypeKind.ZodNull;
+						innermost_type_name !== z.ZodFirstPartyTypeKind.ZodNull &&
+						innermost_type_name !== z.ZodFirstPartyTypeKind.ZodVoid;
 					return `${spec.method}: (${
-						has_params ? `params: typeof ${to_action_spec_params_identifier(spec.method)}` : ''
+						has_params
+							? `params: typeof ${to_action_spec_params_identifier(spec.method)}`
+							: 'params?: void'
 					}) => ${
 						spec.kind === 'request_response'
 							? `Promise<Api_Result<typeof ${to_action_spec_response_params_identifier(spec.method)}>>`

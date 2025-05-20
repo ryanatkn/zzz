@@ -85,15 +85,13 @@ export interface Actions_Api {
 	) => Promise<Api_Result<typeof delete_diskfile_action_spec.response_params>>;
 	filer_change: (params: typeof filer_change_action_spec.params) => void;
 	load_session: (
-		params: typeof load_session_action_spec.params,
+		params?: void,
 	) => Promise<Api_Result<typeof load_session_action_spec.response_params>>;
-	ping: (
-		params: typeof ping_action_spec.params,
-	) => Promise<Api_Result<typeof ping_action_spec.response_params>>;
+	ping: (params?: void) => Promise<Api_Result<typeof ping_action_spec.response_params>>;
 	submit_completion: (
 		params: typeof submit_completion_action_spec.params,
 	) => Promise<Api_Result<typeof submit_completion_action_spec.response_params>>;
-	toggle_main_menu: (params: typeof toggle_main_menu_action_spec.params) => void;
+	toggle_main_menu: (params?: void) => void;
 	update_diskfile: (
 		params: typeof update_diskfile_action_spec.params,
 	) => Promise<Api_Result<typeof update_diskfile_action_spec.response_params>>;
