@@ -7,9 +7,9 @@
 	import Glyph from '$lib/Glyph.svelte';
 
 	interface Props {
-		attribute: Xml_Attribute;
+		attribute: Xml_Attribute_With_Defaults;
 		dormant?: boolean | undefined;
-		onupdate: (updates: Partial<Omit_Strict<Xml_Attribute, 'id'>>) => void;
+		onupdate: (updates: Partial<Omit_Strict<Xml_Attribute_With_Defaults, 'id'>>) => void;
 		onremove: () => void;
 	}
 

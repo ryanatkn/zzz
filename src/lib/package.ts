@@ -63,7 +63,6 @@ export const package_json = {
 		'@hono/node-ws': '^1.1.4',
 		'@ryanatkn/belt': '^0.30.2',
 		'date-fns': '^4.1.0',
-		devalue: '^5.1.1',
 		'esm-env': '^1.2.2',
 		hono: '^4.7.8',
 		openai: '^4.96.2',
@@ -741,9 +740,9 @@ export const package_json = {
 			types: './dist/server/handler_defaults.d.ts',
 			default: './dist/server/handler_defaults.js',
 		},
-		'./server/jsonrpc_server.js': {
-			types: './dist/server/jsonrpc_server.d.ts',
-			default: './dist/server/jsonrpc_server.js',
+		'./server/jsonrpc_server_helpers.js': {
+			types: './dist/server/jsonrpc_server_helpers.d.ts',
+			default: './dist/server/jsonrpc_server_helpers.js',
 		},
 		'./server/register_http_actions.js': {
 			types: './dist/server/register_http_actions.d.ts',
@@ -912,6 +911,7 @@ export const src_json = {
 				{name: 'create_action_json', kind: 'function'},
 				{name: 'lookup_request_action_schema', kind: 'function'},
 				{name: 'lookup_response_action_schema', kind: 'function'},
+				{name: 'to_action_message_type', kind: 'function'},
 				{name: 'to_action_request_message_type', kind: 'function'},
 				{name: 'to_action_response_message_type', kind: 'function'},
 			],
@@ -1530,7 +1530,7 @@ export const src_json = {
 				{name: 'Diskfile_Path', kind: 'variable'},
 				{name: 'Diskfile_Change', kind: 'variable'},
 				{name: 'Zzz_Dir', kind: 'variable'},
-				{name: 'Source_File', kind: 'variable'},
+				{name: 'Serializable_Source_File', kind: 'variable'},
 				{name: 'Diskfile_Json', kind: 'variable'},
 				{name: 'Diskfile_Json_Input', kind: 'type'},
 			],
@@ -2040,15 +2040,15 @@ export const src_json = {
 				{name: 'handle_filer_change', kind: 'function'},
 			],
 		},
-		'./server/jsonrpc_server.js': {
-			path: 'server/jsonrpc_server.ts',
+		'./server/jsonrpc_server_helpers.js': {
+			path: 'server/jsonrpc_server_helpers.ts',
 			declarations: [
 				{name: 'Jsonrpc_Method_Handler', kind: 'type'},
 				{name: 'Jsonrpc_Request_Handler', kind: 'type'},
 				{name: 'Jsonrpc_Notification_Handler', kind: 'type'},
-				{name: 'Jsonrpc_Server_Options', kind: 'type'},
+				{name: 'Handle_Jsonrpc_Request_Options', kind: 'type'},
+				{name: 'handle_jsonrpc_request', kind: 'function'},
 				{name: 'create_jsonrpc_error', kind: 'function'},
-				{name: 'Jsonrpc_Server', kind: 'class'},
 			],
 		},
 		'./server/register_http_actions.js': {
@@ -2307,12 +2307,12 @@ export const src_json = {
 		'./xml.js': {
 			path: 'xml.ts',
 			declarations: [
-				{name: 'Xml_Attribute_Key_Base', kind: 'variable'},
 				{name: 'Xml_Attribute_Key', kind: 'variable'},
-				{name: 'Xml_Attribute_Value_Base', kind: 'variable'},
+				{name: 'Xml_Attribute_Key_With_Default', kind: 'variable'},
 				{name: 'Xml_Attribute_Value', kind: 'variable'},
-				{name: 'Xml_Attribute_Base', kind: 'variable'},
+				{name: 'Xml_Attribute_Value_With_Default', kind: 'variable'},
 				{name: 'Xml_Attribute', kind: 'variable'},
+				{name: 'Xml_Attribute_With_Defaults', kind: 'variable'},
 			],
 		},
 		'./zod_helpers.js': {

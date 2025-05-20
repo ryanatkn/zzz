@@ -14,7 +14,8 @@ const log = new Logger();
 export const create_actions_api = (zzz: Zzz): Actions_Api =>
 	new Proxy(Object.create(null), {
 		get: (_target, method: keyof Actions_Api) => (params: unknown) => {
-			log.debug(...to_logged_args(method, params));
+			// TODO BLOCK `log.debug` isn't formatting the output correctly, shouldn't use console here
+			console.log(...to_logged_args(method, params));
 
 			const spec = zzz.action_registry.by_method.get(method);
 			if (!spec) {
@@ -63,12 +64,11 @@ const to_logged_args = (method: string, params: unknown): Array<any> => {
 };
 
 const to_logged_method = (method: string): Array<any> =>
-	// BROWSER && DEV
-	// ? [
-	// 		'%c[api.%c' + method + '%c]',
-	// 		'color: gray',
-	// 		'color: magenta; font-weight: bold',
-	// 		'color: gray',
-	// 	]
-	// :
-	['[api.' + method + ']'];
+	BROWSER && DEV
+		? [
+				'%c[api.%c' + method + '%c]',
+				'color: gray',
+				'color: magenta; font-weight: bold',
+				'color: gray',
+			]
+		: ['[api.' + method + ']'];

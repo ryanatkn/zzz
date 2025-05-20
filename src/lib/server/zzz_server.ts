@@ -1,4 +1,4 @@
-import {Filer, type Cleanup_Watch} from '@ryanatkn/gro/filer.js';
+import {Filer, type Cleanup_Watch, type Source_File} from '@ryanatkn/gro/filer.js';
 import type {Watcher_Change} from '@ryanatkn/gro/watch_dir.js';
 import {resolve} from 'node:path';
 import {Logger} from '@ryanatkn/belt/log.js';
@@ -46,7 +46,7 @@ export type Action_Handler = (
  */
 export type Filer_Change_Handler = (
 	change: Watcher_Change,
-	source_file: Record<string, any>,
+	source_file: Source_File,
 	server: Zzz_Server,
 	dir: Zzz_Dir,
 ) => void;
@@ -147,7 +147,14 @@ export class Zzz_Server {
 		console.log(`this.zzz_dir`, this.zzz_dir);
 		const filer = new Filer({watch_dir_options: {dir: this.zzz_dir}}); // TODO maybe filter out the db directory at this level? think about this when db is added
 		const cleanup_promise = filer.watch((change, source_file) => {
-			console.log(`change`, change, source_file.id);
+			console.log(
+				`change`,
+				change,
+				source_file.id,
+				typeof source_file.dependencies,
+				source_file.dependencies instanceof Map,
+				source_file.dependencies + '',
+			);
 			this.#handle_filer_change(change, source_file, this, this.zzz_dir);
 		});
 		this.filers.set(this.zzz_dir, {filer, cleanup_promise});

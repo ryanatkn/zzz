@@ -10,13 +10,13 @@ import {
 } from '$env/static/private';
 import {dirname, join} from 'node:path';
 import {format_file} from '@ryanatkn/gro/format_file.js';
-import type {Watcher_Change} from '@ryanatkn/gro/watch_dir.js';
 import {DEV} from 'esm-env';
+import type {Source_File} from '@ryanatkn/gro/filer.js';
 
 import {Action_Message} from '$lib/action_messages.js';
 import type {Action_Message_From_Client} from '$lib/action_collections.js';
 import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
-import {Diskfile_Path, Source_File, type Zzz_Dir} from '$lib/diskfile_types.js';
+import {Diskfile_Path, Serializable_Source_File} from '$lib/diskfile_types.js';
 import {map_watcher_change_to_diskfile_change} from '$lib/diskfile_helpers.js';
 import {
 	format_ollama_messages,
@@ -25,7 +25,7 @@ import {
 	format_gemini_messages,
 } from '$lib/server/ai_provider_utils.js';
 import {create_completion_response_message} from '$lib/response_helpers.js';
-import type {Zzz_Server} from '$lib/server/zzz_server.js';
+import type {Filer_Change_Handler, Zzz_Server} from '$lib/server/zzz_server.js';
 import {Safe_Fs} from '$lib/server/safe_fs.js';
 import type {Service_Return} from '$lib/server/service.js';
 
@@ -62,17 +62,13 @@ export const handle_message = async (
 		case 'load_session': {
 			// TODO change so this only returns metadata, not file contents
 			// Access filers through server and collect all files
-			const files_array: Array<Source_File> = [];
+			const files_array: Array<Serializable_Source_File> = [];
 
 			// Iterate through all filers and collect their files
-			for (const f of server.filers.values()) {
-				// TODO fix name
-				f.filer.files.forEach((file: any, id) => {
-					files_array.push({
-						...file,
-						id: Diskfile_Path.parse(id),
-					});
-				});
+			for (const filer of server.filers.values()) {
+				for (const file of filer.filer.files.values()) {
+					files_array.push(to_serializable_source_file(file, server.zzz_dir)); // TODO dir is a hack
+				}
 			}
 
 			return {
@@ -267,43 +263,42 @@ export const handle_message = async (
 /**
  * Handle file system changes and notify clients.
  */
-export const handle_filer_change = (
-	change: Watcher_Change,
-	source_file: Record<string, any>,
-	server: Zzz_Server,
-	dir: Zzz_Dir,
+export const handle_filer_change: Filer_Change_Handler = (
+	change,
+	source_file,
+	server,
+	dir,
 ): void => {
 	const api_change = {
 		type: map_watcher_change_to_diskfile_change(change.type),
 		path: Diskfile_Path.parse(change.path),
 	};
 
-	// Ensure the id is properly typed
-	source_file.id = Diskfile_Path.parse(source_file.id);
-
-	// Include the source directory with the change notification
-	source_file.source_dir = dir;
-
 	// Declare variable for the source file that will be sent
-	let parsed_source_file: Source_File;
+	const serializable_source_file = to_serializable_source_file(source_file, dir);
 
-	// In development mode, validate strictly
+	// In development mode, validate strictly and fail loudly.
+	// This is less of a need in production because we control both sides,
+	// but maybe it should be optional or even required.
 	if (DEV) {
-		// Use direct parse to make errors loud and fail fast
-		parsed_source_file = Source_File.parse(source_file);
-	} else {
-		// In production, simply typecast for performance (we control both sides)
-		parsed_source_file = source_file as Source_File;
+		Serializable_Source_File.parse(serializable_source_file);
+
+		// TODO can this be moved to the schema?
+		if (!serializable_source_file.id.startsWith(serializable_source_file.source_dir)) {
+			throw new Error(
+				`Source file ${serializable_source_file.id} does not start with source dir ${serializable_source_file.source_dir}`,
+			);
+		}
 	}
 
 	server.send({
 		id: create_uuid(),
 		created: get_datetime_now(),
-		type: 'filer_change', // TODO hacky
+		type: 'filer_change', // TODO BLOCK @api hacky
 		method: 'filer_change',
 		params: {
 			change: api_change,
-			source_file: parsed_source_file,
+			source_file: serializable_source_file,
 		},
 	});
 };
@@ -337,3 +332,21 @@ const write_json = async (path: string, json: unknown, safe_fs: Safe_Fs): Promis
 	console.log('writing json', path, formatted.length);
 	await safe_fs.write_file(path, formatted);
 };
+
+// TODO @many refactor source/disk files with Gro Source_File too
+const to_serializable_source_file = (
+	source_file: Source_File,
+	dir: string,
+): Serializable_Source_File => ({
+	id: source_file.id as Diskfile_Path,
+	source_dir: dir as Diskfile_Path,
+	contents: source_file.contents,
+	ctime: source_file.ctime,
+	mtime: source_file.mtime,
+	dependents: Array.from(
+		source_file.dependents.entries(),
+	) as Serializable_Source_File['dependents'],
+	dependencies: Array.from(
+		source_file.dependencies.entries(),
+	) as Serializable_Source_File['dependencies'],
+}); // TODO @many refactor source/disk files with Gro Source_File too

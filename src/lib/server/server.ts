@@ -1,7 +1,6 @@
 import {Hono} from 'hono';
 import {serve} from '@hono/node-server';
 import {createNodeWebSocket} from '@hono/node-ws';
-import * as devalue from 'devalue';
 import {PUBLIC_SERVER_HOSTNAME, PUBLIC_ZZZ_DIR} from '$env/static/public';
 
 import {Zzz_Server} from '$lib/server/zzz_server.js';
@@ -30,7 +29,7 @@ const main = (): void => {
 		send_to_all_clients: (message) => {
 			// Send messages to all connected websocket clients
 			for (const ws of sockets) {
-				ws.send(devalue.stringify(message));
+				ws.send(JSON.stringify(message));
 			}
 		},
 		handle_message,

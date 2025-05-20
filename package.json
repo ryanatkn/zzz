@@ -67,7 +67,6 @@
     "@hono/node-ws": "^1.1.4",
     "@ryanatkn/belt": "^0.30.2",
     "date-fns": "^4.1.0",
-    "devalue": "^5.1.1",
     "esm-env": "^1.2.2",
     "hono": "^4.7.8",
     "openai": "^4.96.2"
@@ -867,9 +866,9 @@
       "types": "./dist/server/handler_defaults.d.ts",
       "default": "./dist/server/handler_defaults.js"
     },
-    "./server/jsonrpc_server.js": {
-      "types": "./dist/server/jsonrpc_server.d.ts",
-      "default": "./dist/server/jsonrpc_server.js"
+    "./server/jsonrpc_server_helpers.js": {
+      "types": "./dist/server/jsonrpc_server_helpers.d.ts",
+      "default": "./dist/server/jsonrpc_server_helpers.js"
     },
     "./server/register_http_actions.js": {
       "types": "./dist/server/register_http_actions.d.ts",

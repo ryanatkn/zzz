@@ -87,7 +87,7 @@ export class Actions extends Cell<typeof Actions_Json> {
 	// TODO BLOCK @api call this from the dispatcher (middleware?)
 	add_message(message: Action_Message_Any): void {
 		const action_json = create_action_json(message);
-		if (!action_json) throw new Error(`Invalid action: ${message.method}`);
+		if (!action_json) throw Error(`Invalid action: ${message.method}`);
 		this.add_json(action_json);
 	}
 

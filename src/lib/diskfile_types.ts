@@ -39,28 +39,29 @@ export const Zzz_Dir = Diskfile_Path.refine((p) => p.endsWith('/.zzz'), {
 	.brand('Zzz_Dir');
 export type Zzz_Dir = z.infer<typeof Zzz_Dir>;
 
-// Use a more specific definition for Maps compatible with Gro's Source_File
-export const Source_File = z.object({
+// TODO hacky, uses the serializable form of the Gro `Source_File` (which uses maps)
+export const Serializable_Source_File = z.object({
 	id: Diskfile_Path,
+	source_dir: Diskfile_Path,
 	contents: z.string().nullable(),
 	ctime: z.number().nullable(),
 	mtime: z.number().nullable(),
-	// TODO BLOCK remove devalue and change to use zod for serialization
-	dependents: z.map(Diskfile_Path, z.any()), // TODO @many these can't be circular refs, how to rewrite?
-	dependencies: z.map(Diskfile_Path, z.any()), // TODO @many these can't be circular refs, how to rewrite?
+	dependents: z.array(z.tuple([Diskfile_Path, z.any()])), // TODO @many zod4 - these can't be circular refs, how to rewrite?
+	dependencies: z.array(z.tuple([Diskfile_Path, z.any()])), // TODO @many zod4 - these can't be circular refs, how to rewrite?
 });
-export type Source_File = z.infer<typeof Source_File>;
+export type Serializable_Source_File = z.infer<typeof Serializable_Source_File>;
 
 // Directly extend the base schema with Diskfile-specific properties
 export const Diskfile_Json = Cell_Json.extend({
 	path: Diskfile_Path.nullable().default(null),
+	source_dir: Diskfile_Path,
 	content: z.string().nullable().default(null),
 	dependents: z
-		.array(z.tuple([Diskfile_Path, Source_File]))
+		.array(z.tuple([Diskfile_Path, Serializable_Source_File]))
 		.nullable()
 		.default(null),
 	dependencies: z
-		.array(z.tuple([Diskfile_Path, Source_File]))
+		.array(z.tuple([Diskfile_Path, Serializable_Source_File]))
 		.nullable()
 		.default(null),
 });

@@ -1,7 +1,12 @@
 import {z} from 'zod';
 
 import type {Action_Spec} from '$lib/action_spec.js';
-import {Diskfile_Change, Diskfile_Path, Source_File, Zzz_Dir} from '$lib/diskfile_types.js';
+import {
+	Diskfile_Change,
+	Diskfile_Path,
+	Serializable_Source_File,
+	Zzz_Dir,
+} from '$lib/diskfile_types.js';
 import {Type_Literal, Uuid} from '$lib/zod_helpers.js';
 import {Completion_Request, Completion_Response} from '$lib/completion_types.js';
 
@@ -33,7 +38,7 @@ export const load_session_action_spec = {
 				// TODO extract this schema to diskfile_types or something
 				.object({
 					zzz_dir: Zzz_Dir,
-					files: z.array(Source_File),
+					files: z.array(Serializable_Source_File),
 				})
 				.strict(),
 		})
@@ -46,7 +51,7 @@ export const filer_change_action_spec = {
 	params: z
 		.object({
 			change: Diskfile_Change,
-			source_file: Source_File,
+			source_file: Serializable_Source_File,
 		})
 		.strict(),
 } satisfies Action_Spec;

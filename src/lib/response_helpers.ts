@@ -86,6 +86,7 @@ export const create_completion_response_message = (
 	return {
 		id: create_uuid(),
 		created,
+		type: 'submit_completion_response',
 		method: 'submit_completion',
 		params: {
 			completion_response: {
