@@ -41,8 +41,9 @@ import {Api_Client, type Api_Client_Options} from '$lib/api_client.js';
 import type {Completion_Message} from '$lib/completion_types.js';
 import type {JSONRPCMessage} from '$lib/jsonrpc.js';
 import {create_mutation_context} from '$lib/mutation.js';
-import type {Mutations} from '$lib/action_metatypes.js';
+import type {Actions_Api, Mutations} from '$lib/action_metatypes.js';
 import type {Action_Spec} from '$lib/action_spec.js';
+import {create_actions_api} from '$lib/actions_api.js';
 
 export const zzz_context = create_context<Zzz>();
 
@@ -62,8 +63,7 @@ export interface Zzz_Options extends Omit_Strict<Cell_Options<typeof Zzz_Json>, 
 	providers?: Array<Provider_Json>;
 	cell_classes?: Record<string, Class_Constructor<Cell>>;
 	action_specs?: Array<Action_Spec>;
-	send_mutations?: Mutations;
-	receive_mutations?: Mutations;
+	mutations?: Mutations;
 
 	/** URL for server communication */
 	api_url?: string | null;
@@ -86,6 +86,9 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	readonly cell_registry: Cell_Registry;
 
 	readonly action_registry: Action_Registry;
+	readonly mutations: Mutations;
+	readonly api: Actions_Api;
+	readonly api_client: Api_Client;
 
 	// Cells - these are managed objects/collections that contain the app state
 	readonly time: Time;
@@ -101,13 +104,6 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	readonly socket: Socket;
 	readonly url_params: Url_Params;
 	readonly capabilities: Capabilities;
-
-	// TODO implement this, using a proxy with the registry
-	// readonly api: Actions_Api = create_actions_api(this);
-	// create_actions = (): Actions => {
-	// 	const actions: Actions = new Proxy(Object.create(null), {
-	//    get: (_target, action_method: Action_Method) => async (params: unknown) => {
-	readonly api_client: Api_Client;
 
 	readonly bots: Zzz_Config['bots'];
 
@@ -157,6 +153,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 		this.cell_registry = new Cell_Registry(this);
 
 		this.action_registry = new Action_Registry(options.action_specs || []); // making this optional for now, the app will just have no actions
+		this.mutations = options.mutations || {};
 
 		// Register cell classes if provided, otherwise use the default
 		const cells_to_register = options.cell_classes || cell_classes;
@@ -192,7 +189,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 
 		this.bots = options.bots ?? BOTS_DEFAULT;
 
-		const {send_mutations, receive_mutations} = options;
+		this.api = create_actions_api(this);
 
 		this.api_client = new Api_Client({
 			...options.api_client_options, // TODO think about more flexible extension of `Api_Client`
@@ -214,7 +211,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 				this.socket.send(m); // TODO JSON-RPC
 
 				// TODO dynamic registry? maybe with an API not a plain object?
-				const mutation = send_mutations?.[message.method]; // TODO think about before/after
+				const mutation = mutations?.[message.type]; // TODO think about before/after
 				if (!mutation) {
 					// console.warn('unknown message name, ignoring:', message.method, message);
 					return; // Ignore messages with no mutations
@@ -245,9 +242,9 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 				};
 
 				// Handle the message based on its method
-				this.api_client.handle_incoming_message(message);
+				this.api_client.receive_incoming_message(message);
 
-				const mutation = receive_mutations?.[message.method];
+				const mutation = mutations?.[message.type];
 				if (!mutation) {
 					// console.warn('unknown message type, ignoring:', message.type, message);
 					return; // Ignore messages with no mutations
@@ -341,6 +338,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 				this.diskfiles.handle_change({
 					id: create_uuid(), // TODO shouldnt need to fake, maybe call an internal method directly? or do we want a single path?
 					created: get_datetime_now(),
+					type: 'filer_change',
 					method: 'filer_change',
 					params: {
 						change: {type: 'add', path: source_file.id},

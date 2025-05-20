@@ -4,8 +4,8 @@ import {action_specs} from '$lib/action_collections.js';
 import {Action_Registry} from '$lib/action_registry.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
 import {
-	to_action_request_message_name,
-	to_action_response_message_name,
+	to_action_request_message_type,
+	to_action_response_message_type,
 } from '$lib/action_helpers.js';
 
 /**
@@ -42,10 +42,10 @@ export const gen: Gen = ({origin_path}) => {
 				v += `Action_Message.${method},`;
 			} else {
 				if (include_request_response === 'request' || include_request_response === 'both') {
-					v += `Action_Message.${to_action_request_message_name(method)},`;
+					v += `Action_Message.${to_action_request_message_type(method)},`;
 				}
 				if (include_request_response === 'response' || include_request_response === 'both') {
-					v += `Action_Message.${to_action_response_message_name(method)},`;
+					v += `Action_Message.${to_action_response_message_type(method)},`;
 				}
 			}
 		}

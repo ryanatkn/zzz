@@ -103,8 +103,6 @@ export interface Action_Message {
 	update_diskfile_response: z.infer<typeof Action_Message.update_diskfile_response>;
 }
 
-export type Action_Message_Name = keyof Action_Message;
-
 export interface Action_Message_Params {
 	create_directory_request: z.infer<typeof create_directory_action_spec.params>;
 	create_directory_response: z.infer<typeof create_directory_action_spec.response_params>;

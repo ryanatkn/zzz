@@ -25,12 +25,7 @@
 
 <div class="column align_items_start gap_sm">
 	<div>
-		<button
-			type="button"
-			title="ping the server"
-			onclick={() => capabilities.send_ping()}
-			class="flex_1"
-		>
+		<button type="button" title="ping the server" onclick={() => zzz.api.ping()} class="flex_1">
 			{#if children}{@render children()}{:else}⚞{/if}
 			<div class="font_size_lg font_weight_400 pl_sm">ping the server</div>
 		</button>

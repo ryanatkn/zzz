@@ -14,6 +14,8 @@ import {
 	is_request_response_action,
 } from '$lib/schema_helpers.js';
 
+// TODO currently unused
+
 export type Vocab_Name = Flavored<string, 'Vocab_Name'>;
 
 /**

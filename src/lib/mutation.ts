@@ -1,4 +1,3 @@
-import type {Api_Result} from '$lib/api.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 
@@ -11,11 +10,7 @@ import type {Zzz} from '$lib/zzz.svelte.js';
 /**
  * Context provided to mutation handlers.
  */
-export interface Mutation_Context<
-	T_App extends Zzz = Zzz,
-	T_Params = unknown,
-	T_Result extends Api_Result<unknown> | void = any,
-> {
+export interface Mutation_Context<T_App extends Zzz = Zzz, T_Params = unknown, T_Result = any> {
 	/** Reference to the main application instance. */
 	zzz: T_App;
 	/** Name of the action being performed. */
@@ -32,11 +27,9 @@ export interface Mutation_Context<
  * Mutation handler function type.
  * Must be synchronous.
  */
-export type Mutation<
-	T_App extends Zzz = Zzz,
-	T_Params = any,
-	T_Result extends Api_Result<unknown> | void = any,
-> = (ctx: Mutation_Context<T_App, T_Params, T_Result>) => any;
+export type Mutation<T_App extends Zzz = Zzz, T_Params = any, T_Result = any> = (
+	ctx: Mutation_Context<T_App, T_Params, T_Result>,
+) => any;
 
 /**
  * Type for registering callbacks to run after mutation completes.
@@ -55,25 +48,25 @@ export type After_Mutation_Callback = () => void | Promise<void>;
 export const create_mutation_context = <
 	T_App extends Zzz = Zzz,
 	T_Params = unknown,
-	T_Result extends Api_Result<unknown> | void = any,
+	T_Result = any,
 >(
 	zzz: T_App,
 	method: Action_Method,
 	params: T_Params,
 	result: T_Result,
-): {ctx: Mutation_Context<T_App, T_Params, T_Result>; flush_after_mutation: () => void} => {
+): {
+	ctx: Mutation_Context<T_App, T_Params, T_Result>;
+	flush_after_mutation: () => Promise<void>;
+} => {
 	const cbs: Array<After_Mutation_Callback> = [];
 
 	const after_mutation: After_Mutation = (cb) => {
 		cbs.push(cb);
 	};
 
-	const flush_after_mutation = (): void => {
+	const flush_after_mutation = async (): Promise<void> => {
 		for (const cb of cbs) {
-			const returned = cb();
-			if (returned && 'then' in returned) {
-				void returned;
-			}
+			await cb(); // eslint-disable-line no-await-in-loop
 		}
 	};
 

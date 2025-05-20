@@ -406,10 +406,6 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 		}
 	}
 
-	send_ping(): void {
-		this.zzz.actions.add_message(Action_Message.ping_request.parse(undefined));
-	}
-
 	// TODO @many refactor mutations
 	handle_sent_ping(request: Action_Message['ping_request']): void {
 		// Create a new pending ping

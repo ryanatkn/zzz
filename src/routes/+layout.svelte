@@ -18,7 +18,6 @@
 	import Zzz_Root from '$lib/Zzz_Root.svelte';
 	import {pkg_context} from '$lib/pkg.js';
 	import {package_json, src_json} from '$lib/package.js';
-	import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
 	import {Prompt_Json} from '$lib/prompt.svelte.js';
 	import {Provider_Json} from '$lib/provider.svelte.js';
 	import create_zzz_config from '$lib/config.js';
@@ -40,6 +39,11 @@
 		// TODO note the difference between these two APIs, look at both of them and see which makes more sense
 		zzz.add_providers(zzz_config.providers.map((p) => Provider_Json.parse(p))); // TODO handle errors
 		zzz.models.add_many(zzz_config.models.map((m) => Model_Json.parse(m))); // TODO handle errors
+
+		// Initialize the session
+		if (BROWSER) {
+			void zzz.api.load_session();
+		}
 	});
 
 	pkg_context.set(parse_package_meta(package_json, src_json));
@@ -56,16 +60,6 @@
 	}
 
 	if (BROWSER) (window as any).app = (window as any).zzz = zzz; // no types for this, just for runtime convenience
-
-	// Initialize the session
-	if (BROWSER) {
-		// TODO BLOCK entrypoint to refactor actions
-		zzz.actions.add_message({
-			id: create_uuid(),
-			created: get_datetime_now(),
-			method: 'load_session',
-		});
-	}
 
 	// TODO refactor, maybe per route?
 	// Handle URL parameter synchronization

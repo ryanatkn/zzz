@@ -88,9 +88,9 @@ describe('Socket', () => {
 		zzz = monkeypatch_zzz_for_tests(new Zzz());
 
 		// TODO better mocking
-		// Mock capabilities for testing
-		(zzz as any).capabilities = {
-			send_ping: vi.fn(),
+		// Mock action API for testing
+		(zzz as any).api = {
+			ping: vi.fn(),
 		} as any;
 
 		// Set test time properties
@@ -378,7 +378,7 @@ describe('Socket', () => {
 			vi.advanceTimersByTime(1000);
 
 			// Check ping was sent
-			expect(zzz.capabilities.send_ping).toHaveBeenCalled();
+			expect(zzz.api.ping).toHaveBeenCalled();
 		});
 	});
 });

@@ -2,8 +2,8 @@ import type {z} from 'zod';
 
 import {Action_Message_Any, action_spec_by_method} from '$lib/action_collections.js';
 import type {Action_Json} from '$lib/action_types.js';
-import {Action_Message, type Action_Message_Name} from '$lib/action_messages.js';
-import {Action_Method} from '$lib/action_metatypes.js';
+import {Action_Message} from '$lib/action_messages.js';
+import {Action_Message_Type, Action_Method} from '$lib/action_metatypes.js';
 import type {JSONRPCRequest} from '$lib/jsonrpc.js';
 import {Uuid} from '$lib/zod_helpers.js';
 
@@ -29,7 +29,7 @@ export const create_action_json = (action: Action_Message_Any): Action_Json | nu
 export const lookup_request_action_schema = (
 	method: Action_Method,
 ): z.ZodType<Action_Message_Any> | undefined => {
-	const key = to_action_request_message_name(method);
+	const key = to_action_request_message_type(method);
 	return key && (Action_Message[key] as any);
 };
 
@@ -37,25 +37,17 @@ export const lookup_request_action_schema = (
 export const lookup_response_action_schema = (
 	method: Action_Method,
 ): z.ZodType<Action_Message_Any> | undefined => {
-	const key = to_action_response_message_name(method);
+	const key = to_action_response_message_type(method);
 	return key && (Action_Message[key] as any);
 };
 
-export const to_action_request_message_name = (
+export const to_action_request_message_type = (
 	method: Action_Method,
-): Action_Message_Name | undefined => {
-	// TODO BLOCK validate it's a request/response action
-	const name = method + '_request';
-	return name in Action_Message ? (name as Action_Message_Name) : undefined;
-};
+): Action_Message_Type | undefined => Action_Message_Type.parse(method + '_request');
 
-export const to_action_response_message_name = (
+export const to_action_response_message_type = (
 	method: Action_Method,
-): Action_Message_Name | undefined => {
-	// TODO BLOCK validate it's a request/response action
-	const name = method + '_response';
-	return name in Action_Message ? (name as Action_Message_Name) : undefined;
-};
+): Action_Message_Type | undefined => Action_Message_Type.parse(method + '_response');
 
 /**
  * Convert JSON-RPC request to Action_Message format

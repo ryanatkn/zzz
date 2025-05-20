@@ -106,11 +106,12 @@ export class Api_Client {
 		return deferred.promise;
 	}
 
+	// TODO BLOCK @api is this a transport concern?
 	/**
 	 * Processes a received action message from server.
 	 * This is the primary entry point for handling incoming server messages.
 	 */
-	handle_incoming_message(message: Action_Message_From_Server): void {
+	receive_incoming_message(message: Action_Message_From_Server): void {
 		const {id, method, params} = message;
 
 		// First check if this is a response to a pending request

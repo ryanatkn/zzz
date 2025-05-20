@@ -911,8 +911,8 @@ export const src_json = {
 				{name: 'create_action_json', kind: 'function'},
 				{name: 'lookup_request_action_schema', kind: 'function'},
 				{name: 'lookup_response_action_schema', kind: 'function'},
-				{name: 'to_action_request_message_name', kind: 'function'},
-				{name: 'to_action_response_message_name', kind: 'function'},
+				{name: 'to_action_request_message_type', kind: 'function'},
+				{name: 'to_action_response_message_type', kind: 'function'},
 				{name: 'jsonrpc_to_action_message', kind: 'function'},
 			],
 		},
@@ -928,7 +928,6 @@ export const src_json = {
 			path: 'action_messages.ts',
 			declarations: [
 				{name: 'Action_Message', kind: 'variable'},
-				{name: 'Action_Message_Name', kind: 'type'},
 				{name: 'Action_Message_Params', kind: 'type'},
 			],
 		},
@@ -1777,13 +1776,7 @@ export const src_json = {
 				{name: 'create_mutation_context', kind: 'function'},
 			],
 		},
-		'./mutations.js': {
-			path: 'mutations.ts',
-			declarations: [
-				{name: 'send_mutations', kind: 'variable'},
-				{name: 'receive_mutations', kind: 'variable'},
-			],
-		},
+		'./mutations.js': {path: 'mutations.ts', declarations: [{name: 'mutations', kind: 'variable'}]},
 		'./nav_helpers.js': {
 			path: 'nav_helpers.ts',
 			declarations: [

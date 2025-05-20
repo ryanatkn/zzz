@@ -2,7 +2,7 @@ import {create_context} from '@ryanatkn/fuz/context_helpers.js';
 
 import {Zzz, zzz_context, type Zzz_Options} from '$lib/zzz.svelte.js';
 import {cell_classes} from '$lib/cell_classes.js';
-import {receive_mutations, send_mutations} from '$lib/mutations.js';
+import {mutations} from '$lib/mutations.js';
 import {WEBSOCKET_URL, API_URL} from '$lib/constants.js';
 
 // TODO use this instead of `zzz_context` in non-core usages for type safety
@@ -21,8 +21,7 @@ export class App extends Zzz {
 		if (!o.api_url) o.api_url = API_URL;
 		if (!o.socket_url) o.socket_url = WEBSOCKET_URL;
 		if (!o.cell_classes) o.cell_classes = cell_classes;
-		if (!o.send_mutations) o.send_mutations = send_mutations;
-		if (!o.receive_mutations) o.receive_mutations = receive_mutations;
+		if (!o.mutations) o.mutations = mutations;
 		super(o);
 	}
 }

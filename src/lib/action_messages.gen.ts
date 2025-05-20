@@ -8,6 +8,10 @@ import {
 } from '$lib/schema_helpers.js';
 import {action_specs} from '$lib/action_collections.js';
 import {Action_Registry} from '$lib/action_registry.js';
+import {
+	to_action_request_message_type,
+	to_action_response_message_type,
+} from '$lib/action_helpers.js';
 
 /**
  * Outputs a file with action schema definitions that can be imported by other modules.
@@ -24,7 +28,7 @@ export const gen: Gen = ({origin_path}) => {
 		// ${banner}
 
 		import {z} from 'zod';
-		
+
 		import {Action_Message_Base} from '$lib/action_spec.js';
 		import {${registry.specs
 			// TODO maybe change to `import * as specs`
@@ -36,13 +40,13 @@ export const gen: Gen = ({origin_path}) => {
 				.map((spec) => {
 					const {method} = spec;
 					if (is_request_response_action(spec)) {
-						return `${method}_request: Action_Message_Base.extend({
-						type: z.literal('${method}_request'),	
+						return `${to_action_request_message_type(method)}: Action_Message_Base.extend({
+						type: z.literal('${to_action_request_message_type(method)}'),	
 						method: z.literal('${method}'),
 							params: ${to_action_spec_params_identifier(method)},
 						}),
-						${method}_response: Action_Message_Base.extend({
-						type: z.literal('${method}_response'),	
+						${to_action_response_message_type(method)}: Action_Message_Base.extend({
+						type: z.literal('${to_action_response_message_type(method)}'),	
 						method: z.literal('${method}'),
 							params: ${to_action_spec_response_params_identifier(method)},
 						})`;
@@ -61,8 +65,8 @@ export const gen: Gen = ({origin_path}) => {
 				.map((spec) => {
 					const {method} = spec;
 					if (is_request_response_action(spec)) {
-						return `${method}_request: z.infer<typeof Action_Message.${method}_request>,
-						${method}_response: z.infer<typeof Action_Message.${method}_response>`;
+						return `${to_action_request_message_type(method)}: z.infer<typeof Action_Message.${to_action_request_message_type(method)}>,
+						${to_action_response_message_type(method)}: z.infer<typeof Action_Message.${to_action_response_message_type(method)}>`;
 					} else {
 						return `${method}: z.infer<typeof Action_Message.${method}>`;
 					}
@@ -70,15 +74,13 @@ export const gen: Gen = ({origin_path}) => {
 				.join(';\n\t\t\t')}
 		}
 
-		export type Action_Message_Name = keyof Action_Message;
-
 		export interface Action_Message_Params {
 			${registry.specs
 				.map((spec) => {
 					const {method} = spec;
 					if (is_request_response_action(spec)) {
-						return `${method}_request: z.infer<typeof ${to_action_spec_params_identifier(method)}>,
-						${method}_response: z.infer<typeof ${to_action_spec_response_params_identifier(method)}>`;
+						return `${to_action_request_message_type(method)}: z.infer<typeof ${to_action_spec_params_identifier(method)}>,
+						${to_action_response_message_type(method)}: z.infer<typeof ${to_action_spec_response_params_identifier(method)}>`;
 					} else {
 						return `${method}: z.infer<typeof ${to_action_spec_params_identifier(method)}>`;
 					}

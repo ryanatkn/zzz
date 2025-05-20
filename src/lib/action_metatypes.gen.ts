@@ -9,6 +9,11 @@ import {
 import {get_innermost_type} from '$lib/zod_helpers.js';
 import {action_specs} from '$lib/action_collections.js';
 import {Action_Registry} from '$lib/action_registry.js';
+import {
+	to_action_request_message_type,
+	to_action_response_message_type,
+} from '$lib/action_helpers.js';
+import type {Action_Method} from '$lib/action_metatypes.js';
 
 /**
  * Outputs a file with action types that can be imported from anywhere with no runtime cost.
@@ -67,7 +72,10 @@ export const gen: Gen = ({origin_path}) => {
 			${registry.specs
 				.map((spec) =>
 					spec.kind === 'request_response'
-						? [`'${spec.method}_request'`, `'${spec.method}_response'`]
+						? [
+								`'${to_action_request_message_type(spec.method)}'`,
+								`'${to_action_response_message_type(spec.method)}'`,
+							]
 						: `'${spec.method}'`,
 				)
 				.flat()
@@ -103,14 +111,24 @@ export const gen: Gen = ({origin_path}) => {
 		export interface Mutations<T_App extends Zzz = Zzz> {
 			[key: string]: Mutation<T_App> | undefined;
 			${registry.specs
-				.map(
-					(spec) =>
-						`${spec.method}?: Mutation<T_App, typeof ${to_action_spec_params_identifier(spec.method)}, ${
-							is_request_response_action(spec)
-								? `Api_Result<typeof ${to_action_spec_response_params_identifier(spec.method)}>`
+				.map((spec) => {
+					const v = (m: Action_Method, request_response: 'request' | 'response' | null) =>
+						`${
+							request_response === 'request'
+								? to_action_request_message_type(m)
+								: request_response === 'response'
+									? to_action_response_message_type(m)
+									: m
+						}?: Mutation<T_App, typeof ${to_action_spec_params_identifier(m)}, ${
+							request_response === 'response'
+								? `Api_Result<typeof ${to_action_spec_response_params_identifier(m)}>`
 								: 'void'
-						}>;`,
-				)
+						}>;`;
+					return is_request_response_action(spec)
+						? [v(spec.method, 'request'), v(spec.method, 'response')]
+						: v(spec.method, null);
+				})
+				.flat()
 				.join('\n\t')}
 		}
 

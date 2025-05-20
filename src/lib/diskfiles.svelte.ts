@@ -1,13 +1,13 @@
 import {z} from 'zod';
+import {strip_start} from '@ryanatkn/belt/string.js';
 
 import type {Action_Message} from '$lib/action_messages.js';
-import {create_uuid, get_datetime_now, Uuid} from '$lib/zod_helpers.js';
+import {get_datetime_now, Uuid} from '$lib/zod_helpers.js';
 import {Diskfile, Diskfile_Schema} from '$lib/diskfile.svelte.js';
 import {Diskfile_Json, Diskfile_Path} from '$lib/diskfile_types.js';
 import {source_file_to_diskfile_json} from '$lib/diskfile_helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
-import {strip_start} from '@ryanatkn/belt/string.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {create_single_index, create_multi_index} from '$lib/indexed_collection_helpers.js';
 import {Diskfiles_Editor} from '$lib/diskfiles_editor.svelte.js';
@@ -132,21 +132,11 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 	}
 
 	update(path: Diskfile_Path, content: string): void {
-		this.zzz.actions.add_message({
-			id: create_uuid(),
-			created: get_datetime_now(),
-			method: 'update_diskfile',
-			params: {path, content},
-		});
+		this.zzz.api.update_diskfile({path, content});
 	}
 
 	delete(path: Diskfile_Path): void {
-		this.zzz.actions.add_message({
-			id: create_uuid(),
-			created: get_datetime_now(),
-			method: 'delete_diskfile',
-			params: {path},
-		});
+		this.zzz.api.delete_diskfile({path});
 	}
 
 	create_file(filename: string, content: string = ''): void {
@@ -169,12 +159,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 		// Create full path by joining zzz_dir with the directory name
 		const path = Diskfile_Path.parse(`${this.zzz.zzz_dir}${dirname}`);
 
-		this.zzz.actions.add_message({
-			id: create_uuid(),
-			created: get_datetime_now(),
-			method: 'create_directory',
-			params: {path},
-		});
+		this.zzz.api.create_directory({path});
 	}
 
 	get_by_path(path: Diskfile_Path): Diskfile | undefined {
