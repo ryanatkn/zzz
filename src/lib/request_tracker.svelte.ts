@@ -8,17 +8,20 @@ import type {JSONRPCRequestId} from '$lib/jsonrpc.js';
  * Represents a pending request with its associated state.
  */
 export class Request_Tracker_Item<T = any> {
-	deferred: Deferred<T> = $state()!;
-	created: Datetime = $state()!;
+	readonly id: JSONRPCRequestId;
+	readonly deferred: Deferred<T>;
+	readonly created: Datetime;
 	status: Async_Status = $state()!;
 	timeout: NodeJS.Timeout | undefined = $state();
 
 	constructor(
+		id: JSONRPCRequestId,
 		deferred: Deferred<T>,
 		created: Datetime,
 		status: Async_Status,
 		timeout: NodeJS.Timeout | undefined,
 	) {
+		this.id = id;
 		this.deferred = deferred;
 		this.created = created;
 		this.status = status;
@@ -59,7 +62,10 @@ export class Request_Tracker<T = any> {
 		}, this.request_timeout_ms);
 
 		// Store the request tracker using the new class
-		this.pending_requests.set(id, new Request_Tracker_Item(deferred, created, 'pending', timeout));
+		this.pending_requests.set(
+			id,
+			new Request_Tracker_Item(id, deferred, created, 'pending', timeout),
+		);
 
 		return deferred;
 	}
