@@ -12,6 +12,8 @@
 	import Toggle_Button from '$lib/Toggle_Button.svelte';
 	import type {Tape} from '$lib/tape.svelte.js';
 	import Chat_Initializer from '$lib/Chat_Initializer.svelte';
+	import Chat_Tape_Add_By_Model from '$lib/Chat_Tape_Add_By_Model.svelte';
+	import Chat_Tape_Manage_By_Tag from '$lib/Chat_Tape_Manage_By_Tag.svelte';
 
 	const zzz = zzz_context.get();
 	const {chats} = zzz;
@@ -84,10 +86,21 @@
 
 		{#if !empty_chat && (chat.view_mode !== 'simple' || chat.tapes.length > 1)}
 			<section class="column_section">
-				<header class="mt_0 mb_lg font_size_lg"><Glyph glyph={GLYPH_TAPE} /> tapes</header>
+				<header class="mt_0 mb_lg font_size_lg display_flex justify_content_space_between">
+					<span><Glyph glyph={GLYPH_TAPE} /> tapes</span><span>{chat.tapes.length}</span>
+				</header>
 				<Tape_List {chat} />
 			</section>
 			<!-- TODO consider a UX that lets users pin arbitrary prompts/bits/etc to each chat -->
+		{/if}
+
+		{#if chat.view_mode === 'multi'}
+			<section class="column_section">
+				<Chat_Tape_Manage_By_Tag {chat} />
+			</section>
+			<section class="column_section">
+				<Chat_Tape_Add_By_Model {chat} />
+			</section>
 		{/if}
 	</div>
 

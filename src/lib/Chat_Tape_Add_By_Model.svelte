@@ -23,6 +23,7 @@
 				chat.add_tape(model);
 			}
 		}}
+		heading={null}
 	/>
 	{@render children?.()}
 </div>

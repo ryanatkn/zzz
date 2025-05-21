@@ -37,7 +37,11 @@ export const mutations: Mutations = {
 	},
 	submit_completion_response: (ctx) => {
 		console.log('Received completion', ctx.params.completion_request, ctx.result);
-		ctx.zzz.receive_completion_response(ctx.result.data);
+		if (ctx.result.ok) {
+			return ctx.result.value.result; // acts as a method call, no side effects here
+		} else {
+			console.error('Error with completion', ctx.result);
+		}
 	},
 
 	update_diskfile_request: (ctx) => {
@@ -48,12 +52,13 @@ export const mutations: Mutations = {
 	delete_diskfile_request: (ctx) => {
 		console.log('Deleting file', ctx.params.path);
 	},
+	delete_diskfile_response: noop,
 
 	create_directory_request: (ctx) => {
 		console.log('Creating directory', ctx.params.path);
 	},
 	create_directory_response: (ctx) => {
-		console.log('Created directory', ctx.result.data);
+		console.log('Created directory', ctx.result);
 	},
 
 	filer_change: (ctx) => {

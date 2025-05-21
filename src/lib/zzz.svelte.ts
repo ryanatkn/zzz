@@ -258,14 +258,6 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	}
 
 	/**
-	 * Process completion response - called by mutations
-	 */
-	receive_completion_response(params: any): void {
-		// Implementation can be minimal as behavior is handled in mutations
-		console.log('Processing completion response', params.completion_response?.id);
-	}
-
-	/**
 	 * Add multiple providers from JSON configurations
 	 */
 	add_providers(providers_json: Array<Provider_Json>): void {

@@ -12,7 +12,7 @@
 		onpick: (model: Model | undefined) => boolean | void;
 		items?: Array<Model>;
 		filter?: ((model: Model) => boolean) | undefined;
-		heading?: string;
+		heading?: string | null;
 	}
 
 	const {
