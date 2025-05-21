@@ -54,6 +54,8 @@
 			}
 		});
 	});
+
+	// TODO BLOCK bug with `save changes` not correctly disabling after a save
 </script>
 
 <Contextmenu_Diskfile {diskfile}>
