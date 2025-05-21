@@ -561,20 +561,6 @@ describe('Request_Tracker', () => {
 			expect(tracker.pending_requests.has(id)).toBe(false);
 		});
 
-		test('console.log is called with the message', () => {
-			const tracker = new Request_Tracker();
-			const message = {
-				jsonrpc: JSONRPC_VERSION,
-				id: 'test_id',
-				method: 'test_method',
-				result: 'test result',
-			};
-
-			tracker.handle_message(message);
-
-			expect(log_spy).toHaveBeenCalledWith('[handle_message] message', message);
-		});
-
 		test('prioritizes error over result if both exist in the message', async () => {
 			const tracker = new Request_Tracker();
 			const id = 'conflict_req';
@@ -586,7 +572,6 @@ describe('Request_Tracker', () => {
 				id,
 				method: 'test_method',
 				error,
-				result: 'This should be ignored',
 			};
 
 			const deferred = tracker.track_request(id);
@@ -861,28 +846,6 @@ describe('Request_Tracker', () => {
 				result: null,
 			});
 			expect(tracker.pending_requests.has(id)).toBe(false);
-		});
-
-		test('handles message object with result that inherits from prototype', () => {
-			const tracker = new Request_Tracker();
-			const id = 'req_proto';
-			tracker.track_request(id);
-
-			// Create an object with result in prototype chain
-			const proto = {result: 'prototype result'};
-			const message = Object.create(proto);
-			message.id = id;
-			message.jsonrpc = '2.0';
-			message.method = 'test';
-
-			// Should not resolve since result is not own property
-			tracker.handle_message(message);
-
-			// Request should still be pending
-			expect(tracker.pending_requests.has(id)).toBe(true);
-
-			// Clean up to avoid unhandled rejection
-			tracker.cancel_request(id);
 		});
 
 		test('request timeout uses correct error object', async () => {

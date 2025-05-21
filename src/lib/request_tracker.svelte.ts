@@ -131,20 +131,21 @@ export class Request_Tracker {
 	/**
 	 * Handle an incoming JSON-RPC message. Resolves or rejects the associated request.
 	 * Ignores notifications and unknown/invalid messages.
-	 * @param message The JSON-RPC message
 	 */
 	handle_message(message: any): void {
-		console.log(`[handle_message] message`, message);
 		if (!message) return; // ignore invalid values
+
 		const {id} = message;
-		if (id != null) {
-			if (message.error) {
-				this.reject_request(id, message);
-			} else if (Object.hasOwn(message, 'result')) {
-				this.resolve_request(id, message);
-			}
-			// Ignore messages with id but no result or error
+		if (id == null) return; // ignore notifications
+
+		// JSON-RPC responses require both an `id` and either a `result` or `error` field, but not both
+		if ('result' in message) {
+			this.resolve_request(id, message);
+		} else if ('error' in message) {
+			this.reject_request(id, message);
 		}
+
+		// ignore other messages
 	}
 
 	/**

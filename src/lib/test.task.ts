@@ -11,7 +11,7 @@ export const task: Task<Args> = {
 	run: async ({args: {_: rest_args = []}}) => {
 		const spawned = await spawn_cli('vitest', ['run', ...rest_args, '--dir', 'src']); // TODO proper forwarding
 		if (!spawned?.ok) {
-			throw Error(`vitest failed with exit code ${spawned?.code}`);
+			throw new Error(`vitest failed with exit code ${spawned?.code}`);
 		}
 	},
 };

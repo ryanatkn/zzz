@@ -182,7 +182,7 @@ export abstract class Bit<T extends z.ZodType = typeof Bit_Json_Base> extends Ce
 	static create(zzz: Zzz, json: Bit_Json_Input, options?: Bit_Type_Options): Bit_Type;
 	static create(zzz: Zzz, json: Bit_Json_Input, options?: Bit_Type_Options): Bit_Type {
 		if (!json.type) {
-			throw Error('Missing required "type" field in bit JSON');
+			throw new Error('Missing required "type" field in bit JSON');
 		}
 
 		// Create the appropriate bit class based on type using the registry

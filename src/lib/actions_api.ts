@@ -23,7 +23,7 @@ export const create_actions_api = (zzz: Zzz): Actions_Api =>
 
 			const spec = zzz.action_registry.by_method.get(method);
 			if (!spec) {
-				throw Error(`missing action spec for method '${method}'`);
+				throw new Error(`missing action spec for method '${method}'`);
 			}
 
 			const mutate = (

@@ -458,7 +458,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 			});
 		} catch (error) {
 			console.error(`Failed to clone instance of ${constructor.name}:`, error);
-			throw Error(`Failed to clone: ${error instanceof Error ? error.message : String(error)}`);
+			throw new Error(`Failed to clone: ${error instanceof Error ? error.message : String(error)}`);
 		}
 	}
 

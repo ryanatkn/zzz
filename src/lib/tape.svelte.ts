@@ -24,7 +24,7 @@ export class Tape extends Cell<typeof Tape_Json> {
 	model_name: string = $state()!;
 	readonly model: Model = $derived.by(() => {
 		const model = this.zzz.models.find_by_name(this.model_name);
-		if (!model) throw Error(`Model "${this.model_name}" not found`); // TODO do this differently?
+		if (!model) throw new Error(`Model "${this.model_name}" not found`); // TODO do this differently?
 		return model;
 	});
 

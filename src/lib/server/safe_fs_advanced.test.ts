@@ -93,7 +93,7 @@ const setup_mock_filesystem = () => {
 	vi.mocked(fs.lstat).mockImplementation(async (pathStr) => {
 		const entry = (filesystem as any)[pathStr as string];
 		if (!entry) {
-			throw Error('ENOENT: no such file or directory');
+			throw new Error('ENOENT: no such file or directory');
 		}
 
 		return {

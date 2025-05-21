@@ -219,7 +219,7 @@ describe('Socket', () => {
 			// Mock send failure
 			const error_message = 'Send operation failed';
 			mock_socket.send = vi.fn().mockImplementation(() => {
-				throw Error(error_message);
+				throw new Error(error_message);
 			});
 
 			// Connect and trigger send attempt
@@ -243,7 +243,7 @@ describe('Socket', () => {
 
 			// Mock send failure
 			mock_socket.send = vi.fn().mockImplementation(() => {
-				throw Error('Send failed');
+				throw new Error('Send failed');
 			});
 
 			// Connect to trigger processing

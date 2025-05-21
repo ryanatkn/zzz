@@ -30,7 +30,7 @@ export const get_unique_name = (
 
 export const defined = <T>(value: T | undefined): T => {
 	if (value === undefined) {
-		throw Error('Value must be defined');
+		throw new Error('Value must be defined');
 	}
 	return value;
 };

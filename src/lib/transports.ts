@@ -41,7 +41,7 @@ export class Transports {
 
 	set_current_transport(transport_type: Transport_Type): void {
 		const transport = this.#transport_by_type.get(transport_type);
-		if (!transport) throw Error(`Transport not registered: ${transport_type}`);
+		if (!transport) throw new Error(`Transport not registered: ${transport_type}`);
 		this.#current_transport = transport;
 	}
 

@@ -9,7 +9,7 @@ import type {Diskfile_Path} from '$lib/diskfile_types.js';
 
 export const expect_ok: <T>(value: T, message?: string) => asserts value = (value, message) => {
 	if (!value) {
-		throw Error(message ?? 'Expected value to be truthy');
+		throw new Error(message ?? 'Expected value to be truthy');
 	}
 };
 
@@ -23,7 +23,7 @@ export const expect_defined: <T>(value: T | undefined, message?: string) => asse
 	message,
 ) => {
 	if (value === undefined) {
-		throw Error(message ?? 'Expected value to be defined');
+		throw new Error(message ?? 'Expected value to be defined');
 	}
 };
 
@@ -37,7 +37,7 @@ export const expect_nonnullish: <T>(
 	message?: string,
 ) => asserts value is T = (value, message) => {
 	if (value == null) {
-		throw Error(message ?? 'Expected value to be non-nullish');
+		throw new Error(message ?? 'Expected value to be non-nullish');
 	}
 };
 
