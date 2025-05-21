@@ -1,5 +1,7 @@
 // src/lib/jsonrpc_helpers.ts
 
+import {DEV} from 'esm-env';
+
 import {
 	JSONRPC_INTERNAL_ERROR,
 	JSONRPC_INVALID_PARAMS,
@@ -48,6 +50,8 @@ export const create_jsonrpc_notification = (
 	return message;
 };
 
+// TODO this maps http error codes to jsonrpc errors and loses information,
+// but I'm thinking the source of truth should be in http error codes
 export const create_jsonrpc_error = (id: JSONRPCRequestId, error: any): JSONRPCError => {
 	let code = JSONRPC_INTERNAL_ERROR;
 	let message = 'Internal server error';
@@ -71,7 +75,7 @@ export const create_jsonrpc_error = (id: JSONRPCRequestId, error: any): JSONRPCE
 	} else if (error instanceof Error) {
 		message = error.message;
 		// Include stack trace in development mode
-		if (process.env.NODE_ENV === 'development') {
+		if (DEV) {
 			data = {stack: error.stack};
 		}
 	}

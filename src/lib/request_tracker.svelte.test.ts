@@ -122,7 +122,7 @@ describe('Request_Tracker', () => {
 			const deferred = tracker.track_request(id);
 			let rejection_error: any;
 
-			const promise = deferred.promise.catch((err) => {
+			deferred.promise.catch((err) => {
 				rejection_error = err;
 				return err; // Return to ensure promise settles
 			});
@@ -308,7 +308,7 @@ describe('Request_Tracker', () => {
 				jsonrpc: JSONRPC_VERSION,
 				id,
 				error: {code: -32000, message: 'test error'},
-			};
+			} as const;
 
 			const deferred = tracker.track_request(id);
 			const clear_timeout_spy = vi.spyOn(global, 'clearTimeout');
@@ -366,7 +366,7 @@ describe('Request_Tracker', () => {
 						error: {code: -32000, message: 'object error'},
 					},
 				},
-			];
+			] as const;
 
 			for (const {id, error} of test_cases) {
 				const deferred = tracker.track_request(id);
