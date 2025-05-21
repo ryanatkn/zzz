@@ -62,7 +62,7 @@ export interface Zzz_Options extends Omit_Strict<Cell_Options<typeof Zzz_Json>, 
 	mutations?: Mutations;
 
 	/** URL for server communication */
-	api_url?: string | null;
+	http_rpc_url?: string | null;
 
 	/** Websocket URL as an optional transport. */
 	socket_url?: string | null;
@@ -178,7 +178,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 
 		this.api_client = new Api_Client({
 			...options.api_client_options, // TODO think about more flexible extension of `Api_Client`
-			http_url: options.api_url,
+			http_rpc_url: options.http_rpc_url,
 			socket: this.socket,
 		});
 

@@ -5,15 +5,15 @@ import {Path_Without_Trailing_Slash} from '$lib/zod_helpers.js';
 import {JSONRPC_VERSION} from '$lib/jsonrpc.js';
 
 export interface Register_Actions_Options {
+	path: string;
 	app: Hono;
 	zzz_server: Zzz_Server;
-	path: string;
 }
 
 /**
  * Registers HTTP endpoints for all service actions in the schema registry.
  */
-export const register_http_actions = ({app, zzz_server, path}: Register_Actions_Options): void => {
+export const register_http_actions = ({path, app, zzz_server}: Register_Actions_Options): void => {
 	// Register a single JSON-RPC endpoint that handles all methods
 	const final_path = Path_Without_Trailing_Slash.parse(path);
 
@@ -22,7 +22,7 @@ export const register_http_actions = ({app, zzz_server, path}: Register_Actions_
 		try {
 			const request_data = await c.req.json();
 
-			const response = await zzz_server.handle_request(request_data);
+			const response = await zzz_server.handle_jsonrpc_message(request_data);
 
 			// If it's a notification, there's no response
 			if (!response) {

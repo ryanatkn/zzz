@@ -13,7 +13,7 @@ import type {Api_Result} from '$lib/api.js';
 // TODO support canceling
 
 export interface Api_Client_Options {
-	http_url?: string | null; // TODO optional thunk?
+	http_rpc_url?: string | null; // TODO optional thunk?
 	http_headers?: Record<string, string>; // TODO optional thunk?
 	socket?: Socket | null;
 	default_transport_type?: Transport_Type; // TODO optional thunk?
@@ -36,9 +36,9 @@ export class Api_Client {
 
 	constructor(options: Api_Client_Options) {
 		// Set up HTTP transport if URL is provided
-		if (options.http_url) {
+		if (options.http_rpc_url) {
 			this.transports.register_transport(
-				new Http_Rpc_Transport(options.http_url, options.http_headers),
+				new Http_Rpc_Transport(options.http_rpc_url, options.http_headers),
 			);
 		}
 

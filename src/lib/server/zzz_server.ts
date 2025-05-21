@@ -150,68 +150,52 @@ export class Zzz_Server {
 		this.filers.set(this.zzz_dir, {filer, cleanup_promise});
 	}
 
-	async handle_request(message: unknown): Promise<JSONRPCResponse | JSONRPCError | null> {
-		const request = handle_jsonrpc_request({
+	async handle_jsonrpc_message(message: unknown): Promise<JSONRPCResponse | JSONRPCError | null> {
+		return handle_jsonrpc_request({
 			message,
-			onrequest: this.#handle_jsonrpc_request,
-			onnotification: this.#handle_jsonrpc_notification,
+			onrequest: async (request: JSONRPCRequest): Promise<JSONRPCResponse | JSONRPCError> => {
+				try {
+					const action_message = jsonrpc_request_to_action_message(request);
+
+					const service_return = await this.#receive_action_message(action_message);
+
+					// Convert the service return to JSON-RPC format
+					if (service_return.ok !== false) {
+						return {
+							jsonrpc: JSONRPC_VERSION,
+							id: request.id,
+							result: service_return.value,
+						};
+					} else {
+						return create_jsonrpc_error(request.id, {
+							status: service_return.status || 500,
+							message: service_return.message,
+						});
+					}
+				} catch (error) {
+					this.log?.error(`Error processing JSON-RPC request:`, error);
+					return create_jsonrpc_error(request.id, error);
+				}
+			},
+			onnotification: async (notification: JSONRPCNotification): Promise<void> => {
+				try {
+					const action_message = jsonrpc_request_to_action_message(notification);
+
+					// Notifications have no response
+					await this.#receive_action_message(action_message);
+				} catch (error) {
+					this.log?.error(`Error processing JSON-RPC notification:`, error);
+					// No response for notifications, so just log the error
+				}
+			},
 			log: this.log,
 		});
-		// TODO anything here? are the various concerns all handled in callbacks?
-		return request;
 	}
 
-	/**
-	 * Handler for JSON-RPC requests - converts to Zzz message format
-	 */
-	#handle_jsonrpc_request = async (
-		request: JSONRPCRequest,
-	): Promise<JSONRPCResponse | JSONRPCError> => {
-		try {
-			const action_message = jsonrpc_request_to_action_message(request);
-
-			const service_return = await this.#receive(action_message);
-
-			// Convert the service return to JSON-RPC format
-			if (service_return.ok !== false) {
-				return {
-					jsonrpc: JSONRPC_VERSION,
-					id: request.id,
-					result: service_return.value,
-				};
-			} else {
-				return create_jsonrpc_error(request.id, {
-					status: service_return.status || 500,
-					message: service_return.message,
-				});
-			}
-		} catch (error) {
-			this.log?.error(`Error processing JSON-RPC request:`, error);
-			return create_jsonrpc_error(request.id, error);
-		}
-	};
-
-	/**
-	 * Handler for JSON-RPC notifications - converts to Zzz message format
-	 */
-	#handle_jsonrpc_notification = async (notification: JSONRPCNotification): Promise<void> => {
-		try {
-			const action_message = jsonrpc_request_to_action_message(notification);
-
-			// Notifications have no response
-			await this.#receive(action_message);
-		} catch (error) {
-			this.log?.error(`Error processing JSON-RPC notification:`, error);
-			// No response for notifications, so just log the error
-		}
-	};
-
-	/**
-	 * Send a message to all connected clients.
-	 */
-	send(message: Action_Message_From_Server): void {
+	// TODO hacky, currently just broadcasting
+	send_action_message(action_message: Action_Message_From_Server): void {
 		this.#check_destroyed();
-		this.#send_to_all_clients(message);
+		this.#send_to_all_clients(action_message);
 	}
 
 	// TODO consider extracting a service helper, maybe an abstraction for the Service_Request
@@ -219,16 +203,16 @@ export class Zzz_Server {
 	 * Process an action by name with parameters.
 	 * This is the unified entry point for both HTTP and WebSocket actions.
 	 */
-	async #receive(message: Action_Message_Base): Promise<Service_Return> {
-		this.log?.debug(`receive message`, message.id, message.method);
+	async #receive_action_message(action_message: Action_Message_Base): Promise<Service_Return> {
+		this.log?.debug(`receive message`, action_message.id, action_message.method);
 		this.#check_destroyed();
 
 		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-		if (!message) {
+		if (!action_message) {
 			throw new Api_Error(400, 'invalid message');
 		}
 
-		const {method} = message;
+		const {method} = action_message;
 
 		const spec = action_spec_by_method.get(method);
 		if (!spec) {
@@ -244,7 +228,7 @@ export class Zzz_Server {
 			throw new Api_Error(400, `unknown message schema: ${method}`);
 		}
 
-		const parsed_request = request_schema.safeParse(message);
+		const parsed_request = request_schema.safeParse(action_message);
 		if (!parsed_request.success) {
 			this.log?.error('failed to validate service params', method, parsed_request.error.issues);
 			throw new Api_Error(

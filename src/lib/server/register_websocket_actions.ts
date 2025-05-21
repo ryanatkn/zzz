@@ -3,28 +3,32 @@ import type {WSContext} from 'hono/ws';
 import type {createNodeWebSocket} from '@hono/node-ws';
 
 import type {Zzz_Server} from '$lib/server/zzz_server.js';
-import {verify_origin} from '$lib/server/security.js';
+import {verify_origin, type Allowed_Origins} from '$lib/server/security.js';
 import {SERVER_URL} from '$lib/constants.js';
 
 export interface Register_Websocket_Actions_Options {
+	path: string;
 	app: Hono;
 	zzz_server: Zzz_Server;
 	upgradeWebSocket: ReturnType<typeof createNodeWebSocket>['upgradeWebSocket'];
 	sockets?: Set<WSContext>;
+	allowed_origins?: Allowed_Origins;
 }
 
 /**
  * Registers websocket endpoints and handlers.
  */
 export const register_websocket_actions = ({
+	path,
 	app,
 	zzz_server,
 	upgradeWebSocket,
 	sockets = new Set<WSContext>(),
+	allowed_origins = [SERVER_URL],
 }: Register_Websocket_Actions_Options): Set<WSContext> => {
 	app.get(
-		'/ws',
-		verify_origin(SERVER_URL),
+		path,
+		verify_origin(allowed_origins),
 		/**
 		 * @see https://hono.dev/helpers/websocket
 		 */
@@ -67,7 +71,7 @@ export const handle_websocket_message = async (
 
 	console.log(`[ws] handling message`, data);
 
-	const response = await zzz_server.handle_request(data);
+	const response = await zzz_server.handle_jsonrpc_message(data);
 
 	// Only send a response if it's not a notification (which doesn't expect a response)
 	if (response) {

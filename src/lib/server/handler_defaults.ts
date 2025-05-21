@@ -292,7 +292,7 @@ export const handle_filer_change: Filer_Change_Handler = (
 		}
 	}
 
-	server.send({
+	server.send_action_message({
 		id: create_uuid(),
 		created: get_datetime_now(),
 		type: 'filer_change', // TODO BLOCK @api hacky
