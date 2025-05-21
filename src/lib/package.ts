@@ -1685,6 +1685,7 @@ export const src_json = {
 			declarations: [
 				{name: 'create_jsonrpc_request', kind: 'function'},
 				{name: 'create_jsonrpc_notification', kind: 'function'},
+				{name: 'create_jsonrpc_error', kind: 'function'},
 			],
 		},
 		'./jsonrpc.js': {
@@ -2059,7 +2060,6 @@ export const src_json = {
 				{name: 'Jsonrpc_Notification_Handler', kind: 'type'},
 				{name: 'Handle_Jsonrpc_Request_Options', kind: 'type'},
 				{name: 'handle_jsonrpc_request', kind: 'function'},
-				{name: 'create_jsonrpc_error', kind: 'function'},
 			],
 		},
 		'./server/register_http_actions.js': {
