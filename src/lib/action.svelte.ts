@@ -3,7 +3,7 @@ import {z} from 'zod';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Uuid} from '$lib/zod_helpers.js';
 import {Completion_Response, Completion_Request} from '$lib/completion_types.js';
-import {Action_Method} from '$lib/action_metatypes.js';
+import {Action_Message_Type, Action_Method} from '$lib/action_metatypes.js';
 import {Diskfile_Change, Diskfile_Path, Serializable_Source_File} from '$lib/diskfile_types.js';
 import {to_completion_response_text} from '$lib/response_helpers.js';
 import {to_preview} from '$lib/helpers.js';
@@ -14,18 +14,21 @@ export interface Action_Options extends Cell_Options<typeof Action_Json> {} // e
 
 // TODO this class is a mess, probably refactor all of this to have generic immutable data
 export class Action extends Cell<typeof Action_Json> {
+	type: Action_Message_Type = $state()!;
 	method: Action_Method = $state()!;
-	kind: Action_Kind = $state()!;
+	params: any = $state.raw();
+
+	kind: Action_Kind = $state()!; // TODO maybe store the spec here for convenience, instead or or in addition to the kind?
 
 	// Store data based on action type
-	data: Record<string, any> | undefined = $state();
+	data: Record<string, any> | undefined = $state.raw();
 	ping_id: Uuid | undefined = $state();
-	completion_request: Completion_Request | undefined = $state();
-	completion_response: Completion_Response | undefined = $state();
+	completion_request: Completion_Request | undefined = $state.raw();
+	completion_response: Completion_Response | undefined = $state.raw();
 	path: Diskfile_Path | undefined = $state();
 	content: string | undefined = $state();
 	change: Diskfile_Change | undefined = $state();
-	source_file: Serializable_Source_File | undefined = $state();
+	source_file: Serializable_Source_File | undefined = $state.raw();
 
 	readonly display_name: string = $derived(`${this.method} (${this.kind})`);
 

@@ -1,14 +1,16 @@
 import {z} from 'zod';
 
-import {Uuid} from '$lib/zod_helpers.js';
+import {Any, Uuid} from '$lib/zod_helpers.js';
 import {Completion_Response, Completion_Request} from '$lib/completion_types.js';
-import {Action_Method} from '$lib/action_metatypes.js';
+import {Action_Message_Type, Action_Method} from '$lib/action_metatypes.js';
 import {Diskfile_Change, Diskfile_Path, Serializable_Source_File} from '$lib/diskfile_types.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import {Action_Kind} from '$lib/action_spec.js';
 
 export const Action_Json = Cell_Json.extend({
+	type: Action_Message_Type,
 	method: Action_Method,
+	params: Any.optional(),
 	kind: Action_Kind,
 	// Optional fields with proper type checking
 	ping_id: Uuid.optional(),

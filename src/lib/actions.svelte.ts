@@ -84,7 +84,6 @@ export class Actions extends Cell<typeof Actions_Json> {
 		this.#trim_to_history_limit(); // TODO should be unnecessary to override `set_json` for this
 	}
 
-	// TODO BLOCK @api call this from the dispatcher (middleware?)
 	add_message(message: Action_Message_Any): void {
 		const action_json = create_action_json(message);
 		if (!action_json) throw new Error(`Invalid action: ${message.method}`);

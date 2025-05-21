@@ -7,17 +7,20 @@ import {create_mutation_context} from '$lib/mutation.js';
 import type {Api_Request_Response_Flag, Api_Result} from '$lib/api.js';
 import {create_jsonrpc_request} from '$lib/jsonrpc_helpers.js';
 import {create_uuid} from '$lib/zod_helpers.js';
-import type {JSONRPCRequest} from '$lib/jsonrpc.js';
+import {to_action_message, to_action_message_type} from '$lib/action_helpers.js';
+import type {Action_Message_Any} from '$lib/action_collections.js';
+import type {JSONRPCNotification, JSONRPCRequest} from '$lib/jsonrpc.js';
 
 const log = new Logger();
+
+// TODO refactor, extract a clear abstraction, maybe `Action_Invocation_Context`,
+// can have multiple mutation contexts, covers the whole sync/async function call wrapper
 
 // TODO think about transactions, snapshotting
 
 export const create_actions_api = (zzz: Zzz): Actions_Api =>
 	new Proxy(Object.create(null), {
 		get: (_target, method: keyof Actions_Api) => (params: any) => {
-			// TODO maybe create an `Action_Invocation_Context` or something, can have multiple mutation contexts, covers the whole sync/async function call wrapper
-
 			// TODO BLOCK `log.debug` isn't formatting the output correctly, shouldn't use console here
 			console.log(...to_logged_args(method, params));
 
@@ -28,44 +31,83 @@ export const create_actions_api = (zzz: Zzz): Actions_Api =>
 
 			const mutate = (
 				result: Api_Result | null,
-				request_response: Api_Request_Response_Flag,
-				jsonrpc_message: JSONRPCRequest,
+				request_response_flag: Api_Request_Response_Flag,
+				action_message: Action_Message_Any,
+				jsonrpc_message: JSONRPCRequest | JSONRPCNotification | null,
 			) => {
-				console.log('\n\n\n\n\n\n\n\nmutate', method, result, request_response);
+				console.log('\n\n\n\n\n\n\n\nmutate', method, result, request_response_flag);
 				const {ctx, flush_after_mutation} = create_mutation_context(
 					zzz,
 					method,
 					params,
 					result,
-					request_response,
+					request_response_flag,
+					action_message,
 					jsonrpc_message,
 				);
-				console.log(`message_type`, ctx.message_type);
+				console.log(`message_type`, ctx.action_message.type);
 				console.log(`ctx`, ctx);
-				const mutation = zzz.mutations[ctx.message_type];
+
+				const mutation = zzz.mutations[ctx.action_message.type];
 				if (!mutation) {
 					log.warn(`missing mutation for action '${method}'`);
 				}
+
+				// Apply the mutation, updating the local state! May be async but is not awaited.
 				const mutated = mutation?.(ctx);
-				void flush_after_mutation(); // not awaited
+
+				void flush_after_mutation(); // not awaited because these are side effects, also supports sync functions
+
+				// Forward whatever the mutation returns
 				return mutated;
 			};
 
-			const jsonrpc_message = create_jsonrpc_request(method, params, create_uuid());
+			const request_jsonrpc_message = create_jsonrpc_request(method, params, create_uuid());
+
+			const request_action_message_type = to_action_message_type(
+				method,
+				spec.kind === 'request_response' ? 'request' : null,
+			);
+			const request_action_message = to_action_message(
+				request_action_message_type,
+				params as unknown as any, // TODO type
+				request_jsonrpc_message,
+			);
+			zzz.actions.add_message(request_action_message);
+			console.log(`action_message`, request_action_message);
 
 			// Request-response actions have special handling,
 			// each such method has a `_request` and `_response` type variant.
 			if (spec.kind === 'request_response') {
-				mutate(null, 'request', jsonrpc_message);
+				mutate(null, 'request', request_action_message, request_jsonrpc_message);
 
 				// Avoiding `await` for compatibility with sync actions
-				return zzz.api_client
-					.send(jsonrpc_message)
-					.then((result) => mutate(result, 'response', jsonrpc_message));
+				return zzz.api_client.send(request_jsonrpc_message).then((result) => {
+					console.log(`result`, result);
+					if (!result.ok) {
+						// TODO handle error correctly
+						console.error(`API CLIENT error`, result);
+						return;
+					}
+					const response_jsonrpc_message = result.value;
+					const response_action_message_type = to_action_message_type(method, 'response');
+					console.log(`response_action_message_type`, response_action_message_type);
+					console.log(`response_jsonrpc_message.result`, response_jsonrpc_message.result);
+					console.log(`response_jsonrpc_message`, response_jsonrpc_message);
+					const response_action_message = to_action_message(
+						response_action_message_type,
+						response_jsonrpc_message.result as unknown as any, // TODO type
+						response_jsonrpc_message,
+					);
+					console.log(`response_action_message`, response_action_message);
+					zzz.actions.add_message(response_action_message);
+
+					mutate(result, 'response', response_action_message, response_jsonrpc_message);
+				});
 			}
 
 			// Handle non-request-response actions synchronously
-			return mutate(null, null, jsonrpc_message);
+			return mutate(null, null, request_action_message, request_jsonrpc_message);
 		},
 	});
 

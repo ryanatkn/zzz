@@ -133,15 +133,15 @@ export const gen: Gen = ({origin_path}) => {
 		export interface Mutations<T_App extends Zzz = Zzz> extends Partial<Record<Action_Message_Type, Mutation<T_App>>> {
 			${registry.specs
 				.map((spec) => {
-					const v = (m: Action_Method, request_response: Api_Request_Response_Flag) =>
+					const v = (m: Action_Method, request_response_flag: Api_Request_Response_Flag) =>
 						`${to_action_message_type(
 							m,
-							request_response,
+							request_response_flag,
 						)}?: Mutation<T_App, Action_Message_Params['${to_action_message_type(
 							spec.method,
 							spec.kind === 'request_response' ? 'request' : null,
 						)}'], ${
-							request_response === 'response'
+							request_response_flag === 'response'
 								? `Api_Result<Action_Message_Params['${to_action_response_message_type(spec.method)}']>`
 								: 'void'
 						}>;`;

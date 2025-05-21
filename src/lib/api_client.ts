@@ -63,7 +63,7 @@ export class Api_Client {
 		// Send the request
 		const transport = this.transports.get_or_throw(transport_type);
 		const result = await transport.send(request);
-		console.log(`API CLIENT result`, result, 'with transport', transport.type);
+		console.log(`[api_client.send]`, transport.type, result);
 		return result;
 	}
 }

@@ -18,7 +18,7 @@ export const ping_action_spec = {
 	kind: 'request_response',
 	http_method: 'GET',
 	auth: null,
-	params: z.void(),
+	params: z.void().optional(),
 	response_params: z
 		.object({
 			ping_id: Uuid,
@@ -31,7 +31,7 @@ export const load_session_action_spec = {
 	kind: 'request_response',
 	http_method: 'GET',
 	auth: null,
-	params: z.void(),
+	params: z.void().optional(),
 	response_params: z
 		.object({
 			data: z
@@ -67,7 +67,7 @@ export const update_diskfile_action_spec = {
 			content: z.string(),
 		})
 		.strict(),
-	response_params: z.null(),
+	response_params: z.null().optional(), // TODO @many should these be void+optional?
 } satisfies Action_Spec;
 
 export const delete_diskfile_action_spec = {
@@ -80,7 +80,7 @@ export const delete_diskfile_action_spec = {
 			path: Diskfile_Path,
 		})
 		.strict(),
-	response_params: z.null(),
+	response_params: z.null().optional(), // TODO @many should these be void+optional?
 } satisfies Action_Spec;
 
 export const create_directory_action_spec = {
@@ -93,7 +93,7 @@ export const create_directory_action_spec = {
 			path: Diskfile_Path,
 		})
 		.strict(),
-	response_params: z.null(),
+	response_params: z.null().optional(), // TODO @many should these be void+optional?
 } satisfies Action_Spec;
 
 export const submit_completion_action_spec = {
@@ -116,6 +116,6 @@ export const submit_completion_action_spec = {
 export const toggle_main_menu_action_spec = {
 	method: 'toggle_main_menu',
 	kind: 'client_local',
-	params: z.boolean().or(z.void()),
+	params: z.union([z.boolean(), z.void()]).optional(),
 	returns: Type_Literal.parse('boolean'),
 } satisfies Action_Spec;

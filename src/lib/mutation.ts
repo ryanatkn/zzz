@@ -1,8 +1,9 @@
-import type {Action_Message_Type, Action_Method} from '$lib/action_metatypes.js';
+import type {Action_Method} from '$lib/action_metatypes.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 import type {Api_Request_Response_Flag} from '$lib/api.js';
 import type {JSONRPCNotification, JSONRPCRequest} from '$lib/jsonrpc.js';
-import {to_action_message_type} from '$lib/action_helpers.js';
+import {to_action_message, to_action_message_type} from '$lib/action_helpers.js';
+import type {Action_Message_Any} from '$lib/action_collections.js';
 
 /**
  * Client-side mutation system for handling action responses.
@@ -18,17 +19,14 @@ export interface Mutation_Context<T_App extends Zzz = Zzz, T_Params = unknown, T
 	zzz: T_App;
 	/** JSON-RPC method for the action. Maps to two types for request_response actions. */
 	method: Action_Method;
-	/**
-	 * For `request_response` actions, specifies the context of the message,
-	 * either request or response. In other cases it's equal to the `method`.
-	 */
-	message_type: Action_Message_Type;
 	/** Parameters passed to the action. */
 	params: T_Params;
 	/** Result returned from the server. */
 	result: T_Result;
 	/** Convenience flag to indicate if the action is a request, response, or none. */
-	request_response: Api_Request_Response_Flag;
+	request_response_flag: Api_Request_Response_Flag;
+	/** Action system event object. */
+	action_message: Action_Message_Any;
 	/** The JSON-RPC request object, if any. */
 	jsonrpc_message: JSONRPCRequest | JSONRPCNotification | null;
 	/** Adds a callback hook that runs after mutation finishes. */
@@ -66,7 +64,8 @@ export const create_mutation_context = <
 	method: Action_Method,
 	params: T_Params,
 	result: T_Result,
-	request_response: Api_Request_Response_Flag,
+	request_response_flag: Api_Request_Response_Flag,
+	action_message: Action_Message_Any,
 	jsonrpc_message: JSONRPCRequest | JSONRPCNotification | null,
 ): {
 	ctx: Mutation_Context<T_App, T_Params, T_Result>;
@@ -87,10 +86,10 @@ export const create_mutation_context = <
 	const ctx = {
 		zzz,
 		method,
-		message_type: to_action_message_type(method, request_response),
-		request_response,
 		params,
 		result,
+		request_response_flag,
+		action_message,
 		jsonrpc_message,
 		after_mutation,
 	} satisfies Mutation_Context<T_App, T_Params, T_Result>;

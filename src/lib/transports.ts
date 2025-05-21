@@ -228,6 +228,7 @@ export class Http_Rpc_Transport implements Transport {
 			});
 
 			const result = await response.json();
+			console.log(`send result`, result);
 
 			if (!response.ok) {
 				return {

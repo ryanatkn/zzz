@@ -6,8 +6,6 @@
 	import type {Action} from '$lib/action.svelte.js';
 
 	let selected_action: Action | null = $state(null);
-
-	// TODO BLOCK @api this is broken
 </script>
 
 <div class="column p_lg h_100">
