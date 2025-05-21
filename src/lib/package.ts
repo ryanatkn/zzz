@@ -258,6 +258,11 @@ export const package_json = {
 			svelte: './dist/Chat_Tape_Add_By_Model.svelte',
 			default: './dist/Chat_Tape_Add_By_Model.svelte',
 		},
+		'./Chat_Tape_Manage_By_Tag.svelte': {
+			types: './dist/Chat_Tape_Manage_By_Tag.svelte.d.ts',
+			svelte: './dist/Chat_Tape_Manage_By_Tag.svelte',
+			default: './dist/Chat_Tape_Manage_By_Tag.svelte',
+		},
 		'./Chat_Tape.svelte': {
 			types: './dist/Chat_Tape.svelte.d.ts',
 			svelte: './dist/Chat_Tape.svelte',
@@ -1247,6 +1252,10 @@ export const src_json = {
 		},
 		'./Chat_Tape_Add_By_Model.svelte': {
 			path: 'Chat_Tape_Add_By_Model.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Chat_Tape_Manage_By_Tag.svelte': {
+			path: 'Chat_Tape_Manage_By_Tag.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
 		},
 		'./Chat_Tape.svelte': {

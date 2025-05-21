@@ -67,10 +67,11 @@
 
 	<div class="my_lg">
 		<p>
-			The Zzz server provides local system access like to your filesystem, handles API requests to
-			AI providers, and enables other capabilities that are otherwise unavailable to the app running
-			in the browser. It's made with <External_Link href="https://hono.dev/">Hono</External_Link>, a
-			JS server framework that aligns with web standards, and <External_Link
+			The Zzz server provides local system access (like to your filesystem), handles API requests to
+			AI providers, and enables other capabilities that would otherwise be unavailable to the app
+			running in the browser. It's made with <External_Link href="https://hono.dev/"
+				>Hono</External_Link
+			>, a JS server framework that aligns with web standards, and <External_Link
 				href="https://svelte.dev/docs/kit/introduction">SvelteKit</External_Link
 			>.
 		</p>

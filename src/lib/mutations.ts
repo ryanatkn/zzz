@@ -2,7 +2,9 @@ import {noop} from '@ryanatkn/belt/function.js';
 
 import type {Mutations} from '$lib/action_metatypes.js';
 
+// TODO not centrally defined
 // TODO we may also want method-based or middleware-like APIs
+
 /**
  * These map to message types, not action methods.
  */
