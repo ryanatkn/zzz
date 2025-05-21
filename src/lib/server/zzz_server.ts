@@ -18,11 +18,7 @@ import type {Service_Return} from '$lib/server/service.js';
 import {Api_Error} from '$lib/api.js';
 import {is_request_response_action} from '$lib/schema_helpers.js';
 import {stringify_zod_error} from '$lib/zod_helpers.js';
-import {
-	lookup_request_action_schema,
-	lookup_response_action_schema,
-	to_action_message_type,
-} from '$lib/action_helpers.js';
+import {lookup_request_action_schema, lookup_response_action_schema} from '$lib/action_helpers.js';
 import {
 	type JSONRPCRequest,
 	type JSONRPCResponse,
@@ -30,8 +26,10 @@ import {
 	type JSONRPCNotification,
 	JSONRPC_VERSION,
 } from '$lib/jsonrpc.js';
-import {handle_jsonrpc_request} from '$lib/server/jsonrpc_server_helpers.js';
-import {Action_Method} from '$lib/action_metatypes.js';
+import {
+	handle_jsonrpc_request,
+	jsonrpc_request_to_action_message,
+} from '$lib/server/jsonrpc_server_helpers.js';
 import {create_jsonrpc_error} from '$lib/jsonrpc_helpers.js';
 
 /**
@@ -152,9 +150,9 @@ export class Zzz_Server {
 		this.filers.set(this.zzz_dir, {filer, cleanup_promise});
 	}
 
-	async handle_request(data: unknown): Promise<JSONRPCResponse | JSONRPCError | null> {
+	async handle_request(message: unknown): Promise<JSONRPCResponse | JSONRPCError | null> {
 		const request = handle_jsonrpc_request({
-			data,
+			message,
 			onrequest: this.#handle_jsonrpc_request,
 			onnotification: this.#handle_jsonrpc_notification,
 			log: this.log,
@@ -170,15 +168,8 @@ export class Zzz_Server {
 		request: JSONRPCRequest,
 	): Promise<JSONRPCResponse | JSONRPCError> => {
 		try {
-			// Parse the request into an Action_Message_Base using schema
-			const action_message = Action_Message_Base.parse({
-				id: request.id,
-				type: to_action_message_type(Action_Method.parse(request.method), 'request'),
-				method: request.method,
-				params: request.params,
-			});
+			const action_message = jsonrpc_request_to_action_message(request);
 
-			// Process with the standard receive method
 			const service_return = await this.#receive(action_message);
 
 			// Convert the service return to JSON-RPC format
@@ -205,14 +196,9 @@ export class Zzz_Server {
 	 */
 	#handle_jsonrpc_notification = async (notification: JSONRPCNotification): Promise<void> => {
 		try {
-			// Parse the notification into an Action_Message_Base using schema
-			const action_message = Action_Message_Base.parse({
-				type: to_action_message_type(Action_Method.parse(notification.method), 'request'),
-				method: notification.method,
-				params: notification.params,
-			});
+			const action_message = jsonrpc_request_to_action_message(notification);
 
-			// Process with the standard receive method
+			// Notifications have no response
 			await this.#receive(action_message);
 		} catch (error) {
 			this.log?.error(`Error processing JSON-RPC notification:`, error);
@@ -234,6 +220,7 @@ export class Zzz_Server {
 	 * This is the unified entry point for both HTTP and WebSocket actions.
 	 */
 	async #receive(message: Action_Message_Base): Promise<Service_Return> {
+		this.log?.debug(`receive message`, message.id, message.method);
 		this.#check_destroyed();
 
 		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -266,16 +253,14 @@ export class Zzz_Server {
 			);
 		}
 
-		// TODO BLOCK hacky, need to parse the whole message
-		const updated_message = {...(message as any), params: parsed_request.data};
-
-		// forwad the validated params which may have defaults -- we don't parse the other fields here
-		const returned = await this.#perform_action(updated_message);
+		// TODO fix type
+		const returned = await this.#handle_message(parsed_request.data as any, this);
 		if (!returned.ok) {
 			return returned;
 		}
 
-		// in dev mode, expensively validate the response
+		// Validate the response during development
+		// TODO maybe always validate?
 		if (DEV) {
 			const response_schema = lookup_response_action_schema(method);
 			if (!response_schema) {
@@ -297,17 +282,6 @@ export class Zzz_Server {
 		}
 
 		return returned;
-	}
-
-	async #perform_action(message: Action_Message_From_Client): Promise<Service_Return> {
-		this.#check_destroyed();
-
-		// Do a simple fast sanity check because validation is an upstream concern
-		if (!message) throw new Api_Error(400, 'invalid message'); // eslint-disable-line @typescript-eslint/no-unnecessary-condition
-
-		this.log?.debug(`receive message`, message.id, message.method);
-
-		return this.#handle_message(message, this);
 	}
 
 	#destroyed = false;

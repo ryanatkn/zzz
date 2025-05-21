@@ -16,8 +16,8 @@ import {Action_Method, Action_Message_Type} from '$lib/action_metatypes.js';
  */
 export const Action_Message_Base = z
 	.object({
-		id: Uuid_With_Default, // TODO this means we're trusting client ids, revisit
-		created: Datetime_Now,
+		id: Uuid_With_Default, // TODO this means we're trusting client ids, revisit, also probably don't want a default here so we get parse errors
+		created: Datetime_Now, // TODO like with id, probably dont want a default on the base schema like this
 		type: Action_Message_Type,
 		method: Action_Method,
 	})

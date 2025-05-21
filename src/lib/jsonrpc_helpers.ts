@@ -73,6 +73,7 @@ export const create_jsonrpc_error = (id: JSONRPCRequestId, error: any): JSONRPCE
 				message = error.message || 'internal server error';
 		}
 	} else if (error instanceof Error) {
+		// TODO handle zod errors
 		message = error.message;
 		// Include stack trace in development mode
 		if (DEV) {

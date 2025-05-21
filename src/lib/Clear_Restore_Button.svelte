@@ -23,9 +23,11 @@
 
 	let cleared_value = $state('');
 
-	const disabled = $derived(!value && !cleared_value);
-	const attrs = $derived(attrs_prop ? {...attrs_prop, disabled} : {disabled});
 	const has_value = $derived(!!value);
+
+	const disabled = $derived(!value && !cleared_value);
+	const title = $derived(has_value ? 'clear' : 'restore');
+	const attrs = $derived(attrs_prop ? {...attrs_prop, disabled, title} : {disabled, title});
 </script>
 
 <Toggle_Button

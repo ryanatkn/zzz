@@ -214,6 +214,7 @@ export const handle_message = async (
 			return {value: response};
 		}
 		case 'update_diskfile': {
+			console.log(`message`, message);
 			const {
 				params: {path, content},
 			} = message;

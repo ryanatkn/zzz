@@ -30,11 +30,11 @@ export const register_websocket_actions = ({
 		 */
 		upgradeWebSocket(() => {
 			return {
-				onOpen(event, ws) {
+				onOpen: (event, ws) => {
 					sockets.add(ws);
 					console.log('[ws] ws opened', event);
 				},
-				async onMessage(event, ws) {
+				onMessage: async (event, ws) => {
 					await handle_websocket_message(event.data, {ws, zzz_server});
 				},
 				onClose: (event, ws) => {

@@ -11,11 +11,19 @@ import {
 	type JSONRPCRequestId,
 } from '$lib/jsonrpc.js';
 import {create_jsonrpc_error} from '$lib/jsonrpc_helpers.js';
+import {Action_Message_Base} from '$lib/action_spec.js';
+import {to_action_message_type} from '$lib/action_helpers.js';
+import {Action_Method} from '$lib/action_metatypes.js';
 
-/**
- * Handler for JSON-RPC methods
- */
-export type Jsonrpc_Method_Handler = (params: Record<string, any>) => Promise<any>;
+export const jsonrpc_request_to_action_message = (
+	message: JSONRPCRequest | JSONRPCNotification,
+): Action_Message_Base =>
+	Action_Message_Base.parse({
+		id: 'id' in message ? message.id : undefined,
+		type: to_action_message_type(Action_Method.parse(message.method), 'request'),
+		method: message.method,
+		params: message.params,
+	});
 
 /**
  * Handler for processing JSON-RPC requests
@@ -33,7 +41,7 @@ export type Jsonrpc_Notification_Handler = (notification: JSONRPCNotification) =
  * Configuration options for the JSON-RPC server
  */
 export interface Handle_Jsonrpc_Request_Options {
-	data: any;
+	message: any;
 
 	/**
 	 * Handler for processing JSON-RPC requests
@@ -57,13 +65,14 @@ export interface Handle_Jsonrpc_Request_Options {
 export const handle_jsonrpc_request = async (
 	options: Handle_Jsonrpc_Request_Options,
 ): Promise<JSONRPCResponse | JSONRPCError | null> => {
-	const {data, onrequest, onnotification, log} = options;
+	const {message, onrequest, onnotification, log} = options;
 
-	const id: JSONRPCRequestId | undefined | null = data?.id; // include null for completeness
+	const id: JSONRPCRequestId | undefined | null = message?.id; // include null for completeness
 
 	try {
 		// First attempt to validate as a request
-		const parse_result = JSONRPCRequest.safeParse(data);
+		const parse_result = JSONRPCRequest.safeParse(message);
+		console.log(`parse_result`, parse_result);
 
 		if (parse_result.success) {
 			const request = parse_result.data;
@@ -73,35 +82,35 @@ export const handle_jsonrpc_request = async (
 				log?.error(`Error processing JSON-RPC request:`, error);
 				return create_jsonrpc_error(request.id, error);
 			}
-		} else {
-			// If it's not a valid request, check if it's a notification
-			const notification_parse = JSONRPCNotification.safeParse(data);
-			if (notification_parse.success) {
-				const notification = notification_parse.data;
-				try {
-					await onnotification(notification);
-				} catch (error) {
-					log?.error(`Error processing JSON-RPC notification:`, error);
-					// No response for notifications, so just log the error
-				}
-				return null; // No response for notifications
-			}
-
-			// If neither a valid request nor notification, it's an invalid request
-			if (id == null) {
-				// For notifications we can't return an error
-				log?.error('JSON-RPC invalid request:', parse_result.error);
-				return null;
-			}
-			return {
-				jsonrpc: JSONRPC_VERSION,
-				id,
-				error: {
-					code: JSONRPC_INVALID_REQUEST,
-					message: 'invalid request',
-				},
-			};
 		}
+
+		// If it's not a valid request, check if it's a notification
+		const notificatiop_parse = JSONRPCNotification.safeParse(message);
+		if (notificatiop_parse.success) {
+			const notification = notificatiop_parse.data;
+			try {
+				await onnotification(notification);
+			} catch (error) {
+				log?.error(`Error processing JSON-RPC notification:`, error);
+				// No response for notifications, so just log the error
+			}
+			return null; // No response for notifications
+		}
+
+		// If neither a valid request nor notification, it's an invalid request
+		if (id == null) {
+			// For notifications we can't return an error
+			log?.error('JSON-RPC invalid request:', parse_result.error);
+			return null;
+		}
+		return {
+			jsonrpc: JSONRPC_VERSION,
+			id,
+			error: {
+				code: JSONRPC_INVALID_REQUEST,
+				message: 'invalid request',
+			},
+		};
 	} catch (error) {
 		// If we can't even parse the JSON properly
 		log?.error('JSON-RPC parse error:', error);
