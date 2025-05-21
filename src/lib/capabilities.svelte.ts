@@ -118,30 +118,32 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	});
 
 	/**
-	 * Filesystem capability that derives its state from the zzz_dir.
+	 * The filesystem capability derives its state from the server and `zzz_dir`.
 	 */
 	readonly filesystem: Capability<Filesystem_Capability_Data | null | undefined> = $derived.by(
 		() => {
-			// Derive status based on zzz_dir value
 			const {zzz_dir, zzz_dir_parent} = this.zzz;
 			let status: Async_Status;
 
-			if (zzz_dir === undefined) {
-				status = 'initial';
-			} else if (zzz_dir === null) {
-				status = 'pending';
-			} else if (zzz_dir === '') {
-				status = 'failure';
+			if (this.server.status !== 'success') {
+				// Server is not available, so mirror its status
+				status = this.server.status;
 			} else {
-				status = 'success';
+				// TODO hacky, should be explicit
+				if (zzz_dir === undefined) {
+					status = 'initial';
+				} else if (zzz_dir === null) {
+					status = 'pending';
+				} else if (zzz_dir === '') {
+					status = 'failure';
+				} else {
+					status = 'success';
+				}
 			}
-
-			// Filesystem is available if we have a valid zzz_dir
-			const data = status === 'success' ? {zzz_dir, zzz_dir_parent} : undefined;
 
 			return {
 				name: 'filesystem',
-				data,
+				data: status === 'success' ? {zzz_dir, zzz_dir_parent} : undefined,
 				status,
 				message_id: null,
 				error_message: null,
@@ -260,9 +262,10 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	 * (when status is 'initial')
 	 */
 	async init_server_check(): Promise<void> {
-		if (this.server.status === 'initial') {
-			await this.zzz.api.ping();
+		if (this.server.status !== 'initial') {
+			return;
 		}
+		await this.zzz.api.ping();
 	}
 
 	/**
@@ -270,9 +273,10 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	 * (when status is 'initial')
 	 */
 	async init_ollama_check(): Promise<void> {
-		if (this.ollama.status === 'initial') {
-			await this.check_ollama();
+		if (this.ollama.status !== 'initial') {
+			return;
 		}
+		await this.check_ollama();
 	}
 
 	/**

@@ -600,9 +600,6 @@ a.chip {
 .mr_xs {
 	margin-right: var(--space_xs);
 }
-.mr_sm {
-	margin-right: var(--space_sm);
-}
 .mr_md {
 	margin-right: var(--space_md);
 }

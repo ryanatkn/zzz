@@ -145,17 +145,8 @@ export class Zzz_Server {
 
 		// TODO maybe do this in an `init` method
 		// Set up the filer watcher for the zzz_dir
-		console.log(`this.zzz_dir`, this.zzz_dir);
 		const filer = new Filer({watch_dir_options: {dir: this.zzz_dir}}); // TODO maybe filter out the db directory at this level? think about this when db is added
 		const cleanup_promise = filer.watch((change, source_file) => {
-			console.log(
-				`change`,
-				change,
-				source_file.id,
-				typeof source_file.dependencies,
-				source_file.dependencies instanceof Map,
-				source_file.dependencies + '',
-			);
 			this.#handle_filer_change(change, source_file, this, this.zzz_dir);
 		});
 		this.filers.set(this.zzz_dir, {filer, cleanup_promise});
@@ -266,7 +257,6 @@ export class Zzz_Server {
 			throw new Api_Error(400, `unknown message schema: ${method}`);
 		}
 
-		console.log(`message`, message);
 		const parsed_request = request_schema.safeParse(message);
 		if (!parsed_request.success) {
 			this.log?.error('failed to validate service params', method, parsed_request.error.issues);
@@ -275,7 +265,6 @@ export class Zzz_Server {
 				`invalid params to ${method}: ${stringify_zod_error(parsed_request.error)}`,
 			);
 		}
-		console.log(`params`, parsed_request.data);
 
 		// TODO BLOCK hacky, need to parse the whole message
 		const updated_message = {...(message as any), params: parsed_request.data};
@@ -311,7 +300,6 @@ export class Zzz_Server {
 	}
 
 	async #perform_action(message: Action_Message_From_Client): Promise<Service_Return> {
-		console.log(`perform_action message`, message);
 		this.#check_destroyed();
 
 		// Do a simple fast sanity check because validation is an upstream concern

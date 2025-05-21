@@ -5,10 +5,11 @@
 
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
-	import {GLYPH_ARROW_RIGHT, GLYPH_CONNECT} from '$lib/glyphs.js';
+	import {GLYPH_ARROW_RIGHT} from '$lib/glyphs.js';
 	import Error_Message from '$lib/Error_Message.svelte';
 	import {SERVER_URL} from '$lib/constants.js';
 	import Ping_Form from '$lib/Ping_Form.svelte';
+	import External_Link from '$lib/External_Link.svelte';
 
 	const zzz = zzz_context.get();
 	const {capabilities} = zzz;
@@ -18,7 +19,7 @@
 	});
 </script>
 
-<div class="display_flex flex_column gap_sm">
+<div class="display_flex flex_column">
 	<div
 		class="w_100 chip flex_1 px_xl plain justify_content_space_between"
 		style:padding="0 var(--space_xl) !important"
@@ -64,31 +65,14 @@
 		</div>
 	{/if}
 
-	<div>
-		<button
-			type="button"
-			class="flex_1 justify_content_start"
-			disabled={capabilities.server.status === 'pending'}
-			onclick={() => zzz.api.ping()}
-		>
-			<Glyph glyph={GLYPH_CONNECT} size="var(--font_size_xl)" />
-			<span class="font_size_lg font_weight_400 ml_md">
-				{#if capabilities.server.status === 'pending'}
-					<div class="display_inline_flex align_items_end">
-						<span class="mr_sm">checking</span>
-						<Pending_Animation />
-					</div>
-				{:else}
-					check the server
-				{/if}
-			</span>
-		</button>
-	</div>
-
 	<div class="my_lg">
 		<p>
-			The Zzz server provides file system access, handles API requests to AI providers, and
-			maintains your workspaces. A local server is required for many features.
+			The Zzz server provides local system access like to your filesystem, handles API requests to
+			AI providers, and enables other capabilities that are otherwise unavailable to the app running
+			in the browser. It's made with <External_Link href="https://hono.dev/">Hono</External_Link>, a
+			JS server framework that aligns with web standards, and <External_Link
+				href="https://svelte.dev/docs/kit/introduction">SvelteKit</External_Link
+			>.
 		</p>
 	</div>
 
