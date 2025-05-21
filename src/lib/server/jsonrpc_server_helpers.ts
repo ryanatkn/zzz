@@ -6,14 +6,11 @@ import {
 	type JSONRPCError,
 	JSONRPC_PARSE_ERROR,
 	JSONRPC_INVALID_REQUEST,
-	JSONRPC_METHOD_NOT_FOUND,
-	JSONRPC_INVALID_PARAMS,
-	JSONRPC_INTERNAL_ERROR,
 	JSONRPCNotification,
 	JSONRPCRequest,
 	type JSONRPCRequestId,
 } from '$lib/jsonrpc.js';
-import {Api_Error} from '$lib/api.js';
+import {create_jsonrpc_error} from '$lib/jsonrpc_helpers.js';
 
 /**
  * Handler for JSON-RPC methods
@@ -121,44 +118,4 @@ export const handle_jsonrpc_request = async (
 			},
 		};
 	}
-};
-
-// TODO BLOCK this is probably wrong, causes a back and forth, rethink the module's abstraction, users should be able to interface with any Api_Result
-export const create_jsonrpc_error = (id: JSONRPCRequestId, error: any): JSONRPCError => {
-	let code = JSONRPC_INTERNAL_ERROR;
-	let message = 'Internal server error';
-	let data = undefined;
-
-	if (error instanceof Api_Error) {
-		// Map HTTP status codes to JSON-RPC error codes
-		switch (error.status) {
-			case 400:
-				code = JSONRPC_INVALID_PARAMS;
-				message = error.message || 'invalid params';
-				break;
-			case 404:
-				code = JSONRPC_METHOD_NOT_FOUND;
-				message = error.message || 'method not found';
-				break;
-			default:
-				code = JSONRPC_INTERNAL_ERROR;
-				message = error.message || 'internal server error';
-		}
-	} else if (error instanceof Error) {
-		message = error.message;
-		// Include stack trace in development mode
-		if (process.env.NODE_ENV === 'development') {
-			data = {stack: error.stack};
-		}
-	}
-
-	return {
-		jsonrpc: JSONRPC_VERSION,
-		id,
-		error: {
-			code,
-			message,
-			data,
-		},
-	};
 };

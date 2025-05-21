@@ -155,7 +155,6 @@ export class Websocket_Rpc_Transport implements Transport {
 		socket.onmessage = (event) => {
 			try {
 				const data = JSON.parse(event.data);
-				console.log(`PARSED data`, data);
 				this.#request_tracker.handle_message(data);
 			} catch (error) {
 				console.error('[websocket transport] Error parsing WebSocket message:', error);

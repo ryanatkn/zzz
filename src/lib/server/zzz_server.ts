@@ -30,8 +30,9 @@ import {
 	type JSONRPCNotification,
 	JSONRPC_VERSION,
 } from '$lib/jsonrpc.js';
-import {handle_jsonrpc_request, create_jsonrpc_error} from '$lib/server/jsonrpc_server_helpers.js';
+import {handle_jsonrpc_request} from '$lib/server/jsonrpc_server_helpers.js';
 import {Action_Method} from '$lib/action_metatypes.js';
+import {create_jsonrpc_error} from '$lib/jsonrpc_helpers.js';
 
 /**
  * Function type for handling client messages.

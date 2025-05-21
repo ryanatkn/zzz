@@ -1,3 +1,5 @@
+// src/lib/request_tracker.svelte.ts
+
 import {create_deferred, type Deferred, type Async_Status} from '@ryanatkn/belt/async.js';
 import {SvelteMap} from 'svelte/reactivity';
 
@@ -63,8 +65,12 @@ export class Request_Tracker {
 
 		// Set up a timeout to automatically reject the request after a delay
 		const timeout = setTimeout(() => {
-			// TODO what's the correct error code?
-			this.reject_request(id, {code: JSONRPC_INTERNAL_ERROR, message: `Request timed out: ${id}`});
+			// Create a proper timeout error message
+			this.reject_request(id, {
+				jsonrpc: '2.0' as const,
+				id,
+				error: {code: JSONRPC_INTERNAL_ERROR, message: `Request timed out: ${id}`},
+			});
 		}, this.request_timeout_ms);
 
 		// Store the request tracker using the new class
@@ -82,7 +88,6 @@ export class Request_Tracker {
 	 * @param response The response data
 	 */
 	resolve_request(id: JSONRPCRequestId, response: JSONRPCRequest): void {
-		// TODO generic?
 		const request = this.pending_requests.get(id);
 		if (!request) {
 			console.warn(`Received response for unknown request: ${id}`);
@@ -92,6 +97,7 @@ export class Request_Tracker {
 		// Clear the timeout and resolve the promise
 		if (request.timeout) {
 			clearTimeout(request.timeout);
+			request.timeout = undefined;
 		}
 
 		request.status = 'success';
@@ -102,9 +108,9 @@ export class Request_Tracker {
 	/**
 	 * Reject a pending request with the given error.
 	 * @param id The request id
-	 * @param error The error
+	 * @param error The complete JSONRPCError object
 	 */
-	reject_request(id: JSONRPCRequestId, error: JSONRPCError['error']): void {
+	reject_request(id: JSONRPCRequestId, error: JSONRPCError): void {
 		const request = this.pending_requests.get(id);
 		if (!request) {
 			console.warn(`Received error for unknown request: ${id}`);
@@ -114,6 +120,7 @@ export class Request_Tracker {
 		// Clear the timeout and reject the promise
 		if (request.timeout) {
 			clearTimeout(request.timeout);
+			request.timeout = undefined;
 		}
 
 		request.status = 'failure';
@@ -152,8 +159,10 @@ export class Request_Tracker {
 
 		if (request.timeout) {
 			clearTimeout(request.timeout);
+			request.timeout = undefined;
 		}
 
+		// We don't reject the promise here, just clean up the tracking
 		this.pending_requests.delete(id);
 	}
 
@@ -165,6 +174,7 @@ export class Request_Tracker {
 		for (const [id, request] of this.pending_requests.entries()) {
 			if (request.timeout) {
 				clearTimeout(request.timeout);
+				request.timeout = undefined;
 			}
 
 			request.status = 'failure';

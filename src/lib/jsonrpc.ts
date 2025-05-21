@@ -1,3 +1,5 @@
+// src/lib/jsonrpc.ts
+
 /**
  * Following MCP and A2A, Zzz supports JSON-RPC 2.0 as its message format.
  * This can be used by multiple transports including http and websocket.
@@ -151,6 +153,8 @@ export const JSONRPC_INVALID_REQUEST = -32600;
 export const JSONRPC_METHOD_NOT_FOUND = -32601;
 export const JSONRPC_INVALID_PARAMS = -32602;
 export const JSONRPC_INTERNAL_ERROR = -32603;
+// export const JSONRPC_SERVER_ERROR_START = -32000;
+// export const JSONRPC_SERVER_ERROR_END = -32099;
 // -32000 to -32099 - Server error - Reserved for implementation-defined server-errors.
 
 /**
