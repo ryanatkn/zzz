@@ -36,6 +36,7 @@ const anthropic = new Anthropic({apiKey: SECRET_ANTHROPIC_API_KEY});
 const openai = new OpenAI({apiKey: SECRET_OPENAI_API_KEY});
 const google = new GoogleGenerativeAI(SECRET_GOOGLE_API_KEY);
 
+// TODO BLOCK @api return types
 /**
  * Handle client messages and produce appropriate server responses.
  */
