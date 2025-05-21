@@ -1,5 +1,4 @@
 import {z} from 'zod';
-import {ensure_end} from '@ryanatkn/belt/string.js';
 
 import {Cell_Json} from '$lib/cell_types.js';
 import {is_path_absolute} from '$lib/diskfile_helpers.js';
@@ -30,14 +29,8 @@ export type Diskfile_Change = z.infer<typeof Diskfile_Change>;
  *
  * This is a security-sensitive path that should be validated carefully.
  * See the `Safe_Fs` class for usage.
- *
- * Note the canonical path is `/path/to/zzz/.zzz/` with a trailing slash.
  */
-export const Zzz_Dir = Diskfile_Path.refine((p) => p.endsWith('/.zzz'), {
-	message: 'Path must end with /.zzz',
-})
-	.transform((p) => ensure_end(p, '/'))
-	.brand('Zzz_Dir');
+export const Zzz_Dir = Diskfile_Path.refine(is_path_absolute).brand('Zzz_Dir');
 export type Zzz_Dir = z.infer<typeof Zzz_Dir>;
 
 // TODO hacky, uses the serializable form of the Gro `Source_File` (which uses maps)

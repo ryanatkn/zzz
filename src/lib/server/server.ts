@@ -1,7 +1,7 @@
 import {Hono} from 'hono';
 import {serve} from '@hono/node-server';
 import {createNodeWebSocket} from '@hono/node-ws';
-import {PUBLIC_SERVER_HOSTNAME, PUBLIC_ZZZ_DIR} from '$env/static/public';
+import {PUBLIC_SERVER_HOSTNAME} from '$env/static/public';
 import {Logger} from '@ryanatkn/belt/log.js';
 import type {WSContext} from 'hono/ws';
 
@@ -16,6 +16,7 @@ import {
 	SERVER_PROXIED_PORT,
 	SERVER_URL,
 	WEBSOCKET_PATH,
+	ZZZ_DIR,
 } from '$lib/constants.js';
 import {verify_origin} from '$lib/server/security.js';
 
@@ -28,14 +29,14 @@ const main = (): void => {
 	const allowed_origins = [SERVER_URL];
 
 	// TODO better logging
-	log.info('creating server', {config, PUBLIC_ZZZ_DIR, allowed_origins});
+	log.info('creating server', {config, ZZZ_DIR, allowed_origins});
 
 	const app = new Hono();
 	const {injectWebSocket, upgradeWebSocket} = createNodeWebSocket({app});
 
 	// Create the server with handlers and configuration
 	const zzz_server = new Zzz_Server({
-		zzz_dir: PUBLIC_ZZZ_DIR,
+		zzz_dir: ZZZ_DIR,
 		config,
 		action_specs,
 		send_to_all_clients: (message) => {

@@ -50,12 +50,7 @@ export const handle_message = async (
 		case 'ping': {
 			return {
 				value: {
-					id: create_uuid(),
-					created: get_datetime_now(),
-					method: 'ping',
-					params: {
-						ping_id: message.id,
-					},
+					ping_id: message.id,
 				},
 			};
 		}
@@ -73,9 +68,6 @@ export const handle_message = async (
 
 			return {
 				value: {
-					id: create_uuid(),
-					created: get_datetime_now(),
-					method: 'load_session',
 					data: {
 						files: files_array,
 						zzz_dir: server.zzz_dir,

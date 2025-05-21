@@ -16,7 +16,7 @@ export const mutations: Mutations = {
 	ping_response: (ctx) => {
 		console.log('Ping response received', ctx.result);
 		if (ctx.result.ok) {
-			ctx.zzz.capabilities.handle_received_ping(ctx.result.value.result.params.ping_id);
+			ctx.zzz.capabilities.handle_received_ping(ctx.result.value.result.ping_id);
 		} else {
 			ctx.zzz.capabilities.handle_ping_error(ctx.jsonrpc_message.id, ctx.result.message);
 		}

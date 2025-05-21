@@ -111,6 +111,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	 */
 	zzz_dir: Zzz_Dir | null | undefined = $state(null);
 
+	// TODO BLOCK needs to be changed so that this is the explicit directory, and `.zzz` is inferred from it
 	/** The `zzz_dir` without the trailing `.zzz/`. Has its own trailing slash. */
 	zzz_dir_parent: Diskfile_Path | null | undefined = $derived(
 		this.zzz_dir && (strip_end(this.zzz_dir, ZZZ_DIRNAME + '/') as Diskfile_Path),

@@ -5,6 +5,7 @@ import {
 	PUBLIC_SERVER_PROXIED_PORT,
 	PUBLIC_SERVER_API_PATH,
 	PUBLIC_WEBSOCKET_URL,
+	PUBLIC_ZZZ_DIR,
 } from '$env/static/public';
 
 import {Path_With_Leading_Slash, Path_Without_Trailing_Slash} from '$lib/zod_helpers.js';
@@ -22,6 +23,10 @@ export const SERVER_PROXIED_PORT = parseInt(PUBLIC_SERVER_PROXIED_PORT, 10) || 8
 export const SERVER_URL = `${PUBLIC_SERVER_PROTOCOL}://${PUBLIC_SERVER_HOSTNAME}:${PUBLIC_SERVER_PORT}`;
 
 export const ZZZ_DIRNAME = '.zzz';
+
+export const ZZZ_DIR = Path_With_Leading_Slash.parse(
+	Path_Without_Trailing_Slash.parse(PUBLIC_ZZZ_DIR),
+);
 
 export const CONTENT_PREVIEW_LENGTH = 100;
 

@@ -157,6 +157,7 @@ export class Zzz_Server {
 					const action_message = jsonrpc_request_to_action_message(request);
 
 					const service_return = await this.#receive_action_message(action_message);
+					console.log(`service_return`, service_return);
 
 					// Convert the service return to JSON-RPC format
 					if (service_return.ok !== false) {
