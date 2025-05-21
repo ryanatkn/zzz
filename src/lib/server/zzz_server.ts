@@ -16,7 +16,6 @@ import {Safe_Fs} from '$lib/server/safe_fs.js';
 import {Action_Registry} from '$lib/action_registry.js';
 import type {Service_Return} from '$lib/server/service.js';
 import {Api_Error} from '$lib/api.js';
-import {is_request_response_action} from '$lib/schema_helpers.js';
 import {stringify_zod_error} from '$lib/zod_helpers.js';
 import {lookup_request_action_schema, lookup_response_action_schema} from '$lib/action_helpers.js';
 import {
@@ -219,7 +218,7 @@ export class Zzz_Server {
 			throw new Api_Error(400, `unknown action: ${method}`);
 		}
 
-		if (!is_request_response_action(spec)) {
+		if (spec.kind !== 'request_response') {
 			throw new Api_Error(400, `invalid action: ${method}`);
 		}
 

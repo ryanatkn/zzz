@@ -1,5 +1,6 @@
 import type {z} from 'zod';
 import type {Flavored} from '@ryanatkn/belt/types.js';
+import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 
 import type {
 	Action_Spec,
@@ -8,11 +9,6 @@ import type {
 	Client_Local_Action_Spec,
 } from '$lib/action_spec.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
-import {
-	is_client_local_action,
-	is_server_notification_action,
-	is_request_response_action,
-} from '$lib/schema_helpers.js';
 
 // TODO currently unused
 
@@ -103,12 +99,18 @@ export class Schema_Registry {
 			this.action_specs.push(schema);
 			this.action_spec_by_name_map.set(schema.method, schema);
 
-			if (is_request_response_action(schema)) {
-				this.request_response_action_specs.push(schema);
-			} else if (is_server_notification_action(schema)) {
-				this.server_notification_action_specs.push(schema);
-			} else if (is_client_local_action(schema)) {
-				this.client_local_action_specs.push(schema);
+			switch (schema.kind) {
+				case 'request_response':
+					this.request_response_action_specs.push(schema);
+					break;
+				case 'server_notification':
+					this.server_notification_action_specs.push(schema);
+					break;
+				case 'client_local':
+					this.client_local_action_specs.push(schema);
+					break;
+				default:
+					throw new Unreachable_Error(schema);
 			}
 		}
 	}

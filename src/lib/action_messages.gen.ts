@@ -4,7 +4,6 @@ import {
 	to_action_spec_identifier,
 	to_action_spec_params_identifier,
 	to_action_spec_response_params_identifier,
-	is_request_response_action,
 } from '$lib/schema_helpers.js';
 import {action_specs} from '$lib/action_collections.js';
 import {Action_Registry} from '$lib/action_registry.js';
@@ -39,7 +38,7 @@ export const gen: Gen = ({origin_path}) => {
 			${registry.specs
 				.map((spec) => {
 					const {method} = spec;
-					if (is_request_response_action(spec)) {
+					if (spec.kind === 'request_response') {
 						return `${to_action_request_message_type(method)}: Action_Message_Base.extend({
 						type: z.literal('${to_action_request_message_type(method)}'),	
 						method: z.literal('${method}'),
@@ -64,7 +63,7 @@ export const gen: Gen = ({origin_path}) => {
 			${registry.specs
 				.map((spec) => {
 					const {method} = spec;
-					if (is_request_response_action(spec)) {
+					if (spec.kind === 'request_response') {
 						return `${to_action_request_message_type(method)}: z.infer<typeof Action_Message.${to_action_request_message_type(method)}>,
 						${to_action_response_message_type(method)}: z.infer<typeof Action_Message.${to_action_response_message_type(method)}>`;
 					} else {
@@ -72,20 +71,6 @@ export const gen: Gen = ({origin_path}) => {
 					}
 				})
 				.join(';\n\t\t\t')}
-		}
-
-		export interface Action_Message_Params {
-			${registry.specs
-				.map((spec) => {
-					const {method} = spec;
-					if (is_request_response_action(spec)) {
-						return `${to_action_request_message_type(method)}: z.infer<typeof ${to_action_spec_params_identifier(method)}>,
-						${to_action_response_message_type(method)}: z.infer<typeof ${to_action_spec_response_params_identifier(method)}>`;
-					} else {
-						return `${method}: z.infer<typeof ${to_action_spec_params_identifier(method)}>`;
-					}
-				})
-				.join(',\n\t\t\t')}
 		}
 
 		// ${banner}

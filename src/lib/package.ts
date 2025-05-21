@@ -930,10 +930,7 @@ export const src_json = {
 		},
 		'./action_messages.js': {
 			path: 'action_messages.ts',
-			declarations: [
-				{name: 'Action_Message', kind: 'variable'},
-				{name: 'Action_Message_Params', kind: 'type'},
-			],
+			declarations: [{name: 'Action_Message', kind: 'variable'}],
 		},
 		'./action_metatypes.gen.js': {
 			path: 'action_metatypes.gen.ts',
@@ -947,6 +944,7 @@ export const src_json = {
 				{name: 'Server_Notification_Action_Method', kind: 'type'},
 				{name: 'Client_Local_Action_Method', kind: 'type'},
 				{name: 'Action_Message_Type', kind: 'variable'},
+				{name: 'Action_Message_Params', kind: 'type'},
 				{name: 'Actions_Api', kind: 'type'},
 				{name: 'Mutations', kind: 'type'},
 			],
@@ -1344,7 +1342,11 @@ export const src_json = {
 				{name: 'CONTENT_PREVIEW_LENGTH', kind: 'variable'},
 				{name: 'API_PATH', kind: 'variable'},
 				{name: 'API_URL', kind: 'variable'},
+				{name: 'API_PATH_FOR_HTTP_RPC', kind: 'variable'},
+				{name: 'API_URL_FOR_HTTP_RPC', kind: 'variable'},
 				{name: 'WEBSOCKET_URL', kind: 'variable'},
+				{name: 'WEBSOCKET_URL_OBJECT', kind: 'variable'},
+				{name: 'WEBSOCKET_PATH', kind: 'variable'},
 			],
 		},
 		'./Content_Editor.svelte': {
@@ -2012,9 +2014,6 @@ export const src_json = {
 				{name: 'to_action_spec_identifier', kind: 'function'},
 				{name: 'to_action_spec_params_identifier', kind: 'function'},
 				{name: 'to_action_spec_response_params_identifier', kind: 'function'},
-				{name: 'is_request_response_action', kind: 'function'},
-				{name: 'is_server_notification_action', kind: 'function'},
-				{name: 'is_client_local_action', kind: 'function'},
 				{name: 'camel_to_snake_case', kind: 'function'},
 				{name: 'to_pascalsnake_case', kind: 'function'},
 			],
@@ -2055,7 +2054,7 @@ export const src_json = {
 		'./server/jsonrpc_server_helpers.js': {
 			path: 'server/jsonrpc_server_helpers.ts',
 			declarations: [
-				{name: 'Jsonrpc_Method_Handler', kind: 'type'},
+				{name: 'jsonrpc_request_to_action_message', kind: 'function'},
 				{name: 'Jsonrpc_Request_Handler', kind: 'type'},
 				{name: 'Jsonrpc_Notification_Handler', kind: 'type'},
 				{name: 'Handle_Jsonrpc_Request_Options', kind: 'type'},

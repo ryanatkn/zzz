@@ -2,14 +2,17 @@ import type {Gen} from '@ryanatkn/gro/gen.js';
 import {z} from 'zod';
 
 import {
-	is_request_response_action,
 	to_action_spec_params_identifier,
 	to_action_spec_response_params_identifier,
 } from '$lib/schema_helpers.js';
 import {get_innermost_type} from '$lib/zod_helpers.js';
 import {action_specs} from '$lib/action_collections.js';
 import {Action_Registry} from '$lib/action_registry.js';
-import {to_action_message_type} from '$lib/action_helpers.js';
+import {
+	to_action_message_type,
+	to_action_request_message_type,
+	to_action_response_message_type,
+} from '$lib/action_helpers.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
 import type {Api_Request_Response_Flag} from '$lib/api.js';
 
@@ -81,6 +84,20 @@ export const gen: Gen = ({origin_path}) => {
 		]);
 		export type Action_Message_Type = z.infer<typeof Action_Message_Type>;
 
+		export interface Action_Message_Params {
+			${registry.specs
+				.map((spec) => {
+					const {method} = spec;
+					if (spec.kind === 'request_response') {
+						return `${to_action_request_message_type(method)}: z.infer<typeof ${to_action_spec_params_identifier(method)}>,
+						${to_action_response_message_type(method)}: z.infer<typeof ${to_action_spec_response_params_identifier(method)}>`;
+					} else {
+						return `${method}: z.infer<typeof ${to_action_spec_params_identifier(method)}>`;
+					}
+				})
+				.join(',\n\t\t\t')}
+		}
+
 		/**
 		 * Interface for action dispatch functions.
 		 */
@@ -93,11 +110,14 @@ export const gen: Gen = ({origin_path}) => {
 						innermost_type_name !== z.ZodFirstPartyTypeKind.ZodVoid;
 					return `${spec.method}: (${
 						has_params
-							? `params${spec.params.isOptional() ? '?' : ''}: z.infer<typeof ${to_action_spec_params_identifier(spec.method)}>`
+							? `params${spec.params.isOptional() ? '?' : ''}: Action_Message_Params['${to_action_message_type(
+									spec.method,
+									spec.kind === 'request_response' ? 'request' : null,
+								)}']`
 							: 'params?: void'
 					}) => ${
 						spec.kind === 'request_response'
-							? `Promise<Api_Result<z.infer<typeof ${to_action_spec_response_params_identifier(spec.method)}>>>`
+							? `Promise<Api_Result<Action_Message_Params['${to_action_response_message_type(spec.method)}']>>`
 							: spec.kind === 'client_local'
 								? spec.returns
 								: 'void'
@@ -117,12 +137,15 @@ export const gen: Gen = ({origin_path}) => {
 						`${to_action_message_type(
 							m,
 							request_response,
-						)}?: Mutation<T_App, z.infer<typeof ${to_action_spec_params_identifier(m)}>, ${
+						)}?: Mutation<T_App, Action_Message_Params['${to_action_message_type(
+							spec.method,
+							spec.kind === 'request_response' ? 'request' : null,
+						)}'], ${
 							request_response === 'response'
-								? `Api_Result<z.infer<typeof ${to_action_spec_response_params_identifier(m)}>>`
+								? `Api_Result<Action_Message_Params['${to_action_response_message_type(spec.method)}']>`
 								: 'void'
 						}>;`;
-					return is_request_response_action(spec)
+					return spec.kind === 'request_response'
 						? [v(spec.method, 'request'), v(spec.method, 'response')]
 						: v(spec.method, null);
 				})

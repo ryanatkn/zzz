@@ -3,7 +3,8 @@
  * and handling type compatibility issues.
  */
 import {create_uuid, get_datetime_now, Uuid} from '$lib/zod_helpers.js';
-import type {Action_Message, Action_Message_Params} from '$lib/action_messages.js';
+import type {Action_Message} from '$lib/action_messages.js';
+import type {Action_Message_Params} from '$lib/action_metatypes.js';
 import type {Provider_Name, Provider_Data} from '$lib/provider_types.js';
 
 /**
