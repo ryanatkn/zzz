@@ -18,7 +18,6 @@ export const verify_origin =
 	(allowed_origins: Allowed_Origins): Handler =>
 	(c, next) => {
 		const origin = c.req.header('origin');
-		console.log(`origin`, origin, should_allow_origin(origin, allowed_origins));
 		if (!should_allow_origin(origin, allowed_origins)) {
 			return c.text('invalid origin', 403);
 		}
