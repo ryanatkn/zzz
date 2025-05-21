@@ -75,7 +75,8 @@
 			<span class="font_size_lg font_weight_400 ml_md">
 				{#if capabilities.server.status === 'pending'}
 					<div class="display_inline_flex align_items_end">
-						checking <div class="position_relative"><Pending_Animation /></div>
+						<span class="mr_sm">checking</span>
+						<Pending_Animation />
 					</div>
 				{:else}
 					check the server

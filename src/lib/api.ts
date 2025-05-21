@@ -28,6 +28,7 @@ export const Api_Params = z.union([JSONRPCRequestParams, JSONRPCNotificationPara
 export type Api_Params = z.infer<typeof Api_Params>;
 
 export interface Error_Response {
+	// TODO @many rename to `error` or `error_message`?
 	message: string;
 }
 
@@ -42,7 +43,7 @@ export type Api_Result<T_Value = any> = Result<
 export const API_RESULT_UNKNOWN_ERROR = {
 	ok: false as const,
 	status: 500 as const,
-	message: 'unknown error',
+	message: 'unknown error', // TODO @many rename to `error` or `error_message`?
 };
 
 export interface Successful_Api_Result<T_Value = any> {
@@ -54,7 +55,7 @@ export interface Successful_Api_Result<T_Value = any> {
 export interface Failed_Api_Result {
 	ok: false;
 	status: Http_Status;
-	message: string;
+	message: string; // TODO @many rename to `error` or `error_message`?
 }
 
 /**

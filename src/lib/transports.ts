@@ -163,8 +163,8 @@ export class Websocket_Rpc_Transport implements Transport {
 		};
 	}
 
-	async send(data: JSONRPCMessage): Promise<Api_Result> {
-		console.log(`[websocket transport] data`, data);
+	async send(message: JSONRPCMessage): Promise<Api_Result> {
+		console.log(`[websocket transport] data`, message);
 		if (!this.is_ready()) {
 			throw new Error('WebSocket not connected');
 		}
@@ -173,17 +173,19 @@ export class Websocket_Rpc_Transport implements Transport {
 			// If this is a JSON-RPC request with an id (not a notification),
 			// set up request tracking.
 			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-			if ('id' in data && data.id != null) {
+			if ('id' in message && message.id != null) {
 				// TODO track the whole request?
-				const deferred = this.#request_tracker.track_request(data.id);
-				this.#socket.send(data);
+				const deferred = this.#request_tracker.track_request(message.id);
+				this.#socket.send(message);
 
 				// Return the promise that will resolve when the response is received
-				return await deferred.promise;
+				const result = await deferred.promise;
+				console.log(`result`, message, result);
+				return {ok: true, status: 200, value: result};
 			} else {
 				// For notifications, just send without tracking
 				// TODO if we want retries at this abstraction level we'll need to add a way to track them
-				this.#socket.send(data);
+				this.#socket.send(message);
 				return {ok: true, status: 200, value: null};
 			}
 		} catch (error) {
@@ -226,15 +228,16 @@ export class Http_Rpc_Transport implements Transport {
 				// signal: AbortSignal.timeout(REQUEST_TIMEOUT),
 			});
 
+			const result = await response.json();
+
 			if (!response.ok) {
 				return {
 					ok: false,
 					status: response.status as Http_Status,
-					message: (await response.text()) || API_RESULT_UNKNOWN_ERROR.message,
+					message: result.message || API_RESULT_UNKNOWN_ERROR.message, // TODO @many rename to `error` or `error_message`?
 				};
 			}
 
-			const result = await response.json();
 			console.log(`[http transport] result`, result, response.status);
 			return {
 				ok: true,

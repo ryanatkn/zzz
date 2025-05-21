@@ -21,6 +21,8 @@
 	const remaining_placeholders = $derived(
 		Math.max(0, PING_HISTORY_MAX - capabilities.pings.length),
 	);
+
+	// TODO consider multiple buttons for each transport, so we can compare latency
 </script>
 
 <div class="column align_items_start gap_sm">

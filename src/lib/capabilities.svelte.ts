@@ -329,7 +329,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 
 	// TODO @many refactor mutations
 	handle_sent_ping(request_id: Uuid): void {
-		console.log(`[handle_sent_ping] request_id`, request_id);
+		console.log(`[capabilities] [handle_sent_ping] request_id`, request_id);
 		// Create a new pending ping
 		const new_ping: Ping_Data = {
 			ping_id: request_id,
@@ -356,7 +356,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 
 	// TODO @many refactor mutations
 	handle_received_ping(ping_id: Uuid): void {
-		console.log(`[handle_received_ping] ping_id`, ping_id);
+		console.log(`[capabilities] [handle_received_ping] ping_id`, ping_id);
 		const ping = this.pings.find((p) => p.ping_id === ping_id);
 		// If we can't find the ping, we can safely ignore it
 		if (!ping) {
@@ -385,7 +385,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	}
 
 	handle_ping_error(ping_id: Uuid, error_message: string): void {
-		console.error(`[handle_ping_error] ping_id`, ping_id, error_message);
+		console.error(`[capabilities] [handle_ping_error] ping_id`, ping_id, error_message);
 		// TODO @many maybe refactor to middleware or more sophisticated hooks? is spread across 3 methods called from 2 mutations
 		if (this.server.message_id === ping_id) {
 			this.server = {

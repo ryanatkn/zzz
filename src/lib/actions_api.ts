@@ -4,8 +4,7 @@ import {BROWSER, DEV} from 'esm-env';
 import type {Actions_Api} from '$lib/action_metatypes.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 import {create_mutation_context} from '$lib/mutation.js';
-import {to_action_message_type} from '$lib/action_helpers.js';
-import type {Api_Request_Response_Flag} from '$lib/api.js';
+import type {Api_Request_Response_Flag, Api_Result} from '$lib/api.js';
 import {create_jsonrpc_request} from '$lib/jsonrpc_helpers.js';
 import {create_uuid} from '$lib/zod_helpers.js';
 import type {JSONRPCRequest} from '$lib/jsonrpc.js';
@@ -17,6 +16,8 @@ const log = new Logger();
 export const create_actions_api = (zzz: Zzz): Actions_Api =>
 	new Proxy(Object.create(null), {
 		get: (_target, method: keyof Actions_Api) => (params: any) => {
+			// TODO maybe create an `Action_Invocation_Context` or something, can have multiple mutation contexts, covers the whole sync/async function call wrapper
+
 			// TODO BLOCK `log.debug` isn't formatting the output correctly, shouldn't use console here
 			console.log(...to_logged_args(method, params));
 
@@ -26,11 +27,11 @@ export const create_actions_api = (zzz: Zzz): Actions_Api =>
 			}
 
 			const mutate = (
-				result: unknown,
+				result: Api_Result | null,
 				request_response: Api_Request_Response_Flag,
 				jsonrpc_message: JSONRPCRequest,
 			) => {
-				console.log(`mutate`, method, result, request_response);
+				console.log('\n\n\n\n\n\n\n\nmutate', method, result, request_response);
 				const {ctx, flush_after_mutation} = create_mutation_context(
 					zzz,
 					method,
@@ -39,9 +40,9 @@ export const create_actions_api = (zzz: Zzz): Actions_Api =>
 					request_response,
 					jsonrpc_message,
 				);
-				const message_type = to_action_message_type(method, request_response);
-				console.log(`message_type`, message_type);
-				const mutation = zzz.mutations[message_type];
+				console.log(`message_type`, ctx.message_type);
+				console.log(`ctx`, ctx);
+				const mutation = zzz.mutations[ctx.message_type];
 				if (!mutation) {
 					log.warn(`missing mutation for action '${method}'`);
 				}
@@ -55,7 +56,7 @@ export const create_actions_api = (zzz: Zzz): Actions_Api =>
 			// Request-response actions have special handling,
 			// each such method has a `_request` and `_response` type variant.
 			if (spec.kind === 'request_response') {
-				mutate(undefined, 'request', jsonrpc_message);
+				mutate(null, 'request', jsonrpc_message);
 
 				// Avoiding `await` for compatibility with sync actions
 				return zzz.api_client
@@ -64,7 +65,7 @@ export const create_actions_api = (zzz: Zzz): Actions_Api =>
 			}
 
 			// Handle non-request-response actions synchronously
-			return mutate(undefined, null, jsonrpc_message);
+			return mutate(null, null, jsonrpc_message);
 		},
 	});
 

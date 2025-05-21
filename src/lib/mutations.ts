@@ -13,7 +13,7 @@ export const mutations: Mutations = {
 	ping_response: (ctx) => {
 		console.log('Ping response received', ctx.result);
 		if (ctx.result.ok) {
-			ctx.zzz.capabilities.handle_received_ping(ctx.result.data);
+			ctx.zzz.capabilities.handle_received_ping(ctx.result.value.result.params.ping_id);
 		} else {
 			ctx.zzz.capabilities.handle_ping_error(ctx.jsonrpc_message.id, ctx.result.message);
 		}
@@ -25,7 +25,11 @@ export const mutations: Mutations = {
 
 	load_session_response: (ctx) => {
 		console.log('Session loaded', ctx.result);
-		ctx.zzz.receive_session(ctx.result.result.data);
+		if (ctx.result.ok) {
+			ctx.zzz.receive_session(ctx.result.value.result.data);
+		} else {
+			console.error('Error loading session', ctx.result);
+		}
 	},
 
 	submit_completion_request: (ctx) => {
