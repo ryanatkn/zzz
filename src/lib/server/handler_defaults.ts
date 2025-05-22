@@ -63,7 +63,7 @@ export const handle_message = async (
 			// Iterate through all filers and collect their files
 			for (const filer of server.filers.values()) {
 				for (const file of filer.filer.files.values()) {
-					files_array.push(to_serializable_source_file(file, server.zzz_dir)); // TODO dir is a hack
+					files_array.push(to_serializable_source_file(file, server.zzz_cache_dir)); // TODO dir is a hack
 				}
 			}
 
@@ -71,7 +71,7 @@ export const handle_message = async (
 				value: {
 					data: {
 						files: files_array,
-						zzz_dir: server.zzz_dir,
+						zzz_dir: server.zzz_cache_dir,
 					},
 				},
 			};
@@ -200,7 +200,7 @@ export const handle_message = async (
 			}
 
 			// We don't need to wait for this to finish
-			void save_response(message, response, server.zzz_dir, server.safe_fs);
+			void save_response(message, response, server.zzz_cache_dir, server.safe_fs);
 
 			console.log(`got ${provider_name} message`, response.params.completion_response.data);
 
@@ -285,11 +285,14 @@ export const handle_filer_change: Filer_Change_Handler = (
 		}
 	}
 
+	console.log(`change, source_file.id`, change, source_file.id);
+
 	server.send_action_message({
 		id: create_uuid(),
 		created: get_datetime_now(),
 		type: 'filer_change', // TODO BLOCK @api hacky
 		method: 'filer_change',
+		jsonrpc_message_id: null,
 		params: {
 			change: api_change,
 			source_file: serializable_source_file,

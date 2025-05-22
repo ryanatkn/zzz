@@ -1,4 +1,6 @@
 <script lang="ts">
+	// @slop
+
 	import {base} from '$app/paths';
 
 	import {projects_context} from '$routes/projects/projects.svelte.js';

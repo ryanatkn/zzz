@@ -1,7 +1,6 @@
 import {z} from 'zod';
 import {strip_start} from '@ryanatkn/belt/string.js';
 
-import type {Action_Message} from '$lib/action_messages.js';
 import {get_datetime_now, Uuid} from '$lib/zod_helpers.js';
 import {Diskfile, Diskfile_Schema} from '$lib/diskfile.svelte.js';
 import {Diskfile_Json, Diskfile_Path} from '$lib/diskfile_types.js';
@@ -12,6 +11,7 @@ import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {create_single_index, create_multi_index} from '$lib/indexed_collection_helpers.js';
 import {Diskfiles_Editor} from '$lib/diskfiles_editor.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
+import type {Action_Message_Params} from './action_metatypes.js';
 
 export const Diskfiles_Json = Cell_Json.extend({
 	diskfiles: cell_array(
@@ -77,10 +77,10 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 		this.init();
 	}
 
-	handle_change(message: Action_Message['filer_change']): void {
-		const validated_source_file = message.params.source_file;
+	handle_change(params: Action_Message_Params['filer_change']): void {
+		const validated_source_file = params.source_file;
 
-		switch (message.params.change.type) {
+		switch (params.change.type) {
 			case 'add': {
 				this.add(source_file_to_diskfile_json(validated_source_file));
 				break;
@@ -140,24 +140,24 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 	}
 
 	create_file(filename: string, content: string = ''): void {
-		if (!this.zzz.zzz_dir) {
+		if (!this.zzz.zzz_cache_dir) {
 			throw new Error('Cannot create file: zzz_dir is not set');
 		}
 
 		// Create full path by joining zzz_dir with the filename
-		const path = Diskfile_Path.parse(`${this.zzz.zzz_dir}${filename}`);
+		const path = Diskfile_Path.parse(`${this.zzz.zzz_cache_dir}${filename}`);
 
 		// Reuse the update method which creates or updates files
 		this.update(path, content);
 	}
 
 	create_directory(dirname: string): void {
-		if (!this.zzz.zzz_dir) {
+		if (!this.zzz.zzz_cache_dir) {
 			throw new Error('Cannot create directory: zzz_dir is not set');
 		}
 
 		// Create full path by joining zzz_dir with the directory name
-		const path = Diskfile_Path.parse(`${this.zzz.zzz_dir}${dirname}`);
+		const path = Diskfile_Path.parse(`${this.zzz.zzz_cache_dir}${dirname}`);
 
 		this.zzz.api.create_directory({path});
 	}
@@ -168,7 +168,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 
 	/** Like `zzz.zzz_dir`, `undefined` means uninitialized, `null` means loading, `''` means none */
 	to_relative_path(path: string): string | null | undefined {
-		const {zzz_dir} = this.zzz;
+		const {zzz_cache_dir: zzz_dir} = this.zzz;
 		return zzz_dir && strip_start(path, zzz_dir);
 	}
 

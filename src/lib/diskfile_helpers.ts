@@ -4,9 +4,14 @@ import {Uuid, Datetime, Datetime_Now, create_uuid} from '$lib/zod_helpers.js';
 import {
 	Diskfile_Change_Type,
 	Serializable_Source_File,
+	Zzz_Dir,
 	type Diskfile_Json,
 } from '$lib/diskfile_types.js';
 import type {Diskfile} from '$lib/diskfile.svelte.js';
+import {ZZZ_CACHE_DIRNAME} from '$lib/constants.js';
+
+export const to_zzz_cache_dir = (dir: Zzz_Dir, dirname: string = ZZZ_CACHE_DIRNAME): string =>
+	dir + dirname;
 
 // TODO probably extract to `@ryanatkn/belt/path.js`
 export const is_path_absolute = (path: unknown): boolean => {

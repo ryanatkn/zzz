@@ -1,4 +1,6 @@
 <script lang="ts">
+	// @slop
+
 	import {swallow} from '@ryanatkn/belt/dom.js';
 
 	import {projects_context} from '$routes/projects/projects.svelte.js';

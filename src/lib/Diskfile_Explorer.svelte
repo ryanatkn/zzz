@@ -27,13 +27,15 @@
 	const {diskfiles} = zzz;
 	const {editor} = diskfiles;
 
+	const {zzz_cache_dir} = $derived(zzz);
+
 	// TODO need awaitable websocket calls?
 	const TODO_create_file_pending = false;
 	const TODO_create_folder_pending = false;
 
 	// TODO improve UX to not use alert/prompt
 	const create_file = () => {
-		if (!zzz.zzz_dir) {
+		if (!zzz_cache_dir) {
 			alert('Cannot create file: no directory is selected'); // eslint-disable-line no-alert
 			return;
 		}
@@ -50,7 +52,7 @@
 	};
 
 	const create_folder = () => {
-		if (!zzz.zzz_dir) {
+		if (!zzz_cache_dir) {
 			alert('Cannot create folder: no directory is selected'); // eslint-disable-line no-alert
 			return;
 		}
@@ -68,18 +70,18 @@
 </script>
 
 <div class="h_100 overflow_auto scrollbar_width_thin">
-	{#if zzz.zzz_dir === undefined}
+	{#if zzz_cache_dir === undefined}
 		<div>&nbsp;</div>
-	{:else if zzz.zzz_dir === null}
+	{:else if zzz_cache_dir === null}
 		<div class="row h_input_height"><Pending_Animation /></div>
 	{:else}
 		<div class="row h_input_height justify_content_space_between py_xs px_xs">
-			<small class="ellipsis"><Glyph glyph={GLYPH_DIRECTORY} /> {zzz.zzz_dir_pathname}</small>
+			<small class="ellipsis"><Glyph glyph={GLYPH_DIRECTORY} /> {zzz_cache_dir}</small>
 			<div class="display_flex gap_xs2">
 				<Pending_Button
 					pending={TODO_create_file_pending}
 					attrs={{class: 'plain compact'}}
-					title="create file in {zzz.zzz_dir_pathname}"
+					title="create file in {zzz_cache_dir}"
 					onclick={create_file}
 				>
 					<Glyph glyph={GLYPH_CREATE_FILE} />
@@ -87,7 +89,7 @@
 				<Pending_Button
 					pending={TODO_create_folder_pending}
 					attrs={{class: 'plain compact'}}
-					title="create folder in {zzz.zzz_dir_pathname}"
+					title="create folder in {zzz_cache_dir}"
 					onclick={create_folder}
 				>
 					<Glyph glyph={GLYPH_CREATE_FOLDER} />

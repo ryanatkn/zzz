@@ -61,7 +61,7 @@ export interface Websocket_Capability_Data {
 
 export interface Filesystem_Capability_Data {
 	zzz_dir: Zzz_Dir | null | undefined;
-	zzz_dir_parent: string | null | undefined;
+	zzz_cache_dir: string | null | undefined;
 }
 
 export interface Ollama_Capability_Data {
@@ -122,7 +122,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	 */
 	readonly filesystem: Capability<Filesystem_Capability_Data | null | undefined> = $derived.by(
 		() => {
-			const {zzz_dir, zzz_dir_parent} = this.zzz;
+			const {zzz_dir, zzz_cache_dir} = this.zzz;
 			let status: Async_Status;
 
 			if (this.server.status !== 'success') {
@@ -130,11 +130,11 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 				status = this.server.status;
 			} else {
 				// TODO hacky, should be explicit
-				if (zzz_dir === undefined) {
+				if (zzz_cache_dir === undefined) {
 					status = 'initial';
-				} else if (zzz_dir === null) {
+				} else if (zzz_cache_dir === null) {
 					status = 'pending';
-				} else if (zzz_dir === '') {
+				} else if (zzz_cache_dir === '') {
 					status = 'failure';
 				} else {
 					status = 'success';
@@ -143,7 +143,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 
 			return {
 				name: 'filesystem',
-				data: status === 'success' ? {zzz_dir, zzz_dir_parent} : undefined,
+				data: status === 'success' ? {zzz_dir, zzz_cache_dir} : undefined,
 				status,
 				message_id: null,
 				error_message: null,

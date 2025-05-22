@@ -1,4 +1,6 @@
 <script lang="ts">
+	// @slop
+
 	import {GLYPH_DELETE} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
 	import type {Repo_Checkout} from '$routes/projects/repo.svelte.js';

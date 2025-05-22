@@ -2,8 +2,7 @@
  * Helper module for safely working with completion responses
  * and handling type compatibility issues.
  */
-import {create_uuid, get_datetime_now, Uuid} from '$lib/zod_helpers.js';
-import type {Action_Message} from '$lib/action_messages.js';
+import {get_datetime_now, Uuid} from '$lib/zod_helpers.js';
 import type {Action_Message_Params} from '$lib/action_metatypes.js';
 import type {Provider_Name, Provider_Data} from '$lib/provider_types.js';
 
@@ -43,7 +42,7 @@ export const create_completion_response_message = (
 	provider_name: Provider_Name,
 	model: string,
 	api_response: unknown,
-): Action_Message['submit_completion_response'] => {
+): Action_Message_Params['submit_completion_response'] => {
 	let provider_data: Provider_Data;
 
 	// Convert provider-specific response format to our standard format
@@ -85,18 +84,12 @@ export const create_completion_response_message = (
 	const created = get_datetime_now();
 
 	return {
-		id: create_uuid(),
-		created,
-		type: 'submit_completion_response',
-		method: 'submit_completion',
-		params: {
-			completion_response: {
-				created,
-				request_id,
-				provider_name,
-				model,
-				data: provider_data,
-			},
+		completion_response: {
+			created,
+			request_id,
+			provider_name,
+			model,
+			data: provider_data,
 		},
 	};
 };

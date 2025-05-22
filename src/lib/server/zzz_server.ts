@@ -3,6 +3,7 @@ import type {Watcher_Change} from '@ryanatkn/gro/watch_dir.js';
 import {resolve} from 'node:path';
 import {Logger} from '@ryanatkn/belt/log.js';
 import {DEV} from 'esm-env';
+import {ensure_end} from '@ryanatkn/belt/string.js';
 
 import type {Action_Spec} from '$lib/action_spec.js';
 import {
@@ -32,6 +33,8 @@ import {
 import {handle_jsonrpc_request} from '$lib/server/jsonrpc_server_helpers.js';
 import {create_jsonrpc_error} from '$lib/jsonrpc_helpers.js';
 import type {Action_Message_Base} from '$lib/action_types.js';
+import {ZZZ_CACHE_DIRNAME} from '$lib/constants.js';
+import {to_zzz_cache_dir} from '$lib/diskfile_helpers.js';
 
 /**
  * Function type for handling client messages.
@@ -48,7 +51,7 @@ export type Filer_Change_Handler = (
 	change: Watcher_Change,
 	source_file: Source_File,
 	server: Zzz_Server,
-	dir: Zzz_Dir,
+	dir: string,
 ) => void;
 
 /**
@@ -64,6 +67,13 @@ export interface Zzz_Server_Options {
 	 * Directories that Zzz is allowed to read from and write to.
 	 */
 	zzz_dir: string;
+	/**
+	 * Directory name for the Zzz cache.
+	 *
+	 * @relative
+	 * @no_trailing_slash
+	 */
+	zzz_cache_dirname?: string; // TODO @many move this info to path schemas
 	/**
 	 * Configuration for the server and AI providers.
 	 */
@@ -98,6 +108,10 @@ export interface Zzz_Server_Options {
 export class Zzz_Server {
 	/** The root Zzz directory on the server's filesystem. */
 	readonly zzz_dir: Zzz_Dir;
+	/** The Zzz cache directory name, defaults to `.zzz`. */
+	readonly zzz_cache_dirname: string;
+	/** The full path to the Zzz cache directory. */
+	readonly zzz_cache_dir: string;
 
 	readonly config: Zzz_Config;
 
@@ -129,7 +143,9 @@ export class Zzz_Server {
 
 	constructor(options: Zzz_Server_Options) {
 		// Parse the allowed filesystem directories
-		this.zzz_dir = Zzz_Dir.parse(resolve(options.zzz_dir)); // TODO if the class get more paths to deal with, add a `cwd` option - for now callers can just resolve to absolute themselves
+		this.zzz_dir = Zzz_Dir.parse(ensure_end(resolve(options.zzz_dir), '/')); // TODO if the class get more paths to deal with, add a `cwd` option - for now callers can just resolve to absolute themselves
+		this.zzz_cache_dirname = options.zzz_cache_dirname ?? ZZZ_CACHE_DIRNAME;
+		this.zzz_cache_dir = to_zzz_cache_dir(this.zzz_dir, this.zzz_cache_dirname); // TODO if the class get more paths to deal with, add a `cwd` option - for now callers can just resolve to absolute themselves
 
 		this.config = options.config;
 		this.action_registry = new Action_Registry(options.action_specs);
@@ -138,17 +154,17 @@ export class Zzz_Server {
 		this.#handle_filer_change = options.handle_filer_change;
 
 		// Create the safe filesystem interface with the allowed directories
-		this.safe_fs = new Safe_Fs([this.zzz_dir]); // TODO pass filter through on options
+		this.safe_fs = new Safe_Fs([this.zzz_cache_dir]); // TODO pass filter through on options
 
 		this.log = options.log === undefined ? new Logger('[zzz_server]') : options.log;
 
 		// TODO maybe do this in an `init` method
-		// Set up the filer watcher for the zzz_dir
-		const filer = new Filer({watch_dir_options: {dir: this.zzz_dir}}); // TODO maybe filter out the db directory at this level? think about this when db is added
+		// Set up the filer watcher for the zzz_cache_dir
+		const filer = new Filer({watch_dir_options: {dir: this.zzz_cache_dir}}); // TODO maybe filter out the db directory at this level? think about this when db is added
 		const cleanup_promise = filer.watch((change, source_file) => {
-			this.#handle_filer_change(change, source_file, this, this.zzz_dir);
+			this.#handle_filer_change(change, source_file, this, this.zzz_cache_dir);
 		});
-		this.filers.set(this.zzz_dir, {filer, cleanup_promise});
+		this.filers.set(this.zzz_cache_dir, {filer, cleanup_promise});
 	}
 
 	async handle_jsonrpc_message(message: unknown): Promise<JSONRPCResponse | JSONRPCError | null> {

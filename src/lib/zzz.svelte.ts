@@ -2,7 +2,6 @@ import {create_context} from '@ryanatkn/fuz/context_helpers.js';
 import {SvelteMap} from 'svelte/reactivity';
 import {z} from 'zod';
 import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
-import {strip_end, strip_start} from '@ryanatkn/belt/string.js';
 import type {Assignable, Class_Constructor, Omit_Strict} from '@ryanatkn/belt/types.js';
 
 import {Provider, type Provider_Json} from '$lib/provider.svelte.js';
@@ -21,8 +20,8 @@ import {Bits} from '$lib/bits.svelte.js';
 import {Time} from '$lib/time.svelte.js';
 import type {Zzz_Config} from '$lib/config_helpers.js';
 import {BOTS_DEFAULT} from '$lib/config_defaults.js';
-import type {Diskfile_Path, Zzz_Dir} from '$lib/diskfile_types.js';
-import {ZZZ_DIRNAME} from '$lib/constants.js';
+import {Zzz_Dir, type Diskfile_Path} from '$lib/diskfile_types.js';
+import {ZZZ_CACHE_DIRNAME} from '$lib/constants.js';
 import {Url_Params} from '$lib/url_params.svelte.js';
 import {cell_classes} from '$lib/cell_classes.js';
 import {Cell_Json} from '$lib/cell_types.js';
@@ -103,24 +102,27 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 
 	readonly bots: Zzz_Config['bots'];
 
+	// TODO maybe instead of this pattern with getters/setters, using an encoder?
+	#zzz_dir: Zzz_Dir | null | undefined = $state(null);
+
 	/**
 	 * The `zzz_dir` is the path to Zzz's primary directory on the server's filesystem.
 	 * The server's `safe_fs` instance restricts operations to this directory.
 	 * The value is `undefined` when uninitialized,
 	 * `null` when loading, and `''` when disabled or no server.
 	 */
-	zzz_dir: Zzz_Dir | null | undefined = $state(null);
+	get zzz_dir(): Zzz_Dir | null | undefined {
+		return this.#zzz_dir;
+	}
+	set zzz_dir(value: string | null | undefined) {
+		const parsed = value == null ? value : Zzz_Dir.safeParse(value);
+		this.#zzz_dir = parsed == null ? parsed : parsed.data;
+	}
 
-	// TODO BLOCK needs to be changed so that this is the explicit directory, and `.zzz` is inferred from it
-	/** The `zzz_dir` without the trailing `.zzz/`. Has its own trailing slash. */
-	zzz_dir_parent: Diskfile_Path | null | undefined = $derived(
-		this.zzz_dir && (strip_end(this.zzz_dir, ZZZ_DIRNAME + '/') as Diskfile_Path),
-	);
+	zzz_cache_dirname: string = ZZZ_CACHE_DIRNAME; // TODO make this configurable
 
-	zzz_dir_pathname: Diskfile_Path | null | undefined = $derived(
-		this.zzz_dir &&
-			this.zzz_dir_parent &&
-			(strip_start(this.zzz_dir, this.zzz_dir_parent) as Diskfile_Path),
+	zzz_cache_dir: string | null | undefined = $derived(
+		this.zzz_dir && this.zzz_dir + this.zzz_cache_dirname,
 	);
 
 	// Derived set of all tags from models
@@ -239,20 +241,14 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	 */
 	receive_session(data: any): void {
 		// Set the zzz_dir property from the session data
-		this.zzz_dir = data.zzz_dir;
+		this.zzz_cache_dir = data.zzz_dir;
 
 		// Process files through the diskfiles subsystem
 		if (Array.isArray(data.files)) {
 			for (const source_file of data.files) {
 				this.diskfiles.handle_change({
-					id: create_uuid(), // TODO shouldnt need to fake, maybe call an internal method directly? or do we want a single path?
-					created: get_datetime_now(),
-					type: 'filer_change',
-					method: 'filer_change',
-					params: {
-						change: {type: 'add', path: source_file.id},
-						source_file,
-					},
+					change: {type: 'add', path: source_file.id},
+					source_file,
 				});
 			}
 		}

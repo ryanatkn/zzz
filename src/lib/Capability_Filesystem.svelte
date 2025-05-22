@@ -15,7 +15,7 @@
 	const {capabilities} = zzz;
 
 	// Fall back to the context value if not provided
-	const zzz_dir = $derived(zzz_dir_prop !== undefined ? zzz_dir_prop : zzz.zzz_dir);
+	const zzz_dir = $derived(zzz_dir_prop !== undefined ? zzz_dir_prop : zzz.zzz_cache_dir);
 </script>
 
 <div
@@ -60,8 +60,8 @@
 </p>
 <p>
 	For security reasons, all filesystem operations are confined to this path's parent directory,
-	<small class="chip font_family_mono">{zzz.zzz_dir_parent || '[no zzz dir configured]'}</small>,
-	and the path cannot be modified after the server starts. These restrictions may be loosened in the
-	future, but they help ensure predictability when exposing sensitive resources like your local hard
-	drive to web scripts.
+	<small class="chip font_family_mono">{zzz.zzz_dir || '[no zzz dir configured]'}</small>, and the
+	path cannot be modified after the server starts. These restrictions may be loosened in the future,
+	but they help ensure predictability when exposing sensitive resources like your local hard drive
+	to web scripts.
 </p>

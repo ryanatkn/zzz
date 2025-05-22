@@ -1349,7 +1349,7 @@ export const src_json = {
 			declarations: [
 				{name: 'SERVER_PROXIED_PORT', kind: 'variable'},
 				{name: 'SERVER_URL', kind: 'variable'},
-				{name: 'ZZZ_DIRNAME', kind: 'variable'},
+				{name: 'ZZZ_CACHE_DIRNAME', kind: 'variable'},
 				{name: 'ZZZ_DIR', kind: 'variable'},
 				{name: 'CONTENT_PREVIEW_LENGTH', kind: 'variable'},
 				{name: 'API_PATH', kind: 'variable'},
@@ -1476,6 +1476,7 @@ export const src_json = {
 		'./diskfile_helpers.js': {
 			path: 'diskfile_helpers.ts',
 			declarations: [
+				{name: 'to_zzz_cache_dir', kind: 'function'},
 				{name: 'is_path_absolute', kind: 'function'},
 				{name: 'map_watcher_change_to_diskfile_change', kind: 'function'},
 				{name: 'source_file_to_diskfile_json', kind: 'function'},
