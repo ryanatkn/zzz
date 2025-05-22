@@ -11,19 +11,6 @@ import {
 	type JSONRPCRequestId,
 } from '$lib/jsonrpc.js';
 import {create_jsonrpc_error} from '$lib/jsonrpc_helpers.js';
-import {Action_Message_Base} from '$lib/action_spec.js';
-import {to_action_message_type} from '$lib/action_helpers.js';
-import {Action_Method} from '$lib/action_metatypes.js';
-
-export const jsonrpc_request_to_action_message = (
-	message: JSONRPCRequest | JSONRPCNotification,
-): Action_Message_Base =>
-	Action_Message_Base.parse({
-		id: 'id' in message ? message.id : undefined,
-		type: to_action_message_type(Action_Method.parse(message.method), 'request'),
-		method: message.method,
-		params: message.params,
-	});
 
 /**
  * Handler for processing JSON-RPC requests

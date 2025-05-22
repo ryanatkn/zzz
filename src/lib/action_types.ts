@@ -1,18 +1,39 @@
 import {z} from 'zod';
 
-import {Any, Uuid} from '$lib/zod_helpers.js';
+import {Any, Datetime_Now, Uuid, Uuid_With_Default} from '$lib/zod_helpers.js';
 import {Completion_Response, Completion_Request} from '$lib/completion_types.js';
 import {Action_Message_Type, Action_Method} from '$lib/action_metatypes.js';
 import {Diskfile_Change, Diskfile_Path, Serializable_Source_File} from '$lib/diskfile_types.js';
 import {Cell_Json} from '$lib/cell_types.js';
-import {Action_Kind} from '$lib/action_spec.js';
+import {JSONRPCRequestId} from '$lib/jsonrpc.js';
+
+// TODO rethink the naming convention using `_Base`, consider changing the union to `_Type` or `_Union` or something
+/**
+ * Base schema for all actions with common properties.
+ *
+ * Similar to `Cell` but omits `updated` because they're typically immutable.
+ */
+export const Action_Message_Base = z
+	.object({
+		id: Uuid_With_Default, // TODO this means we're trusting client ids, revisit, also probably don't want a default here so we get parse errors
+		created: Datetime_Now, // TODO like with id, probably dont want a default on the base schema like this
+		type: Action_Message_Type,
+		method: Action_Method,
+		jsonrpc_message_id: JSONRPCRequestId.nullable(),
+	})
+	.passthrough(); // TODO is this a good/safe pattern for base schemas? we're doing this so we can parse loosely sometimes, but see too how the Uuid has a fallback
+export type Action_Message_Base = z.infer<typeof Action_Message_Base>;
+
+export const Action_Kind = z.enum(['request_response', 'server_notification', 'client_local']);
+export type Action_Kind = z.infer<typeof Action_Kind>;
 
 export const Action_Json = Cell_Json.extend({
 	type: Action_Message_Type,
 	method: Action_Method,
 	params: Any.optional(),
-	kind: Action_Kind,
-	// Optional fields with proper type checking
+	kind: Action_Kind, // TODO BLOCK doesn't belong here, can be looked up from the method or type
+	jsonrpc_message_id: JSONRPCRequestId.nullable(),
+	// TODO BLOCK this is hacky, maybe just a generic `params: Any`?
 	ping_id: Uuid.optional(),
 	completion_request: Completion_Request.optional(),
 	completion_response: Completion_Response.optional(),

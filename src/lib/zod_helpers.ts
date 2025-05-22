@@ -4,6 +4,7 @@ import {SvelteMap} from 'svelte/reactivity';
 import {ensure_end, ensure_start, strip_end, strip_start} from '@ryanatkn/belt/string.js';
 
 export const Any = z.any();
+export type Any = z.infer<typeof Any>;
 
 export const Type_Literal = z.string().min(1).brand('Type_Literal');
 export type Type_Literal = z.infer<typeof Type_Literal>;

@@ -924,6 +924,7 @@ export const src_json = {
 				{name: 'to_action_message', kind: 'function'},
 				{name: 'to_action_request_message_type', kind: 'function'},
 				{name: 'to_action_response_message_type', kind: 'function'},
+				{name: 'jsonrpc_request_to_action_message', kind: 'function'},
 			],
 		},
 		'./Action_List.svelte': {
@@ -962,8 +963,6 @@ export const src_json = {
 		'./action_spec.js': {
 			path: 'action_spec.ts',
 			declarations: [
-				{name: 'Action_Message_Base', kind: 'variable'},
-				{name: 'Action_Kind', kind: 'variable'},
 				{name: 'Action_Spec_Base', kind: 'variable'},
 				{name: 'Request_Response_Action_Spec', kind: 'variable'},
 				{name: 'Server_Notification_Action_Spec', kind: 'variable'},
@@ -989,6 +988,8 @@ export const src_json = {
 		'./action_types.js': {
 			path: 'action_types.ts',
 			declarations: [
+				{name: 'Action_Message_Base', kind: 'variable'},
+				{name: 'Action_Kind', kind: 'variable'},
 				{name: 'Action_Json', kind: 'variable'},
 				{name: 'Action_Json_Input', kind: 'type'},
 			],
@@ -1349,6 +1350,7 @@ export const src_json = {
 				{name: 'SERVER_PROXIED_PORT', kind: 'variable'},
 				{name: 'SERVER_URL', kind: 'variable'},
 				{name: 'ZZZ_DIRNAME', kind: 'variable'},
+				{name: 'ZZZ_DIR', kind: 'variable'},
 				{name: 'CONTENT_PREVIEW_LENGTH', kind: 'variable'},
 				{name: 'API_PATH', kind: 'variable'},
 				{name: 'API_URL', kind: 'variable'},
@@ -1725,8 +1727,11 @@ export const src_json = {
 				{name: 'JSONRPC_INVALID_PARAMS', kind: 'variable'},
 				{name: 'JSONRPC_INTERNAL_ERROR', kind: 'variable'},
 				{name: 'JSONRPCBatchRequest', kind: 'variable'},
+				{name: 'JSONRPCSingularResponse', kind: 'variable'},
 				{name: 'JSONRPCBatchResponse', kind: 'variable'},
 				{name: 'JSONRPCMessage', kind: 'variable'},
+				{name: 'JSONRPCMessageFromClientToServer', kind: 'variable'},
+				{name: 'JSONRPCMessageFromServerToClient', kind: 'variable'},
 			],
 		},
 		'./list_helpers.js': {
@@ -2064,7 +2069,6 @@ export const src_json = {
 		'./server/jsonrpc_server_helpers.js': {
 			path: 'server/jsonrpc_server_helpers.ts',
 			declarations: [
-				{name: 'jsonrpc_request_to_action_message', kind: 'function'},
 				{name: 'Jsonrpc_Request_Handler', kind: 'type'},
 				{name: 'Jsonrpc_Notification_Handler', kind: 'type'},
 				{name: 'Handle_Jsonrpc_Request_Options', kind: 'type'},

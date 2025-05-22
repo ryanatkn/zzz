@@ -17,7 +17,7 @@ import type {Action_Method} from '$lib/action_metatypes.js';
 import type {Api_Request_Response_Flag} from '$lib/api.js';
 
 /**
- * Outputs a file with action types that can be imported from anywhere with no runtime cost.
+ * Outputs a file with generated types and schemas using the action specs as the source of truth.
  */
 export const gen: Gen = ({origin_path}) => {
 	const registry = new Action_Registry(action_specs);
@@ -31,6 +31,7 @@ export const gen: Gen = ({origin_path}) => {
 		// ${banner}
 
 		import {z} from 'zod';
+
 		import type {Api_Result} from '$lib/api.js';
 		import type {Mutation} from '$lib/mutation.js';
 		import type {${schema_imports.join(', ')}} from '$lib/action_specs.js';

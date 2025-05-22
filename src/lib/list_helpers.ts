@@ -37,7 +37,6 @@ export const to_reordered_list = <T>(
 
 	const item_moved = items[from_index];
 
-	// Create a new array with the reordered items using slices
 	if (from_index < to_index) {
 		// Moving forward: take slices before and after the move, skipping the moved item
 		return [

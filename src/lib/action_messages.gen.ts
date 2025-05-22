@@ -13,8 +13,8 @@ import {
 } from '$lib/action_helpers.js';
 
 /**
- * Outputs a file with action schema definitions that can be imported by other modules.
- * This separates schema definitions from their usage in collections.
+ * Outputs a file with action message schema definitions that can be imported by other modules.
+ * This is separate from `action_metatypes.gen.ts` to avoid circular dependencies.
  */
 export const gen: Gen = ({origin_path}) => {
 	const registry = new Action_Registry(action_specs);
@@ -26,7 +26,7 @@ export const gen: Gen = ({origin_path}) => {
 
 		import {z} from 'zod';
 
-		import {Action_Message_Base} from '$lib/action_spec.js';
+		import {Action_Message_Base} from '$lib/action_types.js';
 		import {${registry.specs
 			// TODO maybe change to `import * as specs`
 			.map((spec) => to_action_spec_identifier(spec.method))

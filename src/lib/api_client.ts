@@ -7,7 +7,15 @@ import {
 	Websocket_Rpc_Transport,
 	type Transport_Type,
 } from '$lib/transports.js';
-import type {JSONRPCRequest} from '$lib/jsonrpc.js';
+import type {
+	JSONRPCBatchRequest,
+	JSONRPCBatchResponse,
+	JSONRPCMessageFromClientToServer,
+	JSONRPCMessageFromServerToClient,
+	JSONRPCNotification,
+	JSONRPCRequest,
+	JSONRPCSingularResponse,
+} from '$lib/jsonrpc.js';
 import type {Api_Result} from '$lib/api.js';
 
 // TODO support canceling
@@ -54,16 +62,30 @@ export class Api_Client {
 	}
 
 	/**
-	 * Send an action to the server and get a response.
+	 * Send a message to the server and get a response.
 	 */
-	async send<T = any>(
-		request: JSONRPCRequest,
+	async send(
+		message: JSONRPCRequest,
 		transport_type?: Transport_Type,
-	): Promise<Api_Result<T>> {
-		// Send the request
+	): Promise<Api_Result<JSONRPCSingularResponse>>;
+	async send(
+		message: JSONRPCNotification,
+		transport_type?: Transport_Type,
+	): Promise<Api_Result<null>>;
+	async send(
+		message: JSONRPCBatchRequest,
+		transport_type?: Transport_Type,
+	): Promise<Api_Result<JSONRPCBatchResponse>>;
+	async send(
+		message: JSONRPCMessageFromClientToServer,
+		transport_type?: Transport_Type,
+	): Promise<Api_Result<JSONRPCMessageFromServerToClient | null>> {
 		const transport = this.transports.get_or_throw(transport_type);
-		const result = await transport.send(request);
-		console.log(`[api_client.send]`, transport.type, result);
+		console.log(`[api_client.send] sending`, transport.type, message);
+
+		const result = await transport.send(message);
+		console.log(`[api_client.send] received`, result);
+
 		return result;
 	}
 }

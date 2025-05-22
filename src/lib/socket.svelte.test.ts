@@ -1,3 +1,5 @@
+// @slop
+
 // @vitest-environment jsdom
 
 import {beforeEach, describe, test, expect, vi, afterEach} from 'vitest';

@@ -1,5 +1,5 @@
 import type {Action_Method} from '$lib/action_metatypes.js';
-import type {Action_Kind} from '$lib/action_spec.js';
+import type {Action_Kind} from '$lib/action_types.js';
 
 export const GLYPH_UNKNOWN = '⁇'; // ⍰
 export const GLYPH_IMPORTANT = '⁈';

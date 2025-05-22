@@ -1,31 +1,9 @@
 import {z} from 'zod';
 
-import {Uuid_With_Default, Datetime_Now, Type_Literal} from '$lib/zod_helpers.js';
+import {Type_Literal} from '$lib/zod_helpers.js';
 import type {Http_Method} from '$lib/api.js';
-import {Action_Method, Action_Message_Type} from '$lib/action_metatypes.js';
-
-/**
- * Centralized definitions for core action structures.
- * This module defines the core types and structures for the action system.
- */
-
-/**
- * Base schema for all actions with common properties.
- *
- * Similar to `Cell` but omits `updated` because they're typically immutable.
- */
-export const Action_Message_Base = z
-	.object({
-		id: Uuid_With_Default, // TODO this means we're trusting client ids, revisit, also probably don't want a default here so we get parse errors
-		created: Datetime_Now, // TODO like with id, probably dont want a default on the base schema like this
-		type: Action_Message_Type,
-		method: Action_Method,
-	})
-	.passthrough(); // TODO is this a good/safe pattern for base schemas? we're doing this so we can parse loosely sometimes, but see too how the Uuid has a fallback
-export type Action_Message_Base = z.infer<typeof Action_Message_Base>;
-
-export const Action_Kind = z.enum(['request_response', 'server_notification', 'client_local']);
-export type Action_Kind = z.infer<typeof Action_Kind>;
+import {Action_Method} from '$lib/action_metatypes.js';
+import {Action_Kind} from '$lib/action_types.js';
 
 export const Action_Spec_Base = z.object({
 	method: Action_Method,

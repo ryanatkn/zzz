@@ -35,7 +35,7 @@ export const create_actions_api = (zzz: Zzz): Actions_Api =>
 				action_message: Action_Message_Any,
 				jsonrpc_message: JSONRPCRequest | JSONRPCNotification | null,
 			) => {
-				console.log('\n\n\n\n\n\n\n\nmutate', method, result, request_response_flag);
+				console.log('\n\n\n\n\n\n\n\n[actions_api] mutate', method, result, request_response_flag);
 				const {ctx, flush_after_mutation} = create_mutation_context(
 					zzz,
 					method,
@@ -45,8 +45,8 @@ export const create_actions_api = (zzz: Zzz): Actions_Api =>
 					action_message,
 					jsonrpc_message,
 				);
-				console.log(`message_type`, ctx.action_message.type);
-				console.log(`ctx`, ctx);
+				console.log(`[actions_api] message_type`, ctx.action_message.type);
+				console.log(`[actions_api] ctx`, ctx);
 
 				const mutation = zzz.mutations[ctx.action_message.type];
 				if (!mutation) {
@@ -74,16 +74,16 @@ export const create_actions_api = (zzz: Zzz): Actions_Api =>
 				request_jsonrpc_message,
 			);
 			zzz.actions.add_message(request_action_message);
-			console.log(`action_message`, request_action_message);
+			console.log(`[actions_api] request_action_message`, request_action_message);
 
-			// Request-response actions have special handling,
+			// `request_response` actions have special handling,
 			// each such method has a `_request` and `_response` type variant.
 			if (spec.kind === 'request_response') {
 				mutate(null, 'request', request_action_message, request_jsonrpc_message);
 
 				// Avoiding `await` for compatibility with sync actions
 				return zzz.api_client.send(request_jsonrpc_message).then((result) => {
-					console.log(`result`, result);
+					console.log(`[actions_api] result`, result);
 					if (!result.ok) {
 						// TODO handle error correctly
 						console.error(`API CLIENT error`, result);
@@ -91,22 +91,25 @@ export const create_actions_api = (zzz: Zzz): Actions_Api =>
 					}
 					const response_jsonrpc_message = result.value;
 					const response_action_message_type = to_action_message_type(method, 'response');
-					console.log(`response_action_message_type`, response_action_message_type);
-					console.log(`response_jsonrpc_message.result`, response_jsonrpc_message.result);
-					console.log(`response_jsonrpc_message`, response_jsonrpc_message);
+					console.log(`[actions_api] response_action_message_type`, response_action_message_type);
+					console.log(
+						`[actions_api] response_jsonrpc_message.result`,
+						response_jsonrpc_message.result,
+					);
+					console.log(`[actions_api] response_jsonrpc_message`, response_jsonrpc_message);
 					const response_action_message = to_action_message(
 						response_action_message_type,
 						response_jsonrpc_message.result as unknown as any, // TODO type
 						response_jsonrpc_message,
 					);
-					console.log(`response_action_message`, response_action_message);
+					console.log(`[actions_api] response_action_message`, response_action_message);
 					zzz.actions.add_message(response_action_message);
 
 					mutate(result, 'response', response_action_message, response_jsonrpc_message);
 				});
 			}
 
-			// Handle non-request-response actions synchronously
+			// Handle non-`request_response` actions synchronously
 			return mutate(null, null, request_action_message, request_jsonrpc_message);
 		},
 	});

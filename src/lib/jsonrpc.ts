@@ -166,7 +166,13 @@ export type JSONRPCBatchRequest = z.infer<typeof JSONRPCBatchRequest>;
 /**
  * A JSON-RPC batch response, as described in https://www.jsonrpc.org/specification#batch.
  */
-export const JSONRPCBatchResponse = z.array(z.union([JSONRPCResponse, JSONRPCError]));
+export const JSONRPCSingularResponse = z.union([JSONRPCResponse, JSONRPCError]);
+export type JSONRPCSingularResponse = z.infer<typeof JSONRPCSingularResponse>;
+
+/**
+ * A JSON-RPC batch response, as described in https://www.jsonrpc.org/specification#batch.
+ */
+export const JSONRPCBatchResponse = z.array(JSONRPCSingularResponse);
 export type JSONRPCBatchResponse = z.infer<typeof JSONRPCBatchResponse>;
 
 /**
@@ -181,3 +187,18 @@ export const JSONRPCMessage = z.union([
 	JSONRPCBatchResponse,
 ]);
 export type JSONRPCMessage = z.infer<typeof JSONRPCMessage>;
+
+export const JSONRPCMessageFromClientToServer = z.union([
+	JSONRPCRequest,
+	JSONRPCNotification,
+	JSONRPCBatchRequest,
+]);
+export type JSONRPCMessageFromClientToServer = z.infer<typeof JSONRPCMessageFromClientToServer>;
+
+export const JSONRPCMessageFromServerToClient = z.union([
+	JSONRPCNotification,
+	JSONRPCResponse,
+	JSONRPCError,
+	JSONRPCBatchResponse,
+]);
+export type JSONRPCMessageFromServerToClient = z.infer<typeof JSONRPCMessageFromServerToClient>;

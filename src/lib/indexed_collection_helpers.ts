@@ -1,3 +1,5 @@
+// @slop
+
 import {SvelteMap} from 'svelte/reactivity';
 import {z} from 'zod';
 

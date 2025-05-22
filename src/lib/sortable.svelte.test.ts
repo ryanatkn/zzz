@@ -1,4 +1,7 @@
+// @slop
+
 // @vitest-environment jsdom
+
 import {test, expect, describe, beforeEach} from 'vitest';
 import {z} from 'zod';
 

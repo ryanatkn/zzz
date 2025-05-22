@@ -1,6 +1,14 @@
 import {z} from 'zod';
 
-import type {JSONRPCMessage} from '$lib/jsonrpc.js';
+import type {
+	JSONRPCBatchRequest,
+	JSONRPCBatchResponse,
+	JSONRPCMessageFromClientToServer,
+	JSONRPCMessageFromServerToClient,
+	JSONRPCNotification,
+	JSONRPCRequest,
+	JSONRPCSingularResponse,
+} from '$lib/jsonrpc.js';
 import type {Socket} from '$lib/socket.svelte.js';
 import {API_RESULT_UNKNOWN_ERROR, type Api_Result, type Http_Status} from '$lib/api.js';
 import {Request_Tracker} from '$lib/request_tracker.svelte.js';
@@ -13,7 +21,13 @@ export type Transport_Type = z.infer<typeof Transport_Type>;
 
 export interface Transport {
 	type: Transport_Type;
-	send: (data: JSONRPCMessage) => Promise<Api_Result>;
+	/* eslint-disable @typescript-eslint/method-signature-style */
+	send(message: JSONRPCRequest): Promise<Api_Result<JSONRPCSingularResponse>>;
+	send(message: JSONRPCNotification): Promise<Api_Result<null>>;
+	send(message: JSONRPCBatchRequest): Promise<Api_Result<JSONRPCBatchResponse>>;
+	send(
+		message: JSONRPCMessageFromClientToServer,
+	): Promise<Api_Result<JSONRPCMessageFromServerToClient | null>>;
 	is_ready: () => boolean;
 }
 
@@ -162,7 +176,12 @@ export class Websocket_Rpc_Transport implements Transport {
 		};
 	}
 
-	async send(message: JSONRPCMessage): Promise<Api_Result> {
+	async send(message: JSONRPCRequest): Promise<Api_Result<JSONRPCSingularResponse>>;
+	async send(message: JSONRPCNotification): Promise<Api_Result<null>>;
+	async send(message: JSONRPCBatchRequest): Promise<Api_Result<JSONRPCBatchResponse>>;
+	async send(
+		message: JSONRPCMessageFromClientToServer,
+	): Promise<Api_Result<JSONRPCMessageFromServerToClient | null>> {
 		console.log(`[websocket transport] data`, message);
 		if (!this.is_ready()) {
 			throw new Error('WebSocket not connected');
@@ -216,13 +235,18 @@ export class Http_Rpc_Transport implements Transport {
 		this.#headers = headers ?? {'content-type': 'application/json', accept: 'application/json'};
 	}
 
-	async send(data: JSONRPCMessage): Promise<Api_Result> {
-		console.log(`[http transport] data`, data);
+	async send(message: JSONRPCRequest): Promise<Api_Result<JSONRPCSingularResponse>>;
+	async send(message: JSONRPCNotification): Promise<Api_Result<null>>;
+	async send(message: JSONRPCBatchRequest): Promise<Api_Result<JSONRPCBatchResponse>>;
+	async send(
+		message: JSONRPCMessageFromClientToServer,
+	): Promise<Api_Result<JSONRPCMessageFromServerToClient | null>> {
+		console.log(`[http transport] message`, message);
 		try {
 			const response = await fetch(this.#url, {
 				method: 'POST', // TODO support GET
 				headers: this.#headers,
-				body: JSON.stringify(data),
+				body: JSON.stringify(message),
 				// TODO
 				// signal: AbortSignal.timeout(REQUEST_TIMEOUT),
 			});

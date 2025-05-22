@@ -64,8 +64,9 @@ export const Bit_Json = z.discriminatedUnion('type', [
 export type Bit_Json = z.infer<typeof Bit_Json>;
 export type Bit_Json_Input = z.input<typeof Bit_Json>;
 
-// Define a type union of all concrete bit classes
+/** Type union of all concrete bit classes.  */
 export type Bit_Type = Text_Bit | Diskfile_Bit | Sequence_Bit;
+/** Type union of all concrete bit json types.  */
 export type Bit_Json_Type = Text_Bit_Json | Diskfile_Bit_Json | Sequence_Bit_Json;
 
 // Base options interface - fixed to properly constrain the type parameter

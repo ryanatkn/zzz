@@ -1,6 +1,8 @@
 import type {Zzz} from '$lib/zzz.svelte.js';
 import type {Diskfile_Path} from '$lib/diskfile_types.js';
 
+// TODO these aren't used, should they be for improved type safety?
+
 /**
  * Vitest's `expects` does not narrow types, this does for falsy values.
  *

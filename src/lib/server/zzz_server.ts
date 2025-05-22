@@ -4,7 +4,7 @@ import {resolve} from 'node:path';
 import {Logger} from '@ryanatkn/belt/log.js';
 import {DEV} from 'esm-env';
 
-import {Action_Message_Base, type Action_Spec} from '$lib/action_spec.js';
+import type {Action_Spec} from '$lib/action_spec.js';
 import {
 	Action_Message_From_Client,
 	action_spec_by_method,
@@ -17,7 +17,11 @@ import {Action_Registry} from '$lib/action_registry.js';
 import type {Service_Return} from '$lib/server/service.js';
 import {Api_Error} from '$lib/api.js';
 import {stringify_zod_error} from '$lib/zod_helpers.js';
-import {lookup_request_action_schema, lookup_response_action_schema} from '$lib/action_helpers.js';
+import {
+	jsonrpc_request_to_action_message,
+	lookup_request_action_schema,
+	lookup_response_action_schema,
+} from '$lib/action_helpers.js';
 import {
 	type JSONRPCRequest,
 	type JSONRPCResponse,
@@ -25,11 +29,9 @@ import {
 	type JSONRPCNotification,
 	JSONRPC_VERSION,
 } from '$lib/jsonrpc.js';
-import {
-	handle_jsonrpc_request,
-	jsonrpc_request_to_action_message,
-} from '$lib/server/jsonrpc_server_helpers.js';
+import {handle_jsonrpc_request} from '$lib/server/jsonrpc_server_helpers.js';
 import {create_jsonrpc_error} from '$lib/jsonrpc_helpers.js';
+import type {Action_Message_Base} from '$lib/action_types.js';
 
 /**
  * Function type for handling client messages.
@@ -164,6 +166,7 @@ export class Zzz_Server {
 						return {
 							jsonrpc: JSONRPC_VERSION,
 							id: request.id,
+							// TODO BLOCK service_return.status -- maybe `result` is an `Api_Result`?
 							result: service_return.value,
 						};
 					} else {

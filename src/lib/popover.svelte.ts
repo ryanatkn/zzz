@@ -1,3 +1,5 @@
+// @slop
+
 import type {Action} from 'svelte/action';
 import type {Snippet} from 'svelte';
 import {on} from 'svelte/events';

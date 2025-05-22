@@ -10,12 +10,12 @@ import {
 
 /**
  * Outputs a file with action collection types that can be imported by schemas.ts.
- * This is separate from action_metatypes.gen.ts to avoid circular dependencies.
+ * This is separate from `action_metatypes.gen.ts` to avoid circular dependencies.
  */
 export const gen: Gen = ({origin_path}) => {
 	const registry = new Action_Registry(action_specs);
 
-	// TODO these are broken/hacky
+	// TODO hacky
 	const {
 		client_methods,
 		networked_methods,

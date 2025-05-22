@@ -5,7 +5,6 @@ import {BROWSER} from 'esm-env';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
 
-// Define minimal JSON schema for Time - no persistent state needed
 export const Time_Json = Cell_Json.extend({});
 export type Time_Json = z.infer<typeof Time_Json>;
 export type Time_Json_Input = z.input<typeof Time_Json>;

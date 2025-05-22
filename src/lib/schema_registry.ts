@@ -1,3 +1,5 @@
+// @slop
+
 import type {z} from 'zod';
 import type {Flavored} from '@ryanatkn/belt/types.js';
 import {Unreachable_Error} from '@ryanatkn/belt/error.js';

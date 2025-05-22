@@ -2,7 +2,7 @@
 
 import {z} from 'zod';
 
-import {Action_Message_Base} from '$lib/action_spec.js';
+import {Action_Message_Base} from '$lib/action_types.js';
 import {
 	create_directory_action_spec,
 	delete_diskfile_action_spec,

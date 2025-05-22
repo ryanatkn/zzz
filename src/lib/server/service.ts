@@ -7,6 +7,11 @@ import {
 	type Http_Status,
 } from '$lib/api.js';
 
+// TODO rename from service to something else, probably --
+// actions have mutations on the client,
+// on the server they're currently called services,
+// but they're basically just handlers
+
 /**
  * Return type for services.
  */

@@ -1,7 +1,7 @@
 import type {z} from 'zod';
 
 import {Action_Message_Any, action_spec_by_method} from '$lib/action_collections.js';
-import type {Action_Json} from '$lib/action_types.js';
+import {Action_Message_Base, type Action_Json} from '$lib/action_types.js';
 import {Action_Message} from '$lib/action_messages.js';
 import {
 	Action_Message_Type,
@@ -59,10 +59,8 @@ export const to_action_message = <T extends Action_Message_Type>(
 	jsonrpc_message: JSONRPCRequest | JSONRPCNotification | null, // TODO maybe store this on the action message?
 ): Action_Message_Any =>
 	Action_Message[action_message_type].parse({
-		// Actions copy the jsonrpc id if available -- they're just different representations
-		// of the same thing in different contexts
-		id: jsonrpc_message && 'id' in jsonrpc_message ? jsonrpc_message.id : undefined,
 		params,
+		jsonrpc_message_id: jsonrpc_message && 'id' in jsonrpc_message ? jsonrpc_message.id : null,
 	});
 
 export const to_action_request_message_type = (method: Action_Method): Action_Message_Type =>
@@ -70,3 +68,13 @@ export const to_action_request_message_type = (method: Action_Method): Action_Me
 
 export const to_action_response_message_type = (method: Action_Method): Action_Message_Type =>
 	Action_Message_Type.parse(method + '_response');
+
+export const jsonrpc_request_to_action_message = (
+	message: JSONRPCRequest | JSONRPCNotification,
+): Action_Message_Base =>
+	Action_Message_Base.parse({
+		type: to_action_message_type(Action_Method.parse(message.method), 'request'),
+		method: message.method,
+		jsonrpc_message_id: 'id' in message ? message.id : null,
+		params: message.params,
+	});

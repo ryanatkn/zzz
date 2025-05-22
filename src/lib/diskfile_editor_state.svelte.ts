@@ -1,3 +1,5 @@
+// @slop
+
 import {estimate_token_count} from '$lib/helpers.js';
 import type {Diskfile} from '$lib/diskfile.svelte.js';
 import type {Diskfile_Path} from '$lib/diskfile_types.js';
