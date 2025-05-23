@@ -7,7 +7,7 @@ import {Diskfile_Change, Diskfile_Path, Serializable_Source_File} from '$lib/dis
 import {Cell_Json} from '$lib/cell_types.js';
 import {JSONRPCRequestId} from '$lib/jsonrpc.js';
 
-// TODO rethink the naming convention using `_Base`, consider changing the union to `_Type` or `_Union` or something
+// TODO BLOCK Action_Message and Action_Message_Json? but not cells?
 /**
  * Base schema for all actions with common properties.
  *
