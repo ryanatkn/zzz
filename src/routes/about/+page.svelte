@@ -138,7 +138,7 @@
 				<External_Link href="https://svelte.dev/">SvelteKit</External_Link> and <External_Link
 					href="https://vite.dev/">Vite</External_Link
 				>, plays a key coordinating role - Hono bases itself on web standards and supports all JS
-				runtimes
+				server runtimes
 			</li>
 			<li>
 				Planned:
