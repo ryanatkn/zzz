@@ -41,13 +41,13 @@ export const gen: Gen = ({origin_path}) => {
 			);
 
 			if (!is_request_response) {
-				v += `Action_Message.${method},`;
+				v += `Action_Messages.${method},`;
 			} else {
 				if (include_request_response === 'request' || include_request_response === 'both') {
-					v += `Action_Message.${to_action_request_message_type(method)},`;
+					v += `Action_Messages.${to_action_request_message_type(method)},`;
 				}
 				if (include_request_response === 'response' || include_request_response === 'both') {
-					v += `Action_Message.${to_action_response_message_type(method)},`;
+					v += `Action_Messages.${to_action_response_message_type(method)},`;
 				}
 			}
 		}
@@ -61,7 +61,7 @@ export const gen: Gen = ({origin_path}) => {
 		import {z} from 'zod';
 
 		import {type Action_Spec, collect_action_specs_by_method} from '$lib/action_spec.js';
-		import {Action_Message} from '$lib/action_messages.js';
+		import {Action_Messages} from '$lib/action_messages.js';
 		import * as action_spec_module from '$lib/action_specs.js';
 		import type {Action_Method} from '$lib/action_metatypes.js';
 
@@ -105,13 +105,14 @@ export const gen: Gen = ({origin_path}) => {
 		]);
 		export type Action_Method_Nonnetworked = z.infer<typeof Action_Method_Nonnetworked>;
 
+		// TODO is \`_Variant\` a better name than \`_Union\`? something else?
 		/**
 		 * All action types combined.
 		 */
-		export const Action_Message_Any = z.discriminatedUnion('type', [
+		export const Action_Message_Union = z.discriminatedUnion('type', [
 			${get_action_messages(all_methods, 'both')}
 		]);
-		export type Action_Message_Any = z.infer<typeof Action_Message_Any>;
+		export type Action_Message_Union = z.infer<typeof Action_Message_Union>;
 
 		/**
 		 * Set of actions with "from_client" direction (originating from client).

@@ -3,7 +3,7 @@
 import {z} from 'zod';
 
 import {type Action_Spec, collect_action_specs_by_method} from '$lib/action_spec.js';
-import {Action_Message} from '$lib/action_messages.js';
+import {Action_Messages} from '$lib/action_messages.js';
 import * as action_spec_module from '$lib/action_specs.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
 
@@ -68,37 +68,38 @@ export type Action_Method_Networked = z.infer<typeof Action_Method_Networked>;
 export const Action_Method_Nonnetworked = z.enum(['filer_change']);
 export type Action_Method_Nonnetworked = z.infer<typeof Action_Method_Nonnetworked>;
 
+// TODO is `_Variant` a better name than `_Union`? something else?
 /**
  * All action types combined.
  */
-export const Action_Message_Any = z.discriminatedUnion('type', [
-	Action_Message.toggle_main_menu,
-	Action_Message.create_directory_request,
-	Action_Message.create_directory_response,
-	Action_Message.delete_diskfile_request,
-	Action_Message.delete_diskfile_response,
-	Action_Message.load_session_request,
-	Action_Message.load_session_response,
-	Action_Message.ping_request,
-	Action_Message.ping_response,
-	Action_Message.submit_completion_request,
-	Action_Message.submit_completion_response,
-	Action_Message.update_diskfile_request,
-	Action_Message.update_diskfile_response,
-	Action_Message.filer_change,
+export const Action_Message_Union = z.discriminatedUnion('type', [
+	Action_Messages.toggle_main_menu,
+	Action_Messages.create_directory_request,
+	Action_Messages.create_directory_response,
+	Action_Messages.delete_diskfile_request,
+	Action_Messages.delete_diskfile_response,
+	Action_Messages.load_session_request,
+	Action_Messages.load_session_response,
+	Action_Messages.ping_request,
+	Action_Messages.ping_response,
+	Action_Messages.submit_completion_request,
+	Action_Messages.submit_completion_response,
+	Action_Messages.update_diskfile_request,
+	Action_Messages.update_diskfile_response,
+	Action_Messages.filer_change,
 ]);
-export type Action_Message_Any = z.infer<typeof Action_Message_Any>;
+export type Action_Message_Union = z.infer<typeof Action_Message_Union>;
 
 /**
  * Set of actions with "from_client" direction (originating from client).
  */
 export const Action_Message_From_Client = z.discriminatedUnion('type', [
-	Action_Message.create_directory_request,
-	Action_Message.delete_diskfile_request,
-	Action_Message.load_session_request,
-	Action_Message.ping_request,
-	Action_Message.submit_completion_request,
-	Action_Message.update_diskfile_request,
+	Action_Messages.create_directory_request,
+	Action_Messages.delete_diskfile_request,
+	Action_Messages.load_session_request,
+	Action_Messages.ping_request,
+	Action_Messages.submit_completion_request,
+	Action_Messages.update_diskfile_request,
 ]);
 export type Action_Message_From_Client = z.infer<typeof Action_Message_From_Client>;
 
@@ -106,13 +107,13 @@ export type Action_Message_From_Client = z.infer<typeof Action_Message_From_Clie
  * Set of actions with "from_server" direction (originating from server).
  */
 export const Action_Message_From_Server = z.discriminatedUnion('type', [
-	Action_Message.create_directory_response,
-	Action_Message.delete_diskfile_response,
-	Action_Message.load_session_response,
-	Action_Message.ping_response,
-	Action_Message.submit_completion_response,
-	Action_Message.update_diskfile_response,
-	Action_Message.filer_change,
+	Action_Messages.create_directory_response,
+	Action_Messages.delete_diskfile_response,
+	Action_Messages.load_session_response,
+	Action_Messages.ping_response,
+	Action_Messages.submit_completion_response,
+	Action_Messages.update_diskfile_response,
+	Action_Messages.filer_change,
 ]);
 export type Action_Message_From_Server = z.infer<typeof Action_Message_From_Server>;
 
@@ -120,18 +121,18 @@ export type Action_Message_From_Server = z.infer<typeof Action_Message_From_Serv
  * Service actions with HTTP endpoints (networked).
  */
 export const Action_Message_Networked = z.discriminatedUnion('type', [
-	Action_Message.create_directory_request,
-	Action_Message.create_directory_response,
-	Action_Message.delete_diskfile_request,
-	Action_Message.delete_diskfile_response,
-	Action_Message.load_session_request,
-	Action_Message.load_session_response,
-	Action_Message.ping_request,
-	Action_Message.ping_response,
-	Action_Message.submit_completion_request,
-	Action_Message.submit_completion_response,
-	Action_Message.update_diskfile_request,
-	Action_Message.update_diskfile_response,
+	Action_Messages.create_directory_request,
+	Action_Messages.create_directory_response,
+	Action_Messages.delete_diskfile_request,
+	Action_Messages.delete_diskfile_response,
+	Action_Messages.load_session_request,
+	Action_Messages.load_session_response,
+	Action_Messages.ping_request,
+	Action_Messages.ping_response,
+	Action_Messages.submit_completion_request,
+	Action_Messages.submit_completion_response,
+	Action_Messages.update_diskfile_request,
+	Action_Messages.update_diskfile_response,
 ]);
 export type Action_Message_Networked = z.infer<typeof Action_Message_Networked>;
 
@@ -139,7 +140,7 @@ export type Action_Message_Networked = z.infer<typeof Action_Message_Networked>;
  * Service actions without HTTP endpoints (non-networked).
  */
 export const Action_Message_Nonnetworked = z.discriminatedUnion('type', [
-	Action_Message.filer_change,
+	Action_Messages.filer_change,
 ]);
 export type Action_Message_Nonnetworked = z.infer<typeof Action_Message_Nonnetworked>;
 

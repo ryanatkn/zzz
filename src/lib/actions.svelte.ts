@@ -5,7 +5,7 @@ import {Action, Action_Schema} from '$lib/action.svelte.js';
 import {Action_Json} from '$lib/action_types.js';
 import {create_action_json} from '$lib/action_helpers.js';
 import {Action_Method} from '$lib/action_metatypes.js';
-import type {Action_Message_Any} from '$lib/action_collections.js';
+import type {Action_Message_Union} from '$lib/action_collections.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {create_multi_index} from '$lib/indexed_collection_helpers.js';
@@ -84,7 +84,7 @@ export class Actions extends Cell<typeof Actions_Json> {
 		this.#trim_to_history_limit(); // TODO should be unnecessary to override `set_json` for this
 	}
 
-	add_message(message: Action_Message_Any): void {
+	add_message(message: Action_Message_Union): void {
 		const action_json = create_action_json(message);
 		if (!action_json) throw new Error(`Invalid action: ${message.method}`);
 		this.add_json(action_json);

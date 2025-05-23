@@ -7,7 +7,7 @@ import {render_tape_to_string, render_completion_messages} from '$lib/tape_helpe
 import type {Bit_Type} from '$lib/bit.svelte.js';
 import {HANDLED} from '$lib/cell_helpers.js';
 import {to_completion_response_text} from '$lib/response_helpers.js';
-import {Action_Message} from '$lib/action_messages.js';
+import {Action_Messages} from '$lib/action_messages.js';
 import {to_preview, estimate_token_count} from '$lib/helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import type {Uuid} from '$lib/zod_helpers.js';
@@ -66,7 +66,7 @@ export class Tape extends Cell<typeof Tape_Json> {
 	/**
 	 * Create and add a user strip with the given content.
 	 */
-	add_user_strip(content: string, request?: Action_Message['submit_completion_request']): Strip {
+	add_user_strip(content: string, request?: Action_Messages['submit_completion_request']): Strip {
 		const strip = create_strip_from_text(content, 'user', {tape_id: this.id, request}, this.zzz);
 		this.add_strip(strip);
 		return strip;
@@ -77,7 +77,7 @@ export class Tape extends Cell<typeof Tape_Json> {
 	 */
 	add_assistant_strip(
 		content: string,
-		response?: Action_Message['submit_completion_response'],
+		response?: Action_Messages['submit_completion_response'],
 	): Strip {
 		const strip = create_strip_from_text(
 			content,

@@ -13,7 +13,7 @@ export const fake_sites = {
 				</header>
 				<section style="width: 300px">
 					<p>Zzz is an ambitious concept and I don't know what could come of it. Maybe it remains a portfolio item that helps me get a job building similar things, or maybe it'll get traction with some enthusiasts to validate my continued work. I'm applying to some grants, so that should be helpful feedback one way or the other.</p>
-					<p>I can say for certain I won't raise VC or change it from being a permissively licensed open source project.</p>
+					<p>I can say for certain I won't raise VC or change it from being a permissively licensed open source project. I'm sympathetic to copyleft but I feel this is the better way, for me, to make better software that's useful to more people.</p>
 					<p>In terms of roadmap, I plan to work on the browser functionality sometime after the sites proof of concept with basic IDE/CMS features, so it'll be a while.</p>
 					<p>Head over to <a href="https://github.com/ryanatkn/zzz" target="_blank" rel="noopener">GitHub</a> to learn more.</p>
 				</section>

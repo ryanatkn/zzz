@@ -1,8 +1,8 @@
 import type {z} from 'zod';
 
-import {Action_Message_Any, action_spec_by_method} from '$lib/action_collections.js';
+import {Action_Message_Union, action_spec_by_method} from '$lib/action_collections.js';
 import {Action_Message_Base, type Action_Json} from '$lib/action_types.js';
-import {Action_Message} from '$lib/action_messages.js';
+import {Action_Messages} from '$lib/action_messages.js';
 import {
 	Action_Message_Type,
 	Action_Method,
@@ -22,7 +22,7 @@ export const ACTION_DATE_FORMAT = 'MMM d, p';
 export const ACTION_TIME_FORMAT = 'p';
 
 // Helper function to convert an action to its json representation
-export const create_action_json = (action: Action_Message_Any): Action_Json | null => {
+export const create_action_json = (action: Action_Message_Union): Action_Json | null => {
 	const spec = action_spec_by_method.get(action.method);
 	if (!spec) {
 		console.error(`No action spec found for method: ${action.method}`, action);
@@ -38,14 +38,14 @@ export const create_action_json = (action: Action_Message_Any): Action_Json | nu
 // TODO some hacky types but looks correct
 export const lookup_request_action_schema = (
 	method: Action_Method,
-): z.ZodType<Action_Message_Any> | undefined =>
-	Action_Message[to_action_request_message_type(method)] as any;
+): z.ZodType<Action_Message_Union> | undefined =>
+	Action_Messages[to_action_request_message_type(method)] as any;
 
 // TODO some hacky types but looks correct
 export const lookup_response_action_schema = (
 	method: Action_Method,
-): z.ZodType<Action_Message_Any> | undefined =>
-	Action_Message[to_action_response_message_type(method)] as any;
+): z.ZodType<Action_Message_Union> | undefined =>
+	Action_Messages[to_action_response_message_type(method)] as any;
 
 export const to_action_message_type = (
 	method: Action_Method,
@@ -63,8 +63,8 @@ export const to_action_message = <T extends Action_Message_Type>(
 	action_message_type: T,
 	params: Action_Message_Params[T],
 	jsonrpc_message_or_id: JSONRPCRequestId | JSONRPCSingularMessage | null,
-): Action_Message_Any =>
-	Action_Message[action_message_type].parse({
+): Action_Message_Union =>
+	Action_Messages[action_message_type].parse({
 		params,
 		jsonrpc_message_id: to_jsonrpc_message_id(jsonrpc_message_or_id),
 	});

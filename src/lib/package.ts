@@ -899,7 +899,7 @@ export const src_json = {
 				{name: 'Action_Method_From_Server', kind: 'variable'},
 				{name: 'Action_Method_Networked', kind: 'variable'},
 				{name: 'Action_Method_Nonnetworked', kind: 'variable'},
-				{name: 'Action_Message_Any', kind: 'variable'},
+				{name: 'Action_Message_Union', kind: 'variable'},
 				{name: 'Action_Message_From_Client', kind: 'variable'},
 				{name: 'Action_Message_From_Server', kind: 'variable'},
 				{name: 'Action_Message_Networked', kind: 'variable'},

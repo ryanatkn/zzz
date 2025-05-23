@@ -13,7 +13,7 @@ import {format_file} from '@ryanatkn/gro/format_file.js';
 import {DEV} from 'esm-env';
 import type {Source_File} from '@ryanatkn/gro/filer.js';
 
-import {Action_Message} from '$lib/action_messages.js';
+import {Action_Messages} from '$lib/action_messages.js';
 import type {Action_Message_From_Client} from '$lib/action_collections.js';
 import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
 import {Diskfile_Path, Serializable_Source_File} from '$lib/diskfile_types.js';
@@ -203,9 +203,11 @@ export const handle_message = async (
 			}
 
 			// TODO this is currently only being created for logging/history purposes, doesn't get sent to client
-			const response_message = to_action_message('submit_completion_response', response_params, {
-				id: message.jsonrpc_message_id, // TODO BLOCK hacky
-			});
+			const response_message = to_action_message(
+				'submit_completion_response',
+				response_params,
+				message.jsonrpc_message_id,
+			);
 
 			// We don't need to wait for this to finish
 			void save_response(message, response_message, server.zzz_cache_dir, server.safe_fs);
@@ -310,8 +312,8 @@ export const handle_filer_change: Filer_Change_Handler = (
 
 // TODO @db refactor
 const save_response = async (
-	request: Action_Message['submit_completion_request'],
-	response: Action_Message['submit_completion_response'],
+	request: Action_Messages['submit_completion_request'],
+	response: Action_Messages['submit_completion_response'],
 	dir: string,
 	safe_fs: Safe_Fs,
 ): Promise<void> => {
