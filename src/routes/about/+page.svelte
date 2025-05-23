@@ -71,6 +71,16 @@
 		<p>Zzz is based on many kinds of software:</p>
 		<ul>
 			<li>
+				web browsers - planned with Chromium via Electron, ideally with swappable browser engines
+			</li>
+			<li>
+				<External_Link href="https://wikipedia.org/wiki/Content_management_system"
+					>content management systems</External_Link
+				>, so you can make and manage websites, see this <External_Link
+					href="https://wikipedia.org/wiki/List_of_content_management_systems">list</External_Link
+				>
+			</li>
+			<li>
 				AI UIs like <External_Link href="https://github.com/Mintplex-Labs/anything-llm"
 					>AnythingLLM</External_Link
 				>, <External_Link href="https://github.com/danny-avila/LibreChat">LibreChat</External_Link>,
@@ -83,16 +93,6 @@
 				tooling and system access
 			</li>
 			<li>
-				web browsers - planned with Chromium via Electron, ideally with swappable browser engines
-			</li>
-			<li>
-				<External_Link href="https://wikipedia.org/wiki/Content_management_system"
-					>content management systems</External_Link
-				>, see this <External_Link
-					href="https://wikipedia.org/wiki/List_of_content_management_systems">list</External_Link
-				>
-			</li>
-			<li>
 				code libraries and web metaframeworks using TypeScript and Svelte - Zzz extends <External_Link
 					href="https://svelte.dev/">SvelteKit</External_Link
 				> and <External_Link href="https://vite.dev/">Vite</External_Link> without wrapping them, enabling
@@ -102,19 +102,23 @@
 		<p>
 			This scope may look far-fetched, and it is to me, but I'm just making tools that I want to use
 			<em>now</em> on the best foundations I can assemble, with at least vague awareness of the endgame.
-			Many of the initial systems have been designed with intention towards a bigger picture.
+			Many of the initial systems have been designed with intention towards a bigger picture, and I plan
+			to continue building incrementally on a quality base with some experiements mixed in.
 		</p>
 		<p>
-			It's also really important to me that Zzz is easy to use and inclusive of people and devices,
-			but it can't cater to everyone -- but thanks to the magic of standards-based interoperability,
-			Zzz works with all websites, like any other browser, and anything you make with Zzz works with
+			It's important to me that Zzz is easy to use and inclusive of people and devices, but it can't
+			cater to everyone -- however thanks to the magic of standards-based interoperability, Zzz
+			works with all websites, like any other browser, and anything you make with Zzz works with
 			other browsers and web technologies. It's just one way to interface with the free web.
 		</p>
 		<p>
-			I've been thinking about and prototyping related ideas for more than 13 years, so there's a
-			lot of thought and plans already formulated, but from here I'm prioritizing user feedback and
-			just shipping a continuously-improving proof-of-concept that's probably only interesting to
-			enthusiasts. Some early (rough) integrations include:
+			I've been thinking about and prototyping related ideas for more than 13 years, and for the
+			last 6 I've been working on open source projects full-time, so there's a lot of thought and
+			plans already formulated, but from here I'm prioritizing user feedback and just shipping a
+			continuously-improving proof-of-concept. Your <External_Link
+				href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link
+			> are most welcome. I'm doing a lot of experimenting and moving fast in places, so API/data stability
+			won't be a priority for a while. Some early (rough) integrations include:
 		</p>
 		<ul>
 			<li>
@@ -184,7 +188,7 @@
 			with powerful open clients. Because of the endless scope I currently like the name "web
 			environment". Some related projects call themselves web UIs or even operating systems.
 			Whatever the name, this class of app is something that I've been wanting for a long time, and
-			this iteration seems to have legs.
+			I appear to be sticking with this iteration.
 		</p>
 		<p>
 			I intend to continue working on Zzz full-time for the foreseeable future, but I know I need to
