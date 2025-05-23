@@ -9,7 +9,13 @@ import {
 	type Action_Message_Params,
 } from '$lib/action_metatypes.js';
 import type {Api_Request_Response_Flag} from '$lib/api.js';
-import type {JSONRPCNotification, JSONRPCRequest} from '$lib/jsonrpc.js';
+import type {
+	JSONRPCNotification,
+	JSONRPCRequest,
+	JSONRPCRequestId,
+	JSONRPCSingularMessage,
+} from '$lib/jsonrpc.js';
+import {to_jsonrpc_message_id} from '$lib/jsonrpc_helpers.js';
 
 // Constants for preview length and formatting
 export const ACTION_DATE_FORMAT = 'MMM d, p';
@@ -56,11 +62,11 @@ export const to_action_message_type = (
 export const to_action_message = <T extends Action_Message_Type>(
 	action_message_type: T,
 	params: Action_Message_Params[T],
-	jsonrpc_message: JSONRPCRequest | JSONRPCNotification | null, // TODO maybe store this on the action message?
+	jsonrpc_message_or_id: JSONRPCRequestId | JSONRPCSingularMessage | null,
 ): Action_Message_Any =>
 	Action_Message[action_message_type].parse({
 		params,
-		jsonrpc_message_id: jsonrpc_message && 'id' in jsonrpc_message ? jsonrpc_message.id : null,
+		jsonrpc_message_id: to_jsonrpc_message_id(jsonrpc_message_or_id),
 	});
 
 export const to_action_request_message_type = (method: Action_Method): Action_Message_Type =>
@@ -75,6 +81,6 @@ export const jsonrpc_request_to_action_message = (
 	Action_Message_Base.parse({
 		type: to_action_message_type(Action_Method.parse(message.method), 'request'),
 		method: message.method,
-		jsonrpc_message_id: 'id' in message ? message.id : null,
+		jsonrpc_message_id: to_jsonrpc_message_id(message),
 		params: message.params,
 	});

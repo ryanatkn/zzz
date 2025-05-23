@@ -14,11 +14,7 @@ export const to_zzz_cache_dir = (dir: Zzz_Dir, dirname: string = ZZZ_CACHE_DIRNA
 	dir + dirname;
 
 // TODO probably extract to `@ryanatkn/belt/path.js`
-export const is_path_absolute = (path: unknown): boolean => {
-	// Guard against non-string inputs
-	if (typeof path !== 'string') return false;
-	return path[0] === '/';
-};
+export const is_path_absolute = (path: string): boolean => path[0] === '/';
 
 /**
  * Maps watcher change types to diskfile change types

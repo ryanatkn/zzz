@@ -8,6 +8,7 @@ import {
 	JSONRPC_METHOD_NOT_FOUND,
 	JSONRPC_VERSION,
 	JSONRPCError,
+	JSONRPCSingularMessage,
 	type JSONRPCMethod,
 	type JSONRPCNotification,
 	type JSONRPCNotificationParams,
@@ -90,4 +91,19 @@ export const create_jsonrpc_error = (id: JSONRPCRequestId, error: any): JSONRPCE
 			data,
 		},
 	};
+};
+
+export const to_jsonrpc_message_id = (
+	message_or_id: JSONRPCRequestId | JSONRPCSingularMessage | null,
+): JSONRPCRequestId | null => {
+	if (!message_or_id) {
+		return null;
+	}
+
+	const type = typeof message_or_id;
+	if (type === 'string' || type === 'number') {
+		return message_or_id as JSONRPCRequestId;
+	}
+
+	return (message_or_id as any).id ?? null;
 };

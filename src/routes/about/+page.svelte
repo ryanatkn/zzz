@@ -56,16 +56,17 @@
 			The software I imagine answering these questions is cross-platform so it runs everywhere, and
 			for that we have the web with HTML, CSS, and JS. We want to solve problems once and have
 			supported features work consistently whether you're on Windows, macOS, iOS, Android, Linux, or
-			any other OS. For all its quirks and flaws, the web is our digital commons, the one we have,
-			and when used with craft and care, it's capable of delivering a great UX.
+			any other OS. For all its flaws and quirks, the web is the turf of our digital commons, and I
+			believe it's capable of delivering a great UX when developers use it with care.
 		</p>
 		<p>
-			My starting point is the user experience in the user interface, because we're all users
-			interfacing with machines. If this part isn't up to par, we're sunk before we sail. This means
-			using JS, the language understood by the browser. Zzz leverages JS to glue software and
-			machines together precisely the way you want, maximizing its utility on any device across the
-			full stack. It can run locally on your machine using any of your available capabilities, or it
-			can deploy anywhere JS runs to play whatever role you need.
+			When thinking about the web UX I want, my starting point is the user interface, because we're
+			all users interfacing with machines. If this part isn't up to par, we're sunk before we sail.
+			We want no compromises when it comes to control over our UI runtime, so this means we're using
+			JS (thankfully, TypeScript makes this palatable). Zzz uses JS to glue software and machines
+			together precisely the way you want, maximizing its utility on any device across the full
+			stack. It can run locally on your machine using any of your available capabilities, or it can
+			deploy anywhere JS runs to play whatever role you need.
 		</p>
 		<p>Zzz is based on many kinds of software:</p>
 		<ul>
@@ -82,14 +83,14 @@
 				tooling and system access
 			</li>
 			<li>
+				web browsers - planned with Chromium via Electron, ideally with swappable browser engines
+			</li>
+			<li>
 				<External_Link href="https://wikipedia.org/wiki/Content_management_system"
 					>content management systems</External_Link
 				>, see this <External_Link
 					href="https://wikipedia.org/wiki/List_of_content_management_systems">list</External_Link
 				>
-			</li>
-			<li>
-				web browsers - planned with Chromium via Electron, ideally with swappable browser engines
 			</li>
 			<li>
 				code libraries and web metaframeworks using TypeScript and Svelte - Zzz extends <External_Link
@@ -99,11 +100,15 @@
 			</li>
 		</ul>
 		<p>
-			This scope may look far-fetched, but I'm just making tools that I want to use now on the best
-			foundations I can assemble. And Zzz doesn't need or want to appeal to every user—thanks to the
-			magic of standards-based interoperability, Zzz works with all websites, and anything you make
-			with Zzz works with other browsers and web technologies. It's just one way to interface with
-			the web.
+			This scope may look far-fetched, and it is to me, but I'm just making tools that I want to use
+			<em>now</em> on the best foundations I can assemble, with at least vague awareness of the endgame.
+			Many of the initial systems have been designed with intention towards a bigger picture.
+		</p>
+		<p>
+			It's also really important to me that Zzz is easy to use and inclusive of people and devices,
+			but it can't cater to everyone -- but thanks to the magic of standards-based interoperability,
+			Zzz works with all websites, like any other browser, and anything you make with Zzz works with
+			other browsers and web technologies. It's just one way to interface with the free web.
 		</p>
 		<p>
 			I've been thinking about and prototyping related ideas for more than 13 years, so there's a
@@ -184,7 +189,7 @@
 		<p>
 			I intend to continue working on Zzz full-time for the foreseeable future, but I know I need to
 			find people and organizations to work with if it's going to reach its goal of supporting Real
-			Users. Your input is appreciated to help make it work for you—see the <External_Link
+			Users. Your input is appreciated to help make it work for you -- see the <External_Link
 				href="https://github.com/ryanatkn/zzz">code</External_Link
 			>,
 			<External_Link href="https://github.com/ryanatkn/zzz/issues">issues</External_Link>, and
@@ -214,8 +219,8 @@
 		<h2 class="mb_lg">Into the future</h2>
 		<p class="mb_md">
 			This project has a huge scope and it's early in development. What you're seeing is a small
-			fraction of the idea—especially if you're viewing this on the website not natively via Node—so
-			here's a button for previewing some of what's planned:
+			fraction of the idea -- especially if you're viewing this on the website not natively via Node
+			-- so here's a button for previewing some of what's planned:
 		</p>
 		<button
 			type="button"

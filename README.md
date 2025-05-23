@@ -59,8 +59,9 @@ Zzz builds on a great deal of software.
 - [Claude](https://claude.ai/) wrote a lot of code after the initial version
   under my often-flawed but usually detailed and patient direction,
   and continues to contribute a lot to varying but sufficient success
-  - there's some slop in low-prioritity areas like tests for client code,
-    but I consider the code quality up to par with my norm
+  - there's some slop in low-prioritity areas like tests and some client code
+    (search for `// @slop`),
+    but I consider the code quality up to par with my norm for the important parts
     (like [Fuz](https://github.com/ryanatkn/fuz),
     [Moss](https://github.com/ryanatkn/moss), and [Gro](https://github.com/ryanatkn/gro)),
     with the caveat that the initial proof of concept

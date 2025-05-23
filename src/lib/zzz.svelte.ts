@@ -241,7 +241,8 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	 */
 	receive_session(data: any): void {
 		// Set the zzz_dir property from the session data
-		this.zzz_cache_dir = data.zzz_dir;
+		this.zzz_dir = data.zzz_dir;
+		this.zzz_cache_dir = data.zzz_cache_dir;
 
 		// Process files through the diskfiles subsystem
 		if (Array.isArray(data.files)) {

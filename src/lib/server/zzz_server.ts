@@ -256,7 +256,7 @@ export class Zzz_Server {
 			);
 		}
 
-		// TODO fix type
+		// TODO BLOCK fix type, and is the action message interface the one we want? or pass through the JSON-RPC message?
 		const returned = await this.#handle_message(parsed_request.data as any, this);
 		if (!returned.ok) {
 			return returned;

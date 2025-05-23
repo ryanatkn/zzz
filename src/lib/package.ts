@@ -2021,7 +2021,7 @@ export const src_json = {
 			path: 'response_helpers.ts',
 			declarations: [
 				{name: 'to_completion_response_text', kind: 'function'},
-				{name: 'create_completion_response_message', kind: 'function'},
+				{name: 'to_completion_response_params', kind: 'function'},
 			],
 		},
 		'./schema_helpers.js': {

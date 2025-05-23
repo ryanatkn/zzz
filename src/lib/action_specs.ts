@@ -38,6 +38,7 @@ export const load_session_action_spec = {
 				// TODO extract this schema to diskfile_types or something
 				.object({
 					zzz_dir: Zzz_Dir,
+					zzz_cache_dir: Diskfile_Path,
 					files: z.array(Serializable_Source_File),
 				})
 				.strict(),

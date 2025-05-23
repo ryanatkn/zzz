@@ -80,17 +80,17 @@
 		<p>
 			As a simple example, picture adding arbitrary metadata like tags to both your browser tabs and
 			files, both local and in the cloud, so you can find things no matter their type. Maybe you
-			want to summon UI that leverages that data for specific needs in specific contexts—without any
-			technical knowledge, third parties, or unnecessary friction. The best usecases are still
+			want to summon UI that leverages that data for specific needs in specific contexts -- without
+			any technical knowledge, third parties, or unnecessary friction. The best usecases are still
 			unknown because today's browsers weren't designed for this kind of experimentation.
 		</p>
 		<p>
-			I believe the optimal architecture—<External_Link
+			I believe the optimal architecture -- <External_Link
 				href="https://www.inkandswitch.com/local-first/">local-first</External_Link
 			>, <External_Link href="https://www.inkandswitch.com/malleable-software/"
 				>malleable</External_Link
-			>, client-sovereign—both respects individual rights and unlocks the full capabilities of web
-			tech, including
+			>, client-sovereign -- both respects individual rights and unlocks the full capabilities of
+			web tech, including
 			<a href="{base}/projects">website creation</a> and adaptive UI. And we can build it today, the
 			web's tools are ready.
 		</p>

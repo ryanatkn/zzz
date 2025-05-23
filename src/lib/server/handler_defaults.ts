@@ -24,10 +24,12 @@ import {
 	format_openai_messages,
 	format_gemini_messages,
 } from '$lib/server/ai_provider_utils.js';
-import {create_completion_response_message} from '$lib/response_helpers.js';
+import {to_completion_response_params} from '$lib/response_helpers.js';
 import type {Filer_Change_Handler, Zzz_Server} from '$lib/server/zzz_server.js';
 import {Safe_Fs} from '$lib/server/safe_fs.js';
 import type {Service_Return} from '$lib/server/service.js';
+import type {Action_Message_Params} from '$lib/action_metatypes.js';
+import {to_action_message} from '$lib/action_helpers.js';
 
 // TODO refactor to a plugin architecture
 
@@ -71,7 +73,8 @@ export const handle_message = async (
 				value: {
 					data: {
 						files: files_array,
-						zzz_dir: server.zzz_cache_dir,
+						zzz_dir: server.zzz_dir,
+						zzz_cache_dir: server.zzz_cache_dir,
 					},
 				},
 			};
@@ -80,7 +83,7 @@ export const handle_message = async (
 			const {prompt, provider_name, model, completion_messages} = message.params.completion_request;
 			const config = server.config;
 
-			let response: Action_Message['submit_completion_response'];
+			let response_params: Action_Message_Params['submit_completion_response'];
 
 			console.log(`texting ${provider_name}:`, prompt.substring(0, 1000));
 
@@ -107,7 +110,7 @@ export const handle_message = async (
 						messages: format_ollama_messages(config.system_message, completion_messages, prompt),
 					});
 					console.log(`ollama api_response`, api_response);
-					response = create_completion_response_message(
+					response_params = to_completion_response_params(
 						message.id,
 						provider_name,
 						model,
@@ -128,7 +131,7 @@ export const handle_message = async (
 						messages: format_claude_messages(completion_messages, prompt),
 					});
 					console.log(`claude api_response`, api_response);
-					response = create_completion_response_message(
+					response_params = to_completion_response_params(
 						message.id,
 						provider_name,
 						model,
@@ -155,7 +158,7 @@ export const handle_message = async (
 						),
 					});
 					console.log(`openai api_response`, api_response);
-					response = create_completion_response_message(
+					response_params = to_completion_response_params(
 						message.id,
 						provider_name,
 						model,
@@ -186,7 +189,7 @@ export const handle_message = async (
 					const content = format_gemini_messages(completion_messages, prompt);
 					const api_response = await google_model.generateContent(content);
 					console.log(`gemini api_response`, api_response);
-					response = create_completion_response_message(
+					response_params = to_completion_response_params(
 						message.id,
 						provider_name,
 						model,
@@ -199,12 +202,17 @@ export const handle_message = async (
 					throw new Unreachable_Error(provider_name);
 			}
 
+			// TODO this is currently only being created for logging/history purposes, doesn't get sent to client
+			const response_message = to_action_message('submit_completion_response', response_params, {
+				id: message.jsonrpc_message_id, // TODO BLOCK hacky
+			});
+
 			// We don't need to wait for this to finish
-			void save_response(message, response, server.zzz_cache_dir, server.safe_fs);
+			void save_response(message, response_message, server.zzz_cache_dir, server.safe_fs);
 
-			console.log(`got ${provider_name} message`, response.params.completion_response.data);
+			console.log(`got ${provider_name} message`, response_params.completion_response.data);
 
-			return {value: response};
+			return {value: response_params};
 		}
 		case 'update_diskfile': {
 			console.log(`message`, message);
