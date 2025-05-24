@@ -1,7 +1,6 @@
 // @slop
 
 import type {JSONRPCErrorCode} from '$lib/jsonrpc.js';
-import {z} from 'zod';
 
 // TODO is messy but gets more type safety
 /**
@@ -11,35 +10,31 @@ import {z} from 'zod';
  */
 export const JSONRPC_ERROR_CODES = {
 	// Standard JSON-RPC errors
-	PARSE_ERROR: -32700 as Jsonrpc_Error_Code,
-	INVALID_REQUEST: -32600 as Jsonrpc_Error_Code,
-	METHOD_NOT_FOUND: -32601 as Jsonrpc_Error_Code,
-	INVALID_PARAMS: -32602 as Jsonrpc_Error_Code,
-	INTERNAL_ERROR: -32603 as Jsonrpc_Error_Code,
+	PARSE_ERROR: -32700 as JSONRPCErrorCode,
+	INVALID_REQUEST: -32600 as JSONRPCErrorCode,
+	METHOD_NOT_FOUND: -32601 as JSONRPCErrorCode,
+	INVALID_PARAMS: -32602 as JSONRPCErrorCode,
+	INTERNAL_ERROR: -32603 as JSONRPCErrorCode,
 
 	// Application-specific errors (-32000 to -32099)
-	UNAUTHORIZED: -32001 as Jsonrpc_Error_Code,
-	FORBIDDEN: -32002 as Jsonrpc_Error_Code,
-	NOT_FOUND: -32003 as Jsonrpc_Error_Code,
-	CONFLICT: -32004 as Jsonrpc_Error_Code,
-	VALIDATION_ERROR: -32005 as Jsonrpc_Error_Code,
-	RATE_LIMITED: -32006 as Jsonrpc_Error_Code,
-	SERVICE_UNAVAILABLE: -32007 as Jsonrpc_Error_Code,
-	TIMEOUT: -32008 as Jsonrpc_Error_Code,
-	INSUFFICIENT_STORAGE: -32009 as Jsonrpc_Error_Code,
-	FILE_TOO_LARGE: -32010 as Jsonrpc_Error_Code,
-	UNSUPPORTED_MEDIA_TYPE: -32011 as Jsonrpc_Error_Code,
+	UNAUTHORIZED: -32001 as JSONRPCErrorCode,
+	FORBIDDEN: -32002 as JSONRPCErrorCode,
+	NOT_FOUND: -32003 as JSONRPCErrorCode,
+	CONFLICT: -32004 as JSONRPCErrorCode,
+	VALIDATION_ERROR: -32005 as JSONRPCErrorCode,
+	RATE_LIMITED: -32006 as JSONRPCErrorCode,
+	SERVICE_UNAVAILABLE: -32007 as JSONRPCErrorCode,
+	TIMEOUT: -32008 as JSONRPCErrorCode,
+	INSUFFICIENT_STORAGE: -32009 as JSONRPCErrorCode,
+	FILE_TOO_LARGE: -32010 as JSONRPCErrorCode,
+	UNSUPPORTED_MEDIA_TYPE: -32011 as JSONRPCErrorCode,
 
 	// AI provider specific errors
-	AI_PROVIDER_ERROR: -32020 as Jsonrpc_Error_Code,
-	AI_MODEL_NOT_FOUND: -32021 as Jsonrpc_Error_Code,
-	AI_QUOTA_EXCEEDED: -32022 as Jsonrpc_Error_Code,
-	AI_INVALID_REQUEST: -32023 as Jsonrpc_Error_Code,
-} as const satisfies Record<string, Jsonrpc_Error_Code>;
-
-// TODO BLOCK @api move this to the jsonrpc.ts module (and probably rename all to use this convention)
-export const Jsonrpc_Error_Code = z.number().brand('Jsonrpc_Error_Code');
-export type Jsonrpc_Error_Code = z.infer<typeof Jsonrpc_Error_Code>;
+	AI_PROVIDER_ERROR: -32020 as JSONRPCErrorCode,
+	AI_MODEL_NOT_FOUND: -32021 as JSONRPCErrorCode,
+	AI_QUOTA_EXCEEDED: -32022 as JSONRPCErrorCode,
+	AI_INVALID_REQUEST: -32023 as JSONRPCErrorCode,
+} as const satisfies Record<string, JSONRPCErrorCode>;
 
 /**
  * Maps HTTP status codes to JSON-RPC error codes.

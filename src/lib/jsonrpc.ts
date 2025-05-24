@@ -123,16 +123,16 @@ export const JSONRPCResponse = z.object({
 });
 export type JSONRPCResponse = z.infer<typeof JSONRPCResponse>;
 
-export const JSONRPCErrorCode = z.number(); // TODO refine
+export const JSONRPCErrorCode = z.number().brand('JSONRPCErrorCode'); // TODO refine
 export type JSONRPCErrorCode = z.infer<typeof JSONRPCErrorCode>;
 
 // TODO add Zzz-specific error codes with mapping
 // Standard JSON-RPC error codes
-export const JSONRPC_PARSE_ERROR = -32700;
-export const JSONRPC_INVALID_REQUEST = -32600;
-export const JSONRPC_METHOD_NOT_FOUND = -32601;
-export const JSONRPC_INVALID_PARAMS = -32602;
-export const JSONRPC_INTERNAL_ERROR = -32603;
+export const JSONRPC_PARSE_ERROR = -32700 as JSONRPCErrorCode;
+export const JSONRPC_INVALID_REQUEST = -32600 as JSONRPCErrorCode;
+export const JSONRPC_METHOD_NOT_FOUND = -32601 as JSONRPCErrorCode;
+export const JSONRPC_INVALID_PARAMS = -32602 as JSONRPCErrorCode;
+export const JSONRPC_INTERNAL_ERROR = -32603 as JSONRPCErrorCode;
 // export const JSONRPC_SERVER_ERROR_START = -32000;
 // export const JSONRPC_SERVER_ERROR_END = -32099;
 // -32000 to -32099 - Server error - Reserved for implementation-defined server-errors.
