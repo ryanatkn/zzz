@@ -3,9 +3,6 @@
 import {DEV} from 'esm-env';
 
 import {
-	JSONRPC_INTERNAL_ERROR,
-	JSONRPC_INVALID_PARAMS,
-	JSONRPC_METHOD_NOT_FOUND,
 	JSONRPC_VERSION,
 	JSONRPCError,
 	JSONRPCSingularMessage,
@@ -16,7 +13,7 @@ import {
 	type JSONRPCRequestId,
 	type JSONRPCRequestParams,
 } from '$lib/jsonrpc.js';
-import {Api_Error} from '$lib/api.js';
+import {Jsonrpc_Error, JSONRPC_ERROR_CODES, type Jsonrpc_Error_Code} from '$lib/jsonrpc_errors.js';
 
 export const create_jsonrpc_request = (
 	method: JSONRPCMethod,
@@ -51,34 +48,31 @@ export const create_jsonrpc_notification = (
 	return message;
 };
 
-// TODO this maps http error codes to jsonrpc errors and loses information,
-// but I'm thinking the source of truth should be in http error codes
+/**
+ * Creates a JSON-RPC error response from any error.
+ * Handles Jsonrpc_Error and regular Error objects.
+ */
 export const create_jsonrpc_error = (id: JSONRPCRequestId, error: any): JSONRPCError => {
-	let code = JSONRPC_INTERNAL_ERROR;
+	let code: Jsonrpc_Error_Code = JSONRPC_ERROR_CODES.INTERNAL_ERROR;
 	let message = 'Internal server error';
 	let data = undefined;
 
-	if (error instanceof Api_Error) {
-		// Map HTTP status codes to JSON-RPC error codes
-		switch (error.status) {
-			case 400:
-				code = JSONRPC_INVALID_PARAMS;
-				message = error.message || 'invalid params';
-				break;
-			case 404:
-				code = JSONRPC_METHOD_NOT_FOUND;
-				message = error.message || 'method not found';
-				break;
-			default:
-				code = JSONRPC_INTERNAL_ERROR;
-				message = error.message || 'internal server error';
-		}
+	if (error instanceof Jsonrpc_Error) {
+		// Use the error directly
+		code = error.code;
+		message = error.message;
+		data = error.data;
 	} else if (error instanceof Error) {
-		// TODO handle zod errors
 		message = error.message;
 		// Include stack trace in development mode
 		if (DEV) {
 			data = {stack: error.stack};
+		}
+	} else if (typeof error === 'object' && error !== null) {
+		// Handle objects with status/message (legacy Api_Error compatibility)
+		if ('status' in error && 'message' in error) {
+			message = error.message || 'Unknown error';
+			// Don't include status in data since we're using JSON-RPC codes
 		}
 	}
 
@@ -107,5 +101,3 @@ export const to_jsonrpc_message_id = (
 
 	return (message_or_id as any).id ?? null;
 };
-
-// TODO maybe add a complete set of `is_*` functions for all the types, or a class?

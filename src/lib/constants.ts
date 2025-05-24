@@ -81,3 +81,5 @@ export const WEBSOCKET_URL_OBJECT = WEBSOCKET_URL ? new URL(WEBSOCKET_URL) : und
  * @no_trailing_slash
  */
 export const WEBSOCKET_PATH = WEBSOCKET_URL_OBJECT?.pathname;
+
+export const UNKNOWN_ERROR_MESSAGE = 'unknown error'; // TODO move

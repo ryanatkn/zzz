@@ -2,7 +2,6 @@
 
 import {z} from 'zod';
 
-import type {Api_Result} from '$lib/api.js';
 import type {Mutation} from '$lib/mutation.js';
 import type {
 	create_directory_action_spec,
@@ -97,22 +96,20 @@ export interface Action_Message_Params {
 export interface Actions_Api {
 	create_directory: (
 		params: Action_Message_Params['create_directory_request'],
-	) => Promise<Api_Result<Action_Message_Params['create_directory_response']>>;
+	) => Promise<Action_Message_Params['create_directory_response']>;
 	delete_diskfile: (
 		params: Action_Message_Params['delete_diskfile_request'],
-	) => Promise<Api_Result<Action_Message_Params['delete_diskfile_response']>>;
+	) => Promise<Action_Message_Params['delete_diskfile_response']>;
 	filer_change: (params: Action_Message_Params['filer_change']) => void;
-	load_session: (
-		params?: void,
-	) => Promise<Api_Result<Action_Message_Params['load_session_response']>>;
-	ping: (params?: void) => Promise<Api_Result<Action_Message_Params['ping_response']>>;
+	load_session: (params?: void) => Promise<Action_Message_Params['load_session_response']>;
+	ping: (params?: void) => Promise<Action_Message_Params['ping_response']>;
 	submit_completion: (
 		params: Action_Message_Params['submit_completion_request'],
-	) => Promise<Api_Result<Action_Message_Params['submit_completion_response']>>;
+	) => Promise<Action_Message_Params['submit_completion_response']>;
 	toggle_main_menu: (params?: Action_Message_Params['toggle_main_menu']) => boolean;
 	update_diskfile: (
 		params: Action_Message_Params['update_diskfile_request'],
-	) => Promise<Api_Result<Action_Message_Params['update_diskfile_response']>>;
+	) => Promise<Action_Message_Params['update_diskfile_response']>;
 }
 
 // TODO maybe extract to $lib/mutation_types.ts or similar, decoupled
@@ -129,26 +126,26 @@ export interface Mutations<T_App extends Zzz = Zzz>
 	create_directory_response?: Mutation<
 		T_App,
 		Action_Message_Params['create_directory_request'],
-		Api_Result<Action_Message_Params['create_directory_response']>
+		Action_Message_Params['create_directory_response']
 	>;
 	delete_diskfile_request?: Mutation<T_App, Action_Message_Params['delete_diskfile_request'], void>;
 	delete_diskfile_response?: Mutation<
 		T_App,
 		Action_Message_Params['delete_diskfile_request'],
-		Api_Result<Action_Message_Params['delete_diskfile_response']>
+		Action_Message_Params['delete_diskfile_response']
 	>;
 	filer_change?: Mutation<T_App, Action_Message_Params['filer_change'], void>;
 	load_session_request?: Mutation<T_App, Action_Message_Params['load_session_request'], void>;
 	load_session_response?: Mutation<
 		T_App,
 		Action_Message_Params['load_session_request'],
-		Api_Result<Action_Message_Params['load_session_response']>
+		Action_Message_Params['load_session_response']
 	>;
 	ping_request?: Mutation<T_App, Action_Message_Params['ping_request'], void>;
 	ping_response?: Mutation<
 		T_App,
 		Action_Message_Params['ping_request'],
-		Api_Result<Action_Message_Params['ping_response']>
+		Action_Message_Params['ping_response']
 	>;
 	submit_completion_request?: Mutation<
 		T_App,
@@ -158,14 +155,14 @@ export interface Mutations<T_App extends Zzz = Zzz>
 	submit_completion_response?: Mutation<
 		T_App,
 		Action_Message_Params['submit_completion_request'],
-		Api_Result<Action_Message_Params['submit_completion_response']>
+		Action_Message_Params['submit_completion_response']
 	>;
 	toggle_main_menu?: Mutation<T_App, Action_Message_Params['toggle_main_menu'], void>;
 	update_diskfile_request?: Mutation<T_App, Action_Message_Params['update_diskfile_request'], void>;
 	update_diskfile_response?: Mutation<
 		T_App,
 		Action_Message_Params['update_diskfile_request'],
-		Api_Result<Action_Message_Params['update_diskfile_response']>
+		Action_Message_Params['update_diskfile_response']
 	>;
 }
 

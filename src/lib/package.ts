@@ -551,6 +551,10 @@ export const package_json = {
 			types: './dist/indexed_collection.svelte.d.ts',
 			default: './dist/indexed_collection.svelte.js',
 		},
+		'./jsonrpc_errors.js': {
+			types: './dist/jsonrpc_errors.d.ts',
+			default: './dist/jsonrpc_errors.js',
+		},
 		'./jsonrpc_helpers.js': {
 			types: './dist/jsonrpc_helpers.d.ts',
 			default: './dist/jsonrpc_helpers.js',
@@ -1028,23 +1032,8 @@ export const src_json = {
 		'./api.js': {
 			path: 'api.ts',
 			declarations: [
-				{name: 'Http_Status', kind: 'variable'},
-				{name: 'is_http_status_ok', kind: 'function'},
 				{name: 'Http_Method', kind: 'variable'},
 				{name: 'Api_Params', kind: 'variable'},
-				{name: 'Error_Response', kind: 'type'},
-				{name: 'ERROR_MESSAGE_UNKNOWN', kind: 'variable'},
-				{name: 'Api_Result', kind: 'type'},
-				{name: 'API_RESULT_UNKNOWN_ERROR', kind: 'variable'},
-				{name: 'Successful_Api_Result', kind: 'type'},
-				{name: 'Failed_Api_Result', kind: 'type'},
-				{name: 'to_failed_api_result', kind: 'function'},
-				{name: 'Api_Error_Name', kind: 'type'},
-				{name: 'Api_Error_Message', kind: 'type'},
-				{name: 'Api_Error', kind: 'class'},
-				{name: 'Api_Errors', kind: 'type'},
-				{name: 'assert_api_error', kind: 'function'},
-				{name: 'create_api_errors', kind: 'function'},
 				{name: 'Api_Request_Response_Flag', kind: 'type'},
 			],
 		},
@@ -1359,6 +1348,7 @@ export const src_json = {
 				{name: 'WEBSOCKET_URL', kind: 'variable'},
 				{name: 'WEBSOCKET_URL_OBJECT', kind: 'variable'},
 				{name: 'WEBSOCKET_PATH', kind: 'variable'},
+				{name: 'UNKNOWN_ERROR_MESSAGE', kind: 'variable'},
 			],
 		},
 		'./Content_Editor.svelte': {
@@ -1693,6 +1683,16 @@ export const src_json = {
 				{name: 'Index_Definition', kind: 'type'},
 				{name: 'Indexed_Collection_Options', kind: 'type'},
 				{name: 'Indexed_Collection', kind: 'class'},
+			],
+		},
+		'./jsonrpc_errors.js': {
+			path: 'jsonrpc_errors.ts',
+			declarations: [
+				{name: 'JSONRPC_ERROR_CODES', kind: 'variable'},
+				{name: 'Jsonrpc_Error_Code', kind: 'type'},
+				{name: 'http_status_to_jsonrpc_code', kind: 'function'},
+				{name: 'Jsonrpc_Error', kind: 'class'},
+				{name: 'jsonrpc_errors', kind: 'variable'},
 			],
 		},
 		'./jsonrpc_helpers.js': {
@@ -2125,13 +2125,10 @@ export const src_json = {
 			path: 'server/service.ts',
 			declarations: [
 				{name: 'Service_Return', kind: 'type'},
-				{name: 'Service_Return_Success', kind: 'type'},
-				{name: 'Service_Return_Failure', kind: 'type'},
-				{name: 'is_service_return_success', kind: 'function'},
 				{name: 'Nonauthenticated_Service', kind: 'type'},
 				{name: 'Nonauthorized_Service', kind: 'type'},
 				{name: 'Authorized_Service', kind: 'type'},
-				{name: 'service_return_to_api_result', kind: 'function'},
+				{name: 'Service', kind: 'type'},
 			],
 		},
 		'./server/zzz_server.js': {

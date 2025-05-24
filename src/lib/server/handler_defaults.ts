@@ -1,3 +1,5 @@
+// src/lib/server/handler_defaults.ts
+
 import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 import Anthropic from '@anthropic-ai/sdk';
 import OpenAI from 'openai';
@@ -30,6 +32,7 @@ import {Safe_Fs} from '$lib/server/safe_fs.js';
 import type {Service_Return} from '$lib/server/service.js';
 import type {Action_Message_Params} from '$lib/action_metatypes.js';
 import {to_action_message} from '$lib/action_helpers.js';
+import {jsonrpc_errors} from '$lib/jsonrpc_errors.js';
 
 // TODO refactor to a plugin architecture
 
@@ -38,9 +41,9 @@ const anthropic = new Anthropic({apiKey: SECRET_ANTHROPIC_API_KEY});
 const openai = new OpenAI({apiKey: SECRET_OPENAI_API_KEY});
 const google = new GoogleGenerativeAI(SECRET_GOOGLE_API_KEY);
 
-// TODO BLOCK @api return types
 /**
  * Handle client messages and produce appropriate server responses.
+ * Returns Service_Return with value property or throws Jsonrpc_Error.
  */
 export const handle_message = async (
 	message: Action_Message_From_Client,
@@ -87,119 +90,128 @@ export const handle_message = async (
 
 			console.log(`texting ${provider_name}:`, prompt.substring(0, 1000));
 
-			switch (provider_name) {
-				case 'ollama': {
-					const listed = await ollama.list();
-					if (!listed.models.some((m) => m.name === model)) {
-						await ollama.pull({model}); // TODO handle stream
+			try {
+				switch (provider_name) {
+					case 'ollama': {
+						const listed = await ollama.list();
+						if (!listed.models.some((m) => m.name === model)) {
+							await ollama.pull({model}); // TODO handle stream
+						}
+						const api_response = await ollama.chat({
+							model,
+							// TODO
+							// tools,
+							options: {
+								temperature: config.temperature,
+								seed: config.seed,
+								num_predict: config.output_token_max,
+								top_k: config.top_k,
+								top_p: config.top_p,
+								frequency_penalty: config.frequency_penalty,
+								presence_penalty: config.presence_penalty,
+								stop: config.stop_sequences,
+							},
+							messages: format_ollama_messages(config.system_message, completion_messages, prompt),
+						});
+						console.log(`ollama api_response`, api_response);
+						response_params = to_completion_response_params(
+							message.id,
+							provider_name,
+							model,
+							api_response,
+						);
+						break;
 					}
-					const api_response = await ollama.chat({
-						model,
-						// TODO
-						// tools,
-						options: {
+
+					case 'claude': {
+						const api_response = await anthropic.messages.create({
+							model,
+							max_tokens: config.output_token_max,
 							temperature: config.temperature,
-							seed: config.seed,
-							num_predict: config.output_token_max,
 							top_k: config.top_k,
+							top_p: config.top_p,
+							stop_sequences: config.stop_sequences,
+							system: config.system_message,
+							messages: format_claude_messages(completion_messages, prompt),
+						});
+						console.log(`claude api_response`, api_response);
+						response_params = to_completion_response_params(
+							message.id,
+							provider_name,
+							model,
+							api_response,
+						);
+						break;
+					}
+
+					case 'chatgpt': {
+						const api_response = await openai.chat.completions.create({
+							model,
+							max_completion_tokens: config.output_token_max,
+							temperature: model === 'o1-mini' ? undefined : config.temperature,
+							seed: config.seed,
 							top_p: config.top_p,
 							frequency_penalty: config.frequency_penalty,
 							presence_penalty: config.presence_penalty,
 							stop: config.stop_sequences,
-						},
-						messages: format_ollama_messages(config.system_message, completion_messages, prompt),
-					});
-					console.log(`ollama api_response`, api_response);
-					response_params = to_completion_response_params(
-						message.id,
-						provider_name,
-						model,
-						api_response,
-					);
-					break;
-				}
-
-				case 'claude': {
-					const api_response = await anthropic.messages.create({
-						model,
-						max_tokens: config.output_token_max,
-						temperature: config.temperature,
-						top_k: config.top_k,
-						top_p: config.top_p,
-						stop_sequences: config.stop_sequences,
-						system: config.system_message,
-						messages: format_claude_messages(completion_messages, prompt),
-					});
-					console.log(`claude api_response`, api_response);
-					response_params = to_completion_response_params(
-						message.id,
-						provider_name,
-						model,
-						api_response,
-					);
-					break;
-				}
-
-				case 'chatgpt': {
-					const api_response = await openai.chat.completions.create({
-						model,
-						max_completion_tokens: config.output_token_max,
-						temperature: model === 'o1-mini' ? undefined : config.temperature,
-						seed: config.seed,
-						top_p: config.top_p,
-						frequency_penalty: config.frequency_penalty,
-						presence_penalty: config.presence_penalty,
-						stop: config.stop_sequences,
-						messages: format_openai_messages(
-							config.system_message,
-							completion_messages,
-							prompt,
+							messages: format_openai_messages(
+								config.system_message,
+								completion_messages,
+								prompt,
+								model,
+							),
+						});
+						console.log(`openai api_response`, api_response);
+						response_params = to_completion_response_params(
+							message.id,
+							provider_name,
 							model,
-						),
-					});
-					console.log(`openai api_response`, api_response);
-					response_params = to_completion_response_params(
-						message.id,
-						provider_name,
-						model,
-						api_response,
-					);
-					break;
+							api_response,
+						);
+						break;
+					}
+
+					case 'gemini': {
+						// TODO cache this by model?
+						const google_model = google.getGenerativeModel({
+							model,
+							systemInstruction: config.system_message,
+							// TODO
+							// tools,
+							// toolConfig
+							generationConfig: {
+								maxOutputTokens: config.output_token_max,
+								temperature: config.temperature,
+								topK: config.top_k,
+								topP: config.top_p,
+								frequencyPenalty: config.frequency_penalty,
+								presencePenalty: config.presence_penalty,
+								stopSequences: config.stop_sequences,
+							},
+						});
+
+						const content = format_gemini_messages(completion_messages, prompt);
+						const api_response = await google_model.generateContent(content);
+						console.log(`gemini api_response`, api_response);
+						response_params = to_completion_response_params(
+							message.id,
+							provider_name,
+							model,
+							api_response,
+						);
+						break;
+					}
+
+					default:
+						throw new Unreachable_Error(provider_name);
 				}
-
-				case 'gemini': {
-					// TODO cache this by model?
-					const google_model = google.getGenerativeModel({
-						model,
-						systemInstruction: config.system_message,
-						// TODO
-						// tools,
-						// toolConfig
-						generationConfig: {
-							maxOutputTokens: config.output_token_max,
-							temperature: config.temperature,
-							topK: config.top_k,
-							topP: config.top_p,
-							frequencyPenalty: config.frequency_penalty,
-							presencePenalty: config.presence_penalty,
-							stopSequences: config.stop_sequences,
-						},
-					});
-
-					const content = format_gemini_messages(completion_messages, prompt);
-					const api_response = await google_model.generateContent(content);
-					console.log(`gemini api_response`, api_response);
-					response_params = to_completion_response_params(
-						message.id,
-						provider_name,
-						model,
-						api_response,
-					);
-					break;
-				}
-
-				default:
-					throw new Unreachable_Error(provider_name);
+			} catch (error) {
+				console.error(`AI provider error:`, error);
+				throw jsonrpc_errors.ai_provider_error(
+					provider_name,
+					error instanceof Error ? error.message : 'Unknown AI provider error',
+					{error},
+				);
 			}
 
 			// TODO this is currently only being created for logging/history purposes, doesn't get sent to client
@@ -228,7 +240,9 @@ export const handle_message = async (
 				return {value: null};
 			} catch (error) {
 				console.error(`Error writing file ${path}:`, error);
-				throw error;
+				throw jsonrpc_errors.internal_error(
+					`Failed to write file: ${error instanceof Error ? error.message : 'Unknown error'}`,
+				);
 			}
 		}
 		case 'delete_diskfile': {
@@ -242,7 +256,9 @@ export const handle_message = async (
 				return {value: null};
 			} catch (error) {
 				console.error(`Error deleting file ${path}:`, error);
-				throw error;
+				throw jsonrpc_errors.internal_error(
+					`Failed to delete file: ${error instanceof Error ? error.message : 'Unknown error'}`,
+				);
 			}
 		}
 		case 'create_directory': {
@@ -256,7 +272,9 @@ export const handle_message = async (
 				return {value: null};
 			} catch (error) {
 				console.error(`Error creating directory ${path}:`, error);
-				throw error;
+				throw jsonrpc_errors.internal_error(
+					`Failed to create directory: ${error instanceof Error ? error.message : 'Unknown error'}`,
+				);
 			}
 		}
 		default:

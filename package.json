@@ -634,6 +634,10 @@
       "types": "./dist/indexed_collection.svelte.d.ts",
       "default": "./dist/indexed_collection.svelte.js"
     },
+    "./jsonrpc_errors.js": {
+      "types": "./dist/jsonrpc_errors.d.ts",
+      "default": "./dist/jsonrpc_errors.js"
+    },
     "./jsonrpc_helpers.js": {
       "types": "./dist/jsonrpc_helpers.d.ts",
       "default": "./dist/jsonrpc_helpers.js"

@@ -109,7 +109,7 @@ export const register_http_actions = ({path, app, zzz_server}: Register_Actions_
 	// 			return c.json(
 	// 				{
 	// 					ok: false,
-	// 					message: error instanceof Error ? error.message : API_RESULT_UNKNOWN_ERROR.message,
+	// 					message: error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE,
 	// 				},
 	// 				error instanceof Api_Error ? error.status : 500,
 	// 			);

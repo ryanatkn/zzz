@@ -1,3 +1,5 @@
+// src/lib/server/zzz_server.ts
+
 import {Filer, type Cleanup_Watch, type Source_File} from '@ryanatkn/gro/filer.js';
 import type {Watcher_Change} from '@ryanatkn/gro/watch_dir.js';
 import {resolve} from 'node:path';
@@ -16,7 +18,6 @@ import {Zzz_Dir} from '$lib/diskfile_types.js';
 import {Safe_Fs} from '$lib/server/safe_fs.js';
 import {Action_Registry} from '$lib/action_registry.js';
 import type {Service_Return} from '$lib/server/service.js';
-import {Api_Error} from '$lib/api.js';
 import {stringify_zod_error} from '$lib/zod_helpers.js';
 import {
 	jsonrpc_request_to_action_message,
@@ -35,9 +36,11 @@ import {create_jsonrpc_error} from '$lib/jsonrpc_helpers.js';
 import type {Action_Message_Base} from '$lib/action_types.js';
 import {ZZZ_CACHE_DIRNAME} from '$lib/constants.js';
 import {to_zzz_cache_dir} from '$lib/diskfile_helpers.js';
+import {jsonrpc_errors} from '$lib/jsonrpc_errors.js';
 
 /**
  * Function type for handling client messages.
+ * Returns Service_Return with value property or throws Jsonrpc_Error.
  */
 export type Action_Handler = (
 	message: Action_Message_From_Client,
@@ -174,24 +177,14 @@ export class Zzz_Server {
 				try {
 					const action_message = jsonrpc_request_to_action_message(request);
 
-					// TODO BLOCK @api what if this was a `new Action_Invocation(request)`?
 					const service_return = await this.#receive_action_message(action_message);
 					console.log(`service_return`, service_return);
 
-					// Convert the service return to JSON-RPC format
-					if (service_return.ok !== false) {
-						return {
-							jsonrpc: JSONRPC_VERSION,
-							id: request.id,
-							// TODO BLOCK service_return.status -- maybe `result` is an `Api_Result`?
-							result: service_return.value,
-						};
-					} else {
-						return create_jsonrpc_error(request.id, {
-							status: service_return.status || 500,
-							message: service_return.message,
-						});
-					}
+					return {
+						jsonrpc: JSONRPC_VERSION,
+						id: request.id,
+						result: service_return.value,
+					};
 				} catch (error) {
 					this.log?.error(`Error processing JSON-RPC request:`, error);
 					return create_jsonrpc_error(request.id, error);
@@ -222,6 +215,7 @@ export class Zzz_Server {
 	/**
 	 * Process an action by name with parameters.
 	 * This is the unified entry point for both HTTP and WebSocket actions.
+	 * Returns Service_Return with value property or throws Jsonrpc_Error.
 	 */
 	async #receive_action_message(action_message: Action_Message_Base): Promise<Service_Return> {
 		this.log?.debug(`receive message`, action_message.id, action_message.method);
@@ -229,48 +223,48 @@ export class Zzz_Server {
 
 		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 		if (!action_message) {
-			throw new Api_Error(400, 'invalid message');
+			throw jsonrpc_errors.invalid_request();
 		}
 
 		const {method} = action_message;
 
 		const spec = action_spec_by_method.get(method);
 		if (!spec) {
-			throw new Api_Error(400, `unknown action: ${method}`);
+			throw jsonrpc_errors.method_not_found(method);
 		}
 
 		if (spec.kind !== 'request_response') {
-			throw new Api_Error(400, `invalid action: ${method}`);
+			throw jsonrpc_errors.invalid_request(`invalid action kind for method: ${method}`);
 		}
 
 		const request_schema = lookup_request_action_schema(method);
 		if (!request_schema) {
-			throw new Api_Error(400, `unknown message schema: ${method}`);
+			throw jsonrpc_errors.internal_error(`unknown message schema: ${method}`);
 		}
 
 		const parsed_request = request_schema.safeParse(action_message);
 		if (!parsed_request.success) {
 			this.log?.error('failed to validate service params', method, parsed_request.error.issues);
-			throw new Api_Error(
-				400,
+			throw jsonrpc_errors.invalid_params(
 				`invalid params to ${method}: ${stringify_zod_error(parsed_request.error)}`,
+				{issues: parsed_request.error.issues},
 			);
 		}
 
 		// TODO BLOCK fix type, and is the action message interface the one we want? or pass through the JSON-RPC message?
 		const returned = await this.#handle_message(parsed_request.data as any, this);
-		if (!returned.ok) {
-			return returned;
-		}
 
 		// Validate the response during development
 		// TODO maybe always validate?
 		if (DEV) {
 			const response_schema = lookup_response_action_schema(method);
 			if (!response_schema) {
-				throw new Api_Error(400, `unknown message schema: ${method}`);
+				throw jsonrpc_errors.internal_error(`unknown response schema: ${method}`);
 			}
-			const parsed_response = response_schema.safeParse(returned.value);
+			const parsed_response = response_schema.safeParse({
+				...action_message,
+				params: returned.value,
+			});
 			if (!parsed_response.success) {
 				this.log?.error(
 					'failed to validate service response params',
@@ -278,9 +272,9 @@ export class Zzz_Server {
 					returned.value,
 					parsed_response.error.issues,
 				);
-				throw new Api_Error(
-					500,
+				throw jsonrpc_errors.internal_error(
 					`service response validation failed for ${spec.method}: ${stringify_zod_error(parsed_response.error)}`,
+					{issues: parsed_response.error.issues},
 				);
 			}
 		}

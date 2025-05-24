@@ -1,3 +1,5 @@
+// src/lib/api_client.ts
+
 import type {Deferred, Async_Status} from '@ryanatkn/belt/async.js';
 
 import type {Socket} from '$lib/socket.svelte.js';
@@ -16,7 +18,6 @@ import type {
 	JSONRPCRequest,
 	JSONRPCSingularResponse,
 } from '$lib/jsonrpc.js';
-import type {Api_Result} from '$lib/api.js';
 
 // TODO support canceling
 
@@ -67,19 +68,16 @@ export class Api_Client {
 	async send(
 		message: JSONRPCRequest,
 		transport_type?: Transport_Type,
-	): Promise<Api_Result<JSONRPCSingularResponse>>;
-	async send(
-		message: JSONRPCNotification,
-		transport_type?: Transport_Type,
-	): Promise<Api_Result<null>>;
+	): Promise<JSONRPCSingularResponse>;
+	async send(message: JSONRPCNotification, transport_type?: Transport_Type): Promise<null>;
 	async send(
 		message: JSONRPCBatchRequest,
 		transport_type?: Transport_Type,
-	): Promise<Api_Result<JSONRPCBatchResponse>>;
+	): Promise<JSONRPCBatchResponse>;
 	async send(
 		message: JSONRPCMessageFromClientToServer,
 		transport_type?: Transport_Type,
-	): Promise<Api_Result<JSONRPCMessageFromServerToClient | null>> {
+	): Promise<JSONRPCMessageFromServerToClient | null> {
 		const transport = this.transports.get_or_throw(transport_type);
 		console.log(`[api_client.send] sending`, transport.type, message);
 

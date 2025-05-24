@@ -32,7 +32,6 @@ export const gen: Gen = ({origin_path}) => {
 
 		import {z} from 'zod';
 
-		import type {Api_Result} from '$lib/api.js';
 		import type {Mutation} from '$lib/mutation.js';
 		import type {${schema_imports.join(', ')}} from '$lib/action_specs.js';
 		import type { Zzz } from '$lib/zzz.svelte.js';
@@ -118,7 +117,7 @@ export const gen: Gen = ({origin_path}) => {
 							: 'params?: void'
 					}) => ${
 						spec.kind === 'request_response'
-							? `Promise<Api_Result<Action_Message_Params['${to_action_response_message_type(spec.method)}']>>`
+							? `Promise<Action_Message_Params['${to_action_response_message_type(spec.method)}']>`
 							: spec.kind === 'client_local'
 								? spec.returns
 								: 'void'
@@ -143,7 +142,7 @@ export const gen: Gen = ({origin_path}) => {
 							spec.kind === 'request_response' ? 'request' : null,
 						)}'], ${
 							request_response_flag === 'response'
-								? `Api_Result<Action_Message_Params['${to_action_response_message_type(spec.method)}']>`
+								? `Action_Message_Params['${to_action_response_message_type(spec.method)}']`
 								: 'void'
 						}>;`;
 					return spec.kind === 'request_response'
