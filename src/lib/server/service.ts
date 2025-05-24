@@ -27,7 +27,7 @@ export interface Service_Return_Success<T_Value = any> {
 	 */
 	ok?: true | undefined; //
 	/** @default 200 */
-	status?: Http_Status;
+	status?: Http_Status; // TODO BLOCK @api need to use JSON-RPC error codes instead, probably remove the wrappers of `Api_Result`
 	value: T_Value;
 }
 export interface Service_Return_Failure extends Error_Response {
