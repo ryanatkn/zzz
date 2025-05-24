@@ -191,14 +191,13 @@
 			I appear to be sticking with this iteration.
 		</p>
 		<p>
-			I intend to continue working on Zzz full-time for the foreseeable future, but I know I need to
-			find people and organizations to work with if it's going to reach its goal of supporting Real
-			Users. Your input is appreciated to help make it work for you -- see the <External_Link
+			If this sounds interesting and you would like to test out some broken pre-release software,
+			your input is appreciated to help make it work for you -- see the <External_Link
 				href="https://github.com/ryanatkn/zzz">code</External_Link
 			>,
 			<External_Link href="https://github.com/ryanatkn/zzz/issues">issues</External_Link>, and
 			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link>,
-			and find me on
+			and find me on my website or
 			<External_Link href="https://bsky.app/profile/ryanatkn.com">Bluesky</External_Link>.
 		</p>
 	</section>
@@ -206,15 +205,15 @@
 	<section>
 		<h2 class="mb_lg">More details</h2>
 		<ul>
-			<li>Zzz is open source, permissively licensed, and forking is encouraged</li>
+			<li>Zzz is open source and permissively licensed, and forking is encouraged</li>
 			<li>it's a noncommercial project and its only official domain is zzz.software</li>
 			<li>
-				the Zzz name and logos are community property, just don't falsely represent the official Zzz
+				the Zzz name/logos/IP are community property, just don't falsely represent the official Zzz
 				project or zzz.software
 			</li>
 			<li>
-				I'm looking for <a href="https://www.ryanatkn.com/funding">funding</a> to make my continued full-time
-				work on it sustainable - if successful, I think Zzz would end up stewarded by some kind of nonprofit
+				I'm looking for <a href="https://www.ryanatkn.com/funding">funding</a> to sustain my continued
+				full-time work - if successful, I think Zzz will be stewarded by some kind of nonprofit
 			</li>
 		</ul>
 	</section>
