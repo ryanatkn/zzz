@@ -1,3 +1,5 @@
+// @slop
+
 import type {Action} from 'svelte/action';
 import {on} from 'svelte/events';
 import {Unreachable_Error} from '@ryanatkn/belt/error.js';

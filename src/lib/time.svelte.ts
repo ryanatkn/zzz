@@ -34,9 +34,10 @@ export interface Time_Options extends Cell_Options<typeof Time_Json> {
  */
 export class Time extends Cell<typeof Time_Json> {
 	/**
-	 * Default update interval in milliseconds (1 minute)
+	 * Default update interval in milliseconds (1 minute).
+	 * The idea is to minimize reactivity and CPU usage for a common use case.
 	 */
-	static readonly DEFAULT_INTERVAL = 60_000;
+	static DEFAULT_INTERVAL = 60_000;
 
 	/**
 	 * Current time that updates on the configured interval.

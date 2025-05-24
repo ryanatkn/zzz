@@ -107,3 +107,5 @@ export const to_jsonrpc_message_id = (
 
 	return (message_or_id as any).id ?? null;
 };
+
+// TODO maybe add a complete set of `is_*` functions for all the types, or a class?
