@@ -8,6 +8,11 @@
  * changed to include the `JSONRPC` prefix on all identifiers.
  * It's also defined with Zod schemas instead of MCP's plain TS.
  *
+ * MCP appears to break spec compatibility through increased specificity in two places
+ * because of its `_meta` field -
+ * `params` does not support the positional array format,
+ * and `result` supports only `object` values, instead of being any JSON value.
+ *
  * @source https://github.com/modelcontextprotocol/typescript-sdk
  * @see https://modelcontextprotocol.io/
  * @license https://github.com/modelcontextprotocol/typescript-sdk/blob/main/LICENSE
