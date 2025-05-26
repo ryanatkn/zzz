@@ -1690,7 +1690,7 @@ export const src_json = {
 			declarations: [
 				{name: 'JSONRPC_ERROR_CODES', kind: 'variable'},
 				{name: 'http_status_to_jsonrpc_code', kind: 'function'},
-				{name: 'Jsonrpc_Error', kind: 'class'},
+				{name: 'Jsonrpc_Error_Class', kind: 'class'},
 				{name: 'jsonrpc_errors', kind: 'variable'},
 			],
 		},
@@ -2124,7 +2124,6 @@ export const src_json = {
 		'./server/service.js': {
 			path: 'server/service.ts',
 			declarations: [
-				{name: 'Service_Return', kind: 'type'},
 				{name: 'Nonauthenticated_Service', kind: 'type'},
 				{name: 'Nonauthorized_Service', kind: 'type'},
 				{name: 'Authorized_Service', kind: 'type'},

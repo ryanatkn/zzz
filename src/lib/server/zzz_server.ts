@@ -17,7 +17,6 @@ import type {Zzz_Config} from '$lib/config_helpers.js';
 import {Zzz_Dir} from '$lib/diskfile_types.js';
 import {Safe_Fs} from '$lib/server/safe_fs.js';
 import {Action_Registry} from '$lib/action_registry.js';
-import type {Service_Return} from '$lib/server/service.js';
 import {stringify_zod_error} from '$lib/zod_helpers.js';
 import {
 	jsonrpc_request_to_action_message,
@@ -38,14 +37,12 @@ import {ZZZ_CACHE_DIRNAME} from '$lib/constants.js';
 import {to_zzz_cache_dir} from '$lib/diskfile_helpers.js';
 import {jsonrpc_errors} from '$lib/jsonrpc_errors.js';
 
-/**
- * Function type for handling client messages.
- * Returns Service_Return with value property or throws Jsonrpc_Error.
- */
 export type Action_Handler = (
+	// TODO BLOCK @api should be jsonrpc only right? maybe just the `params` at this point? wrapped in an object?
+	// should this be the `Server_Message_Handler` and mutations renamed to `Client_Message_Handler`?
 	message: Action_Message_From_Client,
 	server: Zzz_Server,
-) => Promise<Service_Return>;
+) => Promise<unknown>;
 
 /**
  * Function type for handling file system changes.
@@ -177,13 +174,13 @@ export class Zzz_Server {
 				try {
 					const action_message = jsonrpc_request_to_action_message(request);
 
-					const service_return = await this.#receive_action_message(action_message);
-					console.log(`service_return`, service_return);
+					const result = await this.#receive_action_message(action_message);
+					console.log(`result`, result);
 
 					return {
 						jsonrpc: JSONRPC_VERSION,
 						id: request.id,
-						result: service_return.value,
+						result,
 					};
 				} catch (error) {
 					this.log?.error(`Error processing JSON-RPC request:`, error);
@@ -211,13 +208,12 @@ export class Zzz_Server {
 		this.#send_to_all_clients(action_message);
 	}
 
-	// TODO consider extracting a service helper, maybe an abstraction for the Service_Request
+	// TODO consider extracting a helper
 	/**
 	 * Process an action by name with parameters.
 	 * This is the unified entry point for both HTTP and WebSocket actions.
-	 * Returns Service_Return with value property or throws Jsonrpc_Error.
 	 */
-	async #receive_action_message(action_message: Action_Message_Base): Promise<Service_Return> {
+	async #receive_action_message(action_message: Action_Message_Base): Promise<unknown> {
 		this.log?.debug(`receive message`, action_message.id, action_message.method);
 		this.#check_destroyed();
 
@@ -257,19 +253,20 @@ export class Zzz_Server {
 		// Validate the response during development
 		// TODO maybe always validate?
 		if (DEV) {
+			// TODO BLOCK @api use params schema only right? not whole action message
 			const response_schema = lookup_response_action_schema(method);
 			if (!response_schema) {
 				throw jsonrpc_errors.internal_error(`unknown response schema: ${method}`);
 			}
 			const parsed_response = response_schema.safeParse({
 				...action_message,
-				params: returned.value,
+				params: returned,
 			});
 			if (!parsed_response.success) {
 				this.log?.error(
 					'failed to validate service response params',
 					spec.method,
-					returned.value,
+					returned,
 					parsed_response.error.issues,
 				);
 				throw jsonrpc_errors.internal_error(

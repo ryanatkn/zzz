@@ -29,7 +29,6 @@ import {
 import {to_completion_response_params} from '$lib/response_helpers.js';
 import type {Filer_Change_Handler, Zzz_Server} from '$lib/server/zzz_server.js';
 import {Safe_Fs} from '$lib/server/safe_fs.js';
-import type {Service_Return} from '$lib/server/service.js';
 import type {Action_Message_Params} from '$lib/action_metatypes.js';
 import {to_action_message} from '$lib/action_helpers.js';
 import {jsonrpc_errors} from '$lib/jsonrpc_errors.js';
@@ -43,23 +42,22 @@ const google = new GoogleGenerativeAI(SECRET_GOOGLE_API_KEY);
 
 /**
  * Handle client messages and produce appropriate server responses.
- * Returns Service_Return with value property or throws Jsonrpc_Error.
+ * Each returns a value or throws a `Jsonrpc_Error`.
  */
 export const handle_message = async (
 	message: Action_Message_From_Client,
 	server: Zzz_Server,
-): Promise<Service_Return> => {
+): Promise<unknown> => {
 	console.log(`[handle_message] message`, message.id, message.method);
 
 	// TODO service registration in zzz_server with plugin system
 	switch (message.method) {
 		case 'ping': {
 			return {
-				value: {
-					ping_id: message.id,
-				},
+				ping_id: message.id,
 			};
 		}
+
 		case 'load_session': {
 			// TODO change so this only returns metadata, not file contents
 			// Access filers through server and collect all files
@@ -73,15 +71,14 @@ export const handle_message = async (
 			}
 
 			return {
-				value: {
-					data: {
-						files: files_array,
-						zzz_dir: server.zzz_dir,
-						zzz_cache_dir: server.zzz_cache_dir,
-					},
+				data: {
+					files: files_array,
+					zzz_dir: server.zzz_dir,
+					zzz_cache_dir: server.zzz_cache_dir,
 				},
 			};
 		}
+
 		case 'submit_completion': {
 			const {prompt, provider_name, model, completion_messages} = message.params.completion_request;
 			const config = server.config;
@@ -226,8 +223,9 @@ export const handle_message = async (
 
 			console.log(`got ${provider_name} message`, response_params.completion_response.data);
 
-			return {value: response_params};
+			return response_params;
 		}
+
 		case 'update_diskfile': {
 			console.log(`message`, message);
 			const {
@@ -237,7 +235,7 @@ export const handle_message = async (
 			try {
 				// Use the server's safe_fs instance to write the file
 				await server.safe_fs.write_file(path, content);
-				return {value: null};
+				return null;
 			} catch (error) {
 				console.error(`Error writing file ${path}:`, error);
 				throw jsonrpc_errors.internal_error(
@@ -245,6 +243,7 @@ export const handle_message = async (
 				);
 			}
 		}
+
 		case 'delete_diskfile': {
 			const {
 				params: {path},
@@ -253,7 +252,7 @@ export const handle_message = async (
 			try {
 				// Use the server's safe_fs instance to delete the file
 				await server.safe_fs.rm(path);
-				return {value: null};
+				return null;
 			} catch (error) {
 				console.error(`Error deleting file ${path}:`, error);
 				throw jsonrpc_errors.internal_error(
@@ -261,6 +260,7 @@ export const handle_message = async (
 				);
 			}
 		}
+
 		case 'create_directory': {
 			const {
 				params: {path},
@@ -269,7 +269,7 @@ export const handle_message = async (
 			try {
 				// Use the server's safe_fs instance to create the directory
 				await server.safe_fs.mkdir(path, {recursive: true});
-				return {value: null};
+				return null;
 			} catch (error) {
 				console.error(`Error creating directory ${path}:`, error);
 				throw jsonrpc_errors.internal_error(
@@ -277,6 +277,7 @@ export const handle_message = async (
 				);
 			}
 		}
+
 		default:
 			throw new Unreachable_Error(message);
 	}
