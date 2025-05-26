@@ -5,11 +5,10 @@
  * This can be used by multiple transports including http and websocket.
  *
  * These are the JSON-RPC types from the MCP draft in May 2025,
- * changed to include the `JSONRPC` prefix on all identifiers.
- * It's also defined with Zod schemas instead of MCP's plain TS.
+ * changed to include a prefix on all identifiers.
+ * It's also defined with Zod schemas instead of plain TS like the MCP library.
  *
- * MCP appears to break spec compatibility through increased specificity in two places
- * because of its `_meta` field -
+ * MCP messages are a subset of JSON-RPC -
  * `params` does not support the positional array format,
  * and `result` supports only `object` values, instead of being any JSON value.
  *
@@ -216,9 +215,9 @@ export type Jsonrpc_Batch_Response = z.infer<typeof Jsonrpc_Batch_Response>;
 export const Jsonrpc_Message = z.union([
 	Jsonrpc_Request,
 	Jsonrpc_Notification,
-	Jsonrpc_Batch_Request,
 	Jsonrpc_Response,
 	Jsonrpc_Error,
+	Jsonrpc_Batch_Request,
 	Jsonrpc_Batch_Response,
 ]);
 export type Jsonrpc_Message = z.infer<typeof Jsonrpc_Message>;
