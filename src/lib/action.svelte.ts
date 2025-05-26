@@ -8,7 +8,7 @@ import {Diskfile_Change, Diskfile_Path, Serializable_Source_File} from '$lib/dis
 import {to_completion_response_text} from '$lib/response_helpers.js';
 import {to_preview} from '$lib/helpers.js';
 import {Action_Json, Action_Kind} from '$lib/action_types.js';
-import type {JSONRPCRequestId} from '$lib/jsonrpc.js';
+import type {Jsonrpc_Request_Id} from '$lib/jsonrpc.js';
 
 export interface Action_Options extends Cell_Options<typeof Action_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
@@ -17,7 +17,7 @@ export class Action extends Cell<typeof Action_Json> {
 	type: Action_Message_Type = $state()!;
 	method: Action_Method = $state()!;
 	params: any = $state.raw();
-	jsonrpc_message_id: JSONRPCRequestId = $state()!;
+	jsonrpc_message_id: Jsonrpc_Request_Id = $state()!;
 
 	kind: Action_Kind = $state()!; // TODO maybe store the spec here for convenience, instead or or in addition to the kind?
 

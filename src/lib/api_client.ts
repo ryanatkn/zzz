@@ -10,13 +10,13 @@ import {
 	type Transport_Type,
 } from '$lib/transports.js';
 import type {
-	JSONRPCBatchRequest,
-	JSONRPCBatchResponse,
-	JSONRPCMessageFromClientToServer,
-	JSONRPCMessageFromServerToClient,
-	JSONRPCNotification,
-	JSONRPCRequest,
-	JSONRPCSingularResponse,
+	Jsonrpc_Batch_Request,
+	Jsonrpc_Batch_Response,
+	Jsonrpc_Message_From_Client_To_Server,
+	Jsonrpc_Message_From_Server_To_Client,
+	Jsonrpc_Notification,
+	Jsonrpc_Request,
+	Jsonrpc_Singular_Response,
 } from '$lib/jsonrpc.js';
 
 // TODO support canceling
@@ -66,18 +66,18 @@ export class Api_Client {
 	 * Send a message to the server and get a response.
 	 */
 	async send(
-		message: JSONRPCRequest,
+		message: Jsonrpc_Request,
 		transport_type?: Transport_Type,
-	): Promise<JSONRPCSingularResponse>;
-	async send(message: JSONRPCNotification, transport_type?: Transport_Type): Promise<null>;
+	): Promise<Jsonrpc_Singular_Response>;
+	async send(message: Jsonrpc_Notification, transport_type?: Transport_Type): Promise<null>;
 	async send(
-		message: JSONRPCBatchRequest,
+		message: Jsonrpc_Batch_Request,
 		transport_type?: Transport_Type,
-	): Promise<JSONRPCBatchResponse>;
+	): Promise<Jsonrpc_Batch_Response>;
 	async send(
-		message: JSONRPCMessageFromClientToServer,
+		message: Jsonrpc_Message_From_Client_To_Server,
 		transport_type?: Transport_Type,
-	): Promise<JSONRPCMessageFromServerToClient | null> {
+	): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
 		const transport = this.transports.get_or_throw(transport_type);
 		console.log(`[api_client.send] sending`, transport.type, message);
 

@@ -10,10 +10,10 @@ import {
 } from '$lib/action_metatypes.js';
 import type {Api_Request_Response_Flag} from '$lib/api.js';
 import type {
-	JSONRPCNotification,
-	JSONRPCRequest,
-	JSONRPCRequestId,
-	JSONRPCSingularMessage,
+	Jsonrpc_Notification,
+	Jsonrpc_Request,
+	Jsonrpc_Request_Id,
+	Jsonrpc_Singular_Message,
 } from '$lib/jsonrpc.js';
 import {to_jsonrpc_message_id} from '$lib/jsonrpc_helpers.js';
 
@@ -62,7 +62,7 @@ export const to_action_message_type = (
 export const to_action_message = <T extends Action_Message_Type>(
 	action_message_type: T,
 	params: Action_Message_Params[T],
-	jsonrpc_message_or_id: JSONRPCRequestId | JSONRPCSingularMessage | null,
+	jsonrpc_message_or_id: Jsonrpc_Request_Id | Jsonrpc_Singular_Message | null,
 ): Action_Message_Union =>
 	Action_Messages[action_message_type].parse({
 		params,
@@ -76,7 +76,7 @@ export const to_action_response_message_type = (method: Action_Method): Action_M
 	Action_Message_Type.parse(method + '_response');
 
 export const jsonrpc_request_to_action_message = (
-	message: JSONRPCRequest | JSONRPCNotification,
+	message: Jsonrpc_Request | Jsonrpc_Notification,
 ): Action_Message_Base =>
 	Action_Message_Base.parse({
 		type: to_action_message_type(Action_Method.parse(message.method), 'request'),

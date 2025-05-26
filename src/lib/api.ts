@@ -2,7 +2,7 @@
 
 import {z} from 'zod';
 
-import {JSONRPCNotificationParams, JSONRPCRequestParams} from '$lib/jsonrpc.js';
+import {Jsonrpc_Notification_Params, Jsonrpc_Request_Params} from '$lib/jsonrpc.js';
 
 export const Http_Method = z.enum([
 	'CONNECT',
@@ -18,7 +18,7 @@ export const Http_Method = z.enum([
 export type Http_Method = z.infer<typeof Http_Method>;
 
 /** The JSON-RPC `params` types. */
-export const Api_Params = z.union([JSONRPCRequestParams, JSONRPCNotificationParams, z.void()]);
+export const Api_Params = z.union([Jsonrpc_Request_Params, Jsonrpc_Notification_Params, z.void()]);
 export type Api_Params = z.infer<typeof Api_Params>;
 
 /**

@@ -71,7 +71,7 @@ export const register_http_actions = ({path, app, zzz_server}: Register_Actions_
 	// 			}
 	// 			// TODO query params for GET, probably a `params`/`json` JSON string
 
-	// 			const jsonrpc_request = JSONRPCRequest.parse({
+	// 			const jsonrpc_request = Jsonrpc_Request.parse({
 	// 				jsonrpc: JSONRPC_VERSION,
 	// 				id: c.req.header('x-request-id') || create_uuid(), // trusting the client
 	// 				method,

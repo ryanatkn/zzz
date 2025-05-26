@@ -25,10 +25,10 @@ import {
 	lookup_response_action_schema,
 } from '$lib/action_helpers.js';
 import {
-	type JSONRPCRequest,
-	type JSONRPCResponse,
-	type JSONRPCError,
-	type JSONRPCNotification,
+	type Jsonrpc_Request,
+	type Jsonrpc_Response,
+	type Jsonrpc_Error,
+	type Jsonrpc_Notification,
 	JSONRPC_VERSION,
 } from '$lib/jsonrpc.js';
 import {handle_jsonrpc_request} from '$lib/server/jsonrpc_server_helpers.js';
@@ -170,10 +170,10 @@ export class Zzz_Server {
 		this.filers.set(this.zzz_cache_dir, {filer, cleanup_promise});
 	}
 
-	async handle_jsonrpc_message(message: unknown): Promise<JSONRPCResponse | JSONRPCError | null> {
+	async handle_jsonrpc_message(message: unknown): Promise<Jsonrpc_Response | Jsonrpc_Error | null> {
 		return handle_jsonrpc_request({
 			message,
-			onrequest: async (request: JSONRPCRequest): Promise<JSONRPCResponse | JSONRPCError> => {
+			onrequest: async (request: Jsonrpc_Request): Promise<Jsonrpc_Response | Jsonrpc_Error> => {
 				try {
 					const action_message = jsonrpc_request_to_action_message(request);
 
@@ -190,7 +190,7 @@ export class Zzz_Server {
 					return create_jsonrpc_error(request.id, error);
 				}
 			},
-			onnotification: async (notification: JSONRPCNotification): Promise<void> => {
+			onnotification: async (notification: Jsonrpc_Notification): Promise<void> => {
 				try {
 					const action_message = jsonrpc_request_to_action_message(notification);
 

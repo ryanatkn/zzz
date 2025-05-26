@@ -4,24 +4,24 @@ import {DEV} from 'esm-env';
 
 import {
 	JSONRPC_VERSION,
-	JSONRPCError,
-	JSONRPCErrorCode,
-	JSONRPCSingularMessage,
-	type JSONRPCMethod,
-	type JSONRPCNotification,
-	type JSONRPCNotificationParams,
-	type JSONRPCRequest,
-	type JSONRPCRequestId,
-	type JSONRPCRequestParams,
+	Jsonrpc_Error,
+	Jsonrpc_Error_Code,
+	Jsonrpc_Singular_Message,
+	type Jsonrpc_Method,
+	type Jsonrpc_Notification,
+	type Jsonrpc_Notification_Params,
+	type Jsonrpc_Request,
+	type Jsonrpc_Request_Id,
+	type Jsonrpc_Request_Params,
 } from '$lib/jsonrpc.js';
-import {Jsonrpc_Error, JSONRPC_ERROR_CODES} from '$lib/jsonrpc_errors.js';
+import {Jsonrpc_Error_Class, JSONRPC_ERROR_CODES} from '$lib/jsonrpc_errors.js';
 
 export const create_jsonrpc_request = (
-	method: JSONRPCMethod,
-	params: JSONRPCRequestParams | void,
-	id: JSONRPCRequestId,
-): JSONRPCRequest => {
-	const message: JSONRPCRequest = {
+	method: Jsonrpc_Method,
+	params: Jsonrpc_Request_Params | void,
+	id: Jsonrpc_Request_Id,
+): Jsonrpc_Request => {
+	const message: Jsonrpc_Request = {
 		jsonrpc: JSONRPC_VERSION,
 		id,
 		method,
@@ -35,10 +35,10 @@ export const create_jsonrpc_request = (
 
 // TODO currently unused, currently all actions are requests
 export const create_jsonrpc_notification = (
-	method: JSONRPCMethod,
-	params: JSONRPCNotificationParams | void,
-): JSONRPCNotification => {
-	const message: JSONRPCNotification = {
+	method: Jsonrpc_Method,
+	params: Jsonrpc_Notification_Params | void,
+): Jsonrpc_Notification => {
+	const message: Jsonrpc_Notification = {
 		jsonrpc: JSONRPC_VERSION,
 		method,
 	};
@@ -53,12 +53,12 @@ export const create_jsonrpc_notification = (
  * Creates a JSON-RPC error response from any error.
  * Handles Jsonrpc_Error and regular Error objects.
  */
-export const create_jsonrpc_error = (id: JSONRPCRequestId, error: any): JSONRPCError => {
-	let code: JSONRPCErrorCode = JSONRPC_ERROR_CODES.INTERNAL_ERROR;
+export const create_jsonrpc_error = (id: Jsonrpc_Request_Id, error: any): Jsonrpc_Error => {
+	let code: Jsonrpc_Error_Code = JSONRPC_ERROR_CODES.INTERNAL_ERROR;
 	let message = 'Internal server error';
 	let data = undefined;
 
-	if (error instanceof Jsonrpc_Error) {
+	if (error instanceof Jsonrpc_Error_Class) {
 		// Use the error directly
 		code = error.code;
 		message = error.message;
@@ -68,12 +68,6 @@ export const create_jsonrpc_error = (id: JSONRPCRequestId, error: any): JSONRPCE
 		// Include stack trace in development mode
 		if (DEV) {
 			data = {stack: error.stack};
-		}
-	} else if (typeof error === 'object' && error !== null) {
-		// Handle objects with status/message (legacy Api_Error compatibility)
-		if ('status' in error && 'message' in error) {
-			message = error.message || 'Unknown error';
-			// Don't include status in data since we're using JSON-RPC codes
 		}
 	}
 
@@ -89,15 +83,15 @@ export const create_jsonrpc_error = (id: JSONRPCRequestId, error: any): JSONRPCE
 };
 
 export const to_jsonrpc_message_id = (
-	message_or_id: JSONRPCRequestId | JSONRPCSingularMessage | null,
-): JSONRPCRequestId | null => {
+	message_or_id: Jsonrpc_Request_Id | Jsonrpc_Singular_Message | null,
+): Jsonrpc_Request_Id | null => {
 	if (!message_or_id) {
 		return null;
 	}
 
 	const type = typeof message_or_id;
 	if (type === 'string' || type === 'number') {
-		return message_or_id as JSONRPCRequestId;
+		return message_or_id as Jsonrpc_Request_Id;
 	}
 
 	return (message_or_id as any).id ?? null;

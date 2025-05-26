@@ -1,17 +1,17 @@
 import {z} from 'zod';
 
 import type {
-	JSONRPCBatchRequest,
-	JSONRPCBatchResponse,
-	JSONRPCMessageFromClientToServer,
-	JSONRPCMessageFromServerToClient,
-	JSONRPCNotification,
-	JSONRPCRequest,
-	JSONRPCSingularResponse,
+	Jsonrpc_Batch_Request,
+	Jsonrpc_Batch_Response,
+	Jsonrpc_Message_From_Client_To_Server,
+	Jsonrpc_Message_From_Server_To_Client,
+	Jsonrpc_Notification,
+	Jsonrpc_Request,
+	Jsonrpc_Singular_Response,
 } from '$lib/jsonrpc.js';
 import type {Socket} from '$lib/socket.svelte.js';
 import {Request_Tracker} from '$lib/request_tracker.svelte.js';
-import {JSONRPC_ERROR_CODES, Jsonrpc_Error} from '$lib/jsonrpc_errors.js';
+import {Jsonrpc_Error_Class, jsonrpc_errors} from '$lib/jsonrpc_errors.js';
 
 // TODO probably add reactivity?
 
@@ -22,10 +22,12 @@ export type Transport_Type = z.infer<typeof Transport_Type>;
 export interface Transport {
 	type: Transport_Type;
 	/* eslint-disable @typescript-eslint/method-signature-style */
-	send(message: JSONRPCRequest): Promise<JSONRPCSingularResponse>;
-	send(message: JSONRPCNotification): Promise<null>;
-	send(message: JSONRPCBatchRequest): Promise<JSONRPCBatchResponse>;
-	send(message: JSONRPCMessageFromClientToServer): Promise<JSONRPCMessageFromServerToClient | null>;
+	send(message: Jsonrpc_Request): Promise<Jsonrpc_Singular_Response>;
+	send(message: Jsonrpc_Notification): Promise<null>;
+	send(message: Jsonrpc_Batch_Request): Promise<Jsonrpc_Batch_Response>;
+	send(
+		message: Jsonrpc_Message_From_Client_To_Server,
+	): Promise<Jsonrpc_Message_From_Server_To_Client | null>;
 	is_ready: () => boolean;
 }
 
@@ -174,15 +176,15 @@ export class Websocket_Rpc_Transport implements Transport {
 		};
 	}
 
-	async send(message: JSONRPCRequest): Promise<JSONRPCSingularResponse>;
-	async send(message: JSONRPCNotification): Promise<null>;
-	async send(message: JSONRPCBatchRequest): Promise<JSONRPCBatchResponse>;
+	async send(message: Jsonrpc_Request): Promise<Jsonrpc_Singular_Response>;
+	async send(message: Jsonrpc_Notification): Promise<null>;
+	async send(message: Jsonrpc_Batch_Request): Promise<Jsonrpc_Batch_Response>;
 	async send(
-		message: JSONRPCMessageFromClientToServer,
-	): Promise<JSONRPCMessageFromServerToClient | null> {
+		message: Jsonrpc_Message_From_Client_To_Server,
+	): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
 		console.log(`[websocket transport] data`, message);
 		if (!this.is_ready()) {
-			throw new Jsonrpc_Error(JSONRPC_ERROR_CODES.SERVICE_UNAVAILABLE, 'WebSocket not connected');
+			throw jsonrpc_errors.service_unavailable_error('WebSocket not connected');
 		}
 
 		try {
@@ -206,11 +208,10 @@ export class Websocket_Rpc_Transport implements Transport {
 			}
 		} catch (error) {
 			console.error('[websocket transport] Error sending message:', error);
-			if (error instanceof Jsonrpc_Error) {
+			if (error instanceof Jsonrpc_Error_Class) {
 				throw error;
 			}
-			throw new Jsonrpc_Error(
-				JSONRPC_ERROR_CODES.INTERNAL_ERROR,
+			throw jsonrpc_errors.internal_error(
 				error instanceof Error ? error.message : 'Unknown error sending WebSocket message',
 			);
 		}
@@ -235,12 +236,12 @@ export class Http_Rpc_Transport implements Transport {
 		this.#headers = headers ?? {'content-type': 'application/json', accept: 'application/json'};
 	}
 
-	async send(message: JSONRPCRequest): Promise<JSONRPCSingularResponse>;
-	async send(message: JSONRPCNotification): Promise<null>;
-	async send(message: JSONRPCBatchRequest): Promise<JSONRPCBatchResponse>;
+	async send(message: Jsonrpc_Request): Promise<Jsonrpc_Singular_Response>;
+	async send(message: Jsonrpc_Notification): Promise<null>;
+	async send(message: Jsonrpc_Batch_Request): Promise<Jsonrpc_Batch_Response>;
 	async send(
-		message: JSONRPCMessageFromClientToServer,
-	): Promise<JSONRPCMessageFromServerToClient | null> {
+		message: Jsonrpc_Message_From_Client_To_Server,
+	): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
 		console.log(`[http transport] message`, message);
 		try {
 			const response = await fetch(this.#url, {
@@ -257,8 +258,7 @@ export class Http_Rpc_Transport implements Transport {
 			// For JSON-RPC, we always expect a 200 OK response
 			// The actual error will be in the JSON-RPC error field
 			if (!response.ok) {
-				throw new Jsonrpc_Error(
-					JSONRPC_ERROR_CODES.INTERNAL_ERROR,
+				throw jsonrpc_errors.internal_error(
 					`HTTP error: ${response.status} ${response.statusText}`,
 				);
 			}
@@ -267,10 +267,10 @@ export class Http_Rpc_Transport implements Transport {
 			return result;
 		} catch (error) {
 			console.error('[http transport] Error sending HTTP request:', error);
-			if (error instanceof Jsonrpc_Error) {
+			if (error instanceof Jsonrpc_Error_Class) {
 				throw error;
 			}
-			throw new Jsonrpc_Error(JSONRPC_ERROR_CODES.INTERNAL_ERROR, 'Error sending HTTP request', {
+			throw jsonrpc_errors.internal_error('Error sending HTTP request', {
 				error: error instanceof Error ? error.message : String(error),
 			});
 		}

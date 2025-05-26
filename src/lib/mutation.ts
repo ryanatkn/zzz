@@ -1,7 +1,7 @@
 import type {Action_Method} from '$lib/action_metatypes.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
 import type {Api_Request_Response_Flag} from '$lib/api.js';
-import type {JSONRPCNotification, JSONRPCRequest} from '$lib/jsonrpc.js';
+import type {Jsonrpc_Notification, Jsonrpc_Request} from '$lib/jsonrpc.js';
 import type {Action_Message_Union} from '$lib/action_collections.js';
 
 /**
@@ -27,7 +27,7 @@ export interface Mutation_Context<T_App extends Zzz = Zzz, T_Params = unknown, T
 	/** Action system event object. */
 	action_message: Action_Message_Union;
 	/** The JSON-RPC request object, if any. */
-	jsonrpc_message: JSONRPCRequest | JSONRPCNotification | null;
+	jsonrpc_message: Jsonrpc_Request | Jsonrpc_Notification | null;
 	/** Adds a callback hook that runs after mutation finishes. */
 	after_mutation: After_Mutation | undefined;
 }
@@ -65,7 +65,7 @@ export const create_mutation_context = <
 	result: T_Result,
 	request_response_flag: Api_Request_Response_Flag,
 	action_message: Action_Message_Union,
-	jsonrpc_message: JSONRPCRequest | JSONRPCNotification | null,
+	jsonrpc_message: Jsonrpc_Request | Jsonrpc_Notification | null,
 ): {
 	ctx: Mutation_Context<T_App, T_Params, T_Result>;
 	flush_after_mutation: () => Promise<void>;

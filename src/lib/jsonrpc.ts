@@ -11,6 +11,28 @@
  * @source https://github.com/modelcontextprotocol/typescript-sdk
  * @see https://modelcontextprotocol.io/
  * @license https://github.com/modelcontextprotocol/typescript-sdk/blob/main/LICENSE
+ *
+ * MIT License
+ *
+ * Copyright (c) 2024 Anthropic, PBC
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
  */
 
 import {z} from 'zod';
@@ -23,25 +45,25 @@ export const JSONRPC_LATEST_PROTOCOL_VERSION = 'DRAFT-2025-v2';
  *
  * Like MCP but unlike JSON-RPC, the type excludes null.
  */
-export const JSONRPCRequestId = z.union([z.string(), z.number()]);
-export type JSONRPCRequestId = z.infer<typeof JSONRPCRequestId>;
+export const Jsonrpc_Request_Id = z.union([z.string(), z.number()]);
+export type Jsonrpc_Request_Id = z.infer<typeof Jsonrpc_Request_Id>;
 
 /**
  * A JSON-RPC method name, a string with no constraints.
  */
-export const JSONRPCMethod = z.string();
-export type JSONRPCMethod = z.infer<typeof JSONRPCMethod>;
+export const Jsonrpc_Method = z.string();
+export type Jsonrpc_Method = z.infer<typeof Jsonrpc_Method>;
 
 /**
  * A progress token, used to associate progress notifications with the original request.
  */
-export const JSONRPCProgressToken = z.union([z.string(), z.number()]);
-export type JSONRPCProgressToken = z.infer<typeof JSONRPCProgressToken>;
+export const Jsonrpc_Progress_Token = z.union([z.string(), z.number()]);
+export type Jsonrpc_Progress_Token = z.infer<typeof Jsonrpc_Progress_Token>;
 
-export const JSONRPCMCPMeta = z.object({}).passthrough(); // uses object over record to be able to use the better `.extend`
-export type JSONRPCMCPMeta = z.infer<typeof JSONRPCMCPMeta>;
+export const Jsonrpc_Mcp_Meta = z.object({}).passthrough(); // uses object over record to be able to use the better `.extend`
+export type Jsonrpc_Mcp_Meta = z.infer<typeof Jsonrpc_Mcp_Meta>;
 
-export const JSONRPCRequestParamsMeta = JSONRPCMCPMeta.extend({
+export const Jsonrpc_Request_Params_Meta = Jsonrpc_Mcp_Meta.extend({
 	/**
 	 * If specified, the caller is requesting out-of-band progress notifications
 	 * for this request (as represented by notifications/progress).
@@ -49,69 +71,69 @@ export const JSONRPCRequestParamsMeta = JSONRPCMCPMeta.extend({
 	 * to any subsequent notifications.
 	 * The receiver is not obligated to provide these notifications.
 	 */
-	progressToken: JSONRPCProgressToken.optional(),
+	progressToken: Jsonrpc_Progress_Token.optional(),
 });
-export type JSONRPCRequestParamsMeta = z.infer<typeof JSONRPCRequestParamsMeta>;
+export type Jsonrpc_Request_Params_Meta = z.infer<typeof Jsonrpc_Request_Params_Meta>;
 
-export const JSONRPCRequestParams = z
+export const Jsonrpc_Request_Params = z
 	.object({
-		_meta: JSONRPCRequestParamsMeta.optional(),
+		_meta: Jsonrpc_Request_Params_Meta.optional(),
 	})
 	.passthrough();
-export type JSONRPCRequestParams = z.infer<typeof JSONRPCRequestParams>;
+export type Jsonrpc_Request_Params = z.infer<typeof Jsonrpc_Request_Params>;
 
-export const JSONRPCNotificationParams = z
+export const Jsonrpc_Notification_Params = z
 	.object({
 		/**
 		 * This parameter name is reserved by MCP to allow clients and servers
 		 * to attach additional metadata to their responses and notifications.
 		 */
-		_meta: JSONRPCMCPMeta.optional(),
+		_meta: Jsonrpc_Mcp_Meta.optional(),
 	})
 	.passthrough();
-export type JSONRPCNotificationParams = z.infer<typeof JSONRPCNotificationParams>;
+export type Jsonrpc_Notification_Params = z.infer<typeof Jsonrpc_Notification_Params>;
 
-export const JSONRPCResult = z
+export const Jsonrpc_Result = z
 	.object({
 		/**
 		 * This result property is reserved by the protocol to allow clients and servers
 		 * to attach additional metadata to their responses.
 		 */
-		_meta: JSONRPCMCPMeta.optional(),
+		_meta: Jsonrpc_Mcp_Meta.optional(),
 	})
 	.passthrough();
-export type JSONRPCResult = z.infer<typeof JSONRPCResult>;
+export type Jsonrpc_Result = z.infer<typeof Jsonrpc_Result>;
 
 /**
  * A request that expects a response.
  */
-export const JSONRPCRequest = z.object({
+export const Jsonrpc_Request = z.object({
 	jsonrpc: z.literal(JSONRPC_VERSION),
-	id: JSONRPCRequestId,
-	method: JSONRPCMethod,
-	params: JSONRPCRequestParams.optional(),
+	id: Jsonrpc_Request_Id,
+	method: Jsonrpc_Method,
+	params: Jsonrpc_Request_Params.optional(),
 });
-export type JSONRPCRequest = z.infer<typeof JSONRPCRequest>;
+export type Jsonrpc_Request = z.infer<typeof Jsonrpc_Request>;
 
 /**
  * A notification which does not expect a response.
  */
-export const JSONRPCNotification = z.object({
+export const Jsonrpc_Notification = z.object({
 	jsonrpc: z.literal(JSONRPC_VERSION),
-	method: JSONRPCMethod,
-	params: JSONRPCNotificationParams.optional(),
+	method: Jsonrpc_Method,
+	params: Jsonrpc_Notification_Params.optional(),
 });
-export type JSONRPCNotification = z.infer<typeof JSONRPCNotification>;
+export type Jsonrpc_Notification = z.infer<typeof Jsonrpc_Notification>;
 
 /**
  * A successful (non-error) response to a request.
  */
-export const JSONRPCResponse = z.object({
+export const Jsonrpc_Response = z.object({
 	jsonrpc: z.literal(JSONRPC_VERSION),
-	id: JSONRPCRequestId,
-	result: JSONRPCResult,
+	id: Jsonrpc_Request_Id,
+	result: Jsonrpc_Result,
 });
-export type JSONRPCResponse = z.infer<typeof JSONRPCResponse>;
+export type Jsonrpc_Response = z.infer<typeof Jsonrpc_Response>;
 
 // TODO add Zzz-specific error codes with mapping
 // Standard JSON-RPC error codes
@@ -124,34 +146,34 @@ export const JSONRPC_SERVER_ERROR_START = -32000;
 export const JSONRPC_SERVER_ERROR_END = -32099;
 // -32000 to -32099 - Server error - Reserved for implementation-defined server-errors.
 
-export const JSONRPCServerErrorCode = z
+export const Jsonrpc_Server_Error_Code = z
 	.number()
 	.gte(JSONRPC_SERVER_ERROR_END)
 	.lte(JSONRPC_SERVER_ERROR_START)
-	.brand('JSONRPCServerErrorCode');
-export type JSONRPCServerErrorCode = z.infer<typeof JSONRPCServerErrorCode>;
+	.brand('Jsonrpc_Server_Error_Code');
+export type Jsonrpc_Server_Error_Code = z.infer<typeof Jsonrpc_Server_Error_Code>;
 
-export const JSONRPCErrorCode = z.union([
+export const Jsonrpc_Error_Code = z.union([
 	z.literal(JSONRPC_PARSE_ERROR),
 	z.literal(JSONRPC_INVALID_REQUEST),
 	z.literal(JSONRPC_METHOD_NOT_FOUND),
 	z.literal(JSONRPC_INVALID_PARAMS),
 	z.literal(JSONRPC_INTERNAL_ERROR),
-	JSONRPCServerErrorCode,
+	Jsonrpc_Server_Error_Code,
 ]);
-export type JSONRPCErrorCode = z.infer<typeof JSONRPCErrorCode>;
+export type Jsonrpc_Error_Code = z.infer<typeof Jsonrpc_Error_Code>;
 
 /**
  * A response to a request that indicates an error occurred.
  */
-export const JSONRPCError = z.object({
+export const Jsonrpc_Error = z.object({
 	jsonrpc: z.literal(JSONRPC_VERSION),
-	id: JSONRPCRequestId,
+	id: Jsonrpc_Request_Id,
 	error: z.object({
 		/**
 		 * The error type that occurred.
 		 */
-		code: JSONRPCErrorCode,
+		code: Jsonrpc_Error_Code,
 		/**
 		 * A short description of the error. The message SHOULD be limited to a concise single sentence.
 		 */
@@ -163,61 +185,65 @@ export const JSONRPCError = z.object({
 		data: z.unknown().optional(),
 	}),
 });
-export type JSONRPCError = z.infer<typeof JSONRPCError>;
+export type Jsonrpc_Error = z.infer<typeof Jsonrpc_Error>;
 
 /**
  * A JSON-RPC batch request, as described in https://www.jsonrpc.org/specification#batch.
  */
-export const JSONRPCBatchRequest = z.array(z.union([JSONRPCRequest, JSONRPCNotification]));
-export type JSONRPCBatchRequest = z.infer<typeof JSONRPCBatchRequest>;
+export const Jsonrpc_Batch_Request = z.array(z.union([Jsonrpc_Request, Jsonrpc_Notification]));
+export type Jsonrpc_Batch_Request = z.infer<typeof Jsonrpc_Batch_Request>;
 
 /**
  * A JSON-RPC batch response, as described in https://www.jsonrpc.org/specification#batch.
  */
-export const JSONRPCSingularResponse = z.union([JSONRPCResponse, JSONRPCError]);
-export type JSONRPCSingularResponse = z.infer<typeof JSONRPCSingularResponse>;
+export const Jsonrpc_Singular_Response = z.union([Jsonrpc_Response, Jsonrpc_Error]);
+export type Jsonrpc_Singular_Response = z.infer<typeof Jsonrpc_Singular_Response>;
 
 /**
  * A JSON-RPC batch response, as described in https://www.jsonrpc.org/specification#batch.
  */
-export const JSONRPCBatchResponse = z.array(JSONRPCSingularResponse);
-export type JSONRPCBatchResponse = z.infer<typeof JSONRPCBatchResponse>;
+export const Jsonrpc_Batch_Response = z.array(Jsonrpc_Singular_Response);
+export type Jsonrpc_Batch_Response = z.infer<typeof Jsonrpc_Batch_Response>;
 
 /**
  * Refers to any valid JSON-RPC object that can be decoded off the wire, or encoded to be sent.
  */
-export const JSONRPCMessage = z.union([
-	JSONRPCRequest,
-	JSONRPCNotification,
-	JSONRPCBatchRequest,
-	JSONRPCResponse,
-	JSONRPCError,
-	JSONRPCBatchResponse,
+export const Jsonrpc_Message = z.union([
+	Jsonrpc_Request,
+	Jsonrpc_Notification,
+	Jsonrpc_Batch_Request,
+	Jsonrpc_Response,
+	Jsonrpc_Error,
+	Jsonrpc_Batch_Response,
 ]);
-export type JSONRPCMessage = z.infer<typeof JSONRPCMessage>;
+export type Jsonrpc_Message = z.infer<typeof Jsonrpc_Message>;
 
-export const JSONRPCMessageFromClientToServer = z.union([
-	JSONRPCRequest,
-	JSONRPCNotification,
-	JSONRPCBatchRequest,
+export const Jsonrpc_Message_From_Client_To_Server = z.union([
+	Jsonrpc_Request,
+	Jsonrpc_Notification,
+	Jsonrpc_Batch_Request,
 ]);
-export type JSONRPCMessageFromClientToServer = z.infer<typeof JSONRPCMessageFromClientToServer>;
+export type Jsonrpc_Message_From_Client_To_Server = z.infer<
+	typeof Jsonrpc_Message_From_Client_To_Server
+>;
 
-export const JSONRPCMessageFromServerToClient = z.union([
-	JSONRPCNotification,
-	JSONRPCResponse,
-	JSONRPCError,
-	JSONRPCBatchResponse,
+export const Jsonrpc_Message_From_Server_To_Client = z.union([
+	Jsonrpc_Notification,
+	Jsonrpc_Response,
+	Jsonrpc_Error,
+	Jsonrpc_Batch_Response,
 ]);
-export type JSONRPCMessageFromServerToClient = z.infer<typeof JSONRPCMessageFromServerToClient>;
+export type Jsonrpc_Message_From_Server_To_Client = z.infer<
+	typeof Jsonrpc_Message_From_Server_To_Client
+>;
 
-export const JSONRPCSingularMessage = z.union([
-	JSONRPCRequest,
-	JSONRPCNotification,
-	JSONRPCResponse,
-	JSONRPCError,
+export const Jsonrpc_Singular_Message = z.union([
+	Jsonrpc_Request,
+	Jsonrpc_Notification,
+	Jsonrpc_Response,
+	Jsonrpc_Error,
 ]);
-export type JSONRPCSingularMessage = z.infer<typeof JSONRPCSingularMessage>;
+export type Jsonrpc_Singular_Message = z.infer<typeof Jsonrpc_Singular_Message>;
 
-export const JSONRPCBatchMessage = z.union([JSONRPCBatchRequest, JSONRPCBatchResponse]);
-export type JSONRPCBatchMessage = z.infer<typeof JSONRPCBatchMessage>;
+export const Jsonrpc_Batch_Message = z.union([Jsonrpc_Batch_Request, Jsonrpc_Batch_Response]);
+export type Jsonrpc_Batch_Message = z.infer<typeof Jsonrpc_Batch_Message>;

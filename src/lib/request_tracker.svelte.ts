@@ -6,24 +6,24 @@ import {SvelteMap} from 'svelte/reactivity';
 import {Datetime, get_datetime_now} from '$lib/zod_helpers.js';
 import {
 	JSONRPC_INTERNAL_ERROR,
-	type JSONRPCError,
-	type JSONRPCRequest,
-	type JSONRPCRequestId,
+	type Jsonrpc_Error,
+	type Jsonrpc_Request,
+	type Jsonrpc_Request_Id,
 } from '$lib/jsonrpc.js';
 
 /**
  * Represents a pending request with its associated state.
  */
 export class Request_Tracker_Item {
-	readonly id: JSONRPCRequestId;
-	readonly deferred: Deferred<JSONRPCRequest>;
+	readonly id: Jsonrpc_Request_Id;
+	readonly deferred: Deferred<Jsonrpc_Request>;
 	readonly created: Datetime;
 	status: Async_Status = $state()!;
 	timeout: NodeJS.Timeout | undefined = $state();
 
 	constructor(
-		id: JSONRPCRequestId,
-		deferred: Deferred<JSONRPCRequest>,
+		id: Jsonrpc_Request_Id,
+		deferred: Deferred<Jsonrpc_Request>,
 		created: Datetime,
 		status: Async_Status,
 		timeout: NodeJS.Timeout | undefined,
@@ -41,7 +41,7 @@ export class Request_Tracker_Item {
  * Used by transports to handle the request-response lifecycle.
  */
 export class Request_Tracker {
-	readonly pending_requests: SvelteMap<JSONRPCRequestId, Request_Tracker_Item> = new SvelteMap();
+	readonly pending_requests: SvelteMap<Jsonrpc_Request_Id, Request_Tracker_Item> = new SvelteMap();
 	readonly request_timeout_ms: number;
 
 	constructor(request_timeout_ms = 15000) {
@@ -53,8 +53,8 @@ export class Request_Tracker {
 	 * @param id The request id
 	 * @returns A deferred promise that will be resolved when the response is received
 	 */
-	track_request(id: JSONRPCRequestId): Deferred<any> {
-		const deferred = create_deferred<JSONRPCRequest>();
+	track_request(id: Jsonrpc_Request_Id): Deferred<any> {
+		const deferred = create_deferred<Jsonrpc_Request>();
 		const created = get_datetime_now();
 
 		// If we're tracking a request with the same id, clean up the previous one first
@@ -87,7 +87,7 @@ export class Request_Tracker {
 	 * @param id The request id
 	 * @param response The response data
 	 */
-	resolve_request(id: JSONRPCRequestId, response: JSONRPCRequest): void {
+	resolve_request(id: Jsonrpc_Request_Id, response: Jsonrpc_Request): void {
 		const request = this.pending_requests.get(id);
 		if (!request) {
 			console.warn(`Received response for unknown request: ${id}`);
@@ -108,9 +108,9 @@ export class Request_Tracker {
 	/**
 	 * Reject a pending request with the given error.
 	 * @param id The request id
-	 * @param error The complete JSONRPCError object
+	 * @param error The complete Jsonrpc_Error object
 	 */
-	reject_request(id: JSONRPCRequestId, error: JSONRPCError): void {
+	reject_request(id: Jsonrpc_Request_Id, error: Jsonrpc_Error): void {
 		const request = this.pending_requests.get(id);
 		if (!request) {
 			console.warn(`Received error for unknown request: ${id}`);
@@ -152,7 +152,7 @@ export class Request_Tracker {
 	 * Cancel a pending request.
 	 * @param id The request id
 	 */
-	cancel_request(id: JSONRPCRequestId): void {
+	cancel_request(id: Jsonrpc_Request_Id): void {
 		const request = this.pending_requests.get(id);
 		if (!request) {
 			return;

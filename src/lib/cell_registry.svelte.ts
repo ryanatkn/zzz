@@ -14,9 +14,9 @@ export class Class_Not_Registered_Error extends Error {
 	readonly class_name: string;
 	readonly available_classes: Array<string>;
 
-	constructor(class_name: string, available_classes: Array<string>) {
+	constructor(class_name: string, available_classes: Array<string>, options?: ErrorOptions) {
 		const message = `Class "${class_name}" is not registered. Available classes: ${available_classes.join(', ')}`;
-		super(message);
+		super(message, options);
 		this.name = 'Class_Not_Registered_Error';
 		this.class_name = class_name;
 		this.available_classes = available_classes;

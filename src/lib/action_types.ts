@@ -5,7 +5,7 @@ import {Completion_Response, Completion_Request} from '$lib/completion_types.js'
 import {Action_Message_Type, Action_Method} from '$lib/action_metatypes.js';
 import {Diskfile_Change, Diskfile_Path, Serializable_Source_File} from '$lib/diskfile_types.js';
 import {Cell_Json} from '$lib/cell_types.js';
-import {JSONRPCRequestId} from '$lib/jsonrpc.js';
+import {Jsonrpc_Request_Id} from '$lib/jsonrpc.js';
 
 // TODO BLOCK Action_Message and Action_Message_Json? but not cells?
 /**
@@ -19,7 +19,7 @@ export const Action_Message_Base = z
 		created: Datetime_Now, // TODO like with id, probably dont want a default on the base schema like this
 		type: Action_Message_Type,
 		method: Action_Method,
-		jsonrpc_message_id: JSONRPCRequestId.nullable(),
+		jsonrpc_message_id: Jsonrpc_Request_Id.nullable(),
 	})
 	.passthrough(); // TODO is this a good/safe pattern for base schemas? we're doing this so we can parse loosely sometimes, but see too how the Uuid has a fallback
 export type Action_Message_Base = z.infer<typeof Action_Message_Base>;
@@ -32,7 +32,7 @@ export const Action_Json = Cell_Json.extend({
 	method: Action_Method,
 	params: Any.optional(),
 	kind: Action_Kind, // TODO BLOCK doesn't belong here, can be looked up from the method or type
-	jsonrpc_message_id: JSONRPCRequestId.nullable(),
+	jsonrpc_message_id: Jsonrpc_Request_Id.nullable(),
 	// TODO BLOCK this is hacky, maybe just a generic `params: Any`?
 	ping_id: Uuid.optional(),
 	completion_request: Completion_Request.optional(),

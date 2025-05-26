@@ -10,7 +10,7 @@ import {create_jsonrpc_request} from '$lib/jsonrpc_helpers.js';
 import {create_uuid} from '$lib/zod_helpers.js';
 import {to_action_message, to_action_message_type} from '$lib/action_helpers.js';
 import type {Action_Message_Union} from '$lib/action_collections.js';
-import type {JSONRPCNotification, JSONRPCRequest} from '$lib/jsonrpc.js';
+import type {Jsonrpc_Notification, Jsonrpc_Request} from '$lib/jsonrpc.js';
 import type {Api_Request_Response_Flag} from '$lib/api.js';
 
 const log = new Logger();
@@ -35,7 +35,7 @@ export const create_actions_api = (zzz: Zzz): Actions_Api =>
 				result: any | null, // TODO @api type
 				request_response_flag: Api_Request_Response_Flag,
 				action_message: Action_Message_Union,
-				jsonrpc_message: JSONRPCRequest | JSONRPCNotification | null,
+				jsonrpc_message: Jsonrpc_Request | Jsonrpc_Notification | null,
 			) => {
 				console.log('\n\n\n\n\n\n\n\n[actions_api] mutate', method, result, request_response_flag);
 				const {ctx, flush_after_mutation} = create_mutation_context(

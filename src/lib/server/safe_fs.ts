@@ -251,8 +251,8 @@ export class Safe_Fs {
 export class Path_Not_Allowed_Error extends Error {
 	override name = 'Path_Not_Allowed_Error' as const;
 
-	constructor(path: string) {
-		super(`Path is not allowed: ${path}`);
+	constructor(path: string, options?: ErrorOptions) {
+		super(`Path is not allowed: ${path}`, options);
 	}
 }
 
@@ -262,7 +262,7 @@ export class Path_Not_Allowed_Error extends Error {
 export class Symlink_Not_Allowed_Error extends Error {
 	override name = 'Symlink_Not_Allowed_Error' as const;
 
-	constructor(path: string) {
-		super(`Path is a symlink which is not allowed: ${path}`);
+	constructor(path: string, options?: ErrorOptions) {
+		super(`Path is a symlink which is not allowed: ${path}`, options);
 	}
 }

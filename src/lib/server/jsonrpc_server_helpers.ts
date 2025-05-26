@@ -2,13 +2,13 @@ import type {Logger} from '@ryanatkn/belt/log.js';
 
 import {
 	JSONRPC_VERSION,
-	type JSONRPCResponse,
-	type JSONRPCError,
+	type Jsonrpc_Response,
+	type Jsonrpc_Error,
 	JSONRPC_PARSE_ERROR,
 	JSONRPC_INVALID_REQUEST,
-	JSONRPCNotification,
-	JSONRPCRequest,
-	type JSONRPCRequestId,
+	Jsonrpc_Notification,
+	Jsonrpc_Request,
+	type Jsonrpc_Request_Id,
 } from '$lib/jsonrpc.js';
 import {create_jsonrpc_error} from '$lib/jsonrpc_helpers.js';
 
@@ -16,13 +16,13 @@ import {create_jsonrpc_error} from '$lib/jsonrpc_helpers.js';
  * Handler for processing JSON-RPC requests
  */
 export type Jsonrpc_Request_Handler = (
-	request: JSONRPCRequest,
-) => Promise<JSONRPCResponse | JSONRPCError>;
+	request: Jsonrpc_Request,
+) => Promise<Jsonrpc_Response | Jsonrpc_Error>;
 
 /**
  * Handler for processing JSON-RPC notifications
  */
-export type Jsonrpc_Notification_Handler = (notification: JSONRPCNotification) => Promise<void>;
+export type Jsonrpc_Notification_Handler = (notification: Jsonrpc_Notification) => Promise<void>;
 
 /**
  * Configuration options for the JSON-RPC server
@@ -51,14 +51,14 @@ export interface Handle_Jsonrpc_Request_Options {
  */
 export const handle_jsonrpc_request = async (
 	options: Handle_Jsonrpc_Request_Options,
-): Promise<JSONRPCResponse | JSONRPCError | null> => {
+): Promise<Jsonrpc_Response | Jsonrpc_Error | null> => {
 	const {message, onrequest, onnotification, log} = options;
 
-	const id: JSONRPCRequestId | undefined | null = message?.id; // include null for completeness
+	const id: Jsonrpc_Request_Id | undefined | null = message?.id; // include null for completeness
 
 	try {
 		// First attempt to validate as a request
-		const parse_result = JSONRPCRequest.safeParse(message);
+		const parse_result = Jsonrpc_Request.safeParse(message);
 		console.log(`parse_result`, parse_result);
 
 		if (parse_result.success) {
@@ -72,7 +72,7 @@ export const handle_jsonrpc_request = async (
 		}
 
 		// If it's not a valid request, check if it's a notification
-		const notificatiop_parse = JSONRPCNotification.safeParse(message);
+		const notificatiop_parse = Jsonrpc_Notification.safeParse(message);
 		if (notificatiop_parse.success) {
 			const notification = notificatiop_parse.data;
 			try {
