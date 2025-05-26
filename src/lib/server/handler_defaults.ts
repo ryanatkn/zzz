@@ -16,7 +16,6 @@ import {DEV} from 'esm-env';
 import type {Source_File} from '@ryanatkn/gro/filer.js';
 
 import {Action_Messages} from '$lib/action_messages.js';
-import type {Action_Message_From_Client} from '$lib/action_collections.js';
 import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
 import {Diskfile_Path, Serializable_Source_File} from '$lib/diskfile_types.js';
 import {map_watcher_change_to_diskfile_change} from '$lib/diskfile_helpers.js';
@@ -27,7 +26,7 @@ import {
 	format_gemini_messages,
 } from '$lib/server/ai_provider_utils.js';
 import {to_completion_response_params} from '$lib/response_helpers.js';
-import type {Filer_Change_Handler, Zzz_Server} from '$lib/server/zzz_server.js';
+import type {Action_Handler, Filer_Change_Handler} from '$lib/server/zzz_server.js';
 import {Safe_Fs} from '$lib/server/safe_fs.js';
 import type {Action_Message_Params} from '$lib/action_metatypes.js';
 import {to_action_message} from '$lib/action_helpers.js';
@@ -40,14 +39,15 @@ const anthropic = new Anthropic({apiKey: SECRET_ANTHROPIC_API_KEY});
 const openai = new OpenAI({apiKey: SECRET_OPENAI_API_KEY});
 const google = new GoogleGenerativeAI(SECRET_GOOGLE_API_KEY);
 
+// TODO BLOCK @api I think Action_Handler should not exist, and we should make `Client_Message_Handler` too.
+// but should the Jsonrpc_Result be the return type here? or allow `null` that'll then get omitted from the `result` field?
+type Server_Message_Handler = Action_Handler;
+
 /**
  * Handle client messages and produce appropriate server responses.
  * Each returns a value or throws a `Jsonrpc_Error`.
  */
-export const handle_message = async (
-	message: Action_Message_From_Client,
-	server: Zzz_Server,
-): Promise<unknown> => {
+export const handle_message: Server_Message_Handler = async (message, server) => {
 	console.log(`[handle_message] message`, message.id, message.method);
 
 	// TODO service registration in zzz_server with plugin system

@@ -29,6 +29,7 @@ import {
 	type Jsonrpc_Error,
 	type Jsonrpc_Notification,
 	JSONRPC_VERSION,
+	Jsonrpc_Result,
 } from '$lib/jsonrpc.js';
 import {handle_jsonrpc_request} from '$lib/server/jsonrpc_server_helpers.js';
 import {create_jsonrpc_error} from '$lib/jsonrpc_helpers.js';
@@ -42,7 +43,7 @@ export type Action_Handler = (
 	// should this be the `Server_Message_Handler` and mutations renamed to `Client_Message_Handler`?
 	message: Action_Message_From_Client,
 	server: Zzz_Server,
-) => Promise<unknown>;
+) => Promise<Jsonrpc_Result>;
 
 /**
  * Function type for handling file system changes.
@@ -213,7 +214,7 @@ export class Zzz_Server {
 	 * Process an action by name with parameters.
 	 * This is the unified entry point for both HTTP and WebSocket actions.
 	 */
-	async #receive_action_message(action_message: Action_Message_Base): Promise<unknown> {
+	async #receive_action_message(action_message: Action_Message_Base): Promise<Jsonrpc_Result> {
 		this.log?.debug(`receive message`, action_message.id, action_message.method);
 		this.#check_destroyed();
 
