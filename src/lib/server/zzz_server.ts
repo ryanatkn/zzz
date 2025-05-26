@@ -43,7 +43,7 @@ export type Action_Handler = (
 	// should this be the `Server_Message_Handler` and mutations renamed to `Client_Message_Handler`?
 	message: Action_Message_From_Client,
 	server: Zzz_Server,
-) => Promise<Jsonrpc_Result>;
+) => Promise<Jsonrpc_Result | null>;
 
 /**
  * Function type for handling file system changes.
@@ -178,6 +178,11 @@ export class Zzz_Server {
 					const result = await this.#receive_action_message(action_message);
 					console.log(`result`, result);
 
+					if (!result)
+						throw jsonrpc_errors.internal_error(
+							`no result returned for action: ${action_message.method}`,
+						);
+
 					return {
 						jsonrpc: JSONRPC_VERSION,
 						id: request.id,
@@ -214,7 +219,9 @@ export class Zzz_Server {
 	 * Process an action by name with parameters.
 	 * This is the unified entry point for both HTTP and WebSocket actions.
 	 */
-	async #receive_action_message(action_message: Action_Message_Base): Promise<Jsonrpc_Result> {
+	async #receive_action_message(
+		action_message: Action_Message_Base,
+	): Promise<Jsonrpc_Result | null> {
 		this.log?.debug(`receive message`, action_message.id, action_message.method);
 		this.#check_destroyed();
 

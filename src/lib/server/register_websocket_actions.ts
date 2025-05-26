@@ -74,7 +74,7 @@ export const handle_websocket_message = async (
 	const response = await zzz_server.handle_jsonrpc_message(data);
 
 	// Only send a response if it's not a notification (which doesn't expect a response)
-	if (response) {
+	if (response != null) {
 		ws.send(JSON.stringify(response));
 	}
 };
