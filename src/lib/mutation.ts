@@ -10,6 +10,7 @@ import type {Action_Message_Union} from '$lib/action_collections.js';
  * based on action requests or responses.
  */
 
+// TODO BLOCK @api maybe `Action_Invocation`?
 /**
  * Context provided to mutation handlers.
  */
