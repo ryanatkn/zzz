@@ -55,7 +55,7 @@ const create_item = (
 const item_schema = z.custom<Test_Item>((val) => val && typeof val === 'object' && 'id' in val);
 const items_array_schema = z.array(item_schema);
 const email_schema = z.string().email();
-const range_schema = z.number().int().min(10).max(100);
+const range_schema = z.number().int().gte(10).lte(100);
 const str_schema = z.string().min(1);
 
 describe('Indexed_Collection - Schema Validation', () => {

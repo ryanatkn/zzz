@@ -5,7 +5,7 @@
 import {test, expect, describe, vi, beforeEach, afterEach} from 'vitest';
 
 import {Request_Tracker} from '$lib/request_tracker.svelte.js';
-import {JSONRPC_INTERNAL_ERROR, JSONRPC_VERSION} from '$lib/jsonrpc.js';
+import {JSONRPC_INTERNAL_ERROR, JSONRPC_VERSION, JSONRPCErrorCode} from '$lib/jsonrpc.js';
 import {create_jsonrpc_request} from '$lib/jsonrpc_helpers.js';
 
 describe('Request_Tracker', () => {
@@ -307,7 +307,7 @@ describe('Request_Tracker', () => {
 			const error = {
 				jsonrpc: JSONRPC_VERSION,
 				id,
-				error: {code: -32000, message: 'test error'},
+				error: {code: JSONRPCErrorCode.parse(-32000), message: 'test error'},
 			} as const;
 
 			const deferred = tracker.track_request(id);
@@ -332,7 +332,7 @@ describe('Request_Tracker', () => {
 			tracker.reject_request(unknown_id, {
 				jsonrpc: JSONRPC_VERSION,
 				id: unknown_id,
-				error: {code: -32000, message: 'test'},
+				error: {code: JSONRPCErrorCode.parse(-32000), message: 'test'},
 			});
 
 			expect(warn_spy).toHaveBeenCalledTimes(1);
@@ -347,7 +347,7 @@ describe('Request_Tracker', () => {
 					error: {
 						jsonrpc: JSONRPC_VERSION,
 						id: 'error_req',
-						error: {code: -32000, message: 'standard error'},
+						error: {code: JSONRPCErrorCode.parse(-32000), message: 'standard error'},
 					},
 				},
 				{
@@ -355,7 +355,11 @@ describe('Request_Tracker', () => {
 					error: {
 						jsonrpc: JSONRPC_VERSION,
 						id: 'data_req',
-						error: {code: -32001, message: 'error with data', data: {detail: 'extra info'}},
+						error: {
+							code: JSONRPCErrorCode.parse(-32001),
+							message: 'error with data',
+							data: {detail: 'extra info'},
+						},
 					},
 				},
 				{
@@ -363,7 +367,7 @@ describe('Request_Tracker', () => {
 					error: {
 						jsonrpc: JSONRPC_VERSION,
 						id: 'object_req',
-						error: {code: -32000, message: 'object error'},
+						error: {code: JSONRPCErrorCode.parse(-32000), message: 'object error'},
 					},
 				},
 			] as const;
@@ -399,7 +403,7 @@ describe('Request_Tracker', () => {
 			tracker.reject_request(id, {
 				jsonrpc: JSONRPC_VERSION,
 				id,
-				error: {code: -32000, message: 'test error'},
+				error: {code: JSONRPCErrorCode.parse(-32000), message: 'test error'},
 			});
 			await promise;
 
@@ -906,7 +910,7 @@ describe('Request_Tracker', () => {
 			tracker.reject_request(id, {
 				jsonrpc: '2.0' as const,
 				id,
-				error: {code: -32000, message: 'test error'},
+				error: {code: JSONRPCErrorCode.parse(-32000), message: 'test error'},
 			});
 			tracker.cancel_request(id);
 		});
@@ -928,7 +932,7 @@ describe('Request_Tracker', () => {
 				jsonrpc: JSONRPC_VERSION,
 				id,
 				error: {
-					code: -32000,
+					code: JSONRPCErrorCode.parse(-32000),
 					message: 'ignored',
 				},
 			});
@@ -1028,7 +1032,7 @@ describe('Request_Tracker', () => {
 			tracker.reject_request(reject_id, {
 				jsonrpc: '2.0' as const,
 				id: reject_id,
-				error: {code: -32000, message: 'rejected'},
+				error: {code: JSONRPCErrorCode.parse(-32000), message: 'rejected'},
 			});
 
 			// Let the third request time out

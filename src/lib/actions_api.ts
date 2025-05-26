@@ -10,7 +10,7 @@ import {create_jsonrpc_request} from '$lib/jsonrpc_helpers.js';
 import {create_uuid} from '$lib/zod_helpers.js';
 import {to_action_message, to_action_message_type} from '$lib/action_helpers.js';
 import type {Action_Message_Union} from '$lib/action_collections.js';
-import type {JSONRPCNotification, JSONRPCRequest, JSONRPCError} from '$lib/jsonrpc.js';
+import type {JSONRPCNotification, JSONRPCRequest} from '$lib/jsonrpc.js';
 import type {Api_Request_Response_Flag} from '$lib/api.js';
 
 const log = new Logger();

@@ -82,34 +82,24 @@ export const JSONRPCResult = z
 	.passthrough();
 export type JSONRPCResult = z.infer<typeof JSONRPCResult>;
 
-/** Called `Request` in the MCP types. */
-export const JSONRPCBaseRequest = z.object({
-	method: z.string(),
-	params: JSONRPCRequestParams.optional(),
-});
-export type JSONRPCBaseRequest = z.infer<typeof JSONRPCBaseRequest>;
-
-/** Called `Notification` in the MCP types. */
-export const JSONRPCBaseNotification = z.object({
-	method: z.string(),
-	params: JSONRPCNotificationParams.optional(),
-});
-export type JSONRPCBaseNotification = z.infer<typeof JSONRPCBaseNotification>;
-
 /**
  * A request that expects a response.
  */
-export const JSONRPCRequest = JSONRPCBaseRequest.extend({
+export const JSONRPCRequest = z.object({
 	jsonrpc: z.literal(JSONRPC_VERSION),
 	id: JSONRPCRequestId,
+	method: JSONRPCMethod,
+	params: JSONRPCRequestParams.optional(),
 });
 export type JSONRPCRequest = z.infer<typeof JSONRPCRequest>;
 
 /**
  * A notification which does not expect a response.
  */
-export const JSONRPCNotification = JSONRPCBaseNotification.extend({
+export const JSONRPCNotification = z.object({
 	jsonrpc: z.literal(JSONRPC_VERSION),
+	method: JSONRPCMethod,
+	params: JSONRPCNotificationParams.optional(),
 });
 export type JSONRPCNotification = z.infer<typeof JSONRPCNotification>;
 
@@ -123,19 +113,33 @@ export const JSONRPCResponse = z.object({
 });
 export type JSONRPCResponse = z.infer<typeof JSONRPCResponse>;
 
-export const JSONRPCErrorCode = z.number().brand('JSONRPCErrorCode'); // TODO refine
-export type JSONRPCErrorCode = z.infer<typeof JSONRPCErrorCode>;
-
 // TODO add Zzz-specific error codes with mapping
 // Standard JSON-RPC error codes
-export const JSONRPC_PARSE_ERROR = -32700 as JSONRPCErrorCode;
-export const JSONRPC_INVALID_REQUEST = -32600 as JSONRPCErrorCode;
-export const JSONRPC_METHOD_NOT_FOUND = -32601 as JSONRPCErrorCode;
-export const JSONRPC_INVALID_PARAMS = -32602 as JSONRPCErrorCode;
-export const JSONRPC_INTERNAL_ERROR = -32603 as JSONRPCErrorCode;
-// export const JSONRPC_SERVER_ERROR_START = -32000;
-// export const JSONRPC_SERVER_ERROR_END = -32099;
+export const JSONRPC_PARSE_ERROR = -32700;
+export const JSONRPC_INVALID_REQUEST = -32600;
+export const JSONRPC_METHOD_NOT_FOUND = -32601;
+export const JSONRPC_INVALID_PARAMS = -32602;
+export const JSONRPC_INTERNAL_ERROR = -32603;
+export const JSONRPC_SERVER_ERROR_START = -32000;
+export const JSONRPC_SERVER_ERROR_END = -32099;
 // -32000 to -32099 - Server error - Reserved for implementation-defined server-errors.
+
+export const JSONRPCServerErrorCode = z
+	.number()
+	.gte(JSONRPC_SERVER_ERROR_END)
+	.lte(JSONRPC_SERVER_ERROR_START)
+	.brand('JSONRPCServerErrorCode');
+export type JSONRPCServerErrorCode = z.infer<typeof JSONRPCServerErrorCode>;
+
+export const JSONRPCErrorCode = z.union([
+	z.literal(JSONRPC_PARSE_ERROR),
+	z.literal(JSONRPC_INVALID_REQUEST),
+	z.literal(JSONRPC_METHOD_NOT_FOUND),
+	z.literal(JSONRPC_INVALID_PARAMS),
+	z.literal(JSONRPC_INTERNAL_ERROR),
+	JSONRPCServerErrorCode,
+]);
+export type JSONRPCErrorCode = z.infer<typeof JSONRPCErrorCode>;
 
 /**
  * A response to a request that indicates an error occurred.
