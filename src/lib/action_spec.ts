@@ -15,6 +15,7 @@ export type Action_Spec_Base = z.infer<typeof Action_Spec_Base>;
 // Type for request_response actions (client requests, server responds)
 export const Request_Response_Action_Spec = Action_Spec_Base.extend({
 	kind: z.literal('request_response').default('request_response'),
+	// TODO BLOCK @api rethink this, maybe just read/write or query/command separation via a flag?
 	http_method: z.custom<Http_Method>(),
 	auth: z.union([z.literal('authenticate'), z.literal('authorize'), z.null()]),
 	/**
