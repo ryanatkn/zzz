@@ -26,6 +26,9 @@ export class Server_Action_Event<
 	}
 
 	async handle(handler: Server_Action_Handler): Promise<void> {
+		if (this.handled) {
+			throw new Error('Server_Action_Event has already been handled');
+		}
 		this.handled = true;
 		this.result = await handler(this);
 	}
