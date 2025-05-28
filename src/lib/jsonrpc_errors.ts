@@ -88,7 +88,7 @@ export class Jsonrpc_Error_Class extends Error {
 		super(message, options);
 		this.code = code;
 		this.data = data;
-		this.name = 'JsonrpcError';
+		this.name = 'Jsonrpc_Error';
 	}
 }
 
@@ -97,15 +97,15 @@ export class Jsonrpc_Error_Class extends Error {
  */
 export const jsonrpc_errors = {
 	parse_error: (data?: unknown): Jsonrpc_Error_Class =>
-		new Jsonrpc_Error_Class(JSONRPC_ERROR_CODES.PARSE_ERROR, 'Parse error', data),
+		new Jsonrpc_Error_Class(JSONRPC_ERROR_CODES.PARSE_ERROR, 'parse error', data),
 
 	invalid_request: (data?: unknown): Jsonrpc_Error_Class =>
-		new Jsonrpc_Error_Class(JSONRPC_ERROR_CODES.INVALID_REQUEST, 'Invalid request', data),
+		new Jsonrpc_Error_Class(JSONRPC_ERROR_CODES.INVALID_REQUEST, 'invalid request', data),
 
 	method_not_found: (method: string, data?: unknown): Jsonrpc_Error_Class =>
 		new Jsonrpc_Error_Class(
 			JSONRPC_ERROR_CODES.METHOD_NOT_FOUND,
-			`Method not found: ${method}`,
+			`method not found: ${method}`,
 			data,
 		),
 
@@ -113,15 +113,15 @@ export const jsonrpc_errors = {
 		new Jsonrpc_Error_Class(JSONRPC_ERROR_CODES.INVALID_PARAMS, message, data),
 
 	internal_error: (
-		message: string = 'Internal server error',
+		message: string = 'internal server error',
 		data?: unknown,
 	): Jsonrpc_Error_Class =>
 		new Jsonrpc_Error_Class(JSONRPC_ERROR_CODES.INTERNAL_ERROR, message, data),
 
-	unauthorized: (message: string = 'Unauthorized', data?: unknown): Jsonrpc_Error_Class =>
+	unauthorized: (message: string = 'unauthorized', data?: unknown): Jsonrpc_Error_Class =>
 		new Jsonrpc_Error_Class(JSONRPC_ERROR_CODES.UNAUTHORIZED, message, data),
 
-	forbidden: (message: string = 'Forbidden', data?: unknown): Jsonrpc_Error_Class =>
+	forbidden: (message: string = 'forbidden', data?: unknown): Jsonrpc_Error_Class =>
 		new Jsonrpc_Error_Class(JSONRPC_ERROR_CODES.FORBIDDEN, message, data),
 
 	not_found: (resource: string, data?: unknown): Jsonrpc_Error_Class =>

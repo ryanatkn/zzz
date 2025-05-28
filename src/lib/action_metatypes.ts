@@ -75,19 +75,19 @@ export type Action_Message_Type = z.infer<typeof Action_Message_Type>;
 
 export interface Action_Message_Params {
 	create_directory_request: z.infer<typeof create_directory_action_spec.params>;
-	create_directory_response: z.infer<typeof create_directory_action_spec.response_params>;
+	create_directory_response: z.infer<typeof create_directory_action_spec.result>;
 	delete_diskfile_request: z.infer<typeof delete_diskfile_action_spec.params>;
-	delete_diskfile_response: z.infer<typeof delete_diskfile_action_spec.response_params>;
+	delete_diskfile_response: z.infer<typeof delete_diskfile_action_spec.result>;
 	filer_change: z.infer<typeof filer_change_action_spec.params>;
 	load_session_request: z.infer<typeof load_session_action_spec.params>;
-	load_session_response: z.infer<typeof load_session_action_spec.response_params>;
+	load_session_response: z.infer<typeof load_session_action_spec.result>;
 	ping_request: z.infer<typeof ping_action_spec.params>;
-	ping_response: z.infer<typeof ping_action_spec.response_params>;
+	ping_response: z.infer<typeof ping_action_spec.result>;
 	submit_completion_request: z.infer<typeof submit_completion_action_spec.params>;
-	submit_completion_response: z.infer<typeof submit_completion_action_spec.response_params>;
+	submit_completion_response: z.infer<typeof submit_completion_action_spec.result>;
 	toggle_main_menu: z.infer<typeof toggle_main_menu_action_spec.params>;
 	update_diskfile_request: z.infer<typeof update_diskfile_action_spec.params>;
-	update_diskfile_response: z.infer<typeof update_diskfile_action_spec.response_params>;
+	update_diskfile_response: z.infer<typeof update_diskfile_action_spec.result>;
 }
 
 /**

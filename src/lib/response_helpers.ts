@@ -37,7 +37,7 @@ export const to_completion_response_text = (
 /**
  * Creates a standardized completion response message from provider-specific responses
  */
-export const to_completion_response_params = (
+export const to_completion_result = (
 	request_id: Uuid,
 	provider_name: Provider_Name,
 	model: string,

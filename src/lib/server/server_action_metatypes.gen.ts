@@ -4,8 +4,8 @@ import {
 	to_action_message_identifier,
 	to_action_message_type,
 	to_action_spec_auth_identifier,
-	to_action_spec_identifier,
-	to_action_spec_response_params_identifier,
+	to_action_spec_params_identifier,
+	to_action_spec_result_identifier,
 } from '$lib/action_helpers.js';
 import {action_specs} from '$lib/action_collections.js';
 import {Action_Registry} from '$lib/action_registry.js';
@@ -53,8 +53,8 @@ export const gen: Gen = ({origin_path}) => {
 						// TODO BLOCK @api handle response messages too, probably rethinking the spec fields like having source/target/phase
 						const message_type = to_action_message_type(spec.method, 'request');
 						return `${spec.method}: ${to_action_spec_auth_identifier(spec.auth)}<
-							typeof ${to_action_spec_identifier(spec.method)},
-							typeof ${to_action_spec_response_params_identifier(spec.method)},
+							typeof ${to_action_spec_params_identifier(spec.method)},
+							typeof ${to_action_spec_result_identifier(spec.method)},
 							${to_action_message_identifier(message_type)},
 						>;`;
 					})

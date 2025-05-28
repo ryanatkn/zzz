@@ -19,7 +19,7 @@ export const ping_action_spec = {
 	http_method: 'GET',
 	auth: 'public',
 	params: z.void().optional(),
-	response_params: z
+	result: z
 		.object({
 			ping_id: Uuid,
 		})
@@ -32,7 +32,7 @@ export const load_session_action_spec = {
 	http_method: 'GET',
 	auth: 'public',
 	params: z.void().optional(),
-	response_params: z
+	result: z
 		.object({
 			data: z
 				// TODO extract this schema to diskfile_types or something
@@ -68,7 +68,7 @@ export const update_diskfile_action_spec = {
 			content: z.string(),
 		})
 		.strict(),
-	response_params: z.null().optional(), // TODO @many should these be void+optional?
+	result: z.null().optional(), // TODO @many should these be void+optional?
 } satisfies Action_Spec;
 
 export const delete_diskfile_action_spec = {
@@ -81,7 +81,7 @@ export const delete_diskfile_action_spec = {
 			path: Diskfile_Path,
 		})
 		.strict(),
-	response_params: z.null().optional(), // TODO @many should these be void+optional?
+	result: z.null().optional(), // TODO @many should these be void+optional?
 } satisfies Action_Spec;
 
 export const create_directory_action_spec = {
@@ -94,7 +94,7 @@ export const create_directory_action_spec = {
 			path: Diskfile_Path,
 		})
 		.strict(),
-	response_params: z.null().optional(), // TODO @many should these be void+optional?
+	result: z.null().optional(), // TODO @many should these be void+optional?
 } satisfies Action_Spec;
 
 export const submit_completion_action_spec = {
@@ -107,7 +107,7 @@ export const submit_completion_action_spec = {
 			completion_request: Completion_Request,
 		})
 		.strict(),
-	response_params: z
+	result: z
 		.object({
 			completion_response: Completion_Response,
 		})

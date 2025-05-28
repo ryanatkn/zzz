@@ -36,6 +36,7 @@ import {ZZZ_CACHE_DIRNAME} from '$lib/constants.js';
 import {to_zzz_cache_dir} from '$lib/diskfile_helpers.js';
 import {jsonrpc_errors} from '$lib/jsonrpc_errors.js';
 import type {Server_Action_Handlers} from '$lib/server/server_action_metatypes.js';
+import {Server_Action_Event} from '$lib/server/server_action_event.js';
 
 export type Action_Handler = (
 	// TODO BLOCK @api should be jsonrpc only right? maybe just the `params` at this point? wrapped in an object?
@@ -218,18 +219,16 @@ export class Zzz_Server {
 	 * Process an action by name with parameters.
 	 * This is the unified entry point for both HTTP and WebSocket actions.
 	 */
-	async #receive_action_message(
-		action_message: Action_Message_Base,
-	): Promise<Jsonrpc_Result | null> {
-		this.log?.debug(`receive message`, action_message.id, action_message.method);
+	async #receive_action_message(message: Action_Message_Base): Promise<Jsonrpc_Result | null> {
+		this.log?.debug(`receive message`, message.id, message.method);
 		this.#check_destroyed();
 
 		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-		if (!action_message) {
+		if (!message) {
 			throw jsonrpc_errors.invalid_request();
 		}
 
-		const {method} = action_message;
+		const {method} = message;
 
 		const spec = action_spec_by_method.get(method);
 		if (!spec) {
@@ -245,7 +244,7 @@ export class Zzz_Server {
 			throw jsonrpc_errors.internal_error(`unknown message schema: ${method}`);
 		}
 
-		const parsed_request = request_schema.safeParse(action_message);
+		const parsed_request = request_schema.safeParse(message);
 		if (!parsed_request.success) {
 			this.log?.error('failed to validate service params', method, parsed_request.error.issues);
 			throw jsonrpc_errors.invalid_params(
@@ -254,9 +253,14 @@ export class Zzz_Server {
 			);
 		}
 
-		// TODO BLOCK fix type, and is the action message interface the one we want? or pass through the JSON-RPC message?
+		// TODO BLOCK @api fix type, and is the action message interface the one we want? or pass through the JSON-RPC message?
+		// I think it's clearer that it's more like the action message type, but maybe we want send/receive or client/server or other modifiers
 		const handler = this.#server_action_handlers[method];
-		const returned = await this.#handle_message(parsed_request.data as any, this);
+		if (!handler) {
+			throw jsonrpc_errors.internal_error(method); // since there's a spec, this should not happen
+		}
+		const event = new Server_Action_Event(this, parsed_request.data, message);
+		await event.handle(handler);
 
 		// Validate the response during development
 		// TODO maybe always validate?
@@ -267,14 +271,14 @@ export class Zzz_Server {
 				throw jsonrpc_errors.internal_error(`unknown response schema: ${method}`);
 			}
 			const parsed_response = response_schema.safeParse({
-				...action_message,
-				params: returned,
+				...message,
+				params: event.result,
 			});
 			if (!parsed_response.success) {
 				this.log?.error(
 					'failed to validate service response params',
 					spec.method,
-					returned,
+					event.result,
 					parsed_response.error.issues,
 				);
 				throw jsonrpc_errors.internal_error(
@@ -284,7 +288,7 @@ export class Zzz_Server {
 			}
 		}
 
-		return returned;
+		return event.result;
 	}
 
 	#destroyed = false;

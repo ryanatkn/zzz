@@ -16,33 +16,33 @@ import type {Action_Messages} from '$lib/action_messages.js';
  */
 export interface Server_Action_Handlers {
 	create_directory: Public_Server_Action_Handler<
-		typeof create_directory_action_spec,
-		typeof create_directory_action_spec.response_params,
+		typeof create_directory_action_spec.params,
+		typeof create_directory_action_spec.result,
 		Action_Messages['create_directory_request']
 	>;
 	delete_diskfile: Public_Server_Action_Handler<
-		typeof delete_diskfile_action_spec,
-		typeof delete_diskfile_action_spec.response_params,
+		typeof delete_diskfile_action_spec.params,
+		typeof delete_diskfile_action_spec.result,
 		Action_Messages['delete_diskfile_request']
 	>;
 	load_session: Public_Server_Action_Handler<
-		typeof load_session_action_spec,
-		typeof load_session_action_spec.response_params,
+		typeof load_session_action_spec.params,
+		typeof load_session_action_spec.result,
 		Action_Messages['load_session_request']
 	>;
 	ping: Public_Server_Action_Handler<
-		typeof ping_action_spec,
-		typeof ping_action_spec.response_params,
+		typeof ping_action_spec.params,
+		typeof ping_action_spec.result,
 		Action_Messages['ping_request']
 	>;
 	submit_completion: Public_Server_Action_Handler<
-		typeof submit_completion_action_spec,
-		typeof submit_completion_action_spec.response_params,
+		typeof submit_completion_action_spec.params,
+		typeof submit_completion_action_spec.result,
 		Action_Messages['submit_completion_request']
 	>;
 	update_diskfile: Public_Server_Action_Handler<
-		typeof update_diskfile_action_spec,
-		typeof update_diskfile_action_spec.response_params,
+		typeof update_diskfile_action_spec.params,
+		typeof update_diskfile_action_spec.result,
 		Action_Messages['update_diskfile_request']
 	>;
 }

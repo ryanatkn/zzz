@@ -29,7 +29,7 @@ export const Request_Response_Action_Spec = Action_Spec_Base.extend({
 	 * For the request_response the base action `params` are the request params,
 	 * and we mirror the name here for the response message payload.
 	 */
-	response_params: z.instanceof(z.ZodType),
+	result: z.instanceof(z.ZodType),
 });
 export type Request_Response_Action_Spec = z.infer<typeof Request_Response_Action_Spec>;
 

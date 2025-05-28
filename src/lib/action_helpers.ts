@@ -105,8 +105,8 @@ export const to_action_spec_params_identifier = (method: Action_Method): string 
 /**
  * Convert an action name to its response schema identifier.
  */
-export const to_action_spec_response_params_identifier = (method: Action_Method): string =>
-	`${to_action_spec_identifier(method)}.response_params`;
+export const to_action_spec_result_identifier = (method: Action_Method): string =>
+	`${to_action_spec_identifier(method)}.result`;
 
 export const to_action_spec_auth_identifier = (auth: Request_Response_Action_Spec_Auth): string =>
 	auth === 'public'

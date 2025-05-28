@@ -23,7 +23,7 @@ export const Action_Messages = {
 	create_directory_response: Action_Message_Base.extend({
 		type: z.literal('create_directory_response').default('create_directory_response'),
 		method: z.literal('create_directory').default('create_directory'),
-		params: create_directory_action_spec.response_params,
+		params: create_directory_action_spec.result,
 	}),
 	delete_diskfile_request: Action_Message_Base.extend({
 		type: z.literal('delete_diskfile_request').default('delete_diskfile_request'),
@@ -33,7 +33,7 @@ export const Action_Messages = {
 	delete_diskfile_response: Action_Message_Base.extend({
 		type: z.literal('delete_diskfile_response').default('delete_diskfile_response'),
 		method: z.literal('delete_diskfile').default('delete_diskfile'),
-		params: delete_diskfile_action_spec.response_params,
+		params: delete_diskfile_action_spec.result,
 	}),
 	filer_change: Action_Message_Base.extend({
 		type: z.literal('filer_change').default('filer_change'),
@@ -48,7 +48,7 @@ export const Action_Messages = {
 	load_session_response: Action_Message_Base.extend({
 		type: z.literal('load_session_response').default('load_session_response'),
 		method: z.literal('load_session').default('load_session'),
-		params: load_session_action_spec.response_params,
+		params: load_session_action_spec.result,
 	}),
 	ping_request: Action_Message_Base.extend({
 		type: z.literal('ping_request').default('ping_request'),
@@ -58,7 +58,7 @@ export const Action_Messages = {
 	ping_response: Action_Message_Base.extend({
 		type: z.literal('ping_response').default('ping_response'),
 		method: z.literal('ping').default('ping'),
-		params: ping_action_spec.response_params,
+		params: ping_action_spec.result,
 	}),
 	submit_completion_request: Action_Message_Base.extend({
 		type: z.literal('submit_completion_request').default('submit_completion_request'),
@@ -68,7 +68,7 @@ export const Action_Messages = {
 	submit_completion_response: Action_Message_Base.extend({
 		type: z.literal('submit_completion_response').default('submit_completion_response'),
 		method: z.literal('submit_completion').default('submit_completion'),
-		params: submit_completion_action_spec.response_params,
+		params: submit_completion_action_spec.result,
 	}),
 	toggle_main_menu: Action_Message_Base.extend({
 		type: z.literal('toggle_main_menu').default('toggle_main_menu'),
@@ -83,7 +83,7 @@ export const Action_Messages = {
 	update_diskfile_response: Action_Message_Base.extend({
 		type: z.literal('update_diskfile_response').default('update_diskfile_response'),
 		method: z.literal('update_diskfile').default('update_diskfile'),
-		params: update_diskfile_action_spec.response_params,
+		params: update_diskfile_action_spec.result,
 	}),
 };
 export interface Action_Messages {

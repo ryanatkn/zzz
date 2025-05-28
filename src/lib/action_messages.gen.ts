@@ -5,7 +5,7 @@ import {Action_Registry} from '$lib/action_registry.js';
 import {
 	to_action_spec_identifier,
 	to_action_spec_params_identifier,
-	to_action_spec_response_params_identifier,
+	to_action_spec_result_identifier,
 	to_action_request_message_type,
 	to_action_response_message_type,
 } from '$lib/action_helpers.js';
@@ -43,7 +43,7 @@ export const gen: Gen = ({origin_path}) => {
 						${to_action_response_message_type(method)}: Action_Message_Base.extend({
 						type: z.literal('${to_action_response_message_type(method)}').default('${to_action_response_message_type(method)}'),
 						method: z.literal('${method}').default('${method}'),
-							params: ${to_action_spec_response_params_identifier(method)},
+							params: ${to_action_spec_result_identifier(method)},
 						})`;
 					} else {
 						return `${method}: Action_Message_Base.extend({

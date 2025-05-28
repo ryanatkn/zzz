@@ -922,7 +922,7 @@ export const src_json = {
 				{name: 'jsonrpc_request_to_action_message', kind: 'function'},
 				{name: 'to_action_spec_identifier', kind: 'function'},
 				{name: 'to_action_spec_params_identifier', kind: 'function'},
-				{name: 'to_action_spec_response_params_identifier', kind: 'function'},
+				{name: 'to_action_spec_result_identifier', kind: 'function'},
 				{name: 'to_action_spec_auth_identifier', kind: 'function'},
 			],
 		},
@@ -2010,7 +2010,7 @@ export const src_json = {
 			path: 'response_helpers.ts',
 			declarations: [
 				{name: 'to_completion_response_text', kind: 'function'},
-				{name: 'to_completion_response_params', kind: 'function'},
+				{name: 'to_completion_result', kind: 'function'},
 			],
 		},
 		'./schema_helpers.js': {

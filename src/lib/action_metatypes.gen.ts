@@ -6,7 +6,7 @@ import {action_specs} from '$lib/action_collections.js';
 import {Action_Registry} from '$lib/action_registry.js';
 import {
 	to_action_spec_params_identifier,
-	to_action_spec_response_params_identifier,
+	to_action_spec_result_identifier,
 	to_action_message_type,
 	to_action_request_message_type,
 	to_action_response_message_type,
@@ -88,7 +88,7 @@ export const gen: Gen = ({origin_path}) => {
 					const {method} = spec;
 					if (spec.kind === 'request_response') {
 						return `${to_action_request_message_type(method)}: z.infer<typeof ${to_action_spec_params_identifier(method)}>,
-						${to_action_response_message_type(method)}: z.infer<typeof ${to_action_spec_response_params_identifier(method)}>`;
+						${to_action_response_message_type(method)}: z.infer<typeof ${to_action_spec_result_identifier(method)}>`;
 					} else {
 						return `${method}: z.infer<typeof ${to_action_spec_params_identifier(method)}>`;
 					}

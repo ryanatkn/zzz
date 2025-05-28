@@ -23,7 +23,7 @@ import {
 	format_openai_messages,
 	format_gemini_messages,
 } from '$lib/server/ai_provider_utils.js';
-import {to_completion_response_params} from '$lib/response_helpers.js';
+import {to_completion_result} from '$lib/response_helpers.js';
 import type {Filer_Change_Handler} from '$lib/server/zzz_server.js';
 import {Safe_Fs} from '$lib/server/safe_fs.js';
 import type {Action_Message_Params} from '$lib/action_metatypes.js';
@@ -74,7 +74,7 @@ export const server_action_handlers: Server_Action_Handlers = {
 		const {prompt, provider_name, model, completion_messages} = message.params.completion_request;
 		const config = server.config;
 
-		let response_params: Action_Message_Params['submit_completion_response'];
+		let result: Action_Message_Params['submit_completion_response'];
 
 		console.log(`texting ${provider_name}:`, prompt.substring(0, 1000));
 
@@ -102,12 +102,7 @@ export const server_action_handlers: Server_Action_Handlers = {
 						messages: format_ollama_messages(config.system_message, completion_messages, prompt),
 					});
 					console.log(`ollama api_response`, api_response);
-					response_params = to_completion_response_params(
-						message.id,
-						provider_name,
-						model,
-						api_response,
-					);
+					result = to_completion_result(message.id, provider_name, model, api_response);
 					break;
 				}
 
@@ -123,12 +118,7 @@ export const server_action_handlers: Server_Action_Handlers = {
 						messages: format_claude_messages(completion_messages, prompt),
 					});
 					console.log(`claude api_response`, api_response);
-					response_params = to_completion_response_params(
-						message.id,
-						provider_name,
-						model,
-						api_response,
-					);
+					result = to_completion_result(message.id, provider_name, model, api_response);
 					break;
 				}
 
@@ -150,12 +140,7 @@ export const server_action_handlers: Server_Action_Handlers = {
 						),
 					});
 					console.log(`openai api_response`, api_response);
-					response_params = to_completion_response_params(
-						message.id,
-						provider_name,
-						model,
-						api_response,
-					);
+					result = to_completion_result(message.id, provider_name, model, api_response);
 					break;
 				}
 
@@ -181,12 +166,7 @@ export const server_action_handlers: Server_Action_Handlers = {
 					const content = format_gemini_messages(completion_messages, prompt);
 					const api_response = await google_model.generateContent(content);
 					console.log(`gemini api_response`, api_response);
-					response_params = to_completion_response_params(
-						message.id,
-						provider_name,
-						model,
-						api_response,
-					);
+					result = to_completion_result(message.id, provider_name, model, api_response);
 					break;
 				}
 
@@ -205,16 +185,16 @@ export const server_action_handlers: Server_Action_Handlers = {
 		// TODO this is currently only being created for logging/history purposes, doesn't get sent to client
 		const response_message = to_action_message(
 			'submit_completion_response',
-			response_params,
+			result,
 			message.jsonrpc_message_id,
 		);
 
 		// We don't need to wait for this to finish
 		void save_response(message, response_message, server.zzz_cache_dir, server.safe_fs);
 
-		console.log(`got ${provider_name} message`, response_params.completion_response.data);
+		console.log(`got ${provider_name} message`, result.completion_response.data);
 
-		return response_params;
+		return result;
 	},
 
 	update_diskfile: async ({server, message}) => {
