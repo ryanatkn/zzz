@@ -1,7 +1,7 @@
 import {z} from 'zod';
 
 import {Type_Literal} from '$lib/zod_helpers.js';
-import type {Http_Method} from '$lib/api.js';
+import type {Http_Method} from '$lib/http.js';
 import {Action_Method} from '$lib/action_metatypes.js';
 import {Action_Kind} from '$lib/action_types.js';
 

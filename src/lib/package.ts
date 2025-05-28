@@ -131,7 +131,6 @@ export const package_json = {
 			default: './dist/actions.svelte.js',
 		},
 		'./api_client.js': {types: './dist/api_client.d.ts', default: './dist/api_client.js'},
-		'./api.js': {types: './dist/api.d.ts', default: './dist/api.js'},
 		'./app.svelte.js': {types: './dist/app.svelte.d.ts', default: './dist/app.svelte.js'},
 		'./Bit_Editor_For_Diskfile.svelte': {
 			types: './dist/Bit_Editor_For_Diskfile.svelte.d.ts',
@@ -1050,7 +1049,6 @@ export const src_json = {
 				{name: 'Api_Client', kind: 'class'},
 			],
 		},
-		'./api.js': {path: 'api.ts', declarations: [{name: 'Http_Method', kind: 'variable'}]},
 		'./app.svelte.js': {
 			path: 'app.svelte.ts',
 			declarations: [

@@ -166,10 +166,6 @@
       "types": "./dist/api_client.d.ts",
       "default": "./dist/api_client.js"
     },
-    "./api.js": {
-      "types": "./dist/api.d.ts",
-      "default": "./dist/api.js"
-    },
     "./app.svelte.js": {
       "types": "./dist/app.svelte.d.ts",
       "default": "./dist/app.svelte.js"
