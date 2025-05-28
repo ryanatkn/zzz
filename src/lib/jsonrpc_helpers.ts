@@ -2,7 +2,7 @@ import {DEV} from 'esm-env';
 
 import {
 	JSONRPC_VERSION,
-	Jsonrpc_Error,
+	Jsonrpc_Error_Message,
 	Jsonrpc_Error_Code,
 	Jsonrpc_Singular_Message,
 	type Jsonrpc_Method,
@@ -12,7 +12,7 @@ import {
 	type Jsonrpc_Request_Id,
 	type Jsonrpc_Request_Params,
 } from '$lib/jsonrpc.js';
-import {Jsonrpc_Error_Class, JSONRPC_ERROR_CODES} from '$lib/jsonrpc_errors.js';
+import {Jsonrpc_Error, JSONRPC_ERROR_CODES} from '$lib/jsonrpc_errors.js';
 
 export const create_jsonrpc_request = (
 	method: Jsonrpc_Method,
@@ -51,12 +51,12 @@ export const create_jsonrpc_notification = (
  * Creates a JSON-RPC error response from any error.
  * Handles Jsonrpc_Error and regular Error objects.
  */
-export const create_jsonrpc_error = (id: Jsonrpc_Request_Id, error: any): Jsonrpc_Error => {
+export const create_jsonrpc_error = (id: Jsonrpc_Request_Id, error: any): Jsonrpc_Error_Message => {
 	let code: Jsonrpc_Error_Code = JSONRPC_ERROR_CODES.INTERNAL_ERROR;
 	let message = 'Internal server error';
 	let data = undefined;
 
-	if (error instanceof Jsonrpc_Error_Class) {
+	if (error instanceof Jsonrpc_Error) {
 		// Use the error directly
 		code = error.code;
 		message = error.message;

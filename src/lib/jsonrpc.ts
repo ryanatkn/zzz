@@ -171,7 +171,7 @@ export type Jsonrpc_Error_Code = z.infer<typeof Jsonrpc_Error_Code>;
 /**
  * A response to a request that indicates an error occurred.
  */
-export const Jsonrpc_Error = z.object({
+export const Jsonrpc_Error_Message = z.object({
 	jsonrpc: z.literal(JSONRPC_VERSION),
 	id: Jsonrpc_Request_Id,
 	error: z.object({
@@ -190,7 +190,7 @@ export const Jsonrpc_Error = z.object({
 		data: z.unknown().optional(),
 	}),
 });
-export type Jsonrpc_Error = z.infer<typeof Jsonrpc_Error>;
+export type Jsonrpc_Error_Message = z.infer<typeof Jsonrpc_Error_Message>;
 
 /**
  * A JSON-RPC batch request, as described in https://www.jsonrpc.org/specification#batch.
@@ -201,7 +201,7 @@ export type Jsonrpc_Batch_Request = z.infer<typeof Jsonrpc_Batch_Request>;
 /**
  * A JSON-RPC batch response, as described in https://www.jsonrpc.org/specification#batch.
  */
-export const Jsonrpc_Singular_Response = z.union([Jsonrpc_Response, Jsonrpc_Error]);
+export const Jsonrpc_Singular_Response = z.union([Jsonrpc_Response, Jsonrpc_Error_Message]);
 export type Jsonrpc_Singular_Response = z.infer<typeof Jsonrpc_Singular_Response>;
 
 /**
@@ -217,7 +217,7 @@ export const Jsonrpc_Message = z.union([
 	Jsonrpc_Request,
 	Jsonrpc_Notification,
 	Jsonrpc_Response,
-	Jsonrpc_Error,
+	Jsonrpc_Error_Message,
 	Jsonrpc_Batch_Request,
 	Jsonrpc_Batch_Response,
 ]);
@@ -235,7 +235,7 @@ export type Jsonrpc_Message_From_Client_To_Server = z.infer<
 export const Jsonrpc_Message_From_Server_To_Client = z.union([
 	Jsonrpc_Notification,
 	Jsonrpc_Response,
-	Jsonrpc_Error,
+	Jsonrpc_Error_Message,
 	Jsonrpc_Batch_Response,
 ]);
 export type Jsonrpc_Message_From_Server_To_Client = z.infer<
@@ -246,7 +246,7 @@ export const Jsonrpc_Singular_Message = z.union([
 	Jsonrpc_Request,
 	Jsonrpc_Notification,
 	Jsonrpc_Response,
-	Jsonrpc_Error,
+	Jsonrpc_Error_Message,
 ]);
 export type Jsonrpc_Singular_Message = z.infer<typeof Jsonrpc_Singular_Message>;
 

@@ -6,7 +6,7 @@ import {SvelteMap} from 'svelte/reactivity';
 import {Datetime, get_datetime_now} from '$lib/zod_helpers.js';
 import {
 	JSONRPC_INTERNAL_ERROR,
-	type Jsonrpc_Error,
+	type Jsonrpc_Error_Message,
 	type Jsonrpc_Request,
 	type Jsonrpc_Request_Id,
 } from '$lib/jsonrpc.js';
@@ -108,9 +108,9 @@ export class Request_Tracker {
 	/**
 	 * Reject a pending request with the given error.
 	 * @param id The request id
-	 * @param error The complete Jsonrpc_Error object
+	 * @param error The complete Jsonrpc_Error_Message object
 	 */
-	reject_request(id: Jsonrpc_Request_Id, error: Jsonrpc_Error): void {
+	reject_request(id: Jsonrpc_Request_Id, error: Jsonrpc_Error_Message): void {
 		const request = this.pending_requests.get(id);
 		if (!request) {
 			console.warn(`Received error for unknown request: ${id}`);

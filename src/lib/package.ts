@@ -1685,7 +1685,7 @@ export const src_json = {
 			declarations: [
 				{name: 'JSONRPC_ERROR_CODES', kind: 'variable'},
 				{name: 'http_status_to_jsonrpc_code', kind: 'function'},
-				{name: 'Jsonrpc_Error_Class', kind: 'class'},
+				{name: 'Jsonrpc_Error', kind: 'class'},
 				{name: 'jsonrpc_errors', kind: 'variable'},
 			],
 		},

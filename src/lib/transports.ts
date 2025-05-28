@@ -11,7 +11,7 @@ import type {
 } from '$lib/jsonrpc.js';
 import type {Socket} from '$lib/socket.svelte.js';
 import {Request_Tracker} from '$lib/request_tracker.svelte.js';
-import {Jsonrpc_Error_Class, jsonrpc_errors} from '$lib/jsonrpc_errors.js';
+import {Jsonrpc_Error, jsonrpc_errors} from '$lib/jsonrpc_errors.js';
 
 // TODO probably add reactivity?
 
@@ -208,7 +208,7 @@ export class Websocket_Rpc_Transport implements Transport {
 			}
 		} catch (error) {
 			console.error('[websocket transport] Error sending message:', error);
-			if (error instanceof Jsonrpc_Error_Class) {
+			if (error instanceof Jsonrpc_Error) {
 				throw error;
 			}
 			throw jsonrpc_errors.internal_error(
@@ -267,7 +267,7 @@ export class Http_Rpc_Transport implements Transport {
 			return result;
 		} catch (error) {
 			console.error('[http transport] Error sending HTTP request:', error);
-			if (error instanceof Jsonrpc_Error_Class) {
+			if (error instanceof Jsonrpc_Error) {
 				throw error;
 			}
 			throw jsonrpc_errors.internal_error('Error sending HTTP request', {

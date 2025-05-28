@@ -3,7 +3,7 @@ import type {Logger} from '@ryanatkn/belt/log.js';
 import {
 	JSONRPC_VERSION,
 	type Jsonrpc_Response,
-	type Jsonrpc_Error,
+	type Jsonrpc_Error_Message,
 	JSONRPC_PARSE_ERROR,
 	JSONRPC_INVALID_REQUEST,
 	Jsonrpc_Notification,
@@ -17,7 +17,7 @@ import {create_jsonrpc_error} from '$lib/jsonrpc_helpers.js';
  */
 export type Jsonrpc_Request_Handler = (
 	request: Jsonrpc_Request,
-) => Promise<Jsonrpc_Response | Jsonrpc_Error>;
+) => Promise<Jsonrpc_Response | Jsonrpc_Error_Message>;
 
 /**
  * Handler for processing JSON-RPC notifications
@@ -51,7 +51,7 @@ export interface Handle_Jsonrpc_Request_Options {
  */
 export const handle_jsonrpc_request = async (
 	options: Handle_Jsonrpc_Request_Options,
-): Promise<Jsonrpc_Response | Jsonrpc_Error | null> => {
+): Promise<Jsonrpc_Response | Jsonrpc_Error_Message | null> => {
 	const {message, onrequest, onnotification, log} = options;
 
 	const id: Jsonrpc_Request_Id | undefined | null = message?.id; // include null for completeness

@@ -24,7 +24,7 @@ import {
 import {
 	type Jsonrpc_Request,
 	type Jsonrpc_Response,
-	type Jsonrpc_Error,
+	type Jsonrpc_Error_Message,
 	type Jsonrpc_Notification,
 	JSONRPC_VERSION,
 	Jsonrpc_Result,
@@ -168,10 +168,14 @@ export class Zzz_Server {
 		this.filers.set(this.zzz_cache_dir, {filer, cleanup_promise});
 	}
 
-	async handle_jsonrpc_message(message: unknown): Promise<Jsonrpc_Response | Jsonrpc_Error | null> {
+	async handle_jsonrpc_message(
+		message: unknown,
+	): Promise<Jsonrpc_Response | Jsonrpc_Error_Message | null> {
 		return handle_jsonrpc_request({
 			message,
-			onrequest: async (request: Jsonrpc_Request): Promise<Jsonrpc_Response | Jsonrpc_Error> => {
+			onrequest: async (
+				request: Jsonrpc_Request,
+			): Promise<Jsonrpc_Response | Jsonrpc_Error_Message> => {
 				try {
 					const action_message = jsonrpc_request_to_action_message(request);
 
