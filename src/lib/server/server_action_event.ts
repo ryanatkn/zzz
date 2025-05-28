@@ -1,7 +1,7 @@
 import type {Zzz_Server} from '$lib/server/zzz_server.js';
 import type {Jsonrpc_Params} from '$lib/jsonrpc.js';
 import type {Action_Message_Base} from '$lib/action_types.js';
-import type {Server_Action_Handler} from './server_action_handler.js';
+import type {Server_Action_Handler} from '$lib/server/server_action_handler.js';
 
 export class Server_Action_Event<
 	T_Params extends Jsonrpc_Params = any,

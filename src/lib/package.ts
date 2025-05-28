@@ -291,6 +291,18 @@ export const package_json = {
 			svelte: './dist/Clear_Restore_Button.svelte',
 			default: './dist/Clear_Restore_Button.svelte',
 		},
+		'./client_action_event.js': {
+			types: './dist/client_action_event.d.ts',
+			default: './dist/client_action_event.js',
+		},
+		'./client_action_handler.js': {
+			types: './dist/client_action_handler.d.ts',
+			default: './dist/client_action_handler.js',
+		},
+		'./client_action_handlers.js': {
+			types: './dist/client_action_handlers.d.ts',
+			default: './dist/client_action_handlers.js',
+		},
 		'./completion_types.js': {
 			types: './dist/completion_types.d.ts',
 			default: './dist/completion_types.js',
@@ -767,7 +779,18 @@ export const package_json = {
 			types: './dist/server/security.d.ts',
 			default: './dist/server/security.js',
 		},
-		'./server/server.js': {types: './dist/server/server.d.ts', default: './dist/server/server.js'},
+		'./server/server_action_event.js': {
+			types: './dist/server/server_action_event.d.ts',
+			default: './dist/server/server_action_event.js',
+		},
+		'./server/server_action_handler.js': {
+			types: './dist/server/server_action_handler.d.ts',
+			default: './dist/server/server_action_handler.js',
+		},
+		'./server/server_action_handlers.js': {
+			types: './dist/server/server_action_handlers.d.ts',
+			default: './dist/server/server_action_handlers.js',
+		},
 		'./server/server_action_metatypes.gen.js': {
 			types: './dist/server/server_action_metatypes.gen.d.ts',
 			default: './dist/server/server_action_metatypes.gen.js',
@@ -776,6 +799,7 @@ export const package_json = {
 			types: './dist/server/server_action_metatypes.d.ts',
 			default: './dist/server/server_action_metatypes.js',
 		},
+		'./server/server.js': {types: './dist/server/server.d.ts', default: './dist/server/server.js'},
 		'./server/zzz_server.js': {
 			types: './dist/server/zzz_server.d.ts',
 			default: './dist/server/zzz_server.js',
@@ -1288,6 +1312,23 @@ export const src_json = {
 		'./Clear_Restore_Button.svelte': {
 			path: 'Clear_Restore_Button.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./client_action_event.js': {
+			path: 'client_action_event.ts',
+			declarations: [
+				{name: 'Client_Action_Handler', kind: 'type'},
+				{name: 'After_Client_Action', kind: 'type'},
+				{name: 'After_Client_Action_Callback', kind: 'type'},
+				{name: 'Client_Action_Context', kind: 'class'},
+			],
+		},
+		'./client_action_handler.js': {
+			path: 'client_action_handler.ts',
+			declarations: [{name: 'Client_Action_Handler', kind: 'type'}],
+		},
+		'./client_action_handlers.js': {
+			path: 'client_action_handlers.ts',
+			declarations: [{name: 'client_action_handlers', kind: 'variable'}],
 		},
 		'./completion_types.js': {
 			path: 'completion_types.ts',
@@ -2087,7 +2128,26 @@ export const src_json = {
 				{name: 'should_allow_origin', kind: 'function'},
 			],
 		},
-		'./server/server.js': {path: 'server/server.ts'},
+		'./server/server_action_event.js': {
+			path: 'server/server_action_event.ts',
+			declarations: [{name: 'Server_Action_Event', kind: 'class'}],
+		},
+		'./server/server_action_handler.js': {
+			path: 'server/server_action_handler.ts',
+			declarations: [
+				{name: 'Public_Server_Action_Handler', kind: 'type'},
+				{name: 'Authenticated_Server_Action_Handler', kind: 'type'},
+				{name: 'Authorized_Server_Action_Handler', kind: 'type'},
+				{name: 'Server_Action_Handler', kind: 'type'},
+			],
+		},
+		'./server/server_action_handlers.js': {
+			path: 'server/server_action_handlers.ts',
+			declarations: [
+				{name: 'server_action_handlers', kind: 'variable'},
+				{name: 'handle_filer_change', kind: 'function'},
+			],
+		},
 		'./server/server_action_metatypes.gen.js': {
 			path: 'server/server_action_metatypes.gen.ts',
 			declarations: [{name: 'gen', kind: 'function'}],
@@ -2096,6 +2156,7 @@ export const src_json = {
 			path: 'server/server_action_metatypes.ts',
 			declarations: [{name: 'Server_Action_Handlers', kind: 'type'}],
 		},
+		'./server/server.js': {path: 'server/server.ts'},
 		'./server/zzz_server.js': {
 			path: 'server/zzz_server.ts',
 			declarations: [

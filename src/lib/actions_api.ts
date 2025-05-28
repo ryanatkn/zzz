@@ -3,7 +3,7 @@ import {BROWSER, DEV} from 'esm-env';
 
 import type {Actions_Api} from '$lib/action_metatypes.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
-import {create_mutation_context} from '$lib/client_action_handler.js';
+import {Client_Action_Context} from '$lib/client_action_event.js';
 import {create_jsonrpc_request} from '$lib/jsonrpc_helpers.js';
 import {create_uuid} from '$lib/zod_helpers.js';
 import {to_action_message, to_action_message_type} from '$lib/action_helpers.js';
@@ -29,14 +29,14 @@ export const create_actions_api = (zzz: Zzz): Actions_Api =>
 				throw new Error(`missing action spec for method '${method}'`);
 			}
 
-			const mutate = (
+			const handle = (
 				result: any | null, // TODO @api type
 				request_response_flag: Api_Request_Response_Flag,
 				action_message: Action_Message_Union,
 				jsonrpc_message: Jsonrpc_Request | Jsonrpc_Notification | null,
 			) => {
 				console.log('\n\n\n\n\n\n\n\n[actions_api] mutate', method, result, request_response_flag);
-				const {ctx, flush_after_client_action} = create_mutation_context(
+				const event = new Client_Action_Context(
 					zzz,
 					method,
 					params,
@@ -45,21 +45,19 @@ export const create_actions_api = (zzz: Zzz): Actions_Api =>
 					action_message,
 					jsonrpc_message,
 				);
-				console.log(`[actions_api] message_type`, ctx.action_message.type);
-				console.log(`[actions_api] ctx`, ctx);
+				console.log(`[actions_api] message_type`, event.action_message.type);
+				console.log(`[actions_api] event`, event);
 
-				const mutation = zzz.mutations[ctx.action_message.type];
-				if (!mutation) {
+				const handler = zzz.mutations[event.action_message.type];
+				if (!handler) {
 					log.warn(`missing mutation for action '${method}'`);
 				}
 
-				// Apply the mutation, updating the local state! May be async but is not awaited.
-				const mutated = mutation?.(ctx);
+				if (handler) {
+					event.handle(handler);
+				}
 
-				void flush_after_client_action(); // not awaited because these are side effects, also supports sync functions
-
-				// Forward whatever the mutation returns
-				return mutated;
+				return event.result;
 			};
 
 			const request_jsonrpc_message = create_jsonrpc_request(method, params, create_uuid());
@@ -79,7 +77,7 @@ export const create_actions_api = (zzz: Zzz): Actions_Api =>
 			// `request_response` actions have special handling,
 			// each such method has a `_request` and `_response` type variant.
 			if (spec.kind === 'request_response') {
-				mutate(null, 'request', request_action_message, request_jsonrpc_message);
+				handle(null, 'request', request_action_message, request_jsonrpc_message);
 
 				// Avoiding `await` for compatibility with sync actions
 				return zzz.api_client.send(request_jsonrpc_message).then((response) => {
@@ -110,7 +108,7 @@ export const create_actions_api = (zzz: Zzz): Actions_Api =>
 					zzz.actions.add_message(response_action_message);
 
 					const result = response_jsonrpc_message.result;
-					mutate(result, 'response', response_action_message, response_jsonrpc_message);
+					handle(result, 'response', response_action_message, response_jsonrpc_message);
 
 					// Return the result value directly
 					return result;
@@ -118,7 +116,7 @@ export const create_actions_api = (zzz: Zzz): Actions_Api =>
 			}
 
 			// Handle non-`request_response` actions synchronously
-			return mutate(null, null, request_action_message, request_jsonrpc_message);
+			return handle(null, null, request_action_message, request_jsonrpc_message);
 		},
 	});
 
