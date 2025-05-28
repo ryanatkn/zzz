@@ -10,8 +10,16 @@ import {
 import {Type_Literal, Uuid} from '$lib/zod_helpers.js';
 import {Completion_Request, Completion_Response} from '$lib/completion_types.js';
 
-// Specs are the source of truth for many things including generated code -
+// Action specs are the source of truth for many things including generated code -
 // the goal is to make the system extensible for users but it's not there yet.
+
+// TODO BLOCK @api need to rethink the design to fix numerous issues while preserving the desired properties
+// - must support JSON-RPC and MCP (which has some opinions/restrictions on top of JSON-RPC)
+// - functions can be wrapped on the client and remain synchronous or be async, but on the server handlers are always async.
+// 		maybe this restriction isn't desired though? and sync should be allowed?
+// - the client and server can both send notifications as well as request/response messages,
+// 		so the server can query the client as needed, but the client can always deny requests
+// - "params" overloaded for "action messages" so the result of responses is weirdly called params
 
 export const ping_action_spec = {
 	method: 'ping',

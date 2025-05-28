@@ -13,7 +13,7 @@ import type {Api_Request_Response_Flag} from '$lib/api.js';
 
 const log = new Logger();
 
-// TODO refactor, extract a clear abstraction, maybe `Action_Invocation_Context`,
+// TODO @api refactor, extract a clear abstraction, maybe `Action_Invocation`,
 // can have multiple mutation contexts, covers the whole sync/async function call wrapper
 
 // TODO think about transactions, snapshotting

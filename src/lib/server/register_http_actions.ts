@@ -28,7 +28,7 @@ export const register_http_actions = ({path, app, server}: Register_Actions_Opti
 
 			return c.json(response);
 		} catch (error) {
-			console.error('Error processing JSON-RPC request:', error);
+			console.error('[http] error processing JSON-RPC request:', error);
 			return c.json(
 				{
 					jsonrpc: JSONRPC_VERSION,

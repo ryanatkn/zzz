@@ -269,7 +269,9 @@ export class Zzz_Server {
 		// Validate the response during development
 		// TODO maybe always validate?
 		if (DEV) {
-			// TODO BLOCK @api use params schema only right? not whole action message
+			// TODO BLOCK @api use params schema only right? not whole action message.
+			// but we have a problem with the params/result schemas, params is being overloaded
+			// (and `response_params` was partially correct though hacky)
 			const response_schema = lookup_response_action_schema(method);
 			if (!response_schema) {
 				throw jsonrpc_errors.internal_error(`unknown response schema: ${method}`);
@@ -280,13 +282,13 @@ export class Zzz_Server {
 			});
 			if (!parsed_response.success) {
 				this.log?.error(
-					'failed to validate service response params',
+					'failed to validate server action response params',
 					spec.method,
 					event.result,
 					parsed_response.error.issues,
 				);
 				throw jsonrpc_errors.internal_error(
-					`service response validation failed for ${spec.method}: ${stringify_zod_error(parsed_response.error)}`,
+					`server action response validation failed for ${spec.method}: ${stringify_zod_error(parsed_response.error)}`,
 					{issues: parsed_response.error.issues},
 				);
 			}

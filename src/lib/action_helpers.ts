@@ -18,11 +18,11 @@ import type {
 import {to_jsonrpc_message_id} from '$lib/jsonrpc_helpers.js';
 import type {Request_Response_Action_Spec_Auth} from '$lib/action_spec.js';
 
-// Constants for preview length and formatting
+// TODO BLOCK @api refactor all of this, is all very messy
+
 export const ACTION_DATE_FORMAT = 'MMM d, p';
 export const ACTION_TIME_FORMAT = 'p';
 
-// Helper function to convert an action to its json representation
 export const create_action_json = (action: Action_Message_Union): Action_Json | null => {
 	const spec = action_spec_by_method.get(action.method);
 	if (!spec) {

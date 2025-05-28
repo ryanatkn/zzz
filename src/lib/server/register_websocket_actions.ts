@@ -32,49 +32,35 @@ export const register_websocket_actions = ({
 		/**
 		 * @see https://hono.dev/helpers/websocket
 		 */
-		upgradeWebSocket(() => {
-			return {
-				onOpen: (event, ws) => {
-					sockets.add(ws);
-					console.log('[ws] ws opened', event);
-				},
-				onMessage: async (event, ws) => {
-					await handle_websocket_message(event.data, {ws, server});
-				},
-				onClose: (event, ws) => {
-					sockets.delete(ws);
-					console.log('[ws] ws closed', event);
-				},
-			};
-		}),
+		upgradeWebSocket(() => ({
+			onOpen: (event, ws) => {
+				sockets.add(ws);
+				console.log('[ws] ws opened', event);
+			},
+			onMessage: async (event, ws) => {
+				let data;
+				try {
+					data = JSON.parse(String(event.data)); // eslint-disable-line @typescript-eslint/no-base-to-string
+				} catch (error) {
+					console.error(`[ws] received non-json message`, event.data, error);
+					return;
+				}
+
+				console.log(`[ws] handling message`, data);
+
+				const response = await server.handle_jsonrpc_message(data);
+
+				// Only send a response if it's not a notification (which doesn't expect a response)
+				if (response != null) {
+					ws.send(JSON.stringify(response));
+				}
+			},
+			onClose: (event, ws) => {
+				sockets.delete(ws);
+				console.log('[ws] ws closed', event);
+			},
+		})),
 	);
 
 	return sockets;
-};
-
-/**
- * Handles websocket messages for service actions.
- */
-export const handle_websocket_message = async (
-	message_data: unknown,
-	options: {ws: WSContext; server: Zzz_Server},
-): Promise<void> => {
-	const {ws, server} = options;
-
-	let data;
-	try {
-		data = JSON.parse(String(message_data));
-	} catch (error) {
-		console.error(`received non-json message`, message_data, error);
-		return;
-	}
-
-	console.log(`[ws] handling message`, data);
-
-	const response = await server.handle_jsonrpc_message(data);
-
-	// Only send a response if it's not a notification (which doesn't expect a response)
-	if (response != null) {
-		ws.send(JSON.stringify(response));
-	}
 };
