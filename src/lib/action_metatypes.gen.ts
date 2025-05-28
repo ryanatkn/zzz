@@ -12,7 +12,7 @@ import {
 	to_action_response_message_type,
 } from '$lib/action_helpers.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
-import type {Api_Request_Response_Flag} from '$lib/api.js';
+import type {Action_Request_Response_Flag} from '$lib/action_types.js';
 
 /**
  * Outputs a file with generated types and schemas using the action specs as the source of truth.
@@ -131,7 +131,7 @@ export const gen: Gen = ({origin_path}) => {
 		export interface Client_Action_Handlers<T_App extends Zzz = Zzz> extends Partial<Record<Action_Message_Type, Client_Action_Handler<T_App>>> {
 			${registry.specs
 				.map((spec) => {
-					const v = (m: Action_Method, request_response_flag: Api_Request_Response_Flag) =>
+					const v = (m: Action_Method, request_response_flag: Action_Request_Response_Flag) =>
 						`${to_action_message_type(
 							m,
 							request_response_flag,

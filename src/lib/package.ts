@@ -1053,7 +1053,7 @@ export const src_json = {
 			path: 'api.ts',
 			declarations: [
 				{name: 'Http_Method', kind: 'variable'},
-				{name: 'Api_Request_Response_Flag', kind: 'type'},
+				{name: 'Action_Request_Response_Flag', kind: 'type'},
 			],
 		},
 		'./app.svelte.js': {

@@ -1,14 +1,17 @@
 import type {z} from 'zod';
 
 import {Action_Message_Union, action_spec_by_method} from '$lib/action_collections.js';
-import {Action_Message_Base, type Action_Json} from '$lib/action_types.js';
+import {
+	Action_Message_Base,
+	type Action_Json,
+	type Action_Request_Response_Flag,
+} from '$lib/action_types.js';
 import {Action_Messages} from '$lib/action_messages.js';
 import {
 	Action_Message_Type,
 	Action_Method,
 	type Action_Message_Params,
 } from '$lib/action_metatypes.js';
-import type {Api_Request_Response_Flag} from '$lib/api.js';
 import type {
 	Jsonrpc_Notification,
 	Jsonrpc_Request,
@@ -51,7 +54,7 @@ export const lookup_response_action_schema = (
 // TODO maybe variant(s) or replace with send/receive? server/client?
 export const to_action_message_type = (
 	method: Action_Method,
-	request_response_flag: Api_Request_Response_Flag,
+	request_response_flag: Action_Request_Response_Flag,
 ): Action_Message_Type =>
 	Action_Message_Type.parse(
 		request_response_flag === 'request'

@@ -7,6 +7,20 @@ import {Diskfile_Change, Diskfile_Path, Serializable_Source_File} from '$lib/dis
 import {Cell_Json} from '$lib/cell_types.js';
 import {Jsonrpc_Request_Id} from '$lib/jsonrpc.js';
 
+/**
+ * Flag to indicate the phase of a request/response action.
+ * - 'request': The action is being sent to the server
+ * - 'response': The server has responded to the action
+ * - null: The action is not a request/response type (e.g., client_local, server_notification)
+ */
+// TODO BLOCK @api rethink this
+export const Action_Request_Response_Flag = z.union([
+	z.literal('request'),
+	z.literal('response'),
+	z.null(),
+]);
+export type Action_Request_Response_Flag = z.infer<typeof Action_Request_Response_Flag>;
+
 // TODO BLOCK Action_Message and Action_Message_Json? but not cells?
 /**
  * Base schema for all actions with common properties.

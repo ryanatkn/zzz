@@ -1,6 +1,6 @@
 import type {Action_Method} from '$lib/action_metatypes.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
-import type {Api_Request_Response_Flag} from '$lib/api.js';
+import type {Action_Request_Response_Flag} from '$lib/action_types.js';
 import type {Jsonrpc_Notification, Jsonrpc_Request} from '$lib/jsonrpc.js';
 import type {Action_Message_Union} from '$lib/action_collections.js';
 
@@ -39,7 +39,7 @@ export class Client_Action_Context<T_App extends Zzz = Zzz, T_Params = unknown, 
 	params: T_Params;
 	result: T_Result;
 	// TODO refactor
-	request_response_flag: Api_Request_Response_Flag;
+	request_response_flag: Action_Request_Response_Flag;
 	action_message: Action_Message_Union;
 	// TODO need to correctly handle request/response messages, and others if they're not here
 	jsonrpc_message: Jsonrpc_Request | Jsonrpc_Notification | null;
@@ -54,7 +54,7 @@ export class Client_Action_Context<T_App extends Zzz = Zzz, T_Params = unknown, 
 		method: Action_Method,
 		params: T_Params,
 		result: T_Result,
-		request_response_flag: Api_Request_Response_Flag,
+		request_response_flag: Action_Request_Response_Flag,
 		action_message: Action_Message_Union,
 		jsonrpc_message: Jsonrpc_Request | Jsonrpc_Notification | null,
 	) {

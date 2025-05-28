@@ -9,7 +9,7 @@ import {create_uuid} from '$lib/zod_helpers.js';
 import {to_action_message, to_action_message_type} from '$lib/action_helpers.js';
 import type {Action_Message_Union} from '$lib/action_collections.js';
 import type {Jsonrpc_Notification, Jsonrpc_Request} from '$lib/jsonrpc.js';
-import type {Api_Request_Response_Flag} from '$lib/api.js';
+import type {Action_Request_Response_Flag} from '$lib/action_types.js';
 
 const log = new Logger();
 
@@ -31,7 +31,7 @@ export const create_actions_api = (zzz: Zzz): Actions_Api =>
 
 			const handle = (
 				result: any | null, // TODO @api type
-				request_response_flag: Api_Request_Response_Flag,
+				request_response_flag: Action_Request_Response_Flag,
 				action_message: Action_Message_Union,
 				jsonrpc_message: Jsonrpc_Request | Jsonrpc_Notification | null,
 			) => {
