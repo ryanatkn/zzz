@@ -9,7 +9,7 @@ import {SERVER_URL} from '$lib/constants.js';
 export interface Register_Websocket_Actions_Options {
 	path: string;
 	app: Hono;
-	zzz_server: Zzz_Server;
+	server: Zzz_Server;
 	upgradeWebSocket: ReturnType<typeof createNodeWebSocket>['upgradeWebSocket'];
 	sockets?: Set<WSContext>;
 	allowed_origins?: Allowed_Origins;
@@ -21,7 +21,7 @@ export interface Register_Websocket_Actions_Options {
 export const register_websocket_actions = ({
 	path,
 	app,
-	zzz_server,
+	server,
 	upgradeWebSocket,
 	sockets = new Set<WSContext>(),
 	allowed_origins = [SERVER_URL],
@@ -39,7 +39,7 @@ export const register_websocket_actions = ({
 					console.log('[ws] ws opened', event);
 				},
 				onMessage: async (event, ws) => {
-					await handle_websocket_message(event.data, {ws, zzz_server});
+					await handle_websocket_message(event.data, {ws, server});
 				},
 				onClose: (event, ws) => {
 					sockets.delete(ws);
@@ -57,9 +57,9 @@ export const register_websocket_actions = ({
  */
 export const handle_websocket_message = async (
 	message_data: unknown,
-	options: {ws: WSContext; zzz_server: Zzz_Server},
+	options: {ws: WSContext; server: Zzz_Server},
 ): Promise<void> => {
-	const {ws, zzz_server} = options;
+	const {ws, server} = options;
 
 	let data;
 	try {
@@ -71,7 +71,7 @@ export const handle_websocket_message = async (
 
 	console.log(`[ws] handling message`, data);
 
-	const response = await zzz_server.handle_jsonrpc_message(data);
+	const response = await server.handle_jsonrpc_message(data);
 
 	// Only send a response if it's not a notification (which doesn't expect a response)
 	if (response != null) {

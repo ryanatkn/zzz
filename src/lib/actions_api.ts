@@ -1,11 +1,9 @@
-// src/lib/actions_api.ts
-
 import {Logger} from '@ryanatkn/belt/log.js';
 import {BROWSER, DEV} from 'esm-env';
 
 import type {Actions_Api} from '$lib/action_metatypes.js';
 import type {Zzz} from '$lib/zzz.svelte.js';
-import {create_mutation_context} from '$lib/mutation.js';
+import {create_mutation_context} from '$lib/client_action_handler.js';
 import {create_jsonrpc_request} from '$lib/jsonrpc_helpers.js';
 import {create_uuid} from '$lib/zod_helpers.js';
 import {to_action_message, to_action_message_type} from '$lib/action_helpers.js';
@@ -38,7 +36,7 @@ export const create_actions_api = (zzz: Zzz): Actions_Api =>
 				jsonrpc_message: Jsonrpc_Request | Jsonrpc_Notification | null,
 			) => {
 				console.log('\n\n\n\n\n\n\n\n[actions_api] mutate', method, result, request_response_flag);
-				const {ctx, flush_after_mutation} = create_mutation_context(
+				const {ctx, flush_after_client_action} = create_mutation_context(
 					zzz,
 					method,
 					params,
@@ -58,7 +56,7 @@ export const create_actions_api = (zzz: Zzz): Actions_Api =>
 				// Apply the mutation, updating the local state! May be async but is not awaited.
 				const mutated = mutation?.(ctx);
 
-				void flush_after_mutation(); // not awaited because these are side effects, also supports sync functions
+				void flush_after_client_action(); // not awaited because these are side effects, also supports sync functions
 
 				// Forward whatever the mutation returns
 				return mutated;

@@ -6,51 +6,50 @@ import type {Action_Message_Union} from '$lib/action_collections.js';
 
 /**
  * Client-side mutation system for handling action responses.
- * Mutations are synchronous functions that apply state changes to the client app
+ * Client_Action_Handlers are synchronous functions that apply state changes to the client app
  * based on action requests or responses.
  */
 
-// TODO BLOCK @api maybe `Action_Invocation`? `Action_Handler_Context`? `Client|Server_Action_Context`?
 /**
  * Context provided to mutation handlers.
  */
-export interface Mutation_Context<T_App extends Zzz = Zzz, T_Params = unknown, T_Result = any> {
-	/** Reference to the main application instance. */
+export interface Client_Action_Context<
+	T_App extends Zzz = Zzz,
+	T_Params = unknown,
+	T_Result = any,
+> {
 	zzz: T_App;
 	/** JSON-RPC method for the action. Maps to two types for request_response actions. */
 	method: Action_Method;
-	/** Parameters passed to the action. */
 	params: T_Params;
-	/** Result returned from the server. */
 	result: T_Result;
-	/** Convenience flag to indicate if the action is a request, response, or none. */
+	// TODO refactor
 	request_response_flag: Api_Request_Response_Flag;
-	/** Action system event object. */
 	action_message: Action_Message_Union;
-	/** The JSON-RPC request object, if any. */
+	// TODO need to correctly handle request/response messages, and others if they're not here
 	jsonrpc_message: Jsonrpc_Request | Jsonrpc_Notification | null;
 	/** Adds a callback hook that runs after mutation finishes. */
-	after_mutation: After_Mutation | undefined;
+	after_client_action: After_Client_Action | undefined;
 }
 
 /**
- * Mutation handler function type.
  * Must be synchronous.
  */
-export type Mutation<T_App extends Zzz = Zzz, T_Params = any, T_Result = any> = (
-	ctx: Mutation_Context<T_App, T_Params, T_Result>,
+export type Client_Action_Handler<T_App extends Zzz = Zzz, T_Params = any, T_Result = any> = (
+	ctx: Client_Action_Context<T_App, T_Params, T_Result>,
 ) => any;
 
 /**
  * Type for registering callbacks to run after mutation completes.
  */
-export type After_Mutation = (cb: After_Mutation_Callback) => void;
+export type After_Client_Action = (cb: After_Client_Action_Callback) => void;
 
 /**
  * Callback function type for after mutation hooks.
  */
-export type After_Mutation_Callback = () => void | Promise<void>;
+export type After_Client_Action_Callback = () => void | Promise<void>;
 
+// TODO BLOCK @api make this a class where flush is a private method
 /**
  * Creates a mutation context with the provided parameters and
  * a function to flush after-mutation callbacks.
@@ -68,16 +67,16 @@ export const create_mutation_context = <
 	action_message: Action_Message_Union,
 	jsonrpc_message: Jsonrpc_Request | Jsonrpc_Notification | null,
 ): {
-	ctx: Mutation_Context<T_App, T_Params, T_Result>;
-	flush_after_mutation: () => Promise<void>;
+	ctx: Client_Action_Context<T_App, T_Params, T_Result>;
+	flush_after_client_action: () => Promise<void>;
 } => {
-	const cbs: Array<After_Mutation_Callback> = [];
+	const cbs: Array<After_Client_Action_Callback> = [];
 
-	const after_mutation: After_Mutation = (cb) => {
+	const after_client_action: After_Client_Action = (cb) => {
 		cbs.push(cb);
 	};
 
-	const flush_after_mutation = async (): Promise<void> => {
+	const flush_after_client_action = async (): Promise<void> => {
 		for (const cb of cbs) {
 			await cb(); // eslint-disable-line no-await-in-loop
 		}
@@ -91,8 +90,8 @@ export const create_mutation_context = <
 		request_response_flag,
 		action_message,
 		jsonrpc_message,
-		after_mutation,
-	} satisfies Mutation_Context<T_App, T_Params, T_Result>;
+		after_client_action,
+	} satisfies Client_Action_Context<T_App, T_Params, T_Result>;
 
-	return {ctx, flush_after_mutation};
+	return {ctx, flush_after_client_action};
 };

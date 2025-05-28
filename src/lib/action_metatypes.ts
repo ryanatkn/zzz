@@ -2,7 +2,7 @@
 
 import {z} from 'zod';
 
-import type {Mutation} from '$lib/mutation.js';
+import type {Client_Action_Handler} from '$lib/client_action_handler.js';
 import type {
 	create_directory_action_spec,
 	delete_diskfile_action_spec,
@@ -116,50 +116,62 @@ export interface Actions_Api {
 /**
  * Interface for client-side mutation handlers.
  */
-export interface Mutations<T_App extends Zzz = Zzz>
-	extends Partial<Record<Action_Message_Type, Mutation<T_App>>> {
-	create_directory_request?: Mutation<
+export interface Client_Action_Handlers<T_App extends Zzz = Zzz>
+	extends Partial<Record<Action_Message_Type, Client_Action_Handler<T_App>>> {
+	create_directory_request?: Client_Action_Handler<
 		T_App,
 		Action_Message_Params['create_directory_request'],
 		void
 	>;
-	create_directory_response?: Mutation<
+	create_directory_response?: Client_Action_Handler<
 		T_App,
 		Action_Message_Params['create_directory_request'],
 		Action_Message_Params['create_directory_response']
 	>;
-	delete_diskfile_request?: Mutation<T_App, Action_Message_Params['delete_diskfile_request'], void>;
-	delete_diskfile_response?: Mutation<
+	delete_diskfile_request?: Client_Action_Handler<
+		T_App,
+		Action_Message_Params['delete_diskfile_request'],
+		void
+	>;
+	delete_diskfile_response?: Client_Action_Handler<
 		T_App,
 		Action_Message_Params['delete_diskfile_request'],
 		Action_Message_Params['delete_diskfile_response']
 	>;
-	filer_change?: Mutation<T_App, Action_Message_Params['filer_change'], void>;
-	load_session_request?: Mutation<T_App, Action_Message_Params['load_session_request'], void>;
-	load_session_response?: Mutation<
+	filer_change?: Client_Action_Handler<T_App, Action_Message_Params['filer_change'], void>;
+	load_session_request?: Client_Action_Handler<
+		T_App,
+		Action_Message_Params['load_session_request'],
+		void
+	>;
+	load_session_response?: Client_Action_Handler<
 		T_App,
 		Action_Message_Params['load_session_request'],
 		Action_Message_Params['load_session_response']
 	>;
-	ping_request?: Mutation<T_App, Action_Message_Params['ping_request'], void>;
-	ping_response?: Mutation<
+	ping_request?: Client_Action_Handler<T_App, Action_Message_Params['ping_request'], void>;
+	ping_response?: Client_Action_Handler<
 		T_App,
 		Action_Message_Params['ping_request'],
 		Action_Message_Params['ping_response']
 	>;
-	submit_completion_request?: Mutation<
+	submit_completion_request?: Client_Action_Handler<
 		T_App,
 		Action_Message_Params['submit_completion_request'],
 		void
 	>;
-	submit_completion_response?: Mutation<
+	submit_completion_response?: Client_Action_Handler<
 		T_App,
 		Action_Message_Params['submit_completion_request'],
 		Action_Message_Params['submit_completion_response']
 	>;
-	toggle_main_menu?: Mutation<T_App, Action_Message_Params['toggle_main_menu'], void>;
-	update_diskfile_request?: Mutation<T_App, Action_Message_Params['update_diskfile_request'], void>;
-	update_diskfile_response?: Mutation<
+	toggle_main_menu?: Client_Action_Handler<T_App, Action_Message_Params['toggle_main_menu'], void>;
+	update_diskfile_request?: Client_Action_Handler<
+		T_App,
+		Action_Message_Params['update_diskfile_request'],
+		void
+	>;
+	update_diskfile_response?: Client_Action_Handler<
 		T_App,
 		Action_Message_Params['update_diskfile_request'],
 		Action_Message_Params['update_diskfile_response']

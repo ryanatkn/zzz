@@ -1,5 +1,3 @@
-// src/lib/jsonrpc.ts
-
 /**
  * Following MCP and A2A, Zzz supports JSON-RPC 2.0 as its message format.
  * This can be used by multiple transports including http and websocket.
@@ -96,6 +94,9 @@ export const Jsonrpc_Notification_Params = z
 	})
 	.passthrough();
 export type Jsonrpc_Notification_Params = z.infer<typeof Jsonrpc_Notification_Params>;
+
+export const Jsonrpc_Params = z.union([Jsonrpc_Request_Params, Jsonrpc_Notification_Params]);
+export type Jsonrpc_Params = z.infer<typeof Jsonrpc_Params>;
 
 export const Jsonrpc_Result = z
 	.object({

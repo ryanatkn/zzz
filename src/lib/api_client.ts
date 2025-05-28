@@ -1,5 +1,3 @@
-// src/lib/api_client.ts
-
 import type {Deferred, Async_Status} from '@ryanatkn/belt/async.js';
 
 import type {Socket} from '$lib/socket.svelte.js';

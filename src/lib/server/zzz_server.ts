@@ -1,5 +1,3 @@
-// src/lib/server/zzz_server.ts
-
 import {Filer, type Cleanup_Watch, type Source_File} from '@ryanatkn/gro/filer.js';
 import type {Watcher_Change} from '@ryanatkn/gro/watch_dir.js';
 import {resolve} from 'node:path';
@@ -37,6 +35,7 @@ import type {Action_Message_Base} from '$lib/action_types.js';
 import {ZZZ_CACHE_DIRNAME} from '$lib/constants.js';
 import {to_zzz_cache_dir} from '$lib/diskfile_helpers.js';
 import {jsonrpc_errors} from '$lib/jsonrpc_errors.js';
+import type {Server_Action_Handlers} from '$lib/server/server_action_metatypes.js';
 
 export type Action_Handler = (
 	// TODO BLOCK @api should be jsonrpc only right? maybe just the `params` at this point? wrapped in an object?
@@ -91,7 +90,7 @@ export interface Zzz_Server_Options {
 	/**
 	 * Handler function for processing client messages.
 	 */
-	handle_message: Action_Handler;
+	server_action_handlers: Server_Action_Handlers;
 	/**
 	 * Handler function for file system changes.
 	 */
@@ -117,7 +116,7 @@ export class Zzz_Server {
 	readonly config: Zzz_Config;
 
 	readonly #send_to_all_clients: (message: Action_Message_From_Server) => void;
-	readonly #handle_message: Action_Handler;
+	readonly #server_action_handlers: Server_Action_Handlers;
 	readonly #handle_filer_change: Filer_Change_Handler;
 
 	/**
@@ -151,13 +150,13 @@ export class Zzz_Server {
 		this.config = options.config;
 		this.action_registry = new Action_Registry(options.action_specs);
 		this.#send_to_all_clients = options.send_to_all_clients;
-		this.#handle_message = options.handle_message;
+		this.#server_action_handlers = options.server_action_handlers;
 		this.#handle_filer_change = options.handle_filer_change;
 
 		// Create the safe filesystem interface with the allowed directories
 		this.safe_fs = new Safe_Fs([this.zzz_cache_dir]); // TODO pass filter through on options
 
-		this.log = options.log === undefined ? new Logger('[zzz_server]') : options.log;
+		this.log = options.log === undefined ? new Logger('[server]') : options.log;
 
 		// TODO maybe do this in an `init` method
 		// Set up the filer watcher for the zzz_cache_dir
@@ -256,6 +255,7 @@ export class Zzz_Server {
 		}
 
 		// TODO BLOCK fix type, and is the action message interface the one we want? or pass through the JSON-RPC message?
+		const handler = this.#server_action_handlers[method];
 		const returned = await this.#handle_message(parsed_request.data as any, this);
 
 		// Validate the response during development

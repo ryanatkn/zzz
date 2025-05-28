@@ -603,8 +603,6 @@ export const package_json = {
 		},
 		'./model.svelte.js': {types: './dist/model.svelte.d.ts', default: './dist/model.svelte.js'},
 		'./models.svelte.js': {types: './dist/models.svelte.d.ts', default: './dist/models.svelte.js'},
-		'./mutation.js': {types: './dist/mutation.d.ts', default: './dist/mutation.js'},
-		'./mutations.js': {types: './dist/mutations.d.ts', default: './dist/mutations.js'},
 		'./nav_helpers.js': {types: './dist/nav_helpers.d.ts', default: './dist/nav_helpers.js'},
 		'./Nav_Link.svelte': {
 			types: './dist/Nav_Link.svelte.d.ts',
@@ -749,10 +747,6 @@ export const package_json = {
 			types: './dist/server/ai_provider_utils.d.ts',
 			default: './dist/server/ai_provider_utils.js',
 		},
-		'./server/handler_defaults.js': {
-			types: './dist/server/handler_defaults.d.ts',
-			default: './dist/server/handler_defaults.js',
-		},
 		'./server/jsonrpc_server_helpers.js': {
 			types: './dist/server/jsonrpc_server_helpers.d.ts',
 			default: './dist/server/jsonrpc_server_helpers.js',
@@ -774,17 +768,13 @@ export const package_json = {
 			default: './dist/server/security.js',
 		},
 		'./server/server.js': {types: './dist/server/server.d.ts', default: './dist/server/server.js'},
-		'./server/service_metatypes.gen.js': {
-			types: './dist/server/service_metatypes.gen.d.ts',
-			default: './dist/server/service_metatypes.gen.js',
+		'./server/server_action_metatypes.gen.js': {
+			types: './dist/server/server_action_metatypes.gen.d.ts',
+			default: './dist/server/server_action_metatypes.gen.js',
 		},
-		'./server/service_metatypes.js': {
-			types: './dist/server/service_metatypes.d.ts',
-			default: './dist/server/service_metatypes.js',
-		},
-		'./server/service.js': {
-			types: './dist/server/service.d.ts',
-			default: './dist/server/service.js',
+		'./server/server_action_metatypes.js': {
+			types: './dist/server/server_action_metatypes.d.ts',
+			default: './dist/server/server_action_metatypes.js',
 		},
 		'./server/zzz_server.js': {
 			types: './dist/server/zzz_server.d.ts',
@@ -926,9 +916,14 @@ export const src_json = {
 				{name: 'lookup_response_action_schema', kind: 'function'},
 				{name: 'to_action_message_type', kind: 'function'},
 				{name: 'to_action_message', kind: 'function'},
+				{name: 'to_action_message_identifier', kind: 'function'},
 				{name: 'to_action_request_message_type', kind: 'function'},
 				{name: 'to_action_response_message_type', kind: 'function'},
 				{name: 'jsonrpc_request_to_action_message', kind: 'function'},
+				{name: 'to_action_spec_identifier', kind: 'function'},
+				{name: 'to_action_spec_params_identifier', kind: 'function'},
+				{name: 'to_action_spec_response_params_identifier', kind: 'function'},
+				{name: 'to_action_spec_auth_identifier', kind: 'function'},
 			],
 		},
 		'./Action_List.svelte': {
@@ -957,7 +952,7 @@ export const src_json = {
 				{name: 'Action_Message_Type', kind: 'variable'},
 				{name: 'Action_Message_Params', kind: 'type'},
 				{name: 'Actions_Api', kind: 'type'},
-				{name: 'Mutations', kind: 'type'},
+				{name: 'Client_Action_Handlers', kind: 'type'},
 			],
 		},
 		'./action_registry.js': {
@@ -968,6 +963,7 @@ export const src_json = {
 			path: 'action_spec.ts',
 			declarations: [
 				{name: 'Action_Spec_Base', kind: 'variable'},
+				{name: 'Request_Response_Action_Spec_Auth', kind: 'variable'},
 				{name: 'Request_Response_Action_Spec', kind: 'variable'},
 				{name: 'Server_Notification_Action_Spec', kind: 'variable'},
 				{name: 'Client_Local_Action_Spec', kind: 'variable'},
@@ -1033,7 +1029,6 @@ export const src_json = {
 			path: 'api.ts',
 			declarations: [
 				{name: 'Http_Method', kind: 'variable'},
-				{name: 'Api_Params', kind: 'variable'},
 				{name: 'Api_Request_Response_Flag', kind: 'type'},
 			],
 		},
@@ -1715,6 +1710,7 @@ export const src_json = {
 				{name: 'Jsonrpc_Request_Params_Meta', kind: 'variable'},
 				{name: 'Jsonrpc_Request_Params', kind: 'variable'},
 				{name: 'Jsonrpc_Notification_Params', kind: 'variable'},
+				{name: 'Jsonrpc_Params', kind: 'variable'},
 				{name: 'Jsonrpc_Result', kind: 'variable'},
 				{name: 'Jsonrpc_Request', kind: 'variable'},
 				{name: 'Jsonrpc_Notification', kind: 'variable'},
@@ -1798,17 +1794,6 @@ export const src_json = {
 				{name: 'Models', kind: 'class'},
 			],
 		},
-		'./mutation.js': {
-			path: 'mutation.ts',
-			declarations: [
-				{name: 'Mutation_Context', kind: 'type'},
-				{name: 'Mutation', kind: 'type'},
-				{name: 'After_Mutation', kind: 'type'},
-				{name: 'After_Mutation_Callback', kind: 'type'},
-				{name: 'create_mutation_context', kind: 'function'},
-			],
-		},
-		'./mutations.js': {path: 'mutations.ts', declarations: [{name: 'mutations', kind: 'variable'}]},
 		'./nav_helpers.js': {
 			path: 'nav_helpers.ts',
 			declarations: [
@@ -2031,9 +2016,6 @@ export const src_json = {
 		'./schema_helpers.js': {
 			path: 'schema_helpers.ts',
 			declarations: [
-				{name: 'to_action_spec_identifier', kind: 'function'},
-				{name: 'to_action_spec_params_identifier', kind: 'function'},
-				{name: 'to_action_spec_response_params_identifier', kind: 'function'},
 				{name: 'camel_to_snake_case', kind: 'function'},
 				{name: 'to_pascalsnake_case', kind: 'function'},
 			],
@@ -2062,13 +2044,6 @@ export const src_json = {
 				{name: 'format_claude_messages', kind: 'function'},
 				{name: 'format_openai_messages', kind: 'function'},
 				{name: 'format_gemini_messages', kind: 'function'},
-			],
-		},
-		'./server/handler_defaults.js': {
-			path: 'server/handler_defaults.ts',
-			declarations: [
-				{name: 'handle_message', kind: 'function'},
-				{name: 'handle_filer_change', kind: 'function'},
 			],
 		},
 		'./server/jsonrpc_server_helpers.js': {
@@ -2113,22 +2088,13 @@ export const src_json = {
 			],
 		},
 		'./server/server.js': {path: 'server/server.ts'},
-		'./server/service_metatypes.gen.js': {
-			path: 'server/service_metatypes.gen.ts',
+		'./server/server_action_metatypes.gen.js': {
+			path: 'server/server_action_metatypes.gen.ts',
 			declarations: [{name: 'gen', kind: 'function'}],
 		},
-		'./server/service_metatypes.js': {
-			path: 'server/service_metatypes.ts',
-			declarations: [{name: 'Service_By_Name', kind: 'type'}],
-		},
-		'./server/service.js': {
-			path: 'server/service.ts',
-			declarations: [
-				{name: 'Nonauthenticated_Service', kind: 'type'},
-				{name: 'Nonauthorized_Service', kind: 'type'},
-				{name: 'Authorized_Service', kind: 'type'},
-				{name: 'Service', kind: 'type'},
-			],
+		'./server/server_action_metatypes.js': {
+			path: 'server/server_action_metatypes.ts',
+			declarations: [{name: 'Server_Action_Handlers', kind: 'type'}],
 		},
 		'./server/zzz_server.js': {
 			path: 'server/zzz_server.ts',

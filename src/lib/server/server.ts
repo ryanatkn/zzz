@@ -6,7 +6,7 @@ import {Logger} from '@ryanatkn/belt/log.js';
 import type {WSContext} from 'hono/ws';
 
 import {Zzz_Server} from '$lib/server/zzz_server.js';
-import {handle_message, handle_filer_change} from '$lib/server/handler_defaults.js';
+import {server_action_handlers, handle_filer_change} from '$lib/server/server_action_handlers.js';
 import {register_http_actions} from '$lib/server/register_http_actions.js';
 import {register_websocket_actions} from '$lib/server/register_websocket_actions.js';
 import create_config from '$lib/config.js';
@@ -35,7 +35,7 @@ const main = (): void => {
 	const {injectWebSocket, upgradeWebSocket} = createNodeWebSocket({app});
 
 	// Create the server with handlers and configuration
-	const zzz_server = new Zzz_Server({
+	const server = new Zzz_Server({
 		zzz_dir: ZZZ_DIR,
 		config,
 		action_specs,
@@ -47,7 +47,7 @@ const main = (): void => {
 				ws.send(JSON.stringify(message));
 			}
 		},
-		handle_message,
+		server_action_handlers,
 		handle_filer_change,
 	});
 
@@ -60,7 +60,7 @@ const main = (): void => {
 		sockets = register_websocket_actions({
 			path: WEBSOCKET_PATH,
 			app,
-			zzz_server,
+			server,
 			upgradeWebSocket,
 			allowed_origins, // TODO is this good or should they be separate?
 		});
@@ -70,7 +70,7 @@ const main = (): void => {
 	register_http_actions({
 		path: API_PATH_FOR_HTTP_RPC,
 		app,
-		zzz_server,
+		server,
 		// TODO allowed_origins ?
 	});
 

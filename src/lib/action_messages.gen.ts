@@ -1,13 +1,11 @@
 import type {Gen} from '@ryanatkn/gro/gen.js';
 
+import {action_specs} from '$lib/action_collections.js';
+import {Action_Registry} from '$lib/action_registry.js';
 import {
 	to_action_spec_identifier,
 	to_action_spec_params_identifier,
 	to_action_spec_response_params_identifier,
-} from '$lib/schema_helpers.js';
-import {action_specs} from '$lib/action_collections.js';
-import {Action_Registry} from '$lib/action_registry.js';
-import {
 	to_action_request_message_type,
 	to_action_response_message_type,
 } from '$lib/action_helpers.js';

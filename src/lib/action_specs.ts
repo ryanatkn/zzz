@@ -17,7 +17,7 @@ export const ping_action_spec = {
 	method: 'ping',
 	kind: 'request_response',
 	http_method: 'GET',
-	auth: null,
+	auth: 'public',
 	params: z.void().optional(),
 	response_params: z
 		.object({
@@ -30,7 +30,7 @@ export const load_session_action_spec = {
 	method: 'load_session',
 	kind: 'request_response',
 	http_method: 'GET',
-	auth: null,
+	auth: 'public',
 	params: z.void().optional(),
 	response_params: z
 		.object({
@@ -61,7 +61,7 @@ export const update_diskfile_action_spec = {
 	method: 'update_diskfile',
 	kind: 'request_response',
 	http_method: 'POST',
-	auth: null,
+	auth: 'public',
 	params: z
 		.object({
 			path: Diskfile_Path,
@@ -75,7 +75,7 @@ export const delete_diskfile_action_spec = {
 	method: 'delete_diskfile',
 	kind: 'request_response',
 	http_method: 'POST',
-	auth: null,
+	auth: 'public',
 	params: z
 		.object({
 			path: Diskfile_Path,
@@ -88,7 +88,7 @@ export const create_directory_action_spec = {
 	method: 'create_directory',
 	kind: 'request_response',
 	http_method: 'POST',
-	auth: null,
+	auth: 'public',
 	params: z
 		.object({
 			path: Diskfile_Path,
@@ -101,7 +101,7 @@ export const submit_completion_action_spec = {
 	method: 'submit_completion',
 	kind: 'request_response',
 	http_method: 'POST',
-	auth: null,
+	auth: 'public',
 	params: z
 		.object({
 			completion_request: Completion_Request,

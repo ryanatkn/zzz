@@ -1,14 +1,12 @@
 import type {Gen} from '@ryanatkn/gro/gen.js';
 import {z} from 'zod';
 
-import {
-	to_action_spec_params_identifier,
-	to_action_spec_response_params_identifier,
-} from '$lib/schema_helpers.js';
 import {get_innermost_type} from '$lib/zod_helpers.js';
 import {action_specs} from '$lib/action_collections.js';
 import {Action_Registry} from '$lib/action_registry.js';
 import {
+	to_action_spec_params_identifier,
+	to_action_spec_response_params_identifier,
 	to_action_message_type,
 	to_action_request_message_type,
 	to_action_response_message_type,
@@ -32,7 +30,7 @@ export const gen: Gen = ({origin_path}) => {
 
 		import {z} from 'zod';
 
-		import type {Mutation} from '$lib/mutation.js';
+		import type {Client_Action_Handler} from '$lib/client_action_handler.js';
 		import type {${schema_imports.join(', ')}} from '$lib/action_specs.js';
 		import type { Zzz } from '$lib/zzz.svelte.js';
 
@@ -130,14 +128,14 @@ export const gen: Gen = ({origin_path}) => {
 		/**
 		 * Interface for client-side mutation handlers.
 		 */
-		export interface Mutations<T_App extends Zzz = Zzz> extends Partial<Record<Action_Message_Type, Mutation<T_App>>> {
+		export interface Client_Action_Handlers<T_App extends Zzz = Zzz> extends Partial<Record<Action_Message_Type, Client_Action_Handler<T_App>>> {
 			${registry.specs
 				.map((spec) => {
 					const v = (m: Action_Method, request_response_flag: Api_Request_Response_Flag) =>
 						`${to_action_message_type(
 							m,
 							request_response_flag,
-						)}?: Mutation<T_App, Action_Message_Params['${to_action_message_type(
+						)}?: Client_Action_Handler<T_App, Action_Message_Params['${to_action_message_type(
 							spec.method,
 							spec.kind === 'request_response' ? 'request' : null,
 						)}'], ${

@@ -698,14 +698,6 @@
       "types": "./dist/models.svelte.d.ts",
       "default": "./dist/models.svelte.js"
     },
-    "./mutation.js": {
-      "types": "./dist/mutation.d.ts",
-      "default": "./dist/mutation.js"
-    },
-    "./mutations.js": {
-      "types": "./dist/mutations.d.ts",
-      "default": "./dist/mutations.js"
-    },
     "./nav_helpers.js": {
       "types": "./dist/nav_helpers.d.ts",
       "default": "./dist/nav_helpers.js"
@@ -875,10 +867,6 @@
       "types": "./dist/server/ai_provider_utils.d.ts",
       "default": "./dist/server/ai_provider_utils.js"
     },
-    "./server/handler_defaults.js": {
-      "types": "./dist/server/handler_defaults.d.ts",
-      "default": "./dist/server/handler_defaults.js"
-    },
     "./server/jsonrpc_server_helpers.js": {
       "types": "./dist/server/jsonrpc_server_helpers.d.ts",
       "default": "./dist/server/jsonrpc_server_helpers.js"
@@ -903,17 +891,13 @@
       "types": "./dist/server/server.d.ts",
       "default": "./dist/server/server.js"
     },
-    "./server/service_metatypes.gen.js": {
-      "types": "./dist/server/service_metatypes.gen.d.ts",
-      "default": "./dist/server/service_metatypes.gen.js"
+    "./server/server_action_metatypes.gen.js": {
+      "types": "./dist/server/server_action_metatypes.gen.d.ts",
+      "default": "./dist/server/server_action_metatypes.gen.js"
     },
-    "./server/service_metatypes.js": {
-      "types": "./dist/server/service_metatypes.d.ts",
-      "default": "./dist/server/service_metatypes.js"
-    },
-    "./server/service.js": {
-      "types": "./dist/server/service.d.ts",
-      "default": "./dist/server/service.js"
+    "./server/server_action_metatypes.js": {
+      "types": "./dist/server/server_action_metatypes.d.ts",
+      "default": "./dist/server/server_action_metatypes.js"
     },
     "./server/zzz_server.js": {
       "types": "./dist/server/zzz_server.d.ts",

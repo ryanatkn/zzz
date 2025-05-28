@@ -34,11 +34,15 @@ import {HANDLED} from '$lib/cell_helpers.js';
 import {Action_Registry} from '$lib/action_registry.js';
 import {Api_Client, type Api_Client_Options} from '$lib/api_client.js';
 import type {Completion_Message} from '$lib/completion_types.js';
-import type {Action_Message_Type, Actions_Api, Mutations} from '$lib/action_metatypes.js';
+import type {
+	Action_Message_Type,
+	Actions_Api,
+	Client_Action_Handlers,
+} from '$lib/action_metatypes.js';
 import type {Action_Spec} from '$lib/action_spec.js';
 import {action_specs} from '$lib/action_collections.js';
 import {create_actions_api} from '$lib/actions_api.js';
-import type {Mutation} from '$lib/mutation.js';
+import type {Client_Action_Handler} from '$lib/client_action_handler.js';
 
 export const zzz_context = create_context<Zzz>();
 
@@ -58,7 +62,7 @@ export interface Zzz_Options extends Omit_Strict<Cell_Options<typeof Zzz_Json>, 
 	providers?: Array<Provider_Json>;
 	cell_classes?: Record<string, Class_Constructor<Cell>>;
 	action_specs?: Array<Action_Spec>;
-	mutations?: Mutations;
+	mutations?: Client_Action_Handlers;
 
 	/** URL for server communication */
 	http_rpc_url?: string | null;
@@ -81,7 +85,8 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 	readonly cell_registry: Cell_Registry;
 
 	readonly action_registry: Action_Registry;
-	readonly mutations: Mutations & Partial<Record<Action_Message_Type, Mutation<typeof this>>>;
+	readonly mutations: Client_Action_Handlers &
+		Partial<Record<Action_Message_Type, Client_Action_Handler<typeof this>>>;
 	readonly api: Actions_Api;
 	readonly api_client: Api_Client;
 

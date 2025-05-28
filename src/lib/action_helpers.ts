@@ -16,6 +16,7 @@ import type {
 	Jsonrpc_Singular_Message,
 } from '$lib/jsonrpc.js';
 import {to_jsonrpc_message_id} from '$lib/jsonrpc_helpers.js';
+import type {Request_Response_Action_Spec_Auth} from '$lib/action_spec.js';
 
 // Constants for preview length and formatting
 export const ACTION_DATE_FORMAT = 'MMM d, p';
@@ -47,6 +48,7 @@ export const lookup_response_action_schema = (
 ): z.ZodType<Action_Message_Union> | undefined =>
 	Action_Messages[to_action_response_message_type(method)] as any;
 
+// TODO maybe variant(s) or replace with send/receive? server/client?
 export const to_action_message_type = (
 	method: Action_Method,
 	request_response_flag: Api_Request_Response_Flag,
@@ -69,6 +71,9 @@ export const to_action_message = <T extends Action_Message_Type>(
 		jsonrpc_message_id: to_jsonrpc_message_id(jsonrpc_message_or_id),
 	});
 
+export const to_action_message_identifier = (message_type: Action_Message_Type): string =>
+	`Action_Messages['${message_type}']`; // TODO maybe have a non-type variant using `.` notation?
+
 export const to_action_request_message_type = (method: Action_Method): Action_Message_Type =>
 	Action_Message_Type.parse(method + '_request');
 
@@ -84,3 +89,28 @@ export const jsonrpc_request_to_action_message = (
 		jsonrpc_message_id: to_jsonrpc_message_id(message),
 		params: message.params,
 	});
+
+// TODO @api rethink these
+/**
+ * Convert an action name to its type name.
+ */
+export const to_action_spec_identifier = (method: Action_Method): string => `${method}_action_spec`;
+
+/**
+ * Convert an action name to its params type name.
+ */
+export const to_action_spec_params_identifier = (method: Action_Method): string =>
+	`${to_action_spec_identifier(method)}.params`;
+
+/**
+ * Convert an action name to its response schema identifier.
+ */
+export const to_action_spec_response_params_identifier = (method: Action_Method): string =>
+	`${to_action_spec_identifier(method)}.response_params`;
+
+export const to_action_spec_auth_identifier = (auth: Request_Response_Action_Spec_Auth): string =>
+	auth === 'public'
+		? 'Public_Server_Action_Handler'
+		: auth === 'authenticate'
+			? 'Authenticated_Server_Action_Handler'
+			: 'Authorized_Server_Action_Handler';

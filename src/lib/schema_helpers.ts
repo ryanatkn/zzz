@@ -1,21 +1,4 @@
-import type {Action_Method} from '$lib/action_metatypes.js';
-
-/**
- * Convert an action name to its type name.
- */
-export const to_action_spec_identifier = (method: Action_Method): string => `${method}_action_spec`;
-
-/**
- * Convert an action name to its params type name.
- */
-export const to_action_spec_params_identifier = (method: Action_Method): string =>
-	`${to_action_spec_identifier(method)}.params`;
-
-/**
- * Convert an action name to its response schema identifier.
- */
-export const to_action_spec_response_params_identifier = (method: Action_Method): string =>
-	`${to_action_spec_identifier(method)}.response_params`;
+// TODO not used any more, delete if not needed (is hacky but maybe useful)
 
 /**
  * Convert a string from camelCase to snake_case.

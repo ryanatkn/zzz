@@ -6,7 +6,7 @@ import type {
 	Server_Notification_Action_Spec,
 	Client_Local_Action_Spec,
 } from '$lib/action_spec.js';
-import {to_action_spec_identifier} from '$lib/schema_helpers.js';
+import {to_action_spec_identifier} from '$lib/action_helpers.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
 
 /**
@@ -37,7 +37,7 @@ export class Action_Registry {
 	}
 
 	get service_specs(): Array<Action_Spec> {
-		// Service actions include both request_response and server_notification actions
+		// Server actions include both request_response and server_notification actions
 		return [...this.request_response_specs, ...this.server_notification_specs];
 	}
 

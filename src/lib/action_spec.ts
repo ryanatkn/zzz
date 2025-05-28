@@ -12,12 +12,19 @@ export const Action_Spec_Base = z.object({
 });
 export type Action_Spec_Base = z.infer<typeof Action_Spec_Base>;
 
+export const Request_Response_Action_Spec_Auth = z.union([
+	z.literal('public'),
+	z.literal('authenticate'),
+	z.literal('authorize'),
+]);
+export type Request_Response_Action_Spec_Auth = z.infer<typeof Request_Response_Action_Spec_Auth>;
+
 // Type for request_response actions (client requests, server responds)
 export const Request_Response_Action_Spec = Action_Spec_Base.extend({
 	kind: z.literal('request_response').default('request_response'),
 	// TODO BLOCK @api rethink this, maybe just read/write or query/command separation via a flag?
 	http_method: z.custom<Http_Method>(),
-	auth: z.union([z.literal('authenticate'), z.literal('authorize'), z.null()]),
+	auth: Request_Response_Action_Spec_Auth,
 	/**
 	 * For the request_response the base action `params` are the request params,
 	 * and we mirror the name here for the response message payload.

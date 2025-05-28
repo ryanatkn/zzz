@@ -1,5 +1,3 @@
-// src/lib/jsonrpc_helpers.ts
-
 import {DEV} from 'esm-env';
 
 import {

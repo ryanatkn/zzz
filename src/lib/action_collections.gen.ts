@@ -131,7 +131,7 @@ export const gen: Gen = ({origin_path}) => {
 		export type Action_Message_From_Server = z.infer<typeof Action_Message_From_Server>;
 
 		/**
-		 * Service actions with HTTP endpoints (networked).
+		 * Server actions with HTTP endpoints (networked).
 		 */
 		export const Action_Message_Networked = z.discriminatedUnion('type', [
 			${get_action_messages(networked_methods, 'both')}
@@ -139,7 +139,7 @@ export const gen: Gen = ({origin_path}) => {
 		export type Action_Message_Networked = z.infer<typeof Action_Message_Networked>;
 
 		/**
-		 * Service actions without HTTP endpoints (non-networked).
+		 * Server actions without HTTP endpoints (non-networked).
 		 */
 		export const Action_Message_Nonnetworked = z.discriminatedUnion('type', [
 			${get_action_messages(nonnetworked_methods, 'both')}

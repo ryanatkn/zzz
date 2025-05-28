@@ -7,13 +7,13 @@ import {JSONRPC_PARSE_ERROR, JSONRPC_VERSION} from '$lib/jsonrpc.js';
 export interface Register_Actions_Options {
 	path: string;
 	app: Hono;
-	zzz_server: Zzz_Server;
+	server: Zzz_Server;
 }
 
 /**
  * Registers HTTP endpoints for all service actions in the schema registry.
  */
-export const register_http_actions = ({path, app, zzz_server}: Register_Actions_Options): void => {
+export const register_http_actions = ({path, app, server}: Register_Actions_Options): void => {
 	// Register a single JSON-RPC endpoint that handles all methods
 	const final_path = Path_Without_Trailing_Slash.parse(path);
 
@@ -24,7 +24,7 @@ export const register_http_actions = ({path, app, zzz_server}: Register_Actions_
 		try {
 			const request_data = await c.req.json();
 
-			const response = await zzz_server.handle_jsonrpc_message(request_data);
+			const response = await server.handle_jsonrpc_message(request_data);
 
 			return c.json(response);
 		} catch (error) {

@@ -1,14 +1,13 @@
 import {noop} from '@ryanatkn/belt/function.js';
 
-import type {Mutations} from '$lib/action_metatypes.js';
+import type {Client_Action_Handlers} from '$lib/action_metatypes.js';
 
-// TODO not centrally defined
 // TODO we may also want method-based or middleware-like APIs
 
 /**
  * These map to message types, not action methods.
  */
-export const mutations: Mutations = {
+export const client_action_handlers: Client_Action_Handlers = {
 	ping_request: (ctx) => {
 		console.log('Ping request sent', ctx);
 		ctx.zzz.capabilities.handle_sent_ping(ctx.jsonrpc_message.id); // TODO BLOCK @api type safety
