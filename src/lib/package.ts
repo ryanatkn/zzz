@@ -1012,6 +1012,7 @@ export const src_json = {
 		'./action_types.js': {
 			path: 'action_types.ts',
 			declarations: [
+				{name: 'Action_Request_Response_Flag', kind: 'variable'},
 				{name: 'Action_Message_Base', kind: 'variable'},
 				{name: 'Action_Kind', kind: 'variable'},
 				{name: 'Action_Json', kind: 'variable'},
@@ -1049,13 +1050,7 @@ export const src_json = {
 				{name: 'Api_Client', kind: 'class'},
 			],
 		},
-		'./api.js': {
-			path: 'api.ts',
-			declarations: [
-				{name: 'Http_Method', kind: 'variable'},
-				{name: 'Action_Request_Response_Flag', kind: 'type'},
-			],
-		},
+		'./api.js': {path: 'api.ts', declarations: [{name: 'Http_Method', kind: 'variable'}]},
 		'./app.svelte.js': {
 			path: 'app.svelte.ts',
 			declarations: [
@@ -2108,7 +2103,6 @@ export const src_json = {
 			declarations: [
 				{name: 'Register_Websocket_Actions_Options', kind: 'type'},
 				{name: 'register_websocket_actions', kind: 'function'},
-				{name: 'handle_websocket_message', kind: 'function'},
 			],
 		},
 		'./server/safe_fs.js': {
