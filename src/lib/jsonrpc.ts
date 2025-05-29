@@ -62,6 +62,9 @@ export type Jsonrpc_Method = z.infer<typeof Jsonrpc_Method>;
 export const Jsonrpc_Progress_Token = z.union([z.string(), z.number()]);
 export type Jsonrpc_Progress_Token = z.infer<typeof Jsonrpc_Progress_Token>;
 
+// TODO BLOCK @api we may want an `action_id` here
+// to associate messages with actions in contexts that use them,
+// but maybe just for notifications and re-use the jsonrpc id for requests?
 export const Jsonrpc_Mcp_Meta = z.object({}).passthrough(); // uses object over record to be able to use the better `.extend`
 export type Jsonrpc_Mcp_Meta = z.infer<typeof Jsonrpc_Mcp_Meta>;
 

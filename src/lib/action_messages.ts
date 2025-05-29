@@ -18,72 +18,72 @@ export const Action_Messages = {
 	create_directory_request: Action_Message_Base.extend({
 		type: z.literal('create_directory_request').default('create_directory_request'),
 		method: z.literal('create_directory').default('create_directory'),
-		params: create_directory_action_spec.params,
+		params: create_directory_action_spec.input,
 	}),
 	create_directory_response: Action_Message_Base.extend({
 		type: z.literal('create_directory_response').default('create_directory_response'),
 		method: z.literal('create_directory').default('create_directory'),
-		params: create_directory_action_spec.result,
+		params: create_directory_action_spec.output,
 	}),
 	delete_diskfile_request: Action_Message_Base.extend({
 		type: z.literal('delete_diskfile_request').default('delete_diskfile_request'),
 		method: z.literal('delete_diskfile').default('delete_diskfile'),
-		params: delete_diskfile_action_spec.params,
+		params: delete_diskfile_action_spec.input,
 	}),
 	delete_diskfile_response: Action_Message_Base.extend({
 		type: z.literal('delete_diskfile_response').default('delete_diskfile_response'),
 		method: z.literal('delete_diskfile').default('delete_diskfile'),
-		params: delete_diskfile_action_spec.result,
+		params: delete_diskfile_action_spec.output,
 	}),
 	filer_change: Action_Message_Base.extend({
 		type: z.literal('filer_change').default('filer_change'),
 		method: z.literal('filer_change').default('filer_change'),
-		params: filer_change_action_spec.params,
+		params: filer_change_action_spec.input,
 	}),
 	load_session_request: Action_Message_Base.extend({
 		type: z.literal('load_session_request').default('load_session_request'),
 		method: z.literal('load_session').default('load_session'),
-		params: load_session_action_spec.params,
+		params: load_session_action_spec.input,
 	}),
 	load_session_response: Action_Message_Base.extend({
 		type: z.literal('load_session_response').default('load_session_response'),
 		method: z.literal('load_session').default('load_session'),
-		params: load_session_action_spec.result,
+		params: load_session_action_spec.output,
 	}),
 	ping_request: Action_Message_Base.extend({
 		type: z.literal('ping_request').default('ping_request'),
 		method: z.literal('ping').default('ping'),
-		params: ping_action_spec.params,
+		params: ping_action_spec.input,
 	}),
 	ping_response: Action_Message_Base.extend({
 		type: z.literal('ping_response').default('ping_response'),
 		method: z.literal('ping').default('ping'),
-		params: ping_action_spec.result,
+		params: ping_action_spec.output,
 	}),
 	submit_completion_request: Action_Message_Base.extend({
 		type: z.literal('submit_completion_request').default('submit_completion_request'),
 		method: z.literal('submit_completion').default('submit_completion'),
-		params: submit_completion_action_spec.params,
+		params: submit_completion_action_spec.input,
 	}),
 	submit_completion_response: Action_Message_Base.extend({
 		type: z.literal('submit_completion_response').default('submit_completion_response'),
 		method: z.literal('submit_completion').default('submit_completion'),
-		params: submit_completion_action_spec.result,
+		params: submit_completion_action_spec.output,
 	}),
 	toggle_main_menu: Action_Message_Base.extend({
 		type: z.literal('toggle_main_menu').default('toggle_main_menu'),
 		method: z.literal('toggle_main_menu').default('toggle_main_menu'),
-		params: toggle_main_menu_action_spec.params,
+		params: toggle_main_menu_action_spec.input,
 	}),
 	update_diskfile_request: Action_Message_Base.extend({
 		type: z.literal('update_diskfile_request').default('update_diskfile_request'),
 		method: z.literal('update_diskfile').default('update_diskfile'),
-		params: update_diskfile_action_spec.params,
+		params: update_diskfile_action_spec.input,
 	}),
 	update_diskfile_response: Action_Message_Base.extend({
 		type: z.literal('update_diskfile_response').default('update_diskfile_response'),
 		method: z.literal('update_diskfile').default('update_diskfile'),
-		params: update_diskfile_action_spec.result,
+		params: update_diskfile_action_spec.output,
 	}),
 };
 export interface Action_Messages {

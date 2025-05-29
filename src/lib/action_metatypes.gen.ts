@@ -5,8 +5,8 @@ import {get_innermost_type} from '$lib/zod_helpers.js';
 import {action_specs} from '$lib/action_collections.js';
 import {Action_Registry} from '$lib/action_registry.js';
 import {
-	to_action_spec_params_identifier,
-	to_action_spec_result_identifier,
+	to_action_spec_input_identifier,
+	to_action_spec_output_identifier,
 	to_action_message_type,
 	to_action_request_message_type,
 	to_action_response_message_type,
@@ -87,10 +87,10 @@ export const gen: Gen = ({origin_path}) => {
 				.map((spec) => {
 					const {method} = spec;
 					if (spec.kind === 'request_response') {
-						return `${to_action_request_message_type(method)}: z.infer<typeof ${to_action_spec_params_identifier(method)}>,
-						${to_action_response_message_type(method)}: z.infer<typeof ${to_action_spec_result_identifier(method)}>`;
+						return `${to_action_request_message_type(method)}: z.infer<typeof ${to_action_spec_input_identifier(method)}>,
+						${to_action_response_message_type(method)}: z.infer<typeof ${to_action_spec_output_identifier(method)}>`;
 					} else {
-						return `${method}: z.infer<typeof ${to_action_spec_params_identifier(method)}>`;
+						return `${method}: z.infer<typeof ${to_action_spec_input_identifier(method)}>`;
 					}
 				})
 				.join(',\n\t\t\t')}
@@ -102,13 +102,13 @@ export const gen: Gen = ({origin_path}) => {
 		export interface Actions_Api {
 			${registry.specs
 				.map((spec) => {
-					const innermost_type_name = get_innermost_type(spec.params)._def.typeName;
+					const innermost_type_name = get_innermost_type(spec.input)._def.typeName;
 					const has_params =
 						innermost_type_name !== z.ZodFirstPartyTypeKind.ZodNull &&
 						innermost_type_name !== z.ZodFirstPartyTypeKind.ZodVoid;
 					return `${spec.method}: (${
 						has_params
-							? `params${spec.params.isOptional() ? '?' : ''}: Action_Message_Params['${to_action_message_type(
+							? `params${spec.input.isOptional() ? '?' : ''}: Action_Message_Params['${to_action_message_type(
 									spec.method,
 									spec.kind === 'request_response' ? 'request' : null,
 								)}']`

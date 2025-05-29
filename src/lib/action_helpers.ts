@@ -19,7 +19,7 @@ import type {
 	Jsonrpc_Singular_Message,
 } from '$lib/jsonrpc.js';
 import {to_jsonrpc_message_id} from '$lib/jsonrpc_helpers.js';
-import type {Request_Response_Action_Spec_Auth} from '$lib/action_spec.js';
+import type {Action_Auth} from '$lib/action_spec.js';
 
 // TODO BLOCK @api refactor all of this, is all very messy
 
@@ -102,16 +102,16 @@ export const to_action_spec_identifier = (method: Action_Method): string => `${m
 /**
  * Convert an action name to its params type name.
  */
-export const to_action_spec_params_identifier = (method: Action_Method): string =>
-	`${to_action_spec_identifier(method)}.params`;
+export const to_action_spec_input_identifier = (method: Action_Method): string =>
+	`${to_action_spec_identifier(method)}.input`;
 
 /**
  * Convert an action name to its response schema identifier.
  */
-export const to_action_spec_result_identifier = (method: Action_Method): string =>
-	`${to_action_spec_identifier(method)}.result`;
+export const to_action_spec_output_identifier = (method: Action_Method): string =>
+	`${to_action_spec_identifier(method)}.output`;
 
-export const to_action_spec_auth_identifier = (auth: Request_Response_Action_Spec_Auth): string =>
+export const to_action_spec_auth_identifier = (auth: Action_Auth): string =>
 	auth === 'public'
 		? 'Public_Server_Action_Handler'
 		: auth === 'authenticate'

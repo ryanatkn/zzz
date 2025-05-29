@@ -7,46 +7,53 @@ import {Action_Kind} from '$lib/action_types.js';
 export const Action_Operation = z.union([z.literal('command'), z.literal('query')]);
 export type Action_Operation = z.infer<typeof Action_Operation>;
 
-export const Action_Spec_Base = z.object({
-	method: Action_Method,
-	params: z.instanceof(z.ZodType),
-	kind: Action_Kind,
-	// TODO BLOCK @api is not yet used, should be for GET/POST distinction
-	operation: Action_Operation.nullable(),
-});
-export type Action_Spec_Base = z.infer<typeof Action_Spec_Base>;
-
-export const Request_Response_Action_Spec_Auth = z.union([
+export const Action_Auth = z.union([
 	z.literal('public'),
 	z.literal('authenticate'),
 	z.literal('authorize'),
 ]);
-export type Request_Response_Action_Spec_Auth = z.infer<typeof Request_Response_Action_Spec_Auth>;
+export type Action_Auth = z.infer<typeof Action_Auth>;
+
+export const Action_Spec_Base = z.object({
+	method: Action_Method,
+	kind: Action_Kind,
+	// TODO BLOCK @api is not yet used, should be for GET/POST distinction
+	operation: Action_Operation.nullable(),
+	auth: Action_Auth.nullable(),
+	input: z.instanceof(z.ZodType),
+	output: z.instanceof(z.ZodType).nullable(),
+});
+export type Action_Spec_Base = z.infer<typeof Action_Spec_Base>;
 
 /** Type for request_response actions (client requests, server responds). */
 export const Request_Response_Action_Spec = Action_Spec_Base.extend({
 	kind: z.literal('request_response').default('request_response'),
 	operation: Action_Operation,
-	auth: Request_Response_Action_Spec_Auth,
+	auth: Action_Auth,
 	/**
 	 * For the request_response the base action `params` are the request params,
 	 * and we mirror the name here for the response message payload.
 	 */
-	result: z.instanceof(z.ZodType),
+	output: z.instanceof(z.ZodType),
 });
 export type Request_Response_Action_Spec = z.infer<typeof Request_Response_Action_Spec>;
 
 /** Type for remote_notification actions (server sends without a request). */
 export const Remote_Notification_Action_Spec = Action_Spec_Base.extend({
 	kind: z.literal('remote_notification').default('remote_notification'),
-	/** Remote notifications do not have an operation. */
+	/**
+	 * Remote notifications do not have an operation -
+	 * they're saying "something happened" rather than "do this" or "get that".
+	 */
 	operation: z.null().default(null),
+	auth: z.null().default(null),
 });
 export type Remote_Notification_Action_Spec = z.infer<typeof Remote_Notification_Action_Spec>;
 
 /** Type for local_call actions (that never leave the client). */
 export const Local_Call_Action_Spec = Action_Spec_Base.extend({
 	kind: z.literal('local_call').default('local_call'),
+	auth: z.null().default(null),
 	returns: Type_Literal, // TODO BLOCK make this a schema, maybe an optional `returns_type`
 });
 export type Local_Call_Action_Spec = z.infer<typeof Local_Call_Action_Spec>;

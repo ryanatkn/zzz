@@ -60,6 +60,7 @@ export class Client_Action_Context<T_App extends Zzz = Zzz, T_Params = unknown, 
 	) {
 		this.zzz = zzz;
 		this.method = method;
+		// TODO BLOCK @api should these be input/output instead of params/result?
 		this.params = params;
 		this.result = result;
 		this.request_response_flag = request_response_flag;

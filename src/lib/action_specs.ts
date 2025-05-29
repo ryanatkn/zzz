@@ -19,15 +19,14 @@ import {Completion_Request, Completion_Response} from '$lib/completion_types.js'
 // 		maybe this restriction isn't desired though? and sync should be allowed?
 // - the client and server can both send notifications as well as request/response messages,
 // 		so the server can query the client as needed, but the client can always deny requests
-// - "params" overloaded for "action messages" so the result of responses is weirdly called params
 
 export const ping_action_spec = {
 	method: 'ping',
 	kind: 'request_response',
 	operation: 'query',
 	auth: 'public',
-	params: z.void().optional(),
-	result: z
+	input: z.void().optional(),
+	output: z
 		.object({
 			ping_id: Uuid,
 		})
@@ -39,8 +38,8 @@ export const load_session_action_spec = {
 	kind: 'request_response',
 	operation: 'query',
 	auth: 'public',
-	params: z.void().optional(),
-	result: z
+	input: z.void().optional(),
+	output: z
 		.object({
 			data: z
 				// TODO extract this schema to diskfile_types or something
@@ -58,12 +57,14 @@ export const filer_change_action_spec = {
 	method: 'filer_change',
 	kind: 'remote_notification',
 	operation: null,
-	params: z
+	auth: null,
+	input: z
 		.object({
 			change: Diskfile_Change,
 			source_file: Serializable_Source_File,
 		})
 		.strict(),
+	output: null,
 } satisfies Action_Spec;
 
 export const update_diskfile_action_spec = {
@@ -71,13 +72,13 @@ export const update_diskfile_action_spec = {
 	kind: 'request_response',
 	operation: 'command',
 	auth: 'public',
-	params: z
+	input: z
 		.object({
 			path: Diskfile_Path,
 			content: z.string(),
 		})
 		.strict(),
-	result: z.null().optional(), // TODO @many should these be void+optional?
+	output: z.null().optional(), // TODO @many should these be void+optional? or just null?
 } satisfies Action_Spec;
 
 export const delete_diskfile_action_spec = {
@@ -85,12 +86,12 @@ export const delete_diskfile_action_spec = {
 	kind: 'request_response',
 	operation: 'command',
 	auth: 'public',
-	params: z
+	input: z
 		.object({
 			path: Diskfile_Path,
 		})
 		.strict(),
-	result: z.null().optional(), // TODO @many should these be void+optional?
+	output: z.null().optional(), // TODO @many should these be void+optional? or just null?
 } satisfies Action_Spec;
 
 export const create_directory_action_spec = {
@@ -98,12 +99,12 @@ export const create_directory_action_spec = {
 	kind: 'request_response',
 	operation: 'command',
 	auth: 'public',
-	params: z
+	input: z
 		.object({
 			path: Diskfile_Path,
 		})
 		.strict(),
-	result: z.null().optional(), // TODO @many should these be void+optional?
+	output: z.null().optional(), // TODO @many should these be void+optional? or just null?
 } satisfies Action_Spec;
 
 export const submit_completion_action_spec = {
@@ -111,12 +112,12 @@ export const submit_completion_action_spec = {
 	kind: 'request_response',
 	operation: 'command',
 	auth: 'public',
-	params: z
+	input: z
 		.object({
 			completion_request: Completion_Request,
 		})
 		.strict(),
-	result: z
+	output: z
 		.object({
 			completion_response: Completion_Response,
 		})
@@ -127,6 +128,8 @@ export const toggle_main_menu_action_spec = {
 	method: 'toggle_main_menu',
 	kind: 'local_call',
 	operation: 'command',
-	params: z.union([z.boolean(), z.void()]).optional(),
+	auth: null,
+	input: z.union([z.boolean(), z.void()]).optional(),
+	output: null,
 	returns: Type_Literal.parse('boolean'),
 } satisfies Action_Spec;
