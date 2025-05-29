@@ -42,14 +42,14 @@ export type Request_Response_Action_Method =
 	| 'update_diskfile';
 
 /**
- * Names of all server_notification actions.
+ * Names of all remote_notification actions.
  */
-export type Server_Notification_Action_Method = 'filer_change';
+export type Remote_Notification_Action_Method = 'filer_change';
 
 /**
- * Names of all client_local actions.
+ * Names of all local_call actions.
  */
-export type Client_Local_Action_Method = 'toggle_main_menu';
+export type Local_Call_Action_Method = 'toggle_main_menu';
 
 /**
  * All action types. May have '/' separators for namespacing.

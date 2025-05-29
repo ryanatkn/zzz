@@ -90,11 +90,11 @@ export const get_glyph_for_action_method = (method: Action_Method): string => {
 
 export const get_glyph_for_action_kind = (kind: Action_Kind): string => {
 	switch (kind) {
-		case 'client_local':
+		case 'local_call':
 			return GLYPH_ACTION_TYPE_CLIENT_LOCAL;
 		case 'request_response':
 			return GLYPH_ACTION_TYPE_REQUEST_RESPONSE;
-		case 'server_notification':
+		case 'remote_notification':
 			return GLYPH_ACTION_TYPE_NOTIFICATION;
 		default:
 			return GLYPH_ACTION;

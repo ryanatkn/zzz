@@ -7,8 +7,8 @@ import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 import type {
 	Action_Spec,
 	Request_Response_Action_Spec,
-	Server_Notification_Action_Spec,
-	Client_Local_Action_Spec,
+	Remote_Notification_Action_Spec,
+	Local_Call_Action_Spec,
 } from '$lib/action_spec.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
 
@@ -65,14 +65,14 @@ export class Schema_Registry {
 	request_response_action_specs: Array<Request_Response_Action_Spec> = [];
 
 	/**
-	 * Collection of 'server_notification' action specs.
+	 * Collection of 'remote_notification' action specs.
 	 */
-	server_notification_action_specs: Array<Server_Notification_Action_Spec> = [];
+	remote_notification_action_specs: Array<Remote_Notification_Action_Spec> = [];
 
 	/**
-	 * Collection of 'client_local' action specs.
+	 * Collection of 'local_call' action specs.
 	 */
-	client_local_action_specs: Array<Client_Local_Action_Spec> = [];
+	local_call_action_specs: Array<Local_Call_Action_Spec> = [];
 
 	/**
 	 * Map of action spec names to action specs.
@@ -105,11 +105,11 @@ export class Schema_Registry {
 				case 'request_response':
 					this.request_response_action_specs.push(schema);
 					break;
-				case 'server_notification':
-					this.server_notification_action_specs.push(schema);
+				case 'remote_notification':
+					this.remote_notification_action_specs.push(schema);
 					break;
-				case 'client_local':
-					this.client_local_action_specs.push(schema);
+				case 'local_call':
+					this.local_call_action_specs.push(schema);
 					break;
 				default:
 					throw new Unreachable_Error(schema);

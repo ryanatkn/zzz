@@ -1,14 +1,18 @@
 import {z} from 'zod';
 
 import {Type_Literal} from '$lib/zod_helpers.js';
-import type {Http_Method} from '$lib/http.js';
 import {Action_Method} from '$lib/action_metatypes.js';
 import {Action_Kind} from '$lib/action_types.js';
+
+export const Action_Operation = z.union([z.literal('command'), z.literal('query')]);
+export type Action_Operation = z.infer<typeof Action_Operation>;
 
 export const Action_Spec_Base = z.object({
 	method: Action_Method,
 	params: z.instanceof(z.ZodType),
 	kind: Action_Kind,
+	// TODO BLOCK @api is not yet used, should be for GET/POST distinction
+	operation: Action_Operation.nullable(),
 });
 export type Action_Spec_Base = z.infer<typeof Action_Spec_Base>;
 
@@ -19,11 +23,10 @@ export const Request_Response_Action_Spec_Auth = z.union([
 ]);
 export type Request_Response_Action_Spec_Auth = z.infer<typeof Request_Response_Action_Spec_Auth>;
 
-// Type for request_response actions (client requests, server responds)
+/** Type for request_response actions (client requests, server responds). */
 export const Request_Response_Action_Spec = Action_Spec_Base.extend({
 	kind: z.literal('request_response').default('request_response'),
-	// TODO BLOCK @api rethink this, maybe just read/write or query/command separation via a flag?
-	http_method: z.custom<Http_Method>(),
+	operation: Action_Operation,
 	auth: Request_Response_Action_Spec_Auth,
 	/**
 	 * For the request_response the base action `params` are the request params,
@@ -33,24 +36,26 @@ export const Request_Response_Action_Spec = Action_Spec_Base.extend({
 });
 export type Request_Response_Action_Spec = z.infer<typeof Request_Response_Action_Spec>;
 
-// Type for server_notification actions (server sends without a request)
-export const Server_Notification_Action_Spec = Action_Spec_Base.extend({
-	kind: z.literal('server_notification').default('server_notification'),
+/** Type for remote_notification actions (server sends without a request). */
+export const Remote_Notification_Action_Spec = Action_Spec_Base.extend({
+	kind: z.literal('remote_notification').default('remote_notification'),
+	/** Remote notifications do not have an operation. */
+	operation: z.null().default(null),
 });
-export type Server_Notification_Action_Spec = z.infer<typeof Server_Notification_Action_Spec>;
+export type Remote_Notification_Action_Spec = z.infer<typeof Remote_Notification_Action_Spec>;
 
-// Type for client_local actions (that never leave the client)
-export const Client_Local_Action_Spec = Action_Spec_Base.extend({
-	kind: z.literal('client_local').default('client_local'),
+/** Type for local_call actions (that never leave the client). */
+export const Local_Call_Action_Spec = Action_Spec_Base.extend({
+	kind: z.literal('local_call').default('local_call'),
 	returns: Type_Literal, // TODO BLOCK make this a schema, maybe an optional `returns_type`
 });
-export type Client_Local_Action_Spec = z.infer<typeof Client_Local_Action_Spec>;
+export type Local_Call_Action_Spec = z.infer<typeof Local_Call_Action_Spec>;
 
 // Union of all action spec types
 export const Action_Spec = z.union([
 	Request_Response_Action_Spec,
-	Server_Notification_Action_Spec,
-	Client_Local_Action_Spec,
+	Remote_Notification_Action_Spec,
+	Local_Call_Action_Spec,
 ]);
 export type Action_Spec = z.infer<typeof Action_Spec>;
 
@@ -64,8 +69,8 @@ export const is_action_spec = (value: unknown): value is Action_Spec => {
 		'method' in value &&
 		'kind' in value &&
 		((value as Action_Spec).kind === 'request_response' ||
-			(value as Action_Spec).kind === 'server_notification' ||
-			(value as Action_Spec).kind === 'client_local')
+			(value as Action_Spec).kind === 'remote_notification' ||
+			(value as Action_Spec).kind === 'local_call')
 	);
 };
 

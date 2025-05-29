@@ -11,7 +11,7 @@ import {Jsonrpc_Request_Id} from '$lib/jsonrpc.js';
  * Flag to indicate the phase of a request/response action.
  * - 'request': The action is being sent to the server
  * - 'response': The server has responded to the action
- * - null: The action is not a request/response type (e.g., client_local, server_notification)
+ * - null: The action is not a request/response type (e.g., local_call, remote_notification)
  */
 // TODO BLOCK @api rethink this
 export const Action_Request_Response_Flag = z.union([
@@ -38,7 +38,7 @@ export const Action_Message_Base = z
 	.passthrough(); // TODO is this a good/safe pattern for base schemas? we're doing this so we can parse loosely sometimes, but see too how the Uuid has a fallback
 export type Action_Message_Base = z.infer<typeof Action_Message_Base>;
 
-export const Action_Kind = z.enum(['request_response', 'server_notification', 'client_local']);
+export const Action_Kind = z.enum(['request_response', 'remote_notification', 'local_call']);
 export type Action_Kind = z.infer<typeof Action_Kind>;
 
 export const Action_Json = Cell_Json.extend({

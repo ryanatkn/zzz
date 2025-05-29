@@ -50,17 +50,17 @@ export const gen: Gen = ({origin_path}) => {
 		};
 
 		/**
-		 * Names of all server_notification actions.
+		 * Names of all remote_notification actions.
 		 */
-		export type Server_Notification_Action_Method = ${
-			registry.server_notification_specs.map((spec) => `'${spec.method}'`).join(' | ') || 'never'
+		export type Remote_Notification_Action_Method = ${
+			registry.remote_notification_specs.map((spec) => `'${spec.method}'`).join(' | ') || 'never'
 		};
 
 		/**
-		 * Names of all client_local actions.
+		 * Names of all local_call actions.
 		 */
-		export type Client_Local_Action_Method = ${
-			registry.client_local_specs.map((spec) => `'${spec.method}'`).join(' | ') || 'never'
+		export type Local_Call_Action_Method = ${
+			registry.local_call_specs.map((spec) => `'${spec.method}'`).join(' | ') || 'never'
 		};
 
 		/**
@@ -116,7 +116,7 @@ export const gen: Gen = ({origin_path}) => {
 					}) => ${
 						spec.kind === 'request_response'
 							? `Promise<Action_Message_Params['${to_action_response_message_type(spec.method)}']>`
-							: spec.kind === 'client_local'
+							: spec.kind === 'local_call'
 								? spec.returns
 								: 'void'
 					};`;

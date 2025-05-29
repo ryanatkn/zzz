@@ -24,7 +24,7 @@ import {Completion_Request, Completion_Response} from '$lib/completion_types.js'
 export const ping_action_spec = {
 	method: 'ping',
 	kind: 'request_response',
-	http_method: 'GET',
+	operation: 'query',
 	auth: 'public',
 	params: z.void().optional(),
 	result: z
@@ -37,7 +37,7 @@ export const ping_action_spec = {
 export const load_session_action_spec = {
 	method: 'load_session',
 	kind: 'request_response',
-	http_method: 'GET',
+	operation: 'query',
 	auth: 'public',
 	params: z.void().optional(),
 	result: z
@@ -56,7 +56,8 @@ export const load_session_action_spec = {
 
 export const filer_change_action_spec = {
 	method: 'filer_change',
-	kind: 'server_notification',
+	kind: 'remote_notification',
+	operation: null,
 	params: z
 		.object({
 			change: Diskfile_Change,
@@ -68,7 +69,7 @@ export const filer_change_action_spec = {
 export const update_diskfile_action_spec = {
 	method: 'update_diskfile',
 	kind: 'request_response',
-	http_method: 'POST',
+	operation: 'command',
 	auth: 'public',
 	params: z
 		.object({
@@ -82,7 +83,7 @@ export const update_diskfile_action_spec = {
 export const delete_diskfile_action_spec = {
 	method: 'delete_diskfile',
 	kind: 'request_response',
-	http_method: 'POST',
+	operation: 'command',
 	auth: 'public',
 	params: z
 		.object({
@@ -95,7 +96,7 @@ export const delete_diskfile_action_spec = {
 export const create_directory_action_spec = {
 	method: 'create_directory',
 	kind: 'request_response',
-	http_method: 'POST',
+	operation: 'command',
 	auth: 'public',
 	params: z
 		.object({
@@ -108,7 +109,7 @@ export const create_directory_action_spec = {
 export const submit_completion_action_spec = {
 	method: 'submit_completion',
 	kind: 'request_response',
-	http_method: 'POST',
+	operation: 'command',
 	auth: 'public',
 	params: z
 		.object({
@@ -124,7 +125,8 @@ export const submit_completion_action_spec = {
 
 export const toggle_main_menu_action_spec = {
 	method: 'toggle_main_menu',
-	kind: 'client_local',
+	kind: 'local_call',
+	operation: 'command',
 	params: z.union([z.boolean(), z.void()]).optional(),
 	returns: Type_Literal.parse('boolean'),
 } satisfies Action_Spec;

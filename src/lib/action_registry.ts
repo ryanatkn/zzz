@@ -3,8 +3,8 @@
 import type {
 	Action_Spec,
 	Request_Response_Action_Spec,
-	Server_Notification_Action_Spec,
-	Client_Local_Action_Spec,
+	Remote_Notification_Action_Spec,
+	Local_Call_Action_Spec,
 } from '$lib/action_spec.js';
 import {to_action_spec_identifier} from '$lib/action_helpers.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
@@ -28,22 +28,22 @@ export class Action_Registry {
 		return this.specs.filter((spec) => spec.kind === 'request_response');
 	}
 
-	get server_notification_specs(): Array<Server_Notification_Action_Spec> {
-		return this.specs.filter((spec) => spec.kind === 'server_notification');
+	get remote_notification_specs(): Array<Remote_Notification_Action_Spec> {
+		return this.specs.filter((spec) => spec.kind === 'remote_notification');
 	}
 
-	get client_local_specs(): Array<Client_Local_Action_Spec> {
-		return this.specs.filter((spec) => spec.kind === 'client_local');
+	get local_call_specs(): Array<Local_Call_Action_Spec> {
+		return this.specs.filter((spec) => spec.kind === 'local_call');
 	}
 
 	get service_specs(): Array<Action_Spec> {
-		// Server actions include both request_response and server_notification actions
-		return [...this.request_response_specs, ...this.server_notification_specs];
+		// Server actions include both request_response and remote_notification actions
+		return [...this.request_response_specs, ...this.remote_notification_specs];
 	}
 
 	get client_specs(): Array<Action_Spec> {
-		// Client actions are just client_local actions in the new system
-		return this.client_local_specs;
+		// Client actions are just local_call actions in the new system
+		return this.local_call_specs;
 	}
 
 	// Methods for deriving lists of action methods
@@ -51,12 +51,12 @@ export class Action_Registry {
 		return this.request_response_specs.map((spec) => spec.method);
 	}
 
-	get server_notification_methods(): Array<Action_Method> {
-		return this.server_notification_specs.map((spec) => spec.method);
+	get remote_notification_methods(): Array<Action_Method> {
+		return this.remote_notification_specs.map((spec) => spec.method);
 	}
 
-	get client_local_methods(): Array<Action_Method> {
-		return this.client_local_specs.map((spec) => spec.method);
+	get local_call_methods(): Array<Action_Method> {
+		return this.local_call_specs.map((spec) => spec.method);
 	}
 
 	get networked_methods(): Array<Action_Method> {
@@ -66,8 +66,8 @@ export class Action_Registry {
 
 	get nonnetworked_methods(): Array<Action_Method> {
 		const {networked_methods} = this;
-		// Non-networked actions are server_notifications
-		return this.server_notification_specs
+		// Non-networked actions are remote_notifications
+		return this.remote_notification_specs
 			.map((spec) => spec.method)
 			.filter((method) => !networked_methods.includes(method));
 	}
@@ -85,7 +85,7 @@ export class Action_Registry {
 	}
 
 	get server_to_client_methods(): Array<Action_Method> {
-		return [...this.request_response_methods, ...this.server_notification_methods];
+		return [...this.request_response_methods, ...this.remote_notification_methods];
 	}
 
 	// Utility to get imports needed by generators

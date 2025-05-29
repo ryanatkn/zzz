@@ -970,8 +970,8 @@ export const src_json = {
 			declarations: [
 				{name: 'Action_Method', kind: 'variable'},
 				{name: 'Request_Response_Action_Method', kind: 'type'},
-				{name: 'Server_Notification_Action_Method', kind: 'type'},
-				{name: 'Client_Local_Action_Method', kind: 'type'},
+				{name: 'Remote_Notification_Action_Method', kind: 'type'},
+				{name: 'Local_Call_Action_Method', kind: 'type'},
 				{name: 'Action_Message_Type', kind: 'variable'},
 				{name: 'Action_Message_Params', kind: 'type'},
 				{name: 'Actions_Api', kind: 'type'},
@@ -985,11 +985,12 @@ export const src_json = {
 		'./action_spec.js': {
 			path: 'action_spec.ts',
 			declarations: [
+				{name: 'Action_Operation', kind: 'variable'},
 				{name: 'Action_Spec_Base', kind: 'variable'},
 				{name: 'Request_Response_Action_Spec_Auth', kind: 'variable'},
 				{name: 'Request_Response_Action_Spec', kind: 'variable'},
-				{name: 'Server_Notification_Action_Spec', kind: 'variable'},
-				{name: 'Client_Local_Action_Spec', kind: 'variable'},
+				{name: 'Remote_Notification_Action_Spec', kind: 'variable'},
+				{name: 'Local_Call_Action_Spec', kind: 'variable'},
 				{name: 'Action_Spec', kind: 'variable'},
 				{name: 'is_action_spec', kind: 'function'},
 				{name: 'collect_action_specs_by_method', kind: 'function'},
