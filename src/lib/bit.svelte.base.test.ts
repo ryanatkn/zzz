@@ -7,12 +7,12 @@ import {test, expect, describe, beforeEach} from 'vitest';
 import {Bit, Text_Bit, Diskfile_Bit, Sequence_Bit} from '$lib/bit.svelte.js';
 import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
 import {Diskfile_Path, Serializable_Source_File} from '$lib/diskfile_types.js';
-import {Zzz} from '$lib/zzz.svelte.js';
+import {Zzz_App} from '$lib/zzz.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 import {estimate_token_count} from '$lib/helpers.js';
 
 // Test suite variables
-let zzz: Zzz;
+let zzz: Zzz_App;
 
 // Test constants
 const TEST_CONTENT = {
@@ -26,7 +26,7 @@ const TEST_DIR = Serializable_Source_File.shape.source_dir.parse('/path/');
 
 beforeEach(() => {
 	// Create a real Zzz instance for each test
-	zzz = monkeypatch_zzz_for_tests(new Zzz());
+	zzz = monkeypatch_zzz_for_tests(new Zzz_App());
 });
 
 describe('Bit base class functionality', () => {

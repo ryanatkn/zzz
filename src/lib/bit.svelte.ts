@@ -10,7 +10,7 @@ import {Uuid} from '$lib/zod_helpers.js';
 import {Xml_Attribute_With_Defaults} from '$lib/xml.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import type {Diskfile} from '$lib/diskfile.svelte.js';
-import type {Zzz} from '$lib/zzz.svelte.js';
+import type {Zzz_App} from '$lib/zzz.svelte.js';
 import {Diskfile_Path} from '$lib/diskfile_types.js';
 import {CONTENT_PREVIEW_LENGTH} from '$lib/constants.js';
 
@@ -169,19 +169,19 @@ export abstract class Bit<T extends z.ZodType = typeof Bit_Json_Base> extends Ce
 	 * 2. Default values
 	 * 3. Construction of the appropriate bit subclass via the registry
 	 */
-	static create(zzz: Zzz, json: Text_Bit_Json_Input, options?: Text_Bit_Options): Text_Bit;
+	static create(zzz: Zzz_App, json: Text_Bit_Json_Input, options?: Text_Bit_Options): Text_Bit;
 	static create(
-		zzz: Zzz,
+		zzz: Zzz_App,
 		json: Diskfile_Bit_Json_Input,
 		options?: Diskfile_Bit_Options,
 	): Diskfile_Bit;
 	static create(
-		zzz: Zzz,
+		zzz: Zzz_App,
 		json: Sequence_Bit_Json_Input,
 		options?: Sequence_Bit_Options,
 	): Sequence_Bit;
-	static create(zzz: Zzz, json: Bit_Json_Input, options?: Bit_Type_Options): Bit_Type;
-	static create(zzz: Zzz, json: Bit_Json_Input, options?: Bit_Type_Options): Bit_Type {
+	static create(zzz: Zzz_App, json: Bit_Json_Input, options?: Bit_Type_Options): Bit_Type;
+	static create(zzz: Zzz_App, json: Bit_Json_Input, options?: Bit_Type_Options): Bit_Type {
 		if (!json.type) {
 			throw new Error('Missing required "type" field in bit JSON');
 		}

@@ -6,7 +6,7 @@ import {test, expect, beforeEach, describe} from 'vitest';
 
 import {Diskfile_Editor_State} from '$lib/diskfile_editor_state.svelte.js';
 import {Diskfile_Path, Serializable_Source_File} from '$lib/diskfile_types.js';
-import {Zzz} from '$lib/zzz.svelte.js';
+import {Zzz_App} from '$lib/zzz.svelte.js';
 import {Diskfile} from '$lib/diskfile.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
@@ -16,13 +16,13 @@ const TEST_DIR = Serializable_Source_File.shape.source_dir.parse('/path/');
 const TEST_CONTENT = 'This is test content';
 
 // Test suite variables
-let zzz: Zzz;
+let zzz: Zzz_App;
 let test_diskfile: Diskfile;
 let editor_state: Diskfile_Editor_State;
 
 beforeEach(() => {
 	// Create a real Zzz instance for each test
-	zzz = monkeypatch_zzz_for_tests(new Zzz());
+	zzz = monkeypatch_zzz_for_tests(new Zzz_App());
 
 	// Create a real diskfile through the registry
 	test_diskfile = zzz.diskfiles.add(

@@ -1,6 +1,6 @@
 import {create_context} from '@ryanatkn/fuz/context_helpers.js';
 
-import {Zzz, zzz_context, type Zzz_Options} from '$lib/zzz.svelte.js';
+import {Zzz_App, zzz_context, type Zzz_Options} from '$lib/zzz.svelte.js';
 import {cell_classes} from '$lib/cell_classes.js';
 import {client_action_handlers} from '$lib/client_action_handlers.js';
 import {WEBSOCKET_URL, API_URL_FOR_HTTP_RPC} from '$lib/constants.js';
@@ -15,7 +15,7 @@ export interface App_Options extends Zzz_Options {} // eslint-disable-line @type
  * It extends Zzz and should be able to customize as much as possible,
  * including both behaviors and types. (both a work in progress)
  */
-export class App extends Zzz {
+export class App extends Zzz_App {
 	constructor(options?: App_Options) {
 		const o = {...options};
 		if (!o.http_rpc_url) o.http_rpc_url = API_URL_FOR_HTTP_RPC;

@@ -3,7 +3,7 @@ import type {z} from 'zod';
 import {DEV} from 'esm-env';
 
 import type {Cell} from '$lib/cell.svelte.js';
-import type {Zzz} from '$lib/zzz.svelte.js';
+import type {Zzz_App} from '$lib/zzz.svelte.js';
 import type {Cell_Registry_Map} from '$lib/cell_classes.js';
 import type {Uuid} from '$lib/zod_helpers.js';
 
@@ -30,7 +30,7 @@ export class Class_Not_Registered_Error extends Error {
  * but I want to continue exploring the ideas behind it until we get fully snapshottable UI.
  */
 export class Cell_Registry {
-	readonly zzz: Zzz;
+	readonly zzz: Zzz_App;
 
 	readonly #constructors: Map<string, Class_Constructor<Cell>> = new Map();
 
@@ -42,7 +42,7 @@ export class Cell_Registry {
 	// and we could potentially make the collection itself reactive
 	readonly all: Map<Uuid, Cell> = new Map();
 
-	constructor(zzz: Zzz) {
+	constructor(zzz: Zzz_App) {
 		this.zzz = zzz;
 	}
 

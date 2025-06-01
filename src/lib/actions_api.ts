@@ -2,7 +2,7 @@ import {Logger} from '@ryanatkn/belt/log.js';
 import {BROWSER, DEV} from 'esm-env';
 
 import type {Actions_Api} from '$lib/action_metatypes.js';
-import type {Zzz} from '$lib/zzz.svelte.js';
+import type {Zzz_App} from '$lib/zzz.svelte.js';
 import {Client_Action_Context} from '$lib/client_action_event.js';
 import {create_jsonrpc_request} from '$lib/jsonrpc_helpers.js';
 import {create_uuid} from '$lib/zod_helpers.js';
@@ -18,7 +18,7 @@ const log = new Logger();
 
 // TODO think about transactions, snapshotting
 
-export const create_actions_api = (zzz: Zzz): Actions_Api =>
+export const create_actions_api = (zzz: Zzz_App): Actions_Api =>
 	new Proxy(Object.create(null), {
 		get: (_target, method: keyof Actions_Api) => (params: any) => {
 			// TODO BLOCK `log.debug` isn't formatting the output correctly, shouldn't use console here

@@ -8,7 +8,7 @@ import {z} from 'zod';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json, type Schema_Keys} from '$lib/cell_types.js';
 import {Datetime_Now, get_datetime_now, create_uuid, Uuid_With_Default} from '$lib/zod_helpers.js';
-import {Zzz} from '$lib/zzz.svelte.js';
+import {Zzz_App} from '$lib/zzz.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Constants for testing
@@ -17,11 +17,11 @@ const TEST_DATETIME = get_datetime_now();
 const TEST_YEAR = 2022;
 
 // Test suite variables
-let zzz: Zzz;
+let zzz: Zzz_App;
 
 beforeEach(() => {
 	// Create a real Zzz instance for each test
-	zzz = monkeypatch_zzz_for_tests(new Zzz());
+	zzz = monkeypatch_zzz_for_tests(new Zzz_App());
 	vi.clearAllMocks();
 });
 

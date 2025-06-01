@@ -5,7 +5,7 @@
 import {test, expect, describe, beforeEach} from 'vitest';
 
 import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
-import {Zzz} from '$lib/zzz.svelte.js';
+import {Zzz_App} from '$lib/zzz.svelte.js';
 import {Diskfile_Path, Serializable_Source_File} from '$lib/diskfile_types.js';
 import type {Diskfile} from '$lib/diskfile.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
@@ -42,13 +42,13 @@ const TEST_CONTENT = {
 };
 
 // Test suite variables
-let zzz: Zzz;
+let zzz: Zzz_App;
 let test_diskfiles: Map<Diskfile_Path, Diskfile>;
 
 // Setup function to create a real Zzz instance and test diskfiles
 beforeEach(() => {
 	// Create a real Zzz instance
-	zzz = monkeypatch_zzz_for_tests(new Zzz());
+	zzz = monkeypatch_zzz_for_tests(new Zzz_App());
 	test_diskfiles = new Map();
 
 	// Create test diskfiles

@@ -6,11 +6,11 @@ import {test, expect, describe, beforeEach} from 'vitest';
 
 import {estimate_token_count} from '$lib/helpers.js';
 import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
-import {Zzz} from '$lib/zzz.svelte.js';
+import {Zzz_App} from '$lib/zzz.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Test suite variables
-let zzz: Zzz;
+let zzz: Zzz_App;
 
 // Test data constants for reuse
 const TEST_CONTENT = {
@@ -33,7 +33,7 @@ function test() {
 // Setup function to create a real Zzz instance
 beforeEach(() => {
 	// Create a real Zzz instance
-	zzz = monkeypatch_zzz_for_tests(new Zzz());
+	zzz = monkeypatch_zzz_for_tests(new Zzz_App());
 });
 
 describe('Text_Bit initialization', () => {

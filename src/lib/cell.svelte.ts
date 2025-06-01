@@ -8,7 +8,7 @@ import {
 	type Datetime,
 	get_datetime_now,
 } from '$lib/zod_helpers.js';
-import type {Zzz} from '$lib/zzz.svelte.js';
+import type {Zzz_App} from '$lib/zzz.svelte.js';
 import {
 	get_schema_class_info,
 	type Schema_Class_Info,
@@ -25,7 +25,7 @@ import type {Schema_Keys, Cell_Json, Cell_Json_Input} from '$lib/cell_types.js';
  * so they're safe to forward when subclassing without needing to extract the rest options.
  */
 export interface Cell_Options<T_Schema extends z.ZodType> {
-	zzz: Zzz; // TODO needs to be generic
+	zzz: Zzz_App; // TODO needs to be generic
 	json?: z.input<T_Schema>;
 }
 
@@ -103,7 +103,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	);
 
 	// TODO needs to be generic so users can extend it
-	readonly zzz: Zzz;
+	readonly zzz: Zzz_App;
 
 	/**
 	 * Type-safe decoders for custom field decoding.

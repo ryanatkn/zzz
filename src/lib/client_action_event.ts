@@ -1,5 +1,5 @@
 import type {Action_Method} from '$lib/action_metatypes.js';
-import type {Zzz} from '$lib/zzz.svelte.js';
+import type {Zzz_App} from '$lib/zzz.svelte.js';
 import type {Action_Request_Response_Flag} from '$lib/action_types.js';
 import type {Jsonrpc_Notification, Jsonrpc_Request} from '$lib/jsonrpc.js';
 import type {Action_Message_Union} from '$lib/action_collections.js';
@@ -13,9 +13,11 @@ import type {Action_Message_Union} from '$lib/action_collections.js';
 /**
  * Must be synchronous.
  */
-export type Client_Action_Handler<T_App extends Zzz = Zzz, T_Params = any, T_Result = any> = (
-	ctx: Client_Action_Context<T_App, T_Params, T_Result>,
-) => any;
+export type Client_Action_Handler<
+	T_App extends Zzz_App = Zzz_App,
+	T_Params = any,
+	T_Result = any,
+> = (ctx: Client_Action_Context<T_App, T_Params, T_Result>) => any;
 
 /**
  * Type for registering callbacks to run after mutation completes.
@@ -32,7 +34,11 @@ export type After_Client_Action_Callback = () => void | Promise<void>;
  * Creates a mutation context with the provided parameters and
  * a function to flush after-mutation callbacks.
  */
-export class Client_Action_Context<T_App extends Zzz = Zzz, T_Params = unknown, T_Result = any> {
+export class Client_Action_Context<
+	T_App extends Zzz_App = Zzz_App,
+	T_Params = unknown,
+	T_Result = any,
+> {
 	zzz: T_App;
 	/** JSON-RPC method for the action. Maps to two types for request_response actions. */
 	method: Action_Method;

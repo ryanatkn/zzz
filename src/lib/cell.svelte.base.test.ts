@@ -8,7 +8,7 @@ import {z} from 'zod';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import {create_uuid, get_datetime_now, Uuid_With_Default} from '$lib/zod_helpers.js';
-import {Zzz} from '$lib/zzz.svelte.js';
+import {Zzz_App} from '$lib/zzz.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Constants for testing
@@ -37,11 +37,11 @@ class Basic_Test_Cell extends Cell<typeof Test_Schema> {
 }
 
 // Test suite variables
-let zzz: Zzz;
+let zzz: Zzz_App;
 
 beforeEach(() => {
 	// Create a real Zzz instance for each test
-	zzz = monkeypatch_zzz_for_tests(new Zzz());
+	zzz = monkeypatch_zzz_for_tests(new Zzz_App());
 	vi.clearAllMocks();
 });
 
@@ -189,7 +189,7 @@ describe('Cell id handling', () => {
 		content: string = $state()!;
 		version: number = $state()!;
 
-		constructor(options: {zzz: Zzz; json?: any}) {
+		constructor(options: {zzz: Zzz_App; json?: any}) {
 			super(Id_Test_Schema, options);
 			this.init();
 		}

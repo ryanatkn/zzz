@@ -3,7 +3,7 @@
 import {estimate_token_count} from '$lib/helpers.js';
 import type {Diskfile} from '$lib/diskfile.svelte.js';
 import type {Diskfile_Path} from '$lib/diskfile_types.js';
-import type {Zzz} from '$lib/zzz.svelte.js';
+import type {Zzz_App} from '$lib/zzz.svelte.js';
 import type {Diskfile_History, History_Entry} from '$lib/diskfile_history.svelte.js';
 import type {Uuid} from '$lib/zod_helpers.js';
 
@@ -11,7 +11,7 @@ import type {Uuid} from '$lib/zod_helpers.js';
  * Manages the editor state for a diskfile.
  */
 export class Diskfile_Editor_State {
-	zzz: Zzz;
+	zzz: Zzz_App;
 	diskfile: Diskfile = $state()!; // TODO maybe should be nullable to make initialization easier?
 
 	// Store the id of the unsaved edit entry
@@ -111,7 +111,7 @@ export class Diskfile_Editor_State {
 		}
 	}
 
-	constructor(options: {zzz: Zzz; diskfile: Diskfile}) {
+	constructor(options: {zzz: Zzz_App; diskfile: Diskfile}) {
 		this.zzz = options.zzz; // TODO make this a Cell
 		this.diskfile = options.diskfile;
 

@@ -1,4 +1,4 @@
-import type {Zzz} from '$lib/zzz.svelte.js';
+import type {Zzz_App} from '$lib/zzz.svelte.js';
 import type {Diskfile_Path} from '$lib/diskfile_types.js';
 
 // TODO these aren't used, should they be for improved type safety?
@@ -46,7 +46,7 @@ export const expect_nonnullish: <T>(
 /**
  * Applies testing-specific modifications to a Zzz instance.
  */
-export const monkeypatch_zzz_for_tests = <T extends Zzz>(zzz: T): T => {
+export const monkeypatch_zzz_for_tests = <T extends Zzz_App>(zzz: T): T => {
 	// Override diskfiles.update to be synchronous.
 	// In the real implementation, this would make a server request.
 	// Probably want to mock differently than this but it's fine for now.

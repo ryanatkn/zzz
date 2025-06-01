@@ -4,7 +4,7 @@ import {estimate_token_count} from '$lib/helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Uuid} from '$lib/zod_helpers.js';
 import type {Bit_Type} from '$lib/bit.svelte.js';
-import type {Zzz} from '$lib/zzz.svelte.js';
+import type {Zzz_App} from '$lib/zzz.svelte.js';
 import {Strip_Json, type Strip_Role} from '$lib/strip_types.js';
 import type {Completion_Request, Completion_Response} from '$lib/completion_types.js';
 
@@ -95,7 +95,7 @@ export const create_strip_from_text = (
 	content: string,
 	role: Strip_Role,
 	json: Partial<Omit_Strict<Strip_Json, 'role' | 'bit_id'>>,
-	zzz: Zzz,
+	zzz: Zzz_App,
 ): Strip => {
 	const bit = zzz.bits.add({type: 'text', content});
 

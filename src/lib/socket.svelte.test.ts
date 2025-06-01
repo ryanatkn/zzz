@@ -6,7 +6,7 @@ import {beforeEach, describe, test, expect, vi, afterEach} from 'vitest';
 
 import {Socket} from '$lib/socket.svelte.js';
 import {DEFAULT_CLOSE_CODE} from '$lib/socket_helpers.js';
-import {Zzz} from '$lib/zzz.svelte.js';
+import {Zzz_App} from '$lib/zzz.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Mock WebSocket implementation for testing
@@ -76,7 +76,7 @@ const TEST_MESSAGE = {
 describe('Socket', () => {
 	let original_web_socket: typeof WebSocket;
 	let mock_socket: Mocket;
-	let zzz: Zzz;
+	let zzz: Zzz_App;
 
 	// Setup for each test
 	beforeEach(() => {
@@ -87,7 +87,7 @@ describe('Socket', () => {
 		mock_socket = new Mocket(TEST_URLS.BASE);
 
 		// Create real Zzz instance
-		zzz = monkeypatch_zzz_for_tests(new Zzz());
+		zzz = monkeypatch_zzz_for_tests(new Zzz_App());
 
 		// TODO better mocking
 		// Mock action API for testing

@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type {Snippet} from 'svelte';
 
-	import {Zzz, zzz_context} from '$lib/zzz.svelte.js';
+	import {Zzz_App, zzz_context} from '$lib/zzz.svelte.js';
 	import Dashboard from '$lib/Dashboard.svelte';
 	import Main_Dialog from '$lib/Main_Dialog.svelte';
 
@@ -12,8 +12,8 @@
 	*/
 
 	interface Props {
-		zzz: Zzz;
-		children: Snippet<[zzz: Zzz]>;
+		zzz: Zzz_App;
+		children: Snippet<[zzz: Zzz_App]>;
 	}
 
 	const {zzz, children}: Props = $props();

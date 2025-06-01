@@ -13,7 +13,7 @@ import {
 	GLYPH_PROVIDER,
 	GLYPH_SETTINGS,
 } from '$lib/glyphs.js';
-import type {Zzz} from '$lib/zzz.svelte.js';
+import type {Zzz_App} from '$lib/zzz.svelte.js';
 
 export interface Nav_Link_Item {
 	label: string;
@@ -32,7 +32,7 @@ export interface Nav_Item {
 // if any, when not on the route directly.
 // See also the `onNavigate` fix in the root layout for nulling out the value
 // when navigating directly to the base route.
-export const to_nav_link_href = (zzz: Zzz, link: Nav_Link_Item): string => {
+export const to_nav_link_href = (zzz: Zzz_App, link: Nav_Link_Item): string => {
 	if (
 		link.label === 'chats' &&
 		zzz.chats.selected_id_last_non_null &&

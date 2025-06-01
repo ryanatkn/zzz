@@ -13,7 +13,7 @@ import type {
 	toggle_main_menu_action_spec,
 	update_diskfile_action_spec,
 } from '$lib/action_specs.js';
-import type {Zzz} from '$lib/zzz.svelte.js';
+import type {Zzz_App} from '$lib/zzz.svelte.js';
 
 /**
  * All action method names. Request/response actions have two types per method.
@@ -116,7 +116,7 @@ export interface Actions_Api {
 /**
  * Interface for client-side mutation handlers.
  */
-export interface Client_Action_Handlers<T_App extends Zzz = Zzz>
+export interface Client_Action_Handlers<T_App extends Zzz_App = Zzz_App>
 	extends Partial<Record<Action_Message_Type, Client_Action_Handler<T_App>>> {
 	create_directory_request?: Client_Action_Handler<
 		T_App,

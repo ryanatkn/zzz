@@ -6,17 +6,17 @@ import {test, expect, describe, beforeEach} from 'vitest';
 
 import {Text_Bit} from '$lib/bit.svelte.js';
 import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
-import {Zzz} from '$lib/zzz.svelte.js';
+import {Zzz_App} from '$lib/zzz.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Test suite variables
-let zzz: Zzz;
+let zzz: Zzz_App;
 let test_bits: Array<Text_Bit>;
 
 // Setup function to create a real Zzz instance and test bits
 beforeEach(() => {
 	// Create a real Zzz instance
-	zzz = monkeypatch_zzz_for_tests(new Zzz());
+	zzz = monkeypatch_zzz_for_tests(new Zzz_App());
 
 	// Create real Text_Bit instances using the registry
 	test_bits = [];

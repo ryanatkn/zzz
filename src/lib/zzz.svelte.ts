@@ -44,7 +44,7 @@ import {action_specs} from '$lib/action_collections.js';
 import {create_actions_api} from '$lib/actions_api.js';
 import type {Client_Action_Handler} from '$lib/client_action_handler.js';
 
-export const zzz_context = create_context<Zzz>();
+export const zzz_context = create_context<Zzz_App>();
 
 export const Zzz_Json = Cell_Json.extend({
 	ui: Ui_Json.default(() => Ui_Json.parse({})),
@@ -56,7 +56,7 @@ export type Zzz_Json_Input = z.input<typeof Zzz_Json>;
 // Special options type for Zzz to handle circular reference
 export interface Zzz_Options extends Omit_Strict<Cell_Options<typeof Zzz_Json>, 'zzz'> {
 	/** Do not use - optional to avoid circular reference problem. */
-	zzz?: Zzz;
+	zzz?: Zzz_App;
 	models?: Array<Model_Json>;
 	bots?: Zzz_Config['bots'];
 	providers?: Array<Provider_Json>;
@@ -78,7 +78,7 @@ export interface Zzz_Options extends Omit_Strict<Cell_Options<typeof Zzz_Json>, 
  * The main client, typically used by creating your own `App extends Zzz`.
  * Gettable with `zzz_context.get()` inside a `<Zzz_Root>`.
  */
-export class Zzz extends Cell<typeof Zzz_Json> {
+export class Zzz_App extends Cell<typeof Zzz_Json> {
 	/**
 	 * App-wide cell registry, maps class names to constructor and tracks registered instances.
 	 */
@@ -149,7 +149,7 @@ export class Zzz extends Cell<typeof Zzz_Json> {
 
 	constructor(options: Zzz_Options = EMPTY_OBJECT) {
 		// Pass this instance as its own zzz reference - casting hacks around the circular reference
-		super(Zzz_Json, options as Zzz_Options & {zzz: Zzz});
+		super(Zzz_Json, options as Zzz_Options & {zzz: Zzz_App});
 
 		// Set the circular reference now that the object is constructed
 		(this as Assignable<typeof this, 'zzz'>).zzz = this;

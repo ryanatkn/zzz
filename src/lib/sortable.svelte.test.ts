@@ -14,7 +14,7 @@ import {
 	create_uuid,
 	get_datetime_now,
 } from '$lib/zod_helpers.js';
-import {Zzz} from '$lib/zzz.svelte.js';
+import {Zzz_App} from '$lib/zzz.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Create a schema for our test cell
@@ -31,7 +31,7 @@ class Test_Cell extends Cell<typeof Test_Cell_Schema> {
 	name: string = $state('');
 	value: number = $state(0);
 
-	constructor(zzz: Zzz, id: Uuid, name: string, value: number, override_cid?: number) {
+	constructor(zzz: Zzz_App, id: Uuid, name: string, value: number, override_cid?: number) {
 		super(Test_Cell_Schema, {
 			zzz,
 			json: {
@@ -55,7 +55,7 @@ class Test_Cell extends Cell<typeof Test_Cell_Schema> {
 describe('Sortable', () => {
 	let items: Array<Test_Cell>;
 	let sorters: Array<Sorter<Test_Cell>>;
-	let zzz: Zzz;
+	let zzz: Zzz_App;
 
 	const id1 = create_uuid();
 	const id2 = create_uuid();
@@ -64,7 +64,7 @@ describe('Sortable', () => {
 
 	beforeEach(() => {
 		// Setup a real Zzz instance for testing
-		zzz = monkeypatch_zzz_for_tests(new Zzz());
+		zzz = monkeypatch_zzz_for_tests(new Zzz_App());
 
 		// Create test items with intentional name collisions to test stable sorting
 		items = [
