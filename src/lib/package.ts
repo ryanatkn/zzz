@@ -6,7 +6,7 @@ import type {Src_Json} from '@ryanatkn/gro/src_json.js';
 export const package_json = {
 	name: '@ryanatkn/zzz',
 	version: '0.0.1',
-	description: 'web environment',
+	description: 'sovereign web environments',
 	motto: 'nice web things for the tired',
 	glyph: '💤',
 	logo: 'logo.svg',
