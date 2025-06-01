@@ -14,6 +14,7 @@ export const Action_Spec_Base = z.object({
 	auth: Action_Auth.nullable(),
 	input: z.instanceof(z.ZodType),
 	output: z.instanceof(z.ZodType).nullable(),
+	async: z.boolean(),
 });
 export type Action_Spec_Base = z.infer<typeof Action_Spec_Base>;
 
@@ -27,6 +28,7 @@ export const Request_Response_Action_Spec = Action_Spec_Base.extend({
 	 * and we mirror the name here for the response message payload.
 	 */
 	output: z.instanceof(z.ZodType),
+	async: z.literal(true).default(true),
 });
 export type Request_Response_Action_Spec = z.infer<typeof Request_Response_Action_Spec>;
 
@@ -39,6 +41,8 @@ export const Remote_Notification_Action_Spec = Action_Spec_Base.extend({
 	 */
 	operation: z.null().default(null),
 	auth: z.null().default(null),
+	output: z.null().default(null),
+	async: z.literal(false).default(false),
 });
 export type Remote_Notification_Action_Spec = z.infer<typeof Remote_Notification_Action_Spec>;
 
@@ -46,7 +50,7 @@ export type Remote_Notification_Action_Spec = z.infer<typeof Remote_Notification
 export const Local_Call_Action_Spec = Action_Spec_Base.extend({
 	kind: z.literal('local_call').default('local_call'),
 	auth: z.null().default(null),
-	returns: Type_Literal, // TODO BLOCK make this a schema, maybe an optional `returns_type`
+	returns: Type_Literal, // TODO BLOCK ideally wouldn't exist? or make this a schema, maybe on all actions, maybe an optional `returns_type`
 });
 export type Local_Call_Action_Spec = z.infer<typeof Local_Call_Action_Spec>;
 
