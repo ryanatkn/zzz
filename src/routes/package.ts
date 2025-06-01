@@ -6,7 +6,7 @@ import type {Src_Json} from '@ryanatkn/gro/src_json.js';
 export const package_json = {
 	name: '@ryanatkn/zzz',
 	version: '0.0.1',
-	description: 'web environment',
+	description: 'sovereign web environments',
 	motto: 'nice web things for the tired',
 	glyph: '💤',
 	logo: 'logo.svg',
@@ -92,8 +92,11 @@ export const src_json = {
 	name: '@ryanatkn/zzz',
 	version: '0.0.1',
 	modules: {
-		'./package.json': {path: 'package.json', declarations: []},
-		'./Hud_Root.svelte': {path: 'Hud_Root.svelte', declarations: []},
+		'./package.json': {path: 'package.json', declarations: [{name: 'default', kind: 'json'}]},
+		'./Hud_Root.svelte': {
+			path: 'Hud_Root.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./hud.svelte.js': {
 			path: 'hud.svelte.ts',
 			declarations: [{name: 'hud_context', kind: 'variable'}],
@@ -105,8 +108,14 @@ export const src_json = {
 				{name: 'Zzz_Data', kind: 'class'},
 			],
 		},
-		'./Zzz_Main.svelte': {path: 'Zzz_Main.svelte', declarations: []},
-		'./Zzz_Root.svelte': {path: 'Zzz_Root.svelte', declarations: []},
+		'./Zzz_Main.svelte': {
+			path: 'Zzz_Main.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Zzz_Root.svelte': {
+			path: 'Zzz_Root.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./zzz.svelte.js': {
 			path: 'zzz.svelte.ts',
 			declarations: [
