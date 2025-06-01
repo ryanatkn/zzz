@@ -17,6 +17,8 @@ export class Action extends Cell<typeof Action_Json> {
 	type: Action_Message_Type = $state()!;
 	method: Action_Method = $state()!;
 	params: any = $state.raw();
+	// TODO BLOCK @api this needs to have the full jsonrpc message, and there's two for requests and responses (how to handle the notification one? separately?)
+	// maybe one typesafe object that covers all three kinds of actions?
 	jsonrpc_message_id: Jsonrpc_Request_Id = $state()!;
 
 	kind: Action_Kind = $state()!; // TODO maybe store the spec here for convenience, instead or or in addition to the kind?
@@ -33,7 +35,7 @@ export class Action extends Cell<typeof Action_Json> {
 
 	readonly display_name: string = $derived(`${this.method} (${this.kind})`);
 
-	// TODO hacky, refactor
+	// TODO hacky, refactor, probably removing these from this class, find a different way to get type safety
 	readonly is_ping: boolean = $derived(this.method === 'ping');
 	readonly is_prompt: boolean = $derived(this.method === 'submit_completion');
 	readonly is_session: boolean = $derived(this.method === 'load_session');

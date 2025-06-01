@@ -26,6 +26,7 @@ import {to_jsonrpc_message_id} from '$lib/jsonrpc_helpers.js';
 export const ACTION_DATE_FORMAT = 'MMM d, p';
 export const ACTION_TIME_FORMAT = 'p';
 
+// TODO BLOCK @api delete this
 export const create_action_json = (action: Action_Message_Union): Action_Json | null => {
 	const spec = action_spec_by_method.get(action.method);
 	if (!spec) {
