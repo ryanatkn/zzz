@@ -1,8 +1,20 @@
 import {z} from 'zod';
 
-import {Type_Literal} from '$lib/zod_helpers.js';
+import {stringify_zod_error, Type_Literal} from '$lib/zod_helpers.js';
 import {Action_Method} from '$lib/action_metatypes.js';
 import {Action_Auth, Action_Initiator, Action_Kind, Action_Operation} from '$lib/action_types.js';
+
+/**
+ * Creates an action spec, filling in defaults and validating the input.
+ * These are a base source of truth for actions and other interfaces throughout the app.
+ */
+export const create_action_spec = (spec: z.input<typeof Action_Spec>): Action_Spec => {
+	const parsed = Action_Spec.safeParse(spec);
+	if (!parsed.success) {
+		throw new Error('Invalid action spec: ' + stringify_zod_error(parsed.error));
+	}
+	return parsed.data;
+};
 
 export const Action_Spec_Base = z.object({
 	method: Action_Method,
@@ -10,11 +22,14 @@ export const Action_Spec_Base = z.object({
 	// TODO BLOCK @api is not yet used
 	initiator: Action_Initiator,
 	// TODO BLOCK @api is not yet used, should be for GET/POST distinction
-	operation: Action_Operation.nullable(),
+	operation: Action_Operation.nullable().default(null),
 	auth: Action_Auth.nullable(),
 	input: z.instanceof(z.ZodType),
-	output: z.instanceof(z.ZodType).nullable(),
-	async: z.boolean(),
+	// TODO BLOCK @api needs to handle void/undefined right?
+	// because doesn't this make it so we can't model void local functions?
+	output: z.instanceof(z.ZodType).nullable().default(null),
+	// TODO BLOCK @api is not yet used
+	async: z.boolean().default(false),
 });
 export type Action_Spec_Base = z.infer<typeof Action_Spec_Base>;
 
@@ -23,11 +38,6 @@ export const Request_Response_Action_Spec = Action_Spec_Base.extend({
 	kind: z.literal('request_response').default('request_response'),
 	operation: Action_Operation,
 	auth: Action_Auth,
-	/**
-	 * For the request_response the base action `params` are the request params,
-	 * and we mirror the name here for the response message payload.
-	 */
-	output: z.instanceof(z.ZodType),
 	async: z.literal(true).default(true),
 });
 export type Request_Response_Action_Spec = z.infer<typeof Request_Response_Action_Spec>;
@@ -41,7 +51,7 @@ export const Remote_Notification_Action_Spec = Action_Spec_Base.extend({
 	 */
 	operation: z.null().default(null),
 	auth: z.null().default(null),
-	output: z.null().default(null),
+	output: z.null().default(null), // TODO think about `z.void().default(undefined)`
 	async: z.literal(false).default(false),
 });
 export type Remote_Notification_Action_Spec = z.infer<typeof Remote_Notification_Action_Spec>;
@@ -50,7 +60,7 @@ export type Remote_Notification_Action_Spec = z.infer<typeof Remote_Notification
 export const Local_Call_Action_Spec = Action_Spec_Base.extend({
 	kind: z.literal('local_call').default('local_call'),
 	auth: z.null().default(null),
-	returns: Type_Literal, // TODO BLOCK ideally wouldn't exist? or make this a schema, maybe on all actions, maybe an optional `returns_type`
+	returns: Type_Literal, // TODO ideally wouldn't exist, should be generated from the zod schema
 });
 export type Local_Call_Action_Spec = z.infer<typeof Local_Call_Action_Spec>;
 

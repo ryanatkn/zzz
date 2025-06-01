@@ -1,6 +1,6 @@
 import {z} from 'zod';
 
-import type {Action_Spec} from '$lib/action_spec.js';
+import {create_action_spec} from '$lib/action_spec.js';
 import {
 	Diskfile_Change,
 	Diskfile_Path,
@@ -20,7 +20,7 @@ import {Completion_Request, Completion_Response} from '$lib/completion_types.js'
 // - the client and server can both send notifications as well as request/response messages,
 // 		so the server can query the client as needed, but the client can always deny requests
 
-export const ping_action_spec = {
+export const ping_action_spec = create_action_spec({
 	method: 'ping',
 	kind: 'request_response',
 	initiator: 'both',
@@ -32,9 +32,9 @@ export const ping_action_spec = {
 			ping_id: Uuid,
 		})
 		.strict(),
-} satisfies Action_Spec;
+});
 
-export const load_session_action_spec = {
+export const load_session_action_spec = create_action_spec({
 	method: 'load_session',
 	kind: 'request_response',
 	// TODO @api is this actually a good restriction to have?
@@ -55,9 +55,9 @@ export const load_session_action_spec = {
 				.strict(),
 		})
 		.strict(),
-} satisfies Action_Spec;
+});
 
-export const filer_change_action_spec = {
+export const filer_change_action_spec = create_action_spec({
 	method: 'filer_change',
 	kind: 'remote_notification',
 	initiator: 'server',
@@ -70,9 +70,9 @@ export const filer_change_action_spec = {
 		})
 		.strict(),
 	output: null,
-} satisfies Action_Spec;
+});
 
-export const update_diskfile_action_spec = {
+export const update_diskfile_action_spec = create_action_spec({
 	method: 'update_diskfile',
 	kind: 'request_response',
 	initiator: 'client',
@@ -84,10 +84,9 @@ export const update_diskfile_action_spec = {
 			content: z.string(),
 		})
 		.strict(),
-	output: z.null().optional(), // TODO @many should these be void+optional? or just null?
-} satisfies Action_Spec;
+});
 
-export const delete_diskfile_action_spec = {
+export const delete_diskfile_action_spec = create_action_spec({
 	method: 'delete_diskfile',
 	kind: 'request_response',
 	initiator: 'client',
@@ -98,10 +97,9 @@ export const delete_diskfile_action_spec = {
 			path: Diskfile_Path,
 		})
 		.strict(),
-	output: z.null().optional(), // TODO @many should these be void+optional? or just null?
-} satisfies Action_Spec;
+});
 
-export const create_directory_action_spec = {
+export const create_directory_action_spec = create_action_spec({
 	method: 'create_directory',
 	kind: 'request_response',
 	initiator: 'client',
@@ -112,10 +110,9 @@ export const create_directory_action_spec = {
 			path: Diskfile_Path,
 		})
 		.strict(),
-	output: z.null().optional(), // TODO @many should these be void+optional? or just null?
-} satisfies Action_Spec;
+});
 
-export const submit_completion_action_spec = {
+export const submit_completion_action_spec = create_action_spec({
 	method: 'submit_completion',
 	kind: 'request_response',
 	initiator: 'client',
@@ -131,9 +128,9 @@ export const submit_completion_action_spec = {
 			completion_response: Completion_Response,
 		})
 		.strict(),
-} satisfies Action_Spec;
+});
 
-export const toggle_main_menu_action_spec = {
+export const toggle_main_menu_action_spec = create_action_spec({
 	method: 'toggle_main_menu',
 	kind: 'local_call',
 	initiator: 'client',
@@ -142,4 +139,4 @@ export const toggle_main_menu_action_spec = {
 	input: z.union([z.boolean(), z.void()]).optional(),
 	output: null,
 	returns: Type_Literal.parse('boolean'),
-} satisfies Action_Spec;
+});

@@ -29,7 +29,7 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 				throw new Error(`missing action spec for method '${method}'`);
 			}
 
-			const handle = (
+			const handle_message = (
 				result: any | null, // TODO @api type
 				request_response_flag: Action_Request_Response_Flag,
 				action_message: Action_Message_Union,
@@ -77,7 +77,7 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 			// `request_response` actions have special handling,
 			// each such method has a `_request` and `_response` type variant.
 			if (spec.kind === 'request_response') {
-				handle(null, 'request', request_action_message, request_jsonrpc_message);
+				handle_message(null, 'request', request_action_message, request_jsonrpc_message);
 
 				// Avoiding `await` for compatibility with sync actions
 				return app.api_client.send(request_jsonrpc_message).then((response) => {
@@ -108,7 +108,7 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 					app.actions.add_message(response_action_message);
 
 					const result = response_jsonrpc_message.result;
-					handle(result, 'response', response_action_message, response_jsonrpc_message);
+					handle_message(result, 'response', response_action_message, response_jsonrpc_message);
 
 					// Return the result value directly
 					return result;
@@ -116,7 +116,7 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 			}
 
 			// Handle non-`request_response` actions synchronously
-			return handle(null, null, request_action_message, request_jsonrpc_message);
+			return handle_message(null, null, request_action_message, request_jsonrpc_message);
 		},
 	});
 

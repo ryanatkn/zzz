@@ -21,7 +21,7 @@ export const Action_Request_Response_Flag = z.union([
 ]);
 export type Action_Request_Response_Flag = z.infer<typeof Action_Request_Response_Flag>;
 
-// TODO BLOCK Action_Message and Action_Message_Json? but not cells?
+// TODO BLOCK @api Action_Message and Action_Message_Json? but not cells?
 /**
  * Base schema for all actions with common properties.
  *
@@ -58,6 +58,7 @@ export type Action_Auth = z.infer<typeof Action_Auth>;
 export const Action_Json = Cell_Json.extend({
 	type: Action_Message_Type,
 	method: Action_Method,
+	// TODO BLOCK @api this to be input/output right? with jsonrpc_messages saved?
 	params: Any.optional(),
 	kind: Action_Kind, // TODO BLOCK doesn't belong here, can be looked up from the method or type
 	jsonrpc_message_id: Jsonrpc_Request_Id.nullable(),

@@ -985,6 +985,7 @@ export const src_json = {
 		'./action_spec.js': {
 			path: 'action_spec.ts',
 			declarations: [
+				{name: 'create_action_spec', kind: 'function'},
 				{name: 'Action_Spec_Base', kind: 'variable'},
 				{name: 'Request_Response_Action_Spec', kind: 'variable'},
 				{name: 'Remote_Notification_Action_Spec', kind: 'variable'},
