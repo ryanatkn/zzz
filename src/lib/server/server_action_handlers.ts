@@ -48,6 +48,13 @@ export const server_action_handlers: Server_Action_Handlers = {
 			ping_id: message.id,
 		};
 	},
+	// TODO BLOCK @api this?
+	// ping: {
+	// 		send_request: () =>
+	// 		send_response: () =>
+	// 		receive_request: () =>
+	// 		receive_request: () =>
+	// }
 
 	load_session: async ({server}) => {
 		// TODO change so this only returns metadata, not file contents

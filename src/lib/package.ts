@@ -985,8 +985,6 @@ export const src_json = {
 		'./action_spec.js': {
 			path: 'action_spec.ts',
 			declarations: [
-				{name: 'Action_Operation', kind: 'variable'},
-				{name: 'Action_Auth', kind: 'variable'},
 				{name: 'Action_Spec_Base', kind: 'variable'},
 				{name: 'Request_Response_Action_Spec', kind: 'variable'},
 				{name: 'Remote_Notification_Action_Spec', kind: 'variable'},
@@ -1015,6 +1013,9 @@ export const src_json = {
 				{name: 'Action_Request_Response_Flag', kind: 'variable'},
 				{name: 'Action_Message_Base', kind: 'variable'},
 				{name: 'Action_Kind', kind: 'variable'},
+				{name: 'Action_Initiator', kind: 'variable'},
+				{name: 'Action_Operation', kind: 'variable'},
+				{name: 'Action_Auth', kind: 'variable'},
 				{name: 'Action_Json', kind: 'variable'},
 				{name: 'Action_Json_Input', kind: 'type'},
 			],
@@ -2129,7 +2130,6 @@ export const src_json = {
 			path: 'server/server_action_handler.ts',
 			declarations: [
 				{name: 'Public_Server_Action_Handler', kind: 'type'},
-				{name: 'Authenticated_Server_Action_Handler', kind: 'type'},
 				{name: 'Authorized_Server_Action_Handler', kind: 'type'},
 				{name: 'Server_Action_Handler', kind: 'type'},
 			],
@@ -2396,7 +2396,7 @@ export const src_json = {
 				{name: 'Zzz_Json', kind: 'variable'},
 				{name: 'Zzz_Json_Input', kind: 'type'},
 				{name: 'Zzz_Options', kind: 'type'},
-				{name: 'Zzz', kind: 'class'},
+				{name: 'Zzz_App', kind: 'class'},
 			],
 		},
 	},

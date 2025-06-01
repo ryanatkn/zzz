@@ -41,6 +41,20 @@ export type Action_Message_Base = z.infer<typeof Action_Message_Base>;
 export const Action_Kind = z.enum(['request_response', 'remote_notification', 'local_call']);
 export type Action_Kind = z.infer<typeof Action_Kind>;
 
+export const Action_Initiator = z.union([
+	z.literal('client'),
+	z.literal('server'),
+	z.literal('both'),
+]);
+export type Action_Initiator = z.infer<typeof Action_Initiator>;
+
+export const Action_Operation = z.union([z.literal('command'), z.literal('query')]);
+export type Action_Operation = z.infer<typeof Action_Operation>;
+
+// TODO temporary, maybe this can be a config object
+export const Action_Auth = z.union([z.literal('public'), z.literal('authorize')]);
+export type Action_Auth = z.infer<typeof Action_Auth>;
+
 export const Action_Json = Cell_Json.extend({
 	type: Action_Message_Type,
 	method: Action_Method,

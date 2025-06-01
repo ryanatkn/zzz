@@ -2,21 +2,13 @@ import {z} from 'zod';
 
 import {Type_Literal} from '$lib/zod_helpers.js';
 import {Action_Method} from '$lib/action_metatypes.js';
-import {Action_Kind} from '$lib/action_types.js';
-
-export const Action_Operation = z.union([z.literal('command'), z.literal('query')]);
-export type Action_Operation = z.infer<typeof Action_Operation>;
-
-export const Action_Auth = z.union([
-	z.literal('public'),
-	z.literal('authenticate'),
-	z.literal('authorize'),
-]);
-export type Action_Auth = z.infer<typeof Action_Auth>;
+import {Action_Auth, Action_Initiator, Action_Kind, Action_Operation} from '$lib/action_types.js';
 
 export const Action_Spec_Base = z.object({
 	method: Action_Method,
 	kind: Action_Kind,
+	// TODO BLOCK @api is not yet used
+	initiator: Action_Initiator,
 	// TODO BLOCK @api is not yet used, should be for GET/POST distinction
 	operation: Action_Operation.nullable(),
 	auth: Action_Auth.nullable(),

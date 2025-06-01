@@ -4,6 +4,7 @@ import {Action_Message_Union, action_spec_by_method} from '$lib/action_collectio
 import {
 	Action_Message_Base,
 	type Action_Json,
+	type Action_Auth,
 	type Action_Request_Response_Flag,
 } from '$lib/action_types.js';
 import {Action_Messages} from '$lib/action_messages.js';
@@ -19,7 +20,6 @@ import type {
 	Jsonrpc_Singular_Message,
 } from '$lib/jsonrpc.js';
 import {to_jsonrpc_message_id} from '$lib/jsonrpc_helpers.js';
-import type {Action_Auth} from '$lib/action_spec.js';
 
 // TODO BLOCK @api refactor all of this, is all very messy
 
@@ -112,8 +112,4 @@ export const to_action_spec_output_identifier = (method: Action_Method): string 
 	`${to_action_spec_identifier(method)}.output`;
 
 export const to_action_spec_auth_identifier = (auth: Action_Auth): string =>
-	auth === 'public'
-		? 'Public_Server_Action_Handler'
-		: auth === 'authenticate'
-			? 'Authenticated_Server_Action_Handler'
-			: 'Authorized_Server_Action_Handler';
+	auth === 'public' ? 'Public_Server_Action_Handler' : 'Authorized_Server_Action_Handler';

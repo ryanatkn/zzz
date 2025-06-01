@@ -32,7 +32,7 @@ export const gen: Gen = ({origin_path}) => {
 
 		import type {Client_Action_Handler} from '$lib/client_action_handler.js';
 		import type {${schema_imports.join(', ')}} from '$lib/action_specs.js';
-		import type { Zzz } from '$lib/zzz.svelte.js';
+		import type {Zzz_App} from '$lib/zzz.svelte.js';
 
 		/**
 		 * All action method names. Request/response actions have two types per method.
@@ -128,7 +128,7 @@ export const gen: Gen = ({origin_path}) => {
 		/**
 		 * Interface for client-side mutation handlers.
 		 */
-		export interface Client_Action_Handlers<T_App extends Zzz = Zzz> extends Partial<Record<Action_Message_Type, Client_Action_Handler<T_App>>> {
+		export interface Client_Action_Handlers<T_App extends Zzz_App = Zzz_App> extends Partial<Record<Action_Message_Type, Client_Action_Handler<T_App>>> {
 			${registry.specs
 				.map((spec) => {
 					const v = (m: Action_Method, request_response_flag: Action_Request_Response_Flag) =>
