@@ -62,6 +62,7 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 
 			const request_jsonrpc_message = create_jsonrpc_request(method, params, create_uuid());
 
+			// TODO BLOCK @api action messages should be removed, instead tracked inside an action
 			const request_action_message_type = to_action_message_type(
 				method,
 				spec.kind === 'request_response' ? 'request' : null,
@@ -115,6 +116,7 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 				});
 			}
 
+			// TODO BLOCK @api this needs to have action tracking, bc it applies to all actions not just request_response
 			// Handle non-`request_response` actions synchronously
 			return handle_message(null, null, request_action_message, request_jsonrpc_message);
 		},

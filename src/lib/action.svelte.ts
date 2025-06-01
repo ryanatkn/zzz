@@ -16,7 +16,7 @@ export interface Action_Options extends Cell_Options<typeof Action_Json> {} // e
 export class Action extends Cell<typeof Action_Json> {
 	type: Action_Message_Type = $state()!;
 	method: Action_Method = $state()!;
-	params: any = $state.raw();
+	params: any = $state.raw(); // TODO BLOCK @api this should probably not exist and should instead rely on the full jsonrpc messages
 	// TODO BLOCK @api this needs to have the full jsonrpc message, and there's two for requests and responses (how to handle the notification one? separately?)
 	// maybe one typesafe object that covers all three kinds of actions?
 	jsonrpc_message_id: Jsonrpc_Request_Id = $state()!;
