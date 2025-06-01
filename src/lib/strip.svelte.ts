@@ -18,7 +18,7 @@ export class Strip extends Cell<typeof Strip_Json> {
 	response: Completion_Response | undefined = $state();
 
 	// Get the referenced bit - handle case where bit might not exist in registry
-	readonly bit: Bit_Type | null = $derived(this.zzz.bits.items.by_id.get(this.bit_id) ?? null);
+	readonly bit: Bit_Type | null = $derived(this.app.bits.items.by_id.get(this.bit_id) ?? null);
 
 	get enabled(): boolean {
 		return this.bit?.enabled ?? false;
@@ -78,7 +78,7 @@ export const create_strip_from_bit = (
 	json: Partial<Omit_Strict<Strip_Json, 'role' | 'bit_id'>>,
 ): Strip => {
 	return new Strip({
-		zzz: bit.zzz,
+		app: bit.app,
 		json: {
 			...json,
 			role,
@@ -95,12 +95,12 @@ export const create_strip_from_text = (
 	content: string,
 	role: Strip_Role,
 	json: Partial<Omit_Strict<Strip_Json, 'role' | 'bit_id'>>,
-	zzz: Zzz_App,
+	app: Zzz_App,
 ): Strip => {
-	const bit = zzz.bits.add({type: 'text', content});
+	const bit = app.bits.add({type: 'text', content});
 
 	return new Strip({
-		zzz,
+		app,
 		json: {
 			...json,
 			role,

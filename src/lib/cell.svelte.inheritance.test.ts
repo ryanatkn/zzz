@@ -17,11 +17,11 @@ const TEST_ID = create_uuid();
 const TEST_DATETIME = get_datetime_now();
 
 // Test suite variables
-let zzz: Zzz_App;
+let app: Zzz_App;
 
 beforeEach(() => {
 	// Create a real Zzz instance for each test
-	zzz = monkeypatch_zzz_for_tests(new Zzz_App());
+	app = monkeypatch_zzz_for_tests(new Zzz_App());
 	vi.clearAllMocks();
 });
 
@@ -66,7 +66,7 @@ test('Cell supports overriding assign_property', () => {
 	}
 
 	const cell = new Custom_Assignment_Cell({
-		zzz,
+		app,
 		json: {
 			id: TEST_ID,
 			created: TEST_DATETIME,
@@ -113,7 +113,7 @@ test('Cell assign_property returns after handling property correctly', () => {
 	}
 
 	const cell = new Return_Behavior_Cell({
-		zzz,
+		app,
 		json: {
 			id: TEST_ID,
 			created: TEST_DATETIME,
@@ -167,7 +167,7 @@ test('Cell handles inherited properties correctly', () => {
 	}
 
 	const cell = new Derived_Test_Cell({
-		zzz,
+		app,
 		json: {
 			id: TEST_ID,
 			created: TEST_DATETIME,
@@ -233,7 +233,7 @@ test('Cell properly handles collections with HANDLED sentinel', () => {
 	}
 
 	const cell = new Virtual_Collection_Cell({
-		zzz,
+		app,
 		json: {
 			id: TEST_ID,
 			created: TEST_DATETIME,
@@ -262,7 +262,7 @@ test('Cell registration and unregistration works correctly', () => {
 	}
 
 	const cell = new Registration_Test_Cell({
-		zzz,
+		app,
 		json: {
 			id: cell_id,
 			created: TEST_DATETIME,
@@ -270,12 +270,12 @@ test('Cell registration and unregistration works correctly', () => {
 	});
 
 	// Cell should be automatically registered
-	expect(zzz.cell_registry.all.has(cell_id)).toBe(true);
-	expect(zzz.cell_registry.all.get(cell_id)).toBe(cell);
+	expect(app.cell_registry.all.has(cell_id)).toBe(true);
+	expect(app.cell_registry.all.get(cell_id)).toBe(cell);
 
 	// Test disposal
 	cell.dispose();
-	expect(zzz.cell_registry.all.has(cell_id)).toBe(false);
+	expect(app.cell_registry.all.has(cell_id)).toBe(false);
 
 	// Test that disposing again is safe
 	expect(() => cell.dispose()).not.toThrow();

@@ -12,11 +12,11 @@
 
 	const {diskfile}: Props = $props();
 
-	const zzz = zzz_context.get();
+	const app = zzz_context.get();
 
 	const bit = $derived(diskfile.bit);
 
-	const referenced_by_prompts = $derived(bit ? zzz.prompts.filter_by_bit(bit) : null);
+	const referenced_by_prompts = $derived(bit ? app.prompts.filter_by_bit(bit) : null);
 </script>
 
 {#if bit}

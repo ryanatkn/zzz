@@ -6,7 +6,7 @@
 
 	import Footer from '$lib/Footer.svelte';
 
-	const zzz = zzz_context.get();
+	const app = zzz_context.get();
 
 	// TODO display capabilities (like what APIs are available, including remote server (off when deployed statically), local pglite (could be disconnected, websockets?))
 	// TODO display database info/explorer
@@ -23,7 +23,7 @@
 			<h3>ui</h3>
 			<div class="my_md">
 				<label class="row">
-					<input type="checkbox" bind:checked={zzz.ui.show_sidebar} aria-label="show sidebar" />
+					<input type="checkbox" bind:checked={app.ui.show_sidebar} aria-label="show sidebar" />
 					show sidebar <code class="ml_md">[backtick `]</code>
 				</label>
 			</div>
@@ -31,7 +31,7 @@
 				<label class="row">
 					<input
 						type="checkbox"
-						bind:checked={zzz.ui.show_main_dialog}
+						bind:checked={app.ui.show_main_dialog}
 						aria-label="show main dialog"
 					/>
 					show main dialog

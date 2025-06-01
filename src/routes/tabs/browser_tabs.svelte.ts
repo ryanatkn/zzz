@@ -68,7 +68,7 @@ export class Browser_Tabs extends Cell<typeof Browser_Tabs_Json> {
 					// Add tabs from JSON
 					for (const tab_json of tabs) {
 						const tab = new Browser_Tab({
-							zzz: this.zzz,
+							app: this.app,
 							json: tab_json,
 						});
 						this.items.add(tab);
@@ -81,7 +81,7 @@ export class Browser_Tabs extends Cell<typeof Browser_Tabs_Json> {
 					this.recently_closed_tabs = tabs.map(
 						(tab_json) =>
 							new Browser_Tab({
-								zzz: this.zzz,
+								app: this.app,
 								json: tab_json,
 							}),
 					);
@@ -96,7 +96,7 @@ export class Browser_Tabs extends Cell<typeof Browser_Tabs_Json> {
 	add(tab_data: Browser_Tab_Json): void {
 		// Add new tab to collection
 		const tab = new Browser_Tab({
-			zzz: this.zzz,
+			app: this.app,
 			json: tab_data,
 		});
 		this.items.add(tab);

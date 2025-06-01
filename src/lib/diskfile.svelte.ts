@@ -18,7 +18,7 @@ export class Diskfile extends Cell<typeof Diskfile_Json> {
 
 	content: string | null = $state()!;
 
-	readonly bit: Bit_Type | undefined = $derived(this.zzz.bits.find_bit_by_diskfile_path(this.path));
+	readonly bit: Bit_Type | undefined = $derived(this.app.bits.find_bit_by_diskfile_path(this.path));
 
 	// TODO @many add UI support for deps for module diskfiles (TS, Svelte, etc)
 	dependents: Array<[Diskfile_Path, Serializable_Source_File]> = $state()!; // TODO @many these need to be null for unknown file types (support JS modules, etc)
@@ -42,11 +42,11 @@ export class Diskfile extends Cell<typeof Diskfile_Json> {
 
 	/** e.g. .zzz/foo/bar.json */
 	readonly pathname: string | null | undefined = $derived(
-		this.path && this.zzz.zzz_dir && strip_start(this.path, this.zzz.zzz_dir),
+		this.path && this.app.zzz_dir && strip_start(this.path, this.app.zzz_dir),
 	);
 	/** e.g. bar/foo.json */
 	readonly path_relative: string | null | undefined = $derived(
-		this.zzz.diskfiles.to_relative_path(this.path),
+		this.app.diskfiles.to_relative_path(this.path),
 	);
 
 	readonly content_length: number = $derived(this.content?.length ?? 0);

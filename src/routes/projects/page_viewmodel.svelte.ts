@@ -159,7 +159,7 @@ export class Page_Viewmodel {
 		if (!page) {
 			// Create new page
 			page = new Page({
-				zzz: this.projects.zzz,
+				app: this.projects.app,
 				json: {
 					title: this.title,
 					path: formatted_path,

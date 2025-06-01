@@ -60,7 +60,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 		super(Diskfiles_Json, options);
 
 		// Create the editor instance
-		this.editor = new Diskfiles_Editor(this.zzz);
+		this.editor = new Diskfiles_Editor(this.app);
 
 		this.decoders = {
 			diskfiles: (diskfiles) => {
@@ -120,7 +120,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 	}
 
 	add(json: Diskfile_Json): Diskfile {
-		const diskfile = new Diskfile({zzz: this.zzz, json});
+		const diskfile = new Diskfile({app: this.app, json});
 		this.items.add(diskfile);
 
 		// If no file is selected, select this one
@@ -131,44 +131,44 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 		return diskfile;
 	}
 
-	update(path: Diskfile_Path, content: string): void {
-		this.zzz.api.update_diskfile({path, content});
+	async update(path: Diskfile_Path, content: string): Promise<void> {
+		await this.app.api.update_diskfile({path, content});
 	}
 
-	delete(path: Diskfile_Path): void {
-		this.zzz.api.delete_diskfile({path});
+	async delete(path: Diskfile_Path): Promise<void> {
+		await this.app.api.delete_diskfile({path});
 	}
 
-	create_file(filename: string, content: string = ''): void {
-		if (!this.zzz.zzz_cache_dir) {
+	async create_file(filename: string, content: string = ''): Promise<void> {
+		if (!this.app.zzz_cache_dir) {
 			throw new Error('Cannot create file: zzz_dir is not set');
 		}
 
 		// Create full path by joining zzz_dir with the filename
-		const path = Diskfile_Path.parse(`${this.zzz.zzz_cache_dir}${filename}`);
+		const path = Diskfile_Path.parse(`${this.app.zzz_cache_dir}${filename}`);
 
 		// Reuse the update method which creates or updates files
-		this.update(path, content);
+		await this.update(path, content);
 	}
 
-	create_directory(dirname: string): void {
-		if (!this.zzz.zzz_cache_dir) {
+	async create_directory(dirname: string): Promise<void> {
+		if (!this.app.zzz_cache_dir) {
 			throw new Error('Cannot create directory: zzz_dir is not set');
 		}
 
 		// Create full path by joining zzz_dir with the directory name
-		const path = Diskfile_Path.parse(`${this.zzz.zzz_cache_dir}${dirname}`);
+		const path = Diskfile_Path.parse(`${this.app.zzz_cache_dir}${dirname}`);
 
-		this.zzz.api.create_directory({path});
+		await this.app.api.create_directory({path});
 	}
 
 	get_by_path(path: Diskfile_Path): Diskfile | undefined {
 		return this.items.by_optional('by_path', path);
 	}
 
-	/** Like `zzz.zzz_dir`, `undefined` means uninitialized, `null` means loading, `''` means none */
+	/** Like `app.zzz_dir`, `undefined` means uninitialized, `null` means loading, `''` means none */
 	to_relative_path(path: string): string | null | undefined {
-		const {zzz_cache_dir: zzz_dir} = this.zzz;
+		const {zzz_cache_dir: zzz_dir} = this.app;
 		return zzz_dir && strip_start(path, zzz_dir);
 	}
 

@@ -16,17 +16,17 @@ const TEST_DIR = Serializable_Source_File.shape.source_dir.parse('/path/');
 const TEST_CONTENT = 'This is test content';
 
 // Test suite variables
-let zzz: Zzz_App;
+let app: Zzz_App;
 let test_diskfile: Diskfile;
 let editor_state: Diskfile_Editor_State;
 
 beforeEach(() => {
 	// Create a real Zzz instance for each test
-	zzz = monkeypatch_zzz_for_tests(new Zzz_App());
+	app = monkeypatch_zzz_for_tests(new Zzz_App());
 
 	// Create a real diskfile through the registry
-	test_diskfile = zzz.diskfiles.add(
-		zzz.cell_registry.instantiate('Diskfile', {
+	test_diskfile = app.diskfiles.add(
+		app.cell_registry.instantiate('Diskfile', {
 			path: TEST_PATH,
 			source_dir: TEST_DIR,
 			content: TEST_CONTENT,
@@ -35,7 +35,7 @@ beforeEach(() => {
 
 	// Create the editor state with real components
 	editor_state = new Diskfile_Editor_State({
-		zzz,
+		app,
 		diskfile: test_diskfile,
 	});
 });
@@ -70,7 +70,7 @@ describe('disk change detection', () => {
 		expect(editor_state.last_seen_disk_content).toBe(disk_content);
 
 		// History should have a new entry with disk change flag
-		const history = zzz.get_diskfile_history(TEST_PATH)!;
+		const history = app.get_diskfile_history(TEST_PATH)!;
 		const disk_entry = history.entries.find(
 			(entry) => entry.is_disk_change && entry.content === disk_content,
 		);
@@ -110,8 +110,8 @@ describe('disk change detection', () => {
 
 	test('handles first-time initialization correctly', () => {
 		// Create a new diskfile with uninitialized last_seen_disk_content
-		const new_diskfile = zzz.diskfiles.add(
-			zzz.cell_registry.instantiate('Diskfile', {
+		const new_diskfile = app.diskfiles.add(
+			app.cell_registry.instantiate('Diskfile', {
 				path: Diskfile_Path.parse('/new/file.txt'),
 				source_dir: Serializable_Source_File.shape.source_dir.parse('/new/'),
 				content: 'Initial content',
@@ -119,7 +119,7 @@ describe('disk change detection', () => {
 		);
 
 		const new_editor_state = new Diskfile_Editor_State({
-			zzz,
+			app,
 			diskfile: new_diskfile,
 		});
 
@@ -150,7 +150,7 @@ describe('disk change detection', () => {
 		expect(editor_state.last_seen_disk_content).toBe('Changed on disk');
 
 		// Find the disk change entry
-		const history = zzz.get_diskfile_history(TEST_PATH)!;
+		const history = app.get_diskfile_history(TEST_PATH)!;
 		const disk_entry = history.entries.find(
 			(entry) => entry.is_disk_change && entry.content === 'Changed on disk',
 		);
@@ -169,7 +169,7 @@ describe('disk change detection', () => {
 		test_diskfile.content = 'First disk change';
 		editor_state.check_disk_changes();
 
-		const history = zzz.get_diskfile_history(TEST_PATH)!;
+		const history = app.get_diskfile_history(TEST_PATH)!;
 		const count_after_first = history.entries.length;
 
 		// Now make the same disk change again
@@ -181,7 +181,7 @@ describe('disk change detection', () => {
 
 	test('marks existing entry as disk change when content matches', () => {
 		// Add an entry to history that isn't initially marked as a disk change
-		const history = zzz.get_diskfile_history(TEST_PATH)!;
+		const history = app.get_diskfile_history(TEST_PATH)!;
 		const entry = history.add_entry('New content on disk', {
 			is_disk_change: false,
 			is_unsaved_edit: true, // Initially mark as unsaved
@@ -207,7 +207,7 @@ describe('disk change detection', () => {
 describe('file history management', () => {
 	test('creates history entries for disk changes', () => {
 		// Initial state
-		const history = zzz.get_diskfile_history(TEST_PATH)!;
+		const history = app.get_diskfile_history(TEST_PATH)!;
 
 		// Make a sequence of disk changes
 		test_diskfile.content = 'First disk change';
@@ -251,7 +251,7 @@ describe('file history management', () => {
 
 	test('with user selection of older history maintains that selection during disk change', () => {
 		// Add entries to history
-		const history = zzz.get_diskfile_history(TEST_PATH)!;
+		const history = app.get_diskfile_history(TEST_PATH)!;
 		const older_entry = history.add_entry('Older entry');
 
 		// Select the older entry
@@ -315,7 +315,7 @@ describe('edge cases', () => {
 		expect(editor_state.last_seen_disk_content).toBe('');
 
 		// History should include empty content entry
-		const history = zzz.get_diskfile_history(TEST_PATH)!;
+		const history = app.get_diskfile_history(TEST_PATH)!;
 		const empty_entry = history.entries.find((e) => e.content === '' && e.is_disk_change);
 
 		expect(empty_entry).toMatchObject({
@@ -327,8 +327,8 @@ describe('edge cases', () => {
 	test('handles disk changes when history is empty', () => {
 		// Create a new diskfile with a custom path
 		const empty_history_path = Diskfile_Path.parse('/empty/history.txt');
-		const empty_history_diskfile = zzz.diskfiles.add(
-			zzz.cell_registry.instantiate('Diskfile', {
+		const empty_history_diskfile = app.diskfiles.add(
+			app.cell_registry.instantiate('Diskfile', {
 				path: empty_history_path,
 				source_dir: Serializable_Source_File.shape.source_dir.parse('/empty/'),
 				content: 'Initial',
@@ -337,12 +337,12 @@ describe('edge cases', () => {
 
 		// Create editor state but clear the history manually
 		const empty_history_editor = new Diskfile_Editor_State({
-			zzz,
+			app,
 			diskfile: empty_history_diskfile,
 		});
 
 		// Manually clear history entries
-		const history = zzz.get_diskfile_history(empty_history_path)!;
+		const history = app.get_diskfile_history(empty_history_path)!;
 		history.entries = [];
 
 		// Simulate disk change

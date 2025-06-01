@@ -11,8 +11,8 @@
 
 	const {editor_state}: Props = $props();
 
-	const zzz = zzz_context.get();
-	const {diskfiles} = zzz;
+	const app = zzz_context.get();
+	const {diskfiles} = app;
 	const {editor} = diskfiles;
 
 	// Track navigation history

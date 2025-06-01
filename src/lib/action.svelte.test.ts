@@ -7,10 +7,10 @@ import {Zzz_App} from '$lib/zzz.svelte.js';
 
 // Add a basic test that the Action class can be instantiated with minimal data
 test('Action - can be instantiated with minimal data', () => {
-	const zzz = new Zzz_App();
+	const app = new Zzz_App();
 
 	const ping_action = new Action({
-		zzz,
+		app,
 		json: {
 			type: 'ping_request',
 			method: 'ping',

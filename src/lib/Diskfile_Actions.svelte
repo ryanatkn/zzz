@@ -27,7 +27,7 @@
 		auto_save = false,
 	}: Props = $props();
 
-	const zzz = zzz_context.get();
+	const app = zzz_context.get();
 
 	const content = $derived(editor_state.current_content);
 	const has_changes = $derived(editor_state.has_changes);
@@ -57,7 +57,7 @@
 
 	<!-- Delete button is always available -->
 	<Confirm_Button
-		onconfirm={() => zzz.diskfiles.delete(diskfile.path)}
+		onconfirm={() => app.diskfiles.delete(diskfile.path)}
 		attrs={{class: 'plain icon_button', title: 'delete file'}}
 	>
 		<Glyph glyph={GLYPH_DELETE} />

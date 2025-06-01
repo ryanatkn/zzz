@@ -9,8 +9,8 @@
 	import Glyph from '$lib/Glyph.svelte';
 	import Contextmenu_Chats from '$lib/Contextmenu_Chats.svelte';
 
-	const zzz = zzz_context.get();
-	const {chats} = zzz;
+	const app = zzz_context.get();
+	const {chats} = app;
 </script>
 
 <Contextmenu_Chats>

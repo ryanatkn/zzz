@@ -15,8 +15,8 @@
 
 	const {onpick, filter, exclude_ids, selected_ids}: Props = $props();
 
-	const zzz = zzz_context.get();
-	const {prompts} = zzz;
+	const app = zzz_context.get();
+	const {prompts} = app;
 </script>
 
 <Picker

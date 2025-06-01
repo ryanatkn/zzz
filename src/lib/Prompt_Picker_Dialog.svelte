@@ -28,8 +28,8 @@
 		dialog_props,
 	}: Props = $props();
 
-	const zzz = zzz_context.get();
-	const {prompts} = zzz;
+	const app = zzz_context.get();
+	const {prompts} = app;
 </script>
 
 {#if show}

@@ -14,16 +14,16 @@ const TEST_CONTENT = 'Test content';
 
 describe('Diskfile_History', () => {
 	// Test suite
-	let zzz: Zzz_App;
+	let app: Zzz_App;
 	let history: Diskfile_History;
 
 	beforeEach(() => {
 		// Create a real Zzz instance for each test
-		zzz = monkeypatch_zzz_for_tests(new Zzz_App());
+		app = monkeypatch_zzz_for_tests(new Zzz_App());
 
 		// Create a fresh history instance for each test with the real Zzz instance
 		history = new Diskfile_History({
-			zzz,
+			app,
 			json: {
 				path: TEST_PATH,
 				entries: [],

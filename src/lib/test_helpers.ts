@@ -46,17 +46,17 @@ export const expect_nonnullish: <T>(
 /**
  * Applies testing-specific modifications to a Zzz instance.
  */
-export const monkeypatch_zzz_for_tests = <T extends Zzz_App>(zzz: T): T => {
+export const monkeypatch_zzz_for_tests = <T extends Zzz_App>(app: T): T => {
 	// Override diskfiles.update to be synchronous.
 	// In the real implementation, this would make a server request.
 	// Probably want to mock differently than this but it's fine for now.
-	zzz.diskfiles.update = (path: Diskfile_Path, content: string) => {
-		const diskfile = zzz.diskfiles.get_by_path(path);
+	app.diskfiles.update = (path: Diskfile_Path, content: string) => {
+		const diskfile = app.diskfiles.get_by_path(path);
 		if (diskfile) {
 			diskfile.content = content;
 		}
 		return Promise.resolve();
 	};
 
-	return zzz;
+	return app;
 };

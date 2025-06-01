@@ -18,13 +18,13 @@ const log = new Logger();
 
 // TODO think about transactions, snapshotting
 
-export const create_actions_api = (zzz: Zzz_App): Actions_Api =>
+export const create_actions_api = (app: Zzz_App): Actions_Api =>
 	new Proxy(Object.create(null), {
 		get: (_target, method: keyof Actions_Api) => (params: any) => {
 			// TODO BLOCK `log.debug` isn't formatting the output correctly, shouldn't use console here
 			console.log(...to_logged_args(method, params));
 
-			const spec = zzz.action_registry.by_method.get(method);
+			const spec = app.action_registry.by_method.get(method);
 			if (!spec) {
 				throw new Error(`missing action spec for method '${method}'`);
 			}
@@ -37,7 +37,7 @@ export const create_actions_api = (zzz: Zzz_App): Actions_Api =>
 			) => {
 				console.log('\n\n\n\n\n\n\n\n[actions_api] mutate', method, result, request_response_flag);
 				const event = new Client_Action_Context(
-					zzz,
+					app,
 					method,
 					params,
 					result,
@@ -48,7 +48,7 @@ export const create_actions_api = (zzz: Zzz_App): Actions_Api =>
 				console.log(`[actions_api] message_type`, event.action_message.type);
 				console.log(`[actions_api] event`, event);
 
-				const handler = zzz.mutations[event.action_message.type];
+				const handler = app.mutations[event.action_message.type];
 				if (!handler) {
 					log.warn(`missing mutation for action '${method}'`);
 				}
@@ -71,7 +71,7 @@ export const create_actions_api = (zzz: Zzz_App): Actions_Api =>
 				params as unknown as any, // TODO type
 				request_jsonrpc_message,
 			);
-			zzz.actions.add_message(request_action_message);
+			app.actions.add_message(request_action_message);
 			console.log(`[actions_api] request_action_message`, request_action_message);
 
 			// `request_response` actions have special handling,
@@ -80,7 +80,7 @@ export const create_actions_api = (zzz: Zzz_App): Actions_Api =>
 				handle(null, 'request', request_action_message, request_jsonrpc_message);
 
 				// Avoiding `await` for compatibility with sync actions
-				return zzz.api_client.send(request_jsonrpc_message).then((response) => {
+				return app.api_client.send(request_jsonrpc_message).then((response) => {
 					console.log(`[actions_api] response`, response);
 
 					// Check if it's an error response
@@ -105,7 +105,7 @@ export const create_actions_api = (zzz: Zzz_App): Actions_Api =>
 						response_jsonrpc_message,
 					);
 					console.log(`[actions_api] response_action_message`, response_action_message);
-					zzz.actions.add_message(response_action_message);
+					app.actions.add_message(response_action_message);
 
 					const result = response_jsonrpc_message.result;
 					handle(result, 'response', response_action_message, response_jsonrpc_message);

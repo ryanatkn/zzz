@@ -8,8 +8,8 @@
 	import {Reorderable} from '$lib/reorderable.svelte.js';
 	import Diskfile_Picker_Dialog from '$lib/Diskfile_Picker_Dialog.svelte';
 
-	const zzz = zzz_context.get();
-	const {diskfiles} = zzz;
+	const app = zzz_context.get();
+	const {diskfiles} = app;
 	const {editor} = diskfiles;
 
 	const tabs_reorderable = new Reorderable({item_class: null}); // remove the normal reorderable item styling

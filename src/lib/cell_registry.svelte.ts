@@ -30,7 +30,7 @@ export class Class_Not_Registered_Error extends Error {
  * but I want to continue exploring the ideas behind it until we get fully snapshottable UI.
  */
 export class Cell_Registry {
-	readonly zzz: Zzz_App;
+	readonly app: Zzz_App;
 
 	readonly #constructors: Map<string, Class_Constructor<Cell>> = new Map();
 
@@ -42,8 +42,8 @@ export class Cell_Registry {
 	// and we could potentially make the collection itself reactive
 	readonly all: Map<Uuid, Cell> = new Map();
 
-	constructor(zzz: Zzz_App) {
-		this.zzz = zzz;
+	constructor(app: Zzz_App) {
+		this.app = app;
 	}
 
 	/**
@@ -87,7 +87,7 @@ export class Cell_Registry {
 		}
 
 		// Create a new instance with the provided options and cast to the specific type
-		return new constructor({...options, zzz: this.zzz, json}) as Cell_Registry_Map[K];
+		return new constructor({...options, app: this.app, json}) as Cell_Registry_Map[K];
 	}
 
 	/**
@@ -107,7 +107,7 @@ export class Cell_Registry {
 		}
 
 		// Create a new instance with the provided options and cast to the specific type
-		return new constructor({...options, zzz: this.zzz, json}) as Cell_Registry_Map[K];
+		return new constructor({...options, app: this.app, json}) as Cell_Registry_Map[K];
 	}
 
 	add_cell(cell: Cell<any>): void {

@@ -21,7 +21,7 @@
 
 	const {bit, ...rest}: Props = $props();
 
-	const zzz = zzz_context.get();
+	const app = zzz_context.get();
 
 	let show_editor = $state(false);
 </script>
@@ -55,7 +55,7 @@
 					// TODO @many better confirmation
 					// eslint-disable-next-line no-alert
 					if (confirm(`Are you sure you want to delete this bit "${bit.name || 'unnamed'}"?`)) {
-						zzz.bits.remove(bit.id);
+						app.bits.remove(bit.id);
 					}
 				}}
 			>

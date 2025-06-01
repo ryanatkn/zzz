@@ -25,7 +25,7 @@ import type {Schema_Keys, Cell_Json, Cell_Json_Input} from '$lib/cell_types.js';
  * so they're safe to forward when subclassing without needing to extract the rest options.
  */
 export interface Cell_Options<T_Schema extends z.ZodType> {
-	zzz: Zzz_App; // TODO needs to be generic
+	app: Zzz_App; // TODO needs to be generic
 	json?: z.input<T_Schema>;
 }
 
@@ -103,7 +103,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	);
 
 	// TODO needs to be generic so users can extend it
-	readonly zzz: Zzz_App;
+	readonly app: Zzz_App;
 
 	/**
 	 * Type-safe decoders for custom field decoding.
@@ -142,7 +142,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 
 	constructor(schema: T_Schema, options: Cell_Options<T_Schema>) {
 		this.schema = schema;
-		this.zzz = options.zzz;
+		this.app = options.app;
 		this.#initial_json = options.json;
 
 		// Don't auto-initialize here - wait for subclass to call init()
@@ -194,7 +194,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 			return;
 		}
 
-		this.zzz.cell_registry.add_cell(this);
+		this.app.cell_registry.add_cell(this);
 		this.#registered = true;
 	}
 
@@ -205,7 +205,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	protected unregister(): void {
 		if (!this.#registered) return;
 
-		this.zzz.cell_registry.remove_cell(this.id);
+		this.app.cell_registry.remove_cell(this.id);
 		this.#registered = false;
 	}
 
@@ -453,7 +453,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 		try {
 			return new constructor({
 				...options,
-				zzz: this.zzz,
+				app: this.app,
 				json: structuredClone(json ? {...current_json, ...json} : current_json),
 			});
 		} catch (error) {
@@ -468,7 +468,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 			return null;
 		}
 
-		const instance = this.zzz.cell_registry.maybe_instantiate(class_name as any, json, options);
+		const instance = this.app.cell_registry.maybe_instantiate(class_name as any, json, options);
 		if (!instance) console.error(`Failed to instantiate ${class_name}`);
 		return instance;
 	}

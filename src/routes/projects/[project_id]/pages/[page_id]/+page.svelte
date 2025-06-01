@@ -14,7 +14,7 @@
 	import {zzz_context} from '$lib/zzz.svelte.js';
 
 	const projects = projects_context.get();
-	const zzz = zzz_context.get();
+	const app = zzz_context.get();
 
 	const page_viewmodel = $derived(projects.current_page_viewmodel);
 
@@ -47,7 +47,7 @@
 </script>
 
 {#if preview_mode}
-	<div class="preview_fullscreen" class:offset_for_sidebar={zzz.ui.show_sidebar}>
+	<div class="preview_fullscreen" class:offset_for_sidebar={app.ui.show_sidebar}>
 		<div class="markdown_preview p_lg">
 			<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 			{@html page_viewmodel?.formatted_content}

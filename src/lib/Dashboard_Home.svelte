@@ -8,7 +8,7 @@
 	import Model_Link from '$lib/Model_Link.svelte';
 	import {GLYPH_LOG, GLYPH_PROVIDER, GLYPH_MODEL} from '$lib/glyphs.js';
 
-	const zzz = zzz_context.get();
+	const app = zzz_context.get();
 </script>
 
 <div class="p_lg">
@@ -29,7 +29,7 @@
 			</div>
 			<div>
 				<ul class="unstyled">
-					{#each zzz.providers.items as provider (provider.name)}
+					{#each app.providers.items as provider (provider.name)}
 						<li class="mb_xs">
 							<Provider_Link
 								{provider}
@@ -52,7 +52,7 @@
 			</div>
 			<div>
 				<ul class="unstyled">
-					{#each zzz.models.ordered_by_name as model (model.name)}
+					{#each app.models.ordered_by_name as model (model.name)}
 						<li class="mb_xs">
 							<Model_Link
 								{model}

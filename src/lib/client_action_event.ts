@@ -39,7 +39,7 @@ export class Client_Action_Context<
 	T_Params = unknown,
 	T_Result = any,
 > {
-	zzz: T_App;
+	app: T_App;
 	/** JSON-RPC method for the action. Maps to two types for request_response actions. */
 	method: Action_Method;
 	params: T_Params;
@@ -56,7 +56,7 @@ export class Client_Action_Context<
 	handled: boolean = false;
 
 	constructor(
-		zzz: T_App,
+		app: T_App,
 		method: Action_Method,
 		params: T_Params,
 		result: T_Result,
@@ -64,7 +64,7 @@ export class Client_Action_Context<
 		action_message: Action_Message_Union,
 		jsonrpc_message: Jsonrpc_Request | Jsonrpc_Notification | null,
 	) {
-		this.zzz = zzz;
+		this.app = app;
 		this.method = method;
 		// TODO BLOCK @api should these be input/output instead of params/result?
 		this.params = params;

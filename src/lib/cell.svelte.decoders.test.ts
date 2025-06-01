@@ -17,11 +17,11 @@ const TEST_ID = create_uuid();
 const TEST_DATETIME = get_datetime_now();
 
 // Test suite variables
-let zzz: Zzz_App;
+let app: Zzz_App;
 
 beforeEach(() => {
 	// Create a real Zzz instance for each test
-	zzz = monkeypatch_zzz_for_tests(new Zzz_App());
+	app = monkeypatch_zzz_for_tests(new Zzz_App());
 	vi.clearAllMocks();
 });
 
@@ -52,7 +52,7 @@ test('Cell allows schema keys with no properties if a decoder is provided', () =
 	}
 
 	const cell = new Virtual_Property_Cell({
-		zzz,
+		app,
 		json: {
 			id: TEST_ID,
 			created: TEST_DATETIME,
@@ -95,7 +95,7 @@ test('Cell supports virtual properties with custom handling', () => {
 	}
 
 	const cell = new Virtual_Handler_Cell({
-		zzz,
+		app,
 		json: {
 			id: TEST_ID,
 			created: TEST_DATETIME,
@@ -149,7 +149,7 @@ test('Cell handles sentinel values with proper precedence', () => {
 	}
 
 	const cell = new Sentinel_Test_Cell({
-		zzz,
+		app,
 		json: {
 			id: TEST_ID,
 			created: TEST_DATETIME,
@@ -197,7 +197,7 @@ test('Cell parser defaults take precedence over schema defaults', () => {
 	}
 
 	const cell = new Default_Precedence_Cell({
-		zzz,
+		app,
 		json: {},
 	});
 

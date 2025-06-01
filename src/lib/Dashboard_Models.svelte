@@ -4,7 +4,7 @@
 	import Glyph from '$lib/Glyph.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 
-	const zzz = zzz_context.get();
+	const app = zzz_context.get();
 
 	// TODO add search/filtering
 </script>
@@ -13,7 +13,7 @@
 	<h1><Glyph glyph={GLYPH_MODEL} /> models</h1>
 	<aside>⚠️ This information is incomplete and may be incorrect or outdated.</aside>
 	<div class="models_grid">
-		{#each zzz.models.ordered_by_name as model (model)}
+		{#each app.models.ordered_by_name as model (model)}
 			<Model_Summary {model} />
 		{/each}
 	</div>

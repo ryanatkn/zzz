@@ -12,7 +12,7 @@ import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 import {estimate_token_count} from '$lib/helpers.js';
 
 // Test suite variables
-let zzz: Zzz_App;
+let app: Zzz_App;
 
 // Test constants
 const TEST_CONTENT = {
@@ -26,23 +26,23 @@ const TEST_DIR = Serializable_Source_File.shape.source_dir.parse('/path/');
 
 beforeEach(() => {
 	// Create a real Zzz instance for each test
-	zzz = monkeypatch_zzz_for_tests(new Zzz_App());
+	app = monkeypatch_zzz_for_tests(new Zzz_App());
 });
 
 describe('Bit base class functionality', () => {
 	test('attribute management works across all bit types', () => {
 		// Test with different bit types
-		const text_bit = zzz.cell_registry.instantiate('Text_Bit', {
+		const text_bit = app.cell_registry.instantiate('Text_Bit', {
 			type: 'text',
 			content: TEST_CONTENT.BASIC,
 		});
 
-		const diskfile_bit = zzz.cell_registry.instantiate('Diskfile_Bit', {
+		const diskfile_bit = app.cell_registry.instantiate('Diskfile_Bit', {
 			type: 'diskfile',
 			path: TEST_PATH,
 		});
 
-		const sequence_bit = zzz.cell_registry.instantiate('Sequence_Bit', {
+		const sequence_bit = app.cell_registry.instantiate('Sequence_Bit', {
 			type: 'sequence',
 		});
 
@@ -81,7 +81,7 @@ describe('Bit base class functionality', () => {
 
 	test('derived properties work correctly', () => {
 		// Create a text bit to test length and token properties
-		const text_bit = zzz.cell_registry.instantiate('Text_Bit', {
+		const text_bit = app.cell_registry.instantiate('Text_Bit', {
 			type: 'text',
 			content: TEST_CONTENT.BASIC,
 		});
@@ -101,19 +101,19 @@ describe('Bit base class functionality', () => {
 describe('Bit factory method', () => {
 	test('Bit.create creates the correct bit type based on JSON', () => {
 		// Create bits using the static factory
-		const text_bit = Bit.create(zzz, {
+		const text_bit = Bit.create(app, {
 			type: 'text',
 			content: TEST_CONTENT.BASIC,
 			name: 'Text Bit',
 		});
 
-		const diskfile_bit = Bit.create(zzz, {
+		const diskfile_bit = Bit.create(app, {
 			type: 'diskfile',
 			path: TEST_PATH,
 			name: 'Diskfile Bit',
 		});
 
-		const sequence_bit = Bit.create(zzz, {
+		const sequence_bit = Bit.create(app, {
 			type: 'sequence',
 			items: [],
 			name: 'Sequence Bit',
@@ -141,7 +141,7 @@ describe('Bit factory method', () => {
 			type: 'unknown' as const,
 		};
 
-		expect(() => Bit.create(zzz, invalid_json as any)).toThrow('Unreachable case: unknown');
+		expect(() => Bit.create(app, invalid_json as any)).toThrow('Unreachable case: unknown');
 	});
 
 	test('Bit.create throws error for missing type field', () => {
@@ -149,7 +149,7 @@ describe('Bit factory method', () => {
 			name: 'Test',
 		};
 
-		expect(() => Bit.create(zzz, invalid_json as any)).toThrow(
+		expect(() => Bit.create(app, invalid_json as any)).toThrow(
 			'Missing required "type" field in bit JSON',
 		);
 	});
@@ -158,7 +158,7 @@ describe('Bit factory method', () => {
 describe('Text_Bit specific behavior', () => {
 	test('Text_Bit initialization and content management', () => {
 		// Create with constructor
-		const bit = zzz.cell_registry.instantiate('Text_Bit', {
+		const bit = app.cell_registry.instantiate('Text_Bit', {
 			type: 'text',
 			content: TEST_CONTENT.BASIC,
 		});
@@ -180,7 +180,7 @@ describe('Text_Bit specific behavior', () => {
 		const test_date = get_datetime_now();
 
 		// Create bit with all properties
-		const original = zzz.cell_registry.instantiate('Text_Bit', {
+		const original = app.cell_registry.instantiate('Text_Bit', {
 			id: test_id,
 			created: test_date,
 			type: 'text',
@@ -202,7 +202,7 @@ describe('Text_Bit specific behavior', () => {
 		const json = original.to_json();
 
 		// Create new bit from JSON
-		const restored = zzz.cell_registry.instantiate('Text_Bit', json);
+		const restored = app.cell_registry.instantiate('Text_Bit', json);
 
 		// Verify all properties were preserved
 		expect(restored.id).toBe(test_id);
@@ -223,7 +223,7 @@ describe('Text_Bit specific behavior', () => {
 
 	test('Text_Bit cloning creates independent copy', () => {
 		// Create original bit
-		const original = zzz.cell_registry.instantiate('Text_Bit', {
+		const original = app.cell_registry.instantiate('Text_Bit', {
 			type: 'text',
 			content: TEST_CONTENT.BASIC,
 			name: 'Original',
@@ -254,8 +254,8 @@ describe('Text_Bit specific behavior', () => {
 describe('Diskfile_Bit specific behavior', () => {
 	test('Diskfile_Bit initialization and content access', () => {
 		// Create a diskfile first
-		const diskfile = zzz.diskfiles.add(
-			zzz.cell_registry.instantiate('Diskfile', {
+		const diskfile = app.diskfiles.add(
+			app.cell_registry.instantiate('Diskfile', {
 				path: TEST_PATH,
 				source_dir: TEST_DIR,
 				content: TEST_CONTENT.BASIC,
@@ -263,7 +263,7 @@ describe('Diskfile_Bit specific behavior', () => {
 		);
 
 		// Create diskfile bit that references the diskfile
-		const bit = zzz.cell_registry.instantiate('Diskfile_Bit', {
+		const bit = app.cell_registry.instantiate('Diskfile_Bit', {
 			type: 'diskfile',
 			path: TEST_PATH,
 		});
@@ -283,7 +283,7 @@ describe('Diskfile_Bit specific behavior', () => {
 	});
 
 	test('Diskfile_Bit handles null path properly', () => {
-		const bit = zzz.cell_registry.instantiate('Diskfile_Bit', {
+		const bit = app.cell_registry.instantiate('Diskfile_Bit', {
 			type: 'diskfile',
 			path: null,
 		});
@@ -298,16 +298,16 @@ describe('Diskfile_Bit specific behavior', () => {
 		const path1 = Diskfile_Path.parse('/path/to/file1.txt');
 		const path2 = Diskfile_Path.parse('/path/to/file2.txt');
 
-		zzz.diskfiles.add(
-			zzz.cell_registry.instantiate('Diskfile', {
+		app.diskfiles.add(
+			app.cell_registry.instantiate('Diskfile', {
 				path: path1,
 				source_dir: Serializable_Source_File.shape.source_dir.parse('/path/'),
 				content: 'File 1 content',
 			}),
 		);
 
-		zzz.diskfiles.add(
-			zzz.cell_registry.instantiate('Diskfile', {
+		app.diskfiles.add(
+			app.cell_registry.instantiate('Diskfile', {
 				path: path2,
 				source_dir: Serializable_Source_File.shape.source_dir.parse('/path/'),
 				content: 'File 2 content',
@@ -315,7 +315,7 @@ describe('Diskfile_Bit specific behavior', () => {
 		);
 
 		// Create bit referencing first file
-		const bit = zzz.cell_registry.instantiate('Diskfile_Bit', {
+		const bit = app.cell_registry.instantiate('Diskfile_Bit', {
 			type: 'diskfile',
 			path: path1,
 		});
@@ -334,22 +334,22 @@ describe('Diskfile_Bit specific behavior', () => {
 describe('Sequence_Bit specific behavior', () => {
 	test('Sequence_Bit initialization and content derivation', () => {
 		// Create bits to be referenced
-		const bit1 = zzz.cell_registry.instantiate('Text_Bit', {
+		const bit1 = app.cell_registry.instantiate('Text_Bit', {
 			type: 'text',
 			content: 'First bit content',
 		});
 
-		const bit2 = zzz.cell_registry.instantiate('Text_Bit', {
+		const bit2 = app.cell_registry.instantiate('Text_Bit', {
 			type: 'text',
 			content: 'Second bit content',
 		});
 
 		// Add to registry
-		zzz.bits.items.add(bit1);
-		zzz.bits.items.add(bit2);
+		app.bits.items.add(bit1);
+		app.bits.items.add(bit2);
 
 		// Create sequence with references
-		const sequence = zzz.cell_registry.instantiate('Sequence_Bit', {
+		const sequence = app.cell_registry.instantiate('Sequence_Bit', {
 			type: 'sequence',
 			items: [bit1.id, bit2.id],
 		});
@@ -367,28 +367,28 @@ describe('Sequence_Bit specific behavior', () => {
 
 	test('Sequence_Bit item management methods', () => {
 		// Create bits to be referenced
-		const bit1 = zzz.cell_registry.instantiate('Text_Bit', {
+		const bit1 = app.cell_registry.instantiate('Text_Bit', {
 			type: 'text',
 			content: 'First bit',
 		});
 
-		const bit2 = zzz.cell_registry.instantiate('Text_Bit', {
+		const bit2 = app.cell_registry.instantiate('Text_Bit', {
 			type: 'text',
 			content: 'Second bit',
 		});
 
-		const bit3 = zzz.cell_registry.instantiate('Text_Bit', {
+		const bit3 = app.cell_registry.instantiate('Text_Bit', {
 			type: 'text',
 			content: 'Third bit',
 		});
 
 		// Add to registry
-		zzz.bits.items.add(bit1);
-		zzz.bits.items.add(bit2);
-		zzz.bits.items.add(bit3);
+		app.bits.items.add(bit1);
+		app.bits.items.add(bit2);
+		app.bits.items.add(bit3);
 
 		// Create empty sequence
-		const sequence = zzz.cell_registry.instantiate('Sequence_Bit');
+		const sequence = app.cell_registry.instantiate('Sequence_Bit');
 
 		// Test add method
 		const add1 = sequence.add(bit1.id);
@@ -425,7 +425,7 @@ describe('Sequence_Bit specific behavior', () => {
 	});
 
 	test('Sequence_Bit content assignment outputs console error', () => {
-		const sequence = zzz.cell_registry.instantiate('Sequence_Bit');
+		const sequence = app.cell_registry.instantiate('Sequence_Bit');
 
 		// Temporarily override console.error
 		const original_console_error = console.error;
@@ -449,21 +449,21 @@ describe('Sequence_Bit specific behavior', () => {
 describe('Common bit behavior across types', () => {
 	test('Position markers work across bit types', () => {
 		// Create different bit types
-		const text_bit = zzz.cell_registry.instantiate('Text_Bit', {
+		const text_bit = app.cell_registry.instantiate('Text_Bit', {
 			type: 'text',
 			content: TEST_CONTENT.BASIC,
 			start: 5,
 			end: 10,
 		});
 
-		const diskfile_bit = zzz.cell_registry.instantiate('Diskfile_Bit', {
+		const diskfile_bit = app.cell_registry.instantiate('Diskfile_Bit', {
 			type: 'diskfile',
 			path: TEST_PATH,
 			start: 15,
 			end: 20,
 		});
 
-		const sequence_bit = zzz.cell_registry.instantiate('Sequence_Bit', {
+		const sequence_bit = app.cell_registry.instantiate('Sequence_Bit', {
 			type: 'sequence',
 			start: 25,
 			end: 30,
@@ -502,19 +502,19 @@ describe('Common bit behavior across types', () => {
 
 	test('XML tag properties work across bit types', () => {
 		// Create bits with XML tag properties
-		const text_bit = zzz.cell_registry.instantiate('Text_Bit', {
+		const text_bit = app.cell_registry.instantiate('Text_Bit', {
 			type: 'text',
 			has_xml_tag: true,
 			xml_tag_name: 'text-tag',
 		});
 
-		const diskfile_bit = zzz.cell_registry.instantiate('Diskfile_Bit', {
+		const diskfile_bit = app.cell_registry.instantiate('Diskfile_Bit', {
 			type: 'diskfile',
 			has_xml_tag: true,
 			xml_tag_name: 'file-tag',
 		});
 
-		const sequence_bit = zzz.cell_registry.instantiate('Sequence_Bit', {
+		const sequence_bit = app.cell_registry.instantiate('Sequence_Bit', {
 			type: 'sequence',
 			has_xml_tag: true,
 			xml_tag_name: 'sequence-tag',
@@ -551,9 +551,9 @@ describe('Common bit behavior across types', () => {
 
 	test('has_xml_tag defaults correctly for each bit type', () => {
 		// Create different bit types with default values
-		const text_bit = zzz.cell_registry.instantiate('Text_Bit');
-		const diskfile_bit = zzz.cell_registry.instantiate('Diskfile_Bit');
-		const sequence_bit = zzz.cell_registry.instantiate('Sequence_Bit');
+		const text_bit = app.cell_registry.instantiate('Text_Bit');
+		const diskfile_bit = app.cell_registry.instantiate('Diskfile_Bit');
+		const sequence_bit = app.cell_registry.instantiate('Sequence_Bit');
 
 		// Verify default has_xml_tag values
 		expect(text_bit.has_xml_tag).toBe(false); // Text bits default to false
@@ -561,13 +561,13 @@ describe('Common bit behavior across types', () => {
 		expect(sequence_bit.has_xml_tag).toBe(false); // Sequence bits default to false
 
 		// Verify we can override the defaults
-		const custom_text_bit = zzz.cell_registry.instantiate('Text_Bit', {
+		const custom_text_bit = app.cell_registry.instantiate('Text_Bit', {
 			has_xml_tag: true,
 		});
-		const custom_diskfile_bit = zzz.cell_registry.instantiate('Diskfile_Bit', {
+		const custom_diskfile_bit = app.cell_registry.instantiate('Diskfile_Bit', {
 			has_xml_tag: false,
 		});
-		const custom_sequence_bit = zzz.cell_registry.instantiate('Sequence_Bit', {
+		const custom_sequence_bit = app.cell_registry.instantiate('Sequence_Bit', {
 			has_xml_tag: true,
 		});
 

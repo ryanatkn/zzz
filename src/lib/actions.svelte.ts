@@ -94,7 +94,7 @@ export class Actions extends Cell<typeof Actions_Json> {
 	 * Add an action to the collection.
 	 */
 	add_json(action_json: Action_Json): Action {
-		const action = new Action({zzz: this.zzz, json: action_json});
+		const action = new Action({app: this.app, json: action_json});
 		this.items.add(action);
 
 		// Trim collection if it exceeds history limit

@@ -8,7 +8,7 @@
 
 	const {model, show_tags}: Props = $props();
 
-	const provider = $derived(model.zzz.providers.find_by_name(model.provider_name));
+	const provider = $derived(model.app.providers.find_by_name(model.provider_name));
 </script>
 
 <!-- TODO add Contextmenu_Model -->

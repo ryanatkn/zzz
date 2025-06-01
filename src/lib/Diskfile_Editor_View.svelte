@@ -21,10 +21,10 @@
 
 	const {diskfile, onmodified}: Props = $props();
 
-	const zzz = zzz_context.get();
+	const app = zzz_context.get();
 
-	// TODO @many refactor, maybe move a collection on `zzz.diskfiles`?
-	const editor_state = new Diskfile_Editor_State({zzz, diskfile});
+	// TODO @many refactor, maybe move a collection on `app.diskfiles`?
+	const editor_state = new Diskfile_Editor_State({app, diskfile});
 
 	// Reference to the content editor component
 	let content_editor: {focus: () => void} | undefined = $state();
@@ -69,7 +69,7 @@
 				readonly={false}
 				attrs={{class: 'h_100 border_radius_0'}}
 				onsave={(value) => {
-					zzz.diskfiles.update(diskfile.path, value);
+					app.diskfiles.update(diskfile.path, value);
 				}}
 			/>
 		</div>

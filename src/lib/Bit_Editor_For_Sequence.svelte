@@ -16,12 +16,12 @@
 
 	const {sequence_bit, prompt}: Props = $props();
 
-	const zzz = zzz_context.get();
+	const app = zzz_context.get();
 
 	// Available bits that can be added to the sequence (excluding self and already included bits)
 	const available_bits = $derived(
 		// TODO @many should `items.by_id.values()` be a derived even if often inefficient? still better than constructing it multiple times? or should this be an index?
-		Array.from(zzz.bits.items.by_id.values()).filter(
+		Array.from(app.bits.items.by_id.values()).filter(
 			(bit) => bit.id !== sequence_bit.id && !sequence_bit.items.includes(bit.id),
 		),
 	);

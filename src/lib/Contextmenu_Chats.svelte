@@ -12,13 +12,13 @@
 
 	const props: Props = $props();
 
-	const zzz = zzz_context.get();
+	const app = zzz_context.get();
 </script>
 
 <Contextmenu {...props} entries={props.entries ?? entries} />
 
 {#snippet entries()}
-	<Contextmenu_Entry run={() => zzz.chats.add(undefined, true)}>
+	<Contextmenu_Entry run={() => app.chats.add(undefined, true)}>
 		{#snippet icon()}<Glyph glyph={GLYPH_CHAT} />{/snippet}
 		<span>create new chat</span>
 	</Contextmenu_Entry>

@@ -5,9 +5,9 @@
 	import Model_Detail from '$lib/Model_Detail.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 
-	const zzz = zzz_context.get();
+	const app = zzz_context.get();
 
-	const model = $derived(zzz.models.find_by_name(page.params.slug));
+	const model = $derived(app.models.find_by_name(page.params.slug));
 </script>
 
 <div class="p_sm">

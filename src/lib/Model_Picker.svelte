@@ -5,8 +5,8 @@
 	import type {Model} from '$lib/model.svelte.js';
 	import {sort_by_text} from '$lib/sortable.svelte.js';
 
-	const zzz = zzz_context.get();
-	const {models} = zzz;
+	const app = zzz_context.get();
+	const {models} = app;
 
 	interface Props {
 		onpick: (model: Model | undefined) => boolean | void;

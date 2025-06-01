@@ -14,8 +14,8 @@
 
 	const {children}: Props = $props();
 
-	const zzz = zzz_context.get();
-	const {capabilities} = zzz;
+	const app = zzz_context.get();
+	const {capabilities} = app;
 
 	// Calculate placeholders to maintain consistent spacing
 	const remaining_placeholders = $derived(
@@ -27,7 +27,7 @@
 
 <div class="column align_items_start gap_sm">
 	<div>
-		<button type="button" title="ping the server" onclick={() => zzz.api.ping()} class="flex_1">
+		<button type="button" title="ping the server" onclick={() => app.api.ping()} class="flex_1">
 			{#if children}{@render children()}{:else}⚞{/if}
 			<div class="font_size_lg font_weight_400 pl_sm">ping the server</div>
 		</button>

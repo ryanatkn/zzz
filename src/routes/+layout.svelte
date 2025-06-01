@@ -37,19 +37,19 @@
 		const zzz_config = create_zzz_config();
 
 		// TODO note the difference between these two APIs, look at both of them and see which makes more sense
-		zzz.add_providers(zzz_config.providers.map((p) => Provider_Json.parse(p))); // TODO handle errors
-		zzz.models.add_many(zzz_config.models.map((m) => Model_Json.parse(m))); // TODO handle errors
+		app.add_providers(zzz_config.providers.map((p) => Provider_Json.parse(p))); // TODO handle errors
+		app.models.add_many(zzz_config.models.map((m) => Model_Json.parse(m))); // TODO handle errors
 
 		// Initialize the session
 		if (BROWSER) {
-			void zzz.api.load_session();
+			void app.api.load_session();
 		}
 	});
 
 	pkg_context.set(parse_package_meta(package_json, src_json));
 
 	// Create our client App, which extends the Zzz class
-	const zzz = new App();
+	const app = new App();
 
 	// Enhance schemas with metadata for deserialization - use class names
 	// Safely access Zod schema internals using type assertion
@@ -59,23 +59,23 @@
 		prompt_json_obj.shape.bits._def.type.class_name = 'Bit';
 	}
 
-	if (BROWSER) (window as any).app = (window as any).zzz = zzz; // no types for this, just for runtime convenience
+	if (BROWSER) (window as any).app = (window as any).app = app; // no types for this, just for runtime convenience
 
 	// TODO refactor, maybe per route?
 	// Handle URL parameter synchronization
 	$effect.pre(() => {
 		// TODO I think we want a different state value for this, so that we can render links to the "selected_id_recent" or something
-		zzz.chats.selected_id = zzz.url_params.get_uuid_param('chat_id');
-		zzz.prompts.selected_id = zzz.url_params.get_uuid_param('prompt_id');
+		app.chats.selected_id = app.url_params.get_uuid_param('chat_id');
+		app.prompts.selected_id = app.url_params.get_uuid_param('prompt_id');
 	});
 
 	// TODO refactor this, doesn't belong here - see the comment at `to_nav_link_href`
 	onNavigate(() => {
 		const {pathname} = page.url;
 		if (pathname === `${base}/chats`) {
-			zzz.chats.selected_id_last_non_null = null;
+			app.chats.selected_id_last_non_null = null;
 		} else if (pathname === `${base}/prompts`) {
-			zzz.prompts.selected_id_last_non_null = null;
+			app.prompts.selected_id_last_non_null = null;
 		}
 	});
 </script>
@@ -93,7 +93,7 @@
 				icon: '?',
 				run: () => {
 					console.log('show main dialog');
-					zzz.api.toggle_main_menu(true);
+					app.api.toggle_main_menu(true);
 				},
 			},
 		},
@@ -112,7 +112,7 @@
 
 <Themed>
 	<Contextmenu_Root>
-		<Zzz_Root {zzz}>
+		<Zzz_Root {app}>
 			{@render children()}
 		</Zzz_Root>
 	</Contextmenu_Root>

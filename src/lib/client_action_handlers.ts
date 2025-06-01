@@ -10,14 +10,14 @@ import type {Client_Action_Handlers} from '$lib/action_metatypes.js';
 export const client_action_handlers: Client_Action_Handlers = {
 	ping_request: (ctx) => {
 		console.log('Ping request sent', ctx);
-		ctx.zzz.capabilities.handle_sent_ping(ctx.jsonrpc_message.id); // TODO BLOCK @api type safety
+		ctx.app.capabilities.handle_sent_ping(ctx.jsonrpc_message.id); // TODO BLOCK @api type safety
 	},
 	ping_response: (ctx) => {
 		console.log('Ping response received', ctx);
 		if ('todo') {
-			ctx.zzz.capabilities.handle_received_ping(ctx.result.value.result.ping_id);
+			ctx.app.capabilities.handle_received_ping(ctx.result.value.result.ping_id);
 		} else {
-			ctx.zzz.capabilities.handle_ping_error(ctx.jsonrpc_message.id, ctx.result.message);
+			ctx.app.capabilities.handle_ping_error(ctx.jsonrpc_message.id, ctx.result.message);
 		}
 	},
 
@@ -27,7 +27,7 @@ export const client_action_handlers: Client_Action_Handlers = {
 	load_session_response: (ctx) => {
 		console.log('Session loaded', ctx);
 		if ('todo') {
-			ctx.zzz.receive_session(ctx.result.value.result.data);
+			ctx.app.receive_session(ctx.result.value.result.data);
 		} else {
 			console.error('Error loading session', ctx);
 		}
@@ -64,11 +64,11 @@ export const client_action_handlers: Client_Action_Handlers = {
 
 	filer_change: (ctx) => {
 		console.log('File changed', ctx.params.change, ctx.result);
-		ctx.zzz.diskfiles.handle_change(ctx.params);
+		ctx.app.diskfiles.handle_change(ctx.params);
 	},
 
 	toggle_main_menu: (ctx) => {
 		console.log('Toggling main menu', ctx.params);
-		return ctx.zzz.ui.toggle_main_menu(ctx.params);
+		return ctx.app.ui.toggle_main_menu(ctx.params);
 	},
 };

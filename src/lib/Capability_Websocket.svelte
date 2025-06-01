@@ -33,9 +33,9 @@
 	const {socket: socket_prop}: Props = $props();
 
 	// Get socket from props or context
-	const zzz = zzz_context.get();
-	const socket = $derived(socket_prop || zzz.socket);
-	const {capabilities} = zzz;
+	const app = zzz_context.get();
+	const socket = $derived(socket_prop || app.socket);
+	const {capabilities} = app;
 
 	// Track URL state for reset/undo functionality
 	let previous_url = $state('');

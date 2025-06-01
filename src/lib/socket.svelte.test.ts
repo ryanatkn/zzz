@@ -76,7 +76,7 @@ const TEST_MESSAGE = {
 describe('Socket', () => {
 	let original_web_socket: typeof WebSocket;
 	let mock_socket: Mocket;
-	let zzz: Zzz_App;
+	let app: Zzz_App;
 
 	// Setup for each test
 	beforeEach(() => {
@@ -87,16 +87,16 @@ describe('Socket', () => {
 		mock_socket = new Mocket(TEST_URLS.BASE);
 
 		// Create real Zzz instance
-		zzz = monkeypatch_zzz_for_tests(new Zzz_App());
+		app = monkeypatch_zzz_for_tests(new Zzz_App());
 
 		// TODO better mocking
 		// Mock action API for testing
-		(zzz as any).api = {
+		(app as any).api = {
 			ping: vi.fn(),
 		} as any;
 
 		// Set test time properties
-		(zzz as any).time = {
+		(app as any).time = {
 			now_ms: Date.now(),
 			interval: 1000,
 		} as any;
@@ -120,7 +120,7 @@ describe('Socket', () => {
 
 	describe('Connection management', () => {
 		test('connect creates WebSocket with provided URL', () => {
-			const socket = new Socket({zzz});
+			const socket = new Socket({app});
 			socket.connect(TEST_URLS.BASE);
 
 			expect(globalThis.WebSocket).toHaveBeenCalledWith(TEST_URLS.BASE);
@@ -129,7 +129,7 @@ describe('Socket', () => {
 		});
 
 		test('disconnect closes WebSocket with default close code', () => {
-			const socket = new Socket({zzz});
+			const socket = new Socket({app});
 			socket.connect(TEST_URLS.BASE);
 
 			// Simulate connection
@@ -144,7 +144,7 @@ describe('Socket', () => {
 		});
 
 		test('connection success updates state correctly', () => {
-			const socket = new Socket({zzz});
+			const socket = new Socket({app});
 			socket.connect(TEST_URLS.BASE);
 			mock_socket.connect();
 
@@ -154,7 +154,7 @@ describe('Socket', () => {
 		});
 
 		test('update_url reconnects with new URL if already connected', () => {
-			const socket = new Socket({zzz});
+			const socket = new Socket({app});
 			socket.connect(TEST_URLS.BASE);
 			mock_socket.connect();
 
@@ -171,7 +171,7 @@ describe('Socket', () => {
 
 	describe('Message handling', () => {
 		test('send queues message when socket is not connected', () => {
-			const socket = new Socket({zzz});
+			const socket = new Socket({app});
 
 			// Not connected yet
 			const sent = socket.send(TEST_MESSAGE.BASIC);
@@ -180,7 +180,7 @@ describe('Socket', () => {
 		});
 
 		test('send transmits message when socket is connected', () => {
-			const socket = new Socket({zzz});
+			const socket = new Socket({app});
 			socket.connect(TEST_URLS.BASE);
 			mock_socket.connect();
 
@@ -192,7 +192,7 @@ describe('Socket', () => {
 		});
 
 		test('message queueing sends queued messages when reconnected', () => {
-			const socket = new Socket({zzz});
+			const socket = new Socket({app});
 
 			// Queue messages while disconnected
 			socket.send({method: 'message_a'});
@@ -212,7 +212,7 @@ describe('Socket', () => {
 
 	describe('Error handling', () => {
 		test('failed messages moves message to failed when send throws error', () => {
-			const socket = new Socket({zzz});
+			const socket = new Socket({app});
 
 			// Queue a message
 			socket.send(TEST_MESSAGE.BASIC);
@@ -238,7 +238,7 @@ describe('Socket', () => {
 		});
 
 		test('clear_failed_messages removes all failed messages', () => {
-			const socket = new Socket({zzz});
+			const socket = new Socket({app});
 
 			// Queue message
 			socket.send(TEST_MESSAGE.BASIC);
@@ -265,7 +265,7 @@ describe('Socket', () => {
 
 	describe('Automatic reconnection', () => {
 		test('auto reconnect attempts to reconnect after close', () => {
-			const socket = new Socket({zzz});
+			const socket = new Socket({app});
 			socket.reconnect_delay = 1000; // 1 second
 			socket.connect(TEST_URLS.BASE);
 			mock_socket.connect();
@@ -282,7 +282,7 @@ describe('Socket', () => {
 		});
 
 		test('reconnect delay uses exponential backoff', () => {
-			const socket = new Socket({zzz});
+			const socket = new Socket({app});
 			// Set consistent values for testing
 			socket.reconnect_delay = 1000; // base delay 1 second
 			socket.reconnect_delay_max = 30000; // max 30 seconds
@@ -341,7 +341,7 @@ describe('Socket', () => {
 
 	describe('Heartbeat mechanism', () => {
 		test('heartbeat sends ping at interval', () => {
-			const socket = new Socket({zzz});
+			const socket = new Socket({app});
 			socket.heartbeat_interval = 1000; // 1 second for testing
 			socket.connect(TEST_URLS.BASE);
 			mock_socket.connect();
@@ -350,7 +350,7 @@ describe('Socket', () => {
 			vi.advanceTimersByTime(1000);
 
 			// Check ping was sent
-			expect(zzz.api.ping).toHaveBeenCalled();
+			expect(app.api.ping).toHaveBeenCalled();
 		});
 	});
 });

@@ -8,9 +8,9 @@
 
 	const {chat}: Props = $props();
 
-	const {zzz} = $derived(chat);
+	const {app} = $derived(chat);
 
-	const tags = $derived(Array.from(zzz.tags)); // TODO refactor, `Tags` may be a class, maybe with an indexed collection
+	const tags = $derived(Array.from(app.tags)); // TODO refactor, `Tags` may be a class, maybe with an indexed collection
 </script>
 
 <div>
@@ -20,7 +20,7 @@
 			<header class="font_size_lg text_align_center mb_xs">add by tag</header>
 			<menu class="unstyled column">
 				{#each tags as tag (tag)}
-					{@const models_with_tag = zzz.models.filter_by_tag(tag)}
+					{@const models_with_tag = app.models.filter_by_tag(tag)}
 					<button
 						type="button"
 						class="w_100 font_size_sm py_xs3 justify_content_space_between plain border_radius_xs font_weight_600"

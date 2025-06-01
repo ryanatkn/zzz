@@ -16,12 +16,12 @@
 
 	const {diskfile, editor_state}: Props = $props();
 
-	const zzz = zzz_context.get();
+	const app = zzz_context.get();
 </script>
 
 <div class="display_flex flex_column gap_xs w_100">
 	<small class="overflow_wrap_break_all w_100">
-		<Glyph glyph={GLYPH_FILE} />{zzz.diskfiles.to_relative_path(diskfile.path)}
+		<Glyph glyph={GLYPH_FILE} />{app.diskfiles.to_relative_path(diskfile.path)}
 	</small>
 
 	<small class="font_family_mono">

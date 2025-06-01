@@ -23,11 +23,11 @@
 
 	const {empty}: Props = $props();
 
-	const zzz = zzz_context.get();
-	const {diskfiles} = zzz;
+	const app = zzz_context.get();
+	const {diskfiles} = app;
 	const {editor} = diskfiles;
 
-	const {zzz_cache_dir} = $derived(zzz);
+	const {zzz_cache_dir} = $derived(app);
 
 	// TODO need awaitable websocket calls?
 	const TODO_create_file_pending = false;
@@ -94,7 +94,7 @@
 				>
 					<Glyph glyph={GLYPH_CREATE_FOLDER} />
 				</Pending_Button>
-				{#if zzz.diskfiles.items.size > 1}
+				{#if app.diskfiles.items.size > 1}
 					<button
 						type="button"
 						class="plain compact selectable deselectable"

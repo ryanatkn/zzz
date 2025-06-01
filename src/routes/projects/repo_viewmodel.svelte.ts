@@ -107,7 +107,7 @@ export class Repo_Viewmodel {
 		} else {
 			// Create new repo
 			const repo = new Repo({
-				zzz: this.projects.zzz,
+				app: this.projects.app,
 				json: {
 					git_url: this.git_url,
 					checkouts: this.checkouts,

@@ -148,14 +148,14 @@ export class Projects extends Cell<typeof Projects_Json> {
 			projects: (projects_data) => {
 				if (Array.isArray(projects_data)) {
 					this.projects = projects_data.map(
-						(project_data) => new Project({zzz: this.zzz, json: project_data}),
+						(project_data) => new Project({app: this.app, json: project_data}),
 					);
 					return HANDLED;
 				}
 
 				// If no projects provided, initialize with sample data
 				if (!projects_data || !Array.isArray(projects_data) || projects_data.length === 0) {
-					this.projects = create_example_projects(this.zzz);
+					this.projects = create_example_projects(this.app);
 					return HANDLED;
 				}
 
@@ -201,7 +201,7 @@ export class Projects extends Cell<typeof Projects_Json> {
 		const created = get_datetime_now();
 
 		const new_project = new Project({
-			zzz: this.zzz,
+			app: this.app,
 			json: {
 				id,
 				name,

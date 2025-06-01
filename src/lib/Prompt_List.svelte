@@ -7,8 +7,8 @@
 	import type {Prompt} from '$lib/prompt.svelte.js';
 	import Sortable_List from '$lib/Sortable_List.svelte';
 
-	const zzz = zzz_context.get();
-	const {prompts} = zzz;
+	const app = zzz_context.get();
+	const {prompts} = app;
 	const selected_prompt_id = $derived(prompts.selected_id);
 </script>
 

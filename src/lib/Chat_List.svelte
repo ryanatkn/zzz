@@ -7,8 +7,8 @@
 	import type {Chat} from '$lib/chat.svelte.js';
 	import Sortable_List from '$lib/Sortable_List.svelte';
 
-	const zzz = zzz_context.get();
-	const {chats} = zzz;
+	const app = zzz_context.get();
+	const {chats} = app;
 	const selected_chat_id = $derived(chats.selected_id);
 </script>
 

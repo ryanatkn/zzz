@@ -13,15 +13,15 @@
 
 	const {disabled}: Props = $props();
 
-	const zzz = zzz_context.get();
+	const app = zzz_context.get();
 
 	onNavigate(() => {
-		if (zzz.ui.show_main_dialog) zzz.api.toggle_main_menu(false);
+		if (app.ui.show_main_dialog) app.api.toggle_main_menu(false);
 	});
 </script>
 
-{#if !disabled && zzz.ui.show_main_dialog}
-	<Dialog onclose={() => zzz.api.toggle_main_menu(false)} layout="page">
+{#if !disabled && app.ui.show_main_dialog}
+	<Dialog onclose={() => app.api.toggle_main_menu(false)} layout="page">
 		<div class="box">
 			<div class="pane p_xl3">
 				<section class="box mb_xl3">

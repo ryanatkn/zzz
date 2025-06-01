@@ -11,11 +11,11 @@
 	// Get props with default to context value
 	const {zzz_dir: zzz_dir_prop}: Props = $props();
 
-	const zzz = zzz_context.get();
-	const {capabilities} = zzz;
+	const app = zzz_context.get();
+	const {capabilities} = app;
 
 	// Fall back to the context value if not provided
-	const zzz_dir = $derived(zzz_dir_prop !== undefined ? zzz_dir_prop : zzz.zzz_cache_dir);
+	const zzz_dir = $derived(zzz_dir_prop !== undefined ? zzz_dir_prop : app.zzz_cache_dir);
 </script>
 
 <div
@@ -60,7 +60,7 @@
 </p>
 <p>
 	For security reasons, all filesystem operations are confined to this path's parent directory,
-	<small class="chip font_family_mono">{zzz.zzz_dir || '[no zzz dir configured]'}</small>, and the
+	<small class="chip font_family_mono">{app.zzz_dir || '[no zzz dir configured]'}</small>, and the
 	path cannot be modified after the server starts. These restrictions may be loosened in the future,
 	but they help ensure predictability when exposing sensitive resources like your local hard drive
 	to web scripts.

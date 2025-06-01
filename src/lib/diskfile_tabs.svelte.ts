@@ -184,7 +184,7 @@ export class Diskfile_Tabs extends Cell<typeof Diskfile_Tabs_Json> {
 	 */
 	#create_tab(diskfile_id: Uuid, insert_after?: Uuid | null): Diskfile_Tab {
 		const new_tab = new Diskfile_Tab({
-			zzz: this.zzz,
+			app: this.app,
 			tabs: this,
 			json: {
 				id: create_uuid(),

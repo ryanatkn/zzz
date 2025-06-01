@@ -54,9 +54,9 @@ export type Zzz_Json = z.infer<typeof Zzz_Json>;
 export type Zzz_Json_Input = z.input<typeof Zzz_Json>;
 
 // Special options type for Zzz to handle circular reference
-export interface Zzz_Options extends Omit_Strict<Cell_Options<typeof Zzz_Json>, 'zzz'> {
+export interface Zzz_Options extends Omit_Strict<Cell_Options<typeof Zzz_Json>, 'app'> {
 	/** Do not use - optional to avoid circular reference problem. */
-	zzz?: Zzz_App;
+	app?: Zzz_App;
 	models?: Array<Model_Json>;
 	bots?: Zzz_Config['bots'];
 	providers?: Array<Provider_Json>;
@@ -149,10 +149,10 @@ export class Zzz_App extends Cell<typeof Zzz_Json> {
 
 	constructor(options: Zzz_Options = EMPTY_OBJECT) {
 		// Pass this instance as its own zzz reference - casting hacks around the circular reference
-		super(Zzz_Json, options as Zzz_Options & {zzz: Zzz_App});
+		super(Zzz_Json, options as Zzz_Options & {app: Zzz_App});
 
 		// Set the circular reference now that the object is constructed
-		(this as Assignable<typeof this, 'zzz'>).zzz = this;
+		(this as Assignable<typeof this, 'app'>).app = this;
 
 		this.cell_registry = new Cell_Registry(this);
 
@@ -166,19 +166,19 @@ export class Zzz_App extends Cell<typeof Zzz_Json> {
 		}
 
 		// Initialize cell collections
-		this.time = new Time({zzz: this});
-		this.ui = new Ui({zzz: this});
-		this.models = new Models({zzz: this});
-		this.chats = new Chats({zzz: this});
-		this.tapes = new Tapes({zzz: this});
-		this.providers = new Providers({zzz: this});
-		this.prompts = new Prompts({zzz: this});
-		this.bits = new Bits({zzz: this});
-		this.diskfiles = new Diskfiles({zzz: this});
-		this.actions = new Actions({zzz: this});
-		this.socket = new Socket({zzz: this});
-		this.url_params = new Url_Params({zzz: this});
-		this.capabilities = new Capabilities({zzz: this});
+		this.time = new Time({app: this});
+		this.ui = new Ui({app: this});
+		this.models = new Models({app: this});
+		this.chats = new Chats({app: this});
+		this.tapes = new Tapes({app: this});
+		this.providers = new Providers({app: this});
+		this.prompts = new Prompts({app: this});
+		this.bits = new Bits({app: this});
+		this.diskfiles = new Diskfiles({app: this});
+		this.actions = new Actions({app: this});
+		this.socket = new Socket({app: this});
+		this.url_params = new Url_Params({app: this});
+		this.capabilities = new Capabilities({app: this});
 
 		this.bots = options.bots ?? BOTS_DEFAULT;
 
@@ -270,7 +270,7 @@ export class Zzz_App extends Cell<typeof Zzz_Json> {
 	}
 
 	add_provider(provider_json: Provider_Json): void {
-		this.providers.add(new Provider({zzz: this, json: provider_json}));
+		this.providers.add(new Provider({app: this, json: provider_json}));
 	}
 
 	/**
@@ -286,7 +286,7 @@ export class Zzz_App extends Cell<typeof Zzz_Json> {
 	 * @returns The newly created history object
 	 */
 	create_diskfile_history(path: Diskfile_Path): Diskfile_History {
-		const history = new Diskfile_History({zzz: this, json: {path}});
+		const history = new Diskfile_History({app: this, json: {path}});
 		this.diskfile_histories.set(path, history);
 		return history;
 	}

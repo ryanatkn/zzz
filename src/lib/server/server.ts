@@ -22,8 +22,7 @@ import {verify_origin} from '$lib/server/security.js';
 
 const log = new Logger('[server]');
 
-// TODO BLOCK maybe `create_server` that takes options to override each of these handlers like `register_http_actions`?
-const main = (): void => {
+const init_server = (): void => {
 	// TODO better config
 	const config = create_config();
 	const allowed_origins = [SERVER_URL];
@@ -90,7 +89,7 @@ const main = (): void => {
 
 // Some configured deployment targets in SvelteKit don't support top-level await yet but this is sync atm
 try {
-	main(); // TODO BLOCK change this to be `main.ts` and `create_server.ts`
+	init_server();
 } catch (error) {
 	log.error('error starting server:', error);
 	throw error;

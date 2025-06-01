@@ -18,8 +18,8 @@
 
 	const {limit = 20, selected_action_id = null, attrs, onselect}: Props = $props();
 
-	const zzz = zzz_context.get();
-	const {actions} = zzz;
+	const app = zzz_context.get();
+	const {actions} = app;
 
 	// Count total actions for the "showing X of Y" action
 	const total_actions = $derived(actions.items.size);

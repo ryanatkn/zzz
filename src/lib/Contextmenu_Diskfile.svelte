@@ -17,7 +17,7 @@
 
 	const {diskfile, ...rest}: Props = $props();
 
-	const zzz = zzz_context.get();
+	const app = zzz_context.get();
 </script>
 
 <Contextmenu {...rest} {entries} />
@@ -48,7 +48,7 @@
 					// TODO @many better confirmation
 					// eslint-disable-next-line no-alert
 					if (confirm(`Are you sure you want to delete ${diskfile.path_relative}?`)) {
-						zzz.diskfiles.delete(diskfile.path);
+						app.diskfiles.delete(diskfile.path);
 					}
 				}}
 			>

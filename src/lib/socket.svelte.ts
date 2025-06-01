@@ -99,12 +99,12 @@ export class Socket extends Cell<typeof Socket_Json> {
 	// Time tracking and formatting
 	readonly connection_duration: number | null = $derived(
 		this.connected && this.last_connect_time
-			? Math.max(0, this.zzz.time.now_ms - this.last_connect_time) // `Math.max` is needed to avoid negative values with the coarse value of `now_ms`
+			? Math.max(0, this.app.time.now_ms - this.last_connect_time) // `Math.max` is needed to avoid negative values with the coarse value of `now_ms`
 			: null,
 	);
 	readonly connection_duration_rounded: number | null = $derived(
 		this.connection_duration !== null
-			? Math.round(this.connection_duration / this.zzz.time.interval) * this.zzz.time.interval
+			? Math.round(this.connection_duration / this.app.time.interval) * this.app.time.interval
 			: null,
 	);
 
@@ -277,7 +277,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 	 * Sends a ping message for heartbeat purposes
 	 */
 	async send_heartbeat(): Promise<void> {
-		await this.zzz.api.ping(); // TODO BLOCK @api need to force websocket transport, second arg?
+		await this.app.api.ping(); // TODO BLOCK @api need to force websocket transport, second arg?
 	}
 
 	/**

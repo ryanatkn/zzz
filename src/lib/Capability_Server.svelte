@@ -11,8 +11,8 @@
 	import Ping_Form from '$lib/Ping_Form.svelte';
 	import External_Link from '$lib/External_Link.svelte';
 
-	const zzz = zzz_context.get();
-	const {capabilities} = zzz;
+	const app = zzz_context.get();
+	const {capabilities} = app;
 
 	onMount(() => {
 		void capabilities.init_server_check();

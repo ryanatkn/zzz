@@ -81,12 +81,12 @@ export class Models extends Cell<typeof Models_Json> {
 	}
 
 	add(model_json: Model_Json): void {
-		const model = new Model({zzz: this.zzz, json: model_json});
+		const model = new Model({app: this.app, json: model_json});
 		this.items.add(model);
 	}
 
 	add_many(models_json: Array<Model_Json>): void {
-		const models = models_json.map((json) => new Model({zzz: this.zzz, json}));
+		const models = models_json.map((json) => new Model({app: this.app, json}));
 		this.items.add_many(models);
 	}
 

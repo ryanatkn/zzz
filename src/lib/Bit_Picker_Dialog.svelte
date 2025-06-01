@@ -10,8 +10,8 @@
 	import type {Uuid} from '$lib/zod_helpers.js';
 	import {sort_by_text, sort_by_numeric} from '$lib/sortable.svelte.js';
 
-	const zzz = zzz_context.get();
-	const {bits} = zzz;
+	const app = zzz_context.get();
+	const {bits} = app;
 
 	interface Props {
 		onpick: (bit: Bit_Type | undefined) => boolean | void;

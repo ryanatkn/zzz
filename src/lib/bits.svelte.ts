@@ -65,7 +65,7 @@ export class Bits extends Cell<typeof Bits_Json> {
 	 */
 	add(json: Bit_Json_Input): Bit_Type {
 		const j = !json.name ? {...json, name: this.generate_unique_name('new bit')} : json;
-		const bit = Bit.create(this.zzz, j);
+		const bit = Bit.create(this.app, j);
 		this.items.add(bit);
 		return bit;
 	}

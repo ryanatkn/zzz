@@ -113,7 +113,7 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 
 	add(json?: Prompt_Json_Input): Prompt {
 		const j = !json?.name ? {...json, name: this.generate_unique_name('new prompt')} : json;
-		const prompt = new Prompt({zzz: this.zzz, json: j});
+		const prompt = new Prompt({app: this.app, json: j});
 		this.items.add(prompt);
 		if (this.selected_id === null) {
 			this.selected_id = prompt.id;
@@ -127,7 +127,7 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 
 	// TODO @many look into making these more generic, less manual bookkeeping
 	add_many(prompts_json: Array<Prompt_Json_Input>): Array<Prompt> {
-		const prompts = prompts_json.map((json) => new Prompt({zzz: this.zzz, json}));
+		const prompts = prompts_json.map((json) => new Prompt({app: this.app, json}));
 		this.items.add_many(prompts);
 
 		// Set selected_id to the first prompt if none is selected

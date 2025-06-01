@@ -17,11 +17,11 @@ const TEST_DATETIME = get_datetime_now();
 const TEST_YEAR = 2022;
 
 // Test suite variables
-let zzz: Zzz_App;
+let app: Zzz_App;
 
 beforeEach(() => {
 	// Create a real Zzz instance for each test
-	zzz = monkeypatch_zzz_for_tests(new Zzz_App());
+	app = monkeypatch_zzz_for_tests(new Zzz_App());
 	vi.clearAllMocks();
 });
 
@@ -39,12 +39,12 @@ test('Cell uses registry for instantiating class relationships', () => {
 		}
 
 		test_instantiate(json: any, class_name: string): unknown {
-			return this.zzz.cell_registry.instantiate(class_name as any, json);
+			return this.app.cell_registry.instantiate(class_name as any, json);
 		}
 	}
 
 	const cell = new Registry_Test_Cell({
-		zzz,
+		app,
 		json: {
 			id: TEST_ID,
 			created: TEST_DATETIME,
@@ -53,7 +53,7 @@ test('Cell uses registry for instantiating class relationships', () => {
 
 	// Mock the registry instantiate method for this specific test
 	const mock_instantiate = vi
-		.spyOn(zzz.cell_registry, 'instantiate')
+		.spyOn(app.cell_registry, 'instantiate')
 		.mockImplementation((name: any, json) => {
 			if (name === 'Test_Type') {
 				return {type: 'Test_Type', ...((json as any) || {})};
@@ -90,7 +90,7 @@ test('Cell.encode_property uses $state.snapshot for values', () => {
 	}
 
 	const cell = new Encoding_Test_Cell({
-		zzz,
+		app,
 		json: {
 			id: TEST_ID,
 			created: TEST_DATETIME,
@@ -141,7 +141,7 @@ test('Cell handles special types like Map and Set', () => {
 	}
 
 	const cell = new Collections_Test_Cell({
-		zzz,
+		app,
 		json: {
 			id: TEST_ID,
 			created: TEST_DATETIME,
@@ -204,7 +204,7 @@ test('Cell - JSON serialization excludes undefined values correctly', () => {
 
 	// Cell with minimal required fields
 	const minimal_cell = new Serialization_Test_Cell({
-		zzz,
+		app,
 		json: {
 			id: TEST_ID,
 			created: TEST_DATETIME,
@@ -214,7 +214,7 @@ test('Cell - JSON serialization excludes undefined values correctly', () => {
 
 	// Cell with optional fields
 	const complete_cell = new Serialization_Test_Cell({
-		zzz,
+		app,
 		json: {
 			id: TEST_ID,
 			created: TEST_DATETIME,

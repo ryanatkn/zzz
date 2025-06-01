@@ -24,8 +24,8 @@
 
 	const {bit} = $derived(strip);
 
-	const zzz = zzz_context.get();
-	const {prompts} = zzz;
+	const app = zzz_context.get();
+	const {prompts} = app;
 
 	const prompt = $derived(prompts.selected);
 </script>

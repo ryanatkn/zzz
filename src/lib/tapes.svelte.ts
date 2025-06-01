@@ -72,7 +72,7 @@ export class Tapes extends Cell<typeof Tapes_Json> {
 	}
 
 	add(json?: Tape_Json_Input, select?: boolean): Tape {
-		const tape = new Tape({zzz: this.zzz, json});
+		const tape = new Tape({app: this.app, json});
 		return this.add_tape(tape, select);
 	}
 
@@ -87,7 +87,7 @@ export class Tapes extends Cell<typeof Tapes_Json> {
 	}
 
 	add_many(tapes_json: Array<Tape_Json_Input>, select?: boolean | number): Array<Tape> {
-		const tapes = tapes_json.map((json) => new Tape({zzz: this.zzz, json}));
+		const tapes = tapes_json.map((json) => new Tape({app: this.app, json}));
 		this.items.add_many(tapes);
 
 		// Select the first or the specified tape if none is currently selected
@@ -132,7 +132,7 @@ export class Tapes extends Cell<typeof Tapes_Json> {
 
 	// TODO these two methods feel like a code smell, should maintain the collections more automatically
 	#remove_reference_from_chats(tape_id: Uuid): void {
-		for (const chat of this.zzz.chats.items.by_id.values()) {
+		for (const chat of this.app.chats.items.by_id.values()) {
 			chat.remove_tape(tape_id);
 		}
 	}
@@ -143,7 +143,7 @@ export class Tapes extends Cell<typeof Tapes_Json> {
 			return;
 		}
 
-		for (const chat of this.zzz.chats.items.by_id.values()) {
+		for (const chat of this.app.chats.items.by_id.values()) {
 			chat.remove_tapes(tape_ids);
 		}
 	}

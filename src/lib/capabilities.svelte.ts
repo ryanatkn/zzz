@@ -88,7 +88,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	 */
 	readonly websocket: Capability<Websocket_Capability_Data | null | undefined> = $derived.by(() => {
 		// Map socket status to capability status, but consider connection state
-		const {socket} = this.zzz;
+		const {socket} = this.app;
 		const {status} = socket;
 
 		// Socket is available if we're connected,
@@ -122,7 +122,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	 */
 	readonly filesystem: Capability<Filesystem_Capability_Data | null | undefined> = $derived.by(
 		() => {
-			const {zzz_dir, zzz_cache_dir} = this.zzz;
+			const {zzz_dir, zzz_cache_dir} = this.app;
 			let status: Async_Status;
 
 			if (this.server.status !== 'success') {
@@ -265,7 +265,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 		if (this.server.status !== 'initial') {
 			return;
 		}
-		await this.zzz.api.ping();
+		await this.app.api.ping();
 	}
 
 	/**

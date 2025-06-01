@@ -15,8 +15,8 @@
 	import Chat_Tape_Add_By_Model from '$lib/Chat_Tape_Add_By_Model.svelte';
 	import Chat_Tape_Manage_By_Tag from '$lib/Chat_Tape_Manage_By_Tag.svelte';
 
-	const zzz = zzz_context.get();
-	const {chats} = zzz;
+	const app = zzz_context.get();
+	const {chats} = app;
 
 	interface Props {
 		chat: Chat;

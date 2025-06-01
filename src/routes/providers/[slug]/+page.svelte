@@ -5,9 +5,9 @@
 	import Provider_Detail from '$lib/Provider_Detail.svelte';
 	import {zzz_context} from '$lib/zzz.svelte.js';
 
-	const zzz = zzz_context.get();
+	const app = zzz_context.get();
 
-	const provider = $derived(zzz.providers.find_by_name(page.params.slug));
+	const provider = $derived(app.providers.find_by_name(page.params.slug));
 </script>
 
 <div class="p_sm">

@@ -28,8 +28,8 @@
 		dialog_props,
 	}: Props = $props();
 
-	const zzz = zzz_context.get();
-	const {diskfiles} = zzz;
+	const app = zzz_context.get();
+	const {diskfiles} = app;
 </script>
 
 {#if show}

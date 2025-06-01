@@ -14,12 +14,12 @@
 	import {zzz_context} from '$lib/zzz.svelte.js';
 	import External_Link from '$lib/External_Link.svelte';
 
-	const zzz = zzz_context.get();
+	const app = zzz_context.get();
 
 	// Initialize browser with the sample tabs and Zzz instance
 	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 	browser ??= new Browser({
-		zzz,
+		app,
 		json: {tabs: sample_tabs},
 	});
 </script>
@@ -66,7 +66,7 @@
 				type="button"
 				class="inline compact color_d"
 				onclick={() => {
-					zzz.ui.toggle_sidebar();
+					app.ui.toggle_sidebar();
 					if (!browser.browserified) {
 						browser.browserified = true;
 					}

@@ -19,8 +19,8 @@
 
 	const {bit, show_actions = true}: Props = $props();
 
-	const zzz = zzz_context.get();
-	const {prompts} = zzz;
+	const app = zzz_context.get();
+	const {prompts} = app;
 
 	const prompt = $derived(prompts.selected);
 </script>
