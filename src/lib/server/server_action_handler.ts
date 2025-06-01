@@ -1,4 +1,4 @@
-import type {Action_Message_Base} from '$lib/action_types.js';
+import type {Action_Message_Base} from '$lib/action_message.js';
 import type {Server_Action_Event} from '$lib/server/server_action_event.js';
 
 // TODO BLOCK @api think about send/receive and then request/response? `phase`?

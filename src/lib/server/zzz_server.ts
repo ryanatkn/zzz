@@ -31,7 +31,7 @@ import {
 } from '$lib/jsonrpc.js';
 import {handle_jsonrpc_request} from '$lib/server/jsonrpc_server_helpers.js';
 import {create_jsonrpc_error} from '$lib/jsonrpc_helpers.js';
-import type {Action_Message_Base} from '$lib/action_types.js';
+import type {Action_Message_Base} from '$lib/action_message.js';
 import {ZZZ_CACHE_DIRNAME} from '$lib/constants.js';
 import {to_zzz_cache_dir} from '$lib/diskfile_helpers.js';
 import {jsonrpc_errors} from '$lib/jsonrpc_errors.js';

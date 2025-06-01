@@ -84,6 +84,7 @@ export class Actions extends Cell<typeof Actions_Json> {
 		this.#trim_to_history_limit(); // TODO should be unnecessary to override `set_json` for this
 	}
 
+	// TODO BLOCK @api this is wrong because it takes messages as input but needs to act on actions which may wrap multiple messages
 	add_message(message: Action_Message_Union): void {
 		const action_json = create_action_json(message);
 		if (!action_json) throw new Error(`Invalid action: ${message.method}`);

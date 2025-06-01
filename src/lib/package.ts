@@ -1012,7 +1012,6 @@ export const src_json = {
 			path: 'action_types.ts',
 			declarations: [
 				{name: 'Action_Request_Response_Flag', kind: 'variable'},
-				{name: 'Action_Message_Base', kind: 'variable'},
 				{name: 'Action_Kind', kind: 'variable'},
 				{name: 'Action_Initiator', kind: 'variable'},
 				{name: 'Action_Operation', kind: 'variable'},

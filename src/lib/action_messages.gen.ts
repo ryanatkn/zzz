@@ -24,7 +24,7 @@ export const gen: Gen = ({origin_path}) => {
 
 		import {z} from 'zod';
 
-		import {Action_Message_Base} from '$lib/action_types.js';
+		import {Action_Message_Base} from '$lib/action_message.js';
 		import {${registry.specs
 			// TODO maybe change to `import * as specs`
 			.map((spec) => to_action_spec_identifier(spec.method))

@@ -2,11 +2,11 @@ import type {z} from 'zod';
 
 import {Action_Message_Union, action_spec_by_method} from '$lib/action_collections.js';
 import {
-	Action_Message_Base,
 	type Action_Json,
 	type Action_Auth,
 	type Action_Request_Response_Flag,
 } from '$lib/action_types.js';
+import {Action_Message_Base} from '$lib/action_message.js';
 import {Action_Messages} from '$lib/action_messages.js';
 import {
 	Action_Message_Type,
