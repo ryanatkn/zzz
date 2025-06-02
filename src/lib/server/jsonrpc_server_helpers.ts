@@ -1,7 +1,6 @@
 import type {Logger} from '@ryanatkn/belt/log.js';
 
 import {
-	JSONRPC_VERSION,
 	type Jsonrpc_Response,
 	type Jsonrpc_Error_Message,
 	JSONRPC_PARSE_ERROR,
@@ -10,7 +9,7 @@ import {
 	Jsonrpc_Request,
 	type Jsonrpc_Request_Id,
 } from '$lib/jsonrpc.js';
-import {create_jsonrpc_error} from '$lib/jsonrpc_helpers.js';
+import {create_jsonrpc_error, create_jsonrpc_error_from_thrown} from '$lib/jsonrpc_helpers.js';
 
 /**
  * Handler for processing JSON-RPC requests
@@ -46,6 +45,7 @@ export interface Handle_Jsonrpc_Request_Options {
 	log?: Logger | null;
 }
 
+// TODO need to support notifications and batch requests as well, but probably a different helper
 /**
  * Process a JSON-RPC request and return a response.
  */
@@ -67,7 +67,7 @@ export const handle_jsonrpc_request = async (
 				return await onrequest(request);
 			} catch (error) {
 				log?.error(`Error processing JSON-RPC request:`, error);
-				return create_jsonrpc_error(request.id, error);
+				return create_jsonrpc_error_from_thrown(request.id, error);
 			}
 		}
 
@@ -90,14 +90,10 @@ export const handle_jsonrpc_request = async (
 			log?.error('JSON-RPC invalid request:', parse_result.error);
 			return null;
 		}
-		return {
-			jsonrpc: JSONRPC_VERSION,
-			id,
-			error: {
-				code: JSONRPC_INVALID_REQUEST,
-				message: 'invalid request',
-			},
-		};
+		return create_jsonrpc_error(id, {
+			code: JSONRPC_INVALID_REQUEST,
+			message: 'invalid request',
+		});
 	} catch (error) {
 		// If we can't even parse the JSON properly
 		log?.error('JSON-RPC parse error:', error);
@@ -105,13 +101,9 @@ export const handle_jsonrpc_request = async (
 			// For notifications we can't return an error
 			return null;
 		}
-		return {
-			jsonrpc: JSONRPC_VERSION,
-			id,
-			error: {
-				code: JSONRPC_PARSE_ERROR,
-				message: 'parse error',
-			},
-		};
+		return create_jsonrpc_error(id, {
+			code: JSONRPC_PARSE_ERROR,
+			message: 'parse error',
+		});
 	}
 };

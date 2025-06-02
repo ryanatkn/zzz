@@ -2,7 +2,7 @@ import {Hono} from 'hono';
 
 import type {Zzz_Server} from '$lib/server/zzz_server.js';
 import {Path_Without_Trailing_Slash} from '$lib/zod_helpers.js';
-import {JSONRPC_PARSE_ERROR, JSONRPC_VERSION} from '$lib/jsonrpc.js';
+import {create_jsonrpc_error_from_thrown} from '$lib/jsonrpc_helpers.js';
 
 export interface Register_Actions_Options {
 	path: string;
@@ -22,24 +22,12 @@ export const register_http_actions = ({path, app, server}: Register_Actions_Opti
 	app.post(final_path, async (c) => {
 		console.log(`[http] POST ${c.req.url}`);
 		try {
-			const request_data = await c.req.json();
-
-			const response = await server.handle_jsonrpc_message(request_data);
-
+			const json = await c.req.json();
+			const response = await server.handle_jsonrpc_message(json);
 			return c.json(response);
 		} catch (error) {
 			console.error('[http] error processing JSON-RPC request:', error);
-			return c.json(
-				{
-					jsonrpc: JSONRPC_VERSION,
-					id: null,
-					error: {
-						code: JSONRPC_PARSE_ERROR,
-						message: error instanceof Error ? error.message : 'parse error',
-					},
-				},
-				400,
-			);
+			return c.json(create_jsonrpc_error_from_thrown('', error), 400);
 		}
 	});
 };

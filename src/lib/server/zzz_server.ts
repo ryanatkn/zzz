@@ -22,12 +22,11 @@ import {
 	type Jsonrpc_Response,
 	type Jsonrpc_Error_Message,
 	type Jsonrpc_Notification,
-	JSONRPC_VERSION,
 	Jsonrpc_Result,
 	Jsonrpc_Message,
 } from '$lib/jsonrpc.js';
 import {handle_jsonrpc_request} from '$lib/server/jsonrpc_server_helpers.js';
-import {create_jsonrpc_error} from '$lib/jsonrpc_helpers.js';
+import {create_jsonrpc_error_from_thrown, create_jsonrpc_response} from '$lib/jsonrpc_helpers.js';
 import type {Action_Message_Base} from '$lib/action_message.js';
 import {ZZZ_CACHE_DIRNAME} from '$lib/constants.js';
 import {to_zzz_cache_dir} from '$lib/diskfile_helpers.js';
@@ -184,14 +183,10 @@ export class Zzz_Server {
 							`no result returned for action: ${action_message.method}`,
 						);
 
-					return {
-						jsonrpc: JSONRPC_VERSION,
-						id: request.id,
-						result,
-					};
+					return create_jsonrpc_response(request.id, result);
 				} catch (error) {
 					this.log?.error(`Error processing JSON-RPC request:`, error);
-					return create_jsonrpc_error(request.id, error);
+					return create_jsonrpc_error_from_thrown(request.id, error);
 				}
 			},
 			onnotification: async (notification: Jsonrpc_Notification): Promise<void> => {

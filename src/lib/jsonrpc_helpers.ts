@@ -11,6 +11,8 @@ import {
 	type Jsonrpc_Request,
 	type Jsonrpc_Request_Id,
 	type Jsonrpc_Request_Params,
+	Jsonrpc_Result,
+	Jsonrpc_Response,
 } from '$lib/jsonrpc.js';
 import {Jsonrpc_Error, JSONRPC_ERROR_CODES} from '$lib/jsonrpc_errors.js';
 
@@ -31,7 +33,15 @@ export const create_jsonrpc_request = (
 	return message;
 };
 
-// TODO currently unused, currently all actions are requests
+export const create_jsonrpc_response = (
+	id: Jsonrpc_Request_Id,
+	result: Jsonrpc_Result,
+): Jsonrpc_Response => ({
+	jsonrpc: JSONRPC_VERSION,
+	id,
+	result,
+});
+
 export const create_jsonrpc_notification = (
 	method: Jsonrpc_Method,
 	params: Jsonrpc_Notification_Params | void,
@@ -47,11 +57,23 @@ export const create_jsonrpc_notification = (
 	return message;
 };
 
+export const create_jsonrpc_error = (
+	id: Jsonrpc_Request_Id,
+	error: Jsonrpc_Error_Message['error'],
+): Jsonrpc_Error_Message => ({
+	jsonrpc: JSONRPC_VERSION,
+	id,
+	error,
+});
+
 /**
  * Creates a JSON-RPC error response from any error.
  * Handles Jsonrpc_Error and regular Error objects.
  */
-export const create_jsonrpc_error = (id: Jsonrpc_Request_Id, error: any): Jsonrpc_Error_Message => {
+export const create_jsonrpc_error_from_thrown = (
+	id: Jsonrpc_Request_Id,
+	error: any,
+): Jsonrpc_Error_Message => {
 	let code: Jsonrpc_Error_Code = JSONRPC_ERROR_CODES.INTERNAL_ERROR;
 	let message = 'Internal server error';
 	let data = undefined;
