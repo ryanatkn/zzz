@@ -21,7 +21,7 @@ export class App extends Zzz_App {
 		if (!o.http_rpc_url) o.http_rpc_url = API_URL_FOR_HTTP_RPC;
 		if (!o.socket_url) o.socket_url = WEBSOCKET_URL;
 		if (!o.cell_classes) o.cell_classes = cell_classes;
-		if (!o.mutations) o.mutations = client_action_handlers;
+		if (!o.action_handlers) o.action_handlers = client_action_handlers;
 		super(o);
 	}
 }

@@ -7,7 +7,7 @@ import type {
 	Jsonrpc_Message_From_Server_To_Client,
 	Jsonrpc_Notification,
 	Jsonrpc_Request,
-	Jsonrpc_Singular_Response,
+	Jsonrpc_Response_Or_Error,
 } from '$lib/jsonrpc.js';
 import type {Socket} from '$lib/socket.svelte.js';
 import {Request_Tracker} from '$lib/request_tracker.svelte.js';
@@ -22,7 +22,7 @@ export type Transport_Type = z.infer<typeof Transport_Type>;
 export interface Transport {
 	type: Transport_Type;
 	/* eslint-disable @typescript-eslint/method-signature-style */
-	send(message: Jsonrpc_Request): Promise<Jsonrpc_Singular_Response>;
+	send(message: Jsonrpc_Request): Promise<Jsonrpc_Response_Or_Error>;
 	send(message: Jsonrpc_Notification): Promise<null>;
 	send(message: Jsonrpc_Batch_Request): Promise<Jsonrpc_Batch_Response>;
 	send(
@@ -176,7 +176,7 @@ export class Websocket_Rpc_Transport implements Transport {
 		};
 	}
 
-	async send(message: Jsonrpc_Request): Promise<Jsonrpc_Singular_Response>;
+	async send(message: Jsonrpc_Request): Promise<Jsonrpc_Response_Or_Error>;
 	async send(message: Jsonrpc_Notification): Promise<null>;
 	async send(message: Jsonrpc_Batch_Request): Promise<Jsonrpc_Batch_Response>;
 	async send(
@@ -236,7 +236,7 @@ export class Http_Rpc_Transport implements Transport {
 		this.#headers = headers ?? {'content-type': 'application/json', accept: 'application/json'};
 	}
 
-	async send(message: Jsonrpc_Request): Promise<Jsonrpc_Singular_Response>;
+	async send(message: Jsonrpc_Request): Promise<Jsonrpc_Response_Or_Error>;
 	async send(message: Jsonrpc_Notification): Promise<null>;
 	async send(message: Jsonrpc_Batch_Request): Promise<Jsonrpc_Batch_Response>;
 	async send(

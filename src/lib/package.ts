@@ -1311,7 +1311,6 @@ export const src_json = {
 		'./client_action_event.js': {
 			path: 'client_action_event.ts',
 			declarations: [
-				{name: 'Client_Action_Handler', kind: 'type'},
 				{name: 'After_Client_Action', kind: 'type'},
 				{name: 'After_Client_Action_Callback', kind: 'type'},
 				{name: 'Client_Action_Context', kind: 'class'},
@@ -1762,7 +1761,7 @@ export const src_json = {
 				{name: 'Jsonrpc_Error_Code', kind: 'variable'},
 				{name: 'Jsonrpc_Error_Message', kind: 'variable'},
 				{name: 'Jsonrpc_Batch_Request', kind: 'variable'},
-				{name: 'Jsonrpc_Singular_Response', kind: 'variable'},
+				{name: 'Jsonrpc_Response_Or_Error', kind: 'variable'},
 				{name: 'Jsonrpc_Batch_Response', kind: 'variable'},
 				{name: 'Jsonrpc_Message', kind: 'variable'},
 				{name: 'Jsonrpc_Message_From_Client_To_Server', kind: 'variable'},

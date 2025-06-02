@@ -3,7 +3,7 @@ import type {Client_Action_Context} from '$lib/client_action_event.js';
 
 /**
  * `Client_Action_Handler`s are synchronous functions that apply state changes to the client app
- * based on action requests or responses.
+ * based on action messages - requests, responses, notifications, and calls.
  */
 export type Client_Action_Handler<
 	T_App extends Zzz_App = Zzz_App,

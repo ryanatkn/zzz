@@ -62,7 +62,7 @@ export interface Zzz_Options extends Omit_Strict<Cell_Options<typeof Zzz_Json>, 
 	providers?: Array<Provider_Json>;
 	cell_classes?: Record<string, Class_Constructor<Cell>>;
 	action_specs?: Array<Action_Spec>;
-	mutations?: Client_Action_Handlers;
+	action_handlers?: Client_Action_Handlers;
 
 	/** URL for server communication */
 	http_rpc_url?: string | null;
@@ -85,7 +85,7 @@ export class Zzz_App extends Cell<typeof Zzz_Json> {
 	readonly cell_registry: Cell_Registry;
 
 	readonly action_registry: Action_Registry;
-	readonly mutations: Client_Action_Handlers &
+	readonly action_handlers: Client_Action_Handlers &
 		Partial<Record<Action_Message_Type, Client_Action_Handler<typeof this>>>;
 	readonly api: Actions_Api;
 	readonly api_client: Api_Client;
@@ -157,7 +157,7 @@ export class Zzz_App extends Cell<typeof Zzz_Json> {
 		this.cell_registry = new Cell_Registry(this);
 
 		this.action_registry = new Action_Registry(options.action_specs || action_specs);
-		this.mutations = options.mutations || {};
+		this.action_handlers = options.action_handlers || {};
 
 		// Register cell classes if provided, otherwise use the default
 		const cells_to_register = options.cell_classes || cell_classes;

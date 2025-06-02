@@ -14,7 +14,7 @@ import type {
 	Jsonrpc_Message_From_Server_To_Client,
 	Jsonrpc_Notification,
 	Jsonrpc_Request,
-	Jsonrpc_Singular_Response,
+	Jsonrpc_Response_Or_Error,
 } from '$lib/jsonrpc.js';
 
 // TODO support canceling
@@ -66,7 +66,7 @@ export class Api_Client {
 	async send(
 		message: Jsonrpc_Request,
 		transport_type?: Transport_Type,
-	): Promise<Jsonrpc_Singular_Response>;
+	): Promise<Jsonrpc_Response_Or_Error>;
 	async send(message: Jsonrpc_Notification, transport_type?: Transport_Type): Promise<null>;
 	async send(
 		message: Jsonrpc_Batch_Request,

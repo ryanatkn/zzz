@@ -1,11 +1,8 @@
 import {z} from 'zod';
 
-import {Any, Uuid} from '$lib/zod_helpers.js';
-import {Completion_Response, Completion_Request} from '$lib/completion_types.js';
-import {Action_Message_Type, Action_Method} from '$lib/action_metatypes.js';
-import {Diskfile_Change, Diskfile_Path, Serializable_Source_File} from '$lib/diskfile_types.js';
+import {Action_Method} from '$lib/action_metatypes.js';
 import {Cell_Json} from '$lib/cell_types.js';
-import {Jsonrpc_Request_Id} from '$lib/jsonrpc.js';
+import {Jsonrpc_Notification, Jsonrpc_Request, Jsonrpc_Response_Or_Error} from '$lib/jsonrpc.js';
 
 /**
  * Flag to indicate the phase of a request/response action.
@@ -13,7 +10,6 @@ import {Jsonrpc_Request_Id} from '$lib/jsonrpc.js';
  * - 'response': The server has responded to the action
  * - null: The action is not a request/response type (e.g., local_call, remote_notification)
  */
-// TODO BLOCK @api rethink this
 export const Action_Request_Response_Flag = z.union([
 	z.literal('request'),
 	z.literal('response'),
@@ -38,22 +34,41 @@ export type Action_Operation = z.infer<typeof Action_Operation>;
 export const Action_Auth = z.union([z.literal('public'), z.literal('authorize')]);
 export type Action_Auth = z.infer<typeof Action_Auth>;
 
+// TODO maybe this for better type safety
+// export const Action_Request_Response_Data = z.object({
+//  kind: z.literal('request_response'),
+// 	jsonrpc_request: Jsonrpc_Request,
+// 	jsonrpc_response: Jsonrpc_Response_Or_Error,
+// });
+// export type Action_Request_Response_Data = z.infer<typeof Action_Request_Response_Data>;
+
+// export const Action_Remote_Notification_Data = z.object({
+// 	kind: z.literal('remote_notification'),
+// 	jsonrpc_message: Jsonrpc_Request,
+// });
+// export type Action_Remote_Notification_Data = z.infer<typeof Action_Remote_Notification_Data>;
+
+// export const Action_Local_Call_Data = z.object({
+// 	kind: z.literal('local_call'),
+// 	params: Jsonrpc_Params, // TODO BLOCK or should this be a message, so have a local transport for executing?
+// });
+// export type Action_Local_Call_Data = z.infer<typeof Action_Local_Call_Data>;
+
+// export const Action_Data = z.union([
+// 	Action_Request_Response_Data,
+// 	Action_Remote_Notification_Data,
+// 	Action_Local_Call_Data,
+// ]);
+// export type Action_Data = z.infer<typeof Action_Data>;
+
 export const Action_Json = Cell_Json.extend({
-	type: Action_Message_Type,
 	method: Action_Method,
-	// TODO BLOCK @api this to be input/output right? with jsonrpc_messages saved?
-	params: Any.optional(),
-	kind: Action_Kind, // TODO BLOCK doesn't belong here, can be looked up from the method or type
-	jsonrpc_message_id: Jsonrpc_Request_Id.nullable(),
-	// TODO BLOCK this is hacky, maybe just a generic `params: Any`?
-	ping_id: Uuid.optional(),
-	completion_request: Completion_Request.optional(),
-	completion_response: Completion_Response.optional(),
-	path: Diskfile_Path.optional(),
-	content: z.string().optional(),
-	change: Diskfile_Change.optional(),
-	source_file: Serializable_Source_File.optional(),
-	data: z.record(z.string(), z.any()).optional(),
-}).strict();
+	kind: Action_Kind,
+	request_response_flag: Action_Request_Response_Flag,
+	// TODO BLOCK Action_Data probably
+	jsonrpc_request: Jsonrpc_Request.optional(),
+	jsonrpc_response: Jsonrpc_Response_Or_Error.optional(),
+	jsonrpc_notification: Jsonrpc_Notification.optional(),
+});
 export type Action_Json = z.infer<typeof Action_Json>;
 export type Action_Json_Input = z.input<typeof Action_Json>;

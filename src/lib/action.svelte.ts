@@ -3,39 +3,72 @@ import {z} from 'zod';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Uuid} from '$lib/zod_helpers.js';
 import {Completion_Response, Completion_Request} from '$lib/completion_types.js';
-import {Action_Message_Type, Action_Method} from '$lib/action_metatypes.js';
+import {Action_Method} from '$lib/action_metatypes.js';
 import {Diskfile_Change, Diskfile_Path, Serializable_Source_File} from '$lib/diskfile_types.js';
 import {to_completion_response_text} from '$lib/response_helpers.js';
 import {to_preview} from '$lib/helpers.js';
-import {Action_Json, Action_Kind} from '$lib/action_types.js';
-import type {Jsonrpc_Request_Id} from '$lib/jsonrpc.js';
+import {Action_Json, Action_Kind, Action_Request_Response_Flag} from '$lib/action_types.js';
+import {
+	Jsonrpc_Request,
+	Jsonrpc_Response,
+	Jsonrpc_Notification,
+	Jsonrpc_Error_Message,
+	type Jsonrpc_Request_Id,
+} from '$lib/jsonrpc.js';
 
-export interface Action_Options extends Cell_Options<typeof Action_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
+export interface Action_Options extends Cell_Options<typeof Action_Json> {}
 
-// TODO this class is a mess, probably refactor all of this to have generic immutable data
+/**
+ * Represents a single action in the system, tracking its full lifecycle.
+ * For request/response actions, a single Action tracks both the request and response.
+ * For notifications and local calls, it tracks just the single message.
+ */
 export class Action extends Cell<typeof Action_Json> {
-	type: Action_Message_Type = $state()!;
 	method: Action_Method = $state()!;
-	params: any = $state.raw(); // TODO BLOCK @api this should probably not exist and should instead rely on the full jsonrpc messages
-	// TODO BLOCK @api this needs to have the full jsonrpc message, and there's two for requests and responses (how to handle the notification one? separately?)
-	// maybe one typesafe object that covers all three kinds of actions?
-	jsonrpc_message_id: Jsonrpc_Request_Id = $state()!;
+	kind: Action_Kind = $state()!;
+	request_response_flag: Action_Request_Response_Flag = $state()!;
 
-	kind: Action_Kind = $state()!; // TODO maybe store the spec here for convenience, instead or or in addition to the kind?
+	// Store the full JSON-RPC messages
+	// data: Action_Data;
+	jsonrpc_request: Jsonrpc_Request | undefined = $state();
+	jsonrpc_response: Jsonrpc_Response | Jsonrpc_Error_Message | undefined = $state();
+	jsonrpc_notification: Jsonrpc_Notification | undefined = $state();
 
-	// Store data based on action type
-	data: Record<string, any> | undefined = $state.raw();
-	ping_id: Uuid | undefined = $state();
-	completion_request: Completion_Request | undefined = $state.raw();
-	completion_response: Completion_Response | undefined = $state.raw();
-	path: Diskfile_Path | undefined = $state();
-	content: string | undefined = $state();
-	change: Diskfile_Change | undefined = $state();
-	source_file: Serializable_Source_File | undefined = $state.raw();
+	// Computed properties for easy access
+	readonly jsonrpc_message_id: Jsonrpc_Request_Id | null = $derived(
+		this.jsonrpc_request?.id ?? null,
+	);
+
+	readonly has_response: boolean = $derived(!!this.jsonrpc_response);
+	readonly has_error: boolean = $derived(
+		!!this.jsonrpc_response && 'error' in this.jsonrpc_response,
+	);
+
+	readonly is_complete: boolean = $derived(this.kind !== 'request_response' || this.has_response);
+
+	// Extract params and result for convenience
+	readonly params: any = $derived.by(() => {
+		if (this.jsonrpc_request) return this.jsonrpc_request.params;
+		if (this.jsonrpc_notification) return this.jsonrpc_notification.params;
+		return undefined;
+	});
+
+	readonly result: any = $derived.by(() => {
+		if (this.jsonrpc_response && 'result' in this.jsonrpc_response) {
+			return this.jsonrpc_response.result;
+		}
+		return undefined;
+	});
+
+	readonly error: any = $derived.by(() => {
+		if (this.jsonrpc_response && 'error' in this.jsonrpc_response) {
+			return this.jsonrpc_response.error;
+		}
+		return undefined;
+	});
 
 	readonly display_name: string = $derived(`${this.method} (${this.kind})`);
 
-	// TODO hacky, refactor, probably removing these from this class, find a different way to get type safety
 	readonly is_ping: boolean = $derived(this.method === 'ping');
 	readonly is_prompt: boolean = $derived(this.method === 'submit_completion');
 	readonly is_session: boolean = $derived(this.method === 'load_session');
@@ -44,6 +77,63 @@ export class Action extends Cell<typeof Action_Json> {
 			this.method === 'delete_diskfile' ||
 			this.method === 'filer_change',
 	);
+
+	// TODO move all of this, shouldn't be here, just doing this as a hack to see stuff onscreen
+	readonly ping_id: Uuid | undefined = $derived.by(() => {
+		if (this.is_ping && this.result?.ping_id) {
+			return this.result.ping_id;
+		}
+		return undefined;
+	});
+
+	readonly completion_request: Completion_Request | undefined = $derived.by(() => {
+		if (this.is_prompt && this.params?.completion_request) {
+			return this.params.completion_request;
+		}
+		return undefined;
+	});
+
+	readonly completion_response: Completion_Response | undefined = $derived.by(() => {
+		if (this.is_prompt && this.result?.completion_response) {
+			return this.result.completion_response;
+		}
+		return undefined;
+	});
+
+	readonly path: Diskfile_Path | undefined = $derived.by(() => {
+		if (this.is_file_related && this.params?.path) {
+			return this.params.path;
+		}
+		return undefined;
+	});
+
+	readonly content: string | undefined = $derived.by(() => {
+		if (this.method === 'update_diskfile' && this.params?.content) {
+			return this.params.content;
+		}
+		return undefined;
+	});
+
+	readonly change: Diskfile_Change | undefined = $derived.by(() => {
+		if (this.method === 'filer_change' && this.params?.change) {
+			return this.params.change;
+		}
+		return undefined;
+	});
+
+	readonly source_file: Serializable_Source_File | undefined = $derived.by(() => {
+		if (this.method === 'filer_change' && this.params?.source_file) {
+			return this.params.source_file;
+		}
+		return undefined;
+	});
+
+	readonly data: Record<string, any> | undefined = $derived.by(() => {
+		if (this.is_session && this.result?.data) {
+			return this.result.data;
+		}
+		return undefined;
+	});
 
 	readonly prompt_data: Completion_Request | null = $derived(
 		this.is_prompt && this.completion_request ? this.completion_request : null,

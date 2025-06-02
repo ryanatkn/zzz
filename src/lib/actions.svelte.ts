@@ -2,7 +2,7 @@ import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Action, Action_Schema} from '$lib/action.svelte.js';
-import {Action_Json} from '$lib/action_types.js';
+import {Action_Json, type Action_Json_Input} from '$lib/action_types.js';
 import {create_action_json} from '$lib/action_helpers.js';
 import {Action_Method} from '$lib/action_metatypes.js';
 import type {Action_Message_Union} from '$lib/action_collections.js';
@@ -94,7 +94,7 @@ export class Actions extends Cell<typeof Actions_Json> {
 	/**
 	 * Add an action to the collection.
 	 */
-	add_json(action_json: Action_Json): Action {
+	add_json(action_json: Action_Json_Input): Action {
 		const action = new Action({app: this.app, json: action_json});
 		this.items.add(action);
 

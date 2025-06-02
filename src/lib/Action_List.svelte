@@ -1,4 +1,6 @@
 <script lang="ts">
+	// @slop
+
 	import type {SvelteHTMLElements} from 'svelte/elements';
 	import {slide} from 'svelte/transition';
 
@@ -46,6 +48,7 @@
 				type="button"
 				class="w_100 text_align_left justify_content_start py_xs px_md border_radius_0 border_style_none box_shadow_none"
 				class:selected
+				class:color_c={action.has_error}
 				onclick={() => {
 					onselect?.(action);
 				}}
@@ -55,17 +58,54 @@
 					<Glyph glyph={get_glyph_for_action_method(action.method)} />
 					<Glyph glyph={get_glyph_for_action_kind(action.kind)} />
 					<span class="font_family_mono flex_1">{action.method}</span>
+					{#if action.kind === 'request_response' && !action.is_complete}
+						<small class="color_text_subtle">...</small>
+					{/if}
+					{#if action.has_error}
+						<small class="color_c">!</small>
+					{/if}
 					<small class="font_family_mono ml_auto">{action.created_formatted_time}</small>
 				</div>
 
-				{#if selected && action.data}
+				{#if selected}
 					<div class="mt_xs">
 						{#if action.is_prompt}
 							<small class="mb_xs2 display_block">Prompt:</small>
 							<pre
 								class="font_family_mono font_size_xs white_space_pre_wrap word_break_break_word m_0 p_xs2">{action.prompt_preview}</pre>
-							<pre
-								class="font_family_mono font_size_xs white_space_pre_wrap word_break_break_word m_0 p_xs2">{action.completion_preview}</pre>
+							{#if action.has_response}
+								<small class="mb_xs2 mt_xs display_block">Response:</small>
+								{#if action.has_error}
+									<div class="font_size_xs color_c p_xs2">
+										Error: {action.error.message}
+									</div>
+								{:else}
+									<pre
+										class="font_family_mono font_size_xs white_space_pre_wrap word_break_break_word m_0 p_xs2">{action.completion_preview}</pre>
+								{/if}
+							{/if}
+						{:else if action.is_file_related && action.path}
+							<small class="font_family_mono font_size_xs">{action.path}</small>
+						{:else if action.is_session}
+							{#if action.has_response}
+								{#if action.has_error}
+									<small class="color_c">Failed to load session</small>
+								{:else if action.data?.files}
+									<small>{action.data.files.length} files loaded</small>
+								{/if}
+							{:else}
+								<small class="color_text_subtle">Loading...</small>
+							{/if}
+						{:else if action.is_ping}
+							{#if action.has_response}
+								{#if action.has_error}
+									<small class="color_c">Ping failed</small>
+								{:else}
+									<small>Pong! {action.ping_id?.slice(0, 8)}...</small>
+								{/if}
+							{:else}
+								<small class="color_text_subtle">Pinging...</small>
+							{/if}
 						{/if}
 					</div>
 				{/if}

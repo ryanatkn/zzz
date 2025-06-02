@@ -7,8 +7,7 @@ import {Client_Action_Context} from '$lib/client_action_event.js';
 import {create_jsonrpc_request} from '$lib/jsonrpc_helpers.js';
 import {create_uuid} from '$lib/zod_helpers.js';
 import {to_action_message, to_action_message_type} from '$lib/action_helpers.js';
-import type {Action_Message_Union} from '$lib/action_collections.js';
-import type {Jsonrpc_Notification, Jsonrpc_Request} from '$lib/jsonrpc.js';
+import type {Jsonrpc_Singular_Message} from '$lib/jsonrpc.js';
 import type {Action_Request_Response_Flag} from '$lib/action_types.js';
 
 const log = new Logger();
@@ -32,9 +31,8 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 			const handle_message = (
 				result: any | null, // TODO @api type
 				request_response_flag: Action_Request_Response_Flag,
-				action_message: Action_Message_Union,
-				jsonrpc_message: Jsonrpc_Request | Jsonrpc_Notification | null,
-			) => {
+				jsonrpc_message: Jsonrpc_Singular_Message | null,
+			): unknown => {
 				console.log('\n\n\n\n\n\n\n\n[actions_api] mutate', method, result, request_response_flag);
 				const event = new Client_Action_Context(
 					app,
@@ -42,13 +40,15 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 					params,
 					result,
 					request_response_flag,
-					action_message,
 					jsonrpc_message,
 				);
-				console.log(`[actions_api] message_type`, event.action_message.type);
 				console.log(`[actions_api] event`, event);
 
-				const handler = app.mutations[event.action_message.type];
+				// TODO BLOCK @api remove this for method-and-phase-organized handlers
+				const action_message_type = to_action_message_type(method, request_response_flag);
+				console.log(`[actions_api] message_type`, action_message_type);
+
+				const handler = app.action_handlers[action_message_type];
 				if (!handler) {
 					log.warn(`missing mutation for action '${method}'`);
 				}
@@ -62,7 +62,7 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 
 			const request_jsonrpc_message = create_jsonrpc_request(method, params, create_uuid());
 
-			// TODO BLOCK @api action messages should be removed, instead tracked inside an action
+			// TODO BLOCK @api @many action messages should be removed, instead tracked inside an action
 			const request_action_message_type = to_action_message_type(
 				method,
 				spec.kind === 'request_response' ? 'request' : null,
@@ -78,7 +78,7 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 			// `request_response` actions have special handling,
 			// each such method has a `_request` and `_response` type variant.
 			if (spec.kind === 'request_response') {
-				handle_message(null, 'request', request_action_message, request_jsonrpc_message);
+				handle_message(null, 'request', request_jsonrpc_message);
 
 				// Avoiding `await` for compatibility with sync actions
 				return app.api_client.send(request_jsonrpc_message).then((response) => {
@@ -93,6 +93,7 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 					}
 
 					const response_jsonrpc_message = response;
+					// TODO BLOCK @api @many action messages should be removed, instead tracked inside an action
 					const response_action_message_type = to_action_message_type(method, 'response');
 					console.log(`[actions_api] response_action_message_type`, response_action_message_type);
 					console.log(
@@ -109,7 +110,7 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 					app.actions.add_message(response_action_message);
 
 					const result = response_jsonrpc_message.result;
-					handle_message(result, 'response', response_action_message, response_jsonrpc_message);
+					handle_message(result, 'response', response_jsonrpc_message);
 
 					// Return the result value directly
 					return result;
@@ -118,7 +119,7 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 
 			// TODO BLOCK @api this needs to have action tracking, bc it applies to all actions not just request_response
 			// Handle non-`request_response` actions synchronously
-			return handle_message(null, null, request_action_message, request_jsonrpc_message);
+			return handle_message(null, null, request_jsonrpc_message);
 		},
 	});
 

@@ -204,13 +204,13 @@ export type Jsonrpc_Batch_Request = z.infer<typeof Jsonrpc_Batch_Request>;
 /**
  * A JSON-RPC batch response, as described in https://www.jsonrpc.org/specification#batch.
  */
-export const Jsonrpc_Singular_Response = z.union([Jsonrpc_Response, Jsonrpc_Error_Message]);
-export type Jsonrpc_Singular_Response = z.infer<typeof Jsonrpc_Singular_Response>;
+export const Jsonrpc_Response_Or_Error = z.union([Jsonrpc_Response, Jsonrpc_Error_Message]);
+export type Jsonrpc_Response_Or_Error = z.infer<typeof Jsonrpc_Response_Or_Error>;
 
 /**
  * A JSON-RPC batch response, as described in https://www.jsonrpc.org/specification#batch.
  */
-export const Jsonrpc_Batch_Response = z.array(Jsonrpc_Singular_Response);
+export const Jsonrpc_Batch_Response = z.array(Jsonrpc_Response_Or_Error);
 export type Jsonrpc_Batch_Response = z.infer<typeof Jsonrpc_Batch_Response>;
 
 /**
