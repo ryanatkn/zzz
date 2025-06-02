@@ -58,11 +58,9 @@ export const handle_jsonrpc_request = async (
 
 	try {
 		// First attempt to validate as a request
-		const parse_result = Jsonrpc_Request.safeParse(message);
-		console.log(`parse_result`, parse_result);
-
-		if (parse_result.success) {
-			const request = parse_result.data;
+		const parsed_request = Jsonrpc_Request.safeParse(message);
+		if (parsed_request.success) {
+			const request = parsed_request.data;
 			try {
 				return await onrequest(request);
 			} catch (error) {
@@ -72,9 +70,9 @@ export const handle_jsonrpc_request = async (
 		}
 
 		// If it's not a valid request, check if it's a notification
-		const notificatiop_parse = Jsonrpc_Notification.safeParse(message);
-		if (notificatiop_parse.success) {
-			const notification = notificatiop_parse.data;
+		const parsed_notification = Jsonrpc_Notification.safeParse(message);
+		if (parsed_notification.success) {
+			const notification = parsed_notification.data;
 			try {
 				await onnotification(notification);
 			} catch (error) {
@@ -87,7 +85,7 @@ export const handle_jsonrpc_request = async (
 		// If neither a valid request nor notification, it's an invalid request
 		if (id == null) {
 			// For notifications we can't return an error
-			log?.error('JSON-RPC invalid request:', parse_result.error);
+			log?.error('JSON-RPC invalid request:', parsed_request.error);
 			return null;
 		}
 		return create_jsonrpc_error(id, {

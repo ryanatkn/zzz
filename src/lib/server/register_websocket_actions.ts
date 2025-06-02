@@ -45,21 +45,23 @@ export const register_websocket_actions = ({
 				console.log('[ws] ws opened', event);
 			},
 			onMessage: async (event, ws) => {
-				let data;
+				let json;
 				try {
-					data = JSON.parse(String(event.data)); // eslint-disable-line @typescript-eslint/no-base-to-string
+					json = JSON.parse(String(event.data)); // eslint-disable-line @typescript-eslint/no-base-to-string
 				} catch (error) {
-					console.error(`[ws] received non-json message`, event.data, error);
+					console.error(`[ws] received non-json message`, error);
 					return;
 				}
 
-				console.log(`[ws] handling message`, data);
-
-				const response = await server.handle_jsonrpc_message(data);
-
-				// Only send a response if it's not a notification (which doesn't expect a response)
-				if (response != null) {
-					ws.send(JSON.stringify(response));
+				try {
+					const response = await server.handle_jsonrpc_message(json);
+					// No responses for notifications
+					if (response != null) {
+						ws.send(JSON.stringify(response));
+					}
+				} catch (error) {
+					console.error(`[ws] error handling jsonrpc message`, error);
+					return;
 				}
 			},
 			onClose: (event, ws) => {

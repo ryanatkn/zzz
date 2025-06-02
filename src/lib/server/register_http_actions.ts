@@ -20,7 +20,6 @@ export const register_http_actions = ({path, app, server}: Register_Actions_Opti
 	// TODO BLOCK @api handle `GET`
 
 	app.post(final_path, async (c) => {
-		console.log(`[http] POST ${c.req.url}`);
 		try {
 			const json = await c.req.json();
 			const response = await server.handle_jsonrpc_message(json);
