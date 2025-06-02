@@ -1,3 +1,5 @@
+// @slop
+
 import {SvelteMap} from 'svelte/reactivity';
 import type {z} from 'zod';
 import {DEV} from 'esm-env';
