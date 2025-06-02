@@ -38,7 +38,7 @@ const init_server = (): void => {
 		zzz_dir: ZZZ_DIR,
 		config,
 		action_specs,
-		send_to_all_clients: (message) => {
+		broadcast_jsonrpc_message: (message) => {
 			if (!sockets) return; // TODO warn?
 
 			// Send messages to all connected websocket clients
@@ -54,7 +54,7 @@ const init_server = (): void => {
 
 	// TODO options for everything, maybe a nullable array and an enable/disable flag
 	// Register websocket handlers and store the sockets collection
-	let sockets: Set<WSContext> | undefined;
+	let sockets: Set<WSContext> | undefined; // TODO proper API
 	if (WEBSOCKET_PATH) {
 		sockets = register_websocket_actions({
 			path: WEBSOCKET_PATH,

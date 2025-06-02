@@ -1,20 +1,8 @@
 import {z} from 'zod';
 
-import {stringify_zod_error, Type_Literal} from '$lib/zod_helpers.js';
+import {Type_Literal} from '$lib/zod_helpers.js';
 import {Action_Method} from '$lib/action_metatypes.js';
 import {Action_Auth, Action_Initiator, Action_Kind, Action_Operation} from '$lib/action_types.js';
-
-/**
- * Creates an action spec, filling in defaults and validating the input.
- * These are a base source of truth for actions and other interfaces throughout the app.
- */
-export const create_action_spec = (spec: z.input<typeof Action_Spec>): Action_Spec => {
-	const parsed = Action_Spec.safeParse(spec);
-	if (!parsed.success) {
-		throw new Error('Invalid action spec: ' + stringify_zod_error(parsed.error));
-	}
-	return parsed.data;
-};
 
 export const Action_Spec_Base = z.object({
 	method: Action_Method,

@@ -5,14 +5,24 @@ import type {createNodeWebSocket} from '@hono/node-ws';
 import type {Zzz_Server} from '$lib/server/zzz_server.js';
 import {verify_origin, type Allowed_Origins} from '$lib/server/security.js';
 import {SERVER_URL} from '$lib/constants.js';
+import {noop_middleware} from './server_helpers.js';
 
 export interface Register_Websocket_Actions_Options {
 	path: string;
 	app: Hono;
 	server: Zzz_Server;
+	/**
+	 * @see https://hono.dev/helpers/websocket
+	 */
 	upgradeWebSocket: ReturnType<typeof createNodeWebSocket>['upgradeWebSocket'];
 	sockets?: Set<WSContext>;
-	allowed_origins?: Allowed_Origins;
+	/**
+	 * For extra security we verify the origin here as well as upstream.
+	 * This allows the upstream config to change for other purposes
+	 * without affecting the WebSocket endpoint.
+	 * The overhead is negligible since it's a one-time check before the upgrade.
+	 */
+	allowed_origins?: Allowed_Origins | null;
 }
 
 /**
@@ -28,10 +38,7 @@ export const register_websocket_actions = ({
 }: Register_Websocket_Actions_Options): Set<WSContext> => {
 	app.get(
 		path,
-		verify_origin(allowed_origins),
-		/**
-		 * @see https://hono.dev/helpers/websocket
-		 */
+		allowed_origins ? verify_origin(allowed_origins) : noop_middleware, // TODO better pattern?
 		upgradeWebSocket(() => ({
 			onOpen: (event, ws) => {
 				sockets.add(ws);

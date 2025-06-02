@@ -26,13 +26,16 @@ export const verify_origin =
 
 /**
  * Compares `origin` against `allowed_origins` by exact match.
+ * Unexpected types return `false`.
  */
 export const should_allow_origin = (
 	origin: string | null | undefined,
 	// TODO needs better config, maybe matchers, maybe accept an iterator of strings/regexps/callbacks
 	allowed_origins: Allowed_Origins,
 ): boolean => {
-	if (!origin) return false;
+	if (!origin || !allowed_origins) {
+		return false;
+	}
 	if (typeof allowed_origins === 'string') {
 		return origin === allowed_origins;
 	} else if ('has' in allowed_origins) {

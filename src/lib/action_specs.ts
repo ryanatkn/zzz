@@ -1,6 +1,5 @@
 import {z} from 'zod';
 
-import {create_action_spec} from '$lib/action_spec.js';
 import {
 	Diskfile_Change,
 	Diskfile_Path,
@@ -9,18 +8,26 @@ import {
 } from '$lib/diskfile_types.js';
 import {Type_Literal, Uuid} from '$lib/zod_helpers.js';
 import {Completion_Request, Completion_Response} from '$lib/completion_types.js';
+import type {Action_Spec} from '$lib/action_spec.js';
 
 // Action specs are the source of truth for many things including generated code -
 // the goal is to make the system extensible for users but it's not there yet.
 
-// TODO BLOCK @api need to rethink the design to fix numerous issues while preserving the desired properties
-// - must support JSON-RPC and MCP (which has some opinions/restrictions on top of JSON-RPC)
-// - functions can be wrapped on the client and remain synchronous or be async, but on the server handlers are always async.
-// 		maybe this restriction isn't desired though? and sync should be allowed?
-// - the client and server can both send notifications as well as request/response messages,
-// 		so the server can query the client as needed, but the client can always deny requests
+// TODO these were using the helper `create_action_spec` but I don't see how to get proper typing,
+// we want the declared specs to have their literal types but not need to include optional properties -
+// the current implementation below requires all properties to be declared, but does have correct typing:
+//
+// export const create_action_spec = <T extends z.input<U>, U extends typeof Action_Spec>(
+// 	spec: T,
+// ): z.infer<U> => {
+// 	const parsed = Action_Spec.safeParse(spec);
+// 	if (!parsed.success) {
+// 		throw new Error('Invalid action spec: ' + stringify_zod_error(parsed.error));
+// 	}
+// 	return parsed.data;
+// };
 
-export const ping_action_spec = create_action_spec({
+export const ping_action_spec = {
 	method: 'ping',
 	kind: 'request_response',
 	initiator: 'both',
@@ -32,9 +39,10 @@ export const ping_action_spec = create_action_spec({
 			ping_id: Uuid,
 		})
 		.strict(),
-});
+	async: true,
+} satisfies Action_Spec;
 
-export const load_session_action_spec = create_action_spec({
+export const load_session_action_spec = {
 	method: 'load_session',
 	kind: 'request_response',
 	// TODO @api is this actually a good restriction to have?
@@ -55,9 +63,10 @@ export const load_session_action_spec = create_action_spec({
 				.strict(),
 		})
 		.strict(),
-});
+	async: true,
+} satisfies Action_Spec;
 
-export const filer_change_action_spec = create_action_spec({
+export const filer_change_action_spec = {
 	method: 'filer_change',
 	kind: 'remote_notification',
 	initiator: 'server',
@@ -70,9 +79,10 @@ export const filer_change_action_spec = create_action_spec({
 		})
 		.strict(),
 	output: null,
-});
+	async: false,
+} satisfies Action_Spec;
 
-export const update_diskfile_action_spec = create_action_spec({
+export const update_diskfile_action_spec = {
 	method: 'update_diskfile',
 	kind: 'request_response',
 	initiator: 'client',
@@ -84,9 +94,11 @@ export const update_diskfile_action_spec = create_action_spec({
 			content: z.string(),
 		})
 		.strict(),
-});
+	output: null,
+	async: true,
+} satisfies Action_Spec;
 
-export const delete_diskfile_action_spec = create_action_spec({
+export const delete_diskfile_action_spec = {
 	method: 'delete_diskfile',
 	kind: 'request_response',
 	initiator: 'client',
@@ -97,9 +109,11 @@ export const delete_diskfile_action_spec = create_action_spec({
 			path: Diskfile_Path,
 		})
 		.strict(),
-});
+	output: null,
+	async: true,
+} satisfies Action_Spec;
 
-export const create_directory_action_spec = create_action_spec({
+export const create_directory_action_spec = {
 	method: 'create_directory',
 	kind: 'request_response',
 	initiator: 'client',
@@ -110,9 +124,11 @@ export const create_directory_action_spec = create_action_spec({
 			path: Diskfile_Path,
 		})
 		.strict(),
-});
+	output: null,
+	async: true,
+} satisfies Action_Spec;
 
-export const submit_completion_action_spec = create_action_spec({
+export const submit_completion_action_spec = {
 	method: 'submit_completion',
 	kind: 'request_response',
 	initiator: 'client',
@@ -128,9 +144,10 @@ export const submit_completion_action_spec = create_action_spec({
 			completion_response: Completion_Response,
 		})
 		.strict(),
-});
+	async: true,
+} satisfies Action_Spec;
 
-export const toggle_main_menu_action_spec = create_action_spec({
+export const toggle_main_menu_action_spec = {
 	method: 'toggle_main_menu',
 	kind: 'local_call',
 	initiator: 'client',
@@ -139,4 +156,5 @@ export const toggle_main_menu_action_spec = create_action_spec({
 	input: z.union([z.boolean(), z.void()]).optional(),
 	output: null,
 	returns: Type_Literal.parse('boolean'),
-});
+	async: false,
+} satisfies Action_Spec;

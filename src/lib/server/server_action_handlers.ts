@@ -14,7 +14,6 @@ import {DEV} from 'esm-env';
 import type {Source_File} from '@ryanatkn/gro/filer.js';
 
 import {Action_Messages} from '$lib/action_messages.js';
-import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
 import {Diskfile_Path, Serializable_Source_File} from '$lib/diskfile_types.js';
 import {map_watcher_change_to_diskfile_change} from '$lib/diskfile_helpers.js';
 import {
@@ -30,6 +29,8 @@ import type {Action_Message_Params} from '$lib/action_metatypes.js';
 import {to_action_message} from '$lib/action_helpers.js';
 import {jsonrpc_errors} from '$lib/jsonrpc_errors.js';
 import type {Server_Action_Handlers} from '$lib/server/server_action_metatypes.js';
+import {create_jsonrpc_notification} from '$lib/jsonrpc_helpers.js';
+import {filer_change_action_spec} from '$lib/action_specs.js';
 
 // TODO refactor to a plugin architecture
 
@@ -294,17 +295,15 @@ export const handle_filer_change: Filer_Change_Handler = (
 
 	console.log(`change, source_file.id`, change, source_file.id);
 
-	server.send_action_message({
-		id: create_uuid(), // TODO BLOCK @api if this is a notification, we don't need an id, but for messages we are?
-		created: get_datetime_now(),
-		type: 'filer_change', // TODO BLOCK @api hacky
-		method: 'filer_change',
-		jsonrpc_message_id: null,
-		params: {
-			change: api_change,
-			source_file: serializable_source_file,
-		},
+	// TODO @api improve this for better type safety, maybe `jsonrpc_messages.filer_change({change: ...})`?
+	const params = filer_change_action_spec.input.parse({
+		change: api_change,
+		source_file: serializable_source_file,
 	});
+	const message = create_jsonrpc_notification('filer_change', params);
+
+	// TODO @many hacky, currently just broadcasting when most cases should have a specified audience
+	server.broadcast_jsonrpc_message(message);
 };
 
 // TODO @db refactor

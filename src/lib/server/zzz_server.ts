@@ -6,11 +6,7 @@ import {DEV} from 'esm-env';
 import {ensure_end} from '@ryanatkn/belt/string.js';
 
 import type {Action_Spec} from '$lib/action_spec.js';
-import {
-	Action_Message_From_Client,
-	action_spec_by_method,
-	type Action_Message_From_Server,
-} from '$lib/action_collections.js';
+import {Action_Message_From_Client, action_spec_by_method} from '$lib/action_collections.js';
 import type {Zzz_Config} from '$lib/config_helpers.js';
 import {Zzz_Dir} from '$lib/diskfile_types.js';
 import {Safe_Fs} from '$lib/server/safe_fs.js';
@@ -28,6 +24,7 @@ import {
 	type Jsonrpc_Notification,
 	JSONRPC_VERSION,
 	Jsonrpc_Result,
+	Jsonrpc_Message,
 } from '$lib/jsonrpc.js';
 import {handle_jsonrpc_request} from '$lib/server/jsonrpc_server_helpers.js';
 import {create_jsonrpc_error} from '$lib/jsonrpc_helpers.js';
@@ -87,7 +84,7 @@ export interface Zzz_Server_Options {
 	/**
 	 * Send a message to all connected websocket clients.
 	 */
-	send_to_all_clients: (message: Action_Message_From_Server) => void;
+	broadcast_jsonrpc_message: (message: Jsonrpc_Message) => void;
 	/**
 	 * Handler function for processing client messages.
 	 */
@@ -116,7 +113,7 @@ export class Zzz_Server {
 
 	readonly config: Zzz_Config;
 
-	readonly #send_to_all_clients: (message: Action_Message_From_Server) => void;
+	readonly #broadcast_jsonrpc_message: (message: Jsonrpc_Message) => void;
 	readonly #server_action_handlers: Server_Action_Handlers;
 	readonly #handle_filer_change: Filer_Change_Handler;
 
@@ -150,7 +147,7 @@ export class Zzz_Server {
 
 		this.config = options.config;
 		this.action_registry = new Action_Registry(options.action_specs);
-		this.#send_to_all_clients = options.send_to_all_clients;
+		this.#broadcast_jsonrpc_message = options.broadcast_jsonrpc_message;
 		this.#server_action_handlers = options.server_action_handlers;
 		this.#handle_filer_change = options.handle_filer_change;
 
@@ -212,10 +209,10 @@ export class Zzz_Server {
 		});
 	}
 
-	// TODO hacky, currently just broadcasting
-	send_action_message(action_message: Action_Message_From_Server): void {
+	// TODO @many hacky, currently just broadcasting when most cases should have a specified audience
+	broadcast_jsonrpc_message(message: Jsonrpc_Message): void {
 		this.#check_destroyed();
-		this.#send_to_all_clients(action_message);
+		this.#broadcast_jsonrpc_message(message);
 	}
 
 	// TODO consider extracting a helper
