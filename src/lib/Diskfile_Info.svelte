@@ -4,7 +4,7 @@
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import {GLYPH_FILE} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 	import type {Diskfile_Editor_State} from '$lib/diskfile_editor_state.svelte.js';
 	import Diskfile_Metrics from '$lib/Diskfile_Metrics.svelte';
 	import {has_dependencies} from '$lib/diskfile_helpers.js';

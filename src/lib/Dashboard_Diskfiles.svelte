@@ -1,7 +1,7 @@
 <script lang="ts">
 	import {swallow, is_editable} from '@ryanatkn/belt/dom.js';
 
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 	import Diskfile_Explorer from '$lib/Diskfile_Explorer.svelte';
 	import Diskfile_Editor_View from '$lib/Diskfile_Editor_View.svelte';
 	import Diskfile_Tab_Listitem from '$lib/Diskfile_Tab_Listitem.svelte';

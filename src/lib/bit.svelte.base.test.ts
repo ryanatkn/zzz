@@ -7,7 +7,7 @@ import {test, expect, describe, beforeEach} from 'vitest';
 import {Bit, Text_Bit, Diskfile_Bit, Sequence_Bit} from '$lib/bit.svelte.js';
 import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
 import {Diskfile_Path, Serializable_Source_File} from '$lib/diskfile_types.js';
-import {Zzz_App} from '$lib/zzz.svelte.js';
+import {Zzz_App} from '$lib/zzz_app.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 import {estimate_token_count} from '$lib/helpers.js';
 

@@ -5,7 +5,7 @@
 	import {slide} from 'svelte/transition';
 
 	import Glyph from '$lib/Glyph.svelte';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 	import type {Action} from '$lib/action.svelte.js';
 	import {get_glyph_for_action_method, get_glyph_for_action_kind} from '$lib/glyphs.js';
 	import Sortable_List from '$lib/Sortable_List.svelte';

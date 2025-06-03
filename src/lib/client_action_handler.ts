@@ -1,4 +1,4 @@
-import type {Zzz_App} from '$lib/zzz.svelte.js';
+import type {Zzz_App} from '$lib/zzz_app.svelte.js';
 import type {Client_Action_Context} from '$lib/client_action_event.js';
 
 /**

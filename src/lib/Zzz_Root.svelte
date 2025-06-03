@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type {Snippet} from 'svelte';
 
-	import {Zzz_App, zzz_context} from '$lib/zzz.svelte.js';
+	import {Zzz_App, zzz_context} from '$lib/zzz_app.svelte.js';
 	import Dashboard from '$lib/Dashboard.svelte';
 	import Main_Dialog from '$lib/Main_Dialog.svelte';
 

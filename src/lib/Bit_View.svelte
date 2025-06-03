@@ -10,7 +10,7 @@
 	import Bit_Editor_For_Sequence from '$lib/Bit_Editor_For_Sequence.svelte';
 	import Bit_Toggle_Button from '$lib/Bit_Toggle_Button.svelte';
 	import Bit_Remove_Button from '$lib/Bit_Remove_Button.svelte';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 
 	interface Props {
 		bit: Bit_Type;

@@ -3,7 +3,7 @@
 import {estimate_token_count} from '$lib/helpers.js';
 import type {Diskfile} from '$lib/diskfile.svelte.js';
 import type {Diskfile_Path} from '$lib/diskfile_types.js';
-import type {Zzz_App} from '$lib/zzz.svelte.js';
+import type {Zzz_App} from '$lib/zzz_app.svelte.js';
 import type {Diskfile_History, History_Entry} from '$lib/diskfile_history.svelte.js';
 import type {Uuid} from '$lib/zod_helpers.js';
 

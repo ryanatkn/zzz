@@ -5,7 +5,7 @@
 	import {base} from '$app/paths';
 	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
 
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 
 	interface Props {
 		disabled?: boolean | undefined;

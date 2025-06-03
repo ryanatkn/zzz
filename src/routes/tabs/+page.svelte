@@ -11,7 +11,7 @@
 	import {Browser} from '$routes/tabs/browser.svelte.js';
 	import {sample_tabs} from '$routes/tabs/sample_tabs.js';
 	import Browser_View from '$routes/tabs/Browser_View.svelte';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 	import External_Link from '$lib/External_Link.svelte';
 
 	const app = zzz_context.get();

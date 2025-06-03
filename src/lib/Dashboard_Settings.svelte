@@ -2,7 +2,7 @@
 	import {GLYPH_SETTINGS} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
 	import Settings from '$lib/Settings.svelte';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 
 	import Footer from '$lib/Footer.svelte';
 

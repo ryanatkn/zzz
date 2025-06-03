@@ -92,7 +92,7 @@ export const gen: Gen = ({origin_path}) => {
 
 		import type {Client_Action_Handler} from '$lib/client_action_handler.js';
 		import type {${schema_imports.join(', ')}} from '$lib/action_specs.js';
-		import type {Zzz_App} from '$lib/zzz.svelte.js';
+		import type {Zzz_App} from '$lib/zzz_app.svelte.js';
 
 		/**
 		 * All action method names. Request/response actions have two types per method.

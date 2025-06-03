@@ -5,7 +5,7 @@
 	import Chat_View from '$lib/Chat_View.svelte';
 	import Contextmenu_Chat from '$lib/Contextmenu_Chat.svelte';
 	import {GLYPH_ADD, GLYPH_SORT} from '$lib/glyphs.js';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
 	import Contextmenu_Chats from '$lib/Contextmenu_Chats.svelte';
 

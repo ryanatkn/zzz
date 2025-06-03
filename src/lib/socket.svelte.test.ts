@@ -6,7 +6,7 @@ import {beforeEach, describe, test, expect, vi, afterEach} from 'vitest';
 
 import {Socket} from '$lib/socket.svelte.js';
 import {DEFAULT_CLOSE_CODE} from '$lib/socket_helpers.js';
-import {Zzz_App} from '$lib/zzz.svelte.js';
+import {Zzz_App} from '$lib/zzz_app.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Mock WebSocket implementation for testing

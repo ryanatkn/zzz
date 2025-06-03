@@ -7,7 +7,7 @@
 
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import {GLYPH_DELETE, GLYPH_FILE} from '$lib/glyphs.js';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 	import Contextmenu_Entry_Copy_To_Clipboard from '$lib/Contextmenu_Entry_Copy_To_Clipboard.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 

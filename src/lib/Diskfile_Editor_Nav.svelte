@@ -1,7 +1,7 @@
 <script lang="ts">
 	import {GLYPH_ARROW_LEFT, GLYPH_ARROW_RIGHT, GLYPH_REFRESH} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 	import type {Diskfile_Editor_State} from '$lib/diskfile_editor_state.svelte.js';
 	import type {Uuid} from '$lib/zod_helpers.js';
 

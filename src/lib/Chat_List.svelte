@@ -2,7 +2,7 @@
 	import {slide} from 'svelte/transition';
 
 	import Chat_Listitem from '$lib/Chat_Listitem.svelte';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 	import {sort_by_text, sort_by_numeric} from '$lib/sortable.svelte.js';
 	import type {Chat} from '$lib/chat.svelte.js';
 	import Sortable_List from '$lib/Sortable_List.svelte';

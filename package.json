@@ -1059,10 +1059,6 @@
       "types": "./dist/Zzz_Root.svelte.d.ts",
       "svelte": "./dist/Zzz_Root.svelte",
       "default": "./dist/Zzz_Root.svelte"
-    },
-    "./zzz.svelte.js": {
-      "types": "./dist/zzz.svelte.d.ts",
-      "default": "./dist/zzz.svelte.js"
     }
   }
 }

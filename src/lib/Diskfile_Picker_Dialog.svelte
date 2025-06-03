@@ -4,7 +4,7 @@
 	import Dialog from '@ryanatkn/fuz/Dialog.svelte';
 
 	import Picker_Dialog from '$lib/Picker_Dialog.svelte';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import type {Uuid} from '$lib/zod_helpers.js';
 	import {sort_by_text, sort_by_numeric} from '$lib/sortable.svelte.js';

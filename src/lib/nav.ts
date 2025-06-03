@@ -13,7 +13,7 @@ import {
 	GLYPH_PROVIDER,
 	GLYPH_SETTINGS,
 } from '$lib/glyphs.js';
-import type {Zzz_App} from '$lib/zzz.svelte.js';
+import type {Zzz_App} from '$lib/zzz_app.svelte.js';
 
 export interface Nav_Link_Item {
 	label: string;

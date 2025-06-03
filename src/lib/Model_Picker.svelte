@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Picker from '$lib/Picker.svelte';
 	import Model_Listitem from '$lib/Model_Listitem.svelte';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 	import type {Model} from '$lib/model.svelte.js';
 	import {sort_by_text} from '$lib/sortable.svelte.js';
 

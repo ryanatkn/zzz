@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type {Model} from '$lib/model.svelte.js';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 
 	const app = zzz_context.get();
 

@@ -10,7 +10,7 @@ import {Uuid} from '$lib/zod_helpers.js';
 import {Xml_Attribute_With_Defaults} from '$lib/xml.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import type {Diskfile} from '$lib/diskfile.svelte.js';
-import type {Zzz_App} from '$lib/zzz.svelte.js';
+import type {Zzz_App} from '$lib/zzz_app.svelte.js';
 import {Diskfile_Path} from '$lib/diskfile_types.js';
 import {CONTENT_PREVIEW_LENGTH} from '$lib/constants.js';
 

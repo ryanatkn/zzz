@@ -2,7 +2,7 @@ import {Logger} from '@ryanatkn/belt/log.js';
 import {BROWSER, DEV} from 'esm-env';
 
 import type {Actions_Api} from '$lib/action_metatypes.js';
-import type {Zzz_App} from '$lib/zzz.svelte.js';
+import type {Zzz_App} from '$lib/zzz_app.svelte.js';
 import {Client_Action_Context} from '$lib/client_action_event.js';
 import {create_jsonrpc_request} from '$lib/jsonrpc_helpers.js';
 import {create_uuid} from '$lib/zod_helpers.js';

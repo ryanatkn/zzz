@@ -6,7 +6,7 @@
 	import type {Omit_Strict} from '@ryanatkn/belt/types.js';
 
 	import type {Tape} from '$lib/tape.svelte.js';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 	import {GLYPH_DELETE, GLYPH_REMOVE, GLYPH_TAPE, GLYPH_MODEL} from '$lib/glyphs.js';
 	import Contextmenu_Entry_Toggle from '$lib/Contextmenu_Entry_Toggle.svelte';
 	import Contextmenu_Entry_Copy_To_Clipboard from '$lib/Contextmenu_Entry_Copy_To_Clipboard.svelte';

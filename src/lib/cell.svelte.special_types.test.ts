@@ -8,7 +8,7 @@ import {z} from 'zod';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json, type Schema_Keys} from '$lib/cell_types.js';
 import {Datetime_Now, get_datetime_now, create_uuid, Uuid_With_Default} from '$lib/zod_helpers.js';
-import {Zzz_App} from '$lib/zzz.svelte.js';
+import {Zzz_App} from '$lib/zzz_app.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Constants for testing

@@ -34,27 +34,22 @@ import {HANDLED} from '$lib/cell_helpers.js';
 import {Action_Registry} from '$lib/action_registry.js';
 import {Api_Client, type Api_Client_Options} from '$lib/api_client.js';
 import type {Completion_Message} from '$lib/completion_types.js';
-import type {
-	Action_Message_Type,
-	Actions_Api,
-	Client_Action_Handlers,
-} from '$lib/action_metatypes.js';
+import type {Actions_Api, Client_Action_Handlers} from '$lib/action_metatypes.js';
 import type {Action_Spec} from '$lib/action_spec.js';
 import {action_specs} from '$lib/action_collections.js';
 import {create_actions_api} from '$lib/actions_api.js';
-import type {Client_Action_Handler} from '$lib/client_action_handler.js';
 
 export const zzz_context = create_context<Zzz_App>();
 
-export const Zzz_Json = Cell_Json.extend({
+export const Zzz_App_Json = Cell_Json.extend({
 	ui: Ui_Json.default(() => Ui_Json.parse({})),
 	// TODO other state?
 });
-export type Zzz_Json = z.infer<typeof Zzz_Json>;
-export type Zzz_Json_Input = z.input<typeof Zzz_Json>;
+export type Zzz_App_Json = z.infer<typeof Zzz_App_Json>;
+export type Zzz_App_Json_Input = z.input<typeof Zzz_App_Json>;
 
 // Special options type for Zzz to handle circular reference
-export interface Zzz_Options extends Omit_Strict<Cell_Options<typeof Zzz_Json>, 'app'> {
+export interface Zzz_App_Options extends Omit_Strict<Cell_Options<typeof Zzz_App_Json>, 'app'> {
 	/** Do not use - optional to avoid circular reference problem. */
 	app?: Zzz_App;
 	models?: Array<Model_Json>;
@@ -78,15 +73,14 @@ export interface Zzz_Options extends Omit_Strict<Cell_Options<typeof Zzz_Json>, 
  * The main client, typically used by creating your own `App extends Zzz`.
  * Gettable with `zzz_context.get()` inside a `<Zzz_Root>`.
  */
-export class Zzz_App extends Cell<typeof Zzz_Json> {
+export class Zzz_App extends Cell<typeof Zzz_App_Json> {
 	/**
 	 * App-wide cell registry, maps class names to constructor and tracks registered instances.
 	 */
 	readonly cell_registry: Cell_Registry;
 
 	readonly action_registry: Action_Registry;
-	readonly action_handlers: Client_Action_Handlers &
-		Partial<Record<Action_Message_Type, Client_Action_Handler<typeof this>>>;
+	readonly action_handlers: Client_Action_Handlers;
 	readonly api: Actions_Api;
 	readonly api_client: Api_Client;
 
@@ -147,9 +141,9 @@ export class Zzz_App extends Cell<typeof Zzz_Json> {
 	/** See into Zzz's future. */
 	futuremode = $state(false);
 
-	constructor(options: Zzz_Options = EMPTY_OBJECT) {
+	constructor(options: Zzz_App_Options = EMPTY_OBJECT) {
 		// Pass this instance as its own zzz reference - casting hacks around the circular reference
-		super(Zzz_Json, options as Zzz_Options & {app: Zzz_App});
+		super(Zzz_App_Json, options as Zzz_App_Options & {app: Zzz_App});
 
 		// Set the circular reference now that the object is constructed
 		(this as Assignable<typeof this, 'app'>).app = this;

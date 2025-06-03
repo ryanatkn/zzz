@@ -1,5 +1,5 @@
 import type {Action_Method} from '$lib/action_metatypes.js';
-import type {Zzz_App} from '$lib/zzz.svelte.js';
+import type {Zzz_App} from '$lib/zzz_app.svelte.js';
 import type {Action_Phase} from '$lib/action_types.js';
 import type {Jsonrpc_Singular_Message} from '$lib/jsonrpc.js';
 import type {Client_Action_Handler} from '$lib/client_action_handler.js';

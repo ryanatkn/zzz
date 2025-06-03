@@ -3,7 +3,7 @@
 	import {slide} from 'svelte/transition';
 
 	import {Diskfile_Bit} from '$lib/bit.svelte.js';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 	import Content_Editor from '$lib/Content_Editor.svelte';
 	import Diskfile_Actions from '$lib/Diskfile_Actions.svelte';
 	import Diskfile_Metrics from '$lib/Diskfile_Metrics.svelte';

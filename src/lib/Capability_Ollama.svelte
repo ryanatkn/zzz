@@ -3,7 +3,7 @@
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
 	import {onMount} from 'svelte';
 
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
 	import Model_Link from '$lib/Model_Link.svelte';
 	import Provider_Link from '$lib/Provider_Link.svelte';

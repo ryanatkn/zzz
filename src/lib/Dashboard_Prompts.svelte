@@ -16,7 +16,7 @@
 		GLYPH_LIST,
 		GLYPH_SORT,
 	} from '$lib/glyphs.js';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 	import Prompt_Stats from '$lib/Prompt_Stats.svelte';
 	import Bit_List from '$lib/Bit_List.svelte';
 	import Content_Preview from '$lib/Content_Preview.svelte';

@@ -5,7 +5,7 @@
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
 	import {PUBLIC_WEBSOCKET_URL} from '$env/static/public';
 
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 	import type {Socket} from '$lib/socket.svelte.js';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Glyph from '$lib/Glyph.svelte';

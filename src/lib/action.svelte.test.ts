@@ -3,7 +3,7 @@
 import {test, expect} from 'vitest';
 
 import {Action} from '$lib/action.svelte.js';
-import {Zzz_App} from '$lib/zzz.svelte.js';
+import {Zzz_App} from '$lib/zzz_app.svelte.js';
 
 // Add a basic test that the Action class can be instantiated with minimal data
 test('Action - can be instantiated with minimal data', () => {

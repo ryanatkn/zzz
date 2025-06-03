@@ -11,7 +11,7 @@
 	import Project_Not_Found from '$routes/projects/Project_Not_Found.svelte';
 	import {GLYPH_DELETE, GLYPH_PREVIEW, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 
 	const projects = projects_context.get();
 	const app = zzz_context.get();

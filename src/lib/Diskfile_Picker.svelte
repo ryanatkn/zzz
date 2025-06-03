@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Picker from '$lib/Picker.svelte';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import type {Uuid} from '$lib/zod_helpers.js';
 	import {sort_by_text, sort_by_numeric} from '$lib/sortable.svelte.js';

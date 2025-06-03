@@ -2,7 +2,7 @@
 	import {GLYPH_MODEL} from '$lib/glyphs.js';
 	import Model_Summary from '$lib/Model_Summary.svelte';
 	import Glyph from '$lib/Glyph.svelte';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 
 	const app = zzz_context.get();
 

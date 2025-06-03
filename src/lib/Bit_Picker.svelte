@@ -1,7 +1,7 @@
 <script lang="ts">
 	import Picker from '$lib/Picker.svelte';
 	import Bit_Listitem from '$lib/Bit_Listitem.svelte';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 	import type {Bit_Type} from '$lib/bit.svelte.js';
 	import type {Uuid} from '$lib/zod_helpers.js';
 	import {sort_by_text, sort_by_numeric} from '$lib/sortable.svelte.js';

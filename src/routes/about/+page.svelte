@@ -7,7 +7,7 @@
 	import {pkg_context} from '$lib/pkg.js';
 	import External_Link from '$lib/External_Link.svelte';
 	import Footer from '$lib/Footer.svelte';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 
 	const pkg = pkg_context.get();
 	const app = zzz_context.get();

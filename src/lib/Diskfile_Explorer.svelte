@@ -4,7 +4,7 @@
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
 	import Pending_Button from '@ryanatkn/fuz/Pending_Button.svelte';
 
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import Diskfile_Listitem from '$lib/Diskfile_Listitem.svelte';
 	import Glyph from '$lib/Glyph.svelte';

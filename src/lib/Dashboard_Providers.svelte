@@ -3,7 +3,7 @@
 	import Model_Link from '$lib/Model_Link.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 	import {GLYPH_PROVIDER} from '$lib/glyphs.js';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 	import External_Link from '$lib/External_Link.svelte';
 
 	const app = zzz_context.get();

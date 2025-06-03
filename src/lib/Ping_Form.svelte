@@ -3,7 +3,7 @@
 	import type {Snippet} from 'svelte';
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
 
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 	import {GLYPH_ACTION_TYPE_REQUEST_RESPONSE} from '$lib/glyphs.js';
 	import {PING_HISTORY_MAX, type Ping_Data} from '$lib/capabilities.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';

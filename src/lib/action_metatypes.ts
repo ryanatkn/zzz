@@ -13,7 +13,7 @@ import type {
 	toggle_main_menu_action_spec,
 	update_diskfile_action_spec,
 } from '$lib/action_specs.js';
-import type {Zzz_App} from '$lib/zzz.svelte.js';
+import type {Zzz_App} from '$lib/zzz_app.svelte.js';
 
 /**
  * All action method names. Request/response actions have two types per method.

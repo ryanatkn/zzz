@@ -2,7 +2,7 @@
 	import type {Prompt} from '$lib/prompt.svelte.js';
 	import Bit_List from '$lib/Bit_List.svelte';
 	import Content_Preview from '$lib/Content_Preview.svelte';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 	import {Uuid} from '$lib/zod_helpers.js';
 	import type {Sequence_Bit} from '$lib/bit.svelte.js';
 	import {GLYPH_BIT} from '$lib/glyphs.js';

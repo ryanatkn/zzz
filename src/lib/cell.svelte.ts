@@ -8,7 +8,7 @@ import {
 	type Datetime,
 	get_datetime_now,
 } from '$lib/zod_helpers.js';
-import type {Zzz_App} from '$lib/zzz.svelte.js';
+import type {Zzz_App} from '$lib/zzz_app.svelte.js';
 import {
 	get_schema_class_info,
 	type Schema_Class_Info,

@@ -4,7 +4,7 @@
 	import Glyph from '$lib/Glyph.svelte';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import {Chat} from '$lib/chat.svelte.js';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 	import {GLYPH_TAPE, GLYPH_CHAT, GLYPH_DELETE, GLYPH_VIEW} from '$lib/glyphs.js';
 	import Tape_List from '$lib/Tape_List.svelte';
 	import Chat_View_Simple from '$lib/Chat_View_Simple.svelte';

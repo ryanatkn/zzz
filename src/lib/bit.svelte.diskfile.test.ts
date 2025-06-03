@@ -5,7 +5,7 @@
 import {test, expect, describe, beforeEach} from 'vitest';
 
 import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
-import {Zzz_App} from '$lib/zzz.svelte.js';
+import {Zzz_App} from '$lib/zzz_app.svelte.js';
 import {Diskfile_Path, Serializable_Source_File} from '$lib/diskfile_types.js';
 import type {Diskfile} from '$lib/diskfile.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';

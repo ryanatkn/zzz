@@ -7,7 +7,7 @@
 
 	import {Bit} from '$lib/bit.svelte.js';
 	import type {Prompt} from '$lib/prompt.svelte.js';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 	import {
 		GLYPH_BIT,
 		GLYPH_DELETE,

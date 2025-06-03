@@ -1,7 +1,7 @@
 <script lang="ts">
 	import {base} from '$app/paths';
 
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 	import Actions_List from '$lib/Action_List.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 	import Provider_Link from '$lib/Provider_Link.svelte';

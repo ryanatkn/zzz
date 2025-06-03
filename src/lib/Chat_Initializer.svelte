@@ -1,5 +1,5 @@
 <script lang="ts">
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 	import type {Chat_Template} from '$lib/chat_template.js';
 	import type {Model} from '$lib/model.svelte.js';
 	import Model_Picker from '$lib/Model_Picker.svelte';

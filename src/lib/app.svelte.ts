@@ -1,6 +1,6 @@
 import {create_context} from '@ryanatkn/fuz/context_helpers.js';
 
-import {Zzz_App, zzz_context, type Zzz_Options} from '$lib/zzz.svelte.js';
+import {Zzz_App, zzz_context, type Zzz_App_Options} from '$lib/zzz_app.svelte.js';
 import {cell_classes} from '$lib/cell_classes.js';
 import {client_action_handlers} from '$lib/client_action_handlers.js';
 import {WEBSOCKET_URL, API_URL_FOR_HTTP_RPC} from '$lib/constants.js';
@@ -8,7 +8,7 @@ import {WEBSOCKET_URL, API_URL_FOR_HTTP_RPC} from '$lib/constants.js';
 // TODO use this instead of `zzz_context` in non-core usages for type safety
 export const app_context: ReturnType<typeof create_context<App>> = zzz_context;
 
-export interface App_Options extends Zzz_Options {} // eslint-disable-line @typescript-eslint/no-empty-object-type
+export interface App_Options extends Zzz_App_Options {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
 /**
  * The `App` is the user's implementation of the Zzz client app.

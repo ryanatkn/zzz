@@ -1,7 +1,7 @@
 <script lang="ts">
 	import {untrack} from 'svelte';
 
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 	import Diskfile_Info from '$lib/Diskfile_Info.svelte';
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import Content_Editor from '$lib/Content_Editor.svelte';

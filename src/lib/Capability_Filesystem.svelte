@@ -2,7 +2,7 @@
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
 
 	import type {Zzz_Dir} from '$lib/diskfile_types.js';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 
 	interface Props {
 		zzz_dir?: Zzz_Dir | null | undefined;

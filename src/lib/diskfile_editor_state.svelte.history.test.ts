@@ -6,7 +6,7 @@ import {test, expect, beforeEach, describe} from 'vitest';
 
 import {Diskfile_Editor_State} from '$lib/diskfile_editor_state.svelte.js';
 import {Diskfile_Path, Serializable_Source_File} from '$lib/diskfile_types.js';
-import {Zzz_App} from '$lib/zzz.svelte.js';
+import {Zzz_App} from '$lib/zzz_app.svelte.js';
 import {Diskfile} from '$lib/diskfile.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 

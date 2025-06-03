@@ -1,4 +1,4 @@
-import type {Zzz_App} from '$lib/zzz.svelte.js';
+import type {Zzz_App} from '$lib/zzz_app.svelte.js';
 import type {Diskfile_Path} from '$lib/diskfile_types.js';
 
 // TODO these aren't used, should they be for improved type safety?

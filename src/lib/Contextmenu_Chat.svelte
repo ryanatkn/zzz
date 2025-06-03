@@ -6,7 +6,7 @@
 	import type {Omit_Strict} from '@ryanatkn/belt/types.js';
 
 	import type {Chat} from '$lib/chat.svelte.js';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 	import {
 		GLYPH_CHAT,
 		GLYPH_DELETE,

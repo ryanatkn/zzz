@@ -4,7 +4,7 @@
 	import type {Partial_Only} from '@ryanatkn/belt/types.js';
 	import Contextmenu_Entry from '@ryanatkn/fuz/Contextmenu_Entry.svelte';
 
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 	import {GLYPH_CHAT} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
 

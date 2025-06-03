@@ -3,7 +3,7 @@
 	import {page} from '$app/state';
 
 	import Model_Detail from '$lib/Model_Detail.svelte';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 
 	const app = zzz_context.get();
 

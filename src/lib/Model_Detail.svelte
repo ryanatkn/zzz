@@ -7,7 +7,7 @@
 	import Provider_Link from '$lib/Provider_Link.svelte';
 	import type {Model} from '$lib/model.svelte.js';
 	import {GLYPH_MODEL} from '$lib/glyphs.js';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
 
 	interface Props {

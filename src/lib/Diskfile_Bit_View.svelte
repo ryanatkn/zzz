@@ -2,7 +2,7 @@
 	import {slide} from 'svelte/transition';
 	import {base} from '$app/paths';
 
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import Bit_Summary from '$lib/Bit_Summary.svelte';
 

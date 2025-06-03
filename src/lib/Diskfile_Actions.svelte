@@ -4,7 +4,7 @@
 	import {slide} from 'svelte/transition';
 
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/zzz_app.svelte.js';
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
 	import type {Diskfile_Editor_State} from '$lib/diskfile_editor_state.svelte.js';

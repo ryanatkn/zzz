@@ -1,5 +1,5 @@
 import {create_uuid} from '$lib/zod_helpers.js';
-import type {Zzz_App} from '$lib/zzz.svelte.js';
+import type {Zzz_App} from '$lib/zzz_app.svelte.js';
 import {Project} from '$routes/projects/project.svelte.js';
 
 export const create_sample_projects = (app: Zzz_App): Array<Project> => {

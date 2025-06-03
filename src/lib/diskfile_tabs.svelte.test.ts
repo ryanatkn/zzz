@@ -7,7 +7,7 @@ import {test, expect, beforeEach, describe} from 'vitest';
 import {Diskfile_Tabs} from '$lib/diskfile_tabs.svelte.js';
 import {Diskfile_Tab} from '$lib/diskfile_tab.svelte.js';
 import {create_uuid, Uuid} from '$lib/zod_helpers.js';
-import {Zzz_App} from '$lib/zzz.svelte.js';
+import {Zzz_App} from '$lib/zzz_app.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Test data

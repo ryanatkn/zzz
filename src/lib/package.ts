@@ -895,7 +895,6 @@ export const package_json = {
 			svelte: './dist/Zzz_Root.svelte',
 			default: './dist/Zzz_Root.svelte',
 		},
-		'./zzz.svelte.js': {types: './dist/zzz.svelte.d.ts', default: './dist/zzz.svelte.js'},
 	},
 } satisfies Package_Json;
 
@@ -2390,16 +2389,6 @@ export const src_json = {
 		'./Zzz_Root.svelte': {
 			path: 'Zzz_Root.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
-		},
-		'./zzz.svelte.js': {
-			path: 'zzz.svelte.ts',
-			declarations: [
-				{name: 'zzz_context', kind: 'variable'},
-				{name: 'Zzz_Json', kind: 'variable'},
-				{name: 'Zzz_Json_Input', kind: 'type'},
-				{name: 'Zzz_Options', kind: 'type'},
-				{name: 'Zzz_App', kind: 'class'},
-			],
 		},
 	},
 } satisfies Src_Json;
