@@ -1,6 +1,6 @@
 import type {Action_Method} from '$lib/action_metatypes.js';
 import type {Zzz_App} from '$lib/zzz.svelte.js';
-import type {Action_Request_Response_Flag} from '$lib/action_types.js';
+import type {Action_Phase} from '$lib/action_types.js';
 import type {Jsonrpc_Singular_Message} from '$lib/jsonrpc.js';
 import type {Client_Action_Handler} from '$lib/client_action_handler.js';
 
@@ -26,32 +26,31 @@ export class Client_Action_Context<
 	app: T_App;
 	/** JSON-RPC method for the action. */
 	method: Action_Method;
+	/** The phase of the action handling. */
+	phase: Action_Phase;
 	params: T_Params;
 	result: T_Result;
-	// TODO BLOCK @api @many action messages should be removed, instead tracked inside an action
-	request_response_flag: Action_Request_Response_Flag;
 	/** The JSON-RPC message associated with this action */
 	jsonrpc_message: Jsonrpc_Singular_Message | null;
 
 	#cbs: Array<After_Client_Action_Callback> = [];
 
-	// TODO BLOCK should this be multi-phase? or separate events for req/res? refactored with `Action`?
 	handled: boolean = false;
 
 	constructor(
 		app: T_App,
 		method: Action_Method,
+		phase: Action_Phase,
 		params: T_Params,
 		result: T_Result,
-		request_response_flag: Action_Request_Response_Flag,
 		jsonrpc_message: Jsonrpc_Singular_Message | null,
 	) {
 		this.app = app;
 		this.method = method;
+		this.phase = phase;
 		// TODO BLOCK @api should these be input/output instead of params/result?
 		this.params = params;
 		this.result = result;
-		this.request_response_flag = request_response_flag;
 		this.jsonrpc_message = jsonrpc_message;
 	}
 

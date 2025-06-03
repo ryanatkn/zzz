@@ -1,13 +1,15 @@
 import type {Zzz_Server} from '$lib/server/zzz_server.js';
-import type {Action_Message_Base} from '$lib/action_message.js';
 import type {Server_Action_Handler} from '$lib/server/server_action_handler.js';
+import type {Action_Phase} from '$lib/action_types.js';
+import type {Jsonrpc_Message_From_Client_To_Server} from '$lib/jsonrpc.js';
 
 export class Server_Action_Event<
 	T_Params = any,
 	T_Result = any,
-	T_Message extends Action_Message_Base = any,
+	T_Message extends Jsonrpc_Message_From_Client_To_Server = any,
 > {
 	server: Zzz_Server;
+	phase: Action_Phase;
 	params: T_Params;
 	message: T_Message;
 
@@ -18,8 +20,9 @@ export class Server_Action_Event<
 	 */
 	result: T_Result | undefined;
 
-	constructor(server: Zzz_Server, params: T_Params, message: T_Message) {
+	constructor(server: Zzz_Server, phase: Action_Phase, params: T_Params, message: T_Message) {
 		this.server = server;
+		this.phase = phase;
 		this.params = params;
 		this.message = message;
 	}

@@ -112,70 +112,141 @@ export interface Actions_Api {
 	) => Promise<Action_Message_Params['update_diskfile_response']>;
 }
 
-// TODO maybe extract to $lib/mutation_types.ts or similar, decoupled
 /**
- * Interface for client-side mutation handlers.
+ * Interface for client-side action handlers organized by method and phase.
  */
-export interface Client_Action_Handlers<T_App extends Zzz_App = Zzz_App>
-	extends Partial<Record<Action_Message_Type, Client_Action_Handler<T_App>>> {
-	create_directory_request?: Client_Action_Handler<
-		T_App,
-		Action_Message_Params['create_directory_request'],
-		void
-	>;
-	create_directory_response?: Client_Action_Handler<
-		T_App,
-		Action_Message_Params['create_directory_request'],
-		Action_Message_Params['create_directory_response']
-	>;
-	delete_diskfile_request?: Client_Action_Handler<
-		T_App,
-		Action_Message_Params['delete_diskfile_request'],
-		void
-	>;
-	delete_diskfile_response?: Client_Action_Handler<
-		T_App,
-		Action_Message_Params['delete_diskfile_request'],
-		Action_Message_Params['delete_diskfile_response']
-	>;
-	filer_change?: Client_Action_Handler<T_App, Action_Message_Params['filer_change'], void>;
-	load_session_request?: Client_Action_Handler<
-		T_App,
-		Action_Message_Params['load_session_request'],
-		void
-	>;
-	load_session_response?: Client_Action_Handler<
-		T_App,
-		Action_Message_Params['load_session_request'],
-		Action_Message_Params['load_session_response']
-	>;
-	ping_request?: Client_Action_Handler<T_App, Action_Message_Params['ping_request'], void>;
-	ping_response?: Client_Action_Handler<
-		T_App,
-		Action_Message_Params['ping_request'],
-		Action_Message_Params['ping_response']
-	>;
-	submit_completion_request?: Client_Action_Handler<
-		T_App,
-		Action_Message_Params['submit_completion_request'],
-		void
-	>;
-	submit_completion_response?: Client_Action_Handler<
-		T_App,
-		Action_Message_Params['submit_completion_request'],
-		Action_Message_Params['submit_completion_response']
-	>;
-	toggle_main_menu?: Client_Action_Handler<T_App, Action_Message_Params['toggle_main_menu'], void>;
-	update_diskfile_request?: Client_Action_Handler<
-		T_App,
-		Action_Message_Params['update_diskfile_request'],
-		void
-	>;
-	update_diskfile_response?: Client_Action_Handler<
-		T_App,
-		Action_Message_Params['update_diskfile_request'],
-		Action_Message_Params['update_diskfile_response']
-	>;
+export interface Client_Action_Handlers<T_App extends Zzz_App = Zzz_App> {
+	create_directory?: {
+		send_request?: Client_Action_Handler<
+			T_App,
+			Action_Message_Params['create_directory_request'],
+			void
+		>;
+		receive_request?: Client_Action_Handler<
+			T_App,
+			Action_Message_Params['create_directory_request'],
+			Action_Message_Params['create_directory_response']
+		>;
+		send_response?: Client_Action_Handler<
+			T_App,
+			Action_Message_Params['create_directory_response'],
+			void
+		>;
+		receive_response?: Client_Action_Handler<
+			T_App,
+			Action_Message_Params['create_directory_request'],
+			Action_Message_Params['create_directory_response']
+		>;
+	};
+	delete_diskfile?: {
+		send_request?: Client_Action_Handler<
+			T_App,
+			Action_Message_Params['delete_diskfile_request'],
+			void
+		>;
+		receive_request?: Client_Action_Handler<
+			T_App,
+			Action_Message_Params['delete_diskfile_request'],
+			Action_Message_Params['delete_diskfile_response']
+		>;
+		send_response?: Client_Action_Handler<
+			T_App,
+			Action_Message_Params['delete_diskfile_response'],
+			void
+		>;
+		receive_response?: Client_Action_Handler<
+			T_App,
+			Action_Message_Params['delete_diskfile_request'],
+			Action_Message_Params['delete_diskfile_response']
+		>;
+	};
+	filer_change?: {
+		send?: Client_Action_Handler<T_App, Action_Message_Params['filer_change'], void>;
+		receive?: Client_Action_Handler<T_App, Action_Message_Params['filer_change'], void>;
+	};
+	load_session?: {
+		send_request?: Client_Action_Handler<
+			T_App,
+			Action_Message_Params['load_session_request'],
+			void
+		>;
+		receive_request?: Client_Action_Handler<
+			T_App,
+			Action_Message_Params['load_session_request'],
+			Action_Message_Params['load_session_response']
+		>;
+		send_response?: Client_Action_Handler<
+			T_App,
+			Action_Message_Params['load_session_response'],
+			void
+		>;
+		receive_response?: Client_Action_Handler<
+			T_App,
+			Action_Message_Params['load_session_request'],
+			Action_Message_Params['load_session_response']
+		>;
+	};
+	ping?: {
+		send_request?: Client_Action_Handler<T_App, Action_Message_Params['ping_request'], void>;
+		receive_request?: Client_Action_Handler<
+			T_App,
+			Action_Message_Params['ping_request'],
+			Action_Message_Params['ping_response']
+		>;
+		send_response?: Client_Action_Handler<T_App, Action_Message_Params['ping_response'], void>;
+		receive_response?: Client_Action_Handler<
+			T_App,
+			Action_Message_Params['ping_request'],
+			Action_Message_Params['ping_response']
+		>;
+	};
+	submit_completion?: {
+		send_request?: Client_Action_Handler<
+			T_App,
+			Action_Message_Params['submit_completion_request'],
+			void
+		>;
+		receive_request?: Client_Action_Handler<
+			T_App,
+			Action_Message_Params['submit_completion_request'],
+			Action_Message_Params['submit_completion_response']
+		>;
+		send_response?: Client_Action_Handler<
+			T_App,
+			Action_Message_Params['submit_completion_response'],
+			void
+		>;
+		receive_response?: Client_Action_Handler<
+			T_App,
+			Action_Message_Params['submit_completion_request'],
+			Action_Message_Params['submit_completion_response']
+		>;
+	};
+	toggle_main_menu?: {
+		execute?: Client_Action_Handler<T_App, Action_Message_Params['toggle_main_menu'], boolean>;
+	};
+	update_diskfile?: {
+		send_request?: Client_Action_Handler<
+			T_App,
+			Action_Message_Params['update_diskfile_request'],
+			void
+		>;
+		receive_request?: Client_Action_Handler<
+			T_App,
+			Action_Message_Params['update_diskfile_request'],
+			Action_Message_Params['update_diskfile_response']
+		>;
+		send_response?: Client_Action_Handler<
+			T_App,
+			Action_Message_Params['update_diskfile_response'],
+			void
+		>;
+		receive_response?: Client_Action_Handler<
+			T_App,
+			Action_Message_Params['update_diskfile_request'],
+			Action_Message_Params['update_diskfile_response']
+		>;
+	};
 }
 
 // generated by src/lib/action_metatypes.gen.ts - DO NOT EDIT OR RISK LOST DATA

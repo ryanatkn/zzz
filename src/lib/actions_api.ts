@@ -8,7 +8,7 @@ import {create_jsonrpc_request} from '$lib/jsonrpc_helpers.js';
 import {create_uuid} from '$lib/zod_helpers.js';
 import {to_action_message, to_action_message_type} from '$lib/action_helpers.js';
 import type {Jsonrpc_Singular_Message} from '$lib/jsonrpc.js';
-import type {Action_Request_Response_Flag} from '$lib/action_types.js';
+import type {Action_Phase} from '$lib/action_types.js';
 
 const log = new Logger();
 
@@ -30,27 +30,26 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 
 			const handle_message = (
 				result: any | null, // TODO @api type
-				request_response_flag: Action_Request_Response_Flag,
+				phase: Action_Phase,
 				jsonrpc_message: Jsonrpc_Singular_Message | null,
 			): unknown => {
-				console.log('\n\n\n\n\n\n\n\n[actions_api] mutate', method, result, request_response_flag);
+				console.log('[actions_api] handle_message', method, phase, result);
 				const event = new Client_Action_Context(
 					app,
 					method,
+					phase,
 					params,
 					result,
-					request_response_flag,
 					jsonrpc_message,
 				);
 				console.log(`[actions_api] event`, event);
 
-				// TODO BLOCK @api remove this for method-and-phase-organized handlers
-				const action_message_type = to_action_message_type(method, request_response_flag);
-				console.log(`[actions_api] message_type`, action_message_type);
+				// Look up the handler using the nested structure
+				const method_handlers = app.action_handlers[method];
+				const handler = method_handlers?.[phase];
 
-				const handler = app.action_handlers[action_message_type];
 				if (!handler) {
-					log.warn(`missing mutation for action '${method}'`);
+					log.warn(`missing handler for action '${method}.${phase}'`);
 				}
 
 				if (handler) {
@@ -75,10 +74,10 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 			app.actions.add_message(request_action_message);
 			console.log(`[actions_api] request_action_message`, request_action_message);
 
-			// `request_response` actions have special handling,
-			// each such method has a `_request` and `_response` type variant.
+			// Handle different action kinds with their appropriate phases
 			if (spec.kind === 'request_response') {
-				handle_message(null, 'request', request_jsonrpc_message);
+				// Handle request phase
+				handle_message(null, 'send_request', request_jsonrpc_message);
 
 				// Avoiding `await` for compatibility with sync actions
 				return app.api_client.send(request_jsonrpc_message).then((response) => {
@@ -110,16 +109,23 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 					app.actions.add_message(response_action_message);
 
 					const result = response_jsonrpc_message.result;
-					handle_message(result, 'response', response_jsonrpc_message);
+					handle_message(result, 'receive_response', response_jsonrpc_message);
 
 					// Return the result value directly
 					return result;
 				});
+			} else if (spec.kind === 'remote_notification') {
+				return handle_message(params, 'send', request_jsonrpc_message);
 			}
 
+			// TODO BLOCK @api make this a switch
+			// else if (spec.kind === 'local_call') {
+			// 	// Local calls execute immediately
+			// 	return handle_message(params, 'execute', request_jsonrpc_message);
+			// }
 			// TODO BLOCK @api this needs to have action tracking, bc it applies to all actions not just request_response
 			// Handle non-`request_response` actions synchronously
-			return handle_message(null, null, request_jsonrpc_message);
+			return handle_message(null, 'execute', request_jsonrpc_message);
 		},
 	});
 

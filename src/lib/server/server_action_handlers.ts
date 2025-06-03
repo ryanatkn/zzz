@@ -42,222 +42,231 @@ const google = new GoogleGenerativeAI(SECRET_GOOGLE_API_KEY);
 /**
  * Handle client messages and produce appropriate server responses.
  * Each returns a value or throws a `Jsonrpc_Error`.
+ * Organized by method and phase for symmetric handling.
  */
 export const server_action_handlers: Server_Action_Handlers = {
-	ping: async ({message}) => {
-		return {
-			ping_id: message.id,
-		};
+	ping: {
+		receive_request: async ({message}) => {
+			return {
+				ping_id: message.id,
+			};
+		},
 	},
-	// TODO BLOCK @api this?
-	// ping: {
-	// 		send_request: () =>
-	// 		send_response: () =>
-	// 		receive_request: () =>
-	// 		receive_request: () =>
-	// }
 
-	load_session: async ({server}) => {
-		// TODO change so this only returns metadata, not file contents
-		// Access filers through server and collect all files
-		const files_array: Array<Serializable_Source_File> = [];
+	load_session: {
+		receive_request: async ({server}) => {
+			// TODO change so this only returns metadata, not file contents
+			// Access filers through server and collect all files
+			const files_array: Array<Serializable_Source_File> = [];
 
-		// Iterate through all filers and collect their files
-		for (const filer of server.filers.values()) {
-			for (const file of filer.filer.files.values()) {
-				files_array.push(to_serializable_source_file(file, server.zzz_cache_dir)); // TODO dir is a hack
+			// Iterate through all filers and collect their files
+			for (const filer of server.filers.values()) {
+				for (const file of filer.filer.files.values()) {
+					files_array.push(to_serializable_source_file(file, server.zzz_cache_dir)); // TODO dir is a hack
+				}
 			}
-		}
 
-		return {
-			data: {
-				files: files_array,
-				zzz_dir: server.zzz_dir,
-				zzz_cache_dir: server.zzz_cache_dir,
-			},
-		};
+			return {
+				data: {
+					files: files_array,
+					zzz_dir: server.zzz_dir,
+					zzz_cache_dir: server.zzz_cache_dir,
+				},
+			};
+		},
 	},
 
-	submit_completion: async ({server, message}) => {
-		const {prompt, provider_name, model, completion_messages} = message.params.completion_request;
-		const config = server.config;
+	submit_completion: {
+		receive_request: async ({server, message}) => {
+			const {prompt, provider_name, model, completion_messages} = message.params.completion_request;
+			const config = server.config;
 
-		let result: Action_Message_Params['submit_completion_response'];
+			let result: Action_Message_Params['submit_completion_response'];
 
-		console.log(`texting ${provider_name}:`, prompt.substring(0, 1000));
+			console.log(`texting ${provider_name}:`, prompt.substring(0, 1000));
 
-		try {
-			switch (provider_name) {
-				case 'ollama': {
-					const listed = await ollama.list();
-					if (!listed.models.some((m) => m.name === model)) {
-						await ollama.pull({model}); // TODO handle stream
+			try {
+				switch (provider_name) {
+					case 'ollama': {
+						const listed = await ollama.list();
+						if (!listed.models.some((m) => m.name === model)) {
+							await ollama.pull({model}); // TODO handle stream
+						}
+						const api_response = await ollama.chat({
+							model,
+							// TODO
+							// tools,
+							options: {
+								temperature: config.temperature,
+								seed: config.seed,
+								num_predict: config.output_token_max,
+								top_k: config.top_k,
+								top_p: config.top_p,
+								frequency_penalty: config.frequency_penalty,
+								presence_penalty: config.presence_penalty,
+								stop: config.stop_sequences,
+							},
+							messages: format_ollama_messages(config.system_message, completion_messages, prompt),
+						});
+						console.log(`ollama api_response`, api_response);
+						result = to_completion_result(message.id, provider_name, model, api_response);
+						break;
 					}
-					const api_response = await ollama.chat({
-						model,
-						// TODO
-						// tools,
-						options: {
+
+					case 'claude': {
+						const api_response = await anthropic.messages.create({
+							model,
+							max_tokens: config.output_token_max,
 							temperature: config.temperature,
-							seed: config.seed,
-							num_predict: config.output_token_max,
 							top_k: config.top_k,
+							top_p: config.top_p,
+							stop_sequences: config.stop_sequences,
+							system: config.system_message,
+							messages: format_claude_messages(completion_messages, prompt),
+						});
+						console.log(`claude api_response`, api_response);
+						result = to_completion_result(message.id, provider_name, model, api_response);
+						break;
+					}
+
+					case 'chatgpt': {
+						const api_response = await openai.chat.completions.create({
+							model,
+							max_completion_tokens: config.output_token_max,
+							temperature: model === 'o1-mini' ? undefined : config.temperature,
+							seed: config.seed,
 							top_p: config.top_p,
 							frequency_penalty: config.frequency_penalty,
 							presence_penalty: config.presence_penalty,
 							stop: config.stop_sequences,
-						},
-						messages: format_ollama_messages(config.system_message, completion_messages, prompt),
-					});
-					console.log(`ollama api_response`, api_response);
-					result = to_completion_result(message.id, provider_name, model, api_response);
-					break;
-				}
+							messages: format_openai_messages(
+								config.system_message,
+								completion_messages,
+								prompt,
+								model,
+							),
+						});
+						console.log(`openai api_response`, api_response);
+						result = to_completion_result(message.id, provider_name, model, api_response);
+						break;
+					}
 
-				case 'claude': {
-					const api_response = await anthropic.messages.create({
-						model,
-						max_tokens: config.output_token_max,
-						temperature: config.temperature,
-						top_k: config.top_k,
-						top_p: config.top_p,
-						stop_sequences: config.stop_sequences,
-						system: config.system_message,
-						messages: format_claude_messages(completion_messages, prompt),
-					});
-					console.log(`claude api_response`, api_response);
-					result = to_completion_result(message.id, provider_name, model, api_response);
-					break;
-				}
-
-				case 'chatgpt': {
-					const api_response = await openai.chat.completions.create({
-						model,
-						max_completion_tokens: config.output_token_max,
-						temperature: model === 'o1-mini' ? undefined : config.temperature,
-						seed: config.seed,
-						top_p: config.top_p,
-						frequency_penalty: config.frequency_penalty,
-						presence_penalty: config.presence_penalty,
-						stop: config.stop_sequences,
-						messages: format_openai_messages(
-							config.system_message,
-							completion_messages,
-							prompt,
+					case 'gemini': {
+						// TODO cache this by model?
+						const google_model = google.getGenerativeModel({
 							model,
-						),
-					});
-					console.log(`openai api_response`, api_response);
-					result = to_completion_result(message.id, provider_name, model, api_response);
-					break;
+							systemInstruction: config.system_message,
+							// TODO
+							// tools,
+							// toolConfig
+							generationConfig: {
+								maxOutputTokens: config.output_token_max,
+								temperature: config.temperature,
+								topK: config.top_k,
+								topP: config.top_p,
+								frequencyPenalty: config.frequency_penalty,
+								presencePenalty: config.presence_penalty,
+								stopSequences: config.stop_sequences,
+							},
+						});
+
+						const content = format_gemini_messages(completion_messages, prompt);
+						const api_response = await google_model.generateContent(content);
+						console.log(`gemini api_response`, api_response);
+						result = to_completion_result(message.id, provider_name, model, api_response);
+						break;
+					}
+
+					default:
+						throw new Unreachable_Error(provider_name);
 				}
-
-				case 'gemini': {
-					// TODO cache this by model?
-					const google_model = google.getGenerativeModel({
-						model,
-						systemInstruction: config.system_message,
-						// TODO
-						// tools,
-						// toolConfig
-						generationConfig: {
-							maxOutputTokens: config.output_token_max,
-							temperature: config.temperature,
-							topK: config.top_k,
-							topP: config.top_p,
-							frequencyPenalty: config.frequency_penalty,
-							presencePenalty: config.presence_penalty,
-							stopSequences: config.stop_sequences,
-						},
-					});
-
-					const content = format_gemini_messages(completion_messages, prompt);
-					const api_response = await google_model.generateContent(content);
-					console.log(`gemini api_response`, api_response);
-					result = to_completion_result(message.id, provider_name, model, api_response);
-					break;
-				}
-
-				default:
-					throw new Unreachable_Error(provider_name);
+			} catch (error) {
+				console.error(`AI provider error:`, error);
+				throw jsonrpc_errors.ai_provider_error(
+					provider_name,
+					error instanceof Error ? error.message : 'Unknown AI provider error',
+					{error},
+				);
 			}
-		} catch (error) {
-			console.error(`AI provider error:`, error);
-			throw jsonrpc_errors.ai_provider_error(
-				provider_name,
-				error instanceof Error ? error.message : 'Unknown AI provider error',
-				{error},
+
+			// TODO this is currently only being created for logging/history purposes, doesn't get sent to client
+			const response_message = to_action_message(
+				'submit_completion_response',
+				result,
+				message.jsonrpc_message_id,
 			);
-		}
 
-		// TODO this is currently only being created for logging/history purposes, doesn't get sent to client
-		const response_message = to_action_message(
-			'submit_completion_response',
-			result,
-			message.jsonrpc_message_id,
-		);
+			// We don't need to wait for this to finish
+			void save_response(message, response_message, server.zzz_cache_dir, server.safe_fs);
 
-		// We don't need to wait for this to finish
-		void save_response(message, response_message, server.zzz_cache_dir, server.safe_fs);
+			console.log(`got ${provider_name} message`, result.completion_response.data);
 
-		console.log(`got ${provider_name} message`, result.completion_response.data);
-
-		return result;
+			return result;
+		},
 	},
 
-	update_diskfile: async ({server, message}) => {
-		console.log(`message`, message);
-		const {
-			params: {path, content},
-		} = message;
+	update_diskfile: {
+		receive_request: async ({server, message}) => {
+			console.log(`message`, message);
+			const {
+				params: {path, content},
+			} = message;
 
-		try {
-			// Use the server's safe_fs instance to write the file
-			await server.safe_fs.write_file(path, content);
-			return null;
-		} catch (error) {
-			console.error(`Error writing file ${path}:`, error);
-			throw jsonrpc_errors.internal_error(
-				`Failed to write file: ${error instanceof Error ? error.message : 'Unknown error'}`,
-			);
-		}
+			try {
+				// Use the server's safe_fs instance to write the file
+				await server.safe_fs.write_file(path, content);
+				return null;
+			} catch (error) {
+				console.error(`Error writing file ${path}:`, error);
+				throw jsonrpc_errors.internal_error(
+					`Failed to write file: ${error instanceof Error ? error.message : 'Unknown error'}`,
+				);
+			}
+		},
 	},
 
-	delete_diskfile: async ({server, message}) => {
-		const {
-			params: {path},
-		} = message;
+	delete_diskfile: {
+		receive_request: async ({server, message}) => {
+			const {
+				params: {path},
+			} = message;
 
-		try {
-			// Use the server's safe_fs instance to delete the file
-			await server.safe_fs.rm(path);
-			return null;
-		} catch (error) {
-			console.error(`Error deleting file ${path}:`, error);
-			throw jsonrpc_errors.internal_error(
-				`Failed to delete file: ${error instanceof Error ? error.message : 'Unknown error'}`,
-			);
-		}
+			try {
+				// Use the server's safe_fs instance to delete the file
+				await server.safe_fs.rm(path);
+				return null;
+			} catch (error) {
+				console.error(`Error deleting file ${path}:`, error);
+				throw jsonrpc_errors.internal_error(
+					`Failed to delete file: ${error instanceof Error ? error.message : 'Unknown error'}`,
+				);
+			}
+		},
 	},
 
-	create_directory: async ({params, server, message}) => {
-		const {path} = params;
+	create_directory: {
+		receive_request: async ({params, server, message}) => {
+			const {path} = params;
 
-		try {
-			// Use the server's safe_fs instance to create the directory
-			await server.safe_fs.mkdir(path, {recursive: true});
-			return null;
-		} catch (error) {
-			console.error(`Error creating directory ${path}:`, error);
-			throw jsonrpc_errors.internal_error(
-				`Failed to create directory: ${error instanceof Error ? error.message : 'Unknown error'}`,
-			);
-		}
+			try {
+				// Use the server's safe_fs instance to create the directory
+				await server.safe_fs.mkdir(path, {recursive: true});
+				return null;
+			} catch (error) {
+				console.error(`Error creating directory ${path}:`, error);
+				throw jsonrpc_errors.internal_error(
+					`Failed to create directory: ${error instanceof Error ? error.message : 'Unknown error'}`,
+				);
+			}
+		},
 	},
 
-	filer_change: async ({server, message}) => {
-		console.log(`message`, message);
-		// TODO BLOCK @api should be `params`, maybe `message` too, and always have an `id`?
+	filer_change: {
+		// This is a server-to-client notification, so it only has a send phase
+		send: async ({server, message}) => {
+			console.log(`message`, message);
+			// TODO BLOCK @api should be `params`, maybe `message` too, and always have an `id`?
+		},
 	},
 };
 

@@ -12,11 +12,7 @@ import {Zzz_Dir} from '$lib/diskfile_types.js';
 import {Safe_Fs} from '$lib/server/safe_fs.js';
 import {Action_Registry} from '$lib/action_registry.js';
 import {stringify_zod_error} from '$lib/zod_helpers.js';
-import {
-	jsonrpc_request_to_action_message,
-	lookup_request_action_schema,
-	lookup_response_action_schema,
-} from '$lib/action_helpers.js';
+import {lookup_request_action_schema, lookup_response_action_schema} from '$lib/action_helpers.js';
 import {
 	type Jsonrpc_Request,
 	type Jsonrpc_Response,
@@ -24,15 +20,16 @@ import {
 	type Jsonrpc_Notification,
 	Jsonrpc_Result,
 	Jsonrpc_Message,
+	Jsonrpc_Message_From_Client_To_Server,
 } from '$lib/jsonrpc.js';
 import {handle_jsonrpc_request} from '$lib/server/jsonrpc_server_helpers.js';
 import {create_jsonrpc_error_from_thrown, create_jsonrpc_response} from '$lib/jsonrpc_helpers.js';
-import type {Action_Message_Base} from '$lib/action_message.js';
 import {ZZZ_CACHE_DIRNAME} from '$lib/constants.js';
 import {to_zzz_cache_dir} from '$lib/diskfile_helpers.js';
 import {jsonrpc_errors} from '$lib/jsonrpc_errors.js';
 import type {Server_Action_Handlers} from '$lib/server/server_action_metatypes.js';
 import {Server_Action_Event} from '$lib/server/server_action_event.js';
+import {Action_Method} from '$lib/action_metatypes.js';
 
 export type Action_Handler = (
 	// TODO BLOCK @api should be jsonrpc only right? maybe just the `params` at this point? wrapped in an object?
@@ -167,21 +164,18 @@ export class Zzz_Server {
 	async handle_jsonrpc_message(
 		message: unknown,
 	): Promise<Jsonrpc_Response | Jsonrpc_Error_Message | null> {
+		// TODO BLOCK @api probably pass through `#receive_jsonrpc_request` and others directly
 		return handle_jsonrpc_request({
 			message,
 			onrequest: async (
 				request: Jsonrpc_Request,
 			): Promise<Jsonrpc_Response | Jsonrpc_Error_Message> => {
 				try {
-					const action_message = jsonrpc_request_to_action_message(request);
-
-					const result = await this.#receive_action_message(action_message);
+					const result = await this.#receive_jsonrpc_message(request);
 					console.log(`result`, result);
 
 					if (!result)
-						throw jsonrpc_errors.internal_error(
-							`no result returned for action: ${action_message.method}`,
-						);
+						throw jsonrpc_errors.internal_error(`no result returned for action: ${request.method}`);
 
 					return create_jsonrpc_response(request.id, result);
 				} catch (error) {
@@ -191,10 +185,8 @@ export class Zzz_Server {
 			},
 			onnotification: async (notification: Jsonrpc_Notification): Promise<void> => {
 				try {
-					const action_message = jsonrpc_request_to_action_message(notification);
-
 					// Notifications have no response
-					await this.#receive_action_message(action_message);
+					await this.#receive_jsonrpc_message(notification);
 				} catch (error) {
 					this.log?.error(`Error processing JSON-RPC notification:`, error);
 					// No response for notifications, so just log the error
@@ -210,13 +202,22 @@ export class Zzz_Server {
 		this.#broadcast_jsonrpc_message(message);
 	}
 
-	// TODO consider extracting a helper
+	// TODO BLOCK @api remove "action message" stuff, just use jsonrpc messages directly, maybe `receive_jsonrpc_request`?
 	/**
 	 * Process an action by name with parameters.
 	 * This is the unified entry point for both HTTP and WebSocket actions.
 	 */
-	async #receive_action_message(message: Action_Message_Base): Promise<Jsonrpc_Result | null> {
-		this.log?.debug(`receive message`, message.id, message.method);
+	async #receive_jsonrpc_message(
+		message: Jsonrpc_Message_From_Client_To_Server,
+	): Promise<Jsonrpc_Result | null> {
+		if (Array.isArray(message)) {
+			throw jsonrpc_errors.invalid_request('array support is not yet implemented'); // TODO
+		}
+		this.log?.debug(
+			`receive`,
+			'id' in message ? 'request ' + message.id : 'notification',
+			message.method,
+		);
 		this.#check_destroyed();
 
 		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -224,7 +225,11 @@ export class Zzz_Server {
 			throw jsonrpc_errors.invalid_request();
 		}
 
-		const {method} = message;
+		const parsed_method = Action_Method.safeParse(message.method);
+		if (!parsed_method.success) {
+			throw jsonrpc_errors.method_not_found(message.method);
+		}
+		const method = parsed_method.data;
 
 		const spec = action_spec_by_method.get(method);
 		if (!spec) {
@@ -249,19 +254,28 @@ export class Zzz_Server {
 			);
 		}
 
-		// TODO BLOCK @api fix type, and is the action message interface the one we want? or pass through the JSON-RPC message?
-		// I think it's clearer that it's more like the action message type, but maybe we want send/receive or client/server or other modifiers
-		const handler = this.#server_action_handlers[method];
+		// TODO BLOCK @api refactor to fix type below
+		const method_handlers = this.#server_action_handlers[method];
+		const phase =
+			method_handlers &&
+			('receive_request' in method_handlers
+				? 'receive_request'
+				: 'receive' in method_handlers
+					? 'receive'
+					: null);
+		const handler = method_handlers && phase && method_handlers[phase];
+
 		if (!handler) {
 			throw jsonrpc_errors.internal_error(method); // since there's a spec, this should not happen
 		}
-		const event = new Server_Action_Event(this, parsed_request.data, message);
+
+		const event = new Server_Action_Event(this, phase, parsed_request.data, message);
 		await event.handle(handler);
 
 		// Validate the response during development
 		// TODO maybe always validate?
 		if (DEV) {
-			// TODO BLOCK @api use params schema only right? not whole action message.
+			// TODO BLOCK @api use params schema only not whole action message.
 			// but we have a problem with the params/result schemas, params is being overloaded
 			// (and `response_params` was partially correct though hacky)
 			const response_schema = lookup_response_action_schema(method);

@@ -6,19 +6,13 @@ import {
 	type Action_Auth,
 	type Action_Request_Response_Flag,
 } from '$lib/action_types.js';
-import {Action_Message_Base} from '$lib/action_message.js';
 import {Action_Messages} from '$lib/action_messages.js';
 import {
 	Action_Message_Type,
 	Action_Method,
 	type Action_Message_Params,
 } from '$lib/action_metatypes.js';
-import type {
-	Jsonrpc_Notification,
-	Jsonrpc_Request,
-	Jsonrpc_Request_Id,
-	Jsonrpc_Singular_Message,
-} from '$lib/jsonrpc.js';
+import type {Jsonrpc_Request_Id, Jsonrpc_Singular_Message} from '$lib/jsonrpc.js';
 import {to_jsonrpc_message_id} from '$lib/jsonrpc_helpers.js';
 
 // TODO BLOCK @api refactor all of this, is all very messy
@@ -83,16 +77,6 @@ export const to_action_request_message_type = (method: Action_Method): Action_Me
 
 export const to_action_response_message_type = (method: Action_Method): Action_Message_Type =>
 	Action_Message_Type.parse(method + '_response');
-
-export const jsonrpc_request_to_action_message = (
-	message: Jsonrpc_Request | Jsonrpc_Notification,
-): Action_Message_Base =>
-	Action_Message_Base.parse({
-		type: to_action_message_type(Action_Method.parse(message.method), 'request'),
-		method: message.method,
-		jsonrpc_message_id: to_jsonrpc_message_id(message),
-		params: message.params,
-	});
 
 // TODO @api rethink these
 /**

@@ -4,47 +4,171 @@ import type {Public_Server_Action_Handler} from '$lib/server/server_action_handl
 import type {
 	create_directory_action_spec,
 	delete_diskfile_action_spec,
+	filer_change_action_spec,
 	load_session_action_spec,
 	ping_action_spec,
 	submit_completion_action_spec,
+	toggle_main_menu_action_spec,
 	update_diskfile_action_spec,
 } from '$lib/action_specs.js';
 import type {Action_Messages} from '$lib/action_messages.js';
 
 /**
- * Maps action names to their service implementations.
+ * Maps action methods to their server-side phase handlers.
+ * Generated using ACTION_KIND_PHASES for consistent phase handling across all action kinds.
  */
 export interface Server_Action_Handlers {
-	create_directory: Public_Server_Action_Handler<
-		typeof create_directory_action_spec.input,
-		typeof create_directory_action_spec.output,
-		Action_Messages['create_directory_request']
-	>;
-	delete_diskfile: Public_Server_Action_Handler<
-		typeof delete_diskfile_action_spec.input,
-		typeof delete_diskfile_action_spec.output,
-		Action_Messages['delete_diskfile_request']
-	>;
-	load_session: Public_Server_Action_Handler<
-		typeof load_session_action_spec.input,
-		typeof load_session_action_spec.output,
-		Action_Messages['load_session_request']
-	>;
-	ping: Public_Server_Action_Handler<
-		typeof ping_action_spec.input,
-		typeof ping_action_spec.output,
-		Action_Messages['ping_request']
-	>;
-	submit_completion: Public_Server_Action_Handler<
-		typeof submit_completion_action_spec.input,
-		typeof submit_completion_action_spec.output,
-		Action_Messages['submit_completion_request']
-	>;
-	update_diskfile: Public_Server_Action_Handler<
-		typeof update_diskfile_action_spec.input,
-		typeof update_diskfile_action_spec.output,
-		Action_Messages['update_diskfile_request']
-	>;
+	create_directory?: {
+		send_request?: Public_Server_Action_Handler<
+			typeof create_directory_action_spec.input,
+			void,
+			Action_Messages['create_directory_request']
+		>;
+		receive_request?: Public_Server_Action_Handler<
+			typeof create_directory_action_spec.input,
+			typeof create_directory_action_spec.output,
+			Action_Messages['create_directory_request']
+		>;
+		send_response?: Public_Server_Action_Handler<
+			typeof create_directory_action_spec.output,
+			void,
+			Action_Messages['create_directory_response']
+		>;
+		receive_response?: Public_Server_Action_Handler<
+			typeof create_directory_action_spec.output,
+			void,
+			Action_Messages['create_directory_response']
+		>;
+	};
+	delete_diskfile?: {
+		send_request?: Public_Server_Action_Handler<
+			typeof delete_diskfile_action_spec.input,
+			void,
+			Action_Messages['delete_diskfile_request']
+		>;
+		receive_request?: Public_Server_Action_Handler<
+			typeof delete_diskfile_action_spec.input,
+			typeof delete_diskfile_action_spec.output,
+			Action_Messages['delete_diskfile_request']
+		>;
+		send_response?: Public_Server_Action_Handler<
+			typeof delete_diskfile_action_spec.output,
+			void,
+			Action_Messages['delete_diskfile_response']
+		>;
+		receive_response?: Public_Server_Action_Handler<
+			typeof delete_diskfile_action_spec.output,
+			void,
+			Action_Messages['delete_diskfile_response']
+		>;
+	};
+	filer_change?: {
+		send?: Public_Server_Action_Handler<
+			typeof filer_change_action_spec.input,
+			void,
+			Action_Messages['filer_change']
+		>;
+		receive?: Public_Server_Action_Handler<
+			typeof filer_change_action_spec.input,
+			void,
+			Action_Messages['filer_change']
+		>;
+	};
+	load_session?: {
+		send_request?: Public_Server_Action_Handler<
+			typeof load_session_action_spec.input,
+			void,
+			Action_Messages['load_session_request']
+		>;
+		receive_request?: Public_Server_Action_Handler<
+			typeof load_session_action_spec.input,
+			typeof load_session_action_spec.output,
+			Action_Messages['load_session_request']
+		>;
+		send_response?: Public_Server_Action_Handler<
+			typeof load_session_action_spec.output,
+			void,
+			Action_Messages['load_session_response']
+		>;
+		receive_response?: Public_Server_Action_Handler<
+			typeof load_session_action_spec.output,
+			void,
+			Action_Messages['load_session_response']
+		>;
+	};
+	ping?: {
+		send_request?: Public_Server_Action_Handler<
+			typeof ping_action_spec.input,
+			void,
+			Action_Messages['ping_request']
+		>;
+		receive_request?: Public_Server_Action_Handler<
+			typeof ping_action_spec.input,
+			typeof ping_action_spec.output,
+			Action_Messages['ping_request']
+		>;
+		send_response?: Public_Server_Action_Handler<
+			typeof ping_action_spec.output,
+			void,
+			Action_Messages['ping_response']
+		>;
+		receive_response?: Public_Server_Action_Handler<
+			typeof ping_action_spec.output,
+			void,
+			Action_Messages['ping_response']
+		>;
+	};
+	submit_completion?: {
+		send_request?: Public_Server_Action_Handler<
+			typeof submit_completion_action_spec.input,
+			void,
+			Action_Messages['submit_completion_request']
+		>;
+		receive_request?: Public_Server_Action_Handler<
+			typeof submit_completion_action_spec.input,
+			typeof submit_completion_action_spec.output,
+			Action_Messages['submit_completion_request']
+		>;
+		send_response?: Public_Server_Action_Handler<
+			typeof submit_completion_action_spec.output,
+			void,
+			Action_Messages['submit_completion_response']
+		>;
+		receive_response?: Public_Server_Action_Handler<
+			typeof submit_completion_action_spec.output,
+			void,
+			Action_Messages['submit_completion_response']
+		>;
+	};
+	toggle_main_menu?: {
+		execute?: Public_Server_Action_Handler<
+			typeof toggle_main_menu_action_spec.input,
+			boolean,
+			Action_Messages['toggle_main_menu']
+		>;
+	};
+	update_diskfile?: {
+		send_request?: Public_Server_Action_Handler<
+			typeof update_diskfile_action_spec.input,
+			void,
+			Action_Messages['update_diskfile_request']
+		>;
+		receive_request?: Public_Server_Action_Handler<
+			typeof update_diskfile_action_spec.input,
+			typeof update_diskfile_action_spec.output,
+			Action_Messages['update_diskfile_request']
+		>;
+		send_response?: Public_Server_Action_Handler<
+			typeof update_diskfile_action_spec.output,
+			void,
+			Action_Messages['update_diskfile_response']
+		>;
+		receive_response?: Public_Server_Action_Handler<
+			typeof update_diskfile_action_spec.output,
+			void,
+			Action_Messages['update_diskfile_response']
+		>;
+	};
 }
 
 // generated by src/lib/server/server_action_metatypes.gen.ts - DO NOT EDIT OR RISK LOST DATA

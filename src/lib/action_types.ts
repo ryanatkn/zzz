@@ -4,12 +4,7 @@ import {Action_Method} from '$lib/action_metatypes.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import {Jsonrpc_Notification, Jsonrpc_Request, Jsonrpc_Response_Or_Error} from '$lib/jsonrpc.js';
 
-/**
- * Flag to indicate the phase of a request/response action.
- * - 'request': The action is being sent to the server
- * - 'response': The server has responded to the action
- * - null: The action is not a request/response type (e.g., local_call, remote_notification)
- */
+// TODO BLOCK @api delete now that we have phases
 export const Action_Request_Response_Flag = z.union([
 	z.literal('request'),
 	z.literal('response'),
@@ -33,6 +28,31 @@ export type Action_Operation = z.infer<typeof Action_Operation>;
 // TODO temporary, maybe this can be a config object
 export const Action_Auth = z.union([z.literal('public'), z.literal('authorize')]);
 export type Action_Auth = z.infer<typeof Action_Auth>;
+
+export const Action_Phase = z.enum([
+	'send_request',
+	'receive_request',
+	'send_response',
+	'receive_response',
+	'send',
+	'receive',
+	'execute',
+]);
+export type Action_Phase = z.infer<typeof Action_Phase>;
+
+export const ACTION_KIND_PHASES = {
+	request_response: ['send_request', 'receive_request', 'send_response', 'receive_response'],
+	remote_notification: ['send', 'receive'],
+	local_call: ['execute'],
+} as const satisfies Record<Action_Kind, ReadonlyArray<Action_Phase>>;
+
+/**
+ * Gets the appropriate handler phases for a method based on its action spec.
+ */
+export type Handler_Phases_For_Method<T_Method extends Action_Method> =
+	T_Method extends keyof typeof ACTION_KIND_PHASES
+		? (typeof ACTION_KIND_PHASES)[T_Method][number]
+		: never;
 
 // TODO maybe this for better type safety
 // export const Action_Request_Response_Data = z.object({
