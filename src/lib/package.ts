@@ -933,7 +933,6 @@ export const src_json = {
 			declarations: [
 				{name: 'ACTION_DATE_FORMAT', kind: 'variable'},
 				{name: 'ACTION_TIME_FORMAT', kind: 'variable'},
-				{name: 'create_action_json', kind: 'function'},
 				{name: 'lookup_request_action_schema', kind: 'function'},
 				{name: 'lookup_response_action_schema', kind: 'function'},
 				{name: 'to_action_message_type', kind: 'function'},
@@ -957,7 +956,19 @@ export const src_json = {
 		},
 		'./action_messages.js': {
 			path: 'action_messages.ts',
-			declarations: [{name: 'Action_Messages', kind: 'variable'}],
+			declarations: [
+				{name: 'Action_Messages', kind: 'variable'},
+				{name: 'Action_Params', kind: 'variable'},
+				{name: 'Action_Results', kind: 'variable'},
+				{name: 'Action_Params_For', kind: 'type'},
+				{name: 'Action_Result_For', kind: 'type'},
+				{name: 'has_action_params', kind: 'function'},
+				{name: 'has_action_result', kind: 'function'},
+				{name: 'parse_action_params', kind: 'function'},
+				{name: 'parse_action_result', kind: 'function'},
+				{name: 'safe_parse_action_params', kind: 'function'},
+				{name: 'safe_parse_action_result', kind: 'function'},
+			],
 		},
 		'./action_metatypes.gen.js': {
 			path: 'action_metatypes.gen.ts',
@@ -1008,7 +1019,6 @@ export const src_json = {
 		'./action_types.js': {
 			path: 'action_types.ts',
 			declarations: [
-				{name: 'Action_Request_Response_Flag', kind: 'variable'},
 				{name: 'Action_Kind', kind: 'variable'},
 				{name: 'Action_Initiator', kind: 'variable'},
 				{name: 'Action_Operation', kind: 'variable'},
@@ -2378,6 +2388,7 @@ export const src_json = {
 				{name: 'Uuid', kind: 'variable'},
 				{name: 'Uuid_With_Default', kind: 'variable'},
 				{name: 'get_innermost_type', kind: 'function'},
+				{name: 'get_innermost_type_name', kind: 'function'},
 				{name: 'zod_get_schema_keys', kind: 'function'},
 				{name: 'get_field_schema', kind: 'function'},
 				{name: 'maybe_get_field_schema', kind: 'function'},

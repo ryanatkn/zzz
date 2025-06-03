@@ -1,14 +1,15 @@
 import {Logger} from '@ryanatkn/belt/log.js';
 import {BROWSER, DEV} from 'esm-env';
+import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 
 import type {Actions_Api} from '$lib/action_metatypes.js';
 import type {Zzz_App} from '$lib/zzz_app.svelte.js';
 import {Client_Action_Context} from '$lib/client_action_event.js';
-import {create_jsonrpc_request} from '$lib/jsonrpc_helpers.js';
+import {create_jsonrpc_notification, create_jsonrpc_request} from '$lib/jsonrpc_helpers.js';
 import {create_uuid} from '$lib/zod_helpers.js';
-import {to_action_message, to_action_message_type} from '$lib/action_helpers.js';
 import type {Jsonrpc_Singular_Message} from '$lib/jsonrpc.js';
 import type {Action_Phase} from '$lib/action_types.js';
+import {Action} from '$lib/action.svelte.js';
 
 const log = new Logger();
 
@@ -28,6 +29,8 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 				throw new Error(`missing action spec for method '${method}'`);
 			}
 
+			const action = new Action({app, json: {method}});
+
 			const handle_message = (
 				result: any | null, // TODO @api type
 				phase: Action_Phase,
@@ -44,88 +47,71 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 				);
 				console.log(`[actions_api] event`, event);
 
-				// Look up the handler using the nested structure
-				const method_handlers = app.action_handlers[method];
-				const handler = method_handlers?.[phase];
+				const handlers_by_phase = app.action_handlers[method];
+				if (!handlers_by_phase) {
+					log.error(`missing handlers for action ${method}`);
+					return;
+				}
+
+				const handler = (handlers_by_phase as any)[phase]; // TODO @api type
 
 				if (!handler) {
-					log.warn(`missing handler for action '${method}.${phase}'`);
+					log.error(`missing handler for action ${method}.${phase}`);
+					return;
 				}
 
-				if (handler) {
-					event.handle(handler);
-				}
+				event.handle(handler);
 
 				return event.result;
 			};
 
-			const request_jsonrpc_message = create_jsonrpc_request(method, params, create_uuid());
-
-			// TODO BLOCK @api @many action messages should be removed, instead tracked inside an action
-			const request_action_message_type = to_action_message_type(
-				method,
-				spec.kind === 'request_response' ? 'request' : null,
-			);
-			const request_action_message = to_action_message(
-				request_action_message_type,
-				params as unknown as any, // TODO type
-				request_jsonrpc_message,
-			);
-			app.actions.add_message(request_action_message);
-			console.log(`[actions_api] request_action_message`, request_action_message);
-
 			// Handle different action kinds with their appropriate phases
-			if (spec.kind === 'request_response') {
-				// Handle request phase
-				handle_message(null, 'send_request', request_jsonrpc_message);
+			switch (spec.kind) {
+				case 'request_response': {
+					const request = create_jsonrpc_request(method, params, create_uuid());
+					console.log(`[actions_api] request_action_message`, request);
 
-				// Avoiding `await` for compatibility with sync actions
-				return app.api_client.send(request_jsonrpc_message).then((response) => {
-					console.log(`[actions_api] response`, response);
+					action.add_request(request);
 
-					// Check if it's an error response
-					if ('error' in response) {
-						console.error(`response error`, response);
-						// TODO BLOCK @api should this throw or just log?
-						// throw new Error(`JSON-RPC error ${response.error.code}: ${response.error.message}`);
-						return;
-					}
+					// Handle request phase
+					handle_message(null, 'send_request', request);
 
-					const response_jsonrpc_message = response;
-					// TODO BLOCK @api @many action messages should be removed, instead tracked inside an action
-					const response_action_message_type = to_action_message_type(method, 'response');
-					console.log(`[actions_api] response_action_message_type`, response_action_message_type);
-					console.log(
-						`[actions_api] response_jsonrpc_message.result`,
-						response_jsonrpc_message.result,
-					);
-					console.log(`[actions_api] response_jsonrpc_message`, response_jsonrpc_message);
-					const response_action_message = to_action_message(
-						response_action_message_type,
-						response_jsonrpc_message.result as unknown as any, // TODO type
-						response_jsonrpc_message,
-					);
-					console.log(`[actions_api] response_action_message`, response_action_message);
-					app.actions.add_message(response_action_message);
+					// Avoiding `await` for compatibility with sync actions
+					return app.api_client.send(request).then((response) => {
+						console.log(`[actions_api] response`, response);
 
-					const result = response_jsonrpc_message.result;
-					handle_message(result, 'receive_response', response_jsonrpc_message);
+						// Check if it's an error response
+						if ('error' in response) {
+							console.error(`response error`, response);
+							// TODO BLOCK @api should this throw or just log?
+							// throw new Error(`JSON-RPC error ${response.error.code}: ${response.error.message}`);
+							return;
+						}
 
-					// Return the result value directly
-					return result;
-				});
-			} else if (spec.kind === 'remote_notification') {
-				return handle_message(params, 'send', request_jsonrpc_message);
+						action.add_response(response);
+
+						const {result} = response;
+						handle_message(result, 'receive_response', response);
+
+						return result;
+					});
+				}
+
+				case 'remote_notification': {
+					const notification = create_jsonrpc_notification(method, params);
+
+					action.add_notification(notification);
+
+					return handle_message(null, 'send', notification);
+				}
+
+				case 'local_call': {
+					return handle_message(null, 'execute', null);
+				}
+
+				default:
+					throw new Unreachable_Error(spec);
 			}
-
-			// TODO BLOCK @api make this a switch
-			// else if (spec.kind === 'local_call') {
-			// 	// Local calls execute immediately
-			// 	return handle_message(params, 'execute', request_jsonrpc_message);
-			// }
-			// TODO BLOCK @api this needs to have action tracking, bc it applies to all actions not just request_response
-			// Handle non-`request_response` actions synchronously
-			return handle_message(null, 'execute', request_jsonrpc_message);
 		},
 	});
 

@@ -67,6 +67,10 @@ export const get_innermost_type = (schema: z.ZodTypeAny): z.ZodTypeAny => {
 	return schema;
 };
 
+// TODO type
+export const get_innermost_type_name = (schema: z.ZodTypeAny): any =>
+	get_innermost_type(schema)._def.typeName;
+
 /**
  * Gets all property keys from a Zod object schema.
  */

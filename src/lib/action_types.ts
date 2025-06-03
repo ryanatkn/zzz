@@ -4,14 +4,6 @@ import {Action_Method} from '$lib/action_metatypes.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import {Jsonrpc_Notification, Jsonrpc_Request, Jsonrpc_Response_Or_Error} from '$lib/jsonrpc.js';
 
-// TODO BLOCK @api delete now that we have phases
-export const Action_Request_Response_Flag = z.union([
-	z.literal('request'),
-	z.literal('response'),
-	z.null(),
-]);
-export type Action_Request_Response_Flag = z.infer<typeof Action_Request_Response_Flag>;
-
 export const Action_Kind = z.enum(['request_response', 'remote_notification', 'local_call']);
 export type Action_Kind = z.infer<typeof Action_Kind>;
 
@@ -83,8 +75,6 @@ export type Handler_Phases_For_Method<T_Method extends Action_Method> =
 
 export const Action_Json = Cell_Json.extend({
 	method: Action_Method,
-	kind: Action_Kind,
-	request_response_flag: Action_Request_Response_Flag,
 	// TODO BLOCK Action_Data probably
 	jsonrpc_request: Jsonrpc_Request.optional(),
 	jsonrpc_response: Jsonrpc_Response_Or_Error.optional(),

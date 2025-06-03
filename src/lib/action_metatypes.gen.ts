@@ -1,15 +1,15 @@
 import type {Gen} from '@ryanatkn/gro/gen.js';
 import {z} from 'zod';
 
-import {get_innermost_type} from '$lib/zod_helpers.js';
+import {get_innermost_type_name} from '$lib/zod_helpers.js';
 import {action_specs} from '$lib/action_collections.js';
 import {Action_Registry} from '$lib/action_registry.js';
 import {
 	to_action_spec_input_identifier,
 	to_action_spec_output_identifier,
-	to_action_message_type,
 	to_action_request_message_type,
 	to_action_response_message_type,
+	to_action_message_type,
 } from '$lib/action_helpers.js';
 import {ACTION_KIND_PHASES, type Action_Phase} from '$lib/action_types.js';
 
@@ -162,16 +162,13 @@ export const gen: Gen = ({origin_path}) => {
 		export interface Actions_Api {
 			${registry.specs
 				.map((spec) => {
-					const innermost_type_name = get_innermost_type(spec.input)._def.typeName;
+					const innermost_type_name = get_innermost_type_name(spec.input);
 					const has_params =
 						innermost_type_name !== z.ZodFirstPartyTypeKind.ZodNull &&
 						innermost_type_name !== z.ZodFirstPartyTypeKind.ZodVoid;
 					return `${spec.method}: (${
 						has_params
-							? `params${spec.input.isOptional() ? '?' : ''}: Action_Message_Params['${to_action_message_type(
-									spec.method,
-									spec.kind === 'request_response' ? 'request' : null,
-								)}']`
+							? `params${spec.input.isOptional() ? '?' : ''}: Action_Message_Params['${spec.method}']`
 							: 'params?: void'
 					}) => ${
 						spec.kind === 'request_response'

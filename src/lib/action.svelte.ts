@@ -7,7 +7,7 @@ import {Action_Method} from '$lib/action_metatypes.js';
 import {Diskfile_Change, Diskfile_Path, Serializable_Source_File} from '$lib/diskfile_types.js';
 import {to_completion_response_text} from '$lib/response_helpers.js';
 import {to_preview} from '$lib/helpers.js';
-import {Action_Json, Action_Kind, Action_Request_Response_Flag} from '$lib/action_types.js';
+import {Action_Json} from '$lib/action_types.js';
 import {
 	Jsonrpc_Request,
 	Jsonrpc_Response,
@@ -15,6 +15,8 @@ import {
 	Jsonrpc_Error_Message,
 	type Jsonrpc_Request_Id,
 } from '$lib/jsonrpc.js';
+import {action_spec_by_method} from '$lib/action_collections.js';
+import type {Action_Spec} from '$lib/action_spec.js';
 
 export interface Action_Options extends Cell_Options<typeof Action_Json> {}
 
@@ -25,14 +27,18 @@ export interface Action_Options extends Cell_Options<typeof Action_Json> {}
  */
 export class Action extends Cell<typeof Action_Json> {
 	method: Action_Method = $state()!;
-	kind: Action_Kind = $state()!;
-	request_response_flag: Action_Request_Response_Flag = $state()!;
 
 	// Store the full JSON-RPC messages
 	// data: Action_Data;
-	jsonrpc_request: Jsonrpc_Request | undefined = $state();
-	jsonrpc_response: Jsonrpc_Response | Jsonrpc_Error_Message | undefined = $state();
-	jsonrpc_notification: Jsonrpc_Notification | undefined = $state();
+	jsonrpc_request: Jsonrpc_Request | undefined = $state.raw();
+	jsonrpc_response: Jsonrpc_Response | Jsonrpc_Error_Message | undefined = $state.raw();
+	jsonrpc_notification: Jsonrpc_Notification | undefined = $state.raw();
+
+	readonly spec: Action_Spec = $derived.by(() => {
+		const s = action_spec_by_method.get(this.method);
+		if (!s) throw new Error(`Missing action spec for method '${this.method}'`);
+		return s;
+	});
 
 	// Computed properties for easy access
 	readonly jsonrpc_message_id: Jsonrpc_Request_Id | null = $derived(
@@ -44,7 +50,9 @@ export class Action extends Cell<typeof Action_Json> {
 		!!this.jsonrpc_response && 'error' in this.jsonrpc_response,
 	);
 
-	readonly is_complete: boolean = $derived(this.kind !== 'request_response' || this.has_response);
+	readonly is_complete: boolean = $derived(
+		this.spec.kind !== 'request_response' || this.has_response,
+	);
 
 	// Extract params and result for convenience
 	readonly params: any = $derived.by(() => {
@@ -67,7 +75,7 @@ export class Action extends Cell<typeof Action_Json> {
 		return undefined;
 	});
 
-	readonly display_name: string = $derived(`${this.method} (${this.kind})`);
+	readonly display_name: string = $derived(`${this.method} (${this.spec.kind})`);
 
 	readonly is_ping: boolean = $derived(this.method === 'ping');
 	readonly is_prompt: boolean = $derived(this.method === 'submit_completion');
@@ -167,6 +175,27 @@ export class Action extends Cell<typeof Action_Json> {
 	constructor(options: Action_Options) {
 		super(Action_Json, options);
 		this.init();
+	}
+
+	add_request(request: Jsonrpc_Request): void {
+		if (this.spec.kind !== 'request_response') {
+			throw new Error(`Cannot add request to action of kind '${this.spec.kind}'`);
+		}
+		this.jsonrpc_request = request;
+	}
+
+	add_response(response: Jsonrpc_Response | Jsonrpc_Error_Message): void {
+		if (this.spec.kind !== 'request_response') {
+			throw new Error(`Cannot add response to action of kind '${this.spec.kind}'`);
+		}
+		this.jsonrpc_response = response;
+	}
+
+	add_notification(notification: Jsonrpc_Notification): void {
+		if (this.spec.kind !== 'remote_notification') {
+			throw new Error(`Cannot add notification to action of kind '${this.spec.kind}'`);
+		}
+		this.jsonrpc_notification = notification;
 	}
 }
 

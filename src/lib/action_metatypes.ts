@@ -95,20 +95,20 @@ export interface Action_Message_Params {
  */
 export interface Actions_Api {
 	create_directory: (
-		params: Action_Message_Params['create_directory_request'],
+		params: Action_Message_Params['create_directory'],
 	) => Promise<Action_Message_Params['create_directory_response']>;
 	delete_diskfile: (
-		params: Action_Message_Params['delete_diskfile_request'],
+		params: Action_Message_Params['delete_diskfile'],
 	) => Promise<Action_Message_Params['delete_diskfile_response']>;
 	filer_change: (params: Action_Message_Params['filer_change']) => void;
 	load_session: (params?: void) => Promise<Action_Message_Params['load_session_response']>;
 	ping: (params?: void) => Promise<Action_Message_Params['ping_response']>;
 	submit_completion: (
-		params: Action_Message_Params['submit_completion_request'],
+		params: Action_Message_Params['submit_completion'],
 	) => Promise<Action_Message_Params['submit_completion_response']>;
 	toggle_main_menu: (params?: Action_Message_Params['toggle_main_menu']) => boolean;
 	update_diskfile: (
-		params: Action_Message_Params['update_diskfile_request'],
+		params: Action_Message_Params['update_diskfile'],
 	) => Promise<Action_Message_Params['update_diskfile_response']>;
 }
 

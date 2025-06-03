@@ -1,11 +1,7 @@
 import type {z} from 'zod';
 
-import {Action_Message_Union, action_spec_by_method} from '$lib/action_collections.js';
-import {
-	type Action_Json,
-	type Action_Auth,
-	type Action_Request_Response_Flag,
-} from '$lib/action_types.js';
+import {Action_Message_Union} from '$lib/action_collections.js';
+import type {Action_Auth} from '$lib/action_types.js';
 import {Action_Messages} from '$lib/action_messages.js';
 import {
 	Action_Message_Type,
@@ -20,20 +16,6 @@ import {to_jsonrpc_message_id} from '$lib/jsonrpc_helpers.js';
 export const ACTION_DATE_FORMAT = 'MMM d, p';
 export const ACTION_TIME_FORMAT = 'p';
 
-// TODO BLOCK @api delete this
-export const create_action_json = (action: Action_Message_Union): Action_Json | null => {
-	const spec = action_spec_by_method.get(action.method);
-	if (!spec) {
-		console.error(`No action spec found for method: ${action.method}`, action);
-		return null;
-	}
-	return {
-		...action,
-		kind: spec.kind,
-		updated: action.created,
-	};
-};
-
 // TODO some hacky types but looks correct
 export const lookup_request_action_schema = (
 	method: Action_Method,
@@ -46,10 +28,10 @@ export const lookup_response_action_schema = (
 ): z.ZodType<Action_Message_Union> | undefined =>
 	Action_Messages[to_action_response_message_type(method)] as any;
 
-// TODO maybe variant(s) or replace with send/receive? server/client?
+// TODO BLOCK @api delete
 export const to_action_message_type = (
 	method: Action_Method,
-	request_response_flag: Action_Request_Response_Flag,
+	request_response_flag: 'request' | 'response' | null,
 ): Action_Message_Type =>
 	Action_Message_Type.parse(
 		request_response_flag === 'request'

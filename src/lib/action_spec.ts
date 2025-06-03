@@ -10,14 +10,12 @@ export const Action_Spec_Base = z.object({
 	// TODO BLOCK @api is not yet used
 	initiator: Action_Initiator,
 	// TODO BLOCK @api is not yet used, should be for GET/POST distinction
-	operation: Action_Operation.nullable().default(null),
+	operation: Action_Operation.nullable(),
 	auth: Action_Auth.nullable(),
 	input: z.instanceof(z.ZodType),
-	// TODO BLOCK @api needs to handle void/undefined right?
-	// because doesn't this make it so we can't model void local functions?
-	output: z.instanceof(z.ZodType).nullable().default(null),
+	output: z.instanceof(z.ZodType).nullable(),
 	// TODO BLOCK @api is not yet used
-	async: z.boolean().default(false),
+	async: z.boolean(),
 });
 export type Action_Spec_Base = z.infer<typeof Action_Spec_Base>;
 
@@ -26,6 +24,7 @@ export const Request_Response_Action_Spec = Action_Spec_Base.extend({
 	kind: z.literal('request_response').default('request_response'),
 	operation: Action_Operation,
 	auth: Action_Auth,
+	output: z.instanceof(z.ZodType),
 	async: z.literal(true).default(true),
 });
 export type Request_Response_Action_Spec = z.infer<typeof Request_Response_Action_Spec>;
@@ -39,7 +38,7 @@ export const Remote_Notification_Action_Spec = Action_Spec_Base.extend({
 	 */
 	operation: z.null().default(null),
 	auth: z.null().default(null),
-	output: z.null().default(null), // TODO think about `z.void().default(undefined)`
+	output: z.null().default(null),
 	async: z.literal(false).default(false),
 });
 export type Remote_Notification_Action_Spec = z.infer<typeof Remote_Notification_Action_Spec>;
@@ -48,6 +47,7 @@ export type Remote_Notification_Action_Spec = z.infer<typeof Remote_Notification
 export const Local_Call_Action_Spec = Action_Spec_Base.extend({
 	kind: z.literal('local_call').default('local_call'),
 	auth: z.null().default(null),
+	output: z.instanceof(z.ZodType),
 	returns: Type_Literal, // TODO ideally wouldn't exist, should be generated from the zod schema
 });
 export type Local_Call_Action_Spec = z.infer<typeof Local_Call_Action_Spec>;

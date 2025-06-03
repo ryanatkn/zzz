@@ -3,9 +3,7 @@ import {z} from 'zod';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Action, Action_Schema} from '$lib/action.svelte.js';
 import {Action_Json, type Action_Json_Input} from '$lib/action_types.js';
-import {create_action_json} from '$lib/action_helpers.js';
 import {Action_Method} from '$lib/action_metatypes.js';
-import type {Action_Message_Union} from '$lib/action_collections.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {create_multi_index} from '$lib/indexed_collection_helpers.js';
@@ -84,11 +82,11 @@ export class Actions extends Cell<typeof Actions_Json> {
 		this.#trim_to_history_limit(); // TODO should be unnecessary to override `set_json` for this
 	}
 
-	// TODO BLOCK @api this is wrong because it takes messages as input but needs to act on actions which may wrap multiple messages
-	add_message(message: Action_Message_Union): void {
-		const action_json = create_action_json(message);
-		if (!action_json) throw new Error(`Invalid action: ${message.method}`);
-		this.add_json(action_json);
+	add(action: Action): void {
+		this.items.add(action);
+
+		// TODO refactor
+		this.#trim_to_history_limit();
 	}
 
 	/**
@@ -96,11 +94,7 @@ export class Actions extends Cell<typeof Actions_Json> {
 	 */
 	add_json(action_json: Action_Json_Input): Action {
 		const action = new Action({app: this.app, json: action_json});
-		this.items.add(action);
-
-		// Trim collection if it exceeds history limit
-		this.#trim_to_history_limit();
-
+		this.add(action);
 		return action;
 	}
 

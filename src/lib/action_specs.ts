@@ -94,7 +94,7 @@ export const update_diskfile_action_spec = {
 			content: z.string(),
 		})
 		.strict(),
-	output: null,
+	output: z.null(),
 	async: true,
 } satisfies Action_Spec;
 
@@ -109,7 +109,7 @@ export const delete_diskfile_action_spec = {
 			path: Diskfile_Path,
 		})
 		.strict(),
-	output: null,
+	output: z.null(),
 	async: true,
 } satisfies Action_Spec;
 
@@ -124,7 +124,7 @@ export const create_directory_action_spec = {
 			path: Diskfile_Path,
 		})
 		.strict(),
-	output: null,
+	output: z.null(),
 	async: true,
 } satisfies Action_Spec;
 
@@ -154,7 +154,7 @@ export const toggle_main_menu_action_spec = {
 	operation: 'command',
 	auth: null,
 	input: z.union([z.boolean(), z.void()]).optional(),
-	output: null,
+	output: z.void(),
 	returns: Type_Literal.parse('boolean'),
 	async: false,
 } satisfies Action_Spec;

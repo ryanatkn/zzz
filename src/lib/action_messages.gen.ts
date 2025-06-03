@@ -69,6 +69,94 @@ export const gen: Gen = ({origin_path}) => {
 				.join(';\n\t\t\t')}
 		}
 
+		// TODO BLOCK @api use the following or a variant and delete the stuff above
+		/**
+		 * Action parameter schemas indexed by method name.
+		 * These represent the input data for each action.
+		 */
+		export const Action_Params = {
+			${registry.specs
+				.map((spec) => `${spec.method}: ${to_action_spec_input_identifier(spec.method)}`)
+				.join(',\n\t\t\t')}
+		} as const;
+
+		/**
+		 * Action result schemas indexed by method name.
+		 * These represent the output data for each action.
+		 * Note: null outputs are represented as z.null() schemas.
+		 */
+		export const Action_Results = {
+			${registry.specs
+				.map((spec) => `${spec.method}: ${to_action_spec_output_identifier(spec.method)}`)
+				.join(',\n\t\t\t')}
+		} as const;
+
+		/**
+		 * Helper type to get params type for a method.
+		 */
+		export type Action_Params_For<TMethod extends keyof typeof Action_Params> = 
+			z.infer<typeof Action_Params[TMethod]>;
+
+		/**
+		 * Helper type to get result type for a method.
+		 */
+		export type Action_Result_For<TMethod extends keyof typeof Action_Results> = 
+			z.infer<typeof Action_Results[TMethod]>;
+
+		/**
+		 * Type guard to check if a method has params.
+		 */
+		export const has_action_params = (method: string): method is keyof typeof Action_Params => {
+			return method in Action_Params;
+		};
+
+		/**
+		 * Type guard to check if a method has results.
+		 */
+		export const has_action_result = (method: string): method is keyof typeof Action_Results => {
+			return method in Action_Results;
+		};
+
+		/**
+		 * Parse action params with validation.
+		 */
+		export const parse_action_params = <TMethod extends keyof typeof Action_Params>(
+			method: TMethod,
+			data: unknown
+		): Action_Params_For<TMethod> => {
+			return Action_Params[method].parse(data);
+		};
+
+		/**
+		 * Parse action result with validation.
+		 */
+		export const parse_action_result = <TMethod extends keyof typeof Action_Results>(
+			method: TMethod,
+			data: unknown
+		): Action_Result_For<TMethod> => {
+			return Action_Results[method].parse(data);
+		};
+
+		/**
+		 * Safe parse action params.
+		 */
+		export const safe_parse_action_params = <TMethod extends keyof typeof Action_Params>(
+			method: TMethod,
+			data: unknown
+		): z.SafeParseReturnType<unknown, Action_Params_For<TMethod>> => {
+			return Action_Params[method].safeParse(data);
+		};
+
+		/**
+		 * Safe parse action result.
+		 */
+		export const safe_parse_action_result = <TMethod extends keyof typeof Action_Results>(
+			method: TMethod,
+			data: unknown
+		): z.SafeParseReturnType<unknown, Action_Result_For<TMethod>> => {
+			return Action_Results[method].safeParse(data);
+		};
+
 		// ${banner}
 	`;
 };
