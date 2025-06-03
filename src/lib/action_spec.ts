@@ -10,7 +10,7 @@ export const Action_Spec_Base = z.object({
 	// TODO BLOCK @api is not yet used
 	initiator: Action_Initiator,
 	// TODO BLOCK @api is not yet used, should be for GET/POST distinction
-	operation: Action_Operation.nullable(),
+	operation: Action_Operation,
 	auth: Action_Auth.nullable(),
 	input: z.instanceof(z.ZodType),
 	output: z.instanceof(z.ZodType).nullable(),
@@ -32,11 +32,7 @@ export type Request_Response_Action_Spec = z.infer<typeof Request_Response_Actio
 /** Type for remote_notification actions (server sends without a request). */
 export const Remote_Notification_Action_Spec = Action_Spec_Base.extend({
 	kind: z.literal('remote_notification').default('remote_notification'),
-	/**
-	 * Remote notifications do not have an operation -
-	 * they're saying "something happened" rather than "do this" or "get that".
-	 */
-	operation: z.null().default(null),
+	operation: z.literal('command').default('command'), // TODO maybe notification operations should be null or 'event' or something?
 	auth: z.null().default(null),
 	output: z.null().default(null),
 	async: z.literal(false).default(false),

@@ -70,7 +70,7 @@ export const filer_change_action_spec = {
 	method: 'filer_change',
 	kind: 'remote_notification',
 	initiator: 'server',
-	operation: null,
+	operation: 'command',
 	auth: null,
 	input: z
 		.object({
