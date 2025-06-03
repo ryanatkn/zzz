@@ -146,12 +146,7 @@ export const gen: Gen = ({origin_path}) => {
 			${registry.specs
 				.map((spec) => {
 					const {method} = spec;
-					if (spec.kind === 'request_response') {
-						return `${to_action_request_message_type(method)}: z.infer<typeof ${to_action_spec_input_identifier(method)}>,
-						${to_action_response_message_type(method)}: z.infer<typeof ${to_action_spec_output_identifier(method)}>`;
-					} else {
-						return `${method}: z.infer<typeof ${to_action_spec_input_identifier(method)}>`;
-					}
+					return `${method}: z.infer<typeof ${to_action_spec_input_identifier(method)}>`;
 				})
 				.join(',\n\t\t\t')}
 		}

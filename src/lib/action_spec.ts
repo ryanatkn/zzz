@@ -13,7 +13,7 @@ export const Action_Spec_Base = z.object({
 	operation: Action_Operation,
 	auth: Action_Auth.nullable(),
 	input: z.instanceof(z.ZodType),
-	output: z.instanceof(z.ZodType).nullable(),
+	output: z.instanceof(z.ZodType),
 	// TODO BLOCK @api is not yet used
 	async: z.boolean(),
 });
@@ -24,7 +24,6 @@ export const Request_Response_Action_Spec = Action_Spec_Base.extend({
 	kind: z.literal('request_response').default('request_response'),
 	operation: Action_Operation,
 	auth: Action_Auth,
-	output: z.instanceof(z.ZodType),
 	async: z.literal(true).default(true),
 });
 export type Request_Response_Action_Spec = z.infer<typeof Request_Response_Action_Spec>;
@@ -34,7 +33,7 @@ export const Remote_Notification_Action_Spec = Action_Spec_Base.extend({
 	kind: z.literal('remote_notification').default('remote_notification'),
 	operation: z.literal('command').default('command'), // TODO maybe notification operations should be null or 'event' or something?
 	auth: z.null().default(null),
-	output: z.null().default(null),
+	output: z.instanceof(z.ZodVoid),
 	async: z.literal(false).default(false),
 });
 export type Remote_Notification_Action_Spec = z.infer<typeof Remote_Notification_Action_Spec>;
@@ -43,7 +42,6 @@ export type Remote_Notification_Action_Spec = z.infer<typeof Remote_Notification
 export const Local_Call_Action_Spec = Action_Spec_Base.extend({
 	kind: z.literal('local_call').default('local_call'),
 	auth: z.null().default(null),
-	output: z.instanceof(z.ZodType),
 	returns: Type_Literal, // TODO ideally wouldn't exist, should be generated from the zod schema
 });
 export type Local_Call_Action_Spec = z.infer<typeof Local_Call_Action_Spec>;

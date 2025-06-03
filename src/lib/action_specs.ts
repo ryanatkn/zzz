@@ -78,7 +78,7 @@ export const filer_change_action_spec = {
 			source_file: Serializable_Source_File,
 		})
 		.strict(),
-	output: null,
+	output: z.void(),
 	async: false,
 } satisfies Action_Spec;
 

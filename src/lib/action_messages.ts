@@ -118,6 +118,16 @@ export const Action_Inputs = {
 	toggle_main_menu: toggle_main_menu_action_spec.input,
 	update_diskfile: update_diskfile_action_spec.input,
 } as const;
+export interface Action_Inputs {
+	create_directory: z.infer<typeof create_directory_action_spec.input>;
+	delete_diskfile: z.infer<typeof delete_diskfile_action_spec.input>;
+	filer_change: z.infer<typeof filer_change_action_spec.input>;
+	load_session: z.infer<typeof load_session_action_spec.input>;
+	ping: z.infer<typeof ping_action_spec.input>;
+	submit_completion: z.infer<typeof submit_completion_action_spec.input>;
+	toggle_main_menu: z.infer<typeof toggle_main_menu_action_spec.input>;
+	update_diskfile: z.infer<typeof update_diskfile_action_spec.input>;
+}
 
 /**
  * Action result schemas indexed by method name.
@@ -134,6 +144,16 @@ export const Action_Outputs = {
 	toggle_main_menu: toggle_main_menu_action_spec.output,
 	update_diskfile: update_diskfile_action_spec.output,
 } as const;
+export interface Action_Outputs {
+	create_directory: z.infer<typeof create_directory_action_spec.output>;
+	delete_diskfile: z.infer<typeof delete_diskfile_action_spec.output>;
+	filer_change: z.infer<typeof filer_change_action_spec.output>;
+	load_session: z.infer<typeof load_session_action_spec.output>;
+	ping: z.infer<typeof ping_action_spec.output>;
+	submit_completion: z.infer<typeof submit_completion_action_spec.output>;
+	toggle_main_menu: z.infer<typeof toggle_main_menu_action_spec.output>;
+	update_diskfile: z.infer<typeof update_diskfile_action_spec.output>;
+}
 
 /**
  * Helper type to get params type for a method.

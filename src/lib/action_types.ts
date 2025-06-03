@@ -17,7 +17,8 @@ export type Action_Initiator = z.infer<typeof Action_Initiator>;
 export const Action_Operation = z.union([z.literal('command'), z.literal('query')]);
 export type Action_Operation = z.infer<typeof Action_Operation>;
 
-// TODO temporary, maybe this can be a config object
+// TODO temporary/stubbed, maybe this can be a config object
+/** @stub */
 export const Action_Auth = z.union([z.literal('public'), z.literal('authorize')]);
 export type Action_Auth = z.infer<typeof Action_Auth>;
 

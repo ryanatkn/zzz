@@ -79,6 +79,14 @@ export const gen: Gen = ({origin_path}) => {
 				.map((spec) => `${spec.method}: ${to_action_spec_input_identifier(spec.method)}`)
 				.join(',\n\t\t\t')}
 		} as const;
+		export interface Action_Inputs {
+			${registry.specs
+				.map(
+					(spec) =>
+						`${spec.method}: z.infer<typeof ${to_action_spec_input_identifier(spec.method)}>`,
+				)
+				.join(',\n\t\t\t')}
+		}
 
 		/**
 		 * Action result schemas indexed by method name.
@@ -90,6 +98,14 @@ export const gen: Gen = ({origin_path}) => {
 				.map((spec) => `${spec.method}: ${to_action_spec_output_identifier(spec.method)}`)
 				.join(',\n\t\t\t')}
 		} as const;
+		export interface Action_Outputs {
+			${registry.specs
+				.map(
+					(spec) =>
+						`${spec.method}: z.infer<typeof ${to_action_spec_output_identifier(spec.method)}>`,
+				)
+				.join(',\n\t\t\t')}
+		}
 
 		/**
 		 * Helper type to get params type for a method.
