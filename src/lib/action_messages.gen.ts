@@ -74,7 +74,7 @@ export const gen: Gen = ({origin_path}) => {
 		 * Action parameter schemas indexed by method name.
 		 * These represent the input data for each action.
 		 */
-		export const Action_Params = {
+		export const Action_Inputs = {
 			${registry.specs
 				.map((spec) => `${spec.method}: ${to_action_spec_input_identifier(spec.method)}`)
 				.join(',\n\t\t\t')}
@@ -85,7 +85,7 @@ export const gen: Gen = ({origin_path}) => {
 		 * These represent the output data for each action.
 		 * Note: null outputs are represented as z.null() schemas.
 		 */
-		export const Action_Results = {
+		export const Action_Outputs = {
 			${registry.specs
 				.map((spec) => `${spec.method}: ${to_action_spec_output_identifier(spec.method)}`)
 				.join(',\n\t\t\t')}
@@ -94,67 +94,67 @@ export const gen: Gen = ({origin_path}) => {
 		/**
 		 * Helper type to get params type for a method.
 		 */
-		export type Action_Params_For<TMethod extends keyof typeof Action_Params> = 
-			z.infer<typeof Action_Params[TMethod]>;
+		export type Action_Input_For<T_Method extends keyof typeof Action_Inputs> = 
+			z.infer<typeof Action_Inputs[T_Method]>;
 
 		/**
 		 * Helper type to get result type for a method.
 		 */
-		export type Action_Result_For<TMethod extends keyof typeof Action_Results> = 
-			z.infer<typeof Action_Results[TMethod]>;
+		export type Action_Output_For<T_Method extends keyof typeof Action_Outputs> = 
+			z.infer<typeof Action_Outputs[T_Method]>;
 
 		/**
 		 * Type guard to check if a method has params.
 		 */
-		export const has_action_params = (method: string): method is keyof typeof Action_Params => {
-			return method in Action_Params;
+		export const has_action_params = (method: string): method is keyof typeof Action_Inputs => {
+			return method in Action_Inputs;
 		};
 
 		/**
 		 * Type guard to check if a method has results.
 		 */
-		export const has_action_result = (method: string): method is keyof typeof Action_Results => {
-			return method in Action_Results;
+		export const has_action_result = (method: string): method is keyof typeof Action_Outputs => {
+			return method in Action_Outputs;
 		};
 
 		/**
 		 * Parse action params with validation.
 		 */
-		export const parse_action_params = <TMethod extends keyof typeof Action_Params>(
-			method: TMethod,
+		export const parse_action_input = <T_Method extends keyof typeof Action_Inputs>(
+			method: T_Method,
 			data: unknown
-		): Action_Params_For<TMethod> => {
-			return Action_Params[method].parse(data);
+		): Action_Input_For<T_Method> => {
+			return Action_Inputs[method].parse(data);
 		};
 
 		/**
 		 * Parse action result with validation.
 		 */
-		export const parse_action_result = <TMethod extends keyof typeof Action_Results>(
-			method: TMethod,
+		export const parse_action_output = <T_Method extends keyof typeof Action_Outputs>(
+			method: T_Method,
 			data: unknown
-		): Action_Result_For<TMethod> => {
-			return Action_Results[method].parse(data);
+		): Action_Output_For<T_Method> => {
+			return Action_Outputs[method].parse(data);
 		};
 
 		/**
 		 * Safe parse action params.
 		 */
-		export const safe_parse_action_params = <TMethod extends keyof typeof Action_Params>(
-			method: TMethod,
+		export const safe_parse_action_input = <T_Method extends keyof typeof Action_Inputs>(
+			method: T_Method,
 			data: unknown
-		): z.SafeParseReturnType<unknown, Action_Params_For<TMethod>> => {
-			return Action_Params[method].safeParse(data);
+		): z.SafeParseReturnType<unknown, Action_Input_For<T_Method>> => {
+			return Action_Inputs[method].safeParse(data);
 		};
 
 		/**
 		 * Safe parse action result.
 		 */
-		export const safe_parse_action_result = <TMethod extends keyof typeof Action_Results>(
-			method: TMethod,
+		export const safe_parse_action_output = <T_Method extends keyof typeof Action_Outputs>(
+			method: T_Method,
 			data: unknown
-		): z.SafeParseReturnType<unknown, Action_Result_For<TMethod>> => {
-			return Action_Results[method].safeParse(data);
+		): z.SafeParseReturnType<unknown, Action_Output_For<T_Method>> => {
+			return Action_Outputs[method].safeParse(data);
 		};
 
 		// ${banner}
