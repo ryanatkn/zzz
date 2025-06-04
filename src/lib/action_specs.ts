@@ -13,7 +13,7 @@ import type {Action_Spec} from '$lib/action_spec.js';
 // Action specs are the source of truth for many things including generated code -
 // the goal is to make the system extensible for users but it's not there yet.
 
-// TODO these were using the helper `create_action_spec` but I don't see how to get proper typing,
+// TODO I tried using the helper `create_action_spec` but I don't see how to get proper typing,
 // we want the declared specs to have their literal types but not need to include optional properties -
 // the current implementation below requires all properties to be declared, but does have correct typing:
 //
