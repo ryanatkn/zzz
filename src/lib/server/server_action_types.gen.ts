@@ -100,7 +100,6 @@ export const gen: Gen = ({origin_path}) => {
 
     import type {${service_imports.join(', ')}} from '$lib/server/server_action_handler.js';
     import type {${schema_imports.join(', ')}} from '$lib/action_specs.js';
-		import type {Action_Messages} from '$lib/action_messages.js';
 
     /**
      * Maps action methods to their server-side phase handlers.

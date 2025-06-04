@@ -17,7 +17,6 @@ import {Zzz_Dir} from '$lib/diskfile_types.js';
 import {Safe_Fs} from '$lib/server/safe_fs.js';
 import {Action_Registry} from '$lib/action_registry.js';
 import {stringify_zod_error} from '$lib/zod_helpers.js';
-import {lookup_request_action_schema, lookup_response_action_schema} from '$lib/action_helpers.js';
 import {
 	type Jsonrpc_Request,
 	type Jsonrpc_Response,

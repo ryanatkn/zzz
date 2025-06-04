@@ -13,7 +13,6 @@ import type {
 	toggle_main_menu_action_spec,
 	update_diskfile_action_spec,
 } from '$lib/action_specs.js';
-import type {Action_Messages} from '$lib/action_messages.js';
 
 /**
  * Maps action methods to their server-side phase handlers.
