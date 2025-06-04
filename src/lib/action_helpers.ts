@@ -24,3 +24,6 @@ export const to_action_spec_output_identifier = (method: Action_Method): string 
 
 export const to_action_spec_auth_identifier = (auth: Action_Auth): string =>
 	auth === 'public' ? 'Public_Server_Action_Handler' : 'Authorized_Server_Action_Handler';
+
+export const to_action_spec_output_type = (method: Action_Method): string =>
+	`z.infer<typeof ${to_action_spec_output_identifier(method)}>`;

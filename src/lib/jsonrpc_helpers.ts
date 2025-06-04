@@ -13,6 +13,7 @@ import {
 	type Jsonrpc_Request_Params,
 	Jsonrpc_Result,
 	Jsonrpc_Response,
+	Jsonrpc_Message,
 } from '$lib/jsonrpc.js';
 import {Jsonrpc_Error, JSONRPC_ERROR_CODES} from '$lib/jsonrpc_errors.js';
 
@@ -116,3 +117,11 @@ export const to_jsonrpc_message_id = (
 
 	return (message_or_id as any).id ?? null;
 };
+
+export const is_jsonrpc_request = (
+	message: Jsonrpc_Message | null | undefined,
+): message is Jsonrpc_Request => !!message && 'method' in message && 'id' in message;
+
+export const is_jsonrpc_notification = (
+	message: Jsonrpc_Message | null | undefined,
+): message is Jsonrpc_Notification => !!message && 'method' in message && !('id' in message);

@@ -50,13 +50,15 @@ export interface Actions_Api {
 	delete_diskfile: (
 		input: Action_Inputs['delete_diskfile'],
 	) => Promise<Action_Outputs['delete_diskfile']>;
-	filer_change: (input: Action_Inputs['filer_change']) => void;
+	filer_change: (input: Action_Inputs['filer_change']) => Action_Outputs['filer_change'];
 	load_session: (input?: void) => Promise<Action_Outputs['load_session']>;
 	ping: (input?: void) => Promise<Action_Outputs['ping']>;
 	submit_completion: (
 		input: Action_Inputs['submit_completion'],
 	) => Promise<Action_Outputs['submit_completion']>;
-	toggle_main_menu: (input?: Action_Inputs['toggle_main_menu']) => undefined;
+	toggle_main_menu: (
+		input?: Action_Inputs['toggle_main_menu'],
+	) => Action_Outputs['toggle_main_menu'];
 	update_diskfile: (
 		input: Action_Inputs['update_diskfile'],
 	) => Promise<Action_Outputs['update_diskfile']>;

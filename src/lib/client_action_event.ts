@@ -1,6 +1,6 @@
 import type {Action_Method} from '$lib/action_metatypes.js';
 import type {Zzz_App} from '$lib/zzz_app.svelte.js';
-import type {Action_Phase} from '$lib/action_types.js';
+import type {Action_Input, Action_Output, Action_Phase} from '$lib/action_types.js';
 import type {Jsonrpc_Singular_Message} from '$lib/jsonrpc.js';
 import type {Client_Action_Handler} from '$lib/client_action_handler.js';
 
@@ -18,18 +18,18 @@ export type After_Client_Action_Callback = () => void | Promise<void>;
  * Context object passed to client action handlers.
  * Provides access to the app, action details, and results.
  */
-export class Client_Action_Context<
+export class Client_Action_Event<
 	T_App extends Zzz_App = Zzz_App,
-	T_Params = unknown,
-	T_Result = any,
+	T_Input extends Action_Input = any, // TODO @api type
+	T_Output extends Action_Output = any, // TODO @api type
 > {
 	app: T_App;
 	/** JSON-RPC method for the action. */
 	method: Action_Method;
 	/** The phase of the action handling. */
 	phase: Action_Phase;
-	params: T_Params;
-	result: T_Result;
+	input: T_Input;
+	output: T_Output;
 	/** The JSON-RPC message associated with this action */
 	jsonrpc_message: Jsonrpc_Singular_Message | null;
 
@@ -41,16 +41,16 @@ export class Client_Action_Context<
 		app: T_App,
 		method: Action_Method,
 		phase: Action_Phase,
-		params: T_Params,
-		result: T_Result,
+		input: T_Input,
+		output: T_Output,
 		jsonrpc_message: Jsonrpc_Singular_Message | null,
 	) {
 		this.app = app;
 		this.method = method;
 		this.phase = phase;
 		// TODO BLOCK @api should these be input/output instead of params/result?
-		this.params = params;
-		this.result = result;
+		this.input = input;
+		this.output = output;
 		this.jsonrpc_message = jsonrpc_message;
 	}
 
@@ -67,11 +67,11 @@ export class Client_Action_Context<
 
 	handle(handler: Client_Action_Handler): void {
 		if (this.handled) {
-			throw new Error('Client_Action_Context has already been handled');
+			throw new Error('Client_Action_Event has already been handled');
 		}
 		this.handled = true;
 
-		this.result = handler(this);
+		this.output = handler(this);
 
 		void this.#flush_after_client_action(); // not awaited because these are side effects, also supports sync functions
 	}

@@ -3,6 +3,7 @@ import {SvelteMap} from 'svelte/reactivity';
 import {z} from 'zod';
 import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
 import type {Assignable, Class_Constructor, Omit_Strict} from '@ryanatkn/belt/types.js';
+import type {Logger} from '@ryanatkn/belt/log.js';
 
 import {Provider, type Provider_Json} from '$lib/provider.svelte.js';
 import type {Provider_Name} from '$lib/provider_types.js';
@@ -34,10 +35,14 @@ import {HANDLED} from '$lib/cell_helpers.js';
 import {Action_Registry} from '$lib/action_registry.js';
 import {Api_Client, type Api_Client_Options} from '$lib/api_client.js';
 import type {Completion_Message} from '$lib/completion_types.js';
-import type {Actions_Api, Client_Action_Handlers} from '$lib/action_metatypes.js';
+import type {Actions_Api} from '$lib/action_metatypes.js';
+import type {Client_Action_Handlers} from '$lib/client_action_types.js';
 import type {Action_Spec} from '$lib/action_spec.js';
 import {action_specs} from '$lib/action_collections.js';
 import {create_actions_api} from '$lib/actions_api.js';
+import type {Action_Input, Action_Output, Action_Phase} from '$lib/action_types.js';
+import type {Jsonrpc_Singular_Message} from '$lib/jsonrpc.js';
+import {Client_Action_Event} from '$lib/client_action_event.js';
 
 export const zzz_context = create_context<Zzz_App>();
 
@@ -209,6 +214,37 @@ export class Zzz_App extends Cell<typeof Zzz_App_Json> {
 		}
 
 		this.init();
+	}
+
+	// TODO name?
+	handle(
+		method: keyof Actions_Api,
+		input: Action_Input,
+		output: Action_Output,
+		phase: Action_Phase,
+		jsonrpc_message: Jsonrpc_Singular_Message | null,
+		log?: Logger,
+	): unknown {
+		console.log('[actions_api] handle_message', method, phase, output);
+		const event = new Client_Action_Event(this, method, phase, input, output, jsonrpc_message);
+		console.log(`[actions_api] event`, event);
+
+		const handlers_by_phase = this.action_handlers[method];
+		if (!handlers_by_phase) {
+			log?.error(`missing handlers for action ${method}`);
+			return;
+		}
+
+		const handler = (handlers_by_phase as any)[phase]; // TODO @api type
+
+		if (!handler) {
+			log?.error(`missing handler for action ${method}.${phase}`);
+			return;
+		}
+
+		event.handle(handler);
+
+		return event.output;
 	}
 
 	/**

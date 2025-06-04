@@ -934,6 +934,7 @@ export const src_json = {
 				{name: 'to_action_spec_input_identifier', kind: 'function'},
 				{name: 'to_action_spec_output_identifier', kind: 'function'},
 				{name: 'to_action_spec_auth_identifier', kind: 'function'},
+				{name: 'to_action_spec_output_type', kind: 'function'},
 			],
 		},
 		'./Action_List.svelte': {
@@ -992,6 +993,8 @@ export const src_json = {
 				{name: 'Action_Auth', kind: 'variable'},
 				{name: 'Action_Phase', kind: 'variable'},
 				{name: 'ACTION_KIND_PHASES', kind: 'variable'},
+				{name: 'Action_Input', kind: 'variable'},
+				{name: 'Action_Output', kind: 'variable'},
 				{name: 'Handler_Phases_For_Method', kind: 'type'},
 				{name: 'Action_Json', kind: 'variable'},
 				{name: 'Action_Json_Input', kind: 'type'},
@@ -1290,7 +1293,7 @@ export const src_json = {
 			declarations: [
 				{name: 'After_Client_Action', kind: 'type'},
 				{name: 'After_Client_Action_Callback', kind: 'type'},
-				{name: 'Client_Action_Context', kind: 'class'},
+				{name: 'Client_Action_Event', kind: 'class'},
 			],
 		},
 		'./client_action_handler.js': {
@@ -1710,6 +1713,8 @@ export const src_json = {
 				{name: 'create_jsonrpc_error', kind: 'function'},
 				{name: 'create_jsonrpc_error_from_thrown', kind: 'function'},
 				{name: 'to_jsonrpc_message_id', kind: 'function'},
+				{name: 'is_jsonrpc_request', kind: 'function'},
+				{name: 'is_jsonrpc_notification', kind: 'function'},
 			],
 		},
 		'./jsonrpc.js': {

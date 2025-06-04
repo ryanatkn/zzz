@@ -75,8 +75,8 @@ export const server_action_handlers: Server_Action_Handlers = {
 	},
 
 	submit_completion: {
-		receive_request: async ({server, message}) => {
-			const {prompt, provider_name, model, completion_messages} = message.params.completion_request;
+		receive_request: async ({server, input, message}) => {
+			const {prompt, provider_name, model, completion_messages} = input.completion_request;
 			const config = server.config;
 
 			let result: Action_Outputs['submit_completion'];
@@ -237,7 +237,7 @@ export const server_action_handlers: Server_Action_Handlers = {
 	},
 
 	create_directory: {
-		receive_request: async ({params, server, message}) => {
+		receive_request: async ({input: params, server}) => {
 			const {path} = params;
 
 			try {
@@ -256,7 +256,7 @@ export const server_action_handlers: Server_Action_Handlers = {
 	filer_change: {
 		// This is a server-to-client notification, so it only has a send phase
 		send: async ({server, message}) => {
-			console.log(`message`, message);
+			console.log(`send filer_change message`, message);
 			// TODO BLOCK @api should be `params`, maybe `message` too, and always have an `id`?
 		},
 	},

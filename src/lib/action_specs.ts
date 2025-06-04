@@ -6,7 +6,7 @@ import {
 	Serializable_Source_File,
 	Zzz_Dir,
 } from '$lib/diskfile_types.js';
-import {Type_Literal, Uuid} from '$lib/zod_helpers.js';
+import {Uuid} from '$lib/zod_helpers.js';
 import {Completion_Request, Completion_Response} from '$lib/completion_types.js';
 import type {Action_Spec} from '$lib/action_spec.js';
 

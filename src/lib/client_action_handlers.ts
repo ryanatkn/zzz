@@ -16,9 +16,9 @@ export const client_action_handlers: Client_Action_Handlers = {
 		receive_response: (ctx) => {
 			console.log('Ping response received', ctx);
 			if ('todo') {
-				ctx.app.capabilities.handle_received_ping(ctx.result.value.result.ping_id);
+				ctx.app.capabilities.handle_received_ping(ctx.output.value.result.ping_id);
 			} else {
-				ctx.app.capabilities.handle_ping_error(ctx.jsonrpc_message.id, ctx.result.message);
+				ctx.app.capabilities.handle_ping_error(ctx.jsonrpc_message.id, ctx.output.message);
 			}
 		},
 	},
@@ -30,7 +30,7 @@ export const client_action_handlers: Client_Action_Handlers = {
 		receive_response: (ctx) => {
 			console.log('Session loaded', ctx);
 			if ('todo') {
-				ctx.app.receive_session(ctx.result.value.result.data);
+				ctx.app.receive_session(ctx.output.value.result.data);
 			} else {
 				console.error('Error loading session', ctx);
 			}
@@ -39,12 +39,12 @@ export const client_action_handlers: Client_Action_Handlers = {
 
 	submit_completion: {
 		send_request: (ctx) => {
-			console.log('Sending prompt', ctx.params.completion_request.prompt);
+			console.log('Sending prompt', ctx.input.completion_request.prompt);
 		},
 		receive_response: (ctx) => {
-			console.log('Received completion', ctx.params.completion_request, ctx.result);
+			console.log('Received completion', ctx.input.completion_request, ctx.output);
 			if ('todo') {
-				return ctx.result.value.result; // acts as a method call, no side effects here
+				return ctx.output.value.result; // acts as a method call, no side effects here
 			} else {
 				console.error('Error with completion', ctx);
 			}
@@ -53,21 +53,21 @@ export const client_action_handlers: Client_Action_Handlers = {
 
 	update_diskfile: {
 		send_request: (ctx) => {
-			console.log('Updating file', ctx.params.path);
+			console.log('Updating file', ctx.input.path);
 		},
 		receive_response: noop,
 	},
 
 	delete_diskfile: {
 		send_request: (ctx) => {
-			console.log('Deleting file', ctx.params.path);
+			console.log('Deleting file', ctx.input.path);
 		},
 		receive_response: noop,
 	},
 
 	create_directory: {
 		send_request: (ctx) => {
-			console.log('Creating directory', ctx.params.path);
+			console.log('Creating directory', ctx.input.path);
 		},
 		receive_response: (ctx) => {
 			console.log('Created directory', ctx);
@@ -76,15 +76,15 @@ export const client_action_handlers: Client_Action_Handlers = {
 
 	filer_change: {
 		receive: (ctx) => {
-			console.log('File changed', ctx.params.change, ctx.result);
-			ctx.app.diskfiles.handle_change(ctx.params);
+			console.log('File changed', ctx.input.change, ctx.output);
+			ctx.app.diskfiles.handle_change(ctx.input);
 		},
 	},
 
 	toggle_main_menu: {
 		execute: (ctx) => {
-			console.log('Toggling main menu', ctx.params);
-			return ctx.app.ui.toggle_main_menu(ctx.params);
+			console.log('Toggling main menu', ctx.input);
+			return ctx.app.ui.toggle_main_menu(ctx.input);
 		},
 	},
 };

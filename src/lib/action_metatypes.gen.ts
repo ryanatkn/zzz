@@ -64,11 +64,9 @@ export const gen: Gen = ({origin_path}) => {
 							? `input${spec.input.isOptional() ? '?' : ''}: Action_Inputs['${spec.method}']`
 							: 'input?: void'
 					}) => ${
-						spec.kind === 'request_response'
+						spec.kind === 'request_response' || spec.async
 							? `Promise<Action_Outputs['${spec.method}']>`
-							: spec.kind === 'local_call'
-								? spec.returns
-								: 'void'
+							: `Action_Outputs['${spec.method}']`
 					};`;
 				})
 				.join('\n\t')}

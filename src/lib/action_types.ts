@@ -2,7 +2,13 @@ import {z} from 'zod';
 
 import {Action_Method} from '$lib/action_metatypes.js';
 import {Cell_Json} from '$lib/cell_types.js';
-import {Jsonrpc_Notification, Jsonrpc_Request, Jsonrpc_Response_Or_Error} from '$lib/jsonrpc.js';
+import {
+	Jsonrpc_Notification,
+	Jsonrpc_Params,
+	Jsonrpc_Request,
+	Jsonrpc_Response_Or_Error,
+	Jsonrpc_Result,
+} from '$lib/jsonrpc.js';
 
 export const Action_Kind = z.enum(['request_response', 'remote_notification', 'local_call']);
 export type Action_Kind = z.infer<typeof Action_Kind>;
@@ -38,6 +44,14 @@ export const ACTION_KIND_PHASES = {
 	remote_notification: ['send', 'receive'],
 	local_call: ['execute'],
 } as const satisfies Record<Action_Kind, ReadonlyArray<Action_Phase>>;
+
+// TODO @api @many type - any should be any json I think, do with zod 4 for recursive type support
+export const Action_Input = z.union([Jsonrpc_Params, z.any(), z.undefined(), z.void()]);
+export type Action_Input = z.infer<typeof Action_Input>;
+
+// TODO @api @many type - any should be any json I think, do with zod 4 for recursive type support
+export const Action_Output = z.union([Jsonrpc_Result, z.any(), z.undefined(), z.void()]);
+export type Action_Output = z.infer<typeof Action_Output>;
 
 /**
  * Gets the appropriate handler phases for a method based on its action spec.

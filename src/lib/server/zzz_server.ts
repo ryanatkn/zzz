@@ -8,7 +8,7 @@ import {ensure_end} from '@ryanatkn/belt/string.js';
 import type {Action_Spec} from '$lib/action_spec.js';
 import {Action_Inputs, Action_Outputs, action_spec_by_method} from '$lib/action_collections.js';
 import type {Zzz_Config} from '$lib/config_helpers.js';
-import {Zzz_Dir} from '$lib/diskfile_types.js';
+import {Diskfile_Path, Zzz_Dir} from '$lib/diskfile_types.js';
 import {Safe_Fs} from '$lib/server/safe_fs.js';
 import {Action_Registry} from '$lib/action_registry.js';
 import {stringify_zod_error} from '$lib/zod_helpers.js';
@@ -17,7 +17,6 @@ import {
 	type Jsonrpc_Response,
 	type Jsonrpc_Error_Message,
 	type Jsonrpc_Notification,
-	Jsonrpc_Result,
 	Jsonrpc_Message,
 	Jsonrpc_Message_From_Client_To_Server,
 } from '$lib/jsonrpc.js';
@@ -97,7 +96,7 @@ export class Zzz_Server {
 	/** The Zzz cache directory name, defaults to `.zzz`. */
 	readonly zzz_cache_dirname: string;
 	/** The full path to the Zzz cache directory. */
-	readonly zzz_cache_dir: string;
+	readonly zzz_cache_dir: Diskfile_Path;
 
 	readonly config: Zzz_Config;
 
@@ -163,13 +162,17 @@ export class Zzz_Server {
 				request: Jsonrpc_Request,
 			): Promise<Jsonrpc_Response | Jsonrpc_Error_Message> => {
 				try {
-					const result = await this.#receive_jsonrpc_message(request);
+					const event = await this.#receive_jsonrpc_message(request);
+					const {result} = event.output;
 					console.log(`result`, result);
 
-					if (!result)
+					if (!result) {
 						throw jsonrpc_errors.internal_error(`no result returned for action: ${request.method}`);
+					}
 
-					return create_jsonrpc_response(request.id, result);
+					event.response = create_jsonrpc_response(request.id, result);
+
+					return event.response;
 				} catch (error) {
 					this.log?.error(`Error processing JSON-RPC request:`, error);
 					return create_jsonrpc_error_from_thrown(request.id, error);
@@ -201,7 +204,7 @@ export class Zzz_Server {
 	 */
 	async #receive_jsonrpc_message(
 		message: Jsonrpc_Message_From_Client_To_Server,
-	): Promise<Jsonrpc_Result | null> {
+	): Promise<Server_Action_Event> {
 		if (Array.isArray(message)) {
 			throw jsonrpc_errors.invalid_request('array support is not yet implemented'); // TODO
 		}
@@ -275,13 +278,13 @@ export class Zzz_Server {
 			}
 			const parsed_response = output_schema.safeParse({
 				...message,
-				params: event.result,
+				params: event.output,
 			});
 			if (!parsed_response.success) {
 				this.log?.error(
 					'failed to validate server action response params',
 					spec.method,
-					event.result,
+					event.output,
 					parsed_response.error.issues,
 				);
 				throw jsonrpc_errors.internal_error(
@@ -291,7 +294,7 @@ export class Zzz_Server {
 			}
 		}
 
-		return event.result;
+		return event;
 	}
 
 	#destroyed = false;

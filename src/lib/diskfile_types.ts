@@ -10,7 +10,6 @@ export type Diskfile_Change_Type = z.infer<typeof Diskfile_Change_Type>;
 /** An absolute Unix-style file path. */
 export const Diskfile_Path = z
 	.string()
-	.trim()
 	.refine((p) => is_path_absolute(p), {message: 'Path must be absolute'})
 	.brand('Diskfile_Path');
 export type Diskfile_Path = z.infer<typeof Diskfile_Path>;
