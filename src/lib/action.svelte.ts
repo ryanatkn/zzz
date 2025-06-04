@@ -7,7 +7,7 @@ import {Action_Method} from '$lib/action_metatypes.js';
 import {Diskfile_Change, Diskfile_Path, Serializable_Source_File} from '$lib/diskfile_types.js';
 import {to_completion_response_text} from '$lib/response_helpers.js';
 import {to_preview} from '$lib/helpers.js';
-import {Action_Json} from '$lib/action_types.js';
+import {Action_Json, Action_Kind} from '$lib/action_types.js';
 import {
 	Jsonrpc_Request,
 	Jsonrpc_Response,
@@ -39,6 +39,8 @@ export class Action extends Cell<typeof Action_Json> {
 		if (!s) throw new Error(`Missing action spec for method '${this.method}'`);
 		return s;
 	});
+
+	kind: Action_Kind = $derived(this.spec.kind);
 
 	// Computed properties for easy access
 	readonly jsonrpc_message_id: Jsonrpc_Request_Id | null = $derived(
