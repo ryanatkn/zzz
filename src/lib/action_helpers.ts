@@ -1,5 +1,3 @@
-import type {z} from 'zod';
-
 import {Action_Message_Union, type Action_Inputs} from '$lib/action_collections.js';
 import type {Action_Auth} from '$lib/action_types.js';
 import {Action_Messages} from '$lib/action_messages.js';
@@ -11,18 +9,6 @@ import {to_jsonrpc_message_id} from '$lib/jsonrpc_helpers.js';
 
 export const ACTION_DATE_FORMAT = 'MMM d, p';
 export const ACTION_TIME_FORMAT = 'p';
-
-// TODO some hacky types but looks correct
-export const lookup_request_action_schema = (
-	method: Action_Method,
-): z.ZodType<Action_Message_Union> | undefined =>
-	Action_Messages[to_action_request_message_type(method)] as any;
-
-// TODO some hacky types but looks correct
-export const lookup_response_action_schema = (
-	method: Action_Method,
-): z.ZodType<Action_Message_Union> | undefined =>
-	Action_Messages[to_action_response_message_type(method)] as any;
 
 // TODO BLOCK @api delete
 export const to_action_message_type = (

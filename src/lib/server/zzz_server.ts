@@ -6,7 +6,12 @@ import {DEV} from 'esm-env';
 import {ensure_end} from '@ryanatkn/belt/string.js';
 
 import type {Action_Spec} from '$lib/action_spec.js';
-import {Action_Message_From_Client, action_spec_by_method} from '$lib/action_collections.js';
+import {
+	Action_Inputs,
+	Action_Message_From_Client,
+	Action_Outputs,
+	action_spec_by_method,
+} from '$lib/action_collections.js';
 import type {Zzz_Config} from '$lib/config_helpers.js';
 import {Zzz_Dir} from '$lib/diskfile_types.js';
 import {Safe_Fs} from '$lib/server/safe_fs.js';
@@ -240,12 +245,13 @@ export class Zzz_Server {
 			throw jsonrpc_errors.invalid_request(`invalid action kind for method: ${method}`);
 		}
 
-		const request_schema = lookup_request_action_schema(method);
-		if (!request_schema) {
+		const input_schema = Action_Inputs[method];
+		// TODO BLOCK @api @many maybe change the type or add a helper
+		if (!input_schema) {
 			throw jsonrpc_errors.internal_error(`unknown message schema: ${method}`);
 		}
 
-		const parsed_request = request_schema.safeParse(message);
+		const parsed_request = input_schema.safeParse(message);
 		if (!parsed_request.success) {
 			this.log?.error('failed to validate service params', method, parsed_request.error.issues);
 			throw jsonrpc_errors.invalid_params(
@@ -275,14 +281,12 @@ export class Zzz_Server {
 		// Validate the response during development
 		// TODO maybe always validate?
 		if (DEV) {
-			// TODO BLOCK @api use params schema only not whole action message.
-			// but we have a problem with the params/result schemas, params is being overloaded
-			// (and `response_params` was partially correct though hacky)
-			const response_schema = lookup_response_action_schema(method);
-			if (!response_schema) {
+			const output_schema = Action_Outputs[method];
+			// TODO BLOCK @api @many maybe change the type or add a helper
+			if (!output_schema) {
 				throw jsonrpc_errors.internal_error(`unknown response schema: ${method}`);
 			}
-			const parsed_response = response_schema.safeParse({
+			const parsed_response = output_schema.safeParse({
 				...message,
 				params: event.result,
 			});

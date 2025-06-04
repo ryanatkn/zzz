@@ -943,8 +943,6 @@ export const src_json = {
 			declarations: [
 				{name: 'ACTION_DATE_FORMAT', kind: 'variable'},
 				{name: 'ACTION_TIME_FORMAT', kind: 'variable'},
-				{name: 'lookup_request_action_schema', kind: 'function'},
-				{name: 'lookup_response_action_schema', kind: 'function'},
 				{name: 'to_action_message_type', kind: 'function'},
 				{name: 'to_action_message', kind: 'function'},
 				{name: 'to_action_message_identifier', kind: 'function'},
