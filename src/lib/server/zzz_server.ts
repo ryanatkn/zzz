@@ -6,12 +6,7 @@ import {DEV} from 'esm-env';
 import {ensure_end} from '@ryanatkn/belt/string.js';
 
 import type {Action_Spec} from '$lib/action_spec.js';
-import {
-	Action_Inputs,
-	Action_Message_From_Client,
-	Action_Outputs,
-	action_spec_by_method,
-} from '$lib/action_collections.js';
+import {Action_Inputs, Action_Outputs, action_spec_by_method} from '$lib/action_collections.js';
 import type {Zzz_Config} from '$lib/config_helpers.js';
 import {Zzz_Dir} from '$lib/diskfile_types.js';
 import {Safe_Fs} from '$lib/server/safe_fs.js';
@@ -34,13 +29,6 @@ import {jsonrpc_errors} from '$lib/jsonrpc_errors.js';
 import type {Server_Action_Handlers} from '$lib/server/server_action_types.js';
 import {Server_Action_Event} from '$lib/server/server_action_event.js';
 import {Action_Method} from '$lib/action_metatypes.js';
-
-export type Action_Handler = (
-	// TODO BLOCK @api should be jsonrpc only right? maybe just the `params` at this point? wrapped in an object?
-	// should this be the `Server_Message_Handler` and mutations renamed to `Client_Message_Handler`?
-	message: Action_Message_From_Client,
-	server: Zzz_Server,
-) => Promise<Jsonrpc_Result | null>;
 
 /**
  * Function type for handling file system changes.

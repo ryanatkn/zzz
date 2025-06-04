@@ -2,8 +2,7 @@
 
 import {z} from 'zod';
 
-import {type Action_Spec, collect_action_specs_by_method} from '$lib/action_spec.js';
-import {Action_Messages} from '$lib/action_messages.js';
+import {type Action_Spec, collect_action_specs} from '$lib/action_spec.js';
 import * as specs from '$lib/action_specs.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
 
@@ -68,83 +67,7 @@ export type Action_Method_Networked = z.infer<typeof Action_Method_Networked>;
 export const Action_Method_Nonnetworked = z.enum(['filer_change']);
 export type Action_Method_Nonnetworked = z.infer<typeof Action_Method_Nonnetworked>;
 
-// TODO is `_Variant` a better name than `_Union`? something else?
-/**
- * All action types combined.
- */
-export const Action_Message_Union = z.discriminatedUnion('type', [
-	Action_Messages.toggle_main_menu,
-	Action_Messages.create_directory_request,
-	Action_Messages.create_directory_response,
-	Action_Messages.delete_diskfile_request,
-	Action_Messages.delete_diskfile_response,
-	Action_Messages.load_session_request,
-	Action_Messages.load_session_response,
-	Action_Messages.ping_request,
-	Action_Messages.ping_response,
-	Action_Messages.submit_completion_request,
-	Action_Messages.submit_completion_response,
-	Action_Messages.update_diskfile_request,
-	Action_Messages.update_diskfile_response,
-	Action_Messages.filer_change,
-]);
-export type Action_Message_Union = z.infer<typeof Action_Message_Union>;
-
-/**
- * Set of actions with "from_client" direction (originating from client).
- */
-export const Action_Message_From_Client = z.discriminatedUnion('type', [
-	Action_Messages.create_directory_request,
-	Action_Messages.delete_diskfile_request,
-	Action_Messages.load_session_request,
-	Action_Messages.ping_request,
-	Action_Messages.submit_completion_request,
-	Action_Messages.update_diskfile_request,
-]);
-export type Action_Message_From_Client = z.infer<typeof Action_Message_From_Client>;
-
-/**
- * Set of actions with "from_server" direction (originating from server).
- */
-export const Action_Message_From_Server = z.discriminatedUnion('type', [
-	Action_Messages.create_directory_response,
-	Action_Messages.delete_diskfile_response,
-	Action_Messages.load_session_response,
-	Action_Messages.ping_response,
-	Action_Messages.submit_completion_response,
-	Action_Messages.update_diskfile_response,
-	Action_Messages.filer_change,
-]);
-export type Action_Message_From_Server = z.infer<typeof Action_Message_From_Server>;
-
-/**
- * Server actions with HTTP endpoints (networked).
- */
-export const Action_Message_Networked = z.discriminatedUnion('type', [
-	Action_Messages.create_directory_request,
-	Action_Messages.create_directory_response,
-	Action_Messages.delete_diskfile_request,
-	Action_Messages.delete_diskfile_response,
-	Action_Messages.load_session_request,
-	Action_Messages.load_session_response,
-	Action_Messages.ping_request,
-	Action_Messages.ping_response,
-	Action_Messages.submit_completion_request,
-	Action_Messages.submit_completion_response,
-	Action_Messages.update_diskfile_request,
-	Action_Messages.update_diskfile_response,
-]);
-export type Action_Message_Networked = z.infer<typeof Action_Message_Networked>;
-
-/**
- * Server actions without HTTP endpoints (non-networked).
- */
-export const Action_Message_Nonnetworked = z.discriminatedUnion('type', [
-	Action_Messages.filer_change,
-]);
-export type Action_Message_Nonnetworked = z.infer<typeof Action_Message_Nonnetworked>;
-
-export const action_specs: Array<Action_Spec> = collect_action_specs_by_method(specs);
+export const action_specs: Array<Action_Spec> = collect_action_specs(specs);
 
 export const action_spec_by_method: Map<Action_Method, Action_Spec> = new Map(
 	action_specs.map((spec) => [spec.method, spec]),

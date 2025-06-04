@@ -101,14 +101,6 @@ export const package_json = {
 			svelte: './dist/Action_List.svelte',
 			default: './dist/Action_List.svelte',
 		},
-		'./action_messages.gen.js': {
-			types: './dist/action_messages.gen.d.ts',
-			default: './dist/action_messages.gen.js',
-		},
-		'./action_messages.js': {
-			types: './dist/action_messages.d.ts',
-			default: './dist/action_messages.js',
-		},
 		'./action_metatypes.gen.js': {
 			types: './dist/action_metatypes.gen.d.ts',
 			default: './dist/action_metatypes.gen.js',
@@ -915,11 +907,6 @@ export const src_json = {
 				{name: 'Action_Method_From_Server', kind: 'variable'},
 				{name: 'Action_Method_Networked', kind: 'variable'},
 				{name: 'Action_Method_Nonnetworked', kind: 'variable'},
-				{name: 'Action_Message_Union', kind: 'variable'},
-				{name: 'Action_Message_From_Client', kind: 'variable'},
-				{name: 'Action_Message_From_Server', kind: 'variable'},
-				{name: 'Action_Message_Networked', kind: 'variable'},
-				{name: 'Action_Message_Nonnetworked', kind: 'variable'},
 				{name: 'action_specs', kind: 'variable'},
 				{name: 'action_spec_by_method', kind: 'variable'},
 				{name: 'Action_Inputs', kind: 'variable'},
@@ -943,11 +930,6 @@ export const src_json = {
 			declarations: [
 				{name: 'ACTION_DATE_FORMAT', kind: 'variable'},
 				{name: 'ACTION_TIME_FORMAT', kind: 'variable'},
-				{name: 'to_action_message_type', kind: 'function'},
-				{name: 'to_action_message', kind: 'function'},
-				{name: 'to_action_message_identifier', kind: 'function'},
-				{name: 'to_action_request_message_type', kind: 'function'},
-				{name: 'to_action_response_message_type', kind: 'function'},
 				{name: 'to_action_spec_identifier', kind: 'function'},
 				{name: 'to_action_spec_input_identifier', kind: 'function'},
 				{name: 'to_action_spec_output_identifier', kind: 'function'},
@@ -957,14 +939,6 @@ export const src_json = {
 		'./Action_List.svelte': {
 			path: 'Action_List.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
-		},
-		'./action_messages.gen.js': {
-			path: 'action_messages.gen.ts',
-			declarations: [{name: 'gen', kind: 'function'}],
-		},
-		'./action_messages.js': {
-			path: 'action_messages.ts',
-			declarations: [{name: 'Action_Messages', kind: 'variable'}],
 		},
 		'./action_metatypes.gen.js': {
 			path: 'action_metatypes.gen.ts',
@@ -977,7 +951,6 @@ export const src_json = {
 				{name: 'Request_Response_Action_Method', kind: 'type'},
 				{name: 'Remote_Notification_Action_Method', kind: 'type'},
 				{name: 'Local_Call_Action_Method', kind: 'type'},
-				{name: 'Action_Message_Type', kind: 'variable'},
 				{name: 'Actions_Api', kind: 'type'},
 			],
 		},
@@ -994,7 +967,7 @@ export const src_json = {
 				{name: 'Local_Call_Action_Spec', kind: 'variable'},
 				{name: 'Action_Spec', kind: 'variable'},
 				{name: 'is_action_spec', kind: 'function'},
-				{name: 'collect_action_specs_by_method', kind: 'function'},
+				{name: 'collect_action_specs', kind: 'function'},
 			],
 		},
 		'./action_specs.js': {
@@ -2158,7 +2131,6 @@ export const src_json = {
 		'./server/zzz_server.js': {
 			path: 'server/zzz_server.ts',
 			declarations: [
-				{name: 'Action_Handler', kind: 'type'},
 				{name: 'Filer_Change_Handler', kind: 'type'},
 				{name: 'Filer_Instance', kind: 'type'},
 				{name: 'Zzz_Server_Options', kind: 'type'},

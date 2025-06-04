@@ -69,9 +69,7 @@ export const is_action_spec = (value: unknown): value is Action_Spec => {
 	);
 };
 
-export const collect_action_specs_by_method = (
-	obj: Record<string, Action_Spec>,
-): Array<Action_Spec> => {
+export const collect_action_specs = (obj: Record<string, Action_Spec>): Array<Action_Spec> => {
 	const specs: Array<Action_Spec> = [];
 
 	// Filter module exports for action specs

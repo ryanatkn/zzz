@@ -4,7 +4,6 @@ import {z} from 'zod';
 import {get_innermost_type_name} from '$lib/zod_helpers.js';
 import {action_specs} from '$lib/action_collections.js';
 import {Action_Registry} from '$lib/action_registry.js';
-import {to_action_message_type} from '$lib/action_helpers.js';
 
 /**
  * Outputs a file with generated types and schemas using the action specs as the source of truth.
@@ -49,25 +48,6 @@ export const gen: Gen = ({origin_path}) => {
 		export type Local_Call_Action_Method = ${
 			registry.local_call_specs.map((spec) => `'${spec.method}'`).join(' | ') || 'never'
 		};
-
-		/**
-		 * All action types. May have '/' separators for namespacing.
-		 * TODO maybe any relative url-encoded path is valid? add to schema defs
-		 */
-		export const Action_Message_Type = z.enum([
-			${registry.specs
-				.map((spec) =>
-					spec.kind === 'request_response'
-						? [
-								`'${to_action_message_type(spec.method, 'request')}'`,
-								`'${to_action_message_type(spec.method, 'response')}'`,
-							]
-						: `'${spec.method}'`,
-				)
-				.flat()
-				.join(',\n\t')}
-		]);
-		export type Action_Message_Type = z.infer<typeof Action_Message_Type>;
 
 		/**
 		 * Interface for action dispatch functions.

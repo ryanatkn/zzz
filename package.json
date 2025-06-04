@@ -118,14 +118,6 @@
       "svelte": "./dist/Action_List.svelte",
       "default": "./dist/Action_List.svelte"
     },
-    "./action_messages.gen.js": {
-      "types": "./dist/action_messages.gen.d.ts",
-      "default": "./dist/action_messages.gen.js"
-    },
-    "./action_messages.js": {
-      "types": "./dist/action_messages.d.ts",
-      "default": "./dist/action_messages.js"
-    },
     "./action_metatypes.gen.js": {
       "types": "./dist/action_metatypes.gen.d.ts",
       "default": "./dist/action_metatypes.gen.js"

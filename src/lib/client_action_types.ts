@@ -9,110 +9,151 @@ import type {Zzz_App} from '$lib/zzz_app.svelte.js';
  */
 export interface Client_Action_Handlers<T_App extends Zzz_App = Zzz_App> {
 	create_directory?: {
-		send_request?: Client_Action_Handler<T_App, Action_Inputs['create_directory'], void>;
+		send_request?: Client_Action_Handler<T_App, Action_Inputs['create_directory'], void, undefined>;
 		receive_request?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['create_directory'],
-			Action_Outputs['create_directory']
+			Action_Outputs['create_directory'],
+			undefined
 		>;
 		send_response?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['create_directory'],
-			Action_Outputs['create_directory']
+			Action_Outputs['create_directory'],
+			undefined
 		>;
 		receive_response?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['create_directory'],
-			Action_Outputs['create_directory']
+			Action_Outputs['create_directory'],
+			undefined
 		>;
 	};
 	delete_diskfile?: {
-		send_request?: Client_Action_Handler<T_App, Action_Inputs['delete_diskfile'], void>;
+		send_request?: Client_Action_Handler<T_App, Action_Inputs['delete_diskfile'], void, undefined>;
 		receive_request?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['delete_diskfile'],
-			Action_Outputs['delete_diskfile']
+			Action_Outputs['delete_diskfile'],
+			undefined
 		>;
 		send_response?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['delete_diskfile'],
-			Action_Outputs['delete_diskfile']
+			Action_Outputs['delete_diskfile'],
+			undefined
 		>;
 		receive_response?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['delete_diskfile'],
-			Action_Outputs['delete_diskfile']
+			Action_Outputs['delete_diskfile'],
+			undefined
 		>;
 	};
 	filer_change?: {
-		send?: Client_Action_Handler<T_App, Action_Inputs['filer_change'], void>;
+		send?: Client_Action_Handler<T_App, Action_Inputs['filer_change'], void, undefined>;
 		receive?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['filer_change'],
-			Action_Outputs['filer_change']
+			Action_Outputs['filer_change'],
+			undefined
 		>;
 	};
 	load_session?: {
-		send_request?: Client_Action_Handler<T_App, Action_Inputs['load_session'], void>;
+		send_request?: Client_Action_Handler<T_App, Action_Inputs['load_session'], void, undefined>;
 		receive_request?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['load_session'],
-			Action_Outputs['load_session']
+			Action_Outputs['load_session'],
+			undefined
 		>;
 		send_response?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['load_session'],
-			Action_Outputs['load_session']
+			Action_Outputs['load_session'],
+			undefined
 		>;
 		receive_response?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['load_session'],
-			Action_Outputs['load_session']
+			Action_Outputs['load_session'],
+			undefined
 		>;
 	};
 	ping?: {
-		send_request?: Client_Action_Handler<T_App, Action_Inputs['ping'], void>;
-		receive_request?: Client_Action_Handler<T_App, Action_Inputs['ping'], Action_Outputs['ping']>;
-		send_response?: Client_Action_Handler<T_App, Action_Inputs['ping'], Action_Outputs['ping']>;
-		receive_response?: Client_Action_Handler<T_App, Action_Inputs['ping'], Action_Outputs['ping']>;
+		send_request?: Client_Action_Handler<T_App, Action_Inputs['ping'], void, undefined>;
+		receive_request?: Client_Action_Handler<
+			T_App,
+			Action_Inputs['ping'],
+			Action_Outputs['ping'],
+			undefined
+		>;
+		send_response?: Client_Action_Handler<
+			T_App,
+			Action_Inputs['ping'],
+			Action_Outputs['ping'],
+			undefined
+		>;
+		receive_response?: Client_Action_Handler<
+			T_App,
+			Action_Inputs['ping'],
+			Action_Outputs['ping'],
+			undefined
+		>;
 	};
 	submit_completion?: {
-		send_request?: Client_Action_Handler<T_App, Action_Inputs['submit_completion'], void>;
+		send_request?: Client_Action_Handler<
+			T_App,
+			Action_Inputs['submit_completion'],
+			void,
+			undefined
+		>;
 		receive_request?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['submit_completion'],
-			Action_Outputs['submit_completion']
+			Action_Outputs['submit_completion'],
+			undefined
 		>;
 		send_response?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['submit_completion'],
-			Action_Outputs['submit_completion']
+			Action_Outputs['submit_completion'],
+			undefined
 		>;
 		receive_response?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['submit_completion'],
-			Action_Outputs['submit_completion']
+			Action_Outputs['submit_completion'],
+			undefined
 		>;
 	};
 	toggle_main_menu?: {
-		execute?: Client_Action_Handler<T_App, Action_Inputs['toggle_main_menu'], boolean>;
+		execute?: Client_Action_Handler<
+			T_App,
+			Action_Inputs['toggle_main_menu'],
+			Action_Outputs['toggle_main_menu'],
+			boolean
+		>;
 	};
 	update_diskfile?: {
-		send_request?: Client_Action_Handler<T_App, Action_Inputs['update_diskfile'], void>;
+		send_request?: Client_Action_Handler<T_App, Action_Inputs['update_diskfile'], void, undefined>;
 		receive_request?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['update_diskfile'],
-			Action_Outputs['update_diskfile']
+			Action_Outputs['update_diskfile'],
+			undefined
 		>;
 		send_response?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['update_diskfile'],
-			Action_Outputs['update_diskfile']
+			Action_Outputs['update_diskfile'],
+			undefined
 		>;
 		receive_response?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['update_diskfile'],
-			Action_Outputs['update_diskfile']
+			Action_Outputs['update_diskfile'],
+			undefined
 		>;
 	};
 }
