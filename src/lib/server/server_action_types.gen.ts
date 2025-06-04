@@ -2,12 +2,9 @@ import type {Gen} from '@ryanatkn/gro/gen.js';
 import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 
 import {
-	to_action_message_identifier,
 	to_action_spec_auth_identifier,
 	to_action_spec_input_identifier,
 	to_action_spec_output_identifier,
-	to_action_request_message_type,
-	to_action_response_message_type,
 } from '$lib/action_helpers.js';
 import {action_specs} from '$lib/action_collections.js';
 import {Action_Registry} from '$lib/action_registry.js';
@@ -45,13 +42,12 @@ export const gen: Gen = ({origin_path}) => {
 				// Determine input, output, and message types based on phase
 				let input_type: string;
 				let output_type: string;
-				let message_type: string;
 
 				switch (phase) {
 					case 'send_request':
 						input_type = `z.infer<typeof ${to_action_spec_input_identifier(method)}>`;
 						output_type = 'void';
-						message_type = to_action_message_identifier(to_action_request_message_type(method));
+
 						break;
 					case 'receive_request':
 						input_type = `z.infer<typeof ${to_action_spec_input_identifier(method)}>`;
@@ -59,7 +55,6 @@ export const gen: Gen = ({origin_path}) => {
 							kind === 'request_response'
 								? `z.infer<typeof ${to_action_spec_output_identifier(method)}>`
 								: 'void';
-						message_type = to_action_message_identifier(to_action_request_message_type(method));
 						break;
 					case 'send_response':
 						input_type =
@@ -67,10 +62,6 @@ export const gen: Gen = ({origin_path}) => {
 								? `z.infer<typeof ${to_action_spec_output_identifier(method)}>`
 								: 'never';
 						output_type = 'void';
-						message_type =
-							kind === 'request_response'
-								? to_action_message_identifier(to_action_response_message_type(method))
-								: 'never';
 						break;
 					case 'receive_response':
 						input_type =
@@ -78,21 +69,15 @@ export const gen: Gen = ({origin_path}) => {
 								? `z.infer<typeof ${to_action_spec_output_identifier(method)}>`
 								: 'never';
 						output_type = 'void';
-						message_type =
-							kind === 'request_response'
-								? to_action_message_identifier(to_action_response_message_type(method))
-								: 'never';
 						break;
 					case 'send':
 					case 'receive':
 						input_type = `z.infer<typeof ${to_action_spec_input_identifier(method)}>`;
 						output_type = 'void';
-						message_type = to_action_message_identifier(method);
 						break;
 					case 'execute':
 						input_type = `z.infer<typeof ${to_action_spec_input_identifier(method)}>`;
 						output_type = spec.returns || 'void';
-						message_type = to_action_message_identifier(method);
 						break;
 					default:
 						throw new Unreachable_Error(phase);
@@ -100,8 +85,7 @@ export const gen: Gen = ({origin_path}) => {
 
 				return `${phase}?: ${auth_handler}<
 			${input_type},
-			${output_type},
-			${message_type}
+			${output_type}
 		>`;
 			})
 			.join(';\n\t\t');

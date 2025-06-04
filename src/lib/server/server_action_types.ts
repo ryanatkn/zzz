@@ -23,152 +23,110 @@ export interface Server_Action_Handlers {
 	create_directory?: {
 		send_request?: Public_Server_Action_Handler<
 			z.infer<typeof create_directory_action_spec.input>,
-			void,
-			Action_Messages['create_directory_request']
+			void
 		>;
 		receive_request?: Public_Server_Action_Handler<
 			z.infer<typeof create_directory_action_spec.input>,
-			z.infer<typeof create_directory_action_spec.output>,
-			Action_Messages['create_directory_request']
+			z.infer<typeof create_directory_action_spec.output>
 		>;
 		send_response?: Public_Server_Action_Handler<
 			z.infer<typeof create_directory_action_spec.output>,
-			void,
-			Action_Messages['create_directory_response']
+			void
 		>;
 		receive_response?: Public_Server_Action_Handler<
 			z.infer<typeof create_directory_action_spec.output>,
-			void,
-			Action_Messages['create_directory_response']
+			void
 		>;
 	};
 	delete_diskfile?: {
 		send_request?: Public_Server_Action_Handler<
 			z.infer<typeof delete_diskfile_action_spec.input>,
-			void,
-			Action_Messages['delete_diskfile_request']
+			void
 		>;
 		receive_request?: Public_Server_Action_Handler<
 			z.infer<typeof delete_diskfile_action_spec.input>,
-			z.infer<typeof delete_diskfile_action_spec.output>,
-			Action_Messages['delete_diskfile_request']
+			z.infer<typeof delete_diskfile_action_spec.output>
 		>;
 		send_response?: Public_Server_Action_Handler<
 			z.infer<typeof delete_diskfile_action_spec.output>,
-			void,
-			Action_Messages['delete_diskfile_response']
+			void
 		>;
 		receive_response?: Public_Server_Action_Handler<
 			z.infer<typeof delete_diskfile_action_spec.output>,
-			void,
-			Action_Messages['delete_diskfile_response']
+			void
 		>;
 	};
 	filer_change?: {
-		send?: Public_Server_Action_Handler<
-			z.infer<typeof filer_change_action_spec.input>,
-			void,
-			Action_Messages['filer_change']
-		>;
-		receive?: Public_Server_Action_Handler<
-			z.infer<typeof filer_change_action_spec.input>,
-			void,
-			Action_Messages['filer_change']
-		>;
+		send?: Public_Server_Action_Handler<z.infer<typeof filer_change_action_spec.input>, void>;
+		receive?: Public_Server_Action_Handler<z.infer<typeof filer_change_action_spec.input>, void>;
 	};
 	load_session?: {
 		send_request?: Public_Server_Action_Handler<
 			z.infer<typeof load_session_action_spec.input>,
-			void,
-			Action_Messages['load_session_request']
+			void
 		>;
 		receive_request?: Public_Server_Action_Handler<
 			z.infer<typeof load_session_action_spec.input>,
-			z.infer<typeof load_session_action_spec.output>,
-			Action_Messages['load_session_request']
+			z.infer<typeof load_session_action_spec.output>
 		>;
 		send_response?: Public_Server_Action_Handler<
 			z.infer<typeof load_session_action_spec.output>,
-			void,
-			Action_Messages['load_session_response']
+			void
 		>;
 		receive_response?: Public_Server_Action_Handler<
 			z.infer<typeof load_session_action_spec.output>,
-			void,
-			Action_Messages['load_session_response']
+			void
 		>;
 	};
 	ping?: {
-		send_request?: Public_Server_Action_Handler<
-			z.infer<typeof ping_action_spec.input>,
-			void,
-			Action_Messages['ping_request']
-		>;
+		send_request?: Public_Server_Action_Handler<z.infer<typeof ping_action_spec.input>, void>;
 		receive_request?: Public_Server_Action_Handler<
 			z.infer<typeof ping_action_spec.input>,
-			z.infer<typeof ping_action_spec.output>,
-			Action_Messages['ping_request']
+			z.infer<typeof ping_action_spec.output>
 		>;
-		send_response?: Public_Server_Action_Handler<
-			z.infer<typeof ping_action_spec.output>,
-			void,
-			Action_Messages['ping_response']
-		>;
-		receive_response?: Public_Server_Action_Handler<
-			z.infer<typeof ping_action_spec.output>,
-			void,
-			Action_Messages['ping_response']
-		>;
+		send_response?: Public_Server_Action_Handler<z.infer<typeof ping_action_spec.output>, void>;
+		receive_response?: Public_Server_Action_Handler<z.infer<typeof ping_action_spec.output>, void>;
 	};
 	submit_completion?: {
 		send_request?: Public_Server_Action_Handler<
 			z.infer<typeof submit_completion_action_spec.input>,
-			void,
-			Action_Messages['submit_completion_request']
+			void
 		>;
 		receive_request?: Public_Server_Action_Handler<
 			z.infer<typeof submit_completion_action_spec.input>,
-			z.infer<typeof submit_completion_action_spec.output>,
-			Action_Messages['submit_completion_request']
+			z.infer<typeof submit_completion_action_spec.output>
 		>;
 		send_response?: Public_Server_Action_Handler<
 			z.infer<typeof submit_completion_action_spec.output>,
-			void,
-			Action_Messages['submit_completion_response']
+			void
 		>;
 		receive_response?: Public_Server_Action_Handler<
 			z.infer<typeof submit_completion_action_spec.output>,
-			void,
-			Action_Messages['submit_completion_response']
+			void
 		>;
 	};
 	toggle_main_menu?: {
 		execute?: Public_Server_Action_Handler<
 			z.infer<typeof toggle_main_menu_action_spec.input>,
-			boolean,
-			Action_Messages['toggle_main_menu']
+			boolean
 		>;
 	};
 	update_diskfile?: {
 		send_request?: Public_Server_Action_Handler<
 			z.infer<typeof update_diskfile_action_spec.input>,
-			void,
-			Action_Messages['update_diskfile_request']
+			void
 		>;
 		receive_request?: Public_Server_Action_Handler<
 			z.infer<typeof update_diskfile_action_spec.input>,
-			z.infer<typeof update_diskfile_action_spec.output>,
-			Action_Messages['update_diskfile_request']
+			z.infer<typeof update_diskfile_action_spec.output>
 		>;
 		send_response?: Public_Server_Action_Handler<
 			z.infer<typeof update_diskfile_action_spec.output>,
-			void,
-			Action_Messages['update_diskfile_response']
+			void
 		>;
 		receive_response?: Public_Server_Action_Handler<
 			z.infer<typeof update_diskfile_action_spec.output>,
-			void,
-			Action_Messages['update_diskfile_response']
+			void
 		>;
 	};
 }
