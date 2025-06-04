@@ -1,9 +1,10 @@
 import type {Gen} from '@ryanatkn/gro/gen.js';
-import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 
 import {action_specs} from '$lib/action_collections.js';
 import {Action_Registry} from '$lib/action_registry.js';
 import {ACTION_KIND_PHASES, type Action_Phase} from '$lib/action_types.js';
+
+// TODO @api may not be needed, try to replace with regular types
 
 /**
  * Outputs a file with generated types and schemas using the action specs as the source of truth.
@@ -20,43 +21,15 @@ export const gen: Gen = ({origin_path}) => {
 
 		const phase_handlers = phases
 			.map((phase: Action_Phase) => {
-				// Determine input and output types based on phase
-				const input_type = `Action_Inputs['${method}']`;
-				let output_type: string;
-				let returned_type: string;
-
-				// TODO BLOCK do we need another type param for the available result vs return value?
-				switch (phase) {
-					case 'send_request':
-						output_type = 'void';
-						break;
-					case 'receive_request':
-						output_type = `Action_Outputs['${method}']`;
-						break;
-					case 'send_response':
-						output_type = `Action_Outputs['${method}']`;
-						break;
-					case 'receive_response':
-						output_type = `Action_Outputs['${method}']`;
-						break;
-					case 'send':
-						output_type = 'void';
-						break;
-					case 'receive':
-						output_type = `Action_Outputs['${method}']`;
-						break;
-					case 'execute':
-						output_type = `Action_Outputs['${method}']`;
-						returned_type = spec.returns || `Action_Outputs['${method}']`;
-						break;
-					default:
-						throw new Unreachable_Error(phase);
+				let returned_type = spec.returns || `Action_Outputs['${method}']`;
+				if (spec.async) {
+					returned_type = `Promise<${returned_type}>`;
 				}
 
 				return `${phase}?: Client_Action_Handler<
 					T_App,
-					${input_type},
-					${output_type},
+					Action_Inputs['${method}'],
+					Action_Outputs['${method}'],
 					${returned_type}
 				>`;
 			})

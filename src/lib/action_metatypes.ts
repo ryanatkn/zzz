@@ -56,7 +56,7 @@ export interface Actions_Api {
 	submit_completion: (
 		input: Action_Inputs['submit_completion'],
 	) => Promise<Action_Outputs['submit_completion']>;
-	toggle_main_menu: (input?: Action_Inputs['toggle_main_menu']) => boolean;
+	toggle_main_menu: (input?: Action_Inputs['toggle_main_menu']) => undefined;
 	update_diskfile: (
 		input: Action_Inputs['update_diskfile'],
 	) => Promise<Action_Outputs['update_diskfile']>;

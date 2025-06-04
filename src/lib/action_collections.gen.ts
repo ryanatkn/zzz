@@ -36,6 +36,7 @@ export const gen: Gen = ({origin_path}) => {
 		import * as specs from '$lib/action_specs.js';
 		import type {Action_Method} from '$lib/action_metatypes.js';
 
+		// TODO consistent naming
 		/**
 		 * All method types combined.
 		 */

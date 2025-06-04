@@ -6,7 +6,7 @@ import type {Jsonrpc_Message_From_Client_To_Server} from '$lib/jsonrpc.js';
 export class Server_Action_Event<
 	T_Params = any,
 	T_Result = any,
-	T_Message extends Jsonrpc_Message_From_Client_To_Server = any,
+	T_Message extends Jsonrpc_Message_From_Client_To_Server = Jsonrpc_Message_From_Client_To_Server,
 > {
 	server: Zzz_Server;
 	phase: Action_Phase;

@@ -17,12 +17,14 @@ import type {Action_Spec} from '$lib/action_spec.js';
 export const gen: Gen = ({origin_path}) => {
 	const registry = new Action_Registry(action_specs);
 
+	const server_specs = registry.specs.filter((s) => s.kind !== 'local_call');
+
 	// Get all specs that could have server handlers
-	const schema_imports = registry.specs.map((spec) => `${spec.method}_action_spec`);
+	const schema_imports = server_specs.map((spec) => `${spec.method}_action_spec`);
 
 	// Determine which service types are needed based on auth requirements
-	const needs_public = registry.specs.some((spec) => spec.auth === 'public' || spec.auth === null);
-	const needs_authorized = registry.specs.some((spec) => spec.auth === 'authorize');
+	const needs_public = server_specs.some((spec) => spec.auth === 'public' || spec.auth === null);
+	const needs_authorized = server_specs.some((spec) => spec.auth === 'authorize');
 
 	// Create imports based on what's needed
 	const service_imports = [];
@@ -76,9 +78,8 @@ export const gen: Gen = ({origin_path}) => {
 						output_type = 'void';
 						break;
 					case 'execute':
-						input_type = `z.infer<typeof ${to_action_spec_input_identifier(method)}>`;
-						output_type = spec.returns || 'void';
-						break;
+						// can't happen, kinda hacky
+						return '';
 					default:
 						throw new Unreachable_Error(phase);
 				}
@@ -106,7 +107,7 @@ export const gen: Gen = ({origin_path}) => {
      * Generated using ACTION_KIND_PHASES for consistent phase handling across all action kinds.
      */
     export interface Server_Action_Handlers {
-      ${registry.specs.map(generate_server_phase_handlers).join(';\n\t')}
+      ${server_specs.map(generate_server_phase_handlers).join(';\n\t')}
     }
 
     // ${banner}

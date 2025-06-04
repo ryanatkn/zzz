@@ -10,7 +10,6 @@ import type {
 	load_session_action_spec,
 	ping_action_spec,
 	submit_completion_action_spec,
-	toggle_main_menu_action_spec,
 	update_diskfile_action_spec,
 } from '$lib/action_specs.js';
 
@@ -102,12 +101,6 @@ export interface Server_Action_Handlers {
 		receive_response?: Public_Server_Action_Handler<
 			z.infer<typeof submit_completion_action_spec.output>,
 			void
-		>;
-	};
-	toggle_main_menu?: {
-		execute?: Public_Server_Action_Handler<
-			z.infer<typeof toggle_main_menu_action_spec.input>,
-			boolean
 		>;
 	};
 	update_diskfile?: {

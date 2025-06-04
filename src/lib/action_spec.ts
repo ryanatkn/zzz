@@ -42,7 +42,6 @@ export type Remote_Notification_Action_Spec = z.infer<typeof Remote_Notification
 export const Local_Call_Action_Spec = Action_Spec_Base.extend({
 	kind: z.literal('local_call').default('local_call'),
 	auth: z.null().default(null),
-	returns: Type_Literal, // TODO ideally wouldn't exist, should be generated from the zod schema
 });
 export type Local_Call_Action_Spec = z.infer<typeof Local_Call_Action_Spec>;
 

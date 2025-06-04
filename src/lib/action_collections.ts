@@ -6,6 +6,7 @@ import {type Action_Spec, collect_action_specs} from '$lib/action_spec.js';
 import * as specs from '$lib/action_specs.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
 
+// TODO consistent naming
 /**
  * All method types combined.
  */

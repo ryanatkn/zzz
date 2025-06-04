@@ -1,6 +1,6 @@
 import {noop} from '@ryanatkn/belt/function.js';
 
-import type {Client_Action_Handlers} from '$lib/action_metatypes.js';
+import type {Client_Action_Handlers} from '$lib/client_action_types.js';
 
 // TODO we may also want method-based or middleware-like APIs
 
