@@ -25,12 +25,13 @@ import {
 import {to_completion_result} from '$lib/response_helpers.js';
 import type {Filer_Change_Handler} from '$lib/server/zzz_server.js';
 import {Safe_Fs} from '$lib/server/safe_fs.js';
-import type {Action_Message_Params} from '$lib/action_metatypes.js';
+import type {Action_Inputs} from '$lib/action_metatypes.js';
 import {to_action_message} from '$lib/action_helpers.js';
 import {jsonrpc_errors} from '$lib/jsonrpc_errors.js';
-import type {Server_Action_Handlers} from '$lib/server/server_action_metatypes.js';
+import type {Server_Action_Handlers} from '$lib/server/server_action_types.js';
 import {create_jsonrpc_notification} from '$lib/jsonrpc_helpers.js';
 import {filer_change_action_spec} from '$lib/action_specs.js';
+import type {Action_Outputs} from '$lib/action_collections.js';
 
 // TODO refactor to a plugin architecture
 
@@ -81,7 +82,7 @@ export const server_action_handlers: Server_Action_Handlers = {
 			const {prompt, provider_name, model, completion_messages} = message.params.completion_request;
 			const config = server.config;
 
-			let result: Action_Message_Params['submit_completion_response'];
+			let result: Action_Outputs['submit_completion'];
 
 			console.log(`texting ${provider_name}:`, prompt.substring(0, 1000));
 

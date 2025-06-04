@@ -790,13 +790,13 @@ export const package_json = {
 			types: './dist/server/server_action_handlers.d.ts',
 			default: './dist/server/server_action_handlers.js',
 		},
-		'./server/server_action_metatypes.gen.js': {
-			types: './dist/server/server_action_metatypes.gen.d.ts',
-			default: './dist/server/server_action_metatypes.gen.js',
+		'./server/server_action_types.gen.js': {
+			types: './dist/server/server_action_types.gen.d.ts',
+			default: './dist/server/server_action_types.gen.js',
 		},
-		'./server/server_action_metatypes.js': {
-			types: './dist/server/server_action_metatypes.d.ts',
-			default: './dist/server/server_action_metatypes.js',
+		'./server/server_action_types.js': {
+			types: './dist/server/server_action_types.d.ts',
+			default: './dist/server/server_action_types.js',
 		},
 		'./server/server.js': {types: './dist/server/server.d.ts', default: './dist/server/server.js'},
 		'./server/zzz_server.js': {
@@ -2149,12 +2149,12 @@ export const src_json = {
 				{name: 'handle_filer_change', kind: 'function'},
 			],
 		},
-		'./server/server_action_metatypes.gen.js': {
-			path: 'server/server_action_metatypes.gen.ts',
+		'./server/server_action_types.gen.js': {
+			path: 'server/server_action_types.gen.ts',
 			declarations: [{name: 'gen', kind: 'function'}],
 		},
-		'./server/server_action_metatypes.js': {
-			path: 'server/server_action_metatypes.ts',
+		'./server/server_action_types.js': {
+			path: 'server/server_action_types.ts',
 			declarations: [{name: 'Server_Action_Handlers', kind: 'type'}],
 		},
 		'./server/server.js': {path: 'server/server.ts'},
