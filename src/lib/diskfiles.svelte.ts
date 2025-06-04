@@ -11,7 +11,7 @@ import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {create_single_index, create_multi_index} from '$lib/indexed_collection_helpers.js';
 import {Diskfiles_Editor} from '$lib/diskfiles_editor.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
-import type {Action_Message_Params} from '$lib/action_metatypes.js';
+import type {Action_Inputs} from '$lib/action_collections.js';
 
 export const Diskfiles_Json = Cell_Json.extend({
 	diskfiles: cell_array(
@@ -77,7 +77,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 		this.init();
 	}
 
-	handle_change(params: Action_Message_Params['filer_change']): void {
+	handle_change(params: Action_Inputs['filer_change']): void {
 		const validated_source_file = params.source_file;
 
 		switch (params.change.type) {

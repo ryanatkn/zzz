@@ -3,16 +3,7 @@
 import {z} from 'zod';
 
 import type {Client_Action_Handler} from '$lib/client_action_handler.js';
-import type {
-	create_directory_action_spec,
-	delete_diskfile_action_spec,
-	filer_change_action_spec,
-	load_session_action_spec,
-	ping_action_spec,
-	submit_completion_action_spec,
-	toggle_main_menu_action_spec,
-	update_diskfile_action_spec,
-} from '$lib/action_specs.js';
+import type {Action_Inputs, Action_Outputs} from '$lib/action_collections.js';
 import type {Zzz_App} from '$lib/zzz_app.svelte.js';
 
 /**
@@ -73,37 +64,26 @@ export const Action_Message_Type = z.enum([
 ]);
 export type Action_Message_Type = z.infer<typeof Action_Message_Type>;
 
-export interface Action_Message_Params {
-	create_directory: z.infer<typeof create_directory_action_spec.input>;
-	delete_diskfile: z.infer<typeof delete_diskfile_action_spec.input>;
-	filer_change: z.infer<typeof filer_change_action_spec.input>;
-	load_session: z.infer<typeof load_session_action_spec.input>;
-	ping: z.infer<typeof ping_action_spec.input>;
-	submit_completion: z.infer<typeof submit_completion_action_spec.input>;
-	toggle_main_menu: z.infer<typeof toggle_main_menu_action_spec.input>;
-	update_diskfile: z.infer<typeof update_diskfile_action_spec.input>;
-}
-
 /**
  * Interface for action dispatch functions.
  */
 export interface Actions_Api {
 	create_directory: (
-		params: Action_Message_Params['create_directory'],
-	) => Promise<Action_Message_Params['create_directory_response']>;
+		input: Action_Inputs['create_directory'],
+	) => Promise<Action_Outputs['create_directory']>;
 	delete_diskfile: (
-		params: Action_Message_Params['delete_diskfile'],
-	) => Promise<Action_Message_Params['delete_diskfile_response']>;
-	filer_change: (params: Action_Message_Params['filer_change']) => void;
-	load_session: (params?: void) => Promise<Action_Message_Params['load_session_response']>;
-	ping: (params?: void) => Promise<Action_Message_Params['ping_response']>;
+		input: Action_Inputs['delete_diskfile'],
+	) => Promise<Action_Outputs['delete_diskfile']>;
+	filer_change: (input: Action_Inputs['filer_change']) => void;
+	load_session: (input?: void) => Promise<Action_Outputs['load_session']>;
+	ping: (input?: void) => Promise<Action_Outputs['ping']>;
 	submit_completion: (
-		params: Action_Message_Params['submit_completion'],
-	) => Promise<Action_Message_Params['submit_completion_response']>;
-	toggle_main_menu: (params?: Action_Message_Params['toggle_main_menu']) => boolean;
+		input: Action_Inputs['submit_completion'],
+	) => Promise<Action_Outputs['submit_completion']>;
+	toggle_main_menu: (input?: Action_Inputs['toggle_main_menu']) => boolean;
 	update_diskfile: (
-		params: Action_Message_Params['update_diskfile'],
-	) => Promise<Action_Message_Params['update_diskfile_response']>;
+		input: Action_Inputs['update_diskfile'],
+	) => Promise<Action_Outputs['update_diskfile']>;
 }
 
 /**
@@ -111,134 +91,94 @@ export interface Actions_Api {
  */
 export interface Client_Action_Handlers<T_App extends Zzz_App = Zzz_App> {
 	create_directory?: {
-		send_request?: Client_Action_Handler<
-			T_App,
-			Action_Message_Params['create_directory_request'],
-			void
-		>;
+		send_request?: Client_Action_Handler<T_App, Action_Inputs['create_directory_request'], void>;
 		receive_request?: Client_Action_Handler<
 			T_App,
-			Action_Message_Params['create_directory_request'],
-			Action_Message_Params['create_directory_response']
+			Action_Inputs['create_directory_request'],
+			Action_Inputs['create_directory_response']
 		>;
-		send_response?: Client_Action_Handler<
-			T_App,
-			Action_Message_Params['create_directory_response'],
-			void
-		>;
+		send_response?: Client_Action_Handler<T_App, Action_Inputs['create_directory_response'], void>;
 		receive_response?: Client_Action_Handler<
 			T_App,
-			Action_Message_Params['create_directory_request'],
-			Action_Message_Params['create_directory_response']
+			Action_Inputs['create_directory_request'],
+			Action_Inputs['create_directory_response']
 		>;
 	};
 	delete_diskfile?: {
-		send_request?: Client_Action_Handler<
-			T_App,
-			Action_Message_Params['delete_diskfile_request'],
-			void
-		>;
+		send_request?: Client_Action_Handler<T_App, Action_Inputs['delete_diskfile_request'], void>;
 		receive_request?: Client_Action_Handler<
 			T_App,
-			Action_Message_Params['delete_diskfile_request'],
-			Action_Message_Params['delete_diskfile_response']
+			Action_Inputs['delete_diskfile_request'],
+			Action_Inputs['delete_diskfile_response']
 		>;
-		send_response?: Client_Action_Handler<
-			T_App,
-			Action_Message_Params['delete_diskfile_response'],
-			void
-		>;
+		send_response?: Client_Action_Handler<T_App, Action_Inputs['delete_diskfile_response'], void>;
 		receive_response?: Client_Action_Handler<
 			T_App,
-			Action_Message_Params['delete_diskfile_request'],
-			Action_Message_Params['delete_diskfile_response']
+			Action_Inputs['delete_diskfile_request'],
+			Action_Inputs['delete_diskfile_response']
 		>;
 	};
 	filer_change?: {
-		send?: Client_Action_Handler<T_App, Action_Message_Params['filer_change'], void>;
-		receive?: Client_Action_Handler<T_App, Action_Message_Params['filer_change'], void>;
+		send?: Client_Action_Handler<T_App, Action_Inputs['filer_change'], void>;
+		receive?: Client_Action_Handler<T_App, Action_Inputs['filer_change'], void>;
 	};
 	load_session?: {
-		send_request?: Client_Action_Handler<
-			T_App,
-			Action_Message_Params['load_session_request'],
-			void
-		>;
+		send_request?: Client_Action_Handler<T_App, Action_Inputs['load_session_request'], void>;
 		receive_request?: Client_Action_Handler<
 			T_App,
-			Action_Message_Params['load_session_request'],
-			Action_Message_Params['load_session_response']
+			Action_Inputs['load_session_request'],
+			Action_Inputs['load_session_response']
 		>;
-		send_response?: Client_Action_Handler<
-			T_App,
-			Action_Message_Params['load_session_response'],
-			void
-		>;
+		send_response?: Client_Action_Handler<T_App, Action_Inputs['load_session_response'], void>;
 		receive_response?: Client_Action_Handler<
 			T_App,
-			Action_Message_Params['load_session_request'],
-			Action_Message_Params['load_session_response']
+			Action_Inputs['load_session_request'],
+			Action_Inputs['load_session_response']
 		>;
 	};
 	ping?: {
-		send_request?: Client_Action_Handler<T_App, Action_Message_Params['ping_request'], void>;
+		send_request?: Client_Action_Handler<T_App, Action_Inputs['ping_request'], void>;
 		receive_request?: Client_Action_Handler<
 			T_App,
-			Action_Message_Params['ping_request'],
-			Action_Message_Params['ping_response']
+			Action_Inputs['ping_request'],
+			Action_Inputs['ping_response']
 		>;
-		send_response?: Client_Action_Handler<T_App, Action_Message_Params['ping_response'], void>;
+		send_response?: Client_Action_Handler<T_App, Action_Inputs['ping_response'], void>;
 		receive_response?: Client_Action_Handler<
 			T_App,
-			Action_Message_Params['ping_request'],
-			Action_Message_Params['ping_response']
+			Action_Inputs['ping_request'],
+			Action_Inputs['ping_response']
 		>;
 	};
 	submit_completion?: {
-		send_request?: Client_Action_Handler<
-			T_App,
-			Action_Message_Params['submit_completion_request'],
-			void
-		>;
+		send_request?: Client_Action_Handler<T_App, Action_Inputs['submit_completion_request'], void>;
 		receive_request?: Client_Action_Handler<
 			T_App,
-			Action_Message_Params['submit_completion_request'],
-			Action_Message_Params['submit_completion_response']
+			Action_Inputs['submit_completion_request'],
+			Action_Inputs['submit_completion_response']
 		>;
-		send_response?: Client_Action_Handler<
-			T_App,
-			Action_Message_Params['submit_completion_response'],
-			void
-		>;
+		send_response?: Client_Action_Handler<T_App, Action_Inputs['submit_completion_response'], void>;
 		receive_response?: Client_Action_Handler<
 			T_App,
-			Action_Message_Params['submit_completion_request'],
-			Action_Message_Params['submit_completion_response']
+			Action_Inputs['submit_completion_request'],
+			Action_Inputs['submit_completion_response']
 		>;
 	};
 	toggle_main_menu?: {
-		execute?: Client_Action_Handler<T_App, Action_Message_Params['toggle_main_menu'], boolean>;
+		execute?: Client_Action_Handler<T_App, Action_Inputs['toggle_main_menu'], boolean>;
 	};
 	update_diskfile?: {
-		send_request?: Client_Action_Handler<
-			T_App,
-			Action_Message_Params['update_diskfile_request'],
-			void
-		>;
+		send_request?: Client_Action_Handler<T_App, Action_Inputs['update_diskfile_request'], void>;
 		receive_request?: Client_Action_Handler<
 			T_App,
-			Action_Message_Params['update_diskfile_request'],
-			Action_Message_Params['update_diskfile_response']
+			Action_Inputs['update_diskfile_request'],
+			Action_Inputs['update_diskfile_response']
 		>;
-		send_response?: Client_Action_Handler<
-			T_App,
-			Action_Message_Params['update_diskfile_response'],
-			void
-		>;
+		send_response?: Client_Action_Handler<T_App, Action_Inputs['update_diskfile_response'], void>;
 		receive_response?: Client_Action_Handler<
 			T_App,
-			Action_Message_Params['update_diskfile_request'],
-			Action_Message_Params['update_diskfile_response']
+			Action_Inputs['update_diskfile_request'],
+			Action_Inputs['update_diskfile_response']
 		>;
 	};
 }

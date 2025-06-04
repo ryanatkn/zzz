@@ -4,7 +4,7 @@ import {z} from 'zod';
 
 import {type Action_Spec, collect_action_specs_by_method} from '$lib/action_spec.js';
 import {Action_Messages} from '$lib/action_messages.js';
-import * as action_spec_module from '$lib/action_specs.js';
+import * as specs from '$lib/action_specs.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
 
 /**
@@ -144,10 +144,124 @@ export const Action_Message_Nonnetworked = z.discriminatedUnion('type', [
 ]);
 export type Action_Message_Nonnetworked = z.infer<typeof Action_Message_Nonnetworked>;
 
-export const action_specs: Array<Action_Spec> = collect_action_specs_by_method(action_spec_module);
+export const action_specs: Array<Action_Spec> = collect_action_specs_by_method(specs);
 
 export const action_spec_by_method: Map<Action_Method, Action_Spec> = new Map(
 	action_specs.map((spec) => [spec.method, spec]),
 );
+
+/**
+ * Action parameter schemas indexed by method name.
+ * These represent the input data for each action,
+ * e.g. JSON-RPC request/notification params and local call arguments.
+ */
+export const Action_Inputs = {
+	create_directory: specs.create_directory_action_spec.input,
+	delete_diskfile: specs.delete_diskfile_action_spec.input,
+	filer_change: specs.filer_change_action_spec.input,
+	load_session: specs.load_session_action_spec.input,
+	ping: specs.ping_action_spec.input,
+	submit_completion: specs.submit_completion_action_spec.input,
+	toggle_main_menu: specs.toggle_main_menu_action_spec.input,
+	update_diskfile: specs.update_diskfile_action_spec.input,
+} as const;
+export interface Action_Inputs {
+	create_directory: z.infer<typeof specs.create_directory_action_spec.input>;
+	delete_diskfile: z.infer<typeof specs.delete_diskfile_action_spec.input>;
+	filer_change: z.infer<typeof specs.filer_change_action_spec.input>;
+	load_session: z.infer<typeof specs.load_session_action_spec.input>;
+	ping: z.infer<typeof specs.ping_action_spec.input>;
+	submit_completion: z.infer<typeof specs.submit_completion_action_spec.input>;
+	toggle_main_menu: z.infer<typeof specs.toggle_main_menu_action_spec.input>;
+	update_diskfile: z.infer<typeof specs.update_diskfile_action_spec.input>;
+}
+
+/**
+ * Action result schemas indexed by method name.
+ * These represent the output data for each action,
+ * e.g. JSON-RPC response results and local call return values.
+ */
+export const Action_Outputs = {
+	create_directory: specs.create_directory_action_spec.output,
+	delete_diskfile: specs.delete_diskfile_action_spec.output,
+	filer_change: specs.filer_change_action_spec.output,
+	load_session: specs.load_session_action_spec.output,
+	ping: specs.ping_action_spec.output,
+	submit_completion: specs.submit_completion_action_spec.output,
+	toggle_main_menu: specs.toggle_main_menu_action_spec.output,
+	update_diskfile: specs.update_diskfile_action_spec.output,
+} as const;
+export interface Action_Outputs {
+	create_directory: z.infer<typeof specs.create_directory_action_spec.output>;
+	delete_diskfile: z.infer<typeof specs.delete_diskfile_action_spec.output>;
+	filer_change: z.infer<typeof specs.filer_change_action_spec.output>;
+	load_session: z.infer<typeof specs.load_session_action_spec.output>;
+	ping: z.infer<typeof specs.ping_action_spec.output>;
+	submit_completion: z.infer<typeof specs.submit_completion_action_spec.output>;
+	toggle_main_menu: z.infer<typeof specs.toggle_main_menu_action_spec.output>;
+	update_diskfile: z.infer<typeof specs.update_diskfile_action_spec.output>;
+}
+
+// TODO BLOCK @api use the following or a variant and delete the stuff above
+
+/**
+ * Helper type to get params type for a method.
+ */
+export type Action_Input_For<T_Method extends keyof typeof Action_Inputs> = z.infer<
+	(typeof Action_Inputs)[T_Method]
+>;
+
+/**
+ * Helper type to get result type for a method.
+ */
+export type Action_Output_For<T_Method extends keyof typeof Action_Outputs> = z.infer<
+	(typeof Action_Outputs)[T_Method]
+>;
+
+/**
+ * Type guard to check if a method has params.
+ */
+export const has_action_params = (method: string): method is keyof typeof Action_Inputs =>
+	method in Action_Inputs;
+
+/**
+ * Type guard to check if a method has results.
+ */
+export const has_action_result = (method: string): method is keyof typeof Action_Outputs =>
+	method in Action_Outputs;
+
+/**
+ * Parse action params with validation.
+ */
+export const parse_action_input = <T_Method extends keyof typeof Action_Inputs>(
+	method: T_Method,
+	data: unknown,
+): Action_Input_For<T_Method> => Action_Inputs[method].parse(data);
+
+/**
+ * Parse action result with validation.
+ */
+export const parse_action_output = <T_Method extends keyof typeof Action_Outputs>(
+	method: T_Method,
+	data: unknown,
+): Action_Output_For<T_Method> => Action_Outputs[method].parse(data);
+
+/**
+ * Safe parse action params.
+ */
+export const safe_parse_action_input = <T_Method extends keyof typeof Action_Inputs>(
+	method: T_Method,
+	data: unknown,
+): z.SafeParseReturnType<unknown, Action_Input_For<T_Method>> =>
+	Action_Inputs[method].safeParse(data);
+
+/**
+ * Safe parse action result.
+ */
+export const safe_parse_action_output = <T_Method extends keyof typeof Action_Outputs>(
+	method: T_Method,
+	data: unknown,
+): z.SafeParseReturnType<unknown, Action_Output_For<T_Method>> =>
+	Action_Outputs[method].safeParse(data);
 
 // generated by src/lib/action_collections.gen.ts - DO NOT EDIT OR RISK LOST DATA

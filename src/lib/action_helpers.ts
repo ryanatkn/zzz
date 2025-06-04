@@ -1,13 +1,9 @@
 import type {z} from 'zod';
 
-import {Action_Message_Union} from '$lib/action_collections.js';
+import {Action_Message_Union, type Action_Inputs} from '$lib/action_collections.js';
 import type {Action_Auth} from '$lib/action_types.js';
 import {Action_Messages} from '$lib/action_messages.js';
-import {
-	Action_Message_Type,
-	Action_Method,
-	type Action_Message_Params,
-} from '$lib/action_metatypes.js';
+import {Action_Message_Type, Action_Method} from '$lib/action_metatypes.js';
 import type {Jsonrpc_Request_Id, Jsonrpc_Singular_Message} from '$lib/jsonrpc.js';
 import {to_jsonrpc_message_id} from '$lib/jsonrpc_helpers.js';
 
@@ -43,7 +39,7 @@ export const to_action_message_type = (
 
 export const to_action_message = <T extends Action_Message_Type>(
 	action_message_type: T,
-	params: Action_Message_Params[T],
+	params: Action_Inputs[T],
 	jsonrpc_message_or_id: Jsonrpc_Request_Id | Jsonrpc_Singular_Message | null,
 ): Action_Message_Union =>
 	Action_Messages[action_message_type].parse({

@@ -3,7 +3,7 @@
  * and handling type compatibility issues.
  */
 import {get_datetime_now, Uuid} from '$lib/zod_helpers.js';
-import type {Action_Message_Params} from '$lib/action_metatypes.js';
+import type {Action_Outputs} from '$lib/action_collections.js';
 import type {Provider_Name, Provider_Data} from '$lib/provider_types.js';
 
 /**
@@ -11,7 +11,7 @@ import type {Provider_Name, Provider_Data} from '$lib/provider_types.js';
  */
 export const to_completion_response_text = (
 	completion_response:
-		| Action_Message_Params['submit_completion_response']['completion_response']
+		| Action_Outputs['submit_completion']['completion_response']
 		| null
 		| undefined,
 ): string | null => {
@@ -42,7 +42,7 @@ export const to_completion_result = (
 	provider_name: Provider_Name,
 	model: string,
 	api_response: unknown,
-): Action_Message_Params['submit_completion_response'] => {
+): Action_Outputs['submit_completion'] => {
 	let provider_data: Provider_Data;
 
 	// Convert provider-specific response format to our standard format
