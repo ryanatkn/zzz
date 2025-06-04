@@ -981,7 +981,6 @@ export const src_json = {
 				{name: 'Local_Call_Action_Method', kind: 'type'},
 				{name: 'Action_Message_Type', kind: 'variable'},
 				{name: 'Actions_Api', kind: 'type'},
-				{name: 'Client_Action_Handlers', kind: 'type'},
 			],
 		},
 		'./action_registry.js': {
