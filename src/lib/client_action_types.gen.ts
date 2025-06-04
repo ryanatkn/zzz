@@ -23,6 +23,7 @@ export const gen: Gen = ({origin_path}) => {
 				// Determine input and output types based on phase
 				const input_type = `Action_Inputs['${method}']`;
 				let output_type: string;
+				let returned_type: string;
 
 				// TODO BLOCK do we need another type param for the available result vs return value?
 				switch (phase) {
@@ -45,7 +46,8 @@ export const gen: Gen = ({origin_path}) => {
 						output_type = `Action_Outputs['${method}']`;
 						break;
 					case 'execute':
-						output_type = spec.returns || `Action_Outputs['${method}']`;
+						output_type = `Action_Outputs['${method}']`;
+						returned_type = spec.returns || `Action_Outputs['${method}']`;
 						break;
 					default:
 						throw new Unreachable_Error(phase);
@@ -54,7 +56,8 @@ export const gen: Gen = ({origin_path}) => {
 				return `${phase}?: Client_Action_Handler<
 					T_App,
 					${input_type},
-					${output_type}
+					${output_type},
+					${returned_type}
 				>`;
 			})
 			.join(';\n\t\t');

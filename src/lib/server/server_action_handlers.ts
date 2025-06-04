@@ -13,7 +13,6 @@ import {format_file} from '@ryanatkn/gro/format_file.js';
 import {DEV} from 'esm-env';
 import type {Source_File} from '@ryanatkn/gro/filer.js';
 
-import {Action_Messages} from '$lib/action_messages.js';
 import {Diskfile_Path, Serializable_Source_File} from '$lib/diskfile_types.js';
 import {map_watcher_change_to_diskfile_change} from '$lib/diskfile_helpers.js';
 import {
@@ -25,12 +24,11 @@ import {
 import {to_completion_result} from '$lib/response_helpers.js';
 import type {Filer_Change_Handler} from '$lib/server/zzz_server.js';
 import {Safe_Fs} from '$lib/server/safe_fs.js';
-import {to_action_message} from '$lib/action_helpers.js';
 import {jsonrpc_errors} from '$lib/jsonrpc_errors.js';
 import type {Server_Action_Handlers} from '$lib/server/server_action_types.js';
 import {create_jsonrpc_notification} from '$lib/jsonrpc_helpers.js';
 import {filer_change_action_spec} from '$lib/action_specs.js';
-import type {Action_Outputs} from '$lib/action_collections.js';
+import type {Action_Inputs, Action_Outputs} from '$lib/action_collections.js';
 
 // TODO refactor to a plugin architecture
 
@@ -189,15 +187,9 @@ export const server_action_handlers: Server_Action_Handlers = {
 				);
 			}
 
-			// TODO this is currently only being created for logging/history purposes, doesn't get sent to client
-			const response_message = to_action_message(
-				'submit_completion_response',
-				result,
-				message.jsonrpc_message_id,
-			);
-
+			// TODO @db temporary
 			// We don't need to wait for this to finish
-			void save_response(message, response_message, server.zzz_cache_dir, server.safe_fs);
+			void save_completion_response_to_disk(message, result, server.zzz_cache_dir, server.safe_fs);
 
 			console.log(`got ${provider_name} message`, result.completion_response.data);
 
@@ -316,18 +308,18 @@ export const handle_filer_change: Filer_Change_Handler = (
 };
 
 // TODO @db refactor
-const save_response = async (
-	request: Action_Messages['submit_completion_request'],
-	response: Action_Messages['submit_completion_response'],
+const save_completion_response_to_disk = async (
+	input: Action_Inputs['submit_completion'],
+	output: Action_Outputs['submit_completion'],
 	dir: string,
 	safe_fs: Safe_Fs,
 ): Promise<void> => {
 	// includes `Date.now()` for sorting purposes
-	const filename = `${request.params.completion_request.provider_name}__${Date.now()}__${request.params.completion_request.model}__${response.id}.json`; // TODO include model data in these
+	const filename = `${input.completion_request.provider_name}__${Date.now()}__${input.completion_request.model}__${input.completion_request.request_id}.json`; // TODO include model data in these
 
 	const path = join(dir, filename);
 
-	const json = {request, response};
+	const json = {input, output};
 
 	await write_json(path, json, safe_fs);
 };
