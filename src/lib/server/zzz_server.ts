@@ -27,7 +27,7 @@ import {to_zzz_cache_dir} from '$lib/diskfile_helpers.js';
 import {jsonrpc_errors} from '$lib/jsonrpc_errors.js';
 import type {Server_Action_Handlers} from '$lib/server/server_action_types.js';
 import {Server_Action_Event} from '$lib/server/server_action_event.js';
-import {Action_Method} from '$lib/action_metatypes.js';
+import {Server_Action_Method} from '$lib/action_metatypes.js';
 
 /**
  * Function type for handling file system changes.
@@ -220,7 +220,7 @@ export class Zzz_Server {
 			throw jsonrpc_errors.invalid_request();
 		}
 
-		const parsed_method = Action_Method.safeParse(message.method);
+		const parsed_method = Server_Action_Method.safeParse(message.method);
 		if (!parsed_method.success) {
 			throw jsonrpc_errors.method_not_found(message.method);
 		}

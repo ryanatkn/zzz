@@ -13,6 +13,11 @@ export const client_action_handlers: Client_Action_Handlers = {
 		},
 		receive_response: ({app, output}) => {
 			console.log('Ping response received');
+			// TODO BLOCK @api @many this handler should be able to assume `output` is defined, see also response_message
+			if (!output) {
+				console.error('Ping response is missing output');
+				return;
+			}
 			app.capabilities.handle_received_ping(output.ping_id);
 			// TODO BLOCK @api how to handle errors? check args or separate handler?
 			// app.capabilities.handle_ping_error(jsonrpc_message.id, output.message);
@@ -25,6 +30,11 @@ export const client_action_handlers: Client_Action_Handlers = {
 		},
 		receive_response: ({app, output}) => {
 			console.log('Session loaded');
+			// TODO BLOCK @api @many this handler should be able to assume `output` is defined, see also response_message
+			if (!output) {
+				console.error('Ping response is missing output');
+				return;
+			}
 			app.receive_session(output.data);
 		},
 	},
