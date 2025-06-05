@@ -22,16 +22,17 @@ export class Client_Action_Event<
 	T_App extends Zzz_App = Zzz_App,
 	T_Input extends Action_Input = any, // TODO @api type
 	T_Output extends Action_Output = any, // TODO @api type
+	T_Message extends Jsonrpc_Singular_Message | null = Jsonrpc_Singular_Message | null,
 > {
 	app: T_App;
 	/** JSON-RPC method for the action. */
 	method: Action_Method;
-	/** The phase of the action handling. */
+	/** The phase of the action handling event/context. */
 	phase: Action_Phase;
 	input: T_Input;
 	output: T_Output;
 	/** The JSON-RPC message associated with this action */
-	jsonrpc_message: Jsonrpc_Singular_Message | null;
+	jsonrpc_message: T_Message;
 
 	#cbs: Array<After_Client_Action_Callback> = [];
 
@@ -43,7 +44,7 @@ export class Client_Action_Event<
 		phase: Action_Phase,
 		input: T_Input,
 		output: T_Output,
-		jsonrpc_message: Jsonrpc_Singular_Message | null,
+		jsonrpc_message: T_Message,
 	) {
 		this.app = app;
 		this.method = method;

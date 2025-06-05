@@ -25,7 +25,15 @@ export const gen: Gen = ({origin_path}) => {
 					T_App,
 					Action_Inputs['${method}'],
 					Action_Outputs['${method}'],
-					${kind === 'local_call' ? `Action_Outputs['${method}']` : 'void'}
+					${kind === 'local_call' ? `Action_Outputs['${method}']` : 'void'},
+					${
+						// TODO BLOCK @api where are the response messages on the event?
+						kind === 'request_response'
+							? 'Jsonrpc_Request'
+							: kind === 'remote_notification'
+								? 'Jsonrpc_Notification'
+								: 'null'
+					}
 				>`,
 			)
 			.join(';\n\t\t');
@@ -39,6 +47,7 @@ export const gen: Gen = ({origin_path}) => {
 		import type {Client_Action_Handler} from '$lib/client_action_handler.js';
 		import type {Action_Inputs, Action_Outputs} from '$lib/action_collections.js';
 		import type {Zzz_App} from '$lib/zzz_app.svelte.js';
+		import type {Jsonrpc_Request, Jsonrpc_Notification} from '$lib/jsonrpc.js';
 
 		/**
 		 * Interface for client-side action handlers organized by method and phase.

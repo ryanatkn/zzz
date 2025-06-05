@@ -3,6 +3,7 @@
 import type {Client_Action_Handler} from '$lib/client_action_handler.js';
 import type {Action_Inputs, Action_Outputs} from '$lib/action_collections.js';
 import type {Zzz_App} from '$lib/zzz_app.svelte.js';
+import type {Jsonrpc_Request, Jsonrpc_Notification} from '$lib/jsonrpc.js';
 
 /**
  * Interface for client-side action handlers organized by method and phase.
@@ -13,25 +14,29 @@ export interface Client_Action_Handlers<T_App extends Zzz_App = Zzz_App> {
 			T_App,
 			Action_Inputs['create_directory'],
 			Action_Outputs['create_directory'],
-			void
+			void,
+			Jsonrpc_Request
 		>;
 		receive_request?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['create_directory'],
 			Action_Outputs['create_directory'],
-			void
+			void,
+			Jsonrpc_Request
 		>;
 		send_response?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['create_directory'],
 			Action_Outputs['create_directory'],
-			void
+			void,
+			Jsonrpc_Request
 		>;
 		receive_response?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['create_directory'],
 			Action_Outputs['create_directory'],
-			void
+			void,
+			Jsonrpc_Request
 		>;
 	};
 	delete_diskfile?: {
@@ -39,25 +44,29 @@ export interface Client_Action_Handlers<T_App extends Zzz_App = Zzz_App> {
 			T_App,
 			Action_Inputs['delete_diskfile'],
 			Action_Outputs['delete_diskfile'],
-			void
+			void,
+			Jsonrpc_Request
 		>;
 		receive_request?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['delete_diskfile'],
 			Action_Outputs['delete_diskfile'],
-			void
+			void,
+			Jsonrpc_Request
 		>;
 		send_response?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['delete_diskfile'],
 			Action_Outputs['delete_diskfile'],
-			void
+			void,
+			Jsonrpc_Request
 		>;
 		receive_response?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['delete_diskfile'],
 			Action_Outputs['delete_diskfile'],
-			void
+			void,
+			Jsonrpc_Request
 		>;
 	};
 	filer_change?: {
@@ -65,13 +74,15 @@ export interface Client_Action_Handlers<T_App extends Zzz_App = Zzz_App> {
 			T_App,
 			Action_Inputs['filer_change'],
 			Action_Outputs['filer_change'],
-			void
+			void,
+			Jsonrpc_Notification
 		>;
 		receive?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['filer_change'],
 			Action_Outputs['filer_change'],
-			void
+			void,
+			Jsonrpc_Notification
 		>;
 	};
 	load_session?: {
@@ -79,25 +90,29 @@ export interface Client_Action_Handlers<T_App extends Zzz_App = Zzz_App> {
 			T_App,
 			Action_Inputs['load_session'],
 			Action_Outputs['load_session'],
-			void
+			void,
+			Jsonrpc_Request
 		>;
 		receive_request?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['load_session'],
 			Action_Outputs['load_session'],
-			void
+			void,
+			Jsonrpc_Request
 		>;
 		send_response?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['load_session'],
 			Action_Outputs['load_session'],
-			void
+			void,
+			Jsonrpc_Request
 		>;
 		receive_response?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['load_session'],
 			Action_Outputs['load_session'],
-			void
+			void,
+			Jsonrpc_Request
 		>;
 	};
 	ping?: {
@@ -105,25 +120,29 @@ export interface Client_Action_Handlers<T_App extends Zzz_App = Zzz_App> {
 			T_App,
 			Action_Inputs['ping'],
 			Action_Outputs['ping'],
-			void
+			void,
+			Jsonrpc_Request
 		>;
 		receive_request?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['ping'],
 			Action_Outputs['ping'],
-			void
+			void,
+			Jsonrpc_Request
 		>;
 		send_response?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['ping'],
 			Action_Outputs['ping'],
-			void
+			void,
+			Jsonrpc_Request
 		>;
 		receive_response?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['ping'],
 			Action_Outputs['ping'],
-			void
+			void,
+			Jsonrpc_Request
 		>;
 	};
 	submit_completion?: {
@@ -131,25 +150,29 @@ export interface Client_Action_Handlers<T_App extends Zzz_App = Zzz_App> {
 			T_App,
 			Action_Inputs['submit_completion'],
 			Action_Outputs['submit_completion'],
-			void
+			void,
+			Jsonrpc_Request
 		>;
 		receive_request?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['submit_completion'],
 			Action_Outputs['submit_completion'],
-			void
+			void,
+			Jsonrpc_Request
 		>;
 		send_response?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['submit_completion'],
 			Action_Outputs['submit_completion'],
-			void
+			void,
+			Jsonrpc_Request
 		>;
 		receive_response?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['submit_completion'],
 			Action_Outputs['submit_completion'],
-			void
+			void,
+			Jsonrpc_Request
 		>;
 	};
 	toggle_main_menu?: {
@@ -157,7 +180,8 @@ export interface Client_Action_Handlers<T_App extends Zzz_App = Zzz_App> {
 			T_App,
 			Action_Inputs['toggle_main_menu'],
 			Action_Outputs['toggle_main_menu'],
-			Action_Outputs['toggle_main_menu']
+			Action_Outputs['toggle_main_menu'],
+			null
 		>;
 	};
 	update_diskfile?: {
@@ -165,25 +189,29 @@ export interface Client_Action_Handlers<T_App extends Zzz_App = Zzz_App> {
 			T_App,
 			Action_Inputs['update_diskfile'],
 			Action_Outputs['update_diskfile'],
-			void
+			void,
+			Jsonrpc_Request
 		>;
 		receive_request?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['update_diskfile'],
 			Action_Outputs['update_diskfile'],
-			void
+			void,
+			Jsonrpc_Request
 		>;
 		send_response?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['update_diskfile'],
 			Action_Outputs['update_diskfile'],
-			void
+			void,
+			Jsonrpc_Request
 		>;
 		receive_response?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['update_diskfile'],
 			Action_Outputs['update_diskfile'],
-			void
+			void,
+			Jsonrpc_Request
 		>;
 	};
 }
