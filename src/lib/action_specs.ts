@@ -6,9 +6,9 @@ import {
 	Serializable_Source_File,
 	Zzz_Dir,
 } from '$lib/diskfile_types.js';
-import {Uuid} from '$lib/zod_helpers.js';
 import {Completion_Request, Completion_Response} from '$lib/completion_types.js';
 import type {Action_Spec} from '$lib/action_spec.js';
+import {Jsonrpc_Request_Id} from '$lib/jsonrpc.js';
 
 // Action specs are the source of truth for many things including generated code -
 // the goal is to make the system extensible for users but it's not there yet.
@@ -36,7 +36,7 @@ export const ping_action_spec = {
 	input: z.void().optional(),
 	output: z
 		.object({
-			ping_id: Uuid,
+			ping_id: Jsonrpc_Request_Id,
 		})
 		.strict(),
 	async: true,

@@ -2,9 +2,10 @@
  * Helper module for safely working with completion responses
  * and handling type compatibility issues.
  */
-import {get_datetime_now, Uuid} from '$lib/zod_helpers.js';
+import {get_datetime_now} from '$lib/zod_helpers.js';
 import type {Action_Outputs} from '$lib/action_collections.js';
 import type {Provider_Name, Provider_Data} from '$lib/provider_types.js';
+import type {Jsonrpc_Request_Id} from './jsonrpc.js';
 
 /**
  * Extracts the text content from a completion response
@@ -38,7 +39,7 @@ export const to_completion_response_text = (
  * Creates a standardized completion response message from provider-specific responses
  */
 export const to_completion_result = (
-	request_id: Uuid,
+	request_id: Jsonrpc_Request_Id,
 	provider_name: Provider_Name,
 	model: string,
 	api_response: unknown,

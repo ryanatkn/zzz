@@ -29,7 +29,6 @@ import type {Server_Action_Handlers} from '$lib/server/server_action_types.js';
 import {create_jsonrpc_notification} from '$lib/jsonrpc_helpers.js';
 import {filer_change_action_spec} from '$lib/action_specs.js';
 import type {Action_Inputs, Action_Outputs} from '$lib/action_collections.js';
-import {Uuid} from '$lib/zod_helpers.js';
 
 // TODO refactor to a plugin architecture
 
@@ -47,7 +46,7 @@ export const server_action_handlers: Server_Action_Handlers = {
 	ping: {
 		receive_request: ({message}) => {
 			return {
-				ping_id: Uuid.parse(message.id), // TODO BLOCK instead of parsing, maybe `event.id`? see below too
+				ping_id: message.id,
 			};
 		},
 	},
@@ -188,9 +187,9 @@ export const server_action_handlers: Server_Action_Handlers = {
 				);
 			}
 
-			// TODO @db temporary
+			// TODO @db temporary, do better action tracking
 			// We don't need to wait for this to finish
-			void save_completion_response_to_disk(message, result, server.zzz_cache_dir, server.safe_fs);
+			void save_completion_response_to_disk(input, result, server.zzz_cache_dir, server.safe_fs);
 
 			console.log(`got ${provider_name} message`, result.completion_response.data);
 
@@ -199,11 +198,9 @@ export const server_action_handlers: Server_Action_Handlers = {
 	},
 
 	update_diskfile: {
-		receive_request: async ({server, message}) => {
+		receive_request: async ({server, input, message}) => {
 			console.log(`message`, message);
-			const {
-				params: {path, content},
-			} = message;
+			const {path, content} = input;
 
 			try {
 				// Use the server's safe_fs instance to write the file
@@ -219,10 +216,8 @@ export const server_action_handlers: Server_Action_Handlers = {
 	},
 
 	delete_diskfile: {
-		receive_request: async ({server, message}) => {
-			const {
-				params: {path},
-			} = message;
+		receive_request: async ({server, input}) => {
+			const {path} = input;
 
 			try {
 				// Use the server's safe_fs instance to delete the file
@@ -238,8 +233,8 @@ export const server_action_handlers: Server_Action_Handlers = {
 	},
 
 	create_directory: {
-		receive_request: async ({input: params, server}) => {
-			const {path} = params;
+		receive_request: async ({input, server}) => {
+			const {path} = input;
 
 			try {
 				// Use the server's safe_fs instance to create the directory

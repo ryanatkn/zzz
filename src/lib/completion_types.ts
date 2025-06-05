@@ -1,7 +1,8 @@
 import {z} from 'zod';
 
-import {Datetime_Now, Uuid_With_Default} from '$lib/zod_helpers.js';
+import {create_uuid, Datetime_Now} from '$lib/zod_helpers.js';
 import {Provider_Name, Provider_Data_Schema} from '$lib/provider_types.js';
+import {Jsonrpc_Request_Id} from '$lib/jsonrpc.js';
 
 export const Completion_Role = z.enum(['user', 'system', 'assistant']);
 export type Completion_Role = z.infer<typeof Completion_Role>;
@@ -15,7 +16,7 @@ export type Completion_Message = z.infer<typeof Completion_Message>;
 export const Completion_Request = z
 	.object({
 		created: Datetime_Now,
-		request_id: Uuid_With_Default,
+		request_id: Jsonrpc_Request_Id.default(create_uuid),
 		provider_name: Provider_Name,
 		model: z.string(),
 		prompt: z.string(),
@@ -27,7 +28,7 @@ export type Completion_Request = z.infer<typeof Completion_Request>;
 export const Completion_Response = z
 	.object({
 		created: Datetime_Now,
-		request_id: Uuid_With_Default,
+		request_id: Jsonrpc_Request_Id.default(create_uuid),
 		provider_name: Provider_Name,
 		model: z.string(),
 		data: Provider_Data_Schema,
