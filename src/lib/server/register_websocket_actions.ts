@@ -5,7 +5,7 @@ import type {createNodeWebSocket} from '@hono/node-ws';
 import type {Zzz_Server} from '$lib/server/zzz_server.js';
 import {verify_origin, type Allowed_Origins} from '$lib/server/security.js';
 import {SERVER_URL} from '$lib/constants.js';
-import {noop_middleware} from './server_helpers.js';
+import {noop_middleware} from '$lib/server/server_helpers.js';
 
 export interface Register_Websocket_Actions_Options {
 	path: string;

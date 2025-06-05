@@ -7,7 +7,7 @@ import type {Zzz_App} from '$lib/zzz_app.svelte.js';
 import {create_jsonrpc_notification, create_jsonrpc_request} from '$lib/jsonrpc_helpers.js';
 import {create_uuid} from '$lib/zod_helpers.js';
 import {Action} from '$lib/action.svelte.js';
-import type {Action_Input} from './action_types.js';
+import type {Action_Input} from '$lib/action_types.js';
 
 const log = new Logger();
 
@@ -22,7 +22,7 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 			// TODO BLOCK `log.debug` isn't formatting the output correctly, shouldn't use console here
 			console.log(...to_logged_args(method, input));
 
-			const spec = app.action_registry.by_method.get(method);
+			const spec = app.action_registry.spec_by_method.get(method);
 			if (!spec) {
 				throw new Error(`missing action spec for method '${method}'`);
 			}

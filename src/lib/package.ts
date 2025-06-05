@@ -903,8 +903,6 @@ export const src_json = {
 			path: 'action_collections.ts',
 			declarations: [
 				{name: 'Action_Method_Any', kind: 'variable'},
-				{name: 'Action_Method_From_Client', kind: 'variable'},
-				{name: 'Action_Method_From_Server', kind: 'variable'},
 				{name: 'Action_Method_Networked', kind: 'variable'},
 				{name: 'Action_Method_Nonnetworked', kind: 'variable'},
 				{name: 'action_specs', kind: 'variable'},
@@ -949,9 +947,11 @@ export const src_json = {
 			path: 'action_metatypes.ts',
 			declarations: [
 				{name: 'Action_Method', kind: 'variable'},
-				{name: 'Request_Response_Action_Method', kind: 'type'},
-				{name: 'Remote_Notification_Action_Method', kind: 'type'},
-				{name: 'Local_Call_Action_Method', kind: 'type'},
+				{name: 'Request_Response_Action_Method', kind: 'variable'},
+				{name: 'Remote_Notification_Action_Method', kind: 'variable'},
+				{name: 'Local_Call_Action_Method', kind: 'variable'},
+				{name: 'Client_Action_Method', kind: 'variable'},
+				{name: 'Server_Action_Method', kind: 'variable'},
 				{name: 'Actions_Api', kind: 'type'},
 			],
 		},

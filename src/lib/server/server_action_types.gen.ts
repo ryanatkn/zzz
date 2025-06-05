@@ -17,7 +17,7 @@ import type {Action_Spec} from '$lib/action_spec.js';
 export const gen: Gen = ({origin_path}) => {
 	const registry = new Action_Registry(action_specs);
 
-	const server_specs = registry.specs.filter((s) => s.kind !== 'local_call');
+	const {server_specs} = registry;
 
 	// Get all specs that could have server handlers
 	const schema_imports = server_specs.map((spec) => `${spec.method}_action_spec`);

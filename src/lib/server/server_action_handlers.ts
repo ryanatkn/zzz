@@ -29,6 +29,7 @@ import type {Server_Action_Handlers} from '$lib/server/server_action_types.js';
 import {create_jsonrpc_notification} from '$lib/jsonrpc_helpers.js';
 import {filer_change_action_spec} from '$lib/action_specs.js';
 import type {Action_Inputs, Action_Outputs} from '$lib/action_collections.js';
+import {Uuid} from '$lib/zod_helpers.js';
 
 // TODO refactor to a plugin architecture
 
@@ -44,15 +45,15 @@ const google = new GoogleGenerativeAI(SECRET_GOOGLE_API_KEY);
  */
 export const server_action_handlers: Server_Action_Handlers = {
 	ping: {
-		receive_request: async ({message}) => {
+		receive_request: ({message}) => {
 			return {
-				ping_id: message.id,
+				ping_id: Uuid.parse(message.id), // TODO BLOCK instead of parsing, maybe `event.id`? see below too
 			};
 		},
 	},
 
 	load_session: {
-		receive_request: async ({server}) => {
+		receive_request: ({server}) => {
 			// TODO change so this only returns metadata, not file contents
 			// Access filers through server and collect all files
 			const files_array: Array<Serializable_Source_File> = [];
@@ -254,8 +255,8 @@ export const server_action_handlers: Server_Action_Handlers = {
 	},
 
 	filer_change: {
-		// This is a server-to-client notification, so it only has a send phase
-		send: async ({server, message}) => {
+		// TODO this isn't actually needed, just a placeholder
+		send: ({message}) => {
 			console.log(`send filer_change message`, message);
 			// TODO BLOCK @api should be `params`, maybe `message` too, and always have an `id`?
 		},

@@ -11,43 +11,16 @@ import type {Action_Method} from '$lib/action_metatypes.js';
  * All method types combined.
  */
 export const Action_Method_Any = z.enum([
-	'toggle_main_menu',
 	'create_directory',
 	'delete_diskfile',
+	'filer_change',
 	'load_session',
 	'ping',
 	'submit_completion',
+	'toggle_main_menu',
 	'update_diskfile',
-	'filer_change',
 ]);
 export type Action_Method_Any = z.infer<typeof Action_Method_Any>;
-
-/**
- * Method types that can be sent from client to server.
- */
-export const Action_Method_From_Client = z.enum([
-	'create_directory',
-	'delete_diskfile',
-	'load_session',
-	'ping',
-	'submit_completion',
-	'update_diskfile',
-]);
-export type Action_Method_From_Client = z.infer<typeof Action_Method_From_Client>;
-
-/**
- * Method types that can be sent from server to client.
- */
-export const Action_Method_From_Server = z.enum([
-	'create_directory',
-	'delete_diskfile',
-	'load_session',
-	'ping',
-	'submit_completion',
-	'update_diskfile',
-	'filer_change',
-]);
-export type Action_Method_From_Server = z.infer<typeof Action_Method_From_Server>;
 
 /**
  * Method types with network endpoints.

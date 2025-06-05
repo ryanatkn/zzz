@@ -11,7 +11,7 @@ export type Public_Server_Action_Handler<
 	T_Input extends Action_Input = any,
 	T_Output extends Action_Output = any,
 	T_Message extends Jsonrpc_Message_From_Client_To_Server = Jsonrpc_Message_From_Client_To_Server,
-> = (event: Server_Action_Event<T_Input, T_Output, T_Message>) => Promise<T_Output>;
+> = (event: Server_Action_Event<T_Input, T_Output, T_Message>) => T_Output | Promise<T_Output>;
 
 /**
  * Server action handler with full authorization with a user/actor (including authentication).
@@ -20,7 +20,7 @@ export type Authorized_Server_Action_Handler<
 	T_Input extends Action_Input = any,
 	T_Output extends Action_Output = any,
 	T_Message extends Jsonrpc_Message_From_Client_To_Server = Jsonrpc_Message_From_Client_To_Server,
-> = (event: Server_Action_Event<T_Input, T_Output, T_Message>) => Promise<T_Output>;
+> = (event: Server_Action_Event<T_Input, T_Output, T_Message>) => T_Output | Promise<T_Output>;
 
 /**
  * Union type for all service types.

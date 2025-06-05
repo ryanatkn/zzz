@@ -9,6 +9,8 @@ import type {
 import {to_action_spec_identifier} from '$lib/action_helpers.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
 
+// TODO use derived or `??=` in lazy getters for memoization
+
 /**
  * Utility class to manage and query action specifications.
  * Provides helper methods to get actions by various criteria.
@@ -16,14 +18,14 @@ import type {Action_Method} from '$lib/action_metatypes.js';
 export class Action_Registry {
 	specs: Array<Action_Spec>;
 
-	by_method: Map<string, Action_Spec>;
-
 	constructor(specs: Array<Action_Spec>) {
 		this.specs = specs;
-		this.by_method = new Map(specs.map((spec) => [spec.method, spec]));
 	}
 
-	// TODO add maps
+	get spec_by_method(): Map<string, Action_Spec> {
+		return new Map(this.specs.map((spec) => [spec.method, spec]));
+	}
+
 	get request_response_specs(): Array<Request_Response_Action_Spec> {
 		return this.specs.filter((spec) => spec.kind === 'request_response');
 	}
@@ -36,17 +38,27 @@ export class Action_Registry {
 		return this.specs.filter((spec) => spec.kind === 'local_call');
 	}
 
-	get service_specs(): Array<Action_Spec> {
-		// Server actions include both request_response and remote_notification actions
-		return [...this.request_response_specs, ...this.remote_notification_specs];
+	// TODO BLOCK @api I think we need to piece this apart, maybe sender/receiver so you can express server->server calls?
+	get server_specs(): Array<Action_Spec> {
+		return this.specs.filter((spec) => spec.kind !== 'local_call');
 	}
 
 	get client_specs(): Array<Action_Spec> {
-		// Client actions are just local_call actions in the new system
-		return this.local_call_specs;
+		return this.specs;
 	}
 
-	// Methods for deriving lists of action methods
+	get server_to_client_specs(): Array<Action_Spec> {
+		return this.specs.filter((spec) => spec.initiator === 'server' || spec.initiator === 'both');
+	}
+
+	get client_to_server_specs(): Array<Action_Spec> {
+		return this.specs.filter((spec) => spec.initiator === 'client' || spec.initiator === 'both');
+	}
+
+	get methods(): Array<Action_Method> {
+		return this.specs.map((spec) => spec.method);
+	}
+
 	get request_response_methods(): Array<Action_Method> {
 		return this.request_response_specs.map((spec) => spec.method);
 	}
@@ -72,8 +84,8 @@ export class Action_Registry {
 			.filter((method) => !networked_methods.includes(method));
 	}
 
-	get service_methods(): Array<Action_Method> {
-		return this.service_specs.map((spec) => spec.method);
+	get server_methods(): Array<Action_Method> {
+		return this.server_specs.map((spec) => spec.method);
 	}
 
 	get client_methods(): Array<Action_Method> {
@@ -81,14 +93,13 @@ export class Action_Registry {
 	}
 
 	get client_to_server_methods(): Array<Action_Method> {
-		return this.request_response_methods;
+		return this.client_to_server_specs.map((spec) => spec.method);
 	}
 
 	get server_to_client_methods(): Array<Action_Method> {
-		return [...this.request_response_methods, ...this.remote_notification_methods];
+		return this.server_to_client_specs.map((spec) => spec.method);
 	}
 
-	// Utility to get imports needed by generators
 	get_schema_imports(): Array<string> {
 		return this.specs.map((spec) => to_action_spec_identifier(spec.method));
 	}

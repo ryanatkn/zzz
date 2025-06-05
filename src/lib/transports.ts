@@ -12,6 +12,7 @@ import type {
 import type {Socket} from '$lib/socket.svelte.js';
 import {Request_Tracker} from '$lib/request_tracker.svelte.js';
 import {Jsonrpc_Error, jsonrpc_errors} from '$lib/jsonrpc_errors.js';
+import {is_jsonrpc_notification, is_jsonrpc_request} from '$lib/jsonrpc_helpers.js';
 
 // TODO probably add reactivity?
 
@@ -188,10 +189,8 @@ export class Websocket_Rpc_Transport implements Transport {
 		}
 
 		try {
-			// If this is a JSON-RPC request with an id (not a notification),
-			// set up request tracking.
-			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-			if ('id' in message && message.id != null) {
+			// If this is a JSON-RPC request with an id (not a notification), set up request tracking.
+			if (is_jsonrpc_request(message)) {
 				// TODO track the whole request?
 				const deferred = this.#request_tracker.track_request(message.id);
 				this.#socket.send(message);
@@ -200,12 +199,13 @@ export class Websocket_Rpc_Transport implements Transport {
 				const result = await deferred.promise;
 				console.log(`result`, message, result);
 				return result;
-			} else {
+			} else if (is_jsonrpc_notification(message)) {
 				// For notifications, just send without tracking
 				// TODO if we want retries at this abstraction level we'll need to add a way to track them
 				this.#socket.send(message);
 				return null;
 			}
+			throw jsonrpc_errors.invalid_request();
 		} catch (error) {
 			console.error('[websocket transport] Error sending message:', error);
 			if (error instanceof Jsonrpc_Error) {

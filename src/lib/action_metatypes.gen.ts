@@ -31,23 +31,42 @@ export const gen: Gen = ({origin_path}) => {
 		/**
 		 * Names of all request_response actions.
 		 */
-		export type Request_Response_Action_Method = ${
-			registry.request_response_specs.map((spec) => `'${spec.method}'`).join(' | ') || 'never'
-		};
+		export const Request_Response_Action_Method = z.enum([${registry.request_response_specs
+			.map((spec) => `'${spec.method}'`)
+			.join(',\n\t')}]);
+		export type Request_Response_Action_Method = z.infer<typeof Request_Response_Action_Method>;
 
 		/**
 		 * Names of all remote_notification actions.
 		 */
-		export type Remote_Notification_Action_Method = ${
-			registry.remote_notification_specs.map((spec) => `'${spec.method}'`).join(' | ') || 'never'
-		};
+		export const Remote_Notification_Action_Method = z.enum([${registry.remote_notification_specs
+			.map((spec) => `'${spec.method}'`)
+			.join(',\n\t')}]);
+		export type Remote_Notification_Action_Method = z.infer<typeof Remote_Notification_Action_Method>;
 
 		/**
 		 * Names of all local_call actions.
 		 */
-		export type Local_Call_Action_Method = ${
-			registry.local_call_specs.map((spec) => `'${spec.method}'`).join(' | ') || 'never'
-		};
+		export const Local_Call_Action_Method = z.enum([${registry.local_call_specs
+			.map((spec) => `'${spec.method}'`)
+			.join(',\n\t')}]);
+		export type Local_Call_Action_Method = z.infer<typeof Local_Call_Action_Method>;
+
+		/**
+		 * Names of all actions that may be handled on the client.
+		 */
+		export const Client_Action_Method = z.enum([${registry.client_methods
+			.map((method) => `'${method}'`)
+			.join(',\n\t')}]);
+		export type Client_Action_Method = z.infer<typeof Client_Action_Method>;
+
+		/**
+		 * Names of all actions that may be handled on the server.
+		 */
+		export const Server_Action_Method = z.enum([${registry.server_methods
+			.map((method) => `'${method}'`)
+			.join(',\n\t')}]);
+		export type Server_Action_Method = z.infer<typeof Server_Action_Method>;
 
 		/**
 		 * Interface for action dispatch functions.
