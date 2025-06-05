@@ -13,25 +13,25 @@ export interface Client_Action_Handlers<T_App extends Zzz_App = Zzz_App> {
 			T_App,
 			Action_Inputs['create_directory'],
 			Action_Outputs['create_directory'],
-			Action_Outputs['create_directory']
+			void
 		>;
 		receive_request?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['create_directory'],
 			Action_Outputs['create_directory'],
-			Action_Outputs['create_directory']
+			void
 		>;
 		send_response?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['create_directory'],
 			Action_Outputs['create_directory'],
-			Action_Outputs['create_directory']
+			void
 		>;
 		receive_response?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['create_directory'],
 			Action_Outputs['create_directory'],
-			Action_Outputs['create_directory']
+			void
 		>;
 	};
 	delete_diskfile?: {
@@ -39,25 +39,25 @@ export interface Client_Action_Handlers<T_App extends Zzz_App = Zzz_App> {
 			T_App,
 			Action_Inputs['delete_diskfile'],
 			Action_Outputs['delete_diskfile'],
-			Action_Outputs['delete_diskfile']
+			void
 		>;
 		receive_request?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['delete_diskfile'],
 			Action_Outputs['delete_diskfile'],
-			Action_Outputs['delete_diskfile']
+			void
 		>;
 		send_response?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['delete_diskfile'],
 			Action_Outputs['delete_diskfile'],
-			Action_Outputs['delete_diskfile']
+			void
 		>;
 		receive_response?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['delete_diskfile'],
 			Action_Outputs['delete_diskfile'],
-			Action_Outputs['delete_diskfile']
+			void
 		>;
 	};
 	filer_change?: {
@@ -65,13 +65,13 @@ export interface Client_Action_Handlers<T_App extends Zzz_App = Zzz_App> {
 			T_App,
 			Action_Inputs['filer_change'],
 			Action_Outputs['filer_change'],
-			Action_Outputs['filer_change']
+			void
 		>;
 		receive?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['filer_change'],
 			Action_Outputs['filer_change'],
-			Action_Outputs['filer_change']
+			void
 		>;
 	};
 	load_session?: {
@@ -79,25 +79,25 @@ export interface Client_Action_Handlers<T_App extends Zzz_App = Zzz_App> {
 			T_App,
 			Action_Inputs['load_session'],
 			Action_Outputs['load_session'],
-			Action_Outputs['load_session']
+			void
 		>;
 		receive_request?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['load_session'],
 			Action_Outputs['load_session'],
-			Action_Outputs['load_session']
+			void
 		>;
 		send_response?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['load_session'],
 			Action_Outputs['load_session'],
-			Action_Outputs['load_session']
+			void
 		>;
 		receive_response?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['load_session'],
 			Action_Outputs['load_session'],
-			Action_Outputs['load_session']
+			void
 		>;
 	};
 	ping?: {
@@ -105,25 +105,25 @@ export interface Client_Action_Handlers<T_App extends Zzz_App = Zzz_App> {
 			T_App,
 			Action_Inputs['ping'],
 			Action_Outputs['ping'],
-			Action_Outputs['ping']
+			void
 		>;
 		receive_request?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['ping'],
 			Action_Outputs['ping'],
-			Action_Outputs['ping']
+			void
 		>;
 		send_response?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['ping'],
 			Action_Outputs['ping'],
-			Action_Outputs['ping']
+			void
 		>;
 		receive_response?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['ping'],
 			Action_Outputs['ping'],
-			Action_Outputs['ping']
+			void
 		>;
 	};
 	submit_completion?: {
@@ -131,25 +131,25 @@ export interface Client_Action_Handlers<T_App extends Zzz_App = Zzz_App> {
 			T_App,
 			Action_Inputs['submit_completion'],
 			Action_Outputs['submit_completion'],
-			Action_Outputs['submit_completion']
+			void
 		>;
 		receive_request?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['submit_completion'],
 			Action_Outputs['submit_completion'],
-			Action_Outputs['submit_completion']
+			void
 		>;
 		send_response?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['submit_completion'],
 			Action_Outputs['submit_completion'],
-			Action_Outputs['submit_completion']
+			void
 		>;
 		receive_response?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['submit_completion'],
 			Action_Outputs['submit_completion'],
-			Action_Outputs['submit_completion']
+			void
 		>;
 	};
 	toggle_main_menu?: {
@@ -165,25 +165,25 @@ export interface Client_Action_Handlers<T_App extends Zzz_App = Zzz_App> {
 			T_App,
 			Action_Inputs['update_diskfile'],
 			Action_Outputs['update_diskfile'],
-			Action_Outputs['update_diskfile']
+			void
 		>;
 		receive_request?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['update_diskfile'],
 			Action_Outputs['update_diskfile'],
-			Action_Outputs['update_diskfile']
+			void
 		>;
 		send_response?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['update_diskfile'],
 			Action_Outputs['update_diskfile'],
-			Action_Outputs['update_diskfile']
+			void
 		>;
 		receive_response?: Client_Action_Handler<
 			T_App,
 			Action_Inputs['update_diskfile'],
 			Action_Outputs['update_diskfile'],
-			Action_Outputs['update_diskfile']
+			void
 		>;
 	};
 }
