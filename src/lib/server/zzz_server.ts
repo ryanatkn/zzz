@@ -246,7 +246,6 @@ export class Zzz_Server {
 			);
 		}
 
-		// TODO BLOCK @api refactor to fix type below
 		const method_handlers = this.#server_action_handlers[method];
 		const phase =
 			method_handlers &&

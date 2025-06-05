@@ -259,7 +259,7 @@ export const server_action_handlers: Server_Action_Handlers = {
 	},
 };
 
-// TODO BLOCK @api change to a triggered handler on the `server`
+// TODO BLOCK @api change to a triggered event handled on the `server`
 /**
  * Handle file system changes and notify clients.
  */

@@ -277,7 +277,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 	 * Sends a ping message for heartbeat purposes
 	 */
 	async send_heartbeat(): Promise<void> {
-		await this.app.api.ping(); // TODO BLOCK @api need to force websocket transport, second arg?
+		await this.app.api.ping(); // TODO @api need to force websocket transport, second arg?
 	}
 
 	/**

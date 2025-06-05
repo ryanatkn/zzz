@@ -18,7 +18,6 @@ export const Action_Spec_Base = z.object({
 	side_effects: Action_Side_Effects,
 	input: z.instanceof(z.ZodType),
 	output: z.instanceof(z.ZodType),
-	// TODO BLOCK @api is not yet used
 	async: z.boolean(),
 });
 export type Action_Spec_Base = z.infer<typeof Action_Spec_Base>;

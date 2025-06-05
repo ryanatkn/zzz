@@ -38,7 +38,7 @@ export class Action_Registry {
 		return this.specs.filter((spec) => spec.kind === 'local_call');
 	}
 
-	// TODO BLOCK @api I think we need to piece this apart, maybe sender/receiver so you can express server->server calls?
+	// TODO @api piece this apart? maybe sender/receiver so you can express server->server calls?
 	get server_specs(): Array<Action_Spec> {
 		return this.specs.filter((spec) => spec.kind !== 'local_call');
 	}

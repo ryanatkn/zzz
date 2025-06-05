@@ -17,7 +17,7 @@ export const register_http_actions = ({path, app, server}: Register_Actions_Opti
 	// Register a single JSON-RPC endpoint that handles all methods
 	const final_path = Path_Without_Trailing_Slash.parse(path);
 
-	// TODO BLOCK @api handle `GET`
+	// TODO BLOCK @api use `GET` when `side_effects` is null
 
 	app.post(final_path, async (c) => {
 		try {
