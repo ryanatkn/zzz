@@ -90,7 +90,7 @@ export class Client_Action_Event<
 		}
 
 		if (is_jsonrpc_response(response_message)) {
-			this.output = response_message.result; // TODO BLOCK @many @api type
+			this.output = response_message.result; // TODO BLOCK @many @api type need to extract _meta here
 		}
 		// TODO handle error case? can read the `response_message` but maybe we want a more explicit API
 
