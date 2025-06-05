@@ -20,13 +20,14 @@ export const Action_Initiator = z.union([
 ]);
 export type Action_Initiator = z.infer<typeof Action_Initiator>;
 
-export const Action_Operation = z.union([z.literal('command'), z.literal('query')]);
-export type Action_Operation = z.infer<typeof Action_Operation>;
-
 // TODO temporary/stubbed, maybe this can be a config object
 /** @stub */
 export const Action_Auth = z.union([z.literal('public'), z.literal('authorize')]);
 export type Action_Auth = z.infer<typeof Action_Auth>;
+
+// TODO support a config object when we have the use cases
+export const Action_Side_Effects = z.union([z.literal(true), z.null()]);
+export type Action_Side_Effects = z.infer<typeof Action_Side_Effects>;
 
 export const Action_Phase = z.enum([
 	'send_request',

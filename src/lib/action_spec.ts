@@ -1,16 +1,21 @@
 import {z} from 'zod';
 
 import {Action_Method} from '$lib/action_metatypes.js';
-import {Action_Auth, Action_Initiator, Action_Kind, Action_Operation} from '$lib/action_types.js';
+import {
+	Action_Auth,
+	Action_Initiator,
+	Action_Kind,
+	Action_Side_Effects,
+} from '$lib/action_types.js';
 
 export const Action_Spec_Base = z.object({
 	method: Action_Method,
 	kind: Action_Kind,
 	// TODO BLOCK @api is not yet used
 	initiator: Action_Initiator,
-	// TODO BLOCK @api is not yet used, should be for GET/POST distinction
-	operation: Action_Operation,
 	auth: Action_Auth.nullable(),
+	// TODO BLOCK @api stubbed out and not yet used, should be for GET/POST distinction
+	side_effects: Action_Side_Effects,
 	input: z.instanceof(z.ZodType),
 	output: z.instanceof(z.ZodType),
 	// TODO BLOCK @api is not yet used
@@ -21,7 +26,6 @@ export type Action_Spec_Base = z.infer<typeof Action_Spec_Base>;
 /** Type for request_response actions (client requests, server responds). */
 export const Request_Response_Action_Spec = Action_Spec_Base.extend({
 	kind: z.literal('request_response').default('request_response'),
-	operation: Action_Operation,
 	auth: Action_Auth,
 	async: z.literal(true).default(true),
 });
@@ -30,8 +34,8 @@ export type Request_Response_Action_Spec = z.infer<typeof Request_Response_Actio
 /** Type for remote_notification actions (server sends without a request). */
 export const Remote_Notification_Action_Spec = Action_Spec_Base.extend({
 	kind: z.literal('remote_notification').default('remote_notification'),
-	operation: z.literal('command').default('command'), // TODO maybe notification operations should be null or 'event' or something?
 	auth: z.null().default(null),
+	side_effects: z.literal(true).default(true),
 	output: z.instanceof(z.ZodVoid),
 	async: z.literal(false).default(false),
 });

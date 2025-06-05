@@ -31,8 +31,8 @@ export const ping_action_spec = {
 	method: 'ping',
 	kind: 'request_response',
 	initiator: 'both',
-	operation: 'query',
 	auth: 'public',
+	side_effects: null,
 	input: z.void().optional(),
 	output: z
 		.object({
@@ -48,8 +48,8 @@ export const load_session_action_spec = {
 	// TODO @api is this actually a good restriction to have?
 	// or should the server be calling actions internally too?
 	initiator: 'client',
-	operation: 'query',
 	auth: 'public',
+	side_effects: null,
 	input: z.void().optional(),
 	output: z
 		.object({
@@ -70,8 +70,8 @@ export const filer_change_action_spec = {
 	method: 'filer_change',
 	kind: 'remote_notification',
 	initiator: 'server',
-	operation: 'command',
 	auth: null,
+	side_effects: true,
 	input: z
 		.object({
 			change: Diskfile_Change,
@@ -86,8 +86,8 @@ export const update_diskfile_action_spec = {
 	method: 'update_diskfile',
 	kind: 'request_response',
 	initiator: 'client',
-	operation: 'command',
 	auth: 'public',
+	side_effects: true,
 	input: z
 		.object({
 			path: Diskfile_Path,
@@ -102,8 +102,8 @@ export const delete_diskfile_action_spec = {
 	method: 'delete_diskfile',
 	kind: 'request_response',
 	initiator: 'client',
-	operation: 'command',
 	auth: 'public',
+	side_effects: true,
 	input: z
 		.object({
 			path: Diskfile_Path,
@@ -117,8 +117,8 @@ export const create_directory_action_spec = {
 	method: 'create_directory',
 	kind: 'request_response',
 	initiator: 'client',
-	operation: 'command',
 	auth: 'public',
+	side_effects: true,
 	input: z
 		.object({
 			path: Diskfile_Path,
@@ -132,8 +132,8 @@ export const submit_completion_action_spec = {
 	method: 'submit_completion',
 	kind: 'request_response',
 	initiator: 'client',
-	operation: 'command',
 	auth: 'public',
+	side_effects: true,
 	input: z
 		.object({
 			completion_request: Completion_Request,
@@ -151,8 +151,8 @@ export const toggle_main_menu_action_spec = {
 	method: 'toggle_main_menu',
 	kind: 'local_call',
 	initiator: 'client',
-	operation: 'command',
 	auth: null,
+	side_effects: true,
 	input: z.boolean().optional(),
 	output: z.boolean(),
 	async: false,

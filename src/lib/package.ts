@@ -1005,8 +1005,8 @@ export const src_json = {
 			declarations: [
 				{name: 'Action_Kind', kind: 'variable'},
 				{name: 'Action_Initiator', kind: 'variable'},
-				{name: 'Action_Operation', kind: 'variable'},
 				{name: 'Action_Auth', kind: 'variable'},
+				{name: 'Action_Side_Effects', kind: 'variable'},
 				{name: 'Action_Phase', kind: 'variable'},
 				{name: 'ACTION_KIND_PHASES', kind: 'variable'},
 				{name: 'Action_Input', kind: 'variable'},
