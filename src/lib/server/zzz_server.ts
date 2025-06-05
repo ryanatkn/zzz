@@ -241,12 +241,12 @@ export class Zzz_Server {
 			throw jsonrpc_errors.internal_error(`unknown message schema: ${method}`);
 		}
 
-		const parsed_request = input_schema.safeParse(message);
-		if (!parsed_request.success) {
-			this.log?.error('failed to validate service params', method, parsed_request.error.issues);
+		const parsed_input = input_schema.safeParse(message.params);
+		if (!parsed_input.success) {
+			this.log?.error('failed to validate service params', method, parsed_input.error.issues);
 			throw jsonrpc_errors.invalid_params(
-				`invalid params to ${method}: ${stringify_zod_error(parsed_request.error)}`,
-				{issues: parsed_request.error.issues},
+				`invalid params to ${method}: ${stringify_zod_error(parsed_input.error)}`,
+				{issues: parsed_input.error.issues},
 			);
 		}
 
@@ -269,7 +269,7 @@ export class Zzz_Server {
 			throw jsonrpc_errors.internal_error(method); // since there's a spec, this should not happen
 		}
 
-		const event = new Server_Action_Event(this, phase, parsed_request.data, message);
+		const event = new Server_Action_Event(this, phase, parsed_input.data, message);
 		await event.handle(handler);
 
 		// Validate the response during development
@@ -280,20 +280,17 @@ export class Zzz_Server {
 			if (!output_schema) {
 				throw jsonrpc_errors.internal_error(`unknown response schema: ${method}`);
 			}
-			const parsed_response = output_schema.safeParse({
-				...message,
-				params: event.output,
-			});
-			if (!parsed_response.success) {
+			const parsed_output = output_schema.safeParse(event.output);
+			if (!parsed_output.success) {
 				this.log?.error(
 					'failed to validate server action response params',
 					spec.method,
 					event.output,
-					parsed_response.error.issues,
+					parsed_output.error.issues,
 				);
 				throw jsonrpc_errors.internal_error(
-					`server action response validation failed for ${spec.method}: ${stringify_zod_error(parsed_response.error)}`,
-					{issues: parsed_response.error.issues},
+					`server action response validation failed for ${spec.method}: ${stringify_zod_error(parsed_output.error)}`,
+					{issues: parsed_output.error.issues},
 				);
 			}
 		}
