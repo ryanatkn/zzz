@@ -20,19 +20,14 @@ export const gen: Gen = ({origin_path}) => {
 		const phases = ACTION_KIND_PHASES[kind];
 
 		const phase_handlers = phases
-			.map((phase: Action_Phase) => {
-				let returned_type = spec.returns || `Action_Outputs['${method}']`;
-				if (spec.async) {
-					returned_type = `Promise<${returned_type}>`;
-				}
-
-				return `${phase}?: Client_Action_Handler<
+			.map(
+				(phase: Action_Phase) => `${phase}?: Client_Action_Handler<
 					T_App,
 					Action_Inputs['${method}'],
 					Action_Outputs['${method}'],
-					${returned_type}
-				>`;
-			})
+					Action_Outputs['${method}']
+				>`,
+			)
 			.join(';\n\t\t');
 
 		return `${method}?: {\n\t\t${phase_handlers};\n\t}`;

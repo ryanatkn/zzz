@@ -153,7 +153,7 @@ export const toggle_main_menu_action_spec = {
 	initiator: 'client',
 	operation: 'command',
 	auth: null,
-	input: z.union([z.boolean(), z.void()]).optional(),
+	input: z.boolean().optional(),
 	output: z.boolean(),
 	async: false,
 } satisfies Action_Spec;

@@ -1,5 +1,3 @@
-import {noop} from '@ryanatkn/belt/function.js';
-
 import type {Client_Action_Handlers} from '$lib/client_action_types.js';
 
 // TODO we may also want method-based or middleware-like APIs
@@ -9,17 +7,15 @@ import type {Client_Action_Handlers} from '$lib/client_action_types.js';
  */
 export const client_action_handlers: Client_Action_Handlers = {
 	ping: {
-		send_request: (ctx) => {
-			console.log('Ping request sent', ctx);
-			ctx.app.capabilities.handle_sent_ping(ctx.jsonrpc_message.id); // TODO BLOCK @api type safety
+		send_request: ({app, jsonrpc_message}) => {
+			console.log('Ping request sent');
+			app.capabilities.handle_sent_ping(jsonrpc_message.id); // TODO BLOCK @api type safety
 		},
-		receive_response: (ctx) => {
-			console.log('Ping response received', ctx);
-			if ('todo') {
-				ctx.app.capabilities.handle_received_ping(ctx.output.value.result.ping_id);
-			} else {
-				ctx.app.capabilities.handle_ping_error(ctx.jsonrpc_message.id, ctx.output.message);
-			}
+		receive_response: ({app, output}) => {
+			console.log('Ping response received');
+			app.capabilities.handle_received_ping(output.ping_id);
+			// TODO BLOCK @api how to handle errors? check args or separate handler?
+			// app.capabilities.handle_ping_error(jsonrpc_message.id, output.message);
 		},
 	},
 
@@ -27,47 +23,38 @@ export const client_action_handlers: Client_Action_Handlers = {
 		send_request: () => {
 			console.log('Loading session...');
 		},
-		receive_response: (ctx) => {
-			console.log('Session loaded', ctx);
-			if ('todo') {
-				ctx.app.receive_session(ctx.output.value.result.data);
-			} else {
-				console.error('Error loading session', ctx);
-			}
+		receive_response: ({app, output}) => {
+			console.log('Session loaded');
+			app.receive_session(output.data);
 		},
 	},
 
 	submit_completion: {
-		send_request: (ctx) => {
-			console.log('Sending prompt', ctx.input.completion_request.prompt);
+		send_request: ({input}) => {
+			console.log('Sending prompt', input.completion_request.prompt);
 		},
-		receive_response: (ctx) => {
-			console.log('Received completion', ctx.input.completion_request, ctx.output);
-			if ('todo') {
-				return ctx.output.value.result; // acts as a method call, no side effects here
-			} else {
-				console.error('Error with completion', ctx);
-			}
+		receive_response: ({input, output}) => {
+			console.log('Received completion', input.completion_request, output);
 		},
 	},
 
 	update_diskfile: {
-		send_request: (ctx) => {
-			console.log('Updating file', ctx.input.path);
+		send_request: ({input}) => {
+			console.log('Updating file', input.path);
 		},
-		receive_response: noop,
+		// receive_response: noop,
 	},
 
 	delete_diskfile: {
-		send_request: (ctx) => {
-			console.log('Deleting file', ctx.input.path);
+		send_request: ({input}) => {
+			console.log('Deleting file', input.path);
 		},
-		receive_response: noop,
+		// receive_response: noop,
 	},
 
 	create_directory: {
-		send_request: (ctx) => {
-			console.log('Creating directory', ctx.input.path);
+		send_request: ({input}) => {
+			console.log('Creating directory', input.path);
 		},
 		receive_response: (ctx) => {
 			console.log('Created directory', ctx);
@@ -75,16 +62,16 @@ export const client_action_handlers: Client_Action_Handlers = {
 	},
 
 	filer_change: {
-		receive: (ctx) => {
-			console.log('File changed', ctx.input.change, ctx.output);
-			ctx.app.diskfiles.handle_change(ctx.input);
+		receive: ({app, input, output}) => {
+			console.log('File changed', input.change, output);
+			app.diskfiles.handle_change(input);
 		},
 	},
 
 	toggle_main_menu: {
-		execute: (ctx) => {
-			console.log('Toggling main menu', ctx.input);
-			return ctx.app.ui.toggle_main_menu(ctx.input);
+		execute: ({app, input}) => {
+			console.log('Toggling main menu', input);
+			return app.ui.toggle_main_menu(input);
 		},
 	},
 };

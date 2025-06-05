@@ -5,8 +5,9 @@ import type {Async_Status} from '@ryanatkn/belt/async.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import {ollama_list} from '$lib/ollama.js';
-import {create_uuid, Uuid} from '$lib/zod_helpers.js';
+import {create_uuid} from '$lib/zod_helpers.js';
 import type {Zzz_Dir} from '$lib/diskfile_types.js';
+import type {Jsonrpc_Request_Id} from './jsonrpc.js';
 
 /** Maximum number of ping records to keep. */
 export const PING_HISTORY_MAX = 6;
@@ -26,7 +27,7 @@ export interface Capability<T> {
 	/** Async status tracking the connection/check state. */
 	status: Async_Status;
 	/** Message id of the last request for this capability's info, if any. */
-	message_id: Uuid | null;
+	message_id: Jsonrpc_Request_Id | null;
 	/** Error message if any */
 	error_message: string | null;
 	/** Timestamp when the capability was last checked. */
@@ -34,7 +35,7 @@ export interface Capability<T> {
 }
 
 export interface Ping_Data {
-	ping_id: Uuid;
+	ping_id: Jsonrpc_Request_Id;
 	completed: boolean;
 	sent_time: number;
 	received_time: number | null;
@@ -332,7 +333,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	}
 
 	// TODO @many refactor mutations
-	handle_sent_ping(request_id: Uuid): void {
+	handle_sent_ping(request_id: Jsonrpc_Request_Id): void {
 		console.log(`[capabilities] [handle_sent_ping] request_id`, request_id);
 		// Create a new pending ping
 		const new_ping: Ping_Data = {
@@ -359,7 +360,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	}
 
 	// TODO @many refactor mutations
-	handle_received_ping(ping_id: Uuid): void {
+	handle_received_ping(ping_id: Jsonrpc_Request_Id): void {
 		console.log(`[capabilities] [handle_received_ping] ping_id`, ping_id);
 		const ping = this.pings.find((p) => p.ping_id === ping_id);
 		// If we can't find the ping, we can safely ignore it
@@ -388,7 +389,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 		}
 	}
 
-	handle_ping_error(ping_id: Uuid, error_message: string): void {
+	handle_ping_error(ping_id: Jsonrpc_Request_Id, error_message: string): void {
 		console.error(`[capabilities] [handle_ping_error] ping_id`, ping_id, error_message);
 		// TODO @many maybe refactor to middleware or more sophisticated hooks? is spread across 3 methods called from 2 mutations
 		if (this.server.message_id === ping_id) {
