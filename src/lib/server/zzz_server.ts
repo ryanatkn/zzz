@@ -163,15 +163,8 @@ export class Zzz_Server {
 			): Promise<Jsonrpc_Response | Jsonrpc_Error_Message> => {
 				try {
 					const event = await this.#receive_jsonrpc_message(request);
-					const {result} = event.output;
-					console.log(`result`, result);
-
-					if (!result) {
-						throw jsonrpc_errors.internal_error(`no result returned for action: ${request.method}`);
-					}
-
-					event.response = create_jsonrpc_response(request.id, result);
-
+					// TODO hacky, would be cleaned up with specialized classes, maybe some other pattern?
+					event.response = create_jsonrpc_response(request.id, event.output);
 					return event.response;
 				} catch (error) {
 					this.log?.error(`Error processing JSON-RPC request:`, error);

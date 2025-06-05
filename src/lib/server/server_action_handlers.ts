@@ -45,6 +45,7 @@ const google = new GoogleGenerativeAI(SECRET_GOOGLE_API_KEY);
 export const server_action_handlers: Server_Action_Handlers = {
 	ping: {
 		receive_request: ({message}) => {
+			console.log(`ping receive_request message`, message);
 			return {
 				ping_id: message.id,
 			};

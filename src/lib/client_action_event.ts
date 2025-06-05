@@ -41,8 +41,6 @@ export class Client_Action_Event<
 
 	#cbs: Array<After_Client_Action_Callback> = [];
 
-	handled: boolean = false;
-
 	constructor(app: T_App, method: Action_Method, input: T_Input, message: T_Message) {
 		this.app = app;
 		this.method = method;
@@ -68,10 +66,9 @@ export class Client_Action_Event<
 		response_message?: T_Response_Message,
 		log?: Logger,
 	): unknown {
-		if (this.handled) {
-			throw new Error('Client_Action_Event has already been handled');
+		if (this.phase === phase) {
+			throw new Error('Client_Action_Event has already been handled for this phase');
 		}
-		this.handled = true;
 		console.log('[actions_api] handle_message', method, phase);
 		console.log(`[actions_api] event`, this);
 
