@@ -294,6 +294,14 @@ export const package_json = {
 			types: './dist/client_action_handlers.d.ts',
 			default: './dist/client_action_handlers.js',
 		},
+		'./client_action_types.gen.js': {
+			types: './dist/client_action_types.gen.d.ts',
+			default: './dist/client_action_types.gen.js',
+		},
+		'./client_action_types.js': {
+			types: './dist/client_action_types.d.ts',
+			default: './dist/client_action_types.js',
+		},
 		'./completion_types.js': {
 			types: './dist/completion_types.d.ts',
 			default: './dist/completion_types.js',
@@ -790,6 +798,10 @@ export const package_json = {
 			types: './dist/server/server_action_types.d.ts',
 			default: './dist/server/server_action_types.js',
 		},
+		'./server/server_helpers.js': {
+			types: './dist/server/server_helpers.d.ts',
+			default: './dist/server/server_helpers.js',
+		},
 		'./server/server.js': {types: './dist/server/server.d.ts', default: './dist/server/server.js'},
 		'./server/zzz_server.js': {
 			types: './dist/server/zzz_server.d.ts',
@@ -882,6 +894,10 @@ export const package_json = {
 		},
 		'./xml.js': {types: './dist/xml.d.ts', default: './dist/xml.js'},
 		'./zod_helpers.js': {types: './dist/zod_helpers.d.ts', default: './dist/zod_helpers.js'},
+		'./zzz_app.svelte.js': {
+			types: './dist/zzz_app.svelte.d.ts',
+			default: './dist/zzz_app.svelte.js',
+		},
 		'./Zzz_Root.svelte': {
 			types: './dist/Zzz_Root.svelte.d.ts',
 			svelte: './dist/Zzz_Root.svelte',
@@ -1303,6 +1319,14 @@ export const src_json = {
 		'./client_action_handlers.js': {
 			path: 'client_action_handlers.ts',
 			declarations: [{name: 'client_action_handlers', kind: 'variable'}],
+		},
+		'./client_action_types.gen.js': {
+			path: 'client_action_types.gen.ts',
+			declarations: [{name: 'gen', kind: 'function'}],
+		},
+		'./client_action_types.js': {
+			path: 'client_action_types.ts',
+			declarations: [{name: 'Client_Action_Handlers', kind: 'type'}],
 		},
 		'./completion_types.js': {
 			path: 'completion_types.ts',
@@ -2132,6 +2156,10 @@ export const src_json = {
 			path: 'server/server_action_types.ts',
 			declarations: [{name: 'Server_Action_Handlers', kind: 'type'}],
 		},
+		'./server/server_helpers.js': {
+			path: 'server/server_helpers.ts',
+			declarations: [{name: 'noop_middleware', kind: 'function'}],
+		},
 		'./server/server.js': {path: 'server/server.ts'},
 		'./server/zzz_server.js': {
 			path: 'server/zzz_server.ts',
@@ -2366,6 +2394,16 @@ export const src_json = {
 				{name: 'is_array_schema', kind: 'function'},
 				{name: 'get_inner_array_schema', kind: 'function'},
 				{name: 'stringify_zod_error', kind: 'function'},
+			],
+		},
+		'./zzz_app.svelte.js': {
+			path: 'zzz_app.svelte.ts',
+			declarations: [
+				{name: 'zzz_context', kind: 'variable'},
+				{name: 'Zzz_App_Json', kind: 'variable'},
+				{name: 'Zzz_App_Json_Input', kind: 'type'},
+				{name: 'Zzz_App_Options', kind: 'type'},
+				{name: 'Zzz_App', kind: 'class'},
 			],
 		},
 		'./Zzz_Root.svelte': {
