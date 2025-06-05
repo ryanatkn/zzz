@@ -25,7 +25,7 @@ export const gen: Gen = ({origin_path}) => {
 					T_App,
 					Action_Inputs['${method}'],
 					Action_Outputs['${method}'],
-					Action_Outputs['${method}']
+					${kind === 'local_call' ? `Action_Outputs['${method}']` : 'void'}
 				>`,
 			)
 			.join(';\n\t\t');
