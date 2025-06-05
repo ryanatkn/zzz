@@ -1307,7 +1307,6 @@ export const src_json = {
 		'./client_action_event.js': {
 			path: 'client_action_event.ts',
 			declarations: [
-				{name: 'After_Client_Action', kind: 'type'},
 				{name: 'After_Client_Action_Callback', kind: 'type'},
 				{name: 'Client_Action_Event', kind: 'class'},
 			],

@@ -7,17 +7,13 @@ import type {Client_Action_Handlers} from '$lib/client_action_types.js';
  */
 export const client_action_handlers: Client_Action_Handlers = {
 	ping: {
-		send_request: ({app, message}) => {
+		send_request: ({app, request_message: message}) => {
 			console.log('Ping request sent');
 			app.capabilities.handle_sent_ping(message.id); // TODO BLOCK @api type safety
 		},
 		receive_response: ({app, output}) => {
 			console.log('Ping response received');
-			// TODO BLOCK @api @many this handler should be able to assume `output` is defined, see also response_message
-			if (!output) {
-				console.error('Ping response is missing output');
-				return;
-			}
+
 			app.capabilities.handle_received_ping(output.ping_id);
 			// TODO BLOCK @api how to handle errors? check args or separate handler?
 			// app.capabilities.handle_ping_error(jsonrpc_message.id, output.message);
@@ -30,11 +26,7 @@ export const client_action_handlers: Client_Action_Handlers = {
 		},
 		receive_response: ({app, output, response_message}) => {
 			console.log('Session loaded', response_message);
-			// TODO BLOCK @api @many this handler should be able to assume `output` is defined, see also response_message
-			if (!output) {
-				console.error('load_session response is missing output');
-				return;
-			}
+
 			app.receive_session(output.data);
 		},
 	},
@@ -52,14 +44,18 @@ export const client_action_handlers: Client_Action_Handlers = {
 		send_request: ({input}) => {
 			console.log('Updating file', input.path);
 		},
-		// receive_response: noop,
+		receive_response: ({input, output}) => {
+			console.log('Updated file', input.path, output);
+		},
 	},
 
 	delete_diskfile: {
 		send_request: ({input}) => {
 			console.log('Deleting file', input.path);
 		},
-		// receive_response: noop,
+		receive_response: ({input}) => {
+			console.log('Deleted file', input.path);
+		},
 	},
 
 	create_directory: {

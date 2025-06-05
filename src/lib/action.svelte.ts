@@ -28,7 +28,7 @@ export interface Action_Options extends Cell_Options<typeof Action_Json> {}
 export class Action extends Cell<typeof Action_Json> {
 	method: Action_Method = $state()!;
 
-	// Store the full JSON-RPC messages
+	// TODO BLOCK probably refactor to this an object with a type union, and a generic type
 	// data: Action_Data;
 	jsonrpc_request: Jsonrpc_Request | undefined = $state.raw();
 	jsonrpc_response: Jsonrpc_Response | Jsonrpc_Error_Message | undefined = $state.raw();

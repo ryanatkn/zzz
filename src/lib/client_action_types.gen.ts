@@ -26,15 +26,14 @@ export const gen: Gen = ({origin_path}) => {
 					Action_Inputs['${method}'],
 					Action_Outputs['${method}'],
 					${kind === 'local_call' ? `Action_Outputs['${method}']` : 'void'},
+					${kind === 'request_response' ? 'Jsonrpc_Request' : 'undefined'},
 					${
-						// TODO BLOCK @api handle errors how
-						kind === 'request_response'
-							? 'Jsonrpc_Request'
-							: kind === 'remote_notification'
-								? 'Jsonrpc_Notification'
-								: 'null'
+						kind === 'request_response' &&
+						(phase === 'receive_response' || phase === 'send_response')
+							? 'Jsonrpc_Response_Or_Error'
+							: 'undefined'
 					},
-					${kind === 'request_response' ? 'Jsonrpc_Response' : 'undefined'}
+					${kind === 'remote_notification' ? 'Jsonrpc_Notification' : 'undefined'}
 				>`,
 			)
 			.join(';\n\t\t');
@@ -49,7 +48,7 @@ export const gen: Gen = ({origin_path}) => {
 		import type {Client_Action_Handler} from '$lib/client_action_handler.js';
 		import type {Action_Inputs, Action_Outputs} from '$lib/action_collections.js';
 		import type {Zzz_App} from '$lib/zzz_app.svelte.js';
-		import type {Jsonrpc_Request, Jsonrpc_Notification, Jsonrpc_Response} from '$lib/jsonrpc.js';
+		import type {Jsonrpc_Request, Jsonrpc_Response_Or_Error, Jsonrpc_Notification} from '$lib/jsonrpc.js';
 
 		/**
 		 * Interface for client-side action handlers organized by method and phase.
