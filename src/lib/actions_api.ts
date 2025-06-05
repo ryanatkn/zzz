@@ -8,6 +8,7 @@ import {create_jsonrpc_notification, create_jsonrpc_request} from '$lib/jsonrpc_
 import {create_uuid} from '$lib/zod_helpers.js';
 import {Action} from '$lib/action.svelte.js';
 import type {Action_Input} from '$lib/action_types.js';
+import {Client_Action_Event} from './client_action_event.js';
 
 const log = new Logger();
 
@@ -35,10 +36,15 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 					const request = create_jsonrpc_request(method, input, create_uuid());
 					console.log(`[actions_api] request_action_message`, request);
 
+					// TODO BLOCK I think we want different subclasses for the different action kinds,
+					// for type safety over the data, or maybe just an object with a discriminator
+					const event = new Client_Action_Event(app, method, input, request);
+
 					action.add_request(request);
 
+					// TODO BLOCK @api maybe `handle` should be on the event object, not an `app` method
 					// Handle request phase
-					app.handle(method, input, null, 'send_request', request, log);
+					event.handle(method, 'send_request', undefined, log);
 
 					// Avoiding `await` for compatibility with sync actions
 					return app.api_client.send(request).then((response) => {
@@ -55,7 +61,7 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 						action.add_response(response);
 
 						const {result} = response;
-						app.handle(method, input, result, 'receive_response', response, log);
+						event.handle(method, 'receive_response', response, log);
 
 						return result;
 					});
@@ -66,11 +72,14 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 
 					action.add_notification(notification);
 
-					return app.handle(method, input, null, 'send', notification, log);
+					const event = new Client_Action_Event(app, method, input, notification);
+
+					return event.handle(method, 'send', undefined, log);
 				}
 
 				case 'local_call': {
-					return app.handle(method, input, null, 'execute', null, log);
+					const event = new Client_Action_Event(app, method, input, null);
+					return event.handle(method, 'execute', undefined, log);
 				}
 
 				default:

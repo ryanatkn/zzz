@@ -1,8 +1,9 @@
-import type {Action_Method} from '$lib/action_metatypes.js';
+import type {Logger} from '@ryanatkn/belt/log.js';
+
+import type {Action_Method, Actions_Api} from '$lib/action_metatypes.js';
 import type {Zzz_App} from '$lib/zzz_app.svelte.js';
 import type {Action_Input, Action_Output, Action_Phase} from '$lib/action_types.js';
-import type {Jsonrpc_Singular_Message} from '$lib/jsonrpc.js';
-import type {Client_Action_Handler} from '$lib/client_action_handler.js';
+import type {Jsonrpc_Response_Or_Error, Jsonrpc_Singular_Message} from '$lib/jsonrpc.js';
 
 /**
  * Type for registering callbacks to run after mutation completes.
@@ -23,36 +24,30 @@ export class Client_Action_Event<
 	T_Input extends Action_Input = any, // TODO @api type
 	T_Output extends Action_Output = any, // TODO @api type
 	T_Message extends Jsonrpc_Singular_Message | null = Jsonrpc_Singular_Message | null,
+	T_Response_Message extends Jsonrpc_Response_Or_Error | undefined =
+		| Jsonrpc_Response_Or_Error
+		| undefined,
 > {
 	app: T_App;
 	/** JSON-RPC method for the action. */
 	method: Action_Method;
 	/** The phase of the action handling event/context. */
-	phase: Action_Phase;
+	phase: Action_Phase | undefined = undefined;
 	input: T_Input;
-	output: T_Output;
+	output: T_Output | undefined = undefined;
 	/** The JSON-RPC message associated with this action */
-	jsonrpc_message: T_Message;
+	message: T_Message;
+	response_message: T_Response_Message | undefined = undefined;
 
 	#cbs: Array<After_Client_Action_Callback> = [];
 
 	handled: boolean = false;
 
-	constructor(
-		app: T_App,
-		method: Action_Method,
-		phase: Action_Phase,
-		input: T_Input,
-		output: T_Output,
-		jsonrpc_message: T_Message,
-	) {
+	constructor(app: T_App, method: Action_Method, input: T_Input, message: T_Message) {
 		this.app = app;
 		this.method = method;
-		this.phase = phase;
-		// TODO BLOCK @api should these be input/output instead of params/result?
 		this.input = input;
-		this.output = output;
-		this.jsonrpc_message = jsonrpc_message;
+		this.message = message;
 	}
 
 	async #flush_after_client_action(): Promise<void> {
@@ -66,14 +61,40 @@ export class Client_Action_Event<
 		this.#cbs.push(cb);
 	};
 
-	handle(handler: Client_Action_Handler): void {
+	/** Process an event in the context of the app. */
+	handle(
+		method: keyof Actions_Api,
+		phase: Action_Phase,
+		response_message?: T_Response_Message,
+		log?: Logger,
+	): unknown {
 		if (this.handled) {
 			throw new Error('Client_Action_Event has already been handled');
 		}
 		this.handled = true;
+		console.log('[actions_api] handle_message', method, phase);
+		console.log(`[actions_api] event`, this);
+
+		const handlers_by_phase = this.app.action_handlers[method];
+		if (!handlers_by_phase) {
+			log?.error(`missing handlers for action ${method}`);
+			return;
+		}
+
+		this.phase = phase;
+		this.response_message = response_message;
+
+		const handler = (handlers_by_phase as any)[phase]; // TODO @api type
+
+		if (!handler) {
+			log?.error(`missing handler for action ${method}.${phase}`);
+			return;
+		}
 
 		this.output = handler(this);
 
 		void this.#flush_after_client_action(); // not awaited because these are side effects, also supports sync functions
+
+		return this.output;
 	}
 }

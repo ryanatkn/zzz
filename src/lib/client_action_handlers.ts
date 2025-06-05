@@ -7,9 +7,9 @@ import type {Client_Action_Handlers} from '$lib/client_action_types.js';
  */
 export const client_action_handlers: Client_Action_Handlers = {
 	ping: {
-		send_request: ({app, jsonrpc_message}) => {
+		send_request: ({app, message}) => {
 			console.log('Ping request sent');
-			app.capabilities.handle_sent_ping(jsonrpc_message.id); // TODO BLOCK @api type safety
+			app.capabilities.handle_sent_ping(message.id); // TODO BLOCK @api type safety
 		},
 		receive_response: ({app, output}) => {
 			console.log('Ping response received');
