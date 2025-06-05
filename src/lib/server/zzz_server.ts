@@ -21,7 +21,10 @@ import {
 	Jsonrpc_Message_From_Client_To_Server,
 } from '$lib/jsonrpc.js';
 import {handle_jsonrpc_request} from '$lib/server/jsonrpc_server_helpers.js';
-import {create_jsonrpc_error_from_thrown, create_jsonrpc_response} from '$lib/jsonrpc_helpers.js';
+import {
+	create_jsonrpc_error_message_from_thrown,
+	create_jsonrpc_response,
+} from '$lib/jsonrpc_helpers.js';
 import {ZZZ_CACHE_DIRNAME} from '$lib/constants.js';
 import {to_zzz_cache_dir} from '$lib/diskfile_helpers.js';
 import {jsonrpc_errors} from '$lib/jsonrpc_errors.js';
@@ -168,7 +171,7 @@ export class Zzz_Server {
 					return event.response;
 				} catch (error) {
 					this.log?.error(`Error processing JSON-RPC request:`, error);
-					return create_jsonrpc_error_from_thrown(request.id, error);
+					return create_jsonrpc_error_message_from_thrown(request.id, error);
 				}
 			},
 			onnotification: async (notification: Jsonrpc_Notification): Promise<void> => {

@@ -9,7 +9,10 @@ import {
 	Jsonrpc_Request,
 	type Jsonrpc_Request_Id,
 } from '$lib/jsonrpc.js';
-import {create_jsonrpc_error, create_jsonrpc_error_from_thrown} from '$lib/jsonrpc_helpers.js';
+import {
+	create_jsonrpc_error_message,
+	create_jsonrpc_error_message_from_thrown,
+} from '$lib/jsonrpc_helpers.js';
 
 /**
  * Handler for processing JSON-RPC requests
@@ -65,7 +68,7 @@ export const handle_jsonrpc_request = async (
 				return await onrequest(request);
 			} catch (error) {
 				log?.error(`Error processing JSON-RPC request:`, error);
-				return create_jsonrpc_error_from_thrown(request.id, error);
+				return create_jsonrpc_error_message_from_thrown(request.id, error);
 			}
 		}
 
@@ -88,7 +91,7 @@ export const handle_jsonrpc_request = async (
 			log?.error('JSON-RPC invalid request:', parsed_request.error);
 			return null;
 		}
-		return create_jsonrpc_error(id, {
+		return create_jsonrpc_error_message(id, {
 			code: JSONRPC_INVALID_REQUEST,
 			message: 'invalid request',
 		});
@@ -99,7 +102,7 @@ export const handle_jsonrpc_request = async (
 			// For notifications we can't return an error
 			return null;
 		}
-		return create_jsonrpc_error(id, {
+		return create_jsonrpc_error_message(id, {
 			code: JSONRPC_PARSE_ERROR,
 			message: 'parse error',
 		});

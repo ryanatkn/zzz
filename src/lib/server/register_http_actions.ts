@@ -2,7 +2,7 @@ import {Hono} from 'hono';
 
 import type {Zzz_Server} from '$lib/server/zzz_server.js';
 import {Path_Without_Trailing_Slash} from '$lib/zod_helpers.js';
-import {create_jsonrpc_error_from_thrown} from '$lib/jsonrpc_helpers.js';
+import {create_jsonrpc_error_message_from_thrown} from '$lib/jsonrpc_helpers.js';
 
 export interface Register_Actions_Options {
 	path: string;
@@ -26,7 +26,7 @@ export const register_http_actions = ({path, app, server}: Register_Actions_Opti
 			return c.json(response);
 		} catch (error) {
 			console.error('[http] error processing JSON-RPC request:', error);
-			return c.json(create_jsonrpc_error_from_thrown('', error), 400);
+			return c.json(create_jsonrpc_error_message_from_thrown('', error), 400);
 		}
 	});
 };

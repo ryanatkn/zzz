@@ -58,7 +58,7 @@ export const create_jsonrpc_notification = (
 	return message;
 };
 
-export const create_jsonrpc_error = (
+export const create_jsonrpc_error_message = (
 	id: Jsonrpc_Request_Id,
 	error: Jsonrpc_Error_Message['error'],
 ): Jsonrpc_Error_Message => ({
@@ -71,7 +71,7 @@ export const create_jsonrpc_error = (
  * Creates a JSON-RPC error response from any error.
  * Handles Jsonrpc_Error and regular Error objects.
  */
-export const create_jsonrpc_error_from_thrown = (
+export const create_jsonrpc_error_message_from_thrown = (
 	id: Jsonrpc_Request_Id,
 	error: any,
 ): Jsonrpc_Error_Message => {
@@ -120,12 +120,16 @@ export const to_jsonrpc_message_id = (
 
 export const is_jsonrpc_request = (
 	message: Jsonrpc_Message | null | undefined,
-): message is Jsonrpc_Request => !!message && 'params' in message && 'id' in message;
+): message is Jsonrpc_Request => !!message && 'method' in message && 'id' in message;
 
 export const is_jsonrpc_notification = (
 	message: Jsonrpc_Message | null | undefined,
-): message is Jsonrpc_Notification => !!message && 'params' in message && !('id' in message);
+): message is Jsonrpc_Notification => !!message && 'method' in message && !('id' in message);
 
 export const is_jsonrpc_response = (
 	message: Jsonrpc_Message | null | undefined,
 ): message is Jsonrpc_Response => !!message && 'result' in message;
+
+export const is_jsonrpc_error_message = (
+	message: Jsonrpc_Message | null | undefined,
+): message is Jsonrpc_Response => !!message && 'error' in message;
