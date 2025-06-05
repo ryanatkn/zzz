@@ -332,7 +332,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 		}
 	}
 
-	// TODO @many refactor mutations
+	// TODO refactor maybe to a `Pings` class
 	handle_sent_ping(request_id: Jsonrpc_Request_Id): void {
 		console.log(`[capabilities] [handle_sent_ping] request_id`, request_id);
 		// Create a new pending ping

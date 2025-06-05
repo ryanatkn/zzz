@@ -28,11 +28,11 @@ export const client_action_handlers: Client_Action_Handlers = {
 		send_request: () => {
 			console.log('Loading session...');
 		},
-		receive_response: ({app, output}) => {
-			console.log('Session loaded');
+		receive_response: ({app, output, response_message}) => {
+			console.log('Session loaded', response_message);
 			// TODO BLOCK @api @many this handler should be able to assume `output` is defined, see also response_message
 			if (!output) {
-				console.error('Ping response is missing output');
+				console.error('load_session response is missing output');
 				return;
 			}
 			app.receive_session(output.data);

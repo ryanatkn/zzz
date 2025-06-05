@@ -4,6 +4,7 @@ import type {Action_Method, Actions_Api} from '$lib/action_metatypes.js';
 import type {Zzz_App} from '$lib/zzz_app.svelte.js';
 import type {Action_Input, Action_Output, Action_Phase} from '$lib/action_types.js';
 import type {Jsonrpc_Response_Or_Error, Jsonrpc_Singular_Message} from '$lib/jsonrpc.js';
+import {is_jsonrpc_response} from '$lib/jsonrpc_helpers.js';
 
 /**
  * Type for registering callbacks to run after mutation completes.
@@ -81,14 +82,23 @@ export class Client_Action_Event<
 		this.phase = phase;
 		this.response_message = response_message;
 
-		const handler = (handlers_by_phase as any)[phase]; // TODO @api type
+		const handler = handlers_by_phase[phase]; // TODO BLOCK @many @api type
 
 		if (!handler) {
 			log?.error(`missing handler for action ${method}.${phase}`);
 			return;
 		}
 
-		this.output = handler(this);
+		if (is_jsonrpc_response(response_message)) {
+			this.output = response_message.result; // TODO BLOCK @many @api type
+		}
+		// TODO handle error case? can read the `response_message` but maybe we want a more explicit API
+
+		// TODO BLOCK @api not sure about this
+		const returned = handler(this);
+		if (returned !== undefined) {
+			this.output = returned;
+		}
 
 		void this.#flush_after_client_action(); // not awaited because these are side effects, also supports sync functions
 

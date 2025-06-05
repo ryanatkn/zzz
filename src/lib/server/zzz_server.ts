@@ -252,10 +252,7 @@ export class Zzz_Server {
 				: 'receive' in method_handlers
 					? 'receive'
 					: null);
-		// TODO BLOCK @api error:
-		// Element implicitly has an 'any' type because expression of type '"receive" | "receive_request"' can't be used to index type '{ send_request?: Public_Server_Action_Handler<{ path: string & BRAND<"Diskfile_Path">; }, null, { method: string; jsonrpc: "2.0"; id: string | number; params?: objectOutputType<{ _meta: ZodOptional<ZodObject<{ progressToken: ZodOptional<ZodUnion<[ZodString, ZodNumber]>>; }, "passthrough", ZodTypeAny, objectOutputTyp...'.
-		//   Property 'receive' does not exist on type '{ send_request?: Public_Server_Action_Handler<{ path: string & BRAND<"Diskfile_Path">; }, null, { method: string; jsonrpc: "2.0"; id: string | number; params?: objectOutputType<{ _meta: ZodOptional<ZodObject<{ progressToken: ZodOptional<ZodUnion<[ZodString, ZodNumber]>>; }, "passthrough", ZodTypeAny, objectOutputTyp...'.ts(7053)
-		// const phase: "receive" | "receive_request"
+		// TODO BLOCK @many @api type
 		const handler = method_handlers && phase && method_handlers[phase];
 
 		if (!handler) {

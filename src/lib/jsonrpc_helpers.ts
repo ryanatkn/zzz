@@ -1,7 +1,6 @@
 import {DEV} from 'esm-env';
 
 import {
-	JSONRPC_VERSION,
 	Jsonrpc_Error_Message,
 	Jsonrpc_Error_Code,
 	Jsonrpc_Singular_Message,
@@ -14,6 +13,7 @@ import {
 	Jsonrpc_Result,
 	Jsonrpc_Response,
 	Jsonrpc_Message,
+	JSONRPC_VERSION,
 } from '$lib/jsonrpc.js';
 import {Jsonrpc_Error, JSONRPC_ERROR_CODES} from '$lib/jsonrpc_errors.js';
 
@@ -120,8 +120,12 @@ export const to_jsonrpc_message_id = (
 
 export const is_jsonrpc_request = (
 	message: Jsonrpc_Message | null | undefined,
-): message is Jsonrpc_Request => !!message && 'method' in message && 'id' in message;
+): message is Jsonrpc_Request => !!message && 'params' in message && 'id' in message;
 
 export const is_jsonrpc_notification = (
 	message: Jsonrpc_Message | null | undefined,
-): message is Jsonrpc_Notification => !!message && 'method' in message && !('id' in message);
+): message is Jsonrpc_Notification => !!message && 'params' in message && !('id' in message);
+
+export const is_jsonrpc_response = (
+	message: Jsonrpc_Message | null | undefined,
+): message is Jsonrpc_Response => !!message && 'result' in message;
