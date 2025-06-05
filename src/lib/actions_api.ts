@@ -8,7 +8,7 @@ import {create_jsonrpc_notification, create_jsonrpc_request} from '$lib/jsonrpc_
 import {create_uuid} from '$lib/zod_helpers.js';
 import {Action} from '$lib/action.svelte.js';
 import type {Action_Input} from '$lib/action_types.js';
-import {Client_Action_Event} from './client_action_event.js';
+import {Client_Action_Event} from '$lib/client_action_event.js';
 
 const log = new Logger();
 

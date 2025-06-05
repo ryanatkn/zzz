@@ -7,7 +7,7 @@ import {Cell_Json} from '$lib/cell_types.js';
 import {ollama_list} from '$lib/ollama.js';
 import {create_uuid} from '$lib/zod_helpers.js';
 import type {Zzz_Dir} from '$lib/diskfile_types.js';
-import type {Jsonrpc_Request_Id} from './jsonrpc.js';
+import type {Jsonrpc_Request_Id} from '$lib/jsonrpc.js';
 
 /** Maximum number of ping records to keep. */
 export const PING_HISTORY_MAX = 6;

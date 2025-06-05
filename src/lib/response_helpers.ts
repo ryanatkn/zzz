@@ -5,7 +5,7 @@
 import {get_datetime_now} from '$lib/zod_helpers.js';
 import type {Action_Outputs} from '$lib/action_collections.js';
 import type {Provider_Name, Provider_Data} from '$lib/provider_types.js';
-import type {Jsonrpc_Request_Id} from './jsonrpc.js';
+import type {Jsonrpc_Request_Id} from '$lib/jsonrpc.js';
 
 /**
  * Extracts the text content from a completion response
