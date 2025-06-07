@@ -3,7 +3,6 @@ import {DEV} from 'esm-env';
 import {
 	Jsonrpc_Error_Message,
 	Jsonrpc_Error_Code,
-	Jsonrpc_Singular_Message,
 	type Jsonrpc_Method,
 	type Jsonrpc_Notification,
 	type Jsonrpc_Notification_Params,
@@ -103,19 +102,19 @@ export const create_jsonrpc_error_message_from_thrown = (
 	};
 };
 
-export const to_jsonrpc_message_id = (
-	message_or_id: Jsonrpc_Request_Id | Jsonrpc_Singular_Message | null,
-): Jsonrpc_Request_Id | null => {
-	if (!message_or_id) {
-		return null;
-	}
+export const to_jsonrpc_message_id = (message_or_id: unknown): Jsonrpc_Request_Id | null => {
+	if (!message_or_id) return null;
 
-	const type = typeof message_or_id;
-	if (type === 'string' || type === 'number') {
-		return message_or_id as Jsonrpc_Request_Id;
-	}
+	const maybe_id =
+		typeof message_or_id === 'object' ? (message_or_id as {id?: unknown}).id : message_or_id;
 
-	return (message_or_id as any).id ?? null;
+	return is_jsonrpc_request_id(maybe_id) ? maybe_id : null;
+};
+
+// TODO @api probably parse with schema instead
+export const is_jsonrpc_request_id = (id: unknown): id is Jsonrpc_Request_Id => {
+	const type = typeof id;
+	return type === 'string' || (type === 'number' && !Number.isNaN(id) && Number.isFinite(id));
 };
 
 export const is_jsonrpc_request = (

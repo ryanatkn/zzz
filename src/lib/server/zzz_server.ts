@@ -2,35 +2,24 @@ import {Filer, type Cleanup_Watch, type Source_File} from '@ryanatkn/gro/filer.j
 import type {Watcher_Change} from '@ryanatkn/gro/watch_dir.js';
 import {resolve} from 'node:path';
 import {Logger} from '@ryanatkn/belt/log.js';
-import {DEV} from 'esm-env';
 import {ensure_end} from '@ryanatkn/belt/string.js';
 
 import type {Action_Spec} from '$lib/action_spec.js';
-import {Action_Inputs, Action_Outputs, action_spec_by_method} from '$lib/action_collections.js';
 import type {Zzz_Config} from '$lib/config_helpers.js';
 import {Diskfile_Path, Zzz_Dir} from '$lib/diskfile_types.js';
 import {Safe_Fs} from '$lib/server/safe_fs.js';
 import {Action_Registry} from '$lib/action_registry.js';
-import {stringify_zod_error} from '$lib/zod_helpers.js';
 import {
-	type Jsonrpc_Request,
-	type Jsonrpc_Response,
-	type Jsonrpc_Error_Message,
-	type Jsonrpc_Notification,
+	JSONRPC_INTERNAL_ERROR,
 	Jsonrpc_Message,
-	Jsonrpc_Message_From_Client_To_Server,
+	Jsonrpc_Message_From_Server_To_Client,
 } from '$lib/jsonrpc.js';
-import {handle_jsonrpc_request} from '$lib/server/jsonrpc_server_helpers.js';
-import {
-	create_jsonrpc_error_message_from_thrown,
-	create_jsonrpc_response,
-} from '$lib/jsonrpc_helpers.js';
+import {create_jsonrpc_error_message, to_jsonrpc_message_id} from '$lib/jsonrpc_helpers.js';
 import {ZZZ_CACHE_DIRNAME} from '$lib/constants.js';
 import {to_zzz_cache_dir} from '$lib/diskfile_helpers.js';
-import {jsonrpc_errors} from '$lib/jsonrpc_errors.js';
 import type {Server_Action_Handlers} from '$lib/server/server_action_types.js';
 import {Server_Action_Event} from '$lib/server/server_action_event.js';
-import {Server_Action_Method} from '$lib/action_metatypes.js';
+import type {Action_Phase} from '$lib/action_types.js';
 
 /**
  * Function type for handling file system changes.
@@ -155,139 +144,52 @@ export class Zzz_Server {
 		this.filers.set(this.zzz_cache_dir, {filer, cleanup_promise});
 	}
 
-	async handle_jsonrpc_message(
-		message: unknown,
-	): Promise<Jsonrpc_Response | Jsonrpc_Error_Message | null> {
-		// TODO BLOCK @api probably pass through `#receive_jsonrpc_request` and others directly
-		return handle_jsonrpc_request({
-			message,
-			onrequest: async (
-				request: Jsonrpc_Request,
-			): Promise<Jsonrpc_Response | Jsonrpc_Error_Message> => {
-				try {
-					const event = await this.#receive_jsonrpc_message(request);
-					// TODO hacky, would be cleaned up with specialized classes, maybe some other pattern?
-					event.response = create_jsonrpc_response(request.id, event.output);
-					return event.response;
-				} catch (error) {
-					this.log?.error(`Error processing JSON-RPC request:`, error);
-					return create_jsonrpc_error_message_from_thrown(request.id, error);
-				}
-			},
-			onnotification: async (notification: Jsonrpc_Notification): Promise<void> => {
-				try {
-					// Notifications have no response
-					await this.#receive_jsonrpc_message(notification);
-				} catch (error) {
-					this.log?.error(`Error processing JSON-RPC notification:`, error);
-					// No response for notifications, so just log the error
-				}
-			},
-			log: this.log,
-		});
+	// TODO @api better type safety
+	lookup_handler(method: string, phase: Action_Phase): ((event: any) => any) | undefined {
+		const method_handlers = (this.#server_action_handlers as any)[method];
+		if (!method_handlers) return undefined;
+		return method_handlers[phase];
+	}
+
+	/**
+	 * Process a JSON-RPC message and return a response.
+	 * Handles both single messages and batch requests.
+	 */
+	async receive(message: unknown): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
+		this.#check_destroyed();
+
+		try {
+			const event = Server_Action_Event.from(this, message);
+			event.parse();
+			await event.handle();
+			return event.build_response();
+		} catch (error) {
+			// Only programmer errors should reach here because
+			// other errors are returned as JSON-RPC errors,
+			// and we don't leak any of those details to the client.
+			this.log?.error('Unexpected error:', error);
+			return this.#create_fatal_error_response(message);
+		}
+	}
+
+	/**
+	 * Create error response for fatal/unexpected errors.
+	 */
+	#create_fatal_error_response(raw_message: unknown): Jsonrpc_Message_From_Server_To_Client | null {
+		// TODO BLOCK @api needs to handle batch messages, and so doesnt use `this` so extract to a helper
+		const id = to_jsonrpc_message_id(raw_message);
+		return id === null
+			? null
+			: create_jsonrpc_error_message(id, {
+					code: JSONRPC_INTERNAL_ERROR,
+					message: 'Internal server error',
+				});
 	}
 
 	// TODO @many hacky, currently just broadcasting when most cases should have a specified audience
 	broadcast_jsonrpc_message(message: Jsonrpc_Message): void {
 		this.#check_destroyed();
 		this.#broadcast_jsonrpc_message(message);
-	}
-
-	// TODO BLOCK @api remove "action message" stuff, just use jsonrpc messages directly, maybe `receive_jsonrpc_request`?
-	/**
-	 * Process an action by name with parameters.
-	 * This is the unified entry point for both HTTP and WebSocket actions.
-	 */
-	async #receive_jsonrpc_message(
-		message: Jsonrpc_Message_From_Client_To_Server,
-	): Promise<Server_Action_Event> {
-		if (Array.isArray(message)) {
-			throw jsonrpc_errors.invalid_request('array support is not yet implemented'); // TODO
-		}
-		this.log?.debug(
-			`receive`,
-			'id' in message ? 'request ' + message.id : 'notification',
-			message.method,
-		);
-		this.#check_destroyed();
-
-		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-		if (!message) {
-			throw jsonrpc_errors.invalid_request();
-		}
-
-		const parsed_method = Server_Action_Method.safeParse(message.method);
-		if (!parsed_method.success) {
-			throw jsonrpc_errors.method_not_found(message.method);
-		}
-		const method = parsed_method.data;
-
-		const spec = action_spec_by_method.get(method);
-		if (!spec) {
-			throw jsonrpc_errors.method_not_found(method);
-		}
-
-		if (spec.kind !== 'request_response') {
-			throw jsonrpc_errors.invalid_request(`invalid action kind for method: ${method}`);
-		}
-
-		const input_schema = Action_Inputs[method];
-		// TODO BLOCK @api @many maybe change the type or add a helper
-		if (!input_schema) {
-			throw jsonrpc_errors.internal_error(`unknown message schema: ${method}`);
-		}
-
-		const parsed_input = input_schema.safeParse(message.params);
-		if (!parsed_input.success) {
-			this.log?.error('failed to validate service params', method, parsed_input.error.issues);
-			throw jsonrpc_errors.invalid_params(
-				`invalid params to ${method}: ${stringify_zod_error(parsed_input.error)}`,
-				{issues: parsed_input.error.issues},
-			);
-		}
-
-		const method_handlers = this.#server_action_handlers[method];
-		const phase =
-			method_handlers &&
-			('receive_request' in method_handlers
-				? 'receive_request'
-				: 'receive' in method_handlers
-					? 'receive'
-					: null);
-		// TODO BLOCK @many @api type
-		const handler = method_handlers && phase && method_handlers[phase];
-
-		if (!handler) {
-			throw jsonrpc_errors.internal_error(method); // since there's a spec, this should not happen
-		}
-
-		const event = new Server_Action_Event(this, phase, parsed_input.data, message);
-		await event.handle(handler);
-
-		// Validate the response during development
-		// TODO maybe always validate?
-		if (DEV) {
-			const output_schema = Action_Outputs[method];
-			// TODO BLOCK @api @many maybe change the type or add a helper
-			if (!output_schema) {
-				throw jsonrpc_errors.internal_error(`unknown response schema: ${method}`);
-			}
-			const parsed_output = output_schema.safeParse(event.output);
-			if (!parsed_output.success) {
-				this.log?.error(
-					'failed to validate server action response params',
-					spec.method,
-					event.output,
-					parsed_output.error.issues,
-				);
-				throw jsonrpc_errors.internal_error(
-					`server action response validation failed for ${spec.method}: ${stringify_zod_error(parsed_output.error)}`,
-					{issues: parsed_output.error.issues},
-				);
-			}
-		}
-
-		return event;
 	}
 
 	#destroyed = false;

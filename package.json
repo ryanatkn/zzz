@@ -875,10 +875,6 @@
       "types": "./dist/server/ai_provider_utils.d.ts",
       "default": "./dist/server/ai_provider_utils.js"
     },
-    "./server/jsonrpc_server_helpers.js": {
-      "types": "./dist/server/jsonrpc_server_helpers.d.ts",
-      "default": "./dist/server/jsonrpc_server_helpers.js"
-    },
     "./server/register_http_actions.js": {
       "types": "./dist/server/register_http_actions.d.ts",
       "default": "./dist/server/register_http_actions.js"

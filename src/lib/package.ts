@@ -758,10 +758,6 @@ export const package_json = {
 			types: './dist/server/ai_provider_utils.d.ts',
 			default: './dist/server/ai_provider_utils.js',
 		},
-		'./server/jsonrpc_server_helpers.js': {
-			types: './dist/server/jsonrpc_server_helpers.d.ts',
-			default: './dist/server/jsonrpc_server_helpers.js',
-		},
 		'./server/register_http_actions.js': {
 			types: './dist/server/register_http_actions.d.ts',
 			default: './dist/server/register_http_actions.js',
@@ -1736,6 +1732,7 @@ export const src_json = {
 				{name: 'create_jsonrpc_error_message', kind: 'function'},
 				{name: 'create_jsonrpc_error_message_from_thrown', kind: 'function'},
 				{name: 'to_jsonrpc_message_id', kind: 'function'},
+				{name: 'is_jsonrpc_request_id', kind: 'function'},
 				{name: 'is_jsonrpc_request', kind: 'function'},
 				{name: 'is_jsonrpc_notification', kind: 'function'},
 				{name: 'is_jsonrpc_response', kind: 'function'},
@@ -2090,15 +2087,6 @@ export const src_json = {
 				{name: 'format_gemini_messages', kind: 'function'},
 			],
 		},
-		'./server/jsonrpc_server_helpers.js': {
-			path: 'server/jsonrpc_server_helpers.ts',
-			declarations: [
-				{name: 'Jsonrpc_Request_Handler', kind: 'type'},
-				{name: 'Jsonrpc_Notification_Handler', kind: 'type'},
-				{name: 'Handle_Jsonrpc_Request_Options', kind: 'type'},
-				{name: 'handle_jsonrpc_request', kind: 'function'},
-			],
-		},
 		'./server/register_http_actions.js': {
 			path: 'server/register_http_actions.ts',
 			declarations: [
@@ -2132,13 +2120,31 @@ export const src_json = {
 		},
 		'./server/server_action_event.js': {
 			path: 'server/server_action_event.ts',
-			declarations: [{name: 'Server_Action_Event', kind: 'class'}],
+			declarations: [
+				{name: 'Server_Event_Phase', kind: 'type'},
+				{name: 'Server_Event_Data_Base', kind: 'type'},
+				{name: 'Server_Action_Event', kind: 'class'},
+				{name: 'Server_Request_Event_Data', kind: 'type'},
+				{name: 'Server_Request_Event', kind: 'class'},
+				{name: 'Server_Notification_Event_Data', kind: 'type'},
+				{name: 'Server_Notification_Event', kind: 'class'},
+				{name: 'Server_Batch_Event_Data', kind: 'type'},
+				{name: 'Server_Batch_Event', kind: 'class'},
+				{name: 'Server_Invalid_Event_Data', kind: 'type'},
+				{name: 'Server_Invalid_Event', kind: 'class'},
+			],
 		},
 		'./server/server_action_handler.js': {
 			path: 'server/server_action_handler.ts',
 			declarations: [
-				{name: 'Public_Server_Action_Handler', kind: 'type'},
-				{name: 'Authorized_Server_Action_Handler', kind: 'type'},
+				{name: 'Server_Request_Event_Handling', kind: 'type'},
+				{name: 'Server_Notification_Event_Handling', kind: 'type'},
+				{name: 'Public_Server_Request_Handler', kind: 'type'},
+				{name: 'Authorized_Server_Request_Handler', kind: 'type'},
+				{name: 'Public_Server_Notification_Handler', kind: 'type'},
+				{name: 'Authorized_Server_Notification_Handler', kind: 'type'},
+				{name: 'Server_Request_Handler', kind: 'type'},
+				{name: 'Server_Notification_Handler', kind: 'type'},
 				{name: 'Server_Action_Handler', kind: 'type'},
 			],
 		},

@@ -174,6 +174,7 @@ export type Jsonrpc_Error_Code = z.infer<typeof Jsonrpc_Error_Code>;
 export const Jsonrpc_Error_Message = z.object({
 	jsonrpc: z.literal(JSONRPC_VERSION),
 	id: Jsonrpc_Request_Id,
+	// TODO BLOCK @api maybe `Jsonrpc_Error_Data` or `Jsonrpc_Error_Message_Data`? see `to_jsonrpc_error` and `Jsonrpc_Error_Message['error']`
 	error: z.object({
 		/**
 		 * The error type that occurred.
@@ -204,6 +205,7 @@ export type Jsonrpc_Batch_Request = z.infer<typeof Jsonrpc_Batch_Request>;
 export const Jsonrpc_Response_Or_Error = z.union([Jsonrpc_Response, Jsonrpc_Error_Message]);
 export type Jsonrpc_Response_Or_Error = z.infer<typeof Jsonrpc_Response_Or_Error>;
 
+// TODO BLOCK @api maybe this should be able to include notifications too? off-spec?
 /**
  * A JSON-RPC batch response, as described in https://www.jsonrpc.org/specification#batch.
  */

@@ -22,7 +22,7 @@ export const register_http_actions = ({path, app, server}: Register_Actions_Opti
 	app.post(final_path, async (c) => {
 		try {
 			const json = await c.req.json();
-			const response = await server.handle_jsonrpc_message(json);
+			const response = await server.receive(json);
 			return c.json(response);
 		} catch (error) {
 			console.error('[http] error processing JSON-RPC request:', error);

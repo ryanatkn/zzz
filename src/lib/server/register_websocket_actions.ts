@@ -54,7 +54,7 @@ export const register_websocket_actions = ({
 				}
 
 				try {
-					const response = await server.handle_jsonrpc_message(json);
+					const response = await server.receive(json);
 					// No responses for notifications
 					if (response != null) {
 						ws.send(JSON.stringify(response));

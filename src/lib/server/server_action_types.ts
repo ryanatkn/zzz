@@ -2,8 +2,10 @@
 
 import type {z} from 'zod';
 
-// TODO conditionally render with a helper
-import type {Public_Server_Action_Handler} from '$lib/server/server_action_handler.js';
+import type {
+	Public_Server_Request_Handler,
+	Public_Server_Notification_Handler,
+} from '$lib/server/server_action_handler.js';
 import type {
 	create_directory_action_spec,
 	delete_diskfile_action_spec,
@@ -13,7 +15,6 @@ import type {
 	submit_completion_action_spec,
 	update_diskfile_action_spec,
 } from '$lib/action_specs.js';
-import type {Jsonrpc_Request, Jsonrpc_Notification} from '$lib/jsonrpc.js';
 
 /**
  * Maps action methods to their server-side phase handlers.
@@ -21,147 +22,42 @@ import type {Jsonrpc_Request, Jsonrpc_Notification} from '$lib/jsonrpc.js';
  */
 export interface Server_Action_Handlers {
 	create_directory?: {
-		send_request?: Public_Server_Action_Handler<
+		receive_request?: Public_Server_Request_Handler<
 			z.infer<typeof create_directory_action_spec.input>,
-			z.infer<typeof create_directory_action_spec.output>,
-			Jsonrpc_Request
-		>;
-		receive_request?: Public_Server_Action_Handler<
-			z.infer<typeof create_directory_action_spec.input>,
-			z.infer<typeof create_directory_action_spec.output>,
-			Jsonrpc_Request
-		>;
-		send_response?: Public_Server_Action_Handler<
-			z.infer<typeof create_directory_action_spec.input>,
-			z.infer<typeof create_directory_action_spec.output>,
-			Jsonrpc_Request
-		>;
-		receive_response?: Public_Server_Action_Handler<
-			z.infer<typeof create_directory_action_spec.input>,
-			z.infer<typeof create_directory_action_spec.output>,
-			Jsonrpc_Request
+			z.infer<typeof create_directory_action_spec.output>
 		>;
 	};
 	delete_diskfile?: {
-		send_request?: Public_Server_Action_Handler<
+		receive_request?: Public_Server_Request_Handler<
 			z.infer<typeof delete_diskfile_action_spec.input>,
-			z.infer<typeof delete_diskfile_action_spec.output>,
-			Jsonrpc_Request
-		>;
-		receive_request?: Public_Server_Action_Handler<
-			z.infer<typeof delete_diskfile_action_spec.input>,
-			z.infer<typeof delete_diskfile_action_spec.output>,
-			Jsonrpc_Request
-		>;
-		send_response?: Public_Server_Action_Handler<
-			z.infer<typeof delete_diskfile_action_spec.input>,
-			z.infer<typeof delete_diskfile_action_spec.output>,
-			Jsonrpc_Request
-		>;
-		receive_response?: Public_Server_Action_Handler<
-			z.infer<typeof delete_diskfile_action_spec.input>,
-			z.infer<typeof delete_diskfile_action_spec.output>,
-			Jsonrpc_Request
+			z.infer<typeof delete_diskfile_action_spec.output>
 		>;
 	};
 	filer_change?: {
-		send?: Public_Server_Action_Handler<
-			z.infer<typeof filer_change_action_spec.input>,
-			z.infer<typeof filer_change_action_spec.output>,
-			Jsonrpc_Notification
-		>;
-		receive?: Public_Server_Action_Handler<
-			z.infer<typeof filer_change_action_spec.input>,
-			z.infer<typeof filer_change_action_spec.output>,
-			Jsonrpc_Notification
-		>;
+		receive?: Public_Server_Notification_Handler<z.infer<typeof filer_change_action_spec.input>>;
 	};
 	load_session?: {
-		send_request?: Public_Server_Action_Handler<
+		receive_request?: Public_Server_Request_Handler<
 			z.infer<typeof load_session_action_spec.input>,
-			z.infer<typeof load_session_action_spec.output>,
-			Jsonrpc_Request
-		>;
-		receive_request?: Public_Server_Action_Handler<
-			z.infer<typeof load_session_action_spec.input>,
-			z.infer<typeof load_session_action_spec.output>,
-			Jsonrpc_Request
-		>;
-		send_response?: Public_Server_Action_Handler<
-			z.infer<typeof load_session_action_spec.input>,
-			z.infer<typeof load_session_action_spec.output>,
-			Jsonrpc_Request
-		>;
-		receive_response?: Public_Server_Action_Handler<
-			z.infer<typeof load_session_action_spec.input>,
-			z.infer<typeof load_session_action_spec.output>,
-			Jsonrpc_Request
+			z.infer<typeof load_session_action_spec.output>
 		>;
 	};
 	ping?: {
-		send_request?: Public_Server_Action_Handler<
+		receive_request?: Public_Server_Request_Handler<
 			z.infer<typeof ping_action_spec.input>,
-			z.infer<typeof ping_action_spec.output>,
-			Jsonrpc_Request
-		>;
-		receive_request?: Public_Server_Action_Handler<
-			z.infer<typeof ping_action_spec.input>,
-			z.infer<typeof ping_action_spec.output>,
-			Jsonrpc_Request
-		>;
-		send_response?: Public_Server_Action_Handler<
-			z.infer<typeof ping_action_spec.input>,
-			z.infer<typeof ping_action_spec.output>,
-			Jsonrpc_Request
-		>;
-		receive_response?: Public_Server_Action_Handler<
-			z.infer<typeof ping_action_spec.input>,
-			z.infer<typeof ping_action_spec.output>,
-			Jsonrpc_Request
+			z.infer<typeof ping_action_spec.output>
 		>;
 	};
 	submit_completion?: {
-		send_request?: Public_Server_Action_Handler<
+		receive_request?: Public_Server_Request_Handler<
 			z.infer<typeof submit_completion_action_spec.input>,
-			z.infer<typeof submit_completion_action_spec.output>,
-			Jsonrpc_Request
-		>;
-		receive_request?: Public_Server_Action_Handler<
-			z.infer<typeof submit_completion_action_spec.input>,
-			z.infer<typeof submit_completion_action_spec.output>,
-			Jsonrpc_Request
-		>;
-		send_response?: Public_Server_Action_Handler<
-			z.infer<typeof submit_completion_action_spec.input>,
-			z.infer<typeof submit_completion_action_spec.output>,
-			Jsonrpc_Request
-		>;
-		receive_response?: Public_Server_Action_Handler<
-			z.infer<typeof submit_completion_action_spec.input>,
-			z.infer<typeof submit_completion_action_spec.output>,
-			Jsonrpc_Request
+			z.infer<typeof submit_completion_action_spec.output>
 		>;
 	};
 	update_diskfile?: {
-		send_request?: Public_Server_Action_Handler<
+		receive_request?: Public_Server_Request_Handler<
 			z.infer<typeof update_diskfile_action_spec.input>,
-			z.infer<typeof update_diskfile_action_spec.output>,
-			Jsonrpc_Request
-		>;
-		receive_request?: Public_Server_Action_Handler<
-			z.infer<typeof update_diskfile_action_spec.input>,
-			z.infer<typeof update_diskfile_action_spec.output>,
-			Jsonrpc_Request
-		>;
-		send_response?: Public_Server_Action_Handler<
-			z.infer<typeof update_diskfile_action_spec.input>,
-			z.infer<typeof update_diskfile_action_spec.output>,
-			Jsonrpc_Request
-		>;
-		receive_response?: Public_Server_Action_Handler<
-			z.infer<typeof update_diskfile_action_spec.input>,
-			z.infer<typeof update_diskfile_action_spec.output>,
-			Jsonrpc_Request
+			z.infer<typeof update_diskfile_action_spec.output>
 		>;
 	};
 }

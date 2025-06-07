@@ -24,7 +24,6 @@ import {
 import {to_completion_result} from '$lib/response_helpers.js';
 import type {Filer_Change_Handler} from '$lib/server/zzz_server.js';
 import {Safe_Fs} from '$lib/server/safe_fs.js';
-import {jsonrpc_errors} from '$lib/jsonrpc_errors.js';
 import type {Server_Action_Handlers} from '$lib/server/server_action_types.js';
 import {create_jsonrpc_notification} from '$lib/jsonrpc_helpers.js';
 import {filer_change_action_spec} from '$lib/action_specs.js';
@@ -44,10 +43,10 @@ const google = new GoogleGenerativeAI(SECRET_GOOGLE_API_KEY);
  */
 export const server_action_handlers: Server_Action_Handlers = {
 	ping: {
-		receive_request: ({message}) => {
-			console.log(`ping receive_request message`, message);
+		receive_request: ({data}) => {
+			console.log(`ping receive_request message`, data.request);
 			return {
-				ping_id: message.id,
+				ping_id: data.request.id,
 			};
 		},
 	},
@@ -76,8 +75,8 @@ export const server_action_handlers: Server_Action_Handlers = {
 	},
 
 	submit_completion: {
-		receive_request: async ({server, input, message}) => {
-			const {prompt, provider_name, model, completion_messages} = input.completion_request;
+		receive_request: async ({server, data, errors}) => {
+			const {prompt, provider_name, model, completion_messages} = data.input.completion_request;
 			const config = server.config;
 
 			let result: Action_Outputs['submit_completion'];
@@ -108,7 +107,7 @@ export const server_action_handlers: Server_Action_Handlers = {
 							messages: format_ollama_messages(config.system_message, completion_messages, prompt),
 						});
 						console.log(`ollama api_response`, api_response);
-						result = to_completion_result(message.id, provider_name, model, api_response);
+						result = to_completion_result(data.request.id, provider_name, model, api_response);
 						break;
 					}
 
@@ -124,7 +123,7 @@ export const server_action_handlers: Server_Action_Handlers = {
 							messages: format_claude_messages(completion_messages, prompt),
 						});
 						console.log(`claude api_response`, api_response);
-						result = to_completion_result(message.id, provider_name, model, api_response);
+						result = to_completion_result(data.request.id, provider_name, model, api_response);
 						break;
 					}
 
@@ -146,7 +145,7 @@ export const server_action_handlers: Server_Action_Handlers = {
 							),
 						});
 						console.log(`openai api_response`, api_response);
-						result = to_completion_result(message.id, provider_name, model, api_response);
+						result = to_completion_result(data.request.id, provider_name, model, api_response);
 						break;
 					}
 
@@ -172,7 +171,7 @@ export const server_action_handlers: Server_Action_Handlers = {
 						const content = format_gemini_messages(completion_messages, prompt);
 						const api_response = await google_model.generateContent(content);
 						console.log(`gemini api_response`, api_response);
-						result = to_completion_result(message.id, provider_name, model, api_response);
+						result = to_completion_result(data.request.id, provider_name, model, api_response);
 						break;
 					}
 
@@ -181,7 +180,7 @@ export const server_action_handlers: Server_Action_Handlers = {
 				}
 			} catch (error) {
 				console.error(`AI provider error:`, error);
-				throw jsonrpc_errors.ai_provider_error(
+				throw errors.ai_provider_error(
 					provider_name,
 					error instanceof Error ? error.message : 'Unknown AI provider error',
 					{error},
@@ -190,7 +189,12 @@ export const server_action_handlers: Server_Action_Handlers = {
 
 			// TODO @db temporary, do better action tracking
 			// We don't need to wait for this to finish
-			void save_completion_response_to_disk(input, result, server.zzz_cache_dir, server.safe_fs);
+			void save_completion_response_to_disk(
+				data.input,
+				result,
+				server.zzz_cache_dir,
+				server.safe_fs,
+			);
 
 			console.log(`got ${provider_name} message`, result.completion_response.data);
 
@@ -199,9 +203,9 @@ export const server_action_handlers: Server_Action_Handlers = {
 	},
 
 	update_diskfile: {
-		receive_request: async ({server, input, message}) => {
-			console.log(`message`, message);
-			const {path, content} = input;
+		receive_request: async ({server, data, errors}) => {
+			console.log(`message`, data.request);
+			const {path, content} = data.input;
 
 			try {
 				// Use the server's safe_fs instance to write the file
@@ -209,7 +213,7 @@ export const server_action_handlers: Server_Action_Handlers = {
 				return null;
 			} catch (error) {
 				console.error(`Error writing file ${path}:`, error);
-				throw jsonrpc_errors.internal_error(
+				throw errors.internal_error(
 					`Failed to write file: ${error instanceof Error ? error.message : 'Unknown error'}`,
 				);
 			}
@@ -217,8 +221,8 @@ export const server_action_handlers: Server_Action_Handlers = {
 	},
 
 	delete_diskfile: {
-		receive_request: async ({server, input}) => {
-			const {path} = input;
+		receive_request: async ({server, data, errors}) => {
+			const {path} = data.input;
 
 			try {
 				// Use the server's safe_fs instance to delete the file
@@ -226,7 +230,7 @@ export const server_action_handlers: Server_Action_Handlers = {
 				return null;
 			} catch (error) {
 				console.error(`Error deleting file ${path}:`, error);
-				throw jsonrpc_errors.internal_error(
+				throw errors.internal_error(
 					`Failed to delete file: ${error instanceof Error ? error.message : 'Unknown error'}`,
 				);
 			}
@@ -234,8 +238,8 @@ export const server_action_handlers: Server_Action_Handlers = {
 	},
 
 	create_directory: {
-		receive_request: async ({input, server}) => {
-			const {path} = input;
+		receive_request: async ({data, server, errors}) => {
+			const {path} = data.input;
 
 			try {
 				// Use the server's safe_fs instance to create the directory
@@ -243,7 +247,7 @@ export const server_action_handlers: Server_Action_Handlers = {
 				return null;
 			} catch (error) {
 				console.error(`Error creating directory ${path}:`, error);
-				throw jsonrpc_errors.internal_error(
+				throw errors.internal_error(
 					`Failed to create directory: ${error instanceof Error ? error.message : 'Unknown error'}`,
 				);
 			}
@@ -251,11 +255,11 @@ export const server_action_handlers: Server_Action_Handlers = {
 	},
 
 	filer_change: {
-		// TODO this isn't actually needed, just a placeholder
-		send: ({message}) => {
-			console.log(`send filer_change message`, message);
-			// TODO BLOCK @api should be `params`, maybe `message` too, and always have an `id`?
-		},
+		// TODO @api do we want to handle send/send_request handling here? maybe unify client/server event handling?
+		// send: ({message}) => {
+		// 	console.log(`send filer_change message`, message);
+		// 	// TODO BLOCK @api should be `params`, maybe `message` too, and always have an `id`?
+		// },
 	},
 };
 
