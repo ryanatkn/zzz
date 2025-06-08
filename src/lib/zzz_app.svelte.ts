@@ -221,7 +221,7 @@ export class Zzz_App extends Cell<typeof Zzz_App_Json> {
 		provider_name: Provider_Name,
 		model: string,
 		completion_messages?: Array<Completion_Message>,
-	): Promise<any> {
+	): Promise<ReturnType<typeof this.api.submit_completion>> {
 		const request_id = create_uuid();
 
 		return this.api.submit_completion({

@@ -147,11 +147,11 @@ export class Tape extends Cell<typeof Tape_Json> {
 		);
 
 		// Get the response text
-		const response_text = to_completion_response_text(response.params.completion_response) || '';
+		const response_text = to_completion_response_text(response.completion_response) || '';
 
 		// Update the assistant strip with the response content and metadata
 		assistant_strip.content = response_text;
-		assistant_strip.response = response.params.completion_response;
+		assistant_strip.response = response.completion_response;
 
 		return assistant_strip;
 	}
