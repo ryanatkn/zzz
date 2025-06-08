@@ -36,7 +36,7 @@ export type Public_Server_Request_Handler<
 > = (event: Server_Request_Event_Handling<T_Input, T_Output>) => T_Output | Promise<T_Output>;
 
 /**
- * Server action handler for request/response actions with full authorization (including authentication).
+ * Server action handler for request/response actions that require authorization.
  * Receives a server event in the handling phase and returns the output value.
  */
 export type Authorized_Server_Request_Handler<
@@ -53,7 +53,7 @@ export type Public_Server_Notification_Handler<T_Input extends Action_Input = an
 ) => void | Promise<void>;
 
 /**
- * Server action handler for notification actions with full authorization (including authentication).
+ * Server action handler for notification actions that require authorization.
  * Receives a server event in the handling phase and returns nothing.
  */
 export type Authorized_Server_Notification_Handler<T_Input extends Action_Input = any> = (
