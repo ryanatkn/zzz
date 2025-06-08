@@ -942,7 +942,6 @@ export const src_json = {
 				{name: 'to_action_spec_input_identifier', kind: 'function'},
 				{name: 'to_action_spec_output_identifier', kind: 'function'},
 				{name: 'to_action_spec_auth_identifier', kind: 'function'},
-				{name: 'to_action_spec_output_type', kind: 'function'},
 			],
 		},
 		'./Action_List.svelte': {
