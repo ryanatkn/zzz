@@ -1,6 +1,6 @@
 import type {Logger} from '@ryanatkn/belt/log.js';
 
-import type {Action_Method, Actions_Api} from '$lib/action_metatypes.js';
+import type {Action_Method} from '$lib/action_metatypes.js';
 import type {Zzz_App} from '$lib/zzz_app.svelte.js';
 import type {Action_Input, Action_Output, Action_Phase} from '$lib/action_types.js';
 import type {
@@ -87,7 +87,7 @@ export class Client_Action_Event<
 
 	/** Process an event in the context of the app. */
 	handle(
-		method: keyof Actions_Api,
+		method: Action_Method,
 		phase: Action_Phase,
 		response_message?: T_Response_Message,
 		log?: Logger,
@@ -98,10 +98,8 @@ export class Client_Action_Event<
 		console.log('[actions_api] handle_message', method, phase);
 		console.log(`[actions_api] event`, this);
 
-		const handlers_by_phase = this.app.action_handlers[method];
-		if (!handlers_by_phase) {
-			log?.error(`missing handlers for action ${method}`);
-			return;
+		if (!this.app.is_valid_phase_for_method(method, phase)) {
+			throw new Error(`Invalid phase ${phase} for method ${method}`);
 		}
 
 		this.phase = phase;
@@ -110,22 +108,42 @@ export class Client_Action_Event<
 			this.response_message = response_message;
 		}
 
-		const handler = handlers_by_phase[phase]; // TODO BLOCK @many @api type
+		const handler = this.app.lookup_action_handler(method, phase);
 
 		if (!handler) {
 			log?.error(`missing handler for action ${method}.${phase}`);
 			return;
 		}
 
+		let output_schema;
+
 		if (is_jsonrpc_response(response_message)) {
-			this.output = response_message.result; // TODO BLOCK @many @api type need to extract _meta here
+			output_schema ??= this.app.lookup_action_output_schema(method);
+			if (!output_schema) {
+				throw new Error(`No output schema found for method ${method}`);
+			}
+
+			const parsed = output_schema.safeParse(response_message.result);
+			if (!parsed.success) {
+				log?.error(`Failed to parse output for ${method}:`, parsed.error);
+			}
+			this.output = parsed.data as T_Output;
 		}
 		// TODO handle error case? can read the `response_message` but maybe we want a more explicit API
 
-		// TODO BLOCK @api not sure about this
+		// TODO @api not sure about this but seems roughly ok as a heuristic? might need kind- or action-specific behavior
 		const returned = handler(this);
 		if (returned !== undefined) {
-			this.output = returned;
+			output_schema ??= this.app.lookup_action_output_schema(method);
+			if (!output_schema) {
+				throw new Error(`No output schema found for method ${method}`);
+			}
+
+			const parsed = output_schema.safeParse(returned);
+			if (!parsed.success) {
+				log?.error(`Failed to parse returned value for ${method}:`, parsed.error);
+			}
+			this.output = parsed.data as T_Output;
 		}
 
 		void this.#flush_after_client_action(); // not awaited because these are side effects, also supports sync functions

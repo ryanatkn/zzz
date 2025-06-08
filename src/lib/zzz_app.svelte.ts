@@ -34,11 +34,12 @@ import {HANDLED} from '$lib/cell_helpers.js';
 import {Action_Registry} from '$lib/action_registry.js';
 import {Api_Client, type Api_Client_Options} from '$lib/api_client.js';
 import type {Completion_Message} from '$lib/completion_types.js';
-import type {Actions_Api} from '$lib/action_metatypes.js';
+import type {Action_Method, Actions_Api} from '$lib/action_metatypes.js';
 import type {Client_Action_Handlers} from '$lib/client_action_types.js';
 import type {Action_Spec} from '$lib/action_spec.js';
-import {action_specs} from '$lib/action_collections.js';
+import {Action_Inputs, Action_Outputs, action_specs} from '$lib/action_collections.js';
 import {create_actions_api} from '$lib/actions_api.js';
+import {ACTION_KIND_PHASES, type Action_Phase} from '$lib/action_types.js';
 
 export const zzz_context = create_context<Zzz_App>();
 
@@ -280,5 +281,51 @@ export class Zzz_App extends Cell<typeof Zzz_App_Json> {
 		const history = new Diskfile_History({app: this, json: {path}});
 		this.diskfile_histories.set(path, history);
 		return history;
+	}
+
+	/**
+	 * Lookup a client action handler for a specific method and phase.
+	 * Returns undefined if no handler is registered.
+	 */
+	lookup_action_handler(
+		method: Action_Method,
+		phase: Action_Phase,
+	): ((event: any) => any) | undefined {
+		const method_handlers = (this.action_handlers as any)[method];
+		if (!method_handlers) return undefined;
+		return method_handlers[phase];
+	}
+
+	/**
+	 * Lookup the input schema for an action method.
+	 * Returns undefined if the method is not recognized.
+	 */
+	lookup_action_input_schema<T_Method extends Action_Method>(
+		method: T_Method,
+	): (typeof Action_Inputs)[T_Method] | undefined {
+		const spec = this.action_registry.spec_by_method.get(method);
+		return spec?.input as any;
+	}
+
+	/**
+	 * Lookup the output schema for an action method.
+	 * Returns undefined if the method is not recognized.
+	 */
+	lookup_action_output_schema<T_Method extends Action_Method>(
+		method: T_Method,
+	): (typeof Action_Outputs)[T_Method] | undefined {
+		const spec = this.action_registry.spec_by_method.get(method);
+		return spec?.output as any;
+	}
+
+	// TODO maybe better type safety here and the `lookup_action_handler` method?
+	/**
+	 * Check if a phase is valid for a given action method.
+	 */
+	is_valid_phase_for_method(method: Action_Method, phase: Action_Phase): boolean {
+		const spec = this.action_registry.spec_by_method.get(method);
+		if (!spec) return false;
+		const valid_phases = ACTION_KIND_PHASES[spec.kind];
+		return valid_phases.includes(phase as never);
 	}
 }

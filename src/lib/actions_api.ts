@@ -2,7 +2,7 @@ import {Logger} from '@ryanatkn/belt/log.js';
 import {BROWSER, DEV} from 'esm-env';
 import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 
-import type {Actions_Api} from '$lib/action_metatypes.js';
+import type {Action_Method, Actions_Api} from '$lib/action_metatypes.js';
 import type {Zzz_App} from '$lib/zzz_app.svelte.js';
 import {create_jsonrpc_notification, create_jsonrpc_request} from '$lib/jsonrpc_helpers.js';
 import {create_uuid} from '$lib/zod_helpers.js';
@@ -19,7 +19,7 @@ const log = new Logger();
 
 export const create_actions_api = (app: Zzz_App): Actions_Api =>
 	new Proxy(Object.create(null), {
-		get: (_target, method: keyof Actions_Api) => (input: Action_Input) => {
+		get: (_target, method: Action_Method) => (input: Action_Input) => {
 			// TODO BLOCK `log.debug` isn't formatting the output correctly, shouldn't use console here
 			console.log(...to_logged_args(method, input));
 

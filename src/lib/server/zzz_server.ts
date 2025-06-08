@@ -147,7 +147,10 @@ export class Zzz_Server {
 	}
 
 	// TODO @api better type safety
-	lookup_handler(method: Action_Method, phase: Action_Phase): ((event: any) => any) | undefined {
+	lookup_action_handler(
+		method: Action_Method,
+		phase: Action_Phase,
+	): ((event: any) => any) | undefined {
 		const method_handlers = (this.#server_action_handlers as any)[method];
 		if (!method_handlers) return undefined;
 		return method_handlers[phase];

@@ -302,7 +302,7 @@ export class Server_Request_Event<
 
 		try {
 			// Look up handler
-			const handler = this.server.lookup_handler(this.data.method, 'receive_request');
+			const handler = this.server.lookup_action_handler(this.data.method, 'receive_request');
 
 			if (!handler) {
 				throw jsonrpc_errors.internal_error(`no handler for ${this.data.method}`);
@@ -433,7 +433,7 @@ export class Server_Notification_Event<
 
 		try {
 			// Look up handler
-			const handler = this.server.lookup_handler(this.data.method, 'receive');
+			const handler = this.server.lookup_action_handler(this.data.method, 'receive');
 
 			if (!handler) {
 				throw jsonrpc_errors.internal_error(`no handler for ${this.data.method}`);
