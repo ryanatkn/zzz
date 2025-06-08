@@ -77,7 +77,7 @@
 								<small class="mb_xs2 mt_xs display_block">Response:</small>
 								{#if action.has_error}
 									<div class="font_size_xs color_c p_xs2">
-										Error: {action.error.message}
+										Error: {action.error?.message}
 									</div>
 								{:else}
 									<pre
@@ -90,8 +90,8 @@
 							{#if action.has_response}
 								{#if action.has_error}
 									<small class="color_c">Failed to load session</small>
-								{:else if action.data?.files}
-									<small>{action.data.files.length} files loaded</small>
+								{:else if action.session_data?.files}
+									<small>{action.session_data.files.length} files loaded</small>
 								{/if}
 							{:else}
 								<small class="color_text_subtle">Loading...</small>

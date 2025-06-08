@@ -62,39 +62,52 @@ export type Handler_Phases_For_Method<T_Method extends Action_Method> =
 		? (typeof ACTION_KIND_PHASES)[T_Method][number]
 		: never;
 
-// TODO maybe this for better type safety
-// export const Action_Request_Response_Data = z.object({
-//  kind: z.literal('request_response'),
-// 	jsonrpc_request: Jsonrpc_Request,
-// 	jsonrpc_response: Jsonrpc_Response_Or_Error,
-// });
-// export type Action_Request_Response_Data = z.infer<typeof Action_Request_Response_Data>;
+/**
+ * Action data for request/response actions that tracks both the request and optional response.
+ */
+export const Action_Request_Response_Data = z.object({
+	kind: z.literal('request_response'),
+	input: Action_Input,
+	output: Action_Output.optional(),
+	request: Jsonrpc_Request,
+	response: Jsonrpc_Response_Or_Error.optional(),
+});
+export type Action_Request_Response_Data = z.infer<typeof Action_Request_Response_Data>;
 
-// export const Action_Remote_Notification_Data = z.object({
-// 	kind: z.literal('remote_notification'),
-// 	jsonrpc_message: Jsonrpc_Request,
-// });
-// export type Action_Remote_Notification_Data = z.infer<typeof Action_Remote_Notification_Data>;
+/**
+ * Action data for remote notification actions.
+ */
+export const Action_Remote_Notification_Data = z.object({
+	kind: z.literal('remote_notification'),
+	input: Action_Input,
+	output: z.void(), // Notifications have no output
+	notification: Jsonrpc_Notification,
+});
+export type Action_Remote_Notification_Data = z.infer<typeof Action_Remote_Notification_Data>;
 
-// export const Action_Local_Call_Data = z.object({
-// 	kind: z.literal('local_call'),
-// 	params: Jsonrpc_Params, // TODO BLOCK or should this be a message, so have a local transport for executing?
-// });
-// export type Action_Local_Call_Data = z.infer<typeof Action_Local_Call_Data>;
+/**
+ * Action data for local call actions.
+ */
+export const Action_Local_Call_Data = z.object({
+	kind: z.literal('local_call'),
+	input: Action_Input,
+	output: Action_Output.optional(),
+});
+export type Action_Local_Call_Data = z.infer<typeof Action_Local_Call_Data>;
 
-// export const Action_Data = z.union([
-// 	Action_Request_Response_Data,
-// 	Action_Remote_Notification_Data,
-// 	Action_Local_Call_Data,
-// ]);
-// export type Action_Data = z.infer<typeof Action_Data>;
+/**
+ * Discriminated union for all action data types.
+ */
+export const Action_Data = z.discriminatedUnion('kind', [
+	Action_Request_Response_Data,
+	Action_Remote_Notification_Data,
+	Action_Local_Call_Data,
+]);
+export type Action_Data = z.infer<typeof Action_Data>;
 
 export const Action_Json = Cell_Json.extend({
 	method: Action_Method,
-	// TODO BLOCK Action_Data probably
-	jsonrpc_request: Jsonrpc_Request.optional(),
-	jsonrpc_response: Jsonrpc_Response_Or_Error.optional(),
-	jsonrpc_notification: Jsonrpc_Notification.optional(),
+	data: Action_Data.optional(), // Optional because it's set after construction
 });
 export type Action_Json = z.infer<typeof Action_Json>;
 export type Action_Json_Input = z.input<typeof Action_Json>;

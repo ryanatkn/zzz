@@ -29,6 +29,7 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 			}
 
 			const action = new Action({app, json: {method}});
+			app.actions.add(action); // Add to history immediately
 
 			// Handle different action kinds with their appropriate phases
 			switch (spec.kind) {
@@ -36,19 +37,20 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 					const request = create_jsonrpc_request(method, input, create_uuid());
 					console.log(`[actions_api] request_action_message`, request);
 
-					// TODO BLOCK I think we want different subclasses for the different action kinds,
-					// for type safety over the data, or maybe just an object with a discriminator
+					// Update the action with the request and input
+					action.add_request(request, input);
+
 					const event = new Client_Action_Event(app, method, input, request);
 
-					action.add_request(request);
-
-					// TODO BLOCK @api maybe `handle` should be on the event object, not an `app` method
 					// Handle request phase
 					event.handle(method, 'send_request', undefined, log);
 
 					// Avoiding `await` for compatibility with sync actions
 					return app.api_client.send(request).then((response) => {
 						console.log(`[actions_api] response`, response);
+
+						// Update the action with the response
+						action.add_response(response);
 
 						// Check if it's an error response
 						if ('error' in response) {
@@ -59,7 +61,6 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 						}
 
 						console.log(`response`, response);
-						action.add_response(response);
 
 						const {result} = response;
 						event.handle(method, 'receive_response', response, log);
@@ -71,7 +72,7 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 				case 'remote_notification': {
 					const notification = create_jsonrpc_notification(method, input);
 
-					action.add_notification(notification);
+					action.add_notification(notification, input);
 
 					const event = new Client_Action_Event(app, method, input, notification);
 
@@ -79,8 +80,14 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 				}
 
 				case 'local_call': {
+					action.set_local_call_input(input);
+
 					const event = new Client_Action_Event(app, method, input, null);
-					return event.handle(method, 'execute', undefined, log);
+					const returned = event.handle(method, 'execute', undefined, log);
+
+					action.set_local_call_output(returned);
+
+					return returned;
 				}
 
 				default:

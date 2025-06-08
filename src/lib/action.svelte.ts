@@ -7,7 +7,13 @@ import {Action_Method} from '$lib/action_metatypes.js';
 import {Diskfile_Change, Diskfile_Path, Serializable_Source_File} from '$lib/diskfile_types.js';
 import {to_completion_response_text} from '$lib/response_helpers.js';
 import {to_preview} from '$lib/helpers.js';
-import {Action_Json, Action_Kind} from '$lib/action_types.js';
+import {
+	Action_Json,
+	Action_Kind,
+	Action_Data,
+	type Action_Input,
+	type Action_Output,
+} from '$lib/action_types.js';
 import {
 	Jsonrpc_Request,
 	Jsonrpc_Response,
@@ -17,6 +23,10 @@ import {
 } from '$lib/jsonrpc.js';
 import {action_spec_by_method} from '$lib/action_collections.js';
 import type {Action_Spec} from '$lib/action_spec.js';
+
+// TODO BLOCK @api probably refactor with "step" like with the server_action_event.ts,
+// see also client_action_event.ts and action_types.ts -- would get clarity and type safety,
+// but we may need to rework the `Action` and `Client_Action_Event` stuff to be more like the `Server_Action_Event`
 
 export interface Action_Options extends Cell_Options<typeof Action_Json> {}
 
@@ -28,11 +38,11 @@ export interface Action_Options extends Cell_Options<typeof Action_Json> {}
 export class Action extends Cell<typeof Action_Json> {
 	method: Action_Method = $state()!;
 
-	// TODO BLOCK probably refactor to this an object with a type union, and a generic type
-	// data: Action_Data;
-	jsonrpc_request: Jsonrpc_Request | undefined = $state.raw();
-	jsonrpc_response: Jsonrpc_Response | Jsonrpc_Error_Message | undefined = $state.raw();
-	jsonrpc_notification: Jsonrpc_Notification | undefined = $state.raw();
+	/**
+	 * The action data containing messages based on the action kind.
+	 * Uses a discriminated union for type safety.
+	 */
+	data: Action_Data | undefined = $state.raw();
 
 	readonly spec: Action_Spec = $derived.by(() => {
 		const s = action_spec_by_method.get(this.method);
@@ -43,38 +53,45 @@ export class Action extends Cell<typeof Action_Json> {
 	kind: Action_Kind = $derived(this.spec.kind);
 
 	// Computed properties for easy access
-	readonly jsonrpc_message_id: Jsonrpc_Request_Id | null = $derived(
-		this.jsonrpc_request?.id ?? null,
+	readonly jsonrpc_message_id: Jsonrpc_Request_Id | null = $derived.by(() => {
+		if (!this.data) return null;
+		if (this.data.kind === 'request_response') {
+			return this.data.request.id;
+		}
+		return null;
+	});
+
+	readonly has_response: boolean = $derived(
+		this.data?.kind === 'request_response' && !!this.data.response,
 	);
 
-	readonly has_response: boolean = $derived(!!this.jsonrpc_response);
-	readonly has_error: boolean = $derived(
-		!!this.jsonrpc_response && 'error' in this.jsonrpc_response,
-	);
+	readonly has_error: boolean = $derived.by(() => {
+		if (!this.data || this.data.kind !== 'request_response') return false;
+		return !!this.data.response && 'error' in this.data.response;
+	});
 
 	readonly is_complete: boolean = $derived(
 		this.spec.kind !== 'request_response' || this.has_response,
 	);
 
-	// Extract params and result for convenience
+	// Extract input/output for convenience - these work across all action kinds
+	readonly input: Action_Input | undefined = $derived(this.data?.input);
+	readonly output: Action_Output | undefined = $derived(this.data?.output);
+
+	// Extract params and result for convenience (backwards compatibility)
 	readonly params: any = $derived.by(() => {
-		if (this.jsonrpc_request) return this.jsonrpc_request.params;
-		if (this.jsonrpc_notification) return this.jsonrpc_notification.params;
-		return undefined;
+		return this.data?.input;
 	});
 
 	readonly result: any = $derived.by(() => {
-		if (this.jsonrpc_response && 'result' in this.jsonrpc_response) {
-			return this.jsonrpc_response.result;
-		}
-		return undefined;
+		return this.data?.output;
 	});
 
 	readonly error: any = $derived.by(() => {
-		if (this.jsonrpc_response && 'error' in this.jsonrpc_response) {
-			return this.jsonrpc_response.error;
-		}
-		return undefined;
+		if (!this.data || this.data.kind !== 'request_response') return undefined;
+		return this.data.response && 'error' in this.data.response
+			? this.data.response.error
+			: undefined;
 	});
 
 	readonly display_name: string = $derived(`${this.method} (${this.spec.kind})`);
@@ -138,7 +155,7 @@ export class Action extends Cell<typeof Action_Json> {
 		return undefined;
 	});
 
-	readonly data: Record<string, any> | undefined = $derived.by(() => {
+	readonly session_data: Record<string, any> | undefined = $derived.by(() => {
 		if (this.is_session && this.result?.data) {
 			return this.result.data;
 		}
@@ -179,25 +196,62 @@ export class Action extends Cell<typeof Action_Json> {
 		this.init();
 	}
 
-	add_request(request: Jsonrpc_Request): void {
+	add_request(request: Jsonrpc_Request, input: Action_Input): void {
 		if (this.spec.kind !== 'request_response') {
 			throw new Error(`Cannot add request to action of kind '${this.spec.kind}'`);
 		}
-		this.jsonrpc_request = request;
+		this.data = {
+			kind: 'request_response',
+			input,
+			request,
+		};
 	}
 
 	add_response(response: Jsonrpc_Response | Jsonrpc_Error_Message): void {
 		if (this.spec.kind !== 'request_response') {
 			throw new Error(`Cannot add response to action of kind '${this.spec.kind}'`);
 		}
-		this.jsonrpc_response = response;
+		if (!this.data || this.data.kind !== 'request_response') {
+			throw new Error('Cannot add response without request');
+		}
+		this.data = {
+			...this.data,
+			output: 'result' in response ? response.result : undefined,
+			response,
+		};
 	}
 
-	add_notification(notification: Jsonrpc_Notification): void {
+	add_notification(notification: Jsonrpc_Notification, input: Action_Input): void {
 		if (this.spec.kind !== 'remote_notification') {
 			throw new Error(`Cannot add notification to action of kind '${this.spec.kind}'`);
 		}
-		this.jsonrpc_notification = notification;
+		this.data = {
+			kind: 'remote_notification',
+			input,
+			output: undefined, // Notifications have no output
+			notification,
+		};
+	}
+
+	set_local_call_input(input: Action_Input): void {
+		if (this.spec.kind !== 'local_call') {
+			throw new Error(`Cannot set local call input on action of kind '${this.spec.kind}'`);
+		}
+		this.data = {
+			kind: 'local_call',
+			input,
+			output: undefined,
+		};
+	}
+
+	set_local_call_output(output: Action_Output): void {
+		if (this.spec.kind !== 'local_call') {
+			throw new Error(`Cannot set local call output on action of kind '${this.spec.kind}'`);
+		}
+		this.data = {
+			...(this.data as any),
+			output,
+		};
 	}
 }
 

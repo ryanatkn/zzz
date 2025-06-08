@@ -75,7 +75,7 @@
 		{#if action.has_error}
 			<div class="field_row">
 				<div class="font_weight_600 color_text_subtle">Error</div>
-				<div class="color_c">{action.error.message}</div>
+				<div class="color_c">{action.error?.message}</div>
 			</div>
 		{/if}
 	</section>
@@ -112,8 +112,8 @@
 			<h3 class="mt_0 mb_sm">Completion</h3>
 			{#if action.has_error}
 				<div class="color_c p_sm">
-					Error: {action.error.message}
-					{#if action.error.code}
+					Error: {action.error?.message}
+					{#if action.error?.code}
 						(code: {action.error.code})
 					{/if}
 				</div>
@@ -218,7 +218,7 @@
 		</div>
 		{#if action.has_error}
 			<div class="color_c mt_sm">
-				Error: {action.error.message}
+				Error: {action.error?.message}
 			</div>
 		{/if}
 	</section>
@@ -228,13 +228,13 @@
 		{#if action.has_response}
 			{#if action.has_error}
 				<div class="color_c">
-					Error loading session: {action.error.message}
+					Error loading session: {action.error?.message}
 				</div>
-			{:else if action.data}
-				{#if action.data.files}
+			{:else if action.session_data}
+				{#if action.session_data.files}
 					<div class="field_row">
 						<div class="font_weight_600 color_text_subtle">Files loaded</div>
-						<div>{action.data.files.length}</div>
+						<div>{action.session_data.files.length}</div>
 					</div>
 
 					<h4 class="mt_sm mb_xs">Files</h4>
@@ -247,7 +247,7 @@
 								</tr>
 							</thead>
 							<tbody>
-								{#each action.data.files as file_data (file_data.id)}
+								{#each action.session_data.files as file_data (file_data.id)}
 									<tr>
 										<td class="p_xs font_family_mono font_size_sm"
 											>{strip_start(file_data.id, file_data.source_dir)}</td
@@ -262,7 +262,7 @@
 					<div class="w_100">
 						<pre
 							class="font_family_mono font_size_sm white_space_pre_wrap word_break_break_word p_sm w_100 overflow_auto scrollbar_width_thin"
-							style:max-height="300px">{JSON.stringify(action.data, null, 2)}</pre>
+							style:max-height="300px">{JSON.stringify(action.session_data, null, 2)}</pre>
 					</div>
 				{/if}
 			{:else}
@@ -274,39 +274,63 @@
 	</section>
 {/if}
 
-{#if action.jsonrpc_request}
+{#if action.data}
 	<section class="pb_md border_bottom">
-		<h3>JSON-RPC Request</h3>
-		<pre
-			class="font_family_mono font_size_sm white_space_pre_wrap word_break_break_word p_sm w_100">{JSON.stringify(
-				action.jsonrpc_request,
-				null,
-				2,
-			)}</pre>
-	</section>
-{/if}
+		<h3>Action Data</h3>
+		<div class="display_flex flex_column gap_xs mb_sm">
+			<div class="field_row">
+				<div class="font_weight_600 color_text_subtle">Type</div>
+				<div class="font_family_mono">{action.data.kind}</div>
+			</div>
+		</div>
 
-{#if action.jsonrpc_response}
-	<section class="pb_md border_bottom">
-		<h3>JSON-RPC Response</h3>
-		<pre
-			class="font_family_mono font_size_sm white_space_pre_wrap word_break_break_word p_sm w_100">{JSON.stringify(
-				action.jsonrpc_response,
-				null,
-				2,
-			)}</pre>
-	</section>
-{/if}
-
-{#if action.jsonrpc_notification}
-	<section class="pb_md border_bottom">
-		<h3>JSON-RPC Notification</h3>
-		<pre
-			class="font_family_mono font_size_sm white_space_pre_wrap word_break_break_word p_sm w_100">{JSON.stringify(
-				action.jsonrpc_notification,
-				null,
-				2,
-			)}</pre>
+		{#if action.data.kind === 'request_response'}
+			{#if action.data.request}
+				<h4>Request</h4>
+				<pre
+					class="font_family_mono font_size_sm white_space_pre_wrap word_break_break_word p_sm w_100 mb_md">{JSON.stringify(
+						action.data.request,
+						null,
+						2,
+					)}</pre>
+			{/if}
+			{#if action.data.response}
+				<h4>Response</h4>
+				<pre
+					class="font_family_mono font_size_sm white_space_pre_wrap word_break_break_word p_sm w_100">{JSON.stringify(
+						action.data.response,
+						null,
+						2,
+					)}</pre>
+			{/if}
+		{:else if action.data.kind === 'remote_notification'}
+			<h4>Notification</h4>
+			<pre
+				class="font_family_mono font_size_sm white_space_pre_wrap word_break_break_word p_sm w_100">{JSON.stringify(
+					action.data.notification,
+					null,
+					2,
+				)}</pre>
+		{:else if action.data.kind === 'local_call'}
+			{#if action.data.input !== undefined}
+				<h4>Input</h4>
+				<pre
+					class="font_family_mono font_size_sm white_space_pre_wrap word_break_break_word p_sm w_100 mb_md">{JSON.stringify(
+						action.data.input,
+						null,
+						2,
+					)}</pre>
+			{/if}
+			{#if action.data.output !== undefined}
+				<h4>Output</h4>
+				<pre
+					class="font_family_mono font_size_sm white_space_pre_wrap word_break_break_word p_sm w_100">{JSON.stringify(
+						action.data.output,
+						null,
+						2,
+					)}</pre>
+			{/if}
+		{/if}
 	</section>
 {/if}
 
