@@ -13,6 +13,10 @@ import {
 	Jsonrpc_Response,
 	Jsonrpc_Message,
 	JSONRPC_VERSION,
+	Jsonrpc_Batch_Request,
+	Jsonrpc_Batch_Response,
+	Jsonrpc_Singular_Message,
+	Jsonrpc_Batch_Message,
 } from '$lib/jsonrpc.js';
 import {Jsonrpc_Error, JSONRPC_ERROR_CODES} from '$lib/jsonrpc_errors.js';
 
@@ -117,18 +121,41 @@ export const is_jsonrpc_request_id = (id: unknown): id is Jsonrpc_Request_Id => 
 	return type === 'string' || (type === 'number' && !Number.isNaN(id) && Number.isFinite(id));
 };
 
-export const is_jsonrpc_request = (
-	message: Jsonrpc_Message | null | undefined,
-): message is Jsonrpc_Request => !!message && 'method' in message && 'id' in message;
+export const is_jsonrpc_object = (message: unknown): message is {jsonrpc: typeof JSONRPC_VERSION} =>
+	typeof message === 'object' &&
+	message !== null &&
+	!Array.isArray(message) &&
+	(message as any).jsonrpc === JSONRPC_VERSION;
 
-export const is_jsonrpc_notification = (
-	message: Jsonrpc_Message | null | undefined,
-): message is Jsonrpc_Notification => !!message && 'method' in message && !('id' in message);
+export const is_jsonrpc_message = (message: unknown): message is Jsonrpc_Message =>
+	Array.isArray(message)
+		? message.length > 0 && message.every((m) => is_jsonrpc_object(m))
+		: is_jsonrpc_object(message);
 
-export const is_jsonrpc_response = (
-	message: Jsonrpc_Message | null | undefined,
-): message is Jsonrpc_Response => !!message && 'result' in message;
+export const is_jsonrpc_request = (message: unknown): message is Jsonrpc_Request =>
+	is_jsonrpc_object(message) && 'method' in message && 'id' in message;
 
-export const is_jsonrpc_error_message = (
-	message: Jsonrpc_Message | null | undefined,
-): message is Jsonrpc_Response => !!message && 'error' in message;
+export const is_jsonrpc_notification = (message: unknown): message is Jsonrpc_Notification =>
+	is_jsonrpc_object(message) && 'method' in message && !('id' in message);
+
+export const is_jsonrpc_response = (message: unknown): message is Jsonrpc_Response =>
+	is_jsonrpc_object(message) && 'result' in message && 'id' in message;
+
+export const is_jsonrpc_error_message = (message: unknown): message is Jsonrpc_Error_Message =>
+	is_jsonrpc_object(message) && 'error' in message && 'id' in message;
+
+export const is_jsonrpc_singular_message = (
+	message: unknown,
+): message is Jsonrpc_Singular_Message => is_jsonrpc_object(message);
+
+export const is_jsonrpc_batch_message = (message: unknown): message is Jsonrpc_Batch_Message =>
+	Array.isArray(message) && is_jsonrpc_message(message);
+
+export const is_jsonrpc_batch_request = (message: unknown): message is Jsonrpc_Batch_Request =>
+	is_jsonrpc_batch_message(message) &&
+	message.every((m) => is_jsonrpc_request(m) || is_jsonrpc_notification(m));
+
+// TODO BLOCK @api @many maybe this should be able to include notifications too? off-spec?
+export const is_jsonrpc_batch_response = (message: unknown): message is Jsonrpc_Batch_Response =>
+	is_jsonrpc_batch_message(message) &&
+	message.every((m) => is_jsonrpc_response(m) || is_jsonrpc_error_message(m));
