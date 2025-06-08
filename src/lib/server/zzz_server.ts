@@ -20,6 +20,8 @@ import {to_zzz_cache_dir} from '$lib/diskfile_helpers.js';
 import type {Server_Action_Handlers} from '$lib/server/server_action_types.js';
 import {Server_Action_Event} from '$lib/server/server_action_event.js';
 import type {Action_Phase} from '$lib/action_types.js';
+import {Action_Inputs, Action_Outputs} from '$lib/action_collections.js';
+import type {Action_Method} from '$lib/action_metatypes.js';
 
 /**
  * Function type for handling file system changes.
@@ -145,10 +147,22 @@ export class Zzz_Server {
 	}
 
 	// TODO @api better type safety
-	lookup_handler(method: string, phase: Action_Phase): ((event: any) => any) | undefined {
+	lookup_handler(method: Action_Method, phase: Action_Phase): ((event: any) => any) | undefined {
 		const method_handlers = (this.#server_action_handlers as any)[method];
 		if (!method_handlers) return undefined;
 		return method_handlers[phase];
+	}
+
+	lookup_action_input_schema<T_Method extends Action_Method>(
+		method: T_Method,
+	): (typeof Action_Inputs)[T_Method] | undefined {
+		return Action_Inputs[method] as any;
+	}
+
+	lookup_action_output_schema<T_Method extends Action_Method>(
+		method: T_Method,
+	): (typeof Action_Outputs)[T_Method] | undefined {
+		return Action_Outputs[method] as any;
 	}
 
 	/**

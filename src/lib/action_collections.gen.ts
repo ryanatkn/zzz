@@ -110,18 +110,6 @@ export const gen: Gen = ({origin_path}) => {
 			z.infer<typeof Action_Outputs[T_Method]>;
 
 		/**
-		 * Type guard to check if a method has params.
-		 */
-		export const has_action_params = (method: string): method is keyof typeof Action_Inputs =>
-			method in Action_Inputs;
-
-		/**
-		 * Type guard to check if a method has results.
-		 */
-		export const has_action_result = (method: string): method is keyof typeof Action_Outputs =>
-			method in Action_Outputs;
-
-		/**
 		 * Parse action params with validation.
 		 */
 		export const parse_action_input = <T_Method extends keyof typeof Action_Inputs>(
