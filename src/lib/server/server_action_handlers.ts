@@ -43,10 +43,10 @@ const google = new GoogleGenerativeAI(SECRET_GOOGLE_API_KEY);
  */
 export const server_action_handlers: Server_Action_Handlers = {
 	ping: {
-		receive_request: ({data}) => {
-			console.log(`ping receive_request message`, data.request);
+		receive_request: ({data: {request}}) => {
+			console.log(`ping receive_request message`, request);
 			return {
-				ping_id: data.request.id,
+				ping_id: request.id,
 			};
 		},
 	},
@@ -75,8 +75,8 @@ export const server_action_handlers: Server_Action_Handlers = {
 	},
 
 	submit_completion: {
-		receive_request: async ({server, data, errors}) => {
-			const {prompt, provider_name, model, completion_messages} = data.input.completion_request;
+		receive_request: async ({server, data: {input, request}, errors}) => {
+			const {prompt, provider_name, model, completion_messages} = input.completion_request;
 			const config = server.config;
 
 			let result: Action_Outputs['submit_completion'];
@@ -107,7 +107,7 @@ export const server_action_handlers: Server_Action_Handlers = {
 							messages: format_ollama_messages(config.system_message, completion_messages, prompt),
 						});
 						console.log(`ollama api_response`, api_response);
-						result = to_completion_result(data.request.id, provider_name, model, api_response);
+						result = to_completion_result(request.id, provider_name, model, api_response);
 						break;
 					}
 
@@ -123,7 +123,7 @@ export const server_action_handlers: Server_Action_Handlers = {
 							messages: format_claude_messages(completion_messages, prompt),
 						});
 						console.log(`claude api_response`, api_response);
-						result = to_completion_result(data.request.id, provider_name, model, api_response);
+						result = to_completion_result(request.id, provider_name, model, api_response);
 						break;
 					}
 
@@ -145,7 +145,7 @@ export const server_action_handlers: Server_Action_Handlers = {
 							),
 						});
 						console.log(`openai api_response`, api_response);
-						result = to_completion_result(data.request.id, provider_name, model, api_response);
+						result = to_completion_result(request.id, provider_name, model, api_response);
 						break;
 					}
 
@@ -171,7 +171,7 @@ export const server_action_handlers: Server_Action_Handlers = {
 						const content = format_gemini_messages(completion_messages, prompt);
 						const api_response = await google_model.generateContent(content);
 						console.log(`gemini api_response`, api_response);
-						result = to_completion_result(data.request.id, provider_name, model, api_response);
+						result = to_completion_result(request.id, provider_name, model, api_response);
 						break;
 					}
 
@@ -189,12 +189,7 @@ export const server_action_handlers: Server_Action_Handlers = {
 
 			// TODO @db temporary, do better action tracking
 			// We don't need to wait for this to finish
-			void save_completion_response_to_disk(
-				data.input,
-				result,
-				server.zzz_cache_dir,
-				server.safe_fs,
-			);
+			void save_completion_response_to_disk(input, result, server.zzz_cache_dir, server.safe_fs);
 
 			console.log(`got ${provider_name} message`, result.completion_response.data);
 
@@ -203,9 +198,9 @@ export const server_action_handlers: Server_Action_Handlers = {
 	},
 
 	update_diskfile: {
-		receive_request: async ({server, data, errors}) => {
-			console.log(`message`, data.request);
-			const {path, content} = data.input;
+		receive_request: async ({server, data: {input, request}, errors}) => {
+			console.log(`message`, request);
+			const {path, content} = input;
 
 			try {
 				// Use the server's safe_fs instance to write the file
@@ -221,8 +216,8 @@ export const server_action_handlers: Server_Action_Handlers = {
 	},
 
 	delete_diskfile: {
-		receive_request: async ({server, data, errors}) => {
-			const {path} = data.input;
+		receive_request: async ({server, data: {input}, errors}) => {
+			const {path} = input;
 
 			try {
 				// Use the server's safe_fs instance to delete the file
@@ -238,8 +233,8 @@ export const server_action_handlers: Server_Action_Handlers = {
 	},
 
 	create_directory: {
-		receive_request: async ({data, server, errors}) => {
-			const {path} = data.input;
+		receive_request: async ({data: {input}, server, errors}) => {
+			const {path} = input;
 
 			try {
 				// Use the server's safe_fs instance to create the directory

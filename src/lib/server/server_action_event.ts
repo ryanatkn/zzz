@@ -23,7 +23,6 @@ import {action_spec_by_method} from '$lib/action_collections.js';
 import {stringify_zod_error} from '$lib/zod_helpers.js';
 import type {Zzz_Server} from '$lib/server/zzz_server.js';
 import type {Action_Spec} from '$lib/action_spec.js';
-import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 
 /**
  * Server event steps for processing incoming messages.
