@@ -36,7 +36,6 @@ export const gen: Gen = ({origin_path}) => {
 	return `
 		// ${banner}
 
-		import type {Action_Method} from '$lib/action_metatypes.js';
 		import type {Action_Inputs, Action_Outputs} from '$lib/action_collections.js';
 		import type {${action_event_imports.join(', ')}} from '$lib/frontend_action_event.js';
 

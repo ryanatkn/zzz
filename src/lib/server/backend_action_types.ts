@@ -5,6 +5,7 @@ import type {Action_Inputs, Action_Outputs} from '$lib/action_collections.js';
 import type {
 	Backend_Request_Response_Action_Event,
 	Backend_Remote_Notification_Action_Event,
+	Backend_Local_Call_Action_Event,
 } from '$lib/server/backend_action_event.js';
 
 /**

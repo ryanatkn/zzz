@@ -83,7 +83,7 @@ export interface Actions_Api {
 	delete_diskfile: (
 		input: Action_Inputs['delete_diskfile'],
 	) => Promise<Action_Outputs['delete_diskfile']>;
-	filer_change: (input: Action_Inputs['filer_change']) => Action_Outputs['filer_change'];
+	filer_change: (input: Action_Inputs['filer_change']) => Promise<Action_Outputs['filer_change']>;
 	load_session: (input?: void) => Promise<Action_Outputs['load_session']>;
 	ping: (input?: void) => Promise<Action_Outputs['ping']>;
 	submit_completion: (
