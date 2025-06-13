@@ -28,6 +28,7 @@ import type {Backend_Action_Handlers} from '$lib/server/backend_action_types.js'
 import {create_jsonrpc_notification} from '$lib/jsonrpc_helpers.js';
 import {filer_change_action_spec} from '$lib/action_specs.js';
 import type {Action_Inputs, Action_Outputs} from '$lib/action_collections.js';
+import {jsonrpc_errors} from '$lib/jsonrpc_errors.js';
 
 // TODO refactor to a plugin architecture
 
@@ -75,7 +76,7 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 	},
 
 	submit_completion: {
-		receive_request: async ({server, data: {input, request}, errors}) => {
+		receive_request: async ({server, data: {input, request}}) => {
 			const {prompt, provider_name, model, completion_messages} = input.completion_request;
 			const config = server.config;
 
@@ -180,7 +181,7 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 				}
 			} catch (error) {
 				console.error(`AI provider error:`, error);
-				throw errors.ai_provider_error(
+				throw jsonrpc_errors.ai_provider_error(
 					provider_name,
 					error instanceof Error ? error.message : 'Unknown AI provider error',
 					{error},
@@ -198,7 +199,7 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 	},
 
 	update_diskfile: {
-		receive_request: async ({server, data: {input, request}, errors}) => {
+		receive_request: async ({server, data: {input, request}}) => {
 			console.log(`message`, request);
 			const {path, content} = input;
 
@@ -208,7 +209,7 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 				return null;
 			} catch (error) {
 				console.error(`Error writing file ${path}:`, error);
-				throw errors.internal_error(
+				throw jsonrpc_errors.internal_error(
 					`Failed to write file: ${error instanceof Error ? error.message : 'Unknown error'}`,
 				);
 			}
@@ -216,7 +217,7 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 	},
 
 	delete_diskfile: {
-		receive_request: async ({server, data: {input}, errors}) => {
+		receive_request: async ({server, data: {input}}) => {
 			const {path} = input;
 
 			try {
@@ -225,7 +226,7 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 				return null;
 			} catch (error) {
 				console.error(`Error deleting file ${path}:`, error);
-				throw errors.internal_error(
+				throw jsonrpc_errors.internal_error(
 					`Failed to delete file: ${error instanceof Error ? error.message : 'Unknown error'}`,
 				);
 			}
@@ -233,7 +234,7 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 	},
 
 	create_directory: {
-		receive_request: async ({data: {input}, server, errors}) => {
+		receive_request: async ({data: {input}, server}) => {
 			const {path} = input;
 
 			try {
@@ -242,7 +243,7 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 				return null;
 			} catch (error) {
 				console.error(`Error creating directory ${path}:`, error);
-				throw errors.internal_error(
+				throw jsonrpc_errors.internal_error(
 					`Failed to create directory: ${error instanceof Error ? error.message : 'Unknown error'}`,
 				);
 			}

@@ -24,7 +24,7 @@ export const frontend_action_handlers: Frontend_Action_Handlers = {
 		send_request: () => {
 			console.log('Loading session...');
 		},
-		receive_response: ({app, output, response_message}) => {
+		receive_response: ({app, data: {output, response_message}}) => {
 			console.log('Session loaded', response_message);
 
 			app.receive_session(output.data);
@@ -32,16 +32,16 @@ export const frontend_action_handlers: Frontend_Action_Handlers = {
 	},
 
 	submit_completion: {
-		send_request: ({input}) => {
+		send_request: ({data: {input}}) => {
 			console.log('Sending prompt', input.completion_request.prompt);
 		},
-		receive_response: ({input, output}) => {
+		receive_response: ({data: {input, output}}) => {
 			console.log('Received completion', input.completion_request, output);
 		},
 	},
 
 	update_diskfile: {
-		send_request: ({input}) => {
+		send_request: ({data: {input}}) => {
 			console.log('Updating file', input.path);
 		},
 		receive_response: ({input, output}) => {
@@ -50,16 +50,16 @@ export const frontend_action_handlers: Frontend_Action_Handlers = {
 	},
 
 	delete_diskfile: {
-		send_request: ({input}) => {
+		send_request: ({data: {input}}) => {
 			console.log('Deleting file', input.path);
 		},
-		receive_response: ({input}) => {
+		receive_response: ({data: {input}}) => {
 			console.log('Deleted file', input.path);
 		},
 	},
 
 	create_directory: {
-		send_request: ({input}) => {
+		send_request: ({data: {input}}) => {
 			console.log('Creating directory', input.path);
 		},
 		receive_response: (ctx) => {
@@ -68,14 +68,14 @@ export const frontend_action_handlers: Frontend_Action_Handlers = {
 	},
 
 	filer_change: {
-		receive: ({app, input, output}) => {
-			console.log('File changed', input.change, output);
+		receive: ({app, data: {input}}) => {
+			console.log('File changed', input.change);
 			app.diskfiles.handle_change(input);
 		},
 	},
 
 	toggle_main_menu: {
-		execute: ({environment, input}) => {
+		execute: ({environment, data: {input}}) => {
 			console.log('Toggling main menu', input);
 			// TODO BLOCK @api was `app` for the client, `environment` is weird?
 			return environment.ui.toggle_main_menu(input);
