@@ -77,6 +77,7 @@ const generate_backend_phase_handlers = (spec: Action_Spec): string => {
 		if (initiator === 'frontend' || initiator === 'both') {
 			backend_phases.push('receive');
 		}
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 	} else if (kind === 'local_call') {
 		if (initiator === 'backend' || initiator === 'both') {
 			backend_phases.push('execute');
@@ -111,7 +112,7 @@ const get_handler_return_type = (spec: Action_Spec, phase: Action_Phase): string
 	// For request_response receive_request, handler returns the output
 	if (spec.kind === 'request_response' && phase === 'receive_request') {
 		const base_type = `Action_Outputs['${spec.method}']`;
-		return spec.async ? `${base_type} | Promise<${base_type}>` : base_type;
+		return `${base_type} | Promise<${base_type}>`;
 	}
 
 	// For local_call execute, handler returns the output
