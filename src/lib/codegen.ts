@@ -5,45 +5,169 @@ import type {Action_Spec} from '$lib/action_spec.js';
 import type {Action_Phase} from '$lib/action_types.js';
 
 /**
+ * Represents an import item with its kind (type or value).
+ */
+interface Import_Item {
+	name: string;
+	kind: 'type' | 'value';
+}
+
+/**
  * Manages imports for generated code, building them on demand.
+ * Automatically optimizes type-only imports to use `import type` syntax.
+ *
+ * Why this matters:
+ * - `import type` statements are completely removed during compilation
+ * - Mixed imports like `import { type A, B }` cannot be safely removed
+ * - This ensures optimal tree-shaking and smaller bundle sizes
+ *
+ * @example
+ * ```typescript
+ * const imports = new Import_Builder();
+ * imports.add_types('$lib/types.js', 'Foo', 'Bar');
+ * imports.add('$lib/utils.js', 'helper');
+ * imports.add_type('$lib/utils.js', 'Helper_Options');
+ *
+ * // Generates:
+ * // import type {Foo, Bar} from '$lib/types.js';
+ * // import {helper, type Helper_Options} from '$lib/utils.js';
+ * ```
  */
 export class Import_Builder {
-	imports: Map<string, Set<string>> = new Map();
+	imports: Map<string, Map<string, Import_Item>> = new Map();
 
 	/**
-	 * Add an import to be included in the generated code.
+	 * Add a value import to be included in the generated code.
 	 * @param from The module to import from
-	 * @param what What to import (can be a type or value)
+	 * @param what What to import (value)
 	 */
 	add(from: string, what: string): this {
-		if (!this.imports.has(from)) {
-			this.imports.set(from, new Set());
-		}
-		this.imports.get(from)!.add(what);
-		return this;
+		return this.#add_import(from, what, 'value');
 	}
 
 	/**
 	 * Add a type import to be included in the generated code.
-	 * This is a convenience method that prepends 'type' if not already present.
+	 * @param from The module to import from
+	 * @param what What to import (type)
 	 */
 	add_type(from: string, what: string): this {
-		const type_import = what.startsWith('type ') ? what : `type ${what}`;
-		return this.add(from, type_import);
+		return this.#add_import(from, what, 'type');
+	}
+
+	/**
+	 * Add multiple value imports from the same module.
+	 */
+	add_many(from: string, ...items: Array<string>): this {
+		for (const item of items) {
+			this.add(from, item);
+		}
+		return this;
+	}
+
+	/**
+	 * Add multiple type imports from the same module.
+	 */
+	add_types(from: string, ...items: Array<string>): this {
+		for (const item of items) {
+			this.add_type(from, item);
+		}
+		return this;
+	}
+
+	/**
+	 * Internal method to add an import with its kind.
+	 */
+	#add_import(from: string, name: string, kind: 'type' | 'value'): this {
+		if (!this.imports.has(from)) {
+			this.imports.set(from, new Map());
+		}
+
+		const module_imports = this.imports.get(from)!;
+		const existing = module_imports.get(name);
+
+		// If already imported as a value, don't downgrade to type
+		if (existing && existing.kind === 'value' && kind === 'type') {
+			return this;
+		}
+
+		module_imports.set(name, {name, kind});
+		return this;
 	}
 
 	/**
 	 * Generate the import statements.
+	 * If all imports from a module are types, uses `import type` syntax.
 	 */
 	build(): string {
+		return this.#generate_import_statements().join('\n');
+	}
+
+	/**
+	 * Check if the builder has any imports.
+	 */
+	has_imports(): boolean {
+		return this.imports.size > 0;
+	}
+
+	/**
+	 * Get the number of import statements that will be generated.
+	 */
+	get import_count(): number {
+		return this.imports.size;
+	}
+
+	/**
+	 * Preview what imports will be generated (useful for debugging).
+	 * @returns Array of import statement strings
+	 */
+	preview(): Array<string> {
+		return this.#generate_import_statements();
+	}
+
+	/**
+	 * Clear all imports.
+	 */
+	clear(): this {
+		this.imports.clear();
+		return this;
+	}
+
+	/**
+	 * Internal helper to generate import statements from the current state.
+	 * Shared by both build() and preview() methods.
+	 */
+	#generate_import_statements(): Array<string> {
 		const statements: Array<string> = [];
 
-		for (const [from, imports] of this.imports) {
-			const sorted_imports = Array.from(imports).sort();
-			statements.push(`import {${sorted_imports.join(', ')}} from '${from}';`);
+		for (const [from, module_imports] of this.imports) {
+			const items = Array.from(module_imports.values());
+
+			// Check if all imports are types
+			const all_types = items.every((item) => item.kind === 'type');
+
+			if (all_types) {
+				// Use type-only import syntax
+				const sorted_names = items.map((item) => item.name).sort();
+				statements.push(`import type {${sorted_names.join(', ')}} from '${from}';`);
+			} else {
+				// Mixed imports - sort values first, then types, alphabetically within each group
+				const sorted_items = items.sort((a, b) => {
+					// First sort by kind: values before types
+					if (a.kind !== b.kind) {
+						return a.kind === 'value' ? -1 : 1;
+					}
+					// Then sort alphabetically within the same kind
+					return a.name.localeCompare(b.name);
+				});
+
+				const formatted_imports = sorted_items.map((item) =>
+					item.kind === 'type' ? `type ${item.name}` : item.name,
+				);
+				statements.push(`import {${formatted_imports.join(', ')}} from '${from}';`);
+			}
 		}
 
-		return statements.join('\n');
+		return statements;
 	}
 }
 
@@ -110,6 +234,7 @@ export const get_handler_return_type = (spec: Action_Spec, phase: Action_Phase):
 	// For request_response receive_request, handler returns the output
 	if (spec.kind === 'request_response' && phase === 'receive_request') {
 		const base_type = `Action_Outputs['${spec.method}']`;
+		// Request/response actions are always async
 		return `${base_type} | Promise<${base_type}>`;
 	}
 
@@ -146,8 +271,7 @@ export const generate_phase_handlers = (
 			: '$lib/server/backend_action_event.js';
 
 	imports.add_type(module, event_type_name);
-	imports.add_type('$lib/action_collections.js', 'Action_Inputs');
-	imports.add_type('$lib/action_collections.js', 'Action_Outputs');
+	imports.add_types('$lib/action_collections.js', 'Action_Inputs', 'Action_Outputs');
 
 	// Build the parameterized event type
 	let event_type: string;
