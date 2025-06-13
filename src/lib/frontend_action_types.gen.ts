@@ -12,6 +12,12 @@ import {Import_Builder, generate_phase_handlers, create_banner} from '$lib/codeg
  * Frontend can handle:
  * - send/execute phases when initiator is 'frontend' or 'both'
  * - receive phases when initiator is 'backend' or 'both'
+ *
+ * Example generated imports:
+ * ```typescript
+ * import type {Action_Inputs, Action_Outputs} from '$lib/action_collections.js';
+ * import type {Frontend_Request_Response_Action_Event} from '$lib/frontend_action_event.js';
+ * ```
  */
 export const gen: Gen = ({origin_path}) => {
 	const registry = new Action_Registry(action_specs);
