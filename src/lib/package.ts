@@ -999,6 +999,7 @@ export const src_json = {
 				{name: 'Action_Kind', kind: 'variable'},
 				{name: 'Action_Environment', kind: 'variable'},
 				{name: 'Action_Initiator', kind: 'variable'},
+				{name: 'is_action_initiator', kind: 'function'},
 				{name: 'Action_Auth', kind: 'variable'},
 				{name: 'Action_Side_Effects', kind: 'variable'},
 				{name: 'Action_Phase', kind: 'variable'},
