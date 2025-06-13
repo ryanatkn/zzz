@@ -189,7 +189,7 @@ export const is_action_event = (obj: unknown): obj is Action_Event =>
  * Type guard to check if JSON is a valid action event JSON.
  */
 export const is_action_event_json = (obj: unknown): obj is Action_Event_Json =>
-	obj !== null &&
+	!!obj &&
 	typeof obj === 'object' &&
 	'kind' in obj &&
 	'method' in obj &&
