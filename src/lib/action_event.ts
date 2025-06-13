@@ -61,9 +61,7 @@ export abstract class Action_Event<
 
 		const initial_phase = this.get_initial_phase();
 		if (!initial_phase) {
-			throw jsonrpc_errors.internal_error(
-				`No valid initial phase for ${spec.method} on ${this.executor} executor`,
-			);
+			throw jsonrpc_errors.internal_error(`No valid initial phase for ${spec.method}`);
 		}
 
 		this.data = this.build_initial_data(initial_phase, input);
