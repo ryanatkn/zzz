@@ -1,14 +1,20 @@
+// @slop
+// actions_api.ts
+
 import {Logger} from '@ryanatkn/belt/log.js';
 import {BROWSER, DEV} from 'esm-env';
 import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 
 import type {Action_Method, Actions_Api} from '$lib/action_metatypes.js';
 import type {Zzz_App} from '$lib/zzz_app.svelte.js';
-import {create_jsonrpc_notification, create_jsonrpc_request} from '$lib/jsonrpc_helpers.js';
-import {create_uuid} from '$lib/zod_helpers.js';
 import {Action} from '$lib/action.svelte.js';
 import type {Action_Input} from '$lib/action_types.js';
-import {Client_Action_Event} from '$lib/client_action_event.js';
+import {create_frontend_action_event} from '$lib/frontend_action_event.js';
+import type {
+	Frontend_Request_Response_Action_Event,
+	Frontend_Remote_Notification_Action_Event,
+	Frontend_Local_Call_Action_Event,
+} from '$lib/frontend_action_event.js';
 
 const log = new Logger();
 
@@ -29,65 +35,74 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 			}
 
 			const action = new Action({app, json: {method}});
-			app.actions.add(action); // Add to history immediately
+			const action_event = create_frontend_action_event(app, spec, input);
+			action.action_event = action_event;
 
-			// Handle different action kinds with their appropriate phases
 			switch (spec.kind) {
 				case 'request_response': {
-					const request = create_jsonrpc_request(method, input, create_uuid());
-					console.log(`[actions_api] request_action_message`, request);
+					const event = action_event as Frontend_Request_Response_Action_Event;
+					event.parse();
 
-					// Update the action with the request and input
-					action.add_request(request, input);
+					return event.handle_async().then(async () => {
+						if (event.data.step === 'handled' && event.data.phase === 'send_request') {
+							app.actions.add(action);
 
-					const event = new Client_Action_Event(app, method, input, request);
+							const response = await app.api_client.send(event.data.request);
+							console.log(`[actions_api] response`, response);
 
-					// Handle request phase
-					event.handle(method, 'send_request', undefined, log);
+							event.transition_to_phase('receive_response');
+							event.data = {
+								...event.data,
+								response,
+								output: 'result' in response ? response.result : undefined,
+							};
 
-					// Avoiding `await` for compatibility with sync actions
-					return app.api_client.send(request).then((response) => {
-						console.log(`[actions_api] response`, response);
+							await event.parse().handle_async();
 
-						// Update the action with the response
-						action.add_response(response);
+							if ('error' in response) {
+								// TODO API for callers to access the current error?
+								console.error(`response error`, response);
+								return;
+							}
 
-						// Check if it's an error response
-						if ('error' in response) {
-							console.error(`response error`, response);
-							// TODO BLOCK @api should this throw or just log?
-							// throw new Error(`JSON-RPC error ${response.error.code}: ${response.error.message}`);
-							return;
+							if (event.data.phase === 'receive_response' && 'output' in event.data) {
+								return event.data.output; // TODO is this if guard correct? see elsewhere too
+							}
 						}
-
-						console.log(`response`, response);
-
-						const {result} = response;
-						event.handle(method, 'receive_response', response, log);
-
-						return result;
+						throw new Error('Failed to create request');
 					});
 				}
 
 				case 'remote_notification': {
-					const notification = create_jsonrpc_notification(method, input);
+					const event = action_event as Frontend_Remote_Notification_Action_Event;
+					event.parse();
 
-					action.add_notification(notification, input);
-
-					const event = new Client_Action_Event(app, method, input, notification);
-
-					return event.handle(method, 'send', undefined, log);
+					return event.handle_async().then(() => {
+						if (event.data.step === 'handled' && event.data.phase === 'send') {
+							app.actions.add(action);
+							return app.api_client.send(event.data.notification);
+						}
+						throw new Error('Failed to create notification');
+					});
 				}
 
 				case 'local_call': {
-					action.set_local_call_input(input);
+					const event = action_event as Frontend_Local_Call_Action_Event;
+					event.parse();
+					app.actions.add(action);
 
-					const event = new Client_Action_Event(app, method, input, null);
-					const returned = event.handle(method, 'execute', undefined, log);
-
-					action.set_local_call_output(returned);
-
-					return returned;
+					if (spec.async) {
+						return event.handle_async().then(() => {
+							if (event.data.step === 'handled' && 'output' in event.data) {
+								return event.data.output;
+							}
+						});
+					} else {
+						event.handle_sync();
+						if (event.data.step === 'handled' && 'output' in event.data) {
+							return event.data.output;
+						}
+					}
 				}
 
 				default:
@@ -98,7 +113,7 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 
 const to_logged_args = (method: string, params: unknown): Array<any> => {
 	const args = to_logged_method(method);
-	if (params !== undefined) args.push(params); // print null but not undefined}
+	if (params !== undefined) args.push(params);
 	return args;
 };
 

@@ -1,3 +1,5 @@
+// @slop
+
 import {z} from 'zod';
 
 import {Action_Method} from '$lib/action_metatypes.js';
@@ -22,7 +24,7 @@ export const Action_Spec_Base = z.object({
 });
 export type Action_Spec_Base = z.infer<typeof Action_Spec_Base>;
 
-/** Type for request_response actions (client requests, server responds). */
+/** Type for request_response actions (bidirectional request/response pattern). */
 export const Request_Response_Action_Spec = Action_Spec_Base.extend({
 	kind: z.literal('request_response').default('request_response'),
 	auth: Action_Auth,
@@ -30,24 +32,23 @@ export const Request_Response_Action_Spec = Action_Spec_Base.extend({
 });
 export type Request_Response_Action_Spec = z.infer<typeof Request_Response_Action_Spec>;
 
-/** Type for remote_notification actions (server sends without a request). */
+/** Type for remote_notification actions (unidirectional fire-and-forget messages). */
 export const Remote_Notification_Action_Spec = Action_Spec_Base.extend({
 	kind: z.literal('remote_notification').default('remote_notification'),
 	auth: z.null().default(null),
 	side_effects: z.literal(true).default(true),
 	output: z.instanceof(z.ZodVoid),
-	async: z.literal(false).default(false),
+	async: z.literal(true).default(true),
 });
 export type Remote_Notification_Action_Spec = z.infer<typeof Remote_Notification_Action_Spec>;
 
-/** Type for local_call actions (that never leave the client). */
+/** Type for local_call actions (in-process operations that never cross boundaries). */
 export const Local_Call_Action_Spec = Action_Spec_Base.extend({
 	kind: z.literal('local_call').default('local_call'),
 	auth: z.null().default(null),
 });
 export type Local_Call_Action_Spec = z.infer<typeof Local_Call_Action_Spec>;
 
-// Union of all action spec types
 export const Action_Spec = z.union([
 	Request_Response_Action_Spec,
 	Remote_Notification_Action_Spec,
@@ -73,7 +74,6 @@ export const is_action_spec = (value: unknown): value is Action_Spec => {
 export const collect_action_specs = (obj: Record<string, Action_Spec>): Array<Action_Spec> => {
 	const specs: Array<Action_Spec> = [];
 
-	// Filter module exports for action specs
 	for (const value of Object.values(obj)) {
 		if (is_action_spec(value)) {
 			specs.push(value);

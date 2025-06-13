@@ -17,8 +17,8 @@ import {
 import {create_jsonrpc_error_message, to_jsonrpc_message_id} from '$lib/jsonrpc_helpers.js';
 import {ZZZ_CACHE_DIRNAME} from '$lib/constants.js';
 import {to_zzz_cache_dir} from '$lib/diskfile_helpers.js';
-import type {Server_Action_Handlers} from '$lib/server/server_action_types.js';
-import {Server_Action_Event} from '$lib/server/server_action_event.js';
+import type {Backend_Action_Handlers} from '$lib/server/backend_action_types.js';
+import {Backend_Action_Event} from '$lib/server/backend_action_event.js';
 import type {Action_Phase} from '$lib/action_types.js';
 import {Action_Inputs, Action_Outputs} from '$lib/action_collections.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
@@ -69,7 +69,7 @@ export interface Zzz_Server_Options {
 	/**
 	 * Handler function for processing client messages.
 	 */
-	server_action_handlers: Server_Action_Handlers;
+	backend_action_handlers: Backend_Action_Handlers;
 	/**
 	 * Handler function for file system changes.
 	 */
@@ -95,7 +95,7 @@ export class Zzz_Server {
 	readonly config: Zzz_Config;
 
 	readonly #broadcast_jsonrpc_message: (message: Jsonrpc_Message) => void;
-	readonly #server_action_handlers: Server_Action_Handlers;
+	readonly #backend_action_handlers: Backend_Action_Handlers;
 	readonly #handle_filer_change: Filer_Change_Handler;
 
 	/**
@@ -129,7 +129,7 @@ export class Zzz_Server {
 		this.config = options.config;
 		this.action_registry = new Action_Registry(options.action_specs);
 		this.#broadcast_jsonrpc_message = options.broadcast_jsonrpc_message;
-		this.#server_action_handlers = options.server_action_handlers;
+		this.#backend_action_handlers = options.backend_action_handlers;
 		this.#handle_filer_change = options.handle_filer_change;
 
 		// Create the safe filesystem interface with the allowed directories
@@ -151,7 +151,7 @@ export class Zzz_Server {
 		method: Action_Method,
 		phase: Action_Phase,
 	): ((event: any) => any) | undefined {
-		const method_handlers = (this.#server_action_handlers as any)[method];
+		const method_handlers = (this.#backend_action_handlers as any)[method];
 		if (!method_handlers) return undefined;
 		return method_handlers[phase];
 	}
@@ -176,7 +176,7 @@ export class Zzz_Server {
 		this.#check_destroyed();
 
 		try {
-			const event = Server_Action_Event.from(this, message);
+			const event = Backend_Action_Event.from(this, message);
 			event.parse();
 			await event.handle();
 			return event.build_response();

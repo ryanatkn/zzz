@@ -1,23 +1,16 @@
+// @slop
+// action_types.ts
+
 import {z} from 'zod';
 
 import {Action_Method} from '$lib/action_metatypes.js';
 import {Cell_Json} from '$lib/cell_types.js';
-import {
-	Jsonrpc_Notification,
-	Jsonrpc_Params,
-	Jsonrpc_Request,
-	Jsonrpc_Response_Or_Error,
-	Jsonrpc_Result,
-} from '$lib/jsonrpc.js';
+import {Jsonrpc_Params, Jsonrpc_Result} from '$lib/jsonrpc.js';
 
 export const Action_Kind = z.enum(['request_response', 'remote_notification', 'local_call']);
 export type Action_Kind = z.infer<typeof Action_Kind>;
 
-export const Action_Initiator = z.union([
-	z.literal('client'),
-	z.literal('server'),
-	z.literal('both'),
-]);
+export const Action_Initiator = z.enum(['frontend', 'backend', 'both']);
 export type Action_Initiator = z.infer<typeof Action_Initiator>;
 
 // TODO temporary/stubbed, maybe this can be a config object
@@ -54,60 +47,9 @@ export type Action_Input = z.infer<typeof Action_Input>;
 export const Action_Output = z.union([Jsonrpc_Result, z.any(), z.undefined(), z.void()]);
 export type Action_Output = z.infer<typeof Action_Output>;
 
-/**
- * Gets the appropriate handler phases for a method based on its action spec.
- */
-export type Handler_Phases_For_Method<T_Method extends Action_Method> =
-	T_Method extends keyof typeof ACTION_KIND_PHASES
-		? (typeof ACTION_KIND_PHASES)[T_Method][number]
-		: never;
-
-/**
- * Action data for request/response actions that tracks both the request and optional response.
- */
-export const Action_Request_Response_Data = z.object({
-	kind: z.literal('request_response'),
-	input: Action_Input,
-	output: Action_Output.optional(),
-	request: Jsonrpc_Request,
-	response: Jsonrpc_Response_Or_Error.optional(),
-});
-export type Action_Request_Response_Data = z.infer<typeof Action_Request_Response_Data>;
-
-/**
- * Action data for remote notification actions.
- */
-export const Action_Remote_Notification_Data = z.object({
-	kind: z.literal('remote_notification'),
-	input: Action_Input,
-	output: z.void(), // Notifications have no output
-	notification: Jsonrpc_Notification,
-});
-export type Action_Remote_Notification_Data = z.infer<typeof Action_Remote_Notification_Data>;
-
-/**
- * Action data for local call actions.
- */
-export const Action_Local_Call_Data = z.object({
-	kind: z.literal('local_call'),
-	input: Action_Input,
-	output: Action_Output.optional(),
-});
-export type Action_Local_Call_Data = z.infer<typeof Action_Local_Call_Data>;
-
-/**
- * Discriminated union for all action data types.
- */
-export const Action_Data = z.discriminatedUnion('kind', [
-	Action_Request_Response_Data,
-	Action_Remote_Notification_Data,
-	Action_Local_Call_Data,
-]);
-export type Action_Data = z.infer<typeof Action_Data>;
-
 export const Action_Json = Cell_Json.extend({
 	method: Action_Method,
-	data: Action_Data.optional(), // Optional because it's set after construction
+	action_event: z.any().optional(), // TODO BLOCK type Frontend_Action_Event
 });
 export type Action_Json = z.infer<typeof Action_Json>;
 export type Action_Json_Input = z.input<typeof Action_Json>;

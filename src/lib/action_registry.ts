@@ -38,21 +38,20 @@ export class Action_Registry {
 		return this.specs.filter((spec) => spec.kind === 'local_call');
 	}
 
-	// TODO @api piece this apart? maybe sender/receiver so you can express server->server calls?
-	get server_specs(): Array<Action_Spec> {
+	get backend_specs(): Array<Action_Spec> {
 		return this.specs.filter((spec) => spec.kind !== 'local_call');
 	}
 
-	get client_specs(): Array<Action_Spec> {
+	get frontend_specs(): Array<Action_Spec> {
 		return this.specs;
 	}
 
-	get server_to_client_specs(): Array<Action_Spec> {
-		return this.specs.filter((spec) => spec.initiator === 'server' || spec.initiator === 'both');
+	get backend_to_frontend_specs(): Array<Action_Spec> {
+		return this.specs.filter((spec) => spec.initiator === 'backend' || spec.initiator === 'both');
 	}
 
-	get client_to_server_specs(): Array<Action_Spec> {
-		return this.specs.filter((spec) => spec.initiator === 'client' || spec.initiator === 'both');
+	get frontend_to_backend_specs(): Array<Action_Spec> {
+		return this.specs.filter((spec) => spec.initiator === 'frontend' || spec.initiator === 'both');
 	}
 
 	get methods(): Array<Action_Method> {
@@ -84,20 +83,20 @@ export class Action_Registry {
 			.filter((method) => !networked_methods.includes(method));
 	}
 
-	get server_methods(): Array<Action_Method> {
-		return this.server_specs.map((spec) => spec.method);
+	get backend_methods(): Array<Action_Method> {
+		return this.backend_specs.map((spec) => spec.method);
 	}
 
-	get client_methods(): Array<Action_Method> {
-		return this.client_specs.map((spec) => spec.method);
+	get frontend_methods(): Array<Action_Method> {
+		return this.frontend_specs.map((spec) => spec.method);
 	}
 
-	get client_to_server_methods(): Array<Action_Method> {
-		return this.client_to_server_specs.map((spec) => spec.method);
+	get frontend_to_backend_methods(): Array<Action_Method> {
+		return this.frontend_to_backend_specs.map((spec) => spec.method);
 	}
 
-	get server_to_client_methods(): Array<Action_Method> {
-		return this.server_to_client_specs.map((spec) => spec.method);
+	get backend_to_frontend_methods(): Array<Action_Method> {
+		return this.backend_to_frontend_specs.map((spec) => spec.method);
 	}
 
 	get_schema_imports(): Array<string> {

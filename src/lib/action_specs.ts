@@ -1,3 +1,5 @@
+// @slop
+
 import {z} from 'zod';
 
 import {
@@ -10,22 +12,8 @@ import {Completion_Request, Completion_Response} from '$lib/completion_types.js'
 import type {Action_Spec} from '$lib/action_spec.js';
 import {Jsonrpc_Request_Id} from '$lib/jsonrpc.js';
 
-// Action specs are the source of truth for many things including generated code -
-// the goal is to make the system extensible for users but it's not there yet.
-
 // TODO I tried using the helper `create_action_spec` but I don't see how to get proper typing,
-// we want the declared specs to have their literal types but not need to include optional properties -
-// the current implementation below requires all properties to be declared, but does have correct typing:
-//
-// export const create_action_spec = <T extends z.input<U>, U extends typeof Action_Spec>(
-// 	spec: T,
-// ): z.infer<U> => {
-// 	const parsed = Action_Spec.safeParse(spec);
-// 	if (!parsed.success) {
-// 		throw new Error('Invalid action spec: ' + stringify_zod_error(parsed.error));
-// 	}
-// 	return parsed.data;
-// };
+// we want the declared specs to have their literal types but not need to include optional properties
 
 export const ping_action_spec = {
 	method: 'ping',
@@ -47,7 +35,7 @@ export const load_session_action_spec = {
 	kind: 'request_response',
 	// TODO @api is this actually a good restriction to have?
 	// or should the server be calling actions internally too?
-	initiator: 'client',
+	initiator: 'frontend',
 	auth: 'public',
 	side_effects: null,
 	input: z.void().optional(),
@@ -69,7 +57,7 @@ export const load_session_action_spec = {
 export const filer_change_action_spec = {
 	method: 'filer_change',
 	kind: 'remote_notification',
-	initiator: 'server',
+	initiator: 'backend',
 	auth: null,
 	side_effects: true,
 	input: z
@@ -79,13 +67,13 @@ export const filer_change_action_spec = {
 		})
 		.strict(),
 	output: z.void(),
-	async: false,
+	async: true,
 } satisfies Action_Spec;
 
 export const update_diskfile_action_spec = {
 	method: 'update_diskfile',
 	kind: 'request_response',
-	initiator: 'client',
+	initiator: 'frontend',
 	auth: 'public',
 	side_effects: true,
 	input: z
@@ -101,7 +89,7 @@ export const update_diskfile_action_spec = {
 export const delete_diskfile_action_spec = {
 	method: 'delete_diskfile',
 	kind: 'request_response',
-	initiator: 'client',
+	initiator: 'frontend',
 	auth: 'public',
 	side_effects: true,
 	input: z
@@ -116,7 +104,7 @@ export const delete_diskfile_action_spec = {
 export const create_directory_action_spec = {
 	method: 'create_directory',
 	kind: 'request_response',
-	initiator: 'client',
+	initiator: 'frontend',
 	auth: 'public',
 	side_effects: true,
 	input: z
@@ -131,7 +119,7 @@ export const create_directory_action_spec = {
 export const submit_completion_action_spec = {
 	method: 'submit_completion',
 	kind: 'request_response',
-	initiator: 'client',
+	initiator: 'frontend',
 	auth: 'public',
 	side_effects: true,
 	input: z
@@ -150,7 +138,7 @@ export const submit_completion_action_spec = {
 export const toggle_main_menu_action_spec = {
 	method: 'toggle_main_menu',
 	kind: 'local_call',
-	initiator: 'client',
+	initiator: 'frontend',
 	auth: null,
 	side_effects: true,
 	input: z.boolean().optional(),

@@ -24,7 +24,7 @@ import {
 import {to_completion_result} from '$lib/response_helpers.js';
 import type {Filer_Change_Handler} from '$lib/server/zzz_server.js';
 import {Safe_Fs} from '$lib/server/safe_fs.js';
-import type {Server_Action_Handlers} from '$lib/server/server_action_types.js';
+import type {Backend_Action_Handlers} from '$lib/server/backend_action_types.js';
 import {create_jsonrpc_notification} from '$lib/jsonrpc_helpers.js';
 import {filer_change_action_spec} from '$lib/action_specs.js';
 import type {Action_Inputs, Action_Outputs} from '$lib/action_collections.js';
@@ -41,7 +41,7 @@ const google = new GoogleGenerativeAI(SECRET_GOOGLE_API_KEY);
  * Each returns a value or throws a `Jsonrpc_Error`.
  * Organized by method and phase for symmetric handling.
  */
-export const server_action_handlers: Server_Action_Handlers = {
+export const backend_action_handlers: Backend_Action_Handlers = {
 	ping: {
 		receive_request: ({data: {request}}) => {
 			console.log(`ping receive_request message`, request);

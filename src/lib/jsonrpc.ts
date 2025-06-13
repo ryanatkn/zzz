@@ -168,28 +168,31 @@ export const Jsonrpc_Error_Code = z.union([
 ]);
 export type Jsonrpc_Error_Code = z.infer<typeof Jsonrpc_Error_Code>;
 
+// TODO maybe rename to `Jsonrpc_Error_Json`
+export const Jsonrpc_Error_Data = z.object({
+	/**
+	 * The error type that occurred.
+	 */
+	code: Jsonrpc_Error_Code,
+	/**
+	 * A short description of the error. The message SHOULD be limited to a concise single sentence.
+	 */
+	message: z.string(),
+	/**
+	 * Additional information about the error. The value of this member
+	 * is defined by the sender (e.g. detailed error information, nested errors etc.).
+	 */
+	data: z.unknown().optional(),
+});
+export type Jsonrpc_Error_Data = z.infer<typeof Jsonrpc_Error_Data>;
+
 /**
  * A response to a request that indicates an error occurred.
  */
 export const Jsonrpc_Error_Message = z.object({
 	jsonrpc: z.literal(JSONRPC_VERSION),
 	id: Jsonrpc_Request_Id,
-	// TODO BLOCK @api maybe `Jsonrpc_Error_Data` or `Jsonrpc_Error_Message_Data`? see `to_jsonrpc_error` and `Jsonrpc_Error_Message['error']`
-	error: z.object({
-		/**
-		 * The error type that occurred.
-		 */
-		code: Jsonrpc_Error_Code,
-		/**
-		 * A short description of the error. The message SHOULD be limited to a concise single sentence.
-		 */
-		message: z.string(),
-		/**
-		 * Additional information about the error. The value of this member
-		 * is defined by the sender (e.g. detailed error information, nested errors etc.).
-		 */
-		data: z.unknown().optional(),
-	}),
+	error: Jsonrpc_Error_Data,
 });
 export type Jsonrpc_Error_Message = z.infer<typeof Jsonrpc_Error_Message>;
 

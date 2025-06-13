@@ -282,25 +282,25 @@ export const package_json = {
 			svelte: './dist/Clear_Restore_Button.svelte',
 			default: './dist/Clear_Restore_Button.svelte',
 		},
-		'./client_action_event.js': {
-			types: './dist/client_action_event.d.ts',
-			default: './dist/client_action_event.js',
+		'./frontend_action_event.js': {
+			types: './dist/frontend_action_event.d.ts',
+			default: './dist/frontend_action_event.js',
 		},
-		'./client_action_handler.js': {
-			types: './dist/client_action_handler.d.ts',
-			default: './dist/client_action_handler.js',
+		'./frontend_action_handler.js': {
+			types: './dist/frontend_action_handler.d.ts',
+			default: './dist/frontend_action_handler.js',
 		},
-		'./client_action_handlers.js': {
-			types: './dist/client_action_handlers.d.ts',
-			default: './dist/client_action_handlers.js',
+		'./frontend_action_handlers.js': {
+			types: './dist/frontend_action_handlers.d.ts',
+			default: './dist/frontend_action_handlers.js',
 		},
-		'./client_action_types.gen.js': {
-			types: './dist/client_action_types.gen.d.ts',
-			default: './dist/client_action_types.gen.js',
+		'./frontend_action_types.gen.js': {
+			types: './dist/frontend_action_types.gen.d.ts',
+			default: './dist/frontend_action_types.gen.js',
 		},
-		'./client_action_types.js': {
-			types: './dist/client_action_types.d.ts',
-			default: './dist/client_action_types.js',
+		'./frontend_action_types.js': {
+			types: './dist/frontend_action_types.d.ts',
+			default: './dist/frontend_action_types.js',
 		},
 		'./completion_types.js': {
 			types: './dist/completion_types.d.ts',
@@ -774,25 +774,25 @@ export const package_json = {
 			types: './dist/server/security.d.ts',
 			default: './dist/server/security.js',
 		},
-		'./server/server_action_event.js': {
-			types: './dist/server/server_action_event.d.ts',
-			default: './dist/server/server_action_event.js',
+		'./server/backend_action_event.js': {
+			types: './dist/server/backend_action_event.d.ts',
+			default: './dist/server/backend_action_event.js',
 		},
-		'./server/server_action_handler.js': {
-			types: './dist/server/server_action_handler.d.ts',
-			default: './dist/server/server_action_handler.js',
+		'./server/backend_action_handler.js': {
+			types: './dist/server/backend_action_handler.d.ts',
+			default: './dist/server/backend_action_handler.js',
 		},
-		'./server/server_action_handlers.js': {
-			types: './dist/server/server_action_handlers.d.ts',
-			default: './dist/server/server_action_handlers.js',
+		'./server/backend_action_handlers.js': {
+			types: './dist/server/backend_action_handlers.d.ts',
+			default: './dist/server/backend_action_handlers.js',
 		},
-		'./server/server_action_types.gen.js': {
-			types: './dist/server/server_action_types.gen.d.ts',
-			default: './dist/server/server_action_types.gen.js',
+		'./server/backend_action_types.gen.js': {
+			types: './dist/server/backend_action_types.gen.d.ts',
+			default: './dist/server/backend_action_types.gen.js',
 		},
-		'./server/server_action_types.js': {
-			types: './dist/server/server_action_types.d.ts',
-			default: './dist/server/server_action_types.js',
+		'./server/backend_action_types.js': {
+			types: './dist/server/backend_action_types.d.ts',
+			default: './dist/server/backend_action_types.js',
 		},
 		'./server/server_helpers.js': {
 			types: './dist/server/server_helpers.d.ts',
@@ -959,8 +959,8 @@ export const src_json = {
 				{name: 'Request_Response_Action_Method', kind: 'variable'},
 				{name: 'Remote_Notification_Action_Method', kind: 'variable'},
 				{name: 'Local_Call_Action_Method', kind: 'variable'},
-				{name: 'Client_Action_Method', kind: 'variable'},
-				{name: 'Server_Action_Method', kind: 'variable'},
+				{name: 'Frontend_Action_Method', kind: 'variable'},
+				{name: 'Backend_Action_Method', kind: 'variable'},
 				{name: 'Actions_Api', kind: 'type'},
 			],
 		},
@@ -1301,28 +1301,28 @@ export const src_json = {
 			path: 'Clear_Restore_Button.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
 		},
-		'./client_action_event.js': {
-			path: 'client_action_event.ts',
+		'./frontend_action_event.js': {
+			path: 'frontend_action_event.ts',
 			declarations: [
-				{name: 'After_Client_Action_Callback', kind: 'type'},
-				{name: 'Client_Action_Event', kind: 'class'},
+				{name: 'After_Frontend_Action_Callback', kind: 'type'},
+				{name: 'Frontend_Action_Event', kind: 'class'},
 			],
 		},
-		'./client_action_handler.js': {
-			path: 'client_action_handler.ts',
-			declarations: [{name: 'Client_Action_Handler', kind: 'type'}],
+		'./frontend_action_handler.js': {
+			path: 'frontend_action_handler.ts',
+			declarations: [{name: 'Frontend_Action_Handler', kind: 'type'}],
 		},
-		'./client_action_handlers.js': {
-			path: 'client_action_handlers.ts',
-			declarations: [{name: 'client_action_handlers', kind: 'variable'}],
+		'./frontend_action_handlers.js': {
+			path: 'frontend_action_handlers.ts',
+			declarations: [{name: 'frontend_action_handlers', kind: 'variable'}],
 		},
-		'./client_action_types.gen.js': {
-			path: 'client_action_types.gen.ts',
+		'./frontend_action_types.gen.js': {
+			path: 'frontend_action_types.gen.ts',
 			declarations: [{name: 'gen', kind: 'function'}],
 		},
-		'./client_action_types.js': {
-			path: 'client_action_types.ts',
-			declarations: [{name: 'Client_Action_Handlers', kind: 'type'}],
+		'./frontend_action_types.js': {
+			path: 'frontend_action_types.ts',
+			declarations: [{name: 'Frontend_Action_Handlers', kind: 'type'}],
 		},
 		'./completion_types.js': {
 			path: 'completion_types.ts',
@@ -2125,50 +2125,50 @@ export const src_json = {
 				{name: 'should_allow_origin', kind: 'function'},
 			],
 		},
-		'./server/server_action_event.js': {
-			path: 'server/server_action_event.ts',
+		'./server/backend_action_event.js': {
+			path: 'server/backend_action_event.ts',
 			declarations: [
 				{name: 'Server_Event_Step', kind: 'type'},
 				{name: 'Server_Event_Data_Base', kind: 'type'},
-				{name: 'Server_Action_Event', kind: 'class'},
-				{name: 'Server_Request_Event_Data', kind: 'type'},
-				{name: 'Server_Request_Event', kind: 'class'},
-				{name: 'Server_Notification_Event_Data', kind: 'type'},
-				{name: 'Server_Notification_Event', kind: 'class'},
+				{name: 'Backend_Action_Event', kind: 'class'},
+				{name: 'Backend_Request_Event_Data', kind: 'type'},
+				{name: 'Backend_Request_Event', kind: 'class'},
+				{name: 'Backend_Notification_Event_Data', kind: 'type'},
+				{name: 'Backend_Notification_Event', kind: 'class'},
 				{name: 'Server_Batch_Event_Data', kind: 'type'},
 				{name: 'Server_Batch_Event', kind: 'class'},
 				{name: 'Server_Invalid_Event_Data', kind: 'type'},
 				{name: 'Server_Invalid_Event', kind: 'class'},
 			],
 		},
-		'./server/server_action_handler.js': {
-			path: 'server/server_action_handler.ts',
+		'./server/backend_action_handler.js': {
+			path: 'server/backend_action_handler.ts',
 			declarations: [
-				{name: 'Server_Request_Event_Handling', kind: 'type'},
-				{name: 'Server_Notification_Event_Handling', kind: 'type'},
-				{name: 'Public_Server_Request_Handler', kind: 'type'},
-				{name: 'Authorized_Server_Request_Handler', kind: 'type'},
-				{name: 'Public_Server_Notification_Handler', kind: 'type'},
-				{name: 'Authorized_Server_Notification_Handler', kind: 'type'},
-				{name: 'Server_Request_Handler', kind: 'type'},
-				{name: 'Server_Notification_Handler', kind: 'type'},
-				{name: 'Server_Action_Handler', kind: 'type'},
+				{name: 'Backend_Request_Event_Handling', kind: 'type'},
+				{name: 'Backend_Notification_Event_Handling', kind: 'type'},
+				{name: 'Public_Backend_Request_Handler', kind: 'type'},
+				{name: 'Authorized_Backend_Request_Handler', kind: 'type'},
+				{name: 'Public_Backend_Notification_Handler', kind: 'type'},
+				{name: 'Authorized_Backend_Notification_Handler', kind: 'type'},
+				{name: 'Backend_Request_Handler', kind: 'type'},
+				{name: 'Backend_Notification_Handler', kind: 'type'},
+				{name: 'Backend_Action_Handler', kind: 'type'},
 			],
 		},
-		'./server/server_action_handlers.js': {
-			path: 'server/server_action_handlers.ts',
+		'./server/backend_action_handlers.js': {
+			path: 'server/backend_action_handlers.ts',
 			declarations: [
-				{name: 'server_action_handlers', kind: 'variable'},
+				{name: 'backend_action_handlers', kind: 'variable'},
 				{name: 'handle_filer_change', kind: 'function'},
 			],
 		},
-		'./server/server_action_types.gen.js': {
-			path: 'server/server_action_types.gen.ts',
+		'./server/backend_action_types.gen.js': {
+			path: 'server/backend_action_types.gen.ts',
 			declarations: [{name: 'gen', kind: 'function'}],
 		},
-		'./server/server_action_types.js': {
-			path: 'server/server_action_types.ts',
-			declarations: [{name: 'Server_Action_Handlers', kind: 'type'}],
+		'./server/backend_action_types.js': {
+			path: 'server/backend_action_types.ts',
+			declarations: [{name: 'Backend_Action_Handlers', kind: 'type'}],
 		},
 		'./server/server_helpers.js': {
 			path: 'server/server_helpers.ts',

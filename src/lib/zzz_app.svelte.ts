@@ -35,7 +35,7 @@ import {Action_Registry} from '$lib/action_registry.js';
 import {Api_Client, type Api_Client_Options} from '$lib/api_client.js';
 import type {Completion_Message} from '$lib/completion_types.js';
 import type {Action_Method, Actions_Api} from '$lib/action_metatypes.js';
-import type {Client_Action_Handlers} from '$lib/client_action_types.js';
+import type {Frontend_Action_Handlers} from '$lib/frontend_action_types.js';
 import type {Action_Spec} from '$lib/action_spec.js';
 import {Action_Inputs, Action_Outputs, action_specs} from '$lib/action_collections.js';
 import {create_actions_api} from '$lib/actions_api.js';
@@ -59,7 +59,7 @@ export interface Zzz_App_Options extends Omit_Strict<Cell_Options<typeof Zzz_App
 	providers?: Array<Provider_Json>;
 	cell_classes?: Record<string, Class_Constructor<Cell>>;
 	action_specs?: Array<Action_Spec>;
-	action_handlers?: Client_Action_Handlers;
+	action_handlers?: Frontend_Action_Handlers;
 
 	/** URL for server communication */
 	http_rpc_url?: string | null;
@@ -82,7 +82,7 @@ export class Zzz_App extends Cell<typeof Zzz_App_Json> {
 	readonly cell_registry: Cell_Registry;
 
 	readonly action_registry: Action_Registry;
-	readonly action_handlers: Client_Action_Handlers;
+	readonly action_handlers: Frontend_Action_Handlers;
 	readonly api: Actions_Api;
 	readonly api_client: Api_Client;
 

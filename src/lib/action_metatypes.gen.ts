@@ -55,18 +55,18 @@ export const gen: Gen = ({origin_path}) => {
 		/**
 		 * Names of all actions that may be handled on the client.
 		 */
-		export const Client_Action_Method = z.enum([${registry.client_methods
+		export const Frontend_Action_Method = z.enum([${registry.frontend_methods
 			.map((method) => `'${method}'`)
 			.join(',\n\t')}]);
-		export type Client_Action_Method = z.infer<typeof Client_Action_Method>;
+		export type Frontend_Action_Method = z.infer<typeof Frontend_Action_Method>;
 
 		/**
 		 * Names of all actions that may be handled on the server.
 		 */
-		export const Server_Action_Method = z.enum([${registry.server_methods
+		export const Backend_Action_Method = z.enum([${registry.backend_methods
 			.map((method) => `'${method}'`)
 			.join(',\n\t')}]);
-		export type Server_Action_Method = z.infer<typeof Server_Action_Method>;
+		export type Backend_Action_Method = z.infer<typeof Backend_Action_Method>;
 
 		/**
 		 * Interface for action dispatch functions.

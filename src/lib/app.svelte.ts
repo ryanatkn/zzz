@@ -2,7 +2,7 @@ import {create_context} from '@ryanatkn/fuz/context_helpers.js';
 
 import {Zzz_App, zzz_context, type Zzz_App_Options} from '$lib/zzz_app.svelte.js';
 import {cell_classes} from '$lib/cell_classes.js';
-import {client_action_handlers} from '$lib/client_action_handlers.js';
+import {frontend_action_handlers} from '$lib/frontend_action_handlers.js';
 import {WEBSOCKET_URL, API_URL_FOR_HTTP_RPC} from '$lib/constants.js';
 
 // TODO use this instead of `zzz_context` in non-core usages for type safety
@@ -21,7 +21,7 @@ export class App extends Zzz_App {
 		if (!o.http_rpc_url) o.http_rpc_url = API_URL_FOR_HTTP_RPC;
 		if (!o.socket_url) o.socket_url = WEBSOCKET_URL;
 		if (!o.cell_classes) o.cell_classes = cell_classes;
-		if (!o.action_handlers) o.action_handlers = client_action_handlers;
+		if (!o.action_handlers) o.action_handlers = frontend_action_handlers;
 		super(o);
 	}
 }

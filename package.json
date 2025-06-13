@@ -350,25 +350,25 @@
       "svelte": "./dist/Clear_Restore_Button.svelte",
       "default": "./dist/Clear_Restore_Button.svelte"
     },
-    "./client_action_event.js": {
-      "types": "./dist/client_action_event.d.ts",
-      "default": "./dist/client_action_event.js"
+    "./frontend_action_event.js": {
+      "types": "./dist/frontend_action_event.d.ts",
+      "default": "./dist/frontend_action_event.js"
     },
-    "./client_action_handler.js": {
-      "types": "./dist/client_action_handler.d.ts",
-      "default": "./dist/client_action_handler.js"
+    "./frontend_action_handler.js": {
+      "types": "./dist/frontend_action_handler.d.ts",
+      "default": "./dist/frontend_action_handler.js"
     },
-    "./client_action_handlers.js": {
-      "types": "./dist/client_action_handlers.d.ts",
-      "default": "./dist/client_action_handlers.js"
+    "./frontend_action_handlers.js": {
+      "types": "./dist/frontend_action_handlers.d.ts",
+      "default": "./dist/frontend_action_handlers.js"
     },
-    "./client_action_types.gen.js": {
-      "types": "./dist/client_action_types.gen.d.ts",
-      "default": "./dist/client_action_types.gen.js"
+    "./frontend_action_types.gen.js": {
+      "types": "./dist/frontend_action_types.gen.d.ts",
+      "default": "./dist/frontend_action_types.gen.js"
     },
-    "./client_action_types.js": {
-      "types": "./dist/client_action_types.d.ts",
-      "default": "./dist/client_action_types.js"
+    "./frontend_action_types.js": {
+      "types": "./dist/frontend_action_types.d.ts",
+      "default": "./dist/frontend_action_types.js"
     },
     "./completion_types.js": {
       "types": "./dist/completion_types.d.ts",
@@ -891,25 +891,25 @@
       "types": "./dist/server/security.d.ts",
       "default": "./dist/server/security.js"
     },
-    "./server/server_action_event.js": {
-      "types": "./dist/server/server_action_event.d.ts",
-      "default": "./dist/server/server_action_event.js"
+    "./server/backend_action_event.js": {
+      "types": "./dist/server/backend_action_event.d.ts",
+      "default": "./dist/server/backend_action_event.js"
     },
-    "./server/server_action_handler.js": {
-      "types": "./dist/server/server_action_handler.d.ts",
-      "default": "./dist/server/server_action_handler.js"
+    "./server/backend_action_handler.js": {
+      "types": "./dist/server/backend_action_handler.d.ts",
+      "default": "./dist/server/backend_action_handler.js"
     },
-    "./server/server_action_handlers.js": {
-      "types": "./dist/server/server_action_handlers.d.ts",
-      "default": "./dist/server/server_action_handlers.js"
+    "./server/backend_action_handlers.js": {
+      "types": "./dist/server/backend_action_handlers.d.ts",
+      "default": "./dist/server/backend_action_handlers.js"
     },
-    "./server/server_action_types.gen.js": {
-      "types": "./dist/server/server_action_types.gen.d.ts",
-      "default": "./dist/server/server_action_types.gen.js"
+    "./server/backend_action_types.gen.js": {
+      "types": "./dist/server/backend_action_types.gen.d.ts",
+      "default": "./dist/server/backend_action_types.gen.js"
     },
-    "./server/server_action_types.js": {
-      "types": "./dist/server/server_action_types.d.ts",
-      "default": "./dist/server/server_action_types.js"
+    "./server/backend_action_types.js": {
+      "types": "./dist/server/backend_action_types.d.ts",
+      "default": "./dist/server/backend_action_types.js"
     },
     "./server/server_helpers.js": {
       "types": "./dist/server/server_helpers.d.ts",

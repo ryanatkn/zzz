@@ -1,11 +1,11 @@
-import type {Client_Action_Handlers} from '$lib/client_action_types.js';
+import type {Frontend_Action_Handlers} from '$lib/frontend_action_types.js';
 
 // TODO we may also want method-based or middleware-like APIs
 
 /**
  * These map to message types, not action methods.
  */
-export const client_action_handlers: Client_Action_Handlers = {
+export const frontend_action_handlers: Frontend_Action_Handlers = {
 	ping: {
 		send_request: ({app, request_message: message}) => {
 			console.log('Ping request sent');
@@ -75,9 +75,10 @@ export const client_action_handlers: Client_Action_Handlers = {
 	},
 
 	toggle_main_menu: {
-		execute: ({app, input}) => {
+		execute: ({environment, input}) => {
 			console.log('Toggling main menu', input);
-			return app.ui.toggle_main_menu(input);
+			// TODO BLOCK @api was `app` for the client, `environment` is weird?
+			return environment.ui.toggle_main_menu(input);
 		},
 	},
 };

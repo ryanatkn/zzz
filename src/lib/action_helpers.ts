@@ -23,4 +23,4 @@ export const to_action_spec_output_identifier = (method: Action_Method): string 
 	`${to_action_spec_identifier(method)}.output`;
 
 export const to_action_spec_auth_identifier = (auth: Action_Auth): string =>
-	auth === 'public' ? 'Public_Server_Action_Handler' : 'Authorized_Server_Action_Handler';
+	auth === 'public' ? 'Public_Backend_Action_Handler' : 'Authorized_Backend_Action_Handler';

@@ -47,7 +47,7 @@ export type Local_Call_Action_Method = z.infer<typeof Local_Call_Action_Method>;
 /**
  * Names of all actions that may be handled on the client.
  */
-export const Client_Action_Method = z.enum([
+export const Frontend_Action_Method = z.enum([
 	'create_directory',
 	'delete_diskfile',
 	'filer_change',
@@ -57,12 +57,12 @@ export const Client_Action_Method = z.enum([
 	'toggle_main_menu',
 	'update_diskfile',
 ]);
-export type Client_Action_Method = z.infer<typeof Client_Action_Method>;
+export type Frontend_Action_Method = z.infer<typeof Frontend_Action_Method>;
 
 /**
  * Names of all actions that may be handled on the server.
  */
-export const Server_Action_Method = z.enum([
+export const Backend_Action_Method = z.enum([
 	'create_directory',
 	'delete_diskfile',
 	'filer_change',
@@ -71,7 +71,7 @@ export const Server_Action_Method = z.enum([
 	'submit_completion',
 	'update_diskfile',
 ]);
-export type Server_Action_Method = z.infer<typeof Server_Action_Method>;
+export type Backend_Action_Method = z.infer<typeof Backend_Action_Method>;
 
 /**
  * Interface for action dispatch functions.

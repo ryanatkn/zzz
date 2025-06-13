@@ -6,7 +6,7 @@ import {Logger} from '@ryanatkn/belt/log.js';
 import type {WSContext} from 'hono/ws';
 
 import {Zzz_Server} from '$lib/server/zzz_server.js';
-import {server_action_handlers, handle_filer_change} from '$lib/server/server_action_handlers.js';
+import {backend_action_handlers, handle_filer_change} from '$lib/server/backend_action_handlers.js';
 import {register_http_actions} from '$lib/server/register_http_actions.js';
 import {register_websocket_actions} from '$lib/server/register_websocket_actions.js';
 import create_config from '$lib/config.js';
@@ -46,7 +46,7 @@ const init_server = (): void => {
 				ws.send(JSON.stringify(message));
 			}
 		},
-		server_action_handlers,
+		backend_action_handlers,
 		handle_filer_change,
 	});
 

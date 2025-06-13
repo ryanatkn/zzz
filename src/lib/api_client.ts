@@ -1,3 +1,6 @@
+// @slop
+// api_client.ts
+
 import type {Deferred, Async_Status} from '@ryanatkn/belt/async.js';
 
 import type {Socket} from '$lib/socket.svelte.js';
@@ -37,6 +40,7 @@ export interface Request_Tracker<T> {
 /**
  * Client for communicating with the Zzz server.
  * Uses JSON-RPC for both HTTP and WebSocket communication.
+ * Works seamlessly with the action event system by handling the underlying transport.
  */
 export class Api_Client {
 	readonly transports = new Transports();
@@ -62,6 +66,7 @@ export class Api_Client {
 
 	/**
 	 * Send a message to the server and get a response.
+	 * This method is used by the action event system to send JSON-RPC messages.
 	 */
 	async send(
 		message: Jsonrpc_Request,
