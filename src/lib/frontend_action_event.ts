@@ -38,6 +38,8 @@ export class Frontend_Request_Response_Action_Event<
 	readonly executor = 'frontend' as const;
 	readonly valid_phases: ReadonlyArray<Action_Phase>;
 
+	readonly app: Zzz_App;
+
 	constructor(spec: Action_Spec, environment: Zzz_App, input: unknown) {
 		// Compute valid phases based on initiator
 		const phases: Array<Action_Phase> = [];
@@ -51,6 +53,7 @@ export class Frontend_Request_Response_Action_Event<
 		// Must set valid_phases before calling super
 		const valid_phases = phases as ReadonlyArray<Action_Phase>;
 		super(spec, environment, input);
+		this.app = environment;
 		this.valid_phases = valid_phases;
 	}
 
@@ -158,6 +161,8 @@ export class Frontend_Remote_Notification_Action_Event<
 	readonly executor = 'frontend' as const;
 	readonly valid_phases: ReadonlyArray<Action_Phase>;
 
+	readonly app: Zzz_App;
+
 	constructor(spec: Action_Spec, environment: Zzz_App, input: unknown) {
 		// Compute valid phases based on initiator
 		const phases: Array<Action_Phase> = [];
@@ -170,6 +175,7 @@ export class Frontend_Remote_Notification_Action_Event<
 
 		const valid_phases = phases as ReadonlyArray<Action_Phase>;
 		super(spec, environment, input);
+		this.app = environment;
 		this.valid_phases = valid_phases;
 	}
 
@@ -221,11 +227,14 @@ export class Frontend_Local_Call_Action_Event<
 	readonly executor = 'frontend' as const;
 	readonly valid_phases: ReadonlyArray<Action_Phase>;
 
+	readonly app: Zzz_App;
+
 	constructor(spec: Action_Spec, environment: Zzz_App, input: unknown) {
 		const phases =
 			spec.initiator === 'frontend' || spec.initiator === 'both' ? ['execute' as const] : [];
 		const valid_phases = phases as ReadonlyArray<Action_Phase>;
 		super(spec, environment, input);
+		this.app = environment;
 		this.valid_phases = valid_phases;
 	}
 

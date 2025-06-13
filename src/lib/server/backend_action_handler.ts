@@ -1,18 +1,13 @@
-import type {Zzz_Server} from '$lib/server/zzz_server.js';
+// @slop
+// server/backend_action_handler.ts
+
 import type {Action_Input, Action_Output, Action_Phase} from '$lib/action_types.js';
 import type {
 	Backend_Request_Response_Action_Event,
 	Backend_Remote_Notification_Action_Event,
 	Backend_Local_Call_Action_Event,
+	Backend_Action_Event,
 } from '$lib/server/backend_action_event.js';
-
-/**
- * Union type for all backend action event types.
- */
-export type Backend_Action_Event =
-	| Backend_Request_Response_Action_Event
-	| Backend_Remote_Notification_Action_Event
-	| Backend_Local_Call_Action_Event;
 
 /**
  * Backend action handler type that receives an action event.

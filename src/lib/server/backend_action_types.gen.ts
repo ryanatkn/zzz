@@ -1,3 +1,6 @@
+// @slop
+// server/backend_action_types.gen.ts
+
 import type {Gen} from '@ryanatkn/gro/gen.js';
 
 import {action_specs} from '$lib/action_collections.js';

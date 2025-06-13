@@ -1,5 +1,5 @@
 // @slop
-// backend_action_event.ts
+// server/backend_action_event.ts
 
 import type {Zzz_Server} from '$lib/server/zzz_server.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
@@ -38,6 +38,8 @@ export class Backend_Request_Response_Action_Event<
 	readonly executor = 'backend' as const;
 	readonly valid_phases: ReadonlyArray<Action_Phase>;
 
+	readonly server: Zzz_Server;
+
 	constructor(spec: Action_Spec, environment: Zzz_Server, input: unknown) {
 		// Compute valid phases based on initiator
 		const phases: Array<Action_Phase> = [];
@@ -50,6 +52,7 @@ export class Backend_Request_Response_Action_Event<
 
 		const valid_phases = phases as ReadonlyArray<Action_Phase>;
 		super(spec, environment, input);
+		this.server = environment;
 		this.valid_phases = valid_phases;
 	}
 
@@ -157,6 +160,8 @@ export class Backend_Remote_Notification_Action_Event<
 	readonly executor = 'backend' as const;
 	readonly valid_phases: ReadonlyArray<Action_Phase>;
 
+	readonly server: Zzz_Server;
+
 	constructor(spec: Action_Spec, environment: Zzz_Server, input: unknown) {
 		// Compute valid phases based on initiator
 		const phases: Array<Action_Phase> = [];
@@ -169,6 +174,7 @@ export class Backend_Remote_Notification_Action_Event<
 
 		const valid_phases = phases as ReadonlyArray<Action_Phase>;
 		super(spec, environment, input);
+		this.server = environment;
 		this.valid_phases = valid_phases;
 	}
 
@@ -220,11 +226,14 @@ export class Backend_Local_Call_Action_Event<
 	readonly executor = 'backend' as const;
 	readonly valid_phases: ReadonlyArray<Action_Phase>;
 
+	readonly server: Zzz_Server;
+
 	constructor(spec: Action_Spec, environment: Zzz_Server, input: unknown) {
 		const phases =
 			spec.initiator === 'backend' || spec.initiator === 'both' ? ['execute' as const] : [];
 		const valid_phases = phases as ReadonlyArray<Action_Phase>;
 		super(spec, environment, input);
+		this.server = environment;
 		this.valid_phases = valid_phases;
 	}
 

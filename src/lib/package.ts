@@ -1310,7 +1310,6 @@ export const src_json = {
 		'./frontend_action_handler.js': {
 			path: 'frontend_action_handler.ts',
 			declarations: [
-				{name: 'Frontend_Action_Event', kind: 'type'},
 				{name: 'Frontend_Action_Handler', kind: 'type'},
 				{name: 'Frontend_Request_Response_Handler', kind: 'type'},
 				{name: 'Frontend_Notification_Handler', kind: 'type'},
@@ -2145,7 +2144,6 @@ export const src_json = {
 		'./server/backend_action_handler.js': {
 			path: 'server/backend_action_handler.ts',
 			declarations: [
-				{name: 'Backend_Action_Event', kind: 'type'},
 				{name: 'Backend_Action_Handler', kind: 'type'},
 				{name: 'Backend_Request_Response_Handler', kind: 'type'},
 				{name: 'Backend_Notification_Handler', kind: 'type'},

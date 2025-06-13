@@ -1,18 +1,10 @@
-import type {Zzz_App} from '$lib/zzz_app.svelte.js';
 import type {Action_Input, Action_Output, Action_Phase} from '$lib/action_types.js';
 import type {
 	Frontend_Request_Response_Action_Event,
 	Frontend_Remote_Notification_Action_Event,
 	Frontend_Local_Call_Action_Event,
+	Frontend_Action_Event,
 } from '$lib/frontend_action_event.js';
-
-/**
- * Union type for all frontend action event types.
- */
-export type Frontend_Action_Event =
-	| Frontend_Request_Response_Action_Event
-	| Frontend_Remote_Notification_Action_Event
-	| Frontend_Local_Call_Action_Event;
 
 /**
  * Frontend action handler type that receives an action event.
