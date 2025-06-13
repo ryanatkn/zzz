@@ -52,9 +52,6 @@ export const Action_Event_Data = z.object({
 });
 export type Action_Event_Data = z.infer<typeof Action_Event_Data>;
 
-export const Action_Event_Json = Action_Event_Data;
-export type Action_Event_Json = z.infer<typeof Action_Event_Json>;
-
 /**
  * Base interface for action event environments.
  * Both frontend (Zzz_App) and backend (Zzz_Server) must implement this.

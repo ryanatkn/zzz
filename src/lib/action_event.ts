@@ -3,11 +3,17 @@
 
 import {is_promise} from '@ryanatkn/belt/async.js';
 
-import type {Action_Kind, Action_Phase, Action_Environment} from '$lib/action_types.js';
+import type {
+	Action_Kind,
+	Action_Phase,
+	Action_Environment,
+	Action_Input,
+	Action_Output,
+} from '$lib/action_types.js';
 import type {Action_Spec} from '$lib/action_spec.js';
 import {
 	type Action_Event_Data_Union,
-	type Action_Event_Json,
+	type Action_Event_Data,
 	type Action_Event_Step,
 	type Action_Event_Environment,
 	ACTION_STEP_TRANSITIONS,
@@ -21,8 +27,10 @@ import {stringify_zod_error} from '$lib/zod_helpers.js';
  * Abstract base class for action events - handles generic state machine behavior.
  */
 export abstract class Action_Event<
+	T_Input extends Action_Input = Action_Input,
+	T_Output extends Action_Output = Action_Output,
 	// TODO @api maybe constrain by `T_Method` with spec lookup - generated `Action_Specs`? currently doesnt exist
-	T_Data extends Action_Event_Data_Union = Action_Event_Data_Union,
+	T_Data extends Action_Event_Data_Union = Action_Event_Data_Union, // TODO consider `Action_Event_Data` instead?
 	T_Spec extends Action_Spec = Action_Spec,
 	T_Environment extends Action_Event_Environment = Action_Event_Environment,
 > {
@@ -44,9 +52,9 @@ export abstract class Action_Event<
 	/**
 	 * Build phase data for a transition. Subclasses implement phase-specific logic.
 	 * @param to_phase The phase to transition to
-	 * @param handler_result Optional result from handler execution
+	 * @param output Optional output from handler execution
 	 */
-	abstract build_phase_data(to_phase: Action_Phase, handler_result?: unknown): T_Data;
+	abstract build_phase_data(to_phase: Action_Phase, output?: T_Output): T_Data;
 
 	/**
 	 * Determine if the current phase expects input to be parsed.
@@ -54,7 +62,7 @@ export abstract class Action_Event<
 	 */
 	protected abstract should_parse_for_phase(phase: Action_Phase): 'input' | 'output' | null;
 
-	constructor(spec: T_Spec, environment: T_Environment, input: unknown) {
+	constructor(spec: T_Spec, environment: T_Environment, input: T_Input) {
 		this.spec = spec;
 		this.environment = environment;
 		this.method = spec.method;
@@ -67,7 +75,7 @@ export abstract class Action_Event<
 		this.data = this.build_initial_data(initial_phase, input);
 	}
 
-	protected build_initial_data(phase: Action_Phase, input: unknown): T_Data {
+	protected build_initial_data(phase: Action_Phase, input: T_Input): T_Data {
 		return {
 			kind: this.kind,
 			phase,
@@ -76,6 +84,10 @@ export abstract class Action_Event<
 			executor: this.executor,
 			input,
 		} as T_Data;
+	}
+
+	toJSON(): Action_Event_Data {
+		return this.data;
 	}
 
 	protected get_initial_phase(): Action_Phase | null {
@@ -155,13 +167,13 @@ export abstract class Action_Event<
 		this.data = this.transition_to_handling();
 
 		try {
-			const result = this.execute_handler();
-			if (is_promise(result)) {
+			const output = this.execute_handler();
+			if (is_promise(output)) {
 				throw jsonrpc_errors.internal_error(
 					`Synchronous action returned a Promise: ${this.spec.method}`,
 				);
 			}
-			this.data = this.transition_to_handled(result);
+			this.data = this.transition_to_handled(output);
 		} catch (error) {
 			this.handle_handler_error(error);
 		}
@@ -174,8 +186,8 @@ export abstract class Action_Event<
 		this.data = this.transition_to_handling();
 
 		try {
-			const result = await this.execute_handler();
-			this.data = this.transition_to_handled(result);
+			const output = await this.execute_handler();
+			this.data = this.transition_to_handled(output);
 		} catch (error) {
 			this.handle_handler_error(error);
 		}
@@ -198,10 +210,10 @@ export abstract class Action_Event<
 		} as T_Data;
 	}
 
-	protected transition_to_handled(result?: unknown): T_Data {
+	protected transition_to_handled(output?: T_Output): T_Data {
 		this.validate_step_transition('handled');
 		// Delegate to subclass to build phase-specific handled data
-		return this.build_phase_data(this.data.phase, result);
+		return this.build_phase_data(this.data.phase, output);
 	}
 
 	protected handle_handler_error(error: unknown): void {
@@ -254,7 +266,7 @@ export abstract class Action_Event<
 	 * Execute the handler for the current phase.
 	 * Looks up handler from environment and executes it.
 	 */
-	protected execute_handler(): unknown | Promise<unknown> {
+	protected execute_handler(): undefined | T_Output | Promise<T_Output> {
 		const handler = this.environment.lookup_action_handler(this.data.method, this.data.phase);
 		if (!handler) {
 			return undefined;
@@ -274,7 +286,14 @@ export abstract class Action_Event<
 		return this.data.step === 'failed' || this.is_complete();
 	}
 
-	toJSON(): Action_Event_Json {
-		return this.data;
+	// TODO these feel a bit hacky, just adding for convenience
+	get input(): T_Input | undefined {
+		return 'input' in this.data ? this.data.input : undefined;
+	}
+	get output(): T_Output | undefined {
+		return 'output' in this.data ? this.data.output : undefined;
+	}
+	get error(): Jsonrpc_Error_Json | undefined {
+		return 'error' in this.data ? this.data.error : undefined;
 	}
 }

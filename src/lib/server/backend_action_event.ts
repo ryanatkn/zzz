@@ -9,7 +9,7 @@ import {
 	type Request_Response_Action_Event_Data,
 	type Remote_Notification_Action_Event_Data,
 	type Local_Call_Action_Event_Data,
-	type Action_Event_Json,
+	type Action_Event_Data,
 	type Action_Event_Data_Union,
 } from '$lib/action_event_types.js';
 import {Action_Event} from '$lib/action_event.js';
@@ -30,6 +30,8 @@ export class Backend_Request_Response_Action_Event<
 	T_Input extends Action_Input = Action_Input,
 	T_Output extends Action_Output = Action_Output,
 > extends Action_Event<
+	T_Input,
+	T_Output,
 	Request_Response_Action_Event_Data<T_Method, T_Input, T_Output>,
 	Action_Spec,
 	Zzz_Server
@@ -40,7 +42,7 @@ export class Backend_Request_Response_Action_Event<
 
 	readonly server: Zzz_Server;
 
-	constructor(spec: Action_Spec, environment: Zzz_Server, input: unknown) {
+	constructor(spec: Action_Spec, environment: Zzz_Server, input: T_Input) {
 		// Compute valid phases based on initiator
 		const phases: Array<Action_Phase> = [];
 		if (spec.initiator === 'backend' || spec.initiator === 'both') {
@@ -70,7 +72,7 @@ export class Backend_Request_Response_Action_Event<
 
 	build_phase_data(
 		to_phase: Action_Phase,
-		handler_result?: unknown,
+		output?: T_Output,
 	): Request_Response_Action_Event_Data<T_Method, T_Input, T_Output> {
 		const current = this.data;
 
@@ -88,7 +90,7 @@ export class Backend_Request_Response_Action_Event<
 					return {
 						...current,
 						step: 'handled',
-						...(handler_result !== undefined && {output: handler_result as T_Output}),
+						output,
 					} as Request_Response_Action_Event_Data<T_Method, T_Input, T_Output>;
 
 				case 'send_response':
@@ -152,6 +154,8 @@ export class Backend_Remote_Notification_Action_Event<
 	T_Method extends Action_Method = Action_Method,
 	T_Input extends Action_Input = Action_Input,
 > extends Action_Event<
+	T_Input,
+	void,
 	Remote_Notification_Action_Event_Data<T_Method, T_Input>,
 	Action_Spec,
 	Zzz_Server
@@ -162,7 +166,7 @@ export class Backend_Remote_Notification_Action_Event<
 
 	readonly server: Zzz_Server;
 
-	constructor(spec: Action_Spec, environment: Zzz_Server, input: unknown) {
+	constructor(spec: Action_Spec, environment: Zzz_Server, input: T_Input) {
 		// Compute valid phases based on initiator
 		const phases: Array<Action_Phase> = [];
 		if (spec.initiator === 'backend' || spec.initiator === 'both') {
@@ -184,7 +188,6 @@ export class Backend_Remote_Notification_Action_Event<
 
 	build_phase_data(
 		to_phase: Action_Phase,
-		handler_result?: unknown,
 	): Remote_Notification_Action_Event_Data<T_Method, T_Input> {
 		const current = this.data;
 
@@ -218,6 +221,8 @@ export class Backend_Local_Call_Action_Event<
 	T_Input extends Action_Input = Action_Input,
 	T_Output extends Action_Output = Action_Output,
 > extends Action_Event<
+	T_Input,
+	T_Output,
 	Local_Call_Action_Event_Data<T_Method, T_Input, T_Output>,
 	Action_Spec,
 	Zzz_Server
@@ -228,7 +233,7 @@ export class Backend_Local_Call_Action_Event<
 
 	readonly server: Zzz_Server;
 
-	constructor(spec: Action_Spec, environment: Zzz_Server, input: unknown) {
+	constructor(spec: Action_Spec, environment: Zzz_Server, input: T_Input) {
 		const phases =
 			spec.initiator === 'backend' || spec.initiator === 'both' ? ['execute' as const] : [];
 		const valid_phases = phases as ReadonlyArray<Action_Phase>;
@@ -243,7 +248,7 @@ export class Backend_Local_Call_Action_Event<
 
 	build_phase_data(
 		to_phase: Action_Phase,
-		handler_result?: unknown,
+		output?: T_Output,
 	): Local_Call_Action_Event_Data<T_Method, T_Input, T_Output> {
 		const current = this.data;
 
@@ -256,7 +261,7 @@ export class Backend_Local_Call_Action_Event<
 		return {
 			...current,
 			step: 'handled' as const,
-			...(handler_result !== undefined && {output: handler_result as T_Output}),
+			...(output !== undefined && {output}),
 		};
 	}
 }
@@ -282,7 +287,7 @@ export const create_backend_action_event = (
 };
 
 export const backend_action_event_from_json = (
-	json: Action_Event_Json,
+	json: Action_Event_Data,
 	server: Zzz_Server,
 ): Backend_Action_Event => {
 	const spec = action_spec_by_method.get(json.method);

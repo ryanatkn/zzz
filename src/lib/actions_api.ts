@@ -9,11 +9,11 @@ import type {Action_Method, Actions_Api} from '$lib/action_metatypes.js';
 import type {Zzz_App} from '$lib/zzz_app.svelte.js';
 import {Action} from '$lib/action.svelte.js';
 import type {Action_Input} from '$lib/action_types.js';
-import {create_frontend_action_event} from '$lib/frontend_action_event.js';
-import type {
-	Frontend_Request_Response_Action_Event,
-	Frontend_Remote_Notification_Action_Event,
-	Frontend_Local_Call_Action_Event,
+import {
+	create_frontend_action_event,
+	type Frontend_Request_Response_Action_Event,
+	type Frontend_Remote_Notification_Action_Event,
+	type Frontend_Local_Call_Action_Event,
 } from '$lib/frontend_action_event.js';
 
 const log = new Logger();
@@ -50,6 +50,7 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 							const response = await app.api_client.send(event.data.request);
 							console.log(`[actions_api] response`, response);
 
+							// TODO BLOCK should the output be passed through here?
 							event.transition_to_phase('receive_response');
 							event.data = {
 								...event.data,
@@ -92,16 +93,10 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 					app.actions.add(action);
 
 					if (spec.async) {
-						return event.handle_async().then(() => {
-							if (event.data.step === 'handled' && 'output' in event.data) {
-								return event.data.output;
-							}
-						});
+						return event.handle_async().then(() => event.output);
 					} else {
 						event.handle_sync();
-						if (event.data.step === 'handled' && 'output' in event.data) {
-							return event.data.output;
-						}
+						return event.output;
 					}
 				}
 

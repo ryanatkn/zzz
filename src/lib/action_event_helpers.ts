@@ -8,7 +8,6 @@ import {
 	type Action_Event_Step,
 	type Action_Event_Data_Union,
 	type Action_Event_Data,
-	type Action_Event_Json,
 	ACTION_STEP_TRANSITIONS,
 	ACTION_PHASES_BY_KIND,
 } from '$lib/action_event_types.js';
@@ -147,7 +146,7 @@ export const get_next_request_response_phase = (
 /**
  * Check if an action event JSON represents a specific kind.
  */
-export const is_action_event_kind = (json: Action_Event_Json, kind: Action_Kind): boolean =>
+export const is_action_event_kind = (json: Action_Event_Data, kind: Action_Kind): boolean =>
 	json.kind === kind;
 
 /**
@@ -188,7 +187,7 @@ export const is_action_event = (obj: unknown): obj is Action_Event =>
 /**
  * Type guard to check if JSON is a valid action event JSON.
  */
-export const is_action_event_json = (obj: unknown): obj is Action_Event_Json =>
+export const is_action_event_json = (obj: unknown): obj is Action_Event_Data =>
 	!!obj &&
 	typeof obj === 'object' &&
 	'kind' in obj &&
