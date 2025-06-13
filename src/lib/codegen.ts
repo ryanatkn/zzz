@@ -1,8 +1,10 @@
-// @slop claude_opus_4
+// @slop
 // codegen.ts
 
+import {Unreachable_Error} from '@ryanatkn/belt/error.js';
+
 import type {Action_Spec} from '$lib/action_spec.js';
-import type {Action_Phase} from '$lib/action_types.js';
+import {is_action_initiator, type Action_Phase} from '$lib/action_types.js';
 
 /**
  * Represents an import item with its kind (type or value).
@@ -181,30 +183,49 @@ export const get_executor_phases = (
 	const {kind, initiator} = spec;
 	const phases: Array<Action_Phase> = [];
 
-	if (kind === 'request_response') {
-		// Executor can send/receive based on initiator
-		const can_send = initiator === executor || initiator === 'both';
-		const can_receive = initiator === 'both' || initiator !== executor;
+	if (!is_action_initiator(initiator)) {
+		return phases;
+	}
 
-		if (executor === 'frontend') {
-			if (can_send) phases.push('send_request', 'receive_response');
-			if (can_receive) phases.push('receive_request', 'send_response');
-			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-		} else if (executor === 'backend') {
-			if (can_send) phases.push('send_request', 'receive_response');
-			if (can_receive) phases.push('receive_request', 'send_response');
-		} // else ignore invalid executor
-	} else if (kind === 'remote_notification') {
-		const can_send = initiator === executor || initiator === 'both';
-		const can_receive = initiator === 'both' || initiator !== executor;
+	switch (kind) {
+		case 'request_response': {
+			// Executor can send/receive based on initiator
+			const can_send = initiator === executor || initiator === 'both';
+			const can_receive = initiator === 'both' || initiator !== executor;
 
-		if (can_send) phases.push('send');
-		if (can_receive) phases.push('receive');
-		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-	} else if (kind === 'local_call') {
-		const can_execute = initiator === executor || initiator === 'both';
-		if (can_execute) phases.push('execute');
-	} // else ignore invalid kind
+			switch (executor) {
+				case 'frontend':
+					if (can_send) phases.push('send_request', 'receive_response');
+					if (can_receive) phases.push('receive_request', 'send_response');
+					break;
+				case 'backend':
+					if (can_send) phases.push('send_request', 'receive_response');
+					if (can_receive) phases.push('receive_request', 'send_response');
+					break;
+				default:
+					throw new Unreachable_Error(executor);
+			}
+			break;
+		}
+
+		case 'remote_notification': {
+			const can_send = initiator === executor || initiator === 'both';
+			const can_receive = initiator === 'both' || initiator !== executor;
+
+			if (can_send) phases.push('send');
+			if (can_receive) phases.push('receive');
+			break;
+		}
+
+		case 'local_call': {
+			const can_execute = initiator === executor || initiator === 'both';
+			if (can_execute) phases.push('execute');
+			break;
+		}
+
+		default:
+			throw new Unreachable_Error(kind);
+	}
 
 	return phases;
 };

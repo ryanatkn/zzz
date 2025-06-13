@@ -15,6 +15,9 @@ export type Action_Environment = z.infer<typeof Action_Environment>;
 export const Action_Initiator = z.enum(['frontend', 'backend', 'both']);
 export type Action_Initiator = z.infer<typeof Action_Initiator>;
 
+export const is_action_initiator = (v: unknown): v is Action_Initiator =>
+	v === 'frontend' || v === 'backend' || v === 'both';
+
 // TODO temporary/stubbed, maybe this can be a config object
 /** @stub */
 export const Action_Auth = z.union([z.literal('public'), z.literal('authorize')]);

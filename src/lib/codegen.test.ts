@@ -420,7 +420,7 @@ describe('get_handler_return_type', () => {
 				kind: 'request_response',
 				method: 'test_method',
 				async: true,
-			} as Action_Spec;
+			} as unknown as Action_Spec;
 
 			// Request/response actions are always async
 			expect(get_handler_return_type(spec, 'receive_request')).toBe(
@@ -433,7 +433,7 @@ describe('get_handler_return_type', () => {
 				kind: 'request_response',
 				method: 'test_method',
 				async: true,
-			} as Action_Spec;
+			} as unknown as Action_Spec;
 
 			expect(get_handler_return_type(spec, 'send_request')).toBe('void | Promise<void>');
 			expect(get_handler_return_type(spec, 'send_response')).toBe('void | Promise<void>');
@@ -447,7 +447,7 @@ describe('get_handler_return_type', () => {
 				kind: 'local_call',
 				method: 'test_method',
 				async: true,
-			} as Action_Spec;
+			} as unknown as Action_Spec;
 
 			expect(get_handler_return_type(async_spec, 'execute')).toBe(
 				`Action_Outputs['test_method'] | Promise<Action_Outputs['test_method']>`,
@@ -457,7 +457,7 @@ describe('get_handler_return_type', () => {
 				kind: 'local_call',
 				method: 'test_method',
 				async: false,
-			} as Action_Spec;
+			} as unknown as Action_Spec;
 
 			expect(get_handler_return_type(sync_spec, 'execute')).toBe(`Action_Outputs['test_method']`);
 		});
@@ -469,7 +469,7 @@ describe('get_handler_return_type', () => {
 				kind: 'remote_notification',
 				method: 'test_method',
 				async: true,
-			} as Action_Spec;
+			} as unknown as Action_Spec;
 
 			expect(get_handler_return_type(spec, 'send')).toBe('void | Promise<void>');
 			expect(get_handler_return_type(spec, 'receive')).toBe('void | Promise<void>');
@@ -480,7 +480,7 @@ describe('get_handler_return_type', () => {
 				kind: 'remote_notification',
 				method: 'test_method',
 				async: false,
-			} as Action_Spec;
+			} as unknown as Action_Spec;
 
 			expect(get_handler_return_type(spec, 'send')).toBe('void');
 			expect(get_handler_return_type(spec, 'receive')).toBe('void');
@@ -494,7 +494,7 @@ describe('generate_phase_handlers', () => {
 			method: 'test_action',
 			kind: 'local_call',
 			initiator: 'backend',
-		} as Action_Spec;
+		} as unknown as Action_Spec;
 
 		const imports = new Import_Builder();
 		const result = generate_phase_handlers(spec, 'frontend', imports);
@@ -509,7 +509,7 @@ describe('generate_phase_handlers', () => {
 			kind: 'request_response',
 			initiator: 'frontend',
 			async: true,
-		} as Action_Spec;
+		} as unknown as Action_Spec;
 
 		const imports = new Import_Builder();
 		const result = generate_phase_handlers(spec, 'frontend', imports);
@@ -533,7 +533,7 @@ describe('generate_phase_handlers', () => {
 			kind: 'remote_notification',
 			initiator: 'backend',
 			async: true,
-		} as Action_Spec;
+		} as unknown as Action_Spec;
 
 		const imports = new Import_Builder();
 		const result = generate_phase_handlers(spec, 'backend', imports);
@@ -552,7 +552,7 @@ describe('generate_phase_handlers', () => {
 			kind: 'local_call',
 			initiator: 'both',
 			async: false,
-		} as Action_Spec;
+		} as unknown as Action_Spec;
 
 		const imports = new Import_Builder();
 		const result = generate_phase_handlers(spec, 'frontend', imports);
@@ -572,7 +572,7 @@ describe('generate_phase_handlers', () => {
 			kind: 'request_response',
 			initiator: 'frontend',
 			async: true,
-		} as Action_Spec;
+		} as unknown as Action_Spec;
 
 		const imports = new Import_Builder();
 		generate_phase_handlers(spec, 'backend', imports);
@@ -588,7 +588,7 @@ describe('generate_phase_handlers', () => {
 			kind: 'request_response',
 			initiator: 'both',
 			async: true,
-		} as Action_Spec;
+		} as unknown as Action_Spec;
 
 		const imports = new Import_Builder();
 		const result = generate_phase_handlers(spec, 'frontend', imports);
@@ -604,7 +604,7 @@ describe('generate_phase_handlers', () => {
 			kind: 'request_response',
 			initiator: 'both',
 			async: true,
-		} as Action_Spec;
+		} as unknown as Action_Spec;
 
 		const imports = new Import_Builder();
 		const result = generate_phase_handlers(spec, 'frontend', imports);
