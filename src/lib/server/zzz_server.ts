@@ -18,10 +18,10 @@ import {create_jsonrpc_error_message, to_jsonrpc_message_id} from '$lib/jsonrpc_
 import {ZZZ_CACHE_DIRNAME} from '$lib/constants.js';
 import {to_zzz_cache_dir} from '$lib/diskfile_helpers.js';
 import type {Backend_Action_Handlers} from '$lib/server/backend_action_types.js';
-import {Backend_Action_Event} from '$lib/server/backend_action_event.js';
 import type {Action_Phase} from '$lib/action_types.js';
 import {Action_Inputs, Action_Outputs} from '$lib/action_collections.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
+import {backend_action_event_from_json} from './backend_action_event.js';
 
 /**
  * Function type for handling file system changes.
@@ -176,10 +176,14 @@ export class Zzz_Server {
 		this.#check_destroyed();
 
 		try {
-			const event = Backend_Action_Event.from(this, message);
+			const event = backend_action_event_from_json(message, this);
 			event.parse();
-			await event.handle();
-			return event.build_response();
+			await event.handle_async();
+			if (event.data.step === 'handled') {
+				return event.data.output; // TODO BLOCK @api @many these are wrong
+			} else if (event.data.step === 'error') {
+				return event.data.error; // TODO BLOCK @api @many these are wrong
+			}
 		} catch (error) {
 			// Only programmer errors should reach here because
 			// other errors are returned as JSON-RPC errors,
