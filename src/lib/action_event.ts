@@ -6,7 +6,7 @@ import {is_promise} from '@ryanatkn/belt/async.js';
 import type {Action_Kind, Action_Phase, Action_Environment} from '$lib/action_types.js';
 import type {Action_Spec} from '$lib/action_spec.js';
 import {
-	type Action_Event_Data,
+	type Action_Event_Data_Union,
 	type Action_Event_Json,
 	type Action_Event_Step,
 	type Action_Event_Environment,
@@ -21,7 +21,8 @@ import {stringify_zod_error} from '$lib/zod_helpers.js';
  * Abstract base class for action events - handles generic state machine behavior.
  */
 export abstract class Action_Event<
-	T_Data extends Action_Event_Data = Action_Event_Data,
+	// TODO @api maybe constrain by `T_Method` with spec lookup - generated `Action_Specs`? currently doesnt exist
+	T_Data extends Action_Event_Data_Union = Action_Event_Data_Union,
 	T_Spec extends Action_Spec = Action_Spec,
 	T_Environment extends Action_Event_Environment = Action_Event_Environment,
 > {
