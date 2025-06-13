@@ -997,6 +997,7 @@ export const src_json = {
 			path: 'action_types.ts',
 			declarations: [
 				{name: 'Action_Kind', kind: 'variable'},
+				{name: 'Action_Environment', kind: 'variable'},
 				{name: 'Action_Initiator', kind: 'variable'},
 				{name: 'Action_Auth', kind: 'variable'},
 				{name: 'Action_Side_Effects', kind: 'variable'},

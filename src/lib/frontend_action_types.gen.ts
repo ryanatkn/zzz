@@ -5,7 +5,7 @@ import type {Gen} from '@ryanatkn/gro/gen.js';
 
 import {action_specs} from '$lib/action_collections.js';
 import {Action_Registry} from '$lib/action_registry.js';
-import {ACTION_KIND_PHASES, type Action_Phase} from '$lib/action_types.js';
+import type {Action_Phase} from '$lib/action_types.js';
 import type {Action_Spec} from '$lib/action_spec.js';
 
 /**
@@ -59,7 +59,6 @@ export const gen: Gen = ({origin_path}) => {
 
 const generate_frontend_phase_handlers = (spec: Action_Spec): string => {
 	const {method, kind, initiator} = spec;
-	const all_phases = ACTION_KIND_PHASES[kind];
 
 	// Determine which phases frontend can handle based on initiator
 	const frontend_phases: Array<Action_Phase> = [];

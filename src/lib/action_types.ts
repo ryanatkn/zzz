@@ -1,6 +1,3 @@
-// @slop
-// action_types.ts
-
 import {z} from 'zod';
 
 import {Action_Method} from '$lib/action_metatypes.js';
@@ -10,6 +7,7 @@ import {Jsonrpc_Params, Jsonrpc_Result} from '$lib/jsonrpc.js';
 export const Action_Kind = z.enum(['request_response', 'remote_notification', 'local_call']);
 export type Action_Kind = z.infer<typeof Action_Kind>;
 
+// TODO extensible?
 export const Action_Environment = z.enum(['frontend', 'backend']);
 export type Action_Environment = z.infer<typeof Action_Environment>;
 
