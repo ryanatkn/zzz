@@ -189,10 +189,11 @@ export const get_executor_phases = (
 		if (executor === 'frontend') {
 			if (can_send) phases.push('send_request', 'receive_response');
 			if (can_receive) phases.push('receive_request', 'send_response');
-		} else {
+			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+		} else if (executor === 'backend') {
 			if (can_send) phases.push('send_request', 'receive_response');
 			if (can_receive) phases.push('receive_request', 'send_response');
-		}
+		} // else ignore invalid executor
 	} else if (kind === 'remote_notification') {
 		const can_send = initiator === executor || initiator === 'both';
 		const can_receive = initiator === 'both' || initiator !== executor;
@@ -203,7 +204,7 @@ export const get_executor_phases = (
 	} else if (kind === 'local_call') {
 		const can_execute = initiator === executor || initiator === 'both';
 		if (can_execute) phases.push('execute');
-	}
+	} // else ignore invalid kind
 
 	return phases;
 };

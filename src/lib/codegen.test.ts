@@ -63,6 +63,23 @@ describe('Import_Builder', () => {
 				`import {value, type Type_A, type Type_B, type Type_C} from '$lib/mixed.js';`,
 			);
 		});
+
+		test('multiple values and types are sorted correctly', () => {
+			const imports = new Import_Builder();
+
+			// Add in random order
+			imports.add_type('$lib/mixed.js', 'Z_Type');
+			imports.add('$lib/mixed.js', 'z_value');
+			imports.add_type('$lib/mixed.js', 'A_Type');
+			imports.add('$lib/mixed.js', 'a_value');
+			imports.add_type('$lib/mixed.js', 'M_Type');
+			imports.add('$lib/mixed.js', 'm_value');
+
+			// Should sort values first (alphabetically), then types (alphabetically)
+			expect(imports.build()).toBe(
+				`import {a_value, m_value, z_value, type A_Type, type M_Type, type Z_Type} from '$lib/mixed.js';`,
+			);
+		});
 	});
 
 	describe('import precedence', () => {
@@ -120,6 +137,44 @@ describe('Import_Builder', () => {
 			imports.add_type('$lib/types.js', 'Middle');
 
 			expect(imports.build()).toBe(`import type {Apple, Middle, Zebra} from '$lib/types.js';`);
+		});
+
+		test('handles imports with underscores and numbers correctly', () => {
+			const imports = new Import_Builder();
+
+			imports.add_type('$lib/types.js', '_Private_Type');
+			imports.add_type('$lib/types.js', 'Type_1');
+			imports.add_type('$lib/types.js', 'Type_2');
+			imports.add_type('$lib/types.js', 'PUBLIC_TYPE');
+
+			// Underscores sort before letters in most locales
+			expect(imports.build()).toBe(
+				`import type {PUBLIC_TYPE, Type_1, Type_2, _Private_Type} from '$lib/types.js';`,
+			);
+		});
+
+		test('maintains module order based on first addition', () => {
+			const imports = new Import_Builder();
+
+			// Add in specific order
+			imports.add_type('$lib/third.js', 'Type3');
+			imports.add_type('$lib/first.js', 'Type1');
+			imports.add_type('$lib/second.js', 'Type2');
+
+			// Then add more to existing modules
+			imports.add_type('$lib/first.js', 'Type1b');
+			imports.add_type('$lib/third.js', 'Type3b');
+
+			const lines = imports.preview();
+
+			// Module order should be based on insertion order
+			expect(lines[0]).toContain('$lib/third.js');
+			expect(lines[1]).toContain('$lib/first.js');
+			expect(lines[2]).toContain('$lib/second.js');
+
+			// But items within modules are sorted
+			expect(lines[0]).toBe(`import type {Type3, Type3b} from '$lib/third.js';`);
+			expect(lines[1]).toBe(`import type {Type1, Type1b} from '$lib/first.js';`);
 		});
 	});
 
@@ -300,6 +355,31 @@ describe('get_executor_phases', () => {
 			expect(get_executor_phases(spec, 'backend')).toEqual(['execute']);
 		});
 	});
+
+	describe('edge cases', () => {
+		test('returns empty array for invalid combinations', () => {
+			const spec = {
+				kind: 'request_response',
+				initiator: 'invalid' as any,
+			} as Action_Spec;
+
+			expect(get_executor_phases(spec, 'frontend')).toEqual([]);
+			expect(get_executor_phases(spec, 'backend')).toEqual([]);
+		});
+
+		test('phases are returned in correct order', () => {
+			const spec = {
+				kind: 'request_response',
+				initiator: 'both',
+			} as Action_Spec;
+
+			const frontend_phases = get_executor_phases(spec, 'frontend');
+			// Send phases should come before receive phases
+			expect(frontend_phases.indexOf('send_request')).toBeLessThan(
+				frontend_phases.indexOf('receive_request'),
+			);
+		});
+	});
 });
 
 describe('get_action_event_type', () => {
@@ -332,13 +412,14 @@ describe('get_action_event_type', () => {
 
 describe('get_handler_return_type', () => {
 	describe('request_response actions', () => {
-		test('receive_request phase returns output', () => {
+		test('receive_request phase returns output with Promise', () => {
 			const spec = {
 				kind: 'request_response',
 				method: 'test_method',
 				async: true,
 			} as Action_Spec;
 
+			// Request/response actions are always async
 			expect(get_handler_return_type(spec, 'receive_request')).toBe(
 				`Action_Outputs['test_method'] | Promise<Action_Outputs['test_method']>`,
 			);
@@ -496,6 +577,39 @@ describe('generate_phase_handlers', () => {
 		const import_str = imports.build();
 		// All imports should be type-only
 		expect(import_str).toMatch(/^import type/);
+	});
+
+	test('handles methods with special characters in names', () => {
+		const spec = {
+			method: 'test-action_2',
+			kind: 'request_response',
+			initiator: 'both',
+			async: true,
+		} as Action_Spec;
+
+		const imports = new Import_Builder();
+		const result = generate_phase_handlers(spec, 'frontend', imports);
+
+		expect(result).toContain('test-action_2?: {');
+		expect(result).toContain(`Action_Inputs['test-action_2']`);
+		expect(result).toContain(`Action_Outputs['test-action_2']`);
+	});
+
+	test('generates all phases for both initiator', () => {
+		const spec = {
+			method: 'bidirectional',
+			kind: 'request_response',
+			initiator: 'both',
+			async: true,
+		} as Action_Spec;
+
+		const imports = new Import_Builder();
+		const result = generate_phase_handlers(spec, 'frontend', imports);
+
+		expect(result).toContain('send_request?:');
+		expect(result).toContain('receive_response?:');
+		expect(result).toContain('receive_request?:');
+		expect(result).toContain('send_response?:');
 	});
 });
 
