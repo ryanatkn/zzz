@@ -1,4 +1,4 @@
-// @slop
+// @slop claude_opus_4
 
 import {describe, test, expect} from 'vitest';
 import {z} from 'zod';

@@ -1,4 +1,4 @@
-// @slop
+// @slop claude_opus_4
 // server/backend_action_types.gen.ts
 
 import type {Gen} from '@ryanatkn/gro/gen.js';

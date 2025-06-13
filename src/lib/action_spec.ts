@@ -1,4 +1,4 @@
-// @slop
+// @slop claude_opus_4
 // action_spec.ts
 
 import {z} from 'zod';

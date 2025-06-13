@@ -1,5 +1,5 @@
 <script lang="ts">
-	// @slop
+	// @slop claude_opus_4
 
 	import {GLYPH_DELETE} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';

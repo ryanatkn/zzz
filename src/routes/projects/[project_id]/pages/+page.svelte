@@ -1,5 +1,5 @@
 <script lang="ts">
-	// @slop
+	// @slop claude_opus_4
 
 	import {base} from '$app/paths';
 

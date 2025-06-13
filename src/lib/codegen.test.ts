@@ -1,4 +1,4 @@
-// @slop
+// @slop claude_opus_4
 // codegen.test.ts
 
 import {test, expect, describe} from 'vitest';

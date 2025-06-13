@@ -1,4 +1,4 @@
-// @slop
+// @slop claude_opus_4
 // action_event_types.ts
 
 import {z} from 'zod';

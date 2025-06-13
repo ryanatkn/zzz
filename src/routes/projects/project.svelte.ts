@@ -1,4 +1,4 @@
-// @slop
+// @slop claude_opus_4
 
 import {z} from 'zod';
 import type {Array_Element} from '@ryanatkn/belt/types.js';

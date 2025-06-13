@@ -1,5 +1,5 @@
 <script lang="ts">
-	// @slop
+	// @slop claude_opus_4
 	// Action_Detail.svelte
 
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';

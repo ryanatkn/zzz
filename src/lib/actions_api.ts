@@ -1,4 +1,4 @@
-// @slop
+// @slop claude_opus_4
 // actions_api.ts
 
 import {Logger} from '@ryanatkn/belt/log.js';

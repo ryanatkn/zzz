@@ -1,4 +1,4 @@
-// @slop
+// @slop claude_opus_4
 // codegen.ts
 
 import type {Action_Spec} from '$lib/action_spec.js';

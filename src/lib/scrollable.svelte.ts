@@ -1,4 +1,4 @@
-// @slop
+// @slop claude_opus_4
 
 import type {Action} from 'svelte/action';
 import {on} from 'svelte/events';

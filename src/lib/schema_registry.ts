@@ -1,4 +1,4 @@
-// @slop
+// @slop claude_opus_4
 
 import type {z} from 'zod';
 import type {Flavored} from '@ryanatkn/belt/types.js';

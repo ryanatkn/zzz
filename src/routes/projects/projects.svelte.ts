@@ -1,4 +1,4 @@
-// @slop
+// @slop claude_opus_4
 
 import {z} from 'zod';
 import {create_context} from '@ryanatkn/fuz/context_helpers.js';

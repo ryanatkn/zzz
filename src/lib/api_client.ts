@@ -1,4 +1,4 @@
-// @slop
+// @slop claude_opus_4
 // api_client.ts
 
 import type {Deferred, Async_Status} from '@ryanatkn/belt/async.js';

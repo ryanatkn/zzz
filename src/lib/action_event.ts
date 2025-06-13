@@ -1,4 +1,4 @@
-// @slop
+// @slop claude_opus_4
 // action_event.ts
 
 import {is_promise} from '@ryanatkn/belt/async.js';

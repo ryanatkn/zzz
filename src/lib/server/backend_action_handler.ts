@@ -1,4 +1,4 @@
-// @slop
+// @slop claude_opus_4
 // server/backend_action_handler.ts
 
 import type {Action_Input, Action_Output, Action_Phase} from '$lib/action_types.js';

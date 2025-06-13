@@ -1,4 +1,4 @@
-// @slop
+// @slop claude_opus_4
 
 import {SvelteMap} from 'svelte/reactivity';
 import type {z} from 'zod';

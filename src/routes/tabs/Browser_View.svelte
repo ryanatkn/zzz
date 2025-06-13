@@ -1,5 +1,5 @@
 <script lang="ts">
-	// @slop
+	// @slop claude_opus_4
 
 	import {swallow, is_editable} from '@ryanatkn/belt/dom.js';
 	import type {Snippet} from 'svelte';

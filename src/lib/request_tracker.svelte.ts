@@ -1,4 +1,4 @@
-// @slop
+// @slop claude_opus_4
 
 import {create_deferred, type Deferred, type Async_Status} from '@ryanatkn/belt/async.js';
 import {SvelteMap} from 'svelte/reactivity';

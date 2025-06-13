@@ -1,4 +1,4 @@
-// @slop
+// @slop claude_opus_4
 // frontend_action_event.ts
 
 import type {Zzz_App} from '$lib/zzz_app.svelte.js';

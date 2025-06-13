@@ -1,4 +1,4 @@
-// @slop
+// @slop claude_opus_4
 // action_event_helpers.ts
 
 import type {Action_Kind, Action_Phase, Action_Environment} from '$lib/action_types.js';
