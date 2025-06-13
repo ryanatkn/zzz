@@ -22,7 +22,7 @@ import {Jsonrpc_Error, JSONRPC_ERROR_CODES} from '$lib/jsonrpc_errors.js';
 
 export const create_jsonrpc_request = (
 	method: Jsonrpc_Method,
-	params: Jsonrpc_Request_Params | void,
+	params: Jsonrpc_Request_Params | undefined | void,
 	id: Jsonrpc_Request_Id,
 ): Jsonrpc_Request => {
 	const message: Jsonrpc_Request = {
@@ -48,7 +48,7 @@ export const create_jsonrpc_response = (
 
 export const create_jsonrpc_notification = (
 	method: Jsonrpc_Method,
-	params: Jsonrpc_Notification_Params | void,
+	params: Jsonrpc_Notification_Params | undefined | void,
 ): Jsonrpc_Notification => {
 	const message: Jsonrpc_Notification = {
 		jsonrpc: JSONRPC_VERSION,

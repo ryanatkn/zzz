@@ -11,25 +11,28 @@ import {
 	Jsonrpc_Error_Message,
 	Jsonrpc_Response_Or_Error,
 	Jsonrpc_Notification,
-	Jsonrpc_Error_Data,
+	Jsonrpc_Error_Json,
 } from '$lib/jsonrpc.js';
 
 export const Action_Event_Step = z.enum(['initial', 'parsed', 'handling', 'handled', 'failed']);
 export type Action_Event_Step = z.infer<typeof Action_Event_Step>;
 
-export const ACTION_STEP_TRANSITIONS = {
+export const ACTION_STEP_TRANSITIONS: Record<
+	Action_Event_Step,
+	ReadonlyArray<Action_Event_Step>
+> = {
 	initial: ['parsed', 'failed'],
 	parsed: ['handling', 'failed'],
 	handling: ['handled', 'failed'],
 	handled: [],
 	failed: [],
-} as const satisfies Record<Action_Event_Step, ReadonlyArray<Action_Event_Step>>;
+};
 
-export const ACTION_PHASES_BY_KIND = {
+export const ACTION_PHASES_BY_KIND: Record<Action_Kind, ReadonlyArray<Action_Phase>> = {
 	request_response: ['send_request', 'receive_request', 'send_response', 'receive_response'],
 	remote_notification: ['send', 'receive'],
 	local_call: ['execute'],
-} as const satisfies Record<Action_Kind, ReadonlyArray<Action_Phase>>;
+};
 
 export const Action_Executor = z.enum(['frontend', 'backend']);
 export type Action_Executor = z.infer<typeof Action_Executor>;
@@ -42,7 +45,7 @@ export const Action_Event_Data = z.object({
 	executor: Action_Executor,
 	input: z.unknown().optional(),
 	output: z.unknown().optional(),
-	error: Jsonrpc_Error_Data.optional(),
+	error: Jsonrpc_Error_Json.optional(),
 });
 export type Action_Event_Data = z.infer<typeof Action_Event_Data>;
 
@@ -105,7 +108,7 @@ export type Request_Response_Action_Event_Data<
 			method: T_Method;
 			executor: Action_Executor;
 			input?: T_Input;
-			error: Jsonrpc_Error_Data;
+			error: Jsonrpc_Error_Json;
 	  }
 	| {
 			kind: 'request_response';
@@ -152,7 +155,7 @@ export type Request_Response_Action_Event_Data<
 			executor: Action_Executor;
 			input?: T_Input;
 			request: Jsonrpc_Request;
-			error: Jsonrpc_Error_Data;
+			error: Jsonrpc_Error_Json;
 	  }
 	| {
 			kind: 'request_response';
@@ -208,7 +211,7 @@ export type Request_Response_Action_Event_Data<
 			output?: T_Output;
 			request: Jsonrpc_Request;
 			response: Jsonrpc_Response | Jsonrpc_Error_Message;
-			error: Jsonrpc_Error_Data;
+			error: Jsonrpc_Error_Json;
 	  }
 	| {
 			kind: 'request_response';
@@ -264,7 +267,7 @@ export type Request_Response_Action_Event_Data<
 			output?: T_Output;
 			request: Jsonrpc_Request;
 			response: Jsonrpc_Response_Or_Error;
-			error: Jsonrpc_Error_Data;
+			error: Jsonrpc_Error_Json;
 	  };
 
 export type Remote_Notification_Action_Event_Data<
@@ -311,7 +314,7 @@ export type Remote_Notification_Action_Event_Data<
 			method: T_Method;
 			executor: Action_Executor;
 			input?: T_Input;
-			error: Jsonrpc_Error_Data;
+			error: Jsonrpc_Error_Json;
 	  }
 	| {
 			kind: 'remote_notification';
@@ -357,7 +360,7 @@ export type Remote_Notification_Action_Event_Data<
 			executor: Action_Executor;
 			input?: T_Input;
 			notification: Jsonrpc_Notification;
-			error: Jsonrpc_Error_Data;
+			error: Jsonrpc_Error_Json;
 	  };
 
 export type Local_Call_Action_Event_Data<
@@ -405,7 +408,7 @@ export type Local_Call_Action_Event_Data<
 			method: T_Method;
 			executor: Action_Executor;
 			input?: T_Input;
-			error: Jsonrpc_Error_Data;
+			error: Jsonrpc_Error_Json;
 	  };
 
 export type Action_Event_Data_Union<
@@ -468,5 +471,5 @@ export type Batch_Action_Event_Data<T_Action_Event = unknown> =
 			executor: Action_Executor;
 			raw_messages: Array<unknown>;
 			action_events?: Array<T_Action_Event>;
-			error: Jsonrpc_Error_Data;
+			error: Jsonrpc_Error_Json;
 	  };

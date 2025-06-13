@@ -1777,7 +1777,7 @@ export const src_json = {
 				{name: 'JSONRPC_SERVER_ERROR_END', kind: 'variable'},
 				{name: 'Jsonrpc_Server_Error_Code', kind: 'variable'},
 				{name: 'Jsonrpc_Error_Code', kind: 'variable'},
-				{name: 'Jsonrpc_Error_Data', kind: 'variable'},
+				{name: 'Jsonrpc_Error_Json', kind: 'variable'},
 				{name: 'Jsonrpc_Error_Message', kind: 'variable'},
 				{name: 'Jsonrpc_Batch_Request', kind: 'variable'},
 				{name: 'Jsonrpc_Response_Or_Error', kind: 'variable'},

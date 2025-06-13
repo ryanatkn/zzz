@@ -21,13 +21,13 @@ import type {Action_Event} from '$lib/action_event.js';
  * Check if a step transition is valid.
  */
 export const is_valid_step_transition = (from: Action_Event_Step, to: Action_Event_Step): boolean =>
-	ACTION_STEP_TRANSITIONS[from].includes(to as any);
+	ACTION_STEP_TRANSITIONS[from].includes(to);
 
 /**
  * Check if a phase is valid for an action kind.
  */
 export const is_valid_phase_for_kind = (phase: Action_Phase, kind: Action_Kind): boolean =>
-	ACTION_PHASES_BY_KIND[kind].includes(phase as any);
+	ACTION_PHASES_BY_KIND[kind].includes(phase);
 
 /**
  * Get valid phases for an action method.
@@ -177,7 +177,7 @@ export const describe_action_event_state = (data: Action_Event_Data): string => 
  * Type guard to check if an object is an Action Event.
  */
 export const is_action_event = (obj: unknown): obj is Action_Event =>
-	obj !== null &&
+	!!obj &&
 	typeof obj === 'object' &&
 	'spec' in obj &&
 	'context' in obj &&

@@ -168,8 +168,7 @@ export const Jsonrpc_Error_Code = z.union([
 ]);
 export type Jsonrpc_Error_Code = z.infer<typeof Jsonrpc_Error_Code>;
 
-// TODO maybe rename to `Jsonrpc_Error_Json`
-export const Jsonrpc_Error_Data = z.object({
+export const Jsonrpc_Error_Json = z.object({
 	/**
 	 * The error type that occurred.
 	 */
@@ -184,7 +183,7 @@ export const Jsonrpc_Error_Data = z.object({
 	 */
 	data: z.unknown().optional(),
 });
-export type Jsonrpc_Error_Data = z.infer<typeof Jsonrpc_Error_Data>;
+export type Jsonrpc_Error_Json = z.infer<typeof Jsonrpc_Error_Json>;
 
 /**
  * A response to a request that indicates an error occurred.
@@ -192,7 +191,7 @@ export type Jsonrpc_Error_Data = z.infer<typeof Jsonrpc_Error_Data>;
 export const Jsonrpc_Error_Message = z.object({
 	jsonrpc: z.literal(JSONRPC_VERSION),
 	id: Jsonrpc_Request_Id,
-	error: Jsonrpc_Error_Data,
+	error: Jsonrpc_Error_Json,
 });
 export type Jsonrpc_Error_Message = z.infer<typeof Jsonrpc_Error_Message>;
 

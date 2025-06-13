@@ -9,12 +9,12 @@ import {
 	type Action_Event_Data,
 	type Action_Event_Json,
 	type Action_Event_Step,
-	type Jsonrpc_Error_Data,
 	type Action_Executor,
 	type Action_Event_Environment,
 	ACTION_STEP_TRANSITIONS,
 	ACTION_PHASES_BY_KIND,
 } from '$lib/action_event_types.js';
+import type {Jsonrpc_Error_Json} from '$lib/jsonrpc.js';
 import {jsonrpc_errors} from '$lib/jsonrpc_errors.js';
 import {stringify_zod_error} from '$lib/zod_helpers.js';
 
@@ -185,7 +185,7 @@ export abstract class Action_Event<
 
 	protected validate_step_transition(to_step: Action_Event_Step): void {
 		const valid_transitions = ACTION_STEP_TRANSITIONS[this.data.step];
-		if (!valid_transitions.includes(to_step as any)) {
+		if (!valid_transitions.includes(to_step)) {
 			throw jsonrpc_errors.internal_error(
 				`Invalid step transition: ${this.data.step} → ${to_step}`,
 			);
@@ -236,9 +236,9 @@ export abstract class Action_Event<
 		return this.data.step === 'handled';
 	}
 
-	protected to_jsonrpc_error(error: unknown): Jsonrpc_Error_Data {
+	protected to_jsonrpc_error(error: unknown): Jsonrpc_Error_Json {
 		if (error && typeof error === 'object' && 'code' in error && 'message' in error) {
-			return error as Jsonrpc_Error_Data;
+			return error as Jsonrpc_Error_Json;
 		}
 		if (error instanceof Error) {
 			return {
