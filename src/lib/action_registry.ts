@@ -1,4 +1,5 @@
 // @slop
+// action_registry.ts
 
 import type {
 	Action_Spec,

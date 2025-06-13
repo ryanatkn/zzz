@@ -1,4 +1,5 @@
 // @slop
+// jsonrpc_errors.ts
 
 import {
 	JSONRPC_INTERNAL_ERROR,

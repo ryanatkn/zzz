@@ -1,5 +1,6 @@
 <script lang="ts">
 	// @slop
+	// Action_Detail.svelte
 
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
 	import {strip_start} from '@ryanatkn/belt/string.js';
