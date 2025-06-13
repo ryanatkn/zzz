@@ -3,13 +3,12 @@
 
 import {is_promise} from '@ryanatkn/belt/async.js';
 
-import type {Action_Kind, Action_Phase, Action_Input, Action_Output} from '$lib/action_types.js';
+import type {Action_Kind, Action_Phase, Action_Environment} from '$lib/action_types.js';
 import type {Action_Spec} from '$lib/action_spec.js';
 import {
 	type Action_Event_Data,
 	type Action_Event_Json,
 	type Action_Event_Step,
-	type Action_Executor,
 	type Action_Event_Environment,
 	ACTION_STEP_TRANSITIONS,
 	ACTION_PHASES_BY_KIND,
@@ -27,7 +26,7 @@ export abstract class Action_Event<
 	T_Environment extends Action_Event_Environment = Action_Event_Environment,
 > {
 	abstract readonly kind: Action_Kind;
-	abstract readonly executor: Action_Executor;
+	abstract readonly executor: Action_Environment;
 
 	readonly spec: T_Spec;
 	readonly environment: T_Environment;

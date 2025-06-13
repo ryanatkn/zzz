@@ -10,6 +10,10 @@ import {Jsonrpc_Params, Jsonrpc_Result} from '$lib/jsonrpc.js';
 export const Action_Kind = z.enum(['request_response', 'remote_notification', 'local_call']);
 export type Action_Kind = z.infer<typeof Action_Kind>;
 
+export const Action_Environment = z.enum(['frontend', 'backend']);
+export type Action_Environment = z.infer<typeof Action_Environment>;
+
+// TODO extend `Action_Environment` or is this more efficient/easier to work with?
 export const Action_Initiator = z.enum(['frontend', 'backend', 'both']);
 export type Action_Initiator = z.infer<typeof Action_Initiator>;
 

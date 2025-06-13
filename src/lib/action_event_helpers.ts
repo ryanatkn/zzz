@@ -1,6 +1,6 @@
 // @slop
 
-import type {Action_Kind, Action_Phase} from '$lib/action_types.js';
+import type {Action_Kind, Action_Phase, Action_Environment} from '$lib/action_types.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
 import type {Action_Spec} from '$lib/action_spec.js';
 import {
@@ -8,7 +8,6 @@ import {
 	type Action_Event_Data_Union,
 	type Action_Event_Data,
 	type Action_Event_Json,
-	type Action_Executor,
 	ACTION_STEP_TRANSITIONS,
 	ACTION_PHASES_BY_KIND,
 } from '$lib/action_event_types.js';
@@ -42,7 +41,7 @@ export const get_valid_phases_for_method = (method: Action_Method): ReadonlyArra
  */
 export const get_valid_phases_for_executor = (
 	spec: Action_Spec,
-	executor: Action_Executor,
+	executor: Action_Environment,
 ): Array<Action_Phase> => {
 	const all_phases = ACTION_PHASES_BY_KIND[spec.kind];
 
@@ -202,7 +201,7 @@ export const is_action_event_json = (obj: unknown): obj is Action_Event_Json =>
  */
 export const get_initial_phase = (
 	spec: Action_Spec,
-	executor: Action_Executor,
+	executor: Action_Environment,
 ): Action_Phase | null => {
 	const valid_phases = get_valid_phases_for_executor(spec, executor);
 
@@ -223,16 +222,16 @@ export const get_initial_phase = (
 /**
  * Check if an executor can initiate an action.
  */
-export const can_executor_initiate = (spec: Action_Spec, executor: Action_Executor): boolean =>
+export const can_executor_initiate = (spec: Action_Spec, executor: Action_Environment): boolean =>
 	spec.initiator === executor || spec.initiator === 'both';
 
 /**
  * Check if an executor can receive an action.
  */
-export const can_executor_receive = (spec: Action_Spec, executor: Action_Executor): boolean =>
+export const can_executor_receive = (spec: Action_Spec, executor: Action_Environment): boolean =>
 	spec.kind === 'local_call'
 		? can_executor_initiate(spec, executor) // Local calls: same as initiate
-		: spec.initiator !== executor || spec.initiator === 'both'; // Networked: opposite or both
+		: spec.initiator === 'both' || spec.initiator !== executor; // Networked: opposite or both
 
 /**
  * Get all valid step values.
