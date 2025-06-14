@@ -13,15 +13,26 @@ import {
 	JSONRPC_INTERNAL_ERROR,
 	Jsonrpc_Message,
 	Jsonrpc_Message_From_Server_To_Client,
+	Jsonrpc_Batch_Response,
+	Jsonrpc_Request,
+	Jsonrpc_Notification,
 } from '$lib/jsonrpc.js';
-import {create_jsonrpc_error_message, to_jsonrpc_message_id} from '$lib/jsonrpc_helpers.js';
+import {
+	create_jsonrpc_error_message,
+	create_jsonrpc_error_message_from_thrown,
+	to_jsonrpc_message_id,
+	is_jsonrpc_request,
+	is_jsonrpc_notification,
+	is_jsonrpc_batch_request,
+} from '$lib/jsonrpc_helpers.js';
 import {ZZZ_CACHE_DIRNAME} from '$lib/constants.js';
 import {to_zzz_cache_dir} from '$lib/diskfile_helpers.js';
 import type {Backend_Action_Handlers} from '$lib/server/backend_action_types.js';
-import type {Action_Phase} from '$lib/action_types.js';
+import type {Action_Phase, Action_Environment} from '$lib/action_types.js';
 import {Action_Inputs, Action_Outputs} from '$lib/action_collections.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
-import {backend_action_event_from_json} from './backend_action_event.js';
+import {create_action_event} from '$lib/action_event.js';
+import type {Action_Event_Environment} from '$lib/action_event_types.js';
 
 /**
  * Function type for handling file system changes.
@@ -84,7 +95,9 @@ export interface Zzz_Server_Options {
 /**
  * Server for managing the Zzz application state and handling client messages.
  */
-export class Zzz_Server {
+export class Zzz_Server implements Action_Event_Environment {
+	readonly executor: Action_Environment = 'backend';
+
 	/** The root Zzz directory on the server's filesystem. */
 	readonly zzz_dir: Zzz_Dir;
 	/** The Zzz cache directory name, defaults to `.zzz`. */
@@ -122,9 +135,9 @@ export class Zzz_Server {
 
 	constructor(options: Zzz_Server_Options) {
 		// Parse the allowed filesystem directories
-		this.zzz_dir = Zzz_Dir.parse(ensure_end(resolve(options.zzz_dir), '/')); // TODO if the class get more paths to deal with, add a `cwd` option - for now callers can just resolve to absolute themselves
+		this.zzz_dir = Zzz_Dir.parse(ensure_end(resolve(options.zzz_dir), '/')); // TODO @many if the class get more paths to deal with, add a `cwd` option - for now callers can just resolve to absolute themselves
 		this.zzz_cache_dirname = options.zzz_cache_dirname ?? ZZZ_CACHE_DIRNAME;
-		this.zzz_cache_dir = to_zzz_cache_dir(this.zzz_dir, this.zzz_cache_dirname); // TODO if the class get more paths to deal with, add a `cwd` option - for now callers can just resolve to absolute themselves
+		this.zzz_cache_dir = to_zzz_cache_dir(this.zzz_dir, this.zzz_cache_dirname); // TODO @many if the class get more paths to deal with, add a `cwd` option - for now callers can just resolve to absolute themselves
 
 		this.config = options.config;
 		this.action_registry = new Action_Registry(options.action_specs);
@@ -176,28 +189,196 @@ export class Zzz_Server {
 		this.#check_destroyed();
 
 		try {
-			const event = backend_action_event_from_json(message, this);
-			event.parse();
-			await event.handle_async();
-			if (event.data.step === 'handled') {
-				return event.data.output; // TODO BLOCK @api @many these are wrong
-			} else if (event.data.step === 'error') {
-				return event.data.error; // TODO BLOCK @api @many these are wrong
+			// Validate the message is a valid JSON-RPC message
+			if (!message || typeof message !== 'object') {
+				return this.#create_parse_error_response();
 			}
+
+			// Handle batch requests
+			if (Array.isArray(message)) {
+				return await this.#process_batch_message(message);
+			}
+
+			// Handle single message
+			return await this.#process_single_message(message);
 		} catch (error) {
-			// Only programmer errors should reach here because
-			// other errors are returned as JSON-RPC errors,
-			// and we don't leak any of those details to the client.
+			// Only programmer errors should reach here
 			this.log?.error('Unexpected error:', error);
 			return this.#create_fatal_error_response(message);
 		}
 	}
 
 	/**
+	 * Process a single JSON-RPC message.
+	 */
+	async #process_single_message(
+		message: unknown,
+	): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
+		// Validate it's a request or notification
+		if (is_jsonrpc_request(message)) {
+			return this.#process_request(message);
+		} else if (is_jsonrpc_notification(message)) {
+			await this.#process_notification(message);
+			return null; // Notifications don't have responses
+		} else {
+			const id = to_jsonrpc_message_id(message);
+			return id
+				? create_jsonrpc_error_message(id, {
+						code: JSONRPC_INTERNAL_ERROR,
+						message: 'Invalid request',
+					})
+				: null;
+		}
+	}
+
+	/**
+	 * Process a batch of JSON-RPC messages.
+	 */
+	async #process_batch_message(
+		messages: Array<unknown>,
+	): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
+		// Check if it's a valid batch (non-empty array)
+		if (!Array.isArray(messages) || messages.length === 0) {
+			// Invalid batch format - return single error response
+			return this.#create_parse_error_response();
+		}
+
+		if (!is_jsonrpc_batch_request(messages)) {
+			// If we can't process as a batch, return a single error
+			return this.#create_parse_error_response();
+		}
+
+		const responses: Array<Jsonrpc_Message_From_Server_To_Client> = [];
+
+		for (const message of messages) {
+			// TODO BLOCK @api needs to be parallelized, but still add to `responses` in completion order
+			const response = await this.#process_single_message(message);
+			if (response !== null) {
+				responses.push(response);
+			}
+		}
+
+		// Per JSON-RPC spec: if no responses, return nothing (null)
+		if (responses.length === 0) {
+			return null;
+		}
+
+		return responses as Jsonrpc_Batch_Response;
+	}
+
+	/**
+	 * Process a JSON-RPC request.
+	 */
+	async #process_request(request: Jsonrpc_Request): Promise<Jsonrpc_Message_From_Server_To_Client> {
+		const spec = this.action_registry.spec_by_method.get(request.method);
+		if (!spec) {
+			return create_jsonrpc_error_message(request.id, {
+				code: JSONRPC_INTERNAL_ERROR,
+				message: `Method not found: ${request.method}`,
+			});
+		}
+
+		try {
+			// Create action event in receive_request phase
+			const event = create_action_event(this, spec, request.params);
+			// Manually set the phase data with the request
+			event.data = {
+				kind: spec.kind as 'request_response',
+				phase: 'receive_request',
+				step: 'initial',
+				method: request.method as Action_Method,
+				executor: this.executor,
+				input: request.params,
+				request,
+			} as any;
+
+			// Parse and handle
+			event.parse();
+			await event.handle_async();
+
+			// Check if we successfully handled the request
+			if (event.data.step === 'handled' && 'output' in event.data) {
+				// Transition to send_response phase
+				event.transition_to_phase('send_response');
+				event.parse();
+				await event.handle_async();
+
+				// Return the response
+				if (event.data.step === 'handled' && 'response' in (event.data as any)) {
+					return (event.data as any).response;
+				}
+			}
+
+			// If we get here, something went wrong
+			if (event.data.step === 'failed' && event.data.error) {
+				return create_jsonrpc_error_message(request.id, event.data.error);
+			}
+
+			// Fallback error
+			return create_jsonrpc_error_message(request.id, {
+				code: JSONRPC_INTERNAL_ERROR,
+				message: 'Failed to process request',
+			});
+		} catch (error) {
+			return create_jsonrpc_error_message_from_thrown(request.id, error);
+		}
+	}
+
+	/**
+	 * Process a JSON-RPC notification.
+	 */
+	async #process_notification(notification: Jsonrpc_Notification): Promise<void> {
+		const spec = this.action_registry.spec_by_method.get(notification.method);
+		if (!spec) {
+			this.log?.warn(`Unknown notification method: ${notification.method}`);
+			return;
+		}
+
+		try {
+			// Create action event in receive phase
+			const event = create_action_event(this, spec, notification.params);
+			// Manually set the phase data with the notification
+			event.data = {
+				kind: spec.kind as 'remote_notification',
+				phase: 'receive',
+				step: 'initial',
+				method: notification.method as Action_Method,
+				executor: this.executor,
+				input: notification.params,
+				notification,
+			} as any;
+
+			// Parse and handle
+			event.parse();
+			await event.handle_async();
+
+			if (event.data.step === 'failed') {
+				this.log?.error(`Notification handler failed:`, event.data.error);
+			}
+		} catch (error) {
+			this.log?.error(`Error processing notification:`, error);
+		}
+	}
+
+	/**
+	 * Create error response for parse errors.
+	 */
+	#create_parse_error_response(): Jsonrpc_Message_From_Server_To_Client {
+		return {
+			// TODO BLOCK @api what to do here?
+			jsonrpc: '2.0',
+			id: null,
+			error: {
+				code: -32700,
+				message: 'Parse error',
+			},
+		};
+	}
+
+	/**
 	 * Create error response for fatal/unexpected errors.
 	 */
 	#create_fatal_error_response(raw_message: unknown): Jsonrpc_Message_From_Server_To_Client | null {
-		// TODO BLOCK @api needs to handle batch messages, and so doesnt use `this` so extract to a helper
 		const id = to_jsonrpc_message_id(raw_message);
 		return id === null
 			? null
@@ -232,7 +413,7 @@ export class Zzz_Server {
 	async destroy(): Promise<void> {
 		if (this.#destroyed) {
 			this.log?.warn('Server already destroyed');
-			return; // no-op, but maybe should throw?
+			return;
 		}
 		this.#destroyed = true;
 

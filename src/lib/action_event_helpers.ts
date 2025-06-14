@@ -12,9 +12,6 @@ import {
 	ACTION_PHASES_BY_KIND,
 } from '$lib/action_event_types.js';
 import {action_spec_by_method} from '$lib/action_collections.js';
-import type {Action_Event} from '$lib/action_event.js';
-
-// TODO BLOCK delete any of these that are not used
 
 /**
  * Check if a step transition is valid.
@@ -171,30 +168,6 @@ export const describe_action_event_state = (data: Action_Event_Data): string => 
 	const error = get_action_event_error(data);
 	return error ? `${base} (error: ${error.message})` : base;
 };
-
-/**
- * Type guard to check if an object is an Action Event.
- */
-export const is_action_event = (obj: unknown): obj is Action_Event =>
-	!!obj &&
-	typeof obj === 'object' &&
-	'spec' in obj &&
-	'context' in obj &&
-	'data' in obj &&
-	typeof (obj as any).parse === 'function' &&
-	typeof (obj as any).handle === 'function';
-
-/**
- * Type guard to check if JSON is a valid action event JSON.
- */
-export const is_action_event_json = (obj: unknown): obj is Action_Event_Data =>
-	!!obj &&
-	typeof obj === 'object' &&
-	'kind' in obj &&
-	'method' in obj &&
-	'phase' in obj &&
-	'step' in obj &&
-	'executor' in obj;
 
 /**
  * Get the appropriate initial phase for an action based on spec and executor.

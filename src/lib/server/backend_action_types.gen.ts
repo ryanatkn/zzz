@@ -15,9 +15,9 @@ import {Import_Builder, generate_phase_handlers, create_banner} from '$lib/codeg
  *
  * Example generated imports:
  * ```typescript
- * import type {Action_Method} from '$lib/action_metatypes.js';
+ * import type {Action_Event} from '$lib/action_event.js';
  * import type {Action_Inputs, Action_Outputs} from '$lib/action_collections.js';
- * import type {Backend_Request_Response_Action_Event} from '$lib/server/backend_action_event.js';
+ * import type {Zzz_Server} from '$lib/server/zzz_server.js';
  * ```
  */
 export const gen: Gen = ({origin_path}) => {
@@ -30,6 +30,7 @@ export const gen: Gen = ({origin_path}) => {
 		.map((spec) => generate_phase_handlers(spec, 'backend', imports))
 		.join(';\n\t');
 
+	// TODO BLOCK @api probably `Action_Events[method]` instead of `Action_Event_Data_Union` with generic
 	return `
 		// ${banner}
 

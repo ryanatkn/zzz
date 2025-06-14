@@ -282,14 +282,6 @@ export const package_json = {
 			svelte: './dist/Clear_Restore_Button.svelte',
 			default: './dist/Clear_Restore_Button.svelte',
 		},
-		'./frontend_action_event.js': {
-			types: './dist/frontend_action_event.d.ts',
-			default: './dist/frontend_action_event.js',
-		},
-		'./frontend_action_handler.js': {
-			types: './dist/frontend_action_handler.d.ts',
-			default: './dist/frontend_action_handler.js',
-		},
 		'./frontend_action_handlers.js': {
 			types: './dist/frontend_action_handlers.d.ts',
 			default: './dist/frontend_action_handlers.js',
@@ -773,14 +765,6 @@ export const package_json = {
 		'./server/security.js': {
 			types: './dist/server/security.d.ts',
 			default: './dist/server/security.js',
-		},
-		'./server/backend_action_event.js': {
-			types: './dist/server/backend_action_event.d.ts',
-			default: './dist/server/backend_action_event.js',
-		},
-		'./server/backend_action_handler.js': {
-			types: './dist/server/backend_action_handler.d.ts',
-			default: './dist/server/backend_action_handler.js',
 		},
 		'./server/backend_action_handlers.js': {
 			types: './dist/server/backend_action_handlers.d.ts',
@@ -1297,26 +1281,6 @@ export const src_json = {
 		'./Clear_Restore_Button.svelte': {
 			path: 'Clear_Restore_Button.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
-		},
-		'./frontend_action_event.js': {
-			path: 'frontend_action_event.ts',
-			declarations: [
-				{name: 'Frontend_Request_Response_Action_Event', kind: 'class'},
-				{name: 'Frontend_Remote_Notification_Action_Event', kind: 'class'},
-				{name: 'Frontend_Local_Call_Action_Event', kind: 'class'},
-				{name: 'Frontend_Action_Event', kind: 'type'},
-				{name: 'create_frontend_action_event', kind: 'function'},
-				{name: 'frontend_action_event_from_json', kind: 'function'},
-			],
-		},
-		'./frontend_action_handler.js': {
-			path: 'frontend_action_handler.ts',
-			declarations: [
-				{name: 'Frontend_Action_Handler', kind: 'type'},
-				{name: 'Frontend_Request_Response_Handler', kind: 'type'},
-				{name: 'Frontend_Notification_Handler', kind: 'type'},
-				{name: 'Frontend_Local_Call_Handler', kind: 'type'},
-			],
 		},
 		'./frontend_action_handlers.js': {
 			path: 'frontend_action_handlers.ts',
@@ -2130,26 +2094,6 @@ export const src_json = {
 				{name: 'Allowed_Origins', kind: 'type'},
 				{name: 'verify_origin', kind: 'function'},
 				{name: 'should_allow_origin', kind: 'function'},
-			],
-		},
-		'./server/backend_action_event.js': {
-			path: 'server/backend_action_event.ts',
-			declarations: [
-				{name: 'Backend_Request_Response_Action_Event', kind: 'class'},
-				{name: 'Backend_Remote_Notification_Action_Event', kind: 'class'},
-				{name: 'Backend_Local_Call_Action_Event', kind: 'class'},
-				{name: 'Backend_Action_Event', kind: 'type'},
-				{name: 'create_backend_action_event', kind: 'function'},
-				{name: 'backend_action_event_from_json', kind: 'function'},
-			],
-		},
-		'./server/backend_action_handler.js': {
-			path: 'server/backend_action_handler.ts',
-			declarations: [
-				{name: 'Backend_Action_Handler', kind: 'type'},
-				{name: 'Backend_Request_Response_Handler', kind: 'type'},
-				{name: 'Backend_Notification_Handler', kind: 'type'},
-				{name: 'Backend_Local_Call_Handler', kind: 'type'},
 			],
 		},
 		'./server/backend_action_handlers.js': {

@@ -350,14 +350,6 @@
       "svelte": "./dist/Clear_Restore_Button.svelte",
       "default": "./dist/Clear_Restore_Button.svelte"
     },
-    "./frontend_action_event.js": {
-      "types": "./dist/frontend_action_event.d.ts",
-      "default": "./dist/frontend_action_event.js"
-    },
-    "./frontend_action_handler.js": {
-      "types": "./dist/frontend_action_handler.d.ts",
-      "default": "./dist/frontend_action_handler.js"
-    },
     "./frontend_action_handlers.js": {
       "types": "./dist/frontend_action_handlers.d.ts",
       "default": "./dist/frontend_action_handlers.js"
@@ -890,14 +882,6 @@
     "./server/security.js": {
       "types": "./dist/server/security.d.ts",
       "default": "./dist/server/security.js"
-    },
-    "./server/backend_action_event.js": {
-      "types": "./dist/server/backend_action_event.d.ts",
-      "default": "./dist/server/backend_action_event.js"
-    },
-    "./server/backend_action_handler.js": {
-      "types": "./dist/server/backend_action_handler.d.ts",
-      "default": "./dist/server/backend_action_handler.js"
     },
     "./server/backend_action_handlers.js": {
       "types": "./dist/server/backend_action_handlers.d.ts",

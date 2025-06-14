@@ -39,7 +39,8 @@ import type {Frontend_Action_Handlers} from '$lib/frontend_action_types.js';
 import type {Action_Spec} from '$lib/action_spec.js';
 import {Action_Inputs, Action_Outputs, action_specs} from '$lib/action_collections.js';
 import {create_actions_api} from '$lib/actions_api.js';
-import {ACTION_KIND_PHASES, type Action_Phase} from '$lib/action_types.js';
+import {Action_Environment, ACTION_KIND_PHASES, type Action_Phase} from '$lib/action_types.js';
+import type {Action_Event_Environment} from '$lib/action_event_types.js';
 
 export const zzz_context = create_context<Zzz_App>();
 
@@ -75,7 +76,9 @@ export interface Zzz_App_Options extends Omit_Strict<Cell_Options<typeof Zzz_App
  * The main client, typically used by creating your own `App extends Zzz`.
  * Gettable with `zzz_context.get()` inside a `<Zzz_Root>`.
  */
-export class Zzz_App extends Cell<typeof Zzz_App_Json> {
+export class Zzz_App extends Cell<typeof Zzz_App_Json> implements Action_Event_Environment {
+	readonly executor: Action_Environment = 'frontend';
+
 	/**
 	 * App-wide cell registry, maps class names to constructor and tracks registered instances.
 	 */

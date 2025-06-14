@@ -14,10 +14,7 @@ import {Action_Json, Action_Kind} from '$lib/action_types.js';
 import type {Jsonrpc_Request_Id} from '$lib/jsonrpc.js';
 import {action_spec_by_method} from '$lib/action_collections.js';
 import type {Action_Spec} from '$lib/action_spec.js';
-import {
-	frontend_action_event_from_json,
-	type Frontend_Action_Event,
-} from '$lib/frontend_action_event.js';
+import {type Action_Event, action_event_from_json} from '$lib/action_event.js';
 import {HANDLED} from '$lib/cell_helpers.js';
 
 export interface Action_Options extends Cell_Options<typeof Action_Json> {}
@@ -28,7 +25,7 @@ export interface Action_Options extends Cell_Options<typeof Action_Json> {}
 export class Action extends Cell<typeof Action_Json> {
 	method: Action_Method = $state()!;
 
-	action_event: Frontend_Action_Event | undefined = $state.raw();
+	action_event: Action_Event | undefined = $state.raw();
 
 	readonly spec: Action_Spec = $derived.by(() => {
 		const s = action_spec_by_method.get(this.method);
@@ -229,7 +226,7 @@ export class Action extends Cell<typeof Action_Json> {
 			action_event: (data) => {
 				if (data) {
 					try {
-						this.action_event = frontend_action_event_from_json(data, this.app);
+						this.action_event = action_event_from_json(data, this.app);
 					} catch (error) {
 						console.error('Failed to reconstruct action event:', error);
 					}

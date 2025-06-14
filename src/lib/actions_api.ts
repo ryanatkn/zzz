@@ -1,7 +1,7 @@
 // @slop claude_opus_4
 // actions_api.ts
 
-import {Logger} from '@ryanatkn/belt/log.js';
+// import {Logger} from '@ryanatkn/belt/log.js';
 import {BROWSER, DEV} from 'esm-env';
 import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 
@@ -9,17 +9,10 @@ import type {Action_Method, Actions_Api} from '$lib/action_metatypes.js';
 import type {Zzz_App} from '$lib/zzz_app.svelte.js';
 import {Action} from '$lib/action.svelte.js';
 import type {Action_Input} from '$lib/action_types.js';
-import {
-	create_frontend_action_event,
-	type Frontend_Request_Response_Action_Event,
-	type Frontend_Remote_Notification_Action_Event,
-	type Frontend_Local_Call_Action_Event,
-} from '$lib/frontend_action_event.js';
+import {create_action_event} from '$lib/action_event.js';
 
-const log = new Logger();
-
-// TODO @api refactor, extract a clear abstraction, maybe `Action_Invocation`,
-// can have multiple mutation contexts, covers the whole sync/async function call wrapper
+// TODO see below, logger is broken with syntax styling
+// const log = new Logger();
 
 // TODO think about transactions, snapshotting
 
@@ -35,30 +28,34 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 			}
 
 			const action = new Action({app, json: {method}});
-			const action_event = create_frontend_action_event(app, spec, input);
+			const action_event = create_action_event(app, spec, input);
 			action.action_event = action_event;
 
 			switch (spec.kind) {
 				case 'request_response': {
-					const event = action_event as Frontend_Request_Response_Action_Event;
-					event.parse();
+					action_event.parse();
 
-					return event.handle_async().then(async () => {
-						if (event.data.step === 'handled' && event.data.phase === 'send_request') {
+					return action_event.handle_async().then(async () => {
+						if (
+							action_event.data.step === 'handled' &&
+							action_event.data.phase === 'send_request'
+						) {
 							app.actions.add(action);
 
-							const response = await app.api_client.send(event.data.request);
+							const request = (action_event.data as any).request;
+							const response = await app.api_client.send(request);
 							console.log(`[actions_api] response`, response);
 
-							// TODO BLOCK should the output be passed through here?
-							event.transition_to_phase('receive_response');
-							event.data = {
-								...event.data,
+							// Transition to receive_response phase
+							// TODO seems hacky
+							action_event.transition_to_phase('receive_response');
+							action_event.data = {
+								...action_event.data,
 								response,
 								output: 'result' in response ? response.result : undefined,
-							};
+							} as any;
 
-							await event.parse().handle_async();
+							await action_event.parse().handle_async();
 
 							if ('error' in response) {
 								// TODO API for callers to access the current error?
@@ -66,8 +63,8 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 								return;
 							}
 
-							if (event.data.phase === 'receive_response' && 'output' in event.data) {
-								return event.data.output; // TODO is this if guard correct? see elsewhere too
+							if (action_event.data.phase === 'receive_response' && 'output' in action_event.data) {
+								return action_event.data.output;
 							}
 						}
 						throw new Error('Failed to create request');
@@ -75,28 +72,27 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 				}
 
 				case 'remote_notification': {
-					const event = action_event as Frontend_Remote_Notification_Action_Event;
-					event.parse();
+					action_event.parse();
 
-					return event.handle_async().then(() => {
-						if (event.data.step === 'handled' && event.data.phase === 'send') {
+					return action_event.handle_async().then(() => {
+						if (action_event.data.step === 'handled' && action_event.data.phase === 'send') {
 							app.actions.add(action);
-							return app.api_client.send(event.data.notification);
+							const notification = (action_event.data as any).notification;
+							return app.api_client.send(notification);
 						}
 						throw new Error('Failed to create notification');
 					});
 				}
 
 				case 'local_call': {
-					const event = action_event as Frontend_Local_Call_Action_Event;
-					event.parse();
+					action_event.parse();
 					app.actions.add(action);
 
 					if (spec.async) {
-						return event.handle_async().then(() => event.output);
+						return action_event.handle_async().then(() => action_event.output);
 					} else {
-						event.handle_sync();
-						return event.output;
+						action_event.handle_sync();
+						return action_event.output;
 					}
 				}
 

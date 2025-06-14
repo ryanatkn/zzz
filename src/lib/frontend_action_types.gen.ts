@@ -15,8 +15,9 @@ import {Import_Builder, generate_phase_handlers, create_banner} from '$lib/codeg
  *
  * Example generated imports:
  * ```typescript
+ * import type {Action_Event} from '$lib/action_event.js';
  * import type {Action_Inputs, Action_Outputs} from '$lib/action_collections.js';
- * import type {Frontend_Request_Response_Action_Event} from '$lib/frontend_action_event.js';
+ * import type {Zzz_App} from '$lib/zzz_app.svelte.js';
  * ```
  */
 export const gen: Gen = ({origin_path}) => {
@@ -27,6 +28,7 @@ export const gen: Gen = ({origin_path}) => {
 	// Generate handlers for each spec, building imports on demand
 	const frontend_action_handlers = registry.specs
 		.map((spec) => generate_phase_handlers(spec, 'frontend', imports))
+		.filter(Boolean) // Remove empty strings
 		.join(';\n\t');
 
 	return `

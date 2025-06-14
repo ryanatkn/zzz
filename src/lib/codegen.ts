@@ -233,25 +233,6 @@ export const get_executor_phases = (
 };
 
 /**
- * Gets the action event type name for a specific kind and executor.
- */
-export const get_action_event_type = (
-	kind: 'request_response' | 'remote_notification' | 'local_call',
-	executor: 'frontend' | 'backend',
-): string => {
-	const prefix = executor === 'frontend' ? 'Frontend' : 'Backend';
-
-	switch (kind) {
-		case 'request_response':
-			return `${prefix}_Request_Response_Action_Event`;
-		case 'remote_notification':
-			return `${prefix}_Remote_Notification_Action_Event`;
-		case 'local_call':
-			return `${prefix}_Local_Call_Action_Event`;
-	}
-};
-
-/**
  * Gets the handler return type for a specific phase and spec.
  */
 export const get_handler_return_type = (spec: Action_Spec, phase: Action_Phase): string => {
@@ -269,49 +250,53 @@ export const get_handler_return_type = (spec: Action_Spec, phase: Action_Phase):
 	}
 
 	// All other phases return void
-	return spec.async ? 'void | Promise<void>' : 'void';
+	return 'void | Promise<void>';
 };
 
 /**
- * Generates the phase handlers for an action spec.
+ * Generates the phase handlers for an action spec using the unified Action_Event type.
  */
 export const generate_phase_handlers = (
 	spec: Action_Spec,
 	executor: 'frontend' | 'backend',
 	imports: Import_Builder,
 ): string => {
-	const {method, kind} = spec;
+	const {method} = spec;
 	const phases = get_executor_phases(spec, executor);
 
 	if (phases.length === 0) {
 		return `${method}?: never`;
 	}
 
-	// Add necessary imports based on the action kind
-	const event_type_name = get_action_event_type(kind, executor);
-	const module =
-		executor === 'frontend'
-			? '$lib/frontend_action_event.js'
-			: '$lib/server/backend_action_event.js';
-
-	imports.add_type(module, event_type_name);
+	// Add necessary imports for the unified system
+	imports.add_type('$lib/action_event.js', 'Action_Event');
 	imports.add_types('$lib/action_collections.js', 'Action_Inputs', 'Action_Outputs');
+	imports.add_type('$lib/action_event_types.js', 'Action_Event_Data_Union');
 
-	// Build the parameterized event type
-	let event_type: string;
-	if (kind === 'request_response') {
-		event_type = `${event_type_name}<'${method}', Action_Inputs['${method}'], Action_Outputs['${method}']>`;
-	} else if (kind === 'remote_notification') {
-		event_type = `${event_type_name}<'${method}', Action_Inputs['${method}']>`;
-	} else {
-		event_type = `${event_type_name}<'${method}', Action_Inputs['${method}'], Action_Outputs['${method}']>`;
-	}
+	// Add environment type import
+	const environment_type = executor === 'frontend' ? 'Zzz_App' : 'Zzz_Server';
+	const environment_module =
+		executor === 'frontend' ? '$lib/zzz_app.svelte.js' : '$lib/server/zzz_server.js';
+	imports.add_type(environment_module, environment_type);
 
 	// Generate handler definitions for each phase
 	const phase_handlers = phases
 		.map((phase: Action_Phase) => {
 			const return_type = get_handler_return_type(spec, phase);
-			return `${phase}?: (action_event: ${event_type}) => ${return_type}`;
+			// Format the narrowed event type for readability
+			return `${phase}?: (
+				action_event: Action_Event<
+					'${method}',
+					Action_Inputs['${method}'],
+					Action_Outputs['${method}'],
+					${environment_type}
+				> & {
+					data: Extract<
+						Action_Event_Data_Union<'${method}'>,
+						{phase: '${phase}'; step: 'handling'}
+					>;
+				}
+			) => ${return_type}`;
 		})
 		.join(';\n\t\t');
 

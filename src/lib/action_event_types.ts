@@ -3,13 +3,7 @@
 
 import {z} from 'zod';
 
-import {
-	Action_Kind,
-	Action_Phase,
-	Action_Input,
-	Action_Output,
-	Action_Environment,
-} from '$lib/action_types.js';
+import {Action_Kind, Action_Phase, Action_Input, Action_Environment} from '$lib/action_types.js';
 import {Action_Method} from '$lib/action_metatypes.js';
 import {
 	Jsonrpc_Request,
@@ -19,6 +13,7 @@ import {
 	Jsonrpc_Notification,
 	Jsonrpc_Error_Json,
 } from '$lib/jsonrpc.js';
+import type {Action_Inputs, Action_Outputs} from '$lib/action_collections.js';
 
 export const Action_Event_Step = z.enum(['initial', 'parsed', 'handling', 'handled', 'failed']);
 export type Action_Event_Step = z.infer<typeof Action_Event_Step>;
@@ -55,19 +50,25 @@ export type Action_Event_Data = z.infer<typeof Action_Event_Data>;
 /**
  * Base interface for action event environments.
  * Both frontend (Zzz_App) and backend (Zzz_Server) must implement this.
+ * The environment provides the context-specific capabilities and handlers.
  */
 export interface Action_Event_Environment {
+	/**
+	 * The executor type of this environment (frontend or backend).
+	 */
+	readonly executor: Action_Environment;
+
+	/**
+	 * Lookup a handler for a specific method and phase.
+	 * Returns undefined if no handler is registered.
+	 */
 	lookup_action_handler: (
 		method: Action_Method,
 		phase: Action_Phase,
 	) => ((event: any) => any) | undefined;
 }
 
-export type Request_Response_Action_Event_Data<
-	T_Method extends Action_Method = Action_Method,
-	T_Input extends Action_Input = Action_Input,
-	T_Output extends Action_Output = Action_Output,
-> =
+export type Request_Response_Action_Event_Data<T_Method extends Action_Method = Action_Method> =
 	| {
 			kind: 'request_response';
 			phase: 'send_request';
@@ -82,7 +83,7 @@ export type Request_Response_Action_Event_Data<
 			step: 'parsed';
 			method: T_Method;
 			executor: Action_Environment;
-			input: T_Input;
+			input: Action_Inputs[T_Method];
 	  }
 	| {
 			kind: 'request_response';
@@ -90,7 +91,7 @@ export type Request_Response_Action_Event_Data<
 			step: 'handling';
 			method: T_Method;
 			executor: Action_Environment;
-			input: T_Input;
+			input: Action_Inputs[T_Method];
 	  }
 	| {
 			kind: 'request_response';
@@ -98,7 +99,7 @@ export type Request_Response_Action_Event_Data<
 			step: 'handled';
 			method: T_Method;
 			executor: Action_Environment;
-			input: T_Input;
+			input: Action_Inputs[T_Method];
 			request: Jsonrpc_Request;
 	  }
 	| {
@@ -107,7 +108,7 @@ export type Request_Response_Action_Event_Data<
 			step: 'failed';
 			method: T_Method;
 			executor: Action_Environment;
-			input?: T_Input;
+			input?: Action_Inputs[T_Method];
 			error: Jsonrpc_Error_Json;
 	  }
 	| {
@@ -125,7 +126,7 @@ export type Request_Response_Action_Event_Data<
 			step: 'parsed';
 			method: T_Method;
 			executor: Action_Environment;
-			input: T_Input;
+			input: Action_Inputs[T_Method];
 			request: Jsonrpc_Request;
 	  }
 	| {
@@ -134,7 +135,7 @@ export type Request_Response_Action_Event_Data<
 			step: 'handling';
 			method: T_Method;
 			executor: Action_Environment;
-			input: T_Input;
+			input: Action_Inputs[T_Method];
 			request: Jsonrpc_Request;
 	  }
 	| {
@@ -143,8 +144,8 @@ export type Request_Response_Action_Event_Data<
 			step: 'handled';
 			method: T_Method;
 			executor: Action_Environment;
-			input: T_Input;
-			output: T_Output;
+			input: Action_Inputs[T_Method];
+			output: Action_Outputs[T_Method];
 			request: Jsonrpc_Request;
 	  }
 	| {
@@ -153,7 +154,7 @@ export type Request_Response_Action_Event_Data<
 			step: 'failed';
 			method: T_Method;
 			executor: Action_Environment;
-			input?: T_Input;
+			input?: Action_Inputs[T_Method];
 			request: Jsonrpc_Request;
 			error: Jsonrpc_Error_Json;
 	  }
@@ -163,8 +164,8 @@ export type Request_Response_Action_Event_Data<
 			step: 'initial';
 			method: T_Method;
 			executor: Action_Environment;
-			input: T_Input;
-			output: T_Output;
+			input: Action_Inputs[T_Method];
+			output: Action_Outputs[T_Method];
 			request: Jsonrpc_Request;
 			response: Jsonrpc_Response | Jsonrpc_Error_Message;
 	  }
@@ -174,8 +175,8 @@ export type Request_Response_Action_Event_Data<
 			step: 'parsed';
 			method: T_Method;
 			executor: Action_Environment;
-			input: T_Input;
-			output: T_Output;
+			input: Action_Inputs[T_Method];
+			output: Action_Outputs[T_Method];
 			request: Jsonrpc_Request;
 			response: Jsonrpc_Response | Jsonrpc_Error_Message;
 	  }
@@ -185,8 +186,8 @@ export type Request_Response_Action_Event_Data<
 			step: 'handling';
 			method: T_Method;
 			executor: Action_Environment;
-			input: T_Input;
-			output: T_Output;
+			input: Action_Inputs[T_Method];
+			output: Action_Outputs[T_Method];
 			request: Jsonrpc_Request;
 			response: Jsonrpc_Response | Jsonrpc_Error_Message;
 	  }
@@ -196,8 +197,8 @@ export type Request_Response_Action_Event_Data<
 			step: 'handled';
 			method: T_Method;
 			executor: Action_Environment;
-			input: T_Input;
-			output: T_Output;
+			input: Action_Inputs[T_Method];
+			output: Action_Outputs[T_Method];
 			request: Jsonrpc_Request;
 			response: Jsonrpc_Response | Jsonrpc_Error_Message;
 	  }
@@ -207,8 +208,8 @@ export type Request_Response_Action_Event_Data<
 			step: 'failed';
 			method: T_Method;
 			executor: Action_Environment;
-			input: T_Input;
-			output?: T_Output;
+			input: Action_Inputs[T_Method];
+			output?: Action_Outputs[T_Method];
 			request: Jsonrpc_Request;
 			response: Jsonrpc_Response | Jsonrpc_Error_Message;
 			error: Jsonrpc_Error_Json;
@@ -219,7 +220,7 @@ export type Request_Response_Action_Event_Data<
 			step: 'initial';
 			method: T_Method;
 			executor: Action_Environment;
-			input: T_Input;
+			input: Action_Inputs[T_Method];
 			output: unknown;
 			request: Jsonrpc_Request;
 			response: Jsonrpc_Response_Or_Error;
@@ -230,8 +231,8 @@ export type Request_Response_Action_Event_Data<
 			step: 'parsed';
 			method: T_Method;
 			executor: Action_Environment;
-			input: T_Input;
-			output: T_Output;
+			input: Action_Inputs[T_Method];
+			output: Action_Outputs[T_Method];
 			request: Jsonrpc_Request;
 			response: Jsonrpc_Response_Or_Error;
 	  }
@@ -241,8 +242,8 @@ export type Request_Response_Action_Event_Data<
 			step: 'handling';
 			method: T_Method;
 			executor: Action_Environment;
-			input: T_Input;
-			output: T_Output;
+			input: Action_Inputs[T_Method];
+			output: Action_Outputs[T_Method];
 			request: Jsonrpc_Request;
 			response: Jsonrpc_Response_Or_Error;
 	  }
@@ -252,8 +253,8 @@ export type Request_Response_Action_Event_Data<
 			step: 'handled';
 			method: T_Method;
 			executor: Action_Environment;
-			input: T_Input;
-			output: T_Output;
+			input: Action_Inputs[T_Method];
+			output: Action_Outputs[T_Method];
 			request: Jsonrpc_Request;
 			response: Jsonrpc_Response_Or_Error;
 	  }
@@ -263,17 +264,14 @@ export type Request_Response_Action_Event_Data<
 			step: 'failed';
 			method: T_Method;
 			executor: Action_Environment;
-			input: T_Input;
-			output?: T_Output;
+			input: Action_Inputs[T_Method];
+			output?: Action_Outputs[T_Method];
 			request: Jsonrpc_Request;
 			response: Jsonrpc_Response_Or_Error;
 			error: Jsonrpc_Error_Json;
 	  };
 
-export type Remote_Notification_Action_Event_Data<
-	T_Method extends Action_Method = Action_Method,
-	T_Input extends Action_Input = Action_Input,
-> =
+export type Remote_Notification_Action_Event_Data<T_Method extends Action_Method = Action_Method> =
 	| {
 			kind: 'remote_notification';
 			phase: 'send';
@@ -288,7 +286,7 @@ export type Remote_Notification_Action_Event_Data<
 			step: 'parsed';
 			method: T_Method;
 			executor: Action_Environment;
-			input: T_Input;
+			input: Action_Inputs[T_Method];
 	  }
 	| {
 			kind: 'remote_notification';
@@ -296,7 +294,7 @@ export type Remote_Notification_Action_Event_Data<
 			step: 'handling';
 			method: T_Method;
 			executor: Action_Environment;
-			input: T_Input;
+			input: Action_Inputs[T_Method];
 	  }
 	| {
 			kind: 'remote_notification';
@@ -304,7 +302,7 @@ export type Remote_Notification_Action_Event_Data<
 			step: 'handled';
 			method: T_Method;
 			executor: Action_Environment;
-			input: T_Input;
+			input: Action_Inputs[T_Method];
 			notification: Jsonrpc_Notification;
 	  }
 	| {
@@ -313,7 +311,7 @@ export type Remote_Notification_Action_Event_Data<
 			step: 'failed';
 			method: T_Method;
 			executor: Action_Environment;
-			input?: T_Input;
+			input?: Action_Inputs[T_Method];
 			error: Jsonrpc_Error_Json;
 	  }
 	| {
@@ -331,7 +329,7 @@ export type Remote_Notification_Action_Event_Data<
 			step: 'parsed';
 			method: T_Method;
 			executor: Action_Environment;
-			input: T_Input;
+			input: Action_Inputs[T_Method];
 			notification: Jsonrpc_Notification;
 	  }
 	| {
@@ -340,7 +338,7 @@ export type Remote_Notification_Action_Event_Data<
 			step: 'handling';
 			method: T_Method;
 			executor: Action_Environment;
-			input: T_Input;
+			input: Action_Inputs[T_Method];
 			notification: Jsonrpc_Notification;
 	  }
 	| {
@@ -349,7 +347,7 @@ export type Remote_Notification_Action_Event_Data<
 			step: 'handled';
 			method: T_Method;
 			executor: Action_Environment;
-			input: T_Input;
+			input: Action_Inputs[T_Method];
 			notification: Jsonrpc_Notification;
 	  }
 	| {
@@ -358,16 +356,12 @@ export type Remote_Notification_Action_Event_Data<
 			step: 'failed';
 			method: T_Method;
 			executor: Action_Environment;
-			input?: T_Input;
+			input?: Action_Inputs[T_Method];
 			notification: Jsonrpc_Notification;
 			error: Jsonrpc_Error_Json;
 	  };
 
-export type Local_Call_Action_Event_Data<
-	T_Method extends Action_Method = Action_Method,
-	T_Input extends Action_Input = Action_Input,
-	T_Output extends Action_Output = Action_Output,
-> =
+export type Local_Call_Action_Event_Data<T_Method extends Action_Method = Action_Method> =
 	| {
 			kind: 'local_call';
 			phase: 'execute';
@@ -382,7 +376,7 @@ export type Local_Call_Action_Event_Data<
 			step: 'parsed';
 			method: T_Method;
 			executor: Action_Environment;
-			input: T_Input;
+			input: Action_Inputs[T_Method];
 	  }
 	| {
 			kind: 'local_call';
@@ -390,7 +384,7 @@ export type Local_Call_Action_Event_Data<
 			step: 'handling';
 			method: T_Method;
 			executor: Action_Environment;
-			input: T_Input;
+			input: Action_Inputs[T_Method];
 	  }
 	| {
 			kind: 'local_call';
@@ -398,8 +392,8 @@ export type Local_Call_Action_Event_Data<
 			step: 'handled';
 			method: T_Method;
 			executor: Action_Environment;
-			input: T_Input;
-			output: T_Output;
+			input: Action_Inputs[T_Method];
+			output: Action_Outputs[T_Method];
 	  }
 	| {
 			kind: 'local_call';
@@ -407,69 +401,11 @@ export type Local_Call_Action_Event_Data<
 			step: 'failed';
 			method: T_Method;
 			executor: Action_Environment;
-			input?: T_Input;
+			input?: Action_Inputs[T_Method];
 			error: Jsonrpc_Error_Json;
 	  };
 
-export type Action_Event_Data_Union<
-	T_Method extends Action_Method = Action_Method,
-	T_Input extends Action_Input = Action_Input,
-	T_Output extends Action_Output = Action_Output,
-> =
-	| Request_Response_Action_Event_Data<T_Method, T_Input, T_Output>
-	| Remote_Notification_Action_Event_Data<T_Method, T_Input>
-	| Local_Call_Action_Event_Data<T_Method, T_Input, T_Output>;
-
-export type Action_Event_Handler<
-	T_Action_Event extends {data: Action_Event_Data},
-	T_Data extends Action_Event_Data,
-	T_Phase extends Action_Phase,
-	T_Output = void,
-> = (
-	action_event: T_Action_Event & {
-		data: Extract<T_Data, {phase: T_Phase; step: 'handling'}>;
-	},
-) => T_Output | Promise<T_Output>;
-
-export type Batch_Action_Event_Data<T_Action_Event = unknown> =
-	| {
-			kind: 'batch';
-			phase: 'batch';
-			step: 'initial';
-			executor: Action_Environment;
-			raw_messages: Array<unknown>;
-	  }
-	| {
-			kind: 'batch';
-			phase: 'batch';
-			step: 'parsed';
-			executor: Action_Environment;
-			raw_messages: Array<unknown>;
-			action_events: Array<T_Action_Event>;
-	  }
-	| {
-			kind: 'batch';
-			phase: 'batch';
-			step: 'handling';
-			executor: Action_Environment;
-			raw_messages: Array<unknown>;
-			action_events: Array<T_Action_Event>;
-	  }
-	| {
-			kind: 'batch';
-			phase: 'batch';
-			step: 'handled';
-			executor: Action_Environment;
-			raw_messages: Array<unknown>;
-			action_events: Array<T_Action_Event>;
-			responses: Array<unknown>;
-	  }
-	| {
-			kind: 'batch';
-			phase: 'batch';
-			step: 'failed';
-			executor: Action_Environment;
-			raw_messages: Array<unknown>;
-			action_events?: Array<T_Action_Event>;
-			error: Jsonrpc_Error_Json;
-	  };
+export type Action_Event_Data_Union<T_Method extends Action_Method = Action_Method> =
+	| Request_Response_Action_Event_Data<T_Method>
+	| Remote_Notification_Action_Event_Data<T_Method>
+	| Local_Call_Action_Event_Data<T_Method>;
