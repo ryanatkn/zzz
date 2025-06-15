@@ -424,7 +424,6 @@ describe('generate_phase_handlers', () => {
 		expect(imports.has_imports()).toBe(true);
 		const import_str = imports.build();
 		expect(import_str).toContain('Action_Event');
-		expect(import_str).toContain('Action_Event_Datas');
 		expect(import_str).toContain('Zzz_App');
 	});
 
@@ -480,17 +479,27 @@ describe('generate_phase_handlers', () => {
 		expect(result).toContain('send_response?:');
 	});
 
-	test('includes narrowed data type in handler signature', () => {
+	test('uses phase and step type parameters in handler signature', () => {
 		const imports = new Import_Builder();
 		const result = generate_phase_handlers(ping_action_spec, 'frontend', imports);
 
-		// Should include the narrowed data type
+		// Should use the new type parameter syntax instead of data override
 		expect(result).toContain(
-			`data: Extract<Action_Event_Datas['ping'], {phase: 'send_request'; step: 'handling'}>`,
+			`action_event: Action_Event<'ping', Zzz_App, 'send_request', 'handling'>`,
 		);
 		expect(result).toContain(
-			`data: Extract<Action_Event_Datas['ping'], {phase: 'receive_response'; step: 'handling'}>`,
+			`action_event: Action_Event<'ping', Zzz_App, 'receive_response', 'handling'>`,
 		);
+		expect(result).toContain(
+			`action_event: Action_Event<'ping', Zzz_App, 'receive_request', 'handling'>`,
+		);
+		expect(result).toContain(
+			`action_event: Action_Event<'ping', Zzz_App, 'send_response', 'handling'>`,
+		);
+
+		// Should NOT contain the old Extract syntax
+		expect(result).not.toContain('Extract<Action_Event_Datas');
+		expect(result).not.toContain('data:');
 	});
 
 	test('handles Action_Outputs import for handlers that return values', () => {

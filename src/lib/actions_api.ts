@@ -73,7 +73,7 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 								return;
 							}
 
-							return action_event.output;
+							return action_event.data.output;
 						}
 						throw new Error('Failed to create request');
 					});
@@ -101,10 +101,10 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 					app.actions.add(action);
 
 					if (spec.async) {
-						return action_event.handle_async().then(() => action_event.output);
+						return action_event.handle_async().then(() => action_event.data.output);
 					} else {
 						action_event.handle_sync();
-						return action_event.output;
+						return action_event.data.output;
 					}
 				}
 

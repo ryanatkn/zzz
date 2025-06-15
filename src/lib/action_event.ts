@@ -35,10 +35,17 @@ import {
 /**
  * Unified action event class that manages state transitions for all action types.
  * Works symmetrically on both frontend and backend based on the environment.
+ *
+ * @template T_Method - The action method name
+ * @template T_Environment - The execution environment (frontend or backend)
+ * @template T_Phase - The current phase of the action
+ * @template T_Step - The current step within the phase
  */
 export class Action_Event<
 	T_Method extends Action_Method = Action_Method,
 	T_Environment extends Action_Event_Environment = Action_Event_Environment,
+	T_Phase extends Action_Phase = Action_Phase,
+	T_Step extends Action_Event_Step = Action_Event_Step,
 > {
 	readonly method: T_Method;
 	readonly spec: Action_Spec;
@@ -46,7 +53,7 @@ export class Action_Event<
 	readonly kind: Action_Kind;
 	readonly executor: Action_Environment;
 
-	data: Action_Event_Datas[T_Method];
+	data: Extract<Action_Event_Datas[T_Method], {phase: T_Phase; step: T_Step}>;
 
 	constructor(environment: T_Environment, spec: Action_Spec, input: Action_Inputs[T_Method]) {
 		this.environment = environment;
@@ -60,10 +67,10 @@ export class Action_Event<
 			throw jsonrpc_errors.internal_error(`No valid initial phase for ${spec.method}`);
 		}
 
-		this.data = this.#build_initial_data(initial_phase, input);
+		this.data = this.#build_initial_data(initial_phase, input) as any;
 	}
 
-	toJSON(): Action_Event_Data {
+	toJSON(): Extract<Action_Event_Datas[T_Method], {phase: T_Phase; step: T_Step}> {
 		return this.data;
 	}
 
@@ -71,16 +78,16 @@ export class Action_Event<
 	 * Parse the input or output data according to the current phase.
 	 * Transitions to 'parsed' step on success, 'failed' on error.
 	 */
-	parse(): this {
+	parse(): Action_Event<T_Method, T_Environment, T_Phase, 'parsed'> {
 		if (this.data.step !== 'initial') {
 			throw jsonrpc_errors.internal_error(`Cannot parse from step: ${this.data.step}`);
 		}
 		try {
-			this.data = this.#parse_data();
+			this.data = this.#parse_data() as any;
 		} catch (error) {
 			this.#handle_parse_error(error);
 		}
-		return this;
+		return this as any;
 	}
 
 	/**
@@ -91,7 +98,7 @@ export class Action_Event<
 		if (this.data.step !== 'parsed') {
 			throw jsonrpc_errors.internal_error(`Cannot handle from step: ${this.data.step}`);
 		}
-		this.data = this.#transition_to_handling();
+		this.data = this.#transition_to_handling() as any;
 
 		try {
 			const output = this.#execute_handler();
@@ -100,7 +107,7 @@ export class Action_Event<
 					`Synchronous action returned a Promise: ${this.spec.method}`,
 				);
 			}
-			this.data = this.#transition_to_handled(output);
+			this.data = this.#transition_to_handled(output) as any;
 		} catch (error) {
 			this.#handle_handler_error(error);
 		}
@@ -114,11 +121,11 @@ export class Action_Event<
 		if (this.data.step !== 'parsed') {
 			throw jsonrpc_errors.internal_error(`Cannot handle from step: ${this.data.step}`);
 		}
-		this.data = this.#transition_to_handling();
+		this.data = this.#transition_to_handling() as any;
 
 		try {
 			const output = await this.#execute_handler();
-			this.data = this.#transition_to_handled(output);
+			this.data = this.#transition_to_handled(output) as any;
 		} catch (error) {
 			this.#handle_handler_error(error);
 		}
@@ -128,14 +135,16 @@ export class Action_Event<
 	 * Transition to a new phase.
 	 * Only allowed from 'handled' step.
 	 */
-	transition_to_phase(phase: Action_Phase): this {
+	transition_to_phase<T_NewPhase extends Action_Phase>(
+		phase: T_NewPhase,
+	): Action_Event<T_Method, T_Environment, T_NewPhase, 'initial'> {
 		if (!this.#can_transition_to_phase(phase)) {
 			throw jsonrpc_errors.internal_error(
 				`Cannot transition from ${this.data.phase}:${this.data.step} to ${phase}`,
 			);
 		}
-		this.data = this.#build_phase_data(phase);
-		return this;
+		this.data = this.#build_phase_data(phase) as any;
+		return this as any;
 	}
 
 	/**
@@ -292,7 +301,7 @@ export class Action_Event<
 			...this.data,
 			step: 'failed',
 			error: this.#to_jsonrpc_error(error),
-		} as Action_Event_Datas[T_Method]; // Failed state includes error
+		} as any; // Failed state includes error
 	}
 
 	#validate_step_transition(to_step: Action_Event_Step): void {
@@ -322,7 +331,7 @@ export class Action_Event<
 			...this.data,
 			step: 'failed',
 			error: this.#to_jsonrpc_error(error),
-		} as Action_Event_Datas[T_Method]; // Failed state includes error
+		} as any; // Failed state includes error
 	}
 
 	#build_phase_data(
@@ -519,29 +528,38 @@ export class Action_Event<
 
 /**
  * Create an action event from a specification and input.
+ * Returns a properly typed Action_Event for the initial phase and step.
  */
 export const create_action_event = <T_Method extends Action_Method>(
 	environment: Action_Event_Environment,
 	spec: Action_Spec,
 	input: unknown,
-): Action_Event<T_Method> => {
-	return new Action_Event<T_Method>(environment, spec, input as Action_Inputs[T_Method]);
+): Action_Event<T_Method, typeof environment, Action_Phase, 'initial'> => {
+	return new Action_Event<T_Method, typeof environment, Action_Phase, 'initial'>(
+		environment,
+		spec,
+		input as Action_Inputs[T_Method],
+	);
 };
 
 /**
  * Reconstruct an action event from JSON data.
+ * Returns an Action_Event with the phase and step from the JSON data.
  */
-export const action_event_from_json = <T_Method extends Action_Method>(
-	json: Action_Event_Data,
+export const action_event_from_json = <
+	T_Method extends Action_Method,
+	T_Data extends Action_Event_Data = Action_Event_Data,
+>(
+	json: T_Data,
 	environment: Action_Event_Environment,
-): Action_Event<T_Method> => {
+): Action_Event<T_Method, typeof environment, T_Data['phase'], T_Data['step']> => {
 	const spec = action_spec_by_method.get(json.method);
 	if (!spec) {
 		throw new Error(`Unknown action method: ${json.method}`);
 	}
 
 	const event = create_action_event<T_Method>(environment, spec, json.input);
-	event.data = json as Action_Event_Datas[T_Method]; // JSON has already been validated elsewhere
+	event.data = json as any; // Safe cast - JSON has already been validated elsewhere
 
-	return event;
+	return event as any;
 };

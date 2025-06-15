@@ -261,7 +261,8 @@ export const get_handler_return_type = (
 };
 
 /**
- * Generates the phase handlers for an action spec using the unified Action_Event type.
+ * Generates the phase handlers for an action spec using the unified Action_Event type
+ * with the new phase/step type parameters.
  */
 export const generate_phase_handlers = (
 	spec: Action_Spec,
@@ -277,7 +278,6 @@ export const generate_phase_handlers = (
 
 	// Add necessary imports for the unified system
 	imports.add_type('$lib/action_event.js', 'Action_Event');
-	imports.add_type('$lib/action_collections.js', 'Action_Event_Datas');
 
 	// Add environment type import
 	const environment_type = executor === 'frontend' ? 'Zzz_App' : 'Zzz_Server';
@@ -290,12 +290,10 @@ export const generate_phase_handlers = (
 		.map((phase: Action_Phase) => {
 			// Pass imports to get_handler_return_type so it can add necessary imports
 			const return_type = get_handler_return_type(spec, phase, imports);
-			// Format the narrowed event type for readability
+			// Use the new type parameter approach
 			return `${phase}?: (
-				action_event: Action_Event<'${method}', ${environment_type}> & {
-					data: Extract<Action_Event_Datas['${method}'], {phase: '${phase}'; step: 'handling'}>;
-				}
-			) => ${return_type}`;
+			action_event: Action_Event<'${method}', ${environment_type}, '${phase}', 'handling'>
+		) => ${return_type}`;
 		})
 		.join(';\n\t\t');
 

@@ -16,7 +16,7 @@ import {Import_Builder, generate_phase_handlers, create_banner} from '$lib/codeg
  * Example generated imports:
  * ```typescript
  * import type {Action_Event} from '$lib/action_event.js';
- * import type {Action_Inputs, Action_Outputs} from '$lib/action_collections.js';
+ * import type {Action_Outputs} from '$lib/action_collections.js';
  * import type {Zzz_Server} from '$lib/server/zzz_server.js';
  * ```
  */
@@ -30,10 +30,6 @@ export const gen: Gen = ({origin_path}) => {
 		.map((spec) => generate_phase_handlers(spec, 'backend', imports))
 		.join(';\n\t');
 
-	// TODO BLOCK @api change these so instead of generating a `data` override, make an optional 3rd generic type param for Action_Event
-	// action_event: Action_Event<'filer_change', Zzz_Server> & {
-	// 				data: Extract<Action_Event_Datas['filer_change'], {phase: 'send'; step: 'handling'}>;
-	// 			},
 	return `
 		// ${banner}
 
