@@ -283,14 +283,9 @@ export const generate_phase_handlers = (
 	const phase_handlers = phases
 		.map((phase: Action_Phase) => {
 			const return_type = get_handler_return_type(spec, phase);
-			// Format the narrowed event type for readability
+			// TODO @api maybe tbe phase/step should be generic for the event type, making this much simpler?
 			return `${phase}?: (
-				action_event: Action_Event<
-					'${method}',
-					Action_Inputs['${method}'],
-					Action_Outputs['${method}'],
-					${environment_type}
-				> & {
+				action_event: Action_Event<'${method}', ${environment_type}> & {
 					data: Extract<
 						Action_Event_Data_Union<'${method}'>,
 						{phase: '${phase}'; step: 'handling'}

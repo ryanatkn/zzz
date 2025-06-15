@@ -15,12 +15,7 @@ import type {Zzz_App} from '$lib/zzz_app.svelte.js';
 export interface Frontend_Action_Handlers {
 	create_directory?: {
 		send_request?: (
-			action_event: Action_Event<
-				'create_directory',
-				Action_Inputs['create_directory'],
-				Action_Outputs['create_directory'],
-				Zzz_App
-			> & {
+			action_event: Action_Event<'create_directory', Zzz_App> & {
 				data: Extract<
 					Action_Event_Data_Union<'create_directory'>,
 					{phase: 'send_request'; step: 'handling'}
@@ -28,12 +23,7 @@ export interface Frontend_Action_Handlers {
 			},
 		) => void | Promise<void>;
 		receive_response?: (
-			action_event: Action_Event<
-				'create_directory',
-				Action_Inputs['create_directory'],
-				Action_Outputs['create_directory'],
-				Zzz_App
-			> & {
+			action_event: Action_Event<'create_directory', Zzz_App> & {
 				data: Extract<
 					Action_Event_Data_Union<'create_directory'>,
 					{phase: 'receive_response'; step: 'handling'}
@@ -43,12 +33,7 @@ export interface Frontend_Action_Handlers {
 	};
 	delete_diskfile?: {
 		send_request?: (
-			action_event: Action_Event<
-				'delete_diskfile',
-				Action_Inputs['delete_diskfile'],
-				Action_Outputs['delete_diskfile'],
-				Zzz_App
-			> & {
+			action_event: Action_Event<'delete_diskfile', Zzz_App> & {
 				data: Extract<
 					Action_Event_Data_Union<'delete_diskfile'>,
 					{phase: 'send_request'; step: 'handling'}
@@ -56,12 +41,7 @@ export interface Frontend_Action_Handlers {
 			},
 		) => void | Promise<void>;
 		receive_response?: (
-			action_event: Action_Event<
-				'delete_diskfile',
-				Action_Inputs['delete_diskfile'],
-				Action_Outputs['delete_diskfile'],
-				Zzz_App
-			> & {
+			action_event: Action_Event<'delete_diskfile', Zzz_App> & {
 				data: Extract<
 					Action_Event_Data_Union<'delete_diskfile'>,
 					{phase: 'receive_response'; step: 'handling'}
@@ -71,12 +51,7 @@ export interface Frontend_Action_Handlers {
 	};
 	filer_change?: {
 		receive?: (
-			action_event: Action_Event<
-				'filer_change',
-				Action_Inputs['filer_change'],
-				Action_Outputs['filer_change'],
-				Zzz_App
-			> & {
+			action_event: Action_Event<'filer_change', Zzz_App> & {
 				data: Extract<
 					Action_Event_Data_Union<'filer_change'>,
 					{phase: 'receive'; step: 'handling'}
@@ -86,12 +61,7 @@ export interface Frontend_Action_Handlers {
 	};
 	load_session?: {
 		send_request?: (
-			action_event: Action_Event<
-				'load_session',
-				Action_Inputs['load_session'],
-				Action_Outputs['load_session'],
-				Zzz_App
-			> & {
+			action_event: Action_Event<'load_session', Zzz_App> & {
 				data: Extract<
 					Action_Event_Data_Union<'load_session'>,
 					{phase: 'send_request'; step: 'handling'}
@@ -99,12 +69,7 @@ export interface Frontend_Action_Handlers {
 			},
 		) => void | Promise<void>;
 		receive_response?: (
-			action_event: Action_Event<
-				'load_session',
-				Action_Inputs['load_session'],
-				Action_Outputs['load_session'],
-				Zzz_App
-			> & {
+			action_event: Action_Event<'load_session', Zzz_App> & {
 				data: Extract<
 					Action_Event_Data_Union<'load_session'>,
 					{phase: 'receive_response'; step: 'handling'}
@@ -114,12 +79,12 @@ export interface Frontend_Action_Handlers {
 	};
 	ping?: {
 		send_request?: (
-			action_event: Action_Event<'ping', Action_Inputs['ping'], Action_Outputs['ping'], Zzz_App> & {
+			action_event: Action_Event<'ping', Zzz_App> & {
 				data: Extract<Action_Event_Data_Union<'ping'>, {phase: 'send_request'; step: 'handling'}>;
 			},
 		) => void | Promise<void>;
 		receive_response?: (
-			action_event: Action_Event<'ping', Action_Inputs['ping'], Action_Outputs['ping'], Zzz_App> & {
+			action_event: Action_Event<'ping', Zzz_App> & {
 				data: Extract<
 					Action_Event_Data_Union<'ping'>,
 					{phase: 'receive_response'; step: 'handling'}
@@ -127,7 +92,7 @@ export interface Frontend_Action_Handlers {
 			},
 		) => void | Promise<void>;
 		receive_request?: (
-			action_event: Action_Event<'ping', Action_Inputs['ping'], Action_Outputs['ping'], Zzz_App> & {
+			action_event: Action_Event<'ping', Zzz_App> & {
 				data: Extract<
 					Action_Event_Data_Union<'ping'>,
 					{phase: 'receive_request'; step: 'handling'}
@@ -135,19 +100,14 @@ export interface Frontend_Action_Handlers {
 			},
 		) => Action_Outputs['ping'] | Promise<Action_Outputs['ping']>;
 		send_response?: (
-			action_event: Action_Event<'ping', Action_Inputs['ping'], Action_Outputs['ping'], Zzz_App> & {
+			action_event: Action_Event<'ping', Zzz_App> & {
 				data: Extract<Action_Event_Data_Union<'ping'>, {phase: 'send_response'; step: 'handling'}>;
 			},
 		) => void | Promise<void>;
 	};
 	submit_completion?: {
 		send_request?: (
-			action_event: Action_Event<
-				'submit_completion',
-				Action_Inputs['submit_completion'],
-				Action_Outputs['submit_completion'],
-				Zzz_App
-			> & {
+			action_event: Action_Event<'submit_completion', Zzz_App> & {
 				data: Extract<
 					Action_Event_Data_Union<'submit_completion'>,
 					{phase: 'send_request'; step: 'handling'}
@@ -155,12 +115,7 @@ export interface Frontend_Action_Handlers {
 			},
 		) => void | Promise<void>;
 		receive_response?: (
-			action_event: Action_Event<
-				'submit_completion',
-				Action_Inputs['submit_completion'],
-				Action_Outputs['submit_completion'],
-				Zzz_App
-			> & {
+			action_event: Action_Event<'submit_completion', Zzz_App> & {
 				data: Extract<
 					Action_Event_Data_Union<'submit_completion'>,
 					{phase: 'receive_response'; step: 'handling'}
@@ -170,12 +125,7 @@ export interface Frontend_Action_Handlers {
 	};
 	toggle_main_menu?: {
 		execute?: (
-			action_event: Action_Event<
-				'toggle_main_menu',
-				Action_Inputs['toggle_main_menu'],
-				Action_Outputs['toggle_main_menu'],
-				Zzz_App
-			> & {
+			action_event: Action_Event<'toggle_main_menu', Zzz_App> & {
 				data: Extract<
 					Action_Event_Data_Union<'toggle_main_menu'>,
 					{phase: 'execute'; step: 'handling'}
@@ -185,12 +135,7 @@ export interface Frontend_Action_Handlers {
 	};
 	update_diskfile?: {
 		send_request?: (
-			action_event: Action_Event<
-				'update_diskfile',
-				Action_Inputs['update_diskfile'],
-				Action_Outputs['update_diskfile'],
-				Zzz_App
-			> & {
+			action_event: Action_Event<'update_diskfile', Zzz_App> & {
 				data: Extract<
 					Action_Event_Data_Union<'update_diskfile'>,
 					{phase: 'send_request'; step: 'handling'}
@@ -198,12 +143,7 @@ export interface Frontend_Action_Handlers {
 			},
 		) => void | Promise<void>;
 		receive_response?: (
-			action_event: Action_Event<
-				'update_diskfile',
-				Action_Inputs['update_diskfile'],
-				Action_Outputs['update_diskfile'],
-				Zzz_App
-			> & {
+			action_event: Action_Event<'update_diskfile', Zzz_App> & {
 				data: Extract<
 					Action_Event_Data_Union<'update_diskfile'>,
 					{phase: 'receive_response'; step: 'handling'}
