@@ -286,10 +286,6 @@ export class Zzz_App extends Cell<typeof Zzz_App_Json> implements Action_Event_E
 		return history;
 	}
 
-	/**
-	 * Lookup a client action handler for a specific method and phase.
-	 * Returns undefined if no handler is registered.
-	 */
 	lookup_action_handler(
 		method: Action_Method,
 		phase: Action_Phase,
@@ -299,10 +295,6 @@ export class Zzz_App extends Cell<typeof Zzz_App_Json> implements Action_Event_E
 		return method_handlers[phase];
 	}
 
-	/**
-	 * Lookup the input schema for an action method.
-	 * Returns undefined if the method is not recognized.
-	 */
 	lookup_action_input_schema<T_Method extends Action_Method>(
 		method: T_Method,
 	): (typeof Action_Inputs)[T_Method] | undefined {
@@ -310,10 +302,6 @@ export class Zzz_App extends Cell<typeof Zzz_App_Json> implements Action_Event_E
 		return spec?.input as any;
 	}
 
-	/**
-	 * Lookup the output schema for an action method.
-	 * Returns undefined if the method is not recognized.
-	 */
 	lookup_action_output_schema<T_Method extends Action_Method>(
 		method: T_Method,
 	): (typeof Action_Outputs)[T_Method] | undefined {
