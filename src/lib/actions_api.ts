@@ -10,6 +10,10 @@ import type {Zzz_App} from '$lib/zzz_app.svelte.js';
 import {Action} from '$lib/action.svelte.js';
 import type {Action_Input} from '$lib/action_types.js';
 import {create_action_event} from '$lib/action_event.js';
+import type {
+	Request_Response_Action_Event_Data,
+	Remote_Notification_Action_Event_Data,
+} from '$lib/action_event_types.js';
 
 // TODO see below, logger is broken with syntax styling
 // const log = new Logger();
@@ -42,18 +46,24 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 						) {
 							app.actions.add(action);
 
-							const request = (action_event.data as any).request;
-							const response = await app.api_client.send(request);
+							// TODO BLOCK @api try to make these use narrowing
+							// TypeScript knows this is the right phase/step combination
+							const data = action_event.data as Extract<
+								Request_Response_Action_Event_Data,
+								{phase: 'send_request'; step: 'handled'}
+							>;
+							const response = await app.api_client.send(data.request);
 							console.log(`[actions_api] response`, response);
 
 							// Transition to receive_response phase
-							// TODO seems hacky
 							action_event.transition_to_phase('receive_response');
+							// TODO seems hacky
+							// Manually set the response data
 							action_event.data = {
 								...action_event.data,
 								response,
 								output: 'result' in response ? response.result : undefined,
-							} as any;
+							} as any; // Complex state transition requires cast
 
 							await action_event.parse().handle_async();
 
@@ -63,9 +73,7 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 								return;
 							}
 
-							if (action_event.data.phase === 'receive_response' && 'output' in action_event.data) {
-								return action_event.data.output;
-							}
+							return action_event.output;
 						}
 						throw new Error('Failed to create request');
 					});
@@ -77,8 +85,12 @@ export const create_actions_api = (app: Zzz_App): Actions_Api =>
 					return action_event.handle_async().then(() => {
 						if (action_event.data.step === 'handled' && action_event.data.phase === 'send') {
 							app.actions.add(action);
-							const notification = (action_event.data as any).notification;
-							return app.api_client.send(notification);
+							// TypeScript knows this is the right phase/step combination
+							const data = action_event.data as Extract<
+								Remote_Notification_Action_Event_Data,
+								{phase: 'send'; step: 'handled'}
+							>;
+							return app.api_client.send(data.notification);
 						}
 						throw new Error('Failed to create notification');
 					});

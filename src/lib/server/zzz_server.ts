@@ -290,12 +290,13 @@ export class Zzz_Server implements Action_Event_Environment {
 				executor: this.executor,
 				input: request.params,
 				request,
-			} as any;
+			} as any; // TODO @api @many try to avoid casting
 
 			// Parse and handle
 			event.parse();
 			await event.handle_async();
 
+			// TODO BLOCK @api probably be more explicit than checking for property existence here and below?
 			// Check if we successfully handled the request
 			if (event.data.step === 'handled' && 'output' in event.data) {
 				// Transition to send_response phase
@@ -304,12 +305,19 @@ export class Zzz_Server implements Action_Event_Environment {
 				await event.handle_async();
 
 				// Return the response
-				if (event.data.step === 'handled' && 'response' in (event.data as any)) {
-					return (event.data as any).response;
+				if (event.data.step === 'handled' && event.data.phase === 'send_response') {
+					const data = event.data as Extract<
+						typeof event.data,
+						{phase: 'send_response'; step: 'handled'}
+					>;
+					if ('response' in data) {
+						return data.response;
+					}
 				}
 			}
 
-			// If we get here, something went wrong
+			// TODO this may be unnecessary depending on event behavior,
+			// does it create a response for all errors? should it?
 			if (event.data.step === 'failed' && event.data.error) {
 				return create_jsonrpc_error_message(request.id, event.data.error);
 			}
@@ -346,7 +354,7 @@ export class Zzz_Server implements Action_Event_Environment {
 				executor: this.executor,
 				input: notification.params,
 				notification,
-			} as any;
+			} as any; // TODO @api @many try to avoid casting
 
 			// Parse and handle
 			event.parse();

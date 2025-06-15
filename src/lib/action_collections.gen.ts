@@ -27,6 +27,11 @@ export const gen: Gen = ({origin_path}) => {
 		import {type Action_Spec, collect_action_specs} from '$lib/action_spec.js';
 		import * as specs from '$lib/action_specs.js';
 		import type {Action_Method} from '$lib/action_metatypes.js';
+		import type {
+			Request_Response_Action_Event_Data,
+			Remote_Notification_Action_Event_Data,
+			Local_Call_Action_Event_Data,
+		} from '$lib/action_event_types.js';
 
 		// TODO consistent naming
 		/**
@@ -73,7 +78,7 @@ export const gen: Gen = ({origin_path}) => {
 					(spec) =>
 						`${spec.method}: z.infer<typeof specs.${to_action_spec_input_identifier(spec.method)}>`,
 				)
-				.join(',\n\t\t\t')}
+				.join(';\n\t\t\t')}
 		}
 
 		/**
@@ -92,22 +97,27 @@ export const gen: Gen = ({origin_path}) => {
 					(spec) =>
 						`${spec.method}: z.infer<typeof specs.${to_action_spec_output_identifier(spec.method)}>`,
 				)
-				.join(',\n\t\t\t')}
+				.join(';\n\t\t\t')}
 		}
 
-		// TODO BLOCK @api use the following or a variant and delete the stuff above
-
 		/**
-		 * Helper type to get params type for a method.
+		 * Action event data types indexed by method name.
+		 * These represent the full discriminated union of all possible states
+		 * for each action's event data, properly typed with inputs and outputs.
 		 */
-		export type Action_Input_For<T_Method extends keyof typeof Action_Inputs> = 
-			z.infer<typeof Action_Inputs[T_Method]>;
-
-		/**
-		 * Helper type to get result type for a method.
-		 */
-		export type Action_Output_For<T_Method extends keyof typeof Action_Outputs> = 
-			z.infer<typeof Action_Outputs[T_Method]>;
+		export interface Action_Event_Datas {
+			${registry.specs
+				.map((spec) => {
+					const dataType =
+						spec.kind === 'request_response'
+							? `Request_Response_Action_Event_Data<'${spec.method}'>`
+							: spec.kind === 'remote_notification'
+								? `Remote_Notification_Action_Event_Data<'${spec.method}'>`
+								: `Local_Call_Action_Event_Data<'${spec.method}'>`;
+					return `${spec.method}: ${dataType}`;
+				})
+				.join(';\n\t\t\t')}
+		}
 
 		/**
 		 * Parse action params with validation.
@@ -115,8 +125,8 @@ export const gen: Gen = ({origin_path}) => {
 		export const parse_action_input = <T_Method extends keyof typeof Action_Inputs>(
 			method: T_Method,
 			data: unknown
-		): Action_Input_For<T_Method> =>
-			Action_Inputs[method].parse(data);
+		): Action_Inputs[T_Method] =>
+			Action_Inputs[method].parse(data) as Action_Inputs[T_Method];
 
 		/**
 		 * Parse action result with validation.
@@ -124,8 +134,8 @@ export const gen: Gen = ({origin_path}) => {
 		export const parse_action_output = <T_Method extends keyof typeof Action_Outputs>(
 			method: T_Method,
 			data: unknown
-		): Action_Output_For<T_Method> =>
-			Action_Outputs[method].parse(data);
+		): Action_Outputs[T_Method] =>
+			Action_Outputs[method].parse(data) as Action_Outputs[T_Method];
 
 		/**
 		 * Safe parse action params.
@@ -133,8 +143,8 @@ export const gen: Gen = ({origin_path}) => {
 		export const safe_parse_action_input = <T_Method extends keyof typeof Action_Inputs>(
 			method: T_Method,
 			data: unknown
-		): z.SafeParseReturnType<unknown, Action_Input_For<T_Method>> =>
-			Action_Inputs[method].safeParse(data);
+		): z.SafeParseReturnType<unknown, Action_Inputs[T_Method]> =>
+			Action_Inputs[method].safeParse(data) as z.SafeParseReturnType<unknown, Action_Inputs[T_Method]>;
 
 		/**
 		 * Safe parse action result.
@@ -142,8 +152,8 @@ export const gen: Gen = ({origin_path}) => {
 		export const safe_parse_action_output = <T_Method extends keyof typeof Action_Outputs>(
 			method: T_Method,
 			data: unknown
-		): z.SafeParseReturnType<unknown, Action_Output_For<T_Method>> =>
-			Action_Outputs[method].safeParse(data);
+		): z.SafeParseReturnType<unknown, Action_Outputs[T_Method]> =>
+			Action_Outputs[method].safeParse(data) as z.SafeParseReturnType<unknown, Action_Outputs[T_Method]>;
 
 		// ${banner}
 	`;

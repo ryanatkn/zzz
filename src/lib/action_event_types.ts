@@ -3,8 +3,9 @@
 
 import {z} from 'zod';
 
-import {Action_Kind, Action_Phase, Action_Input, Action_Environment} from '$lib/action_types.js';
+import {Action_Kind, Action_Phase, Action_Environment} from '$lib/action_types.js';
 import {Action_Method} from '$lib/action_metatypes.js';
+import {type Action_Inputs, type Action_Outputs} from '$lib/action_collections.js';
 import {
 	Jsonrpc_Request,
 	Jsonrpc_Response,
@@ -13,7 +14,6 @@ import {
 	Jsonrpc_Notification,
 	Jsonrpc_Error_Json,
 } from '$lib/jsonrpc.js';
-import type {Action_Inputs, Action_Outputs} from '$lib/action_collections.js';
 
 export const Action_Event_Step = z.enum(['initial', 'parsed', 'handling', 'handled', 'failed']);
 export type Action_Event_Step = z.infer<typeof Action_Event_Step>;

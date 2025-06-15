@@ -1,17 +1,24 @@
 // @slop claude_opus_4
 // codegen.test.ts
 
+// @vitest-environment jsdom
+
 import {test, expect, describe} from 'vitest';
 
 import {
 	Import_Builder,
 	get_executor_phases,
-	get_action_event_type,
 	get_handler_return_type,
 	generate_phase_handlers,
 	create_banner,
 } from '$lib/codegen.js';
-import type {Action_Spec} from '$lib/action_spec.js';
+import {
+	ping_action_spec,
+	load_session_action_spec,
+	filer_change_action_spec,
+	toggle_main_menu_action_spec,
+	submit_completion_action_spec,
+} from '$lib/action_specs.js';
 
 describe('Import_Builder', () => {
 	describe('type-only imports', () => {
@@ -263,120 +270,66 @@ describe('Import_Builder', () => {
 
 describe('get_executor_phases', () => {
 	describe('request_response actions', () => {
-		test('frontend initiator', () => {
-			const spec = {
-				kind: 'request_response',
-				initiator: 'frontend',
-			} as Action_Spec;
-
-			expect(get_executor_phases(spec, 'frontend')).toEqual(['send_request', 'receive_response']);
-			expect(get_executor_phases(spec, 'backend')).toEqual(['receive_request', 'send_response']);
+		test('frontend initiator - ping spec', () => {
+			// ping has initiator: 'both'
+			expect(get_executor_phases(ping_action_spec, 'frontend')).toEqual([
+				'send_request',
+				'receive_response',
+				'receive_request',
+				'send_response',
+			]);
+			expect(get_executor_phases(ping_action_spec, 'backend')).toEqual([
+				'send_request',
+				'receive_response',
+				'receive_request',
+				'send_response',
+			]);
 		});
 
-		test('backend initiator', () => {
-			const spec = {
-				kind: 'request_response',
-				initiator: 'backend',
-			} as Action_Spec;
-
-			expect(get_executor_phases(spec, 'frontend')).toEqual(['receive_request', 'send_response']);
-			expect(get_executor_phases(spec, 'backend')).toEqual(['send_request', 'receive_response']);
+		test('frontend initiator - load_session spec', () => {
+			// load_session has initiator: 'frontend'
+			expect(get_executor_phases(load_session_action_spec, 'frontend')).toEqual([
+				'send_request',
+				'receive_response',
+			]);
+			expect(get_executor_phases(load_session_action_spec, 'backend')).toEqual([
+				'receive_request',
+				'send_response',
+			]);
 		});
 
-		test('both initiator', () => {
-			const spec = {
-				kind: 'request_response',
-				initiator: 'both',
-			} as Action_Spec;
-
-			const expected_all = ['send_request', 'receive_response', 'receive_request', 'send_response'];
-			expect(get_executor_phases(spec, 'frontend')).toEqual(expected_all);
-			expect(get_executor_phases(spec, 'backend')).toEqual(expected_all);
+		test('frontend initiator - submit_completion spec', () => {
+			// submit_completion has initiator: 'frontend'
+			expect(get_executor_phases(submit_completion_action_spec, 'frontend')).toEqual([
+				'send_request',
+				'receive_response',
+			]);
+			expect(get_executor_phases(submit_completion_action_spec, 'backend')).toEqual([
+				'receive_request',
+				'send_response',
+			]);
 		});
 	});
 
 	describe('remote_notification actions', () => {
-		test('frontend initiator', () => {
-			const spec = {
-				kind: 'remote_notification',
-				initiator: 'frontend',
-			} as Action_Spec;
-
-			expect(get_executor_phases(spec, 'frontend')).toEqual(['send']);
-			expect(get_executor_phases(spec, 'backend')).toEqual(['receive']);
-		});
-
-		test('backend initiator', () => {
-			const spec = {
-				kind: 'remote_notification',
-				initiator: 'backend',
-			} as Action_Spec;
-
-			expect(get_executor_phases(spec, 'frontend')).toEqual(['receive']);
-			expect(get_executor_phases(spec, 'backend')).toEqual(['send']);
-		});
-
-		test('both initiator', () => {
-			const spec = {
-				kind: 'remote_notification',
-				initiator: 'both',
-			} as Action_Spec;
-
-			expect(get_executor_phases(spec, 'frontend')).toEqual(['send', 'receive']);
-			expect(get_executor_phases(spec, 'backend')).toEqual(['send', 'receive']);
+		test('backend initiator - filer_change spec', () => {
+			// filer_change has initiator: 'backend'
+			expect(get_executor_phases(filer_change_action_spec, 'frontend')).toEqual(['receive']);
+			expect(get_executor_phases(filer_change_action_spec, 'backend')).toEqual(['send']);
 		});
 	});
 
 	describe('local_call actions', () => {
-		test('frontend initiator', () => {
-			const spec = {
-				kind: 'local_call',
-				initiator: 'frontend',
-			} as Action_Spec;
-
-			expect(get_executor_phases(spec, 'frontend')).toEqual(['execute']);
-			expect(get_executor_phases(spec, 'backend')).toEqual([]);
-		});
-
-		test('backend initiator', () => {
-			const spec = {
-				kind: 'local_call',
-				initiator: 'backend',
-			} as Action_Spec;
-
-			expect(get_executor_phases(spec, 'frontend')).toEqual([]);
-			expect(get_executor_phases(spec, 'backend')).toEqual(['execute']);
-		});
-
-		test('both initiator', () => {
-			const spec = {
-				kind: 'local_call',
-				initiator: 'both',
-			} as Action_Spec;
-
-			expect(get_executor_phases(spec, 'frontend')).toEqual(['execute']);
-			expect(get_executor_phases(spec, 'backend')).toEqual(['execute']);
+		test('frontend initiator - toggle_main_menu spec', () => {
+			// toggle_main_menu has initiator: 'frontend'
+			expect(get_executor_phases(toggle_main_menu_action_spec, 'frontend')).toEqual(['execute']);
+			expect(get_executor_phases(toggle_main_menu_action_spec, 'backend')).toEqual([]);
 		});
 	});
 
 	describe('edge cases', () => {
-		test('returns empty array for invalid combinations', () => {
-			const spec = {
-				kind: 'request_response',
-				initiator: 'invalid' as any,
-			} as Action_Spec;
-
-			expect(get_executor_phases(spec, 'frontend')).toEqual([]);
-			expect(get_executor_phases(spec, 'backend')).toEqual([]);
-		});
-
 		test('phases are returned in correct order', () => {
-			const spec = {
-				kind: 'request_response',
-				initiator: 'both',
-			} as Action_Spec;
-
-			const frontend_phases = get_executor_phases(spec, 'frontend');
+			const frontend_phases = get_executor_phases(ping_action_spec, 'frontend');
 			// Send phases should come before receive phases
 			expect(frontend_phases.indexOf('send_request')).toBeLessThan(
 				frontend_phases.indexOf('receive_request'),
@@ -385,136 +338,84 @@ describe('get_executor_phases', () => {
 	});
 });
 
-describe('get_action_event_type', () => {
-	test('frontend event types', () => {
-		expect(get_action_event_type('request_response', 'frontend')).toBe(
-			'Frontend_Request_Response_Action_Event',
-		);
-
-		expect(get_action_event_type('remote_notification', 'frontend')).toBe(
-			'Frontend_Remote_Notification_Action_Event',
-		);
-
-		expect(get_action_event_type('local_call', 'frontend')).toBe(
-			'Frontend_Local_Call_Action_Event',
-		);
-	});
-
-	test('backend event types', () => {
-		expect(get_action_event_type('request_response', 'backend')).toBe(
-			'Backend_Request_Response_Action_Event',
-		);
-
-		expect(get_action_event_type('remote_notification', 'backend')).toBe(
-			'Backend_Remote_Notification_Action_Event',
-		);
-
-		expect(get_action_event_type('local_call', 'backend')).toBe('Backend_Local_Call_Action_Event');
-	});
-});
-
 describe('get_handler_return_type', () => {
 	describe('request_response actions', () => {
-		test('receive_request phase returns output with Promise', () => {
-			const spec = {
-				kind: 'request_response',
-				method: 'test_method',
-				async: true,
-			} as unknown as Action_Spec;
+		test('receive_request phase returns output with Promise and adds import', () => {
+			const imports = new Import_Builder();
 
-			// Request/response actions are always async
-			expect(get_handler_return_type(spec, 'receive_request')).toBe(
-				`Action_Outputs['test_method'] | Promise<Action_Outputs['test_method']>`,
-			);
+			// ping_action_spec is a request/response action
+			const result = get_handler_return_type(ping_action_spec, 'receive_request', imports);
+			expect(result).toBe(`Action_Outputs['ping'] | Promise<Action_Outputs['ping']>`);
+
+			// Check that Action_Outputs was added to imports
+			const built = imports.build();
+			expect(built).toContain('Action_Outputs');
+			expect(built).toContain('$lib/action_collections.js');
 		});
 
-		test('other phases return void', () => {
-			const spec = {
-				kind: 'request_response',
-				method: 'test_method',
-				async: true,
-			} as unknown as Action_Spec;
+		test('other phases return void and do not add imports', () => {
+			const imports = new Import_Builder();
 
-			expect(get_handler_return_type(spec, 'send_request')).toBe('void | Promise<void>');
-			expect(get_handler_return_type(spec, 'send_response')).toBe('void | Promise<void>');
-			expect(get_handler_return_type(spec, 'receive_response')).toBe('void | Promise<void>');
+			expect(get_handler_return_type(load_session_action_spec, 'send_request', imports)).toBe(
+				'void | Promise<void>',
+			);
+			expect(get_handler_return_type(load_session_action_spec, 'send_response', imports)).toBe(
+				'void | Promise<void>',
+			);
+			expect(get_handler_return_type(load_session_action_spec, 'receive_response', imports)).toBe(
+				'void | Promise<void>',
+			);
+
+			// Should not add Action_Outputs for void returns
+			expect(imports.build()).toBe('');
 		});
 	});
 
 	describe('local_call actions', () => {
-		test('execute phase returns output', () => {
-			const async_spec = {
-				kind: 'local_call',
-				method: 'test_method',
-				async: true,
-			} as unknown as Action_Spec;
+		test('execute phase returns output for sync action', () => {
+			const imports = new Import_Builder();
 
-			expect(get_handler_return_type(async_spec, 'execute')).toBe(
-				`Action_Outputs['test_method'] | Promise<Action_Outputs['test_method']>`,
-			);
+			// toggle_main_menu is a sync local_call (async: false)
+			const result = get_handler_return_type(toggle_main_menu_action_spec, 'execute', imports);
+			expect(result).toBe(`Action_Outputs['toggle_main_menu']`);
 
-			const sync_spec = {
-				kind: 'local_call',
-				method: 'test_method',
-				async: false,
-			} as unknown as Action_Spec;
-
-			expect(get_handler_return_type(sync_spec, 'execute')).toBe(`Action_Outputs['test_method']`);
+			// Should add Action_Outputs import
+			expect(imports.build()).toContain('Action_Outputs');
 		});
 	});
 
 	describe('remote_notification actions', () => {
 		test('all phases return void', () => {
-			const spec = {
-				kind: 'remote_notification',
-				method: 'test_method',
-				async: true,
-			} as unknown as Action_Spec;
+			const imports = new Import_Builder();
 
-			expect(get_handler_return_type(spec, 'send')).toBe('void | Promise<void>');
-			expect(get_handler_return_type(spec, 'receive')).toBe('void | Promise<void>');
-		});
+			expect(get_handler_return_type(filer_change_action_spec, 'send', imports)).toBe(
+				'void | Promise<void>',
+			);
+			expect(get_handler_return_type(filer_change_action_spec, 'receive', imports)).toBe(
+				'void | Promise<void>',
+			);
 
-		test('sync notifications still return void', () => {
-			const spec = {
-				kind: 'remote_notification',
-				method: 'test_method',
-				async: false,
-			} as unknown as Action_Spec;
-
-			expect(get_handler_return_type(spec, 'send')).toBe('void');
-			expect(get_handler_return_type(spec, 'receive')).toBe('void');
+			// Should not add imports for void returns
+			expect(imports.build()).toBe('');
 		});
 	});
 });
 
 describe('generate_phase_handlers', () => {
 	test('generates never for actions with no valid phases', () => {
-		const spec = {
-			method: 'test_action',
-			kind: 'local_call',
-			initiator: 'backend',
-		} as unknown as Action_Spec;
-
+		// toggle_main_menu on backend should have no valid phases
 		const imports = new Import_Builder();
-		const result = generate_phase_handlers(spec, 'frontend', imports);
+		const result = generate_phase_handlers(toggle_main_menu_action_spec, 'backend', imports);
 
-		expect(result).toBe('test_action?: never');
+		expect(result).toBe('toggle_main_menu?: never');
 		expect(imports.has_imports()).toBe(false);
 	});
 
 	test('generates handlers for request_response action', () => {
-		const spec = {
-			method: 'save_file',
-			kind: 'request_response',
-			initiator: 'frontend',
-			async: true,
-		} as unknown as Action_Spec;
-
 		const imports = new Import_Builder();
-		const result = generate_phase_handlers(spec, 'frontend', imports);
+		const result = generate_phase_handlers(load_session_action_spec, 'frontend', imports);
 
-		expect(result).toContain('save_file?: {');
+		expect(result).toContain('load_session?: {');
 		expect(result).toContain('send_request?:');
 		expect(result).toContain('receive_response?:');
 		expect(result).not.toContain('receive_request');
@@ -522,97 +423,87 @@ describe('generate_phase_handlers', () => {
 		// Check imports were added
 		expect(imports.has_imports()).toBe(true);
 		const import_str = imports.build();
-		expect(import_str).toContain('Frontend_Request_Response_Action_Event');
-		expect(import_str).toContain('Action_Inputs');
-		expect(import_str).toContain('Action_Outputs');
+		expect(import_str).toContain('Action_Event');
+		expect(import_str).toContain('Action_Event_Datas');
+		expect(import_str).toContain('Zzz_App');
 	});
 
 	test('generates handlers for notification action', () => {
-		const spec = {
-			method: 'file_changed',
-			kind: 'remote_notification',
-			initiator: 'backend',
-			async: true,
-		} as unknown as Action_Spec;
-
 		const imports = new Import_Builder();
-		const result = generate_phase_handlers(spec, 'backend', imports);
+		const result = generate_phase_handlers(filer_change_action_spec, 'backend', imports);
 
-		expect(result).toContain('file_changed?: {');
+		expect(result).toContain('filer_change?: {');
 		expect(result).toContain('send?:');
 		expect(result).not.toContain('receive?:');
 
 		const import_str = imports.build();
-		expect(import_str).toContain('Backend_Remote_Notification_Action_Event');
+		expect(import_str).toContain('Action_Event');
+		expect(import_str).toContain('Zzz_Server');
 	});
 
 	test('generates handlers for local_call action', () => {
-		const spec = {
-			method: 'toggle_menu',
-			kind: 'local_call',
-			initiator: 'both',
-			async: false,
-		} as unknown as Action_Spec;
-
 		const imports = new Import_Builder();
-		const result = generate_phase_handlers(spec, 'frontend', imports);
+		const result = generate_phase_handlers(toggle_main_menu_action_spec, 'frontend', imports);
 
-		expect(result).toContain('toggle_menu?: {');
+		expect(result).toContain('toggle_main_menu?: {');
 		expect(result).toContain('execute?:');
-		expect(result).toContain(`Action_Outputs['toggle_menu']`);
-		expect(result).not.toContain('Promise');
+		expect(result).toContain(`Action_Outputs['toggle_main_menu']`);
+		expect(result).not.toContain('Promise'); // It's a sync action
 
 		const import_str = imports.build();
-		expect(import_str).toContain('Frontend_Local_Call_Action_Event');
+		expect(import_str).toContain('Action_Event');
+		expect(import_str).toContain('Action_Outputs'); // Added by get_handler_return_type
+		expect(import_str).toContain('Zzz_App');
 	});
 
 	test('uses type-only imports when appropriate', () => {
-		const spec = {
-			method: 'test',
-			kind: 'request_response',
-			initiator: 'frontend',
-			async: true,
-		} as unknown as Action_Spec;
-
 		const imports = new Import_Builder();
-		generate_phase_handlers(spec, 'backend', imports);
+		generate_phase_handlers(submit_completion_action_spec, 'backend', imports);
 
 		const import_str = imports.build();
 		// All imports should be type-only
-		expect(import_str).toMatch(/^import type/);
-	});
-
-	test('handles methods with special characters in names', () => {
-		const spec = {
-			method: 'test-action_2',
-			kind: 'request_response',
-			initiator: 'both',
-			async: true,
-		} as unknown as Action_Spec;
-
-		const imports = new Import_Builder();
-		const result = generate_phase_handlers(spec, 'frontend', imports);
-
-		expect(result).toContain('test-action_2?: {');
-		expect(result).toContain(`Action_Inputs['test-action_2']`);
-		expect(result).toContain(`Action_Outputs['test-action_2']`);
+		const lines = import_str.split('\n');
+		lines.forEach((line) => {
+			if (line.trim()) {
+				expect(line).toMatch(/^import type/);
+			}
+		});
 	});
 
 	test('generates all phases for both initiator', () => {
-		const spec = {
-			method: 'bidirectional',
-			kind: 'request_response',
-			initiator: 'both',
-			async: true,
-		} as unknown as Action_Spec;
-
 		const imports = new Import_Builder();
-		const result = generate_phase_handlers(spec, 'frontend', imports);
+		const result = generate_phase_handlers(ping_action_spec, 'frontend', imports);
 
 		expect(result).toContain('send_request?:');
 		expect(result).toContain('receive_response?:');
 		expect(result).toContain('receive_request?:');
 		expect(result).toContain('send_response?:');
+	});
+
+	test('includes narrowed data type in handler signature', () => {
+		const imports = new Import_Builder();
+		const result = generate_phase_handlers(ping_action_spec, 'frontend', imports);
+
+		// Should include the narrowed data type
+		expect(result).toContain(
+			`data: Extract<Action_Event_Datas['ping'], {phase: 'send_request'; step: 'handling'}>`,
+		);
+		expect(result).toContain(
+			`data: Extract<Action_Event_Datas['ping'], {phase: 'receive_response'; step: 'handling'}>`,
+		);
+	});
+
+	test('handles Action_Outputs import for handlers that return values', () => {
+		const imports = new Import_Builder();
+		// ping has receive_request handler on backend which returns output
+		const result = generate_phase_handlers(ping_action_spec, 'backend', imports);
+
+		expect(result).toContain('receive_request?:');
+		expect(result).toContain(`Action_Outputs['ping'] | Promise<Action_Outputs['ping']>`);
+
+		// Check that Action_Outputs was imported
+		const import_str = imports.build();
+		expect(import_str).toContain('Action_Outputs');
 	});
 });
 

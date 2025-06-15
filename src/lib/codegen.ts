@@ -234,10 +234,16 @@ export const get_executor_phases = (
 
 /**
  * Gets the handler return type for a specific phase and spec.
+ * Also adds necessary imports to the Import_Builder.
  */
-export const get_handler_return_type = (spec: Action_Spec, phase: Action_Phase): string => {
+export const get_handler_return_type = (
+	spec: Action_Spec,
+	phase: Action_Phase,
+	imports: Import_Builder,
+): string => {
 	// For request_response receive_request, handler returns the output
 	if (spec.kind === 'request_response' && phase === 'receive_request') {
+		imports.add_type('$lib/action_collections.js', 'Action_Outputs');
 		const base_type = `Action_Outputs['${spec.method}']`;
 		// Request/response actions are always async
 		return `${base_type} | Promise<${base_type}>`;
@@ -245,6 +251,7 @@ export const get_handler_return_type = (spec: Action_Spec, phase: Action_Phase):
 
 	// For local_call execute, handler returns the output
 	if (spec.kind === 'local_call' && phase === 'execute') {
+		imports.add_type('$lib/action_collections.js', 'Action_Outputs');
 		const base_type = `Action_Outputs['${spec.method}']`;
 		return spec.async ? `${base_type} | Promise<${base_type}>` : base_type;
 	}
@@ -270,8 +277,7 @@ export const generate_phase_handlers = (
 
 	// Add necessary imports for the unified system
 	imports.add_type('$lib/action_event.js', 'Action_Event');
-	imports.add_types('$lib/action_collections.js', 'Action_Inputs', 'Action_Outputs');
-	imports.add_type('$lib/action_event_types.js', 'Action_Event_Data_Union');
+	imports.add_type('$lib/action_collections.js', 'Action_Event_Datas');
 
 	// Add environment type import
 	const environment_type = executor === 'frontend' ? 'Zzz_App' : 'Zzz_Server';
@@ -282,14 +288,12 @@ export const generate_phase_handlers = (
 	// Generate handler definitions for each phase
 	const phase_handlers = phases
 		.map((phase: Action_Phase) => {
-			const return_type = get_handler_return_type(spec, phase);
-			// TODO @api maybe tbe phase/step should be generic for the event type, making this much simpler?
+			// Pass imports to get_handler_return_type so it can add necessary imports
+			const return_type = get_handler_return_type(spec, phase, imports);
+			// Format the narrowed event type for readability
 			return `${phase}?: (
 				action_event: Action_Event<'${method}', ${environment_type}> & {
-					data: Extract<
-						Action_Event_Data_Union<'${method}'>,
-						{phase: '${phase}'; step: 'handling'}
-					>;
+					data: Extract<Action_Event_Datas['${method}'], {phase: '${phase}'; step: 'handling'}>;
 				}
 			) => ${return_type}`;
 		})

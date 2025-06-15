@@ -2,37 +2,35 @@
 // action_event.ts
 
 import {is_promise} from '@ryanatkn/belt/async.js';
-import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 
-import type {
-	Action_Kind,
-	Action_Phase,
-	Action_Input,
-	Action_Output,
-	Action_Environment,
-} from '$lib/action_types.js';
+import type {Action_Kind, Action_Phase} from '$lib/action_types.js';
 import type {Action_Spec} from '$lib/action_spec.js';
 import {
-	type Action_Event_Data_Union,
 	type Action_Event_Data,
 	type Action_Event_Step,
 	type Action_Event_Environment,
-	ACTION_STEP_TRANSITIONS,
-	ACTION_PHASES_BY_KIND,
 	type Request_Response_Action_Event_Data,
 	type Remote_Notification_Action_Event_Data,
 	type Local_Call_Action_Event_Data,
+	ACTION_STEP_TRANSITIONS,
+	ACTION_PHASES_BY_KIND,
 } from '$lib/action_event_types.js';
 import type {Jsonrpc_Error_Json} from '$lib/jsonrpc.js';
 import {jsonrpc_errors} from '$lib/jsonrpc_errors.js';
-import {stringify_zod_error, create_uuid} from '$lib/zod_helpers.js';
+import {stringify_zod_error} from '$lib/zod_helpers.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
-import {action_spec_by_method} from '$lib/action_collections.js';
+import {
+	action_spec_by_method,
+	type Action_Event_Datas,
+	type Action_Inputs,
+	type Action_Outputs,
+} from '$lib/action_collections.js';
 import {
 	create_jsonrpc_request,
 	create_jsonrpc_notification,
 	create_jsonrpc_response,
 } from '$lib/jsonrpc_helpers.js';
+import {create_uuid} from '$lib/zod_helpers.js';
 
 /**
  * Unified action event class that manages state transitions for all action types.
@@ -40,8 +38,6 @@ import {
  */
 export class Action_Event<
 	T_Method extends Action_Method = Action_Method,
-	T_Input extends Action_Input = Action_Input,
-	T_Output extends Action_Output = Action_Output,
 	T_Environment extends Action_Event_Environment = Action_Event_Environment,
 > {
 	readonly method: T_Method;
@@ -50,9 +46,9 @@ export class Action_Event<
 	readonly kind: Action_Kind;
 	readonly executor: Action_Environment;
 
-	data: Action_Event_Data_Union<T_Method>;
+	data: Action_Event_Datas[T_Method];
 
-	constructor(environment: T_Environment, spec: Action_Spec, input: T_Input) {
+	constructor(environment: T_Environment, spec: Action_Spec, input: Action_Inputs[T_Method]) {
 		this.environment = environment;
 		this.spec = spec;
 		this.method = spec.method as T_Method;
@@ -104,7 +100,7 @@ export class Action_Event<
 					`Synchronous action returned a Promise: ${this.spec.method}`,
 				);
 			}
-			this.data = this.#transition_to_handled(output);
+			this.data = this.#transition_to_handled(output as Action_Outputs[T_Method] | undefined);
 		} catch (error) {
 			this.#handle_handler_error(error);
 		}
@@ -164,12 +160,12 @@ export class Action_Event<
 	}
 
 	// Convenience getters
-	get input(): T_Input | undefined {
-		return 'input' in this.data ? (this.data.input as T_Input) : undefined;
+	get input(): Action_Inputs[T_Method] | undefined {
+		return 'input' in this.data ? this.data.input : undefined;
 	}
 
-	get output(): T_Output | undefined {
-		return 'output' in this.data ? (this.data.output as T_Output) : undefined;
+	get output(): Action_Outputs[T_Method] | undefined {
+		return 'output' in this.data ? this.data.output : undefined;
 	}
 
 	get error(): Jsonrpc_Error_Json | undefined {
@@ -182,30 +178,27 @@ export class Action_Event<
 		const all_phases = ACTION_PHASES_BY_KIND[this.kind];
 		const phases: Array<Action_Phase> = [];
 
-		switch (this.kind) {
-			case 'local_call':
-				if (this.#can_executor_initiate()) {
-					phases.push(...all_phases);
-				}
-				break;
-			case 'request_response':
-				if (this.#can_executor_initiate()) {
-					phases.push('send_request', 'receive_response');
-				}
-				if (this.#can_executor_receive()) {
-					phases.push('receive_request', 'send_response');
-				}
-				break;
-			case 'remote_notification':
-				if (this.#can_executor_initiate()) {
-					phases.push('send');
-				}
-				if (this.#can_executor_receive()) {
-					phases.push('receive');
-				}
-				break;
-			default:
-				throw new Unreachable_Error(this.kind);
+		if (this.kind === 'local_call') {
+			// Local calls: check initiator
+			if (this.#can_executor_initiate()) {
+				phases.push(...all_phases);
+			}
+		} else if (this.kind === 'request_response') {
+			// Request/response: determine based on initiator
+			if (this.#can_executor_initiate()) {
+				phases.push('send_request', 'receive_response');
+			}
+			if (this.#can_executor_receive()) {
+				phases.push('receive_request', 'send_response');
+			}
+		} else if (this.kind === 'remote_notification') {
+			// Notifications: determine based on initiator
+			if (this.#can_executor_initiate()) {
+				phases.push('send');
+			}
+			if (this.#can_executor_receive()) {
+				phases.push('receive');
+			}
 		}
 
 		return phases;
@@ -235,7 +228,10 @@ export class Action_Event<
 		return 'execute'; // Local calls only have one phase
 	}
 
-	#build_initial_data(phase: Action_Phase, input: T_Input): Action_Event_Data_Union<T_Method> {
+	#build_initial_data(
+		phase: Action_Phase,
+		input: Action_Inputs[T_Method],
+	): Action_Event_Datas[T_Method] {
 		return {
 			kind: this.kind,
 			phase,
@@ -243,7 +239,7 @@ export class Action_Event<
 			method: this.method,
 			executor: this.executor,
 			input,
-		} as Action_Event_Data_Union<T_Method>;
+		} as Action_Event_Datas[T_Method]; // Initial data always has these fields
 	}
 
 	#should_parse_for_phase(phase: Action_Phase): 'input' | 'output' | null {
@@ -261,7 +257,7 @@ export class Action_Event<
 		}
 	}
 
-	#parse_data(): Action_Event_Data_Union<T_Method> {
+	#parse_data(): Action_Event_Datas[T_Method] {
 		const parse_target = this.#should_parse_for_phase(this.data.phase);
 
 		if (parse_target === 'input') {
@@ -276,7 +272,7 @@ export class Action_Event<
 				...this.data,
 				step: 'parsed',
 				input: parsed.data,
-			} as Action_Event_Data_Union<T_Method>;
+			} as Action_Event_Datas[T_Method]; // Narrowing step, preserving other fields
 		}
 
 		if (parse_target === 'output' && 'output' in this.data) {
@@ -291,14 +287,14 @@ export class Action_Event<
 				...this.data,
 				step: 'parsed',
 				output: parsed.data,
-			} as Action_Event_Data_Union<T_Method>;
+			} as Action_Event_Datas[T_Method]; // Narrowing step, preserving other fields
 		}
 
 		// No parsing needed for this phase
 		return {
 			...this.data,
 			step: 'parsed',
-		} as Action_Event_Data_Union<T_Method>;
+		} as Action_Event_Datas[T_Method]; // Narrowing step only
 	}
 
 	#handle_parse_error(error: unknown): void {
@@ -306,7 +302,7 @@ export class Action_Event<
 			...this.data,
 			step: 'failed',
 			error: this.#to_jsonrpc_error(error),
-		} as Action_Event_Data_Union<T_Method>;
+		} as Action_Event_Datas[T_Method]; // Failed state includes error
 	}
 
 	#validate_step_transition(to_step: Action_Event_Step): void {
@@ -318,15 +314,15 @@ export class Action_Event<
 		}
 	}
 
-	#transition_to_handling(): Action_Event_Data_Union<T_Method> {
+	#transition_to_handling(): Action_Event_Datas[T_Method] {
 		this.#validate_step_transition('handling');
 		return {
 			...this.data,
 			step: 'handling',
-		} as Action_Event_Data_Union<T_Method>;
+		} as Action_Event_Datas[T_Method]; // Narrowing step only
 	}
 
-	#transition_to_handled(output?: T_Output): Action_Event_Data_Union<T_Method> {
+	#transition_to_handled(output?: Action_Outputs[T_Method]): Action_Event_Datas[T_Method] {
 		this.#validate_step_transition('handled');
 		return this.#build_phase_data(this.data.phase, output);
 	}
@@ -336,31 +332,31 @@ export class Action_Event<
 			...this.data,
 			step: 'failed',
 			error: this.#to_jsonrpc_error(error),
-		} as Action_Event_Data_Union<T_Method>;
+		} as Action_Event_Datas[T_Method]; // Failed state includes error
 	}
 
-	#build_phase_data(to_phase: Action_Phase, output?: T_Output): Action_Event_Data_Union<T_Method> {
+	#build_phase_data(
+		to_phase: Action_Phase,
+		output?: Action_Outputs[T_Method],
+	): Action_Event_Datas[T_Method] {
 		const current = this.data;
 
 		// Handle step transitions within current phase
 		if (to_phase === current.phase) {
-			switch (this.kind) {
-				case 'request_response':
-					return this.#build_request_response_phase_data(
-						current as Request_Response_Action_Event_Data<T_Method>,
-						output,
-					);
-				case 'remote_notification':
-					return this.#build_notification_phase_data(
-						current as Remote_Notification_Action_Event_Data<T_Method>,
-					);
-				case 'local_call':
-					return this.#build_local_call_phase_data(
-						current as Local_Call_Action_Event_Data<T_Method>,
-						output,
-					);
-				default:
-					throw new Unreachable_Error(this.kind);
+			if (this.kind === 'request_response') {
+				return this.#build_request_response_phase_data(
+					current as Request_Response_Action_Event_Data<T_Method>,
+					output,
+				);
+			} else if (this.kind === 'remote_notification') {
+				return this.#build_notification_phase_data(
+					current as Remote_Notification_Action_Event_Data<T_Method>,
+				);
+			} else if (this.kind === 'local_call') {
+				return this.#build_local_call_phase_data(
+					current as Local_Call_Action_Event_Data<T_Method>,
+					output,
+				);
 			}
 		}
 
@@ -378,7 +374,7 @@ export class Action_Event<
 
 	#build_request_response_phase_data(
 		current: Request_Response_Action_Event_Data<T_Method>,
-		output?: T_Output,
+		output?: Action_Outputs[T_Method],
 	): Request_Response_Action_Event_Data<T_Method> {
 		switch (current.phase) {
 			case 'send_request':
@@ -386,14 +382,17 @@ export class Action_Event<
 					...current,
 					step: 'handled',
 					request: create_jsonrpc_request(current.method, current.input, create_uuid()),
-				} as Request_Response_Action_Event_Data<T_Method>;
+				};
 
 			case 'receive_request':
+				if (output === undefined) {
+					throw jsonrpc_errors.internal_error('Output required for receive_request handled state');
+				}
 				return {
 					...current,
 					step: 'handled',
-					output: output!,
-				} as Request_Response_Action_Event_Data<T_Method>;
+					output,
+				};
 
 			case 'send_response':
 				if (!('request' in current) || !('output' in current)) {
@@ -403,13 +402,13 @@ export class Action_Event<
 					...current,
 					step: 'handled',
 					response: create_jsonrpc_response(current.request.id, current.output),
-				} as Request_Response_Action_Event_Data<T_Method>;
+				};
 
 			case 'receive_response':
 				return {
 					...current,
 					step: 'handled',
-				} as Request_Response_Action_Event_Data<T_Method>;
+				};
 
 			default:
 				return current;
@@ -436,12 +435,15 @@ export class Action_Event<
 
 	#build_local_call_phase_data(
 		current: Local_Call_Action_Event_Data<T_Method>,
-		output?: T_Output,
+		output?: Action_Outputs[T_Method],
 	): Local_Call_Action_Event_Data<T_Method> {
+		if (output === undefined) {
+			throw jsonrpc_errors.internal_error('Output required for local_call handled state');
+		}
 		return {
 			...current,
 			step: 'handled' as const,
-			output: output!,
+			output,
 		};
 	}
 
@@ -450,6 +452,9 @@ export class Action_Event<
 		to_phase: Action_Phase,
 	): Request_Response_Action_Event_Data<T_Method> {
 		if (to_phase === 'receive_response' && current.phase === 'send_request') {
+			if (!('request' in current)) {
+				throw jsonrpc_errors.internal_error('Missing request for phase transition');
+			}
 			return {
 				kind: 'request_response',
 				phase: 'receive_response',
@@ -457,13 +462,16 @@ export class Action_Event<
 				method: current.method,
 				executor: this.executor,
 				input: current.input,
-				output: undefined as any,
-				request: (current as any).request,
-				response: undefined as any,
+				output: undefined as any, // Will be populated when response arrives
+				request: current.request,
+				response: undefined as any, // Will be populated when response arrives
 			};
 		}
 
 		if (to_phase === 'send_response' && current.phase === 'receive_request') {
+			if (!('request' in current) || !('output' in current)) {
+				throw jsonrpc_errors.internal_error('Missing request or output for phase transition');
+			}
 			return {
 				kind: 'request_response',
 				phase: 'send_response',
@@ -471,9 +479,9 @@ export class Action_Event<
 				method: current.method,
 				executor: this.executor,
 				input: current.input,
-				output: (current as any).output,
-				request: (current as any).request,
-				response: undefined as any,
+				output: current.output,
+				request: current.request,
+				response: undefined as any, // Will be created during handling
 			};
 		}
 
@@ -510,7 +518,7 @@ export class Action_Event<
 		};
 	}
 
-	#execute_handler(): undefined | T_Output | Promise<T_Output> {
+	#execute_handler(): undefined | Action_Outputs[T_Method] | Promise<Action_Outputs[T_Method]> {
 		const handler = this.environment.lookup_action_handler(this.data.method, this.data.phase);
 		if (!handler) {
 			return undefined;
@@ -527,7 +535,7 @@ export const create_action_event = <T_Method extends Action_Method>(
 	spec: Action_Spec,
 	input: unknown,
 ): Action_Event<T_Method> => {
-	return new Action_Event<T_Method>(environment, spec, input);
+	return new Action_Event<T_Method>(environment, spec, input as Action_Inputs[T_Method]);
 };
 
 /**
@@ -543,7 +551,7 @@ export const action_event_from_json = <T_Method extends Action_Method>(
 	}
 
 	const event = create_action_event<T_Method>(environment, spec, json.input);
-	event.data = json as Action_Event_Data_Union<T_Method>;
+	event.data = json as Action_Event_Datas[T_Method]; // JSON has already been validated elsewhere
 
 	return event;
 };
