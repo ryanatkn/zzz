@@ -30,7 +30,10 @@ export const gen: Gen = ({origin_path}) => {
 		.map((spec) => generate_phase_handlers(spec, 'backend', imports))
 		.join(';\n\t');
 
-	// TODO BLOCK @api probably `Action_Events[method]` instead of `Action_Event_Data_Union` with generic
+	// TODO BLOCK @api change these so instead of generating a `data` override, make an optional 3rd generic type param for Action_Event
+	// action_event: Action_Event<'filer_change', Zzz_Server> & {
+	// 				data: Extract<Action_Event_Datas['filer_change'], {phase: 'send'; step: 'handling'}>;
+	// 			},
 	return `
 		// ${banner}
 

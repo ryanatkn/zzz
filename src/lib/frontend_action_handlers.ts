@@ -7,11 +7,11 @@ import type {Frontend_Action_Handlers} from '$lib/frontend_action_types.js';
  */
 export const frontend_action_handlers: Frontend_Action_Handlers = {
 	ping: {
-		send_request: ({app, request_message: message}) => {
+		send_request: ({app, data: {request}}) => {
 			console.log('Ping request sent');
-			app.capabilities.handle_sent_ping(message.id); // TODO BLOCK @api type safety
+			app.capabilities.handle_sent_ping(request.id); // TODO BLOCK @api type safety
 		},
-		receive_response: ({app, output}) => {
+		receive_response: ({app, data: {output}}) => {
 			console.log('Ping response received');
 
 			app.capabilities.handle_received_ping(output.ping_id);
@@ -24,8 +24,8 @@ export const frontend_action_handlers: Frontend_Action_Handlers = {
 		send_request: () => {
 			console.log('Loading session...');
 		},
-		receive_response: ({app, data: {output, response_message}}) => {
-			console.log('Session loaded', response_message);
+		receive_response: ({app, data: {output, response}}) => {
+			console.log('Session loaded', response);
 
 			app.receive_session(output.data);
 		},
@@ -44,7 +44,7 @@ export const frontend_action_handlers: Frontend_Action_Handlers = {
 		send_request: ({data: {input}}) => {
 			console.log('Updating file', input.path);
 		},
-		receive_response: ({input, output}) => {
+		receive_response: ({data: {input, output}}) => {
 			console.log('Updated file', input.path, output);
 		},
 	},
