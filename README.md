@@ -10,7 +10,7 @@
 
 Zzz, pronounced "zees" like bees,
 is a software project with a focus on user power and experimentation.
-The idea is to make fullstack software that adapts to your needs on the fly
+The idea is to make a fullstack software environment that adapts to your needs
 while remaining fully open, aligned, and in your control.
 
 This is a pre-alpha and the ideas are still developing -

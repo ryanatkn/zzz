@@ -37,8 +37,8 @@
 		</aside>
 		<p>
 			Zzz, pronounced "zees" like bees, is a software project focused on user power and
-			experimentation. The idea is to make fullstack web tools that adapt to your needs on the fly
-			while remaining fully open, aligned, and in your control.
+			experimentation. The idea is to make a fullstack software environment that adapts to your
+			needs while remaining fully open, aligned, and in your control.
 		</p>
 		<p>
 			In the technology landscape of 2025, where LLM-based AI is upending long held assumptions, and <External_Link
