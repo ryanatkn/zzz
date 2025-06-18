@@ -1,37 +1,41 @@
+// @slop claude_opus_4
+
 // @vitest-environment jsdom
 
 import {test, expect, beforeEach, describe} from 'vitest';
 
 import {Diskfile_Editor_State} from '$lib/diskfile_editor_state.svelte.js';
-import {Diskfile_Path} from '$lib/diskfile_types.js';
-import {Zzz} from '$lib/zzz.svelte.js';
+import {Diskfile_Path, Serializable_Source_File} from '$lib/diskfile_types.js';
+import {Frontend} from '$lib/frontend.svelte.js';
 import {Diskfile} from '$lib/diskfile.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Constants for testing
 const TEST_PATH = Diskfile_Path.parse('/path/to/test.txt');
+const TEST_DIR = Serializable_Source_File.shape.source_dir.parse('/path/');
 const TEST_CONTENT = 'This is test content';
 
 // Test suite variables
-let zzz: Zzz;
+let app: Frontend;
 let test_diskfile: Diskfile;
 let editor_state: Diskfile_Editor_State;
 
 beforeEach(() => {
 	// Create a real Zzz instance for each test
-	zzz = monkeypatch_zzz_for_tests(new Zzz());
+	app = monkeypatch_zzz_for_tests(new Frontend());
 
 	// Create a real diskfile through the registry
-	test_diskfile = zzz.diskfiles.add(
-		zzz.registry.instantiate('Diskfile', {
+	test_diskfile = app.diskfiles.add(
+		app.cell_registry.instantiate('Diskfile', {
 			path: TEST_PATH,
+			source_dir: TEST_DIR,
 			content: TEST_CONTENT,
 		}),
 	);
 
 	// Create the editor state with real components
 	editor_state = new Diskfile_Editor_State({
-		zzz,
+		app,
 		diskfile: test_diskfile,
 	});
 });
@@ -46,7 +50,7 @@ describe('initialization', () => {
 		expect(editor_state.last_seen_disk_content).toBe(TEST_CONTENT);
 
 		// Selected history entry should be initialized to the current entry
-		const history = zzz.get_diskfile_history(TEST_PATH);
+		const history = app.get_diskfile_history(TEST_PATH);
 		expect(history).toBeDefined();
 		expect(history!.entries.length).toBe(1);
 		expect(editor_state.selected_history_entry_id).toBe(history!.entries[0].id);
@@ -54,7 +58,7 @@ describe('initialization', () => {
 	});
 
 	test('editor_state initializes with correct history entry', () => {
-		const history = zzz.get_diskfile_history(TEST_PATH);
+		const history = app.get_diskfile_history(TEST_PATH);
 		expect(history).toBeDefined();
 		expect(history!.entries.length).toBe(1);
 
@@ -68,16 +72,17 @@ describe('initialization', () => {
 
 	test('editor_state handles initialization with null content', () => {
 		// Create a diskfile with null content
-		const null_diskfile = zzz.diskfiles.add(
-			zzz.registry.instantiate('Diskfile', {
+		const null_diskfile = app.diskfiles.add(
+			app.cell_registry.instantiate('Diskfile', {
 				path: Diskfile_Path.parse('/null/content.txt'),
+				source_dir: Serializable_Source_File.shape.source_dir.parse('/null/'),
 				content: null,
 			}),
 		);
 
 		// Create editor state
 		const null_editor_state = new Diskfile_Editor_State({
-			zzz,
+			app,
 			diskfile: null_diskfile,
 		});
 
@@ -88,7 +93,7 @@ describe('initialization', () => {
 		expect(null_editor_state.last_seen_disk_content).toBeNull();
 
 		// History should still be created
-		const history = zzz.get_diskfile_history(null_diskfile.path);
+		const history = app.get_diskfile_history(null_diskfile.path);
 		expect(history).toBeDefined();
 		expect(history!.entries.length).toBe(0); // No entries for null content
 	});
@@ -133,7 +138,7 @@ describe('content editing', () => {
 	test('editing content preserves selection state', () => {
 		// First make an edit to create history entries
 		editor_state.current_content = 'First edit';
-		const history = zzz.get_diskfile_history(TEST_PATH)!;
+		const history = app.get_diskfile_history(TEST_PATH)!;
 
 		// Get the selected entry id
 		const selected_id = editor_state.selected_history_entry_id;
@@ -228,16 +233,17 @@ describe('content metrics', () => {
 
 	test('length_diff_percent handles zero original length correctly', () => {
 		// Create a diskfile with empty content
-		const empty_diskfile = zzz.diskfiles.add(
-			zzz.registry.instantiate('Diskfile', {
+		const empty_diskfile = app.diskfiles.add(
+			app.cell_registry.instantiate('Diskfile', {
 				path: Diskfile_Path.parse('/empty/file.txt'),
+				source_dir: Serializable_Source_File.shape.source_dir.parse('/empty/'),
 				content: '',
 			}),
 		);
 
 		// Create editor state
 		const empty_editor_state = new Diskfile_Editor_State({
-			zzz,
+			app,
 			diskfile: empty_diskfile,
 		});
 
@@ -259,9 +265,10 @@ describe('file management', () => {
 		// Create another diskfile
 		const another_path = Diskfile_Path.parse('/different/file.txt');
 		const another_content = 'Different file content';
-		const another_diskfile = zzz.diskfiles.add(
-			zzz.registry.instantiate('Diskfile', {
+		const another_diskfile = app.diskfiles.add(
+			app.cell_registry.instantiate('Diskfile', {
 				path: another_path,
+				source_dir: Serializable_Source_File.shape.source_dir.parse('/different/'),
 				content: another_content,
 			}),
 		);
@@ -280,7 +287,7 @@ describe('file management', () => {
 		expect(editor_state.content_was_modified_by_user).toBe(false);
 
 		// History should be initialized for the new file
-		const new_history = zzz.get_diskfile_history(another_path);
+		const new_history = app.get_diskfile_history(another_path);
 		expect(new_history).toBeDefined();
 		expect(new_history!.entries.length).toBe(1);
 		expect(new_history!.entries[0].content).toBe(another_content);
@@ -307,7 +314,7 @@ describe('file management', () => {
 		editor_state.current_content = 'Edited content';
 
 		// Create and select unsaved entry
-		const history = zzz.get_diskfile_history(TEST_PATH)!;
+		const history = app.get_diskfile_history(TEST_PATH)!;
 		const test_entry = history.add_entry('Test entry', {is_unsaved_edit: true});
 		editor_state.set_content_from_history(test_entry.id);
 
@@ -358,7 +365,7 @@ describe('derived state', () => {
 		expect(editor_state.can_clear_unsaved_edits).toBe(false);
 
 		// Add a saved entry
-		const history = zzz.get_diskfile_history(TEST_PATH)!;
+		const history = app.get_diskfile_history(TEST_PATH)!;
 		history.add_entry('Saved entry 1');
 		history.add_entry('Saved entry 2');
 
@@ -374,7 +381,7 @@ describe('derived state', () => {
 
 	test('content_matching_entry_ids tracks entries with matching content', () => {
 		// Create entries with duplicate content
-		const history = zzz.get_diskfile_history(TEST_PATH)!;
+		const history = app.get_diskfile_history(TEST_PATH)!;
 		const entry1 = history.add_entry('Unique content');
 		const entry2 = history.add_entry('Duplicate content');
 		const entry3 = history.add_entry('Duplicate content');
@@ -428,7 +435,7 @@ describe('saving changes', () => {
 		editor_state.save_changes();
 
 		// Check history entry
-		const history = zzz.get_diskfile_history(TEST_PATH)!;
+		const history = app.get_diskfile_history(TEST_PATH)!;
 		const entry = history.entries[0]; // Newest entry
 
 		expect(entry.content).toBe('Content to be saved');

@@ -1,3 +1,5 @@
+// @slop claude_opus_4
+
 import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
@@ -20,7 +22,7 @@ export type Browser_Json_Input = z.input<typeof Browser_Json>;
 export type Browser_Options = Cell_Options<typeof Browser_Json>;
 
 export class Browser extends Cell<typeof Browser_Json> {
-	tabs: Browser_Tabs = new Browser_Tabs({zzz: this.zzz});
+	tabs: Browser_Tabs = new Browser_Tabs({app: this.app});
 	edited_url: string = $state()!;
 	browserified: boolean = $state()!;
 

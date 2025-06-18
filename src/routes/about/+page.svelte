@@ -7,10 +7,12 @@
 	import {pkg_context} from '$lib/pkg.js';
 	import External_Link from '$lib/External_Link.svelte';
 	import Footer from '$lib/Footer.svelte';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/frontend.svelte.js';
 
 	const pkg = pkg_context.get();
-	const zzz = zzz_context.get();
+	const app = zzz_context.get();
+
+	// TODO probably link to a blog post that's more approachable and less technical
 
 	// TODO rewrite prose
 </script>
@@ -56,19 +58,30 @@
 			The software I imagine answering these questions is cross-platform so it runs everywhere, and
 			for that we have the web with HTML, CSS, and JS. We want to solve problems once and have
 			supported features work consistently whether you're on Windows, macOS, iOS, Android, Linux, or
-			any other OS. For all its quirks and flaws, the web is our digital commons, the one we have,
-			and when used with craft and care, it's capable of delivering a great UX.
+			any other OS. For all its flaws and quirks, the web is the turf of our digital commons, and I
+			believe it's capable of delivering a great UX when developers use it with care.
 		</p>
 		<p>
-			My starting point is the user experience in the user interface, because we're all users
-			interfacing with machines. If this part isn't up to par, we're sunk before we sail. This means
-			using JS, the language understood by the browser. Zzz leverages JS to glue software and
-			machines together precisely the way you want, maximizing its utility on any device across the
-			full stack. It can run locally on your machine using any of your available capabilities, or it
-			can deploy anywhere JS runs to play whatever role you need.
+			When thinking about the web UX I want, my starting point is the user interface, because we're
+			all users interfacing with machines. If this part isn't up to par, we're sunk before we sail.
+			We want no compromises when it comes to control over our UI runtime, so this means we're using
+			JS (thankfully, TypeScript makes this palatable). Zzz uses JS to glue software and machines
+			together precisely the way you want, maximizing its utility on any device across the full
+			stack. It can run locally on your machine using any of your available capabilities, or it can
+			deploy anywhere JS runs to play whatever role you need.
 		</p>
 		<p>Zzz is based on many kinds of software:</p>
 		<ul>
+			<li>
+				web browsers - planned with Chromium via Electron, ideally with swappable browser engines
+			</li>
+			<li>
+				<External_Link href="https://wikipedia.org/wiki/Content_management_system"
+					>content management systems</External_Link
+				>, so you can make and manage websites, see this <External_Link
+					href="https://wikipedia.org/wiki/List_of_content_management_systems">list</External_Link
+				>
+			</li>
 			<li>
 				AI UIs like <External_Link href="https://github.com/Mintplex-Labs/anything-llm"
 					>AnythingLLM</External_Link
@@ -82,16 +95,6 @@
 				tooling and system access
 			</li>
 			<li>
-				<External_Link href="https://wikipedia.org/wiki/Content_management_system"
-					>content management systems</External_Link
-				>, see this <External_Link
-					href="https://wikipedia.org/wiki/List_of_content_management_systems">list</External_Link
-				>
-			</li>
-			<li>
-				web browsers - planned with Chromium via Electron, ideally with swappable browser engines
-			</li>
-			<li>
 				code libraries and web metaframeworks using TypeScript and Svelte - Zzz extends <External_Link
 					href="https://svelte.dev/">SvelteKit</External_Link
 				> and <External_Link href="https://vite.dev/">Vite</External_Link> without wrapping them, enabling
@@ -99,17 +102,25 @@
 			</li>
 		</ul>
 		<p>
-			This scope may look far-fetched, but I'm just making tools I want to use now on the best
-			foundations I can assemble. And Zzz doesn't need or want to appeal to every user—thanks to the
-			magic of standards-based interoperability, Zzz works with all websites, and anything you make
-			with Zzz works with other browsers and web technologies. It's just one more optional take on
-			the web.
+			This scope may look far-fetched, and it is to me, but I'm just making tools that I want to use
+			<em>now</em> on the best foundations I can assemble, with at least vague awareness of the endgame.
+			Many of the initial systems have been designed with intention towards a bigger picture, and I plan
+			to continue building incrementally on a quality base with some experiements mixed in.
 		</p>
 		<p>
-			I've been thinking about and prototyping related ideas for more than 13 years, so there's a
-			lot of thought and plans already formulated, but from here I'm prioritizing user feedback and
-			just shipping a continuously-improving proof-of-concept that's only interesting to
-			enthusiasts. Some early (rough) integrations include:
+			It's important to me that Zzz is easy to use and inclusive of people and devices, but it can't
+			cater to everyone -- however thanks to the magic of standards-based interoperability, Zzz
+			works with all websites, like any other browser, and anything you make with Zzz works with
+			other browsers and web technologies. It's just one way to interface with the free web.
+		</p>
+		<p>
+			I've been thinking about and prototyping related ideas for more than 13 years, and for the
+			last 6 I've been working on open source projects full-time, so there's a lot of thought and
+			plans already formulated, but from here I'm prioritizing user feedback and just shipping a
+			continuously-improving proof-of-concept. Your <External_Link
+				href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link
+			> are most welcome. I'm doing a lot of experimenting and moving fast in places, so API/data stability
+			won't be a priority for a while. Some early (rough) integrations include:
 		</p>
 		<ul>
 			<li>
@@ -129,12 +140,13 @@
 				<External_Link href="https://svelte.dev/">SvelteKit</External_Link> and <External_Link
 					href="https://vite.dev/">Vite</External_Link
 				>, plays a key coordinating role - Hono bases itself on web standards and supports all JS
-				runtimes
+				server runtimes
 			</li>
 			<li>
 				Planned:
 				<ul>
 					<li>
+						<!-- TODO @db -->
 						<External_Link href="https://github.com/electric-sql/pglite">pglite</External_Link> via
 						<External_Link href="https://github.com/drizzle-team/drizzle-orm">Drizzle</External_Link
 						> and full <External_Link href="https://www.postgresql.org/">Postgres</External_Link> when
@@ -178,17 +190,16 @@
 			with powerful open clients. Because of the endless scope I currently like the name "web
 			environment". Some related projects call themselves web UIs or even operating systems.
 			Whatever the name, this class of app is something that I've been wanting for a long time, and
-			this iteration seems to have legs.
+			I appear to be sticking with this iteration.
 		</p>
 		<p>
-			I intend to continue working on Zzz full-time for the foreseeable future, but I know I need to
-			find people and organizations to work with if it's going to reach its goal of supporting Real
-			Users. Your input is appreciated to help make it work for you—see the <External_Link
+			If this sounds interesting and you would like to test out some broken pre-release software,
+			your input is appreciated to help make it work for you -- see the <External_Link
 				href="https://github.com/ryanatkn/zzz">code</External_Link
 			>,
 			<External_Link href="https://github.com/ryanatkn/zzz/issues">issues</External_Link>, and
 			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link>,
-			and find me on
+			and find me on my website or
 			<External_Link href="https://bsky.app/profile/ryanatkn.com">Bluesky</External_Link>.
 		</p>
 	</section>
@@ -196,15 +207,15 @@
 	<section>
 		<h2 class="mb_lg">More details</h2>
 		<ul>
-			<li>Zzz is open source, permissively licensed, and forking is encouraged</li>
+			<li>Zzz is open source and permissively licensed, and forking is encouraged</li>
 			<li>it's a noncommercial project and its only official domain is zzz.software</li>
 			<li>
-				the Zzz name and logos are community property, just don't falsely represent the official Zzz
+				the Zzz name/logos/IP are community property, just don't falsely represent the official Zzz
 				project or zzz.software
 			</li>
 			<li>
-				I'm looking for <a href="https://www.ryanatkn.com/funding">funding</a> to make my continued full-time
-				work on it sustainable - if successful, I think Zzz would end up stewarded by some kind of nonprofit
+				I'm looking for <a href="https://www.ryanatkn.com/funding">funding</a> to sustain my continued
+				full-time work - if successful, I think Zzz will be stewarded by some kind of nonprofit
 			</li>
 		</ul>
 	</section>
@@ -213,37 +224,37 @@
 		<h2 class="mb_lg">Into the future</h2>
 		<p class="mb_md">
 			This project has a huge scope and it's early in development. What you're seeing is a small
-			fraction of the idea—especially if you're viewing this on the website not natively via Node—so
-			here's a button for previewing some of what's planned:
+			fraction of the idea -- especially if you're viewing this on the website not natively via Node
+			-- so here's a button for previewing some of what's planned:
 		</p>
 		<button
 			type="button"
-			class:color_h={zzz.futuremode}
+			class:color_h={app.futuremode}
 			onclick={() => {
-				zzz.futuremode = !zzz.futuremode;
+				app.futuremode = !app.futuremode;
 			}}
 		>
 			<Svg
 				data={zzz_logo}
 				size="var(--icon_size_sm)"
-				fill={zzz.futuremode ? 'var(--color_h_5)' : 'var(--text_color)'}
+				fill={app.futuremode ? 'var(--color_h_5)' : 'var(--text_color)'}
 				attrs={{
-					class: 'mr_md' + (zzz.futuremode ? ' flip_x' : ''),
+					class: 'mr_md' + (app.futuremode ? ' flip_x' : ''),
 					style: 'transition: transform 200ms ease',
 				}}
 			/>
 			<span
 				><span class="display_inline_block text_align_right" style:width="6ch"
-					>{zzz.futuremode ? 'disable' : 'enable'}</span
+					>{app.futuremode ? 'disable' : 'enable'}</span
 				>
 				futuremode</span
 			>
 			<Svg
 				data={zzz_logo}
 				size="var(--icon_size_sm)"
-				fill={zzz.futuremode ? 'var(--color_h_5)' : 'var(--text_color)'}
+				fill={app.futuremode ? 'var(--color_h_5)' : 'var(--text_color)'}
 				attrs={{
-					class: 'ml_md' + (zzz.futuremode ? '' : ' flip_x'),
+					class: 'ml_md' + (app.futuremode ? '' : ' flip_x'),
 					style: 'transition: transform 200ms ease',
 				}}
 			/>

@@ -11,15 +11,15 @@
 	import {Browser} from '$routes/tabs/browser.svelte.js';
 	import {sample_tabs} from '$routes/tabs/sample_tabs.js';
 	import Browser_View from '$routes/tabs/Browser_View.svelte';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/frontend.svelte.js';
 	import External_Link from '$lib/External_Link.svelte';
 
-	const zzz = zzz_context.get();
+	const app = zzz_context.get();
 
 	// Initialize browser with the sample tabs and Zzz instance
 	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 	browser ??= new Browser({
-		zzz,
+		app,
 		json: {tabs: sample_tabs},
 	});
 </script>
@@ -66,7 +66,7 @@
 				type="button"
 				class="inline compact color_d"
 				onclick={() => {
-					zzz.ui.toggle_sidebar();
+					app.ui.toggle_sidebar();
 					if (!browser.browserified) {
 						browser.browserified = true;
 					}
@@ -80,18 +80,18 @@
 		<p>
 			As a simple example, picture adding arbitrary metadata like tags to both your browser tabs and
 			files, both local and in the cloud, so you can find things no matter their type. Maybe you
-			want to summon UI that leverages that data for specific needs in specific contexts—without any
-			technical knowledge, third parties, or unnecessary friction. The best usecases are still
+			want to summon UI that leverages that data for specific needs in specific contexts -- without
+			any technical knowledge, third parties, or unnecessary friction. The best usecases are still
 			unknown because today's browsers weren't designed for this kind of experimentation.
 		</p>
 		<p>
-			I believe the optimal architecture—<External_Link
+			I believe the optimal architecture -- <External_Link
 				href="https://www.inkandswitch.com/local-first/">local-first</External_Link
 			>, <External_Link href="https://www.inkandswitch.com/malleable-software/"
 				>malleable</External_Link
-			>, client-sovereign—both respects individual rights and unlocks the full capabilities of web
-			tech, including
-			<a href="{base}/projects">website creation</a> and adaptive UI. And we can build it today, the
+			>, client-sovereign -- both respects individual rights and unlocks the full capabilities of
+			web tech, including
+			<a href="{base}/projects">website creation</a> and adaptive UI. And it can be built today, the
 			web's tools are ready.
 		</p>
 		<p>More <a href="{base}/about">about</a> Zzz.</p>

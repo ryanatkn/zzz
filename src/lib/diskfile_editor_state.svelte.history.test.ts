@@ -1,37 +1,41 @@
+// @slop claude_opus_4
+
 // @vitest-environment jsdom
 
 import {test, expect, beforeEach, describe} from 'vitest';
 
 import {Diskfile_Editor_State} from '$lib/diskfile_editor_state.svelte.js';
-import {Diskfile_Path} from '$lib/diskfile_types.js';
-import {Zzz} from '$lib/zzz.svelte.js';
+import {Diskfile_Path, Serializable_Source_File} from '$lib/diskfile_types.js';
+import {Frontend} from '$lib/frontend.svelte.js';
 import {Diskfile} from '$lib/diskfile.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Constants for testing
 const TEST_PATH = Diskfile_Path.parse('/path/to/test.txt');
+const TEST_DIR = Serializable_Source_File.shape.source_dir.parse('/path/');
 const TEST_CONTENT = 'This is test content';
 
 // Test suite variables
-let zzz: Zzz;
+let app: Frontend;
 let test_diskfile: Diskfile;
 let editor_state: Diskfile_Editor_State;
 
 beforeEach(() => {
 	// Create a real Zzz instance for each test
-	zzz = monkeypatch_zzz_for_tests(new Zzz());
+	app = monkeypatch_zzz_for_tests(new Frontend());
 
 	// Create a real diskfile through the registry
-	test_diskfile = zzz.diskfiles.add(
-		zzz.registry.instantiate('Diskfile', {
+	test_diskfile = app.diskfiles.add(
+		app.cell_registry.instantiate('Diskfile', {
 			path: TEST_PATH,
+			source_dir: TEST_DIR,
 			content: TEST_CONTENT,
 		}),
 	);
 
 	// Create the editor state with real components
 	editor_state = new Diskfile_Editor_State({
-		zzz,
+		app,
 		diskfile: test_diskfile,
 	});
 });
@@ -46,7 +50,7 @@ describe('unsaved edit creation', () => {
 		expect(editor_state.unsaved_edit_entry_id).not.toBeNull();
 
 		// Verify the new entry
-		const history = zzz.get_diskfile_history(TEST_PATH)!;
+		const history = app.get_diskfile_history(TEST_PATH)!;
 		const new_entry = history.find_entry_by_id(editor_state.unsaved_edit_entry_id!);
 
 		expect(new_entry).toMatchObject({
@@ -75,7 +79,7 @@ describe('unsaved edit creation', () => {
 		expect(editor_state.unsaved_edit_entry_id).toBe(unsaved_id);
 
 		// Verify the entry content was updated
-		const history = zzz.get_diskfile_history(TEST_PATH)!;
+		const history = app.get_diskfile_history(TEST_PATH)!;
 		const updated_entry = history.find_entry_by_id(unsaved_id!);
 
 		expect(updated_entry).toMatchObject({
@@ -96,13 +100,13 @@ describe('unsaved edit creation', () => {
 		expect(editor_state.unsaved_edit_entry_id).toBeNull();
 
 		// Entry should no longer exist
-		const history = zzz.get_diskfile_history(TEST_PATH)!;
+		const history = app.get_diskfile_history(TEST_PATH)!;
 		expect(history.find_entry_by_id(unsaved_id!)).toBeUndefined();
 	});
 
 	test('editing to match existing content selects that entry instead of creating new one', () => {
 		// Create entries in history
-		const history = zzz.get_diskfile_history(TEST_PATH)!;
+		const history = app.get_diskfile_history(TEST_PATH)!;
 		const existing_entry = history.add_entry('Existing content');
 
 		// Edit to match existing content
@@ -115,7 +119,7 @@ describe('unsaved edit creation', () => {
 
 	test('editing to match existing unsaved edit selects that entry', () => {
 		// Create an unsaved entry
-		const history = zzz.get_diskfile_history(TEST_PATH)!;
+		const history = app.get_diskfile_history(TEST_PATH)!;
 		const unsaved_entry = history.add_entry('Unsaved content', {is_unsaved_edit: true});
 
 		// Select a different entry
@@ -134,7 +138,7 @@ describe('unsaved edit creation', () => {
 describe('history navigation', () => {
 	test('set_content_from_history loads content and updates selection', () => {
 		// Create history entries
-		const history = zzz.get_diskfile_history(TEST_PATH)!;
+		const history = app.get_diskfile_history(TEST_PATH)!;
 		const entry1 = history.add_entry('Entry 1');
 		const entry2 = history.add_entry('Entry 2');
 
@@ -155,7 +159,7 @@ describe('history navigation', () => {
 
 	test('set_content_from_history with unsaved edit sets unsaved_edit_entry_id', () => {
 		// Create unsaved entry
-		const history = zzz.get_diskfile_history(TEST_PATH)!;
+		const history = app.get_diskfile_history(TEST_PATH)!;
 		const unsaved_entry = history.add_entry('Unsaved content', {is_unsaved_edit: true});
 
 		// Select unsaved entry
@@ -168,7 +172,7 @@ describe('history navigation', () => {
 
 	test('set_content_from_history with saved entry clears unsaved_edit_entry_id', () => {
 		// Create entries
-		const history = zzz.get_diskfile_history(TEST_PATH)!;
+		const history = app.get_diskfile_history(TEST_PATH)!;
 		const saved_entry = history.add_entry('Saved content');
 
 		// First select an unsaved entry
@@ -185,7 +189,7 @@ describe('history navigation', () => {
 
 	test('content_matching_entry_ids tracks entries with matching content', () => {
 		// Create entries with duplicate content
-		const history = zzz.get_diskfile_history(TEST_PATH)!;
+		const history = app.get_diskfile_history(TEST_PATH)!;
 		const entry1 = history.add_entry('Unique content');
 		const entry2 = history.add_entry('Duplicate content');
 		const entry3 = history.add_entry('Duplicate content');
@@ -218,7 +222,7 @@ describe('saving history changes', () => {
 		expect(editor_state.unsaved_edit_entry_id).toBeNull();
 
 		// A new entry should be created with correct properties
-		const history = zzz.get_diskfile_history(TEST_PATH)!;
+		const history = app.get_diskfile_history(TEST_PATH)!;
 		const new_saved_entry = history.entries[0];
 
 		expect(new_saved_entry).toMatchObject({
@@ -259,7 +263,7 @@ describe('saving history changes', () => {
 describe('managing unsaved edits', () => {
 	test('multiple unsaved edits can exist simultaneously', () => {
 		// Create two base entries
-		const history = zzz.get_diskfile_history(TEST_PATH)!;
+		const history = app.get_diskfile_history(TEST_PATH)!;
 		const entry1 = history.add_entry('Base 1');
 		const entry2 = history.add_entry('Base 2');
 
@@ -295,7 +299,7 @@ describe('managing unsaved edits', () => {
 
 	test('clear_unsaved_edits removes all unsaved entries', () => {
 		// Create multiple unsaved edits
-		const history = zzz.get_diskfile_history(TEST_PATH)!;
+		const history = app.get_diskfile_history(TEST_PATH)!;
 
 		// Add one through normal editing
 		editor_state.current_content = 'Unsaved 1';
@@ -333,7 +337,7 @@ describe('managing unsaved edits', () => {
 describe('history clearing', () => {
 	test('clear_history removes all but most recent entry', () => {
 		// Add multiple entries
-		const history = zzz.get_diskfile_history(TEST_PATH)!;
+		const history = app.get_diskfile_history(TEST_PATH)!;
 		history.add_entry('Entry 1');
 		history.add_entry('Entry 2');
 		const newest = history.add_entry('Newest entry');
@@ -356,7 +360,7 @@ describe('history clearing', () => {
 
 	test('clear_history preserves all unsaved edits', () => {
 		// Setup history with both saved and unsaved entries
-		const history = zzz.get_diskfile_history(TEST_PATH)!;
+		const history = app.get_diskfile_history(TEST_PATH)!;
 
 		// Add a saved entry
 		history.add_entry('Newest entry');

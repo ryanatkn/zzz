@@ -3,17 +3,17 @@
 	import Model_Link from '$lib/Model_Link.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 	import {GLYPH_PROVIDER} from '$lib/glyphs.js';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/frontend.svelte.js';
 	import External_Link from '$lib/External_Link.svelte';
 
-	const zzz = zzz_context.get();
+	const app = zzz_context.get();
 </script>
 
 <div class="p_lg">
 	<h1><Glyph glyph={GLYPH_PROVIDER} /> providers</h1>
 	<aside>⚠️ This information is incomplete and may be incorrect or outdated.</aside>
 	<div class="providers_grid">
-		{#each zzz.providers.items as provider (provider)}
+		{#each app.providers.items as provider (provider)}
 			<div class="panel p_lg">
 				<div class="font_size_xl mb_lg">
 					<Provider_Link {provider} icon="svg" />

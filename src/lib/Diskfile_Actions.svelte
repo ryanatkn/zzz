@@ -4,7 +4,7 @@
 	import {slide} from 'svelte/transition';
 
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/frontend.svelte.js';
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import Clear_Restore_Button from '$lib/Clear_Restore_Button.svelte';
 	import type {Diskfile_Editor_State} from '$lib/diskfile_editor_state.svelte.js';
@@ -27,7 +27,7 @@
 		auto_save = false,
 	}: Props = $props();
 
-	const zzz = zzz_context.get();
+	const app = zzz_context.get();
 
 	const content = $derived(editor_state.current_content);
 	const has_changes = $derived(editor_state.has_changes);
@@ -57,8 +57,8 @@
 
 	<!-- Delete button is always available -->
 	<Confirm_Button
-		onconfirm={() => zzz.diskfiles.delete(diskfile.path)}
-		attrs={{class: 'plain icon_button', title: `delete ${diskfile.pathname}`}}
+		onconfirm={() => app.diskfiles.delete(diskfile.path)}
+		attrs={{class: 'plain icon_button', title: 'delete file'}}
 	>
 		<Glyph glyph={GLYPH_DELETE} />
 	</Confirm_Button>

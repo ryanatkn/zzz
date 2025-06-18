@@ -1,3 +1,5 @@
+// @slop claude_opus_4
+
 // @vitest-environment jsdom
 
 import {test, expect, vi, beforeEach, describe} from 'vitest';
@@ -6,7 +8,7 @@ import {z} from 'zod';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import {create_uuid, get_datetime_now, Uuid_With_Default} from '$lib/zod_helpers.js';
-import {Zzz} from '$lib/zzz.svelte.js';
+import {Frontend} from '$lib/frontend.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Constants for testing
@@ -35,18 +37,18 @@ class Basic_Test_Cell extends Cell<typeof Test_Schema> {
 }
 
 // Test suite variables
-let zzz: Zzz;
+let app: Frontend;
 
 beforeEach(() => {
 	// Create a real Zzz instance for each test
-	zzz = monkeypatch_zzz_for_tests(new Zzz());
+	app = monkeypatch_zzz_for_tests(new Frontend());
 	vi.clearAllMocks();
 });
 
 describe('Cell initialization', () => {
 	test('initializes with provided json', () => {
 		const test_cell = new Basic_Test_Cell({
-			zzz,
+			app,
 			json: {
 				id: TEST_ID,
 				created: TEST_DATETIME,
@@ -65,13 +67,13 @@ describe('Cell initialization', () => {
 		expect(test_cell.items).toEqual(['item1', 'item2']);
 
 		// Verify cell was registered
-		expect(zzz.cells.has(TEST_ID)).toBe(true);
-		expect(zzz.cells.get(TEST_ID)).toBe(test_cell);
+		expect(app.cell_registry.all.has(TEST_ID)).toBe(true);
+		expect(app.cell_registry.all.get(TEST_ID)).toBe(test_cell);
 	});
 
 	test('uses default values when json is empty', () => {
 		const test_cell = new Basic_Test_Cell({
-			zzz,
+			app,
 		});
 
 		// Should use schema defaults
@@ -86,7 +88,7 @@ describe('Cell initialization', () => {
 
 	test('derived schema properties are correctly calculated', () => {
 		const test_cell = new Basic_Test_Cell({
-			zzz,
+			app,
 			json: {
 				id: TEST_ID,
 			},
@@ -120,7 +122,7 @@ describe('Cell registry lifecycle', () => {
 		const cell_id = create_uuid();
 
 		const test_cell = new Basic_Test_Cell({
-			zzz,
+			app,
 			json: {
 				id: cell_id,
 				created: TEST_DATETIME,
@@ -128,15 +130,15 @@ describe('Cell registry lifecycle', () => {
 		});
 
 		// Cell should be registered automatically in init()
-		expect(zzz.cells.has(cell_id)).toBe(true);
-		expect(zzz.cells.get(cell_id)).toBe(test_cell);
+		expect(app.cell_registry.all.has(cell_id)).toBe(true);
+		expect(app.cell_registry.all.get(cell_id)).toBe(test_cell);
 	});
 
 	test('dispose removes from registry', () => {
 		const cell_id = create_uuid();
 
 		const test_cell = new Basic_Test_Cell({
-			zzz,
+			app,
 			json: {
 				id: cell_id,
 				created: TEST_DATETIME,
@@ -144,20 +146,20 @@ describe('Cell registry lifecycle', () => {
 		});
 
 		// Verify initial registration
-		expect(zzz.cells.has(cell_id)).toBe(true);
+		expect(app.cell_registry.all.has(cell_id)).toBe(true);
 
 		// Dispose cell
 		test_cell.dispose();
 
 		// Should be removed from registry
-		expect(zzz.cells.has(cell_id)).toBe(false);
+		expect(app.cell_registry.all.has(cell_id)).toBe(false);
 	});
 
 	test('dispose is safe to call multiple times', () => {
 		const cell_id = create_uuid();
 
 		const test_cell = new Basic_Test_Cell({
-			zzz,
+			app,
 			json: {
 				id: cell_id,
 			},
@@ -165,7 +167,7 @@ describe('Cell registry lifecycle', () => {
 
 		// First dispose
 		test_cell.dispose();
-		expect(zzz.cells.has(cell_id)).toBe(false);
+		expect(app.cell_registry.all.has(cell_id)).toBe(false);
 
 		// Second dispose should not throw
 		expect(() => test_cell.dispose()).not.toThrow();
@@ -187,7 +189,7 @@ describe('Cell id handling', () => {
 		content: string = $state()!;
 		version: number = $state()!;
 
-		constructor(options: {zzz: Zzz; json?: any}) {
+		constructor(options: {app: Frontend; json?: any}) {
 			super(Id_Test_Schema, options);
 			this.init();
 		}
@@ -195,7 +197,7 @@ describe('Cell id handling', () => {
 
 	test('set_json overwrites id when provided in input', () => {
 		// Create initial cell
-		const cell = new Id_Test_Cell({zzz});
+		const cell = new Id_Test_Cell({app});
 		const initial_id = cell.id;
 
 		// Verify initial state
@@ -220,7 +222,7 @@ describe('Cell id handling', () => {
 
 	test('set_json_partial updates id when included in partial update', () => {
 		// Create initial cell
-		const cell = new Id_Test_Cell({zzz});
+		const cell = new Id_Test_Cell({app});
 		const initial_id = cell.id;
 
 		// Create a new id to set
@@ -242,7 +244,7 @@ describe('Cell id handling', () => {
 
 	test('set_json_partial preserves id when not included in partial update', () => {
 		// Create initial cell
-		const cell = new Id_Test_Cell({zzz});
+		const cell = new Id_Test_Cell({app});
 		const initial_id = cell.id;
 		const initial_content = '';
 
@@ -259,7 +261,7 @@ describe('Cell id handling', () => {
 
 	test('schema validation rejects invalid id formats', () => {
 		// Create initial cell
-		const cell = new Id_Test_Cell({zzz});
+		const cell = new Id_Test_Cell({app});
 
 		// Attempt to set invalid id
 		expect(() => {
@@ -272,7 +274,7 @@ describe('Cell id handling', () => {
 	test('clone creates a new id instead of copying the original', () => {
 		// Create cell with initial values
 		const cell = new Id_Test_Cell({
-			zzz,
+			app,
 			json: {
 				type: 'test',
 				content: 'Original content',
@@ -298,7 +300,7 @@ describe('Cell id handling', () => {
 describe('Cell serialization', () => {
 	test('to_json creates correct representation', () => {
 		const test_cell = new Basic_Test_Cell({
-			zzz,
+			app,
 			json: {
 				id: TEST_ID,
 				created: TEST_DATETIME,
@@ -319,7 +321,7 @@ describe('Cell serialization', () => {
 
 	test('toJSON method works with JSON.stringify', () => {
 		const test_cell = new Basic_Test_Cell({
-			zzz,
+			app,
 			json: {
 				id: TEST_ID,
 				text: 'Stringify Test',
@@ -335,7 +337,7 @@ describe('Cell serialization', () => {
 
 	test('derived json properties update when cell changes', () => {
 		const test_cell = new Basic_Test_Cell({
-			zzz,
+			app,
 			json: {
 				id: TEST_ID,
 				text: 'Initial',
@@ -365,7 +367,7 @@ describe('Cell serialization', () => {
 describe('Cell modification methods', () => {
 	test('set_json updates properties', () => {
 		const test_cell = new Basic_Test_Cell({
-			zzz,
+			app,
 			json: {
 				id: TEST_ID,
 				text: 'Initial',
@@ -386,7 +388,7 @@ describe('Cell modification methods', () => {
 	});
 
 	test('set_json rejects invalid data', () => {
-		const test_cell = new Basic_Test_Cell({zzz});
+		const test_cell = new Basic_Test_Cell({app});
 
 		// Should reject invalid data with a schema error
 		expect(() => test_cell.set_json({number: 'not a number' as any})).toThrow();
@@ -394,7 +396,7 @@ describe('Cell modification methods', () => {
 
 	test('set_json_partial updates only specified properties', () => {
 		const test_cell = new Basic_Test_Cell({
-			zzz,
+			app,
 			json: {
 				id: TEST_ID,
 				text: 'Initial text',
@@ -422,7 +424,7 @@ describe('Cell modification methods', () => {
 
 	test('set_json_partial handles null or undefined input', () => {
 		const test_cell = new Basic_Test_Cell({
-			zzz,
+			app,
 			json: {
 				id: TEST_ID,
 				text: 'Initial',
@@ -440,7 +442,7 @@ describe('Cell modification methods', () => {
 
 	test('set_json_partial validates merged data against schema', () => {
 		const test_cell = new Basic_Test_Cell({
-			zzz,
+			app,
 			json: {
 				id: TEST_ID,
 				text: 'Initial',
@@ -462,7 +464,7 @@ describe('Cell date formatting', () => {
 		const updated = new Date(now.getTime() + 10000).toISOString();
 
 		const test_cell = new Basic_Test_Cell({
-			zzz,
+			app,
 			json: {
 				id: TEST_ID,
 				created,
@@ -476,7 +478,7 @@ describe('Cell date formatting', () => {
 
 		// Verify formatted strings exist
 		expect(test_cell.created_formatted_short_date).not.toBeNull();
-		expect(test_cell.created_formatted_date).not.toBeNull();
+		expect(test_cell.created_formatted_datetime).not.toBeNull();
 		expect(test_cell.created_formatted_time).not.toBeNull();
 
 		expect(test_cell.updated_formatted_short_date).not.toBeNull();
@@ -486,7 +488,7 @@ describe('Cell date formatting', () => {
 
 	test('handles null updated date', () => {
 		const test_cell = new Basic_Test_Cell({
-			zzz,
+			app,
 			json: {
 				id: TEST_ID,
 				created: TEST_DATETIME,
@@ -504,7 +506,7 @@ describe('Cell date formatting', () => {
 describe('Cell cloning', () => {
 	test('clone creates independent copy', () => {
 		const original = new Basic_Test_Cell({
-			zzz,
+			app,
 			json: {
 				id: TEST_ID,
 				text: 'Original',
@@ -536,7 +538,7 @@ describe('Cell cloning', () => {
 
 	test('clone registers new instance in registry', () => {
 		const original = new Basic_Test_Cell({
-			zzz,
+			app,
 			json: {
 				id: TEST_ID,
 			},
@@ -545,16 +547,16 @@ describe('Cell cloning', () => {
 		const clone = original.clone();
 
 		// Both instances should be registered
-		expect(zzz.cells.has(original.id)).toBe(true);
-		expect(zzz.cells.has(clone.id)).toBe(true);
-		expect(zzz.cells.get(clone.id)).toBe(clone);
+		expect(app.cell_registry.all.has(original.id)).toBe(true);
+		expect(app.cell_registry.all.has(clone.id)).toBe(true);
+		expect(app.cell_registry.all.get(clone.id)).toBe(clone);
 	});
 });
 
 describe('Schema validation', () => {
 	test('json_parsed validates cell state', () => {
 		const test_cell = new Basic_Test_Cell({
-			zzz,
+			app,
 			json: {
 				id: TEST_ID,
 				text: 'Valid',
@@ -568,7 +570,7 @@ describe('Schema validation', () => {
 		expect(
 			() =>
 				new Basic_Test_Cell({
-					zzz,
+					app,
 					json: {
 						id: TEST_ID,
 						text: 123 as any,

@@ -12,21 +12,16 @@ import {to_reordered_list} from '$lib/list_helpers.js';
 import type {Bit_Type} from '$lib/bit.svelte.js';
 import {get_unique_name} from '$lib/helpers.js';
 import {to_prompts_url} from '$lib/nav_helpers.js';
+import {Cell_Json} from '$lib/cell_types.js';
 
-export const Prompts_Json = z
-	.object({
-		items: cell_array(
-			z.array(Prompt_Json).default(() => []),
-			'Prompt',
-		),
-		selected_id: z.string().nullable().default(null),
-		show_sort_controls: z.boolean().default(false),
-	})
-	.default(() => ({
-		items: [],
-		selected_id: null,
-		show_sort_controls: false,
-	}));
+export const Prompts_Json = Cell_Json.extend({
+	items: cell_array(
+		z.array(Prompt_Json).default(() => []),
+		'Prompt',
+	),
+	selected_id: z.string().nullable().default(null),
+	show_sort_controls: z.boolean().default(false),
+});
 export type Prompts_Json = z.infer<typeof Prompts_Json>;
 export type Prompts_Json_Input = z.input<typeof Prompts_Json>;
 
@@ -96,7 +91,7 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 		super(Prompts_Json, options);
 
 		this.decoders = {
-			// TODO @many maybe infer or create a helper for this, duplicated many places
+			// TODO @many improve this API, maybe infer or create a helper, duplicated many places
 			items: (items) => {
 				if (Array.isArray(items)) {
 					this.items.clear();
@@ -118,7 +113,7 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 
 	add(json?: Prompt_Json_Input): Prompt {
 		const j = !json?.name ? {...json, name: this.generate_unique_name('new prompt')} : json;
-		const prompt = new Prompt({zzz: this.zzz, json: j});
+		const prompt = new Prompt({app: this.app, json: j});
 		this.items.add(prompt);
 		if (this.selected_id === null) {
 			this.selected_id = prompt.id;
@@ -132,7 +127,7 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 
 	// TODO @many look into making these more generic, less manual bookkeeping
 	add_many(prompts_json: Array<Prompt_Json_Input>): Array<Prompt> {
-		const prompts = prompts_json.map((json) => new Prompt({zzz: this.zzz, json}));
+		const prompts = prompts_json.map((json) => new Prompt({app: this.app, json}));
 		this.items.add_many(prompts);
 
 		// Set selected_id to the first prompt if none is selected

@@ -46,7 +46,7 @@ export class Safe_Fs {
 			);
 		} catch (error) {
 			if (error instanceof z.ZodError) {
-				throw Error(`Invalid path in allowed_paths: ${error.message}`);
+				throw new Error(`Invalid path in allowed_paths: ${error.message}`);
 			}
 			throw error;
 		}
@@ -216,10 +216,10 @@ export class Safe_Fs {
 			if (stats.isSymbolicLink()) {
 				throw new Symlink_Not_Allowed_Error(normalized_path);
 			}
-		} catch (err) {
+		} catch (error) {
 			// If error is due to non-existence, ignore
-			if (!(err instanceof Error && err.message.includes('ENOENT'))) {
-				throw err;
+			if (!(error instanceof Error && error.message.includes('ENOENT'))) {
+				throw error;
 			}
 		}
 
@@ -234,9 +234,9 @@ export class Safe_Fs {
 				if (stats.isSymbolicLink()) {
 					throw new Symlink_Not_Allowed_Error(parent);
 				}
-			} catch (err) {
-				if (!(err instanceof Error && err.message.includes('ENOENT'))) {
-					throw err;
+			} catch (error) {
+				if (!(error instanceof Error && error.message.includes('ENOENT'))) {
+					throw error;
 				}
 			}
 			current = parent;
@@ -251,8 +251,8 @@ export class Safe_Fs {
 export class Path_Not_Allowed_Error extends Error {
 	override name = 'Path_Not_Allowed_Error' as const;
 
-	constructor(path: string) {
-		super(`Path is not allowed: ${path}`);
+	constructor(path: string, options?: ErrorOptions) {
+		super(`Path is not allowed: ${path}`, options);
 	}
 }
 
@@ -262,7 +262,7 @@ export class Path_Not_Allowed_Error extends Error {
 export class Symlink_Not_Allowed_Error extends Error {
 	override name = 'Symlink_Not_Allowed_Error' as const;
 
-	constructor(path: string) {
-		super(`Path is a symlink which is not allowed: ${path}`);
+	constructor(path: string, options?: ErrorOptions) {
+		super(`Path is a symlink which is not allowed: ${path}`, options);
 	}
 }

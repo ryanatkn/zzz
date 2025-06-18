@@ -2,145 +2,95 @@
  * Helper module for safely working with completion responses
  * and handling type compatibility issues.
  */
-import type {Provider_Name} from '$lib/provider_types.js';
-import type {
-	Provider_Data,
-	Completion_Response,
-	Provider_Data_Ollama,
-	Provider_Data_Claude,
-	Provider_Data_Chatgpt,
-	Provider_Data_Gemini,
-	Action_Completion_Response,
-} from '$lib/action_types.js';
-import {create_uuid, get_datetime_now, Uuid} from '$lib/zod_helpers.js';
+import {get_datetime_now} from '$lib/zod_helpers.js';
+import type {Action_Outputs} from '$lib/action_collections.js';
+import type {Provider_Name, Provider_Data} from '$lib/provider_types.js';
+import type {Jsonrpc_Request_Id} from '$lib/jsonrpc.js';
 
 /**
- * Extract text content from a completion response based on provider type.
+ * Extracts the text content from a completion response
  */
 export const to_completion_response_text = (
-	completion_response: Completion_Response | null | undefined,
+	completion_response:
+		| Action_Outputs['submit_completion']['completion_response']
+		| null
+		| undefined,
 ): string | null => {
 	if (!completion_response) return null;
 
-	const provider = completion_response.provider_name;
 	const {data} = completion_response;
 
-	// Validate provider type matches
-	if (data.type !== provider) {
-		console.error('Mismatched provider type in completion response', data.type, provider);
-		return null;
-	}
-
-	// Ensure value exists before trying to access properties
-	if (!data.value) {
-		console.error('Missing value in completion response data', data);
-		return null;
-	}
-
-	// TODO avoid casting
-	switch (provider) {
+	switch (data.type) {
 		case 'ollama':
-			return (data as Provider_Data_Ollama).value?.message?.content || null;
-
+			return data.value?.message?.content || null;
 		case 'claude':
-			return (data as Provider_Data_Claude).value?.content?.[0]?.text || null;
-
+			return data.value?.content?.[0]?.text || null;
 		case 'chatgpt':
-			return (data as Provider_Data_Chatgpt).value?.choices?.[0]?.message?.content || null;
-
+			return data.value?.choices?.[0]?.message?.content || null;
 		case 'gemini':
-			return (data as Provider_Data_Gemini).value.text || null;
-
+			return data.value.text || null;
 		default:
-			console.error('Unknown provider', provider);
+			console.error('Unknown provider type', data);
 			return null;
 	}
 };
 
 /**
- * Process provider-specific data to ensure it conforms to expected schema.
+ * Creates a standardized completion response message from provider-specific responses
  */
-export const process_provider_data = (
+export const to_completion_result = (
+	request_id: Jsonrpc_Request_Id,
 	provider_name: Provider_Name,
-	api_response: any,
-): Provider_Data => {
+	model: string,
+	api_response: unknown,
+): Action_Outputs['submit_completion'] => {
+	let provider_data: Provider_Data;
+
+	// Convert provider-specific response format to our standard format
 	switch (provider_name) {
 		case 'ollama':
-			return {
+			provider_data = {
 				type: 'ollama',
 				value: api_response,
 			};
-
+			break;
 		case 'claude':
-			return {
+			provider_data = {
 				type: 'claude',
 				value: api_response,
 			};
-
+			break;
 		case 'chatgpt':
-			return {
+			provider_data = {
 				type: 'chatgpt',
 				value: api_response,
 			};
-
-		case 'gemini': {
-			// Handle Gemini's special case with function response getters
-			return {
+			break;
+		case 'gemini':
+			provider_data = {
 				type: 'gemini',
 				value: {
-					// Extract text immediately from the function to avoid serialization issues
-					text:
-						typeof api_response.response.text === 'function' ? api_response.response.text() : '',
-					candidates: api_response.response.candidates || null,
-					function_calls:
-						typeof api_response.response.functionCalls === 'function'
-							? api_response.response.functionCalls()
-							: null,
-					prompt_feedback: api_response.response.promptFeedback || null,
-					usage_metadata: api_response.response.usageMetadata || null,
+					text: (api_response as any)?.response?.text() || '',
+					candidates: (api_response as any)?.candidates || null,
+					function_calls: (api_response as any)?.functionCalls || null,
+					prompt_feedback: (api_response as any)?.promptFeedback || null,
+					usage_metadata: (api_response as any)?.usageMetadata || null,
 				},
 			};
-		}
-
+			break;
 		default:
-			console.error('Unknown provider', provider_name);
-			return {
-				type: provider_name as Provider_Name,
-				value: api_response,
-			};
+			throw new Error(`Unsupported provider: ${provider_name}`);
 	}
-};
 
-/**
- * Creates a standard completion response object.
- */
-export const create_completion_response = (
-	request_id: Uuid,
-	provider_name: Provider_Name,
-	model: string,
-	api_response: any,
-): Completion_Response => {
-	return {
-		created: get_datetime_now(),
-		request_id: Uuid.parse(request_id),
-		provider_name,
-		model,
-		data: process_provider_data(provider_name, api_response),
-	};
-};
+	const created = get_datetime_now();
 
-/**
- * Creates a completion response message.
- */
-export const create_completion_response_message = (
-	request_id: Uuid,
-	provider_name: Provider_Name,
-	model: string,
-	api_response: any,
-): Action_Completion_Response => {
 	return {
-		id: create_uuid(),
-		type: 'completion_response',
-		completion_response: create_completion_response(request_id, provider_name, model, api_response),
+		completion_response: {
+			created,
+			request_id,
+			provider_name,
+			model,
+			data: provider_data,
+		},
 	};
 };

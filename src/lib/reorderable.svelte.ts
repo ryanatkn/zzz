@@ -1,3 +1,5 @@
+// @slop claude_opus_4
+
 import type {Action} from 'svelte/action';
 import {on} from 'svelte/events';
 import {Unreachable_Error} from '@ryanatkn/belt/error.js';
@@ -92,7 +94,6 @@ export interface Reorderable_Options {
 }
 
 export class Reorderable implements Reorderable_Style_Config {
-	// Initialization state
 	initialized = $state(false);
 
 	// Drag state tracking
@@ -157,6 +158,7 @@ export class Reorderable implements Reorderable_Style_Config {
 	 */
 	constructor(options: Reorderable_Options = EMPTY_OBJECT) {
 		const {
+			// preserve nulls
 			list_class = LIST_CLASS_DEFAULT,
 			item_class = ITEM_CLASS_DEFAULT,
 			dragging_class = DRAGGING_CLASS_DEFAULT,
@@ -586,7 +588,7 @@ export class Reorderable implements Reorderable_Style_Config {
 	list: Action<HTMLElement, Reorderable_List_Params> = (node, params) => {
 		// Check if we already have a list node
 		if (this.list_node && this.list_node !== node) {
-			throw Error('This Reorderable instance is already attached to a different list element.');
+			throw new Error('This Reorderable instance is already attached to a different list element.');
 		}
 
 		// Clean up previous state if this is a re-initialization

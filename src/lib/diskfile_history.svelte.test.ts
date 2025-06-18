@@ -5,7 +5,7 @@ import {test, expect, beforeEach, describe} from 'vitest';
 import {Diskfile_History} from '$lib/diskfile_history.svelte.js';
 import {Diskfile_Path} from '$lib/diskfile_types.js';
 import {create_uuid} from '$lib/zod_helpers.js';
-import {Zzz} from '$lib/zzz.svelte.js';
+import {Frontend} from '$lib/frontend.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Test data
@@ -14,16 +14,16 @@ const TEST_CONTENT = 'Test content';
 
 describe('Diskfile_History', () => {
 	// Test suite
-	let zzz: Zzz;
+	let app: Frontend;
 	let history: Diskfile_History;
 
 	beforeEach(() => {
 		// Create a real Zzz instance for each test
-		zzz = monkeypatch_zzz_for_tests(new Zzz());
+		app = monkeypatch_zzz_for_tests(new Frontend());
 
 		// Create a fresh history instance for each test with the real Zzz instance
 		history = new Diskfile_History({
-			zzz,
+			app,
 			json: {
 				path: TEST_PATH,
 				entries: [],

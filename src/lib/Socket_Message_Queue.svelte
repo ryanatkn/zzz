@@ -210,9 +210,9 @@
 									{/if}
 								{/snippet}
 							</Copy_To_Clipboard>
-							<small class="chip">{message.data.message.type}</small>
+							<small class="chip">{message.data.method}</small>
 							<Copy_To_Clipboard
-								text={message.data.message.id}
+								text={message.data.id}
 								attrs={{
 									class: 'plain font_size_xs text_color_5',
 									style: 'width: 120px;',
@@ -222,10 +222,10 @@
 							>
 								{#snippet children(copied)}
 									{#if copied}
-										<div><small class="font_size_xs">{message.data.message.id}</small></div>
+										<div><small class="font_size_xs">{message.data.id}</small></div>
 									{:else}
 										<div in:slide={{duration: 200}}>
-											<small class="font_size_xs">{message.data.message.id}</small>
+											<small class="font_size_xs">{message.data.id}</small>
 										</div>
 									{/if}
 								{/snippet}

@@ -1,4 +1,7 @@
+// @slop claude_opus_4
+
 // @vitest-environment jsdom
+
 import {test, expect, describe, beforeEach} from 'vitest';
 import {z} from 'zod';
 
@@ -11,7 +14,7 @@ import {
 	create_uuid,
 	get_datetime_now,
 } from '$lib/zod_helpers.js';
-import {Zzz} from '$lib/zzz.svelte.js';
+import {Frontend} from '$lib/frontend.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Create a schema for our test cell
@@ -28,9 +31,9 @@ class Test_Cell extends Cell<typeof Test_Cell_Schema> {
 	name: string = $state('');
 	value: number = $state(0);
 
-	constructor(zzz: Zzz, id: Uuid, name: string, value: number, override_cid?: number) {
+	constructor(app: Frontend, id: Uuid, name: string, value: number, override_cid?: number) {
 		super(Test_Cell_Schema, {
-			zzz,
+			app,
 			json: {
 				id,
 				created: get_datetime_now(),
@@ -52,9 +55,8 @@ class Test_Cell extends Cell<typeof Test_Cell_Schema> {
 describe('Sortable', () => {
 	let items: Array<Test_Cell>;
 	let sorters: Array<Sorter<Test_Cell>>;
-	let zzz: Zzz;
+	let app: Frontend;
 
-	// Create test UUIDs - using proper UUIDs instead of simple strings
 	const id1 = create_uuid();
 	const id2 = create_uuid();
 	const id3 = create_uuid();
@@ -62,14 +64,14 @@ describe('Sortable', () => {
 
 	beforeEach(() => {
 		// Setup a real Zzz instance for testing
-		zzz = monkeypatch_zzz_for_tests(new Zzz());
+		app = monkeypatch_zzz_for_tests(new Frontend());
 
 		// Create test items with intentional name collisions to test stable sorting
 		items = [
-			new Test_Cell(zzz, id3, 'Banana', 10, 30),
-			new Test_Cell(zzz, id1, 'Apple', 5, 10),
-			new Test_Cell(zzz, id2, 'Cherry', 15, 20),
-			new Test_Cell(zzz, id4, 'Apple', 20, 40), // Same name as item with id1
+			new Test_Cell(app, id3, 'Banana', 10, 30),
+			new Test_Cell(app, id1, 'Apple', 5, 10),
+			new Test_Cell(app, id2, 'Cherry', 15, 20),
+			new Test_Cell(app, id4, 'Apple', 20, 40), // Same name as item with id1
 		];
 
 		sorters = [
@@ -234,9 +236,9 @@ describe('Sortable', () => {
 		test('maintains stable sort order with equal values using cid', () => {
 			// Create items with equal values but different cids
 			const equal_items = [
-				new Test_Cell(zzz, create_uuid(), 'Item3', 10, 300),
-				new Test_Cell(zzz, create_uuid(), 'Item1', 10, 100),
-				new Test_Cell(zzz, create_uuid(), 'Item2', 10, 200),
+				new Test_Cell(app, create_uuid(), 'Item3', 10, 300),
+				new Test_Cell(app, create_uuid(), 'Item1', 10, 100),
+				new Test_Cell(app, create_uuid(), 'Item2', 10, 200),
 			];
 
 			const equal_sorter = sort_by_numeric<Test_Cell>('value', 'Value', 'value');
@@ -266,7 +268,7 @@ describe('Sortable', () => {
 			expect(sortable.sorted_items.length).toBe(4);
 
 			// Add a new item
-			const new_item = new Test_Cell(zzz, create_uuid(), 'Dragonfruit', 25, 50);
+			const new_item = new Test_Cell(app, create_uuid(), 'Dragonfruit', 25, 50);
 
 			// Update the items array reference so the derived getter gets the new value
 			current_items = [...current_items, new_item];

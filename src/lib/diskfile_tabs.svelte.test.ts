@@ -1,3 +1,5 @@
+// @slop claude_opus_4
+
 // @vitest-environment jsdom
 
 import {test, expect, beforeEach, describe} from 'vitest';
@@ -5,7 +7,7 @@ import {test, expect, beforeEach, describe} from 'vitest';
 import {Diskfile_Tabs} from '$lib/diskfile_tabs.svelte.js';
 import {Diskfile_Tab} from '$lib/diskfile_tab.svelte.js';
 import {create_uuid, Uuid} from '$lib/zod_helpers.js';
-import {Zzz} from '$lib/zzz.svelte.js';
+import {Frontend} from '$lib/frontend.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Test data
@@ -15,16 +17,16 @@ const TEST_DISKFILE_ID_3 = Uuid.parse('33333333-3333-3333-3333-333333333333');
 
 describe('Diskfile_Tabs', () => {
 	// Test suite
-	let zzz: Zzz;
+	let app: Frontend;
 	let tabs: Diskfile_Tabs;
 
 	beforeEach(() => {
 		// Create a real Zzz instance for each test
-		zzz = monkeypatch_zzz_for_tests(new Zzz());
+		app = monkeypatch_zzz_for_tests(new Frontend());
 
 		// Create a fresh tabs instance for each test
 		tabs = new Diskfile_Tabs({
-			zzz,
+			app,
 			json: {
 				id: create_uuid(),
 			},

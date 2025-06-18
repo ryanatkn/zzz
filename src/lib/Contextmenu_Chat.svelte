@@ -6,7 +6,7 @@
 	import type {Omit_Strict} from '@ryanatkn/belt/types.js';
 
 	import type {Chat} from '$lib/chat.svelte.js';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/frontend.svelte.js';
 	import {
 		GLYPH_CHAT,
 		GLYPH_DELETE,
@@ -25,7 +25,7 @@
 
 	const {chat, ...rest}: Props = $props();
 
-	const zzz = zzz_context.get();
+	const app = zzz_context.get();
 
 	let show_model_picker = $state(false);
 </script>
@@ -96,7 +96,7 @@
 				run={async () => {
 					// TODO BLOCK this is broken bc we need a unique name, and adding tapes looks hacky, maybe add a `chats/chat.duplicate` method
 					// Create a duplicate of this chat
-					const new_chat = zzz.chats.add_chat(chat.clone());
+					const new_chat = app.chats.add_chat(chat.clone());
 
 					// Add the same tapes
 					for (const tape of chat.tapes) {
@@ -104,7 +104,7 @@
 					}
 
 					// Select the new chat
-					await zzz.chats.navigate_to(new_chat.id);
+					await app.chats.navigate_to(new_chat.id);
 				}}
 			>
 				{#snippet icon()}<Glyph glyph={GLYPH_CHAT} />{/snippet}
@@ -116,7 +116,7 @@
 					// TODO @many better confirmation
 					// eslint-disable-next-line no-alert
 					if (confirm(`Are you sure you want to delete the chat "${chat.name}"?`)) {
-						zzz.chats.remove(chat.id);
+						app.chats.remove(chat.id);
 					}
 				}}
 			>

@@ -1,12 +1,12 @@
 <script lang="ts">
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/frontend.svelte.js';
 	import type {Chat_Template} from '$lib/chat_template.js';
 	import type {Model} from '$lib/model.svelte.js';
 	import Model_Picker from '$lib/Model_Picker.svelte';
 	import type {Uuid} from '$lib/zod_helpers.js';
 	import type {Chat} from '$lib/chat.svelte.js';
 
-	const zzz = zzz_context.get();
+	const app = zzz_context.get();
 
 	interface Props {
 		chat?: Chat;
@@ -17,12 +17,12 @@
 
 	const {chat: chat_prop, oninit, heading = 'create new chat', items}: Props = $props();
 
-	const get_or_create_chat = () => chat_prop ?? zzz.chats.add();
+	const get_or_create_chat = () => chat_prop ?? app.chats.add();
 
 	const init_from_template = (template: Chat_Template): void => {
 		const chat = get_or_create_chat();
 
-		const models = zzz.models.filter_by_names(template.model_names);
+		const models = app.models.filter_by_names(template.model_names);
 		if (models && models.length > 0) {
 			for (const model of models) {
 				chat.add_tape(model);
@@ -66,7 +66,7 @@
 	<section class="width_md min_width_sm">
 		<h3 class="mt_0 mb_lg px_md">from template</h3>
 		<menu class="unstyled column gap_xs px_md">
-			{#each zzz.chats.chat_templates as chat_template (chat_template.id)}
+			{#each app.chats.chat_templates as chat_template (chat_template.id)}
 				<button
 					type="button"
 					class="plain selectable w_100 py_sm text_align_left justify_content_start font_weight_400"

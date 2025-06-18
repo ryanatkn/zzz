@@ -1,3 +1,5 @@
+// @slop claude_opus_4
+
 // @vitest-environment jsdom
 
 import {test, expect, vi, beforeEach} from 'vitest';
@@ -7,7 +9,7 @@ import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import {Datetime_Now, get_datetime_now, create_uuid, Uuid_With_Default} from '$lib/zod_helpers.js';
 import {HANDLED} from '$lib/cell_helpers.js';
-import {Zzz} from '$lib/zzz.svelte.js';
+import {Frontend} from '$lib/frontend.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Constants for testing
@@ -15,11 +17,11 @@ const TEST_ID = create_uuid();
 const TEST_DATETIME = get_datetime_now();
 
 // Test suite variables
-let zzz: Zzz;
+let app: Frontend;
 
 beforeEach(() => {
 	// Create a real Zzz instance for each test
-	zzz = monkeypatch_zzz_for_tests(new Zzz());
+	app = monkeypatch_zzz_for_tests(new Frontend());
 	vi.clearAllMocks();
 });
 
@@ -50,7 +52,7 @@ test('Cell allows schema keys with no properties if a decoder is provided', () =
 	}
 
 	const cell = new Virtual_Property_Cell({
-		zzz,
+		app,
 		json: {
 			id: TEST_ID,
 			created: TEST_DATETIME,
@@ -93,7 +95,7 @@ test('Cell supports virtual properties with custom handling', () => {
 	}
 
 	const cell = new Virtual_Handler_Cell({
-		zzz,
+		app,
 		json: {
 			id: TEST_ID,
 			created: TEST_DATETIME,
@@ -147,7 +149,7 @@ test('Cell handles sentinel values with proper precedence', () => {
 	}
 
 	const cell = new Sentinel_Test_Cell({
-		zzz,
+		app,
 		json: {
 			id: TEST_ID,
 			created: TEST_DATETIME,
@@ -195,7 +197,7 @@ test('Cell parser defaults take precedence over schema defaults', () => {
 	}
 
 	const cell = new Default_Precedence_Cell({
-		zzz,
+		app,
 		json: {},
 	});
 

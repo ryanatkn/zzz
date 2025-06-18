@@ -23,6 +23,7 @@ export const package_json = {
 		dev: 'gro dev',
 		build: 'gro build',
 		check: 'gro check',
+		typecheck: 'gro typecheck',
 		test: 'gro test',
 		preview: 'vite preview',
 		deploy: 'gro deploy',
@@ -38,7 +39,7 @@ export const package_json = {
 		'@ryanatkn/gro': '^0.159.0',
 		'@ryanatkn/moss': '^0.31.0',
 		'@sveltejs/adapter-static': '^3.0.8',
-		'@sveltejs/kit': '^2.20.8',
+		'@sveltejs/kit': '^2.21.1',
 		'@sveltejs/package': '^2.3.11',
 		'@sveltejs/vite-plugin-svelte': '^5.0.3',
 		eslint: '^9.25.1',
@@ -47,7 +48,7 @@ export const package_json = {
 		ollama: '^0.5.15',
 		prettier: '^3.5.3',
 		'prettier-plugin-svelte': '^3.3.3',
-		svelte: '^5.28.2',
+		svelte: '^5.31.1',
 		'svelte-check': '^4.1.6',
 		tslib: '^2.8.1',
 		typescript: '^5.8.3',
@@ -62,7 +63,6 @@ export const package_json = {
 		'@hono/node-ws': '^1.1.4',
 		'@ryanatkn/belt': '^0.30.2',
 		'date-fns': '^4.1.0',
-		devalue: '^5.1.1',
 		'esm-env': '^1.2.2',
 		hono: '^4.7.8',
 		openai: '^4.96.2',
@@ -79,16 +79,60 @@ export const package_json = {
 	files: ['dist'],
 	exports: {
 		'./package.json': './package.json',
+		'./action_collection_helpers.js': {
+			types: './dist/action_collection_helpers.d.ts',
+			default: './dist/action_collection_helpers.js',
+		},
+		'./action_collections.gen.js': {
+			types: './dist/action_collections.gen.d.ts',
+			default: './dist/action_collections.gen.js',
+		},
+		'./action_collections.js': {
+			types: './dist/action_collections.d.ts',
+			default: './dist/action_collections.js',
+		},
 		'./Action_Detail.svelte': {
 			types: './dist/Action_Detail.svelte.d.ts',
 			svelte: './dist/Action_Detail.svelte',
 			default: './dist/Action_Detail.svelte',
+		},
+		'./action_event_data.js': {
+			types: './dist/action_event_data.d.ts',
+			default: './dist/action_event_data.js',
+		},
+		'./action_event_helpers.js': {
+			types: './dist/action_event_helpers.d.ts',
+			default: './dist/action_event_helpers.js',
+		},
+		'./action_event_types.js': {
+			types: './dist/action_event_types.d.ts',
+			default: './dist/action_event_types.js',
+		},
+		'./action_event.js': {types: './dist/action_event.d.ts', default: './dist/action_event.js'},
+		'./action_helpers.js': {
+			types: './dist/action_helpers.d.ts',
+			default: './dist/action_helpers.js',
 		},
 		'./Action_List.svelte': {
 			types: './dist/Action_List.svelte.d.ts',
 			svelte: './dist/Action_List.svelte',
 			default: './dist/Action_List.svelte',
 		},
+		'./action_metatypes.gen.js': {
+			types: './dist/action_metatypes.gen.d.ts',
+			default: './dist/action_metatypes.gen.js',
+		},
+		'./action_metatypes.js': {
+			types: './dist/action_metatypes.d.ts',
+			default: './dist/action_metatypes.js',
+		},
+		'./action_peer.js': {types: './dist/action_peer.d.ts', default: './dist/action_peer.js'},
+		'./action_registry.js': {
+			types: './dist/action_registry.d.ts',
+			default: './dist/action_registry.js',
+		},
+		'./action_spec.js': {types: './dist/action_spec.d.ts', default: './dist/action_spec.js'},
+		'./action_specs.js': {types: './dist/action_specs.d.ts', default: './dist/action_specs.js'},
 		'./action_types.js': {types: './dist/action_types.d.ts', default: './dist/action_types.js'},
 		'./action.svelte.js': {types: './dist/action.svelte.d.ts', default: './dist/action.svelte.js'},
 		'./actions.svelte.js': {
@@ -168,6 +212,11 @@ export const package_json = {
 			types: './dist/capabilities.svelte.d.ts',
 			default: './dist/capabilities.svelte.js',
 		},
+		'./Capability_Backend.svelte': {
+			types: './dist/Capability_Backend.svelte.d.ts',
+			svelte: './dist/Capability_Backend.svelte',
+			default: './dist/Capability_Backend.svelte',
+		},
 		'./Capability_Filesystem.svelte': {
 			types: './dist/Capability_Filesystem.svelte.d.ts',
 			svelte: './dist/Capability_Filesystem.svelte',
@@ -177,11 +226,6 @@ export const package_json = {
 			types: './dist/Capability_Ollama.svelte.d.ts',
 			svelte: './dist/Capability_Ollama.svelte',
 			default: './dist/Capability_Ollama.svelte',
-		},
-		'./Capability_Server.svelte': {
-			types: './dist/Capability_Server.svelte.d.ts',
-			svelte: './dist/Capability_Server.svelte',
-			default: './dist/Capability_Server.svelte',
 		},
 		'./Capability_System.svelte': {
 			types: './dist/Capability_System.svelte.d.ts',
@@ -221,6 +265,11 @@ export const package_json = {
 			svelte: './dist/Chat_Tape_Add_By_Model.svelte',
 			default: './dist/Chat_Tape_Add_By_Model.svelte',
 		},
+		'./Chat_Tape_Manage_By_Tag.svelte': {
+			types: './dist/Chat_Tape_Manage_By_Tag.svelte.d.ts',
+			svelte: './dist/Chat_Tape_Manage_By_Tag.svelte',
+			default: './dist/Chat_Tape_Manage_By_Tag.svelte',
+		},
 		'./Chat_Tape.svelte': {
 			types: './dist/Chat_Tape.svelte.d.ts',
 			svelte: './dist/Chat_Tape.svelte',
@@ -248,6 +297,11 @@ export const package_json = {
 			types: './dist/Clear_Restore_Button.svelte.d.ts',
 			svelte: './dist/Clear_Restore_Button.svelte',
 			default: './dist/Clear_Restore_Button.svelte',
+		},
+		'./codegen.js': {types: './dist/codegen.d.ts', default: './dist/codegen.js'},
+		'./completion_types.js': {
+			types: './dist/completion_types.d.ts',
+			default: './dist/completion_types.js',
 		},
 		'./config_defaults.js': {
 			types: './dist/config_defaults.d.ts',
@@ -490,6 +544,34 @@ export const package_json = {
 			svelte: './dist/Footer.svelte',
 			default: './dist/Footer.svelte',
 		},
+		'./frontend_action_handlers.js': {
+			types: './dist/frontend_action_handlers.d.ts',
+			default: './dist/frontend_action_handlers.js',
+		},
+		'./frontend_action_types.gen.js': {
+			types: './dist/frontend_action_types.gen.d.ts',
+			default: './dist/frontend_action_types.gen.js',
+		},
+		'./frontend_action_types.js': {
+			types: './dist/frontend_action_types.d.ts',
+			default: './dist/frontend_action_types.js',
+		},
+		'./frontend_actions_api.js': {
+			types: './dist/frontend_actions_api.d.ts',
+			default: './dist/frontend_actions_api.js',
+		},
+		'./frontend_http_transport.js': {
+			types: './dist/frontend_http_transport.d.ts',
+			default: './dist/frontend_http_transport.js',
+		},
+		'./frontend_websocket_transport.js': {
+			types: './dist/frontend_websocket_transport.d.ts',
+			default: './dist/frontend_websocket_transport.js',
+		},
+		'./frontend.svelte.js': {
+			types: './dist/frontend.svelte.d.ts',
+			default: './dist/frontend.svelte.js',
+		},
 		'./Glyph.svelte': {
 			types: './dist/Glyph.svelte.d.ts',
 			svelte: './dist/Glyph.svelte',
@@ -505,6 +587,15 @@ export const package_json = {
 			types: './dist/indexed_collection.svelte.d.ts',
 			default: './dist/indexed_collection.svelte.js',
 		},
+		'./jsonrpc_errors.js': {
+			types: './dist/jsonrpc_errors.d.ts',
+			default: './dist/jsonrpc_errors.js',
+		},
+		'./jsonrpc_helpers.js': {
+			types: './dist/jsonrpc_helpers.d.ts',
+			default: './dist/jsonrpc_helpers.js',
+		},
+		'./jsonrpc.js': {types: './dist/jsonrpc.d.ts', default: './dist/jsonrpc.js'},
 		'./list_helpers.js': {types: './dist/list_helpers.d.ts', default: './dist/list_helpers.js'},
 		'./Main_Dialog.svelte': {
 			types: './dist/Main_Dialog.svelte.d.ts',
@@ -666,9 +757,21 @@ export const package_json = {
 			types: './dist/reorderable.svelte.d.ts',
 			default: './dist/reorderable.svelte.js',
 		},
+		'./request_tracker.svelte.js': {
+			types: './dist/request_tracker.svelte.d.ts',
+			default: './dist/request_tracker.svelte.js',
+		},
 		'./response_helpers.js': {
 			types: './dist/response_helpers.d.ts',
 			default: './dist/response_helpers.js',
+		},
+		'./schema_helpers.js': {
+			types: './dist/schema_helpers.d.ts',
+			default: './dist/schema_helpers.js',
+		},
+		'./schema_registry.js': {
+			types: './dist/schema_registry.d.ts',
+			default: './dist/schema_registry.js',
 		},
 		'./scrollable.svelte.js': {
 			types: './dist/scrollable.svelte.d.ts',
@@ -680,19 +783,51 @@ export const package_json = {
 			types: './dist/server/ai_provider_utils.d.ts',
 			default: './dist/server/ai_provider_utils.js',
 		},
-		'./server/handler_defaults.js': {
-			types: './dist/server/handler_defaults.d.ts',
-			default: './dist/server/handler_defaults.js',
+		'./server/backend_action_handlers.js': {
+			types: './dist/server/backend_action_handlers.d.ts',
+			default: './dist/server/backend_action_handlers.js',
+		},
+		'./server/backend_action_types.gen.js': {
+			types: './dist/server/backend_action_types.gen.d.ts',
+			default: './dist/server/backend_action_types.gen.js',
+		},
+		'./server/backend_action_types.js': {
+			types: './dist/server/backend_action_types.d.ts',
+			default: './dist/server/backend_action_types.js',
+		},
+		'./server/backend_actions_api.js': {
+			types: './dist/server/backend_actions_api.d.ts',
+			default: './dist/server/backend_actions_api.js',
+		},
+		'./server/backend_websocket_transport.js': {
+			types: './dist/server/backend_websocket_transport.d.ts',
+			default: './dist/server/backend_websocket_transport.js',
+		},
+		'./server/backend.js': {
+			types: './dist/server/backend.d.ts',
+			default: './dist/server/backend.js',
+		},
+		'./server/register_http_actions.js': {
+			types: './dist/server/register_http_actions.d.ts',
+			default: './dist/server/register_http_actions.js',
+		},
+		'./server/register_websocket_actions.js': {
+			types: './dist/server/register_websocket_actions.d.ts',
+			default: './dist/server/register_websocket_actions.js',
 		},
 		'./server/safe_fs.js': {
 			types: './dist/server/safe_fs.d.ts',
 			default: './dist/server/safe_fs.js',
 		},
-		'./server/server.js': {types: './dist/server/server.d.ts', default: './dist/server/server.js'},
-		'./server/zzz_server.js': {
-			types: './dist/server/zzz_server.d.ts',
-			default: './dist/server/zzz_server.js',
+		'./server/security.js': {
+			types: './dist/server/security.d.ts',
+			default: './dist/server/security.js',
 		},
+		'./server/server_helpers.js': {
+			types: './dist/server/server_helpers.d.ts',
+			default: './dist/server/server_helpers.js',
+		},
+		'./server/server.js': {types: './dist/server/server.d.ts', default: './dist/server/server.js'},
 		'./Settings.svelte': {
 			types: './dist/Settings.svelte.d.ts',
 			svelte: './dist/Settings.svelte',
@@ -727,6 +862,7 @@ export const package_json = {
 			svelte: './dist/Strip_Listitem.svelte',
 			default: './dist/Strip_Listitem.svelte',
 		},
+		'./strip_types.js': {types: './dist/strip_types.d.ts', default: './dist/strip_types.js'},
 		'./Strip_View.svelte': {
 			types: './dist/Strip_View.svelte.d.ts',
 			svelte: './dist/Strip_View.svelte',
@@ -761,6 +897,7 @@ export const package_json = {
 			svelte: './dist/Toggle_Button.svelte',
 			default: './dist/Toggle_Button.svelte',
 		},
+		'./transports.js': {types: './dist/transports.d.ts', default: './dist/transports.js'},
 		'./ui.svelte.js': {types: './dist/ui.svelte.d.ts', default: './dist/ui.svelte.js'},
 		'./url_params.svelte.js': {
 			types: './dist/url_params.svelte.d.ts',
@@ -783,7 +920,6 @@ export const package_json = {
 			svelte: './dist/Zzz_Root.svelte',
 			default: './dist/Zzz_Root.svelte',
 		},
-		'./zzz.svelte.js': {types: './dist/zzz.svelte.d.ts', default: './dist/zzz.svelte.js'},
 	},
 } satisfies Package_Json;
 
@@ -792,53 +928,188 @@ export const src_json = {
 	version: '0.0.1',
 	modules: {
 		'./package.json': {path: 'package.json', declarations: [{name: 'default', kind: 'json'}]},
+		'./action_collection_helpers.js': {
+			path: 'action_collection_helpers.ts',
+			declarations: [
+				{name: 'parse_action_input', kind: 'function'},
+				{name: 'parse_action_output', kind: 'function'},
+				{name: 'safe_parse_action_input', kind: 'function'},
+				{name: 'safe_parse_action_output', kind: 'function'},
+			],
+		},
+		'./action_collections.gen.js': {
+			path: 'action_collections.gen.ts',
+			declarations: [{name: 'gen', kind: 'function'}],
+		},
+		'./action_collections.js': {
+			path: 'action_collections.ts',
+			declarations: [
+				{name: 'Action_Method_Any', kind: 'variable'},
+				{name: 'action_specs', kind: 'variable'},
+				{name: 'action_spec_by_method', kind: 'variable'},
+				{name: 'Action_Inputs', kind: 'variable'},
+				{name: 'Action_Outputs', kind: 'variable'},
+				{name: 'Action_Event_Datas', kind: 'type'},
+			],
+		},
 		'./Action_Detail.svelte': {
 			path: 'Action_Detail.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./action_event_data.js': {
+			path: 'action_event_data.ts',
+			declarations: [
+				{name: 'Action_Event_Data', kind: 'variable'},
+				{name: 'Action_Event_Request_Response_Data', kind: 'type'},
+				{name: 'Action_Event_Remote_Notification_Data', kind: 'type'},
+				{name: 'Action_Event_Local_Call_Data', kind: 'type'},
+				{name: 'Action_Event_Data_Union', kind: 'type'},
+			],
+		},
+		'./action_event_helpers.js': {
+			path: 'action_event_helpers.ts',
+			declarations: [
+				{name: 'is_request_response', kind: 'function'},
+				{name: 'is_remote_notification', kind: 'function'},
+				{name: 'is_local_call', kind: 'function'},
+				{name: 'is_send_request', kind: 'function'},
+				{name: 'is_receive_request', kind: 'function'},
+				{name: 'is_send_response', kind: 'function'},
+				{name: 'is_receive_response', kind: 'function'},
+				{name: 'is_notification_send', kind: 'function'},
+				{name: 'is_notification_receive', kind: 'function'},
+				{name: 'is_execute', kind: 'function'},
+				{name: 'is_initial', kind: 'function'},
+				{name: 'is_parsed', kind: 'function'},
+				{name: 'is_handling', kind: 'function'},
+				{name: 'is_handled', kind: 'function'},
+				{name: 'is_failed', kind: 'function'},
+				{name: 'is_send_request_with_parsed_input', kind: 'function'},
+				{name: 'is_notification_send_with_parsed_input', kind: 'function'},
+				{name: 'validate_step_transition', kind: 'function'},
+				{name: 'validate_phase_for_kind', kind: 'function'},
+				{name: 'validate_phase_transition', kind: 'function'},
+				{name: 'get_initial_phase', kind: 'function'},
+				{name: 'should_validate_output', kind: 'function'},
+				{name: 'create_parse_error', kind: 'function'},
+				{name: 'create_validation_error', kind: 'function'},
+				{name: 'create_handler_error', kind: 'function'},
+				{name: 'is_action_complete', kind: 'function'},
+				{name: 'create_initial_data', kind: 'function'},
+				{name: 'to_jsonrpc_params', kind: 'function'},
+				{name: 'to_jsonrpc_result', kind: 'function'},
+			],
+		},
+		'./action_event_types.js': {
+			path: 'action_event_types.ts',
+			declarations: [
+				{name: 'Action_Step', kind: 'variable'},
+				{name: 'Action_Phase', kind: 'variable'},
+				{name: 'Action_Kind', kind: 'variable'},
+				{name: 'STEP_TRANSITIONS', kind: 'variable'},
+				{name: 'PHASE_BY_KIND', kind: 'variable'},
+				{name: 'PHASE_TRANSITIONS', kind: 'variable'},
+				{name: 'Action_Event_Environment', kind: 'type'},
+			],
+		},
+		'./action_event.js': {
+			path: 'action_event.ts',
+			declarations: [
+				{name: 'Action_Event_Change_Observer', kind: 'type'},
+				{name: 'Action_Event', kind: 'class'},
+				{name: 'create_action_event', kind: 'function'},
+				{name: 'create_action_event_from_json', kind: 'function'},
+				{name: 'parse_action_event', kind: 'function'},
+			],
+		},
+		'./action_helpers.js': {
+			path: 'action_helpers.ts',
+			declarations: [
+				{name: 'ACTION_DATE_FORMAT', kind: 'variable'},
+				{name: 'ACTION_TIME_FORMAT', kind: 'variable'},
+				{name: 'to_action_spec_identifier', kind: 'function'},
+				{name: 'to_action_spec_input_identifier', kind: 'function'},
+				{name: 'to_action_spec_output_identifier', kind: 'function'},
+				{name: 'to_action_spec_auth_identifier', kind: 'function'},
+			],
 		},
 		'./Action_List.svelte': {
 			path: 'Action_List.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
 		},
+		'./action_metatypes.gen.js': {
+			path: 'action_metatypes.gen.ts',
+			declarations: [{name: 'gen', kind: 'function'}],
+		},
+		'./action_metatypes.js': {
+			path: 'action_metatypes.ts',
+			declarations: [
+				{name: 'Action_Method', kind: 'variable'},
+				{name: 'Request_Response_Action_Method', kind: 'variable'},
+				{name: 'Remote_Notification_Action_Method', kind: 'variable'},
+				{name: 'Local_Call_Action_Method', kind: 'variable'},
+				{name: 'Frontend_Action_Method', kind: 'variable'},
+				{name: 'Backend_Action_Method', kind: 'variable'},
+				{name: 'Actions_Api', kind: 'type'},
+			],
+		},
+		'./action_peer.js': {
+			path: 'action_peer.ts',
+			declarations: [
+				{name: 'Action_Peer_Send_Options', kind: 'type'},
+				{name: 'Action_Peer_Options', kind: 'type'},
+				{name: 'Action_Peer', kind: 'class'},
+			],
+		},
+		'./action_registry.js': {
+			path: 'action_registry.ts',
+			declarations: [{name: 'Action_Registry', kind: 'class'}],
+		},
+		'./action_spec.js': {
+			path: 'action_spec.ts',
+			declarations: [
+				{name: 'Action_Spec_Base', kind: 'variable'},
+				{name: 'Request_Response_Action_Spec', kind: 'variable'},
+				{name: 'Remote_Notification_Action_Spec', kind: 'variable'},
+				{name: 'Local_Call_Action_Spec', kind: 'variable'},
+				{name: 'Action_Spec', kind: 'variable'},
+				{name: 'is_action_spec', kind: 'function'},
+				{name: 'collect_action_specs', kind: 'function'},
+			],
+		},
+		'./action_specs.js': {
+			path: 'action_specs.ts',
+			declarations: [
+				{name: 'ping_action_spec', kind: 'variable'},
+				{name: 'load_session_action_spec', kind: 'variable'},
+				{name: 'filer_change_action_spec', kind: 'variable'},
+				{name: 'update_diskfile_action_spec', kind: 'variable'},
+				{name: 'delete_diskfile_action_spec', kind: 'variable'},
+				{name: 'create_directory_action_spec', kind: 'variable'},
+				{name: 'submit_completion_action_spec', kind: 'variable'},
+				{name: 'toggle_main_menu_action_spec', kind: 'variable'},
+			],
+		},
 		'./action_types.js': {
 			path: 'action_types.ts',
 			declarations: [
-				{name: 'Action_Direction', kind: 'variable'},
-				{name: 'Action_Type', kind: 'variable'},
-				{name: 'Tape_Message', kind: 'variable'},
-				{name: 'Provider_Data_Ollama', kind: 'type'},
-				{name: 'Provider_Data_Claude', kind: 'type'},
-				{name: 'Provider_Data_Chatgpt', kind: 'type'},
-				{name: 'Provider_Data_Gemini', kind: 'type'},
-				{name: 'Provider_Data', kind: 'type'},
-				{name: 'Provider_Data_Schema', kind: 'variable'},
-				{name: 'Completion_Request', kind: 'variable'},
-				{name: 'Completion_Response', kind: 'variable'},
-				{name: 'Action_Base', kind: 'variable'},
-				{name: 'Action_Ping', kind: 'variable'},
-				{name: 'Action_Pong', kind: 'variable'},
-				{name: 'Action_Load_Session', kind: 'variable'},
-				{name: 'Action_Loaded_Session', kind: 'variable'},
-				{name: 'Diskfile_Change', kind: 'variable'},
-				{name: 'Action_Filer_Change', kind: 'variable'},
-				{name: 'Action_Update_Diskfile', kind: 'variable'},
-				{name: 'Action_Delete_Diskfile', kind: 'variable'},
-				{name: 'Action_Create_Directory', kind: 'variable'},
-				{name: 'Action_Send_Prompt', kind: 'variable'},
-				{name: 'Action_Completion_Response', kind: 'variable'},
-				{name: 'Action_Client', kind: 'variable'},
-				{name: 'Action_Server', kind: 'variable'},
-				{name: 'Action', kind: 'variable'},
-				{name: 'Action_Json', kind: 'variable'},
-				{name: 'Action_Json_Input', kind: 'type'},
-				{name: 'create_action_json', kind: 'function'},
+				{name: 'Action_Kind', kind: 'variable'},
+				{name: 'Action_Executor', kind: 'variable'},
+				{name: 'Action_Initiator', kind: 'variable'},
+				{name: 'is_action_initiator', kind: 'function'},
+				{name: 'Action_Auth', kind: 'variable'},
+				{name: 'Action_Side_Effects', kind: 'variable'},
+				{name: 'Action_Phase', kind: 'variable'},
+				{name: 'ACTION_KIND_PHASES', kind: 'variable'},
+				{name: 'Action_Input', kind: 'variable'},
+				{name: 'Action_Output', kind: 'variable'},
 			],
 		},
 		'./action.svelte.js': {
 			path: 'action.svelte.ts',
 			declarations: [
-				{name: 'ACTION_DATE_FORMAT', kind: 'variable'},
-				{name: 'ACTION_TIME_FORMAT', kind: 'variable'},
+				{name: 'Action_Json', kind: 'variable'},
+				{name: 'Action_Json_Input', kind: 'type'},
 				{name: 'Action_Options', kind: 'type'},
 				{name: 'Action', kind: 'class'},
 				{name: 'Action_Schema', kind: 'variable'},
@@ -859,6 +1130,7 @@ export const src_json = {
 			path: 'app.svelte.ts',
 			declarations: [
 				{name: 'app_context', kind: 'variable'},
+				{name: 'App_Options', kind: 'type'},
 				{name: 'App', kind: 'class'},
 			],
 		},
@@ -963,16 +1235,20 @@ export const src_json = {
 			path: 'capabilities.svelte.ts',
 			declarations: [
 				{name: 'PING_HISTORY_MAX', kind: 'variable'},
-				{name: 'Ping_Data', kind: 'type'},
 				{name: 'Capabilities_Json', kind: 'variable'},
 				{name: 'Capabilities_Json_Input', kind: 'type'},
 				{name: 'Capability', kind: 'type'},
-				{name: 'Ollama_Capability_Data', kind: 'type'},
+				{name: 'Ping_Data', kind: 'type'},
 				{name: 'Server_Capability_Data', kind: 'type'},
 				{name: 'Websocket_Capability_Data', kind: 'type'},
 				{name: 'Filesystem_Capability_Data', kind: 'type'},
+				{name: 'Ollama_Capability_Data', kind: 'type'},
 				{name: 'Capabilities', kind: 'class'},
 			],
+		},
+		'./Capability_Backend.svelte': {
+			path: 'Capability_Backend.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
 		},
 		'./Capability_Filesystem.svelte': {
 			path: 'Capability_Filesystem.svelte',
@@ -980,10 +1256,6 @@ export const src_json = {
 		},
 		'./Capability_Ollama.svelte': {
 			path: 'Capability_Ollama.svelte',
-			declarations: [{name: 'default', kind: 'component'}],
-		},
-		'./Capability_Server.svelte': {
-			path: 'Capability_Server.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
 		},
 		'./Capability_System.svelte': {
@@ -1010,7 +1282,7 @@ export const src_json = {
 			declarations: [
 				{name: 'HANDLED', kind: 'variable'},
 				{name: 'FILE_SHORT_DATE_FORMAT', kind: 'variable'},
-				{name: 'FILE_DATE_FORMAT', kind: 'variable'},
+				{name: 'FILE_DATETIME_FORMAT', kind: 'variable'},
 				{name: 'FILE_TIME_FORMAT', kind: 'variable'},
 				{name: 'ZOD_CELL_CLASS_NAME', kind: 'variable'},
 				{name: 'ZOD_ELEMENT_CLASS_NAME', kind: 'variable'},
@@ -1062,6 +1334,10 @@ export const src_json = {
 			path: 'Chat_Tape_Add_By_Model.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
 		},
+		'./Chat_Tape_Manage_By_Tag.svelte': {
+			path: 'Chat_Tape_Manage_By_Tag.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./Chat_Tape.svelte': {
 			path: 'Chat_Tape.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
@@ -1107,6 +1383,25 @@ export const src_json = {
 			path: 'Clear_Restore_Button.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
 		},
+		'./codegen.js': {
+			path: 'codegen.ts',
+			declarations: [
+				{name: 'Import_Builder', kind: 'class'},
+				{name: 'get_executor_phases', kind: 'function'},
+				{name: 'get_handler_return_type', kind: 'function'},
+				{name: 'generate_phase_handlers', kind: 'function'},
+				{name: 'create_banner', kind: 'function'},
+			],
+		},
+		'./completion_types.js': {
+			path: 'completion_types.ts',
+			declarations: [
+				{name: 'Completion_Role', kind: 'variable'},
+				{name: 'Completion_Message', kind: 'variable'},
+				{name: 'Completion_Request', kind: 'variable'},
+				{name: 'Completion_Response', kind: 'variable'},
+			],
+		},
 		'./config_defaults.js': {
 			path: 'config_defaults.ts',
 			declarations: [
@@ -1142,9 +1437,17 @@ export const src_json = {
 			declarations: [
 				{name: 'SERVER_PROXIED_PORT', kind: 'variable'},
 				{name: 'SERVER_URL', kind: 'variable'},
-				{name: 'ZZZ_DIRNAME', kind: 'variable'},
-				{name: 'REQUEST_TIMEOUT', kind: 'variable'},
+				{name: 'ZZZ_CACHE_DIRNAME', kind: 'variable'},
+				{name: 'ZZZ_DIR', kind: 'variable'},
 				{name: 'CONTENT_PREVIEW_LENGTH', kind: 'variable'},
+				{name: 'API_PATH', kind: 'variable'},
+				{name: 'API_URL', kind: 'variable'},
+				{name: 'API_PATH_FOR_HTTP_RPC', kind: 'variable'},
+				{name: 'API_URL_FOR_HTTP_RPC', kind: 'variable'},
+				{name: 'WEBSOCKET_URL', kind: 'variable'},
+				{name: 'WEBSOCKET_URL_OBJECT', kind: 'variable'},
+				{name: 'WEBSOCKET_PATH', kind: 'variable'},
+				{name: 'UNKNOWN_ERROR_MESSAGE', kind: 'variable'},
 			],
 		},
 		'./Content_Editor.svelte': {
@@ -1262,11 +1565,13 @@ export const src_json = {
 		'./diskfile_helpers.js': {
 			path: 'diskfile_helpers.ts',
 			declarations: [
+				{name: 'to_zzz_cache_dir', kind: 'function'},
 				{name: 'is_path_absolute', kind: 'function'},
 				{name: 'map_watcher_change_to_diskfile_change', kind: 'function'},
 				{name: 'source_file_to_diskfile_json', kind: 'function'},
 				{name: 'SUPPORTED_CODE_FILETYPE_MATCHER', kind: 'variable'},
 				{name: 'has_dependencies', kind: 'function'},
+				{name: 'to_serializable_source_file', kind: 'function'},
 			],
 		},
 		'./Diskfile_History_View.svelte': {
@@ -1332,8 +1637,9 @@ export const src_json = {
 			declarations: [
 				{name: 'Diskfile_Change_Type', kind: 'variable'},
 				{name: 'Diskfile_Path', kind: 'variable'},
+				{name: 'Diskfile_Change', kind: 'variable'},
 				{name: 'Zzz_Dir', kind: 'variable'},
-				{name: 'Source_File', kind: 'variable'},
+				{name: 'Serializable_Source_File', kind: 'variable'},
 				{name: 'Diskfile_Json', kind: 'variable'},
 				{name: 'Diskfile_Json_Input', kind: 'type'},
 			],
@@ -1381,6 +1687,40 @@ export const src_json = {
 			path: 'Footer.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
 		},
+		'./frontend_action_handlers.js': {
+			path: 'frontend_action_handlers.ts',
+			declarations: [{name: 'frontend_action_handlers', kind: 'variable'}],
+		},
+		'./frontend_action_types.gen.js': {
+			path: 'frontend_action_types.gen.ts',
+			declarations: [{name: 'gen', kind: 'function'}],
+		},
+		'./frontend_action_types.js': {
+			path: 'frontend_action_types.ts',
+			declarations: [{name: 'Frontend_Action_Handlers', kind: 'type'}],
+		},
+		'./frontend_actions_api.js': {
+			path: 'frontend_actions_api.ts',
+			declarations: [{name: 'create_frontend_actions_api', kind: 'function'}],
+		},
+		'./frontend_http_transport.js': {
+			path: 'frontend_http_transport.ts',
+			declarations: [{name: 'Frontend_Http_Transport', kind: 'class'}],
+		},
+		'./frontend_websocket_transport.js': {
+			path: 'frontend_websocket_transport.ts',
+			declarations: [{name: 'Frontend_Websocket_Transport', kind: 'class'}],
+		},
+		'./frontend.svelte.js': {
+			path: 'frontend.svelte.ts',
+			declarations: [
+				{name: 'zzz_context', kind: 'variable'},
+				{name: 'Frontend_Json', kind: 'variable'},
+				{name: 'Frontend_Json_Input', kind: 'type'},
+				{name: 'Frontend_Options', kind: 'type'},
+				{name: 'Frontend', kind: 'class'},
+			],
+		},
 		'./Glyph.svelte': {path: 'Glyph.svelte', declarations: [{name: 'default', kind: 'component'}]},
 		'./glyphs.js': {
 			path: 'glyphs.ts',
@@ -1406,7 +1746,7 @@ export const src_json = {
 				{name: 'GLYPH_CHECKMARK', kind: 'variable'},
 				{name: 'GLYPH_EDIT', kind: 'variable'},
 				{name: 'GLYPH_SORT', kind: 'variable'},
-				{name: 'GLYPH_SERVER', kind: 'variable'},
+				{name: 'GLYPH_BACKEND', kind: 'variable'},
 				{name: 'GLYPH_CHAT', kind: 'variable'},
 				{name: 'GLYPH_TAPE', kind: 'variable'},
 				{name: 'GLYPH_STRIP', kind: 'variable'},
@@ -1430,18 +1770,18 @@ export const src_json = {
 				{name: 'GLYPH_DOMAIN', kind: 'variable'},
 				{name: 'GLYPH_PAGE', kind: 'variable'},
 				{name: 'GLYPH_IDEA', kind: 'variable'},
-				{name: 'GLYPH_ECHO', kind: 'variable'},
+				{name: 'GLYPH_PING', kind: 'variable'},
 				{name: 'GLYPH_HEARTBEAT', kind: 'variable'},
 				{name: 'GLYPH_RESPONSE', kind: 'variable'},
 				{name: 'GLYPH_SESSION', kind: 'variable'},
-				{name: 'GLYPH_DIRECTION_CLIENT', kind: 'variable'},
-				{name: 'GLYPH_DIRECTION_SERVER', kind: 'variable'},
-				{name: 'GLYPH_DIRECTION_BOTH', kind: 'variable'},
+				{name: 'GLYPH_ACTION_TYPE_LOCAL_CALL', kind: 'variable'},
+				{name: 'GLYPH_ACTION_TYPE_REMOTE_NOTIFICATION', kind: 'variable'},
+				{name: 'GLYPH_ACTION_TYPE_REQUEST_RESPONSE', kind: 'variable'},
 				{name: 'GLYPH_EXTERNAL_LINK', kind: 'variable'},
 				{name: 'GLYPH_ARROW_RIGHT', kind: 'variable'},
 				{name: 'GLYPH_ARROW_LEFT', kind: 'variable'},
-				{name: 'get_icon_for_action_type', kind: 'function'},
-				{name: 'get_direction_icon', kind: 'function'},
+				{name: 'get_glyph_for_action_method', kind: 'function'},
+				{name: 'get_glyph_for_action_kind', kind: 'function'},
 			],
 		},
 		'./helpers.js': {
@@ -1458,7 +1798,6 @@ export const src_json = {
 		'./indexed_collection_helpers.js': {
 			path: 'indexed_collection_helpers.ts',
 			declarations: [
-				{name: 'Svelte_Map_Schema', kind: 'variable'},
 				{name: 'Indexed_Item', kind: 'variable'},
 				{name: 'Index_Options', kind: 'type'},
 				{name: 'Single_Index_Options', kind: 'type'},
@@ -1478,6 +1817,75 @@ export const src_json = {
 				{name: 'Index_Definition', kind: 'type'},
 				{name: 'Indexed_Collection_Options', kind: 'type'},
 				{name: 'Indexed_Collection', kind: 'class'},
+			],
+		},
+		'./jsonrpc_errors.js': {
+			path: 'jsonrpc_errors.ts',
+			declarations: [
+				{name: 'JSONRPC_ERROR_CODES', kind: 'variable'},
+				{name: 'http_status_to_jsonrpc_code', kind: 'function'},
+				{name: 'Jsonrpc_Error', kind: 'class'},
+				{name: 'jsonrpc_errors', kind: 'variable'},
+			],
+		},
+		'./jsonrpc_helpers.js': {
+			path: 'jsonrpc_helpers.ts',
+			declarations: [
+				{name: 'create_jsonrpc_request', kind: 'function'},
+				{name: 'create_jsonrpc_response', kind: 'function'},
+				{name: 'create_jsonrpc_notification', kind: 'function'},
+				{name: 'create_jsonrpc_error_message', kind: 'function'},
+				{name: 'create_jsonrpc_error_message_from_thrown', kind: 'function'},
+				{name: 'to_jsonrpc_message_id', kind: 'function'},
+				{name: 'is_jsonrpc_request_id', kind: 'function'},
+				{name: 'is_jsonrpc_object', kind: 'function'},
+				{name: 'is_jsonrpc_message', kind: 'function'},
+				{name: 'is_jsonrpc_request', kind: 'function'},
+				{name: 'is_jsonrpc_notification', kind: 'function'},
+				{name: 'is_jsonrpc_response', kind: 'function'},
+				{name: 'is_jsonrpc_error_message', kind: 'function'},
+				{name: 'is_jsonrpc_singular_message', kind: 'function'},
+				{name: 'is_jsonrpc_batch_message', kind: 'function'},
+				{name: 'is_jsonrpc_batch_request', kind: 'function'},
+				{name: 'is_jsonrpc_batch_response', kind: 'function'},
+			],
+		},
+		'./jsonrpc.js': {
+			path: 'jsonrpc.ts',
+			declarations: [
+				{name: 'JSONRPC_VERSION', kind: 'variable'},
+				{name: 'JSONRPC_LATEST_PROTOCOL_VERSION', kind: 'variable'},
+				{name: 'Jsonrpc_Request_Id', kind: 'variable'},
+				{name: 'Jsonrpc_Method', kind: 'variable'},
+				{name: 'Jsonrpc_Progress_Token', kind: 'variable'},
+				{name: 'Jsonrpc_Mcp_Meta', kind: 'variable'},
+				{name: 'Jsonrpc_Request_Params_Meta', kind: 'variable'},
+				{name: 'Jsonrpc_Request_Params', kind: 'variable'},
+				{name: 'Jsonrpc_Notification_Params', kind: 'variable'},
+				{name: 'Jsonrpc_Params', kind: 'variable'},
+				{name: 'Jsonrpc_Result', kind: 'variable'},
+				{name: 'Jsonrpc_Request', kind: 'variable'},
+				{name: 'Jsonrpc_Notification', kind: 'variable'},
+				{name: 'Jsonrpc_Response', kind: 'variable'},
+				{name: 'JSONRPC_PARSE_ERROR', kind: 'variable'},
+				{name: 'JSONRPC_INVALID_REQUEST', kind: 'variable'},
+				{name: 'JSONRPC_METHOD_NOT_FOUND', kind: 'variable'},
+				{name: 'JSONRPC_INVALID_PARAMS', kind: 'variable'},
+				{name: 'JSONRPC_INTERNAL_ERROR', kind: 'variable'},
+				{name: 'JSONRPC_SERVER_ERROR_START', kind: 'variable'},
+				{name: 'JSONRPC_SERVER_ERROR_END', kind: 'variable'},
+				{name: 'Jsonrpc_Server_Error_Code', kind: 'variable'},
+				{name: 'Jsonrpc_Error_Code', kind: 'variable'},
+				{name: 'Jsonrpc_Error_Json', kind: 'variable'},
+				{name: 'Jsonrpc_Error_Message', kind: 'variable'},
+				{name: 'Jsonrpc_Batch_Request', kind: 'variable'},
+				{name: 'Jsonrpc_Response_Or_Error', kind: 'variable'},
+				{name: 'Jsonrpc_Batch_Response', kind: 'variable'},
+				{name: 'Jsonrpc_Message', kind: 'variable'},
+				{name: 'Jsonrpc_Message_From_Client_To_Server', kind: 'variable'},
+				{name: 'Jsonrpc_Message_From_Server_To_Client', kind: 'variable'},
+				{name: 'Jsonrpc_Singular_Message', kind: 'variable'},
+				{name: 'Jsonrpc_Batch_Message', kind: 'variable'},
 			],
 		},
 		'./list_helpers.js': {
@@ -1681,7 +2089,15 @@ export const src_json = {
 		},
 		'./provider_types.js': {
 			path: 'provider_types.ts',
-			declarations: [{name: 'Provider_Name', kind: 'variable'}],
+			declarations: [
+				{name: 'Provider_Name', kind: 'variable'},
+				{name: 'Provider_Data_Ollama', kind: 'variable'},
+				{name: 'Provider_Data_Claude', kind: 'variable'},
+				{name: 'Provider_Data_Chatgpt', kind: 'variable'},
+				{name: 'Provider_Data_Gemini', kind: 'variable'},
+				{name: 'Provider_Data_Schema', kind: 'variable'},
+				{name: 'Provider_Data', kind: 'type'},
+			],
 		},
 		'./provider.svelte.js': {
 			path: 'provider.svelte.ts',
@@ -1736,13 +2152,33 @@ export const src_json = {
 				{name: 'Reorderable', kind: 'class'},
 			],
 		},
+		'./request_tracker.svelte.js': {
+			path: 'request_tracker.svelte.ts',
+			declarations: [
+				{name: 'Request_Tracker_Item', kind: 'class'},
+				{name: 'Request_Tracker', kind: 'class'},
+			],
+		},
 		'./response_helpers.js': {
 			path: 'response_helpers.ts',
 			declarations: [
 				{name: 'to_completion_response_text', kind: 'function'},
-				{name: 'process_provider_data', kind: 'function'},
-				{name: 'create_completion_response', kind: 'function'},
-				{name: 'create_completion_response_message', kind: 'function'},
+				{name: 'to_completion_result', kind: 'function'},
+			],
+		},
+		'./schema_helpers.js': {
+			path: 'schema_helpers.ts',
+			declarations: [
+				{name: 'camel_to_snake_case', kind: 'function'},
+				{name: 'to_pascalsnake_case', kind: 'function'},
+			],
+		},
+		'./schema_registry.js': {
+			path: 'schema_registry.ts',
+			declarations: [
+				{name: 'Vocab_Name', kind: 'type'},
+				{name: 'Schema_Registry', kind: 'class'},
+				{name: 'global_schema_registry', kind: 'variable'},
 			],
 		},
 		'./scrollable.svelte.js': {
@@ -1763,11 +2199,51 @@ export const src_json = {
 				{name: 'format_gemini_messages', kind: 'function'},
 			],
 		},
-		'./server/handler_defaults.js': {
-			path: 'server/handler_defaults.ts',
+		'./server/backend_action_handlers.js': {
+			path: 'server/backend_action_handlers.ts',
+			declarations: [{name: 'backend_action_handlers', kind: 'variable'}],
+		},
+		'./server/backend_action_types.gen.js': {
+			path: 'server/backend_action_types.gen.ts',
+			declarations: [{name: 'gen', kind: 'function'}],
+		},
+		'./server/backend_action_types.js': {
+			path: 'server/backend_action_types.ts',
+			declarations: [{name: 'Backend_Action_Handlers', kind: 'type'}],
+		},
+		'./server/backend_actions_api.js': {
+			path: 'server/backend_actions_api.ts',
 			declarations: [
-				{name: 'handle_message', kind: 'function'},
+				{name: 'Backend_Actions_Api', kind: 'type'},
+				{name: 'create_backend_actions_api', kind: 'function'},
 				{name: 'handle_filer_change', kind: 'function'},
+			],
+		},
+		'./server/backend_websocket_transport.js': {
+			path: 'server/backend_websocket_transport.ts',
+			declarations: [{name: 'Backend_Websocket_Transport', kind: 'class'}],
+		},
+		'./server/backend.js': {
+			path: 'server/backend.ts',
+			declarations: [
+				{name: 'Filer_Change_Handler', kind: 'type'},
+				{name: 'Filer_Instance', kind: 'type'},
+				{name: 'Backend_Options', kind: 'type'},
+				{name: 'Backend', kind: 'class'},
+			],
+		},
+		'./server/register_http_actions.js': {
+			path: 'server/register_http_actions.ts',
+			declarations: [
+				{name: 'Register_Actions_Options', kind: 'type'},
+				{name: 'register_http_actions', kind: 'function'},
+			],
+		},
+		'./server/register_websocket_actions.js': {
+			path: 'server/register_websocket_actions.ts',
+			declarations: [
+				{name: 'Register_Websocket_Actions_Options', kind: 'type'},
+				{name: 'register_websocket_actions', kind: 'function'},
 			],
 		},
 		'./server/safe_fs.js': {
@@ -1779,17 +2255,19 @@ export const src_json = {
 				{name: 'Symlink_Not_Allowed_Error', kind: 'class'},
 			],
 		},
-		'./server/server.js': {path: 'server/server.ts'},
-		'./server/zzz_server.js': {
-			path: 'server/zzz_server.ts',
+		'./server/security.js': {
+			path: 'server/security.ts',
 			declarations: [
-				{name: 'Action_Handler', kind: 'type'},
-				{name: 'Filer_Change_Handler', kind: 'type'},
-				{name: 'Filer_Instance', kind: 'type'},
-				{name: 'Zzz_Server_Options', kind: 'type'},
-				{name: 'Zzz_Server', kind: 'class'},
+				{name: 'Allowed_Origins', kind: 'type'},
+				{name: 'verify_origin', kind: 'function'},
+				{name: 'should_allow_origin', kind: 'function'},
 			],
 		},
+		'./server/server_helpers.js': {
+			path: 'server/server_helpers.ts',
+			declarations: [{name: 'noop_middleware', kind: 'function'}],
+		},
+		'./server/server.js': {path: 'server/server.ts'},
 		'./Settings.svelte': {
 			path: 'Settings.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
@@ -1843,6 +2321,15 @@ export const src_json = {
 			path: 'Strip_Listitem.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
 		},
+		'./strip_types.js': {
+			path: 'strip_types.ts',
+			declarations: [
+				{name: 'Strip_Role', kind: 'variable'},
+				{name: 'Strip_Json', kind: 'variable'},
+				{name: 'Strip_Json_Input', kind: 'type'},
+				{name: 'Strip_Schema', kind: 'variable'},
+			],
+		},
 		'./Strip_View.svelte': {
 			path: 'Strip_View.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
@@ -1850,10 +2337,6 @@ export const src_json = {
 		'./strip.svelte.js': {
 			path: 'strip.svelte.ts',
 			declarations: [
-				{name: 'Strip_Role', kind: 'variable'},
-				{name: 'Strip_Json', kind: 'variable'},
-				{name: 'Strip_Json_Input', kind: 'type'},
-				{name: 'Strip_Schema', kind: 'variable'},
 				{name: 'Strip_Options', kind: 'type'},
 				{name: 'Strip', kind: 'class'},
 				{name: 'create_strip_from_bit', kind: 'function'},
@@ -1864,7 +2347,7 @@ export const src_json = {
 			path: 'tape_helpers.ts',
 			declarations: [
 				{name: 'render_tape_to_string', kind: 'function'},
-				{name: 'render_tape_messages', kind: 'function'},
+				{name: 'render_completion_messages', kind: 'function'},
 			],
 		},
 		'./Tape_List.svelte': {
@@ -1938,6 +2421,14 @@ export const src_json = {
 			path: 'Toggle_Button.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
 		},
+		'./transports.js': {
+			path: 'transports.ts',
+			declarations: [
+				{name: 'Transport_Type', kind: 'variable'},
+				{name: 'Transport', kind: 'type'},
+				{name: 'Transports', kind: 'class'},
+			],
+		},
 		'./ui.svelte.js': {
 			path: 'ui.svelte.ts',
 			declarations: [
@@ -1967,18 +2458,23 @@ export const src_json = {
 		'./xml.js': {
 			path: 'xml.ts',
 			declarations: [
-				{name: 'Xml_Attribute_Key_Base', kind: 'variable'},
 				{name: 'Xml_Attribute_Key', kind: 'variable'},
-				{name: 'Xml_Attribute_Value_Base', kind: 'variable'},
+				{name: 'Xml_Attribute_Key_With_Default', kind: 'variable'},
 				{name: 'Xml_Attribute_Value', kind: 'variable'},
-				{name: 'Xml_Attribute_Base', kind: 'variable'},
+				{name: 'Xml_Attribute_Value_With_Default', kind: 'variable'},
 				{name: 'Xml_Attribute', kind: 'variable'},
+				{name: 'Xml_Attribute_With_Defaults', kind: 'variable'},
 			],
 		},
 		'./zod_helpers.js': {
 			path: 'zod_helpers.ts',
 			declarations: [
 				{name: 'Any', kind: 'variable'},
+				{name: 'Type_Literal', kind: 'variable'},
+				{name: 'Path_With_Trailing_Slash', kind: 'variable'},
+				{name: 'Path_Without_Trailing_Slash', kind: 'variable'},
+				{name: 'Path_With_Leading_Slash', kind: 'variable'},
+				{name: 'Path_Without_Leading_Slash', kind: 'variable'},
 				{name: 'Svelte_Map_Schema', kind: 'variable'},
 				{name: 'get_datetime_now', kind: 'function'},
 				{name: 'Datetime', kind: 'variable'},
@@ -1986,28 +2482,19 @@ export const src_json = {
 				{name: 'create_uuid', kind: 'function'},
 				{name: 'Uuid', kind: 'variable'},
 				{name: 'Uuid_With_Default', kind: 'variable'},
+				{name: 'get_innermost_type', kind: 'function'},
+				{name: 'get_innermost_type_name', kind: 'function'},
 				{name: 'zod_get_schema_keys', kind: 'function'},
 				{name: 'get_field_schema', kind: 'function'},
 				{name: 'maybe_get_field_schema', kind: 'function'},
-				{name: 'unwrap_schema', kind: 'function'},
 				{name: 'is_array_schema', kind: 'function'},
 				{name: 'get_inner_array_schema', kind: 'function'},
+				{name: 'stringify_zod_error', kind: 'function'},
 			],
 		},
 		'./Zzz_Root.svelte': {
 			path: 'Zzz_Root.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
-		},
-		'./zzz.svelte.js': {
-			path: 'zzz.svelte.ts',
-			declarations: [
-				{name: 'zzz_context', kind: 'variable'},
-				{name: 'Zzz_Json', kind: 'variable'},
-				{name: 'Zzz_Json_Input', kind: 'type'},
-				{name: 'Zzz_Options', kind: 'type'},
-				{name: 'Action_With_History', kind: 'type'},
-				{name: 'Zzz', kind: 'class'},
-			],
 		},
 	},
 } satisfies Src_Json;

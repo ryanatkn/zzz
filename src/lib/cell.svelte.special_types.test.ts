@@ -1,3 +1,5 @@
+// @slop claude_opus_4
+
 // @vitest-environment jsdom
 
 import {test, expect, vi, beforeEach} from 'vitest';
@@ -6,7 +8,7 @@ import {z} from 'zod';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json, type Schema_Keys} from '$lib/cell_types.js';
 import {Datetime_Now, get_datetime_now, create_uuid, Uuid_With_Default} from '$lib/zod_helpers.js';
-import {Zzz} from '$lib/zzz.svelte.js';
+import {Frontend} from '$lib/frontend.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Constants for testing
@@ -15,11 +17,11 @@ const TEST_DATETIME = get_datetime_now();
 const TEST_YEAR = 2022;
 
 // Test suite variables
-let zzz: Zzz;
+let app: Frontend;
 
 beforeEach(() => {
 	// Create a real Zzz instance for each test
-	zzz = monkeypatch_zzz_for_tests(new Zzz());
+	app = monkeypatch_zzz_for_tests(new Frontend());
 	vi.clearAllMocks();
 });
 
@@ -37,12 +39,12 @@ test('Cell uses registry for instantiating class relationships', () => {
 		}
 
 		test_instantiate(json: any, class_name: string): unknown {
-			return this.zzz.registry.instantiate(class_name as any, json);
+			return this.app.cell_registry.instantiate(class_name as any, json);
 		}
 	}
 
 	const cell = new Registry_Test_Cell({
-		zzz,
+		app,
 		json: {
 			id: TEST_ID,
 			created: TEST_DATETIME,
@@ -51,7 +53,7 @@ test('Cell uses registry for instantiating class relationships', () => {
 
 	// Mock the registry instantiate method for this specific test
 	const mock_instantiate = vi
-		.spyOn(zzz.registry, 'instantiate')
+		.spyOn(app.cell_registry, 'instantiate')
 		.mockImplementation((name: any, json) => {
 			if (name === 'Test_Type') {
 				return {type: 'Test_Type', ...((json as any) || {})};
@@ -88,7 +90,7 @@ test('Cell.encode_property uses $state.snapshot for values', () => {
 	}
 
 	const cell = new Encoding_Test_Cell({
-		zzz,
+		app,
 		json: {
 			id: TEST_ID,
 			created: TEST_DATETIME,
@@ -139,7 +141,7 @@ test('Cell handles special types like Map and Set', () => {
 	}
 
 	const cell = new Collections_Test_Cell({
-		zzz,
+		app,
 		json: {
 			id: TEST_ID,
 			created: TEST_DATETIME,
@@ -202,7 +204,7 @@ test('Cell - JSON serialization excludes undefined values correctly', () => {
 
 	// Cell with minimal required fields
 	const minimal_cell = new Serialization_Test_Cell({
-		zzz,
+		app,
 		json: {
 			id: TEST_ID,
 			created: TEST_DATETIME,
@@ -212,7 +214,7 @@ test('Cell - JSON serialization excludes undefined values correctly', () => {
 
 	// Cell with optional fields
 	const complete_cell = new Serialization_Test_Cell({
-		zzz,
+		app,
 		json: {
 			id: TEST_ID,
 			created: TEST_DATETIME,

@@ -2,7 +2,7 @@
 	import {slide} from 'svelte/transition';
 	import {base} from '$app/paths';
 
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/frontend.svelte.js';
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import Bit_Summary from '$lib/Bit_Summary.svelte';
 
@@ -12,11 +12,11 @@
 
 	const {diskfile}: Props = $props();
 
-	const zzz = zzz_context.get();
+	const app = zzz_context.get();
 
 	const bit = $derived(diskfile.bit);
 
-	const referenced_by_prompts = $derived(bit ? zzz.prompts.filter_by_bit(bit) : null);
+	const referenced_by_prompts = $derived(bit ? app.prompts.filter_by_bit(bit) : null);
 </script>
 
 {#if bit}

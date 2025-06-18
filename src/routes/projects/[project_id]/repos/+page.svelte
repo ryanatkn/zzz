@@ -1,4 +1,6 @@
 <script lang="ts">
+	// @slop claude_opus_4
+
 	import {projects_context} from '$routes/projects/projects.svelte.js';
 	import Project_Sidebar from '$routes/projects/Project_Sidebar.svelte';
 	import Section_Sidebar from '$routes/projects/Section_Sidebar.svelte';

@@ -20,7 +20,7 @@ export const format_prompt_content = (bits: Array<Bit_Type>): string => {
 
 		const xml_tag_name = bit.xml_tag_name.trim() || bit.xml_tag_name_default;
 
-		// Build attributes string efficiently
+		// Build attributes string
 		let attrs = '';
 		for (const attr of bit.attributes) {
 			// Safely handle key which might be null (in tests) but should be string in production

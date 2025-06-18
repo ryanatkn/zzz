@@ -3,7 +3,7 @@
 	import {slide} from 'svelte/transition';
 
 	import {Diskfile_Bit} from '$lib/bit.svelte.js';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/frontend.svelte.js';
 	import Content_Editor from '$lib/Content_Editor.svelte';
 	import Diskfile_Actions from '$lib/Diskfile_Actions.svelte';
 	import Diskfile_Metrics from '$lib/Diskfile_Metrics.svelte';
@@ -20,7 +20,7 @@
 
 	const {diskfile_bit, show_actions = true}: Props = $props();
 
-	const zzz = zzz_context.get();
+	const app = zzz_context.get();
 
 	const {diskfile} = $derived(diskfile_bit);
 
@@ -34,7 +34,7 @@
 
 	let show_file_picker = $state(false);
 
-	// TODO probably refactor to avoid the effect, look also at `TODO @many refactor, maybe move a collection on `zzz.diskfiles`?`
+	// TODO probably refactor to avoid the effect, look also at `TODO @many refactor, maybe move a collection on `app.diskfiles`?`
 	// Effect for managing editor state lifecycle
 	$effect.pre(() => {
 		// Track the diskfile from the bit
@@ -50,7 +50,7 @@
 		untrack(() => {
 			// Create new editor state if it doesn't exist
 			if (!editor_state) {
-				editor_state = new Diskfile_Editor_State({zzz, diskfile}); // TODO @many refactor, maybe move a collection on `zzz.diskfiles`?
+				editor_state = new Diskfile_Editor_State({app, diskfile}); // TODO @many refactor, maybe move a collection on `app.diskfiles`?
 				diskfile_bit.link_editor_state(editor_state); // TODO @many this initialization is awkward, ideally becomes refactored to mostly derived
 				return;
 			}
@@ -106,7 +106,7 @@
 				show_stats={false}
 				readonly={false}
 				onsave={(value) => {
-					zzz.diskfiles.update(diskfile.path, value);
+					app.diskfiles.update(diskfile.path, value);
 				}}
 			/>
 

@@ -1,3 +1,5 @@
+// @slop claude_opus_4
+
 // @vitest-environment jsdom
 
 import {describe, test, expect, vi, beforeEach, afterEach} from 'vitest';
@@ -77,7 +79,7 @@ describe('Popover', () => {
 
 	// Helper to register actions for automatic cleanup
 	const register_action = <T extends ActionReturn<any, any>>(action: T | void): T => {
-		if (!action) throw Error('Expected action to be defined');
+		if (!action) throw new Error('Expected action to be defined');
 		if (action.destroy) {
 			cleanup_actions.push(action.destroy);
 		}

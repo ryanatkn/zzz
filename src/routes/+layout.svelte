@@ -9,10 +9,7 @@
 	import Contextmenu_Root from '@ryanatkn/fuz/Contextmenu_Root.svelte';
 	import {contextmenu_action} from '@ryanatkn/fuz/contextmenu_state.svelte.js';
 	import {parse_package_meta} from '@ryanatkn/gro/package_meta.js';
-	import * as devalue from 'devalue';
 	import {BROWSER} from 'esm-env';
-	import {Unreachable_Error} from '@ryanatkn/belt/error.js';
-	import {PUBLIC_WEBSOCKET_URL} from '$env/static/public';
 	import {page} from '$app/state';
 	import {onNavigate} from '$app/navigation';
 	import {base} from '$app/paths';
@@ -21,9 +18,7 @@
 	import Zzz_Root from '$lib/Zzz_Root.svelte';
 	import {pkg_context} from '$lib/pkg.js';
 	import {package_json, src_json} from '$lib/package.js';
-	import {create_uuid} from '$lib/zod_helpers.js';
 	import {Prompt_Json} from '$lib/prompt.svelte.js';
-	import {cell_classes} from '$lib/cell_classes.js';
 	import {Provider_Json} from '$lib/provider.svelte.js';
 	import create_zzz_config from '$lib/config.js';
 	import {Model_Json} from '$lib/model.svelte.js';
@@ -36,49 +31,25 @@
 
 	// TODO think through initialization
 	onMount(() => {
+		// TODO BLOCK pull `futuremode` and others from the query params or hash
+
 		// TODO init properly from data
 		const zzz_config = create_zzz_config();
 
 		// TODO note the difference between these two APIs, look at both of them and see which makes more sense
-		zzz.add_providers(zzz_config.providers.map((p) => Provider_Json.parse(p))); // TODO handle errors
-		zzz.models.add_many(zzz_config.models.map((m) => Model_Json.parse(m))); // TODO handle errors
+		app.add_providers(zzz_config.providers.map((p) => Provider_Json.parse(p))); // TODO handle errors
+		app.models.add_many(zzz_config.models.map((m) => Model_Json.parse(m))); // TODO handle errors
+
+		// Initialize the session
+		if (BROWSER) {
+			void app.api.load_session();
+		}
 	});
 
 	pkg_context.set(parse_package_meta(package_json, src_json));
 
-	// Create an instance of Zzz with socket_url
-	const zzz = new App({
-		cell_classes,
-		socket_url: PUBLIC_WEBSOCKET_URL,
-		onsend: (message) => {
-			console.log('[page] sending message via socket', message);
-			zzz.socket.send({type: 'server_message', message});
-		},
-		onreceive: (message) => {
-			console.log(`[page] received message`, message);
-			switch (message.type) {
-				case 'loaded_session': {
-					console.log(`[page] loaded_session`, message);
-					zzz.receive_session(message.data);
-					break;
-				}
-				case 'completion_response': {
-					zzz.receive_completion_response(message);
-					break;
-				}
-				case 'filer_change': {
-					zzz.diskfiles.handle_change(message);
-					break;
-				}
-				case 'pong': {
-					zzz.capabilities.receive_pong(message);
-					break;
-				}
-				default:
-					throw new Unreachable_Error(message);
-			}
-		},
-	});
+	// Create our client App, which extends the Zzz class
+	const app = new App();
 
 	// Enhance schemas with metadata for deserialization - use class names
 	// Safely access Zod schema internals using type assertion
@@ -88,46 +59,23 @@
 		prompt_json_obj.shape.bits._def.type.class_name = 'Bit';
 	}
 
-	// Set up the socket message handler
-	if (BROWSER) {
-		// Configure socket message handler
-		zzz.socket.onmessage = (event) => {
-			try {
-				const data = devalue.parse(event.data);
-				console.log('[page] socket message received', data);
-				if (data.type === 'server_message') {
-					zzz.actions.receive(data.message);
-				} else {
-					console.error('unknown message', data);
-				}
-			} catch (err) {
-				console.error('Error processing message', err);
-			}
-		};
-	}
-
-	if (BROWSER) (window as any).app = (window as any).zzz = zzz; // no types for this, just for runtime convenience
-
-	// Initialize the session
-	if (BROWSER) {
-		zzz.actions.send({id: create_uuid(), type: 'load_session'});
-	}
+	if (BROWSER) (window as any).app = (window as any).app = app; // no types for this, just for runtime convenience
 
 	// TODO refactor, maybe per route?
 	// Handle URL parameter synchronization
 	$effect.pre(() => {
 		// TODO I think we want a different state value for this, so that we can render links to the "selected_id_recent" or something
-		zzz.chats.selected_id = zzz.url_params.get_uuid_param('chat_id');
-		zzz.prompts.selected_id = zzz.url_params.get_uuid_param('prompt_id');
+		app.chats.selected_id = app.url_params.get_uuid_param('chat_id');
+		app.prompts.selected_id = app.url_params.get_uuid_param('prompt_id');
 	});
 
 	// TODO refactor this, doesn't belong here - see the comment at `to_nav_link_href`
 	onNavigate(() => {
 		const {pathname} = page.url;
 		if (pathname === `${base}/chats`) {
-			zzz.chats.selected_id_last_non_null = null;
+			app.chats.selected_id_last_non_null = null;
 		} else if (pathname === `${base}/prompts`) {
-			zzz.prompts.selected_id_last_non_null = null;
+			app.prompts.selected_id_last_non_null = null;
 		}
 	});
 </script>
@@ -145,7 +93,7 @@
 				icon: '?',
 				run: () => {
 					console.log('show main dialog');
-					zzz.ui.show_main_dialog = true;
+					app.api.toggle_main_menu({show: true});
 				},
 			},
 		},
@@ -164,7 +112,7 @@
 
 <Themed>
 	<Contextmenu_Root>
-		<Zzz_Root {zzz}>
+		<Zzz_Root {app}>
 			{@render children()}
 		</Zzz_Root>
 	</Contextmenu_Root>

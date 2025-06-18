@@ -23,7 +23,7 @@ export class Provider extends Cell<typeof Provider_Json> {
 	title: string = $state()!;
 	url: string = $state()!;
 
-	readonly models: Array<Model> = $derived(this.zzz.models.items.where('provider_name', this.name));
+	readonly models: Array<Model> = $derived(this.app.models.items.where('provider_name', this.name));
 
 	constructor(options: Provider_Options) {
 		super(Provider_Json, options);

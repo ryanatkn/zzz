@@ -3,6 +3,7 @@
 
 	import Error_Message from '$lib/Error_Message.svelte';
 	import type {Strip} from '$lib/strip.svelte.js';
+	import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
 	import Contextmenu_Strip from '$lib/Contextmenu_Strip.svelte';
 
 	interface Props {
@@ -30,7 +31,7 @@
 			{:else if strip.bit === null}
 				<span class="text_color_4 font_family_mono">missing bit: {strip.bit_id}</span>
 			{:else}
-				<Error_Message>unknown error</Error_Message>
+				<Error_Message>{UNKNOWN_ERROR_MESSAGE}</Error_Message>
 			{/if}
 		</div>
 	</div>

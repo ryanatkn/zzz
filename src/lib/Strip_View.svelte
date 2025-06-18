@@ -9,7 +9,7 @@
 	import Bit_Editor_For_Sequence from '$lib/Bit_Editor_For_Sequence.svelte';
 	import Bit_Toggle_Button from '$lib/Bit_Toggle_Button.svelte';
 	import Bit_Remove_Button from '$lib/Bit_Remove_Button.svelte';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/frontend.svelte.js';
 
 	// TODO strips having the bit reference as the source of truth may be the wrong way to go?
 	// then the strips would have a copy of the final rendered content,
@@ -24,8 +24,8 @@
 
 	const {bit} = $derived(strip);
 
-	const zzz = zzz_context.get();
-	const {prompts} = zzz;
+	const app = zzz_context.get();
+	const {prompts} = app;
 
 	const prompt = $derived(prompts.selected);
 </script>

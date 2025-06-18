@@ -22,7 +22,7 @@ export class Diskfiles_Editor extends Cell<typeof Diskfiles_Editor_Json> {
 
 	/** Tabs for managing the open diskfiles. */
 	readonly tabs: Diskfile_Tabs = new Diskfile_Tabs({
-		zzz: this.zzz,
+		app: this.app,
 		json: {
 			id: create_uuid(),
 		},
@@ -116,7 +116,7 @@ export class Diskfiles_Editor extends Cell<typeof Diskfiles_Editor_Json> {
 		console.log('Diskfiles_Editor.sync_selected_file');
 		const selected_diskfile_id = this.tabs.selected_diskfile_id;
 		if (selected_diskfile_id) {
-			this.zzz.diskfiles.selected_file_id = selected_diskfile_id;
+			this.app.diskfiles.selected_file_id = selected_diskfile_id;
 		}
 	}
 

@@ -1,10 +1,12 @@
+// @slop claude_opus_4
+
 // @vitest-environment jsdom
 
 import {beforeEach, describe, test, expect, vi, afterEach} from 'vitest';
 
 import {Socket} from '$lib/socket.svelte.js';
 import {DEFAULT_CLOSE_CODE} from '$lib/socket_helpers.js';
-import {Zzz} from '$lib/zzz.svelte.js';
+import {Frontend} from '$lib/frontend.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Mock WebSocket implementation for testing
@@ -24,21 +26,21 @@ class Mocket {
 		this.url = url;
 	}
 
-	addEventListener(type: string, listener: (event: any) => void) {
-		if (!this.listeners[type]) {
-			this.listeners[type] = [];
+	addEventListener(method: string, listener: (event: any) => void) {
+		if (!this.listeners[method]) {
+			this.listeners[method] = [];
 		}
-		this.listeners[type].push(listener);
+		this.listeners[method].push(listener);
 	}
 
-	removeEventListener(type: string, listener: (event: any) => void) {
-		if (!this.listeners[type]) return;
-		this.listeners[type] = this.listeners[type].filter((l) => l !== listener);
+	removeEventListener(method: string, listener: (event: any) => void) {
+		if (!this.listeners[method]) return;
+		this.listeners[method] = this.listeners[method].filter((l) => l !== listener);
 	}
 
-	dispatchEvent(type: string, event: any = {}) {
-		if (!this.listeners[type]) return;
-		for (const listener of this.listeners[type]) {
+	dispatchEvent(method: string, event: any = {}) {
+		if (!this.listeners[method]) return;
+		for (const listener of this.listeners[method]) {
 			listener(event);
 		}
 	}
@@ -62,19 +64,19 @@ class Mocket {
 
 // Test constants
 const TEST_URLS = {
-	BASE: 'ws://test.example.com',
-	ALTERNATE: 'ws://alternate.example.com',
+	BASE: 'ws://test.zzz.software',
+	ALTERNATE: 'ws://alternate.zzz.software',
 };
 
 const TEST_MESSAGE = {
-	BASIC: {type: 'test_action', data: 'test_data'},
-	PING: {type: 'ping', timestamp: 123456789},
+	BASIC: {method: 'test_action', params: 'test_data'},
+	PING: {method: 'ping', timestamp: 123456789},
 };
 
 describe('Socket', () => {
 	let original_web_socket: typeof WebSocket;
 	let mock_socket: Mocket;
-	let zzz: Zzz;
+	let app: Frontend;
 
 	// Setup for each test
 	beforeEach(() => {
@@ -85,16 +87,16 @@ describe('Socket', () => {
 		mock_socket = new Mocket(TEST_URLS.BASE);
 
 		// Create real Zzz instance
-		zzz = monkeypatch_zzz_for_tests(new Zzz());
+		app = monkeypatch_zzz_for_tests(new Frontend());
 
 		// TODO better mocking
-		// Mock capabilities for testing
-		(zzz as any).capabilities = {
-			send_ping: vi.fn(),
+		// Mock action API for testing
+		(app as any).api = {
+			ping: vi.fn(),
 		} as any;
 
 		// Set test time properties
-		(zzz as any).time = {
+		(app as any).time = {
 			now_ms: Date.now(),
 			interval: 1000,
 		} as any;
@@ -118,7 +120,7 @@ describe('Socket', () => {
 
 	describe('Connection management', () => {
 		test('connect creates WebSocket with provided URL', () => {
-			const socket = new Socket({zzz});
+			const socket = new Socket({app});
 			socket.connect(TEST_URLS.BASE);
 
 			expect(globalThis.WebSocket).toHaveBeenCalledWith(TEST_URLS.BASE);
@@ -127,7 +129,7 @@ describe('Socket', () => {
 		});
 
 		test('disconnect closes WebSocket with default close code', () => {
-			const socket = new Socket({zzz});
+			const socket = new Socket({app});
 			socket.connect(TEST_URLS.BASE);
 
 			// Simulate connection
@@ -142,7 +144,7 @@ describe('Socket', () => {
 		});
 
 		test('connection success updates state correctly', () => {
-			const socket = new Socket({zzz});
+			const socket = new Socket({app});
 			socket.connect(TEST_URLS.BASE);
 			mock_socket.connect();
 
@@ -152,7 +154,7 @@ describe('Socket', () => {
 		});
 
 		test('update_url reconnects with new URL if already connected', () => {
-			const socket = new Socket({zzz});
+			const socket = new Socket({app});
 			socket.connect(TEST_URLS.BASE);
 			mock_socket.connect();
 
@@ -169,7 +171,7 @@ describe('Socket', () => {
 
 	describe('Message handling', () => {
 		test('send queues message when socket is not connected', () => {
-			const socket = new Socket({zzz});
+			const socket = new Socket({app});
 
 			// Not connected yet
 			const sent = socket.send(TEST_MESSAGE.BASIC);
@@ -178,7 +180,7 @@ describe('Socket', () => {
 		});
 
 		test('send transmits message when socket is connected', () => {
-			const socket = new Socket({zzz});
+			const socket = new Socket({app});
 			socket.connect(TEST_URLS.BASE);
 			mock_socket.connect();
 
@@ -190,11 +192,11 @@ describe('Socket', () => {
 		});
 
 		test('message queueing sends queued messages when reconnected', () => {
-			const socket = new Socket({zzz});
+			const socket = new Socket({app});
 
 			// Queue messages while disconnected
-			socket.send({type: 'message_a'});
-			socket.send({type: 'message_b'});
+			socket.send({method: 'message_a'});
+			socket.send({method: 'message_b'});
 
 			expect(socket.queued_message_count).toBe(2);
 
@@ -206,41 +208,11 @@ describe('Socket', () => {
 			expect(mock_socket.sent_messages.length).toBe(2);
 			expect(socket.queued_message_count).toBe(0);
 		});
-
-		test('request resolves when matching response received', async () => {
-			const socket = new Socket({zzz});
-			socket.connect(TEST_URLS.BASE);
-			mock_socket.connect();
-
-			// Create request promise
-			const request_promise = socket.request<{type: string; request_id: string; data: string}>(
-				{type: 'query_a', id: 'req_a'},
-				(message) => {
-					if (message.type === 'response_a' && message.request_id === 'req_a') {
-						return message;
-					}
-					return false;
-				},
-				1000,
-			);
-
-			// Verify request sent
-			expect(mock_socket.sent_messages.length).toBe(1);
-
-			// Simulate response
-			mock_socket.dispatchEvent('message', {
-				data: JSON.stringify({type: 'response_a', request_id: 'req_a', data: 'result_a'}),
-			});
-
-			const result = await request_promise;
-			expect(result.type).toBe('response_a');
-			expect(result.data).toBe('result_a');
-		});
 	});
 
 	describe('Error handling', () => {
 		test('failed messages moves message to failed when send throws error', () => {
-			const socket = new Socket({zzz});
+			const socket = new Socket({app});
 
 			// Queue a message
 			socket.send(TEST_MESSAGE.BASIC);
@@ -249,7 +221,7 @@ describe('Socket', () => {
 			// Mock send failure
 			const error_message = 'Send operation failed';
 			mock_socket.send = vi.fn().mockImplementation(() => {
-				throw Error(error_message);
+				throw new Error(error_message);
 			});
 
 			// Connect and trigger send attempt
@@ -266,14 +238,14 @@ describe('Socket', () => {
 		});
 
 		test('clear_failed_messages removes all failed messages', () => {
-			const socket = new Socket({zzz});
+			const socket = new Socket({app});
 
 			// Queue message
 			socket.send(TEST_MESSAGE.BASIC);
 
 			// Mock send failure
 			mock_socket.send = vi.fn().mockImplementation(() => {
-				throw Error('Send failed');
+				throw new Error('Send failed');
 			});
 
 			// Connect to trigger processing
@@ -293,7 +265,7 @@ describe('Socket', () => {
 
 	describe('Automatic reconnection', () => {
 		test('auto reconnect attempts to reconnect after close', () => {
-			const socket = new Socket({zzz});
+			const socket = new Socket({app});
 			socket.reconnect_delay = 1000; // 1 second
 			socket.connect(TEST_URLS.BASE);
 			mock_socket.connect();
@@ -310,7 +282,7 @@ describe('Socket', () => {
 		});
 
 		test('reconnect delay uses exponential backoff', () => {
-			const socket = new Socket({zzz});
+			const socket = new Socket({app});
 			// Set consistent values for testing
 			socket.reconnect_delay = 1000; // base delay 1 second
 			socket.reconnect_delay_max = 30000; // max 30 seconds
@@ -369,7 +341,7 @@ describe('Socket', () => {
 
 	describe('Heartbeat mechanism', () => {
 		test('heartbeat sends ping at interval', () => {
-			const socket = new Socket({zzz});
+			const socket = new Socket({app});
 			socket.heartbeat_interval = 1000; // 1 second for testing
 			socket.connect(TEST_URLS.BASE);
 			mock_socket.connect();
@@ -378,7 +350,7 @@ describe('Socket', () => {
 			vi.advanceTimersByTime(1000);
 
 			// Check ping was sent
-			expect(zzz.capabilities.send_ping).toHaveBeenCalled();
+			expect(app.api.ping).toHaveBeenCalled();
 		});
 	});
 });

@@ -24,7 +24,7 @@
 			style: 'min-height: 0;',
 		}}
 	>
-		<div>
+		<div class="ellipsis">
 			<Glyph glyph={GLYPH_PROMPT} attrs={{class: 'mr_xs2'}} />
 			<span>{prompt.name}</span>
 		</div>

@@ -1,3 +1,5 @@
+// @slop claude_opus_4
+
 import {z} from 'zod';
 import {goto} from '$app/navigation';
 import {base} from '$app/paths';
@@ -88,7 +90,7 @@ export class Domain_Viewmodel {
 		} else {
 			// Create new domain
 			const domain = new Domain({
-				zzz: this.projects.zzz,
+				app: this.projects.app,
 				json: {
 					name: this.domain_name,
 					status: this.domain_status,

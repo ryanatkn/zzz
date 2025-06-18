@@ -4,7 +4,7 @@
 	import type {Chat} from '$lib/chat.svelte.js';
 	import {Reorderable} from '$lib/reorderable.svelte.js';
 	import Tape_Listitem from '$lib/Tape_Listitem.svelte';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/frontend.svelte.js';
 
 	interface Props {
 		chat?: Chat | undefined;

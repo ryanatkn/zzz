@@ -1,14 +1,16 @@
+// @slop claude_opus_4
+
 // @vitest-environment jsdom
 
 import {test, expect, describe, beforeEach} from 'vitest';
 
 import {estimate_token_count} from '$lib/helpers.js';
 import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
-import {Zzz} from '$lib/zzz.svelte.js';
+import {Frontend} from '$lib/frontend.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 
 // Test suite variables
-let zzz: Zzz;
+let app: Frontend;
 
 // Test data constants for reuse
 const TEST_CONTENT = {
@@ -31,12 +33,12 @@ function test() {
 // Setup function to create a real Zzz instance
 beforeEach(() => {
 	// Create a real Zzz instance
-	zzz = monkeypatch_zzz_for_tests(new Zzz());
+	app = monkeypatch_zzz_for_tests(new Frontend());
 });
 
 describe('Text_Bit initialization', () => {
 	test('creates with default values when no options provided', () => {
-		const bit = zzz.registry.instantiate('Text_Bit');
+		const bit = app.cell_registry.instantiate('Text_Bit');
 
 		expect(bit.type).toBe('text');
 		expect(bit.content).toBe(TEST_CONTENT.EMPTY);
@@ -53,7 +55,7 @@ describe('Text_Bit initialization', () => {
 
 	test('initializes with direct content property', () => {
 		const content = TEST_CONTENT.INITIAL;
-		const bit = zzz.registry.instantiate('Text_Bit', {
+		const bit = app.cell_registry.instantiate('Text_Bit', {
 			type: 'text',
 			content,
 		});
@@ -67,7 +69,7 @@ describe('Text_Bit initialization', () => {
 		const test_id = create_uuid();
 		const test_date = get_datetime_now();
 
-		const bit = zzz.registry.instantiate('Text_Bit', {
+		const bit = app.cell_registry.instantiate('Text_Bit', {
 			id: test_id,
 			created: test_date,
 			type: 'text',
@@ -102,7 +104,7 @@ describe('Text_Bit initialization', () => {
 
 describe('Text_Bit reactive properties', () => {
 	test('derived properties update when content changes', () => {
-		const bit = zzz.registry.instantiate('Text_Bit', {
+		const bit = app.cell_registry.instantiate('Text_Bit', {
 			type: 'text',
 			content: TEST_CONTENT.INITIAL,
 		});
@@ -123,7 +125,7 @@ describe('Text_Bit reactive properties', () => {
 	});
 
 	test('length is zero when content is empty', () => {
-		const bit = zzz.registry.instantiate('Text_Bit', {
+		const bit = app.cell_registry.instantiate('Text_Bit', {
 			type: 'text',
 			content: TEST_CONTENT.EMPTY,
 		});
@@ -144,7 +146,7 @@ describe('Text_Bit serialization', () => {
 		const test_id = create_uuid();
 		const created = get_datetime_now();
 
-		const bit = zzz.registry.instantiate('Text_Bit', {
+		const bit = app.cell_registry.instantiate('Text_Bit', {
 			id: test_id,
 			created,
 			type: 'text',
@@ -177,7 +179,7 @@ describe('Text_Bit serialization', () => {
 			NAME: 'Modified name',
 		};
 
-		const original = zzz.registry.instantiate('Text_Bit', {
+		const original = app.cell_registry.instantiate('Text_Bit', {
 			type: 'text',
 			content: ORIGINAL.CONTENT,
 			name: ORIGINAL.NAME,
@@ -203,7 +205,7 @@ describe('Text_Bit serialization', () => {
 
 describe('Text_Bit content modification', () => {
 	test('update_content method directly updates content', () => {
-		const bit = zzz.registry.instantiate('Text_Bit', {
+		const bit = app.cell_registry.instantiate('Text_Bit', {
 			type: 'text',
 			content: TEST_CONTENT.INITIAL,
 		});
@@ -219,7 +221,7 @@ describe('Text_Bit content modification', () => {
 	});
 
 	test('content setter directly updates content', () => {
-		const bit = zzz.registry.instantiate('Text_Bit', {
+		const bit = app.cell_registry.instantiate('Text_Bit', {
 			type: 'text',
 			content: TEST_CONTENT.INITIAL,
 		});
@@ -237,7 +239,7 @@ describe('Text_Bit content modification', () => {
 
 describe('Text_Bit content edge cases', () => {
 	test('handles long content correctly', () => {
-		const bit = zzz.registry.instantiate('Text_Bit', {
+		const bit = app.cell_registry.instantiate('Text_Bit', {
 			type: 'text',
 			content: TEST_CONTENT.LONG,
 		});
@@ -248,7 +250,7 @@ describe('Text_Bit content edge cases', () => {
 	});
 
 	test('handles unicode characters correctly', () => {
-		const bit = zzz.registry.instantiate('Text_Bit', {
+		const bit = app.cell_registry.instantiate('Text_Bit', {
 			type: 'text',
 			content: TEST_CONTENT.UNICODE,
 		});
@@ -259,7 +261,7 @@ describe('Text_Bit content edge cases', () => {
 	});
 
 	test('handles special characters correctly', () => {
-		const bit = zzz.registry.instantiate('Text_Bit', {
+		const bit = app.cell_registry.instantiate('Text_Bit', {
 			type: 'text',
 			content: TEST_CONTENT.SPECIAL_CHARS,
 		});
@@ -270,7 +272,7 @@ describe('Text_Bit content edge cases', () => {
 	});
 
 	test('handles code and markup content correctly', () => {
-		const bit = zzz.registry.instantiate('Text_Bit', {
+		const bit = app.cell_registry.instantiate('Text_Bit', {
 			type: 'text',
 			content: TEST_CONTENT.CODE,
 		});
@@ -283,7 +285,7 @@ describe('Text_Bit content edge cases', () => {
 
 describe('Text_Bit attribute management', () => {
 	test('can add, update and remove attributes', () => {
-		const bit = zzz.registry.instantiate('Text_Bit', {
+		const bit = app.cell_registry.instantiate('Text_Bit', {
 			type: 'text',
 			content: 'Test content',
 		});
@@ -312,7 +314,7 @@ describe('Text_Bit attribute management', () => {
 	});
 
 	test('updates attribute key and value together', () => {
-		const bit = zzz.registry.instantiate('Text_Bit');
+		const bit = app.cell_registry.instantiate('Text_Bit');
 
 		bit.add_attribute({key: 'class', value: 'highlight'});
 		const attr_id = bit.attributes[0].id;
@@ -325,7 +327,7 @@ describe('Text_Bit attribute management', () => {
 	});
 
 	test('attributes are preserved when serializing to JSON', () => {
-		const bit = zzz.registry.instantiate('Text_Bit', {
+		const bit = app.cell_registry.instantiate('Text_Bit', {
 			type: 'text',
 			content: 'Test content',
 		});
@@ -340,7 +342,7 @@ describe('Text_Bit attribute management', () => {
 		expect(json.attributes[1].key).toBe('class');
 
 		// Verify they're properly restored
-		const new_bit = zzz.registry.instantiate('Text_Bit', json);
+		const new_bit = app.cell_registry.instantiate('Text_Bit', json);
 
 		expect(new_bit.attributes).toHaveLength(2);
 		expect(new_bit.attributes[0].key).toBe('data-test');
@@ -351,42 +353,42 @@ describe('Text_Bit attribute management', () => {
 describe('Text_Bit instance management', () => {
 	test('bit is added to registry when created', () => {
 		// Create a bit
-		const bit = zzz.registry.instantiate('Text_Bit', {
+		const bit = app.cell_registry.instantiate('Text_Bit', {
 			type: 'text',
 			content: 'Registry test content',
 		});
 
 		// Add to the registry
-		zzz.bits.items.add(bit);
+		app.bits.items.add(bit);
 
 		// Verify it's in the registry
-		const retrieved_bit = zzz.bits.items.by_id.get(bit.id);
+		const retrieved_bit = app.bits.items.by_id.get(bit.id);
 		expect(retrieved_bit).toBe(bit);
 	});
 
 	test('bit is removed from registry when requested', () => {
 		// Create a bit and add to registry
-		const bit = zzz.registry.instantiate('Text_Bit', {
+		const bit = app.cell_registry.instantiate('Text_Bit', {
 			type: 'text',
 			content: 'Removable content',
 		});
 
-		zzz.bits.items.add(bit);
+		app.bits.items.add(bit);
 
 		// Verify it's in the registry
-		expect(zzz.bits.items.by_id.get(bit.id)).toBe(bit);
+		expect(app.bits.items.by_id.get(bit.id)).toBe(bit);
 
 		// Remove from registry
-		zzz.bits.items.remove(bit.id);
+		app.bits.items.remove(bit.id);
 
 		// Verify it's gone
-		expect(zzz.bits.items.by_id.get(bit.id)).toBeUndefined();
+		expect(app.bits.items.by_id.get(bit.id)).toBeUndefined();
 	});
 });
 
 describe('Text_Bit start and end position markers', () => {
 	test('start and end positions are initialized properly', () => {
-		const bit = zzz.registry.instantiate('Text_Bit', {
+		const bit = app.cell_registry.instantiate('Text_Bit', {
 			type: 'text',
 			content: 'Position test',
 			start: 10,
@@ -398,7 +400,7 @@ describe('Text_Bit start and end position markers', () => {
 	});
 
 	test('start and end positions can be updated', () => {
-		const bit = zzz.registry.instantiate('Text_Bit', {
+		const bit = app.cell_registry.instantiate('Text_Bit', {
 			type: 'text',
 			content: 'Position test',
 		});
@@ -416,7 +418,7 @@ describe('Text_Bit start and end position markers', () => {
 	});
 
 	test('positions are preserved when serializing and deserializing', () => {
-		const bit = zzz.registry.instantiate('Text_Bit', {
+		const bit = app.cell_registry.instantiate('Text_Bit', {
 			type: 'text',
 			content: 'Position preservation test',
 			start: 8,
@@ -427,7 +429,7 @@ describe('Text_Bit start and end position markers', () => {
 		const json = bit.to_json();
 
 		// Create new bit from JSON
-		const new_bit = zzz.registry.instantiate('Text_Bit', json);
+		const new_bit = app.cell_registry.instantiate('Text_Bit', json);
 
 		// Verify positions were preserved
 		expect(new_bit.start).toBe(8);

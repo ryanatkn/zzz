@@ -1,13 +1,15 @@
+// @slop claude_opus_4
+
 import {describe, test, expect} from 'vitest';
 import {z} from 'zod';
 
 import {
+	Xml_Attribute_With_Defaults,
 	Xml_Attribute,
-	Xml_Attribute_Base,
+	Xml_Attribute_Key_With_Default,
 	Xml_Attribute_Key,
-	Xml_Attribute_Key_Base,
+	Xml_Attribute_Value_With_Default,
 	Xml_Attribute_Value,
-	Xml_Attribute_Value_Base,
 } from '$lib/xml.js';
 
 // Test constants
@@ -28,12 +30,12 @@ const TEST_VALUES = {
 
 describe('Xml_Attribute_Key', () => {
 	test('is a Zod string schema', () => {
-		expect(Xml_Attribute_Key).toBeInstanceOf(z.ZodType);
+		expect(Xml_Attribute_Key_With_Default).toBeInstanceOf(z.ZodType);
 	});
 
 	test('accepts valid strings', () => {
 		for (const key of TEST_KEYS.VALID) {
-			const result = Xml_Attribute_Key.safeParse(key);
+			const result = Xml_Attribute_Key_With_Default.safeParse(key);
 			expect(result.success).toBe(true);
 			if (result.success) {
 				expect(result.data).toBe(key);
@@ -41,42 +43,44 @@ describe('Xml_Attribute_Key', () => {
 		}
 	});
 
-	test('allows empty strings due to default', () => {
-		const result = Xml_Attribute_Key.safeParse('');
-		expect(result.success).toBe(true);
-		if (result.success) {
-			expect(result.data).toBe('');
-		}
+	test('disallows empty strings', () => {
+		const result = Xml_Attribute_Key_With_Default.safeParse('');
+		expect(result.success).toBe(false);
 	});
 
 	test('provides empty string as default when undefined', () => {
-		const result = Xml_Attribute_Key.parse(undefined);
-		expect(result).toBe('');
+		const result = Xml_Attribute_Key_With_Default.parse(undefined);
+		expect(result).toBe('attr');
 	});
 
-	test('does not trim whitespace', () => {
-		const result = Xml_Attribute_Key.safeParse('  attr_a  ');
+	test('trims whitespace', () => {
+		const result = Xml_Attribute_Key_With_Default.safeParse('  attr_a  ');
 		expect(result.success).toBe(true);
 		if (result.success) {
-			expect(result.data).toBe('  attr_a  ');
+			expect(result.data).toBe('attr_a');
 		}
 
-		const whitespace_result = Xml_Attribute_Key.safeParse('   ');
-		expect(whitespace_result.success).toBe(true);
-		if (whitespace_result.success) {
-			expect(whitespace_result.data).toBe('   ');
+		const whitespace_result = Xml_Attribute_Key_With_Default.safeParse('   ');
+		expect(whitespace_result.success).toBe(false);
+		if (!whitespace_result.success) {
+			expect(whitespace_result.error.issues[0].code).toBe('too_small');
 		}
+	});
+
+	test('disallows empty strings with whitespace', () => {
+		const result = Xml_Attribute_Key_With_Default.safeParse(' ');
+		expect(result.success).toBe(false);
 	});
 
 	test('does not allow null values', () => {
-		const result = Xml_Attribute_Key.safeParse(null);
+		const result = Xml_Attribute_Key_With_Default.safeParse(null);
 		expect(result.success).toBe(false);
 	});
 });
 
 describe('Xml_Attribute_Key_Base', () => {
 	test('rejects empty strings', () => {
-		const result = Xml_Attribute_Key_Base.safeParse('');
+		const result = Xml_Attribute_Key.safeParse('');
 		expect(result.success).toBe(false);
 		if (!result.success) {
 			expect(result.error.issues[0].code).toBe('too_small');
@@ -84,14 +88,14 @@ describe('Xml_Attribute_Key_Base', () => {
 	});
 
 	test('rejects undefined', () => {
-		const result = Xml_Attribute_Key_Base.safeParse(undefined);
+		const result = Xml_Attribute_Key.safeParse(undefined);
 		expect(result.success).toBe(false);
 	});
 });
 
 describe('Xml_Attribute_Value', () => {
 	test('is a Zod string schema', () => {
-		expect(Xml_Attribute_Value).toBeInstanceOf(z.ZodType);
+		expect(Xml_Attribute_Value_With_Default).toBeInstanceOf(z.ZodType);
 	});
 
 	test('accepts any string', () => {
@@ -103,7 +107,7 @@ describe('Xml_Attribute_Value', () => {
 		];
 
 		for (const value of valid_values) {
-			const result = Xml_Attribute_Value.safeParse(value);
+			const result = Xml_Attribute_Value_With_Default.safeParse(value);
 			expect(result.success).toBe(true);
 			if (result.success) {
 				expect(result.data).toBe(value);
@@ -112,21 +116,21 @@ describe('Xml_Attribute_Value', () => {
 	});
 
 	test('provides default empty string when undefined', () => {
-		const result = Xml_Attribute_Value.parse(undefined);
+		const result = Xml_Attribute_Value_With_Default.parse(undefined);
 		expect(result).toBe('');
 	});
 });
 
 describe('Xml_Attribute_Value_Base', () => {
 	test('rejects undefined', () => {
-		const result = Xml_Attribute_Value_Base.safeParse(undefined);
+		const result = Xml_Attribute_Value.safeParse(undefined);
 		expect(result.success).toBe(false);
 	});
 });
 
 describe('Xml_Attribute', () => {
 	test('is a Zod object schema', () => {
-		expect(Xml_Attribute).toBeInstanceOf(z.ZodType);
+		expect(Xml_Attribute_With_Defaults).toBeInstanceOf(z.ZodType);
 	});
 
 	test('accepts valid attribute objects', () => {
@@ -136,7 +140,7 @@ describe('Xml_Attribute', () => {
 			value: TEST_VALUES.TEXT,
 		};
 
-		const result = Xml_Attribute.safeParse(valid_attribute);
+		const result = Xml_Attribute_With_Defaults.safeParse(valid_attribute);
 		expect(result.success).toBe(true);
 		if (result.success) {
 			expect(result.data.id).toBe(TEST_UUID);
@@ -150,11 +154,11 @@ describe('Xml_Attribute', () => {
 			id: TEST_UUID,
 		};
 
-		const result = Xml_Attribute.safeParse(partial_attribute as any);
+		const result = Xml_Attribute_With_Defaults.safeParse(partial_attribute as any);
 		expect(result.success).toBe(true);
 		if (result.success) {
 			expect(result.data.id).toBe(TEST_UUID);
-			expect(result.data.key).toBe('');
+			expect(result.data.key).toBe('attr');
 			expect(result.data.value).toBe('');
 		}
 	});
@@ -165,7 +169,7 @@ describe('Xml_Attribute', () => {
 			value: TEST_VALUES.TEXT,
 		};
 
-		const result = Xml_Attribute.safeParse(attribute_without_id);
+		const result = Xml_Attribute_With_Defaults.safeParse(attribute_without_id);
 		expect(result.success).toBe(true);
 		if (result.success) {
 			expect(result.data.id).toMatch(
@@ -183,7 +187,7 @@ describe('Xml_Attribute', () => {
 			value: TEST_VALUES.TEXT,
 		};
 
-		const result = Xml_Attribute.safeParse(invalid_attribute);
+		const result = Xml_Attribute_With_Defaults.safeParse(invalid_attribute);
 		expect(result.success).toBe(false);
 	});
 
@@ -193,7 +197,7 @@ describe('Xml_Attribute', () => {
 			value: TEST_VALUES.NUMERIC,
 		};
 
-		const result = Xml_Attribute.safeParse(partial_attribute);
+		const result = Xml_Attribute_With_Defaults.safeParse(partial_attribute);
 		expect(result.success).toBe(true);
 		if (result.success) {
 			expect(result.data.id).toMatch(
@@ -211,7 +215,7 @@ describe('Xml_Attribute', () => {
 			value: '',
 		};
 
-		const result = Xml_Attribute.safeParse(valid_attribute);
+		const result = Xml_Attribute_With_Defaults.safeParse(valid_attribute);
 		expect(result.success).toBe(true);
 		if (result.success) {
 			expect(result.data.id).toBe(TEST_UUID);
@@ -227,7 +231,7 @@ describe('Xml_Attribute', () => {
 			value: TEST_VALUES.TEXT,
 		};
 
-		const result = Xml_Attribute.safeParse(obj_with_undefined_id);
+		const result = Xml_Attribute_With_Defaults.safeParse(obj_with_undefined_id);
 		expect(result.success).toBe(true);
 		if (result.success) {
 			expect(result.data.id).toMatch(
@@ -243,7 +247,7 @@ describe('Xml_Attribute', () => {
 			value: TEST_VALUES.TEXT,
 		};
 
-		const result = Xml_Attribute.safeParse(attr_with_null_key);
+		const result = Xml_Attribute_With_Defaults.safeParse(attr_with_null_key);
 		expect(result.success).toBe(false);
 	});
 });
@@ -251,7 +255,7 @@ describe('Xml_Attribute', () => {
 describe('Xml_Attribute_Base', () => {
 	test('requires all properties without defaults', () => {
 		// Valid full object
-		const valid_result = Xml_Attribute_Base.safeParse({
+		const valid_result = Xml_Attribute.safeParse({
 			id: TEST_UUID,
 			key: 'attr_a',
 			value: TEST_VALUES.TEXT,
@@ -259,14 +263,14 @@ describe('Xml_Attribute_Base', () => {
 		expect(valid_result.success).toBe(true);
 
 		// Missing key
-		const missing_key_result = Xml_Attribute_Base.safeParse({
+		const missing_key_result = Xml_Attribute.safeParse({
 			id: TEST_UUID,
 			value: TEST_VALUES.TEXT,
 		} as any);
 		expect(missing_key_result.success).toBe(false);
 
 		// Missing value
-		const missing_value_result = Xml_Attribute_Base.safeParse({
+		const missing_value_result = Xml_Attribute.safeParse({
 			id: TEST_UUID,
 			key: 'attr_a',
 		} as any);
@@ -280,7 +284,7 @@ describe('Xml_Attribute_Base', () => {
 			value: TEST_VALUES.TEXT,
 		};
 
-		const result = Xml_Attribute_Base.safeParse(attribute_with_empty_key);
+		const result = Xml_Attribute.safeParse(attribute_with_empty_key);
 		expect(result.success).toBe(false);
 	});
 });
@@ -289,7 +293,7 @@ describe('Xml_Attribute integrations', () => {
 	test('integrates with other Zod schemas', () => {
 		const Element = z.object({
 			tag_name: z.string(),
-			attributes: z.array(Xml_Attribute),
+			attributes: z.array(Xml_Attribute_With_Defaults),
 		});
 
 		const valid_element = {
@@ -305,7 +309,7 @@ describe('Xml_Attribute integrations', () => {
 	});
 
 	test('works with nested structures', () => {
-		const AttributeMap = z.record(z.string(), Xml_Attribute);
+		const AttributeMap = z.record(z.string(), Xml_Attribute_With_Defaults);
 
 		const valid_map = {
 			attr1: {id: TEST_UUID, key: 'attr_a', value: TEST_VALUES.TEXT},
@@ -328,7 +332,7 @@ describe('Xml_Attribute special cases', () => {
 				value: '',
 			};
 
-			const result = Xml_Attribute.safeParse(boolean_attr);
+			const result = Xml_Attribute_With_Defaults.safeParse(boolean_attr);
 			expect(result.success).toBe(true);
 			if (result.success) {
 				expect(result.data.key).toBe(attr_name);
@@ -344,7 +348,7 @@ describe('Xml_Attribute special cases', () => {
 			value: TEST_VALUES.TEXT,
 		};
 
-		const result = Xml_Attribute.safeParse(invalid_attribute);
+		const result = Xml_Attribute_With_Defaults.safeParse(invalid_attribute);
 		expect(result.success).toBe(false);
 		if (!result.success) {
 			expect(result.error.issues[0].path).toContain('id');
@@ -357,7 +361,7 @@ describe('Xml_Attribute special cases', () => {
 
 		// Validate 1000 attributes
 		for (let i = 0; i < 1000; i++) {
-			Xml_Attribute.safeParse({
+			Xml_Attribute_With_Defaults.safeParse({
 				id: TEST_UUID,
 				key: 'attr_a',
 				value: TEST_VALUES.TEXT,

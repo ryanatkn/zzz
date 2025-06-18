@@ -5,7 +5,7 @@
 	import {base} from '$app/paths';
 	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
 
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/frontend.svelte.js';
 
 	interface Props {
 		disabled?: boolean | undefined;
@@ -13,15 +13,15 @@
 
 	const {disabled}: Props = $props();
 
-	const zzz = zzz_context.get();
+	const app = zzz_context.get();
 
 	onNavigate(() => {
-		if (zzz.ui.show_main_dialog) zzz.ui.toggle_main_menu(false);
+		if (app.ui.show_main_dialog) app.api.toggle_main_menu({show: false});
 	});
 </script>
 
-{#if !disabled && zzz.ui.show_main_dialog}
-	<Dialog onclose={() => zzz.ui.toggle_main_menu(false)} layout="page">
+{#if !disabled && app.ui.show_main_dialog}
+	<Dialog onclose={() => app.api.toggle_main_menu({show: false})} layout="page">
 		<div class="box">
 			<div class="pane p_xl3">
 				<section class="box mb_xl3">

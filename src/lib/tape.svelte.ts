@@ -1,20 +1,16 @@
-import {type Model} from '$lib/model.svelte.js';
-import {
-	Strip,
-	Strip_Role,
-	create_strip_from_text,
-	create_strip_from_bit,
-} from '$lib/strip.svelte.js';
+import type {Model} from '$lib/model.svelte.js';
+import {Strip, create_strip_from_text, create_strip_from_bit} from '$lib/strip.svelte.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Tape_Json} from '$lib/tape_types.js';
-import {render_tape_to_string, render_tape_messages} from '$lib/tape_helpers.js';
-import {type Bit_Type} from '$lib/bit.svelte.js';
+import {Completion_Request, Completion_Response} from '$lib/completion_types.js';
+import {render_tape_to_string, render_completion_messages} from '$lib/tape_helpers.js';
+import type {Bit_Type} from '$lib/bit.svelte.js';
 import {HANDLED} from '$lib/cell_helpers.js';
 import {to_completion_response_text} from '$lib/response_helpers.js';
-import {Completion_Request, type Completion_Response} from '$lib/action_types.js';
 import {to_preview, estimate_token_count} from '$lib/helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import type {Uuid} from '$lib/zod_helpers.js';
+import type {Strip_Role} from '$lib/strip_types.js';
 
 // TODO add `tape.name` probably
 
@@ -26,8 +22,8 @@ export interface Tape_Options extends Cell_Options<typeof Tape_Json> {} // eslin
 export class Tape extends Cell<typeof Tape_Json> {
 	model_name: string = $state()!;
 	readonly model: Model = $derived.by(() => {
-		const model = this.zzz.models.find_by_name(this.model_name);
-		if (!model) throw Error(`Model "${this.model_name}" not found`); // TODO do this differently?
+		const model = this.app.models.find_by_name(this.model_name);
+		if (!model) throw new Error(`Model "${this.model_name}" not found`); // TODO do this differently?
 		return model;
 	});
 
@@ -70,7 +66,7 @@ export class Tape extends Cell<typeof Tape_Json> {
 	 * Create and add a user strip with the given content.
 	 */
 	add_user_strip(content: string, request?: Completion_Request): Strip {
-		const strip = create_strip_from_text(content, 'user', {tape_id: this.id, request}, this.zzz);
+		const strip = create_strip_from_text(content, 'user', {tape_id: this.id, request}, this.app);
 		this.add_strip(strip);
 		return strip;
 	}
@@ -83,7 +79,7 @@ export class Tape extends Cell<typeof Tape_Json> {
 			content,
 			'assistant',
 			{tape_id: this.id, response},
-			this.zzz,
+			this.app,
 		);
 		this.add_strip(strip);
 		return strip;
@@ -93,7 +89,7 @@ export class Tape extends Cell<typeof Tape_Json> {
 	 * Create and add a system strip with the given content.
 	 */
 	add_system_strip(content: string): Strip {
-		const strip = create_strip_from_text(content, 'system', {tape_id: this.id}, this.zzz);
+		const strip = create_strip_from_text(content, 'system', {tape_id: this.id}, this.app);
 		this.add_strip(strip);
 		return strip;
 	}
@@ -121,7 +117,7 @@ export class Tape extends Cell<typeof Tape_Json> {
 	 */
 	async send_message(content: string): Promise<Strip> {
 		// TODO @many rethink this API with the completion request/response (see OpenAI/MCP/A2A)
-		const tape_messages = render_tape_messages(this.strips.by_id.values());
+		const completion_messages = render_completion_messages(this.strips.by_id.values());
 
 		const user_strip = this.add_user_strip(content);
 
@@ -132,7 +128,7 @@ export class Tape extends Cell<typeof Tape_Json> {
 			provider_name: this.model.provider_name,
 			model: this.model.name,
 			prompt: content,
-			tape_messages,
+			completion_messages,
 		});
 
 		// Update the user strip with the request
@@ -143,11 +139,11 @@ export class Tape extends Cell<typeof Tape_Json> {
 		const assistant_strip = this.add_assistant_strip('', undefined);
 
 		// Send the prompt with tape history
-		const response = await this.zzz.send_prompt(
+		const response = await this.app.submit_completion(
 			content,
 			this.model.provider_name,
 			this.model.name,
-			tape_messages,
+			completion_messages,
 		);
 
 		// Get the response text
@@ -161,7 +157,7 @@ export class Tape extends Cell<typeof Tape_Json> {
 	}
 
 	switch_model(model_id: Uuid): void {
-		const model = this.zzz.models.items.by_id.get(model_id);
+		const model = this.app.models.items.by_id.get(model_id);
 		if (model) {
 			this.model_name = model.name; // TODO @many probably should be id
 		} else {

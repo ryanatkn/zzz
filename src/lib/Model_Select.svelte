@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type {Model} from '$lib/model.svelte.js';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/frontend.svelte.js';
 
-	const zzz = zzz_context.get();
+	const app = zzz_context.get();
 
 	interface Props {
 		selected_model: Model; // TODO get from context?
@@ -11,7 +11,7 @@
 
 	// I think I like this pattern of `prop_` aliasing for situations like this because
 	// it makes acciental use less likely, the `final_models` pattern is more error-prone
-	let {models = zzz.models.ordered_by_name, selected_model = $bindable()}: Props = $props();
+	let {models = app.models.ordered_by_name, selected_model = $bindable()}: Props = $props();
 </script>
 
 <div class="row">

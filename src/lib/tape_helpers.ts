@@ -1,5 +1,5 @@
 import type {Strip} from '$lib/strip.svelte.js';
-import type {Tape_Message} from '$lib/action_types.js';
+import type {Completion_Message} from '$lib/completion_types.js';
 import {to_completion_response_text} from '$lib/response_helpers.js';
 
 // TODO look into refactoring this to be more correct, it's only used to calculate the token count for a tape by combining all chat strips
@@ -23,14 +23,14 @@ export const render_tape_to_string = (strips: IterableIterator<Strip>): string =
  * Creates a tape history array for model consumption from a collection of strips.
  * Normalizes content for assistant strips with responses.
  */
-export const render_tape_messages = (
+export const render_completion_messages = (
 	strips: IterableIterator<Strip>,
-	tape_messages: Array<Tape_Message> = [],
-): Array<Tape_Message> => {
+	completion_messages: Array<Completion_Message> = [],
+): Array<Completion_Message> => {
 	for (const strip of strips) {
 		if (!strip.enabled) continue;
 
-		tape_messages.push({
+		completion_messages.push({
 			role: strip.role,
 			content:
 				strip.role === 'assistant' && strip.response
@@ -39,5 +39,5 @@ export const render_tape_messages = (
 		});
 	}
 
-	return tape_messages;
+	return completion_messages;
 };

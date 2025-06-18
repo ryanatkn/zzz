@@ -3,7 +3,7 @@
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
 	import {onMount} from 'svelte';
 
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/frontend.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
 	import Model_Link from '$lib/Model_Link.svelte';
 	import Provider_Link from '$lib/Provider_Link.svelte';
@@ -18,8 +18,8 @@
 	import {OLLAMA_URL} from '$lib/ollama.js';
 	import External_Link from '$lib/External_Link.svelte';
 
-	const zzz = zzz_context.get();
-	const {capabilities} = zzz;
+	const app = zzz_context.get();
+	const {capabilities} = app;
 
 	// Initial load when component mounts
 	onMount(() => {
@@ -57,7 +57,7 @@
 			model server that forks
 			<External_Link href="https://github.com/ggml-org/llama.cpp">llama.cpp</External_Link>. It's
 			one of Zzz's first integrations but will be one of many supported local backends. See also the <Provider_Link
-				provider={zzz.providers.find_by_name('ollama')}
+				provider={app.providers.find_by_name('ollama')}
 				><span class="white_space_nowrap"><Glyph glyph={GLYPH_PROVIDER} /> Ollama</span> provider</Provider_Link
 			> page.
 		</div>
@@ -112,7 +112,7 @@
 			<h4 class="mt_0 mb_sm"><Glyph glyph={GLYPH_MODEL} /> models installed locally</h4>
 			<ul class="unstyled">
 				{#each capabilities.ollama_models as ollama_model (ollama_model.name)}
-					{@const model = zzz.models.find_by_name(ollama_model.name)}
+					{@const model = app.models.find_by_name(ollama_model.name)}
 					<li class="p_xs">
 						{#if model}<Model_Link {model} />{:else}{ollama_model.name}{/if}
 						<div class="font_family_mono font_size_sm">{ollama_model.size} MB</div>
@@ -122,7 +122,7 @@
 		</div>
 	{:else if capabilities.ollama.status === 'success' && capabilities.ollama.data?.list_response?.models.length === 0}
 		<div class="panel p_md" transition:slide>
-			<p>No models found. You can install models using the Ollama CLI.</p>
+			<p>no models found - for now you can install models using the Ollama CLI</p>
 		</div>
 	{/if}
 

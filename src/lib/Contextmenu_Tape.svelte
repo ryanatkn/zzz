@@ -6,7 +6,7 @@
 	import type {Omit_Strict} from '@ryanatkn/belt/types.js';
 
 	import type {Tape} from '$lib/tape.svelte.js';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/frontend.svelte.js';
 	import {GLYPH_DELETE, GLYPH_REMOVE, GLYPH_TAPE, GLYPH_MODEL} from '$lib/glyphs.js';
 	import Contextmenu_Entry_Toggle from '$lib/Contextmenu_Entry_Toggle.svelte';
 	import Contextmenu_Entry_Copy_To_Clipboard from '$lib/Contextmenu_Entry_Copy_To_Clipboard.svelte';
@@ -19,7 +19,7 @@
 
 	const {tape, ...rest}: Props = $props();
 
-	const zzz = zzz_context.get();
+	const app = zzz_context.get();
 
 	let show_model_picker = $state(false);
 
@@ -75,7 +75,7 @@
 					// TODO @many better confirmation
 					// eslint-disable-next-line no-alert
 					if (confirm(`Are you sure you want to delete this tape?`)) {
-						zzz.tapes.remove(tape.id);
+						app.tapes.remove(tape.id);
 					}
 				}}
 			>

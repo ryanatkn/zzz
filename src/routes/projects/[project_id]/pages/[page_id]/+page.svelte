@@ -1,4 +1,6 @@
 <script lang="ts">
+	// @slop claude_opus_4
+
 	import {goto} from '$app/navigation';
 	import {base} from '$app/paths';
 
@@ -9,10 +11,10 @@
 	import Project_Not_Found from '$routes/projects/Project_Not_Found.svelte';
 	import {GLYPH_DELETE, GLYPH_PREVIEW, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/frontend.svelte.js';
 
 	const projects = projects_context.get();
-	const zzz = zzz_context.get();
+	const app = zzz_context.get();
 
 	const page_viewmodel = $derived(projects.current_page_viewmodel);
 
@@ -45,7 +47,7 @@
 </script>
 
 {#if preview_mode}
-	<div class="preview_fullscreen" class:offset_for_sidebar={zzz.ui.toggle_main_menu}>
+	<div class="preview_fullscreen" class:offset_for_sidebar={app.ui.show_sidebar}>
 		<div class="markdown_preview p_lg">
 			<!-- eslint-disable-next-line svelte/no-at-html-tags -->
 			{@html page_viewmodel?.formatted_content}

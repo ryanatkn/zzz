@@ -1,4 +1,6 @@
 <script lang="ts">
+	// @slop claude_opus_4
+
 	import {projects_context} from '$routes/projects/projects.svelte.js';
 	import Project_Sidebar from '$routes/projects/Project_Sidebar.svelte';
 	import Section_Sidebar from '$routes/projects/Section_Sidebar.svelte';
@@ -50,7 +52,7 @@
 								<h3 class="mt_0 mb_sm">Domain name</h3>
 								<input type="text" bind:value={domains_viewmodel.domain_name} class="w_100" />
 							</label>
-							<p>Enter the full domain name, like example.com or blog.example.com</p>
+							<p>Enter the full domain name, like zzz.software or blog.zzz.software</p>
 						</div>
 
 						{#if domains_viewmodel.domain}

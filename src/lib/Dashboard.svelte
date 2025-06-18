@@ -11,7 +11,7 @@
 	import Nav_Link from '$lib/Nav_Link.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 	import {GLYPH_ARROW_LEFT, GLYPH_ARROW_RIGHT, GLYPH_PROJECT, GLYPH_TAB} from '$lib/glyphs.js';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/frontend.svelte.js';
 	import {main_nav_items_default, to_nav_link_href} from '$lib/nav.js';
 
 	// TODO dashboard should be mounted with Markdown
@@ -22,10 +22,10 @@
 
 	const {children}: Props = $props();
 
-	const zzz = zzz_context.get();
+	const app = zzz_context.get();
 
 	const SIDEBAR_WIDTH_MAX = 180;
-	const sidebar_width = $derived(zzz.ui.show_sidebar ? SIDEBAR_WIDTH_MAX : 0);
+	const sidebar_width = $derived(app.ui.show_sidebar ? SIDEBAR_WIDTH_MAX : 0);
 
 	let futureclicks = $state(0);
 	const FUTURECLICKS = 3;
@@ -47,7 +47,7 @@
 	const dashboard_nav_items = $derived.by(() => {
 		const nav_items = structuredClone(main_nav_items_default);
 
-		if (zzz.futuremode) {
+		if (app.futuremode) {
 			// Add tabs to main group
 			const main_group = nav_items.find((l) => l.group === 'main');
 			if (main_group) {
@@ -65,14 +65,14 @@
 	});
 
 	const sidebar_button_title = $derived(
-		(zzz.ui.show_sidebar ? 'hide sidebar' : 'show sidebar') + ' [backtick `]',
+		(app.ui.show_sidebar ? 'hide sidebar' : 'show sidebar') + ' [backtick `]',
 	);
 </script>
 
 <svelte:window
 	onkeydowncapture={(e) => {
 		if (e.key === '`' && !is_editable(e.target)) {
-			zzz.ui.toggle_sidebar();
+			app.ui.toggle_sidebar();
 			swallow(e);
 		}
 	}}
@@ -97,18 +97,18 @@
 							<Nav_Link
 								href="{base}/"
 								attrs={{
-									title: zzz.futuremode ? 'futuremode' : 'home',
+									title: app.futuremode ? 'futuremode' : 'home',
 									class: 'click_effect_scale',
 									onclick: () => {
 										if (futureclicks_activated) {
 											// If already activated once, toggle immediately when on root
 											if (page.url.pathname === base + '/') {
-												zzz.futuremode = !zzz.futuremode;
+												app.futuremode = !app.futuremode;
 											}
 										} else {
 											futureclicks++;
 											if (futureclicks >= FUTURECLICKS) {
-												zzz.futuremode = !zzz.futuremode;
+												app.futuremode = !app.futuremode;
 												futureclicks_activated = true;
 											}
 										}
@@ -118,10 +118,10 @@
 								<Svg
 									data={zzz_logo}
 									size="var(--icon_size_md)"
-									fill={zzz.futuremode ? 'var(--color_h_5)' : undefined}
+									fill={app.futuremode ? 'var(--color_h_5)' : undefined}
 									attrs={{
 										style: 'transition: transform 200ms ease',
-										class: zzz.futuremode ? 'flip_x' : '',
+										class: app.futuremode ? 'flip_x' : '',
 									}}
 								/>
 							</Nav_Link>
@@ -133,7 +133,7 @@
 					{/if}
 
 					{#each section.items as link (link.label)}
-						{@const href = to_nav_link_href(zzz, link)}
+						{@const href = to_nav_link_href(app, link)}
 						<div transition:slide>
 							<Nav_Link {href}>
 								{#snippet children(selected)}
@@ -159,7 +159,6 @@
 	</div>
 
 	<!-- Sidebar toggle button -->
-	<!-- TODO shortcut key -->
 	<button
 		type="button"
 		class="position_fixed b_0 l_0 icon_button plain border_radius_xs2"
@@ -167,8 +166,8 @@
 		style:border-top-right-radius="var(--border_radius_lg)"
 		aria-label={sidebar_button_title}
 		title={sidebar_button_title}
-		onclick={() => zzz.ui.toggle_sidebar()}
+		onclick={() => app.ui.toggle_sidebar()}
 	>
-		<Glyph glyph={zzz.ui.show_sidebar ? GLYPH_ARROW_LEFT : GLYPH_ARROW_RIGHT} />
+		<Glyph glyph={app.ui.show_sidebar ? GLYPH_ARROW_LEFT : GLYPH_ARROW_RIGHT} />
 	</button>
 </div>

@@ -22,6 +22,7 @@
     "dev": "gro dev",
     "build": "gro build",
     "check": "gro check",
+    "typecheck": "gro typecheck",
     "test": "gro test",
     "preview": "vite preview",
     "deploy": "gro deploy",
@@ -42,7 +43,7 @@
     "@ryanatkn/gro": "^0.159.0",
     "@ryanatkn/moss": "^0.31.0",
     "@sveltejs/adapter-static": "^3.0.8",
-    "@sveltejs/kit": "^2.20.8",
+    "@sveltejs/kit": "^2.21.1",
     "@sveltejs/package": "^2.3.11",
     "@sveltejs/vite-plugin-svelte": "^5.0.3",
     "eslint": "^9.25.1",
@@ -51,7 +52,7 @@
     "ollama": "^0.5.15",
     "prettier": "^3.5.3",
     "prettier-plugin-svelte": "^3.3.3",
-    "svelte": "^5.28.2",
+    "svelte": "^5.31.1",
     "svelte-check": "^4.1.6",
     "tslib": "^2.8.1",
     "typescript": "^5.8.3",
@@ -66,7 +67,6 @@
     "@hono/node-ws": "^1.1.4",
     "@ryanatkn/belt": "^0.30.2",
     "date-fns": "^4.1.0",
-    "devalue": "^5.1.1",
     "esm-env": "^1.2.2",
     "hono": "^4.7.8",
     "openai": "^4.96.2"
@@ -96,15 +96,71 @@
   ],
   "exports": {
     "./package.json": "./package.json",
+    "./action_collection_helpers.js": {
+      "types": "./dist/action_collection_helpers.d.ts",
+      "default": "./dist/action_collection_helpers.js"
+    },
+    "./action_collections.gen.js": {
+      "types": "./dist/action_collections.gen.d.ts",
+      "default": "./dist/action_collections.gen.js"
+    },
+    "./action_collections.js": {
+      "types": "./dist/action_collections.d.ts",
+      "default": "./dist/action_collections.js"
+    },
     "./Action_Detail.svelte": {
       "types": "./dist/Action_Detail.svelte.d.ts",
       "svelte": "./dist/Action_Detail.svelte",
       "default": "./dist/Action_Detail.svelte"
     },
+    "./action_event_data.js": {
+      "types": "./dist/action_event_data.d.ts",
+      "default": "./dist/action_event_data.js"
+    },
+    "./action_event_helpers.js": {
+      "types": "./dist/action_event_helpers.d.ts",
+      "default": "./dist/action_event_helpers.js"
+    },
+    "./action_event_types.js": {
+      "types": "./dist/action_event_types.d.ts",
+      "default": "./dist/action_event_types.js"
+    },
+    "./action_event.js": {
+      "types": "./dist/action_event.d.ts",
+      "default": "./dist/action_event.js"
+    },
+    "./action_helpers.js": {
+      "types": "./dist/action_helpers.d.ts",
+      "default": "./dist/action_helpers.js"
+    },
     "./Action_List.svelte": {
       "types": "./dist/Action_List.svelte.d.ts",
       "svelte": "./dist/Action_List.svelte",
       "default": "./dist/Action_List.svelte"
+    },
+    "./action_metatypes.gen.js": {
+      "types": "./dist/action_metatypes.gen.d.ts",
+      "default": "./dist/action_metatypes.gen.js"
+    },
+    "./action_metatypes.js": {
+      "types": "./dist/action_metatypes.d.ts",
+      "default": "./dist/action_metatypes.js"
+    },
+    "./action_peer.js": {
+      "types": "./dist/action_peer.d.ts",
+      "default": "./dist/action_peer.js"
+    },
+    "./action_registry.js": {
+      "types": "./dist/action_registry.d.ts",
+      "default": "./dist/action_registry.js"
+    },
+    "./action_spec.js": {
+      "types": "./dist/action_spec.d.ts",
+      "default": "./dist/action_spec.js"
+    },
+    "./action_specs.js": {
+      "types": "./dist/action_specs.d.ts",
+      "default": "./dist/action_specs.js"
     },
     "./action_types.js": {
       "types": "./dist/action_types.d.ts",
@@ -203,6 +259,11 @@
       "types": "./dist/capabilities.svelte.d.ts",
       "default": "./dist/capabilities.svelte.js"
     },
+    "./Capability_Backend.svelte": {
+      "types": "./dist/Capability_Backend.svelte.d.ts",
+      "svelte": "./dist/Capability_Backend.svelte",
+      "default": "./dist/Capability_Backend.svelte"
+    },
     "./Capability_Filesystem.svelte": {
       "types": "./dist/Capability_Filesystem.svelte.d.ts",
       "svelte": "./dist/Capability_Filesystem.svelte",
@@ -212,11 +273,6 @@
       "types": "./dist/Capability_Ollama.svelte.d.ts",
       "svelte": "./dist/Capability_Ollama.svelte",
       "default": "./dist/Capability_Ollama.svelte"
-    },
-    "./Capability_Server.svelte": {
-      "types": "./dist/Capability_Server.svelte.d.ts",
-      "svelte": "./dist/Capability_Server.svelte",
-      "default": "./dist/Capability_Server.svelte"
     },
     "./Capability_System.svelte": {
       "types": "./dist/Capability_System.svelte.d.ts",
@@ -268,6 +324,11 @@
       "svelte": "./dist/Chat_Tape_Add_By_Model.svelte",
       "default": "./dist/Chat_Tape_Add_By_Model.svelte"
     },
+    "./Chat_Tape_Manage_By_Tag.svelte": {
+      "types": "./dist/Chat_Tape_Manage_By_Tag.svelte.d.ts",
+      "svelte": "./dist/Chat_Tape_Manage_By_Tag.svelte",
+      "default": "./dist/Chat_Tape_Manage_By_Tag.svelte"
+    },
     "./Chat_Tape.svelte": {
       "types": "./dist/Chat_Tape.svelte.d.ts",
       "svelte": "./dist/Chat_Tape.svelte",
@@ -304,6 +365,14 @@
       "types": "./dist/Clear_Restore_Button.svelte.d.ts",
       "svelte": "./dist/Clear_Restore_Button.svelte",
       "default": "./dist/Clear_Restore_Button.svelte"
+    },
+    "./codegen.js": {
+      "types": "./dist/codegen.d.ts",
+      "default": "./dist/codegen.js"
+    },
+    "./completion_types.js": {
+      "types": "./dist/completion_types.d.ts",
+      "default": "./dist/completion_types.js"
     },
     "./config_defaults.js": {
       "types": "./dist/config_defaults.d.ts",
@@ -552,6 +621,34 @@
       "svelte": "./dist/Footer.svelte",
       "default": "./dist/Footer.svelte"
     },
+    "./frontend_action_handlers.js": {
+      "types": "./dist/frontend_action_handlers.d.ts",
+      "default": "./dist/frontend_action_handlers.js"
+    },
+    "./frontend_action_types.gen.js": {
+      "types": "./dist/frontend_action_types.gen.d.ts",
+      "default": "./dist/frontend_action_types.gen.js"
+    },
+    "./frontend_action_types.js": {
+      "types": "./dist/frontend_action_types.d.ts",
+      "default": "./dist/frontend_action_types.js"
+    },
+    "./frontend_actions_api.js": {
+      "types": "./dist/frontend_actions_api.d.ts",
+      "default": "./dist/frontend_actions_api.js"
+    },
+    "./frontend_http_transport.js": {
+      "types": "./dist/frontend_http_transport.d.ts",
+      "default": "./dist/frontend_http_transport.js"
+    },
+    "./frontend_websocket_transport.js": {
+      "types": "./dist/frontend_websocket_transport.d.ts",
+      "default": "./dist/frontend_websocket_transport.js"
+    },
+    "./frontend.svelte.js": {
+      "types": "./dist/frontend.svelte.d.ts",
+      "default": "./dist/frontend.svelte.js"
+    },
     "./Glyph.svelte": {
       "types": "./dist/Glyph.svelte.d.ts",
       "svelte": "./dist/Glyph.svelte",
@@ -572,6 +669,18 @@
     "./indexed_collection.svelte.js": {
       "types": "./dist/indexed_collection.svelte.d.ts",
       "default": "./dist/indexed_collection.svelte.js"
+    },
+    "./jsonrpc_errors.js": {
+      "types": "./dist/jsonrpc_errors.d.ts",
+      "default": "./dist/jsonrpc_errors.js"
+    },
+    "./jsonrpc_helpers.js": {
+      "types": "./dist/jsonrpc_helpers.d.ts",
+      "default": "./dist/jsonrpc_helpers.js"
+    },
+    "./jsonrpc.js": {
+      "types": "./dist/jsonrpc.d.ts",
+      "default": "./dist/jsonrpc.js"
     },
     "./list_helpers.js": {
       "types": "./dist/list_helpers.d.ts",
@@ -764,9 +873,21 @@
       "types": "./dist/reorderable.svelte.d.ts",
       "default": "./dist/reorderable.svelte.js"
     },
+    "./request_tracker.svelte.js": {
+      "types": "./dist/request_tracker.svelte.d.ts",
+      "default": "./dist/request_tracker.svelte.js"
+    },
     "./response_helpers.js": {
       "types": "./dist/response_helpers.d.ts",
       "default": "./dist/response_helpers.js"
+    },
+    "./schema_helpers.js": {
+      "types": "./dist/schema_helpers.d.ts",
+      "default": "./dist/schema_helpers.js"
+    },
+    "./schema_registry.js": {
+      "types": "./dist/schema_registry.d.ts",
+      "default": "./dist/schema_registry.js"
     },
     "./scrollable.svelte.js": {
       "types": "./dist/scrollable.svelte.d.ts",
@@ -782,21 +903,53 @@
       "types": "./dist/server/ai_provider_utils.d.ts",
       "default": "./dist/server/ai_provider_utils.js"
     },
-    "./server/handler_defaults.js": {
-      "types": "./dist/server/handler_defaults.d.ts",
-      "default": "./dist/server/handler_defaults.js"
+    "./server/backend_action_handlers.js": {
+      "types": "./dist/server/backend_action_handlers.d.ts",
+      "default": "./dist/server/backend_action_handlers.js"
+    },
+    "./server/backend_action_types.gen.js": {
+      "types": "./dist/server/backend_action_types.gen.d.ts",
+      "default": "./dist/server/backend_action_types.gen.js"
+    },
+    "./server/backend_action_types.js": {
+      "types": "./dist/server/backend_action_types.d.ts",
+      "default": "./dist/server/backend_action_types.js"
+    },
+    "./server/backend_actions_api.js": {
+      "types": "./dist/server/backend_actions_api.d.ts",
+      "default": "./dist/server/backend_actions_api.js"
+    },
+    "./server/backend_websocket_transport.js": {
+      "types": "./dist/server/backend_websocket_transport.d.ts",
+      "default": "./dist/server/backend_websocket_transport.js"
+    },
+    "./server/backend.js": {
+      "types": "./dist/server/backend.d.ts",
+      "default": "./dist/server/backend.js"
+    },
+    "./server/register_http_actions.js": {
+      "types": "./dist/server/register_http_actions.d.ts",
+      "default": "./dist/server/register_http_actions.js"
+    },
+    "./server/register_websocket_actions.js": {
+      "types": "./dist/server/register_websocket_actions.d.ts",
+      "default": "./dist/server/register_websocket_actions.js"
     },
     "./server/safe_fs.js": {
       "types": "./dist/server/safe_fs.d.ts",
       "default": "./dist/server/safe_fs.js"
     },
+    "./server/security.js": {
+      "types": "./dist/server/security.d.ts",
+      "default": "./dist/server/security.js"
+    },
+    "./server/server_helpers.js": {
+      "types": "./dist/server/server_helpers.d.ts",
+      "default": "./dist/server/server_helpers.js"
+    },
     "./server/server.js": {
       "types": "./dist/server/server.d.ts",
       "default": "./dist/server/server.js"
-    },
-    "./server/zzz_server.js": {
-      "types": "./dist/server/zzz_server.d.ts",
-      "default": "./dist/server/zzz_server.js"
     },
     "./Settings.svelte": {
       "types": "./dist/Settings.svelte.d.ts",
@@ -834,6 +987,10 @@
       "types": "./dist/Strip_Listitem.svelte.d.ts",
       "svelte": "./dist/Strip_Listitem.svelte",
       "default": "./dist/Strip_Listitem.svelte"
+    },
+    "./strip_types.js": {
+      "types": "./dist/strip_types.d.ts",
+      "default": "./dist/strip_types.js"
     },
     "./Strip_View.svelte": {
       "types": "./dist/Strip_View.svelte.d.ts",
@@ -896,6 +1053,10 @@
       "svelte": "./dist/Toggle_Button.svelte",
       "default": "./dist/Toggle_Button.svelte"
     },
+    "./transports.js": {
+      "types": "./dist/transports.d.ts",
+      "default": "./dist/transports.js"
+    },
     "./ui.svelte.js": {
       "types": "./dist/ui.svelte.d.ts",
       "default": "./dist/ui.svelte.js"
@@ -926,10 +1087,6 @@
       "types": "./dist/Zzz_Root.svelte.d.ts",
       "svelte": "./dist/Zzz_Root.svelte",
       "default": "./dist/Zzz_Root.svelte"
-    },
-    "./zzz.svelte.js": {
-      "types": "./dist/zzz.svelte.d.ts",
-      "default": "./dist/zzz.svelte.js"
     }
   }
 }

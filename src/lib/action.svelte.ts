@@ -1,105 +1,64 @@
+// @slop claude_opus_4
+// action.svelte.ts
+
 import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Uuid} from '$lib/zod_helpers.js';
-import {
-	Action_Json,
-	Completion_Response,
-	Completion_Request,
-	type Action_Direction,
-	type Action_Type,
-	type Diskfile_Change,
-} from '$lib/action_types.js';
-import {Diskfile_Path, Source_File} from '$lib/diskfile_types.js';
-import {to_completion_response_text} from '$lib/response_helpers.js';
-import {to_preview} from '$lib/helpers.js';
+import {Action_Method} from '$lib/action_metatypes.js';
+import {Action_Kind} from '$lib/action_types.js';
+import {action_spec_by_method} from '$lib/action_collections.js';
+import type {Action_Spec} from '$lib/action_spec.js';
+import {type Action_Event, parse_action_event} from '$lib/action_event.js';
+import {HANDLED} from '$lib/cell_helpers.js';
+import {Cell_Json} from '$lib/cell_types.js';
+import {Action_Event_Data} from '$lib/action_event_data.js';
 
-// Constants for preview length and formatting
-export const ACTION_DATE_FORMAT = 'MMM d, p';
-export const ACTION_TIME_FORMAT = 'p';
+// TODO this isnt in action_types.ts because of circular dependencies, idk what pattern is best yet
+export const Action_Json = Cell_Json.extend({
+	method: Action_Method,
+	action_event: Action_Event_Data,
+});
+export type Action_Json = z.infer<typeof Action_Json>;
+export type Action_Json_Input = z.input<typeof Action_Json>;
 
-export interface Action_Options extends Cell_Options<typeof Action_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
+export interface Action_Options extends Cell_Options<typeof Action_Json> {}
 
-// TODO think about splitting out a different non-reactive version
-// that only handles the static expectation,
-// but then another for dynamic usage? is there even such a thing of an action changing?
-// if not shouldn't we just remove the $state below?
+/**
+ * Represents a single action in the system, tracking its full lifecycle through action events.
+ */
 export class Action extends Cell<typeof Action_Json> {
-	type: Action_Type = $state()!;
-	direction: Action_Direction = $state()!;
+	method: Action_Method = $state()!;
 
-	// Store data based on action type
-	data: Record<string, any> | undefined = $state();
-	ping_id: Uuid | undefined = $state();
-	completion_request: Completion_Request | undefined = $state();
-	completion_response: Completion_Response | undefined = $state();
-	path: Diskfile_Path | undefined = $state();
-	content: string | undefined = $state();
-	change: Diskfile_Change | undefined = $state();
-	source_file: Source_File | undefined = $state();
+	action_event: Action_Event | undefined = $state.raw();
 
-	readonly display_name: string = $derived(`${this.type} (${this.direction})`);
-
-	// TODO maybe change these to be located on `this.type` as a `Action_Type_Name` class which JSON serializes to the string `Action_Type` but at runtime has properties like these:
-	readonly is_ping: boolean = $derived(this.type === 'ping');
-	readonly is_pong: boolean = $derived(this.type === 'pong');
-	readonly is_prompt: boolean = $derived(this.type === 'send_prompt');
-	readonly is_completion: boolean = $derived(this.type === 'completion_response');
-	readonly is_session: boolean = $derived(
-		this.type === 'load_session' || this.type === 'loaded_session',
-	);
-	readonly is_file_related: boolean = $derived(
-		this.type === 'update_diskfile' ||
-			this.type === 'delete_diskfile' ||
-			this.type === 'filer_change',
-	);
-
-	readonly prompt_data: Completion_Request | null = $derived(
-		this.is_prompt && this.completion_request ? this.completion_request : null,
-	);
-
-	readonly completion_data: Completion_Response | null = $derived(
-		this.is_completion && this.completion_response ? this.completion_response : null,
-	);
-
-	readonly completion_text: string | null | undefined = $derived(
-		this.completion_data ? to_completion_response_text(this.completion_data) : null,
-	);
-
-	readonly prompt_preview: string = $derived.by(() => {
-		if (!this.is_prompt) return 'Not a prompt action';
-
-		const prompt = this.prompt_data?.prompt;
-		if (!prompt) return 'No prompt';
-
-		return to_preview(prompt);
+	readonly spec: Action_Spec = $derived.by(() => {
+		const s = action_spec_by_method.get(this.method);
+		if (!s) throw new Error(`Missing action spec for method '${this.method}'`);
+		return s;
 	});
 
-	readonly completion_preview: string = $derived.by(() => {
-		if (!this.is_completion) return 'Not a completion action';
+	kind: Action_Kind = $derived(this.spec.kind);
 
-		if (!this.completion_text) return 'No completion';
+	readonly data = $derived(this.action_event?.data);
 
-		return to_preview(this.completion_text);
-	});
+	readonly has_error = $derived(!!this.data?.error);
 
 	constructor(options: Action_Options) {
 		super(Action_Json, options);
 
-		// Initialize decoders with type-specific handlers
 		this.decoders = {
-			completion_request: (value) =>
-				this.type === 'send_prompt' ? Completion_Request.parse(value) : undefined,
-			completion_response: (value) =>
-				this.type === 'completion_response' ? Completion_Response.parse(value) : undefined,
-			ping_id: (value) => (this.type === 'pong' ? Uuid.parse(value) : undefined),
-			path: (value) =>
-				this.type === 'update_diskfile' || this.type === 'delete_diskfile'
-					? Diskfile_Path.parse(value)
-					: undefined,
+			action_event: (data) => {
+				if (data) {
+					try {
+						this.action_event = parse_action_event(data, this.app);
+					} catch (error) {
+						console.error('Failed to reconstruct action event:', error);
+					}
+				}
+				return HANDLED;
+			},
 		};
 
-		// Initialize base properties
 		this.init();
 	}
 }

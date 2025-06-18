@@ -5,13 +5,13 @@
 
 	import Picker_Dialog from '$lib/Picker_Dialog.svelte';
 	import Bit_Listitem from '$lib/Bit_Listitem.svelte';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/frontend.svelte.js';
 	import type {Bit_Type} from '$lib/bit.svelte.js';
 	import type {Uuid} from '$lib/zod_helpers.js';
 	import {sort_by_text, sort_by_numeric} from '$lib/sortable.svelte.js';
 
-	const zzz = zzz_context.get();
-	const {bits} = zzz;
+	const app = zzz_context.get();
+	const {bits} = app;
 
 	interface Props {
 		onpick: (bit: Bit_Type | undefined) => boolean | void;

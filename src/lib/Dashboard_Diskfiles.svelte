@@ -1,15 +1,15 @@
 <script lang="ts">
 	import {swallow, is_editable} from '@ryanatkn/belt/dom.js';
 
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/frontend.svelte.js';
 	import Diskfile_Explorer from '$lib/Diskfile_Explorer.svelte';
 	import Diskfile_Editor_View from '$lib/Diskfile_Editor_View.svelte';
 	import Diskfile_Tab_Listitem from '$lib/Diskfile_Tab_Listitem.svelte';
 	import {Reorderable} from '$lib/reorderable.svelte.js';
 	import Diskfile_Picker_Dialog from '$lib/Diskfile_Picker_Dialog.svelte';
 
-	const zzz = zzz_context.get();
-	const {diskfiles} = zzz;
+	const app = zzz_context.get();
+	const {diskfiles} = app;
 	const {editor} = diskfiles;
 
 	const tabs_reorderable = new Reorderable({item_class: null}); // remove the normal reorderable item styling

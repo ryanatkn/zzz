@@ -9,19 +9,15 @@ import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {create_multi_index, create_derived_index} from '$lib/indexed_collection_helpers.js';
 import {Model_Name} from '$lib/model.svelte.js';
 import {to_reordered_list} from '$lib/list_helpers.js';
+import {Cell_Json} from '$lib/cell_types.js';
 
-export const Tapes_Json = z
-	.object({
-		items: cell_array(
-			z.array(Tape_Json).default(() => []),
-			'Tape',
-		),
-		selected_id: z.string().nullable().default(null),
-	})
-	.default(() => ({
-		items: [],
-		selected_id: null,
-	}));
+export const Tapes_Json = Cell_Json.extend({
+	items: cell_array(
+		z.array(Tape_Json).default(() => []),
+		'Tape',
+	),
+	selected_id: z.string().nullable().default(null),
+});
 export type Tapes_Json = z.infer<typeof Tapes_Json>;
 export type Tapes_Json_Input = z.input<typeof Tapes_Json>;
 
@@ -59,7 +55,7 @@ export class Tapes extends Cell<typeof Tapes_Json> {
 		super(Tapes_Json, options);
 
 		this.decoders = {
-			// TODO @many maybe infer or create a helper for this, duplicated many places
+			// TODO @many improve this API, maybe infer or create a helper, duplicated many places
 			items: (items) => {
 				if (Array.isArray(items)) {
 					this.items.clear();
@@ -76,7 +72,7 @@ export class Tapes extends Cell<typeof Tapes_Json> {
 	}
 
 	add(json?: Tape_Json_Input, select?: boolean): Tape {
-		const tape = new Tape({zzz: this.zzz, json});
+		const tape = new Tape({app: this.app, json});
 		return this.add_tape(tape, select);
 	}
 
@@ -91,7 +87,7 @@ export class Tapes extends Cell<typeof Tapes_Json> {
 	}
 
 	add_many(tapes_json: Array<Tape_Json_Input>, select?: boolean | number): Array<Tape> {
-		const tapes = tapes_json.map((json) => new Tape({zzz: this.zzz, json}));
+		const tapes = tapes_json.map((json) => new Tape({app: this.app, json}));
 		this.items.add_many(tapes);
 
 		// Select the first or the specified tape if none is currently selected
@@ -136,7 +132,7 @@ export class Tapes extends Cell<typeof Tapes_Json> {
 
 	// TODO these two methods feel like a code smell, should maintain the collections more automatically
 	#remove_reference_from_chats(tape_id: Uuid): void {
-		for (const chat of this.zzz.chats.items.by_id.values()) {
+		for (const chat of this.app.chats.items.by_id.values()) {
 			chat.remove_tape(tape_id);
 		}
 	}
@@ -147,7 +143,7 @@ export class Tapes extends Cell<typeof Tapes_Json> {
 			return;
 		}
 
-		for (const chat of this.zzz.chats.items.by_id.values()) {
+		for (const chat of this.app.chats.items.by_id.values()) {
 			chat.remove_tapes(tape_ids);
 		}
 	}

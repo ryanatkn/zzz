@@ -1,6 +1,8 @@
+// @slop claude_opus_4
+
 import {z} from 'zod';
 import {SvelteMap} from 'svelte/reactivity';
-import {create_deferred, type Async_Status} from '@ryanatkn/belt/async.js';
+import type {Async_Status} from '@ryanatkn/belt/async.js';
 import {BROWSER} from 'esm-env';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
@@ -13,6 +15,7 @@ import {
 	DEFAULT_AUTO_RECONNECT,
 	DEFAULT_CLOSE_CODE,
 } from '$lib/socket_helpers.js';
+import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
 
 // TODO the plan here is to make websockets one of multiple transports, this just gets the proof of concept working
 
@@ -96,12 +99,12 @@ export class Socket extends Cell<typeof Socket_Json> {
 	// Time tracking and formatting
 	readonly connection_duration: number | null = $derived(
 		this.connected && this.last_connect_time
-			? Math.max(0, this.zzz.time.now_ms - this.last_connect_time) // `Math.max` is needed to avoid negative values with the coarse value of `now_ms`
+			? Math.max(0, this.app.time.now_ms - this.last_connect_time) // `Math.max` is needed to avoid negative values with the coarse value of `now_ms`
 			: null,
 	);
 	readonly connection_duration_rounded: number | null = $derived(
 		this.connection_duration !== null
-			? Math.round(this.connection_duration / this.zzz.time.interval) * this.zzz.time.interval
+			? Math.round(this.connection_duration / this.app.time.interval) * this.app.time.interval
 			: null,
 	);
 
@@ -192,8 +195,8 @@ export class Socket extends Cell<typeof Socket_Json> {
 			ws.addEventListener('close', this.#handle_close);
 			ws.addEventListener('error', this.#handle_error);
 			ws.addEventListener('message', this.#handle_message);
-		} catch (err) {
-			console.error('Failed to create WebSocket:', err);
+		} catch (error) {
+			console.error('Failed to create WebSocket:', error);
 			this.ws = null;
 			this.open = false;
 			this.status = 'failure';
@@ -219,8 +222,8 @@ export class Socket extends Cell<typeof Socket_Json> {
 			if (this.open) {
 				try {
 					this.ws.close(code);
-				} catch (err) {
-					console.error('Error closing WebSocket:', err);
+				} catch (error) {
+					console.error('Error closing WebSocket:', error);
 				}
 			}
 
@@ -242,8 +245,8 @@ export class Socket extends Cell<typeof Socket_Json> {
 				this.ws!.send(JSON.stringify(data));
 				this.last_send_time = Date.now();
 				return true;
-			} catch (err) {
-				console.error('Error sending message:', err);
+			} catch (error) {
+				console.error('Error sending message:', error);
 				this.#queue_message(data);
 				return false;
 			}
@@ -273,8 +276,8 @@ export class Socket extends Cell<typeof Socket_Json> {
 	/**
 	 * Sends a ping message for heartbeat purposes
 	 */
-	send_heartbeat(): void {
-		this.zzz.capabilities.send_ping();
+	async send_heartbeat(): Promise<void> {
+		await this.app.api.ping(); // TODO @api need to force websocket transport, second arg?
 	}
 
 	/**
@@ -297,60 +300,6 @@ export class Socket extends Cell<typeof Socket_Json> {
 	 */
 	clear_failed_messages(): void {
 		this.failed_messages.clear();
-	}
-
-	/**
-	 * Create a promise that resolves when a specific response is received
-	 * @param send_data Data to send immediately
-	 * @param predicate Function to determine if a message is the expected response
-	 * @param timeout Optional timeout in milliseconds
-	 */
-	async request<T>(
-		send_data: object,
-		predicate: (message: any) => boolean | T,
-		timeout: number = 10000,
-	): Promise<T> {
-		const deferred = create_deferred<T>();
-
-		// Set up timeout
-		const timeout_id = setTimeout(() => {
-			cleanup();
-			deferred.reject(new Error('Request timed out'));
-		}, timeout);
-
-		// Create temp handler that listens for the response
-		const temp_handler = (event: MessageEvent) => {
-			try {
-				const data = JSON.parse(event.data);
-				const result = predicate(data);
-				if (result !== false) {
-					cleanup();
-					deferred.resolve(result === true ? data : result);
-				}
-			} catch (_err) {
-				// Ignore parsing errors
-			}
-		};
-
-		// Store original handler to restore it later
-		const original_handler = this.onmessage;
-
-		// Set up our handler that calls both the temp handler and the original one
-		this.onmessage = (event) => {
-			temp_handler(event);
-			if (original_handler) original_handler(event);
-		};
-
-		// Send the request
-		this.send(send_data);
-
-		// Cleanup function to restore original state
-		const cleanup = () => {
-			clearTimeout(timeout_id);
-			this.onmessage = original_handler;
-		};
-
-		return deferred.promise;
 	}
 
 	// Private methods
@@ -380,12 +329,12 @@ export class Socket extends Cell<typeof Socket_Json> {
 			// TODO need the round-trip protocol, this is a hack
 			this.ws!.send(JSON.stringify(message.data));
 			this.last_send_time = Date.now();
-		} catch (err) {
+		} catch (error) {
 			// Mark as failed immediately since we don't have retry count anymore
 			const failed_message: Failed_Message = {
 				...message,
 				failed: Date.now(),
-				reason: err instanceof Error ? err.message : 'Unknown error',
+				reason: error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE,
 			};
 			this.failed_messages.set(message.id, failed_message);
 		}
@@ -411,7 +360,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 				const next_timeout_time = this.#get_next_heartbeat_time();
 
 				if (next_timeout_time <= now) {
-					this.send_heartbeat();
+					void this.send_heartbeat();
 				}
 
 				this.#schedule_next_heartbeat();
@@ -494,9 +443,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 	};
 
 	#handle_error = (event: Event): void => {
-		if (this.onerror) {
-			this.onerror(event);
-		}
+		this.onerror?.(event);
 
 		console.error('WebSocket error occurred:', event);
 		this.status = 'failure';
@@ -513,8 +460,6 @@ export class Socket extends Cell<typeof Socket_Json> {
 	#handle_message = (event: MessageEvent): void => {
 		this.last_receive_time = Date.now();
 
-		if (this.onmessage) {
-			this.onmessage(event);
-		}
+		this.onmessage?.(event);
 	};
 }

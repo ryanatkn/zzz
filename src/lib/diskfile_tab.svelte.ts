@@ -38,7 +38,7 @@ export class Diskfile_Tab extends Cell<typeof Diskfile_Tab_Json> {
 	readonly is_selected: boolean = $derived.by(() => this.tabs.selected_tab_id === this.id);
 
 	readonly diskfile: Diskfile | undefined = $derived(
-		this.zzz.diskfiles.items.by_id.get(this.diskfile_id),
+		this.app.diskfiles.items.by_id.get(this.diskfile_id),
 	);
 
 	constructor(options: Diskfile_Tab_Options) {

@@ -9,7 +9,7 @@ import {create_uuid} from '$lib/zod_helpers.js';
 // TODO @many refactor with db
 
 // Configuration defaults
-export const SYSTEM_MESSAGE_DEFAULT = 'You are a helpful assistant that responds succintly.'; // TODO without the succintly part? I dont think splitting it for DEV makes sense
+export const SYSTEM_MESSAGE_DEFAULT = 'You are a helpful assistant that responds succinctly.'; // TODO without the succinctly part? I dont think splitting it for DEV makes sense
 export const OUTPUT_TOKEN_MAX_DEFAULT = 1000;
 export const TEMPERATURE_DEFAULT = 0;
 export const SEED_DEFAULT: number | undefined = undefined;

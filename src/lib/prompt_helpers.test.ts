@@ -1,3 +1,5 @@
+// @slop claude_opus_4
+
 import {test, expect} from 'vitest';
 
 import {format_prompt_content} from '$lib/prompt_helpers.js';

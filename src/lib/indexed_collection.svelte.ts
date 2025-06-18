@@ -1,3 +1,6 @@
+// @slop claude_opus_4
+// indexed_collection.svelte.ts
+
 import {SvelteMap} from 'svelte/reactivity';
 import type {z} from 'zod';
 import {DEV} from 'esm-env';
@@ -33,11 +36,13 @@ export interface Index_Definition<T extends Indexed_Item, T_Result = any, T_Quer
 	/**
 	 * Schema for validating query parameters.
 	 */
+	// TODO @many loses type info in the schema
 	query_schema?: z.ZodType<T_Query>; // TODO @many should query/result schemas be optional or required? helpers could make required schemas easier to work with
 
 	/**
 	 * Schema for validating the computed result.
 	 */
+	// TODO @many loses type info in the schema
 	result_schema: z.ZodType<T_Result>; // TODO @many should query/result schemas be optional or required? helpers could make required schemas easier to work with
 
 	/** Optional predicate to determine if an item is relevant to this index. */
@@ -230,12 +235,12 @@ export class Indexed_Collection<
 	#ensure_index(key: string, expected_type: Index_Type): void {
 		const index = this.indexes[key];
 		if (index === undefined) {
-			throw Error(`Index not found: ${key}`);
+			throw new Error(`Index not found: ${key}`);
 		}
 
 		const actual_type = this.#index_types.get(key);
 		if (actual_type !== expected_type) {
-			throw Error(
+			throw new Error(
 				`Index type mismatch: ${key} is a ${actual_type || 'unknown'} index, not a ${expected_type} index`,
 			);
 		}
@@ -274,6 +279,25 @@ export class Indexed_Collection<
 
 		// For array indexes or other types, return the whole index
 		return index;
+	}
+
+	/**
+	 * Add an item to the collection and update all indexes.
+	 */
+	add(item: T): T {
+		const {by_id} = this;
+
+		if (by_id.has(item.id)) {
+			if (DEV) console.error('Item with this id already exists in the collection: ' + item.id);
+			return by_id.get(item.id)!;
+		}
+
+		by_id.set(item.id, item);
+
+		// Update all indexes
+		this.#update_indexes_for_added_item(item);
+
+		return item;
 	}
 
 	/**
@@ -336,25 +360,6 @@ export class Indexed_Collection<
 				this.indexes[def.key] = result;
 			}
 		}
-	}
-
-	/**
-	 * Add an item to the collection and update all indexes.
-	 */
-	add(item: T): T {
-		const {by_id} = this;
-
-		if (by_id.has(item.id)) {
-			if (DEV) console.error('Item with this id already exists in the collection: ' + item.id);
-			return by_id.get(item.id)!;
-		}
-
-		by_id.set(item.id, item);
-
-		// Update all indexes
-		this.#update_indexes_for_added_item(item);
-
-		return item;
 	}
 
 	/**
@@ -484,7 +489,7 @@ export class Indexed_Collection<
 		const item = index.get(value);
 
 		if (!item) {
-			throw Error(`Item not found for index ${index_key} with value ${String(value)}`);
+			throw new Error(`Item not found for index ${index_key} with value ${String(value)}`);
 		}
 		return item;
 	}

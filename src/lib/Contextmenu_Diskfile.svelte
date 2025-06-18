@@ -7,7 +7,7 @@
 
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import {GLYPH_DELETE, GLYPH_FILE} from '$lib/glyphs.js';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/frontend.svelte.js';
 	import Contextmenu_Entry_Copy_To_Clipboard from '$lib/Contextmenu_Entry_Copy_To_Clipboard.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 
@@ -17,7 +17,7 @@
 
 	const {diskfile, ...rest}: Props = $props();
 
-	const zzz = zzz_context.get();
+	const app = zzz_context.get();
 </script>
 
 <Contextmenu {...rest} {entries} />
@@ -48,7 +48,7 @@
 					// TODO @many better confirmation
 					// eslint-disable-next-line no-alert
 					if (confirm(`Are you sure you want to delete ${diskfile.path_relative}?`)) {
-						zzz.diskfiles.delete(diskfile.path);
+						app.diskfiles.delete(diskfile.path);
 					}
 				}}
 			>

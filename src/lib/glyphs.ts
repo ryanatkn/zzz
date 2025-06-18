@@ -1,3 +1,6 @@
+import type {Action_Method} from '$lib/action_metatypes.js';
+import type {Action_Kind} from '$lib/action_types.js';
+
 export const GLYPH_UNKNOWN = '⁇'; // ⍰
 export const GLYPH_IMPORTANT = '⁈';
 export const GLYPH_INFO = 'ⓘ';
@@ -26,9 +29,9 @@ export const GLYPH_EDIT = '✎'; // ✎ ✏ ✐ ✑ ✒
 // ⎗ ⎗ ⎘ ⌖ ⌶ ⎙
 // ⎘ ⎘ ⎌ ⌫ ⊘ ⦸
 // ⤺ ⤻ ⤼ ⤽ ⤾ ⤿
-export const GLYPH_SORT = '⇅'; // ⇅ ⇵ ⥮ ⮃
+export const GLYPH_SORT = '⇅'; // ⇅ ⇵ ⮃ ⮁
 
-export const GLYPH_SERVER = '🜢';
+export const GLYPH_BACKEND = '🜢';
 export const GLYPH_CHAT = '⌸';
 export const GLYPH_TAPE = '☷';
 export const GLYPH_STRIP = '⎍'; // ⎎ ⎍
@@ -54,30 +57,27 @@ export const GLYPH_PAGE = '⌺'; // ⌺ ⎚
 
 export const GLYPH_IDEA = '⌆'; // TODO use
 
-export const GLYPH_ECHO = '⥀';
+export const GLYPH_PING = '⥀';
 export const GLYPH_HEARTBEAT = '∽'; // ∿ ≋ 〰 ∽ ~
 export const GLYPH_RESPONSE = '⮑';
 export const GLYPH_SESSION = '⏣';
 
-export const GLYPH_DIRECTION_CLIENT = '⥘'; // ⤤ ⤳
-export const GLYPH_DIRECTION_SERVER = '⥙'; // ⤷
-export const GLYPH_DIRECTION_BOTH = '⤨';
+export const GLYPH_ACTION_TYPE_LOCAL_CALL = '⤳'; // ⤤ ⤳
+export const GLYPH_ACTION_TYPE_REMOTE_NOTIFICATION = '⥙'; // ⤷
+export const GLYPH_ACTION_TYPE_REQUEST_RESPONSE = '⥮'; // ⤨ ⥮ ⥯
 
 export const GLYPH_EXTERNAL_LINK = '🡵';
 
 export const GLYPH_ARROW_RIGHT = '→'; // → ➝ ➞ ➜ ➡ ⟶ ⭢ ⤷ ⤳ ⥅ ⮕ ⭆ ⮞ ⭆ ⭈ ⤞ ⤠
 export const GLYPH_ARROW_LEFT = '←'; // ← ⭠
 
-export const get_icon_for_action_type = (type: string): string => {
-	switch (type) {
-		case 'echo':
-			return GLYPH_ECHO;
-		case 'send_prompt':
-			return GLYPH_PROMPT;
-		case 'completion_response':
+export const get_glyph_for_action_method = (method: Action_Method): string => {
+	switch (method) {
+		case 'ping':
+			return GLYPH_PING;
+		case 'submit_completion':
 			return GLYPH_RESPONSE;
 		case 'load_session':
-		case 'loaded_session':
 			return GLYPH_SESSION;
 		case 'update_diskfile':
 		case 'delete_diskfile':
@@ -88,21 +88,21 @@ export const get_icon_for_action_type = (type: string): string => {
 	}
 };
 
-export const get_direction_icon = (direction: string): string => {
-	switch (direction) {
-		case 'client':
-			return GLYPH_DIRECTION_CLIENT;
-		case 'server':
-			return GLYPH_DIRECTION_SERVER;
-		case 'both':
-			return GLYPH_DIRECTION_BOTH;
+export const get_glyph_for_action_kind = (kind: Action_Kind): string => {
+	switch (kind) {
+		case 'local_call':
+			return GLYPH_ACTION_TYPE_LOCAL_CALL;
+		case 'request_response':
+			return GLYPH_ACTION_TYPE_REQUEST_RESPONSE;
+		case 'remote_notification':
+			return GLYPH_ACTION_TYPE_REMOTE_NOTIFICATION;
 		default:
-			return GLYPH_UNKNOWN;
+			return GLYPH_ACTION;
 	}
 };
 
 // ⭍ ⏻
-//⥘ ⥙
+//⥘ ⥙ ⇅ ⇵ ⇳ ⇊ ⇈  ⮃
 // ⬎⤣
 
 // ⎗ ⎘

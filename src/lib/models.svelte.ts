@@ -9,17 +9,14 @@ import {
 	create_multi_index,
 	create_derived_index,
 } from '$lib/indexed_collection_helpers.js';
+import {Cell_Json} from '$lib/cell_types.js';
 
-export const Models_Json = z
-	.object({
-		items: cell_array(
-			z.array(Model_Json).default(() => []),
-			'Model',
-		),
-	})
-	.default(() => ({
-		items: [],
-	}));
+export const Models_Json = Cell_Json.extend({
+	items: cell_array(
+		z.array(Model_Json).default(() => []),
+		'Model',
+	),
+});
 export type Models_Json = z.infer<typeof Models_Json>;
 export type Models_Json_Input = z.input<typeof Models_Json>;
 
@@ -68,7 +65,7 @@ export class Models extends Cell<typeof Models_Json> {
 		// Add custom decoder for the items property,
 		// which also prevents it from automatically overwriting our collection
 		this.decoders = {
-			// TODO @many maybe infer or create a helper for this, duplicated many places
+			// TODO @many improve this API, maybe infer or create a helper, duplicated many places
 			items: (items) => {
 				if (Array.isArray(items)) {
 					this.items.clear();
@@ -84,12 +81,12 @@ export class Models extends Cell<typeof Models_Json> {
 	}
 
 	add(model_json: Model_Json): void {
-		const model = new Model({zzz: this.zzz, json: model_json});
+		const model = new Model({app: this.app, json: model_json});
 		this.items.add(model);
 	}
 
 	add_many(models_json: Array<Model_Json>): void {
-		const models = models_json.map((json) => new Model({zzz: this.zzz, json}));
+		const models = models_json.map((json) => new Model({app: this.app, json}));
 		this.items.add_many(models);
 	}
 

@@ -7,10 +7,10 @@ import type {Omit_Strict} from '@ryanatkn/belt/types.js';
 import {estimate_token_count} from '$lib/helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Uuid} from '$lib/zod_helpers.js';
-import {Xml_Attribute} from '$lib/xml.js';
+import {Xml_Attribute_With_Defaults} from '$lib/xml.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import type {Diskfile} from '$lib/diskfile.svelte.js';
-import type {Zzz} from '$lib/zzz.svelte.js';
+import type {Frontend} from '$lib/frontend.svelte.js';
 import {Diskfile_Path} from '$lib/diskfile_types.js';
 import {CONTENT_PREVIEW_LENGTH} from '$lib/constants.js';
 
@@ -22,7 +22,7 @@ export const Bit_Json_Base = Cell_Json.extend({
 	end: z.number().nullable().default(null),
 	has_xml_tag: z.boolean().default(false),
 	xml_tag_name: z.string().default(''), // TODO @many move to the prompt somewhere
-	attributes: z.array(Xml_Attribute).default(() => []), // TODO @many move to the prompt somewhere
+	attributes: z.array(Xml_Attribute_With_Defaults).default(() => []), // TODO @many move to the prompt somewhere
 	enabled: z.boolean().default(true),
 	title: z.string().nullable().default(null),
 	summary: z.string().nullable().default(null),
@@ -64,8 +64,9 @@ export const Bit_Json = z.discriminatedUnion('type', [
 export type Bit_Json = z.infer<typeof Bit_Json>;
 export type Bit_Json_Input = z.input<typeof Bit_Json>;
 
-// Define a type union of all concrete bit classes
+/** Type union of all concrete bit classes.  */
 export type Bit_Type = Text_Bit | Diskfile_Bit | Sequence_Bit;
+/** Type union of all concrete bit json types.  */
 export type Bit_Json_Type = Text_Bit_Json | Diskfile_Bit_Json | Sequence_Bit_Json;
 
 // Base options interface - fixed to properly constrain the type parameter
@@ -108,7 +109,7 @@ export abstract class Bit<T extends z.ZodType = typeof Bit_Json_Base> extends Ce
 	name: string = $state()!;
 	has_xml_tag: boolean = $state()!;
 	xml_tag_name: string = $state()!;
-	attributes: Array<Xml_Attribute> = $state()!;
+	attributes: Array<Xml_Attribute_With_Defaults> = $state()!;
 	enabled: boolean = $state()!;
 	title: string | null = $state()!;
 	summary: string | null = $state()!;
@@ -117,14 +118,17 @@ export abstract class Bit<T extends z.ZodType = typeof Bit_Json_Base> extends Ce
 		this.type === 'diskfile' ? 'File' : 'Fragment',
 	);
 
-	add_attribute(partial: z.input<typeof Xml_Attribute> = EMPTY_OBJECT): void {
-		this.attributes.push(Xml_Attribute.parse(partial));
+	add_attribute(partial: z.input<typeof Xml_Attribute_With_Defaults> = EMPTY_OBJECT): void {
+		this.attributes.push(Xml_Attribute_With_Defaults.parse(partial));
 	}
 
 	/**
 	 * @returns `true` if the attribute was updated, `false` if the attribute was not found
 	 */
-	update_attribute(id: Uuid, updates: Partial<Omit_Strict<Xml_Attribute, 'id'>>): boolean {
+	update_attribute(
+		id: Uuid,
+		updates: Partial<Omit_Strict<Xml_Attribute_With_Defaults, 'id'>>,
+	): boolean {
 		// Find the attribute by id
 		const index = this.attributes.findIndex((a) => a.id === id);
 		if (index === -1) return false;
@@ -165,32 +169,32 @@ export abstract class Bit<T extends z.ZodType = typeof Bit_Json_Base> extends Ce
 	 * 2. Default values
 	 * 3. Construction of the appropriate bit subclass via the registry
 	 */
-	static create(zzz: Zzz, json: Text_Bit_Json_Input, options?: Text_Bit_Options): Text_Bit;
+	static create(app: Frontend, json: Text_Bit_Json_Input, options?: Text_Bit_Options): Text_Bit;
 	static create(
-		zzz: Zzz,
+		app: Frontend,
 		json: Diskfile_Bit_Json_Input,
 		options?: Diskfile_Bit_Options,
 	): Diskfile_Bit;
 	static create(
-		zzz: Zzz,
+		app: Frontend,
 		json: Sequence_Bit_Json_Input,
 		options?: Sequence_Bit_Options,
 	): Sequence_Bit;
-	static create(zzz: Zzz, json: Bit_Json_Input, options?: Bit_Type_Options): Bit_Type;
-	static create(zzz: Zzz, json: Bit_Json_Input, options?: Bit_Type_Options): Bit_Type {
+	static create(app: Frontend, json: Bit_Json_Input, options?: Bit_Type_Options): Bit_Type;
+	static create(app: Frontend, json: Bit_Json_Input, options?: Bit_Type_Options): Bit_Type {
 		if (!json.type) {
-			throw Error('Missing required "type" field in bit JSON');
+			throw new Error('Missing required "type" field in bit JSON');
 		}
 
 		// Create the appropriate bit class based on type using the registry
 		// Throws if the class isn't registered.
 		switch (json.type) {
 			case 'text':
-				return new Text_Bit({...options, zzz, json});
+				return new Text_Bit({...options, app, json});
 			case 'diskfile':
-				return new Diskfile_Bit({...options, zzz, json});
+				return new Diskfile_Bit({...options, app, json});
 			case 'sequence':
-				return new Sequence_Bit({...options, zzz, json});
+				return new Sequence_Bit({...options, app, json});
 			default:
 				throw new Unreachable_Error(json.type);
 		}
@@ -239,7 +243,7 @@ export class Diskfile_Bit extends Bit<typeof Diskfile_Bit_Json> {
 		if (value === null) return;
 
 		// Update the path attribute when the path changes
-		const diskfile = this.zzz.diskfiles.get_by_path(value);
+		const diskfile = this.app.diskfiles.get_by_path(value);
 		const relative_path = diskfile?.path_relative;
 
 		if (!relative_path) return;
@@ -265,7 +269,7 @@ export class Diskfile_Bit extends Bit<typeof Diskfile_Bit_Json> {
 	#editor_state: {current_content: string} | null = $state(null); // TODO @many this initialization is awkward, ideally becomes refactored to mostly derived
 
 	readonly diskfile: Diskfile | null | undefined = $derived(
-		this.path && this.zzz.diskfiles.get_by_path(this.path),
+		this.path && this.app.diskfiles.get_by_path(this.path),
 	);
 
 	// The current relative path value for display in the XML path attribute
@@ -283,7 +287,7 @@ export class Diskfile_Bit extends Bit<typeof Diskfile_Bit_Json> {
 		}
 
 		if (this.path) {
-			this.zzz.diskfiles.update(this.path, value);
+			this.app.diskfiles.update(this.path, value);
 		}
 	}
 
@@ -313,7 +317,7 @@ export class Sequence_Bit extends Bit<typeof Sequence_Bit_Json> {
 
 	readonly bits: Array<Bit_Type> = $derived(
 		this.items
-			.map((id) => this.zzz.bits.items.by_id.get(id))
+			.map((id) => this.app.bits.items.by_id.get(id))
 			.filter((bit): bit is Bit_Type => !!bit),
 	);
 

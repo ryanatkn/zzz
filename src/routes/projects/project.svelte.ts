@@ -1,3 +1,5 @@
+// @slop claude_opus_4
+
 import {z} from 'zod';
 import type {Array_Element} from '@ryanatkn/belt/types.js';
 
@@ -30,7 +32,7 @@ export class Project extends Cell<typeof Project_Json> {
 		this.decoders = {
 			pages: (pages_data) => {
 				if (Array.isArray(pages_data)) {
-					this.pages = pages_data.map((page_data) => new Page({zzz: this.zzz, json: page_data}));
+					this.pages = pages_data.map((page_data) => new Page({app: this.app, json: page_data}));
 					return HANDLED;
 				}
 				return undefined;
@@ -38,7 +40,7 @@ export class Project extends Cell<typeof Project_Json> {
 			domains: (domains_data) => {
 				if (Array.isArray(domains_data)) {
 					this.domains = domains_data.map(
-						(domain_data) => new Domain({zzz: this.zzz, json: domain_data}),
+						(domain_data) => new Domain({app: this.app, json: domain_data}),
 					);
 					return HANDLED;
 				}
@@ -46,7 +48,7 @@ export class Project extends Cell<typeof Project_Json> {
 			},
 			repos: (repos_data) => {
 				if (Array.isArray(repos_data)) {
-					this.repos = repos_data.map((repo_data) => new Repo({zzz: this.zzz, json: repo_data}));
+					this.repos = repos_data.map((repo_data) => new Repo({app: this.app, json: repo_data}));
 					return HANDLED;
 				}
 				return undefined;

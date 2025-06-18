@@ -7,7 +7,7 @@
 
 	import {Bit} from '$lib/bit.svelte.js';
 	import type {Prompt} from '$lib/prompt.svelte.js';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/frontend.svelte.js';
 	import {
 		GLYPH_BIT,
 		GLYPH_DELETE,
@@ -26,7 +26,7 @@
 
 	const {prompt, ...rest}: Props = $props();
 
-	const zzz = zzz_context.get();
+	const app = zzz_context.get();
 
 	let show_diskfile_picker = $state(false);
 </script>
@@ -48,7 +48,7 @@
 			<Contextmenu_Entry
 				run={() => {
 					prompt.add_bit(
-						Bit.create(zzz, {
+						Bit.create(app, {
 							type: 'text',
 							content: '',
 						}),
@@ -61,7 +61,7 @@
 			<Contextmenu_Entry
 				run={() => {
 					// Get all available files
-					if (!zzz.diskfiles.items.size) {
+					if (!app.diskfiles.items.size) {
 						alert('No files available. Add files first.'); // eslint-disable-line no-alert
 						return;
 					}
@@ -75,7 +75,7 @@
 			<Contextmenu_Entry
 				run={() => {
 					prompt.add_bit(
-						Bit.create(zzz, {
+						Bit.create(app, {
 							type: 'sequence',
 						}),
 					);
@@ -105,7 +105,7 @@
 					// TODO @many better confirmation
 					// eslint-disable-next-line no-alert
 					if (confirm(`Are you sure you want to delete prompt "${prompt.name}"?`)) {
-						zzz.prompts.remove(prompt);
+						app.prompts.remove(prompt);
 					}
 				}}
 			>
@@ -122,7 +122,7 @@
 		if (!diskfile) return false;
 
 		prompt.add_bit(
-			Bit.create(zzz, {
+			Bit.create(app, {
 				type: 'diskfile',
 				path: diskfile.path,
 			}),

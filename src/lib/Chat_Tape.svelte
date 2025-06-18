@@ -57,7 +57,7 @@
 				</div>
 				<small
 					><Provider_Link
-						provider={tape.zzz.providers.find_by_name(tape.model.provider_name)}
+						provider={tape.app.providers.find_by_name(tape.model.provider_name)}
 						icon="glyph"
 						show_name
 					/></small

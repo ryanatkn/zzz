@@ -24,7 +24,7 @@
 			style: 'min-height: 0;',
 		}}
 	>
-		<div>
+		<div class="ellipsis">
 			<Glyph attrs={{class: 'mr_xs2'}} glyph={GLYPH_CHAT} />
 			<span>{chat.name}</span>
 		</div>

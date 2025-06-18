@@ -5,7 +5,7 @@
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
 	import {PUBLIC_WEBSOCKET_URL} from '$env/static/public';
 
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/frontend.svelte.js';
 	import type {Socket} from '$lib/socket.svelte.js';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Glyph from '$lib/Glyph.svelte';
@@ -33,9 +33,9 @@
 	const {socket: socket_prop}: Props = $props();
 
 	// Get socket from props or context
-	const zzz = zzz_context.get();
-	const socket = $derived(socket_prop || zzz.socket);
-	const {capabilities} = zzz;
+	const app = zzz_context.get();
+	const socket = $derived(socket_prop || app.socket);
+	const {capabilities} = app;
 
 	// Track URL state for reset/undo functionality
 	let previous_url = $state('');
@@ -90,16 +90,14 @@
 				class:color_h={capabilities.websocket.status === 'success' && !socket.connected}
 			>
 				<div class="column justify_content_center gap_xs pl_md" style:min-height="80px">
-					websocket {socket.connected
-						? 'connected'
-						: socket.status === 'pending'
-							? 'connecting'
-							: 'disconnected'}
-					{#if capabilities.has_pending_pings}
-						<span class="font_family_mono"
-							>(pending pings: {capabilities.pending_ping_count}) <Pending_Animation /></span
-						>
-					{/if}
+					<span
+						>websocket {socket.connected
+							? 'connected'
+							: socket.status === 'pending'
+								? 'connecting'
+								: 'disconnected'}{#if socket.status === 'pending'}
+							<Pending_Animation inline attrs={{class: 'ml_sm'}} />{/if}</span
+					>
 					<small class="font_family_mono"
 						>{#if socket.url}{socket.url}{:else}&nbsp;{/if}</small
 					>

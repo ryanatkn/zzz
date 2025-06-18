@@ -8,21 +8,24 @@ import {
 	type Datetime,
 	get_datetime_now,
 } from '$lib/zod_helpers.js';
-import type {Zzz} from '$lib/zzz.svelte.js';
+import type {Frontend} from '$lib/frontend.svelte.js';
 import {
 	get_schema_class_info,
 	type Schema_Class_Info,
 	HANDLED,
 	FILE_SHORT_DATE_FORMAT,
-	FILE_DATE_FORMAT,
+	FILE_DATETIME_FORMAT,
 	FILE_TIME_FORMAT,
 	type Cell_Value_Decoder,
 } from '$lib/cell_helpers.js';
 import type {Schema_Keys, Cell_Json, Cell_Json_Input} from '$lib/cell_types.js';
 
-// Base options type that all cells will extend
+/**
+ * Any options besides these declared ones are ignored,
+ * so they're safe to forward when subclassing without needing to extract the rest options.
+ */
 export interface Cell_Options<T_Schema extends z.ZodType> {
-	zzz: Zzz; // TODO needs to be generic
+	app: Frontend; // TODO needs to be generic
 	json?: z.input<T_Schema>;
 }
 
@@ -100,7 +103,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	);
 
 	// TODO needs to be generic so users can extend it
-	readonly zzz: Zzz;
+	readonly app: Frontend;
 
 	/**
 	 * Type-safe decoders for custom field decoding.
@@ -118,7 +121,9 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	readonly created_formatted_short_date: string = $derived(
 		format(this.created_date, FILE_SHORT_DATE_FORMAT),
 	);
-	readonly created_formatted_date: string = $derived(format(this.created_date, FILE_DATE_FORMAT));
+	readonly created_formatted_datetime: string = $derived(
+		format(this.created_date, FILE_DATETIME_FORMAT),
+	);
 	readonly created_formatted_time: string = $derived(format(this.created_date, FILE_TIME_FORMAT));
 
 	readonly updated_date: Date | null = $derived(this.updated ? new Date(this.updated) : null);
@@ -126,7 +131,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 		this.updated_date ? format(this.updated_date, FILE_SHORT_DATE_FORMAT) : null,
 	);
 	readonly updated_formatted_date: string | null = $derived(
-		this.updated_date ? format(this.updated_date, FILE_DATE_FORMAT) : null,
+		this.updated_date ? format(this.updated_date, FILE_DATETIME_FORMAT) : null,
 	);
 	readonly updated_formatted_time: string | null = $derived(
 		this.updated_date ? format(this.updated_date, FILE_TIME_FORMAT) : null,
@@ -137,7 +142,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 
 	constructor(schema: T_Schema, options: Cell_Options<T_Schema>) {
 		this.schema = schema;
-		this.zzz = options.zzz;
+		this.app = options.app;
 		this.#initial_json = options.json;
 
 		// Don't auto-initialize here - wait for subclass to call init()
@@ -167,6 +172,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 		this.register();
 	}
 
+	// TODO handle disposing a subtree?
 	/**
 	 * Clean up resources when this cell is no longer needed.
 	 * Should be called before the cell is discarded.
@@ -188,7 +194,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 			return;
 		}
 
-		this.zzz.cells.set(this.id, this as any); // TODO refactor to avoid casting?
+		this.app.cell_registry.add_cell(this);
 		this.#registered = true;
 	}
 
@@ -199,7 +205,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	protected unregister(): void {
 		if (!this.#registered) return;
 
-		this.zzz.cells.delete(this.id);
+		this.app.cell_registry.remove_cell(this.id);
 		this.#registered = false;
 	}
 
@@ -447,12 +453,12 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 		try {
 			return new constructor({
 				...options,
-				zzz: this.zzz,
+				app: this.app,
 				json: structuredClone(json ? {...current_json, ...json} : current_json),
 			});
 		} catch (error) {
 			console.error(`Failed to clone instance of ${constructor.name}:`, error);
-			throw Error(`Failed to clone: ${error instanceof Error ? error.message : String(error)}`);
+			throw new Error(`Failed to clone: ${error instanceof Error ? error.message : String(error)}`);
 		}
 	}
 
@@ -462,7 +468,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 			return null;
 		}
 
-		const instance = this.zzz.registry.maybe_instantiate(class_name as any, json, options);
+		const instance = this.app.cell_registry.maybe_instantiate(class_name as any, json, options);
 		if (!instance) console.error(`Failed to instantiate ${class_name}`);
 		return instance;
 	}

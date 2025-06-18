@@ -4,7 +4,7 @@
 	import Dialog from '@ryanatkn/fuz/Dialog.svelte';
 
 	import Picker_Dialog from '$lib/Picker_Dialog.svelte';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/frontend.svelte.js';
 	import type {Prompt} from '$lib/prompt.svelte.js';
 	import Prompt_Summary from '$lib/Prompt_Summary.svelte';
 	import type {Uuid} from '$lib/zod_helpers.js';
@@ -28,8 +28,8 @@
 		dialog_props,
 	}: Props = $props();
 
-	const zzz = zzz_context.get();
-	const {prompts} = zzz;
+	const app = zzz_context.get();
+	const {prompts} = app;
 </script>
 
 {#if show}

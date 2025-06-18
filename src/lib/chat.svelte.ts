@@ -36,7 +36,7 @@ export class Chat extends Cell<typeof Chat_Json> {
 	// TODO look into using an index for this, incremental from `this.tape_ids`
 	readonly tapes: Array<Tape> = $derived.by(() => {
 		const result: Array<Tape> = [];
-		const {by_id} = this.zzz.tapes.items;
+		const {by_id} = this.app.tapes.items;
 
 		for (const id of this.tape_ids) {
 			const tape = by_id.get(id);
@@ -58,13 +58,13 @@ export class Chat extends Cell<typeof Chat_Json> {
 	}
 
 	add_tape(model: Model): void {
-		const tape = new Tape({zzz: this.zzz, json: {model_name: model.name}});
-		this.zzz.tapes.add_tape(tape);
+		const tape = new Tape({app: this.app, json: {model_name: model.name}});
+		this.app.tapes.add_tape(tape);
 		this.tape_ids.push(tape.id);
 	}
 
 	add_tapes_by_model_tag(tag: string): void {
-		for (const model of this.zzz.models.filter_by_tag(tag)) {
+		for (const model of this.app.models.filter_by_tag(tag)) {
 			this.add_tape(model);
 		}
 	}
@@ -127,11 +127,11 @@ export class Chat extends Cell<typeof Chat_Json> {
 
 		try {
 			// TODO configure this utility LLM (roles?), and set the output token count from config as well
-			const name_response = await this.zzz.send_prompt(
+			const name_response = await this.app.submit_completion(
 				p,
 				// TODO @many hacky, rework the bots interface (currently just copies over the config) - the provider should be on the model object, but should models be able to have multiple providers, or do they need unique names? and another field for canonical model name?
-				this.zzz.models.find_by_name(this.zzz.bots.namerbot)!.provider_name,
-				this.zzz.bots.namerbot,
+				this.app.models.find_by_name(this.app.bots.namerbot)!.provider_name,
+				this.app.bots.namerbot,
 			);
 			const {completion_response} = name_response;
 
@@ -145,11 +145,11 @@ export class Chat extends Cell<typeof Chat_Json> {
 
 			this.init_name_status = 'success';
 			if (response_text !== this.name) {
-				this.name = get_unique_name(response_text, this.zzz.chats.items_by_name);
+				this.name = get_unique_name(response_text, this.app.chats.items_by_name);
 			}
-		} catch (err) {
+		} catch (error) {
 			this.init_name_status = 'initial'; // ignore failures, will retry
-			console.error('failed to infer a name for a chat', err);
+			console.error('failed to infer a name for a chat', error);
 		}
 	}
 

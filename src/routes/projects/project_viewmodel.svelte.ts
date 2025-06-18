@@ -1,3 +1,5 @@
+// @slop claude_opus_4
+
 import {z} from 'zod';
 import {goto} from '$app/navigation';
 import {base} from '$app/paths';
@@ -127,7 +129,7 @@ export class Project_Viewmodel {
 		const created = get_datetime_now();
 
 		const page = new Page({
-			zzz: this.projects.zzz,
+			app: this.projects.app,
 			json: {
 				id: page_id,
 				title: unique_title,
@@ -152,14 +154,14 @@ export class Project_Viewmodel {
 		const created = get_datetime_now();
 
 		const domain = new Domain({
-			zzz: this.projects.zzz,
+			app: this.projects.app,
 			json: {
 				id: domain_id,
+				created,
+				updated: created,
 				name: '',
 				status: 'pending',
 				ssl: false,
-				created,
-				updated: created,
 			},
 		});
 
@@ -177,7 +179,7 @@ export class Project_Viewmodel {
 
 		// Create a new repo
 		const repo = new Repo({
-			zzz: this.projects.zzz,
+			app: this.projects.app,
 			// TODO parse with schema
 			json: {
 				id: repo_id,

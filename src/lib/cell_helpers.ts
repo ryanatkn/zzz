@@ -1,13 +1,13 @@
 import {z} from 'zod';
 import {DEV} from 'esm-env';
-import {unwrap_schema, get_inner_array_schema} from '$lib/zod_helpers.js';
+import {get_inner_array_schema, get_innermost_type} from '$lib/zod_helpers.js';
 
 /** Sentinel value to indicate a parser has completely handled a property */
 export const HANDLED = Symbol('HANDLED_BY_PARSER');
 
 // Constants for date formatting
 export const FILE_SHORT_DATE_FORMAT = 'MMM d, p';
-export const FILE_DATE_FORMAT = 'MMM d, yyyy h:mm:ss a';
+export const FILE_DATETIME_FORMAT = 'MMM d, yyyy h:mm:ss a';
 export const FILE_TIME_FORMAT = 'HH:mm:ss';
 
 // Metadata properties for Zod schemas.
@@ -99,7 +99,7 @@ export const get_schema_class_info = (
 	if (!schema) return null;
 
 	// Unwrap to get the core schema
-	const unwrapped = unwrap_schema(schema);
+	const unwrapped = get_innermost_type(schema);
 
 	// Handle ZodArray
 	if (unwrapped instanceof z.ZodArray) {

@@ -1,3 +1,5 @@
+// @slop claude_opus_4
+
 import type {Action} from 'svelte/action';
 import {on} from 'svelte/events';
 
@@ -81,16 +83,4 @@ export class Scrollable {
 			},
 		};
 	};
-
-	/**
-	 * Updates the parameters of the scrolled instance.
-	 */
-	update(params: Scrollable_Parameters): void {
-		if (params.target_class !== undefined) {
-			this.target_class = params.target_class;
-		}
-		if (params.threshold !== undefined) {
-			this.threshold = params.threshold;
-		}
-	}
 }

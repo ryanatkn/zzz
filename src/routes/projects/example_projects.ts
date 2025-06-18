@@ -1,11 +1,11 @@
 import {create_uuid} from '$lib/zod_helpers.js';
-import type {Zzz} from '$lib/zzz.svelte.js';
+import type {Frontend} from '$lib/frontend.svelte.js';
 import {Project} from '$routes/projects/project.svelte.js';
 
-export const create_sample_projects = (zzz: Zzz): Array<Project> => {
+export const create_sample_projects = (app: Frontend): Array<Project> => {
 	return [
 		new Project({
-			zzz,
+			app,
 			json: {
 				id: create_uuid(),
 				name: 'Zzz',
@@ -67,7 +67,7 @@ export const create_sample_projects = (zzz: Zzz): Array<Project> => {
 			},
 		}),
 		new Project({
-			zzz,
+			app,
 			json: {
 				id: create_uuid(),
 				name: 'Dealt',
@@ -135,7 +135,7 @@ export const create_sample_projects = (zzz: Zzz): Array<Project> => {
 			},
 		}),
 		new Project({
-			zzz,
+			app,
 			json: {
 				id: create_uuid(),
 				name: 'cosmicplayground',

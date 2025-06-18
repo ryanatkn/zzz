@@ -1,30 +1,32 @@
 <script lang="ts">
 	import type {Snippet} from 'svelte';
 
-	import {Zzz, zzz_context} from '$lib/zzz.svelte.js';
+	import {Frontend, zzz_context} from '$lib/frontend.svelte.js';
 	import Dashboard from '$lib/Dashboard.svelte';
 	import Main_Dialog from '$lib/Main_Dialog.svelte';
 
+	// TODO maybe just make this `Zzz`?
+
 	/*
 
-	Sets `zzz` in context.
+	Sets `app` in context.
 
 	*/
 
 	interface Props {
-		zzz: Zzz;
-		children: Snippet<[zzz: Zzz]>;
+		app: Frontend;
+		children: Snippet<[zzz: Frontend]>;
 	}
 
-	const {zzz, children}: Props = $props();
+	const {app, children}: Props = $props();
 
-	zzz_context.set(zzz);
+	zzz_context.set(app);
 </script>
 
 <Main_Dialog />
 <!-- TODO user-defined pages should be able to control the full page at runtime -->
 <Dashboard>
 	<div class="h_100 overflow_auto">
-		{@render children(zzz)}
+		{@render children(app)}
 	</div>
 </Dashboard>

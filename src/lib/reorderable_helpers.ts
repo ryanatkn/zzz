@@ -1,3 +1,5 @@
+// @slop claude_opus_4
+
 import type {
 	Reorderable_Direction,
 	Reorderable_Valid_Drop_Position,

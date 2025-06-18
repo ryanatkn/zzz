@@ -453,9 +453,6 @@ a.chip {
 .p_xs4 {
 	padding: var(--space_xs4);
 }
-.p_xs2 {
-	padding: var(--space_xs2);
-}
 .p_xs {
 	padding: var(--space_xs);
 }
@@ -494,9 +491,6 @@ a.chip {
 }
 .pb_0 {
 	padding-bottom: 0;
-}
-.pb_md {
-	padding-bottom: var(--space_md);
 }
 .pb_xl3 {
 	padding-bottom: var(--space_xl3);
@@ -611,9 +605,6 @@ a.chip {
 }
 .mb_xs3 {
 	margin-bottom: var(--space_xs3);
-}
-.mb_xs2 {
-	margin-bottom: var(--space_xs2);
 }
 .mb_xs {
 	margin-bottom: var(--space_xs);

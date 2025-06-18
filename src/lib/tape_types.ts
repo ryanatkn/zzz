@@ -3,7 +3,7 @@ import {z} from 'zod';
 import {Model_Name} from '$lib/model.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import {cell_array} from '$lib/cell_helpers.js';
-import {Strip_Json} from '$lib/strip.svelte.js';
+import {Strip_Json} from '$lib/strip_types.js';
 
 // TODO BLOCK add tape name and make it editable
 export const Tape_Json = Cell_Json.extend({

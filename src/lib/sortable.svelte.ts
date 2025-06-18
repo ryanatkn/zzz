@@ -1,3 +1,5 @@
+// @slop claude_opus_4
+
 import type {Thunk} from '@ryanatkn/belt/function.js';
 import type {Cell} from '$lib/cell.svelte.js';
 

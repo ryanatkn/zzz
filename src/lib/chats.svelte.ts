@@ -13,23 +13,18 @@ import {get_unique_name} from '$lib/helpers.js';
 import {to_chats_url} from '$lib/nav_helpers.js';
 import {chat_template_defaults} from '$lib/config_defaults.js';
 import type {Chat_Template} from '$lib/chat_template.js';
+import {Cell_Json} from '$lib/cell_types.js';
 
-export const Chats_Json = z
-	.object({
-		// First create the array, then apply default, then attach metadata
-		items: cell_array(
-			z.array(Chat_Json).default(() => []),
-			'Chat',
-		),
-		selected_id: z.string().nullable().default(null),
-		selected_id_last_non_null: z.string().nullable().default(null),
-		show_sort_controls: z.boolean().default(false),
-	})
-	.default(() => ({
-		items: [],
-		selected_id: null,
-		show_sort_controls: false,
-	}));
+export const Chats_Json = Cell_Json.extend({
+	// First create the array, then apply default, then attach metadata
+	items: cell_array(
+		z.array(Chat_Json).default(() => []),
+		'Chat',
+	),
+	selected_id: z.string().nullable().default(null),
+	selected_id_last_non_null: z.string().nullable().default(null),
+	show_sort_controls: z.boolean().default(false),
+});
 export type Chats_Json = z.infer<typeof Chats_Json>;
 export type Chats_Json_Input = z.input<typeof Chats_Json>;
 
@@ -82,7 +77,7 @@ export class Chats extends Cell<typeof Chats_Json> {
 		super(Chats_Json, options);
 
 		this.decoders = {
-			// TODO @many maybe infer or create a helper for this, duplicated many places
+			// TODO @many improve this API, maybe infer or create a helper, duplicated many places
 			items: (items) => {
 				if (Array.isArray(items)) {
 					this.items.clear();
@@ -100,7 +95,7 @@ export class Chats extends Cell<typeof Chats_Json> {
 
 	add(json?: Chat_Json_Input, select?: boolean): Chat {
 		const j = !json?.name ? {...json, name: this.generate_unique_name('new chat')} : json;
-		const chat = new Chat({zzz: this.zzz, json: j});
+		const chat = new Chat({app: this.app, json: j});
 		return this.add_chat(chat, select);
 	}
 
@@ -117,7 +112,7 @@ export class Chats extends Cell<typeof Chats_Json> {
 	}
 
 	add_many(chats_json: Array<Chat_Json_Input>, select?: boolean | number): Array<Chat> {
-		const chats = chats_json.map((json) => new Chat({zzz: this.zzz, json}));
+		const chats = chats_json.map((json) => new Chat({app: this.app, json}));
 		this.items.add_many(chats);
 
 		// Select the first or the specified chat if none is currently selected

@@ -2,7 +2,7 @@
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
 
 	import type {Zzz_Dir} from '$lib/diskfile_types.js';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/frontend.svelte.js';
 
 	interface Props {
 		zzz_dir?: Zzz_Dir | null | undefined;
@@ -11,11 +11,11 @@
 	// Get props with default to context value
 	const {zzz_dir: zzz_dir_prop}: Props = $props();
 
-	const zzz = zzz_context.get();
-	const {capabilities} = zzz;
+	const app = zzz_context.get();
+	const {capabilities} = app;
 
 	// Fall back to the context value if not provided
-	const zzz_dir = $derived(zzz_dir_prop !== undefined ? zzz_dir_prop : zzz.zzz_dir);
+	const zzz_dir = $derived(zzz_dir_prop !== undefined ? zzz_dir_prop : app.zzz_cache_dir);
 </script>
 
 <div
@@ -45,7 +45,7 @@
 			{#if zzz_dir === undefined || zzz_dir === null}
 				&nbsp;
 			{:else if zzz_dir === ''}
-				No server directory configured
+				No backend directory configured
 			{:else}
 				{zzz_dir}
 			{/if}
@@ -54,14 +54,15 @@
 </div>
 
 <p>
-	This is the server's filesystem directory, the <code>zzz_dir</code>. It defaults to
-	<code>.zzz</code> in the server's current working directory. To configure it set the .env variable
+	This is the backend's filesystem directory, the <code>zzz_dir</code>. It defaults to
+	<code>.zzz</code> in the backend's current working directory. To configure it set the .env
+	variable
 	<code class="font_size_sm">PUBLIC_ZZZ_DIR</code>.
 </p>
 <p>
 	For security reasons, all filesystem operations are confined to this path's parent directory,
-	<small class="chip font_family_mono">{zzz.zzz_dir_parent || '[no zzz dir configured]'}</small>,
-	and the path cannot be modified after the server starts. These restrictions may be loosened in the
+	<small class="chip font_family_mono">{app.zzz_dir || '[no zzz dir configured]'}</small>, and the
+	path cannot be modified after the backend starts. These restrictions may be loosened in the
 	future, but they help ensure predictability when exposing sensitive resources like your local hard
 	drive to web scripts.
 </p>

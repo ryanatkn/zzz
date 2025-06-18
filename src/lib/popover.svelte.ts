@@ -1,3 +1,5 @@
+// @slop claude_opus_4
+
 import type {Action} from 'svelte/action';
 import type {Snippet} from 'svelte';
 import {on} from 'svelte/events';
@@ -50,7 +52,7 @@ export type Transition_Function = (node: HTMLElement) => TransitionConfig | {des
  */
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface Popover_Content_Parameters extends Popover_Parameters {
-	// Container reference is now managed internally through the container action
+	// Container reference is managed internally through the container action
 }
 
 /**
@@ -231,11 +233,11 @@ export class Popover {
 	/**
 	 * Toggles the popover visibility.
 	 */
-	toggle(): void {
-		if (this.visible) {
-			this.hide();
-		} else {
+	toggle(visible = !this.visible): void {
+		if (visible) {
 			this.show();
+		} else {
+			this.hide();
 		}
 	}
 

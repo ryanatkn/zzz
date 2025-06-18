@@ -1,29 +1,25 @@
 import {z} from 'zod';
+import {strip_start} from '@ryanatkn/belt/string.js';
 
-import type {Action_Filer_Change} from '$lib/action_types.js';
-import {create_uuid, get_datetime_now, Uuid} from '$lib/zod_helpers.js';
+import {get_datetime_now, Uuid} from '$lib/zod_helpers.js';
 import {Diskfile, Diskfile_Schema} from '$lib/diskfile.svelte.js';
 import {Diskfile_Json, Diskfile_Path} from '$lib/diskfile_types.js';
 import {source_file_to_diskfile_json} from '$lib/diskfile_helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
-import {strip_start} from '@ryanatkn/belt/string.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {create_single_index, create_multi_index} from '$lib/indexed_collection_helpers.js';
 import {Diskfiles_Editor} from '$lib/diskfiles_editor.svelte.js';
+import {Cell_Json} from '$lib/cell_types.js';
+import type {Action_Inputs} from '$lib/action_collections.js';
 
-export const Diskfiles_Json = z
-	.object({
-		diskfiles: cell_array(
-			z.array(Diskfile_Json).default(() => []),
-			'Diskfile',
-		),
-		selected_file_id: Uuid.nullable().default(null),
-	})
-	.default(() => ({
-		diskfiles: [],
-		selected_file_id: null,
-	}));
+export const Diskfiles_Json = Cell_Json.extend({
+	diskfiles: cell_array(
+		z.array(Diskfile_Json).default(() => []),
+		'Diskfile',
+	),
+	selected_file_id: Uuid.nullable().default(null),
+});
 export type Diskfiles_Json = z.infer<typeof Diskfiles_Json>;
 export type Diskfiles_Json_Input = z.input<typeof Diskfiles_Json>;
 
@@ -64,7 +60,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 		super(Diskfiles_Json, options);
 
 		// Create the editor instance
-		this.editor = new Diskfiles_Editor(this.zzz);
+		this.editor = new Diskfiles_Editor(this.app);
 
 		this.decoders = {
 			diskfiles: (diskfiles) => {
@@ -81,10 +77,10 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 		this.init();
 	}
 
-	handle_change(action: Action_Filer_Change): void {
-		const validated_source_file = action.source_file;
+	handle_change(params: Action_Inputs['filer_change']): void {
+		const validated_source_file = params.source_file;
 
-		switch (action.change.type) {
+		switch (params.change.type) {
 			case 'add': {
 				this.add(source_file_to_diskfile_json(validated_source_file));
 				break;
@@ -124,7 +120,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 	}
 
 	add(json: Diskfile_Json): Diskfile {
-		const diskfile = new Diskfile({zzz: this.zzz, json});
+		const diskfile = new Diskfile({app: this.app, json});
 		this.items.add(diskfile);
 
 		// If no file is selected, select this one
@@ -135,57 +131,44 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 		return diskfile;
 	}
 
-	update(path: Diskfile_Path, content: string): void {
-		this.zzz.actions.send({
-			id: create_uuid(),
-			type: 'update_diskfile',
-			path,
-			content,
-		});
+	async update(path: Diskfile_Path, content: string): Promise<void> {
+		await this.app.api.update_diskfile({path, content});
 	}
 
-	delete(path: Diskfile_Path): void {
-		this.zzz.actions.send({
-			id: create_uuid(),
-			type: 'delete_diskfile',
-			path,
-		});
+	async delete(path: Diskfile_Path): Promise<void> {
+		await this.app.api.delete_diskfile({path});
 	}
 
-	create_file(filename: string, content: string = ''): void {
-		if (!this.zzz.zzz_dir) {
-			throw Error('Cannot create file: zzz_dir is not set');
+	async create_file(filename: string, content: string = ''): Promise<void> {
+		if (!this.app.zzz_cache_dir) {
+			throw new Error('Cannot create file: zzz_dir is not set');
 		}
 
 		// Create full path by joining zzz_dir with the filename
-		const path = Diskfile_Path.parse(`${this.zzz.zzz_dir}${filename}`);
+		const path = Diskfile_Path.parse(`${this.app.zzz_cache_dir}${filename}`);
 
 		// Reuse the update method which creates or updates files
-		this.update(path, content);
+		await this.update(path, content);
 	}
 
-	create_directory(dirname: string): void {
-		if (!this.zzz.zzz_dir) {
-			throw Error('Cannot create directory: zzz_dir is not set');
+	async create_directory(dirname: string): Promise<void> {
+		if (!this.app.zzz_cache_dir) {
+			throw new Error('Cannot create directory: zzz_dir is not set');
 		}
 
 		// Create full path by joining zzz_dir with the directory name
-		const path = Diskfile_Path.parse(`${this.zzz.zzz_dir}${dirname}`);
+		const path = Diskfile_Path.parse(`${this.app.zzz_cache_dir}${dirname}`);
 
-		this.zzz.actions.send({
-			id: create_uuid(),
-			type: 'create_directory',
-			path,
-		});
+		await this.app.api.create_directory({path});
 	}
 
 	get_by_path(path: Diskfile_Path): Diskfile | undefined {
 		return this.items.by_optional('by_path', path);
 	}
 
-	/** Like `zzz.zzz_dir`, `undefined` means uninitialized, `null` means loading, `''` means none */
+	/** Like `app.zzz_dir`, `undefined` means uninitialized, `null` means loading, `''` means none */
 	to_relative_path(path: string): string | null | undefined {
-		const {zzz_dir} = this.zzz;
+		const {zzz_cache_dir: zzz_dir} = this.app;
 		return zzz_dir && strip_start(path, zzz_dir);
 	}
 

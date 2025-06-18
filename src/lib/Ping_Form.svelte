@@ -3,8 +3,8 @@
 	import type {Snippet} from 'svelte';
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
 
-	import {zzz_context} from '$lib/zzz.svelte.js';
-	import {GLYPH_DIRECTION_CLIENT, GLYPH_DIRECTION_SERVER} from '$lib/glyphs.js';
+	import {zzz_context} from '$lib/frontend.svelte.js';
+	import {GLYPH_ACTION_TYPE_REQUEST_RESPONSE} from '$lib/glyphs.js';
 	import {PING_HISTORY_MAX, type Ping_Data} from '$lib/capabilities.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
 
@@ -14,23 +14,20 @@
 
 	const {children}: Props = $props();
 
-	const zzz = zzz_context.get();
-	const {capabilities} = zzz;
+	const app = zzz_context.get();
+	const {capabilities} = app;
 
 	// Calculate placeholders to maintain consistent spacing
 	const remaining_placeholders = $derived(
 		Math.max(0, PING_HISTORY_MAX - capabilities.pings.length),
 	);
+
+	// TODO consider multiple buttons for each transport, so we can compare latency
 </script>
 
 <div class="column align_items_start gap_sm">
 	<div>
-		<button
-			type="button"
-			title="ping the server"
-			onclick={() => capabilities.send_ping()}
-			class="flex_1"
-		>
+		<button type="button" title="ping the server" onclick={() => app.api.ping()} class="flex_1">
 			{#if children}{@render children()}{:else}⚞{/if}
 			<div class="font_size_lg font_weight_400 pl_sm">ping the server</div>
 		</button>
@@ -66,8 +63,8 @@
 </div>
 
 {#snippet ping_item(ping: Ping_Data)}
-	<Glyph glyph={GLYPH_DIRECTION_CLIENT} /><Glyph
-		glyph={GLYPH_DIRECTION_SERVER}
+	<Glyph
+		glyph={GLYPH_ACTION_TYPE_REQUEST_RESPONSE}
 		attrs={{class: ping.completed ? '' : 'opacity_40'}}
 	/>
 	{#if !ping.completed}

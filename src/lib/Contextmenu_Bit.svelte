@@ -7,7 +7,7 @@
 	import Dialog from '@ryanatkn/fuz/Dialog.svelte';
 
 	import type {Bit_Type} from '$lib/bit.svelte.js';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/frontend.svelte.js';
 	import {GLYPH_BIT, GLYPH_DELETE, GLYPH_EDIT} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
 	import Contextmenu_Entry_Copy_To_Clipboard from '$lib/Contextmenu_Entry_Copy_To_Clipboard.svelte';
@@ -21,7 +21,7 @@
 
 	const {bit, ...rest}: Props = $props();
 
-	const zzz = zzz_context.get();
+	const app = zzz_context.get();
 
 	let show_editor = $state(false);
 </script>
@@ -55,7 +55,7 @@
 					// TODO @many better confirmation
 					// eslint-disable-next-line no-alert
 					if (confirm(`Are you sure you want to delete this bit "${bit.name || 'unnamed'}"?`)) {
-						zzz.bits.remove(bit.id);
+						app.bits.remove(bit.id);
 					}
 				}}
 			>

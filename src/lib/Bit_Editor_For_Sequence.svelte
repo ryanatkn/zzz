@@ -2,7 +2,7 @@
 	import type {Prompt} from '$lib/prompt.svelte.js';
 	import Bit_List from '$lib/Bit_List.svelte';
 	import Content_Preview from '$lib/Content_Preview.svelte';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/frontend.svelte.js';
 	import {Uuid} from '$lib/zod_helpers.js';
 	import type {Sequence_Bit} from '$lib/bit.svelte.js';
 	import {GLYPH_BIT} from '$lib/glyphs.js';
@@ -16,12 +16,12 @@
 
 	const {sequence_bit, prompt}: Props = $props();
 
-	const zzz = zzz_context.get();
+	const app = zzz_context.get();
 
 	// Available bits that can be added to the sequence (excluding self and already included bits)
 	const available_bits = $derived(
 		// TODO @many should `items.by_id.values()` be a derived even if often inefficient? still better than constructing it multiple times? or should this be an index?
-		Array.from(zzz.bits.items.by_id.values()).filter(
+		Array.from(app.bits.items.by_id.values()).filter(
 			(bit) => bit.id !== sequence_bit.id && !sequence_bit.items.includes(bit.id),
 		),
 	);

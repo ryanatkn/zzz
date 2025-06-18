@@ -1,7 +1,7 @@
 <script lang="ts">
 	import {untrack} from 'svelte';
 
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/frontend.svelte.js';
 	import Diskfile_Info from '$lib/Diskfile_Info.svelte';
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import Content_Editor from '$lib/Content_Editor.svelte';
@@ -21,10 +21,10 @@
 
 	const {diskfile, onmodified}: Props = $props();
 
-	const zzz = zzz_context.get();
+	const app = zzz_context.get();
 
-	// TODO @many refactor, maybe move a collection on `zzz.diskfiles`?
-	const editor_state = new Diskfile_Editor_State({zzz, diskfile});
+	// TODO @many refactor, maybe move a collection on `app.diskfiles`?
+	const editor_state = new Diskfile_Editor_State({app, diskfile});
 
 	// Reference to the content editor component
 	let content_editor: {focus: () => void} | undefined = $state();
@@ -54,6 +54,8 @@
 			}
 		});
 	});
+
+	// TODO BLOCK bug with `save changes` not correctly disabling after a save
 </script>
 
 <Contextmenu_Diskfile {diskfile}>
@@ -67,7 +69,7 @@
 				readonly={false}
 				attrs={{class: 'h_100 border_radius_0'}}
 				onsave={(value) => {
-					zzz.diskfiles.update(diskfile.path, value);
+					app.diskfiles.update(diskfile.path, value);
 				}}
 			/>
 		</div>

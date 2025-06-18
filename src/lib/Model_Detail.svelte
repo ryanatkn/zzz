@@ -7,7 +7,7 @@
 	import Provider_Link from '$lib/Provider_Link.svelte';
 	import type {Model} from '$lib/model.svelte.js';
 	import {GLYPH_MODEL} from '$lib/glyphs.js';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/frontend.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
 
 	interface Props {
@@ -17,10 +17,10 @@
 
 	const {model, attrs}: Props = $props();
 
-	const zzz = zzz_context.get();
+	const app = zzz_context.get();
 
 	const at_detail_page = $derived(page.url.pathname === `${base}/models/${model.name}`);
-	const provider = $derived(zzz.providers.find_by_name(model.provider_name));
+	const provider = $derived(app.providers.find_by_name(model.provider_name));
 </script>
 
 <div {...attrs} class="panel p_lg {attrs?.class}">

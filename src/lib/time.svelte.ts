@@ -5,7 +5,6 @@ import {BROWSER} from 'esm-env';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
 
-// Define minimal JSON schema for Time - no persistent state needed
 export const Time_Json = Cell_Json.extend({});
 export type Time_Json = z.infer<typeof Time_Json>;
 export type Time_Json_Input = z.input<typeof Time_Json>;
@@ -28,14 +27,17 @@ export interface Time_Options extends Cell_Options<typeof Time_Json> {
 }
 
 /**
- * Reactive time management class that provides time-related utilities
- * with configurable update interval to minimize unnecessary reactivity.
+ * Reactive time management class that provides time-related utilities.
+ * Has a configurable update interval that defaults to
+ * a full minute to minimize wasteful reactivity,
+ * so it's suitable for any cases that need at best 1-minute precision, unless reconfigured.
  */
 export class Time extends Cell<typeof Time_Json> {
 	/**
-	 * Default update interval in milliseconds (1 minute)
+	 * Default update interval in milliseconds (1 minute).
+	 * The idea is to minimize reactivity and CPU usage for a common use case.
 	 */
-	static readonly DEFAULT_INTERVAL = 60_000;
+	static DEFAULT_INTERVAL = 60_000;
 
 	/**
 	 * Current time that updates on the configured interval.

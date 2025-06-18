@@ -13,7 +13,7 @@ import {
 	GLYPH_PROVIDER,
 	GLYPH_SETTINGS,
 } from '$lib/glyphs.js';
-import type {Zzz} from '$lib/zzz.svelte.js';
+import type {Frontend} from '$lib/frontend.svelte.js';
 
 export interface Nav_Link_Item {
 	label: string;
@@ -32,19 +32,19 @@ export interface Nav_Item {
 // if any, when not on the route directly.
 // See also the `onNavigate` fix in the root layout for nulling out the value
 // when navigating directly to the base route.
-export const to_nav_link_href = (zzz: Zzz, link: Nav_Link_Item): string => {
+export const to_nav_link_href = (app: Frontend, link: Nav_Link_Item): string => {
 	if (
 		link.label === 'chats' &&
-		zzz.chats.selected_id_last_non_null &&
+		app.chats.selected_id_last_non_null &&
 		!(page.url.pathname === link.href || page.url.pathname.startsWith(link.href + '/'))
 	) {
-		return link.href + '/' + zzz.chats.selected_id_last_non_null;
+		return link.href + '/' + app.chats.selected_id_last_non_null;
 	} else if (
 		link.label === 'prompts' &&
-		zzz.prompts.selected_id_last_non_null &&
+		app.prompts.selected_id_last_non_null &&
 		!(page.url.pathname === link.href || page.url.pathname.startsWith(link.href + '/'))
 	) {
-		return link.href + '/' + zzz.prompts.selected_id_last_non_null;
+		return link.href + '/' + app.prompts.selected_id_last_non_null;
 	}
 	return link.href;
 };

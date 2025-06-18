@@ -16,7 +16,7 @@
 		GLYPH_LIST,
 		GLYPH_SORT,
 	} from '$lib/glyphs.js';
-	import {zzz_context} from '$lib/zzz.svelte.js';
+	import {zzz_context} from '$lib/frontend.svelte.js';
 	import Prompt_Stats from '$lib/Prompt_Stats.svelte';
 	import Bit_List from '$lib/Bit_List.svelte';
 	import Content_Preview from '$lib/Content_Preview.svelte';
@@ -25,7 +25,7 @@
 	import Diskfile_Picker_Dialog from '$lib/Diskfile_Picker_Dialog.svelte';
 	import Prompt_List from '$lib/Prompt_List.svelte';
 
-	const zzz = zzz_context.get();
+	const app = zzz_context.get();
 
 	// TODO BLOCK clicking the bits should select them, and then selected one should show its name input (or just on hover/tap? what signifier?)
 
@@ -37,19 +37,19 @@
 
 	// Create and add a Text bit
 	const add_text_bit = () => {
-		if (!zzz.prompts.selected) return;
+		if (!app.prompts.selected) return;
 
-		const bit = Bit.create(zzz, {
+		const bit = Bit.create(app, {
 			type: 'text',
 			content: '',
 		});
 
-		zzz.prompts.selected.add_bit(bit);
+		app.prompts.selected.add_bit(bit);
 	};
 
 	// Create and add a Diskfile bit
 	const add_diskfile_bit = () => {
-		if (!zzz.prompts.selected) return;
+		if (!app.prompts.selected) return;
 
 		// Show the diskfile picker dialog
 		show_diskfile_picker = true;
@@ -57,14 +57,14 @@
 
 	// Create and add a Sequence bit
 	const add_sequence_bit = () => {
-		if (!zzz.prompts.selected) return;
+		if (!app.prompts.selected) return;
 
-		const bit = Bit.create(zzz, {
+		const bit = Bit.create(app, {
 			type: 'sequence',
 			items: [],
 		});
 
-		zzz.prompts.selected.add_bit(bit);
+		app.prompts.selected.add_bit(bit);
 	};
 </script>
 
@@ -76,20 +76,20 @@
 					type="button"
 					class="plain w_100 justify_content_start"
 					onclick={async () => {
-						const prompt = zzz.prompts.add();
-						prompt.add_bit(Bit.create(zzz, {type: 'text'}));
-						await zzz.prompts.navigate_to(prompt.id);
+						const prompt = app.prompts.add();
+						prompt.add_bit(Bit.create(app, {type: 'text'}));
+						await app.prompts.navigate_to(prompt.id);
 					}}
 				>
 					<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new prompt
 				</button>
-				{#if zzz.prompts.items.size > 1}
+				{#if app.prompts.items.size > 1}
 					<button
 						type="button"
 						class="plain compact selectable deselectable"
-						class:selected={zzz.prompts.show_sort_controls}
+						class:selected={app.prompts.show_sort_controls}
 						title="toggle sort controls"
-						onclick={() => zzz.prompts.toggle_sort_controls()}
+						onclick={() => app.prompts.toggle_sort_controls()}
 					>
 						<Glyph glyph={GLYPH_SORT} />
 					</button>
@@ -99,45 +99,45 @@
 		</div>
 	</div>
 
-	{#if zzz.prompts.selected}
-		<Contextmenu_Prompt prompt={zzz.prompts.selected}>
+	{#if app.prompts.selected}
+		<Contextmenu_Prompt prompt={app.prompts.selected}>
 			<div class="column_fixed pr_sm">
 				<section class="column_section">
 					<div class="font_size_lg">
 						<Glyph glyph={GLYPH_PROMPT} />
-						{zzz.prompts.selected.name}
+						{app.prompts.selected.name}
 					</div>
 					<div class="column">
-						<small>created {zzz.prompts.selected.created_formatted_short_date}</small>
+						<small>created {app.prompts.selected.created_formatted_short_date}</small>
 						<small>
-							{zzz.prompts.selected.bits.length}
-							bit{#if zzz.prompts.selected.bits.length !== 1}s{/if}
+							{app.prompts.selected.bits.length}
+							bit{#if app.prompts.selected.bits.length !== 1}s{/if}
 						</small>
 					</div>
 					<div class="row gap_xs py_xs">
 						<Confirm_Button
-							onconfirm={() => zzz.prompts.selected && zzz.prompts.remove(zzz.prompts.selected)}
+							onconfirm={() => app.prompts.selected && app.prompts.remove(app.prompts.selected)}
 							position="right"
 							attrs={{
-								title: `delete prompt ${zzz.prompts.selected.id}`,
+								title: `delete prompt ${app.prompts.selected.id}`,
 								class: 'plain icon_button',
 							}}
 						>
 							<Glyph glyph={GLYPH_DELETE} />
 							{#snippet popover_button_content()}<Glyph glyph={GLYPH_DELETE} />{/snippet}
 						</Confirm_Button>
-						<Copy_To_Clipboard text={zzz.prompts.selected.content} attrs={{class: 'plain'}} />
-						<Prompt_Stats prompt={zzz.prompts.selected} />
+						<Copy_To_Clipboard text={app.prompts.selected.content} attrs={{class: 'plain'}} />
+						<Prompt_Stats prompt={app.prompts.selected} />
 					</div>
-					<Content_Preview content={zzz.prompts.selected.content} />
+					<Content_Preview content={app.prompts.selected.content} />
 				</section>
 				<section class="column_section">
 					<header class="font_size_lg mb_lg"><Glyph glyph={GLYPH_BIT} /> bits</header>
 					<Bit_List
-						bits={zzz.prompts.selected.bits}
-						prompt={zzz.prompts.selected}
+						bits={app.prompts.selected.bits}
+						prompt={app.prompts.selected}
 						onreorder={(from_index, to_index) => {
-							zzz.prompts.selected?.reorder_bits(from_index, to_index);
+							app.prompts.selected?.reorder_bits(from_index, to_index);
 						}}
 					/>
 				</section>
@@ -156,7 +156,7 @@
 								type="button"
 								class="plain font_size_sm"
 								onclick={add_diskfile_bit}
-								disabled={!zzz.diskfiles.items.size}
+								disabled={!app.diskfiles.items.size}
 							>
 								<div class="row white_space_nowrap">
 									<Glyph glyph={GLYPH_FILE} attrs={{class: 'mr_xs2'}} /> add file
@@ -168,8 +168,8 @@
 								</div>
 							</button>
 							<Confirm_Button
-								onconfirm={() => zzz.prompts.selected?.remove_all_bits()}
-								attrs={{disabled: !zzz.prompts.selected.bits.length, class: 'plain font_size_sm'}}
+								onconfirm={() => app.prompts.selected?.remove_all_bits()}
+								attrs={{disabled: !app.prompts.selected.bits.length, class: 'plain font_size_sm'}}
 							>
 								<div class="row white_space_nowrap">
 									<Glyph glyph={GLYPH_REMOVE} attrs={{class: 'mr_xs2'}} /> remove all
@@ -181,7 +181,7 @@
 						class="unstyled display_grid gap_md"
 						style:grid-template-columns="repeat(auto-fill, minmax(300px, 1fr))"
 					>
-						{#each zzz.prompts.selected.bits as bit (bit.id)}
+						{#each app.prompts.selected.bits as bit (bit.id)}
 							<li in:scale>
 								<!-- the extra wrapper makes the grid items not stretch vertically -->
 								<div class="bg border_radius_xs p_sm">
@@ -193,14 +193,14 @@
 				</div>
 			</div>
 		</Contextmenu_Prompt>
-	{:else if zzz.prompts.items.size}
+	{:else if app.prompts.items.size}
 		<div class="display_flex align_items_center justify_content_center h_100 flex_1" in:fade>
 			<p>
 				select a prompt from the list or <button
 					type="button"
 					class="inline color_d"
 					onclick={() => {
-						zzz.prompts.add();
+						app.prompts.add();
 					}}>create one</button
 				>
 				or
@@ -208,8 +208,8 @@
 					type="button"
 					class="inline color_f"
 					onclick={async () => {
-						const prompt = random_item(zzz.prompts.ordered_items);
-						await zzz.prompts.navigate_to(prompt.id);
+						const prompt = random_item(app.prompts.ordered_items);
+						await app.prompts.navigate_to(prompt.id);
 					}}>go fish</button
 				>?
 			</p>
@@ -221,7 +221,7 @@
 					type="button"
 					class="inline color_d"
 					onclick={() => {
-						zzz.prompts.add();
+						app.prompts.add();
 					}}>create a new prompt</button
 				>?
 			</p>
@@ -232,14 +232,14 @@
 <Diskfile_Picker_Dialog
 	bind:show={show_diskfile_picker}
 	onpick={(diskfile) => {
-		if (!zzz.prompts.selected || !diskfile) return false;
+		if (!app.prompts.selected || !diskfile) return false;
 
-		const bit = Bit.create(zzz, {
+		const bit = Bit.create(app, {
 			type: 'diskfile',
 			path: diskfile.path,
 		});
 
-		zzz.prompts.selected.add_bit(bit);
+		app.prompts.selected.add_bit(bit);
 		return true;
 	}}
 />

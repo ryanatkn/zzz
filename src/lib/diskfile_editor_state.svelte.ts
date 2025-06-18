@@ -1,15 +1,18 @@
+// @slop claude_opus_4
+
 import {estimate_token_count} from '$lib/helpers.js';
 import type {Diskfile} from '$lib/diskfile.svelte.js';
 import type {Diskfile_Path} from '$lib/diskfile_types.js';
-import type {Zzz} from '$lib/zzz.svelte.js';
+import type {Frontend} from '$lib/frontend.svelte.js';
 import type {Diskfile_History, History_Entry} from '$lib/diskfile_history.svelte.js';
 import type {Uuid} from '$lib/zod_helpers.js';
 
+// TODO maybe should be a cell?
 /**
  * Manages the editor state for a diskfile.
  */
 export class Diskfile_Editor_State {
-	zzz: Zzz;
+	app: Frontend;
 	diskfile: Diskfile = $state()!; // TODO maybe should be nullable to make initialization easier?
 
 	// Store the id of the unsaved edit entry
@@ -37,7 +40,7 @@ export class Diskfile_Editor_State {
 
 	// History-related derived states
 	readonly history: Diskfile_History | undefined = $derived.by(() =>
-		this.zzz.get_diskfile_history(this.diskfile.path),
+		this.app.get_diskfile_history(this.diskfile.path),
 	);
 	readonly selected_history_entry = $derived.by(() =>
 		this.history && this.selected_history_entry_id
@@ -109,8 +112,8 @@ export class Diskfile_Editor_State {
 		}
 	}
 
-	constructor(options: {zzz: Zzz; diskfile: Diskfile}) {
-		this.zzz = options.zzz; // TODO make this a Cell
+	constructor(options: {app: Frontend; diskfile: Diskfile}) {
+		this.app = options.app; // TODO make this a Cell
 		this.diskfile = options.diskfile;
 
 		// Set initial last_seen_disk_content
@@ -136,9 +139,9 @@ export class Diskfile_Editor_State {
 	 * Ensures a history object exists for the current file.
 	 */
 	#ensure_history(): Diskfile_History {
-		let history = this.zzz.get_diskfile_history(this.path);
+		let history = this.app.get_diskfile_history(this.path);
 		if (!history) {
-			history = this.zzz.create_diskfile_history(this.path);
+			history = this.app.create_diskfile_history(this.path);
 		}
 
 		// Ensure we always have at least one entry for the original content
@@ -320,7 +323,7 @@ export class Diskfile_Editor_State {
 		const entry = history.add_entry(content_to_save);
 
 		// Save to the file
-		this.zzz.diskfiles.update(this.path, content_to_save);
+		this.app.diskfiles.update(this.path, content_to_save);
 
 		// Update last seen content after saving
 		this.last_seen_disk_content = content_to_save;

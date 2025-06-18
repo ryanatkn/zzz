@@ -14,8 +14,10 @@ import {
 	BOTS_DEFAULT,
 } from '$lib/config_defaults.js';
 
-// TODO refactor currently this is imported directly by client and server, but we probably only want to forward a serialized subset to the client -
-// maybe move to zzz.config.ts in the repo root, and genfile for the client config
+// TODO hacky and temporary, just thinking through designs
+
+// TODO refactor currently this is imported directly by frontend and backend, but we probably only want to forward a serialized subset to the client -
+// maybe move to zzz.config.ts in the repo root, and genfile for the frontend config
 const config: Zzz_Config_Creator = () => {
 	return {
 		providers: providers_default,
