@@ -1,5 +1,4 @@
 // @slop claude_opus_4
-// action_event_data.ts
 
 import {z} from 'zod';
 
@@ -11,14 +10,14 @@ import {
 	Jsonrpc_Notification,
 	Jsonrpc_Error_Json,
 } from '$lib/jsonrpc.js';
-import {Action_Executor} from '$lib/action_types.js';
-import {Action_Kind, Action_Phase, Action_Step} from '$lib/action_event_types.js';
+import {Action_Executor, Action_Kind} from '$lib/action_types.js';
+import {Action_Event_Phase, Action_Event_Step} from '$lib/action_event_types.js';
 
 // Base schema for all action event data
 export const Action_Event_Data = z.object({
 	kind: Action_Kind,
-	phase: Action_Phase,
-	step: Action_Step,
+	phase: Action_Event_Phase,
+	step: Action_Event_Step,
 	method: Action_Method,
 	executor: Action_Executor,
 	input: z.unknown(),

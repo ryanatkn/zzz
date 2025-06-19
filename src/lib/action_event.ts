@@ -1,13 +1,11 @@
 // @slop claude_opus_4
-// action_event.ts
 
 import type {Action_Method} from '$lib/action_metatypes.js';
 import type {Action_Spec} from '$lib/action_spec.js';
 import type {
 	Action_Event_Environment,
-	Action_Phase,
-	Action_Step,
-	Action_Kind,
+	Action_Event_Phase,
+	Action_Event_Step,
 } from '$lib/action_event_types.js';
 import {Action_Event_Data} from '$lib/action_event_data.js';
 import {
@@ -41,6 +39,7 @@ import type {
 	Jsonrpc_Notification,
 	Jsonrpc_Error_Json,
 } from '$lib/jsonrpc.js';
+import type {Action_Kind} from '$lib/action_types.js';
 
 // State change observer type
 export type Action_Event_Change_Observer<T_Method extends Action_Method> = (
@@ -55,8 +54,8 @@ export type Action_Event_Change_Observer<T_Method extends Action_Method> = (
 export class Action_Event<
 	T_Method extends Action_Method = Action_Method,
 	T_Environment extends Action_Event_Environment = Action_Event_Environment,
-	T_Phase extends Action_Phase = Action_Phase,
-	T_Step extends Action_Step = Action_Step,
+	T_Phase extends Action_Event_Phase = Action_Event_Phase,
+	T_Step extends Action_Event_Step = Action_Event_Step,
 > {
 	#data: Action_Event_Datas[T_Method];
 	#observers: Set<Action_Event_Change_Observer<T_Method>> = new Set();
@@ -183,7 +182,7 @@ export class Action_Event<
 	/**
 	 * Transition to a new phase.
 	 */
-	transition(phase: Action_Phase): void {
+	transition(phase: Action_Event_Phase): void {
 		if (this.#data.step !== 'handled') {
 			throw new Error(`Cannot transition from step '${this.#data.step}' - must be 'handled'`);
 		}
@@ -231,7 +230,7 @@ export class Action_Event<
 		this.#update_data({notification});
 	}
 
-	#transition_step(step: Action_Step, updates?: Partial<Action_Event_Data>): void {
+	#transition_step(step: Action_Event_Step, updates?: Partial<Action_Event_Data>): void {
 		validate_step_transition(this.#data.step, step);
 		this.#update_data({...updates, step});
 	}
@@ -258,7 +257,7 @@ export class Action_Event<
 
 	#validate_protocol_setter(
 		field: string,
-		requirements: {kind: Action_Kind; phase: Action_Phase},
+		requirements: {kind: Action_Kind; phase: Action_Event_Phase},
 	): void {
 		if (this.#data.kind !== requirements.kind || this.#data.phase !== requirements.phase) {
 			throw new Error(`Can only set ${field} in ${requirements.phase} phase`);
@@ -306,7 +305,7 @@ export class Action_Event<
 		}
 	}
 
-	#create_phase_data(phase: Action_Phase): Action_Event_Datas[T_Method] {
+	#create_phase_data(phase: Action_Event_Phase): Action_Event_Datas[T_Method] {
 		const base_data = create_initial_data(
 			this.#data.kind,
 			phase,
@@ -357,7 +356,7 @@ export const create_action_event = <T_Method extends Action_Method>(
 	environment: Action_Event_Environment,
 	spec: Action_Spec,
 	input: unknown,
-	initial_phase?: Action_Phase,
+	initial_phase?: Action_Event_Phase,
 ): Action_Event<T_Method> => {
 	const phase = initial_phase || get_initial_phase(spec.kind, spec.initiator, environment.executor);
 	if (!phase) {

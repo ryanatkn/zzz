@@ -39,9 +39,12 @@ import type {Frontend_Action_Handlers} from '$lib/frontend_action_types.js';
 import type {Action_Spec} from '$lib/action_spec.js';
 import {Action_Inputs, Action_Outputs, action_specs} from '$lib/action_collections.js';
 import {create_frontend_actions_api} from '$lib/frontend_actions_api.js';
-import {Action_Executor, ACTION_KIND_PHASES, type Action_Phase} from '$lib/action_types.js';
-import type {Action_Event_Environment} from '$lib/action_event_types.js';
-import type {Transport_Type} from '$lib/transports.js';
+import {Action_Executor} from '$lib/action_types.js';
+import {
+	Action_Event_Phase,
+	ACTION_EVENT_PHASE_BY_KIND,
+	type Action_Event_Environment,
+} from '$lib/action_event_types.js';
 import {Frontend_Http_Transport} from '$lib/frontend_http_transport.js';
 import {Frontend_Websocket_Transport} from '$lib/frontend_websocket_transport.js';
 
@@ -70,9 +73,6 @@ export interface Frontend_Options extends Omit_Strict<Cell_Options<typeof Fronte
 
 	/** Websocket URL as an optional transport. */
 	socket_url?: string | null;
-
-	/** Default transport type for actions */
-	default_transport_type?: Transport_Type;
 
 	/** Additional HTTP headers for requests */
 	http_headers?: Record<string, string>;
@@ -189,28 +189,17 @@ export class Frontend extends Cell<typeof Frontend_Json> implements Action_Event
 
 		this.api = create_frontend_actions_api(this);
 
-		// Create peer with minimal options
-		this.peer = new Action_Peer({
-			environment: this,
-			default_send_options: {
-				transport_type: options.default_transport_type,
-			},
-		});
+		this.peer = new Action_Peer({environment: this});
 
-		// TODO @many make transports an option?
-		// Set up transports
+		// Set up transports, adding websocket first so it'll be the default
+		if (options.socket_url) {
+			this.socket.connect(options.socket_url);
+			this.peer.transports.register_transport(new Frontend_Websocket_Transport(this.socket));
+		}
 		if (options.http_rpc_url) {
 			this.peer.transports.register_transport(
 				new Frontend_Http_Transport(options.http_rpc_url, options.http_headers),
 			);
-		}
-		if (options.socket_url) {
-			this.socket.connect(options.socket_url);
-			this.peer.transports.register_transport(new Frontend_Websocket_Transport(this.socket));
-			this.peer.transports.set_current_transport('websocket_rpc'); // prefer if available
-		}
-		if (options.default_transport_type) {
-			this.peer.transports.set_current_transport(options.default_transport_type);
 		}
 
 		this.decoders = {
@@ -308,7 +297,7 @@ export class Frontend extends Cell<typeof Frontend_Json> implements Action_Event
 
 	lookup_action_handler(
 		method: Action_Method,
-		phase: Action_Phase,
+		phase: Action_Event_Phase,
 	): ((event: any) => any) | undefined {
 		const method_handlers = (this.action_handlers as any)[method];
 		if (!method_handlers) return undefined;
@@ -337,10 +326,10 @@ export class Frontend extends Cell<typeof Frontend_Json> implements Action_Event
 	/**
 	 * Check if a phase is valid for a given action method.
 	 */
-	is_valid_phase_for_method(method: Action_Method, phase: Action_Phase): boolean {
+	is_valid_phase_for_method(method: Action_Method, phase: Action_Event_Phase): boolean {
 		const spec = this.action_registry.spec_by_method.get(method);
 		if (!spec) return false;
-		const valid_phases = ACTION_KIND_PHASES[spec.kind];
+		const valid_phases = ACTION_EVENT_PHASE_BY_KIND[spec.kind];
 		return valid_phases.includes(phase as never);
 	}
 }

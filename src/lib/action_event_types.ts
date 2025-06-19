@@ -1,18 +1,16 @@
 // @slop claude_opus_4
-// action_event_types.ts
 
 import {z} from 'zod';
 import type {Logger} from '@ryanatkn/belt/log.js';
 
 import type {Action_Method} from '$lib/action_metatypes.js';
-import type {Action_Executor} from '$lib/action_types.js';
+import type {Action_Executor, Action_Kind} from '$lib/action_types.js';
 import type {Action_Spec} from '$lib/action_spec.js';
 
-// Core enums
-export const Action_Step = z.enum(['initial', 'parsed', 'handling', 'handled', 'failed']);
-export type Action_Step = z.infer<typeof Action_Step>;
+export const Action_Event_Step = z.enum(['initial', 'parsed', 'handling', 'handled', 'failed']);
+export type Action_Event_Step = z.infer<typeof Action_Event_Step>;
 
-export const Action_Phase = z.enum([
+export const Action_Event_Phase = z.enum([
 	'send_request',
 	'receive_request',
 	'send_response',
@@ -21,29 +19,23 @@ export const Action_Phase = z.enum([
 	'receive',
 	'execute',
 ]);
-export type Action_Phase = z.infer<typeof Action_Phase>;
+export type Action_Event_Phase = z.infer<typeof Action_Event_Phase>;
 
-export const Action_Kind = z.enum(['request_response', 'remote_notification', 'local_call']);
-export type Action_Kind = z.infer<typeof Action_Kind>;
-
-// Step transitions
-export const STEP_TRANSITIONS = {
+export const ACTION_EVENT_STEP_TRANSITIONS = {
 	initial: ['parsed', 'failed'],
 	parsed: ['handling', 'failed'],
 	handling: ['handled', 'failed'],
 	handled: [],
 	failed: [],
-} as Record<Action_Step, ReadonlyArray<Action_Step>>;
+} as Record<Action_Event_Step, ReadonlyArray<Action_Event_Step>>;
 
-// Phase configurations by kind
-export const PHASE_BY_KIND = {
+export const ACTION_EVENT_PHASE_BY_KIND = {
 	request_response: ['send_request', 'receive_request', 'send_response', 'receive_response'],
 	remote_notification: ['send', 'receive'],
 	local_call: ['execute'],
-} as Record<Action_Kind, ReadonlyArray<Action_Phase>>;
+} as Record<Action_Kind, ReadonlyArray<Action_Event_Phase>>;
 
-// Phase transitions
-export const PHASE_TRANSITIONS = {
+export const ACTION_EVENT_PHASE_TRANSITIONS = {
 	send_request: 'receive_response',
 	receive_request: 'send_response',
 	send_response: null,
@@ -51,14 +43,13 @@ export const PHASE_TRANSITIONS = {
 	send: null,
 	receive: null,
 	execute: null,
-} as Record<Action_Phase, Action_Phase | null>;
+} as Record<Action_Event_Phase, Action_Event_Phase | null>;
 
-// Environment interface
 export interface Action_Event_Environment {
 	readonly executor: Action_Executor;
 	lookup_action_handler: (
 		method: Action_Method,
-		phase: Action_Phase,
+		phase: Action_Event_Phase,
 	) => ((event: any) => any) | undefined;
 	lookup_action_spec: (method: Action_Method) => Action_Spec | undefined;
 	readonly log?: Logger | null;

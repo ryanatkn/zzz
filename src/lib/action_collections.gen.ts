@@ -1,5 +1,4 @@
 // @slop claude_opus_4
-// action_collections.gen.ts
 
 import type {Gen} from '@ryanatkn/gro/gen.js';
 

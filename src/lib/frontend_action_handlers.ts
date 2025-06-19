@@ -1,22 +1,12 @@
 import type {Frontend_Action_Handlers} from '$lib/frontend_action_types.js';
 
-// TODO we may also want method-based or middleware-like APIs
-
-/**
- * These map to message types, not action methods.
- */
 export const frontend_action_handlers: Frontend_Action_Handlers = {
 	ping: {
 		send_request: ({app, data: {request}}) => {
-			console.log('Ping request sent', request);
-			app.capabilities.handle_sent_ping(request.id); // TODO BLOCK @api type safety
+			app.capabilities.handle_sent_ping(request.id);
 		},
 		receive_response: ({app, data: {output}}) => {
-			console.log('Ping response received');
-
 			app.capabilities.handle_received_ping(output.ping_id);
-			// TODO BLOCK @api how to handle errors? check args or separate handler?
-			// app.capabilities.handle_ping_error(jsonrpc_message.id, output.message);
 		},
 	},
 
@@ -69,14 +59,12 @@ export const frontend_action_handlers: Frontend_Action_Handlers = {
 
 	filer_change: {
 		receive: ({app, data: {input}}) => {
-			console.log('File changed', input.change);
 			app.diskfiles.handle_change(input);
 		},
 	},
 
 	toggle_main_menu: {
 		execute: ({app, data: {input}}) => {
-			console.log('Toggling main menu', input);
 			return {show: app.ui.toggle_main_menu(input?.show)};
 		},
 	},

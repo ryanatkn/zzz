@@ -12,12 +12,8 @@ import type {
 	Jsonrpc_Response_Or_Error,
 } from '$lib/jsonrpc.js';
 
-/**
- * Frontend HTTP transport for RPC API calls.
- * Can only send requests, cannot receive server-initiated messages.
- */
 export class Frontend_Http_Transport implements Transport {
-	readonly type = 'http_rpc' as const;
+	readonly transport_name = 'frontend_http_rpc' as const;
 
 	#url: string;
 	#headers: Record<string, string>;

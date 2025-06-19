@@ -1,5 +1,4 @@
 // @slop claude_opus_4
-// backend_actions_api.ts
 
 import {DEV} from 'esm-env';
 

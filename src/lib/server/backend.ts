@@ -12,7 +12,7 @@ import {Action_Registry} from '$lib/action_registry.js';
 import {ZZZ_CACHE_DIRNAME} from '$lib/constants.js';
 import {to_zzz_cache_dir} from '$lib/diskfile_helpers.js';
 import type {Backend_Action_Handlers} from '$lib/server/backend_action_types.js';
-import type {Action_Phase, Action_Event_Environment} from '$lib/action_event_types.js';
+import type {Action_Event_Phase, Action_Event_Environment} from '$lib/action_event_types.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
 import {
 	create_backend_actions_api,
@@ -156,7 +156,7 @@ export class Backend implements Action_Event_Environment {
 	// TODO @api better type safety
 	lookup_action_handler(
 		method: Action_Method,
-		phase: Action_Phase,
+		phase: Action_Event_Phase,
 	): ((event: any) => any) | undefined {
 		const method_handlers = this.#action_handlers[method as keyof Backend_Action_Handlers];
 		if (!method_handlers) return undefined;

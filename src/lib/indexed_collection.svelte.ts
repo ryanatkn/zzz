@@ -1,5 +1,4 @@
 // @slop claude_opus_4
-// indexed_collection.svelte.ts
 
 import {SvelteMap} from 'svelte/reactivity';
 import type {z} from 'zod';

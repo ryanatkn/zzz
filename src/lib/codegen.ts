@@ -4,7 +4,8 @@
 import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 
 import type {Action_Spec} from '$lib/action_spec.js';
-import {is_action_initiator, type Action_Phase} from '$lib/action_types.js';
+import {is_action_initiator} from '$lib/action_types.js';
+import type {Action_Event_Phase} from '$lib/action_event_types.js';
 
 // TODO probably refactor this into more reusable and more app-specific helpers/config
 
@@ -203,9 +204,9 @@ export class Import_Builder {
 export const get_executor_phases = (
 	spec: Action_Spec,
 	executor: 'frontend' | 'backend',
-): Array<Action_Phase> => {
+): Array<Action_Event_Phase> => {
 	const {kind, initiator} = spec;
-	const phases: Array<Action_Phase> = [];
+	const phases: Array<Action_Event_Phase> = [];
 
 	if (!is_action_initiator(initiator)) {
 		return phases;
@@ -260,7 +261,7 @@ export const get_executor_phases = (
  */
 export const get_handler_return_type = (
 	spec: Action_Spec,
-	phase: Action_Phase,
+	phase: Action_Event_Phase,
 	imports: Import_Builder,
 ): string => {
 	// For request_response receive_request, handler returns the output
@@ -309,7 +310,7 @@ export const generate_phase_handlers = (
 
 	// Generate handler definitions for each phase
 	const phase_handlers = phases
-		.map((phase: Action_Phase) => {
+		.map((phase: Action_Event_Phase) => {
 			// Pass imports to get_handler_return_type so it can add necessary imports
 			const return_type = get_handler_return_type(spec, phase, imports);
 			// Use the new type parameter approach

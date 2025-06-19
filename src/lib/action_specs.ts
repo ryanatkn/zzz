@@ -1,5 +1,4 @@
 // @slop claude_opus_4
-// action_specs.ts
 
 import {z} from 'zod';
 
@@ -136,6 +135,7 @@ export const submit_completion_action_spec = {
 	async: true,
 } satisfies Action_Spec;
 
+// TODO this is just a placeholder for a local call
 export const toggle_main_menu_action_spec = {
 	method: 'toggle_main_menu',
 	kind: 'local_call',

@@ -1,13 +1,11 @@
 // @slop claude_opus_4
-// action_event_helpers.ts
 
 import {
-	type Action_Phase,
-	type Action_Step,
-	type Action_Kind,
-	STEP_TRANSITIONS,
-	PHASE_BY_KIND,
-	PHASE_TRANSITIONS,
+	type Action_Event_Phase,
+	type Action_Event_Step,
+	ACTION_EVENT_STEP_TRANSITIONS,
+	ACTION_EVENT_PHASE_BY_KIND,
+	ACTION_EVENT_PHASE_TRANSITIONS,
 } from '$lib/action_event_types.js';
 import type {
 	Action_Event_Data,
@@ -22,7 +20,7 @@ import {
 } from '$lib/jsonrpc.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
 import type {Action_Inputs} from '$lib/action_collections.js';
-import type {Action_Executor, Action_Initiator} from '$lib/action_types.js';
+import type {Action_Executor, Action_Initiator, Action_Kind} from '$lib/action_types.js';
 
 // Type guards for action kinds
 export const is_request_response = (
@@ -113,22 +111,25 @@ export const is_notification_send_with_parsed_input = <
 } => is_notification_send(data) && (data.step === 'parsed' || data.step === 'handling');
 
 // Validation helpers
-export const validate_step_transition = (from: Action_Step, to: Action_Step): void => {
-	const valid_transitions = STEP_TRANSITIONS[from];
+export const validate_step_transition = (from: Action_Event_Step, to: Action_Event_Step): void => {
+	const valid_transitions = ACTION_EVENT_STEP_TRANSITIONS[from];
 	if (!valid_transitions.includes(to)) {
 		throw new Error(`Invalid step transition from '${from}' to '${to}'`);
 	}
 };
 
-export const validate_phase_for_kind = (kind: Action_Kind, phase: Action_Phase): void => {
-	const valid_phases = PHASE_BY_KIND[kind];
+export const validate_phase_for_kind = (kind: Action_Kind, phase: Action_Event_Phase): void => {
+	const valid_phases = ACTION_EVENT_PHASE_BY_KIND[kind];
 	if (!valid_phases.includes(phase)) {
 		throw new Error(`Invalid phase '${phase}' for ${kind} action`);
 	}
 };
 
-export const validate_phase_transition = (from: Action_Phase, to: Action_Phase): void => {
-	const expected = PHASE_TRANSITIONS[from];
+export const validate_phase_transition = (
+	from: Action_Event_Phase,
+	to: Action_Event_Phase,
+): void => {
+	const expected = ACTION_EVENT_PHASE_TRANSITIONS[from];
 	if (expected !== to) {
 		throw new Error(`Invalid phase transition from '${from}' to '${to}'`);
 	}
@@ -139,7 +140,7 @@ export const get_initial_phase = (
 	kind: Action_Kind,
 	initiator: Action_Initiator,
 	executor: Action_Executor,
-): Action_Phase | null => {
+): Action_Event_Phase | null => {
 	// Check if executor can initiate
 	if (initiator !== 'both' && initiator !== executor) return null;
 
@@ -155,7 +156,7 @@ export const get_initial_phase = (
 };
 
 // Check if output should be validated for a phase
-export const should_validate_output = (kind: Action_Kind, phase: Action_Phase): boolean => {
+export const should_validate_output = (kind: Action_Kind, phase: Action_Event_Phase): boolean => {
 	return (
 		(kind === 'request_response' &&
 			(phase === 'receive_request' || phase === 'receive_response')) ||
@@ -188,14 +189,14 @@ export const is_action_complete = (data: Action_Event_Data): boolean => {
 	if (data.step !== 'handled') return false;
 
 	// Check if in terminal phase
-	const next_phase = PHASE_TRANSITIONS[data.phase];
+	const next_phase = ACTION_EVENT_PHASE_TRANSITIONS[data.phase];
 	return next_phase === null;
 };
 
 // Create initial data for action
 export const create_initial_data = (
 	kind: Action_Kind,
-	phase: Action_Phase,
+	phase: Action_Event_Phase,
 	method: Action_Method,
 	executor: Action_Executor,
 	input: unknown,

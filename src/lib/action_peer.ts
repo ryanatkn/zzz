@@ -1,5 +1,4 @@
 // @slop claude_opus_4
-// action_peer.ts
 
 import {
 	JSONRPC_INTERNAL_ERROR,
@@ -14,7 +13,7 @@ import {
 	Jsonrpc_Request,
 	Jsonrpc_Response_Or_Error,
 } from '$lib/jsonrpc.js';
-import {Transports, type Transport_Type} from '$lib/transports.js';
+import {Transports, type Transport_Name} from '$lib/transports.js';
 import type {Action_Event_Environment} from '$lib/action_event_types.js';
 import {
 	create_jsonrpc_error_message,
@@ -30,7 +29,7 @@ import type {Action_Method} from '$lib/action_metatypes.js';
 // TODO the goal is to make this fully symmetric but we're not quite there
 
 export interface Action_Peer_Send_Options {
-	transport_type?: Transport_Type;
+	transport_name?: Transport_Name;
 }
 
 export interface Action_Peer_Options {
@@ -70,7 +69,7 @@ export class Action_Peer {
 		options?: Action_Peer_Send_Options,
 	): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
 		const transport = this.transports.get_or_throw(
-			options?.transport_type ?? this.default_send_options.transport_type,
+			options?.transport_name ?? this.default_send_options.transport_name,
 		);
 		return transport.send(message);
 	}

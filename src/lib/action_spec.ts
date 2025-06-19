@@ -1,5 +1,4 @@
 // @slop claude_opus_4
-// action_spec.ts
 
 import {z} from 'zod';
 
@@ -14,7 +13,6 @@ import {
 export const Action_Spec_Base = z.object({
 	method: Action_Method,
 	kind: Action_Kind,
-	// TODO BLOCK @api use more? maybe for validation?
 	initiator: Action_Initiator,
 	auth: Action_Auth.nullable(),
 	// TODO @api stubbed out and not yet used, should be for GET/POST distinction and other things, we get guarantees like cacheability from these, interesting with transport agnosticism

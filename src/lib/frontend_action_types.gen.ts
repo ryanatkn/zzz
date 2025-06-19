@@ -1,5 +1,4 @@
 // @slop claude_opus_4
-// frontend_action_types.gen.ts
 
 import type {Gen} from '@ryanatkn/gro/gen.js';
 

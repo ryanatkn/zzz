@@ -1,5 +1,4 @@
 // @slop claude_opus_4
-// transports.ts
 
 import {z} from 'zod';
 
@@ -13,14 +12,16 @@ import type {
 	Jsonrpc_Response_Or_Error,
 } from '$lib/jsonrpc.js';
 
-// TODO probably add reactivity?
+// TODO figure out the symmetry of frontend and backend transports (none/partial/full?) --
+// we may also need orthogonal abstractions to clarify the transport role
 
 // TODO support configurable/extensible transports
-export const Transport_Type = z.enum(['http_rpc', 'websocket_rpc']);
-export type Transport_Type = z.infer<typeof Transport_Type>;
+
+export const Transport_Name = z.string(); // not branded for convenience, will just error at runtime, the schema is just for docs atm
+export type Transport_Name = z.infer<typeof Transport_Name>;
 
 export interface Transport {
-	type: Transport_Type;
+	transport_name: Transport_Name;
 	/* eslint-disable @typescript-eslint/method-signature-style */
 	send(message: Jsonrpc_Request): Promise<Jsonrpc_Response_Or_Error>;
 	send(message: Jsonrpc_Notification): Promise<null>;
@@ -33,7 +34,7 @@ export interface Transport {
 
 export class Transports {
 	#current_transport: Transport | null = null;
-	#transport_by_type: Map<Transport_Type, Transport> = new Map();
+	#transport_by_name: Map<Transport_Name, Transport> = new Map();
 
 	/**
 	 * Whether to allow fallback to other transports if the current one is not available.
@@ -45,7 +46,7 @@ export class Transports {
 	 * Registers a transport.
 	 */
 	register_transport(transport: Transport): void {
-		this.#transport_by_type.set(transport.type, transport); // TODO maybe ensure unregistering of any previous transport?
+		this.#transport_by_name.set(transport.transport_name, transport); // TODO maybe ensure unregistering of any previous transport?
 
 		// Set current transport if not already set
 		if (!this.#current_transport) {
@@ -53,9 +54,9 @@ export class Transports {
 		}
 	}
 
-	set_current_transport(transport_type: Transport_Type): void {
-		const transport = this.#transport_by_type.get(transport_type);
-		if (!transport) throw new Error(`Transport not registered: ${transport_type}`);
+	set_current_transport(transport_name: Transport_Name): void {
+		const transport = this.#transport_by_name.get(transport_name);
+		if (!transport) throw new Error(`Transport not registered: ${transport_name}`);
 		this.#current_transport = transport;
 	}
 
@@ -69,39 +70,35 @@ export class Transports {
 		return this.#current_transport ?? null;
 	}
 
-	get_current_transport_type(): Transport_Type | null {
-		return this.#current_transport?.type ?? null;
+	get_current_transport_name(): Transport_Name | null {
+		return this.#current_transport?.transport_name ?? null;
 	}
 
-	get_transport(transport_type: Transport_Type): Transport | null {
-		return this.#transport_by_type.get(transport_type) ?? null;
-	}
-
-	get_transport_type(): Transport_Type | null {
-		return this.#current_transport?.type ?? null;
+	get_transport(transport_name: Transport_Name): Transport | null {
+		return this.#transport_by_name.get(transport_name) ?? null;
 	}
 
 	/**
 	 * Gets either the current transport or the first ready transport
 	 * depending on `allow_fallback`, or throws an error.
-	 * @param transport_type Optional transport type to use instead of the current
+	 * @param transport_name Optional transport to use instead of the current
 	 * @throws when no transport available or ready
 	 */
-	get_or_throw(transport_type?: Transport_Type): Transport {
+	get_or_throw(transport_name?: Transport_Name): Transport {
 		if (this.allow_fallback) {
-			return this.#get_first_ready_or_throw(transport_type);
+			return this.#get_first_ready_or_throw(transport_name);
 		}
-		return this.#get_exact_or_throw(transport_type);
+		return this.#get_exact_or_throw(transport_name);
 	}
 
 	/**
 	 * Gets the specified transport, defaulting to the current, or throws an error.
-	 * @param transport_type Optional transport type to use instead of the current
+	 * @param transport_name Optional transport type to use instead of the current
 	 * @throws when no transport available or ready
 	 */
-	#get_exact_or_throw(transport_type?: Transport_Type): Transport {
-		const transport = transport_type
-			? this.#transport_by_type.get(transport_type)
+	#get_exact_or_throw(transport_name?: Transport_Name): Transport {
+		const transport = transport_name
+			? this.#transport_by_name.get(transport_name)
 			: this.#current_transport;
 
 		if (!transport) {
@@ -116,16 +113,16 @@ export class Transports {
 
 	/**
 	 * Gets the appropriate transport or throws an error.
-	 * @param transport_type Optional transport type or array of types to use instead of the current
+	 * @param transport_name Optional transport type or array of types to use instead of the current
 	 * @throws when no transport available or ready
 	 */
-	#get_first_ready_or_throw(transport_type?: Transport_Type | Array<Transport_Type>): Transport {
+	#get_first_ready_or_throw(transport_name?: Transport_Name | Array<Transport_Name>): Transport {
 		// First try the specified transport(s) if provided
-		if (transport_type) {
-			const transport_types = Array.isArray(transport_type) ? transport_type : [transport_type];
+		if (transport_name) {
+			const transport_names = Array.isArray(transport_name) ? transport_name : [transport_name];
 
-			for (const transport_type of transport_types) {
-				const transport = this.#transport_by_type.get(transport_type);
+			for (const transport_name of transport_names) {
+				const transport = this.#transport_by_name.get(transport_name);
 				if (transport?.is_ready()) {
 					return transport;
 				}
@@ -138,7 +135,7 @@ export class Transports {
 		}
 
 		// Finally, try any other available transport
-		for (const transport of this.#transport_by_type.values()) {
+		for (const transport of this.#transport_by_name.values()) {
 			if (transport.is_ready()) {
 				return transport;
 			}

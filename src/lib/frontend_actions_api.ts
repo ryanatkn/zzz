@@ -1,5 +1,4 @@
 // @slop claude_opus_4
-// frontend_actions_api.ts
 
 import type {Action_Method, Actions_Api} from '$lib/action_metatypes.js';
 import type {Action_Event_Environment} from '$lib/action_event_types.js';
@@ -214,9 +213,7 @@ const create_request_response_method = (
 				event.transition('receive_response');
 
 				// Set the response data
-				if (response) {
-					event.set_response(response);
-				}
+				event.set_response(response);
 
 				// Parse and handle the response
 				await event.parse().handle_async();

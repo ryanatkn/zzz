@@ -20,12 +20,8 @@ import type {
 } from '$lib/jsonrpc.js';
 import type {Transport} from '$lib/transports.js';
 
-/**
- * Frontend WebSocket transport that uses the Socket class.
- * Can send requests and receive both responses and server-initiated messages.
- */
 export class Frontend_Websocket_Transport implements Transport {
-	readonly type = 'websocket_rpc' as const;
+	readonly transport_name = 'frontend_websocket_rpc' as const;
 
 	#socket: Socket;
 	#request_tracker: Request_Tracker;

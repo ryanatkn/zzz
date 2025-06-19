@@ -26,23 +26,6 @@ export type Action_Auth = z.infer<typeof Action_Auth>;
 export const Action_Side_Effects = z.union([z.literal(true), z.null()]);
 export type Action_Side_Effects = z.infer<typeof Action_Side_Effects>;
 
-export const Action_Phase = z.enum([
-	'send_request',
-	'receive_request',
-	'send_response',
-	'receive_response',
-	'send',
-	'receive',
-	'execute',
-]);
-export type Action_Phase = z.infer<typeof Action_Phase>;
-
-export const ACTION_KIND_PHASES = {
-	request_response: ['send_request', 'receive_request', 'send_response', 'receive_response'],
-	remote_notification: ['send', 'receive'],
-	local_call: ['execute'],
-} as const satisfies Record<Action_Kind, ReadonlyArray<Action_Phase>>;
-
 export const Action_Input = z.union([Jsonrpc_Params, z.undefined(), z.void()]);
 export type Action_Input = z.infer<typeof Action_Input>;
 

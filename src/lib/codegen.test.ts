@@ -1,5 +1,4 @@
 // @slop claude_opus_4
-// codegen.test.ts
 
 // @vitest-environment jsdom
 
