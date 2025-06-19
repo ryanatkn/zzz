@@ -31,8 +31,6 @@
 
 	// TODO think through initialization
 	onMount(() => {
-		// TODO BLOCK pull `futuremode` and others from the query params or hash
-
 		// TODO init properly from data
 		const zzz_config = create_zzz_config();
 

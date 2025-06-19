@@ -54,8 +54,6 @@
 			}
 		});
 	});
-
-	// TODO BLOCK bug with `save changes` not correctly disabling after a save
 </script>
 
 <Contextmenu_Diskfile {diskfile}>
@@ -68,8 +66,8 @@
 				placeholder={GLYPH_PLACEHOLDER + ' ' + diskfile.path_relative}
 				readonly={false}
 				attrs={{class: 'h_100 border_radius_0'}}
-				onsave={(value) => {
-					app.diskfiles.update(diskfile.path, value);
+				onsave={async (value) => {
+					await app.diskfiles.update(diskfile.path, value);
 				}}
 			/>
 		</div>

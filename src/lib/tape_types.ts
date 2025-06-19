@@ -5,7 +5,7 @@ import {Cell_Json} from '$lib/cell_types.js';
 import {cell_array} from '$lib/cell_helpers.js';
 import {Strip_Json} from '$lib/strip_types.js';
 
-// TODO BLOCK add tape name and make it editable
+// TODO add tape name and make it editable
 export const Tape_Json = Cell_Json.extend({
 	model_name: Model_Name.default(''),
 	strips: cell_array(

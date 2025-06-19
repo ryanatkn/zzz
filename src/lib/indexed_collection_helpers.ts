@@ -199,7 +199,7 @@ export const create_multi_index = <T extends Indexed_Item, K>(
  */
 export interface Derived_Index_Options<T extends Indexed_Item> extends Index_Options<T> {
 	/** Function that computes the derived collection from the full collection. */
-	compute: (collection: Indexed_Collection<T>) => Array<T>; // TODO BLOCK probably default this to the by_id values - `compute: (collection) => Array.from(collection.by_id.values()),`
+	compute: (collection: Indexed_Collection<T>) => Array<T>; // TODO probably default this to the by_id values - `compute: (collection) => Array.from(collection.by_id.values()),`
 
 	/** Optional sort function for the derived array. */
 	sort?: (a: T, b: T) => number;
