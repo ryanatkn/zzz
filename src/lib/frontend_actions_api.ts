@@ -12,7 +12,6 @@ import type {
 } from '$lib/action_spec.js';
 import type {Action} from '$lib/action.svelte.js';
 import {is_send_request, is_notification_send} from '$lib/action_event_helpers.js';
-import type {Action_Peer} from '$lib/action_peer.js';
 
 // TODO BLOCK @api think about unification with backend_actions_api.ts
 
@@ -24,14 +23,6 @@ interface Action_History_Environment extends Action_Event_Environment {
 	actions: {
 		add_json: (json: {method: Action_Method; action_event?: any}) => Action;
 	};
-}
-
-/**
- * Interface for environments that support network communication.
- */
-// TODO BLOCK @api refactor
-interface Action_Network_Environment extends Action_Event_Environment {
-	peer: Action_Peer;
 }
 
 /**
@@ -190,7 +181,6 @@ const create_request_response_method = (
 			);
 		}
 
-		const network_env = environment as Action_Network_Environment;
 		const event = create_action_event(environment, spec, input);
 		const action = track_action(environment, spec.method, event);
 
@@ -207,7 +197,7 @@ const create_request_response_method = (
 				update_tracked_action(action, event);
 
 				// Send the request and wait for response
-				const response = await network_env.peer.send(event.data.request);
+				const response = await environment.peer.send(event.data.request);
 
 				// Transition to receive_response phase
 				event.transition('receive_response');
@@ -257,7 +247,6 @@ const create_remote_notification_method = (
 			);
 		}
 
-		const network_env = environment as Action_Network_Environment;
 		const event = create_action_event(environment, spec, input);
 		const action = track_action(environment, spec.method, event);
 
@@ -273,7 +262,7 @@ const create_remote_notification_method = (
 				is_notification_send(event.data)
 			) {
 				// Send without waiting for response
-				await network_env.peer.send(event.data.notification);
+				await environment.peer.send(event.data.notification);
 			}
 
 			// Notifications return void

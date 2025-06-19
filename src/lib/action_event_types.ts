@@ -6,6 +6,7 @@ import type {Logger} from '@ryanatkn/belt/log.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
 import type {Action_Executor, Action_Kind} from '$lib/action_types.js';
 import type {Action_Spec} from '$lib/action_spec.js';
+import type {Action_Peer} from '$lib/action_peer.js';
 
 export const Action_Event_Step = z.enum(['initial', 'parsed', 'handling', 'handled', 'failed']);
 export type Action_Event_Step = z.infer<typeof Action_Event_Step>;
@@ -47,6 +48,7 @@ export const ACTION_EVENT_PHASE_TRANSITIONS = {
 
 export interface Action_Event_Environment {
 	readonly executor: Action_Executor;
+	peer: Action_Peer;
 	lookup_action_handler: (
 		method: Action_Method,
 		phase: Action_Event_Phase,

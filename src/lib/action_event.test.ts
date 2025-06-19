@@ -19,6 +19,7 @@ import type {Action_Executor} from '$lib/action_types.js';
 // Mock environment for testing
 class Test_Environment implements Action_Event_Environment {
 	executor: Action_Executor = 'frontend';
+	peer: any = {}; // Mock peer, not used in tests
 	handlers: Map<string, Map<string, (event: any) => any>> = new Map();
 	specs: Map<string, Action_Spec> = new Map();
 
