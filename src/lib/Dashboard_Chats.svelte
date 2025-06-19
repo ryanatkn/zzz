@@ -5,11 +5,11 @@
 	import Chat_View from '$lib/Chat_View.svelte';
 	import Contextmenu_Chat from '$lib/Contextmenu_Chat.svelte';
 	import {GLYPH_ADD, GLYPH_SORT} from '$lib/glyphs.js';
-	import {zzz_context} from '$lib/frontend.svelte.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
 	import Contextmenu_Chats from '$lib/Contextmenu_Chats.svelte';
 
-	const app = zzz_context.get();
+	const app = frontend_context.get();
 	const {chats} = app;
 </script>
 

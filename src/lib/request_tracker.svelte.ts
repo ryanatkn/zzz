@@ -44,7 +44,7 @@ export class Request_Tracker {
 	readonly pending_requests: SvelteMap<Jsonrpc_Request_Id, Request_Tracker_Item> = new SvelteMap();
 	readonly request_timeout_ms: number;
 
-	constructor(request_timeout_ms = 15000) {
+	constructor(request_timeout_ms = 120_000) {
 		this.request_timeout_ms = request_timeout_ms;
 	}
 

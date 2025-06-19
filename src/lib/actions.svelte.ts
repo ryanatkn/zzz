@@ -61,7 +61,7 @@ export class Actions extends Cell<typeof Actions_Json> {
 				if (Array.isArray(items)) {
 					this.items.clear();
 					for (const item_json of items) {
-						this.add_json(item_json);
+						this.add_from_json(item_json);
 					}
 				}
 				return HANDLED;
@@ -88,10 +88,7 @@ export class Actions extends Cell<typeof Actions_Json> {
 		this.#trim_to_history_limit();
 	}
 
-	/**
-	 * Add an action to the collection.
-	 */
-	add_json(action_json: Action_Json_Input): Action {
+	add_from_json(action_json: Action_Json_Input): Action {
 		const action = new Action({app: this.app, json: action_json});
 		this.add(action);
 		return action;

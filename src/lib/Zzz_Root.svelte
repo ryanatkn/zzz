@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type {Snippet} from 'svelte';
 
-	import {Frontend, zzz_context} from '$lib/frontend.svelte.js';
+	import {Frontend, frontend_context} from '$lib/frontend.svelte.js';
 	import Dashboard from '$lib/Dashboard.svelte';
 	import Main_Dialog from '$lib/Main_Dialog.svelte';
 
@@ -20,7 +20,7 @@
 
 	const {app, children}: Props = $props();
 
-	zzz_context.set(app);
+	frontend_context.set(app);
 </script>
 
 <Main_Dialog />

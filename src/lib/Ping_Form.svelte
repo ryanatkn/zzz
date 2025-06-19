@@ -3,7 +3,7 @@
 	import type {Snippet} from 'svelte';
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
 
-	import {zzz_context} from '$lib/frontend.svelte.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 	import {GLYPH_ACTION_TYPE_REQUEST_RESPONSE} from '$lib/glyphs.js';
 	import {PING_HISTORY_MAX, type Ping_Data} from '$lib/capabilities.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
@@ -14,7 +14,7 @@
 
 	const {children}: Props = $props();
 
-	const app = zzz_context.get();
+	const app = frontend_context.get();
 	const {capabilities} = app;
 
 	// Calculate placeholders to maintain consistent spacing

@@ -6,7 +6,7 @@
 	import type {Omit_Strict} from '@ryanatkn/belt/types.js';
 
 	import type {Chat} from '$lib/chat.svelte.js';
-	import {zzz_context} from '$lib/frontend.svelte.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 	import {
 		GLYPH_CHAT,
 		GLYPH_DELETE,
@@ -25,7 +25,7 @@
 
 	const {chat, ...rest}: Props = $props();
 
-	const app = zzz_context.get();
+	const app = frontend_context.get();
 
 	let show_model_picker = $state(false);
 </script>

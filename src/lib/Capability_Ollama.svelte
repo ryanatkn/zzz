@@ -3,7 +3,7 @@
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
 	import {onMount} from 'svelte';
 
-	import {zzz_context} from '$lib/frontend.svelte.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
 	import Model_Link from '$lib/Model_Link.svelte';
 	import Provider_Link from '$lib/Provider_Link.svelte';
@@ -18,7 +18,7 @@
 	import {OLLAMA_URL} from '$lib/ollama.js';
 	import External_Link from '$lib/External_Link.svelte';
 
-	const app = zzz_context.get();
+	const app = frontend_context.get();
 	const {capabilities} = app;
 
 	// Initial load when component mounts

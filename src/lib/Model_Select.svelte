@@ -1,8 +1,8 @@
 <script lang="ts">
 	import type {Model} from '$lib/model.svelte.js';
-	import {zzz_context} from '$lib/frontend.svelte.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 
-	const app = zzz_context.get();
+	const app = frontend_context.get();
 
 	interface Props {
 		selected_model: Model; // TODO get from context?

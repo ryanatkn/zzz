@@ -1711,7 +1711,7 @@ export const src_json = {
 		'./frontend.svelte.js': {
 			path: 'frontend.svelte.ts',
 			declarations: [
-				{name: 'zzz_context', kind: 'variable'},
+				{name: 'frontend_context', kind: 'variable'},
 				{name: 'Frontend_Json', kind: 'variable'},
 				{name: 'Frontend_Json_Input', kind: 'type'},
 				{name: 'Frontend_Options', kind: 'type'},

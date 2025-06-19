@@ -5,7 +5,7 @@
 	import {base} from '$app/paths';
 	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
 
-	import {zzz_context} from '$lib/frontend.svelte.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 
 	interface Props {
 		disabled?: boolean | undefined;
@@ -13,7 +13,7 @@
 
 	const {disabled}: Props = $props();
 
-	const app = zzz_context.get();
+	const app = frontend_context.get();
 
 	onNavigate(() => {
 		if (app.ui.show_main_dialog) app.api.toggle_main_menu({show: false});

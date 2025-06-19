@@ -4,7 +4,7 @@
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import {GLYPH_FILE} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
-	import {zzz_context} from '$lib/frontend.svelte.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 	import type {Diskfile_Editor_State} from '$lib/diskfile_editor_state.svelte.js';
 	import Diskfile_Metrics from '$lib/Diskfile_Metrics.svelte';
 	import {has_dependencies} from '$lib/diskfile_helpers.js';
@@ -16,7 +16,7 @@
 
 	const {diskfile, editor_state}: Props = $props();
 
-	const app = zzz_context.get();
+	const app = frontend_context.get();
 </script>
 
 <div class="display_flex flex_column gap_xs w_100">

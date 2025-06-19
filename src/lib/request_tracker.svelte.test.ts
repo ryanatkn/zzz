@@ -37,7 +37,7 @@ describe('Request_Tracker', () => {
 			const tracker = new Request_Tracker();
 
 			expect(tracker).toBeInstanceOf(Request_Tracker);
-			expect(tracker.request_timeout_ms).toBe(15000);
+			expect(tracker.request_timeout_ms).toBe(120_000);
 			expect(tracker.pending_requests.size).toBe(0);
 		});
 

@@ -3,10 +3,10 @@
 	import Model_Link from '$lib/Model_Link.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 	import {GLYPH_PROVIDER} from '$lib/glyphs.js';
-	import {zzz_context} from '$lib/frontend.svelte.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 	import External_Link from '$lib/External_Link.svelte';
 
-	const app = zzz_context.get();
+	const app = frontend_context.get();
 </script>
 
 <div class="p_lg">

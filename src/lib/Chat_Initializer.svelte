@@ -1,12 +1,12 @@
 <script lang="ts">
-	import {zzz_context} from '$lib/frontend.svelte.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 	import type {Chat_Template} from '$lib/chat_template.js';
 	import type {Model} from '$lib/model.svelte.js';
 	import Model_Picker from '$lib/Model_Picker.svelte';
 	import type {Uuid} from '$lib/zod_helpers.js';
 	import type {Chat} from '$lib/chat.svelte.js';
 
-	const app = zzz_context.get();
+	const app = frontend_context.get();
 
 	interface Props {
 		chat?: Chat;

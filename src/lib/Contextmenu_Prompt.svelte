@@ -7,7 +7,7 @@
 
 	import {Bit} from '$lib/bit.svelte.js';
 	import type {Prompt} from '$lib/prompt.svelte.js';
-	import {zzz_context} from '$lib/frontend.svelte.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 	import {
 		GLYPH_BIT,
 		GLYPH_DELETE,
@@ -26,7 +26,7 @@
 
 	const {prompt, ...rest}: Props = $props();
 
-	const app = zzz_context.get();
+	const app = frontend_context.get();
 
 	let show_diskfile_picker = $state(false);
 </script>

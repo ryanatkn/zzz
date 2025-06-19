@@ -3,9 +3,9 @@
 	import {page} from '$app/state';
 
 	import Provider_Detail from '$lib/Provider_Detail.svelte';
-	import {zzz_context} from '$lib/frontend.svelte.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 
-	const app = zzz_context.get();
+	const app = frontend_context.get();
 
 	const provider = $derived(app.providers.find_by_name(page.params.slug));
 </script>

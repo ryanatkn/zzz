@@ -7,7 +7,7 @@
 
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import {GLYPH_DELETE, GLYPH_FILE} from '$lib/glyphs.js';
-	import {zzz_context} from '$lib/frontend.svelte.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 	import Contextmenu_Entry_Copy_To_Clipboard from '$lib/Contextmenu_Entry_Copy_To_Clipboard.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 
@@ -17,7 +17,7 @@
 
 	const {diskfile, ...rest}: Props = $props();
 
-	const app = zzz_context.get();
+	const app = frontend_context.get();
 </script>
 
 <Contextmenu {...rest} {entries} />

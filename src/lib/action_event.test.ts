@@ -465,7 +465,7 @@ describe('Action_Event', () => {
 	});
 
 	describe('observe()', () => {
-		test('notifies observers of state changes', () => {
+		test('notifies listeners of state changes', () => {
 			const env = new Test_Environment([ping_action_spec]);
 			const event = create_action_event(env, ping_action_spec, undefined);
 
@@ -487,7 +487,7 @@ describe('Action_Event', () => {
 			});
 		});
 
-		test('cleanup function removes observer', async () => {
+		test('cleanup function removes listener', async () => {
 			const env = new Test_Environment([ping_action_spec]);
 			const event = create_action_event(env, ping_action_spec, undefined);
 
@@ -505,25 +505,25 @@ describe('Action_Event', () => {
 			expect(call_count).toBe(1); // No additional calls
 		});
 
-		test('multiple observers work independently', () => {
+		test('multiple listeners work independently', () => {
 			const env = new Test_Environment([ping_action_spec]);
 			const event = create_action_event(env, ping_action_spec, undefined);
 
-			const observer1_calls: Array<string> = [];
-			const observer2_calls: Array<string> = [];
+			const listener1_calls: Array<string> = [];
+			const listener2_calls: Array<string> = [];
 
 			event.observe((_event, _old, new_data) => {
-				observer1_calls.push(new_data.step);
+				listener1_calls.push(new_data.step);
 			});
 
 			event.observe((_event, _old, new_data) => {
-				observer2_calls.push(new_data.step);
+				listener2_calls.push(new_data.step);
 			});
 
 			event.parse();
 
-			expect(observer1_calls).toEqual(['parsed']);
-			expect(observer2_calls).toEqual(['parsed']);
+			expect(listener1_calls).toEqual(['parsed']);
+			expect(listener2_calls).toEqual(['parsed']);
 		});
 	});
 

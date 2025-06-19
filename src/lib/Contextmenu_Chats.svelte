@@ -4,7 +4,7 @@
 	import type {Partial_Only} from '@ryanatkn/belt/types.js';
 	import Contextmenu_Entry from '@ryanatkn/fuz/Contextmenu_Entry.svelte';
 
-	import {zzz_context} from '$lib/frontend.svelte.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 	import {GLYPH_CHAT} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
 
@@ -12,7 +12,7 @@
 
 	const props: Props = $props();
 
-	const app = zzz_context.get();
+	const app = frontend_context.get();
 </script>
 
 <Contextmenu {...props} entries={props.entries ?? entries} />

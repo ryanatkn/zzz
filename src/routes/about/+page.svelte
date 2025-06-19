@@ -7,10 +7,10 @@
 	import {pkg_context} from '$lib/pkg.js';
 	import External_Link from '$lib/External_Link.svelte';
 	import Footer from '$lib/Footer.svelte';
-	import {zzz_context} from '$lib/frontend.svelte.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 
 	const pkg = pkg_context.get();
-	const app = zzz_context.get();
+	const app = frontend_context.get();
 
 	// TODO probably link to a blog post that's more approachable and less technical
 
@@ -38,7 +38,8 @@
 		<p>
 			Zzz, pronounced "zees" like bees, is a software project focused on user power and
 			experimentation. The idea is to make a fullstack software environment that adapts to your
-			needs while remaining fully open, aligned, and in your control.
+			needs while remaining fully open, aligned, and in your control. It's a flexible toolkit for
+			making nice web software and content.
 		</p>
 		<p>
 			In the technology landscape of 2025, where LLM-based AI is upending long held assumptions, and <External_Link
@@ -70,7 +71,10 @@
 			stack. It can run locally on your machine using any of your available capabilities, or it can
 			deploy anywhere JS runs to play whatever role you need.
 		</p>
-		<p>Zzz is based on many kinds of software:</p>
+		<p>
+			Zzz is based on many kinds of software, and it can be used to make any number of mashups of
+			them:
+		</p>
 		<ul>
 			<li>
 				web browsers - planned with Chromium via Electron, ideally with swappable browser engines
@@ -104,23 +108,25 @@
 		<p>
 			This scope may look far-fetched, and it is to me, but I'm just making tools that I want to use
 			<em>now</em> on the best foundations I can assemble, with at least vague awareness of the endgame.
-			Many of the initial systems have been designed with intention towards a bigger picture, and I plan
-			to continue building incrementally on a quality base with some experiements mixed in.
+			I think the most successful version of Zzz is where it's used to build other systems, with different
+			ideas and brands. Many of the initial systems have been designed with some thought towards this
+			bigger picture, but it's too big an idea to be anywhere near complete, and I plan to continue building
+			incrementally on a quality base with some experiements mixed in.
 		</p>
 		<p>
-			It's important to me that Zzz is easy to use and inclusive of people and devices, but it can't
-			cater to everyone -- however thanks to the magic of standards-based interoperability, Zzz
-			works with all websites, like any other browser, and anything you make with Zzz works with
-			other browsers and web technologies. It's just one way to interface with the free web.
+			Zzz must be easy to use and inclusive of people and devices, but it can't cater to everyone --
+			however thanks to the magic of standards-based interoperability, Zzz works with all websites,
+			like any other browser, and anything you make with Zzz works with other browsers and web
+			technologies. It's just one way to use the web.
 		</p>
 		<p>
 			I've been thinking about and prototyping related ideas for more than 13 years, and for the
-			last 6 I've been working on open source projects full-time, so there's a lot of thought and
-			plans already formulated, but from here I'm prioritizing user feedback and just shipping a
-			continuously-improving proof-of-concept. Your <External_Link
-				href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link
-			> are most welcome. I'm doing a lot of experimenting and moving fast in places, so API/data stability
-			won't be a priority for a while. Some early (rough) integrations include:
+			last 6 I've been working on my open source projects full-time, so there's a lot of thought and
+			plans already formulated, but this iteration of Zzz was released after about 5 months from
+			here I'm prioritizing user feedback and just shipping a
+			continuously-improving-but-not-quite-usable proof-of-concept. I'm doing a lot of experimenting
+			in places, so data and API stability aren't yet priorities. Some early (rough) integrations
+			include:
 		</p>
 		<ul>
 			<li>
@@ -186,15 +192,15 @@
 			</li>
 		</ul>
 		<p>
-			Zzz is just one implementation of an increasingly common idea that combines web tech and AI
-			with powerful open clients. Because of the endless scope I currently like the name "web
-			environment". Some related projects call themselves web UIs or even operating systems.
-			Whatever the name, this class of app is something that I've been wanting for a long time, and
-			I appear to be sticking with this iteration.
+			Zzz is one implementation of an increasingly common idea that combines web tech and AI with
+			powerful open clients. Some related projects call themselves web UIs or even operating
+			systems. I currently like word "environment" to describe the device+software UX, and "adaptive
+			web environments" to get the bigger picture. Whatever the name, this class of app is something
+			that I've been wanting for a long time, and I appear to be sticking with this iteration.
 		</p>
 		<p>
 			If this sounds interesting and you would like to test out some broken pre-release software,
-			your input is appreciated to help make it work for you -- see the <External_Link
+			input is appreciated to help make it work for you -- see the <External_Link
 				href="https://github.com/ryanatkn/zzz">code</External_Link
 			>,
 			<External_Link href="https://github.com/ryanatkn/zzz/issues">issues</External_Link>, and

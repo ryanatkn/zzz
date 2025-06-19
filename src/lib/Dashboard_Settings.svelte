@@ -2,11 +2,11 @@
 	import {GLYPH_SETTINGS} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
 	import Settings from '$lib/Settings.svelte';
-	import {zzz_context} from '$lib/frontend.svelte.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 
 	import Footer from '$lib/Footer.svelte';
 
-	const app = zzz_context.get();
+	const app = frontend_context.get();
 
 	// TODO display capabilities (like what APIs are available, including remote server (off when deployed statically), local pglite (could be disconnected, websockets?))
 	// TODO display database info/explorer

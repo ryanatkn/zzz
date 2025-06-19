@@ -4,7 +4,7 @@
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
 	import Pending_Button from '@ryanatkn/fuz/Pending_Button.svelte';
 
-	import {zzz_context} from '$lib/frontend.svelte.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import Diskfile_Listitem from '$lib/Diskfile_Listitem.svelte';
 	import Glyph from '$lib/Glyph.svelte';
@@ -23,7 +23,7 @@
 
 	const {empty}: Props = $props();
 
-	const app = zzz_context.get();
+	const app = frontend_context.get();
 	const {diskfiles} = app;
 	const {editor} = diskfiles;
 

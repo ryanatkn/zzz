@@ -2,7 +2,7 @@
 
 import type {Action_Method, Actions_Api} from '$lib/action_metatypes.js';
 import type {Action_Event_Environment} from '$lib/action_event_types.js';
-import {create_action_event} from '$lib/action_event.js';
+import {Action_Event, create_action_event} from '$lib/action_event.js';
 import {is_jsonrpc_error_message} from '$lib/jsonrpc_helpers.js';
 import type {
 	Action_Spec,
@@ -10,23 +10,12 @@ import type {
 	Remote_Notification_Action_Spec,
 	Request_Response_Action_Spec,
 } from '$lib/action_spec.js';
-import type {Action} from '$lib/action.svelte.js';
 import {is_send_request, is_notification_send} from '$lib/action_event_helpers.js';
 
-// TODO BLOCK @api think about unification with backend_actions_api.ts
+// TODO @api think about unification between frontend|backend_actions_api.ts
 
 /**
- * Interface for environments that support action history tracking.
- */
-// TODO BLOCK @api refactor
-interface Action_History_Environment extends Action_Event_Environment {
-	actions: {
-		add_json: (json: {method: Action_Method; action_event?: any}) => Action;
-	};
-}
-
-/**
- * Creates the actions API methods for the given environment.
+ * Creates the actions API methods for the frontend.
  * Uses a Proxy to provide dynamic method lookup with full type safety.
  */
 export const create_frontend_actions_api = <T extends Action_Event_Environment>(
@@ -67,54 +56,19 @@ const create_action_method = (environment: Action_Event_Environment, spec: Actio
 	}
 };
 
-// TODO @api refactor
-/**
- * Helper to track action in history if the environment supports it.
- */
-const track_action = (
-	environment: Action_Event_Environment,
-	method: Action_Method,
-	event: any,
-): Action | undefined => {
-	if (
-		'actions' in environment &&
-		typeof environment.actions === 'object' &&
-		environment.actions &&
-		'add_json' in environment.actions
-	) {
-		return (environment as Action_History_Environment).actions.add_json({
-			method,
-			action_event: event.toJSON(),
-		});
-	}
-	return undefined;
-};
-
-/**
- * Helper to update tracked action with new event state.
- */
-const update_tracked_action = (action: Action | undefined, event: any): void => {
-	if (action && 'action_event' in action) {
-		action.action_event = event;
-	}
-};
-
-/**
- * Helper to extract result or throw error.
- */
-const extract_result_or_throw = (event: any): any => {
-	const data = event.data;
+// TODO maybe move this?
+const extract_result_or_throw = (event: Action_Event): any => {
+	const {data} = event;
 
 	if (data.step === 'handled') {
 		return data.output;
 	}
 
-	if (data.step === 'failed' && data.error) {
+	if (data.step === 'failed') {
 		throw new Error(data.error.message);
 	}
 
-	// For void returns
-	return undefined;
+	throw new Error(); // TODO maybe include a message? is an internal failure
 };
 
 /**
@@ -126,16 +80,19 @@ const create_sync_local_call_method = (
 ) => {
 	return (input?: unknown) => {
 		const event = create_action_event(environment, spec, input);
-		const action = track_action(environment, spec.method, event);
+		const action = environment.actions?.add_from_json({
+			method: spec.method,
+			action_event: event.toJSON(),
+		});
 
 		try {
 			// Execute synchronously
 			event.parse().handle_sync();
 
-			update_tracked_action(action, event);
+			action?.update_from_event(event);
 			return extract_result_or_throw(event);
 		} catch (error) {
-			update_tracked_action(action, event); // TODO @many track the error?
+			action?.update_from_event(event); // TODO @many track the error?
 			throw error;
 		}
 	};
@@ -150,16 +107,19 @@ const create_async_local_call_method = (
 ) => {
 	return async (input?: unknown) => {
 		const event = create_action_event(environment, spec, input);
-		const action = track_action(environment, spec.method, event);
+		const action = environment.actions?.add_from_json({
+			method: spec.method,
+			action_event: event.toJSON(),
+		});
 
 		try {
 			// Execute asynchronously
 			await event.parse().handle_async();
 
-			update_tracked_action(action, event);
+			action?.update_from_event(event);
 			return extract_result_or_throw(event);
 		} catch (error) {
-			update_tracked_action(action, event); // TODO @many track the error?
+			action?.update_from_event(event); // TODO @many track the error?
 			throw error;
 		}
 	};
@@ -173,28 +133,20 @@ const create_request_response_method = (
 	spec: Request_Response_Action_Spec,
 ) => {
 	return async (input?: unknown) => {
-		// Check if environment supports networking
-		if (!('peer' in environment)) {
-			console.log(`environment`, environment);
-			throw new Error(
-				`Environment does not support network communication for action '${spec.method}'`,
-			);
-		}
-
 		const event = create_action_event(environment, spec, input);
-		const action = track_action(environment, spec.method, event);
+		const action = environment.actions?.add_from_json({
+			method: spec.method,
+			action_event: event.toJSON(),
+		});
 
 		try {
 			// Parse and handle send_request phase
 			await event.parse().handle_async();
 
 			// Check if handled successfully and has request
-			if (
-				event.data.step === 'handled' &&
-				// TODO BLOCK @api @many is this ever not the case?
-				is_send_request(event.data)
-			) {
-				update_tracked_action(action, event);
+			if (!is_send_request(event.data)) throw Error(); // TODO @many maybe make this an assertion helper?
+			if (event.data.step === 'handled') {
+				action?.update_from_event(event);
 
 				// Send the request and wait for response
 				const response = await environment.peer.send(event.data.request);
@@ -207,9 +159,10 @@ const create_request_response_method = (
 
 				// Parse and handle the response
 				await event.parse().handle_async();
-				update_tracked_action(action, event);
+				action?.update_from_event(event);
 
 				// Extract the result
+				// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 				if (event.data.step === 'handled') {
 					return event.data.output;
 				}
@@ -222,11 +175,11 @@ const create_request_response_method = (
 				throw new Error('No output received');
 			} else {
 				// Failed to handle send_request
-				update_tracked_action(action, event);
+				action?.update_from_event(event);
 				return extract_result_or_throw(event);
 			}
 		} catch (error) {
-			update_tracked_action(action, event); // TODO @many track the error?
+			action?.update_from_event(event); // TODO @many track the error?
 			throw error;
 		}
 	};
@@ -248,27 +201,24 @@ const create_remote_notification_method = (
 		}
 
 		const event = create_action_event(environment, spec, input);
-		const action = track_action(environment, spec.method, event);
+		const action = environment.actions?.add_from_json({
+			method: spec.method,
+			action_event: event.toJSON(),
+		});
 
 		try {
 			// Parse and handle
 			await event.parse().handle_async();
-			update_tracked_action(action, event);
+			action?.update_from_event(event);
 
-			// Send notification if successful and has notification
-			if (
-				event.data.step === 'handled' &&
-				// TODO BLOCK @api @many is this ever not the case?
-				is_notification_send(event.data)
-			) {
-				// Send without waiting for response
+			if (!is_notification_send(event.data)) throw Error(); // TODO @many maybe make this an assertion helper?
+
+			// Send notification if successful
+			if (event.data.step === 'handled') {
 				await environment.peer.send(event.data.notification);
 			}
-
-			// Notifications return void
-			return undefined as any;
 		} catch (error) {
-			update_tracked_action(action, event); // TODO @many track the error?
+			action?.update_from_event(event); // TODO @many track the error?
 			throw error;
 		}
 	};

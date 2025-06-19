@@ -3,7 +3,7 @@
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
 	import {onMount} from 'svelte';
 
-	import {zzz_context} from '$lib/frontend.svelte.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
 	import {GLYPH_ARROW_RIGHT} from '$lib/glyphs.js';
 	import Error_Message from '$lib/Error_Message.svelte';
@@ -11,7 +11,7 @@
 	import Ping_Form from '$lib/Ping_Form.svelte';
 	import External_Link from '$lib/External_Link.svelte';
 
-	const app = zzz_context.get();
+	const app = frontend_context.get();
 	const {capabilities} = app;
 
 	onMount(() => {

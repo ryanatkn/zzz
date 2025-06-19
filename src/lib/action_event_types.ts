@@ -7,6 +7,7 @@ import type {Action_Method} from '$lib/action_metatypes.js';
 import type {Action_Executor, Action_Kind} from '$lib/action_types.js';
 import type {Action_Spec} from '$lib/action_spec.js';
 import type {Action_Peer} from '$lib/action_peer.js';
+import type {Actions} from '$lib/actions.svelte.js';
 
 export const Action_Event_Step = z.enum(['initial', 'parsed', 'handling', 'handled', 'failed']);
 export type Action_Event_Step = z.infer<typeof Action_Event_Step>;
@@ -55,4 +56,6 @@ export interface Action_Event_Environment {
 	) => ((event: any) => any) | undefined;
 	lookup_action_spec: (method: Action_Method) => Action_Spec | undefined;
 	readonly log?: Logger | null;
+	// TODO feels hacky, added for optional tracking
+	actions?: Actions;
 }

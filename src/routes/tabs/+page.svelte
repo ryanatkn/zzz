@@ -11,10 +11,10 @@
 	import {Browser} from '$routes/tabs/browser.svelte.js';
 	import {sample_tabs} from '$routes/tabs/sample_tabs.js';
 	import Browser_View from '$routes/tabs/Browser_View.svelte';
-	import {zzz_context} from '$lib/frontend.svelte.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 	import External_Link from '$lib/External_Link.svelte';
 
-	const app = zzz_context.get();
+	const app = frontend_context.get();
 
 	// Initialize browser with the sample tabs and Zzz instance
 	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition

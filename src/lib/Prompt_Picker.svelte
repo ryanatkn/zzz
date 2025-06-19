@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Picker from '$lib/Picker.svelte';
-	import {zzz_context} from '$lib/frontend.svelte.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 	import type {Prompt} from '$lib/prompt.svelte.js';
 	import Prompt_Summary from '$lib/Prompt_Summary.svelte';
 	import type {Uuid} from '$lib/zod_helpers.js';
@@ -15,7 +15,7 @@
 
 	const {onpick, filter, exclude_ids, selected_ids}: Props = $props();
 
-	const app = zzz_context.get();
+	const app = frontend_context.get();
 	const {prompts} = app;
 </script>
 

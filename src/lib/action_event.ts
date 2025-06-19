@@ -41,7 +41,7 @@ import type {
 } from '$lib/jsonrpc.js';
 import type {Action_Kind} from '$lib/action_types.js';
 
-// State change observer type
+// State change listener type
 export type Action_Event_Change_Observer<T_Method extends Action_Method> = (
 	event: Action_Event<T_Method>,
 	old_data: Action_Event_Datas[T_Method],
@@ -58,7 +58,7 @@ export class Action_Event<
 	T_Step extends Action_Event_Step = Action_Event_Step,
 > {
 	#data: Action_Event_Datas[T_Method];
-	#observers: Set<Action_Event_Change_Observer<T_Method>> = new Set();
+	#listeners: Set<Action_Event_Change_Observer<T_Method>> = new Set();
 
 	readonly environment: T_Environment;
 	readonly spec: Action_Spec;
@@ -89,20 +89,17 @@ export class Action_Event<
 		this.#data = data;
 	}
 
-	/**
-	 * Serialize for JSON.
-	 */
 	toJSON(): Action_Event_Datas[T_Method] {
-		return this.#data;
+		return structuredClone(this.#data);
 	}
 
 	/**
-	 * Add observer for state changes.
+	 * Add listener for state changes.
 	 */
 	// TODO Consider middleware pattern for more complex scenarios
-	observe(observer: Action_Event_Change_Observer<T_Method>): () => void {
-		this.#observers.add(observer);
-		return () => this.#observers.delete(observer);
+	observe(listener: Action_Event_Change_Observer<T_Method>): () => void {
+		this.#listeners.add(listener);
+		return () => this.#listeners.delete(listener);
 	}
 
 	/**
@@ -191,7 +188,7 @@ export class Action_Event<
 
 		// Create new data for the phase
 		const new_data = this.#create_phase_data(phase);
-		this.#set_data(new_data);
+		this.set_data(new_data);
 	}
 
 	/**
@@ -238,16 +235,16 @@ export class Action_Event<
 	/** Shallowly merges `updates` with the current data. */
 	#update_data(updates: Partial<Action_Event_Data>): void {
 		const new_data = {...this.#data, ...updates} as Action_Event_Datas[T_Method];
-		this.#set_data(new_data);
+		this.set_data(new_data);
 	}
 
-	#set_data(new_data: Action_Event_Datas[T_Method]): void {
+	set_data(new_data: Action_Event_Datas[T_Method]): void {
 		const old_data = this.#data;
 		this.#data = new_data;
 
-		// Notify observers
-		for (const observer of this.#observers) {
-			observer(this, old_data, new_data);
+		// Notify listeners
+		for (const listener of this.#listeners) {
+			listener(this, old_data, new_data);
 		}
 	}
 

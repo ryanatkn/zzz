@@ -2,7 +2,7 @@
 	import {slide} from 'svelte/transition';
 	import {base} from '$app/paths';
 
-	import {zzz_context} from '$lib/frontend.svelte.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import Bit_Summary from '$lib/Bit_Summary.svelte';
 
@@ -12,7 +12,7 @@
 
 	const {diskfile}: Props = $props();
 
-	const app = zzz_context.get();
+	const app = frontend_context.get();
 
 	const bit = $derived(diskfile.bit);
 

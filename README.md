@@ -11,7 +11,8 @@
 Zzz, pronounced "zees" like bees,
 is a software project with a focus on user power and experimentation.
 The idea is to make a fullstack software environment that adapts to your needs
-while remaining fully open, aligned, and in your control.
+while remaining fully open, aligned, and in your control. It's a flexible toolkit for
+making nice web software and content.
 
 This is a pre-alpha and the ideas are still developing -
 see the issues and [discussions](https://github.com/ryanatkn/zzz/discussions)
@@ -21,12 +22,15 @@ More at [zzz.software/about](https://www.zzz.software/about).
 
 ## Setup
 
-Zzz uses SvelteKit and Vite and currently requires Node.
-(Node is the only runtime I've tested, YMMV with Deno/Bun/etc)
-Eventually there will be an installable desktop app and npm library,
-but it's not there yet - for now you'll need `node` 22.11+ and `git` to clone the repo.
+This project is in its early stages, and installing it currently requires some technical skills.
+Eventually there will be an installable desktop app for nontechnical users,
+and for developers, an npm library for TypeScript and Svelte,
+but it's not there yet -
+for now you'll need Node 22.11+ (YMMV with Bun/Deno/etc)
+and Git to clone the repo.
 
-It can be deployed via SvelteKit's static adapter with diminished capabilities.
+Zzz is deployed via SvelteKit's static adapter with diminished capabilities.
+([zzz.software](https://www.zzz.software/))
 
 > Windows probably doesn't work but will be supported - help is appreciated.
 > For now I recommend [WSL](https://learn.microsoft.com/en-us/windows/wsl/install).
@@ -56,16 +60,16 @@ Browse to the location is says, probably `localhost:5173`.
 Zzz builds on a great deal of software.
 
 - see the deps in [package.json](package.json)
-- [Claude](https://claude.ai/) wrote a lot of code after the initial version
-  under my often-flawed but usually detailed and patient direction,
-  and continues to contribute a lot to varying but sufficient success
-  - there's some slop in low-prioritity areas like tests and some client code
-    (search for `// @slop`),
-    but I consider the code quality up to par with my norm for the important parts
-    (like [Fuz](https://github.com/ryanatkn/fuz),
-    [Moss](https://github.com/ryanatkn/moss), and [Gro](https://github.com/ryanatkn/gro)),
-    with the caveat that the initial proof of concept
-    was intentionally slapdash in places for speed and to experiment,
+- I started using [Claude](https://claude.ai/) after making the initial prototype,
+  and and I've continued to use it to varying but sufficient success
+  to shape its outputs into my usual style
+  - I'm meticulous with most things,
+    but there's low quality slop in lower prioritity areas like some tests and peripheral utilities
+  - search for `// @slop` to see them, I'll make a UI to document this data soon
+  - for the important parts, I consider the code quality up to par with my norm
+    (my normal quality being [Fuz](https://github.com/ryanatkn/fuz)/[Moss](https://github.com/ryanatkn/moss)/[Gro](https://github.com/ryanatkn/gro)/[Belt](https://github.com/ryanatkn/belt)),
+    with the caveat that this initial proof of concept
+    is intentionally slapdash in places for speed and to experiment,
     and LLMs make this mindset easy to indulge
 
 ## License 🐦

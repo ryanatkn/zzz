@@ -48,7 +48,7 @@ import {
 import {Frontend_Http_Transport} from '$lib/frontend_http_transport.js';
 import {Frontend_Websocket_Transport} from '$lib/frontend_websocket_transport.js';
 
-export const zzz_context = create_context<Frontend>();
+export const frontend_context = create_context<Frontend>();
 
 export const Frontend_Json = Cell_Json.extend({
 	ui: Ui_Json.default(() => Ui_Json.parse({})),
@@ -80,7 +80,7 @@ export interface Frontend_Options extends Omit_Strict<Cell_Options<typeof Fronte
 
 /**
  * The base frontend app, typically used by creating your own `App extends Frontend`.
- * Gettable with `zzz_context.get()` inside a `<Zzz_Root>`.
+ * Gettable with `frontend_context.get()` inside a `<Zzz_Root>`.
  */
 export class Frontend extends Cell<typeof Frontend_Json> implements Action_Event_Environment {
 	readonly executor: Action_Executor = 'frontend';

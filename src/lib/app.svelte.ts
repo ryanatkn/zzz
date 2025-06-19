@@ -1,12 +1,16 @@
 import {create_context} from '@ryanatkn/fuz/context_helpers.js';
 
-import {Frontend, zzz_context, type Frontend_Options} from '$lib/frontend.svelte.js';
+import {Frontend, frontend_context, type Frontend_Options} from '$lib/frontend.svelte.js';
 import {cell_classes} from '$lib/cell_classes.js';
 import {frontend_action_handlers} from '$lib/frontend_action_handlers.js';
 import {WEBSOCKET_URL, API_URL_FOR_HTTP_RPC} from '$lib/constants.js';
 
-// TODO use this instead of `zzz_context` in non-core usages for type safety
-export const app_context: ReturnType<typeof create_context<App>> = zzz_context;
+// TODO some of this is awkward -- the idea
+// is that this `App` is specific to the Zzz frontend application,
+// and each project can create its own like this, if desired, or use the Frontend directly some other way
+
+// TODO use this instead of `frontend_context` in non-core usages for type safety
+export const app_context: ReturnType<typeof create_context<App>> = frontend_context;
 
 export interface App_Options extends Frontend_Options {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 

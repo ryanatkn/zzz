@@ -1,7 +1,7 @@
 <script lang="ts">
 	import {untrack} from 'svelte';
 
-	import {zzz_context} from '$lib/frontend.svelte.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 	import Diskfile_Info from '$lib/Diskfile_Info.svelte';
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import Content_Editor from '$lib/Content_Editor.svelte';
@@ -21,7 +21,7 @@
 
 	const {diskfile, onmodified}: Props = $props();
 
-	const app = zzz_context.get();
+	const app = frontend_context.get();
 
 	// TODO @many refactor, maybe move a collection on `app.diskfiles`?
 	const editor_state = new Diskfile_Editor_State({app, diskfile});

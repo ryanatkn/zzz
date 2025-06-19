@@ -3,9 +3,9 @@
 	import {page} from '$app/state';
 
 	import Model_Detail from '$lib/Model_Detail.svelte';
-	import {zzz_context} from '$lib/frontend.svelte.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 
-	const app = zzz_context.get();
+	const app = frontend_context.get();
 
 	const model = $derived(app.models.find_by_name(page.params.slug));
 </script>

@@ -20,7 +20,7 @@ export const Action_Json = Cell_Json.extend({
 export type Action_Json = z.infer<typeof Action_Json>;
 export type Action_Json_Input = z.input<typeof Action_Json>;
 
-export interface Action_Options extends Cell_Options<typeof Action_Json> {}
+export interface Action_Options extends Cell_Options<typeof Action_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
 /**
  * Represents a single action in the system, tracking its full lifecycle through action events.
@@ -48,6 +48,7 @@ export class Action extends Cell<typeof Action_Json> {
 		this.decoders = {
 			action_event: (data) => {
 				if (data) {
+					// TODO maybe try/catch in the base class?
 					try {
 						this.action_event = parse_action_event(data, this.app);
 					} catch (error) {
@@ -59,6 +60,10 @@ export class Action extends Cell<typeof Action_Json> {
 		};
 
 		this.init();
+	}
+
+	update_from_event(action_event: Action_Event): void {
+		this.action_event?.set_data(action_event.toJSON());
 	}
 }
 

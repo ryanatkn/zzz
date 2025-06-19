@@ -1,5 +1,3 @@
-// @slop claude_opus_4
-
 import {DEV} from 'esm-env';
 
 import type {Filer_Change_Handler, Backend} from '$lib/server/backend.js';
@@ -12,9 +10,10 @@ import {
 } from '$lib/diskfile_helpers.js';
 import {Diskfile_Path, Serializable_Source_File} from '$lib/diskfile_types.js';
 
-// TODO @api this is all a hacky WIP,
+// TODO @api think about unification between frontend|backend_actions_api.ts
+// this is all a hacky WIP,
 // thinking about a symmetric API for the frontend/backend
-// without blowing the overhead budgets for complexity and performance,
+// without blowing the budgets for complexity and performance,
 // think about unification with frontend_actions_api.ts and see it for better patterns
 
 export interface Backend_Actions_Api {
@@ -44,7 +43,7 @@ export const create_backend_actions_api = (backend: Backend): Backend_Actions_Ap
 	};
 };
 
-// TODO where does this belong?
+// TODO where does this belong? it calls into the `Backend_Actions_Api`
 /**
  * Handle file system changes and notify clients.
  */

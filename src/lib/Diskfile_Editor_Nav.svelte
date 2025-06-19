@@ -1,7 +1,7 @@
 <script lang="ts">
 	import {GLYPH_ARROW_LEFT, GLYPH_ARROW_RIGHT, GLYPH_REFRESH} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
-	import {zzz_context} from '$lib/frontend.svelte.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 	import type {Diskfile_Editor_State} from '$lib/diskfile_editor_state.svelte.js';
 	import type {Uuid} from '$lib/zod_helpers.js';
 
@@ -11,7 +11,7 @@
 
 	const {editor_state}: Props = $props();
 
-	const app = zzz_context.get();
+	const app = frontend_context.get();
 	const {diskfiles} = app;
 	const {editor} = diskfiles;
 

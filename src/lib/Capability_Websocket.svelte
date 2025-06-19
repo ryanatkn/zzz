@@ -5,7 +5,7 @@
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
 	import {PUBLIC_WEBSOCKET_URL} from '$env/static/public';
 
-	import {zzz_context} from '$lib/frontend.svelte.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 	import type {Socket} from '$lib/socket.svelte.js';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Glyph from '$lib/Glyph.svelte';
@@ -33,7 +33,7 @@
 	const {socket: socket_prop}: Props = $props();
 
 	// Get socket from props or context
-	const app = zzz_context.get();
+	const app = frontend_context.get();
 	const socket = $derived(socket_prop || app.socket);
 	const {capabilities} = app;
 

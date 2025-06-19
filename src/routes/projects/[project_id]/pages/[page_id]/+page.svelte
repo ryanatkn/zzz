@@ -11,10 +11,10 @@
 	import Project_Not_Found from '$routes/projects/Project_Not_Found.svelte';
 	import {GLYPH_DELETE, GLYPH_PREVIEW, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
-	import {zzz_context} from '$lib/frontend.svelte.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 
 	const projects = projects_context.get();
-	const app = zzz_context.get();
+	const app = frontend_context.get();
 
 	const page_viewmodel = $derived(projects.current_page_viewmodel);
 

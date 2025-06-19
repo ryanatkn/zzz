@@ -6,7 +6,7 @@
 	import {slide} from 'svelte/transition';
 
 	import Glyph from '$lib/Glyph.svelte';
-	import {zzz_context} from '$lib/frontend.svelte.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 	import type {Action} from '$lib/action.svelte.js';
 	import {get_glyph_for_action_method, get_glyph_for_action_kind} from '$lib/glyphs.js';
 	import Sortable_List from '$lib/Sortable_List.svelte';
@@ -21,7 +21,7 @@
 
 	const {limit = 20, selected_action_id = null, attrs, onselect}: Props = $props();
 
-	const app = zzz_context.get();
+	const app = frontend_context.get();
 	const {actions} = app;
 
 	// Count total actions for the "showing X of Y" action

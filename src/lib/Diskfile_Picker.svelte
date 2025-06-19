@@ -1,6 +1,6 @@
 <script lang="ts">
 	import Picker from '$lib/Picker.svelte';
-	import {zzz_context} from '$lib/frontend.svelte.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import type {Uuid} from '$lib/zod_helpers.js';
 	import {sort_by_text, sort_by_numeric} from '$lib/sortable.svelte.js';
@@ -15,7 +15,7 @@
 
 	const {onpick, filter, exclude_ids, selected_ids}: Props = $props();
 
-	const app = zzz_context.get();
+	const app = frontend_context.get();
 	const {diskfiles} = app;
 </script>
 

@@ -6,7 +6,7 @@
 	import type {Snippet} from 'svelte';
 
 	import {projects_context, Projects} from '$routes/projects/projects.svelte.js';
-	import {zzz_context} from '$lib/frontend.svelte.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 
 	interface Props {
 		children: Snippet;
@@ -14,7 +14,7 @@
 
 	const {children}: Props = $props();
 
-	const app = zzz_context.get();
+	const app = frontend_context.get();
 
 	// Initialize the Projects instance and set it in context
 	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition

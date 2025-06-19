@@ -10,6 +10,7 @@ import {
 	Action_Side_Effects,
 } from '$lib/action_types.js';
 
+// TODO BLOCK rethink this name as `Action_Spec` maybe with `_Union`, see `Action_Event_Data` for an example
 export const Action_Spec_Base = z.object({
 	method: Action_Method,
 	kind: Action_Kind,

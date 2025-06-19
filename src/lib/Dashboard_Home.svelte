@@ -1,14 +1,14 @@
 <script lang="ts">
 	import {base} from '$app/paths';
 
-	import {zzz_context} from '$lib/frontend.svelte.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 	import Actions_List from '$lib/Action_List.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 	import Provider_Link from '$lib/Provider_Link.svelte';
 	import Model_Link from '$lib/Model_Link.svelte';
 	import {GLYPH_LOG, GLYPH_PROVIDER, GLYPH_MODEL} from '$lib/glyphs.js';
 
-	const app = zzz_context.get();
+	const app = frontend_context.get();
 </script>
 
 <div class="p_lg">

@@ -2,7 +2,7 @@
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
 
 	import type {Zzz_Dir} from '$lib/diskfile_types.js';
-	import {zzz_context} from '$lib/frontend.svelte.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 
 	interface Props {
 		zzz_dir?: Zzz_Dir | null | undefined;
@@ -11,7 +11,7 @@
 	// Get props with default to context value
 	const {zzz_dir: zzz_dir_prop}: Props = $props();
 
-	const app = zzz_context.get();
+	const app = frontend_context.get();
 	const {capabilities} = app;
 
 	// Fall back to the context value if not provided

@@ -4,13 +4,13 @@
 	import type {Chat} from '$lib/chat.svelte.js';
 	import {Reorderable} from '$lib/reorderable.svelte.js';
 	import Tape_Listitem from '$lib/Tape_Listitem.svelte';
-	import {zzz_context} from '$lib/frontend.svelte.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 
 	interface Props {
 		chat?: Chat | undefined;
 	}
 
-	const {chat = zzz_context.get().chats.selected}: Props = $props();
+	const {chat = frontend_context.get().chats.selected}: Props = $props();
 
 	const reorderable = new Reorderable();
 </script>
