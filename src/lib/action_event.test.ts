@@ -6,7 +6,7 @@ import {test, expect, describe} from 'vitest';
 
 import {create_action_event, create_action_event_from_json} from '$lib/action_event.js';
 import type {Action_Event_Environment} from '$lib/action_event_types.js';
-import type {Action_Spec} from '$lib/action_spec.js';
+import type {Action_Spec_Union} from '$lib/action_spec.js';
 import {
 	ping_action_spec,
 	filer_change_action_spec,
@@ -21,9 +21,9 @@ class Test_Environment implements Action_Event_Environment {
 	executor: Action_Executor = 'frontend';
 	peer: any = {}; // Mock peer, not used in tests
 	handlers: Map<string, Map<string, (event: any) => any>> = new Map();
-	specs: Map<string, Action_Spec> = new Map();
+	specs: Map<string, Action_Spec_Union> = new Map();
 
-	constructor(specs: Array<Action_Spec> = []) {
+	constructor(specs: Array<Action_Spec_Union> = []) {
 		for (const spec of specs) {
 			this.specs.set(spec.method, spec);
 		}
@@ -33,7 +33,7 @@ class Test_Environment implements Action_Event_Environment {
 		return this.handlers.get(method)?.get(phase);
 	}
 
-	lookup_action_spec(method: string): Action_Spec | undefined {
+	lookup_action_spec(method: string): Action_Spec_Union | undefined {
 		return this.specs.get(method);
 	}
 

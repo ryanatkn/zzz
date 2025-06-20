@@ -21,10 +21,8 @@ export const gen: Gen = ({origin_path}) => {
 
 	// Add base imports
 	imports.add('zod', 'z');
-	imports.add_type('$lib/action_spec.js', 'Action_Spec');
-	imports.add('$lib/action_spec.js', 'collect_action_specs');
+	imports.add_type('$lib/action_spec.js', 'Action_Spec_Union');
 	imports.add_many('$lib/action_specs.js', '* as specs');
-	imports.add_type('$lib/action_metatypes.js', 'Action_Method');
 	imports.add_types(
 		'$lib/action_event_data.js',
 		'Action_Event_Request_Response_Data',
@@ -49,18 +47,31 @@ export const gen: Gen = ({origin_path}) => {
 
 		${imports.build()}
 
-		// TODO consistent naming
+		// TODO consistent naming, maybe \`Action_Method_Union\`
 		/**
 		 * All method types combined.
 		 */
-		export const Action_Method_Any = z.enum([
+		export const Action_Methods = z.enum([
 			${registry.methods.map((method) => `'${method}'`).join(',\n\t\t\t')}
 		]);
-		export type Action_Method_Any = z.infer<typeof Action_Method_Any>;
-
-		export const action_specs: Array<Action_Spec> = collect_action_specs(specs);
+		export type Action_Methods = z.infer<typeof Action_Methods>;
 		
-		export const action_spec_by_method: Map<Action_Method, Action_Spec> = new Map(action_specs.map((spec) => [spec.method, spec]));
+		/**
+		 * Action specifications indexed by method name.
+		 * These represent the complete action spec definitions.
+		 */
+		export const Action_Specs = {
+			${registry.specs
+				.map((spec) => `${spec.method}: specs.${spec.method}_action_spec`)
+				.join(',\n\t\t\t')}
+		} as const;
+		export interface Action_Specs {
+			${registry.specs
+				.map((spec) => `${spec.method}: typeof specs.${spec.method}_action_spec`)
+				.join(';\n\t\t\t')}
+		}
+
+		export const action_specs: Array<Action_Spec_Union> = Object.values(Action_Specs);
 
 		/**
 		 * Action parameter schemas indexed by method name.

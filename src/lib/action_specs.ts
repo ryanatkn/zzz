@@ -9,7 +9,7 @@ import {
 	Zzz_Dir,
 } from '$lib/diskfile_types.js';
 import {Completion_Request, Completion_Response} from '$lib/completion_types.js';
-import type {Action_Spec} from '$lib/action_spec.js';
+import type {Action_Spec_Union} from '$lib/action_spec.js';
 import {Jsonrpc_Request_Id} from '$lib/jsonrpc.js';
 
 // TODO I tried using the helper `create_action_spec` but I don't see how to get proper typing,
@@ -28,7 +28,7 @@ export const ping_action_spec = {
 		})
 		.strict(),
 	async: true,
-} satisfies Action_Spec;
+} satisfies Action_Spec_Union;
 
 export const load_session_action_spec = {
 	method: 'load_session',
@@ -52,7 +52,7 @@ export const load_session_action_spec = {
 		})
 		.strict(),
 	async: true,
-} satisfies Action_Spec;
+} satisfies Action_Spec_Union;
 
 export const filer_change_action_spec = {
 	method: 'filer_change',
@@ -68,7 +68,7 @@ export const filer_change_action_spec = {
 		.strict(),
 	output: z.void(),
 	async: true,
-} satisfies Action_Spec;
+} satisfies Action_Spec_Union;
 
 export const update_diskfile_action_spec = {
 	method: 'update_diskfile',
@@ -84,7 +84,7 @@ export const update_diskfile_action_spec = {
 		.strict(),
 	output: z.null(),
 	async: true,
-} satisfies Action_Spec;
+} satisfies Action_Spec_Union;
 
 export const delete_diskfile_action_spec = {
 	method: 'delete_diskfile',
@@ -99,7 +99,7 @@ export const delete_diskfile_action_spec = {
 		.strict(),
 	output: z.null(),
 	async: true,
-} satisfies Action_Spec;
+} satisfies Action_Spec_Union;
 
 export const create_directory_action_spec = {
 	method: 'create_directory',
@@ -114,7 +114,7 @@ export const create_directory_action_spec = {
 		.strict(),
 	output: z.null(),
 	async: true,
-} satisfies Action_Spec;
+} satisfies Action_Spec_Union;
 
 export const submit_completion_action_spec = {
 	method: 'submit_completion',
@@ -133,7 +133,7 @@ export const submit_completion_action_spec = {
 		})
 		.strict(),
 	async: true,
-} satisfies Action_Spec;
+} satisfies Action_Spec_Union;
 
 // TODO this is just a placeholder for a local call
 export const toggle_main_menu_action_spec = {
@@ -145,4 +145,4 @@ export const toggle_main_menu_action_spec = {
 	input: z.object({show: z.boolean().optional()}).optional(),
 	output: z.object({show: z.boolean()}),
 	async: false,
-} satisfies Action_Spec;
+} satisfies Action_Spec_Union;

@@ -10,8 +10,7 @@ import {
 	Action_Side_Effects,
 } from '$lib/action_types.js';
 
-// TODO BLOCK rethink this name as `Action_Spec` maybe with `_Union`, see `Action_Event_Data` for an example
-export const Action_Spec_Base = z.object({
+export const Action_Spec = z.object({
 	method: Action_Method,
 	kind: Action_Kind,
 	initiator: Action_Initiator,
@@ -25,19 +24,17 @@ export const Action_Spec_Base = z.object({
 		z.instanceof(z.ZodOptional<z.ZodVoid>),
 	]),
 	async: z.boolean(),
-});
-export type Action_Spec_Base = z.infer<typeof Action_Spec_Base>;
+}); // TODO also make strict? additional properties are not passed through
+export type Action_Spec = z.infer<typeof Action_Spec>;
 
-/** Type for request_response actions (bidirectional request/response pattern). */
-export const Request_Response_Action_Spec = Action_Spec_Base.extend({
+export const Request_Response_Action_Spec = Action_Spec.extend({
 	kind: z.literal('request_response').default('request_response'),
 	auth: Action_Auth,
 	async: z.literal(true).default(true),
 });
 export type Request_Response_Action_Spec = z.infer<typeof Request_Response_Action_Spec>;
 
-/** Type for remote_notification actions (unidirectional fire-and-forget messages). */
-export const Remote_Notification_Action_Spec = Action_Spec_Base.extend({
+export const Remote_Notification_Action_Spec = Action_Spec.extend({
 	kind: z.literal('remote_notification').default('remote_notification'),
 	auth: z.null().default(null),
 	side_effects: z.literal(true).nullable().default(true), // TODO this probably will change hence the awkward types
@@ -46,43 +43,22 @@ export const Remote_Notification_Action_Spec = Action_Spec_Base.extend({
 });
 export type Remote_Notification_Action_Spec = z.infer<typeof Remote_Notification_Action_Spec>;
 
-/** Type for local_call actions (in-process operations that never cross boundaries). */
-export const Local_Call_Action_Spec = Action_Spec_Base.extend({
+export const Local_Call_Action_Spec = Action_Spec.extend({
 	kind: z.literal('local_call').default('local_call'),
 	auth: z.null().default(null),
 });
 export type Local_Call_Action_Spec = z.infer<typeof Local_Call_Action_Spec>;
 
-export const Action_Spec = z.union([
+export const Action_Spec_Union = z.union([
 	Request_Response_Action_Spec,
 	Remote_Notification_Action_Spec,
 	Local_Call_Action_Spec,
 ]);
-export type Action_Spec = z.infer<typeof Action_Spec>;
+export type Action_Spec_Union = z.infer<typeof Action_Spec_Union>;
 
-/**
- * Type guard to validate if a value is an Action_Spec
- */
-export const is_action_spec = (value: unknown): value is Action_Spec => {
-	return (
-		value !== null &&
-		typeof value === 'object' &&
-		'method' in value &&
-		'kind' in value &&
-		((value as Action_Spec).kind === 'request_response' ||
-			(value as Action_Spec).kind === 'remote_notification' ||
-			(value as Action_Spec).kind === 'local_call')
-	);
-};
-
-export const collect_action_specs = (obj: Record<string, Action_Spec>): Array<Action_Spec> => {
-	const specs: Array<Action_Spec> = [];
-
-	for (const value of Object.values(obj)) {
-		if (is_action_spec(value)) {
-			specs.push(value);
-		}
-	}
-
-	return specs;
-};
+export const is_action_spec = (value: unknown): value is Action_Spec_Union =>
+	value !== null &&
+	typeof value === 'object' &&
+	'method' in value &&
+	'kind' in value &&
+	Action_Kind._def.values.includes(value.kind as any);

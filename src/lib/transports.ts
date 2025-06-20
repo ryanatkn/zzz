@@ -3,8 +3,6 @@
 import {z} from 'zod';
 
 import type {
-	Jsonrpc_Batch_Request,
-	Jsonrpc_Batch_Response,
 	Jsonrpc_Message_From_Client_To_Server,
 	Jsonrpc_Message_From_Server_To_Client,
 	Jsonrpc_Notification,
@@ -25,7 +23,6 @@ export interface Transport {
 	/* eslint-disable @typescript-eslint/method-signature-style */
 	send(message: Jsonrpc_Request): Promise<Jsonrpc_Response_Or_Error>;
 	send(message: Jsonrpc_Notification): Promise<null>;
-	send(message: Jsonrpc_Batch_Request): Promise<Jsonrpc_Batch_Response>;
 	send(
 		message: Jsonrpc_Message_From_Client_To_Server,
 	): Promise<Jsonrpc_Message_From_Server_To_Client | null>;

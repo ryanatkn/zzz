@@ -2,7 +2,7 @@
 
 import type {Socket} from '$lib/socket.svelte.js';
 import {Request_Tracker} from '$lib/request_tracker.svelte.js';
-import {Jsonrpc_Error, jsonrpc_errors} from '$lib/jsonrpc_errors.js';
+import {Thrown_Jsonrpc_Error, jsonrpc_errors} from '$lib/jsonrpc_errors.js';
 import {
 	is_jsonrpc_notification,
 	is_jsonrpc_request,
@@ -10,8 +10,6 @@ import {
 	is_jsonrpc_error_message,
 } from '$lib/jsonrpc_helpers.js';
 import type {
-	Jsonrpc_Batch_Request,
-	Jsonrpc_Batch_Response,
 	Jsonrpc_Message_From_Client_To_Server,
 	Jsonrpc_Message_From_Server_To_Client,
 	Jsonrpc_Notification,
@@ -42,7 +40,6 @@ export class Frontend_Websocket_Transport implements Transport {
 					this.#request_tracker.handle_message(data);
 				} else if (is_jsonrpc_request(data) || is_jsonrpc_notification(data)) {
 					// This is a new request/notification from the server
-					// TODO @many check if batches need special handling here
 					await socket.app.peer.receive(data);
 				} else {
 					console.warn('[frontend websocket transport] Received unknown message type:', data);
@@ -55,7 +52,6 @@ export class Frontend_Websocket_Transport implements Transport {
 
 	async send(message: Jsonrpc_Request): Promise<Jsonrpc_Response_Or_Error>;
 	async send(message: Jsonrpc_Notification): Promise<null>;
-	async send(message: Jsonrpc_Batch_Request): Promise<Jsonrpc_Batch_Response>;
 	async send(
 		message: Jsonrpc_Message_From_Client_To_Server,
 	): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
@@ -83,7 +79,7 @@ export class Frontend_Websocket_Transport implements Transport {
 			throw jsonrpc_errors.invalid_request();
 		} catch (error) {
 			console.error('[frontend websocket transport] Error sending message:', error);
-			if (error instanceof Jsonrpc_Error) {
+			if (error instanceof Thrown_Jsonrpc_Error) {
 				throw error;
 			}
 			throw jsonrpc_errors.internal_error(

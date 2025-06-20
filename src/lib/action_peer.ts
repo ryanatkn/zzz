@@ -5,8 +5,6 @@ import {
 	JSONRPC_INVALID_REQUEST,
 	JSONRPC_METHOD_NOT_FOUND,
 	JSONRPC_PARSE_ERROR,
-	Jsonrpc_Batch_Request,
-	Jsonrpc_Batch_Response,
 	Jsonrpc_Message_From_Client_To_Server,
 	Jsonrpc_Message_From_Server_To_Client,
 	Jsonrpc_Notification,
@@ -21,7 +19,6 @@ import {
 	to_jsonrpc_message_id,
 	is_jsonrpc_request,
 	is_jsonrpc_notification,
-	is_jsonrpc_batch_request,
 } from '$lib/jsonrpc_helpers.js';
 import {create_action_event} from '$lib/action_event.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
@@ -61,10 +58,6 @@ export class Action_Peer {
 	): Promise<Jsonrpc_Response_Or_Error>;
 	async send(message: Jsonrpc_Notification, options?: Action_Peer_Send_Options): Promise<null>;
 	async send(
-		message: Jsonrpc_Batch_Request,
-		options?: Action_Peer_Send_Options,
-	): Promise<Jsonrpc_Batch_Response>;
-	async send(
 		message: Jsonrpc_Message_From_Client_To_Server,
 		options?: Action_Peer_Send_Options,
 	): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
@@ -81,16 +74,12 @@ export class Action_Peer {
 				return this.#create_parse_error_response();
 			}
 
-			// Handle batch requests
-			if (Array.isArray(message)) {
-				return await this.#process_batch_message(message);
-			}
-
-			// Handle single message
-			return await this.#process_single_message(message);
+			// Handle a single message - MCP does not support JSON-RPC batches
+			// because of some tricky cases, so we don't either
+			return await this.#process_message(message);
 		} catch (error) {
 			// Only programmer errors should reach here
-			this.environment.log?.error('Unexpected error:', error);
+			this.environment.log?.error('unexpected error:', error);
 			return this.#create_fatal_error_response(message);
 		}
 	}
@@ -98,9 +87,7 @@ export class Action_Peer {
 	/**
 	 * Process a single JSON-RPC message.
 	 */
-	async #process_single_message(
-		message: unknown,
-	): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
+	async #process_message(message: unknown): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
 		// Validate it's a request or notification
 		if (is_jsonrpc_request(message)) {
 			return this.#process_request(message);
@@ -116,45 +103,6 @@ export class Action_Peer {
 						message: 'invalid request',
 					});
 		}
-	}
-
-	/**
-	 * Process a batch of JSON-RPC messages.
-	 */
-	async #process_batch_message(
-		messages: Array<unknown>,
-	): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
-		// Check if it's a valid batch (non-empty array)
-		if (!Array.isArray(messages) || messages.length === 0) {
-			// Invalid batch format - return single error response
-			return this.#create_parse_error_response();
-		}
-
-		if (!is_jsonrpc_batch_request(messages)) {
-			// If we can't process as a batch, return a single error
-			return this.#create_parse_error_response();
-		}
-
-		// Responses are collected in resolution order
-		const responses: Array<Jsonrpc_Message_From_Server_To_Client> = [];
-
-		// Process messages in parallel because the JSON-RPC spec allows it
-		// TODO @api configurable max concurrency
-		await Promise.all(
-			messages.map(async (message) => {
-				const response = await this.#process_single_message(message);
-				if (response !== null) {
-					responses.push(response); // intentionally ordering in completion order
-				}
-			}),
-		);
-
-		// Per JSON-RPC spec: if no responses, return nothing (null)
-		if (responses.length === 0) {
-			return null;
-		}
-
-		return responses as Jsonrpc_Batch_Response;
 	}
 
 	/**
@@ -211,7 +159,7 @@ export class Action_Peer {
 	async #process_notification(notification: Jsonrpc_Notification): Promise<void> {
 		const spec = this.environment.lookup_action_spec(notification.method as Action_Method); // TODO @many try not to cast, idk what the best design is here
 		if (!spec) {
-			this.environment.log?.warn(`Unknown notification method: ${notification.method}`);
+			this.environment.log?.warn(`unknown notification method: ${notification.method}`);
 			return;
 		}
 
@@ -224,10 +172,10 @@ export class Action_Peer {
 			await event.parse().handle_async();
 
 			if (event.data.step === 'failed') {
-				this.environment.log?.error(`Notification handler failed:`, event.data.error);
+				this.environment.log?.error(`notification handler failed:`, event.data.error);
 			}
 		} catch (error) {
-			this.environment.log?.error(`Error processing notification:`, error);
+			this.environment.log?.error(`error processing notification:`, error);
 		}
 	}
 

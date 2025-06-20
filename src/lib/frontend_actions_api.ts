@@ -5,7 +5,7 @@ import type {Action_Event_Environment} from '$lib/action_event_types.js';
 import {Action_Event, create_action_event} from '$lib/action_event.js';
 import {is_jsonrpc_error_message} from '$lib/jsonrpc_helpers.js';
 import type {
-	Action_Spec,
+	Action_Spec_Union,
 	Local_Call_Action_Spec,
 	Remote_Notification_Action_Spec,
 	Request_Response_Action_Spec,
@@ -42,7 +42,7 @@ export const create_frontend_actions_api = <T extends Action_Event_Environment>(
 /**
  * Creates a method that executes an action through its complete lifecycle.
  */
-const create_action_method = (environment: Action_Event_Environment, spec: Action_Spec) => {
+const create_action_method = (environment: Action_Event_Environment, spec: Action_Spec_Union) => {
 	// Return different implementations based on action kind
 	switch (spec.kind) {
 		case 'local_call':

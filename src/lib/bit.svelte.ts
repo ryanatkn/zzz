@@ -287,7 +287,7 @@ export class Diskfile_Bit extends Bit<typeof Diskfile_Bit_Json> {
 		}
 
 		if (this.path) {
-			this.app.diskfiles.update(this.path, value);
+			void this.app.diskfiles.update(this.path, value);
 		}
 	}
 

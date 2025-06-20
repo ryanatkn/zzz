@@ -34,7 +34,7 @@ const google = new GoogleGenerativeAI(SECRET_GOOGLE_API_KEY);
 
 /**
  * Handle client messages and produce appropriate server responses.
- * Each returns a value or throws a `Jsonrpc_Error`.
+ * Each returns a value or throws a `Thrown_Jsonrpc_Error`.
  * Organized by method and phase for symmetric handling.
  */
 export const backend_action_handlers: Backend_Action_Handlers = {

@@ -5,8 +5,8 @@ import {z} from 'zod';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Action_Method} from '$lib/action_metatypes.js';
 import {Action_Kind} from '$lib/action_types.js';
-import {action_spec_by_method} from '$lib/action_collections.js';
-import type {Action_Spec} from '$lib/action_spec.js';
+import {Action_Specs} from '$lib/action_collections.js';
+import type {Action_Spec_Union} from '$lib/action_spec.js';
 import {type Action_Event, parse_action_event} from '$lib/action_event.js';
 import {HANDLED} from '$lib/cell_helpers.js';
 import {Cell_Json} from '$lib/cell_types.js';
@@ -30,8 +30,8 @@ export class Action extends Cell<typeof Action_Json> {
 
 	action_event: Action_Event | undefined = $state.raw();
 
-	readonly spec: Action_Spec = $derived.by(() => {
-		const s = action_spec_by_method.get(this.method);
+	readonly spec: Action_Spec_Union = $derived.by(() => {
+		const s = Action_Specs[this.method] as Action_Spec_Union | undefined; // TODO refactor
 		if (!s) throw new Error(`Missing action spec for method '${this.method}'`);
 		return s;
 	});

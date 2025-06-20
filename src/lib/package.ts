@@ -944,9 +944,9 @@ export const src_json = {
 		'./action_collections.js': {
 			path: 'action_collections.ts',
 			declarations: [
-				{name: 'Action_Method_Any', kind: 'variable'},
+				{name: 'Action_Methods', kind: 'variable'},
+				{name: 'Action_Specs', kind: 'variable'},
 				{name: 'action_specs', kind: 'variable'},
-				{name: 'action_spec_by_method', kind: 'variable'},
 				{name: 'Action_Inputs', kind: 'variable'},
 				{name: 'Action_Outputs', kind: 'variable'},
 				{name: 'Action_Event_Datas', kind: 'type'},
@@ -1067,13 +1067,12 @@ export const src_json = {
 		'./action_spec.js': {
 			path: 'action_spec.ts',
 			declarations: [
-				{name: 'Action_Spec_Base', kind: 'variable'},
+				{name: 'Action_Spec', kind: 'variable'},
 				{name: 'Request_Response_Action_Spec', kind: 'variable'},
 				{name: 'Remote_Notification_Action_Spec', kind: 'variable'},
 				{name: 'Local_Call_Action_Spec', kind: 'variable'},
-				{name: 'Action_Spec', kind: 'variable'},
+				{name: 'Action_Spec_Union', kind: 'variable'},
 				{name: 'is_action_spec', kind: 'function'},
-				{name: 'collect_action_specs', kind: 'function'},
 			],
 		},
 		'./action_specs.js': {
@@ -1821,7 +1820,7 @@ export const src_json = {
 			declarations: [
 				{name: 'JSONRPC_ERROR_CODES', kind: 'variable'},
 				{name: 'http_status_to_jsonrpc_code', kind: 'function'},
-				{name: 'Jsonrpc_Error', kind: 'class'},
+				{name: 'Thrown_Jsonrpc_Error', kind: 'class'},
 				{name: 'jsonrpc_errors', kind: 'variable'},
 			],
 		},
@@ -1842,9 +1841,6 @@ export const src_json = {
 				{name: 'is_jsonrpc_response', kind: 'function'},
 				{name: 'is_jsonrpc_error_message', kind: 'function'},
 				{name: 'is_jsonrpc_singular_message', kind: 'function'},
-				{name: 'is_jsonrpc_batch_message', kind: 'function'},
-				{name: 'is_jsonrpc_batch_request', kind: 'function'},
-				{name: 'is_jsonrpc_batch_response', kind: 'function'},
 			],
 		},
 		'./jsonrpc.js': {
@@ -1875,14 +1871,11 @@ export const src_json = {
 				{name: 'Jsonrpc_Error_Code', kind: 'variable'},
 				{name: 'Jsonrpc_Error_Json', kind: 'variable'},
 				{name: 'Jsonrpc_Error_Message', kind: 'variable'},
-				{name: 'Jsonrpc_Batch_Request', kind: 'variable'},
 				{name: 'Jsonrpc_Response_Or_Error', kind: 'variable'},
-				{name: 'Jsonrpc_Batch_Response', kind: 'variable'},
 				{name: 'Jsonrpc_Message', kind: 'variable'},
 				{name: 'Jsonrpc_Message_From_Client_To_Server', kind: 'variable'},
 				{name: 'Jsonrpc_Message_From_Server_To_Client', kind: 'variable'},
 				{name: 'Jsonrpc_Singular_Message', kind: 'variable'},
-				{name: 'Jsonrpc_Batch_Message', kind: 'variable'},
 			],
 		},
 		'./list_helpers.js': {

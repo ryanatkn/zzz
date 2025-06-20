@@ -5,7 +5,7 @@ import type {Flavored} from '@ryanatkn/belt/types.js';
 import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 
 import type {
-	Action_Spec,
+	Action_Spec_Union,
 	Request_Response_Action_Spec,
 	Remote_Notification_Action_Spec,
 	Local_Call_Action_Spec,
@@ -57,7 +57,7 @@ export class Schema_Registry {
 	/**
 	 * Collection of all action specs.
 	 */
-	action_specs: Array<Action_Spec> = [];
+	action_specs: Array<Action_Spec_Union> = [];
 
 	/**
 	 * Collection of 'request_response' action specs.
@@ -77,12 +77,12 @@ export class Schema_Registry {
 	/**
 	 * Map of action spec names to action specs.
 	 */
-	action_spec_by_name_map: Map<Action_Method, Action_Spec> = new Map();
+	action_spec_by_name_map: Map<Action_Method, Action_Spec_Union> = new Map();
 
 	/**
 	 * Add a schema to the appropriate registries.
 	 */
-	add_schema(name: Vocab_Name, schema: z.ZodTypeAny | Action_Spec): void {
+	add_schema(name: Vocab_Name, schema: z.ZodTypeAny | Action_Spec_Union): void {
 		if ('_def' in schema) {
 			// It's a Zod schema
 			this.schemas.push(schema);
@@ -140,7 +140,7 @@ export class Schema_Registry {
 	/**
 	 * Get an action specification by method name.
 	 */
-	get_action_spec(method: Action_Method): Action_Spec | undefined {
+	get_action_spec(method: Action_Method): Action_Spec_Union | undefined {
 		return this.action_spec_by_name_map.get(method);
 	}
 

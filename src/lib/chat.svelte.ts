@@ -92,7 +92,7 @@ export class Chat extends Cell<typeof Chat_Json> {
 
 	async send_to_all(content: string): Promise<void> {
 		await Promise.all(
-			// TODO batch endpoint
+			// TODO batched endpoint
 			this.enabled_tapes.map((tape) => this.send_to_tape(tape.id, content)),
 		);
 	}

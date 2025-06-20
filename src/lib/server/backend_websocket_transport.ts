@@ -5,8 +5,6 @@ import type {WSContext} from 'hono/ws';
 import {create_uuid, Uuid} from '$lib/zod_helpers.js';
 import type {Transport} from '$lib/transports.js';
 import type {
-	Jsonrpc_Batch_Request,
-	Jsonrpc_Batch_Response,
 	Jsonrpc_Message_From_Client_To_Server,
 	Jsonrpc_Message_From_Server_To_Client,
 	Jsonrpc_Notification,
@@ -49,7 +47,6 @@ export class Backend_Websocket_Transport implements Transport {
 
 	async send(message: Jsonrpc_Request): Promise<Jsonrpc_Response_Or_Error>;
 	async send(message: Jsonrpc_Notification): Promise<null>;
-	async send(message: Jsonrpc_Batch_Request): Promise<Jsonrpc_Batch_Response>;
 	async send(
 		message: Jsonrpc_Message_From_Client_To_Server,
 	): Promise<Jsonrpc_Message_From_Server_To_Client | null> {

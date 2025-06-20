@@ -1,7 +1,7 @@
 // @slop claude_opus_4
 
 import type {Action_Method} from '$lib/action_metatypes.js';
-import type {Action_Spec} from '$lib/action_spec.js';
+import type {Action_Spec_Union} from '$lib/action_spec.js';
 import type {
 	Action_Event_Environment,
 	Action_Event_Phase,
@@ -61,7 +61,7 @@ export class Action_Event<
 	#listeners: Set<Action_Event_Change_Observer<T_Method>> = new Set();
 
 	readonly environment: T_Environment;
-	readonly spec: Action_Spec;
+	readonly spec: Action_Spec_Union;
 
 	get data(): Action_Event_Datas[T_Method] & {phase: T_Phase; step: T_Step} {
 		return this.#data as Action_Event_Datas[T_Method] & {phase: T_Phase; step: T_Step};
@@ -83,7 +83,11 @@ export class Action_Event<
 		return this.environment;
 	}
 
-	constructor(environment: T_Environment, spec: Action_Spec, data: Action_Event_Datas[T_Method]) {
+	constructor(
+		environment: T_Environment,
+		spec: Action_Spec_Union,
+		data: Action_Event_Datas[T_Method],
+	) {
 		this.environment = environment;
 		this.spec = spec;
 		this.#data = data;
@@ -351,7 +355,7 @@ export class Action_Event<
  */
 export const create_action_event = <T_Method extends Action_Method>(
 	environment: Action_Event_Environment,
-	spec: Action_Spec,
+	spec: Action_Spec_Union,
 	input: unknown,
 	initial_phase?: Action_Event_Phase,
 ): Action_Event<T_Method> => {

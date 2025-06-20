@@ -36,7 +36,7 @@ import {Action_Peer} from '$lib/action_peer.js';
 import type {Completion_Message} from '$lib/completion_types.js';
 import type {Action_Method, Actions_Api} from '$lib/action_metatypes.js';
 import type {Frontend_Action_Handlers} from '$lib/frontend_action_types.js';
-import type {Action_Spec} from '$lib/action_spec.js';
+import type {Action_Spec_Union} from '$lib/action_spec.js';
 import {Action_Inputs, Action_Outputs, action_specs} from '$lib/action_collections.js';
 import {create_frontend_actions_api} from '$lib/frontend_actions_api.js';
 import {Action_Executor} from '$lib/action_types.js';
@@ -65,7 +65,7 @@ export interface Frontend_Options extends Omit_Strict<Cell_Options<typeof Fronte
 	bots?: Zzz_Config['bots'];
 	providers?: Array<Provider_Json>;
 	cell_classes?: Record<string, Class_Constructor<Cell>>;
-	action_specs?: Array<Action_Spec>;
+	action_specs?: Array<Action_Spec_Union>;
 	action_handlers?: Frontend_Action_Handlers;
 
 	/** URL for server communication */
@@ -304,7 +304,7 @@ export class Frontend extends Cell<typeof Frontend_Json> implements Action_Event
 		return method_handlers[phase];
 	}
 
-	lookup_action_spec(method: Action_Method): Action_Spec | undefined {
+	lookup_action_spec(method: Action_Method): Action_Spec_Union | undefined {
 		return this.action_registry.spec_by_method.get(method);
 	}
 

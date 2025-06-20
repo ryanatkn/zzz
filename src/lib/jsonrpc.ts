@@ -6,9 +6,13 @@
  * changed to include a prefix on all identifiers.
  * It's also defined with Zod schemas instead of plain TS like the MCP library.
  *
- * MCP messages are a subset of JSON-RPC -
- * `params` does not support the positional array format,
- * and `result` supports only `object` values, instead of being any JSON value.
+ * MCP messages are a subset of JSON-RPC:
+ *
+ * - `params` does not support the positional array format,
+ * 		and `result` supports only `object` values, instead of being any JSON value.
+ * - MCP does not support batching,
+ * 		see https://github.com/modelcontextprotocol/modelcontextprotocol/pull/416
+ * 		and https://github.com/modelcontextprotocol/modelcontextprotocol/pull/228
  *
  * @source https://github.com/modelcontextprotocol/typescript-sdk
  * @see https://modelcontextprotocol.io/
@@ -196,23 +200,10 @@ export const Jsonrpc_Error_Message = z.object({
 export type Jsonrpc_Error_Message = z.infer<typeof Jsonrpc_Error_Message>;
 
 /**
- * A JSON-RPC batch request, as described in https://www.jsonrpc.org/specification#batch.
- */
-export const Jsonrpc_Batch_Request = z.array(z.union([Jsonrpc_Request, Jsonrpc_Notification]));
-export type Jsonrpc_Batch_Request = z.infer<typeof Jsonrpc_Batch_Request>;
-
-/**
- * A JSON-RPC batch response, as described in https://www.jsonrpc.org/specification#batch.
+ * Convenience helper union.
  */
 export const Jsonrpc_Response_Or_Error = z.union([Jsonrpc_Response, Jsonrpc_Error_Message]);
 export type Jsonrpc_Response_Or_Error = z.infer<typeof Jsonrpc_Response_Or_Error>;
-
-// TODO @api @many maybe this should be able to include related notifications too? is that off-spec?
-/**
- * A JSON-RPC batch response, as described in https://www.jsonrpc.org/specification#batch.
- */
-export const Jsonrpc_Batch_Response = z.array(Jsonrpc_Response_Or_Error);
-export type Jsonrpc_Batch_Response = z.infer<typeof Jsonrpc_Batch_Response>;
 
 /**
  * Refers to any valid JSON-RPC object that can be decoded off the wire, or encoded to be sent.
@@ -222,15 +213,17 @@ export const Jsonrpc_Message = z.union([
 	Jsonrpc_Notification,
 	Jsonrpc_Response,
 	Jsonrpc_Error_Message,
-	Jsonrpc_Batch_Request,
-	Jsonrpc_Batch_Response,
+	// Not supported by MCP, this shows what's omitted.
+	// Jsonrpc_Batch_Request,
+	// Jsonrpc_Batch_Response,
 ]);
 export type Jsonrpc_Message = z.infer<typeof Jsonrpc_Message>;
 
 export const Jsonrpc_Message_From_Client_To_Server = z.union([
 	Jsonrpc_Request,
 	Jsonrpc_Notification,
-	Jsonrpc_Batch_Request,
+	// Not supported by MCP, this shows what's omitted.
+	// Jsonrpc_Batch_Request,
 ]);
 export type Jsonrpc_Message_From_Client_To_Server = z.infer<
 	typeof Jsonrpc_Message_From_Client_To_Server
@@ -240,7 +233,8 @@ export const Jsonrpc_Message_From_Server_To_Client = z.union([
 	Jsonrpc_Notification,
 	Jsonrpc_Response,
 	Jsonrpc_Error_Message,
-	Jsonrpc_Batch_Response,
+	// Not supported by MCP, this shows what's omitted.
+	// Jsonrpc_Batch_Response,
 ]);
 export type Jsonrpc_Message_From_Server_To_Client = z.infer<
 	typeof Jsonrpc_Message_From_Server_To_Client
@@ -254,5 +248,10 @@ export const Jsonrpc_Singular_Message = z.union([
 ]);
 export type Jsonrpc_Singular_Message = z.infer<typeof Jsonrpc_Singular_Message>;
 
-export const Jsonrpc_Batch_Message = z.union([Jsonrpc_Batch_Request, Jsonrpc_Batch_Response]);
-export type Jsonrpc_Batch_Message = z.infer<typeof Jsonrpc_Batch_Message>;
+// Not supported by MCP, this shows what's omitted.
+// export const Jsonrpc_Batch_Message = z.union([Jsonrpc_Batch_Request, Jsonrpc_Batch_Response]);
+// export type Jsonrpc_Batch_Message = z.infer<typeof Jsonrpc_Batch_Message>;
+// export const Jsonrpc_Batch_Request = z.array(z.union([Jsonrpc_Request, Jsonrpc_Notification]));
+// export type Jsonrpc_Batch_Request = z.infer<typeof Jsonrpc_Batch_Request>;
+// export const Jsonrpc_Batch_Response = z.array(Jsonrpc_Response_Or_Error);
+// export type Jsonrpc_Batch_Response = z.infer<typeof Jsonrpc_Batch_Response>;

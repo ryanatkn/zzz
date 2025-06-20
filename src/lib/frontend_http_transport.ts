@@ -1,10 +1,8 @@
 // @slop claude_opus_4
 
-import {Jsonrpc_Error, jsonrpc_errors} from '$lib/jsonrpc_errors.js';
+import {Thrown_Jsonrpc_Error, jsonrpc_errors} from '$lib/jsonrpc_errors.js';
 import type {Transport} from '$lib/transports.js';
 import type {
-	Jsonrpc_Batch_Request,
-	Jsonrpc_Batch_Response,
 	Jsonrpc_Message_From_Client_To_Server,
 	Jsonrpc_Message_From_Server_To_Client,
 	Jsonrpc_Notification,
@@ -25,7 +23,6 @@ export class Frontend_Http_Transport implements Transport {
 
 	async send(message: Jsonrpc_Request): Promise<Jsonrpc_Response_Or_Error>;
 	async send(message: Jsonrpc_Notification): Promise<null>;
-	async send(message: Jsonrpc_Batch_Request): Promise<Jsonrpc_Batch_Response>;
 	async send(
 		message: Jsonrpc_Message_From_Client_To_Server,
 	): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
@@ -54,7 +51,7 @@ export class Frontend_Http_Transport implements Transport {
 			return result;
 		} catch (error) {
 			console.error('[frontend http transport] Error sending HTTP request:', error);
-			if (error instanceof Jsonrpc_Error) {
+			if (error instanceof Thrown_Jsonrpc_Error) {
 				throw error;
 			}
 			throw jsonrpc_errors.internal_error('Error sending HTTP request', {

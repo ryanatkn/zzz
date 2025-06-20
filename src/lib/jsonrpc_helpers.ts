@@ -13,12 +13,9 @@ import {
 	Jsonrpc_Response,
 	Jsonrpc_Message,
 	JSONRPC_VERSION,
-	Jsonrpc_Batch_Request,
-	Jsonrpc_Batch_Response,
 	Jsonrpc_Singular_Message,
-	Jsonrpc_Batch_Message,
 } from '$lib/jsonrpc.js';
-import {Jsonrpc_Error, JSONRPC_ERROR_CODES} from '$lib/jsonrpc_errors.js';
+import {Thrown_Jsonrpc_Error, JSONRPC_ERROR_CODES} from '$lib/jsonrpc_errors.js';
 
 export const create_jsonrpc_request = (
 	method: Jsonrpc_Method,
@@ -82,7 +79,7 @@ export const create_jsonrpc_error_message_from_thrown = (
 	let message = 'Internal server error';
 	let data = undefined;
 
-	if (error instanceof Jsonrpc_Error) {
+	if (error instanceof Thrown_Jsonrpc_Error) {
 		// Use the error directly
 		code = error.code;
 		message = error.message;
@@ -147,15 +144,3 @@ export const is_jsonrpc_error_message = (message: unknown): message is Jsonrpc_E
 export const is_jsonrpc_singular_message = (
 	message: unknown,
 ): message is Jsonrpc_Singular_Message => is_jsonrpc_object(message);
-
-export const is_jsonrpc_batch_message = (message: unknown): message is Jsonrpc_Batch_Message =>
-	Array.isArray(message) && is_jsonrpc_message(message);
-
-export const is_jsonrpc_batch_request = (message: unknown): message is Jsonrpc_Batch_Request =>
-	is_jsonrpc_batch_message(message) &&
-	message.every((m) => is_jsonrpc_request(m) || is_jsonrpc_notification(m));
-
-// TODO @api @many maybe this should be able to include related notifications too? is that off-spec?
-export const is_jsonrpc_batch_response = (message: unknown): message is Jsonrpc_Batch_Response =>
-	is_jsonrpc_batch_message(message) &&
-	message.every((m) => is_jsonrpc_response(m) || is_jsonrpc_error_message(m));

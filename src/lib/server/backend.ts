@@ -4,7 +4,7 @@ import {resolve} from 'node:path';
 import {Logger} from '@ryanatkn/belt/log.js';
 import {ensure_end} from '@ryanatkn/belt/string.js';
 
-import type {Action_Spec} from '$lib/action_spec.js';
+import type {Action_Spec_Union} from '$lib/action_spec.js';
 import type {Zzz_Config} from '$lib/config_helpers.js';
 import {Diskfile_Path, Zzz_Dir} from '$lib/diskfile_types.js';
 import {Safe_Fs} from '$lib/server/safe_fs.js';
@@ -59,7 +59,7 @@ export interface Backend_Options {
 	/**
 	 * Action specifications that determine what the backend can do.
 	 */
-	action_specs: Array<Action_Spec>;
+	action_specs: Array<Action_Spec_Union>;
 	/**
 	 * Handler function for processing client messages.
 	 */
@@ -118,7 +118,7 @@ export class Backend implements Action_Event_Environment {
 	/**
 	 * Access to all action specifications.
 	 */
-	get action_specs(): Array<Action_Spec> {
+	get action_specs(): Array<Action_Spec_Union> {
 		return this.action_registry.specs;
 	}
 
@@ -163,13 +163,13 @@ export class Backend implements Action_Event_Environment {
 		return method_handlers[phase as keyof Backend_Action_Handlers[keyof Backend_Action_Handlers]];
 	}
 
-	lookup_action_spec(method: Action_Method): Action_Spec | undefined {
+	lookup_action_spec(method: Action_Method): Action_Spec_Union | undefined {
 		return this.action_registry.spec_by_method.get(method);
 	}
 
 	/**
-	 * Process a JSON-RPC message and return a response.
-	 * Handles both single messages and batch requests.
+	 * Process a singular JSON-RPC message and return a response.
+	 * Like MCP, Zzz breaks from JSON-RPC by not supporting batching.
 	 */
 	async receive(message: unknown): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
 		this.#check_destroyed();

@@ -1,7 +1,7 @@
 // @slop claude_opus_4
 
 import type {
-	Action_Spec,
+	Action_Spec_Union,
 	Request_Response_Action_Spec,
 	Remote_Notification_Action_Spec,
 	Local_Call_Action_Spec,
@@ -16,13 +16,13 @@ import type {Action_Method} from '$lib/action_metatypes.js';
  * Provides helper methods to get actions by various criteria.
  */
 export class Action_Registry {
-	specs: Array<Action_Spec>;
+	specs: Array<Action_Spec_Union>;
 
-	constructor(specs: Array<Action_Spec>) {
+	constructor(specs: Array<Action_Spec_Union>) {
 		this.specs = specs;
 	}
 
-	get spec_by_method(): Map<string, Action_Spec> {
+	get spec_by_method(): Map<string, Action_Spec_Union> {
 		return new Map(this.specs.map((spec) => [spec.method, spec]));
 	}
 
@@ -38,19 +38,19 @@ export class Action_Registry {
 		return this.specs.filter((spec) => spec.kind === 'local_call');
 	}
 
-	get backend_specs(): Array<Action_Spec> {
+	get backend_specs(): Array<Action_Spec_Union> {
 		return this.specs.filter((spec) => spec.kind !== 'local_call');
 	}
 
-	get frontend_specs(): Array<Action_Spec> {
+	get frontend_specs(): Array<Action_Spec_Union> {
 		return this.specs;
 	}
 
-	get backend_to_frontend_specs(): Array<Action_Spec> {
+	get backend_to_frontend_specs(): Array<Action_Spec_Union> {
 		return this.specs.filter((spec) => spec.initiator === 'backend' || spec.initiator === 'both');
 	}
 
-	get frontend_to_backend_specs(): Array<Action_Spec> {
+	get frontend_to_backend_specs(): Array<Action_Spec_Union> {
 		return this.specs.filter((spec) => spec.initiator === 'frontend' || spec.initiator === 'both');
 	}
 

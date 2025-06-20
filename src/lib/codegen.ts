@@ -3,7 +3,7 @@
 
 import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 
-import type {Action_Spec} from '$lib/action_spec.js';
+import type {Action_Spec_Union} from '$lib/action_spec.js';
 import {is_action_initiator} from '$lib/action_types.js';
 import type {Action_Event_Phase} from '$lib/action_event_types.js';
 
@@ -202,7 +202,7 @@ export class Import_Builder {
  * Determines which phases an executor can handle based on the action spec.
  */
 export const get_executor_phases = (
-	spec: Action_Spec,
+	spec: Action_Spec_Union,
 	executor: 'frontend' | 'backend',
 ): Array<Action_Event_Phase> => {
 	const {kind, initiator} = spec;
@@ -260,7 +260,7 @@ export const get_executor_phases = (
  * Also adds necessary imports to the Import_Builder.
  */
 export const get_handler_return_type = (
-	spec: Action_Spec,
+	spec: Action_Spec_Union,
 	phase: Action_Event_Phase,
 	imports: Import_Builder,
 ): string => {
@@ -288,7 +288,7 @@ export const get_handler_return_type = (
  * with the new phase/step type parameters.
  */
 export const generate_phase_handlers = (
-	spec: Action_Spec,
+	spec: Action_Spec_Union,
 	executor: 'frontend' | 'backend',
 	imports: Import_Builder,
 ): string => {

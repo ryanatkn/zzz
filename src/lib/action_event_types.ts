@@ -5,7 +5,7 @@ import type {Logger} from '@ryanatkn/belt/log.js';
 
 import type {Action_Method} from '$lib/action_metatypes.js';
 import type {Action_Executor, Action_Kind} from '$lib/action_types.js';
-import type {Action_Spec} from '$lib/action_spec.js';
+import type {Action_Spec_Union} from '$lib/action_spec.js';
 import type {Action_Peer} from '$lib/action_peer.js';
 import type {Actions} from '$lib/actions.svelte.js';
 
@@ -54,7 +54,7 @@ export interface Action_Event_Environment {
 		method: Action_Method,
 		phase: Action_Event_Phase,
 	) => ((event: any) => any) | undefined;
-	lookup_action_spec: (method: Action_Method) => Action_Spec | undefined;
+	lookup_action_spec: (method: Action_Method) => Action_Spec_Union | undefined;
 	readonly log?: Logger | null;
 	// TODO feels hacky, added for optional tracking
 	actions?: Actions;
