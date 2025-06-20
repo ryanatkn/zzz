@@ -49,10 +49,6 @@
 					<small title={selected_chat.created_formatted_datetime}
 						>created {selected_chat.created_formatted_short_date}</small
 					>
-					<small>
-						{selected_chat.tapes.length}
-						tape{#if selected_chat.tapes.length !== 1}s{/if}
-					</small>
 				</div>
 				<div class="row gap_xs py_xs">
 					<Confirm_Button

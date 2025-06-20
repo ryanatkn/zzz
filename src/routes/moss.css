@@ -492,6 +492,9 @@ a.chip {
 .pb_0 {
 	padding-bottom: 0;
 }
+.pb_xs {
+	padding-bottom: var(--space_xs);
+}
 .pb_xl3 {
 	padding-bottom: var(--space_xl3);
 }

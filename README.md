@@ -10,11 +10,12 @@
 
 Zzz, pronounced "zees" like bees,
 is a software project with a focus on user power and experimentation.
-The idea is to make a fullstack software environment that adapts to your needs
-while remaining fully open, aligned, and in your control. It's a flexible toolkit for
-making nice web software and content.
+The idea is to make a fullstack software environment that adapts to your needs and intent
+while remaining fully open, aligned, and in your control. It's a flexible toolkit
+for consuming and creating content, developing web software,
+and crafting experiences with uncompromising UX and DX.
 
-This is a pre-alpha and the ideas are still developing -
+This is an early stage project and the ideas are still developing -
 see the issues and [discussions](https://github.com/ryanatkn/zzz/discussions)
 or @ me on [Bluesky](https://bsky.app/profile/ryanatkn.com).
 
@@ -23,8 +24,8 @@ More at [zzz.software/about](https://www.zzz.software/about).
 ## Setup
 
 This project is in its early stages, and installing it currently requires some technical skills.
-Eventually there will be an installable desktop app for nontechnical users,
-and for developers, an npm library for TypeScript and Svelte,
+Eventually there will be an installable desktop app for nontechnical users
+(and for developers, an npm library for TypeScript and Svelte),
 but it's not there yet -
 for now you'll need Node 22.11+ (YMMV with Bun/Deno/etc)
 and Git to clone the repo.
