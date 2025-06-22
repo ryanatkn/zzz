@@ -19,7 +19,7 @@
 
 <Contextmenu_Tape {tape}>
 	<div class="tape_summary panel p_xs" class:dormant={!tape.enabled}>
-		<div class="row justify_content_space_between">
+		<div class="row justify_content_space_between gap_xs">
 			<div class="flex_1">
 				<div class="font_weight_600">{tape.model_name}</div>
 				<div class="display_flex gap_xs">
