@@ -15,7 +15,7 @@
 		GLYPH_RESET,
 	} from '$lib/glyphs.js';
 	import Error_Message from '$lib/Error_Message.svelte';
-	import {OLLAMA_URL} from '$lib/ollama.js';
+	import {OLLAMA_URL} from '$lib/ollama_helpers.js';
 	import External_Link from '$lib/External_Link.svelte';
 
 	const app = frontend_context.get();

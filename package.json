@@ -747,9 +747,9 @@
       "types": "./dist/nav.d.ts",
       "default": "./dist/nav.js"
     },
-    "./ollama.js": {
-      "types": "./dist/ollama.d.ts",
-      "default": "./dist/ollama.js"
+    "./ollama_helpers.js": {
+      "types": "./dist/ollama_helpers.d.ts",
+      "default": "./dist/ollama_helpers.js"
     },
     "./package.gen.js": {
       "types": "./dist/package.gen.d.ts",

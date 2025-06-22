@@ -4,7 +4,7 @@ import type {Async_Status} from '@ryanatkn/belt/async.js';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
-import {ollama_list} from '$lib/ollama.js';
+import {ollama_list} from '$lib/ollama_helpers.js';
 import {create_uuid} from '$lib/zod_helpers.js';
 import type {Zzz_Dir} from '$lib/diskfile_types.js';
 import type {Jsonrpc_Request_Id} from '$lib/jsonrpc.js';

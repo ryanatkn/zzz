@@ -50,6 +50,7 @@
 		</div>
 	</section>
 	{#if provider.name === 'ollama'}
+		<!-- TODO BLOCK mount new component here -->
 		<section>
 			<p>
 				TODO add UI for the full Ollama API - <a href="https://github.com/ollama/ollama-js"

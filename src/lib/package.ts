@@ -646,7 +646,10 @@ export const package_json = {
 			default: './dist/Nav_Link.svelte',
 		},
 		'./nav.js': {types: './dist/nav.d.ts', default: './dist/nav.js'},
-		'./ollama.js': {types: './dist/ollama.d.ts', default: './dist/ollama.js'},
+		'./ollama_helpers.js': {
+			types: './dist/ollama_helpers.d.ts',
+			default: './dist/ollama_helpers.js',
+		},
 		'./package.gen.js': {types: './dist/package.gen.d.ts', default: './dist/package.gen.js'},
 		'./package.js': {types: './dist/package.d.ts', default: './dist/package.js'},
 		'./Picker_Dialog.svelte': {
@@ -1957,8 +1960,8 @@ export const src_json = {
 				{name: 'main_nav_items_default', kind: 'variable'},
 			],
 		},
-		'./ollama.js': {
-			path: 'ollama.ts',
+		'./ollama_helpers.js': {
+			path: 'ollama_helpers.ts',
 			declarations: [
 				{name: 'OLLAMA_URL', kind: 'variable'},
 				{name: 'Ollama_Model_Info', kind: 'type'},

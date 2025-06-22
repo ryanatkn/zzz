@@ -2,7 +2,7 @@ import {z} from 'zod';
 
 import {Provider_Name} from '$lib/provider_types.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import type {Ollama_Model_Info} from '$lib/ollama.js';
+import type {Ollama_Model_Info} from '$lib/ollama_helpers.js';
 import {Cell_Json} from '$lib/cell_types.js';
 
 export const Model_Name = z.string();
