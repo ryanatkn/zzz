@@ -105,8 +105,8 @@
 				placeholder={GLYPH_PLACEHOLDER + ' ' + diskfile.path_relative}
 				show_stats={false}
 				readonly={false}
-				onsave={(value) => {
-					app.diskfiles.update(diskfile.path, value);
+				onsave={async (value) => {
+					await app.diskfiles.update(diskfile.path, value);
 				}}
 			/>
 

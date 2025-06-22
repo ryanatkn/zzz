@@ -22,10 +22,6 @@
 	const app = frontend_context.get();
 
 	let show_model_picker = $state(false);
-
-	const switch_model = () => {
-		show_model_picker = true;
-	};
 </script>
 
 <Contextmenu {...rest} {entries} />
@@ -65,7 +61,7 @@
 
 			<Contextmenu_Entry_Toggle bind:enabled={tape.enabled} label="tape" />
 
-			<Contextmenu_Entry run={switch_model}>
+			<Contextmenu_Entry run={() => (show_model_picker = true)}>
 				{#snippet icon()}<Glyph glyph={GLYPH_MODEL} />{/snippet}
 				<span>switch model</span>
 			</Contextmenu_Entry>

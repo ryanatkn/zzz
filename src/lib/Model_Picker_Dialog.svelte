@@ -29,30 +29,28 @@
 	}: Props = $props();
 </script>
 
-{#if show}
-	<Picker_Dialog
-		show={true}
-		items={models.ordered_by_name}
-		{onpick}
-		{filter}
-		{dialog_props}
-		sorters={[
-			sort_by_text<Model>('name_asc', 'name (a-z)', 'name'),
-			sort_by_text<Model>('name_desc', 'name (z-a)', 'name', 'desc'),
-			sort_by_text<Model>('provider_asc', 'provider (a-z)', 'provider_name'),
-			sort_by_text<Model>('provider_desc', 'provider (z-a)', 'provider_name', 'desc'),
-		]}
-		sort_key_default="name_asc"
-		show_sort_controls
-		heading="Pick a model"
-	>
-		{#snippet children(model, pick)}
-			{#if children_prop}
-				{@render children_prop()}
-			{/if}
-			<button type="button" class="listitem compact w_100" onclick={() => pick(model)}>
-				<Model_Listitem {model} />
-			</button>
-		{/snippet}
-	</Picker_Dialog>
-{/if}
+<Picker_Dialog
+	bind:show
+	items={models.ordered_by_name}
+	{onpick}
+	{filter}
+	{dialog_props}
+	sorters={[
+		sort_by_text<Model>('name_asc', 'name (a-z)', 'name'),
+		sort_by_text<Model>('name_desc', 'name (z-a)', 'name', 'desc'),
+		sort_by_text<Model>('provider_asc', 'provider (a-z)', 'provider_name'),
+		sort_by_text<Model>('provider_desc', 'provider (z-a)', 'provider_name', 'desc'),
+	]}
+	sort_key_default="name_asc"
+	show_sort_controls
+	heading="Pick a model"
+>
+	{#snippet children(model, pick)}
+		{#if children_prop}
+			{@render children_prop()}
+		{/if}
+		<button type="button" class="listitem compact w_100" onclick={() => pick(model)}>
+			<Model_Listitem {model} />
+		</button>
+	{/snippet}
+</Picker_Dialog>

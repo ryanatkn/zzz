@@ -7,7 +7,8 @@ import type {Action_Spec_Union} from '$lib/action_spec.js';
 import {is_action_initiator} from '$lib/action_types.js';
 import type {Action_Event_Phase} from '$lib/action_event_types.js';
 
-// TODO probably refactor this into more reusable and more app-specific helpers/config
+// TODO probably refactor this into more reusable and more app-specific helpers/config,
+// maybe `import_builder.ts` and `gen_helpers.ts`
 
 /**
  * Represents an import item with its kind (type, value, or namespace).

@@ -10,9 +10,13 @@
 
 <div class="column p_lg h_100">
 	<h1><Glyph glyph={GLYPH_LOG} /> system log</h1>
+	<p>
+		This page shows the actions that have happened behind the scenes. It's a work in progress and
+		not too useful yet.
+	</p>
 
 	<div
-		class="flex_1 display_grid mt_md overflow_hidden"
+		class="flex_1 display_grid pt_md overflow_hidden"
 		style:grid-template-columns="320px 1fr"
 		style:gap="var(--space_md)"
 	>

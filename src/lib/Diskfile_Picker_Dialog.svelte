@@ -32,35 +32,33 @@
 	const {diskfiles} = app;
 </script>
 
-{#if show}
-	<Picker_Dialog
-		show={true}
-		items={Array.from(diskfiles.items.by_id.values())}
-		{onpick}
-		{filter}
-		{exclude_ids}
-		{dialog_props}
-		sorters={[
-			// TODO @many rework API to avoid casting
-			sort_by_text<Diskfile>('path_asc', 'path (a-z)', 'path'),
-			sort_by_text<Diskfile>('path_desc', 'path (z-a)', 'path', 'desc'),
-			sort_by_numeric('created_newest', 'newest first', 'created_date', 'desc'),
-			sort_by_numeric('created_oldest', 'oldest first', 'created_date', 'asc'),
-			sort_by_numeric('updated_recently', 'recently updated', 'updated_date', 'desc'),
-			sort_by_numeric('updated_oldest', 'least recently updated', 'updated_date', 'asc'),
-			sort_by_numeric<Diskfile>('font_size_largest', 'largest first', 'content_length', 'desc'),
-			sort_by_numeric<Diskfile>('font_size_smallest', 'smallest first', 'content_length', 'asc'),
-		]}
-		sort_key_default="path_asc"
-		show_sort_controls
-		heading="Pick a file"
-	>
-		{#snippet children(diskfile, pick)}
-			<Diskfile_Listitem
-				{diskfile}
-				selected={!!selected_ids && selected_ids.includes(diskfile.id)}
-				onselect={pick}
-			/>
-		{/snippet}
-	</Picker_Dialog>
-{/if}
+<Picker_Dialog
+	bind:show
+	items={Array.from(diskfiles.items.by_id.values())}
+	{onpick}
+	{filter}
+	{exclude_ids}
+	{dialog_props}
+	sorters={[
+		// TODO @many rework API to avoid casting
+		sort_by_text<Diskfile>('path_asc', 'path (a-z)', 'path'),
+		sort_by_text<Diskfile>('path_desc', 'path (z-a)', 'path', 'desc'),
+		sort_by_numeric('created_newest', 'newest first', 'created_date', 'desc'),
+		sort_by_numeric('created_oldest', 'oldest first', 'created_date', 'asc'),
+		sort_by_numeric('updated_recently', 'recently updated', 'updated_date', 'desc'),
+		sort_by_numeric('updated_oldest', 'least recently updated', 'updated_date', 'asc'),
+		sort_by_numeric<Diskfile>('font_size_largest', 'largest first', 'content_length', 'desc'),
+		sort_by_numeric<Diskfile>('font_size_smallest', 'smallest first', 'content_length', 'asc'),
+	]}
+	sort_key_default="path_asc"
+	show_sort_controls
+	heading="Pick a file"
+>
+	{#snippet children(diskfile, pick)}
+		<Diskfile_Listitem
+			{diskfile}
+			selected={!!selected_ids && selected_ids.includes(diskfile.id)}
+			onselect={pick}
+		/>
+	{/snippet}
+</Picker_Dialog>

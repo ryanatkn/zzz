@@ -59,7 +59,7 @@ export const main_nav_items_default: Array<Nav_Item> = [
 		],
 	},
 	{
-		group: 'AI',
+		group: 'LLMs',
 		items: [
 			{label: 'models', href: `${base}/models`, icon: GLYPH_MODEL},
 			{label: 'providers', href: `${base}/providers`, icon: GLYPH_PROVIDER},

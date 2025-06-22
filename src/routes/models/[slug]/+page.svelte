@@ -8,6 +8,8 @@
 	const app = frontend_context.get();
 
 	const model = $derived(app.models.find_by_name(page.params.slug));
+
+	// TODO @many consider namespacing under `/llms/`
 </script>
 
 <div class="p_sm">

@@ -1,6 +1,7 @@
 /**
- * Following MCP and A2A, Zzz supports JSON-RPC 2.0 as its message format.
- * This can be used by multiple transports including http and websocket.
+ * Following MCP, Zzz supports a subset of JSON-RPC 2.0 as its message format
+ * (A2A too, but I haven't looked into if they support the full spec).
+ * It can be used by multiple transports including http and websocket.
  *
  * These are the JSON-RPC types from the MCP draft in May 2025,
  * changed to include a prefix on all identifiers.

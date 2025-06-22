@@ -15,7 +15,7 @@
 	interface Props {
 		limit?: number | undefined;
 		selected_action_id?: string | null | undefined;
-		attrs?: SvelteHTMLElements['menu'] | undefined;
+		attrs?: SvelteHTMLElements['div'] | undefined;
 		onselect?: ((action: Action) => void) | undefined;
 	}
 
@@ -31,7 +31,7 @@
 	const items = $derived(Array.from(actions.items.by_id.values()).slice(0, limit));
 </script>
 
-<menu {...attrs} class="flex_1 unstyled overflow_auto scrollbar_width_thin {attrs?.class}">
+<div {...attrs} class="flex_1 unstyled overflow_auto scrollbar_width_thin {attrs?.class}">
 	<!-- TODO @many more efficient array? maybe add `all` back to the base Indexed_Collection? -->
 	<Sortable_List
 		{items}
@@ -76,4 +76,4 @@
 			<small>Showing {limit} of {total_actions} actions</small>
 		</div>
 	{/if}
-</menu>
+</div>

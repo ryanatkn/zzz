@@ -56,7 +56,8 @@
 			<External_Link href="https://github.com/ollama/ollama">GitHub</External_Link>) is a local
 			model server that forks
 			<External_Link href="https://github.com/ggml-org/llama.cpp">llama.cpp</External_Link>. It's
-			one of Zzz's first integrations but will be one of many supported local backends. See also the <Provider_Link
+			one of Zzz's first integrations and the plan is to support many other local LLM backends
+			(input/feedback is welcome). See also the <Provider_Link
 				provider={app.providers.find_by_name('ollama')}
 				><span class="white_space_nowrap"><Glyph glyph={GLYPH_PROVIDER} /> Ollama</span> provider</Provider_Link
 			> page.

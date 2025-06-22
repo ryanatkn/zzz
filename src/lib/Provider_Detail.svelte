@@ -18,10 +18,12 @@
 	const {provider, attrs}: Props = $props();
 
 	const at_detail_page = $derived(page.url.pathname === `${base}/providers/${provider.name}`);
+
+	// TODO BLOCK Ollama UI
 </script>
 
 <div {...attrs} class="panel p_lg {attrs?.class}">
-	<div class="display_flex mb_lg">
+	<section class="display_flex mb_lg">
 		<Provider_Logo name={provider.name} size="var(--icon_size_xl)" fill={null} />
 		<div class="pl_xl">
 			{#if at_detail_page}
@@ -46,12 +48,22 @@
 				</div>
 			</div>
 		</div>
-	</div>
+	</section>
+	{#if provider.name === 'ollama'}
+		<section>
+			<p>
+				TODO add UI for the full Ollama API - <a href="https://github.com/ollama/ollama-js"
+					>https://github.com/ollama/ollama-js</a
+				>
+			</p>
+		</section>
+	{/if}
 	<section>
 		<ul class="display_flex flex_wrap unstyled gap_md">
 			{#each provider.models as model (model)}
 				<Model_Summary {model} />
 			{/each}
 		</ul>
+		<!-- TODO UI to add models -->
 	</section>
 </div>

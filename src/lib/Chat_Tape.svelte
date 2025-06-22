@@ -3,7 +3,7 @@
 
 	import {estimate_token_count} from '$lib/helpers.js';
 	import type {Tape} from '$lib/tape.svelte.js';
-	import Model_Link from '$lib/Model_Link.svelte';
+	import Model_Picker_Dialog from '$lib/Model_Picker_Dialog.svelte';
 	import Strip_List from '$lib/Strip_List.svelte';
 	import Provider_Link from '$lib/Provider_Link.svelte';
 	import Contextmenu_Tape from '$lib/Contextmenu_Tape.svelte';
@@ -43,18 +43,22 @@
 
 	const strip_count = $derived(tape.strips.size);
 
-	// TODO BLOCK the link should instead be a model picker (dialog? or overlaid without a bg maybe?)
-
 	const empty = $derived(!strip_count);
+
+	let show_model_picker = $state(false);
 </script>
 
 <Contextmenu_Tape {tape}>
 	<div {...attrs} class="chat_tape {attrs?.class}" class:empty class:dormant={!tape.enabled}>
 		<div class="display_flex justify_content_space_between align_items_start">
 			<header>
-				<div class="font_size_lg">
-					<Model_Link model={tape.model} icon />
-				</div>
+				<button
+					type="button"
+					class="plain compact font_size_lg text_align_left"
+					onclick={() => (show_model_picker = true)}
+				>
+					{tape.model.name}
+				</button>
 				<small
 					><Provider_Link
 						provider={tape.app.providers.find_by_name(tape.model.provider_name)}
@@ -94,6 +98,15 @@
 			</Content_Editor>
 		</div>
 	</div>
+
+	<Model_Picker_Dialog
+		bind:show={show_model_picker}
+		onpick={(model) => {
+			if (model) {
+				tape.switch_model(model.id);
+			}
+		}}
+	/>
 </Contextmenu_Tape>
 
 <style>

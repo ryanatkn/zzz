@@ -23,12 +23,6 @@ export const gen: Gen = ({origin_path}) => {
 	imports.add('zod', 'z');
 	imports.add_type('$lib/action_spec.js', 'Action_Spec_Union');
 	imports.add_many('$lib/action_specs.js', '* as specs');
-	imports.add_types(
-		'$lib/action_event_data.js',
-		'Action_Event_Request_Response_Data',
-		'Action_Event_Remote_Notification_Data',
-		'Action_Event_Local_Call_Data',
-	);
 
 	// Determine which data type to use for each method based on its spec
 	const action_event_data_mappings = registry.specs.map((spec) => {
@@ -38,6 +32,8 @@ export const gen: Gen = ({origin_path}) => {
 				: spec.kind === 'remote_notification'
 					? 'Action_Event_Remote_Notification_Data'
 					: 'Action_Event_Local_Call_Data';
+
+		imports.add_types('$lib/action_event_data.js', data_type);
 
 		return `${spec.method}: ${data_type}<'${spec.method}'>`;
 	});

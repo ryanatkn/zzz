@@ -18,6 +18,7 @@
 	} = $props();
 </script>
 
+<!-- TODO API with `bind:show` in Fuz dialog? -->
 {#if show}
 	<Dialog
 		{...dialog_props}
