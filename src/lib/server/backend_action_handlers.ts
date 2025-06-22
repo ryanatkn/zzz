@@ -73,7 +73,21 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 	submit_completion: {
 		receive_request: async ({backend, data: {input, request}}) => {
 			const {prompt, provider_name, model, completion_messages} = input.completion_request;
-			const config = backend.config;
+			// TODO probably refactor so each handler is independent, and destructure all params so we can see what's unused
+			const {
+				// bots,
+				frequency_penalty,
+				// models,
+				output_token_max,
+				presence_penalty,
+				// providers,
+				seed,
+				stop_sequences,
+				system_message,
+				temperature,
+				top_k,
+				top_p,
+			} = backend.config;
 
 			let result: Action_Outputs['submit_completion'];
 
@@ -91,16 +105,16 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 							// TODO
 							// tools,
 							options: {
-								temperature: config.temperature,
-								seed: config.seed,
-								num_predict: config.output_token_max,
-								top_k: config.top_k,
-								top_p: config.top_p,
-								frequency_penalty: config.frequency_penalty,
-								presence_penalty: config.presence_penalty,
-								stop: config.stop_sequences,
+								temperature,
+								seed,
+								num_predict: output_token_max,
+								top_k,
+								top_p,
+								frequency_penalty,
+								presence_penalty,
+								stop: stop_sequences,
 							},
-							messages: format_ollama_messages(config.system_message, completion_messages, prompt),
+							messages: format_ollama_messages(system_message, completion_messages, prompt),
 						});
 						console.log(`ollama api_response`, api_response);
 						result = to_completion_result(request.id, provider_name, model, api_response);
@@ -110,12 +124,12 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 					case 'claude': {
 						const api_response = await anthropic.messages.create({
 							model,
-							max_tokens: config.output_token_max,
-							temperature: config.temperature,
-							top_k: config.top_k,
-							top_p: config.top_p,
-							stop_sequences: config.stop_sequences,
-							system: config.system_message,
+							max_tokens: output_token_max,
+							temperature,
+							top_k,
+							top_p,
+							stop_sequences,
+							system: system_message,
 							messages: format_claude_messages(completion_messages, prompt),
 						});
 						console.log(`claude api_response`, api_response);
@@ -126,19 +140,14 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 					case 'chatgpt': {
 						const api_response = await openai.chat.completions.create({
 							model,
-							max_completion_tokens: config.output_token_max,
-							temperature: model === 'o1-mini' ? undefined : config.temperature,
-							seed: config.seed,
-							top_p: config.top_p,
-							frequency_penalty: config.frequency_penalty,
-							presence_penalty: config.presence_penalty,
-							stop: config.stop_sequences,
-							messages: format_openai_messages(
-								config.system_message,
-								completion_messages,
-								prompt,
-								model,
-							),
+							max_completion_tokens: output_token_max,
+							temperature: model === 'o1-mini' ? undefined : temperature,
+							seed,
+							top_p,
+							frequency_penalty,
+							presence_penalty,
+							stop: stop_sequences,
+							messages: format_openai_messages(system_message, completion_messages, prompt, model),
 						});
 						console.log(`openai api_response`, api_response);
 						result = to_completion_result(request.id, provider_name, model, api_response);
@@ -149,18 +158,18 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 						// TODO cache this by model?
 						const google_model = google.getGenerativeModel({
 							model,
-							systemInstruction: config.system_message,
+							systemInstruction: system_message,
 							// TODO
 							// tools,
 							// toolConfig
 							generationConfig: {
-								maxOutputTokens: config.output_token_max,
-								temperature: config.temperature,
-								topK: config.top_k,
-								topP: config.top_p,
-								frequencyPenalty: config.frequency_penalty,
-								presencePenalty: config.presence_penalty,
-								stopSequences: config.stop_sequences,
+								maxOutputTokens: output_token_max,
+								temperature,
+								topK: top_k,
+								topP: top_p,
+								frequencyPenalty: frequency_penalty,
+								presencePenalty: presence_penalty,
+								stopSequences: stop_sequences,
 							},
 						});
 
