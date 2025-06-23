@@ -46,6 +46,8 @@
 		console.log(`[Ollama_Manager] deleting model: ${model_name}`);
 		await ollama.delete_model(model_name);
 	};
+
+	// TODO BLOCK these need to link to the models
 </script>
 
 <div class="display_flex flex_column gap_lg">
