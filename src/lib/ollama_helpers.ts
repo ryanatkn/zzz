@@ -1,7 +1,7 @@
 import ollama from 'ollama/browser';
 import type {ListResponse, ModelResponse, ShowResponse} from 'ollama/browser'; // eslint-disable-line no-duplicate-imports
 
-export const OLLAMA_URL = 'http://127.0.0.1:11434/'; // TODO config
+export const OLLAMA_URL = 'http://127.0.0.1:11434'; // TODO config
 
 export interface Ollama_Model_Info {
 	model: ModelResponse;
