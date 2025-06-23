@@ -144,7 +144,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 
 	last_refreshed_from_now = $derived(
 		this.last_refreshed &&
-			formatDistance(this.app.time.now_ms, this.last_refreshed, {addSuffix: true}),
+			formatDistance(this.last_refreshed, this.app.time.now_ms, {addSuffix: true}),
 	);
 
 	// Operations tracking using Cell instances

@@ -129,7 +129,7 @@
 					{/if}
 
 					<!-- Model Info -->
-					{#if model_detail.show_response.model_info && model_detail.show_response.model_info instanceof Map && model_detail.show_response.model_info.size > 0}
+					{#if model_detail.show_response.model_info instanceof Map && model_detail.show_response.model_info.size > 0}
 						<div>
 							<h5 class="mt_0 mb_xs font_weight_600">Model Info:</h5>
 							<pre
