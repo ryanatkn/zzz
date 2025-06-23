@@ -143,9 +143,16 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	list_last_updated: number | null = $state(null);
 	last_refreshed: string | null = $state(null);
 
+	// TODO helpers/cleanup
 	last_refreshed_from_now = $derived(
 		this.last_refreshed &&
-			formatDistance(this.last_refreshed, this.app.time.now_ms, {addSuffix: true}),
+			formatDistance(
+				// `time.now_ms` updates every minute, so we use the minimum
+				// of the last refreshed time and the current time to prevent displaying a future distance
+				Math.min(new Date(this.last_refreshed).getTime(), this.app.time.now_ms),
+				this.app.time.now_ms,
+				{addSuffix: true},
+			),
 	);
 
 	// Operations tracking using Cell instances

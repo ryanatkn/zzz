@@ -69,34 +69,21 @@
 	</div>
 
 	<div class="display_flex flex_column gap_sm">
-		<!-- Pending Operations -->
-		{#each ollama.pending_operations as operation (operation.id)}
+		<!-- All Operations (most recent first) -->
+		<!-- TODO use indexed collection probably, with normal sorting/filtering patterns -->
+		{#each Array.from(ollama.operations.values()).reverse() as operation (operation.id)}
 			<div
-				class="display_flex justify_content_space_between align_items_center p_sm border_radius_xs bg_2"
+				class="display_flex justify_content_space_between align_items_center p_sm border_radius_xs {operation.status ===
+				'pending'
+					? 'bg_2'
+					: 'bg_1'} {get_operation_color(operation.status)}"
 			>
 				<div class="display_flex gap_sm align_items_center">
-					<Pending_Animation />
-					<Glyph glyph={get_operation_icon(operation.type)} />
-					<span class="font_weight_600">{operation.type}</span>
-					{#if operation.model}
-						<span class="font_family_mono font_size_sm">{operation.model}</span>
+					{#if operation.status === 'pending'}
+						<Pending_Animation />
+					{:else}
+						<Glyph glyph={operation.status === 'success' ? GLYPH_CHECKMARK : GLYPH_ERROR} />
 					{/if}
-				</div>
-				<span class="font_size_sm">
-					{format_timestamp(operation.created_date.getTime())}
-				</span>
-			</div>
-		{/each}
-
-		<!-- Completed Operations -->
-		{#each ollama.completed_operations.slice().reverse() as operation (operation.id)}
-			<div
-				class="display_flex justify_content_space_between align_items_center p_sm border_radius_xs bg_1 {get_operation_color(
-					operation.status,
-				)}"
-			>
-				<div class="display_flex gap_sm align_items_center">
-					<Glyph glyph={operation.status === 'success' ? GLYPH_CHECKMARK : GLYPH_ERROR} />
 					<Glyph glyph={get_operation_icon(operation.type)} />
 					<span class="font_weight_600">{operation.type}</span>
 					{#if operation.model}
