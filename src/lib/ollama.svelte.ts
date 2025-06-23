@@ -9,7 +9,7 @@ import {formatDistance} from 'date-fns';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
-import {create_uuid, type Uuid, get_datetime_now} from '$lib/zod_helpers.js';
+import {create_uuid, Uuid, get_datetime_now} from '$lib/zod_helpers.js';
 import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
 import {OLLAMA_URL} from '$lib/ollama_helpers.js';
 
@@ -34,13 +34,13 @@ export type Ollama_Operation_Type = z.infer<typeof Ollama_Operation_Type>;
  * Cell class for tracking individual Ollama operations
  */
 export const Ollama_Operation_Json = Cell_Json.extend({
+	operation_id: Uuid,
 	type: Ollama_Operation_Type,
 	status: z.enum(['initial', 'pending', 'success', 'failure']).default('initial'),
 	model: z.string().optional(),
 	progress: z.number().min(0).max(100).optional(),
 	error_message: z.string().optional(),
 	result: z.any().optional(),
-	operation_id: z.string().optional(),
 });
 export type Ollama_Operation_Json = z.infer<typeof Ollama_Operation_Json>;
 export type Ollama_Operation_Json_Input = z.input<typeof Ollama_Operation_Json>;
@@ -48,13 +48,13 @@ export type Ollama_Operation_Json_Input = z.input<typeof Ollama_Operation_Json>;
 export interface Ollama_Operation_Options extends Cell_Options<typeof Ollama_Operation_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
 export class Ollama_Operation extends Cell<typeof Ollama_Operation_Json> {
+	operation_id: Uuid = $state()!;
 	type: Ollama_Operation_Type = $state()!;
 	status: Async_Status = $state()!;
 	model: string | undefined = $state();
 	progress: number | undefined = $state();
 	error_message: string | undefined = $state();
 	result: any = $state();
-	operation_id: string | undefined = $state();
 
 	constructor(options: Ollama_Operation_Options) {
 		super(Ollama_Operation_Json, options);
@@ -224,6 +224,8 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 
 		console.log(`[ollama] listing models from: ${this.host}`);
 
+		const operation = this.#create_operation('list');
+
 		this.list_status = 'pending';
 		this.list_error = null;
 
@@ -235,28 +237,34 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 			this.list_status = 'success';
 			this.list_last_updated = Date.now();
 
+			operation.complete_success(response);
+
 			// Ensure model details exist for all models and update existing ones
-			for (const model of response.models) {
-				let detail = this.model_details.get(model.name);
+			for (const model_response of response.models) {
+				let detail = this.model_details.get(model_response.name);
 				if (!detail) {
 					detail = new Ollama_Model_Detail({
 						app: this.app,
 						json: {
-							model_name: model.name,
+							model_name: model_response.name,
 							last_updated: Date.now(),
 						},
 					});
-					this.model_details.set(model.name, detail);
+					this.model_details.set(model_response.name, detail);
 				}
 				// Update the model response for both new and existing details
-				detail.model_response = model;
+				detail.model_response = model_response;
 			}
 
 			return response;
 		} catch (error) {
 			console.error('[ollama] failed to list models:', error);
-			this.list_error = error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE;
+			const error_message = error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE;
+			this.list_error = error_message;
 			this.list_status = 'failure';
+
+			operation.complete_failure(error_message);
+
 			return null;
 		}
 	}
@@ -269,18 +277,9 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 
 		console.log(`[ollama] showing model details for: ${model_name}`);
 
-		const operation_id = create_uuid();
-		const operation = new Ollama_Operation({
-			app: this.app,
-			json: {
-				type: 'show',
-				status: 'pending',
-				model: model_name,
-				operation_id,
-			},
+		const operation = this.#create_operation('show', {
+			model: model_name,
 		});
-
-		this.operations.set(operation_id, operation);
 
 		let detail = this.model_details.get(model_name);
 		if (!detail) {
@@ -321,20 +320,12 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	async pull_model(model_name: string, insecure = false): Promise<Uuid> {
 		console.log(`[ollama] pulling model: ${model_name}, insecure: ${insecure}`);
 
-		const operation_id = create_uuid();
-		const operation = new Ollama_Operation({
-			app: this.app,
-			json: {
-				type: 'pull',
-				status: 'pending',
-				model: model_name,
-				progress: 0,
-			},
+		const operation = this.#create_operation('pull', {
+			model: model_name,
+			progress: 0,
 		});
 
-		this.operations.set(operation_id, operation);
-
-		if (!BROWSER) return operation_id;
+		if (!BROWSER) return operation.operation_id;
 
 		try {
 			const response = await ollama.pull({model: model_name, insecure, stream: false});
@@ -349,7 +340,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 			operation.complete_failure(error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE);
 		}
 
-		return operation_id;
+		return operation.operation_id;
 	}
 
 	/**
@@ -358,19 +349,11 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	async delete_model(model_name: string): Promise<Uuid> {
 		console.log(`[ollama] deleting model: ${model_name}`);
 
-		const operation_id = create_uuid();
-		const operation = new Ollama_Operation({
-			app: this.app,
-			json: {
-				type: 'delete',
-				status: 'pending',
-				model: model_name,
-			},
+		const operation = this.#create_operation('delete', {
+			model: model_name,
 		});
 
-		this.operations.set(operation_id, operation);
-
-		if (!BROWSER) return operation_id;
+		if (!BROWSER) return operation.operation_id;
 
 		try {
 			const response = await ollama.delete({model: model_name});
@@ -388,7 +371,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 			operation.complete_failure(error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE);
 		}
 
-		return operation_id;
+		return operation.operation_id;
 	}
 
 	/**
@@ -397,19 +380,11 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	async copy_model(source: string, destination: string): Promise<Uuid> {
 		console.log(`[ollama] copying model: ${source} → ${destination}`);
 
-		const operation_id = create_uuid();
-		const operation = new Ollama_Operation({
-			app: this.app,
-			json: {
-				type: 'copy',
-				status: 'pending',
-				model: `${source} → ${destination}`,
-			},
+		const operation = this.#create_operation('copy', {
+			model: `${source} → ${destination}`,
 		});
 
-		this.operations.set(operation_id, operation);
-
-		if (!BROWSER) return operation_id;
+		if (!BROWSER) return operation.operation_id;
 
 		try {
 			const response = await ollama.copy({source, destination});
@@ -424,7 +399,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 			operation.complete_failure(error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE);
 		}
 
-		return operation_id;
+		return operation.operation_id;
 	}
 
 	/**
@@ -433,19 +408,11 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	async create_model(name: string, from?: string, modelfile?: string): Promise<Uuid> {
 		console.log(`[ollama] creating model: ${name}, from: ${from || 'none'}`);
 
-		const operation_id = create_uuid();
-		const operation = new Ollama_Operation({
-			app: this.app,
-			json: {
-				type: 'create',
-				status: 'pending',
-				model: name,
-			},
+		const operation = this.#create_operation('create', {
+			model: name,
 		});
 
-		this.operations.set(operation_id, operation);
-
-		if (!BROWSER) return operation_id;
+		if (!BROWSER) return operation.operation_id;
 
 		try {
 			const create_request: any = {name, stream: false};
@@ -464,7 +431,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 			operation.complete_failure(error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE);
 		}
 
-		return operation_id;
+		return operation.operation_id;
 	}
 
 	/**
@@ -478,6 +445,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 		}
 	}
 
+	// TODO BLOCK add `clear details` to each model and `clear all details` to configure view
 	/**
 	 * Clear all model details cache.
 	 */
@@ -486,6 +454,25 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	}
 
 	// Private methods
+
+	#create_operation(
+		type: Ollama_Operation_Type,
+		options?: Partial<Ollama_Operation_Json_Input>,
+	): Ollama_Operation {
+		const operation_id = create_uuid();
+		const operation = new Ollama_Operation({
+			app: this.app,
+			json: {
+				type,
+				status: 'pending',
+				operation_id,
+				...options,
+			},
+		});
+
+		this.operations.set(operation_id, operation);
+		return operation;
+	}
 
 	#update_ollama_config(): void {
 		if (!BROWSER) return;

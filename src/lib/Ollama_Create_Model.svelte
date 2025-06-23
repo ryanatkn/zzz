@@ -145,7 +145,7 @@
 				disabled={!model_name.trim() || is_creating}
 				onclick={handle_create}
 			>
-				<Glyph glyph={GLYPH_ADD} />
+				<Glyph glyph={GLYPH_ADD} />&nbsp;
 				{is_creating ? 'creating...' : 'create model'}
 			</button>
 		</div>

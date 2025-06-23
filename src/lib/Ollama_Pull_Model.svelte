@@ -84,7 +84,7 @@
 				disabled={!model_name.trim() || is_pulling}
 				onclick={handle_pull}
 			>
-				<Glyph glyph={GLYPH_DOWNLOAD} />
+				<Glyph glyph={GLYPH_DOWNLOAD} />&nbsp;
 				{is_pulling ? 'pulling...' : 'pull model'}
 			</button>
 		</div>

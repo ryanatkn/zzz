@@ -57,7 +57,7 @@
 
 	<div class="display_flex flex_column gap_md">
 		<fieldset>
-			<label for="source_model" class="display_block mb_xs">Source Model</label>
+			<label for="source_model" class="display_block mb_xs">source model</label>
 			{#if available_models.length > 0}
 				<select
 					id="source_model"
@@ -84,7 +84,7 @@
 		</fieldset>
 
 		<fieldset>
-			<label for="destination_model" class="display_block mb_xs">Destination Model Name</label>
+			<label for="destination_model" class="display_block mb_xs">destination model name</label>
 			<input
 				id="destination_model"
 				type="text"
@@ -105,7 +105,7 @@
 				disabled={!source_model.trim() || !destination_model.trim() || is_copying}
 				onclick={handle_copy}
 			>
-				<Glyph glyph={GLYPH_COPY} />
+				<Glyph glyph={GLYPH_COPY} />&nbsp;
 				{is_copying ? 'copying...' : 'copy model'}
 			</button>
 		</div>

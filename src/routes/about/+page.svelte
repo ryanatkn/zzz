@@ -65,28 +65,18 @@
 		</p>
 		<p>
 			When thinking about the web UX I want, my starting point is the user interface, because we're
-			all users interfacing with machines. If this part isn't up to par, we're sunk before we sail.
-			We want no compromises when it comes to control over our UI runtime, so this means we're using
-			JS (thankfully, TypeScript makes this palatable). Zzz uses JS to glue software and machines
-			together precisely the way you want, maximizing its utility on any device across the full
-			stack. It can run locally on your machine using any of your available capabilities, or it can
-			deploy anywhere JS runs to play whatever role you need.
+			all users interfacing with machines. UX has primacy; the design serves it first. We want no
+			compromises when it comes to control over our UI runtime, so this means we're using JS
+			(thankfully, TypeScript). Zzz uses JS to glue software and machines together precisely the way
+			you want, maximizing its utility on any device across the full stack. It can run locally on
+			your machine using any of your available capabilities, or it can deploy anywhere JS runs to
+			play whatever role you need.
 		</p>
 		<p>
 			Zzz is based on many kinds of software, and it can be used to make any number of mashups of
 			them:
 		</p>
 		<ul>
-			<li>
-				web browsers - planned with Chromium via Electron, ideally with swappable browser engines
-			</li>
-			<li>
-				<External_Link href="https://wikipedia.org/wiki/Content_management_system"
-					>content management systems</External_Link
-				>, so you can make and manage websites, see this <External_Link
-					href="https://wikipedia.org/wiki/List_of_content_management_systems">list</External_Link
-				>
-			</li>
 			<li>
 				AI UIs like <External_Link href="https://github.com/Mintplex-Labs/anything-llm"
 					>AnythingLLM</External_Link
@@ -100,6 +90,16 @@
 				tooling and system access
 			</li>
 			<li>
+				web browsers - planned with Chromium via Electron, ideally with swappable browser engines
+			</li>
+			<li>
+				<External_Link href="https://wikipedia.org/wiki/Content_management_system"
+					>content management systems</External_Link
+				>, so you can make and manage websites, see this <External_Link
+					href="https://wikipedia.org/wiki/List_of_content_management_systems">list</External_Link
+				>
+			</li>
+			<li>
 				code libraries and web metaframeworks using TypeScript and Svelte - Zzz extends <External_Link
 					href="https://svelte.dev/">SvelteKit</External_Link
 				> and <External_Link href="https://vite.dev/">Vite</External_Link> without wrapping them, enabling
@@ -108,27 +108,20 @@
 		</ul>
 		<p>
 			This scope may look far-fetched, and it is to me, but I'm just making tools that I want to use
-			<em>now</em> on the best foundations I can assemble, with at least vague awareness of the endgame.
-			I think the most successful version of Zzz is where it's used to build other systems, with different
-			ideas and brands. Many of the initial systems have been designed with some thought towards this
-			bigger picture, but it's too big an idea to be anywhere near complete, and I plan to continue building
-			incrementally on a quality base with some experiements mixed in.
+			now on the best foundations I can assemble, and correcting course while imagining the endgame.
+			I think the most successful version of Zzz is where it's used to build other systems, with
+			different ideas/systems/software being more important than Zzz the tool. Many of the initial
+			systems have been designed with some thought towards this bigger picture, but it's too big an
+			idea to be anywhere near complete, and I plan to continue building incrementally on a quality
+			base with some experiements mixed in.
 		</p>
 		<p>
 			Zzz must be easy to use and inclusive of people and devices, but it can't cater to everyone --
 			however thanks to the magic of standards-based interoperability, Zzz works with all websites,
 			like any other browser, and anything you make with Zzz works with other browsers and web
-			technologies. It's just one way to use the web.
+			technologies. It's only one way to use the web.
 		</p>
-		<p>
-			I've been thinking about and prototyping related ideas for more than 13 years, and for the
-			last 6 I've been working on my open source projects full-time, so there's a lot of thought and
-			plans already formulated, but this iteration of Zzz was released after about 5 months from
-			here I'm prioritizing user feedback and just shipping a
-			continuously-improving-but-not-quite-usable proof-of-concept. I'm doing a lot of experimenting
-			in places, so data and API stability aren't yet priorities. Some early (rough) integrations
-			include:
-		</p>
+		<p>Some early (rough) integrations include:</p>
 		<ul>
 			<li>
 				<External_Link href="https://github.com/ollama/ollama">Ollama</External_Link> runs AI models
@@ -198,6 +191,14 @@
 			systems. I currently like word "environment" to describe the device+software UX, and "adaptive
 			web environments" to get the bigger picture. Whatever the name, this class of app is something
 			that I've been wanting for a long time, and I appear to be sticking with this iteration.
+		</p>
+		<p>
+			I've been thinking about and prototyping related ideas for more than 13 years, and for the
+			last 6 I've been working on my open source projects full-time, so there's a lot of thought and
+			plans already formulated, but this iteration of Zzz was released after about 5 months from
+			here I'm prioritizing user feedback and just shipping a
+			continuously-improving-but-not-quite-usable proof-of-concept. I'm doing a lot of experimenting
+			in places, so data and API stability aren't yet priorities.
 		</p>
 		<p>
 			If this sounds interesting and you would like to test out some broken pre-release software,

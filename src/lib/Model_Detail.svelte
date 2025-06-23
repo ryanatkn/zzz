@@ -21,6 +21,10 @@
 
 	const at_detail_page = $derived(page.url.pathname === `${base}/models/${model.name}`);
 	const provider = $derived(app.providers.find_by_name(model.provider_name));
+
+	// TODO BLOCK should be able to start a chat from a button here with this model
+
+	// TODO BLOCK the `not downloaded` state is broken, refactor with ollama.svelte.ts
 </script>
 
 <div {...attrs} class="panel p_lg {attrs?.class}">

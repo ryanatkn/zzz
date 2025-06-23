@@ -146,7 +146,7 @@
 
 					<button
 						type="button"
-						class="w_100 justify_content_start border_radius_0 plain menu_item selectable font_weight_500 color_a"
+						class="w_100 justify_content_start border_radius_0 plain menu_item selectable font_weight_500"
 						class:selected={selected_view === 'pull'}
 						disabled={!ollama.available}
 						onclick={handle_show_pull}

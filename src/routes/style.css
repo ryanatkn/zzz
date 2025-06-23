@@ -337,10 +337,6 @@ a.chip {
 .menu_item.selected.plain {
 	--button_text_color: var(--text_color_2);
 }
-/* TODO very hacky */
-.menu_item.selected.plain.color_a {
-	--button_text_color: var(--color_a_5);
-}
 
 /* TODO hacky, is like `.pane` but softer and without the semantics for dialogs, maybe these styles should replace .pane upstream? */
 .floating {

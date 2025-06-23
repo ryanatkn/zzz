@@ -40,15 +40,16 @@ describe('Ollama', () => {
 		expect(ollama.completed_operations).toHaveLength(0);
 
 		// Add a pending operation
+		const id_1 = create_uuid();
 		const operation_1 = new Ollama_Operation({
 			app,
 			json: {
 				type: 'pull',
 				status: 'pending',
 				model: 'test_model_1',
+				operation_id: id_1,
 			},
 		});
-		const id_1 = create_uuid();
 		ollama.operations.set(id_1, operation_1);
 
 		expect(ollama.pending_operations).toHaveLength(1);
@@ -66,12 +67,15 @@ describe('Ollama', () => {
 		const ollama = new Ollama({app});
 
 		// Add completed operations
+		const id_1 = create_uuid();
+		const id_2 = create_uuid();
 		const operation_1 = new Ollama_Operation({
 			app,
 			json: {
 				type: 'pull',
 				status: 'success',
 				model: 'test_model_1',
+				operation_id: id_1,
 			},
 		});
 		const operation_2 = new Ollama_Operation({
@@ -80,11 +84,10 @@ describe('Ollama', () => {
 				type: 'delete',
 				status: 'pending',
 				model: 'test_model_2',
+				operation_id: id_2,
 			},
 		});
 
-		const id_1 = create_uuid();
-		const id_2 = create_uuid();
 		ollama.operations.set(id_1, operation_1);
 		ollama.operations.set(id_2, operation_2);
 
@@ -142,6 +145,7 @@ describe('Ollama_Operation', () => {
 		const operation = new Ollama_Operation({
 			app,
 			json: {
+				operation_id: create_uuid(),
 				type: 'pull',
 				status: 'pending',
 				model: 'test_model',
@@ -160,11 +164,7 @@ describe('Ollama_Operation', () => {
 		const app = create_mock_app();
 		const operation = new Ollama_Operation({
 			app,
-			json: {
-				type: 'pull',
-				status: 'pending',
-				model: 'test_model',
-			},
+			json: {operation_id: create_uuid(), type: 'pull', status: 'pending', model: 'test_model'},
 		});
 
 		operation.complete_failure('test error');
@@ -178,11 +178,7 @@ describe('Ollama_Operation', () => {
 		const app = create_mock_app();
 		const operation = new Ollama_Operation({
 			app,
-			json: {
-				type: 'pull',
-				status: 'pending',
-				model: 'test_model',
-			},
+			json: {operation_id: create_uuid(), type: 'pull', status: 'pending', model: 'test_model'},
 		});
 
 		operation.update_progress(50);

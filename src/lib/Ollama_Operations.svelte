@@ -14,7 +14,6 @@
 		GLYPH_CHECKMARK,
 		GLYPH_ERROR,
 		GLYPH_CLEAR,
-		GLYPH_LIST,
 		GLYPH_INFO,
 	} from '$lib/glyphs.js';
 	import type {Ollama, Ollama_Operation_Type} from '$lib/ollama.svelte.js';
@@ -37,7 +36,6 @@
 			case 'delete':
 				return GLYPH_DELETE;
 			case 'list':
-				return GLYPH_LIST;
 			case 'show':
 				return GLYPH_INFO;
 			default:
@@ -59,7 +57,7 @@
 	};
 </script>
 
-<div class="panel p_md" transition:slide>
+<div class="panel p_md width_md" transition:slide>
 	<div class="display_flex justify_content_space_between align_items_center mb_md">
 		<h4 class="mt_0 mb_0">operations</h4>
 		<div class="display_flex gap_xs">
@@ -76,35 +74,39 @@
 		</div>
 	</div>
 
-	<div class="display_flex flex_column gap_sm">
+	<ul class="unstyled">
 		<!-- All Operations (most recent first) -->
 		<!-- TODO use indexed collection probably, with normal sorting/filtering patterns -->
 		{#each Array.from(ollama.operations.values()).reverse() as operation (operation.id)}
-			<div
-				class="display_flex justify_content_space_between align_items_center p_sm border_radius_xs {operation.status ===
-				'pending'
-					? 'bg_2'
-					: 'bg_1'} {get_operation_color(operation.status)}"
-			>
-				<div class="display_flex gap_sm align_items_center">
-					{#if operation.status === 'pending'}
-						<Pending_Animation />
-					{:else}
-						<Glyph glyph={operation.status === 'success' ? GLYPH_CHECKMARK : GLYPH_ERROR} />
-					{/if}
-					<Glyph glyph={get_operation_icon(operation.type)} />
-					<span class="font_weight_600">{operation.type}</span>
-					{#if operation.model}
-						<span class="font_family_mono font_size_sm">{operation.model}</span>
-					{/if}
-					{#if operation.status === 'failure' && operation.error_message}
-						<span class="font_size_sm">- {operation.error_message}</span>
-					{/if}
+			<li transition:slide class="py_xs3">
+				<div
+					class="display_flex justify_content_space_between align_items_center p_sm border_radius_xs {operation.status ===
+					'pending'
+						? 'bg_2'
+						: 'bg_1'} {get_operation_color(operation.status)}"
+				>
+					<div class="display_flex gap_sm align_items_center">
+						{#if operation.status === 'pending'}
+							<Pending_Animation />
+						{:else}
+							<Glyph glyph={operation.status === 'success' ? GLYPH_CHECKMARK : GLYPH_ERROR} />
+						{/if}
+						<Glyph glyph={get_operation_icon(operation.type)} />
+						<div class="font_weight_600">{operation.type}</div>
+						{#if operation.model}
+							<div class="flex_1 font_family_mono font_size_sm ellipsis">
+								<div class="ellipsis">{operation.model}</div>
+							</div>
+						{/if}
+						{#if operation.status === 'failure' && operation.error_message}
+							<div class="font_size_sm">- {operation.error_message}</div>
+						{/if}
+					</div>
+					<span class="font_size_sm">
+						{format_timestamp(operation.updated_date.getTime())}
+					</span>
 				</div>
-				<span class="font_size_sm">
-					{format_timestamp(operation.updated_date.getTime())}
-				</span>
-			</div>
+			</li>
 		{/each}
-	</div>
+	</ul>
 </div>
