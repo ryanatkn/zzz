@@ -1,3 +1,5 @@
+// @slop claude_sonnet_4
+
 import {z} from 'zod';
 import {SvelteMap} from 'svelte/reactivity';
 import type {Async_Status} from '@ryanatkn/belt/async.js';

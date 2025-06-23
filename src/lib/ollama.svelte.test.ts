@@ -1,7 +1,11 @@
+// @slop claude_sonnet_4
+
 // @vitest-environment jsdom
+
 import {test, expect, describe, vi} from 'vitest';
-import {Ollama, Ollama_Operation, Ollama_Model_Detail} from './ollama.svelte.js';
-import {create_uuid} from './zod_helpers.js';
+
+import {Ollama, Ollama_Operation, Ollama_Model_Detail} from '$lib/ollama.svelte.js';
+import {create_uuid} from '$lib/zod_helpers.js';
 
 // TODO this should use the real thing probably, but it's interesting to see the minimum mock required
 // Mock the app object with minimal required properties

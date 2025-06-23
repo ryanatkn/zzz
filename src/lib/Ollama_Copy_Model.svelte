@@ -1,5 +1,6 @@
-<!-- filepath: /home/ryan/dev/zzz/src/lib/Ollama_Copy_Model.svelte -->
 <script lang="ts">
+	// @slop claude_sonnet_4
+
 	import Glyph from '$lib/Glyph.svelte';
 	import {GLYPH_COPY, GLYPH_CANCEL, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
 	import type {Ollama} from '$lib/ollama.svelte.js';

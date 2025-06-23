@@ -1,10 +1,9 @@
-<!-- filepath: /home/ryan/dev/zzz/src/lib/Ollama_Model_Detail.svelte -->
 <script lang="ts">
+	// @slop claude_sonnet_4
+
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
 
-	import {frontend_context} from '$lib/frontend.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
-	import Model_Link from '$lib/Model_Link.svelte';
 	import {GLYPH_REFRESH} from '$lib/glyphs.js';
 	import type {Ollama_Model_Detail, Ollama} from '$lib/ollama.svelte.js';
 
@@ -14,11 +13,6 @@
 	}
 
 	const {model_detail, ollama}: Props = $props();
-
-	const app = frontend_context.get();
-
-	// Check if this model exists in our models registry
-	const model = $derived(app.models.find_by_name(model_detail.model_name));
 
 	const load_model_details = async () => {
 		await ollama.show_model(model_detail.model_name);
@@ -69,16 +63,6 @@
 	</div>
 {:else if model_detail.show_response}
 	<div class="display_flex flex_column gap_md">
-		<!-- Model Link (if exists in registry) -->
-		{#if model}
-			<div class="panel p_sm bg_a_1">
-				<div class="display_flex align_items_center gap_sm">
-					<span class="font_weight_600">Model Page:</span>
-					<Model_Link {model} />
-				</div>
-			</div>
-		{/if}
-
 		<!-- Basic Info -->
 		<div class="display_grid gap_sm" style:grid-template-columns="auto 1fr">
 			<span class="font_weight_600">Family:</span>

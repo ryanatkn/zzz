@@ -1,8 +1,10 @@
-<!-- filepath: /home/ryan/dev/zzz/src/lib/Ollama_Manager.svelte -->
 <script lang="ts">
+	// @slop claude_sonnet_4
+
 	import {slide} from 'svelte/transition';
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
 	import {onMount} from 'svelte';
+	import {plural} from '@ryanatkn/belt/string.js';
 
 	import Glyph from '$lib/Glyph.svelte';
 	import {
@@ -17,14 +19,16 @@
 		GLYPH_PLACEHOLDER,
 	} from '$lib/glyphs.js';
 	import Error_Message from '$lib/Error_Message.svelte';
-	import Ollama_Model_Detail from '$lib/Ollama_Model_Detail.svelte';
+	import Ollama_Model_Details from '$lib/Ollama_Model_Details.svelte';
 	import Ollama_Operations from '$lib/Ollama_Operations.svelte';
 	import Ollama_Pull_Model from '$lib/Ollama_Pull_Model.svelte';
 	import Ollama_Create_Model from '$lib/Ollama_Create_Model.svelte';
 	import Ollama_Copy_Model from '$lib/Ollama_Copy_Model.svelte';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
-	import type {Ollama, Ollama_Model_Detail as ModelDetailType} from '$lib/ollama.svelte.js';
-	import {OLLAMA_URL} from './ollama_helpers.js';
+	import type {Ollama, Ollama_Model_Detail} from '$lib/ollama.svelte.js';
+	import {OLLAMA_URL} from '$lib/ollama_helpers.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
+	import Model_Link from '$lib/Model_Link.svelte';
 
 	interface Props {
 		ollama: Ollama;
@@ -37,7 +41,7 @@
 	// TODO probably should use routes instead of internal state, but I want to see about using this as a snapshotting experiment
 
 	let selected_view: 'configure' | 'model' | 'pull' | 'create' | 'copy' = $state('configure');
-	let selected_model_detail: ModelDetailType | null = $state(null);
+	let selected_model_detail: Ollama_Model_Detail | null = $state(null as any);
 
 	// Initial load when component mounts
 	onMount(() => {
@@ -54,7 +58,7 @@
 		}
 	};
 
-	const handle_select_model = async (model_detail: ModelDetailType) => {
+	const handle_select_model = async (model_detail: Ollama_Model_Detail) => {
 		selected_model_detail = model_detail;
 		selected_view = 'model';
 		// Auto-load details if not already loaded
@@ -82,6 +86,12 @@
 		selected_view = 'configure';
 		selected_model_detail = null;
 	};
+
+	const app = frontend_context.get();
+
+	const model = $derived(
+		selected_model_detail && app.models.find_by_name(selected_model_detail.model_name),
+	);
 </script>
 
 <div class="display_flex h_100">
@@ -176,14 +186,14 @@
 			{#if ollama.available && ollama.models_count > 0}
 				<section>
 					<h3 class="mt_xl3 mb_md">
-						<Glyph glyph={GLYPH_MODEL} /> models - {ollama.models_count}
+						{ollama.models_count} model{plural(ollama.models_count)}
 					</h3>
 
 					<div class="column">
 						{#each ollama.models_with_details as model_detail (model_detail.model_name)}
 							<button
 								type="button"
-								class="menu_item selectable plain text_align_start p_sm border_radius_xs font_weight_400"
+								class="menu_item selectable plain text_align_start p_sm border_radius_0 font_weight_400"
 								class:selected={selected_view === 'model' &&
 									selected_model_detail?.model_name === model_detail.model_name}
 								onclick={() => handle_select_model(model_detail)}
@@ -294,10 +304,15 @@
 			</div>
 		{:else if selected_view === 'model' && selected_model_detail}
 			<div class="panel p_md">
-				<!-- Model Header -->
 				<div class="display_flex justify_content_space_between align_items_center mb_md">
 					<div class="display_flex flex_column gap_xs">
-						<h3 class="mt_0 mb_0 font_family_mono">{selected_model_detail.model_name}</h3>
+						<h3 class="mt_0 mb_0 font_family_mono">
+							{#if model}
+								<Model_Link {model} icon />
+							{:else}
+								<Glyph glyph={GLYPH_MODEL} /> {selected_model_detail.model_name}
+							{/if}
+						</h3>
 						<div class="display_flex gap_md font_size_sm">
 							<span
 								>{selected_model_detail.model_response
@@ -339,9 +354,7 @@
 						</Confirm_Button>
 					</div>
 				</div>
-
-				<!-- Model Details (always expanded) -->
-				<Ollama_Model_Detail model_detail={selected_model_detail} {ollama} />
+				<Ollama_Model_Details model_detail={selected_model_detail} {ollama} />
 			</div>
 		{:else if selected_view === 'pull'}
 			<Ollama_Pull_Model {ollama} onclose={handle_close_form} />

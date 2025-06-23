@@ -1,5 +1,6 @@
-<!-- filepath: /home/ryan/dev/zzz/src/lib/Ollama_Operations.svelte -->
 <script lang="ts">
+	// @slop claude_sonnet_4
+
 	import {slide} from 'svelte/transition';
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
 	import {Unreachable_Error} from '@ryanatkn/belt/error.js';
