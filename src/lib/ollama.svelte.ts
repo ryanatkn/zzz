@@ -139,6 +139,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	list_status: Async_Status = $state('initial');
 	list_error: string | null = $state(null);
 	list_last_updated: number | null = $state(null);
+	last_refreshed: string | null = $state(null);
 
 	// Operations tracking using Cell instances
 	operations: SvelteMap<Uuid, Ollama_Operation> = new SvelteMap();
@@ -179,6 +180,16 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 		super(Ollama_Json, options);
 		this.init();
 		this.#update_ollama_config();
+	}
+
+	/**
+	 * Refresh the list of models and update timestamps.
+	 */
+	async refresh(): Promise<ListResponse | null> {
+		const result = await this.list_models();
+		this.last_refreshed = get_datetime_now();
+		this.updated = get_datetime_now();
+		return result;
 	}
 
 	/**
@@ -308,7 +319,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 			operation.complete_success(response);
 
 			// Refresh model list after successful pull
-			void this.list_models();
+			await this.refresh();
 		} catch (error) {
 			console.error(`[ollama] failed to pull model ${model_name}:`, error);
 			operation.complete_failure(error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE);
@@ -347,7 +358,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 			this.model_details.delete(model_name);
 
 			// Refresh model list after successful delete
-			void this.list_models();
+			await this.refresh();
 		} catch (error) {
 			console.error(`[ollama] failed to delete model ${model_name}:`, error);
 			operation.complete_failure(error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE);
@@ -383,7 +394,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 			operation.complete_success(response);
 
 			// Refresh model list after successful copy
-			void this.list_models();
+			await this.refresh();
 		} catch (error) {
 			console.error(`[ollama] failed to copy model ${source} → ${destination}:`, error);
 			operation.complete_failure(error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE);
@@ -423,7 +434,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 			operation.complete_success(response);
 
 			// Refresh model list after successful create
-			void this.list_models();
+			await this.refresh();
 		} catch (error) {
 			console.error(`[ollama] failed to create model ${name}:`, error);
 			operation.complete_failure(error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE);

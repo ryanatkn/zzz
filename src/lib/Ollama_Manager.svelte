@@ -38,7 +38,7 @@
 
 	// Initial load when component mounts
 	onMount(() => {
-		void ollama.list_models();
+		void ollama.refresh();
 	});
 
 	const handle_delete_model = async (model_name: string) => {
@@ -75,6 +75,11 @@
 						{/if}
 					</span>
 					<small class="font_family_mono">{ollama.host}</small>
+					{#if ollama.last_refreshed}
+						<small class="text_color_dimmed">
+							last refreshed: {new Date(ollama.last_refreshed).toLocaleTimeString()}
+						</small>
+					{/if}
 				</div>
 			</div>
 
@@ -124,7 +129,7 @@
 				type="button"
 				class="flex_1 justify_content_start"
 				disabled={ollama.list_status === 'pending'}
-				onclick={() => ollama.list_models()}
+				onclick={() => ollama.refresh()}
 			>
 				<Glyph
 					glyph={ollama.list_status === 'success' ? GLYPH_REFRESH : GLYPH_CONNECT}

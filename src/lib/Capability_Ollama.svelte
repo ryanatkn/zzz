@@ -127,5 +127,9 @@
 		</div>
 	{/if}
 
-	<div>TODO add a ui to manage models</div>
+	<p>
+		Full controls are on the <Provider_Link provider={app.providers.find_by_name('ollama')}
+			><span class="white_space_nowrap"><Glyph glyph={GLYPH_PROVIDER} /> Ollama</span> provider</Provider_Link
+		> page.
+	</p>
 </div>
