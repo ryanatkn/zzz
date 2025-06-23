@@ -52,17 +52,14 @@
 	<section class="display_flex flex_column gap_md">
 		<div class="display_flex gap_sm align_items_start">
 			<div
-				class="flex_1 chip plain font_size_xl flex_column"
-				style:display="display_flex !important"
-				style:align-items="flex-start !important"
-				style:font-weight="400 !important"
+				class="flex_1 chip plain display_flex justify_content_start font_weight_400"
 				class:color_b={ollama.list_status === 'success'}
 				class:color_c={ollama.list_status === 'failure'}
 				class:color_d={ollama.list_status === 'pending'}
 				class:color_e={ollama.list_status === 'initial'}
 			>
 				<div class="column justify_content_center gap_xs pl_md" style:min-height="80px">
-					<span>
+					<span class="font_size_xl">
 						ollama {ollama.list_status === 'success'
 							? `connected (${ollama.models_count} models)`
 							: ollama.list_status === 'failure'
@@ -74,11 +71,11 @@
 							<Pending_Animation inline attrs={{class: 'ml_sm'}} />
 						{/if}
 					</span>
-					<small class="font_family_mono">{ollama.host}</small>
-					{#if ollama.last_refreshed}
-						<small class="text_color_dimmed">
-							last refreshed: {new Date(ollama.last_refreshed).toLocaleTimeString()}
-						</small>
+					<div class="font_family_mono">{ollama.host}</div>
+					{#if ollama.last_refreshed_from_now}
+						<div>
+							refreshed {ollama.last_refreshed_from_now}
+						</div>
 					{/if}
 				</div>
 			</div>
@@ -220,7 +217,7 @@
 						<div class="display_flex justify_content_space_between align_items_center p_md bg_1">
 							<div class="display_flex flex_column gap_xs">
 								<h4 class="mt_0 mb_0 font_family_mono">{model_detail.model_name}</h4>
-								<div class="display_flex gap_md font_size_sm text_color_dimmed">
+								<div class="display_flex gap_md font_size_sm">
 									<span
 										>{model_detail.model_response
 											? Math.round(model_detail.model_response.size / (1024 * 1024))

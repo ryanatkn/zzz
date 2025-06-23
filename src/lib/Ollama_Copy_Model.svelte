@@ -93,7 +93,7 @@
 				onkeydown={handle_keydown}
 				disabled={is_copying}
 			/>
-			<small class="text_color_dimmed"> Create a copy of the source model with a new name </small>
+			<small> Create a copy of the source model with a new name </small>
 		</fieldset>
 
 		<div class="display_flex justify_content_end gap_md">

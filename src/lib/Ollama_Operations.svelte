@@ -9,7 +9,7 @@
 		GLYPH_ADD,
 		GLYPH_COPY,
 		GLYPH_DELETE,
-		GLYPH_CHECK,
+		GLYPH_CHECKMARK,
 		GLYPH_ERROR,
 		GLYPH_CLEAR,
 	} from '$lib/glyphs.js';
@@ -33,7 +33,7 @@
 			case 'delete':
 				return GLYPH_DELETE;
 			default:
-				return GLYPH_CHECK;
+				return GLYPH_CHECKMARK;
 		}
 	};
 
@@ -82,31 +82,31 @@
 						<span class="font_family_mono font_size_sm">{operation.model}</span>
 					{/if}
 				</div>
-				<span class="font_size_sm text_color_dimmed">
+				<span class="font_size_sm">
 					{format_timestamp(operation.created_date.getTime())}
 				</span>
 			</div>
 		{/each}
 
 		<!-- Completed Operations -->
-		{#each ollama.completed_operations.slice(-10) as operation (operation.id)}
+		{#each ollama.completed_operations.slice().reverse() as operation (operation.id)}
 			<div
 				class="display_flex justify_content_space_between align_items_center p_sm border_radius_xs bg_1 {get_operation_color(
 					operation.status,
 				)}"
 			>
 				<div class="display_flex gap_sm align_items_center">
-					<Glyph glyph={operation.status === 'success' ? GLYPH_CHECK : GLYPH_ERROR} />
+					<Glyph glyph={operation.status === 'success' ? GLYPH_CHECKMARK : GLYPH_ERROR} />
 					<Glyph glyph={get_operation_icon(operation.type)} />
 					<span class="font_weight_600">{operation.type}</span>
 					{#if operation.model}
 						<span class="font_family_mono font_size_sm">{operation.model}</span>
 					{/if}
 					{#if operation.status === 'failure' && operation.error_message}
-						<span class="font_size_sm text_color_dimmed">- {operation.error_message}</span>
+						<span class="font_size_sm">- {operation.error_message}</span>
 					{/if}
 				</div>
-				<span class="font_size_sm text_color_dimmed">
+				<span class="font_size_sm">
 					{format_timestamp(operation.updated_date.getTime())}
 				</span>
 			</div>

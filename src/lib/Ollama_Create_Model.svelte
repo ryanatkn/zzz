@@ -106,9 +106,7 @@
 					disabled={is_creating}
 				/>
 			{/if}
-			<small class="text_color_dimmed">
-				Choose a base model to customize, or leave empty for a completely new model
-			</small>
+			<small> Choose a base model to customize, or leave empty for a completely new model </small>
 		</fieldset>
 
 		<fieldset class="mb_0">
@@ -121,7 +119,7 @@
 				bind:value={system_prompt}
 				disabled={is_creating}
 			></textarea>
-			<small class="text_color_dimmed"> Define the model's behavior and personality </small>
+			<small> Define the model's behavior and personality </small>
 		</fieldset>
 
 		<fieldset class="mb_0">
@@ -135,7 +133,7 @@
 				bind:value={template}
 				disabled={is_creating}
 			></textarea>
-			<small class="text_color_dimmed"> Custom prompt template using Ollama template syntax </small>
+			<small> Custom prompt template using Ollama template syntax </small>
 		</fieldset>
 
 		<div class="display_flex justify_content_end gap_md">

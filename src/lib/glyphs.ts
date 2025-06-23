@@ -21,10 +21,9 @@ export const GLYPH_DISCONNECT = '⨂';
 export const GLYPH_RETRY = '↺'; // ⟲'; // ⟲ ⟳ ⤾ ⤼ ↻
 export const GLYPH_PLACEHOLDER = '↳';
 
-export const GLYPH_CHECKMARK = '✓'; // ✓ ✔ ✗ ✖ ✕ ✘
+export const GLYPH_CHECKMARK = '✓'; // ✓ ✔ ✗ ✖ ✕ ✘ ☑ ⍻
 
 export const GLYPH_DOWNLOAD = '⭳'; // ⭳ ⥥ ⤓ ⇩
-export const GLYPH_CHECK = '✔'; // ✔ ☑ ⍻
 export const GLYPH_ERROR = '⁉'; // ⁉ ‼ ‽ ⸮ ⸘ ⚠
 export const GLYPH_CHEVRON_UP = '⮝'; // ⮝ ⯅ ˄ ∧ ⌃ ▴ ▵ ▲
 export const GLYPH_CHEVRON_RIGHT = '⮞'; // ⮞ ❯ ▸ ⭢

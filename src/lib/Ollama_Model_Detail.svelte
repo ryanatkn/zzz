@@ -60,7 +60,7 @@
 					>
 						<Glyph glyph={GLYPH_REFRESH} />
 					</button>
-					<span class="font_size_sm text_color_dimmed">click to load model details</span>
+					<span class="font_size_sm">click to load model details</span>
 				</div>
 			{:else if model_detail.show_status === 'pending'}
 				<div class="display_flex gap_sm align_items_center">

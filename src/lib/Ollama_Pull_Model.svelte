@@ -61,7 +61,7 @@
 				onkeydown={handle_keydown}
 				disabled={is_pulling}
 			/>
-			<small class="text_color_dimmed">
+			<small>
 				Enter a model name from the <a
 					href="https://ollama.com/library"
 					target="_blank"

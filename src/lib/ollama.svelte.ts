@@ -3,6 +3,7 @@ import {SvelteMap} from 'svelte/reactivity';
 import type {Async_Status} from '@ryanatkn/belt/async.js';
 import {BROWSER} from 'esm-env';
 import ollama, {type ListResponse, type ModelResponse, type ShowResponse} from 'ollama/browser';
+import {formatDistance} from 'date-fns';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
@@ -141,6 +142,11 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	list_last_updated: number | null = $state(null);
 	last_refreshed: string | null = $state(null);
 
+	last_refreshed_from_now = $derived(
+		this.last_refreshed &&
+			formatDistance(this.app.time.now_ms, this.last_refreshed, {addSuffix: true}),
+	);
+
 	// Operations tracking using Cell instances
 	operations: SvelteMap<Uuid, Ollama_Operation> = new SvelteMap();
 
@@ -188,7 +194,6 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	async refresh(): Promise<ListResponse | null> {
 		const result = await this.list_models();
 		this.last_refreshed = get_datetime_now();
-		this.updated = get_datetime_now();
 		return result;
 	}
 

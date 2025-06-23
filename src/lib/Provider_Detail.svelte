@@ -22,6 +22,10 @@
 	const at_detail_page = $derived(page.url.pathname === `${base}/providers/${provider.name}`);
 
 	const app = frontend_context.get();
+
+	$effect(() => {
+		console.log(`app.time.now`, app.time.now);
+	});
 </script>
 
 <div {...attrs} class="panel p_lg {attrs?.class}">
