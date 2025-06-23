@@ -10,12 +10,10 @@
 	import {
 		GLYPH_CONNECT,
 		GLYPH_REFRESH,
-		GLYPH_DELETE,
 		GLYPH_COPY,
 		GLYPH_ADD,
 		GLYPH_DOWNLOAD,
 		GLYPH_SETTINGS,
-		GLYPH_MODEL,
 		GLYPH_PLACEHOLDER,
 	} from '$lib/glyphs.js';
 	import Error_Message from '$lib/Error_Message.svelte';
@@ -24,11 +22,8 @@
 	import Ollama_Pull_Model from '$lib/Ollama_Pull_Model.svelte';
 	import Ollama_Create_Model from '$lib/Ollama_Create_Model.svelte';
 	import Ollama_Copy_Model from '$lib/Ollama_Copy_Model.svelte';
-	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import type {Ollama, Ollama_Model_Detail} from '$lib/ollama.svelte.js';
 	import {OLLAMA_URL} from '$lib/ollama_helpers.js';
-	import {frontend_context} from '$lib/frontend.svelte.js';
-	import Model_Link from '$lib/Model_Link.svelte';
 
 	interface Props {
 		ollama: Ollama;
@@ -86,12 +81,6 @@
 		selected_view = 'configure';
 		selected_model_detail = null;
 	};
-
-	const app = frontend_context.get();
-
-	const model = $derived(
-		selected_model_detail && app.models.find_by_name(selected_model_detail.model_name),
-	);
 </script>
 
 <div class="display_flex h_100">
@@ -303,59 +292,12 @@
 				</div>
 			</div>
 		{:else if selected_view === 'model' && selected_model_detail}
-			<div class="panel p_md">
-				<div class="display_flex justify_content_space_between align_items_center mb_md">
-					<div class="display_flex flex_column gap_xs">
-						<h3 class="mt_0 mb_0 font_family_mono">
-							{#if model}
-								<Model_Link {model} icon />
-							{:else}
-								<Glyph glyph={GLYPH_MODEL} /> {selected_model_detail.model_name}
-							{/if}
-						</h3>
-						<div class="display_flex gap_md font_size_sm">
-							<span
-								>{selected_model_detail.model_response
-									? Math.round(selected_model_detail.model_response.size / (1024 * 1024))
-									: '?'} MB</span
-							>
-							<span class="font_family_mono">
-								{selected_model_detail.updated_date.toLocaleDateString()}
-							</span>
-						</div>
-					</div>
-
-					<div class="display_flex gap_xs">
-						<Confirm_Button
-							onconfirm={() =>
-								selected_model_detail && handle_delete_model(selected_model_detail.model_name)}
-							attrs={{
-								class: 'plain color_c',
-								title: `delete ${selected_model_detail.model_name}`,
-							}}
-						>
-							<Glyph glyph={GLYPH_DELETE} />&nbsp; delete model
-
-							{#snippet popover_content(popover)}
-								<button
-									type="button"
-									class="color_c icon_button bg_c_1"
-									title="confirm delete"
-									onclick={() => {
-										// TODO async confirmation
-										selected_model_detail &&
-											void handle_delete_model(selected_model_detail.model_name);
-										popover.hide();
-									}}
-								>
-									<Glyph glyph={GLYPH_DELETE} />
-								</button>
-							{/snippet}
-						</Confirm_Button>
-					</div>
-				</div>
-				<Ollama_Model_Details model_detail={selected_model_detail} {ollama} />
-			</div>
+			<Ollama_Model_Details
+				model_detail={selected_model_detail}
+				{ollama}
+				onclose={handle_close_form}
+				ondelete={handle_delete_model}
+			/>
 		{:else if selected_view === 'pull'}
 			<Ollama_Pull_Model {ollama} onclose={handle_close_form} />
 		{:else if selected_view === 'create'}

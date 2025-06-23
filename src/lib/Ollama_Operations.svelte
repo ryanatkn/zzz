@@ -17,7 +17,7 @@
 		GLYPH_LIST,
 		GLYPH_INFO,
 	} from '$lib/glyphs.js';
-	import type {Ollama, Ollama_Operation_Json} from '$lib/ollama.svelte.js';
+	import type {Ollama, Ollama_Operation_Type} from '$lib/ollama.svelte.js';
 	import {format_timestamp} from '$lib/time_helpers.js';
 
 	interface Props {
@@ -26,7 +26,7 @@
 
 	const {ollama}: Props = $props();
 
-	const get_operation_icon = (type: Ollama_Operation_Json['type']) => {
+	const get_operation_icon = (type: Ollama_Operation_Type) => {
 		switch (type) {
 			case 'pull':
 				return GLYPH_DOWNLOAD;

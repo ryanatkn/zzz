@@ -25,10 +25,16 @@ export interface Ollama_Options extends Cell_Options<typeof Ollama_Json> {} // e
 // could have a single Ollama action, this is a good usecase for observability
 
 /**
+ * Schema for Ollama operation types
+ */
+export const Ollama_Operation_Type = z.enum(['pull', 'create', 'delete', 'copy', 'show', 'list']);
+export type Ollama_Operation_Type = z.infer<typeof Ollama_Operation_Type>;
+
+/**
  * Cell class for tracking individual Ollama operations
  */
 export const Ollama_Operation_Json = Cell_Json.extend({
-	type: z.enum(['pull', 'create', 'delete', 'copy', 'show', 'list']),
+	type: Ollama_Operation_Type,
 	status: z.enum(['initial', 'pending', 'success', 'failure']).default('initial'),
 	model: z.string().optional(),
 	progress: z.number().min(0).max(100).optional(),
@@ -42,7 +48,7 @@ export type Ollama_Operation_Json_Input = z.input<typeof Ollama_Operation_Json>;
 export interface Ollama_Operation_Options extends Cell_Options<typeof Ollama_Operation_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
 export class Ollama_Operation extends Cell<typeof Ollama_Operation_Json> {
-	type: 'pull' | 'create' | 'delete' | 'copy' | 'show' | 'list' = $state()!;
+	type: Ollama_Operation_Type = $state()!;
 	status: Async_Status = $state()!;
 	model: string | undefined = $state();
 	progress: number | undefined = $state();
