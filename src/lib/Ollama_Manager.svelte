@@ -24,6 +24,7 @@
 	import Ollama_Copy_Model from '$lib/Ollama_Copy_Model.svelte';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import type {Ollama} from '$lib/ollama.svelte.js';
+	import {OLLAMA_URL} from './ollama_helpers.js';
 
 	interface Props {
 		ollama: Ollama;
@@ -107,24 +108,39 @@
 
 				<div class="display_flex flex_column gap_md">
 					<fieldset class="mb_0">
-						<label for="ollama_host" class="display_block mb_xs">Host URL</label>
+						<label for="ollama_host" class="display_block mb_xs">Ollama host url</label>
 						<input
 							id="ollama_host"
 							type="text"
 							class="plain flex_1"
-							placeholder="{GLYPH_PLACEHOLDER} Ollama server URL"
+							placeholder="{GLYPH_PLACEHOLDER} {OLLAMA_URL}"
 							bind:value={ollama.host}
+							oninput={() => ollama.refresh()}
 						/>
 					</fieldset>
+					{#if ollama.host !== OLLAMA_URL}
+						<div class="row gap_sm" transition:slide>
+							<button
+								type="button"
+								onclick={async () => {
+									ollama.host = OLLAMA_URL;
+									await ollama.refresh();
+								}}>reset to default</button
+							>
+							<small class="font_family_mono">
+								{OLLAMA_URL}
+							</small>
+						</div>
+					{/if}
 				</div>
 			</div>
 		{/if}
 
 		<!-- Action Buttons -->
-		<div class="display_flex gap_md flex_wrap">
+		<div class="flex_column gap_md width_xs">
 			<button
 				type="button"
-				class="flex_1 justify_content_start"
+				class="w_100 flex_1 justify_content_start"
 				disabled={ollama.list_status === 'pending'}
 				onclick={() => ollama.refresh()}
 			>
@@ -147,7 +163,7 @@
 
 			<button
 				type="button"
-				class="flex_1 justify_content_start color_a"
+				class="w_100 flex_1 justify_content_start color_a"
 				disabled={!ollama.available}
 				onclick={() => (show_pull_form = !show_pull_form)}
 			>
@@ -157,7 +173,7 @@
 
 			<button
 				type="button"
-				class="flex_1 justify_content_start color_b"
+				class="w_100 flex_1 justify_content_start"
 				disabled={!ollama.available}
 				onclick={() => (show_create_form = !show_create_form)}
 			>
@@ -167,7 +183,7 @@
 
 			<button
 				type="button"
-				class="flex_1 justify_content_start color_d"
+				class="w_100 flex_1 justify_content_start"
 				disabled={!ollama.available || ollama.models_count === 0}
 				onclick={() => (show_copy_form = !show_copy_form)}
 			>
