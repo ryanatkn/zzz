@@ -2,6 +2,7 @@
 <script lang="ts">
 	import {slide} from 'svelte/transition';
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
+	import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 
 	import Glyph from '$lib/Glyph.svelte';
 	import {
@@ -12,8 +13,10 @@
 		GLYPH_CHECKMARK,
 		GLYPH_ERROR,
 		GLYPH_CLEAR,
+		GLYPH_LIST,
+		GLYPH_INFO,
 	} from '$lib/glyphs.js';
-	import type {Ollama} from '$lib/ollama.svelte.js';
+	import type {Ollama, Ollama_Operation_Json} from '$lib/ollama.svelte.js';
 	import {format_timestamp} from '$lib/time_helpers.js';
 
 	interface Props {
@@ -22,7 +25,7 @@
 
 	const {ollama}: Props = $props();
 
-	const get_operation_icon = (type: string) => {
+	const get_operation_icon = (type: Ollama_Operation_Json['type']) => {
 		switch (type) {
 			case 'pull':
 				return GLYPH_DOWNLOAD;
@@ -32,8 +35,12 @@
 				return GLYPH_COPY;
 			case 'delete':
 				return GLYPH_DELETE;
+			case 'list':
+				return GLYPH_LIST;
+			case 'show':
+				return GLYPH_INFO;
 			default:
-				return GLYPH_CHECKMARK;
+				throw new Unreachable_Error(type);
 		}
 	};
 

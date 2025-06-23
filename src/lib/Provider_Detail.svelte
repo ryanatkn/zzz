@@ -23,9 +23,7 @@
 
 	const app = frontend_context.get();
 
-	$effect(() => {
-		console.log(`app.time.now`, app.time.now);
-	});
+	// TODO BLOCK the `Ollama_Manager` needs to be unified with the Model_Summary list
 </script>
 
 <div {...attrs} class="panel p_lg {attrs?.class}">
