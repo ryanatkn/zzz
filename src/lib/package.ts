@@ -1787,7 +1787,6 @@ export const src_json = {
 				{name: 'GLYPH_PLACEHOLDER', kind: 'variable'},
 				{name: 'GLYPH_CHECKMARK', kind: 'variable'},
 				{name: 'GLYPH_DOWNLOAD', kind: 'variable'},
-				{name: 'GLYPH_CHECK', kind: 'variable'},
 				{name: 'GLYPH_ERROR', kind: 'variable'},
 				{name: 'GLYPH_CHEVRON_UP', kind: 'variable'},
 				{name: 'GLYPH_CHEVRON_RIGHT', kind: 'variable'},
