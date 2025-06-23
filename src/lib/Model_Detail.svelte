@@ -50,7 +50,7 @@
 			{/if}
 		</div>
 	</div>
-
+	<aside class="mt_xl3">⚠️ This information is incomplete and may be incorrect or outdated.</aside>
 	<section>
 		<h2>Specs</h2>
 		<div class="specs_grid">

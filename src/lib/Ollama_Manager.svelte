@@ -34,6 +34,8 @@
 
 	// TODO think about snapshotting/loading this and ollama.svelte.ts data
 
+	// TODO probably should use routes instead of internal state, but I want to see about using this as a snapshotting experiment
+
 	let selected_view: 'configure' | 'model' | 'pull' | 'create' | 'copy' = $state('configure');
 	let selected_model_detail: ModelDetailType | null = $state(null);
 
@@ -98,7 +100,7 @@
 					>
 						<div class="column justify_content_center gap_xs p_md">
 							<span class="font_size_lg">
-								ollama {ollama.list_status === 'success'
+								Ollama {ollama.list_status === 'success'
 									? `connected`
 									: ollama.list_status === 'failure'
 										? 'unavailable'
@@ -112,46 +114,19 @@
 							<div class="font_family_mono font_size_sm">{ollama.host}</div>
 							{#if ollama.last_refreshed_from_now}
 								<div class="font_size_sm">
-									refreshed {ollama.last_refreshed_from_now}
+									{#if ollama.list_error}attempted{:else}refreshed{/if}
+									{ollama.last_refreshed_from_now}
 								</div>
 							{/if}
 						</div>
 					</div>
 				</div>
 
-				{#if ollama.list_error}
-					<div transition:slide>
-						<Error_Message
-							><small class="font_family_mono">{ollama.list_error}</small></Error_Message
-						>
-					</div>
-				{/if}
-
-				<div class="row justify_content_space_between gap_xs">
-					<button
-						type="button"
-						class="justify_content_start"
-						disabled={ollama.list_status === 'pending'}
-						onclick={() => ollama.refresh()}
-					>
-						<Glyph glyph={ollama.list_status === 'success' ? GLYPH_REFRESH : GLYPH_CONNECT} />
-						<span class="ml_sm">
-							{#if ollama.list_status === 'pending'}
-								checking...
-							{:else if ollama.list_status === 'success'}
-								refresh
-							{:else}
-								connect
-							{/if}
-						</span>
-					</button>
-				</div>
-
-				<!-- View Selection -->
+				<!-- TODO hacky styles, trying a variant of menu styles here, some of which may be upstreamed (plain doesnt currently mix well with others like menu_item and colors) -->
 				<div class="flex_column gap_sm">
 					<button
 						type="button"
-						class="w_100 justify_content_start border_radius_0"
+						class="w_100 justify_content_start border_radius_0 plain menu_item selectable font_weight_500"
 						class:selected={selected_view === 'configure'}
 						onclick={() => {
 							selected_view = 'configure';
@@ -161,13 +136,10 @@
 						<Glyph glyph={GLYPH_SETTINGS} />
 						<span class="ml_sm">configure</span>
 					</button>
-				</div>
 
-				<!-- Action Buttons -->
-				<div class="flex_column gap_sm">
 					<button
 						type="button"
-						class="w_100 justify_content_start color_a border_radius_0"
+						class="w_100 justify_content_start border_radius_0 plain menu_item selectable font_weight_500 color_a"
 						class:selected={selected_view === 'pull'}
 						disabled={!ollama.available}
 						onclick={handle_show_pull}
@@ -178,7 +150,7 @@
 
 					<button
 						type="button"
-						class="w_100 justify_content_start border_radius_0"
+						class="w_100 justify_content_start border_radius_0 plain menu_item selectable font_weight_500"
 						class:selected={selected_view === 'create'}
 						disabled={!ollama.available}
 						onclick={handle_show_create}
@@ -189,7 +161,7 @@
 
 					<button
 						type="button"
-						class="w_100 justify_content_start border_radius_0"
+						class="w_100 justify_content_start border_radius_0 plain menu_item selectable font_weight_500"
 						class:selected={selected_view === 'copy'}
 						disabled={!ollama.available || ollama.models_count === 0}
 						onclick={handle_show_copy}
@@ -203,30 +175,30 @@
 			<!-- Models List -->
 			{#if ollama.available && ollama.models_count > 0}
 				<section>
-					<h4 class="mt_0 mb_md">
-						<Glyph glyph={GLYPH_MODEL} /> models ({ollama.models_count})
-					</h4>
+					<h3 class="mt_xl3 mb_md">
+						<Glyph glyph={GLYPH_MODEL} /> models - {ollama.models_count}
+					</h3>
 
-					<div class="display_flex flex_column gap_xs">
+					<div class="column">
 						{#each ollama.models_with_details as model_detail (model_detail.model_name)}
 							<button
 								type="button"
-								class="menu_item text_align_start p_sm border_radius_xs"
+								class="menu_item selectable plain text_align_start p_sm border_radius_xs font_weight_400"
 								class:selected={selected_view === 'model' &&
 									selected_model_detail?.model_name === model_detail.model_name}
 								onclick={() => handle_select_model(model_detail)}
 							>
 								<div class="display_flex flex_column gap_xs">
-									<div class="font_weight_600 font_family_mono ellipsis">
+									<div class="ellipsis font_size_lg">
 										{model_detail.model_name}
 									</div>
-									<div class="display_flex gap_md font_size_sm">
+									<div class="row gap_xl font_size_sm">
 										<span
 											>{model_detail.model_response
 												? Math.round(model_detail.model_response.size / (1024 * 1024))
 												: '?'} MB</span
 										>
-										<span class="font_family_mono">
+										<span>
 											{model_detail.updated_date.toLocaleDateString()}
 										</span>
 									</div>
@@ -247,32 +219,52 @@
 	</div>
 
 	<!-- Main Content -->
-	<div class="flex_1 h_100">
+	<div class="flex_1 h_100 overflow_auto p_md">
 		{#if selected_view === 'configure'}
-			<div class="h_100 overflow_auto p_md">
-				<div class="panel p_md">
-					<h3 class="mt_0 mb_md">
-						<Glyph glyph={GLYPH_SETTINGS} /> configure
-					</h3>
+			<div class="panel p_md">
+				<h3 class="mt_0 mb_md">
+					<Glyph glyph={GLYPH_SETTINGS} /> configure
+				</h3>
 
-					<div class="display_flex flex_column gap_lg">
-						<!-- Host Configuration -->
-						<div class="display_flex flex_column gap_md">
-							<fieldset class="mb_0">
-								<label for="ollama_host" class="display_block mb_xs">ollama host url</label>
-								<input
-									id="ollama_host"
-									type="text"
-									class="plain flex_1"
-									placeholder="{GLYPH_PLACEHOLDER} {OLLAMA_URL}"
-									bind:value={ollama.host}
-									oninput={() => ollama.refresh()}
-								/>
-							</fieldset>
+				<div class="display_flex flex_column gap_lg">
+					<!-- Host Configuration -->
+					<div class="display_flex flex_column gap_md">
+						<fieldset>
+							<label for="ollama_host" class="display_block mb_xs">Ollama host url</label>
+							<input
+								id="ollama_host"
+								type="text"
+								class="plain flex_1"
+								placeholder="{GLYPH_PLACEHOLDER} {OLLAMA_URL}"
+								bind:value={ollama.host}
+								oninput={() => ollama.refresh()}
+							/>
+						</fieldset>
+
+						<div class="row gap_xs">
+							<button
+								type="button"
+								class="justify_content_start"
+								disabled={ollama.list_status === 'pending'}
+								onclick={() => ollama.refresh()}
+							>
+								<Glyph glyph={ollama.list_status === 'success' ? GLYPH_REFRESH : GLYPH_CONNECT} />
+								<span class="ml_sm">
+									{#if ollama.list_status === 'pending'}
+										checking...
+									{:else if ollama.list_status === 'success'}
+										refresh
+									{:else}
+										connect
+									{/if}
+								</span>
+							</button>
+
 							{#if ollama.host !== OLLAMA_URL}
-								<div class="row gap_sm" transition:slide>
+								<div class="row gap_sm" transition:slide={{axis: 'x'}}>
 									<button
 										type="button"
+										class="shrink_0"
 										onclick={async () => {
 											ollama.host = OLLAMA_URL;
 											await ollama.refresh();
@@ -285,78 +277,78 @@
 							{/if}
 						</div>
 
-						<!-- Operations Panel -->
-						{#if ollama.pending_operations.length > 0 || ollama.completed_operations.length > 0}
-							<Ollama_Operations {ollama} />
+						{#if ollama.list_error}
+							<div transition:slide>
+								<Error_Message
+									><small class="font_family_mono">{ollama.list_error}</small></Error_Message
+								>
+							</div>
 						{/if}
 					</div>
+
+					<!-- Operations Panel -->
+					{#if ollama.pending_operations.length > 0 || ollama.completed_operations.length > 0}
+						<Ollama_Operations {ollama} />
+					{/if}
 				</div>
 			</div>
 		{:else if selected_view === 'model' && selected_model_detail}
-			<div class="h_100 overflow_auto p_md">
-				<div class="panel p_md">
-					<!-- Model Header -->
-					<div class="display_flex justify_content_space_between align_items_center mb_md">
-						<div class="display_flex flex_column gap_xs">
-							<h3 class="mt_0 mb_0 font_family_mono">{selected_model_detail.model_name}</h3>
-							<div class="display_flex gap_md font_size_sm">
-								<span
-									>{selected_model_detail.model_response
-										? Math.round(selected_model_detail.model_response.size / (1024 * 1024))
-										: '?'} MB</span
-								>
-								<span class="font_family_mono">
-									{selected_model_detail.updated_date.toLocaleDateString()}
-								</span>
-							</div>
-						</div>
-
-						<div class="display_flex gap_xs">
-							<Confirm_Button
-								onconfirm={() =>
-									selected_model_detail && handle_delete_model(selected_model_detail.model_name)}
-								attrs={{
-									class: 'icon_button plain color_c',
-									title: `delete ${selected_model_detail.model_name}`,
-								}}
+			<div class="panel p_md">
+				<!-- Model Header -->
+				<div class="display_flex justify_content_space_between align_items_center mb_md">
+					<div class="display_flex flex_column gap_xs">
+						<h3 class="mt_0 mb_0 font_family_mono">{selected_model_detail.model_name}</h3>
+						<div class="display_flex gap_md font_size_sm">
+							<span
+								>{selected_model_detail.model_response
+									? Math.round(selected_model_detail.model_response.size / (1024 * 1024))
+									: '?'} MB</span
 							>
-								<Glyph glyph={GLYPH_DELETE} />
-
-								{#snippet popover_content(popover)}
-									<button
-										type="button"
-										class="color_c icon_button bg_c_1"
-										title="confirm delete"
-										onclick={() => {
-											// TODO async confirmation
-											selected_model_detail &&
-												void handle_delete_model(selected_model_detail.model_name);
-											popover.hide();
-										}}
-									>
-										<Glyph glyph={GLYPH_DELETE} />
-									</button>
-								{/snippet}
-							</Confirm_Button>
+							<span class="font_family_mono">
+								{selected_model_detail.updated_date.toLocaleDateString()}
+							</span>
 						</div>
 					</div>
 
-					<!-- Model Details (always expanded) -->
-					<Ollama_Model_Detail model_detail={selected_model_detail} {ollama} />
+					<div class="display_flex gap_xs">
+						<Confirm_Button
+							onconfirm={() =>
+								selected_model_detail && handle_delete_model(selected_model_detail.model_name)}
+							attrs={{
+								class: 'plain color_c',
+								title: `delete ${selected_model_detail.model_name}`,
+							}}
+						>
+							<Glyph glyph={GLYPH_DELETE} />&nbsp; delete model
+
+							{#snippet popover_content(popover)}
+								<button
+									type="button"
+									class="color_c icon_button bg_c_1"
+									title="confirm delete"
+									onclick={() => {
+										// TODO async confirmation
+										selected_model_detail &&
+											void handle_delete_model(selected_model_detail.model_name);
+										popover.hide();
+									}}
+								>
+									<Glyph glyph={GLYPH_DELETE} />
+								</button>
+							{/snippet}
+						</Confirm_Button>
+					</div>
 				</div>
+
+				<!-- Model Details (always expanded) -->
+				<Ollama_Model_Detail model_detail={selected_model_detail} {ollama} />
 			</div>
 		{:else if selected_view === 'pull'}
-			<div class="h_100 overflow_auto p_md">
-				<Ollama_Pull_Model {ollama} onclose={handle_close_form} />
-			</div>
+			<Ollama_Pull_Model {ollama} onclose={handle_close_form} />
 		{:else if selected_view === 'create'}
-			<div class="h_100 overflow_auto p_md">
-				<Ollama_Create_Model {ollama} onclose={handle_close_form} />
-			</div>
+			<Ollama_Create_Model {ollama} onclose={handle_close_form} />
 		{:else if selected_view === 'copy'}
-			<div class="h_100 overflow_auto p_md">
-				<Ollama_Copy_Model {ollama} onclose={handle_close_form} />
-			</div>
+			<Ollama_Copy_Model {ollama} onclose={handle_close_form} />
 		{/if}
 	</div>
 </div>

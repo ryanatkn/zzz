@@ -46,16 +46,16 @@
 
 <div class="panel p_md">
 	<div class="display_flex justify_content_space_between align_items_center mb_md">
-		<h4 class="mt_0 mb_0">
-			<Glyph glyph={GLYPH_COPY} /> Copy Model
-		</h4>
+		<h3 class="mt_0 mb_0">
+			<Glyph glyph={GLYPH_COPY} /> copy model
+		</h3>
 		<button type="button" class="icon_button plain" onclick={onclose} title="close">
 			<Glyph glyph={GLYPH_CANCEL} />
 		</button>
 	</div>
 
 	<div class="display_flex flex_column gap_md">
-		<fieldset class="mb_0">
+		<fieldset>
 			<label for="source_model" class="display_block mb_xs">Source Model</label>
 			{#if available_models.length > 0}
 				<select
@@ -82,7 +82,7 @@
 			{/if}
 		</fieldset>
 
-		<fieldset class="mb_0">
+		<fieldset>
 			<label for="destination_model" class="display_block mb_xs">Destination Model Name</label>
 			<input
 				id="destination_model"

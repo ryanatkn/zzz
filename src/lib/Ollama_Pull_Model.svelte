@@ -41,17 +41,17 @@
 
 <div class="panel p_md">
 	<div class="display_flex justify_content_space_between align_items_center mb_md">
-		<h4 class="mt_0 mb_0">
-			<Glyph glyph={GLYPH_DOWNLOAD} /> Pull Model
-		</h4>
+		<h3 class="mt_0 mb_0">
+			<Glyph glyph={GLYPH_DOWNLOAD} /> pull model
+		</h3>
 		<button type="button" class="icon_button plain" onclick={onclose} title="close">
 			<Glyph glyph={GLYPH_CANCEL} />
 		</button>
 	</div>
 
 	<div class="display_flex flex_column gap_md">
-		<fieldset class="mb_0">
-			<label for="model_name" class="display_block mb_xs">Model Name</label>
+		<fieldset>
+			<label for="model_name" class="display_block mb_xs">model name</label>
 			<input
 				id="model_name"
 				type="text"

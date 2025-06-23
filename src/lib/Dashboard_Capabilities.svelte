@@ -11,16 +11,12 @@
 	</header>
 	<section class="width_md">
 		<p>
-			This page lets you view and control the app's capabilities, which enable some tools and
-			experiences.
+			This page lets you view and control the app's capabilities, powers that determine what you can
+			do with it.
 		</p>
 		<p>
 			Zzz's goal is to connect your intent to the world through machines, so it runs in many
-			contexts and you can do whatever you wish with whatever capabilities are available.
-		</p>
-		<p>
-			This interface is designed for transparency to support user control and understanding, but a
-			simplified and friendlier UX will be probably be developed as the default.
+			contexts, and you can do whatever you wish with whatever capabilities are on hand.
 		</p>
 	</section>
 	<section>

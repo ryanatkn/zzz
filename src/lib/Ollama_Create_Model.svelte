@@ -64,17 +64,17 @@
 
 <div class="panel p_md">
 	<div class="display_flex justify_content_space_between align_items_center mb_md">
-		<h4 class="mt_0 mb_0">
-			<Glyph glyph={GLYPH_ADD} /> Create Model
-		</h4>
+		<h3 class="mt_0 mb_0">
+			<Glyph glyph={GLYPH_ADD} /> create model
+		</h3>
 		<button type="button" class="icon_button plain" onclick={onclose} title="close">
 			<Glyph glyph={GLYPH_CANCEL} />
 		</button>
 	</div>
 
 	<div class="display_flex flex_column gap_md">
-		<fieldset class="mb_0">
-			<label for="new_model_name" class="display_block mb_xs">New Model Name</label>
+		<fieldset>
+			<label for="new_model_name" class="display_block mb_xs">new model name</label>
 			<input
 				id="new_model_name"
 				type="text"
@@ -86,8 +86,8 @@
 			/>
 		</fieldset>
 
-		<fieldset class="mb_0">
-			<label for="from_model" class="display_block mb_xs">Base Model (optional)</label>
+		<fieldset>
+			<label for="from_model" class="display_block mb_xs">base model (optional)</label>
 			{#if available_models.length > 0}
 				<select id="from_model" class="plain w_100" bind:value={from_model} disabled={is_creating}>
 					<option value="">-- select base model --</option>
@@ -109,8 +109,8 @@
 			<small> Choose a base model to customize, or leave empty for a completely new model </small>
 		</fieldset>
 
-		<fieldset class="mb_0">
-			<label for="system_prompt" class="display_block mb_xs">System Prompt (optional)</label>
+		<fieldset>
+			<label for="system_prompt" class="display_block mb_xs">system prompt (optional)</label>
 			<textarea
 				id="system_prompt"
 				class="plain w_100"
@@ -122,8 +122,8 @@
 			<small> Define the model's behavior and personality </small>
 		</fieldset>
 
-		<fieldset class="mb_0">
-			<label for="template" class="display_block mb_xs">Template (optional)</label>
+		<fieldset>
+			<label for="template" class="display_block mb_xs">template (optional)</label>
 			<!-- TODO fix this placeholder -->
 			<textarea
 				id="template"

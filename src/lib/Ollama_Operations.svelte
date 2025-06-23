@@ -60,7 +60,7 @@
 
 <div class="panel p_md" transition:slide>
 	<div class="display_flex justify_content_space_between align_items_center mb_md">
-		<h4 class="mt_0 mb_0">Operations</h4>
+		<h4 class="mt_0 mb_0">operations</h4>
 		<div class="display_flex gap_xs">
 			{#if ollama.completed_operations.length > 0}
 				<button

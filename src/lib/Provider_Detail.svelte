@@ -57,6 +57,10 @@
 		<section>
 			<Ollama_Manager ollama={app.ollama} />
 		</section>
+	{:else}
+		<aside class="mt_xl3">
+			⚠️ This information is incomplete and may be incorrect or outdated.
+		</aside>
 	{/if}
 	<section>
 		<ul class="display_flex flex_wrap unstyled gap_md">

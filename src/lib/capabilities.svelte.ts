@@ -287,6 +287,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	async check_ollama(): Promise<void> {
 		const message_id = create_uuid();
 
+		// TODO BLOCK @many maybe the Ollama class and capability should be the same thing?
 		this.ollama = {
 			name: 'ollama',
 			data: null,

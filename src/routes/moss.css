@@ -265,6 +265,9 @@ a.chip {
 .flex_column {
 	flex-direction: column;
 }
+.shrink_0 {
+	flex-shrink: 0;
+}
 .align_items_center {
 	align-items: center;
 }
@@ -342,6 +345,10 @@ a.chip {
 .font_weight_400 {
 	font-weight: 400;
 	--font_weight: 400;
+}
+.font_weight_500 {
+	font-weight: 500;
+	--font_weight: 500;
 }
 .font_weight_600 {
 	font-weight: 600;
