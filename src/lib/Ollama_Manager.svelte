@@ -34,8 +34,7 @@
 
 	// TODO think about snapshotting/loading this and ollama.svelte.ts data
 
-	let show_settings = $state(false);
-	let selected_view: 'model' | 'pull' | 'create' | 'copy' | null = $state(null);
+	let selected_view: 'configure' | 'model' | 'pull' | 'create' | 'copy' = $state('configure');
 	let selected_model_detail: ModelDetailType | null = $state(null);
 
 	// Initial load when component mounts
@@ -49,7 +48,7 @@
 		// Clear selection if the deleted model was selected
 		if (selected_model_detail?.model_name === model_name) {
 			selected_model_detail = null;
-			selected_view = null;
+			selected_view = 'configure';
 		}
 	};
 
@@ -78,7 +77,7 @@
 	};
 
 	const handle_close_form = () => {
-		selected_view = null;
+		selected_view = 'configure';
 		selected_model_detail = null;
 	};
 </script>
@@ -128,43 +127,6 @@
 					</div>
 				{/if}
 
-				<!-- Settings Panel -->
-				{#if show_settings}
-					<div class="panel p_md" transition:slide>
-						<h4 class="mt_0 mb_md">
-							<Glyph glyph={GLYPH_SETTINGS} /> Settings
-						</h4>
-
-						<div class="display_flex flex_column gap_md">
-							<fieldset class="mb_0">
-								<label for="ollama_host" class="display_block mb_xs">Ollama host url</label>
-								<input
-									id="ollama_host"
-									type="text"
-									class="plain flex_1"
-									placeholder="{GLYPH_PLACEHOLDER} {OLLAMA_URL}"
-									bind:value={ollama.host}
-									oninput={() => ollama.refresh()}
-								/>
-							</fieldset>
-							{#if ollama.host !== OLLAMA_URL}
-								<div class="row gap_sm" transition:slide>
-									<button
-										type="button"
-										onclick={async () => {
-											ollama.host = OLLAMA_URL;
-											await ollama.refresh();
-										}}>reset to default</button
-									>
-									<small class="font_family_mono">
-										{OLLAMA_URL}
-									</small>
-								</div>
-							{/if}
-						</div>
-					</div>
-				{/if}
-
 				<div class="row justify_content_space_between gap_xs">
 					<button
 						type="button"
@@ -183,17 +145,22 @@
 							{/if}
 						</span>
 					</button>
+				</div>
 
-					<div class="display_flex gap_xs">
-						<button
-							type="button"
-							class="icon_button plain"
-							title="settings"
-							onclick={() => (show_settings = !show_settings)}
-						>
-							<Glyph glyph={GLYPH_SETTINGS} />
-						</button>
-					</div>
+				<!-- View Selection -->
+				<div class="flex_column gap_sm">
+					<button
+						type="button"
+						class="w_100 justify_content_start border_radius_0"
+						class:selected={selected_view === 'configure'}
+						onclick={() => {
+							selected_view = 'configure';
+							selected_model_detail = null;
+						}}
+					>
+						<Glyph glyph={GLYPH_SETTINGS} />
+						<span class="ml_sm">configure</span>
+					</button>
 				</div>
 
 				<!-- Action Buttons -->
@@ -231,18 +198,13 @@
 						<span class="ml_sm">copy model</span>
 					</button>
 				</div>
-
-				<!-- Operations Panel -->
-				{#if ollama.pending_operations.length > 0 || ollama.completed_operations.length > 0}
-					<Ollama_Operations {ollama} />
-				{/if}
 			</section>
 
 			<!-- Models List -->
 			{#if ollama.available && ollama.models_count > 0}
 				<section>
 					<h4 class="mt_0 mb_md">
-						<Glyph glyph={GLYPH_MODEL} /> Models ({ollama.models_count})
+						<Glyph glyph={GLYPH_MODEL} /> models ({ollama.models_count})
 					</h4>
 
 					<div class="display_flex flex_column gap_xs">
@@ -276,7 +238,7 @@
 			{:else if ollama.available && ollama.models_count === 0}
 				<section class="panel p_md" transition:slide>
 					<p>
-						No models found. Pull a model using the button above or install models using the Ollama
+						no models found. pull a model using the button above or install models using the ollama
 						CLI.
 					</p>
 				</section>
@@ -286,7 +248,51 @@
 
 	<!-- Main Content -->
 	<div class="flex_1 h_100">
-		{#if selected_view === 'model' && selected_model_detail}
+		{#if selected_view === 'configure'}
+			<div class="h_100 overflow_auto p_md">
+				<div class="panel p_md">
+					<h3 class="mt_0 mb_md">
+						<Glyph glyph={GLYPH_SETTINGS} /> configure
+					</h3>
+
+					<div class="display_flex flex_column gap_lg">
+						<!-- Host Configuration -->
+						<div class="display_flex flex_column gap_md">
+							<fieldset class="mb_0">
+								<label for="ollama_host" class="display_block mb_xs">ollama host url</label>
+								<input
+									id="ollama_host"
+									type="text"
+									class="plain flex_1"
+									placeholder="{GLYPH_PLACEHOLDER} {OLLAMA_URL}"
+									bind:value={ollama.host}
+									oninput={() => ollama.refresh()}
+								/>
+							</fieldset>
+							{#if ollama.host !== OLLAMA_URL}
+								<div class="row gap_sm" transition:slide>
+									<button
+										type="button"
+										onclick={async () => {
+											ollama.host = OLLAMA_URL;
+											await ollama.refresh();
+										}}>reset to default</button
+									>
+									<small class="font_family_mono">
+										{OLLAMA_URL}
+									</small>
+								</div>
+							{/if}
+						</div>
+
+						<!-- Operations Panel -->
+						{#if ollama.pending_operations.length > 0 || ollama.completed_operations.length > 0}
+							<Ollama_Operations {ollama} />
+						{/if}
+					</div>
+				</div>
+			</div>
+		{:else if selected_view === 'model' && selected_model_detail}
 			<div class="h_100 overflow_auto p_md">
 				<div class="panel p_md">
 					<!-- Model Header -->
@@ -350,10 +356,6 @@
 		{:else if selected_view === 'copy'}
 			<div class="h_100 overflow_auto p_md">
 				<Ollama_Copy_Model {ollama} onclose={handle_close_form} />
-			</div>
-		{:else}
-			<div class="display_flex align_items_center justify_content_center h_100">
-				<p>Select a model or action from the sidebar</p>
 			</div>
 		{/if}
 	</div>

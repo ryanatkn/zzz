@@ -695,6 +695,9 @@ a.chip {
 .gap_md {
 	gap: var(--space_md);
 }
+.gap_lg {
+	gap: var(--space_lg);
+}
 .gap_xl {
 	gap: var(--space_xl);
 }
