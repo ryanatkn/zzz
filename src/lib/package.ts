@@ -2049,6 +2049,7 @@ export const src_json = {
 				{name: 'Ollama_Json', kind: 'variable'},
 				{name: 'Ollama_Json_Input', kind: 'type'},
 				{name: 'Ollama_Options', kind: 'type'},
+				{name: 'Ollama_Operation_Type', kind: 'variable'},
 				{name: 'Ollama_Operation_Json', kind: 'variable'},
 				{name: 'Ollama_Operation_Json_Input', kind: 'type'},
 				{name: 'Ollama_Operation_Options', kind: 'type'},
