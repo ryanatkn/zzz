@@ -9,9 +9,10 @@ import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import {create_uuid, type Uuid, get_datetime_now} from '$lib/zod_helpers.js';
 import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
+import {OLLAMA_URL} from '$lib/ollama_helpers.js';
 
 export const Ollama_Json = Cell_Json.extend({
-	host: z.string().default('http://127.0.0.1:11434'),
+	host: z.string().default(OLLAMA_URL),
 });
 export type Ollama_Json = z.infer<typeof Ollama_Json>;
 export type Ollama_Json_Input = z.input<typeof Ollama_Json>;
