@@ -7,23 +7,13 @@
 	import {plural} from '@ryanatkn/belt/string.js';
 
 	import Glyph from '$lib/Glyph.svelte';
-	import {
-		GLYPH_CONNECT,
-		GLYPH_REFRESH,
-		GLYPH_COPY,
-		GLYPH_ADD,
-		GLYPH_DOWNLOAD,
-		GLYPH_SETTINGS,
-		GLYPH_PLACEHOLDER,
-	} from '$lib/glyphs.js';
-	import Error_Message from '$lib/Error_Message.svelte';
+	import {GLYPH_COPY, GLYPH_ADD, GLYPH_DOWNLOAD, GLYPH_SETTINGS} from '$lib/glyphs.js';
+	import Ollama_Configure from '$lib/Ollama_Configure.svelte';
 	import Ollama_Model_Details from '$lib/Ollama_Model_Details.svelte';
-	import Ollama_Operations from '$lib/Ollama_Operations.svelte';
 	import Ollama_Pull_Model from '$lib/Ollama_Pull_Model.svelte';
 	import Ollama_Create_Model from '$lib/Ollama_Create_Model.svelte';
 	import Ollama_Copy_Model from '$lib/Ollama_Copy_Model.svelte';
 	import type {Ollama, Ollama_Model_Detail} from '$lib/ollama.svelte.js';
-	import {OLLAMA_URL} from '$lib/ollama_helpers.js';
 
 	interface Props {
 		ollama: Ollama;
@@ -37,25 +27,48 @@
 
 	let selected_view: 'configure' | 'model' | 'pull' | 'create' | 'copy' = $state('configure');
 	let selected_model_detail: Ollama_Model_Detail | null = $state(null as any);
+	let last_active_view: {view: string; model_detail: Ollama_Model_Detail | null} | null =
+		$state(null);
 
 	// Initial load when component mounts
 	onMount(() => {
 		void ollama.refresh();
 	});
 
+	const set_view = (view: typeof selected_view, model_detail?: Ollama_Model_Detail | null) => {
+		// Store the previous view as the last active view if it's not 'configure'
+		if (selected_view !== 'configure' && selected_view !== view) {
+			last_active_view = {
+				view: selected_view,
+				model_detail: selected_model_detail,
+			};
+		}
+		selected_view = view;
+		if (model_detail !== undefined) {
+			selected_model_detail = model_detail;
+		}
+	};
+
+	const handle_back_to_last_view = () => {
+		if (last_active_view) {
+			const view_to_restore = last_active_view;
+			last_active_view = null; // Clear history
+			selected_view = view_to_restore.view as typeof selected_view;
+			selected_model_detail = view_to_restore.model_detail;
+		}
+	};
+
 	const handle_delete_model = async (model_name: string) => {
 		console.log(`[Ollama_Manager] deleting model: ${model_name}`);
 		await ollama.delete_model(model_name);
 		// Clear selection if the deleted model was selected
 		if (selected_model_detail?.model_name === model_name) {
-			selected_model_detail = null;
-			selected_view = 'configure';
+			set_view('configure', null);
 		}
 	};
 
 	const handle_select_model = async (model_detail: Ollama_Model_Detail) => {
-		selected_model_detail = model_detail;
-		selected_view = 'model';
+		set_view('model', model_detail);
 		// Auto-load details if not already loaded
 		if (model_detail.show_status === 'initial') {
 			await ollama.show_model(model_detail.model_name);
@@ -63,23 +76,19 @@
 	};
 
 	const handle_show_pull = () => {
-		selected_view = 'pull';
-		selected_model_detail = null;
+		set_view('pull', null);
 	};
 
 	const handle_show_create = () => {
-		selected_view = 'create';
-		selected_model_detail = null;
+		set_view('create', null);
 	};
 
 	const handle_show_copy = () => {
-		selected_view = 'copy';
-		selected_model_detail = null;
+		set_view('copy', null);
 	};
 
 	const handle_close_form = () => {
-		selected_view = 'configure';
-		selected_model_detail = null;
+		set_view('configure', null);
 	};
 </script>
 
@@ -128,8 +137,7 @@
 						class="w_100 justify_content_start border_radius_0 plain menu_item selectable font_weight_500"
 						class:selected={selected_view === 'configure'}
 						onclick={() => {
-							selected_view = 'configure';
-							selected_model_detail = null;
+							set_view('configure', null);
 						}}
 					>
 						<Glyph glyph={GLYPH_SETTINGS} />
@@ -220,77 +228,11 @@
 	<!-- Main Content -->
 	<div class="flex_1 h_100 overflow_auto p_md">
 		{#if selected_view === 'configure'}
-			<div class="panel p_md">
-				<h3 class="mt_0 mb_md">
-					<Glyph glyph={GLYPH_SETTINGS} /> configure
-				</h3>
-
-				<div class="display_flex flex_column gap_lg">
-					<!-- Host Configuration -->
-					<div class="display_flex flex_column gap_md">
-						<fieldset>
-							<label for="ollama_host" class="display_block mb_xs">Ollama host url</label>
-							<input
-								id="ollama_host"
-								type="text"
-								class="plain flex_1"
-								placeholder="{GLYPH_PLACEHOLDER} {OLLAMA_URL}"
-								bind:value={ollama.host}
-								oninput={() => ollama.refresh()}
-							/>
-						</fieldset>
-
-						<div class="row gap_xs">
-							<button
-								type="button"
-								class="justify_content_start"
-								disabled={ollama.list_status === 'pending'}
-								onclick={() => ollama.refresh()}
-							>
-								<Glyph glyph={ollama.list_status === 'success' ? GLYPH_REFRESH : GLYPH_CONNECT} />
-								<span class="ml_sm">
-									{#if ollama.list_status === 'pending'}
-										checking...
-									{:else if ollama.list_status === 'success'}
-										refresh
-									{:else}
-										connect
-									{/if}
-								</span>
-							</button>
-
-							{#if ollama.host !== OLLAMA_URL}
-								<div class="row gap_sm" transition:slide={{axis: 'x'}}>
-									<button
-										type="button"
-										class="shrink_0"
-										onclick={async () => {
-											ollama.host = OLLAMA_URL;
-											await ollama.refresh();
-										}}>reset to default</button
-									>
-									<small class="font_family_mono">
-										{OLLAMA_URL}
-									</small>
-								</div>
-							{/if}
-						</div>
-
-						{#if ollama.list_error}
-							<div transition:slide>
-								<Error_Message
-									><small class="font_family_mono">{ollama.list_error}</small></Error_Message
-								>
-							</div>
-						{/if}
-					</div>
-
-					<!-- Operations Panel -->
-					{#if ollama.pending_operations.length > 0 || ollama.completed_operations.length > 0}
-						<Ollama_Operations {ollama} />
-					{/if}
-				</div>
-			</div>
+			<Ollama_Configure
+				{ollama}
+				last_active_view={last_active_view?.view ?? null}
+				onback={handle_back_to_last_view}
+			/>
 		{:else if selected_view === 'model' && selected_model_detail}
 			<Ollama_Model_Details
 				model_detail={selected_model_detail}
