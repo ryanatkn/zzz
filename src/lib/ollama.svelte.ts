@@ -19,6 +19,8 @@ export type Ollama_Json_Input = z.input<typeof Ollama_Json>;
 
 export interface Ollama_Options extends Cell_Options<typeof Ollama_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
+// TODO all of the operations stuff should probably use Action patterns, this is a good usecase for observability
+
 /**
  * Cell class for tracking individual Ollama operations
  */
