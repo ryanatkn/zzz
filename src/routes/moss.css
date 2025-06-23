@@ -321,6 +321,9 @@ a.chip {
 	font-size: var(--font_size_xl);
 	--font_size: var(--font_size_xl);
 }
+.text_align_start {
+	text-align: start;
+}
 .text_align_left {
 	text-align: left;
 }
@@ -688,6 +691,9 @@ a.chip {
 }
 .gap_md {
 	gap: var(--space_md);
+}
+.gap_lg {
+	gap: var(--space_lg);
 }
 .gap_xl {
 	gap: var(--space_xl);

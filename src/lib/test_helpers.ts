@@ -43,6 +43,7 @@ export const expect_nonnullish: <T>(
 	}
 };
 
+// TODO improve this pattern
 /**
  * Applies testing-specific modifications to a Zzz instance.
  */
@@ -60,3 +61,5 @@ export const monkeypatch_zzz_for_tests = <T extends Frontend>(app: T): T => {
 
 	return app;
 };
+
+// Test helpers for unit tests

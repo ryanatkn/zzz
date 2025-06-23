@@ -621,6 +621,10 @@
       "svelte": "./dist/Footer.svelte",
       "default": "./dist/Footer.svelte"
     },
+    "./format_helpers.js": {
+      "types": "./dist/format_helpers.d.ts",
+      "default": "./dist/format_helpers.js"
+    },
     "./frontend_action_handlers.js": {
       "types": "./dist/frontend_action_handlers.d.ts",
       "default": "./dist/frontend_action_handlers.js"
@@ -747,9 +751,43 @@
       "types": "./dist/nav.d.ts",
       "default": "./dist/nav.js"
     },
+    "./Ollama_Copy_Model.svelte": {
+      "types": "./dist/Ollama_Copy_Model.svelte.d.ts",
+      "svelte": "./dist/Ollama_Copy_Model.svelte",
+      "default": "./dist/Ollama_Copy_Model.svelte"
+    },
+    "./Ollama_Create_Model.svelte": {
+      "types": "./dist/Ollama_Create_Model.svelte.d.ts",
+      "svelte": "./dist/Ollama_Create_Model.svelte",
+      "default": "./dist/Ollama_Create_Model.svelte"
+    },
     "./ollama_helpers.js": {
       "types": "./dist/ollama_helpers.d.ts",
       "default": "./dist/ollama_helpers.js"
+    },
+    "./Ollama_Manager.svelte": {
+      "types": "./dist/Ollama_Manager.svelte.d.ts",
+      "svelte": "./dist/Ollama_Manager.svelte",
+      "default": "./dist/Ollama_Manager.svelte"
+    },
+    "./Ollama_Model_Detail.svelte": {
+      "types": "./dist/Ollama_Model_Detail.svelte.d.ts",
+      "svelte": "./dist/Ollama_Model_Detail.svelte",
+      "default": "./dist/Ollama_Model_Detail.svelte"
+    },
+    "./Ollama_Operations.svelte": {
+      "types": "./dist/Ollama_Operations.svelte.d.ts",
+      "svelte": "./dist/Ollama_Operations.svelte",
+      "default": "./dist/Ollama_Operations.svelte"
+    },
+    "./Ollama_Pull_Model.svelte": {
+      "types": "./dist/Ollama_Pull_Model.svelte.d.ts",
+      "svelte": "./dist/Ollama_Pull_Model.svelte",
+      "default": "./dist/Ollama_Pull_Model.svelte"
+    },
+    "./ollama.svelte.js": {
+      "types": "./dist/ollama.svelte.d.ts",
+      "default": "./dist/ollama.svelte.js"
     },
     "./package.gen.js": {
       "types": "./dist/package.gen.d.ts",

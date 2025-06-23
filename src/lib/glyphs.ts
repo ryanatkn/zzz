@@ -23,6 +23,17 @@ export const GLYPH_PLACEHOLDER = '↳';
 
 export const GLYPH_CHECKMARK = '✓'; // ✓ ✔ ✗ ✖ ✕ ✘
 
+export const GLYPH_DOWNLOAD = '⭳'; // ⭳ ⥥ ⤓ ⇩
+export const GLYPH_CHECK = '✔'; // ✔ ☑ ⍻
+export const GLYPH_ERROR = '⁉'; // ⁉ ‼ ‽ ⸮ ⸘ ⚠
+export const GLYPH_CHEVRON_UP = '⮝'; // ⮝ ⯅ ˄ ∧ ⌃ ▴ ▵ ▲
+export const GLYPH_CHEVRON_RIGHT = '⮞'; // ⮞ ❯ ▸ ⭢
+export const GLYPH_CHEVRON_DOWN = '⮟'; // ⮟ ⌄ ˅ ∨
+export const GLYPH_CHEVRON_LEFT = '⮜'; // ⮜ ⯇ ˂ ‹ ◁ ▹ ◂ ◃ ◀
+
+// « » ‹ › ⪡ ⪢ ⪜ ⪞
+// ⤉ ⤈ ⤣ ⤤ ⤥ ⤦
+
 export const GLYPH_EDIT = '✎'; // ✎ ✏ ✐ ✑ ✒
 // export const GLYPH_MOVE = '⧈';
 // ⊞ ⧉ ⧈
@@ -68,7 +79,7 @@ export const GLYPH_ACTION_TYPE_REQUEST_RESPONSE = '⥮'; // ⤨ ⥮ ⥯
 
 export const GLYPH_EXTERNAL_LINK = '🡵';
 
-export const GLYPH_ARROW_RIGHT = '→'; // → ➝ ➞ ➜ ➡ ⟶ ⭢ ⤷ ⤳ ⥅ ⮕ ⭆ ⮞ ⭆ ⭈ ⤞ ⤠
+export const GLYPH_ARROW_RIGHT = '→'; // → ➝ ➞ ➜ ➡ ⟶ ⭢ ⤷ ⤳ ⥅ ⮕ ⭆ ⭆ ⭈ ⤞ ⤠
 export const GLYPH_ARROW_LEFT = '←'; // ← ⭠
 
 export const get_glyph_for_action_method = (method: Action_Method): string => {
@@ -219,8 +230,6 @@ export const get_glyph_for_action_kind = (kind: Action_Kind): string => {
 // ⌘
 // ▄
 // ▪
-
-// ⮟
 
 // ⭉ ⭊ ⤟⮭ ⎋
 

@@ -544,6 +544,10 @@ export const package_json = {
 			svelte: './dist/Footer.svelte',
 			default: './dist/Footer.svelte',
 		},
+		'./format_helpers.js': {
+			types: './dist/format_helpers.d.ts',
+			default: './dist/format_helpers.js',
+		},
 		'./frontend_action_handlers.js': {
 			types: './dist/frontend_action_handlers.d.ts',
 			default: './dist/frontend_action_handlers.js',
@@ -646,10 +650,41 @@ export const package_json = {
 			default: './dist/Nav_Link.svelte',
 		},
 		'./nav.js': {types: './dist/nav.d.ts', default: './dist/nav.js'},
+		'./Ollama_Copy_Model.svelte': {
+			types: './dist/Ollama_Copy_Model.svelte.d.ts',
+			svelte: './dist/Ollama_Copy_Model.svelte',
+			default: './dist/Ollama_Copy_Model.svelte',
+		},
+		'./Ollama_Create_Model.svelte': {
+			types: './dist/Ollama_Create_Model.svelte.d.ts',
+			svelte: './dist/Ollama_Create_Model.svelte',
+			default: './dist/Ollama_Create_Model.svelte',
+		},
 		'./ollama_helpers.js': {
 			types: './dist/ollama_helpers.d.ts',
 			default: './dist/ollama_helpers.js',
 		},
+		'./Ollama_Manager.svelte': {
+			types: './dist/Ollama_Manager.svelte.d.ts',
+			svelte: './dist/Ollama_Manager.svelte',
+			default: './dist/Ollama_Manager.svelte',
+		},
+		'./Ollama_Model_Detail.svelte': {
+			types: './dist/Ollama_Model_Detail.svelte.d.ts',
+			svelte: './dist/Ollama_Model_Detail.svelte',
+			default: './dist/Ollama_Model_Detail.svelte',
+		},
+		'./Ollama_Operations.svelte': {
+			types: './dist/Ollama_Operations.svelte.d.ts',
+			svelte: './dist/Ollama_Operations.svelte',
+			default: './dist/Ollama_Operations.svelte',
+		},
+		'./Ollama_Pull_Model.svelte': {
+			types: './dist/Ollama_Pull_Model.svelte.d.ts',
+			svelte: './dist/Ollama_Pull_Model.svelte',
+			default: './dist/Ollama_Pull_Model.svelte',
+		},
+		'./ollama.svelte.js': {types: './dist/ollama.svelte.d.ts', default: './dist/ollama.svelte.js'},
 		'./package.gen.js': {types: './dist/package.gen.d.ts', default: './dist/package.gen.js'},
 		'./package.js': {types: './dist/package.d.ts', default: './dist/package.js'},
 		'./Picker_Dialog.svelte': {
@@ -1686,6 +1721,14 @@ export const src_json = {
 			path: 'Footer.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
 		},
+		'./format_helpers.js': {
+			path: 'format_helpers.ts',
+			declarations: [
+				{name: 'format_bytes', kind: 'function'},
+				{name: 'format_percentage', kind: 'function'},
+				{name: 'format_duration', kind: 'function'},
+			],
+		},
 		'./frontend_action_handlers.js': {
 			path: 'frontend_action_handlers.ts',
 			declarations: [{name: 'frontend_action_handlers', kind: 'variable'}],
@@ -1743,6 +1786,13 @@ export const src_json = {
 				{name: 'GLYPH_RETRY', kind: 'variable'},
 				{name: 'GLYPH_PLACEHOLDER', kind: 'variable'},
 				{name: 'GLYPH_CHECKMARK', kind: 'variable'},
+				{name: 'GLYPH_DOWNLOAD', kind: 'variable'},
+				{name: 'GLYPH_CHECK', kind: 'variable'},
+				{name: 'GLYPH_ERROR', kind: 'variable'},
+				{name: 'GLYPH_CHEVRON_UP', kind: 'variable'},
+				{name: 'GLYPH_CHEVRON_RIGHT', kind: 'variable'},
+				{name: 'GLYPH_CHEVRON_DOWN', kind: 'variable'},
+				{name: 'GLYPH_CHEVRON_LEFT', kind: 'variable'},
 				{name: 'GLYPH_EDIT', kind: 'variable'},
 				{name: 'GLYPH_SORT', kind: 'variable'},
 				{name: 'GLYPH_BACKEND', kind: 'variable'},
@@ -1960,6 +2010,14 @@ export const src_json = {
 				{name: 'main_nav_items_default', kind: 'variable'},
 			],
 		},
+		'./Ollama_Copy_Model.svelte': {
+			path: 'Ollama_Copy_Model.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Ollama_Create_Model.svelte': {
+			path: 'Ollama_Create_Model.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./ollama_helpers.js': {
 			path: 'ollama_helpers.ts',
 			declarations: [
@@ -1968,6 +2026,39 @@ export const src_json = {
 				{name: 'Ollama_Models_Response', kind: 'type'},
 				{name: 'ollama_list', kind: 'function'},
 				{name: 'ollama_list_with_metadata', kind: 'function'},
+			],
+		},
+		'./Ollama_Manager.svelte': {
+			path: 'Ollama_Manager.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Ollama_Model_Detail.svelte': {
+			path: 'Ollama_Model_Detail.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Ollama_Operations.svelte': {
+			path: 'Ollama_Operations.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Ollama_Pull_Model.svelte': {
+			path: 'Ollama_Pull_Model.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./ollama.svelte.js': {
+			path: 'ollama.svelte.ts',
+			declarations: [
+				{name: 'Ollama_Json', kind: 'variable'},
+				{name: 'Ollama_Json_Input', kind: 'type'},
+				{name: 'Ollama_Options', kind: 'type'},
+				{name: 'Ollama_Operation_Json', kind: 'variable'},
+				{name: 'Ollama_Operation_Json_Input', kind: 'type'},
+				{name: 'Ollama_Operation_Options', kind: 'type'},
+				{name: 'Ollama_Operation', kind: 'class'},
+				{name: 'Ollama_Model_Detail_Json', kind: 'variable'},
+				{name: 'Ollama_Model_Detail_Json_Input', kind: 'type'},
+				{name: 'Ollama_Model_Detail_Options', kind: 'type'},
+				{name: 'Ollama_Model_Detail', kind: 'class'},
+				{name: 'Ollama', kind: 'class'},
 			],
 		},
 		'./package.gen.js': {path: 'package.gen.ts', declarations: [{name: 'gen', kind: 'function'}]},

@@ -9,6 +9,8 @@
 	import {GLYPH_PROVIDER} from '$lib/glyphs.js';
 	import External_Link from '$lib/External_Link.svelte';
 	import Glyph from '$lib/Glyph.svelte';
+	import Ollama_Manager from '$lib/Ollama_Manager.svelte';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 
 	interface Props {
 		provider: Provider;
@@ -19,7 +21,7 @@
 
 	const at_detail_page = $derived(page.url.pathname === `${base}/providers/${provider.name}`);
 
-	// TODO BLOCK Ollama UI
+	const app = frontend_context.get();
 </script>
 
 <div {...attrs} class="panel p_lg {attrs?.class}">
@@ -50,13 +52,8 @@
 		</div>
 	</section>
 	{#if provider.name === 'ollama'}
-		<!-- TODO BLOCK mount new component here -->
 		<section>
-			<p>
-				TODO add UI for the full Ollama API - <a href="https://github.com/ollama/ollama-js"
-					>https://github.com/ollama/ollama-js</a
-				>
-			</p>
+			<Ollama_Manager ollama={app.ollama} />
 		</section>
 	{/if}
 	<section>

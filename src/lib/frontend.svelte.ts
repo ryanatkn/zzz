@@ -18,6 +18,7 @@ import {Cell_Registry} from '$lib/cell_registry.svelte.js';
 import {Prompts} from '$lib/prompts.svelte.js';
 import {Bits} from '$lib/bits.svelte.js';
 import {Time} from '$lib/time.svelte.js';
+import {Ollama} from '$lib/ollama.svelte.js';
 import type {Zzz_Config} from '$lib/config_helpers.js';
 import {BOTS_DEFAULT} from '$lib/config_defaults.js';
 import {Zzz_Dir, type Diskfile_Path} from '$lib/diskfile_types.js';
@@ -109,6 +110,7 @@ export class Frontend extends Cell<typeof Frontend_Json> implements Action_Event
 	readonly socket: Socket;
 	readonly url_params: Url_Params;
 	readonly capabilities: Capabilities;
+	readonly ollama: Ollama;
 
 	readonly bots: Zzz_Config['bots'];
 
@@ -184,6 +186,7 @@ export class Frontend extends Cell<typeof Frontend_Json> implements Action_Event
 		this.socket = new Socket({app: this});
 		this.url_params = new Url_Params({app: this});
 		this.capabilities = new Capabilities({app: this});
+		this.ollama = new Ollama({app: this});
 
 		this.bots = options.bots ?? BOTS_DEFAULT;
 

@@ -126,16 +126,14 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	);
 	readonly created_formatted_time: string = $derived(format(this.created_date, FILE_TIME_FORMAT));
 
-	readonly updated_date: Date | null = $derived(this.updated ? new Date(this.updated) : null);
-	readonly updated_formatted_short_date: string | null = $derived(
-		this.updated_date ? format(this.updated_date, FILE_SHORT_DATE_FORMAT) : null,
+	readonly updated_date: Date = $derived(new Date(this.updated));
+	readonly updated_formatted_short_date: string = $derived(
+		format(this.updated_date, FILE_SHORT_DATE_FORMAT),
 	);
-	readonly updated_formatted_date: string | null = $derived(
-		this.updated_date ? format(this.updated_date, FILE_DATETIME_FORMAT) : null,
+	readonly updated_formatted_date: string = $derived(
+		format(this.updated_date, FILE_DATETIME_FORMAT),
 	);
-	readonly updated_formatted_time: string | null = $derived(
-		this.updated_date ? format(this.updated_date, FILE_TIME_FORMAT) : null,
-	);
+	readonly updated_formatted_time: string = $derived(format(this.updated_date, FILE_TIME_FORMAT));
 
 	/** Stored only between construction and initialization */
 	#initial_json: z.input<T_Schema> | undefined;
