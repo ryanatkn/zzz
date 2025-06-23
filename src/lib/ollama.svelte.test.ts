@@ -22,8 +22,6 @@ describe('Ollama', () => {
 		const ollama = new Ollama({app});
 
 		expect(ollama.host).toBe('http://127.0.0.1:11434');
-		expect(ollama.auto_refresh).toBe(true);
-		expect(ollama.refresh_interval).toBe(30000);
 		expect(ollama.list_status).toBe('initial');
 		expect(ollama.available).toBe(false);
 		expect(ollama.models_count).toBe(0);

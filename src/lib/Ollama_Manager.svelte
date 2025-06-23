@@ -23,7 +23,6 @@
 	import Ollama_Create_Model from '$lib/Ollama_Create_Model.svelte';
 	import Ollama_Copy_Model from '$lib/Ollama_Copy_Model.svelte';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
-	import {format_ms_to_readable} from '$lib/time_helpers.js';
 	import type {Ollama} from '$lib/ollama.svelte.js';
 
 	interface Props {
@@ -115,31 +114,6 @@
 							bind:value={ollama.host}
 						/>
 					</fieldset>
-
-					<div class="display_flex gap_md align_items_center">
-						<label class="display_flex gap_xs align_items_center">
-							<input type="checkbox" class="compact" bind:checked={ollama.auto_refresh} />
-							<span>auto-refresh models</span>
-						</label>
-
-						{#if ollama.auto_refresh}
-							<div class="display_flex gap_xs align_items_center">
-								<label for="refresh_interval" class="font_size_sm">interval:</label>
-								<input
-									id="refresh_interval"
-									type="range"
-									min="5000"
-									max="300000"
-									step="5000"
-									class="compact plain"
-									bind:value={ollama.refresh_interval}
-								/>
-								<span class="font_size_sm font_family_mono">
-									{format_ms_to_readable(ollama.refresh_interval)}
-								</span>
-							</div>
-						{/if}
-					</div>
 				</div>
 			</div>
 		{/if}

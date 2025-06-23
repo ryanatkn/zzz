@@ -11,13 +11,11 @@ import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
 
 export const Ollama_Json = Cell_Json.extend({
 	host: z.string().default('http://127.0.0.1:11434'),
-	auto_refresh: z.boolean().default(true),
-	refresh_interval: z.number().int().positive().default(30000),
 });
 export type Ollama_Json = z.infer<typeof Ollama_Json>;
 export type Ollama_Json_Input = z.input<typeof Ollama_Json>;
 
-export interface Ollama_Options extends Cell_Options<typeof Ollama_Json> {}
+export interface Ollama_Options extends Cell_Options<typeof Ollama_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
 /**
  * Cell class for tracking individual Ollama operations
@@ -34,7 +32,7 @@ export const Ollama_Operation_Json = Cell_Json.extend({
 export type Ollama_Operation_Json = z.infer<typeof Ollama_Operation_Json>;
 export type Ollama_Operation_Json_Input = z.input<typeof Ollama_Operation_Json>;
 
-export interface Ollama_Operation_Options extends Cell_Options<typeof Ollama_Operation_Json> {}
+export interface Ollama_Operation_Options extends Cell_Options<typeof Ollama_Operation_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
 export class Ollama_Operation extends Cell<typeof Ollama_Operation_Json> {
 	type: 'pull' | 'create' | 'delete' | 'copy' | 'show' | 'list' = $state()!;
@@ -82,7 +80,7 @@ export const Ollama_Model_Detail_Json = Cell_Json.extend({
 export type Ollama_Model_Detail_Json = z.infer<typeof Ollama_Model_Detail_Json>;
 export type Ollama_Model_Detail_Json_Input = z.input<typeof Ollama_Model_Detail_Json>;
 
-export interface Ollama_Model_Detail_Options
+export interface Ollama_Model_Detail_Options // eslint-disable-line @typescript-eslint/no-empty-object-type
 	extends Cell_Options<typeof Ollama_Model_Detail_Json> {}
 
 export class Ollama_Model_Detail extends Cell<typeof Ollama_Model_Detail_Json> {
@@ -135,8 +133,6 @@ export class Ollama_Model_Detail extends Cell<typeof Ollama_Model_Detail_Json> {
 export class Ollama extends Cell<typeof Ollama_Json> {
 	// Private serializable state
 	#host: string = $state()!;
-	#auto_refresh: boolean = $state()!;
-	#refresh_interval: number = $state()!;
 
 	// Runtime-only state
 	list_response: ListResponse | null = $state(null);
@@ -150,10 +146,6 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	// Model details cache using Cell instances
 	model_details: SvelteMap<string, Ollama_Model_Detail> = new SvelteMap();
 
-	// Auto-refresh timer
-	refresh_timeout: NodeJS.Timeout | null = $state(null);
-	next_refresh_time: number | null = $state(null);
-
 	// Getters and setters for serializable state
 	get host(): string {
 		return this.#host;
@@ -161,22 +153,6 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	set host(value: string) {
 		this.#host = Ollama_Json.shape.host.parse(value);
 		this.#update_ollama_config();
-	}
-
-	get auto_refresh(): boolean {
-		return this.#auto_refresh;
-	}
-	set auto_refresh(value: boolean) {
-		this.#auto_refresh = Ollama_Json.shape.auto_refresh.parse(value);
-		this.#manage_auto_refresh();
-	}
-
-	get refresh_interval(): number {
-		return this.#refresh_interval;
-	}
-	set refresh_interval(value: number) {
-		this.#refresh_interval = Ollama_Json.shape.refresh_interval.parse(value);
-		this.#manage_auto_refresh();
 	}
 
 	// Derived state
@@ -199,24 +175,10 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 			.filter(Boolean) as Array<Ollama_Model_Detail>;
 	});
 
-	// Auto-refresh countdown
-	readonly refresh_countdown: number | null = $derived.by(() => {
-		if (!this.auto_refresh || !this.next_refresh_time) return null;
-		const remaining = this.next_refresh_time - this.app.time.now_ms;
-		return Math.max(0, remaining);
-	});
-
-	readonly refresh_countdown_rounded: number | null = $derived(
-		this.refresh_countdown !== null
-			? Math.round(this.refresh_countdown / this.app.time.interval) * this.app.time.interval
-			: null,
-	);
-
 	constructor(options: Ollama_Options) {
 		super(Ollama_Json, options);
 		this.init();
 		this.#update_ollama_config();
-		this.#manage_auto_refresh();
 	}
 
 	/**
@@ -494,22 +456,5 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 		if (!BROWSER) return;
 		// Update the global ollama instance configuration
 		(ollama as any).config = {host: this.host};
-	}
-
-	#manage_auto_refresh(): void {
-		if (this.refresh_timeout) {
-			clearTimeout(this.refresh_timeout);
-			this.refresh_timeout = null;
-		}
-
-		if (this.auto_refresh && BROWSER) {
-			this.next_refresh_time = Date.now() + this.refresh_interval;
-			this.refresh_timeout = setTimeout(() => {
-				void this.list_models();
-				this.#manage_auto_refresh(); // Schedule next refresh
-			}, this.refresh_interval);
-		} else {
-			this.next_refresh_time = null;
-		}
 	}
 }
