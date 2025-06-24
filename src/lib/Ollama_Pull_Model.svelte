@@ -4,6 +4,7 @@
 	import Glyph from '$lib/Glyph.svelte';
 	import Error_Message from '$lib/Error_Message.svelte';
 	import {GLYPH_DOWNLOAD, GLYPH_CANCEL, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
+	import {small_recommended_models} from '$lib/config_defaults.js';
 	import type {Ollama} from '$lib/ollama.svelte.js';
 
 	interface Props {
@@ -22,6 +23,10 @@
 		parsed_model_name && ollama.model_by_name.has(parsed_model_name),
 	);
 	const can_pull = $derived(parsed_model_name && !is_duplicate_name);
+
+	const available_small_recommended_models = $derived(
+		small_recommended_models.filter((model) => !ollama.model_by_name.has(model)),
+	);
 
 	const handle_pull = async () => {
 		if (!can_pull) return;
@@ -77,6 +82,21 @@
 					rel="noopener noreferrer">Ollama library</a
 				>
 			</p>
+			{#if available_small_recommended_models.length > 0}
+				<p>Here are some small recommended models:</p>
+				<div class="display_flex flex_wrap gap_xs">
+					{#each available_small_recommended_models as model (model)}
+						<button
+							type="button"
+							class="compact"
+							onclick={() => (model_name = model)}
+							disabled={is_pulling || model_name === model}
+						>
+							{model}
+						</button>
+					{/each}
+				</div>
+			{/if}
 		</fieldset>
 
 		<label class="display_flex gap_xs align_items_center">

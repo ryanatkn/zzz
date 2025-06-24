@@ -6,14 +6,16 @@ import type {Chat_Template} from '$lib/chat_template.js';
 import {create_uuid} from '$lib/zod_helpers.js';
 
 // TODO BLOCK rethink for Ollama
-// gemma3:1b
-// qwen3:0.6b
-// deepseek-r1:1.5b
-// llama3.2:1b
-// phi4-mini:3.8b
-// smollm2:135m
-// smollm2:360m
-// smollm2:1.7b
+export const small_recommended_models = [
+	'gemma3:1b',
+	'qwen3:0.6b',
+	'deepseek-r1:1.5b',
+	'llama3.2:1b',
+	'phi4-mini:3.8b',
+	'smollm2:135m',
+	'smollm2:360m',
+	'smollm2:1.7b',
+];
 
 // TODO this is a temporary source of truth, use APIs instead
 // TODO @many refactor with db
