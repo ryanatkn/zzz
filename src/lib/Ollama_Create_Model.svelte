@@ -2,6 +2,7 @@
 	// @slop claude_sonnet_4
 
 	import Glyph from '$lib/Glyph.svelte';
+	import Error_Message from '$lib/Error_Message.svelte';
 	import {GLYPH_ADD, GLYPH_CANCEL, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
 	import type {Ollama} from '$lib/ollama.svelte.js';
 
@@ -19,10 +20,16 @@
 	let template = $state('');
 	let is_creating = $state(false);
 
-	const available_models = $derived(ollama.list_response?.models.map((m) => m.name) || []);
+	const parsed_model_name = $derived(model_name.trim());
+	const is_duplicate_name = $derived(
+		parsed_model_name && ollama.model_by_name.has(parsed_model_name),
+	);
+	const can_create = $derived(parsed_model_name && !is_duplicate_name);
+
+	// TODO BLOCK is this correct? ` or leave empty for a completely new model`
 
 	const handle_create = async () => {
-		if (!model_name.trim()) return;
+		if (!can_create) return;
 
 		is_creating = true;
 		try {
@@ -39,7 +46,7 @@
 			}
 
 			await ollama.create_model(
-				model_name.trim(),
+				parsed_model_name,
 				from_model.trim() || undefined,
 				modelfile || undefined,
 			);
@@ -99,10 +106,10 @@
 		<fieldset>
 			<label>
 				<div class="title mb_xs">base model (optional)</div>
-				{#if available_models.length > 0}
+				{#if ollama.model_names.length > 0}
 					<select class="plain w_100" bind:value={from_model} disabled={is_creating}>
 						<option value="">-- select base model --</option>
-						{#each available_models as model_name (model_name)}
+						{#each ollama.model_names as model_name (model_name)}
 							<option value={model_name}>{model_name}</option>
 						{/each}
 					</select>
@@ -153,7 +160,7 @@
 			<button
 				type="button"
 				class="color_b"
-				disabled={!model_name.trim() || is_creating}
+				disabled={!can_create || is_creating}
 				onclick={handle_create}
 			>
 				<Glyph glyph={GLYPH_ADD} />&nbsp;
@@ -161,5 +168,9 @@
 			</button>
 			<button type="button" class="plain" onclick={onclose} disabled={is_creating}>cancel</button>
 		</div>
+
+		{#if is_duplicate_name}
+			<Error_Message>a model with this name already exists</Error_Message>
+		{/if}
 	</div>
 </div>

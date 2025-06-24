@@ -21,6 +21,8 @@
 
 	const {ollama}: Props = $props();
 
+	// TODO consider "pinning" views so that when others open, they stay open and stable onscreen (but you probably want to rearrange the panels)
+
 	// TODO think about snapshotting/loading this and ollama.svelte.ts data
 
 	// TODO probably should use routes instead of internal state, but I want to see about using this as a snapshotting experiment
@@ -187,7 +189,7 @@
 					</h3>
 
 					<div class="column">
-						{#each ollama.models_with_details as model_detail (model_detail.model_name)}
+						{#each ollama.models as model_detail (model_detail.model_name)}
 							<button
 								type="button"
 								class="menu_item selectable plain text_align_start p_sm border_radius_0 font_weight_400"

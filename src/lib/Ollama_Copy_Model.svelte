@@ -2,6 +2,7 @@
 	// @slop claude_sonnet_4
 
 	import Glyph from '$lib/Glyph.svelte';
+	import Error_Message from '$lib/Error_Message.svelte';
 	import {GLYPH_COPY, GLYPH_CANCEL, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
 	import type {Ollama} from '$lib/ollama.svelte.js';
 
@@ -16,14 +17,24 @@
 	let destination_model = $state('');
 	let is_copying = $state(false);
 
-	const available_models = $derived(ollama.list_response?.models.map((m) => m.name) || []);
+
+	const parsed_source_model = $derived(source_model.trim());
+	const parsed_destination_model = $derived(destination_model.trim());
+
+	const is_duplicate_name = $derived(
+		parsed_destination_model && ollama.model_by_name.has(parsed_destination_model),
+	);
+
+	const destination_model_changed = $derived(
+		parsed_source_model && parsed_destination_model && !is_duplicate_name,
+	);
 
 	const handle_copy = async () => {
-		if (!source_model.trim() || !destination_model.trim()) return;
+		if (!destination_model_changed) return;
 
 		is_copying = true;
 		try {
-			await ollama.copy_model(source_model.trim(), destination_model.trim());
+			await ollama.copy_model(parsed_source_model, parsed_destination_model);
 
 			// Reset form
 			source_model = '';
@@ -37,7 +48,7 @@
 	};
 
 	const handle_keydown = (event: KeyboardEvent) => {
-		if (event.key === 'Enter' && !is_copying && source_model.trim() && destination_model.trim()) {
+		if (event.key === 'Enter' && !is_copying && destination_model_changed) {
 			void handle_copy();
 		} else if (event.key === 'Escape') {
 			onclose();
@@ -59,10 +70,10 @@
 		<fieldset>
 			<label>
 				<div class="title mb_xs">source model</div>
-				{#if available_models.length > 0}
+				{#if ollama.model_names.length > 0}
 					<select class="plain w_100" bind:value={source_model} disabled={is_copying}>
 						<option value="">-- select source model --</option>
-						{#each available_models as model_name (model_name)}
+						{#each ollama.model_names as model_name (model_name)}
 							<option value={model_name}>{model_name}</option>
 						{/each}
 					</select>
@@ -98,7 +109,7 @@
 			<button
 				type="button"
 				class="color_d"
-				disabled={!source_model.trim() || !destination_model.trim() || is_copying}
+				disabled={!destination_model_changed || is_copying}
 				onclick={handle_copy}
 			>
 				<Glyph glyph={GLYPH_COPY} />&nbsp;
@@ -106,5 +117,9 @@
 			</button>
 			<button type="button" class="plain" onclick={onclose} disabled={is_copying}>cancel</button>
 		</div>
+
+		{#if is_duplicate_name}
+			<Error_Message>a model with this name already exists</Error_Message>
+		{/if}
 	</div>
 </div>

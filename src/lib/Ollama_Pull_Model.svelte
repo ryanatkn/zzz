@@ -2,6 +2,7 @@
 	// @slop claude_sonnet_4
 
 	import Glyph from '$lib/Glyph.svelte';
+	import Error_Message from '$lib/Error_Message.svelte';
 	import {GLYPH_DOWNLOAD, GLYPH_CANCEL, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
 	import type {Ollama} from '$lib/ollama.svelte.js';
 
@@ -16,12 +17,18 @@
 	let insecure = $state(false);
 	let is_pulling = $state(false);
 
+	const parsed_model_name = $derived(model_name.trim());
+	const is_duplicate_name = $derived(
+		parsed_model_name && ollama.model_by_name.has(parsed_model_name),
+	);
+	const can_pull = $derived(parsed_model_name && !is_duplicate_name);
+
 	const handle_pull = async () => {
-		if (!model_name.trim()) return;
+		if (!can_pull) return;
 
 		is_pulling = true;
 		try {
-			await ollama.pull_model(model_name.trim(), insecure);
+			await ollama.pull_model(parsed_model_name, insecure);
 			model_name = '';
 			onclose();
 		} catch (error) {
@@ -32,7 +39,7 @@
 	};
 
 	const handle_keydown = (event: KeyboardEvent) => {
-		if (event.key === 'Enter' && !is_pulling && model_name.trim()) {
+		if (event.key === 'Enter' && !is_pulling && can_pull) {
 			void handle_pull();
 		} else if (event.key === 'Escape') {
 			onclose();
@@ -81,7 +88,7 @@
 			<button
 				type="button"
 				class="color_a"
-				disabled={!model_name.trim() || is_pulling}
+				disabled={!can_pull || is_pulling}
 				onclick={handle_pull}
 			>
 				<Glyph glyph={GLYPH_DOWNLOAD} />&nbsp;
@@ -89,5 +96,9 @@
 			</button>
 			<button type="button" class="plain" onclick={onclose} disabled={is_pulling}>cancel</button>
 		</div>
+
+		{#if is_duplicate_name}
+			<Error_Message>a model with this name already exists</Error_Message>
+		{/if}
 	</div>
 </div>

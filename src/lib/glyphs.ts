@@ -26,11 +26,12 @@ export const GLYPH_CHECKMARK = '✓'; // ✓ ✔ ✗ ✖ ✕ ✘ ☑ ⍻
 export const GLYPH_DOWNLOAD = '⭳'; // ⭳ ⥥ ⤓ ⇩
 export const GLYPH_ERROR = '⁉'; // ⁉ ‼ ‽ ⸮ ⸘ ⚠
 export const GLYPH_CHEVRON_UP = '⮝'; // ⮝ ⯅ ˄ ∧ ⌃ ▴ ▵ ▲
-export const GLYPH_CHEVRON_RIGHT = '⮞'; // ⮞ ❯ ▸ ⭢
+export const GLYPH_CHEVRON_RIGHT = '⮞'; // ⮞ ❯ ▸ ⭢ ›
 export const GLYPH_CHEVRON_DOWN = '⮟'; // ⮟ ⌄ ˅ ∨
 export const GLYPH_CHEVRON_LEFT = '⮜'; // ⮜ ⯇ ˂ ‹ ◁ ▹ ◂ ◃ ◀
+export const GLYPH_DOUBLE_CHEVRON_LEFT = '«'; // « ⪡ ⪛ ⟪ ⟨ ≪ ⯇ ⭠ ⇇ ⇚ ⇦
+export const GLYPH_DOUBLE_CHEVRON_RIGHT = '»'; // » ⪢ ⪜ ⟫ ⟩ ≫ ⯈ ⭢ ⇉ ⇛ ⇨
 
-// « » ‹ › ⪡ ⪢ ⪜ ⪞
 // ⤉ ⤈ ⤣ ⤤ ⤥ ⤦
 
 export const GLYPH_EDIT = '✎'; // ✎ ✏ ✐ ✑ ✒

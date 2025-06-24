@@ -98,8 +98,8 @@ export interface Ollama_Model_Detail_Options // eslint-disable-line @typescript-
 
 export class Ollama_Model_Detail extends Cell<typeof Ollama_Model_Detail_Json> {
 	model_name: string = $state()!;
-	model_response: ModelResponse | undefined = $state();
-	show_response: ShowResponse | undefined = $state();
+	model_response: ModelResponse | undefined = $state.raw();
+	show_response: ShowResponse | undefined = $state.raw();
 	show_status: Async_Status = $state()!;
 	show_error: string | undefined = $state();
 	last_updated: number = $state()!;
@@ -148,7 +148,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	#host: string = $state()!;
 
 	// Runtime-only state
-	list_response: ListResponse | null = $state(null);
+	list_response: ListResponse | null = $state.raw(null);
 	list_status: Async_Status = $state('initial');
 	list_error: string | null = $state(null);
 	list_last_updated: number | null = $state(null);
@@ -183,7 +183,6 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 
 	// Derived state
 	readonly available: boolean = $derived(this.list_status === 'success');
-	readonly models_count: number = $derived(this.list_response?.models.length ?? 0);
 	readonly pending_operations: Array<Ollama_Operation> = $derived(
 		Array.from(this.operations.values()).filter((op) => op.status === 'pending'),
 	);
@@ -193,13 +192,34 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 		),
 	);
 
-	readonly models_with_details: Array<Ollama_Model_Detail> = $derived.by(() => {
-		if (!this.list_response?.models) return [];
-
-		return this.list_response.models
-			.map((model) => this.model_details.get(model.name))
-			.filter(Boolean) as Array<Ollama_Model_Detail>;
+	readonly model_by_name: Map<string, ModelResponse> = $derived.by(() => {
+		const map: Map<string, ModelResponse> = new Map();
+		if (this.list_response?.models) {
+			for (const model of this.list_response.models) {
+				map.set(model.name, model);
+			}
+		}
+		return map;
 	});
+
+	readonly models: Array<Ollama_Model_Detail> = $derived.by(() => {
+		const result: Array<Ollama_Model_Detail> = [];
+		if (!this.list_response?.models) return result;
+
+		for (const model of this.list_response.models) {
+			const detail = this.model_details.get(model.name);
+			if (detail) {
+				result.push(detail);
+			} else {
+				console.error(`[ollama] Missing model detail for: ${model.name}`);
+			}
+		}
+		return result;
+	});
+
+	readonly models_count: number = $derived(this.models.length);
+
+	readonly model_names: Array<string> = $derived(Array.from(this.model_by_name.keys()));
 
 	// TODO awkward naming, trying not to change Ollama's way of doing things as much as possible but idk
 	readonly model_details_with_cached_show: Array<Ollama_Model_Detail> = $derived.by(() => {
@@ -397,6 +417,14 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 
 		if (!BROWSER) return operation.operation_id;
 
+		// Check if destination model already exists
+		if (this.model_by_name.has(destination)) {
+			const error_message = `Model "${destination}" already exists`;
+			console.error(`[ollama] ${error_message}`);
+			operation.complete_failure(error_message);
+			return operation.operation_id;
+		}
+
 		try {
 			const response = await ollama.copy({source, destination});
 			console.log(`[ollama] copy model success: ${source} → ${destination}`, response);
@@ -424,6 +452,14 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 		});
 
 		if (!BROWSER) return operation.operation_id;
+
+		// Check if model already exists
+		if (this.model_by_name.has(name)) {
+			const error_message = `Model "${name}" already exists`;
+			console.error(`[ollama] ${error_message}`);
+			operation.complete_failure(error_message);
+			return operation.operation_id;
+		}
 
 		try {
 			const create_request: any = {name, stream: false};
