@@ -16,7 +16,7 @@
 	<header>
 		<h1><Glyph glyph={GLYPH_SETTINGS} /> system settings</h1>
 	</header>
-	<section class="width_sm">
+	<section class="width_md">
 		<Settings />
 
 		<div class="mt_lg">

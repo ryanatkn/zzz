@@ -112,13 +112,33 @@ describe('Ollama', () => {
 			},
 		});
 
+		// Add some mock details to the detail
+		detail.complete_loading({name: 'test_model'} as any);
+
 		ollama.model_details.set('test_model', detail);
 
 		expect(ollama.model_details.size).toBe(1);
+		expect(detail.has_details).toBe(true);
 
+		// Clear individual model details
+		ollama.clear_model_details('test_model');
+		expect(detail.has_details).toBe(false);
+		expect(detail.show_status).toBe('initial');
+
+		// Model should still be in cache, just reset
+		expect(ollama.model_details.size).toBe(1);
+
+		// Clear all model details cache
 		ollama.clear_model_details_cache();
-
 		expect(ollama.model_details.size).toBe(0);
+	});
+
+	test('should handle clearing details for non-existent model', () => {
+		const app = create_mock_app();
+		const ollama = new Ollama({app});
+
+		// Should not throw when clearing details for a model that doesn't exist
+		expect(() => ollama.clear_model_details('non_existent_model')).not.toThrow();
 	});
 
 	test('should update derived state correctly', () => {

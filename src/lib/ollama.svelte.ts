@@ -201,6 +201,17 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 			.filter(Boolean) as Array<Ollama_Model_Detail>;
 	});
 
+	// TODO awkward naming, trying not to change Ollama's way of doing things as much as possible but idk
+	readonly model_details_with_cached_show: Array<Ollama_Model_Detail> = $derived.by(() => {
+		const result: Array<Ollama_Model_Detail> = [];
+		for (const detail of this.model_details.values()) {
+			if (detail.has_details) {
+				result.push(detail);
+			}
+		}
+		return result;
+	});
+
 	constructor(options: Ollama_Options) {
 		super(Ollama_Json, options);
 		this.init();
@@ -445,7 +456,30 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 		}
 	}
 
-	// TODO BLOCK add `clear details` to each model and `clear all details` to configure view
+	/**
+	 * Clear details for a specific model.
+	 */
+	clear_model_details(model_name: string): void {
+		const detail = this.model_details.get(model_name);
+		if (detail) {
+			detail.reset();
+		}
+	}
+
+	/**
+	 * Clear details for a specific model.
+	 */
+	async refresh_model_details(model_name: string): Promise<void> {
+		this.clear_model_details(model_name);
+		await this.show_model(model_name);
+	}
+
+	clear_all_model_details(): void {
+		for (const detail of this.model_details.values()) {
+			detail.reset();
+		}
+	}
+
 	/**
 	 * Clear all model details cache.
 	 */

@@ -50,25 +50,26 @@
 		</button>
 	</div>
 
-	<div class="display_flex flex_column gap_md">
+	<div class="width_md display_flex flex_column gap_md">
 		<fieldset>
-			<label for="model_name" class="display_block mb_xs">model name</label>
-			<input
-				id="model_name"
-				type="text"
-				class="plain w_100"
-				placeholder="{GLYPH_PLACEHOLDER} e.g., llama3.1, mistral, codellama"
-				bind:value={model_name}
-				onkeydown={handle_keydown}
-				disabled={is_pulling}
-			/>
-			<small>
+			<label class="display_block mb_xs">
+				<div class="title">model name</div>
+				<input
+					type="text"
+					class="plain w_100"
+					placeholder="{GLYPH_PLACEHOLDER} e.g., llama3.1, mistral, codellama"
+					bind:value={model_name}
+					onkeydown={handle_keydown}
+					disabled={is_pulling}
+				/>
+			</label>
+			<p>
 				Enter a model name from the <a
 					href="https://ollama.com/library"
 					target="_blank"
 					rel="noopener noreferrer">Ollama library</a
 				>
-			</small>
+			</p>
 		</fieldset>
 
 		<label class="display_flex gap_xs align_items_center">
@@ -76,8 +77,7 @@
 			<span>allow insecure connections</span>
 		</label>
 
-		<div class="display_flex justify_content_end gap_md">
-			<button type="button" class="plain" onclick={onclose} disabled={is_pulling}>cancel</button>
+		<div class="display_flex gap_md">
 			<button
 				type="button"
 				class="color_a"
@@ -87,6 +87,7 @@
 				<Glyph glyph={GLYPH_DOWNLOAD} />&nbsp;
 				{is_pulling ? 'pulling...' : 'pull model'}
 			</button>
+			<button type="button" class="plain" onclick={onclose} disabled={is_pulling}>cancel</button>
 		</div>
 	</div>
 </div>

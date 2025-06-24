@@ -650,6 +650,11 @@ export const package_json = {
 			default: './dist/Nav_Link.svelte',
 		},
 		'./nav.js': {types: './dist/nav.d.ts', default: './dist/nav.js'},
+		'./Ollama_Configure.svelte': {
+			types: './dist/Ollama_Configure.svelte.d.ts',
+			svelte: './dist/Ollama_Configure.svelte',
+			default: './dist/Ollama_Configure.svelte',
+		},
 		'./Ollama_Copy_Model.svelte': {
 			types: './dist/Ollama_Copy_Model.svelte.d.ts',
 			svelte: './dist/Ollama_Copy_Model.svelte',
@@ -669,10 +674,10 @@ export const package_json = {
 			svelte: './dist/Ollama_Manager.svelte',
 			default: './dist/Ollama_Manager.svelte',
 		},
-		'./Ollama_Model_Detail.svelte': {
-			types: './dist/Ollama_Model_Detail.svelte.d.ts',
-			svelte: './dist/Ollama_Model_Detail.svelte',
-			default: './dist/Ollama_Model_Detail.svelte',
+		'./Ollama_Model_Details.svelte': {
+			types: './dist/Ollama_Model_Details.svelte.d.ts',
+			svelte: './dist/Ollama_Model_Details.svelte',
+			default: './dist/Ollama_Model_Details.svelte',
 		},
 		'./Ollama_Operations.svelte': {
 			types: './dist/Ollama_Operations.svelte.d.ts',
@@ -2009,6 +2014,10 @@ export const src_json = {
 				{name: 'main_nav_items_default', kind: 'variable'},
 			],
 		},
+		'./Ollama_Configure.svelte': {
+			path: 'Ollama_Configure.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./Ollama_Copy_Model.svelte': {
 			path: 'Ollama_Copy_Model.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
@@ -2031,8 +2040,8 @@ export const src_json = {
 			path: 'Ollama_Manager.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
 		},
-		'./Ollama_Model_Detail.svelte': {
-			path: 'Ollama_Model_Detail.svelte',
+		'./Ollama_Model_Details.svelte': {
+			path: 'Ollama_Model_Details.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
 		},
 		'./Ollama_Operations.svelte': {

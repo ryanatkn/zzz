@@ -1,12 +1,11 @@
 <script lang="ts">
 	import {slide} from 'svelte/transition';
-	import {format} from 'date-fns';
+	import type {SvelteHTMLElements} from 'svelte/elements';
 
-	import {FILE_TIME_FORMAT} from '$lib/cell_helpers.js';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import type {Diskfile_Editor_State} from '$lib/diskfile_editor_state.svelte.js';
 	import type {Uuid} from '$lib/zod_helpers.js';
-	import type {SvelteHTMLElements} from 'svelte/elements';
+	import {format_time} from '$lib/time_helpers.js';
 
 	interface Props {
 		editor_state: Diskfile_Editor_State;
@@ -64,7 +63,7 @@
 				title={entry.label}
 			>
 				<span>
-					<span>{format(new Date(entry.created), FILE_TIME_FORMAT)}</span>
+					<span>{format_time(new Date(entry.created))}</span>
 					{#if entry.is_disk_change}
 						<span class="ml_xl">from disk</span>
 					{:else if entry.is_unsaved_edit}

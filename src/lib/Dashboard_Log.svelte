@@ -1,15 +1,27 @@
 <script lang="ts">
 	import Action_List from '$lib/Action_List.svelte';
 	import Action_Detail from '$lib/Action_Detail.svelte';
+	import Dashboard_Header from '$lib/Dashboard_Header.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 	import {GLYPH_LOG} from '$lib/glyphs.js';
 	import type {Action} from '$lib/action.svelte.js';
+	import {app_context} from '$lib/app.svelte.js';
+	import {format_timestamp} from '$lib/time_helpers.js';
 
 	let selected_action: Action | null = $state(null);
+
+	const app = app_context.get();
 </script>
 
 <div class="column p_lg h_100">
-	<h1><Glyph glyph={GLYPH_LOG} /> system log</h1>
+	<Dashboard_Header>
+		{#snippet header()}
+			<h1><Glyph glyph={GLYPH_LOG} /> system log</h1>
+		{/snippet}
+		<div class="font_family_serif font_size_xl3">
+			{format_timestamp(app.time.now)}
+		</div>
+	</Dashboard_Header>
 	<p>
 		This page shows the actions that have happened behind the scenes. It's a work in progress and
 		not too useful yet.

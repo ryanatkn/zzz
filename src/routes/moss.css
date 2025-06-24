@@ -324,6 +324,10 @@ a.chip {
 	font-size: var(--font_size_xl);
 	--font_size: var(--font_size_xl);
 }
+.font_size_xl3 {
+	font-size: var(--font_size_xl3);
+	--font_size: var(--font_size_xl3);
+}
 .text_align_start {
 	text-align: start;
 }

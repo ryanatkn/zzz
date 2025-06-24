@@ -55,7 +55,7 @@
 		</button>
 	</div>
 
-	<div class="display_flex flex_column gap_md">
+	<div class="width_md display_flex flex_column gap_md">
 		<fieldset>
 			<label for="source_model" class="display_block mb_xs">source model</label>
 			{#if available_models.length > 0}
@@ -97,8 +97,7 @@
 			<small> Create a copy of the source model with a new name </small>
 		</fieldset>
 
-		<div class="display_flex justify_content_end gap_md">
-			<button type="button" class="plain" onclick={onclose} disabled={is_copying}>cancel</button>
+		<div class="display_flex gap_md">
 			<button
 				type="button"
 				class="color_d"
@@ -108,6 +107,7 @@
 				<Glyph glyph={GLYPH_COPY} />&nbsp;
 				{is_copying ? 'copying...' : 'copy model'}
 			</button>
+			<button type="button" class="plain" onclick={onclose} disabled={is_copying}>cancel</button>
 		</div>
 	</div>
 </div>

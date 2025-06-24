@@ -13,7 +13,10 @@ h6 {
 
 textarea {
 	scrollbar-width: thin; /* TODO maybe upstream? */
-	border-radius: var(--border_radius_xs2);
+	border-radius: var(--border_radius_xs2); /* TODO upstream? */
+}
+input {
+	border-radius: var(--border_radius_xs2); /* TODO upstream? */
 }
 
 /* TODO upstream */
@@ -333,8 +336,12 @@ a.chip {
 	background-color: var(--fg_3);
 }
 
+/* TODO hacky for buttons as menu_items, fix upstream, need to think about composability of the classes if it even makes sense */
+button.menu_item.plain {
+	box-shadow: none !important;
+}
 /* TODO also hacky */
-.menu_item.selected.plain {
+button.menu_item.selected.plain {
 	--button_text_color: var(--text_color_2);
 }
 

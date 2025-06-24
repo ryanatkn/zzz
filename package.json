@@ -751,6 +751,11 @@
       "types": "./dist/nav.d.ts",
       "default": "./dist/nav.js"
     },
+    "./Ollama_Configure.svelte": {
+      "types": "./dist/Ollama_Configure.svelte.d.ts",
+      "svelte": "./dist/Ollama_Configure.svelte",
+      "default": "./dist/Ollama_Configure.svelte"
+    },
     "./Ollama_Copy_Model.svelte": {
       "types": "./dist/Ollama_Copy_Model.svelte.d.ts",
       "svelte": "./dist/Ollama_Copy_Model.svelte",
@@ -770,10 +775,10 @@
       "svelte": "./dist/Ollama_Manager.svelte",
       "default": "./dist/Ollama_Manager.svelte"
     },
-    "./Ollama_Model_Detail.svelte": {
-      "types": "./dist/Ollama_Model_Detail.svelte.d.ts",
-      "svelte": "./dist/Ollama_Model_Detail.svelte",
-      "default": "./dist/Ollama_Model_Detail.svelte"
+    "./Ollama_Model_Details.svelte": {
+      "types": "./dist/Ollama_Model_Details.svelte.d.ts",
+      "svelte": "./dist/Ollama_Model_Details.svelte",
+      "default": "./dist/Ollama_Model_Details.svelte"
     },
     "./Ollama_Operations.svelte": {
       "types": "./dist/Ollama_Operations.svelte.d.ts",

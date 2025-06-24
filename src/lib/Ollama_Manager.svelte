@@ -195,19 +195,14 @@
 									selected_model_detail?.model_name === model_detail.model_name}
 								onclick={() => handle_select_model(model_detail)}
 							>
-								<div class="display_flex flex_column gap_xs">
+								<div class="display_flex flex_column gap_xs w_100">
 									<div class="ellipsis font_size_lg">
 										{model_detail.model_name}
 									</div>
-									<div class="row gap_xl font_size_sm">
-										<span
-											>{model_detail.model_response
-												? Math.round(model_detail.model_response.size / (1024 * 1024))
-												: '?'} MB</span
-										>
-										<span>
-											{model_detail.updated_date.toLocaleDateString()}
-										</span>
+									<div class="font_size_sm">
+										{model_detail.model_response
+											? Math.round(model_detail.model_response.size / (1024 * 1024))
+											: '?'} MB
 									</div>
 								</div>
 							</button>

@@ -10,6 +10,7 @@
 		GLYPH_SETTINGS,
 		GLYPH_PLACEHOLDER,
 		GLYPH_ARROW_LEFT,
+		GLYPH_CLEAR,
 	} from '$lib/glyphs.js';
 	import Error_Message from '$lib/Error_Message.svelte';
 	import Ollama_Operations from '$lib/Ollama_Operations.svelte';
@@ -23,6 +24,8 @@
 	}
 
 	const {ollama, last_active_view, onback}: Props = $props();
+
+	const details_cache_size = $derived(ollama.model_details_with_cached_show.length);
 </script>
 
 <div class="panel p_md">
@@ -42,7 +45,7 @@
 		{/if}
 	</div>
 
-	<div class="display_flex flex_column gap_lg">
+	<div class="width_md display_flex flex_column gap_lg">
 		<!-- Host Configuration -->
 		<div class="display_flex flex_column gap_md">
 			<fieldset>
@@ -89,6 +92,20 @@
 						<small class="font_family_mono">
 							{OLLAMA_URL}
 						</small>
+					</div>
+				{/if}
+
+				{#if ollama.model_details.size > 0}
+					<div class="display_flex gap_sm" transition:slide>
+						<button
+							type="button"
+							class="plain"
+							onclick={() => ollama.clear_all_model_details()}
+							title="clear all cached model details"
+							disabled={details_cache_size === 0}
+						>
+							<Glyph glyph={GLYPH_CLEAR} />&nbsp; clear details cache {#if details_cache_size}({details_cache_size}){/if}
+						</button>
 					</div>
 				{/if}
 			</div>

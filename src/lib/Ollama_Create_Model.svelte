@@ -73,7 +73,7 @@
 		</button>
 	</div>
 
-	<div class="display_flex flex_column gap_md">
+	<div class="width_md display_flex flex_column gap_md">
 		<fieldset>
 			<label for="new_model_name" class="display_block mb_xs">new model name</label>
 			<input
@@ -137,8 +137,7 @@
 			<small> Custom prompt template using Ollama template syntax </small>
 		</fieldset>
 
-		<div class="display_flex justify_content_end gap_md">
-			<button type="button" class="plain" onclick={onclose} disabled={is_creating}>cancel</button>
+		<div class="display_flex gap_md">
 			<button
 				type="button"
 				class="color_b"
@@ -148,6 +147,7 @@
 				<Glyph glyph={GLYPH_ADD} />&nbsp;
 				{is_creating ? 'creating...' : 'create model'}
 			</button>
+			<button type="button" class="plain" onclick={onclose} disabled={is_creating}>cancel</button>
 		</div>
 	</div>
 </div>
