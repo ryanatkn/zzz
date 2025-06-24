@@ -74,7 +74,7 @@
 		</button>
 	</header>
 	<p>
-		This creates a new custom modelfile, to get a builtin model see <button
+		This creates a new custom modelfile, to download a builtin model see <button
 			type="button"
 			class="inline compact"
 			onclick={onshowpull}>pull model</button
