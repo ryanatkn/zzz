@@ -393,6 +393,11 @@ export const package_json = {
 			svelte: './dist/Dashboard_Diskfiles.svelte',
 			default: './dist/Dashboard_Diskfiles.svelte',
 		},
+		'./Dashboard_Header.svelte': {
+			types: './dist/Dashboard_Header.svelte.d.ts',
+			svelte: './dist/Dashboard_Header.svelte',
+			default: './dist/Dashboard_Header.svelte',
+		},
 		'./Dashboard_Home.svelte': {
 			types: './dist/Dashboard_Home.svelte.d.ts',
 			svelte: './dist/Dashboard_Home.svelte',
@@ -1548,6 +1553,10 @@ export const src_json = {
 		},
 		'./Dashboard_Diskfiles.svelte': {
 			path: 'Dashboard_Diskfiles.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Dashboard_Header.svelte': {
+			path: 'Dashboard_Header.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
 		},
 		'./Dashboard_Home.svelte': {
