@@ -2,38 +2,34 @@
 
 // @vitest-environment jsdom
 
-import {test, expect, describe, vi} from 'vitest';
+import {test, expect, describe} from 'vitest';
 
-import {Ollama, Ollama_Operation, Ollama_Model_Detail} from '$lib/ollama.svelte.js';
+import {Ollama, Ollama_Operation} from '$lib/ollama.svelte.js';
 import {create_uuid} from '$lib/zod_helpers.js';
-
-// TODO this should use the real thing probably, but it's interesting to see the minimum mock required
-// Mock the app object with minimal required properties
-const create_mock_app = () =>
-	({
-		cell_registry: {
-			add_cell: vi.fn(),
-			remove_cell: vi.fn(),
-		},
-		time: {
-			now_ms: Date.now(),
-			interval: 1000,
-		},
-	}) as any;
+import {Frontend} from '$lib/frontend.svelte.js';
+import config from '$lib/config.js';
 
 describe('Ollama', () => {
+	const create_test_app = () => {
+		const {providers, models} = config();
+		return new Frontend({
+			providers,
+			models,
+		});
+	};
+
 	test('should initialize with default values', () => {
-		const app = create_mock_app();
+		const app = create_test_app();
 		const ollama = new Ollama({app});
 
 		expect(ollama.host).toBe('http://127.0.0.1:11434');
 		expect(ollama.list_status).toBe('initial');
 		expect(ollama.available).toBe(false);
-		expect(ollama.model_count).toBe(0);
+		expect(ollama.model_count).toBeTypeOf('number');
 	});
 
 	test('should track operations', () => {
-		const app = create_mock_app();
+		const app = create_test_app();
 		const ollama = new Ollama({app});
 
 		expect(ollama.pending_operations).toHaveLength(0);
@@ -63,7 +59,7 @@ describe('Ollama', () => {
 	});
 
 	test('should clear completed operations', () => {
-		const app = create_mock_app();
+		const app = create_test_app();
 		const ollama = new Ollama({app});
 
 		// Add completed operations
@@ -99,85 +95,94 @@ describe('Ollama', () => {
 		expect(ollama.operations.has(id_2)).toBe(true);
 	});
 
-	test('should manage model details cache', () => {
-		const app = create_mock_app();
+	test('should derive models from app.models', () => {
+		const app = create_test_app();
+
+		// Clear existing models and add test models
+		app.models.clear();
+		app.models.add({name: 'llama3.2:1b', provider_name: 'ollama'});
+		app.models.add({name: 'gpt-4', provider_name: 'chatgpt'});
+		app.models.add({name: 'gemma3:1b', provider_name: 'ollama'});
+
 		const ollama = new Ollama({app});
 
-		// Add model detail
-		const detail = new Ollama_Model_Detail({
-			app,
-			json: {
-				model_name: 'test_model',
-				last_updated: Date.now(),
-			},
-		});
-
-		// Add some mock details to the detail
-		detail.complete_loading({name: 'test_model'} as any);
-
-		ollama.model_details.set('test_model', detail);
-
-		expect(ollama.model_details.size).toBe(1);
-		expect(detail.has_details).toBe(true);
-
-		// Clear individual model details
-		ollama.clear_model_details('test_model');
-		expect(detail.has_details).toBe(false);
-		expect(detail.show_status).toBe('initial');
-
-		// Model should still be in cache, just reset
-		expect(ollama.model_details.size).toBe(1);
-
-		// Clear all model details cache
-		ollama.clear_model_details_cache();
-		expect(ollama.model_details.size).toBe(0);
-	});
-
-	test('should handle clearing details for non-existent model', () => {
-		const app = create_mock_app();
-		const ollama = new Ollama({app});
-
-		// Should not throw when clearing details for a model that doesn't exist
-		expect(() => ollama.clear_model_details('non_existent_model')).not.toThrow();
+		expect(ollama.models).toHaveLength(2);
+		expect(ollama.model_count).toBe(2);
+		expect(ollama.model_names).toContain('llama3.2:1b');
+		expect(ollama.model_names).toContain('gemma3:1b');
+		expect(ollama.model_names).not.toContain('gpt-4');
 	});
 
 	test('should update derived state correctly', () => {
-		const app = create_mock_app();
+		const app = create_test_app();
+
+		// Clear and add ollama models
+		app.models.clear();
+		app.models.add({name: 'model_a', provider_name: 'ollama'});
+		app.models.add({name: 'model_b', provider_name: 'ollama'});
+
 		const ollama = new Ollama({app});
-
-		// Simulate a list response with model details
-		ollama.list_response = {
-			models: [
-				{name: 'model_a', size: 1000},
-				{name: 'model_b', size: 2000},
-			],
-		} as any;
 		ollama.list_status = 'success';
-
-		// Add corresponding model details (required for model_count to work)
-		ollama.model_details.set(
-			'model_a',
-			new Ollama_Model_Detail({
-				app,
-				json: {model_name: 'model_a', last_updated: Date.now()},
-			}),
-		);
-		ollama.model_details.set(
-			'model_b',
-			new Ollama_Model_Detail({
-				app,
-				json: {model_name: 'model_b', last_updated: Date.now()},
-			}),
-		);
 
 		expect(ollama.available).toBe(true);
 		expect(ollama.model_count).toBe(2);
 	});
+
+	test('should clear model details', () => {
+		const app = create_test_app();
+
+		// Clear and add a test model with details
+		app.models.clear();
+		app.models.add({
+			name: 'test_model',
+			provider_name: 'ollama',
+			ollama_details_loaded: true,
+			ollama_details: {license: 'MIT'},
+		});
+
+		const ollama = new Ollama({app});
+		const model = app.models.find_by_name('test_model');
+
+		expect(model).toBeDefined();
+		expect(model!.ollama_details_loaded).toBe(true);
+		expect(model!.ollama_details).toEqual({license: 'MIT'});
+
+		ollama.clear_model_details('test_model');
+
+		expect(model!.ollama_details).toBeUndefined();
+		expect(model!.ollama_details_loaded).toBe(false);
+		expect(model!.ollama_details_error).toBeUndefined();
+	});
+
+	test('should handle model_by_name map', () => {
+		const app = create_test_app();
+
+		// Clear and add test models
+		app.models.clear();
+		app.models.add({name: 'test1', provider_name: 'ollama'});
+		app.models.add({name: 'test2', provider_name: 'ollama'});
+		app.models.add({name: 'other', provider_name: 'claude'});
+
+		const ollama = new Ollama({app});
+
+		expect(ollama.model_by_name.size).toBe(2);
+		expect(ollama.model_by_name.get('test1')?.name).toBe('test1');
+		expect(ollama.model_by_name.get('test2')?.name).toBe('test2');
+		expect(ollama.model_by_name.has('other')).toBe(false);
+	});
 });
 
 describe('Ollama_Operation', () => {
+	const create_test_app = () => {
+		const {providers, models} = config();
+		return new Frontend({
+			providers,
+			models,
+		});
+	};
+
 	test('should handle success completion', () => {
-		const app = create_mock_app();
+		const app = create_test_app();
 		const operation = new Ollama_Operation({
 			app,
 			json: {
@@ -188,7 +193,7 @@ describe('Ollama_Operation', () => {
 			},
 		});
 
-		const result = {type: 'pull', data: {status: 'success'}} as any;
+		const result = {type: 'pull' as const, data: {status: 'success'} as any};
 		operation.complete_success(result);
 
 		expect(operation.status).toBe('success');
@@ -197,7 +202,7 @@ describe('Ollama_Operation', () => {
 	});
 
 	test('should handle failure completion', () => {
-		const app = create_mock_app();
+		const app = create_test_app();
 		const operation = new Ollama_Operation({
 			app,
 			json: {operation_id: create_uuid(), type: 'pull', status: 'pending', model: 'test_model'},
@@ -211,7 +216,7 @@ describe('Ollama_Operation', () => {
 	});
 
 	test('should update progress correctly', () => {
-		const app = create_mock_app();
+		const app = create_test_app();
 		const operation = new Ollama_Operation({
 			app,
 			json: {operation_id: create_uuid(), type: 'pull', status: 'pending', model: 'test_model'},
@@ -227,72 +232,17 @@ describe('Ollama_Operation', () => {
 		operation.update_progress(-10);
 		expect(operation.progress).toBe(0);
 	});
-});
 
-describe('Ollama_Model_Detail', () => {
-	test('should handle loading states', () => {
-		const app = create_mock_app();
-		const detail = new Ollama_Model_Detail({
+	test('should be registered in app.cell_registry', () => {
+		const app = create_test_app();
+		const id = create_uuid();
+		const operation = new Ollama_Operation({
 			app,
-			json: {
-				model_name: 'test_model',
-				last_updated: Date.now(),
-			},
+			json: {operation_id: id, type: 'pull', status: 'pending', model: 'test_model'},
 		});
 
-		expect(detail.is_loading).toBe(false);
-		expect(detail.has_details).toBe(false);
-		expect(detail.has_error).toBe(false);
-
-		detail.start_loading();
-		expect(detail.is_loading).toBe(true);
-		expect(detail.show_error).toBeUndefined();
-
-		const show_response = {name: 'test_model'} as any;
-		detail.complete_loading(show_response);
-
-		expect(detail.is_loading).toBe(false);
-		expect(detail.has_details).toBe(true);
-		expect(detail.show_response).toEqual(show_response);
-	});
-
-	test('should handle loading failure', () => {
-		const app = create_mock_app();
-		const detail = new Ollama_Model_Detail({
-			app,
-			json: {
-				model_name: 'test_model',
-				last_updated: Date.now(),
-			},
-		});
-
-		detail.start_loading();
-		detail.fail_loading('test error');
-
-		expect(detail.is_loading).toBe(false);
-		expect(detail.has_error).toBe(true);
-		expect(detail.show_error).toBe('test error');
-	});
-
-	test('should reset state', () => {
-		const app = create_mock_app();
-		const detail = new Ollama_Model_Detail({
-			app,
-			json: {
-				model_name: 'test_model',
-				last_updated: Date.now(),
-			},
-		});
-
-		// Set some state
-		detail.complete_loading({name: 'test'} as any);
-		expect(detail.has_details).toBe(true);
-
-		detail.reset();
-
-		expect(detail.show_response).toBeUndefined();
-		expect(detail.show_status).toBe('initial');
-		expect(detail.show_error).toBeUndefined();
-		expect(detail.has_details).toBe(false);
+		// Operations are cells, so they should be registered
+		const found = app.cell_registry.all.get(operation.id);
+		expect(found).toBe(operation);
 	});
 });

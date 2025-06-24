@@ -1,7 +1,7 @@
 import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Model, Model_Json, Model_Schema} from '$lib/model.svelte.js';
+import {Model, Model_Json, Model_Schema, type Model_Json_Input} from '$lib/model.svelte.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {
@@ -80,12 +80,12 @@ export class Models extends Cell<typeof Models_Json> {
 		this.init();
 	}
 
-	add(model_json: Model_Json): void {
+	add(model_json: Model_Json_Input): void {
 		const model = new Model({app: this.app, json: model_json});
 		this.items.add(model);
 	}
 
-	add_many(models_json: Array<Model_Json>): void {
+	add_many(models_json: Array<Model_Json_Input>): void {
 		const models = models_json.map((json) => new Model({app: this.app, json}));
 		this.items.add_many(models);
 	}

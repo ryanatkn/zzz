@@ -12,10 +12,10 @@ export const frontend_action_handlers: Frontend_Action_Handlers = {
 
 	load_session: {
 		send_request: () => {
-			console.log('Loading session...');
+			console.log('[frontend_action_handlers] Loading session...');
 		},
 		receive_response: ({app, data: {output, response}}) => {
-			console.log('Session loaded', response);
+			console.log('[frontend_action_handlers] Session loaded:', response);
 
 			app.receive_session(output.data);
 		},
@@ -23,37 +23,41 @@ export const frontend_action_handlers: Frontend_Action_Handlers = {
 
 	submit_completion: {
 		send_request: ({data: {input}}) => {
-			console.log('Sending prompt', input.completion_request.prompt);
+			console.log('[frontend_action_handlers] Sending prompt:', input.completion_request.prompt);
 		},
 		receive_response: ({data: {input, output}}) => {
-			console.log('Received completion', input.completion_request, output);
+			console.log(
+				'[frontend_action_handlers] Received completion:',
+				input.completion_request,
+				output,
+			);
 		},
 	},
 
 	update_diskfile: {
 		send_request: ({data: {input}}) => {
-			console.log('Updating file', input.path);
+			console.log('[frontend_action_handlers] Updating file:', input.path);
 		},
 		receive_response: ({data: {input, output}}) => {
-			console.log('Updated file', input.path, output);
+			console.log('[frontend_action_handlers] Updated file:', input.path, output);
 		},
 	},
 
 	delete_diskfile: {
 		send_request: ({data: {input}}) => {
-			console.log('Deleting file', input.path);
+			console.log('[frontend_action_handlers] Deleting file:', input.path);
 		},
 		receive_response: ({data: {input}}) => {
-			console.log('Deleted file', input.path);
+			console.log('[frontend_action_handlers] Deleted file:', input.path);
 		},
 	},
 
 	create_directory: {
 		send_request: ({data: {input}}) => {
-			console.log('Creating directory', input.path);
+			console.log('[frontend_action_handlers] Creating directory:', input.path);
 		},
 		receive_response: (ctx) => {
-			console.log('Created directory', ctx);
+			console.log('[frontend_action_handlers] Created directory:', ctx);
 		},
 	},
 

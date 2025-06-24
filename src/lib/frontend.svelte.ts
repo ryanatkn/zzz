@@ -4,7 +4,7 @@ import {z} from 'zod';
 import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
 import type {Assignable, Class_Constructor, Omit_Strict} from '@ryanatkn/belt/types.js';
 
-import {Provider, type Provider_Json} from '$lib/provider.svelte.js';
+import {Provider, type Provider_Json_Input} from '$lib/provider.svelte.js';
 import type {Provider_Name} from '$lib/provider_types.js';
 import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
 import {Models} from '$lib/models.svelte.js';
@@ -13,7 +13,7 @@ import {Tapes} from '$lib/tapes.svelte.js';
 import {Providers} from '$lib/providers.svelte.js';
 import {Diskfiles} from '$lib/diskfiles.svelte.js';
 import {Actions} from '$lib/actions.svelte.js';
-import type {Model_Json} from '$lib/model.svelte.js';
+import type {Model_Json_Input} from '$lib/model.svelte.js';
 import {Cell_Registry} from '$lib/cell_registry.svelte.js';
 import {Prompts} from '$lib/prompts.svelte.js';
 import {Bits} from '$lib/bits.svelte.js';
@@ -62,9 +62,9 @@ export type Frontend_Json_Input = z.input<typeof Frontend_Json>;
 export interface Frontend_Options extends Omit_Strict<Cell_Options<typeof Frontend_Json>, 'app'> {
 	/** Do not use - optional to avoid circular reference problem. */
 	app?: Frontend;
-	models?: Array<Model_Json>;
+	models?: Array<Model_Json_Input>;
 	bots?: Zzz_Config['bots'];
-	providers?: Array<Provider_Json>;
+	providers?: Array<Provider_Json_Input>;
 	cell_classes?: Record<string, Class_Constructor<Cell>>;
 	action_specs?: Array<Action_Spec_Union>;
 	action_handlers?: Frontend_Action_Handlers;
@@ -270,13 +270,13 @@ export class Frontend extends Cell<typeof Frontend_Json> implements Action_Event
 	/**
 	 * Add multiple providers from JSON configurations
 	 */
-	add_providers(providers_json: Array<Provider_Json>): void {
+	add_providers(providers_json: Array<Provider_Json_Input>): void {
 		for (const json of providers_json) {
 			this.add_provider(json);
 		}
 	}
 
-	add_provider(provider_json: Provider_Json): void {
+	add_provider(provider_json: Provider_Json_Input): void {
 		this.providers.add(new Provider({app: this, json: provider_json}));
 	}
 

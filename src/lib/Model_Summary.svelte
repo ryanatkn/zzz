@@ -41,19 +41,19 @@
 	<div class="specs_grid">
 		{#if model.context_window}
 			<div class="spec_item">
-				<span class="spec_label">Context:</span>
+				<span class="spec_label">context:</span>
 				<span>{model.context_window.toLocaleString()} tokens</span>
 			</div>
 		{/if}
 		{#if model.parameter_count}
 			<div class="spec_item">
-				<span class="spec_label">Parameters:</span>
+				<span class="spec_label">parameters:</span>
 				<span>{model.parameter_count.toLocaleString()}B</span>
 			</div>
 		{/if}
 		{#if model.filesize}
 			<div class="spec_item">
-				<span class="spec_label">Size:</span>
+				<span class="spec_label">size:</span>
 				<span>{model.filesize}GB</span>
 			</div>
 		{/if}

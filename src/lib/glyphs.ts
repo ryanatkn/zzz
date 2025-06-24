@@ -17,14 +17,14 @@ export const GLYPH_PASTE = '⎌'; // ⧈ ⎗ ⎘ ⎙
 export const GLYPH_RESET = '⤺';
 export const GLYPH_REFRESH = '⟳'; // ↻ ⟳
 export const GLYPH_CONNECT = '⭍'; // ⨁
-export const GLYPH_DISCONNECT = '⨂';
+export const GLYPH_DISCONNECT = '⊝';
 export const GLYPH_RETRY = '↺'; // ⟲'; // ⟲ ⟳ ⤾ ⤼ ↻
 export const GLYPH_PLACEHOLDER = '↳';
 
 export const GLYPH_CHECKMARK = '✓'; // ✓ ✔ ✗ ✖ ✕ ✘ ☑ ⍻
 
 export const GLYPH_DOWNLOAD = '⭳'; // ⭳ ⥥ ⤓ ⇩
-export const GLYPH_ERROR = '⁉'; // ⁉ ‼ ‽ ⸮ ⸘ ⚠
+export const GLYPH_ERROR = '⨂'; // ⁉ ‼ ‽ ⸮ ⸘ ⚠
 export const GLYPH_CHEVRON_UP = '⮝'; // ⮝ ⯅ ˄ ∧ ⌃ ▴ ▵ ▲
 export const GLYPH_CHEVRON_RIGHT = '⮞'; // ⮞ ❯ ▸ ⭢ ›
 export const GLYPH_CHEVRON_DOWN = '⮟'; // ⮟ ⌄ ˅ ∨

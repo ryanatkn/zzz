@@ -108,18 +108,17 @@
 		</ul>
 		<p>
 			This scope may look far-fetched, and it is to me, but I'm just making tools that I want to use
-			now on the best foundations I can assemble, and correcting course while imagining the endgame.
-			I think the most successful version of Zzz is where it's used to build other systems, with
-			different ideas/systems/software being more important than Zzz the tool. Many of the initial
-			systems have been designed with some thought towards this bigger picture, but it's too big an
-			idea to be anywhere near complete, and I plan to continue building incrementally on a quality
-			base with some experiements mixed in.
+			now on the best foundations I can assemble. I think the most successful version of Zzz is
+			where it's used to build other systems, with different ideas/systems/software being more
+			important than Zzz the tool. Many of the initial systems have been designed with some thought
+			towards this bigger picture, but it's too big an idea to be anywhere near complete, and I plan
+			to continue building incrementally on a quality base with some experiments mixed in.
 		</p>
 		<p>
-			Zzz must be easy to use and inclusive of people and devices, but it can't cater to everyone --
-			however thanks to the magic of standards-based interoperability, Zzz works with all websites,
-			like any other browser, and anything you make with Zzz works with other browsers and web
-			technologies. It's only one way to use the web.
+			Zzz wants to be easy to use and inclusive of people and devices, but try as it might, it can't
+			cater to every case for every person -- however, thanks to the magic of standards-based
+			interoperability, Zzz works with all websites, like any other browser, and anything you make
+			with Zzz works with other browsers and web technologies. It's only one way to use the web.
 		</p>
 		<p>Some early (rough) integrations include:</p>
 		<ul>

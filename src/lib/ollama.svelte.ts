@@ -6,19 +6,18 @@ import type {Async_Status} from '@ryanatkn/belt/async.js';
 import {BROWSER} from 'esm-env';
 import ollama, {
 	type ListResponse,
-	type ModelResponse,
 	type ShowResponse,
 	type ProgressResponse,
 	type StatusResponse,
 	type DeleteRequest,
 } from 'ollama/browser';
-import {formatDistance} from 'date-fns';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import {create_uuid, Uuid, get_datetime_now} from '$lib/zod_helpers.js';
 import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
 import {OLLAMA_URL} from '$lib/ollama_helpers.js';
+import type {Model} from '$lib/model.svelte.js';
 
 export const Ollama_Json = Cell_Json.extend({
 	host: z.string().default(OLLAMA_URL),
@@ -27,7 +26,6 @@ export type Ollama_Json = z.infer<typeof Ollama_Json>;
 export type Ollama_Json_Input = z.input<typeof Ollama_Json>;
 
 export interface Ollama_Options extends Cell_Options<typeof Ollama_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
-
 // TODO all of the operations stuff should probably use Action patterns,
 // could have a single Ollama action, this is a good usecase for observability
 
@@ -98,97 +96,21 @@ export class Ollama_Operation extends Cell<typeof Ollama_Operation_Json> {
 }
 
 /**
- * Cell class for model details with caching
- */
-export const Ollama_Model_Detail_Json = Cell_Json.extend({
-	model_name: z.string(),
-	model_response: z.any().optional(),
-	show_response: z.any().optional(),
-	show_status: z.enum(['initial', 'pending', 'success', 'failure']).default('initial'),
-	show_error: z.string().optional(),
-	last_updated: z.number(),
-});
-export type Ollama_Model_Detail_Json = z.infer<typeof Ollama_Model_Detail_Json>;
-export type Ollama_Model_Detail_Json_Input = z.input<typeof Ollama_Model_Detail_Json>;
-
-export interface Ollama_Model_Detail_Options // eslint-disable-line @typescript-eslint/no-empty-object-type
-	extends Cell_Options<typeof Ollama_Model_Detail_Json> {}
-
-export class Ollama_Model_Detail extends Cell<typeof Ollama_Model_Detail_Json> {
-	model_name: string = $state()!;
-	model_response: ModelResponse | undefined = $state.raw();
-	show_response: ShowResponse | undefined = $state.raw();
-	show_status: Async_Status = $state()!;
-	show_error: string | undefined = $state();
-	last_updated: number = $state()!;
-
-	readonly is_loading: boolean = $derived(this.show_status === 'pending');
-	readonly has_details: boolean = $derived(!!this.show_response);
-	readonly has_error: boolean = $derived(this.show_status === 'failure');
-
-	constructor(options: Ollama_Model_Detail_Options) {
-		super(Ollama_Model_Detail_Json, options);
-		this.init();
-	}
-
-	start_loading(): void {
-		this.show_status = 'pending';
-		this.show_error = undefined;
-		this.last_updated = Date.now();
-	}
-
-	complete_loading(show_response: ShowResponse): void {
-		this.show_response = show_response;
-		this.show_status = 'success';
-		this.show_error = undefined;
-		this.last_updated = Date.now();
-	}
-
-	fail_loading(error_message: string): void {
-		this.show_status = 'failure';
-		this.show_error = error_message;
-		this.last_updated = Date.now();
-	}
-
-	reset(): void {
-		this.show_response = undefined;
-		this.show_status = 'initial';
-		this.show_error = undefined;
-		this.last_updated = Date.now();
-	}
-}
-
-/**
- * Ollama client state management with full API coverage.
+ * Ollama client state management with simplified API.
+ * Model data is stored in app.models, not here.
  */
 export class Ollama extends Cell<typeof Ollama_Json> {
 	// Private serializable state
 	#host: string = $state()!;
 
 	// Runtime-only state
-	list_response: ListResponse | null = $state.raw(null);
 	list_status: Async_Status = $state('initial');
 	list_error: string | null = $state(null);
 	list_last_updated: number | null = $state(null);
 	last_refreshed: string | null = $state(null);
 
-	// TODO helpers/cleanup
-	last_refreshed_from_now = $derived(
-		this.last_refreshed &&
-			formatDistance(
-				// `time.now_ms` updates every minute, so we use the minimum
-				// of the last refreshed time and the current time to prevent displaying a future distance
-				Math.min(new Date(this.last_refreshed).getTime(), this.app.time.now_ms),
-				this.app.time.now_ms,
-				{addSuffix: true},
-			),
-	);
-
 	// Operations tracking using Cell instances
 	operations: SvelteMap<Uuid, Ollama_Operation> = new SvelteMap();
-
-	// Model details cache using Cell instances
-	model_details: SvelteMap<string, Ollama_Model_Detail> = new SvelteMap();
 
 	// Getters and setters for serializable state
 	get host(): string {
@@ -210,44 +132,21 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 		),
 	);
 
-	readonly model_by_name: Map<string, ModelResponse> = $derived.by(() => {
-		const map: Map<string, ModelResponse> = new Map();
-		if (this.list_response?.models) {
-			for (const model of this.list_response.models) {
-				map.set(model.name, model);
-			}
-		}
-		return map;
-	});
-
-	readonly models: Array<Ollama_Model_Detail> = $derived.by(() => {
-		const result: Array<Ollama_Model_Detail> = [];
-		if (!this.list_response?.models) return result;
-
-		for (const model of this.list_response.models) {
-			const detail = this.model_details.get(model.name);
-			if (detail) {
-				result.push(detail);
-			} else {
-				console.error(`[ollama] Missing model detail for: ${model.name}`);
-			}
-		}
-		return result;
-	});
+	/**
+	 * Get Ollama models from app.models
+	 */
+	readonly models: Array<Model> = $derived(this.app.models.items.where('provider_name', 'ollama'));
 
 	readonly model_count: number = $derived(this.models.length);
 
-	readonly model_names: Array<string> = $derived(Array.from(this.model_by_name.keys()));
+	readonly model_names: Array<string> = $derived(this.models.map((m) => m.name));
 
-	// TODO awkward naming, trying not to change Ollama's way of doing things as much as possible but idk
-	readonly model_details_with_cached_show: Array<Ollama_Model_Detail> = $derived.by(() => {
-		const result: Array<Ollama_Model_Detail> = [];
-		for (const detail of this.model_details.values()) {
-			if (detail.has_details) {
-				result.push(detail);
-			}
+	readonly model_by_name: Map<string, Model> = $derived.by(() => {
+		const map: Map<string, Model> = new Map();
+		for (const model of this.models) {
+			map.set(model.name, model);
 		}
-		return result;
+		return map;
 	});
 
 	constructor(options: Ollama_Options) {
@@ -266,7 +165,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	}
 
 	/**
-	 * List all models available on the Ollama server.
+	 * List all models available on the Ollama server and sync with app.models.
 	 */
 	async list_models(): Promise<ListResponse | null> {
 		if (!BROWSER) return null;
@@ -282,28 +181,13 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 			const response = await ollama.list();
 			console.log(`[ollama] list models success, found ${response.models.length} models`, response);
 
-			this.list_response = response;
 			this.list_status = 'success';
 			this.list_last_updated = Date.now();
 
 			operation.complete_success({type: 'list', data: response});
 
-			// Ensure model details exist for all models and update existing ones
-			for (const model_response of response.models) {
-				let detail = this.model_details.get(model_response.name);
-				if (!detail) {
-					detail = new Ollama_Model_Detail({
-						app: this.app,
-						json: {
-							model_name: model_response.name,
-							last_updated: Date.now(),
-						},
-					});
-					this.model_details.set(model_response.name, detail);
-				}
-				// Update the model response for both new and existing details
-				detail.model_response = model_response;
-			}
+			// Sync with app.models
+			this.#sync_models_with_list_response(response);
 
 			return response;
 		} catch (error) {
@@ -324,29 +208,41 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	async show_model(model_name: string): Promise<ShowResponse | null> {
 		if (!BROWSER) return null;
 
+		const model = this.app.models.find_by_name(model_name);
+		if (!model) {
+			console.error(`[ollama] model not found: ${model_name}`);
+			return null;
+		}
+		if (model.provider_name !== 'ollama') {
+			console.error(`[ollama] model not an ollama model: ${model_name}`);
+			return null;
+		}
+
 		console.log(`[ollama] showing model details for: ${model_name}`);
 
 		const operation = this.#create_operation('show', {model: model_name});
 
-		let detail = this.model_details.get(model_name);
-		if (!detail) {
-			detail = new Ollama_Model_Detail({
-				app: this.app,
-				json: {
-					model_name,
-					last_updated: Date.now(),
-				},
-			});
-			this.model_details.set(model_name, detail);
-		}
-
-		detail.start_loading();
+		// Update loading state on the model
+		model.ollama_details_loading = true;
+		model.ollama_details_error = undefined;
 
 		try {
 			const response = await ollama.show({model: model_name});
 			console.log(`[ollama] show model success for: ${model_name}`, response);
 
-			detail.complete_loading(response);
+			// Update model with details
+			model.ollama_details = {
+				details: response.details,
+				modelfile: response.modelfile,
+				template: response.template,
+				system: response.system,
+				license: response.license,
+				model_info: response.model_info,
+				modified_at: response.modified_at as unknown as string, // TODO Ollama bug or type issue?
+			};
+			model.ollama_details_loaded = true;
+			model.ollama_details_loading = false;
+
 			operation.complete_success({type: 'show', data: response});
 
 			return response;
@@ -354,7 +250,9 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 			console.error(`[ollama] failed to show model ${model_name}:`, error);
 			const error_message = error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE;
 
-			detail.fail_loading(error_message);
+			model.ollama_details_loading = false;
+			model.ollama_details_error = error_message;
+
 			operation.complete_failure(error_message);
 
 			return null;
@@ -373,6 +271,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 		if (!BROWSER) return operation.operation_id;
 
 		try {
+			// TODO stream so we get progress updates
 			const response = await ollama.pull({...partial, insecure, model: model_name, stream: false});
 			console.log(`[ollama] pull model success for: ${model_name}`, response);
 
@@ -404,11 +303,8 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 
 			operation.complete_success({type: 'delete', data: response});
 
-			// Remove from model details cache
-			this.model_details.delete(model_name);
-
-			// Refresh model list after successful delete
-			await this.refresh();
+			// Remove from app.models
+			this.app.models.remove_by_name(model_name);
 		} catch (error) {
 			console.error(`[ollama] failed to delete model ${model_name}:`, error);
 			operation.complete_failure(error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE);
@@ -451,53 +347,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 		return operation.operation_id;
 	}
 
-	// TODO @many create model
-	// 	interface CreateRequest {
-	// 	model: string;
-	// 	from?: string;
-	// 	stream?: boolean;
-	// 	quantize?: string;
-	// 	template?: string;
-	// 	license?: string | string[];
-	// 	system?: string;
-	// 	parameters?: Record<string, unknown>;
-	// 	messages?: Message[];
-	// 	adapters?: Record<string, string>;
-	// }
-	/**
-	 * Create a new model from a Modelfile.
-	 */
-	// async create_model(model_name: string, partial: Partial<CreateRequest>): Promise<Uuid> {
-	// 	console.log(`[ollama] creating model: ${model_name}, from: ${partial.from || 'none'}`);
-
-	// 	const operation = this.#create_operation('create', {model: model_name});
-
-	// 	if (!BROWSER) return operation.operation_id;
-
-	// 	// Check if model already exists
-	// 	if (this.model_by_name.has(model_name)) {
-	// 		const error_message = `Model "${model_name}" already exists`;
-	// 		console.error(`[ollama] ${error_message}`);
-	// 		operation.complete_failure(error_message);
-	// 		return operation.operation_id;
-	// 	}
-
-	// 	try {
-	// 		// TODO stream
-	// 		const response = await ollama.create({...partial, model: model_name, stream: false});
-	// 		console.log(`[ollama] create model success for: ${model_name}`, response);
-
-	// 		operation.complete_success({type: 'create', data: response});
-
-	// 		// Refresh model list after successful create
-	// 		await this.refresh();
-	// 	} catch (error) {
-	// 		console.error(`[ollama] failed to create model ${model_name}:`, error);
-	// 		operation.complete_failure(error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE);
-	// 	}
-
-	// 	return operation.operation_id;
-	// }
+	// TODO implement `create_model`
 
 	/**
 	 * Clear completed operations from the history.
@@ -514,31 +364,31 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	 * Clear details for a specific model.
 	 */
 	clear_model_details(model_name: string): void {
-		const detail = this.model_details.get(model_name);
-		if (detail) {
-			detail.reset();
+		const model = this.app.models.find_by_name(model_name);
+		if (model && model.provider_name === 'ollama') {
+			model.ollama_details = undefined;
+			model.ollama_details_loaded = false;
+			model.ollama_details_error = undefined;
 		}
 	}
 
 	/**
-	 * Clear details for a specific model.
+	 * Clear and refresh details for a specific model.
 	 */
 	async refresh_model_details(model_name: string): Promise<void> {
 		this.clear_model_details(model_name);
 		await this.show_model(model_name);
 	}
 
-	clear_all_model_details(): void {
-		for (const detail of this.model_details.values()) {
-			detail.reset();
-		}
-	}
-
 	/**
-	 * Clear all model details cache.
+	 * Clear all model details.
 	 */
-	clear_model_details_cache(): void {
-		this.model_details.clear();
+	clear_all_model_details(): void {
+		for (const model of this.models) {
+			model.ollama_details = undefined;
+			model.ollama_details_loaded = false;
+			model.ollama_details_error = undefined;
+		}
 	}
 
 	// Private methods
@@ -566,5 +416,68 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 		if (!BROWSER) return;
 		// Update the global ollama instance configuration
 		(ollama as any).config = {host: this.host};
+	}
+
+	/**
+	 * Sync the list response with app.models
+	 */
+	#sync_models_with_list_response(response: ListResponse): void {
+		// Get current ollama models for comparison
+		const existing_models = new Map(this.models.map((m) => [m.name, m]));
+
+		// Update or add models
+		for (const model_response of response.models) {
+			const existing = existing_models.get(model_response.name);
+
+			if (existing) {
+				// Update existing model with fresh data
+				existing.filesize = model_response.size / (1024 * 1024 * 1024); // Convert bytes to GB
+				existing.ollama_list_data = {
+					name: model_response.name,
+					modified_at: model_response.modified_at as unknown as string, // TODO Ollama bug? or type issue,
+					size: model_response.size,
+					digest: model_response.digest,
+					details: model_response.details,
+				};
+				existing_models.delete(model_response.name);
+			} else {
+				// Add new model
+				this.app.models.add({
+					name: model_response.name,
+					provider_name: 'ollama',
+					filesize: model_response.size / (1024 * 1024 * 1024), // Convert bytes to GB
+					// Extract some info from details if available
+					parameter_count: this.#extract_parameter_count(model_response.details.parameter_size),
+					architecture: model_response.details.family,
+					ollama_list_data: {
+						name: model_response.name,
+						modified_at: model_response.modified_at as unknown as string, // TODO Ollama bug? or type issue,
+						size: model_response.size,
+						digest: model_response.digest,
+						details: model_response.details,
+					},
+				});
+			}
+		}
+
+		// Remove models that no longer exist in Ollama
+		for (const name of existing_models.keys()) {
+			this.app.models.remove_by_name(name);
+		}
+	}
+
+	/**
+	 * Extract parameter count from parameter size string like "7B", "13B", etc.
+	 */
+	#extract_parameter_count(parameter_size: string | undefined): number | undefined {
+		if (!parameter_size) return undefined;
+		const match = /^(\d+(?:\.\d+)?)[BM]?$/i.exec(parameter_size);
+		if (!match) return undefined;
+		const value = parseFloat(match[1]);
+		// If it ends with M, convert to billions
+		if (parameter_size.toUpperCase().endsWith('M')) {
+			return value / 1000;
+		}
+		return value;
 	}
 }

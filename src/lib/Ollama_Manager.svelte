@@ -15,7 +15,8 @@
 	// TODO @many create model
 	// import Ollama_Create_Model from '$lib/Ollama_Create_Model.svelte';
 	import Ollama_Copy_Model from '$lib/Ollama_Copy_Model.svelte';
-	import type {Ollama, Ollama_Model_Detail} from '$lib/ollama.svelte.js';
+	import type {Ollama} from '$lib/ollama.svelte.js';
+	import type {Model} from '$lib/model.svelte.js';
 
 	interface Props {
 		ollama: Ollama;
@@ -29,27 +30,27 @@
 
 	// TODO probably should use routes instead of internal state, but I want to see about using this as a snapshotting experiment
 
+	// TODO maybe put this into a viewmodel or just `ollama`?
 	let selected_view: 'configure' | 'model' | 'pull' | 'copy' = $state('configure');
-	let selected_model_detail: Ollama_Model_Detail | null = $state(null as any);
-	let last_active_view: {view: string; model_detail: Ollama_Model_Detail | null} | null =
-		$state(null);
+	let selected_model: Model | null = $state(null);
+	let last_active_view: {view: string; model: Model | null} | null = $state(null);
 
 	// Initial load when component mounts
 	onMount(() => {
 		void ollama.refresh();
 	});
 
-	const set_view = (view: typeof selected_view, model_detail?: Ollama_Model_Detail | null) => {
+	const set_view = (view: typeof selected_view, model?: Model | null) => {
 		// Store the previous view as the last active view if it's not 'configure'
 		if (selected_view !== 'configure' && selected_view !== view) {
 			last_active_view = {
 				view: selected_view,
-				model_detail: selected_model_detail,
+				model: selected_model,
 			};
 		}
 		selected_view = view;
-		if (model_detail !== undefined) {
-			selected_model_detail = model_detail;
+		if (model !== undefined) {
+			selected_model = model;
 		}
 	};
 
@@ -58,7 +59,7 @@
 			const view_to_restore = last_active_view;
 			last_active_view = null; // Clear history
 			selected_view = view_to_restore.view as typeof selected_view;
-			selected_model_detail = view_to_restore.model_detail;
+			selected_model = view_to_restore.model;
 		}
 	};
 
@@ -66,16 +67,16 @@
 		console.log(`[Ollama_Manager] deleting model: ${model_name}`);
 		await ollama.delete_model(model_name);
 		// Clear selection if the deleted model was selected
-		if (selected_model_detail?.model_name === model_name) {
+		if (selected_model?.name === model_name) {
 			set_view('configure', null);
 		}
 	};
 
-	const handle_select_model = async (model_detail: Ollama_Model_Detail) => {
-		set_view('model', model_detail);
+	const handle_select_model = async (model: Model) => {
+		set_view('model', model);
 		// Auto-load details if not already loaded
-		if (model_detail.show_status === 'initial') {
-			await ollama.show_model(model_detail.model_name);
+		if (model.needs_ollama_details) {
+			await ollama.show_model(model.name);
 		}
 	};
 
@@ -125,10 +126,10 @@
 								{/if}
 							</span>
 							<div class="font_family_mono font_size_sm">{ollama.host}</div>
-							{#if ollama.last_refreshed_from_now}
+							{#if ollama.last_refreshed}
 								<div class="font_size_sm">
 									{#if ollama.list_error}attempted{:else}refreshed{/if}
-									{ollama.last_refreshed_from_now}
+									{new Date(ollama.last_refreshed).toLocaleTimeString()}
 								</div>
 							{/if}
 						</div>
@@ -193,22 +194,19 @@
 					</h3>
 
 					<div class="column">
-						{#each ollama.models as model_detail (model_detail.model_name)}
+						{#each ollama.models as model (model.id)}
 							<button
 								type="button"
 								class="menu_item selectable plain text_align_start p_sm border_radius_0 font_weight_400"
-								class:selected={selected_view === 'model' &&
-									selected_model_detail?.model_name === model_detail.model_name}
-								onclick={() => handle_select_model(model_detail)}
+								class:selected={selected_view === 'model' && selected_model?.id === model.id}
+								onclick={() => handle_select_model(model)}
 							>
 								<div class="display_flex flex_column gap_xs w_100">
 									<div class="ellipsis font_size_lg">
-										{model_detail.model_name}
+										{model.name}
 									</div>
 									<div class="font_size_sm">
-										{model_detail.model_response
-											? Math.round(model_detail.model_response.size / (1024 * 1024))
-											: '?'} MB
+										{model.filesize ? Math.round(model.filesize) : '?'} GB
 									</div>
 								</div>
 							</button>
@@ -241,9 +239,9 @@
 				onshowpull={handle_show_pull}
 				onback={handle_back_to_last_view}
 			/>
-		{:else if selected_view === 'model' && selected_model_detail}
+		{:else if selected_view === 'model' && selected_model}
 			<Ollama_Model_Details
-				model_detail={selected_model_detail}
+				model={selected_model}
 				{ollama}
 				onclose={handle_close_form}
 				ondelete={handle_delete_model}

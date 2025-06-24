@@ -26,7 +26,7 @@
 
 	const {ollama, last_active_view, onshowpull, onback}: Props = $props();
 
-	const details_cache_size = $derived(ollama.model_details_with_cached_show.length);
+	const models_with_details = $derived(ollama.models.filter((m) => m.ollama_details_loaded));
 </script>
 
 <div class="panel p_md">
@@ -107,19 +107,17 @@
 					</div>
 				{/if}
 
-				{#if ollama.model_details.size > 0}
-					<div class="display_flex gap_sm" transition:slide>
-						<button
-							type="button"
-							class="plain"
-							onclick={() => ollama.clear_all_model_details()}
-							title="clear all cached model details"
-							disabled={details_cache_size === 0}
-						>
-							<Glyph glyph={GLYPH_CLEAR} />&nbsp; clear details cache {#if details_cache_size}({details_cache_size}){/if}
-						</button>
-					</div>
-				{/if}
+				<div class="display_flex gap_sm">
+					<button
+						type="button"
+						class="plain"
+						onclick={() => ollama.clear_all_model_details()}
+						title="clear all cached model details"
+						disabled={models_with_details.length === 0}
+					>
+						<Glyph glyph={GLYPH_CLEAR} />&nbsp; clear details cache {#if models_with_details.length}({models_with_details.length}){/if}
+					</button>
+				</div>
 			</div>
 
 			{#if ollama.list_error}

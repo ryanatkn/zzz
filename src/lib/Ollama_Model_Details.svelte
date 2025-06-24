@@ -4,59 +4,40 @@
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
 
 	import Glyph from '$lib/Glyph.svelte';
-	import {GLYPH_REFRESH, GLYPH_MODEL, GLYPH_DELETE, GLYPH_CANCEL} from '$lib/glyphs.js';
-	import type {Ollama_Model_Detail, Ollama} from '$lib/ollama.svelte.js';
+	import {GLYPH_REFRESH, GLYPH_DELETE, GLYPH_CANCEL} from '$lib/glyphs.js';
+	import type {Model} from '$lib/model.svelte.js';
+	import type {Ollama} from '$lib/ollama.svelte.js';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Model_Link from '$lib/Model_Link.svelte';
-	import {frontend_context} from '$lib/frontend.svelte.js';
 	import {format_short_date} from './time_helpers.js';
 
 	interface Props {
-		model_detail: Ollama_Model_Detail;
+		model: Model;
 		ollama: Ollama;
 		onclose?: () => void;
 		ondelete?: (model_name: string) => void;
 	}
 
-	const {model_detail, ollama, onclose, ondelete}: Props = $props();
-
-	const app = frontend_context.get();
-
-	const model = $derived(app.models.find_by_name(model_detail.model_name));
+	const {model, ollama, onclose, ondelete}: Props = $props();
 
 	const load_model_details = async () => {
-		await ollama.show_model(model_detail.model_name);
+		await ollama.show_model(model.name);
 	};
 
-	// Format model info for display
-	const format_model_info = (info: Record<string, any>) => {
-		const entries = Object.entries(info);
-		return entries.map(([key, value]) => {
-			if (typeof value === 'object' && value !== null) {
-				return `${key}: ${JSON.stringify(value, null, 2)}`;
-			}
-			return `${key}: ${value}`;
-		});
-	};
+	// TODO refactor with `Model_Detail`?
 </script>
 
 <div class="panel p_md">
 	<header class="display_flex justify_content_space_between mb_md">
 		<div class="display_flex flex_column gap_xs">
 			<h3 class="mt_0 mb_0 font_family_mono">
-				{#if model}
-					<Model_Link {model} icon />
-				{:else}
-					<Glyph glyph={GLYPH_MODEL} /> {model_detail.model_name}
-				{/if}
+				<Model_Link {model} icon />
 			</h3>
 			<div>
-				{model_detail.model_response
-					? Math.round(model_detail.model_response.size / (1024 * 1024))
-					: '?'} MB
+				{model.filesize ? Math.round(model.filesize) : '?'} GB
 			</div>
 			<div class="font_family_mono">
-				modified {format_short_date(model_detail.model_response?.modified_at) || '--'}
+				modified {format_short_date(model.ollama_modified_at) || '--'}
 			</div>
 		</div>
 
@@ -70,11 +51,11 @@
 	<section class="display_flex gap_sm mb_md">
 		{#if ondelete}
 			<Confirm_Button
-				onconfirm={() => ondelete(model_detail.model_name)}
+				onconfirm={() => ondelete(model.name)}
 				position="right"
 				attrs={{
 					class: 'plain color_c',
-					title: `delete ${model_detail.model_name}`,
+					title: `delete ${model.name}`,
 				}}
 			>
 				<Glyph glyph={GLYPH_DELETE} />&nbsp; delete model
@@ -86,7 +67,7 @@
 						title="confirm delete"
 						onclick={() => {
 							// TODO async confirmation
-							ondelete(model_detail.model_name);
+							ondelete(model.name);
 							popover.hide();
 						}}
 					>
@@ -96,16 +77,16 @@
 			</Confirm_Button>
 		{/if}
 
-		{#if model_detail.has_details}
+		{#if model.ollama_details_loaded}
 			<button
 				type="button"
 				class="plain"
 				title="clear cache and reload details"
-				onclick={() => ollama.refresh_model_details(model_detail.model_name)}
+				onclick={() => ollama.refresh_model_details(model.name)}
 			>
 				<Glyph glyph={GLYPH_REFRESH} />&nbsp; reload details
 			</button>
-		{:else if model_detail.show_status === 'initial'}
+		{:else if model.needs_ollama_details}
 			<div class="display_flex gap_sm align_items_center">
 				<button
 					type="button"
@@ -119,15 +100,15 @@
 		{/if}
 	</section>
 
-	{#if model_detail.show_status === 'pending'}
+	{#if model.ollama_details_loading}
 		<section class="display_flex gap_sm align_items_center">
 			<Pending_Animation />
 			<span class="font_size_sm">loading model details...</span>
 		</section>
-	{:else if model_detail.show_status === 'failure'}
+	{:else if model.ollama_details_error}
 		<section class="display_flex flex_column gap_sm">
 			<div class="color_c font_size_sm">
-				failed to load details: {model_detail.show_error || 'unknown error'}
+				failed to load details: {model.ollama_details_error}
 			</div>
 			<button
 				type="button"
@@ -138,81 +119,81 @@
 				<Glyph glyph={GLYPH_REFRESH} />
 			</button>
 		</section>
-	{:else if model_detail.show_response}
+	{:else if model.ollama_details}
 		<section class="display_flex flex_column gap_md">
 			<!-- Basic Info -->
-			<div class="display_grid gap_sm" style:grid-template-columns="auto 1fr">
-				<span class="font_weight_600">family:</span>
-				<span class="font_family_mono">{model_detail.show_response.details.family}</span>
+			{#if model.ollama_details.details}
+				<div class="display_grid gap_sm" style:grid-template-columns="auto 1fr">
+					<span class="font_weight_600">family:</span>
+					<span class="font_family_mono">{model.ollama_details.details.family}</span>
 
-				<span class="font_weight_600">format:</span>
-				<span class="font_family_mono">{model_detail.show_response.details.format}</span>
+					<span class="font_weight_600">format:</span>
+					<span class="font_family_mono">{model.ollama_details.details.format}</span>
 
-				<span class="font_weight_600">parameters:</span>
-				<span class="font_family_mono">
-					{model_detail.show_response.details.parameter_size}
-				</span>
+					<span class="font_weight_600">parameters:</span>
+					<span class="font_family_mono">
+						{model.ollama_details.details.parameter_size}
+					</span>
 
-				<span class="font_weight_600">quantization:</span>
-				<span class="font_family_mono">
-					{model_detail.show_response.details.quantization_level}
-				</span>
+					<span class="font_weight_600">quantization:</span>
+					<span class="font_family_mono">
+						{model.ollama_details.details.quantization_level}
+					</span>
 
-				{#if model_detail.show_response.details.parent_model}
-					<span class="font_weight_600">Parent:</span>
-					<span class="font_family_mono">{model_detail.show_response.details.parent_model}</span>
-				{/if}
-			</div>
+					{#if model.ollama_details.details.parent_model}
+						<span class="font_weight_600">parent:</span>
+						<span class="font_family_mono">{model.ollama_details.details.parent_model}</span>
+					{/if}
+				</div>
+			{/if}
 
 			<!-- System Prompt -->
-			{#if model_detail.show_response.system}
+			{#if model.ollama_details.system}
 				<div>
 					<h5 class="mt_0 mb_xs font_weight_600">system prompt:</h5>
 					<pre
 						class="font_size_sm bg_2 p_sm border_radius_xs overflow_auto"
-						style:max-height="200px">{model_detail.show_response.system}</pre>
+						style:max-height="200px">{model.ollama_details.system}</pre>
 				</div>
 			{/if}
 
 			<!-- Template -->
-			{#if model_detail.show_response.template}
+			{#if model.ollama_details.template}
 				<div>
 					<h5 class="mt_0 mb_xs font_weight_600">template:</h5>
 					<pre
 						class="font_size_sm bg_2 p_sm border_radius_xs overflow_auto"
-						style:max-height="200px">{model_detail.show_response.template}</pre>
+						style:max-height="200px">{model.ollama_details.template}</pre>
 				</div>
 			{/if}
 
 			<!-- Model Info -->
-			{#if model_detail.show_response.model_info instanceof Map && model_detail.show_response.model_info.size > 0}
+			{#if model.ollama_details.model_info && Object.keys(model.ollama_details.model_info).length > 0}
 				<div>
 					<h5 class="mt_0 mb_xs font_weight_600">model info:</h5>
 					<pre
 						class="font_size_sm bg_2 p_sm border_radius_xs overflow_auto"
-						style:max-height="300px">{format_model_info(model_detail.show_response.model_info).join(
-							'\n',
-						)}</pre>
+						style:max-height="300px">{JSON.stringify(model.ollama_details, null, '\t')}</pre>
 				</div>
 			{/if}
 
 			<!-- License -->
-			{#if model_detail.show_response.license}
+			{#if model.ollama_details.license}
 				<div>
 					<h5 class="mt_0 mb_xs font_weight_600">license:</h5>
 					<pre
 						class="font_size_sm bg_2 p_sm border_radius_xs overflow_auto"
-						style:max-height="200px">{model_detail.show_response.license}</pre>
+						style:max-height="200px">{model.ollama_details.license}</pre>
 				</div>
 			{/if}
 
 			<!-- Modelfile -->
-			{#if model_detail.show_response.modelfile}
+			{#if model.ollama_details.modelfile}
 				<div>
 					<h5 class="mt_0 mb_xs font_weight_600">modelfile:</h5>
 					<pre
 						class="font_size_sm bg_2 p_sm border_radius_xs overflow_auto"
-						style:max-height="300px">{model_detail.show_response.modelfile}</pre>
+						style:max-height="300px">{model.ollama_details.modelfile}</pre>
 				</div>
 			{/if}
 		</section>
