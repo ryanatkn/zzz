@@ -51,7 +51,7 @@ export class Time extends Cell<typeof Time_Json> {
 	 */
 	readonly now: SvelteDate = new SvelteDate();
 	readonly now_ms: number = $derived(this.now.getTime());
-	readonly now_timestamp = $derived(format_timestamp(this.now_ms));
+	readonly now_timestamp = $derived(format_timestamp(this.now));
 	readonly now_formatted_short_date: string = $derived(format_short_date(this.now));
 	readonly now_formatted_datetime: string = $derived(format_datetime(this.now));
 	readonly now_formatted_time: string = $derived(format_time(this.now));

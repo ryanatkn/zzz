@@ -238,7 +238,7 @@
 		{:else if selected_view === 'pull'}
 			<Ollama_Pull_Model {ollama} onclose={handle_close_form} />
 		{:else if selected_view === 'create'}
-			<Ollama_Create_Model {ollama} onclose={handle_close_form} />
+			<Ollama_Create_Model {ollama} onclose={handle_close_form} onshowpull={handle_show_pull} />
 		{:else if selected_view === 'copy'}
 			<Ollama_Copy_Model {ollama} onclose={handle_close_form} />
 		{/if}

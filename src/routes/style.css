@@ -344,6 +344,9 @@ button.menu_item.plain {
 button.menu_item.selected.plain {
 	--button_text_color: var(--text_color_2);
 }
+button.menu_item.plain:hover:not(.selected) {
+	background-color: var(--bg_6);
+}
 
 /* TODO hacky, is like `.pane` but softer and without the semantics for dialogs, maybe these styles should replace .pane upstream? */
 .floating {

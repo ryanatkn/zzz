@@ -8,9 +8,10 @@
 	interface Props {
 		ollama: Ollama;
 		onclose: () => void;
+		onshowpull: () => void;
 	}
 
-	const {ollama, onclose}: Props = $props();
+	const {ollama, onclose, onshowpull}: Props = $props();
 
 	let model_name = $state('');
 	let from_model = $state('');
@@ -73,10 +74,11 @@
 		</button>
 	</header>
 	<p>
-		This creates a custom model, to get one the normal way to go <button
+		This creates a new custom modelfile, to get a builtin model see <button
 			type="button"
-			class="inline compact">pull model</button
-		>
+			class="inline compact"
+			onclick={onshowpull}>pull model</button
+		>.
 	</p>
 
 	<div class="width_md display_flex flex_column gap_md">
