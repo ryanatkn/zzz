@@ -26,30 +26,18 @@
 	);
 	const can_create = $derived(parsed_model_name && !is_duplicate_name);
 
-	// TODO BLOCK is this correct? ` or leave empty for a completely new model`
+	// Users can create custom models with optional base model, system prompt, and template
 
 	const handle_create = async () => {
 		if (!can_create) return;
 
 		is_creating = true;
 		try {
-			// Build a simple Modelfile if we have custom prompts
-			let modelfile = '';
-			if (from_model) {
-				modelfile += `FROM ${from_model}\n`;
-			}
-			if (system_prompt.trim()) {
-				modelfile += `SYSTEM ${system_prompt.trim()}\n`;
-			}
-			if (template.trim()) {
-				modelfile += `TEMPLATE ${template.trim()}\n`;
-			}
-
-			await ollama.create_model(
-				parsed_model_name,
-				from_model.trim() || undefined,
-				modelfile || undefined,
-			);
+			await ollama.create_model(parsed_model_name, {
+				from: from_model.trim() || undefined,
+				system: system_prompt.trim() || undefined,
+				template: template.trim() || undefined,
+			});
 
 			// Reset form
 			model_name = '';
@@ -80,15 +68,16 @@
 			<Glyph glyph={GLYPH_CANCEL} />
 		</button>
 	</header>
-	<p>
-		This creates a new custom modelfile, to download a builtin model see <button
-			type="button"
-			class="inline compact"
-			onclick={onshowpull}>pull model</button
-		>.
-	</p>
 
-	<div class="width_md display_flex flex_column gap_md">
+	<section class="width_md display_flex flex_column gap_md">
+		<p>
+			This creates a new custom modelfile, to download a builtin model see <button
+				type="button"
+				class="inline compact"
+				onclick={onshowpull}>pull model</button
+			>.
+		</p>
+
 		<fieldset>
 			<label>
 				<div class="title mb_xs">new model name</div>
@@ -144,7 +133,7 @@
 		<fieldset>
 			<label>
 				<div class="title mb_xs">template (optional)</div>
-				<!-- TODO fix this placeholder -->
+				<!-- Custom template using Ollama template syntax -->
 				<textarea
 					class="plain w_100"
 					rows="3"
@@ -172,5 +161,5 @@
 		{#if is_duplicate_name}
 			<Error_Message>a model with this name already exists</Error_Message>
 		{/if}
-	</div>
+	</section>
 </div>

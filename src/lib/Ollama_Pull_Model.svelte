@@ -33,7 +33,7 @@
 
 		is_pulling = true;
 		try {
-			await ollama.pull_model(parsed_model_name, insecure);
+			await ollama.pull_model(parsed_model_name, {insecure});
 			model_name = '';
 			onclose();
 		} catch (error) {
@@ -80,7 +80,7 @@
 					href="https://ollama.com/library"
 					target="_blank"
 					rel="noopener noreferrer">Ollama library</a
-				>
+				>.
 			</p>
 			{#if available_small_recommended_models.length > 0}
 				<p>Here are some small recommended models:</p>

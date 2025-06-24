@@ -228,6 +228,7 @@
 			<Ollama_Configure
 				{ollama}
 				last_active_view={last_active_view?.view ?? null}
+				onshowpull={handle_show_pull}
 				onback={handle_back_to_last_view}
 			/>
 		{:else if selected_view === 'model' && selected_model_detail}

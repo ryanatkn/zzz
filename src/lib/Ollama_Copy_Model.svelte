@@ -17,7 +17,6 @@
 	let destination_model = $state('');
 	let is_copying = $state(false);
 
-
 	const parsed_source_model = $derived(source_model.trim());
 	const parsed_destination_model = $derived(destination_model.trim());
 
@@ -66,7 +65,7 @@
 		</button>
 	</header>
 
-	<div class="width_md display_flex flex_column gap_md">
+	<section class="width_md display_flex flex_column gap_md">
 		<fieldset>
 			<label>
 				<div class="title mb_xs">source model</div>
@@ -121,5 +120,5 @@
 		{#if is_duplicate_name}
 			<Error_Message>a model with this name already exists</Error_Message>
 		{/if}
-	</div>
+	</section>
 </div>

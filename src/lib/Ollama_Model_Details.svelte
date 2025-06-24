@@ -41,7 +41,7 @@
 </script>
 
 <div class="panel p_md">
-	<div class="display_flex justify_content_space_between mb_md">
+	<header class="display_flex justify_content_space_between mb_md">
 		<div class="display_flex flex_column gap_xs">
 			<h3 class="mt_0 mb_0 font_family_mono">
 				{#if model}
@@ -65,10 +65,10 @@
 				<Glyph glyph={GLYPH_CANCEL} />
 			</button>
 		{/if}
-	</div>
+	</header>
 
-	{#if ondelete}
-		<div class="display_flex gap_sm mb_md">
+	<section class="display_flex gap_sm mb_md">
+		{#if ondelete}
 			<Confirm_Button
 				onconfirm={() => ondelete(model_detail.model_name)}
 				position="right"
@@ -94,38 +94,38 @@
 					</button>
 				{/snippet}
 			</Confirm_Button>
+		{/if}
 
-			{#if model_detail.has_details}
+		{#if model_detail.has_details}
+			<button
+				type="button"
+				class="plain"
+				title="clear cache and reload details"
+				onclick={() => ollama.refresh_model_details(model_detail.model_name)}
+			>
+				<Glyph glyph={GLYPH_REFRESH} />&nbsp; reload details
+			</button>
+		{:else if model_detail.show_status === 'initial'}
+			<div class="display_flex gap_sm align_items_center">
 				<button
 					type="button"
 					class="plain"
-					title="clear cache and reload details"
-					onclick={() => ollama.refresh_model_details(model_detail.model_name)}
+					onclick={() => load_model_details()}
+					title="load model details"
 				>
-					<Glyph glyph={GLYPH_REFRESH} />&nbsp; reload details
+					<Glyph glyph={GLYPH_REFRESH} />&nbsp; load details
 				</button>
-			{:else if model_detail.show_status === 'initial'}
-				<div class="display_flex gap_sm align_items_center">
-					<button
-						type="button"
-						class="plain"
-						onclick={() => load_model_details()}
-						title="load model details"
-					>
-						<Glyph glyph={GLYPH_REFRESH} />&nbsp; load details
-					</button>
-				</div>
-			{/if}
-		</div>
-	{/if}
+			</div>
+		{/if}
+	</section>
 
 	{#if model_detail.show_status === 'pending'}
-		<div class="display_flex gap_sm align_items_center">
+		<section class="display_flex gap_sm align_items_center">
 			<Pending_Animation />
 			<span class="font_size_sm">loading model details...</span>
-		</div>
+		</section>
 	{:else if model_detail.show_status === 'failure'}
-		<div class="display_flex flex_column gap_sm">
+		<section class="display_flex flex_column gap_sm">
 			<div class="color_c font_size_sm">
 				failed to load details: {model_detail.show_error || 'unknown error'}
 			</div>
@@ -137,9 +137,9 @@
 			>
 				<Glyph glyph={GLYPH_REFRESH} />
 			</button>
-		</div>
+		</section>
 	{:else if model_detail.show_response}
-		<div class="display_flex flex_column gap_md">
+		<section class="display_flex flex_column gap_md">
 			<!-- Basic Info -->
 			<div class="display_grid gap_sm" style:grid-template-columns="auto 1fr">
 				<span class="font_weight_600">family:</span>
@@ -215,6 +215,6 @@
 						style:max-height="300px">{model_detail.show_response.modelfile}</pre>
 				</div>
 			{/if}
-		</div>
+		</section>
 	{/if}
 </div>

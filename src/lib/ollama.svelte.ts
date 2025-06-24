@@ -4,7 +4,14 @@ import {z} from 'zod';
 import {SvelteMap} from 'svelte/reactivity';
 import type {Async_Status} from '@ryanatkn/belt/async.js';
 import {BROWSER} from 'esm-env';
-import ollama, {type ListResponse, type ModelResponse, type ShowResponse} from 'ollama/browser';
+import ollama, {
+	type ListResponse,
+	type ModelResponse,
+	type ShowResponse,
+	type ProgressResponse,
+	type StatusResponse,
+	type DeleteRequest,
+} from 'ollama/browser';
 import {formatDistance} from 'date-fns';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
@@ -31,6 +38,17 @@ export const Ollama_Operation_Type = z.enum(['pull', 'create', 'delete', 'copy',
 export type Ollama_Operation_Type = z.infer<typeof Ollama_Operation_Type>;
 
 /**
+ * Union type for all possible operation results
+ */
+export type Ollama_Operation_Result =
+	| {type: 'list'; data: ListResponse}
+	| {type: 'show'; data: ShowResponse}
+	| {type: 'pull'; data: ProgressResponse}
+	| {type: 'create'; data: ProgressResponse}
+	| {type: 'delete'; data: StatusResponse}
+	| {type: 'copy'; data: StatusResponse};
+
+/**
  * Cell class for tracking individual Ollama operations
  */
 export const Ollama_Operation_Json = Cell_Json.extend({
@@ -40,7 +58,7 @@ export const Ollama_Operation_Json = Cell_Json.extend({
 	model: z.string().optional(),
 	progress: z.number().min(0).max(100).optional(),
 	error_message: z.string().optional(),
-	result: z.any().optional(),
+	result: z.any().optional(), // TODO use discriminated union
 });
 export type Ollama_Operation_Json = z.infer<typeof Ollama_Operation_Json>;
 export type Ollama_Operation_Json_Input = z.input<typeof Ollama_Operation_Json>;
@@ -54,16 +72,16 @@ export class Ollama_Operation extends Cell<typeof Ollama_Operation_Json> {
 	model: string | undefined = $state();
 	progress: number | undefined = $state();
 	error_message: string | undefined = $state();
-	result: any = $state();
+	result: Ollama_Operation_Result | null = $state(null);
 
 	constructor(options: Ollama_Operation_Options) {
 		super(Ollama_Operation_Json, options);
 		this.init();
 	}
 
-	complete_success(result?: any): void {
+	complete_success(result?: Ollama_Operation_Result): void {
 		this.status = 'success';
-		this.result = result;
+		this.result = result || null;
 		this.updated = get_datetime_now();
 	}
 
@@ -268,7 +286,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 			this.list_status = 'success';
 			this.list_last_updated = Date.now();
 
-			operation.complete_success(response);
+			operation.complete_success({type: 'list', data: response});
 
 			// Ensure model details exist for all models and update existing ones
 			for (const model_response of response.models) {
@@ -308,9 +326,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 
 		console.log(`[ollama] showing model details for: ${model_name}`);
 
-		const operation = this.#create_operation('show', {
-			model: model_name,
-		});
+		const operation = this.#create_operation('show', {model: model_name});
 
 		let detail = this.model_details.get(model_name);
 		if (!detail) {
@@ -331,7 +347,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 			console.log(`[ollama] show model success for: ${model_name}`, response);
 
 			detail.complete_loading(response);
-			operation.complete_success(response);
+			operation.complete_success({type: 'show', data: response});
 
 			return response;
 		} catch (error) {
@@ -348,21 +364,19 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	/**
 	 * Pull a model from the Ollama registry.
 	 */
-	async pull_model(model_name: string, insecure = false): Promise<Uuid> {
+	async pull_model(model_name: string, partial: Partial<PullRequest>): Promise<Uuid> {
+		const insecure = partial.insecure || false;
 		console.log(`[ollama] pulling model: ${model_name}, insecure: ${insecure}`);
 
-		const operation = this.#create_operation('pull', {
-			model: model_name,
-			progress: 0,
-		});
+		const operation = this.#create_operation('pull', {model: model_name, progress: 0});
 
 		if (!BROWSER) return operation.operation_id;
 
 		try {
-			const response = await ollama.pull({model: model_name, insecure, stream: false});
+			const response = await ollama.pull({...partial, insecure, model: model_name, stream: false});
 			console.log(`[ollama] pull model success for: ${model_name}`, response);
 
-			operation.complete_success(response);
+			operation.complete_success({type: 'pull', data: response});
 
 			// Refresh model list after successful pull
 			await this.refresh();
@@ -377,20 +391,18 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	/**
 	 * Delete a model from the Ollama server.
 	 */
-	async delete_model(model_name: string): Promise<Uuid> {
+	async delete_model(model_name: string, partial?: Partial<DeleteRequest>): Promise<Uuid> {
 		console.log(`[ollama] deleting model: ${model_name}`);
 
-		const operation = this.#create_operation('delete', {
-			model: model_name,
-		});
+		const operation = this.#create_operation('delete', {model: model_name});
 
 		if (!BROWSER) return operation.operation_id;
 
 		try {
-			const response = await ollama.delete({model: model_name});
+			const response = await ollama.delete({...partial, model: model_name});
 			console.log(`[ollama] delete model success for: ${model_name}`, response);
 
-			operation.complete_success(response);
+			operation.complete_success({type: 'delete', data: response});
 
 			// Remove from model details cache
 			this.model_details.delete(model_name);
@@ -411,9 +423,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	async copy_model(source: string, destination: string): Promise<Uuid> {
 		console.log(`[ollama] copying model: ${source} → ${destination}`);
 
-		const operation = this.#create_operation('copy', {
-			model: `${source} → ${destination}`,
-		});
+		const operation = this.#create_operation('copy', {model: `${source} → ${destination}`});
 
 		if (!BROWSER) return operation.operation_id;
 
@@ -429,7 +439,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 			const response = await ollama.copy({source, destination});
 			console.log(`[ollama] copy model success: ${source} → ${destination}`, response);
 
-			operation.complete_success(response);
+			operation.complete_success({type: 'copy', data: response});
 
 			// Refresh model list after successful copy
 			await this.refresh();
@@ -444,37 +454,32 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	/**
 	 * Create a new model from a Modelfile.
 	 */
-	async create_model(name: string, from?: string, modelfile?: string): Promise<Uuid> {
-		console.log(`[ollama] creating model: ${name}, from: ${from || 'none'}`);
+	async create_model(model_name: string, partial: Partial<CreateRequest>): Promise<Uuid> {
+		console.log(`[ollama] creating model: ${model_name}, from: ${partial.from || 'none'}`);
 
-		const operation = this.#create_operation('create', {
-			model: name,
-		});
+		const operation = this.#create_operation('create', {model: model_name});
 
 		if (!BROWSER) return operation.operation_id;
 
 		// Check if model already exists
-		if (this.model_by_name.has(name)) {
-			const error_message = `Model "${name}" already exists`;
+		if (this.model_by_name.has(model_name)) {
+			const error_message = `Model "${model_name}" already exists`;
 			console.error(`[ollama] ${error_message}`);
 			operation.complete_failure(error_message);
 			return operation.operation_id;
 		}
 
 		try {
-			const create_request: any = {name, stream: false};
-			if (from) create_request.from = from;
-			if (modelfile) create_request.modelfile = modelfile;
+			// TODO stream
+			const response = await ollama.create({...partial, model: model_name, stream: false});
+			console.log(`[ollama] create model success for: ${model_name}`, response);
 
-			const response = await ollama.create(create_request);
-			console.log(`[ollama] create model success for: ${name}`, response);
-
-			operation.complete_success(response);
+			operation.complete_success({type: 'create', data: response});
 
 			// Refresh model list after successful create
 			await this.refresh();
 		} catch (error) {
-			console.error(`[ollama] failed to create model ${name}:`, error);
+			console.error(`[ollama] failed to create model ${model_name}:`, error);
 			operation.complete_failure(error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE);
 		}
 

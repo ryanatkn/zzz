@@ -20,10 +20,11 @@
 	interface Props {
 		ollama: Ollama;
 		last_active_view: string | null;
+		onshowpull: () => void;
 		onback?: () => void;
 	}
 
-	const {ollama, last_active_view, onback}: Props = $props();
+	const {ollama, last_active_view, onshowpull, onback}: Props = $props();
 
 	const details_cache_size = $derived(ollama.model_details_with_cached_show.length);
 </script>
@@ -45,7 +46,15 @@
 		{/if}
 	</header>
 
-	<div class="width_md display_flex flex_column gap_lg">
+	<section class="width_md display_flex flex_column gap_lg">
+		<p>
+			Ollama is a local model provider. To get started see <button
+				type="button"
+				class="inline compact"
+				onclick={onshowpull}>pull model</button
+			>.
+		</p>
+
 		<!-- Host Configuration -->
 		<div class="display_flex flex_column gap_md">
 			<fieldset>
@@ -122,5 +131,5 @@
 		{#if ollama.pending_operations.length > 0 || ollama.completed_operations.length > 0}
 			<Ollama_Operations {ollama} />
 		{/if}
-	</div>
+	</section>
 </div>
