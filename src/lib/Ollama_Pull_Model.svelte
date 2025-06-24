@@ -41,14 +41,14 @@
 </script>
 
 <div class="panel p_md">
-	<div class="display_flex justify_content_space_between align_items_center mb_md">
+	<header class="display_flex justify_content_space_between align_items_center mb_md">
 		<h3 class="mt_0 mb_0">
 			<Glyph glyph={GLYPH_DOWNLOAD} /> pull model
 		</h3>
 		<button type="button" class="icon_button plain" onclick={onclose} title="close">
 			<Glyph glyph={GLYPH_CANCEL} />
 		</button>
-	</div>
+	</header>
 
 	<div class="width_md display_flex flex_column gap_md">
 		<fieldset>

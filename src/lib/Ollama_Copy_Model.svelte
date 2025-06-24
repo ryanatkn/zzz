@@ -46,55 +46,52 @@
 </script>
 
 <div class="panel p_md">
-	<div class="display_flex justify_content_space_between align_items_center mb_md">
+	<header class="display_flex justify_content_space_between align_items_center mb_md">
 		<h3 class="mt_0 mb_0">
 			<Glyph glyph={GLYPH_COPY} /> copy model
 		</h3>
 		<button type="button" class="icon_button plain" onclick={onclose} title="close">
 			<Glyph glyph={GLYPH_CANCEL} />
 		</button>
-	</div>
+	</header>
 
 	<div class="width_md display_flex flex_column gap_md">
 		<fieldset>
-			<label for="source_model" class="display_block mb_xs">source model</label>
-			{#if available_models.length > 0}
-				<select
-					id="source_model"
-					class="plain w_100"
-					bind:value={source_model}
-					disabled={is_copying}
-				>
-					<option value="">-- select source model --</option>
-					{#each available_models as model_name (model_name)}
-						<option value={model_name}>{model_name}</option>
-					{/each}
-				</select>
-			{:else}
-				<input
-					id="source_model"
-					type="text"
-					class="plain w_100"
-					placeholder="{GLYPH_PLACEHOLDER} source model name"
-					bind:value={source_model}
-					onkeydown={handle_keydown}
-					disabled={is_copying}
-				/>
-			{/if}
+			<label>
+				<div class="title mb_xs">source model</div>
+				{#if available_models.length > 0}
+					<select class="plain w_100" bind:value={source_model} disabled={is_copying}>
+						<option value="">-- select source model --</option>
+						{#each available_models as model_name (model_name)}
+							<option value={model_name}>{model_name}</option>
+						{/each}
+					</select>
+				{:else}
+					<input
+						type="text"
+						class="plain w_100"
+						placeholder="{GLYPH_PLACEHOLDER} source model name"
+						bind:value={source_model}
+						onkeydown={handle_keydown}
+						disabled={is_copying}
+					/>
+				{/if}
+			</label>
 		</fieldset>
 
 		<fieldset>
-			<label for="destination_model" class="display_block mb_xs">destination model name</label>
-			<input
-				id="destination_model"
-				type="text"
-				class="plain w_100"
-				placeholder="{GLYPH_PLACEHOLDER} new model name"
-				bind:value={destination_model}
-				onkeydown={handle_keydown}
-				disabled={is_copying}
-			/>
-			<small> Create a copy of the source model with a new name </small>
+			<label>
+				<div class="title mb_xs">destination model name</div>
+				<input
+					type="text"
+					class="plain w_100"
+					placeholder="{GLYPH_PLACEHOLDER} new model name"
+					bind:value={destination_model}
+					onkeydown={handle_keydown}
+					disabled={is_copying}
+				/>
+			</label>
+			<p>Create a copy of the source model with a new name</p>
 		</fieldset>
 
 		<div class="display_flex gap_md">

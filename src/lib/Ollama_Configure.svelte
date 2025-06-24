@@ -29,7 +29,7 @@
 </script>
 
 <div class="panel p_md">
-	<div class="display_flex justify_content_space_between align_items_center mb_md">
+	<header class="display_flex justify_content_space_between align_items_center mb_md">
 		<h3 class="mt_0 mb_0">
 			<Glyph glyph={GLYPH_SETTINGS} /> configure
 		</h3>
@@ -43,21 +43,22 @@
 				<Glyph glyph={GLYPH_ARROW_LEFT} />
 			</button>
 		{/if}
-	</div>
+	</header>
 
 	<div class="width_md display_flex flex_column gap_lg">
 		<!-- Host Configuration -->
 		<div class="display_flex flex_column gap_md">
 			<fieldset>
-				<label for="ollama_host" class="display_block mb_xs">Ollama host url</label>
-				<input
-					id="ollama_host"
-					type="text"
-					class="plain flex_1"
-					placeholder="{GLYPH_PLACEHOLDER} {OLLAMA_URL}"
-					bind:value={ollama.host}
-					oninput={() => ollama.refresh()}
-				/>
+				<label>
+					<div class="title mb_xs">Ollama host url</div>
+					<input
+						type="text"
+						class="plain flex_1"
+						placeholder="{GLYPH_PLACEHOLDER} {OLLAMA_URL}"
+						bind:value={ollama.host}
+						oninput={() => ollama.refresh()}
+					/>
+				</label>
 			</fieldset>
 
 			<div class="row gap_xs">

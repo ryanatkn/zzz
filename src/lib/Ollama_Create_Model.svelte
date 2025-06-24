@@ -64,77 +64,87 @@
 </script>
 
 <div class="panel p_md">
-	<div class="display_flex justify_content_space_between align_items_center mb_md">
+	<header class="display_flex justify_content_space_between align_items_center mb_md">
 		<h3 class="mt_0 mb_0">
 			<Glyph glyph={GLYPH_ADD} /> create model
 		</h3>
 		<button type="button" class="icon_button plain" onclick={onclose} title="close">
 			<Glyph glyph={GLYPH_CANCEL} />
 		</button>
-	</div>
+	</header>
+	<p>
+		This creates a custom model, to get one the normal way to go <button
+			type="button"
+			class="inline compact">pull model</button
+		>
+	</p>
 
 	<div class="width_md display_flex flex_column gap_md">
 		<fieldset>
-			<label for="new_model_name" class="display_block mb_xs">new model name</label>
-			<input
-				id="new_model_name"
-				type="text"
-				class="plain w_100"
-				placeholder="{GLYPH_PLACEHOLDER} my-custom-model"
-				bind:value={model_name}
-				onkeydown={handle_keydown}
-				disabled={is_creating}
-			/>
-		</fieldset>
-
-		<fieldset>
-			<label for="from_model" class="display_block mb_xs">base model (optional)</label>
-			{#if available_models.length > 0}
-				<select id="from_model" class="plain w_100" bind:value={from_model} disabled={is_creating}>
-					<option value="">-- select base model --</option>
-					{#each available_models as model_name (model_name)}
-						<option value={model_name}>{model_name}</option>
-					{/each}
-				</select>
-			{:else}
+			<label>
+				<div class="title mb_xs">new model name</div>
 				<input
-					id="from_model"
 					type="text"
 					class="plain w_100"
-					placeholder="{GLYPH_PLACEHOLDER} base model name"
-					bind:value={from_model}
+					placeholder="{GLYPH_PLACEHOLDER} my-custom-model"
+					bind:value={model_name}
 					onkeydown={handle_keydown}
 					disabled={is_creating}
 				/>
-			{/if}
-			<small> Choose a base model to customize, or leave empty for a completely new model </small>
+			</label>
 		</fieldset>
 
 		<fieldset>
-			<label for="system_prompt" class="display_block mb_xs">system prompt (optional)</label>
-			<textarea
-				id="system_prompt"
-				class="plain w_100"
-				rows="4"
-				placeholder="{GLYPH_PLACEHOLDER} You are a helpful assistant..."
-				bind:value={system_prompt}
-				disabled={is_creating}
-			></textarea>
-			<small> Define the model's behavior and personality </small>
+			<label>
+				<div class="title mb_xs">base model (optional)</div>
+				{#if available_models.length > 0}
+					<select class="plain w_100" bind:value={from_model} disabled={is_creating}>
+						<option value="">-- select base model --</option>
+						{#each available_models as model_name (model_name)}
+							<option value={model_name}>{model_name}</option>
+						{/each}
+					</select>
+				{:else}
+					<input
+						type="text"
+						class="plain w_100"
+						placeholder="{GLYPH_PLACEHOLDER} base model name"
+						bind:value={from_model}
+						onkeydown={handle_keydown}
+						disabled={is_creating}
+					/>
+				{/if}
+			</label>
+			<p>Choose a base model to customize, or leave empty for a completely new model</p>
 		</fieldset>
 
 		<fieldset>
-			<label for="template" class="display_block mb_xs">template (optional)</label>
-			<!-- TODO fix this placeholder -->
-			<textarea
-				id="template"
-				class="plain w_100"
-				rows="3"
-				placeholder="{GLYPH_PLACEHOLDER} {'{{{ .System }}}'} {'{{{ .Prompt }}}'}"
-				bind:value={template}
-				disabled={is_creating}
-			></textarea>
-			<small> Custom prompt template using Ollama template syntax </small>
+			<label>
+				<div class="title mb_xs">system prompt (optional)</div>
+				<textarea
+					class="plain w_100"
+					rows="4"
+					placeholder="{GLYPH_PLACEHOLDER} You are a helpful assistant..."
+					bind:value={system_prompt}
+					disabled={is_creating}
+				></textarea>
+			</label>
+			<p>Define the model's behavior and personality</p>
+		</fieldset>
+
+		<fieldset>
+			<label>
+				<div class="title mb_xs">template (optional)</div>
+				<!-- TODO fix this placeholder -->
+				<textarea
+					class="plain w_100"
+					rows="3"
+					placeholder="{GLYPH_PLACEHOLDER} {'{{{ .System }}}'} {'{{{ .Prompt }}}'}"
+					bind:value={template}
+					disabled={is_creating}
+				></textarea>
+			</label>
+			<p>Custom prompt template using Ollama template syntax</p>
 		</fieldset>
 
 		<div class="display_flex gap_md">
