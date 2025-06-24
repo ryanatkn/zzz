@@ -1444,6 +1444,7 @@ export const src_json = {
 		'./config_defaults.js': {
 			path: 'config_defaults.ts',
 			declarations: [
+				{name: 'small_recommended_models', kind: 'variable'},
 				{name: 'SYSTEM_MESSAGE_DEFAULT', kind: 'variable'},
 				{name: 'OUTPUT_TOKEN_MAX_DEFAULT', kind: 'variable'},
 				{name: 'TEMPERATURE_DEFAULT', kind: 'variable'},
@@ -1797,6 +1798,8 @@ export const src_json = {
 				{name: 'GLYPH_CHEVRON_RIGHT', kind: 'variable'},
 				{name: 'GLYPH_CHEVRON_DOWN', kind: 'variable'},
 				{name: 'GLYPH_CHEVRON_LEFT', kind: 'variable'},
+				{name: 'GLYPH_DOUBLE_CHEVRON_LEFT', kind: 'variable'},
+				{name: 'GLYPH_DOUBLE_CHEVRON_RIGHT', kind: 'variable'},
 				{name: 'GLYPH_EDIT', kind: 'variable'},
 				{name: 'GLYPH_SORT', kind: 'variable'},
 				{name: 'GLYPH_BACKEND', kind: 'variable'},
@@ -2059,6 +2062,7 @@ export const src_json = {
 				{name: 'Ollama_Json_Input', kind: 'type'},
 				{name: 'Ollama_Options', kind: 'type'},
 				{name: 'Ollama_Operation_Type', kind: 'variable'},
+				{name: 'Ollama_Operation_Result', kind: 'type'},
 				{name: 'Ollama_Operation_Json', kind: 'variable'},
 				{name: 'Ollama_Operation_Json_Input', kind: 'type'},
 				{name: 'Ollama_Operation_Options', kind: 'type'},
@@ -2497,7 +2501,11 @@ export const src_json = {
 		'./time_helpers.js': {
 			path: 'time_helpers.ts',
 			declarations: [
+				{name: 'Time_Value', kind: 'type'},
 				{name: 'format_timestamp', kind: 'function'},
+				{name: 'format_short_date', kind: 'function'},
+				{name: 'format_datetime', kind: 'function'},
+				{name: 'format_time', kind: 'function'},
 				{name: 'format_ms_to_readable', kind: 'function'},
 			],
 		},
