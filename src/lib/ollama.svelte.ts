@@ -235,7 +235,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 		return result;
 	});
 
-	readonly models_count: number = $derived(this.models.length);
+	readonly model_count: number = $derived(this.models.length);
 
 	readonly model_names: Array<string> = $derived(Array.from(this.model_by_name.keys()));
 
@@ -451,40 +451,53 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 		return operation.operation_id;
 	}
 
+	// TODO @many create model
+	// 	interface CreateRequest {
+	// 	model: string;
+	// 	from?: string;
+	// 	stream?: boolean;
+	// 	quantize?: string;
+	// 	template?: string;
+	// 	license?: string | string[];
+	// 	system?: string;
+	// 	parameters?: Record<string, unknown>;
+	// 	messages?: Message[];
+	// 	adapters?: Record<string, string>;
+	// }
 	/**
 	 * Create a new model from a Modelfile.
 	 */
-	async create_model(model_name: string, partial: Partial<CreateRequest>): Promise<Uuid> {
-		console.log(`[ollama] creating model: ${model_name}, from: ${partial.from || 'none'}`);
+	// async create_model(model_name: string, partial: Partial<CreateRequest>): Promise<Uuid> {
+	// 	console.log(`[ollama] creating model: ${model_name}, from: ${partial.from || 'none'}`);
 
-		const operation = this.#create_operation('create', {model: model_name});
+	// 	const operation = this.#create_operation('create', {model: model_name});
 
-		if (!BROWSER) return operation.operation_id;
+	// 	if (!BROWSER) return operation.operation_id;
 
-		// Check if model already exists
-		if (this.model_by_name.has(model_name)) {
-			const error_message = `Model "${model_name}" already exists`;
-			console.error(`[ollama] ${error_message}`);
-			operation.complete_failure(error_message);
-			return operation.operation_id;
-		}
+	// 	// Check if model already exists
+	// 	if (this.model_by_name.has(model_name)) {
+	// 		const error_message = `Model "${model_name}" already exists`;
+	// 		console.error(`[ollama] ${error_message}`);
+	// 		operation.complete_failure(error_message);
+	// 		return operation.operation_id;
+	// 	}
 
-		try {
-			// TODO stream
-			const response = await ollama.create({...partial, model: model_name, stream: false});
-			console.log(`[ollama] create model success for: ${model_name}`, response);
+	// 	try {
+	// 		// TODO stream
+	// 		const response = await ollama.create({...partial, model: model_name, stream: false});
+	// 		console.log(`[ollama] create model success for: ${model_name}`, response);
 
-			operation.complete_success({type: 'create', data: response});
+	// 		operation.complete_success({type: 'create', data: response});
 
-			// Refresh model list after successful create
-			await this.refresh();
-		} catch (error) {
-			console.error(`[ollama] failed to create model ${model_name}:`, error);
-			operation.complete_failure(error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE);
-		}
+	// 		// Refresh model list after successful create
+	// 		await this.refresh();
+	// 	} catch (error) {
+	// 		console.error(`[ollama] failed to create model ${model_name}:`, error);
+	// 		operation.complete_failure(error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE);
+	// 	}
 
-		return operation.operation_id;
-	}
+	// 	return operation.operation_id;
+	// }
 
 	/**
 	 * Clear completed operations from the history.

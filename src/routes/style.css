@@ -347,6 +347,10 @@ button.menu_item.selected.plain {
 button.menu_item.plain:hover:not(.selected) {
 	background-color: var(--bg_6);
 }
+/* TODO hacky */
+button.menu_item[disabled] {
+	cursor: default;
+}
 
 /* TODO hacky, is like `.pane` but softer and without the semantics for dialogs, maybe these styles should replace .pane upstream? */
 .floating {

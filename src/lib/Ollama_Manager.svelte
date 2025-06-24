@@ -7,11 +7,13 @@
 	import {plural} from '@ryanatkn/belt/string.js';
 
 	import Glyph from '$lib/Glyph.svelte';
-	import {GLYPH_COPY, GLYPH_ADD, GLYPH_DOWNLOAD, GLYPH_SETTINGS} from '$lib/glyphs.js';
+	import External_Link from '$lib/External_Link.svelte';
+	import {GLYPH_COPY, GLYPH_DOWNLOAD, GLYPH_SETTINGS} from '$lib/glyphs.js';
 	import Ollama_Configure from '$lib/Ollama_Configure.svelte';
 	import Ollama_Model_Details from '$lib/Ollama_Model_Details.svelte';
 	import Ollama_Pull_Model from '$lib/Ollama_Pull_Model.svelte';
-	import Ollama_Create_Model from '$lib/Ollama_Create_Model.svelte';
+	// TODO @many create model
+	// import Ollama_Create_Model from '$lib/Ollama_Create_Model.svelte';
 	import Ollama_Copy_Model from '$lib/Ollama_Copy_Model.svelte';
 	import type {Ollama, Ollama_Model_Detail} from '$lib/ollama.svelte.js';
 
@@ -27,7 +29,7 @@
 
 	// TODO probably should use routes instead of internal state, but I want to see about using this as a snapshotting experiment
 
-	let selected_view: 'configure' | 'model' | 'pull' | 'create' | 'copy' = $state('configure');
+	let selected_view: 'configure' | 'model' | 'pull' | 'copy' = $state('configure');
 	let selected_model_detail: Ollama_Model_Detail | null = $state(null as any);
 	let last_active_view: {view: string; model_detail: Ollama_Model_Detail | null} | null =
 		$state(null);
@@ -81,9 +83,10 @@
 		set_view('pull', null);
 	};
 
-	const handle_show_create = () => {
-		set_view('create', null);
-	};
+	// TODO @many create model
+	// const handle_show_create = () => {
+	// 	set_view('create', null);
+	// };
 
 	const handle_show_copy = () => {
 		set_view('copy', null);
@@ -157,7 +160,8 @@
 						<span class="ml_sm">pull model</span>
 					</button>
 
-					<button
+					<!-- TODO @many create model -->
+					<!-- <button
 						type="button"
 						class="w_100 justify_content_start border_radius_0 plain menu_item selectable font_weight_500"
 						class:selected={selected_view === 'create'}
@@ -166,13 +170,13 @@
 					>
 						<Glyph glyph={GLYPH_ADD} />
 						<span class="ml_sm">create model</span>
-					</button>
+					</button> -->
 
 					<button
 						type="button"
 						class="w_100 justify_content_start border_radius_0 plain menu_item selectable font_weight_500"
 						class:selected={selected_view === 'copy'}
-						disabled={!ollama.available || ollama.models_count === 0}
+						disabled={!ollama.available || ollama.model_count === 0}
 						onclick={handle_show_copy}
 					>
 						<Glyph glyph={GLYPH_COPY} />
@@ -182,10 +186,10 @@
 			</section>
 
 			<!-- Models List -->
-			{#if ollama.available && ollama.models_count > 0}
+			{#if ollama.available && ollama.model_count > 0}
 				<section>
 					<h3 class="mt_xl3 mb_md">
-						{ollama.models_count} model{plural(ollama.models_count)}
+						{ollama.model_count} model{plural(ollama.model_count)}
 					</h3>
 
 					<div class="column">
@@ -211,11 +215,17 @@
 						{/each}
 					</div>
 				</section>
-			{:else if ollama.available && ollama.models_count === 0}
+			{:else if ollama.available && ollama.model_count === 0}
 				<section class="panel p_md" transition:slide>
 					<p>
-						no models found. pull a model using the button above or install models using the ollama
-						CLI.
+						no models found, <button
+							type="button"
+							class="inline compact"
+							disabled={selected_view === 'pull'}
+							onclick={handle_show_pull}>pull a model</button
+						>
+						or install them using the
+						<External_Link href="https://github.com/ollama/ollama">Ollama CLI</External_Link>
 					</p>
 				</section>
 			{/if}
@@ -240,8 +250,8 @@
 			/>
 		{:else if selected_view === 'pull'}
 			<Ollama_Pull_Model {ollama} onclose={handle_close_form} />
-		{:else if selected_view === 'create'}
-			<Ollama_Create_Model {ollama} onclose={handle_close_form} onshowpull={handle_show_pull} />
+			<!-- {:else if selected_view === 'create'}
+			<Ollama_Create_Model {ollama} onclose={handle_close_form} onshowpull={handle_show_pull} /> -->
 		{:else if selected_view === 'copy'}
 			<Ollama_Copy_Model {ollama} onclose={handle_close_form} />
 		{/if}

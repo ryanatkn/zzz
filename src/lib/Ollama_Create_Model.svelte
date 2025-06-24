@@ -1,6 +1,9 @@
 <script lang="ts">
 	// @slop claude_sonnet_4
 
+	// TODO @many create model
+	// @ts-nocheck
+
 	import Glyph from '$lib/Glyph.svelte';
 	import Error_Message from '$lib/Error_Message.svelte';
 	import {GLYPH_ADD, GLYPH_CANCEL, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';

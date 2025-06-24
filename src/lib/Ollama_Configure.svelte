@@ -47,13 +47,15 @@
 	</header>
 
 	<section class="width_md display_flex flex_column gap_lg">
-		<p>
-			Ollama is a local model provider. To get started see <button
-				type="button"
-				class="inline compact"
-				onclick={onshowpull}>pull model</button
-			>.
-		</p>
+		{#if ollama.model_count === 0}
+			<p>
+				Ollama is a local LLM provider. Get started by <button
+					type="button"
+					class="inline compact"
+					onclick={onshowpull}>pulling a model</button
+				>.
+			</p>
+		{/if}
 
 		<!-- Host Configuration -->
 		<div class="display_flex flex_column gap_md">

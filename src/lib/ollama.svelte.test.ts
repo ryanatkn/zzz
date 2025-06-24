@@ -29,7 +29,7 @@ describe('Ollama', () => {
 		expect(ollama.host).toBe('http://127.0.0.1:11434');
 		expect(ollama.list_status).toBe('initial');
 		expect(ollama.available).toBe(false);
-		expect(ollama.models_count).toBe(0);
+		expect(ollama.model_count).toBe(0);
 	});
 
 	test('should track operations', () => {
@@ -145,7 +145,7 @@ describe('Ollama', () => {
 		const app = create_mock_app();
 		const ollama = new Ollama({app});
 
-		// Simulate a list response
+		// Simulate a list response with model details
 		ollama.list_response = {
 			models: [
 				{name: 'model_a', size: 1000},
@@ -154,8 +154,24 @@ describe('Ollama', () => {
 		} as any;
 		ollama.list_status = 'success';
 
+		// Add corresponding model details (required for model_count to work)
+		ollama.model_details.set(
+			'model_a',
+			new Ollama_Model_Detail({
+				app,
+				json: {model_name: 'model_a', last_updated: Date.now()},
+			}),
+		);
+		ollama.model_details.set(
+			'model_b',
+			new Ollama_Model_Detail({
+				app,
+				json: {model_name: 'model_b', last_updated: Date.now()},
+			}),
+		);
+
 		expect(ollama.available).toBe(true);
-		expect(ollama.models_count).toBe(2);
+		expect(ollama.model_count).toBe(2);
 	});
 });
 
@@ -172,7 +188,7 @@ describe('Ollama_Operation', () => {
 			},
 		});
 
-		const result = {success: true};
+		const result = {type: 'pull', data: {status: 'success'}} as any;
 		operation.complete_success(result);
 
 		expect(operation.status).toBe('success');
@@ -191,7 +207,7 @@ describe('Ollama_Operation', () => {
 
 		expect(operation.status).toBe('failure');
 		expect(operation.error_message).toBe('test error');
-		expect(operation.result).toBeUndefined();
+		expect(operation.result).toBe(null);
 	});
 
 	test('should update progress correctly', () => {
