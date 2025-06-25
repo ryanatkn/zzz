@@ -11,9 +11,10 @@ export type Model_Name = z.infer<typeof Model_Name>;
 export const Model_Json = Cell_Json.extend({
 	// source of truth we maintain:
 	name: Model_Name,
-	provider_name: Provider_Name.nullable().default(null),
+	provider_name: Provider_Name,
 	tags: z.array(z.string()).default(() => []),
 
+	// TODO expand/improve these
 	// fetched from provider APIs:
 	architecture: z.string().optional(),
 	parameter_count: z.number().optional(),

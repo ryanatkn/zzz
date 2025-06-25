@@ -1,6 +1,9 @@
 <script lang="ts">
 	import type {SvelteHTMLElements} from 'svelte/elements';
+	import {round} from '@ryanatkn/belt/maths.js';
+
 	import Model_Link from '$lib/Model_Link.svelte';
+	import Contextmenu_Model from '$lib/Contextmenu_Model.svelte';
 	import Provider_Link from '$lib/Provider_Link.svelte';
 	import type {Model} from '$lib/model.svelte.js';
 
@@ -16,49 +19,51 @@
 	// TODO maybe rename to Model_Listitem, particularly if we add a `Model_List` for the parent usage
 </script>
 
-<div {...attrs} class="panel p_lg {attrs?.class}">
-	<div class="font_size_xl mb_lg">
-		<Model_Link {model} icon="glyph" />
-	</div>
-	<div class="mb_lg">
-		<Provider_Link {provider} icon="svg" attrs={{class: 'row gap_sm'}} />
-	</div>
-
-	{#if model.tags.length}
-		<ul class="unstyled display_flex flex_wrap gap_xs mb_md mt_sm">
-			{#each model.tags as tag (tag)}
-				<small class="chip font_weight_400">{tag}</small>
-			{/each}
-		</ul>
-	{/if}
-
-	{#if model.downloaded === false}
-		<div class="mb_sm">
-			<small class="bg_e_1 px_sm border_radius_xs">not downloaded</small>
+<Contextmenu_Model {model}>
+	<div {...attrs} class="panel p_lg {attrs?.class}">
+		<div class="font_size_xl mb_lg">
+			<Model_Link {model} icon="glyph" />
 		</div>
-	{/if}
+		<div class="mb_lg">
+			<Provider_Link {provider} icon="svg" attrs={{class: 'row gap_sm'}} />
+		</div>
 
-	<div class="specs_grid">
-		{#if model.context_window}
-			<div class="spec_item">
-				<span class="spec_label">context:</span>
-				<span>{model.context_window.toLocaleString()} tokens</span>
+		{#if model.tags.length}
+			<ul class="unstyled display_flex flex_wrap gap_xs mb_md mt_sm">
+				{#each model.tags as tag (tag)}
+					<small class="chip font_weight_400">{tag}</small>
+				{/each}
+			</ul>
+		{/if}
+
+		{#if model.downloaded === false}
+			<div class="mb_sm">
+				<small class="bg_e_1 px_sm border_radius_xs">not downloaded</small>
 			</div>
 		{/if}
-		{#if model.parameter_count}
-			<div class="spec_item">
-				<span class="spec_label">parameters:</span>
-				<span>{model.parameter_count.toLocaleString()}B</span>
-			</div>
-		{/if}
-		{#if model.filesize}
-			<div class="spec_item">
-				<span class="spec_label">size:</span>
-				<span>{model.filesize}GB</span>
-			</div>
-		{/if}
+
+		<div class="specs_grid">
+			{#if model.context_window}
+				<div class="spec_item">
+					<span class="spec_label">context:</span>
+					<span>{model.context_window.toLocaleString()} tokens</span>
+				</div>
+			{/if}
+			{#if model.parameter_count}
+				<div class="spec_item">
+					<span class="spec_label">parameters:</span>
+					<span>{model.parameter_count.toLocaleString()}B</span>
+				</div>
+			{/if}
+			{#if model.filesize}
+				<div class="spec_item">
+					<span class="spec_label">size:</span>
+					<span>{round(model.filesize, 2)}GB</span>
+				</div>
+			{/if}
+		</div>
 	</div>
-</div>
+</Contextmenu_Model>
 
 <style>
 	.specs_grid {

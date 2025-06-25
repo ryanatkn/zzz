@@ -27,11 +27,6 @@
 						<External_Link href={provider.url}>docs</External_Link>
 					</div>
 				{/if}
-				{#if provider.icon}
-					<div class="mb_sm">
-						<img src={provider.icon} alt={`${provider.title} icon`} class="provider_icon" />
-					</div>
-				{/if}
 				<ul class="unstyled">
 					{#each provider.models as model (model)}
 						<li class="row flex_wrap mb_xs3">
@@ -53,11 +48,5 @@
 		grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 		gap: var(--space_lg);
 		width: 100%;
-	}
-
-	.provider_icon {
-		max-width: 32px;
-		max-height: 32px;
-		object-fit: contain;
 	}
 </style>

@@ -54,9 +54,15 @@
 	{:else}
 		<Alert status="error">
 			no model found with name "{name}", maybe
-			<button type="button" class="inline color_f" onclick={() => app.models.add({name})}
-				>create it</button
+			<button
+				type="button"
+				class="inline color_f"
+				onclick={() =>
+					// TODO UI for choosing provider
+					app.models.add({name, provider_name: 'ollama'})}
 			>
+				create it
+			</button>
 			or see the <a href="{base}/models">models</a> or
 			<a href="{base}/providers">providers</a>
 		</Alert>

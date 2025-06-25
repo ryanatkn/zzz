@@ -8,7 +8,6 @@ import {Cell_Json} from '$lib/cell_types.js';
 // TODO optional/defaults?
 export const Provider_Json = Cell_Json.extend({
 	name: Provider_Name,
-	icon: z.string(),
 	title: z.string(),
 	url: z.string(),
 });
@@ -19,7 +18,6 @@ export interface Provider_Options extends Cell_Options<typeof Provider_Json> {} 
 
 export class Provider extends Cell<typeof Provider_Json> {
 	name: Provider_Name = $state()!;
-	icon: string = $state()!;
 	title: string = $state()!;
 	url: string = $state()!;
 

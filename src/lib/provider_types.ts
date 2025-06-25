@@ -1,5 +1,6 @@
 import {z} from 'zod';
 
+/** See `app.providers.names` for the available names at runtime. */
 export const Provider_Name = z.enum(['ollama', 'claude', 'chatgpt', 'gemini']);
 export type Provider_Name = z.infer<typeof Provider_Name>;
 

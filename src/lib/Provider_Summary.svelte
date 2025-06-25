@@ -27,9 +27,6 @@
 			<External_Link href={provider.url}>{provider.title}</External_Link>
 		</h2>
 	{/if}
-	{#if provider.icon}
-		<div>{provider.icon}</div>
-	{/if}
 	<section>
 		<div class="mb_md font_family_mono">{provider.name}</div>
 		<div>

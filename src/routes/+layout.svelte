@@ -42,6 +42,11 @@
 		if (BROWSER) {
 			void app.api.load_session();
 		}
+
+		// Init Ollama
+		if (BROWSER) {
+			void app.ollama.refresh();
+		}
 	});
 
 	pkg_context.set(parse_package_meta(package_json, src_json));

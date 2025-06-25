@@ -39,9 +39,6 @@
 					<External_Link href={provider.url}>{provider.title}</External_Link>
 				</h2>
 			{/if}
-			{#if provider.icon}
-				<div>{provider.icon}</div>
-			{/if}
 			<div>
 				<div class="mb_md font_family_mono">
 					<Glyph glyph={GLYPH_PROVIDER} />
