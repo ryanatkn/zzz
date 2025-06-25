@@ -80,7 +80,12 @@
 		</fieldset>
 
 		<label class="display_flex gap_xs align_items_center">
-			<input type="checkbox" class="compact" bind:checked={ollama.pull_insecure} disabled={ollama.pull_is_pulling} />
+			<input
+				type="checkbox"
+				class="compact"
+				bind:checked={ollama.pull_insecure}
+				disabled={ollama.pull_is_pulling}
+			/>
 			<span>allow insecure connections</span>
 		</label>
 
@@ -94,11 +99,13 @@
 				<Glyph glyph={GLYPH_DOWNLOAD} />&nbsp;
 				{ollama.pull_is_pulling ? 'pulling...' : 'pull model'}
 			</button>
-			<button type="button" class="plain" onclick={onclose} disabled={ollama.pull_is_pulling}>cancel</button>
+			<button type="button" class="plain" onclick={onclose} disabled={ollama.pull_is_pulling}
+				>cancel</button
+			>
 		</div>
 
-		{#if ollama.pull_is_duplicate_name}
-			<Error_Message>a model with this name already exists</Error_Message>
+		{#if ollama.pull_already_downloaded}
+			<Error_Message>this model is already downloaded</Error_Message>
 		{/if}
 	</div>
 </div>

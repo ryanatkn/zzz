@@ -175,11 +175,13 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 
 	// Pull model derived state
 	readonly pull_parsed_model_name: string = $derived(this.pull_model_name.trim());
-	readonly pull_is_duplicate_name: boolean = $derived(
-		!!this.pull_parsed_model_name && this.model_by_name.has(this.pull_parsed_model_name),
+	readonly pull_already_downloaded: boolean = $derived(
+		!!(
+			this.pull_parsed_model_name && this.model_by_name.get(this.pull_parsed_model_name)?.downloaded
+		),
 	);
 	readonly pull_can_pull: boolean = $derived(
-		!!this.pull_parsed_model_name && !this.pull_is_duplicate_name,
+		!!this.pull_parsed_model_name && !this.pull_already_downloaded,
 	);
 
 	// Copy model derived state
