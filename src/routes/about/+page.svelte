@@ -154,6 +154,13 @@
 						>
 					</li>
 					<li>
+						<External_Link href="https://modelcontextprotocol.io/"
+							>Model Context Protocol</External_Link
+						>, maybe others like <External_Link href="https://github.com/google/A2A"
+							>Agent2Agent (A2A) protocol</External_Link
+						>
+					</li>
+					<li>
 						<External_Link href="https://wikipedia.org/wiki/RSS">RSS</External_Link> and <External_Link
 							href="https://wikipedia.org/wiki/Atom_(web_standard)">Atom</External_Link
 						> and <External_Link href="https://wikipedia.org/wiki/JSON_Feed"
@@ -164,13 +171,6 @@
 						<External_Link href="https://activitypub.rocks/">ActivityPub</External_Link>
 						and
 						<External_Link href="https://atproto.com/">AT Protocol</External_Link>
-					</li>
-					<li>
-						<External_Link href="https://modelcontextprotocol.io/"
-							>Model Context Protocol</External_Link
-						> is planned, maybe others like <External_Link href="https://github.com/google/A2A"
-							>Agent2Agent (A2A) protocol</External_Link
-						>
 					</li>
 					<li>
 						I think it makes sense to prioritize a few high-utility integrations for manipulating
