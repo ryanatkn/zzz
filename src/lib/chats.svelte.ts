@@ -103,9 +103,13 @@ export class Chats extends Cell<typeof Chats_Json> {
 		return get_unique_name(base_name, this.items_by_name);
 	}
 
+	/** Ephemeral state that directs the UI to focus the input when the component next mounts.  */
+	pending_chat_id_to_focus: Uuid | null = $state(null);
+
 	add_chat(chat: Chat, select?: boolean): Chat {
 		this.items.add(chat);
 		if (select) {
+			this.pending_chat_id_to_focus = chat.id;
 			void this.select(chat.id);
 		}
 		return chat;

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Pending_Button from '@ryanatkn/fuz/Pending_Button.svelte';
+	import {onMount} from 'svelte';
 
 	import {estimate_token_count} from '$lib/helpers.js';
 	import type {Tape} from '$lib/tape.svelte.js';
@@ -12,6 +13,7 @@
 	import type {SvelteHTMLElements} from 'svelte/elements';
 	import Tape_Toggle_Button from '$lib/Tape_Toggle_Button.svelte';
 	import type {Chat} from '$lib/chat.svelte.js';
+	import {app_context} from '$lib/app.svelte.js';
 
 	interface Props {
 		chat: Chat;
@@ -22,6 +24,15 @@
 	}
 
 	const {chat, tape, onsend, strips_attrs, attrs}: Props = $props();
+
+	const app = app_context.get();
+
+	onMount(() => {
+		if (chat.id === app.chats.pending_chat_id_to_focus) {
+			app.chats.pending_chat_id_to_focus = null;
+			content_input?.focus();
+		}
+	});
 
 	let input = $state('');
 	const input_token_count = $derived(estimate_token_count(input));

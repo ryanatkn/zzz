@@ -8,7 +8,13 @@
 	import Model_Link from '$lib/Model_Link.svelte';
 	import Provider_Link from '$lib/Provider_Link.svelte';
 	import type {Model} from '$lib/model.svelte.js';
-	import {GLYPH_MODEL, GLYPH_REFRESH, GLYPH_ERROR, GLYPH_CHECKMARK} from '$lib/glyphs.js';
+	import {
+		GLYPH_MODEL,
+		GLYPH_REFRESH,
+		GLYPH_ERROR,
+		GLYPH_CHECKMARK,
+		GLYPH_ADD,
+	} from '$lib/glyphs.js';
 	import {frontend_context} from '$lib/frontend.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
 	import {format_short_date} from '$lib/time_helpers.js';
@@ -53,12 +59,15 @@
 		return `${gb.toFixed(1)} GB`;
 	};
 
-	// TODO BLOCK should be able to start a chat from a button here with this model
+	const create_chat_with_model = () => {
+		const chat = app.chats.add(undefined, true);
+		chat.add_tape(model);
+	};
 </script>
 
 <Contextmenu_Model {model}>
 	<div {...attrs} class="panel p_lg {attrs?.class}">
-		<div class="row">
+		<section class="row">
 			<div class="glyph_container">
 				<Glyph glyph={GLYPH_MODEL} size="var(--icon_size_xl)" />
 			</div>
@@ -75,27 +84,30 @@
 				<div class="display_flex font_family_mono ml_sm mb_md font_size_lg">
 					<Provider_Link {provider} attrs={{class: 'row gap_sm'}} icon="svg" />
 				</div>
+				{#if model.downloaded !== undefined}
+					<div class="column mb_lg">
+						{#if model.downloaded}
+							<small>{GLYPH_CHECKMARK} downloaded</small>
+						{:else}
+							<small class="chip color_e px_sm">not downloaded</small>
+						{/if}
+					</div>
+				{/if}
 				{#if model.tags.length}
-					<ul class="unstyled display_flex gap_xs mb_md">
+					<ul class="unstyled display_flex gap_xs">
 						{#each model.tags as tag (tag)}
 							<small class="chip font_weight_400">{tag}</small>
 						{/each}
 					</ul>
 				{/if}
-				{#if model.downloaded !== undefined}
-					<div class="mb_md">
-						{#if model.downloaded}
-							<small class="chip bg_b_1 color_b px_sm">{GLYPH_CHECKMARK} downloaded</small>
-							{#if model.ollama_modified_at}
-								<small class="ml_sm">modified {format_short_date(model.ollama_modified_at)}</small>
-							{/if}
-						{:else}
-							<small class="chip bg_e_1 color_e px_sm">not downloaded</small>
-						{/if}
-					</div>
-				{/if}
 			</div>
-		</div>
+		</section>
+
+		<section>
+			<button type="button" class="color_i" onclick={create_chat_with_model}>
+				<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> create a new chat
+			</button>
+		</section>
 
 		{#if model.provider_name !== 'ollama'}
 			<aside class="mt_xl3">
@@ -187,6 +199,7 @@
 				<section>
 					<div class="display_flex justify_content_space_between align_items_center mb_md">
 						<h3>Ollama details</h3>
+
 						<div class="display_flex gap_sm">
 							{#if model.ollama_details_loaded}
 								<button
@@ -214,8 +227,15 @@
 						</div>
 					</div>
 
+					{#if model.ollama_modified_at}
+						<div>
+							<h4>modified</h4>
+							{format_short_date(model.ollama_modified_at)}
+						</div>
+					{/if}
+
 					{#if model.ollama_details_error}
-						<div class="panel p_sm bg_c_1 color_c mb_md">
+						<div class="panel p_sm color_c mb_md">
 							<Glyph glyph={GLYPH_ERROR} /> failed to load details: {model.ollama_details_error}
 						</div>
 					{/if}
