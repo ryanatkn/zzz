@@ -30,7 +30,7 @@
 	$effect(() => {
 		if (chat.id === app.chats.pending_chat_id_to_focus) {
 			app.chats.pending_chat_id_to_focus = null;
-			content_input?.focus();
+			setTimeout(() => content_input?.focus());
 		}
 	});
 
