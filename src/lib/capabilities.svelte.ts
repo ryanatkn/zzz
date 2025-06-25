@@ -4,7 +4,6 @@ import type {Async_Status} from '@ryanatkn/belt/async.js';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
-import {ollama_list} from '$lib/ollama_helpers.js';
 import {create_uuid} from '$lib/zod_helpers.js';
 import type {Zzz_Dir} from '$lib/diskfile_types.js';
 import type {Jsonrpc_Request_Id} from '$lib/jsonrpc.js';
@@ -287,7 +286,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	async check_ollama(): Promise<void> {
 		const message_id = create_uuid();
 
-		// TODO BLOCK @many maybe the Ollama class and capability should be the same thing?
+		// TODO maybe the Ollama class and capability should be the same thing?
 		this.ollama = {
 			name: 'ollama',
 			data: null,
@@ -301,7 +300,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 
 		try {
 			// Check if Ollama API is available by getting the list of models
-			const list_response = await ollama_list();
+			const list_response = await this.app.ollama.refresh();
 
 			// Set the capability data
 			if (list_response && this.ollama.message_id === message_id) {
@@ -314,11 +313,11 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 					updated: Date.now(),
 				};
 			} else {
-				error_message = 'No response from Ollama API';
+				error_message = 'no response from Ollama API';
 			}
 		} catch (error) {
-			console.error('Failed to connect to Ollama API:', error);
-			error_message = error instanceof Error ? error.message : 'Unknown error connecting to Ollama';
+			console.error('failed to connect to Ollama API:', error);
+			error_message = error instanceof Error ? error.message : 'unknown error connecting to Ollama';
 		}
 
 		if (error_message && this.ollama.message_id === message_id) {

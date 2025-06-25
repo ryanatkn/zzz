@@ -73,6 +73,9 @@ export class Chats extends Cell<typeof Chats_Json> {
 
 	readonly items_by_name = $derived(this.items.single_index('by_name'));
 
+	/** Ephemeral reactive state that directs the UI to focus the input.  */
+	pending_chat_id_to_focus: Uuid | null = $state(null);
+
 	constructor(options: Chats_Options) {
 		super(Chats_Json, options);
 
@@ -103,13 +106,9 @@ export class Chats extends Cell<typeof Chats_Json> {
 		return get_unique_name(base_name, this.items_by_name);
 	}
 
-	/** Ephemeral state that directs the UI to focus the input when the component next mounts.  */
-	pending_chat_id_to_focus: Uuid | null = null;
-
 	add_chat(chat: Chat, select?: boolean): Chat {
 		this.items.add(chat);
 		if (select) {
-			this.pending_chat_id_to_focus = chat.id;
 			void this.select(chat.id);
 		}
 		return chat;
@@ -163,6 +162,7 @@ export class Chats extends Cell<typeof Chats_Json> {
 
 	async navigate_to(chat_id: Uuid | null, force = false): Promise<void> {
 		const url = to_chats_url(chat_id);
+		this.pending_chat_id_to_focus = chat_id;
 		if (!force && page.url.pathname === url) return;
 		return goto(url);
 	}

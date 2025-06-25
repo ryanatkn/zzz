@@ -4,7 +4,7 @@
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
 
 	import Glyph from '$lib/Glyph.svelte';
-	import {GLYPH_REFRESH, GLYPH_DELETE, GLYPH_ARROW_LEFT} from '$lib/glyphs.js';
+	import {GLYPH_REFRESH, GLYPH_DELETE, GLYPH_ARROW_LEFT, GLYPH_ADD} from '$lib/glyphs.js';
 	import type {Model} from '$lib/model.svelte.js';
 	import type {Ollama} from '$lib/ollama.svelte.js';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
@@ -102,6 +102,18 @@
 					</button>
 				</div>
 			{/if}
+
+			<button
+				type="button"
+				class="plain"
+				onclick={() => {
+					// TODO get `app` from context? or is this fine? should it be protected? generic types might make it a no-go
+					const chat = ollama.app.chats.add(undefined, true);
+					chat.add_tape(model);
+				}}
+			>
+				<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> create a new chat
+			</button>
 		</section>
 
 		{#if model.ollama_details_loading}

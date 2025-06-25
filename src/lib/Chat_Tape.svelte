@@ -1,6 +1,5 @@
 <script lang="ts">
 	import Pending_Button from '@ryanatkn/fuz/Pending_Button.svelte';
-	import {onMount} from 'svelte';
 
 	import {estimate_token_count} from '$lib/helpers.js';
 	import type {Tape} from '$lib/tape.svelte.js';
@@ -8,6 +7,7 @@
 	import Strip_List from '$lib/Strip_List.svelte';
 	import Provider_Link from '$lib/Provider_Link.svelte';
 	import Contextmenu_Tape from '$lib/Contextmenu_Tape.svelte';
+	import Contextmenu_Model from '$lib/Contextmenu_Model.svelte';
 	import Content_Editor from '$lib/Content_Editor.svelte';
 	import {GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
 	import type {SvelteHTMLElements} from 'svelte/elements';
@@ -27,7 +27,7 @@
 
 	const app = app_context.get();
 
-	onMount(() => {
+	$effect(() => {
 		if (chat.id === app.chats.pending_chat_id_to_focus) {
 			app.chats.pending_chat_id_to_focus = null;
 			content_input?.focus();
@@ -59,66 +59,68 @@
 	let show_model_picker = $state(false);
 </script>
 
-<Contextmenu_Tape {tape}>
-	<div {...attrs} class="chat_tape {attrs?.class}" class:empty class:dormant={!tape.enabled}>
-		<div class="display_flex justify_content_space_between align_items_start">
-			<header>
-				<button
-					type="button"
-					class="plain compact font_size_lg text_align_left"
-					onclick={() => (show_model_picker = true)}
-				>
-					{tape.model.name}
-				</button>
-				<small
-					><Provider_Link
-						provider={tape.app.providers.find_by_name(tape.model.provider_name)}
-						icon="glyph"
-						show_name
-					/></small
-				>
-			</header>
-			{#if chat.view_mode !== 'simple'}
-				<div class="display_flex gap_xs">
-					<Tape_Toggle_Button {tape} />
-				</div>
+<Contextmenu_Model model={tape.model}>
+	<Contextmenu_Tape {tape}>
+		<div {...attrs} class="chat_tape {attrs?.class}" class:empty class:dormant={!tape.enabled}>
+			<div class="display_flex justify_content_space_between align_items_start">
+				<header>
+					<button
+						type="button"
+						class="plain compact font_size_lg text_align_left"
+						onclick={() => (show_model_picker = true)}
+					>
+						{tape.model.name}
+					</button>
+					<small
+						><Provider_Link
+							provider={tape.app.providers.find_by_name(tape.model.provider_name)}
+							icon="glyph"
+							show_name
+						/></small
+					>
+				</header>
+				{#if chat.view_mode !== 'simple'}
+					<div class="display_flex gap_xs">
+						<Tape_Toggle_Button {tape} />
+					</div>
+				{/if}
+			</div>
+
+			{#if strip_count}
+				<Strip_List {tape} attrs={strips_attrs} />
 			{/if}
-		</div>
 
-		{#if strip_count}
-			<Strip_List {tape} attrs={strips_attrs} />
-		{/if}
-
-		<div>
-			<Content_Editor
-				bind:this={content_input}
-				bind:content={input}
-				token_count={input_token_count}
-				placeholder={GLYPH_PLACEHOLDER}
-				show_stats
-				show_actions
-			>
-				<Pending_Button
-					{pending}
-					onclick={send}
-					attrs={{class: 'plain'}}
-					title="send {input_token_count} tokens to {tape.model_name}"
+			<div>
+				<Content_Editor
+					bind:this={content_input}
+					bind:content={input}
+					token_count={input_token_count}
+					placeholder={GLYPH_PLACEHOLDER}
+					show_stats
+					show_actions
 				>
-					send
-				</Pending_Button>
-			</Content_Editor>
+					<Pending_Button
+						{pending}
+						onclick={send}
+						attrs={{class: 'plain'}}
+						title="send {input_token_count} tokens to {tape.model_name}"
+					>
+						send
+					</Pending_Button>
+				</Content_Editor>
+			</div>
 		</div>
-	</div>
 
-	<Model_Picker_Dialog
-		bind:show={show_model_picker}
-		onpick={(model) => {
-			if (model) {
-				tape.switch_model(model.id);
-			}
-		}}
-	/>
-</Contextmenu_Tape>
+		<Model_Picker_Dialog
+			bind:show={show_model_picker}
+			onpick={(model) => {
+				if (model) {
+					tape.switch_model(model.id);
+				}
+			}}
+		/>
+	</Contextmenu_Tape>
+</Contextmenu_Model>
 
 <style>
 	.chat_tape {

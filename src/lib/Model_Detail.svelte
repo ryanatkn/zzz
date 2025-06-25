@@ -58,11 +58,6 @@
 		}
 		return `${gb.toFixed(1)} GB`;
 	};
-
-	const create_chat_with_model = () => {
-		const chat = app.chats.add(undefined, true);
-		chat.add_tape(model);
-	};
 </script>
 
 <Contextmenu_Model {model}>
@@ -86,11 +81,13 @@
 				</div>
 				{#if model.downloaded !== undefined}
 					<div class="column mb_lg">
-						{#if model.downloaded}
-							<small>{GLYPH_CHECKMARK} downloaded</small>
-						{:else}
-							<small class="chip color_e px_sm">not downloaded</small>
-						{/if}
+						<small>
+							{#if model.downloaded}
+								{GLYPH_CHECKMARK} downloaded
+							{:else}
+								not downloaded
+							{/if}
+						</small>
 					</div>
 				{/if}
 				{#if model.tags.length}
@@ -104,7 +101,14 @@
 		</section>
 
 		<section>
-			<button type="button" class="color_i" onclick={create_chat_with_model}>
+			<button
+				type="button"
+				class="color_d"
+				onclick={() => {
+					const chat = app.chats.add(undefined, true);
+					chat.add_tape(model);
+				}}
+			>
 				<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> create a new chat
 			</button>
 		</section>

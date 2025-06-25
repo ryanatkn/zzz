@@ -63,7 +63,7 @@
 
 			<Contextmenu_Entry run={() => (show_model_picker = true)}>
 				{#snippet icon()}<Glyph glyph={GLYPH_MODEL} />{/snippet}
-				<span>switch model</span>
+				switch model &nbsp; <small>{tape.model_name}</small>
 			</Contextmenu_Entry>
 
 			<Contextmenu_Entry
