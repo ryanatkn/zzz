@@ -398,9 +398,6 @@ a.chip {
 .bg_d_2 {
 	background-color: var(--color_d_2);
 }
-.bg_h_1 {
-	background-color: var(--color_h_1);
-}
 .border_color_2 {
 	border-color: var(--border_color_2);
 }

@@ -47,7 +47,7 @@
 	</header>
 
 	<section class="width_md display_flex flex_column gap_lg">
-		{#if ollama.model_count === 0}
+		{#if ollama.models.length === 0}
 			<p>
 				Ollama is a local LLM provider. Get started by <button
 					type="button"

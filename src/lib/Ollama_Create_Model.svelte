@@ -1,26 +1,7 @@
 <script lang="ts">
-	// @slop claude_sonnet_4
-
-	// TODO @many create model
-	// @ts-nocheck
-
-	// TODO @many be sure the whole `CreateRequest` is supported
-	// interface CreateRequest {
-	//     model: string;
-	//     from?: string;
-	//     stream?: boolean;
-	//     quantize?: string;
-	//     template?: string;
-	//     license?: string | string[];
-	//     system?: string;
-	//     parameters?: Record<string, unknown>;
-	//     messages?: Message[];
-	//     adapters?: Record<string, string>;
-	// }
-
 	import Glyph from '$lib/Glyph.svelte';
 	import Error_Message from '$lib/Error_Message.svelte';
-	import {GLYPH_ADD, GLYPH_CANCEL, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
+	import {GLYPH_ADD, GLYPH_ARROW_LEFT, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
 	import type {Ollama} from '$lib/ollama.svelte.js';
 
 	interface Props {
@@ -31,42 +12,9 @@
 
 	const {ollama, onclose, onshowpull}: Props = $props();
 
-	let model_name = $state('');
-	let from_model = $state('');
-	let system_prompt = $state('');
-	let template = $state('');
-	let is_creating = $state(false);
-
-	const parsed_model_name = $derived(model_name.trim());
-	const is_duplicate_name = $derived(
-		parsed_model_name && ollama.model_by_name.has(parsed_model_name),
-	);
-	const can_create = $derived(parsed_model_name && !is_duplicate_name);
-
-	// Users can create custom models with optional base model, system prompt, and template
-
 	const handle_create = async () => {
-		if (!can_create) return;
-
-		is_creating = true;
-		try {
-			await ollama.create_model(parsed_model_name, {
-				from: from_model.trim() || undefined,
-				system: system_prompt.trim() || undefined,
-				template: template.trim() || undefined,
-			});
-
-			// Reset form
-			model_name = '';
-			from_model = '';
-			system_prompt = '';
-			template = '';
-			onclose();
-		} catch (error) {
-			console.error('Create failed:', error);
-		} finally {
-			is_creating = false;
-		}
+		await ollama.handle_create();
+		onclose();
 	};
 
 	const handle_keydown = (event: KeyboardEvent) => {
@@ -82,7 +30,7 @@
 			<Glyph glyph={GLYPH_ADD} /> create model
 		</h3>
 		<button type="button" class="icon_button plain" onclick={onclose} title="close">
-			<Glyph glyph={GLYPH_CANCEL} />
+			<Glyph glyph={GLYPH_ARROW_LEFT} />
 		</button>
 	</header>
 
@@ -102,9 +50,9 @@
 					type="text"
 					class="plain w_100"
 					placeholder="{GLYPH_PLACEHOLDER} my-custom-model"
-					bind:value={model_name}
+					bind:value={ollama.create_model_name}
 					onkeydown={handle_keydown}
-					disabled={is_creating}
+					disabled={ollama.create_is_creating}
 				/>
 			</label>
 		</fieldset>
@@ -113,7 +61,11 @@
 			<label>
 				<div class="title mb_xs">base model (optional)</div>
 				{#if ollama.model_names.length > 0}
-					<select class="plain w_100" bind:value={from_model} disabled={is_creating}>
+					<select
+						class="plain w_100"
+						bind:value={ollama.create_from_model}
+						disabled={ollama.create_is_creating}
+					>
 						<option value="">-- select base model --</option>
 						{#each ollama.model_names as model_name (model_name)}
 							<option value={model_name}>{model_name}</option>
@@ -124,9 +76,9 @@
 						type="text"
 						class="plain w_100"
 						placeholder="{GLYPH_PLACEHOLDER} base model name"
-						bind:value={from_model}
+						bind:value={ollama.create_from_model}
 						onkeydown={handle_keydown}
-						disabled={is_creating}
+						disabled={ollama.create_is_creating}
 					/>
 				{/if}
 			</label>
@@ -140,8 +92,8 @@
 					class="plain w_100"
 					rows="4"
 					placeholder="{GLYPH_PLACEHOLDER} You are a helpful assistant..."
-					bind:value={system_prompt}
-					disabled={is_creating}
+					bind:value={ollama.create_system_prompt}
+					disabled={ollama.create_is_creating}
 				></textarea>
 			</label>
 			<p>Define the model's behavior and personality</p>
@@ -155,8 +107,8 @@
 					class="plain w_100"
 					rows="3"
 					placeholder="{GLYPH_PLACEHOLDER} {'{{{ .System }}}'} {'{{{ .Prompt }}}'}"
-					bind:value={template}
-					disabled={is_creating}
+					bind:value={ollama.create_template}
+					disabled={ollama.create_is_creating}
 				></textarea>
 			</label>
 			<p>Custom prompt template using Ollama template syntax</p>
@@ -166,16 +118,18 @@
 			<button
 				type="button"
 				class="color_b"
-				disabled={!can_create || is_creating}
+				disabled={!ollama.create_can_create || ollama.create_is_creating}
 				onclick={handle_create}
 			>
 				<Glyph glyph={GLYPH_ADD} />&nbsp;
-				{is_creating ? 'creating...' : 'create model'}
+				{ollama.create_is_creating ? 'creating...' : 'create model'}
 			</button>
-			<button type="button" class="plain" onclick={onclose} disabled={is_creating}>cancel</button>
+			<button type="button" class="plain" onclick={onclose} disabled={ollama.create_is_creating}
+				>cancel</button
+			>
 		</div>
 
-		{#if is_duplicate_name}
+		{#if ollama.create_is_duplicate_name}
 			<Error_Message>a model with this name already exists</Error_Message>
 		{/if}
 	</section>

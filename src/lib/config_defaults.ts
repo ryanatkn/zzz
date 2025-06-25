@@ -1,7 +1,7 @@
 import type {z} from 'zod';
 
 import type {Provider_Json_Input} from '$lib/provider.svelte.js';
-import type {Model_Json, Model_Name} from '$lib/model.svelte.js';
+import type {Model_Json} from '$lib/model.svelte.js';
 import type {Chat_Template} from '$lib/chat_template.js';
 import {create_uuid} from '$lib/zod_helpers.js';
 
@@ -74,7 +74,6 @@ export const models_default: Array<z.input<typeof Model_Json>> = [
 	{name: 'gemini-2.5-flash', provider_name: 'gemini', tags: ['cheap']},
 	{name: 'gemini-2.5-pro', provider_name: 'gemini', tags: ['smart']},
 ];
-
 
 /**
  * Default chat templates available in the application

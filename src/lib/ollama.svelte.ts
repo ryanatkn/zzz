@@ -10,6 +10,8 @@ import ollama, {
 	type ProgressResponse,
 	type StatusResponse,
 	type DeleteRequest,
+	type PullRequest,
+	type CreateRequest,
 } from 'ollama/browser';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
@@ -109,6 +111,28 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	list_last_updated: number | null = $state(null);
 	last_refreshed: string | null = $state(null);
 
+	// Pull model state
+	pull_model_name: string = $state('');
+	pull_insecure: boolean = $state(false);
+	pull_is_pulling: boolean = $state(false);
+
+	// Copy model state
+	copy_source_model: string = $state('');
+	copy_destination_model: string = $state('');
+	copy_is_copying: boolean = $state(false);
+
+	// Create model state
+	create_model_name: string = $state('');
+	create_from_model: string = $state('');
+	create_system_prompt: string = $state('');
+	create_template: string = $state('');
+	create_is_creating: boolean = $state(false);
+
+	// Manager view state
+	manager_selected_view: 'configure' | 'model' | 'pull' | 'copy' | 'create' = $state('configure');
+	manager_selected_model: Model | null = $state(null);
+	manager_last_active_view: {view: string; model: Model | null} | null = $state(null);
+
 	// Operations tracking using Cell instances
 	operations: SvelteMap<Uuid, Ollama_Operation> = new SvelteMap();
 
@@ -148,6 +172,37 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	});
 
 	readonly model_names: Array<string> = $derived(Array.from(this.model_by_name.keys()));
+
+	// Pull model derived state
+	readonly pull_parsed_model_name: string = $derived(this.pull_model_name.trim());
+	readonly pull_is_duplicate_name: boolean = $derived(
+		!!this.pull_parsed_model_name && this.model_by_name.has(this.pull_parsed_model_name),
+	);
+	readonly pull_can_pull: boolean = $derived(
+		!!this.pull_parsed_model_name && !this.pull_is_duplicate_name,
+	);
+
+	// Copy model derived state
+	readonly copy_parsed_source_model: string = $derived(this.copy_source_model.trim());
+	readonly copy_parsed_destination_model: string = $derived(this.copy_destination_model.trim());
+	readonly copy_is_duplicate_name: boolean = $derived(
+		!!this.copy_parsed_destination_model &&
+			this.model_by_name.has(this.copy_parsed_destination_model),
+	);
+	readonly copy_destination_model_changed: boolean = $derived(
+		!!this.copy_parsed_source_model &&
+			!!this.copy_parsed_destination_model &&
+			!this.copy_is_duplicate_name,
+	);
+
+	// Create model derived state
+	readonly create_parsed_model_name: string = $derived(this.create_model_name.trim());
+	readonly create_is_duplicate_name: boolean = $derived(
+		!!this.create_parsed_model_name && this.model_by_name.has(this.create_parsed_model_name),
+	);
+	readonly create_can_create: boolean = $derived(
+		!!this.create_parsed_model_name && !this.create_is_duplicate_name,
+	);
 
 	constructor(options: Ollama_Options) {
 		super(Ollama_Json, options);
@@ -346,33 +401,40 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 		return operation.operation_id;
 	}
 
-	// TODO implement `create_model`
-	// TODO @many be sure the whole `CreateRequest` is supported
-	// interface CreateRequest {
-	//     model: string;
-	//     from?: string;
-	//     stream?: boolean;
-	//     quantize?: string;
-	//     template?: string;
-	//     license?: string | string[];
-	//     system?: string;
-	//     parameters?: Record<string, unknown>;
-	//     messages?: Message[];
-	//     adapters?: Record<string, string>;
-	// }
-	// `ollama.create(request);`
-	// - `request` `<Object>`: The request object containing create parameters.
-	//   - `model` `<string>` The name of the model to create.
-	//   - `from` `<string>`: The base model to derive from.
-	//   - `stream` `<boolean>`: (Optional) When true an `AsyncGenerator` is returned.
-	//   - `quantize` `<string>`: Quanization precision level (`q8_0`, `q4_K_M`, etc.).
-	//   - `template` `<string>`: (Optional) The prompt template to use with the model.
-	//   - `license` `<string|string[]>`: (Optional) The license(s) associated with the model.
-	//   - `system` `<string>`: (Optional) The system prompt for the model.
-	//   - `parameters` `<Record<string, unknown>>`: (Optional) Additional model parameters as key-value pairs.
-	//   - `messages` `<Message[]>`: (Optional) Initial chat messages for the model.
-	//   - `adapters` `<Record<string, string>>`: (Optional) A key-value map of LoRA adapter configurations.
-	// - Returns: `<ProgressResponse>`
+	/**
+	 * Create a new model with custom configuration.
+	 */
+	async create_model(model_name: string, partial: Partial<CreateRequest>): Promise<Uuid> {
+		console.log(`[ollama] creating model: ${model_name}`);
+
+		const operation = this.#create_operation('create', {model: model_name, progress: 0});
+
+		if (!BROWSER) return operation.operation_id;
+
+		// Check if model already exists
+		if (this.model_by_name.has(model_name)) {
+			const error_message = `Model "${model_name}" already exists`;
+			console.error(`[ollama] ${error_message}`);
+			operation.complete_failure(error_message);
+			return operation.operation_id;
+		}
+
+		try {
+			// TODO stream so we get progress updates
+			const response = await ollama.create({...partial, model: model_name, stream: false});
+			console.log(`[ollama] create model success for: ${model_name}`, response);
+
+			operation.complete_success({type: 'create', data: response});
+
+			// Refresh model list after successful creation
+			await this.refresh();
+		} catch (error) {
+			console.error(`[ollama] failed to create model ${model_name}:`, error);
+			operation.complete_failure(error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE);
+		}
+
+		return operation.operation_id;
+	}
 
 	/**
 	 * Clear completed operations from the history.
@@ -414,6 +476,127 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 			model.ollama_details_loaded = false;
 			model.ollama_details_error = undefined;
 		}
+	}
+
+	/**
+	 * Handle pull model form submission
+	 */
+	async handle_pull(): Promise<void> {
+		if (!this.pull_can_pull) return;
+
+		this.pull_is_pulling = true;
+		try {
+			await this.pull_model(this.pull_parsed_model_name, {insecure: this.pull_insecure});
+			this.pull_model_name = '';
+			this.pull_insecure = false;
+		} catch (error) {
+			console.error('Pull failed:', error);
+		} finally {
+			this.pull_is_pulling = false;
+		}
+	}
+
+	/**
+	 * Handle copy model form submission
+	 */
+	async handle_copy(): Promise<void> {
+		if (!this.copy_destination_model_changed) return;
+
+		this.copy_is_copying = true;
+		try {
+			await this.copy_model(this.copy_parsed_source_model, this.copy_parsed_destination_model);
+			this.copy_source_model = '';
+			this.copy_destination_model = '';
+		} catch (error) {
+			console.error('Copy failed:', error);
+		} finally {
+			this.copy_is_copying = false;
+		}
+	}
+
+	/**
+	 * Handle create model form submission
+	 */
+	async handle_create(): Promise<void> {
+		if (!this.create_can_create) return;
+
+		this.create_is_creating = true;
+		try {
+			await this.create_model(this.create_parsed_model_name, {
+				from: this.create_from_model.trim() || undefined,
+				system: this.create_system_prompt.trim() || undefined,
+				template: this.create_template.trim() || undefined,
+			});
+
+			// Reset form
+			this.create_model_name = '';
+			this.create_from_model = '';
+			this.create_system_prompt = '';
+			this.create_template = '';
+		} catch (error) {
+			console.error('Create failed:', error);
+		} finally {
+			this.create_is_creating = false;
+		}
+	}
+
+	/**
+	 * Set the manager view and optionally the selected model
+	 */
+	set_manager_view(view: typeof this.manager_selected_view, model?: Model | null): void {
+		// Store the previous view as the last active view if it's not 'configure'
+		if (this.manager_selected_view !== 'configure' && this.manager_selected_view !== view) {
+			this.manager_last_active_view = {
+				view: this.manager_selected_view,
+				model: this.manager_selected_model,
+			};
+		}
+		this.manager_selected_view = view;
+		if (model !== undefined) {
+			this.manager_selected_model = model;
+		}
+	}
+
+	/**
+	 * Navigate back to the last active view
+	 */
+	manager_back_to_last_view(): void {
+		if (this.manager_last_active_view) {
+			const view_to_restore = this.manager_last_active_view;
+			this.manager_last_active_view = null; // Clear history
+			this.manager_selected_view = view_to_restore.view as typeof this.manager_selected_view;
+			this.manager_selected_model = view_to_restore.model;
+		}
+	}
+
+	/**
+	 * Handle delete model from manager
+	 */
+	async handle_delete_model(model_name: string): Promise<void> {
+		console.log(`[ollama] deleting model from manager: ${model_name}`);
+		await this.delete_model(model_name);
+		// Clear selection if the deleted model was selected
+		if (this.manager_selected_model?.name === model_name) {
+			this.set_manager_view('configure', null);
+		}
+	}
+
+	/**
+	 * Handle select model in manager
+	 */
+	async handle_select_model(model: Model): Promise<void> {
+		this.set_manager_view('model', model);
+		// Auto-load details if not already loaded
+		if (model.needs_ollama_details) {
+			await this.show_model(model.name);
+		}
+	}
+
+	/**
+	 * Handle close form in manager
+	 */
+	handle_close_form(): void {
+		this.set_manager_view('configure', null);
 	}
 
 	// Private methods

@@ -25,7 +25,7 @@ describe('Ollama', () => {
 		expect(ollama.host).toBe('http://127.0.0.1:11434');
 		expect(ollama.list_status).toBe('initial');
 		expect(ollama.available).toBe(false);
-		expect(ollama.model_count).toBeTypeOf('number');
+		expect(ollama.models.length).toBeTypeOf('number');
 	});
 
 	test('should track operations', () => {
@@ -107,7 +107,7 @@ describe('Ollama', () => {
 		const ollama = new Ollama({app});
 
 		expect(ollama.models).toHaveLength(2);
-		expect(ollama.model_count).toBe(2);
+		expect(ollama.models.length).toBe(2);
 		expect(ollama.model_names).toContain('llama3.2:1b');
 		expect(ollama.model_names).toContain('gemma3:1b');
 		expect(ollama.model_names).not.toContain('gpt-4');
@@ -125,7 +125,7 @@ describe('Ollama', () => {
 		ollama.list_status = 'success';
 
 		expect(ollama.available).toBe(true);
-		expect(ollama.model_count).toBe(2);
+		expect(ollama.models.length).toBe(2);
 	});
 
 	test('should clear model details', () => {

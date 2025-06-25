@@ -16,35 +16,15 @@
 
 	const app = frontend_context.get();
 
-	let model_name = $state('');
-	let insecure = $state(false);
-	let is_pulling = $state(false);
-
-	const parsed_model_name = $derived(model_name.trim());
-	const is_duplicate_name = $derived(
-		parsed_model_name && ollama.model_by_name.has(parsed_model_name),
-	);
-	const can_pull = $derived(parsed_model_name && !is_duplicate_name);
-
 	const models_not_downloaded = $derived(app.ollama.models_not_downloaded);
 
 	const handle_pull = async () => {
-		if (!can_pull) return;
-
-		is_pulling = true;
-		try {
-			await ollama.pull_model(parsed_model_name, {insecure});
-			model_name = '';
-			onclose();
-		} catch (error) {
-			console.error('Pull failed:', error);
-		} finally {
-			is_pulling = false;
-		}
+		await ollama.handle_pull();
+		onclose();
 	};
 
 	const handle_keydown = (event: KeyboardEvent) => {
-		if (event.key === 'Enter' && !is_pulling && can_pull) {
+		if (event.key === 'Enter' && !ollama.pull_is_pulling && ollama.pull_can_pull) {
 			void handle_pull();
 		} else if (event.key === 'Escape') {
 			onclose();
@@ -70,9 +50,9 @@
 					type="text"
 					class="plain w_100"
 					placeholder="{GLYPH_PLACEHOLDER} e.g., llama3.1, mistral, codellama"
-					bind:value={model_name}
+					bind:value={ollama.pull_model_name}
 					onkeydown={handle_keydown}
-					disabled={is_pulling}
+					disabled={ollama.pull_is_pulling}
 				/>
 			</label>
 			<p>
@@ -89,8 +69,8 @@
 						<button
 							type="button"
 							class="compact"
-							onclick={() => (model_name = model.name)}
-							disabled={is_pulling || model_name === model.name}
+							onclick={() => (ollama.pull_model_name = model.name)}
+							disabled={ollama.pull_is_pulling || ollama.pull_model_name === model.name}
 						>
 							{model.name}
 						</button>
@@ -100,7 +80,7 @@
 		</fieldset>
 
 		<label class="display_flex gap_xs align_items_center">
-			<input type="checkbox" class="compact" bind:checked={insecure} disabled={is_pulling} />
+			<input type="checkbox" class="compact" bind:checked={ollama.pull_insecure} disabled={ollama.pull_is_pulling} />
 			<span>allow insecure connections</span>
 		</label>
 
@@ -108,16 +88,16 @@
 			<button
 				type="button"
 				class="color_a"
-				disabled={!can_pull || is_pulling}
+				disabled={!ollama.pull_can_pull || ollama.pull_is_pulling}
 				onclick={handle_pull}
 			>
 				<Glyph glyph={GLYPH_DOWNLOAD} />&nbsp;
-				{is_pulling ? 'pulling...' : 'pull model'}
+				{ollama.pull_is_pulling ? 'pulling...' : 'pull model'}
 			</button>
-			<button type="button" class="plain" onclick={onclose} disabled={is_pulling}>cancel</button>
+			<button type="button" class="plain" onclick={onclose} disabled={ollama.pull_is_pulling}>cancel</button>
 		</div>
 
-		{#if is_duplicate_name}
+		{#if ollama.pull_is_duplicate_name}
 			<Error_Message>a model with this name already exists</Error_Message>
 		{/if}
 	</div>

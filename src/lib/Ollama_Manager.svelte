@@ -8,15 +8,13 @@
 
 	import Glyph from '$lib/Glyph.svelte';
 	import External_Link from '$lib/External_Link.svelte';
-	import {GLYPH_COPY, GLYPH_DOWNLOAD, GLYPH_SETTINGS} from '$lib/glyphs.js';
+	import {GLYPH_ADD, GLYPH_COPY, GLYPH_DOWNLOAD, GLYPH_SETTINGS} from '$lib/glyphs.js';
 	import Ollama_Configure from '$lib/Ollama_Configure.svelte';
 	import Ollama_Model_Details from '$lib/Ollama_Model_Details.svelte';
 	import Ollama_Pull_Model from '$lib/Ollama_Pull_Model.svelte';
-	// TODO @many create model
-	// import Ollama_Create_Model from '$lib/Ollama_Create_Model.svelte';
+	import Ollama_Create_Model from '$lib/Ollama_Create_Model.svelte';
 	import Ollama_Copy_Model from '$lib/Ollama_Copy_Model.svelte';
 	import type {Ollama} from '$lib/ollama.svelte.js';
-	import type {Model} from '$lib/model.svelte.js';
 
 	interface Props {
 		ollama: Ollama;
@@ -30,72 +28,10 @@
 
 	// TODO probably should use routes instead of internal state, but I want to see about using this as a snapshotting experiment
 
-	// TODO maybe put this into a viewmodel or just `ollama`?
-	let selected_view: 'configure' | 'model' | 'pull' | 'copy' = $state('configure');
-	let selected_model: Model | null = $state(null);
-	let last_active_view: {view: string; model: Model | null} | null = $state(null);
-
 	// Initial load when component mounts
 	onMount(() => {
 		void ollama.refresh();
 	});
-
-	const set_view = (view: typeof selected_view, model?: Model | null) => {
-		// Store the previous view as the last active view if it's not 'configure'
-		if (selected_view !== 'configure' && selected_view !== view) {
-			last_active_view = {
-				view: selected_view,
-				model: selected_model,
-			};
-		}
-		selected_view = view;
-		if (model !== undefined) {
-			selected_model = model;
-		}
-	};
-
-	const handle_back_to_last_view = () => {
-		if (last_active_view) {
-			const view_to_restore = last_active_view;
-			last_active_view = null; // Clear history
-			selected_view = view_to_restore.view as typeof selected_view;
-			selected_model = view_to_restore.model;
-		}
-	};
-
-	const handle_delete_model = async (model_name: string) => {
-		console.log(`[Ollama_Manager] deleting model: ${model_name}`);
-		await ollama.delete_model(model_name);
-		// Clear selection if the deleted model was selected
-		if (selected_model?.name === model_name) {
-			set_view('configure', null);
-		}
-	};
-
-	const handle_select_model = async (model: Model) => {
-		set_view('model', model);
-		// Auto-load details if not already loaded
-		if (model.needs_ollama_details) {
-			await ollama.show_model(model.name);
-		}
-	};
-
-	const handle_show_pull = () => {
-		set_view('pull', null);
-	};
-
-	// TODO @many create model
-	// const handle_show_create = () => {
-	// 	set_view('create', null);
-	// };
-
-	const handle_show_copy = () => {
-		set_view('copy', null);
-	};
-
-	const handle_close_form = () => {
-		set_view('configure', null);
-	};
 </script>
 
 <div class="display_flex h_100">
@@ -141,9 +77,9 @@
 					<button
 						type="button"
 						class="w_100 justify_content_start border_radius_0 plain menu_item selectable font_weight_500"
-						class:selected={selected_view === 'configure'}
+						class:selected={ollama.manager_selected_view === 'configure'}
 						onclick={() => {
-							set_view('configure', null);
+							ollama.set_manager_view('configure', null);
 						}}
 					>
 						<Glyph glyph={GLYPH_SETTINGS} />
@@ -153,32 +89,31 @@
 					<button
 						type="button"
 						class="w_100 justify_content_start border_radius_0 plain menu_item selectable font_weight_500"
-						class:selected={selected_view === 'pull'}
+						class:selected={ollama.manager_selected_view === 'pull'}
 						disabled={!ollama.available}
-						onclick={handle_show_pull}
+						onclick={() => ollama.set_manager_view('pull', null)}
 					>
 						<Glyph glyph={GLYPH_DOWNLOAD} />
 						<span class="ml_sm">pull model</span>
 					</button>
 
-					<!-- TODO @many create model -->
-					<!-- <button
+					<button
 						type="button"
 						class="w_100 justify_content_start border_radius_0 plain menu_item selectable font_weight_500"
-						class:selected={selected_view === 'create'}
+						class:selected={ollama.manager_selected_view === 'create'}
 						disabled={!ollama.available}
-						onclick={handle_show_create}
+						onclick={() => ollama.set_manager_view('create', null)}
 					>
 						<Glyph glyph={GLYPH_ADD} />
 						<span class="ml_sm">create model</span>
-					</button> -->
+					</button>
 
 					<button
 						type="button"
 						class="w_100 justify_content_start border_radius_0 plain menu_item selectable font_weight_500"
-						class:selected={selected_view === 'copy'}
+						class:selected={ollama.manager_selected_view === 'copy'}
 						disabled={!ollama.available || ollama.models_downloaded.length === 0}
-						onclick={handle_show_copy}
+						onclick={() => ollama.set_manager_view('copy', null)}
 					>
 						<Glyph glyph={GLYPH_COPY} />
 						<span class="ml_sm">copy model</span>
@@ -198,8 +133,9 @@
 							<button
 								type="button"
 								class="menu_item selectable plain text_align_start p_sm border_radius_0 font_weight_400"
-								class:selected={selected_view === 'model' && selected_model?.id === model.id}
-								onclick={() => handle_select_model(model)}
+								class:selected={ollama.manager_selected_view === 'model' &&
+									ollama.manager_selected_model?.id === model.id}
+								onclick={() => ollama.handle_select_model(model)}
 							>
 								<div class="display_flex flex_column gap_xs w_100">
 									<div class="ellipsis font_size_lg">
@@ -219,8 +155,8 @@
 						no models found, <button
 							type="button"
 							class="inline compact"
-							disabled={selected_view === 'pull'}
-							onclick={handle_show_pull}>pull a model</button
+							disabled={ollama.manager_selected_view === 'pull'}
+							onclick={() => ollama.set_manager_view('pull', null)}>pull a model</button
 						>
 						or install them using the
 						<External_Link href="https://github.com/ollama/ollama">Ollama CLI</External_Link>
@@ -232,26 +168,30 @@
 
 	<!-- Main Content -->
 	<div class="flex_1 h_100 overflow_auto p_md">
-		{#if selected_view === 'configure'}
+		{#if ollama.manager_selected_view === 'configure'}
 			<Ollama_Configure
 				{ollama}
-				last_active_view={last_active_view?.view ?? null}
-				onshowpull={handle_show_pull}
-				onback={handle_back_to_last_view}
+				last_active_view={ollama.manager_last_active_view?.view ?? null}
+				onshowpull={() => ollama.set_manager_view('pull', null)}
+				onback={() => ollama.manager_back_to_last_view()}
 			/>
-		{:else if selected_view === 'model' && selected_model}
+		{:else if ollama.manager_selected_view === 'model' && ollama.manager_selected_model}
 			<Ollama_Model_Details
-				model={selected_model}
+				model={ollama.manager_selected_model}
 				{ollama}
-				onclose={handle_close_form}
-				ondelete={handle_delete_model}
+				onclose={() => ollama.handle_close_form()}
+				ondelete={(model_name) => ollama.handle_delete_model(model_name)}
 			/>
-		{:else if selected_view === 'pull'}
-			<Ollama_Pull_Model {ollama} onclose={handle_close_form} />
-			<!-- {:else if selected_view === 'create'}
-			<Ollama_Create_Model {ollama} onclose={handle_close_form} onshowpull={handle_show_pull} /> -->
-		{:else if selected_view === 'copy'}
-			<Ollama_Copy_Model {ollama} onclose={handle_close_form} />
+		{:else if ollama.manager_selected_view === 'pull'}
+			<Ollama_Pull_Model {ollama} onclose={() => ollama.handle_close_form()} />
+		{:else if ollama.manager_selected_view === 'create'}
+			<Ollama_Create_Model
+				{ollama}
+				onclose={() => ollama.handle_close_form()}
+				onshowpull={() => ollama.set_manager_view('pull', null)}
+			/>
+		{:else if ollama.manager_selected_view === 'copy'}
+			<Ollama_Copy_Model {ollama} onclose={() => ollama.handle_close_form()} />
 		{/if}
 	</div>
 </div>
