@@ -3,6 +3,7 @@
 	import {page} from '$app/state';
 	import type {SvelteHTMLElements} from 'svelte/elements';
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
+	import {onMount} from 'svelte';
 
 	import Model_Link from '$lib/Model_Link.svelte';
 	import Provider_Link from '$lib/Provider_Link.svelte';
@@ -21,11 +22,18 @@
 
 	const app = frontend_context.get();
 
+	// Initial load when component mounts
+	onMount(async () => {
+		if (model.needs_ollama_details) {
+			await app.ollama.show_model(model.name);
+		}
+	});
+
 	const at_detail_page = $derived(page.url.pathname === `${base}/models/${model.name}`);
 	const provider = $derived(app.providers.find_by_name(model.provider_name));
 
 	const load_ollama_details = async () => {
-		if (model.provider_name === 'ollama' && model.needs_ollama_details) {
+		if (model.needs_ollama_details) {
 			await app.ollama.show_model(model.name);
 		}
 	};
@@ -139,7 +147,7 @@
 				</div>
 			{/if}
 
-			{#if model.provider_name === 'ollama' && model.ollama_list_data?.details}
+			{#if model.ollama_list_data?.details}
 				{#if model.ollama_list_data.details.format}
 					<div>
 						<strong>format:</strong>
@@ -163,7 +171,7 @@
 
 		{#if model.cost_input || model.cost_output}
 			<section>
-				<h3>Pricing</h3>
+				<h3>pricing</h3>
 				{#if model.cost_input}
 					<div><strong>input:</strong> ${model.cost_input.toFixed(2)} / 1M tokens</div>
 				{/if}
@@ -176,16 +184,16 @@
 		{#if model.provider_name === 'ollama'}
 			<section>
 				<div class="display_flex justify_content_space_between align_items_center mb_md">
-					<h3 class="mt_0 mb_0">Ollama Details</h3>
+					<h3>Ollama details</h3>
 					<div class="display_flex gap_sm">
 						{#if model.ollama_details_loaded}
 							<button
 								type="button"
-								class="plain compact"
+								class="plain icon_button"
 								onclick={reload_ollama_details}
 								title="reload details"
 							>
-								<Glyph glyph={GLYPH_REFRESH} /> reload
+								<Glyph glyph={GLYPH_REFRESH} />
 							</button>
 						{:else if model.needs_ollama_details}
 							<button
@@ -236,42 +244,32 @@
 
 				{#if model.ollama_details}
 					{#if model.ollama_details.system}
-						<div class="subsection">
-							<h4>system prompt</h4>
-							<pre class="code_block">{model.ollama_details.system}</pre>
-						</div>
+						<h4>system prompt</h4>
+						<pre class="code_block"><code>{model.ollama_details.system}</code></pre>
 					{/if}
 
 					{#if model.ollama_details.template}
-						<div class="subsection">
-							<h4>template</h4>
-							<pre class="code_block">{model.ollama_details.template}</pre>
-						</div>
-					{/if}
-
-					{#if model.ollama_details.modelfile}
-						<details class="subsection">
-							<summary><h4 class="inline">modelfile</h4></summary>
-							<pre class="code_block mt_sm">{model.ollama_details.modelfile}</pre>
-						</details>
+						<h4>template</h4>
+						<pre class="code_block"><code>{model.ollama_details.template}</code></pre>
 					{/if}
 
 					{#if model.ollama_details.model_info && Object.keys(model.ollama_details.model_info).length > 0}
-						<details class="subsection">
-							<summary><h4 class="inline">model info</h4></summary>
-							<pre class="code_block mt_sm">{JSON.stringify(
-									model.ollama_details.model_info,
-									null,
-									2,
-								)}</pre>
-						</details>
+						<h4>model info</h4>
+						<pre class="code_block"><code
+								>{JSON.stringify(model.ollama_details.model_info, null, 2)}</code
+							></pre>
 					{/if}
 
 					{#if model.ollama_details.license}
-						<div class="subsection">
-							<h4>License</h4>
-							<pre class="code_block">{model.ollama_details.license}</pre>
-						</div>
+						<h4>license</h4>
+						<pre class="code_block"><code>{model.ollama_details.license}</code></pre>
+					{/if}
+
+					{#if model.ollama_details.modelfile}
+						<details>
+							<summary><h4 class="display_inline">modelfile</h4></summary>
+							<pre class="code_block mt_sm"><code>{model.ollama_details.modelfile}</code></pre>
+						</details>
 					{/if}
 				{:else if !model.ollama_details_loading && !model.needs_ollama_details}
 					<p class="font_size_sm">
@@ -308,44 +306,5 @@
 		grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 		gap: var(--space_sm);
 		margin-top: var(--space_xs);
-	}
-
-	.subsection {
-		margin-top: var(--space_md);
-	}
-
-	.subsection h4 {
-		margin-top: 0;
-		margin-bottom: var(--space_xs);
-	}
-
-	h4.inline {
-		display: inline;
-		margin: 0;
-		cursor: pointer;
-	}
-
-	.code_block {
-		background: var(--bg_2);
-		padding: var(--space_sm);
-		border-radius: var(--radius_xs);
-		overflow-x: auto;
-		max-height: 300px;
-		font-size: var(--font_size_sm);
-		white-space: pre-wrap;
-		word-break: break-word;
-	}
-
-	details summary {
-		cursor: pointer;
-		user-select: none;
-	}
-
-	details summary:hover {
-		opacity: 0.8;
-	}
-
-	code {
-		font-family: var(--font_mono);
 	}
 </style>

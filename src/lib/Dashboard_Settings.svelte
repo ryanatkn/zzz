@@ -27,7 +27,7 @@
 					show sidebar <code class="ml_md">[backtick `]</code>
 				</label>
 			</div>
-			<div class="my_md">
+			<!-- TODO idk <div class="my_md">
 				<label class="row">
 					<input
 						type="checkbox"
@@ -36,7 +36,7 @@
 					/>
 					show main dialog
 				</label>
-			</div>
+			</div> -->
 		</div>
 	</section>
 	<section class="mb_xl7 display_flex justify_content_center">
