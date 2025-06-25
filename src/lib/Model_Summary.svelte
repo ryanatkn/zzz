@@ -6,6 +6,8 @@
 	import Contextmenu_Model from '$lib/Contextmenu_Model.svelte';
 	import Provider_Link from '$lib/Provider_Link.svelte';
 	import type {Model} from '$lib/model.svelte.js';
+	import Glyph from '$lib/Glyph.svelte';
+	import {GLYPH_DOWNLOAD} from '$lib/glyphs.js';
 
 	interface Props {
 		model: Model;
@@ -37,9 +39,16 @@
 		{/if}
 
 		{#if model.downloaded === false}
-			<div class="mb_sm">
-				<small>not downloaded</small>
-			</div>
+			{#if model.provider_name === 'ollama' && !model.downloaded}
+				<button
+					type="button"
+					class="plain compact"
+					onclick={() => model.navigate_to_download()}
+					disabled={model.name === model.app.ollama.pull_model_name}
+				>
+					<Glyph glyph={GLYPH_DOWNLOAD} attrs={{class: 'mr_xs2'}} /> download
+				</button>
+			{/if}
 		{/if}
 
 		<div class="specs_grid">

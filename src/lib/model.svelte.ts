@@ -1,4 +1,7 @@
 import {z} from 'zod';
+import {goto} from '$app/navigation';
+import {base} from '$app/paths';
+import {page} from '$app/state';
 
 import {Provider_Name} from '$lib/provider_types.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
@@ -87,6 +90,30 @@ export class Model extends Cell<typeof Model_Json> {
 			!this.ollama_details_loading &&
 			!this.ollama_details_error,
 	);
+
+	/**
+	 * Download this model. Currently only works for Ollama models.
+	 */
+	async navigate_to_download(): Promise<void> {
+		if (this.provider_name !== 'ollama') {
+			console.error(`Download not supported for provider: ${this.provider_name}`);
+			return;
+		}
+
+		if (this.downloaded) {
+			console.error(`Model ${this.name} is already downloaded`);
+			return;
+		}
+
+		// Set the model name on the Ollama instance and navigate to the providers page
+		this.app.ollama.pull_model_name = this.name;
+		this.app.ollama.set_manager_view('pull');
+		// TODO BLOCK add helper goto_unless_current
+		const path = `${base}/providers/ollama`;
+		if (page.url.pathname !== path) {
+			await goto(path);
+		}
+	}
 
 	constructor(options: Model_Options) {
 		super(Model_Json, options);

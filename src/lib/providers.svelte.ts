@@ -4,7 +4,7 @@ import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Provider, Provider_Json} from '$lib/provider.svelte.js';
 import {cell_array} from '$lib/cell_helpers.js';
 import {Cell_Json} from '$lib/cell_types.js';
-import type {Provider_Name} from './provider_types.js';
+import type {Provider_Name} from '$lib/provider_types.js';
 
 export const Providers_Json = Cell_Json.extend({
 	items: cell_array(

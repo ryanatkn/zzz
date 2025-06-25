@@ -14,6 +14,7 @@
 		GLYPH_ERROR,
 		GLYPH_CHECKMARK,
 		GLYPH_ADD,
+		GLYPH_DOWNLOAD,
 	} from '$lib/glyphs.js';
 	import {frontend_context} from '$lib/frontend.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
@@ -81,13 +82,15 @@
 				</div>
 				{#if model.downloaded !== undefined}
 					<div class="column mb_lg">
-						<small>
-							{#if model.downloaded}
+						{#if model.downloaded}
+							<small>
 								{GLYPH_CHECKMARK} downloaded
-							{:else}
-								not downloaded
-							{/if}
-						</small>
+							</small>
+						{:else if model.provider_name === 'ollama' && !model.downloaded}
+							<button type="button" class="color_b" onclick={() => model.navigate_to_download()}>
+								<Glyph glyph={GLYPH_DOWNLOAD} attrs={{class: 'mr_xs2'}} /> download model
+							</button>
+						{/if}
 					</div>
 				{/if}
 				{#if model.tags.length}
