@@ -4,8 +4,8 @@
 	import Glyph from '$lib/Glyph.svelte';
 	import Error_Message from '$lib/Error_Message.svelte';
 	import {GLYPH_DOWNLOAD, GLYPH_ARROW_LEFT, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
-	import {small_recommended_models} from '$lib/config_defaults.js';
 	import type {Ollama} from '$lib/ollama.svelte.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
 
 	interface Props {
 		ollama: Ollama;
@@ -13,6 +13,8 @@
 	}
 
 	const {ollama, onclose}: Props = $props();
+
+	const app = frontend_context.get();
 
 	let model_name = $state('');
 	let insecure = $state(false);
@@ -24,9 +26,7 @@
 	);
 	const can_pull = $derived(parsed_model_name && !is_duplicate_name);
 
-	const available_small_recommended_models = $derived(
-		small_recommended_models.filter((model) => !ollama.model_by_name.has(model)),
-	);
+	const models_not_downloaded = $derived(app.ollama.models_not_downloaded);
 
 	const handle_pull = async () => {
 		if (!can_pull) return;
@@ -82,17 +82,17 @@
 					rel="noopener noreferrer">Ollama library</a
 				>.
 			</p>
-			{#if available_small_recommended_models.length > 0}
-				<p>Here are some small recommended models:</p>
+			{#if models_not_downloaded.length > 0}
+				<p>Available models not yet downloaded:</p>
 				<div class="display_flex flex_wrap gap_xs">
-					{#each available_small_recommended_models as model (model)}
+					{#each models_not_downloaded as model (model.id)}
 						<button
 							type="button"
 							class="compact"
-							onclick={() => (model_name = model)}
-							disabled={is_pulling || model_name === model}
+							onclick={() => (model_name = model.name)}
+							disabled={is_pulling || model_name === model.name}
 						>
-							{model}
+							{model.name}
 						</button>
 					{/each}
 				</div>

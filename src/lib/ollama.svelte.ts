@@ -118,7 +118,6 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	}
 	set host(value: string) {
 		this.#host = Ollama_Json.shape.host.parse(value);
-		this.#update_ollama_config();
 	}
 
 	// Derived state
@@ -137,9 +136,8 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	 */
 	readonly models: Array<Model> = $derived(this.app.models.items.where('provider_name', 'ollama'));
 
-	readonly model_count: number = $derived(this.models.length);
-
-	readonly model_names: Array<string> = $derived(this.models.map((m) => m.name));
+	readonly models_downloaded = $derived(this.models.filter((m) => m.downloaded));
+	readonly models_not_downloaded = $derived(this.models.filter((m) => !m.downloaded));
 
 	readonly model_by_name: Map<string, Model> = $derived.by(() => {
 		const map: Map<string, Model> = new Map();
@@ -149,10 +147,11 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 		return map;
 	});
 
+	readonly model_names: Array<string> = $derived(Array.from(this.model_by_name.keys()));
+
 	constructor(options: Ollama_Options) {
 		super(Ollama_Json, options);
 		this.init();
-		this.#update_ollama_config();
 	}
 
 	/**
@@ -438,12 +437,6 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 		return operation;
 	}
 
-	#update_ollama_config(): void {
-		if (!BROWSER) return;
-		// Update the global ollama instance configuration
-		(ollama as any).config = {host: this.host};
-	}
-
 	/**
 	 * Sync the list response with app.models
 	 */
@@ -487,8 +480,9 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 		}
 
 		// Remove models that no longer exist in Ollama
-		for (const name of existing_models.keys()) {
-			this.app.models.remove_by_name(name);
+		for (const removed_model of existing_models.values()) {
+			removed_model.ollama_list_data = undefined;
+			removed_model.ollama_details = undefined;
 		}
 	}
 

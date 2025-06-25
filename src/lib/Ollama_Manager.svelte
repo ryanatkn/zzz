@@ -177,7 +177,7 @@
 						type="button"
 						class="w_100 justify_content_start border_radius_0 plain menu_item selectable font_weight_500"
 						class:selected={selected_view === 'copy'}
-						disabled={!ollama.available || ollama.model_count === 0}
+						disabled={!ollama.available || ollama.models_downloaded.length === 0}
 						onclick={handle_show_copy}
 					>
 						<Glyph glyph={GLYPH_COPY} />
@@ -187,14 +187,14 @@
 			</section>
 
 			<!-- Models List -->
-			{#if ollama.available && ollama.model_count > 0}
+			{#if ollama.available && ollama.models_downloaded.length > 0}
 				<section>
 					<h3 class="mt_xl3 mb_md">
-						{ollama.model_count} model{plural(ollama.model_count)}
+						{ollama.models_downloaded.length} model{plural(ollama.models_downloaded.length)}
 					</h3>
 
 					<div class="column">
-						{#each ollama.models as model (model.id)}
+						{#each ollama.models_downloaded as model (model.id)}
 							<button
 								type="button"
 								class="menu_item selectable plain text_align_start p_sm border_radius_0 font_weight_400"
@@ -213,7 +213,7 @@
 						{/each}
 					</div>
 				</section>
-			{:else if ollama.available && ollama.model_count === 0}
+			{:else if ollama.available && ollama.models_downloaded.length === 0}
 				<section class="panel p_md" transition:slide>
 					<p>
 						no models found, <button

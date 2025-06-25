@@ -38,7 +38,7 @@
 
 		{#if model.downloaded === false}
 			<div class="mb_sm">
-				<small class="bg_e_1 px_sm border_radius_xs">not downloaded</small>
+				<small class="bg_h_1 px_sm border_radius_xs">not downloaded</small>
 			</div>
 		{/if}
 

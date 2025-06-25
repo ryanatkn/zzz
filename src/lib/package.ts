@@ -363,6 +363,11 @@ export const package_json = {
 			svelte: './dist/Contextmenu_Entry_Toggle.svelte',
 			default: './dist/Contextmenu_Entry_Toggle.svelte',
 		},
+		'./Contextmenu_Model.svelte': {
+			types: './dist/Contextmenu_Model.svelte.d.ts',
+			svelte: './dist/Contextmenu_Model.svelte',
+			default: './dist/Contextmenu_Model.svelte',
+		},
 		'./Contextmenu_Prompt.svelte': {
 			types: './dist/Contextmenu_Prompt.svelte.d.ts',
 			svelte: './dist/Contextmenu_Prompt.svelte',
@@ -1449,7 +1454,6 @@ export const src_json = {
 		'./config_defaults.js': {
 			path: 'config_defaults.ts',
 			declarations: [
-				{name: 'small_recommended_models', kind: 'variable'},
 				{name: 'SYSTEM_MESSAGE_DEFAULT', kind: 'variable'},
 				{name: 'OUTPUT_TOKEN_MAX_DEFAULT', kind: 'variable'},
 				{name: 'TEMPERATURE_DEFAULT', kind: 'variable'},
@@ -1529,6 +1533,10 @@ export const src_json = {
 		},
 		'./Contextmenu_Entry_Toggle.svelte': {
 			path: 'Contextmenu_Entry_Toggle.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Contextmenu_Model.svelte': {
+			path: 'Contextmenu_Model.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
 		},
 		'./Contextmenu_Prompt.svelte': {

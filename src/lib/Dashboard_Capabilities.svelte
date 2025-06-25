@@ -3,12 +3,22 @@
 	import Glyph from '$lib/Glyph.svelte';
 	import Footer from '$lib/Footer.svelte';
 	import Capabilities_View from '$lib/Capabilities_View.svelte';
+	import Dashboard_Header from '$lib/Dashboard_Header.svelte';
+	import {format_timestamp} from '$lib/time_helpers.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
+
+	const app = frontend_context.get();
 </script>
 
 <div class="p_lg">
-	<header>
-		<h1><Glyph glyph={GLYPH_CAPABILITY} /> system capabilities</h1>
-	</header>
+	<Dashboard_Header>
+		{#snippet header()}
+			<h1><Glyph glyph={GLYPH_CAPABILITY} /> system capabilities</h1>
+		{/snippet}
+		<div class="font_family_serif font_size_xl3">
+			{format_timestamp(app.time.now)}
+		</div>
+	</Dashboard_Header>
 	<section class="width_md">
 		<p>
 			This page lets you view and control the app's capabilities, powers that determine what you can

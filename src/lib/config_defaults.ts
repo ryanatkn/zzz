@@ -75,9 +75,6 @@ export const models_default: Array<z.input<typeof Model_Json>> = [
 	{name: 'gemini-2.5-pro', provider_name: 'gemini', tags: ['smart']},
 ];
 
-export const small_recommended_models: Array<Model_Name> = models_default
-	.filter((m) => m.provider_name === 'ollama' && m.tags?.includes('small'))
-	.map((m) => m.name);
 
 /**
  * Default chat templates available in the application
