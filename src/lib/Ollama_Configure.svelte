@@ -9,7 +9,7 @@
 		GLYPH_REFRESH,
 		GLYPH_SETTINGS,
 		GLYPH_PLACEHOLDER,
-		GLYPH_ARROW_LEFT,
+		GLYPH_ARROW_RIGHT,
 		GLYPH_CLEAR,
 	} from '$lib/glyphs.js';
 	import Error_Message from '$lib/Error_Message.svelte';
@@ -41,7 +41,7 @@
 				onclick={onback}
 				title="back to {last_active_view}"
 			>
-				<Glyph glyph={GLYPH_ARROW_LEFT} />
+				<Glyph glyph={GLYPH_ARROW_RIGHT} />
 			</button>
 		{/if}
 	</header>

@@ -4,7 +4,7 @@
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
 
 	import Glyph from '$lib/Glyph.svelte';
-	import {GLYPH_REFRESH, GLYPH_DELETE, GLYPH_CANCEL} from '$lib/glyphs.js';
+	import {GLYPH_REFRESH, GLYPH_DELETE, GLYPH_ARROW_LEFT} from '$lib/glyphs.js';
 	import type {Model} from '$lib/model.svelte.js';
 	import type {Ollama} from '$lib/ollama.svelte.js';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
@@ -34,7 +34,7 @@
 				<Model_Link {model} icon />
 			</h3>
 			<div>
-				{model.filesize ? Math.round(model.filesize) : '?'} GB
+				{model.filesize ? Math.round(model.filesize * 1024) : '?'} GB
 			</div>
 			<div class="font_family_mono">
 				modified {format_short_date(model.ollama_modified_at) || '--'}
@@ -43,7 +43,7 @@
 
 		{#if onclose}
 			<button type="button" class="icon_button plain" onclick={onclose} title="close">
-				<Glyph glyph={GLYPH_CANCEL} />
+				<Glyph glyph={GLYPH_ARROW_LEFT} />
 			</button>
 		{/if}
 	</header>
@@ -124,24 +124,24 @@
 			<!-- Basic Info -->
 			{#if model.ollama_details.details}
 				<div class="display_grid gap_sm" style:grid-template-columns="auto 1fr">
-					<span class="font_weight_600">family:</span>
+					<h5 class="my_0">family:</h5>
 					<span class="font_family_mono">{model.ollama_details.details.family}</span>
 
-					<span class="font_weight_600">format:</span>
+					<h5 class="my_0">format:</h5>
 					<span class="font_family_mono">{model.ollama_details.details.format}</span>
 
-					<span class="font_weight_600">parameters:</span>
+					<h5 class="my_0">parameters:</h5>
 					<span class="font_family_mono">
 						{model.ollama_details.details.parameter_size}
 					</span>
 
-					<span class="font_weight_600">quantization:</span>
+					<h5 class="my_0">quantization:</h5>
 					<span class="font_family_mono">
 						{model.ollama_details.details.quantization_level}
 					</span>
 
 					{#if model.ollama_details.details.parent_model}
-						<span class="font_weight_600">parent:</span>
+						<h5 class="my_0">parent:</h5>
 						<span class="font_family_mono">{model.ollama_details.details.parent_model}</span>
 					{/if}
 				</div>
@@ -150,50 +150,40 @@
 			<!-- System Prompt -->
 			{#if model.ollama_details.system}
 				<div>
-					<h5 class="mt_0 mb_xs font_weight_600">system prompt:</h5>
-					<pre
-						class="font_size_sm bg_2 p_sm border_radius_xs overflow_auto"
-						style:max-height="200px">{model.ollama_details.system}</pre>
+					<h5>system prompt:</h5>
+					<pre><code>{model.ollama_details.system}</code></pre>
 				</div>
 			{/if}
 
 			<!-- Template -->
 			{#if model.ollama_details.template}
 				<div>
-					<h5 class="mt_0 mb_xs font_weight_600">template:</h5>
-					<pre
-						class="font_size_sm bg_2 p_sm border_radius_xs overflow_auto"
-						style:max-height="200px">{model.ollama_details.template}</pre>
+					<h5>template:</h5>
+					<pre><code>{model.ollama_details.template}</code></pre>
 				</div>
 			{/if}
 
 			<!-- Model Info -->
 			{#if model.ollama_details.model_info && Object.keys(model.ollama_details.model_info).length > 0}
 				<div>
-					<h5 class="mt_0 mb_xs font_weight_600">model info:</h5>
-					<pre
-						class="font_size_sm bg_2 p_sm border_radius_xs overflow_auto"
-						style:max-height="300px">{JSON.stringify(model.ollama_details, null, '\t')}</pre>
+					<h5>model info:</h5>
+					<pre><code>{JSON.stringify(model.ollama_details, null, '\t')}</code></pre>
 				</div>
 			{/if}
 
 			<!-- License -->
 			{#if model.ollama_details.license}
 				<div>
-					<h5 class="mt_0 mb_xs font_weight_600">license:</h5>
-					<pre
-						class="font_size_sm bg_2 p_sm border_radius_xs overflow_auto"
-						style:max-height="200px">{model.ollama_details.license}</pre>
+					<h5>license:</h5>
+					<pre><code>{model.ollama_details.license}</code></pre>
 				</div>
 			{/if}
 
 			<!-- Modelfile -->
 			{#if model.ollama_details.modelfile}
 				<div>
-					<h5 class="mt_0 mb_xs font_weight_600">modelfile:</h5>
-					<pre
-						class="font_size_sm bg_2 p_sm border_radius_xs overflow_auto"
-						style:max-height="300px">{model.ollama_details.modelfile}</pre>
+					<h5>modelfile:</h5>
+					<pre><code>{model.ollama_details.modelfile}</code></pre>
 				</div>
 			{/if}
 		</section>

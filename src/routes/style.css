@@ -362,3 +362,8 @@ button.menu_item[disabled] {
 		var(--shadow_bottom_xs)
 			color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_1)), transparent);
 }
+
+/* TODO upstream? */
+pre code {
+	padding: var(--space_xs) var(--space_md);
+}

@@ -7,7 +7,7 @@ export const GLYPH_INFO = 'ⓘ';
 
 export const GLYPH_ADD = '✛'; // + ✚ ✛ ✜
 export const GLYPH_REMOVE = '⨉'; // TODO REMOVE and DELETE are currently the same but shouldn't be, maybe DELETE is a trash can?
-export const GLYPH_DELETE = '⨉'; // ⨉ ✕ 🗙 ⤫ ⤬ ✗ ✘ ⌧ ⨂ ⊝
+export const GLYPH_DELETE = '⌧'; // 🗑 ⨉ ✕ 🗙 ⤫ ⤬ ✗ ✘ ⌧ ⨂ ⊝
 export const GLYPH_CLEAR = '⌫';
 export const GLYPH_RESTORE = '⤻';
 export const GLYPH_CANCEL = '⦸';

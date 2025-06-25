@@ -3,7 +3,7 @@
 
 	import Glyph from '$lib/Glyph.svelte';
 	import Error_Message from '$lib/Error_Message.svelte';
-	import {GLYPH_DOWNLOAD, GLYPH_CANCEL, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
+	import {GLYPH_DOWNLOAD, GLYPH_ARROW_LEFT, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
 	import {small_recommended_models} from '$lib/config_defaults.js';
 	import type {Ollama} from '$lib/ollama.svelte.js';
 
@@ -58,7 +58,7 @@
 			<Glyph glyph={GLYPH_DOWNLOAD} /> pull model
 		</h3>
 		<button type="button" class="icon_button plain" onclick={onclose} title="close">
-			<Glyph glyph={GLYPH_CANCEL} />
+			<Glyph glyph={GLYPH_ARROW_LEFT} />
 		</button>
 	</header>
 
