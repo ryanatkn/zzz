@@ -166,10 +166,9 @@
 						<External_Link href="https://atproto.com/">AT Protocol</External_Link>
 					</li>
 					<li>
-						probably <External_Link href="https://modelcontextprotocol.io/"
+						<External_Link href="https://modelcontextprotocol.io/"
 							>Model Context Protocol</External_Link
-						>
-						and <External_Link href="https://github.com/google/A2A"
+						> is planned, maybe others like <External_Link href="https://github.com/google/A2A"
 							>Agent2Agent (A2A) protocol</External_Link
 						>
 					</li>
