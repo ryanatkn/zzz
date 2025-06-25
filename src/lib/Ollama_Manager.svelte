@@ -206,7 +206,7 @@
 										{model.name}
 									</div>
 									<div class="font_size_sm">
-										{model.filesize ? Math.round(model.filesize) : '?'} GB
+										{model.filesize ? Math.round(model.filesize * 1024) : '?'} MB
 									</div>
 								</div>
 							</button>
