@@ -348,6 +348,32 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	}
 
 	// TODO implement `create_model`
+	// TODO @many be sure the whole `CreateRequest` is supported
+	// interface CreateRequest {
+	//     model: string;
+	//     from?: string;
+	//     stream?: boolean;
+	//     quantize?: string;
+	//     template?: string;
+	//     license?: string | string[];
+	//     system?: string;
+	//     parameters?: Record<string, unknown>;
+	//     messages?: Message[];
+	//     adapters?: Record<string, string>;
+	// }
+	// `ollama.create(request);`
+	// - `request` `<Object>`: The request object containing create parameters.
+	//   - `model` `<string>` The name of the model to create.
+	//   - `from` `<string>`: The base model to derive from.
+	//   - `stream` `<boolean>`: (Optional) When true an `AsyncGenerator` is returned.
+	//   - `quantize` `<string>`: Quanization precision level (`q8_0`, `q4_K_M`, etc.).
+	//   - `template` `<string>`: (Optional) The prompt template to use with the model.
+	//   - `license` `<string|string[]>`: (Optional) The license(s) associated with the model.
+	//   - `system` `<string>`: (Optional) The system prompt for the model.
+	//   - `parameters` `<Record<string, unknown>>`: (Optional) Additional model parameters as key-value pairs.
+	//   - `messages` `<Message[]>`: (Optional) Initial chat messages for the model.
+	//   - `adapters` `<Record<string, string>>`: (Optional) A key-value map of LoRA adapter configurations.
+	// - Returns: `<ProgressResponse>`
 
 	/**
 	 * Clear completed operations from the history.

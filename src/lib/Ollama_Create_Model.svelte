@@ -4,6 +4,20 @@
 	// TODO @many create model
 	// @ts-nocheck
 
+	// TODO @many be sure the whole `CreateRequest` is supported
+	// interface CreateRequest {
+	//     model: string;
+	//     from?: string;
+	//     stream?: boolean;
+	//     quantize?: string;
+	//     template?: string;
+	//     license?: string | string[];
+	//     system?: string;
+	//     parameters?: Record<string, unknown>;
+	//     messages?: Message[];
+	//     adapters?: Record<string, string>;
+	// }
+
 	import Glyph from '$lib/Glyph.svelte';
 	import Error_Message from '$lib/Error_Message.svelte';
 	import {GLYPH_ADD, GLYPH_CANCEL, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';

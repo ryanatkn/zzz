@@ -48,11 +48,13 @@ let global_cell_count = 0;
  *
  * - Integration with Svelte's reactivity, encouraging single-depth inheritance
  * 		with Svelte class patterns for both persistent and ephemeral state
- * - Schema-driven parsing/validation and JSON serialization/deserialization via Zod
- * 		(I plan to evaluate ArkType soon)
+ * - Schema-driven parsing/validation and JSON serialization/deserialization
+ * 		(supporting snapshot and restore/replay patterns)
+ * 		via Zod (I plan to evaluate ArkType soon)
  * - Custom property encoding/decoding for complex types,
  * 		and no boilerplate for schema-inferrable properties
  * - Lifecycle management with generic instantiation/registration and disposal
+ * 		(conceptually a WIP, partially implemented)
  * - Runtime type metadata for reflection
  *
  * Cells are automatically registered in the global registry by `id`,

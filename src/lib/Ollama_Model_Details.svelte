@@ -9,7 +9,7 @@
 	import type {Ollama} from '$lib/ollama.svelte.js';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Model_Link from '$lib/Model_Link.svelte';
-	import {format_short_date} from './time_helpers.js';
+	import {format_short_date} from '$lib/time_helpers.js';
 
 	interface Props {
 		model: Model;

@@ -1,12 +1,12 @@
 import type {z} from 'zod';
 
 import type {Provider_Json_Input} from '$lib/provider.svelte.js';
-import type {Model_Json} from '$lib/model.svelte.js';
+import type {Model_Json, Model_Name} from '$lib/model.svelte.js';
 import type {Chat_Template} from '$lib/chat_template.js';
 import {create_uuid} from '$lib/zod_helpers.js';
 
 // TODO BLOCK rethink for Ollama
-export const small_recommended_models = [
+export const small_recommended_models: Array<Model_Name> = [
 	'gemma3:1b',
 	'qwen3:0.6b',
 	'deepseek-r1:1.5b',
@@ -21,7 +21,8 @@ export const small_recommended_models = [
 // TODO @many refactor with db
 
 // Configuration defaults
-export const SYSTEM_MESSAGE_DEFAULT = 'You are a helpful assistant that responds succinctly.'; // TODO without the succinctly part? I dont think splitting it for DEV makes sense
+// TODO without the succinctly part - I dont think splitting it for DEV makes sense, make a UI affordance instead
+export const SYSTEM_MESSAGE_DEFAULT = 'You are a helpful assistant that responds succinctly.';
 export const OUTPUT_TOKEN_MAX_DEFAULT = 1000;
 export const TEMPERATURE_DEFAULT = 0;
 export const SEED_DEFAULT: number | undefined = undefined;
@@ -45,7 +46,7 @@ export const providers_default: Array<Provider_Json_Input> = [
 		name: 'ollama',
 		icon: '',
 		title: 'Ollama',
-		url: 'https://github.com/ollama/ollama',
+		url: 'https://github.com/ollama/ollama/tree/main/docs',
 	},
 	{
 		name: 'claude',
@@ -67,109 +68,54 @@ export const providers_default: Array<Provider_Json_Input> = [
 	},
 ];
 
-// TODO duplicating this data isn't great, it's just temporary measures for UX
+// TODO any data here beyond name/provider_name/tags (and probably some future ones) should be fetched from the provider API
+// TODO @db refactor with db
 export const models_default: Array<z.input<typeof Model_Json>> = [
 	// TODO BLOCK remove but make sure these are all mapped
 	// {
 	// 	name: 'llama3.2:3b',
 	// 	provider_name: 'ollama',
 	// 	tags: ['llama', 'llama3'],
-	// 	architecture: 'llama',
-	// 	parameter_count: 3.21,
-	// 	context_window: 131_072,
-	// 	output_token_limit: 8_192,
-	// 	embedding_length: 3_072,
-	// 	filesize: 2.0,
-	// 	training_cutoff: 'December 2023',
 	// },
 	// {
 	// 	name: 'llama3.2:1b',
 	// 	provider_name: 'ollama',
 	// 	tags: ['llama', 'llama3', 'small'],
-	// 	architecture: 'llama',
-	// 	parameter_count: 1.24,
-	// 	context_window: 131_072,
-	// 	output_token_limit: 8_192,
-	// 	embedding_length: 2_048,
-	// 	filesize: 1.3,
-	// 	training_cutoff: 'December 2023',
 	// },
 	// {
 	// 	name: 'gemma3:1b',
 	// 	provider_name: 'ollama',
 	// 	tags: ['gemma', 'small'],
-	// 	architecture: 'gemma3',
-	// 	parameter_count: 1.0,
-	// 	context_window: 32_768,
-	// 	output_token_limit: 6_912,
-	// 	embedding_length: 1_152,
-	// 	filesize: 0.815,
 	// },
 	// {
 	// 	name: 'gemma3:4b',
 	// 	provider_name: 'ollama',
 	// 	tags: ['gemma', 'small'],
-	// 	architecture: 'gemma3',
-	// 	parameter_count: 4.3,
-	// 	context_window: 8_192,
-	// 	output_token_limit: 10_240,
-	// 	embedding_length: 2_560,
-	// 	filesize: 3.3,
 	// },
 	// {
 	// 	name: 'qwen2.5:1.5b',
 	// 	provider_name: 'ollama',
 	// 	tags: ['qwen2', 'small'],
-	// 	architecture: 'qwen2',
-	// 	parameter_count: 1.54,
-	// 	context_window: 32_768,
-	// 	output_token_limit: 8_960,
-	// 	embedding_length: 1_536,
-	// 	filesize: 0.986,
 	// },
 	// {
 	// 	name: 'qwen2.5:0.5b',
 	// 	provider_name: 'ollama',
 	// 	tags: ['qwen2', 'small'],
-	// 	architecture: 'qwen2',
-	// 	parameter_count: 0.494,
-	// 	context_window: 32_768,
-	// 	output_token_limit: 4_864,
-	// 	embedding_length: 896,
-	// 	filesize: 0.398,
 	// },
 	// {
 	// 	name: 'deepseek-r1:7b',
 	// 	provider_name: 'ollama',
 	// 	tags: ['deepseek', 'reasoning'],
-	// 	architecture: 'qwen2',
-	// 	parameter_count: 7.62,
-	// 	context_window: 131_072,
-	// 	output_token_limit: 18_944,
-	// 	embedding_length: 3_584,
-	// 	filesize: 4.7,
 	// },
 	// {
 	// 	name: 'deepseek-r1:8b',
 	// 	provider_name: 'ollama',
 	// 	tags: ['deepseek', 'reasoning'],
-	// 	architecture: 'llama',
-	// 	parameter_count: 8.03,
-	// 	context_window: 131_072,
-	// 	embedding_length: 4_096,
-	// 	output_token_limit: 14_336,
-	// 	filesize: 4.9,
 	// },
 	// {
 	// 	name: 'deepseek-r1:1.5b',
 	// 	provider_name: 'ollama',
 	// 	tags: ['deepseek', 'reasoning', 'small'],
-	// 	architecture: 'qwen2',
-	// 	parameter_count: 1.78,
-	// 	context_window: 131_072,
-	// 	output_token_limit: 8_960,
-	// 	embedding_length: 1536,
-	// 	filesize: 1.1,
 	// },
 	{
 		name: 'claude-3-5-haiku-20241022',

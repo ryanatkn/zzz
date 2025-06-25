@@ -3,15 +3,18 @@ import {z} from 'zod';
 import {Provider_Name} from '$lib/provider_types.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
-import {Ollama_Details, Ollama_List_Data} from './ollama_helpers.js';
+import {Ollama_Details, Ollama_List_Data} from '$lib/ollama_helpers.js';
 
 export const Model_Name = z.string();
 export type Model_Name = z.infer<typeof Model_Name>;
 
 export const Model_Json = Cell_Json.extend({
+	// source of truth we maintain:
 	name: Model_Name,
 	provider_name: Provider_Name,
 	tags: z.array(z.string()).default(() => []),
+
+	// fetched from provider APIs:
 	architecture: z.string().optional(),
 	parameter_count: z.number().optional(),
 	context_window: z.number().optional(),
@@ -21,8 +24,6 @@ export const Model_Json = Cell_Json.extend({
 	cost_input: z.number().optional(),
 	cost_output: z.number().optional(),
 	training_cutoff: z.string().optional(),
-
-	// TODO maybe put these in an `ollama` namespace?
 	// Ollama-specific fields
 	ollama_list_data: Ollama_List_Data.optional(),
 	ollama_details: Ollama_Details.optional(),
