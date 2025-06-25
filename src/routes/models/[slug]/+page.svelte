@@ -7,6 +7,7 @@
 
 	import Model_Detail from '$lib/Model_Detail.svelte';
 	import {frontend_context} from '$lib/frontend.svelte.js';
+	import {base} from '$app/paths';
 
 	const app = frontend_context.get();
 
@@ -34,7 +35,9 @@
 		}
 	});
 
-	const model = $derived(app.models.find_by_name(page.params.slug));
+	const name = $derived(page.params.slug);
+
+	const model = $derived(app.models.find_by_name(name));
 
 	// TODO @many consider namespacing under `/llms/`
 </script>
@@ -50,7 +53,12 @@
 		<Model_Detail {model} />
 	{:else}
 		<Alert status="error">
-			no model found with name "{page.params.slug}"
+			no model found with name "{name}", maybe
+			<button type="button" class="inline color_f" onclick={() => app.models.add({name})}
+				>create it</button
+			>
+			or see the <a href="{base}/models">models</a> or
+			<a href="{base}/providers">providers</a>
 		</Alert>
 	{/if}
 </div>
