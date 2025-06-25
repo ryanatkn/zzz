@@ -667,7 +667,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 		// Remove models that no longer exist in Ollama
 		for (const removed_model of existing_models.values()) {
 			removed_model.ollama_list_data = undefined;
-			removed_model.ollama_details = undefined;
+			this.clear_model_details(removed_model.name);
 		}
 	}
 
