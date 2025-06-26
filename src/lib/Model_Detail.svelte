@@ -59,6 +59,10 @@
 		}
 		return `${gb.toFixed(1)} GB`;
 	};
+
+	// TODO BLOCK fix error with getting model details when they're not downloaded
+	// TODO BLOCK get spec data mapped to model fields
+	console.log(`model`, model);
 </script>
 
 <Contextmenu_Model tag="div" attrs={{class: 'panel p_lg', ...attrs}} {model}>

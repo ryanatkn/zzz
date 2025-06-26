@@ -53,7 +53,7 @@
 		{#if chat}
 			<section class="column_section" transition:slide>
 				<!-- TODO needs work -->
-				<div class="font_size_lg display_flex align_items_center gap_xs">
+				<div class="font_size_lg display_flex align_items_center">
 					<Glyph glyph={GLYPH_CHAT} />
 					{#if is_editing_name}
 						<input
@@ -76,7 +76,7 @@
 					{:else}
 						<button
 							type="button"
-							class="plain flex_1 font_weight_400 justify_content_start"
+							class="plain flex_1 font_weight_400 ellipsis text_align_left"
 							onclick={() => {
 								is_editing_name = true;
 								edited_name = chat.name;
