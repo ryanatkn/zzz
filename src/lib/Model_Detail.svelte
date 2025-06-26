@@ -61,8 +61,7 @@
 	};
 
 	// TODO BLOCK fix error with getting model details when they're not downloaded
-	// TODO BLOCK get spec data mapped to model fields
-	console.log(`model`, model);
+	// TODO BLOCK get spec data mapped to model fields for the frontier providers
 </script>
 
 <Contextmenu_Model tag="div" attrs={{class: 'panel p_lg', ...attrs}} {model}>

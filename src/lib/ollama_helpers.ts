@@ -13,8 +13,6 @@ export interface Ollama_Models_Response {
 	model_infos: Array<Ollama_Model_Info>;
 }
 
-// TODO BLOCK fix with Ollama types
-// Ollama-specific schemas
 export const Ollama_Model_Details = z.object({
 	families: z.array(z.string()),
 	family: z.string(),

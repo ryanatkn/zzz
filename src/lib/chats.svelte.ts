@@ -1,5 +1,4 @@
 import {z} from 'zod';
-import {goto} from '$app/navigation';
 import {page} from '$app/state';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
@@ -14,6 +13,7 @@ import {to_chats_url} from '$lib/nav_helpers.js';
 import {chat_template_defaults} from '$lib/config_defaults.js';
 import type {Chat_Template} from '$lib/chat_template.js';
 import {Cell_Json} from '$lib/cell_types.js';
+import {goto_unless_current} from '$lib/navigation_helpers.js';
 
 export const Chats_Json = Cell_Json.extend({
 	// First create the array, then apply default, then attach metadata
@@ -164,7 +164,7 @@ export class Chats extends Cell<typeof Chats_Json> {
 		const url = to_chats_url(chat_id);
 		this.pending_chat_id_to_focus = chat_id;
 		if (!force && page.url.pathname === url) return;
-		return goto(url);
+		return goto_unless_current(url);
 	}
 
 	reorder_chats(from_index: number, to_index: number): void {

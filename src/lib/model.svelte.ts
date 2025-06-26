@@ -1,12 +1,11 @@
 import {z} from 'zod';
-import {goto} from '$app/navigation';
 import {base} from '$app/paths';
-import {page} from '$app/state';
 
 import {Provider_Name} from '$lib/provider_types.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import {Ollama_Show_Response, Ollama_List_Response_Item} from '$lib/ollama_helpers.js';
+import {goto_unless_current} from '$lib/navigation_helpers.js';
 
 export const Model_Name = z.string();
 export type Model_Name = z.infer<typeof Model_Name>;
@@ -108,11 +107,7 @@ export class Model extends Cell<typeof Model_Json> {
 		// Set the model name on the Ollama instance and navigate to the providers page
 		this.app.ollama.pull_model_name = this.name;
 		this.app.ollama.set_manager_view('pull');
-		// TODO BLOCK add helper goto_unless_current
-		const path = `${base}/providers/ollama`;
-		if (page.url.pathname !== path) {
-			await goto(path);
-		}
+		await goto_unless_current(`${base}/providers/ollama`);
 	}
 
 	constructor(options: Model_Options) {

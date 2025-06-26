@@ -1,5 +1,4 @@
 import {z} from 'zod';
-import {goto} from '$app/navigation';
 import {page} from '$app/state';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
@@ -13,6 +12,7 @@ import type {Bit_Type} from '$lib/bit.svelte.js';
 import {get_unique_name} from '$lib/helpers.js';
 import {to_prompts_url} from '$lib/nav_helpers.js';
 import {Cell_Json} from '$lib/cell_types.js';
+import {goto_unless_current} from '$lib/navigation_helpers.js';
 
 export const Prompts_Json = Cell_Json.extend({
 	items: cell_array(
@@ -175,7 +175,7 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 	async navigate_to(prompt_id: Uuid | null, force = false): Promise<void> {
 		const url = to_prompts_url(prompt_id);
 		if (!force && page.url.pathname === url) return;
-		return goto(url);
+		return goto_unless_current(url);
 	}
 
 	reorder_prompts(from_index: number, to_index: number): void {

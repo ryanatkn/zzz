@@ -96,15 +96,17 @@
 <style>
 	input {
 		flex: 1;
-		padding: 0;
+		padding: 0 var(--space_xs);
 		margin: 0;
 	}
 	span[role='button'] {
 		display: inline-flex;
 		align-items: center;
 		height: var(--input_height);
+		border-radius: var(--border_radius_xs);
 		cursor: text;
 		flex: 1;
+		padding: 0 var(--space_xs);
 		overflow: hidden; /* for ellipsis, is there another way to force it to shrink to obscure content? */
 	}
 	span[role='button']:hover {
