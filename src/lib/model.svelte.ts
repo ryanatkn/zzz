@@ -6,7 +6,7 @@ import {page} from '$app/state';
 import {Provider_Name} from '$lib/provider_types.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
-import {Ollama_Details, Ollama_List_Data} from '$lib/ollama_helpers.js';
+import {Ollama_Show_Response, Ollama_List_Response_Item} from '$lib/ollama_helpers.js';
 
 export const Model_Name = z.string();
 export type Model_Name = z.infer<typeof Model_Name>;
@@ -29,11 +29,11 @@ export const Model_Json = Cell_Json.extend({
 	cost_output: z.number().optional(),
 	training_cutoff: z.string().optional(),
 	// Ollama-specific fields
-	ollama_list_data: Ollama_List_Data.optional(),
-	ollama_details: Ollama_Details.optional(),
-	ollama_details_loaded: z.boolean().default(false),
-	ollama_details_loading: z.boolean().default(false),
-	ollama_details_error: z.string().optional(),
+	ollama_list_response_item: Ollama_List_Response_Item.optional(),
+	ollama_show_response: Ollama_Show_Response.optional(),
+	ollama_show_response_loaded: z.boolean().default(false),
+	ollama_show_response_loading: z.boolean().default(false),
+	ollama_show_response_error: z.string().optional(),
 });
 export type Model_Json = z.infer<typeof Model_Json>;
 export type Model_Json_Input = z.input<typeof Model_Json>;
@@ -55,18 +55,18 @@ export class Model extends Cell<typeof Model_Json> {
 	training_cutoff: string | undefined = $state();
 
 	// Ollama-specific state
-	ollama_list_data: Ollama_List_Data | undefined = $state();
-	ollama_details: Ollama_Details | undefined = $state();
-	ollama_details_loaded: boolean = $state()!;
-	ollama_details_loading: boolean = $state()!;
-	ollama_details_error: string | undefined = $state();
+	ollama_list_response_item: Ollama_List_Response_Item | undefined = $state();
+	ollama_show_response: Ollama_Show_Response | undefined = $state();
+	ollama_show_response_loaded: boolean = $state(false);
+	ollama_show_response_loading: boolean = $state(false);
+	ollama_show_response_error: string | undefined = $state();
 
 	/**
 	 * For models that run locally, this is a boolean indicating if the model is downloaded.
 	 * Is `undefined` for non-local models.
 	 */
 	readonly downloaded: boolean | undefined = $derived(
-		this.provider_name === 'ollama' ? !!this.ollama_list_data : undefined,
+		this.provider_name === 'ollama' ? !!this.ollama_list_response_item : undefined,
 	);
 
 	readonly context_window_formatted: string | null = $derived(
@@ -77,7 +77,7 @@ export class Model extends Cell<typeof Model_Json> {
 	 * Get the modified date from Ollama data if available.
 	 */
 	readonly ollama_modified_at: Date | undefined = $derived.by(() => {
-		const m = this.ollama_list_data?.modified_at || this.ollama_details?.modified_at;
+		const m = this.ollama_list_response_item?.modified_at || this.ollama_show_response?.modified_at;
 		return m === undefined ? undefined : typeof m === 'string' ? new Date(m) : m;
 	});
 
@@ -86,9 +86,9 @@ export class Model extends Cell<typeof Model_Json> {
 	 */
 	readonly needs_ollama_details: boolean = $derived(
 		this.provider_name === 'ollama' &&
-			!this.ollama_details_loaded &&
-			!this.ollama_details_loading &&
-			!this.ollama_details_error,
+			!this.ollama_show_response_loaded &&
+			!this.ollama_show_response_loading &&
+			!this.ollama_show_response_error,
 	);
 
 	/**

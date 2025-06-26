@@ -136,22 +136,22 @@ describe('Ollama', () => {
 		app.models.add({
 			name: 'test_model',
 			provider_name: 'ollama',
-			ollama_details_loaded: true,
-			ollama_details: {license: 'MIT'},
+			ollama_show_response_loaded: true,
+			ollama_show_response: {license: 'MIT'},
 		});
 
 		const ollama = new Ollama({app});
 		const model = app.models.find_by_name('test_model');
 
 		expect(model).toBeDefined();
-		expect(model!.ollama_details_loaded).toBe(true);
-		expect(model!.ollama_details).toEqual({license: 'MIT'});
+		expect(model!.ollama_show_response_loaded).toBe(true);
+		expect(model!.ollama_show_response).toEqual({license: 'MIT'});
 
 		ollama.clear_model_details('test_model');
 
-		expect(model!.ollama_details).toBeUndefined();
-		expect(model!.ollama_details_loaded).toBe(false);
-		expect(model!.ollama_details_error).toBeUndefined();
+		expect(model!.ollama_show_response).toBeUndefined();
+		expect(model!.ollama_show_response_loaded).toBe(false);
+		expect(model!.ollama_show_response_error).toBeUndefined();
 	});
 
 	test('should handle model_by_name map', () => {

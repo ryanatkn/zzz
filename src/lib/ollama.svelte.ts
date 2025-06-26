@@ -3,7 +3,7 @@
 import {z} from 'zod';
 import {SvelteMap} from 'svelte/reactivity';
 import type {Async_Status} from '@ryanatkn/belt/async.js';
-import {BROWSER} from 'esm-env';
+import {BROWSER, DEV} from 'esm-env';
 import ollama, {
 	type ListResponse,
 	type ShowResponse,
@@ -18,7 +18,7 @@ import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import {create_uuid, Uuid, get_datetime_now} from '$lib/zod_helpers.js';
 import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
-import {OLLAMA_URL} from '$lib/ollama_helpers.js';
+import {OLLAMA_URL, Ollama_Show_Response, Ollama_List_Response} from '$lib/ollama_helpers.js';
 import type {Model} from '$lib/model.svelte.js';
 
 export const Ollama_Json = Cell_Json.extend({
@@ -155,9 +155,6 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 		),
 	);
 
-	/**
-	 * Get Ollama models from app.models
-	 */
 	readonly models: Array<Model> = $derived(this.app.models.items.where('provider_name', 'ollama'));
 
 	readonly models_downloaded = $derived(this.models.filter((m) => m.downloaded));
@@ -237,13 +234,21 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 			const response = await ollama.list();
 			console.log(`[ollama] list models success, found ${response.models.length} models`, response);
 
+			// Parse to log bugs but assign data anyway to avoid breaking the UX
+			if (DEV) {
+				const parsed = Ollama_List_Response.safeParse(response);
+				if (!parsed.success) {
+					console.error(`[ollama.list_models] failed to parse:`, parsed.error);
+				}
+			}
+
 			this.list_status = 'success';
 			this.list_last_updated = Date.now();
 
 			operation.complete_success({type: 'list', data: response});
 
 			// Sync with app.models
-			this.#sync_models_with_list_response(response);
+			this.#sync_models_with_list_response(response as unknown as Ollama_List_Response);
 
 			return response;
 		} catch (error) {
@@ -279,25 +284,25 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 		const operation = this.#create_operation('show', {model: model_name});
 
 		// Update loading state on the model
-		model.ollama_details_loading = true;
-		model.ollama_details_error = undefined;
+		model.ollama_show_response_loading = true;
+		model.ollama_show_response_error = undefined;
 
 		try {
 			const response = await ollama.show({model: model_name});
 			console.log(`[ollama] show model success for: ${model_name}`, response);
 
+			// Parse to log bugs but assign data anyway to avoid breaking the UX
+			if (DEV) {
+				const parsed = Ollama_Show_Response.safeParse(response);
+				if (!parsed.success) {
+					console.error(`[ollama.show_model] failed to parse for ${model_name}:`, parsed.error);
+				}
+			}
+
 			// Update model with details
-			model.ollama_details = {
-				details: response.details,
-				modelfile: response.modelfile,
-				template: response.template,
-				system: response.system,
-				license: response.license,
-				model_info: response.model_info,
-				modified_at: response.modified_at as unknown as string, // TODO Ollama bug or type issue?
-			};
-			model.ollama_details_loaded = true;
-			model.ollama_details_loading = false;
+			model.ollama_show_response = response as unknown as Ollama_Show_Response;
+			model.ollama_show_response_loaded = true;
+			model.ollama_show_response_loading = false;
 
 			operation.complete_success({type: 'show', data: response});
 
@@ -306,8 +311,8 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 			console.error(`[ollama] failed to show model ${model_name}:`, error);
 			const error_message = error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE;
 
-			model.ollama_details_loading = false;
-			model.ollama_details_error = error_message;
+			model.ollama_show_response_loading = false;
+			model.ollama_show_response_error = error_message;
 
 			operation.complete_failure(error_message);
 
@@ -455,9 +460,9 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	clear_model_details(model_name: string): void {
 		const model = this.app.models.find_by_name(model_name);
 		if (model && model.provider_name === 'ollama') {
-			model.ollama_details = undefined;
-			model.ollama_details_loaded = false;
-			model.ollama_details_error = undefined;
+			model.ollama_show_response = undefined;
+			model.ollama_show_response_loaded = false;
+			model.ollama_show_response_error = undefined;
 		}
 	}
 
@@ -474,14 +479,14 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	 */
 	clear_all_model_details(): void {
 		for (const model of this.models) {
-			model.ollama_details = undefined;
-			model.ollama_details_loaded = false;
-			model.ollama_details_error = undefined;
+			model.ollama_show_response = undefined;
+			model.ollama_show_response_loaded = false;
+			model.ollama_show_response_error = undefined;
 		}
 	}
 
 	/**
-	 * Handle pull model form submission
+	 * Handle pull model form submission.
 	 */
 	async handle_pull(): Promise<void> {
 		if (!this.pull_can_pull) return;
@@ -499,7 +504,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	}
 
 	/**
-	 * Handle copy model form submission
+	 * Handle copy model form submission.
 	 */
 	async handle_copy(): Promise<void> {
 		if (!this.copy_destination_model_changed) return;
@@ -517,7 +522,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	}
 
 	/**
-	 * Handle create model form submission
+	 * Handle create model form submission.
 	 */
 	async handle_create(): Promise<void> {
 		if (!this.create_can_create) return;
@@ -543,7 +548,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	}
 
 	/**
-	 * Set the manager view and optionally the selected model
+	 * Set the manager view and optionally the selected model.
 	 */
 	set_manager_view(view: typeof this.manager_selected_view, model?: Model | null): void {
 		// Store the previous view as the last active view if it's not 'configure'
@@ -560,7 +565,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	}
 
 	/**
-	 * Navigate back to the last active view
+	 * Navigate back to the last active view.
 	 */
 	manager_back_to_last_view(): void {
 		if (this.manager_last_active_view) {
@@ -572,7 +577,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	}
 
 	/**
-	 * Handle delete model from manager
+	 * Handle delete model from manager.
 	 */
 	async handle_delete_model(model_name: string): Promise<void> {
 		console.log(`[ollama] deleting model from manager: ${model_name}`);
@@ -584,7 +589,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	}
 
 	/**
-	 * Handle select model in manager
+	 * Handle select model in manager.
 	 */
 	async handle_select_model(model: Model): Promise<void> {
 		this.set_manager_view('model', model);
@@ -595,7 +600,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	}
 
 	/**
-	 * Handle close form in manager
+	 * Handle close form in manager.
 	 */
 	handle_close_form(): void {
 		this.set_manager_view('configure', null);
@@ -623,50 +628,38 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	}
 
 	/**
-	 * Sync the list response with app.models
+	 * Sync the list response with app.models.
 	 */
-	#sync_models_with_list_response(response: ListResponse): void {
+	#sync_models_with_list_response(response: Ollama_List_Response): void {
 		// Get current ollama models for comparison
 		const existing_models = new Map(this.models.map((m) => [m.name, m]));
 
 		// Update or add models
-		for (const model_response of response.models) {
-			const existing = existing_models.get(model_response.name);
+		for (const m of response.models) {
+			const existing = existing_models.get(m.name);
 
 			if (existing) {
 				// Update existing model with fresh data
-				existing.filesize = model_response.size / (1024 * 1024 * 1024); // Convert bytes to GB
-				existing.ollama_list_data = {
-					name: model_response.name,
-					modified_at: model_response.modified_at as unknown as string, // TODO Ollama bug? or type issue,
-					size: model_response.size,
-					digest: model_response.digest,
-					details: model_response.details,
-				};
-				existing_models.delete(model_response.name);
+				existing.filesize = m.size / (1024 * 1024 * 1024); // Convert bytes to GB
+				existing.ollama_list_response_item = m;
+				existing_models.delete(m.name);
 			} else {
 				// Add new model
 				this.app.models.add({
-					name: model_response.name,
+					name: m.name,
 					provider_name: 'ollama',
-					filesize: model_response.size / (1024 * 1024 * 1024), // Convert bytes to GB
+					filesize: m.size / (1024 * 1024 * 1024), // Convert bytes to GB
 					// Extract some info from details if available
-					parameter_count: this.#extract_parameter_count(model_response.details.parameter_size),
-					architecture: model_response.details.family,
-					ollama_list_data: {
-						name: model_response.name,
-						modified_at: model_response.modified_at as unknown as string, // TODO Ollama bug? or type issue,
-						size: model_response.size,
-						digest: model_response.digest,
-						details: model_response.details,
-					},
+					parameter_count: this.#extract_parameter_count(m.details?.parameter_size),
+					architecture: m.details?.family,
+					ollama_list_response_item: m,
 				});
 			}
 		}
 
 		// Remove models that no longer exist in Ollama
 		for (const removed_model of existing_models.values()) {
-			removed_model.ollama_list_data = undefined;
+			removed_model.ollama_list_response_item = undefined;
 			this.clear_model_details(removed_model.name);
 		}
 	}

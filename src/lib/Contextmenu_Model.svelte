@@ -35,11 +35,11 @@
 
 			<Contextmenu_Entry_Copy_To_Clipboard content={model.name} label="copy name" />
 
-			{#if model.ollama_list_data?.digest}
+			{#if model.ollama_list_response_item?.digest}
 				<Contextmenu_Entry_Copy_To_Clipboard
-					content={model.ollama_list_data.digest}
+					content={model.ollama_list_response_item.digest}
 					label="copy digest"
-					preview={model.ollama_list_data.digest.slice(0, 12) + '...'}
+					preview={model.ollama_list_response_item.digest.slice(0, 12) + '...'}
 				/>
 			{/if}
 
@@ -54,7 +54,7 @@
 				</Contextmenu_Entry>
 			{/if}
 
-			{#if model.provider_name === 'ollama' && model.ollama_details_loaded}
+			{#if model.provider_name === 'ollama' && model.ollama_show_response_loaded}
 				<Contextmenu_Entry
 					run={async () => {
 						await app.ollama.refresh_model_details(model.name);

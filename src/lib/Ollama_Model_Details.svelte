@@ -35,7 +35,7 @@
 				<Model_Link {model} icon />
 			</h3>
 			<div>
-				{model.filesize ? Math.round(model.filesize * 1024) : '?'} GB
+				{model.filesize ? Math.round(model.filesize * 1024) : '?'} MB
 			</div>
 			<div class="font_family_mono">
 				modified {format_short_date(model.ollama_modified_at) || '--'}
@@ -62,7 +62,7 @@
 			<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> create a new chat
 		</button>
 
-		{#if model.ollama_details_loaded}
+		{#if model.ollama_show_response_loaded}
 			<button
 				type="button"
 				class="plain"
@@ -113,15 +113,15 @@
 		{/if}
 	</section>
 
-	{#if model.ollama_details_loading}
+	{#if model.ollama_show_response_loading}
 		<section class="display_flex gap_sm align_items_center">
 			<Pending_Animation />
 			<span class="font_size_sm">loading model details...</span>
 		</section>
-	{:else if model.ollama_details_error}
+	{:else if model.ollama_show_response_error}
 		<section class="display_flex flex_column gap_sm">
 			<div class="color_c font_size_sm">
-				failed to load details: {model.ollama_details_error}
+				failed to load details: {model.ollama_show_response_error}
 			</div>
 			<button
 				type="button"
@@ -132,71 +132,68 @@
 				<Glyph glyph={GLYPH_REFRESH} />
 			</button>
 		</section>
-	{:else if model.ollama_details}
+	{:else if model.ollama_show_response}
 		<section class="display_flex flex_column gap_md">
 			<!-- Basic Info -->
-			{#if model.ollama_details.details}
+			{#if model.ollama_show_response.details}
 				<div class="display_grid gap_sm" style:grid-template-columns="auto 1fr">
-					<h5 class="my_0">family:</h5>
-					<span class="font_family_mono">{model.ollama_details.details.family}</span>
-
-					<h5 class="my_0">format:</h5>
-					<span class="font_family_mono">{model.ollama_details.details.format}</span>
+					<h5 class="my_0">capabilities:</h5>
+					<span class="font_family_mono">
+						{model.ollama_show_response.capabilities?.join(', ') || 'none'}
+					</span>
 
 					<h5 class="my_0">parameters:</h5>
 					<span class="font_family_mono">
-						{model.ollama_details.details.parameter_size}
+						{model.ollama_show_response.details.parameter_size}
 					</span>
+
+					<h5 class="my_0">family:</h5>
+					<span class="font_family_mono">{model.ollama_show_response.details.family}</span>
 
 					<h5 class="my_0">quantization:</h5>
 					<span class="font_family_mono">
-						{model.ollama_details.details.quantization_level}
+						{model.ollama_show_response.details.quantization_level}
 					</span>
 
-					{#if model.ollama_details.details.parent_model}
+					<h5 class="my_0">format:</h5>
+					<span class="font_family_mono">{model.ollama_show_response.details.format}</span>
+
+					{#if model.ollama_show_response.details.parent_model}
 						<h5 class="my_0">parent:</h5>
-						<span class="font_family_mono">{model.ollama_details.details.parent_model}</span>
+						<span class="font_family_mono">{model.ollama_show_response.details.parent_model}</span>
 					{/if}
 				</div>
 			{/if}
 
-			<!-- System Prompt -->
-			{#if model.ollama_details.system}
-				<div>
-					<h5>system prompt:</h5>
-					<pre><code>{model.ollama_details.system}</code></pre>
-				</div>
-			{/if}
-
 			<!-- Template -->
-			{#if model.ollama_details.template}
+			{#if model.ollama_show_response.template}
 				<div>
 					<h5>template:</h5>
-					<pre><code>{model.ollama_details.template}</code></pre>
+					<pre><code>{model.ollama_show_response.template}</code></pre>
 				</div>
 			{/if}
 
 			<!-- Model Info -->
-			{#if model.ollama_details.model_info && Object.keys(model.ollama_details.model_info).length > 0}
+			{#if model.ollama_show_response.model_info && Object.keys(model.ollama_show_response.model_info).length > 0}
 				<div>
 					<h5>model info:</h5>
-					<pre><code>{JSON.stringify(model.ollama_details, null, '\t')}</code></pre>
+					<pre><code>{JSON.stringify(model.ollama_show_response, null, '\t')}</code></pre>
 				</div>
 			{/if}
 
 			<!-- License -->
-			{#if model.ollama_details.license}
+			{#if model.ollama_show_response.license}
 				<div>
 					<h5>license:</h5>
-					<pre><code>{model.ollama_details.license}</code></pre>
+					<pre><code>{model.ollama_show_response.license}</code></pre>
 				</div>
 			{/if}
 
 			<!-- Modelfile -->
-			{#if model.ollama_details.modelfile}
+			{#if model.ollama_show_response.modelfile}
 				<div>
 					<h5>modelfile:</h5>
-					<pre><code>{model.ollama_details.modelfile}</code></pre>
+					<pre><code>{model.ollama_show_response.modelfile}</code></pre>
 				</div>
 			{/if}
 		</section>

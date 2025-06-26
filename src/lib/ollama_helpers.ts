@@ -16,31 +16,38 @@ export interface Ollama_Models_Response {
 // TODO BLOCK fix with Ollama types
 // Ollama-specific schemas
 export const Ollama_Model_Details = z.object({
-	parent_model: z.string(),
-	format: z.string(),
-	family: z.string(),
 	families: z.array(z.string()),
+	family: z.string(),
+	format: z.string(),
 	parameter_size: z.string(),
+	parent_model: z.string(),
 	quantization_level: z.string(),
 });
 export type Ollama_Model_Details = z.infer<typeof Ollama_Model_Details>;
 
-export const Ollama_List_Data = z.object({
-	name: z.string(),
-	modified_at: z.string(), // TODO @many transform to Date?
-	size: z.number(),
+export const Ollama_List_Response_Item = z.object({
+	details: Ollama_Model_Details.optional(),
 	digest: z.string(),
-	details: Ollama_Model_Details.optional(),
+	model: z.string(),
+	modified_at: z.string(), // TODO @many transform to Date?
+	name: z.string(),
+	size: z.number(),
 });
-export type Ollama_List_Data = z.infer<typeof Ollama_List_Data>;
+export type Ollama_List_Response_Item = z.infer<typeof Ollama_List_Response_Item>;
 
-export const Ollama_Details = z.object({
+export const Ollama_List_Response = z.object({
+	models: z.array(Ollama_List_Response_Item),
+});
+export type Ollama_List_Response = z.infer<typeof Ollama_List_Response>;
+
+export const Ollama_Show_Response = z.object({
+	capabilities: z.array(z.string()).optional(),
 	details: Ollama_Model_Details.optional(),
-	modelfile: z.string().optional(),
-	template: z.string().optional(),
-	system: z.string().optional(),
 	license: z.string().optional(),
 	model_info: z.any().optional(), // Map<string, any> in the API
+	modelfile: z.string().optional(),
 	modified_at: z.string().optional(), // TODO @many transform to Date?
+	template: z.string().optional(),
+	tensors: z.array(z.any()).optional(),
 });
-export type Ollama_Details = z.infer<typeof Ollama_Details>;
+export type Ollama_Show_Response = z.infer<typeof Ollama_Show_Response>;

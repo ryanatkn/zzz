@@ -26,7 +26,7 @@
 
 	const {ollama, last_active_view, onshowpull, onback}: Props = $props();
 
-	const models_with_details = $derived(ollama.models.filter((m) => m.ollama_details_loaded));
+	const models_with_details = $derived(ollama.models.filter((m) => m.ollama_show_response_loaded));
 </script>
 
 <div class="panel p_md">

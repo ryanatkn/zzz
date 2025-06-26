@@ -174,23 +174,23 @@
 					</div>
 				{/if}
 
-				{#if model.ollama_list_data?.details}
-					{#if model.ollama_list_data.details.format}
+				{#if model.ollama_list_response_item?.details}
+					{#if model.ollama_list_response_item.details.format}
 						<div>
 							<strong>format:</strong>
-							{model.ollama_list_data.details.format}
+							{model.ollama_list_response_item.details.format}
 						</div>
 					{/if}
-					{#if model.ollama_list_data.details.quantization_level}
+					{#if model.ollama_list_response_item.details.quantization_level}
 						<div>
 							<strong>quantization:</strong>
-							{model.ollama_list_data.details.quantization_level}
+							{model.ollama_list_response_item.details.quantization_level}
 						</div>
 					{/if}
-					{#if model.ollama_list_data.details.families.length}
+					{#if model.ollama_list_response_item.details.families.length}
 						<div>
 							<strong>families:</strong>
-							{model.ollama_list_data.details.families.join(', ')}
+							{model.ollama_list_response_item.details.families.join(', ')}
 						</div>
 					{/if}
 				{/if}
@@ -214,7 +214,7 @@
 						<h3>Ollama details</h3>
 
 						<div class="display_flex gap_sm">
-							{#if model.ollama_details_loaded}
+							{#if model.ollama_show_response_loaded}
 								<button
 									type="button"
 									class="plain icon_button"
@@ -228,9 +228,9 @@
 									type="button"
 									class="compact"
 									onclick={load_ollama_details}
-									disabled={model.ollama_details_loading}
+									disabled={model.ollama_show_response_loading}
 								>
-									{#if model.ollama_details_loading}
+									{#if model.ollama_show_response_loading}
 										<Pending_Animation inline /> loading...
 									{:else}
 										<Glyph glyph={GLYPH_REFRESH} /> load details
@@ -247,61 +247,57 @@
 						</div>
 					{/if}
 
-					{#if model.ollama_details_error}
+					{#if model.ollama_show_response_error}
 						<div class="panel p_sm color_c mb_md">
-							<Glyph glyph={GLYPH_ERROR} /> failed to load details: {model.ollama_details_error}
+							<Glyph glyph={GLYPH_ERROR} /> failed to load details: {model.ollama_show_response_error}
 						</div>
 					{/if}
 
-					{#if model.ollama_list_data}
+					{#if model.ollama_list_response_item}
 						<div class="subsection">
 							<h4>model info</h4>
 							<div>
 								<strong>digest:</strong>
-								<code class="font_size_sm">{model.ollama_list_data.digest}</code>
+								<code class="font_size_sm">{model.ollama_list_response_item.digest}</code>
 							</div>
-							{#if model.ollama_list_data.size}
+							{#if model.ollama_list_response_item.size}
 								<div>
 									<strong>size:</strong>
-									{(model.ollama_list_data.size / (1024 * 1024 * 1024)).toFixed(2)} GB
+									{(model.ollama_list_response_item.size / (1024 * 1024 * 1024)).toFixed(2)} GB
 								</div>
 							{/if}
-							{#if model.ollama_list_data.details?.parent_model}
+							{#if model.ollama_list_response_item.details?.parent_model}
 								<div>
 									<strong>parent:</strong>
-									{model.ollama_list_data.details.parent_model}
+									{model.ollama_list_response_item.details.parent_model}
 								</div>
 							{/if}
 						</div>
 					{/if}
 
-					{#if model.ollama_details}
-						{#if model.ollama_details.system}
-							<h4>system prompt</h4>
-							<pre class="code_block"><code>{model.ollama_details.system}</code></pre>
-						{/if}
-
-						{#if model.ollama_details.template}
+					{#if model.ollama_show_response}
+						{#if model.ollama_show_response.template}
 							<h4>template</h4>
-							<pre class="code_block"><code>{model.ollama_details.template}</code></pre>
+							<pre class="code_block"><code>{model.ollama_show_response.template}</code></pre>
 						{/if}
 
-						{#if model.ollama_details.model_info && Object.keys(model.ollama_details.model_info).length > 0}
+						{#if model.ollama_show_response.model_info && Object.keys(model.ollama_show_response.model_info).length > 0}
 							<h4>model info</h4>
 							<pre class="code_block"><code
-									>{JSON.stringify(model.ollama_details.model_info, null, 2)}</code
+									>{JSON.stringify(model.ollama_show_response.model_info, null, 2)}</code
 								></pre>
 						{/if}
 
-						{#if model.ollama_details.license}
+						{#if model.ollama_show_response.license}
 							<h4>license</h4>
-							<pre class="code_block"><code>{model.ollama_details.license}</code></pre>
+							<pre class="code_block"><code>{model.ollama_show_response.license}</code></pre>
 						{/if}
 
-						{#if model.ollama_details.modelfile}
+						{#if model.ollama_show_response.modelfile}
 							<details>
 								<summary><h4 class="display_inline">modelfile</h4></summary>
-								<pre class="code_block mt_sm"><code>{model.ollama_details.modelfile}</code></pre>
+								<pre class="code_block mt_sm"><code>{model.ollama_show_response.modelfile}</code
+									></pre>
 							</details>
 						{/if}
 					{/if}

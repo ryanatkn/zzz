@@ -2062,8 +2062,8 @@ export const src_json = {
 				{name: 'Ollama_Model_Info', kind: 'type'},
 				{name: 'Ollama_Models_Response', kind: 'type'},
 				{name: 'Ollama_Model_Details', kind: 'variable'},
-				{name: 'Ollama_List_Data', kind: 'variable'},
-				{name: 'Ollama_Details', kind: 'variable'},
+				{name: 'Ollama_List_Response_Item', kind: 'variable'},
+				{name: 'Ollama_Show_Response', kind: 'variable'},
 			],
 		},
 		'./Ollama_Manager.svelte': {
