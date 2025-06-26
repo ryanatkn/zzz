@@ -1,5 +1,6 @@
 <script lang="ts">
 	import Pending_Button from '@ryanatkn/fuz/Pending_Button.svelte';
+	import {tick} from 'svelte';
 
 	import {estimate_token_count} from '$lib/helpers.js';
 	import type {Tape} from '$lib/tape.svelte.js';
@@ -30,7 +31,7 @@
 	$effect(() => {
 		if (chat.id === app.chats.pending_chat_id_to_focus) {
 			app.chats.pending_chat_id_to_focus = null;
-			setTimeout(() => content_input?.focus());
+			void tick().then(() => content_input?.focus());
 		}
 	});
 
@@ -46,7 +47,7 @@
 			return;
 		}
 		input = '';
-		setTimeout(() => content_input?.focus()); // timeout is maybe unnecessary, lets the input clear first to maybe avoid a frame of jank
+		void tick().then(() => content_input?.focus()); // timeout is maybe unnecessary, lets the input clear first to maybe avoid a frame of jank
 		pending = true;
 		await onsend(parsed);
 		pending = false;
