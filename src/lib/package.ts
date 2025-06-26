@@ -534,6 +534,11 @@ export const package_json = {
 			types: './dist/diskfiles.svelte.d.ts',
 			default: './dist/diskfiles.svelte.js',
 		},
+		'./Editable_Text.svelte': {
+			types: './dist/Editable_Text.svelte.d.ts',
+			svelte: './dist/Editable_Text.svelte',
+			default: './dist/Editable_Text.svelte',
+		},
 		'./Error_Message.svelte': {
 			types: './dist/Error_Message.svelte.d.ts',
 			svelte: './dist/Error_Message.svelte',
@@ -1727,6 +1732,10 @@ export const src_json = {
 				{name: 'Diskfiles_Options', kind: 'type'},
 				{name: 'Diskfiles', kind: 'class'},
 			],
+		},
+		'./Editable_Text.svelte': {
+			path: 'Editable_Text.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
 		},
 		'./Error_Message.svelte': {
 			path: 'Error_Message.svelte',

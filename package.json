@@ -611,6 +611,11 @@
       "types": "./dist/diskfiles.svelte.d.ts",
       "default": "./dist/diskfiles.svelte.js"
     },
+    "./Editable_Text.svelte": {
+      "types": "./dist/Editable_Text.svelte.d.ts",
+      "svelte": "./dist/Editable_Text.svelte",
+      "default": "./dist/Editable_Text.svelte"
+    },
     "./Error_Message.svelte": {
       "types": "./dist/Error_Message.svelte.d.ts",
       "svelte": "./dist/Error_Message.svelte",

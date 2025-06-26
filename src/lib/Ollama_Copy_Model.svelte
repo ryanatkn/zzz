@@ -38,11 +38,17 @@
 	</header>
 
 	<section class="width_md display_flex flex_column gap_md">
+		<p>Create a copy of the source model with a new name.</p>
+
 		<fieldset>
 			<label>
 				<div class="title mb_xs">source model</div>
 				{#if ollama.model_names.length > 0}
-					<select class="plain w_100" bind:value={ollama.copy_source_model} disabled={ollama.copy_is_copying}>
+					<select
+						class="plain w_100"
+						bind:value={ollama.copy_source_model}
+						disabled={ollama.copy_is_copying}
+					>
 						<option value="">-- select source model --</option>
 						{#each ollama.model_names as model_name (model_name)}
 							<option value={model_name}>{model_name}</option>
@@ -73,7 +79,6 @@
 					disabled={ollama.copy_is_copying}
 				/>
 			</label>
-			<p>Create a copy of the source model with a new name</p>
 		</fieldset>
 
 		<div class="display_flex gap_md">
@@ -86,7 +91,9 @@
 				<Glyph glyph={GLYPH_COPY} />&nbsp;
 				{ollama.copy_is_copying ? 'copying...' : 'copy model'}
 			</button>
-			<button type="button" class="plain" onclick={onclose} disabled={ollama.copy_is_copying}>cancel</button>
+			<button type="button" class="plain" onclick={onclose} disabled={ollama.copy_is_copying}
+				>cancel</button
+			>
 		</div>
 
 		{#if ollama.copy_is_duplicate_name}

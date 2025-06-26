@@ -36,6 +36,8 @@ export const providers_default: Array<Provider_Json_Input> = [
 // TODO @db refactor with db
 export const models_default: Array<z.input<typeof Model_Json>> = [
 	// https://ollama.com/search
+	{name: 'gemma3n:e2b', provider_name: 'ollama', tags: ['small']},
+	{name: 'gemma3n:e4b', provider_name: 'ollama', tags: ['small']},
 	{name: 'gemma3:1b', provider_name: 'ollama', tags: ['small']},
 	{name: 'gemma3:4b', provider_name: 'ollama', tags: ['small']},
 	{name: 'qwen3:0.6b', provider_name: 'ollama', tags: ['small']},
