@@ -103,7 +103,7 @@
 		height: var(--input_height);
 		cursor: text;
 		flex: 1;
-		overflow: hidden;
+		overflow: hidden; /* for ellipsis, is there another way to force it to shrink to obscure content? */
 	}
 	span[role='button']:hover {
 		background-color: var(--bg_6);
