@@ -97,7 +97,7 @@
 		padding: 0;
 		margin: 0;
 	}
-	span:not(.ellipsis) {
+	span[role='button'] {
 		display: inline-flex;
 		align-items: center;
 		height: var(--input_height);
@@ -105,7 +105,7 @@
 		flex: 1;
 		overflow: hidden;
 	}
-	span:not(.ellipsis):hover {
+	span[role='button']:hover {
 		background-color: var(--bg_6);
 	}
 </style>
