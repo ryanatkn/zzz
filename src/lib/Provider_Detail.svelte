@@ -4,13 +4,13 @@
 	import type {SvelteHTMLElements} from 'svelte/elements';
 
 	import type {Provider} from '$lib/provider.svelte.js';
-	import Model_Summary from '$lib/Model_Summary.svelte';
 	import Provider_Logo from '$lib/Provider_Logo.svelte';
 	import {GLYPH_PROVIDER} from '$lib/glyphs.js';
 	import External_Link from '$lib/External_Link.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 	import Ollama_Manager from '$lib/Ollama_Manager.svelte';
 	import {frontend_context} from '$lib/frontend.svelte.js';
+	import Model_Summary from '$lib/Model_Summary.svelte';
 
 	interface Props {
 		provider: Provider;
@@ -22,8 +22,6 @@
 	const at_detail_page = $derived(page.url.pathname === `${base}/providers/${provider.name}`);
 
 	const app = frontend_context.get();
-
-	// TODO BLOCK the `Ollama_Manager` needs to be unified with the Model_Summary list
 </script>
 
 <div {...attrs} class="panel p_lg {attrs?.class}">
@@ -58,13 +56,13 @@
 		<aside class="mt_xl3">
 			⚠️ This information is incomplete and may be incorrect or outdated.
 		</aside>
+		<section>
+			<ul class="display_flex flex_wrap unstyled gap_md">
+				{#each provider.models as model (model)}
+					<Model_Summary {model} />
+				{/each}
+			</ul>
+			<!-- TODO UI to add models -->
+		</section>
 	{/if}
-	<section>
-		<ul class="display_flex flex_wrap unstyled gap_md">
-			{#each provider.models as model (model)}
-				<Model_Summary {model} />
-			{/each}
-		</ul>
-		<!-- TODO UI to add models -->
-	</section>
 </div>

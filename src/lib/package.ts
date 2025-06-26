@@ -35,7 +35,7 @@ export const package_json = {
 	devDependencies: {
 		'@changesets/changelog-git': '^0.2.1',
 		'@ryanatkn/eslint-config': '^0.8.0',
-		'@ryanatkn/fuz': '^0.144.0',
+		'@ryanatkn/fuz': '^0.144.2',
 		'@ryanatkn/gro': '^0.159.0',
 		'@ryanatkn/moss': '^0.31.0',
 		'@sveltejs/adapter-static': '^3.0.8',
@@ -2055,8 +2055,6 @@ export const src_json = {
 				{name: 'Ollama_Model_Details', kind: 'variable'},
 				{name: 'Ollama_List_Data', kind: 'variable'},
 				{name: 'Ollama_Details', kind: 'variable'},
-				{name: 'ollama_list', kind: 'function'},
-				{name: 'ollama_list_with_metadata', kind: 'function'},
 			],
 		},
 		'./Ollama_Manager.svelte': {

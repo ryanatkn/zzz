@@ -56,7 +56,7 @@ export const models_default: Array<z.input<typeof Model_Json>> = [
 	{name: 'claude-3-5-haiku-latest', provider_name: 'claude', tags: ['cheap']},
 	{name: 'claude-3-7-sonnet-latest', provider_name: 'claude', tags: ['smart']},
 	{name: 'claude-sonnet-4-20250514', provider_name: 'claude', tags: ['smart']},
-	{name: 'claude-opus-4-20250514', provider_name: 'claude', tags: ['smart']},
+	{name: 'claude-opus-4-20250514', provider_name: 'claude', tags: ['smart', 'smarter']},
 
 	// https://platform.openai.com/docs/overview
 	{name: 'gpt-4.1-nano', provider_name: 'chatgpt', tags: ['cheap']},
@@ -70,7 +70,11 @@ export const models_default: Array<z.input<typeof Model_Json>> = [
 	// {name: 'o3', provider_name: 'chatgpt', tags: ['reasoning', 'smart']},
 
 	// https://ai.google.dev/gemini-api/docs/
-	{name: 'gemini-2.5-flash-lite-preview-06-17', provider_name: 'gemini', tags: ['cheaper']},
+	{
+		name: 'gemini-2.5-flash-lite-preview-06-17',
+		provider_name: 'gemini',
+		tags: ['cheap', 'cheaper'],
+	},
 	{name: 'gemini-2.5-flash', provider_name: 'gemini', tags: ['cheap']},
 	{name: 'gemini-2.5-pro', provider_name: 'gemini', tags: ['smart']},
 ];

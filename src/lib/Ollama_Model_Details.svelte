@@ -53,6 +53,40 @@
 		</header>
 
 		<section class="display_flex gap_sm mb_md">
+			<button
+				type="button"
+				class="plain"
+				onclick={() => {
+					// TODO get `app` from context? or is this fine? should it be protected? generic types might make it a no-go
+					const chat = ollama.app.chats.add(undefined, true);
+					chat.add_tape(model);
+				}}
+			>
+				<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> create a new chat
+			</button>
+
+			{#if model.ollama_details_loaded}
+				<button
+					type="button"
+					class="plain"
+					title="clear cache and reload details"
+					onclick={() => ollama.refresh_model_details(model.name)}
+				>
+					<Glyph glyph={GLYPH_REFRESH} />&nbsp; reload details
+				</button>
+			{:else if model.needs_ollama_details}
+				<div class="display_flex gap_sm align_items_center">
+					<button
+						type="button"
+						class="plain"
+						onclick={() => load_model_details()}
+						title="load model details"
+					>
+						<Glyph glyph={GLYPH_REFRESH} />&nbsp; load details
+					</button>
+				</div>
+			{/if}
+
 			{#if ondelete}
 				<Confirm_Button
 					onconfirm={() => ondelete(model.name)}
@@ -80,40 +114,6 @@
 					{/snippet}
 				</Confirm_Button>
 			{/if}
-
-			{#if model.ollama_details_loaded}
-				<button
-					type="button"
-					class="plain"
-					title="clear cache and reload details"
-					onclick={() => ollama.refresh_model_details(model.name)}
-				>
-					<Glyph glyph={GLYPH_REFRESH} />&nbsp; reload details
-				</button>
-			{:else if model.needs_ollama_details}
-				<div class="display_flex gap_sm align_items_center">
-					<button
-						type="button"
-						class="plain"
-						onclick={() => load_model_details()}
-						title="load model details"
-					>
-						<Glyph glyph={GLYPH_REFRESH} />&nbsp; load details
-					</button>
-				</div>
-			{/if}
-
-			<button
-				type="button"
-				class="plain"
-				onclick={() => {
-					// TODO get `app` from context? or is this fine? should it be protected? generic types might make it a no-go
-					const chat = ollama.app.chats.add(undefined, true);
-					chat.add_tape(model);
-				}}
-			>
-				<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> create a new chat
-			</button>
 		</section>
 
 		{#if model.ollama_details_loading}
