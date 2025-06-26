@@ -3,6 +3,8 @@
 	import {swallow} from '@ryanatkn/belt/dom.js';
 	import type {SvelteHTMLElements} from 'svelte/elements';
 
+	// TODO either refactor to support Textarea or make that a separate Editable_Textarea
+
 	// TODO maybe rewrite with contenteditable, be less opinionated
 
 	interface Props {
