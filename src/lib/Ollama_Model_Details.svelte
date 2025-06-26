@@ -28,7 +28,7 @@
 	// TODO refactor with `Model_Detail`?
 </script>
 
-<Contextmenu_Model attrs={{class: 'panel p_md'}} {model}>
+<Contextmenu_Model attrs={{class: 'display_block panel p_md'}} {model}>
 	<header class="display_flex justify_content_space_between mb_md">
 		<div class="display_flex flex_column gap_xs">
 			<h3 class="mt_0 mb_0 font_family_mono">

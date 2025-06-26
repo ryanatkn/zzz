@@ -2,7 +2,7 @@
 	import Provider_Link from '$lib/Provider_Link.svelte';
 	import Model_Link from '$lib/Model_Link.svelte';
 	import Glyph from '$lib/Glyph.svelte';
-	import {GLYPH_PROVIDER} from '$lib/glyphs.js';
+	import {GLYPH_CHECKMARK, GLYPH_PROVIDER} from '$lib/glyphs.js';
 	import {frontend_context} from '$lib/frontend.svelte.js';
 	import External_Link from '$lib/External_Link.svelte';
 
@@ -30,10 +30,14 @@
 				<ul class="unstyled">
 					{#each provider.models as model (model)}
 						<li class="row flex_wrap mb_xs3">
-							<Model_Link attrs={{class: 'font_family_mono px_xs font_size_sm'}} {model} icon />
-							<!-- {#each model.tags as tag (tag)}
-								<small class="chip">{tag}</small>
-							{/each} -->
+							{#if model.provider_name === 'ollama'}<Glyph
+									glyph={model.downloaded ? GLYPH_CHECKMARK : ' '}
+									attrs={{title: model.downloaded ? 'downloaded' : 'not downloaded'}}
+								/>{/if}<Model_Link
+								attrs={{class: 'font_family_mono px_xs font_size_sm'}}
+								{model}
+								icon
+							/>
 						</li>
 					{/each}
 				</ul>

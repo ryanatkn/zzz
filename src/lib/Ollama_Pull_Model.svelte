@@ -16,7 +16,7 @@
 
 	const app = frontend_context.get();
 
-	const models_not_downloaded = $derived(app.ollama.models_not_downloaded);
+	const {models_not_downloaded} = $derived(app.ollama);
 
 	const handle_pull = async () => {
 		await ollama.handle_pull();

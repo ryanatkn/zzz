@@ -61,13 +61,7 @@
 	};
 </script>
 
-<!-- TODO hacky, I guess adding clsx as a dep like Svelte makes sense? -->
-<!-- eslint-disable-next-line @typescript-eslint/no-base-to-string -->
-<Contextmenu_Model
-	tag="div"
-	attrs={{...attrs, class: 'panel p_lg ' + (attrs?.class || '')}}
-	{model}
->
+<Contextmenu_Model tag="div" attrs={{class: 'panel p_lg', ...attrs}} {model}>
 	<section class="row">
 		<div class="glyph_container">
 			<Glyph glyph={GLYPH_MODEL} size="var(--icon_size_xl)" />
@@ -129,186 +123,188 @@
 		</aside>
 	{/if}
 
-	<section>
-		<h2>Specs</h2>
-		<div>
-			{#if model.context_window}
-				<div>
-					<strong>context window:</strong>
-					{model.context_window.toLocaleString()} tokens
-				</div>
-			{/if}
-			{#if model.output_token_limit}
-				<div>
-					<strong>output limit:</strong>
-					{model.output_token_limit.toLocaleString()} tokens
-				</div>
-			{/if}
-			{#if model.parameter_count}
-				<div>
-					<strong>parameters:</strong>
-					{model.parameter_count.toLocaleString()}B
-				</div>
-			{/if}
-			{#if model.filesize}
-				<div>
-					<strong>file size:</strong>
-					{format_file_size(model.filesize)}
-				</div>
-			{/if}
-			{#if model.architecture}
-				<div>
-					<strong>architecture:</strong>
-					{model.architecture}
-				</div>
-			{/if}
-			{#if model.embedding_length}
-				<div>
-					<strong>embedding length:</strong>
-					{model.embedding_length.toLocaleString()}
-				</div>
-			{/if}
-			{#if model.training_cutoff}
-				<div>
-					<strong>training cutoff:</strong>
-					{model.training_cutoff}
-				</div>
-			{/if}
-
-			{#if model.ollama_list_data?.details}
-				{#if model.ollama_list_data.details.format}
+	{#if model.provider_name !== 'ollama' || model.downloaded}
+		<section>
+			<h2>Specs</h2>
+			<div>
+				{#if model.context_window}
 					<div>
-						<strong>format:</strong>
-						{model.ollama_list_data.details.format}
+						<strong>context window:</strong>
+						{model.context_window.toLocaleString()} tokens
 					</div>
 				{/if}
-				{#if model.ollama_list_data.details.quantization_level}
+				{#if model.output_token_limit}
 					<div>
-						<strong>quantization:</strong>
-						{model.ollama_list_data.details.quantization_level}
+						<strong>output limit:</strong>
+						{model.output_token_limit.toLocaleString()} tokens
 					</div>
 				{/if}
-				{#if model.ollama_list_data.details.families.length}
+				{#if model.parameter_count}
 					<div>
-						<strong>families:</strong>
-						{model.ollama_list_data.details.families.join(', ')}
+						<strong>parameters:</strong>
+						{model.parameter_count.toLocaleString()}B
 					</div>
 				{/if}
-			{/if}
-		</div>
-
-		{#if model.cost_input || model.cost_output}
-			<section>
-				<h3>pricing</h3>
-				{#if model.cost_input}
-					<div><strong>input:</strong> ${model.cost_input.toFixed(2)} / 1M tokens</div>
-				{/if}
-				{#if model.cost_output}
-					<div><strong>output:</strong> ${model.cost_output.toFixed(2)} / 1M tokens</div>
-				{/if}
-			</section>
-		{/if}
-
-		{#if model.provider_name === 'ollama'}
-			<section>
-				<div class="display_flex justify_content_space_between align_items_center mb_md">
-					<h3>Ollama details</h3>
-
-					<div class="display_flex gap_sm">
-						{#if model.ollama_details_loaded}
-							<button
-								type="button"
-								class="plain icon_button"
-								onclick={reload_ollama_details}
-								title="reload details"
-							>
-								<Glyph glyph={GLYPH_REFRESH} />
-							</button>
-						{:else if model.needs_ollama_details}
-							<button
-								type="button"
-								class="compact"
-								onclick={load_ollama_details}
-								disabled={model.ollama_details_loading}
-							>
-								{#if model.ollama_details_loading}
-									<Pending_Animation inline /> loading...
-								{:else}
-									<Glyph glyph={GLYPH_REFRESH} /> load details
-								{/if}
-							</button>
-						{/if}
-					</div>
-				</div>
-
-				{#if model.ollama_modified_at}
+				{#if model.filesize}
 					<div>
-						<h4>modified</h4>
-						{format_short_date(model.ollama_modified_at)}
+						<strong>file size:</strong>
+						{format_file_size(model.filesize)}
+					</div>
+				{/if}
+				{#if model.architecture}
+					<div>
+						<strong>architecture:</strong>
+						{model.architecture}
+					</div>
+				{/if}
+				{#if model.embedding_length}
+					<div>
+						<strong>embedding length:</strong>
+						{model.embedding_length.toLocaleString()}
+					</div>
+				{/if}
+				{#if model.training_cutoff}
+					<div>
+						<strong>training cutoff:</strong>
+						{model.training_cutoff}
 					</div>
 				{/if}
 
-				{#if model.ollama_details_error}
-					<div class="panel p_sm color_c mb_md">
-						<Glyph glyph={GLYPH_ERROR} /> failed to load details: {model.ollama_details_error}
-					</div>
-				{/if}
-
-				{#if model.ollama_list_data}
-					<div class="subsection">
-						<h4>model info</h4>
+				{#if model.ollama_list_data?.details}
+					{#if model.ollama_list_data.details.format}
 						<div>
-							<strong>digest:</strong>
-							<code class="font_size_sm">{model.ollama_list_data.digest}</code>
+							<strong>format:</strong>
+							{model.ollama_list_data.details.format}
 						</div>
-						{#if model.ollama_list_data.size}
-							<div>
-								<strong>size:</strong>
-								{(model.ollama_list_data.size / (1024 * 1024 * 1024)).toFixed(2)} GB
-							</div>
-						{/if}
-						{#if model.ollama_list_data.details?.parent_model}
-							<div>
-								<strong>parent:</strong>
-								{model.ollama_list_data.details.parent_model}
-							</div>
-						{/if}
+					{/if}
+					{#if model.ollama_list_data.details.quantization_level}
+						<div>
+							<strong>quantization:</strong>
+							{model.ollama_list_data.details.quantization_level}
+						</div>
+					{/if}
+					{#if model.ollama_list_data.details.families.length}
+						<div>
+							<strong>families:</strong>
+							{model.ollama_list_data.details.families.join(', ')}
+						</div>
+					{/if}
+				{/if}
+			</div>
+
+			{#if model.cost_input || model.cost_output}
+				<section>
+					<h3>pricing</h3>
+					{#if model.cost_input}
+						<div><strong>input:</strong> ${model.cost_input.toFixed(2)} / 1M tokens</div>
+					{/if}
+					{#if model.cost_output}
+						<div><strong>output:</strong> ${model.cost_output.toFixed(2)} / 1M tokens</div>
+					{/if}
+				</section>
+			{/if}
+
+			{#if model.provider_name === 'ollama'}
+				<section>
+					<div class="display_flex justify_content_space_between align_items_center mb_md">
+						<h3>Ollama details</h3>
+
+						<div class="display_flex gap_sm">
+							{#if model.ollama_details_loaded}
+								<button
+									type="button"
+									class="plain icon_button"
+									onclick={reload_ollama_details}
+									title="reload details"
+								>
+									<Glyph glyph={GLYPH_REFRESH} />
+								</button>
+							{:else if model.needs_ollama_details}
+								<button
+									type="button"
+									class="compact"
+									onclick={load_ollama_details}
+									disabled={model.ollama_details_loading}
+								>
+									{#if model.ollama_details_loading}
+										<Pending_Animation inline /> loading...
+									{:else}
+										<Glyph glyph={GLYPH_REFRESH} /> load details
+									{/if}
+								</button>
+							{/if}
+						</div>
 					</div>
-				{/if}
 
-				{#if model.ollama_details}
-					{#if model.ollama_details.system}
-						<h4>system prompt</h4>
-						<pre class="code_block"><code>{model.ollama_details.system}</code></pre>
+					{#if model.ollama_modified_at}
+						<div>
+							<h4>modified</h4>
+							{format_short_date(model.ollama_modified_at)}
+						</div>
 					{/if}
 
-					{#if model.ollama_details.template}
-						<h4>template</h4>
-						<pre class="code_block"><code>{model.ollama_details.template}</code></pre>
+					{#if model.ollama_details_error}
+						<div class="panel p_sm color_c mb_md">
+							<Glyph glyph={GLYPH_ERROR} /> failed to load details: {model.ollama_details_error}
+						</div>
 					{/if}
 
-					{#if model.ollama_details.model_info && Object.keys(model.ollama_details.model_info).length > 0}
-						<h4>model info</h4>
-						<pre class="code_block"><code
-								>{JSON.stringify(model.ollama_details.model_info, null, 2)}</code
-							></pre>
+					{#if model.ollama_list_data}
+						<div class="subsection">
+							<h4>model info</h4>
+							<div>
+								<strong>digest:</strong>
+								<code class="font_size_sm">{model.ollama_list_data.digest}</code>
+							</div>
+							{#if model.ollama_list_data.size}
+								<div>
+									<strong>size:</strong>
+									{(model.ollama_list_data.size / (1024 * 1024 * 1024)).toFixed(2)} GB
+								</div>
+							{/if}
+							{#if model.ollama_list_data.details?.parent_model}
+								<div>
+									<strong>parent:</strong>
+									{model.ollama_list_data.details.parent_model}
+								</div>
+							{/if}
+						</div>
 					{/if}
 
-					{#if model.ollama_details.license}
-						<h4>license</h4>
-						<pre class="code_block"><code>{model.ollama_details.license}</code></pre>
-					{/if}
+					{#if model.ollama_details}
+						{#if model.ollama_details.system}
+							<h4>system prompt</h4>
+							<pre class="code_block"><code>{model.ollama_details.system}</code></pre>
+						{/if}
 
-					{#if model.ollama_details.modelfile}
-						<details>
-							<summary><h4 class="display_inline">modelfile</h4></summary>
-							<pre class="code_block mt_sm"><code>{model.ollama_details.modelfile}</code></pre>
-						</details>
+						{#if model.ollama_details.template}
+							<h4>template</h4>
+							<pre class="code_block"><code>{model.ollama_details.template}</code></pre>
+						{/if}
+
+						{#if model.ollama_details.model_info && Object.keys(model.ollama_details.model_info).length > 0}
+							<h4>model info</h4>
+							<pre class="code_block"><code
+									>{JSON.stringify(model.ollama_details.model_info, null, 2)}</code
+								></pre>
+						{/if}
+
+						{#if model.ollama_details.license}
+							<h4>license</h4>
+							<pre class="code_block"><code>{model.ollama_details.license}</code></pre>
+						{/if}
+
+						{#if model.ollama_details.modelfile}
+							<details>
+								<summary><h4 class="display_inline">modelfile</h4></summary>
+								<pre class="code_block mt_sm"><code>{model.ollama_details.modelfile}</code></pre>
+							</details>
+						{/if}
 					{/if}
-				{/if}
-			</section>
-		{/if}
-	</section>
+				</section>
+			{/if}
+		</section>
+	{/if}
 </Contextmenu_Model>
 
 <style>
