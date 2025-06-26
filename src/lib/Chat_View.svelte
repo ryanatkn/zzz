@@ -1,7 +1,5 @@
 <script lang="ts">
 	import {slide} from 'svelte/transition';
-	import {tick} from 'svelte';
-	import {swallow} from '@ryanatkn/belt/dom.js';
 
 	import Glyph from '$lib/Glyph.svelte';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
@@ -15,6 +13,7 @@
 	import Chat_Initializer from '$lib/Chat_Initializer.svelte';
 	import Chat_Tape_Add_By_Model from '$lib/Chat_Tape_Add_By_Model.svelte';
 	import Chat_Tape_Manage_By_Tag from '$lib/Chat_Tape_Manage_By_Tag.svelte';
+	import Editable_Text from '$lib/Editable_Text.svelte';
 
 	const app = frontend_context.get();
 	const {chats} = app;
@@ -29,18 +28,6 @@
 
 	// TODO BLOCK do this in the prompt view
 	// TODO BLOCK consider hoisting this state to the chat, maybe in a new helper class
-	let is_editing_name = $state(false);
-	let edited_name = $state('');
-	let name_input_el: HTMLInputElement | undefined = $state();
-
-	const save_name = () => {
-		if (!edited_name.trim()) {
-			is_editing_name = false;
-			return;
-		}
-		chat.name = edited_name.trim();
-		is_editing_name = false;
-	};
 
 	// TODO clicking tapes should select them, if none selected then default to the first
 
@@ -55,38 +42,7 @@
 				<!-- TODO needs work -->
 				<div class="font_size_lg display_flex align_items_center">
 					<Glyph glyph={GLYPH_CHAT} />
-					{#if is_editing_name}
-						<input
-							type="text"
-							class="plain"
-							bind:this={name_input_el}
-							bind:value={edited_name}
-							onblur={save_name}
-							onkeydown={(e) => {
-								if (e.key === 'Enter') {
-									swallow(e);
-									save_name();
-								} else if (e.key === 'Escape') {
-									swallow(e);
-									is_editing_name = false;
-									edited_name = '';
-								}
-							}}
-						/>
-					{:else}
-						<button
-							type="button"
-							class="plain flex_1 font_weight_400 ellipsis text_align_left"
-							onclick={() => {
-								is_editing_name = true;
-								edited_name = chat.name;
-								void tick().then(() => name_input_el?.select());
-							}}
-							title="Click to edit chat name"
-						>
-							{chat.name}
-						</button>
-					{/if}
+					<Editable_Text bind:value={chat.name} />
 				</div>
 				<div class="column">
 					<small title={chat.created_formatted_datetime}

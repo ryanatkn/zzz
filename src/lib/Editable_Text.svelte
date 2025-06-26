@@ -1,0 +1,111 @@
+<script lang="ts">
+	import {tick} from 'svelte';
+	import {swallow} from '@ryanatkn/belt/dom.js';
+	import type {SvelteHTMLElements} from 'svelte/elements';
+
+	// TODO maybe rewrite with contenteditable, be less opinionated
+
+	interface Props {
+		value: string;
+		// TODO maybe support `onsave`, but `bind:` now supports this easily enough
+		// onsave: (value: string) => void;
+		attrs?: SvelteHTMLElements['span'];
+		span_attrs?: SvelteHTMLElements['span'];
+		input_attrs?: SvelteHTMLElements['input'];
+	}
+
+	let {value = $bindable(), attrs, span_attrs, input_attrs}: Props = $props();
+
+	let is_editing = $state(false);
+	let edited_value = $state('');
+	let input_el: HTMLInputElement | undefined = $state();
+	let span_el: HTMLSpanElement | undefined = $state();
+
+	const save = () => {
+		const trimmed = edited_value.trim(); // TODO parse with an optional zod schema
+		if (!trimmed) {
+			is_editing = false;
+			return;
+		}
+		value = trimmed;
+		is_editing = false;
+		finalize_editing();
+	};
+
+	const cancel = () => {
+		is_editing = false;
+		edited_value = '';
+		finalize_editing();
+	};
+
+	const start_editing = () => {
+		is_editing = true;
+		edited_value = value;
+		void tick().then(() => input_el?.select());
+	};
+
+	const finalize_editing = () => {
+		void tick().then(() => span_el?.focus());
+	};
+
+	// TODO maybe export the classes as module-scoped constants?
+</script>
+
+{#if is_editing}
+	<input
+		type="text"
+		{...attrs}
+		{...input_attrs}
+		bind:this={input_el}
+		bind:value={edited_value}
+		onblur={save}
+		onkeydown={(e) => {
+			if (e.key === 'Enter') {
+				swallow(e);
+				save();
+			} else if (e.key === 'Escape') {
+				swallow(e);
+				cancel();
+			}
+		}}
+	/>
+{:else}
+	<span
+		role="button"
+		tabindex="0"
+		aria-label="click to edit"
+		{...attrs}
+		{...span_attrs}
+		bind:this={span_el}
+		onclick={start_editing}
+		onkeydown={(e) => {
+			if (e.key === 'Enter' || e.key === ' ') {
+				swallow(e);
+				start_editing();
+			}
+		}}
+	>
+		<span class="ellipsis">
+			{value}
+		</span>
+	</span>
+{/if}
+
+<style>
+	input {
+		flex: 1;
+		padding: 0;
+		margin: 0;
+	}
+	span:not(.ellipsis) {
+		display: inline-flex;
+		align-items: center;
+		height: var(--input_height);
+		cursor: text;
+		flex: 1;
+		overflow: hidden;
+	}
+	span:not(.ellipsis):hover {
+		background-color: var(--bg_6);
+	}
+</style>
