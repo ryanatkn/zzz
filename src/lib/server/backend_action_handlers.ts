@@ -91,7 +91,7 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 
 			let result: Action_Outputs['submit_completion'];
 
-			console.log(`texting ${provider_name}:`, prompt.substring(0, 1000));
+			console.log(`texting ${provider_name}:`, prompt.substring(0, 100));
 
 			try {
 				switch (provider_name) {

@@ -221,7 +221,9 @@
 			</li>
 			<li>
 				I'm looking for <a href="https://www.ryanatkn.com/funding">funding</a> to sustain my continued
-				full-time work - if successful, I think Zzz will be stewarded by some kind of nonprofit
+				full-time work - if successful, I think Zzz will be stewarded by some kind of nonprofit, but
+				I'm open to corporate sponsorship if it means sustainability with independence (also I'm currently
+				open to jobs that would allocate part of my time to Zzz)
 			</li>
 		</ul>
 	</section>
