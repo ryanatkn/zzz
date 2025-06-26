@@ -77,6 +77,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 
 	readonly schema: T_Schema; // TODO currently Zod, but I'm evaluating ArkType soon - Zzz's goals may justify its runtime weight, or maybe precompilation will eventually beat Zod on that point too - https://github.com/arktypeio/arktype/issues/810
 
+	// TODO maybe rename to `fields` or `field_schema_keys`?
 	readonly schema_keys: Array<Schema_Keys<T_Schema>> = $derived.by(() =>
 		zod_get_schema_keys(this.schema),
 	);
