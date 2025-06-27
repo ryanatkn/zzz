@@ -4,8 +4,7 @@
 	import Settings from '$lib/Settings.svelte';
 	import {frontend_context} from '$lib/frontend.svelte.js';
 	import Dashboard_Header from '$lib/Dashboard_Header.svelte';
-	import {format_timestamp} from '$lib/time_helpers.js';
-
+	import Time_Widget from '$lib/Time_Widget.svelte';
 	import Footer from '$lib/Footer.svelte';
 
 	const app = frontend_context.get();
@@ -19,9 +18,7 @@
 		{#snippet header()}
 			<h1><Glyph glyph={GLYPH_SETTINGS} /> system settings</h1>
 		{/snippet}
-		<div class="font_family_serif font_size_xl3">
-			{format_timestamp(app.time.now)}
-		</div>
+		<Time_Widget value={app.time.now} />
 	</Dashboard_Header>
 	<section class="width_md">
 		<Settings />

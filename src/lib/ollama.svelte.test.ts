@@ -8,6 +8,7 @@ import {Ollama, Ollama_Operation} from '$lib/ollama.svelte.js';
 import {create_uuid} from '$lib/zod_helpers.js';
 import {Frontend} from '$lib/frontend.svelte.js';
 import config from '$lib/config.js';
+import {OLLAMA_URL} from '$lib/ollama_helpers.js';
 
 describe('Ollama', () => {
 	const create_test_app = () => {
@@ -22,7 +23,7 @@ describe('Ollama', () => {
 		const app = create_test_app();
 		const ollama = new Ollama({app});
 
-		expect(ollama.host).toBe('http://127.0.0.1:11434');
+		expect(ollama.host).toBe(OLLAMA_URL);
 		expect(ollama.list_status).toBe('initial');
 		expect(ollama.available).toBe(false);
 		expect(ollama.models.length).toBeTypeOf('number');
@@ -222,15 +223,59 @@ describe('Ollama_Operation', () => {
 			json: {operation_id: create_uuid(), type: 'pull', status: 'pending', model: 'test_model'},
 		});
 
-		operation.update_progress(50);
-		expect(operation.progress).toBe(50);
+		// Normal progress update
+		operation.update_progress({status: 'test', completed: 50, total: 100});
+		expect(operation.progress_percent).toBe(50);
+		expect(operation.progress).toEqual({status: 'test', completed: 50, total: 100});
 
-		// Test bounds
-		operation.update_progress(150);
-		expect(operation.progress).toBe(100);
+		// Progress at 100%
+		operation.update_progress({status: 'test', completed: 100, total: 100});
+		expect(operation.progress_percent).toBe(100);
 
-		operation.update_progress(-10);
-		expect(operation.progress).toBe(0);
+		// Progress exceeding total (should clamp to 100)
+		operation.update_progress({status: 'test', completed: 150, total: 100});
+		expect(operation.progress_percent).toBe(100);
+
+		// Negative progress (should clamp to 0)
+		operation.update_progress({status: 'test', completed: -10, total: 100});
+		expect(operation.progress_percent).toBe(0);
+
+		// Zero total edge case
+		operation.update_progress({status: 'test', completed: 50, total: 0});
+		expect(operation.progress_percent).toBe(100);
+
+		// Fractional progress
+		operation.update_progress({status: 'test', completed: 1, total: 3});
+		expect(operation.progress_percent).toBe(33);
+
+		operation.update_progress({status: 'test', completed: 2, total: 3});
+		expect(operation.progress_percent).toBe(67);
+	});
+
+	test('should handle missing progress fields', () => {
+		const app = create_test_app();
+		const operation = new Ollama_Operation({
+			app,
+			json: {operation_id: create_uuid(), type: 'pull', status: 'pending', model: 'test_model'},
+		});
+
+		const initial_progress = operation.progress_percent;
+		const initial_progress_obj = operation.progress;
+
+		// Should not update if completed is undefined
+		operation.update_progress({status: 'test', completed: undefined, total: 100} as any);
+		expect(operation.progress_percent).toBe(initial_progress);
+		expect(operation.progress).toBe(initial_progress_obj);
+
+		// Should not update if total is undefined
+		operation.update_progress({status: 'test', completed: 50, total: undefined} as any);
+		expect(operation.progress_percent).toBe(initial_progress);
+		expect(operation.progress).toBe(initial_progress_obj);
+
+		// Should not update if both are undefined
+		operation.update_progress({status: 'test', completed: undefined, total: undefined} as any);
+		expect(operation.progress_percent).toBe(initial_progress);
+		expect(operation.progress).toBe(initial_progress_obj);
 	});
 
 	test('should be registered in app.cell_registry', () => {
@@ -244,5 +289,85 @@ describe('Ollama_Operation', () => {
 		// Operations are cells, so they should be registered
 		const found = app.cell_registry.all.get(operation.id);
 		expect(found).toBe(operation);
+	});
+
+	test('should initialize with correct default values', () => {
+		const app = create_test_app();
+		const id = create_uuid();
+		const operation = new Ollama_Operation({
+			app,
+			json: {
+				operation_id: id,
+				type: 'pull',
+				status: 'pending',
+				model: 'test_model',
+			},
+		});
+
+		expect(operation.operation_id).toBe(id);
+		expect(operation.type).toBe('pull');
+		expect(operation.status).toBe('pending');
+		expect(operation.model).toBe('test_model');
+		expect(operation.progress).toBeUndefined();
+		expect(operation.progress_percent).toBeUndefined();
+		expect(operation.error_message).toBeUndefined();
+		expect(operation.result).toBe(null);
+	});
+
+	test('should update timestamps on state changes', () => {
+		const app = create_test_app();
+		const operation = new Ollama_Operation({
+			app,
+			json: {operation_id: create_uuid(), type: 'pull', status: 'pending', model: 'test_model'},
+		});
+
+		const initial_updated = operation.updated;
+
+		// Wait a bit to ensure timestamp difference
+		setTimeout(() => {
+			operation.complete_success();
+			expect(operation.updated).not.toBe(initial_updated);
+		}, 10);
+	});
+
+	test('should handle various operation types', () => {
+		const app = create_test_app();
+
+		const pull_op = new Ollama_Operation({
+			app,
+			json: {operation_id: create_uuid(), type: 'pull', status: 'pending', model: 'model1'},
+		});
+		expect(pull_op.type).toBe('pull');
+
+		const delete_op = new Ollama_Operation({
+			app,
+			json: {operation_id: create_uuid(), type: 'delete', status: 'pending', model: 'model2'},
+		});
+		expect(delete_op.type).toBe('delete');
+
+		const copy_op = new Ollama_Operation({
+			app,
+			json: {operation_id: create_uuid(), type: 'copy', status: 'pending', model: 'model3'},
+		});
+		expect(copy_op.type).toBe('copy');
+
+		const create_op = new Ollama_Operation({
+			app,
+			json: {operation_id: create_uuid(), type: 'create', status: 'pending', model: 'model4'},
+		});
+		expect(create_op.type).toBe('create');
+
+		const list_op = new Ollama_Operation({
+			app,
+			json: {operation_id: create_uuid(), type: 'list', status: 'pending'},
+		});
+		expect(list_op.type).toBe('list');
+		expect(list_op.model).toBeUndefined();
+
+		const show_op = new Ollama_Operation({
+			app,
+			json: {operation_id: create_uuid(), type: 'show', status: 'pending', model: 'model5'},
+		});
+		expect(show_op.type).toBe('show');
 	});
 });

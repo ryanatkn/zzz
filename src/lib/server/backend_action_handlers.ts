@@ -96,6 +96,7 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 			try {
 				switch (provider_name) {
 					case 'ollama': {
+						// TODO BLOCK is this what we want to do? or error? needs to stream progress if kept
 						const listed = await ollama.list();
 						if (!listed.models.some((m) => m.name === model)) {
 							await ollama.pull({model}); // TODO handle stream

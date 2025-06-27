@@ -766,6 +766,10 @@
       "types": "./dist/nav.d.ts",
       "default": "./dist/nav.js"
     },
+    "./navigation_helpers.js": {
+      "types": "./dist/navigation_helpers.d.ts",
+      "default": "./dist/navigation_helpers.js"
+    },
     "./Ollama_Configure.svelte": {
       "types": "./dist/Ollama_Configure.svelte.d.ts",
       "svelte": "./dist/Ollama_Configure.svelte",

@@ -43,6 +43,10 @@ export const Remote_Notification_Action_Spec = Action_Spec.extend({
 });
 export type Remote_Notification_Action_Spec = z.infer<typeof Remote_Notification_Action_Spec>;
 
+/**
+ * Local calls can wrap synchronous or asynchronous actions,
+ * and are the escape hatch for remote APIs that do not support SAES.
+ */
 export const Local_Call_Action_Spec = Action_Spec.extend({
 	kind: z.literal('local_call').default('local_call'),
 	auth: z.null().default(null),

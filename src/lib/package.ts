@@ -665,6 +665,10 @@ export const package_json = {
 			default: './dist/Nav_Link.svelte',
 		},
 		'./nav.js': {types: './dist/nav.d.ts', default: './dist/nav.js'},
+		'./navigation_helpers.js': {
+			types: './dist/navigation_helpers.d.ts',
+			default: './dist/navigation_helpers.js',
+		},
 		'./Ollama_Configure.svelte': {
 			types: './dist/Ollama_Configure.svelte.d.ts',
 			svelte: './dist/Ollama_Configure.svelte',
@@ -2043,6 +2047,10 @@ export const src_json = {
 				{name: 'main_nav_items_default', kind: 'variable'},
 			],
 		},
+		'./navigation_helpers.js': {
+			path: 'navigation_helpers.ts',
+			declarations: [{name: 'goto_unless_current', kind: 'function'}],
+		},
 		'./Ollama_Configure.svelte': {
 			path: 'Ollama_Configure.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
@@ -2059,10 +2067,10 @@ export const src_json = {
 			path: 'ollama_helpers.ts',
 			declarations: [
 				{name: 'OLLAMA_URL', kind: 'variable'},
-				{name: 'Ollama_Model_Info', kind: 'type'},
-				{name: 'Ollama_Models_Response', kind: 'type'},
+				{name: 'Ollama_Progress_Response', kind: 'variable'},
 				{name: 'Ollama_Model_Details', kind: 'variable'},
 				{name: 'Ollama_List_Response_Item', kind: 'variable'},
+				{name: 'Ollama_List_Response', kind: 'variable'},
 				{name: 'Ollama_Show_Response', kind: 'variable'},
 			],
 		},

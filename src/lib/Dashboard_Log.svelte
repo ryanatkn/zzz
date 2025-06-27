@@ -6,7 +6,7 @@
 	import {GLYPH_LOG} from '$lib/glyphs.js';
 	import type {Action} from '$lib/action.svelte.js';
 	import {app_context} from '$lib/app.svelte.js';
-	import {format_timestamp} from '$lib/time_helpers.js';
+	import Time_Widget from '$lib/Time_Widget.svelte';
 
 	let selected_action: Action | null = $state(null);
 
@@ -18,9 +18,7 @@
 		{#snippet header()}
 			<h1><Glyph glyph={GLYPH_LOG} /> system log</h1>
 		{/snippet}
-		<div class="font_family_serif font_size_xl3">
-			{format_timestamp(app.time.now)}
-		</div>
+		<Time_Widget value={app.time.now} />
 	</Dashboard_Header>
 	<p>
 		This page shows the actions that have happened behind the scenes. It's a work in progress and

@@ -1,5 +1,4 @@
 import {z} from 'zod';
-import type {ListResponse, ModelResponse} from 'ollama/browser';
 import type {Async_Status} from '@ryanatkn/belt/async.js';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
@@ -7,6 +6,7 @@ import {Cell_Json} from '$lib/cell_types.js';
 import {create_uuid} from '$lib/zod_helpers.js';
 import type {Zzz_Dir} from '$lib/diskfile_types.js';
 import type {Jsonrpc_Request_Id} from '$lib/jsonrpc.js';
+import type {Ollama_List_Response, Ollama_List_Response_Item} from '$lib/ollama_helpers.js';
 
 /** Maximum number of ping records to keep. */
 export const PING_HISTORY_MAX = 6;
@@ -65,7 +65,7 @@ export interface Filesystem_Capability_Data {
 }
 
 export interface Ollama_Capability_Data {
-	list_response: ListResponse | null; // TODO add `round_trip_time` here or generically to all capabilities
+	list_response: Ollama_List_Response | null; // TODO add `round_trip_time` here or generically to all capabilities
 }
 
 /**
@@ -243,15 +243,18 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	/**
 	 * Latest Ollama model list response, if available.
 	 */
-	readonly ollama_models: Array<{name: string; size: number; model_response: ModelResponse}> =
-		$derived(
-			// TODO hacky
-			this.ollama.data?.list_response?.models.map((m) => ({
-				name: m.name,
-				size: Math.round(m.size / (1024 * 1024)), // Size in MB
-				model_response: m,
-			})) || [],
-		);
+	readonly ollama_models: Array<{
+		name: string;
+		size: number;
+		model_response: Ollama_List_Response_Item;
+	}> = $derived(
+		// TODO hacky
+		this.ollama.data?.list_response?.models.map((m) => ({
+			name: m.name,
+			size: Math.round(m.size / (1024 * 1024)), // Size in MB
+			model_response: m,
+		})) || [],
+	);
 
 	constructor(options: Cell_Options<typeof Capabilities_Json>) {
 		super(Capabilities_Json, options);

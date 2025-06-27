@@ -39,8 +39,8 @@
 			Zzz, pronounced "zees" like bees, is a software project focused on user power and
 			experimentation. The idea is to make a fullstack software environment that adapts to your
 			needs and intent while remaining fully open, aligned, and in your control. It's a flexible
-			toolkit for consuming and creating content, developing web software, and crafting experiences
-			with uncompromising UX and DX.
+			toolkit for crafting experiences and tools with maximal UX and DX, like developing web
+			software for creating and consuming content.
 		</p>
 		<p>
 			In the technology landscape of 2025, where LLM-based AI is upending long held assumptions, and <External_Link
@@ -59,9 +59,9 @@
 		<p>
 			The software I imagine answering these questions is cross-platform so it runs everywhere, and
 			for that we have the web with HTML, CSS, and JS. We want to solve problems once and have
-			supported features work consistently whether you're on Windows, macOS, iOS, Android, Linux, or
-			any other OS. For all its flaws and quirks, the web is the turf of our digital commons, and I
-			believe it's capable of delivering a great UX when developers use it with care.
+			supported features work consistently across operating systems and devices. For all its flaws
+			and quirks, the web is the turf of our digital commons, and I believe it's capable of
+			delivering a great UX when developers use it with care.
 		</p>
 		<p>
 			When thinking about the web UX I want, my starting point is the user interface, because we're
@@ -69,21 +69,21 @@
 			compromises when it comes to control over our UI runtime, so this means we're using JS
 			(thankfully, TypeScript). Zzz uses JS to glue software and machines together precisely the way
 			you want, maximizing its utility on any device across the full stack. It can run locally on
-			your machine using any of your available capabilities, or it can deploy anywhere JS runs to
-			play whatever role you need.
+			your machine using any of your available and granted capabilities, or it can deploy anywhere
+			JS runs to play whatever role you need.
 		</p>
 		<p>
-			Zzz is based on many kinds of software, and it can be used to make any number of mashups of
-			them:
+			Zzz is based on many kinds of software, borrowing features to provide end-users and devs an
+			integrated and extensible system:
 		</p>
 		<ul>
 			<li>
-				AI UIs like <External_Link href="https://github.com/Mintplex-Labs/anything-llm"
+				LLM UIs like <External_Link href="https://github.com/Mintplex-Labs/anything-llm"
 					>AnythingLLM</External_Link
 				>, <External_Link href="https://github.com/danny-avila/LibreChat">LibreChat</External_Link>,
 				and <External_Link href="https://github.com/oobabooga/text-generation-webui"
 					>Text generation web UI</External_Link
-				>
+				>, like LM Studio but FOSS and designed as a toolkit
 			</li>
 			<li>
 				IDEs like <External_Link href="https://code.visualstudio.com/">VSCode</External_Link> for open-ended
@@ -91,6 +91,8 @@
 			</li>
 			<li>
 				web browsers - planned with Chromium via Electron, ideally with swappable browser engines
+				(webview-based toolkits like Tauri do not provide the web-integrated affordances I'm after,
+				I think)
 			</li>
 			<li>
 				<External_Link href="https://wikipedia.org/wiki/Content_management_system"
@@ -109,16 +111,19 @@
 		<p>
 			This scope may look far-fetched, and it is to me, but I'm just making tools that I want to use
 			now on the best foundations I can assemble. I think the most successful version of Zzz is
-			where it's used to build other systems, with different ideas/systems/software being more
-			important than Zzz the tool. Many of the initial systems have been designed with some thought
-			towards this bigger picture, but it's too big an idea to be anywhere near complete, and I plan
-			to continue building incrementally on a quality base with some experiments mixed in.
+			where it's used to build other systems, and it fades into the background as just another tool
+			with a particular take on a part of the stack. From a personal POV, it's my flagship that's
+			the primary user of my other software, and I plan to make various websites and tools with it.
+			Many of the initial systems have been designed with some thought towards this bigger picture,
+			and I plan to continue building incrementally on a quality base with some (lower-quality)
+			experiments mixed in.
 		</p>
 		<p>
 			Zzz wants to be easy to use and inclusive of people and devices, but try as it might, it can't
 			cater to every case for every person -- however, thanks to the magic of standards-based
 			interoperability, Zzz works with all websites, like any other browser, and anything you make
-			with Zzz works with other browsers and web technologies. It's only one way to use the web.
+			with Zzz works with other browsers and web technologies. It's one of infinite ways to use the
+			web.
 		</p>
 		<p>Some early (rough) integrations include:</p>
 		<ul>
@@ -179,7 +184,7 @@
 							href="https://imagemagick.org/">ImageMagick</External_Link
 						>
 					</li>
-					<li>more, please send feedback/requests/help</li>
+					<li>more, please send thoughts</li>
 				</ul>
 			</li>
 		</ul>
@@ -191,16 +196,8 @@
 			that I've been wanting for a long time, and I appear to be sticking with this iteration.
 		</p>
 		<p>
-			I've been thinking about and prototyping related ideas for more than 13 years, and for the
-			last 6 I've been working on my open source projects full-time, so there's a lot of thought and
-			plans already formulated, but this iteration of Zzz was released after about 5 months from
-			here I'm prioritizing user feedback and just shipping a
-			continuously-improving-but-not-quite-usable proof-of-concept. I'm doing a lot of experimenting
-			in places, so data and API stability aren't yet priorities.
-		</p>
-		<p>
 			If this sounds interesting and you would like to test out some broken pre-release software,
-			input is appreciated to help make it work for you -- see the <External_Link
+			feedback is appreciated to help make it work for you -- see the <External_Link
 				href="https://github.com/ryanatkn/zzz">code</External_Link
 			>,
 			<External_Link href="https://github.com/ryanatkn/zzz/issues">issues</External_Link>, and
@@ -221,9 +218,9 @@
 			</li>
 			<li>
 				I'm looking for <a href="https://www.ryanatkn.com/funding">funding</a> to sustain my continued
-				full-time work - if successful, I think Zzz will be stewarded by some kind of nonprofit, but
-				I'm open to corporate sponsorship if it means sustainability with independence (also I'm currently
-				open to jobs that would allocate part of my time to Zzz)
+				full-time work - if successful, I think Zzz will be stewarded by some kind of nonprofit, and
+				I'm open to employment that sponsors at least part-time work on Zzz and its dependencies (without
+				changing the independence I have over my repos)
 			</li>
 		</ul>
 	</section>
@@ -231,9 +228,9 @@
 	<section>
 		<h2 class="mb_lg">Into the future</h2>
 		<p class="mb_md">
-			This project has a huge scope and it's early in development. What you're seeing is a small
-			fraction of the idea -- especially if you're viewing this on the website not natively via Node
-			-- so here's a button for previewing some of what's planned:
+			This project has a big scope and it's early in development. What you're seeing is a small part
+			of the idea -- especially if you're viewing this on the website not natively via Node -- so
+			here's a button for previewing some of what's planned:
 		</p>
 		<button
 			type="button"

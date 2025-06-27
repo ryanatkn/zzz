@@ -16,7 +16,13 @@
 
 	const app = frontend_context.get();
 
-	const {models_not_downloaded} = $derived(app.ollama);
+	const {models_not_downloaded, pending_operations} = $derived(app.ollama);
+
+	const current_pull_operation = $derived(
+		pending_operations.find(
+			(op) => op.type === 'pull' && op.model === ollama.pull_parsed_model_name,
+		),
+	);
 
 	const handle_pull = async () => {
 		await ollama.handle_pull();
@@ -30,6 +36,8 @@
 			onclose();
 		}
 	};
+
+	// TODO BLOCK show similar UI in the configure operation's list (showing progress, and req/res times, but also using actions)
 </script>
 
 <div class="panel p_md">
@@ -108,6 +116,21 @@
 
 		{#if ollama.pull_already_downloaded}
 			<Error_Message>this model is already downloaded</Error_Message>
+		{/if}
+
+		{#if current_pull_operation}
+			<div class="panel bg_2 p_sm">
+				<div class="display_flex align_items_center gap_sm mb_xs">
+					<div class="text_2">pulling {current_pull_operation.model}</div>
+				</div>
+				{#if current_pull_operation.progress_percent !== undefined}
+					<div class="display_flex align_items_center gap_sm">
+						<meter class="flex_1" value={current_pull_operation.progress_percent} min="0" max="100"
+						></meter>
+						<div class="text_2 size_xs">{current_pull_operation.progress_percent}%</div>
+					</div>
+				{/if}
+			</div>
 		{/if}
 	</div>
 </div>
