@@ -4,12 +4,7 @@ import {z} from 'zod';
 import {SvelteMap} from 'svelte/reactivity';
 import type {Async_Status} from '@ryanatkn/belt/async.js';
 import {BROWSER, DEV} from 'esm-env';
-import ollama, {
-	type StatusResponse,
-	type DeleteRequest,
-	type PullRequest,
-	type CreateRequest,
-} from 'ollama/browser';
+import ollama, {type DeleteRequest, type PullRequest, type CreateRequest} from 'ollama/browser';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
@@ -48,8 +43,8 @@ export type Ollama_Operation_Result =
 	| {type: 'show'; data: Ollama_Show_Response}
 	| {type: 'pull'; data: Ollama_Progress_Response}
 	| {type: 'create'; data: Ollama_Progress_Response}
-	| {type: 'delete'; data: StatusResponse}
-	| {type: 'copy'; data: StatusResponse};
+	| {type: 'delete'; data: Ollama_Status_Response}
+	| {type: 'copy'; data: Ollama_Status_Response};
 
 /**
  * Cell class for tracking individual Ollama operations
@@ -62,7 +57,7 @@ export const Ollama_Operation_Json = Cell_Json.extend({
 	progress: Ollama_Progress_Response.optional(),
 	progress_percent: z.number().min(0).max(100).optional(),
 	error_message: z.string().optional(),
-	result: z.any().optional(), // TODO use discriminated union
+	result: z.any().optional(), // TODO use discriminated union after adding schema
 });
 export type Ollama_Operation_Json = z.infer<typeof Ollama_Operation_Json>;
 export type Ollama_Operation_Json_Input = z.input<typeof Ollama_Operation_Json>;
@@ -337,7 +332,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 		const insecure = partial.insecure || false;
 		console.log(`[ollama.pull_model] pulling: ${model_name}, insecure: ${insecure}`);
 
-		const operation = this.#create_operation('pull', {model: model_name, progress: 0});
+		const operation = this.#create_operation('pull', {model: model_name});
 
 		if (!BROWSER) return operation.operation_id;
 
@@ -395,7 +390,10 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 				}
 			}
 
-			operation.complete_success({type: 'delete', data: response});
+			operation.complete_success({
+				type: 'delete',
+				data: response as unknown as Ollama_Status_Response,
+			});
 
 			// Refresh model list after successful deletion
 			await this.refresh();
@@ -440,7 +438,10 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 				}
 			}
 
-			operation.complete_success({type: 'copy', data: response});
+			operation.complete_success({
+				type: 'copy',
+				data: response as unknown as Ollama_Status_Response,
+			});
 
 			// Refresh model list after successful copy
 			await this.refresh();
@@ -458,7 +459,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	async create_model(model_name: string, partial: Partial<CreateRequest>): Promise<Uuid> {
 		console.log(`[ollama.create_model] creating: ${model_name}`);
 
-		const operation = this.#create_operation('create', {model: model_name, progress: 0});
+		const operation = this.#create_operation('create', {model: model_name});
 
 		if (!BROWSER) return operation.operation_id;
 
