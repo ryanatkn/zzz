@@ -123,7 +123,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	ps_status: Async_Status = $state('initial');
 	ps_error: string | null = $state(null);
 	ps_polling_enabled: boolean = $state(false);
-	ps_polling_interval: number | null = $state(null);
+	ps_polling_interval: NodeJS.Timeout | null = $state(null);
 
 	// Pull model state
 	pull_model_name: string = $state('');
@@ -230,6 +230,11 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 		this.init();
 	}
 
+	override dispose(): void {
+		this.stop_ps_polling();
+		super.dispose();
+	}
+
 	/**
 	 * Get the list of currently running models.
 	 */
@@ -270,6 +275,8 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 		}
 	}
 
+	// TODO BLOCK probably extract a `Poller` helper class to a `ps_poller` instance var (not $state, readonly), (`poller.svelte.ts`), to abstract away the interval handling
+	// TODO need to stop on dispose
 	/**
 	 * Start polling for running models status.
 	 * Default interval is 10 seconds.
@@ -280,11 +287,9 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 		this.ps_polling_enabled = true;
 		console.log('[ollama.start_ps_polling] starting ps polling');
 
-		// Initial call
 		void this.call_ps();
 
-		// Set up polling interval (1 second)
-		this.ps_polling_interval = window.setInterval(() => {
+		this.ps_polling_interval = setInterval(() => {
 			if (this.ps_polling_enabled && this.available) {
 				void this.call_ps();
 			}
@@ -295,13 +300,15 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	 * Stop polling for running models status.
 	 */
 	stop_ps_polling(): void {
-		if (!this.ps_polling_enabled) return;
+		if (!BROWSER || !this.ps_polling_enabled) return;
 
 		console.log('[ollama.stop_ps_polling] stopping ps polling');
 		this.ps_polling_enabled = false;
 
-		window.clearInterval(this.ps_polling_interval!);
-		this.ps_polling_interval = null;
+		if (this.ps_polling_interval) {
+			clearInterval(this.ps_polling_interval);
+			this.ps_polling_interval = null;
+		}
 	}
 
 	/**

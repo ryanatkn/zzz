@@ -237,7 +237,7 @@ describe('Ollama', () => {
 
 		expect(ollama.ps_polling_enabled).toBe(true);
 		expect(ollama.ps_polling_interval).toBe(123);
-		expect(setIntervalSpy).toHaveBeenCalledWith(expect.any(Function), 1000);
+		expect(setIntervalSpy).toHaveBeenCalledWith(expect.any(Function), 10000);
 
 		// Starting again should not create another interval
 		ollama.start_ps_polling();
