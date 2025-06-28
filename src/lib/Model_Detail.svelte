@@ -20,7 +20,7 @@
 	import Glyph from '$lib/Glyph.svelte';
 	import {format_short_date} from '$lib/time_helpers.js';
 	import Contextmenu_Model from '$lib/Contextmenu_Model.svelte';
-	import {format_file_size} from '$lib/format_helpers.js';
+	import {format_gigabytes} from '$lib/format_helpers.js';
 
 	interface Props {
 		model: Model;
@@ -40,18 +40,6 @@
 
 	const at_detail_page = $derived(page.url.pathname === `${base}/models/${model.name}`);
 	const provider = $derived(app.providers.find_by_name(model.provider_name));
-
-	const load_ollama_details = async () => {
-		if (model.needs_ollama_details) {
-			await app.ollama.show_model(model.name);
-		}
-	};
-
-	const reload_ollama_details = async () => {
-		if (model.provider_name === 'ollama') {
-			await app.ollama.refresh_model_details(model.name);
-		}
-	};
 
 	// TODO BLOCK fix error with getting model details when they're not downloaded
 	// TODO BLOCK get spec data mapped to model fields for the frontier providers
@@ -103,10 +91,7 @@
 			<button
 				type="button"
 				class="color_d"
-				onclick={() => {
-					const chat = app.chats.add(undefined, true);
-					chat.add_tape(model);
-				}}
+				onclick={() => app.chats.add(undefined, true).add_tape(model)}
 			>
 				<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> create a new chat
 			</button>
@@ -144,7 +129,7 @@
 				{#if model.filesize}
 					<div>
 						<strong>file size:</strong>
-						{format_file_size(model.filesize)}
+						{format_gigabytes(model.filesize)}
 					</div>
 				{/if}
 				{#if model.architecture}
@@ -210,7 +195,7 @@
 								<button
 									type="button"
 									class="plain icon_button"
-									onclick={reload_ollama_details}
+									onclick={() => app.ollama.show_model(model.name)}
 									title="reload details"
 								>
 									<Glyph glyph={GLYPH_REFRESH} />
@@ -219,7 +204,7 @@
 								<button
 									type="button"
 									class="compact"
-									onclick={load_ollama_details}
+									onclick={() => app.ollama.show_model(model.name)}
 									disabled={model.ollama_show_response_loading}
 								>
 									{#if model.ollama_show_response_loading}

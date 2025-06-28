@@ -7,7 +7,7 @@
 	import type {Model} from '$lib/model.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
 	import {GLYPH_DOWNLOAD} from '$lib/glyphs.js';
-	import {format_file_size} from '$lib/format_helpers.js';
+	import {format_gigabytes} from '$lib/format_helpers.js';
 
 	interface Props {
 		model: Model;
@@ -67,7 +67,7 @@
 			{#if model.filesize}
 				<div class="spec_item">
 					<span class="spec_label">size:</span>
-					<span>{format_file_size(model.filesize)}</span>
+					<span>{format_gigabytes(model.filesize)}</span>
 				</div>
 			{/if}
 		</div>

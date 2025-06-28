@@ -14,9 +14,8 @@
 	import Ollama_Pull_Model from '$lib/Ollama_Pull_Model.svelte';
 	import Ollama_Create_Model from '$lib/Ollama_Create_Model.svelte';
 	import Ollama_Copy_Model from '$lib/Ollama_Copy_Model.svelte';
-	import Ollama_Model_Status from '$lib/Ollama_Model_Status.svelte';
+	import Ollama_Model_Listitem from '$lib/Ollama_Model_Listitem.svelte';
 	import type {Ollama} from '$lib/ollama.svelte.js';
-	import {format_file_size} from '$lib/format_helpers.js';
 
 	interface Props {
 		ollama: Ollama;
@@ -132,27 +131,7 @@
 
 					<div class="column">
 						{#each ollama.models_downloaded as model (model.id)}
-							<button
-								type="button"
-								class="menu_item selectable plain text_align_start p_sm border_radius_0 font_weight_400"
-								class:selected={ollama.manager_selected_view === 'model' &&
-									ollama.manager_selected_model?.id === model.id}
-								onclick={() => ollama.handle_select_model(model)}
-							>
-								<div class="display_flex flex_column gap_xs w_100">
-									<div class="display_flex justify_content_space_between align_items_center">
-										<div class="ellipsis font_size_lg">
-											{model.name}
-										</div>
-										<Ollama_Model_Status {model} {ollama} />
-									</div>
-									{#if model.filesize}
-										<div class="font_size_sm">
-											{format_file_size(model.filesize)}
-										</div>
-									{/if}
-								</div>
-							</button>
+							<Ollama_Model_Listitem {model} />
 						{/each}
 					</div>
 				</section>

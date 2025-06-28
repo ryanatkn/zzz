@@ -29,6 +29,8 @@
 	// TODO BLOCK do this in the prompt view
 	// TODO BLOCK consider hoisting this state to the chat, maybe in a new helper class
 
+	// TODO the add by model stuff is too noisy, maybe put behind a `Details`
+
 	// TODO clicking tapes should select them, if none selected then default to the first
 
 	// TODO add `presets` section to the top with the custom buttons/sets (accessible via contextmenu)

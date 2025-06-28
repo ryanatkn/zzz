@@ -11,7 +11,7 @@
 	import Contextmenu_Model from '$lib/Contextmenu_Model.svelte';
 	import Model_Link from '$lib/Model_Link.svelte';
 	import {format_short_date} from '$lib/time_helpers.js';
-	import {format_file_size} from '$lib/format_helpers.js';
+	import {format_gigabytes} from '$lib/format_helpers.js';
 
 	interface Props {
 		model: Model;
@@ -37,7 +37,7 @@
 			</h3>
 			{#if model.filesize}
 				<div>
-					{format_file_size(model.filesize)}
+					{format_gigabytes(model.filesize)}
 				</div>
 			{/if}
 			<div class="font_family_mono">
@@ -56,11 +56,7 @@
 		<button
 			type="button"
 			class="plain"
-			onclick={() => {
-				// TODO get `app` from context? or is this fine? should it be protected? generic types might make it a no-go
-				const chat = ollama.app.chats.add(undefined, true);
-				chat.add_tape(model);
-			}}
+			onclick={() => ollama.app.chats.add(undefined, true).add_tape(model)}
 		>
 			<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> create a new chat
 		</button>

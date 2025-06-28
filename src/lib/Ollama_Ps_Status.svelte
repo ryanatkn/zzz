@@ -1,6 +1,5 @@
 <script lang="ts">
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
-	import {print_number_with_separators} from '@ryanatkn/belt/print.js';
 	import {formatDistance} from 'date-fns';
 	import {slide} from 'svelte/transition';
 
@@ -8,6 +7,7 @@
 	import Model_Link from '$lib/Model_Link.svelte';
 	import {GLYPH_INFO, GLYPH_PAUSE, GLYPH_PLAY} from '$lib/glyphs.js';
 	import type {Ollama} from '$lib/ollama.svelte.js';
+	import {format_bytes} from '$lib/format_helpers.js';
 
 	interface Props {
 		ollama: Ollama;
@@ -66,7 +66,7 @@
 							<Model_Link model={{name: item.name, provider_name: 'ollama'}} />
 							{#if item.size_vram > 0}
 								<small>
-									VRAM: {print_number_with_separators(item.size_vram + '', ',')}
+									VRAM: {format_bytes(item.size_vram)}
 								</small>
 							{/if}
 						</div>

@@ -8,7 +8,13 @@
 
 	import type {Model} from '$lib/model.svelte.js';
 	import {frontend_context} from '$lib/frontend.svelte.js';
-	import {GLYPH_MODEL, GLYPH_REFRESH, GLYPH_PROVIDER, GLYPH_CHECKMARK} from '$lib/glyphs.js';
+	import {
+		GLYPH_MODEL,
+		GLYPH_REFRESH,
+		GLYPH_PROVIDER,
+		GLYPH_CHECKMARK,
+		GLYPH_CHAT,
+	} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
 	import Contextmenu_Entry_Copy_To_Clipboard from '$lib/Contextmenu_Entry_Copy_To_Clipboard.svelte';
 
@@ -23,6 +29,7 @@
 
 <Contextmenu {...rest} {entries} />
 
+<!-- TODO maybe extract Contextmenu_Model_Entries that can be used elsewhere like the Model_Link as an action? -->
 {#snippet entries()}
 	<Contextmenu_Submenu>
 		{#snippet icon()}<Glyph glyph={GLYPH_MODEL} />{/snippet}
@@ -35,13 +42,10 @@
 
 			<Contextmenu_Entry_Copy_To_Clipboard content={model.name} label="copy name" />
 
-			{#if model.ollama_list_response_item?.digest}
-				<Contextmenu_Entry_Copy_To_Clipboard
-					content={model.ollama_list_response_item.digest}
-					label="copy digest"
-					preview={model.ollama_list_response_item.digest.slice(0, 12) + '...'}
-				/>
-			{/if}
+			<Contextmenu_Entry run={() => model.app.chats.add(undefined, true).add_tape(model)}>
+				{#snippet icon()}<Glyph glyph={GLYPH_CHAT} />{/snippet}
+				<span>create new chat</span>
+			</Contextmenu_Entry>
 
 			{#if model.provider_name === 'ollama' && model.needs_ollama_details}
 				<Contextmenu_Entry
@@ -50,18 +54,18 @@
 					}}
 				>
 					{#snippet icon()}<Glyph glyph={GLYPH_REFRESH} />{/snippet}
-					<span>load ollama details</span>
+					<span>load Ollama details</span>
 				</Contextmenu_Entry>
 			{/if}
 
 			{#if model.provider_name === 'ollama' && model.ollama_show_response_loaded}
 				<Contextmenu_Entry
 					run={async () => {
-						await app.ollama.refresh_model_details(model.name);
+						await app.ollama.show_model(model.name);
 					}}
 				>
 					{#snippet icon()}<Glyph glyph={GLYPH_REFRESH} />{/snippet}
-					<span>refresh ollama details</span>
+					<span>reload Ollama details</span>
 				</Contextmenu_Entry>
 			{/if}
 

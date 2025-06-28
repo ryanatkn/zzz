@@ -71,7 +71,7 @@
 				</label>
 			</fieldset>
 
-			<div class="row gap_xs">
+			<div class="row gap_xs justify_content_space_between">
 				<button
 					type="button"
 					class="justify_content_start"
