@@ -228,7 +228,7 @@
 							>
 								reconnecting in...
 							</div>
-							{#key socket.current_reconnect_delay}
+							{#key socket.reconnect_attempt}
 								<div
 									class="progress_fill bg_d_2"
 									style:animation-duration="{socket.current_reconnect_delay}ms"
