@@ -27,7 +27,7 @@
 			{/if}
 			<button
 				type="button"
-				class="display_flex align_items_center gap_sm"
+				class="plain align_items_center gap_sm"
 				disabled={ollama.ps_status === 'pending'}
 				onclick={() => {
 					if (ollama.ps_polling_enabled) {
@@ -39,7 +39,7 @@
 			>
 				<Glyph glyph={ollama.ps_polling_enabled ? GLYPH_PAUSE : GLYPH_PLAY} />
 				<span>
-					{ollama.ps_polling_enabled ? 'stop monitoring' : 'start monitoring'}
+					{ollama.ps_polling_enabled ? 'stop' : 'start'} monitoring
 				</span>
 			</button>
 		</div>
@@ -47,22 +47,22 @@
 
 	{#if ollama.running_models.length > 0}
 		<ul class="unstyled" transition:slide>
-			{#each ollama.running_models as model (model.name)}
+			{#each ollama.running_models as item (item.name)}
 				<li class="py_xs3" transition:slide>
 					<div
 						class="display_flex justify_content_space_between align_items_center p_sm border_radius_xs bg_1"
 					>
 						<div class="display_flex gap_sm align_items_center">
-							<div class="font_weight_600 font_family_mono">{model.name}</div>
-							{#if model.size_vram > 0}
+							<div class="font_weight_600 font_family_mono">{item.name}</div>
+							{#if item.size_vram > 0}
 								<small>
-									VRAM: {print_number_with_separators(model.size_vram + '', ',')}
+									VRAM: {print_number_with_separators(item.size_vram + '', ',')}
 								</small>
 							{/if}
 						</div>
 						<!-- TODO maybe refactor with derived state -->
-						{#if model.expires_at}
-							{@const expires_at_date = new Date(model.expires_at)}
+						{#if item.expires_at}
+							{@const expires_at_date = new Date(item.expires_at)}
 							{@const expires_at_ms = expires_at_date.valueOf()}
 							<small>
 								{#if expires_at_ms > ollama.app.time.now_ms}
