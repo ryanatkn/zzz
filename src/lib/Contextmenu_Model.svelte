@@ -7,7 +7,6 @@
 	import type {Omit_Strict} from '@ryanatkn/belt/types.js';
 
 	import type {Model} from '$lib/model.svelte.js';
-	import {frontend_context} from '$lib/frontend.svelte.js';
 	import {
 		GLYPH_MODEL,
 		GLYPH_REFRESH,
@@ -23,8 +22,6 @@
 	}
 
 	const {model, ...rest}: Props = $props();
-
-	const app = frontend_context.get();
 </script>
 
 <Contextmenu {...rest} {entries} />
@@ -50,7 +47,7 @@
 			{#if model.provider_name === 'ollama' && model.needs_ollama_details}
 				<Contextmenu_Entry
 					run={async () => {
-						await app.ollama.show_model(model.name);
+						await model.app.ollama.show_model(model.name);
 					}}
 				>
 					{#snippet icon()}<Glyph glyph={GLYPH_REFRESH} />{/snippet}
@@ -61,7 +58,7 @@
 			{#if model.provider_name === 'ollama' && model.ollama_show_response_loaded}
 				<Contextmenu_Entry
 					run={async () => {
-						await app.ollama.show_model(model.name);
+						await model.app.ollama.show_model(model.name);
 					}}
 				>
 					{#snippet icon()}<Glyph glyph={GLYPH_REFRESH} />{/snippet}
@@ -75,7 +72,7 @@
 				set provider
 
 				{#snippet menu()}
-					{#each app.providers.names as provider_name (provider_name)}
+					{#each model.app.providers.names as provider_name (provider_name)}
 						<Contextmenu_Entry
 							run={() => {
 								model.provider_name = provider_name;

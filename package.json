@@ -799,6 +799,11 @@
       "svelte": "./dist/Ollama_Model_Details.svelte",
       "default": "./dist/Ollama_Model_Details.svelte"
     },
+    "./Ollama_Model_Listitem.svelte": {
+      "types": "./dist/Ollama_Model_Listitem.svelte.d.ts",
+      "svelte": "./dist/Ollama_Model_Listitem.svelte",
+      "default": "./dist/Ollama_Model_Listitem.svelte"
+    },
     "./Ollama_Model_Status.svelte": {
       "types": "./dist/Ollama_Model_Status.svelte.d.ts",
       "svelte": "./dist/Ollama_Model_Status.svelte",

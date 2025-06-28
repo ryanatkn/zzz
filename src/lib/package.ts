@@ -698,6 +698,11 @@ export const package_json = {
 			svelte: './dist/Ollama_Model_Details.svelte',
 			default: './dist/Ollama_Model_Details.svelte',
 		},
+		'./Ollama_Model_Listitem.svelte': {
+			types: './dist/Ollama_Model_Listitem.svelte.d.ts',
+			svelte: './dist/Ollama_Model_Listitem.svelte',
+			default: './dist/Ollama_Model_Listitem.svelte',
+		},
 		'./Ollama_Model_Status.svelte': {
 			types: './dist/Ollama_Model_Status.svelte.d.ts',
 			svelte: './dist/Ollama_Model_Status.svelte',
@@ -1777,9 +1782,9 @@ export const src_json = {
 			path: 'format_helpers.ts',
 			declarations: [
 				{name: 'format_bytes', kind: 'function'},
+				{name: 'format_gigabytes', kind: 'function'},
 				{name: 'format_percentage', kind: 'function'},
 				{name: 'format_duration', kind: 'function'},
-				{name: 'format_gigabytes', kind: 'function'},
 			],
 		},
 		'./frontend_action_handlers.js': {
@@ -2102,6 +2107,10 @@ export const src_json = {
 		},
 		'./Ollama_Model_Details.svelte': {
 			path: 'Ollama_Model_Details.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Ollama_Model_Listitem.svelte': {
+			path: 'Ollama_Model_Listitem.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
 		},
 		'./Ollama_Model_Status.svelte': {
