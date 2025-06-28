@@ -2,7 +2,7 @@
 
 // @vitest-environment jsdom
 
-import {test, expect, describe, vi} from 'vitest';
+import {test, expect, describe} from 'vitest';
 
 import {Ollama, Ollama_Operation} from '$lib/ollama.svelte.js';
 import {create_uuid} from '$lib/zod_helpers.js';
@@ -180,7 +180,6 @@ describe('Ollama', () => {
 		expect(ollama.ps_status).toBe('initial');
 		expect(ollama.ps_error).toBeNull();
 		expect(ollama.ps_polling_enabled).toBe(false);
-		expect(ollama.ps_polling_interval).toBeNull();
 		expect(ollama.running_models).toEqual([]);
 		expect(ollama.running_model_names.size).toBe(0);
 	});
@@ -228,35 +227,21 @@ describe('Ollama', () => {
 		const app = create_test_app();
 		const ollama = new Ollama({app});
 
-		// Mock window timers
-		const setIntervalSpy = vi.spyOn(window, 'setInterval').mockReturnValue(123 as any);
-		const clearIntervalSpy = vi.spyOn(window, 'clearInterval');
-
 		// Start polling
 		ollama.start_ps_polling();
-
 		expect(ollama.ps_polling_enabled).toBe(true);
-		expect(ollama.ps_polling_interval).toBe(123);
-		expect(setIntervalSpy).toHaveBeenCalledWith(expect.any(Function), 10000);
 
-		// Starting again should not create another interval
+		// Starting again should be safe
 		ollama.start_ps_polling();
-		expect(setIntervalSpy).toHaveBeenCalledTimes(1);
+		expect(ollama.ps_polling_enabled).toBe(true);
 
 		// Stop polling
 		ollama.stop_ps_polling();
-
 		expect(ollama.ps_polling_enabled).toBe(false);
-		expect(ollama.ps_polling_interval).toBeNull();
-		expect(clearIntervalSpy).toHaveBeenCalledWith(123);
 
 		// Stopping again should be safe
 		ollama.stop_ps_polling();
-		expect(clearIntervalSpy).toHaveBeenCalledTimes(1);
-
-		// Cleanup
-		setIntervalSpy.mockRestore();
-		clearIntervalSpy.mockRestore();
+		expect(ollama.ps_polling_enabled).toBe(false);
 	});
 });
 

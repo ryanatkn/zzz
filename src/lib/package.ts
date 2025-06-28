@@ -1778,6 +1778,7 @@ export const src_json = {
 				{name: 'format_bytes', kind: 'function'},
 				{name: 'format_percentage', kind: 'function'},
 				{name: 'format_duration', kind: 'function'},
+				{name: 'format_file_size', kind: 'function'},
 			],
 		},
 		'./frontend_action_handlers.js': {
