@@ -80,14 +80,13 @@ export const Ollama_Show_Response = z
 	.passthrough();
 export type Ollama_Show_Response = z.infer<typeof Ollama_Show_Response>;
 
-// PS response item has additional fields compared to list response
+// TODO @many assert type: ModelResponse -- Ollama is bugged, PS response item has additional fields compared to list
 export const Ollama_Ps_Response_Item = z
 	.object({
 		details: Ollama_Model_Details.optional(),
 		digest: z.string(),
 		expires_at: z.string(), // ISO date string for when the model will be unloaded
 		model: z.string(),
-		modified_at: z.string(),
 		name: z.string(),
 		size: z.number(),
 		size_vram: z.number(), // Amount of VRAM used by the model
@@ -95,6 +94,7 @@ export const Ollama_Ps_Response_Item = z
 	.passthrough();
 export type Ollama_Ps_Response_Item = z.infer<typeof Ollama_Ps_Response_Item>;
 
+// TODO @many assert type: ListResponse (bugged in Ollama, is different for list vs ps)
 export const Ollama_Ps_Response = z
 	.object({
 		models: z.array(Ollama_Ps_Response_Item),

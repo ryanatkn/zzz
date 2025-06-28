@@ -10,7 +10,7 @@
 	import Glyph from '$lib/Glyph.svelte';
 
 	interface Props {
-		model: Model;
+		model: Pick<Model, 'name' | 'provider_name'>;
 		/**
 		 * `true` is equivalent to `'svg'`
 		 */

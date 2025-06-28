@@ -5,6 +5,7 @@
 	import {slide} from 'svelte/transition';
 
 	import Glyph from '$lib/Glyph.svelte';
+	import Model_Link from '$lib/Model_Link.svelte';
 	import {GLYPH_INFO, GLYPH_PAUSE, GLYPH_PLAY} from '$lib/glyphs.js';
 	import type {Ollama} from '$lib/ollama.svelte.js';
 
@@ -13,14 +14,13 @@
 	}
 
 	const {ollama}: Props = $props();
+
+	// TODO this should show "running" models as being actively doing inference, otherwise "loaded"
 </script>
 
 <div class="panel p_md width_md mb_md">
 	<div class="display_flex justify_content_space_between align_items_center mb_md">
-		<h4 class="mt_0 mb_0">
-			<Glyph glyph={GLYPH_INFO} />
-			running models
-		</h4>
+		<h4 class="mt_0 mb_0">active models</h4>
 		<div class="display_flex align_items_center gap_sm">
 			{#if ollama.ps_status === 'pending'}
 				<Pending_Animation />
@@ -53,7 +53,16 @@
 						class="display_flex justify_content_space_between align_items_center p_sm border_radius_xs bg_1"
 					>
 						<div class="display_flex gap_sm align_items_center">
-							<div class="font_weight_600 font_family_mono">{item.name}</div>
+							<!-- TODO handle this API without the `!`, maybe change to only require the name, and derive the model -->
+							<button
+								type="button"
+								class="icon_button plain"
+								title="view model details"
+								onclick={() => ollama.handle_select_model(ollama.model_by_name.get(item.name)!)}
+							>
+								<Glyph glyph={GLYPH_INFO} />
+							</button>
+							<Model_Link model={{name: item.name, provider_name: 'ollama'}} />
 							{#if item.size_vram > 0}
 								<small>
 									VRAM: {print_number_with_separators(item.size_vram + '', ',')}
