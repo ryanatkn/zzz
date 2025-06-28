@@ -737,6 +737,7 @@ export const package_json = {
 			default: './dist/Ping_Form.svelte',
 		},
 		'./pkg.js': {types: './dist/pkg.d.ts', default: './dist/pkg.js'},
+		'./poller.svelte.js': {types: './dist/poller.svelte.d.ts', default: './dist/poller.svelte.js'},
 		'./Popover_Button.svelte': {
 			types: './dist/Popover_Button.svelte.d.ts',
 			svelte: './dist/Popover_Button.svelte',
@@ -2155,6 +2156,13 @@ export const src_json = {
 			declarations: [{name: 'default', kind: 'component'}],
 		},
 		'./pkg.js': {path: 'pkg.ts', declarations: [{name: 'pkg_context', kind: 'variable'}]},
+		'./poller.svelte.js': {
+			path: 'poller.svelte.ts',
+			declarations: [
+				{name: 'Poller_Options', kind: 'type'},
+				{name: 'Poller', kind: 'class'},
+			],
+		},
 		'./Popover_Button.svelte': {
 			path: 'Popover_Button.svelte',
 			declarations: [{name: 'default', kind: 'component'}],

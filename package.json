@@ -850,6 +850,10 @@
       "types": "./dist/pkg.d.ts",
       "default": "./dist/pkg.js"
     },
+    "./poller.svelte.js": {
+      "types": "./dist/poller.svelte.d.ts",
+      "default": "./dist/poller.svelte.js"
+    },
     "./Popover_Button.svelte": {
       "types": "./dist/Popover_Button.svelte.d.ts",
       "svelte": "./dist/Popover_Button.svelte",

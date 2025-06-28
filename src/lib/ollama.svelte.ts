@@ -244,7 +244,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	}
 
 	override dispose(): void {
-		this.#ps_poller.dispose();
+		this.#ps_poller.dispose(); // TODO maybe add a generic cell unsubscriber/dispose method collection?
 		super.dispose();
 	}
 
@@ -409,6 +409,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 			}
 
 			// Update model with details
+			response.tensors = undefined; // TODO this is hacky but we dont want this in most cases
 			model.ollama_show_response = response;
 			model.ollama_show_response_loaded = true;
 			model.ollama_show_response_loading = false;
@@ -623,14 +624,6 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 			model.ollama_show_response_loaded = false;
 			model.ollama_show_response_error = undefined;
 		}
-	}
-
-	/**
-	 * Clear and refresh details for a specific model.
-	 */
-	async refresh_model_details(model_name: string): Promise<void> {
-		this.clear_model_details(model_name);
-		await this.show_model(model_name);
 	}
 
 	/**

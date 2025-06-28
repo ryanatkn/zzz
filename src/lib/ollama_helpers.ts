@@ -75,7 +75,7 @@ export const Ollama_Show_Response = z
 		modelfile: z.string().optional(),
 		modified_at: z.string().optional(), // TODO @many Ollama bug - says Date but is a string
 		template: z.string().optional(),
-		tensors: z.array(z.any()).optional(), // TODO maybe strip?
+		tensors: z.array(z.any()).optional(), // TODO maybe strip? is removed atm in `ollama.svelte.ts`
 	})
 	.passthrough();
 export type Ollama_Show_Response = z.infer<typeof Ollama_Show_Response>;

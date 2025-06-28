@@ -29,6 +29,7 @@
 				type="button"
 				class="plain align_items_center gap_sm"
 				disabled={ollama.ps_status === 'pending'}
+				title="polls Ollama continuously for the status of running models"
 				onclick={() => {
 					if (ollama.ps_polling_enabled) {
 						ollama.stop_ps_polling();
