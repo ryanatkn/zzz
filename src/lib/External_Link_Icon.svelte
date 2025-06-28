@@ -11,7 +11,7 @@
 	const {children}: Props = $props();
 </script>
 
-<sup class="font_size_xs font_family_mono"
+<sup class="font_size_xs font_family_mono white_space_nowrap"
 	>[{#if children}{@render children(GLYPH_EXTERNAL_LINK)}{:else}<Glyph
 			glyph={GLYPH_EXTERNAL_LINK}
 		/>{/if}]</sup

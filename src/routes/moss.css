@@ -389,6 +389,9 @@ a.chip {
 .color_c_5 {
 	color: var(--color_c_5);
 }
+.bg_b_5 {
+	background-color: var(--color_b_5);
+}
 .bg_c_1 {
 	background-color: var(--color_c_1);
 }
@@ -412,6 +415,9 @@ a.chip {
 }
 .border_style_dashed {
 	border-style: dashed;
+}
+.border_radius_100 {
+	border-radius: 100%;
 }
 .border_radius_0 {
 	border-radius: 0;
@@ -447,11 +453,17 @@ a.chip {
 .w_100 {
 	width: 100%;
 }
+.w_xs2 {
+	width: var(--space_xs2);
+}
 .h_0 {
 	height: 0;
 }
 .h_100 {
 	height: 100%;
+}
+.h_xs2 {
+	height: var(--space_xs2);
 }
 .t_0 {
 	top: 0;

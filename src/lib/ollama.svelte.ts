@@ -16,6 +16,8 @@ import {
 	Ollama_List_Response,
 	Ollama_Progress_Response,
 	Ollama_Status_Response,
+	Ollama_Ps_Response,
+	Ollama_Ps_Response_Item,
 } from '$lib/ollama_helpers.js';
 import type {Model} from '$lib/model.svelte.js';
 
@@ -116,6 +118,13 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	list_last_updated: number | null = $state(null);
 	last_refreshed: string | null = $state(null);
 
+	// PS (running models) state
+	ps_response: Ollama_Ps_Response | null = $state(null);
+	ps_status: Async_Status = $state('initial');
+	ps_error: string | null = $state(null);
+	ps_polling_enabled: boolean = $state(false);
+	ps_polling_interval: number | null = $state(null);
+
 	// Pull model state
 	pull_model_name: string = $state('');
 	pull_insecure: boolean = $state(false);
@@ -175,6 +184,14 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 
 	readonly model_names: Array<string> = $derived(Array.from(this.model_by_name.keys()));
 
+	// PS derived state
+	readonly running_models: Array<Ollama_Ps_Response_Item> = $derived(
+		this.ps_response?.models ?? [],
+	);
+	readonly running_model_names: Set<string> = $derived(
+		new Set(this.running_models.map((m) => m.name)),
+	);
+
 	// Pull model derived state
 	readonly pull_parsed_model_name: string = $derived(this.pull_model_name.trim());
 	readonly pull_already_downloaded: boolean = $derived(
@@ -214,12 +231,89 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	}
 
 	/**
-	 * Refresh the list of models and update timestamps.
+	 * Get the list of currently running models.
 	 */
-	async refresh(): Promise<Ollama_List_Response | null> {
-		const result = await this.list_models();
+	async call_ps(): Promise<Ollama_Ps_Response | null> {
+		if (!BROWSER) return null;
+
+		console.log(`[ollama.call_ps] fetching running models from: ${this.host}`);
+
+		this.ps_status = 'pending';
+		this.ps_error = null;
+
+		try {
+			const response = (await ollama.ps()) as unknown as Ollama_Ps_Response;
+			console.log(
+				`[ollama.call_ps] success, found ${response.models.length} running models`,
+				response,
+			);
+
+			// Parse to log bugs but assign data anyway to avoid breaking the UX
+			if (DEV) {
+				const parsed = Ollama_Ps_Response.safeParse(response);
+				if (!parsed.success) {
+					console.error(`[ollama.call_ps] failed to parse:`, parsed.error);
+				}
+			}
+
+			this.ps_response = response;
+			this.ps_status = 'success';
+
+			return response;
+		} catch (error) {
+			console.error('[ollama.call_ps] failed:', error);
+			const error_message = error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE;
+			this.ps_error = error_message;
+			this.ps_status = 'failure';
+
+			return null;
+		}
+	}
+
+	/**
+	 * Start polling for running models status.
+	 * Default interval is 10 seconds.
+	 */
+	start_ps_polling(interval: number = 10_000): void {
+		if (!BROWSER || this.ps_polling_enabled) return;
+
+		this.ps_polling_enabled = true;
+		console.log('[ollama.start_ps_polling] starting ps polling');
+
+		// Initial call
+		void this.call_ps();
+
+		// Set up polling interval (1 second)
+		this.ps_polling_interval = window.setInterval(() => {
+			if (this.ps_polling_enabled && this.available) {
+				void this.call_ps();
+			}
+		}, interval);
+	}
+
+	/**
+	 * Stop polling for running models status.
+	 */
+	stop_ps_polling(): void {
+		if (!this.ps_polling_enabled) return;
+
+		console.log('[ollama.stop_ps_polling] stopping ps polling');
+		this.ps_polling_enabled = false;
+
+		window.clearInterval(this.ps_polling_interval!);
+		this.ps_polling_interval = null;
+	}
+
+	/**
+	 * Refresh the list of models and ps info and update the refresh timestamp.
+	 */
+	async refresh(): Promise<{
+		list_response: Ollama_List_Response | null;
+		ps_response: Ollama_Ps_Response | null;
+	}> {
+		const [list_response, ps_response] = await Promise.all([this.list_models(), this.call_ps()]);
 		this.last_refreshed = get_datetime_now();
-		return result;
+		return {list_response, ps_response};
 	}
 
 	/**

@@ -14,6 +14,7 @@
 	import Ollama_Pull_Model from '$lib/Ollama_Pull_Model.svelte';
 	import Ollama_Create_Model from '$lib/Ollama_Create_Model.svelte';
 	import Ollama_Copy_Model from '$lib/Ollama_Copy_Model.svelte';
+	import Ollama_Model_Status from '$lib/Ollama_Model_Status.svelte';
 	import type {Ollama} from '$lib/ollama.svelte.js';
 
 	interface Props {
@@ -138,8 +139,11 @@
 								onclick={() => ollama.handle_select_model(model)}
 							>
 								<div class="display_flex flex_column gap_xs w_100">
-									<div class="ellipsis font_size_lg">
-										{model.name}
+									<div class="display_flex justify_content_space_between align_items_center">
+										<div class="ellipsis font_size_lg">
+											{model.name}
+										</div>
+										<Ollama_Model_Status {model} {ollama} />
 									</div>
 									<div class="font_size_sm">
 										{model.filesize ? Math.round(model.filesize * 1024) : '?'} MB

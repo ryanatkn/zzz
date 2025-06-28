@@ -90,9 +90,9 @@
 				tooling and system access
 			</li>
 			<li>
-				web browsers - planned with Chromium via Electron, ideally with swappable browser engines
+				web browsers, planned with Chromium via Electron, ideally with swappable browser engines
 				(webview-based toolkits like Tauri do not provide the web-integrated affordances I'm after,
-				I think)
+				I think, but you can use Zzz with Tauri where it supports JS)
 			</li>
 			<li>
 				<External_Link href="https://wikipedia.org/wiki/Content_management_system"
@@ -102,34 +102,43 @@
 				>
 			</li>
 			<li>
-				code libraries and web metaframeworks using TypeScript and Svelte - Zzz extends <External_Link
-					href="https://svelte.dev/">SvelteKit</External_Link
-				> and <External_Link href="https://vite.dev/">Vite</External_Link> without wrapping them, enabling
-				devs to use Zzz as a library with existing workflows
+				code libraries and web metaframeworks using TypeScript and <External_Link
+					href="https://svelte.dev/">Svelte</External_Link
+				> -- Zzz extends SvelteKit and <External_Link href="https://vite.dev/">Vite</External_Link> without
+				wrapping them, enabling devs to use all or parts of Zzz as a library with existing workflows
 			</li>
 		</ul>
+		<p>
+			Putting it all together, we have a fullstack, fully capable, user-editable, and extensible
+			system-and-toolkit that bridges dev workflows to end-user experiences, without prescribing
+			changes to current behaviors and expectations.
+		</p>
 		<p>
 			This scope may look far-fetched, and it is to me, but I'm just making tools that I want to use
 			now on the best foundations I can assemble. I think the most successful version of Zzz is
 			where it's used to build other systems, and it fades into the background as just another tool
-			with a particular take on a part of the stack. From a personal POV, it's my flagship that's
-			the primary user of my other software, and I plan to make various websites and tools with it.
-			Many of the initial systems have been designed with some thought towards this bigger picture,
-			and I plan to continue building incrementally on a quality base with some (lower-quality)
-			experiments mixed in.
+			with a particular take on a part of the stack. From a personal POV, it's my flagship project
+			and primary+priority user of my other software, and I plan to make various websites and tools
+			with it. Many of the initial systems have been designed with some thought towards this bigger
+			picture, and I plan to continue building incrementally on a quality base with some
+			lower-quality experiments and stubbed future features mixed in.
 		</p>
 		<p>
 			Zzz wants to be easy to use and inclusive of people and devices, but try as it might, it can't
 			cater to every case for every person -- however, thanks to the magic of standards-based
-			interoperability, Zzz works with all websites, like any other browser, and anything you make
-			with Zzz works with other browsers and web technologies. It's one of infinite ways to use the
-			web.
+			interoperability, Zzz works with all websites like you'd expect from a browser, and anything
+			you make with Zzz works with other browsers and web technologies. It's one of infinite ways to
+			use the web, and it's designed to help you level up your technical knowledge and abilities, if
+			you're so inclined.
 		</p>
 		<p>Some early (rough) integrations include:</p>
 		<ul>
 			<li>
 				<External_Link href="https://github.com/ollama/ollama">Ollama</External_Link> runs AI models
-				locally - more local LLM backends will be supported, this choice was an easy first step
+				locally -- more local LLM backends will be supported starting with <External_Link
+					href="https://github.com/ggml-org/llama.cpp">llama.cpp</External_Link
+				> which Ollama is based on -- Ollama prioritizes ease of use, so although you have to install
+				it yourself separately, they make it about as easy as possible
 			</li>
 			<li>
 				<External_Link href="https://github.com/openai/openai-node">ChatGPT</External_Link>,
@@ -137,24 +146,27 @@
 					>Claude</External_Link
 				>, and <External_Link href="https://github.com/google-gemini/generative-ai-js"
 					>Gemini</External_Link
-				> - requires API keys
+				> -- requires you to bring your own API keys
 			</li>
 			<li>
 				<External_Link href="https://hono.dev/">Hono</External_Link> as the web server with
 				<External_Link href="https://svelte.dev/">SvelteKit</External_Link> and <External_Link
 					href="https://vite.dev/">Vite</External_Link
-				>, plays a key coordinating role - Hono bases itself on web standards and supports all JS
+				>, plays a key coordinating role -- Hono bases itself on web standards and supports all JS
 				server runtimes
 			</li>
 			<li>
-				Planned:
+				planned:
 				<ul>
 					<li>
 						<!-- TODO @db -->
-						<External_Link href="https://github.com/electric-sql/pglite">pglite</External_Link> via
-						<External_Link href="https://github.com/drizzle-team/drizzle-orm">Drizzle</External_Link
-						> and full <External_Link href="https://www.postgresql.org/">Postgres</External_Link> when
-						desired, see <External_Link href="https://github.com/ryanatkn/zzz/issues/7"
+						<External_Link href="https://github.com/electric-sql/pglite">pglite</External_Link>
+						and full <External_Link href="https://www.postgresql.org/">Postgres</External_Link> when
+						desired, using <External_Link href="https://github.com/drizzle-team/drizzle-orm"
+							>Drizzle</External_Link
+						> or maybe <External_Link href="https://github.com/porsager/postgres"
+							>postgres</External_Link
+						>, see <External_Link href="https://github.com/ryanatkn/zzz/issues/7"
 							>issue #7</External_Link
 						>
 					</li>

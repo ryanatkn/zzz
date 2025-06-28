@@ -698,10 +698,20 @@ export const package_json = {
 			svelte: './dist/Ollama_Model_Details.svelte',
 			default: './dist/Ollama_Model_Details.svelte',
 		},
+		'./Ollama_Model_Status.svelte': {
+			types: './dist/Ollama_Model_Status.svelte.d.ts',
+			svelte: './dist/Ollama_Model_Status.svelte',
+			default: './dist/Ollama_Model_Status.svelte',
+		},
 		'./Ollama_Operations.svelte': {
 			types: './dist/Ollama_Operations.svelte.d.ts',
 			svelte: './dist/Ollama_Operations.svelte',
 			default: './dist/Ollama_Operations.svelte',
+		},
+		'./Ollama_Ps_Status.svelte': {
+			types: './dist/Ollama_Ps_Status.svelte.d.ts',
+			svelte: './dist/Ollama_Ps_Status.svelte',
+			default: './dist/Ollama_Ps_Status.svelte',
 		},
 		'./Ollama_Pull_Model.svelte': {
 			types: './dist/Ollama_Pull_Model.svelte.d.ts',
@@ -953,6 +963,11 @@ export const package_json = {
 		'./test_helpers.js': {types: './dist/test_helpers.d.ts', default: './dist/test_helpers.js'},
 		'./test.task.js': {types: './dist/test.task.d.ts', default: './dist/test.task.js'},
 		'./time_helpers.js': {types: './dist/time_helpers.d.ts', default: './dist/time_helpers.js'},
+		'./Time_Widget.svelte': {
+			types: './dist/Time_Widget.svelte.d.ts',
+			svelte: './dist/Time_Widget.svelte',
+			default: './dist/Time_Widget.svelte',
+		},
 		'./time.svelte.js': {types: './dist/time.svelte.d.ts', default: './dist/time.svelte.js'},
 		'./Toggle_Button.svelte': {
 			types: './dist/Toggle_Button.svelte.d.ts',
@@ -1821,6 +1836,8 @@ export const src_json = {
 				{name: 'GLYPH_DISCONNECT', kind: 'variable'},
 				{name: 'GLYPH_RETRY', kind: 'variable'},
 				{name: 'GLYPH_PLACEHOLDER', kind: 'variable'},
+				{name: 'GLYPH_PLAY', kind: 'variable'},
+				{name: 'GLYPH_PAUSE', kind: 'variable'},
 				{name: 'GLYPH_CHECKMARK', kind: 'variable'},
 				{name: 'GLYPH_DOWNLOAD', kind: 'variable'},
 				{name: 'GLYPH_ERROR', kind: 'variable'},
@@ -2067,11 +2084,14 @@ export const src_json = {
 			path: 'ollama_helpers.ts',
 			declarations: [
 				{name: 'OLLAMA_URL', kind: 'variable'},
+				{name: 'Ollama_Status_Response', kind: 'variable'},
 				{name: 'Ollama_Progress_Response', kind: 'variable'},
 				{name: 'Ollama_Model_Details', kind: 'variable'},
 				{name: 'Ollama_List_Response_Item', kind: 'variable'},
 				{name: 'Ollama_List_Response', kind: 'variable'},
 				{name: 'Ollama_Show_Response', kind: 'variable'},
+				{name: 'Ollama_Ps_Response_Item', kind: 'variable'},
+				{name: 'Ollama_Ps_Response', kind: 'variable'},
 			],
 		},
 		'./Ollama_Manager.svelte': {
@@ -2082,8 +2102,16 @@ export const src_json = {
 			path: 'Ollama_Model_Details.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
 		},
+		'./Ollama_Model_Status.svelte': {
+			path: 'Ollama_Model_Status.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./Ollama_Operations.svelte': {
 			path: 'Ollama_Operations.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Ollama_Ps_Status.svelte': {
+			path: 'Ollama_Ps_Status.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
 		},
 		'./Ollama_Pull_Model.svelte': {
@@ -2539,6 +2567,10 @@ export const src_json = {
 				{name: 'format_time', kind: 'function'},
 				{name: 'format_ms_to_readable', kind: 'function'},
 			],
+		},
+		'./Time_Widget.svelte': {
+			path: 'Time_Widget.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
 		},
 		'./time.svelte.js': {
 			path: 'time.svelte.ts',

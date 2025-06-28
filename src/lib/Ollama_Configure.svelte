@@ -14,6 +14,7 @@
 	} from '$lib/glyphs.js';
 	import Error_Message from '$lib/Error_Message.svelte';
 	import Ollama_Operations from '$lib/Ollama_Operations.svelte';
+	import Ollama_Ps_Status from '$lib/Ollama_Ps_Status.svelte';
 	import type {Ollama} from '$lib/ollama.svelte.js';
 	import {OLLAMA_URL} from '$lib/ollama_helpers.js';
 
@@ -48,11 +49,11 @@
 
 	<section class="width_md display_flex flex_column gap_lg">
 		<p>
-			Ollama is a local LLM provider. Want to <button
+			Ollama is a local LLM provider. Start by <button
 				type="button"
 				class="inline compact"
-				onclick={onshowpull}>pull a model</button
-			>?
+				onclick={onshowpull}>pulling a model</button
+			>.
 		</p>
 
 		<!-- Host Configuration -->
@@ -124,6 +125,9 @@
 				</div>
 			{/if}
 		</div>
+
+		<!-- Running Models Status -->
+		<Ollama_Ps_Status {ollama} />
 
 		<!-- Operations Panel -->
 		{#if ollama.pending_operations.length > 0 || ollama.completed_operations.length > 0}

@@ -2,7 +2,7 @@
 
 // @vitest-environment jsdom
 
-import {test, expect, describe} from 'vitest';
+import {test, expect, describe, vi} from 'vitest';
 
 import {Ollama, Ollama_Operation} from '$lib/ollama.svelte.js';
 import {create_uuid} from '$lib/zod_helpers.js';
@@ -170,6 +170,93 @@ describe('Ollama', () => {
 		expect(ollama.model_by_name.get('test1')?.name).toBe('test1');
 		expect(ollama.model_by_name.get('test2')?.name).toBe('test2');
 		expect(ollama.model_by_name.has('other')).toBe(false);
+	});
+
+	test('should initialize ps state correctly', () => {
+		const app = create_test_app();
+		const ollama = new Ollama({app});
+
+		expect(ollama.ps_response).toBeNull();
+		expect(ollama.ps_status).toBe('initial');
+		expect(ollama.ps_error).toBeNull();
+		expect(ollama.ps_polling_enabled).toBe(false);
+		expect(ollama.ps_polling_interval).toBeNull();
+		expect(ollama.running_models).toEqual([]);
+		expect(ollama.running_model_names.size).toBe(0);
+	});
+
+	test('should derive running models from ps response', () => {
+		const app = create_test_app();
+		const ollama = new Ollama({app});
+
+		// Set a mock ps response
+		ollama.ps_response = {
+			models: [
+				{
+					name: 'llama3.2:1b',
+					model: 'llama3.2:1b',
+					size: 1024 * 1024 * 1024,
+					size_vram: 1024 * 1024 * 1024,
+					digest: 'sha256:test1',
+					modified_at: '2024-01-01T00:00:00Z',
+					expires_at: '2024-01-01T01:00:00Z',
+				},
+				{
+					name: 'gemma:2b',
+					model: 'gemma:2b',
+					size: 2 * 1024 * 1024 * 1024,
+					size_vram: 2 * 1024 * 1024 * 1024,
+					digest: 'sha256:test2',
+					modified_at: '2024-01-01T00:00:00Z',
+					expires_at: '2024-01-01T01:00:00Z',
+				},
+			],
+		};
+
+		expect(ollama.running_models).toHaveLength(2);
+		expect(ollama.running_models[0].name).toBe('llama3.2:1b');
+		expect(ollama.running_models[0].size_vram).toBe(1024 * 1024 * 1024);
+		expect(ollama.running_models[1].name).toBe('gemma:2b');
+		expect(ollama.running_models[1].size_vram).toBe(2 * 1024 * 1024 * 1024);
+
+		expect(ollama.running_model_names.has('llama3.2:1b')).toBe(true);
+		expect(ollama.running_model_names.has('gemma:2b')).toBe(true);
+		expect(ollama.running_model_names.has('other')).toBe(false);
+	});
+
+	test('should handle ps polling state', () => {
+		const app = create_test_app();
+		const ollama = new Ollama({app});
+
+		// Mock window timers
+		const setIntervalSpy = vi.spyOn(window, 'setInterval').mockReturnValue(123 as any);
+		const clearIntervalSpy = vi.spyOn(window, 'clearInterval');
+
+		// Start polling
+		ollama.start_ps_polling();
+
+		expect(ollama.ps_polling_enabled).toBe(true);
+		expect(ollama.ps_polling_interval).toBe(123);
+		expect(setIntervalSpy).toHaveBeenCalledWith(expect.any(Function), 1000);
+
+		// Starting again should not create another interval
+		ollama.start_ps_polling();
+		expect(setIntervalSpy).toHaveBeenCalledTimes(1);
+
+		// Stop polling
+		ollama.stop_ps_polling();
+
+		expect(ollama.ps_polling_enabled).toBe(false);
+		expect(ollama.ps_polling_interval).toBeNull();
+		expect(clearIntervalSpy).toHaveBeenCalledWith(123);
+
+		// Stopping again should be safe
+		ollama.stop_ps_polling();
+		expect(clearIntervalSpy).toHaveBeenCalledTimes(1);
+
+		// Cleanup
+		setIntervalSpy.mockRestore();
+		clearIntervalSpy.mockRestore();
 	});
 });
 

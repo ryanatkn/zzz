@@ -20,6 +20,11 @@ export const GLYPH_CONNECT = '⭍'; // ⨁
 export const GLYPH_DISCONNECT = '⊝';
 export const GLYPH_RETRY = '↺'; // ⟲'; // ⟲ ⟳ ⤾ ⤼ ↻
 export const GLYPH_PLACEHOLDER = '↳';
+export const GLYPH_PLAY = '▶︎';
+export const GLYPH_PAUSE = '❙❙'; // is 2 chars, should be supported by usage
+// export const GLYPH_STOP = '⏹'; // ⏹ ■ ▣ ▪
+// export const GLYPH_EJECT = '⏏';
+//  ⏭ ⏯ ⏮
 
 export const GLYPH_CHECKMARK = '✓'; // ✓ ✔ ✗ ✖ ✕ ✘ ☑ ⍻
 
@@ -58,7 +63,7 @@ export const GLYPH_MODEL = '⊛'; // ⨹ ⨺ ⊛
 export const GLYPH_ACTION = '⍾';
 export const GLYPH_VIEW = '⍜'; // ⦿ ⦾ ⦽ ⦼
 export const GLYPH_PREVIEW = '⦾'; // ⦾
-export const GLYPH_LOG = '⎙'; // ⎙ ⏚ ⌺ ⏏ ⍜
+export const GLYPH_LOG = '⎙'; // ⎙ ⏚ ⌺ ⍜
 export const GLYPH_TAB = '⛶';
 export const GLYPH_PROJECT = '⌬';
 export const GLYPH_CAPABILITY = '⧰'; // ⌁

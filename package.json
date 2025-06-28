@@ -799,10 +799,20 @@
       "svelte": "./dist/Ollama_Model_Details.svelte",
       "default": "./dist/Ollama_Model_Details.svelte"
     },
+    "./Ollama_Model_Status.svelte": {
+      "types": "./dist/Ollama_Model_Status.svelte.d.ts",
+      "svelte": "./dist/Ollama_Model_Status.svelte",
+      "default": "./dist/Ollama_Model_Status.svelte"
+    },
     "./Ollama_Operations.svelte": {
       "types": "./dist/Ollama_Operations.svelte.d.ts",
       "svelte": "./dist/Ollama_Operations.svelte",
       "default": "./dist/Ollama_Operations.svelte"
+    },
+    "./Ollama_Ps_Status.svelte": {
+      "types": "./dist/Ollama_Ps_Status.svelte.d.ts",
+      "svelte": "./dist/Ollama_Ps_Status.svelte",
+      "default": "./dist/Ollama_Ps_Status.svelte"
     },
     "./Ollama_Pull_Model.svelte": {
       "types": "./dist/Ollama_Pull_Model.svelte.d.ts",
@@ -1105,6 +1115,11 @@
     "./time_helpers.js": {
       "types": "./dist/time_helpers.d.ts",
       "default": "./dist/time_helpers.js"
+    },
+    "./Time_Widget.svelte": {
+      "types": "./dist/Time_Widget.svelte.d.ts",
+      "svelte": "./dist/Time_Widget.svelte",
+      "default": "./dist/Time_Widget.svelte"
     },
     "./time.svelte.js": {
       "types": "./dist/time.svelte.d.ts",

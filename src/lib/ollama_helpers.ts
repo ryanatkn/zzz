@@ -79,3 +79,102 @@ export const Ollama_Show_Response = z
 	})
 	.passthrough();
 export type Ollama_Show_Response = z.infer<typeof Ollama_Show_Response>;
+
+// PS response item has additional fields compared to list response
+export const Ollama_Ps_Response_Item = z
+	.object({
+		details: Ollama_Model_Details.optional(),
+		digest: z.string(),
+		expires_at: z.string(), // ISO date string for when the model will be unloaded
+		model: z.string(),
+		modified_at: z.string(),
+		name: z.string(),
+		size: z.number(),
+		size_vram: z.number(), // Amount of VRAM used by the model
+	})
+	.passthrough();
+export type Ollama_Ps_Response_Item = z.infer<typeof Ollama_Ps_Response_Item>;
+
+export const Ollama_Ps_Response = z
+	.object({
+		models: z.array(Ollama_Ps_Response_Item),
+	})
+	.passthrough();
+export type Ollama_Ps_Response = z.infer<typeof Ollama_Ps_Response>;
+
+// TODO BLOCK Ollama `ps`
+// export const format_ollama_process_info = (models: Array<any>, args?: Array<string>) => {
+// 	const data: Array<Array<string>> = [];
+
+// 	for (const m of models) {
+// 		if (args?.length === 0 || !args || m.Name.startsWith(args[0] || '')) {
+// 			let proc_str: string;
+
+// 			if (m.SizeVRAM === 0) {
+// 				proc_str = '100% CPU';
+// 			} else if (m.SizeVRAM === m.Size) {
+// 				proc_str = '100% GPU';
+// 			} else if (m.SizeVRAM > m.Size || m.Size === 0) {
+// 				proc_str = 'Unknown';
+// 			} else {
+// 				const size_cpu = m.Size - m.SizeVRAM;
+// 				const cpu_percent = Math.round((size_cpu / m.Size) * 100);
+// 				proc_str = `${cpu_percent}%/${100 - cpu_percent}% CPU/GPU`;
+// 			}
+
+// 			let until: string;
+// 			const delta = Date.now() - new Date(m.ExpiresAt).getTime();
+// 			if (delta > 0) {
+// 				until = 'Stopping...';
+// 			} else {
+// 				until = format_human_time(new Date(m.ExpiresAt), 'Never');
+// 			}
+
+// 			data.push([m.Name, m.Digest.slice(0, 12), format_human_bytes(m.Size), proc_str, until]);
+// 		}
+// 	}
+
+// 	return data;
+// };
+
+// export const format_human_bytes = (bytes: number): string => {
+// 	const units = ['B', 'KB', 'MB', 'GB', 'TB', 'PB'];
+// 	let size = bytes;
+// 	let unit_index = 0;
+
+// 	while (size >= 1024 && unit_index < units.length - 1) {
+// 		size /= 1024;
+// 		unit_index++;
+// 	}
+
+// 	return `${size.toFixed(1)} ${units[unit_index]}`;
+// };
+
+// export const format_human_time = (date: Date, never_text: string = 'Never'): string => {
+// 	if (!date || date.getTime() === 0) {
+// 		return never_text;
+// 	}
+
+// 	const now = Date.now();
+// 	const target = date.getTime();
+// 	const delta = target - now;
+
+// 	if (delta < 0) {
+// 		return 'Expired';
+// 	}
+
+// 	const seconds = Math.floor(delta / 1000);
+// 	const minutes = Math.floor(seconds / 60);
+// 	const hours = Math.floor(minutes / 60);
+// 	const days = Math.floor(hours / 24);
+
+// 	if (days > 0) {
+// 		return `${days}d ${hours % 24}h`;
+// 	} else if (hours > 0) {
+// 		return `${hours}h ${minutes % 60}m`;
+// 	} else if (minutes > 0) {
+// 		return `${minutes}m ${seconds % 60}s`;
+// 	} else {
+// 		return `${seconds}s`;
+// 	}
+// };

@@ -303,7 +303,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 
 		try {
 			// Check if Ollama API is available by getting the list of models
-			const list_response = await this.app.ollama.refresh();
+			const {list_response} = await this.app.ollama.refresh();
 
 			// Set the capability data
 			if (list_response && this.ollama.message_id === message_id) {
