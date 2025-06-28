@@ -23,6 +23,7 @@ export const Model_Json = Cell_Json.extend({
 	context_window: z.number().optional(),
 	output_token_limit: z.number().optional(),
 	embedding_length: z.number().optional(),
+	/** Size in gigabytes. */
 	filesize: z.number().optional(),
 	cost_input: z.number().optional(),
 	cost_output: z.number().optional(),
@@ -48,6 +49,7 @@ export class Model extends Cell<typeof Model_Json> {
 	context_window: number | undefined = $state();
 	output_token_limit: number | undefined = $state();
 	embedding_length: number | undefined = $state();
+	/** Size in gigabytes. */
 	filesize: number | undefined = $state();
 	cost_input: number | undefined = $state();
 	cost_output: number | undefined = $state();

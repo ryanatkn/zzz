@@ -16,6 +16,7 @@
 	import Ollama_Copy_Model from '$lib/Ollama_Copy_Model.svelte';
 	import Ollama_Model_Status from '$lib/Ollama_Model_Status.svelte';
 	import type {Ollama} from '$lib/ollama.svelte.js';
+	import {format_file_size} from '$lib/format_helpers.js';
 
 	interface Props {
 		ollama: Ollama;
@@ -145,9 +146,11 @@
 										</div>
 										<Ollama_Model_Status {model} {ollama} />
 									</div>
-									<div class="font_size_sm">
-										{model.filesize ? Math.round(model.filesize * 1024) : '?'} MB
-									</div>
+									{#if model.filesize}
+										<div class="font_size_sm">
+											{format_file_size(model.filesize)}
+										</div>
+									{/if}
 								</div>
 							</button>
 						{/each}

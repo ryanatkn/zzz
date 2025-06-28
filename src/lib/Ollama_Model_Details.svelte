@@ -11,6 +11,7 @@
 	import Contextmenu_Model from '$lib/Contextmenu_Model.svelte';
 	import Model_Link from '$lib/Model_Link.svelte';
 	import {format_short_date} from '$lib/time_helpers.js';
+	import {format_file_size} from '$lib/format_helpers.js';
 
 	interface Props {
 		model: Model;
@@ -34,9 +35,11 @@
 			<h3 class="mt_0 mb_0 font_family_mono">
 				<Model_Link {model} icon />
 			</h3>
-			<div>
-				{model.filesize ? Math.round(model.filesize * 1024) : '?'} MB
-			</div>
+			{#if model.filesize}
+				<div>
+					{format_file_size(model.filesize)}
+				</div>
+			{/if}
 			<div class="font_family_mono">
 				modified {format_short_date(model.ollama_modified_at) || '--'}
 			</div>

@@ -1,4 +1,6 @@
 <script lang="ts">
+	// @slop claude_sonnet_4
+
 	import Glyph from '$lib/Glyph.svelte';
 	import Error_Message from '$lib/Error_Message.svelte';
 	import {GLYPH_ADD, GLYPH_ARROW_LEFT, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';

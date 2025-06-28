@@ -1,6 +1,5 @@
 <script lang="ts">
 	import type {SvelteHTMLElements} from 'svelte/elements';
-	import {round} from '@ryanatkn/belt/maths.js';
 
 	import Model_Link from '$lib/Model_Link.svelte';
 	import Contextmenu_Model from '$lib/Contextmenu_Model.svelte';
@@ -8,6 +7,7 @@
 	import type {Model} from '$lib/model.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
 	import {GLYPH_DOWNLOAD} from '$lib/glyphs.js';
+	import {format_file_size} from '$lib/format_helpers.js';
 
 	interface Props {
 		model: Model;
@@ -67,7 +67,7 @@
 			{#if model.filesize}
 				<div class="spec_item">
 					<span class="spec_label">size:</span>
-					<span>{round(model.filesize, 2)}GB</span>
+					<span>{format_file_size(model.filesize)}</span>
 				</div>
 			{/if}
 		</div>

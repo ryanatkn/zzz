@@ -30,3 +30,6 @@ export const format_duration = (ms: number): string => {
 	if (ms < 3600000) return `${(ms / 60000).toFixed(1)}m`;
 	return `${(ms / 3600000).toFixed(1)}h`;
 };
+
+export const format_file_size = (gb: number): string =>
+	gb < 1 ? `${Math.round(gb * 1024)} MB` : `${gb.toFixed(1)} GB`;

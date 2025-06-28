@@ -20,6 +20,7 @@
 	import Glyph from '$lib/Glyph.svelte';
 	import {format_short_date} from '$lib/time_helpers.js';
 	import Contextmenu_Model from '$lib/Contextmenu_Model.svelte';
+	import {format_file_size} from '$lib/format_helpers.js';
 
 	interface Props {
 		model: Model;
@@ -50,14 +51,6 @@
 		if (model.provider_name === 'ollama') {
 			await app.ollama.refresh_model_details(model.name);
 		}
-	};
-
-	// Format file size nicely
-	const format_file_size = (gb: number): string => {
-		if (gb < 1) {
-			return `${Math.round(gb * 1024)} MB`;
-		}
-		return `${gb.toFixed(1)} GB`;
 	};
 
 	// TODO BLOCK fix error with getting model details when they're not downloaded
