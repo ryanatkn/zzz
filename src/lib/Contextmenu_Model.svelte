@@ -44,25 +44,17 @@
 				<span>create new chat</span>
 			</Contextmenu_Entry>
 
-			{#if model.provider_name === 'ollama' && model.needs_ollama_details}
+			{#if model.provider_name === 'ollama'}
+				<!-- TODO I think we want `disabled` to be supported on Contextmenu_Entry here for loading states -->
 				<Contextmenu_Entry
 					run={async () => {
 						await model.app.ollama.show_model(model.name);
 					}}
 				>
 					{#snippet icon()}<Glyph glyph={GLYPH_REFRESH} />{/snippet}
-					<span>load Ollama details</span>
-				</Contextmenu_Entry>
-			{/if}
-
-			{#if model.provider_name === 'ollama' && model.ollama_show_response_loaded}
-				<Contextmenu_Entry
-					run={async () => {
-						await model.app.ollama.show_model(model.name);
-					}}
-				>
-					{#snippet icon()}<Glyph glyph={GLYPH_REFRESH} />{/snippet}
-					<span>reload Ollama details</span>
+					<span
+						>{#if model.ollama_show_response_loaded}re{/if}load Ollama details</span
+					>
 				</Contextmenu_Entry>
 			{/if}
 

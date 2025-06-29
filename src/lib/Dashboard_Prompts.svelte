@@ -120,7 +120,7 @@
 							onconfirm={() => app.prompts.selected && app.prompts.remove(app.prompts.selected)}
 							position="right"
 							attrs={{
-								title: `delete prompt ${app.prompts.selected.id}`,
+								title: `delete prompt "${app.prompts.selected.name}"`,
 								class: 'plain icon_button',
 							}}
 						>

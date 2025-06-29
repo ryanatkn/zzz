@@ -17,6 +17,7 @@
 	import Ollama_Ps_Status from '$lib/Ollama_Ps_Status.svelte';
 	import type {Ollama} from '$lib/ollama.svelte.js';
 	import {OLLAMA_URL} from '$lib/ollama_helpers.js';
+	import {plural} from '@ryanatkn/belt/string.js';
 
 	interface Props {
 		ollama: Ollama;
@@ -27,7 +28,9 @@
 
 	const {ollama, last_active_view, onshowpull, onback}: Props = $props();
 
+	// TODO maybe add to ollama.svelte.ts
 	const models_with_details = $derived(ollama.models.filter((m) => m.ollama_show_response_loaded));
+	const models_with_details_count = $derived(models_with_details.length);
 </script>
 
 <div class="panel p_md">
@@ -111,10 +114,12 @@
 						type="button"
 						class="plain"
 						onclick={() => ollama.clear_all_model_details()}
-						title="clear all cached model details"
-						disabled={models_with_details.length === 0}
+						title="clear all cached model details ({models_with_details_count} item{plural(
+							models_with_details_count,
+						)})"
+						disabled={models_with_details_count === 0}
 					>
-						<Glyph glyph={GLYPH_CLEAR} />&nbsp; clear details cache {#if models_with_details.length}({models_with_details.length}){/if}
+						<Glyph glyph={GLYPH_CLEAR} />&nbsp; clear details cache {#if models_with_details_count}({models_with_details_count}){/if}
 					</button>
 				</div>
 			</div>
