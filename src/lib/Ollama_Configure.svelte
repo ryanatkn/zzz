@@ -52,11 +52,11 @@
 
 	<section class="width_md display_flex flex_column gap_lg">
 		<p>
-			Ollama is a local LLM provider. Start by <button
+			Ollama is a local LLM provider. Want to <button
 				type="button"
 				class="inline compact"
-				onclick={onshowpull}>pulling a model</button
-			>.
+				onclick={onshowpull}>pull a model</button
+			>?
 		</p>
 
 		<!-- Host Configuration -->

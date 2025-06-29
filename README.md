@@ -2,14 +2,14 @@
 
 [<img src="/static/logo.svg" alt="three sleepy z's" align="right" width="192" height="192">](https://www.zzz.software/)
 
-> fullstack web toolkit 💤 adaptive web environments
+> fullstack toolkit for adaptive web environments 💤 nice web things
 
 ⚠️ early pre-release
 
 **[zzz.software](https://www.zzz.software/)**
 
 Zzz, pronounced "zees" like bees,
-is a fullstack web toolkit with a focus on user power and experimentation.
+is a fullstack toolkit for adaptive web environments.
 The idea is to make a cross-platform software environment that adapts to your needs and intent
 while remaining fully open, aligned, and in your control. It's a flexible toolkit
 for consuming and creating content, developing web software,
