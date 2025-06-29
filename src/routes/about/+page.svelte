@@ -36,8 +36,8 @@
 			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link> 💤
 		</aside>
 		<p>
-			Zzz, pronounced "zees" like bees, is a software project focused on user power and
-			experimentation. The idea is to make a fullstack software environment that adapts to your
+			Zzz, pronounced "zees" like bees, is a fullstack web toolkit with a focus on user power and
+			experimentation. The idea is to make a cross-platform software environment that adapts to your
 			needs and intent while remaining fully open, aligned, and in your control. It's a flexible
 			toolkit for crafting experiences and tools with maximal UX and DX, like developing web
 			software for creating and consuming content.

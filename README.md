@@ -2,15 +2,15 @@
 
 [<img src="/static/logo.svg" alt="three sleepy z's" align="right" width="192" height="192">](https://www.zzz.software/)
 
-> web environment 💤 nice web things for the tired
+> fullstack web toolkit 💤 adaptive web environments
 
 ⚠️ early pre-release
 
 **[zzz.software](https://www.zzz.software/)**
 
 Zzz, pronounced "zees" like bees,
-is a software project with a focus on user power and experimentation.
-The idea is to make a fullstack software environment that adapts to your needs and intent
+is a fullstack web toolkit with a focus on user power and experimentation.
+The idea is to make a cross-platform software environment that adapts to your needs and intent
 while remaining fully open, aligned, and in your control. It's a flexible toolkit
 for consuming and creating content, developing web software,
 and crafting experiences with uncompromising UX and DX.

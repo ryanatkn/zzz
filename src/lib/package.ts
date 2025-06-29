@@ -6,8 +6,8 @@ import type {Src_Json} from '@ryanatkn/gro/src_json.js';
 export const package_json = {
 	name: '@ryanatkn/zzz',
 	version: '0.0.1',
-	description: 'adaptive web environments',
-	motto: 'nice web things for the tired',
+	description: 'fullstack web toolkit with a focus on user power and experimentation',
+	motto: 'adaptive web environments',
 	glyph: '💤',
 	logo: 'logo.svg',
 	logo_alt: "three sleepy z's",
