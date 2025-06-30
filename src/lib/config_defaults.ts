@@ -69,7 +69,7 @@ export const models_default: Array<z.input<typeof Model_Json>> = [
 	// access?
 	{name: 'o4-mini', provider_name: 'chatgpt', tags: ['reasoning']},
 	// no access :[
-	// {name: 'o3', provider_name: 'chatgpt', tags: ['reasoning', 'smart']},
+	{name: 'o3', provider_name: 'chatgpt', tags: ['reasoning', 'smart']},
 
 	// https://ai.google.dev/gemini-api/docs/
 	{
@@ -97,14 +97,29 @@ export const chat_template_defaults: Array<Chat_Template> = [
 	},
 	{
 		id: create_uuid(),
-		name: 'local comparison',
+		name: 'local 1-2b',
 		model_names: [
-			'llama3.2:1b',
-			'llama3.2:3b',
+			'gemma3n:e2b',
 			'gemma3:1b',
-			'gemma3:4b',
-			'qwen3:0.6b',
+			'llama3.2:1b',
 			'qwen3:1.7b',
+			'deepseek-r1:1.5b',
+			'smollm2:1.7b',
 		],
+	},
+	{
+		id: create_uuid(),
+		name: 'local 3-4b',
+		model_names: ['gemma3n:e4b', 'gemma3:4b', 'llama3.2:3b', 'phi4-mini:3.8b', 'qwen3:4b'],
+	},
+	{
+		id: create_uuid(),
+		name: 'local 0-1b',
+		model_names: ['qwen3:0.6b', 'smollm2:135m', 'smollm2:360m'],
+	},
+	{
+		id: create_uuid(),
+		name: 'gemmas',
+		model_names: ['gemma3:1b', 'gemma3n:e2b', 'gemma3n:e4b', 'gemma3:4b'],
 	},
 ];

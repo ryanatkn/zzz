@@ -1,5 +1,6 @@
 <script lang="ts">
 	import {slide} from 'svelte/transition';
+	import Details from '@ryanatkn/fuz/Details.svelte';
 
 	import Glyph from '$lib/Glyph.svelte';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
@@ -83,7 +84,10 @@
 
 		{#if tape_count && (chat.view_mode !== 'simple' || tape_count > 1)}
 			<section class="column_section">
-				<header class="mt_0 mb_lg font_size_lg display_flex justify_content_space_between">
+				<header
+					class="mt_0 mb_lg font_size_lg display_flex justify_content_space_between"
+					title="tapes are the individual threads of conversation in a chat -- each chat can have many tapes, comprising its history"
+				>
 					<span><Glyph glyph={GLYPH_TAPE} /> tapes</span><span>{tape_count}</span>
 				</header>
 				<Tape_List {chat} />
@@ -92,12 +96,15 @@
 		{/if}
 
 		{#if chat.view_mode === 'multi'}
-			<section class="column_section">
-				<Chat_Tape_Add_By_Model {chat} />
-			</section>
-			<section class="column_section">
-				<Chat_Tape_Manage_By_Tag {chat} />
-			</section>
+			<Details>
+				{#snippet summary()}manage tapes{/snippet}
+				<section class="column_section">
+					<Chat_Tape_Add_By_Model {chat} />
+				</section>
+				<section class="column_section">
+					<Chat_Tape_Manage_By_Tag {chat} />
+				</section>
+			</Details>
 		{/if}
 	</div>
 

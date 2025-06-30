@@ -61,12 +61,13 @@
 		bind:this={input_el}
 		bind:value={edited_value}
 		onblur={save}
-		onkeydown={(e) => {
-			if (e.key === 'Enter') {
-				swallow(e);
+		onkeydown={(event) => {
+			const {key} = event;
+			if (key === 'Enter' || key === 'F2') {
+				swallow(event);
 				save();
-			} else if (e.key === 'Escape') {
-				swallow(e);
+			} else if (key === 'Escape') {
+				swallow(event);
 				cancel();
 			}
 		}}
@@ -80,9 +81,10 @@
 		{...span_attrs}
 		bind:this={span_el}
 		onclick={start_editing}
-		onkeydown={(e) => {
-			if (e.key === 'Enter' || e.key === ' ') {
-				swallow(e);
+		onkeydown={(event) => {
+			const {key} = event;
+			if (key === 'Enter' || key === ' ' || key === 'F2') {
+				swallow(event);
 				start_editing();
 			}
 		}}
