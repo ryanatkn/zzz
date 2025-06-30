@@ -11,12 +11,12 @@ import {z} from 'zod';
 /**
  * A branded type for representing safely normalized filesystem paths
  */
-export const Safe_Fs_Path = z
+export const Scoped_Fs_Path = z
 	.string()
 	.refine((p) => p.startsWith('/'), {message: 'Path must be absolute'})
 	.transform((p) => normalize(p.trim()))
-	.brand('Safe_Fs_Path');
-export type Safe_Fs_Path = z.infer<typeof Safe_Fs_Path>;
+	.brand('Scoped_Fs_Path');
+export type Scoped_Fs_Path = z.infer<typeof Scoped_Fs_Path>;
 
 /**
  * Provides a secure wrapper around filesystem operations to prevent path traversal attacks and
@@ -32,17 +32,17 @@ export type Safe_Fs_Path = z.infer<typeof Safe_Fs_Path>;
  * This class should be used whenever performing filesystem operations on
  * user-provided or untrusted input paths to ensure proper access boundaries.
  */
-export class Safe_Fs {
-	readonly allowed_paths: ReadonlyArray<Safe_Fs_Path>;
+export class Scoped_Fs {
+	readonly allowed_paths: ReadonlyArray<Scoped_Fs_Path>;
 
 	/**
-	 * Create a new Safe_Fs instance with the specified allowed paths.
+	 * Create a new Scoped_Fs instance with the specified allowed paths.
 	 * @param allowed_paths Array of absolute paths that operations will be restricted to
 	 */
 	constructor(allowed_paths: Array<string> | ReadonlyArray<string>) {
 		try {
 			this.allowed_paths = Object.freeze(
-				allowed_paths.filter(Boolean).map((p) => Safe_Fs_Path.parse(ensure_end(p, '/'))),
+				allowed_paths.filter(Boolean).map((p) => Scoped_Fs_Path.parse(ensure_end(p, '/'))),
 			);
 		} catch (error) {
 			if (error instanceof z.ZodError) {
@@ -61,7 +61,7 @@ export class Safe_Fs {
 		try {
 			// Let the parser normalize and validate - this handles absolute path requirement
 			// and normalizes all path traversal attempts
-			const normalized_path = Safe_Fs_Path.parse(path_to_check);
+			const normalized_path = Scoped_Fs_Path.parse(path_to_check);
 
 			// Check if within allowed paths
 			for (const allowed_path of this.allowed_paths) {
@@ -187,7 +187,7 @@ export class Safe_Fs {
 		}
 		try {
 			await this.#ensure_safe_path(path_to_check);
-			await fs.access(Safe_Fs_Path.parse(path_to_check));
+			await fs.access(Scoped_Fs_Path.parse(path_to_check));
 			return true;
 		} catch {
 			return false;
@@ -199,9 +199,9 @@ export class Safe_Fs {
 	 * Throws an error if the path is not allowed or contains symlinks.
 	 */
 	async #ensure_safe_path(path_to_check: string): Promise<string> {
-		let normalized_path: Safe_Fs_Path;
+		let normalized_path: Scoped_Fs_Path;
 		try {
-			normalized_path = Safe_Fs_Path.parse(path_to_check);
+			normalized_path = Scoped_Fs_Path.parse(path_to_check);
 		} catch {
 			throw new Path_Not_Allowed_Error(path_to_check);
 		}

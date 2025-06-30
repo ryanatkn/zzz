@@ -119,7 +119,7 @@ export class Frontend extends Cell<typeof Frontend_Json> implements Action_Event
 
 	/**
 	 * The `zzz_dir` is the path to Zzz's primary directory on the server's filesystem.
-	 * The server's `safe_fs` instance restricts operations to this directory.
+	 * The server's `scoped_fs` instance restricts operations to this directory.
 	 * The value is `undefined` when uninitialized,
 	 * `null` when loading, and `''` when disabled or no server.
 	 */

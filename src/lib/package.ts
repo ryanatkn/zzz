@@ -893,9 +893,9 @@ export const package_json = {
 			types: './dist/server/register_websocket_actions.d.ts',
 			default: './dist/server/register_websocket_actions.js',
 		},
-		'./server/safe_fs.js': {
-			types: './dist/server/safe_fs.d.ts',
-			default: './dist/server/safe_fs.js',
+		'./server/scoped_fs.js': {
+			types: './dist/server/scoped_fs.d.ts',
+			default: './dist/server/scoped_fs.js',
 		},
 		'./server/security.js': {
 			types: './dist/server/security.d.ts',
@@ -2420,11 +2420,11 @@ export const src_json = {
 				{name: 'register_websocket_actions', kind: 'function'},
 			],
 		},
-		'./server/safe_fs.js': {
-			path: 'server/safe_fs.ts',
+		'./server/scoped_fs.js': {
+			path: 'server/scoped_fs.ts',
 			declarations: [
-				{name: 'Safe_Fs_Path', kind: 'variable'},
-				{name: 'Safe_Fs', kind: 'class'},
+				{name: 'Scoped_Fs_Path', kind: 'variable'},
+				{name: 'Scoped_Fs', kind: 'class'},
 				{name: 'Path_Not_Allowed_Error', kind: 'class'},
 				{name: 'Symlink_Not_Allowed_Error', kind: 'class'},
 			],

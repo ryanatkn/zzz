@@ -1016,9 +1016,9 @@
       "types": "./dist/server/register_websocket_actions.d.ts",
       "default": "./dist/server/register_websocket_actions.js"
     },
-    "./server/safe_fs.js": {
-      "types": "./dist/server/safe_fs.d.ts",
-      "default": "./dist/server/safe_fs.js"
+    "./server/scoped_fs.js": {
+      "types": "./dist/server/scoped_fs.d.ts",
+      "default": "./dist/server/scoped_fs.js"
     },
     "./server/security.js": {
       "types": "./dist/server/security.d.ts",

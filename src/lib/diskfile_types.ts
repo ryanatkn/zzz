@@ -27,7 +27,7 @@ export type Diskfile_Change = z.infer<typeof Diskfile_Change>;
  * Zzz also provides an API for reading and writing to `.zzz`'s parent directory.
  *
  * This is a security-sensitive path that should be validated carefully.
- * See the `Safe_Fs` class for usage.
+ * See the `Scoped_Fs` class for usage.
  */
 export const Zzz_Dir = Diskfile_Path.brand('Zzz_Dir');
 export type Zzz_Dir = z.infer<typeof Zzz_Dir>;

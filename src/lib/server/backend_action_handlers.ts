@@ -19,7 +19,7 @@ import {
 	format_gemini_messages,
 } from '$lib/server/ai_provider_utils.js';
 import {to_completion_result} from '$lib/response_helpers.js';
-import {Safe_Fs} from '$lib/server/safe_fs.js';
+import {Scoped_Fs} from '$lib/server/scoped_fs.js';
 import type {Backend_Action_Handlers} from '$lib/server/backend_action_types.js';
 import type {Action_Inputs, Action_Outputs} from '$lib/action_collections.js';
 import {jsonrpc_errors} from '$lib/jsonrpc_errors.js';
@@ -195,7 +195,12 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 
 			// TODO @db temporary, do better action tracking
 			// We don't need to wait for this to finish
-			void save_completion_response_to_disk(input, result, backend.zzz_cache_dir, backend.safe_fs);
+			void save_completion_response_to_disk(
+				input,
+				result,
+				backend.zzz_cache_dir,
+				backend.scoped_fs,
+			);
 
 			console.log(`got ${provider_name} message`, result.completion_response.data);
 
@@ -209,8 +214,8 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 			const {path, content} = input;
 
 			try {
-				// Use the server's safe_fs instance to write the file
-				await backend.safe_fs.write_file(path, content);
+				// Use the server's scoped_fs instance to write the file
+				await backend.scoped_fs.write_file(path, content);
 				return null;
 			} catch (error) {
 				console.error(`Error writing file ${path}:`, error);
@@ -226,8 +231,8 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 			const {path} = input;
 
 			try {
-				// Use the server's safe_fs instance to delete the file
-				await backend.safe_fs.rm(path);
+				// Use the server's scoped_fs instance to delete the file
+				await backend.scoped_fs.rm(path);
 				return null;
 			} catch (error) {
 				console.error(`Error deleting file ${path}:`, error);
@@ -243,8 +248,8 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 			const {path} = input;
 
 			try {
-				// Use the server's safe_fs instance to create the directory
-				await backend.safe_fs.mkdir(path, {recursive: true});
+				// Use the server's scoped_fs instance to create the directory
+				await backend.scoped_fs.mkdir(path, {recursive: true});
 				return null;
 			} catch (error) {
 				console.error(`Error creating directory ${path}:`, error);
@@ -268,7 +273,7 @@ const save_completion_response_to_disk = async (
 	input: Action_Inputs['submit_completion'],
 	output: Action_Outputs['submit_completion'],
 	dir: string,
-	safe_fs: Safe_Fs,
+	scoped_fs: Scoped_Fs,
 ): Promise<void> => {
 	// includes `Date.now()` for sorting purposes
 	const filename = `${input.completion_request.provider_name}__${Date.now()}__${input.completion_request.model}__${input.completion_request.request_id}.json`; // TODO include model data in these
@@ -277,18 +282,18 @@ const save_completion_response_to_disk = async (
 
 	const json = {input, output};
 
-	await write_json(path, json, safe_fs);
+	await write_json(path, json, scoped_fs);
 };
 // TODO @db refactor
-const write_json = async (path: string, json: unknown, safe_fs: Safe_Fs): Promise<void> => {
+const write_json = async (path: string, json: unknown, scoped_fs: Scoped_Fs): Promise<void> => {
 	// Check if directory exists and create it if needed
-	if (!(await safe_fs.exists(path))) {
-		await safe_fs.mkdir(dirname(path), {recursive: true});
+	if (!(await scoped_fs.exists(path))) {
+		await scoped_fs.mkdir(dirname(path), {recursive: true});
 	}
 
 	const formatted = await format_file(JSON.stringify(json), {parser: 'json'});
 
-	// Use Safe_Fs for writing the file
+	// Use Scoped_Fs for writing the file
 	console.log('writing json', path, formatted.length);
-	await safe_fs.write_file(path, formatted);
+	await scoped_fs.write_file(path, formatted);
 };
