@@ -1,11 +1,12 @@
-// @slop claude_opus_4
+// @slop Claude Sonnet 3.7
 
 import {SvelteMap} from 'svelte/reactivity';
 import type {z} from 'zod';
 import {DEV} from 'esm-env';
+import {EMPTY_ARRAY} from '@ryanatkn/belt/array.js';
 
 import {Uuid} from '$lib/zod_helpers.js';
-import type {Indexed_Item} from '$lib/indexed_collection_helpers.js';
+import type {Indexed_Item} from '$lib/indexed_collection_helpers.svelte.js';
 
 // TODO @many rethink the indexed collection API -
 // particularly type safety, performance, and integration with Svelte patterns -
@@ -89,15 +90,21 @@ export class Indexed_Collection<
 	T_Key_Derived extends string = string,
 	T_Key_Dynamic extends string = string,
 > {
-	/** The full collection keyed by Uuid. */
+	/** The main source of turth, the full collection keyed by Uuid. */
 	readonly by_id: SvelteMap<Uuid, T> = new SvelteMap();
+
+	// TODO change to `ReadonlyArray`s? problem is downstream usage type errors
+	readonly values: Array<T> = $derived(Array.from(this.by_id.values()));
+	readonly keys: Array<Uuid> = $derived(Array.from(this.by_id.keys()));
 
 	/** Get the current count of items. */
 	readonly size: number = $derived(this.by_id.size);
 
-	// TODO ideally I think this would leverage derived? need to ensure we have the right lazy perf characteristics
+	// TODO ideally I think this would leverage derived?
+	// need to ensure we have the right lazy perf characteristics
+	// and currently we eagerly compute indexes
 	/** Stores all index values in a reactive object. */
-	readonly indexes: Record<string, any> = $state({}); // TODO should this be `$state.raw`?
+	readonly indexes: Record<string, any> = $state({}); // TODO should this be `$state.raw`? I dont think we want to apply deep reactivity to the index values
 
 	// Map of index types for type safety and runtime checks
 	readonly #index_types: Map<string, Index_Type> = new Map();
@@ -180,8 +187,9 @@ export class Indexed_Collection<
 		}
 	}
 
-	toJSON(): Array<any> {
-		return $state.snapshot([...this.by_id.values()]);
+	// TODO type (add another generic? infer from cell? currently we have no dep on that)
+	toJSON(): ReadonlyArray<any> {
+		return $state.snapshot(this.values);
 	}
 
 	/**
@@ -283,27 +291,25 @@ export class Indexed_Collection<
 	/**
 	 * Add an item to the collection and update all indexes.
 	 */
-	add(item: T): T {
+	add(item: T): void {
 		const {by_id} = this;
 
 		if (by_id.has(item.id)) {
 			if (DEV) console.error('Item with this id already exists in the collection: ' + item.id);
-			return by_id.get(item.id)!;
+			return;
 		}
 
 		by_id.set(item.id, item);
 
 		// Update all indexes
 		this.#update_indexes_for_added_item(item);
-
-		return item;
 	}
 
 	/**
 	 * Add multiple items to the collection at once with improved performance.
 	 */
-	add_many(items: Array<T>): Array<T> {
-		if (!items.length) return [];
+	add_many(items: Array<T>): void {
+		if (!items.length) return;
 
 		// Add all items to the collection
 		for (const item of items) {
@@ -313,8 +319,6 @@ export class Indexed_Collection<
 			// Update all other indexes
 			this.#update_indexes_for_added_item(item); // TODO update afterwards instead? in a batch?
 		}
-
-		return items;
 	}
 
 	/**
@@ -448,7 +452,7 @@ export class Indexed_Collection<
 	where<V = any>(index_key: T_Key_Multi, value: V): Array<T> {
 		this.#ensure_index(index_key, 'multi');
 		const index = this.indexes[index_key];
-		return [...(index.get(value) || [])];
+		return index.get(value) || EMPTY_ARRAY;
 	}
 
 	/**
@@ -457,7 +461,7 @@ export class Indexed_Collection<
 	 */
 	first<V = any>(index_key: T_Key_Multi, value: V, limit: number): Array<T> {
 		// Handle edge cases with limit
-		if (limit <= 0) return [];
+		if (limit <= 0) return EMPTY_ARRAY;
 
 		const items = this.where<V>(index_key, value);
 		return items.slice(0, limit);
@@ -469,7 +473,7 @@ export class Indexed_Collection<
 	 */
 	latest<V = any>(index_key: T_Key_Multi, value: V, limit: number): Array<T> {
 		// Handle edge cases with limit
-		if (limit <= 0) return [];
+		if (limit <= 0) return EMPTY_ARRAY;
 
 		const items = this.where<V>(index_key, value);
 		return items.slice(-Math.min(limit, items.length));

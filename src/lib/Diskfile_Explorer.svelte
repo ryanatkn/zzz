@@ -75,7 +75,7 @@
 	{:else if zzz_cache_dir === null}
 		<div class="row h_input_height"><Pending_Animation /></div>
 	{:else}
-		<div class="row h_input_height justify_content_space_between py_xs px_xs">
+		<div class="row h_input_height justify_content_space_between px_xs">
 			<small class="ellipsis"><Glyph glyph={GLYPH_DIRECTORY} /> {zzz_cache_dir}</small>
 			<div class="display_flex gap_xs2">
 				<Pending_Button
@@ -110,7 +110,7 @@
 
 		<!-- TODO @many improve efficiency - maybe add `all` back to the base Indexed_Collection, or add an incremental index for this case? -->
 		<Sortable_List
-			items={Array.from(diskfiles.items.by_id.values())}
+			items={diskfiles.items.values}
 			show_sort_controls={editor.show_sort_controls}
 			sorters={[
 				// TODO @many rework API to avoid casting

@@ -1,5 +1,4 @@
 import {z} from 'zod';
-import {goto} from '$app/navigation';
 import {page} from '$app/state';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
@@ -7,13 +6,14 @@ import {Chat, Chat_Json, Chat_Schema, type Chat_Json_Input} from '$lib/chat.svel
 import type {Uuid} from '$lib/zod_helpers.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
-import {create_single_index, create_derived_index} from '$lib/indexed_collection_helpers.js';
+import {create_single_index, create_derived_index} from '$lib/indexed_collection_helpers.svelte.js';
 import {to_reordered_list} from '$lib/list_helpers.js';
 import {get_unique_name} from '$lib/helpers.js';
 import {to_chats_url} from '$lib/nav_helpers.js';
 import {chat_template_defaults} from '$lib/config_defaults.js';
 import type {Chat_Template} from '$lib/chat_template.js';
 import {Cell_Json} from '$lib/cell_types.js';
+import {goto_unless_current} from '$lib/navigation_helpers.js';
 
 export const Chats_Json = Cell_Json.extend({
 	// First create the array, then apply default, then attach metadata
@@ -42,12 +42,14 @@ export class Chats extends Cell<typeof Chats_Json> {
 
 			create_derived_index({
 				key: 'manual_order',
-				compute: (collection) => Array.from(collection.by_id.values()),
+				compute: (collection) => collection.values,
 				result_schema: z.array(Chat_Schema),
 			}),
 		],
 	});
 
+	// TODO would be nice to story a history of selected ids so
+	// e.g. when deleting a chat we can navigate back to where we were
 	#selected_id: Uuid | null = $state()!;
 	selected_id_last_non_null: Uuid | null = $state()!;
 	get selected_id(): Uuid | null {
@@ -72,6 +74,9 @@ export class Chats extends Cell<typeof Chats_Json> {
 	readonly ordered_items: Array<Chat> = $derived(this.items.derived_index('manual_order'));
 
 	readonly items_by_name = $derived(this.items.single_index('by_name'));
+
+	/** Ephemeral reactive state that directs the UI to focus the input.  */
+	pending_chat_id_to_focus: Uuid | null = $state(null);
 
 	constructor(options: Chats_Options) {
 		super(Chats_Json, options);
@@ -159,8 +164,9 @@ export class Chats extends Cell<typeof Chats_Json> {
 
 	async navigate_to(chat_id: Uuid | null, force = false): Promise<void> {
 		const url = to_chats_url(chat_id);
+		this.pending_chat_id_to_focus = chat_id;
 		if (!force && page.url.pathname === url) return;
-		return goto(url);
+		return goto_unless_current(url);
 	}
 
 	reorder_chats(from_index: number, to_index: number): void {

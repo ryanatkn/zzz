@@ -1,5 +1,4 @@
 import {z} from 'zod';
-import {goto} from '$app/navigation';
 import {page} from '$app/state';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
@@ -7,12 +6,13 @@ import {Prompt, Prompt_Json, Prompt_Schema, type Prompt_Json_Input} from '$lib/p
 import type {Uuid} from '$lib/zod_helpers.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
-import {create_single_index, create_derived_index} from '$lib/indexed_collection_helpers.js';
+import {create_single_index, create_derived_index} from '$lib/indexed_collection_helpers.svelte.js';
 import {to_reordered_list} from '$lib/list_helpers.js';
 import type {Bit_Type} from '$lib/bit.svelte.js';
 import {get_unique_name} from '$lib/helpers.js';
 import {to_prompts_url} from '$lib/nav_helpers.js';
 import {Cell_Json} from '$lib/cell_types.js';
+import {goto_unless_current} from '$lib/navigation_helpers.js';
 
 export const Prompts_Json = Cell_Json.extend({
 	items: cell_array(
@@ -41,9 +41,9 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 			create_derived_index({
 				key: 'recent_prompts',
 				compute: (collection) =>
-					[...collection.by_id.values()].sort(
-						(a, b) => new Date(b.created).getTime() - new Date(a.created).getTime(),
-					),
+					collection.values
+						.slice()
+						.sort((a, b) => new Date(b.created).getTime() - new Date(a.created).getTime()),
 				result_schema: z.array(Prompt_Schema),
 				onadd: (items, item) => {
 					// Insert at the right position based on creation date
@@ -61,7 +61,7 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 
 			create_derived_index({
 				key: 'manual_order',
-				compute: (collection) => Array.from(collection.by_id.values()),
+				compute: (collection) => collection.values,
 				result_schema: z.array(Prompt_Schema),
 			}),
 		],
@@ -175,7 +175,7 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 	async navigate_to(prompt_id: Uuid | null, force = false): Promise<void> {
 		const url = to_prompts_url(prompt_id);
 		if (!force && page.url.pathname === url) return;
-		return goto(url);
+		return goto_unless_current(url);
 	}
 
 	reorder_prompts(from_index: number, to_index: number): void {

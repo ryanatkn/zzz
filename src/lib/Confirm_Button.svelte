@@ -63,7 +63,7 @@
 				type="button"
 				class="icon_button color_c bg_c_1"
 				onclick={() => confirm(popover)}
-				title="confirm"
+				title="confirm {rest.attrs?.title || ''}"
 				{...popover_button_attrs}
 			>
 				{#if popover_button_content}

@@ -1,3 +1,5 @@
+// @slop Claude Sonnet 3.7
+
 // @vitest-environment jsdom
 
 import {test, expect, beforeEach, describe} from 'vitest';

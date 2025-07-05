@@ -34,7 +34,7 @@
 
 <Picker_Dialog
 	bind:show
-	items={Array.from(diskfiles.items.by_id.values())}
+	items={diskfiles.items.values}
 	{onpick}
 	{filter}
 	{exclude_ids}

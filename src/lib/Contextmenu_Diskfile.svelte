@@ -28,13 +28,6 @@
 		file
 		{#snippet menu()}
 			<!-- TODO maybe show disabled versions? changing what appears isn't great -->
-			{#if diskfile.content}
-				<Contextmenu_Entry_Copy_To_Clipboard
-					content={diskfile.content}
-					label="copy file content"
-					preview={diskfile.content_preview}
-				/>
-			{/if}
 
 			{#if diskfile.path_relative}
 				<Contextmenu_Entry_Copy_To_Clipboard
@@ -43,12 +36,20 @@
 				/>
 			{/if}
 
+			{#if diskfile.content}
+				<Contextmenu_Entry_Copy_To_Clipboard
+					content={diskfile.content}
+					label="copy file content"
+					preview={diskfile.content_preview}
+				/>
+			{/if}
+
 			<Contextmenu_Entry
-				run={() => {
+				run={async () => {
 					// TODO @many better confirmation
 					// eslint-disable-next-line no-alert
 					if (confirm(`Are you sure you want to delete ${diskfile.path_relative}?`)) {
-						app.diskfiles.delete(diskfile.path);
+						await app.diskfiles.delete(diskfile.path);
 					}
 				}}
 			>

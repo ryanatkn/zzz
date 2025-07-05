@@ -41,11 +41,11 @@ import type {
 } from '$lib/jsonrpc.js';
 import type {Action_Kind} from '$lib/action_types.js';
 
-// State change listener type
+// TODO maybe just use runes in this module and remove `observe`
 export type Action_Event_Change_Observer<T_Method extends Action_Method> = (
-	event: Action_Event<T_Method>,
-	old_data: Action_Event_Datas[T_Method],
 	new_data: Action_Event_Datas[T_Method],
+	old_data: Action_Event_Datas[T_Method],
+	event: Action_Event<T_Method>,
 ) => void;
 
 /**
@@ -106,12 +106,22 @@ export class Action_Event<
 		return () => this.#listeners.delete(listener);
 	}
 
+	set_data(new_data: Action_Event_Datas[T_Method]): void {
+		const old_data = this.#data;
+		this.#data = new_data;
+
+		// Notify listeners
+		for (const listener of this.#listeners) {
+			listener(new_data, old_data, this);
+		}
+	}
+
 	/**
 	 * Parse input data according to the action's schema.
 	 */
 	parse(): this {
 		if (this.#data.step !== 'initial') {
-			throw new Error(`Cannot parse from step '${this.#data.step}' - must be 'initial'`);
+			throw new Error(`cannot parse from step '${this.#data.step}' - must be 'initial'`);
 		}
 
 		try {
@@ -127,11 +137,11 @@ export class Action_Event<
 	/**
 	 * Execute the handler for the current phase.
 	 */
-	// TODO Add timeout support
-	// TODO Add cancellation support
+	// TODO add timeout support
+	// TODO add cancellation support
 	async handle_async(): Promise<void> {
 		if (this.#data.step !== 'parsed') {
-			throw new Error(`Cannot handle from step '${this.#data.step}' - must be 'parsed'`);
+			throw new Error(`cannot handle from step '${this.#data.step}' - must be 'parsed'`);
 		}
 
 		// Add protocol messages if needed
@@ -161,7 +171,7 @@ export class Action_Event<
 		}
 
 		if (this.#data.step !== 'parsed') {
-			throw new Error(`Cannot handle from step '${this.#data.step}' - must be 'parsed'`);
+			throw new Error(`cannot handle from step '${this.#data.step}' - must be 'parsed'`);
 		}
 
 		this.#transition_step('handling');
@@ -185,7 +195,7 @@ export class Action_Event<
 	 */
 	transition(phase: Action_Event_Phase): void {
 		if (this.#data.step !== 'handled') {
-			throw new Error(`Cannot transition from step '${this.#data.step}' - must be 'handled'`);
+			throw new Error(`cannot transition from step '${this.#data.step}' - must be 'handled'`);
 		}
 
 		validate_phase_transition(this.#data.phase, phase);
@@ -200,6 +210,18 @@ export class Action_Event<
 	 */
 	is_complete(): boolean {
 		return is_action_complete(this.#data);
+	}
+
+	// TODO does it make sense for notifications to be sent after the action is complete? they wouldn't be "progress" I suppose
+	/**
+	 * Update progress for long-running operations.
+	 */
+	update_progress(progress: unknown): void {
+		if (this.#data.step !== 'handling') {
+			throw new Error(`cannot update progress from step '${this.#data.step}' - must be 'handling'`);
+		}
+
+		this.#update_data({progress});
 	}
 
 	/**
@@ -242,16 +264,6 @@ export class Action_Event<
 		this.set_data(new_data);
 	}
 
-	set_data(new_data: Action_Event_Datas[T_Method]): void {
-		const old_data = this.#data;
-		this.#data = new_data;
-
-		// Notify listeners
-		for (const listener of this.#listeners) {
-			listener(this, old_data, new_data);
-		}
-	}
-
 	#fail(error: Jsonrpc_Error_Json): void {
 		this.#transition_step('failed', {error});
 	}
@@ -261,10 +273,10 @@ export class Action_Event<
 		requirements: {kind: Action_Kind; phase: Action_Event_Phase},
 	): void {
 		if (this.#data.kind !== requirements.kind || this.#data.phase !== requirements.phase) {
-			throw new Error(`Can only set ${field} in ${requirements.phase} phase`);
+			throw new Error(`can only set ${field} in ${requirements.phase} phase`);
 		}
 		if (this.#data.step !== 'initial') {
-			throw new Error(`Can only set ${field} at initial step`);
+			throw new Error(`can only set ${field} at initial step`);
 		}
 	}
 
@@ -337,7 +349,7 @@ export class Action_Event<
 
 	#create_response_from_data(): Jsonrpc_Response_Or_Error {
 		if (!is_request_response(this.#data) || !this.#data.request) {
-			throw new Error('Cannot create response without request');
+			throw new Error('cannot create response without request');
 		}
 
 		if (this.#data.error) {
@@ -362,7 +374,7 @@ export const create_action_event = <T_Method extends Action_Method>(
 	const phase = initial_phase || get_initial_phase(spec.kind, spec.initiator, environment.executor);
 	if (!phase) {
 		throw new Error(
-			`Executor '${environment.executor}' cannot initiate action '${spec.method}' with initiator '${spec.initiator}'`,
+			`executor '${environment.executor}' cannot initiate action '${spec.method}' with initiator '${spec.initiator}'`,
 		);
 	}
 
@@ -386,7 +398,7 @@ export const create_action_event_from_json = <T_Method extends Action_Method>(
 ): Action_Event<T_Method> => {
 	const spec = environment.lookup_action_spec(json.method);
 	if (!spec) {
-		throw new Error(`No spec found for method '${json.method}'`);
+		throw new Error(`no spec found for method '${json.method}'`);
 	}
 
 	return new Action_Event(environment, spec, json);

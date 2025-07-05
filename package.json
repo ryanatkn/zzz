@@ -1,8 +1,8 @@
 {
   "name": "@ryanatkn/zzz",
   "version": "0.0.1",
-  "description": "adaptive web environments",
-  "motto": "nice web things for the tired",
+  "description": "fullstack toolkit for adaptive web environments",
+  "motto": "nice web things",
   "glyph": "💤",
   "logo": "logo.svg",
   "logo_alt": "three sleepy z's",
@@ -39,7 +39,7 @@
   "devDependencies": {
     "@changesets/changelog-git": "^0.2.1",
     "@ryanatkn/eslint-config": "^0.8.0",
-    "@ryanatkn/fuz": "^0.144.0",
+    "@ryanatkn/fuz": "^0.144.3",
     "@ryanatkn/gro": "^0.159.0",
     "@ryanatkn/moss": "^0.31.0",
     "@sveltejs/adapter-static": "^3.0.8",
@@ -52,7 +52,7 @@
     "ollama": "^0.5.16",
     "prettier": "^3.5.3",
     "prettier-plugin-svelte": "^3.4.0",
-    "svelte": "^5.34.7",
+    "svelte": "^5.34.9",
     "svelte-check": "^4.2.2",
     "tslib": "^2.8.1",
     "typescript": "^5.8.3",
@@ -440,6 +440,11 @@
       "svelte": "./dist/Contextmenu_Entry_Toggle.svelte",
       "default": "./dist/Contextmenu_Entry_Toggle.svelte"
     },
+    "./Contextmenu_Model.svelte": {
+      "types": "./dist/Contextmenu_Model.svelte.d.ts",
+      "svelte": "./dist/Contextmenu_Model.svelte",
+      "default": "./dist/Contextmenu_Model.svelte"
+    },
     "./Contextmenu_Prompt.svelte": {
       "types": "./dist/Contextmenu_Prompt.svelte.d.ts",
       "svelte": "./dist/Contextmenu_Prompt.svelte",
@@ -469,6 +474,11 @@
       "types": "./dist/Dashboard_Diskfiles.svelte.d.ts",
       "svelte": "./dist/Dashboard_Diskfiles.svelte",
       "default": "./dist/Dashboard_Diskfiles.svelte"
+    },
+    "./Dashboard_Header.svelte": {
+      "types": "./dist/Dashboard_Header.svelte.d.ts",
+      "svelte": "./dist/Dashboard_Header.svelte",
+      "default": "./dist/Dashboard_Header.svelte"
     },
     "./Dashboard_Home.svelte": {
       "types": "./dist/Dashboard_Home.svelte.d.ts",
@@ -601,6 +611,11 @@
       "types": "./dist/diskfiles.svelte.d.ts",
       "default": "./dist/diskfiles.svelte.js"
     },
+    "./Editable_Text.svelte": {
+      "types": "./dist/Editable_Text.svelte.d.ts",
+      "svelte": "./dist/Editable_Text.svelte",
+      "default": "./dist/Editable_Text.svelte"
+    },
     "./Error_Message.svelte": {
       "types": "./dist/Error_Message.svelte.d.ts",
       "svelte": "./dist/Error_Message.svelte",
@@ -620,6 +635,10 @@
       "types": "./dist/Footer.svelte.d.ts",
       "svelte": "./dist/Footer.svelte",
       "default": "./dist/Footer.svelte"
+    },
+    "./format_helpers.js": {
+      "types": "./dist/format_helpers.d.ts",
+      "default": "./dist/format_helpers.js"
     },
     "./frontend_action_handlers.js": {
       "types": "./dist/frontend_action_handlers.d.ts",
@@ -662,13 +681,17 @@
       "types": "./dist/helpers.d.ts",
       "default": "./dist/helpers.js"
     },
-    "./indexed_collection_helpers.js": {
-      "types": "./dist/indexed_collection_helpers.d.ts",
-      "default": "./dist/indexed_collection_helpers.js"
+    "./indexed_collection_helpers.svelte.js": {
+      "types": "./dist/indexed_collection_helpers.svelte.d.ts",
+      "default": "./dist/indexed_collection_helpers.svelte.js"
     },
     "./indexed_collection.svelte.js": {
       "types": "./dist/indexed_collection.svelte.d.ts",
       "default": "./dist/indexed_collection.svelte.js"
+    },
+    "./iterable_helpers.js": {
+      "types": "./dist/iterable_helpers.d.ts",
+      "default": "./dist/iterable_helpers.js"
     },
     "./jsonrpc_errors.js": {
       "types": "./dist/jsonrpc_errors.d.ts",
@@ -747,9 +770,72 @@
       "types": "./dist/nav.d.ts",
       "default": "./dist/nav.js"
     },
-    "./ollama.js": {
-      "types": "./dist/ollama.d.ts",
-      "default": "./dist/ollama.js"
+    "./navigation_helpers.js": {
+      "types": "./dist/navigation_helpers.d.ts",
+      "default": "./dist/navigation_helpers.js"
+    },
+    "./Ollama_Action_Item.svelte": {
+      "types": "./dist/Ollama_Action_Item.svelte.d.ts",
+      "svelte": "./dist/Ollama_Action_Item.svelte",
+      "default": "./dist/Ollama_Action_Item.svelte"
+    },
+    "./Ollama_Actions.svelte": {
+      "types": "./dist/Ollama_Actions.svelte.d.ts",
+      "svelte": "./dist/Ollama_Actions.svelte",
+      "default": "./dist/Ollama_Actions.svelte"
+    },
+    "./Ollama_Configure.svelte": {
+      "types": "./dist/Ollama_Configure.svelte.d.ts",
+      "svelte": "./dist/Ollama_Configure.svelte",
+      "default": "./dist/Ollama_Configure.svelte"
+    },
+    "./Ollama_Copy_Model.svelte": {
+      "types": "./dist/Ollama_Copy_Model.svelte.d.ts",
+      "svelte": "./dist/Ollama_Copy_Model.svelte",
+      "default": "./dist/Ollama_Copy_Model.svelte"
+    },
+    "./Ollama_Create_Model.svelte": {
+      "types": "./dist/Ollama_Create_Model.svelte.d.ts",
+      "svelte": "./dist/Ollama_Create_Model.svelte",
+      "default": "./dist/Ollama_Create_Model.svelte"
+    },
+    "./ollama_helpers.js": {
+      "types": "./dist/ollama_helpers.d.ts",
+      "default": "./dist/ollama_helpers.js"
+    },
+    "./Ollama_Manager.svelte": {
+      "types": "./dist/Ollama_Manager.svelte.d.ts",
+      "svelte": "./dist/Ollama_Manager.svelte",
+      "default": "./dist/Ollama_Manager.svelte"
+    },
+    "./Ollama_Model_Details.svelte": {
+      "types": "./dist/Ollama_Model_Details.svelte.d.ts",
+      "svelte": "./dist/Ollama_Model_Details.svelte",
+      "default": "./dist/Ollama_Model_Details.svelte"
+    },
+    "./Ollama_Model_Listitem.svelte": {
+      "types": "./dist/Ollama_Model_Listitem.svelte.d.ts",
+      "svelte": "./dist/Ollama_Model_Listitem.svelte",
+      "default": "./dist/Ollama_Model_Listitem.svelte"
+    },
+    "./Ollama_Model_Status.svelte": {
+      "types": "./dist/Ollama_Model_Status.svelte.d.ts",
+      "svelte": "./dist/Ollama_Model_Status.svelte",
+      "default": "./dist/Ollama_Model_Status.svelte"
+    },
+    "./Ollama_Ps_Status.svelte": {
+      "types": "./dist/Ollama_Ps_Status.svelte.d.ts",
+      "svelte": "./dist/Ollama_Ps_Status.svelte",
+      "default": "./dist/Ollama_Ps_Status.svelte"
+    },
+    "./Ollama_Pull_Model.svelte": {
+      "types": "./dist/Ollama_Pull_Model.svelte.d.ts",
+      "svelte": "./dist/Ollama_Pull_Model.svelte",
+      "default": "./dist/Ollama_Pull_Model.svelte"
+    },
+    "./ollama.svelte.js": {
+      "types": "./dist/ollama.svelte.d.ts",
+      "default": "./dist/ollama.svelte.js"
     },
     "./package.gen.js": {
       "types": "./dist/package.gen.d.ts",
@@ -778,6 +864,10 @@
       "types": "./dist/pkg.d.ts",
       "default": "./dist/pkg.js"
     },
+    "./poller.svelte.js": {
+      "types": "./dist/poller.svelte.d.ts",
+      "default": "./dist/poller.svelte.js"
+    },
     "./Popover_Button.svelte": {
       "types": "./dist/Popover_Button.svelte.d.ts",
       "svelte": "./dist/Popover_Button.svelte",
@@ -790,6 +880,11 @@
     "./position_helpers.js": {
       "types": "./dist/position_helpers.d.ts",
       "default": "./dist/position_helpers.js"
+    },
+    "./Progress_Bar.svelte": {
+      "types": "./dist/Progress_Bar.svelte.d.ts",
+      "svelte": "./dist/Progress_Bar.svelte",
+      "default": "./dist/Progress_Bar.svelte"
     },
     "./prompt_helpers.js": {
       "types": "./dist/prompt_helpers.d.ts",
@@ -935,9 +1030,9 @@
       "types": "./dist/server/register_websocket_actions.d.ts",
       "default": "./dist/server/register_websocket_actions.js"
     },
-    "./server/safe_fs.js": {
-      "types": "./dist/server/safe_fs.d.ts",
-      "default": "./dist/server/safe_fs.js"
+    "./server/scoped_fs.js": {
+      "types": "./dist/server/scoped_fs.d.ts",
+      "default": "./dist/server/scoped_fs.js"
     },
     "./server/security.js": {
       "types": "./dist/server/security.d.ts",
@@ -1043,6 +1138,11 @@
     "./time_helpers.js": {
       "types": "./dist/time_helpers.d.ts",
       "default": "./dist/time_helpers.js"
+    },
+    "./Time_Widget.svelte": {
+      "types": "./dist/Time_Widget.svelte.d.ts",
+      "svelte": "./dist/Time_Widget.svelte",
+      "default": "./dist/Time_Widget.svelte"
     },
     "./time.svelte.js": {
       "types": "./dist/time.svelte.d.ts",

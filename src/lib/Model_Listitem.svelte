@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type {Model} from '$lib/model.svelte.js';
+	import Contextmenu_Model from '$lib/Contextmenu_Model.svelte';
 
 	interface Props {
 		model: Model;
@@ -11,8 +12,7 @@
 	const provider = $derived(model.app.providers.find_by_name(model.provider_name));
 </script>
 
-<!-- TODO add Contextmenu_Model -->
-<div class="w_100 py_sm">
+<Contextmenu_Model attrs={{class: 'w_100 py_sm'}} {model}>
 	<div class="font_size_md">
 		{model.name}
 	</div>
@@ -29,4 +29,4 @@
 			{/each}
 		</ul>
 	{/if}
-</div>
+</Contextmenu_Model>

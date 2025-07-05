@@ -1,3 +1,5 @@
+// @slop Claude Sonnet 3.7
+
 import {test, expect} from 'vitest';
 
 import {generate_position_styles, type Position, type Alignment} from '$lib/position_helpers.js';

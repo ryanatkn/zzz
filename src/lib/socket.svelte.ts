@@ -1,4 +1,4 @@
-// @slop claude_opus_4
+// @slop Claude Sonnet 3.7
 
 import {z} from 'zod';
 import {SvelteMap} from 'svelte/reactivity';
@@ -77,6 +77,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 
 	// Keep track of connection attempts
 	reconnect_count: number = $state(0);
+	reconnect_attempt: number = $state(0); // increments on each reconnect attempt for animation triggering
 	reconnect_timeout: NodeJS.Timeout | null = $state(null);
 	current_reconnect_delay: number = $state(0);
 
@@ -387,6 +388,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 		this.#cancel_reconnect();
 
 		this.reconnect_count++;
+		this.reconnect_attempt++; // increment for animation triggering
 		this.current_reconnect_delay = Math.round(
 			Math.min(this.reconnect_delay_max, this.reconnect_delay * 1.5 ** (this.reconnect_count - 1)),
 		);

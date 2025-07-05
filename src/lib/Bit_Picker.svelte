@@ -19,7 +19,7 @@
 </script>
 
 <Picker
-	items={Array.from(bits.items.by_id.values())}
+	items={bits.items.values}
 	{onpick}
 	{filter}
 	{exclude_ids}

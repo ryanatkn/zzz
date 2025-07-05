@@ -11,6 +11,9 @@ import {
 	type Jsonrpc_Request_Id,
 } from '$lib/jsonrpc.js';
 
+// TODO what if this uses a tracker id param that's an opaque UUID but can be used for action association?
+
+// TODO name, like `Tracked_Request`? or is this implicit namespacing and generic name preferred
 /**
  * Represents a pending request with its associated state.
  */
@@ -69,7 +72,7 @@ export class Request_Tracker {
 			this.reject_request(id, {
 				jsonrpc: '2.0' as const,
 				id,
-				error: {code: JSONRPC_INTERNAL_ERROR, message: `Request timed out: ${id}`},
+				error: {code: JSONRPC_INTERNAL_ERROR, message: `request timed out: ${id}`},
 			});
 		}, this.request_timeout_ms);
 
@@ -90,7 +93,7 @@ export class Request_Tracker {
 	resolve_request(id: Jsonrpc_Request_Id, response: Jsonrpc_Request): void {
 		const request = this.pending_requests.get(id);
 		if (!request) {
-			console.warn(`Received response for unknown request: ${id}`);
+			console.warn(`received response for unknown request: ${id}`);
 			return;
 		}
 
@@ -113,7 +116,7 @@ export class Request_Tracker {
 	reject_request(id: Jsonrpc_Request_Id, error: Jsonrpc_Error_Message): void {
 		const request = this.pending_requests.get(id);
 		if (!request) {
-			console.warn(`Received error for unknown request: ${id}`);
+			console.warn(`received error for unknown request: ${id}`);
 			return;
 		}
 
@@ -180,7 +183,7 @@ export class Request_Tracker {
 			}
 
 			request.status = 'failure';
-			request.deferred.reject(new Error(reason || 'Request cancelled'));
+			request.deferred.reject(new Error(reason || 'request cancelled'));
 			this.pending_requests.delete(id);
 		}
 	}

@@ -98,6 +98,13 @@
 			{/if}
 
 			<Diskfile_Bit_View {diskfile} />
+
+			<div class="p_md">
+				<aside>
+					⚠️ this filesystem interface is just a proof of concept and lacks most features you'd
+					expect, more soon
+				</aside>
+			</div>
 		</div>
 	</div>
 </Contextmenu_Diskfile>

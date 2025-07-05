@@ -35,6 +35,8 @@
 	const count = $derived(chat.enabled_tapes.length);
 
 	let show_model_picker = $state(false);
+
+	// TODO BLOCK need to select the main `content_input`, currently selects a tape's input
 </script>
 
 <div class="column_fluid">

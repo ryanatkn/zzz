@@ -11,6 +11,10 @@
 	}
 
 	const {strip}: Props = $props();
+
+	// TODO BLOCK this needs to show the correct error message,
+	// reproduce by trying to send an o3 message
+	// (the main fix is probably in the transport and/or action event stuff)
 </script>
 
 <Contextmenu_Strip {strip}>

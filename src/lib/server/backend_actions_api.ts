@@ -35,9 +35,10 @@ export const create_backend_actions_api = (backend: Backend): Backend_Actions_Ap
 				} else if (event.data.step === 'failed') {
 					console.error('Failed to create filer_change notification:', event.data.error);
 				}
-			} catch (error) {
+			} catch (_error) {
+				// TODO silencing because it's loud on startup, needs to be rewritten
 				// TODO implement proper error handling strategy (don't throw - notifications are fire-and-forget)
-				console.error('Unexpected error in filer_change:', error);
+				// console.error('Unexpected error in filer_change:', error);
 			}
 		},
 	};

@@ -12,6 +12,13 @@ export const Action_Method = z.enum([
 	'delete_diskfile',
 	'filer_change',
 	'load_session',
+	'ollama_copy',
+	'ollama_create',
+	'ollama_delete',
+	'ollama_list',
+	'ollama_ps',
+	'ollama_pull',
+	'ollama_show',
 	'ping',
 	'submit_completion',
 	'toggle_main_menu',
@@ -41,7 +48,16 @@ export type Remote_Notification_Action_Method = z.infer<typeof Remote_Notificati
 /**
  * Names of all local_call actions.
  */
-export const Local_Call_Action_Method = z.enum(['toggle_main_menu']);
+export const Local_Call_Action_Method = z.enum([
+	'ollama_copy',
+	'ollama_create',
+	'ollama_delete',
+	'ollama_list',
+	'ollama_ps',
+	'ollama_pull',
+	'ollama_show',
+	'toggle_main_menu',
+]);
 export type Local_Call_Action_Method = z.infer<typeof Local_Call_Action_Method>;
 
 /**
@@ -52,6 +68,13 @@ export const Frontend_Action_Method = z.enum([
 	'delete_diskfile',
 	'filer_change',
 	'load_session',
+	'ollama_copy',
+	'ollama_create',
+	'ollama_delete',
+	'ollama_list',
+	'ollama_ps',
+	'ollama_pull',
+	'ollama_show',
 	'ping',
 	'submit_completion',
 	'toggle_main_menu',
@@ -85,6 +108,17 @@ export interface Actions_Api {
 	) => Promise<Action_Outputs['delete_diskfile']>;
 	filer_change: (input: Action_Inputs['filer_change']) => Promise<Action_Outputs['filer_change']>;
 	load_session: (input?: void) => Promise<Action_Outputs['load_session']>;
+	ollama_copy: (input: Action_Inputs['ollama_copy']) => Promise<Action_Outputs['ollama_copy']>;
+	ollama_create: (
+		input: Action_Inputs['ollama_create'],
+	) => Promise<Action_Outputs['ollama_create']>;
+	ollama_delete: (
+		input: Action_Inputs['ollama_delete'],
+	) => Promise<Action_Outputs['ollama_delete']>;
+	ollama_list: (input?: void) => Promise<Action_Outputs['ollama_list']>;
+	ollama_ps: (input?: void) => Promise<Action_Outputs['ollama_ps']>;
+	ollama_pull: (input: Action_Inputs['ollama_pull']) => Promise<Action_Outputs['ollama_pull']>;
+	ollama_show: (input: Action_Inputs['ollama_show']) => Promise<Action_Outputs['ollama_show']>;
 	ping: (input?: void) => Promise<Action_Outputs['ping']>;
 	submit_completion: (
 		input: Action_Inputs['submit_completion'],

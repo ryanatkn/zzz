@@ -6,8 +6,8 @@ import type {Src_Json} from '@ryanatkn/gro/src_json.js';
 export const package_json = {
 	name: '@ryanatkn/zzz',
 	version: '0.0.1',
-	description: 'adaptive web environments',
-	motto: 'nice web things for the tired',
+	description: 'fullstack toolkit for adaptive web environments',
+	motto: 'nice web things',
 	glyph: '💤',
 	logo: 'logo.svg',
 	logo_alt: "three sleepy z's",
@@ -35,7 +35,7 @@ export const package_json = {
 	devDependencies: {
 		'@changesets/changelog-git': '^0.2.1',
 		'@ryanatkn/eslint-config': '^0.8.0',
-		'@ryanatkn/fuz': '^0.144.0',
+		'@ryanatkn/fuz': '^0.144.3',
 		'@ryanatkn/gro': '^0.159.0',
 		'@ryanatkn/moss': '^0.31.0',
 		'@sveltejs/adapter-static': '^3.0.8',
@@ -48,7 +48,7 @@ export const package_json = {
 		ollama: '^0.5.16',
 		prettier: '^3.5.3',
 		'prettier-plugin-svelte': '^3.4.0',
-		svelte: '^5.34.7',
+		svelte: '^5.34.9',
 		'svelte-check': '^4.2.2',
 		tslib: '^2.8.1',
 		typescript: '^5.8.3',
@@ -363,6 +363,11 @@ export const package_json = {
 			svelte: './dist/Contextmenu_Entry_Toggle.svelte',
 			default: './dist/Contextmenu_Entry_Toggle.svelte',
 		},
+		'./Contextmenu_Model.svelte': {
+			types: './dist/Contextmenu_Model.svelte.d.ts',
+			svelte: './dist/Contextmenu_Model.svelte',
+			default: './dist/Contextmenu_Model.svelte',
+		},
 		'./Contextmenu_Prompt.svelte': {
 			types: './dist/Contextmenu_Prompt.svelte.d.ts',
 			svelte: './dist/Contextmenu_Prompt.svelte',
@@ -392,6 +397,11 @@ export const package_json = {
 			types: './dist/Dashboard_Diskfiles.svelte.d.ts',
 			svelte: './dist/Dashboard_Diskfiles.svelte',
 			default: './dist/Dashboard_Diskfiles.svelte',
+		},
+		'./Dashboard_Header.svelte': {
+			types: './dist/Dashboard_Header.svelte.d.ts',
+			svelte: './dist/Dashboard_Header.svelte',
+			default: './dist/Dashboard_Header.svelte',
 		},
 		'./Dashboard_Home.svelte': {
 			types: './dist/Dashboard_Home.svelte.d.ts',
@@ -524,6 +534,11 @@ export const package_json = {
 			types: './dist/diskfiles.svelte.d.ts',
 			default: './dist/diskfiles.svelte.js',
 		},
+		'./Editable_Text.svelte': {
+			types: './dist/Editable_Text.svelte.d.ts',
+			svelte: './dist/Editable_Text.svelte',
+			default: './dist/Editable_Text.svelte',
+		},
 		'./Error_Message.svelte': {
 			types: './dist/Error_Message.svelte.d.ts',
 			svelte: './dist/Error_Message.svelte',
@@ -543,6 +558,10 @@ export const package_json = {
 			types: './dist/Footer.svelte.d.ts',
 			svelte: './dist/Footer.svelte',
 			default: './dist/Footer.svelte',
+		},
+		'./format_helpers.js': {
+			types: './dist/format_helpers.d.ts',
+			default: './dist/format_helpers.js',
 		},
 		'./frontend_action_handlers.js': {
 			types: './dist/frontend_action_handlers.d.ts',
@@ -579,13 +598,17 @@ export const package_json = {
 		},
 		'./glyphs.js': {types: './dist/glyphs.d.ts', default: './dist/glyphs.js'},
 		'./helpers.js': {types: './dist/helpers.d.ts', default: './dist/helpers.js'},
-		'./indexed_collection_helpers.js': {
-			types: './dist/indexed_collection_helpers.d.ts',
-			default: './dist/indexed_collection_helpers.js',
+		'./indexed_collection_helpers.svelte.js': {
+			types: './dist/indexed_collection_helpers.svelte.d.ts',
+			default: './dist/indexed_collection_helpers.svelte.js',
 		},
 		'./indexed_collection.svelte.js': {
 			types: './dist/indexed_collection.svelte.d.ts',
 			default: './dist/indexed_collection.svelte.js',
+		},
+		'./iterable_helpers.js': {
+			types: './dist/iterable_helpers.d.ts',
+			default: './dist/iterable_helpers.js',
 		},
 		'./jsonrpc_errors.js': {
 			types: './dist/jsonrpc_errors.d.ts',
@@ -646,7 +669,70 @@ export const package_json = {
 			default: './dist/Nav_Link.svelte',
 		},
 		'./nav.js': {types: './dist/nav.d.ts', default: './dist/nav.js'},
-		'./ollama.js': {types: './dist/ollama.d.ts', default: './dist/ollama.js'},
+		'./navigation_helpers.js': {
+			types: './dist/navigation_helpers.d.ts',
+			default: './dist/navigation_helpers.js',
+		},
+		'./Ollama_Action_Item.svelte': {
+			types: './dist/Ollama_Action_Item.svelte.d.ts',
+			svelte: './dist/Ollama_Action_Item.svelte',
+			default: './dist/Ollama_Action_Item.svelte',
+		},
+		'./Ollama_Actions.svelte': {
+			types: './dist/Ollama_Actions.svelte.d.ts',
+			svelte: './dist/Ollama_Actions.svelte',
+			default: './dist/Ollama_Actions.svelte',
+		},
+		'./Ollama_Configure.svelte': {
+			types: './dist/Ollama_Configure.svelte.d.ts',
+			svelte: './dist/Ollama_Configure.svelte',
+			default: './dist/Ollama_Configure.svelte',
+		},
+		'./Ollama_Copy_Model.svelte': {
+			types: './dist/Ollama_Copy_Model.svelte.d.ts',
+			svelte: './dist/Ollama_Copy_Model.svelte',
+			default: './dist/Ollama_Copy_Model.svelte',
+		},
+		'./Ollama_Create_Model.svelte': {
+			types: './dist/Ollama_Create_Model.svelte.d.ts',
+			svelte: './dist/Ollama_Create_Model.svelte',
+			default: './dist/Ollama_Create_Model.svelte',
+		},
+		'./ollama_helpers.js': {
+			types: './dist/ollama_helpers.d.ts',
+			default: './dist/ollama_helpers.js',
+		},
+		'./Ollama_Manager.svelte': {
+			types: './dist/Ollama_Manager.svelte.d.ts',
+			svelte: './dist/Ollama_Manager.svelte',
+			default: './dist/Ollama_Manager.svelte',
+		},
+		'./Ollama_Model_Details.svelte': {
+			types: './dist/Ollama_Model_Details.svelte.d.ts',
+			svelte: './dist/Ollama_Model_Details.svelte',
+			default: './dist/Ollama_Model_Details.svelte',
+		},
+		'./Ollama_Model_Listitem.svelte': {
+			types: './dist/Ollama_Model_Listitem.svelte.d.ts',
+			svelte: './dist/Ollama_Model_Listitem.svelte',
+			default: './dist/Ollama_Model_Listitem.svelte',
+		},
+		'./Ollama_Model_Status.svelte': {
+			types: './dist/Ollama_Model_Status.svelte.d.ts',
+			svelte: './dist/Ollama_Model_Status.svelte',
+			default: './dist/Ollama_Model_Status.svelte',
+		},
+		'./Ollama_Ps_Status.svelte': {
+			types: './dist/Ollama_Ps_Status.svelte.d.ts',
+			svelte: './dist/Ollama_Ps_Status.svelte',
+			default: './dist/Ollama_Ps_Status.svelte',
+		},
+		'./Ollama_Pull_Model.svelte': {
+			types: './dist/Ollama_Pull_Model.svelte.d.ts',
+			svelte: './dist/Ollama_Pull_Model.svelte',
+			default: './dist/Ollama_Pull_Model.svelte',
+		},
+		'./ollama.svelte.js': {types: './dist/ollama.svelte.d.ts', default: './dist/ollama.svelte.js'},
 		'./package.gen.js': {types: './dist/package.gen.d.ts', default: './dist/package.gen.js'},
 		'./package.js': {types: './dist/package.d.ts', default: './dist/package.js'},
 		'./Picker_Dialog.svelte': {
@@ -665,6 +751,7 @@ export const package_json = {
 			default: './dist/Ping_Form.svelte',
 		},
 		'./pkg.js': {types: './dist/pkg.d.ts', default: './dist/pkg.js'},
+		'./poller.svelte.js': {types: './dist/poller.svelte.d.ts', default: './dist/poller.svelte.js'},
 		'./Popover_Button.svelte': {
 			types: './dist/Popover_Button.svelte.d.ts',
 			svelte: './dist/Popover_Button.svelte',
@@ -677,6 +764,11 @@ export const package_json = {
 		'./position_helpers.js': {
 			types: './dist/position_helpers.d.ts',
 			default: './dist/position_helpers.js',
+		},
+		'./Progress_Bar.svelte': {
+			types: './dist/Progress_Bar.svelte.d.ts',
+			svelte: './dist/Progress_Bar.svelte',
+			default: './dist/Progress_Bar.svelte',
 		},
 		'./prompt_helpers.js': {
 			types: './dist/prompt_helpers.d.ts',
@@ -815,9 +907,9 @@ export const package_json = {
 			types: './dist/server/register_websocket_actions.d.ts',
 			default: './dist/server/register_websocket_actions.js',
 		},
-		'./server/safe_fs.js': {
-			types: './dist/server/safe_fs.d.ts',
-			default: './dist/server/safe_fs.js',
+		'./server/scoped_fs.js': {
+			types: './dist/server/scoped_fs.d.ts',
+			default: './dist/server/scoped_fs.js',
 		},
 		'./server/security.js': {
 			types: './dist/server/security.d.ts',
@@ -891,6 +983,11 @@ export const package_json = {
 		'./test_helpers.js': {types: './dist/test_helpers.d.ts', default: './dist/test_helpers.js'},
 		'./test.task.js': {types: './dist/test.task.d.ts', default: './dist/test.task.js'},
 		'./time_helpers.js': {types: './dist/time_helpers.d.ts', default: './dist/time_helpers.js'},
+		'./Time_Widget.svelte': {
+			types: './dist/Time_Widget.svelte.d.ts',
+			svelte: './dist/Time_Widget.svelte',
+			default: './dist/Time_Widget.svelte',
+		},
 		'./time.svelte.js': {types: './dist/time.svelte.d.ts', default: './dist/time.svelte.js'},
 		'./Toggle_Button.svelte': {
 			types: './dist/Toggle_Button.svelte.d.ts',
@@ -1086,6 +1183,13 @@ export const src_json = {
 				{name: 'create_directory_action_spec', kind: 'variable'},
 				{name: 'submit_completion_action_spec', kind: 'variable'},
 				{name: 'toggle_main_menu_action_spec', kind: 'variable'},
+				{name: 'ollama_list_action_spec', kind: 'variable'},
+				{name: 'ollama_ps_action_spec', kind: 'variable'},
+				{name: 'ollama_show_action_spec', kind: 'variable'},
+				{name: 'ollama_pull_action_spec', kind: 'variable'},
+				{name: 'ollama_delete_action_spec', kind: 'variable'},
+				{name: 'ollama_copy_action_spec', kind: 'variable'},
+				{name: 'ollama_create_action_spec', kind: 'variable'},
 			],
 		},
 		'./action_types.js': {
@@ -1482,6 +1586,10 @@ export const src_json = {
 			path: 'Contextmenu_Entry_Toggle.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
 		},
+		'./Contextmenu_Model.svelte': {
+			path: 'Contextmenu_Model.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./Contextmenu_Prompt.svelte': {
 			path: 'Contextmenu_Prompt.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
@@ -1504,6 +1612,10 @@ export const src_json = {
 		},
 		'./Dashboard_Diskfiles.svelte': {
 			path: 'Dashboard_Diskfiles.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Dashboard_Header.svelte': {
+			path: 'Dashboard_Header.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
 		},
 		'./Dashboard_Home.svelte': {
@@ -1667,6 +1779,10 @@ export const src_json = {
 				{name: 'Diskfiles', kind: 'class'},
 			],
 		},
+		'./Editable_Text.svelte': {
+			path: 'Editable_Text.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./Error_Message.svelte': {
 			path: 'Error_Message.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
@@ -1682,6 +1798,15 @@ export const src_json = {
 		'./Footer.svelte': {
 			path: 'Footer.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./format_helpers.js': {
+			path: 'format_helpers.ts',
+			declarations: [
+				{name: 'format_bytes', kind: 'function'},
+				{name: 'format_gigabytes', kind: 'function'},
+				{name: 'format_percentage', kind: 'function'},
+				{name: 'format_duration', kind: 'function'},
+			],
 		},
 		'./frontend_action_handlers.js': {
 			path: 'frontend_action_handlers.ts',
@@ -1739,7 +1864,19 @@ export const src_json = {
 				{name: 'GLYPH_DISCONNECT', kind: 'variable'},
 				{name: 'GLYPH_RETRY', kind: 'variable'},
 				{name: 'GLYPH_PLACEHOLDER', kind: 'variable'},
+				{name: 'GLYPH_PLAY', kind: 'variable'},
+				{name: 'GLYPH_PAUSE', kind: 'variable'},
 				{name: 'GLYPH_CHECKMARK', kind: 'variable'},
+				{name: 'GLYPH_XMARK', kind: 'variable'},
+				{name: 'GLYPH_XMARK_HEAVY', kind: 'variable'},
+				{name: 'GLYPH_DOWNLOAD', kind: 'variable'},
+				{name: 'GLYPH_ERROR', kind: 'variable'},
+				{name: 'GLYPH_CHEVRON_UP', kind: 'variable'},
+				{name: 'GLYPH_CHEVRON_RIGHT', kind: 'variable'},
+				{name: 'GLYPH_CHEVRON_DOWN', kind: 'variable'},
+				{name: 'GLYPH_CHEVRON_LEFT', kind: 'variable'},
+				{name: 'GLYPH_DOUBLE_CHEVRON_LEFT', kind: 'variable'},
+				{name: 'GLYPH_DOUBLE_CHEVRON_RIGHT', kind: 'variable'},
 				{name: 'GLYPH_EDIT', kind: 'variable'},
 				{name: 'GLYPH_SORT', kind: 'variable'},
 				{name: 'GLYPH_BACKEND', kind: 'variable'},
@@ -1791,8 +1928,8 @@ export const src_json = {
 				{name: 'to_preview', kind: 'function'},
 			],
 		},
-		'./indexed_collection_helpers.js': {
-			path: 'indexed_collection_helpers.ts',
+		'./indexed_collection_helpers.svelte.js': {
+			path: 'indexed_collection_helpers.svelte.ts',
 			declarations: [
 				{name: 'Indexed_Item', kind: 'variable'},
 				{name: 'Index_Options', kind: 'type'},
@@ -1814,6 +1951,10 @@ export const src_json = {
 				{name: 'Indexed_Collection_Options', kind: 'type'},
 				{name: 'Indexed_Collection', kind: 'class'},
 			],
+		},
+		'./iterable_helpers.js': {
+			path: 'iterable_helpers.ts',
+			declarations: [{name: 'create_map_by_property', kind: 'function'}],
 		},
 		'./jsonrpc_errors.js': {
 			path: 'jsonrpc_errors.ts',
@@ -1957,14 +2098,84 @@ export const src_json = {
 				{name: 'main_nav_items_default', kind: 'variable'},
 			],
 		},
-		'./ollama.js': {
-			path: 'ollama.ts',
+		'./navigation_helpers.js': {
+			path: 'navigation_helpers.ts',
+			declarations: [{name: 'goto_unless_current', kind: 'function'}],
+		},
+		'./Ollama_Action_Item.svelte': {
+			path: 'Ollama_Action_Item.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Ollama_Actions.svelte': {
+			path: 'Ollama_Actions.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Ollama_Configure.svelte': {
+			path: 'Ollama_Configure.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Ollama_Copy_Model.svelte': {
+			path: 'Ollama_Copy_Model.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Ollama_Create_Model.svelte': {
+			path: 'Ollama_Create_Model.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./ollama_helpers.js': {
+			path: 'ollama_helpers.ts',
 			declarations: [
 				{name: 'OLLAMA_URL', kind: 'variable'},
-				{name: 'Ollama_Model_Info', kind: 'type'},
-				{name: 'Ollama_Models_Response', kind: 'type'},
-				{name: 'ollama_list', kind: 'function'},
-				{name: 'ollama_list_with_metadata', kind: 'function'},
+				{name: 'Ollama_Status_Response', kind: 'variable'},
+				{name: 'Ollama_Progress_Response', kind: 'variable'},
+				{name: 'Ollama_Model_Details', kind: 'variable'},
+				{name: 'Ollama_List_Response_Item', kind: 'variable'},
+				{name: 'Ollama_List_Response', kind: 'variable'},
+				{name: 'Ollama_Show_Response', kind: 'variable'},
+				{name: 'Ollama_Ps_Response_Item', kind: 'variable'},
+				{name: 'Ollama_Ps_Response', kind: 'variable'},
+				{name: 'Ollama_List_Request', kind: 'variable'},
+				{name: 'Ollama_Ps_Request', kind: 'variable'},
+				{name: 'Ollama_Show_Request', kind: 'variable'},
+				{name: 'Ollama_Pull_Request', kind: 'variable'},
+				{name: 'Ollama_Push_Request', kind: 'variable'},
+				{name: 'Ollama_Create_Request', kind: 'variable'},
+				{name: 'Ollama_Delete_Request', kind: 'variable'},
+				{name: 'Ollama_Copy_Request', kind: 'variable'},
+				{name: 'extract_parameter_count', kind: 'function'},
+			],
+		},
+		'./Ollama_Manager.svelte': {
+			path: 'Ollama_Manager.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Ollama_Model_Details.svelte': {
+			path: 'Ollama_Model_Details.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Ollama_Model_Listitem.svelte': {
+			path: 'Ollama_Model_Listitem.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Ollama_Model_Status.svelte': {
+			path: 'Ollama_Model_Status.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Ollama_Ps_Status.svelte': {
+			path: 'Ollama_Ps_Status.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Ollama_Pull_Model.svelte': {
+			path: 'Ollama_Pull_Model.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./ollama.svelte.js': {
+			path: 'ollama.svelte.ts',
+			declarations: [
+				{name: 'Ollama_Json', kind: 'variable'},
+				{name: 'Ollama_Json_Input', kind: 'type'},
+				{name: 'Ollama_Options', kind: 'type'},
+				{name: 'Ollama', kind: 'class'},
 			],
 		},
 		'./package.gen.js': {path: 'package.gen.ts', declarations: [{name: 'gen', kind: 'function'}]},
@@ -1988,6 +2199,13 @@ export const src_json = {
 			declarations: [{name: 'default', kind: 'component'}],
 		},
 		'./pkg.js': {path: 'pkg.ts', declarations: [{name: 'pkg_context', kind: 'variable'}]},
+		'./poller.svelte.js': {
+			path: 'poller.svelte.ts',
+			declarations: [
+				{name: 'Poller_Options', kind: 'type'},
+				{name: 'Poller', kind: 'class'},
+			],
+		},
 		'./Popover_Button.svelte': {
 			path: 'Popover_Button.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
@@ -2010,6 +2228,10 @@ export const src_json = {
 				{name: 'Alignment', kind: 'type'},
 				{name: 'generate_position_styles', kind: 'function'},
 			],
+		},
+		'./Progress_Bar.svelte': {
+			path: 'Progress_Bar.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
 		},
 		'./prompt_helpers.js': {
 			path: 'prompt_helpers.ts',
@@ -2236,11 +2458,11 @@ export const src_json = {
 				{name: 'register_websocket_actions', kind: 'function'},
 			],
 		},
-		'./server/safe_fs.js': {
-			path: 'server/safe_fs.ts',
+		'./server/scoped_fs.js': {
+			path: 'server/scoped_fs.ts',
 			declarations: [
-				{name: 'Safe_Fs_Path', kind: 'variable'},
-				{name: 'Safe_Fs', kind: 'class'},
+				{name: 'Scoped_Fs_Path', kind: 'variable'},
+				{name: 'Scoped_Fs', kind: 'class'},
 				{name: 'Path_Not_Allowed_Error', kind: 'class'},
 				{name: 'Symlink_Not_Allowed_Error', kind: 'class'},
 			],
@@ -2394,9 +2616,17 @@ export const src_json = {
 		'./time_helpers.js': {
 			path: 'time_helpers.ts',
 			declarations: [
+				{name: 'Time_Value', kind: 'type'},
 				{name: 'format_timestamp', kind: 'function'},
+				{name: 'format_short_date', kind: 'function'},
+				{name: 'format_datetime', kind: 'function'},
+				{name: 'format_time', kind: 'function'},
 				{name: 'format_ms_to_readable', kind: 'function'},
 			],
+		},
+		'./Time_Widget.svelte': {
+			path: 'Time_Widget.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
 		},
 		'./time.svelte.js': {
 			path: 'time.svelte.ts',

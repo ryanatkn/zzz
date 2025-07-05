@@ -14,6 +14,8 @@ import {is_send_request, is_notification_send} from '$lib/action_event_helpers.j
 
 // TODO BLOCK @api streaming
 
+// TODO @api @many refactor frontend_actions_api.ts with action_peer.ts
+
 // TODO @api think about unification between frontend|backend_actions_api.ts
 
 /**
@@ -86,17 +88,12 @@ const create_sync_local_call_method = (
 			method: spec.method,
 			action_event: event.toJSON(),
 		});
+		action?.listen_to_action_event(event);
 
-		try {
-			// Execute synchronously
-			event.parse().handle_sync();
+		// Execute synchronously
+		event.parse().handle_sync();
 
-			action?.update_from_event(event);
-			return extract_result_or_throw(event);
-		} catch (error) {
-			action?.update_from_event(event); // TODO @many track the error?
-			throw error;
-		}
+		return extract_result_or_throw(event);
 	};
 };
 
@@ -113,17 +110,12 @@ const create_async_local_call_method = (
 			method: spec.method,
 			action_event: event.toJSON(),
 		});
+		action?.listen_to_action_event(event);
 
-		try {
-			// Execute asynchronously
-			await event.parse().handle_async();
+		// Execute asynchronously
+		await event.parse().handle_async();
 
-			action?.update_from_event(event);
-			return extract_result_or_throw(event);
-		} catch (error) {
-			action?.update_from_event(event); // TODO @many track the error?
-			throw error;
-		}
+		return extract_result_or_throw(event);
 	};
 };
 
@@ -140,49 +132,42 @@ const create_request_response_method = (
 			method: spec.method,
 			action_event: event.toJSON(),
 		});
+		action?.listen_to_action_event(event);
 
-		try {
-			// Parse and handle send_request phase
+		// Parse and handle send_request phase
+		await event.parse().handle_async();
+
+		// Check if handled successfully and has request
+		if (!is_send_request(event.data)) throw Error(); // TODO @many maybe make this an assertion helper?
+		if (event.data.step === 'handled') {
+			// Send the request and wait for response
+			const response = await environment.peer.send(event.data.request);
+
+			// Transition to receive_response phase
+			event.transition('receive_response');
+
+			// TODO @api shouldn't this happen in the peer like the other method calls?
+			// Set the response data
+			event.set_response(response);
+
+			// Parse and handle the response
 			await event.parse().handle_async();
 
-			// Check if handled successfully and has request
-			if (!is_send_request(event.data)) throw Error(); // TODO @many maybe make this an assertion helper?
+			// Extract the result
+			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 			if (event.data.step === 'handled') {
-				action?.update_from_event(event);
-
-				// Send the request and wait for response
-				const response = await environment.peer.send(event.data.request);
-
-				// Transition to receive_response phase
-				event.transition('receive_response');
-
-				// Set the response data
-				event.set_response(response);
-
-				// Parse and handle the response
-				await event.parse().handle_async();
-				action?.update_from_event(event);
-
-				// Extract the result
-				// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-				if (event.data.step === 'handled') {
-					return event.data.output;
-				}
-
-				// Handle error responses
-				if (is_jsonrpc_error_message(response)) {
-					throw new Error(response.error.message);
-				}
-
-				throw new Error('No output received');
-			} else {
-				// Failed to handle send_request
-				action?.update_from_event(event);
-				return extract_result_or_throw(event);
+				return event.data.output;
 			}
-		} catch (error) {
-			action?.update_from_event(event); // TODO @many track the error?
-			throw error;
+
+			// Handle error responses
+			if (is_jsonrpc_error_message(response)) {
+				throw new Error(response.error.message);
+			}
+
+			throw new Error('No output received');
+		} else {
+			// Failed to handle send_request
+			return extract_result_or_throw(event);
 		}
 	};
 };
@@ -207,21 +192,16 @@ const create_remote_notification_method = (
 			method: spec.method,
 			action_event: event.toJSON(),
 		});
+		action?.listen_to_action_event(event);
 
-		try {
-			// Parse and handle
-			await event.parse().handle_async();
-			action?.update_from_event(event);
+		// Parse and handle
+		await event.parse().handle_async();
 
-			if (!is_notification_send(event.data)) throw Error(); // TODO @many maybe make this an assertion helper?
+		if (!is_notification_send(event.data)) throw Error(); // TODO @many maybe make this an assertion helper?
 
-			// Send notification if successful
-			if (event.data.step === 'handled') {
-				await environment.peer.send(event.data.notification);
-			}
-		} catch (error) {
-			action?.update_from_event(event); // TODO @many track the error?
-			throw error;
+		// Send notification if successful
+		if (event.data.step === 'handled') {
+			await environment.peer.send(event.data.notification);
 		}
 	};
 };

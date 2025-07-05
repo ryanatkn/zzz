@@ -2,7 +2,8 @@
 
 import type {Gen} from '@ryanatkn/gro/gen.js';
 
-import {action_specs} from '$lib/action_collections.js';
+import * as action_specs from '$lib/action_specs.js';
+import {is_action_spec} from '$lib/action_spec.js';
 import {Action_Registry} from '$lib/action_registry.js';
 import {
 	to_action_spec_input_identifier,
@@ -15,7 +16,9 @@ import {Import_Builder, create_banner} from '$lib/codegen.js';
  * This is separate from `action_metatypes.gen.ts` to avoid circular dependencies.
  */
 export const gen: Gen = ({origin_path}) => {
-	const registry = new Action_Registry(action_specs);
+	const registry = new Action_Registry(
+		Object.values(action_specs).filter((s) => is_action_spec(s)),
+	);
 	const imports = new Import_Builder();
 	const banner = create_banner(origin_path);
 

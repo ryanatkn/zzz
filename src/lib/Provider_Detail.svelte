@@ -4,11 +4,13 @@
 	import type {SvelteHTMLElements} from 'svelte/elements';
 
 	import type {Provider} from '$lib/provider.svelte.js';
-	import Model_Summary from '$lib/Model_Summary.svelte';
 	import Provider_Logo from '$lib/Provider_Logo.svelte';
 	import {GLYPH_PROVIDER} from '$lib/glyphs.js';
 	import External_Link from '$lib/External_Link.svelte';
 	import Glyph from '$lib/Glyph.svelte';
+	import Ollama_Manager from '$lib/Ollama_Manager.svelte';
+	import {frontend_context} from '$lib/frontend.svelte.js';
+	import Model_Summary from '$lib/Model_Summary.svelte';
 
 	interface Props {
 		provider: Provider;
@@ -19,7 +21,7 @@
 
 	const at_detail_page = $derived(page.url.pathname === `${base}/providers/${provider.name}`);
 
-	// TODO BLOCK Ollama UI
+	const app = frontend_context.get();
 </script>
 
 <div {...attrs} class="panel p_lg {attrs?.class}">
@@ -35,9 +37,6 @@
 					<External_Link href={provider.url}>{provider.title}</External_Link>
 				</h2>
 			{/if}
-			{#if provider.icon}
-				<div>{provider.icon}</div>
-			{/if}
 			<div>
 				<div class="mb_md font_family_mono">
 					<Glyph glyph={GLYPH_PROVIDER} />
@@ -51,19 +50,19 @@
 	</section>
 	{#if provider.name === 'ollama'}
 		<section>
-			<p>
-				TODO add UI for the full Ollama API - <a href="https://github.com/ollama/ollama-js"
-					>https://github.com/ollama/ollama-js</a
-				>
-			</p>
+			<Ollama_Manager ollama={app.ollama} />
+		</section>
+	{:else}
+		<aside class="mt_xl3">
+			⚠️ This information is incomplete and may be incorrect or outdated.
+		</aside>
+		<section>
+			<ul class="display_flex flex_wrap unstyled gap_md">
+				{#each provider.models as model (model)}
+					<Model_Summary {model} />
+				{/each}
+			</ul>
+			<!-- TODO UI to add models -->
 		</section>
 	{/if}
-	<section>
-		<ul class="display_flex flex_wrap unstyled gap_md">
-			{#each provider.models as model (model)}
-				<Model_Summary {model} />
-			{/each}
-		</ul>
-		<!-- TODO UI to add models -->
-	</section>
 </div>

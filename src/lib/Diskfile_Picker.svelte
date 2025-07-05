@@ -20,7 +20,7 @@
 </script>
 
 <Picker
-	items={Array.from(diskfiles.items.by_id.values())}
+	items={diskfiles.items.values}
 	{onpick}
 	{filter}
 	{exclude_ids}

@@ -1,13 +1,19 @@
+// @slop Claude Sonnet 3.7
+
 import {z} from 'zod';
-import type {ListResponse, ModelResponse} from 'ollama/browser';
 import type {Async_Status} from '@ryanatkn/belt/async.js';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
-import {ollama_list} from '$lib/ollama.js';
-import {create_uuid} from '$lib/zod_helpers.js';
 import type {Zzz_Dir} from '$lib/diskfile_types.js';
 import type {Jsonrpc_Request_Id} from '$lib/jsonrpc.js';
+import type {
+	Ollama_List_Response,
+	Ollama_List_Response_Item,
+	Ollama_Ps_Response,
+} from '$lib/ollama_helpers.js';
+
+// TODO extract reusable stuff to make this generic
 
 /** Maximum number of ping records to keep. */
 export const PING_HISTORY_MAX = 6;
@@ -66,7 +72,9 @@ export interface Filesystem_Capability_Data {
 }
 
 export interface Ollama_Capability_Data {
-	list_response: ListResponse | null; // TODO add `round_trip_time` here or generically to all capabilities
+	list_response: Ollama_List_Response | null;
+	ps_response: Ollama_Ps_Response | null;
+	round_trip_time: number | null;
 }
 
 /**
@@ -153,13 +161,30 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 		},
 	);
 
-	ollama: Capability<Ollama_Capability_Data | null | undefined> = $state.raw({
-		name: 'ollama',
-		data: undefined,
-		status: 'initial',
-		message_id: null,
-		error_message: null,
-		updated: null,
+	/**
+	 * Ollama capability that derives its state from app.ollama.
+	 */
+	readonly ollama: Capability<Ollama_Capability_Data | null | undefined> = $derived.by(() => {
+		const {ollama} = this.app;
+		const {list_status} = ollama;
+
+		return {
+			name: 'ollama',
+			data:
+				list_status === 'initial'
+					? undefined
+					: list_status === 'success'
+						? {
+								list_response: ollama.list_response,
+								ps_response: ollama.ps_response,
+								round_trip_time: ollama.list_round_trip_time,
+							}
+						: null,
+			status: list_status,
+			message_id: null,
+			error_message: ollama.list_error,
+			updated: ollama.list_last_updated,
+		};
 	});
 
 	/**
@@ -244,15 +269,19 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	/**
 	 * Latest Ollama model list response, if available.
 	 */
-	readonly ollama_models: Array<{name: string; size: number; model_response: ModelResponse}> =
-		$derived(
-			// TODO hacky
-			this.ollama.data?.list_response?.models.map((m) => ({
+	readonly ollama_models: Array<{
+		name: string;
+		size: number;
+		model_response: Ollama_List_Response_Item;
+	}> = $derived(
+		this.app.ollama.models_downloaded
+			.filter((m) => !!m.ollama_list_response_item)
+			.map((m) => ({
 				name: m.name,
-				size: Math.round(m.size / (1024 * 1024)), // Size in MB
-				model_response: m,
-			})) || [],
-		);
+				size: Math.round((m.filesize ?? 0) * 1024), // Convert GB back to MB for compatibility
+				model_response: m.ollama_list_response_item!,
+			})),
+	);
 
 	constructor(options: Cell_Options<typeof Capabilities_Json>) {
 		super(Capabilities_Json, options);
@@ -285,50 +314,13 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	 * @returns A promise that resolves when the check is complete
 	 */
 	async check_ollama(): Promise<void> {
-		const message_id = create_uuid();
-
-		this.ollama = {
-			name: 'ollama',
-			data: null,
-			status: 'pending',
-			message_id,
-			error_message: null,
-			updated: Date.now(),
-		};
-
-		let error_message: string | undefined;
-
+		// Simply delegate to app.ollama.refresh()
+		// The derived state will automatically update based on ollama's state
 		try {
-			// Check if Ollama API is available by getting the list of models
-			const list_response = await ollama_list();
-
-			// Set the capability data
-			if (list_response && this.ollama.message_id === message_id) {
-				this.ollama = {
-					name: 'ollama',
-					data: {list_response},
-					status: 'success',
-					message_id,
-					error_message: null,
-					updated: Date.now(),
-				};
-			} else {
-				error_message = 'No response from Ollama API';
-			}
+			await this.app.ollama.refresh();
 		} catch (error) {
-			console.error('Failed to connect to Ollama API:', error);
-			error_message = error instanceof Error ? error.message : 'Unknown error connecting to Ollama';
-		}
-
-		if (error_message && this.ollama.message_id === message_id) {
-			this.ollama = {
-				name: 'ollama',
-				data: null,
-				status: 'failure',
-				message_id: null,
-				error_message,
-				updated: Date.now(),
-			};
+			console.error('failed to check Ollama:', error);
+			// Error handling is done in the ollama class itself
 		}
 	}
 
@@ -418,14 +410,16 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 		};
 	}
 
+	// TODO maybe should be a method on app.ollama?
 	reset_ollama(): void {
-		this.ollama = {
-			name: 'ollama',
-			data: undefined,
-			status: 'initial',
-			message_id: null,
-			error_message: null,
-			updated: null,
-		};
+		// Reset the ollama state in app.ollama
+		this.app.ollama.list_response = null;
+		this.app.ollama.list_status = 'initial';
+		this.app.ollama.list_error = null;
+		this.app.ollama.list_last_updated = null;
+		this.app.ollama.list_round_trip_time = null;
+		this.app.ollama.ps_response = null;
+		this.app.ollama.ps_status = 'initial';
+		this.app.ollama.ps_error = null;
 	}
 }

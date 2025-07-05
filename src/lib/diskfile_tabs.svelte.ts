@@ -1,3 +1,5 @@
+// @slop Claude Sonnet 3.7
+
 import {z} from 'zod';
 import {SvelteMap} from 'svelte/reactivity';
 
@@ -12,9 +14,9 @@ export const Diskfile_Tabs_Json = Cell_Json.extend({
 	selected_tab_id: Uuid.nullable().default(null),
 	preview_tab_id: Uuid.nullable().default(null),
 	tab_order: z.array(Uuid).default(() => []),
-	/** Tracks recently accessed tabs for better tab selection when closing tabs */
+	/** Tracks recently accessed tabs for better tab selection when closing tabs. */
 	recent_tab_ids: z.array(Uuid).default(() => []),
-	/** Maximum number of tabs to track in access history */
+	/** Maximum number of tabs to track in access history. */
 	max_tab_history: z.number().default(20),
 });
 export type Diskfile_Tabs_Json = z.infer<typeof Diskfile_Tabs_Json>;
@@ -26,7 +28,6 @@ export type Diskfile_Tabs_Options = Cell_Options<typeof Diskfile_Tabs_Json>;
  * Manages tabs for diskfiles in the editor with preview behavior.
  */
 export class Diskfile_Tabs extends Cell<typeof Diskfile_Tabs_Json> {
-	// Central source of truth for tab state
 	selected_tab_id: Uuid | null = $state()!;
 	preview_tab_id: Uuid | null = $state()!;
 	tab_order: Array<Uuid> = $state()!;

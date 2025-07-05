@@ -1,4 +1,4 @@
-// @slop claude_opus_4
+// @slop Claude Sonnet 3.7
 
 import type {Action} from 'svelte/action';
 import type {Snippet} from 'svelte';

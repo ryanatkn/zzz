@@ -158,10 +158,10 @@
 
 					<div class="panel p_md">
 						<h2 class="mt_0 mb_lg">
-							<a href="{base}/projects/{project.id}/repos">Repositories</a>
+							<a href="{base}/projects/{project.id}/repos">Repos</a>
 						</h2>
 						{#if project.repos.length === 0}
-							<p class="text_color_5">No repositories configured yet.</p>
+							<p class="text_color_5">No repos configured yet.</p>
 						{:else}
 							<ul class="repos_list">
 								{#each project.repos as repo (repo.id)}

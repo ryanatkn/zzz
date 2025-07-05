@@ -8,7 +8,7 @@ import {source_file_to_diskfile_json} from '$lib/diskfile_helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
-import {create_single_index, create_multi_index} from '$lib/indexed_collection_helpers.js';
+import {create_single_index, create_multi_index} from '$lib/indexed_collection_helpers.svelte.js';
 import {Diskfiles_Editor} from '$lib/diskfiles_editor.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import type {Action_Inputs} from '$lib/action_collections.js';
@@ -141,7 +141,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 
 	async create_file(filename: string, content: string = ''): Promise<void> {
 		if (!this.app.zzz_cache_dir) {
-			throw new Error('Cannot create file: zzz_dir is not set');
+			throw new Error('cannot create file: zzz_dir is not set');
 		}
 
 		// Create full path by joining zzz_dir with the filename
@@ -153,7 +153,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 
 	async create_directory(dirname: string): Promise<void> {
 		if (!this.app.zzz_cache_dir) {
-			throw new Error('Cannot create directory: zzz_dir is not set');
+			throw new Error('cannot create directory: zzz_dir is not set');
 		}
 
 		// Create full path by joining zzz_dir with the directory name

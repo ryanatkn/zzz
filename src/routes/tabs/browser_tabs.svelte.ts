@@ -4,7 +4,7 @@ import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
-import {create_single_index, create_derived_index} from '$lib/indexed_collection_helpers.js';
+import {create_single_index, create_derived_index} from '$lib/indexed_collection_helpers.svelte.js';
 import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import {
@@ -41,7 +41,7 @@ export class Browser_Tabs extends Cell<typeof Browser_Tabs_Json> {
 			}),
 			create_derived_index({
 				key: 'manual_order',
-				compute: (collection) => Array.from(collection.by_id.values()),
+				compute: (collection) => collection.values,
 				result_schema: z.array(Browser_Tab_Schema),
 			}),
 		],

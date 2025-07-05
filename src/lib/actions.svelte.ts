@@ -5,7 +5,7 @@ import {Action, Action_Json, Action_Schema, type Action_Json_Input} from '$lib/a
 import {Action_Method} from '$lib/action_metatypes.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
-import {create_multi_index} from '$lib/indexed_collection_helpers.js';
+import {create_multi_index} from '$lib/indexed_collection_helpers.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
 
 export const HISTORY_LIMIT_DEFAULT = 512;

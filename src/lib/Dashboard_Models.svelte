@@ -6,7 +6,9 @@
 
 	const app = frontend_context.get();
 
-	// TODO add search/filtering
+	// TODO make this a table
+
+	// TODO add search/filtering/sorting
 </script>
 
 <div class="p_lg">

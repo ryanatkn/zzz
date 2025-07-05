@@ -25,7 +25,7 @@
 		...rest
 	}: Props = $props();
 
-	if (DEV && label && children) throw new Error('Cannot provide both label and children');
+	if (DEV && label && children) throw new Error('cannot provide both label and children');
 
 	const final_children = $derived(children ?? children_default);
 </script>

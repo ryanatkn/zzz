@@ -1,3 +1,5 @@
+// @slop Claude Sonnet 3.7
+
 import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';

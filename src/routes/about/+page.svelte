@@ -36,11 +36,11 @@
 			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link> 💤
 		</aside>
 		<p>
-			Zzz, pronounced "zees" like bees, is a software project focused on user power and
-			experimentation. The idea is to make a fullstack software environment that adapts to your
+			Zzz, pronounced "zees" like bees, is a fullstack web toolkit with a focus on user power and
+			experimentation. The idea is to make a cross-platform software environment that adapts to your
 			needs and intent while remaining fully open, aligned, and in your control. It's a flexible
-			toolkit for consuming and creating content, developing web software, and crafting experiences
-			with uncompromising UX and DX.
+			toolkit for crafting experiences and tools with maximal UX and DX, like developing web
+			software for creating and consuming content.
 		</p>
 		<p>
 			In the technology landscape of 2025, where LLM-based AI is upending long held assumptions, and <External_Link
@@ -59,26 +59,40 @@
 		<p>
 			The software I imagine answering these questions is cross-platform so it runs everywhere, and
 			for that we have the web with HTML, CSS, and JS. We want to solve problems once and have
-			supported features work consistently whether you're on Windows, macOS, iOS, Android, Linux, or
-			any other OS. For all its flaws and quirks, the web is the turf of our digital commons, and I
-			believe it's capable of delivering a great UX when developers use it with care.
+			supported features work consistently across operating systems and devices. For all its flaws
+			and quirks, the web is the turf of our digital commons, and I believe it's capable of
+			delivering a great UX when developers use it with care.
 		</p>
 		<p>
 			When thinking about the web UX I want, my starting point is the user interface, because we're
-			all users interfacing with machines. If this part isn't up to par, we're sunk before we sail.
-			We want no compromises when it comes to control over our UI runtime, so this means we're using
-			JS (thankfully, TypeScript makes this palatable). Zzz uses JS to glue software and machines
-			together precisely the way you want, maximizing its utility on any device across the full
-			stack. It can run locally on your machine using any of your available capabilities, or it can
-			deploy anywhere JS runs to play whatever role you need.
+			all users interfacing with machines. UX has primacy; the design serves it first. We want no
+			compromises when it comes to control over our UI runtime, so this means we're using JS
+			(thankfully, TypeScript). Zzz uses JS to glue software and machines together precisely the way
+			you want, maximizing its utility on any device across the full stack. It can run locally on
+			your machine using any of your available and granted capabilities, or it can deploy anywhere
+			JS runs to play whatever role you need.
 		</p>
 		<p>
-			Zzz is based on many kinds of software, and it can be used to make any number of mashups of
-			them:
+			Zzz is based on many kinds of software, borrowing features to provide end-users and devs an
+			integrated and extensible system:
 		</p>
 		<ul>
 			<li>
-				web browsers - planned with Chromium via Electron, ideally with swappable browser engines
+				LLM UIs like <External_Link href="https://github.com/Mintplex-Labs/anything-llm"
+					>AnythingLLM</External_Link
+				>, <External_Link href="https://github.com/danny-avila/LibreChat">LibreChat</External_Link>,
+				and <External_Link href="https://github.com/oobabooga/text-generation-webui"
+					>Text generation web UI</External_Link
+				>, like LM Studio but FOSS and designed as a toolkit
+			</li>
+			<li>
+				IDEs like <External_Link href="https://code.visualstudio.com/">VSCode</External_Link> for open-ended
+				tooling and system access
+			</li>
+			<li>
+				web browsers, planned with Chromium via Electron, ideally with swappable browser engines
+				(webview-based toolkits like Tauri do not provide the web-integrated affordances I'm after,
+				I think, but you can use Zzz with Tauri where it supports JS)
 			</li>
 			<li>
 				<External_Link href="https://wikipedia.org/wiki/Content_management_system"
@@ -88,51 +102,43 @@
 				>
 			</li>
 			<li>
-				AI UIs like <External_Link href="https://github.com/Mintplex-Labs/anything-llm"
-					>AnythingLLM</External_Link
-				>, <External_Link href="https://github.com/danny-avila/LibreChat">LibreChat</External_Link>,
-				and <External_Link href="https://github.com/oobabooga/text-generation-webui"
-					>Text generation web UI</External_Link
-				>
-			</li>
-			<li>
-				IDEs like <External_Link href="https://code.visualstudio.com/">VSCode</External_Link> for open-ended
-				tooling and system access
-			</li>
-			<li>
-				code libraries and web metaframeworks using TypeScript and Svelte - Zzz extends <External_Link
-					href="https://svelte.dev/">SvelteKit</External_Link
-				> and <External_Link href="https://vite.dev/">Vite</External_Link> without wrapping them, enabling
-				devs to use Zzz as a library with existing workflows
+				code libraries and web metaframeworks using TypeScript and <External_Link
+					href="https://svelte.dev/">Svelte</External_Link
+				> -- Zzz extends SvelteKit and <External_Link href="https://vite.dev/">Vite</External_Link> without
+				wrapping them, enabling devs to use all or parts of Zzz as a library with existing workflows
 			</li>
 		</ul>
 		<p>
+			Putting it all together, we have a fullstack, fully capable, user-editable, and extensible
+			system-and-toolkit that bridges dev workflows to end-user experiences, without prescribing
+			changes to current behaviors and expectations.
+		</p>
+		<p>
 			This scope may look far-fetched, and it is to me, but I'm just making tools that I want to use
-			<em>now</em> on the best foundations I can assemble, with at least vague awareness of the endgame.
-			I think the most successful version of Zzz is where it's used to build other systems, with different
-			ideas and brands. Many of the initial systems have been designed with some thought towards this
-			bigger picture, but it's too big an idea to be anywhere near complete, and I plan to continue building
-			incrementally on a quality base with some experiements mixed in.
+			now on the best foundations I can assemble. I think the most successful version of Zzz is
+			where it's used to build other systems, and it fades into the background as just another tool
+			with a particular take on a part of the stack. From a personal POV, it's my flagship project
+			and primary+priority user of my other software, and I plan to make various websites and tools
+			with it. Many of the initial systems have been designed with some thought towards this bigger
+			picture, and I plan to continue building incrementally on a quality base with some
+			lower-quality experiments and stubbed future features mixed in.
 		</p>
 		<p>
-			Zzz must be easy to use and inclusive of people and devices, but it can't cater to everyone --
-			however thanks to the magic of standards-based interoperability, Zzz works with all websites,
-			like any other browser, and anything you make with Zzz works with other browsers and web
-			technologies. It's just one way to use the web.
+			Zzz wants to be easy to use and inclusive of people and devices, but try as it might, it can't
+			cater to every case for every person -- however, thanks to the magic of standards-based
+			interoperability, Zzz works with all websites like you'd expect from a browser, and anything
+			you make with Zzz works with other browsers and web technologies. It's one of infinite ways to
+			use the web, and it's designed to help you level up your technical knowledge and abilities, if
+			you're so inclined.
 		</p>
-		<p>
-			I've been thinking about and prototyping related ideas for more than 13 years, and for the
-			last 6 I've been working on my open source projects full-time, so there's a lot of thought and
-			plans already formulated, but this iteration of Zzz was released after about 5 months from
-			here I'm prioritizing user feedback and just shipping a
-			continuously-improving-but-not-quite-usable proof-of-concept. I'm doing a lot of experimenting
-			in places, so data and API stability aren't yet priorities. Some early (rough) integrations
-			include:
-		</p>
+		<p>Some early (rough) integrations include:</p>
 		<ul>
 			<li>
 				<External_Link href="https://github.com/ollama/ollama">Ollama</External_Link> runs AI models
-				locally - more local LLM backends will be supported, this choice was an easy first step
+				locally -- more local LLM backends will be supported starting with <External_Link
+					href="https://github.com/ggml-org/llama.cpp">llama.cpp</External_Link
+				> which Ollama is based on -- Ollama prioritizes ease of use, so although you have to install
+				it yourself separately, they make it about as easy as possible
 			</li>
 			<li>
 				<External_Link href="https://github.com/openai/openai-node">ChatGPT</External_Link>,
@@ -140,25 +146,35 @@
 					>Claude</External_Link
 				>, and <External_Link href="https://github.com/google-gemini/generative-ai-js"
 					>Gemini</External_Link
-				> - requires API keys
+				> -- requires you to bring your own API keys
 			</li>
 			<li>
 				<External_Link href="https://hono.dev/">Hono</External_Link> as the web server with
 				<External_Link href="https://svelte.dev/">SvelteKit</External_Link> and <External_Link
 					href="https://vite.dev/">Vite</External_Link
-				>, plays a key coordinating role - Hono bases itself on web standards and supports all JS
+				>, plays a key coordinating role -- Hono bases itself on web standards and supports all JS
 				server runtimes
 			</li>
 			<li>
-				Planned:
+				planned:
 				<ul>
 					<li>
 						<!-- TODO @db -->
-						<External_Link href="https://github.com/electric-sql/pglite">pglite</External_Link> via
-						<External_Link href="https://github.com/drizzle-team/drizzle-orm">Drizzle</External_Link
-						> and full <External_Link href="https://www.postgresql.org/">Postgres</External_Link> when
-						desired, see <External_Link href="https://github.com/ryanatkn/zzz/issues/7"
+						<External_Link href="https://github.com/electric-sql/pglite">pglite</External_Link>
+						and full <External_Link href="https://www.postgresql.org/">Postgres</External_Link> when
+						desired, using <External_Link href="https://github.com/drizzle-team/drizzle-orm"
+							>Drizzle</External_Link
+						> or maybe <External_Link href="https://github.com/porsager/postgres"
+							>postgres</External_Link
+						>, see <External_Link href="https://github.com/ryanatkn/zzz/issues/7"
 							>issue #7</External_Link
+						>
+					</li>
+					<li>
+						<External_Link href="https://modelcontextprotocol.io/"
+							>Model Context Protocol</External_Link
+						>, maybe others like <External_Link href="https://github.com/google/A2A"
+							>Agent2Agent (A2A) protocol</External_Link
 						>
 					</li>
 					<li>
@@ -174,21 +190,13 @@
 						<External_Link href="https://atproto.com/">AT Protocol</External_Link>
 					</li>
 					<li>
-						probably <External_Link href="https://modelcontextprotocol.io/"
-							>Model Context Protocol</External_Link
-						>
-						and <External_Link href="https://github.com/google/A2A"
-							>Agent2Agent (A2A) protocol</External_Link
-						>
-					</li>
-					<li>
 						I think it makes sense to prioritize a few high-utility integrations for manipulating
 						media files, like <External_Link href="https://pandoc.org/">Pandoc</External_Link>,
 						<External_Link href="https://ffmpeg.org/">ffmpeg</External_Link>, and <External_Link
 							href="https://imagemagick.org/">ImageMagick</External_Link
 						>
 					</li>
-					<li>more, please send feedback/requests/help</li>
+					<li>more, please send thoughts</li>
 				</ul>
 			</li>
 		</ul>
@@ -201,7 +209,7 @@
 		</p>
 		<p>
 			If this sounds interesting and you would like to test out some broken pre-release software,
-			input is appreciated to help make it work for you -- see the <External_Link
+			feedback is appreciated to help make it work for you -- see the <External_Link
 				href="https://github.com/ryanatkn/zzz">code</External_Link
 			>,
 			<External_Link href="https://github.com/ryanatkn/zzz/issues">issues</External_Link>, and
@@ -222,7 +230,9 @@
 			</li>
 			<li>
 				I'm looking for <a href="https://www.ryanatkn.com/funding">funding</a> to sustain my continued
-				full-time work - if successful, I think Zzz will be stewarded by some kind of nonprofit
+				full-time work - if successful, I think Zzz will be stewarded by some kind of nonprofit, and
+				I'm open to employment that sponsors at least part-time work on Zzz and its dependencies (without
+				changing the independence I have over my repos)
 			</li>
 		</ul>
 	</section>
@@ -230,9 +240,9 @@
 	<section>
 		<h2 class="mb_lg">Into the future</h2>
 		<p class="mb_md">
-			This project has a huge scope and it's early in development. What you're seeing is a small
-			fraction of the idea -- especially if you're viewing this on the website not natively via Node
-			-- so here's a button for previewing some of what's planned:
+			This project has a big scope and it's early in development. What you're seeing is a small part
+			of the idea -- especially if you're viewing this on the website not natively via Node -- so
+			here's a button for previewing some of what's planned:
 		</p>
 		<button
 			type="button"

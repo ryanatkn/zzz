@@ -25,12 +25,17 @@ const log = new Logger('[server]');
 const create_server = (): void => {
 	// TODO better config
 	const config = create_config();
+	// Security: allow only the configured server URL, extend with care
 	const allowed_origins = [SERVER_URL];
 
 	// TODO better logging
 	log.info('creating server', {config, ZZZ_DIR, allowed_origins});
 
 	const app = new Hono();
+
+	// Security: first verify the origin of incoming requests
+	app.use(verify_origin(allowed_origins));
+
 	const {injectWebSocket, upgradeWebSocket} = createNodeWebSocket({app});
 
 	const backend = new Backend({
@@ -40,8 +45,6 @@ const create_server = (): void => {
 		action_handlers: backend_action_handlers,
 		handle_filer_change,
 	});
-
-	app.use(verify_origin(allowed_origins));
 
 	// TODO options for everything, maybe a nullable array and an enable/disable flag
 

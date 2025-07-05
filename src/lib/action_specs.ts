@@ -11,6 +11,18 @@ import {
 import {Completion_Request, Completion_Response} from '$lib/completion_types.js';
 import type {Action_Spec_Union} from '$lib/action_spec.js';
 import {Jsonrpc_Request_Id} from '$lib/jsonrpc.js';
+import {
+	Ollama_List_Request,
+	Ollama_List_Response,
+	Ollama_Ps_Request,
+	Ollama_Ps_Response,
+	Ollama_Show_Request,
+	Ollama_Show_Response,
+	Ollama_Pull_Request,
+	Ollama_Delete_Request,
+	Ollama_Copy_Request,
+	Ollama_Create_Request,
+} from '$lib/ollama_helpers.js';
 
 // TODO I tried using the helper `create_action_spec` but I don't see how to get proper typing,
 // we want the declared specs to have their literal types but not need to include optional properties
@@ -145,4 +157,81 @@ export const toggle_main_menu_action_spec = {
 	input: z.object({show: z.boolean().optional()}).optional(),
 	output: z.object({show: z.boolean()}),
 	async: false,
+} satisfies Action_Spec_Union;
+
+export const ollama_list_action_spec = {
+	method: 'ollama_list',
+	kind: 'local_call',
+	initiator: 'frontend',
+	auth: null,
+	side_effects: null,
+	input: Ollama_List_Request,
+	output: Ollama_List_Response,
+	async: true,
+} satisfies Action_Spec_Union;
+
+export const ollama_ps_action_spec = {
+	method: 'ollama_ps',
+	kind: 'local_call',
+	initiator: 'frontend',
+	auth: null,
+	side_effects: null,
+	input: Ollama_Ps_Request,
+	output: Ollama_Ps_Response,
+	async: true,
+} satisfies Action_Spec_Union;
+
+export const ollama_show_action_spec = {
+	method: 'ollama_show',
+	kind: 'local_call',
+	initiator: 'frontend',
+	auth: null,
+	side_effects: null,
+	input: Ollama_Show_Request,
+	output: Ollama_Show_Response,
+	async: true,
+} satisfies Action_Spec_Union;
+
+export const ollama_pull_action_spec = {
+	method: 'ollama_pull',
+	kind: 'local_call',
+	initiator: 'frontend',
+	auth: null,
+	side_effects: true,
+	input: Ollama_Pull_Request,
+	output: z.void().optional(),
+	async: true,
+} satisfies Action_Spec_Union;
+
+export const ollama_delete_action_spec = {
+	method: 'ollama_delete',
+	kind: 'local_call',
+	initiator: 'frontend',
+	auth: null,
+	side_effects: true,
+	input: Ollama_Delete_Request,
+	output: z.void().optional(),
+	async: true,
+} satisfies Action_Spec_Union;
+
+export const ollama_copy_action_spec = {
+	method: 'ollama_copy',
+	kind: 'local_call',
+	initiator: 'frontend',
+	auth: null,
+	side_effects: true,
+	input: Ollama_Copy_Request,
+	output: z.void().optional(),
+	async: true,
+} satisfies Action_Spec_Union;
+
+export const ollama_create_action_spec = {
+	method: 'ollama_create',
+	kind: 'local_call',
+	initiator: 'frontend',
+	auth: null,
+	side_effects: true,
+	input: Ollama_Create_Request,
+	output: z.void().optional(),
+	async: true,
 } satisfies Action_Spec_Union;

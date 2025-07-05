@@ -1,5 +1,4 @@
 import {z} from 'zod';
-import {format} from 'date-fns';
 
 import {
 	get_field_schema,
@@ -13,12 +12,10 @@ import {
 	get_schema_class_info,
 	type Schema_Class_Info,
 	HANDLED,
-	FILE_SHORT_DATE_FORMAT,
-	FILE_DATETIME_FORMAT,
-	FILE_TIME_FORMAT,
 	type Cell_Value_Decoder,
 } from '$lib/cell_helpers.js';
 import type {Schema_Keys, Cell_Json, Cell_Json_Input} from '$lib/cell_types.js';
+import {format_datetime, format_short_date, format_time} from '$lib/time_helpers.js';
 
 /**
  * Any options besides these declared ones are ignored,
@@ -51,11 +48,13 @@ let global_cell_count = 0;
  *
  * - Integration with Svelte's reactivity, encouraging single-depth inheritance
  * 		with Svelte class patterns for both persistent and ephemeral state
- * - Schema-driven parsing/validation and JSON serialization/deserialization via Zod
- * 		(I plan to evaluate ArkType soon)
+ * - Schema-driven parsing/validation and JSON serialization/deserialization
+ * 		(supporting snapshot and restore/replay patterns)
+ * 		via Zod (I plan to evaluate ArkType soon)
  * - Custom property encoding/decoding for complex types,
  * 		and no boilerplate for schema-inferrable properties
  * - Lifecycle management with generic instantiation/registration and disposal
+ * 		(conceptually a WIP, partially implemented)
  * - Runtime type metadata for reflection
  *
  * Cells are automatically registered in the global registry by `id`,
@@ -78,6 +77,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 
 	readonly schema: T_Schema; // TODO currently Zod, but I'm evaluating ArkType soon - Zzz's goals may justify its runtime weight, or maybe precompilation will eventually beat Zod on that point too - https://github.com/arktypeio/arktype/issues/810
 
+	// TODO maybe rename to `fields` or `field_schema_keys`?
 	readonly schema_keys: Array<Schema_Keys<T_Schema>> = $derived.by(() =>
 		zod_get_schema_keys(this.schema),
 	);
@@ -118,24 +118,14 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 	protected decoders: Cell_Value_Decoder<T_Schema> = {};
 
 	readonly created_date: Date = $derived(new Date(this.created));
-	readonly created_formatted_short_date: string = $derived(
-		format(this.created_date, FILE_SHORT_DATE_FORMAT),
-	);
-	readonly created_formatted_datetime: string = $derived(
-		format(this.created_date, FILE_DATETIME_FORMAT),
-	);
-	readonly created_formatted_time: string = $derived(format(this.created_date, FILE_TIME_FORMAT));
+	readonly created_formatted_short_date: string = $derived(format_short_date(this.created_date));
+	readonly created_formatted_datetime: string = $derived(format_datetime(this.created_date));
+	readonly created_formatted_time: string = $derived(format_time(this.created_date));
 
-	readonly updated_date: Date | null = $derived(this.updated ? new Date(this.updated) : null);
-	readonly updated_formatted_short_date: string | null = $derived(
-		this.updated_date ? format(this.updated_date, FILE_SHORT_DATE_FORMAT) : null,
-	);
-	readonly updated_formatted_date: string | null = $derived(
-		this.updated_date ? format(this.updated_date, FILE_DATETIME_FORMAT) : null,
-	);
-	readonly updated_formatted_time: string | null = $derived(
-		this.updated_date ? format(this.updated_date, FILE_TIME_FORMAT) : null,
-	);
+	readonly updated_date: Date = $derived(new Date(this.updated));
+	readonly updated_formatted_short_date: string = $derived(format_short_date(this.updated_date));
+	readonly updated_formatted_date: string = $derived(format_datetime(this.updated_date));
+	readonly updated_formatted_time: string = $derived(format_time(this.updated_date));
 
 	/** Stored only between construction and initialization */
 	#initial_json: z.input<T_Schema> | undefined;

@@ -13,72 +13,68 @@
 	const {chats} = app;
 </script>
 
-<Contextmenu_Chats>
-	<div class="display_flex w_100 h_100">
-		<div class="column_fixed">
-			<div class="py_sm pr_sm">
-				<div class="row gap_xs2 mb_xs pl_xs2">
+<Contextmenu_Chats attrs={{class: 'display_flex w_100 h_100'}}>
+	<div class="column_fixed">
+		<div class="py_sm pr_sm">
+			<div class="row gap_xs2 mb_xs pl_xs2">
+				<button
+					class="plain flex_1 justify_content_start"
+					type="button"
+					onclick={() => chats.add(undefined, true)}
+				>
+					<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new chat
+				</button>
+				{#if chats.items.size > 1}
 					<button
-						class="plain flex_1 justify_content_start"
 						type="button"
-						onclick={() => chats.add(undefined, true)}
+						class="plain compact selectable deselectable"
+						class:selected={chats.show_sort_controls}
+						title="toggle sort controls"
+						onclick={() => chats.toggle_sort_controls()}
 					>
-						<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new chat
+						<Glyph glyph={GLYPH_SORT} />
 					</button>
-					{#if chats.items.size > 1}
-						<button
-							type="button"
-							class="plain compact selectable deselectable"
-							class:selected={chats.show_sort_controls}
-							title="toggle sort controls"
-							onclick={() => chats.toggle_sort_controls()}
-						>
-							<Glyph glyph={GLYPH_SORT} />
-						</button>
-					{/if}
-				</div>
-				{#if chats.items.size}
-					<Chats_List />
 				{/if}
 			</div>
+			{#if chats.items.size}
+				<Chats_List />
+			{/if}
 		</div>
+	</div>
 
-		<div class="column_fluid">
-			{#if chats.selected}
-				<Contextmenu_Chat chat={chats.selected}>
-					<Chat_View chat={chats.selected} />
-				</Contextmenu_Chat>
-			{:else if chats.items.size}
-				<div class="display_flex align_items_center justify_content_center h_100 flex_1">
-					<div class="p_md text_align_center">
-						<p>
-							select a chat from the list,
-							<button
-								type="button"
-								class="inline color_d"
-								onclick={() => chats.add(undefined, true)}>create a new chat</button
-							>, or
-							<button
-								type="button"
-								class="inline color_f"
-								onclick={() => {
-									const chat = random_item(chats.ordered_items);
-									void chats.navigate_to(chat.id);
-								}}>go fish</button
-							>?
-						</p>
-					</div>
-				</div>
-			{:else}
-				<div class="box h_100">
+	<div class="column_fluid">
+		{#if chats.selected}
+			<Contextmenu_Chat chat={chats.selected}>
+				<Chat_View chat={chats.selected} />
+			</Contextmenu_Chat>
+		{:else if chats.items.size}
+			<div class="display_flex align_items_center justify_content_center h_100 flex_1">
+				<div class="p_md text_align_center">
 					<p>
-						no chats yet,
+						select a chat from the list,
 						<button type="button" class="inline color_d" onclick={() => chats.add(undefined, true)}
 							>create a new chat</button
+						>, or
+						<button
+							type="button"
+							class="inline color_f"
+							onclick={() => {
+								const chat = random_item(chats.ordered_items);
+								void chats.navigate_to(chat.id);
+							}}>go fish</button
 						>?
 					</p>
 				</div>
-			{/if}
-		</div>
+			</div>
+		{:else}
+			<div class="box h_100">
+				<p>
+					no chats yet,
+					<button type="button" class="inline color_d" onclick={() => chats.add(undefined, true)}
+						>create a new chat</button
+					>?
+				</p>
+			</div>
+		{/if}
 	</div>
 </Contextmenu_Chats>

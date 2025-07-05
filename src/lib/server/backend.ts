@@ -7,7 +7,7 @@ import {ensure_end} from '@ryanatkn/belt/string.js';
 import type {Action_Spec_Union} from '$lib/action_spec.js';
 import type {Zzz_Config} from '$lib/config_helpers.js';
 import {Diskfile_Path, Zzz_Dir} from '$lib/diskfile_types.js';
-import {Safe_Fs} from '$lib/server/safe_fs.js';
+import {Scoped_Fs} from '$lib/server/scoped_fs.js';
 import {Action_Registry} from '$lib/action_registry.js';
 import {ZZZ_CACHE_DIRNAME} from '$lib/constants.js';
 import {to_zzz_cache_dir} from '$lib/diskfile_helpers.js';
@@ -101,9 +101,9 @@ export class Backend implements Action_Event_Environment {
 	readonly api: Backend_Actions_Api;
 
 	/**
-	 * Safe filesystem interface that restricts operations to allowed directories.
+	 * Scoped filesystem interface that restricts operations to allowed directories.
 	 */
-	readonly safe_fs: Safe_Fs;
+	readonly scoped_fs: Scoped_Fs;
 
 	readonly log: Logger | null;
 
@@ -140,7 +140,7 @@ export class Backend implements Action_Event_Environment {
 
 		this.api = create_backend_actions_api(this);
 
-		this.safe_fs = new Safe_Fs([this.zzz_cache_dir]); // TODO pass filter through on options
+		this.scoped_fs = new Scoped_Fs([this.zzz_cache_dir]); // TODO pass filter through on options
 
 		this.log = options.log === undefined ? new Logger('[backend]') : options.log;
 

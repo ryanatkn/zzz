@@ -4,6 +4,7 @@ import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Provider, Provider_Json} from '$lib/provider.svelte.js';
 import {cell_array} from '$lib/cell_helpers.js';
 import {Cell_Json} from '$lib/cell_types.js';
+import type {Provider_Name} from '$lib/provider_types.js';
 
 export const Providers_Json = Cell_Json.extend({
 	items: cell_array(
@@ -17,6 +18,8 @@ export type Providers_Json_Input = z.input<typeof Providers_Json>;
 export interface Providers_Options extends Cell_Options<typeof Providers_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 export class Providers extends Cell<typeof Providers_Json> {
 	items: Array<Provider> = $state()!; // TODO probably make an indexed collection for convenient querying, despite small N
+
+	names: ReadonlyArray<Provider_Name> = $derived(this.items.map((p) => p.name));
 
 	constructor(options: Providers_Options) {
 		super(Providers_Json, options);

@@ -41,6 +41,41 @@ export interface Frontend_Action_Handlers {
 			action_event: Action_Event<'load_session', Frontend, 'receive_response', 'handling'>,
 		) => void | Promise<void>;
 	};
+	ollama_copy?: {
+		execute?: (
+			action_event: Action_Event<'ollama_copy', Frontend, 'execute', 'handling'>,
+		) => Action_Outputs['ollama_copy'] | Promise<Action_Outputs['ollama_copy']>;
+	};
+	ollama_create?: {
+		execute?: (
+			action_event: Action_Event<'ollama_create', Frontend, 'execute', 'handling'>,
+		) => Action_Outputs['ollama_create'] | Promise<Action_Outputs['ollama_create']>;
+	};
+	ollama_delete?: {
+		execute?: (
+			action_event: Action_Event<'ollama_delete', Frontend, 'execute', 'handling'>,
+		) => Action_Outputs['ollama_delete'] | Promise<Action_Outputs['ollama_delete']>;
+	};
+	ollama_list?: {
+		execute?: (
+			action_event: Action_Event<'ollama_list', Frontend, 'execute', 'handling'>,
+		) => Action_Outputs['ollama_list'] | Promise<Action_Outputs['ollama_list']>;
+	};
+	ollama_ps?: {
+		execute?: (
+			action_event: Action_Event<'ollama_ps', Frontend, 'execute', 'handling'>,
+		) => Action_Outputs['ollama_ps'] | Promise<Action_Outputs['ollama_ps']>;
+	};
+	ollama_pull?: {
+		execute?: (
+			action_event: Action_Event<'ollama_pull', Frontend, 'execute', 'handling'>,
+		) => Action_Outputs['ollama_pull'] | Promise<Action_Outputs['ollama_pull']>;
+	};
+	ollama_show?: {
+		execute?: (
+			action_event: Action_Event<'ollama_show', Frontend, 'execute', 'handling'>,
+		) => Action_Outputs['ollama_show'] | Promise<Action_Outputs['ollama_show']>;
+	};
 	ping?: {
 		send_request?: (
 			action_event: Action_Event<'ping', Frontend, 'send_request', 'handling'>,

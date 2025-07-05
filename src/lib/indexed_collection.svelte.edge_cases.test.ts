@@ -1,4 +1,4 @@
-// @slop claude_opus_4
+// @slop Claude Sonnet 3.7
 
 // @vitest-environment jsdom
 
@@ -11,7 +11,7 @@ import {
 	create_multi_index,
 	create_derived_index,
 	create_dynamic_index,
-} from '$lib/indexed_collection_helpers.js';
+} from '$lib/indexed_collection_helpers.svelte.js';
 import {create_uuid, Uuid} from '$lib/zod_helpers.js';
 
 /* eslint-disable @typescript-eslint/no-empty-function */
@@ -77,7 +77,7 @@ describe('Indexed_Collection - Edge Cases', () => {
 		// Test multi-index with shared array values
 		const tag1_items = collection.where('by_array_a', 'tag1');
 		expect(tag1_items.length).toBe(2);
-		expect(tag1_items.map((i) => i.string_a).sort()).toEqual(['a1', 'a4'].sort());
+		expect(tag1_items.map((i) => i.string_a).sort()).toEqual(['a1', 'a4']);
 
 		// Item with empty array should be excluded from by_array_a index
 		expect(collection.where('by_array_a', undefined)).toHaveLength(0);
@@ -373,7 +373,7 @@ describe('Indexed_Collection - Edge Cases', () => {
 				{
 					key: 'stats',
 					compute: (collection) => {
-						const items = [...collection.by_id.values()];
+						const items = collection.values;
 						return {
 							count: items.length,
 							boolean_a_true_count: items.filter((i) => i.boolean_a).length,
@@ -476,5 +476,404 @@ describe('Indexed_Collection - Edge Cases', () => {
 		expect(stats.sum_number_a).toBe(90);
 		expect(stats.array_a_frequency.tag1).toBe(2);
 		expect(stats.array_a_frequency.tag2).toBe(1);
+	});
+
+	test('multi-index array instance consistency', () => {
+		// Test that multi-indexes return the same array instance for the same key
+		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+			indexes: [
+				create_multi_index({
+					key: 'by_boolean_a',
+					extractor: (item) => item.boolean_a,
+					query_schema: z.boolean(),
+				}),
+			],
+		});
+
+		// Get array before adding items
+		const true_items_before = $derived(collection.where('by_boolean_a', true));
+		const false_items_before = $derived(collection.where('by_boolean_a', false));
+
+		// Add items
+		const item1 = create_test_item('a1', 1, [], true);
+		const item2 = create_test_item('a2', 2, [], false);
+		collection.add_many([item1, item2]);
+
+		// Get arrays after adding items
+		const true_items_after = collection.where('by_boolean_a', true);
+		const false_items_after = collection.where('by_boolean_a', false);
+
+		// Should be the same array instances
+		expect(true_items_before).toBe(true_items_after);
+		expect(false_items_before).toBe(false_items_after);
+
+		// Arrays should have the correct content
+		expect(true_items_after.length).toBe(1);
+		expect(false_items_after.length).toBe(1);
+	});
+
+	test('multi-index reactivity behavior outside reactive context', () => {
+		// Test that arrays are updated but we can't observe reactively outside Svelte components
+		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+			indexes: [
+				create_multi_index({
+					key: 'by_number_group',
+					extractor: (item) => {
+						if (item.number_a === null) return 'null';
+						if (item.number_a < 10) return 'small';
+						if (item.number_a < 50) return 'medium';
+						return 'large';
+					},
+					query_schema: z.string(),
+				}),
+			],
+		});
+
+		// Get initial references
+		const small_items = $derived(collection.where('by_number_group', 'small'));
+		const medium_items = $derived(collection.where('by_number_group', 'medium'));
+		const large_items = $derived(collection.where('by_number_group', 'large'));
+
+		// Initial state
+		expect(small_items.length).toBe(0);
+		expect(medium_items.length).toBe(0);
+		expect(large_items.length).toBe(0);
+
+		// Add items
+		collection.add(create_test_item('a1', 5));
+		expect(small_items.length).toBe(1);
+
+		collection.add(create_test_item('a2', 25));
+		expect(medium_items.length).toBe(1);
+
+		collection.add(create_test_item('a3', 75));
+		expect(large_items.length).toBe(1);
+
+		// Add multiple items
+		collection.add_many([
+			create_test_item('a4', 8),
+			create_test_item('a5', 35),
+			create_test_item('a6', 100),
+		]);
+		expect(small_items.length).toBe(2);
+		expect(medium_items.length).toBe(2);
+		expect(large_items.length).toBe(2);
+	});
+
+	test('multi-index maintains same array with complex extractors', () => {
+		// Test reactivity with extractors that return arrays or undefined
+		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+			indexes: [
+				create_multi_index({
+					key: 'by_tags',
+					extractor: (item) => item.array_a,
+					query_schema: z.string(),
+				}),
+				create_multi_index({
+					key: 'by_conditional_tags',
+					extractor: (item) => {
+						// only index if boolean_a is true
+						return item.boolean_a ? item.array_a : undefined;
+					},
+					query_schema: z.string(),
+				}),
+			],
+		});
+
+		// Get initial references
+		const tag1_items = $derived(collection.where('by_tags', 'tag1'));
+		const tag2_items = $derived(collection.where('by_tags', 'tag2'));
+		const conditional_tag1_items = $derived(collection.where('by_conditional_tags', 'tag1'));
+
+		// Add items with various tag configurations
+		const item1 = create_test_item('a1', 1, ['tag1', 'tag2'], true);
+		const item2 = create_test_item('a2', 2, ['tag2', 'tag3'], false);
+		const item3 = create_test_item('a3', 3, ['tag1', 'tag3'], true);
+
+		collection.add_many([item1, item2, item3]);
+
+		// Verify state
+		expect(tag1_items.length).toBe(2); // item1, item3
+		expect(tag2_items.length).toBe(2); // item1, item2
+		expect(conditional_tag1_items.length).toBe(2); // item1, item3 (both have boolean_a true)
+
+		// Get references again - should be same instances
+		const tag1_items_2 = $derived(collection.where('by_tags', 'tag1'));
+		const tag2_items_2 = $derived(collection.where('by_tags', 'tag2'));
+		const conditional_tag1_items_2 = $derived(collection.where('by_conditional_tags', 'tag1'));
+
+		expect(tag1_items).toBe(tag1_items_2);
+		expect(tag2_items).toBe(tag2_items_2);
+		expect(conditional_tag1_items).toBe(conditional_tag1_items_2);
+	});
+
+	test('multi-index sort functionality', () => {
+		// Test that sorted multi-indexes maintain order
+		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+			indexes: [
+				create_multi_index({
+					key: 'by_boolean_sorted',
+					extractor: (item) => item.boolean_a,
+					sort: (a, b) => (a.number_a || 0) - (b.number_a || 0), // ascending by number
+					query_schema: z.boolean(),
+				}),
+			],
+		});
+
+		// Add items out of order
+		const item1 = create_test_item('a1', 30, [], true);
+		const item2 = create_test_item('a2', 10, [], true);
+		const item3 = create_test_item('a3', 20, [], true);
+
+		collection.add_many([item1, item2, item3]);
+
+		const true_items = collection.where('by_boolean_sorted', true);
+
+		// Verify initial sort order
+		expect(true_items.map((i) => i.string_a)).toEqual(['a2', 'a3', 'a1']);
+
+		// Add new item that should be inserted in middle
+		const item4 = create_test_item('a4', 25, [], true);
+		collection.add(item4);
+
+		// Verify array maintains sort order
+		expect(true_items.map((i) => i.string_a)).toEqual(['a2', 'a3', 'a4', 'a1']);
+
+		// Add item at beginning
+		const item5 = create_test_item('a5', 5, [], true);
+		collection.add(item5);
+
+		expect(true_items.map((i) => i.string_a)).toEqual(['a5', 'a2', 'a3', 'a4', 'a1']);
+
+		// Remove middle item
+		collection.remove(item3.id);
+		expect(true_items.map((i) => i.string_a)).toEqual(['a5', 'a2', 'a4', 'a1']);
+	});
+
+	test('multi-index empty bucket behavior', () => {
+		// Test creation and deletion of empty buckets
+		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+			indexes: [
+				create_multi_index({
+					key: 'by_category',
+					extractor: (item) => item.string_a.split('_')[0], // extract prefix before underscore
+					query_schema: z.string(),
+				}),
+			],
+		});
+
+		// Get initial reference
+		const category_x = $derived(collection.where('by_category', 'x'));
+		expect(category_x.length).toBe(0);
+
+		// Add item to create bucket
+		const item1 = create_test_item('x_1', 1);
+		collection.add(item1);
+		expect(category_x.length).toBe(1);
+
+		// Get new reference - should be same instance
+		const category_x_after = $derived(collection.where('by_category', 'x'));
+		expect(category_x).toBe(category_x_after);
+
+		// Add more items
+		collection.add_many([
+			create_test_item('x_2', 2),
+			create_test_item('x_3', 3),
+			create_test_item('y_1', 4),
+		]);
+
+		expect(category_x.length).toBe(3);
+
+		// Remove all x items
+		const x_ids = category_x.map((item) => item.id);
+		collection.remove_many(x_ids);
+
+		// After removal, the same array is empty
+		expect(category_x_after.length).toBe(0);
+	});
+
+	test('multi-index behavior with bucket deletion and recreation', () => {
+		// Test that buckets are deleted when empty and recreated as needed
+		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+			indexes: [
+				create_multi_index({
+					key: 'by_prefix',
+					extractor: (item) => item.string_a.charAt(0),
+					query_schema: z.string(),
+				}),
+			],
+		});
+
+		// Get reference before adding any items
+		const a_items_1 = $derived(collection.where('by_prefix', 'a'));
+		expect(a_items_1.length).toBe(0);
+
+		// Add and remove items
+		const item1 = create_test_item('a1', 1);
+		collection.add(item1);
+		expect(a_items_1.length).toBe(1);
+
+		collection.remove(item1.id);
+		// The array is now empty
+		expect(a_items_1.length).toBe(0);
+
+		// Add items again - updates the same array
+		const item2 = create_test_item('a2', 2);
+		collection.add(item2);
+		expect(a_items_1.length).toBe(1); // both references see the update
+	});
+
+	test('multi-index with undefined extractor results', () => {
+		// Test indexes that conditionally return undefined
+		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+			indexes: [
+				create_multi_index({
+					key: 'by_even_numbers',
+					extractor: (item) => {
+						if (item.number_a === null) return undefined;
+						if (item.number_a % 2 === 0) return 'even';
+						return undefined; // odd numbers not indexed
+					},
+					query_schema: z.string(),
+				}),
+			],
+		});
+
+		// Add items
+		collection.add_many([
+			create_test_item('a1', 2), // even
+			create_test_item('a2', 3), // odd - not indexed
+			create_test_item('a3', 4), // even
+			create_test_item('a4', null), // null - not indexed
+		]);
+
+		const even_items = collection.where('by_even_numbers', 'even');
+		expect(even_items.length).toBe(2);
+		expect(even_items.map((i) => i.string_a).sort()).toEqual(['a1', 'a3']);
+
+		// Undefined key should return empty array
+		const undefined_items = collection.where('by_even_numbers', undefined);
+		expect(undefined_items.length).toBe(0);
+	});
+
+	test('multi-index preserves array reference consistency', () => {
+		// Comprehensive test of array reference preservation
+		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+			indexes: [
+				create_multi_index({
+					key: 'by_category',
+					extractor: (item) => item.string_a.split('_')[0],
+					query_schema: z.string(),
+				}),
+			],
+		});
+
+		// Step 1: Get initial empty array references
+		const cat_a = $derived(collection.where('by_category', 'a'));
+		const cat_b = $derived(collection.where('by_category', 'b'));
+		expect(cat_a.length).toBe(0);
+		expect(cat_b.length).toBe(0);
+
+		// Step 2: Add items
+		collection.add_many([
+			create_test_item('a_1', 1),
+			create_test_item('a_2', 2),
+			create_test_item('b_1', 3),
+		]);
+
+		// Step 3: Verify same array instances are updated
+		expect(cat_a.length).toBe(2);
+		expect(cat_b.length).toBe(1);
+		expect(collection.where('by_category', 'a')).toBe(cat_a);
+		expect(collection.where('by_category', 'b')).toBe(cat_b);
+
+		// Step 4: Remove some items
+		const a_1 = cat_a.find((i) => i.string_a === 'a_1');
+		collection.remove(a_1!.id);
+		expect(cat_a.length).toBe(1);
+
+		// Step 5: Remove all items from a category
+		const a_2 = cat_a.find((i) => i.string_a === 'a_2');
+		collection.remove(a_2!.id);
+		// Array is now empty but still exists
+		expect(cat_a.length).toBe(0);
+
+		// Step 6: Verify we still get the same instance
+		const cat_a_new = collection.where('by_category', 'a');
+		expect(cat_a_new.length).toBe(0);
+	});
+
+	test('reactive context tracking with $derived', () => {
+		// Test that reactivity works properly in reactive contexts
+		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+			indexes: [
+				create_multi_index({
+					key: 'by_boolean_a',
+					extractor: (item) => item.boolean_a,
+					query_schema: z.boolean(),
+				}),
+			],
+		});
+
+		// Create derived values that track array lengths
+		const true_count = $derived(collection.where('by_boolean_a', true).length);
+		const false_count = $derived(collection.where('by_boolean_a', false).length);
+
+		// Initial state
+		expect(true_count).toBe(0);
+		expect(false_count).toBe(0);
+
+		// Add items
+		collection.add_many([
+			create_test_item('a1', 1, [], true),
+			create_test_item('a2', 2, [], false),
+			create_test_item('a3', 3, [], true),
+		]);
+
+		// Derived values should update
+		expect(true_count).toBe(2);
+		expect(false_count).toBe(1);
+
+		// Remove an item
+		const items = collection.where('by_boolean_a', true);
+		collection.remove(items[0].id);
+
+		expect(true_count).toBe(1);
+		expect(false_count).toBe(1);
+	});
+
+	test('multi-index with $state creates reactive arrays', () => {
+		// Test that the $state([]) in add_to_multi_map creates reactive arrays
+		const collection: Indexed_Collection<Test_Item> = new Indexed_Collection({
+			indexes: [
+				create_multi_index({
+					key: 'by_tags',
+					extractor: (item) => item.array_a,
+					query_schema: z.string(),
+				}),
+			],
+		});
+
+		// Create reactive context to observe changes
+		const tag1_derived_length = $derived(collection.where('by_tags', 'tag1').length);
+
+		// Initial state
+		expect(tag1_derived_length).toBe(0);
+
+		// Add items
+		collection.add_many([
+			create_test_item('a1', 1, ['tag1', 'tag2']),
+			create_test_item('a2', 2, ['tag1', 'tag3']),
+		]);
+
+		// Derived value should update
+		expect(tag1_derived_length).toBe(2);
+
+		// Remove an item
+		const tag1_items = collection.where('by_tags', 'tag1');
+		collection.remove(tag1_items[0].id);
+
+		// Derived value should update again
+		expect(tag1_derived_length).toBe(1);
 	});
 });

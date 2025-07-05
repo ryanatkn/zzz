@@ -1,4 +1,4 @@
-// @slop claude_opus_4
+// @slop Claude Sonnet 3.7
 
 import {describe, test, expect} from 'vitest';
 import {z} from 'zod';

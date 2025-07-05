@@ -7,15 +7,14 @@ import {Action_Method} from '$lib/action_metatypes.js';
 import {Action_Kind} from '$lib/action_types.js';
 import {Action_Specs} from '$lib/action_collections.js';
 import type {Action_Spec_Union} from '$lib/action_spec.js';
-import {type Action_Event, parse_action_event} from '$lib/action_event.js';
-import {HANDLED} from '$lib/cell_helpers.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import {Action_Event_Data} from '$lib/action_event_data.js';
+import type {Action_Event} from './action_event.js';
 
 // TODO this isnt in action_types.ts because of circular dependencies, idk what pattern is best yet
 export const Action_Json = Cell_Json.extend({
 	method: Action_Method,
-	action_event: Action_Event_Data,
+	action_event: Action_Event_Data.optional(),
 });
 export type Action_Json = z.infer<typeof Action_Json>;
 export type Action_Json_Input = z.input<typeof Action_Json>;
@@ -28,7 +27,8 @@ export interface Action_Options extends Cell_Options<typeof Action_Json> {} // e
 export class Action extends Cell<typeof Action_Json> {
 	method: Action_Method = $state()!;
 
-	action_event: Action_Event | undefined = $state.raw();
+	// TODO maybe use a decoder to make this an `Action_Event`
+	action_event: Action_Event_Data | undefined = $state.raw();
 
 	readonly spec: Action_Spec_Union = $derived.by(() => {
 		const s = Action_Specs[this.method] as Action_Spec_Union | undefined; // TODO refactor
@@ -36,34 +36,32 @@ export class Action extends Cell<typeof Action_Json> {
 		return s;
 	});
 
-	kind: Action_Kind = $derived(this.spec.kind);
+	readonly kind: Action_Kind = $derived(this.spec.kind);
 
-	readonly data = $derived(this.action_event?.data);
+	readonly has_error = $derived(!!this.action_event?.error);
 
-	readonly has_error = $derived(!!this.data?.error);
+	readonly pending = $derived(this.action_event?.step === 'handling');
+	readonly failed = $derived(this.action_event?.step === 'failed');
+	readonly success = $derived(this.action_event?.step === 'handled');
 
 	constructor(options: Action_Options) {
 		super(Action_Json, options);
-
-		this.decoders = {
-			action_event: (data) => {
-				if (data) {
-					// TODO maybe try/catch in the base class?
-					try {
-						this.action_event = parse_action_event(data, this.app);
-					} catch (error) {
-						console.error('Failed to reconstruct action event:', error);
-					}
-				}
-				return HANDLED;
-			},
-		};
-
 		this.init();
 	}
 
-	update_from_event(action_event: Action_Event): void {
-		this.action_event?.set_data(action_event.toJSON());
+	// TODO @api temporary hacking this, rethink the reactivity/action_event usage with this class
+	unlisten_to_action_event: (() => void) | undefined;
+	listen_to_action_event(action_event: Action_Event): void {
+		this.unlisten_to_action_event?.();
+		this.unlisten_to_action_event = action_event.observe((new_data) => {
+			this.action_event = new_data;
+		});
+	}
+
+	// TODO automatic cleanup with a cell API
+	override dispose(): void {
+		super.dispose();
+		this.unlisten_to_action_event?.();
 	}
 }
 

@@ -9,7 +9,8 @@ import {create_uuid} from '$lib/zod_helpers.js';
 // TODO @many refactor with db
 
 // Configuration defaults
-export const SYSTEM_MESSAGE_DEFAULT = 'You are a helpful assistant that responds succinctly.'; // TODO without the succinctly part? I dont think splitting it for DEV makes sense
+export const SYSTEM_MESSAGE_DEFAULT =
+	'You are a helpful assistant that responds succinctly unless asked for more.';
 export const OUTPUT_TOKEN_MAX_DEFAULT = 1000;
 export const TEMPERATURE_DEFAULT = 0;
 export const SEED_DEFAULT: number | undefined = undefined;
@@ -19,262 +20,64 @@ export const FREQUENCY_PENALTY_DEFAULT: number | undefined = undefined;
 export const PRESENCE_PENALTY_DEFAULT: number | undefined = undefined;
 export const STOP_SEQUENCES_DEFAULT: Array<string> | undefined = undefined;
 export const BOTS_DEFAULT = {
-	namerbot: 'llama3.2:1b',
+	namerbot: 'gemma3:1b',
 };
 
-// TODO needs work, hardcoding a bunch of stuff for now
-
-// TODO other providers, or some generic one? (vercel, mistral, ...)
-
-// TODO add WebLLM ? https://github.com/mlc-ai/web-llm - others?
+// TODO needs work, hardcoding a bunch of stuff for now, and needs more support for different providers
 
 export const providers_default: Array<Provider_Json_Input> = [
-	{
-		name: 'ollama',
-		icon: '',
-		title: 'Ollama',
-		url: 'https://github.com/ollama/ollama',
-	},
-	{
-		name: 'claude',
-		icon: '',
-		title: 'Claude',
-		url: 'https://docs.anthropic.com/en/home',
-	},
-	{
-		name: 'chatgpt',
-		icon: '',
-		title: 'ChatGPT',
-		url: 'https://platform.openai.com/docs/overview',
-	},
-	{
-		name: 'gemini',
-		icon: '',
-		title: 'Gemini',
-		url: 'https://ai.google.dev/gemini-api/docs/',
-	},
+	{name: 'ollama', title: 'Ollama', url: 'https://github.com/ollama/ollama/tree/main/docs'},
+	{name: 'claude', title: 'Claude', url: 'https://docs.anthropic.com/en/home'},
+	{name: 'chatgpt', title: 'ChatGPT', url: 'https://platform.openai.com/docs/overview'},
+	{name: 'gemini', title: 'Gemini', url: 'https://ai.google.dev/gemini-api/docs/'},
 ];
 
-// TODO duplicating this data isn't great, it's just temporary measures for UX
+// TODO any data here beyond name/provider_name/tags (and probably some future ones) should be fetched from the provider API
+// TODO @db refactor with db
 export const models_default: Array<z.input<typeof Model_Json>> = [
-	{
-		name: 'llama3.2:3b',
-		provider_name: 'ollama',
-		tags: ['llama', 'llama3'],
-		architecture: 'llama',
-		parameter_count: 3.21,
-		context_window: 131_072,
-		output_token_limit: 8_192,
-		embedding_length: 3_072,
-		filesize: 2.0,
-		training_cutoff: 'December 2023',
-	},
-	{
-		name: 'llama3.2:1b',
-		provider_name: 'ollama',
-		tags: ['llama', 'llama3', 'small'],
-		architecture: 'llama',
-		parameter_count: 1.24,
-		context_window: 131_072,
-		output_token_limit: 8_192,
-		embedding_length: 2_048,
-		filesize: 1.3,
-		training_cutoff: 'December 2023',
-	},
-	{
-		name: 'gemma3:1b',
-		provider_name: 'ollama',
-		tags: ['gemma', 'small'],
-		architecture: 'gemma3',
-		parameter_count: 1.0,
-		context_window: 32_768,
-		output_token_limit: 6_912,
-		embedding_length: 1_152,
-		filesize: 0.815,
-	},
-	{
-		name: 'gemma3:4b',
-		provider_name: 'ollama',
-		tags: ['gemma', 'small'],
-		architecture: 'gemma3',
-		parameter_count: 4.3,
-		context_window: 8_192,
-		output_token_limit: 10_240,
-		embedding_length: 2_560,
-		filesize: 3.3,
-	},
-	{
-		name: 'qwen2.5:1.5b',
-		provider_name: 'ollama',
-		tags: ['qwen2', 'small'],
-		architecture: 'qwen2',
-		parameter_count: 1.54,
-		context_window: 32_768,
-		output_token_limit: 8_960,
-		embedding_length: 1_536,
-		filesize: 0.986,
-	},
-	{
-		name: 'qwen2.5:0.5b',
-		provider_name: 'ollama',
-		tags: ['qwen2', 'small'],
-		architecture: 'qwen2',
-		parameter_count: 0.494,
-		context_window: 32_768,
-		output_token_limit: 4_864,
-		embedding_length: 896,
-		filesize: 0.398,
-	},
-	{
-		name: 'deepseek-r1:7b',
-		provider_name: 'ollama',
-		tags: ['deepseek', 'reasoning'],
-		architecture: 'qwen2',
-		parameter_count: 7.62,
-		context_window: 131_072,
-		output_token_limit: 18_944,
-		embedding_length: 3_584,
-		filesize: 4.7,
-	},
-	{
-		name: 'deepseek-r1:8b',
-		provider_name: 'ollama',
-		tags: ['deepseek', 'reasoning'],
-		architecture: 'llama',
-		parameter_count: 8.03,
-		context_window: 131_072,
-		embedding_length: 4_096,
-		output_token_limit: 14_336,
-		filesize: 4.9,
-	},
-	{
-		name: 'deepseek-r1:1.5b',
-		provider_name: 'ollama',
-		tags: ['deepseek', 'reasoning', 'small'],
-		architecture: 'qwen2',
-		parameter_count: 1.78,
-		context_window: 131_072,
-		output_token_limit: 8_960,
-		embedding_length: 1536,
-		filesize: 1.1,
-	},
-	{
-		name: 'claude-3-5-haiku-20241022',
-		provider_name: 'claude',
-		tags: ['cheap'],
-		context_window: 200_000,
-		output_token_limit: 8_192,
-		cost_input: 3,
-		cost_output: 15,
-		training_cutoff: 'April 2024',
-	},
-	{
-		name: 'claude-3-7-sonnet-20250219',
-		provider_name: 'claude',
-		tags: ['smart'],
-		context_window: 200_000,
-		output_token_limit: 128_192,
-		cost_input: 0.8,
-		cost_output: 4,
-		training_cutoff: 'October 2024',
-	},
-	{
-		name: 'claude-3-5-sonnet-20241022',
-		provider_name: 'claude',
-		tags: ['smart'],
-		context_window: 200_000,
-		output_token_limit: 8_192,
-		cost_input: 0.8,
-		cost_output: 4,
-		training_cutoff: 'July 2024',
-	},
-	{
-		name: 'gpt-4o-mini',
-		provider_name: 'chatgpt',
-		tags: ['cheap'],
-		context_window: 128_000,
-		output_token_limit: 16_384,
-		cost_input: 0.15,
-		cost_output: 0.6,
-	},
-	{
-		name: 'gpt-4o',
-		provider_name: 'chatgpt',
-		tags: ['smart'],
-		context_window: 128_000,
-		output_token_limit: 16_384,
-		cost_input: 2.5,
-		cost_output: 10,
-	},
-	{
-		name: 'chatgpt-4o-latest',
-		provider_name: 'chatgpt',
-		tags: ['smart'],
-		context_window: 128_000,
-		output_token_limit: 16_384,
-		cost_input: 2.5,
-		cost_output: 10,
-	},
+	// https://ollama.com/search
+	{name: 'gemma3n:e2b', provider_name: 'ollama', tags: ['small']},
+	{name: 'gemma3n:e4b', provider_name: 'ollama', tags: ['small']},
+	{name: 'gemma3:1b', provider_name: 'ollama', tags: ['small']},
+	{name: 'gemma3:4b', provider_name: 'ollama', tags: ['small']},
+	{name: 'qwen3:0.6b', provider_name: 'ollama', tags: ['small']},
+	{name: 'qwen3:1.7b', provider_name: 'ollama', tags: ['small']},
+	{name: 'qwen3:4b', provider_name: 'ollama', tags: []},
+	{name: 'qwen3:8b', provider_name: 'ollama', tags: []},
+	{name: 'deepseek-r1:1.5b', provider_name: 'ollama', tags: ['small', 'reasoning']},
+	{name: 'deepseek-r1:7b', provider_name: 'ollama', tags: ['reasoning']},
+	{name: 'deepseek-r1:8b', provider_name: 'ollama', tags: ['reasoning']},
+	{name: 'llama3.2:1b', provider_name: 'ollama', tags: ['small']},
+	{name: 'llama3.2:3b', provider_name: 'ollama', tags: ['small']},
+	{name: 'phi4-mini:3.8b', provider_name: 'ollama', tags: []},
+	{name: 'smollm2:135m', provider_name: 'ollama', tags: ['small']},
+	{name: 'smollm2:360m', provider_name: 'ollama', tags: ['small']},
+	{name: 'smollm2:1.7b', provider_name: 'ollama', tags: ['small']},
+
+	// https://docs.anthropic.com/en/home
+	{name: 'claude-sonnet-4-20250514', provider_name: 'claude', tags: ['smart']}, // name: 'claude-sonnet-4-0'
+	{name: 'claude-opus-4-20250514', provider_name: 'claude', tags: ['smart', 'smarter']}, // name: 'claude-opus-4-0'
+	{name: 'claude-3-7-sonnet-20250219', provider_name: 'claude', tags: ['smart']}, // name: 'claude-3-7-sonnet-latest'
+	{name: 'claude-3-5-haiku-20241022', provider_name: 'claude', tags: ['cheap']}, // name: 'claude-3-5-haiku-latest'
+
+	// https://platform.openai.com/docs/overview
+	{name: 'gpt-4.1-nano-2025-04-14', provider_name: 'chatgpt', tags: ['cheap']},
+	{name: 'gpt-4o-mini-2024-07-18', provider_name: 'chatgpt', tags: ['cheap']},
+	{name: 'gpt-4.1-2025-04-14', provider_name: 'chatgpt', tags: ['smart']},
+	{name: 'gpt-4o-2024-08-06', provider_name: 'chatgpt', tags: ['smart']},
+	{name: 'chatgpt-4o-latest', provider_name: 'chatgpt', tags: ['smart']},
+	// access?
+	{name: 'o4-mini-2025-04-16', provider_name: 'chatgpt', tags: ['reasoning']},
 	// no access :[
-	// {
-	// 	name: 'o1',
-	// 	provider_name: 'chatgpt',
-	// 	tags: ['reasoning', 'smart'],
-	// 	context_window: 200_000,
-	// 	output_token_limit: 100_000,
-	// 	cost_input: 15,
-	// 	cost_output: 60,
-	// },
+	{name: 'o3-2025-04-16', provider_name: 'chatgpt', tags: ['reasoning', 'smart']},
+
+	// https://ai.google.dev/gemini-api/docs/
+	{name: 'gemini-2.5-flash', provider_name: 'gemini', tags: ['cheap']},
+	{name: 'gemini-2.5-pro', provider_name: 'gemini', tags: ['smart']},
 	{
-		name: 'o1-mini',
-		provider_name: 'chatgpt',
-		tags: ['reasoning'],
-		context_window: 128_000,
-		output_token_limit: 65_536,
-		cost_input: 1.1,
-		cost_output: 4.4,
-	},
-	// no access :[
-	// {
-	// 	name: 'o3-mini',
-	// 	provider_name: 'chatgpt',
-	// 	tags: ['reasoning', 'cheap'],
-	// context_window: 200_000,
-	// output_token_limit: 100_000,
-	// 	cost_input: 1.1,
-	// 	cost_output: 4.4,
-	// },
-	{
-		name: 'gemini-2.0-flash-lite-preview-02-05',
+		name: 'gemini-2.5-flash-lite-preview-06-17',
 		provider_name: 'gemini',
-		tags: ['cheaper'],
-		context_window: 1_048_576,
-		output_token_limit: 8_192,
-		cost_input: 0.075,
-		cost_output: 0.3,
-		training_cutoff: 'August 2024',
-	},
-	{
-		name: 'gemini-2.0-flash',
-		provider_name: 'gemini',
-		tags: ['cheap'],
-		context_window: 1_048_576,
-		output_token_limit: 8_192,
-		cost_input: 0.1,
-		cost_output: 0.4,
-		training_cutoff: 'August 2024',
-	},
-	{
-		name: 'gemini-2.0-pro-exp-02-05',
-		provider_name: 'gemini',
-		tags: ['smart'],
-		cost_input: 0.15,
-		cost_output: 0.6,
-	}, // TODO input is $0.075, prompts <= 128k tokens, $0.15, prompts > 128k tokens -- output is $0.30, prompts <= 128k tokens, $0.60, prompts > 128k tokens
-	{
-		name: 'gemini-2.0-flash-thinking-exp-01-21',
-		provider_name: 'gemini',
-		tags: ['cheap', 'reasoning'],
+		tags: ['cheap', 'cheaper'],
 	},
 ];
 
@@ -284,24 +87,45 @@ export const models_default: Array<z.input<typeof Model_Json>> = [
 export const chat_template_defaults: Array<Chat_Template> = [
 	{
 		id: create_uuid(),
-		name: 'small and local',
-		model_names: ['llama3.2:1b', 'gemma3:1b', 'qwen2.5:0.5b'],
-	},
-	{
-		id: create_uuid(),
 		name: 'frontier',
-		model_names: ['claude-3-7-sonnet-20250219', 'chatgpt-4o-latest', 'gemini-2.0-pro-exp-02-05'],
+		model_names: ['claude-opus-4-20250514', 'chatgpt-4o-latest', 'gemini-2.5-pro'],
 	},
 	{
 		id: create_uuid(),
-		name: 'local comparison',
+		name: 'cheap frontier',
 		model_names: [
-			'llama3.2:1b',
-			'llama3.2:3b',
-			'gemma3:1b',
-			'gemma3:4b',
-			'qwen2.5:0.5b',
-			'qwen2.5:1.5b',
+			'claude-3-5-haiku-20241022',
+			'gpt-4.1-nano-2025-04-14',
+			'gpt-4o-mini-2024-07-18',
+			'gemini-2.5-flash',
+			'gemini-2.5-flash-lite-preview-06-17',
 		],
+	},
+	{
+		id: create_uuid(),
+		name: 'local 3-4b',
+		model_names: ['gemma3n:e4b', 'gemma3:4b', 'llama3.2:3b', 'phi4-mini:3.8b', 'qwen3:4b'],
+	},
+	{
+		id: create_uuid(),
+		name: 'local 1-2b',
+		model_names: [
+			'gemma3n:e2b',
+			'gemma3:1b',
+			'llama3.2:1b',
+			'qwen3:1.7b',
+			'deepseek-r1:1.5b',
+			'smollm2:1.7b',
+		],
+	},
+	{
+		id: create_uuid(),
+		name: 'local <1b',
+		model_names: ['qwen3:0.6b', 'smollm2:135m', 'smollm2:360m'],
+	},
+	{
+		id: create_uuid(),
+		name: 'local gemmas',
+		model_names: ['gemma3:1b', 'gemma3n:e2b', 'gemma3n:e4b', 'gemma3:4b'],
 	},
 ];

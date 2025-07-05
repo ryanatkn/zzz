@@ -48,6 +48,9 @@ export class Chat extends Cell<typeof Chat_Json> {
 		return result;
 	});
 
+	// TODO maybe make this settable directly, currently relies on the order of `tapes`
+	readonly current_tape: Tape | undefined = $derived(this.tapes.find((t) => t.enabled));
+
 	readonly enabled_tapes = $derived(this.tapes.filter((t) => t.enabled)); // TODO indexed collection, also disabled variant?
 
 	init_name_status: Async_Status = $state('initial');

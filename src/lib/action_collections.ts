@@ -18,6 +18,13 @@ export const Action_Methods = z.enum([
 	'delete_diskfile',
 	'filer_change',
 	'load_session',
+	'ollama_copy',
+	'ollama_create',
+	'ollama_delete',
+	'ollama_list',
+	'ollama_ps',
+	'ollama_pull',
+	'ollama_show',
 	'ping',
 	'submit_completion',
 	'toggle_main_menu',
@@ -34,6 +41,13 @@ export const Action_Specs = {
 	delete_diskfile: specs.delete_diskfile_action_spec,
 	filer_change: specs.filer_change_action_spec,
 	load_session: specs.load_session_action_spec,
+	ollama_copy: specs.ollama_copy_action_spec,
+	ollama_create: specs.ollama_create_action_spec,
+	ollama_delete: specs.ollama_delete_action_spec,
+	ollama_list: specs.ollama_list_action_spec,
+	ollama_ps: specs.ollama_ps_action_spec,
+	ollama_pull: specs.ollama_pull_action_spec,
+	ollama_show: specs.ollama_show_action_spec,
 	ping: specs.ping_action_spec,
 	submit_completion: specs.submit_completion_action_spec,
 	toggle_main_menu: specs.toggle_main_menu_action_spec,
@@ -44,6 +58,13 @@ export interface Action_Specs {
 	delete_diskfile: typeof specs.delete_diskfile_action_spec;
 	filer_change: typeof specs.filer_change_action_spec;
 	load_session: typeof specs.load_session_action_spec;
+	ollama_copy: typeof specs.ollama_copy_action_spec;
+	ollama_create: typeof specs.ollama_create_action_spec;
+	ollama_delete: typeof specs.ollama_delete_action_spec;
+	ollama_list: typeof specs.ollama_list_action_spec;
+	ollama_ps: typeof specs.ollama_ps_action_spec;
+	ollama_pull: typeof specs.ollama_pull_action_spec;
+	ollama_show: typeof specs.ollama_show_action_spec;
 	ping: typeof specs.ping_action_spec;
 	submit_completion: typeof specs.submit_completion_action_spec;
 	toggle_main_menu: typeof specs.toggle_main_menu_action_spec;
@@ -62,6 +83,13 @@ export const Action_Inputs = {
 	delete_diskfile: specs.delete_diskfile_action_spec.input,
 	filer_change: specs.filer_change_action_spec.input,
 	load_session: specs.load_session_action_spec.input,
+	ollama_copy: specs.ollama_copy_action_spec.input,
+	ollama_create: specs.ollama_create_action_spec.input,
+	ollama_delete: specs.ollama_delete_action_spec.input,
+	ollama_list: specs.ollama_list_action_spec.input,
+	ollama_ps: specs.ollama_ps_action_spec.input,
+	ollama_pull: specs.ollama_pull_action_spec.input,
+	ollama_show: specs.ollama_show_action_spec.input,
 	ping: specs.ping_action_spec.input,
 	submit_completion: specs.submit_completion_action_spec.input,
 	toggle_main_menu: specs.toggle_main_menu_action_spec.input,
@@ -72,6 +100,13 @@ export interface Action_Inputs {
 	delete_diskfile: z.infer<typeof specs.delete_diskfile_action_spec.input>;
 	filer_change: z.infer<typeof specs.filer_change_action_spec.input>;
 	load_session: z.infer<typeof specs.load_session_action_spec.input>;
+	ollama_copy: z.infer<typeof specs.ollama_copy_action_spec.input>;
+	ollama_create: z.infer<typeof specs.ollama_create_action_spec.input>;
+	ollama_delete: z.infer<typeof specs.ollama_delete_action_spec.input>;
+	ollama_list: z.infer<typeof specs.ollama_list_action_spec.input>;
+	ollama_ps: z.infer<typeof specs.ollama_ps_action_spec.input>;
+	ollama_pull: z.infer<typeof specs.ollama_pull_action_spec.input>;
+	ollama_show: z.infer<typeof specs.ollama_show_action_spec.input>;
 	ping: z.infer<typeof specs.ping_action_spec.input>;
 	submit_completion: z.infer<typeof specs.submit_completion_action_spec.input>;
 	toggle_main_menu: z.infer<typeof specs.toggle_main_menu_action_spec.input>;
@@ -88,6 +123,13 @@ export const Action_Outputs = {
 	delete_diskfile: specs.delete_diskfile_action_spec.output,
 	filer_change: specs.filer_change_action_spec.output,
 	load_session: specs.load_session_action_spec.output,
+	ollama_copy: specs.ollama_copy_action_spec.output,
+	ollama_create: specs.ollama_create_action_spec.output,
+	ollama_delete: specs.ollama_delete_action_spec.output,
+	ollama_list: specs.ollama_list_action_spec.output,
+	ollama_ps: specs.ollama_ps_action_spec.output,
+	ollama_pull: specs.ollama_pull_action_spec.output,
+	ollama_show: specs.ollama_show_action_spec.output,
 	ping: specs.ping_action_spec.output,
 	submit_completion: specs.submit_completion_action_spec.output,
 	toggle_main_menu: specs.toggle_main_menu_action_spec.output,
@@ -98,6 +140,13 @@ export interface Action_Outputs {
 	delete_diskfile: z.infer<typeof specs.delete_diskfile_action_spec.output>;
 	filer_change: z.infer<typeof specs.filer_change_action_spec.output>;
 	load_session: z.infer<typeof specs.load_session_action_spec.output>;
+	ollama_copy: z.infer<typeof specs.ollama_copy_action_spec.output>;
+	ollama_create: z.infer<typeof specs.ollama_create_action_spec.output>;
+	ollama_delete: z.infer<typeof specs.ollama_delete_action_spec.output>;
+	ollama_list: z.infer<typeof specs.ollama_list_action_spec.output>;
+	ollama_ps: z.infer<typeof specs.ollama_ps_action_spec.output>;
+	ollama_pull: z.infer<typeof specs.ollama_pull_action_spec.output>;
+	ollama_show: z.infer<typeof specs.ollama_show_action_spec.output>;
 	ping: z.infer<typeof specs.ping_action_spec.output>;
 	submit_completion: z.infer<typeof specs.submit_completion_action_spec.output>;
 	toggle_main_menu: z.infer<typeof specs.toggle_main_menu_action_spec.output>;
@@ -114,6 +163,13 @@ export interface Action_Event_Datas {
 	delete_diskfile: Action_Event_Request_Response_Data<'delete_diskfile'>;
 	filer_change: Action_Event_Remote_Notification_Data<'filer_change'>;
 	load_session: Action_Event_Request_Response_Data<'load_session'>;
+	ollama_copy: Action_Event_Local_Call_Data<'ollama_copy'>;
+	ollama_create: Action_Event_Local_Call_Data<'ollama_create'>;
+	ollama_delete: Action_Event_Local_Call_Data<'ollama_delete'>;
+	ollama_list: Action_Event_Local_Call_Data<'ollama_list'>;
+	ollama_ps: Action_Event_Local_Call_Data<'ollama_ps'>;
+	ollama_pull: Action_Event_Local_Call_Data<'ollama_pull'>;
+	ollama_show: Action_Event_Local_Call_Data<'ollama_show'>;
 	ping: Action_Event_Request_Response_Data<'ping'>;
 	submit_completion: Action_Event_Request_Response_Data<'submit_completion'>;
 	toggle_main_menu: Action_Event_Local_Call_Data<'toggle_main_menu'>;

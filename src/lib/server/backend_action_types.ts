@@ -41,6 +41,13 @@ export interface Backend_Action_Handlers {
 			action_event: Action_Event<'load_session', Backend, 'send_response', 'handling'>,
 		) => void | Promise<void>;
 	};
+	ollama_copy?: never;
+	ollama_create?: never;
+	ollama_delete?: never;
+	ollama_list?: never;
+	ollama_ps?: never;
+	ollama_pull?: never;
+	ollama_show?: never;
 	ping?: {
 		send_request?: (
 			action_event: Action_Event<'ping', Backend, 'send_request', 'handling'>,

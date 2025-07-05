@@ -1,4 +1,4 @@
-// @slop claude_opus_4
+// @slop Claude Sonnet 3.7
 
 // @vitest-environment jsdom
 
@@ -12,7 +12,7 @@ import {
 	create_derived_index,
 	create_dynamic_index,
 	type Indexed_Item,
-} from '$lib/indexed_collection_helpers.js';
+} from '$lib/indexed_collection_helpers.svelte.js';
 import {create_uuid, Uuid} from '$lib/zod_helpers.js';
 
 // Mock item type that implements Indexed_Item

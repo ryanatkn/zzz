@@ -59,14 +59,14 @@ export const main_nav_items_default: Array<Nav_Item> = [
 		],
 	},
 	{
-		group: 'LLMs',
+		group: 'llms',
 		items: [
 			{label: 'models', href: `${base}/models`, icon: GLYPH_MODEL},
 			{label: 'providers', href: `${base}/providers`, icon: GLYPH_PROVIDER},
 		],
 	},
 	{
-		group: 'System',
+		group: 'system',
 		items: [
 			{label: 'about', href: `${base}/about`, icon: zzz_logo},
 			{label: 'capabilities', href: `${base}/capabilities`, icon: GLYPH_CAPABILITY},

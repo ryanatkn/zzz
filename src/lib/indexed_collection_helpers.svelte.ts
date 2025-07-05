@@ -1,4 +1,4 @@
-// @slop claude_opus_4
+// @slop Claude Sonnet 3.7
 
 import {SvelteMap} from 'svelte/reactivity';
 import {z} from 'zod';
@@ -322,8 +322,11 @@ const add_to_multi_map = <T extends Indexed_Item, K>(
 	if (key === undefined) return;
 
 	let items = map.get(key);
-	if (!items) map.set(key, (items = []));
-	items.push(item);
+	if (!items) {
+		const value = $state([]);
+		map.set(key, (items = value));
+	}
+	items.push(item); // TODO maybe optimize to insert at index=0 (or similar heuristics) using the sort fn
 
 	if (sort) {
 		items.sort(sort); // TODO instead of sorting all, maybe find the insertion index instead?

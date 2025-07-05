@@ -22,7 +22,10 @@ export const is_action_initiator = (v: unknown): v is Action_Initiator =>
 export const Action_Auth = z.union([z.literal('public'), z.literal('authorize')]);
 export type Action_Auth = z.infer<typeof Action_Auth>;
 
-// TODO support a config object when we have the use cases
+// TODO support a config object when we have the use cases,
+// maybe support `false` as a value, possibly instead of `null`?
+// idk I like `null` as the base for things like this
+// and allowing duplicate values seems less than ideal, but maybe is better overall
 export const Action_Side_Effects = z.union([z.literal(true), z.null()]);
 export type Action_Side_Effects = z.infer<typeof Action_Side_Effects>;
 

@@ -4,7 +4,7 @@ import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Bit, Bit_Json, Bit_Schema, type Bit_Json_Input, type Bit_Type} from '$lib/bit.svelte.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
-import {create_single_index} from '$lib/indexed_collection_helpers.js';
+import {create_single_index} from '$lib/indexed_collection_helpers.svelte.js';
 import {Uuid} from '$lib/zod_helpers.js';
 import {get_unique_name} from '$lib/helpers.js';
 import {Cell_Json} from '$lib/cell_types.js';

@@ -3,7 +3,8 @@
 	import Glyph from '$lib/Glyph.svelte';
 	import Settings from '$lib/Settings.svelte';
 	import {frontend_context} from '$lib/frontend.svelte.js';
-
+	import Dashboard_Header from '$lib/Dashboard_Header.svelte';
+	import Time_Widget from '$lib/Time_Widget.svelte';
 	import Footer from '$lib/Footer.svelte';
 
 	const app = frontend_context.get();
@@ -13,10 +14,13 @@
 </script>
 
 <div class="p_lg">
-	<header>
-		<h1><Glyph glyph={GLYPH_SETTINGS} /> system settings</h1>
-	</header>
-	<section class="width_sm">
+	<Dashboard_Header>
+		{#snippet header()}
+			<h1><Glyph glyph={GLYPH_SETTINGS} /> system settings</h1>
+		{/snippet}
+		<Time_Widget value={app.time.now} />
+	</Dashboard_Header>
+	<section class="width_md">
 		<Settings />
 
 		<div class="mt_lg">
@@ -27,7 +31,7 @@
 					show sidebar <code class="ml_md">[backtick `]</code>
 				</label>
 			</div>
-			<div class="my_md">
+			<!-- TODO idk <div class="my_md">
 				<label class="row">
 					<input
 						type="checkbox"
@@ -36,7 +40,7 @@
 					/>
 					show main dialog
 				</label>
-			</div>
+			</div> -->
 		</div>
 	</section>
 	<section class="mb_xl7 display_flex justify_content_center">

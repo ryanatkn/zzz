@@ -1,4 +1,4 @@
-// @slop claude_opus_4
+// @slop Claude Sonnet 3.7
 
 // @vitest-environment jsdom
 
@@ -10,7 +10,7 @@ import {
 	create_derived_index,
 	create_dynamic_index,
 	create_multi_index,
-} from '$lib/indexed_collection_helpers.js';
+} from '$lib/indexed_collection_helpers.svelte.js';
 import {create_uuid, Uuid} from '$lib/zod_helpers.js';
 
 // Mock item type that implements Indexed_Item
@@ -256,11 +256,11 @@ describe('Indexed_Collection - Optimization Tests', () => {
 
 		// Add them in one batch
 		collection.add_many(large_dataset);
-		console.log(`collection.indexes`, $state.snapshot(collection.indexes));
+		// console.log(`collection.indexes`, $state.snapshot(collection.indexes));
 
 		// Verify the index contains the expected number of categories
 		const b_index = collection.get_index<Map<string, Array<Test_Item>>>('by_string_b');
-		console.log(`b_index`, $state.snapshot(b_index));
+		// console.log(`b_index`, $state.snapshot(b_index));
 		expect(b_index.size).toBe(10); // 10 unique categories
 
 		// Verify each category has the right number of items

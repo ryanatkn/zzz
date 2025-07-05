@@ -7,7 +7,7 @@ import {to_completion_response_text} from '$lib/response_helpers.js';
  * Renders the tape's content by combining all chat strips
  * in a format suitable for token counting and display.
  */
-export const render_tape_to_string = (strips: IterableIterator<Strip>): string => {
+export const render_tape_to_string = (strips: Iterable<Strip>): string => {
 	let s = '';
 
 	for (const strip of strips) {
@@ -24,7 +24,7 @@ export const render_tape_to_string = (strips: IterableIterator<Strip>): string =
  * Normalizes content for assistant strips with responses.
  */
 export const render_completion_messages = (
-	strips: IterableIterator<Strip>,
+	strips: Iterable<Strip>,
 	completion_messages: Array<Completion_Message> = [],
 ): Array<Completion_Message> => {
 	for (const strip of strips) {

@@ -22,6 +22,10 @@
 		attrs={{
 			class: 'justify_content_space_between',
 			style: 'min-height: 0;',
+			onclick: () => {
+				// TODO cleaner way to do this?
+				chat.app.chats.pending_chat_id_to_focus = chat.id;
+			},
 		}}
 	>
 		<div class="ellipsis">

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import {slide} from 'svelte/transition';
+	import Details from '@ryanatkn/fuz/Details.svelte';
 
 	import Glyph from '$lib/Glyph.svelte';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
@@ -10,10 +11,10 @@
 	import Chat_View_Simple from '$lib/Chat_View_Simple.svelte';
 	import Chat_View_Multi from '$lib/Chat_View_Multi.svelte';
 	import Toggle_Button from '$lib/Toggle_Button.svelte';
-	import type {Tape} from '$lib/tape.svelte.js';
 	import Chat_Initializer from '$lib/Chat_Initializer.svelte';
 	import Chat_Tape_Add_By_Model from '$lib/Chat_Tape_Add_By_Model.svelte';
 	import Chat_Tape_Manage_By_Tag from '$lib/Chat_Tape_Manage_By_Tag.svelte';
+	import Editable_Text from '$lib/Editable_Text.svelte';
 
 	const app = frontend_context.get();
 	const {chats} = app;
@@ -24,9 +25,9 @@
 
 	const {chat}: Props = $props();
 
-	const first_tape = $derived(chat.tapes[0] as Tape | undefined);
-	const selected_chat = $derived(chats.selected);
-	const empty_chat = $derived(chat.tapes.length === 0);
+	const tape_count = $derived(chat.tapes.length);
+
+	// TODO the add by model stuff is too noisy/overwhelming, needs some redesign
 
 	// TODO clicking tapes should select them, if none selected then default to the first
 
@@ -36,33 +37,31 @@
 
 <div class="flex_1 h_100 display_flex align_items_start">
 	<div class="column_fixed">
-		{#if selected_chat}
+		{#if chat}
 			<section class="column_section" transition:slide>
 				<!-- TODO needs work -->
-				<div class="display_flex justify_content_space_between">
-					<div class="font_size_lg">
-						<Glyph glyph={GLYPH_CHAT} />
-						{selected_chat.name}
-					</div>
+				<div class="font_size_lg display_flex align_items_center">
+					<Glyph glyph={GLYPH_CHAT} />
+					<Editable_Text bind:value={chat.name} />
 				</div>
 				<div class="column">
-					<small title={selected_chat.created_formatted_datetime}
-						>created {selected_chat.created_formatted_short_date}</small
+					<small title={chat.created_formatted_datetime}
+						>created {chat.created_formatted_short_date}</small
 					>
 				</div>
 				<div class="row gap_xs py_xs">
 					<Confirm_Button
-						onconfirm={() => chats.selected_id && chats.remove(chats.selected_id)}
+						onconfirm={() => chat.id && chats.remove(chat.id)}
 						position="right"
 						attrs={{
-							title: `delete chat "${selected_chat.name}"`,
+							title: `delete chat "${chat.name}"`,
 							class: 'plain icon_button',
 						}}
 					>
 						<Glyph glyph={GLYPH_DELETE} />
 						{#snippet popover_button_content()}<Glyph glyph={GLYPH_DELETE} />{/snippet}
 					</Confirm_Button>
-					{#if selected_chat.tapes.length}
+					{#if tape_count}
 						<Toggle_Button
 							active={chat.view_mode === 'simple'}
 							active_content="multi"
@@ -80,10 +79,13 @@
 			</section>
 		{/if}
 
-		{#if !empty_chat && (chat.view_mode !== 'simple' || chat.tapes.length > 1)}
+		{#if tape_count && (chat.view_mode !== 'simple' || tape_count > 1)}
 			<section class="column_section">
-				<header class="mt_0 mb_lg font_size_lg display_flex justify_content_space_between">
-					<span><Glyph glyph={GLYPH_TAPE} /> tapes</span><span>{chat.tapes.length}</span>
+				<header
+					class="mt_0 mb_lg font_size_lg display_flex justify_content_space_between"
+					title="tapes are the individual threads of conversation in a chat -- each chat can have many tapes, comprising its history"
+				>
+					<span><Glyph glyph={GLYPH_TAPE} /> tapes</span><span>{tape_count}</span>
 				</header>
 				<Tape_List {chat} />
 			</section>
@@ -91,21 +93,24 @@
 		{/if}
 
 		{#if chat.view_mode === 'multi'}
-			<section class="column_section">
-				<Chat_Tape_Add_By_Model {chat} />
-			</section>
-			<section class="column_section">
-				<Chat_Tape_Manage_By_Tag {chat} />
-			</section>
+			<Details>
+				{#snippet summary()}manage tapes{/snippet}
+				<section class="column_section">
+					<Chat_Tape_Add_By_Model {chat} />
+				</section>
+				<section class="column_section">
+					<Chat_Tape_Manage_By_Tag {chat} />
+				</section>
+			</Details>
 		{/if}
 	</div>
 
-	{#if empty_chat}
+	{#if !tape_count}
 		<div class="column_fluid p_md">
 			<Chat_Initializer {chat} oninit={(chat_id) => chats.navigate_to(chat_id)} />
 		</div>
 	{:else if chat.view_mode === 'simple'}
-		<Chat_View_Simple {chat} tape={first_tape} />
+		<Chat_View_Simple {chat} tape={chat.current_tape} />
 	{:else}
 		<Chat_View_Multi {chat} />
 	{/if}

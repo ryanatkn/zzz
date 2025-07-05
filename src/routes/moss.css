@@ -219,6 +219,10 @@ a.chip {
 .display_block {
 	display: block;
 }
+/** Same as `display: inline flow`. */
+.display_inline {
+	display: inline;
+}
 /** Same as `display: inline flow-root`. */
 .display_inline_block {
 	display: inline-block;
@@ -264,6 +268,9 @@ a.chip {
 }
 .flex_column {
 	flex-direction: column;
+}
+.shrink_0 {
+	flex-shrink: 0;
 }
 .align_items_center {
 	align-items: center;
@@ -321,6 +328,13 @@ a.chip {
 	font-size: var(--font_size_xl);
 	--font_size: var(--font_size_xl);
 }
+.font_size_xl3 {
+	font-size: var(--font_size_xl3);
+	--font_size: var(--font_size_xl3);
+}
+.text_align_start {
+	text-align: start;
+}
 .text_align_left {
 	text-align: left;
 }
@@ -339,6 +353,10 @@ a.chip {
 .font_weight_400 {
 	font-weight: 400;
 	--font_weight: 400;
+}
+.font_weight_500 {
+	font-weight: 500;
+	--font_weight: 500;
 }
 .font_weight_600 {
 	font-weight: 600;
@@ -362,6 +380,9 @@ a.chip {
 .bg_2 {
 	background-color: var(--bg_2);
 }
+.bg_5 {
+	background-color: var(--bg_5);
+}
 .fg_1 {
 	background-color: var(--fg_1);
 }
@@ -371,6 +392,9 @@ a.chip {
 .color_c_5 {
 	color: var(--color_c_5);
 }
+.bg_a_5 {
+	background-color: var(--color_a_5);
+}
 .bg_c_1 {
 	background-color: var(--color_c_1);
 }
@@ -379,9 +403,6 @@ a.chip {
 }
 .bg_d_2 {
 	background-color: var(--color_d_2);
-}
-.bg_e_1 {
-	background-color: var(--color_e_1);
 }
 .border_color_2 {
 	border-color: var(--border_color_2);
@@ -432,6 +453,9 @@ a.chip {
 .w_100 {
 	width: 100%;
 }
+.w_xl4 {
+	width: var(--space_xl4);
+}
 .h_0 {
 	height: 0;
 }
@@ -468,6 +492,9 @@ a.chip {
 .p_xl3 {
 	padding: var(--space_xl3);
 }
+.pt_0 {
+	padding-top: 0;
+}
 .pt_md {
 	padding-top: var(--space_md);
 }
@@ -491,9 +518,6 @@ a.chip {
 }
 .pb_0 {
 	padding-bottom: 0;
-}
-.pb_xs {
-	padding-bottom: var(--space_xs);
 }
 .pb_xl3 {
 	padding-bottom: var(--space_xl3);
@@ -658,6 +682,10 @@ a.chip {
 	margin-left: auto;
 	margin-right: auto;
 }
+.my_0 {
+	margin-top: 0;
+	margin-bottom: 0;
+}
 .my_xs {
 	margin-top: var(--space_xs);
 	margin-bottom: var(--space_xs);
@@ -688,6 +716,9 @@ a.chip {
 }
 .gap_md {
 	gap: var(--space_md);
+}
+.gap_lg {
+	gap: var(--space_lg);
 }
 .gap_xl {
 	gap: var(--space_xl);

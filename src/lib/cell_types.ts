@@ -17,6 +17,7 @@ export type Schema_Value<T extends z.ZodType, K extends Schema_Keys<T>> = z.infe
 export const Cell_Json = z.object({
 	id: Uuid_With_Default,
 	created: Datetime_Now,
+	/** Required and initially equal to `created`. */
 	updated: Datetime_Now,
 });
 export type Cell_Json = z.infer<typeof Cell_Json>;

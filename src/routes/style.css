@@ -13,7 +13,10 @@ h6 {
 
 textarea {
 	scrollbar-width: thin; /* TODO maybe upstream? */
-	border-radius: var(--border_radius_xs2);
+	border-radius: var(--border_radius_xs2); /* TODO upstream? */
+}
+input {
+	border-radius: var(--border_radius_xs2); /* TODO upstream? */
 }
 
 /* TODO upstream */
@@ -333,6 +336,22 @@ a.chip {
 	background-color: var(--fg_3);
 }
 
+/* TODO hacky for buttons as menu_items, fix upstream, need to think about composability of the classes if it even makes sense */
+button.menu_item.plain {
+	box-shadow: none !important;
+}
+/* TODO also hacky */
+button.menu_item.selected.plain {
+	--button_text_color: var(--text_color_2);
+}
+button.menu_item.plain:hover:not(.selected) {
+	background-color: var(--bg_6);
+}
+/* TODO hacky */
+button.menu_item[disabled] {
+	cursor: default;
+}
+
 /* TODO hacky, is like `.pane` but softer and without the semantics for dialogs, maybe these styles should replace .pane upstream? */
 .floating {
 	--shadow_alpha: 14%;
@@ -342,4 +361,9 @@ a.chip {
 			color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_1)), transparent),
 		var(--shadow_bottom_xs)
 			color-mix(in hsl, var(--shadow_color) var(--shadow_alpha, var(--shadow_alpha_1)), transparent);
+}
+
+/* TODO upstream? */
+pre code {
+	padding: var(--space_xs) var(--space_md);
 }

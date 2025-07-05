@@ -6,7 +6,7 @@ import {Tape_Json, type Tape_Json_Input} from '$lib/tape_types.js';
 import type {Uuid} from '$lib/zod_helpers.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
-import {create_multi_index, create_derived_index} from '$lib/indexed_collection_helpers.js';
+import {create_multi_index, create_derived_index} from '$lib/indexed_collection_helpers.svelte.js';
 import {Model_Name} from '$lib/model.svelte.js';
 import {to_reordered_list} from '$lib/list_helpers.js';
 import {Cell_Json} from '$lib/cell_types.js';
@@ -34,7 +34,7 @@ export class Tapes extends Cell<typeof Tapes_Json> {
 			}),
 			create_derived_index({
 				key: 'manual_order',
-				compute: (collection) => Array.from(collection.by_id.values()),
+				compute: (collection) => collection.values,
 				result_schema: z.array(z.instanceof(Tape)),
 			}),
 		],

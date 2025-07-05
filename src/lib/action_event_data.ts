@@ -23,6 +23,7 @@ export const Action_Event_Data = z.object({
 	input: z.unknown(),
 	output: z.unknown().nullable(),
 	error: Jsonrpc_Error_Json.nullable(),
+	progress: z.unknown().nullable(),
 	// Fields for specific kinds - always present but may be null
 	request: Jsonrpc_Request.nullable(),
 	response: Jsonrpc_Response_Or_Error.nullable(),
@@ -41,6 +42,7 @@ export type Action_Event_Request_Response_Data<T_Method extends Action_Method = 
 			input: unknown;
 			output: null;
 			error: null;
+			progress: null;
 			request: null;
 			response: null;
 			notification: null;
@@ -54,6 +56,7 @@ export type Action_Event_Request_Response_Data<T_Method extends Action_Method = 
 			input: Action_Inputs[T_Method];
 			output: null;
 			error: null;
+			progress: null;
 			request: null;
 			response: null;
 			notification: null;
@@ -67,6 +70,7 @@ export type Action_Event_Request_Response_Data<T_Method extends Action_Method = 
 			input: Action_Inputs[T_Method];
 			output: null;
 			error: null;
+			progress: unknown;
 			request: Jsonrpc_Request;
 			response: null;
 			notification: null;
@@ -80,6 +84,7 @@ export type Action_Event_Request_Response_Data<T_Method extends Action_Method = 
 			input: Action_Inputs[T_Method];
 			output: null;
 			error: null;
+			progress: unknown;
 			request: Jsonrpc_Request;
 			response: null;
 			notification: null;
@@ -93,6 +98,7 @@ export type Action_Event_Request_Response_Data<T_Method extends Action_Method = 
 			input: unknown;
 			output: null;
 			error: Jsonrpc_Error_Json;
+			progress: unknown;
 			request: Jsonrpc_Request | null;
 			response: null;
 			notification: null;
@@ -106,6 +112,7 @@ export type Action_Event_Request_Response_Data<T_Method extends Action_Method = 
 			input: unknown;
 			output: null;
 			error: null;
+			progress: null;
 			request: Jsonrpc_Request;
 			response: null;
 			notification: null;
@@ -119,6 +126,7 @@ export type Action_Event_Request_Response_Data<T_Method extends Action_Method = 
 			input: Action_Inputs[T_Method];
 			output: null;
 			error: null;
+			progress: null;
 			request: Jsonrpc_Request;
 			response: null;
 			notification: null;
@@ -132,6 +140,7 @@ export type Action_Event_Request_Response_Data<T_Method extends Action_Method = 
 			input: Action_Inputs[T_Method];
 			output: null;
 			error: null;
+			progress: unknown;
 			request: Jsonrpc_Request;
 			response: null;
 			notification: null;
@@ -145,6 +154,7 @@ export type Action_Event_Request_Response_Data<T_Method extends Action_Method = 
 			input: Action_Inputs[T_Method];
 			output: Action_Outputs[T_Method];
 			error: null;
+			progress: unknown;
 			request: Jsonrpc_Request;
 			response: null;
 			notification: null;
@@ -158,6 +168,7 @@ export type Action_Event_Request_Response_Data<T_Method extends Action_Method = 
 			input: unknown;
 			output: null;
 			error: Jsonrpc_Error_Json;
+			progress: unknown;
 			request: Jsonrpc_Request;
 			response: null;
 			notification: null;
@@ -171,6 +182,7 @@ export type Action_Event_Request_Response_Data<T_Method extends Action_Method = 
 			input: Action_Inputs[T_Method];
 			output: Action_Outputs[T_Method];
 			error: null;
+			progress: null;
 			request: Jsonrpc_Request;
 			response: Jsonrpc_Response_Or_Error;
 			notification: null;
@@ -184,6 +196,7 @@ export type Action_Event_Request_Response_Data<T_Method extends Action_Method = 
 			input: Action_Inputs[T_Method];
 			output: Action_Outputs[T_Method];
 			error: null;
+			progress: null;
 			request: Jsonrpc_Request;
 			response: Jsonrpc_Response_Or_Error;
 			notification: null;
@@ -197,6 +210,7 @@ export type Action_Event_Request_Response_Data<T_Method extends Action_Method = 
 			input: Action_Inputs[T_Method];
 			output: Action_Outputs[T_Method];
 			error: null;
+			progress: unknown;
 			request: Jsonrpc_Request;
 			response: Jsonrpc_Response_Or_Error;
 			notification: null;
@@ -210,6 +224,7 @@ export type Action_Event_Request_Response_Data<T_Method extends Action_Method = 
 			input: Action_Inputs[T_Method];
 			output: Action_Outputs[T_Method];
 			error: null;
+			progress: unknown;
 			request: Jsonrpc_Request;
 			response: Jsonrpc_Response_Or_Error;
 			notification: null;
@@ -223,6 +238,7 @@ export type Action_Event_Request_Response_Data<T_Method extends Action_Method = 
 			input: Action_Inputs[T_Method];
 			output: Action_Outputs[T_Method] | null;
 			error: Jsonrpc_Error_Json;
+			progress: unknown;
 			request: Jsonrpc_Request;
 			response: Jsonrpc_Response_Or_Error;
 			notification: null;
@@ -236,6 +252,7 @@ export type Action_Event_Request_Response_Data<T_Method extends Action_Method = 
 			input: Action_Inputs[T_Method];
 			output: unknown;
 			error: null;
+			progress: null;
 			request: Jsonrpc_Request;
 			response: Jsonrpc_Response_Or_Error;
 			notification: null;
@@ -249,6 +266,7 @@ export type Action_Event_Request_Response_Data<T_Method extends Action_Method = 
 			input: Action_Inputs[T_Method];
 			output: Action_Outputs[T_Method];
 			error: null;
+			progress: null;
 			request: Jsonrpc_Request;
 			response: Jsonrpc_Response_Or_Error;
 			notification: null;
@@ -262,6 +280,7 @@ export type Action_Event_Request_Response_Data<T_Method extends Action_Method = 
 			input: Action_Inputs[T_Method];
 			output: Action_Outputs[T_Method];
 			error: null;
+			progress: unknown;
 			request: Jsonrpc_Request;
 			response: Jsonrpc_Response_Or_Error;
 			notification: null;
@@ -275,6 +294,7 @@ export type Action_Event_Request_Response_Data<T_Method extends Action_Method = 
 			input: Action_Inputs[T_Method];
 			output: Action_Outputs[T_Method];
 			error: null;
+			progress: unknown;
 			request: Jsonrpc_Request;
 			response: Jsonrpc_Response_Or_Error;
 			notification: null;
@@ -288,6 +308,7 @@ export type Action_Event_Request_Response_Data<T_Method extends Action_Method = 
 			input: Action_Inputs[T_Method];
 			output: Action_Outputs[T_Method] | null;
 			error: Jsonrpc_Error_Json;
+			progress: unknown;
 			request: Jsonrpc_Request;
 			response: Jsonrpc_Response_Or_Error;
 			notification: null;
@@ -303,6 +324,7 @@ export type Action_Event_Remote_Notification_Data<T_Method extends Action_Method
 			input: unknown;
 			output: null;
 			error: null;
+			progress: null;
 			request: null;
 			response: null;
 			notification: null;
@@ -316,6 +338,7 @@ export type Action_Event_Remote_Notification_Data<T_Method extends Action_Method
 			input: Action_Inputs[T_Method];
 			output: null;
 			error: null;
+			progress: null;
 			request: null;
 			response: null;
 			notification: null;
@@ -329,6 +352,7 @@ export type Action_Event_Remote_Notification_Data<T_Method extends Action_Method
 			input: Action_Inputs[T_Method];
 			output: null;
 			error: null;
+			progress: unknown;
 			request: null;
 			response: null;
 			notification: Jsonrpc_Notification;
@@ -342,6 +366,7 @@ export type Action_Event_Remote_Notification_Data<T_Method extends Action_Method
 			input: Action_Inputs[T_Method];
 			output: null;
 			error: null;
+			progress: unknown;
 			request: null;
 			response: null;
 			notification: Jsonrpc_Notification;
@@ -355,6 +380,7 @@ export type Action_Event_Remote_Notification_Data<T_Method extends Action_Method
 			input: unknown;
 			output: null;
 			error: Jsonrpc_Error_Json;
+			progress: unknown;
 			request: null;
 			response: null;
 			notification: Jsonrpc_Notification | null;
@@ -368,6 +394,7 @@ export type Action_Event_Remote_Notification_Data<T_Method extends Action_Method
 			input: unknown;
 			output: null;
 			error: null;
+			progress: null;
 			request: null;
 			response: null;
 			notification: Jsonrpc_Notification;
@@ -381,6 +408,7 @@ export type Action_Event_Remote_Notification_Data<T_Method extends Action_Method
 			input: Action_Inputs[T_Method];
 			output: null;
 			error: null;
+			progress: null;
 			request: null;
 			response: null;
 			notification: Jsonrpc_Notification;
@@ -394,6 +422,7 @@ export type Action_Event_Remote_Notification_Data<T_Method extends Action_Method
 			input: Action_Inputs[T_Method];
 			output: null;
 			error: null;
+			progress: unknown;
 			request: null;
 			response: null;
 			notification: Jsonrpc_Notification;
@@ -407,6 +436,7 @@ export type Action_Event_Remote_Notification_Data<T_Method extends Action_Method
 			input: Action_Inputs[T_Method];
 			output: null;
 			error: null;
+			progress: unknown;
 			request: null;
 			response: null;
 			notification: Jsonrpc_Notification;
@@ -420,6 +450,7 @@ export type Action_Event_Remote_Notification_Data<T_Method extends Action_Method
 			input: unknown;
 			output: null;
 			error: Jsonrpc_Error_Json;
+			progress: unknown;
 			request: null;
 			response: null;
 			notification: Jsonrpc_Notification;
@@ -435,6 +466,7 @@ export type Action_Event_Local_Call_Data<T_Method extends Action_Method = Action
 			input: unknown;
 			output: null;
 			error: null;
+			progress: null;
 			request: null;
 			response: null;
 			notification: null;
@@ -448,6 +480,7 @@ export type Action_Event_Local_Call_Data<T_Method extends Action_Method = Action
 			input: Action_Inputs[T_Method];
 			output: null;
 			error: null;
+			progress: null;
 			request: null;
 			response: null;
 			notification: null;
@@ -461,6 +494,7 @@ export type Action_Event_Local_Call_Data<T_Method extends Action_Method = Action
 			input: Action_Inputs[T_Method];
 			output: null;
 			error: null;
+			progress: unknown;
 			request: null;
 			response: null;
 			notification: null;
@@ -474,6 +508,7 @@ export type Action_Event_Local_Call_Data<T_Method extends Action_Method = Action
 			input: Action_Inputs[T_Method];
 			output: Action_Outputs[T_Method];
 			error: null;
+			progress: unknown;
 			request: null;
 			response: null;
 			notification: null;
@@ -487,6 +522,7 @@ export type Action_Event_Local_Call_Data<T_Method extends Action_Method = Action
 			input: unknown;
 			output: null;
 			error: Jsonrpc_Error_Json;
+			progress: unknown;
 			request: null;
 			response: null;
 			notification: null;

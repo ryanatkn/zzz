@@ -133,9 +133,8 @@
 					{/if}
 
 					{#each section.items as link (link.label)}
-						{@const href = to_nav_link_href(app, link)}
 						<div transition:slide>
-							<Nav_Link {href}>
+							<Nav_Link href={to_nav_link_href(app, link)}>
 								{#snippet children(selected)}
 									{#if typeof link.icon === 'string'}
 										<Glyph glyph={link.icon} attrs={{class: 'icon_xs'}} /> {link.label}

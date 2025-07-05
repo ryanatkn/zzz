@@ -28,6 +28,8 @@
 	const app = frontend_context.get();
 
 	let show_model_picker = $state(false);
+
+	// TODO BLOCK edit chat dialog instead of prompt for name
 </script>
 
 <Contextmenu {...rest} {entries} />

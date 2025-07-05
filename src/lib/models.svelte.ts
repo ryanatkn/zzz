@@ -1,14 +1,14 @@
 import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Model, Model_Json, Model_Schema} from '$lib/model.svelte.js';
+import {Model, Model_Json, Model_Schema, type Model_Json_Input} from '$lib/model.svelte.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {
 	create_single_index,
 	create_multi_index,
 	create_derived_index,
-} from '$lib/indexed_collection_helpers.js';
+} from '$lib/indexed_collection_helpers.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
 
 export const Models_Json = Cell_Json.extend({
@@ -25,6 +25,11 @@ export interface Models_Options extends Cell_Options<typeof Models_Json> {} // e
 export class Models extends Cell<typeof Models_Json> {
 	readonly items: Indexed_Collection<Model> = new Indexed_Collection({
 		indexes: [
+			// TODO I think this is a mistake to have `name` be unique,
+			// unless we prefix with `${provider_name}/${model_name}`,
+			// unless we want to design around multiple providers per model
+			// (structurally tying together supposedly-identical models from different providers,
+			// which sounds like it could be important for some UX cases)
 			create_single_index({
 				key: 'name',
 				extractor: (model) => model.name,
@@ -49,7 +54,7 @@ export class Models extends Cell<typeof Models_Json> {
 
 			create_derived_index({
 				key: 'ordered_by_name',
-				compute: (collection) => Array.from(collection.by_id.values()),
+				compute: (collection) => collection.values,
 				sort: (a, b) => a.name.localeCompare(b.name),
 				result_schema: z.array(Model_Schema),
 			}),
@@ -80,12 +85,12 @@ export class Models extends Cell<typeof Models_Json> {
 		this.init();
 	}
 
-	add(model_json: Model_Json): void {
+	add(model_json: Model_Json_Input): void {
 		const model = new Model({app: this.app, json: model_json});
 		this.items.add(model);
 	}
 
-	add_many(models_json: Array<Model_Json>): void {
+	add_many(models_json: Array<Model_Json_Input>): void {
 		const models = models_json.map((json) => new Model({app: this.app, json}));
 		this.items.add_many(models);
 	}

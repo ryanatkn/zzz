@@ -24,6 +24,7 @@
 	import Contextmenu_Prompt from '$lib/Contextmenu_Prompt.svelte';
 	import Diskfile_Picker_Dialog from '$lib/Diskfile_Picker_Dialog.svelte';
 	import Prompt_List from '$lib/Prompt_List.svelte';
+	import Editable_Text from '$lib/Editable_Text.svelte';
 
 	const app = frontend_context.get();
 
@@ -103,9 +104,9 @@
 		<Contextmenu_Prompt prompt={app.prompts.selected}>
 			<div class="column_fixed pr_sm">
 				<section class="column_section">
-					<div class="font_size_lg">
+					<div class="font_size_lg display_flex align_items_center">
 						<Glyph glyph={GLYPH_PROMPT} />
-						{app.prompts.selected.name}
+						<Editable_Text bind:value={app.prompts.selected.name} />
 					</div>
 					<div class="column">
 						<small>created {app.prompts.selected.created_formatted_short_date}</small>
@@ -119,7 +120,7 @@
 							onconfirm={() => app.prompts.selected && app.prompts.remove(app.prompts.selected)}
 							position="right"
 							attrs={{
-								title: `delete prompt ${app.prompts.selected.id}`,
+								title: `delete prompt "${app.prompts.selected.name}"`,
 								class: 'plain icon_button',
 							}}
 						>

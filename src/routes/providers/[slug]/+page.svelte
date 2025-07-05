@@ -12,6 +12,8 @@
 	const provider = $derived(app.providers.find_by_name(page.params.slug));
 
 	// TODO @many consider namespacing under `/llms/`
+
+	// TODO should you be able to create arbitrary providers from a name?
 </script>
 
 <div class="p_sm">

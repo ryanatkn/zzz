@@ -10,6 +10,8 @@
 	import Capability_Ollama from '$lib/Capability_Ollama.svelte';
 	import Capability_Backend from '$lib/Capability_Backend.svelte';
 	import Capability_System from '$lib/Capability_System.svelte';
+
+	// TODO add Capability_Chatgpt|Gemini|Claude (or the company equivalents)
 </script>
 
 <div class="width_md">
@@ -25,8 +27,9 @@
 		<section class="mb_xl12">
 			<h2><Glyph glyph={GLYPH_CONNECT} /> backend websocket</h2>
 			<p>
-				Zzz currently relies on websockets for pushed updates like filesystem changes. This will be
-				made optional in the future and SSE will be supported too.
+				Websockets are an optional transport that's preferred by default. Zzz currently relies on
+				websockets for pushed updates like filesystem changes - SSE support as an alternative will
+				be added in the future. (will it work for all usecases?)
 			</p>
 			<Capability_Websocket />
 		</section>

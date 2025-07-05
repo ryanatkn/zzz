@@ -1,4 +1,4 @@
-// action_event.test.ts
+// @slop claude_opus_4
 
 // @vitest-environment jsdom
 
@@ -70,7 +70,7 @@ describe('Action_Event', () => {
 				completion_request: {
 					created: '2024-01-01T00:00:00Z',
 					request_id: create_uuid(),
-					provider_name: 'claude' as const,
+					provider_name: 'claude',
 					model: 'claude-3-opus',
 					prompt: 'test prompt',
 				},
@@ -90,11 +90,11 @@ describe('Action_Event', () => {
 
 		test('throws for invalid executor/initiator combination', () => {
 			const env = new Test_Environment([filer_change_action_spec]);
-			env.executor = 'frontend' as const;
+			env.executor = 'frontend';
 
 			// filer_change has initiator: 'backend', so frontend can't initiate send
 			expect(() => create_action_event(env, filer_change_action_spec, {})).toThrow(
-				"Executor 'frontend' cannot initiate action 'filer_change'",
+				"executor 'frontend' cannot initiate action 'filer_change'",
 			);
 		});
 	});
@@ -117,7 +117,7 @@ describe('Action_Event', () => {
 				completion_request: {
 					created: '2024-01-01T00:00:00Z',
 					request_id: create_uuid(),
-					provider_name: 'claude' as const,
+					provider_name: 'claude',
 					model: 'claude-3-opus',
 					prompt: 'test prompt',
 				},
@@ -145,7 +145,7 @@ describe('Action_Event', () => {
 			expect(event.data.step).toBe('failed');
 			expect(event.data.error).toBeDefined();
 			expect(event.data.error?.code).toBe(-32602);
-			expect(event.data.error?.message).toContain('Failed to parse input');
+			expect(event.data.error?.message).toContain('failed to parse input');
 		});
 
 		test('throws when not in initial step', () => {
@@ -155,7 +155,7 @@ describe('Action_Event', () => {
 			event.parse(); // First parse succeeds
 
 			// Second parse should throw
-			expect(() => event.parse()).toThrow("Cannot parse from step 'parsed' - must be 'initial'");
+			expect(() => event.parse()).toThrow("cannot parse from step 'parsed' - must be 'initial'");
 		});
 	});
 
@@ -196,7 +196,7 @@ describe('Action_Event', () => {
 			const env = new Test_Environment([ping_action_spec]);
 
 			env.add_handler('ping', 'send_request', () => {
-				throw new Error('Handler error');
+				throw new Error('handler error');
 			});
 
 			const event = create_action_event(env, ping_action_spec, undefined);
@@ -207,12 +207,12 @@ describe('Action_Event', () => {
 			expect(event.data.step).toBe('failed');
 			expect(event.data.error).toBeDefined();
 			expect(event.data.error?.code).toBe(-32603);
-			expect(event.data.error?.message).toContain('Handler error');
+			expect(event.data.error?.message).toContain('handler error');
 		});
 
 		test('validates output for phases that expect it', async () => {
 			const env = new Test_Environment([ping_action_spec]);
-			env.executor = 'backend' as const;
+			env.executor = 'backend';
 
 			env.add_handler('ping', 'receive_request', () => {
 				return Promise.resolve({ping_id: create_uuid()});
@@ -234,7 +234,7 @@ describe('Action_Event', () => {
 
 			// Not parsed yet
 			await expect(event.handle_async()).rejects.toThrow(
-				"Cannot handle from step 'initial' - must be 'parsed'",
+				"cannot handle from step 'initial' - must be 'parsed'",
 			);
 		});
 	});
@@ -306,20 +306,20 @@ describe('Action_Event', () => {
 
 			// Still in initial step
 			expect(() => event.transition('receive_response')).toThrow(
-				"Cannot transition from step 'initial' - must be 'handled'",
+				"cannot transition from step 'initial' - must be 'handled'",
 			);
 		});
 
 		test('carries data forward in transitions', async () => {
 			const env = new Test_Environment([ping_action_spec]);
-			env.executor = 'backend' as const;
+			env.executor = 'backend';
 
 			const event = create_action_event(env, ping_action_spec, undefined, 'receive_request');
 			const request = {
-				jsonrpc: '2.0' as const,
+				jsonrpc: '2.0',
 				id: create_uuid(),
-				method: 'ping' as const,
-			};
+				method: 'ping',
+			} as const;
 			event.set_request(request);
 
 			env.add_handler('ping', 'receive_request', () => ({ping_id: request.id}));
@@ -341,14 +341,14 @@ describe('Action_Event', () => {
 	describe('protocol setters', () => {
 		test('set_request() sets request data', () => {
 			const env = new Test_Environment([ping_action_spec]);
-			env.executor = 'backend' as const;
+			env.executor = 'backend';
 
 			const event = create_action_event(env, ping_action_spec, undefined, 'receive_request');
 			const request = {
-				jsonrpc: '2.0' as const,
+				jsonrpc: '2.0',
 				id: create_uuid(),
-				method: 'ping' as const,
-			};
+				method: 'ping',
+			} as const;
 
 			event.set_request(request);
 
@@ -364,20 +364,20 @@ describe('Action_Event', () => {
 			event.handle_sync = () => {
 				// Mock sync handling
 			};
-			event.data.step = 'handled' as const;
+			event.data.step = 'handled';
 			event.data.request = {
-				jsonrpc: '2.0' as const,
+				jsonrpc: '2.0',
 				id: create_uuid(),
-				method: 'ping' as const,
+				method: 'ping',
 			};
 
 			event.transition('receive_response');
 
 			const response = {
-				jsonrpc: '2.0' as const,
+				jsonrpc: '2.0',
 				id: event.data.request.id,
 				result: {ping_id: create_uuid()},
-			};
+			} as const;
 
 			event.set_response(response);
 
@@ -387,17 +387,17 @@ describe('Action_Event', () => {
 
 		test('set_notification() sets notification data', () => {
 			const env = new Test_Environment([filer_change_action_spec]);
-			env.executor = 'frontend' as const;
+			env.executor = 'frontend';
 
 			const event = create_action_event(env, filer_change_action_spec, {}, 'receive');
 			const notification = {
-				jsonrpc: '2.0' as const,
-				method: 'filer_change' as const,
+				jsonrpc: '2.0',
+				method: 'filer_change',
 				params: {
-					change: {type: 'add' as const, path: '/test.txt'},
+					change: {type: 'add', path: '/test.txt'},
 					source_file: {} as any,
 				},
-			};
+			} as const;
 
 			event.set_notification(notification);
 
@@ -409,11 +409,11 @@ describe('Action_Event', () => {
 			const event = create_action_event(env, ping_action_spec, undefined);
 
 			expect(() => event.set_request({} as any)).toThrow(
-				'Can only set request in receive_request phase',
+				'can only set request in receive_request phase',
 			);
 
 			expect(() => event.set_notification({} as any)).toThrow(
-				'Can only set notification in receive phase',
+				'can only set notification in receive phase',
 			);
 		});
 	});
@@ -471,7 +471,7 @@ describe('Action_Event', () => {
 
 			const changes: Array<{old_step: string; new_step: string}> = [];
 
-			event.observe((_event, old_data, new_data) => {
+			event.observe((new_data, old_data) => {
 				changes.push({
 					old_step: old_data.step,
 					new_step: new_data.step,
@@ -512,11 +512,11 @@ describe('Action_Event', () => {
 			const listener1_calls: Array<string> = [];
 			const listener2_calls: Array<string> = [];
 
-			event.observe((_event, _old, new_data) => {
+			event.observe((new_data) => {
 				listener1_calls.push(new_data.step);
 			});
 
-			event.observe((_event, _old, new_data) => {
+			event.observe((new_data) => {
 				listener2_calls.push(new_data.step);
 			});
 
@@ -552,11 +552,11 @@ describe('Action_Event', () => {
 			const env = new Test_Environment(); // No specs registered
 
 			const json = {
-				kind: 'request_response' as const,
-				phase: 'send_request' as const,
-				step: 'initial' as const,
+				kind: 'request_response',
+				phase: 'send_request',
+				step: 'initial',
 				method: 'unknown_method',
-				executor: 'frontend' as const,
+				executor: 'frontend',
 				input: undefined,
 				output: null,
 				error: null,
@@ -566,7 +566,7 @@ describe('Action_Event', () => {
 			};
 
 			expect(() => create_action_event_from_json(json as any, env)).toThrow(
-				"No spec found for method 'unknown_method'",
+				"no spec found for method 'unknown_method'",
 			);
 		});
 	});
@@ -574,7 +574,7 @@ describe('Action_Event', () => {
 	describe('environment helpers', () => {
 		test('app getter works for frontend environment', () => {
 			const env = new Test_Environment([ping_action_spec]);
-			env.executor = 'frontend' as const;
+			env.executor = 'frontend';
 
 			const event = create_action_event(env, ping_action_spec, undefined);
 
@@ -583,7 +583,7 @@ describe('Action_Event', () => {
 
 		test('backend getter works for backend environment', () => {
 			const env = new Test_Environment([ping_action_spec]);
-			env.executor = 'backend' as const;
+			env.executor = 'backend';
 
 			const event = create_action_event(env, ping_action_spec, undefined);
 
@@ -592,7 +592,7 @@ describe('Action_Event', () => {
 
 		test('app getter throws for backend environment', () => {
 			const env = new Test_Environment([ping_action_spec]);
-			env.executor = 'backend' as const;
+			env.executor = 'backend';
 
 			const event = create_action_event(env, ping_action_spec, undefined);
 
@@ -603,7 +603,7 @@ describe('Action_Event', () => {
 
 		test('backend getter throws for frontend environment', () => {
 			const env = new Test_Environment([ping_action_spec]);
-			env.executor = 'frontend' as const;
+			env.executor = 'frontend';
 
 			const event = create_action_event(env, ping_action_spec, undefined);
 
@@ -616,10 +616,10 @@ describe('Action_Event', () => {
 	describe('different action kinds', () => {
 		test('remote_notification fails parsing with invalid input', async () => {
 			const env = new Test_Environment([filer_change_action_spec]);
-			env.executor = 'backend' as const;
+			env.executor = 'backend';
 
 			const invalid_input = {
-				change: {type: 'add' as const, path: '/test.txt'},
+				change: {type: 'add', path: '/test.txt'},
 				source_file: {} as any, // Missing required fields
 			};
 
@@ -630,20 +630,20 @@ describe('Action_Event', () => {
 			expect(event.data.step).toBe('failed');
 			expect(event.data.error).toBeDefined();
 			expect(event.data.error?.code).toBe(-32602);
-			expect(event.data.error?.message).toContain('Failed to parse input');
+			expect(event.data.error?.message).toContain('failed to parse input');
 
 			// Should not be able to handle after parse failure
 			await expect(() => event.handle_async()).rejects.toThrow(
-				"Cannot handle from step 'failed' - must be 'parsed'",
+				"cannot handle from step 'failed' - must be 'parsed'",
 			);
 		});
 
 		test('remote_notification creates notification in send phase', async () => {
 			const env = new Test_Environment([filer_change_action_spec]);
-			env.executor = 'backend' as const;
+			env.executor = 'backend';
 
 			const input = {
-				change: {type: 'add' as const, path: '/test.txt'},
+				change: {type: 'add', path: '/test.txt'},
 				source_file: {
 					id: '/test.txt',
 					source_dir: '/',

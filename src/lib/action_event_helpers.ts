@@ -21,6 +21,7 @@ import {
 import type {Action_Method} from '$lib/action_metatypes.js';
 import type {Action_Inputs} from '$lib/action_collections.js';
 import type {Action_Executor, Action_Initiator, Action_Kind} from '$lib/action_types.js';
+import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
 
 // Type guards for action kinds
 export const is_request_response = (
@@ -167,19 +168,19 @@ export const should_validate_output = (kind: Action_Kind, phase: Action_Event_Ph
 // Error creation helpers
 export const create_parse_error = (error: unknown): Jsonrpc_Error_Json => ({
 	code: JSONRPC_INVALID_PARAMS,
-	message: `Failed to parse input: ${error instanceof Error ? error.message : 'Unknown error'}`,
+	message: `failed to parse input: ${error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE}`,
 	data: {error: String(error)},
 });
 
 export const create_validation_error = (field: string, error: unknown): Jsonrpc_Error_Json => ({
 	code: JSONRPC_INVALID_PARAMS,
-	message: `Failed to validate ${field}: ${error instanceof Error ? error.message : 'Unknown error'}`,
+	message: `failed to validate ${field}: ${error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE}`,
 	data: {field, error: String(error)},
 });
 
 export const create_handler_error = (error: unknown): Jsonrpc_Error_Json => ({
 	code: JSONRPC_INTERNAL_ERROR,
-	message: `Handler error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+	message: `handler error: ${error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE}`,
 	data: {error: String(error)},
 });
 
@@ -209,6 +210,7 @@ export const create_initial_data = (
 	input,
 	output: null,
 	error: null,
+	progress: null,
 	request: null,
 	response: null,
 	notification: null,

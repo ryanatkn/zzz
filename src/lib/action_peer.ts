@@ -23,7 +23,10 @@ import {
 import {create_action_event} from '$lib/action_event.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
 
-// TODO the goal is to make this fully symmetric but we're not quite there
+// TODO @api @many refactor frontend_actions_api.ts with action_peer.ts
+
+// TODO the goal is to make this fully symmetric but we're not quite there,
+// this does receiving but only part of sending, and some deeper changes may be needed
 
 export interface Action_Peer_Send_Options {
 	transport_name?: Transport_Name;

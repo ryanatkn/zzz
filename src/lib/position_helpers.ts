@@ -1,3 +1,5 @@
+// @slop Claude Sonnet 3.7
+
 import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 
 // TODO zod schemas

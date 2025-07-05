@@ -139,7 +139,7 @@ describe('Request_Tracker', () => {
 			expect(rejection_error).toBeDefined();
 			expect(rejection_error.jsonrpc).toBe('2.0');
 			expect(rejection_error.error.code).toBe(JSONRPC_INTERNAL_ERROR);
-			expect(rejection_error.error.message).toBe(`Request timed out: ${id}`);
+			expect(rejection_error.error.message).toBe(`request timed out: ${id}`);
 			expect(rejection_error.id).toBe(id);
 		});
 
@@ -250,7 +250,7 @@ describe('Request_Tracker', () => {
 			tracker.resolve_request(unknown_id, response);
 
 			expect(warn_spy).toHaveBeenCalledTimes(1);
-			expect(warn_spy).toHaveBeenCalledWith(`Received response for unknown request: ${unknown_id}`);
+			expect(warn_spy).toHaveBeenCalledWith(`received response for unknown request: ${unknown_id}`);
 		});
 
 		test('handles various data types', async () => {
@@ -336,7 +336,7 @@ describe('Request_Tracker', () => {
 			});
 
 			expect(warn_spy).toHaveBeenCalledTimes(1);
-			expect(warn_spy).toHaveBeenCalledWith(`Received error for unknown request: ${unknown_id}`);
+			expect(warn_spy).toHaveBeenCalledWith(`received error for unknown request: ${unknown_id}`);
 		});
 
 		test('handles various error types', async () => {
@@ -723,7 +723,7 @@ describe('Request_Tracker', () => {
 			const id = 'req_1';
 
 			const deferred = tracker.track_request(id);
-			const promise = expect(deferred.promise).rejects.toThrow('Request cancelled');
+			const promise = expect(deferred.promise).rejects.toThrow('request cancelled');
 
 			tracker.cancel_all_requests();
 			expect(tracker.pending_requests.size).toBe(0);
@@ -870,7 +870,7 @@ describe('Request_Tracker', () => {
 				id,
 				error: {
 					code: JSONRPC_INTERNAL_ERROR,
-					message: `Request timed out: ${id}`,
+					message: `request timed out: ${id}`,
 				},
 			});
 		});
@@ -1052,7 +1052,7 @@ describe('Request_Tracker', () => {
 
 			const timeout_promise = timeout_deferred.promise.catch((error) => {
 				expect(error).toHaveProperty('jsonrpc', '2.0');
-				expect(error.error).toHaveProperty('message', `Request timed out: ${timeout_id}`);
+				expect(error.error).toHaveProperty('message', `request timed out: ${timeout_id}`);
 				return true;
 			});
 

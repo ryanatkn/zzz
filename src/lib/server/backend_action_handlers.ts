@@ -19,11 +19,12 @@ import {
 	format_gemini_messages,
 } from '$lib/server/ai_provider_utils.js';
 import {to_completion_result} from '$lib/response_helpers.js';
-import {Safe_Fs} from '$lib/server/safe_fs.js';
+import {Scoped_Fs} from '$lib/server/scoped_fs.js';
 import type {Backend_Action_Handlers} from '$lib/server/backend_action_types.js';
 import type {Action_Inputs, Action_Outputs} from '$lib/action_collections.js';
 import {jsonrpc_errors} from '$lib/jsonrpc_errors.js';
 import {to_serializable_source_file} from '$lib/diskfile_helpers.js';
+import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
 
 // TODO refactor to a plugin architecture
 
@@ -73,15 +74,30 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 	submit_completion: {
 		receive_request: async ({backend, data: {input, request}}) => {
 			const {prompt, provider_name, model, completion_messages} = input.completion_request;
-			const config = backend.config;
+			// TODO probably refactor so each handler is independent, and destructure all params so we can see what's unused
+			const {
+				// bots,
+				frequency_penalty,
+				// models,
+				output_token_max,
+				presence_penalty,
+				// providers,
+				seed,
+				stop_sequences,
+				system_message,
+				temperature,
+				top_k,
+				top_p,
+			} = backend.config;
 
 			let result: Action_Outputs['submit_completion'];
 
-			console.log(`texting ${provider_name}:`, prompt.substring(0, 1000));
+			console.log(`texting ${provider_name}:`, prompt.substring(0, 100));
 
 			try {
 				switch (provider_name) {
 					case 'ollama': {
+						// TODO BLOCK is this what we want to do? or error? needs to stream progress if kept
 						const listed = await ollama.list();
 						if (!listed.models.some((m) => m.name === model)) {
 							await ollama.pull({model}); // TODO handle stream
@@ -91,16 +107,16 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 							// TODO
 							// tools,
 							options: {
-								temperature: config.temperature,
-								seed: config.seed,
-								num_predict: config.output_token_max,
-								top_k: config.top_k,
-								top_p: config.top_p,
-								frequency_penalty: config.frequency_penalty,
-								presence_penalty: config.presence_penalty,
-								stop: config.stop_sequences,
+								temperature,
+								seed,
+								num_predict: output_token_max,
+								top_k,
+								top_p,
+								frequency_penalty,
+								presence_penalty,
+								stop: stop_sequences,
 							},
-							messages: format_ollama_messages(config.system_message, completion_messages, prompt),
+							messages: format_ollama_messages(system_message, completion_messages, prompt),
 						});
 						console.log(`ollama api_response`, api_response);
 						result = to_completion_result(request.id, provider_name, model, api_response);
@@ -110,12 +126,12 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 					case 'claude': {
 						const api_response = await anthropic.messages.create({
 							model,
-							max_tokens: config.output_token_max,
-							temperature: config.temperature,
-							top_k: config.top_k,
-							top_p: config.top_p,
-							stop_sequences: config.stop_sequences,
-							system: config.system_message,
+							max_tokens: output_token_max,
+							temperature,
+							top_k,
+							top_p,
+							stop_sequences,
+							system: system_message,
 							messages: format_claude_messages(completion_messages, prompt),
 						});
 						console.log(`claude api_response`, api_response);
@@ -126,19 +142,14 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 					case 'chatgpt': {
 						const api_response = await openai.chat.completions.create({
 							model,
-							max_completion_tokens: config.output_token_max,
-							temperature: model === 'o1-mini' ? undefined : config.temperature,
-							seed: config.seed,
-							top_p: config.top_p,
-							frequency_penalty: config.frequency_penalty,
-							presence_penalty: config.presence_penalty,
-							stop: config.stop_sequences,
-							messages: format_openai_messages(
-								config.system_message,
-								completion_messages,
-								prompt,
-								model,
-							),
+							max_completion_tokens: output_token_max,
+							temperature: model === 'o1-mini' ? undefined : temperature,
+							seed,
+							top_p,
+							frequency_penalty,
+							presence_penalty,
+							stop: stop_sequences,
+							messages: format_openai_messages(system_message, completion_messages, prompt, model),
 						});
 						console.log(`openai api_response`, api_response);
 						result = to_completion_result(request.id, provider_name, model, api_response);
@@ -149,18 +160,18 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 						// TODO cache this by model?
 						const google_model = google.getGenerativeModel({
 							model,
-							systemInstruction: config.system_message,
+							systemInstruction: system_message,
 							// TODO
 							// tools,
 							// toolConfig
 							generationConfig: {
-								maxOutputTokens: config.output_token_max,
-								temperature: config.temperature,
-								topK: config.top_k,
-								topP: config.top_p,
-								frequencyPenalty: config.frequency_penalty,
-								presencePenalty: config.presence_penalty,
-								stopSequences: config.stop_sequences,
+								maxOutputTokens: output_token_max,
+								temperature,
+								topK: top_k,
+								topP: top_p,
+								frequencyPenalty: frequency_penalty,
+								presencePenalty: presence_penalty,
+								stopSequences: stop_sequences,
 							},
 						});
 
@@ -185,7 +196,12 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 
 			// TODO @db temporary, do better action tracking
 			// We don't need to wait for this to finish
-			void save_completion_response_to_disk(input, result, backend.zzz_cache_dir, backend.safe_fs);
+			void save_completion_response_to_disk(
+				input,
+				result,
+				backend.zzz_cache_dir,
+				backend.scoped_fs,
+			);
 
 			console.log(`got ${provider_name} message`, result.completion_response.data);
 
@@ -199,13 +215,13 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 			const {path, content} = input;
 
 			try {
-				// Use the server's safe_fs instance to write the file
-				await backend.safe_fs.write_file(path, content);
+				// Use the server's scoped_fs instance to write the file
+				await backend.scoped_fs.write_file(path, content);
 				return null;
 			} catch (error) {
 				console.error(`Error writing file ${path}:`, error);
 				throw jsonrpc_errors.internal_error(
-					`Failed to write file: ${error instanceof Error ? error.message : 'Unknown error'}`,
+					`Failed to write file: ${error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE}`,
 				);
 			}
 		},
@@ -216,13 +232,13 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 			const {path} = input;
 
 			try {
-				// Use the server's safe_fs instance to delete the file
-				await backend.safe_fs.rm(path);
+				// Use the server's scoped_fs instance to delete the file
+				await backend.scoped_fs.rm(path);
 				return null;
 			} catch (error) {
 				console.error(`Error deleting file ${path}:`, error);
 				throw jsonrpc_errors.internal_error(
-					`Failed to delete file: ${error instanceof Error ? error.message : 'Unknown error'}`,
+					`Failed to delete file: ${error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE}`,
 				);
 			}
 		},
@@ -233,13 +249,13 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 			const {path} = input;
 
 			try {
-				// Use the server's safe_fs instance to create the directory
-				await backend.safe_fs.mkdir(path, {recursive: true});
+				// Use the server's scoped_fs instance to create the directory
+				await backend.scoped_fs.mkdir(path, {recursive: true});
 				return null;
 			} catch (error) {
 				console.error(`Error creating directory ${path}:`, error);
 				throw jsonrpc_errors.internal_error(
-					`Failed to create directory: ${error instanceof Error ? error.message : 'Unknown error'}`,
+					`Failed to create directory: ${error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE}`,
 				);
 			}
 		},
@@ -258,7 +274,7 @@ const save_completion_response_to_disk = async (
 	input: Action_Inputs['submit_completion'],
 	output: Action_Outputs['submit_completion'],
 	dir: string,
-	safe_fs: Safe_Fs,
+	scoped_fs: Scoped_Fs,
 ): Promise<void> => {
 	// includes `Date.now()` for sorting purposes
 	const filename = `${input.completion_request.provider_name}__${Date.now()}__${input.completion_request.model}__${input.completion_request.request_id}.json`; // TODO include model data in these
@@ -267,18 +283,18 @@ const save_completion_response_to_disk = async (
 
 	const json = {input, output};
 
-	await write_json(path, json, safe_fs);
+	await write_json(path, json, scoped_fs);
 };
 // TODO @db refactor
-const write_json = async (path: string, json: unknown, safe_fs: Safe_Fs): Promise<void> => {
+const write_json = async (path: string, json: unknown, scoped_fs: Scoped_Fs): Promise<void> => {
 	// Check if directory exists and create it if needed
-	if (!(await safe_fs.exists(path))) {
-		await safe_fs.mkdir(dirname(path), {recursive: true});
+	if (!(await scoped_fs.exists(path))) {
+		await scoped_fs.mkdir(dirname(path), {recursive: true});
 	}
 
 	const formatted = await format_file(JSON.stringify(json), {parser: 'json'});
 
-	// Use Safe_Fs for writing the file
+	// Use Scoped_Fs for writing the file
 	console.log('writing json', path, formatted.length);
-	await safe_fs.write_file(path, formatted);
+	await scoped_fs.write_file(path, formatted);
 };

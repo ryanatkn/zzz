@@ -4,6 +4,12 @@ import {BROWSER} from 'esm-env';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
+import {
+	format_datetime,
+	format_short_date,
+	format_time,
+	format_timestamp,
+} from '$lib/time_helpers.js';
 
 export const Time_Json = Cell_Json.extend({});
 export type Time_Json = z.infer<typeof Time_Json>;
@@ -45,6 +51,10 @@ export class Time extends Cell<typeof Time_Json> {
 	 */
 	readonly now: SvelteDate = new SvelteDate();
 	readonly now_ms: number = $derived(this.now.getTime());
+	readonly now_timestamp = $derived(format_timestamp(this.now));
+	readonly now_formatted_short_date: string = $derived(format_short_date(this.now));
+	readonly now_formatted_datetime: string = $derived(format_datetime(this.now));
+	readonly now_formatted_time: string = $derived(format_time(this.now));
 
 	/**
 	 * The interval in milliseconds between time updates.

@@ -1,5 +1,4 @@
-// @slop
-// codegen.ts
+// @slop claude_opus_4
 
 import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 

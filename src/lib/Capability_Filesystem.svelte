@@ -19,7 +19,7 @@
 </script>
 
 <div
-	class="chip plain flex_1 font_size_xl px_xl flex_column mb_xl"
+	class="chip plain flex_1 font_size_xl px_xl flex_column mb_xl width_sm"
 	style:display="display_flex !important"
 	style:align-items="flex-start !important"
 	style:font-weight="400 !important"
@@ -45,7 +45,7 @@
 			{#if zzz_dir === undefined || zzz_dir === null}
 				&nbsp;
 			{:else if zzz_dir === ''}
-				No backend directory configured
+				no backend directory configured
 			{:else}
 				{zzz_dir}
 			{/if}

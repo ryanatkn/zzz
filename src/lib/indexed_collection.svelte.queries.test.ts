@@ -1,4 +1,4 @@
-// @slop claude_opus_4
+// @slop Claude Sonnet 3.7
 
 // @vitest-environment jsdom
 
@@ -11,7 +11,7 @@ import {
 	create_multi_index,
 	create_derived_index,
 	type Indexed_Item,
-} from '$lib/indexed_collection_helpers.js';
+} from '$lib/indexed_collection_helpers.svelte.js';
 import {create_uuid, Uuid} from '$lib/zod_helpers.js';
 
 // Test item representing a generic item
@@ -302,14 +302,14 @@ describe('Indexed_Collection - Query Capabilities', () => {
 		const current_year = new Date().getFullYear();
 		const this_year_items = collection.where('by_year', current_year);
 
-		const items_this_year_count = Array.from(collection.by_id.values()).filter(
+		const items_this_year_count = collection.values.filter(
 			(item) => item.date_a.getFullYear() === current_year,
 		).length;
 		expect(this_year_items.length).toBe(items_this_year_count);
 
 		// More complex date range query - last 7 days
 		const now = Date.now();
-		const recent_items = Array.from(collection.by_id.values()).filter(
+		const recent_items = collection.values.filter(
 			(item) => item.date_a.getTime() > now - 1000 * 60 * 60 * 24 * 7,
 		);
 		expect(recent_items.map((i) => i.string_a)).toContain('b1'); // 5 days ago
@@ -359,15 +359,13 @@ describe('Indexed_Collection - Query Capabilities', () => {
 
 	test('dynamic ordering of query results', () => {
 		// Get all items and sort by number_a (highest first)
-		const sorted_by_number_a = [...collection.by_id.values()].sort(
-			(a, b) => b.number_a - a.number_a,
-		);
+		const sorted_by_number_a = collection.values.slice().sort((a, b) => b.number_a - a.number_a);
 		expect(sorted_by_number_a[0].number_a).toBe(5);
 
 		// Sort by creation time (newest first)
-		const sorted_by_time = [...collection.by_id.values()].sort(
-			(a, b) => b.date_a.getTime() - a.date_a.getTime(),
-		);
+		const sorted_by_time = collection.values
+			.slice()
+			.sort((a, b) => b.date_a.getTime() - a.date_a.getTime());
 		expect(sorted_by_time[0].string_a).toBe('b2'); // 3 days ago
 	});
 });

@@ -15,7 +15,7 @@ export const Action_Spec = z.object({
 	kind: Action_Kind,
 	initiator: Action_Initiator,
 	auth: Action_Auth.nullable(),
-	// TODO @api stubbed out and not yet used, should be for GET/POST distinction and other things, we get guarantees like cacheability from these, interesting with transport agnosticism
+	// TODO @api should be for GET/POST distinction and probably other things, we get guarantees like cacheability from these, interesting with transport agnosticism
 	side_effects: Action_Side_Effects,
 	input: z.union([z.instanceof(z.ZodObject), z.instanceof(z.ZodNull), z.instanceof(z.ZodOptional)]),
 	output: z.union([
@@ -43,6 +43,10 @@ export const Remote_Notification_Action_Spec = Action_Spec.extend({
 });
 export type Remote_Notification_Action_Spec = z.infer<typeof Remote_Notification_Action_Spec>;
 
+/**
+ * Local calls can wrap synchronous or asynchronous actions,
+ * and are the escape hatch for remote APIs that do not support SAES.
+ */
 export const Local_Call_Action_Spec = Action_Spec.extend({
 	kind: z.literal('local_call').default('local_call'),
 	auth: z.null().default(null),

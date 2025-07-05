@@ -15,7 +15,7 @@
 
 	const scrollable = new Scrollable();
 
-	const strips = $derived(Array.from(tape.strips.by_id.values()));
+	const strips = $derived(tape.strips.values);
 </script>
 
 <div {...attrs} class="strip_list {attrs?.class}" use:scrollable.container use:scrollable.target>

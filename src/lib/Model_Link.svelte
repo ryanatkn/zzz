@@ -8,6 +8,7 @@
 	import Provider_Logo from '$lib/Provider_Logo.svelte';
 	import {GLYPH_MODEL} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
+	import Contextmenu_Model from '$lib/Contextmenu_Model.svelte';
 
 	interface Props {
 		model: Model;
@@ -24,17 +25,20 @@
 	const selected = $derived(page.url.pathname === `${base}/models/${model.name}`);
 </script>
 
-<a {...attrs} href="{base}/models/{model.name}" class:selected
-	>{#if children}
-		{@render children()}
-	{:else}
-		{#if icon === 'svg' || icon === true}
-			<Provider_Logo name={model.provider_name} />
-		{:else if icon === 'glyph'}
-			<Glyph glyph={GLYPH_MODEL} />
-		{/if}
-		{model.name}
-	{/if}</a
+<!-- TODO this contextmenu appears as a duplicate, I think a de-duped key is the best fix, not manually disabling it -->
+<Contextmenu_Model {model}
+	><a {...attrs} href="{base}/models/{model.name}" class:selected
+		>{#if children}
+			{@render children()}
+		{:else}
+			{#if icon === 'svg' || icon === true}
+				<Provider_Logo name={model.provider_name} />
+			{:else if icon === 'glyph'}
+				<Glyph glyph={GLYPH_MODEL} />
+			{/if}
+			{model.name}
+		{/if}</a
+	></Contextmenu_Model
 >
 
 <style>

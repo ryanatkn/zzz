@@ -28,7 +28,7 @@
 	const total_actions = $derived(actions.items.size);
 
 	// TODO inefficient, query collection better probably
-	const items = $derived(Array.from(actions.items.by_id.values()).slice(0, limit));
+	const items = $derived(actions.items.values.slice(0, limit));
 </script>
 
 <div {...attrs} class="flex_1 unstyled overflow_auto scrollbar_width_thin {attrs?.class}">
