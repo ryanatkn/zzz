@@ -1,0 +1,61 @@
+<script lang="ts">
+	import type {ComponentProps} from 'svelte';
+	import Contextmenu from '@ryanatkn/fuz/Contextmenu.svelte';
+	import Contextmenu_Entry from '@ryanatkn/fuz/Contextmenu_Entry.svelte';
+	import Contextmenu_Submenu from '@ryanatkn/fuz/Contextmenu_Submenu.svelte';
+	import type {Omit_Strict} from '@ryanatkn/belt/types.js';
+
+	import type {Diskfile} from '$lib/diskfile.svelte.js';
+	import {GLYPH_DELETE, GLYPH_FILE} from '$lib/glyphs.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
+	import Contextmenu_Entry_Copy_To_Clipboard from '$lib/Contextmenu_Entry_Copy_To_Clipboard.svelte';
+	import Glyph from '$lib/Glyph.svelte';
+
+	interface Props extends Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> {
+		diskfile: Diskfile;
+	}
+
+	const {diskfile, ...rest}: Props = $props();
+
+	const app = frontend_context.get();
+</script>
+
+<Contextmenu {...rest} {entries} />
+
+{#snippet entries()}
+	<Contextmenu_Submenu>
+		{#snippet icon()}<Glyph glyph={GLYPH_FILE} />{/snippet}
+		file
+		{#snippet menu()}
+			<!-- TODO maybe show disabled versions? changing what appears isn't great -->
+
+			{#if diskfile.path_relative}
+				<Contextmenu_Entry_Copy_To_Clipboard
+					content={diskfile.path_relative}
+					label="copy file path"
+				/>
+			{/if}
+
+			{#if diskfile.content}
+				<Contextmenu_Entry_Copy_To_Clipboard
+					content={diskfile.content}
+					label="copy file content"
+					preview={diskfile.content_preview}
+				/>
+			{/if}
+
+			<Contextmenu_Entry
+				run={async () => {
+					// TODO @many better confirmation
+					// eslint-disable-next-line no-alert
+					if (confirm(`Are you sure you want to delete ${diskfile.path_relative}?`)) {
+						await app.diskfiles.delete(diskfile.path);
+					}
+				}}
+			>
+				{#snippet icon()}<Glyph glyph={GLYPH_DELETE} />{/snippet}
+				<span>delete file</span>
+			</Contextmenu_Entry>
+		{/snippet}
+	</Contextmenu_Submenu>
+{/snippet}

@@ -1,0 +1,22 @@
+<script lang="ts">
+	import {goto} from '$app/navigation';
+	import {base} from '$app/paths';
+
+	import {projects_context} from '$routes/projects/projects.svelte.js';
+
+	const projects = projects_context.get();
+</script>
+
+<!-- TODO have a contextmenu entry up the tree for a project that isn't found, but the id is present -->
+<div class="p_lg">
+	<p>
+		project not found, <button
+			type="button"
+			class="inline color_d"
+			onclick={() => {
+				const project = projects.create_new_project();
+				void goto(`${base}/projects/${project.id}`);
+			}}>create one</button
+		>?
+	</p>
+</div>
