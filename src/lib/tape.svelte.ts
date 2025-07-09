@@ -2,15 +2,14 @@ import type {Model} from '$lib/model.svelte.js';
 import {Strip, create_strip_from_text, create_strip_from_bit} from '$lib/strip.svelte.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Tape_Json} from '$lib/tape_types.js';
-import {Completion_Request, Completion_Response} from '$lib/completion_types.js';
+import {Completion_Request} from '$lib/completion_types.js';
 import {render_tape_to_string, render_completion_messages} from '$lib/tape_helpers.js';
 import type {Bit_Type} from '$lib/bit.svelte.js';
 import {HANDLED} from '$lib/cell_helpers.js';
-import {to_completion_response_text} from '$lib/response_helpers.js';
 import {to_preview, estimate_token_count} from '$lib/helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import type {Uuid} from '$lib/zod_helpers.js';
-import type {Strip_Role} from '$lib/strip_types.js';
+import type {Strip_Role, Strip_Json} from '$lib/strip_types.js';
 
 // TODO add `tape.name` probably
 
@@ -74,11 +73,11 @@ export class Tape extends Cell<typeof Tape_Json> {
 	/**
 	 * Create and add an assistant strip with the given content.
 	 */
-	add_assistant_strip(content: string, response?: Completion_Response): Strip {
+	add_assistant_strip(content: string, json?: Partial<Strip_Json>): Strip {
 		const strip = create_strip_from_text(
 			content,
 			'assistant',
-			{tape_id: this.id, response},
+			{...json, tape_id: this.id},
 			this.app,
 		);
 		this.add_strip(strip);
@@ -116,42 +115,31 @@ export class Tape extends Cell<typeof Tape_Json> {
 	 * Send a message to the AI and create corresponding strips.
 	 */
 	async send_message(content: string): Promise<Strip> {
-		// TODO @many rethink this API with the completion request/response (see OpenAI/MCP/A2A)
+		// TODO rethink this API with the completion request/response (see OpenAI/MCP/A2A)
+		// TODO maybe do this in the `create_completion: {send_request:` handler?
 		const completion_messages = render_completion_messages(this.strips.by_id.values());
 
 		const user_strip = this.add_user_strip(content);
 
-		// Create a properly typed completion request
 		const completion_request = Completion_Request.parse({
 			created: user_strip.created,
-			request_id: user_strip.id,
 			provider_name: this.model.provider_name,
 			model: this.model.name,
 			prompt: content,
 			completion_messages,
 		});
 
+		// Create assistant strip with the request info so streaming updates can find it
+		const assistant_strip = this.add_assistant_strip('', {request: completion_request});
+
 		// Update the user strip with the request
 		user_strip.request = completion_request;
 
-		// TODO better abstraction
-		// Create assistant strip immediately with empty content to show pending state
-		const assistant_strip = this.add_assistant_strip('', undefined);
-
 		// Send the prompt with tape history
-		const response = await this.app.submit_completion(
-			content,
-			this.model.provider_name,
-			this.model.name,
-			completion_messages,
-		);
-
-		// Get the response text
-		const response_text = to_completion_response_text(response.completion_response) || '';
-
-		// Update the assistant strip with the response content and metadata
-		assistant_strip.content = response_text;
-		assistant_strip.response = response.completion_response;
+		await this.app.api.create_completion({
+			completion_request,
+			_meta: {progressToken: assistant_strip.id},
+		});
 
 		return assistant_strip;
 	}

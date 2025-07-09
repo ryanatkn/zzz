@@ -185,8 +185,6 @@ export class Project_Viewmodel {
 				id: repo_id,
 				git_url: '',
 				checkouts: [],
-				created: get_datetime_now(),
-				updated: get_datetime_now(),
 			},
 		});
 

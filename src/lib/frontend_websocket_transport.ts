@@ -18,6 +18,8 @@ import type {
 } from '$lib/jsonrpc.js';
 import type {Transport} from '$lib/transports.js';
 
+// TODO logging - maybe add a getter to Cell that falls back to the app logger?
+
 export class Frontend_Websocket_Transport implements Transport {
 	readonly transport_name = 'frontend_websocket_rpc' as const;
 
@@ -69,7 +71,7 @@ export class Frontend_Websocket_Transport implements Transport {
 
 				// Return the promise that will resolve when the response is received
 				const result = await deferred.promise;
-				console.log(`result`, message, result);
+				console.log(`[frontend websocket transport] result`, message, result);
 				return result;
 			} else if (is_jsonrpc_notification(message)) {
 				// For notifications, just send without tracking
@@ -78,7 +80,7 @@ export class Frontend_Websocket_Transport implements Transport {
 			}
 			throw jsonrpc_errors.invalid_request();
 		} catch (error) {
-			console.error('[frontend websocket transport] Error sending message:', error);
+			console.error('[frontend websocket transport] error sending message:', error);
 			if (error instanceof Thrown_Jsonrpc_Error) {
 				throw error;
 			}

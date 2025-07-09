@@ -1,10 +1,10 @@
 import {z} from 'zod';
 
-import {create_uuid, Datetime_Now} from '$lib/zod_helpers.js';
+import {Datetime_Now} from '$lib/zod_helpers.js';
 import {Provider_Name, Provider_Data_Schema} from '$lib/provider_types.js';
-import {Jsonrpc_Request_Id} from '$lib/jsonrpc.js';
 
-export const Completion_Role = z.enum(['user', 'system', 'assistant']);
+// TODO needs to be open ended right? any benefit to an enum system/user/assistant? maybe merge with `Strip_Role`
+export const Completion_Role = z.string(); // branding is too unwieldy at data declaration sites
 export type Completion_Role = z.infer<typeof Completion_Role>;
 
 export const Completion_Message = z.object({
@@ -16,7 +16,6 @@ export type Completion_Message = z.infer<typeof Completion_Message>;
 export const Completion_Request = z
 	.object({
 		created: Datetime_Now,
-		request_id: Jsonrpc_Request_Id.default(create_uuid),
 		provider_name: Provider_Name,
 		model: z.string(),
 		prompt: z.string(),
@@ -28,7 +27,6 @@ export type Completion_Request = z.infer<typeof Completion_Request>;
 export const Completion_Response = z
 	.object({
 		created: Datetime_Now,
-		request_id: Jsonrpc_Request_Id.default(create_uuid),
 		provider_name: Provider_Name,
 		model: z.string(),
 		data: Provider_Data_Schema,

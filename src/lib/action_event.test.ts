@@ -11,7 +11,7 @@ import {
 	ping_action_spec,
 	filer_change_action_spec,
 	toggle_main_menu_action_spec,
-	submit_completion_action_spec,
+	create_completion_action_spec,
 } from '$lib/action_specs.js';
 import {create_uuid} from '$lib/zod_helpers.js';
 import type {Action_Executor} from '$lib/action_types.js';
@@ -65,7 +65,7 @@ describe('Action_Event', () => {
 		});
 
 		test('creates event with input data', () => {
-			const env = new Test_Environment([submit_completion_action_spec]);
+			const env = new Test_Environment([create_completion_action_spec]);
 			const input = {
 				completion_request: {
 					created: '2024-01-01T00:00:00Z',
@@ -76,7 +76,7 @@ describe('Action_Event', () => {
 				},
 			};
 
-			const event = create_action_event(env, submit_completion_action_spec, input);
+			const event = create_action_event(env, create_completion_action_spec, input);
 
 			expect(event.data.input).toEqual(input);
 		});
@@ -112,18 +112,18 @@ describe('Action_Event', () => {
 		});
 
 		test('parses complex input with validation', () => {
-			const env = new Test_Environment([submit_completion_action_spec]);
+			const env = new Test_Environment([create_completion_action_spec]);
 			const input = {
 				completion_request: {
 					created: '2024-01-01T00:00:00Z',
-					request_id: create_uuid(),
 					provider_name: 'claude',
 					model: 'claude-3-opus',
 					prompt: 'test prompt',
 				},
+				_meta: {progressToken: create_uuid()},
 			};
 
-			const event = create_action_event(env, submit_completion_action_spec, input);
+			const event = create_action_event(env, create_completion_action_spec, input);
 			event.parse();
 
 			expect(event.data.step).toBe('parsed');
@@ -131,7 +131,7 @@ describe('Action_Event', () => {
 		});
 
 		test('fails on invalid input', () => {
-			const env = new Test_Environment([submit_completion_action_spec]);
+			const env = new Test_Environment([create_completion_action_spec]);
 			const invalid_input = {
 				completion_request: {
 					// Missing required fields
@@ -139,7 +139,7 @@ describe('Action_Event', () => {
 				},
 			};
 
-			const event = create_action_event(env, submit_completion_action_spec, invalid_input);
+			const event = create_action_event(env, create_completion_action_spec, invalid_input);
 			event.parse();
 
 			expect(event.data.step).toBe('failed');

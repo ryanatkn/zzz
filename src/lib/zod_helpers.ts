@@ -32,7 +32,7 @@ export type Svelte_Map_Schema = z.infer<typeof Svelte_Map_Schema>;
  */
 export const get_datetime_now = (): Datetime => new Date().toISOString() as Datetime; // TODO maybe memoize one by `Date.now()`? or is the overhead not worth it?
 
-// TODO move these? helpers at least
+// TODO move these? helpers at least - maybe `types.ts`? is belt going to use zod?
 export const Datetime = z.string().datetime().brand('Datetime');
 export type Datetime = z.infer<typeof Datetime>;
 export const Datetime_Now = Datetime.default(get_datetime_now);

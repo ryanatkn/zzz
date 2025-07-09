@@ -61,9 +61,10 @@
 			{#each editor.tabs.ordered_tabs as tab, index (tab.id)}
 				<li class="display_flex py_xs3 px_xs4">
 					<div class="display_flex" use:tabs_reorderable.item={{index}}>
+						<!-- TODO notice the different APIs here, needs fixing, diskfiles is higher in the tree -->
 						<Diskfile_Tab_Listitem
 							{tab}
-							onselect={(tab) => editor.select_tab(tab.id)}
+							onselect={(tab) => diskfiles.select(tab.diskfile_id)}
 							onclose={(tab) => editor.close_tab(tab.id)}
 							onopen={(tab) => editor.open_tab(tab.id)}
 						/>

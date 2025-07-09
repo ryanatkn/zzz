@@ -210,13 +210,13 @@ describe('history navigation', () => {
 });
 
 describe('saving history changes', () => {
-	test('save_changes persists content and converts unsaved to saved', () => {
+	test('save_changes persists content and converts unsaved to saved', async () => {
 		// Make an edit to create unsaved entry
 		editor_state.current_content = 'Content to save';
 		expect(editor_state.unsaved_edit_entry_id).not.toBeNull();
 
 		// Save changes
-		editor_state.save_changes();
+		await editor_state.save_changes();
 
 		// Verify the unsaved flag was cleared
 		expect(editor_state.unsaved_edit_entry_id).toBeNull();
@@ -234,23 +234,23 @@ describe('saving history changes', () => {
 		expect(editor_state.selected_history_entry_id).toBe(new_saved_entry.id);
 	});
 
-	test('save_changes with no changes returns false', () => {
+	test('save_changes with no changes returns false', async () => {
 		// Don't make any changes
 		expect(editor_state.has_changes).toBe(false);
 
 		// Try to save
-		const result = editor_state.save_changes();
+		const result = await editor_state.save_changes();
 
 		// Verify nothing was saved
 		expect(result).toBe(false);
 	});
 
-	test('save_changes updates the diskfile content', () => {
+	test('save_changes updates the diskfile content', async () => {
 		// Make an edit
 		editor_state.current_content = 'New saved content';
 
 		// Save changes
-		editor_state.save_changes();
+		await editor_state.save_changes();
 
 		// Verify diskfile was updated
 		expect(test_diskfile.content).toBe('New saved content');

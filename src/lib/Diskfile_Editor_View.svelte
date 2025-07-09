@@ -23,7 +23,7 @@
 
 	const app = frontend_context.get();
 
-	// TODO @many refactor, maybe move a collection on `app.diskfiles`?
+	// TODO @many refactor, maybe move a collection on `app.diskfiles`? one problem is the contextmenu can't access it without hacking something with context
 	const editor_state = new Diskfile_Editor_State({app, diskfile});
 
 	// Reference to the content editor component
@@ -101,8 +101,8 @@
 
 			<div class="p_md">
 				<aside>
-					⚠️ this filesystem interface is just a proof of concept and lacks most features you'd
-					expect, more soon
+					⚠️ This filesystem interface is an early proof of concept and lacks most features you'd
+					expect, more soon.
 				</aside>
 			</div>
 		</div>

@@ -93,7 +93,7 @@ export const get_glyph_for_action_method = (method: Action_Method): string => {
 	switch (method) {
 		case 'ping':
 			return GLYPH_PING;
-		case 'submit_completion':
+		case 'create_completion':
 			return GLYPH_RESPONSE;
 		case 'load_session':
 			return GLYPH_SESSION;

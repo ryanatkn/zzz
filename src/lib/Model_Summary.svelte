@@ -11,10 +11,11 @@
 
 	interface Props {
 		model: Model;
+		omit_provider?: boolean | undefined;
 		attrs?: SvelteHTMLElements['div'] | undefined;
 	}
 
-	const {model, attrs}: Props = $props();
+	const {model, omit_provider, attrs}: Props = $props();
 
 	const provider = $derived(model.app.providers.find_by_name(model.provider_name));
 
@@ -26,9 +27,11 @@
 		<div class="font_size_xl mb_lg">
 			<Model_Link {model} icon />
 		</div>
-		<div class="mb_lg">
-			<Provider_Link {provider} icon="glyph" attrs={{class: 'row gap_sm'}} />
-		</div>
+		{#if !omit_provider}
+			<div class="mb_lg">
+				<Provider_Link {provider} icon="glyph" show_name />
+			</div>
+		{/if}
 
 		{#if model.tags.length}
 			<ul class="unstyled display_flex flex_wrap gap_xs mb_md mt_sm">

@@ -300,7 +300,7 @@ export class Diskfile_Editor_State {
 	/**
 	 * Save changes to the diskfile.
 	 */
-	save_changes(): boolean {
+	async save_changes(): Promise<boolean> {
 		if (!this.has_changes) return false;
 
 		const history = this.#ensure_history();
@@ -323,7 +323,7 @@ export class Diskfile_Editor_State {
 		const entry = history.add_entry(content_to_save);
 
 		// Save to the file
-		this.app.diskfiles.update(this.path, content_to_save);
+		await this.app.diskfiles.update(this.path, content_to_save);
 
 		// Update last seen content after saving
 		this.last_seen_disk_content = content_to_save;

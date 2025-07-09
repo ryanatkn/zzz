@@ -5,8 +5,6 @@ import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
 import type {Assignable, Class_Constructor, Omit_Strict} from '@ryanatkn/belt/types.js';
 
 import {Provider, type Provider_Json_Input} from '$lib/provider.svelte.js';
-import type {Provider_Name} from '$lib/provider_types.js';
-import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
 import {Models} from '$lib/models.svelte.js';
 import {Chats} from '$lib/chats.svelte.js';
 import {Tapes} from '$lib/tapes.svelte.js';
@@ -34,7 +32,6 @@ import {Diskfile_History} from '$lib/diskfile_history.svelte.js';
 import {HANDLED} from '$lib/cell_helpers.js';
 import {Action_Registry} from '$lib/action_registry.js';
 import {Action_Peer} from '$lib/action_peer.js';
-import type {Completion_Message} from '$lib/completion_types.js';
 import type {Action_Method, Actions_Api} from '$lib/action_metatypes.js';
 import type {Frontend_Action_Handlers} from '$lib/frontend_action_types.js';
 import type {Action_Spec_Union} from '$lib/action_spec.js';
@@ -229,29 +226,6 @@ export class Frontend extends Cell<typeof Frontend_Json> implements Action_Event
 	}
 
 	// TODO think about this API, keep it more minimal
-
-	/**
-	 * Submit a completion request to an AI provider and return a promise for the response
-	 */
-	async submit_completion(
-		prompt: string,
-		provider_name: Provider_Name,
-		model: string,
-		completion_messages?: Array<Completion_Message>,
-	): Promise<ReturnType<typeof this.api.submit_completion>> {
-		const request_id = create_uuid();
-
-		return this.api.submit_completion({
-			completion_request: {
-				created: get_datetime_now(),
-				request_id,
-				provider_name,
-				model,
-				prompt,
-				completion_messages,
-			},
-		});
-	}
 
 	// TODO refactor, probably `app.session`
 	receive_session(data: any): void {

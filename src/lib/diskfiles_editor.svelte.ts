@@ -4,7 +4,7 @@ import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Diskfile_Tabs} from '$lib/diskfile_tabs.svelte.js';
-import {create_uuid, Uuid} from '$lib/zod_helpers.js';
+import {Uuid} from '$lib/zod_helpers.js';
 import {Cell_Json} from '$lib/cell_types.js';
 
 export const Diskfiles_Editor_Json = Cell_Json.extend({
@@ -23,12 +23,7 @@ export class Diskfiles_Editor extends Cell<typeof Diskfiles_Editor_Json> {
 	show_sort_controls: boolean = $state(false);
 
 	/** Tabs for managing the open diskfiles. */
-	readonly tabs: Diskfile_Tabs = new Diskfile_Tabs({
-		app: this.app,
-		json: {
-			id: create_uuid(),
-		},
-	});
+	readonly tabs: Diskfile_Tabs = new Diskfile_Tabs({app: this.app});
 
 	constructor(options: Diskfiles_Editor_Options) {
 		super(Diskfiles_Editor_Json, options);

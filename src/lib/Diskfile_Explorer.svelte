@@ -34,7 +34,7 @@
 	const TODO_create_folder_pending = false;
 
 	// TODO improve UX to not use alert/prompt
-	const create_file = () => {
+	const create_file = async () => {
 		if (!zzz_cache_dir) {
 			alert('Cannot create file: no directory is selected'); // eslint-disable-line no-alert
 			return;
@@ -44,14 +44,14 @@
 		if (!filename) return;
 
 		try {
-			diskfiles.create_file(filename);
+			await diskfiles.create_file(filename);
 		} catch (error) {
-			console.error('Failed to create file:', error);
+			console.error('failed to create file:', error);
 			alert(`Failed to create file: ${error}`); // eslint-disable-line no-alert
 		}
 	};
 
-	const create_folder = () => {
+	const create_folder = async () => {
 		if (!zzz_cache_dir) {
 			alert('Cannot create folder: no directory is selected'); // eslint-disable-line no-alert
 			return;
@@ -61,9 +61,9 @@
 		if (!dirname) return;
 
 		try {
-			diskfiles.create_directory(dirname);
+			await diskfiles.create_directory(dirname);
 		} catch (error) {
-			console.error('Failed to create folder:', error);
+			console.error('failed to create folder:', error);
 			alert(`Failed to create folder: ${error}`); // eslint-disable-line no-alert
 		}
 	};
@@ -124,6 +124,8 @@
 			sort_key_default="path_asc"
 			no_items={empty ? undefined : '[no files available]'}
 		>
+			<!-- TODO show the status of being open in any tab (what signifier?) -->
+			<!-- TODO bug with `selected` -->
 			{#snippet children(diskfile)}
 				{@const selected = diskfiles.selected_file_id === diskfile.id}
 				<div class="diskfile_listitem_wrapper" class:selected transition:slide>

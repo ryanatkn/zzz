@@ -2,17 +2,18 @@
  * Helper module for safely working with completion responses
  * and handling type compatibility issues.
  */
-import {get_datetime_now} from '$lib/zod_helpers.js';
+import {get_datetime_now, Uuid} from '$lib/zod_helpers.js';
 import type {Action_Outputs} from '$lib/action_collections.js';
 import type {Provider_Name, Provider_Data} from '$lib/provider_types.js';
-import type {Jsonrpc_Request_Id} from '$lib/jsonrpc.js';
+import type {Model_Name} from '$lib/model.svelte.js';
 
+// TODO hacky, shouldn't exist
 /**
  * Extracts the text content from a completion response
  */
 export const to_completion_response_text = (
 	completion_response:
-		| Action_Outputs['submit_completion']['completion_response']
+		| Action_Outputs['create_completion']['completion_response']
 		| null
 		| undefined,
 ): string | null => {
@@ -30,20 +31,21 @@ export const to_completion_response_text = (
 		case 'gemini':
 			return data.value.text || null;
 		default:
-			console.error('Unknown provider type', data);
+			console.error('unknown provider type', data);
 			return null;
 	}
 };
 
+// TODO hacky, probably refactor
 /**
- * Creates a standardized completion response message from provider-specific responses
+ * Creates a standardized completion response message from provider-specific responses.
  */
 export const to_completion_result = (
-	request_id: Jsonrpc_Request_Id,
 	provider_name: Provider_Name,
-	model: string,
-	api_response: unknown,
-): Action_Outputs['submit_completion'] => {
+	model: Model_Name,
+	api_response: unknown, // TODO types
+	progress_token?: Uuid,
+): Action_Outputs['create_completion'] => {
 	let provider_data: Provider_Data;
 
 	// Convert provider-specific response format to our standard format
@@ -70,27 +72,34 @@ export const to_completion_result = (
 			provider_data = {
 				type: 'gemini',
 				value: {
-					text: (api_response as any)?.response?.text() || '',
+					// TODO hacky
+					text: (api_response as any)?.text || (api_response as any)?.response?.text() || '',
 					candidates: (api_response as any)?.candidates || null,
-					function_calls: (api_response as any)?.functionCalls || null,
-					prompt_feedback: (api_response as any)?.promptFeedback || null,
-					usage_metadata: (api_response as any)?.usageMetadata || null,
+					function_calls: (api_response as any)?.function_calls || null,
+					prompt_feedback: (api_response as any)?.prompt_feedback || null,
+					usage_metadata: (api_response as any)?.usage_metadata || null,
 				},
 			};
 			break;
 		default:
-			throw new Error(`Unsupported provider: ${provider_name}`);
+			// TODO throw jsonrpc error
+			throw new Error(`unsupported provider: ${provider_name}`);
 	}
 
 	const created = get_datetime_now();
 
-	return {
+	const output: Action_Outputs['create_completion'] = {
 		completion_response: {
 			created,
-			request_id,
 			provider_name,
 			model,
 			data: provider_data,
 		},
 	};
+
+	if (progress_token) {
+		output._meta = {progressToken: progress_token};
+	}
+
+	return output;
 };

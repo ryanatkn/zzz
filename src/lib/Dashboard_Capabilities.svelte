@@ -18,13 +18,14 @@
 		<Time_Widget value={app.time.now} />
 	</Dashboard_Header>
 	<section class="width_md">
-		<p>
-			This page lets you view and control the app's capabilities, powers that determine what you can
-			do with it.
-		</p>
+		<p>This page lets you view and control the app's capabilities, the available powers.</p>
 		<p>
 			Zzz's goal is to connect your intent to the world through machines, so it runs in many
 			contexts, and you can do whatever you wish with whatever capabilities are on hand.
+		</p>
+		<p>
+			This is a work in progress. The idea is to put handles on the system for transparency and
+			control.
 		</p>
 	</section>
 	<section>

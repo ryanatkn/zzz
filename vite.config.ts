@@ -15,7 +15,7 @@ export default defineConfig({
 		: undefined,
 	server: {
 		proxy: {
-			'/api': 'http://localhost:8999', // equal to `PUBLIC_SERVER_HOSTNAME + ':' + PUBLIC_SERVER_PROXIED_PORT`
+			'/api': 'http://localhost:8999', // equal to `PUBLIC_SERVER_HOST + ':' + PUBLIC_SERVER_PROXIED_PORT`
 		},
 	},
 });

@@ -12,6 +12,19 @@ import type {Action_Outputs} from '$lib/action_collections.js';
  * - initiator: 'both' → all valid phases
  */
 export interface Backend_Action_Handlers {
+	completion_progress?: {
+		send?: (
+			action_event: Action_Event<'completion_progress', Backend, 'send', 'handling'>,
+		) => void | Promise<void>;
+	};
+	create_completion?: {
+		receive_request?: (
+			action_event: Action_Event<'create_completion', Backend, 'receive_request', 'handling'>,
+		) => Action_Outputs['create_completion'] | Promise<Action_Outputs['create_completion']>;
+		send_response?: (
+			action_event: Action_Event<'create_completion', Backend, 'send_response', 'handling'>,
+		) => void | Promise<void>;
+	};
 	create_directory?: {
 		receive_request?: (
 			action_event: Action_Event<'create_directory', Backend, 'receive_request', 'handling'>,
@@ -60,14 +73,6 @@ export interface Backend_Action_Handlers {
 		) => Action_Outputs['ping'] | Promise<Action_Outputs['ping']>;
 		send_response?: (
 			action_event: Action_Event<'ping', Backend, 'send_response', 'handling'>,
-		) => void | Promise<void>;
-	};
-	submit_completion?: {
-		receive_request?: (
-			action_event: Action_Event<'submit_completion', Backend, 'receive_request', 'handling'>,
-		) => Action_Outputs['submit_completion'] | Promise<Action_Outputs['submit_completion']>;
-		send_response?: (
-			action_event: Action_Event<'submit_completion', Backend, 'send_response', 'handling'>,
 		) => void | Promise<void>;
 	};
 	toggle_main_menu?: never;

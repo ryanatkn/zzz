@@ -12,7 +12,6 @@
 	import Content_Editor from '$lib/Content_Editor.svelte';
 	import {GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
 	import type {SvelteHTMLElements} from 'svelte/elements';
-	import Tape_Toggle_Button from '$lib/Tape_Toggle_Button.svelte';
 	import type {Chat} from '$lib/chat.svelte.js';
 	import {app_context} from '$lib/app.svelte.js';
 
@@ -81,11 +80,7 @@
 						/></small
 					>
 				</header>
-				{#if chat.view_mode !== 'simple'}
-					<div class="display_flex gap_xs">
-						<Tape_Toggle_Button {tape} />
-					</div>
-				{/if}
+				<!-- TODO maybe add a button here that opens the contextmenu? -->
 			</div>
 
 			{#if strip_count}

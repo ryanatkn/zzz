@@ -14,6 +14,8 @@ import type {
  * All method types combined.
  */
 export const Action_Methods = z.enum([
+	'completion_progress',
+	'create_completion',
 	'create_directory',
 	'delete_diskfile',
 	'filer_change',
@@ -26,7 +28,6 @@ export const Action_Methods = z.enum([
 	'ollama_pull',
 	'ollama_show',
 	'ping',
-	'submit_completion',
 	'toggle_main_menu',
 	'update_diskfile',
 ]);
@@ -37,6 +38,8 @@ export type Action_Methods = z.infer<typeof Action_Methods>;
  * These represent the complete action spec definitions.
  */
 export const Action_Specs = {
+	completion_progress: specs.completion_progress_action_spec,
+	create_completion: specs.create_completion_action_spec,
 	create_directory: specs.create_directory_action_spec,
 	delete_diskfile: specs.delete_diskfile_action_spec,
 	filer_change: specs.filer_change_action_spec,
@@ -49,11 +52,12 @@ export const Action_Specs = {
 	ollama_pull: specs.ollama_pull_action_spec,
 	ollama_show: specs.ollama_show_action_spec,
 	ping: specs.ping_action_spec,
-	submit_completion: specs.submit_completion_action_spec,
 	toggle_main_menu: specs.toggle_main_menu_action_spec,
 	update_diskfile: specs.update_diskfile_action_spec,
 } as const;
 export interface Action_Specs {
+	completion_progress: typeof specs.completion_progress_action_spec;
+	create_completion: typeof specs.create_completion_action_spec;
 	create_directory: typeof specs.create_directory_action_spec;
 	delete_diskfile: typeof specs.delete_diskfile_action_spec;
 	filer_change: typeof specs.filer_change_action_spec;
@@ -66,7 +70,6 @@ export interface Action_Specs {
 	ollama_pull: typeof specs.ollama_pull_action_spec;
 	ollama_show: typeof specs.ollama_show_action_spec;
 	ping: typeof specs.ping_action_spec;
-	submit_completion: typeof specs.submit_completion_action_spec;
 	toggle_main_menu: typeof specs.toggle_main_menu_action_spec;
 	update_diskfile: typeof specs.update_diskfile_action_spec;
 }
@@ -79,6 +82,8 @@ export const action_specs: Array<Action_Spec_Union> = Object.values(Action_Specs
  * e.g. JSON-RPC request/notification params and local call arguments.
  */
 export const Action_Inputs = {
+	completion_progress: specs.completion_progress_action_spec.input,
+	create_completion: specs.create_completion_action_spec.input,
 	create_directory: specs.create_directory_action_spec.input,
 	delete_diskfile: specs.delete_diskfile_action_spec.input,
 	filer_change: specs.filer_change_action_spec.input,
@@ -91,11 +96,12 @@ export const Action_Inputs = {
 	ollama_pull: specs.ollama_pull_action_spec.input,
 	ollama_show: specs.ollama_show_action_spec.input,
 	ping: specs.ping_action_spec.input,
-	submit_completion: specs.submit_completion_action_spec.input,
 	toggle_main_menu: specs.toggle_main_menu_action_spec.input,
 	update_diskfile: specs.update_diskfile_action_spec.input,
 } as const;
 export interface Action_Inputs {
+	completion_progress: z.infer<typeof specs.completion_progress_action_spec.input>;
+	create_completion: z.infer<typeof specs.create_completion_action_spec.input>;
 	create_directory: z.infer<typeof specs.create_directory_action_spec.input>;
 	delete_diskfile: z.infer<typeof specs.delete_diskfile_action_spec.input>;
 	filer_change: z.infer<typeof specs.filer_change_action_spec.input>;
@@ -108,7 +114,6 @@ export interface Action_Inputs {
 	ollama_pull: z.infer<typeof specs.ollama_pull_action_spec.input>;
 	ollama_show: z.infer<typeof specs.ollama_show_action_spec.input>;
 	ping: z.infer<typeof specs.ping_action_spec.input>;
-	submit_completion: z.infer<typeof specs.submit_completion_action_spec.input>;
 	toggle_main_menu: z.infer<typeof specs.toggle_main_menu_action_spec.input>;
 	update_diskfile: z.infer<typeof specs.update_diskfile_action_spec.input>;
 }
@@ -119,6 +124,8 @@ export interface Action_Inputs {
  * e.g. JSON-RPC response results and local call return values.
  */
 export const Action_Outputs = {
+	completion_progress: specs.completion_progress_action_spec.output,
+	create_completion: specs.create_completion_action_spec.output,
 	create_directory: specs.create_directory_action_spec.output,
 	delete_diskfile: specs.delete_diskfile_action_spec.output,
 	filer_change: specs.filer_change_action_spec.output,
@@ -131,11 +138,12 @@ export const Action_Outputs = {
 	ollama_pull: specs.ollama_pull_action_spec.output,
 	ollama_show: specs.ollama_show_action_spec.output,
 	ping: specs.ping_action_spec.output,
-	submit_completion: specs.submit_completion_action_spec.output,
 	toggle_main_menu: specs.toggle_main_menu_action_spec.output,
 	update_diskfile: specs.update_diskfile_action_spec.output,
 } as const;
 export interface Action_Outputs {
+	completion_progress: z.infer<typeof specs.completion_progress_action_spec.output>;
+	create_completion: z.infer<typeof specs.create_completion_action_spec.output>;
 	create_directory: z.infer<typeof specs.create_directory_action_spec.output>;
 	delete_diskfile: z.infer<typeof specs.delete_diskfile_action_spec.output>;
 	filer_change: z.infer<typeof specs.filer_change_action_spec.output>;
@@ -148,7 +156,6 @@ export interface Action_Outputs {
 	ollama_pull: z.infer<typeof specs.ollama_pull_action_spec.output>;
 	ollama_show: z.infer<typeof specs.ollama_show_action_spec.output>;
 	ping: z.infer<typeof specs.ping_action_spec.output>;
-	submit_completion: z.infer<typeof specs.submit_completion_action_spec.output>;
 	toggle_main_menu: z.infer<typeof specs.toggle_main_menu_action_spec.output>;
 	update_diskfile: z.infer<typeof specs.update_diskfile_action_spec.output>;
 }
@@ -159,6 +166,8 @@ export interface Action_Outputs {
  * for each action's event data, properly typed with inputs and outputs.
  */
 export interface Action_Event_Datas {
+	completion_progress: Action_Event_Remote_Notification_Data<'completion_progress'>;
+	create_completion: Action_Event_Request_Response_Data<'create_completion'>;
 	create_directory: Action_Event_Request_Response_Data<'create_directory'>;
 	delete_diskfile: Action_Event_Request_Response_Data<'delete_diskfile'>;
 	filer_change: Action_Event_Remote_Notification_Data<'filer_change'>;
@@ -171,7 +180,6 @@ export interface Action_Event_Datas {
 	ollama_pull: Action_Event_Local_Call_Data<'ollama_pull'>;
 	ollama_show: Action_Event_Local_Call_Data<'ollama_show'>;
 	ping: Action_Event_Request_Response_Data<'ping'>;
-	submit_completion: Action_Event_Request_Response_Data<'submit_completion'>;
 	toggle_main_menu: Action_Event_Local_Call_Data<'toggle_main_menu'>;
 	update_diskfile: Action_Event_Request_Response_Data<'update_diskfile'>;
 }

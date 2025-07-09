@@ -1,7 +1,6 @@
 import {Hono} from 'hono';
 import {serve} from '@hono/node-server';
 import {createNodeWebSocket} from '@hono/node-ws';
-import {PUBLIC_SERVER_HOSTNAME} from '$env/static/public';
 import {Logger} from '@ryanatkn/belt/log.js';
 
 import {Backend} from '$lib/server/backend.js';
@@ -12,6 +11,7 @@ import create_config from '$lib/config.js';
 import {action_specs} from '$lib/action_collections.js';
 import {
 	API_PATH_FOR_HTTP_RPC,
+	SERVER_HOST,
 	SERVER_PROXIED_PORT,
 	SERVER_URL,
 	WEBSOCKET_PATH,
@@ -69,9 +69,9 @@ const create_server = (): void => {
 
 	const hono = serve(
 		{
-			fetch: app.fetch,
-			hostname: PUBLIC_SERVER_HOSTNAME,
+			hostname: SERVER_HOST,
 			port: SERVER_PROXIED_PORT,
+			fetch: app.fetch,
 		},
 		(info) => {
 			log.info(`listening on http://${info.address}:${info.port}`);

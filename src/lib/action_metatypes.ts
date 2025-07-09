@@ -8,6 +8,8 @@ import type {Action_Inputs, Action_Outputs} from '$lib/action_collections.js';
  * All action method names. Request/response actions have two types per method.
  */
 export const Action_Method = z.enum([
+	'completion_progress',
+	'create_completion',
 	'create_directory',
 	'delete_diskfile',
 	'filer_change',
@@ -20,7 +22,6 @@ export const Action_Method = z.enum([
 	'ollama_pull',
 	'ollama_show',
 	'ping',
-	'submit_completion',
 	'toggle_main_menu',
 	'update_diskfile',
 ]);
@@ -30,11 +31,11 @@ export type Action_Method = z.infer<typeof Action_Method>;
  * Names of all request_response actions.
  */
 export const Request_Response_Action_Method = z.enum([
+	'create_completion',
 	'create_directory',
 	'delete_diskfile',
 	'load_session',
 	'ping',
-	'submit_completion',
 	'update_diskfile',
 ]);
 export type Request_Response_Action_Method = z.infer<typeof Request_Response_Action_Method>;
@@ -42,7 +43,7 @@ export type Request_Response_Action_Method = z.infer<typeof Request_Response_Act
 /**
  * Names of all remote_notification actions.
  */
-export const Remote_Notification_Action_Method = z.enum(['filer_change']);
+export const Remote_Notification_Action_Method = z.enum(['completion_progress', 'filer_change']);
 export type Remote_Notification_Action_Method = z.infer<typeof Remote_Notification_Action_Method>;
 
 /**
@@ -64,6 +65,8 @@ export type Local_Call_Action_Method = z.infer<typeof Local_Call_Action_Method>;
  * Names of all actions that may be handled on the client.
  */
 export const Frontend_Action_Method = z.enum([
+	'completion_progress',
+	'create_completion',
 	'create_directory',
 	'delete_diskfile',
 	'filer_change',
@@ -76,7 +79,6 @@ export const Frontend_Action_Method = z.enum([
 	'ollama_pull',
 	'ollama_show',
 	'ping',
-	'submit_completion',
 	'toggle_main_menu',
 	'update_diskfile',
 ]);
@@ -86,12 +88,13 @@ export type Frontend_Action_Method = z.infer<typeof Frontend_Action_Method>;
  * Names of all actions that may be handled on the server.
  */
 export const Backend_Action_Method = z.enum([
+	'completion_progress',
+	'create_completion',
 	'create_directory',
 	'delete_diskfile',
 	'filer_change',
 	'load_session',
 	'ping',
-	'submit_completion',
 	'update_diskfile',
 ]);
 export type Backend_Action_Method = z.infer<typeof Backend_Action_Method>;
@@ -100,6 +103,12 @@ export type Backend_Action_Method = z.infer<typeof Backend_Action_Method>;
  * Interface for action dispatch functions.
  */
 export interface Actions_Api {
+	completion_progress: (
+		input: Action_Inputs['completion_progress'],
+	) => Promise<Action_Outputs['completion_progress']>;
+	create_completion: (
+		input: Action_Inputs['create_completion'],
+	) => Promise<Action_Outputs['create_completion']>;
 	create_directory: (
 		input: Action_Inputs['create_directory'],
 	) => Promise<Action_Outputs['create_directory']>;
@@ -120,9 +129,6 @@ export interface Actions_Api {
 	ollama_pull: (input: Action_Inputs['ollama_pull']) => Promise<Action_Outputs['ollama_pull']>;
 	ollama_show: (input: Action_Inputs['ollama_show']) => Promise<Action_Outputs['ollama_show']>;
 	ping: (input?: void) => Promise<Action_Outputs['ping']>;
-	submit_completion: (
-		input: Action_Inputs['submit_completion'],
-	) => Promise<Action_Outputs['submit_completion']>;
 	toggle_main_menu: (
 		input?: Action_Inputs['toggle_main_menu'],
 	) => Action_Outputs['toggle_main_menu'];

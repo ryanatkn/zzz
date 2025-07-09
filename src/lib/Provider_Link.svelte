@@ -35,6 +35,7 @@
 	);
 </script>
 
+<!-- whitespace is a bit tricky here, we want none with glyphs -->
 {#if provider}
 	<a {...attrs} href="{base}/providers/{provider.name}" class:selected
 		>{#if children}
@@ -43,11 +44,10 @@
 			{#if icon === 'glyph'}
 				<Glyph glyph={GLYPH_PROVIDER} />
 			{:else if icon === 'svg'}
-				<Provider_Logo name={provider.name} {...icon_props} />
+				<Provider_Logo name={provider.name} {...icon_props} />&nbsp;
 			{:else if icon}
 				{@render icon(provider, GLYPH_PROVIDER)}
-			{/if}
-			{#if show_name}
+			{/if}{#if show_name}
 				{provider.name}
 			{:else}
 				{provider.title}

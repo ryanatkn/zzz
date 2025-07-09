@@ -23,11 +23,10 @@ More at [zzz.software/about](https://www.zzz.software/about).
 
 ## Setup
 
-This project is in its early stages, and installing it currently requires some technical skills.
-Eventually there will be an installable desktop app for nontechnical users
-(and in the near-term developers will have an npm library for TypeScript and Svelte),
-but it's not there yet -
-for now you'll need Node 22.11+ (YMMV with Bun/Deno/etc)
+This project is in its early stages, and installing it
+currently requires some basic technical skills.
+Eventually there will be a desktop app but
+for now you'll need Node 22.15+ (YMMV with Deno/Bun/etc)
 and Git to clone the repo.
 
 Zzz is deployed via SvelteKit's static adapter with diminished capabilities.
@@ -79,7 +78,7 @@ Zzz builds on a great deal of software.
     so there's a higher quantity of lower quality code in Zzz
     because I'm using LLMs in my workflows
     (and yearning for better tools so building Zzz with haste),
-    but the important parts are carefully done
+    but the important parts are carefully done, and I still prioritize quality over velocity
 
 ## License 🐦
 

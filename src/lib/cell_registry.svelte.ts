@@ -112,7 +112,11 @@ export class Cell_Registry {
 
 	add_cell(cell: Cell<any>): void {
 		if (DEV && this.all.has(cell.id)) {
-			console.error(`cell already exists in registry: ${cell.id}`);
+			console.error(
+				cell === this.all.get(cell.id)
+					? `registry already has this cell instance: ${cell.id}`
+					: `registry already has a different cell instance with this id: ${cell.id}`,
+			);
 		}
 		this.all.set(cell.id, cell);
 	}

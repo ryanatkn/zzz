@@ -271,12 +271,12 @@ describe('Ollama', () => {
 		});
 
 		app.actions.add_from_json({
-			method: 'submit_completion',
+			method: 'create_completion',
 			action_event: {
 				kind: 'request_response',
 				phase: 'send_request',
 				step: 'handled',
-				method: 'submit_completion',
+				method: 'create_completion',
 				executor: 'frontend',
 				input: {},
 				output: null,
@@ -291,7 +291,7 @@ describe('Ollama', () => {
 		expect(ollama.actions).toHaveLength(2);
 		expect(ollama.actions.map((a) => a.method)).toContain('ollama_pull');
 		expect(ollama.actions.map((a) => a.method)).toContain('ollama_list');
-		expect(ollama.actions.map((a) => a.method)).not.toContain('submit_completion');
+		expect(ollama.actions.map((a) => a.method)).not.toContain('create_completion');
 	});
 
 	test('should filter read operations when show_read_actions is false', () => {

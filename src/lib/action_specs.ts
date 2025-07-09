@@ -8,7 +8,11 @@ import {
 	Serializable_Source_File,
 	Zzz_Dir,
 } from '$lib/diskfile_types.js';
-import {Completion_Request, Completion_Response} from '$lib/completion_types.js';
+import {
+	Completion_Message,
+	Completion_Request,
+	Completion_Response,
+} from '$lib/completion_types.js';
 import type {Action_Spec_Union} from '$lib/action_spec.js';
 import {Jsonrpc_Request_Id} from '$lib/jsonrpc.js';
 import {
@@ -23,6 +27,7 @@ import {
 	Ollama_Copy_Request,
 	Ollama_Create_Request,
 } from '$lib/ollama_helpers.js';
+import {Uuid} from '$lib/zod_helpers.js';
 
 // TODO I tried using the helper `create_action_spec` but I don't see how to get proper typing,
 // we want the declared specs to have their literal types but not need to include optional properties
@@ -128,8 +133,8 @@ export const create_directory_action_spec = {
 	async: true,
 } satisfies Action_Spec_Union;
 
-export const submit_completion_action_spec = {
-	method: 'submit_completion',
+export const create_completion_action_spec = {
+	method: 'create_completion',
 	kind: 'request_response',
 	initiator: 'frontend',
 	auth: 'public',
@@ -137,13 +142,58 @@ export const submit_completion_action_spec = {
 	input: z
 		.object({
 			completion_request: Completion_Request,
+			_meta: z.object({progressToken: Uuid.optional()}).passthrough().optional(),
 		})
 		.strict(),
 	output: z
 		.object({
 			completion_response: Completion_Response,
+			_meta: z.object({progressToken: Uuid.optional()}).passthrough().optional(),
 		})
 		.strict(),
+	async: true,
+} satisfies Action_Spec_Union;
+
+export const completion_progress_action_spec = {
+	method: 'completion_progress',
+	kind: 'remote_notification',
+	initiator: 'backend',
+	auth: null,
+	side_effects: true,
+	input: z
+		.object({
+			// TODO improve schema
+			// "gemma3:1b"
+			// 		interface ChatResponse {
+			//     model: string;
+			//     created_at: Date;
+			//     message: Message;
+			//     done: boolean;
+			//     done_reason: string;
+			//     total_duration: number;
+			//     load_duration: number;
+			//     prompt_eval_count: number;
+			//     prompt_eval_duration: number;
+			//     eval_count: number;
+			//     eval_duration: number;
+			// }
+			// Ollama types:
+			//		 thinking?: string;
+			//		 images?: Uint8Array[] | string[];
+			//		 tool_calls?: ToolCall[];
+			chunk: z
+				.object({
+					model: z.string().optional(),
+					created_at: z.string().optional(),
+					done: z.boolean().optional(),
+					message: Completion_Message.passthrough().optional(),
+				})
+				.passthrough()
+				.optional(),
+			_meta: z.object({progressToken: Uuid.optional()}).passthrough().optional(),
+		})
+		.strict(),
+	output: z.void(),
 	async: true,
 } satisfies Action_Spec_Union;
 
@@ -166,7 +216,7 @@ export const ollama_list_action_spec = {
 	auth: null,
 	side_effects: null,
 	input: Ollama_List_Request,
-	output: Ollama_List_Response,
+	output: z.union([Ollama_List_Response, z.null()]),
 	async: true,
 } satisfies Action_Spec_Union;
 
@@ -177,7 +227,7 @@ export const ollama_ps_action_spec = {
 	auth: null,
 	side_effects: null,
 	input: Ollama_Ps_Request,
-	output: Ollama_Ps_Response,
+	output: z.union([Ollama_Ps_Response, z.null()]),
 	async: true,
 } satisfies Action_Spec_Union;
 
@@ -188,7 +238,7 @@ export const ollama_show_action_spec = {
 	auth: null,
 	side_effects: null,
 	input: Ollama_Show_Request,
-	output: Ollama_Show_Response,
+	output: z.union([Ollama_Show_Response, z.null()]),
 	async: true,
 } satisfies Action_Spec_Union;
 

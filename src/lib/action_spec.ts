@@ -22,6 +22,8 @@ export const Action_Spec = z.object({
 		z.instanceof(z.ZodObject),
 		z.instanceof(z.ZodNull),
 		z.instanceof(z.ZodOptional<z.ZodVoid>),
+		// TODO broken type and schema usage, idk what I'm doing
+		z.instanceof(z.ZodUnion),
 	]),
 	async: z.boolean(),
 }); // TODO also make strict? additional properties are not passed through

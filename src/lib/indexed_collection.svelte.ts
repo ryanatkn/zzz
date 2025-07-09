@@ -295,7 +295,12 @@ export class Indexed_Collection<
 		const {by_id} = this;
 
 		if (by_id.has(item.id)) {
-			if (DEV) console.error('Item with this id already exists in the collection: ' + item.id);
+			if (DEV)
+				console.error(
+					'item already exists in collection with id: ' + item.id,
+					item,
+					by_id.get(item.id),
+				);
 			return;
 		}
 

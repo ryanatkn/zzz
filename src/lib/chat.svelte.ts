@@ -9,6 +9,8 @@ import {reorder_list} from '$lib/list_helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import {get_unique_name, estimate_token_count} from '$lib/helpers.js';
+import {Completion_Request} from '$lib/completion_types.js';
+import {render_message_with_role} from '$lib/tape_helpers.js';
 
 const Chat_View_Mode = z.enum(['simple', 'multi']).default('simple');
 export type Chat_View_Mode = z.infer<typeof Chat_View_Mode>;
@@ -111,31 +113,37 @@ export class Chat extends Cell<typeof Chat_Json> {
 		void this.init_name_from_strips(content, assistant_strip.content);
 	}
 
-	// TODO needs to be reworked, also shouldn't clobber any user-assigned names
+	// TODO needs to be reworked (maybe accept an array of messages?), also shouldn't clobber any user-assigned names
 	/**
 	 * Uses an LLM to name the chat based on the user input and AI response.
 	 */
 	async init_name_from_strips(user_content: string, assistant_content: string): Promise<void> {
+		// TODO better abstraction for this kind of thing including de-duping the request,
+		// returning the current promise, see `Request_Tracker/Request_Tracker_Item`
 		if (this.init_name_status !== 'initial') return;
 
 		this.init_name_status = 'pending';
 
-		let p = `Output a short name for this chat with no additional commentary.
-			This is a short and descriptive phrase that's used by humans to refer to this chat in the future,
-			and it should be related to the content.
-			Prefer lowercase unless it's a proper noun or acronym.`;
+		// TODO refactor
+		let p = `Output a short title for this chat conversation with no commentary,
+			for this chat content, use lowercase words (unless proper nouns) with no punctuation:\n\n`;
 
-		p += `<User_Message>${user_content}</User_Message>`;
-		p += `\n<Assistant_Message>${assistant_content}</Assistant_Message>`;
+		// TODO not hardcoded?
+		p += render_message_with_role('user', user_content);
+		p += '\n\n' + render_message_with_role('assistant', assistant_content);
 
 		try {
+			// TODO BLOCK disable streaming (should be automatic by not including the `progressToken`, or otherwise explicitly in the API)
 			// TODO configure this utility LLM (roles?), and set the output token count from config as well
-			const name_response = await this.app.submit_completion(
-				p,
-				// TODO @many hacky, rework the bots interface (currently just copies over the config) - the provider should be on the model object, but should models be able to have multiple providers, or do they need unique names? and another field for canonical model name?
-				this.app.models.find_by_name(this.app.bots.namerbot)!.provider_name,
-				this.app.bots.namerbot,
-			);
+			const name_response = await this.app.api.create_completion({
+				// TODO @many should parsing be automatic, so the types change to schema input types? makes sense yeah?
+				// I think perf is maybe the main reason not to do this?
+				completion_request: Completion_Request.parse({
+					provider_name: this.app.models.find_by_name(this.app.bots.namerbot)!.provider_name,
+					model: this.app.bots.namerbot,
+					prompt: p,
+				}),
+			});
 			const {completion_response} = name_response;
 
 			const response_text = to_completion_response_text(completion_response) || '';

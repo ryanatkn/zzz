@@ -215,36 +215,3 @@ export const create_initial_data = (
 	response: null,
 	notification: null,
 });
-
-// Helper to ensure input is valid for JSON-RPC params
-// JSON-RPC params must be objects or undefined
-export const to_jsonrpc_params = (input: unknown): Record<string, any> | undefined => {
-	// Handle void/undefined inputs
-	if (input === undefined || input === null) {
-		return undefined;
-	}
-
-	// Ensure it's an object for JSON-RPC params
-	if (typeof input === 'object' && !Array.isArray(input)) {
-		return input as Record<string, any>;
-	}
-
-	// Wrap non-object values
-	return {value: input};
-};
-
-// Helper to ensure output is valid for JSON-RPC result
-// JSON-RPC results must be objects (per MCP spec)
-export const to_jsonrpc_result = (output: unknown): Record<string, any> => {
-	// JSON-RPC results must be objects
-	if (output === null || output === undefined) {
-		return {};
-	}
-
-	if (typeof output === 'object' && !Array.isArray(output)) {
-		return output as Record<string, any>;
-	}
-
-	// Wrap non-object values
-	return {value: output};
-};

@@ -238,7 +238,7 @@
 	</section>
 	<hr />
 	<section>
-		<h2 class="mb_lg">Into the future</h2>
+		<h2 class="mb_lg">Peek into the future</h2>
 		<p class="mb_md">
 			This project has a big scope and it's early in development. What you're seeing is a small part
 			of the idea -- especially if you're viewing this on the website not natively via Node -- so

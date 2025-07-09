@@ -268,12 +268,12 @@ describe('file history management', () => {
 });
 
 describe('save changes behavior', () => {
-	test('save_changes persists content and updates tracking', () => {
+	test('save_changes persists content and updates tracking', async () => {
 		// Make user edits
 		editor_state.current_content = 'User edit to save';
 
 		// Save changes
-		editor_state.save_changes();
+		await editor_state.save_changes();
 
 		// Content should be saved to disk
 		expect(test_diskfile.content).toBe('User edit to save');
@@ -285,7 +285,7 @@ describe('save changes behavior', () => {
 		expect(editor_state.content_was_modified_by_user).toBe(false);
 	});
 
-	test('saving during disk changes preserves selected content', () => {
+	test('saving during disk changes preserves selected content', async () => {
 		// Make user edit
 		editor_state.current_content = 'User edit';
 
@@ -294,7 +294,7 @@ describe('save changes behavior', () => {
 		editor_state.check_disk_changes();
 
 		// Save user changes (should overwrite disk change)
-		editor_state.save_changes();
+		await editor_state.save_changes();
 
 		// Disk should have user content
 		expect(test_diskfile.content).toBe('User edit');

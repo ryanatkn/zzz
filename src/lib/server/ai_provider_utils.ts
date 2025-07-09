@@ -22,7 +22,10 @@ export const format_claude_messages = (
 	completion_messages: Array<Completion_Message> | undefined,
 	prompt: string,
 ): Array<{role: 'user' | 'assistant'; content: Array<{type: 'text'; text: string}>}> => {
-	const claude_messages = [];
+	const claude_messages: Array<{
+		role: 'user' | 'assistant';
+		content: Array<{type: 'text'; text: string}>;
+	}> = [];
 
 	// Add tape history with proper typing for Claude API
 	if (completion_messages) {
@@ -30,8 +33,8 @@ export const format_claude_messages = (
 			if (message.role !== 'system') {
 				// Claude expects 'user' or 'assistant' roles only
 				claude_messages.push({
-					role: message.role,
-					content: [{type: 'text' as const, text: message.content}],
+					role: message.role as 'user' | 'assistant', // TODO maybe parse?
+					content: [{type: 'text', text: message.content}],
 				});
 			}
 		}
@@ -39,8 +42,8 @@ export const format_claude_messages = (
 
 	// Add the current message
 	claude_messages.push({
-		role: 'user' as const,
-		content: [{type: 'text' as const, text: prompt}],
+		role: 'user',
+		content: [{type: 'text', text: prompt}],
 	});
 
 	return claude_messages;
@@ -55,12 +58,12 @@ export const format_openai_messages = (
 	prompt: string,
 	model: string,
 ): Array<{role: 'system' | 'user' | 'assistant'; content: string}> => {
-	const openai_messages = [];
+	const openai_messages: Array<{role: 'system' | 'user' | 'assistant'; content: string}> = [];
 
 	// Only add system message if the model supports it
 	if (model !== 'o1-mini') {
 		openai_messages.push({
-			role: 'system' as const,
+			role: 'system',
 			content: system_message,
 		});
 	}
@@ -69,8 +72,7 @@ export const format_openai_messages = (
 	if (completion_messages) {
 		for (const message of completion_messages) {
 			openai_messages.push({
-				// Type assertion to match OpenAI's expected roles
-				role: message.role,
+				role: message.role as 'system' | 'user' | 'assistant', // TODO maybe parse?
 				content: message.content,
 			});
 		}
@@ -78,7 +80,7 @@ export const format_openai_messages = (
 
 	// Add the current message
 	openai_messages.push({
-		role: 'user' as const,
+		role: 'user',
 		content: prompt,
 	});
 

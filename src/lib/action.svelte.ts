@@ -9,7 +9,7 @@ import {Action_Specs} from '$lib/action_collections.js';
 import type {Action_Spec_Union} from '$lib/action_spec.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import {Action_Event_Data} from '$lib/action_event_data.js';
-import type {Action_Event} from './action_event.js';
+import type {Action_Event} from '$lib/action_event.js';
 
 // TODO this isnt in action_types.ts because of circular dependencies, idk what pattern is best yet
 export const Action_Json = Cell_Json.extend({

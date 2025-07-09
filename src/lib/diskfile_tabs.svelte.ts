@@ -9,6 +9,7 @@ import {create_uuid, Uuid} from '$lib/zod_helpers.js';
 import {to_reordered_list} from '$lib/list_helpers.js';
 import {Diskfile_Tab} from '$lib/diskfile_tab.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
+import {create_map_by_property} from '$lib/iterable_helpers.js';
 
 export const Diskfile_Tabs_Json = Cell_Json.extend({
 	selected_tab_id: Uuid.nullable().default(null),
@@ -39,13 +40,9 @@ export class Diskfile_Tabs extends Cell<typeof Diskfile_Tabs_Json> {
 	/**
 	 * Map for looking up tabs by their associated diskfile_id.
 	 */
-	readonly by_diskfile_id: Map<Uuid, Diskfile_Tab> = $derived.by(() => {
-		const map: Map<Uuid, Diskfile_Tab> = new Map();
-		for (const tab of this.items.by_id.values()) {
-			map.set(tab.diskfile_id, tab);
-		}
-		return map;
-	});
+	readonly by_diskfile_id: Map<Uuid, Diskfile_Tab> = $derived(
+		create_map_by_property(this.items.by_id.values(), 'diskfile_id'),
+	);
 
 	/**
 	 * Ordered array of tabs derived directly from tab_order.

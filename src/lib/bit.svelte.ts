@@ -23,6 +23,7 @@ export const Bit_Json_Base = Cell_Json.extend({
 	has_xml_tag: z.boolean().default(false),
 	xml_tag_name: z.string().default(''), // TODO @many move to the prompt somewhere
 	attributes: z.array(Xml_Attribute_With_Defaults).default(() => []), // TODO @many move to the prompt somewhere
+	// TODO should maybe be swapped to `disabled`
 	enabled: z.boolean().default(true),
 	title: z.string().nullable().default(null),
 	summary: z.string().nullable().default(null),

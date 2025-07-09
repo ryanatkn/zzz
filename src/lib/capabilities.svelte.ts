@@ -32,6 +32,7 @@ export interface Capability<T> {
 	data: T;
 	/** Async status tracking the connection/check state. */
 	status: Async_Status;
+	// TODO maybe rename to `request_id` as it's used elsewhere?
 	/** Message id of the last request for this capability's info, if any. */
 	message_id: Jsonrpc_Request_Id | null;
 	/** Error message if any */

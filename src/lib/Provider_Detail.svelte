@@ -38,9 +38,8 @@
 				</h2>
 			{/if}
 			<div>
-				<div class="mb_md font_family_mono">
-					<Glyph glyph={GLYPH_PROVIDER} />
-					{provider.name}
+				<div class="mb_md">
+					<Glyph glyph={GLYPH_PROVIDER} />{provider.name}
 				</div>
 				<div>
 					<External_Link href={provider.url}>docs</External_Link>
@@ -59,7 +58,7 @@
 		<section>
 			<ul class="display_flex flex_wrap unstyled gap_md">
 				{#each provider.models as model (model)}
-					<Model_Summary {model} />
+					<Model_Summary {model} omit_provider />
 				{/each}
 			</ul>
 			<!-- TODO UI to add models -->

@@ -1,4 +1,6 @@
 <script lang="ts">
+	// @slop Claude Sonnet 3.7
+
 	import {base} from '$app/paths';
 	import {page} from '$app/state';
 	import type {SvelteHTMLElements} from 'svelte/elements';

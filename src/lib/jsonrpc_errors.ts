@@ -33,8 +33,8 @@ export const JSONRPC_ERROR_CODES = {
 	SERVICE_UNAVAILABLE: -32007 as Jsonrpc_Error_Code,
 	TIMEOUT: -32008 as Jsonrpc_Error_Code,
 	INSUFFICIENT_STORAGE: -32009 as Jsonrpc_Error_Code,
-	FILE_TOO_LARGE: -32010 as Jsonrpc_Error_Code,
-	UNSUPPORTED_MEDIA_TYPE: -32011 as Jsonrpc_Error_Code,
+	// FILE_TOO_LARGE: -32010 as Jsonrpc_Error_Code,
+	// UNSUPPORTED_MEDIA_TYPE: -32011 as Jsonrpc_Error_Code,
 
 	// AI provider specific errors
 	AI_PROVIDER_ERROR: -32020 as Jsonrpc_Error_Code,

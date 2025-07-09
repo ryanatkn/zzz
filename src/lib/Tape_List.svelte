@@ -13,6 +13,8 @@
 	const {chat = frontend_context.get().chats.selected}: Props = $props();
 
 	const reorderable = new Reorderable();
+
+	// TODO for "single" chat views we need this to show the first tape as selected
 </script>
 
 {#if chat}

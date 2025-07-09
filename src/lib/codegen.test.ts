@@ -15,7 +15,7 @@ import {
 	load_session_action_spec,
 	filer_change_action_spec,
 	toggle_main_menu_action_spec,
-	submit_completion_action_spec,
+	create_completion_action_spec,
 } from '$lib/action_specs.js';
 
 describe('Import_Builder', () => {
@@ -395,13 +395,13 @@ describe('get_executor_phases', () => {
 			]);
 		});
 
-		test('frontend initiator - submit_completion spec', () => {
-			// submit_completion has initiator: 'frontend'
-			expect(get_executor_phases(submit_completion_action_spec, 'frontend')).toEqual([
+		test('frontend initiator - create_completion spec', () => {
+			// create_completion has initiator: 'frontend'
+			expect(get_executor_phases(create_completion_action_spec, 'frontend')).toEqual([
 				'send_request',
 				'receive_response',
 			]);
-			expect(get_executor_phases(submit_completion_action_spec, 'backend')).toEqual([
+			expect(get_executor_phases(create_completion_action_spec, 'backend')).toEqual([
 				'receive_request',
 				'send_response',
 			]);
@@ -595,7 +595,7 @@ describe('generate_phase_handlers', () => {
 
 	test('uses type-only imports when appropriate', () => {
 		const imports = new Import_Builder();
-		generate_phase_handlers(submit_completion_action_spec, 'backend', imports);
+		generate_phase_handlers(create_completion_action_spec, 'backend', imports);
 
 		const import_str = imports.build();
 		// All imports should be type-only

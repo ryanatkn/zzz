@@ -40,7 +40,7 @@
 		try {
 			await navigator.clipboard.writeText(c);
 		} catch (error) {
-			console.error('Failed to copy text: ', error);
+			console.error('failed to copy text: ', error);
 		}
 	};
 </script>

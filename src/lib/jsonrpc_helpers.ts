@@ -144,3 +144,40 @@ export const is_jsonrpc_error_message = (message: unknown): message is Jsonrpc_E
 export const is_jsonrpc_singular_message = (
 	message: unknown,
 ): message is Jsonrpc_Singular_Message => is_jsonrpc_object(message);
+
+/**
+ * Normalizes input to JSON-RPC params format.
+ * Returns undefined for null/undefined, wraps primitives in {value}.
+ */
+export const to_jsonrpc_params = (input: unknown): Record<string, any> | undefined => {
+	// Handle void/undefined inputs
+	if (input === undefined || input === null) {
+		return undefined;
+	}
+
+	// Ensure it's an object for JSON-RPC params
+	if (typeof input === 'object' && !Array.isArray(input)) {
+		return input as Record<string, any>;
+	}
+
+	// Wrap non-object values
+	return {value: input};
+};
+
+/**
+ * Normalizes output to JSON-RPC result format.
+ * Returns empty object for null/undefined, wraps primitives in {value}.
+ */
+export const to_jsonrpc_result = (output: unknown): Record<string, any> => {
+	// JSON-RPC results must be objects
+	if (output === null || output === undefined) {
+		return {};
+	}
+
+	if (typeof output === 'object' && !Array.isArray(output)) {
+		return output as Record<string, any>;
+	}
+
+	// Wrap non-object values
+	return {value: output};
+};

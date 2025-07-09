@@ -197,7 +197,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 			ws.addEventListener('error', this.#handle_error);
 			ws.addEventListener('message', this.#handle_message);
 		} catch (error) {
-			console.error('Failed to create WebSocket:', error);
+			console.error('failed to create WebSocket:', error);
 			this.ws = null;
 			this.open = false;
 			this.status = 'failure';
@@ -247,7 +247,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 				this.last_send_time = Date.now();
 				return true;
 			} catch (error) {
-				console.error('Error sending message:', error);
+				console.error('error sending message:', error);
 				this.#queue_message(data);
 				return false;
 			}

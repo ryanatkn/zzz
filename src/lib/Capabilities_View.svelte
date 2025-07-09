@@ -12,6 +12,8 @@
 	import Capability_System from '$lib/Capability_System.svelte';
 
 	// TODO add Capability_Chatgpt|Gemini|Claude (or the company equivalents)
+
+	// TODO add ping button that forces websocket transport
 </script>
 
 <div class="width_md">

@@ -11,19 +11,18 @@
 
 <div class="p_lg">
 	<h1><Glyph glyph={GLYPH_PROVIDER} /> providers</h1>
-	<aside>⚠️ This information is incomplete and may be incorrect or outdated.</aside>
+	<aside>⚠️ This is a work in progress.</aside>
 	<div class="providers_grid">
 		{#each app.providers.items as provider (provider)}
 			<div class="panel p_lg">
 				<div class="font_size_xl mb_lg">
 					<Provider_Link {provider} icon="svg" />
 				</div>
-				<div class="mb_sm font_family_mono">
-					<Glyph glyph={GLYPH_PROVIDER} />
-					{provider.name}
+				<div class="mb_lg">
+					<Glyph glyph={GLYPH_PROVIDER} />{provider.name}
 				</div>
 				{#if provider.url}
-					<div class="mb_sm">
+					<div class="mb_lg">
 						<External_Link href={provider.url}>docs</External_Link>
 					</div>
 				{/if}

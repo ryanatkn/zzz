@@ -4,6 +4,7 @@
 	import {GLYPH_REMOVE} from '$lib/glyphs.js';
 	import type {Diskfile_Tab} from '$lib/diskfile_tab.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
+	import Contextmenu_Diskfile from '$lib/Contextmenu_Diskfile.svelte';
 
 	interface Props {
 		tab: Diskfile_Tab;
@@ -14,51 +15,59 @@
 
 	const {tab, onselect, onclose, onopen}: Props = $props();
 
-	const path = $derived(tab.diskfile?.path_relative ?? '[no diskfile found]'); // TODO ?
+	const diskfile = $derived(tab.diskfile);
+
+	const path = $derived(diskfile?.path_relative ?? '[no diskfile found]'); // TODO ?
 </script>
 
-<div class="diskfile_tab_container" class:selected={tab.is_selected} class:preview={tab.is_preview}>
+<Contextmenu_Diskfile {diskfile}>
 	<div
-		role="button"
-		tabindex="0"
-		class="diskfile_tab_button border_radius_0 plain px_sm py_xs"
+		class="diskfile_tab_container"
 		class:selected={tab.is_selected}
 		class:preview={tab.is_preview}
-		onclick={(e) => {
-			swallow(e);
-			// If it's a preview tab and it's double-clicked, promote it to permanent
-			if (tab.is_preview && e.detail === 2) {
-				onopen(tab);
-			} else {
-				onselect(tab);
-			}
-		}}
-		onkeydown={(e) => {
-			if (e.key === 'Enter' || e.key === ' ') {
-				swallow(e);
-				onselect(tab);
-			}
-		}}
-		aria-label={`Tab ${path}`}
-		aria-pressed={tab.is_selected}
 	>
-		<div class="ellipsis font_weight_400 flex_1">
-			<small class="ml_xs">{path}</small>
-		</div>
-		<button
-			type="button"
-			class="tab_close_button plain icon_button compact border_radius_md ml_sm"
+		<div
+			role="button"
+			tabindex="0"
+			class="diskfile_tab_button border_radius_0 plain px_sm py_xs"
+			class:selected={tab.is_selected}
+			class:preview={tab.is_preview}
 			onclick={(e) => {
 				swallow(e);
-				onclose(tab);
+				// If it's a preview tab and it's double-clicked, promote it to permanent
+				if (tab.is_preview && e.detail === 2) {
+					onopen(tab);
+				} else {
+					onselect(tab);
+				}
 			}}
-			title="close tab"
-			aria-label={`close tab ${path}`}
+			onkeydown={(e) => {
+				if (e.key === 'Enter' || e.key === ' ') {
+					swallow(e);
+					onselect(tab);
+				}
+			}}
+			aria-label={`Tab ${path}`}
+			aria-pressed={tab.is_selected}
 		>
-			<Glyph glyph={GLYPH_REMOVE} />
-		</button>
+			<div class="ellipsis font_weight_400 flex_1">
+				<small class="ml_xs">{path}</small>
+			</div>
+			<button
+				type="button"
+				class="tab_close_button plain icon_button compact border_radius_md ml_sm"
+				onclick={(e) => {
+					swallow(e);
+					onclose(tab);
+				}}
+				title="close tab"
+				aria-label={`close tab ${path}`}
+			>
+				<Glyph glyph={GLYPH_REMOVE} />
+			</button>
+		</div>
 	</div>
-</div>
+</Contextmenu_Diskfile>
 
 <style>
 	.diskfile_tab_container {

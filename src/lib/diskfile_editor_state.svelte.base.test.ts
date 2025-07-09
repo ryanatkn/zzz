@@ -342,7 +342,7 @@ describe('derived state', () => {
 		expect(editor_state.has_history).toBe(true);
 	});
 
-	test('derived property has_unsaved_edits is accurate', () => {
+	test('derived property has_unsaved_edits is accurate', async () => {
 		// Initial state - no unsaved edits
 		expect(editor_state.has_unsaved_edits).toBe(false);
 
@@ -353,7 +353,7 @@ describe('derived state', () => {
 		expect(editor_state.has_unsaved_edits).toBe(true);
 
 		// Save the changes
-		editor_state.save_changes();
+		await editor_state.save_changes();
 
 		// No more unsaved edits
 		expect(editor_state.has_unsaved_edits).toBe(false);
@@ -402,12 +402,12 @@ describe('derived state', () => {
 });
 
 describe('saving changes', () => {
-	test('save_changes persists content to diskfile', () => {
+	test('save_changes persists content to diskfile', async () => {
 		// Make an edit
 		editor_state.current_content = 'Content to save';
 
 		// Save changes
-		const result = editor_state.save_changes();
+		const result = await editor_state.save_changes();
 
 		// Verify result and diskfile update
 		expect(result).toBe(true);
@@ -416,23 +416,23 @@ describe('saving changes', () => {
 		expect(editor_state.content_was_modified_by_user).toBe(false);
 	});
 
-	test('save_changes with no changes returns false', () => {
+	test('save_changes with no changes returns false', async () => {
 		// Don't make any changes
 		expect(editor_state.has_changes).toBe(false);
 
 		// Try to save
-		const result = editor_state.save_changes();
+		const result = await editor_state.save_changes();
 
 		// Verify nothing was saved
 		expect(result).toBe(false);
 	});
 
-	test('save_changes creates history entry with correct properties', () => {
+	test('save_changes creates history entry with correct properties', async () => {
 		// Make an edit
 		editor_state.current_content = 'Content to be saved';
 
 		// Save changes
-		editor_state.save_changes();
+		await editor_state.save_changes();
 
 		// Check history entry
 		const history = app.get_diskfile_history(TEST_PATH)!;

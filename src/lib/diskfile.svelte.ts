@@ -10,6 +10,8 @@ import {
 import {to_preview, estimate_token_count} from '$lib/helpers.js';
 import type {Bit_Type} from '$lib/bit.svelte.js';
 
+// TODO support directories/folders
+
 export interface Diskfile_Options extends Cell_Options<typeof Diskfile_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
 export class Diskfile extends Cell<typeof Diskfile_Json> {

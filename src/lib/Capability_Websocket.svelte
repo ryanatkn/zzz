@@ -5,7 +5,6 @@
 	import {formatDuration, intervalToDuration} from 'date-fns';
 	import {BROWSER} from 'esm-env';
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
-	import {PUBLIC_WEBSOCKET_URL} from '$env/static/public';
 
 	import {frontend_context} from '$lib/frontend.svelte.js';
 	import type {Socket} from '$lib/socket.svelte.js';
@@ -25,6 +24,7 @@
 		DEFAULT_RECONNECT_DELAY_MAX,
 	} from '$lib/socket_helpers.js';
 	import Socket_Message_Queue from '$lib/Socket_Message_Queue.svelte';
+	import {WEBSOCKET_URL} from '$lib/constants.js';
 
 	const pid = $props.id();
 
@@ -52,10 +52,10 @@
 
 	// Reset the URL to the default value
 	const reset_url = () => {
-		if (socket.url_input !== PUBLIC_WEBSOCKET_URL) {
+		if (socket.url_input !== WEBSOCKET_URL) {
 			previous_url = socket.url_input;
 			has_undo_state = true;
-			socket.url_input = PUBLIC_WEBSOCKET_URL;
+			socket.url_input = WEBSOCKET_URL;
 		}
 	};
 
@@ -69,7 +69,7 @@
 	};
 
 	// Check if the current URL is the default
-	const is_default_url = $derived(socket.url_input === PUBLIC_WEBSOCKET_URL); // TODO maybe move to `socket.url_input_is_default`
+	const is_default_url = $derived(socket.url_input === WEBSOCKET_URL); // TODO maybe move to `socket.url_input_is_default`
 </script>
 
 <!-- Main control section with flex layout for wide screens -->

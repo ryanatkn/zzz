@@ -39,37 +39,37 @@
   "devDependencies": {
     "@changesets/changelog-git": "^0.2.1",
     "@ryanatkn/eslint-config": "^0.8.0",
-    "@ryanatkn/fuz": "^0.144.3",
-    "@ryanatkn/gro": "^0.159.0",
+    "@ryanatkn/fuz": "^0.144.4",
+    "@ryanatkn/gro": "^0.160.0",
     "@ryanatkn/moss": "^0.31.0",
     "@sveltejs/adapter-static": "^3.0.8",
-    "@sveltejs/kit": "^2.21.5",
-    "@sveltejs/package": "^2.3.11",
+    "@sveltejs/kit": "^2.22.2",
+    "@sveltejs/package": "^2.3.12",
     "@sveltejs/vite-plugin-svelte": "^5.1.0",
-    "eslint": "^9.25.1",
-    "eslint-plugin-svelte": "^3.9.2",
+    "eslint": "^9.30.1",
+    "eslint-plugin-svelte": "^3.10.1",
     "jsdom": "^26.1.0",
     "ollama": "^0.5.16",
-    "prettier": "^3.5.3",
+    "prettier": "^3.6.2",
     "prettier-plugin-svelte": "^3.4.0",
-    "svelte": "^5.34.9",
+    "svelte": "^5.35.4",
     "svelte-check": "^4.2.2",
     "tslib": "^2.8.1",
     "typescript": "^5.8.3",
-    "typescript-eslint": "^8.34.1",
+    "typescript-eslint": "^8.35.1",
     "vitest": "^3.2.4",
-    "zod": "^3.25.67"
+    "zod": "^3.25.74"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.54.0",
+    "@anthropic-ai/sdk": "^0.56.0",
     "@google/generative-ai": "^0.24.1",
-    "@hono/node-server": "^1.14.4",
-    "@hono/node-ws": "^1.1.7",
-    "@ryanatkn/belt": "^0.30.2",
+    "@hono/node-server": "^1.15.0",
+    "@hono/node-ws": "^1.2.0",
+    "@ryanatkn/belt": "^0.31.0",
     "date-fns": "^4.1.0",
     "esm-env": "^1.2.2",
-    "hono": "^4.8.0",
-    "openai": "^5.5.1"
+    "hono": "^4.8.4",
+    "openai": "^5.8.2"
   },
   "prettier": {
     "plugins": [
@@ -1021,6 +1021,10 @@
     "./server/backend.js": {
       "types": "./dist/server/backend.d.ts",
       "default": "./dist/server/backend.js"
+    },
+    "./server/handle_create_completion.js": {
+      "types": "./dist/server/handle_create_completion.d.ts",
+      "default": "./dist/server/handle_create_completion.js"
     },
     "./server/register_http_actions.js": {
       "types": "./dist/server/register_http_actions.d.ts",

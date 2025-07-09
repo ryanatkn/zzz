@@ -8,14 +8,16 @@ import type {Frontend} from '$lib/frontend.svelte.js';
 import {Strip_Json, type Strip_Role} from '$lib/strip_types.js';
 import type {Completion_Request, Completion_Response} from '$lib/completion_types.js';
 
+// TODO rename? is more like a message, maybe `Tape_Message`, idk, maybe rethink "tape" too
+
 export interface Strip_Options extends Cell_Options<typeof Strip_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
 export class Strip extends Cell<typeof Strip_Json> {
 	bit_id: Uuid = $state()!;
 	tape_id: Uuid | null | undefined = $state();
 	role: Strip_Role = $state()!;
-	request: Completion_Request | undefined = $state();
-	response: Completion_Response | undefined = $state();
+	request: Completion_Request | undefined = $state.raw();
+	response: Completion_Response | undefined = $state.raw();
 
 	// Get the referenced bit - handle case where bit might not exist in registry
 	readonly bit: Bit_Type | null = $derived(this.app.bits.items.by_id.get(this.bit_id) ?? null);

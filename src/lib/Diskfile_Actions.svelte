@@ -14,28 +14,18 @@
 	interface Props {
 		diskfile: Diskfile;
 		editor_state: Diskfile_Editor_State;
-		save_button_text?: string | undefined;
 		readonly?: boolean | undefined;
 		auto_save?: boolean | undefined;
 	}
 
-	const {
-		diskfile,
-		editor_state,
-		save_button_text = 'save changes',
-		readonly = false,
-		auto_save = false,
-	}: Props = $props();
+	const {diskfile, editor_state, readonly = false, auto_save = false}: Props = $props();
 
 	const app = frontend_context.get();
-
-	const content = $derived(editor_state.current_content);
-	const has_changes = $derived(editor_state.has_changes);
 </script>
 
 <!-- Content modification actions (copy, paste, clear) -->
 <div class="display_flex gap_xs">
-	<Copy_To_Clipboard text={content} attrs={{class: 'plain'}} />
+	<Copy_To_Clipboard text={editor_state.current_content} attrs={{class: 'plain'}} />
 
 	{#if !readonly}
 		<Paste_From_Clipboard
@@ -48,7 +38,7 @@
 		</Paste_From_Clipboard>
 
 		<Clear_Restore_Button
-			value={content}
+			value={editor_state.current_content}
 			onchange={(value) => {
 				editor_state.current_content = value;
 			}}
@@ -69,10 +59,10 @@
 		<button
 			class="flex_1 color_a"
 			type="button"
-			disabled={!has_changes}
+			disabled={!editor_state.has_changes}
 			onclick={() => editor_state.save_changes()}
 		>
-			{save_button_text}
+			save changes
 		</button>
 	</div>
 {/if}

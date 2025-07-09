@@ -10,6 +10,8 @@
 	const {model, show_tags}: Props = $props();
 
 	const provider = $derived(model.app.providers.find_by_name(model.provider_name));
+
+	// TODO show something to show if it's local (probably not file size?)
 </script>
 
 <Contextmenu_Model attrs={{class: 'w_100 py_sm'}} {model}>

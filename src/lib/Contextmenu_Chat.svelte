@@ -29,7 +29,7 @@
 
 	let show_model_picker = $state(false);
 
-	// TODO BLOCK edit chat dialog instead of prompt for name
+	// TODO BLOCK edit chat dialog instead of prompt for name (just focus the input for now?)
 </script>
 
 <Contextmenu {...rest} {entries} />
@@ -82,8 +82,7 @@
 
 			<Contextmenu_Entry
 				run={() => {
-					// Open name edit dialog or other rename mechanism.
-					// This is a placeholder for future implementation.
+					// TODO make this focus the `Editable_Text` if available, somehow
 					const new_name = prompt('Enter new name for chat:', chat.name); // eslint-disable-line no-alert
 					if (new_name && new_name !== chat.name) {
 						chat.name = new_name;

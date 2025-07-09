@@ -12,8 +12,6 @@ import type {
 } from '$lib/action_spec.js';
 import {is_send_request, is_notification_send} from '$lib/action_event_helpers.js';
 
-// TODO BLOCK @api streaming
-
 // TODO @api @many refactor frontend_actions_api.ts with action_peer.ts
 
 // TODO @api think about unification between frontend|backend_actions_api.ts

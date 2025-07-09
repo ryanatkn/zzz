@@ -21,8 +21,6 @@ import {
 	is_request_response,
 	is_send_request_with_parsed_input,
 	is_notification_send_with_parsed_input,
-	to_jsonrpc_params,
-	to_jsonrpc_result,
 } from '$lib/action_event_helpers.js';
 import type {Action_Event_Datas} from '$lib/action_collections.js';
 import {parse_action_input, parse_action_output} from '$lib/action_collection_helpers.js';
@@ -31,6 +29,8 @@ import {
 	create_jsonrpc_response,
 	create_jsonrpc_error_message,
 	create_jsonrpc_notification,
+	to_jsonrpc_params,
+	to_jsonrpc_result,
 } from '$lib/jsonrpc_helpers.js';
 import {create_uuid} from '$lib/zod_helpers.js';
 import type {
@@ -141,12 +141,12 @@ export class Action_Event<
 	// TODO add cancellation support
 	async handle_async(): Promise<void> {
 		if (this.#data.step !== 'parsed') {
-			throw new Error(`cannot handle from step '${this.#data.step}' - must be 'parsed'`);
+			throw new Error(
+				`cannot handle from step '${this.#data.step}' - must be 'parsed': ${this.#data.error?.message}`,
+			);
 		}
 
-		// Add protocol messages if needed
-		const updates = this.#create_handling_updates();
-		this.#transition_step('handling', updates);
+		this.#transition_step('handling', this.#create_handling_updates());
 
 		const handler = this.environment.lookup_action_handler(this.spec.method, this.#data.phase);
 		if (!handler) {
@@ -171,10 +171,12 @@ export class Action_Event<
 		}
 
 		if (this.#data.step !== 'parsed') {
-			throw new Error(`cannot handle from step '${this.#data.step}' - must be 'parsed'`);
+			throw new Error(
+				`cannot handle from step '${this.#data.step}' - must be 'parsed': ${this.#data.error?.message}`,
+			);
 		}
 
-		this.#transition_step('handling');
+		this.#transition_step('handling', this.#create_handling_updates());
 
 		const handler = this.environment.lookup_action_handler(this.spec.method, this.#data.phase);
 		if (!handler) {
@@ -280,7 +282,7 @@ export class Action_Event<
 		}
 	}
 
-	#create_handling_updates(): Partial<Action_Event_Data> {
+	#create_handling_updates(): Partial<Action_Event_Data> | undefined {
 		// Create protocol messages when transitioning to 'handling' step
 		// We check for 'parsed' state since this method is called before the transition
 		if (is_send_request_with_parsed_input(this.#data)) {
@@ -302,7 +304,7 @@ export class Action_Event<
 			};
 		}
 
-		return {};
+		return undefined;
 	}
 
 	#complete_handling(result: unknown): void {
@@ -404,6 +406,7 @@ export const create_action_event_from_json = <T_Method extends Action_Method>(
 	return new Action_Event(environment, spec, json);
 };
 
+// TODO this and the above one arent used atm, see the comment on `create_action_event` too
 // TODO how to avoid casting? this should generally be safe but we dont have schemas for each possible action event state
 export const parse_action_event = (
 	raw_json: unknown,

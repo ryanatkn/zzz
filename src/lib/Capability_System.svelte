@@ -16,4 +16,5 @@
 	</p>
 	<p><External_Link href={pkg.repo_url}>{format_url(pkg.repo_url)}</External_Link></p>
 	<p><a href="{base}/about">/about</a></p>
+	<p><a href="{base}/settings">/settings</a></p>
 </div>

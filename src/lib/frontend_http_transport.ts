@@ -50,11 +50,11 @@ export class Frontend_Http_Transport implements Transport {
 			console.log(`[frontend http transport] result`, result);
 			return result;
 		} catch (error) {
-			console.error('[frontend http transport] Error sending HTTP request:', error);
+			console.error('[frontend http transport] error sending HTTP request:', error);
 			if (error instanceof Thrown_Jsonrpc_Error) {
 				throw error;
 			}
-			throw jsonrpc_errors.internal_error('Error sending HTTP request', {
+			throw jsonrpc_errors.internal_error('error sending HTTP request', {
 				error: error instanceof Error ? error.message : String(error),
 			});
 		}

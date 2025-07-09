@@ -3,7 +3,7 @@ import {DEV} from 'esm-env';
 import type {Filer_Change_Handler, Backend} from '$lib/server/backend.js';
 import type {Action_Inputs} from '$lib/action_collections.js';
 import {create_action_event} from '$lib/action_event.js';
-import {filer_change_action_spec} from '$lib/action_specs.js';
+import {filer_change_action_spec, completion_progress_action_spec} from '$lib/action_specs.js';
 import {
 	map_watcher_change_to_diskfile_change,
 	to_serializable_source_file,
@@ -18,6 +18,7 @@ import {Diskfile_Path, Serializable_Source_File} from '$lib/diskfile_types.js';
 
 export interface Backend_Actions_Api {
 	filer_change: (input: Action_Inputs['filer_change']) => Promise<void>;
+	completion_progress: (input: Action_Inputs['completion_progress']) => Promise<void>;
 }
 
 export const create_backend_actions_api = (backend: Backend): Backend_Actions_Api => {
@@ -33,12 +34,28 @@ export const create_backend_actions_api = (backend: Backend): Backend_Actions_Ap
 					// Send notification to all clients via the WebSocket transport
 					await backend.peer.send(event.data.notification);
 				} else if (event.data.step === 'failed') {
-					console.error('Failed to create filer_change notification:', event.data.error);
+					console.error('failed to create filer_change notification:', event.data.error);
 				}
 			} catch (_error) {
 				// TODO silencing because it's loud on startup, needs to be rewritten
 				// TODO implement proper error handling strategy (don't throw - notifications are fire-and-forget)
-				// console.error('Unexpected error in filer_change:', error);
+				// console.error('unexpected error in filer_change:', error);
+			}
+		},
+		completion_progress: async (input: Action_Inputs['completion_progress']) => {
+			try {
+				const event = create_action_event(backend, completion_progress_action_spec, input, 'send');
+
+				await event.parse().handle_async();
+
+				if (event.data.step === 'handled' && event.data.notification) {
+					// Send notification to all clients via the WebSocket transport
+					await backend.peer.send(event.data.notification);
+				} else if (event.data.step === 'failed') {
+					console.error('failed to create completion_progress notification:', event.data.error);
+				}
+			} catch (error) {
+				console.error('unexpected error in completion_progress:', error);
 			}
 		},
 	};
@@ -69,7 +86,7 @@ export const handle_filer_change: Filer_Change_Handler = (
 		// TODO can this be moved to the schema?
 		if (!serializable_source_file.id.startsWith(serializable_source_file.source_dir)) {
 			throw new Error(
-				`Source file ${serializable_source_file.id} does not start with source dir ${serializable_source_file.source_dir}`,
+				`source file ${serializable_source_file.id} does not start with source dir ${serializable_source_file.source_dir}`,
 			);
 		}
 	}
