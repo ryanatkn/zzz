@@ -103,8 +103,8 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 				completion_options,
 				completion_messages,
 				prompt,
-				progress_token,
 				backend,
+				progress_token,
 			};
 
 			let result: Action_Outputs['create_completion'];

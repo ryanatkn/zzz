@@ -994,9 +994,9 @@
     "./server/.env.production.example": {
       "default": "./dist/server/.env.production.example"
     },
-    "./server/ai_provider_utils.js": {
-      "types": "./dist/server/ai_provider_utils.d.ts",
-      "default": "./dist/server/ai_provider_utils.js"
+    "./server/ai_provider_helpers.js": {
+      "types": "./dist/server/ai_provider_helpers.d.ts",
+      "default": "./dist/server/ai_provider_helpers.js"
     },
     "./server/backend_action_handlers.js": {
       "types": "./dist/server/backend_action_handlers.d.ts",

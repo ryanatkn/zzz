@@ -15,7 +15,7 @@ import {
 	format_claude_messages,
 	format_openai_messages,
 	format_gemini_messages,
-} from '$lib/server/ai_provider_utils.js';
+} from '$lib/server/ai_provider_helpers.js';
 import {to_completion_result} from '$lib/response_helpers.js';
 import {Scoped_Fs} from '$lib/server/scoped_fs.js';
 import {Action_Inputs, type Action_Outputs} from '$lib/action_collections.js';
@@ -29,8 +29,8 @@ export interface Completion_Handler_Options {
 	completion_options: Completion_Options;
 	completion_messages: Array<Completion_Message> | undefined;
 	prompt: string;
-	progress_token?: Uuid;
 	backend: Backend;
+	progress_token?: Uuid;
 }
 
 // TODO refactor to a plugin/mod architecture

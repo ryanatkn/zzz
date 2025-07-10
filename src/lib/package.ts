@@ -871,9 +871,9 @@ export const package_json = {
 		},
 		'./server/.env.example': {default: './dist/server/.env.example'},
 		'./server/.env.production.example': {default: './dist/server/.env.production.example'},
-		'./server/ai_provider_utils.js': {
-			types: './dist/server/ai_provider_utils.d.ts',
-			default: './dist/server/ai_provider_utils.js',
+		'./server/ai_provider_helpers.js': {
+			types: './dist/server/ai_provider_helpers.d.ts',
+			default: './dist/server/ai_provider_helpers.js',
 		},
 		'./server/backend_action_handlers.js': {
 			types: './dist/server/backend_action_handlers.d.ts',
@@ -2409,8 +2409,8 @@ export const src_json = {
 		},
 		'./server/.env.example': {path: 'server/.env.example'},
 		'./server/.env.production.example': {path: 'server/.env.production.example'},
-		'./server/ai_provider_utils.js': {
-			path: 'server/ai_provider_utils.ts',
+		'./server/ai_provider_helpers.js': {
+			path: 'server/ai_provider_helpers.ts',
 			declarations: [
 				{name: 'format_ollama_messages', kind: 'function'},
 				{name: 'format_claude_messages', kind: 'function'},
