@@ -26,7 +26,7 @@
 
 <Contextmenu {...rest} {entries} />
 
-<!-- TODO maybe extract Contextmenu_Model_Entries that can be used elsewhere like the Model_Link as an action? -->
+<!-- TODO maybe extract Model_Contextmenu_Entries that can be used elsewhere like the Model_Link as an action? -->
 {#snippet entries()}
 	<Contextmenu_Submenu>
 		{#snippet icon()}<Glyph glyph={GLYPH_MODEL} />{/snippet}

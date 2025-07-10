@@ -2,7 +2,7 @@
 	import type {SvelteHTMLElements} from 'svelte/elements';
 
 	import type {Bit_Type} from '$lib/bit.svelte.js';
-	import Contextmenu_Bit from '$lib/Contextmenu_Bit.svelte';
+	import Bit_Contextmenu from '$lib/Bit_Contextmenu.svelte';
 
 	interface Props {
 		bit: Bit_Type;
@@ -15,7 +15,7 @@
 	const {bit, selected, onclick, compact = true, attrs}: Props = $props();
 </script>
 
-<Contextmenu_Bit {bit}>
+<Bit_Contextmenu {bit}>
 	<button
 		type="button"
 		class="listitem w_100"
@@ -32,4 +32,4 @@
 			{/if}
 		</div>
 	</button>
-</Contextmenu_Bit>
+</Bit_Contextmenu>

@@ -140,6 +140,11 @@ export const package_json = {
 			default: './dist/actions.svelte.js',
 		},
 		'./app.svelte.js': {types: './dist/app.svelte.d.ts', default: './dist/app.svelte.js'},
+		'./Bit_Contextmenu.svelte': {
+			types: './dist/Bit_Contextmenu.svelte.d.ts',
+			svelte: './dist/Bit_Contextmenu.svelte',
+			default: './dist/Bit_Contextmenu.svelte',
+		},
 		'./Bit_Editor_For_Diskfile.svelte': {
 			types: './dist/Bit_Editor_For_Diskfile.svelte.d.ts',
 			svelte: './dist/Bit_Editor_For_Diskfile.svelte',
@@ -245,6 +250,11 @@ export const package_json = {
 		},
 		'./cell_types.js': {types: './dist/cell_types.d.ts', default: './dist/cell_types.js'},
 		'./cell.svelte.js': {types: './dist/cell.svelte.d.ts', default: './dist/cell.svelte.js'},
+		'./Chat_Contextmenu.svelte': {
+			types: './dist/Chat_Contextmenu.svelte.d.ts',
+			svelte: './dist/Chat_Contextmenu.svelte',
+			default: './dist/Chat_Contextmenu.svelte',
+		},
 		'./Chat_Initializer.svelte': {
 			types: './dist/Chat_Initializer.svelte.d.ts',
 			svelte: './dist/Chat_Initializer.svelte',
@@ -292,6 +302,11 @@ export const package_json = {
 			default: './dist/Chat_View.svelte',
 		},
 		'./chat.svelte.js': {types: './dist/chat.svelte.d.ts', default: './dist/chat.svelte.js'},
+		'./Chats_Contextmenu.svelte': {
+			types: './dist/Chats_Contextmenu.svelte.d.ts',
+			svelte: './dist/Chats_Contextmenu.svelte',
+			default: './dist/Chats_Contextmenu.svelte',
+		},
 		'./chats.svelte.js': {types: './dist/chats.svelte.d.ts', default: './dist/chats.svelte.js'},
 		'./Clear_Restore_Button.svelte': {
 			types: './dist/Clear_Restore_Button.svelte.d.ts',
@@ -333,26 +348,6 @@ export const package_json = {
 			svelte: './dist/Content_Stats.svelte',
 			default: './dist/Content_Stats.svelte',
 		},
-		'./Contextmenu_Bit.svelte': {
-			types: './dist/Contextmenu_Bit.svelte.d.ts',
-			svelte: './dist/Contextmenu_Bit.svelte',
-			default: './dist/Contextmenu_Bit.svelte',
-		},
-		'./Contextmenu_Chat.svelte': {
-			types: './dist/Contextmenu_Chat.svelte.d.ts',
-			svelte: './dist/Contextmenu_Chat.svelte',
-			default: './dist/Contextmenu_Chat.svelte',
-		},
-		'./Contextmenu_Chats.svelte': {
-			types: './dist/Contextmenu_Chats.svelte.d.ts',
-			svelte: './dist/Contextmenu_Chats.svelte',
-			default: './dist/Contextmenu_Chats.svelte',
-		},
-		'./Contextmenu_Diskfile.svelte': {
-			types: './dist/Contextmenu_Diskfile.svelte.d.ts',
-			svelte: './dist/Contextmenu_Diskfile.svelte',
-			default: './dist/Contextmenu_Diskfile.svelte',
-		},
 		'./Contextmenu_Entry_Copy_To_Clipboard.svelte': {
 			types: './dist/Contextmenu_Entry_Copy_To_Clipboard.svelte.d.ts',
 			svelte: './dist/Contextmenu_Entry_Copy_To_Clipboard.svelte',
@@ -362,26 +357,6 @@ export const package_json = {
 			types: './dist/Contextmenu_Entry_Toggle.svelte.d.ts',
 			svelte: './dist/Contextmenu_Entry_Toggle.svelte',
 			default: './dist/Contextmenu_Entry_Toggle.svelte',
-		},
-		'./Contextmenu_Model.svelte': {
-			types: './dist/Contextmenu_Model.svelte.d.ts',
-			svelte: './dist/Contextmenu_Model.svelte',
-			default: './dist/Contextmenu_Model.svelte',
-		},
-		'./Contextmenu_Prompt.svelte': {
-			types: './dist/Contextmenu_Prompt.svelte.d.ts',
-			svelte: './dist/Contextmenu_Prompt.svelte',
-			default: './dist/Contextmenu_Prompt.svelte',
-		},
-		'./Contextmenu_Strip.svelte': {
-			types: './dist/Contextmenu_Strip.svelte.d.ts',
-			svelte: './dist/Contextmenu_Strip.svelte',
-			default: './dist/Contextmenu_Strip.svelte',
-		},
-		'./Contextmenu_Tape.svelte': {
-			types: './dist/Contextmenu_Tape.svelte.d.ts',
-			svelte: './dist/Contextmenu_Tape.svelte',
-			default: './dist/Contextmenu_Tape.svelte',
 		},
 		'./Dashboard_Capabilities.svelte': {
 			types: './dist/Dashboard_Capabilities.svelte.d.ts',
@@ -447,6 +422,11 @@ export const package_json = {
 			types: './dist/Diskfile_Bit_View.svelte.d.ts',
 			svelte: './dist/Diskfile_Bit_View.svelte',
 			default: './dist/Diskfile_Bit_View.svelte',
+		},
+		'./Diskfile_Contextmenu.svelte': {
+			types: './dist/Diskfile_Contextmenu.svelte.d.ts',
+			svelte: './dist/Diskfile_Contextmenu.svelte',
+			default: './dist/Diskfile_Contextmenu.svelte',
 		},
 		'./Diskfile_Editor_Nav.svelte': {
 			types: './dist/Diskfile_Editor_Nav.svelte.d.ts',
@@ -625,6 +605,11 @@ export const package_json = {
 			svelte: './dist/Main_Dialog.svelte',
 			default: './dist/Main_Dialog.svelte',
 		},
+		'./Model_Contextmenu.svelte': {
+			types: './dist/Model_Contextmenu.svelte.d.ts',
+			svelte: './dist/Model_Contextmenu.svelte',
+			default: './dist/Model_Contextmenu.svelte',
+		},
 		'./Model_Detail.svelte': {
 			types: './dist/Model_Detail.svelte.d.ts',
 			svelte: './dist/Model_Detail.svelte',
@@ -770,6 +755,11 @@ export const package_json = {
 			svelte: './dist/Progress_Bar.svelte',
 			default: './dist/Progress_Bar.svelte',
 		},
+		'./Prompt_Contextmenu.svelte': {
+			types: './dist/Prompt_Contextmenu.svelte.d.ts',
+			svelte: './dist/Prompt_Contextmenu.svelte',
+			default: './dist/Prompt_Contextmenu.svelte',
+		},
 		'./prompt_helpers.js': {
 			types: './dist/prompt_helpers.d.ts',
 			default: './dist/prompt_helpers.js',
@@ -871,10 +861,6 @@ export const package_json = {
 		},
 		'./server/.env.example': {default: './dist/server/.env.example'},
 		'./server/.env.production.example': {default: './dist/server/.env.production.example'},
-		'./server/ai_provider_helpers.js': {
-			types: './dist/server/ai_provider_helpers.d.ts',
-			default: './dist/server/ai_provider_helpers.js',
-		},
 		'./server/backend_action_handlers.js': {
 			types: './dist/server/backend_action_handlers.d.ts',
 			default: './dist/server/backend_action_handlers.js',
@@ -891,6 +877,10 @@ export const package_json = {
 			types: './dist/server/backend_actions_api.d.ts',
 			default: './dist/server/backend_actions_api.js',
 		},
+		'./server/backend_provider.js': {
+			types: './dist/server/backend_provider.d.ts',
+			default: './dist/server/backend_provider.js',
+		},
 		'./server/backend_websocket_transport.js': {
 			types: './dist/server/backend_websocket_transport.d.ts',
 			default: './dist/server/backend_websocket_transport.js',
@@ -899,9 +889,25 @@ export const package_json = {
 			types: './dist/server/backend.d.ts',
 			default: './dist/server/backend.js',
 		},
-		'./server/handle_create_completion.js': {
-			types: './dist/server/handle_create_completion.d.ts',
-			default: './dist/server/handle_create_completion.js',
+		'./server/chatgpt_backend_provider.js': {
+			types: './dist/server/chatgpt_backend_provider.d.ts',
+			default: './dist/server/chatgpt_backend_provider.js',
+		},
+		'./server/claude_backend_provider.js': {
+			types: './dist/server/claude_backend_provider.d.ts',
+			default: './dist/server/claude_backend_provider.js',
+		},
+		'./server/gemini_backend_provider.js': {
+			types: './dist/server/gemini_backend_provider.d.ts',
+			default: './dist/server/gemini_backend_provider.js',
+		},
+		'./server/helpers.js': {
+			types: './dist/server/helpers.d.ts',
+			default: './dist/server/helpers.js',
+		},
+		'./server/ollama_backend_provider.js': {
+			types: './dist/server/ollama_backend_provider.d.ts',
+			default: './dist/server/ollama_backend_provider.js',
 		},
 		'./server/register_http_actions.js': {
 			types: './dist/server/register_http_actions.d.ts',
@@ -948,6 +954,11 @@ export const package_json = {
 			types: './dist/sortable.svelte.d.ts',
 			default: './dist/sortable.svelte.js',
 		},
+		'./Strip_Contextmenu.svelte': {
+			types: './dist/Strip_Contextmenu.svelte.d.ts',
+			svelte: './dist/Strip_Contextmenu.svelte',
+			default: './dist/Strip_Contextmenu.svelte',
+		},
 		'./Strip_List.svelte': {
 			types: './dist/Strip_List.svelte.d.ts',
 			svelte: './dist/Strip_List.svelte',
@@ -965,6 +976,11 @@ export const package_json = {
 			default: './dist/Strip_View.svelte',
 		},
 		'./strip.svelte.js': {types: './dist/strip.svelte.d.ts', default: './dist/strip.svelte.js'},
+		'./Tape_Contextmenu.svelte': {
+			types: './dist/Tape_Contextmenu.svelte.d.ts',
+			svelte: './dist/Tape_Contextmenu.svelte',
+			default: './dist/Tape_Contextmenu.svelte',
+		},
 		'./tape_helpers.js': {types: './dist/tape_helpers.d.ts', default: './dist/tape_helpers.js'},
 		'./Tape_List.svelte': {
 			types: './dist/Tape_List.svelte.d.ts',
@@ -1237,6 +1253,10 @@ export const src_json = {
 				{name: 'App', kind: 'class'},
 			],
 		},
+		'./Bit_Contextmenu.svelte': {
+			path: 'Bit_Contextmenu.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./Bit_Editor_For_Diskfile.svelte': {
 			path: 'Bit_Editor_For_Diskfile.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
@@ -1421,6 +1441,10 @@ export const src_json = {
 				{name: 'Cell', kind: 'class'},
 			],
 		},
+		'./Chat_Contextmenu.svelte': {
+			path: 'Chat_Contextmenu.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./Chat_Initializer.svelte': {
 			path: 'Chat_Initializer.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
@@ -1471,6 +1495,10 @@ export const src_json = {
 				{name: 'Chat', kind: 'class'},
 				{name: 'Chat_Schema', kind: 'variable'},
 			],
+		},
+		'./Chats_Contextmenu.svelte': {
+			path: 'Chats_Contextmenu.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
 		},
 		'./chats.svelte.js': {
 			path: 'chats.svelte.ts',
@@ -1567,44 +1595,12 @@ export const src_json = {
 			path: 'Content_Stats.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
 		},
-		'./Contextmenu_Bit.svelte': {
-			path: 'Contextmenu_Bit.svelte',
-			declarations: [{name: 'default', kind: 'component'}],
-		},
-		'./Contextmenu_Chat.svelte': {
-			path: 'Contextmenu_Chat.svelte',
-			declarations: [{name: 'default', kind: 'component'}],
-		},
-		'./Contextmenu_Chats.svelte': {
-			path: 'Contextmenu_Chats.svelte',
-			declarations: [{name: 'default', kind: 'component'}],
-		},
-		'./Contextmenu_Diskfile.svelte': {
-			path: 'Contextmenu_Diskfile.svelte',
-			declarations: [{name: 'default', kind: 'component'}],
-		},
 		'./Contextmenu_Entry_Copy_To_Clipboard.svelte': {
 			path: 'Contextmenu_Entry_Copy_To_Clipboard.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
 		},
 		'./Contextmenu_Entry_Toggle.svelte': {
 			path: 'Contextmenu_Entry_Toggle.svelte',
-			declarations: [{name: 'default', kind: 'component'}],
-		},
-		'./Contextmenu_Model.svelte': {
-			path: 'Contextmenu_Model.svelte',
-			declarations: [{name: 'default', kind: 'component'}],
-		},
-		'./Contextmenu_Prompt.svelte': {
-			path: 'Contextmenu_Prompt.svelte',
-			declarations: [{name: 'default', kind: 'component'}],
-		},
-		'./Contextmenu_Strip.svelte': {
-			path: 'Contextmenu_Strip.svelte',
-			declarations: [{name: 'default', kind: 'component'}],
-		},
-		'./Contextmenu_Tape.svelte': {
-			path: 'Contextmenu_Tape.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
 		},
 		'./Dashboard_Capabilities.svelte': {
@@ -1657,6 +1653,10 @@ export const src_json = {
 		},
 		'./Diskfile_Bit_View.svelte': {
 			path: 'Diskfile_Bit_View.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Diskfile_Contextmenu.svelte': {
+			path: 'Diskfile_Contextmenu.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
 		},
 		'./Diskfile_Editor_Nav.svelte': {
@@ -2037,6 +2037,10 @@ export const src_json = {
 			path: 'Main_Dialog.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
 		},
+		'./Model_Contextmenu.svelte': {
+			path: 'Model_Contextmenu.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./Model_Detail.svelte': {
 			path: 'Model_Detail.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
@@ -2240,6 +2244,10 @@ export const src_json = {
 			path: 'Progress_Bar.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
 		},
+		'./Prompt_Contextmenu.svelte': {
+			path: 'Prompt_Contextmenu.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./prompt_helpers.js': {
 			path: 'prompt_helpers.ts',
 			declarations: [{name: 'format_prompt_content', kind: 'function'}],
@@ -2409,15 +2417,6 @@ export const src_json = {
 		},
 		'./server/.env.example': {path: 'server/.env.example'},
 		'./server/.env.production.example': {path: 'server/.env.production.example'},
-		'./server/ai_provider_helpers.js': {
-			path: 'server/ai_provider_helpers.ts',
-			declarations: [
-				{name: 'format_ollama_messages', kind: 'function'},
-				{name: 'format_claude_messages', kind: 'function'},
-				{name: 'format_openai_messages', kind: 'function'},
-				{name: 'format_gemini_messages', kind: 'function'},
-			],
-		},
 		'./server/backend_action_handlers.js': {
 			path: 'server/backend_action_handlers.ts',
 			declarations: [{name: 'backend_action_handlers', kind: 'variable'}],
@@ -2438,6 +2437,15 @@ export const src_json = {
 				{name: 'handle_filer_change', kind: 'function'},
 			],
 		},
+		'./server/backend_provider.js': {
+			path: 'server/backend_provider.ts',
+			declarations: [
+				{name: 'Completion_Handler', kind: 'type'},
+				{name: 'Completion_Options', kind: 'type'},
+				{name: 'Completion_Handler_Options', kind: 'type'},
+				{name: 'Backend_Provider', kind: 'class'},
+			],
+		},
 		'./server/backend_websocket_transport.js': {
 			path: 'server/backend_websocket_transport.ts',
 			declarations: [{name: 'Backend_Websocket_Transport', kind: 'class'}],
@@ -2451,23 +2459,25 @@ export const src_json = {
 				{name: 'Backend', kind: 'class'},
 			],
 		},
-		'./server/handle_create_completion.js': {
-			path: 'server/handle_create_completion.ts',
-			declarations: [
-				{name: 'Completion_Handler_Options', kind: 'type'},
-				{name: 'Completion_Options', kind: 'type'},
-				{name: 'Completion_Handler', kind: 'type'},
-				{name: 'get_completion_handler', kind: 'function'},
-				{name: 'handle_ollama_streaming', kind: 'function'},
-				{name: 'handle_ollama_non_streaming', kind: 'function'},
-				{name: 'handle_claude_streaming', kind: 'function'},
-				{name: 'handle_claude_non_streaming', kind: 'function'},
-				{name: 'handle_chatgpt_streaming', kind: 'function'},
-				{name: 'handle_chatgpt_non_streaming', kind: 'function'},
-				{name: 'handle_gemini_streaming', kind: 'function'},
-				{name: 'handle_gemini_non_streaming', kind: 'function'},
-				{name: 'save_completion_response_to_disk', kind: 'function'},
-			],
+		'./server/chatgpt_backend_provider.js': {
+			path: 'server/chatgpt_backend_provider.ts',
+			declarations: [{name: 'Chatgpt_Backend_Provider', kind: 'class'}],
+		},
+		'./server/claude_backend_provider.js': {
+			path: 'server/claude_backend_provider.ts',
+			declarations: [{name: 'Claude_Backend_Provider', kind: 'class'}],
+		},
+		'./server/gemini_backend_provider.js': {
+			path: 'server/gemini_backend_provider.ts',
+			declarations: [{name: 'Gemini_Backend_Provider', kind: 'class'}],
+		},
+		'./server/helpers.js': {
+			path: 'server/helpers.ts',
+			declarations: [{name: 'save_completion_response_to_disk', kind: 'function'}],
+		},
+		'./server/ollama_backend_provider.js': {
+			path: 'server/ollama_backend_provider.ts',
+			declarations: [{name: 'Ollama_Backend_Provider', kind: 'class'}],
 		},
 		'./server/register_http_actions.js': {
 			path: 'server/register_http_actions.ts',
@@ -2550,6 +2560,10 @@ export const src_json = {
 				{name: 'sort_by_numeric', kind: 'function'},
 			],
 		},
+		'./Strip_Contextmenu.svelte': {
+			path: 'Strip_Contextmenu.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./Strip_List.svelte': {
 			path: 'Strip_List.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
@@ -2561,7 +2575,6 @@ export const src_json = {
 		'./strip_types.js': {
 			path: 'strip_types.ts',
 			declarations: [
-				{name: 'Strip_Role', kind: 'variable'},
 				{name: 'Strip_Json', kind: 'variable'},
 				{name: 'Strip_Json_Input', kind: 'type'},
 				{name: 'Strip_Schema', kind: 'variable'},
@@ -2580,11 +2593,15 @@ export const src_json = {
 				{name: 'create_strip_from_text', kind: 'function'},
 			],
 		},
+		'./Tape_Contextmenu.svelte': {
+			path: 'Tape_Contextmenu.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./tape_helpers.js': {
 			path: 'tape_helpers.ts',
 			declarations: [
 				{name: 'render_message_with_role', kind: 'function'},
-				{name: 'render_tape_to_string', kind: 'function'},
+				{name: 'render_messages_to_string', kind: 'function'},
 				{name: 'render_completion_messages', kind: 'function'},
 			],
 		},

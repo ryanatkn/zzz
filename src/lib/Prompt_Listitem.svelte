@@ -3,7 +3,7 @@
 
 	import Nav_Link from '$lib/Nav_Link.svelte';
 	import {GLYPH_PROMPT} from '$lib/glyphs.js';
-	import Contextmenu_Prompt from '$lib/Contextmenu_Prompt.svelte';
+	import Prompt_Contextmenu from '$lib/Prompt_Contextmenu.svelte';
 	import type {Prompt} from '$lib/prompt.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
 
@@ -15,7 +15,7 @@
 	const {prompt, selected}: Props = $props();
 </script>
 
-<Contextmenu_Prompt {prompt}>
+<Prompt_Contextmenu {prompt}>
 	<Nav_Link
 		href="{base}/prompts/{prompt.id}"
 		{selected}
@@ -30,4 +30,4 @@
 		</div>
 		{#if prompt.bits.length}<small>{prompt.bits.length}</small>{/if}
 	</Nav_Link>
-</Contextmenu_Prompt>
+</Prompt_Contextmenu>

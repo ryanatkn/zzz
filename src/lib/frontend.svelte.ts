@@ -46,6 +46,7 @@ import {
 import {Frontend_Http_Transport} from '$lib/frontend_http_transport.js';
 import {Frontend_Websocket_Transport} from '$lib/frontend_websocket_transport.js';
 
+// TODO this is over-used, see also `app_context` for the user pattern
 export const frontend_context = create_context<Frontend>();
 
 export const Frontend_Json = Cell_Json.extend({

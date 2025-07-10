@@ -2,14 +2,14 @@ import type {Model} from '$lib/model.svelte.js';
 import {Strip, create_strip_from_text, create_strip_from_bit} from '$lib/strip.svelte.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Tape_Json} from '$lib/tape_types.js';
-import {Completion_Request} from '$lib/completion_types.js';
-import {render_tape_to_string, render_completion_messages} from '$lib/tape_helpers.js';
+import {Completion_Request, Completion_Role} from '$lib/completion_types.js';
+import {render_messages_to_string, render_completion_messages} from '$lib/tape_helpers.js';
 import type {Bit_Type} from '$lib/bit.svelte.js';
 import {HANDLED} from '$lib/cell_helpers.js';
 import {to_preview, estimate_token_count} from '$lib/helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import type {Uuid} from '$lib/zod_helpers.js';
-import type {Strip_Role, Strip_Json} from '$lib/strip_types.js';
+import type {Strip_Json} from '$lib/strip_types.js';
 
 // TODO add `tape.name` probably
 
@@ -30,7 +30,7 @@ export class Tape extends Cell<typeof Tape_Json> {
 
 	enabled: boolean = $state()!;
 
-	readonly content: string = $derived(render_tape_to_string(this.strips.by_id.values()));
+	readonly content: string = $derived(render_messages_to_string(this.strips.by_id.values()));
 	readonly length: number = $derived(this.content.length);
 	readonly token_count: number = $derived(estimate_token_count(this.content));
 	readonly content_preview: string = $derived(to_preview(this.content));
@@ -96,7 +96,7 @@ export class Tape extends Cell<typeof Tape_Json> {
 	/**
 	 * Create and add a strip from a bit.
 	 */
-	add_strip_from_bit(bit: Bit_Type, role: Strip_Role): Strip {
+	add_strip_from_bit(bit: Bit_Type, role: Completion_Role): Strip {
 		const strip = create_strip_from_bit(bit, role, {
 			tape_id: this.id,
 		});

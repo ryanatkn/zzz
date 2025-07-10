@@ -2,7 +2,7 @@
 	import type {SvelteHTMLElements} from 'svelte/elements';
 
 	import Model_Link from '$lib/Model_Link.svelte';
-	import Contextmenu_Model from '$lib/Contextmenu_Model.svelte';
+	import Model_Contextmenu from '$lib/Model_Contextmenu.svelte';
 	import Provider_Link from '$lib/Provider_Link.svelte';
 	import type {Model} from '$lib/model.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
@@ -22,7 +22,7 @@
 	// TODO maybe rename to Model_Listitem, particularly if we add a `Model_List` for the parent usage
 </script>
 
-<Contextmenu_Model {model}>
+<Model_Contextmenu {model}>
 	<div {...attrs} class="panel p_lg {attrs?.class}">
 		<div class="font_size_xl mb_lg">
 			<Model_Link {model} icon />
@@ -70,7 +70,7 @@
 			{/if}
 		</div>
 	</div>
-</Contextmenu_Model>
+</Model_Contextmenu>
 
 <style>
 	.specs_grid {

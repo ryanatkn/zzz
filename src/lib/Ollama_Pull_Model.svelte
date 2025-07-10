@@ -52,7 +52,7 @@
 	</header>
 
 	<div class="width_md display_flex flex_column gap_md">
-		<p>This downloads a model so you can use it locally.</p>
+		<p>This downloads a builtin model so you can use it locally.</p>
 
 		<fieldset>
 			<label class="display_block mb_xs">

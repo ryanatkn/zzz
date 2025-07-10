@@ -1,11 +1,9 @@
-/**
- * Helper module for safely working with completion responses
- * and handling type compatibility issues.
- */
 import {get_datetime_now, Uuid} from '$lib/zod_helpers.js';
 import type {Action_Outputs} from '$lib/action_collections.js';
 import type {Provider_Name, Provider_Data} from '$lib/provider_types.js';
 import type {Model_Name} from '$lib/model.svelte.js';
+
+// TODO refactor these
 
 // TODO hacky, shouldn't exist
 /**

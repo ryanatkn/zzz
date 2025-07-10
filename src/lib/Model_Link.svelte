@@ -8,7 +8,7 @@
 	import Provider_Logo from '$lib/Provider_Logo.svelte';
 	import {GLYPH_MODEL} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
-	import Contextmenu_Model from '$lib/Contextmenu_Model.svelte';
+	import Model_Contextmenu from '$lib/Model_Contextmenu.svelte';
 
 	interface Props {
 		model: Model;
@@ -26,7 +26,7 @@
 </script>
 
 <!-- TODO this contextmenu appears as a duplicate, I think a de-duped key is the best fix, not manually disabling it -->
-<Contextmenu_Model {model}
+<Model_Contextmenu {model}
 	><a {...attrs} href="{base}/models/{model.name}" class:selected
 		>{#if children}
 			{@render children()}
@@ -38,7 +38,7 @@
 			{/if}
 			{model.name}
 		{/if}</a
-	></Contextmenu_Model
+	></Model_Contextmenu
 >
 
 <style>

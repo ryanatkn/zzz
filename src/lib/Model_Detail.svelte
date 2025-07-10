@@ -12,7 +12,7 @@
 	import {GLYPH_MODEL, GLYPH_CHECKMARK, GLYPH_ADD, GLYPH_XMARK} from '$lib/glyphs.js';
 	import {frontend_context} from '$lib/frontend.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
-	import Contextmenu_Model from '$lib/Contextmenu_Model.svelte';
+	import Model_Contextmenu from '$lib/Model_Contextmenu.svelte';
 	import Ollama_Model_Details from '$lib/Ollama_Model_Details.svelte';
 	import {format_gigabytes} from '$lib/format_helpers.js';
 
@@ -38,10 +38,11 @@
 	const at_detail_page = $derived(page.url.pathname === `${base}/models/${model.name}`);
 	const provider = $derived(app.providers.find_by_name(model.provider_name));
 
-	// TODO BLOCK get spec data mapped to model fields for the frontier providers
+	// TODO get spec data mapped to model fields for the frontier providers
+	// TODO add custom models/providers, show in the UI when they're in a bad state
 </script>
 
-<Contextmenu_Model tag="div" attrs={{class: 'panel p_lg', ...attrs}} {model}>
+<Model_Contextmenu tag="div" attrs={{class: 'panel p_lg', ...attrs}} {model}>
 	<section class="row mb_xl3">
 		<div class="glyph_container">
 			<Glyph glyph={GLYPH_MODEL} size="var(--icon_size_xl)" />
@@ -177,7 +178,7 @@
 			{/if}
 		</section>
 	{/if}
-</Contextmenu_Model>
+</Model_Contextmenu>
 
 <style>
 	.glyph_container {

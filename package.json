@@ -178,6 +178,11 @@
       "types": "./dist/app.svelte.d.ts",
       "default": "./dist/app.svelte.js"
     },
+    "./Bit_Contextmenu.svelte": {
+      "types": "./dist/Bit_Contextmenu.svelte.d.ts",
+      "svelte": "./dist/Bit_Contextmenu.svelte",
+      "default": "./dist/Bit_Contextmenu.svelte"
+    },
     "./Bit_Editor_For_Diskfile.svelte": {
       "types": "./dist/Bit_Editor_For_Diskfile.svelte.d.ts",
       "svelte": "./dist/Bit_Editor_For_Diskfile.svelte",
@@ -304,6 +309,11 @@
       "types": "./dist/cell.svelte.d.ts",
       "default": "./dist/cell.svelte.js"
     },
+    "./Chat_Contextmenu.svelte": {
+      "types": "./dist/Chat_Contextmenu.svelte.d.ts",
+      "svelte": "./dist/Chat_Contextmenu.svelte",
+      "default": "./dist/Chat_Contextmenu.svelte"
+    },
     "./Chat_Initializer.svelte": {
       "types": "./dist/Chat_Initializer.svelte.d.ts",
       "svelte": "./dist/Chat_Initializer.svelte",
@@ -356,6 +366,11 @@
     "./chat.svelte.js": {
       "types": "./dist/chat.svelte.d.ts",
       "default": "./dist/chat.svelte.js"
+    },
+    "./Chats_Contextmenu.svelte": {
+      "types": "./dist/Chats_Contextmenu.svelte.d.ts",
+      "svelte": "./dist/Chats_Contextmenu.svelte",
+      "default": "./dist/Chats_Contextmenu.svelte"
     },
     "./chats.svelte.js": {
       "types": "./dist/chats.svelte.d.ts",
@@ -410,26 +425,6 @@
       "svelte": "./dist/Content_Stats.svelte",
       "default": "./dist/Content_Stats.svelte"
     },
-    "./Contextmenu_Bit.svelte": {
-      "types": "./dist/Contextmenu_Bit.svelte.d.ts",
-      "svelte": "./dist/Contextmenu_Bit.svelte",
-      "default": "./dist/Contextmenu_Bit.svelte"
-    },
-    "./Contextmenu_Chat.svelte": {
-      "types": "./dist/Contextmenu_Chat.svelte.d.ts",
-      "svelte": "./dist/Contextmenu_Chat.svelte",
-      "default": "./dist/Contextmenu_Chat.svelte"
-    },
-    "./Contextmenu_Chats.svelte": {
-      "types": "./dist/Contextmenu_Chats.svelte.d.ts",
-      "svelte": "./dist/Contextmenu_Chats.svelte",
-      "default": "./dist/Contextmenu_Chats.svelte"
-    },
-    "./Contextmenu_Diskfile.svelte": {
-      "types": "./dist/Contextmenu_Diskfile.svelte.d.ts",
-      "svelte": "./dist/Contextmenu_Diskfile.svelte",
-      "default": "./dist/Contextmenu_Diskfile.svelte"
-    },
     "./Contextmenu_Entry_Copy_To_Clipboard.svelte": {
       "types": "./dist/Contextmenu_Entry_Copy_To_Clipboard.svelte.d.ts",
       "svelte": "./dist/Contextmenu_Entry_Copy_To_Clipboard.svelte",
@@ -439,26 +434,6 @@
       "types": "./dist/Contextmenu_Entry_Toggle.svelte.d.ts",
       "svelte": "./dist/Contextmenu_Entry_Toggle.svelte",
       "default": "./dist/Contextmenu_Entry_Toggle.svelte"
-    },
-    "./Contextmenu_Model.svelte": {
-      "types": "./dist/Contextmenu_Model.svelte.d.ts",
-      "svelte": "./dist/Contextmenu_Model.svelte",
-      "default": "./dist/Contextmenu_Model.svelte"
-    },
-    "./Contextmenu_Prompt.svelte": {
-      "types": "./dist/Contextmenu_Prompt.svelte.d.ts",
-      "svelte": "./dist/Contextmenu_Prompt.svelte",
-      "default": "./dist/Contextmenu_Prompt.svelte"
-    },
-    "./Contextmenu_Strip.svelte": {
-      "types": "./dist/Contextmenu_Strip.svelte.d.ts",
-      "svelte": "./dist/Contextmenu_Strip.svelte",
-      "default": "./dist/Contextmenu_Strip.svelte"
-    },
-    "./Contextmenu_Tape.svelte": {
-      "types": "./dist/Contextmenu_Tape.svelte.d.ts",
-      "svelte": "./dist/Contextmenu_Tape.svelte",
-      "default": "./dist/Contextmenu_Tape.svelte"
     },
     "./Dashboard_Capabilities.svelte": {
       "types": "./dist/Dashboard_Capabilities.svelte.d.ts",
@@ -524,6 +499,11 @@
       "types": "./dist/Diskfile_Bit_View.svelte.d.ts",
       "svelte": "./dist/Diskfile_Bit_View.svelte",
       "default": "./dist/Diskfile_Bit_View.svelte"
+    },
+    "./Diskfile_Contextmenu.svelte": {
+      "types": "./dist/Diskfile_Contextmenu.svelte.d.ts",
+      "svelte": "./dist/Diskfile_Contextmenu.svelte",
+      "default": "./dist/Diskfile_Contextmenu.svelte"
     },
     "./Diskfile_Editor_Nav.svelte": {
       "types": "./dist/Diskfile_Editor_Nav.svelte.d.ts",
@@ -714,6 +694,11 @@
       "svelte": "./dist/Main_Dialog.svelte",
       "default": "./dist/Main_Dialog.svelte"
     },
+    "./Model_Contextmenu.svelte": {
+      "types": "./dist/Model_Contextmenu.svelte.d.ts",
+      "svelte": "./dist/Model_Contextmenu.svelte",
+      "default": "./dist/Model_Contextmenu.svelte"
+    },
     "./Model_Detail.svelte": {
       "types": "./dist/Model_Detail.svelte.d.ts",
       "svelte": "./dist/Model_Detail.svelte",
@@ -886,6 +871,11 @@
       "svelte": "./dist/Progress_Bar.svelte",
       "default": "./dist/Progress_Bar.svelte"
     },
+    "./Prompt_Contextmenu.svelte": {
+      "types": "./dist/Prompt_Contextmenu.svelte.d.ts",
+      "svelte": "./dist/Prompt_Contextmenu.svelte",
+      "default": "./dist/Prompt_Contextmenu.svelte"
+    },
     "./prompt_helpers.js": {
       "types": "./dist/prompt_helpers.d.ts",
       "default": "./dist/prompt_helpers.js"
@@ -994,10 +984,6 @@
     "./server/.env.production.example": {
       "default": "./dist/server/.env.production.example"
     },
-    "./server/ai_provider_helpers.js": {
-      "types": "./dist/server/ai_provider_helpers.d.ts",
-      "default": "./dist/server/ai_provider_helpers.js"
-    },
     "./server/backend_action_handlers.js": {
       "types": "./dist/server/backend_action_handlers.d.ts",
       "default": "./dist/server/backend_action_handlers.js"
@@ -1014,6 +1000,10 @@
       "types": "./dist/server/backend_actions_api.d.ts",
       "default": "./dist/server/backend_actions_api.js"
     },
+    "./server/backend_provider.js": {
+      "types": "./dist/server/backend_provider.d.ts",
+      "default": "./dist/server/backend_provider.js"
+    },
     "./server/backend_websocket_transport.js": {
       "types": "./dist/server/backend_websocket_transport.d.ts",
       "default": "./dist/server/backend_websocket_transport.js"
@@ -1022,9 +1012,25 @@
       "types": "./dist/server/backend.d.ts",
       "default": "./dist/server/backend.js"
     },
-    "./server/handle_create_completion.js": {
-      "types": "./dist/server/handle_create_completion.d.ts",
-      "default": "./dist/server/handle_create_completion.js"
+    "./server/chatgpt_backend_provider.js": {
+      "types": "./dist/server/chatgpt_backend_provider.d.ts",
+      "default": "./dist/server/chatgpt_backend_provider.js"
+    },
+    "./server/claude_backend_provider.js": {
+      "types": "./dist/server/claude_backend_provider.d.ts",
+      "default": "./dist/server/claude_backend_provider.js"
+    },
+    "./server/gemini_backend_provider.js": {
+      "types": "./dist/server/gemini_backend_provider.d.ts",
+      "default": "./dist/server/gemini_backend_provider.js"
+    },
+    "./server/helpers.js": {
+      "types": "./dist/server/helpers.d.ts",
+      "default": "./dist/server/helpers.js"
+    },
+    "./server/ollama_backend_provider.js": {
+      "types": "./dist/server/ollama_backend_provider.d.ts",
+      "default": "./dist/server/ollama_backend_provider.js"
     },
     "./server/register_http_actions.js": {
       "types": "./dist/server/register_http_actions.d.ts",
@@ -1077,6 +1083,11 @@
       "types": "./dist/sortable.svelte.d.ts",
       "default": "./dist/sortable.svelte.js"
     },
+    "./Strip_Contextmenu.svelte": {
+      "types": "./dist/Strip_Contextmenu.svelte.d.ts",
+      "svelte": "./dist/Strip_Contextmenu.svelte",
+      "default": "./dist/Strip_Contextmenu.svelte"
+    },
     "./Strip_List.svelte": {
       "types": "./dist/Strip_List.svelte.d.ts",
       "svelte": "./dist/Strip_List.svelte",
@@ -1099,6 +1110,11 @@
     "./strip.svelte.js": {
       "types": "./dist/strip.svelte.d.ts",
       "default": "./dist/strip.svelte.js"
+    },
+    "./Tape_Contextmenu.svelte": {
+      "types": "./dist/Tape_Contextmenu.svelte.d.ts",
+      "svelte": "./dist/Tape_Contextmenu.svelte",
+      "default": "./dist/Tape_Contextmenu.svelte"
     },
     "./tape_helpers.js": {
       "types": "./dist/tape_helpers.d.ts",

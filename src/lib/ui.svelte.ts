@@ -15,6 +15,10 @@ export class Ui extends Cell<typeof Ui_Json> {
 	show_main_dialog = $state(false);
 	show_sidebar = $state(true);
 
+	// TODO revisit this API, maybe with an associated attachment?
+	/** Consumed by components like `Content_Editor` for focusing elements. */
+	pending_element_to_focus_key: string | number | null = $state(null);
+
 	constructor(options: Ui_Options) {
 		super(Ui_Json, options);
 		this.init();

@@ -20,6 +20,9 @@
 		show_stats?: boolean | undefined;
 		show_actions?: boolean | undefined;
 		textarea_height?: string | undefined;
+		// TODO @many think about how these two could be refactored, like a single class instance
+		focus_key?: string | number | null | undefined;
+		pending_element_to_focus_key?: string | number | null | undefined;
 		attrs?: SvelteHTMLElements['textarea'] | undefined;
 		after?: Snippet | undefined;
 		children?: Snippet | undefined;
@@ -34,6 +37,8 @@
 		show_stats = false,
 		show_actions = false,
 		textarea_height,
+		focus_key,
+		pending_element_to_focus_key = $bindable(),
 		attrs,
 		after,
 		children,
@@ -45,7 +50,7 @@
 	const token_count = $derived(token_count_prop ?? estimate_token_count(content));
 
 	/**
-	 * Focus the textarea element - exposed for parent components
+	 * Focus the textarea element - exposed for parent components.
 	 */
 	export const focus = (): void => {
 		textarea_el?.focus();
@@ -74,6 +79,14 @@
 			{placeholder}
 			{readonly}
 			style="{textarea_height ? `height: ${textarea_height};` : ''} {attrs?.style || ''}"
+			{@attach focus_key == null
+				? null
+				: () => {
+						if (focus_key === pending_element_to_focus_key) {
+							pending_element_to_focus_key = null;
+							focus();
+						}
+					}}
 		></textarea>
 		{@render children?.()}
 	</div>
@@ -91,7 +104,7 @@
 				onpaste={(value) => {
 					const new_content = content + value;
 					content = new_content;
-					textarea_el?.focus();
+					focus();
 				}}
 				attrs={{class: 'plain icon_button font_size_lg'}}
 			>
@@ -102,7 +115,7 @@
 				value={content}
 				onchange={(value) => {
 					content = value;
-					textarea_el?.focus();
+					focus();
 				}}
 			/>
 		</div>

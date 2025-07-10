@@ -2,7 +2,7 @@
 	import {base} from '$app/paths';
 
 	import Nav_Link from '$lib/Nav_Link.svelte';
-	import Contextmenu_Chat from '$lib/Contextmenu_Chat.svelte';
+	import Chat_Contextmenu from '$lib/Chat_Contextmenu.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 	import {GLYPH_CHAT} from '$lib/glyphs.js';
 	import type {Chat} from '$lib/chat.svelte.js';
@@ -15,17 +15,13 @@
 	const {chat, selected}: Props = $props();
 </script>
 
-<Contextmenu_Chat {chat}>
+<Chat_Contextmenu {chat}>
 	<Nav_Link
 		href="{base}/chats/{chat.id}"
 		{selected}
 		attrs={{
 			class: 'justify_content_space_between',
 			style: 'min-height: 0;',
-			onclick: () => {
-				// TODO cleaner way to do this?
-				chat.app.chats.pending_chat_id_to_focus = chat.id;
-			},
 		}}
 	>
 		<div class="ellipsis">
@@ -34,4 +30,4 @@
 		</div>
 		{#if chat.tapes.length}<small>{chat.tapes.length}</small>{/if}
 	</Nav_Link>
-</Contextmenu_Chat>
+</Chat_Contextmenu>

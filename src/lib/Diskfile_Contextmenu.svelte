@@ -11,14 +11,12 @@
 	import Contextmenu_Entry_Copy_To_Clipboard from '$lib/Contextmenu_Entry_Copy_To_Clipboard.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 
-	const {
-		diskfile,
-		children,
-		...rest
-	}: Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> & {
+	interface Props extends Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> {
 		diskfile: Diskfile | null | undefined;
 		children: Snippet;
-	} = $props();
+	}
+
+	const {diskfile, children, ...rest}: Props = $props();
 
 	const app = frontend_context.get();
 </script>

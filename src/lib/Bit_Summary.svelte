@@ -4,7 +4,7 @@
 	import Bit_Toggle_Button from '$lib/Bit_Toggle_Button.svelte';
 	import Bit_Remove_Button from '$lib/Bit_Remove_Button.svelte';
 	import Glyph from '$lib/Glyph.svelte';
-	import Contextmenu_Bit from '$lib/Contextmenu_Bit.svelte';
+	import Bit_Contextmenu from '$lib/Bit_Contextmenu.svelte';
 	import {get_bit_type_glyph} from '$lib/bit_helpers.js';
 
 	interface Props {
@@ -20,7 +20,7 @@
 	// TODO visuals are very basic
 </script>
 
-<Contextmenu_Bit {bit}>
+<Bit_Contextmenu {bit}>
 	<div
 		class="bit_summary display_flex justify_content_space_between gap_xs2 font_size_sm position_relative panel"
 		class:dormant={!bit.enabled}
@@ -36,7 +36,7 @@
 			<Bit_Remove_Button {bit} {prompt} />
 		</div>
 	</div>
-</Contextmenu_Bit>
+</Bit_Contextmenu>
 
 <style>
 	.progress_bar {

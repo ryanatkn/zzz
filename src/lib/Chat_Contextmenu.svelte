@@ -95,11 +95,10 @@
 
 			<Contextmenu_Entry
 				run={async () => {
-					// TODO BLOCK this is broken bc we want a unique name, and adding tapes looks hacky, maybe add a `chats/chat.duplicate` method
-					// Create a duplicate of this chat
+					// TODO make it have a unique name, and adding tapes looks hacky,
+					// maybe add a `chats.duplicate` method
 					const new_chat = app.chats.add_chat(chat.clone());
-
-					// Add the same tapes
+					// TODO hacky
 					for (const tape of chat.tapes) {
 						new_chat.add_tape(tape.model);
 					}

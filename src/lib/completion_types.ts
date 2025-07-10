@@ -3,7 +3,7 @@ import {z} from 'zod';
 import {Datetime_Now} from '$lib/zod_helpers.js';
 import {Provider_Name, Provider_Data_Schema} from '$lib/provider_types.js';
 
-// TODO needs to be open ended right? any benefit to an enum system/user/assistant? maybe merge with `Strip_Role`
+// TODO any restrictions?
 export const Completion_Role = z.string(); // branding is too unwieldy at data declaration sites
 export type Completion_Role = z.infer<typeof Completion_Role>;
 

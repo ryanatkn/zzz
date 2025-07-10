@@ -5,7 +5,7 @@
 	import Glyph from '$lib/Glyph.svelte';
 	import {get_bit_type_glyph} from '$lib/bit_helpers.js';
 	import Bit_Editor_For_Text from '$lib/Bit_Editor_For_Text.svelte';
-	import Contextmenu_Bit from '$lib/Contextmenu_Bit.svelte';
+	import Bit_Contextmenu from '$lib/Bit_Contextmenu.svelte';
 	import Bit_Editor_For_Diskfile from '$lib/Bit_Editor_For_Diskfile.svelte';
 	import Bit_Editor_For_Sequence from '$lib/Bit_Editor_For_Sequence.svelte';
 	import Bit_Toggle_Button from '$lib/Bit_Toggle_Button.svelte';
@@ -25,7 +25,7 @@
 	const prompt = $derived(prompts.selected);
 </script>
 
-<Contextmenu_Bit {bit}>
+<Bit_Contextmenu {bit}>
 	<div class="column gap_sm" class:dormant={!bit.enabled}>
 		<div class="display_flex mb_0 justify_content_space_between">
 			<div class="font_size_lg m_0">
@@ -54,4 +54,4 @@
 		<Bit_Stats {bit} />
 		<Xml_Tag_Controls {bit} />
 	</div>
-</Contextmenu_Bit>
+</Bit_Contextmenu>

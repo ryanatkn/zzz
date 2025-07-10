@@ -25,11 +25,11 @@ export interface Models_Options extends Cell_Options<typeof Models_Json> {} // e
 export class Models extends Cell<typeof Models_Json> {
 	readonly items: Indexed_Collection<Model> = new Indexed_Collection({
 		indexes: [
-			// TODO I think this is a mistake to have `name` be unique,
-			// unless we prefix with `${provider_name}/${model_name}`,
-			// unless we want to design around multiple providers per model
-			// (structurally tying together supposedly-identical models from different providers,
-			// which sounds like it could be important for some UX cases)
+			// TODO this is a mistake to have `name` be unique,
+			// unless we prefix with `${provider_name}/${model_name}` and have some other property -
+			// I think designing around multiple providers per model is the wrong approach,
+			// because there may be a lot of details that need to be overridden per-provider,
+			// although that could potentially work with some rules around overrrides
 			create_single_index({
 				key: 'name',
 				extractor: (model) => model.name,

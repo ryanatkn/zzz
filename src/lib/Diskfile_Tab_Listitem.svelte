@@ -4,7 +4,7 @@
 	import {GLYPH_REMOVE} from '$lib/glyphs.js';
 	import type {Diskfile_Tab} from '$lib/diskfile_tab.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
-	import Contextmenu_Diskfile from '$lib/Contextmenu_Diskfile.svelte';
+	import Diskfile_Contextmenu from '$lib/Diskfile_Contextmenu.svelte';
 
 	interface Props {
 		tab: Diskfile_Tab;
@@ -20,7 +20,7 @@
 	const path = $derived(diskfile?.path_relative ?? '[no diskfile found]'); // TODO ?
 </script>
 
-<Contextmenu_Diskfile {diskfile}>
+<Diskfile_Contextmenu {diskfile}>
 	<div
 		class="diskfile_tab_container"
 		class:selected={tab.is_selected}
@@ -67,7 +67,7 @@
 			</button>
 		</div>
 	</div>
-</Contextmenu_Diskfile>
+</Diskfile_Contextmenu>
 
 <style>
 	.diskfile_tab_container {

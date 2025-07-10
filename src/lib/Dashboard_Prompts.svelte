@@ -21,16 +21,16 @@
 	import Bit_List from '$lib/Bit_List.svelte';
 	import Content_Preview from '$lib/Content_Preview.svelte';
 	import {Bit} from '$lib/bit.svelte.js';
-	import Contextmenu_Prompt from '$lib/Contextmenu_Prompt.svelte';
+	import Prompt_Contextmenu from '$lib/Prompt_Contextmenu.svelte';
 	import Diskfile_Picker_Dialog from '$lib/Diskfile_Picker_Dialog.svelte';
 	import Prompt_List from '$lib/Prompt_List.svelte';
 	import Editable_Text from '$lib/Editable_Text.svelte';
 
 	const app = frontend_context.get();
 
-	// TODO BLOCK clicking the bits should select them, and then selected one should show its name input (or just on hover/tap? what signifier?)
+	// TODO clicking the bits should select them, and then selected one should show its name input (or just on hover/tap? what signifier?)
 
-	// TODO BLOCK history of prompt states using cell builtins/helpers, like file state but generalized for all cells? the json-based, set_json stuff
+	// TODO history of prompt states (opt in snapshots? also autosave?) using cell builtins/helpers, like file state but generalized for all cells? the json-based, set_json stuff
 
 	// TODO BLOCK the reorderable dashed pattern state isn't working for the xml tag input or attributes
 
@@ -101,7 +101,7 @@
 	</div>
 
 	{#if app.prompts.selected}
-		<Contextmenu_Prompt prompt={app.prompts.selected}>
+		<Prompt_Contextmenu prompt={app.prompts.selected}>
 			<div class="column_fixed pr_sm">
 				<section class="column_section">
 					<div class="font_size_lg display_flex align_items_center">
@@ -193,7 +193,7 @@
 					</ul>
 				</div>
 			</div>
-		</Contextmenu_Prompt>
+		</Prompt_Contextmenu>
 	{:else if app.prompts.items.size}
 		<div class="display_flex align_items_center justify_content_center h_100 flex_1" in:fade>
 			<p>

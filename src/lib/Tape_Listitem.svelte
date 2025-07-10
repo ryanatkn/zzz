@@ -3,7 +3,7 @@
 	import type {Tape} from '$lib/tape.svelte.js';
 	import {GLYPH_REMOVE} from '$lib/glyphs.js';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
-	import Contextmenu_Tape from '$lib/Contextmenu_Tape.svelte';
+	import Tape_Contextmenu from '$lib/Tape_Contextmenu.svelte';
 	import Tape_Toggle_Button from '$lib/Tape_Toggle_Button.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 
@@ -17,7 +17,7 @@
 	const strip_count = $derived(tape.strips.size);
 </script>
 
-<Contextmenu_Tape {tape}>
+<Tape_Contextmenu {tape}>
 	<div class="tape_summary panel p_xs" class:dormant={!tape.enabled}>
 		<div class="row justify_content_space_between gap_xs">
 			<div class="flex_1">
@@ -48,7 +48,7 @@
 			</div>
 		</div>
 	</div>
-</Contextmenu_Tape>
+</Tape_Contextmenu>
 
 <style>
 	.tape_summary:hover {

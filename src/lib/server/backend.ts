@@ -21,6 +21,8 @@ import {
 import {Action_Peer} from '$lib/action_peer.js';
 import type {Jsonrpc_Message_From_Server_To_Client} from '$lib/jsonrpc.js';
 import type {Action_Executor} from '$lib/action_types.js';
+import type {Backend_Provider} from '$lib/server/backend_provider.js';
+import {jsonrpc_errors} from '$lib/jsonrpc_errors.js';
 
 /**
  * Function type for handling file system changes.
@@ -65,6 +67,10 @@ export interface Backend_Options {
 	 */
 	action_handlers: Backend_Action_Handlers;
 	/**
+	 * Available AI providers.
+	 */
+	providers?: Array<Backend_Provider>;
+	/**
 	 * Handler function for file system changes.
 	 */
 	handle_filer_change: Filer_Change_Handler;
@@ -90,9 +96,6 @@ export class Backend implements Action_Event_Environment {
 
 	readonly config: Zzz_Config;
 
-	readonly #action_handlers: Backend_Action_Handlers;
-	readonly #handle_filer_change: Filer_Change_Handler;
-
 	readonly peer: Action_Peer;
 
 	/**
@@ -111,16 +114,20 @@ export class Backend implements Action_Event_Environment {
 	// Map of directory paths to their respective Filer instances
 	readonly filers: Map<string, Filer_Instance> = new Map();
 
-	/**
-	 * Action registry for centralized action specification access.
-	 */
 	readonly action_registry;
-	/**
-	 * Access to all action specifications.
-	 */
+
+	/** Available actions. */
 	get action_specs(): Array<Action_Spec_Union> {
 		return this.action_registry.specs;
 	}
+
+	readonly #action_handlers: Backend_Action_Handlers;
+
+	// TODO wrapper class?
+	/** Available AI providers. */
+	readonly providers: Array<Backend_Provider>;
+
+	readonly #handle_filer_change: Filer_Change_Handler;
 
 	constructor(options: Backend_Options) {
 		// Parse the allowed filesystem directories
@@ -130,12 +137,12 @@ export class Backend implements Action_Event_Environment {
 
 		this.config = options.config;
 
-		this.action_registry = new Action_Registry(options.action_specs);
-
 		// TODO @many make transports an option?
 		this.peer = new Action_Peer({environment: this});
 
+		this.action_registry = new Action_Registry(options.action_specs);
 		this.#action_handlers = options.action_handlers;
+		this.providers = options.providers ?? [];
 		this.#handle_filer_change = options.handle_filer_change;
 
 		this.api = create_backend_actions_api(this);
@@ -165,6 +172,15 @@ export class Backend implements Action_Event_Environment {
 
 	lookup_action_spec(method: Action_Method): Action_Spec_Union | undefined {
 		return this.action_registry.spec_by_method.get(method);
+	}
+
+	// TODO probably extract a `Backend_Providers` or `Backend_Provider_Registry` class that caches a map by name
+	lookup_provider(provider_name: string): Backend_Provider {
+		const provider = this.providers.find((p) => p.name === provider_name);
+		if (!provider) {
+			throw jsonrpc_errors.invalid_params(`unsupported provider: ${provider_name}`);
+		}
+		return provider;
 	}
 
 	/**

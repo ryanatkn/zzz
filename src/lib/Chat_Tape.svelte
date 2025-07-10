@@ -1,39 +1,38 @@
 <script lang="ts">
 	import Pending_Button from '@ryanatkn/fuz/Pending_Button.svelte';
 	import {tick} from 'svelte';
+	import type {SvelteHTMLElements} from 'svelte/elements';
 
 	import {estimate_token_count} from '$lib/helpers.js';
 	import type {Tape} from '$lib/tape.svelte.js';
 	import Model_Picker_Dialog from '$lib/Model_Picker_Dialog.svelte';
 	import Strip_List from '$lib/Strip_List.svelte';
 	import Provider_Link from '$lib/Provider_Link.svelte';
-	import Contextmenu_Tape from '$lib/Contextmenu_Tape.svelte';
-	import Contextmenu_Model from '$lib/Contextmenu_Model.svelte';
+	import Tape_Contextmenu from '$lib/Tape_Contextmenu.svelte';
+	import Model_Contextmenu from '$lib/Model_Contextmenu.svelte';
 	import Content_Editor from '$lib/Content_Editor.svelte';
 	import {GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
-	import type {SvelteHTMLElements} from 'svelte/elements';
-	import type {Chat} from '$lib/chat.svelte.js';
-	import {app_context} from '$lib/app.svelte.js';
+
+	// TODO no longer uses `Chat`, maybe rename to `Tape_View` or similar?
 
 	interface Props {
-		chat: Chat;
 		tape: Tape;
 		onsend: (input: string) => Promise<void>;
+		// TODO @many think about how these two could be refactored, like a single class instance
+		focus_key?: string | number | null | undefined;
+		pending_element_to_focus_key?: string | number | null | undefined;
 		strips_attrs?: SvelteHTMLElements['div'] | undefined;
 		attrs?: SvelteHTMLElements['div'] | undefined;
 	}
 
-	const {chat, tape, onsend, strips_attrs, attrs}: Props = $props();
-
-	const app = app_context.get();
-
-	$effect(() => {
-		if (chat.id === app.chats.pending_chat_id_to_focus) {
-			app.chats.pending_chat_id_to_focus = null;
-			console.log(`app.chats.pending_chat_id_to_focus`, app.chats.pending_chat_id_to_focus);
-			void tick().then(() => content_input?.focus());
-		}
-	});
+	let {
+		tape,
+		onsend,
+		focus_key,
+		pending_element_to_focus_key = $bindable(),
+		strips_attrs,
+		attrs,
+	}: Props = $props();
 
 	let input = $state('');
 	const input_token_count = $derived(estimate_token_count(input));
@@ -60,8 +59,8 @@
 	let show_model_picker = $state(false);
 </script>
 
-<Contextmenu_Model model={tape.model}>
-	<Contextmenu_Tape {tape}>
+<Model_Contextmenu model={tape.model}>
+	<Tape_Contextmenu {tape}>
 		<div {...attrs} class="chat_tape {attrs?.class}" class:empty class:dormant={!tape.enabled}>
 			<div class="display_flex justify_content_space_between align_items_start">
 				<header>
@@ -95,6 +94,8 @@
 					placeholder={GLYPH_PLACEHOLDER}
 					show_stats
 					show_actions
+					{focus_key}
+					bind:pending_element_to_focus_key
 				>
 					<Pending_Button
 						{pending}
@@ -116,8 +117,8 @@
 				}
 			}}
 		/>
-	</Contextmenu_Tape>
-</Contextmenu_Model>
+	</Tape_Contextmenu>
+</Model_Contextmenu>
 
 <style>
 	.chat_tape {

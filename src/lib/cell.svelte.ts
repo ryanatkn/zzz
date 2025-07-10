@@ -256,7 +256,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 				this.assign_property(key, parsed_value);
 			}
 		} catch (error) {
-			console.error(`Error setting JSON for ${this.constructor.name}:`, error);
+			console.error(`error setting JSON for ${this.constructor.name}:`, error);
 			throw error; // Re-throw so tests that expect errors will pass
 		}
 	}
@@ -304,7 +304,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 				}
 			}
 		} catch (error) {
-			console.error(`Error in partial update for ${this.constructor.name}:`, error);
+			console.error(`error in partial update for ${this.constructor.name}:`, error);
 			throw error;
 		}
 	}

@@ -27,10 +27,16 @@
 	<div class="column width_md min_width_sm" class:h_100={!empty} class:p_sm={!empty}>
 		{#if tape}
 			<Chat_Tape
-				{chat}
 				{tape}
 				onsend={(input) => chat.send_to_tape(tape.id, input)}
 				attrs={{class: empty ? 'floating p_sm' : 'h_100'}}
+				focus_key={chat.id}
+				bind:pending_element_to_focus_key={
+					() => chat.app.ui.pending_element_to_focus_key,
+					(v) => {
+						chat.app.ui.pending_element_to_focus_key = v;
+					}
+				}
 			/>
 		{:else}
 			<Chat_Tape_Add_By_Model {chat} />

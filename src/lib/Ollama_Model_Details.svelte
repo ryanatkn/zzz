@@ -15,7 +15,7 @@
 	} from '$lib/glyphs.js';
 	import type {Model} from '$lib/model.svelte.js';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
-	import Contextmenu_Model from '$lib/Contextmenu_Model.svelte';
+	import Model_Contextmenu from '$lib/Model_Contextmenu.svelte';
 	import Model_Link from '$lib/Model_Link.svelte';
 	import {format_short_date} from '$lib/time_helpers.js';
 	import {format_gigabytes} from '$lib/format_helpers.js';
@@ -34,7 +34,7 @@
 	// TODO refactor with `Model_Detail`?
 </script>
 
-<Contextmenu_Model {model}>
+<Model_Contextmenu {model}>
 	{#if header}
 		{@render header()}
 	{:else}
@@ -217,4 +217,4 @@
 			{/if}
 		</section>
 	{/if}
-</Contextmenu_Model>
+</Model_Contextmenu>

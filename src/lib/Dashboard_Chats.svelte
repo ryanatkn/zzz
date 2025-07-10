@@ -3,17 +3,17 @@
 
 	import Chats_List from '$lib/Chat_List.svelte';
 	import Chat_View from '$lib/Chat_View.svelte';
-	import Contextmenu_Chat from '$lib/Contextmenu_Chat.svelte';
+	import Chat_Contextmenu from '$lib/Chat_Contextmenu.svelte';
 	import {GLYPH_ADD, GLYPH_SORT} from '$lib/glyphs.js';
 	import {frontend_context} from '$lib/frontend.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
-	import Contextmenu_Chats from '$lib/Contextmenu_Chats.svelte';
+	import Chats_Contextmenu from '$lib/Chats_Contextmenu.svelte';
 
 	const app = frontend_context.get();
 	const {chats} = app;
 </script>
 
-<Contextmenu_Chats attrs={{class: 'display_flex w_100 h_100'}}>
+<Chats_Contextmenu attrs={{class: 'display_flex w_100 h_100'}}>
 	<div class="column_fixed">
 		<div class="py_sm pr_sm">
 			<div class="row gap_xs2 mb_xs pl_xs2">
@@ -44,9 +44,9 @@
 
 	<div class="column_fluid">
 		{#if chats.selected}
-			<Contextmenu_Chat chat={chats.selected}>
+			<Chat_Contextmenu chat={chats.selected}>
 				<Chat_View chat={chats.selected} />
-			</Contextmenu_Chat>
+			</Chat_Contextmenu>
 		{:else if chats.items.size}
 			<div class="display_flex align_items_center justify_content_center h_100 flex_1">
 				<div class="p_md text_align_center">
@@ -77,4 +77,4 @@
 			</div>
 		{/if}
 	</div>
-</Contextmenu_Chats>
+</Chats_Contextmenu>

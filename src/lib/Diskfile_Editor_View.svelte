@@ -10,7 +10,7 @@
 	import Diskfile_History_View from '$lib/Diskfile_History_View.svelte';
 	import {GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
 	import Diskfile_Bit_View from '$lib/Diskfile_Bit_View.svelte';
-	import Contextmenu_Diskfile from '$lib/Contextmenu_Diskfile.svelte';
+	import Diskfile_Contextmenu from '$lib/Diskfile_Contextmenu.svelte';
 	import type {Uuid} from '$lib/zod_helpers.js';
 	import Diskfile_Editor_Nav from '$lib/Diskfile_Editor_Nav.svelte';
 
@@ -56,7 +56,7 @@
 	});
 </script>
 
-<Contextmenu_Diskfile {diskfile}>
+<Diskfile_Contextmenu {diskfile}>
 	<div class="display_flex h_100">
 		<div class="flex_1 min_width_sm h_100 column">
 			<Content_Editor
@@ -107,7 +107,7 @@
 			</div>
 		</div>
 	</div>
-</Contextmenu_Diskfile>
+</Diskfile_Contextmenu>
 
 <style>
 	.slide_container {

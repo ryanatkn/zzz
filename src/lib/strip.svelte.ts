@@ -5,8 +5,12 @@ import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Uuid} from '$lib/zod_helpers.js';
 import type {Bit_Type} from '$lib/bit.svelte.js';
 import type {Frontend} from '$lib/frontend.svelte.js';
-import {Strip_Json, type Strip_Role} from '$lib/strip_types.js';
-import type {Completion_Request, Completion_Response} from '$lib/completion_types.js';
+import {Strip_Json} from '$lib/strip_types.js';
+import type {
+	Completion_Request,
+	Completion_Response,
+	Completion_Role,
+} from '$lib/completion_types.js';
 
 // TODO rename? is more like a message, maybe `Tape_Message`, idk, maybe rethink "tape" too
 
@@ -15,7 +19,7 @@ export interface Strip_Options extends Cell_Options<typeof Strip_Json> {} // esl
 export class Strip extends Cell<typeof Strip_Json> {
 	bit_id: Uuid = $state()!;
 	tape_id: Uuid | null | undefined = $state();
-	role: Strip_Role = $state()!;
+	role: Completion_Role = $state()!;
 	request: Completion_Request | undefined = $state.raw();
 	response: Completion_Response | undefined = $state.raw();
 
@@ -76,7 +80,7 @@ export class Strip extends Cell<typeof Strip_Json> {
  */
 export const create_strip_from_bit = (
 	bit: Bit_Type,
-	role: Strip_Role,
+	role: Completion_Role,
 	json: Partial<Omit_Strict<Strip_Json, 'role' | 'bit_id'>>,
 ): Strip => {
 	return new Strip({
@@ -95,7 +99,7 @@ export const create_strip_from_bit = (
  */
 export const create_strip_from_text = (
 	content: string,
-	role: Strip_Role,
+	role: Completion_Role,
 	json: Partial<Omit_Strict<Strip_Json, 'role' | 'bit_id'>>,
 	app: Frontend,
 ): Strip => {

@@ -75,9 +75,6 @@ export class Chats extends Cell<typeof Chats_Json> {
 
 	readonly items_by_name = $derived(this.items.single_index('by_name'));
 
-	/** Ephemeral reactive state that directs the UI to focus the input.  */
-	pending_chat_id_to_focus: Uuid | null = $state(null);
-
 	constructor(options: Chats_Options) {
 		super(Chats_Json, options);
 
@@ -164,7 +161,7 @@ export class Chats extends Cell<typeof Chats_Json> {
 
 	async navigate_to(chat_id: Uuid | null, force = false): Promise<void> {
 		const url = to_chats_url(chat_id);
-		this.pending_chat_id_to_focus = chat_id;
+		this.app.ui.pending_element_to_focus_key = chat_id;
 		if (!force && page.url.pathname === url) return;
 		return goto_unless_current(url);
 	}

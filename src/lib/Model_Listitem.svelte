@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type {Model} from '$lib/model.svelte.js';
-	import Contextmenu_Model from '$lib/Contextmenu_Model.svelte';
+	import Model_Contextmenu from '$lib/Model_Contextmenu.svelte';
 
 	interface Props {
 		model: Model;
@@ -14,7 +14,7 @@
 	// TODO show something to show if it's local (probably not file size?)
 </script>
 
-<Contextmenu_Model attrs={{class: 'w_100 py_sm'}} {model}>
+<Model_Contextmenu attrs={{class: 'w_100 py_sm'}} {model}>
 	<div class="font_size_md">
 		{model.name}
 	</div>
@@ -31,4 +31,4 @@
 			{/each}
 		</ul>
 	{/if}
-</Contextmenu_Model>
+</Model_Contextmenu>

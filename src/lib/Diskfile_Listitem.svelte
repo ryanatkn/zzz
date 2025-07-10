@@ -2,7 +2,7 @@
 	import {swallow} from '@ryanatkn/belt/dom.js';
 
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
-	import Contextmenu_Diskfile from '$lib/Contextmenu_Diskfile.svelte';
+	import Diskfile_Contextmenu from '$lib/Diskfile_Contextmenu.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 	import {GLYPH_FILE} from '$lib/glyphs.js';
 
@@ -21,7 +21,7 @@
 	// TODO add a visible status when open in a tab
 </script>
 
-<Contextmenu_Diskfile {diskfile}>
+<Diskfile_Contextmenu {diskfile}>
 	<div
 		role="button"
 		tabindex="0"
@@ -50,4 +50,4 @@
 			<span class="ml_xs">{diskfile.path_relative}</span>
 		</small>
 	</div>
-</Contextmenu_Diskfile>
+</Diskfile_Contextmenu>

@@ -10,6 +10,10 @@ import {WEBSOCKET_URL, API_URL_FOR_HTTP_RPC} from '$lib/constants.js';
 // and each project can create its own like this, if desired, or use the Frontend directly some other way
 
 // TODO use this instead of `frontend_context` in non-core usages for type safety
+/**
+ * This is an example of a user-typed alias of `frontend_context`.
+ * I like this pattern in my apps but there are other patterns too!
+ */
 export const app_context: ReturnType<typeof create_context<App>> = frontend_context;
 
 export interface App_Options extends Frontend_Options {} // eslint-disable-line @typescript-eslint/no-empty-object-type

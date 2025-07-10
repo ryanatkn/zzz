@@ -133,7 +133,6 @@ export class Chat extends Cell<typeof Chat_Json> {
 		p += '\n\n' + render_message_with_role('assistant', assistant_content);
 
 		try {
-			// TODO BLOCK disable streaming (should be automatic by not including the `progressToken`, or otherwise explicitly in the API)
 			// TODO configure this utility LLM (roles?), and set the output token count from config as well
 			const name_response = await this.app.api.create_completion({
 				// TODO @many should parsing be automatic, so the types change to schema input types? makes sense yeah?

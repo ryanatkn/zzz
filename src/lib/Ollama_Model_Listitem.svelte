@@ -2,7 +2,7 @@
 	// @slop claude_sonnet_4
 
 	import Ollama_Model_Status from '$lib/Ollama_Model_Status.svelte';
-	import Contextmenu_Model from '$lib/Contextmenu_Model.svelte';
+	import Model_Contextmenu from '$lib/Model_Contextmenu.svelte';
 	import {format_gigabytes} from '$lib/format_helpers.js';
 	import type {Model} from '$lib/model.svelte.js';
 
@@ -26,7 +26,7 @@
 	);
 </script>
 
-<Contextmenu_Model {model}>
+<Model_Contextmenu {model}>
 	<button
 		type="button"
 		class="menu_item selectable plain text_align_start p_sm border_radius_0 font_weight_400"
@@ -47,4 +47,4 @@
 			{/if}
 		</div>
 	</button>
-</Contextmenu_Model>
+</Model_Contextmenu>

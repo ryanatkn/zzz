@@ -3,15 +3,12 @@ import {z} from 'zod';
 import {Cell} from '$lib/cell.svelte.js';
 import {Uuid, Uuid_With_Default} from '$lib/zod_helpers.js';
 import {Cell_Json} from '$lib/cell_types.js';
-import {Completion_Request, Completion_Response} from '$lib/completion_types.js';
-
-export const Strip_Role = z.enum(['user', 'assistant', 'system']);
-export type Strip_Role = z.infer<typeof Strip_Role>;
+import {Completion_Request, Completion_Response, Completion_Role} from '$lib/completion_types.js';
 
 export const Strip_Json = Cell_Json.extend({
 	bit_id: Uuid_With_Default,
 	tape_id: Uuid.nullable().optional(),
-	role: Strip_Role,
+	role: Completion_Role,
 	request: Completion_Request.optional(),
 	response: Completion_Response.optional(),
 });

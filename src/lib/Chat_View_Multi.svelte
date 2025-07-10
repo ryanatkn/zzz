@@ -35,8 +35,6 @@
 	const count = $derived(chat.enabled_tapes.length);
 
 	let show_model_picker = $state(false);
-
-	// TODO BLOCK need to select the main `content_input`, currently selects a tape's input
 </script>
 
 <div class="column_fluid">
@@ -48,6 +46,13 @@
 			placeholder="{GLYPH_PLACEHOLDER} to {count}"
 			show_actions
 			show_stats
+			focus_key={chat.id}
+			bind:pending_element_to_focus_key={
+				() => chat.app.ui.pending_element_to_focus_key,
+				(v) => {
+					chat.app.ui.pending_element_to_focus_key = v;
+				}
+			}
 		>
 			<Pending_Button
 				{pending}
@@ -74,7 +79,6 @@
 			{#each chat.tapes as tape (tape.id)}
 				<li in:slide>
 					<Chat_Tape
-						{chat}
 						{tape}
 						onsend={(input) => chat.send_to_tape(tape.id, input)}
 						strips_attrs={{class: 'max_height_sm'}}

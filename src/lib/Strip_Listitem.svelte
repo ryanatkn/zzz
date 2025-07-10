@@ -4,7 +4,7 @@
 	import Error_Message from '$lib/Error_Message.svelte';
 	import type {Strip} from '$lib/strip.svelte.js';
 	import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
-	import Contextmenu_Strip from '$lib/Contextmenu_Strip.svelte';
+	import Strip_Contextmenu from '$lib/Strip_Contextmenu.svelte';
 
 	interface Props {
 		strip: Strip;
@@ -17,7 +17,7 @@
 	// (the main fix is probably in the transport and/or action event stuff)
 </script>
 
-<Contextmenu_Strip {strip}>
+<Strip_Contextmenu {strip}>
 	<div
 		class="px_sm py_xl"
 		class:user={strip.role === 'user'}
@@ -39,4 +39,4 @@
 			{/if}
 		</div>
 	</div>
-</Contextmenu_Strip>
+</Strip_Contextmenu>
