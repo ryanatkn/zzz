@@ -1,4 +1,4 @@
-// @slop claude_opus_4
+// @slop Claude Opus 4
 
 import type {Socket} from '$lib/socket.svelte.js';
 import {Request_Tracker} from '$lib/request_tracker.svelte.js';
@@ -78,6 +78,7 @@ export class Frontend_Websocket_Transport implements Transport {
 				this.#socket.send(message);
 				return null;
 			}
+			// TODO maybe dont throw, return? figure out error handling
 			throw jsonrpc_errors.invalid_request();
 		} catch (error) {
 			console.error('[frontend websocket transport] error sending message:', error);
@@ -85,7 +86,14 @@ export class Frontend_Websocket_Transport implements Transport {
 				throw error;
 			}
 			throw jsonrpc_errors.internal_error(
-				error instanceof Error ? error.message : 'Unknown error sending WebSocket message',
+				error instanceof Error
+					? error.message
+					: // TODO maybe dont throw, return? figure out error handling
+						// in this case it's weirder because maybe the request tracker
+						// should not reject with jsonrpc error messages, intead use return values or correct errors?
+						is_jsonrpc_error_message(error)
+						? error.error.message
+						: 'unknown error sending websocket message',
 			);
 		}
 	}

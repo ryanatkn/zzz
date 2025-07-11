@@ -1,4 +1,4 @@
-// @slop claude_opus_4
+// @slop Claude Opus 4
 
 import type {Action_Method} from '$lib/action_metatypes.js';
 import type {Action_Spec_Union} from '$lib/action_spec.js';

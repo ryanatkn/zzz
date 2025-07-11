@@ -40,7 +40,6 @@
 								? 'checking'
 								: 'not checked'}
 					{#if capabilities.backend.status === 'pending'}
-						<!-- TODO @many Pending_Animation `inline` prop -->
 						<Pending_Animation inline />
 					{/if}
 				</div>

@@ -1,4 +1,4 @@
-// @slop claude_opus_4
+// @slop Claude Opus 4
 
 import {test, expect, describe} from 'vitest';
 import {reorder_list, to_reordered_list} from '$lib/list_helpers.js';

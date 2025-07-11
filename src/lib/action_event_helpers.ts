@@ -1,4 +1,4 @@
-// @slop claude_opus_4
+// @slop Claude Opus 4
 
 import {
 	type Action_Event_Phase,

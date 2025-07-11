@@ -1,8 +1,3 @@
-<script module lang="ts">
-	// svelte-ignore non_reactive_update
-	let browser: Browser;
-</script>
-
 <script lang="ts">
 	import {base} from '$app/paths';
 
@@ -16,12 +11,11 @@
 
 	const app = frontend_context.get();
 
-	// Initialize browser with the sample tabs and Zzz instance
-	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-	browser ??= new Browser({
+	// TODO super hacky but w/e, inits app.browser to the global
+	const browser: Browser = ((app as any).browser ??= new Browser({
 		app,
 		json: {tabs: sample_tabs},
-	});
+	}));
 </script>
 
 {#if browser.browserified}
@@ -71,7 +65,7 @@
 						browser.browserified = true;
 					}
 				}}>pretend it's all a dream</button
-			>.
+			> (that's just the current keybinding, likely to change)
 		</p>
 		<p>
 			This simple change recontextualizes the web's UX - instead of the browser being its own silo,

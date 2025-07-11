@@ -116,6 +116,7 @@ export class Chat extends Cell<typeof Chat_Json> {
 	// TODO needs to be reworked (maybe accept an array of messages?), also shouldn't clobber any user-assigned names
 	/**
 	 * Uses an LLM to name the chat based on the user input and AI response.
+	 * Ignores failures and retries on next intention.
 	 */
 	async init_name_from_strips(user_content: string, assistant_content: string): Promise<void> {
 		// TODO better abstraction for this kind of thing including de-duping the request,
@@ -149,7 +150,7 @@ export class Chat extends Cell<typeof Chat_Json> {
 
 			if (!response_text) {
 				console.error('unknown inference failure', name_response);
-				this.init_name_status = 'initial'; // ignore failures, will retry
+				this.init_name_status = 'initial'; // ignore failures
 				return;
 			}
 
@@ -158,7 +159,7 @@ export class Chat extends Cell<typeof Chat_Json> {
 				this.name = get_unique_name(response_text, this.app.chats.items_by_name);
 			}
 		} catch (error) {
-			this.init_name_status = 'initial'; // ignore failures, will retry
+			this.init_name_status = 'initial'; // ignore failures
 			console.error('failed to infer a name for a chat', error);
 		}
 	}

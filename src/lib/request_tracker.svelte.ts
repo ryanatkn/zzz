@@ -1,4 +1,4 @@
-// @slop claude_opus_4
+// @slop Claude Opus 4
 
 import {create_deferred, type Deferred, type Async_Status} from '@ryanatkn/belt/async.js';
 import {SvelteMap} from 'svelte/reactivity';
@@ -111,9 +111,9 @@ export class Request_Tracker {
 	/**
 	 * Reject a pending request with the given error.
 	 * @param id The request id
-	 * @param error The complete Jsonrpc_Error_Message object
+	 * @param error_message The complete Jsonrpc_Error_Message object
 	 */
-	reject_request(id: Jsonrpc_Request_Id, error: Jsonrpc_Error_Message): void {
+	reject_request(id: Jsonrpc_Request_Id, error_message: Jsonrpc_Error_Message): void {
 		const request = this.pending_requests.get(id);
 		if (!request) {
 			console.warn(`received error for unknown request: ${id}`);
@@ -127,7 +127,7 @@ export class Request_Tracker {
 		}
 
 		request.status = 'failure';
-		request.deferred.reject(error);
+		request.deferred.reject(error_message); // TODO rejecting with an error message instead of object feels maybe broken
 		this.pending_requests.delete(id);
 	}
 

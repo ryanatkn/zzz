@@ -11,10 +11,6 @@
 	}
 
 	const {strip}: Props = $props();
-
-	// TODO BLOCK this needs to show the correct error message,
-	// reproduce by trying to send an o3 message
-	// (the main fix is probably in the transport and/or action event stuff)
 </script>
 
 <Strip_Contextmenu {strip}>
@@ -28,8 +24,9 @@
 		<div class="white_space_pre_wrap overflow_wrap_break_word">
 			<small class="mr_xs font_weight_600" title={strip.created}>@{strip.role}:</small>
 			{#if strip.pending}
-				<!-- TODO @many Pending_Animation `inline` prop -->
 				<Pending_Animation inline />
+			{:else if strip.error_message}
+				<Error_Message>{strip.error_message}</Error_Message>
 			{:else if strip.is_content_loaded}
 				{strip.content}
 			{:else if strip.bit === null}

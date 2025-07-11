@@ -1,4 +1,4 @@
-// @slop claude_opus_4
+// @slop Claude Opus 4
 
 import {
 	JSONRPC_INTERNAL_ERROR,
@@ -9,7 +9,9 @@ import {
 	type Jsonrpc_Error_Code,
 } from '$lib/jsonrpc.js';
 
-// TODO maybe move some of this to `jsonrpc.ts` and extract the rest to `jsonrpc_helpers.ts`
+// TODO maybe move some of this to `jsonrpc.ts` and extract the rest to `jsonrpc_helpers.ts`,
+// some of this is awkward, see `create_jsonrpc_error_message`
+// and `create_jsonrpc_error_message_from_thrown` in `jsonrpc_helpers.ts`
 
 /**
  * Extended JSON-RPC error codes with application-specific errors.

@@ -1,5 +1,5 @@
 <script lang="ts">
-	// @slop claude_opus_4
+	// @slop Claude Opus 4
 
 	import {base} from '$app/paths';
 
@@ -27,7 +27,7 @@
 	<div class="project_content">
 		{#if project_viewmodel?.project}
 			<div class="p_lg">
-				<h1 class="mb_lg">Domains</h1>
+				<h1 class="mb_lg">domains</h1>
 
 				{#if project_viewmodel.project.domains.length === 0}
 					<div class="panel p_lg mb_lg">

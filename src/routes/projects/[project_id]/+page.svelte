@@ -1,5 +1,5 @@
 <script lang="ts">
-	// @slop claude_opus_4
+	// @slop Claude Opus 4
 
 	import {base} from '$app/paths';
 
@@ -57,13 +57,13 @@
 					<div class="panel p_md width_md mb_lg">
 						<div class="mb_md">
 							<label>
-								Project name
+								project name
 								<input type="text" bind:value={project_viewmodel.edited_name} class="w_100" />
 							</label>
 						</div>
 						<div>
 							<label>
-								Description
+								description
 								<textarea bind:value={project_viewmodel.edited_description} class="w_100" rows="3"
 								></textarea>
 							</label>
@@ -93,10 +93,10 @@
 				<div class="projects_grid">
 					<div class="panel p_md">
 						<h2 class="mt_0 mb_lg">
-							<a href="{base}/projects/{project.id}/pages">Pages</a>
+							<a href="{base}/projects/{project.id}/pages">pages</a>
 						</h2>
 						{#if project.pages.length === 0}
-							<p class="text_color_5">No pages created yet.</p>
+							<p class="text_color_5">no pages created yet</p>
 						{:else}
 							<ul class="pages_list">
 								{#each project.pages as page (page.id)}
@@ -118,10 +118,10 @@
 
 					<div class="panel p_md">
 						<h2 class="mt_0 mb_lg">
-							<a href="{base}/projects/{project.id}/domains">Domains</a>
+							<a href="{base}/projects/{project.id}/domains">domains</a>
 						</h2>
 						{#if project.domains.length === 0}
-							<p class="text_color_5">No domains configured yet.</p>
+							<p class="text_color_5">no domains configured yet</p>
 						{:else}
 							<ul class="domains_list">
 								{#each project.domains as domain (domain.id)}
@@ -158,10 +158,10 @@
 
 					<div class="panel p_md">
 						<h2 class="mt_0 mb_lg">
-							<a href="{base}/projects/{project.id}/repos">Repos</a>
+							<a href="{base}/projects/{project.id}/repos">repos</a>
 						</h2>
 						{#if project.repos.length === 0}
-							<p class="text_color_5">No repos configured yet.</p>
+							<p class="text_color_5">no repos configured yet</p>
 						{:else}
 							<ul class="repos_list">
 								{#each project.repos as repo (repo.id)}

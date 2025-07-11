@@ -1,5 +1,5 @@
 <script lang="ts">
-	// @slop claude_opus_4
+	// @slop Claude Opus 4
 	// Action_List.svelte
 
 	import type {SvelteHTMLElements} from 'svelte/elements';

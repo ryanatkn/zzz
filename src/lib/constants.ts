@@ -22,6 +22,8 @@ import {
 
 // TODO better validation
 
+// TODO maybe remove the SERVER_ prefixes
+
 export const SERVER_PROXIED_PORT = parseInt(PUBLIC_SERVER_PROXIED_PORT, 10) || 8999;
 
 export const SERVER_PROTOCOL = PUBLIC_SERVER_PROTOCOL || 'http';
@@ -92,4 +94,4 @@ export const WEBSOCKET_URL_OBJECT: URL | null = WEBSOCKET_URL ? new URL(WEBSOCKE
  */
 export const WEBSOCKET_PATH = WEBSOCKET_URL_OBJECT?.pathname;
 
-export const UNKNOWN_ERROR_MESSAGE = 'unknown error'; // TODO move
+export const UNKNOWN_ERROR_MESSAGE = 'unknown error'; // TODO move/configure

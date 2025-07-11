@@ -11,6 +11,7 @@ export const Strip_Json = Cell_Json.extend({
 	role: Completion_Role,
 	request: Completion_Request.optional(),
 	response: Completion_Response.optional(),
+	error_message: z.string().optional(), // TODO full jsonrpc error message?
 });
 export type Strip_Json = z.infer<typeof Strip_Json>;
 export type Strip_Json_Input = z.input<typeof Strip_Json>;

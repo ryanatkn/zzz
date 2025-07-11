@@ -1,15 +1,10 @@
 <script lang="ts">
-	import type {Snippet} from 'svelte';
+	import type {ComponentProps} from 'svelte';
 	import Alert from '@ryanatkn/fuz/Alert.svelte';
 
-	interface Props {
-		children: Snippet;
-	}
+	type Props = ComponentProps<typeof Alert>;
 
-	const {children}: Props = $props();
+	const props: Props = $props();
 </script>
 
-<!-- TODO forward props -->
-<Alert status="error">
-	{@render children()}
-</Alert>
+<Alert status="error" {...props} />

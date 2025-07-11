@@ -1,6 +1,8 @@
 import type {Handler} from 'hono';
 
-// TODO add thorough tests
+// TODO need to probably change these from exact matches to support wildcards, is there an RFC for this?
+
+// TODO add thorough tests after the API stabilizes more
 
 /**
  * Accepts strings or array-like or set-like objects.

@@ -1,5 +1,5 @@
 <script lang="ts">
-	// @slop claude_opus_4
+	// @slop Claude Opus 4
 
 	import {goto} from '$app/navigation';
 	import {base} from '$app/paths';
@@ -111,18 +111,18 @@
 						<div class="display_flex gap_sm">
 							<div class="flex_1">
 								<label>
-									Page title
+									page title
 									<input
 										type="text"
 										bind:value={page_viewmodel.title}
 										class="w_100"
-										placeholder="Page title"
+										placeholder="page title"
 									/>
 								</label>
 							</div>
 							<div class="flex_1">
 								<label>
-									Page path
+									page path
 									<input
 										type="text"
 										bind:value={page_viewmodel.path}

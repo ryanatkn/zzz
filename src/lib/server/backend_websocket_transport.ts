@@ -1,4 +1,4 @@
-// @slop claude_opus_4
+// @slop Claude Opus 4
 
 import type {WSContext} from 'hono/ws';
 
@@ -57,7 +57,7 @@ export class Backend_Websocket_Transport implements Transport {
 			);
 		}
 
-		await this.#broadcast(message as Jsonrpc_Notification);
+		await this.#broadcast(message);
 		return null;
 	}
 

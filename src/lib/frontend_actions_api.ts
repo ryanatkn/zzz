@@ -1,4 +1,4 @@
-// @slop claude_opus_4
+// @slop Claude Opus 4
 
 import type {Action_Method, Actions_Api} from '$lib/action_metatypes.js';
 import type {Action_Event_Environment} from '$lib/action_event_types.js';
@@ -26,13 +26,11 @@ export const create_frontend_actions_api = <T extends Action_Event_Environment>(
 	// Create a proxy that dynamically creates methods based on the action specs
 	return new Proxy({} as Actions_Api, {
 		get(_target, method: string) {
-			// Check if this is a valid action method
 			const spec = environment.lookup_action_spec(method as Action_Method);
 			if (!spec) {
 				return undefined;
 			}
 
-			// Return the appropriate method implementation
 			return create_action_method(environment, spec);
 		},
 		has(_target, method: string) {
@@ -141,7 +139,6 @@ const create_request_response_method = (
 			// Send the request and wait for response
 			const response = await environment.peer.send(event.data.request);
 
-			// Transition to receive_response phase
 			event.transition('receive_response');
 
 			// TODO @api shouldn't this happen in the peer like the other method calls?
@@ -162,7 +159,7 @@ const create_request_response_method = (
 				throw new Error(response.error.message);
 			}
 
-			throw new Error('No output received');
+			throw new Error('no output received');
 		} else {
 			// Failed to handle send_request
 			return extract_result_or_throw(event);
@@ -181,7 +178,7 @@ const create_remote_notification_method = (
 		// Check if environment supports networking
 		if (!('peer' in environment)) {
 			throw new Error(
-				`Environment does not support network communication for action '${spec.method}'`,
+				`environment does not support network communication for action '${spec.method}'`,
 			);
 		}
 

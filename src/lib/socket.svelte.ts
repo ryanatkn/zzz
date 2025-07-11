@@ -447,7 +447,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 	#handle_error = (event: Event): void => {
 		this.onerror?.(event);
 
-		console.error('WebSocket error occurred:', event);
+		console.error('websocket error occurred:', event);
 		this.status = 'failure';
 
 		// The WebSocket will close after an error, but we need to make sure

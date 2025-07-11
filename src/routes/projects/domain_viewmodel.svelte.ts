@@ -1,4 +1,4 @@
-// @slop claude_opus_4
+// @slop Claude Opus 4
 
 import {z} from 'zod';
 import {goto} from '$app/navigation';

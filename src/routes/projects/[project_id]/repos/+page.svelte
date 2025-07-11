@@ -1,5 +1,5 @@
 <script lang="ts">
-	// @slop claude_opus_4
+	// @slop Claude Opus 4
 
 	import {projects_context} from '$routes/projects/projects.svelte.js';
 	import Project_Sidebar from '$routes/projects/Project_Sidebar.svelte';
@@ -27,11 +27,11 @@
 	<div class="project_content">
 		{#if project_viewmodel?.project}
 			<div class="p_lg">
-				<h1 class="mb_lg">Repos</h1>
+				<h1 class="mb_lg">repos</h1>
 
 				{#if project_viewmodel.project.repos.length === 0}
 					<div class="panel p_lg text_align_center mb_lg">
-						<p>This project doesn't have any repositories configured yet.</p>
+						<p>this project has no repositories configured yet</p>
 						<p>
 							<button
 								type="button"

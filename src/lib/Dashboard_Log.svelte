@@ -22,7 +22,7 @@
 	</Dashboard_Header>
 	<p>
 		This page shows the actions that have happened behind the scenes. It's a work in progress and
-		not too useful yet.
+		not too useful yet. The idea is to make the system visible and manipulable.
 	</p>
 
 	<div

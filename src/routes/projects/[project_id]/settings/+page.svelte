@@ -1,5 +1,5 @@
 <script lang="ts">
-	// @slop claude_opus_4
+	// @slop Claude Opus 4
 
 	import {projects_context} from '$routes/projects/projects.svelte.js';
 	import Project_Sidebar from '$routes/projects/Project_Sidebar.svelte';
@@ -25,12 +25,12 @@
 	<div class="project_content">
 		{#if project_viewmodel?.project}
 			<div class="p_lg">
-				<h1 class="mb_lg">Project settings</h1>
+				<h1 class="mb_lg">project settings</h1>
 
 				<div class="panel p_md width_md my_lg">
 					<div class="mb_md">
 						<label>
-							<div class="title">Project name</div>
+							<div class="title">project name</div>
 							<input
 								type="text"
 								bind:value={project_viewmodel.edited_name}
@@ -42,7 +42,7 @@
 
 					<div class="mb_md">
 						<label>
-							<div class="title">Description</div>
+							<div class="title">description</div>
 							<textarea
 								bind:value={project_viewmodel.edited_description}
 								class="w_100"
@@ -63,7 +63,7 @@
 				</div>
 
 				<div class="panel p_md width_md">
-					<h2 class="mt_0 mb_lg">Danger zone</h2>
+					<h2 class="mt_0 mb_lg">danger zone</h2>
 					<p class="mb_md">These actions cannot be undone.</p>
 
 					<button

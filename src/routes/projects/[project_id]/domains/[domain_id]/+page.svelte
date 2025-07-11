@@ -1,5 +1,5 @@
 <script lang="ts">
-	// @slop claude_opus_4
+	// @slop Claude Opus 4
 
 	import {projects_context} from '$routes/projects/projects.svelte.js';
 	import Project_Sidebar from '$routes/projects/Project_Sidebar.svelte';
@@ -28,7 +28,7 @@
 	<div class="domain_content">
 		{#if project && domains_viewmodel}
 			<div class="p_lg">
-				<h1 class="mb_lg">Edit domain</h1>
+				<h1 class="mb_lg">edit domain</h1>
 
 				<p>
 					{#if domains_viewmodel.domain_name}
@@ -52,7 +52,7 @@
 								<h3 class="mt_0 mb_sm">Domain name</h3>
 								<input type="text" bind:value={domains_viewmodel.domain_name} class="w_100" />
 							</label>
-							<p>Enter the full domain name, like zzz.software or blog.zzz.software</p>
+							<p>enter the full domain name, like zzz.software or blog.zzz.software</p>
 						</div>
 
 						{#if domains_viewmodel.domain}

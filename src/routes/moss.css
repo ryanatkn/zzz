@@ -386,9 +386,6 @@ a.chip {
 .fg_1 {
 	background-color: var(--fg_1);
 }
-.color_a_5 {
-	color: var(--color_a_5);
-}
 .color_c_5 {
 	color: var(--color_c_5);
 }
@@ -497,9 +494,6 @@ a.chip {
 }
 .pt_md {
 	padding-top: var(--space_md);
-}
-.pt_xl2 {
-	padding-top: var(--space_xl2);
 }
 .pr_xs3 {
 	padding-right: var(--space_xs3);

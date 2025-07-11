@@ -1,5 +1,5 @@
 <script lang="ts">
-	// @slop claude_opus_4
+	// @slop Claude Opus 4
 
 	import {swallow} from '@ryanatkn/belt/dom.js';
 
@@ -48,7 +48,7 @@
 	<div class="repo_content">
 		{#if project && repos_viewmodel}
 			<div class="p_lg">
-				<h1 class="mb_lg">Edit repo</h1>
+				<h1 class="mb_lg">edit repo</h1>
 
 				<div class="panel p_md width_md">
 					<form
@@ -63,7 +63,7 @@
 								<input type="text" bind:value={repos_viewmodel.git_url} class="w_100" />
 							</label>
 							<p>
-								Enter the git URL, e.g. https://github.com/username/repo or
+								enter the git URL, e.g. https://github.com/username/repo or
 								git@github.com:username/repo.git
 							</p>
 						</div>
@@ -77,7 +77,7 @@
 						{/if}
 
 						<div class="mb_lg">
-							<h3 class="mt_0 mb_sm">Checkouts</h3>
+							<h3 class="mt_0 mb_sm">checkouts</h3>
 
 							{#if repos_viewmodel.checkouts.length === 0}
 								<p class="mb_md">no checkouts yet</p>

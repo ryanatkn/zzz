@@ -22,6 +22,7 @@ export class Strip extends Cell<typeof Strip_Json> {
 	role: Completion_Role = $state()!;
 	request: Completion_Request | undefined = $state.raw();
 	response: Completion_Response | undefined = $state.raw();
+	error_message: string | undefined = $state();
 
 	// Get the referenced bit - handle case where bit might not exist in registry
 	readonly bit: Bit_Type | null = $derived(this.app.bits.items.by_id.get(this.bit_id) ?? null);
@@ -59,7 +60,11 @@ export class Strip extends Cell<typeof Strip_Json> {
 	);
 
 	readonly pending: boolean = $derived(
-		this.role === 'assistant' && this.is_content_loaded && this.is_content_empty && !this.response,
+		this.role === 'assistant' &&
+			this.is_content_loaded &&
+			this.is_content_empty &&
+			!this.response &&
+			!this.error_message,
 	);
 
 	constructor(options: Strip_Options) {

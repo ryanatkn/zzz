@@ -40,4 +40,6 @@
 			{/each}
 		</ul>
 	</nav>
+
+	<aside>⚠️⚠️ speculative demo</aside>
 </aside>

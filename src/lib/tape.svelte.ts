@@ -10,8 +10,9 @@ import {to_preview, estimate_token_count} from '$lib/helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import type {Uuid} from '$lib/zod_helpers.js';
 import type {Strip_Json} from '$lib/strip_types.js';
+import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
 
-// TODO add `tape.name` probably
+// TODO add `tape.name` and lots of other things probably
 
 export interface Tape_Options extends Cell_Options<typeof Tape_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 /**
@@ -136,10 +137,17 @@ export class Tape extends Cell<typeof Tape_Json> {
 		user_strip.request = completion_request;
 
 		// Send the prompt with tape history
-		await this.app.api.create_completion({
-			completion_request,
-			_meta: {progressToken: assistant_strip.id},
-		});
+		try {
+			await this.app.api.create_completion({
+				completion_request,
+				_meta: {progressToken: assistant_strip.id},
+			});
+		} catch (error) {
+			// Update the assistant strip with the error message
+			assistant_strip.error_message =
+				error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE; // TODO extract
+			console.error('failed to create completion:', error);
+		}
 
 		return assistant_strip;
 	}

@@ -1,5 +1,5 @@
 <script lang="ts">
-	// @slop claude_opus_4
+	// @slop Claude Opus 4
 
 	import {base} from '$app/paths';
 
@@ -29,10 +29,10 @@
 	<div class="project_content">
 		{#if project_viewmodel?.project}
 			<div class="p_lg">
-				<h1 class="mb_lg">Pages</h1>
+				<h1 class="mb_lg">pages</h1>
 
 				{#if !page_count}
-					<p>This project doesn't have any web pages yet.</p>
+					<p>this project has no web pages yet</p>
 					<p>
 						<button
 							type="button"

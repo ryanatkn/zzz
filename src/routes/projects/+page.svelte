@@ -30,8 +30,10 @@
 	<section class="width_md">
 		<p>
 			When it's ready, Zzz will let you both <a href="{base}/tabs">browse websites</a> and also create
-			them, so Zzz is both a browser and editor for the read-write web, and it can be used as a desktop
-			app to deploy and manage sites, content, and other data and systems.
+			them. Websites are just one kind of thing that you can make in a project, a project could be a
+			simple collection of documents, with a UX no more complex than a folder. This makes Zzz both a
+			browser and an editor for the read-write web, and it can be used as a desktop app to deploy and
+			manage sites, content, and other data and systems.
 		</p>
 		<p>
 			Zzz tries to give us the maximum of the web's capabilities on all of our devices with minimal
@@ -39,11 +41,15 @@
 			and easy, because owning your web presence should be a cinch.
 		</p>
 		<p>
-			Zzz doesn't try to be everything to everybody. That's what open standardized protocols are
-			for! The goal of this "projects" design is to provide a streamlined extensible UX with one
-			take on building for the web, with CMS and IDE features that integrate with the rest of Zzz.
-			Because it's the web, anything you make in Zzz can be used by other browsers and tools, and
-			vice versa, like magic.
+			The goal of this "projects" design sketch is to provide a streamlined extensible UX with one
+			take on building for the web, with integrated CMS and IDE features. This abstraction makes
+			rough sense for my workflows. A project can have many repos, and other things like files and
+			user data, and a repo can be referenced by many projects.
+		</p>
+		<p>
+			Try as it might to be flexible, Zzz can't be everything to everybody. But we have open
+			standardized protocols! Because it's the web, anything you make in Zzz can be used by other
+			browsers and tools, and vice versa, like magic.
 		</p>
 		<p>
 			Here's a very rough sketch of <button

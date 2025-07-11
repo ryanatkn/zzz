@@ -22,6 +22,14 @@ export default {
 						'ws://localhost:8999',
 						'http://127.0.0.1:11434', // for Ollama, OLLAMA_URL
 					],
+					'frame-src': [
+						'self',
+						// enable iframing for the example sites
+						'https://ryanatkn.com/',
+						'https://*.ryanatkn.com/',
+						'https://fuz.dev/',
+						'https://*.fuz.dev/',
+					],
 				},
 			}),
 		},
