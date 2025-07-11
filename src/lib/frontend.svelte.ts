@@ -56,10 +56,9 @@ export const Frontend_Json = Cell_Json.extend({
 export type Frontend_Json = z.infer<typeof Frontend_Json>;
 export type Frontend_Json_Input = z.input<typeof Frontend_Json>;
 
-// Special options type for Zzz to handle circular reference
 export interface Frontend_Options extends Omit_Strict<Cell_Options<typeof Frontend_Json>, 'app'> {
 	/** Do not use - optional to avoid circular reference problem. */
-	app?: Frontend;
+	app?: never;
 	models?: Array<Model_Json_Input>;
 	bots?: Zzz_Config['bots'];
 	providers?: Array<Provider_Json_Input>;
