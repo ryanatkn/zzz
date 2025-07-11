@@ -1,4 +1,4 @@
-// @slop Claude Sonnet 3.7
+// @slop Claude Sonnet 4
 
 import type {Attachment} from 'svelte/attachments';
 import {on} from 'svelte/events';

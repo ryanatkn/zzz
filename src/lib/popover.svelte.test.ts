@@ -910,4 +910,194 @@ describe('Popover', () => {
 			document.body.removeChild(elements2.container);
 		});
 	});
+
+	describe('real-world scenarios and robustness', () => {
+		test('popover survives DOM manipulation', () => {
+			const {trigger, content} = elements;
+			const onhide = vi.fn();
+			popover = new Popover({onhide});
+
+			register_attachment(popover.trigger()(trigger));
+			register_attachment(popover.content()(content));
+
+			// Show popover
+			trigger.click();
+			expect(popover.visible).toBe(true);
+
+			// Add/remove siblings (common in dynamic UIs)
+			const sibling = document.createElement('div');
+			elements.container.appendChild(sibling);
+			elements.container.removeChild(sibling);
+
+			// Popover should still be functional
+			expect(popover.visible).toBe(true);
+			trigger.click();
+			expect(popover.visible).toBe(false);
+			expect(onhide).toHaveBeenCalled();
+		});
+
+		test('handles rapid show/hide cycles', () => {
+			const {trigger} = elements;
+			const onshow = vi.fn();
+			const onhide = vi.fn();
+			popover = new Popover({onshow, onhide});
+
+			register_attachment(popover.trigger()(trigger));
+
+			// Rapid clicking should be handled gracefully
+			for (let i = 0; i < 10; i++) {
+				trigger.click();
+			}
+
+			// Should end up hidden (started hidden, 10 clicks = even number)
+			expect(popover.visible).toBe(false);
+			expect(onshow).toHaveBeenCalledTimes(5);
+			expect(onhide).toHaveBeenCalledTimes(5);
+		});
+
+		test('preserves state during attachment recreation', () => {
+			const {trigger} = elements;
+			popover = new Popover({position: 'top', align: 'start'});
+
+			// Set up initial attachment
+			let cleanup = popover.trigger()(trigger);
+			register_attachment(cleanup);
+
+			// Show popover
+			trigger.click();
+			expect(popover.visible).toBe(true);
+
+			// Recreate attachment (simulates reactive updates)
+			cleanup?.();
+			cleanup = popover.trigger()(trigger);
+			register_attachment(cleanup);
+
+			// State should be preserved
+			expect(popover.visible).toBe(true);
+			expect(popover.position).toBe('top');
+			expect(popover.align).toBe('start');
+		});
+
+		test('handles element removal gracefully', () => {
+			const {trigger} = elements;
+
+			// Should not throw when elements are missing
+			expect(() => {
+				popover.show();
+				popover.hide();
+				popover.toggle();
+			}).not.toThrow();
+
+			// Should handle element removal during operation
+			register_attachment(popover.trigger()(trigger));
+			popover.show();
+
+			// Should not crash when trigger is removed
+			trigger.remove();
+			expect(() => popover.hide()).not.toThrow();
+		});
+
+		test('ARIA attributes maintained correctly', () => {
+			const {trigger, content} = elements;
+			register_attachment(popover.trigger()(trigger));
+			register_attachment(popover.content()(content));
+
+			// Initial ARIA state
+			expect(trigger.getAttribute('aria-expanded')).toBe('false');
+			expect(content.getAttribute('role')).toBe('dialog');
+
+			// Show and verify ARIA
+			popover.show();
+			expect(trigger.getAttribute('aria-expanded')).toBe('true');
+			expect(trigger.getAttribute('aria-controls')).toBeTruthy();
+			expect(content.id).toBeTruthy();
+			expect(trigger.getAttribute('aria-controls')).toBe(content.id);
+
+			// Hide and verify ARIA persists
+			popover.hide();
+			expect(trigger.getAttribute('aria-expanded')).toBe('false');
+			expect(trigger.getAttribute('aria-controls')).toBe(content.id);
+		});
+
+		test('callbacks fire in correct order', () => {
+			const events: Array<string> = [];
+			const onshow = () => events.push('show');
+			const onhide = () => events.push('hide');
+			popover = new Popover({onshow, onhide});
+
+			// Test multiple show/hide cycles
+			popover.show();
+			popover.hide();
+			popover.show();
+			popover.hide();
+
+			expect(events).toEqual(['show', 'hide', 'show', 'hide']);
+		});
+
+		test('nested element click detection', () => {
+			const {trigger, content} = elements;
+			register_attachment(popover.trigger()(trigger));
+			register_attachment(popover.content()(content));
+
+			// Create deeply nested structure
+			const level1 = document.createElement('div');
+			const level2 = document.createElement('span');
+			const level3 = document.createElement('em');
+			level1.appendChild(level2);
+			level2.appendChild(level3);
+			content.appendChild(level1);
+
+			popover.show();
+			expect(popover.visible).toBe(true);
+
+			// Click on deeply nested element should not close popover
+			const nested_click = create_mock_event('click', level3);
+			document.dispatchEvent(nested_click);
+			expect(popover.visible).toBe(true);
+
+			// Click outside should close popover
+			const outside_click = create_mock_event('click', document.body);
+			document.dispatchEvent(outside_click);
+			expect(popover.visible).toBe(false);
+		});
+
+		test('multiple popovers independence', () => {
+			const popovers: Array<Popover> = [];
+			const triggers: Array<HTMLElement> = [];
+
+			// Create multiple popovers
+			for (let i = 0; i < 3; i++) {
+				const popover_instance = new Popover();
+				const trigger = document.createElement('button');
+				trigger.textContent = `Trigger ${i}`;
+				document.body.appendChild(trigger);
+
+				register_attachment(popover_instance.trigger()(trigger));
+				popovers.push(popover_instance);
+				triggers.push(trigger);
+			}
+
+			// Show all popovers
+			for (const popover_instance of popovers) {
+				popover_instance.show();
+				expect(popover_instance.visible).toBe(true);
+			}
+
+			// Hide them one by one and verify others remain visible
+			for (let i = 0; i < popovers.length; i++) {
+				popovers[i].hide();
+				expect(popovers[i].visible).toBe(false);
+
+				// Check remaining popovers are still visible
+				for (let j = i + 1; j < popovers.length; j++) {
+					expect(popovers[j].visible).toBe(true);
+				}
+			}
+
+			// Clean up
+			for (const trigger of triggers) {
+				trigger.remove();
+			}
+		});
+	});
 });
