@@ -1,8 +1,6 @@
 import type {Handler} from 'hono';
 
-// TODO need to probably change these from exact matches to support wildcards, is there an RFC for this?
-
-// TODO BLOCK tests
+// TODO BLOCK replace with https://hono.dev/docs/middleware/builtin/csrf#origin-string-string-function
 
 /**
  * Accepts strings or array-like or set-like objects.
