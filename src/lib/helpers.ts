@@ -1,6 +1,9 @@
 import {CONTENT_PREVIEW_LENGTH} from '$lib/constants.js';
 
-export const ESTIMATED_CHARS_PER_TOKEN = 3.8; // guesstimate
+// TODO configure
+// this is a guesstimate, is lower to better estimate for code,
+// and in general I think it's better better to overestimate counts (which lower does)
+export const ESTIMATED_CHARS_PER_TOKEN = 3;
 
 /**
  * Quick and dirty token count estimate using `ESTIMATED_CHARS_PER_TOKEN`.
