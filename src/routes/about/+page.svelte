@@ -85,7 +85,8 @@
 				and <External_Link href="https://github.com/oobabooga/text-generation-webui"
 					>Text generation web UI</External_Link
 				> -- this is the starting point so I can ship something I use at work (the
-				<a href="{base}/prompts">prompt</a> builder is the main thing)
+				<a href="{base}/prompts">prompt</a> builder is the most useful thing to me right now, followed
+				by multi chats)
 			</li>
 			<li>
 				IDEs like <External_Link href="https://code.visualstudio.com/">VSCode</External_Link> for open-ended

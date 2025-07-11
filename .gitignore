@@ -36,4 +36,4 @@ Thumbs.db
 # AI
 .github/copilot-instructions.md
 CLAUDE.md
-**/.claude/settings.local.json
+.claude
