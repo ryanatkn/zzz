@@ -91,6 +91,8 @@
 		}
 		return undefined;
 	});
+
+	// TODO BLOCK this is showing progress as finished immediately, showing no pending animation during the progress bar
 </script>
 
 <li transition:slide class="py_xs3">
