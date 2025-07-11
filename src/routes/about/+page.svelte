@@ -14,7 +14,7 @@
 
 	// TODO probably link to a blog post that's more approachable and less technical
 
-	// TODO BLOCK review
+	// TODO BLOCK review (also see the readme)
 </script>
 
 <div class="width_md p_lg">
