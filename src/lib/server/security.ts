@@ -1,6 +1,6 @@
 import type {Handler} from 'hono';
 
-// TODO BLOCK replace with
+// TODO BLOCK replace this module with
 // https://hono.dev/docs/middleware/builtin/csrf#origin-string-string-function
 // and also see sveltekit -
 // https://svelte.dev/docs/kit/configuration#csrf
