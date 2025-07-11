@@ -156,19 +156,18 @@ export const frontend_action_handlers: Frontend_Action_Handlers = {
 		send_request: ({data: {input}}) => {
 			console.log('[frontend_action_handlers] sending ollama_show request:', input);
 		},
-		receive_response: async ({app, data: {input, output}}) => {
+		receive_response: ({app, data: {input, output}}) => {
 			console.log('[frontend_action_handlers] received ollama_show response:', input, output);
-			await app.ollama.handle_ollama_show(input, output);
+			app.ollama.handle_ollama_show(input, output);
 		},
 	},
 	ollama_pull: {
 		send_request: ({data: {input}}) => {
 			console.log('[frontend_action_handlers] sending ollama_pull request:', input);
 		},
-		receive_response: async ({app, data: {input, output}}) => {
+		receive_response: ({app, data: {input, output}}) => {
 			console.log('[frontend_action_handlers] received ollama_pull response:', input, output);
-			// For now, just mark as complete - progress will come via notifications
-			await app.ollama.handle_ollama_pull(input, () => {});
+			app.ollama.handle_ollama_pull(input);
 		},
 	},
 	ollama_delete: {
@@ -200,9 +199,9 @@ export const frontend_action_handlers: Frontend_Action_Handlers = {
 	},
 
 	ollama_progress: {
-		receive: ({data: {input}}) => {
+		receive: ({app, data: {input}}) => {
 			console.log('[frontend_action_handlers] received ollama_progress notification:', input);
-			
+
 			const meta = input._meta;
 			if (!meta) {
 				console.error('[frontend_action_handlers] ollama_progress missing _meta');
@@ -216,13 +215,37 @@ export const frontend_action_handlers: Frontend_Action_Handlers = {
 					`[frontend_action_handlers] ${meta.operation} ${meta.model}: ${percent}% - ${input.status}`,
 				);
 			} else {
-				console.log(
-					`[frontend_action_handlers] ${meta.operation} ${meta.model}: ${input.status}`,
-				);
+				console.log(`[frontend_action_handlers] ${meta.operation} ${meta.model}: ${input.status}`);
 			}
 
-			// TODO: Update UI with progress information
-			// For now, just log the progress
+			// TODO refactor probably
+			// If we have a progress token, update the corresponding action
+			const progress_token = meta.progressToken;
+			if (progress_token && app.actions) {
+				// Find the action with this progress token
+				const matching_actions = Array.from(app.actions.items.values).filter((action) => {
+					const action_meta = action.action_event?.input?._meta;
+					return action_meta?.progressToken === progress_token;
+				});
+
+				if (matching_actions.length > 0) {
+					const action = matching_actions[0];
+					// The action is already listening to its action_event via listen_to_action_event
+					// We need to update the action_event's progress
+					if (action.action_event) {
+						// Create a new action_event data with progress
+						action.action_event = {
+							...action.action_event,
+							progress: {
+								status: input.status,
+								digest: input.digest,
+								total: input.total,
+								completed: input.completed,
+							},
+						};
+					}
+				}
+			}
 		},
 	},
 };

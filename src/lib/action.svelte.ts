@@ -40,6 +40,7 @@ export class Action extends Cell<typeof Action_Json> {
 
 	readonly has_error = $derived(!!this.action_event?.error);
 
+	// TODO BLOCK this is bugged because the actions resolve before the ollama streaming finishes (I think?)
 	readonly pending = $derived(this.action_event?.step === 'handling');
 	readonly failed = $derived(this.action_event?.step === 'failed');
 	readonly success = $derived(this.action_event?.step === 'handled');

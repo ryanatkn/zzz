@@ -26,6 +26,7 @@ import {
 	Ollama_Delete_Request,
 	Ollama_Copy_Request,
 	Ollama_Create_Request,
+	Ollama_Progress_Response,
 } from '$lib/ollama_helpers.js';
 import {Uuid} from '$lib/zod_helpers.js';
 
@@ -204,23 +205,16 @@ export const ollama_progress_action_spec = {
 	initiator: 'backend',
 	auth: null,
 	side_effects: true,
-	input: z
-		.object({
-			// Progress data from Ollama pull/create operations
-			status: z.string(),
-			digest: z.string().optional(),
-			total: z.number().optional(),
-			completed: z.number().optional(),
-			// Metadata to identify which operation this progress belongs to
-			_meta: z
-				.object({
-					operation: z.enum(['pull', 'create']),
-					model: z.string(),
-				})
-				.passthrough()
-				.optional(),
-		})
-		.strict(),
+	input: Ollama_Progress_Response.extend({
+		_meta: z
+			.object({
+				operation: z.enum(['pull', 'create']),
+				model: z.string(),
+				progressToken: Uuid.optional(),
+			})
+			.passthrough()
+			.optional(),
+	}).strict(),
 	output: z.void(),
 	async: true,
 } satisfies Action_Spec_Union;
@@ -276,7 +270,9 @@ export const ollama_pull_action_spec = {
 	initiator: 'frontend',
 	auth: 'public',
 	side_effects: true,
-	input: Ollama_Pull_Request,
+	input: Ollama_Pull_Request.extend({
+		_meta: z.object({progressToken: Uuid.optional()}).passthrough().optional(),
+	}).strict(), // TODO @many is strict right here?
 	output: z.void().optional(),
 	async: true,
 } satisfies Action_Spec_Union;
@@ -309,7 +305,9 @@ export const ollama_create_action_spec = {
 	initiator: 'frontend',
 	auth: 'public',
 	side_effects: true,
-	input: Ollama_Create_Request,
+	input: Ollama_Create_Request.extend({
+		_meta: z.object({progressToken: Uuid.optional()}).passthrough().optional(),
+	}).strict(), // TODO @many is strict right here?
 	output: z.void().optional(),
 	async: true,
 } satisfies Action_Spec_Union;

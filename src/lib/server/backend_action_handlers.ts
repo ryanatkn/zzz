@@ -1,3 +1,5 @@
+import ollama from 'ollama';
+
 import {Serializable_Source_File} from '$lib/diskfile_types.js';
 import type {Backend_Action_Handlers} from '$lib/server/backend_action_types.js';
 import type {Action_Outputs} from '$lib/action_collections.js';
@@ -6,7 +8,6 @@ import {to_serializable_source_file} from '$lib/diskfile_helpers.js';
 import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
 import type {Completion_Options, Completion_Handler_Options} from '$lib/server/backend_provider.js';
 import {save_completion_response_to_disk} from '$lib/server/helpers.js';
-import ollama from 'ollama';
 import type {
 	Ollama_List_Response,
 	Ollama_Ps_Response,
@@ -320,6 +321,7 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 						_meta: {
 							operation: 'pull',
 							model: input.model,
+							progressToken: input._meta?.progressToken,
 						},
 					});
 				}
@@ -411,6 +413,7 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 						_meta: {
 							operation: 'create',
 							model: input.model,
+							progressToken: input._meta?.progressToken,
 						},
 					});
 				}

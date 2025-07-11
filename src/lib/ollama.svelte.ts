@@ -7,7 +7,7 @@ import {SvelteSet} from 'svelte/reactivity';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
-import {get_datetime_now} from '$lib/zod_helpers.js';
+import {get_datetime_now, create_uuid} from '$lib/zod_helpers.js';
 import {
 	OLLAMA_URL,
 	Ollama_Show_Response,
@@ -315,10 +315,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	/**
 	 * Get detailed information about a specific model.
 	 */
-	async handle_ollama_show(
-		request: Ollama_Show_Request,
-		response: Ollama_Show_Response | null,
-	): Promise<void> {
+	handle_ollama_show(request: Ollama_Show_Request, response: Ollama_Show_Response | null): void {
 		const model = this.app.models.find_by_name(request.model);
 		if (!model) {
 			console.error(`[ollama.handle_ollama_show] model not found: ${request.model}`);
@@ -361,16 +358,10 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	/**
 	 * Pull a model from the Ollama registry.
 	 */
-	async handle_ollama_pull(
-		request: Ollama_Pull_Request,
-		update_progress: (progress: unknown) => void,
-	): Promise<void> {
+	handle_ollama_pull(request: Ollama_Pull_Request): void {
 		console.log('[ollama.handle_ollama_pull] pulling:', request);
 
 		this.pulling_models.add(request.model);
-
-		// Progress updates will be handled by backend via action events
-		update_progress({status: 'started'});
 	}
 
 	/**
@@ -449,11 +440,11 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 		if (!this.pull_can_pull) return;
 
 		try {
-			// TODO makes me think we should mark methods that use the API, maybe just in the generated
-			// reference docs
+			// TODO makes me think we should mark methods that use the API, maybe just in the generated reference docs
 			await this.app.api.ollama_pull({
 				model: this.pull_parsed_model_name,
 				insecure: this.pull_insecure,
+				_meta: {progressToken: create_uuid()}, // TODO @many maybe save the token? needed to opt into progress notifications
 			});
 			this.pull_model_name = '';
 			this.pull_insecure = false;
@@ -496,6 +487,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 				from: this.create_from_model.trim() || undefined,
 				system: this.create_system_prompt.trim() || undefined,
 				template: this.create_template.trim() || undefined,
+				_meta: {progressToken: create_uuid()}, // TODO @many maybe save the token? needed to opt into progress notifications
 			});
 
 			// Reset form
