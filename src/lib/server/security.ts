@@ -1,6 +1,9 @@
 import type {Handler} from 'hono';
 
-// TODO BLOCK replace with https://hono.dev/docs/middleware/builtin/csrf#origin-string-string-function
+// TODO BLOCK replace with
+// https://hono.dev/docs/middleware/builtin/csrf#origin-string-string-function
+// and also see sveltekit -
+// https://svelte.dev/docs/kit/configuration#csrf
 
 /**
  * Accepts strings or array-like or set-like objects.
