@@ -118,12 +118,19 @@
 		</p>
 		<p>
 			This scope may look far-fetched, and it is to me, but I'm just making tools that I want to use
-			now on the best foundations I can assemble. I think the most successful version of Zzz is
-			where it's used to build other systems, and it fades into the background as just another tool
-			with a particular take on a part of the stack. From a personal POV, it's my flagship project
-			and primary+priority user of my other software, and I plan to make various websites and tools
-			with it. Many of the initial systems have been designed with some thought towards this bigger
-			picture, and I plan to continue building incrementally on a quality base with some
+			now on the best foundations I can assemble. Software has a way of accumulating into more than
+			the sum of its parts over time, when designed for it. It will take time though, because I
+			prioritize quality over velocity, and the project's resources are meager, having only my
+			donated time right now -- of quality/velocity/cost, pick 2. I think the most successful
+			version of Zzz is where it's used to build products that people care about, and it fades into
+			the background as just another part of the stack with a particular take (right now, the scope
+			of that part is hard to define, as it borgs its tendrils into all the things).
+		</p>
+		<p>
+			From a personal POV, Zzz is the primary user of my lower level software (Fuz/Moss/Gro), and
+			the primary dependency of my planned products (websites/apps/etc, idk, I don't like
+			operations). Many of the initial systems have been designed with some thought towards this
+			bigger picture, and I plan to continue building incrementally on a quality base with some
 			lower-quality experiments and stubbed future features mixed in.
 		</p>
 		<p>
@@ -165,10 +172,10 @@
 						<!-- TODO @db -->
 						<External_Link href="https://github.com/electric-sql/pglite">pglite</External_Link>
 						and full <External_Link href="https://www.postgresql.org/">Postgres</External_Link> when
-						desired, using <External_Link href="https://github.com/drizzle-team/drizzle-orm"
+						desired, using <External_Link href="https://github.com/porsager/postgres"
+							>Postgres.js</External_Link
+						> and probably <External_Link href="https://github.com/drizzle-team/drizzle-orm"
 							>Drizzle</External_Link
-						> or maybe <External_Link href="https://github.com/porsager/postgres"
-							>postgres</External_Link
 						>, see <External_Link href="https://github.com/ryanatkn/zzz/issues/7"
 							>issue #7</External_Link
 						>
@@ -241,7 +248,7 @@
 	</section>
 	<hr />
 	<section>
-		<h2 class="mb_lg">Peek into the future</h2>
+		<h2 class="mb_lg">Peek futures</h2>
 		<p class="mb_md">
 			This project has a big scope and it's early in development. What you're seeing is a small part
 			of the idea -- especially if you're viewing this on the website not natively via Node -- so
