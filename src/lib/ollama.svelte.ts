@@ -29,6 +29,8 @@ import type {Model, Model_Name} from '$lib/model.svelte.js';
 import {Poller} from '$lib/poller.svelte.js';
 import {create_map_by_property} from '$lib/iterable_helpers.js';
 
+// TODO BLOCK remove client-side usage, no imports to `ollama/browser`
+
 // TODO IDK about the `handle_` prefix for methods called by the action handlers, maybe rethink some things
 
 // TODO the async methods need to be de-duped,
