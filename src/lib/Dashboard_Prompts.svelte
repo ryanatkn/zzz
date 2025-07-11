@@ -32,7 +32,7 @@
 
 	// TODO history of prompt states (opt in snapshots? also autosave?) using cell builtins/helpers, like file state but generalized for all cells? the json-based, set_json stuff
 
-	// TODO BLOCK the reorderable dashed pattern state isn't working for the xml tag input or attributes
+	// TODO BLOCK the reorderable dashed pattern state isn't working for the xml tag input or attributes, same with tape list
 
 	let show_diskfile_picker = $state(false);
 
