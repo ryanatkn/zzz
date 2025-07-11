@@ -3,6 +3,7 @@
 	import Package_Detail from '@ryanatkn/fuz/Package_Detail.svelte';
 	import Community_Links_Panel from '@ryanatkn/fuz/Community_Links_Panel.svelte';
 	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
+	import {base} from '$app/paths';
 
 	import {pkg_context} from '$lib/pkg.js';
 	import External_Link from '$lib/External_Link.svelte';
@@ -83,7 +84,8 @@
 				>, <External_Link href="https://github.com/danny-avila/LibreChat">LibreChat</External_Link>,
 				and <External_Link href="https://github.com/oobabooga/text-generation-webui"
 					>Text generation web UI</External_Link
-				>, like LM Studio but FOSS and designed as a toolkit
+				> -- this is the starting point so I can ship something I use for work (the
+				<a href="{base}/prompts">prompt</a> builder is the main thing)
 			</li>
 			<li>
 				IDEs like <External_Link href="https://code.visualstudio.com/">VSCode</External_Link> for open-ended
