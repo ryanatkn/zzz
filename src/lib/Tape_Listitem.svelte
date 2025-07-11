@@ -4,6 +4,7 @@
 	import {GLYPH_REMOVE} from '$lib/glyphs.js';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Tape_Contextmenu from '$lib/Tape_Contextmenu.svelte';
+	import Provider_Logo from '$lib/Provider_Logo.svelte';
 	import Tape_Toggle_Button from '$lib/Tape_Toggle_Button.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 
@@ -21,7 +22,10 @@
 	<div class="tape_summary panel p_xs" class:dormant={!tape.enabled}>
 		<div class="row justify_content_space_between gap_xs">
 			<div class="flex_1">
-				<div class="font_weight_600">{tape.model_name}</div>
+				<div class="font_weight_600">
+					<Provider_Logo name={tape.model.provider_name} size="var(--font_size_md)" />
+					{tape.model_name}
+				</div>
 				<div class="display_flex gap_xs">
 					{#if strip_count > 0}
 						<small
@@ -30,8 +34,7 @@
 								? 's'
 								: ''}</small
 						>
-					{:else}&nbsp;
-					{/if}
+					{:else}&nbsp;{/if}
 				</div>
 			</div>
 			<div class="display_flex gap_xs">

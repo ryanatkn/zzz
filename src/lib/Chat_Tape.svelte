@@ -74,7 +74,8 @@
 					<small
 						><Provider_Link
 							provider={tape.app.providers.find_by_name(tape.model.provider_name)}
-							icon="glyph"
+							icon="svg"
+							icon_props={{size: 'var(--font_size_sm)'}}
 							show_name
 						/></small
 					>

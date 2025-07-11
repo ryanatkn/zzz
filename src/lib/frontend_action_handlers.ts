@@ -221,12 +221,11 @@ export const frontend_action_handlers: Frontend_Action_Handlers = {
 			// TODO refactor probably
 			// If we have a progress token, update the corresponding action
 			const progress_token = meta.progressToken;
-			if (progress_token && app.actions) {
+			if (progress_token) {
 				// Find the action with this progress token
-				const matching_actions = Array.from(app.actions.items.values).filter((action) => {
-					const action_meta = action.action_event?.input?._meta;
-					return action_meta?.progressToken === progress_token;
-				});
+				const matching_actions = app.actions.items.values.filter(
+					(action) => (action.action_event?.input as any)?._meta?.progressToken === progress_token,
+				);
 
 				if (matching_actions.length > 0) {
 					const action = matching_actions[0];
