@@ -511,6 +511,7 @@ export class Reorderable implements Reorderable_Style_Config {
 	 * Attachment factory for the list container.
 	 */
 	list = (params: Reorderable_List_Params): Attachment<HTMLElement> => {
+		// TODO any setup here?
 		return (node) => {
 			// Check if we already have a list node
 			if (this.list_node && this.list_node !== node) {
@@ -577,6 +578,7 @@ export class Reorderable implements Reorderable_Style_Config {
 	 * Attachment factory for reorderable items.
 	 */
 	item = (params: Reorderable_Item_Params): Attachment<HTMLElement> => {
+		// TODO any setup here?
 		return (node) => {
 			// Get the current index
 			const {index} = params;

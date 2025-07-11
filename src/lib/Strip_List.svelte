@@ -18,7 +18,7 @@
 	const strips = $derived(tape.strips.values);
 </script>
 
-<div {...attrs} class="strip_list {attrs?.class}" use:scrollable.container use:scrollable.target>
+<div {...attrs} class="strip_list {attrs?.class}" {@attach scrollable.container} {@attach scrollable.target}>
 	<ul class="unstyled">
 		{#each strips as strip (strip.id)}
 			<li transition:slide>
