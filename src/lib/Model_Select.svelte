@@ -1,0 +1,23 @@
+<script lang="ts">
+	import type {Model} from '$lib/model.svelte.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
+
+	const app = frontend_context.get();
+
+	interface Props {
+		selected_model: Model; // TODO get from context?
+		models?: Array<Model> | undefined;
+	}
+
+	// I think I like this pattern of `prop_` aliasing for situations like this because
+	// it makes acciental use less likely, the `final_models` pattern is more error-prone
+	let {models = app.models.ordered_by_name, selected_model = $bindable()}: Props = $props();
+</script>
+
+<div class="row">
+	<select bind:value={selected_model}>
+		{#each models as model (model)}
+			<option value={model}>{model.name}</option>
+		{/each}
+	</select>
+</div>
