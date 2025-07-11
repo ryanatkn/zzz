@@ -14,7 +14,7 @@
 
 	// TODO probably link to a blog post that's more approachable and less technical
 
-	// TODO rewrite prose
+	// TODO BLOCK review
 </script>
 
 <div class="width_md p_lg">
