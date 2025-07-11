@@ -26,10 +26,30 @@ export const BOTS_DEFAULT = {
 // TODO needs work, hardcoding a bunch of stuff for now, and needs more support for different providers
 
 export const providers_default: Array<Provider_Json_Input> = [
-	{name: 'ollama', title: 'Ollama', url: 'https://github.com/ollama/ollama/tree/main/docs'},
-	{name: 'claude', title: 'Claude', url: 'https://docs.anthropic.com/en/home'},
-	{name: 'chatgpt', title: 'ChatGPT', url: 'https://platform.openai.com/docs/overview'},
-	{name: 'gemini', title: 'Gemini', url: 'https://ai.google.dev/gemini-api/docs/'},
+	{
+		name: 'ollama',
+		title: 'Ollama',
+		url: 'https://github.com/ollama/ollama/tree/main/docs',
+		homepage: 'https://ollama.com/',
+	},
+	{
+		name: 'claude',
+		title: 'Claude',
+		url: 'https://docs.anthropic.com/en/home',
+		homepage: 'https://claude.ai/',
+	},
+	{
+		name: 'chatgpt',
+		title: 'ChatGPT',
+		url: 'https://platform.openai.com/docs/overview',
+		homepage: 'https://chatgpt.com/',
+	},
+	{
+		name: 'gemini',
+		title: 'Gemini',
+		url: 'https://ai.google.dev/gemini-api/docs/',
+		homepage: 'https://gemini.google.com/',
+	},
 ];
 
 // TODO any data here beyond name/provider_name/tags (and probably some future ones) should be fetched from the provider API

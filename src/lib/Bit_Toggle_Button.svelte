@@ -1,10 +1,10 @@
 <script lang="ts">
 	import type {SvelteHTMLElements} from 'svelte/elements';
 
-	import type {Bit_Type} from '$lib/bit.svelte.js';
+	import type {Bit_Union} from '$lib/bit.svelte.js';
 
 	interface Props {
-		bit: Bit_Type;
+		bit: Bit_Union;
 		attrs?: SvelteHTMLElements['input'] | undefined;
 	}
 

@@ -94,8 +94,6 @@
 			</li>
 			<li>
 				web browsers, planned with Chromium via Electron, ideally with swappable browser engines
-				(webview-based toolkits like Tauri do not provide the web-integrated affordances I'm after,
-				I think, but you can use Zzz with Tauri where it supports JS)
 			</li>
 			<li>
 				<External_Link href="https://wikipedia.org/wiki/Content_management_system"
@@ -124,7 +122,7 @@
 			donated time right now -- of quality/velocity/cost, pick 2. I think the most successful
 			version of Zzz is where it's used to build products that people care about, and it fades into
 			the background as just another part of the stack with a particular take (right now, the scope
-			of that part is hard to define, as it borgs its tendrils into all the things).
+			of that part is hard to define, as it borgs its tendrils into things).
 		</p>
 		<p>
 			From a personal POV, Zzz is the primary user of my lower level software (Fuz/Moss/Gro), and
@@ -133,6 +131,7 @@
 			bigger picture, and I plan to continue building incrementally on a quality base with some
 			lower-quality experiments and stubbed future features mixed in.
 		</p>
+		<p>Compared it to low|nocode, the main difference is we ship optimal .</p>
 		<p>
 			Zzz wants to be easy to use and inclusive of people and devices, but try as it might, it can't
 			cater to every case for every person -- however, thanks to the magic of standards-based

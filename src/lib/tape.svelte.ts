@@ -4,7 +4,7 @@ import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Tape_Json} from '$lib/tape_types.js';
 import {Completion_Request, Completion_Role} from '$lib/completion_types.js';
 import {render_messages_to_string, render_completion_messages} from '$lib/tape_helpers.js';
-import type {Bit_Type} from '$lib/bit.svelte.js';
+import type {Bit_Union} from '$lib/bit.svelte.js';
 import {HANDLED} from '$lib/cell_helpers.js';
 import {to_preview, estimate_token_count} from '$lib/helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
@@ -97,7 +97,7 @@ export class Tape extends Cell<typeof Tape_Json> {
 	/**
 	 * Create and add a strip from a bit.
 	 */
-	add_strip_from_bit(bit: Bit_Type, role: Completion_Role): Strip {
+	add_strip_from_bit(bit: Bit_Union, role: Completion_Role): Strip {
 		const strip = create_strip_from_bit(bit, role, {
 			tape_id: this.id,
 		});

@@ -1,8 +1,7 @@
-// @slop Claude Sonnet 3.7
+// @slop Claude Opus 4
 
-import type {Action} from 'svelte/action';
+import type {Attachment} from 'svelte/attachments';
 import {on} from 'svelte/events';
-import {Unreachable_Error} from '@ryanatkn/belt/error.js';
 import type {Flavored} from '@ryanatkn/belt/types.js';
 import {EMPTY_OBJECT} from '@ryanatkn/belt/object.js';
 
@@ -58,7 +57,7 @@ export const DRAG_OVER_RIGHT_CLASS_DEFAULT = 'drag_over_right';
 export const INVALID_DROP_CLASS_DEFAULT = 'invalid_drop';
 
 /**
- * Parameters for list action.
+ * Parameters for list attachment.
  */
 export interface Reorderable_List_Params {
 	onreorder: (from_index: number, to_index: number) => void;
@@ -67,7 +66,7 @@ export interface Reorderable_List_Params {
 }
 
 /**
- * Parameters for item action.
+ * Parameters for item attachment.
  */
 export interface Reorderable_Item_Params {
 	index: number;
@@ -94,19 +93,18 @@ export interface Reorderable_Options {
 }
 
 export class Reorderable implements Reorderable_Style_Config {
-	initialized = $state(false);
+	initialized = false;
 
 	// Drag state tracking
-	source_index = $state(-1);
-	source_item_id: Reorderable_Item_Id | null = $state(null);
-	reordering_in_progress = $state(false);
+	source_index = -1;
+	source_item_id: Reorderable_Item_Id | null = null;
 
 	// Indicator state tracking
-	active_indicator_item_id: Reorderable_Item_Id | null = $state(null);
-	current_indicator: Reorderable_Drop_Position = $state('none');
+	active_indicator_item_id: Reorderable_Item_Id | null = null;
+	current_indicator: Reorderable_Drop_Position = 'none';
 
-	// Direction for drag/drop positioning - initialized either in the constructor or list action
-	direction: Reorderable_Direction = $state()!;
+	// Direction for drag/drop positioning
+	direction: Reorderable_Direction = 'vertical';
 
 	// Unique identifier for this reorderable instance
 	readonly id: Reorderable_Id = `r${create_client_id()}`;
@@ -122,19 +120,19 @@ export class Reorderable implements Reorderable_Style_Config {
 	readonly drag_over_right_class: string | null;
 	readonly invalid_drop_class: string | null;
 
-	readonly classes = $derived.by(() => {
-		const c = [];
-		if (this.list_class) c.push(this.list_class);
-		if (this.item_class) c.push(this.item_class);
-		if (this.dragging_class) c.push(this.dragging_class);
-		if (this.drag_over_class) c.push(this.drag_over_class);
-		if (this.drag_over_top_class) c.push(this.drag_over_top_class);
-		if (this.drag_over_bottom_class) c.push(this.drag_over_bottom_class);
-		if (this.drag_over_left_class) c.push(this.drag_over_left_class);
-		if (this.drag_over_right_class) c.push(this.drag_over_right_class);
-		if (this.invalid_drop_class) c.push(this.invalid_drop_class);
-		return c;
-	});
+	get classes(): Array<string> {
+		return [
+			this.list_class,
+			this.item_class,
+			this.dragging_class,
+			this.drag_over_class,
+			this.drag_over_top_class,
+			this.drag_over_bottom_class,
+			this.drag_over_left_class,
+			this.drag_over_right_class,
+			this.invalid_drop_class,
+		].filter((c): c is string => c !== null);
+	}
 
 	// List reference
 	list_node: HTMLElement | null = null;
@@ -144,9 +142,13 @@ export class Reorderable implements Reorderable_Style_Config {
 	readonly indices: Map<Reorderable_Item_Id, number> = new Map();
 	readonly elements: Map<Reorderable_Item_Id, HTMLElement> = new Map();
 
-	cleanup_handlers: Array<() => void> = [];
+	// Single cleanup function for all event handlers
+	#cleanup: (() => void) | null = null;
 
-	// Pending items collection
+	// Track pending initialization
+	#pending_init_frame: number | null = null;
+
+	// Items waiting to be added
 	pending_items: Array<{
 		id: Reorderable_Item_Id;
 		index: number;
@@ -185,17 +187,17 @@ export class Reorderable implements Reorderable_Style_Config {
 
 	/**
 	 * Initialize the reorderable component.
+	 * Made public for testing purposes.
 	 */
-	#init(): void {
-		if (!this.list_node) return;
+	init(): void {
+		if (!this.list_node || this.initialized) return;
 
-		if (this.initialized) {
-			if (!process.env.VITEST) console.error('Reorderable is already initialized'); // TODO better way to silence this?
-			return;
+		// Process any pending items
+		for (const {id, index, element} of this.pending_items) {
+			this.indices.set(id, index);
+			this.elements.set(id, element);
 		}
-
-		// Process any pending items first - this is crucial
-		this.#process_pending_items();
+		this.pending_items = [];
 
 		// Set up events
 		this.#setup_list_events(this.list_node);
@@ -205,51 +207,28 @@ export class Reorderable implements Reorderable_Style_Config {
 	}
 
 	/**
-	 * Process any pending items that were registered before the list was initialized.
-	 */
-	#process_pending_items(): void {
-		if (this.pending_items.length === 0) return;
-
-		// Add all pending items to our maps
-		for (const {id, index, element} of this.pending_items) {
-			this.indices.set(id, index);
-			this.elements.set(id, element);
-		}
-
-		// Clear the pending items
-		this.pending_items = [];
-	}
-
-	/**
 	 * Reset all drag state in one place.
 	 */
 	#reset_drag_state(): void {
-		if (this.source_item_id) {
-			if (this.dragging_class) {
-				const element = this.elements.get(this.source_item_id);
-				if (element) {
-					element.classList.remove(this.dragging_class);
-				}
+		// Remove dragging class from source element
+		if (this.source_item_id && this.dragging_class) {
+			const element = this.elements.get(this.source_item_id);
+			if (element) {
+				element.classList.remove(this.dragging_class);
 			}
-			this.source_item_id = null;
 		}
-		this.clear_indicators();
-		this.source_index = -1;
-	}
 
-	// TODO better way to do this?
-	/**
-	 * Meant for testing only.
-	 */
-	dangerously_reset_drag_state(): void {
-		this.#reset_drag_state();
+		// Clear all state
+		this.source_item_id = null;
+		this.source_index = -1;
+		this.clear_indicators();
 	}
 
 	/**
 	 * Check if a drag operation is valid.
 	 */
-	#is_valid_drag_operation(): boolean {
-		return this.source_index !== -1 && this.source_item_id !== null && !this.reordering_in_progress;
+	get #is_valid_drag_operation(): boolean {
+		return this.source_index !== -1 && this.source_item_id !== null;
 	}
 
 	/**
@@ -275,12 +254,8 @@ export class Reorderable implements Reorderable_Style_Config {
 		new_indicator: Reorderable_Drop_Position,
 		is_valid = true,
 	): void {
-		// Get the element from our stored elements
-		const element = this.elements.get(item_id);
-		if (!element) return;
-
-		// When hovering over the source element, always clear indicators and return
-		if (this.source_item_id === item_id) {
+		// When hovering over the source element, always clear indicators
+		if (this.source_item_id === item_id || new_indicator === 'none') {
 			this.clear_indicators();
 			return;
 		}
@@ -290,48 +265,38 @@ export class Reorderable implements Reorderable_Style_Config {
 			return;
 		}
 
+		// Get the element
+		const element = this.elements.get(item_id);
+		if (!element) return;
+
 		// Clear existing indicator
 		this.clear_indicators();
 
-		// Apply new indicator classes if needed
-		if (new_indicator !== 'none') {
-			if (this.drag_over_class) element.classList.add(this.drag_over_class);
+		// Apply new indicator classes
+		if (this.drag_over_class) element.classList.add(this.drag_over_class);
 
-			// Add invalid drop class if needed
-			if (!is_valid) {
-				if (this.invalid_drop_class) element.classList.add(this.invalid_drop_class);
-				this.active_indicator_item_id = item_id;
-				this.current_indicator = new_indicator;
-				return;
-			}
+		if (!is_valid) {
+			// Invalid drop
+			if (this.invalid_drop_class) element.classList.add(this.invalid_drop_class);
+		} else {
+			// Valid drop - add direction class
+			const direction_class = {
+				top: this.drag_over_top_class,
+				bottom: this.drag_over_bottom_class,
+				left: this.drag_over_left_class,
+				right: this.drag_over_right_class,
+			}[new_indicator];
 
-			// Add specific direction class
-			switch (new_indicator) {
-				case 'top':
-					if (this.drag_over_top_class) element.classList.add(this.drag_over_top_class);
-					break;
-				case 'bottom':
-					if (this.drag_over_bottom_class) element.classList.add(this.drag_over_bottom_class);
-					break;
-				case 'left':
-					if (this.drag_over_left_class) element.classList.add(this.drag_over_left_class);
-					break;
-				case 'right':
-					if (this.drag_over_right_class) element.classList.add(this.drag_over_right_class);
-					break;
-				default:
-					throw new Unreachable_Error(new_indicator);
-			}
-
-			// Update the active element id
-			this.active_indicator_item_id = item_id;
-			this.current_indicator = new_indicator;
+			if (direction_class) element.classList.add(direction_class);
 		}
+
+		// Update state
+		this.active_indicator_item_id = item_id;
+		this.current_indicator = new_indicator;
 	}
 
 	/**
-	 * Find an item from an event target by traversing the DOM and
-	 * looking for a match in our maps.
+	 * Find an item from an event target by traversing the DOM.
 	 */
 	#find_item_from_event(event: Event): [Reorderable_Item_Id, number, HTMLElement] | null {
 		const target = event.target as HTMLElement | null;
@@ -342,19 +307,11 @@ export class Reorderable implements Reorderable_Style_Config {
 		while (current && current !== this.list_node) {
 			// Check if this element has a data-reorderable-item-id attribute
 			const item_id = current.dataset.reorderableItemId as Reorderable_Item_Id | undefined;
-			if (item_id && this.indices.has(item_id)) {
+			if (item_id) {
 				const index = this.indices.get(item_id);
-				if (index === undefined) return null;
-
-				// Double check that the element in our map matches the current element
-				const stored_element = this.elements.get(item_id);
-				if (
-					stored_element &&
-					(stored_element === current ||
-						stored_element.contains(current) ||
-						current.contains(stored_element))
-				) {
-					return [item_id, index, stored_element];
+				const element = this.elements.get(item_id);
+				if (index !== undefined && element) {
+					return [item_id, index, element];
 				}
 			}
 
@@ -372,19 +329,12 @@ export class Reorderable implements Reorderable_Style_Config {
 		// Clean up any existing handlers
 		this.#cleanup_events();
 
-		// The dragstart event is crucial - it sets up the entire drag operation
-		this.cleanup_handlers.push(
+		const handlers = [
 			on(
 				list,
 				'dragstart',
 				(e: DragEvent) => {
 					if (!e.dataTransfer) return;
-
-					// If reordering is in progress, don't start a new drag
-					if (this.reordering_in_progress) {
-						e.preventDefault();
-						return;
-					}
 
 					// Find the item being dragged
 					const found = this.#find_item_from_event(e);
@@ -392,44 +342,32 @@ export class Reorderable implements Reorderable_Style_Config {
 
 					const [item_id, index, element] = found;
 
-					// Clear any existing drag operation
-					this.clear_indicators();
-					this.source_index = -1;
-					this.source_item_id = null;
-
-					// Set up the new drag operation
+					// Set up the drag operation
 					this.source_index = index;
 					this.source_item_id = item_id;
 
 					// Add dragging style
 					if (this.dragging_class) element.classList.add(this.dragging_class);
 
-					// Set up drag data with the helper function
+					// Set up drag data
 					set_reorderable_drag_data_transfer(e.dataTransfer, item_id);
 				},
 				{capture: true},
 			),
-		);
-
-		this.cleanup_handlers.push(
 			on(
 				list,
 				'dragend',
-				(_: DragEvent) => {
+				() => {
 					this.#reset_drag_state();
 				},
 				{capture: true},
 			),
-		);
-
-		// Set up dragover handler
-		this.cleanup_handlers.push(
 			on(list, 'dragover', (e: DragEvent) => {
 				e.preventDefault();
 				if (e.dataTransfer) e.dataTransfer.dropEffect = 'move';
 
 				// If no valid drag operation, return
-				if (!this.#is_valid_drag_operation()) {
+				if (!this.#is_valid_drag_operation) {
 					this.clear_indicators();
 					return;
 				}
@@ -437,7 +375,6 @@ export class Reorderable implements Reorderable_Style_Config {
 				// Find the item being dragged over
 				const found = this.#find_item_from_event(e);
 				if (!found) {
-					// Not over an item, clear indicators
 					this.clear_indicators();
 					return;
 				}
@@ -474,19 +411,12 @@ export class Reorderable implements Reorderable_Style_Config {
 				// Update indicator
 				this.update_indicator(item_id, position, allowed);
 			}),
-		);
-
-		// Set up drop handler
-		this.cleanup_handlers.push(
-			on(list, 'drop', (e: DragEvent): void => {
+			on(list, 'drop', (e: DragEvent) => {
 				e.preventDefault();
 
-				// Save current state to local variables to avoid race conditions
-				const current_source_index = this.source_index;
-
 				// If no valid drag operation, return
-				if (!this.#is_valid_drag_operation()) {
-					this.clear_indicators();
+				if (!this.#is_valid_drag_operation) {
+					this.#reset_drag_state();
 					return;
 				}
 
@@ -508,132 +438,121 @@ export class Reorderable implements Reorderable_Style_Config {
 				// Get drop position
 				const position = get_reorderable_drop_position(
 					this.direction,
-					current_source_index,
+					this.source_index,
 					item_index,
 				);
 
-				// Calculate target index
+				// Calculate and validate target index
 				let target_index = calculate_reorderable_target_index(
-					current_source_index,
+					this.source_index,
 					item_index,
 					position,
 				);
-
-				// Validate target index
-				const max_items_count = this.indices.size;
-				target_index = validate_reorderable_target_index(target_index, max_items_count - 1);
+				target_index = validate_reorderable_target_index(target_index, this.indices.size - 1);
 
 				// Check if reordering is allowed
-				const allowed = is_reorder_allowed(
-					this.list_params?.can_reorder,
-					current_source_index,
-					target_index,
-				);
-
-				if (!allowed) {
+				if (!is_reorder_allowed(this.list_params?.can_reorder, this.source_index, target_index)) {
 					this.#reset_drag_state();
 					return;
 				}
 
-				// Reset state BEFORE performing the reorder
+				// Save source index before resetting
+				const source_index = this.source_index;
+
+				// Reset state before performing the reorder
 				this.#reset_drag_state();
 
-				// Mark as in the process of reordering
-				this.reordering_in_progress = true;
-
 				try {
-					// Perform the reordering using the callback
-					this.list_params?.onreorder(current_source_index, target_index);
+					// Perform the reordering
+					this.list_params?.onreorder(source_index, target_index);
 				} catch (error) {
 					console.error('Error during reordering:', error);
-				} finally {
-					this.reordering_in_progress = false;
 				}
 			}),
-		);
-
-		// Set up dragleave and dragenter handlers
-		this.cleanup_handlers.push(
 			on(list, 'dragleave', (e: DragEvent) => {
 				const related_target = e.relatedTarget as Node | null;
 				if (!related_target || !list.contains(related_target)) {
 					this.clear_indicators();
 				}
 			}),
-		);
-
-		this.cleanup_handlers.push(
 			on(list, 'dragenter', (e: DragEvent) => {
 				e.preventDefault();
 				if (e.dataTransfer) {
 					e.dataTransfer.dropEffect = 'move';
 				}
 			}),
-		);
+		];
+
+		// Store cleanup function
+		this.#cleanup = () => {
+			for (const cleanup of handlers) {
+				cleanup();
+			}
+		};
 	}
 
 	/**
-	 * Clean up event handlers.
+	 * Clean up event handlers and pending initialization.
 	 */
 	#cleanup_events(): void {
-		for (const cleanup of this.cleanup_handlers) {
-			cleanup();
+		if (this.#cleanup) {
+			this.#cleanup();
+			this.#cleanup = null;
 		}
-		this.cleanup_handlers = [];
+
+		// Cancel any pending initialization
+		if (this.#pending_init_frame !== null) {
+			cancelAnimationFrame(this.#pending_init_frame);
+			this.#pending_init_frame = null;
+		}
 	}
 
 	/**
-	 * Action for the list container.
+	 * Attachment factory for the list container.
 	 */
-	list: Action<HTMLElement, Reorderable_List_Params> = (node, params) => {
-		// Check if we already have a list node
-		if (this.list_node && this.list_node !== node) {
-			throw new Error('This Reorderable instance is already attached to a different list element.');
-		}
+	list = (params: Reorderable_List_Params): Attachment<HTMLElement> => {
+		return (node) => {
+			// Check if we already have a list node
+			if (this.list_node && this.list_node !== node) {
+				throw new Error('reorderable instance is already attached to a different list element');
+			}
 
-		// Clean up previous state if this is a re-initialization
-		if (this.list_node === node) {
-			this.#cleanup_events();
-			this.initialized = false;
-		}
+			// Clean up previous state if this is a re-initialization
+			if (this.list_node === node) {
+				this.#cleanup_events();
+				this.initialized = false;
+			}
 
-		// Update direction based on the list's layout if not manually set
-		if (params.direction) {
-			this.direction = params.direction;
-			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-		} else if (!this.direction) {
-			this.direction = detect_reorderable_direction(node);
-		}
+			// Set direction - use provided direction or detect from DOM
+			if (params.direction) {
+				this.direction = params.direction;
+			} else if (!this.initialized) {
+				// Only detect on first initialization
+				this.direction = detect_reorderable_direction(node);
+			}
 
-		// Store the list params and node
-		this.list_params = params;
-		this.list_node = node;
+			// Store the list params and node
+			this.list_params = params;
+			this.list_node = node;
 
-		// Reset all state
-		this.indices.clear();
-		this.elements.clear();
-		this.reordering_in_progress = false;
-		this.source_item_id = null;
-		this.source_index = -1;
+			// Reset all state
+			this.indices.clear();
+			this.elements.clear();
+			this.#reset_drag_state();
 
-		// Add the list class and identifier
-		if (this.list_class) node.classList.add(this.list_class);
-		node.setAttribute('role', 'list');
-		node.dataset.reorderableListId = this.id;
+			// Add the list class and identifier
+			if (this.list_class) node.classList.add(this.list_class);
+			node.setAttribute('role', 'list');
+			node.dataset.reorderableListId = this.id;
 
-		// Use requestAnimationFrame for initialization - allows all items to register first
-		// because the order isn't always guaranteed
-		requestAnimationFrame(() => this.#init());
+			// Use requestAnimationFrame for initialization - allows all items to register first
+			// because the order isn't always guaranteed
+			this.#pending_init_frame = requestAnimationFrame(() => {
+				this.#pending_init_frame = null;
+				this.init();
+			});
 
-		return {
-			update: (new_params) => {
-				// Update the stored parameters
-				this.list_params = new_params;
-				if (new_params.direction) {
-					this.direction = new_params.direction;
-				}
-			},
-			destroy: () => {
+			return () => {
 				// Clean up event handlers
 				this.#cleanup_events();
 
@@ -645,87 +564,44 @@ export class Reorderable implements Reorderable_Style_Config {
 				// Reset state
 				this.list_node = null;
 				this.list_params = null;
-				this.source_item_id = null;
-				this.source_index = -1;
-				this.reordering_in_progress = false;
-				this.clear_indicators();
-				this.indices.clear();
-				this.elements.clear();
 				this.initialized = false;
 				this.pending_items = [];
-			},
+				this.indices.clear();
+				this.elements.clear();
+				this.#reset_drag_state();
+			};
 		};
 	};
 
 	/**
-	 * Action for reorderable items.
+	 * Attachment factory for reorderable items.
 	 */
-	item: Action<HTMLElement, Reorderable_Item_Params> = (node, params) => {
-		// Get the current index
-		let {index} = params;
+	item = (params: Reorderable_Item_Params): Attachment<HTMLElement> => {
+		return (node) => {
+			// Get the current index
+			const {index} = params;
 
-		// Generate a unique item id if not already present
-		let item_id = node.dataset.reorderableItemId as Reorderable_Item_Id | undefined;
-		if (!item_id) {
-			item_id = `i${create_client_id()}`;
-			node.dataset.reorderableItemId = item_id;
-		}
-
-		node.setAttribute('draggable', 'true');
-		if (this.item_class) node.classList.add(this.item_class);
-		node.setAttribute('role', 'listitem');
-		node.dataset.reorderableListId = this.id;
-
-		if (this.initialized) {
-			// If already initialized, add directly to maps
-			this.indices.set(item_id, index);
-			this.elements.set(item_id, node);
-		} else {
-			// Otherwise, add to pending items to be processed during initialization
-			this.pending_items.push({id: item_id, index, element: node});
-		}
-
-		// Add a direct dragstart handler to ensure the drag operation is properly initiated
-		// This is crucial for nested components like in Bit_List
-		const dragstart_cleanup = on(node, 'dragstart', (e: DragEvent) => {
-			if (!e.dataTransfer) return;
-
-			// Only handle if we haven't already set up this drag operation
-			if (this.source_index === -1 && this.source_item_id === null) {
-				// Set up the drag operation directly
-				this.source_index = index;
-				this.source_item_id = item_id;
-
-				// Add dragging style
-				if (this.dragging_class) node.classList.add(this.dragging_class);
-
-				// Set up drag data with the helper function
-				set_reorderable_drag_data_transfer(e.dataTransfer, item_id);
+			// Generate a unique item id if not already present
+			let item_id = node.dataset.reorderableItemId as Reorderable_Item_Id | undefined;
+			if (!item_id) {
+				item_id = `i${create_client_id()}`;
+				node.dataset.reorderableItemId = item_id;
 			}
-		});
+			node.setAttribute('draggable', 'true');
+			if (this.item_class) node.classList.add(this.item_class);
+			node.setAttribute('role', 'listitem');
+			node.dataset.reorderableListId = this.id;
 
-		return {
-			update: (new_params) => {
-				// Update the index if it changed
-				if (new_params.index !== index) {
-					index = new_params.index;
+			if (this.initialized) {
+				// If already initialized, add directly to maps
+				this.indices.set(item_id, index);
+				this.elements.set(item_id, node);
+			} else {
+				// Otherwise, add to pending items to be processed during initialization
+				this.pending_items.push({id: item_id, index, element: node});
+			}
 
-					// Update in the appropriate storage
-					if (this.initialized) {
-						this.indices.set(item_id, index);
-					} else {
-						// Find and update in pending items
-						const pending_item = this.pending_items.find((item) => item.id === item_id);
-						if (pending_item) {
-							pending_item.index = index;
-						}
-					}
-				}
-			},
-			destroy: () => {
-				// Clean up the direct dragstart handler
-				dragstart_cleanup();
-
+			return () => {
 				// Remove from appropriate storage
 				if (this.initialized) {
 					this.indices.delete(item_id);
@@ -749,21 +625,9 @@ export class Reorderable implements Reorderable_Style_Config {
 
 				// Clean up source item state if needed
 				if (this.source_item_id === item_id) {
-					this.source_item_id = null;
-					this.source_index = -1;
+					this.#reset_drag_state();
 				}
-			},
+			};
 		};
 	};
-
-	/**
-	 * Update styling configuration.
-	 */
-	update_styles(styles: Partial<Reorderable_Style_Config>): void {
-		for (const key in styles) {
-			const value = (styles as any)[key];
-			if (value === undefined) continue;
-			(this as any)[key] = value;
-		}
-	}
 }

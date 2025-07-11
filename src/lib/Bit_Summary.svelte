@@ -1,6 +1,6 @@
 <script lang="ts">
 	import type {Prompt} from '$lib/prompt.svelte.js';
-	import type {Bit_Type} from '$lib/bit.svelte.js';
+	import type {Bit_Union} from '$lib/bit.svelte.js';
 	import Bit_Toggle_Button from '$lib/Bit_Toggle_Button.svelte';
 	import Bit_Remove_Button from '$lib/Bit_Remove_Button.svelte';
 	import Glyph from '$lib/Glyph.svelte';
@@ -8,7 +8,7 @@
 	import {get_bit_type_glyph} from '$lib/bit_helpers.js';
 
 	interface Props {
-		bit: Bit_Type;
+		bit: Bit_Union;
 		prompt?: Prompt | undefined;
 	}
 	const {bit, prompt}: Props = $props();

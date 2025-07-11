@@ -66,7 +66,7 @@ export type Bit_Json = z.infer<typeof Bit_Json>;
 export type Bit_Json_Input = z.input<typeof Bit_Json>;
 
 /** Type union of all concrete bit classes.  */
-export type Bit_Type = Text_Bit | Diskfile_Bit | Sequence_Bit;
+export type Bit_Union = Text_Bit | Diskfile_Bit | Sequence_Bit;
 /** Type union of all concrete bit json types.  */
 export type Bit_Json_Type = Text_Bit_Json | Diskfile_Bit_Json | Sequence_Bit_Json;
 
@@ -82,7 +82,7 @@ export type Diskfile_Bit_Options = Bit_Options<typeof Diskfile_Bit_Json>;
 
 export type Sequence_Bit_Options = Bit_Options<typeof Sequence_Bit_Json>;
 
-export type Bit_Type_Options = Text_Bit_Options | Diskfile_Bit_Options | Sequence_Bit_Options;
+export type Bit_Options_Union = Text_Bit_Options | Diskfile_Bit_Options | Sequence_Bit_Options;
 
 /**
  * Abstract base class for all bit types.
@@ -181,8 +181,8 @@ export abstract class Bit<T extends z.ZodType = typeof Bit_Json_Base> extends Ce
 		json: Sequence_Bit_Json_Input,
 		options?: Sequence_Bit_Options,
 	): Sequence_Bit;
-	static create(app: Frontend, json: Bit_Json_Input, options?: Bit_Type_Options): Bit_Type;
-	static create(app: Frontend, json: Bit_Json_Input, options?: Bit_Type_Options): Bit_Type {
+	static create(app: Frontend, json: Bit_Json_Input, options?: Bit_Options_Union): Bit_Union;
+	static create(app: Frontend, json: Bit_Json_Input, options?: Bit_Options_Union): Bit_Union {
 		if (!json.type) {
 			throw new Error('Missing required "type" field in bit JSON');
 		}
@@ -316,10 +316,10 @@ export class Sequence_Bit extends Bit<typeof Sequence_Bit_Json> {
 
 	items: Array<Uuid> = $state()!;
 
-	readonly bits: Array<Bit_Type> = $derived(
+	readonly bits: Array<Bit_Union> = $derived(
 		this.items
 			.map((id) => this.app.bits.items.by_id.get(id))
-			.filter((bit): bit is Bit_Type => !!bit),
+			.filter((bit): bit is Bit_Union => !!bit),
 	);
 
 	override get content(): string {

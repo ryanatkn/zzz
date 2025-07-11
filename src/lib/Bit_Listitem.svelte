@@ -1,13 +1,13 @@
 <script lang="ts">
 	import type {SvelteHTMLElements} from 'svelte/elements';
 
-	import type {Bit_Type} from '$lib/bit.svelte.js';
+	import type {Bit_Union} from '$lib/bit.svelte.js';
 	import Bit_Contextmenu from '$lib/Bit_Contextmenu.svelte';
 
 	interface Props {
-		bit: Bit_Type;
+		bit: Bit_Union;
 		selected?: boolean | undefined;
-		onclick?: ((bit: Bit_Type) => void) | undefined;
+		onclick?: ((bit: Bit_Union) => void) | undefined;
 		compact?: boolean | undefined;
 		attrs?: SvelteHTMLElements['button'] | undefined;
 	}

@@ -1,7 +1,7 @@
 import {z} from 'zod';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
-import {Bit, Bit_Json, Bit_Schema, type Bit_Json_Input, type Bit_Type} from '$lib/bit.svelte.js';
+import {Bit, Bit_Json, Bit_Schema, type Bit_Json_Input, type Bit_Union} from '$lib/bit.svelte.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
 import {create_single_index} from '$lib/indexed_collection_helpers.svelte.js';
@@ -22,7 +22,7 @@ export interface Bits_Options extends Cell_Options<typeof Bits_Json> {} // eslin
 
 export class Bits extends Cell<typeof Bits_Json> {
 	// Initialize items with proper typing and unified indexes
-	readonly items: Indexed_Collection<Bit_Type> = new Indexed_Collection({
+	readonly items: Indexed_Collection<Bit_Union> = new Indexed_Collection({
 		indexes: [
 			create_single_index({
 				key: 'by_name',
@@ -63,7 +63,7 @@ export class Bits extends Cell<typeof Bits_Json> {
 	/**
 	 * Add a bit to the collection.
 	 */
-	add(json: Bit_Json_Input): Bit_Type {
+	add(json: Bit_Json_Input): Bit_Union {
 		const j = !json.name ? {...json, name: this.generate_unique_name('new bit')} : json;
 		const bit = Bit.create(this.app, j);
 		this.items.add(bit);
@@ -87,7 +87,7 @@ export class Bits extends Cell<typeof Bits_Json> {
 	/**
 	 * Find a bit that references a specific file path.
 	 */
-	find_bit_by_diskfile_path(path: string): Bit_Type | undefined {
+	find_bit_by_diskfile_path(path: string): Bit_Union | undefined {
 		return this.items.single_index('by_diskfile_path').get(path);
 	}
 }

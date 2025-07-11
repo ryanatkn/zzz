@@ -1,10 +1,10 @@
-import type {Bit_Type} from '$lib/bit.svelte.js';
+import type {Bit_Union} from '$lib/bit.svelte.js';
 
 /**
  * Formats a collection of bits into a prompt string,
  * applying XML tags and attributes where specified.
  */
-export const format_prompt_content = (bits: Array<Bit_Type>): string => {
+export const format_prompt_content = (bits: Array<Bit_Union>): string => {
 	const formatted_contents = [];
 
 	for (const bit of bits) {

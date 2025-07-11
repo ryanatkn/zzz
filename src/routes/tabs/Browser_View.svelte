@@ -15,7 +15,7 @@
 	import type {Browser} from '$routes/tabs/browser.svelte.js';
 	import Browser_Tab_Content from '$routes/tabs/Browser_Tab_Content.svelte';
 	import Browser_Tab_Listitem from '$routes/tabs/Browser_Tab_Listitem.svelte';
-	import {Reorderable} from '$lib/reorderable.svelte.js';
+	import {Reorderable} from '$lib/reorderable.js';
 
 	interface Props {
 		browser: Browser;
@@ -67,12 +67,12 @@
 		<!-- Tab Bar -->
 		<ul
 			class="browser_tab_bar unstyled display_flex overflow_x_auto overflow_y_hidden scrollbar_width_thin"
-			use:tabs_reorderable.list={{
+			{@attach tabs_reorderable.list({
 				onreorder: (from_index, to_index) => browser.reorder_tab(from_index, to_index),
-			}}
+			})}
 		>
 			{#each browser.tabs.ordered_tabs as tab, index (tab.id)}
-				<li class="display_flex" use:tabs_reorderable.item={{index}}>
+				<li class="display_flex" {@attach tabs_reorderable.item({index})}>
 					<Browser_Tab_Listitem
 						{tab}
 						{index}

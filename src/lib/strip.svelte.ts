@@ -3,7 +3,7 @@ import type {Omit_Strict} from '@ryanatkn/belt/types.js';
 import {estimate_token_count} from '$lib/helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Uuid} from '$lib/zod_helpers.js';
-import type {Bit_Type} from '$lib/bit.svelte.js';
+import type {Bit_Union} from '$lib/bit.svelte.js';
 import type {Frontend} from '$lib/frontend.svelte.js';
 import {Strip_Json} from '$lib/strip_types.js';
 import type {
@@ -25,7 +25,7 @@ export class Strip extends Cell<typeof Strip_Json> {
 	error_message: string | undefined = $state();
 
 	// Get the referenced bit - handle case where bit might not exist in registry
-	readonly bit: Bit_Type | null = $derived(this.app.bits.items.by_id.get(this.bit_id) ?? null);
+	readonly bit: Bit_Union | null = $derived(this.app.bits.items.by_id.get(this.bit_id) ?? null);
 
 	get enabled(): boolean {
 		return this.bit?.enabled ?? false;
@@ -75,7 +75,7 @@ export class Strip extends Cell<typeof Strip_Json> {
 	/**
 	 * Update the bit reference for this strip
 	 */
-	set_bit(bit: Bit_Type): void {
+	set_bit(bit: Bit_Union): void {
 		this.bit_id = bit.id;
 	}
 }
@@ -84,7 +84,7 @@ export class Strip extends Cell<typeof Strip_Json> {
  * Create a strip that references an existing bit for its content
  */
 export const create_strip_from_bit = (
-	bit: Bit_Type,
+	bit: Bit_Union,
 	role: Completion_Role,
 	json: Partial<Omit_Strict<Strip_Json, 'role' | 'bit_id'>>,
 ): Strip => {

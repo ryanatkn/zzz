@@ -4,13 +4,13 @@
 	import type {SvelteHTMLElements} from 'svelte/elements';
 	import {DEV} from 'esm-env';
 
-	import {Reorderable, type Reorderable_Options} from '$lib/reorderable.svelte.js';
+	import {Reorderable, type Reorderable_Options} from '$lib/reorderable.js';
 	import Bit_Summary from '$lib/Bit_Summary.svelte';
-	import type {Bit_Type} from '$lib/bit.svelte.js';
+	import type {Bit_Union} from '$lib/bit.svelte.js';
 	import type {Prompt} from '$lib/prompt.svelte.js';
 
 	interface Props {
-		bits: Array<Bit_Type>;
+		bits: Array<Bit_Union>;
 		prompt?: Prompt | undefined;
 		onreorder?: ((from_index: number, to_index: number) => void) | undefined;
 		reorderable_options?: Reorderable_Options | undefined;
@@ -47,12 +47,16 @@
 {#if bits.length === 0}
 	{@render empty()}
 {:else if reorderable && onreorder}
-	<ul {...attrs} class="unstyled column gap_xs5 {attrs?.class}" use:reorderable.list={{onreorder}}>
+	<ul
+		{...attrs}
+		class="unstyled column gap_xs5 {attrs?.class}"
+		{@attach reorderable.list({onreorder})}
+	>
 		{#each bits as bit, i (bit.id)}
 			<li
 				{...item_attrs}
 				class="border_radius_xs {item_attrs?.class}"
-				use:reorderable.item={{index: i}}
+				{@attach reorderable.item({index: i})}
 				transition:slide
 			>
 				<Bit_Summary {bit} {prompt} />

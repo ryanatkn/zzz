@@ -5,7 +5,7 @@
 	import Diskfile_Explorer from '$lib/Diskfile_Explorer.svelte';
 	import Diskfile_Editor_View from '$lib/Diskfile_Editor_View.svelte';
 	import Diskfile_Tab_Listitem from '$lib/Diskfile_Tab_Listitem.svelte';
-	import {Reorderable} from '$lib/reorderable.svelte.js';
+	import {Reorderable} from '$lib/reorderable.js';
 	import Diskfile_Picker_Dialog from '$lib/Diskfile_Picker_Dialog.svelte';
 
 	const app = frontend_context.get();
@@ -54,13 +54,13 @@
 		<!-- Tab Bar -->
 		<ul
 			class="unstyled display_flex overflow_x_auto scrollbar_width_thin"
-			use:tabs_reorderable.list={{
+			{@attach tabs_reorderable.list({
 				onreorder: (from_index, to_index) => editor.reorder_tabs(from_index, to_index),
-			}}
+			})}
 		>
 			{#each editor.tabs.ordered_tabs as tab, index (tab.id)}
 				<li class="display_flex py_xs3 px_xs4">
-					<div class="display_flex" use:tabs_reorderable.item={{index}}>
+					<div class="display_flex" {@attach tabs_reorderable.item({index})}>
 						<!-- TODO notice the different APIs here, needs fixing, diskfiles is higher in the tree -->
 						<Diskfile_Tab_Listitem
 							{tab}

@@ -2,7 +2,7 @@
 	import {slide} from 'svelte/transition';
 
 	import type {Chat} from '$lib/chat.svelte.js';
-	import {Reorderable} from '$lib/reorderable.svelte.js';
+	import {Reorderable} from '$lib/reorderable.js';
 	import Tape_Listitem from '$lib/Tape_Listitem.svelte';
 	import {frontend_context} from '$lib/frontend.svelte.js';
 
@@ -20,14 +20,14 @@
 {#if chat}
 	<ul
 		class="unstyled column gap_xs5"
-		use:reorderable.list={{
+		{@attach reorderable.list({
 			onreorder: (from_index, to_index) => {
 				chat.reorder_tapes(from_index, to_index);
 			},
-		}}
+		})}
 	>
 		{#each chat.tapes as tape, i (tape.id)}
-			<li class="border_radius_xs" use:reorderable.item={{index: i}} transition:slide>
+			<li class="border_radius_xs" {@attach reorderable.item({index: i})} transition:slide>
 				<Tape_Listitem {tape} {chat} />
 			</li>
 		{/each}

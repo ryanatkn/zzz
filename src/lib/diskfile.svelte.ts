@@ -8,7 +8,7 @@ import {
 	type Serializable_Source_File,
 } from '$lib/diskfile_types.js';
 import {to_preview, estimate_token_count} from '$lib/helpers.js';
-import type {Bit_Type} from '$lib/bit.svelte.js';
+import type {Bit_Union} from '$lib/bit.svelte.js';
 
 // TODO support directories/folders
 
@@ -20,7 +20,9 @@ export class Diskfile extends Cell<typeof Diskfile_Json> {
 
 	content: string | null = $state()!;
 
-	readonly bit: Bit_Type | undefined = $derived(this.app.bits.find_bit_by_diskfile_path(this.path));
+	readonly bit: Bit_Union | undefined = $derived(
+		this.app.bits.find_bit_by_diskfile_path(this.path),
+	);
 
 	// TODO @many add UI support for deps for module diskfiles (TS, Svelte, etc)
 	dependents: Array<[Diskfile_Path, Serializable_Source_File]> = $state()!; // TODO @many these need to be null for unknown file types (support JS modules, etc)

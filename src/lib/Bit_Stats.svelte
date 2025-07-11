@@ -1,9 +1,9 @@
 <script lang="ts">
-	import type {Bit_Type} from '$lib/bit.svelte.js';
+	import type {Bit_Union} from '$lib/bit.svelte.js';
 	import Content_Stats from '$lib/Content_Stats.svelte';
 
 	interface Props {
-		bit: Bit_Type;
+		bit: Bit_Union;
 	}
 
 	const {bit}: Props = $props();

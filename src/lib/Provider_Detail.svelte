@@ -2,6 +2,7 @@
 	import {base} from '$app/paths';
 	import {page} from '$app/state';
 	import type {SvelteHTMLElements} from 'svelte/elements';
+	import {format_url} from '@ryanatkn/belt/url.js';
 
 	import type {Provider} from '$lib/provider.svelte.js';
 	import Provider_Logo from '$lib/Provider_Logo.svelte';
@@ -37,14 +38,15 @@
 					<External_Link href={provider.url}>{provider.title}</External_Link>
 				</h2>
 			{/if}
-			<div>
-				<div class="mb_md">
-					<Glyph glyph={GLYPH_PROVIDER} />{provider.name}
-				</div>
-				<div>
-					<External_Link href={provider.url}>docs</External_Link>
-				</div>
-			</div>
+			<p>
+				<Glyph glyph={GLYPH_PROVIDER} />{provider.name}
+			</p>
+			<p>
+				<External_Link href={provider.homepage}>{format_url(provider.homepage)}</External_Link>
+			</p>
+			<p>
+				<External_Link href={provider.url}>docs</External_Link>
+			</p>
 		</div>
 	</section>
 	{#if provider.name === 'ollama'}

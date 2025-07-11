@@ -2,7 +2,7 @@
 
 [<img src="/static/logo.svg" alt="three sleepy z's" align="right" width="192" height="192">](https://www.zzz.software/)
 
-> fullstack toolkit for adaptive web environments 💤 nice web things
+> fullstack toolkit for adaptive web environments 💤 nice web things for the tired
 
 ⚠️ early pre-release, does not persist your data yet
 

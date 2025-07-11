@@ -16,7 +16,9 @@
 
 <div class="box">
 	<Svg data={zzz_logo} size="var(--icon_size_xl2)" attrs={{class: 'my_xl5'}} />
-	<p class="mt_xl3">web environment 💤 nice web things for the tired</p>
+	<p class="mt_xl3">
+		fullstack toolkit for adaptive web environments 💤 nice web things for the tired
+	</p>
 	<p class="mt_xl3">work in progress, see <a href="{base}/about">/about</a></p>
 </div>
 

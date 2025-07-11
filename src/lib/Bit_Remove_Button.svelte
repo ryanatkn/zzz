@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type {Bit_Type} from '$lib/bit.svelte.js';
+	import type {Bit_Union} from '$lib/bit.svelte.js';
 	import type {Prompt} from '$lib/prompt.svelte.js';
 	import type {Prompts} from '$lib/prompts.svelte.js';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
@@ -7,7 +7,7 @@
 	import Glyph from '$lib/Glyph.svelte';
 
 	interface Props {
-		bit: Bit_Type;
+		bit: Bit_Union;
 		prompt?: Prompt | undefined;
 		prompts?: Prompts | undefined;
 		attrs?: Record<string, string> | undefined;

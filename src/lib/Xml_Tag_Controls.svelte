@@ -1,13 +1,13 @@
 <script lang="ts">
 	import {slide} from 'svelte/transition';
 
-	import type {Bit_Type} from '$lib/bit.svelte.js';
+	import type {Bit_Union} from '$lib/bit.svelte.js';
 	import Xml_Attribute_Editor from '$lib/Xml_Attribute_Editor.svelte';
 	import {GLYPH_ADD, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
 
 	interface Props {
-		bit: Bit_Type;
+		bit: Bit_Union;
 	}
 
 	const {bit}: Props = $props();

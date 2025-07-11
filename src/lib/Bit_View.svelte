@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type {Bit_Type} from '$lib/bit.svelte.js';
+	import type {Bit_Union} from '$lib/bit.svelte.js';
 	import Xml_Tag_Controls from '$lib/Xml_Tag_Controls.svelte';
 	import Bit_Stats from '$lib/Bit_Stats.svelte';
 	import Glyph from '$lib/Glyph.svelte';
@@ -13,7 +13,7 @@
 	import {frontend_context} from '$lib/frontend.svelte.js';
 
 	interface Props {
-		bit: Bit_Type;
+		bit: Bit_Union;
 		show_actions?: boolean | undefined;
 	}
 

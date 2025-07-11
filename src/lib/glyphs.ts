@@ -20,6 +20,7 @@ export const GLYPH_CONNECT = '⭍'; // ⨁
 export const GLYPH_DISCONNECT = '⊝';
 export const GLYPH_RETRY = '↺'; // ⟲'; // ⟲ ⟳ ⤾ ⤼ ↻
 export const GLYPH_PLACEHOLDER = '↳';
+export const GLYPH_SEND = '⮥'; // ⮥ ⭷ ↗
 export const GLYPH_PLAY = '▶︎';
 export const GLYPH_PAUSE = '❙❙'; // is 2 chars, should be supported by usage
 // export const GLYPH_STOP = '⏹'; // ⏹ ■ ▣ ▪
@@ -122,6 +123,12 @@ export const get_glyph_for_action_kind = (kind: Action_Kind): string => {
 // ⭍ ⏻
 //⥘ ⥙ ⇅ ⇵ ⇳ ⇊ ⇈  ⮃
 // ⬎⤣
+
+// ↗ ⤴ ⤊ ⥘ ⭡ ⭧ ⥉ ↱ ⤐ ⤏ ⥟ ⤞ ⤟ ⤠ ⎋ ⧉ ⬈ ⌁ ⍙ ⎗ ⍏ ⍟ ⍝ ⏏ ⎄ ↑ ⇧ ⮕ ⮝ ⤈ ⥁ ⥅ ⥇ ⥓ ⥖ ⥗ ⥚ ⥛ ⤊ ⤉ ⤒
+// ⇗ ⤈ ⤉ ⤒ ⥈ ⥑ ⥒ ⥔ ⥕ ⥙ ⥛ ⭦ ⭧ ⭨ ⭩ ⯁ ⯅ ⯇ ⯈ ⯊ ⯋ ⯏ ⯑ ⯓ ⯕ ⯗ ⯙ ⯛ ⯝ ⯟
+// ⇪ ⮊ ⮌ ⮎ ⮐ ⮒ ⮓ ⮕ ⮗ ⮙ ⮛ ⮝ ⮟ ⮡ ⮣ ⮥ ⮧ ⮩ ⮫ ⮭ ⮯ ⮱ ⮳ ⮵ ⮷ ⮹ ⮻ ⮽ ⮿ ⯁ ⯃ ⯅
+// ⯇ ⯈ ⯊ ⯌ ⯎ ⯐ ⯒ ⯔ ⯖ ⯘ ⯚ ⯜ ⯞ ⯠ ⯢ ⯤ ⯦ ⯨ ⯪ ⯬ ⯮ ⯰ ⯲ ⯴ ⯶ ⯸ ⯺ ⯼ ⯾ Ⰰ Ⰱ
+// Ⰲ Ⰳ Ⰴ Ⰵ Ⰶ Ⰷ Ⰸ Ⰹ Ⰺ Ⰻ Ⰼ Ⰽ Ⰾ Ⰿ Ⱀ Ⱁ Ⱂ Ⱃ Ⱄ Ⱅ Ⱆ Ⱇ Ⱈ Ⱉ Ⱊ Ⱋ Ⱌ Ⱍ Ⱎ Ⱏ
 
 // ⎗ ⎘
 

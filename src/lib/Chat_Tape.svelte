@@ -11,7 +11,8 @@
 	import Tape_Contextmenu from '$lib/Tape_Contextmenu.svelte';
 	import Model_Contextmenu from '$lib/Model_Contextmenu.svelte';
 	import Content_Editor from '$lib/Content_Editor.svelte';
-	import {GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
+	import {GLYPH_PLACEHOLDER, GLYPH_SEND} from '$lib/glyphs.js';
+	import Glyph from '$lib/Glyph.svelte';
 
 	// TODO no longer uses `Chat`, maybe rename to `Tape_View` or similar?
 
@@ -104,7 +105,7 @@
 						attrs={{class: 'plain'}}
 						title="send {input_token_count} tokens to {tape.model_name}"
 					>
-						send
+						<Glyph glyph={GLYPH_SEND} />
 					</Pending_Button>
 				</Content_Editor>
 			</div>
