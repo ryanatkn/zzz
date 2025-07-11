@@ -367,3 +367,8 @@ button.menu_item[disabled] {
 pre code {
 	padding: var(--space_xs) var(--space_md);
 }
+
+/* TODO upstream */
+[role='button'] {
+	outline-color: var(--outline_color);
+}
