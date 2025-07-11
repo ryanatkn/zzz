@@ -61,7 +61,7 @@
 <div
 	{...popover_container_attrs}
 	class="position_relative {popover_container_attrs?.class}"
-	use:popover.container
+	{@attach popover.container}
 >
 	{#if button}
 		{@render button(popover)}
@@ -69,11 +69,11 @@
 		<button
 			type="button"
 			class="icon_button"
-			use:popover.trigger={{
+			{@attach popover.trigger({
 				position,
 				align,
 				disable_outside_click,
-			}}
+			})}
 			{...attrs}
 		>
 			{@render children?.(popover)}
@@ -82,12 +82,12 @@
 
 	{#if popover.visible}
 		<div
-			use:popover.content={{
+			{@attach popover.content({
 				position,
 				align,
 				disable_outside_click,
 				popover_class,
-			}}
+			})}
 			in:scale={{duration: 80}}
 			out:scale={{duration: 200}}
 			{...popover_attrs}
