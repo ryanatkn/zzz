@@ -161,6 +161,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	);
 
 	pull_is_pulling(model_name: Model_Name): boolean {
+		// TODO BLOCK this continues showing after it's done (fix in actions api/handlers probably)
 		return this.pulling_models.has(model_name);
 	}
 
