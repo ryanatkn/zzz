@@ -18,6 +18,7 @@ export const Action_Method = z.enum([
 	'ollama_create',
 	'ollama_delete',
 	'ollama_list',
+	'ollama_progress',
 	'ollama_ps',
 	'ollama_pull',
 	'ollama_show',
@@ -35,6 +36,13 @@ export const Request_Response_Action_Method = z.enum([
 	'create_directory',
 	'delete_diskfile',
 	'load_session',
+	'ollama_copy',
+	'ollama_create',
+	'ollama_delete',
+	'ollama_list',
+	'ollama_ps',
+	'ollama_pull',
+	'ollama_show',
 	'ping',
 	'update_diskfile',
 ]);
@@ -43,22 +51,17 @@ export type Request_Response_Action_Method = z.infer<typeof Request_Response_Act
 /**
  * Names of all remote_notification actions.
  */
-export const Remote_Notification_Action_Method = z.enum(['completion_progress', 'filer_change']);
+export const Remote_Notification_Action_Method = z.enum([
+	'completion_progress',
+	'filer_change',
+	'ollama_progress',
+]);
 export type Remote_Notification_Action_Method = z.infer<typeof Remote_Notification_Action_Method>;
 
 /**
  * Names of all local_call actions.
  */
-export const Local_Call_Action_Method = z.enum([
-	'ollama_copy',
-	'ollama_create',
-	'ollama_delete',
-	'ollama_list',
-	'ollama_ps',
-	'ollama_pull',
-	'ollama_show',
-	'toggle_main_menu',
-]);
+export const Local_Call_Action_Method = z.enum(['toggle_main_menu']);
 export type Local_Call_Action_Method = z.infer<typeof Local_Call_Action_Method>;
 
 /**
@@ -75,6 +78,7 @@ export const Frontend_Action_Method = z.enum([
 	'ollama_create',
 	'ollama_delete',
 	'ollama_list',
+	'ollama_progress',
 	'ollama_ps',
 	'ollama_pull',
 	'ollama_show',
@@ -94,6 +98,14 @@ export const Backend_Action_Method = z.enum([
 	'delete_diskfile',
 	'filer_change',
 	'load_session',
+	'ollama_copy',
+	'ollama_create',
+	'ollama_delete',
+	'ollama_list',
+	'ollama_progress',
+	'ollama_ps',
+	'ollama_pull',
+	'ollama_show',
 	'ping',
 	'update_diskfile',
 ]);
@@ -125,6 +137,9 @@ export interface Actions_Api {
 		input: Action_Inputs['ollama_delete'],
 	) => Promise<Action_Outputs['ollama_delete']>;
 	ollama_list: (input?: void) => Promise<Action_Outputs['ollama_list']>;
+	ollama_progress: (
+		input: Action_Inputs['ollama_progress'],
+	) => Promise<Action_Outputs['ollama_progress']>;
 	ollama_ps: (input?: void) => Promise<Action_Outputs['ollama_ps']>;
 	ollama_pull: (input: Action_Inputs['ollama_pull']) => Promise<Action_Outputs['ollama_pull']>;
 	ollama_show: (input: Action_Inputs['ollama_show']) => Promise<Action_Outputs['ollama_show']>;

@@ -135,52 +135,94 @@ export const frontend_action_handlers: Frontend_Action_Handlers = {
 	},
 
 	ollama_list: {
-		execute: async ({app}) => {
-			console.log('[frontend_action_handlers.ollama_list]');
-			return await app.ollama.handle_ollama_list();
+		send_request: () => {
+			console.log('[frontend_action_handlers] sending ollama_list request');
+		},
+		receive_response: async ({app, data: {output}}) => {
+			console.log('[frontend_action_handlers] received ollama_list response:', output);
+			await app.ollama.handle_ollama_list(output);
 		},
 	},
 	ollama_ps: {
-		execute: async ({app}) => {
-			console.log('[frontend_action_handlers.ollama_ps]');
-			return await app.ollama.handle_ollama_ps();
+		send_request: () => {
+			console.log('[frontend_action_handlers] sending ollama_ps request');
+		},
+		receive_response: async ({app, data: {output}}) => {
+			console.log('[frontend_action_handlers] received ollama_ps response:', output);
+			await app.ollama.handle_ollama_ps(output);
 		},
 	},
 	ollama_show: {
-		execute: async ({app, data: {input}}) => {
-			console.log('[frontend_action_handlers.ollama_show]', input);
-			return await app.ollama.handle_ollama_show(input);
+		send_request: ({data: {input}}) => {
+			console.log('[frontend_action_handlers] sending ollama_show request:', input);
+		},
+		receive_response: async ({app, data: {input, output}}) => {
+			console.log('[frontend_action_handlers] received ollama_show response:', input, output);
+			await app.ollama.handle_ollama_show(input, output);
 		},
 	},
 	ollama_pull: {
-		execute: async (action_event) => {
-			const {
-				app,
-				data: {input},
-			} = action_event;
-			console.log('[frontend_action_handlers.ollama_pull]', input);
-			// TODO is this the pattern we want?
-			await app.ollama.handle_ollama_pull(input, (progress) => {
-				action_event.update_progress(progress);
-			});
+		send_request: ({data: {input}}) => {
+			console.log('[frontend_action_handlers] sending ollama_pull request:', input);
+		},
+		receive_response: async ({app, data: {input, output}}) => {
+			console.log('[frontend_action_handlers] received ollama_pull response:', input, output);
+			// For now, just mark as complete - progress will come via notifications
+			await app.ollama.handle_ollama_pull(input, () => {});
 		},
 	},
 	ollama_delete: {
-		execute: async ({app, data: {input}}) => {
-			console.log('[frontend_action_handlers.ollama_delete]', input);
+		send_request: ({data: {input}}) => {
+			console.log('[frontend_action_handlers] sending ollama_delete request:', input);
+		},
+		receive_response: async ({app, data: {input}}) => {
+			console.log('[frontend_action_handlers] received ollama_delete response:', input);
 			await app.ollama.handle_ollama_delete(input);
 		},
 	},
 	ollama_copy: {
-		execute: async ({app, data: {input}}) => {
-			console.log('[frontend_action_handlers.ollama_copy]', input);
+		send_request: ({data: {input}}) => {
+			console.log('[frontend_action_handlers] sending ollama_copy request:', input);
+		},
+		receive_response: async ({app, data: {input}}) => {
+			console.log('[frontend_action_handlers] received ollama_copy response:', input);
 			await app.ollama.handle_ollama_copy(input);
 		},
 	},
 	ollama_create: {
-		execute: async ({app, data: {input}}) => {
-			console.log('[frontend_action_handlers.ollama_create]', input);
+		send_request: ({data: {input}}) => {
+			console.log('[frontend_action_handlers] sending ollama_create request:', input);
+		},
+		receive_response: async ({app, data: {input}}) => {
+			console.log('[frontend_action_handlers] received ollama_create response:', input);
 			await app.ollama.handle_ollama_create(input);
+		},
+	},
+
+	ollama_progress: {
+		receive: ({data: {input}}) => {
+			console.log('[frontend_action_handlers] received ollama_progress notification:', input);
+			
+			const meta = input._meta;
+			if (!meta) {
+				console.error('[frontend_action_handlers] ollama_progress missing _meta');
+				return;
+			}
+
+			// Log progress for debugging
+			if (input.total && input.completed) {
+				const percent = Math.round((input.completed / input.total) * 100);
+				console.log(
+					`[frontend_action_handlers] ${meta.operation} ${meta.model}: ${percent}% - ${input.status}`,
+				);
+			} else {
+				console.log(
+					`[frontend_action_handlers] ${meta.operation} ${meta.model}: ${input.status}`,
+				);
+			}
+
+			// TODO: Update UI with progress information
+			// For now, just log the progress
 		},
 	},
 };

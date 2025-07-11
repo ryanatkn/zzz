@@ -3,19 +3,15 @@
 import {z} from 'zod';
 import type {Async_Status} from '@ryanatkn/belt/async.js';
 import {BROWSER, DEV} from 'esm-env';
-import ollama_client from 'ollama/browser';
 import {SvelteSet} from 'svelte/reactivity';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
 import {get_datetime_now} from '$lib/zod_helpers.js';
-import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
 import {
 	OLLAMA_URL,
 	Ollama_Show_Response,
 	Ollama_List_Response,
-	Ollama_Progress_Response,
-	Ollama_Status_Response,
 	Ollama_Ps_Response,
 	Ollama_Ps_Response_Item,
 	Ollama_Create_Request,
@@ -29,9 +25,8 @@ import type {Model, Model_Name} from '$lib/model.svelte.js';
 import {Poller} from '$lib/poller.svelte.js';
 import {create_map_by_property} from '$lib/iterable_helpers.js';
 
-// TODO BLOCK remove client-side usage, no imports to `ollama/browser`
-
-// TODO IDK about the `handle_` prefix for methods called by the action handlers, maybe rethink some things
+// TODO IDK about the `handle_` prefix for methods called by the action handlers, maybe rethink
+// some things
 
 // TODO the async methods need to be de-duped,
 // returning current promises (maybe using deferred pattern),
@@ -45,17 +40,13 @@ export const Ollama_Json = Cell_Json.extend({
 export type Ollama_Json = z.infer<typeof Ollama_Json>;
 export type Ollama_Json_Input = z.input<typeof Ollama_Json>;
 
-export interface Ollama_Options extends Cell_Options<typeof Ollama_Json> {
-	client?: typeof ollama_client;
-}
+export interface Ollama_Options extends Cell_Options<typeof Ollama_Json> {}
 
 /**
  * Ollama client state management with simplified API.
  * Model data is stored in app.models, not here.
  */
 export class Ollama extends Cell<typeof Ollama_Json> {
-	client: typeof ollama_client;
-
 	// Private serializable state
 	#host: string = $state()!;
 
@@ -94,7 +85,8 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 
 	// Manager view state
 	manager_selected_view: 'configure' | 'model' | 'pull' | 'copy' | 'create' = $state('configure');
-	// TODO maybe should be an id and serialized? think about this when dealing with adding routes for navigation
+	// TODO maybe should be an id and serialized? think about this when dealing with adding routes
+	// for navigation
 	manager_selected_model: Model | null = $state(null);
 	manager_last_active_view: {view: string; model: Model | null} | null = $state(null);
 
@@ -197,8 +189,6 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	constructor(options: Ollama_Options) {
 		super(Ollama_Json, options);
 
-		this.client = options.client ?? ollama_client;
-
 		this.#ps_poller = new Poller({
 			poll_fn: () => {
 				if (this.ps_polling_enabled && this.available) {
@@ -212,7 +202,8 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	}
 
 	override dispose(): void {
-		this.#ps_poller.dispose(); // TODO maybe add a generic cell unsubscriber/dispose method collection?
+		this.#ps_poller.dispose(); // TODO maybe add a generic cell unsubscriber/dispose method
+		// collection?
 		super.dispose();
 	}
 
@@ -259,147 +250,112 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	/**
 	 * List all models available on the Ollama server and sync with app.models.
 	 */
-	async handle_ollama_list(): Promise<Ollama_List_Response | null> {
-		if (!BROWSER) return null;
-
-		console.log(`[ollama.handle_ollama_list] listing from: ${this.host}`);
-
-		this.list_status = 'pending';
-		this.list_error = null;
-
-		try {
-			const start_time = Date.now();
-			const response = (await this.client.list()) as unknown as Ollama_List_Response;
-			const end_time = Date.now();
-
-			console.log(
-				`[ollama.handle_ollama_list] success, found ${response.models.length} models`,
-				response,
-			);
-
-			// Parse to log bugs but assign data anyway to avoid breaking the UX
-			if (DEV) {
-				const parsed = Ollama_List_Response.safeParse(response);
-				if (!parsed.success) {
-					console.error(`[ollama.handle_ollama_list] failed to parse:`, parsed.error);
-				}
-			}
-
-			this.list_response = response;
-			this.list_status = 'success';
-			this.list_last_updated = end_time;
-			this.list_round_trip_time = end_time - start_time;
-
-			// Sync with app.models
-			this.#sync_models_with_list_response(response);
-
-			return response;
-		} catch (error) {
-			console.error('[ollama.handle_ollama_list] failed:', error);
-			const error_message = error?.message || UNKNOWN_ERROR_MESSAGE;
+	async handle_ollama_list(response: Ollama_List_Response | null): Promise<void> {
+		if (!response) {
+			console.error('[ollama.handle_ollama_list] no response');
 			this.list_response = null;
-			this.list_error = error_message;
 			this.list_status = 'failure';
+			this.list_error = 'No response from server';
 			this.list_round_trip_time = null;
-
-			return null;
+			return;
 		}
+
+		console.log(
+			`[ollama.handle_ollama_list] success, found ${response.models.length} models`,
+			response,
+		);
+
+		// Parse to log bugs but assign data anyway to avoid breaking the UX
+		if (DEV) {
+			const parsed = Ollama_List_Response.safeParse(response);
+			if (!parsed.success) {
+				console.error(`[ollama.handle_ollama_list] failed to parse:`, parsed.error);
+			}
+		}
+
+		this.list_response = response;
+		this.list_status = 'success';
+		this.list_error = null;
+		this.list_last_updated = Date.now();
+
+		// Sync with app.models
+		this.#sync_models_with_list_response(response);
 	}
 
 	/**
 	 * Get the list of currently running models.
 	 */
-	async handle_ollama_ps(): Promise<Ollama_Ps_Response | null> {
-		if (!BROWSER) return null;
-
-		console.log(`[ollama.handle_ollama_ps] fetching running models from: ${this.host}`);
-
-		this.ps_status = 'pending';
-		this.ps_error = null;
-
-		try {
-			const response = (await this.client.ps()) as unknown as Ollama_Ps_Response;
-			console.log(
-				`[ollama.handle_ollama_ps] success, found ${response.models.length} running models`,
-				response,
-			);
-
-			// Parse to log bugs but assign data anyway to avoid breaking the UX
-			if (DEV) {
-				const parsed = Ollama_Ps_Response.safeParse(response);
-				if (!parsed.success) {
-					console.error(`[ollama.handle_ollama_ps] failed to parse:`, parsed.error);
-				}
-			}
-
-			this.ps_response = response;
-			this.ps_status = 'success';
-
-			return response;
-		} catch (error) {
-			console.error('[ollama.handle_ollama_ps] failed:', error);
-			const error_message = error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE;
-			this.ps_error = error_message;
+	async handle_ollama_ps(response: Ollama_Ps_Response | null): Promise<void> {
+		if (!response) {
+			console.error('[ollama.handle_ollama_ps] no response');
+			this.ps_response = null;
 			this.ps_status = 'failure';
-
-			return null;
+			this.ps_error = 'No response from server';
+			return;
 		}
+
+		console.log(
+			`[ollama.handle_ollama_ps] success, found ${response.models.length} running models`,
+			response,
+		);
+
+		// Parse to log bugs but assign data anyway to avoid breaking the UX
+		if (DEV) {
+			const parsed = Ollama_Ps_Response.safeParse(response);
+			if (!parsed.success) {
+				console.error(`[ollama.handle_ollama_ps] failed to parse:`, parsed.error);
+			}
+		}
+
+		this.ps_response = response;
+		this.ps_status = 'success';
+		this.ps_error = null;
 	}
 
 	/**
 	 * Get detailed information about a specific model.
 	 */
-	async handle_ollama_show(request: Ollama_Show_Request): Promise<Ollama_Show_Response | null> {
-		if (!BROWSER) return null;
-
+	async handle_ollama_show(
+		request: Ollama_Show_Request,
+		response: Ollama_Show_Response | null,
+	): Promise<void> {
 		const model = this.app.models.find_by_name(request.model);
 		if (!model) {
 			console.error(`[ollama.handle_ollama_show] model not found: ${request.model}`);
-			return null;
+			return;
 		}
 		if (model.provider_name !== 'ollama') {
 			console.error(`[ollama.handle_ollama_show] model not an ollama model: ${request.model}`);
-			return null;
+			return;
 		}
 
-		console.log(`[ollama.handle_ollama_show] showing details for: ${request.model}`);
+		if (!response) {
+			console.error(`[ollama.handle_ollama_show] no response for: ${request.model}`);
+			model.ollama_show_response_loading = false;
+			model.ollama_show_response_error = 'No response from server';
+			return;
+		}
 
-		// Update loading state on the model
-		model.ollama_show_response_loading = true;
-		model.ollama_show_response_error = undefined;
+		console.log(`[ollama.handle_ollama_show] success for: ${request.model}`, response);
 
-		try {
-			const response = (await this.client.show(request)) as unknown as Ollama_Show_Response;
-			console.log(`[ollama.handle_ollama_show] success for: ${request.model}`, response);
-
-			// Parse to log bugs but assign data anyway to avoid breaking the UX
-			if (DEV) {
-				const parsed = Ollama_Show_Response.safeParse(response);
-				if (!parsed.success) {
-					console.error(
-						`[ollama.handle_ollama_show] failed to parse for ${request.model}:`,
-						parsed.error,
-					);
-				}
+		// Parse to log bugs but assign data anyway to avoid breaking the UX
+		if (DEV) {
+			const parsed = Ollama_Show_Response.safeParse(response);
+			if (!parsed.success) {
+				console.error(
+					`[ollama.handle_ollama_show] failed to parse for ${request.model}:`,
+					parsed.error,
+				);
 			}
-
-			// Update model with details
-			// TODO maybe remove to avoid bloat? or is it needed for something
-			response.tensors = undefined;
-			model.ollama_show_response = response;
-			model.ollama_show_response_loaded = true;
-			model.ollama_show_response_loading = false;
-
-			return response;
-		} catch (error) {
-			console.error(`[ollama.handle_ollama_show] failed for ${request.model}:`, error);
-			const error_message = error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE;
-
-			model.ollama_show_response_loading = false;
-			model.ollama_show_response_error = error_message;
-
-			return null;
 		}
+
+		// Update model with details
+		// TODO maybe remove to avoid bloat? or is it needed for something
+		response.tensors = undefined;
+		model.ollama_show_response = response;
+		model.ollama_show_response_loaded = true;
+		model.ollama_show_response_loading = false;
+		model.ollama_show_response_error = undefined;
 	}
 
 	/**
@@ -411,42 +367,10 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	): Promise<void> {
 		console.log('[ollama.handle_ollama_pull] pulling:', request);
 
-		if (!BROWSER) return;
-
 		this.pulling_models.add(request.model);
 
-		try {
-			// TODO fix type to remove stream or something
-			const response = await this.client.pull({...request, stream: true});
-			console.log(`[ollama.handle_ollama_pull] streaming started for: ${request.model}`);
-
-			for await (const progress of response) {
-				// console.log(`[ollama.handle_ollama_pull] progress`, progress);
-				if (DEV) {
-					const parsed = Ollama_Progress_Response.safeParse(progress);
-					if (!parsed.success) {
-						console.error(
-							`[ollama.handle_ollama_pull] failed to parse for ${request.model}:`,
-							parsed.error,
-						);
-					}
-				}
-
-				// Update progress via callback if provided
-				console.log(`progress`, progress);
-				update_progress(progress);
-			}
-
-			console.log(`[ollama.handle_ollama_pull] completed`);
-
-			// Refresh model list after successful pull
-			await this.refresh();
-		} catch (error) {
-			console.error(`[ollama.handle_ollama_pull] failed for ${request.model}:`, error);
-			throw error; // Re-throw so action event can handle the error
-		} finally {
-			this.pulling_models.delete(request.model);
-		}
+		// Progress updates will be handled by backend via action events
+		update_progress({status: 'started'});
 	}
 
 	/**
@@ -455,28 +379,8 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	async handle_ollama_delete(request: Ollama_Delete_Request): Promise<void> {
 		console.log(`[ollama.handle_ollama_delete] deleting: ${request.model}`);
 
-		if (!BROWSER) return;
-
-		try {
-			const response = await this.client.delete({model: request.model});
-			console.log(`[ollama.handle_ollama_delete] success for: ${request.model}`, response);
-
-			if (DEV) {
-				const parsed = Ollama_Status_Response.safeParse(response);
-				if (!parsed.success) {
-					console.error(
-						`[ollama.handle_ollama_delete] failed to parse for ${request.model}:`,
-						parsed.error,
-					);
-				}
-			}
-
-			// Refresh model list after successful deletion
-			await this.refresh();
-		} catch (error) {
-			console.error(`[ollama.handle_ollama_delete] failed for ${request.model}:`, error);
-			throw error;
-		}
+		// Refresh model list after successful deletion
+		await this.refresh();
 	}
 
 	/**
@@ -484,9 +388,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	 */
 	async handle_ollama_copy(request: Ollama_Copy_Request): Promise<void> {
 		const {source, destination} = request;
-		console.log(`[ollama.handle_ollama_copy] copying: ${source} → ${destination}`);
-
-		if (!BROWSER) return;
+		console.log(`[ollama.handle_ollama_copy] copying: ${source} ΓåÆ ${destination}`);
 
 		// Check if destination model already exists
 		if (this.model_by_name.has(destination)) {
@@ -495,26 +397,8 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 			throw new Error(error_message);
 		}
 
-		try {
-			const response = await this.client.copy(request);
-			console.log(`[ollama.handle_ollama_copy] success: ${source} → ${destination}`, response);
-
-			if (DEV) {
-				const parsed = Ollama_Status_Response.safeParse(response);
-				if (!parsed.success) {
-					console.error(
-						`[ollama.handle_ollama_copy] failed to parse for ${source} → ${destination}:`,
-						parsed.error,
-					);
-				}
-			}
-
-			// Refresh model list after successful copy
-			await this.refresh();
-		} catch (error) {
-			console.error(`[ollama.handle_ollama_copy] failed for ${source} → ${destination}:`, error);
-			throw error;
-		}
+		// Refresh model list after successful copy
+		await this.refresh();
 	}
 
 	/**
@@ -526,8 +410,6 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	): Promise<void> {
 		console.log(`[ollama.handle_ollama_create] creating: ${request.model}`);
 
-		if (!BROWSER) return;
-
 		// Check if model already exists
 		if (this.model_by_name.has(request.model)) {
 			const error_message = `Model "${request.model}" already exists`;
@@ -535,27 +417,8 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 			throw new Error(error_message);
 		}
 
-		try {
-			// TODO stream so we get progress updates
-			const response = await this.client.create({...request, stream: false});
-			console.log(`[ollama.handle_ollama_create] success for: ${request.model}`, response);
-
-			if (DEV) {
-				const parsed = Ollama_Progress_Response.safeParse(response);
-				if (!parsed.success) {
-					console.error(
-						`[ollama.handle_ollama_create] failed to parse for ${request.model}:`,
-						parsed.error,
-					);
-				}
-			}
-
-			// Refresh model list after successful creation
-			await this.refresh();
-		} catch (error) {
-			console.error(`[ollama.handle_ollama_create] failed for ${request.model}:`, error);
-			throw error;
-		}
+		// Refresh model list after successful creation
+		await this.refresh();
 	}
 
 	/**
@@ -586,7 +449,8 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 		if (!this.pull_can_pull) return;
 
 		try {
-			// TODO makes me think we should mark methods that use the API, maybe just in the generated reference docs
+			// TODO makes me think we should mark methods that use the API, maybe just in the generated
+			// reference docs
 			await this.app.api.ollama_pull({
 				model: this.pull_parsed_model_name,
 				insecure: this.pull_insecure,

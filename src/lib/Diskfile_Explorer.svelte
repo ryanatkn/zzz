@@ -47,7 +47,7 @@
 			await diskfiles.create_file(filename);
 		} catch (error) {
 			console.error('failed to create file:', error);
-			alert(`Failed to create file: ${error}`); // eslint-disable-line no-alert
+			alert(`failed to create file: ${error}`); // eslint-disable-line no-alert
 		}
 	};
 
@@ -64,7 +64,7 @@
 			await diskfiles.create_directory(dirname);
 		} catch (error) {
 			console.error('failed to create folder:', error);
-			alert(`Failed to create folder: ${error}`); // eslint-disable-line no-alert
+			alert(`failed to create folder: ${error}`); // eslint-disable-line no-alert
 		}
 	};
 </script>

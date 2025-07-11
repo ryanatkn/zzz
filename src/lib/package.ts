@@ -1201,6 +1201,7 @@ export const src_json = {
 				{name: 'create_directory_action_spec', kind: 'variable'},
 				{name: 'create_completion_action_spec', kind: 'variable'},
 				{name: 'completion_progress_action_spec', kind: 'variable'},
+				{name: 'ollama_progress_action_spec', kind: 'variable'},
 				{name: 'toggle_main_menu_action_spec', kind: 'variable'},
 				{name: 'ollama_list_action_spec', kind: 'variable'},
 				{name: 'ollama_ps_action_spec', kind: 'variable'},

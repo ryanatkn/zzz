@@ -58,7 +58,7 @@
 				</h2>
 			{/if}
 			<div class="display_flex font_family_mono ml_sm mb_md font_size_lg">
-				<Provider_Link {provider} attrs={{class: 'row gap_sm'}} icon="svg" />
+				<Provider_Link {provider} icon="svg" />
 			</div>
 			{#if model.downloaded !== undefined}
 				<div class="mb_lg">

@@ -14,6 +14,8 @@
 	const strip_count = $derived(tape?.strips.size);
 
 	const empty = $derived(!strip_count);
+
+	// TODO BLOCK this is bugged when choosing a model after disabling the existing tape
 </script>
 
 <!-- TODO the overflow change is hacky, allows the shadow to overlap the sidebar -->

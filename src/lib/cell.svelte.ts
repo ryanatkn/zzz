@@ -361,7 +361,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 				const field_schema = this.field_schemas.get(key);
 				return (field_schema?.parse(value) ?? value) as this[K];
 			} catch (e) {
-				console.error(`Failed to parse branded type for ${key}:`, e);
+				console.error(`failed to parse branded type for ${key}:`, e);
 				return value as this[K];
 			}
 		}
@@ -447,8 +447,8 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 				json: structuredClone(json ? {...current_json, ...json} : current_json),
 			});
 		} catch (error) {
-			console.error(`Failed to clone instance of ${constructor.name}:`, error);
-			throw new Error(`Failed to clone: ${error instanceof Error ? error.message : String(error)}`);
+			console.error(`failed to clone instance of ${constructor.name}:`, error);
+			throw new Error(`failed to clone: ${error instanceof Error ? error.message : String(error)}`);
 		}
 	}
 
@@ -459,7 +459,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 		}
 
 		const instance = this.app.cell_registry.maybe_instantiate(class_name as any, json, options);
-		if (!instance) console.error(`Failed to instantiate ${class_name}`);
+		if (!instance) console.error(`failed to instantiate ${class_name}`);
 		return instance;
 	}
 }

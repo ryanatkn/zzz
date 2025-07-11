@@ -9,6 +9,7 @@ import {Cell_Json} from '$lib/cell_types.js';
 export const Provider_Json = Cell_Json.extend({
 	name: Provider_Name,
 	title: z.string(),
+	// TODO maybe change this to `docs_url` and add `url` for the homepage? and/or some other homepage url property?
 	url: z.string(),
 });
 export type Provider_Json = z.infer<typeof Provider_Json>;
