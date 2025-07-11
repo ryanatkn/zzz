@@ -289,6 +289,7 @@
 	</section>
 	<hr />
 	<Community_Links_Panel />
+	<hr />
 	<section>
 		<Details>
 			{#snippet summary()}package details{/snippet}
@@ -297,6 +298,7 @@
 			</div>
 		</Details>
 	</section>
+	<hr />
 	<section class="mb_xl7">
 		<Footer />
 	</section>
