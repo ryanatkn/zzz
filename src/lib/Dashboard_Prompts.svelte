@@ -32,7 +32,7 @@
 
 	// TODO history of prompt states (opt in snapshots? also autosave?) using cell builtins/helpers, like file state but generalized for all cells? the json-based, set_json stuff
 
-	// TODO BLOCK the reorderable dashed pattern state isn't working for the xml tag input or attributes, same with tape list
+	// TODO BLOCK the reorderable dashed pattern state isn't working for the xml tag input or attributes, same with bits list
 
 	let show_diskfile_picker = $state(false);
 
@@ -97,6 +97,24 @@
 				{/if}
 			</div>
 			<Prompt_List />
+		</div>
+		<div class="mt_lg">
+			<aside>
+				<p>
+					This is a prompt builder UI demo. The goal is to experiement with many such tools, both
+					simpler and more complex.
+				</p>
+				<p>
+					As the system vocabulary and APIs are refined, they should support fast iteration on novel
+					UIs with an increasingly lower technical barrier to entry, accessible to novice TypeScript
+					and Svelte users.
+				</p>
+				<p>
+					Soon I expect you'll be able to choose from numerous tools. <a
+						href="https://github.com/ryanatkn/zzz/discussions">Share</a
+					> your ideas.
+				</p>
+			</aside>
 		</div>
 	</div>
 

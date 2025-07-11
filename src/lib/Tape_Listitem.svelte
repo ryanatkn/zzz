@@ -16,10 +16,17 @@
 	const {tape, chat}: Props = $props();
 
 	const strip_count = $derived(tape.strips.size);
+
+	// TODO BLOCK bugged styles after reordering
+
+	// selected only for the simple view mode where there's multiple tapes
+	const selected = $derived(
+		chat.view_mode === 'simple' && chat.tapes.length > 1 && chat.tapes[0].id === tape.id,
+	);
 </script>
 
 <Tape_Contextmenu {tape}>
-	<div class="tape_summary panel p_xs" class:dormant={!tape.enabled}>
+	<div class="tape_listitem p_xs2" class:dormant={!tape.enabled} class:selected>
 		<div class="row justify_content_space_between gap_xs">
 			<div class="flex_1">
 				<div class="font_weight_600">
@@ -54,7 +61,15 @@
 </Tape_Contextmenu>
 
 <style>
-	.tape_summary:hover {
+	/* TODO hacky styles, see usage, extract reusable parts (classes/components and border variables) */
+	.tape_listitem {
+		border-radius: var(--border_radius_xs);
+		border: var(--border_width_2) var(--border_style) transparent;
+	}
+	.tape_listitem.selected {
+		border-color: var(--border_color_a);
+	}
+	.tape_listitem:hover {
 		background-color: var(--bg_1);
 	}
 </style>
