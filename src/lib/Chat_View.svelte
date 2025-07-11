@@ -44,37 +44,36 @@
 					<Glyph glyph={GLYPH_CHAT} />
 					<Editable_Text bind:value={chat.name} />
 				</div>
-				<div class="column">
-					<small title={chat.created_formatted_datetime}
+				<div class="row">
+					<small class="flex_1" title={chat.created_formatted_datetime}
 						>created {chat.created_formatted_short_date}</small
 					>
-				</div>
-				<div class="row gap_xs py_xs">
-					<Confirm_Button
-						onconfirm={() => chat.id && chats.remove(chat.id)}
-						position="right"
-						attrs={{
-							title: `delete chat "${chat.name}"`,
-							class: 'plain icon_button',
-						}}
-					>
-						<Glyph glyph={GLYPH_DELETE} />
-						{#snippet popover_button_content()}<Glyph glyph={GLYPH_DELETE} />{/snippet}
-					</Confirm_Button>
-					{#if tape_count}
-						<Toggle_Button
-							active={chat.view_mode === 'simple'}
-							active_content="multi"
-							inactive_content="simple"
-							ontoggle={(active) => (chat.view_mode = active ? 'simple' : 'multi')}
+					<div class="row gap_xs py_xs">
+						{#if tape_count}
+							<Toggle_Button
+								active={chat.view_mode === 'simple'}
+								active_content="simple"
+								inactive_content="multi"
+								ontoggle={(active) => (chat.view_mode = active ? 'simple' : 'multi')}
+								attrs={{
+									class: 'plain compact',
+									title: `toggle chat to ${chat.view_mode === 'multi' ? 'simple' : 'multi'} view`,
+								}}
+							>
+								<Glyph glyph={GLYPH_VIEW} attrs={{class: 'mr_xs'}} />
+							</Toggle_Button>
+						{/if}
+						<Confirm_Button
+							onconfirm={() => chat.id && chats.remove(chat.id)}
 							attrs={{
-								class: 'plain compact',
-								title: `toggle chat to ${chat.view_mode === 'multi' ? 'simple' : 'multi'} view`,
+								title: `delete chat "${chat.name}"`,
+								class: 'plain icon_button',
 							}}
 						>
-							<Glyph glyph={GLYPH_VIEW} attrs={{class: 'mr_xs'}} />
-						</Toggle_Button>
-					{/if}
+							<Glyph glyph={GLYPH_DELETE} />
+							{#snippet popover_button_content()}<Glyph glyph={GLYPH_DELETE} />{/snippet}
+						</Confirm_Button>
+					</div>
 				</div>
 			</section>
 		{/if}
