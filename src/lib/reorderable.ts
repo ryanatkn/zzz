@@ -305,8 +305,8 @@ export class Reorderable implements Reorderable_Style_Config {
 		// Walk up the DOM to find the item element
 		let current: HTMLElement | null = target;
 		while (current && current !== this.list_node) {
-			// Check if this element has a data-reorderable-item-id attribute
-			const item_id = current.dataset.reorderableItemId as Reorderable_Item_Id | undefined;
+			// Check if this element has a reorderable_item_id data attribute
+			const item_id = current.dataset.reorderable_item_id as Reorderable_Item_Id | undefined;
 			if (item_id) {
 				const index = this.indices.get(item_id);
 				const element = this.elements.get(item_id);
@@ -543,7 +543,7 @@ export class Reorderable implements Reorderable_Style_Config {
 			// Add the list class and identifier
 			if (this.list_class) node.classList.add(this.list_class);
 			node.setAttribute('role', 'list');
-			node.dataset.reorderableListId = this.id;
+			node.dataset.reorderable_list_id = this.id;
 
 			// Use requestAnimationFrame for initialization - allows all items to register first
 			// because the order isn't always guaranteed
@@ -559,7 +559,7 @@ export class Reorderable implements Reorderable_Style_Config {
 				// Remove the list class and data attribute
 				if (this.list_class) node.classList.remove(this.list_class);
 				node.removeAttribute('role');
-				delete node.dataset.reorderableListId;
+				delete node.dataset.reorderable_list_id;
 
 				// Reset state
 				this.list_node = null;
@@ -582,15 +582,15 @@ export class Reorderable implements Reorderable_Style_Config {
 			const {index} = params;
 
 			// Generate a unique item id if not already present
-			let item_id = node.dataset.reorderableItemId as Reorderable_Item_Id | undefined;
+			let item_id = node.dataset.reorderable_item_id as Reorderable_Item_Id | undefined;
 			if (!item_id) {
 				item_id = `i${create_client_id()}`;
-				node.dataset.reorderableItemId = item_id;
+				node.dataset.reorderable_item_id = item_id;
 			}
 			node.setAttribute('draggable', 'true');
 			if (this.item_class) node.classList.add(this.item_class);
 			node.setAttribute('role', 'listitem');
-			node.dataset.reorderableListId = this.id;
+			node.dataset.reorderable_list_id = this.id;
 
 			if (this.initialized) {
 				// If already initialized, add directly to maps
@@ -614,8 +614,8 @@ export class Reorderable implements Reorderable_Style_Config {
 				if (this.item_class) node.classList.remove(this.item_class);
 				node.removeAttribute('role');
 				node.removeAttribute('draggable');
-				delete node.dataset.reorderableListId;
-				delete node.dataset.reorderableItemId;
+				delete node.dataset.reorderable_list_id;
+				delete node.dataset.reorderable_item_id;
 
 				// Clean up indicator state if needed
 				if (this.active_indicator_item_id === item_id) {

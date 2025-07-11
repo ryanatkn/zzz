@@ -160,7 +160,7 @@ describe('Reorderable', () => {
 			expect(reorderable.list_params).toEqual({onreorder: mock_callback});
 			expect(list.classList.contains(reorderable.list_class!)).toBe(true);
 			expect(list.getAttribute('role')).toBe('list');
-			expect(list.dataset.reorderableListId).toBe(reorderable.id);
+			expect(list.dataset.reorderable_list_id).toBe(reorderable.id);
 		});
 
 		test('re-attachment changes callbacks', () => {
@@ -192,7 +192,7 @@ describe('Reorderable', () => {
 			expect(reorderable.list_params).toBeNull();
 			expect(list.classList.contains(reorderable.list_class!)).toBe(false);
 			expect(list.hasAttribute('role')).toBe(false);
-			expect(list.dataset.reorderableListId).toBeUndefined();
+			expect(list.dataset.reorderable_list_id).toBeUndefined();
 		});
 	});
 
@@ -219,11 +219,11 @@ describe('Reorderable', () => {
 			expect(item.classList.contains(reorderable.item_class!)).toBe(true);
 			expect(item.getAttribute('draggable')).toBe('true');
 			expect(item.getAttribute('role')).toBe('listitem');
-			expect(item.dataset.reorderableItemId).toBeDefined();
-			expect(item.dataset.reorderableListId).toBe(reorderable.id);
+			expect(item.dataset.reorderable_item_id).toBeDefined();
+			expect(item.dataset.reorderable_list_id).toBe(reorderable.id);
 
 			// Either in pending items or regular maps
-			const item_id = item.dataset.reorderableItemId as Reorderable_Item_Id;
+			const item_id = item.dataset.reorderable_item_id as Reorderable_Item_Id;
 			const is_indexed = reorderable.initialized
 				? reorderable.indices.has(item_id)
 				: reorderable.pending_items.some((p) => p.id === item_id);
@@ -235,7 +235,7 @@ describe('Reorderable', () => {
 			const cleanup1 = attach_item(reorderable, item, {index: 0});
 
 			// Get the item id
-			const item_id = item.dataset.reorderableItemId as Reorderable_Item_Id;
+			const item_id = item.dataset.reorderable_item_id as Reorderable_Item_Id;
 
 			// Check initial index
 			if (reorderable.initialized) {
@@ -250,7 +250,7 @@ describe('Reorderable', () => {
 			cleanup_fn = attach_item(reorderable, item, {index: 5});
 
 			// Get the new item id after re-attachment
-			const new_item_id = item.dataset.reorderableItemId as Reorderable_Item_Id;
+			const new_item_id = item.dataset.reorderable_item_id as Reorderable_Item_Id;
 
 			// Check if index was updated in the appropriate storage
 			if (reorderable.initialized) {
@@ -264,7 +264,7 @@ describe('Reorderable', () => {
 		test('destroy cleans up', () => {
 			cleanup_fn = attach_item(reorderable, item, {index: 0});
 
-			const item_id = item.dataset.reorderableItemId as Reorderable_Item_Id;
+			const item_id = item.dataset.reorderable_item_id as Reorderable_Item_Id;
 
 			// Before destroy
 			expect(item.classList.contains(reorderable.item_class!)).toBe(true);
@@ -277,8 +277,8 @@ describe('Reorderable', () => {
 			expect(item.classList.contains(reorderable.item_class!)).toBe(false);
 			expect(item.hasAttribute('draggable')).toBe(false);
 			expect(item.hasAttribute('role')).toBe(false);
-			expect(item.dataset.reorderableItemId).toBeUndefined();
-			expect(item.dataset.reorderableListId).toBeUndefined();
+			expect(item.dataset.reorderable_item_id).toBeUndefined();
+			expect(item.dataset.reorderable_list_id).toBeUndefined();
 
 			// Item should be removed from storage
 			const still_pending = reorderable.pending_items.some((p) => p.id === item_id);
@@ -302,7 +302,7 @@ describe('Reorderable', () => {
 
 			// Set up item
 			cleanup_fn = attach_item(reorderable, item, {index: 0});
-			item_id = item.dataset.reorderableItemId as Reorderable_Item_Id;
+			item_id = item.dataset.reorderable_item_id as Reorderable_Item_Id;
 
 			// Manually add the element to the elements map to fix the test
 			reorderable.elements.set(item_id, item);
@@ -374,7 +374,7 @@ describe('Reorderable', () => {
 
 		test('dragstart sets up source item', () => {
 			// Get item id
-			const item_id = items[0].dataset.reorderableItemId as Reorderable_Item_Id;
+			const item_id = items[0].dataset.reorderable_item_id as Reorderable_Item_Id;
 
 			// Create mock event
 			const mock_data_transfer = {
@@ -396,7 +396,7 @@ describe('Reorderable', () => {
 
 		test('dragend resets state', () => {
 			// Set up drag state manually
-			const item_id = items[0].dataset.reorderableItemId as Reorderable_Item_Id;
+			const item_id = items[0].dataset.reorderable_item_id as Reorderable_Item_Id;
 			reorderable.source_index = 0;
 			reorderable.source_item_id = item_id;
 			items[0].classList.add(reorderable.dragging_class!);
@@ -470,7 +470,7 @@ describe('Reorderable', () => {
 			const outer_action = {destroy: outer_cleanup};
 
 			// Get outer item id
-			const outer_id = outer_item.dataset.reorderableItemId as Reorderable_Item_Id;
+			const outer_id = outer_item.dataset.reorderable_item_id as Reorderable_Item_Id;
 
 			// Force initialization
 			force_initialize(reorderable);
@@ -516,7 +516,7 @@ describe('Reorderable', () => {
 
 			// Set up source item (index 0)
 			reorderable.source_index = 0;
-			reorderable.source_item_id = items[0].dataset.reorderableItemId as Reorderable_Item_Id;
+			reorderable.source_item_id = items[0].dataset.reorderable_item_id as Reorderable_Item_Id;
 
 			// Mock drop event on item 1 (should be prevented)
 			const drop_event1 = create_mock_drag_event('drop', items[1]);
@@ -552,12 +552,12 @@ describe('Reorderable', () => {
 			force_initialize(reorderable);
 
 			// Set up source item (index 0)
-			const source_id = items[0].dataset.reorderableItemId as Reorderable_Item_Id;
+			const source_id = items[0].dataset.reorderable_item_id as Reorderable_Item_Id;
 			reorderable.source_index = 0;
 			reorderable.source_item_id = source_id;
 
 			// Apply indicators to another item
-			const other_id = items[1].dataset.reorderableItemId as Reorderable_Item_Id;
+			const other_id = items[1].dataset.reorderable_item_id as Reorderable_Item_Id;
 			reorderable.update_indicator(other_id, 'bottom');
 
 			expect(items[1].classList.contains(reorderable.drag_over_class!)).toBe(true);
