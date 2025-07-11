@@ -102,7 +102,7 @@
 			<div class="pt_lg" out:blur={{duration: 1000}}>
 				<aside>
 					<p>
-						This is a prompt builder UI demo. The goal is to experiement with many such tools, both
+						This is a prompt builder UI demo. The goal is to experiment with many such tools, both
 						simpler and more complex. Similarly, we'll explore variants of the chat interface.
 					</p>
 					<p>
@@ -143,9 +143,12 @@
 						</small>
 					</div>
 					<div class="row gap_xs py_xs">
+						<Copy_To_Clipboard text={app.prompts.selected.content} attrs={{class: 'plain'}} />
+						<div class="flex_1">
+							<Prompt_Stats prompt={app.prompts.selected} />
+						</div>
 						<Confirm_Button
 							onconfirm={() => app.prompts.selected && app.prompts.remove(app.prompts.selected)}
-							position="right"
 							attrs={{
 								title: `delete prompt "${app.prompts.selected.name}"`,
 								class: 'plain icon_button',
@@ -154,8 +157,6 @@
 							<Glyph glyph={GLYPH_DELETE} />
 							{#snippet popover_button_content()}<Glyph glyph={GLYPH_DELETE} />{/snippet}
 						</Confirm_Button>
-						<Copy_To_Clipboard text={app.prompts.selected.content} attrs={{class: 'plain'}} />
-						<Prompt_Stats prompt={app.prompts.selected} />
 					</div>
 					<Content_Preview content={app.prompts.selected.content} />
 				</section>

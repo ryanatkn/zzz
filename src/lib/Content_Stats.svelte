@@ -8,7 +8,7 @@
 	const {token_count}: Props = $props();
 </script>
 
-<div class="display_flex gap_xs px_xs font_family_mono font_size_sm">
+<div class="display_flex gap_xs font_family_mono font_size_sm">
 	{#if !token_count}
 		&nbsp;
 	{:else}

@@ -32,6 +32,8 @@
 	};
 
 	let show_bit_picker = $state(false);
+
+	// TODO BLOCK sequence bits are broken, add bit doesn't work
 </script>
 
 <div class="row justify_content_space_between mb_xs">
