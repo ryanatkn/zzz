@@ -28,6 +28,8 @@
 
 	const app = frontend_context.get();
 
+	// TODO hovering/selecting bits should show them hovered/selected in both the grid and list
+
 	// TODO clicking the bits should select them, and then selected one should show its name input (or just on hover/tap? what signifier?)
 
 	// TODO history of prompt states (opt in snapshots? also autosave?) using cell builtins/helpers, like file state but generalized for all cells? the json-based, set_json stuff
