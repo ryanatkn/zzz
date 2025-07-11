@@ -65,7 +65,8 @@
 						browser.browserified = true;
 					}
 				}}>pretend it's all a dream</button
-			> (that's just the current keybinding, likely to change)
+			> -- that's just the current keybinding, it's likely to change, also see the little button in the
+			bottom left corner of this window.
 		</p>
 		<p>
 			This simple change recontextualizes the web's UX - instead of the browser being its own silo,
