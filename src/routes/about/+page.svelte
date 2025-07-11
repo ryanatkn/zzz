@@ -4,6 +4,7 @@
 	import Community_Links_Panel from '@ryanatkn/fuz/Community_Links_Panel.svelte';
 	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
 	import {base} from '$app/paths';
+	import Details from '@ryanatkn/fuz/Details.svelte';
 
 	import {pkg_context} from '$lib/pkg.js';
 	import External_Link from '$lib/External_Link.svelte';
@@ -289,9 +290,12 @@
 	<hr />
 	<Community_Links_Panel />
 	<section>
-		<div class="panel p_md width_md">
-			<Package_Detail {pkg} />
-		</div>
+		<Details>
+			{#snippet summary()}package details{/snippet}
+			<div class="panel p_md width_md">
+				<Package_Detail {pkg} />
+			</div>
+		</Details>
 	</section>
 	<section class="mb_xl7">
 		<Footer />
