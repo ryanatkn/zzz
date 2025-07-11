@@ -84,7 +84,7 @@
 				>, <External_Link href="https://github.com/danny-avila/LibreChat">LibreChat</External_Link>,
 				and <External_Link href="https://github.com/oobabooga/text-generation-webui"
 					>Text generation web UI</External_Link
-				> -- this is the starting point so I can ship something I use for work (the
+				> -- this is the starting point so I can ship something I use at work (the
 				<a href="{base}/prompts">prompt</a> builder is the main thing)
 			</li>
 			<li>
