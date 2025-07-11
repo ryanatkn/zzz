@@ -1,5 +1,5 @@
 <script lang="ts">
-	import {scale, fade} from 'svelte/transition';
+	import {fade, blur} from 'svelte/transition';
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
 	import {random_item} from '@ryanatkn/belt/random.js';
 
@@ -98,24 +98,33 @@
 			</div>
 			<Prompt_List />
 		</div>
-		<div class="mt_lg">
-			<aside>
-				<p>
-					This is a prompt builder UI demo. The goal is to experiement with many such tools, both
-					simpler and more complex.
-				</p>
-				<p>
-					As the system vocabulary and APIs are refined, they should support fast iteration on novel
-					UIs with an increasingly lower technical barrier to entry, accessible to novice TypeScript
-					and Svelte users.
-				</p>
-				<p>
-					Soon I expect you'll be able to choose from numerous tools. <a
-						href="https://github.com/ryanatkn/zzz/discussions">Share</a
-					> your ideas.
-				</p>
-			</aside>
-		</div>
+		{#if app.prompts.show_tutorial}
+			<div class="pt_lg" out:blur={{duration: 1000}}>
+				<aside>
+					<p>
+						This is a prompt builder UI demo. The goal is to experiement with many such tools, both
+						simpler and more complex. Similarly, we'll explore variants of the chat interface.
+					</p>
+					<p>
+						As the system vocabulary and APIs are refined, they should support fast iteration on
+						novel UIs with an increasingly lower technical barrier to entry, accessible to novice
+						TypeScript and Svelte users.
+					</p>
+					<p>
+						Soon I expect you'll be able to choose from numerous tools on this page. <a
+							href="https://github.com/ryanatkn/zzz/discussions">Share</a
+						> your ideas.
+					</p>
+					<button
+						type="button"
+						class="compact"
+						onclick={() => {
+							app.prompts.show_tutorial = false;
+						}}>got it</button
+					>
+				</aside>
+			</div>
+		{/if}
 	</div>
 
 	{#if app.prompts.selected}
@@ -201,7 +210,7 @@
 						style:grid-template-columns="repeat(auto-fill, minmax(300px, 1fr))"
 					>
 						{#each app.prompts.selected.bits as bit (bit.id)}
-							<li in:scale>
+							<li in:fade>
 								<!-- the extra wrapper makes the grid items not stretch vertically -->
 								<div class="bg border_radius_xs p_sm">
 									<Bit_View {bit} />

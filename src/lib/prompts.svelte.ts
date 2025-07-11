@@ -21,6 +21,7 @@ export const Prompts_Json = Cell_Json.extend({
 	),
 	selected_id: z.string().nullable().default(null),
 	show_sort_controls: z.boolean().default(false),
+	show_tutorial: z.boolean().default(true),
 });
 export type Prompts_Json = z.infer<typeof Prompts_Json>;
 export type Prompts_Json_Input = z.input<typeof Prompts_Json>;
@@ -82,7 +83,9 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 	);
 
 	/** Controls visibility of sort controls in the prompts list. */
-	show_sort_controls: boolean = $state(false);
+	show_sort_controls: boolean = $state()!;
+
+	show_tutorial: boolean = $state()!;
 
 	/** Ordered array of prompts derived from the `manual_order` index. */
 	readonly ordered_items: Array<Prompt> = $derived(this.items.derived_index('manual_order'));

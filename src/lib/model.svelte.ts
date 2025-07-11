@@ -13,7 +13,7 @@ export type Model_Name = z.infer<typeof Model_Name>;
 export const Model_Json = Cell_Json.extend({
 	// TODO consider whether we should support one model with multiple providers,
 	// or individual models per provider, currently we expect
-	// `name` to be unique across providers and this should be changed,
+	// `name` to be unique across providers and this needs to change,
 	// I think it's like chats/prompts/etc, names should not be unique,
 	// unless we think they're more like file paths? `provider_name/model_name` seems good for `path`?
 	// that would make model/provider name like filenames, makes sense
