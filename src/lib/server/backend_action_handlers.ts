@@ -63,14 +63,9 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 	},
 
 	create_completion: {
-		receive_request: async ({
-			backend,
-			data: {
-				input: {_meta, ...input}, // TODO @many maybe extract `_meta` upstream bc it's an MCP thing, or maybe dont extract meta at all
-			},
-		}) => {
+		receive_request: async ({backend, data: {input}}) => {
 			const {prompt, provider_name, model, completion_messages} = input.completion_request;
-			const progress_token = _meta?.progressToken;
+			const progress_token = input._meta?.progressToken;
 
 			console.log(
 				'[backend_action_handlers.create_completion.receive_request] progress_token:',
@@ -300,16 +295,12 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 	},
 
 	ollama_pull: {
-		receive_request: async ({
-			backend,
-			data: {
-				input: {_meta, ...input}, // TODO @many maybe extract `_meta` upstream bc it's an MCP thing, or maybe dont extract meta at all
-			},
-		}) => {
+		receive_request: async ({backend, data: {input}}) => {
 			console.log(`[backend_action_handlers.ollama_pull.receive_request] pulling: ${input.model}`);
+			const {_meta, ...params} = input;
 
 			try {
-				const response = await ollama.pull({...input, stream: true});
+				const response = await ollama.pull({...params, stream: true});
 
 				for await (const progress of response) {
 					// Send progress updates to frontend
@@ -388,21 +379,14 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 	},
 
 	ollama_create: {
-		receive_request: async ({
-			backend,
-			data: {
-				input: {_meta, ...input}, // TODO @many maybe extract `_meta` upstream bc it's an MCP thing, or maybe dont extract meta at all
-			},
-		}) => {
+		receive_request: async ({backend, data: {input}}) => {
 			console.log(
 				`[backend_action_handlers.ollama_create.receive_request] creating: ${input.model}`,
 			);
+			const {_meta, ...params} = input;
 
 			try {
-				const response = await ollama.create({
-					...input,
-					stream: true,
-				});
+				const response = await ollama.create({...params, stream: true});
 
 				for await (const progress of response) {
 					// Send progress updates to frontend

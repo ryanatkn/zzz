@@ -143,7 +143,7 @@
 		</section>
 	{:else if model.ollama_show_response}
 		<section class="display_flex flex_column gap_md">
-			<!-- Basic Info -->
+			<!-- basic info -->
 			{#if model.ollama_show_response.details}
 				<div class="display_grid gap_sm" style:grid-template-columns="auto 1fr">
 					<h5 class="my_0">capabilities:</h5>
@@ -184,15 +184,7 @@
 				</div>
 			{/if}
 
-			<!-- Template -->
-			{#if model.ollama_show_response.template}
-				<div>
-					<h5>template:</h5>
-					<pre><code>{model.ollama_show_response.template}</code></pre>
-				</div>
-			{/if}
-
-			<!-- Model Info -->
+			<!-- model info -->
 			{#if model.ollama_show_response.model_info && Object.keys(model.ollama_show_response.model_info).length > 0}
 				<div>
 					<h5>model info:</h5>
@@ -200,15 +192,23 @@
 				</div>
 			{/if}
 
-			<!-- License -->
-			{#if model.ollama_show_response.license}
+			<!-- template -->
+			{#if model.ollama_show_response.template}
 				<div>
-					<h5>license:</h5>
-					<pre><code>{model.ollama_show_response.license}</code></pre>
+					<h5>template:</h5>
+					<pre><code>{model.ollama_show_response.template}</code></pre>
 				</div>
 			{/if}
 
-			<!-- Modelfile -->
+			<!-- license -->
+			{#if model.ollama_show_response.license}
+				<Details attrs={{class: 'mt_xl3'}}>
+					{#snippet summary()}<h5 class="display_inline">license:</h5>{/snippet}
+					<pre><code>{model.ollama_show_response.license}</code></pre>
+				</Details>
+			{/if}
+
+			<!-- modelfile -->
 			{#if model.ollama_show_response.modelfile}
 				<Details attrs={{class: 'mt_xl3'}}>
 					{#snippet summary()}<h5 class="display_inline">modelfile:</h5>{/snippet}

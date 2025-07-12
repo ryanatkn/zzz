@@ -18,6 +18,7 @@
 
 	interface Props {
 		href: string;
+		// TODO maybe dont default to external?
 		/** Set to false to disable external link behavior. */
 		open_externally?: boolean | undefined;
 		attrs?: SvelteHTMLElements['a'] | undefined;

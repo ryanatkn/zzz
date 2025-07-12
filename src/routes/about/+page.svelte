@@ -117,29 +117,32 @@
 		</p>
 		<p>
 			This scope may look far-fetched, and it is to me, but I'm just making tools that I want to use
-			now on the best foundations I can assemble. Software has a way of accumulating into more than
-			the sum of its parts over time, when designed for it. It will take time though, because I
+			now on the best foundations I can assemble. When designed for it, software has a way of
+			accumulating into more than the sum of its parts. It will take time though, because I
 			prioritize quality over velocity, and the project's resources are meager, having only my
-			donated time right now -- of quality/velocity/cost, pick 2. I think the most successful
-			version of Zzz is where it's used to build products that people care about, and it fades into
-			the background as just another part of the stack with a particular take (right now, the scope
-			of that part is hard to define, as it borgs its tendrils into things).
+			donated time right now -- of quality/velocity/cost, pick 2. A consequence is I can't really
+			compete on features in the medium term, and working alone isn't the best. I think the most
+			successful version of Zzz is where people use it to build products that people care about,
+			where devs build whatever custom stuff on a community-supported stack, and Zzz fades into the
+			background as just another part of the stack with a particular take.
 		</p>
 		<p>
-			From a personal POV, Zzz is the primary user of my lower level software (Fuz/Moss/Gro), and
-			the primary dependency of my planned products (websites/apps/etc, idk, I don't like
-			operations). Many of the initial systems have been designed with some thought towards this
-			bigger picture, and I plan to continue building incrementally on a quality base with some
-			lower-quality experiments and stubbed future features mixed in.
+			From a personal POV, Zzz is the primary user of my lower level software (Fuz/Moss/Gro/others),
+			and it's the primary dependency of my planned products (websites/apps/etc, idk what I'm going
+			to do exactly, I'm hestitant to involve myself with operating services -- I imagine Zzz
+			Browser or something will be the planned Electron app). Many of the initial systems have been
+			designed with some thought towards this bigger picture, trying to make Zzz reusable and
+			reasonably tightly designed not sprawling, and I plan to continue building incrementally on a
+			quality base with some lower-quality experiments and stubbed future features mixed in.
+			(increasingly I'll experiment outside of the main codebase now that it's been announced)
 		</p>
-		<p>Compared it to low|nocode, the main difference is we ship optimal .</p>
 		<p>
 			Zzz wants to be easy to use and inclusive of people and devices, but try as it might, it can't
 			cater to every case for every person -- however, thanks to the magic of standards-based
-			interoperability, Zzz works with all websites like you'd expect from a browser, and anything
-			you make with Zzz works with other browsers and web technologies. It's one of infinite ways to
-			use the web, and it's designed to help you level up your technical knowledge and abilities, if
-			you're so inclined.
+			interoperability, as a browser Zzz works with all websites, and anything you make with Zzz
+			works with other browsers and web technologies. It's one of infinite ways to use the web, and
+			it's designed to help you level up your technical knowledge and abilities, if you're so
+			inclined.
 		</p>
 		<p>Some early (rough) integrations include:</p>
 		<ul>
@@ -165,66 +168,75 @@
 				>, plays a key coordinating role -- Hono bases itself on web standards and supports all JS
 				server runtimes
 			</li>
+		</ul>
+		<p>Planned integrations:</p>
+		<ul>
 			<li>
-				planned:
+				<!-- TODO @db -->
+				<External_Link href="https://github.com/electric-sql/pglite">pglite</External_Link>
+				and full <External_Link href="https://www.postgresql.org/">Postgres</External_Link> when desired,
+				using <External_Link href="https://github.com/porsager/postgres">Postgres.js</External_Link>
+				and probably <External_Link href="https://github.com/drizzle-team/drizzle-orm"
+					>Drizzle</External_Link
+				>, see <External_Link href="https://github.com/ryanatkn/zzz/issues/7"
+					>issue #7</External_Link
+				>
+			</li>
+			<li>
+				<External_Link href="https://modelcontextprotocol.io/">Model Context Protocol</External_Link
+				>, maybe others like <External_Link href="https://github.com/google/A2A"
+					>Agent2Agent (A2A) protocol</External_Link
+				>
+			</li>
+			<li>
+				<External_Link href="https://wikipedia.org/wiki/RSS">RSS</External_Link> and <External_Link
+					href="https://wikipedia.org/wiki/Atom_(web_standard)">Atom</External_Link
+				> and <External_Link href="https://wikipedia.org/wiki/JSON_Feed">JSON Feed</External_Link>
+			</li>
+			<li>
+				<External_Link href="https://activitypub.rocks/">ActivityPub</External_Link>
+				and
+				<External_Link href="https://atproto.com/">AT Protocol</External_Link>
+			</li>
+			<li>
+				I think it makes sense to prioritize a few high-utility integrations for manipulating media
+				files, like <External_Link href="https://pandoc.org/">Pandoc</External_Link>,
+				<External_Link href="https://ffmpeg.org/">ffmpeg</External_Link>, and <External_Link
+					href="https://imagemagick.org/">ImageMagick</External_Link
+				>
+			</li>
+			<li>
+				more, input welcome
 				<ul>
 					<li>
-						<!-- TODO @db -->
-						<External_Link href="https://github.com/electric-sql/pglite">pglite</External_Link>
-						and full <External_Link href="https://www.postgresql.org/">Postgres</External_Link> when
-						desired, using <External_Link href="https://github.com/porsager/postgres"
-							>Postgres.js</External_Link
-						> and probably <External_Link href="https://github.com/drizzle-team/drizzle-orm"
-							>Drizzle</External_Link
-						>, see <External_Link href="https://github.com/ryanatkn/zzz/issues/7"
-							>issue #7</External_Link
-						>
+						the system is being designed for extensibility, so your use cases are helpful for
+						shaping it
 					</li>
+					<li>devs can extend Zzz to do anything but I want to provide a thoughtful base tool</li>
 					<li>
-						<External_Link href="https://modelcontextprotocol.io/"
-							>Model Context Protocol</External_Link
-						>, maybe others like <External_Link href="https://github.com/google/A2A"
-							>Agent2Agent (A2A) protocol</External_Link
-						>
+						some decisions like Postgres lock us into a region of the possibility space in some
+						respects -- you can always bring other databases but don't expect full integration, e.g.
+						there is a serious mismatch with sqlite
 					</li>
-					<li>
-						<External_Link href="https://wikipedia.org/wiki/RSS">RSS</External_Link> and <External_Link
-							href="https://wikipedia.org/wiki/Atom_(web_standard)">Atom</External_Link
-						> and <External_Link href="https://wikipedia.org/wiki/JSON_Feed"
-							>JSON Feed</External_Link
-						>
-					</li>
-					<li>
-						<External_Link href="https://activitypub.rocks/">ActivityPub</External_Link>
-						and
-						<External_Link href="https://atproto.com/">AT Protocol</External_Link>
-					</li>
-					<li>
-						I think it makes sense to prioritize a few high-utility integrations for manipulating
-						media files, like <External_Link href="https://pandoc.org/">Pandoc</External_Link>,
-						<External_Link href="https://ffmpeg.org/">ffmpeg</External_Link>, and <External_Link
-							href="https://imagemagick.org/">ImageMagick</External_Link
-						>
-					</li>
-					<li>more, please send thoughts</li>
 				</ul>
 			</li>
 		</ul>
 		<p>
 			Zzz is one implementation of an increasingly common idea that combines web tech and AI with
-			powerful open clients. Some related projects call themselves web UIs or even operating
-			systems. I currently like word "environment" to describe the device+software UX, and "adaptive
-			web environments" to get the bigger picture. Whatever the name, this class of app is something
-			that I've been wanting for a long time, and I appear to be sticking with this iteration.
+			powerful open clients. Some related projects call themselves web UIs, AI browsers, or even
+			operating systems. I currently like word "environment" to describe the device+software UX, and
+			"adaptive web environments" to get the bigger picture. Whatever the name, this class of app is
+			something that I've been wanting for a long time, and I appear to be sticking with this
+			iteration.
 		</p>
 		<p>
-			If this sounds interesting and you would like to test out some broken pre-release software,
+			If this sounds interesting and you would like to test out some rickety pre-release software,
 			feedback is appreciated to help make it work for you -- see the <External_Link
 				href="https://github.com/ryanatkn/zzz">code</External_Link
 			>,
 			<External_Link href="https://github.com/ryanatkn/zzz/issues">issues</External_Link>, and
 			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link>,
-			and find me on my website or
+			and find me on my <External_Link href="https://www.ryanatkn.com/">website</External_Link> or
 			<External_Link href="https://bsky.app/profile/ryanatkn.com">Bluesky</External_Link>.
 		</p>
 	</section>
@@ -240,7 +252,7 @@
 			</li>
 			<li>
 				I'm looking for <a href="https://www.ryanatkn.com/funding">funding</a> to sustain my continued
-				full-time work - if successful, I think Zzz will be stewarded by some kind of nonprofit, and
+				full-time work -- if successful, I think Zzz will be stewarded by some kind of nonprofit, and
 				I'm open to employment that sponsors at least part-time work on Zzz and its dependencies (without
 				changing the independence I have over my repos)
 			</li>

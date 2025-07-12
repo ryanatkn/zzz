@@ -12,7 +12,7 @@ import type {
 	Completion_Role,
 } from '$lib/completion_types.js';
 
-// TODO rename? is more like a message, maybe `Tape_Message`, idk, maybe rethink "tape" too
+// TODO BLOCK rename? is more like a message, bits are maybe parts and strips have many bits, maybe `Tape_Message`, idk, maybe rethink "tape" too
 
 export interface Strip_Options extends Cell_Options<typeof Strip_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
