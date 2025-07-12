@@ -58,22 +58,21 @@
 		<p>
 			The software I imagine answering these questions is cross-platform so it runs everywhere, and
 			for that we have the web with HTML, CSS, and JS. We want to solve problems once and have
-			supported features work consistently across operating systems and devices. For all its flaws
-			and quirks, the web is the turf of our digital commons, and I believe it's capable of
-			delivering a great UX when developers use it with care.
+			supported features work consistently across operating systems and devices, without dependence
+			on any one company. For all its flaws and quirks, the web is the turf of our digital commons,
+			and I believe it's capable of delivering a great UX when developers use it with care.
 		</p>
 		<p>
-			When thinking about the web UX I want, my starting point is the user interface, because we're
-			all users interfacing with machines. UX has primacy; the design serves it first. We want no
-			compromises when it comes to control over our UI runtime, so this means we're using JS
-			(thankfully, TypeScript). Zzz uses JS to glue software and machines together precisely the way
-			you want, maximizing its utility on any device across the full stack. It can run locally on
-			your machine using any of your available and granted capabilities, or it can deploy anywhere
-			JS runs to play whatever role you need.
+			In Zzz we assume UX has primacy and should inform decisions with emphasis. Is HTML/CSS/JS
+			actually the best choice for UX? To some degree it's the pragmatic choice; the web's adoption
+			is second to none, so we choose distribution over performance and perfection.
 		</p>
 		<p>
-			Zzz is based on many kinds of software, borrowing features to provide end-users and devs an
-			integrated and extensible system:
+			Zzz uses JS to glue software and machines together precisely the way the user wants,
+			maximizing its utility on any device across the full stack. It can run locally on your machine
+			using any of your available and granted capabilities, or it can deploy anywhere JS runs to
+			play whatever role is needed. It's based on many kinds of software, borrowing features to
+			provide end-users and devs an integrated and extensible system:
 		</p>
 		<ul>
 			<li>
@@ -209,7 +208,7 @@
 						the system is being designed for extensibility, so your use cases are helpful for
 						shaping it
 					</li>
-					<li>devs can extend Zzz to do anything but I want to provide a thoughtful base tool</li>
+					<li>devs can extend Zzz to do anything but it should provide useful defaults</li>
 					<li>
 						some decisions like Postgres lock us into a region of the possibility space in some
 						respects -- you can always bring other databases but don't expect full integration, e.g.
@@ -223,7 +222,7 @@
 			powerful open clients. Some related projects call themselves web UIs, AI browsers, or even
 			operating systems. I currently like word "environment" to describe the device+software UX, and
 			"adaptive web environments" to get the bigger picture. Whatever the name or scope, I'll
-			continue making modular software that can be used to build them.
+			continue making modular software for building them.
 		</p>
 		<p>
 			If this sounds interesting and you would like to test out some rickety pre-release software,
@@ -294,71 +293,77 @@
 	<section>
 		<h2 class="mb_lg">Security</h2>
 		<aside>
-			⚠️ I am not a security professional and Zzz is not audited -- treat it as possibly dangerous
-			to run -- and any claims I make possibly misinformed
+			⚠️ I am not a security professional and Zzz is not audited, it may be dangerous to run and I
+			may be wrong about some things (in my estimation it's secure but I can't say for sure)
 		</aside>
 		<p>
-			User agency requires reliable security, and I think the topic is worth a footnote in this
-			otherwise high-level document. Zzz is an extensible system, and that means it carries
-			important risks that must be managed.
+			Zzz is a powerful and extensible system, and that means its has additional security risks
+			beyond normal web apps. Although it can be used to build simple and secure websites, the Zzz
+			server is capable like an IDE and can do bad things when bidden.
 		</p>
 		<p>
-			Zzz does its best to put the user in control, so one must have the ability to install what
-			they wish, including obvious_malware. That leads me to UX design as a primary mechanism of
-			influence to protect users, and design systems that maximize utility while simultaneously
-			designing for safe usage.
+			Zzz puts the user in control, so one must have the ability to install whatever one wishes,
+			including obvious_malware. This basic tension between power and safety leads me to think that
+			UX design should be a primary mechanism of influence to protect users -- instead of
+			restricting power, we'll design for its safe usage. Every person and situation may have a
+			different threat model, so we want to make it easy to choose agency, where lazy is secure.
 		</p>
-		<p>For now, I'm trying to keep things simple:</p>
+		<p>For now, I'm trying to keep things simple given the target capabilities:</p>
 		<ul>
-			<li>
-				The frontend <External_Link
-					href="https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Content_Security_Policy"
-					>CSP</External_Link
-				> is fairly locked down, closing many vectors like unknown network connections. For details,
-				see the CSP config in <External_Link
-					href="https://github.com/ryanatkn/zzz/blob/main/svelte.config.js"
-					>svelte.config.js</External_Link
-				> and the <External_Link href="https://www.fuz.dev/docs/csp">Fuz CSP docs</External_Link>.
-				We'll need to add config options, unlocking shenanigans good and bad, so we'll tread
-				carefully. But at least we start from secure footing.
-			</li>
 			<li>
 				Zzz's Node server can do things like:
 				<ul>
 					<li>
-						read and write to the configured filesystem directory, <code>./</code>
-						in production and <code>../</code> in development, securely scoped and does not follow symlinks
-						-- this could potentially be disastrous, so don't give it a directory you treasure
+						read and write to the configured filesystem directory, defaults to <code>./.zzz</code>
+						in the <code>ZZZ_DIR</code> (which defaults to <code>./</code>), and is securely scoped
+						(does not follow symlinks) -- this opens a significant surface area for both you and
+						attackers to use, and it can be lead to arbitrary code execution if, for example, you're
+						running a hot reloading dev server in that directory
 					</li>
 					<li>
 						use your API keys for calls to Claude, ChatGPT, and Gemini -- $$ risk of lost credits
 					</li>
-					<li>
-						call Ollama's API if available -- low risk but can devour your disk space and hog gpu
-					</li>
+					<li>call Ollama's API if available -- low consequences</li>
+					<li>soon, more integrations including terminal access, which has huge consequences</li>
 				</ul>
 			</li>
 			<li>
-				any modules you install via npm, or any code you add to the src directory, carry the normal
-				(elevated) risks associated with development -- I practice good dependency <External_Link
+				There are no mechanisms for end-users to load executable code or instructions/config.
+				Developers have full control, of course. Node is currently the only supported way to use
+				Zzz. We'll develop a plugin API so people can make reusable integrations, and distribution
+				will be through npm. Any modules you install via npm, or any code you add to the src
+				directory (did you configure Zzz to be able to write to it?), carry the normal (elevated)
+				risks associated with development. I try to practice good dependency <External_Link
 					href="https://github.com/ryanatkn/fuz_template/issues/1">hygiene</External_Link
-				>, and to give you an idea of my taste, postinstall scripts drive me nuts, like how dare you
-				lol please _just_ the data
+				>, and to give you an idea of my taste, the existence of postinstall scripts drives me nuts.
+			</li>
+			<li>
+				The frontend <External_Link
+					href="https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Content_Security_Policy"
+					>CSP</External_Link
+				> is fairly locked down, including blocking all unknown network connections. For details, see
+				the CSP config in <External_Link
+					href="https://github.com/ryanatkn/zzz/blob/main/svelte.config.js"
+					>svelte.config.js</External_Link
+				> and the <External_Link href="https://www.fuz.dev/docs/csp">Fuz CSP docs</External_Link>.
+				We'll need to add config options, unlocking shenanigans good and bad, so we'll tread
+				carefully. But at least we start from secure footing here.
 			</li>
 			<li>
 				In 2025, LLMs are known to be vulnerable to attacks like <External_Link
 					href="https://wikipedia.org/wiki/Prompt_injection">prompt injection</External_Link
-				>, where they are unable to reliably separate instructions intended by the prompter from
-				adversarial instructions in the data. People are building digital horrors. Zzz will develop
-				slowly here so you stay in control but yall, MCP is <External_Link
+				>, where they are unable to reliably discern instructions intended by the prompter from
+				adversarial instructions in the data. People are building digital horrors. MCP's utility is
+				high, it's <External_Link
 					href="https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/"
 					attrs={{
 						title:
 							'Simon Willison’s Weblog: The lethal trifecta for AI agents: private data, untrusted content, and external communication',
-					}}>wild</External_Link
-				>
+					}}>wildly insecure</External_Link
+				> in some cases. Zzz will integrate LLMs into its own functionality slowly and carefully (currently
+				the only LLM app integration is using a local model to name new chats).
 			</li>
-			<li>I'm trying to be careful but I will make mistakes, help is always appreciated</li>
+			<li>I prioritize security but I will make mistakes, help is always appreciated</li>
 		</ul>
 	</section>
 	<hr />
