@@ -48,9 +48,7 @@
 				href="https://wikipedia.org/wiki/Enshittification">enshittification</External_Link
 			> is a widely-understood phenomenon among the very-online, Zzz asks:
 		</p>
-		<blockquote>
-			"How can composable computing environments transform user agency in the age of AI?"
-		</blockquote>
+		<blockquote>"How can we build the best software to support user agency with AI?"</blockquote>
 		<p>or with less true-believer energy and more detail:</p>
 		<blockquote>
 			"What becomes possible when web users move from exploitative service-controlled spaces to
@@ -224,18 +222,15 @@
 			Zzz is one implementation of an increasingly common idea that combines web tech and AI with
 			powerful open clients. Some related projects call themselves web UIs, AI browsers, or even
 			operating systems. I currently like word "environment" to describe the device+software UX, and
-			"adaptive web environments" to get the bigger picture. Whatever the name, this class of app is
-			something that I've been wanting for a long time, and I appear to be sticking with this
-			iteration.
+			"adaptive web environments" to get the bigger picture. Whatever the name or scope, I'll
+			continue making modular software that can be used to build them.
 		</p>
 		<p>
 			If this sounds interesting and you would like to test out some rickety pre-release software,
-			feedback is appreciated to help make it work for you -- see the <External_Link
-				href="https://github.com/ryanatkn/zzz">code</External_Link
-			>,
-			<External_Link href="https://github.com/ryanatkn/zzz/issues">issues</External_Link>, and
-			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link>,
-			and find me on my <External_Link href="https://www.ryanatkn.com/">website</External_Link> or
+			feedback is appreciated to help make it work for you -- see the
+			<External_Link href="https://github.com/ryanatkn/zzz/issues">issues</External_Link> and
+			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link> or
+			see my <External_Link href="https://www.ryanatkn.com/">website</External_Link> or
 			<External_Link href="https://bsky.app/profile/ryanatkn.com">Bluesky</External_Link>.
 		</p>
 	</section>
@@ -245,10 +240,7 @@
 		<ul>
 			<li>Zzz is open source and permissively licensed, and forking is encouraged</li>
 			<li>it's a noncommercial project and its only official domain is zzz.software</li>
-			<li>
-				the Zzz name/logos/IP are community property, just don't falsely represent the official Zzz
-				project or zzz.software
-			</li>
+			<li>the Zzz name/logos/IP are community property, no rug to pull</li>
 			<li>
 				I'm looking for <a href="https://www.ryanatkn.com/funding">funding</a> to sustain my continued
 				full-time work -- if successful, I think Zzz will be stewarded by some kind of nonprofit, and
@@ -301,42 +293,73 @@
 	<hr />
 	<section>
 		<h2 class="mb_lg">Security</h2>
-		<p class="mb_md">
-			User agency requires security, and I think it's worth including in this otherwise high-level
-			document, because extensible systems have risks that must be managed. Anything you can do can
-			be done against your desire when the system thinks you're the one doing it. But things get
-			very messy in the real world, and this messiness compounds infinitely with LLMs in the
-			equation.
+		<aside>
+			⚠️ I am not a security professional and Zzz is not audited -- treat it as possibly dangerous
+			to run -- and any claims I make possibly misinformed
+		</aside>
+		<p>
+			User agency requires reliable security, and I think the topic is worth a footnote in this
+			otherwise high-level document. Zzz is an extensible system, and that means it carries
+			important risks that must be managed.
+		</p>
+		<p>
+			Zzz does its best to put the user in control, so one must have the ability to install what
+			they wish, including obvious_malware. That leads me to UX design as a primary mechanism of
+			influence to protect users, and design systems that maximize utility while simultaneously
+			designing for safe usage.
 		</p>
 		<p>For now, I'm trying to keep things simple:</p>
 		<ul>
 			<li>
-				running Zzz as a developer opens up filesystem access to its configured directory (`./` in
-				production, `../` in development), and carries the normal risks with API keys being stored
-				in env files
-			</li>
-			<li>
-				any modules you install via npm, or any code you add to the src directory, carry the normal
-				(elevated) risks associated with development
+				The frontend <External_Link
+					href="https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Content_Security_Policy"
+					>CSP</External_Link
+				> is fairly locked down, closing many vectors like unknown network connections. For details,
+				see the CSP config in <External_Link
+					href="https://github.com/ryanatkn/zzz/blob/main/svelte.config.js"
+					>svelte.config.js</External_Link
+				> and the <External_Link href="https://www.fuz.dev/docs/csp">Fuz CSP docs</External_Link>.
+				We'll need to add config options, unlocking shenanigans good and bad, so we'll tread
+				carefully. But at least we start from secure footing.
 			</li>
 			<li>
 				Zzz's Node server can do things like:
 				<ul>
-					<li>read and write to the configured filesystem directory</li>
-					<li>use Ollama's API if it's installed locally</li>
-					<li>use your API keys for Claude, ChatGPT, and Gemini</li>
+					<li>
+						read and write to the configured filesystem directory, <code>./</code>
+						in production and <code>../</code> in development, securely scoped and does not follow symlinks
+						-- this could potentially be disastrous, so don't give it a directory you treasure
+					</li>
+					<li>
+						use your API keys for calls to Claude, ChatGPT, and Gemini -- $$ risk of lost credits
+					</li>
+					<li>
+						call Ollama's API if available -- low risk but can devour your disk space and hog gpu
+					</li>
 				</ul>
 			</li>
+			<li>
+				any modules you install via npm, or any code you add to the src directory, carry the normal
+				(elevated) risks associated with development -- I practice good dependency <External_Link
+					href="https://github.com/ryanatkn/fuz_template/issues/1">hygiene</External_Link
+				>, and to give you an idea of my taste, postinstall scripts drive me nuts, like how dare you
+				lol please _just_ the data
+			</li>
+			<li>
+				In 2025, LLMs are known to be vulnerable to attacks like <External_Link
+					href="https://wikipedia.org/wiki/Prompt_injection">prompt injection</External_Link
+				>, where they are unable to reliably separate instructions intended by the prompter from
+				adversarial instructions in the data. People are building digital horrors. Zzz will develop
+				slowly here so you stay in control but yall, MCP is <External_Link
+					href="https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/"
+					attrs={{
+						title:
+							'Simon Willison’s Weblog: The lethal trifecta for AI agents: private data, untrusted content, and external communication',
+					}}>wild</External_Link
+				>
+			</li>
+			<li>I'm trying to be careful but I will make mistakes, help is always appreciated</li>
 		</ul>
-		<p>
-			I am not a fan of the privacy and security realities of app stores and browser extensions.
-			These extensible capabilities enable widespread ongoing exploitation. But in Zzz, the user is
-			in control, so one must have the ability to install such things. So, I turn to UX design as
-			the primary mechanism of influence for protection, and design systems that maximize the user's
-			ability to affect them. (technically this includes designing for security, e.g. post install
-			Node scripts drive me nuts)
-		</p>
-		<p>I'm trying to be careful but I will make mistakes.</p>
 	</section>
 	<hr />
 	<Community_Links_Panel />

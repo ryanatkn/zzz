@@ -58,13 +58,16 @@
 			to
 			<button
 				type="button"
-				class="inline compact color_d"
+				class="inline compact"
+				class:color_d={app.ui.show_sidebar}
+				class:color_f={!app.ui.show_sidebar}
 				onclick={() => {
 					app.ui.toggle_sidebar();
 					if (!browser.browserified) {
 						browser.browserified = true;
 					}
-				}}>pretend it's all a dream</button
+				}}
+				>{#if !app.ui.show_sidebar}un{/if}pretend it's all a dream</button
 			> -- that's just the current keybinding, it's likely to change, also see the little button in the
 			bottom left corner of this window.
 		</p>
