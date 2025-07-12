@@ -40,8 +40,8 @@
 		<p>
 			Zzz, pronounced "zees" like bees, is a fullstack web toolkit with a focus on user power and
 			experimentation. The idea is to make an integrated cross-platform environment that adapts to
-			your needs and intent while remaining fully open, aligned, and in your control. It's a
-			flexible toolkit for crafting experiences with maximal UX and streamlined DX.
+			your needs and intent while remaining fully open, aligned, and in your control. It's flexible
+			software for crafting experiences with maximal UX and streamlined DX.
 		</p>
 		<p>
 			In the technology landscape of 2025, where LLM-based AI is upending long held assumptions, and <External_Link
