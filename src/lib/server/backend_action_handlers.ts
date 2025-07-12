@@ -63,15 +63,13 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 	},
 
 	create_completion: {
-		receive_request: async (action_event) => {
-			const {
-				backend,
-				data: {input},
-			} = action_event;
-			const {
-				completion_request: {prompt, provider_name, model, completion_messages},
-				_meta,
-			} = input;
+		receive_request: async ({
+			backend,
+			data: {
+				input: {_meta, ...input}, // TODO @many maybe extract `_meta` upstream bc it's an MCP thing, or maybe dont extract meta at all
+			},
+		}) => {
+			const {prompt, provider_name, model, completion_messages} = input.completion_request;
 			const progress_token = _meta?.progressToken;
 
 			console.log(
@@ -305,7 +303,7 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 		receive_request: async ({
 			backend,
 			data: {
-				input: {_meta, ...input}, // TODO @many maybe extract `_meta` upstream bc it's an MCP thing
+				input: {_meta, ...input}, // TODO @many maybe extract `_meta` upstream bc it's an MCP thing, or maybe dont extract meta at all
 			},
 		}) => {
 			console.log(`[backend_action_handlers.ollama_pull.receive_request] pulling: ${input.model}`);
@@ -322,11 +320,7 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 						digest: progress.digest,
 						total: progress.total,
 						completed: progress.completed,
-						_meta: {
-							operation: 'pull',
-							model: input.model,
-							progressToken: _meta?.progressToken,
-						},
+						_meta: {progressToken: _meta?.progressToken},
 					});
 				}
 
@@ -397,7 +391,7 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 		receive_request: async ({
 			backend,
 			data: {
-				input: {_meta, ...input}, // TODO @many maybe extract `_meta` upstream bc it's an MCP thing
+				input: {_meta, ...input}, // TODO @many maybe extract `_meta` upstream bc it's an MCP thing, or maybe dont extract meta at all
 			},
 		}) => {
 			console.log(
@@ -419,11 +413,7 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 						digest: progress.digest,
 						total: progress.total,
 						completed: progress.completed,
-						_meta: {
-							operation: 'create',
-							model: input.model,
-							progressToken: _meta?.progressToken,
-						},
+						_meta: {progressToken: _meta?.progressToken},
 					});
 				}
 

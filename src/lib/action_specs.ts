@@ -206,14 +206,7 @@ export const ollama_progress_action_spec = {
 	auth: null,
 	side_effects: true,
 	input: Ollama_Progress_Response.extend({
-		_meta: z
-			.object({
-				operation: z.enum(['pull', 'create']),
-				model: z.string(),
-				progressToken: Uuid.optional(),
-			})
-			.passthrough()
-			.optional(),
+		_meta: z.object({progressToken: Uuid.optional()}).passthrough().optional(),
 	}).strict(),
 	output: z.void(),
 	async: true,

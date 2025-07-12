@@ -208,16 +208,6 @@ export const frontend_action_handlers: Frontend_Action_Handlers = {
 				return;
 			}
 
-			// Log progress for debugging
-			if (input.total && input.completed) {
-				const percent = Math.round((input.completed / input.total) * 100);
-				console.log(
-					`[frontend_action_handlers] ${meta.operation} ${meta.model}: ${percent}% - ${input.status}`,
-				);
-			} else {
-				console.log(`[frontend_action_handlers] ${meta.operation} ${meta.model}: ${input.status}`);
-			}
-
 			// TODO refactor probably
 			// If we have a progress token, update the corresponding action
 			const progress_token = meta.progressToken;
