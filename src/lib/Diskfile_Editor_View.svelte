@@ -101,8 +101,10 @@
 
 			<div class="p_md">
 				<aside>
-					⚠️ This filesystem interface is an early proof of concept and lacks most features you'd
-					expect, more soon.
+					⚠️ <small
+						>This filesystem interface is an early proof of concept and lacks most features you'd
+						expect, more soon.</small
+					>
 				</aside>
 			</div>
 		</div>

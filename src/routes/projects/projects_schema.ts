@@ -15,8 +15,8 @@ export type Domain_Json_Input = z.input<typeof Domain_Json>;
 // Page schema
 export const Page_Json = Cell_Json.extend({
 	path: z.string().default('/'),
-	title: z.string().default('New Page'),
-	content: z.string().default('# New Page\n\nAdd your content here.'),
+	title: z.string().default('New page'),
+	content: z.string().default('# New page\n\nAdd your content here.'),
 });
 export type Page_Json = z.infer<typeof Page_Json>;
 export type Page_Json_Input = z.input<typeof Page_Json>;

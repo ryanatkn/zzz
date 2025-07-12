@@ -133,6 +133,7 @@
 						{diskfile}
 						{selected}
 						onselect={(diskfile, hard) => {
+							// TODO this needs to navigate to the path of the file (so should be a link, not this onselect callback)
 							diskfiles.select(diskfile.id, hard);
 						}}
 					/>

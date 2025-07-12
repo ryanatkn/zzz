@@ -9,17 +9,17 @@
 **[zzz.software](https://www.zzz.software/)**
 
 Zzz, pronounced "zees" like bees,
-is a fullstack toolkit for adaptive web environments.
-The idea is to make a cross-platform software environment that adapts to your needs and intent
-while remaining fully open, aligned, and in your control. It's a flexible toolkit
-for consuming and creating content, developing web software,
-and crafting experiences with uncompromising UX and DX.
+is a fullstack web toolkit with a focus on user power and experimentation.
+The idea is to make an integrated cross-platform environment
+that adapts to your needs and intent
+while remaining fully open, aligned, and in your control.
+It's a flexible toolkit for crafting experiences with maximal UX and streamlined DX.
+
+More at [zzz.software/about](https://www.zzz.software/about).
 
 This is an early stage project and the ideas are still developing -
 see the issues and [discussions](https://github.com/ryanatkn/zzz/discussions)
 or @ me on [Bluesky](https://bsky.app/profile/ryanatkn.com).
-
-More at [zzz.software/about](https://www.zzz.software/about).
 
 ## Setup
 

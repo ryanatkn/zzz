@@ -41,5 +41,7 @@
 		</ul>
 	</nav>
 
-	<aside>⚠️⚠️ speculative demo</aside>
+	<aside title="huh I might take quality vibecoded PRs, but probably in a new repo">
+		⚠️ <small>speculative demo</small> ⚠️
+	</aside>
 </aside>

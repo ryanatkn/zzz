@@ -39,10 +39,9 @@
 		</aside>
 		<p>
 			Zzz, pronounced "zees" like bees, is a fullstack web toolkit with a focus on user power and
-			experimentation. The idea is to make a cross-platform software environment that adapts to your
-			needs and intent while remaining fully open, aligned, and in your control. It's a flexible
-			toolkit for crafting experiences and tools with maximal UX and DX, like developing web
-			software for creating and consuming content.
+			experimentation. The idea is to make an integrated cross-platform environment that adapts to
+			your needs and intent while remaining fully open, aligned, and in your control. It's a
+			flexible toolkit for crafting experiences with maximal UX and streamlined DX.
 		</p>
 		<p>
 			In the technology landscape of 2025, where LLM-based AI is upending long held assumptions, and <External_Link
@@ -298,6 +297,46 @@
 				}}
 			/>
 		</button>
+	</section>
+	<hr />
+	<section>
+		<h2 class="mb_lg">Security</h2>
+		<p class="mb_md">
+			User agency requires security, and I think it's worth including in this otherwise high-level
+			document, because extensible systems have risks that must be managed. Anything you can do can
+			be done against your desire when the system thinks you're the one doing it. But things get
+			very messy in the real world, and this messiness compounds infinitely with LLMs in the
+			equation.
+		</p>
+		<p>For now, I'm trying to keep things simple:</p>
+		<ul>
+			<li>
+				running Zzz as a developer opens up filesystem access to its configured directory (`./` in
+				production, `../` in development), and carries the normal risks with API keys being stored
+				in env files
+			</li>
+			<li>
+				any modules you install via npm, or any code you add to the src directory, carry the normal
+				(elevated) risks associated with development
+			</li>
+			<li>
+				Zzz's Node server can do things like:
+				<ul>
+					<li>read and write to the configured filesystem directory</li>
+					<li>use Ollama's API if it's installed locally</li>
+					<li>use your API keys for Claude, ChatGPT, and Gemini</li>
+				</ul>
+			</li>
+		</ul>
+		<p>
+			I am not a fan of the privacy and security realities of app stores and browser extensions.
+			These extensible capabilities enable widespread ongoing exploitation. But in Zzz, the user is
+			in control, so one must have the ability to install such things. So, I turn to UX design as
+			the primary mechanism of influence for protection, and design systems that maximize the user's
+			ability to affect them. (technically this includes designing for security, e.g. post install
+			Node scripts drive me nuts)
+		</p>
+		<p>I'm trying to be careful but I will make mistakes.</p>
 	</section>
 	<hr />
 	<Community_Links_Panel />
