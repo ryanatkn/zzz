@@ -15,6 +15,9 @@ import {
 } from '$lib/reorderable_helpers.js';
 import {create_client_id} from '$lib/helpers.js';
 
+// TODO BLOCK this breaks styles for elements that are hovered while dragging another element,
+// can we make the element modifications less intrusive?
+
 export type Reorderable_Id = Flavored<string, 'Reorderable_Id'>;
 export type Reorderable_Item_Id = Flavored<string, 'Reorderable_Item_Id'>;
 

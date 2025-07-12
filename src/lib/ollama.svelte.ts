@@ -380,7 +380,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	 */
 	async handle_ollama_copy(request: Ollama_Copy_Request): Promise<void> {
 		const {source, destination} = request;
-		console.log(`[ollama.handle_ollama_copy] copying: ${source} ΓåÆ ${destination}`);
+		console.log(`[ollama.handle_ollama_copy] copying: ${source} --> ${destination}`);
 
 		// Check if destination model already exists
 		if (this.model_by_name.has(destination)) {

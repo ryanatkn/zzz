@@ -17,6 +17,7 @@ import type {
 export interface Strip_Options extends Cell_Options<typeof Strip_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 
 export class Strip extends Cell<typeof Strip_Json> {
+	// TODO looking at A2A, I think the best mapping is Strip::Message and Bit::Part, but this is 1:1 with bits right now
 	bit_id: Uuid = $state()!;
 	tape_id: Uuid | null | undefined = $state();
 	role: Completion_Role = $state()!;

@@ -215,36 +215,35 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 		},
 	},
 
+	// these work but are too noisy right now, maybe at a debug level?
+
 	// TODO @api think about logging, validation, or other processing
-	filer_change: {
-		send: ({data: {input}}) => {
-			console.log(
-				'[backend_action_handlers.filer_change.send] sending filer_change notification',
-				input.source_file.id,
-				input.change,
-			);
-		},
-	},
+	// filer_change: {
+	// 	send: ({data: {input}}) => {
+	// 		console.log(
+	// 			'[backend_action_handlers.filer_change.send] sending filer_change notification',
+	// 			input,
+	// 		);
+	// 	},
+	// },
 
-	completion_progress: {
-		send: ({data: {input}}) => {
-			console.log(
-				'[backend_action_handlers.completion_progress.send] sending completion_progress notification',
-				input._meta?.progressToken,
-				input.chunk,
-			);
-		},
-	},
+	// completion_progress: {
+	// 	send: ({data: {input}}) => {
+	// 		console.log(
+	// 			'[backend_action_handlers.completion_progress.send] sending completion_progress notification',
+	// 			input,
+	// 		);
+	// 	},
+	// },
 
-	ollama_progress: {
-		send: ({data: {input}}) => {
-			console.log(
-				'[backend_action_handlers.ollama_progress.send] sending ollama_progress notification',
-				input._meta,
-				input.status,
-			);
-		},
-	},
+	// ollama_progress: {
+	// 	send: ({data: {input}}) => {
+	// 		console.log(
+	// 			'[backend_action_handlers.ollama_progress.send] sending ollama_progress notification',
+	// 			input,
+	// 		);
+	// 	},
+	// },
 
 	// Ollama action handlers
 	ollama_list: {
@@ -303,7 +302,12 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 	},
 
 	ollama_pull: {
-		receive_request: async ({backend, data: {input}}) => {
+		receive_request: async ({
+			backend,
+			data: {
+				input: {_meta, ...input}, // TODO @many maybe extract `_meta` upstream bc it's an MCP thing
+			},
+		}) => {
 			console.log(`[backend_action_handlers.ollama_pull.receive_request] pulling: ${input.model}`);
 
 			try {
@@ -321,7 +325,7 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 						_meta: {
 							operation: 'pull',
 							model: input.model,
-							progressToken: input._meta?.progressToken,
+							progressToken: _meta?.progressToken,
 						},
 					});
 				}
@@ -368,18 +372,18 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 		receive_request: async ({data: {input}}) => {
 			const {source, destination} = input;
 			console.log(
-				`[backend_action_handlers.ollama_copy.receive_request] copying: ${source} ΓåÆ ${destination}`,
+				`[backend_action_handlers.ollama_copy.receive_request] copying: ${source} --> ${destination}`,
 			);
 
 			try {
 				await ollama.copy(input);
 				console.log(
-					`[backend_action_handlers.ollama_copy.receive_request] success: ${source} ΓåÆ ${destination}`,
+					`[backend_action_handlers.ollama_copy.receive_request] success: ${source} --> ${destination}`,
 				);
 				return undefined;
 			} catch (error) {
 				console.error(
-					`[backend_action_handlers.ollama_copy.receive_request] failed for ${source} ΓåÆ ${destination}:`,
+					`[backend_action_handlers.ollama_copy.receive_request] failed for ${source} --> ${destination}:`,
 					error,
 				);
 				throw jsonrpc_errors.internal_error(
@@ -390,7 +394,12 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 	},
 
 	ollama_create: {
-		receive_request: async ({backend, data: {input}}) => {
+		receive_request: async ({
+			backend,
+			data: {
+				input: {_meta, ...input}, // TODO @many maybe extract `_meta` upstream bc it's an MCP thing
+			},
+		}) => {
 			console.log(
 				`[backend_action_handlers.ollama_create.receive_request] creating: ${input.model}`,
 			);
@@ -413,7 +422,7 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 						_meta: {
 							operation: 'create',
 							model: input.model,
-							progressToken: input._meta?.progressToken,
+							progressToken: _meta?.progressToken,
 						},
 					});
 				}
