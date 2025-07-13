@@ -139,8 +139,8 @@
 			Zzz wants to be easy to use and inclusive of people and devices, but try as it might, it can't
 			cater to every case for every person, and I must admit it favors power users -- however,
 			thanks to the magic of standards-based interoperability, anything you make with Zzz works with
-			other browsers and web technologies. It's only one of countless ways to use the web, and plays
-			nicely with others.
+			other browsers and web technologies. It's only one of countless ways to use the web, and tries
+			to play nicely with others.
 		</p>
 		<p>Some early (rough) integrations include:</p>
 		<ul>
