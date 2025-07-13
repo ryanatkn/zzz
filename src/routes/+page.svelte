@@ -24,6 +24,6 @@
 
 <Dashboard_Home />
 
-<footer class="box py_xl9">
+<div class="box py_xl9">
 	<Footer />
-</footer>
+</div>

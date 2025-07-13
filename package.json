@@ -1203,10 +1203,10 @@
       "types": "./dist/zod_helpers.d.ts",
       "default": "./dist/zod_helpers.js"
     },
-    "./Zzz_Root.svelte": {
-      "types": "./dist/Zzz_Root.svelte.d.ts",
-      "svelte": "./dist/Zzz_Root.svelte",
-      "default": "./dist/Zzz_Root.svelte"
+    "./Frontend_Root.svelte": {
+      "types": "./dist/Frontend_Root.svelte.d.ts",
+      "svelte": "./dist/Frontend_Root.svelte",
+      "default": "./dist/Frontend_Root.svelte"
     }
   }
 }

@@ -1029,10 +1029,10 @@ export const package_json = {
 		},
 		'./xml.js': {types: './dist/xml.d.ts', default: './dist/xml.js'},
 		'./zod_helpers.js': {types: './dist/zod_helpers.d.ts', default: './dist/zod_helpers.js'},
-		'./Zzz_Root.svelte': {
-			types: './dist/Zzz_Root.svelte.d.ts',
-			svelte: './dist/Zzz_Root.svelte',
-			default: './dist/Zzz_Root.svelte',
+		'./Frontend_Root.svelte': {
+			types: './dist/Frontend_Root.svelte.d.ts',
+			svelte: './dist/Frontend_Root.svelte',
+			default: './dist/Frontend_Root.svelte',
 		},
 	},
 } satisfies Package_Json;
@@ -2754,8 +2754,8 @@ export const src_json = {
 				{name: 'stringify_zod_error', kind: 'function'},
 			],
 		},
-		'./Zzz_Root.svelte': {
-			path: 'Zzz_Root.svelte',
+		'./Frontend_Root.svelte': {
+			path: 'Frontend_Root.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
 		},
 	},

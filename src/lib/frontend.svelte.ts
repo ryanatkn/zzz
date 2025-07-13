@@ -78,7 +78,7 @@ export interface Frontend_Options extends Omit_Strict<Cell_Options<typeof Fronte
 
 /**
  * The base frontend app, typically used by creating your own `App extends Frontend`.
- * Gettable with `frontend_context.get()` inside a `<Zzz_Root>`.
+ * Gettable with `frontend_context.get()` inside a `<Frontend_Root>`.
  */
 export class Frontend extends Cell<typeof Frontend_Json> implements Action_Event_Environment {
 	readonly executor: Action_Executor = 'frontend';

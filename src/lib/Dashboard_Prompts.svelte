@@ -103,7 +103,7 @@
 		{#if app.prompts.show_tutorial}
 			<div class="pt_lg" out:blur={{duration: 1000}}>
 				<!-- TODO is there no end value param? -->
-				<aside out:scale={{duration: 24000}}>
+				<aside out:scale={{duration: 44000}}>
 					<p>
 						This is a prompt builder UI demo. The goal is to experiment with many such tools, both
 						simpler and more complex. Similarly, we'll explore variants of the chat interface.
