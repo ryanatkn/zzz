@@ -128,19 +128,17 @@
 		</p>
 		<p>
 			From a personal POV, Zzz is the primary user of my lower level software (Fuz/Moss/Gro/others),
-			and it's the primary dependency of my planned products (websites/apps/etc, but I like a simple
-			life and I do not like operations so idk). Many of the initial systems have been designed with
-			some thought towards this bigger picture, trying to make Zzz reusable and reasonably tight,
-			and I plan to continue building incrementally on a quality base with some lower-quality
-			experiments and stubbed future features mixed in. (increasingly I'll experiment outside of the
-			main codebase now that it's been announced)
+			and it's the primary dependency of some planned websites and apps. Many of the initial systems
+			have been designed with some thought towards this bigger picture, trying to make Zzz reusable
+			and well-scoped, and I plan to continue building incrementally on a quality base with some
+			lower-quality experiments and stubbed future features mixed in. (increasingly I'll experiment
+			outside of the main codebase now that it's been announced)
 		</p>
 		<p>
 			Zzz wants to be easy to use and inclusive of people and devices, but try as it might, it can't
 			cater to every case for every person, and I must admit it favors power users -- however,
-			thanks to the magic of standards-based interoperability, as a browser Zzz works with all
-			websites, and anything you make with Zzz works with other browsers and web technologies. It's
-			one of infinite ways to use the web.
+			thanks to the magic of standards-based interoperability, anything you make with Zzz works with
+			other browsers and web technologies. It's one of countless ways to use the web.
 		</p>
 		<p>Some early (rough) integrations include:</p>
 		<ul>
@@ -148,8 +146,7 @@
 				<External_Link href="https://github.com/ollama/ollama">Ollama</External_Link> runs AI models
 				locally -- more local LLM backends will be supported starting with <External_Link
 					href="https://github.com/ggml-org/llama.cpp">llama.cpp</External_Link
-				> which Ollama is based on -- Ollama prioritizes ease of use, so although you have to install
-				it yourself separately, they make it about as easy as possible
+				> which Ollama is based on -- Ollama makes installation and onboarding very easy
 			</li>
 			<li>
 				<External_Link href="https://github.com/openai/openai-node">ChatGPT</External_Link>,
@@ -157,14 +154,14 @@
 					>Claude</External_Link
 				>, and <External_Link href="https://github.com/google-gemini/generative-ai-js"
 					>Gemini</External_Link
-				> -- requires you to bring your own API keys
+				> -- these require API keys
 			</li>
 			<li>
-				<External_Link href="https://hono.dev/">Hono</External_Link> as the web server with
+				<External_Link href="https://hono.dev/">Hono</External_Link> as the backend web server with
 				<External_Link href="https://svelte.dev/">SvelteKit</External_Link> and <External_Link
 					href="https://vite.dev/">Vite</External_Link
 				>, plays a key coordinating role -- Hono bases itself on web standards and supports all JS
-				server runtimes
+				server runtimes; Zzz deploys it locally and in the cloud
 			</li>
 		</ul>
 		<p>Planned integrations:</p>
@@ -196,6 +193,7 @@
 				and
 				<External_Link href="https://atproto.com/">AT Protocol</External_Link>
 			</li>
+			<li>Git</li>
 			<li>
 				I think it makes sense to prioritize a few high-utility integrations for manipulating media
 				files, like <External_Link href="https://pandoc.org/">Pandoc</External_Link>,
@@ -210,11 +208,14 @@
 						the system is being designed for extensibility, so your use cases are helpful for
 						shaping it
 					</li>
-					<li>devs can extend Zzz to do anything but it should provide useful defaults</li>
+					<li>
+						devs can extend Zzz to do anything but it should provide useful defaults and optional
+						high-quality first-party integrations
+					</li>
 					<li>
 						some decisions like Postgres lock us into a region of the possibility space in some
-						respects -- you can always bring other databases but don't expect full integration, e.g.
-						there is a serious mismatch with sqlite
+						respects -- you can always bring other databases but don't expect full integration with
+						reasonable performance, e.g. there is a serious mismatch with sqlite
 					</li>
 				</ul>
 			</li>
@@ -335,10 +336,12 @@
 						use your API keys for calls to Claude, ChatGPT, and Gemini -- $$ risk of lost credits
 					</li>
 					<li>call Ollama's API if available -- low consequences</li>
-					<li>soon, more integrations including terminal access (which has huge consequences)</li>
 					<li>
 						<strong class="color_c_5">there is no authentication yet</strong>, only an origin check,
 						so do not use this in production
+					</li>
+					<li>
+						soon, more integrations including terminal access, but nothing that powerful before auth
 					</li>
 				</ul>
 			</li>
@@ -352,7 +355,7 @@
 					>svelte.config.js</External_Link
 				> and the <External_Link href="https://www.fuz.dev/docs/csp">Fuz CSP docs</External_Link>.
 				We'll need to add configurable options, unlocking shenanigans good and bad, so we'll tread
-				carefully. But at least we start from secure footing here.
+				carefully.
 			</li>
 			<li>
 				There are no mechanisms for end-users to load executable code or dangerous config. Of
@@ -386,15 +389,15 @@
 					href="https://wikipedia.org/wiki/Prompt_injection">prompt injection</External_Link
 				>, where they are unable to reliably discern instructions intended by the prompter from
 				adversarial instructions in the data. It's unclear if this is fixable but people are
-				building sensitive systems with probabilistic components. MCP's utility is high, but it's
-				commonly used in <External_Link
+				building sensitive systems with probabilistic components. MCP's utility is high, but it can
+				be used in <External_Link
 					href="https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/"
 					attrs={{
 						title:
 							'Simon Willison’s Weblog: The lethal trifecta for AI agents: private data, untrusted content, and external communication',
-					}}>wildly insecure</External_Link
-				> ways. Zzz integrates LLMs into its own functionality slowly and carefully -- currently the
-				only in-app LLM integration is using a local model to name new chats. There will be more, and
+					}}>insecure ways</External_Link
+				>. Zzz integrates LLMs into its own functionality slowly and carefully -- currently the only
+				in-app LLM integration is using a local model to name new chats. There will be more, and
 				we'll make sure you always have visibility and control over this behavior.
 			</li>
 			<li>
