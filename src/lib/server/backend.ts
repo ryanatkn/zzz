@@ -67,10 +67,6 @@ export interface Backend_Options {
 	 */
 	action_handlers: Backend_Action_Handlers;
 	/**
-	 * Available AI providers.
-	 */
-	providers?: Array<Backend_Provider>;
-	/**
 	 * Handler function for file system changes.
 	 */
 	handle_filer_change: Filer_Change_Handler;
@@ -125,7 +121,7 @@ export class Backend implements Action_Event_Environment {
 
 	// TODO wrapper class?
 	/** Available AI providers. */
-	readonly providers: Array<Backend_Provider>;
+	readonly providers: Array<Backend_Provider> = [];
 
 	readonly #handle_filer_change: Filer_Change_Handler;
 
@@ -142,7 +138,6 @@ export class Backend implements Action_Event_Environment {
 
 		this.action_registry = new Action_Registry(options.action_specs);
 		this.#action_handlers = options.action_handlers;
-		this.providers = options.providers ?? [];
 		this.#handle_filer_change = options.handle_filer_change;
 
 		this.api = create_backend_actions_api(this);
@@ -225,5 +220,13 @@ export class Backend implements Action_Event_Environment {
 		}
 
 		await Promise.all(cleanup_promises);
+	}
+
+	add_provider(provider: Backend_Provider): void {
+		if (this.providers.some((p) => p.name === provider.name)) {
+			throw new Error(`provider with name ${provider.name} already exists`);
+		}
+		this.providers.push(provider);
+		this.log?.info(`added provider: ${provider.name}`);
 	}
 }

@@ -12,8 +12,7 @@ export class Ollama_Backend_Provider extends Backend_Provider<Ollama> {
 	async handle_streaming_completion(
 		options: Completion_Handler_Options,
 	): Promise<Action_Outputs['create_completion']> {
-		const {model, completion_options, completion_messages, prompt, progress_token, backend} =
-			options;
+		const {model, completion_options, completion_messages, prompt, progress_token} = options;
 		this.validate_streaming_requirements(progress_token);
 
 		// TODO @many is this what we want to do? or error? needs to stream progress in the streaming case
@@ -45,7 +44,6 @@ export class Ollama_Backend_Provider extends Backend_Provider<Ollama> {
 				chunk,
 			);
 			void this.send_streaming_progress(
-				backend,
 				progress_token,
 				// TODO see the other patterns, maybe the API should be parsing and this takes the input schema (same issue on frontend)
 				Action_Inputs.completion_progress.shape.chunk.parse(chunk),

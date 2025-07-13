@@ -108,7 +108,6 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 				completion_options,
 				completion_messages,
 				prompt,
-				backend,
 				progress_token,
 			};
 

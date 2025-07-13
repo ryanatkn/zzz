@@ -150,7 +150,7 @@ export const chat_template_defaults: Array<Chat_Template> = [
 	},
 	{
 		id: create_uuid(),
-		name: 'inexpensive test',
+		name: 'quick test',
 		model_names: [
 			'gemma3:1b',
 			'claude-3-5-haiku-20241022',

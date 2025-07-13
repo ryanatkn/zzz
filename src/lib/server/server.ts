@@ -23,7 +23,6 @@ import {Ollama_Backend_Provider} from '$lib/server/ollama_backend_provider.js';
 import {Claude_Backend_Provider} from '$lib/server/claude_backend_provider.js';
 import {Chatgpt_Backend_Provider} from '$lib/server/chatgpt_backend_provider.js';
 import {Gemini_Backend_Provider} from '$lib/server/gemini_backend_provider.js';
-import type {Backend_Provider} from '$lib/server/backend_provider.js';
 
 const log = new Logger('[server]');
 
@@ -33,20 +32,11 @@ const create_server = (): void => {
 	// Security: allow only the configured server URL, extend with care
 	const allowed_origins = [SERVER_URL];
 
-	// TODO from config
-	const providers: Array<Backend_Provider> = [
-		new Ollama_Backend_Provider(),
-		new Claude_Backend_Provider(),
-		new Chatgpt_Backend_Provider(),
-		new Gemini_Backend_Provider(),
-	];
-
 	// TODO better logging
 	log.info('creating server', {
 		config,
 		ZZZ_DIR,
 		allowed_origins,
-		providers: providers.map((p) => p.name),
 	});
 
 	const app = new Hono();
@@ -61,9 +51,14 @@ const create_server = (): void => {
 		config,
 		action_specs,
 		action_handlers: backend_action_handlers,
-		providers,
 		handle_filer_change,
 	});
+
+	// TODO from config
+	backend.add_provider(new Ollama_Backend_Provider(backend));
+	backend.add_provider(new Claude_Backend_Provider(backend));
+	backend.add_provider(new Chatgpt_Backend_Provider(backend));
+	backend.add_provider(new Gemini_Backend_Provider(backend));
 
 	// TODO options for everything, maybe a nullable array and an enable/disable flag
 

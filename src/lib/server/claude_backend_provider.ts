@@ -13,8 +13,7 @@ export class Claude_Backend_Provider extends Backend_Provider<Anthropic> {
 	async handle_streaming_completion(
 		options: Completion_Handler_Options,
 	): Promise<Action_Outputs['create_completion']> {
-		const {model, completion_options, completion_messages, prompt, progress_token, backend} =
-			options;
+		const {model, completion_options, completion_messages, prompt, progress_token} = options;
 		this.validate_streaming_requirements(progress_token);
 
 		const stream = await this.client.messages.create(
@@ -42,7 +41,7 @@ export class Claude_Backend_Provider extends Backend_Provider<Anthropic> {
 				accumulated_content += event.delta.text;
 
 				// Send streaming progress notification to frontend
-				void this.send_streaming_progress(backend, progress_token, {
+				void this.send_streaming_progress(progress_token, {
 					// TODO @many other chunk data
 					message: {
 						role: 'assistant',

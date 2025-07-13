@@ -29,7 +29,6 @@ export interface Completion_Handler_Options {
 	completion_options: Completion_Options;
 	completion_messages: Array<Completion_Message> | undefined;
 	prompt: string;
-	backend: Backend;
 	/** Opts into streaming notifications when provided. */
 	progress_token?: Uuid;
 }
@@ -37,6 +36,12 @@ export interface Completion_Handler_Options {
 export abstract class Backend_Provider<T_Client = unknown> {
 	abstract readonly name: string;
 	abstract readonly client: T_Client;
+
+	readonly backend: Backend;
+
+	constructor(backend: Backend) {
+		this.backend = backend;
+	}
 
 	abstract handle_streaming_completion(
 		options: Completion_Handler_Options,
@@ -60,11 +65,10 @@ export abstract class Backend_Provider<T_Client = unknown> {
 
 	/** Sends streaming progress notification to frontend */
 	protected async send_streaming_progress(
-		backend: Backend,
 		progress_token: Uuid,
 		chunk: Action_Inputs['completion_progress']['chunk'],
 	): Promise<void> {
-		await backend.api.completion_progress({
+		await this.backend.api.completion_progress({
 			chunk,
 			_meta: {progressToken: progress_token},
 		});
