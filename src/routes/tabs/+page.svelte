@@ -67,7 +67,7 @@
 						browser.browserified = true;
 					}
 				}}
-				>{#if !app.ui.show_sidebar}un{/if}pretend it's all a dream</button
+				>{#if !app.ui.show_sidebar}remember your true power{:else}pretend it's all a dream{/if}</button
 			> -- that's just the current keybinding, it's likely to change, also see the little button in the
 			bottom left corner of this window.
 		</p>
