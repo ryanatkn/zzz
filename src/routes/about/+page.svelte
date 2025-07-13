@@ -64,7 +64,7 @@
 		</p>
 		<p>
 			We want the best possible UX, but to some degree the web is the pragmatic choice; its adoption
-			is second to none and its affordances appear sufficient, so Zzz chooses distribution and
+			is second to none and its affordances are sufficient, so Zzz chooses distribution and
 			accessibility over performance and perfection. One consequence: mobile in some cases will be
 			worse than native, but tbh I think it's fine long term, and other solutions may arise that let
 			the Zzz codebase go more places. And I think you'll find performance quite good, thanks mostly
