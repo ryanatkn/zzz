@@ -75,7 +75,7 @@
 			Zzz uses JS to glue software and machines together precisely the way the user wants,
 			maximizing its utility on any device across the full stack. It can run locally on your machine
 			using any of your available capabilities, or deploy wherever JS runs to play whatever roles
-			you need.
+			needed.
 		</p>
 		<p>
 			It's based on many kinds of software, borrowing features to provide both end-users and devs an
