@@ -198,7 +198,7 @@
 				and
 				<External_Link href="https://atproto.com/">AT Protocol</External_Link>
 			</li>
-			<li>Git</li>
+			<li>Git!</li>
 			<li>
 				I think it makes sense to prioritize a few high-utility integrations for manipulating media
 				files, like <External_Link href="https://pandoc.org/">Pandoc</External_Link>,
