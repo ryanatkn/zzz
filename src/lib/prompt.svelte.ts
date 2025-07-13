@@ -9,7 +9,7 @@ import {Cell_Json} from '$lib/cell_types.js';
 import {format_prompt_content} from '$lib/prompt_helpers.js';
 
 export interface Prompt_Message {
-	role: 'user' | 'system';
+	role: 'user' | 'system'; // TODO assistant? string? eh?
 	content: Array<Prompt_Action_Content>;
 }
 

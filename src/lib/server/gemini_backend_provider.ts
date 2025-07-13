@@ -46,8 +46,8 @@ export class Gemini_Backend_Provider extends Backend_Provider<GoogleGenerativeAI
 				void this.send_streaming_progress(backend, progress_token, {
 					// TODO @many other chunk data
 					message: {
-						content: chunk_text,
 						role: 'assistant',
+						content: chunk_text,
 					},
 				});
 			} catch (error) {

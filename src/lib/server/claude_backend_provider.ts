@@ -18,7 +18,7 @@ export class Claude_Backend_Provider extends Backend_Provider<Anthropic> {
 		this.validate_streaming_requirements(progress_token);
 
 		const stream = await this.client.messages.create(
-			this.#create_claude_completion_options(
+			create_claude_completion_options(
 				model,
 				completion_options,
 				completion_messages,
@@ -45,8 +45,8 @@ export class Claude_Backend_Provider extends Backend_Provider<Anthropic> {
 				void this.send_streaming_progress(backend, progress_token, {
 					// TODO @many other chunk data
 					message: {
-						content: event.delta.text,
 						role: 'assistant',
+						content: event.delta.text,
 					},
 				});
 			} else if (event.type === 'message_delta') {
@@ -79,7 +79,7 @@ export class Claude_Backend_Provider extends Backend_Provider<Anthropic> {
 		const {model, completion_options, completion_messages, prompt} = options;
 
 		const response = await this.client.messages.create(
-			this.#create_claude_completion_options(
+			create_claude_completion_options(
 				model,
 				completion_options,
 				completion_messages,
@@ -103,26 +103,6 @@ export class Claude_Backend_Provider extends Backend_Provider<Anthropic> {
 
 		this.log_api_response(api_response);
 		return to_completion_result('claude', model, api_response);
-	}
-
-	#create_claude_completion_options<T extends boolean>(
-		model: string,
-		completion_options: Completion_Handler_Options['completion_options'],
-		completion_messages: Array<Completion_Message> | undefined,
-		prompt: string,
-		stream: T,
-	) {
-		return {
-			model,
-			stream,
-			max_tokens: completion_options.output_token_max,
-			temperature: completion_options.temperature,
-			top_k: completion_options.top_k,
-			top_p: completion_options.top_p,
-			stop_sequences: completion_options.stop_sequences,
-			system: completion_options.system_message,
-			messages: to_messages(completion_messages, prompt),
-		};
 	}
 }
 
@@ -157,3 +137,21 @@ const to_messages = (
 
 	return claude_messages;
 };
+
+const create_claude_completion_options = <T extends boolean>(
+	model: string,
+	completion_options: Completion_Handler_Options['completion_options'],
+	completion_messages: Array<Completion_Message> | undefined,
+	prompt: string,
+	stream: T,
+) => ({
+	model,
+	stream,
+	max_tokens: completion_options.output_token_max,
+	temperature: completion_options.temperature,
+	top_k: completion_options.top_k,
+	top_p: completion_options.top_p,
+	stop_sequences: completion_options.stop_sequences,
+	system: completion_options.system_message,
+	messages: to_messages(completion_messages, prompt),
+});

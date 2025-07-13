@@ -30,6 +30,7 @@ export interface Completion_Handler_Options {
 	completion_messages: Array<Completion_Message> | undefined;
 	prompt: string;
 	backend: Backend;
+	/** Opts into streaming notifications when provided. */
 	progress_token?: Uuid;
 }
 

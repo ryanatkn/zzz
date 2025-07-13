@@ -52,8 +52,8 @@ export class Chatgpt_Backend_Provider extends Backend_Provider<OpenAI> {
 				void this.send_streaming_progress(backend, progress_token, {
 					// TODO @many other chunk data
 					message: {
-						content: delta.content,
 						role: 'assistant',
+						content: delta.content,
 					},
 				});
 			}
