@@ -61,16 +61,22 @@
 			problems once and have supported features work consistently across operating systems and
 			devices, without dependence on any one company. For all its flaws and quirks, the web is the
 			turf of our digital commons, and I believe it's capable of delivering a great UX when
-			developers use it with care. We want the best possible UX, but to some degree it's the
-			pragmatic choice; the web's adoption is second to none, and the its platform affordances are
-			sufficient, so we choose distribution and accessibility over performance and perfection.
+			developers use it with care.
+		</p>
+		<p>
+			We want the best possible UX, but to some degree the web is the pragmatic choice; its adoption
+			is second to none and its affordances appear sufficient, so Zzz chooses distribution and
+			accessibility over performance and perfection. One consequence: mobile in some cases will be
+			worse than native, but tbh I think it's fine long term, and other solutions may arise that let
+			the Zzz codebase go more places. And I think you'll find performance quite good, thanks mostly
+			to Svelte and the browser builders.
 		</p>
 		<p>
 			Zzz uses JS to glue software and machines together precisely the way the user wants,
 			maximizing its utility on any device across the full stack. It can run locally on your machine
-			using any of your available and granted capabilities, or it can deploy anywhere JS runs to
-			play whatever role is needed. It's based on many kinds of software, borrowing features to
-			provide end-users and devs an integrated and extensible system:
+			using any of your available capabilities, or it can deploy anywhere JS runs to play whatever
+			role is needed. It's based on many kinds of software, borrowing features to provide both
+			end-users and devs an integrated and extensible system:
 		</p>
 		<ul>
 			<li>
@@ -216,10 +222,12 @@
 		</ul>
 		<p>
 			Zzz is one implementation of an increasingly common idea that combines web tech and AI with
-			powerful open clients. Some related projects call themselves web UIs, AI browsers, or even
+			powerful clients. Some related projects call themselves web UIs, AI browsers, or even
 			operating systems. I currently like word "environment" to describe the device+software UX, and
 			"adaptive web environments" to get the bigger picture. Whatever the name or scope, I'll
-			continue making modular software for building them.
+			continue making modular software for building them. I think it's pretty important that we have
+			quality options that are open source, community-driven, protocol-interoperable, and
+			monoculture-resistant.
 		</p>
 		<p>
 			If this sounds interesting and you would like to test out some rickety pre-release software,
@@ -234,14 +242,14 @@
 	<section>
 		<h2 class="mb_lg">More details</h2>
 		<ul>
-			<li>Zzz is open source and permissively licensed, and forking is encouraged</li>
+			<li>Zzz is free and open source and permissively licensed, and forking is encouraged</li>
 			<li>it's a noncommercial project and its only official domain is zzz.software</li>
-			<li>the Zzz name/logos/IP are community property, no rug to pull</li>
+			<li>the Zzz name/logos/IP are community property</li>
 			<li>
 				I'm looking for <a href="https://www.ryanatkn.com/funding">funding</a> to sustain my continued
-				full-time work -- if successful, I think Zzz will be stewarded by some kind of nonprofit, and
-				I'm open to employment that sponsors at least part-time work on Zzz and its dependencies (without
-				changing the independence I have over my repos)
+				work on it -- if successful, I think Zzz and its dependencies will be stewarded by some kind
+				of nonprofit, and I'm open to jobs that want to use it or sponsor my part-time work on it (without
+				changing my independence over my repos)
 			</li>
 		</ul>
 	</section>
@@ -339,27 +347,31 @@
 					href="https://github.com/ryanatkn/zzz/blob/main/svelte.config.js"
 					>svelte.config.js</External_Link
 				> and the <External_Link href="https://www.fuz.dev/docs/csp">Fuz CSP docs</External_Link>.
-				We'll need to add config options, unlocking shenanigans good and bad, so we'll tread
+				We'll need to add configurable options, unlocking shenanigans good and bad, so we'll tread
 				carefully. But at least we start from secure footing here.
 			</li>
 			<li>
 				There are no mechanisms for end-users to load executable code or dangerous config.
-				Developers have full control to shoot their own feet, of course, and Node is currently the
-				only supported way to use Zzz. We'll develop a plugin API so people can make reusable
-				integrations, and distribution will be through npm, decentralized from the project's POV
-				like a typical open source web ecosystem project, I gatekeep nothing -- I expect to publish
-				a number of <code>@ryanatkn/zzz_*</code> packages, and others may do who knows what, you'll
-				have to vet their code
+				Developers have full control to shoot their own feet of course, and Node is currently the
+				only supported way to use Zzz.
 				<ul>
 					<li>
-						Any modules you install via npm, or any code you add to the src directory (did you
-						configure Zzz to be able to write to it?), carry the normal (elevated) risks associated
-						with development, and as normal, end-users must trust the developers of software they
-						install.
+						we'll develop a plugin API so people can make reusable integrations, and distribution
+						will be through npm, decentralized from the project's POV like a typical open source web
+						ecosystem project so I gatekeep nothing -- I expect to publish a number of <code
+							>@ryanatkn/zzz_*</code
+						> packages, and others may do who knows what, you'll have to vet their code
 					</li>
 					<li>
-						I try to practice good dependency <External_Link
-							href="https://github.com/ryanatkn/fuz_template/issues/1">hygiene</External_Link
+						any modules you install via npm, or any code you add to the src directory (did you
+						configure Zzz to be able to write to it?), carry the normal elevated risks associated
+						with development (because code execution), and anyone installing software is trusting
+						its developer
+					</li>
+					<li>
+						I try to practice good <External_Link
+							href="https://github.com/ryanatkn/fuz_template/issues/1"
+							>dependency hygiene</External_Link
 						>, and to give you an idea of my taste, the existence of opt-out postinstall scripts
 						drives me nuts, but I'm not trained or very knowledgable on security
 					</li>
