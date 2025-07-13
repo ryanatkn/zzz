@@ -63,7 +63,7 @@
 			turf of our digital commons, and I believe it's capable of delivering a great UX when
 			developers use it with care. We want the best possible UX, but to some degree it's the
 			pragmatic choice; the web's adoption is second to none, and the its platform affordances are
-			sufficient, so we choose distribution over performance and perfection.
+			sufficient, so we choose distribution and accessibility over performance and perfection.
 		</p>
 		<p>
 			Zzz uses JS to glue software and machines together precisely the way the user wants,
