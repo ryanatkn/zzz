@@ -148,4 +148,14 @@ export const chat_template_defaults: Array<Chat_Template> = [
 		name: 'local gemmas',
 		model_names: ['gemma3:1b', 'gemma3n:e2b', 'gemma3n:e4b', 'gemma3:4b'],
 	},
+	{
+		id: create_uuid(),
+		name: 'inexpensive test',
+		model_names: [
+			'gemma3:1b',
+			'claude-3-5-haiku-20241022',
+			'gpt-4.1-nano-2025-04-14',
+			'gemini-2.5-flash-lite-preview-06-17',
+		],
+	},
 ];

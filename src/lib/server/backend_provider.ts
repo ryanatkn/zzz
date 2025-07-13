@@ -33,8 +33,9 @@ export interface Completion_Handler_Options {
 	progress_token?: Uuid;
 }
 
-export abstract class Backend_Provider {
+export abstract class Backend_Provider<T_Client = unknown> {
 	abstract readonly name: string;
+	abstract readonly client: T_Client;
 
 	abstract handle_streaming_completion(
 		options: Completion_Handler_Options,

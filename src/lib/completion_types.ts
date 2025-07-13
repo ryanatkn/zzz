@@ -9,7 +9,7 @@ export type Completion_Role = z.infer<typeof Completion_Role>;
 
 export const Completion_Message = z.object({
 	role: Completion_Role,
-	content: z.string(),
+	content: z.string(), // TODO maybe rename to `text` or something, see the APIs, they have different names
 });
 export type Completion_Message = z.infer<typeof Completion_Message>;
 

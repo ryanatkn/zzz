@@ -1,24 +1,13 @@
-import ollama from 'ollama';
+import ollama, {Ollama} from 'ollama';
 
 import {Backend_Provider, type Completion_Handler_Options} from '$lib/server/backend_provider.js';
 import {to_completion_result} from '$lib/response_helpers.js';
 import {Action_Inputs, type Action_Outputs} from '$lib/action_collections.js';
 import type {Completion_Message} from '$lib/completion_types.js';
 
-export class Ollama_Backend_Provider extends Backend_Provider {
+export class Ollama_Backend_Provider extends Backend_Provider<Ollama> {
 	readonly name = 'ollama';
-
-	format_messages(
-		system_message: string,
-		completion_messages: Array<Completion_Message> | undefined,
-		prompt: string,
-	): Array<{role: string; content: string}> {
-		return [
-			{role: 'system', content: system_message},
-			...(completion_messages || []),
-			{role: 'user', content: prompt},
-		];
-	}
+	readonly client = ollama;
 
 	async handle_streaming_completion(
 		options: Completion_Handler_Options,
@@ -36,13 +25,7 @@ export class Ollama_Backend_Provider extends Backend_Provider {
 		// TODO should we support this?
 		// ollama.generate({prompt})
 		const response = await ollama.chat(
-			this.#create_ollama_chat_options(
-				model,
-				completion_options,
-				completion_messages,
-				prompt,
-				true,
-			),
+			create_ollama_chat_options(model, completion_options, completion_messages, prompt, true),
 		);
 
 		let accumulated_content = '';
@@ -99,13 +82,7 @@ export class Ollama_Backend_Provider extends Backend_Provider {
 		}
 
 		const response = await ollama.chat(
-			this.#create_ollama_chat_options(
-				model,
-				completion_options,
-				completion_messages,
-				prompt,
-				false,
-			),
+			create_ollama_chat_options(model, completion_options, completion_messages, prompt, false),
 		);
 
 		this.log_non_streaming_response(response);
@@ -121,37 +98,43 @@ export class Ollama_Backend_Provider extends Backend_Provider {
 		this.log_api_response(api_response);
 		return to_completion_result('ollama', model, api_response);
 	}
-
-	#create_ollama_chat_options<T extends boolean>(
-		model: string,
-		completion_options: Completion_Handler_Options['completion_options'],
-		completion_messages: Array<Completion_Message> | undefined,
-		prompt: string,
-		stream: T,
-	) {
-		return {
-			model,
-			// TODO
-			// format,
-			// keep_alive,
-			stream,
-			// think,
-			// tools,
-			options: {
-				temperature: completion_options.temperature,
-				seed: completion_options.seed,
-				num_predict: completion_options.output_token_max,
-				top_k: completion_options.top_k,
-				top_p: completion_options.top_p,
-				frequency_penalty: completion_options.frequency_penalty,
-				presence_penalty: completion_options.presence_penalty,
-				stop: completion_options.stop_sequences,
-			},
-			messages: this.format_messages(
-				completion_options.system_message,
-				completion_messages,
-				prompt,
-			),
-		};
-	}
 }
+
+const to_messages = (
+	system_message: string,
+	completion_messages: Array<Completion_Message> | undefined,
+	prompt: string,
+): Array<{role: string; content: string}> => {
+	return [
+		{role: 'system', content: system_message},
+		...(completion_messages || []),
+		{role: 'user', content: prompt},
+	];
+};
+
+const create_ollama_chat_options = <T extends boolean>(
+	model: string,
+	completion_options: Completion_Handler_Options['completion_options'],
+	completion_messages: Array<Completion_Message> | undefined,
+	prompt: string,
+	stream: T,
+) => ({
+	model,
+	// TODO
+	// format,
+	// keep_alive,
+	stream,
+	// think,
+	// tools,
+	options: {
+		temperature: completion_options.temperature,
+		seed: completion_options.seed,
+		num_predict: completion_options.output_token_max,
+		top_k: completion_options.top_k,
+		top_p: completion_options.top_p,
+		frequency_penalty: completion_options.frequency_penalty,
+		presence_penalty: completion_options.presence_penalty,
+		stop: completion_options.stop_sequences,
+	},
+	messages: to_messages(completion_options.system_message, completion_messages, prompt),
+});

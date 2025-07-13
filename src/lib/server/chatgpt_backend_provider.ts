@@ -6,44 +6,9 @@ import {to_completion_result} from '$lib/response_helpers.js';
 import type {Action_Outputs} from '$lib/action_collections.js';
 import type {Completion_Message} from '$lib/completion_types.js';
 
-export class Chatgpt_Backend_Provider extends Backend_Provider {
+export class Chatgpt_Backend_Provider extends Backend_Provider<OpenAI> {
 	readonly name = 'chatgpt';
-	private openai = new OpenAI({apiKey: SECRET_OPENAI_API_KEY});
-
-	format_messages(
-		system_message: string,
-		completion_messages: Array<Completion_Message> | undefined,
-		prompt: string,
-		model: string,
-	): Array<{role: 'system' | 'user' | 'assistant'; content: string}> {
-		const openai_messages: Array<{role: 'system' | 'user' | 'assistant'; content: string}> = [];
-
-		// Only add system message if the model supports it
-		if (model !== 'o1-mini') {
-			openai_messages.push({
-				role: 'system',
-				content: system_message,
-			});
-		}
-
-		// Add tape history
-		if (completion_messages) {
-			for (const message of completion_messages) {
-				openai_messages.push({
-					role: message.role as 'system' | 'user' | 'assistant', // TODO maybe parse?
-					content: message.content,
-				});
-			}
-		}
-
-		// Add the current message
-		openai_messages.push({
-			role: 'user',
-			content: prompt,
-		});
-
-		return openai_messages;
-	}
+	readonly client = new OpenAI({apiKey: SECRET_OPENAI_API_KEY});
 
 	async handle_streaming_completion(
 		options: Completion_Handler_Options,
@@ -53,8 +18,8 @@ export class Chatgpt_Backend_Provider extends Backend_Provider {
 		this.validate_streaming_requirements(progress_token);
 
 		// TODO use responses API instead
-		const stream = await this.openai.chat.completions.create(
-			this.#create_chatgpt_completion_options(
+		const stream = await this.client.chat.completions.create(
+			create_chatgpt_completion_options(
 				model,
 				completion_options,
 				completion_messages,
@@ -135,8 +100,8 @@ export class Chatgpt_Backend_Provider extends Backend_Provider {
 		const {model, completion_options, completion_messages, prompt} = options;
 
 		// TODO use responses API instead
-		const response = await this.openai.chat.completions.create(
-			this.#create_chatgpt_completion_options(
+		const response = await this.client.chat.completions.create(
+			create_chatgpt_completion_options(
 				model,
 				completion_options,
 				completion_messages,
@@ -159,30 +124,59 @@ export class Chatgpt_Backend_Provider extends Backend_Provider {
 		this.log_api_response(api_response);
 		return to_completion_result('chatgpt', model, api_response);
 	}
-
-	#create_chatgpt_completion_options<T extends boolean>(
-		model: string,
-		completion_options: Completion_Handler_Options['completion_options'],
-		completion_messages: Array<Completion_Message> | undefined,
-		prompt: string,
-		stream: T,
-	) {
-		return {
-			model,
-			stream,
-			max_completion_tokens: completion_options.output_token_max,
-			temperature: completion_options.temperature,
-			seed: completion_options.seed,
-			top_p: completion_options.top_p,
-			frequency_penalty: completion_options.frequency_penalty,
-			presence_penalty: completion_options.presence_penalty,
-			stop: completion_options.stop_sequences,
-			messages: this.format_messages(
-				completion_options.system_message,
-				completion_messages,
-				prompt,
-				model,
-			),
-		};
-	}
 }
+
+// TODO @many cleanup with better data structures/helpers
+const format_messages = (
+	system_message: string,
+	completion_messages: Array<Completion_Message> | undefined,
+	prompt: string,
+	model: string,
+): Array<{role: 'system' | 'user' | 'assistant'; content: string}> => {
+	const openai_messages: Array<{role: 'system' | 'user' | 'assistant'; content: string}> = [];
+
+	// Only add system message if the model supports it
+	if (model !== 'o1-mini') {
+		openai_messages.push({
+			role: 'system',
+			content: system_message,
+		});
+	}
+
+	// Add tape history
+	if (completion_messages) {
+		for (const message of completion_messages) {
+			openai_messages.push({
+				role: message.role as 'system' | 'user' | 'assistant', // TODO maybe parse?
+				content: message.content,
+			});
+		}
+	}
+
+	// Add the current message
+	openai_messages.push({
+		role: 'user',
+		content: prompt,
+	});
+
+	return openai_messages;
+};
+
+const create_chatgpt_completion_options = <T extends boolean>(
+	model: string,
+	completion_options: Completion_Handler_Options['completion_options'],
+	completion_messages: Array<Completion_Message> | undefined,
+	prompt: string,
+	stream: T,
+) => ({
+	model,
+	stream,
+	max_completion_tokens: completion_options.output_token_max,
+	temperature: completion_options.temperature,
+	seed: completion_options.seed,
+	top_p: completion_options.top_p,
+	frequency_penalty: completion_options.frequency_penalty,
+	presence_penalty: completion_options.presence_penalty,
+	stop: completion_options.stop_sequences,
+	messages: format_messages(completion_options.system_message, completion_messages, prompt, model),
+});

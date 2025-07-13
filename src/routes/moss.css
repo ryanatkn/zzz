@@ -389,6 +389,9 @@ a.chip {
 .color_c_5 {
 	color: var(--color_c_5);
 }
+.color_f_5 {
+	color: var(--color_f_5);
+}
 .bg_a_5 {
 	background-color: var(--color_a_5);
 }

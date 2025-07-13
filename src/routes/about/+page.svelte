@@ -300,12 +300,6 @@
 	<hr />
 	<section>
 		<h2 class="mb_lg">Security</h2>
-		<aside>
-			⚠️ I am not a security professional and Zzz is not audited; it may be <strong
-				class="color_c_5">dangerous</strong
-			> to run and I may be wrong about some things (I think it's secure given the context below, but
-			I can't say for sure, and you should not run Zzz in production)
-		</aside>
 		<p>
 			Zzz is a powerful and extensible system, and that means it carries significant security risks.
 			Although it can be used to build simple and secure websites, the Zzz backend is capable like
@@ -320,9 +314,16 @@
 			seal, to install the malware. Every person and situation may have a different threat model, so
 			we want to make it easy to choose agency, where lazy is secure.
 		</p>
+		<aside>
+			⚠️ I am not a security professional and Zzz has not been audited; it may be <strong
+				class="color_c_5">dangerous</strong
+			>
+			to run and I may be <strong class="color_f_5">wrong</strong> about matters of security (I *think*
+			it's secure given the context below, but I can't say for sure, and you should not run Zzz in production)
+		</aside>
 		<p>
-			I'm trying to keep things simple given the target capabilities of being an
-			IDE+CMS+browser+library (lol):
+			I'm trying to keep things simple given the target capabilities of an IDE+CMS+browser+library
+			(lol):
 		</p>
 		<ul>
 			<li>
@@ -338,7 +339,7 @@
 					<li>
 						use your API keys for calls to Claude, ChatGPT, and Gemini -- $$ and impersonation risk
 					</li>
-					<li>call Ollama's API if available -- low consequences (unless your LLM is a snitch)</li>
+					<li>call Ollama's API if available -- low risk (unless your LLM is a snitch)</li>
 					<li>
 						<strong class="color_c_5">there is no authentication yet</strong>, only an origin check,
 						so do not use this in production
@@ -370,7 +371,8 @@
 						will be through npm, decentralized from the project's POV like a typical open source web
 						ecosystem project so I gatekeep nothing -- I expect to publish a number of <code
 							>@ryanatkn/zzz_*</code
-						> packages, and others may do who knows what, you'll have to vet their code
+						> packages, and if people think it's worth their time to make Zzz things, they can publish
+						according to their taste and you can vet their code
 					</li>
 					<li>
 						any modules you install via npm, or any code you add to the src directory (did you
