@@ -563,6 +563,11 @@ export const package_json = {
 			types: './dist/frontend_http_transport.d.ts',
 			default: './dist/frontend_http_transport.js',
 		},
+		'./Frontend_Root.svelte': {
+			types: './dist/Frontend_Root.svelte.d.ts',
+			svelte: './dist/Frontend_Root.svelte',
+			default: './dist/Frontend_Root.svelte',
+		},
 		'./frontend_websocket_transport.js': {
 			types: './dist/frontend_websocket_transport.d.ts',
 			default: './dist/frontend_websocket_transport.js',
@@ -1029,11 +1034,6 @@ export const package_json = {
 		},
 		'./xml.js': {types: './dist/xml.d.ts', default: './dist/xml.js'},
 		'./zod_helpers.js': {types: './dist/zod_helpers.d.ts', default: './dist/zod_helpers.js'},
-		'./Frontend_Root.svelte': {
-			types: './dist/Frontend_Root.svelte.d.ts',
-			svelte: './dist/Frontend_Root.svelte',
-			default: './dist/Frontend_Root.svelte',
-		},
 	},
 } satisfies Package_Json;
 
@@ -1830,6 +1830,10 @@ export const src_json = {
 		'./frontend_http_transport.js': {
 			path: 'frontend_http_transport.ts',
 			declarations: [{name: 'Frontend_Http_Transport', kind: 'class'}],
+		},
+		'./Frontend_Root.svelte': {
+			path: 'Frontend_Root.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
 		},
 		'./frontend_websocket_transport.js': {
 			path: 'frontend_websocket_transport.ts',
@@ -2753,10 +2757,6 @@ export const src_json = {
 				{name: 'get_inner_array_schema', kind: 'function'},
 				{name: 'stringify_zod_error', kind: 'function'},
 			],
-		},
-		'./Frontend_Root.svelte': {
-			path: 'Frontend_Root.svelte',
-			declarations: [{name: 'default', kind: 'component'}],
 		},
 	},
 } satisfies Src_Json;

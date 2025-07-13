@@ -640,6 +640,11 @@
       "types": "./dist/frontend_http_transport.d.ts",
       "default": "./dist/frontend_http_transport.js"
     },
+    "./Frontend_Root.svelte": {
+      "types": "./dist/Frontend_Root.svelte.d.ts",
+      "svelte": "./dist/Frontend_Root.svelte",
+      "default": "./dist/Frontend_Root.svelte"
+    },
     "./frontend_websocket_transport.js": {
       "types": "./dist/frontend_websocket_transport.d.ts",
       "default": "./dist/frontend_websocket_transport.js"
@@ -1202,11 +1207,6 @@
     "./zod_helpers.js": {
       "types": "./dist/zod_helpers.d.ts",
       "default": "./dist/zod_helpers.js"
-    },
-    "./Frontend_Root.svelte": {
-      "types": "./dist/Frontend_Root.svelte.d.ts",
-      "svelte": "./dist/Frontend_Root.svelte",
-      "default": "./dist/Frontend_Root.svelte"
     }
   }
 }
