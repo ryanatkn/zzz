@@ -26,7 +26,7 @@ export class Gemini_Backend_Provider extends Backend_Provider {
 		return prompt;
 	}
 
-	async handle_streaming(
+	async handle_streaming_completion(
 		options: Completion_Handler_Options,
 	): Promise<Action_Outputs['create_completion']> {
 		const {model, completion_options, completion_messages, prompt, progress_token, backend} =
@@ -90,7 +90,7 @@ export class Gemini_Backend_Provider extends Backend_Provider {
 		return to_completion_result('gemini', model, api_response, progress_token);
 	}
 
-	async handle_non_streaming(
+	async handle_non_streaming_completion(
 		options: Completion_Handler_Options,
 	): Promise<Action_Outputs['create_completion']> {
 		const {model, completion_options, completion_messages, prompt} = options;

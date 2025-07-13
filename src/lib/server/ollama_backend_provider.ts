@@ -20,7 +20,7 @@ export class Ollama_Backend_Provider extends Backend_Provider {
 		];
 	}
 
-	async handle_streaming(
+	async handle_streaming_completion(
 		options: Completion_Handler_Options,
 	): Promise<Action_Outputs['create_completion']> {
 		const {model, completion_options, completion_messages, prompt, progress_token, backend} =
@@ -85,7 +85,7 @@ export class Ollama_Backend_Provider extends Backend_Provider {
 		return to_completion_result('ollama', model, api_response, progress_token);
 	}
 
-	async handle_non_streaming(
+	async handle_non_streaming_completion(
 		options: Completion_Handler_Options,
 	): Promise<Action_Outputs['create_completion']> {
 		const {model, completion_options, completion_messages, prompt} = options;

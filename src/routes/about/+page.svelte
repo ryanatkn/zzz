@@ -131,15 +131,15 @@
 		</p>
 		<p>
 			From a personal POV, Zzz is the primary user of my lower level software (Fuz/Moss/Gro/others),
-			and it's the primary dependency of some planned websites and apps, like the Zzz Browser or
-			whatever it's called. Many of the initial systems have been designed with some thought towards
-			this bigger picture, trying to make Zzz reusable and well-scoped.
+			and it's the primary dependency of some planned websites and apps, like the Zzz Browser (or
+			whatever it's called). Many of the initial systems have been designed with some thought
+			towards this bigger picture, trying to make Zzz reusable and well-scoped.
 		</p>
 		<p>
 			Zzz wants to be easy to use and inclusive of people and devices, but try as it might, it can't
 			cater to every case for every person, and I must admit it favors power users -- however,
 			thanks to the magic of standards-based interoperability, anything you make with Zzz works with
-			other browsers and web technologies. It's only one of countless ways to use the web and plays
+			other browsers and web technologies. It's only one of countless ways to use the web, and plays
 			nicely with others.
 		</p>
 		<p>Some early (rough) integrations include:</p>
@@ -405,9 +405,10 @@
 				we'll make sure you always have visibility into and control over this behavior.
 			</li>
 			<li>
-				security and privacy should be the expected default, so for example Zzz won't make calls to
+				Security and privacy should be the expected default, so for example Zzz won't make calls to
 				external providers without explicit configuration, but it will use local models without
-				asking if it sees them available, and this should be configurable
+				asking if it sees them available, and this should be configurable and transparent. The
+				Ollama integration is a fine start.
 			</li>
 			<li>I prioritize security but I will make mistakes, help is always appreciated</li>
 		</ul>

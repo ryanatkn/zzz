@@ -36,15 +36,17 @@ export interface Completion_Handler_Options {
 export abstract class Backend_Provider {
 	abstract readonly name: string;
 
-	abstract handle_streaming(
+	abstract handle_streaming_completion(
 		options: Completion_Handler_Options,
 	): Promise<Action_Outputs['create_completion']>;
-	abstract handle_non_streaming(
+	abstract handle_non_streaming_completion(
 		options: Completion_Handler_Options,
 	): Promise<Action_Outputs['create_completion']>;
 
 	get_handler(streaming: boolean): Completion_Handler {
-		return streaming ? this.handle_streaming.bind(this) : this.handle_non_streaming.bind(this);
+		return streaming
+			? this.handle_streaming_completion.bind(this)
+			: this.handle_non_streaming_completion.bind(this);
 	}
 
 	/** Validates that progress_token is provided for streaming requests. */
