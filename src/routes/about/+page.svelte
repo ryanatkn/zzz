@@ -348,9 +348,8 @@
 				only supported way to use Zzz. We'll develop a plugin API so people can make reusable
 				integrations, and distribution will be through npm. (decentralized from the project's POV
 				like a typical open source web ecosystem project, I gatekeep nothing -- I expect to publish
-				a number of
-				<code>@ryanatkn/zzz_*</code> packages, and others may do who knows what, you'll have to vet
-				their code)
+				a number of <code>@ryanatkn/zzz_*</code> packages, and others may do who knows what, you'll
+				have to vet their code)
 				<ul>
 					<li>
 						Any modules you install via npm, or any code you add to the src directory (did you
