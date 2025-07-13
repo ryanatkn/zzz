@@ -63,8 +63,8 @@
 			turf of our digital commons, and it's capable of delivering excellent UX when used carefully.
 		</p>
 		<p>
-			We want the best possible UX, but to some degree the web is the pragmatic choice: its adoption
-			is second to none and its affordances are sufficient, so Zzz chooses distribution and
+			We want to enjoy the best possible UX, but to some degree the web is a pragmatic choice: its
+			adoption is second to none and its affordances are sufficient, so Zzz chooses distribution and
 			accessibility over performance and perfection. One consequence is that mobile in some cases
 			will be worse than native, but I think it's fine long term, a fine trade for freedom, and
 			other solutions may arise that let the Zzz codebase go more places, challenging native
@@ -73,8 +73,8 @@
 		</p>
 		<p>
 			Zzz uses JS to glue software and machines together precisely the way the user wants,
-			maximizing its utility on any device across the full stack. It can run locally on your machine
-			using any of your available capabilities, or deploy wherever JS runs to play whatever roles
+			maximizing its utility in context across the full stack. It runs locally on your devices using
+			any of your available capabilities, and deploys wherever JS runs to play whatever roles are
 			needed.
 		</p>
 		<p>
