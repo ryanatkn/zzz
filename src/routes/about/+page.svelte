@@ -226,7 +226,7 @@
 			operating systems. I currently like word "environment" to describe the device+software UX, and
 			"adaptive web environments" to get the bigger picture. Whatever the name or scope, I'll
 			continue making modular software for building them. I think it's pretty important that we have
-			quality options that are open source, community-driven, protocol-interoperable, and
+			quality options that are free, open source, community-driven, protocol-interoperable, and
 			monoculture-resistant.
 		</p>
 		<p>
