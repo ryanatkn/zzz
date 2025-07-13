@@ -60,8 +60,7 @@
 			runs everywhere, and for that we have the web with HTML, CSS, and JS. We want to solve
 			problems once and have supported features work consistently across operating systems and
 			devices, without dependence on any one company. For all its flaws and quirks, the web is the
-			turf of our digital commons, and I believe it's capable of delivering a great UX when
-			developers use it with care.
+			turf of our digital commons, and it's capable of delivering excellent UX when used carefully.
 		</p>
 		<p>
 			We want the best possible UX, but to some degree the web is the pragmatic choice; its adoption
