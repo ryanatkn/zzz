@@ -1,5 +1,5 @@
 <script lang="ts">
-	import {fade, blur} from 'svelte/transition';
+	import {fade, blur, scale} from 'svelte/transition';
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
 	import {random_item} from '@ryanatkn/belt/random.js';
 
@@ -102,7 +102,8 @@
 		</div>
 		{#if app.prompts.show_tutorial}
 			<div class="pt_lg" out:blur={{duration: 1000}}>
-				<aside>
+				<!-- TODO is there no end value param? -->
+				<aside out:scale={{duration: 24000}}>
 					<p>
 						This is a prompt builder UI demo. The goal is to experiment with many such tools, both
 						simpler and more complex. Similarly, we'll explore variants of the chat interface.
