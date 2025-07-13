@@ -13,6 +13,8 @@ import type {
 	Ollama_Ps_Response,
 } from '$lib/ollama_helpers.js';
 
+// TODO namerbot capability, uses backend+(at least one provider) (or rethink its role in a bigger picture, not just names)
+
 // TODO extract reusable stuff to make this generic
 
 /** Maximum number of ping records to keep. */

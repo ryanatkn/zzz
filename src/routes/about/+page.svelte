@@ -299,8 +299,8 @@
 		<aside>
 			⚠️ I am not a security professional and Zzz is not audited, it may be <strong
 				class="color_c_5">dangerous</strong
-			> to run and I may be wrong about some things (in my estimation it's secure given the context below,
-			but I can't say for sure)
+			> to run and I may be wrong about some things (I think it's secure given the context below, but
+			I can't say for sure, and you should not run Zzz in production)
 		</aside>
 		<p>
 			Zzz is a powerful and extensible system, and that means it carries significant security risks.
@@ -311,11 +311,13 @@
 			Zzz puts the user in control, so if you insist on installing obvious_malware, Zzz will abide.
 			This basic tension between power and safety leads me to think that UX design should be a
 			primary mechanism of influence to protect users -- instead of restricting power from user
-			control, we'll design for its safe usage. Every person and situation may have a different
-			threat model, so we want to make it easy to choose agency, where lazy is secure.
+			control, we'll design for its safe usage, including clear visibility into your delegation
+			situation. Maybe you'll have to click through an annoying UI and 2FA, obviously breaking the
+			seal, to install the malware. Every person and situation may have a different threat model, so
+			we want to make it easy to choose agency, where lazy is secure.
 		</p>
 		<p>
-			For now, I'm trying to keep things simple given the target capabilities of being an
+			I'm trying to keep things simple given the target capabilities of being an
 			IDE+CMS+browser+library:
 		</p>
 		<ul>
@@ -333,8 +335,11 @@
 						use your API keys for calls to Claude, ChatGPT, and Gemini -- $$ risk of lost credits
 					</li>
 					<li>call Ollama's API if available -- low consequences</li>
-					<li>there is no authentication yet, only an origin check</li>
 					<li>soon, more integrations including terminal access (which has huge consequences)</li>
+					<li>
+						<strong class="color_c_5">there is no authentication yet</strong>, only an origin check,
+						so do not use this in production
+					</li>
 				</ul>
 			</li>
 			<li>
@@ -350,9 +355,9 @@
 				carefully. But at least we start from secure footing here.
 			</li>
 			<li>
-				There are no mechanisms for end-users to load executable code or dangerous config.
-				Developers have full control to shoot their own feet of course, and Node is currently the
-				only supported way to use Zzz.
+				There are no mechanisms for end-users to load executable code or dangerous config. Of
+				course, developers have full control to shoot their own feet, and Node is currently the only
+				supported way to use Zzz.
 				<ul>
 					<li>
 						we'll develop a plugin API so people can make reusable integrations, and distribution
@@ -377,19 +382,25 @@
 				</ul>
 			</li>
 			<li>
-				In 2025, LLMs have a serious and unfixed (unfixable?) vulnerability to attacks like <External_Link
+				In 2025, LLMs have a serious vulnerability to attacks like <External_Link
 					href="https://wikipedia.org/wiki/Prompt_injection">prompt injection</External_Link
 				>, where they are unable to reliably discern instructions intended by the prompter from
-				adversarial instructions in the data. People are building digital horrors. MCP's utility is
-				high, it's <External_Link
+				adversarial instructions in the data. It's unclear if this is fixable but people are
+				building sensitive systems with probabilistic components. MCP's utility is high, but it's
+				commonly used in <External_Link
 					href="https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/"
 					attrs={{
 						title:
 							'Simon Willison’s Weblog: The lethal trifecta for AI agents: private data, untrusted content, and external communication',
 					}}>wildly insecure</External_Link
-				> in some cases. Zzz will integrate LLMs into its own functionality slowly and carefully -- currently
-				the only in-app LLM integration is using a local model to name new chats. There will be more,
-				but initiated by the user.
+				> ways. Zzz integrates LLMs into its own functionality slowly and carefully -- currently the
+				only in-app LLM integration is using a local model to name new chats. There will be more, and
+				we'll make sure you always have visibility and control over this behavior.
+			</li>
+			<li>
+				security and privacy should be the expected default, so for example Zzz won't make calls to
+				external providers without explicit configuration, but it will use local models without
+				asking if it sees them available, and this should be configurable
 			</li>
 			<li>I prioritize security but I will make mistakes, help is always appreciated</li>
 		</ul>
