@@ -56,16 +56,14 @@
 			access to local and remote capabilities?"
 		</blockquote>
 		<p>
-			The software I imagine answering these questions is cross-platform so it runs everywhere, and
-			for that we have the web with HTML, CSS, and JS. We want to solve problems once and have
-			supported features work consistently across operating systems and devices, without dependence
-			on any one company. For all its flaws and quirks, the web is the turf of our digital commons,
-			and I believe it's capable of delivering a great UX when developers use it with care.
-		</p>
-		<p>
-			In Zzz we assume UX has primacy and should inform decisions with emphasis. Is HTML/CSS/JS
-			actually the best choice for UX? To some degree it's the pragmatic choice; the web's adoption
-			is second to none, so we choose distribution over performance and perfection.
+			The free and open source software I imagine answering these questions is cross-platform so it
+			runs everywhere, and for that we have the web with HTML, CSS, and JS. We want to solve
+			problems once and have supported features work consistently across operating systems and
+			devices, without dependence on any one company. For all its flaws and quirks, the web is the
+			turf of our digital commons, and I believe it's capable of delivering a great UX when
+			developers use it with care. We want the best possible UX, but to some degree it's the
+			pragmatic choice; the web's adoption is second to none, and the its platform affordances are
+			sufficient, so we choose distribution over performance and perfection.
 		</p>
 		<p>
 			Zzz uses JS to glue software and machines together precisely the way the user wants,
@@ -134,11 +132,10 @@
 		</p>
 		<p>
 			Zzz wants to be easy to use and inclusive of people and devices, but try as it might, it can't
-			cater to every case for every person -- however, thanks to the magic of standards-based
-			interoperability, as a browser Zzz works with all websites, and anything you make with Zzz
-			works with other browsers and web technologies. It's one of infinite ways to use the web, and
-			it's designed to help you level up your technical knowledge and abilities, if you're so
-			inclined.
+			cater to every case for every person, and it favors power users -- however, thanks to the
+			magic of standards-based interoperability, as a browser Zzz works with all websites, and
+			anything you make with Zzz works with other browsers and web technologies. It's one of
+			infinite ways to use the web.
 		</p>
 		<p>Some early (rough) integrations include:</p>
 		<ul>
@@ -293,22 +290,27 @@
 	<section>
 		<h2 class="mb_lg">Security</h2>
 		<aside>
-			⚠️ I am not a security professional and Zzz is not audited, it may be dangerous to run and I
-			may be wrong about some things (in my estimation it's secure but I can't say for sure)
+			⚠️ I am not a security professional and Zzz is not audited, it may be <strong
+				class="color_c_5">dangerous</strong
+			> to run and I may be wrong about some things (in my estimation it's secure given the context below,
+			but I can't say for sure)
 		</aside>
 		<p>
-			Zzz is a powerful and extensible system, and that means its has additional security risks
-			beyond normal web apps. Although it can be used to build simple and secure websites, the Zzz
-			server is capable like an IDE and can do bad things when bidden.
+			Zzz is a powerful and extensible system, and that means it carries significant security risks.
+			Although it can be used to build simple and secure websites, the Zzz backend is capable like
+			an IDE and can do bad things when bidden.
 		</p>
 		<p>
-			Zzz puts the user in control, so one must have the ability to install whatever one wishes,
-			including obvious_malware. This basic tension between power and safety leads me to think that
-			UX design should be a primary mechanism of influence to protect users -- instead of
-			restricting power, we'll design for its safe usage. Every person and situation may have a
-			different threat model, so we want to make it easy to choose agency, where lazy is secure.
+			Zzz puts the user in control, so if you insist on installing obvious_malware, Zzz will abide.
+			This basic tension between power and safety leads me to think that UX design should be a
+			primary mechanism of influence to protect users -- instead of restricting power from user
+			control, we'll design for its safe usage. Every person and situation may have a different
+			threat model, so we want to make it easy to choose agency, where lazy is secure.
 		</p>
-		<p>For now, I'm trying to keep things simple given the target capabilities:</p>
+		<p>
+			For now, I'm trying to keep things simple given the target capabilities of being an
+			IDE+CMS+browser+library:
+		</p>
 		<ul>
 			<li>
 				Zzz's Node server can do things like:
@@ -324,18 +326,9 @@
 						use your API keys for calls to Claude, ChatGPT, and Gemini -- $$ risk of lost credits
 					</li>
 					<li>call Ollama's API if available -- low consequences</li>
-					<li>soon, more integrations including terminal access, which has huge consequences</li>
+					<li>there is no authentication yet, only an origin check</li>
+					<li>soon, more integrations including terminal access (which has huge consequences)</li>
 				</ul>
-			</li>
-			<li>
-				There are no mechanisms for end-users to load executable code or instructions/config.
-				Developers have full control, of course. Node is currently the only supported way to use
-				Zzz. We'll develop a plugin API so people can make reusable integrations, and distribution
-				will be through npm. Any modules you install via npm, or any code you add to the src
-				directory (did you configure Zzz to be able to write to it?), carry the normal (elevated)
-				risks associated with development. I try to practice good dependency <External_Link
-					href="https://github.com/ryanatkn/fuz_template/issues/1">hygiene</External_Link
-				>, and to give you an idea of my taste, the existence of postinstall scripts drives me nuts.
 			</li>
 			<li>
 				The frontend <External_Link
@@ -350,7 +343,30 @@
 				carefully. But at least we start from secure footing here.
 			</li>
 			<li>
-				In 2025, LLMs are known to be vulnerable to attacks like <External_Link
+				There are no mechanisms for end-users to load executable code or dangerous config.
+				Developers have full control to shoot their own feet, of course, and Node is currently the
+				only supported way to use Zzz. We'll develop a plugin API so people can make reusable
+				integrations, and distribution will be through npm. (decentralized from the project's POV
+				like a typical open source web ecosystem project -- I expect to publish a number of
+				<code>@ryanatkn/zzz_*</code> packages, and others may do who knows what, you'll have to vet
+				their code)
+				<ul>
+					<li>
+						Any modules you install via npm, or any code you add to the src directory (did you
+						configure Zzz to be able to write to it?), carry the normal (elevated) risks associated
+						with development, and as normal, end-users must trust the developers of software they
+						install.
+					</li>
+					<li>
+						I try to practice good dependency <External_Link
+							href="https://github.com/ryanatkn/fuz_template/issues/1">hygiene</External_Link
+						>, and to give you an idea of my taste, the existence of opt-out postinstall scripts
+						drives me nuts, but I'm not trained or very knowledgable on security
+					</li>
+				</ul>
+			</li>
+			<li>
+				In 2025, LLMs have a serious and unfixed (unfixable?) vulnerability to attacks like <External_Link
 					href="https://wikipedia.org/wiki/Prompt_injection">prompt injection</External_Link
 				>, where they are unable to reliably discern instructions intended by the prompter from
 				adversarial instructions in the data. People are building digital horrors. MCP's utility is
@@ -360,8 +376,9 @@
 						title:
 							'Simon Willison’s Weblog: The lethal trifecta for AI agents: private data, untrusted content, and external communication',
 					}}>wildly insecure</External_Link
-				> in some cases. Zzz will integrate LLMs into its own functionality slowly and carefully (currently
-				the only LLM app integration is using a local model to name new chats).
+				> in some cases. Zzz will integrate LLMs into its own functionality slowly and carefully -- currently
+				the only in-app LLM integration is using a local model to name new chats. There will be more,
+				but initiated by the user.
 			</li>
 			<li>I prioritize security but I will make mistakes, help is always appreciated</li>
 		</ul>
