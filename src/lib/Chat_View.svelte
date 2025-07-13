@@ -29,7 +29,7 @@
 
 	// TODO the add by model stuff is too noisy/overwhelming, needs some redesign
 
-	// TODO clicking tapes should select them, if none selected then default to the first
+	// TODO BLOCK clicking tapes should select them, if none selected then default to the first
 
 	// TODO add `presets` section to the top with the custom buttons/sets (accessible via contextmenu)
 	// TODO custom buttons section - including quick local, smartest all, all, etc - custom buttons to do common things, compose them with buttons like "fill all" or "fill with tag" or at least drag
