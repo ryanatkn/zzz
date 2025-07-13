@@ -32,6 +32,7 @@ and Git to clone the repo.
 
 Zzz is deployed via SvelteKit's static adapter with diminished capabilities.
 ([zzz.software](https://www.zzz.software/))
+It will have another build with the Node adapter soon.
 
 > Windows probably doesn't work but will be supported - help is appreciated.
 > For now I recommend [WSL](https://learn.microsoft.com/en-us/windows/wsl/install).
