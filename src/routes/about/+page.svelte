@@ -40,8 +40,9 @@
 		<p>
 			Zzz, pronounced "zees" like bees, is a fullstack web toolkit with a focus on user power and
 			experimentation. The idea is to make an integrated cross-platform environment that adapts to
-			your needs and intent while remaining fully open, aligned, and in your control. It's flexible
-			software for crafting experiences with maximal UX and streamlined DX.
+			your needs and intent while remaining fully open, aligned, and in your control. It's both a
+			customizable web user interface and also a flexible tool for crafting UX-maximizing websites
+			with a streamlined developer experience.
 		</p>
 		<p>
 			In the technology landscape of 2025, where LLM-based AI is upending long held assumptions, and <External_Link
@@ -59,17 +60,19 @@
 			The free and open source software I imagine answering these questions is cross-platform so it
 			runs everywhere, and for that we have the web with HTML, CSS, and JS. We want to solve
 			problems once and have supported features work consistently across operating systems and
-			devices, without dependence on any one company. For all its flaws and quirks, the web is the
-			turf of our digital commons, and it's capable of delivering excellent UX when used carefully.
+			devices, without dependence on any one company. For all its flaws and quirks (so many quirks),
+			the web is the turf of our digital commons, and it's capable of delivering excellent UX when
+			used carefully.
 		</p>
 		<p>
 			We want to enjoy the best possible UX, but to some degree the web is a pragmatic choice: its
-			adoption is second to none and its affordances are sufficient, so Zzz chooses distribution and
-			accessibility over performance and perfection. One consequence is that mobile in some cases
-			will be worse than native, but I think it's fine long term, a fine trade for freedom, and
-			other solutions may arise that let the Zzz codebase go more places, challenging native
-			advantages in unexpected ways (let me cope). And I think you'll find performance quite good,
-			thanks mostly to the browser builders and Svelte.
+			affordances feel sufficient (this is faint praise) but its adoption is second to none -- the
+			web is everywhere -- so Zzz chooses distribution and accessibility over performance and
+			perfection. One consequence is that mobile in some cases will be worse than native (like
+			battery life), but I think it's fine trade long term. Maybe solutions could arise that let the
+			Zzz codebase go more places, where the web challenges native advantages in unexpected ways
+			(let me cope). In any case, I think you'll find performance generally good, thanks largely to
+			the browser builders and Svelte.
 		</p>
 		<p>
 			Zzz uses JS to glue software and machines together precisely the way the user wants,
@@ -120,20 +123,21 @@
 		</p>
 		<p>
 			This scope may look far-fetched, and it is to me, but I'm just making tools that I want to use
-			now on the best foundations I can assemble. When designed for it, software has a way of
-			accumulating into more than the sum of its parts. It will take time though, because I
-			prioritize quality over velocity, and the project's resources are meager, having only my
-			donated time right now (of quality/velocity/cost, pick 2). A consequence is I can't really
-			compete on features in the short or medium term, and working alone isn't the best. I think the
-			most successful version of Zzz is where people use it to build products that people care
-			about, where devs build their custom stuff on a community-supported stack, and Zzz fades into
-			the background as just another part of the stack with a particular take.
+			now on the best foundations I can assemble. I hope it accumulates into more than the sum of
+			its parts. It will take time though, because I prioritize quality over velocity, and the
+			project's resources are meager, having only my donated time right now (of
+			quality/velocity/cost, pick 2). A consequence is I can't really compete on features in the
+			short or medium term, and working alone isn't the best. I think the most successful version of
+			Zzz is where people use it to build products that people care about, where devs build their
+			custom stuff on a community-supported stack, and Zzz fades into the background as just another
+			part of the stack with a particular take.
 		</p>
 		<p>
-			From a personal POV, Zzz is the primary user of my lower level software (Fuz/Moss/Gro/others),
-			and it's the primary dependency of some planned websites and apps, like the Zzz Browser (or
-			whatever it's called). Many of the initial systems have been designed with some thought
-			towards this bigger picture, trying to make Zzz reusable and well-scoped.
+			From me personally, Zzz is the primary user of my lower level software that I've been building
+			publicly since 2019 (Fuz/Moss/Gro/others), and it's the primary dependency of some planned
+			websites and apps (like the Zzz Electron-based browser mentioned above). Many of the initial
+			systems have been designed with some thought towards this bigger picture, trying to make Zzz
+			reusable and well-scoped.
 		</p>
 		<p>
 			Zzz wants to be easy to use and inclusive of people and devices, but try as it might, it can't
@@ -192,9 +196,11 @@
 				> and <External_Link href="https://wikipedia.org/wiki/JSON_Feed">JSON Feed</External_Link>
 			</li>
 			<li>
-				<External_Link href="https://activitypub.rocks/">ActivityPub</External_Link>
-				and
-				<External_Link href="https://atproto.com/">AT Protocol</External_Link>
+				<External_Link href="https://atproto.com/">AT Protocol</External_Link> and <External_Link
+					href="https://activitypub.rocks/">ActivityPub</External_Link
+				> (probably both but not immediate priorities, elsewhere I have an initial <External_Link
+					href="https://github.com/ryanatkn/fuz_mastodon">Mastodon integration</External_Link
+				> with readonly embedded posts)
 			</li>
 			<li>Git!</li>
 			<li>
