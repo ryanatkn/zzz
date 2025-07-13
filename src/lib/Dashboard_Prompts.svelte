@@ -102,7 +102,9 @@
 		</div>
 		{#if app.prompts.show_tutorial}
 			<div class="pt_lg" out:blur={{duration: 1000}}>
-				<!-- TODO is there no end value param? -->
+				<!-- TODO is there no end value param? how to do this better?
+				 it weirdly stays in the dom the whole duration,
+				 will cause layout issues if anything is placed after it -->
 				<aside out:scale={{duration: 44000}}>
 					<p>
 						This is a prompt builder UI demo. The goal is to experiment with many such tools, both
