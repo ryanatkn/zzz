@@ -317,9 +317,7 @@
 		<aside>
 			⚠️ I am not a security professional and Zzz has not been audited; it may be <strong
 				class="color_c_5">dangerous</strong
-			>
-			to run and I may be <strong>wrong</strong> about matters of security (I *think* it's secure given
-			the context below, but I can't say for sure, and you should not run Zzz in production yet)
+			> to run in production and there is no auth yet
 		</aside>
 		<p>
 			I'm trying to keep things simple given the target capabilities of an IDE+CMS+browser+library
