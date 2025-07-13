@@ -319,7 +319,7 @@
 		</p>
 		<p>
 			I'm trying to keep things simple given the target capabilities of being an
-			IDE+CMS+browser+library:
+			IDE+CMS+browser+library (lol):
 		</p>
 		<ul>
 			<li>
@@ -330,12 +330,12 @@
 						in the <code>ZZZ_DIR</code> (which defaults to <code>./</code>), and is securely scoped
 						(does not follow symlinks) -- this opens a significant surface area for both you and
 						attackers to use, and it can be lead to arbitrary code execution if, for example, you're
-						running a hot reloading dev server in that directory
+						running a hot reloading dev server in that directory (Zzz does not do this by default)
 					</li>
 					<li>
-						use your API keys for calls to Claude, ChatGPT, and Gemini -- $$ risk of lost credits
+						use your API keys for calls to Claude, ChatGPT, and Gemini -- $$ and impersonation risk
 					</li>
-					<li>call Ollama's API if available -- low consequences</li>
+					<li>call Ollama's API if available -- low consequences (unless your LLM is a snitch)</li>
 					<li>
 						<strong class="color_c_5">there is no authentication yet</strong>, only an origin check,
 						so do not use this in production
