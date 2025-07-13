@@ -298,7 +298,7 @@
 	<section>
 		<h2 class="mb_lg">Security</h2>
 		<aside>
-			⚠️ I am not a security professional and Zzz is not audited, it may be <strong
+			⚠️ I am not a security professional and Zzz is not audited; it may be <strong
 				class="color_c_5">dangerous</strong
 			> to run and I may be wrong about some things (I think it's secure given the context below, but
 			I can't say for sure, and you should not run Zzz in production)
