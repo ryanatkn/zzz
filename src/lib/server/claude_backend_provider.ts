@@ -105,6 +105,24 @@ export class Claude_Backend_Provider extends Backend_Provider<Anthropic> {
 	}
 }
 
+const create_claude_completion_options = <T extends boolean>(
+	model: string,
+	completion_options: Completion_Handler_Options['completion_options'],
+	completion_messages: Array<Completion_Message> | undefined,
+	prompt: string,
+	stream: T,
+) => ({
+	model,
+	stream,
+	max_tokens: completion_options.output_token_max,
+	temperature: completion_options.temperature,
+	top_k: completion_options.top_k,
+	top_p: completion_options.top_p,
+	stop_sequences: completion_options.stop_sequences,
+	system: completion_options.system_message,
+	messages: to_messages(completion_messages, prompt),
+});
+
 // TODO @many cleanup with better data structures/helpers
 const to_messages = (
 	completion_messages: Array<Completion_Message> | undefined,
@@ -136,21 +154,3 @@ const to_messages = (
 
 	return claude_messages;
 };
-
-const create_claude_completion_options = <T extends boolean>(
-	model: string,
-	completion_options: Completion_Handler_Options['completion_options'],
-	completion_messages: Array<Completion_Message> | undefined,
-	prompt: string,
-	stream: T,
-) => ({
-	model,
-	stream,
-	max_tokens: completion_options.output_token_max,
-	temperature: completion_options.temperature,
-	top_k: completion_options.top_k,
-	top_p: completion_options.top_p,
-	stop_sequences: completion_options.stop_sequences,
-	system: completion_options.system_message,
-	messages: to_messages(completion_messages, prompt),
-});

@@ -110,23 +110,6 @@ export class Gemini_Backend_Provider extends Backend_Provider<GoogleGenerativeAI
 	}
 }
 
-// TODO @many cleanup with better data structures/helpers
-const to_contents = (
-	completion_messages: Array<Completion_Message> | undefined,
-	prompt: string,
-): Array<google.Content> => {
-	const prompt_message = {role: 'user', parts: [{text: prompt}]};
-
-	return completion_messages
-		? completion_messages
-				.map(({role, content}) => ({
-					role: role === 'user' ? role : 'model', // TODO maybe clearer API for mapping roles, Google uses 'model' not 'assistant'
-					parts: [{text: content}],
-				}))
-				.concat(prompt_message)
-		: [prompt_message];
-};
-
 const create_gemini_model_options = (
 	model: string,
 	completion_options: Completion_Handler_Options['completion_options'],
@@ -146,3 +129,20 @@ const create_gemini_model_options = (
 		stopSequences: completion_options.stop_sequences,
 	},
 });
+
+// TODO @many cleanup with better data structures/helpers
+const to_contents = (
+	completion_messages: Array<Completion_Message> | undefined,
+	prompt: string,
+): Array<google.Content> => {
+	const prompt_message = {role: 'user', parts: [{text: prompt}]};
+
+	return completion_messages
+		? completion_messages
+				.map(({role, content}) => ({
+					role: role === 'user' ? role : 'model', // TODO maybe clearer API for mapping roles, Google uses 'model' not 'assistant'
+					parts: [{text: content}],
+				}))
+				.concat(prompt_message)
+		: [prompt_message];
+};

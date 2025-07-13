@@ -98,18 +98,6 @@ export class Ollama_Backend_Provider extends Backend_Provider<Ollama> {
 	}
 }
 
-const to_messages = (
-	system_message: string,
-	completion_messages: Array<Completion_Message> | undefined,
-	prompt: string,
-): Array<{role: string; content: string}> => {
-	return [
-		{role: 'system', content: system_message},
-		...(completion_messages || []),
-		{role: 'user', content: prompt},
-	];
-};
-
 const create_ollama_chat_options = <T extends boolean>(
 	model: string,
 	completion_options: Completion_Handler_Options['completion_options'],
@@ -136,3 +124,15 @@ const create_ollama_chat_options = <T extends boolean>(
 	},
 	messages: to_messages(completion_options.system_message, completion_messages, prompt),
 });
+
+const to_messages = (
+	system_message: string,
+	completion_messages: Array<Completion_Message> | undefined,
+	prompt: string,
+): Array<{role: string; content: string}> => {
+	return [
+		{role: 'system', content: system_message},
+		...(completion_messages || []),
+		{role: 'user', content: prompt},
+	];
+};

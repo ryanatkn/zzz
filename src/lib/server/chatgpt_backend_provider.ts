@@ -125,8 +125,27 @@ export class Chatgpt_Backend_Provider extends Backend_Provider<OpenAI> {
 	}
 }
 
+const create_chatgpt_completion_options = <T extends boolean>(
+	model: string,
+	completion_options: Completion_Handler_Options['completion_options'],
+	completion_messages: Array<Completion_Message> | undefined,
+	prompt: string,
+	stream: T,
+) => ({
+	model,
+	stream,
+	max_completion_tokens: completion_options.output_token_max,
+	temperature: completion_options.temperature,
+	seed: completion_options.seed,
+	top_p: completion_options.top_p,
+	frequency_penalty: completion_options.frequency_penalty,
+	presence_penalty: completion_options.presence_penalty,
+	stop: completion_options.stop_sequences,
+	messages: to_messages(completion_options.system_message, completion_messages, prompt, model),
+});
+
 // TODO @many cleanup with better data structures/helpers
-const format_messages = (
+const to_messages = (
 	system_message: string,
 	completion_messages: Array<Completion_Message> | undefined,
 	prompt: string,
@@ -160,22 +179,3 @@ const format_messages = (
 
 	return openai_messages;
 };
-
-const create_chatgpt_completion_options = <T extends boolean>(
-	model: string,
-	completion_options: Completion_Handler_Options['completion_options'],
-	completion_messages: Array<Completion_Message> | undefined,
-	prompt: string,
-	stream: T,
-) => ({
-	model,
-	stream,
-	max_completion_tokens: completion_options.output_token_max,
-	temperature: completion_options.temperature,
-	seed: completion_options.seed,
-	top_p: completion_options.top_p,
-	frequency_penalty: completion_options.frequency_penalty,
-	presence_penalty: completion_options.presence_penalty,
-	stop: completion_options.stop_sequences,
-	messages: format_messages(completion_options.system_message, completion_messages, prompt, model),
-});
