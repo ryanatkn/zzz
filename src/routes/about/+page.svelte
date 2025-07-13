@@ -131,11 +131,9 @@
 		</p>
 		<p>
 			From a personal POV, Zzz is the primary user of my lower level software (Fuz/Moss/Gro/others),
-			and it's the primary dependency of some planned websites and apps. Many of the initial systems
-			have been designed with some thought towards this bigger picture, trying to make Zzz reusable
-			and well-scoped, and I plan to continue building incrementally on a quality base with some
-			lower-quality experiments and stubbed future features mixed in. (increasingly I'll experiment
-			outside of the main codebase now that it's been announced)
+			and it's the primary dependency of some planned websites and apps, like the Zzz Browser or
+			whatever it's called. Many of the initial systems have been designed with some thought towards
+			this bigger picture, trying to make Zzz reusable and well-scoped.
 		</p>
 		<p>
 			Zzz wants to be easy to use and inclusive of people and devices, but try as it might, it can't
@@ -230,7 +228,7 @@
 			powerful clients. Some related projects call themselves web UIs, AI browsers, or even
 			operating systems. I currently like word "environment" to describe the devices+software UX,
 			and "adaptive web environments" to get the bigger picture. Whatever the name or scope, I'll
-			continue making modular software for building them. I think it's pretty important that we have
+			continue making modular software for building them. I think it's important that we enjoy
 			quality options that are free, open source, community-driven, protocol-interoperable, and
 			monoculture-resistant.
 		</p>
@@ -247,7 +245,7 @@
 	<section>
 		<h2 class="mb_lg">More details</h2>
 		<ul>
-			<li>Zzz is free and open source and permissively licensed, and forking is encouraged</li>
+			<li>Zzz is free and open source and permissively licensed</li>
 			<li>it's a noncommercial project and its only official domain is zzz.software</li>
 			<li>the Zzz name/logos/IP are community property</li>
 			<li>
@@ -390,12 +388,13 @@
 				</ul>
 			</li>
 			<li>
-				In 2025, LLMs have a serious vulnerability to attacks like <External_Link
+				In 2025, LLMs have serious vulnerabilities to attacks like <External_Link
 					href="https://wikipedia.org/wiki/Prompt_injection">prompt injection</External_Link
 				>, where they are unable to reliably discern instructions intended by the prompter from
 				adversarial instructions in the data. It's unclear if this is fixable but people are
-				building sensitive systems with probabilistic components. MCP's utility is high, but it can
-				be used in <External_Link
+				definitely building sensitive systems with probabilistic components, and I don't want to see
+				Zzz, an AI UI, make dumb predictable errors with LLMs. MCP's utility is high, but it can be
+				used in <External_Link
 					href="https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/"
 					attrs={{
 						title:
@@ -403,7 +402,7 @@
 					}}>insecure ways</External_Link
 				>. Zzz integrates LLMs into its own functionality slowly and carefully -- currently the only
 				in-app LLM integration is using a local model to name new chats. There will be more, and
-				we'll make sure you always have visibility and control over this behavior.
+				we'll make sure you always have visibility into and control over this behavior.
 			</li>
 			<li>
 				security and privacy should be the expected default, so for example Zzz won't make calls to
