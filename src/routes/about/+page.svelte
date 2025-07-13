@@ -128,20 +128,19 @@
 		</p>
 		<p>
 			From a personal POV, Zzz is the primary user of my lower level software (Fuz/Moss/Gro/others),
-			and it's the primary dependency of my planned products (websites/apps/etc, idk what I'm going
-			to do exactly, I'm hestitant to involve myself with operating services -- I imagine Zzz
-			Browser or something will be the planned Electron app). Many of the initial systems have been
-			designed with some thought towards this bigger picture, trying to make Zzz reusable and
-			reasonably tightly designed not sprawling, and I plan to continue building incrementally on a
-			quality base with some lower-quality experiments and stubbed future features mixed in.
-			(increasingly I'll experiment outside of the main codebase now that it's been announced)
+			and it's the primary dependency of my planned products (websites/apps/etc, but I like a simple
+			life and I do not like operations so idk). Many of the initial systems have been designed with
+			some thought towards this bigger picture, trying to make Zzz reusable and reasonably tight,
+			and I plan to continue building incrementally on a quality base with some lower-quality
+			experiments and stubbed future features mixed in. (increasingly I'll experiment outside of the
+			main codebase now that it's been announced)
 		</p>
 		<p>
 			Zzz wants to be easy to use and inclusive of people and devices, but try as it might, it can't
-			cater to every case for every person, and it favors power users -- however, thanks to the
-			magic of standards-based interoperability, as a browser Zzz works with all websites, and
-			anything you make with Zzz works with other browsers and web technologies. It's one of
-			infinite ways to use the web.
+			cater to every case for every person, and I must admit it favors power users -- however,
+			thanks to the magic of standards-based interoperability, as a browser Zzz works with all
+			websites, and anything you make with Zzz works with other browsers and web technologies. It's
+			one of infinite ways to use the web.
 		</p>
 		<p>Some early (rough) integrations include:</p>
 		<ul>
