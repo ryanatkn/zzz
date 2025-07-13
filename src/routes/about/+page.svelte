@@ -166,7 +166,7 @@
 				<External_Link href="https://svelte.dev/">SvelteKit</External_Link> and <External_Link
 					href="https://vite.dev/">Vite</External_Link
 				> playing a key coordinating role -- Hono bases itself on web standards and supports all JS server
-				runtimes; Zzz deploys it locally and in the cloud
+				runtimes; Zzz uses Hono locally and can deploy it to the cloud
 			</li>
 		</ul>
 		<p>Planned integrations:</p>
