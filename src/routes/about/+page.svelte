@@ -63,19 +63,23 @@
 			turf of our digital commons, and it's capable of delivering excellent UX when used carefully.
 		</p>
 		<p>
-			We want the best possible UX, but to some degree the web is the pragmatic choice; its adoption
+			We want the best possible UX, but to some degree the web is the pragmatic choice: its adoption
 			is second to none and its affordances are sufficient, so Zzz chooses distribution and
-			accessibility over performance and perfection. One consequence: mobile in some cases will be
-			worse than native, but I think it's fine long term, and other solutions may arise that let the
-			Zzz codebase go more places. And I think you'll find performance quite good, thanks mostly to
-			Svelte and the browser builders.
+			accessibility over performance and perfection. One consequence is that mobile in some cases
+			will be worse than native, but I think it's fine long term, a fine trade for freedom, and
+			other solutions may arise that let the Zzz codebase go more places, challenging native
+			advantages in unexpected ways (let me cope). And I think you'll find performance quite good,
+			thanks mostly to the browser builders and Svelte.
 		</p>
 		<p>
 			Zzz uses JS to glue software and machines together precisely the way the user wants,
 			maximizing its utility on any device across the full stack. It can run locally on your machine
-			using any of your available capabilities, or it can deploy anywhere JS runs to play whatever
-			role is needed. It's based on many kinds of software, borrowing features to provide both
-			end-users and devs an integrated and extensible system:
+			using any of your available capabilities, or it can deploy wherever JS runs to play whatever
+			role is needed.
+		</p>
+		<p>
+			It's based on many kinds of software, borrowing features to provide both end-users and devs an
+			integrated and extensible system:
 		</p>
 		<ul>
 			<li>
@@ -119,11 +123,11 @@
 			now on the best foundations I can assemble. When designed for it, software has a way of
 			accumulating into more than the sum of its parts. It will take time though, because I
 			prioritize quality over velocity, and the project's resources are meager, having only my
-			donated time right now -- of quality/velocity/cost, pick 2. A consequence is I can't really
-			compete on features in the medium term, and working alone isn't the best. I think the most
-			successful version of Zzz is where people use it to build products that people care about,
-			where devs build whatever custom stuff on a community-supported stack, and Zzz fades into the
-			background as just another part of the stack with a particular take.
+			donated time right now (of quality/velocity/cost, pick 2). A consequence is I can't really
+			compete on features in the short or medium term, and working alone isn't the best. I think the
+			most successful version of Zzz is where people use it to build products that people care
+			about, where devs build their custom stuff on a community-supported stack, and Zzz fades into
+			the background as just another part of the stack with a particular take.
 		</p>
 		<p>
 			From a personal POV, Zzz is the primary user of my lower level software (Fuz/Moss/Gro/others),
@@ -137,15 +141,17 @@
 			Zzz wants to be easy to use and inclusive of people and devices, but try as it might, it can't
 			cater to every case for every person, and I must admit it favors power users -- however,
 			thanks to the magic of standards-based interoperability, anything you make with Zzz works with
-			other browsers and web technologies. It's one of countless ways to use the web.
+			other browsers and web technologies. It's only one of countless ways to use the web and plays
+			nicely with others.
 		</p>
 		<p>Some early (rough) integrations include:</p>
 		<ul>
 			<li>
 				<External_Link href="https://github.com/ollama/ollama">Ollama</External_Link> runs AI models
-				locally -- more local LLM backends will be supported starting with <External_Link
-					href="https://github.com/ggml-org/llama.cpp">llama.cpp</External_Link
-				> which Ollama is based on -- Ollama makes installation and onboarding very easy
+				locally and makes installation and onboarding very easy -- additional local LLM backends will
+				be supported like <External_Link href="https://github.com/ggml-org/llama.cpp"
+					>llama.cpp</External_Link
+				> which Ollama is based on
 			</li>
 			<li>
 				<External_Link href="https://github.com/openai/openai-node">ChatGPT</External_Link>,
@@ -153,14 +159,14 @@
 					>Claude</External_Link
 				>, and <External_Link href="https://github.com/google-gemini/generative-ai-js"
 					>Gemini</External_Link
-				> -- these require API keys
+				> -- bring your own API keys
 			</li>
 			<li>
-				<External_Link href="https://hono.dev/">Hono</External_Link> as the backend web server with
+				<External_Link href="https://hono.dev/">Hono</External_Link> for the backend web server with
 				<External_Link href="https://svelte.dev/">SvelteKit</External_Link> and <External_Link
 					href="https://vite.dev/">Vite</External_Link
-				>, plays a key coordinating role -- Hono bases itself on web standards and supports all JS
-				server runtimes; Zzz deploys it locally and in the cloud
+				> playing a key coordinating role -- Hono bases itself on web standards and supports all JS server
+				runtimes; Zzz deploys it locally and in the cloud
 			</li>
 		</ul>
 		<p>Planned integrations:</p>
