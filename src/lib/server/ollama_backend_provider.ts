@@ -33,6 +33,8 @@ export class Ollama_Backend_Provider extends Backend_Provider {
 			await ollama.pull({model}); // TODO handle stream
 		}
 
+		// TODO should we support this?
+		// ollama.generate({prompt})
 		const response = await ollama.chat(
 			this.#create_ollama_chat_options(
 				model,
