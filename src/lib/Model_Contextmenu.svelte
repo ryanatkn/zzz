@@ -61,7 +61,7 @@
 				>
 					{#snippet icon()}<Glyph glyph={GLYPH_REFRESH} />{/snippet}
 					<span
-						>{#if model.ollama_show_response_loaded}re{/if}load Ollama details</span
+						>{#if model.ollama_show_response_loaded}re{/if}load model details</span
 					>
 				</Contextmenu_Entry>
 			{/if}

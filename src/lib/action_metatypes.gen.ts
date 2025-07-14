@@ -6,6 +6,8 @@ import * as action_specs from '$lib/action_specs.js';
 import {is_action_spec} from '$lib/action_spec.js';
 import {Action_Registry} from '$lib/action_registry.js';
 
+// TODO some of these can probably be declared differently without codegen
+
 /**
  * Outputs a file with generated types and schemas using the action specs as the source of truth.
  */

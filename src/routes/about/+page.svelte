@@ -67,11 +67,11 @@
 		<p>
 			We want to enjoy the best possible UX, but to some degree the web is a pragmatic choice: it
 			pales in some respects to native software, but its adoption is second to none -- the web is
-			globally available and low cost to use and develop for -- so Zzz chooses distribution and
-			accessibility over performance and perfection. One consequence is that mobile in some cases
-			will be worse than native (like battery life), but I think it's a fine trade long term. I
-			think you'll find performance generally good, thanks largely to the work of the browser
-			builders, and then Svelte and SvelteKit.
+			globally available at low cost with minimal gatekeeping to users and developers -- so Zzz
+			chooses distribution and accessibility over performance and perfection. One consequence is
+			that mobile in some cases will be worse than native (like battery life), but I think it's a
+			fine trade long term. I think you'll find performance generally good, thanks to the work of
+			many people including the browser builders and Svelte/SvelteKit.
 		</p>
 		<p>
 			Zzz uses JS to glue software and machines together precisely the way the user wants,

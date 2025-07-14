@@ -92,6 +92,8 @@
 		return undefined;
 	});
 
+	// TODO BLOCK failed pull shows as successful
+
 	// TODO BLOCK this is showing progress as finished immediately, showing no pending animation during the progress bar
 </script>
 

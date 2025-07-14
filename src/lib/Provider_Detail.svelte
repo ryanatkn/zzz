@@ -23,6 +23,9 @@
 	const at_detail_page = $derived(page.url.pathname === `${base}/providers/${provider.name}`);
 
 	const app = frontend_context.get();
+
+	// TODO BLOCK @many get and display Ollama version
+	// maybe at `<Glyph glyph={GLYPH_PROVIDER} />{provider.name}`
 </script>
 
 <div {...attrs} class="panel p_lg {attrs?.class}">

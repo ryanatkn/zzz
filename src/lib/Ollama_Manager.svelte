@@ -140,17 +140,19 @@
 
 			{#if ollama.available}
 				{#if ollama.models_downloaded.length > 0}
-					<!-- downloaded mdels -->
+					<!-- downloaded models -->
 					<section>
 						<h3 class="mt_xl3 mb_md">
 							{ollama.models_downloaded.length} model{plural(ollama.models_downloaded.length)}
 						</h3>
 
-						<div class="column">
+						<menu class="unstyled column">
 							{#each ollama.models_downloaded as model (model.id)}
-								<Ollama_Model_Listitem {model} />
+								<li transition:slide>
+									<Ollama_Model_Listitem {model} />
+								</li>
 							{/each}
-						</div>
+						</menu>
 					</section>
 					<!-- models not downloaded -->
 					{#if ollama.models_not_downloaded.length > 0}
@@ -159,16 +161,18 @@
 								{ollama.models_not_downloaded.length} not downloaded
 							</h3>
 
-							<div class="column">
+							<menu class="unstyled column">
 								{#each ollama.models_not_downloaded as model (model.id)}
-									<Ollama_Model_Listitem
-										{model}
-										onclick={async () => {
-											await model.navigate_to_download();
-										}}
-									/>
+									<li transition:slide>
+										<Ollama_Model_Listitem
+											{model}
+											onclick={async () => {
+												await model.navigate_to_download();
+											}}
+										/>
+									</li>
 								{/each}
-							</div>
+							</menu>
 						</section>
 					{/if}
 				{:else}
