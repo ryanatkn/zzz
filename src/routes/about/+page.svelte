@@ -61,18 +61,17 @@
 			runs everywhere, and for that we have the web with HTML, CSS, and JS. We want to solve
 			problems once and have supported features work consistently across operating systems and
 			devices, without dependence on any one company. For all its flaws and quirks (so many quirks),
-			the web is the turf of our digital commons, and it's capable of delivering excellent UX when
-			used carefully.
+			the web is the turf of our digital commons, and it's capable of delivering a good-to-excellent
+			UX.
 		</p>
 		<p>
-			We want to enjoy the best possible UX, but to some degree the web is a pragmatic choice: its
-			affordances feel sufficient (this is faint praise) but its adoption is second to none -- the
-			web is everywhere -- so Zzz chooses distribution and accessibility over performance and
-			perfection. One consequence is that mobile in some cases will be worse than native (like
-			battery life), but I think it's fine trade long term. Maybe solutions could arise that let the
-			Zzz codebase go more places, where the web challenges native advantages in unexpected ways
-			(let me cope). In any case, I think you'll find performance generally good, thanks largely to
-			the browser builders and Svelte.
+			We want to enjoy the best possible UX, but to some degree the web is a pragmatic choice: it
+			pales in some respects to native software, but its adoption is second to none -- the web is
+			globally available and low cost to develop for -- so Zzz chooses distribution and
+			accessibility over performance and perfection. One consequence is that mobile in some cases
+			will be worse than native (like battery life), but I think it's a fine trade long term. I
+			think you'll find performance generally good, thanks largely to the work of the browser
+			builders, and then Svelte and SvelteKit.
 		</p>
 		<p>
 			Zzz uses JS to glue software and machines together precisely the way the user wants,
