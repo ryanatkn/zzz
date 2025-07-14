@@ -31,6 +31,8 @@
 
 	const {model, onshow, onclose, ondelete, header}: Props = $props();
 
+	// TODO BLOCK the model info has the modelfile/template, making it huge
+
 	// TODO refactor with `Model_Detail`?
 </script>
 

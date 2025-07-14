@@ -190,18 +190,19 @@ export const frontend_action_handlers: Frontend_Action_Handlers = {
 		},
 	},
 	ollama_create: {
-		send_request: ({data: {input}}) => {
+		send_request: ({app, data: {input}}) => {
 			console.log('[frontend_action_handlers] sending ollama_create request:', input);
+			app.ollama.handle_ollama_create_start(input);
 		},
 		receive_response: async ({app, data: {input}}) => {
 			console.log('[frontend_action_handlers] received ollama_create response:', input);
-			await app.ollama.handle_ollama_create(input);
+			await app.ollama.handle_ollama_create_complete(input);
 		},
 	},
 
 	ollama_progress: {
 		receive: ({app, data: {input}}) => {
-			console.log('[frontend_action_handlers] received ollama_progress notification:', input);
+			// console.log('[frontend_action_handlers] received ollama_progress notification:', input);
 
 			const meta = input._meta;
 			if (!meta) {

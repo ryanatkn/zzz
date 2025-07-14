@@ -34,7 +34,7 @@ import {create_map_by_property} from '$lib/iterable_helpers.js';
 
 // TODO rough logging
 
-// TODO BLOCK get version
+// TODO BLOCK @many get and display Ollama version
 
 export const Ollama_Json = Cell_Json.extend({
 	host: z.string().default(OLLAMA_URL),
@@ -42,7 +42,7 @@ export const Ollama_Json = Cell_Json.extend({
 export type Ollama_Json = z.infer<typeof Ollama_Json>;
 export type Ollama_Json_Input = z.input<typeof Ollama_Json>;
 
-export interface Ollama_Options extends Cell_Options<typeof Ollama_Json> {}
+export type Ollama_Options = Cell_Options<typeof Ollama_Json>;
 
 /**
  * Ollama client state management with simplified API.
@@ -252,7 +252,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	/**
 	 * List all models available on the Ollama server and sync with app.models.
 	 */
-	async handle_ollama_list(response: Ollama_List_Response | null): Promise<void> {
+	handle_ollama_list(response: Ollama_List_Response | null): void {
 		if (!response) {
 			console.error('[ollama.handle_ollama_list] no response');
 			this.list_response = null;
@@ -366,11 +366,12 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	}
 
 	/**
-	 * Handle the completion of a pull operation.
+	 * Handle completion of a pull operation.
 	 */
 	handle_ollama_pull_complete(request: Ollama_Pull_Request): void {
-		console.log('[ollama.handle_ollama_pull_complete] completed pull:', request);
+		console.log('[ollama.handle_ollama_pull_complete] completed:', request);
 		this.pulling_models.delete(request.model);
+		// TODO this is needed right?
 		// Refresh the model list to show the newly pulled model
 		void this.refresh();
 	}
@@ -406,11 +407,10 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	/**
 	 * Create a new model with custom configuration.
 	 */
-	async handle_ollama_create(
-		request: Ollama_Create_Request,
-		// update_progress?: Progress_Update_Callback,
-	): Promise<void> {
+	handle_ollama_create_start(request: Ollama_Create_Request): void {
 		console.log(`[ollama.handle_ollama_create] creating: ${request.model}`);
+		// Add model to pulling_models set to track creation progress
+		this.pulling_models.add(request.model);
 
 		// Check if model already exists
 		if (this.model_by_name.has(request.model)) {
@@ -418,6 +418,14 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 			console.error(`[ollama.handle_ollama_create] ${error_message}`);
 			throw new Error(error_message);
 		}
+	}
+
+	/**
+	 * Handle completion of a create operation.
+	 */
+	async handle_ollama_create_complete(request: Ollama_Create_Request): Promise<void> {
+		console.log(`[ollama.handle_ollama_create_complete] completed: ${request.model}`);
+		this.pulling_models.delete(request.model);
 
 		// Refresh model list after successful creation
 		await this.refresh();
