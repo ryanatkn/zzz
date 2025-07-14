@@ -252,6 +252,10 @@
 		<ul>
 			<li>Zzz is free and open source and permissively licensed</li>
 			<li>it's a noncommercial project and its only official domain is zzz.software</li>
+			<li>
+				I can be selective about what goes in the repo, but it should be easy to extend (and
+				maintain forks)
+			</li>
 			<li>the Zzz name/logos/IP are community property</li>
 			<li>
 				I'm looking for <a href="https://www.ryanatkn.com/funding">funding</a> to sustain my continued

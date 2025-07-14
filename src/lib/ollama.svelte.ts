@@ -163,7 +163,6 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	);
 
 	pull_is_pulling(model_name: Model_Name): boolean {
-		// TODO BLOCK this continues showing after it's done (fix in actions api/handlers probably)
 		return this.pulling_models.has(model_name);
 	}
 
@@ -288,7 +287,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	/**
 	 * Get the list of currently running models.
 	 */
-	async handle_ollama_ps(response: Ollama_Ps_Response | null): Promise<void> {
+	handle_ollama_ps(response: Ollama_Ps_Response | null): void {
 		if (!response) {
 			console.error('[ollama.handle_ollama_ps] no response');
 			this.ps_response = null;
@@ -359,12 +358,21 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	}
 
 	/**
-	 * Pull a model from the Ollama registry.
+	 * Handle the start of a pull operation.
 	 */
-	handle_ollama_pull(request: Ollama_Pull_Request): void {
-		console.log('[ollama.handle_ollama_pull] pulling:', request);
-
+	handle_ollama_pull_start(request: Ollama_Pull_Request): void {
+		console.log('[ollama.handle_ollama_pull_start] starting pull:', request);
 		this.pulling_models.add(request.model);
+	}
+
+	/**
+	 * Handle the completion of a pull operation.
+	 */
+	handle_ollama_pull_complete(request: Ollama_Pull_Request): void {
+		console.log('[ollama.handle_ollama_pull_complete] completed pull:', request);
+		this.pulling_models.delete(request.model);
+		// Refresh the model list to show the newly pulled model
+		void this.refresh();
 	}
 
 	/**

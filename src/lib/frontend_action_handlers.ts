@@ -147,9 +147,9 @@ export const frontend_action_handlers: Frontend_Action_Handlers = {
 		send_request: () => {
 			console.log('[frontend_action_handlers] sending ollama_ps request');
 		},
-		receive_response: async ({app, data: {output}}) => {
+		receive_response: ({app, data: {output}}) => {
 			console.log('[frontend_action_handlers] received ollama_ps response:', output);
-			await app.ollama.handle_ollama_ps(output);
+			app.ollama.handle_ollama_ps(output);
 		},
 	},
 	ollama_show: {
@@ -162,12 +162,13 @@ export const frontend_action_handlers: Frontend_Action_Handlers = {
 		},
 	},
 	ollama_pull: {
-		send_request: ({data: {input}}) => {
+		send_request: ({app, data: {input}}) => {
 			console.log('[frontend_action_handlers] sending ollama_pull request:', input);
+			app.ollama.handle_ollama_pull_start(input);
 		},
 		receive_response: ({app, data: {input, output}}) => {
 			console.log('[frontend_action_handlers] received ollama_pull response:', input, output);
-			app.ollama.handle_ollama_pull(input);
+			app.ollama.handle_ollama_pull_complete(input);
 		},
 	},
 	ollama_delete: {
