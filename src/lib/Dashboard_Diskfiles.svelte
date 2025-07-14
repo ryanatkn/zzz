@@ -5,7 +5,7 @@
 	import Diskfile_Explorer from '$lib/Diskfile_Explorer.svelte';
 	import Diskfile_Editor_View from '$lib/Diskfile_Editor_View.svelte';
 	import Diskfile_Tab_Listitem from '$lib/Diskfile_Tab_Listitem.svelte';
-	import {Reorderable} from '$lib/reorderable.js';
+	import {Reorderable} from '$lib/reorderable.svelte.js';
 	import Diskfile_Picker_Dialog from '$lib/Diskfile_Picker_Dialog.svelte';
 
 	const app = frontend_context.get();

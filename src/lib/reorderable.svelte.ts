@@ -301,7 +301,9 @@ export class Reorderable implements Reorderable_Style_Config {
 	/**
 	 * Find an item from an event target by traversing the DOM.
 	 */
-	#find_item_from_event(event: Event): [Reorderable_Item_Id, number, HTMLElement] | null {
+	#find_item_from_event(
+		event: Event,
+	): [item_id: Reorderable_Item_Id, index: number, item: HTMLElement] | null {
 		const target = event.target as HTMLElement | null;
 		if (!target || !this.list_node) return null;
 
@@ -514,7 +516,6 @@ export class Reorderable implements Reorderable_Style_Config {
 	 * Attachment factory for the list container.
 	 */
 	list = (params: Reorderable_List_Params): Attachment<HTMLElement> => {
-		// TODO any setup here?
 		return (node) => {
 			// Check if we already have a list node
 			if (this.list_node && this.list_node !== node) {
@@ -581,7 +582,6 @@ export class Reorderable implements Reorderable_Style_Config {
 	 * Attachment factory for reorderable items.
 	 */
 	item = (params: Reorderable_Item_Params): Attachment<HTMLElement> => {
-		// TODO any setup here?
 		return (node) => {
 			// Get the current index
 			const {index} = params;
@@ -593,7 +593,8 @@ export class Reorderable implements Reorderable_Style_Config {
 				node.dataset.reorderable_item_id = item_id;
 			}
 			node.setAttribute('draggable', 'true');
-			if (this.item_class) node.classList.add(this.item_class);
+			const item_class = this.item_class;
+			if (item_class) node.classList.add(item_class);
 			node.setAttribute('role', 'listitem');
 			node.dataset.reorderable_list_id = this.id;
 
@@ -616,7 +617,7 @@ export class Reorderable implements Reorderable_Style_Config {
 				}
 
 				// Remove classes and attributes
-				if (this.item_class) node.classList.remove(this.item_class);
+				if (item_class) node.classList.remove(item_class);
 				node.removeAttribute('role');
 				node.removeAttribute('draggable');
 				delete node.dataset.reorderable_list_id;

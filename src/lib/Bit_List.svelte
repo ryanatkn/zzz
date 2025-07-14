@@ -4,7 +4,7 @@
 	import type {SvelteHTMLElements} from 'svelte/elements';
 	import {DEV} from 'esm-env';
 
-	import {Reorderable, type Reorderable_Options} from '$lib/reorderable.js';
+	import {Reorderable, type Reorderable_Options} from '$lib/reorderable.svelte.js';
 	import Bit_Summary from '$lib/Bit_Summary.svelte';
 	import type {Bit_Union} from '$lib/bit.svelte.js';
 	import type {Prompt} from '$lib/prompt.svelte.js';

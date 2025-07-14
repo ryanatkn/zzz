@@ -15,7 +15,7 @@
 	import type {Browser} from '$routes/tabs/browser.svelte.js';
 	import Browser_Tab_Content from '$routes/tabs/Browser_Tab_Content.svelte';
 	import Browser_Tab_Listitem from '$routes/tabs/Browser_Tab_Listitem.svelte';
-	import {Reorderable} from '$lib/reorderable.js';
+	import {Reorderable} from '$lib/reorderable.svelte.js';
 
 	interface Props {
 		browser: Browser;
