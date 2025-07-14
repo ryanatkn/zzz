@@ -1678,6 +1678,7 @@ export const src_json = {
 			declarations: [
 				{name: 'to_zzz_cache_dir', kind: 'function'},
 				{name: 'is_path_absolute', kind: 'function'},
+				{name: 'to_relative_path', kind: 'function'},
 				{name: 'map_watcher_change_to_diskfile_change', kind: 'function'},
 				{name: 'source_file_to_diskfile_json', kind: 'function'},
 				{name: 'SUPPORTED_CODE_FILETYPE_MATCHER', kind: 'variable'},

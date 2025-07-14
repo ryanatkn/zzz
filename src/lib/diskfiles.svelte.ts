@@ -1,10 +1,9 @@
 import {z} from 'zod';
-import {strip_start} from '@ryanatkn/belt/string.js';
 
 import {get_datetime_now, Uuid} from '$lib/zod_helpers.js';
 import {Diskfile, Diskfile_Schema} from '$lib/diskfile.svelte.js';
 import {Diskfile_Json, Diskfile_Path} from '$lib/diskfile_types.js';
-import {source_file_to_diskfile_json} from '$lib/diskfile_helpers.js';
+import {source_file_to_diskfile_json, to_relative_path} from '$lib/diskfile_helpers.js';
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {cell_array, HANDLED} from '$lib/cell_helpers.js';
 import {Indexed_Collection} from '$lib/indexed_collection.svelte.js';
@@ -59,7 +58,6 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 	constructor(options: Diskfiles_Options) {
 		super(Diskfiles_Json, options);
 
-		// Create the editor instance
 		this.editor = new Diskfiles_Editor(this.app);
 
 		this.decoders = {
@@ -86,17 +84,14 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 				break;
 			}
 			case 'change': {
-				// Find existing diskfile by path
 				const existing_diskfile = this.items.by_optional('by_path', validated_source_file.id);
 
 				if (existing_diskfile) {
-					// Update the existing diskfile, preserving its id
 					const diskfile_json = source_file_to_diskfile_json(
 						validated_source_file,
-						existing_diskfile.id, // Pass the existing id to maintain stability
+						existing_diskfile.id,
 					);
 
-					// Only update changed properties, not the entire object
 					existing_diskfile.set_json({
 						...diskfile_json,
 						// TODO hacky, should be handled more cleanly elsewhere
@@ -119,12 +114,11 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 		}
 	}
 
-	add(json: Diskfile_Json): Diskfile {
+	add(json: Diskfile_Json, auto_select: boolean = true): Diskfile {
 		const diskfile = new Diskfile({app: this.app, json});
 		this.items.add(diskfile);
 
-		// If no file is selected, select this one
-		if (this.selected_file_id === null) {
+		if (auto_select && this.selected_file_id === null) {
 			this.select(diskfile.id);
 		}
 
@@ -144,10 +138,9 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 			throw new Error('cannot create file: zzz_dir is not set');
 		}
 
-		// Create full path by joining zzz_dir with the filename
 		const path = Diskfile_Path.parse(`${this.app.zzz_cache_dir}${filename}`);
 
-		// Reuse the update method which creates or updates files
+		// Reuse `update` which creates or updates files
 		await this.update(path, content);
 	}
 
@@ -156,7 +149,6 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 			throw new Error('cannot create directory: zzz_dir is not set');
 		}
 
-		// Create full path by joining zzz_dir with the directory name
 		const path = Diskfile_Path.parse(`${this.app.zzz_cache_dir}${dirname}`);
 
 		await this.app.api.create_directory({path});
@@ -166,10 +158,11 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 		return this.items.by_optional('by_path', path);
 	}
 
+	// TODO make this a derived property?
 	/** Like `app.zzz_dir`, `undefined` means uninitialized, `null` means loading, `''` means none */
 	to_relative_path(path: string): string | null | undefined {
-		const {zzz_cache_dir: zzz_dir} = this.app;
-		return zzz_dir && strip_start(path, zzz_dir);
+		const {zzz_cache_dir} = this.app;
+		return zzz_cache_dir && to_relative_path(path, zzz_cache_dir);
 	}
 
 	/**

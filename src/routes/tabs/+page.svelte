@@ -67,31 +67,40 @@
 						browser.browserified = true;
 					}
 				}}
-				>{#if !app.ui.show_sidebar}remember your true power{:else}pretend it's all a dream{/if}</button
-			> -- that's just the current keybinding, it's likely to change, also see the little button in the
-			bottom left corner of this window.
+				>{#if !app.ui.show_sidebar}remember your power{:else}pretend it's all a dream{/if}</button
+			> (that's just the current keybinding, it will probably change, also see the button at the bottom
+			left corner of this window)
 		</p>
 		<p>
 			This simple change recontextualizes the web's UX - instead of the browser being its own silo,
-			users can compose tabs in a larger integrated system that's open and extensible by design.
+			users compose tabs in a larger integrated system that's open and extensible by design.
 		</p>
 		<p>
-			As a simple example, picture adding arbitrary metadata like tags to both your browser tabs and
-			files, both local and in the cloud, so you can find things no matter their type. Maybe you
-			want to summon UI that leverages that data for specific needs in specific contexts -- without
-			any technical knowledge, third parties, or unnecessary friction. The best usecases are still
-			unknown because today's browsers weren't designed for this kind of experimentation.
+			As a simple example, you could add metadata like tags to both your browser tabs and files,
+			both local and in the cloud, so you can find things no matter their type or location. Maybe
+			you want to summon UI that leverages that data for specific needs in specific contexts --
+			without any technical knowledge, third parties, or unnecessary friction. The best usecases are
+			still unknown, and today's browsers weren't designed for LLMs or experimentation at this
+			level.
 		</p>
 		<p>
-			I believe the optimal architecture -- <External_Link
-				href="https://www.inkandswitch.com/local-first/">local-first</External_Link
-			>, <External_Link href="https://www.inkandswitch.com/malleable-software/"
-				>malleable</External_Link
-			>, client-sovereign -- both respects individual rights and unlocks the full capabilities of
-			web tech, including
-			<a href="{base}/projects">website creation</a> and adaptive UI. And it can be built today, the
-			web's tools are ready.
+			I think that by optimizing for UX, Zzz and a lot of software is converging on similar
+			architectures. I'm not deep in the literature but some of my favorite most relevant writing is
+			from Ink and Switch -- <External_Link href="https://www.inkandswitch.com/local-first/"
+				>local-first</External_Link
+			> and <External_Link href="https://www.inkandswitch.com/malleable-software/"
+				>malleable software</External_Link
+			>. I think that we can all have software that's really nice to use, not that expensive to
+			produce, that also respects individual rights, that integrates our experience across the web
+			and our devices the way we prefer.
 		</p>
-		<p>More <a href="{base}/about">about</a> Zzz.</p>
+		<p>
+			The browser gains new life with this design. Maybe <a href="{base}/about">Zzz</a> is just a
+			browser with parlor tricks.
+			<small>And it's not even a real browser, just a (planned) Chromium wrapper.</small>
+			<small class="font_size_xs"
+				>(it would be neat if Zzz supported multiple browser engines)</small
+			>
+		</p>
 	</section>
 {/snippet}

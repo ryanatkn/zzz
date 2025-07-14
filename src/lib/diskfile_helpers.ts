@@ -1,5 +1,6 @@
 import type {Watcher_Change_Type} from '@ryanatkn/gro/watch_dir.js';
 import type {Source_File} from '@ryanatkn/gro/filer.js';
+import {strip_start} from '@ryanatkn/belt/string.js';
 
 import {Uuid, Datetime, Datetime_Now, create_uuid} from '$lib/zod_helpers.js';
 import {
@@ -19,6 +20,10 @@ export const to_zzz_cache_dir = (
 
 // TODO probably extract to `@ryanatkn/belt/path.js`
 export const is_path_absolute = (path: string): boolean => path[0] === '/';
+
+// TODO hacky, refactor path helpers with `@ryanatkn/belt/path.js`
+export const to_relative_path = (path: string, parent: string): string =>
+	strip_start(strip_start(path, parent), '/');
 
 /**
  * Maps watcher change types to diskfile change types

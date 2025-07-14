@@ -2,6 +2,7 @@
 	import {fade, blur, scale} from 'svelte/transition';
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
 	import {random_item} from '@ryanatkn/belt/random.js';
+	import {base} from '$app/paths';
 
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Glyph from '$lib/Glyph.svelte';
@@ -103,12 +104,13 @@
 		{#if app.prompts.show_tutorial}
 			<div class="pt_lg" out:blur={{duration: 1000}}>
 				<!-- TODO is there no end value param? how to do this better?
-				 it weirdly stays in the dom the whole duration,
-				 will cause layout issues if anything is placed after it -->
+				 it stays in the dom the whole duration (causes the parent to as well),
+				 which will cause layout issues if anything is placed after it in the DOM -->
 				<aside out:scale={{duration: 44000}}>
 					<p>
-						This is a prompt builder UI demo. The goal is to experiment with many such tools, both
-						simpler and more complex. Similarly, we'll explore variants of the chat interface.
+						This is a prompt builder UI demo. The goal is to experiment with many related ideas for
+						making and managing prompts, both simpler and more complex than what's here already.
+						Similarly, we'll explore variants of the <a href="{base}/chat">chat</a> interface.
 					</p>
 					<p>
 						As the system vocabulary and APIs are refined, they should support fast iteration on

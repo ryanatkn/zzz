@@ -34,17 +34,17 @@
 					{provider.title}
 				</h1>
 			{:else}
-				<h2>
+				<h2 class="mb_md">
 					<External_Link href={provider.url}>{provider.title}</External_Link>
 				</h2>
 			{/if}
-			<p>
+			<p class="mb_md">
 				<Glyph glyph={GLYPH_PROVIDER} />{provider.name}
 			</p>
-			<p>
+			<p class="mb_md">
 				<External_Link href={provider.homepage}>{format_url(provider.homepage)}</External_Link>
 			</p>
-			<p>
+			<p class="mb_md">
 				<External_Link href={provider.url}>docs</External_Link>
 			</p>
 		</div>
