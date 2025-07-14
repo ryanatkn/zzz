@@ -67,7 +67,7 @@
 		<p>
 			We want to enjoy the best possible UX, but to some degree the web is a pragmatic choice: it
 			pales in some respects to native software, but its adoption is second to none -- the web is
-			globally available and low cost to develop for -- so Zzz chooses distribution and
+			globally available and low cost to use and develop for -- so Zzz chooses distribution and
 			accessibility over performance and perfection. One consequence is that mobile in some cases
 			will be worse than native (like battery life), but I think it's a fine trade long term. I
 			think you'll find performance generally good, thanks largely to the work of the browser
