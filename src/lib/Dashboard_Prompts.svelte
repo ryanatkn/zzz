@@ -113,14 +113,11 @@
 						Similarly, we'll explore variants of the <a href="{base}/chat">chat</a> interface.
 					</p>
 					<p>
-						As the system vocabulary and APIs are refined, they should support fast iteration on
-						novel UIs with an increasingly lower technical barrier to entry, accessible to novice
-						TypeScript and Svelte users.
-					</p>
-					<p>
-						Soon I expect you'll be able to choose from numerous tools on this page. <a
-							href="https://github.com/ryanatkn/zzz/discussions">Share</a
-						> your ideas.
+						Soon I expect you'll be able to choose from numerous UIs on this page, and as the system
+						vocabulary and APIs are refined, it should get easier for novices to make their ideas
+						with TypeScript and Svelte. Share your ideas in the <a
+							href="https://github.com/ryanatkn/zzz/discussions">discussions</a
+						>.
 					</p>
 					<button
 						type="button"

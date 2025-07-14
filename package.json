@@ -959,6 +959,10 @@
       "types": "./dist/reorderable_helpers.d.ts",
       "default": "./dist/reorderable_helpers.js"
     },
+    "./reorderable.svelte.js": {
+      "types": "./dist/reorderable.svelte.d.ts",
+      "default": "./dist/reorderable.svelte.js"
+    },
     "./request_tracker.svelte.js": {
       "types": "./dist/request_tracker.svelte.d.ts",
       "default": "./dist/request_tracker.svelte.js"
