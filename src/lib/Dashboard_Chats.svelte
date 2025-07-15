@@ -9,6 +9,7 @@
 	import {frontend_context} from '$lib/frontend.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
 	import Chats_Contextmenu from '$lib/Chats_Contextmenu.svelte';
+	import External_Link from '$lib/External_Link.svelte';
 
 	const app = frontend_context.get();
 	const {chats} = app;
@@ -41,7 +42,7 @@
 				<Chats_List />
 			{/if}
 		</div>
-		{#if app.prompts.show_tutorial_for_chats}
+		{#if app.prompts.tutorial_for_chats}
 			<div class="pt_lg" out:blur={{duration: 1000}}>
 				<!-- TODO is there no end value param? how to do this better?
 				 it stays in the dom the whole duration (causes the parent to as well),
@@ -49,7 +50,9 @@
 				<aside out:scale={{duration: 44000}}>
 					<p>
 						⚠️ This is a an early prototype and your data is not saved yet -- soon it will be
-						persisted to a local Postgres or pglite database.
+						persisted to a local Postgres or pglite database. (<External_Link
+							href="https://github.com/ryanatkn/zzz/issues/7">issue 7</External_Link
+						>)
 					</p>
 					<p>
 						It currently supports chatting with local models via Ollama, and if you bring your own
@@ -59,8 +62,8 @@
 						type="button"
 						class="compact"
 						onclick={() => {
-							app.prompts.show_tutorial_for_chats = false;
-						}}>k</button
+							app.prompts.tutorial_for_chats = false;
+						}}>ok</button
 					>
 				</aside>
 			</div>

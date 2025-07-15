@@ -101,7 +101,7 @@
 			</div>
 			<Prompt_List />
 		</div>
-		{#if app.prompts.show_tutorial_for_prompts}
+		{#if app.prompts.tutorial_for_prompts}
 			<div class="pt_lg" out:blur={{duration: 1000}}>
 				<!-- TODO is there no end value param? how to do this better?
 				 it stays in the dom the whole duration (causes the parent to as well),
@@ -124,8 +124,8 @@
 						type="button"
 						class="compact"
 						onclick={() => {
-							app.prompts.show_tutorial_for_prompts = false;
-						}}>got it</button
+							app.prompts.tutorial_for_prompts = false;
+						}}>ok</button
 					>
 				</aside>
 			</div>
