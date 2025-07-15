@@ -58,20 +58,44 @@
 		</blockquote>
 		<p>
 			The free and open source software I imagine answering these questions is cross-platform so it
-			runs everywhere, and for that we have the web with HTML, CSS, and JS. We want to solve
-			problems once and have supported features work consistently across operating systems and
-			devices, without dependence on any one company. For all its flaws and quirks (so many quirks),
-			the web is the turf of our digital commons, and it's capable of delivering a good-to-excellent
-			UX.
+			runs everywhere. One unified runtime and one root codebase designed to be a dependency like
+			any other. Zzz doesn't have to be built this way, but I think it makes things vastly simpler.
+			To elaborate:
+		</p>
+		<ul>
+			<li>
+				I think UX should have primacy, and that UI should not be compromised in quality,
+				capability, performance, or accessibility.
+			</li>
+			<li>
+				I want to ship features once, and have things work consistently across operating systems and
+				devices with graceful fallbacks, with minimal dependence on any one company, and without
+				duplicating effort per-platform.
+			</li>
+			<li>
+				I want to maintain a single source of truth in code, without duplicating logic and data
+				across languages -- meaning, I want one primary language that runs on the frontend and also
+				the backend, and dev tooling while we're at it. This lets us eliminate classes of bugs,
+				makes security easier to reason, and enables fullstack integrations like rich runtime
+				schemas and custom dev tools. Clear and complete sources of truth are also helpful for
+				deterministic codegen in development, which Zzz uses to improve fullstack system coherence.
+			</li>
+		</ul>
+		<p>
+			All of this leads me to the web. I don't see an alternative. This means HTML, CSS, and JS
+			(thankfully TypeScript). For all its flaws and quirks (so many quirks), the web is the turf of
+			our digital commons, and it's capable of delivering a good-to-excellent UX.
 		</p>
 		<p>
-			We want to enjoy the best possible UX, but to some degree the web is a pragmatic choice: it
-			pales in some respects to native software, but its adoption is second to none -- the web is
-			globally available at low cost with minimal gatekeeping to users and developers -- so Zzz
-			chooses distribution and accessibility over performance and perfection. One consequence is
-			that mobile in some cases will be worse than native (like battery life), but I think it's a
-			fine trade long term. I think you'll find performance generally good, thanks to the work of
-			many people including the browser builders and Svelte/SvelteKit.
+			Naturally we want to enjoy the best possible UX, but to some degree, choosing the web is a
+			pragmatic move: it pales in some respects to native software, but its adoption is second to
+			none -- the web is globally available at low cost with minimal gatekeeping to users and
+			developers -- so Zzz chooses distribution and accessibility over performance and perfection.
+			One consequence is that mobile in some cases will be worse than native (like battery life),
+			but I think it's a fine trade long term. The web also has UX advantages, like supporting
+			extensions and devtools, and it has improved throughout my career, and IMO it's quite good
+			now. I think you'll find performance generally good, thanks to the work of many people
+			including the browser builders and Svelte/SvelteKit.
 		</p>
 		<p>
 			Zzz uses JS to glue software and machines together precisely the way the user wants,

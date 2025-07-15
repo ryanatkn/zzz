@@ -15,7 +15,7 @@ textarea {
 	scrollbar-width: thin; /* TODO maybe upstream? */
 	border-radius: var(--border_radius_xs2); /* TODO upstream? */
 }
-input {
+input[type='text'] {
 	border-radius: var(--border_radius_xs2); /* TODO upstream? */
 }
 
