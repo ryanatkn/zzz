@@ -1,5 +1,6 @@
 <script lang="ts">
 	import {random_item} from '@ryanatkn/belt/random.js';
+	import {blur, scale} from 'svelte/transition';
 
 	import Chats_List from '$lib/Chat_List.svelte';
 	import Chat_View from '$lib/Chat_View.svelte';
@@ -40,11 +41,27 @@
 				<Chats_List />
 			{/if}
 		</div>
-		<p>
-			⚠️ This is a an early prototype. Your data is not saved to a local database yet. It currently
-			supports chatting with local models via Ollama, and if you bring your own API key, it supports
-			basic text chat with ChatGPT, Claude, and Gemini.
-		</p>
+		{#if app.prompts.show_tutorial_for_chats}
+			<div class="pt_lg" out:blur={{duration: 1000}}>
+				<!-- TODO is there no end value param? how to do this better?
+				 it stays in the dom the whole duration (causes the parent to as well),
+				 which will cause layout issues if anything is placed after it in the DOM -->
+				<aside out:scale={{duration: 44000}}>
+					<p>
+						⚠️ This is a an early prototype. Your data is not saved to a local database yet. It
+						currently supports chatting with local models via Ollama, and if you bring your own API
+						key, it supports basic text chat with ChatGPT, Claude, and Gemini.
+					</p>
+					<button
+						type="button"
+						class="compact"
+						onclick={() => {
+							app.prompts.show_tutorial_for_chats = false;
+						}}>got it</button
+					>
+				</aside>
+			</div>
+		{/if}
 	</div>
 
 	<div class="column_fluid">
