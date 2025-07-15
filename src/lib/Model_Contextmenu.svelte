@@ -7,13 +7,7 @@
 	import type {Omit_Strict} from '@ryanatkn/belt/types.js';
 
 	import type {Model} from '$lib/model.svelte.js';
-	import {
-		GLYPH_MODEL,
-		GLYPH_REFRESH,
-		GLYPH_PROVIDER,
-		GLYPH_CHECKMARK,
-		GLYPH_CHAT,
-	} from '$lib/glyphs.js';
+	import {GLYPH_MODEL, GLYPH_PROVIDER, GLYPH_CHECKMARK, GLYPH_CHAT} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
 	import Contextmenu_Entry_Copy_To_Clipboard from '$lib/Contextmenu_Entry_Copy_To_Clipboard.svelte';
 
@@ -52,17 +46,6 @@
 				>
 					{#snippet icon()}<Glyph glyph={GLYPH_MODEL} />{/snippet}
 					<span>manage Ollama model</span>
-				</Contextmenu_Entry>
-				<!-- TODO I think we want `disabled` to be supported on Contextmenu_Entry here for loading states -->
-				<Contextmenu_Entry
-					run={async () => {
-						await model.app.api.ollama_show({model: model.name});
-					}}
-				>
-					{#snippet icon()}<Glyph glyph={GLYPH_REFRESH} />{/snippet}
-					<span
-						>{#if model.ollama_show_response_loaded}re{/if}load model details</span
-					>
 				</Contextmenu_Entry>
 			{/if}
 

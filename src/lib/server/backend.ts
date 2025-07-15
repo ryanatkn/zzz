@@ -92,12 +92,13 @@ export class Backend implements Action_Event_Environment {
 
 	readonly config: Zzz_Config;
 
-	readonly peer: Action_Peer;
+	// TODO @many make transports an option?
+	readonly peer: Action_Peer = new Action_Peer({environment: this});
 
 	/**
 	 * API for backend-initiated actions.
 	 */
-	readonly api: Backend_Actions_Api;
+	readonly api: Backend_Actions_Api = create_backend_actions_api(this);
 
 	/**
 	 * Scoped filesystem interface that restricts operations to allowed directories.
@@ -133,14 +134,9 @@ export class Backend implements Action_Event_Environment {
 
 		this.config = options.config;
 
-		// TODO @many make transports an option?
-		this.peer = new Action_Peer({environment: this});
-
 		this.action_registry = new Action_Registry(options.action_specs);
 		this.#action_handlers = options.action_handlers;
 		this.#handle_filer_change = options.handle_filer_change;
-
-		this.api = create_backend_actions_api(this);
 
 		this.scoped_fs = new Scoped_Fs([this.zzz_cache_dir]); // TODO pass filter through on options
 

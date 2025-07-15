@@ -34,22 +34,22 @@
 	<section class="width_md">
 		{#if browser.browserified}
 			<aside>
-				⚠️⚠️ This is just a demo of planned functionality, nothing works like it should. Zzz will
-				need a native installation to function like a real browser. The initial version will use
-				Chromium via Electron, and long term, a user-friendly design would allow choosing your
-				engine among Chromium, Firefox, Safari, Ladybird, etc.
+				⚠️⚠️ This is just a demo of planned functionality, nothing works like it should. Zzz needs a
+				native installation to function like a real browser. The initial version will use Chromium
+				via Electron, and long term, a user-friendly design would allow choosing your engine among
+				Chromium, Firefox, Safari, Ladybird, etc.
 			</aside>
 		{/if}
 		<p>
-			When installed as a native app instead of running in a browser tab, Zzz extends the web
-			browser using the form factor you already know well - imagine your current browser, and then
-			add a sidebar on the left like the one on this page, then <button
+			Zzz can be used to build installable apps that extend the web browser, using the form factor
+			you already know well - imagine your current browser, and then add a sidebar on the left like
+			the one on this page, then <button
 				type="button"
 				onclick={() => (browser.browserified = !browser.browserified)}
 				class:color_i={!browser.browserified}
 				class:color_h={browser.browserified}
 				class="inline compact">{browser.browserified ? 'un' : ''}browserify!</button
-			>
+			> I'm planning to make an Electron-based version of Zzz first.
 		</p>
 		<p>
 			And users don't have to buy in, either - the basic browser UX is unchanged. Press <code
@@ -95,8 +95,9 @@
 			and our devices the way we prefer.
 		</p>
 		<p>
-			The browser gains new life with this design. Maybe <a href="{base}/about">Zzz</a> is just a
-			browser with parlor tricks.
+			The browser gains new life with this design -- not everyone wants this, but I'm looking
+			forward to having my tabs and files in one place -- and maybe <a href="{base}/about">Zzz</a>
+			was always going to a browser with parlor tricks, insisting it's so much more.
 			<small>And it's not even a real browser, just a (planned) Chromium wrapper.</small>
 			<small class="font_size_xs"
 				>(it would be neat if Zzz supported multiple browser engines)</small
