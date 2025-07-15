@@ -326,7 +326,7 @@
 		<aside>
 			⚠️ I am not a security professional and Zzz has not been audited; it may be <strong
 				class="color_c_5">dangerous</strong
-			> to run in production and there is no auth yet
+			> to run and there is no auth yet
 		</aside>
 		<p>
 			I'm trying to keep things simple given the target capabilities of an IDE+CMS+browser+library
@@ -347,7 +347,7 @@
 					<li>
 						use your API keys for calls to Claude, ChatGPT, and Gemini -- $$ and impersonation risk
 					</li>
-					<li>call Ollama's API if available -- low risk (unless your LLM is a snitch)</li>
+					<li>call Ollama's API if available -- low risk</li>
 					<li>
 						<strong class="color_c_5">there is no authentication yet</strong>, only an origin check,
 						so do not use this in production
