@@ -82,26 +82,32 @@
 			</li>
 		</ul>
 		<p>
-			All of this leads me to the web. I don't see a suitable alternative. We get to use HTML, CSS,
-			and JS (thankfully TypeScript). For all its flaws and quirks (so many quirks), the web is the
-			turf of our digital commons, and it's capable of delivering a good-to-excellent UX.
+			All of this leads me to the web. I don't see a suitable alternative. History has decided we
+			get to use HTML, CSS, and JS (thankfully TypeScript). For all its flaws and quirks (so many
+			quirks), the web is the turf of our digital commons, but having worked with it for a while and
+			seeing the results on this website and elsewhere, I'm pretty sure it's capable of delivering a
+			good-to-excellent UX.
 		</p>
 		<p>
 			Naturally we want to enjoy the best possible UX, but to some degree, choosing the web is a
-			pragmatic move: it pales in some respects to native software, but its adoption is second to
-			none -- the web is globally available at low cost with minimal gatekeeping to users and
-			developers -- so Zzz chooses distribution and accessibility over performance and perfection.
-			One consequence is that mobile in some cases will be worse than native (like battery life),
-			but I think it's a fine trade long term. The web also has UX advantages, like supporting
-			extensions and devtools, and it has improved throughout my career, and IMO it's quite good
-			now. I think you'll find performance generally good, thanks to the work of many people
-			including the browser builders and Svelte/SvelteKit.
+			pragmatic move: it pales in some respects to native software, we ought not deny realities. But
+			its adoption is second to none -- the web is globally available at low cost with minimal
+			gatekeeping to users and developers -- so Zzz chooses distribution and accessibility over
+			performance and perfection.
 		</p>
 		<p>
-			Zzz uses JS to glue software and machines together precisely the way the user wants,
-			maximizing its utility in context across the full stack. It runs locally on your devices using
-			any of your available capabilities, and deploys wherever JS runs to play whatever roles are
-			needed.
+			One consequence is that Zzz-made things on mobile in some cases will be worse than native
+			(like battery life), but I think it's a fine trade long term. The web also has UX advantages,
+			like supporting extensions and devtools, and it has improved throughout my career, and IMO
+			it's quite good now. The web's privacy advantages seem mixed and subject to platform
+			influence. I think you'll find performance generally good, thanks to the work of many people
+			including the builders of browser and Svelte/SvelteKit.
+		</p>
+		<p>
+			Given its web roots, Zzz uses JS to glue software and machines together precisely the way the
+			user wants, maximizing its utility in context across the full stack. It runs locally on your
+			devices using any of your available capabilities, and deploys wherever JS runs to play
+			whatever roles are needed.
 		</p>
 		<p>
 			It's based on many kinds of software, borrowing features to provide both end-users and devs an
@@ -136,11 +142,12 @@
 				code libraries and web metaframeworks using TypeScript and <External_Link
 					href="https://svelte.dev/">Svelte</External_Link
 				> -- Zzz extends SvelteKit and <External_Link href="https://vite.dev/">Vite</External_Link> without
-				wrapping them, enabling devs to use all or parts of Zzz as a library with existing workflows
+				wrapping them, enabling devs to use all or parts of Zzz as a library with existing workflows,
+				and the plan is to support more streamlined/opinionated workflows too
 			</li>
 		</ul>
 		<p>
-			Putting it all together, we have a fullstack, fully capable, user-editable, and extensible
+			Putting it all together, we have a fullstack, fully capable, user-editable, extensible
 			system-and-toolkit that bridges dev workflows to end-user experiences, without prescribing
 			changes to current behaviors and expectations.
 		</p>
