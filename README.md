@@ -13,7 +13,7 @@ is a fullstack web toolkit with a focus on user power and experimentation.
 The idea is to make an integrated cross-platform environment that adapts to
 your needs and intent while remaining fully open, aligned, and in your control.
 It's both a customizable web user interface
-and also a flexible tool for crafting UX-maximizing websites
+and flexible tool for crafting UX-maximizing websites
 with a streamlined developer experience.
 
 More at [zzz.software/about](https://www.zzz.software/about).
