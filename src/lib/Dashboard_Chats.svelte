@@ -48,8 +48,8 @@
 				 which will cause layout issues if anything is placed after it in the DOM -->
 				<aside out:scale={{duration: 44000}}>
 					<p>
-						⚠️ This is a an early prototype and your data is not saved yet -- soon it will be to a
-						local Postgres or pglite database.
+						⚠️ This is a an early prototype and your data is not saved yet -- soon it will be
+						persisted to a local Postgres or pglite database.
 					</p>
 					<p>
 						It currently supports chatting with local models via Ollama, and if you bring your own
@@ -60,7 +60,7 @@
 						class="compact"
 						onclick={() => {
 							app.prompts.show_tutorial_for_chats = false;
-						}}>ok</button
+						}}>k</button
 					>
 				</aside>
 			</div>
