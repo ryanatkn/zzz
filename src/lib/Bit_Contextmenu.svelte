@@ -15,11 +15,12 @@
 	import {get_bit_type_glyph} from '$lib/bit_helpers.js';
 	import Contextmenu_Entry_Toggle from '$lib/Contextmenu_Entry_Toggle.svelte';
 
-	interface Props extends Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> {
+	const {
+		bit,
+		...rest
+	}: Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> & {
 		bit: Bit_Union;
-	}
-
-	const {bit, ...rest}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 

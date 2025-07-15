@@ -48,16 +48,19 @@
 				 which will cause layout issues if anything is placed after it in the DOM -->
 				<aside out:scale={{duration: 44000}}>
 					<p>
-						⚠️ This is a an early prototype. Your data is not saved to a local database yet. It
-						currently supports chatting with local models via Ollama, and if you bring your own API
-						key, it supports basic text chat with ChatGPT, Claude, and Gemini.
+						⚠️ This is a an early prototype and your data is not saved yet -- soon it will be to a
+						local Postgres or pglite database.
+					</p>
+					<p>
+						It currently supports chatting with local models via Ollama, and if you bring your own
+						API key, it supports basic text chat with ChatGPT, Claude, and Gemini.
 					</p>
 					<button
 						type="button"
 						class="compact"
 						onclick={() => {
 							app.prompts.show_tutorial_for_chats = false;
-						}}>got it</button
+						}}>ok</button
 					>
 				</aside>
 			</div>

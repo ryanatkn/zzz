@@ -11,7 +11,21 @@
 	import {GLYPH_PASTE, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
 
-	interface Props {
+	let {
+		content = $bindable(),
+		token_count: token_count_prop,
+		placeholder = GLYPH_PLACEHOLDER,
+		readonly = false,
+		show_stats = false,
+		show_actions = false,
+		textarea_height,
+		focus_key,
+		pending_element_to_focus_key = $bindable(),
+		attrs,
+		after,
+		children,
+		onsave,
+	}: {
 		content: string; // TODO maybe rename to value? rethink `Content_Editor` in general when we switch to CodeMirror
 		/** Estimated if not provided and `show_stats` is true. */
 		token_count?: number | undefined;
@@ -27,23 +41,7 @@
 		after?: Snippet | undefined;
 		children?: Snippet | undefined;
 		onsave?: ((value: string) => void) | undefined;
-	}
-
-	let {
-		content = $bindable(),
-		token_count: token_count_prop,
-		placeholder = GLYPH_PLACEHOLDER,
-		readonly = false,
-		show_stats = false,
-		show_actions = false,
-		textarea_height,
-		focus_key,
-		pending_element_to_focus_key = $bindable(),
-		attrs,
-		after,
-		children,
-		onsave,
-	}: Props = $props();
+	} = $props();
 
 	let textarea_el: HTMLTextAreaElement | undefined = $state();
 

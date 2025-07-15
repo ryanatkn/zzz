@@ -16,16 +16,6 @@
 
 	// TODO no longer uses `Chat`, maybe rename to `Tape_View` or similar?
 
-	interface Props {
-		tape: Tape;
-		onsend: (input: string) => Promise<void>;
-		// TODO @many think about how these two could be refactored, like a single class instance
-		focus_key?: string | number | null | undefined;
-		pending_element_to_focus_key?: string | number | null | undefined;
-		strips_attrs?: SvelteHTMLElements['div'] | undefined;
-		attrs?: SvelteHTMLElements['div'] | undefined;
-	}
-
 	let {
 		tape,
 		onsend,
@@ -33,7 +23,15 @@
 		pending_element_to_focus_key = $bindable(),
 		strips_attrs,
 		attrs,
-	}: Props = $props();
+	}: {
+		tape: Tape;
+		onsend: (input: string) => Promise<void>;
+		// TODO @many think about how these two could be refactored, like a single class instance
+		focus_key?: string | number | null | undefined;
+		pending_element_to_focus_key?: string | number | null | undefined;
+		strips_attrs?: SvelteHTMLElements['div'] | undefined;
+		attrs?: SvelteHTMLElements['div'] | undefined;
+	} = $props();
 
 	let input = $state('');
 	const input_token_count = $derived(estimate_token_count(input));

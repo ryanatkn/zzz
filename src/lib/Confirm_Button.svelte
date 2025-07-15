@@ -9,19 +9,6 @@
 	import type {Popover} from '$lib/popover.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
 
-	interface Props
-		extends Omit_Strict<ComponentProps<typeof Popover_Button>, 'popover_content' | 'children'> {
-		onconfirm: (popover: Popover) => void;
-		popover_button_attrs?: SvelteHTMLElements['button'] | undefined;
-		hide_on_confirm?: boolean | undefined;
-		/** Unlike on `Popover_Button` this is optional and has a `confirm` arg */
-		popover_content?: Snippet<[popover: Popover, confirm: () => void]> | undefined;
-		/** Content for the popover button */
-		popover_button_content?: Snippet<[popover: Popover, confirm: () => void]> | undefined;
-		/** Unlike on `Popover_Button` this has a `confirm` arg */
-		children?: Snippet<[popover: Popover, confirm: () => void]> | undefined;
-	}
-
 	const {
 		onconfirm,
 		popover_button_attrs,
@@ -32,7 +19,17 @@
 		button,
 		children,
 		...rest
-	}: Props = $props();
+	}: Omit_Strict<ComponentProps<typeof Popover_Button>, 'popover_content' | 'children'> & {
+		onconfirm: (popover: Popover) => void;
+		popover_button_attrs?: SvelteHTMLElements['button'] | undefined;
+		hide_on_confirm?: boolean | undefined;
+		/** Unlike on `Popover_Button` this is optional and has a `confirm` arg */
+		popover_content?: Snippet<[popover: Popover, confirm: () => void]> | undefined;
+		/** Content for the popover button */
+		popover_button_content?: Snippet<[popover: Popover, confirm: () => void]> | undefined;
+		/** Unlike on `Popover_Button` this has a `confirm` arg */
+		children?: Snippet<[popover: Popover, confirm: () => void]> | undefined;
+	} = $props();
 
 	// TODO @many type union instead of this pattern?
 	if (DEV) {

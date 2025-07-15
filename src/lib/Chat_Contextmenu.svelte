@@ -19,11 +19,12 @@
 	import Model_Picker_Dialog from '$lib/Model_Picker_Dialog.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 
-	interface Props extends Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> {
+	const {
+		chat,
+		...rest
+	}: Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> & {
 		chat: Chat;
-	}
-
-	const {chat, ...rest}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 

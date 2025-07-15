@@ -4,12 +4,11 @@
 	import type {Zzz_Dir} from '$lib/diskfile_types.js';
 	import {frontend_context} from '$lib/frontend.svelte.js';
 
-	interface Props {
+	const {
+		zzz_dir: zzz_dir_prop,
+	}: {
 		zzz_dir?: Zzz_Dir | null | undefined;
-	}
-
-	// Get props with default to context value
-	const {zzz_dir: zzz_dir_prop}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 	const {capabilities} = app;

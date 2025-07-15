@@ -7,16 +7,19 @@
 
 	// TODO maybe rewrite with contenteditable, be less opinionated
 
-	interface Props {
+	let {
+		value = $bindable(),
+		attrs,
+		span_attrs,
+		input_attrs,
+	}: {
 		value: string;
 		// TODO maybe support `onsave`, but `bind:` now supports this easily enough
 		// onsave: (value: string) => void;
 		attrs?: SvelteHTMLElements['span'];
 		span_attrs?: SvelteHTMLElements['span'];
 		input_attrs?: SvelteHTMLElements['input'];
-	}
-
-	let {value = $bindable(), attrs, span_attrs, input_attrs}: Props = $props();
+	} = $props();
 
 	let is_editing = $state(false);
 	let edited_value = $state('');

@@ -11,11 +11,12 @@
 	import Glyph from '$lib/Glyph.svelte';
 	import Contextmenu_Entry_Copy_To_Clipboard from '$lib/Contextmenu_Entry_Copy_To_Clipboard.svelte';
 
-	interface Props extends Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> {
+	const {
+		model,
+		...rest
+	}: Omit_Strict<ComponentProps<typeof Contextmenu>, 'entries'> & {
 		model: Model;
-	}
-
-	const {model, ...rest}: Props = $props();
+	} = $props();
 </script>
 
 <Contextmenu {...rest} {entries} />
