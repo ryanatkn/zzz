@@ -376,24 +376,17 @@
 				<ul>
 					<li>
 						we'll develop a plugin API so people can make reusable integrations, and distribution
-						will be through npm, decentralized from the project's POV like a typical open source web
-						ecosystem project so I gatekeep nothing -- I expect to publish a number of <code
-							>@ryanatkn/zzz_*</code
-						> packages, and if people think it's worth their time to make Zzz things, they can publish
-						according to their taste and you can vet their code
+						will be through npm, decentralized like a typical open source web ecosystem project so I
+						gatekeep nothing -- I plan to publish a number of <code>@ryanatkn/zzz_*</code> packages,
+						and if people think it's worth their time to make Zzz things, they can publish according
+						to their taste and devs can vet their code
 					</li>
 					<li>
-						any modules you install via npm, or any code you add to the src directory (did you
-						configure Zzz to be able to write to it?), carry the normal elevated risks associated
-						with development (because code execution), and anyone installing software is trusting
-						its developer
-					</li>
-					<li>
-						I try to practice good <External_Link
-							href="https://github.com/ryanatkn/fuz_template/issues/1"
+						any modules you install from npm, or any code you add to the src directory, carry the
+						normal elevated risks associated with development and code execution -- I try to
+						practice good <External_Link href="https://github.com/ryanatkn/fuz_template/issues/1"
 							>dependency hygiene</External_Link
-						>, and to give you an idea of my taste, the existence of opt-out postinstall scripts
-						drives me nuts, but I'm not trained or very knowledgable on security
+						>
 					</li>
 				</ul>
 			</li>
@@ -403,16 +396,18 @@
 				>, where they are unable to reliably discern instructions intended by the prompter from
 				adversarial instructions in the data. It's unclear if this is fixable but people are
 				definitely building sensitive systems with probabilistic components, and I don't want to see
-				Zzz, an AI UI, make dumb predictable errors with LLMs. MCP's utility is high, but it can be
-				used in <External_Link
+				Zzz, an AI UI, make dumb predictable errors with LLMs or be designed to encourage us to make
+				them. MCP's utility is high, but it can be used in <External_Link
 					href="https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/"
 					attrs={{
 						title:
 							'Simon Willison’s Weblog: The lethal trifecta for AI agents: private data, untrusted content, and external communication',
 					}}>insecure ways</External_Link
-				>. Zzz integrates LLMs into its own functionality slowly and carefully -- currently the only
-				in-app LLM integration is using a local model to name new chats. There will be more, and
-				we'll make sure you always have visibility into and control over this behavior.
+				> that I want to account for before integrating. Zzz will integrate LLMs into its own functionality
+				slowly and carefully -- currently the only in-app LLM integration is using a local model to name
+				new chats. There will be more, and we'll make sure you always have visibility into and control
+				over this behavior. (for example see the
+				<a href="{base}/providers/ollama">Ollama controls</a>)
 			</li>
 			<li>
 				Security and privacy should be the expected default, so for example Zzz won't make calls to
