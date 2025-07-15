@@ -82,9 +82,9 @@
 			</li>
 		</ul>
 		<p>
-			All of this leads me to the web. I don't see a suitable alternative. This means HTML, CSS, and
-			JS (thankfully TypeScript). For all its flaws and quirks (so many quirks), the web is the turf
-			of our digital commons, and it's capable of delivering a good-to-excellent UX.
+			All of this leads me to the web. I don't see a suitable alternative. We get to use HTML, CSS,
+			and JS (thankfully TypeScript). For all its flaws and quirks (so many quirks), the web is the
+			turf of our digital commons, and it's capable of delivering a good-to-excellent UX.
 		</p>
 		<p>
 			Naturally we want to enjoy the best possible UX, but to some degree, choosing the web is a
