@@ -13,12 +13,13 @@
 	import {frontend_context} from '$lib/frontend.svelte.js';
 	import Model_Summary from '$lib/Model_Summary.svelte';
 
-	interface Props {
+	const {
+		provider,
+		attrs,
+	}: {
 		provider: Provider;
 		attrs?: SvelteHTMLElements['div'] | undefined;
-	}
-
-	const {provider, attrs}: Props = $props();
+	} = $props();
 
 	const at_detail_page = $derived(page.url.pathname === `${base}/providers/${provider.name}`);
 

@@ -1,13 +1,15 @@
 <script lang="ts">
 	import type {SvelteHTMLElements} from 'svelte/elements';
 
-	interface Props {
+	const {
+		glyph,
+		size,
+		attrs,
+	}: {
 		glyph: string;
 		size?: string | undefined;
 		attrs?: SvelteHTMLElements['span'] | undefined;
-	}
-
-	const {glyph, size, attrs}: Props = $props();
+	} = $props();
 
 	const DEFAULT_SIZE = 'var(--font_size, 1em)';
 	const DEFAULT_FONT_SIZE = 'var(--font_size, inherit)';

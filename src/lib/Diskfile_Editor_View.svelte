@@ -14,12 +14,13 @@
 	import type {Uuid} from '$lib/zod_helpers.js';
 	import Diskfile_Editor_Nav from '$lib/Diskfile_Editor_Nav.svelte';
 
-	interface Props {
+	const {
+		diskfile,
+		onmodified,
+	}: {
 		diskfile: Diskfile;
 		onmodified?: (diskfile_id: Uuid) => void;
-	}
-
-	const {diskfile, onmodified}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 
@@ -103,7 +104,8 @@
 				<aside>
 					⚠️ <small
 						>This filesystem interface is an early proof of concept and lacks most features you'd
-						expect, more soon.</small
+						expect. There will be more soon. For now you can chat to create files, then change and
+						save them to see an example history feature.</small
 					>
 				</aside>
 			</div>

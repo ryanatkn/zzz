@@ -7,12 +7,13 @@
 	import type {Prompt} from '$lib/prompt.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
 
-	interface Props {
+	const {
+		prompt,
+		selected,
+	}: {
 		prompt: Prompt;
 		selected?: boolean | undefined;
-	}
-
-	const {prompt, selected}: Props = $props();
+	} = $props();
 </script>
 
 <Prompt_Contextmenu {prompt}>

@@ -5,21 +5,19 @@
 
 	import type {Provider_Name} from '$lib/provider_types.js';
 
-	interface Props {
-		name: Provider_Name;
-		fill?: string | null | undefined;
-		size?: string | undefined;
-		inline?: boolean | undefined;
-		props?: ComponentProps<typeof Svg> | undefined;
-	}
-
 	const {
 		name,
 		fill = 'var(--text_color)',
 		size = 'var(--font_size, var(--font_size_xl))', // TODO remove after changing the default in Svg.svelte upstream
 		inline = true,
 		props,
-	}: Props = $props();
+	}: {
+		name: Provider_Name;
+		fill?: string | null | undefined;
+		size?: string | undefined;
+		inline?: boolean | undefined;
+		props?: ComponentProps<typeof Svg> | undefined;
+	} = $props();
 
 	const provider_logos = {
 		chatgpt: chatgpt_logo,

@@ -6,11 +6,11 @@
 	import Tape_Listitem from '$lib/Tape_Listitem.svelte';
 	import {frontend_context} from '$lib/frontend.svelte.js';
 
-	interface Props {
+	const {
+		chat = frontend_context.get().chats.selected,
+	}: {
 		chat?: Chat | undefined;
-	}
-
-	const {chat = frontend_context.get().chats.selected}: Props = $props();
+	} = $props();
 
 	const reorderable = new Reorderable();
 

@@ -15,12 +15,13 @@
 	// then the strips would have a copy of the final rendered content,
 	// so they can be edited without affecting other data
 
-	interface Props {
+	const {
+		strip,
+		show_actions = true,
+	}: {
 		strip: Strip;
 		show_actions?: boolean | undefined;
-	}
-
-	const {strip, show_actions = true}: Props = $props();
+	} = $props();
 
 	const {bit} = $derived(strip);
 

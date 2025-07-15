@@ -16,12 +16,13 @@
 	import Ollama_Model_Details from '$lib/Ollama_Model_Details.svelte';
 	import {format_gigabytes} from '$lib/format_helpers.js';
 
-	interface Props {
+	const {
+		model,
+		attrs,
+	}: {
 		model: Model;
 		attrs?: SvelteHTMLElements['span'] | undefined;
-	}
-
-	const {model, attrs}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 

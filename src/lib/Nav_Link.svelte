@@ -5,21 +5,19 @@
 	import {base} from '$app/paths';
 	import {strip_end} from '@ryanatkn/belt/string.js';
 
-	interface Props {
-		href: string;
-		selected?: boolean | undefined;
-		show_selected_descendent?: boolean | undefined;
-		attrs?: SvelteHTMLElements['a'] | undefined;
-		children: Snippet<[selected: boolean, selected_descendent: boolean]>;
-	}
-
 	const {
 		href,
 		selected: selected_prop,
 		show_selected_descendent = true,
 		attrs,
 		children,
-	}: Props = $props();
+	}: {
+		href: string;
+		selected?: boolean | undefined;
+		show_selected_descendent?: boolean | undefined;
+		attrs?: SvelteHTMLElements['a'] | undefined;
+		children: Snippet<[selected: boolean, selected_descendent: boolean]>;
+	} = $props();
 
 	const href_normalized = $derived(strip_end(href, '/'));
 	const pathname_normalized = $derived(strip_end(page.url.pathname, '/'));

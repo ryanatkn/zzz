@@ -5,11 +5,11 @@
 	import type {Diskfile_Editor_State} from '$lib/diskfile_editor_state.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
 
-	interface Props {
+	const {
+		editor_state,
+	}: {
 		editor_state: Diskfile_Editor_State;
-	}
-
-	const {editor_state}: Props = $props();
+	} = $props();
 </script>
 
 <div class="font_family_mono font_size_sm">

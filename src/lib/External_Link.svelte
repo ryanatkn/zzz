@@ -16,7 +16,13 @@
 
 	// TODO maybe make this `Link` and infer optional prop `external`?
 
-	interface Props {
+	const {
+		href,
+		open_externally = true,
+		attrs,
+		icon,
+		children,
+	}: {
 		href: string;
 		// TODO maybe dont default to external?
 		/** Set to false to disable external link behavior. */
@@ -24,9 +30,7 @@
 		attrs?: SvelteHTMLElements['a'] | undefined;
 		icon?: Snippet<[known_logo: Svg_Data | null]> | undefined;
 		children?: Snippet | undefined;
-	}
-
-	const {href, open_externally = true, attrs, icon, children}: Props = $props();
+	} = $props();
 
 	const known_logo: Svg_Data | null = $derived(
 		github_regex.test(href)

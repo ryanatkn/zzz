@@ -6,11 +6,11 @@
 	import {GLYPH_CLEAR} from '$lib/glyphs.js';
 	import type {Ollama} from '$lib/ollama.svelte.js';
 
-	interface Props {
+	const {
+		ollama,
+	}: {
 		ollama: Ollama;
-	}
-
-	const {ollama}: Props = $props();
+	} = $props();
 
 	// Clear completed actions
 	const clear_completed_actions = () => {

@@ -9,12 +9,13 @@
 	import Diskfile_Metrics from '$lib/Diskfile_Metrics.svelte';
 	import {has_dependencies} from '$lib/diskfile_helpers.js';
 
-	interface Props {
+	const {
+		diskfile,
+		editor_state,
+	}: {
 		diskfile: Diskfile;
 		editor_state: Diskfile_Editor_State;
-	}
-
-	const {diskfile, editor_state}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 </script>

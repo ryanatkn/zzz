@@ -7,11 +7,13 @@
 	import Bit_Contextmenu from '$lib/Bit_Contextmenu.svelte';
 	import {get_bit_type_glyph} from '$lib/bit_helpers.js';
 
-	interface Props {
+	const {
+		bit,
+		prompt,
+	}: {
 		bit: Bit_Union;
 		prompt?: Prompt | undefined;
-	}
-	const {bit, prompt}: Props = $props();
+	} = $props();
 
 	const total_chars = $derived(bit.enabled ? bit.length : 0);
 	// TODO bug here where the xml tag is not taken into account, so they add up to less than 100% as calculated

@@ -1,15 +1,16 @@
 <script lang="ts">
 	import type {Snippet} from 'svelte';
 
-	interface Props {
+	const {
+		value,
+		text,
+	}: {
 		/**
 		 * The percentage value of the progress bar, 0-100.
 		 */
 		value: number;
 		text?: Snippet;
-	}
-
-	const {value, text}: Props = $props();
+	} = $props();
 
 	// TODO a11y
 </script>

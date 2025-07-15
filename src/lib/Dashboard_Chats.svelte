@@ -40,6 +40,11 @@
 				<Chats_List />
 			{/if}
 		</div>
+		<p>
+			⚠️ This is a an early prototype. Your data is not saved to a local database yet. It currently
+			supports chatting with local models via Ollama, and if you bring your own API key, it supports
+			basic text chat with ChatGPT, Claude, and Gemini.
+		</p>
 	</div>
 
 	<div class="column_fluid">

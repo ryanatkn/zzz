@@ -8,11 +8,11 @@
 	import {PING_HISTORY_MAX, type Ping_Data} from '$lib/capabilities.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
 
-	interface Props {
+	const {
+		children,
+	}: {
 		children?: Snippet | undefined;
-	}
-
-	const {children}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 	const {capabilities} = app;
@@ -34,7 +34,7 @@
 	</div>
 
 	<ul
-		class="unstyled overflow_auto scrollbar_width_thin column panel p_md pb_0 mb_0 shadow_inset_top_xs"
+		class="unstyled column panel p_md pb_0 mb_0 shadow_inset_top_xs"
 		style:height="150px"
 		style:min-height="150px"
 	>

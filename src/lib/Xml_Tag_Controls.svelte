@@ -6,11 +6,11 @@
 	import {GLYPH_ADD, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
 
-	interface Props {
+	const {
+		bit,
+	}: {
 		bit: Bit_Union;
-	}
-
-	const {bit}: Props = $props();
+	} = $props();
 
 	let input_el: HTMLInputElement | undefined;
 </script>

@@ -7,12 +7,13 @@
 	import {GLYPH_CHAT} from '$lib/glyphs.js';
 	import type {Chat} from '$lib/chat.svelte.js';
 
-	interface Props {
+	const {
+		chat,
+		selected,
+	}: {
 		chat: Chat;
 		selected?: boolean | undefined;
-	}
-
-	const {chat, selected}: Props = $props();
+	} = $props();
 </script>
 
 <Chat_Contextmenu {chat}>

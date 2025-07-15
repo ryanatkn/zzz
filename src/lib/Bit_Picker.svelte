@@ -9,13 +9,15 @@
 	const app = frontend_context.get();
 	const {bits} = app;
 
-	interface Props {
+	const {
+		onpick,
+		filter,
+		exclude_ids,
+	}: {
 		onpick: (bit: Bit_Union | undefined) => boolean | void;
 		filter?: ((bit: Bit_Union) => boolean) | undefined;
 		exclude_ids?: Array<Uuid> | undefined;
-	}
-
-	const {onpick, filter, exclude_ids}: Props = $props();
+	} = $props();
 </script>
 
 <Picker

@@ -9,16 +9,6 @@
 	import type {Bit_Union} from '$lib/bit.svelte.js';
 	import type {Prompt} from '$lib/prompt.svelte.js';
 
-	interface Props {
-		bits: Array<Bit_Union>;
-		prompt?: Prompt | undefined;
-		onreorder?: ((from_index: number, to_index: number) => void) | undefined;
-		reorderable_options?: Reorderable_Options | undefined;
-		item_attrs?: SvelteHTMLElements['li'] | undefined;
-		attrs?: SvelteHTMLElements['ul'] | undefined;
-		empty?: Snippet | undefined;
-	}
-
 	const {
 		bits,
 		prompt,
@@ -27,7 +17,15 @@
 		item_attrs,
 		attrs,
 		empty = empty_default,
-	}: Props = $props();
+	}: {
+		bits: Array<Bit_Union>;
+		prompt?: Prompt | undefined;
+		onreorder?: ((from_index: number, to_index: number) => void) | undefined;
+		reorderable_options?: Reorderable_Options | undefined;
+		item_attrs?: SvelteHTMLElements['li'] | undefined;
+		attrs?: SvelteHTMLElements['ul'] | undefined;
+		empty?: Snippet | undefined;
+	} = $props();
 
 	const reorderable = $derived(onreorder ? new Reorderable(reorderable_options) : null);
 

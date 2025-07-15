@@ -6,14 +6,17 @@
 	import {sort_by_text, sort_by_numeric} from '$lib/sortable.svelte.js';
 	import Diskfile_Listitem from '$lib/Diskfile_Listitem.svelte';
 
-	interface Props {
+	const {
+		onpick,
+		filter,
+		exclude_ids,
+		selected_ids,
+	}: {
 		onpick: (diskfile: Diskfile | undefined) => boolean | void;
 		filter?: ((diskfile: Diskfile) => boolean) | undefined;
 		exclude_ids?: Array<Uuid> | undefined;
 		selected_ids?: Array<Uuid> | undefined;
-	}
-
-	const {onpick, filter, exclude_ids, selected_ids}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 	const {diskfiles} = app;

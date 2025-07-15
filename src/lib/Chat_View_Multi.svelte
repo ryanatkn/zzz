@@ -10,11 +10,11 @@
 	import Model_Picker_Dialog from '$lib/Model_Picker_Dialog.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 
-	interface Props {
+	const {
+		chat,
+	}: {
 		chat: Chat;
-	}
-
-	const {chat}: Props = $props();
+	} = $props();
 
 	let content_input: {focus: () => void} | undefined;
 	let pending = $state(false); // TODO refactor request state

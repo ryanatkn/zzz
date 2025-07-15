@@ -8,12 +8,13 @@
 	import Tape_Toggle_Button from '$lib/Tape_Toggle_Button.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 
-	interface Props {
+	const {
+		tape,
+		chat,
+	}: {
 		tape: Tape;
 		chat: Chat;
-	}
-
-	const {tape, chat}: Props = $props();
+	} = $props();
 
 	const strip_count = $derived(tape.strips.size);
 

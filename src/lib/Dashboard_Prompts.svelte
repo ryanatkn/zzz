@@ -108,14 +108,15 @@
 				 which will cause layout issues if anything is placed after it in the DOM -->
 				<aside out:scale={{duration: 44000}}>
 					<p>
-						This is a prompt builder UI demo. The goal is to experiment with many related ideas for
-						making and managing prompts, both simpler and more complex than what's here already.
-						Similarly, we'll explore variants of the <a href="{base}/chat">chat</a> interface.
+						⚠️ This is a prompt builder UI demo, an early prototype. Your data is not saved yet. The
+						goal is to experiment with many related ideas for making and managing prompts, both
+						simpler and more complex than what's here already. Similarly, we'll explore variants of
+						the <a href="{base}/chat">chat</a> interface.
 					</p>
 					<p>
-						Soon I expect you'll be able to choose from numerous UIs on this page, and as the system
-						vocabulary and APIs are refined, it should get easier for novices to make their ideas
-						with TypeScript and Svelte. Share your ideas in the <a
+						Soon this page will offer numerous UIs for creating and managing prompts, and as the
+						system vocabulary and APIs are refined, it should get easier for novices to make their
+						ideas with TypeScript and Svelte. Share your ideas in the <a
 							href="https://github.com/ryanatkn/zzz/discussions">discussions</a
 						>.
 					</p>

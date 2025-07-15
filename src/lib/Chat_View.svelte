@@ -19,11 +19,11 @@
 	const app = frontend_context.get();
 	const {chats} = app;
 
-	interface Props {
+	const {
+		chat,
+	}: {
 		chat: Chat;
-	}
-
-	const {chat}: Props = $props();
+	} = $props();
 
 	const tape_count = $derived(chat.tapes.length);
 

@@ -58,14 +58,13 @@
 		</blockquote>
 		<p>
 			The free and open source software I imagine answering these questions is cross-platform so it
-			runs everywhere. One unified metaruntime and one root codebase designed to be a dependency
-			like any other. Zzz doesn't have to be built this way, but I think it makes things vastly
+			runs everywhere. Zzz doesn't have to be built this way, but I think it makes things much
 			simpler. To elaborate:
 		</p>
 		<ul>
 			<li>
-				I think UX should have primacy, and that UI should not be compromised in quality,
-				capability, performance, or accessibility.
+				I think UX should have primacy, and UI should not be compromised in quality, capability,
+				performance, or accessibility.
 			</li>
 			<li>
 				I want to ship features once, and have things work consistently across operating systems and
@@ -74,11 +73,11 @@
 			</li>
 			<li>
 				I want to maintain a single source of truth in code, without duplicating logic and data
-				across languages -- meaning, I want one primary language that runs on the frontend and also
-				the backend, and dev tooling while we're at it. This lets us eliminate classes of bugs,
-				makes security easier to reason, and enables fullstack integrations like rich runtime
-				schemas and custom dev tools. Clear and complete sources of truth are also helpful for
-				deterministic codegen in development, which Zzz uses to improve fullstack system coherence.
+				across languages, so there's one primary language that runs on the frontend and also the
+				backend, and also dev tooling. This lets us avoid many bugs and enables fullstack
+				integrations like rich runtime schemas and custom dev tools, which can improve security and
+				data integrity. Clear and complete sources of truth are also helpful for deterministic
+				codegen in development, which Zzz uses to improve fullstack system coherence.
 			</li>
 		</ul>
 		<p>

@@ -2,7 +2,14 @@
 	import type {Snippet} from 'svelte';
 	import type {SvelteHTMLElements} from 'svelte/elements';
 
-	interface Props {
+	const {
+		active,
+		active_content,
+		inactive_content,
+		ontoggle,
+		attrs,
+		children,
+	}: {
 		/**
 		 * Current state of the toggle
 		 */
@@ -21,9 +28,7 @@
 		ontoggle: (active: boolean) => void;
 		attrs?: SvelteHTMLElements['button'] | undefined;
 		children?: Snippet | undefined;
-	}
-
-	const {active, active_content, inactive_content, ontoggle, attrs, children}: Props = $props();
+	} = $props();
 </script>
 
 <button type="button" class="plain icon_button" {...attrs} onclick={() => ontoggle(!active)}>

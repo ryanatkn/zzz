@@ -17,11 +17,11 @@
 	import Sortable_List from '$lib/Sortable_List.svelte';
 	import {sort_by_text, sort_by_numeric} from '$lib/sortable.svelte.js';
 
-	interface Props {
+	const {
+		empty,
+	}: {
 		empty?: Snippet | undefined;
-	}
-
-	const {empty}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 	const {diskfiles} = app;

@@ -5,11 +5,11 @@
 	import {get_glyph_for_action_kind} from '$lib/glyphs.js';
 	import type {Action} from '$lib/action.svelte.js';
 
-	interface Props {
+	const {
+		action,
+	}: {
 		action: Action;
-	}
-
-	const {action}: Props = $props();
+	} = $props();
 
 	// TODO this is all hacky, just proof of concept stuff
 </script>

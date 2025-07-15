@@ -8,13 +8,15 @@
 	import type {Ollama} from '$lib/ollama.svelte.js';
 	import {frontend_context} from '$lib/frontend.svelte.js';
 
-	interface Props {
+	const {
+		ollama,
+		onclose,
+		oncancel,
+	}: {
 		ollama: Ollama;
 		onclose?: () => void;
 		oncancel?: () => void;
-	}
-
-	const {ollama, onclose, oncancel}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 

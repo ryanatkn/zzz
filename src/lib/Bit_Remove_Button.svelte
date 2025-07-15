@@ -6,14 +6,17 @@
 	import {GLYPH_REMOVE} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
 
-	interface Props {
+	const {
+		bit,
+		prompt,
+		prompts,
+		attrs,
+	}: {
 		bit: Bit_Union;
 		prompt?: Prompt | undefined;
 		prompts?: Prompts | undefined;
 		attrs?: Record<string, string> | undefined;
-	}
-
-	const {bit, prompt, prompts, attrs}: Props = $props();
+	} = $props();
 </script>
 
 <Confirm_Button

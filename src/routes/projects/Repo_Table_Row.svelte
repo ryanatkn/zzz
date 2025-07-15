@@ -2,12 +2,13 @@
 	import {base} from '$app/paths';
 	import type {Repo} from '$routes/projects/repo.svelte.js';
 
-	interface Props {
+	const {
+		repo,
+		project_id,
+	}: {
 		repo: Repo;
 		project_id: string;
-	}
-
-	const {repo, project_id}: Props = $props();
+	} = $props();
 </script>
 
 <tr>

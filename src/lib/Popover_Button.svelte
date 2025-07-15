@@ -7,19 +7,6 @@
 	import {Popover} from '$lib/popover.svelte.js';
 	import type {Position, Alignment} from '$lib/position_helpers.js';
 
-	interface Props {
-		position?: Position | undefined;
-		align?: Alignment | undefined;
-		disable_outside_click?: boolean | undefined;
-		popover_class?: string | undefined;
-		popover_attrs?: SvelteHTMLElements['div'] | undefined;
-		popover_content: Snippet<[popover: Popover]>;
-		popover_container_attrs?: SvelteHTMLElements['div'] | undefined;
-		attrs?: SvelteHTMLElements['button'] | undefined;
-		button?: Snippet<[popover: Popover]> | undefined;
-		children?: Snippet<[popover: Popover]> | undefined;
-	}
-
 	const {
 		position = 'bottom',
 		align = 'center',
@@ -31,7 +18,18 @@
 		attrs,
 		button,
 		children,
-	}: Props = $props();
+	}: {
+		position?: Position | undefined;
+		align?: Alignment | undefined;
+		disable_outside_click?: boolean | undefined;
+		popover_class?: string | undefined;
+		popover_attrs?: SvelteHTMLElements['div'] | undefined;
+		popover_content: Snippet<[popover: Popover]>;
+		popover_container_attrs?: SvelteHTMLElements['div'] | undefined;
+		attrs?: SvelteHTMLElements['button'] | undefined;
+		button?: Snippet<[popover: Popover]> | undefined;
+		children?: Snippet<[popover: Popover]> | undefined;
+	} = $props();
 
 	// TODO @many type union instead of this pattern?
 	if (DEV) {

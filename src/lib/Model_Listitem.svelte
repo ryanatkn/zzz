@@ -3,12 +3,13 @@
 	import Model_Contextmenu from '$lib/Model_Contextmenu.svelte';
 	import Provider_Logo from '$lib/Provider_Logo.svelte';
 
-	interface Props {
+	const {
+		model,
+		show_tags,
+	}: {
 		model: Model;
 		show_tags?: boolean | undefined;
-	}
-
-	const {model, show_tags}: Props = $props();
+	} = $props();
 
 	// const provider = $derived(model.app.providers.find_by_name(model.provider_name));
 

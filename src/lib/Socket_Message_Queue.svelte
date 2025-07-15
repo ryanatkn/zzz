@@ -11,12 +11,13 @@
 	import Popover_Button from '$lib/Popover_Button.svelte';
 	import {format_timestamp} from '$lib/time_helpers.js';
 
-	interface Props {
+	const {
+		socket,
+		type,
+	}: {
 		socket: Socket;
 		type: 'queued' | 'failed';
-	}
-
-	const {socket, type}: Props = $props();
+	} = $props();
 
 	// TODO show "ping the server" for both http and websocket transports
 

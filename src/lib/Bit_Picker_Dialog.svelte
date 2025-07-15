@@ -13,15 +13,19 @@
 	const app = frontend_context.get();
 	const {bits} = app;
 
-	interface Props {
+	let {
+		show = $bindable(false),
+		onpick,
+		filter,
+		exclude_ids,
+		dialog_props,
+	}: {
 		onpick: (bit: Bit_Union | undefined) => boolean | void;
 		show?: boolean | undefined;
 		filter?: ((bit: Bit_Union) => boolean) | undefined;
 		exclude_ids?: Array<Uuid> | undefined;
 		dialog_props?: Omit_Strict<ComponentProps<typeof Dialog>, 'children'> | undefined;
-	}
-
-	let {show = $bindable(false), onpick, filter, exclude_ids, dialog_props}: Props = $props();
+	} = $props();
 </script>
 
 <Picker_Dialog

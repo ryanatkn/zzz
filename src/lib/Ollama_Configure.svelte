@@ -19,14 +19,17 @@
 	import type {Ollama} from '$lib/ollama.svelte.js';
 	import {OLLAMA_URL} from '$lib/ollama_helpers.js';
 
-	interface Props {
+	const {
+		ollama,
+		last_active_view,
+		onshowpull,
+		onback,
+	}: {
 		ollama: Ollama;
 		last_active_view: string | null;
 		onshowpull: () => void;
 		onback?: () => void;
-	}
-
-	const {ollama, last_active_view, onshowpull, onback}: Props = $props();
+	} = $props();
 
 	// TODO maybe add to ollama.svelte.ts
 	const models_with_details = $derived(ollama.models.filter((m) => m.ollama_show_response_loaded));

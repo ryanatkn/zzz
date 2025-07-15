@@ -6,7 +6,12 @@
 	import Glyph from '$lib/Glyph.svelte';
 	import {GLYPH_FILE} from '$lib/glyphs.js';
 
-	interface Props {
+	const {
+		diskfile,
+		selected = false,
+		attrs,
+		onselect,
+	}: {
 		diskfile: Diskfile;
 		selected?: boolean | undefined;
 		attrs?: Record<string, unknown>;
@@ -14,9 +19,7 @@
 		 * `hard` indicates a "hard select" like a doubleclick or enter keypress.
 		 */
 		onselect?: (diskfile: Diskfile, hard: boolean) => void;
-	}
-
-	const {diskfile, selected = false, attrs, onselect}: Props = $props();
+	} = $props();
 
 	// TODO add a visible status when open in a tab
 </script>

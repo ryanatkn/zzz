@@ -3,12 +3,13 @@
 
 	import type {Bit_Union} from '$lib/bit.svelte.js';
 
-	interface Props {
+	const {
+		bit,
+		attrs,
+	}: {
 		bit: Bit_Union;
 		attrs?: SvelteHTMLElements['input'] | undefined;
-	}
-
-	const {bit, attrs}: Props = $props();
+	} = $props();
 </script>
 
 <input

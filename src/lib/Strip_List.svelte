@@ -6,12 +6,13 @@
 	import {Scrollable} from '$lib/scrollable.svelte.js';
 	import type {SvelteHTMLElements} from 'svelte/elements';
 
-	interface Props {
+	const {
+		tape,
+		attrs,
+	}: {
 		tape: Tape;
 		attrs?: SvelteHTMLElements['div'] | undefined;
-	}
-
-	const {tape, attrs}: Props = $props();
+	} = $props();
 
 	const scrollable = new Scrollable();
 

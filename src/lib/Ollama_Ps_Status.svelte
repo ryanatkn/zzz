@@ -9,11 +9,11 @@
 	import type {Ollama} from '$lib/ollama.svelte.js';
 	import {format_bytes} from '$lib/format_helpers.js';
 
-	interface Props {
+	const {
+		ollama,
+	}: {
 		ollama: Ollama;
-	}
-
-	const {ollama}: Props = $props();
+	} = $props();
 
 	// TODO this should show "running" models as being actively doing inference, otherwise "loaded"
 </script>

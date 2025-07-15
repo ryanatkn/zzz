@@ -15,12 +15,13 @@
 
 	*/
 
-	interface Props {
+	const {
+		app,
+		children,
+	}: {
 		app: Frontend;
 		children: Snippet<[zzz: Frontend]>;
-	}
-
-	const {app, children}: Props = $props();
+	} = $props();
 
 	frontend_context.set(app);
 </script>

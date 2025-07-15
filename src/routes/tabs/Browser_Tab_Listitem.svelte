@@ -5,14 +5,17 @@
 	import Glyph from '$lib/Glyph.svelte';
 	import type {Browser_Tab} from '$routes/tabs/browser_tab.svelte.js';
 
-	interface Props {
+	const {
+		tab,
+		index,
+		onselect,
+		onclose,
+	}: {
 		tab: Browser_Tab;
 		index: number;
 		onselect: (index: number) => void;
 		onclose: (index: number) => void;
-	}
-
-	const {tab, index, onselect, onclose}: Props = $props();
+	} = $props();
 </script>
 
 <!-- TODO the transition is janky because it resizes the content, instead it should just hide with overflow -->

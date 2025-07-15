@@ -1,11 +1,11 @@
 <script lang="ts">
 	import type {Prompt} from '$lib/prompt.svelte.js';
 
-	interface Props {
+	const {
+		prompt,
+	}: {
 		prompt: Prompt;
-	}
-
-	const {prompt}: Props = $props();
+	} = $props();
 </script>
 
 <div class="pr_md">

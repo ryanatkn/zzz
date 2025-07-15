@@ -6,14 +6,17 @@
 	import Glyph from '$lib/Glyph.svelte';
 	import Diskfile_Contextmenu from '$lib/Diskfile_Contextmenu.svelte';
 
-	interface Props {
+	const {
+		tab,
+		onselect,
+		onclose,
+		onopen,
+	}: {
 		tab: Diskfile_Tab;
 		onselect: (tab: Diskfile_Tab) => void;
 		onclose: (tab: Diskfile_Tab) => void;
 		onopen: (tab: Diskfile_Tab) => void;
-	}
-
-	const {tab, onselect, onclose, onopen}: Props = $props();
+	} = $props();
 
 	const diskfile = $derived(tab.diskfile);
 

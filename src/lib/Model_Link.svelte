@@ -10,7 +10,12 @@
 	import Glyph from '$lib/Glyph.svelte';
 	import Model_Contextmenu from '$lib/Model_Contextmenu.svelte';
 
-	interface Props {
+	const {
+		model,
+		icon,
+		attrs,
+		children,
+	}: {
 		model: Model;
 		/**
 		 * `true` is equivalent to `'svg'`
@@ -18,9 +23,7 @@
 		icon?: boolean | 'svg' | 'glyph' | undefined;
 		attrs?: SvelteHTMLElements['a'] | undefined;
 		children?: Snippet | undefined;
-	}
-
-	const {model, icon, attrs, children}: Props = $props();
+	} = $props();
 
 	const selected = $derived(page.url.pathname === `${base}/models/${model.name}`);
 </script>

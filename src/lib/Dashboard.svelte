@@ -16,11 +16,11 @@
 
 	// TODO dashboard should be mounted with Markdown
 
-	interface Props {
+	const {
+		children,
+	}: {
 		children: Snippet;
-	}
-
-	const {children}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 

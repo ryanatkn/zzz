@@ -11,14 +11,17 @@
 	import {GLYPH_PASTE, GLYPH_DELETE} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
 
-	interface Props {
+	const {
+		diskfile,
+		editor_state,
+		readonly = false,
+		auto_save = false,
+	}: {
 		diskfile: Diskfile;
 		editor_state: Diskfile_Editor_State;
 		readonly?: boolean | undefined;
 		auto_save?: boolean | undefined;
-	}
-
-	const {diskfile, editor_state, readonly = false, auto_save = false}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 </script>

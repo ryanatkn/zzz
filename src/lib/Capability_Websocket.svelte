@@ -28,11 +28,11 @@
 
 	const pid = $props.id();
 
-	interface Props {
+	const {
+		socket: socket_prop,
+	}: {
 		socket?: Socket | undefined;
-	}
-
-	const {socket: socket_prop}: Props = $props();
+	} = $props();
 
 	// Get socket from props or context
 	const app = frontend_context.get();

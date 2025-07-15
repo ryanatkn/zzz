@@ -4,11 +4,11 @@
 	import {GLYPH_EXTERNAL_LINK} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
 
-	interface Props {
+	const {
+		children,
+	}: {
 		children?: Snippet<[text_icon: string]>;
-	}
-
-	const {children}: Props = $props();
+	} = $props();
 </script>
 
 <sup class="font_size_xs font_family_mono white_space_nowrap"

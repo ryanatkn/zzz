@@ -6,12 +6,13 @@
 	import {GLYPH_COPY, GLYPH_ARROW_LEFT, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
 	import type {Ollama} from '$lib/ollama.svelte.js';
 
-	interface Props {
+	const {
+		ollama,
+		onclose,
+	}: {
 		ollama: Ollama;
 		onclose: () => void;
-	}
-
-	const {ollama, onclose}: Props = $props();
+	} = $props();
 
 	const handle_copy = async () => {
 		await ollama.copy();

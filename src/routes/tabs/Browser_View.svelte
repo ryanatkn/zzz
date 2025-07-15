@@ -17,12 +17,13 @@
 	import Browser_Tab_Listitem from '$routes/tabs/Browser_Tab_Listitem.svelte';
 	import {Reorderable} from '$lib/reorderable.svelte.js';
 
-	interface Props {
+	const {
+		browser,
+		children,
+	}: {
 		browser: Browser;
 		children: Snippet;
-	}
-
-	const {browser, children}: Props = $props();
+	} = $props();
 
 	const tabs_reorderable = new Reorderable({item_class: null}); // remove the normal reorderable item styling
 </script>

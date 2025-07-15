@@ -17,11 +17,11 @@
 	import type {Action_Method} from '$lib/action_metatypes.js';
 	import {format_timestamp} from '$lib/time_helpers.js';
 
-	interface Props {
+	const {
+		action,
+	}: {
 		action: Action;
-	}
-
-	const {action}: Props = $props();
+	} = $props();
 
 	// TODO refactor these
 

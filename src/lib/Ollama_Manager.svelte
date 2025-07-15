@@ -17,11 +17,11 @@
 	import Ollama_Model_Listitem from '$lib/Ollama_Model_Listitem.svelte';
 	import type {Ollama} from '$lib/ollama.svelte.js';
 
-	interface Props {
+	const {
+		ollama,
+	}: {
 		ollama: Ollama;
-	}
-
-	const {ollama}: Props = $props();
+	} = $props();
 
 	// TODO consider "pinning" views so that when others open, they stay open and stable onscreen (but you probably want to rearrange the panels)
 

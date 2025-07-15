@@ -9,13 +9,15 @@
 	import {GLYPH_DOWNLOAD} from '$lib/glyphs.js';
 	import {format_gigabytes} from '$lib/format_helpers.js';
 
-	interface Props {
+	const {
+		model,
+		omit_provider,
+		attrs,
+	}: {
 		model: Model;
 		omit_provider?: boolean | undefined;
 		attrs?: SvelteHTMLElements['div'] | undefined;
-	}
-
-	const {model, omit_provider, attrs}: Props = $props();
+	} = $props();
 
 	const provider = $derived(model.app.providers.find_by_name(model.provider_name));
 

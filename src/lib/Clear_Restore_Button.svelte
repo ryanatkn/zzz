@@ -5,21 +5,19 @@
 	import {GLYPH_CLEAR, GLYPH_RESTORE} from '$lib/glyphs.js';
 	import Toggle_Button from '$lib/Toggle_Button.svelte';
 
-	interface Props {
-		value: string;
-		onchange: (value: string) => void;
-		attrs?: SvelteHTMLElements['button'] | undefined;
-		restore_icon?: Snippet | string | undefined;
-		clear_icon?: Snippet | string | undefined;
-	}
-
 	const {
 		value,
 		onchange,
 		attrs: attrs_prop,
 		restore_icon = GLYPH_RESTORE,
 		clear_icon = GLYPH_CLEAR,
-	}: Props = $props();
+	}: {
+		value: string;
+		onchange: (value: string) => void;
+		attrs?: SvelteHTMLElements['button'] | undefined;
+		restore_icon?: Snippet | string | undefined;
+		clear_icon?: Snippet | string | undefined;
+	} = $props();
 
 	let cleared_value = $state('');
 

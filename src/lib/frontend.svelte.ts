@@ -66,14 +66,10 @@ export interface Frontend_Options extends Omit_Strict<Cell_Options<typeof Fronte
 	action_specs?: Array<Action_Spec_Union>;
 	action_handlers?: Frontend_Action_Handlers;
 
-	/** URL for server communication */
 	http_rpc_url?: string | null;
-
-	/** Websocket URL as an optional transport. */
-	socket_url?: string | null;
-
-	/** Additional HTTP headers for requests */
 	http_headers?: Record<string, string>;
+
+	socket_url?: string | null;
 }
 
 /**
@@ -112,7 +108,7 @@ export class Frontend extends Cell<typeof Frontend_Json> implements Action_Event
 	readonly bots: Zzz_Config['bots'];
 
 	// TODO maybe instead of this pattern with getters/setters, using an encoder?
-	#zzz_dir: Zzz_Dir | null | undefined = $state(null);
+	#zzz_dir: Zzz_Dir | null | undefined = $state(null); // TODO should this be undefined?
 
 	/**
 	 * The `zzz_dir` is the path to Zzz's primary directory on the server's filesystem.
@@ -134,7 +130,7 @@ export class Frontend extends Cell<typeof Frontend_Json> implements Action_Event
 		this.zzz_dir && this.zzz_dir + this.zzz_cache_dirname,
 	);
 
-	// Derived set of all tags from models
+	// TODO refactor
 	tags: Set<string> = $derived.by(() => {
 		const tag_set: Set<string> = new Set();
 		for (const model of this.models.items.by_id.values()) {
@@ -169,7 +165,7 @@ export class Frontend extends Cell<typeof Frontend_Json> implements Action_Event
 			this.cell_registry.register(constructor);
 		}
 
-		// Initialize cell collections
+		// Initialize cell collections - the frontend is the root cell
 		this.time = new Time({app: this});
 		this.ui = new Ui({app: this});
 		this.models = new Models({app: this});
@@ -205,11 +201,9 @@ export class Frontend extends Cell<typeof Frontend_Json> implements Action_Event
 		this.decoders = {
 			// TODO do this automatically from the schema?
 			ui: (value) => {
-				// If ui data is provided, update the existing ui instance
 				if (value && typeof value === 'object') {
 					this.ui.set_json(value);
 				}
-				// Always return HANDLED since we manage the ui instance directly
 				return HANDLED;
 			},
 		};
@@ -232,7 +226,6 @@ export class Frontend extends Cell<typeof Frontend_Json> implements Action_Event
 		this.zzz_dir = data.zzz_dir;
 		this.zzz_cache_dir = data.zzz_cache_dir;
 
-		// Process files through the diskfiles subsystem
 		if (Array.isArray(data.files)) {
 			for (const source_file of data.files) {
 				this.diskfiles.handle_change({
@@ -243,9 +236,6 @@ export class Frontend extends Cell<typeof Frontend_Json> implements Action_Event
 		}
 	}
 
-	/**
-	 * Add multiple providers from JSON configurations
-	 */
 	add_providers(providers_json: Array<Provider_Json_Input>): void {
 		for (const json of providers_json) {
 			this.add_provider(json);
@@ -256,18 +246,12 @@ export class Frontend extends Cell<typeof Frontend_Json> implements Action_Event
 		this.providers.add(new Provider({app: this, json: provider_json}));
 	}
 
-	/**
-	 * Lookup a history object for a given diskfile path without creating it.
-	 * @returns The history object if it exists, undefined otherwise
-	 */
+	// TODO refactor
 	get_diskfile_history(path: Diskfile_Path): Diskfile_History | undefined {
 		return this.diskfile_histories.get(path);
 	}
 
-	/**
-	 * Create a new history object for a given diskfile path.
-	 * @returns The newly created history object
-	 */
+	// TODO refactor
 	create_diskfile_history(path: Diskfile_Path): Diskfile_History {
 		const history = new Diskfile_History({app: this, json: {path}});
 		this.diskfile_histories.set(path, history);
@@ -302,9 +286,6 @@ export class Frontend extends Cell<typeof Frontend_Json> implements Action_Event
 	}
 
 	// TODO maybe better type safety here and the `lookup_action_handler` method?
-	/**
-	 * Check if a phase is valid for a given action method.
-	 */
 	is_valid_phase_for_method(method: Action_Method, phase: Action_Event_Phase): boolean {
 		const spec = this.action_registry.spec_by_method.get(method);
 		if (!spec) return false;

@@ -9,14 +9,17 @@
 
 	const app = frontend_context.get();
 
-	interface Props {
+	const {
+		chat: chat_prop,
+		oninit,
+		heading = 'create new chat',
+		items,
+	}: {
 		chat?: Chat;
 		oninit?: (chat_id: Uuid) => void;
 		heading?: string;
 		items?: Array<Model>;
-	}
-
-	const {chat: chat_prop, oninit, heading = 'create new chat', items}: Props = $props();
+	} = $props();
 
 	const get_or_create_chat = () => chat_prop ?? app.chats.add();
 

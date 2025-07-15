@@ -20,16 +20,20 @@
 	import {format_short_date} from '$lib/time_helpers.js';
 	import {format_gigabytes} from '$lib/format_helpers.js';
 
-	interface Props {
+	const {
+		model,
+		onshow,
+		onclose,
+		ondelete,
+		header,
+	}: {
 		model: Model;
 		// TODO maybe dont include these args?
 		onshow: (model: Model) => void;
 		onclose?: (model: Model) => void;
 		ondelete?: (model: Model) => void;
 		header?: Snippet;
-	}
-
-	const {model, onshow, onclose, ondelete, header}: Props = $props();
+	} = $props();
 
 	// TODO BLOCK the model info has the modelfile/template, making it huge
 

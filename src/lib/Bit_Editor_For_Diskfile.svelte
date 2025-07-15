@@ -13,12 +13,13 @@
 	import Glyph from '$lib/Glyph.svelte';
 	import {GLYPH_FILE, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
 
-	interface Props {
+	const {
+		diskfile_bit,
+		show_actions = true,
+	}: {
 		diskfile_bit: Diskfile_Bit;
 		show_actions?: boolean | undefined;
-	}
-
-	const {diskfile_bit, show_actions = true}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 

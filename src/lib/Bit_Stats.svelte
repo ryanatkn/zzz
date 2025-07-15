@@ -2,11 +2,11 @@
 	import type {Bit_Union} from '$lib/bit.svelte.js';
 	import Content_Stats from '$lib/Content_Stats.svelte';
 
-	interface Props {
+	const {
+		bit,
+	}: {
 		bit: Bit_Union;
-	}
-
-	const {bit}: Props = $props();
+	} = $props();
 
 	const token_count = $derived(bit.token_count ?? 0);
 </script>

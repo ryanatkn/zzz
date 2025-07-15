@@ -6,13 +6,15 @@
 
 	// TODO better name? prioritizing clarity/colocation
 
-	interface Props {
+	const {
+		chat,
+		attrs,
+		children,
+	}: {
 		chat: Chat;
 		attrs?: SvelteHTMLElements['div'] | undefined;
 		children?: Snippet | undefined;
-	}
-
-	const {chat, attrs, children}: Props = $props();
+	} = $props();
 </script>
 
 <div {...attrs} class="p_sm ${attrs?.class}">

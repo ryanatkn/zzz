@@ -7,13 +7,15 @@
 	import type {Uuid} from '$lib/zod_helpers.js';
 	import {format_time} from '$lib/time_helpers.js';
 
-	interface Props {
+	const {
+		editor_state,
+		onselectentry,
+		attrs,
+	}: {
 		editor_state: Diskfile_Editor_State;
 		onselectentry: (entry_id: Uuid) => void;
 		attrs?: SvelteHTMLElements['menu'] | undefined;
-	}
-
-	const {editor_state, onselectentry, attrs}: Props = $props();
+	} = $props();
 </script>
 
 <div>

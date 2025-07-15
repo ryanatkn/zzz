@@ -1,11 +1,11 @@
 <script lang="ts">
 	import {print_number_with_separators} from '@ryanatkn/belt/print.js';
 
-	interface Props {
+	const {
+		token_count,
+	}: {
 		token_count: number;
-	}
-
-	const {token_count}: Props = $props();
+	} = $props();
 </script>
 
 <div class="display_flex gap_xs font_family_mono font_size_sm">

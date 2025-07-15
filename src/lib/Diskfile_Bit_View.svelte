@@ -6,11 +6,11 @@
 	import type {Diskfile} from '$lib/diskfile.svelte.js';
 	import Bit_Summary from '$lib/Bit_Summary.svelte';
 
-	interface Props {
+	const {
+		diskfile,
+	}: {
 		diskfile: Diskfile;
-	}
-
-	const {diskfile}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 

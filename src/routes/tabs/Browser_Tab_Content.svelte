@@ -3,12 +3,13 @@
 
 	import type {Browser_Tab} from '$routes/tabs/browser_tab.svelte.js';
 
-	interface Props {
+	const {
+		tab,
+		children,
+	}: {
 		tab: Browser_Tab;
 		children: Snippet;
-	}
-
-	const {tab, children}: Props = $props();
+	} = $props();
 </script>
 
 {#key tab.refresh_counter}

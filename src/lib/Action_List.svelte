@@ -12,14 +12,17 @@
 	import Sortable_List from '$lib/Sortable_List.svelte';
 	import {sort_by_numeric, sort_by_text} from '$lib/sortable.svelte.js';
 
-	interface Props {
+	const {
+		limit = 20,
+		selected_action_id = null,
+		attrs,
+		onselect,
+	}: {
 		limit?: number | undefined;
 		selected_action_id?: string | null | undefined;
 		attrs?: SvelteHTMLElements['div'] | undefined;
 		onselect?: ((action: Action) => void) | undefined;
-	}
-
-	const {limit = 20, selected_action_id = null, attrs, onselect}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 	const {actions} = app;

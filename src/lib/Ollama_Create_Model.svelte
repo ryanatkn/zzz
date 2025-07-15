@@ -6,13 +6,15 @@
 	import {GLYPH_ADD, GLYPH_ARROW_LEFT, GLYPH_PLACEHOLDER} from '$lib/glyphs.js';
 	import type {Ollama} from '$lib/ollama.svelte.js';
 
-	interface Props {
+	const {
+		ollama,
+		onclose,
+		onshowpull,
+	}: {
 		ollama: Ollama;
 		onclose: () => void;
 		onshowpull: () => void;
-	}
-
-	const {ollama, onclose, onshowpull}: Props = $props();
+	} = $props();
 
 	const handle_create = async () => {
 		await ollama.create();

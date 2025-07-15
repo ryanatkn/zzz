@@ -4,12 +4,13 @@
 	import Chat_Tape from '$lib/Chat_Tape.svelte';
 	import Chat_Tape_Add_By_Model from '$lib/Chat_Tape_Add_By_Model.svelte';
 
-	interface Props {
+	const {
+		chat,
+		tape,
+	}: {
 		chat: Chat;
 		tape: Tape | undefined;
-	}
-
-	const {chat, tape}: Props = $props();
+	} = $props();
 
 	const strip_count = $derived(tape?.strips.size);
 

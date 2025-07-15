@@ -12,12 +12,13 @@
 	import Bit_Remove_Button from '$lib/Bit_Remove_Button.svelte';
 	import {frontend_context} from '$lib/frontend.svelte.js';
 
-	interface Props {
+	const {
+		bit,
+		show_actions = true,
+	}: {
 		bit: Bit_Union;
 		show_actions?: boolean | undefined;
-	}
-
-	const {bit, show_actions = true}: Props = $props();
+	} = $props();
 
 	const app = frontend_context.get();
 	const {prompts} = app;
