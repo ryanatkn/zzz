@@ -32,15 +32,11 @@
 	if (DEV && !onreorder && !!reorderable_options) {
 		console.error('`reorderable_options` provided to `Bit_List` without `onreorder`');
 	}
-
-	// const reorderable2 = new Reorderable();
 </script>
 
 <!-- TODO create bit button -->
 
-<!-- TODO messy until something like this lands bc actions arent conditional
-	 and I dont want to make it internally complex with disabled states,
-	 there's many entrypoints and reactivity would be tricky - https://github.com/sveltejs/svelte/pull/15000  -->
+<!-- TODO clean this up with attachments -->
 
 {#if bits.length === 0}
 	{@render empty()}
