@@ -58,9 +58,9 @@
 		</blockquote>
 		<p>
 			The free and open source software I imagine answering these questions is cross-platform so it
-			runs everywhere. One unified runtime and one root codebase designed to be a dependency like
-			any other. Zzz doesn't have to be built this way, but I think it makes things vastly simpler.
-			To elaborate:
+			runs everywhere. One unified metaruntime and one root codebase designed to be a dependency
+			like any other. Zzz doesn't have to be built this way, but I think it makes things vastly
+			simpler. To elaborate:
 		</p>
 		<ul>
 			<li>
@@ -82,9 +82,9 @@
 			</li>
 		</ul>
 		<p>
-			All of this leads me to the web. I don't see an alternative. This means HTML, CSS, and JS
-			(thankfully TypeScript). For all its flaws and quirks (so many quirks), the web is the turf of
-			our digital commons, and it's capable of delivering a good-to-excellent UX.
+			All of this leads me to the web. I don't see a suitable alternative. This means HTML, CSS, and
+			JS (thankfully TypeScript). For all its flaws and quirks (so many quirks), the web is the turf
+			of our digital commons, and it's capable of delivering a good-to-excellent UX.
 		</p>
 		<p>
 			Naturally we want to enjoy the best possible UX, but to some degree, choosing the web is a
