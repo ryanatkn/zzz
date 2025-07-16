@@ -1938,6 +1938,7 @@ export const src_json = {
 				{name: 'get_unique_name', kind: 'function'},
 				{name: 'defined', kind: 'function'},
 				{name: 'to_preview', kind: 'function'},
+				{name: 'DURATION_MD', kind: 'variable'},
 			],
 		},
 		'./indexed_collection_helpers.svelte.js': {

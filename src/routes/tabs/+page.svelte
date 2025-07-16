@@ -63,9 +63,6 @@
 				class:color_f={!app.ui.show_sidebar}
 				onclick={() => {
 					app.ui.toggle_sidebar();
-					if (!browser.browserified) {
-						browser.browserified = true;
-					}
 				}}
 				>{#if !app.ui.show_sidebar}remember your power{:else}pretend it's all a dream{/if}</button
 			> (that's just the current keybinding, it will probably change, also see the button at the bottom
