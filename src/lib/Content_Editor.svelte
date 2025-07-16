@@ -21,7 +21,7 @@
 		textarea_height,
 		focus_key,
 		pending_element_to_focus_key = $bindable(),
-		attrs,
+		attrs, // TODO probably extend base props with SvelteHTMLElements['textarea'] and delete this
 		after,
 		children,
 		onsave,

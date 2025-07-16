@@ -21,8 +21,8 @@ export interface Provider_Options extends Cell_Options<typeof Provider_Json> {} 
 export class Provider extends Cell<typeof Provider_Json> {
 	name: Provider_Name = $state()!;
 	title: string = $state()!;
-	url: string = $state()!;
-	homepage: string = $state()!;
+	url: string = $state()!; // TODO @many should these be optional? or just default to `''`? need init patterns
+	homepage: string = $state()!; // TODO @many should these be optional? or just default to `''`? need init patterns
 
 	readonly models: Array<Model> = $derived(this.app.models.items.where('provider_name', this.name));
 

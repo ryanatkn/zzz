@@ -6,6 +6,7 @@
 	import Provider_Link from '$lib/Provider_Link.svelte';
 	import type {Model} from '$lib/model.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
+	import Provider_Logo from '$lib/Provider_Logo.svelte';
 	import {GLYPH_DOWNLOAD} from '$lib/glyphs.js';
 	import {format_gigabytes} from '$lib/format_helpers.js';
 
@@ -27,7 +28,12 @@
 <Model_Contextmenu {model}>
 	<div {...attrs} class="panel p_lg {attrs?.class}">
 		<div class="font_size_xl mb_lg">
-			<Model_Link {model} icon />
+			<Model_Link {model} icon class="row">
+				<div class="shrink_0">
+					<Provider_Logo name={model.provider_name} />
+				</div>
+				<span class="pl_sm">{model.name}</span>
+			</Model_Link>
 		</div>
 		{#if !omit_provider}
 			<div class="mb_lg">
