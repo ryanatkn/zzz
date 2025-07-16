@@ -21,7 +21,8 @@
 				tab.title = title.trim();
 			}
 		} catch (error) {
-			// Silently fail for cross-origin content
+			// Will fail for cross-origin content
+			console.log('Unable to access iframe content:', error);
 		}
 	}
 </script>
