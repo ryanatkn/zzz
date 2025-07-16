@@ -40,12 +40,7 @@
 			<Glyph glyph={GLYPH_PASTE} />
 		</Paste_From_Clipboard>
 
-		<Clear_Restore_Button
-			value={editor_state.current_content}
-			onchange={(value) => {
-				editor_state.current_content = value;
-			}}
-		/>
+		<Clear_Restore_Button bind:value={editor_state.current_content} />
 	{/if}
 
 	<!-- Delete button is always available -->

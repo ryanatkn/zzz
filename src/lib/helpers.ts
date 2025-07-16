@@ -43,3 +43,6 @@ export const to_preview = (
 	max_length: number = CONTENT_PREVIEW_LENGTH,
 ): string =>
 	content ? (content.length > max_length ? content.substring(0, max_length) + '...' : content) : '';
+
+// TODO should be from moss and respect prefers-reduced-motion
+export const DURATION_MD = 1000;

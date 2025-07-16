@@ -26,6 +26,7 @@
 	import Diskfile_Picker_Dialog from '$lib/Diskfile_Picker_Dialog.svelte';
 	import Prompt_List from '$lib/Prompt_List.svelte';
 	import Editable_Text from '$lib/Editable_Text.svelte';
+	import {DURATION_MD} from '$lib/helpers.js';
 
 	const app = frontend_context.get();
 
@@ -102,18 +103,21 @@
 			<Prompt_List />
 		</div>
 		{#if app.prompts.tutorial_for_prompts}
-			<div class="pt_lg" out:blur={{duration: 1000}}>
-				<aside out:fly={{duration: 1000, y: 15, x: -5}}>
+			<div class="pt_lg" out:blur={{duration: DURATION_MD}}>
+				<aside out:fly={{duration: DURATION_MD, y: 15, x: -5}}>
 					<p>
-						⚠️ This is a prompt builder UI demo, an early prototype. Your data is not saved yet. The
-						goal is to experiment with many related ideas for making and managing prompts, both
-						simpler and more complex than what's here already. Similarly, we'll explore variants of
-						the <a href="{base}/chat">chat</a> interface.
+						⚠️ This is an early prototype of a prompt builder UI. Your data will be lost when the
+						page is refreshed but soon the Node backend will persist it.
 					</p>
 					<p>
-						Soon this page will offer numerous UIs for creating and managing prompts, and as the
-						system vocabulary and APIs are refined, it should get easier for novices to make their
-						ideas with TypeScript and Svelte. Share your ideas in the <a
+						The plan here is to experiment with many ideas for making and managing prompts, both
+						simpler and more complex than what you see here. We'll likewise explore variants of the <a
+							href="{base}/chat">chat</a
+						> interface.
+					</p>
+					<p>
+						As the system vocabulary and APIs are refined, it should get easier for novices to make
+						their ideas with TypeScript and Svelte. Share your ideas in the <a
 							href="https://github.com/ryanatkn/zzz/discussions">discussions</a
 						>.
 					</p>

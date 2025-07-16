@@ -1,6 +1,7 @@
 <script lang="ts">
 	import {random_item} from '@ryanatkn/belt/random.js';
 	import {blur, scale} from 'svelte/transition';
+	import {sineInOut} from 'svelte/easing';
 
 	import Chats_List from '$lib/Chat_List.svelte';
 	import Chat_View from '$lib/Chat_View.svelte';
@@ -10,9 +11,12 @@
 	import Glyph from '$lib/Glyph.svelte';
 	import Chats_Contextmenu from '$lib/Chats_Contextmenu.svelte';
 	import External_Link from '$lib/External_Link.svelte';
+	import {DURATION_MD} from '$lib/helpers.js';
 
 	const app = frontend_context.get();
 	const {chats} = app;
+
+	// TODO BLOCK this needs to have an error if no backend capability
 </script>
 
 <Chats_Contextmenu attrs={{class: 'display_flex w_100 h_100'}}>
@@ -43,14 +47,11 @@
 			{/if}
 		</div>
 		{#if app.prompts.tutorial_for_chats}
-			<div class="pt_lg" out:blur={{duration: 1000}}>
-				<!-- TODO is there no end value param? how to do this better?
-				 it stays in the dom the whole duration (causes the parent to as well),
-				 which will cause layout issues if anything is placed after it in the DOM -->
-				<aside out:scale={{duration: 44000}}>
+			<div class="pt_lg" out:blur={{duration: DURATION_MD}}>
+				<aside out:scale={{duration: DURATION_MD, easing: (t) => sineInOut(t / 3)}}>
 					<p>
-						⚠️ This is a an early prototype and your data is not saved yet -- soon it will be
-						persisted to a local Postgres or pglite database. (<External_Link
+						⚠️ This is a an early prototype and your data is not saved yet -- soon the Node backend
+						will persist data to a local Postgres or pglite database. (<External_Link
 							href="https://github.com/ryanatkn/zzz/issues/7">issue 7</External_Link
 						>)
 					</p>

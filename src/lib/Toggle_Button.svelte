@@ -2,14 +2,12 @@
 	import type {Snippet} from 'svelte';
 	import type {SvelteHTMLElements} from 'svelte/elements';
 
-	const {
-		active,
+	let {
+		active = $bindable(),
 		active_content,
 		inactive_content,
-		ontoggle,
-		attrs,
-		children,
-	}: {
+		...rest
+	}: SvelteHTMLElements['button'] & {
 		/**
 		 * Current state of the toggle
 		 */
@@ -22,17 +20,11 @@
 		 * Content to display when toggle is inactive
 		 */
 		inactive_content: Snippet | string;
-		/**
-		 * Callback when toggle state changes
-		 */
-		ontoggle: (active: boolean) => void;
-		attrs?: SvelteHTMLElements['button'] | undefined;
-		children?: Snippet | undefined; // TODO BLOCK migrate this and other _Button components away from `attrs` and declared children type (unless needed)
 	} = $props();
 </script>
 
-<button type="button" class="plain icon_button" {...attrs} onclick={() => ontoggle(!active)}>
-	{@render children?.()}
+<button type="button" class="plain icon_button" {...rest} onclick={() => (active = !active)}>
+	{@render rest.children?.()}
 	<span class="position_relative">
 		<span style:visibility="hidden" class="display_inline_flex flex_column h_0">
 			<span>

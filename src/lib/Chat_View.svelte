@@ -51,14 +51,14 @@
 					<div class="row gap_xs py_xs">
 						{#if tape_count}
 							<Toggle_Button
-								active={chat.view_mode === 'simple'}
+								bind:active={
+									() => chat.view_mode === 'simple',
+									(active) => (chat.view_mode = active ? 'simple' : 'multi')
+								}
 								active_content="simple"
 								inactive_content="multi"
-								ontoggle={(active) => (chat.view_mode = active ? 'simple' : 'multi')}
-								attrs={{
-									class: 'plain compact',
-									title: `toggle chat to ${chat.view_mode === 'multi' ? 'simple' : 'multi'} view`,
-								}}
+								class="plain compact"
+								title="toggle chat to ${chat.view_mode === 'multi' ? 'simple' : 'multi'} view"
 							>
 								<Glyph glyph={GLYPH_VIEW} class="mr_xs" />
 							</Toggle_Button>

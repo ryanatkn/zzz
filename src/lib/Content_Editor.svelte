@@ -110,11 +110,13 @@
 				<Glyph glyph={GLYPH_PASTE} />
 			</Paste_From_Clipboard>
 			<Clear_Restore_Button
-				value={content}
-				onchange={(value) => {
-					content = value;
-					focus();
-				}}
+				bind:value={
+					() => content,
+					(value) => {
+						content = value;
+						focus();
+					}
+				}
 			/>
 		</div>
 	{/if}
