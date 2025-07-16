@@ -22,7 +22,7 @@ export const fake_sites = {
 	},
 	new_tab: {
 		title: 'new tab',
-		url: 'about:newtab',
+		url: '/newtab',
 		content: `
 			<div style="padding: 20px; font-family: system-ui;">
 				<h1>new tab</h1>
