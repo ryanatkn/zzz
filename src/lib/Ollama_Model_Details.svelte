@@ -37,6 +37,8 @@
 
 	// TODO BLOCK the model info has the modelfile/template, making it huge
 
+	// TODO BLOCK probably want to have the same delete button here as in the ollama one, see Model_Details
+
 	// TODO refactor with `Model_Detail`?
 </script>
 
