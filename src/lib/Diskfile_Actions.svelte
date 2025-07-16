@@ -46,7 +46,8 @@
 	<!-- Delete button is always available -->
 	<Confirm_Button
 		onconfirm={() => app.diskfiles.delete(diskfile.path)}
-		attrs={{class: 'plain icon_button', title: 'delete file'}}
+		class="plain icon_button"
+		title="delete file"
 	>
 		<Glyph glyph={GLYPH_DELETE} />
 	</Confirm_Button>

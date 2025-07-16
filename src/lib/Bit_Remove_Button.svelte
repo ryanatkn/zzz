@@ -1,4 +1,6 @@
 <script lang="ts">
+	import type {SvelteHTMLElements} from 'svelte/elements';
+
 	import type {Bit_Union} from '$lib/bit.svelte.js';
 	import type {Prompt} from '$lib/prompt.svelte.js';
 	import type {Prompts} from '$lib/prompts.svelte.js';
@@ -10,16 +12,16 @@
 		bit,
 		prompt,
 		prompts,
-		attrs,
-	}: {
+		...rest
+	}: SvelteHTMLElements['button'] & {
 		bit: Bit_Union;
 		prompt?: Prompt | undefined;
 		prompts?: Prompts | undefined;
-		attrs?: Record<string, string> | undefined;
 	} = $props();
 </script>
 
 <Confirm_Button
+	{...rest}
 	onconfirm={() => {
 		if (prompt) {
 			prompt.remove_bit(bit.id);
@@ -27,11 +29,8 @@
 			prompts.remove_bit(bit.id);
 		}
 	}}
-	attrs={{
-		class: 'plain compact',
-		title: `remove bit "${bit.name}"`,
-		...attrs,
-	}}
+	class="plain compact"
+	title="remove bit {'"' + bit.name + '"'}"
 >
 	<Glyph glyph={GLYPH_REMOVE} />
 </Confirm_Button>

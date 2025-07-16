@@ -333,7 +333,7 @@
 			<div class="display_flex justify_content_end">
 				<Confirm_Button
 					onconfirm={reset_to_defaults}
-					attrs={{class: 'plain font_size_sm compact font_weight_600'}}
+					class="plain font_size_sm compact font_weight_600"
 				>
 					reset to defaults
 

@@ -65,10 +65,8 @@
 						{/if}
 						<Confirm_Button
 							onconfirm={() => chat.id && chats.remove(chat.id)}
-							attrs={{
-								title: `delete chat "${chat.name}"`,
-								class: 'plain icon_button',
-							}}
+							title="delete chat {'"' + chat.name + '"'}"
+							class="plain icon_button"
 						>
 							<Glyph glyph={GLYPH_DELETE} />
 							{#snippet popover_button_content()}<Glyph glyph={GLYPH_DELETE} />{/snippet}

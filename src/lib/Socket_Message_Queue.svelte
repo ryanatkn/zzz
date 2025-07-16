@@ -146,7 +146,8 @@
 					<Confirm_Button
 						onconfirm={remove_selected}
 						popover_button_attrs={{class: 'icon_button color_c bg_c_1 font_size_sm'}}
-						attrs={{class: 'icon_button plain', title: 'remove selected messages'}}
+						class="icon_button plain"
+						title="remove selected messages"
 					>
 						<Glyph glyph={GLYPH_REMOVE} />
 					</Confirm_Button>
@@ -239,7 +240,8 @@
 							<!-- Message details in popover -->
 							<Popover_Button
 								position="left"
-								attrs={{class: 'icon_button plain font_size_sm', title: 'view message details'}}
+								class="icon_button plain font_size_sm"
+								title="view message details"
 							>
 								<Glyph glyph={GLYPH_INFO} size="var(--font_size_lg)" />
 								{#snippet popover_content(popover)}
@@ -285,7 +287,8 @@
 								onconfirm={() => remove_message(message.id)}
 								position="center"
 								popover_button_attrs={{class: 'icon_button color_c bg_c_1 font_size_sm'}}
-								attrs={{class: 'icon_button plain font_size_sm', title: 'remove message'}}
+								class="icon_button plain font_size_sm"
+								title="remove message"
 							>
 								<Glyph glyph={GLYPH_REMOVE} />
 							</Confirm_Button>

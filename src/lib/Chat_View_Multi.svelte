@@ -71,8 +71,8 @@
 			<Confirm_Button
 				onconfirm={() => chat.remove_all_tapes()}
 				position="right"
-				attrs={{disabled: !count, class: 'plain'}}
-				><Glyph glyph={GLYPH_REMOVE} />&nbsp; remove all</Confirm_Button
+				disabled={!count}
+				class="plain"><Glyph glyph={GLYPH_REMOVE} />&nbsp; remove all</Confirm_Button
 			>
 		</div>
 		<ul class="tapes unstyled mt_lg">

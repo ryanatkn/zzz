@@ -74,10 +74,12 @@
 			<li>
 				I want to maintain a single source of truth in code, without duplicating logic and data
 				across languages, so there's one primary language that runs on the frontend and also the
-				backend, and also dev tooling. This lets us avoid many bugs and enables fullstack
-				integrations like rich runtime schemas and custom dev tools, which can improve security and
-				data integrity. Clear and complete sources of truth are also helpful for deterministic
-				codegen in development, which Zzz uses to improve fullstack system coherence.
+				backend, and also dev tooling. This avoids many bugs and frictions, and enables integrations
+				like rich runtime schemas and custom dev tools across the full stack, which can improve
+				security and data integrity. I think it also improves UX through systematically enforced
+				guarantees and more structured error messages. Clear and complete sources of truth are also
+				helpful for deterministic codegen in development, which Zzz uses to generate
+				contextually-optimal files and data.
 			</li>
 		</ul>
 		<p>
@@ -89,10 +91,9 @@
 		</p>
 		<p>
 			Naturally we want to enjoy the best possible UX, but to some degree, choosing the web is a
-			pragmatic move: it pales in some respects to native software, we ought not deny realities. But
-			its adoption is second to none -- the web is globally available at low cost with minimal
-			gatekeeping to users and developers -- so Zzz chooses distribution and accessibility over
-			performance and perfection.
+			pragmatic move: websites pale in some respects to native software. But adoption is second to
+			none -- the web is globally available at low cost with minimal gatekeeping to users and
+			developers -- so Zzz chooses distribution and accessibility over performance and perfection.
 		</p>
 		<p>
 			One consequence is that Zzz-made things on mobile in some cases will be worse than native
@@ -396,8 +397,8 @@
 					href="https://github.com/ryanatkn/zzz/blob/main/svelte.config.js"
 					>svelte.config.js</External_Link
 				> and the <External_Link href="https://www.fuz.dev/docs/csp">Fuz CSP docs</External_Link>.
-				We'll need to add configurable options, unlocking shenanigans good and bad, so we'll tread
-				carefully.
+				Configuration will be needed for many usecases, unlocking shenanigans good and bad, so we'll
+				tread carefully.
 			</li>
 			<li>
 				There are no mechanisms for end-users to load executable code or dangerous config. Of

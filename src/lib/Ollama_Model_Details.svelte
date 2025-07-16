@@ -89,10 +89,8 @@
 				<Confirm_Button
 					onconfirm={() => ondelete(model)}
 					position="right"
-					attrs={{
-						class: 'plain color_c',
-						title: `delete ${model.name}`,
-					}}
+					class="plain color_c"
+					title="delete {model.name}"
 				>
 					<Glyph glyph={GLYPH_DELETE} />&nbsp; delete model
 

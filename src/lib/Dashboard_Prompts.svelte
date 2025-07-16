@@ -158,10 +158,8 @@
 						</div>
 						<Confirm_Button
 							onconfirm={() => app.prompts.selected && app.prompts.remove(app.prompts.selected)}
-							attrs={{
-								title: `delete prompt "${app.prompts.selected.name}"`,
-								class: 'plain icon_button',
-							}}
+							title="delete prompt {'"' + app.prompts.selected.name + '"'}"
+							class="plain icon_button"
 						>
 							<Glyph glyph={GLYPH_DELETE} />
 							{#snippet popover_button_content()}<Glyph glyph={GLYPH_DELETE} />{/snippet}
@@ -207,7 +205,8 @@
 							</button>
 							<Confirm_Button
 								onconfirm={() => app.prompts.selected?.remove_all_bits()}
-								attrs={{disabled: !app.prompts.selected.bits.length, class: 'plain font_size_sm'}}
+								disabled={!app.prompts.selected.bits.length}
+								class="plain font_size_sm"
 							>
 								<div class="row white_space_nowrap">
 									<Glyph glyph={GLYPH_REMOVE} />&nbsp; remove all
