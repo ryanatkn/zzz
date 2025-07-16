@@ -60,7 +60,7 @@
 									title: `toggle chat to ${chat.view_mode === 'multi' ? 'simple' : 'multi'} view`,
 								}}
 							>
-								<Glyph glyph={GLYPH_VIEW} attrs={{class: 'mr_xs'}} />
+								<Glyph glyph={GLYPH_VIEW} class="mr_xs" />
 							</Toggle_Button>
 						{/if}
 						<Confirm_Button

@@ -45,6 +45,7 @@ export const JSONRPC_ERROR_CODES = {
 	// AI_INVALID_REQUEST: -32023 as Jsonrpc_Error_Code,
 } as const satisfies Record<string, Jsonrpc_Error_Code>;
 
+// TODO review, is slop
 /**
  * Maps HTTP status codes to JSON-RPC error codes.
  */

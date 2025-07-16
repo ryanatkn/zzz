@@ -66,13 +66,13 @@
 
 		<div class="display_flex mt_lg">
 			<button type="button" class="plain" onclick={() => (show_model_picker = true)}>
-				<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> add tape
+				<Glyph glyph={GLYPH_ADD} />&nbsp; add tape
 			</button>
 			<Confirm_Button
 				onconfirm={() => chat.remove_all_tapes()}
 				position="right"
 				attrs={{disabled: !count, class: 'plain'}}
-				><Glyph glyph={GLYPH_REMOVE} attrs={{class: 'mr_xs2'}} /> remove all</Confirm_Button
+				><Glyph glyph={GLYPH_REMOVE} />&nbsp; remove all</Confirm_Button
 			>
 		</div>
 		<ul class="tapes unstyled mt_lg">

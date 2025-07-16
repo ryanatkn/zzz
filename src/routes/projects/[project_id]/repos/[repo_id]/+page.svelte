@@ -99,7 +99,7 @@
 									class="color_b"
 									onclick={() => repos_viewmodel.add_checkout_dir()}
 								>
-									<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> add checkout
+									<Glyph glyph={GLYPH_ADD} />&nbsp; add checkout
 								</button>
 							</div>
 						</div>
@@ -117,7 +117,7 @@
 
 							{#if repos_viewmodel.repo}
 								<button type="button" class="color_c" onclick={() => repos_viewmodel.remove_repo()}>
-									<Glyph glyph={GLYPH_DELETE} attrs={{class: 'mr_xs2'}} /> delete repo
+									<Glyph glyph={GLYPH_DELETE} />&nbsp; delete repo
 								</button>
 							{/if}
 						</div>

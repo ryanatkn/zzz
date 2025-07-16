@@ -27,7 +27,7 @@
 		 */
 		ontoggle: (active: boolean) => void;
 		attrs?: SvelteHTMLElements['button'] | undefined;
-		children?: Snippet | undefined;
+		children?: Snippet | undefined; // TODO BLOCK migrate this and other _Button components away from `attrs` and declared children type (unless needed)
 	} = $props();
 </script>
 

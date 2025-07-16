@@ -96,7 +96,7 @@
 				class="color_d"
 				onclick={() => app.chats.add(undefined, true).add_tape(model)}
 			>
-				<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> create a new chat
+				<Glyph glyph={GLYPH_ADD} />&nbsp; create a new chat
 			</button>
 		</section>
 		<section>

@@ -37,7 +37,7 @@
 			<div class="display_flex mb_0 justify_content_space_between">
 				<div class="font_size_lg m_0">
 					<!-- TODO I like the idea of making this glyph the drag handle (but we probably want dynamic tiles first) -->
-					<Glyph glyph={get_bit_type_glyph(bit)} attrs={{class: 'mr_xs2'}} />
+					<Glyph glyph={get_bit_type_glyph(bit)} />&nbsp;
 					{bit.name}
 				</div>
 				<div class="display_flex gap_xs">

@@ -430,7 +430,7 @@
 				them. MCP's utility is high, but it can be used in <External_Link
 					href="https://simonwillison.net/2025/Jun/16/the-lethal-trifecta/"
 					title="Simon Willison’s Weblog: The lethal trifecta for AI agents: private data, untrusted content, and external communication"
-					,>insecure ways</External_Link
+					>insecure ways</External_Link
 				> that I want to account for before integrating. Zzz will integrate LLMs into its own functionality
 				slowly and carefully -- currently the only in-app LLM integration is using a local model to name
 				new chats. There will be more, and we'll make sure you always have visibility into and control

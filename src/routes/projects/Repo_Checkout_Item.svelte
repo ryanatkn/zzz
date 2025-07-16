@@ -89,7 +89,7 @@
 
 	<div class="display_flex justify_content_end">
 		<button type="button" class="color_c" onclick={() => on_remove(index)}>
-			<Glyph glyph={GLYPH_DELETE} attrs={{class: 'mr_xs2'}} /> delete checkout
+			<Glyph glyph={GLYPH_DELETE} />&nbsp; delete checkout
 		</button>
 	</div>
 </div>

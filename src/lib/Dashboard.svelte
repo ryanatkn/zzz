@@ -104,23 +104,21 @@
 						<div class="display_flex p_sm mb_sm">
 							<Nav_Link
 								href="{base}/"
-								attrs={{
-									title: app.futuremode ? 'futuremode' : 'home',
-									class: 'click_effect_scale',
-									onclick: () => {
-										if (futureclicks_activated) {
-											// If already activated once, toggle immediately when on root
-											if (page.url.pathname === base + '/') {
-												app.futuremode = !app.futuremode;
-											}
-										} else {
-											futureclicks++;
-											if (futureclicks >= FUTURECLICKS) {
-												app.futuremode = !app.futuremode;
-												futureclicks_activated = true;
-											}
+								title={app.futuremode ? 'futuremode' : 'home'}
+								class="click_effect_scale"
+								onclick={() => {
+									if (futureclicks_activated) {
+										// If already activated once, toggle immediately when on root
+										if (page.url.pathname === base + '/') {
+											app.futuremode = !app.futuremode;
 										}
-									},
+									} else {
+										futureclicks++;
+										if (futureclicks >= FUTURECLICKS) {
+											app.futuremode = !app.futuremode;
+											futureclicks_activated = true;
+										}
+									}
 								}}
 							>
 								<Svg
@@ -145,7 +143,7 @@
 							<Nav_Link href={to_nav_link_href(app, link)}>
 								{#snippet children(selected)}
 									{#if typeof link.icon === 'string'}
-										<Glyph glyph={link.icon} attrs={{class: 'icon_xs'}} /> {link.label}
+										<Glyph glyph={link.icon} class="icon_xs" /> {link.label}
 									{:else}
 										<span class="icon_xs">
 											<Svg

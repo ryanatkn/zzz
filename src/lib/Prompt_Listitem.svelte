@@ -20,13 +20,11 @@
 	<Nav_Link
 		href="{base}/prompts/{prompt.id}"
 		{selected}
-		attrs={{
-			class: 'justify_content_space_between',
-			style: 'min-height: 0;',
-		}}
+		class="justify_content_space_between"
+		style="min-height: 0;"
 	>
 		<div class="ellipsis">
-			<Glyph glyph={GLYPH_PROMPT} attrs={{class: 'mr_xs2'}} />
+			<Glyph glyph={GLYPH_PROMPT} class="mr_xs2" />
 			<span>{prompt.name}</span>
 		</div>
 		{#if prompt.bits.length}<small>{prompt.bits.length}</small>{/if}

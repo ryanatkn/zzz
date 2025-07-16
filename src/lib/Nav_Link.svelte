@@ -9,13 +9,12 @@
 		href,
 		selected: selected_prop,
 		show_selected_descendent = true,
-		attrs,
 		children,
-	}: {
+		...rest
+	}: Omit<SvelteHTMLElements['a'], 'children'> & {
 		href: string;
 		selected?: boolean | undefined;
 		show_selected_descendent?: boolean | undefined;
-		attrs?: SvelteHTMLElements['a'] | undefined;
 		children: Snippet<[selected: boolean, selected_descendent: boolean]>;
 	} = $props();
 
@@ -35,7 +34,7 @@
 
 <!-- 
 	transition:slide -->
-<a {...attrs} {href} class="nav_link {attrs?.class}" class:selected class:selected_descendent
+<a {...rest} {href} class="nav_link {rest.class}" class:selected class:selected_descendent
 	>{@render children(selected, selected_descendent)}</a
 >
 

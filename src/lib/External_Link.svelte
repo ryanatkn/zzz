@@ -22,14 +22,13 @@
 		icon,
 		children,
 		...rest
-	}: {
+	}: SvelteHTMLElements['a'] & {
 		href: string;
 		// TODO maybe dont default to external?
 		/** Set to false to disable external link behavior. */
 		open_externally?: boolean | undefined;
 		icon?: Snippet<[known_logo: Svg_Data | null]> | undefined;
-		children?: Snippet | undefined;
-	} & SvelteHTMLElements['a'] = $props();
+	} = $props();
 
 	const known_logo: Svg_Data | null = $derived(
 		github_regex.test(href)

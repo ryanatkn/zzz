@@ -63,10 +63,7 @@
 </div>
 
 {#snippet ping_item(ping: Ping_Data)}
-	<Glyph
-		glyph={GLYPH_ACTION_TYPE_REQUEST_RESPONSE}
-		attrs={{class: ping.completed ? '' : 'opacity_40'}}
-	/>
+	<Glyph glyph={GLYPH_ACTION_TYPE_REQUEST_RESPONSE} class={ping.completed ? '' : 'opacity_40'} />
 	{#if !ping.completed}
 		<span class="font_family_mono">
 			<Pending_Animation inline />

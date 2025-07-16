@@ -14,19 +14,17 @@
 		icon,
 		icon_props,
 		show_name,
-		attrs,
 		fallback_attrs,
 		fallback,
 		children,
-	}: {
+		...rest
+	}: SvelteHTMLElements['a'] & {
 		provider: Provider | null | undefined;
 		icon?: 'glyph' | 'svg' | Snippet<[provider: Provider, glyph: string]> | undefined;
 		icon_props?: Record<string, any> | undefined;
 		show_name?: boolean | undefined;
-		attrs?: SvelteHTMLElements['a'] | undefined;
 		fallback_attrs?: SvelteHTMLElements['span'] | undefined;
 		fallback?: Snippet | undefined;
-		children?: Snippet | undefined;
 	} = $props();
 
 	if (icon && children) {
@@ -43,7 +41,7 @@
 
 <!-- whitespace is a bit tricky here, we want none with glyphs -->
 {#if provider}
-	<a {...attrs} href="{base}/providers/{provider.name}" class:selected
+	<a {...rest} href="{base}/providers/{provider.name}" class:selected
 		>{#if children}
 			{@render children()}
 		{:else}

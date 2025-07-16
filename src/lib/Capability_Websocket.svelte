@@ -128,7 +128,7 @@
 						}}
 					>
 						<div class:flip_x={has_undo_state}>
-							<Glyph glyph={GLYPH_RESET} attrs={{class: 'mr_xs2'}} />
+							<Glyph glyph={GLYPH_RESET} />
 						</div>
 					</button>
 				</div>
@@ -347,7 +347,7 @@
 								popover.hide();
 							}}
 						>
-							<Glyph glyph={GLYPH_RESET} attrs={{class: 'mr_xs2'}} />
+							<Glyph glyph={GLYPH_RESET} />
 						</button>
 					{/snippet}
 				</Confirm_Button>

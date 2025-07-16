@@ -70,7 +70,7 @@
 				class="plain"
 				onclick={() => model.app.chats.add(undefined, true).add_tape(model)}
 			>
-				<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> create a new chat
+				<Glyph glyph={GLYPH_ADD} />&nbsp; create a new chat
 			</button>
 
 			<button
@@ -119,7 +119,7 @@
 				onclick={() => model.navigate_to_download()}
 				title="download this model"
 			>
-				<Glyph glyph={GLYPH_DOWNLOAD} attrs={{class: 'mr_xs2'}} /> download model
+				<Glyph glyph={GLYPH_DOWNLOAD} />&nbsp; download model
 			</button>
 		{/if}
 	</section>

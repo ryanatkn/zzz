@@ -24,7 +24,7 @@
 					type="button"
 					onclick={() => chats.add(undefined, true)}
 				>
-					<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new chat
+					<Glyph glyph={GLYPH_ADD} />&nbsp; new chat
 				</button>
 				{#if chats.items.size > 1}
 					<button

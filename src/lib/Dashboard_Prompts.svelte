@@ -1,5 +1,5 @@
 <script lang="ts">
-	import {fade, blur, scale} from 'svelte/transition';
+	import {fade, blur, fly} from 'svelte/transition';
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
 	import {random_item} from '@ryanatkn/belt/random.js';
 	import {base} from '$app/paths';
@@ -85,7 +85,7 @@
 						await app.prompts.navigate_to(prompt.id);
 					}}
 				>
-					<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new prompt
+					<Glyph glyph={GLYPH_ADD} />&nbsp; new prompt
 				</button>
 				{#if app.prompts.items.size > 1}
 					<button
@@ -103,10 +103,7 @@
 		</div>
 		{#if app.prompts.tutorial_for_prompts}
 			<div class="pt_lg" out:blur={{duration: 1000}}>
-				<!-- TODO is there no end value param? how to do this better?
-				 it stays in the dom the whole duration (causes the parent to as well),
-				 which will cause layout issues if anything is placed after it in the DOM -->
-				<aside out:scale={{duration: 44000}}>
+				<aside out:fly={{duration: 1000, y: 15, x: -5}}>
 					<p>
 						⚠️ This is a prompt builder UI demo, an early prototype. Your data is not saved yet. The
 						goal is to experiment with many related ideas for making and managing prompts, both
@@ -183,7 +180,7 @@
 						<div class="display_flex flex_wrap gap_xs">
 							<button type="button" class="plain font_size_sm" onclick={add_text_bit}>
 								<div class="row white_space_nowrap">
-									<Glyph glyph={GLYPH_BIT} attrs={{class: 'mr_xs2'}} /> add text
+									<Glyph glyph={GLYPH_BIT} />&nbsp; add text
 								</div>
 							</button>
 							<button
@@ -193,12 +190,12 @@
 								disabled={!app.diskfiles.items.size}
 							>
 								<div class="row white_space_nowrap">
-									<Glyph glyph={GLYPH_FILE} attrs={{class: 'mr_xs2'}} /> add file
+									<Glyph glyph={GLYPH_FILE} />&nbsp; add file
 								</div>
 							</button>
 							<button type="button" class="plain font_size_sm" onclick={add_sequence_bit}>
 								<div class="row white_space_nowrap">
-									<Glyph glyph={GLYPH_LIST} attrs={{class: 'mr_xs2'}} /> add sequence
+									<Glyph glyph={GLYPH_LIST} />&nbsp; add sequence
 								</div>
 							</button>
 							<Confirm_Button
@@ -206,7 +203,7 @@
 								attrs={{disabled: !app.prompts.selected.bits.length, class: 'plain font_size_sm'}}
 							>
 								<div class="row white_space_nowrap">
-									<Glyph glyph={GLYPH_REMOVE} attrs={{class: 'mr_xs2'}} /> remove all
+									<Glyph glyph={GLYPH_REMOVE} />&nbsp; remove all
 								</div>
 							</Confirm_Button>
 						</div>

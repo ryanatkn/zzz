@@ -97,12 +97,12 @@
 								</button>
 
 								<button type="button" onclick={toggle_preview} class="plain" title="Preview page">
-									<Glyph glyph={GLYPH_PREVIEW} attrs={{class: 'mr_xs2'}} /> preview
+									<Glyph glyph={GLYPH_PREVIEW} />&nbsp; preview
 								</button>
 							</div>
 
 							<button type="button" onclick={delete_page} class="color_c"
-								><Glyph glyph={GLYPH_DELETE} attrs={{class: 'mr_xs2'}} /> delete</button
+								><Glyph glyph={GLYPH_DELETE} />&nbsp; delete</button
 							>
 						</div>
 					</div>

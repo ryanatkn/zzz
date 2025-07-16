@@ -34,7 +34,7 @@
 							<Provider_Link
 								{provider}
 								icon="svg"
-								attrs={{class: 'menu_item row justify_content_start gap_xs'}}
+								class="menu_item row justify_content_start gap_xs"
 							/>
 						</li>
 					{:else}

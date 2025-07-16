@@ -16,15 +16,14 @@
 		name,
 		children,
 		...rest
-	}: {
+	}: SvelteHTMLElements['a'] & {
 		model: Model;
 		/**
 		 * `true` is equivalent to `'svg'`
 		 */
 		icon?: boolean | 'svg' | 'glyph' | undefined;
 		name?: Snippet | undefined;
-		children?: Snippet | undefined;
-	} & SvelteHTMLElements['a'] = $props();
+	} = $props();
 
 	const selected = $derived(page.url.pathname === `${base}/models/${model.name}`);
 </script>

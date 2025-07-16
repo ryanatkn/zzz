@@ -20,7 +20,7 @@
 				class="plain justify_content_start flex_1"
 				onclick={() => project_viewmodel.create_new_repo()}
 			>
-				<Glyph glyph={GLYPH_ADD} attrs={{class: 'mr_xs2'}} /> new repo
+				<Glyph glyph={GLYPH_ADD} />&nbsp; new repo
 			</button>
 		</div>
 
@@ -32,7 +32,7 @@
 							<Nav_Link
 								href="{base}/projects/{project_viewmodel.project_id}/repos/{repo.id}"
 								selected={repo.id === projects.current_repo_id}
-								attrs={{title: repo.git_url}}
+								title={repo.git_url}
 							>
 								<div class="ellipsis row flex_1 pr_xs">
 									{#if repo.git_url}

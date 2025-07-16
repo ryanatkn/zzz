@@ -15,6 +15,8 @@
 		ollama: Ollama;
 	} = $props();
 
+	// TODO BLOCK add button on the right that sends to `generate` `{model, keep_alive: 0}`
+
 	// TODO this should show "running" models as being actively doing inference, otherwise "loaded"
 </script>
 
