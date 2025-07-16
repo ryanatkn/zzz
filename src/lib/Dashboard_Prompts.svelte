@@ -38,6 +38,9 @@
 
 	// TODO BLOCK the reorderable dashed pattern state isn't working for the xml tag input or attributes, same with bits list
 
+	// TODO BLOCK change teh `but soon the Node backend will persist it` to be a new property
+	// tracking the state of just the database acknowledgment, separate from the chats/prompts ones
+
 	let show_diskfile_picker = $state(false);
 
 	// Create and add a Text bit
