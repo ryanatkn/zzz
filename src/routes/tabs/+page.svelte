@@ -95,8 +95,8 @@
 			our experience across the web and our devices the way we prefer.
 		</p>
 		<p>
-			The browser gains new life with this design -- not everyone wants this, but I'm looking
-			forward to having my tabs and files in one place -- and maybe <a href="{base}/about">Zzz</a>
+			Not everyone wants this, but I think I will prefer to have my tabs and files in one place --
+			and maybe <a href="{base}/about">Zzz</a>
 			was always going to a browser with parlor tricks.
 		</p>
 	</section>
