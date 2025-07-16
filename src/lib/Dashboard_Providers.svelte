@@ -28,15 +28,11 @@
 				{/if}
 				<ul class="unstyled">
 					{#each provider.models as model (model)}
-						<li class="row flex_wrap mb_xs3">
+						<li class="row">
 							{#if model.provider_name === 'ollama'}<Glyph
 									glyph={model.downloaded ? GLYPH_CHECKMARK : ' '}
 									attrs={{title: model.downloaded ? 'downloaded' : 'not downloaded'}}
-								/>{/if}<Model_Link
-								attrs={{class: 'font_family_mono px_xs font_size_sm'}}
-								{model}
-								icon
-							/>
+								/>{/if}<Model_Link class="font_family_mono px_xs py_xs3 ellipsis" {model} icon />
 						</li>
 					{/each}
 				</ul>

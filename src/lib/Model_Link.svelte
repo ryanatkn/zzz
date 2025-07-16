@@ -13,24 +13,25 @@
 	const {
 		model,
 		icon,
-		attrs,
+		name,
 		children,
+		...rest
 	}: {
 		model: Model;
 		/**
 		 * `true` is equivalent to `'svg'`
 		 */
 		icon?: boolean | 'svg' | 'glyph' | undefined;
-		attrs?: SvelteHTMLElements['a'] | undefined;
+		name?: Snippet | undefined;
 		children?: Snippet | undefined;
-	} = $props();
+	} & SvelteHTMLElements['a'] = $props();
 
 	const selected = $derived(page.url.pathname === `${base}/models/${model.name}`);
 </script>
 
 <!-- TODO this contextmenu appears as a duplicate, I think a de-duped key is the best fix, not manually disabling it -->
 <Model_Contextmenu {model}
-	><a {...attrs} href="{base}/models/{model.name}" class:selected
+	><a {...rest} href="{base}/models/{model.name}" class:selected
 		>{#if children}
 			{@render children()}
 		{:else}
@@ -39,7 +40,7 @@
 			{:else if icon === 'glyph'}
 				<Glyph glyph={GLYPH_MODEL} />
 			{/if}
-			{model.name}
+			{#if name}{@render name()}{:else}{model.name}{/if}
 		{/if}</a
 	></Model_Contextmenu
 >

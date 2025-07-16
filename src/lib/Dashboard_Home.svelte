@@ -54,11 +54,7 @@
 				<ul class="unstyled">
 					{#each app.models.ordered_by_name as model (model.name)}
 						<li class="mb_xs">
-							<Model_Link
-								{model}
-								icon
-								attrs={{class: 'menu_item row justify_content_start gap_xs'}}
-							/>
+							<Model_Link {model} icon class="menu_item row justify_content_start gap_xs" />
 						</li>
 					{:else}
 						<p>no models available yet</p>

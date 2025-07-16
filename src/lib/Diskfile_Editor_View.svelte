@@ -102,11 +102,9 @@
 
 			<div class="p_md">
 				<aside>
-					⚠️ <small
-						>This filesystem interface is an early proof of concept and lacks most features you'd
-						expect. There will be more soon. For now you can chat to create files, then change and
-						save them to see an example history feature.</small
-					>
+					⚠️ This filesystem interface is an early proof of concept and lacks most features you'd
+					expect. There will be more soon. For now you can chat to create files, then change and
+					save them to see an example history feature.
 				</aside>
 			</div>
 		</div>

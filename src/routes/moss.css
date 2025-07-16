@@ -630,9 +630,6 @@ a.chip {
 .mb_0 {
 	margin-bottom: 0;
 }
-.mb_xs3 {
-	margin-bottom: var(--space_xs3);
-}
 .mb_xs {
 	margin-bottom: var(--space_xs);
 }
