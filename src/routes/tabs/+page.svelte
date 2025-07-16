@@ -91,7 +91,7 @@
 			> and <External_Link href="https://www.inkandswitch.com/malleable-software/"
 				>malleable software</External_Link
 			>. I think that we can all have software that's really nice to use, not that expensive to
-			produce, that also respects individual rights and is designed for our benefit, that integrates
+			produce, that also respects individual rights and is designed for our benefit, and integrates
 			our experience across the web and our devices the way we prefer.
 		</p>
 		<p>
