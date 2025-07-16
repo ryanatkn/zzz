@@ -85,23 +85,19 @@
 		</p>
 		<p>
 			I think that by optimizing for UX, Zzz and a lot of software is converging on similar
-			architectures. I'm not deep in the literature but some of my favorite most relevant writing is
-			from Ink and Switch -- <External_Link href="https://www.inkandswitch.com/local-first/"
+			architectures. I'm not well-read in the literature but some of my favorite writing is from Ink
+			and Switch: <External_Link href="https://www.inkandswitch.com/local-first/"
 				>local-first</External_Link
 			> and <External_Link href="https://www.inkandswitch.com/malleable-software/"
 				>malleable software</External_Link
 			>. I think that we can all have software that's really nice to use, not that expensive to
-			produce, that also respects individual rights, that integrates our experience across the web
-			and our devices the way we prefer.
+			produce, that also respects individual rights and is designed for our benefit, that integrates
+			our experience across the web and our devices the way we prefer.
 		</p>
 		<p>
 			The browser gains new life with this design -- not everyone wants this, but I'm looking
 			forward to having my tabs and files in one place -- and maybe <a href="{base}/about">Zzz</a>
-			was always going to a browser with parlor tricks, insisting it's so much more.
-			<small>And it's not even a real browser, just a (planned) Chromium wrapper.</small>
-			<small class="font_size_xs"
-				>(it would be neat if Zzz supported multiple browser engines)</small
-			>
+			was always going to a browser with parlor tricks.
 		</p>
 	</section>
 {/snippet}
