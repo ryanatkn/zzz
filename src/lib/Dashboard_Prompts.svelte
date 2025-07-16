@@ -107,7 +107,7 @@
 		</div>
 		{#if app.prompts.tutorial_for_prompts}
 			<div class="pt_lg" out:blur={{duration: DURATION_MD}}>
-				<aside out:fly={{duration: DURATION_MD, y: 15, x: -5}}>
+				<aside out:fly={{duration: DURATION_MD, y: -1, x: -10}}>
 					<p>
 						⚠️ This is an early prototype of a prompt builder UI. Your data will be lost when the
 						page is refreshed but soon the Node backend will persist it.
