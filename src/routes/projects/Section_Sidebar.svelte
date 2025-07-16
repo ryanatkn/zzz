@@ -11,6 +11,10 @@
 		project: Project;
 		section: Project_Section;
 	} = $props();
+
+	// TODO what else should be here? deployments?
+	// is `pages` the wrong way to think about it?
+	// what about data?
 </script>
 
 <aside class="overflow_y_auto unstyled width_xs p_xs">
