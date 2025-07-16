@@ -23,19 +23,16 @@
 				<p>
 					<Glyph glyph={GLYPH_PROVIDER} />{provider.name}
 				</p>
-				<div class="display_flex justify_content_space_between">
-					{#if provider.homepage}
-						<p>
-							<External_Link href={provider.homepage}>{format_url(provider.homepage)}</External_Link
-							>
-						</p>
-					{/if}
-					{#if provider.url}
-						<p>
-							<External_Link href={provider.url}>docs</External_Link>
-						</p>
-					{/if}
-				</div>
+				{#if provider.homepage}
+					<p>
+						<External_Link href={provider.homepage}>{format_url(provider.homepage)}</External_Link>
+					</p>
+				{/if}
+				{#if provider.url}
+					<p>
+						<External_Link href={provider.url}>docs</External_Link>
+					</p>
+				{/if}
 				<ul class="unstyled">
 					{#each provider.models as model (model)}
 						<li class="row">
