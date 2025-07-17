@@ -15,27 +15,52 @@
 </script>
 
 <div class="p_lg">
-	{#if app.chats.ordered_items.length || app.prompts.ordered_items.length}
-		<section class="display_flex gap_lg">
+	<section class="display_flex align_items_start gap_lg">
+		<div class="panel p_md flex_1 width_sm">
+			<h3 class="mt_0 mb_lg">
+				<a class="font_weight_500" href={to_nav_link_href(app, 'chats', `${base}/chats`)}>chats</a>
+			</h3>
 			{#if app.chats.ordered_items.length}
-				<div class="p_md flex_1 width_sm fg_1 border_radius_xs">
-					<h3 class="mt_0 mb_lg">
-						<a href={to_nav_link_href(app, 'chats', `${base}/chats`)}>chats</a>
-					</h3>
-					<Chat_List />
+				<Chat_List />
+			{:else}
+				<div class="text_align_center p_md">
+					<button
+						type="button"
+						class="color_a"
+						onclick={() => {
+							const chat = app.chats.add();
+							void app.chats.navigate_to(chat.id);
+						}}
+					>
+						create a new chat
+					</button>
 				</div>
 			{/if}
+		</div>
+		<div class="panel p_md flex_1 width_sm">
+			<h3 class="mt_0 mb_lg">
+				<a class="font_weight_500" href={to_nav_link_href(app, 'prompts', `${base}/prompts`)}
+					>prompts</a
+				>
+			</h3>
 			{#if app.prompts.ordered_items.length}
-				<div class="p_md flex_1 width_sm fg_1 border_radius_xs">
-					<h3 class="mt_0 mb_lg">
-						<a href={to_nav_link_href(app, 'prompts', `${base}/prompts`)}>prompts</a>
-					</h3>
-					<Prompt_List />
+				<Prompt_List />
+			{:else}
+				<div class="text_align_center p_md">
+					<button
+						type="button"
+						onclick={() => {
+							const prompt = app.prompts.add();
+							void app.prompts.navigate_to(prompt.id);
+						}}
+					>
+						create a new prompt
+					</button>
 				</div>
 			{/if}
-		</section>
-	{/if}
-	<div class="display_flex flex_wrap gap_lg mt_lg">
+		</div>
+	</section>
+	<div class="display_flex align_items_start flex_wrap gap_lg mt_lg">
 		<section class="panel p_md mb_0 flex_1 min_width_sm" style:max-width="480px">
 			<div class="mb_lg">
 				<a href="{base}/log"
