@@ -40,7 +40,7 @@
 							<Model_Link class="font_family_mono w_100 row px_xs py_xs3 font_size_md" {model}>
 								<div class="flex_1">
 									<Provider_Logo name={model.provider_name} />
-									<span class="pl_sm">{model.name}</span>
+									<span>{model.name}</span>
 								</div>
 								{#if model.provider_name === 'ollama'}<Glyph
 										glyph={model.downloaded ? GLYPH_CHECKMARK : ' '}
