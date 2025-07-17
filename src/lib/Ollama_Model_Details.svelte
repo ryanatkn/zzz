@@ -35,10 +35,6 @@
 		header?: Snippet;
 	} = $props();
 
-	// TODO BLOCK the model info has the modelfile/template, making it huge
-
-	// TODO BLOCK probably want to have the same delete button here as in the ollama one, see Model_Details
-
 	// TODO BLOCK add unload button here and in the configure list
 
 	// TODO refactor with `Model_Detail`?
@@ -196,7 +192,8 @@
 			{#if model.ollama_show_response.model_info && Object.keys(model.ollama_show_response.model_info).length > 0}
 				<div>
 					<h5>model info:</h5>
-					<pre><code>{JSON.stringify(model.ollama_show_response, null, '\t')}</code></pre>
+					<pre><code>{JSON.stringify(model.ollama_show_response.model_info, null, '\t')}</code
+						></pre>
 				</div>
 			{/if}
 
@@ -205,6 +202,22 @@
 				<div>
 					<h5>template:</h5>
 					<pre><code>{model.ollama_show_response.template}</code></pre>
+				</div>
+			{/if}
+
+			<!-- parameters -->
+			{#if model.ollama_show_response.parameters}
+				<div>
+					<h5>parameters:</h5>
+					<pre><code>{model.ollama_show_response.parameters}</code></pre>
+				</div>
+			{/if}
+
+			<!-- system -->
+			{#if model.ollama_show_response.system}
+				<div>
+					<h5>system:</h5>
+					<pre><code>{model.ollama_show_response.system}</code></pre>
 				</div>
 			{/if}
 

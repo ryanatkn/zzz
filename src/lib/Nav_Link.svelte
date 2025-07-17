@@ -4,6 +4,7 @@
 	import type {Snippet} from 'svelte';
 	import {base} from '$app/paths';
 	import {strip_end} from '@ryanatkn/belt/string.js';
+	import type {Omit_Strict} from '@ryanatkn/belt/types.js';
 
 	const {
 		href,
@@ -11,7 +12,7 @@
 		show_selected_descendent = true,
 		children,
 		...rest
-	}: Omit<SvelteHTMLElements['a'], 'children'> & {
+	}: Omit_Strict<SvelteHTMLElements['a'], 'children'> & {
 		href: string;
 		selected?: boolean | undefined;
 		show_selected_descendent?: boolean | undefined;

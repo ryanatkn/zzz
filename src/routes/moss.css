@@ -362,6 +362,9 @@ a.chip {
 	font-weight: 600;
 	--font_weight: 600;
 }
+.text_color_2 {
+	color: var(--text_color_2);
+}
 .text_color_3 {
 	color: var(--text_color_3);
 }
@@ -694,10 +697,6 @@ a.chip {
 .my_lg {
 	margin-top: var(--space_lg);
 	margin-bottom: var(--space_lg);
-}
-.my_xl5 {
-	margin-top: var(--space_xl5);
-	margin-bottom: var(--space_xl5);
 }
 .gap_xs5 {
 	gap: var(--space_xs5);

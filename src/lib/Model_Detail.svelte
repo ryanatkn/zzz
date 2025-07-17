@@ -83,7 +83,13 @@
 	</section>
 
 	{#if model.provider_name === 'ollama'}
-		<Ollama_Model_Details {model} onshow={() => app.api.ollama_show({model: model.name})}>
+		<Ollama_Model_Details
+			{model}
+			onshow={() => app.api.ollama_show({model: model.name})}
+			ondelete={async (m) => {
+				await app.ollama.delete(m.name);
+			}}
+		>
 			{#snippet header()}{/snippet}
 		</Ollama_Model_Details>
 	{:else}

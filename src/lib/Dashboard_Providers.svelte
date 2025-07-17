@@ -7,6 +7,7 @@
 	import {GLYPH_CHECKMARK, GLYPH_PROVIDER} from '$lib/glyphs.js';
 	import {frontend_context} from '$lib/frontend.svelte.js';
 	import External_Link from '$lib/External_Link.svelte';
+	import Provider_Logo from '$lib/Provider_Logo.svelte';
 
 	const app = frontend_context.get();
 </script>
@@ -36,15 +37,15 @@
 				<ul class="unstyled">
 					{#each provider.models as model (model)}
 						<li class="row">
-							{#if model.provider_name === 'ollama'}<Glyph
-									glyph={model.downloaded ? GLYPH_CHECKMARK : ' '}
-									title={model.downloaded ? 'downloaded' : 'not downloaded'}
-								/>{/if}<Model_Link
-								class="font_family_mono row px_xs py_xs3 font_size_md"
-								{model}
-								icon
-							>
-								{#snippet name()}<span class="pl_sm">{model.name}</span>{/snippet}
+							<Model_Link class="font_family_mono w_100 row px_xs py_xs3 font_size_md" {model}>
+								<div class="flex_1">
+									<Provider_Logo name={model.provider_name} />
+									<span class="pl_sm">{model.name}</span>
+								</div>
+								{#if model.provider_name === 'ollama'}<Glyph
+										glyph={model.downloaded ? GLYPH_CHECKMARK : ' '}
+										title={model.downloaded ? 'downloaded' : 'not downloaded'}
+									/>{/if}
 							</Model_Link>
 						</li>
 					{/each}

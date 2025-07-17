@@ -1,6 +1,6 @@
 import type {Frontend_Action_Handlers} from '$lib/frontend_action_types.js';
 import {Strip} from '$lib/strip.svelte.js';
-import {to_completion_response_text} from './response_helpers.js';
+import {to_completion_response_text} from '$lib/response_helpers.js';
 
 // TODO stubbing out a lot of these
 
@@ -138,9 +138,9 @@ export const frontend_action_handlers: Frontend_Action_Handlers = {
 		send_request: () => {
 			console.log('[frontend_action_handlers] sending ollama_list request');
 		},
-		receive_response: async ({app, data: {output}}) => {
+		receive_response: ({app, data: {output}}) => {
 			console.log('[frontend_action_handlers] received ollama_list response:', output);
-			await app.ollama.handle_ollama_list(output);
+			app.ollama.handle_ollama_list(output);
 		},
 	},
 	ollama_ps: {

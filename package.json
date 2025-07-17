@@ -39,7 +39,7 @@
   "devDependencies": {
     "@changesets/changelog-git": "^0.2.1",
     "@ryanatkn/eslint-config": "^0.8.0",
-    "@ryanatkn/fuz": "^0.144.4",
+    "@ryanatkn/fuz": "^0.144.5",
     "@ryanatkn/gro": "^0.160.0",
     "@ryanatkn/moss": "^0.31.0",
     "@sveltejs/adapter-static": "^3.0.8",
@@ -1181,6 +1181,21 @@
     "./transports.js": {
       "types": "./dist/transports.d.ts",
       "default": "./dist/transports.js"
+    },
+    "./Tutorial_For_Chats.svelte": {
+      "types": "./dist/Tutorial_For_Chats.svelte.d.ts",
+      "svelte": "./dist/Tutorial_For_Chats.svelte",
+      "default": "./dist/Tutorial_For_Chats.svelte"
+    },
+    "./Tutorial_For_Database.svelte": {
+      "types": "./dist/Tutorial_For_Database.svelte.d.ts",
+      "svelte": "./dist/Tutorial_For_Database.svelte",
+      "default": "./dist/Tutorial_For_Database.svelte"
+    },
+    "./Tutorial_For_Prompts.svelte": {
+      "types": "./dist/Tutorial_For_Prompts.svelte.d.ts",
+      "svelte": "./dist/Tutorial_For_Prompts.svelte",
+      "default": "./dist/Tutorial_For_Prompts.svelte"
     },
     "./ui.svelte.js": {
       "types": "./dist/ui.svelte.d.ts",

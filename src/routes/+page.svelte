@@ -14,13 +14,14 @@
 	import Dashboard_Home from '$lib/Dashboard_Home.svelte';
 </script>
 
-<section class="box">
-	<Svg data={zzz_logo} size="var(--icon_size_xl2)" attrs={{class: 'my_xl5'}} />
-	<p>nice web things for the tired 💤</p>
-	<div class="mt_xl5">
-		<p>Zzz is a fullstack toolkit for adaptive web environments.</p>
+<section class="row gap_xl5 mb_xl5">
+	<div>
+		<Svg data={zzz_logo} size="var(--icon_size_xl2)" attrs={{class: 'mt_xl5'}} />
+	</div>
+	<div>
+		<p style:padding-top="132px">Zzz is a fullstack toolkit for adaptive web environments.</p>
 		<p>
-			It's an early work in progress, see <a href="{base}/about">/about</a>.
+			It's an early work in progress. See <a href="{base}/about">/about</a>.
 		</p>
 	</div>
 </section>

@@ -1020,6 +1020,21 @@ export const package_json = {
 			default: './dist/Toggle_Button.svelte',
 		},
 		'./transports.js': {types: './dist/transports.d.ts', default: './dist/transports.js'},
+		'./Tutorial_For_Chats.svelte': {
+			types: './dist/Tutorial_For_Chats.svelte.d.ts',
+			svelte: './dist/Tutorial_For_Chats.svelte',
+			default: './dist/Tutorial_For_Chats.svelte',
+		},
+		'./Tutorial_For_Database.svelte': {
+			types: './dist/Tutorial_For_Database.svelte.d.ts',
+			svelte: './dist/Tutorial_For_Database.svelte',
+			default: './dist/Tutorial_For_Database.svelte',
+		},
+		'./Tutorial_For_Prompts.svelte': {
+			types: './dist/Tutorial_For_Prompts.svelte.d.ts',
+			svelte: './dist/Tutorial_For_Prompts.svelte',
+			default: './dist/Tutorial_For_Prompts.svelte',
+		},
 		'./ui.svelte.js': {types: './dist/ui.svelte.d.ts', default: './dist/ui.svelte.js'},
 		'./url_params.svelte.js': {
 			types: './dist/url_params.svelte.d.ts',
@@ -2699,6 +2714,18 @@ export const src_json = {
 				{name: 'Transport', kind: 'type'},
 				{name: 'Transports', kind: 'class'},
 			],
+		},
+		'./Tutorial_For_Chats.svelte': {
+			path: 'Tutorial_For_Chats.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Tutorial_For_Database.svelte': {
+			path: 'Tutorial_For_Database.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Tutorial_For_Prompts.svelte': {
+			path: 'Tutorial_For_Prompts.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
 		},
 		'./ui.svelte.js': {
 			path: 'ui.svelte.ts',
