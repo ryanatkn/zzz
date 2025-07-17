@@ -10,6 +10,7 @@
 	import Model_Link from '$lib/Model_Link.svelte';
 	import {GLYPH_LOG, GLYPH_PROVIDER, GLYPH_MODEL} from '$lib/glyphs.js';
 	import {to_nav_link_href} from '$lib/nav.js';
+	import {GLYPH_ADD} from '$lib/glyphs.js';
 
 	const app = frontend_context.get();
 </script>
@@ -17,8 +18,18 @@
 <div class="p_lg">
 	<section class="display_flex align_items_start gap_lg">
 		<div class="panel p_md flex_1 width_sm">
-			<h3 class="mt_0 mb_lg">
+			<h3 class="mt_0 mb_lg display_flex align_items_center justify_content_space_between">
 				<a class="font_weight_500" href={to_nav_link_href(app, 'chats', `${base}/chats`)}>chats</a>
+				<button
+					type="button"
+					class="plain icon_button font_size_md"
+					onclick={() => {
+						const chat = app.chats.add();
+						void app.chats.navigate_to(chat.id);
+					}}
+				>
+					<Glyph glyph={GLYPH_ADD} />
+				</button>
 			</h3>
 			{#if app.chats.ordered_items.length}
 				<Chat_List />
@@ -38,10 +49,20 @@
 			{/if}
 		</div>
 		<div class="panel p_md flex_1 width_sm">
-			<h3 class="mt_0 mb_lg">
+			<h3 class="mt_0 mb_lg display_flex align_items_center justify_content_space_between">
 				<a class="font_weight_500" href={to_nav_link_href(app, 'prompts', `${base}/prompts`)}
 					>prompts</a
 				>
+				<button
+					type="button"
+					class="plain icon_button font_size_md"
+					onclick={() => {
+						const prompt = app.prompts.add();
+						void app.prompts.navigate_to(prompt.id);
+					}}
+				>
+					<Glyph glyph={GLYPH_ADD} />
+				</button>
 			</h3>
 			{#if app.prompts.ordered_items.length}
 				<Prompt_List />
