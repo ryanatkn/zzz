@@ -43,7 +43,7 @@
 							void app.chats.navigate_to(chat.id);
 						}}
 					>
-						create a new chat
+						create your first chat
 					</button>
 				</div>
 			{/if}
@@ -75,7 +75,7 @@
 							void app.prompts.navigate_to(prompt.id);
 						}}
 					>
-						create a new prompt
+						create your first prompt
 					</button>
 				</div>
 			{/if}

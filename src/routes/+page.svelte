@@ -16,12 +16,13 @@
 
 <section class="box">
 	<Svg data={zzz_logo} size="var(--icon_size_xl2)" attrs={{class: 'my_xl5'}} />
-	<p class="mt_xl3">nice web things for the tired 💤</p>
-	<p class="mt_xl3 width_sm">
-		Zzz is a fullstack toolkit for adaptive web environments. It's an early work in progress, see <a
-			href="{base}/about">/about</a
-		>.
-	</p>
+	<p>nice web things for the tired 💤</p>
+	<div class="mt_xl5">
+		<p>Zzz is a fullstack toolkit for adaptive web environments.</p>
+		<p>
+			It's an early work in progress, see <a href="{base}/about">/about</a>.
+		</p>
+	</div>
 </section>
 
 <Dashboard_Home />
