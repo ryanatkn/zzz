@@ -46,25 +46,41 @@
 				<Chats_List />
 			{/if}
 		</div>
-		{#if app.prompts.tutorial_for_chats}
+		{#if app.prompts.tutorial_for_database}
 			<div class="pt_lg" out:blur={{duration: DURATION_MD}}>
 				<aside out:scale={{duration: DURATION_MD, easing: (t) => sineInOut(t / 3)}}>
 					<p>
 						⚠️ This is a an early prototype and your data is not saved yet -- soon the Node backend
-						will persist data to a local Postgres or pglite database. (<External_Link
+						will persist data to a Postgres or pglite database. (<External_Link
 							href="https://github.com/ryanatkn/zzz/issues/7">issue 7</External_Link
 						>)
 					</p>
+					<button
+						type="button"
+						class="compact"
+						onclick={() => {
+							app.prompts.tutorial_for_database = false;
+						}}>ok</button
+					>
+				</aside>
+			</div>
+		{/if}
+		{#if app.prompts.tutorial_for_chats}
+			<div class="pt_lg" out:blur={{duration: DURATION_MD}}>
+				<aside out:scale={{duration: DURATION_MD, easing: (t) => sineInOut(t / 3)}}>
 					<p>
-						It currently supports chatting with local models via Ollama, and if you bring your own
-						API key, it supports basic text chat with ChatGPT, Claude, and Gemini.
+						This currently supports chatting with local models via Ollama, and if you bring your own
+						API key, it supports basic text chat with ChatGPT, Claude, and Gemini. It's still early,
+						share your ideas in the <a href="https://github.com/ryanatkn/zzz/discussions"
+							>discussions</a
+						>.
 					</p>
 					<button
 						type="button"
 						class="compact"
 						onclick={() => {
 							app.prompts.tutorial_for_chats = false;
-						}}>ok</button
+						}}>k</button
 					>
 				</aside>
 			</div>

@@ -18,9 +18,7 @@
 
 	const strip_count = $derived(tape.strips.size);
 
-	// TODO BLOCK bugged styles after reordering
-
-	// selected only for the simple view mode where there's multiple tapes
+	// TODO BLOCK move to a class and add selection behavior for tapes even in multi view
 	const selected = $derived(
 		chat.view_mode === 'simple' && chat.tapes.length > 1 && chat.tapes[0].id === tape.id,
 	);

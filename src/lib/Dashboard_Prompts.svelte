@@ -1,8 +1,9 @@
 <script lang="ts">
-	import {fade, blur, fly} from 'svelte/transition';
+	import {fade, blur, fly, scale} from 'svelte/transition';
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
 	import {random_item} from '@ryanatkn/belt/random.js';
 	import {base} from '$app/paths';
+	import {sineInOut} from 'svelte/easing';
 
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Glyph from '$lib/Glyph.svelte';
@@ -26,6 +27,7 @@
 	import Diskfile_Picker_Dialog from '$lib/Diskfile_Picker_Dialog.svelte';
 	import Prompt_List from '$lib/Prompt_List.svelte';
 	import Editable_Text from '$lib/Editable_Text.svelte';
+	import External_Link from '$lib/External_Link.svelte';
 	import {DURATION_MD} from '$lib/helpers.js';
 
 	const app = frontend_context.get();
@@ -35,8 +37,6 @@
 	// TODO clicking the bits should select them, and then selected one should show its name input (or just on hover/tap? what signifier?)
 
 	// TODO history of prompt states (opt in snapshots? also autosave?) using cell builtins/helpers, like file state but generalized for all cells? the json-based, set_json stuff
-
-	// TODO BLOCK the reorderable dashed pattern state isn't working for the xml tag input or attributes, same with bits list
 
 	// TODO BLOCK change teh `but soon the Node backend will persist it` to be a new property
 	// tracking the state of just the database acknowledgment, separate from the chats/prompts ones
@@ -105,13 +105,28 @@
 			</div>
 			<Prompt_List />
 		</div>
+		{#if app.prompts.tutorial_for_database}
+			<div class="pt_lg" out:blur={{duration: DURATION_MD}}>
+				<aside out:scale={{duration: DURATION_MD, easing: (t) => sineInOut(t / 3)}}>
+					<p>
+						⚠️ This is a an early prototype and your data is not saved yet -- soon the Node backend
+						will persist data to a Postgres or pglite database. (<External_Link
+							href="https://github.com/ryanatkn/zzz/issues/7">issue 7</External_Link
+						>)
+					</p>
+					<button
+						type="button"
+						class="compact"
+						onclick={() => {
+							app.prompts.tutorial_for_database = false;
+						}}>ok</button
+					>
+				</aside>
+			</div>
+		{/if}
 		{#if app.prompts.tutorial_for_prompts}
 			<div class="pt_lg" out:blur={{duration: DURATION_MD}}>
 				<aside out:fly={{duration: DURATION_MD, y: -1, x: -10}}>
-					<p>
-						⚠️ This is an early prototype of a prompt builder UI. Your data will be lost when the
-						page is refreshed but soon the Node backend will persist it.
-					</p>
 					<p>
 						The plan here is to experiment with many ideas for making and managing prompts, both
 						simpler and more complex than what you see here. We'll likewise explore variants of the <a
@@ -129,7 +144,7 @@
 						class="compact"
 						onclick={() => {
 							app.prompts.tutorial_for_prompts = false;
-						}}>ok</button
+						}}>got it</button
 					>
 				</aside>
 			</div>

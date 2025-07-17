@@ -57,37 +57,35 @@
 			access to local and remote capabilities?"
 		</blockquote>
 		<p>
-			The free and open source software I imagine answering these questions is cross-platform so it
-			runs everywhere. Zzz doesn't have to be built this way, but I think it makes things much
-			simpler. To elaborate:
+			The free and open source software I imagine answering these questions is influenced a lot by
+			my situation and opinions:
 		</p>
 		<ul>
 			<li>
-				I think UX should have primacy, and UI should not be compromised in quality, capability,
-				performance, or accessibility.
+				I think UX should have primacy, and so UI should be prioritized in terms of quality,
+				capability, performance, and accessibility.
 			</li>
 			<li>
-				I want to ship features once, and have things work consistently across operating systems and
-				devices with graceful fallbacks, with minimal dependence on any one company, and without
-				duplicating effort per-platform.
+				I want to make cross-platform software so it runs everywhere. I want to ship features once,
+				and have things work consistently across operating systems and devices with graceful
+				fallbacks, with minimal dependence on any one company, and without duplicating effort
+				per-platform. There's a balance here to take advantage of platform specifics without
+				intruding on the benefits of a shared codebase and singular UX design.
 			</li>
 			<li>
-				I want to maintain a single source of truth in code, without duplicating logic and data
-				across languages, so there's one primary language that runs on the frontend and also the
-				backend, and also dev tooling. This avoids many bugs and frictions, and enables integrations
-				like rich runtime schemas and custom dev tools across the full stack, which can improve
-				security and data integrity. I think it also improves UX through systematically enforced
-				guarantees and more structured error messages. Clear and complete sources of truth are also
-				helpful for deterministic codegen in development, which Zzz uses to generate
-				contextually-optimal files and data.
+				I want to maintain a single source of truth in code, without duplicating logic and data in
+				multiple languages, so there's one primary language that runs on the frontend and backend
+				(and also dev tooling), and modules run everywhere by default. This avoids many bugs,
+				frictions, and inconsistencies, and enables fullstack integrations like rich schemas, which
+				can improve security, data integrity, and error messages.
 			</li>
 		</ul>
 		<p>
 			All of this leads me to the web. I don't see a suitable alternative. History has decided we
-			get to use HTML, CSS, and JS (thankfully TypeScript). For all its flaws and quirks (so many
-			quirks), the web is the turf of our digital commons, but having worked with it for a while and
-			seeing the results on this website and elsewhere, I'm pretty sure it's capable of delivering a
-			good-to-excellent UX.
+			get to use HTML, CSS, and JS (thankfully TypeScript) given the above constraints. For all its
+			flaws and quirks (so many quirks), the web is the turf of our digital commons. Having worked
+			with it for a while and seeing the results on this website and elsewhere, I think it's capable
+			of delivering a good-to-excellent UX.
 		</p>
 		<p>
 			Naturally we want to enjoy the best possible UX, but to some degree, choosing the web is a
@@ -96,12 +94,10 @@
 			developers -- so Zzz chooses distribution and accessibility over performance and perfection.
 		</p>
 		<p>
-			One consequence is that Zzz-made things on mobile in some cases will be worse than native
-			(like battery life), but I think it's a fine trade long term. The web also has UX advantages,
-			like supporting extensions and devtools, and it has improved throughout my career, and IMO
-			it's quite good now. The web's privacy advantages seem mixed and subject to platform
-			influence. I think you'll find performance generally good, thanks to the work of many people
-			including the builders of browser and Svelte/SvelteKit.
+			One consequence is that the Zzz frontend on mobile in some cases will be worse than native,
+			but I think it's a fine trade long term. The web also has UX advantages, like supporting
+			extensions and devtools. I think you'll find performance generally good, thanks to the work of
+			many people including the builders of browser and Svelte/SvelteKit.
 		</p>
 		<p>
 			Given its web roots, Zzz uses JS to glue software and machines together precisely the way the
@@ -407,10 +403,11 @@
 				<ul>
 					<li>
 						we'll develop a plugin API so people can make reusable integrations, and distribution
-						will be through npm, decentralized like a typical open source web ecosystem project so I
-						gatekeep nothing -- I plan to publish a number of <code>@ryanatkn/zzz_*</code> packages,
-						and if people think it's worth their time to make Zzz things, they can publish according
-						to their taste and devs can vet their code
+						will be through npm, decentralized like a typical open source web ecosystem project so
+						the risks assumed by developers are unchanged and I gatekeep nothing -- I plan to
+						publish a number of <code>@ryanatkn/zzz_*</code> packages, and if people think it's worth
+						their time to make Zzz things, they can publish according to their taste and devs can vet
+						their code
 					</li>
 					<li>
 						any modules you install from npm, or any code you add to the src directory, carry the

@@ -21,6 +21,7 @@ export const Prompts_Json = Cell_Json.extend({
 	),
 	selected_id: z.string().nullable().default(null),
 	show_sort_controls: z.boolean().default(false),
+	tutorial_for_database: z.boolean().default(true),
 	tutorial_for_chats: z.boolean().default(true),
 	tutorial_for_prompts: z.boolean().default(true),
 });
@@ -86,6 +87,7 @@ export class Prompts extends Cell<typeof Prompts_Json> {
 	/** Controls visibility of sort controls in the prompts list. */
 	show_sort_controls: boolean = $state()!;
 
+	tutorial_for_database: boolean = $state()!;
 	tutorial_for_chats: boolean = $state()!;
 	tutorial_for_prompts: boolean = $state()!;
 

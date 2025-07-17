@@ -55,11 +55,13 @@ export const GLYPH_CHAT = '⌸';
 export const GLYPH_TAPE = '☷';
 export const GLYPH_STRIP = '⎍'; // ⎎ ⎍
 export const GLYPH_FILE = '⧈'; // ⏚ ⧈ ⊞ ⌺ ▤
-export const GLYPH_LIST = '▤'; //
+// TODO looks too much like chat
+export const GLYPH_LIST = '▤';
 export const GLYPH_DIRECTORY = '▦'; // 🗁 ▦ ▥ 🗀
 export const GLYPH_CREATE_FILE = '🗎';
 export const GLYPH_CREATE_FOLDER = '🗁';
 export const GLYPH_PROMPT = '⌇'; // ⌇ ⍋  ⌭
+// TODO idk about this one, is maybe better suited for list?
 export const GLYPH_BIT = '┊'; //  ┊ ┋ ╎ ╏
 export const GLYPH_PROVIDER = '⨕';
 export const GLYPH_MODEL = '⊛'; // ⨹ ⨺ ⊛
