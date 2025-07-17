@@ -1,0 +1,27 @@
+<script lang="ts">
+	import {blur, fly} from 'svelte/transition';
+
+	import {DURATION_MD} from '$lib/helpers.js';
+	import {frontend_context} from '$lib/frontend.svelte.js';
+
+	const app = frontend_context.get();
+</script>
+
+{#if app.ui.tutorial_for_chats}
+	<div class="pt_lg" out:blur={{duration: DURATION_MD}}>
+		<aside out:fly={{duration: DURATION_MD, x: -10, y: -1}}>
+			<p>
+				This currently supports chatting with local models via Ollama, and if you bring your own API
+				key, it supports basic text chat with ChatGPT, Claude, and Gemini. It's still early, share
+				your ideas in the <a href="https://github.com/ryanatkn/zzz/discussions">discussions</a>.
+			</p>
+			<button
+				type="button"
+				class="compact"
+				onclick={() => {
+					app.ui.tutorial_for_chats = false;
+				}}>k</button
+			>
+		</aside>
+	</div>
+{/if}

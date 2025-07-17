@@ -1,7 +1,5 @@
 <script lang="ts">
 	import {random_item} from '@ryanatkn/belt/random.js';
-	import {blur, scale} from 'svelte/transition';
-	import {sineInOut} from 'svelte/easing';
 
 	import Chats_List from '$lib/Chat_List.svelte';
 	import Chat_View from '$lib/Chat_View.svelte';
@@ -10,8 +8,8 @@
 	import {frontend_context} from '$lib/frontend.svelte.js';
 	import Glyph from '$lib/Glyph.svelte';
 	import Chats_Contextmenu from '$lib/Chats_Contextmenu.svelte';
-	import External_Link from '$lib/External_Link.svelte';
-	import {DURATION_MD} from '$lib/helpers.js';
+	import Tutorial_For_Database from '$lib/Tutorial_For_Database.svelte';
+	import Tutorial_For_Chats from '$lib/Tutorial_For_Chats.svelte';
 
 	const app = frontend_context.get();
 	const {chats} = app;
@@ -46,45 +44,8 @@
 				<Chats_List />
 			{/if}
 		</div>
-		{#if app.prompts.tutorial_for_database}
-			<div class="pt_lg" out:blur={{duration: DURATION_MD}}>
-				<aside out:scale={{duration: DURATION_MD, easing: (t) => sineInOut(t / 3)}}>
-					<p>
-						⚠️ This is a an early prototype and your data is not saved yet -- soon the Node backend
-						will persist data to a Postgres or pglite database. (<External_Link
-							href="https://github.com/ryanatkn/zzz/issues/7">issue 7</External_Link
-						>)
-					</p>
-					<button
-						type="button"
-						class="compact"
-						onclick={() => {
-							app.prompts.tutorial_for_database = false;
-						}}>ok</button
-					>
-				</aside>
-			</div>
-		{/if}
-		{#if app.prompts.tutorial_for_chats}
-			<div class="pt_lg" out:blur={{duration: DURATION_MD}}>
-				<aside out:scale={{duration: DURATION_MD, easing: (t) => sineInOut(t / 3)}}>
-					<p>
-						This currently supports chatting with local models via Ollama, and if you bring your own
-						API key, it supports basic text chat with ChatGPT, Claude, and Gemini. It's still early,
-						share your ideas in the <a href="https://github.com/ryanatkn/zzz/discussions"
-							>discussions</a
-						>.
-					</p>
-					<button
-						type="button"
-						class="compact"
-						onclick={() => {
-							app.prompts.tutorial_for_chats = false;
-						}}>k</button
-					>
-				</aside>
-			</div>
-		{/if}
+		<Tutorial_For_Database />
+		<Tutorial_For_Chats />
 	</div>
 
 	<div class="column_fluid">

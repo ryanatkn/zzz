@@ -1,9 +1,7 @@
 <script lang="ts">
-	import {fade, blur, fly, scale} from 'svelte/transition';
+	import {fade} from 'svelte/transition';
 	import Copy_To_Clipboard from '@ryanatkn/fuz/Copy_To_Clipboard.svelte';
 	import {random_item} from '@ryanatkn/belt/random.js';
-	import {base} from '$app/paths';
-	import {sineInOut} from 'svelte/easing';
 
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Glyph from '$lib/Glyph.svelte';
@@ -27,8 +25,8 @@
 	import Diskfile_Picker_Dialog from '$lib/Diskfile_Picker_Dialog.svelte';
 	import Prompt_List from '$lib/Prompt_List.svelte';
 	import Editable_Text from '$lib/Editable_Text.svelte';
-	import External_Link from '$lib/External_Link.svelte';
-	import {DURATION_MD} from '$lib/helpers.js';
+	import Tutorial_For_Database from '$lib/Tutorial_For_Database.svelte';
+	import Tutorial_For_Prompts from '$lib/Tutorial_For_Prompts.svelte';
 
 	const app = frontend_context.get();
 
@@ -105,50 +103,8 @@
 			</div>
 			<Prompt_List />
 		</div>
-		{#if app.prompts.tutorial_for_database}
-			<div class="pt_lg" out:blur={{duration: DURATION_MD}}>
-				<aside out:scale={{duration: DURATION_MD, easing: (t) => sineInOut(t / 3)}}>
-					<p>
-						⚠️ This is a an early prototype and your data is not saved yet -- soon the Node backend
-						will persist data to a Postgres or pglite database. (<External_Link
-							href="https://github.com/ryanatkn/zzz/issues/7">issue 7</External_Link
-						>)
-					</p>
-					<button
-						type="button"
-						class="compact"
-						onclick={() => {
-							app.prompts.tutorial_for_database = false;
-						}}>ok</button
-					>
-				</aside>
-			</div>
-		{/if}
-		{#if app.prompts.tutorial_for_prompts}
-			<div class="pt_lg" out:blur={{duration: DURATION_MD}}>
-				<aside out:fly={{duration: DURATION_MD, y: -1, x: -10}}>
-					<p>
-						The plan here is to experiment with many ideas for making and managing prompts, both
-						simpler and more complex than what you see here. We'll likewise explore variants of the <a
-							href="{base}/chat">chat</a
-						> interface.
-					</p>
-					<p>
-						As the system vocabulary and APIs are refined, it should get easier for novices to make
-						their ideas with TypeScript and Svelte. Share your ideas in the <a
-							href="https://github.com/ryanatkn/zzz/discussions">discussions</a
-						>.
-					</p>
-					<button
-						type="button"
-						class="compact"
-						onclick={() => {
-							app.prompts.tutorial_for_prompts = false;
-						}}>got it</button
-					>
-				</aside>
-			</div>
-		{/if}
+		<Tutorial_For_Database />
+		<Tutorial_For_Prompts />
 	</div>
 
 	{#if app.prompts.selected}

@@ -6,6 +6,9 @@ import {Cell_Json} from '$lib/cell_types.js';
 export const Ui_Json = Cell_Json.extend({
 	show_main_dialog: z.boolean().default(false),
 	show_sidebar: z.boolean().default(true),
+	tutorial_for_database: z.boolean().default(true),
+	tutorial_for_chats: z.boolean().default(true),
+	tutorial_for_prompts: z.boolean().default(true),
 });
 export type Ui_Json = z.infer<typeof Ui_Json>;
 export type Ui_Json_Input = z.input<typeof Ui_Json>;
@@ -14,6 +17,9 @@ export interface Ui_Options extends Cell_Options<typeof Ui_Json> {} // eslint-di
 export class Ui extends Cell<typeof Ui_Json> {
 	show_main_dialog = $state(false);
 	show_sidebar = $state(true);
+	tutorial_for_database = $state(true);
+	tutorial_for_chats = $state(true);
+	tutorial_for_prompts = $state(true);
 
 	// TODO revisit this API, maybe with an associated attachment?
 	/** Consumed by components like `Content_Editor` for focusing elements. */
