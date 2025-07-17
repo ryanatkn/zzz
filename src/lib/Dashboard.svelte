@@ -140,7 +140,7 @@
 
 					{#each section.items as link (link.label)}
 						<div transition:slide>
-							<Nav_Link href={to_nav_link_href(app, link)}>
+							<Nav_Link href={to_nav_link_href(app, link.label, link.href)}>
 								{#snippet children(selected)}
 									{#if typeof link.icon === 'string'}
 										<Glyph glyph={link.icon} class="icon_xs" /> {link.label}

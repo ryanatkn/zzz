@@ -1,7 +1,7 @@
 <script lang="ts">
 	import {random_item} from '@ryanatkn/belt/random.js';
 
-	import Chats_List from '$lib/Chat_List.svelte';
+	import Chat_List from '$lib/Chat_List.svelte';
 	import Chat_View from '$lib/Chat_View.svelte';
 	import Chat_Contextmenu from '$lib/Chat_Contextmenu.svelte';
 	import {GLYPH_ADD, GLYPH_SORT} from '$lib/glyphs.js';
@@ -41,7 +41,7 @@
 				{/if}
 			</div>
 			{#if chats.items.size}
-				<Chats_List />
+				<Chat_List />
 			{/if}
 		</div>
 		<Tutorial_For_Database />

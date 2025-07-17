@@ -5,26 +5,52 @@
 	import Actions_List from '$lib/Action_List.svelte';
 	import Glyph from '$lib/Glyph.svelte';
 	import Provider_Link from '$lib/Provider_Link.svelte';
+	import Prompt_List from '$lib/Prompt_List.svelte';
+	import Chat_List from '$lib/Chat_List.svelte';
 	import Model_Link from '$lib/Model_Link.svelte';
 	import {GLYPH_LOG, GLYPH_PROVIDER, GLYPH_MODEL} from '$lib/glyphs.js';
+	import {to_nav_link_href} from '$lib/nav.js';
 
 	const app = frontend_context.get();
 </script>
 
 <div class="p_lg">
-	<div class="sections mt_lg">
-		<section class="panel p_md mb_0">
+	{#if app.chats.ordered_items.length || app.prompts.ordered_items.length}
+		<section class="display_flex gap_lg">
+			{#if app.chats.ordered_items.length}
+				<div class="p_md flex_1 width_sm fg_1 border_radius_xs">
+					<h3 class="mt_0 mb_lg">
+						<a href={to_nav_link_href(app, 'chats', `${base}/chats`)}>chats</a>
+					</h3>
+					<Chat_List />
+				</div>
+			{/if}
+			{#if app.prompts.ordered_items.length}
+				<div class="p_md flex_1 width_sm fg_1 border_radius_xs">
+					<h3 class="mt_0 mb_lg">
+						<a href={to_nav_link_href(app, 'prompts', `${base}/prompts`)}>prompts</a>
+					</h3>
+					<Prompt_List />
+				</div>
+			{/if}
+		</section>
+	{/if}
+	<div class="display_flex flex_wrap gap_lg mt_lg">
+		<section class="panel p_md mb_0 flex_1 min_width_sm" style:max-width="480px">
 			<div class="mb_lg">
-				<a class="font_size_xl font_weight_600" href="{base}/log"><Glyph glyph={GLYPH_LOG} /> log</a
+				<a href="{base}/log"
+					><Glyph glyph={GLYPH_LOG} />
+					<h3 class="display_inline my_0">log</h3></a
 				>
 			</div>
 			<Actions_List limit={5} attrs={{class: 'mt_sm'}} />
 		</section>
 
-		<section class="panel p_md mb_0">
+		<section class="panel p_md mb_0 flex_1 min_width_sm" style:max-width="480px">
 			<div class="mb_lg">
-				<a class="font_size_xl font_weight_600" href="{base}/providers"
-					><Glyph glyph={GLYPH_PROVIDER} /> providers</a
+				<a href="{base}/providers"
+					><Glyph glyph={GLYPH_PROVIDER} />
+					<h3 class="display_inline my_0">providers</h3></a
 				>
 			</div>
 			<div>
@@ -44,10 +70,11 @@
 			</div>
 		</section>
 
-		<section class="panel p_md mb_0">
+		<section class="panel p_md mb_0 flex_1 min_width_sm" style:max-width="480px">
 			<div class="mb_lg">
-				<a class="font_size_xl font_weight_600" href="{base}/models"
-					><Glyph glyph={GLYPH_MODEL} /> models</a
+				<a href="{base}/models"
+					><Glyph glyph={GLYPH_MODEL} />
+					<h3 class="display_inline my_0">models</h3></a
 				>
 			</div>
 			<div>
@@ -64,17 +91,3 @@
 		</section>
 	</div>
 </div>
-
-<style>
-	.sections {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(var(--distance_sm), 1fr));
-		gap: var(--space_lg);
-	}
-
-	.panel {
-		min-width: var(--distance_sm);
-		max-width: var(--width_md);
-		width: 100%;
-	}
-</style>

@@ -53,15 +53,8 @@
 </div>
 
 <p>
-	This is the backend's filesystem directory, the <code>zzz_dir</code>. It defaults to
-	<code>.zzz</code> in the backend's current working directory. To configure it set the .env
-	variable
-	<code class="font_size_sm">PUBLIC_ZZZ_DIR</code>.
-</p>
-<p>
-	For security reasons, all filesystem operations are confined to this path's parent directory,
-	<small class="chip font_family_mono">{app.zzz_dir || '[no zzz dir configured]'}</small>, and the
-	path cannot be modified after the backend starts. These restrictions may be loosened in the
-	future, but they help ensure predictability when exposing sensitive resources like your local hard
-	drive to web scripts.
+	This is the backend's filesystem directory. For security reasons, filesystem operations are scoped
+	to this directory, and symlinks are not followed. Defaults to the backend's current working
+	directory. To configure it set the .env variable
+	<code class="font_size_sm">PUBLIC_ZZZ_DIR</code>. Configure at your own risk.
 </p>

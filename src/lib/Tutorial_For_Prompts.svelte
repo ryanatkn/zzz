@@ -28,7 +28,7 @@
 				class="compact"
 				onclick={() => {
 					app.ui.tutorial_for_prompts = false;
-				}}>got it</button
+				}}>okay</button
 			>
 		</aside>
 	</div>
