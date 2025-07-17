@@ -36,9 +36,6 @@
 
 	// TODO history of prompt states (opt in snapshots? also autosave?) using cell builtins/helpers, like file state but generalized for all cells? the json-based, set_json stuff
 
-	// TODO BLOCK change teh `but soon the Node backend will persist it` to be a new property
-	// tracking the state of just the database acknowledgment, separate from the chats/prompts ones
-
 	let show_diskfile_picker = $state(false);
 
 	// Create and add a Text bit
