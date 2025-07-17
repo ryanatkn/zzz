@@ -8,9 +8,8 @@
 	import Prompt_List from '$lib/Prompt_List.svelte';
 	import Chat_List from '$lib/Chat_List.svelte';
 	import Model_Link from '$lib/Model_Link.svelte';
-	import {GLYPH_LOG, GLYPH_PROVIDER, GLYPH_MODEL} from '$lib/glyphs.js';
+	import {GLYPH_LOG, GLYPH_ADD, GLYPH_PROVIDER, GLYPH_MODEL} from '$lib/glyphs.js';
 	import {to_nav_link_href} from '$lib/nav.js';
-	import {GLYPH_ADD} from '$lib/glyphs.js';
 
 	const app = frontend_context.get();
 </script>

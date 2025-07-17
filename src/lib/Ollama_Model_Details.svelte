@@ -39,6 +39,8 @@
 
 	// TODO BLOCK probably want to have the same delete button here as in the ollama one, see Model_Details
 
+	// TODO BLOCK add unload button here and in the configure list
+
 	// TODO refactor with `Model_Detail`?
 </script>
 
