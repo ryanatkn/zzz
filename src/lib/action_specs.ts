@@ -304,3 +304,18 @@ export const ollama_create_action_spec = {
 	output: z.void().optional(),
 	async: true,
 } satisfies Action_Spec_Union;
+
+export const ollama_unload_action_spec = {
+	method: 'ollama_unload',
+	kind: 'request_response',
+	initiator: 'frontend',
+	auth: 'public',
+	side_effects: true,
+	input: z
+		.object({
+			model: z.string(),
+		})
+		.strict(),
+	output: z.void().optional(),
+	async: true,
+} satisfies Action_Spec_Union;

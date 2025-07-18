@@ -5,7 +5,7 @@
 
 	import Glyph from '$lib/Glyph.svelte';
 	import Model_Link from '$lib/Model_Link.svelte';
-	import {GLYPH_INFO, GLYPH_PAUSE, GLYPH_PLAY} from '$lib/glyphs.js';
+	import {GLYPH_INFO, GLYPH_PAUSE, GLYPH_PLAY, GLYPH_REMOVE} from '$lib/glyphs.js';
 	import type {Ollama} from '$lib/ollama.svelte.js';
 	import {format_bytes} from '$lib/format_helpers.js';
 
@@ -14,8 +14,6 @@
 	}: {
 		ollama: Ollama;
 	} = $props();
-
-	// TODO BLOCK add button on the right that sends to `generate` `{model, keep_alive: 0}`
 
 	// TODO this should show "running" models as being actively doing inference, otherwise "loaded"
 </script>
@@ -84,20 +82,30 @@
 									</small>
 								{/if}
 							</div>
-							<!-- TODO maybe refactor with derived state -->
-							{#if item.expires_at}
-								{@const expires_at_date = new Date(item.expires_at)}
-								{@const expires_at_ms = expires_at_date.valueOf()}
-								<small>
-									{#if expires_at_ms > ollama.app.time.now_ms}
-										expires {formatDistance(expires_at_date, ollama.app.time.now_ms, {
-											addSuffix: true,
-										})}
-									{:else}
-										expired
-									{/if}
-								</small>
-							{/if}
+							<div class="display_flex gap_sm align_items_center">
+								<!-- TODO maybe refactor with derived state -->
+								{#if item.expires_at}
+									{@const expires_at_date = new Date(item.expires_at)}
+									{@const expires_at_ms = expires_at_date.valueOf()}
+									<small>
+										{#if expires_at_ms > ollama.app.time.now_ms}
+											expires {formatDistance(expires_at_date, ollama.app.time.now_ms, {
+												addSuffix: true,
+											})}
+										{:else}
+											expired
+										{/if}
+									</small>
+								{/if}
+								<button
+									type="button"
+									class="icon_button plain"
+									title="unload model from memory"
+									onclick={() => ollama.unload(item.name)}
+								>
+									<Glyph glyph={GLYPH_REMOVE} />
+								</button>
+							</div>
 						</div>
 					{/if}
 				</li>

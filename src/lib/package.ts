@@ -1225,6 +1225,7 @@ export const src_json = {
 				{name: 'ollama_delete_action_spec', kind: 'variable'},
 				{name: 'ollama_copy_action_spec', kind: 'variable'},
 				{name: 'ollama_create_action_spec', kind: 'variable'},
+				{name: 'ollama_unload_action_spec', kind: 'variable'},
 			],
 		},
 		'./action_types.js': {
@@ -1947,13 +1948,14 @@ export const src_json = {
 		'./helpers.js': {
 			path: 'helpers.ts',
 			declarations: [
+				{name: 'DURATION_LG', kind: 'variable'},
+				{name: 'DURATION_SM', kind: 'variable'},
 				{name: 'ESTIMATED_CHARS_PER_TOKEN', kind: 'variable'},
 				{name: 'estimate_token_count', kind: 'function'},
 				{name: 'create_client_id', kind: 'function'},
 				{name: 'get_unique_name', kind: 'function'},
 				{name: 'defined', kind: 'function'},
 				{name: 'to_preview', kind: 'function'},
-				{name: 'DURATION_LG', kind: 'variable'},
 			],
 		},
 		'./indexed_collection_helpers.svelte.js': {

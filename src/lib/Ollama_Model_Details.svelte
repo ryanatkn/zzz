@@ -12,6 +12,7 @@
 		GLYPH_ARROW_LEFT,
 		GLYPH_ADD,
 		GLYPH_DOWNLOAD,
+		GLYPH_REMOVE,
 	} from '$lib/glyphs.js';
 	import type {Model} from '$lib/model.svelte.js';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
@@ -34,8 +35,6 @@
 		ondelete?: (model: Model) => void;
 		header?: Snippet;
 	} = $props();
-
-	// TODO BLOCK add unload button here and in the configure list
 
 	// TODO refactor with `Model_Detail`?
 </script>
@@ -83,6 +82,17 @@
 					model.ollama_show_response_loading}
 			>
 				<Glyph glyph={GLYPH_REFRESH} />&nbsp; reload details
+			</button>
+
+			<!-- TODO should show pending status -->
+			<button
+				type="button"
+				class="plain"
+				title="unload model from memory"
+				onclick={() => model.app.ollama.unload(model.name)}
+				disabled={!model.loaded}
+			>
+				<Glyph glyph={GLYPH_REMOVE} />&nbsp; unload
 			</button>
 
 			{#if ondelete}

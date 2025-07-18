@@ -115,6 +115,14 @@ export interface Backend_Action_Handlers {
 			action_event: Action_Event<'ollama_show', Backend, 'send_response', 'handling'>,
 		) => void | Promise<void>;
 	};
+	ollama_unload?: {
+		receive_request?: (
+			action_event: Action_Event<'ollama_unload', Backend, 'receive_request', 'handling'>,
+		) => Action_Outputs['ollama_unload'] | Promise<Action_Outputs['ollama_unload']>;
+		send_response?: (
+			action_event: Action_Event<'ollama_unload', Backend, 'send_response', 'handling'>,
+		) => void | Promise<void>;
+	};
 	ping?: {
 		send_request?: (
 			action_event: Action_Event<'ping', Backend, 'send_request', 'handling'>,

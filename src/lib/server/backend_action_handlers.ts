@@ -416,4 +416,28 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 			}
 		},
 	},
+
+	ollama_unload: {
+		receive_request: async ({data: {input}}) => {
+			console.log(
+				`[backend_action_handlers.ollama_unload.receive_request] unloading: ${input.model}`,
+			);
+
+			try {
+				await ollama.generate({model: input.model, prompt: '', keep_alive: 0});
+				console.log(
+					`[backend_action_handlers.ollama_unload.receive_request] success for: ${input.model}`,
+				);
+				return undefined;
+			} catch (error) {
+				console.error(
+					`[backend_action_handlers.ollama_unload.receive_request] failed for ${input.model}:`,
+					error,
+				);
+				throw jsonrpc_errors.internal_error(
+					`failed to unload model: ${error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE}`,
+				);
+			}
+		},
+	},
 };

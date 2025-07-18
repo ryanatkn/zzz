@@ -21,7 +21,7 @@ import {
 	Ollama_Show_Request,
 	extract_parameter_count,
 } from '$lib/ollama_helpers.js';
-import type {Model, Model_Name} from '$lib/model.svelte.js';
+import {Model_Name, type Model} from '$lib/model.svelte.js';
 import {Poller} from '$lib/poller.svelte.js';
 import {create_map_by_property} from '$lib/iterable_helpers.js';
 
@@ -149,8 +149,9 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 		new Set(this.running_models.map((m) => m.name)),
 	);
 
+	// TODO the prefix naming is awkward but sometimes useful, but inconsistently used
 	// `pull` model derived state
-	readonly pull_parsed_model_name: Model_Name = $derived(this.pull_model_name.trim());
+	readonly pull_parsed_model_name: Model_Name = $derived(Model_Name.parse(this.pull_model_name));
 	readonly pull_already_downloaded: boolean = $derived(
 		!!(
 			this.pull_parsed_model_name && this.model_by_name.get(this.pull_parsed_model_name)?.downloaded
@@ -167,8 +168,12 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	}
 
 	// `copy` model derived state
-	readonly copy_parsed_source_model: string = $derived(this.copy_source_model.trim());
-	readonly copy_parsed_destination_model: string = $derived(this.copy_destination_model.trim());
+	readonly copy_parsed_source_model: Model_Name = $derived(
+		Model_Name.parse(this.copy_source_model),
+	);
+	readonly copy_parsed_destination_model: Model_Name = $derived(
+		Model_Name.parse(this.copy_destination_model),
+	);
 	readonly copy_is_duplicate_name: boolean = $derived(
 		!!this.copy_parsed_destination_model &&
 			this.model_by_name.has(this.copy_parsed_destination_model),
@@ -180,7 +185,9 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	);
 
 	// `create` model derived state
-	readonly create_parsed_model_name: string = $derived(this.create_model_name.trim());
+	readonly create_parsed_model_name: Model_Name = $derived(
+		Model_Name.parse(this.create_model_name),
+	);
 	readonly create_is_duplicate_name: boolean = $derived(
 		!!this.create_parsed_model_name && this.model_by_name.has(this.create_parsed_model_name),
 	);
@@ -524,13 +531,21 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	/**
 	 * Submit delete model form.
 	 */
-	async delete(model_name: string): Promise<void> {
+	async delete(model_name: Model_Name): Promise<void> {
 		console.log(`[ollama.delete_model] deleting from manager: ${model_name}`);
 		await this.app.api.ollama_delete({model: model_name});
 		// Clear selection if the deleted model was selected
 		if (this.manager_selected_model?.name === model_name) {
 			this.set_manager_view('configure', null);
 		}
+	}
+
+	/**
+	 * Unload a model from memory.
+	 */
+	async unload(model_name: Model_Name): Promise<void> {
+		console.log(`[ollama.unload] unloading from memory: ${model_name}`);
+		await this.app.api.ollama_unload({model: model_name});
 	}
 
 	/**

@@ -28,6 +28,7 @@ export const Action_Methods = z.enum([
 	'ollama_ps',
 	'ollama_pull',
 	'ollama_show',
+	'ollama_unload',
 	'ping',
 	'toggle_main_menu',
 	'update_diskfile',
@@ -53,6 +54,7 @@ export const Action_Specs = {
 	ollama_ps: specs.ollama_ps_action_spec,
 	ollama_pull: specs.ollama_pull_action_spec,
 	ollama_show: specs.ollama_show_action_spec,
+	ollama_unload: specs.ollama_unload_action_spec,
 	ping: specs.ping_action_spec,
 	toggle_main_menu: specs.toggle_main_menu_action_spec,
 	update_diskfile: specs.update_diskfile_action_spec,
@@ -72,6 +74,7 @@ export interface Action_Specs {
 	ollama_ps: typeof specs.ollama_ps_action_spec;
 	ollama_pull: typeof specs.ollama_pull_action_spec;
 	ollama_show: typeof specs.ollama_show_action_spec;
+	ollama_unload: typeof specs.ollama_unload_action_spec;
 	ping: typeof specs.ping_action_spec;
 	toggle_main_menu: typeof specs.toggle_main_menu_action_spec;
 	update_diskfile: typeof specs.update_diskfile_action_spec;
@@ -99,6 +102,7 @@ export const Action_Inputs = {
 	ollama_ps: specs.ollama_ps_action_spec.input,
 	ollama_pull: specs.ollama_pull_action_spec.input,
 	ollama_show: specs.ollama_show_action_spec.input,
+	ollama_unload: specs.ollama_unload_action_spec.input,
 	ping: specs.ping_action_spec.input,
 	toggle_main_menu: specs.toggle_main_menu_action_spec.input,
 	update_diskfile: specs.update_diskfile_action_spec.input,
@@ -118,6 +122,7 @@ export interface Action_Inputs {
 	ollama_ps: z.infer<typeof specs.ollama_ps_action_spec.input>;
 	ollama_pull: z.infer<typeof specs.ollama_pull_action_spec.input>;
 	ollama_show: z.infer<typeof specs.ollama_show_action_spec.input>;
+	ollama_unload: z.infer<typeof specs.ollama_unload_action_spec.input>;
 	ping: z.infer<typeof specs.ping_action_spec.input>;
 	toggle_main_menu: z.infer<typeof specs.toggle_main_menu_action_spec.input>;
 	update_diskfile: z.infer<typeof specs.update_diskfile_action_spec.input>;
@@ -143,6 +148,7 @@ export const Action_Outputs = {
 	ollama_ps: specs.ollama_ps_action_spec.output,
 	ollama_pull: specs.ollama_pull_action_spec.output,
 	ollama_show: specs.ollama_show_action_spec.output,
+	ollama_unload: specs.ollama_unload_action_spec.output,
 	ping: specs.ping_action_spec.output,
 	toggle_main_menu: specs.toggle_main_menu_action_spec.output,
 	update_diskfile: specs.update_diskfile_action_spec.output,
@@ -162,6 +168,7 @@ export interface Action_Outputs {
 	ollama_ps: z.infer<typeof specs.ollama_ps_action_spec.output>;
 	ollama_pull: z.infer<typeof specs.ollama_pull_action_spec.output>;
 	ollama_show: z.infer<typeof specs.ollama_show_action_spec.output>;
+	ollama_unload: z.infer<typeof specs.ollama_unload_action_spec.output>;
 	ping: z.infer<typeof specs.ping_action_spec.output>;
 	toggle_main_menu: z.infer<typeof specs.toggle_main_menu_action_spec.output>;
 	update_diskfile: z.infer<typeof specs.update_diskfile_action_spec.output>;
@@ -187,6 +194,7 @@ export interface Action_Event_Datas {
 	ollama_ps: Action_Event_Request_Response_Data<'ollama_ps'>;
 	ollama_pull: Action_Event_Request_Response_Data<'ollama_pull'>;
 	ollama_show: Action_Event_Request_Response_Data<'ollama_show'>;
+	ollama_unload: Action_Event_Request_Response_Data<'ollama_unload'>;
 	ping: Action_Event_Request_Response_Data<'ping'>;
 	toggle_main_menu: Action_Event_Local_Call_Data<'toggle_main_menu'>;
 	update_diskfile: Action_Event_Request_Response_Data<'update_diskfile'>;

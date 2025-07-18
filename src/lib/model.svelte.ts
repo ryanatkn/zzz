@@ -7,7 +7,7 @@ import {Cell_Json} from '$lib/cell_types.js';
 import {Ollama_Show_Response, Ollama_List_Response_Item} from '$lib/ollama_helpers.js';
 import {goto_unless_current} from '$lib/navigation_helpers.js';
 
-export const Model_Name = z.string();
+export const Model_Name = z.string().trim();
 export type Model_Name = z.infer<typeof Model_Name>;
 
 export const Model_Json = Cell_Json.extend({
@@ -100,6 +100,14 @@ export class Model extends Cell<typeof Model_Json> {
 			!this.ollama_show_response_loaded &&
 			!this.ollama_show_response_loading &&
 			!this.ollama_show_response_error,
+	);
+
+	/**
+	 * Check if this model is currently loaded/running.
+	 * For Ollama models, this checks if the model is in the running models set.
+	 */
+	readonly loaded: boolean = $derived(
+		this.provider_name === 'ollama' ? this.app.ollama.running_model_names.has(this.name) : false,
 	);
 
 	constructor(options: Model_Options) {

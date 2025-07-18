@@ -22,6 +22,7 @@ export const Action_Method = z.enum([
 	'ollama_ps',
 	'ollama_pull',
 	'ollama_show',
+	'ollama_unload',
 	'ping',
 	'toggle_main_menu',
 	'update_diskfile',
@@ -43,6 +44,7 @@ export const Request_Response_Action_Method = z.enum([
 	'ollama_ps',
 	'ollama_pull',
 	'ollama_show',
+	'ollama_unload',
 	'ping',
 	'update_diskfile',
 ]);
@@ -82,6 +84,7 @@ export const Frontend_Action_Method = z.enum([
 	'ollama_ps',
 	'ollama_pull',
 	'ollama_show',
+	'ollama_unload',
 	'ping',
 	'toggle_main_menu',
 	'update_diskfile',
@@ -106,6 +109,7 @@ export const Backend_Action_Method = z.enum([
 	'ollama_ps',
 	'ollama_pull',
 	'ollama_show',
+	'ollama_unload',
 	'ping',
 	'update_diskfile',
 ]);
@@ -143,6 +147,9 @@ export interface Actions_Api {
 	ollama_ps: (input?: void) => Promise<Action_Outputs['ollama_ps']>;
 	ollama_pull: (input: Action_Inputs['ollama_pull']) => Promise<Action_Outputs['ollama_pull']>;
 	ollama_show: (input: Action_Inputs['ollama_show']) => Promise<Action_Outputs['ollama_show']>;
+	ollama_unload: (
+		input: Action_Inputs['ollama_unload'],
+	) => Promise<Action_Outputs['ollama_unload']>;
 	ping: (input?: void) => Promise<Action_Outputs['ping']>;
 	toggle_main_menu: (
 		input?: Action_Inputs['toggle_main_menu'],

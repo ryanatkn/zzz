@@ -115,6 +115,14 @@ export interface Frontend_Action_Handlers {
 			action_event: Action_Event<'ollama_show', Frontend, 'receive_response', 'handling'>,
 		) => void | Promise<void>;
 	};
+	ollama_unload?: {
+		send_request?: (
+			action_event: Action_Event<'ollama_unload', Frontend, 'send_request', 'handling'>,
+		) => void | Promise<void>;
+		receive_response?: (
+			action_event: Action_Event<'ollama_unload', Frontend, 'receive_response', 'handling'>,
+		) => void | Promise<void>;
+	};
 	ping?: {
 		send_request?: (
 			action_event: Action_Event<'ping', Frontend, 'send_request', 'handling'>,
