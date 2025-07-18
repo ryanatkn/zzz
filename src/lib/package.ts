@@ -35,7 +35,7 @@ export const package_json = {
 	devDependencies: {
 		'@changesets/changelog-git': '^0.2.1',
 		'@ryanatkn/eslint-config': '^0.8.0',
-		'@ryanatkn/fuz': '^0.144.4',
+		'@ryanatkn/fuz': '^0.144.5',
 		'@ryanatkn/gro': '^0.160.0',
 		'@ryanatkn/moss': '^0.31.0',
 		'@sveltejs/adapter-static': '^3.0.8',
@@ -1953,7 +1953,7 @@ export const src_json = {
 				{name: 'get_unique_name', kind: 'function'},
 				{name: 'defined', kind: 'function'},
 				{name: 'to_preview', kind: 'function'},
-				{name: 'DURATION_MD', kind: 'variable'},
+				{name: 'DURATION_LG', kind: 'variable'},
 			],
 		},
 		'./indexed_collection_helpers.svelte.js': {

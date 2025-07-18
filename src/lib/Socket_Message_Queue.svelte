@@ -10,6 +10,7 @@
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
 	import Popover_Button from '$lib/Popover_Button.svelte';
 	import {format_timestamp} from '$lib/time_helpers.js';
+	import {DURATION_SM} from '$lib/helpers.js';
 
 	const {
 		socket,
@@ -206,7 +207,7 @@
 									{#if copied}
 										<div><small class="font_size_xs">{message.id}</small></div>
 									{:else}
-										<div in:slide={{duration: 200}}>
+										<div in:slide={{duration: DURATION_SM}}>
 											<small class="font_size_xs">{message.id}</small>
 										</div>
 									{/if}
@@ -226,7 +227,7 @@
 									{#if copied}
 										<div><small class="font_size_xs">{message.data.id}</small></div>
 									{:else}
-										<div in:slide={{duration: 200}}>
+										<div in:slide={{duration: DURATION_SM}}>
 											<small class="font_size_xs">{message.data.id}</small>
 										</div>
 									{/if}

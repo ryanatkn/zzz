@@ -1,5 +1,9 @@
 import {CONTENT_PREVIEW_LENGTH} from '$lib/constants.js';
 
+// TODO import from moss (and respect prefers-reduced-motion? maybe optionally)
+export const DURATION_LG = 1000;
+export const DURATION_SM = 180;
+
 // TODO configure
 // this is a guesstimate, is lower to better estimate for code,
 // and in general I think it's better better to overestimate counts (which lower does)
@@ -43,6 +47,3 @@ export const to_preview = (
 	max_length: number = CONTENT_PREVIEW_LENGTH,
 ): string =>
 	content ? (content.length > max_length ? content.substring(0, max_length) + '...' : content) : '';
-
-// TODO should be from moss and respect prefers-reduced-motion
-export const DURATION_MD = 1000;

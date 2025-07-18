@@ -27,6 +27,7 @@
 	import Editable_Text from '$lib/Editable_Text.svelte';
 	import Tutorial_For_Database from '$lib/Tutorial_For_Database.svelte';
 	import Tutorial_For_Prompts from '$lib/Tutorial_For_Prompts.svelte';
+	import {DURATION_SM} from '$lib/helpers.js';
 
 	const app = frontend_context.get();
 
@@ -187,7 +188,7 @@
 						style:grid-template-columns="repeat(auto-fill, minmax(300px, 1fr))"
 					>
 						{#each app.prompts.selected.bits as bit (bit.id)}
-							<li in:fade>
+							<li in:fade={{duration: DURATION_SM}}>
 								<!-- the extra wrapper makes the grid items not stretch vertically -->
 								<div class="bg border_radius_xs p_sm">
 									<Bit_View {bit} />
@@ -199,7 +200,10 @@
 			</div>
 		</Prompt_Contextmenu>
 	{:else if app.prompts.items.size}
-		<div class="display_flex align_items_center justify_content_center h_100 flex_1" in:fade>
+		<div
+			class="display_flex align_items_center justify_content_center h_100 flex_1"
+			in:fade={{duration: DURATION_SM}}
+		>
 			<p>
 				select a prompt from the list or <button
 					type="button"
@@ -220,7 +224,10 @@
 			</p>
 		</div>
 	{:else}
-		<div class="display_flex align_items_center justify_content_center h_100 flex_1" in:fade>
+		<div
+			class="display_flex align_items_center justify_content_center h_100 flex_1"
+			in:fade={{duration: DURATION_SM}}
+		>
 			<p>
 				no prompts yet, <button
 					type="button"

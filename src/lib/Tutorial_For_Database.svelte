@@ -3,15 +3,15 @@
 	import {sineInOut} from 'svelte/easing';
 
 	import External_Link from '$lib/External_Link.svelte';
-	import {DURATION_MD} from '$lib/helpers.js';
+	import {DURATION_LG} from '$lib/helpers.js';
 	import {frontend_context} from '$lib/frontend.svelte.js';
 
 	const app = frontend_context.get();
 </script>
 
 {#if app.ui.tutorial_for_database}
-	<div class="pt_lg" out:blur={{duration: DURATION_MD}}>
-		<aside out:scale={{duration: DURATION_MD, easing: (t) => sineInOut(t / 3)}}>
+	<div class="pt_lg" out:blur={{duration: DURATION_LG}}>
+		<aside out:scale={{duration: DURATION_LG, easing: (t) => sineInOut(t / 3)}}>
 			<p>
 				⚠️ This is an early prototype and your data is not saved yet -- soon the Node backend will
 				persist data to a Postgres or pglite database. (<External_Link
