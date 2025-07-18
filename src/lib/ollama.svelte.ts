@@ -546,6 +546,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	async unload(model_name: Model_Name): Promise<void> {
 		console.log(`[ollama.unload] unloading from memory: ${model_name}`);
 		await this.app.api.ollama_unload({model: model_name});
+		await this.app.api.ollama_ps(); // TODO Ollama doesnt seem to be updated by this time
 	}
 
 	/**
