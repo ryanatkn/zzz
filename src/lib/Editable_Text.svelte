@@ -66,10 +66,10 @@
 			const {key} = event;
 			if (key === 'Enter' || key === 'F2') {
 				swallow(event);
-				save();
+				void save();
 			} else if (key === 'Escape') {
 				swallow(event);
-				cancel();
+				void cancel();
 			}
 		}}
 	/>
@@ -87,7 +87,7 @@
 			const {key} = event;
 			if (key === 'Enter' || key === ' ' || key === 'F2') {
 				swallow(event);
-				edit();
+				void edit();
 			}
 		}}
 	>
