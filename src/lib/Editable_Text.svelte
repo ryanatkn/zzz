@@ -26,7 +26,7 @@
 	let input_el: HTMLInputElement | undefined = $state();
 	let span_el: HTMLSpanElement | undefined = $state();
 
-	const save = () => {
+	export const save = async (): Promise<void> => {
 		const trimmed = edited_value.trim(); // TODO parse with an optional zod schema
 		if (!trimmed) {
 			is_editing = false;
@@ -34,24 +34,22 @@
 		}
 		value = trimmed;
 		is_editing = false;
-		finalize_editing();
+		await finalize_editing();
 	};
 
-	const cancel = () => {
+	export const cancel = async (): Promise<void> => {
 		is_editing = false;
 		edited_value = '';
-		finalize_editing();
+		await finalize_editing();
 	};
 
-	const start_editing = () => {
+	export const edit = async (): Promise<void> => {
 		is_editing = true;
 		edited_value = value;
-		void tick().then(() => input_el?.select());
+		await tick().then(() => input_el?.select());
 	};
 
-	const finalize_editing = () => {
-		void tick().then(() => span_el?.focus());
-	};
+	const finalize_editing = () => tick().then(() => span_el?.focus());
 
 	// TODO maybe export the classes as module-scoped constants?
 </script>
@@ -76,6 +74,7 @@
 		}}
 	/>
 {:else}
+	<!-- using a fake button for styling reasons, should appear like normal content -->
 	<span
 		role="button"
 		tabindex="0"
@@ -83,12 +82,12 @@
 		{...attrs}
 		{...span_attrs}
 		bind:this={span_el}
-		onclick={start_editing}
+		onclick={edit}
 		onkeydown={(event) => {
 			const {key} = event;
 			if (key === 'Enter' || key === ' ' || key === 'F2') {
 				swallow(event);
-				start_editing();
+				edit();
 			}
 		}}
 	>
