@@ -13,6 +13,7 @@
 	import Diskfile_Contextmenu from '$lib/Diskfile_Contextmenu.svelte';
 	import type {Uuid} from '$lib/zod_helpers.js';
 	import Diskfile_Editor_Nav from '$lib/Diskfile_Editor_Nav.svelte';
+	import Tutorial_For_Diskfiles from '$lib/Tutorial_For_Diskfiles.svelte';
 
 	const {
 		diskfile,
@@ -100,12 +101,8 @@
 
 			<Diskfile_Bit_View {diskfile} />
 
-			<div class="p_md">
-				<aside>
-					⚠️ This filesystem interface is an early proof of concept and lacks most features you'd
-					expect. There will be more soon. For now you can chat to create files, then change and
-					save them to see an example history feature.
-				</aside>
+			<div class="px_md">
+				<Tutorial_For_Diskfiles />
 			</div>
 		</div>
 	</div>

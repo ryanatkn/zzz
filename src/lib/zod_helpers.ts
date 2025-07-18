@@ -9,6 +9,7 @@ export type Any = z.infer<typeof Any>;
 export const Type_Literal = z.string().min(1).brand('Type_Literal');
 export type Type_Literal = z.infer<typeof Type_Literal>;
 
+// TODO @many how to handle paths? need some more structure to the way they're normalized and joined
 // TODO rethink with ensure/strip usages, normally we'd want to validate these not transform
 export const Path_With_Trailing_Slash = z.string().transform((v) => ensure_end(v, '/'));
 export type Path_With_Trailing_Slash = z.infer<typeof Path_With_Trailing_Slash>;

@@ -154,6 +154,7 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 			console.log(`[backend_action_handlers.update_diskfile.receive_request] message`, request);
 			const {path, content} = input;
 
+			// TODO this clobbers existing files even if that wasn't the intent since there's no `create` action
 			try {
 				// Use the server's scoped_fs instance to write the file
 				await backend.scoped_fs.write_file(path, content);

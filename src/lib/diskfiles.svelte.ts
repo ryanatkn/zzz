@@ -1,6 +1,6 @@
 import {z} from 'zod';
 
-import {get_datetime_now, Uuid} from '$lib/zod_helpers.js';
+import {get_datetime_now, Path_With_Leading_Slash, Uuid} from '$lib/zod_helpers.js';
 import {Diskfile, Diskfile_Schema} from '$lib/diskfile.svelte.js';
 import {Diskfile_Json, Diskfile_Path} from '$lib/diskfile_types.js';
 import {source_file_to_diskfile_json, to_relative_path} from '$lib/diskfile_helpers.js';
@@ -138,7 +138,10 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 			throw new Error('cannot create file: zzz_dir is not set');
 		}
 
-		const path = Diskfile_Path.parse(`${this.app.zzz_cache_dir}${filename}`);
+		// TODO @many how to handle paths? need some more structure to the way they're normalized and joined
+		const path = Diskfile_Path.parse(
+			`${this.app.zzz_cache_dir}${Path_With_Leading_Slash.parse(filename)}`,
+		);
 
 		// Reuse `update` which creates or updates files
 		await this.update(path, content);

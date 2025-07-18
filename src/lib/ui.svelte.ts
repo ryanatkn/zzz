@@ -9,6 +9,7 @@ export const Ui_Json = Cell_Json.extend({
 	tutorial_for_database: z.boolean().default(true),
 	tutorial_for_chats: z.boolean().default(true),
 	tutorial_for_prompts: z.boolean().default(true),
+	tutorial_for_diskfiles: z.boolean().default(true),
 });
 export type Ui_Json = z.infer<typeof Ui_Json>;
 export type Ui_Json_Input = z.input<typeof Ui_Json>;
@@ -20,6 +21,7 @@ export class Ui extends Cell<typeof Ui_Json> {
 	tutorial_for_database: boolean = $state()!;
 	tutorial_for_chats: boolean = $state()!;
 	tutorial_for_prompts: boolean = $state()!;
+	tutorial_for_diskfiles: boolean = $state()!;
 
 	// TODO revisit this API, maybe with an associated attachment?
 	/** Consumed by components like `Content_Editor` for focusing elements. */
