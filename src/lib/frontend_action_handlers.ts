@@ -214,14 +214,13 @@ export const frontend_action_handlers: Frontend_Action_Handlers = {
 			// also notice we have a different progress pattern for other actions because the data received is different,
 			// but there's probably a cleaner/simpler design
 
-			// If we have a progress token, find the corresponding action
 			const progress_token = _meta.progressToken;
 			if (!progress_token) {
 				console.error('[frontend_action_handlers] ollama_progress missing progress_token');
 				return;
 			}
 
-			// Find the action with this progress token
+			// TODO refactor
 			const action = app.actions.items.values.find(
 				(a) => (a.action_event_data?.input as any)?._meta?.progressToken === progress_token,
 			);

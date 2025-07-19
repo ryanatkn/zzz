@@ -205,28 +205,14 @@ export class Action_Event<
 		this.set_data(new_data);
 	}
 
-	/**
-	 * Check if the action event is complete.
-	 */
 	is_complete(): boolean {
 		return is_action_complete(this.#data);
 	}
 
-	/**
-	 * Update progress for long-running operations.
-	 */
 	update_progress(progress: unknown): void {
-		// TODO this fails for progress updates on `ollama_pull` because it's already handled, maybe some deeper issues in our state sequencing
-		// if (this.#data.step !== 'handling') {
-		// 	throw new Error(`cannot update progress from step '${this.#data.step}' - must be 'handling'`);
-		// }
-
 		this.#update_data({progress});
 	}
 
-	/**
-	 * Set protocol-specific data.
-	 */
 	set_request(request: Jsonrpc_Request): void {
 		this.#validate_protocol_setter('request', {
 			kind: 'request_response',
@@ -258,7 +244,7 @@ export class Action_Event<
 		this.#update_data({...updates, step});
 	}
 
-	/** Shallowly merges `updates` with the current data. */
+	/** Shallowly merge `updates` with the current data immutably. */
 	#update_data(updates: Partial<Action_Event_Data>): void {
 		const new_data = {...this.#data, ...updates} as Action_Event_Datas[T_Method];
 		this.set_data(new_data);

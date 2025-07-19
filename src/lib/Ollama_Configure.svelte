@@ -57,7 +57,7 @@
 		<p>
 			Ollama is a local LLM provider. Want to <button
 				type="button"
-				class="inline compact"
+				class="inline compact color_a"
 				onclick={onshowpull}>pull a model</button
 			>?
 		</p>

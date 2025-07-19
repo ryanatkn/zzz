@@ -113,7 +113,7 @@ export const handle_filer_change: Filer_Change_Handler = (
 		}
 	}
 
-	console.log(`change, source_file.id`, change, source_file.id);
+	// console.log(`change, source_file.id`, change.type, change.path, change.is_directory);
 
 	void backend.api.filer_change({
 		change: api_change,

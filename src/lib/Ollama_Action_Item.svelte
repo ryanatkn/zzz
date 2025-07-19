@@ -89,7 +89,7 @@
 				return Math.round((completed / total) * 100);
 			}
 		}
-		return undefined;
+		return null;
 	});
 
 	// TODO BLOCK failed pull shows as successful
@@ -129,7 +129,7 @@
 				{format_timestamp(action.updated_date.getTime())}
 			</span>
 		</div>
-		{#if progress_percent !== undefined}
+		{#if progress_percent !== null}
 			<div class="p_sm pt_0">
 				<Progress_Bar value={progress_percent} />
 			</div>
