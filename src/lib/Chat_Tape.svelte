@@ -65,7 +65,7 @@
 				<header>
 					<button
 						type="button"
-						class="plain compact font_size_lg text_align_left"
+						class="plain compact font_size_lg text_align_left font_weight_400"
 						onclick={() => (show_model_picker = true)}
 					>
 						{tape.model.name}

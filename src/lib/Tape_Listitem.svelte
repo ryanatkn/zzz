@@ -28,7 +28,7 @@
 	<div class="tape_listitem p_xs2" class:dormant={!tape.enabled} class:selected>
 		<div class="row justify_content_space_between gap_xs">
 			<div class="flex_1">
-				<div class="font_weight_600">
+				<div class="font_weight_400">
 					<Provider_Logo name={tape.model.provider_name} size="var(--font_size_md)" />
 					{tape.model_name}
 				</div>
