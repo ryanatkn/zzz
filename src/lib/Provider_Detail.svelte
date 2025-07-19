@@ -25,7 +25,7 @@
 
 	const app = frontend_context.get();
 
-	// TODO BLOCK @many get and display Ollama version
+	// TODO @many get and display Ollama version, JS API client doesnt have it but the REST API does
 	// maybe at `<Glyph glyph={GLYPH_PROVIDER} />{provider.name}`
 </script>
 

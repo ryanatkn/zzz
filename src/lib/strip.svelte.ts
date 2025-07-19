@@ -12,7 +12,11 @@ import type {
 	Completion_Role,
 } from '$lib/completion_types.js';
 
-// TODO BLOCK rename? is more like a message, bits are maybe parts and strips have many bits, maybe `Tape_Message`, idk, maybe rethink "tape" too
+// TODO BLOCK rename? is more like a message but Message (A2A) is *so* generic of a word,
+// and is already used in contexts with additional names like "error_message" "jsonrpc_message",
+// bits are maybe parts and strips have many bits,
+// maybe `Tape_Message` or `Chat_Message`, idk, maybe rethink "tape" too.
+// Is `Turn` a misnaming?
 
 export interface Strip_Options extends Cell_Options<typeof Strip_Json> {} // eslint-disable-line @typescript-eslint/no-empty-object-type
 

@@ -34,7 +34,7 @@ import {create_map_by_property} from '$lib/iterable_helpers.js';
 
 // TODO rough logging
 
-// TODO BLOCK @many get and display Ollama version
+// TODO @many get and display Ollama version, JS API client doesnt have it but the REST API does
 
 export const Ollama_Json = Cell_Json.extend({
 	host: z.string().default(OLLAMA_URL),

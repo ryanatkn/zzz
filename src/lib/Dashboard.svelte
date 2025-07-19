@@ -68,13 +68,7 @@
 		(app.ui.show_sidebar ? 'hide sidebar' : 'show sidebar') + ' [backtick `]',
 	);
 
-	// TODO BLOCK see the `Sidebar toggle button` below, change it to a component that
-	// can be registered to for toggling any number of UI elements,
-	// starting with the chats/prompts being able to toggle their inner 2 sidebars,
-	// arranged so that there's always 3 buttons from left to right:
-	// 1. Toggle main nav
-	// 2. Toggle list of chats/prompts
-	// 3. Toggle chat/prompt details
+	// TODO consider the
 </script>
 
 <svelte:window
@@ -163,12 +157,10 @@
 		</div>
 	</div>
 
-	<!-- Sidebar toggle button -->
+	<!-- sidebar toggle button -->
 	<button
 		type="button"
-		class="position_fixed b_0 l_0 icon_button plain border_radius_xs2"
-		style:border-bottom-left-radius="0"
-		style:border-top-right-radius="var(--border_radius_lg)"
+		class="position_fixed b_0 l_0 icon_button plain border_radius_0"
 		aria-label={sidebar_button_title}
 		title={sidebar_button_title}
 		onclick={() => app.ui.toggle_sidebar()}

@@ -53,14 +53,12 @@
 			{@html page_viewmodel?.formatted_content}
 		</div>
 
-		<!-- Close preview button in top-right corner -->
+		<!-- preview toggle button in top-right corner -->
 		<button
 			type="button"
-			class="position_fixed t_0 r_0 icon_button plain border_radius_xs2"
-			style:border-top-right-radius="0"
-			style:border-bottom-left-radius="var(--border_radius_lg)"
-			aria-label="Close preview"
-			title="Close preview"
+			class="position_fixed t_0 r_0 icon_button plain border_radius_0"
+			aria-label="close preview"
+			title="close preview"
 			onclick={toggle_preview}
 		>
 			<Glyph glyph={GLYPH_PREVIEW} />

@@ -1030,6 +1030,11 @@ export const package_json = {
 			svelte: './dist/Tutorial_For_Database.svelte',
 			default: './dist/Tutorial_For_Database.svelte',
 		},
+		'./Tutorial_For_Diskfiles.svelte': {
+			types: './dist/Tutorial_For_Diskfiles.svelte.d.ts',
+			svelte: './dist/Tutorial_For_Diskfiles.svelte',
+			default: './dist/Tutorial_For_Diskfiles.svelte',
+		},
 		'./Tutorial_For_Prompts.svelte': {
 			types: './dist/Tutorial_For_Prompts.svelte.d.ts',
 			svelte: './dist/Tutorial_For_Prompts.svelte',
@@ -2723,6 +2728,10 @@ export const src_json = {
 		},
 		'./Tutorial_For_Database.svelte': {
 			path: 'Tutorial_For_Database.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Tutorial_For_Diskfiles.svelte': {
+			path: 'Tutorial_For_Diskfiles.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
 		},
 		'./Tutorial_For_Prompts.svelte': {
