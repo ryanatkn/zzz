@@ -106,8 +106,11 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	// Derived state
 	readonly available: boolean = $derived(this.list_status === 'success');
 
+	// TODO maybe move this to an index for automatic filtering/sorting?
 	readonly actions = $derived(
-		this.app.actions.items.values.filter((a) => a.method.startsWith('ollama_')),
+		this.app.actions.items.values
+			.filter((a) => a.method.startsWith('ollama_'))
+			.sort((a, b) => (a.created > b.created ? -1 : 1)),
 	);
 	readonly pending_actions = $derived(
 		this.actions.filter((a) => a.action_event_data?.step === 'handling'),
@@ -118,14 +121,13 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 		),
 	);
 	readonly filtered_actions = $derived(
-		(this.show_read_actions
-			? this.actions.slice()
+		this.show_read_actions
+			? this.actions
 			: this.actions.filter(
+					// TODO maybe add a helper? `is_ollama_read_action`
 					(a) =>
-						// TODO maybe helper? is_ollama_read_action
 						a.method !== 'ollama_list' && a.method !== 'ollama_show' && a.method !== 'ollama_ps',
-				)
-		).reverse(),
+				),
 	);
 
 	readonly models: Array<Model> = $derived(this.app.models.items.where('provider_name', 'ollama'));
