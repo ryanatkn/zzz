@@ -38,7 +38,8 @@
 	const at_detail_page = $derived(page.url.pathname === `${base}/models/${model.name}`);
 	const provider = $derived(app.providers.find_by_name(model.provider_name));
 
-	// TODO get spec data mapped to model fields for the frontier providers
+	// TODO get model metadata, probably both at build time and runtime for the best UX
+
 	// TODO add custom models/providers, show in the UI when they're in a bad state
 </script>
 
@@ -93,10 +94,10 @@
 		</Ollama_Model_Details>
 	{:else}
 		<aside class="mt_xl3 width_md">
-			⚠️ This should show model info, but the APIs for ChatGPT and Claude do not return details like
-			context window size, output token limit, and other details. Gemini however does. It looks like
-			we'll have to maintain hardcoded metadata for models, probably extending what we can retrieve
-			from each API, and probably getting that data at build time.
+			⚠️ This should show model info, but the APIs for ChatGPT and Claude do not provide metadata
+			like context window size, output token limit, and other details. Gemini however does. It looks
+			like we'll have to maintain hardcoded metadata for models, probably extending what we can
+			retrieve from each API.
 		</aside>
 		<section class="display_flex gap_xs">
 			<button

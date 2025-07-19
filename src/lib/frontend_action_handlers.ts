@@ -234,10 +234,7 @@ export const frontend_action_handlers: Frontend_Action_Handlers = {
 				return;
 			}
 
-			// The action is already listening to its action_event via listen_to_action_event
-			// We need to update the action_event's progress
 			if (action.action_event_data) {
-				// Create a new action_event data with progress
 				action.action_event_data = {
 					...action.action_event_data,
 					progress,
