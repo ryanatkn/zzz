@@ -298,7 +298,7 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 		receive_request: async ({backend, data: {input}}) => {
 			console.log(`[backend_action_handlers.ollama_pull.receive_request] pulling: ${input.model}`);
 			const {_meta, ...params} = input;
-
+			throw jsonrpc_errors.internal_error(`idk bad things`);
 			try {
 				const response = await ollama.pull({...params, stream: true});
 

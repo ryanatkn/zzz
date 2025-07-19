@@ -30,7 +30,7 @@ export class Frontend_Websocket_Transport implements Transport {
 		this.#socket = socket;
 		this.#request_tracker = new Request_Tracker(request_timeout_ms);
 
-		// Set up the message handler
+		// TODO better API to support more listeners?
 		socket.onmessage = async (event) => {
 			try {
 				const data = JSON.parse(event.data);
@@ -44,10 +44,10 @@ export class Frontend_Websocket_Transport implements Transport {
 					// This is a new request/notification from the server
 					await socket.app.peer.receive(data);
 				} else {
-					console.warn('[frontend websocket transport] Received unknown message type:', data);
+					console.warn('[frontend websocket transport] received unknown message type:', data);
 				}
 			} catch (error) {
-				console.error('[frontend websocket transport] Error parsing WebSocket message:', error);
+				console.error('[frontend websocket transport] error parsing WebSocket message:', error);
 			}
 		};
 	}
