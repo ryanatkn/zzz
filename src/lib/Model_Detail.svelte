@@ -93,10 +93,10 @@
 		</Ollama_Model_Details>
 	{:else}
 		<aside class="mt_xl3 width_md">
-			⚠️ This should show model info, but it the APIs for Claude and ChatGPT do not return details
-			like context window size, output token limit, and other details. Gemini however does. It looks
-			like we'll have to maintain hardcoded metadata for models, probably extending what we can
-			retrieve from the API, maybe getting that data at build time.
+			⚠️ This should show model info, but the APIs for ChatGPT and Claude do not return details like
+			context window size, output token limit, and other details. Gemini however does. It looks like
+			we'll have to maintain hardcoded metadata for models, probably extending what we can retrieve
+			from each API, and probably getting that data at build time.
 		</aside>
 		<section class="display_flex gap_xs">
 			<button
