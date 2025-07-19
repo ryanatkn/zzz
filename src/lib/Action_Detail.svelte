@@ -45,10 +45,10 @@
 				<td>kind</td>
 				<td>{action.kind}</td>
 			</tr>
-			{#if action.action_event?.error}
+			{#if action.action_event_data?.error}
 				<tr>
 					<td>error</td>
-					<td class="font_family_mono color_c">{JSON.stringify(action.action_event.error)}</td>
+					<td class="font_family_mono color_c">{JSON.stringify(action.action_event_data.error)}</td>
 				</tr>
 			{/if}
 		</tbody>

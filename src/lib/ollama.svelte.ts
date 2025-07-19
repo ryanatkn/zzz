@@ -107,25 +107,23 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	readonly available: boolean = $derived(this.list_status === 'success');
 
 	readonly actions = $derived(
-		this.app.actions.items.values.filter((action) => action.method.startsWith('ollama_')),
+		this.app.actions.items.values.filter((a) => a.method.startsWith('ollama_')),
 	);
 	readonly pending_actions = $derived(
-		this.actions.filter((action) => action.action_event?.step === 'handling'),
+		this.actions.filter((a) => a.action_event_data?.step === 'handling'),
 	);
 	readonly completed_actions = $derived(
 		this.actions.filter(
-			(action) => action.action_event?.step === 'handled' || action.action_event?.step === 'failed',
+			(a) => a.action_event_data?.step === 'handled' || a.action_event_data?.step === 'failed',
 		),
 	);
 	readonly filtered_actions = $derived(
 		(this.show_read_actions
 			? this.actions.slice()
 			: this.actions.filter(
-					(action) =>
+					(a) =>
 						// TODO maybe helper? is_ollama_read_action
-						action.method !== 'ollama_list' &&
-						action.method !== 'ollama_show' &&
-						action.method !== 'ollama_ps',
+						a.method !== 'ollama_list' && a.method !== 'ollama_show' && a.method !== 'ollama_ps',
 				)
 		).reverse(),
 	);

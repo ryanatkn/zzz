@@ -14,7 +14,7 @@ import type {Action_Event} from '$lib/action_event.js';
 // TODO this isnt in action_types.ts because of circular dependencies, idk what pattern is best yet
 export const Action_Json = Cell_Json.extend({
 	method: Action_Method,
-	action_event: Action_Event_Data.optional(),
+	action_event_data: Action_Event_Data.optional(),
 });
 export type Action_Json = z.infer<typeof Action_Json>;
 export type Action_Json_Input = z.input<typeof Action_Json>;
@@ -28,7 +28,7 @@ export class Action extends Cell<typeof Action_Json> {
 	method: Action_Method = $state()!;
 
 	// TODO maybe use a decoder to make this an `Action_Event`
-	action_event: Action_Event_Data | undefined = $state.raw();
+	action_event_data: Action_Event_Data | undefined = $state.raw();
 
 	readonly spec: Action_Spec_Union = $derived.by(() => {
 		const s = Action_Specs[this.method] as Action_Spec_Union | undefined; // TODO refactor
@@ -38,11 +38,11 @@ export class Action extends Cell<typeof Action_Json> {
 
 	readonly kind: Action_Kind = $derived(this.spec.kind);
 
-	readonly has_error = $derived(!!this.action_event?.error);
+	readonly has_error = $derived(!!this.action_event_data?.error);
 
-	readonly pending = $derived(this.action_event?.step === 'handling');
-	readonly failed = $derived(this.action_event?.step === 'failed');
-	readonly success = $derived(this.action_event?.step === 'handled');
+	readonly pending = $derived(this.action_event_data?.step === 'handling');
+	readonly failed = $derived(this.action_event_data?.step === 'failed');
+	readonly success = $derived(this.action_event_data?.step === 'handled');
 
 	constructor(options: Action_Options) {
 		super(Action_Json, options);
@@ -54,7 +54,7 @@ export class Action extends Cell<typeof Action_Json> {
 	listen_to_action_event(action_event: Action_Event): void {
 		this.unlisten_to_action_event?.();
 		this.unlisten_to_action_event = action_event.observe((new_data) => {
-			this.action_event = new_data;
+			this.action_event_data = new_data;
 		});
 	}
 

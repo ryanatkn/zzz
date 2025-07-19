@@ -214,7 +214,7 @@ export class Action_Event<
 		return is_action_complete(this.#data);
 	}
 
-	// TODO does it make sense for notifications to be sent after the action is complete? they wouldn't be "progress" I suppose
+	// TODO BLOCK this is not used
 	/**
 	 * Update progress for long-running operations.
 	 */

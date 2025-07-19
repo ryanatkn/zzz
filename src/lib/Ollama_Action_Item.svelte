@@ -58,7 +58,7 @@
 
 	// Extract model name from action input if available
 	const get_model_name = (action: Action): string | undefined => {
-		const input = action.action_event?.input;
+		const input = action.action_event_data?.input;
 		if (input && typeof input === 'object' && 'model' in input) {
 			return (input as any).model;
 		}
@@ -67,7 +67,7 @@
 
 	// Get error message from action event
 	const get_error_message = (action: Action): string | undefined => {
-		const error = action.action_event?.error;
+		const error = action.action_event_data?.error;
 		if (error && typeof error === 'object' && 'message' in error) {
 			return (error as any).message;
 		}
@@ -76,7 +76,7 @@
 
 	// TODO refactor
 	const progress_percent = $derived.by(() => {
-		const progress = action.action_event?.progress;
+		const progress = action.action_event_data?.progress;
 		if (
 			progress &&
 			typeof progress === 'object' &&
@@ -100,7 +100,7 @@
 <li transition:slide class="py_xs3">
 	<div
 		class="border_radius_xs {action.pending ? 'bg_2' : 'bg_1'} {get_operation_color(
-			action.action_event?.step || 'initial',
+			action.action_event_data?.step || 'initial',
 		)}"
 	>
 		<div class="display_flex justify_content_space_between align_items_center p_sm">

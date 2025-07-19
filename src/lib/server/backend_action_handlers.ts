@@ -303,8 +303,7 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 				const response = await ollama.pull({...params, stream: true});
 
 				for await (const progress of response) {
-					// Send progress updates to frontend
-					console.log(`[backend_action_handlers.ollama_pull.receive_request] progress`, progress);
+					// console.log(`[backend_action_handlers.ollama_pull.receive_request] progress`, progress);
 
 					await backend.api.ollama_progress({
 						status: progress.status,
@@ -389,8 +388,7 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 				const response = await ollama.create({...params, stream: true});
 
 				for await (const progress of response) {
-					// Send progress updates to frontend
-					console.log(`[backend_action_handlers.ollama_create.receive_request] progress`, progress);
+					// console.log(`[backend_action_handlers.ollama_create.receive_request] progress`, progress);
 
 					await backend.api.ollama_progress({
 						status: progress.status,

@@ -22,10 +22,7 @@
 
 	const {models_not_downloaded} = $derived(app.ollama);
 
-	// Filter actions to show only pull operations
-	const pull_actions = $derived(
-		ollama.actions.filter((action) => action.method === 'ollama_pull').reverse(),
-	);
+	const pull_actions = $derived(ollama.actions.filter((a) => a.method === 'ollama_pull').reverse());
 
 	const handle_pull = async () => {
 		onclose?.();

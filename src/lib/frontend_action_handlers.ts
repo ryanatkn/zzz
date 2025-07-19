@@ -204,38 +204,44 @@ export const frontend_action_handlers: Frontend_Action_Handlers = {
 		receive: ({app, data: {input}}) => {
 			// console.log('[frontend_action_handlers] received ollama_progress notification:', input);
 
-			const meta = input._meta;
-			if (!meta) {
+			const {_meta, ...progress} = input;
+			if (!_meta) {
 				console.error('[frontend_action_handlers] ollama_progress missing _meta');
 				return;
 			}
 
-			// TODO refactor probably
-			// If we have a progress token, update the corresponding action
-			const progress_token = meta.progressToken;
-			if (progress_token) {
-				// Find the action with this progress token
-				const matching_actions = app.actions.items.values.filter(
-					(action) => (action.action_event?.input as any)?._meta?.progressToken === progress_token,
-				);
+			// TODO BLOCK updating the action_event seems wrong,
+			// shouldn't it call `update_progress` on the action_event?
+			// how to get the action_event from the progress token?
+			// ideally doesnt deal with the action at all
 
-				if (matching_actions.length > 0) {
-					const action = matching_actions[0];
-					// The action is already listening to its action_event via listen_to_action_event
-					// We need to update the action_event's progress
-					if (action.action_event) {
-						// Create a new action_event data with progress
-						action.action_event = {
-							...action.action_event,
-							progress: {
-								status: input.status,
-								digest: input.digest,
-								total: input.total,
-								completed: input.completed,
-							},
-						};
-					}
-				}
+			// If we have a progress token, update the corresponding action
+			const progress_token = _meta.progressToken;
+			if (!progress_token) {
+				console.error('[frontend_action_handlers] ollama_progress missing progress_token');
+				return;
+			}
+
+			// Find the action with this progress token
+			const action = app.actions.items.values.find(
+				(a) => (a.action_event_data?.input as any)?._meta?.progressToken === progress_token,
+			);
+			if (!action) {
+				console.error(
+					'[frontend_action_handlers] ollama_progress cannot find action for progress_token:',
+					progress_token,
+				);
+				return;
+			}
+
+			// The action is already listening to its action_event via listen_to_action_event
+			// We need to update the action_event's progress
+			if (action.action_event_data) {
+				// Create a new action_event data with progress
+				action.action_event_data = {
+					...action.action_event_data,
+					progress,
+				};
 			}
 		},
 	},

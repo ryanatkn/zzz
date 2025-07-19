@@ -82,7 +82,7 @@ const create_sync_local_call_method = (
 		const event = create_action_event(environment, spec, input);
 		const action = environment.actions?.add_from_json({
 			method: spec.method,
-			action_event: event.toJSON(),
+			action_event_data: event.toJSON(),
 		});
 		action?.listen_to_action_event(event);
 
@@ -104,7 +104,7 @@ const create_async_local_call_method = (
 		const event = create_action_event(environment, spec, input);
 		const action = environment.actions?.add_from_json({
 			method: spec.method,
-			action_event: event.toJSON(),
+			action_event_data: event.toJSON(),
 		});
 		action?.listen_to_action_event(event);
 
@@ -126,7 +126,7 @@ const create_request_response_method = (
 		const event = create_action_event(environment, spec, input);
 		const action = environment.actions?.add_from_json({
 			method: spec.method,
-			action_event: event.toJSON(),
+			action_event_data: event.toJSON(),
 		});
 		action?.listen_to_action_event(event);
 
@@ -185,7 +185,7 @@ const create_remote_notification_method = (
 		const event = create_action_event(environment, spec, input);
 		const action = environment.actions?.add_from_json({
 			method: spec.method,
-			action_event: event.toJSON(),
+			action_event_data: event.toJSON(),
 		});
 		action?.listen_to_action_event(event);
 
