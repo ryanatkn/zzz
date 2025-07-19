@@ -51,11 +51,19 @@ export class Action extends Cell<typeof Action_Json> {
 
 	// TODO @api temporary hacking this, rethink the reactivity/action_event usage with this class
 	unlisten_to_action_event: (() => void) | undefined;
-	listen_to_action_event(action_event: Action_Event): void {
+	action_event: Action_Event | undefined;
+	listen_to_action_event(action_event: Action_Event): () => void {
 		this.unlisten_to_action_event?.();
-		this.unlisten_to_action_event = action_event.observe((new_data) => {
+		this.action_event = action_event;
+		const unobserve = action_event.observe((new_data) => {
 			this.action_event_data = new_data;
 		});
+		this.unlisten_to_action_event = () => {
+			unobserve();
+			this.unlisten_to_action_event = undefined;
+			this.action_event = undefined;
+		};
+		return this.unlisten_to_action_event;
 	}
 
 	// TODO automatic cleanup with a cell API

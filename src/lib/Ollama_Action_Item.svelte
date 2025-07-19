@@ -94,18 +94,22 @@
 
 	// TODO BLOCK failed pull shows as successful
 
-	// TODO BLOCK this is showing progress as finished immediately, showing no pending animation during the progress bar
+	// TODO hacky, probably need to refine the data flow for action events
+	const pending = $derived(
+		action.action_event_data?.phase !== 'receive_response' ||
+			(progress_percent !== 100 && !(action.action_event_data.step === 'handled')),
+	);
 </script>
 
 <li transition:slide class="py_xs3">
 	<div
-		class="border_radius_xs {action.pending ? 'bg_2' : 'bg_1'} {get_operation_color(
+		class="border_radius_xs {pending ? 'bg_2' : 'bg_1'} {get_operation_color(
 			action.action_event_data?.step || 'initial',
 		)}"
 	>
 		<div class="display_flex justify_content_space_between align_items_center p_sm">
 			<div class="display_flex gap_sm align_items_center">
-				{#if action.pending}
+				{#if pending}
 					<Pending_Animation />
 				{:else}
 					<Glyph glyph={action.success ? GLYPH_CHECKMARK : GLYPH_XMARK} />

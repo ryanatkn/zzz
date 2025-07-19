@@ -210,12 +210,11 @@ export const frontend_action_handlers: Frontend_Action_Handlers = {
 				return;
 			}
 
-			// TODO BLOCK updating the action_event_data seems wrong,
-			// shouldn't it call `update_progress` on the action_event?
-			// how to get the action_event from the progress token?
-			// ideally doesnt deal with the action at all
+			// TODO this is hacky, rethink in combination with some other things including the backend,
+			// also notice we have a different progress pattern for other actions because the data received is different,
+			// but there's probably a cleaner/simpler design
 
-			// If we have a progress token, update the corresponding action
+			// If we have a progress token, find the corresponding action
 			const progress_token = _meta.progressToken;
 			if (!progress_token) {
 				console.error('[frontend_action_handlers] ollama_progress missing progress_token');
@@ -233,13 +232,15 @@ export const frontend_action_handlers: Frontend_Action_Handlers = {
 				);
 				return;
 			}
-
-			if (action.action_event_data) {
-				action.action_event_data = {
-					...action.action_event_data,
-					progress,
-				};
+			if (!action.action_event) {
+				console.error(
+					'[frontend_action_handlers] action does not have action_event reference',
+					action,
+				);
+				return;
 			}
+
+			action.action_event.update_progress(progress);
 		},
 	},
 };

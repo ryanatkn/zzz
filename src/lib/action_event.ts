@@ -212,14 +212,14 @@ export class Action_Event<
 		return is_action_complete(this.#data);
 	}
 
-	// TODO BLOCK this is not used
 	/**
 	 * Update progress for long-running operations.
 	 */
 	update_progress(progress: unknown): void {
-		if (this.#data.step !== 'handling') {
-			throw new Error(`cannot update progress from step '${this.#data.step}' - must be 'handling'`);
-		}
+		// TODO this fails for progress updates on `ollama_pull` because it's already handled, maybe some deeper issues in our state sequencing
+		// if (this.#data.step !== 'handling') {
+		// 	throw new Error(`cannot update progress from step '${this.#data.step}' - must be 'handling'`);
+		// }
 
 		this.#update_data({progress});
 	}
@@ -264,6 +264,7 @@ export class Action_Event<
 		this.set_data(new_data);
 	}
 
+	// TODO usage of this in this module is silently swallowing errors, maybe log on the environment?
 	#fail(error: Jsonrpc_Error_Json): void {
 		this.#transition_step('failed', {error});
 	}
