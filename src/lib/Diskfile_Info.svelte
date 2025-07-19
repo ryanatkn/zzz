@@ -25,9 +25,11 @@
 		<Glyph glyph={GLYPH_FILE} />{app.diskfiles.to_relative_path(diskfile.path)}
 	</small>
 
-	<small class="font_family_mono">
+	<small>
 		<div>created {diskfile.created_formatted_datetime}</div>
-		<div>updated {diskfile.updated_formatted_date}</div>
+		{#if diskfile.updated_formatted_datetime !== diskfile.created_formatted_datetime}
+			<div transition:slide>updated {diskfile.updated_formatted_datetime}</div>
+		{/if}
 	</small>
 
 	<Diskfile_Metrics {editor_state} />

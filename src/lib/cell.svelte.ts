@@ -125,7 +125,7 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 
 	readonly updated_date: Date = $derived(new Date(this.updated));
 	readonly updated_formatted_short_date: string = $derived(format_short_date(this.updated_date));
-	readonly updated_formatted_date: string = $derived(format_datetime(this.updated_date));
+	readonly updated_formatted_datetime: string = $derived(format_datetime(this.updated_date));
 	readonly updated_formatted_time: string = $derived(format_time(this.updated_date));
 
 	/** Stored only between construction and initialization */

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import {untrack} from 'svelte';
+	import {slide} from 'svelte/transition';
 
 	import {frontend_context} from '$lib/frontend.svelte.js';
 	import Diskfile_Info from '$lib/Diskfile_Info.svelte';
@@ -88,7 +89,7 @@
 			</div>
 
 			{#if editor_state.has_history}
-				<div class="slide_container">
+				<div transition:slide>
 					<Diskfile_History_View
 						{editor_state}
 						onselectentry={(entry_id) => {
@@ -107,20 +108,3 @@
 		</div>
 	</div>
 </Diskfile_Contextmenu>
-
-<style>
-	.slide_container {
-		animation: slide-down 0.2s ease-out;
-	}
-
-	@keyframes slide-down {
-		0% {
-			opacity: 0;
-			transform: translateY(-10px);
-		}
-		100% {
-			opacity: 1;
-			transform: translateY(0);
-		}
-	}
-</style>

@@ -32,11 +32,11 @@
 					{action.created_formatted_time}
 				</td>
 			</tr>
-			{#if action.updated_formatted_date}
+			{#if action.updated_formatted_datetime !== action.created_formatted_datetime}
 				<tr>
 					<td>updated</td>
 					<td>
-						{action.updated_formatted_date}
+						{action.updated_formatted_datetime}
 						{action.updated_formatted_time}
 					</td>
 				</tr>
