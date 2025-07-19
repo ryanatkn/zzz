@@ -210,7 +210,7 @@ export const frontend_action_handlers: Frontend_Action_Handlers = {
 				return;
 			}
 
-			// TODO BLOCK updating the action_event seems wrong,
+			// TODO BLOCK updating the action_event_data seems wrong,
 			// shouldn't it call `update_progress` on the action_event?
 			// how to get the action_event from the progress token?
 			// ideally doesnt deal with the action at all

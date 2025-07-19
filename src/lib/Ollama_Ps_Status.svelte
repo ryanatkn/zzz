@@ -5,7 +5,7 @@
 
 	import Glyph from '$lib/Glyph.svelte';
 	import Model_Link from '$lib/Model_Link.svelte';
-	import {GLYPH_INFO, GLYPH_PAUSE, GLYPH_PLAY, GLYPH_REMOVE} from '$lib/glyphs.js';
+	import {GLYPH_DISCONNECT, GLYPH_INFO, GLYPH_PAUSE, GLYPH_PLAY} from '$lib/glyphs.js';
 	import type {Ollama} from '$lib/ollama.svelte.js';
 	import {format_bytes} from '$lib/format_helpers.js';
 
@@ -58,7 +58,7 @@
 						>
 							<div class="display_flex gap_sm align_items_center">
 								<Glyph glyph={GLYPH_INFO} />
-								<span>Model {item.name} not found</span>
+								<span>model {item.name} not found</span>
 							</div>
 						</div>
 					{:else}
@@ -103,7 +103,7 @@
 									title="unload model from memory"
 									onclick={() => ollama.unload(item.name)}
 								>
-									<Glyph glyph={GLYPH_REMOVE} />
+									<Glyph glyph={GLYPH_DISCONNECT} />
 								</button>
 							</div>
 						</div>

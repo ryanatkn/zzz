@@ -97,10 +97,8 @@ export class Action_Event<
 		return structuredClone(this.#data);
 	}
 
-	/**
-	 * Add listener for state changes.
-	 */
-	// TODO Consider middleware pattern for more complex scenarios
+	// TODO rethink the reactivity of this class, maybe just use `$state` or `$state.raw`?
+	// does that have any negative implications when used on the backend?
 	observe(listener: Action_Event_Change_Observer<T_Method>): () => void {
 		this.#listeners.add(listener);
 		return () => this.#listeners.delete(listener);

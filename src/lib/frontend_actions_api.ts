@@ -135,35 +135,35 @@ const create_request_response_method = (
 
 		// Check if handled successfully and has request
 		if (!is_send_request(event.data)) throw Error(); // TODO @many maybe make this an assertion helper?
-		if (event.data.step === 'handled') {
-			// Send the request and wait for response
-			const response = await environment.peer.send(event.data.request);
 
-			event.transition('receive_response');
-
-			// TODO @api shouldn't this happen in the peer like the other method calls?
-			// Set the response data
-			event.set_response(response);
-
-			// Parse and handle the response
-			await event.parse().handle_async();
-
-			// Extract the result
-			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-			if (event.data.step === 'handled') {
-				return event.data.output;
-			}
-
-			// Handle error responses
-			if (is_jsonrpc_error_message(response)) {
-				throw new Error(response.error.message);
-			}
-
-			throw new Error('no output received');
-		} else {
-			// Failed to handle send_request
+		if (event.data.step !== 'handled') {
 			return extract_result_or_throw(event);
 		}
+
+		// Send the request and wait for response
+		const response = await environment.peer.send(event.data.request);
+
+		event.transition('receive_response');
+
+		// TODO @api shouldn't this happen in the peer like the other method calls?
+		// Set the response data
+		event.set_response(response);
+
+		// Parse and handle the response
+		await event.parse().handle_async();
+
+		// Extract the result
+		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+		if (event.data.step === 'handled') {
+			return event.data.output;
+		}
+
+		// Handle error responses
+		if (is_jsonrpc_error_message(response)) {
+			throw new Error(response.error.message);
+		}
+
+		throw new Error('no output received');
 	};
 };
 

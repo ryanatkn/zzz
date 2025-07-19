@@ -12,7 +12,7 @@
 		GLYPH_ARROW_LEFT,
 		GLYPH_ADD,
 		GLYPH_DOWNLOAD,
-		GLYPH_REMOVE,
+		GLYPH_DISCONNECT,
 	} from '$lib/glyphs.js';
 	import type {Model} from '$lib/model.svelte.js';
 	import Confirm_Button from '$lib/Confirm_Button.svelte';
@@ -92,7 +92,7 @@
 				onclick={() => model.app.ollama.unload(model.name)}
 				disabled={!model.loaded}
 			>
-				<Glyph glyph={GLYPH_REMOVE} />&nbsp; unload
+				<Glyph glyph={GLYPH_DISCONNECT} />&nbsp; unload
 			</button>
 
 			{#if ondelete}
