@@ -14,7 +14,6 @@
 	import Glyph from '$lib/Glyph.svelte';
 	import Model_Contextmenu from '$lib/Model_Contextmenu.svelte';
 	import Ollama_Model_Details from '$lib/Ollama_Model_Details.svelte';
-	import {format_gigabytes} from '$lib/format_helpers.js';
 
 	const {
 		model,
@@ -93,8 +92,11 @@
 			{#snippet header()}{/snippet}
 		</Ollama_Model_Details>
 	{:else}
-		<aside class="mt_xl3">
-			⚠️ This information is incomplete and may be incorrect or outdated.
+		<aside class="mt_xl3 width_md">
+			⚠️ This should show model info, but it the APIs for Claude and ChatGPT do not return details
+			like context window size, output token limit, and other details. Gemini however does. It looks
+			like we'll have to maintain hardcoded metadata for models, probably extending what we can
+			retrieve from the API, maybe getting that data at build time.
 		</aside>
 		<section class="display_flex gap_xs">
 			<button
@@ -105,7 +107,8 @@
 				<Glyph glyph={GLYPH_ADD} />&nbsp; create a new chat
 			</button>
 		</section>
-		<section>
+		<!-- TODo do something like this when the warning above is addressed -->
+		<!-- <section>
 			<div>
 				{#if model.context_window}
 					<div>
@@ -183,7 +186,7 @@
 					{/if}
 				</section>
 			{/if}
-		</section>
+		</section> -->
 	{/if}
 </Model_Contextmenu>
 
