@@ -23,7 +23,6 @@ import {is_send_request, is_notification_send} from '$lib/action_event_helpers.j
 export const create_frontend_actions_api = <T extends Action_Event_Environment>(
 	environment: T,
 ): Actions_Api => {
-	// Create a proxy that dynamically creates methods based on the action specs
 	return new Proxy({} as Actions_Api, {
 		get(_target, method: string) {
 			const spec = environment.lookup_action_spec(method as Action_Method);
@@ -43,7 +42,6 @@ export const create_frontend_actions_api = <T extends Action_Event_Environment>(
  * Creates a method that executes an action through its complete lifecycle.
  */
 const create_action_method = (environment: Action_Event_Environment, spec: Action_Spec_Union) => {
-	// Return different implementations based on action kind
 	switch (spec.kind) {
 		case 'local_call':
 			return spec.async
@@ -86,7 +84,6 @@ const create_sync_local_call_method = (
 		});
 		action?.listen_to_action_event(event);
 
-		// Execute synchronously
 		event.parse().handle_sync();
 
 		return extract_result_or_throw(event);
@@ -108,7 +105,6 @@ const create_async_local_call_method = (
 		});
 		action?.listen_to_action_event(event);
 
-		// Execute asynchronously
 		await event.parse().handle_async();
 
 		return extract_result_or_throw(event);
@@ -130,35 +126,28 @@ const create_request_response_method = (
 		});
 		action?.listen_to_action_event(event);
 
-		// Parse and handle send_request phase
 		await event.parse().handle_async();
 
-		// Check if handled successfully and has request
 		if (!is_send_request(event.data)) throw Error(); // TODO @many maybe make this an assertion helper?
 
 		if (event.data.step !== 'handled') {
 			return extract_result_or_throw(event);
 		}
 
-		// Send the request and wait for response
 		const response = await environment.peer.send(event.data.request);
 
 		event.transition('receive_response');
 
 		// TODO @api shouldn't this happen in the peer like the other method calls?
-		// Set the response data
 		event.set_response(response);
 
-		// Parse and handle the response
 		await event.parse().handle_async();
 
-		// Extract the result
 		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 		if (event.data.step === 'handled') {
 			return event.data.output;
 		}
 
-		// Handle error responses
 		if (is_jsonrpc_error_message(response)) {
 			throw new Error(response.error.message);
 		}
@@ -182,12 +171,10 @@ const create_remote_notification_method = (
 		});
 		action?.listen_to_action_event(event);
 
-		// Parse and handle
 		await event.parse().handle_async();
 
 		if (!is_notification_send(event.data)) throw Error(); // TODO @many maybe make this an assertion helper?
 
-		// Send notification if successful
 		if (event.data.step === 'handled') {
 			await environment.peer.send(event.data.notification);
 			// TODO @api rethink this with the action event lifecycle, should there be more after this?
