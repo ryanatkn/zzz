@@ -49,16 +49,16 @@
 				href="https://wikipedia.org/wiki/Enshittification">enshittification</External_Link
 			> is a widely-understood phenomenon among the very-online, Zzz asks:
 		</p>
-		<blockquote>"How can we build the best software to support user agency with AI?"</blockquote>
+		<blockquote>"What software could we build to best support user agency?"</blockquote>
 		<p>or with less true-believer energy and more detail:</p>
 		<blockquote>
-			"What becomes possible when web users move from exploitative service-controlled spaces to
+			"What becomes possible when users move from exploitative service-controlled spaces to
 			user-controlled environments that are open, extensible, and well-designed, with unrestricted
 			access to local and remote capabilities?"
 		</blockquote>
 		<p>
-			The free and open source software I imagine answering these questions is influenced by my
-			situation and opinions:
+			I'm a developer, and the free and open source software I imagine answering these questions is
+			influenced by my situation and opinions:
 		</p>
 		<ul>
 			<li>
@@ -70,35 +70,32 @@
 				have things work consistently across operating systems and devices with graceful fallbacks,
 				with minimal dependence on any one company, and without duplicating effort per-platform.
 				There's a balance here to take advantage of platform specifics without intruding on the
-				benefits of a shared codebase and coherent UX design.
+				benefits of a shared codebase and coherent UX design. Some of this is shaped by my resource
+				constraints, but there's also an ethos of independence here.
 			</li>
 			<li>
 				I want to maintain a single source of truth in code, not duplicating logic and data in
 				multiple languages and contexts, so there's one primary language that runs on the frontend
-				and backend (and also dev tooling), and modules run everywhere by default. This avoids many
-				bugs, frictions, and inconsistencies, and enables fullstack integrations like rich schemas,
-				which can improve security, data integrity, and error messages. I think this is an
-				interesting topic that looks fruitful for further leveraging, e.g. with generative methods
-				and automations.
+				and backend (and also dev tooling), and modules run everywhere by default. It's both simpler
+				and more powerful to have one runtime like this in many respects, avoiding many bugs,
+				frictions, and inconsistencies, and enabling various dev patterns and fullstack integrations
+				(e.g. schemas in any language are more powerful than the language-interoperable JSON
+				Schema).
 			</li>
 		</ul>
 		<p>
-			All of this leads me to the web. History has decided I use HTML, CSS, and JS (thankfully
-			TypeScript) given the above constraints. For all its flaws and quirks (so many quirks), the
-			web is the turf of our digital commons, and I think it can deliver excellent UX when used with
-			care (and devices cooperate).
+			This all leads me to the web, and therefore HTML, CSS, and JS (thankfully TypeScript). For all
+			its flaws and quirks (so many quirks), the web is the turf of our digital commons, and I think
+			it can deliver a good enough UX when used with care (and devices cooperate). But to some
+			degree, choosing the web is a pragmatic move: websites are lacking some respects to native
+			software. But the web's adoption is second to none and it minimally gatekeeps users and
+			developers, so Zzz chooses distribution and accessibility over perfection.
 		</p>
 		<p>
-			Naturally we want to enjoy the best possible UX, but to some degree, choosing the web is a
-			pragmatic move: websites pale in some respects to native software. But adoption is second to
-			none -- the web is globally available at low cost with minimal gatekeeping to users and
-			developers -- so Zzz chooses distribution and accessibility over performance and perfection.
-		</p>
-		<p>
-			Given its web roots, Zzz uses JS to glue software and machines together precisely the way the
-			user wants, maximizing its utility in context across the full stack. It runs locally on your
-			devices using any of your available capabilities, and deploys wherever JS runs to play
-			whatever roles are needed.
+			Given its web roots, Zzz uses JS to glue software and machines together how the user wants,
+			maximizing its utility in context across the full stack. It runs locally on your devices using
+			any of your available capabilities, and deploys wherever JS runs to play whatever roles are
+			needed.
 		</p>
 		<p>
 			It's based on many kinds of software, borrowing features to provide both end-users and devs an
