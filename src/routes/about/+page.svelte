@@ -57,27 +57,29 @@
 			access to local and remote capabilities?"
 		</blockquote>
 		<p>
-			The free and open source software I imagine answering these questions is influenced a lot by
-			my situation and opinions:
+			The free and open source software I imagine answering these questions is influenced by my
+			situation and opinions:
 		</p>
 		<ul>
 			<li>
-				I think UX should have primacy, and so UI should be prioritized in terms of quality,
-				capability, performance, and accessibility.
+				I think UX should have primacy, and so UI quality is a top priority, informing other
+				technology decisions.
 			</li>
 			<li>
-				I want to make cross-platform software so it runs everywhere. I want to ship features once,
-				and have things work consistently across operating systems and devices with graceful
-				fallbacks, with minimal dependence on any one company, and without duplicating effort
-				per-platform. There's a balance here to take advantage of platform specifics without
-				intruding on the benefits of a shared codebase and singular UX design.
+				I want to make cross-platform software so it runs everywhere, shipping features once and
+				have things work consistently across operating systems and devices with graceful fallbacks,
+				with minimal dependence on any one company, and without duplicating effort per-platform.
+				There's a balance here to take advantage of platform specifics without intruding on the
+				benefits of a shared codebase and coherent UX design.
 			</li>
 			<li>
-				I want to maintain a single source of truth in code, without duplicating logic and data in
-				multiple languages, so there's one primary language that runs on the frontend and backend
-				(and also dev tooling), and modules run everywhere by default. This avoids many bugs,
-				frictions, and inconsistencies, and enables fullstack integrations like rich schemas, which
-				can improve security, data integrity, and error messages.
+				I want to maintain a single source of truth in code, not duplicating logic and data in
+				multiple languages and contexts, so there's one primary language that runs on the frontend
+				and backend (and also dev tooling), and modules run everywhere by default. This avoids many
+				bugs, frictions, and inconsistencies, and enables fullstack integrations like rich schemas,
+				which can improve security, data integrity, and error messages. I think this is an
+				interesting topic that looks fruitful for further leveraging, e.g. with generative methods
+				and automations.
 			</li>
 		</ul>
 		<p>
