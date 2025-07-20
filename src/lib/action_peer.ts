@@ -22,6 +22,9 @@ import {
 } from '$lib/jsonrpc_helpers.js';
 import {create_action_event} from '$lib/action_event.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
+import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
+
+// TODO BLOCK should this be `Network_Peer` intead of `Action_Peer`? Something else completely?
 
 // TODO @api @many refactor frontend_actions_api.ts with action_peer.ts
 
@@ -64,45 +67,50 @@ export class Action_Peer {
 		message: Jsonrpc_Message_From_Client_To_Server,
 		options?: Action_Peer_Send_Options,
 	): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
-		const transport = this.transports.get_or_throw(
-			options?.transport_name ?? this.default_send_options.transport_name,
-		);
-		// TODO BLOCK clean up error handling, notice `receive` catches but we intentionally throw here, what should the peer be doing?
-		// I think we should use return values here since
-		// it's a high level abstraction in terms of the module architecture,
-		// and is not called deep in user code,
-		// and if this is the case then the transports should prefer returning errors over throwing
-		return transport.send(message);
+		try {
+			const transport = this.transports.get_or_throw(
+				options?.transport_name ?? this.default_send_options.transport_name,
+			);
+			// TODO BLOCK clean up error handling, notice `receive` catches but we intentionally throw here, what should the peer be doing?
+			// I think we should use return values here since
+			// it's a high level abstraction in terms of the module architecture,
+			// and is not called deep in user code,
+			// and if this is the case then the transports should prefer returning errors over throwing
+			const result = await transport.send(message);
+			return result;
+		} catch (error) {
+			this.environment.log?.error('[action_peer.send] unexpected error:', error);
+			return this.#create_fatal_error_response(message);
+		} // TODO finally?
 	}
 
 	async receive(message: unknown): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
 		try {
-			// Validate the message is a valid JSON-RPC message
+			// TODO better validation? move to `#process_message`?
 			if (!message || typeof message !== 'object') {
 				return this.#create_parse_error_response();
 			}
 
-			// Handle a single message - MCP does not support JSON-RPC batches
-			// because of some tricky cases, so we don't either
-			return await this.#process_message(message);
+			const result = await this.#process_message(message);
+			return result;
 		} catch (error) {
-			// Only programmer errors should reach here
-			this.environment.log?.error('unexpected error:', error);
+			this.environment.log?.error('[action_peer.receive] unexpected error:', error);
+			// TODO BLOCK refactor with the above, get error handling right
 			return this.#create_fatal_error_response(message);
-		}
+		} // TODO finally?
 	}
 
 	/**
 	 * Process a single JSON-RPC message.
 	 */
 	async #process_message(message: unknown): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
-		// Validate it's a request or notification
 		if (is_jsonrpc_request(message)) {
 			return this.#process_request(message);
 		} else if (is_jsonrpc_notification(message)) {
 			await this.#process_notification(message);
-			return null; // Notifications don't have responses
+			return null;
 		} else {
+			// TODO BLOCK error messages info is being lost here
 			const id = to_jsonrpc_message_id(message);
 			return id === null
 				? null
@@ -203,7 +211,7 @@ export class Action_Peer {
 	#create_fatal_error_response(raw_message: unknown): Jsonrpc_Message_From_Server_To_Client | null {
 		return create_jsonrpc_error_message(to_jsonrpc_message_id(raw_message), {
 			code: JSONRPC_INTERNAL_ERROR,
-			message: 'internal server error',
+			message: UNKNOWN_ERROR_MESSAGE,
 		});
 	}
 }
