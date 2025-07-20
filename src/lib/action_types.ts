@@ -10,7 +10,7 @@ export const Action_Executor = z.enum(['frontend', 'backend']);
 export type Action_Executor = z.infer<typeof Action_Executor>;
 
 // TODO extend `Action_Executor` or is this more efficient/easier to work with?
-// TODO is `Action_Responder` needed?
+// TODO is `Action_Responder` needed? `Action_Participant`?
 export const Action_Initiator = z.enum(['frontend', 'backend', 'both']);
 export type Action_Initiator = z.infer<typeof Action_Initiator>;
 
