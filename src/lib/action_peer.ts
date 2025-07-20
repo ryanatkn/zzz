@@ -70,7 +70,8 @@ export class Action_Peer {
 		// TODO BLOCK clean up error handling, notice `receive` catches but we intentionally throw here, what should the peer be doing?
 		// I think we should use return values here since
 		// it's a high level abstraction in terms of the module architecture,
-		// and is not called deep in user code
+		// and is not called deep in user code,
+		// and if this is the case then the transports should prefer returning errors over throwing
 		return transport.send(message);
 	}
 
