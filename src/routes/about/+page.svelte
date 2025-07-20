@@ -41,8 +41,8 @@
 			Zzz, pronounced "zees" like bees, is a fullstack web toolkit with a focus on user power and
 			experimentation. The idea is to make an integrated cross-platform environment that adapts to
 			your needs and intent while remaining fully open, aligned, and in your control. It's both a
-			customizable web user interface and flexible tool for crafting UX-maximizing websites with a
-			streamlined developer experience.
+			customizable web UI for power users, and a flexible tool for crafting UX-maximizing websites
+			with a streamlined developer experience.
 		</p>
 		<p>
 			In the technology landscape of 2025, where LLM-based AI is upending long held assumptions, and <External_Link
@@ -63,7 +63,7 @@
 		<ul>
 			<li>
 				I think UX should have primacy, and so UI quality is a top priority, informing other
-				technology decisions.
+				technology decisions. It should be efficient, powerful, and customizable for devs and users.
 			</li>
 			<li>
 				I want to make cross-platform software so it runs everywhere, shipping features once and
@@ -71,7 +71,8 @@
 				with minimal dependence on any one company, and without duplicating effort per-platform.
 				There's a balance here to take advantage of platform specifics without intruding on the
 				benefits of a shared codebase and coherent UX design. Some of this is shaped by my resource
-				constraints, but there's also an ethos of independence here.
+				constraints, but there's also a desire for independence, freedom from undue influence over
+				how I design and use tools.
 			</li>
 			<li>
 				I want to maintain a single source of truth in code, not duplicating logic and data in
@@ -84,12 +85,14 @@
 			</li>
 		</ul>
 		<p>
-			This all leads me to the web, and therefore HTML, CSS, and JS (thankfully TypeScript). For all
-			its flaws and quirks (so many quirks), the web is the turf of our digital commons, and I think
-			it can deliver a good enough UX when used with care (and devices cooperate). But to some
-			degree, choosing the web is a pragmatic move: websites are lacking some respects to native
-			software. But the web's adoption is second to none and it minimally gatekeeps users and
-			developers, so Zzz chooses distribution and accessibility over perfection.
+			This all leads me to the web, and therefore HTML, CSS, and JS (thankfully TypeScript --
+			loading a Python or C# interpreter every page load is too costly from a user POV). For all its
+			flaws and quirks (so many quirks), the web is the turf of our digital commons, and I think it
+			can deliver a good enough UX when used with care by devs and devices cooperate. But to some
+			degree, choosing the web is a pragmatic move: sometimes web technology can be a worse UX than
+			native software. But the web's adoption is second to none, browsers run everywhere, and it
+			minimally gatekeeps users and developers, so Zzz chooses distribution and accessibility over
+			perfection.
 		</p>
 		<p>
 			Given its web roots, Zzz uses JS to glue software and machines together how the user wants,
