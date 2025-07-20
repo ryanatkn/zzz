@@ -10,6 +10,8 @@ import type {
 	Jsonrpc_Response_Or_Error,
 } from '$lib/jsonrpc.js';
 
+// TODO BLOCK should these be jsonrpc errors?
+
 // TODO figure out the symmetry of frontend and backend transports (none/partial/full?) --
 // we may also need orthogonal abstractions to clarify the transport role
 

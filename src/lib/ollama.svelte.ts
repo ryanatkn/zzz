@@ -36,6 +36,8 @@ import {create_map_by_property} from '$lib/iterable_helpers.js';
 
 // TODO @many get and display Ollama version, JS API client doesnt have it but the REST API does
 
+const NO_RESPONSE_ERROR_MESSAGE = 'no response from Ollama server';
+
 export const Ollama_Json = Cell_Json.extend({
 	host: z.string().default(OLLAMA_URL),
 });
@@ -264,7 +266,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 			console.error('[ollama.handle_ollama_list] no response');
 			this.list_response = null;
 			this.list_status = 'failure';
-			this.list_error = 'No response from server';
+			this.list_error = NO_RESPONSE_ERROR_MESSAGE;
 			this.list_round_trip_time = null;
 			return;
 		}
@@ -299,7 +301,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 			console.error('[ollama.handle_ollama_ps] no response');
 			this.ps_response = null;
 			this.ps_status = 'failure';
-			this.ps_error = 'No response from server';
+			this.ps_error = NO_RESPONSE_ERROR_MESSAGE;
 			return;
 		}
 
@@ -338,7 +340,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 		if (!response) {
 			console.error(`[ollama.handle_ollama_show] no response for: ${request.model}`);
 			model.ollama_show_response_loading = false;
-			model.ollama_show_response_error = 'No response from server';
+			model.ollama_show_response_error = NO_RESPONSE_ERROR_MESSAGE;
 			return;
 		}
 

@@ -3,7 +3,7 @@
 	import Svg from '@ryanatkn/fuz/Svg.svelte';
 	import {zzz_logo} from '@ryanatkn/fuz/logos.js';
 
-	import Footer from '$lib/Footer.svelte';
+	import Page_Footer from '$routes/Page_Footer.svelte';
 
 	// TODO remove this after fixing
 	// class:row
@@ -21,13 +21,11 @@
 	<div>
 		<p style:padding-top="132px">Zzz is a fullstack toolkit for adaptive web environments.</p>
 		<p>
-			It's an early work in progress. See <a href="{base}/about">/about</a>.
+			It's an early work in progress with more on the way. See <a href="{base}/about">/about</a>.
 		</p>
 	</div>
 </section>
 
 <Dashboard_Home />
 
-<div class="box py_xl9">
-	<Footer />
-</div>
+<Page_Footer />

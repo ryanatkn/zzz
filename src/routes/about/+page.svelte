@@ -8,7 +8,7 @@
 
 	import {pkg_context} from '$lib/pkg.js';
 	import External_Link from '$lib/External_Link.svelte';
-	import Footer from '$lib/Footer.svelte';
+	import Page_Footer from '$routes/Page_Footer.svelte';
 	import {frontend_context} from '$lib/frontend.svelte.js';
 
 	const pkg = pkg_context.get();
@@ -83,23 +83,16 @@
 			</li>
 		</ul>
 		<p>
-			All of this leads me to the web. I don't see a suitable alternative. History has decided we
-			get to use HTML, CSS, and JS (thankfully TypeScript) given the above constraints. For all its
-			flaws and quirks (so many quirks), the web is the turf of our digital commons. Having worked
-			with it for a while and seeing the results on this website and elsewhere, I think it's capable
-			of delivering a good-to-excellent UX.
+			All of this leads me to the web. History has decided I use HTML, CSS, and JS (thankfully
+			TypeScript) given the above constraints. For all its flaws and quirks (so many quirks), the
+			web is the turf of our digital commons, and I think it can deliver excellent UX when used with
+			care (and devices cooperate).
 		</p>
 		<p>
 			Naturally we want to enjoy the best possible UX, but to some degree, choosing the web is a
 			pragmatic move: websites pale in some respects to native software. But adoption is second to
 			none -- the web is globally available at low cost with minimal gatekeeping to users and
 			developers -- so Zzz chooses distribution and accessibility over performance and perfection.
-		</p>
-		<p>
-			One consequence is that the Zzz frontend on mobile in some cases will be worse than native,
-			but I think it's a fine trade long term. The web also has UX advantages, like supporting
-			extensions and devtools. I think you'll find performance generally good, thanks to the work of
-			many people including the builders of browser and Svelte/SvelteKit.
 		</p>
 		<p>
 			Given its web roots, Zzz uses JS to glue software and machines together precisely the way the
@@ -457,8 +450,5 @@
 			</div>
 		</Details>
 	</section>
-	<hr />
-	<section class="mb_xl7">
-		<Footer />
-	</section>
+	<Page_Footer />
 </div>

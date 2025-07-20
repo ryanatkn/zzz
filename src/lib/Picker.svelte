@@ -40,6 +40,8 @@
 	const pick = (item: T): void => {
 		onpick(item);
 	};
+
+	// TODO add search box? or at usage sites?
 </script>
 
 {#if heading}
