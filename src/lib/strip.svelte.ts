@@ -41,6 +41,7 @@ export class Strip extends Cell<typeof Strip_Json> {
 		}
 	}
 
+	// TODO thinking about refactoring this, does this sort of thing make it more like a viewmodel? still want the cell machinery?
 	// Content always returns a string, normalizing null/undefined to empty string
 	get content(): string {
 		return this.bit?.content ?? '';

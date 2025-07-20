@@ -159,17 +159,26 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 		this.#initial_json = undefined;
 		this.set_json(initial_json); // `set_json` parses with the schema, so this may be `undefined` and it's fine
 
-		// Register the cell with the global registry
+		// Add to global registry
 		this.register();
 	}
 
-	// TODO handle disposing a subtree?
+	// TODO change when Symbol.dispose is supported in Safari
+	// [Symbol.dispose](): void {
+	// 	this.#dispose();
+	// }
 	/**
 	 * Clean up resources when this cell is no longer needed.
-	 * Should be called before the cell is discarded.
 	 */
 	dispose(): void {
+		// Remove from global registry
 		this.unregister();
+
+		// TODO handle disposing a subtree?
+
+		// TODO any other cleanup needed? null out any references?
+		// maybe things can register themselves to be tied to this cell's lifecycle
+		// and we loop over those here?
 	}
 
 	/** Flag to track registration status - prevents double registration */
