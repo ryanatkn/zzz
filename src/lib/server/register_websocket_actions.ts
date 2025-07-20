@@ -44,14 +44,14 @@ export const register_websocket_actions = ({
 		upgradeWebSocket(() => ({
 			onOpen: (event, ws) => {
 				const connection_id = transport.add_connection(ws);
-				console.log('[ws] ws opened', connection_id, event);
+				backend.log?.debug('[ws] ws opened', connection_id, event);
 			},
 			onMessage: async (event, ws) => {
 				let json;
 				try {
 					json = JSON.parse(String(event.data)); // eslint-disable-line @typescript-eslint/no-base-to-string
 				} catch (error) {
-					console.error(`[ws] received non-json message`, error);
+					backend.log?.error(`[ws] received non-json message`, error);
 					return;
 				}
 
@@ -62,13 +62,13 @@ export const register_websocket_actions = ({
 						ws.send(JSON.stringify(response));
 					}
 				} catch (error) {
-					console.error(`[ws] error handling jsonrpc message`, error);
+					backend.log?.error(`[ws] error handling jsonrpc message`, error);
 					return;
 				}
 			},
 			onClose: (event, ws) => {
 				transport.remove_connection(ws);
-				console.log('[ws] ws closed', event);
+				backend.log?.debug('[ws] ws closed', event);
 			},
 		})),
 	);

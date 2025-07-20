@@ -10,6 +10,8 @@ import type {
 	Jsonrpc_Response_Or_Error,
 } from '$lib/jsonrpc.js';
 
+// TODO instead of throwing, maybe switch to all returning errors?
+
 // TODO BLOCK should these be jsonrpc errors?
 
 // TODO figure out the symmetry of frontend and backend transports (none/partial/full?) --

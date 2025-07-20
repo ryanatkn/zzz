@@ -25,8 +25,8 @@ export const register_http_actions = ({path, app, backend}: Register_Actions_Opt
 			const response = await backend.receive(json);
 			return c.json(response);
 		} catch (error) {
-			console.error('[http] error processing JSON-RPC request:', error);
-			return c.json(create_jsonrpc_error_message_from_thrown('', error), 400);
+			backend.log?.error('[http] error processing JSON-RPC request:', error);
+			return c.json(create_jsonrpc_error_message_from_thrown(null, error), 400);
 		}
 	});
 };

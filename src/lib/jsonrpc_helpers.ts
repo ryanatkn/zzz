@@ -72,11 +72,11 @@ export const create_jsonrpc_error_message = (
  * Handles Jsonrpc_Error and regular Error objects.
  */
 export const create_jsonrpc_error_message_from_thrown = (
-	id: Jsonrpc_Request_Id,
+	id: Jsonrpc_Request_Id | null,
 	error: any,
 ): Jsonrpc_Error_Message => {
 	let code: Jsonrpc_Error_Code = JSONRPC_ERROR_CODES.INTERNAL_ERROR;
-	let message = 'Internal server error';
+	let message = 'internal server error';
 	let data = undefined;
 
 	if (error instanceof Thrown_Jsonrpc_Error) {
