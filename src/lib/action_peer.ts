@@ -1,5 +1,6 @@
 // @slop Claude Opus 4
 
+import {create_action_event} from '$lib/action_event.js';
 import {
 	JSONRPC_INTERNAL_ERROR,
 	JSONRPC_INVALID_REQUEST,
@@ -20,11 +21,8 @@ import {
 	is_jsonrpc_request,
 	is_jsonrpc_notification,
 } from '$lib/jsonrpc_helpers.js';
-import {create_action_event} from '$lib/action_event.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
 import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
-
-// TODO BLOCK should this be `Network_Peer` intead of `Action_Peer`? Something else completely?
 
 // TODO @api @many refactor frontend_actions_api.ts with action_peer.ts
 

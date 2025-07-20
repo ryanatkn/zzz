@@ -26,7 +26,7 @@ export interface Register_Websocket_Actions_Options {
 }
 
 /**
- * Registers websocket endpoints and handlers.
+ * Registers websocket endpoints for all service actions in the schema registry.
  */
 export const register_websocket_actions = ({
 	path,

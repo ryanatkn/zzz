@@ -197,6 +197,7 @@ const create_remote_notification_method = (
 		// Send notification if successful
 		if (event.data.step === 'handled') {
 			await environment.peer.send(event.data.notification);
+			// TODO @api rethink this with the action event lifecycle, should there be more after this?
 		}
 	};
 };
