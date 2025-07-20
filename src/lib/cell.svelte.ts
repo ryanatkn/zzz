@@ -163,10 +163,6 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 		this.register();
 	}
 
-	// TODO change when Symbol.dispose is supported in Safari
-	// [Symbol.dispose](): void {
-	// 	this.#dispose();
-	// }
 	/**
 	 * Clean up resources when this cell is no longer needed.
 	 */
@@ -179,6 +175,14 @@ export abstract class Cell<T_Schema extends z.ZodType = z.ZodType> implements Ce
 		// TODO any other cleanup needed? null out any references?
 		// maybe things can register themselves to be tied to this cell's lifecycle
 		// and we loop over those here?
+	}
+
+	/**
+	 * This is not supported in Safari, don't rely on this yet.
+	 * Uncomment temporarily to experiment in dev.
+	 */
+	[Symbol.dispose](): void {
+		this.dispose();
 	}
 
 	/** Flag to track registration status - prevents double registration */
