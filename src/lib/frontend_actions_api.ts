@@ -175,13 +175,6 @@ const create_remote_notification_method = (
 	spec: Remote_Notification_Action_Spec,
 ) => {
 	return async (input?: unknown) => {
-		// Check if environment supports networking
-		if (!('peer' in environment)) {
-			throw new Error(
-				`environment does not support network communication for action '${spec.method}'`,
-			);
-		}
-
 		const event = create_action_event(environment, spec, input);
 		const action = environment.actions?.add_from_json({
 			method: spec.method,
