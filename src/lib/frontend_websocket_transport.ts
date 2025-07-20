@@ -78,9 +78,9 @@ export class Frontend_Websocket_Transport implements Transport {
 				this.#socket.send(message);
 				return null;
 			}
-			// TODO maybe dont throw, return? figure out error handling
 			throw jsonrpc_errors.invalid_request();
 		} catch (error) {
+			// TODO @many clean up transport error handling
 			console.error('[frontend websocket transport] error sending message:', error);
 			if (error instanceof Thrown_Jsonrpc_Error) {
 				throw error;
@@ -88,9 +88,9 @@ export class Frontend_Websocket_Transport implements Transport {
 			throw jsonrpc_errors.internal_error(
 				error instanceof Error
 					? error.message
-					: // TODO maybe dont throw, return? figure out error handling
-						// in this case it's weirder because maybe the request tracker
-						// should not reject with jsonrpc error messages, intead use return values or correct errors?
+					: // TODO weird because maybe the request tracker
+						// should not reject with jsonrpc error messages,
+						// instead use return values or correct errors?
 						is_jsonrpc_error_message(error)
 						? error.error.message
 						: 'unknown error sending websocket message',

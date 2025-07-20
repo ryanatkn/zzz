@@ -67,6 +67,10 @@ export class Action_Peer {
 		const transport = this.transports.get_or_throw(
 			options?.transport_name ?? this.default_send_options.transport_name,
 		);
+		// TODO BLOCK clean up error handling, notice `receive` catches but we intentionally throw here, what should the peer be doing?
+		// I think we should use return values here since
+		// it's a high level abstraction in terms of the module architecture,
+		// and is not called deep in user code
 		return transport.send(message);
 	}
 

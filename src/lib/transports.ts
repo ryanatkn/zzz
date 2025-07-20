@@ -53,7 +53,7 @@ export class Transports {
 
 	set_current_transport(transport_name: Transport_Name): void {
 		const transport = this.#transport_by_name.get(transport_name);
-		if (!transport) throw new Error(`Transport not registered: ${transport_name}`);
+		if (!transport) throw new Error(`transport not registered: ${transport_name}`);
 		this.#current_transport = transport;
 	}
 
@@ -99,10 +99,10 @@ export class Transports {
 			: this.#current_transport;
 
 		if (!transport) {
-			throw new Error('No transport available');
+			throw new Error('no transport available');
 		}
 		if (!transport.is_ready()) {
-			throw new Error('Transport not ready');
+			throw new Error('transport not ready');
 		}
 
 		return transport;
@@ -140,8 +140,8 @@ export class Transports {
 
 		// No ready transport found, throw an error
 		if (!this.#current_transport) {
-			throw new Error('No transport available');
+			throw new Error('no transport available');
 		}
-		throw new Error('Transport not ready');
+		throw new Error('transport not ready');
 	}
 }

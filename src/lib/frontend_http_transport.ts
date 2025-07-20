@@ -50,6 +50,7 @@ export class Frontend_Http_Transport implements Transport {
 			console.log(`[frontend http transport] result`, result);
 			return result;
 		} catch (error) {
+			// TODO @many clean up transport error handling
 			console.error('[frontend http transport] error sending HTTP request:', error);
 			if (error instanceof Thrown_Jsonrpc_Error) {
 				throw error;
