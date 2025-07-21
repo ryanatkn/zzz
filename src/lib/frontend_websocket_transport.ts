@@ -92,10 +92,8 @@ export class Frontend_Websocket_Transport implements Transport {
 				jsonrpc_error_messages.invalid_request(),
 			);
 		} catch (error) {
-			// TODO @many clean up transport error handling
 			console.error('[frontend websocket transport] error sending message:', error);
 
-			// Return error response instead of throwing
 			if (error instanceof Thrown_Jsonrpc_Error) {
 				return create_jsonrpc_error_message(to_jsonrpc_message_id(message), {
 					code: error.code,
@@ -105,9 +103,7 @@ export class Frontend_Websocket_Transport implements Transport {
 			}
 			return create_jsonrpc_error_message(
 				to_jsonrpc_message_id(message),
-				jsonrpc_error_messages.internal_error(
-					error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE,
-				),
+				jsonrpc_error_messages.internal_error(error.message || UNKNOWN_ERROR_MESSAGE),
 			);
 		}
 	}
