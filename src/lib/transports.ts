@@ -81,10 +81,9 @@ export class Transports {
 	 * @throws when no transport available or ready
 	 */
 	get_ready_transport(transport_name?: Transport_Name): Transport | null {
-		if (this.allow_fallback) {
-			return this.#get_first_ready(transport_name);
-		}
-		return this.#get_exact(transport_name);
+		return this.allow_fallback
+			? this.#get_first_ready(transport_name)
+			: this.#get_exact(transport_name);
 	}
 
 	/**
@@ -97,11 +96,11 @@ export class Transports {
 			? this.#transport_by_name.get(transport_name)
 			: this.#current_transport;
 
-		if (!transport?.is_ready()) {
-			return null;
+		if (transport?.is_ready()) {
+			return transport;
 		}
 
-		return transport;
+		return null;
 	}
 
 	/**
@@ -134,10 +133,6 @@ export class Transports {
 			}
 		}
 
-		// No ready transport found, throw an error
-		if (!this.#current_transport) {
-			throw new Error('no transport available');
-		}
-		throw new Error('transport not ready');
+		return null;
 	}
 }
