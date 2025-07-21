@@ -10,6 +10,8 @@ import type {
 	Jsonrpc_Response_Or_Error,
 } from '$lib/jsonrpc.js';
 
+// TODO BLOCK dont throw in here
+
 export class Frontend_Http_Transport implements Transport {
 	readonly transport_name = 'frontend_http_rpc' as const;
 

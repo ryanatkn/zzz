@@ -20,6 +20,8 @@ import type {Transport} from '$lib/transports.js';
 
 // TODO logging - maybe add a getter to Cell that falls back to the app logger?
 
+// TODO BLOCK dont throw in here
+
 export class Frontend_Websocket_Transport implements Transport {
 	readonly transport_name = 'frontend_websocket_rpc' as const;
 
