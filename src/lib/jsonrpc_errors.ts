@@ -45,7 +45,7 @@ export const JSONRPC_ERROR_CODES = {
 	invalid_params: JSONRPC_INVALID_PARAMS,
 	internal_error: JSONRPC_INTERNAL_ERROR,
 
-	// TODO review/use these
+	// TODO BLOCK review/use these, comment out the unused ones
 	// Application-specific errors (-32000 to -32099)
 	/**
 	 * Same as HTTP status code 401 "unauthorized", but correctly named.
@@ -207,7 +207,6 @@ const create_error_thrower = <T_Fn extends (...args: Array<any>) => Jsonrpc_Erro
 	};
 };
 
-// TODO BLOCK use jsonrpc_error_messages in more places
 export const jsonrpc_errors = {
 	parse_error: create_error_thrower(jsonrpc_error_messages.parse_error),
 	invalid_request: create_error_thrower(jsonrpc_error_messages.invalid_request),

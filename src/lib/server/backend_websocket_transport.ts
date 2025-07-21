@@ -57,6 +57,7 @@ export class Backend_Websocket_Transport implements Transport {
 		if ('id' in message) {
 			return create_jsonrpc_error_message(
 				message.id,
+				// TODO maybe use a not yet implemented error message?
 				jsonrpc_error_messages.internal_error(
 					'TODO not yet implemented - backend WebSocket transport cannot send requests expecting responses yet',
 				),
