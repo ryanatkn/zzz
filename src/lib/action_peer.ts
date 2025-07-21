@@ -70,7 +70,7 @@ export class Action_Peer {
 		options?: Action_Peer_Send_Options,
 	): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
 		try {
-			const transport = this.transports.get_or_throw(
+			const transport = this.transports.get_transport_or_throw(
 				options?.transport_name ?? this.default_send_options.transport_name,
 			);
 			// TODO BLOCK clean up error handling, notice `receive` catches but we intentionally throw here, what should the peer be doing?

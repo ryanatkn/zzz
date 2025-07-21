@@ -85,7 +85,7 @@ export class Transports {
 	 * @param transport_name Optional transport to use instead of the current
 	 * @throws when no transport available or ready
 	 */
-	get_or_throw(transport_name?: Transport_Name): Transport {
+	get_transport_or_throw(transport_name?: Transport_Name): Transport {
 		if (this.allow_fallback) {
 			return this.#get_first_ready_or_throw(transport_name);
 		}
