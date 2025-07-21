@@ -75,7 +75,7 @@ export class Transports {
 		return this.#current_transport?.transport_name ?? null;
 	}
 
-	get_transport(transport_name: Transport_Name): Transport | null {
+	get_transport_by_name(transport_name: Transport_Name): Transport | null {
 		return this.#transport_by_name.get(transport_name) ?? null;
 	}
 
