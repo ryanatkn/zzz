@@ -18,7 +18,7 @@
 		</div>
 		<p>Zzz is a fullstack toolkit for adaptive web environments.</p>
 		<p>It's an early work in progress with more on the way.</p>
-		<p>See <a href="{base}/about">/about</a>.</p>
+		<p>More <a href="{base}/about">about Zzz</a>.</p>
 	</div>
 </section>
 
