@@ -58,21 +58,7 @@ export class Action extends Cell<typeof Action_Json> {
 			return step !== 'handled' && step !== 'failed';
 		}
 	});
-	readonly failed = $derived.by(() => {
-		if (!this.action_event_data) {
-			return false; // no data yet means not failed
-		}
-
-		const {step, kind} = this.action_event_data;
-
-		// For request_response actions, failure can happen in any phase
-		if (kind === 'request_response') {
-			return step === 'failed';
-		} else {
-			// For other kinds, step === 'failed' means failed
-			return step === 'failed';
-		}
-	});
+	readonly failed = $derived(this.action_event_data?.step === 'failed');
 	readonly success = $derived.by(() => {
 		if (!this.action_event_data) {
 			return false; // no data yet means not successful
