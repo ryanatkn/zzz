@@ -1,6 +1,7 @@
 // @slop Claude Opus 4
 
-import {Thrown_Jsonrpc_Error, jsonrpc_errors} from '$lib/jsonrpc_errors.js';
+import {Thrown_Jsonrpc_Error, jsonrpc_error_messages} from '$lib/jsonrpc_errors.js';
+import {create_jsonrpc_error_message, to_jsonrpc_message_id} from '$lib/jsonrpc_helpers.js';
 import type {Transport} from '$lib/transports.js';
 import type {
 	Jsonrpc_Message_From_Client_To_Server,
@@ -8,9 +9,8 @@ import type {
 	Jsonrpc_Notification,
 	Jsonrpc_Request,
 	Jsonrpc_Response_Or_Error,
+	Jsonrpc_Error_Message,
 } from '$lib/jsonrpc.js';
-
-// TODO BLOCK dont throw in here
 
 export class Frontend_Http_Transport implements Transport {
 	readonly transport_name = 'frontend_http_rpc' as const;
@@ -24,7 +24,7 @@ export class Frontend_Http_Transport implements Transport {
 	}
 
 	async send(message: Jsonrpc_Request): Promise<Jsonrpc_Response_Or_Error>;
-	async send(message: Jsonrpc_Notification): Promise<null>;
+	async send(message: Jsonrpc_Notification): Promise<Jsonrpc_Error_Message | null>;
 	async send(
 		message: Jsonrpc_Message_From_Client_To_Server,
 	): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
@@ -44,8 +44,16 @@ export class Frontend_Http_Transport implements Transport {
 			// For JSON-RPC, we always expect a 200 OK response
 			// The actual error will be in the JSON-RPC error field
 			if (!response.ok) {
-				throw jsonrpc_errors.internal_error(
-					`HTTP error: ${response.status} ${response.statusText}`,
+				console.error(
+					'[frontend http transport] HTTP error:',
+					response.status,
+					response.statusText,
+				);
+				return create_jsonrpc_error_message(
+					to_jsonrpc_message_id(message),
+					jsonrpc_error_messages.internal_error(
+						`HTTP error: ${response.status} ${response.statusText}`,
+					),
 				);
 			}
 
@@ -54,12 +62,20 @@ export class Frontend_Http_Transport implements Transport {
 		} catch (error) {
 			// TODO @many clean up transport error handling
 			console.error('[frontend http transport] error sending HTTP request:', error);
+
 			if (error instanceof Thrown_Jsonrpc_Error) {
-				throw error;
+				return create_jsonrpc_error_message(to_jsonrpc_message_id(message), {
+					code: error.code,
+					message: error.message,
+					data: error.data,
+				});
 			}
-			throw jsonrpc_errors.internal_error('error sending HTTP request', {
-				error: error instanceof Error ? error.message : String(error),
-			});
+			return create_jsonrpc_error_message(
+				to_jsonrpc_message_id(message),
+				jsonrpc_error_messages.internal_error('error sending HTTP request', {
+					error: error instanceof Error ? error.message : String(error),
+				}),
+			);
 		}
 	}
 

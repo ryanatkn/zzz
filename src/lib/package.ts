@@ -1994,10 +1994,12 @@ export const src_json = {
 		'./jsonrpc_errors.js': {
 			path: 'jsonrpc_errors.ts',
 			declarations: [
+				{name: 'Jsonrpc_Error_Name', kind: 'type'},
 				{name: 'JSONRPC_ERROR_CODES', kind: 'variable'},
-				{name: 'http_status_to_jsonrpc_code', kind: 'function'},
+				{name: 'jsonrpc_error_messages', kind: 'variable'},
 				{name: 'Thrown_Jsonrpc_Error', kind: 'class'},
 				{name: 'jsonrpc_errors', kind: 'variable'},
+				{name: 'http_status_to_jsonrpc_code', kind: 'function'},
 			],
 		},
 		'./jsonrpc_helpers.js': {

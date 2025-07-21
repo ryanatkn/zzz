@@ -8,6 +8,7 @@ import type {
 	Jsonrpc_Notification,
 	Jsonrpc_Request,
 	Jsonrpc_Response_Or_Error,
+	Jsonrpc_Error_Message,
 } from '$lib/jsonrpc.js';
 
 // TODO figure out the symmetry of frontend and backend transports (none/partial/full?) --
@@ -20,7 +21,7 @@ export interface Transport {
 	transport_name: Transport_Name;
 	/* eslint-disable @typescript-eslint/method-signature-style */
 	send(message: Jsonrpc_Request): Promise<Jsonrpc_Response_Or_Error>;
-	send(message: Jsonrpc_Notification): Promise<null>;
+	send(message: Jsonrpc_Notification): Promise<Jsonrpc_Error_Message | null>;
 	send(
 		message: Jsonrpc_Message_From_Client_To_Server,
 	): Promise<Jsonrpc_Message_From_Server_To_Client | null>;

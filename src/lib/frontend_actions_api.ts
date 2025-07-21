@@ -136,6 +136,9 @@ const create_request_response_method = (
 
 		const response = await environment.peer.send(event.data.request);
 
+		// TODO BLOCK what to do if this is an error? it's currently transitioning to "handled"
+		console.log(`response`, response);
+
 		event.transition('receive_response');
 
 		// TODO @api shouldn't this happen in the peer like the other method calls?
@@ -176,7 +179,11 @@ const create_remote_notification_method = (
 		if (!is_notification_send(event.data)) throw Error(); // TODO @many maybe make this an assertion helper?
 
 		if (event.data.step === 'handled') {
-			await environment.peer.send(event.data.notification);
+			const result = await environment.peer.send(event.data.notification);
+			// Check if notification failed to send
+			if (result !== null) {
+				environment.log?.error('notification send failed:', result.error);
+			}
 			// TODO @api rethink this with the action event lifecycle, should there be more after this?
 		}
 	};

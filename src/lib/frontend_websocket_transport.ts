@@ -2,12 +2,14 @@
 
 import type {Socket} from '$lib/socket.svelte.js';
 import {Request_Tracker} from '$lib/request_tracker.svelte.js';
-import {Thrown_Jsonrpc_Error, jsonrpc_errors} from '$lib/jsonrpc_errors.js';
+import {Thrown_Jsonrpc_Error, jsonrpc_error_messages} from '$lib/jsonrpc_errors.js';
 import {
 	is_jsonrpc_notification,
 	is_jsonrpc_request,
 	is_jsonrpc_response,
 	is_jsonrpc_error_message,
+	to_jsonrpc_message_id,
+	create_jsonrpc_error_message,
 } from '$lib/jsonrpc_helpers.js';
 import type {
 	Jsonrpc_Message_From_Client_To_Server,
@@ -15,12 +17,12 @@ import type {
 	Jsonrpc_Notification,
 	Jsonrpc_Request,
 	Jsonrpc_Response_Or_Error,
+	Jsonrpc_Error_Message,
 } from '$lib/jsonrpc.js';
 import type {Transport} from '$lib/transports.js';
+import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
 
 // TODO logging - maybe add a getter to Cell that falls back to the app logger?
-
-// TODO BLOCK dont throw in here
 
 export class Frontend_Websocket_Transport implements Transport {
 	readonly transport_name = 'frontend_websocket_rpc' as const;
@@ -55,13 +57,17 @@ export class Frontend_Websocket_Transport implements Transport {
 	}
 
 	async send(message: Jsonrpc_Request): Promise<Jsonrpc_Response_Or_Error>;
-	async send(message: Jsonrpc_Notification): Promise<null>;
+	async send(message: Jsonrpc_Notification): Promise<Jsonrpc_Error_Message | null>;
 	async send(
 		message: Jsonrpc_Message_From_Client_To_Server,
 	): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
 		console.log(`[frontend websocket transport] data`, message);
 		if (!this.is_ready()) {
-			throw jsonrpc_errors.service_unavailable('WebSocket not connected');
+			console.error('[frontend websocket transport] WebSocket not connected');
+			return create_jsonrpc_error_message(
+				to_jsonrpc_message_id(message),
+				jsonrpc_error_messages.service_unavailable('WebSocket not connected'),
+			);
 		}
 
 		try {
@@ -80,22 +86,28 @@ export class Frontend_Websocket_Transport implements Transport {
 				this.#socket.send(message);
 				return null;
 			}
-			throw jsonrpc_errors.invalid_request();
+			// Invalid message type - return error with id if available
+			return create_jsonrpc_error_message(
+				to_jsonrpc_message_id(message),
+				jsonrpc_error_messages.invalid_request(),
+			);
 		} catch (error) {
 			// TODO @many clean up transport error handling
 			console.error('[frontend websocket transport] error sending message:', error);
+
+			// Return error response instead of throwing
 			if (error instanceof Thrown_Jsonrpc_Error) {
-				throw error;
+				return create_jsonrpc_error_message(to_jsonrpc_message_id(message), {
+					code: error.code,
+					message: error.message,
+					data: error.data,
+				});
 			}
-			throw jsonrpc_errors.internal_error(
-				error instanceof Error
-					? error.message
-					: // TODO weird because maybe the request tracker
-						// should not reject with jsonrpc error messages,
-						// instead use return values or correct errors?
-						is_jsonrpc_error_message(error)
-						? error.error.message
-						: 'unknown error sending websocket message',
+			return create_jsonrpc_error_message(
+				to_jsonrpc_message_id(message),
+				jsonrpc_error_messages.internal_error(
+					error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE,
+				),
 			);
 		}
 	}

@@ -14,6 +14,8 @@ import {
 } from '$lib/diskfile_helpers.js';
 import {Diskfile_Path, Serializable_Source_File} from '$lib/diskfile_types.js';
 
+// TODO very unfinished/hacky
+
 // TODO @api think about unification between frontend|backend_actions_api.ts
 // (also think about unification with backend_action_handlers.ts)
 // this is all a hacky WIP,
@@ -28,6 +30,7 @@ export interface Backend_Actions_Api {
 }
 
 export const create_backend_actions_api = (backend: Backend): Backend_Actions_Api => {
+	// TODO extend logger to add labels to the below
 	return {
 		filer_change: async (input: Action_Inputs['filer_change']) => {
 			// TODO @api think about symmetry and generic handling, see how the frontend actions does it
@@ -38,14 +41,26 @@ export const create_backend_actions_api = (backend: Backend): Backend_Actions_Ap
 
 				if (event.data.step === 'handled' && event.data.notification) {
 					// Send notification to all clients via the WebSocket transport
-					await backend.peer.send(event.data.notification);
+					const result = await backend.peer.send(event.data.notification);
+					if (result !== null) {
+						backend.log?.error(
+							'[backend_actions_api.filer_change] failed to send filer_change notification:',
+							result.error,
+						);
+					}
 				} else if (event.data.step === 'failed') {
-					console.error('failed to create filer_change notification:', event.data.error);
+					backend.log?.error(
+						'[backend_actions_api.filer_change] failed to create filer_change notification:',
+						event.data.error,
+					);
 				}
-			} catch (_error) {
+			} catch (error) {
 				// TODO silencing because it's loud on startup, needs to be rewritten
 				// TODO implement proper error handling strategy (don't throw - notifications are fire-and-forget)
-				// console.error('unexpected error in filer_change:', error);
+				backend.log?.error(
+					'[backend_actions_api.filer_change] unexpected error in filer_change:',
+					error,
+				);
 			}
 		},
 		completion_progress: async (input: Action_Inputs['completion_progress']) => {
@@ -56,12 +71,24 @@ export const create_backend_actions_api = (backend: Backend): Backend_Actions_Ap
 
 				if (event.data.step === 'handled' && event.data.notification) {
 					// Send notification to all clients via the WebSocket transport
-					await backend.peer.send(event.data.notification);
+					const result = await backend.peer.send(event.data.notification);
+					if (result !== null) {
+						backend.log?.error(
+							'[backend_actions_api.completion_progress] failed to send completion_progress notification:',
+							result.error,
+						);
+					}
 				} else if (event.data.step === 'failed') {
-					console.error('failed to create completion_progress notification:', event.data.error);
+					backend.log?.error(
+						'[backend_actions_api.completion_progress] failed to create completion_progress notification:',
+						event.data.error,
+					);
 				}
 			} catch (error) {
-				console.error('unexpected error in completion_progress:', error);
+				backend.log?.error(
+					'[backend_actions_api.completion_progress] unexpected error in completion_progress:',
+					error,
+				);
 			}
 		},
 		ollama_progress: async (input: Action_Inputs['ollama_progress']) => {
@@ -72,12 +99,24 @@ export const create_backend_actions_api = (backend: Backend): Backend_Actions_Ap
 
 				if (event.data.step === 'handled' && event.data.notification) {
 					// Send notification to all clients via the WebSocket transport
-					await backend.peer.send(event.data.notification);
+					const result = await backend.peer.send(event.data.notification);
+					if (result !== null) {
+						backend.log?.error(
+							'[backend_actions_api.ollama_progress] failed to send ollama_progress notification:',
+							result.error,
+						);
+					}
 				} else if (event.data.step === 'failed') {
-					console.error('failed to create ollama_progress notification:', event.data.error);
+					backend.log?.error(
+						'[backend_actions_api.ollama_progress] failed to create ollama_progress notification:',
+						event.data.error,
+					);
 				}
 			} catch (error) {
-				console.error('unexpected error in ollama_progress:', error);
+				backend.log?.error(
+					'[backend_actions_api.ollama_progress] unexpected error in ollama_progress:',
+					error,
+				);
 			}
 		},
 	};

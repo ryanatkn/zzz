@@ -2,15 +2,12 @@
 
 import {create_action_event} from '$lib/action_event.js';
 import {
-	JSONRPC_INTERNAL_ERROR,
-	JSONRPC_INVALID_REQUEST,
-	JSONRPC_METHOD_NOT_FOUND,
-	JSONRPC_PARSE_ERROR,
 	Jsonrpc_Message_From_Client_To_Server,
 	Jsonrpc_Message_From_Server_To_Client,
 	Jsonrpc_Notification,
 	Jsonrpc_Request,
 	Jsonrpc_Response_Or_Error,
+	Jsonrpc_Error_Message,
 } from '$lib/jsonrpc.js';
 import {Transports, type Transport_Name} from '$lib/transports.js';
 import type {Action_Event_Environment} from '$lib/action_event_types.js';
@@ -21,8 +18,8 @@ import {
 	is_jsonrpc_request,
 	is_jsonrpc_notification,
 } from '$lib/jsonrpc_helpers.js';
+import {jsonrpc_error_messages} from '$lib/jsonrpc_errors.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
-import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
 
 // TODO @api @many refactor frontend_actions_api.ts with action_peer.ts
 
@@ -64,7 +61,10 @@ export class Action_Peer {
 		message: Jsonrpc_Request,
 		options?: Action_Peer_Send_Options,
 	): Promise<Jsonrpc_Response_Or_Error>;
-	async send(message: Jsonrpc_Notification, options?: Action_Peer_Send_Options): Promise<null>;
+	async send(
+		message: Jsonrpc_Notification,
+		options?: Action_Peer_Send_Options,
+	): Promise<Jsonrpc_Error_Message | null>;
 	async send(
 		message: Jsonrpc_Message_From_Client_To_Server,
 		options?: Action_Peer_Send_Options,
@@ -76,20 +76,19 @@ export class Action_Peer {
 
 			if (!transport) {
 				this.environment.log?.error('[action_peer.send] no transport available');
-				// TODO BLOCK return a more specific JSON-RPC error
-				return this.#create_fatal_error_response(message);
+				return create_jsonrpc_error_message(
+					to_jsonrpc_message_id(message),
+					jsonrpc_error_messages.service_unavailable('no transport available'),
+				);
 			}
 
-			// TODO BLOCK clean up error handling, notice `receive` catches but we intentionally throw here, what should the peer be doing?
-			// I think we should use return values here since
-			// it's a high level abstraction in terms of the module architecture,
-			// and is not called deep in user code,
-			// and if this is the case then the transports should prefer returning errors over throwing
+			// Transports now return error responses instead of throwing
 			const result = await transport.send(message);
 			return result;
 		} catch (error) {
+			// TODO add retry handling here?
 			this.environment.log?.error('[action_peer.send] unexpected error:', error);
-			return this.#create_fatal_error_response(message);
+			return create_jsonrpc_error_message_from_thrown(to_jsonrpc_message_id(message), error);
 		} // TODO finally?
 	}
 
@@ -97,15 +96,15 @@ export class Action_Peer {
 		try {
 			// TODO better validation? move to `#receive_message`?
 			if (!message || typeof message !== 'object') {
-				return this.#create_parse_error_response();
+				return create_jsonrpc_error_message(null, jsonrpc_error_messages.parse_error());
 			}
 
 			const result = await this.#receive_message(message);
 			return result;
 		} catch (error) {
 			this.environment.log?.error('[action_peer.receive] unexpected error:', error);
-			// TODO BLOCK refactor with the above, get error handling right
-			return this.#create_fatal_error_response(message);
+			// Return appropriate error response based on the message
+			return create_jsonrpc_error_message_from_thrown(to_jsonrpc_message_id(message), error);
 		} // TODO finally?
 	}
 
@@ -119,14 +118,10 @@ export class Action_Peer {
 			await this.#receive_notification(message);
 			return null;
 		} else {
-			// TODO BLOCK error messages info is being lost here
-			const id = to_jsonrpc_message_id(message);
-			return id === null
-				? null
-				: create_jsonrpc_error_message(id, {
-						code: JSONRPC_INVALID_REQUEST,
-						message: 'invalid request',
-					});
+			return create_jsonrpc_error_message(
+				to_jsonrpc_message_id(message),
+				jsonrpc_error_messages.invalid_request(),
+			);
 		}
 	}
 
@@ -136,10 +131,10 @@ export class Action_Peer {
 	async #receive_request(request: Jsonrpc_Request): Promise<Jsonrpc_Message_From_Server_To_Client> {
 		const spec = this.environment.lookup_action_spec(request.method as Action_Method); // TODO @many try not to cast, idk what the best design is here
 		if (!spec) {
-			return create_jsonrpc_error_message(request.id, {
-				code: JSONRPC_METHOD_NOT_FOUND,
-				message: `method not found: ${request.method}`,
-			});
+			return create_jsonrpc_error_message(
+				request.id,
+				jsonrpc_error_messages.method_not_found(request.method),
+			);
 		}
 
 		try {
@@ -168,12 +163,11 @@ export class Action_Peer {
 				return create_jsonrpc_error_message(request.id, event.data.error);
 			}
 
-			// TODO BLOCK refactor with error helpers (returning data should be the norm, maybe simple plain fns)
 			// Fallback error
-			return create_jsonrpc_error_message(request.id, {
-				code: JSONRPC_INTERNAL_ERROR,
-				message: 'failed to receive request',
-			});
+			return create_jsonrpc_error_message(
+				request.id,
+				jsonrpc_error_messages.internal_error('failed to receive request'),
+			);
 		} catch (error) {
 			return create_jsonrpc_error_message_from_thrown(request.id, error);
 		}
@@ -203,21 +197,5 @@ export class Action_Peer {
 		} catch (error) {
 			this.environment.log?.error(`error receiving notification:`, error);
 		}
-	}
-
-	// TODO BLOCK maybe delete/refactor
-	#create_parse_error_response(): Jsonrpc_Message_From_Server_To_Client {
-		return create_jsonrpc_error_message(null, {
-			code: JSONRPC_PARSE_ERROR,
-			message: 'parse error',
-		});
-	}
-
-	// TODO BLOCK maybe delete/refactor
-	#create_fatal_error_response(raw_message: unknown): Jsonrpc_Message_From_Server_To_Client | null {
-		return create_jsonrpc_error_message(to_jsonrpc_message_id(raw_message), {
-			code: JSONRPC_INTERNAL_ERROR,
-			message: UNKNOWN_ERROR_MESSAGE,
-		});
 	}
 }
