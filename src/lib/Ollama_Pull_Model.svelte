@@ -22,7 +22,7 @@
 
 	const {models_not_downloaded} = $derived(app.ollama);
 
-	const pull_actions = $derived(ollama.actions.filter((a) => a.method === 'ollama_pull').reverse());
+	const pull_actions = $derived(ollama.actions.filter((a) => a.method === 'ollama_pull')); // TODO index?
 
 	const handle_pull = async () => {
 		onclose?.();

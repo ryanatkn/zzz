@@ -22,6 +22,8 @@
 		action: Action;
 	} = $props();
 
+	const {action_event_data} = $derived(action);
+
 	const operation_icon = $derived.by(() => {
 		switch (action.method) {
 			case 'ollama_pull':
@@ -40,8 +42,8 @@
 		}
 	});
 
-	const operation_color = $derived.by(() => {
-		const step = action.action_event_data?.step || 'initial';
+	const operation_color_class = $derived.by(() => {
+		const step = action_event_data?.step || 'initial';
 		switch (step) {
 			case 'handled':
 				return 'color_b';
@@ -55,7 +57,7 @@
 	});
 
 	const model_name = $derived.by(() => {
-		const input = action.action_event_data?.input;
+		const input = action_event_data?.input;
 		if (input && typeof input === 'object' && 'model' in input) {
 			return (input as any).model;
 		}
@@ -63,7 +65,7 @@
 	});
 
 	const error_message = $derived.by(() => {
-		const error = action.action_event_data?.error;
+		const error = action_event_data?.error;
 		if (error && typeof error === 'object' && 'message' in error) {
 			return (error as any).message;
 		}
@@ -71,7 +73,7 @@
 	});
 
 	const progress_percent = $derived.by(() => {
-		const progress = action.action_event_data?.progress;
+		const progress = action_event_data?.progress;
 		if (
 			progress &&
 			typeof progress === 'object' &&
@@ -87,20 +89,14 @@
 		return null;
 	});
 
-	// TODO hacky, probably need to refine the data flow for action events
-	const pending = $derived(
-		action.action_event_data?.step === 'handling' ||
-			(action.action_event_data?.phase !== 'receive_response' &&
-				action.action_event_data?.step !== 'failed' &&
-				action.action_event_data?.step !== 'handled'),
-	);
+	$inspect(`action.pending`, action.pending);
 </script>
 
 <li transition:slide class="py_xs3">
-	<div class="border_radius_xs {pending ? 'bg_2' : 'bg_1'} {operation_color}">
+	<div class="border_radius_xs {action.pending ? 'bg_2' : 'bg_1'} {operation_color_class}">
 		<div class="display_flex justify_content_space_between align_items_center p_sm">
 			<div class="display_flex gap_md align_items_center">
-				{#if pending}
+				{#if action.pending}
 					<Pending_Animation />
 				{:else}
 					<Glyph

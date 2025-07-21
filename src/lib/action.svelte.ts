@@ -40,9 +40,54 @@ export class Action extends Cell<typeof Action_Json> {
 
 	readonly has_error = $derived(!!this.action_event_data?.error);
 
-	readonly pending = $derived(this.action_event_data?.step === 'handling');
-	readonly failed = $derived(this.action_event_data?.step === 'failed');
-	readonly success = $derived(this.action_event_data?.step === 'handled');
+	// TODO this being convoluted is indicative of a larger issue
+	// that we may want to rethink with the flow of action events with phase+step
+	readonly pending = $derived.by(() => {
+		if (!this.action_event_data) {
+			return true; // no data yet means pending
+		}
+
+		const {step, phase, kind} = this.action_event_data;
+
+		// For request_response actions, only the final phase (receive_response)
+		// with a terminal step (handled/failed) means the action is complete
+		if (kind === 'request_response') {
+			return !(phase === 'receive_response' && (step === 'handled' || step === 'failed'));
+		} else {
+			// For other kinds, just check if step is terminal
+			return step !== 'handled' && step !== 'failed';
+		}
+	});
+	readonly failed = $derived.by(() => {
+		if (!this.action_event_data) {
+			return false; // no data yet means not failed
+		}
+
+		const {step, kind} = this.action_event_data;
+
+		// For request_response actions, failure can happen in any phase
+		if (kind === 'request_response') {
+			return step === 'failed';
+		} else {
+			// For other kinds, step === 'failed' means failed
+			return step === 'failed';
+		}
+	});
+	readonly success = $derived.by(() => {
+		if (!this.action_event_data) {
+			return false; // no data yet means not successful
+		}
+
+		const {step, phase, kind} = this.action_event_data;
+
+		// For request_response actions, success means completing the full cycle
+		if (kind === 'request_response') {
+			return phase === 'receive_response' && step === 'handled';
+		} else {
+			// For other kinds, step === 'handled' means success
+			return step === 'handled';
+		}
+	});
 
 	constructor(options: Action_Options) {
 		super(Action_Json, options);

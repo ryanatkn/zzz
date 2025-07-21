@@ -1,8 +1,10 @@
 import {Hono} from 'hono';
+import {wait} from '@ryanatkn/belt/async.js';
 
 import type {Backend} from '$lib/server/backend.js';
 import {Path_Without_Trailing_Slash} from '$lib/zod_helpers.js';
 import {create_jsonrpc_error_message_from_thrown} from '$lib/jsonrpc_helpers.js';
+import {BACKEND_ARTIFICIAL_RESPONSE_DELAY} from '$lib/constants.js';
 
 export interface Register_Actions_Options {
 	path: string;
@@ -14,8 +16,15 @@ export interface Register_Actions_Options {
  * Registers HTTP endpoints for all service actions in the schema registry.
  */
 export const register_http_actions = ({path, app, backend}: Register_Actions_Options): void => {
-	// Register a single JSON-RPC endpoint that handles all methods
 	const final_path = Path_Without_Trailing_Slash.parse(path);
+
+	if (BACKEND_ARTIFICIAL_RESPONSE_DELAY > 0) {
+		app.use('*', async (_c, next) => {
+			backend.log?.debug(`[http_middleware] throttling ${BACKEND_ARTIFICIAL_RESPONSE_DELAY}ms`);
+			await wait(BACKEND_ARTIFICIAL_RESPONSE_DELAY);
+			await next();
+		});
+	}
 
 	// TODO @api use `GET` when `side_effects` is falsy, encode in URL params (what format?)
 

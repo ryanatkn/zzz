@@ -1,9 +1,10 @@
 import type {Hono} from 'hono';
 import type {createNodeWebSocket} from '@hono/node-ws';
+import {wait} from '@ryanatkn/belt/async.js';
 
 import type {Backend} from '$lib/server/backend.js';
 import {verify_origin, type Allowed_Origins} from '$lib/server/security.js';
-import {SERVER_URL} from '$lib/constants.js';
+import {BACKEND_ARTIFICIAL_RESPONSE_DELAY, SERVER_URL} from '$lib/constants.js';
 import {noop_middleware} from '$lib/server/server_helpers.js';
 import {Backend_Websocket_Transport} from '$lib/server/backend_websocket_transport.js';
 
@@ -53,6 +54,11 @@ export const register_websocket_actions = ({
 				} catch (error) {
 					backend.log?.error(`[ws] received non-json message`, error);
 					return;
+				}
+
+				if (BACKEND_ARTIFICIAL_RESPONSE_DELAY > 0) {
+					backend.log?.debug(`[ws] throttling ${BACKEND_ARTIFICIAL_RESPONSE_DELAY}ms`);
+					await wait(BACKEND_ARTIFICIAL_RESPONSE_DELAY);
 				}
 
 				try {
