@@ -467,10 +467,12 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	async pull(): Promise<void> {
 		if (!this.pull_can_pull) return;
 
+		const model = this.pull_parsed_model_name;
+
 		try {
 			// TODO makes me think we should mark methods that use the API, maybe just in the generated reference docs
 			await this.app.api.ollama_pull({
-				model: this.pull_parsed_model_name,
+				model,
 				insecure: this.pull_insecure,
 				_meta: {progressToken: create_uuid()}, // TODO @many maybe save the token? needed to opt into progress notifications
 			});
@@ -478,6 +480,12 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 			this.pull_insecure = false;
 		} catch (error) {
 			console.error('[ollama.pull] failed:', error);
+			// TODO @api this is hacky, might belong in a new `handle_ollama_pull_error`
+			// (because it probably doesn't belong in `handle_ollama_pull_complete`)
+			// that's called from a new action handler,
+			// and then `this.pull` does nothing specific or is even removed,
+			// and there are similar problems elsewhere in this module
+			this.pulling_models.delete(model);
 		}
 	}
 
