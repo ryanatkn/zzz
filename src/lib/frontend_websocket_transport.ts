@@ -59,7 +59,7 @@ export class Frontend_Websocket_Transport implements Transport {
 	): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
 		console.log(`[frontend websocket transport] data`, message);
 		if (!this.is_ready()) {
-			throw jsonrpc_errors.service_unavailable_error('WebSocket not connected');
+			throw jsonrpc_errors.service_unavailable('WebSocket not connected');
 		}
 
 		try {
