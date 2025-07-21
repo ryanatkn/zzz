@@ -10,6 +10,7 @@ import type {
 	Request_Response_Action_Spec,
 } from '$lib/action_spec.js';
 import {is_send_request, is_notification_send} from '$lib/action_event_helpers.js';
+import {Thrown_Jsonrpc_Error} from '$lib/jsonrpc_errors.js';
 
 // TODO @api @many refactor frontend_actions_api.ts with action_peer.ts
 
@@ -53,7 +54,6 @@ const create_action_method = (environment: Action_Event_Environment, spec: Actio
 	}
 };
 
-// TODO BLOCK thrown jsonrpc error type?
 // TODO maybe move this?
 const extract_result_or_throw = (event: Action_Event): any => {
 	const {data} = event;
@@ -63,10 +63,10 @@ const extract_result_or_throw = (event: Action_Event): any => {
 	}
 
 	if (data.step === 'failed') {
-		throw new Error(data.error.message);
+		throw new Thrown_Jsonrpc_Error(data.error.code, data.error.message, data.error.data);
 	}
 
-	throw new Error(); // TODO maybe include a message? is an internal failure
+	throw new Error('cannot extract result: action event is not handled or failed');
 };
 
 /**
