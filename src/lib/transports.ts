@@ -79,6 +79,7 @@ export class Transports {
 		return this.#transport_by_name.get(transport_name) ?? null;
 	}
 
+	// TODO BLOCK this is not a good name, and should not throw, it's more like `get_transport_or_fallback` or `get_transport_or_first_ready`
 	/**
 	 * Gets either the current transport or the first ready transport
 	 * depending on `allow_fallback`, or throws an error.
