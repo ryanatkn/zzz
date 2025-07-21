@@ -109,9 +109,9 @@
 					/>
 				{/if}
 				<Glyph glyph={operation_icon} />
-				<div class="font_weight_600">{action.method}</div>
+				<div class="font_size_sm font_weight_600">{action.method}</div>
 				{#if model_name}
-					<div class="flex_1 font_family_mono font_size_sm ellipsis">
+					<div class="font_size_sm flex_1 font_family_mono ellipsis">
 						<div class="ellipsis">{model_name}</div>
 					</div>
 				{/if}

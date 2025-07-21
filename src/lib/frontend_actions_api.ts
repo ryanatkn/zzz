@@ -2,15 +2,18 @@
 
 import type {Action_Method, Actions_Api} from '$lib/action_metatypes.js';
 import type {Action_Event_Environment} from '$lib/action_event_types.js';
-import {Action_Event, create_action_event} from '$lib/action_event.js';
+import {create_action_event} from '$lib/action_event.js';
 import type {
 	Action_Spec_Union,
 	Local_Call_Action_Spec,
 	Remote_Notification_Action_Spec,
 	Request_Response_Action_Spec,
 } from '$lib/action_spec.js';
-import {is_send_request, is_notification_send} from '$lib/action_event_helpers.js';
-import {Thrown_Jsonrpc_Error} from '$lib/jsonrpc_errors.js';
+import {
+	is_send_request,
+	is_notification_send,
+	extract_action_result,
+} from '$lib/action_event_helpers.js';
 
 // TODO @api @many refactor frontend_actions_api.ts with action_peer.ts
 
@@ -54,21 +57,6 @@ const create_action_method = (environment: Action_Event_Environment, spec: Actio
 	}
 };
 
-// TODO maybe move this?
-const extract_result_or_throw = (event: Action_Event): any => {
-	const {data} = event;
-
-	if (data.step === 'handled') {
-		return data.output;
-	}
-
-	if (data.step === 'failed') {
-		throw new Thrown_Jsonrpc_Error(data.error.code, data.error.message, data.error.data);
-	}
-
-	throw new Error('cannot extract result: action event is not handled or failed');
-};
-
 /**
  * Creates a synchronous local call method.
  */
@@ -86,7 +74,7 @@ const create_sync_local_call_method = (
 
 		event.parse().handle_sync();
 
-		return extract_result_or_throw(event);
+		return extract_action_result(event);
 	};
 };
 
@@ -107,7 +95,7 @@ const create_async_local_call_method = (
 
 		await event.parse().handle_async();
 
-		return extract_result_or_throw(event);
+		return extract_action_result(event);
 	};
 };
 
@@ -131,7 +119,7 @@ const create_request_response_method = (
 		if (!is_send_request(event.data)) throw Error(); // TODO @many maybe make this an assertion helper?
 
 		if (event.data.step !== 'handled') {
-			return extract_result_or_throw(event);
+			return extract_action_result(event);
 		}
 
 		const response = await environment.peer.send(event.data.request);
@@ -143,7 +131,7 @@ const create_request_response_method = (
 
 		await event.parse().handle_async();
 
-		return extract_result_or_throw(event);
+		return extract_action_result(event);
 	};
 };
 

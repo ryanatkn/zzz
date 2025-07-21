@@ -22,6 +22,8 @@ import type {Action_Method} from '$lib/action_metatypes.js';
 import type {Action_Inputs} from '$lib/action_collections.js';
 import type {Action_Executor, Action_Initiator, Action_Kind} from '$lib/action_types.js';
 import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
+import {Thrown_Jsonrpc_Error} from '$lib/jsonrpc_errors.js';
+import type {Action_Event} from '$lib/action_event.js';
 
 // Type guards for action kinds
 export const is_request_response = (
@@ -180,7 +182,7 @@ export const create_validation_error = (field: string, error: unknown): Jsonrpc_
 
 export const create_handler_error = (error: unknown): Jsonrpc_Error_Json => ({
 	code: JSONRPC_INTERNAL_ERROR,
-	message: `handler error: ${error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE}`,
+	message: error instanceof Error ? error.message : UNKNOWN_ERROR_MESSAGE,
 	data: {error: String(error)},
 });
 
@@ -215,3 +217,17 @@ export const create_initial_data = (
 	response: null,
 	notification: null,
 });
+
+export const extract_action_result = (event: Action_Event): Action_Event_Data['output'] => {
+	const {data} = event;
+
+	if (data.step === 'handled') {
+		return data.output;
+	}
+
+	if (data.step === 'failed') {
+		throw new Thrown_Jsonrpc_Error(data.error.code, data.error.message, data.error.data);
+	}
+
+	throw new Error('cannot extract result: action event is not handled or failed');
+};
