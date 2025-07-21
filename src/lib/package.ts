@@ -1133,6 +1133,7 @@ export const src_json = {
 				{name: 'create_handler_error', kind: 'function'},
 				{name: 'is_action_complete', kind: 'function'},
 				{name: 'create_initial_data', kind: 'function'},
+				{name: 'extract_action_result', kind: 'function'},
 			],
 		},
 		'./action_event_types.js': {
@@ -1588,10 +1589,11 @@ export const src_json = {
 		'./constants.js': {
 			path: 'constants.ts',
 			declarations: [
-				{name: 'SERVER_PROXIED_PORT', kind: 'variable'},
 				{name: 'SERVER_PROTOCOL', kind: 'variable'},
 				{name: 'SERVER_HOST', kind: 'variable'},
 				{name: 'SERVER_URL', kind: 'variable'},
+				{name: 'SERVER_PROXIED_PORT', kind: 'variable'},
+				{name: 'BACKEND_ARTIFICIAL_RESPONSE_DELAY', kind: 'variable'},
 				{name: 'ZZZ_CACHE_DIRNAME', kind: 'variable'},
 				{name: 'ZZZ_DIR', kind: 'variable'},
 				{name: 'CONTENT_PREVIEW_LENGTH', kind: 'variable'},

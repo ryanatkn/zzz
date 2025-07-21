@@ -88,8 +88,6 @@
 		}
 		return null;
 	});
-
-	$inspect(`action.pending`, action.pending);
 </script>
 
 <li transition:slide class="py_xs3">

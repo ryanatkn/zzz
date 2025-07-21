@@ -69,7 +69,7 @@ export class Frontend_Http_Transport implements Transport {
 				const actual_code = result.error.code;
 				if (actual_code !== expected_code) {
 					console.warn(
-						`[http] JSON-RPC error code mismatch: got ${actual_code} but HTTP ${response.status} should map to ${expected_code}`,
+						`[http] JSON-RPC error code mismatch: got ${actual_code} but ${response.status} should map to ${expected_code}`,
 						result,
 					);
 				}
@@ -77,7 +77,7 @@ export class Frontend_Http_Transport implements Transport {
 
 			return result;
 		} catch (error) {
-			console.error('[http] error sending HTTP request:', error);
+			console.error('[http] error sending request:', error);
 
 			if (error instanceof Thrown_Jsonrpc_Error) {
 				return create_jsonrpc_error_message(to_jsonrpc_message_id(message), {
@@ -88,7 +88,7 @@ export class Frontend_Http_Transport implements Transport {
 			}
 			return create_jsonrpc_error_message(
 				to_jsonrpc_message_id(message),
-				jsonrpc_error_messages.internal_error('error sending HTTP request', {
+				jsonrpc_error_messages.internal_error('error sending request', {
 					error: error.message || UNKNOWN_ERROR_MESSAGE,
 				}),
 			);
