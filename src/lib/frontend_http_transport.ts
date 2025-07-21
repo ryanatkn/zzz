@@ -1,7 +1,16 @@
 // @slop Claude Opus 4
 
-import {Thrown_Jsonrpc_Error, jsonrpc_error_messages} from '$lib/jsonrpc_errors.js';
-import {create_jsonrpc_error_message, to_jsonrpc_message_id} from '$lib/jsonrpc_helpers.js';
+import {DEV} from 'esm-env';
+import {
+	Thrown_Jsonrpc_Error,
+	jsonrpc_error_messages,
+	http_status_to_jsonrpc_code,
+} from '$lib/jsonrpc_errors.js';
+import {
+	create_jsonrpc_error_message,
+	to_jsonrpc_message_id,
+	is_jsonrpc_error_message,
+} from '$lib/jsonrpc_helpers.js';
 import type {Transport} from '$lib/transports.js';
 import type {
 	Jsonrpc_Message_From_Client_To_Server,
@@ -41,19 +50,31 @@ export class Frontend_Http_Transport implements Transport {
 
 			const result = await response.json();
 
-			// For JSON-RPC, we always expect a 200 OK response
-			// The actual error will be in the JSON-RPC error field
+			// For JSON-RPC, we always expect a 200 OK response.
+			// The actual error will be in the JSON-RPC error field.
 			if (!response.ok) {
 				console.error('[http] error sending message:', response.status, response.statusText);
-				return create_jsonrpc_error_message(
-					to_jsonrpc_message_id(message),
-					jsonrpc_error_messages.internal_error(
-						`HTTP error: ${response.status} ${response.statusText}`,
-					),
-				);
+				return create_jsonrpc_error_message(to_jsonrpc_message_id(message), {
+					code: http_status_to_jsonrpc_code(response.status),
+					message: `HTTP error: ${response.status} ${response.statusText}`,
+				});
 			}
 
 			console.log(`[http] result`, result);
+
+			// In development, check if we got a JSON-RPC error with HTTP 200
+			// and verify the error code matches the expected HTTP status.
+			if (DEV && is_jsonrpc_error_message(result)) {
+				const expected_code = http_status_to_jsonrpc_code(response.status);
+				const actual_code = result.error.code;
+				if (actual_code !== expected_code) {
+					console.warn(
+						`[http] JSON-RPC error code mismatch: got ${actual_code} but HTTP ${response.status} should map to ${expected_code}`,
+						result,
+					);
+				}
+			}
+
 			return result;
 		} catch (error) {
 			console.error('[http] error sending HTTP request:', error);
