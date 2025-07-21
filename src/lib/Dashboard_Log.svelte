@@ -11,6 +11,8 @@
 	let selected_action: Action | null = $state(null);
 
 	const app = app_context.get();
+
+	// TODO BLOCK add clear actions button
 </script>
 
 <div class="column p_lg h_100">
