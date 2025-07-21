@@ -12,7 +12,7 @@ import type {
 	Jsonrpc_Response_Or_Error,
 	Jsonrpc_Error_Message,
 } from '$lib/jsonrpc.js';
-import {jsonrpc_errors, jsonrpc_error_messages} from '$lib/jsonrpc_errors.js';
+import {jsonrpc_error_messages} from '$lib/jsonrpc_errors.js';
 import {create_jsonrpc_error_message, to_jsonrpc_message_id} from '$lib/jsonrpc_helpers.js';
 
 // TODO support a SSE backend transport
@@ -55,8 +55,11 @@ export class Backend_Websocket_Transport implements Transport {
 	): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
 		// TODO currently just broadcasts all messages to all clients, the transport abstraction is still a WIP
 		if ('id' in message) {
-			throw jsonrpc_errors.internal_error(
-				'TODO not yet implemented - backend WebSocket transport cannot send requests expecting responses yet',
+			return create_jsonrpc_error_message(
+				message.id,
+				jsonrpc_error_messages.internal_error(
+					'TODO not yet implemented - backend WebSocket transport cannot send requests expecting responses yet',
+				),
 			);
 		}
 
