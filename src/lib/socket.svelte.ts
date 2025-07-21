@@ -183,7 +183,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 		}
 
 		if (!this.url) {
-			console.error('Cannot connect: no URL provided');
+			console.error('[socket] cannot connect: no URL provided');
 			return;
 		}
 
@@ -197,7 +197,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 			ws.addEventListener('error', this.#handle_error);
 			ws.addEventListener('message', this.#handle_message);
 		} catch (error) {
-			console.error('failed to create WebSocket:', error);
+			console.error('[socket] failed to create WebSocket:', error);
 			this.ws = null;
 			this.open = false;
 			this.status = 'failure';
@@ -224,7 +224,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 				try {
 					this.ws.close(code);
 				} catch (error) {
-					console.error('Error closing WebSocket:', error);
+					console.error('[socket] error closing WebSocket:', error);
 				}
 			}
 
@@ -247,7 +247,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 				this.last_send_time = Date.now();
 				return true;
 			} catch (error) {
-				console.error('error sending message:', error);
+				console.error('[socket] error sending message:', error);
 				this.#queue_message(data);
 				return false;
 			}
@@ -447,7 +447,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 	#handle_error = (event: Event): void => {
 		this.onerror?.(event);
 
-		console.error('websocket error occurred:', event);
+		console.error('[socket] websocket error occurred:', event);
 		this.status = 'failure';
 
 		// The WebSocket will close after an error, but we need to make sure

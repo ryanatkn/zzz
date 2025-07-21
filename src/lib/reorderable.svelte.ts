@@ -384,7 +384,7 @@ export class Reorderable implements Reorderable_Style_Config {
 				try {
 					this.list_params?.onreorder(source_index, target_index);
 				} catch (error) {
-					console.error('Error during reordering:', error);
+					console.error('[reorderable] error during reordering:', error);
 				}
 			}),
 			on(list, 'dragleave', (e: DragEvent) => {

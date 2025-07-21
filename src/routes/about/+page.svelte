@@ -65,6 +65,9 @@
 			<li>
 				I think UX should have primacy, and so UI quality is a top priority, informing other
 				technology decisions. It should be efficient, powerful, and customizable for devs and users.
+				My personal bias is to invest significant time in the UI, and use it to make the fullstack
+				system visible and controllable (for some early examples, try right-clicking on a
+				chat/prompt/file, or see the prototype <a href="{base}/capabilities">capabilities</a> page).
 			</li>
 			<li>
 				I want to make cross-platform software so it runs everywhere, shipping features once and
@@ -72,17 +75,17 @@
 				with minimal dependence on any one company, and without duplicating effort per-platform.
 				There's a balance here to take advantage of platform specifics without intruding on the
 				benefits of a shared codebase and coherent UX design. Some of this is shaped by my resource
-				constraints, but there's also a desire for independence, freedom from undue influence over
-				how I design and use tools.
+				constraints, but I also desire independence, freedom from undue influence over how I design
+				and use tools.
 			</li>
 			<li>
 				I want to maintain a single source of truth in code, not duplicating logic and data in
 				multiple languages and contexts, so there's one primary language that runs on the frontend
 				and backend (and also dev tooling), and modules run everywhere by default. It's both simpler
-				and more powerful to have one runtime like this in many respects, avoiding many bugs,
-				frictions, and inconsistencies, and enabling various dev patterns and fullstack integrations
-				(e.g. schemas in any language are more powerful than the language-interoperable JSON
-				Schema).
+				and more powerful to have one runtime like this in many respects -- it avoids many bugs,
+				frictions, and inconsistencies, and enables various dev patterns and fullstack integrations,
+				e.g. schemas in any language are more powerful than the language-interoperable JSON Schema,
+				and they can be leveraged to improve code quality and development velocity.
 			</li>
 		</ul>
 		<p>

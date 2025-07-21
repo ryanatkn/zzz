@@ -29,7 +29,7 @@ export class Frontend_Http_Transport implements Transport {
 	async send(
 		message: Jsonrpc_Message_From_Client_To_Server,
 	): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
-		console.log(`[frontend http transport] message`, message);
+		console.log(`[http] message`, message);
 		try {
 			const response = await fetch(this.#url, {
 				method: 'POST', // TODO support GET when `!spec.side_effects`
@@ -44,11 +44,7 @@ export class Frontend_Http_Transport implements Transport {
 			// For JSON-RPC, we always expect a 200 OK response
 			// The actual error will be in the JSON-RPC error field
 			if (!response.ok) {
-				console.error(
-					'[frontend http transport] error sending message:',
-					response.status,
-					response.statusText,
-				);
+				console.error('[http] error sending message:', response.status, response.statusText);
 				return create_jsonrpc_error_message(
 					to_jsonrpc_message_id(message),
 					jsonrpc_error_messages.internal_error(
@@ -57,10 +53,10 @@ export class Frontend_Http_Transport implements Transport {
 				);
 			}
 
-			console.log(`[frontend http transport] result`, result);
+			console.log(`[http] result`, result);
 			return result;
 		} catch (error) {
-			console.error('[frontend http transport] error sending HTTP request:', error);
+			console.error('[http] error sending HTTP request:', error);
 
 			if (error instanceof Thrown_Jsonrpc_Error) {
 				return create_jsonrpc_error_message(to_jsonrpc_message_id(message), {

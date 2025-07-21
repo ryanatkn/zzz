@@ -48,10 +48,10 @@ export class Frontend_Websocket_Transport implements Transport {
 					// This is a new request/notification from the server
 					await socket.app.peer.receive(data);
 				} else {
-					console.warn('[frontend websocket transport] received unknown message type:', data);
+					console.warn('[ws] received unknown message type:', data);
 				}
 			} catch (error) {
-				console.error('[frontend websocket transport] error parsing WebSocket message:', error);
+				console.error('[ws] error parsing WebSocket message:', error);
 			}
 		};
 	}
@@ -61,9 +61,9 @@ export class Frontend_Websocket_Transport implements Transport {
 	async send(
 		message: Jsonrpc_Message_From_Client_To_Server,
 	): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
-		console.log(`[frontend websocket transport] data`, message);
+		console.log(`[ws] data`, message);
 		if (!this.is_ready()) {
-			console.error('[frontend websocket transport] WebSocket not connected');
+			console.error('[ws] WebSocket not connected');
 			return create_jsonrpc_error_message(
 				to_jsonrpc_message_id(message),
 				jsonrpc_error_messages.service_unavailable('WebSocket not connected'),
@@ -79,7 +79,7 @@ export class Frontend_Websocket_Transport implements Transport {
 
 				// Return the promise that will resolve when the response is received
 				const result = await deferred.promise;
-				console.log(`[frontend websocket transport] result`, message, result);
+				console.log(`[ws] result`, message, result);
 				return result;
 			} else if (is_jsonrpc_notification(message)) {
 				// For notifications, just send without tracking
@@ -92,7 +92,7 @@ export class Frontend_Websocket_Transport implements Transport {
 				jsonrpc_error_messages.invalid_request(),
 			);
 		} catch (error) {
-			console.error('[frontend websocket transport] error sending message:', error);
+			console.error('[ws] error sending message:', error);
 
 			if (error instanceof Thrown_Jsonrpc_Error) {
 				return create_jsonrpc_error_message(to_jsonrpc_message_id(message), {
