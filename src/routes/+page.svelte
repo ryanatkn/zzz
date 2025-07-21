@@ -5,12 +5,6 @@
 
 	import Page_Footer from '$routes/Page_Footer.svelte';
 
-	// TODO remove this after fixing
-	// class:row
-	// class:content
-	// class:icon
-	// class:title
-
 	import Dashboard_Home from '$lib/Dashboard_Home.svelte';
 </script>
 
