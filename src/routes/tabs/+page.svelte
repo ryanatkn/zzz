@@ -1,6 +1,4 @@
 <script lang="ts">
-	import {base} from '$app/paths';
-
 	import {GLYPH_TAB} from '$lib/glyphs.js';
 	import Glyph from '$lib/Glyph.svelte';
 	import {Browser} from '$routes/tabs/browser.svelte.js';
@@ -42,7 +40,7 @@
 		{/if}
 		<p>
 			Zzz can be used to build installable apps that extend the web browser, using the form factor
-			you already know well - imagine your current browser, and then add a sidebar on the left like
+			you already know well -- imagine your current browser, and then add a sidebar on the left like
 			the one on this page, then <button
 				type="button"
 				onclick={() => (browser.browserified = !browser.browserified)}
@@ -52,7 +50,7 @@
 			> I'm planning to make an Electron-based version of Zzz first.
 		</p>
 		<p>
-			And users don't have to buy in, either - the basic browser UX is unchanged. Press <code
+			And users don't have to buy in, either -- the basic browser UX is unchanged. Press <code
 				>[backtick `]</code
 			>
 			to
@@ -72,7 +70,7 @@
 			left corner of this window)
 		</p>
 		<p>
-			This simple change recontextualizes the web's UX - instead of the browser being its own silo,
+			This simple change recontextualizes the web's UX -- instead of the browser being its own silo,
 			users compose tabs in a larger integrated system that's open and extensible by design.
 		</p>
 		<p>
@@ -85,19 +83,15 @@
 		</p>
 		<p>
 			I think that by optimizing for UX, Zzz and a lot of software is converging on similar
-			architectures. I'm not well-read in the literature but some of my favorite writing is from Ink
-			and Switch: <External_Link href="https://www.inkandswitch.com/local-first/"
-				>local-first</External_Link
+			architectures. I'm not well-read in The Literature or staying current with the design or
+			product communities, but some of my favorite writing is from Ink and Switch: <External_Link
+				href="https://www.inkandswitch.com/local-first/">local-first</External_Link
 			> and <External_Link href="https://www.inkandswitch.com/malleable-software/"
 				>malleable software</External_Link
 			>. I think that we can all have software that's really nice to use, not that expensive to
-			produce, that also respects individual rights and is designed for our benefit, and integrates
-			our experience across the web and our devices the way we prefer.
-		</p>
-		<p>
-			Not everyone wants this, but I think I will prefer to have my tabs and files in one place --
-			and maybe <a href="{base}/about">Zzz</a>
-			was always going to a browser with parlor tricks.
+			produce, that also respects individual rights and is designed for our benefit, that
+			<small class="font_size_xs">UNLEASHES THE FULL POWER OF THE WEB</small>, and integrates our
+			experience across the web and our devices how we each prefer.
 		</p>
 	</section>
 {/snippet}

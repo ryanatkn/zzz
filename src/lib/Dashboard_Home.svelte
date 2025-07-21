@@ -24,6 +24,7 @@
 				<button
 					type="button"
 					class="plain icon_button font_size_md"
+					title="create new chat"
 					onclick={() => {
 						const chat = app.chats.add();
 						void app.chats.navigate_to(chat.id);
@@ -58,6 +59,7 @@
 				<button
 					type="button"
 					class="plain icon_button font_size_md"
+					title="create new prompt"
 					onclick={() => {
 						const prompt = app.prompts.add();
 						void app.prompts.navigate_to(prompt.id);

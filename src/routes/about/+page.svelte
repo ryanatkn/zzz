@@ -21,7 +21,7 @@
 
 <div class="width_md p_lg">
 	<section>
-		<header style:--font_size="var(--font_size_xl)">
+		<header class="mb_xl5" style:--font_size="var(--font_size_xl)">
 			<h1 class="row">
 				<Svg
 					data={zzz_logo}
@@ -31,12 +31,7 @@
 				/> about
 			</h1>
 		</header>
-		<aside class="mt_xl5">
-			⚠️ This is an early pre-release, see the
-			<External_Link href="https://github.com/ryanatkn/zzz">repo</External_Link>
-			and
-			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link> 💤
-		</aside>
+		<blockquote>nice web things for the tired 💤</blockquote>
 		<p>
 			Zzz, pronounced "zees" like bees, is a fullstack web toolkit with a focus on user power and
 			experimentation. The idea is to make an integrated cross-platform environment that adapts to
@@ -44,12 +39,18 @@
 			customizable web UI for power users, and a flexible tool for crafting UX-maximizing websites
 			with a streamlined developer experience.
 		</p>
+		<aside>
+			⚠️ This is an early pre-release, see the
+			<External_Link href="https://github.com/ryanatkn/zzz">repo</External_Link>
+			and
+			<External_Link href="https://github.com/ryanatkn/zzz/discussions">discussions</External_Link> 💤
+		</aside>
 		<p>
 			In the technology landscape of 2025, where LLM-based AI is upending long held assumptions, and <External_Link
 				href="https://wikipedia.org/wiki/Enshittification">enshittification</External_Link
 			> is a widely-understood phenomenon among the very-online, Zzz asks:
 		</p>
-		<blockquote>"What software could we build to best support user agency?"</blockquote>
+		<blockquote>"What software can we build to best support user agency?"</blockquote>
 		<p>or with less true-believer energy and more detail:</p>
 		<blockquote>
 			"What becomes possible when users move from exploitative service-controlled spaces to
@@ -85,20 +86,21 @@
 			</li>
 		</ul>
 		<p>
-			This all leads me to the web, and therefore HTML, CSS, and JS (thankfully TypeScript --
-			loading a Python or C# interpreter every page load is too costly from a user POV). For all its
-			flaws and quirks (so many quirks), the web is the turf of our digital commons, and I think it
-			can deliver a good enough UX when used with care by devs and devices cooperate. But to some
-			degree, choosing the web is a pragmatic move: sometimes web technology can be a worse UX than
-			native software. But the web's adoption is second to none, browsers run everywhere, and it
-			minimally gatekeeps users and developers, so Zzz chooses distribution and accessibility over
-			perfection.
+			This all leads me to the web, and therefore HTML, CSS, and JS (thankfully TypeScript -- not
+			Python/C#/etc because I think loading the interpreter every page load is too costly for
+			users). For all its flaws and quirks (so many quirks), the web is the turf of our digital
+			commons, and I think it can deliver sufficient-to-excellent UX when used with care by devs and
+			devices cooperate. But to some degree, choosing the web is a pragmatic move: sometimes web
+			technology can be a worse UX than native software. But the web's adoption is second to none,
+			browsers run everywhere, and it minimally gatekeeps users and developers, so Zzz chooses
+			distribution and accessibility over perfection.
 		</p>
 		<p>
 			Given its web roots, Zzz uses JS to glue software and machines together how the user wants,
-			maximizing its utility in context across the full stack. It runs locally on your devices using
-			any of your available capabilities, and deploys wherever JS runs to play whatever roles are
-			needed.
+			trying to maximize its utility in context across the full stack. It runs locally on your
+			devices using any of your available capabilities, and deploys wherever JS runs to play
+			whatever roles are needed. It can integrate with all kinds of software unrelated to the web or
+			JS, and it's also an IDE purpose-made for the web.
 		</p>
 		<p>
 			It's based on many kinds of software, borrowing features to provide both end-users and devs an
@@ -375,7 +377,8 @@
 						so do not use this in production
 					</li>
 					<li>
-						soon, more integrations including terminal access, but nothing that powerful before auth
+						soon, more integrations including terminal access assuming Bash, but nothing that
+						powerful before auth
 					</li>
 				</ul>
 			</li>
@@ -436,7 +439,10 @@
 				asking if it sees them available, and this should be configurable and transparent. The
 				Ollama integration is a fine start.
 			</li>
-			<li>I prioritize security but I will make mistakes, help is always appreciated</li>
+			<li>
+				I prioritize security but I have a lot to learn and will make mistakes, help is always
+				appreciated
+			</li>
 		</ul>
 	</section>
 	<hr />
