@@ -207,6 +207,7 @@ const create_error_thrower = <T_Fn extends (...args: Array<any>) => Jsonrpc_Erro
 	};
 };
 
+// TODO BLOCK use jsonrpc_error_messages in more places
 export const jsonrpc_errors = {
 	parse_error: create_error_thrower(jsonrpc_error_messages.parse_error),
 	invalid_request: create_error_thrower(jsonrpc_error_messages.invalid_request),
