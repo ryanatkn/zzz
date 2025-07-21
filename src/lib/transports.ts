@@ -10,14 +10,8 @@ import type {
 	Jsonrpc_Response_Or_Error,
 } from '$lib/jsonrpc.js';
 
-// TODO instead of throwing, maybe switch to all returning errors?
-
-// TODO BLOCK should these be jsonrpc errors?
-
 // TODO figure out the symmetry of frontend and backend transports (none/partial/full?) --
 // we may also need orthogonal abstractions to clarify the transport role
-
-// TODO support configurable/extensible transports
 
 export const Transport_Name = z.string(); // not branded for convenience, will just error at runtime, the schema is just for docs atm
 export type Transport_Name = z.infer<typeof Transport_Name>;
@@ -86,11 +80,11 @@ export class Transports {
 	 * @param transport_name Optional transport to use instead of the current
 	 * @throws when no transport available or ready
 	 */
-	get_transport_or_throw(transport_name?: Transport_Name): Transport {
+	get_ready_transport(transport_name?: Transport_Name): Transport | null {
 		if (this.allow_fallback) {
-			return this.#get_first_ready_or_throw(transport_name);
+			return this.#get_first_ready(transport_name);
 		}
-		return this.#get_exact_or_throw(transport_name);
+		return this.#get_exact(transport_name);
 	}
 
 	/**
@@ -98,16 +92,13 @@ export class Transports {
 	 * @param transport_name Optional transport type to use instead of the current
 	 * @throws when no transport available or ready
 	 */
-	#get_exact_or_throw(transport_name?: Transport_Name): Transport {
+	#get_exact(transport_name?: Transport_Name): Transport | null {
 		const transport = transport_name
 			? this.#transport_by_name.get(transport_name)
 			: this.#current_transport;
 
-		if (!transport) {
-			throw new Error('no transport available');
-		}
-		if (!transport.is_ready()) {
-			throw new Error('transport not ready');
+		if (!transport?.is_ready()) {
+			return null;
 		}
 
 		return transport;
@@ -118,7 +109,7 @@ export class Transports {
 	 * @param transport_name Optional transport type or array of types to use instead of the current
 	 * @throws when no transport available or ready
 	 */
-	#get_first_ready_or_throw(transport_name?: Transport_Name | Array<Transport_Name>): Transport {
+	#get_first_ready(transport_name?: Transport_Name | Array<Transport_Name>): Transport | null {
 		// First try the specified transport(s) if provided
 		if (transport_name) {
 			const transport_names = Array.isArray(transport_name) ? transport_name : [transport_name];

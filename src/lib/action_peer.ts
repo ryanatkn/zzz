@@ -70,9 +70,16 @@ export class Action_Peer {
 		options?: Action_Peer_Send_Options,
 	): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
 		try {
-			const transport = this.transports.get_transport_or_throw(
+			const transport = this.transports.get_ready_transport(
 				options?.transport_name ?? this.default_send_options.transport_name,
 			);
+
+			if (!transport) {
+				this.environment.log?.error('[action_peer.send] no transport available');
+				// TODO BLOCK return a more specific JSON-RPC error
+				return this.#create_fatal_error_response(message);
+			}
+
 			// TODO BLOCK clean up error handling, notice `receive` catches but we intentionally throw here, what should the peer be doing?
 			// I think we should use return values here since
 			// it's a high level abstraction in terms of the module architecture,
