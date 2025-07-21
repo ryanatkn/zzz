@@ -70,7 +70,7 @@ export class Action_Peer {
 		options?: Action_Peer_Send_Options,
 	): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
 		try {
-			const transport = this.transports.get_ready_transport(
+			const transport = this.transports.get_transport(
 				options?.transport_name ?? this.default_send_options.transport_name,
 			);
 

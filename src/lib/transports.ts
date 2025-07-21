@@ -56,6 +56,19 @@ export class Transports {
 		this.#current_transport = transport;
 	}
 
+	/**
+	 * Gets either the current transport or the first ready transport
+	 * depending on `allow_fallback`, or throws an error.
+	 * @param transport_name Optional transport to use instead of the current
+	 * @throws when no transport available or ready
+	 */
+	get_transport(transport_name?: Transport_Name): Transport | null {
+		return this.allow_fallback
+			? this.#get_first_ready(transport_name)
+			: this.#get_exact(transport_name);
+	}
+
+	// TODO these 4 arent used yet but seem useful? `get_transport` is the main method
 	is_ready(): boolean | null {
 		const transport = this.#current_transport;
 		if (!transport) return null;
@@ -72,19 +85,6 @@ export class Transports {
 
 	get_transport_by_name(transport_name: Transport_Name): Transport | null {
 		return this.#transport_by_name.get(transport_name) ?? null;
-	}
-
-	// TODO BLOCK this is not a good name, it's more like `get_transport_or_fallback` or `get_transport_or_first_ready`
-	/**
-	 * Gets either the current transport or the first ready transport
-	 * depending on `allow_fallback`, or throws an error.
-	 * @param transport_name Optional transport to use instead of the current
-	 * @throws when no transport available or ready
-	 */
-	get_ready_transport(transport_name?: Transport_Name): Transport | null {
-		return this.allow_fallback
-			? this.#get_first_ready(transport_name)
-			: this.#get_exact(transport_name);
 	}
 
 	/**
