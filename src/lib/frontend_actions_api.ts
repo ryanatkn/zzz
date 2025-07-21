@@ -3,7 +3,6 @@
 import type {Action_Method, Actions_Api} from '$lib/action_metatypes.js';
 import type {Action_Event_Environment} from '$lib/action_event_types.js';
 import {Action_Event, create_action_event} from '$lib/action_event.js';
-import {is_jsonrpc_error_message} from '$lib/jsonrpc_helpers.js';
 import type {
 	Action_Spec_Union,
 	Local_Call_Action_Spec,
@@ -54,6 +53,7 @@ const create_action_method = (environment: Action_Event_Environment, spec: Actio
 	}
 };
 
+// TODO BLOCK thrown jsonrpc error type?
 // TODO maybe move this?
 const extract_result_or_throw = (event: Action_Event): any => {
 	const {data} = event;
@@ -136,9 +136,6 @@ const create_request_response_method = (
 
 		const response = await environment.peer.send(event.data.request);
 
-		// TODO BLOCK what to do if this is an error? it's currently transitioning to "handled"
-		console.log(`response`, response);
-
 		event.transition('receive_response');
 
 		// TODO @api shouldn't this happen in the peer like the other method calls?
@@ -146,16 +143,7 @@ const create_request_response_method = (
 
 		await event.parse().handle_async();
 
-		// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-		if (event.data.step === 'handled') {
-			return event.data.output;
-		}
-
-		if (is_jsonrpc_error_message(response)) {
-			throw new Error(response.error.message);
-		}
-
-		throw new Error('no output received');
+		return extract_result_or_throw(event);
 	};
 };
 

@@ -385,6 +385,45 @@ describe('Action_Event', () => {
 			expect(event.data.output).toEqual(response.result);
 		});
 
+		test('error response transitions to failed state on parse', () => {
+			const env = new Test_Environment([ping_action_spec]);
+
+			const event = create_action_event(env, ping_action_spec, undefined);
+			event.parse();
+			// Need to handle and transition first
+			event.handle_sync = () => {
+				// Mock sync handling
+			};
+			event.data.step = 'handled';
+			event.data.request = {
+				jsonrpc: '2.0',
+				id: create_uuid(),
+				method: 'ping',
+			};
+
+			event.transition('receive_response');
+
+			const errorResponse = {
+				jsonrpc: '2.0',
+				id: event.data.request.id,
+				error: {
+					code: -32603,
+					message: 'Internal error',
+					data: {details: 'Test error'},
+				},
+			} as const;
+
+			event.set_response(errorResponse);
+
+			// Parse should detect the error and transition to failed
+			event.parse();
+
+			expect(event.data.step).toBe('failed');
+			expect(event.data.error).toEqual(errorResponse.error);
+			expect(event.data.response).toEqual(errorResponse);
+			expect(event.data.output).toBe(null);
+		});
+
 		test('set_notification() sets notification data', () => {
 			const env = new Test_Environment([filer_change_action_spec]);
 			env.executor = 'frontend';

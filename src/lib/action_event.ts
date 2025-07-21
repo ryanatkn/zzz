@@ -122,6 +122,12 @@ export class Action_Event<
 			throw new Error(`cannot parse from step '${this.#data.step}' - must be 'initial'`);
 		}
 
+		// Propagate any existing error, short-circuiting parsing.
+		if (this.#data.response && 'error' in this.#data.response) {
+			this.#fail(this.#data.response.error);
+			return this;
+		}
+
 		try {
 			const parsed_input = parse_action_input(this.spec.method, this.#data.input);
 			this.#transition_step('parsed', {input: parsed_input});

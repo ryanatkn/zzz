@@ -14,7 +14,6 @@
 		GLYPH_XMARK,
 	} from '$lib/glyphs.js';
 	import type {Action} from '$lib/action.svelte.js';
-	import type {Action_Method} from '$lib/action_metatypes.js';
 	import {format_timestamp} from '$lib/time_helpers.js';
 
 	const {
@@ -23,10 +22,8 @@
 		action: Action;
 	} = $props();
 
-	// TODO refactor these
-
-	const get_operation_icon = (method: Action_Method) => {
-		switch (method) {
+	const operation_icon = $derived.by(() => {
+		switch (action.method) {
 			case 'ollama_pull':
 				return GLYPH_DOWNLOAD;
 			case 'ollama_create':
@@ -41,9 +38,10 @@
 			default:
 				return GLYPH_INFO;
 		}
-	};
+	});
 
-	const get_operation_color = (step: string) => {
+	const operation_color = $derived.by(() => {
+		const step = action.action_event_data?.step || 'initial';
 		switch (step) {
 			case 'handled':
 				return 'color_b';
@@ -54,27 +52,24 @@
 			default:
 				return '';
 		}
-	};
+	});
 
-	// Extract model name from action input if available
-	const get_model_name = (action: Action): string | undefined => {
+	const model_name = $derived.by(() => {
 		const input = action.action_event_data?.input;
 		if (input && typeof input === 'object' && 'model' in input) {
 			return (input as any).model;
 		}
 		return undefined;
-	};
+	});
 
-	// Get error message from action event
-	const get_error_message = (action: Action): string | undefined => {
+	const error_message = $derived.by(() => {
 		const error = action.action_event_data?.error;
 		if (error && typeof error === 'object' && 'message' in error) {
 			return (error as any).message;
 		}
 		return undefined;
-	};
+	});
 
-	// TODO refactor
 	const progress_percent = $derived.by(() => {
 		const progress = action.action_event_data?.progress;
 		if (
@@ -92,37 +87,36 @@
 		return null;
 	});
 
-	// TODO BLOCK failed pull shows as successful
-
 	// TODO hacky, probably need to refine the data flow for action events
 	const pending = $derived(
-		action.action_event_data?.phase !== 'receive_response' ||
-			(progress_percent !== 100 && !(action.action_event_data.step === 'handled')),
+		action.action_event_data?.step === 'handling' ||
+			(action.action_event_data?.phase !== 'receive_response' &&
+				action.action_event_data?.step !== 'failed' &&
+				action.action_event_data?.step !== 'handled'),
 	);
 </script>
 
 <li transition:slide class="py_xs3">
-	<div
-		class="border_radius_xs {pending ? 'bg_2' : 'bg_1'} {get_operation_color(
-			action.action_event_data?.step || 'initial',
-		)}"
-	>
+	<div class="border_radius_xs {pending ? 'bg_2' : 'bg_1'} {operation_color}">
 		<div class="display_flex justify_content_space_between align_items_center p_sm">
-			<div class="display_flex gap_sm align_items_center">
+			<div class="display_flex gap_md align_items_center">
 				{#if pending}
 					<Pending_Animation />
 				{:else}
-					<Glyph glyph={action.success ? GLYPH_CHECKMARK : GLYPH_XMARK} />
+					<Glyph
+						glyph={action.success ? GLYPH_CHECKMARK : GLYPH_XMARK}
+						class={action.failed ? 'color_c_5' : undefined}
+					/>
 				{/if}
-				<Glyph glyph={get_operation_icon(action.method)} />
+				<Glyph glyph={operation_icon} />
 				<div class="font_weight_600">{action.method}</div>
-				{#if get_model_name(action)}
+				{#if model_name}
 					<div class="flex_1 font_family_mono font_size_sm ellipsis">
-						<div class="ellipsis">{get_model_name(action)}</div>
+						<div class="ellipsis">{model_name}</div>
 					</div>
 				{/if}
-				{#if action.failed && get_error_message(action)}
-					<div class="font_size_sm">- {get_error_message(action)}</div>
+				{#if action.failed && error_message}
+					<div class="font_size_sm color_c_5 font_weight_500">{error_message}</div>
 				{/if}
 			</div>
 			<span class="font_size_sm">

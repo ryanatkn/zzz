@@ -82,7 +82,6 @@ export class Action_Peer {
 				);
 			}
 
-			// Transports now return error responses instead of throwing
 			const result = await transport.send(message);
 			return result;
 		} catch (error) {
