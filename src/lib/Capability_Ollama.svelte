@@ -41,8 +41,6 @@
 				}
 			: undefined;
 	});
-
-	// TODO BLOCK is not showing pending correctly clicking refresh/reset
 </script>
 
 <div class="display_flex flex_column">
