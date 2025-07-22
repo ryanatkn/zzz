@@ -1590,7 +1590,6 @@ export const src_json = {
 				{name: 'SERVER_URL', kind: 'variable'},
 				{name: 'SERVER_PROXIED_PORT', kind: 'variable'},
 				{name: 'BACKEND_ARTIFICIAL_RESPONSE_DELAY', kind: 'variable'},
-				{name: 'ZZZ_CACHE_DIRNAME', kind: 'variable'},
 				{name: 'ZZZ_CACHE_DIR', kind: 'variable'},
 				{name: 'CONTENT_PREVIEW_LENGTH', kind: 'variable'},
 				{name: 'API_PATH', kind: 'variable'},
@@ -1770,6 +1769,7 @@ export const src_json = {
 			declarations: [
 				{name: 'Diskfile_Change_Type', kind: 'variable'},
 				{name: 'Diskfile_Path', kind: 'variable'},
+				{name: 'Diskfile_Directory_Path', kind: 'variable'},
 				{name: 'Diskfile_Change', kind: 'variable'},
 				{name: 'Serializable_Source_File', kind: 'variable'},
 				{name: 'Diskfile_Json', kind: 'variable'},

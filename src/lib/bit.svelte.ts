@@ -136,13 +136,11 @@ export abstract class Bit<T extends z.ZodType = typeof Bit_Json_Base> extends Ce
 		const index = this.attributes.findIndex((a) => a.id === id);
 		if (index === -1) return false;
 
-		// Create a new attributes array to ensure reactivity
+		// TODO refactor this code, maybe update directly? using svelte 5 idioms
 		const new_attributes = [...this.attributes];
 
-		// Get the attribute to update
 		const attr = new_attributes[index];
 
-		// Apply updates directly
 		if ('key' in updates && updates.key !== undefined) {
 			attr.key = updates.key;
 		}
@@ -151,7 +149,6 @@ export abstract class Bit<T extends z.ZodType = typeof Bit_Json_Base> extends Ce
 			attr.value = updates.value;
 		}
 
-		// Replace the entire array to ensure reactivity
 		this.attributes = new_attributes;
 
 		return true;
@@ -212,7 +209,6 @@ export const Bit_Schema = z.instanceof(Bit);
 export class Text_Bit extends Bit<typeof Text_Bit_Json> {
 	override readonly type = 'text';
 
-	// Direct content storage
 	override content: string = $state()!;
 
 	constructor(options: Text_Bit_Options) {
