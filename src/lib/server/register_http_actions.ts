@@ -30,6 +30,7 @@ export const register_http_actions = ({path, app, backend}: Register_Actions_Opt
 
 	app.post(final_path, async (c) => {
 		try {
+			// TODO BLOCK @many use correct JSON-RPC error message, parse_error, should be the ONLY place it's returned
 			const json = await c.req.json();
 			const response = await backend.receive(json);
 			return c.json(response);

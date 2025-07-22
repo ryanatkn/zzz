@@ -1,5 +1,7 @@
 // @slop Claude Opus 4
 
+import {DEV} from 'esm-env';
+
 import type {Action_Method} from '$lib/action_metatypes.js';
 import type {Action_Spec_Union} from '$lib/action_spec.js';
 import type {
@@ -12,9 +14,6 @@ import {
 	validate_step_transition,
 	validate_phase_transition,
 	should_validate_output,
-	create_parse_error,
-	create_validation_error,
-	create_handler_error,
 	is_action_complete,
 	create_initial_data,
 	get_initial_phase,
@@ -23,7 +22,7 @@ import {
 	is_notification_send_with_parsed_input,
 } from '$lib/action_event_helpers.js';
 import type {Action_Event_Datas} from '$lib/action_collections.js';
-import {parse_action_input, parse_action_output} from '$lib/action_collection_helpers.js';
+import {safe_parse_action_input, safe_parse_action_output} from '$lib/action_collection_helpers.js';
 import {
 	create_jsonrpc_request,
 	create_jsonrpc_response,
@@ -32,7 +31,8 @@ import {
 	to_jsonrpc_params,
 	to_jsonrpc_result,
 } from '$lib/jsonrpc_helpers.js';
-import {create_uuid} from '$lib/zod_helpers.js';
+import {create_uuid, format_zod_validation_error} from '$lib/zod_helpers.js';
+import {jsonrpc_error_messages} from '$lib/jsonrpc_errors.js';
 import type {
 	Jsonrpc_Request,
 	Jsonrpc_Response_Or_Error,
@@ -40,6 +40,7 @@ import type {
 	Jsonrpc_Error_Json,
 } from '$lib/jsonrpc.js';
 import type {Action_Kind} from '$lib/action_types.js';
+import {UNKNOWN_ERROR_MESSAGE} from './constants.js';
 
 // TODO maybe just use runes in this module and remove `observe`
 export type Action_Event_Change_Observer<T_Method extends Action_Method> = (
@@ -128,11 +129,17 @@ export class Action_Event<
 			return this;
 		}
 
-		try {
-			const parsed_input = parse_action_input(this.spec.method, this.#data.input);
-			this.#transition_step('parsed', {input: parsed_input});
-		} catch (error) {
-			this.#fail(create_parse_error(error));
+		const parsed = safe_parse_action_input(this.spec.method, this.#data.input);
+		if (parsed.success) {
+			this.#transition_step('parsed', {input: parsed.data});
+		} else {
+			this.#fail(
+				// no need to protect this info
+				jsonrpc_error_messages.invalid_params(
+					`failed to parse input: ${format_zod_validation_error(parsed.error)}`,
+					{validation_errors: parsed.error.errors},
+				),
+			);
 		}
 
 		return this;
@@ -162,7 +169,14 @@ export class Action_Event<
 			const result = await handler(this);
 			this.#complete_handling(result);
 		} catch (error) {
-			this.#fail(create_handler_error(error));
+			this.#fail(
+				// TODO @many what simpler/safer/more correct patterns are there for protecting errors/info in prod?
+				DEV
+					? jsonrpc_error_messages.internal_error(error.message || UNKNOWN_ERROR_MESSAGE, {
+							error: String(error),
+						})
+					: jsonrpc_error_messages.internal_error(),
+			);
 		}
 	}
 
@@ -192,7 +206,14 @@ export class Action_Event<
 			const result = handler(this);
 			this.#complete_handling(result);
 		} catch (error) {
-			this.#fail(create_handler_error(error));
+			this.#fail(
+				// TODO @many what simpler/safer/more correct patterns are there for protecting errors/info in prod?
+				DEV
+					? jsonrpc_error_messages.internal_error(error.message || UNKNOWN_ERROR_MESSAGE, {
+							error: String(error),
+						})
+					: jsonrpc_error_messages.internal_error(),
+			);
 		}
 	}
 
@@ -298,13 +319,21 @@ export class Action_Event<
 		return undefined;
 	}
 
-	#complete_handling(result: unknown): void {
-		if (result !== undefined && should_validate_output(this.spec.kind, this.#data.phase)) {
-			try {
-				const parsed_output = parse_action_output(this.spec.method, result);
-				this.#transition_step('handled', {output: parsed_output});
-			} catch (error) {
-				this.#fail(create_validation_error('output', error));
+	#complete_handling(output: unknown): void {
+		if (output !== undefined && should_validate_output(this.spec.kind, this.#data.phase)) {
+			const parsed = safe_parse_action_output(this.spec.method, output);
+			if (parsed.success) {
+				this.#transition_step('handled', {output: parsed.data});
+			} else {
+				this.#fail(
+					// TODO @many what simpler/safer/more correct patterns are there for protecting errors/info in prod?
+					DEV
+						? jsonrpc_error_messages.validation_error(
+								`failed to parse output: ${format_zod_validation_error(parsed.error)}`,
+								{output, validation_errors: parsed.error.errors},
+							)
+						: jsonrpc_error_messages.validation_error('failed to parse output'),
+				);
 			}
 		} else {
 			this.#transition_step('handled');

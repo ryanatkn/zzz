@@ -144,3 +144,14 @@ export const get_inner_array_schema = (schema: z.ZodTypeAny): z.ZodArray<any> | 
 
 export const stringify_zod_error = (error: z.ZodError): string =>
 	error.issues.map((issue) => issue.message).join(', '); // TODO improve
+
+/**
+ * Formats a Zod validation error with field paths for clearer error messages.
+ */
+export const format_zod_validation_error = (error: z.ZodError): string =>
+	error.errors
+		.map((e) => {
+			const path = e.path.length > 0 ? `${e.path.join('.')}: ` : '';
+			return `${path}${e.message}`;
+		})
+		.join(', ');

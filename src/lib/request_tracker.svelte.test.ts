@@ -323,7 +323,7 @@ describe('Request_Tracker', () => {
 
 			// Verify promise rejects with the correct error
 			await expect(deferred.promise).rejects.toBeInstanceOf(Thrown_Jsonrpc_Error);
-			
+
 			const rejection_error = await deferred.promise.catch((err) => err);
 			expect(rejection_error.code).toBe(error.error.code);
 			expect(rejection_error.message).toBe(error.error.message);
@@ -380,11 +380,11 @@ describe('Request_Tracker', () => {
 				const deferred = tracker.track_request(id);
 				tracker.reject_request(id, error);
 				await expect(deferred.promise).rejects.toBeInstanceOf(Thrown_Jsonrpc_Error); // eslint-disable-line no-await-in-loop
-				
+
 				const rejection_error = await deferred.promise.catch((err) => err); // eslint-disable-line no-await-in-loop
 				expect(rejection_error.code).toBe(error.error.code);
 				expect(rejection_error.message).toBe(error.error.message);
-				
+
 				expect(tracker.pending_requests.has(id)).toBe(false);
 			}
 		});
@@ -470,7 +470,7 @@ describe('Request_Tracker', () => {
 
 			// Verify promise rejects with correct error
 			await expect(deferred.promise).rejects.toBeInstanceOf(Thrown_Jsonrpc_Error);
-			
+
 			const rejection_error = await deferred.promise.catch((err) => err);
 			expect(rejection_error.code).toBe(message.error.code);
 			expect(rejection_error.message).toBe(message.error.message);
@@ -602,7 +602,7 @@ describe('Request_Tracker', () => {
 
 			// Promise should be rejected with the error
 			await expect(deferred.promise).rejects.toBeInstanceOf(Thrown_Jsonrpc_Error);
-			
+
 			const rejection_error = await deferred.promise.catch((err) => err);
 			expect(rejection_error.code).toBe(message.error.code);
 			expect(rejection_error.message).toBe(message.error.message);
@@ -717,7 +717,7 @@ describe('Request_Tracker', () => {
 			const timeout1 = tracker.pending_requests.get(id1)?.timeout;
 			const timeout2 = tracker.pending_requests.get(id2)?.timeout;
 
-			// Set up promise rejection tracking  
+			// Set up promise rejection tracking
 			const promise1 = expect(deferred1.promise).rejects.toBeInstanceOf(Thrown_Jsonrpc_Error);
 			const promise2 = expect(deferred2.promise).rejects.toBeInstanceOf(Thrown_Jsonrpc_Error);
 

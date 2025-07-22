@@ -41,10 +41,15 @@ export type Jsonrpc_Error_Name =
  */
 export const JSONRPC_ERROR_CODES = {
 	// Standard JSON-RPC errors - https://www.jsonrpc.org/specification
+	/** -32700 */
 	parse_error: JSONRPC_PARSE_ERROR,
+	/** -32600 */
 	invalid_request: JSONRPC_INVALID_REQUEST,
+	/** -32601 */
 	method_not_found: JSONRPC_METHOD_NOT_FOUND,
+	/** -32602 */
 	invalid_params: JSONRPC_INVALID_PARAMS,
+	/** -32603 */
 	internal_error: JSONRPC_INTERNAL_ERROR,
 
 	// These are the application-specific errors (-32000 to -32099,
@@ -71,6 +76,10 @@ export const JSONRPC_ERROR_CODES = {
 	forbidden: -32002 as Jsonrpc_Error_Code,
 	not_found: -32003 as Jsonrpc_Error_Code,
 	conflict: -32004 as Jsonrpc_Error_Code,
+	/**
+	 * For application-level validation failures (e.g., business logic validation).
+	 * Use `invalid_params` (-32602) for schema/parsing failures of input parameters.
+	 */
 	validation_error: -32005 as Jsonrpc_Error_Code,
 	rate_limited: -32006 as Jsonrpc_Error_Code,
 	service_unavailable: -32007 as Jsonrpc_Error_Code,
@@ -144,7 +153,6 @@ export const jsonrpc_error_messages = {
 		data,
 	}),
 
-	// TODO BLOCK should be used, make sure we do Zod.safeParse for clarity
 	validation_error: (message: string = 'validation error', data?: unknown): Jsonrpc_Error_Json => ({
 		code: JSONRPC_ERROR_CODES.validation_error,
 		message,
