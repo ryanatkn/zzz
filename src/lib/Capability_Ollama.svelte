@@ -32,7 +32,7 @@
 		// Start polling for `ps` status if not already started
 		const started_polling = !ollama.ps_polling_enabled;
 		if (started_polling) {
-			ollama.start_ps_polling({immediate: false}); // refresh does this above
+			ollama.start_ps_polling({immediate: capabilities.ollama.status !== 'initial'}); // may be refreshed in `init_ollama_check`
 		}
 
 		return started_polling

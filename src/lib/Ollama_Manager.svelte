@@ -35,7 +35,7 @@
 	// like using SvelteKit's snapshots - https://svelte.dev/docs/kit/snapshots
 
 	onMount(() => {
-		void ollama.refresh();
+		void ollama.refresh(); // TODO maybe only if `this.ollama.status === 'initial'` like the capability?
 
 		// TODO @many probably want a different state to capture user intent of enabling polling, but the whole UX may change
 		// Start polling for `ps` status if not already started
