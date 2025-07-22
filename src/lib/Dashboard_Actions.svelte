@@ -9,11 +9,11 @@
 	import Time_Widget from '$lib/Time_Widget.svelte';
 	import {random_item} from '@ryanatkn/belt/random.js';
 
-	let selected_action: Action | null = $state(null);
-
 	const app = app_context.get();
 
 	const {actions} = $derived(app);
+
+	let selected_action: Action | null = $state(null);
 </script>
 
 <div class="column p_lg h_100">
@@ -31,7 +31,10 @@
 		<button
 			type="button"
 			class="compact"
-			onclick={() => actions.items.clear()}
+			onclick={() => {
+				actions.items.clear();
+				selected_action = null;
+			}}
 			disabled={!actions.items.size}
 		>
 			clear action history
