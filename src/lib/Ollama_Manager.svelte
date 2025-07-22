@@ -138,57 +138,55 @@
 				</div>
 			</section>
 
-			{#if ollama.available}
-				{#if ollama.models_downloaded.length > 0}
-					<!-- downloaded models -->
+			{#if ollama.models_downloaded.length > 0}
+				<!-- downloaded models -->
+				<section>
+					<h3 class="mt_xl3 mb_md">
+						{ollama.models_downloaded.length} model{plural(ollama.models_downloaded.length)}
+					</h3>
+
+					<menu class="unstyled column">
+						{#each ollama.models_downloaded as model (model.id)}
+							<li transition:slide>
+								<Ollama_Model_Listitem {model} />
+							</li>
+						{/each}
+					</menu>
+				</section>
+				<!-- models not downloaded -->
+				{#if ollama.models_not_downloaded.length > 0}
 					<section>
 						<h3 class="mt_xl3 mb_md">
-							{ollama.models_downloaded.length} model{plural(ollama.models_downloaded.length)}
+							{ollama.models_not_downloaded.length} not downloaded
 						</h3>
 
 						<menu class="unstyled column">
-							{#each ollama.models_downloaded as model (model.id)}
+							{#each ollama.models_not_downloaded as model (model.id)}
 								<li transition:slide>
-									<Ollama_Model_Listitem {model} />
+									<Ollama_Model_Listitem
+										{model}
+										onclick={async () => {
+											await model.navigate_to_download();
+										}}
+									/>
 								</li>
 							{/each}
 						</menu>
 					</section>
-					<!-- models not downloaded -->
-					{#if ollama.models_not_downloaded.length > 0}
-						<section>
-							<h3 class="mt_xl3 mb_md">
-								{ollama.models_not_downloaded.length} not downloaded
-							</h3>
-
-							<menu class="unstyled column">
-								{#each ollama.models_not_downloaded as model (model.id)}
-									<li transition:slide>
-										<Ollama_Model_Listitem
-											{model}
-											onclick={async () => {
-												await model.navigate_to_download();
-											}}
-										/>
-									</li>
-								{/each}
-							</menu>
-						</section>
-					{/if}
-				{:else}
-					<section class="panel p_md" transition:slide>
-						<p>
-							no models found, <button
-								type="button"
-								class="inline compact"
-								disabled={ollama.manager_selected_view === 'pull'}
-								onclick={() => ollama.set_manager_view('pull', null)}>pull a model</button
-							>
-							or install them using the
-							<External_Link href="https://github.com/ollama/ollama">Ollama CLI</External_Link>
-						</p>
-					</section>
 				{/if}
+			{:else if ollama.available}
+				<section class="panel p_md" transition:slide>
+					<p>
+						no models found, <button
+							type="button"
+							class="inline compact"
+							disabled={ollama.manager_selected_view === 'pull'}
+							onclick={() => ollama.set_manager_view('pull', null)}>pull a model</button
+						>
+						or install them using the
+						<External_Link href="https://github.com/ollama/ollama">Ollama CLI</External_Link>
+					</p>
+				</section>
 			{/if}
 		</div>
 	</div>

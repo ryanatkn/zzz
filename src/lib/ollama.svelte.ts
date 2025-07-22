@@ -106,7 +106,9 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	}
 
 	// Derived state
-	readonly available: boolean = $derived(this.list_status === 'success');
+	readonly available: boolean = $derived(
+		this.list_status === 'success' || this.ps_status === 'success',
+	);
 
 	// TODO maybe move this to an index for automatic filtering/sorting?
 	readonly actions = $derived(
