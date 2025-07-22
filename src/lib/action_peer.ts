@@ -43,7 +43,7 @@ export interface Action_Peer_Options {
 export class Action_Peer {
 	readonly environment: Action_Event_Environment;
 	readonly transports: Transports;
-	// TODO maybe could be refactored in the direction of `transports` being sending, so what's receiving?
+	// TODO maybe expand the pattern of using `transports` in send, so what's used in receive?
 	// It seems abstracting that out would make this class much simpler and generic, but too much so?
 	// What deps should it actually know about, and what gains could we have by making it more decoupled?
 	// e.g. don't just decouple for the sake of imagined flexibility!
@@ -93,11 +93,6 @@ export class Action_Peer {
 
 	async receive(message: unknown): Promise<Jsonrpc_Message_From_Server_To_Client | null> {
 		try {
-			// TODO better validation? move to `#receive_message`?
-			if (!message || typeof message !== 'object') {
-				return create_jsonrpc_error_message(null, jsonrpc_error_messages.parse_error());
-			}
-
 			const result = await this.#receive_message(message);
 			return result;
 		} catch (error) {
