@@ -29,6 +29,8 @@ import type {
 export const backend_action_handlers: Backend_Action_Handlers = {
 	ping: {
 		receive_request: ({data: {request}}) => {
+			// TODO BLOCK @many these errors need to render correctly
+			throw Error('ois');
 			console.log(
 				`[backend_action_handlers.ping.receive_request] ping receive_request message`,
 				request,
@@ -241,6 +243,8 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 	ollama_list: {
 		receive_request: async () => {
 			console.log('[backend_action_handlers.ollama_list.receive_request] listing models');
+			// TODO BLOCK @many these errors need to render correctly
+			throw Error('bleh2');
 
 			try {
 				const response = (await ollama.list()) as unknown as Ollama_List_Response;
@@ -257,6 +261,8 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 
 	ollama_ps: {
 		receive_request: async () => {
+			// TODO BLOCK @many these errors need to render correctly
+			throw Error('bleh');
 			console.log('[backend_action_handlers.ollama_ps.receive_request] getting running models');
 
 			try {
