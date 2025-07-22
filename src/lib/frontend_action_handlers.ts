@@ -135,8 +135,9 @@ export const frontend_action_handlers: Frontend_Action_Handlers = {
 	},
 
 	ollama_list: {
-		send_request: () => {
+		send_request: ({app}) => {
 			console.log('[frontend_action_handlers] sending ollama_list request');
+			app.ollama.list_status = 'pending';
 		},
 		receive_response: ({app, data: {output}}) => {
 			console.log('[frontend_action_handlers] received ollama_list response:', output);
@@ -144,8 +145,9 @@ export const frontend_action_handlers: Frontend_Action_Handlers = {
 		},
 	},
 	ollama_ps: {
-		send_request: () => {
+		send_request: ({app}) => {
 			console.log('[frontend_action_handlers] sending ollama_ps request');
+			app.ollama.ps_status = 'pending';
 		},
 		receive_response: ({app, data: {output}}) => {
 			console.log('[frontend_action_handlers] received ollama_ps response:', output);

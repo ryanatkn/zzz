@@ -49,7 +49,7 @@
 	<div class="py_sm display_flex gap_sm align_items_start">
 		<div class="flex_1">
 			<div
-				class="w_100 chip plain flex_1 font_size_xl flex_column mb_lg"
+				class="w_100 chip plain flex_1 flex_column mb_lg"
 				style:display="display_flex !important"
 				style:align-items="flex-start !important"
 				style:font-weight="400 !important"
@@ -59,13 +59,18 @@
 				class:color_e={capabilities.ollama.status === 'initial'}
 			>
 				<div class="column justify_content_center gap_xs pl_md" style:min-height="80px">
-					ollama {capabilities.ollama.status === 'success'
-						? 'available'
-						: capabilities.ollama.status === 'failure'
-							? 'unavailable'
-							: capabilities.ollama.status === 'pending'
-								? 'checking'
-								: 'not checked'}
+					<div class="font_size_xl">
+						ollama {capabilities.ollama.status === 'success'
+							? 'available'
+							: capabilities.ollama.status === 'failure'
+								? 'unavailable'
+								: capabilities.ollama.status === 'pending'
+									? 'checking'
+									: 'not checked'}
+						{#if capabilities.ollama.status === 'pending'}
+							<Pending_Animation inline />
+						{/if}
+					</div>
 					<span class="font_family_mono font_size_sm"
 						>{ollama.host}
 						{#if capabilities.ollama.data?.round_trip_time}<span
@@ -88,9 +93,7 @@
 					/>
 					<span class="font_size_lg font_weight_400 ml_md">
 						{#if capabilities.ollama.status === 'pending'}
-							<div class="display_inline_flex align_items_end">
-								checking <div class="position_relative"><Pending_Animation /></div>
-							</div>
+							checking <Pending_Animation inline />
 						{:else if capabilities.ollama.status === 'success'}
 							refresh
 						{:else}
