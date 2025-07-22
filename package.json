@@ -435,6 +435,11 @@
       "svelte": "./dist/Contextmenu_Entry_Toggle.svelte",
       "default": "./dist/Contextmenu_Entry_Toggle.svelte"
     },
+    "./Dashboard_Actions.svelte": {
+      "types": "./dist/Dashboard_Actions.svelte.d.ts",
+      "svelte": "./dist/Dashboard_Actions.svelte",
+      "default": "./dist/Dashboard_Actions.svelte"
+    },
     "./Dashboard_Capabilities.svelte": {
       "types": "./dist/Dashboard_Capabilities.svelte.d.ts",
       "svelte": "./dist/Dashboard_Capabilities.svelte",
@@ -459,11 +464,6 @@
       "types": "./dist/Dashboard_Home.svelte.d.ts",
       "svelte": "./dist/Dashboard_Home.svelte",
       "default": "./dist/Dashboard_Home.svelte"
-    },
-    "./Dashboard_Actions.svelte": {
-      "types": "./dist/Dashboard_Actions.svelte.d.ts",
-      "svelte": "./dist/Dashboard_Actions.svelte",
-      "default": "./dist/Dashboard_Actions.svelte"
     },
     "./Dashboard_Models.svelte": {
       "types": "./dist/Dashboard_Models.svelte.d.ts",

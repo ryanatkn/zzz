@@ -1,20 +1,12 @@
 <script lang="ts">
 	import Pending_Animation from '@ryanatkn/fuz/Pending_Animation.svelte';
 
-	import type {Zzz_Dir} from '$lib/diskfile_types.js';
 	import {frontend_context} from '$lib/frontend.svelte.js';
-
-	const {
-		zzz_dir: zzz_dir_prop,
-	}: {
-		zzz_dir?: Zzz_Dir | null | undefined;
-	} = $props();
 
 	const app = frontend_context.get();
 	const {capabilities} = app;
 
-	// Fall back to the context value if not provided
-	const zzz_dir = $derived(zzz_dir_prop !== undefined ? zzz_dir_prop : app.zzz_cache_dir);
+	const zzz_cache_dir = $derived(app.zzz_cache_dir);
 </script>
 
 <div
@@ -41,12 +33,12 @@
 			{/if}
 		</div>
 		<small class="font_family_mono">
-			{#if zzz_dir === undefined || zzz_dir === null}
+			{#if zzz_cache_dir === undefined || zzz_cache_dir === null}
 				&nbsp;
-			{:else if zzz_dir === ''}
+			{:else if zzz_cache_dir === ''}
 				no backend directory configured
 			{:else}
-				{zzz_dir}
+				{zzz_cache_dir}
 			{/if}
 		</small>
 	</div>
@@ -54,7 +46,7 @@
 
 <p>
 	This is the backend's filesystem directory. For security reasons, filesystem operations are scoped
-	to this directory, and symlinks are not followed. Defaults to the backend's current working
+	to this directory and they do not follow symlinks. Defaults to the backend's current working
 	directory. To configure it set the .env variable
-	<code class="font_size_sm">PUBLIC_ZZZ_DIR</code>. Configure at your own risk.
+	<code class="font_size_sm">PUBLIC_ZZZ_CACHE_DIR</code>. Configure at your own risk.
 </p>

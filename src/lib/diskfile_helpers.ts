@@ -7,16 +7,9 @@ import {
 	Diskfile_Change_Type,
 	Diskfile_Path,
 	Serializable_Source_File,
-	Zzz_Dir,
 	type Diskfile_Json,
 } from '$lib/diskfile_types.js';
 import type {Diskfile} from '$lib/diskfile.svelte.js';
-import {ZZZ_CACHE_DIRNAME} from '$lib/constants.js';
-
-export const to_zzz_cache_dir = (
-	dir: Zzz_Dir,
-	dirname: string = ZZZ_CACHE_DIRNAME,
-): Diskfile_Path => Diskfile_Path.parse(dir + dirname);
 
 // TODO probably extract to `@ryanatkn/belt/path.js`
 export const is_path_absolute = (path: string): boolean => path[0] === '/';

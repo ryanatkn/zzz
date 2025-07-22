@@ -19,8 +19,7 @@ import {Time} from '$lib/time.svelte.js';
 import {Ollama} from '$lib/ollama.svelte.js';
 import type {Zzz_Config} from '$lib/config_helpers.js';
 import {BOTS_DEFAULT} from '$lib/config_defaults.js';
-import {Zzz_Dir, type Diskfile_Path} from '$lib/diskfile_types.js';
-import {ZZZ_CACHE_DIRNAME} from '$lib/constants.js';
+import {Diskfile_Directory_Path, Diskfile_Path} from '$lib/diskfile_types.js';
 import {Url_Params} from '$lib/url_params.svelte.js';
 import {cell_classes} from '$lib/cell_classes.js';
 import {Cell_Json} from '$lib/cell_types.js';
@@ -108,27 +107,21 @@ export class Frontend extends Cell<typeof Frontend_Json> implements Action_Event
 	readonly bots: Zzz_Config['bots'];
 
 	// TODO maybe instead of this pattern with getters/setters, using an encoder?
-	#zzz_dir: Zzz_Dir | null | undefined = $state(null); // TODO should this be undefined?
+	#zzz_cache_dir: Diskfile_Directory_Path | null | undefined = $state(null); // TODO should this be undefined?
 
 	/**
-	 * The `zzz_dir` is the path to Zzz's primary directory on the server's filesystem.
+	 * The `zzz_cache_dir` is the path to Zzz's primary directory on the server's filesystem.
 	 * The server's `scoped_fs` instance restricts operations to this directory.
 	 * The value is `undefined` when uninitialized,
 	 * `null` when loading, and `''` when disabled or no server.
 	 */
-	get zzz_dir(): Zzz_Dir | null | undefined {
-		return this.#zzz_dir;
+	get zzz_cache_dir(): Diskfile_Directory_Path | null | undefined {
+		return this.#zzz_cache_dir;
 	}
-	set zzz_dir(value: string | null | undefined) {
-		const parsed = value == null ? value : Zzz_Dir.safeParse(value);
-		this.#zzz_dir = parsed == null ? parsed : parsed.data;
+	set zzz_cache_dir(value: string | null | undefined) {
+		const parsed = value == null ? value : Diskfile_Directory_Path.safeParse(value);
+		this.#zzz_cache_dir = parsed == null ? parsed : parsed.data;
 	}
-
-	zzz_cache_dirname: string = ZZZ_CACHE_DIRNAME; // TODO make this configurable
-
-	readonly zzz_cache_dir: string | null | undefined = $derived(
-		this.zzz_dir && this.zzz_dir + this.zzz_cache_dirname,
-	);
 
 	// TODO refactor
 	readonly tags: Set<string> = $derived.by(() => {
@@ -223,7 +216,6 @@ export class Frontend extends Cell<typeof Frontend_Json> implements Action_Event
 
 	// TODO refactor, probably `app.session`
 	receive_session(data: Action_Outputs['load_session']['data']): void {
-		this.zzz_dir = data.zzz_dir;
 		this.zzz_cache_dir = data.zzz_cache_dir;
 
 		if (Array.isArray(data.files)) {

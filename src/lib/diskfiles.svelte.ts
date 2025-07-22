@@ -135,7 +135,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 
 	async create_file(filename: string, content: string = ''): Promise<void> {
 		if (!this.app.zzz_cache_dir) {
-			throw new Error('cannot create file: zzz_dir is not set');
+			throw new Error('cannot create file: zzz_cache_dir is not set');
 		}
 
 		// TODO @many how to handle paths? need some more structure to the way they're normalized and joined
@@ -149,7 +149,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 
 	async create_directory(dirname: string): Promise<void> {
 		if (!this.app.zzz_cache_dir) {
-			throw new Error('cannot create directory: zzz_dir is not set');
+			throw new Error('cannot create directory: zzz_cache_dir is not set');
 		}
 
 		const path = Diskfile_Path.parse(`${this.app.zzz_cache_dir}${dirname}`);
@@ -162,7 +162,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 	}
 
 	// TODO make this a derived property?
-	/** Like `app.zzz_dir`, `undefined` means uninitialized, `null` means loading, `''` means none */
+	/** The value `undefined` means uninitialized, `null` means loading, `''` means none */
 	to_relative_path(path: string): string | null | undefined {
 		const {zzz_cache_dir} = this.app;
 		return zzz_cache_dir && to_relative_path(path, zzz_cache_dir);

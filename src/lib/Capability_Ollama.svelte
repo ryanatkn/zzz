@@ -82,6 +82,7 @@
 				<button
 					type="button"
 					class="flex_1 justify_content_start"
+					class:color_a={capabilities.ollama.status === 'initial'}
 					disabled={capabilities.ollama.status === 'pending'}
 					onclick={() => capabilities.check_ollama()}
 				>

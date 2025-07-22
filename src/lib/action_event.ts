@@ -40,7 +40,7 @@ import type {
 	Jsonrpc_Error_Json,
 } from '$lib/jsonrpc.js';
 import type {Action_Kind} from '$lib/action_types.js';
-import {UNKNOWN_ERROR_MESSAGE} from './constants.js';
+import {UNKNOWN_ERROR_MESSAGE} from '$lib/constants.js';
 
 // TODO maybe just use runes in this module and remove `observe`
 export type Action_Event_Change_Observer<T_Method extends Action_Method> = (

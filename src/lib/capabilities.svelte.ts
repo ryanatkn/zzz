@@ -5,13 +5,13 @@ import type {Async_Status} from '@ryanatkn/belt/async.js';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {Cell_Json} from '$lib/cell_types.js';
-import type {Zzz_Dir} from '$lib/diskfile_types.js';
 import type {Jsonrpc_Request_Id} from '$lib/jsonrpc.js';
 import type {
 	Ollama_List_Response,
 	Ollama_List_Response_Item,
 	Ollama_Ps_Response,
 } from '$lib/ollama_helpers.js';
+import type {Diskfile_Directory_Path} from '$lib/diskfile_types.js';
 
 // TODO namerbot capability, uses backend+(at least one provider) (or rethink its role in a bigger picture, not just names)
 
@@ -70,8 +70,7 @@ export interface Websocket_Capability_Data {
 }
 
 export interface Filesystem_Capability_Data {
-	zzz_dir: Zzz_Dir | null | undefined;
-	zzz_cache_dir: string | null | undefined;
+	zzz_cache_dir: Diskfile_Directory_Path | null | undefined;
 }
 
 export interface Ollama_Capability_Data {
@@ -130,11 +129,11 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 	});
 
 	/**
-	 * The filesystem capability derives its state from the backend and `zzz_dir`.
+	 * The filesystem capability derives its state from the backend and `zzz_cache_dir`.
 	 */
 	readonly filesystem: Capability<Filesystem_Capability_Data | null | undefined> = $derived.by(
 		() => {
-			const {zzz_dir, zzz_cache_dir} = this.app;
+			const {zzz_cache_dir} = this.app;
 			let status: Async_Status;
 
 			if (this.backend.status !== 'success') {
@@ -155,7 +154,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 
 			return {
 				name: 'filesystem',
-				data: status === 'success' ? {zzz_dir, zzz_cache_dir} : undefined,
+				data: status === 'success' ? {zzz_cache_dir} : undefined,
 				status,
 				message_id: null,
 				error_message: null,
@@ -323,6 +322,7 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 			await this.app.ollama.refresh();
 		} catch (error) {
 			console.error('failed to check Ollama:', error);
+			// TODO BLOCK I think we need to handle the error here? or elsewhere
 			// Error handling is done in the ollama class itself
 		}
 	}

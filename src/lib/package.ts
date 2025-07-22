@@ -358,6 +358,11 @@ export const package_json = {
 			svelte: './dist/Contextmenu_Entry_Toggle.svelte',
 			default: './dist/Contextmenu_Entry_Toggle.svelte',
 		},
+		'./Dashboard_Actions.svelte': {
+			types: './dist/Dashboard_Actions.svelte.d.ts',
+			svelte: './dist/Dashboard_Actions.svelte',
+			default: './dist/Dashboard_Actions.svelte',
+		},
 		'./Dashboard_Capabilities.svelte': {
 			types: './dist/Dashboard_Capabilities.svelte.d.ts',
 			svelte: './dist/Dashboard_Capabilities.svelte',
@@ -382,11 +387,6 @@ export const package_json = {
 			types: './dist/Dashboard_Home.svelte.d.ts',
 			svelte: './dist/Dashboard_Home.svelte',
 			default: './dist/Dashboard_Home.svelte',
-		},
-		'./Dashboard_Actions.svelte': {
-			types: './dist/Dashboard_Actions.svelte.d.ts',
-			svelte: './dist/Dashboard_Actions.svelte',
-			default: './dist/Dashboard_Actions.svelte',
 		},
 		'./Dashboard_Models.svelte': {
 			types: './dist/Dashboard_Models.svelte.d.ts',
@@ -1162,7 +1162,6 @@ export const src_json = {
 				{name: 'to_action_spec_identifier', kind: 'function'},
 				{name: 'to_action_spec_input_identifier', kind: 'function'},
 				{name: 'to_action_spec_output_identifier', kind: 'function'},
-				{name: 'to_action_spec_auth_identifier', kind: 'function'},
 			],
 		},
 		'./Action_List.svelte': {
@@ -1592,7 +1591,7 @@ export const src_json = {
 				{name: 'SERVER_PROXIED_PORT', kind: 'variable'},
 				{name: 'BACKEND_ARTIFICIAL_RESPONSE_DELAY', kind: 'variable'},
 				{name: 'ZZZ_CACHE_DIRNAME', kind: 'variable'},
-				{name: 'ZZZ_DIR', kind: 'variable'},
+				{name: 'ZZZ_CACHE_DIR', kind: 'variable'},
 				{name: 'CONTENT_PREVIEW_LENGTH', kind: 'variable'},
 				{name: 'API_PATH', kind: 'variable'},
 				{name: 'API_URL', kind: 'variable'},
@@ -1624,6 +1623,10 @@ export const src_json = {
 			path: 'Contextmenu_Entry_Toggle.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
 		},
+		'./Dashboard_Actions.svelte': {
+			path: 'Dashboard_Actions.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./Dashboard_Capabilities.svelte': {
 			path: 'Dashboard_Capabilities.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
@@ -1642,10 +1645,6 @@ export const src_json = {
 		},
 		'./Dashboard_Home.svelte': {
 			path: 'Dashboard_Home.svelte',
-			declarations: [{name: 'default', kind: 'component'}],
-		},
-		'./Dashboard_Actions.svelte': {
-			path: 'Dashboard_Actions.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
 		},
 		'./Dashboard_Models.svelte': {
@@ -1699,7 +1698,6 @@ export const src_json = {
 		'./diskfile_helpers.js': {
 			path: 'diskfile_helpers.ts',
 			declarations: [
-				{name: 'to_zzz_cache_dir', kind: 'function'},
 				{name: 'is_path_absolute', kind: 'function'},
 				{name: 'to_relative_path', kind: 'function'},
 				{name: 'map_watcher_change_to_diskfile_change', kind: 'function'},
@@ -1773,7 +1771,6 @@ export const src_json = {
 				{name: 'Diskfile_Change_Type', kind: 'variable'},
 				{name: 'Diskfile_Path', kind: 'variable'},
 				{name: 'Diskfile_Change', kind: 'variable'},
-				{name: 'Zzz_Dir', kind: 'variable'},
 				{name: 'Serializable_Source_File', kind: 'variable'},
 				{name: 'Diskfile_Json', kind: 'variable'},
 				{name: 'Diskfile_Json_Input', kind: 'type'},

@@ -2,15 +2,13 @@ import {Filer, type Cleanup_Watch, type Source_File} from '@ryanatkn/gro/filer.j
 import type {Watcher_Change} from '@ryanatkn/gro/watch_dir.js';
 import {resolve} from 'node:path';
 import {Logger} from '@ryanatkn/belt/log.js';
-import {ensure_end} from '@ryanatkn/belt/string.js';
 
 import type {Action_Spec_Union} from '$lib/action_spec.js';
 import type {Zzz_Config} from '$lib/config_helpers.js';
-import {Diskfile_Path, Zzz_Dir} from '$lib/diskfile_types.js';
+import {Diskfile_Directory_Path, Diskfile_Path} from '$lib/diskfile_types.js';
 import {Scoped_Fs} from '$lib/server/scoped_fs.js';
 import {Action_Registry} from '$lib/action_registry.js';
-import {ZZZ_CACHE_DIRNAME} from '$lib/constants.js';
-import {to_zzz_cache_dir} from '$lib/diskfile_helpers.js';
+import {ZZZ_CACHE_DIR} from '$lib/constants.js';
 import type {Backend_Action_Handlers} from '$lib/server/backend_action_types.js';
 import type {Action_Event_Phase, Action_Event_Environment} from '$lib/action_event_types.js';
 import type {Action_Method} from '$lib/action_metatypes.js';
@@ -44,16 +42,9 @@ export interface Filer_Instance {
 
 export interface Backend_Options {
 	/**
-	 * Directories that Zzz is allowed to read from and write to.
+	 * Directory path for the Zzz cache.
 	 */
-	zzz_dir: string;
-	/**
-	 * Directory name for the Zzz cache.
-	 *
-	 * @relative
-	 * @no_trailing_slash
-	 */
-	zzz_cache_dirname?: string; // TODO @many move this info to path schemas
+	zzz_cache_dir?: string; // TODO @many move this info to path schemas
 	/**
 	 * Configuration for the backend and AI providers.
 	 */
@@ -83,12 +74,8 @@ export interface Backend_Options {
 export class Backend implements Action_Event_Environment {
 	readonly executor: Action_Executor = 'backend';
 
-	/** The root Zzz directory on the backend's filesystem. */
-	readonly zzz_dir: Zzz_Dir;
-	/** The Zzz cache directory name, defaults to `.zzz`. */
-	readonly zzz_cache_dirname: string;
 	/** The full path to the Zzz cache directory. */
-	readonly zzz_cache_dir: Diskfile_Path;
+	readonly zzz_cache_dir: Diskfile_Directory_Path;
 
 	readonly config: Zzz_Config;
 
@@ -127,10 +114,7 @@ export class Backend implements Action_Event_Environment {
 	readonly #handle_filer_change: Filer_Change_Handler;
 
 	constructor(options: Backend_Options) {
-		// Parse the allowed filesystem directories
-		this.zzz_dir = Zzz_Dir.parse(ensure_end(resolve(options.zzz_dir), '/')); // TODO @many if the class get more paths to deal with, add a `cwd` option - for now callers can just resolve to absolute themselves
-		this.zzz_cache_dirname = options.zzz_cache_dirname ?? ZZZ_CACHE_DIRNAME;
-		this.zzz_cache_dir = to_zzz_cache_dir(this.zzz_dir, this.zzz_cache_dirname); // TODO @many if the class get more paths to deal with, add a `cwd` option - for now callers can just resolve to absolute themselves
+		this.zzz_cache_dir = Diskfile_Path.parse(resolve(options.zzz_cache_dir || ZZZ_CACHE_DIR));
 
 		this.config = options.config;
 

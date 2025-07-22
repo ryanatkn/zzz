@@ -55,7 +55,6 @@ export const backend_action_handlers: Backend_Action_Handlers = {
 			return {
 				data: {
 					files: files_array,
-					zzz_dir: backend.zzz_dir,
 					zzz_cache_dir: backend.zzz_cache_dir,
 				},
 			};

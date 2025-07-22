@@ -4,9 +4,9 @@ import {z} from 'zod';
 
 import {
 	Diskfile_Change,
+	Diskfile_Directory_Path,
 	Diskfile_Path,
 	Serializable_Source_File,
-	Zzz_Dir,
 } from '$lib/diskfile_types.js';
 import {
 	Completion_Message,
@@ -63,8 +63,7 @@ export const load_session_action_spec = {
 			data: z
 				// TODO extract this schema to diskfile_types or something
 				.object({
-					zzz_dir: Zzz_Dir,
-					zzz_cache_dir: Diskfile_Path,
+					zzz_cache_dir: Diskfile_Directory_Path,
 					files: z.array(Serializable_Source_File),
 				})
 				.strict(),
