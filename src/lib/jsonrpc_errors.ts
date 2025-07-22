@@ -62,8 +62,9 @@ export const JSONRPC_ERROR_CODES = {
 	unauthenticated: -32001 as Jsonrpc_Error_Code,
 	/**
 	 * This could be `unauthorized` for better symmetry with `unauthenticated`,
-	 * but we choose to name it the same as HTTP status code 403 to avoid confusion
-	 * with 401 which is badly named "unauthorized".
+	 * but Zzz names it the same as HTTP status code 403 to avoid confusion
+	 * with 401 which is incorrectly named "unauthorized" in HTTP
+	 * (basics were still being figured out, this is backwards compat in action).
 	 *
 	 * @see https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status#client_error_responses
 	 */
