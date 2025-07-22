@@ -13,6 +13,8 @@
 
 	const {actions} = $derived(app);
 
+	// TODO could potentially be removed from the collection by some external process,
+	// so having this state be component-local solves some problems but not all
 	let selected_action: Action | null = $state(null);
 </script>
 
