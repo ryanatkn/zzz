@@ -62,6 +62,9 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	list_round_trip_time: number | null = $state(null);
 	last_refreshed: string | null = $state(null);
 
+	// Track if Ollama has ever successfully responded
+	ever_responded: boolean = $state(false);
+
 	// PS (running models) state
 	ps_response: Ollama_Ps_Response | null = $state.raw(null);
 	ps_status: Async_Status = $state('initial');
@@ -107,7 +110,9 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 
 	// Derived state
 	readonly available: boolean = $derived(
-		this.list_status === 'success' || this.ps_status === 'success',
+		this.list_status === 'success' ||
+			this.ps_status === 'success' ||
+			(this.ever_responded && (this.list_status === 'pending' || this.ps_status === 'pending')),
 	);
 
 	// TODO maybe move this to an index for automatic filtering/sorting?
@@ -298,6 +303,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 		this.list_status = 'success';
 		this.list_error = null;
 		this.list_last_updated = Date.now();
+		this.ever_responded = true;
 
 		// Sync with app.models
 		this.#sync_models_with_list_response(response);
@@ -339,6 +345,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 		this.ps_response = response;
 		this.ps_status = 'success';
 		this.ps_error = null;
+		this.ever_responded = true;
 	}
 
 	/**

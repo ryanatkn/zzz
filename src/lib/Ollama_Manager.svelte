@@ -61,14 +61,14 @@
 				<div class="display_flex gap_sm align_items_start">
 					<div
 						class="flex_1 chip plain display_flex justify_content_start font_weight_400"
-						class:color_b={ollama.list_status === 'success'}
-						class:color_c={ollama.list_status === 'failure'}
-						class:color_d={ollama.list_status === 'pending'}
-						class:color_e={ollama.list_status === 'initial'}
+						class:color_b={ollama.available}
+						class:color_c={!ollama.available && ollama.list_status === 'failure'}
+						class:color_d={!ollama.available && ollama.list_status === 'pending'}
+						class:color_e={!ollama.available && ollama.list_status === 'initial'}
 					>
 						<div class="column justify_content_center gap_xs p_md">
 							<span class="font_size_lg">
-								Ollama {ollama.list_status === 'success'
+								Ollama {ollama.available
 									? `connected`
 									: ollama.list_status === 'failure'
 										? 'unavailable'
