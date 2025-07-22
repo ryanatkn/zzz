@@ -14,6 +14,8 @@ import {
 // some of this is awkward, see `create_jsonrpc_error_message`
 // and `create_jsonrpc_error_message_from_thrown` in `jsonrpc_helpers.ts`
 
+// TODO of these, maybe implement `timeout` first, refine the API
+
 /**
  * Includes standard JSON-RPC error codes and application-specific errors.
  */
@@ -23,7 +25,7 @@ export type Jsonrpc_Error_Name =
 	| 'method_not_found'
 	| 'invalid_params'
 	| 'internal_error'
-	| 'unauthenticated'
+	| 'unauthenticated' // begin application-specific errors
 	| 'forbidden'
 	| 'not_found'
 	| 'conflict'
@@ -31,22 +33,27 @@ export type Jsonrpc_Error_Name =
 	| 'rate_limited'
 	| 'service_unavailable'
 	| 'timeout'
-	| 'insufficient_storage'
+	// | 'insufficient_storage'
 	| 'ai_provider_error';
 
 /**
  * Extended JSON-RPC error codes with application-specific errors.
  */
 export const JSONRPC_ERROR_CODES = {
-	// Standard JSON-RPC errors
+	// Standard JSON-RPC errors - https://www.jsonrpc.org/specification
 	parse_error: JSONRPC_PARSE_ERROR,
 	invalid_request: JSONRPC_INVALID_REQUEST,
 	method_not_found: JSONRPC_METHOD_NOT_FOUND,
 	invalid_params: JSONRPC_INVALID_PARAMS,
 	internal_error: JSONRPC_INTERNAL_ERROR,
 
-	// TODO BLOCK review/use these, comment out the unused ones
-	// Application-specific errors (-32000 to -32099)
+	// These are the application-specific errors (-32000 to -32099,
+	// JSONRPC_SERVER_ERROR_START to JSONRPC_SERVER_ERROR_END)
+	// defined in the spec - https://www.jsonrpc.org/specification
+
+	// Casts to `Jsonrpc_Error_Code` because parse has a runtime cost
+	// and this is needed for the exported types.
+
 	/**
 	 * Same as HTTP status code 401 "unauthorized", but correctly named.
 	 *
@@ -67,7 +74,7 @@ export const JSONRPC_ERROR_CODES = {
 	rate_limited: -32006 as Jsonrpc_Error_Code,
 	service_unavailable: -32007 as Jsonrpc_Error_Code,
 	timeout: -32008 as Jsonrpc_Error_Code,
-	insufficient_storage: -32009 as Jsonrpc_Error_Code,
+	// insufficient_storage: -32009 as Jsonrpc_Error_Code,
 	// file_too_large: -32010 as Jsonrpc_Error_Code,
 	// unsupported_media_type: -32011 as Jsonrpc_Error_Code,
 
@@ -136,6 +143,7 @@ export const jsonrpc_error_messages = {
 		data,
 	}),
 
+	// TODO BLOCK should be used, make sure we do Zod.safeParse for clarity
 	validation_error: (message: string = 'validation error', data?: unknown): Jsonrpc_Error_Json => ({
 		code: JSONRPC_ERROR_CODES.validation_error,
 		message,
@@ -163,14 +171,14 @@ export const jsonrpc_error_messages = {
 		data,
 	}),
 
-	insufficient_storage: (
-		message: string = 'insufficient storage',
-		data?: unknown,
-	): Jsonrpc_Error_Json => ({
-		code: JSONRPC_ERROR_CODES.insufficient_storage,
-		message,
-		data,
-	}),
+	// insufficient_storage: (
+	// 	message: string = 'insufficient storage',
+	// 	data?: unknown,
+	// ): Jsonrpc_Error_Json => ({
+	// 	code: JSONRPC_ERROR_CODES.insufficient_storage,
+	// 	message,
+	// 	data,
+	// }),
 
 	ai_provider_error: (provider?: string, message?: string, data?: unknown): Jsonrpc_Error_Json => ({
 		code: JSONRPC_ERROR_CODES.ai_provider_error,
@@ -221,7 +229,7 @@ export const jsonrpc_errors = {
 	rate_limited: create_error_thrower(jsonrpc_error_messages.rate_limited),
 	service_unavailable: create_error_thrower(jsonrpc_error_messages.service_unavailable),
 	timeout: create_error_thrower(jsonrpc_error_messages.timeout),
-	insufficient_storage: create_error_thrower(jsonrpc_error_messages.insufficient_storage),
+	// insufficient_storage: create_error_thrower(jsonrpc_error_messages.insufficient_storage),
 	ai_provider_error: create_error_thrower(jsonrpc_error_messages.ai_provider_error),
 } as const satisfies Record<Jsonrpc_Error_Name, (...args: Array<any>) => Thrown_Jsonrpc_Error>;
 
@@ -251,9 +259,9 @@ export const http_status_to_jsonrpc_code = (status: number): Jsonrpc_Error_Code 
 			return JSONRPC_ERROR_CODES.service_unavailable;
 		case 504:
 			return JSONRPC_ERROR_CODES.timeout;
-		case 507:
-			return JSONRPC_ERROR_CODES.insufficient_storage;
+		// case 507:
+		// 	return JSONRPC_ERROR_CODES.insufficient_storage;
 		default:
-			return JSONRPC_ERROR_CODES.internal_error;
+			return JSONRPC_ERROR_CODES.internal_error; // TODO maybe unknown instead?
 	}
 };
