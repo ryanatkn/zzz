@@ -259,11 +259,19 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	}
 
 	/**
+	 * Handle the start of a list operation.
+	 */
+	handle_ollama_list_start(): void {
+		console.log('[ollama.handle_ollama_list_start] starting list request');
+		this.list_status = 'pending';
+	}
+
+	/**
 	 * List all models available on the Ollama server and sync with app.models.
 	 */
-	handle_ollama_list(response: Ollama_List_Response | null): void {
+	handle_ollama_list_complete(response: Ollama_List_Response | null): void {
 		if (!response) {
-			console.error('[ollama.handle_ollama_list] no response');
+			console.error('[ollama.handle_ollama_list_complete] no response');
 			this.list_response = null;
 			this.list_status = 'failure';
 			this.list_error = NO_RESPONSE_ERROR_MESSAGE;
@@ -272,7 +280,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 		}
 
 		console.log(
-			`[ollama.handle_ollama_list] success, found ${response.models.length} models`,
+			`[ollama.handle_ollama_list_complete] success, found ${response.models.length} models`,
 			response,
 		);
 
@@ -280,7 +288,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 		if (DEV) {
 			const parsed = Ollama_List_Response.safeParse(response);
 			if (!parsed.success) {
-				console.error(`[ollama.handle_ollama_list] failed to parse:`, parsed.error);
+				console.error(`[ollama.handle_ollama_list_complete] failed to parse:`, parsed.error);
 			}
 		}
 
@@ -294,11 +302,19 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 	}
 
 	/**
+	 * Handle the start of a ps operation.
+	 */
+	handle_ollama_ps_start(): void {
+		console.log('[ollama.handle_ollama_ps_start] starting ps request');
+		this.ps_status = 'pending';
+	}
+
+	/**
 	 * Get the list of currently running models.
 	 */
-	handle_ollama_ps(response: Ollama_Ps_Response | null): void {
+	handle_ollama_ps_complete(response: Ollama_Ps_Response | null): void {
 		if (!response) {
-			console.error('[ollama.handle_ollama_ps] no response');
+			console.error('[ollama.handle_ollama_ps_complete] no response');
 			this.ps_response = null;
 			this.ps_status = 'failure';
 			this.ps_error = NO_RESPONSE_ERROR_MESSAGE;
@@ -306,7 +322,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 		}
 
 		console.log(
-			`[ollama.handle_ollama_ps] success, found ${response.models.length} running models`,
+			`[ollama.handle_ollama_ps_complete] success, found ${response.models.length} running models`,
 			response,
 		);
 
@@ -314,7 +330,7 @@ export class Ollama extends Cell<typeof Ollama_Json> {
 		if (DEV) {
 			const parsed = Ollama_Ps_Response.safeParse(response);
 			if (!parsed.success) {
-				console.error(`[ollama.handle_ollama_ps] failed to parse:`, parsed.error);
+				console.error(`[ollama.handle_ollama_ps_complete] failed to parse:`, parsed.error);
 			}
 		}
 
