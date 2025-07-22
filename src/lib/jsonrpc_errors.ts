@@ -241,36 +241,3 @@ export const jsonrpc_errors = {
 	// insufficient_storage: create_error_thrower(jsonrpc_error_messages.insufficient_storage),
 	ai_provider_error: create_error_thrower(jsonrpc_error_messages.ai_provider_error),
 } as const satisfies Record<Jsonrpc_Error_Name, (...args: Array<any>) => Thrown_Jsonrpc_Error>;
-
-// TODO review, is slop
-/**
- * Maps HTTP status codes to JSON-RPC error codes.
- */
-export const http_status_to_jsonrpc_code = (status: number): Jsonrpc_Error_Code => {
-	switch (status) {
-		case 400:
-			return JSONRPC_ERROR_CODES.invalid_params;
-		case 401:
-			return JSONRPC_ERROR_CODES.unauthenticated; // fixes the HTTP code name -- https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Status#client_error_responses
-		case 403:
-			return JSONRPC_ERROR_CODES.forbidden; // preserves the HTTP code name instead of going with the better-rhyming "unauthorized" to avoid confusion with 401's incorrect name
-		case 404:
-			return JSONRPC_ERROR_CODES.not_found;
-		case 409:
-			return JSONRPC_ERROR_CODES.conflict;
-		case 422:
-			return JSONRPC_ERROR_CODES.validation_error;
-		case 429:
-			return JSONRPC_ERROR_CODES.rate_limited;
-		case 500:
-			return JSONRPC_ERROR_CODES.internal_error;
-		case 503:
-			return JSONRPC_ERROR_CODES.service_unavailable;
-		case 504:
-			return JSONRPC_ERROR_CODES.timeout;
-		// case 507:
-		// 	return JSONRPC_ERROR_CODES.insufficient_storage;
-		default:
-			return JSONRPC_ERROR_CODES.internal_error; // TODO maybe unknown instead?
-	}
-};

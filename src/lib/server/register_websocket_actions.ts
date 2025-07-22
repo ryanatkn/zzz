@@ -7,6 +7,7 @@ import {verify_origin, type Allowed_Origins} from '$lib/server/security.js';
 import {BACKEND_ARTIFICIAL_RESPONSE_DELAY, SERVER_URL} from '$lib/constants.js';
 import {noop_middleware} from '$lib/server/server_helpers.js';
 import {Backend_Websocket_Transport} from '$lib/server/backend_websocket_transport.js';
+import {jsonrpc_error_messages} from '$lib/jsonrpc_errors.js';
 
 export interface Register_Websocket_Actions_Options {
 	path: string;
@@ -52,7 +53,8 @@ export const register_websocket_actions = ({
 				try {
 					json = JSON.parse(String(event.data)); // eslint-disable-line @typescript-eslint/no-base-to-string
 				} catch (error) {
-					backend.log?.error(`[ws] received non-json message`, error);
+					backend.log?.error(`[ws] JSON parse error:`, error);
+					ws.send(JSON.stringify(jsonrpc_error_messages.parse_error()));
 					return;
 				}
 

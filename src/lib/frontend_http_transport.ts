@@ -1,15 +1,12 @@
 // @slop Claude Opus 4
 
 import {DEV} from 'esm-env';
-import {
-	Thrown_Jsonrpc_Error,
-	jsonrpc_error_messages,
-	http_status_to_jsonrpc_code,
-} from '$lib/jsonrpc_errors.js';
+import {Thrown_Jsonrpc_Error, jsonrpc_error_messages} from '$lib/jsonrpc_errors.js';
 import {
 	create_jsonrpc_error_message,
 	to_jsonrpc_message_id,
 	is_jsonrpc_error_message,
+	http_status_to_jsonrpc_error_code,
 } from '$lib/jsonrpc_helpers.js';
 import type {Transport} from '$lib/transports.js';
 import type {
@@ -55,7 +52,7 @@ export class Frontend_Http_Transport implements Transport {
 			if (!response.ok) {
 				console.error('[http] error sending message:', response.status, response.statusText);
 				return create_jsonrpc_error_message(to_jsonrpc_message_id(message), {
-					code: http_status_to_jsonrpc_code(response.status),
+					code: http_status_to_jsonrpc_error_code(response.status),
 					message: `HTTP error: ${response.status} ${response.statusText}`,
 				});
 			}
@@ -65,7 +62,7 @@ export class Frontend_Http_Transport implements Transport {
 			// In development, check if we got a JSON-RPC error with HTTP 200
 			// and verify the error code matches the expected HTTP status.
 			if (DEV && is_jsonrpc_error_message(result)) {
-				const expected_code = http_status_to_jsonrpc_code(response.status);
+				const expected_code = http_status_to_jsonrpc_error_code(response.status);
 				const actual_code = result.error.code;
 				if (actual_code !== expected_code) {
 					console.warn(
