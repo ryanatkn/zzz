@@ -52,9 +52,11 @@ export class Browser_Tabs extends Cell<typeof Browser_Tabs_Json> {
 
 	recently_closed_tabs: Array<Browser_Tab> = $state([]);
 
-	selected_tab: Browser_Tab | undefined = $derived(this.ordered_tabs.find((t) => t.selected));
+	readonly selected_tab: Browser_Tab | undefined = $derived(
+		this.ordered_tabs.find((t) => t.selected),
+	);
 
-	selected_url: string = $derived(this.selected_tab?.url || '');
+	readonly selected_url: string = $derived(this.selected_tab?.url || '');
 
 	constructor(options: Browser_Tabs_Options) {
 		super(Browser_Tabs_Json, options);

@@ -28,7 +28,7 @@ export class Domain_Viewmodel {
 	ssl_enabled: boolean = $state()!;
 
 	/** Whether the form has unsaved changes. */
-	has_changes = $derived.by(
+	readonly has_changes = $derived.by(
 		() =>
 			this.domain === null ||
 			this.domain_name !== this.domain.name ||

@@ -126,12 +126,12 @@ export class Frontend extends Cell<typeof Frontend_Json> implements Action_Event
 
 	zzz_cache_dirname: string = ZZZ_CACHE_DIRNAME; // TODO make this configurable
 
-	zzz_cache_dir: string | null | undefined = $derived(
+	readonly zzz_cache_dir: string | null | undefined = $derived(
 		this.zzz_dir && this.zzz_dir + this.zzz_cache_dirname,
 	);
 
 	// TODO refactor
-	tags: Set<string> = $derived.by(() => {
+	readonly tags: Set<string> = $derived.by(() => {
 		const tag_set: Set<string> = new Set();
 		for (const model of this.models.items.by_id.values()) {
 			for (const tag of model.tags) {
@@ -219,10 +219,10 @@ export class Frontend extends Cell<typeof Frontend_Json> implements Action_Event
 		this.init();
 	}
 
-	// TODO think about this API, keep it more minimal
+	// TODO think about what the scope of the frontend object's API should be, keep it more minimal than these methods
 
 	// TODO refactor, probably `app.session`
-	receive_session(data: any): void {
+	receive_session(data: Action_Outputs['load_session']['data']): void {
 		this.zzz_dir = data.zzz_dir;
 		this.zzz_cache_dir = data.zzz_cache_dir;
 

@@ -30,7 +30,7 @@ export class Project_Viewmodel {
 	editing_project: boolean = $state(false);
 
 	/** Whether the form has unsaved changes. */
-	has_changes = $derived.by(
+	readonly has_changes = $derived.by(
 		() =>
 			this.project &&
 			(this.edited_name !== this.project.name ||

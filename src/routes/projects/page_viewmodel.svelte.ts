@@ -93,7 +93,7 @@ export class Page_Viewmodel {
 	content: string = $state()!;
 
 	/** Whether the form has unsaved changes. */
-	has_changes = $derived.by(
+	readonly has_changes = $derived.by(
 		() =>
 			this.current_page &&
 			(this.title !== this.current_page.title ||
