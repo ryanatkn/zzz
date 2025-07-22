@@ -52,6 +52,8 @@ export class Frontend_Websocket_Transport implements Transport {
 				}
 			} catch (error) {
 				console.error('[ws] error parsing WebSocket message:', error);
+				// TODO maybe send the whole thing back wrapped in an error?
+				// can't reference anything else for a response
 			}
 		};
 	}

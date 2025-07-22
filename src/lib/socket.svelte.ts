@@ -86,6 +86,7 @@ export class Socket extends Cell<typeof Socket_Json> {
 	message_queue: Array<Queued_Message> = $state([]);
 	failed_messages: SvelteMap<string, Failed_Message> = new SvelteMap();
 
+	// TODO BLOCK make these sets (SvelteSet?)
 	// Event handlers - can be assigned by consumers
 	onmessage: Socket_Action_Handler | null = $state(null);
 	onerror: Socket_Error_Handler | null = $state(null);
