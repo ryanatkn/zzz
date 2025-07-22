@@ -86,10 +86,9 @@ export class Socket extends Cell<typeof Socket_Json> {
 	message_queue: Array<Queued_Message> = $state([]);
 	failed_messages: SvelteMap<string, Failed_Message> = new SvelteMap();
 
-	// TODO BLOCK make these sets (SvelteSet?)
-	// Event handlers - can be assigned by consumers
-	onmessage: Socket_Action_Handler | null = $state(null);
-	onerror: Socket_Error_Handler | null = $state(null);
+	// Event handlers
+	#message_handlers: Set<Socket_Action_Handler> = new Set();
+	#error_handlers: Set<Socket_Error_Handler> = new Set();
 
 	// Derived properties
 	readonly connected: boolean = $derived(this.open && this.status === 'success');
@@ -400,7 +399,6 @@ export class Socket extends Cell<typeof Socket_Json> {
 		}, this.current_reconnect_delay);
 	}
 
-	// Public method that delegates to private implementation
 	maybe_reconnect(): void {
 		this.#maybe_reconnect();
 	}
@@ -410,6 +408,26 @@ export class Socket extends Cell<typeof Socket_Json> {
 	 */
 	cancel_reconnect(): void {
 		this.#cancel_reconnect();
+	}
+
+	/**
+	 * Add a message handler and return a function to remove it.
+	 * @param handler The message handler to add
+	 * @returns A function that removes the handler when called
+	 */
+	add_message_handler(handler: Socket_Action_Handler): () => void {
+		this.#message_handlers.add(handler);
+		return () => this.#message_handlers.delete(handler);
+	}
+
+	/**
+	 * Add an error handler and return a function to remove it.
+	 * @param handler The error handler to add
+	 * @returns A function that removes the handler when called
+	 */
+	add_error_handler(handler: Socket_Error_Handler): () => void {
+		this.#error_handlers.add(handler);
+		return () => this.#error_handlers.delete(handler);
 	}
 
 	#cancel_reconnect(): void {
@@ -429,7 +447,6 @@ export class Socket extends Cell<typeof Socket_Json> {
 		this.#start_heartbeat();
 		this.last_connect_time = Date.now();
 
-		// Try to send any queued messages
 		if (this.has_queued_messages) {
 			this.retry_queued_messages();
 		}
@@ -438,7 +455,6 @@ export class Socket extends Cell<typeof Socket_Json> {
 	#handle_close = (_: CloseEvent): void => {
 		this.open = false;
 
-		// Only change status and try to reconnect if this wasn't initiated by the client
 		if (this.status === 'success' || this.status === 'pending') {
 			this.status = 'failure';
 			this.#maybe_reconnect();
@@ -446,23 +462,27 @@ export class Socket extends Cell<typeof Socket_Json> {
 	};
 
 	#handle_error = (event: Event): void => {
-		this.onerror?.(event);
+		for (const handler of this.#error_handlers) {
+			handler(event);
+		}
 
 		console.error('[socket] websocket error occurred:', event);
 		this.status = 'failure';
 
 		// The WebSocket will close after an error, but we need to make sure
-		// the socket state is updated now in case close doesn't fire for some reason
+		// the socket state is updated now in case close doesn't fire for some reason.
 		this.open = false;
 
-		// Some errors might not trigger the close event, so we force a reconnection attempt
-		// This ensures we don't get stuck when errors occur
+		// Some errors might not trigger the close event, so we force a reconnection attempt.
+		// This ensures we don't get stuck when errors occur.
 		this.#maybe_reconnect();
 	};
 
 	#handle_message = (event: MessageEvent): void => {
 		this.last_receive_time = Date.now();
 
-		this.onmessage?.(event);
+		for (const handler of this.#message_handlers) {
+			handler(event);
+		}
 	};
 }

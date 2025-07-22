@@ -29,13 +29,15 @@ export class Frontend_Websocket_Transport implements Transport {
 
 	#socket: Socket;
 	#request_tracker: Request_Tracker;
+	#remove_message_handler: (() => void) | null;
+	#remove_error_handler: (() => void) | null;
 
 	constructor(socket: Socket, request_timeout_ms?: number) {
 		this.#socket = socket;
 		this.#request_tracker = new Request_Tracker(request_timeout_ms);
 
-		// TODO better API to support more listeners?
-		socket.onmessage = async (event) => {
+		// TODO maybe we want to do this setup elsewhere, not hardcoded like this
+		this.#remove_message_handler = socket.add_message_handler(async (event) => {
 			try {
 				const data = JSON.parse(event.data);
 
@@ -55,7 +57,12 @@ export class Frontend_Websocket_Transport implements Transport {
 				// TODO maybe send the whole thing back wrapped in an error?
 				// can't reference anything else for a response
 			}
-		};
+		});
+
+		this.#remove_error_handler = socket.add_error_handler((event) => {
+			// TODO do what?
+			console.error('[ws] WebSocket error:', event);
+		});
 	}
 
 	async send(message: Jsonrpc_Request): Promise<Jsonrpc_Response_Or_Error>;
@@ -112,5 +119,17 @@ export class Frontend_Websocket_Transport implements Transport {
 
 	is_ready(): boolean {
 		return this.#socket.connected;
+	}
+
+	// TODO ? not called, maybe add to base class?
+	dispose(): void {
+		if (this.#remove_message_handler) {
+			this.#remove_message_handler();
+			this.#remove_message_handler = null;
+		}
+		if (this.#remove_error_handler) {
+			this.#remove_error_handler();
+			this.#remove_error_handler = null;
+		}
 	}
 }

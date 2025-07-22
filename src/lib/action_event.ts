@@ -151,10 +151,11 @@ export class Action_Event<
 	// TODO add timeout support
 	// TODO add cancellation support
 	async handle_async(): Promise<void> {
+		if (this.#data.step === 'failed') {
+			return; // already failed, no-op
+		}
 		if (this.#data.step !== 'parsed') {
-			throw new Error(
-				`cannot handle from step '${this.#data.step}' - must be 'parsed': ${this.#data.error?.message}`,
-			);
+			throw new Error(`cannot handle from step '${this.#data.step}' - must be 'parsed'`);
 		}
 
 		this.#transition_step('handling', this.#create_handling_updates());
@@ -188,10 +189,11 @@ export class Action_Event<
 			throw new Error('handle_sync can only be used with synchronous local_call actions');
 		}
 
+		if (this.#data.step === 'failed') {
+			return; // already failed, no-op
+		}
 		if (this.#data.step !== 'parsed') {
-			throw new Error(
-				`cannot handle from step '${this.#data.step}' - must be 'parsed': ${this.#data.error?.message}`,
-			);
+			throw new Error(`cannot handle from step '${this.#data.step}' - must be 'parsed'`);
 		}
 
 		this.#transition_step('handling', this.#create_handling_updates());
@@ -221,6 +223,9 @@ export class Action_Event<
 	 * Transition to a new phase.
 	 */
 	transition(phase: Action_Event_Phase): void {
+		if (this.#data.step === 'failed') {
+			return; // already failed, no-op
+		}
 		if (this.#data.step !== 'handled') {
 			throw new Error(`cannot transition from step '${this.#data.step}' - must be 'handled'`);
 		}

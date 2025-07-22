@@ -12,6 +12,8 @@
 
 	const app = app_context.get();
 
+	// TODO BLOCK maybe rename to `actions`
+
 	// TODO BLOCK add clear actions button
 </script>
 
