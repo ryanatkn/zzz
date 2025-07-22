@@ -71,7 +71,7 @@ export const main_nav_items_default: Array<Nav_Item> = [
 		items: [
 			{label: 'about', href: `${base}/about`, icon: zzz_logo},
 			{label: 'capabilities', href: `${base}/capabilities`, icon: GLYPH_CAPABILITY},
-			{label: 'log', href: `${base}/log`, icon: GLYPH_LOG},
+			{label: 'actions', href: `${base}/actions`, icon: GLYPH_LOG},
 			{label: 'settings', href: `${base}/settings`, icon: GLYPH_SETTINGS},
 		],
 	},

@@ -383,10 +383,10 @@ export const package_json = {
 			svelte: './dist/Dashboard_Home.svelte',
 			default: './dist/Dashboard_Home.svelte',
 		},
-		'./Dashboard_Log.svelte': {
-			types: './dist/Dashboard_Log.svelte.d.ts',
-			svelte: './dist/Dashboard_Log.svelte',
-			default: './dist/Dashboard_Log.svelte',
+		'./Dashboard_Actions.svelte': {
+			types: './dist/Dashboard_Actions.svelte.d.ts',
+			svelte: './dist/Dashboard_Actions.svelte',
+			default: './dist/Dashboard_Actions.svelte',
 		},
 		'./Dashboard_Models.svelte': {
 			types: './dist/Dashboard_Models.svelte.d.ts',
@@ -1644,8 +1644,8 @@ export const src_json = {
 			path: 'Dashboard_Home.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
 		},
-		'./Dashboard_Log.svelte': {
-			path: 'Dashboard_Log.svelte',
+		'./Dashboard_Actions.svelte': {
+			path: 'Dashboard_Actions.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
 		},
 		'./Dashboard_Models.svelte': {

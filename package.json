@@ -460,10 +460,10 @@
       "svelte": "./dist/Dashboard_Home.svelte",
       "default": "./dist/Dashboard_Home.svelte"
     },
-    "./Dashboard_Log.svelte": {
-      "types": "./dist/Dashboard_Log.svelte.d.ts",
-      "svelte": "./dist/Dashboard_Log.svelte",
-      "default": "./dist/Dashboard_Log.svelte"
+    "./Dashboard_Actions.svelte": {
+      "types": "./dist/Dashboard_Actions.svelte.d.ts",
+      "svelte": "./dist/Dashboard_Actions.svelte",
+      "default": "./dist/Dashboard_Actions.svelte"
     },
     "./Dashboard_Models.svelte": {
       "types": "./dist/Dashboard_Models.svelte.d.ts",
