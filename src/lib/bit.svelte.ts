@@ -106,11 +106,12 @@ export abstract class Bit<T extends z.ZodType = typeof Bit_Json_Base> extends Ce
 			: this.content,
 	);
 
+	// TODO rethink these patterns, see A2A Parts
 	// Common properties for all bit types
 	name: string = $state()!;
 	has_xml_tag: boolean = $state()!;
 	xml_tag_name: string = $state()!;
-	attributes: Array<Xml_Attribute_With_Defaults> = $state()!;
+	attributes: Array<Xml_Attribute_With_Defaults> = $state()!; // TODO if kept, name `xml_attributes`?
 	enabled: boolean = $state()!;
 	title: string | null = $state()!;
 	summary: string | null = $state()!;
@@ -120,6 +121,7 @@ export abstract class Bit<T extends z.ZodType = typeof Bit_Json_Base> extends Ce
 	);
 
 	add_attribute(partial: z.input<typeof Xml_Attribute_With_Defaults> = EMPTY_OBJECT): void {
+		// TODO add with a default name
 		this.attributes.push(Xml_Attribute_With_Defaults.parse(partial));
 	}
 

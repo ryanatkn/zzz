@@ -70,21 +70,19 @@
 
 		app.prompts.selected.add_bit(bit);
 	};
+
+	// TODO refactor, maybe move the nav and init logic to `Prompts`?
+	const create_prompt = async () => {
+		const prompt = app.prompts.add();
+		await app.prompts.navigate_to(prompt.id);
+	};
 </script>
 
 <div class="display_flex w_100 h_100">
 	<div class="column_fixed">
 		<div class="p_sm pl_0">
 			<div class="row gap_xs2 mb_xs pl_xs2">
-				<button
-					type="button"
-					class="plain w_100 justify_content_start"
-					onclick={async () => {
-						const prompt = app.prompts.add();
-						prompt.add_bit(Bit.create(app, {type: 'text'}));
-						await app.prompts.navigate_to(prompt.id);
-					}}
-				>
+				<button type="button" class="plain w_100 justify_content_start" onclick={create_prompt}>
 					<Glyph glyph={GLYPH_ADD} />&nbsp; new prompt
 				</button>
 				{#if app.prompts.items.size > 1}
@@ -208,9 +206,7 @@
 				select a prompt from the list or <button
 					type="button"
 					class="inline color_d"
-					onclick={() => {
-						app.prompts.add();
-					}}>create one</button
+					onclick={create_prompt}>create one</button
 				>
 				or
 				<button
@@ -229,12 +225,8 @@
 			in:fade={{duration: DURATION_SM}}
 		>
 			<p>
-				no prompts yet, <button
-					type="button"
-					class="inline color_d"
-					onclick={() => {
-						app.prompts.add();
-					}}>create a new prompt</button
+				no prompts yet, <button type="button" class="inline color_d" onclick={create_prompt}
+					>create a new prompt</button
 				>?
 			</p>
 		</div>

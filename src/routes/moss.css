@@ -561,6 +561,10 @@ a.chip {
 	padding-left: var(--space_xl);
 	padding-right: var(--space_xl);
 }
+.py_xs4 {
+	padding-top: var(--space_xs4);
+	padding-bottom: var(--space_xs4);
+}
 .py_xs3 {
 	padding-top: var(--space_xs3);
 	padding-bottom: var(--space_xs3);
