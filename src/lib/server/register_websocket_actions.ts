@@ -8,6 +8,10 @@ import {BACKEND_ARTIFICIAL_RESPONSE_DELAY, SERVER_URL} from '$lib/constants.js';
 import {noop_middleware} from '$lib/server/server_helpers.js';
 import {Backend_Websocket_Transport} from '$lib/server/backend_websocket_transport.js';
 import {jsonrpc_error_messages} from '$lib/jsonrpc_errors.js';
+import {
+	create_jsonrpc_error_message_from_thrown,
+	to_jsonrpc_message_id,
+} from '$lib/jsonrpc_helpers.js';
 
 export interface Register_Websocket_Actions_Options {
 	path: string;
@@ -70,8 +74,13 @@ export const register_websocket_actions = ({
 						ws.send(JSON.stringify(response));
 					}
 				} catch (error) {
-					backend.log?.error(`[ws] error handling jsonrpc message`, error);
-					return;
+					// TODO maybe only return messages if it's req/res? breaks from http version tho
+					backend.log?.error('[ws] error processing JSON-RPC request:', error);
+					const error_response = create_jsonrpc_error_message_from_thrown(
+						to_jsonrpc_message_id(json),
+						error,
+					);
+					ws.send(JSON.stringify(error_response));
 				}
 			},
 			onClose: (event, ws) => {
