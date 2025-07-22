@@ -24,9 +24,19 @@
 		{/snippet}
 		<Time_Widget value={app.time.now} />
 	</Dashboard_Header>
-	<p>
+	<p class="width_md">
 		This page shows the actions that have happened behind the scenes. It's a work in progress and
 		not too useful yet. The idea is to make the system visible and manipulable.
+	</p>
+	<p>
+		<button
+			type="button"
+			class="compact"
+			onclick={() => app.actions.items.clear()}
+			disabled={!app.actions.items.size}
+		>
+			clear all actions
+		</button>
 	</p>
 
 	<div
