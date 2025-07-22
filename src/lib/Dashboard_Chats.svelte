@@ -54,7 +54,7 @@
 				<Chat_View chat={chats.selected} />
 			</Chat_Contextmenu>
 		{:else if chats.items.size}
-			<div class="display_flex align_items_center justify_content_center h_100 flex_1">
+			<div class="box h_100 flex_1">
 				<div class="p_md text_align_center">
 					<p>
 						select a chat from the list,

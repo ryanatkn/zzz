@@ -198,10 +198,7 @@
 			</div>
 		</Prompt_Contextmenu>
 	{:else if app.prompts.items.size}
-		<div
-			class="display_flex align_items_center justify_content_center h_100 flex_1"
-			in:fade={{duration: DURATION_SM}}
-		>
+		<div class="box h_100 flex_1" in:fade={{duration: DURATION_SM}}>
 			<p>
 				select a prompt from the list or <button
 					type="button"
@@ -220,10 +217,7 @@
 			</p>
 		</div>
 	{:else}
-		<div
-			class="display_flex align_items_center justify_content_center h_100 flex_1"
-			in:fade={{duration: DURATION_SM}}
-		>
+		<div class="box h_100 flex_1" in:fade={{duration: DURATION_SM}}>
 			<p>
 				no prompts yet, <button type="button" class="inline color_d" onclick={create_prompt}
 					>create a new prompt</button

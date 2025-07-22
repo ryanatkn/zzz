@@ -62,7 +62,7 @@
 			{#if selected_action}
 				<Action_Detail action={selected_action} />
 			{:else if actions.items.size > 0}
-				<div class="display_flex align_items_center justify_content_center h_100">
+				<div class="box h_100">
 					<p>
 						select an action from the list or <button
 							type="button"
@@ -74,7 +74,7 @@
 					</p>
 				</div>
 			{:else}
-				<div class="display_flex align_items_center justify_content_center h_100">
+				<div class="box h_100">
 					<p>
 						no actions yet, <button
 							type="button"

@@ -172,9 +172,9 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 	 * Select a diskfile by id and also update the editor tabs.
 	 * Default to the first file if `id` is `undefined`.
 	 * If `id` is `null`, it selects no file.
-	 * If `hard` is `true`, opens as a permanent tab, otherwise previews.
+	 * If `open_not_preview` is `true`, opens as a permanent tab, otherwise previews.
 	 */
-	select(id: Uuid | null | undefined, hard: boolean = false): void {
+	select(id: Uuid | null | undefined, open_not_preview: boolean = false): void {
 		if (id === undefined) {
 			this.select_next();
 		} else {
@@ -182,7 +182,7 @@ export class Diskfiles extends Cell<typeof Diskfiles_Json> {
 
 			// Update the editor if a file is selected
 			if (id !== null) {
-				if (hard) {
+				if (open_not_preview) {
 					this.editor.open_diskfile(id);
 				} else {
 					this.editor.preview_diskfile(id);

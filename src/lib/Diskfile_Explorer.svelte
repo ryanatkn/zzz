@@ -33,14 +33,15 @@
 	const TODO_create_file_pending = false;
 	const TODO_create_folder_pending = false;
 
-	// TODO improve UX to not use alert/prompt
+	// TODO @many this is very hacky and duplicated, refactor into cell methods
+	// TODO @many improve UX to not use alert/prompt
 	const create_file = async () => {
 		if (!zzz_cache_dir) {
-			alert('Cannot create file: no directory is selected'); // eslint-disable-line no-alert
+			alert('cannot create file: filesystem is not available'); // eslint-disable-line no-alert
 			return;
 		}
 
-		const filename = prompt('New file name:'); // eslint-disable-line no-alert
+		const filename = prompt('new file name:'); // eslint-disable-line no-alert
 		if (!filename) return;
 
 		try {
@@ -53,7 +54,7 @@
 
 	const create_folder = async () => {
 		if (!zzz_cache_dir) {
-			alert('Cannot create folder: no directory is selected'); // eslint-disable-line no-alert
+			alert('cannot create folder: filesystem is not available'); // eslint-disable-line no-alert
 			return;
 		}
 
@@ -132,9 +133,9 @@
 					<Diskfile_Listitem
 						{diskfile}
 						{selected}
-						onselect={(diskfile, hard) => {
+						onselect={(diskfile, open_not_preview) => {
 							// TODO this needs to navigate to the path of the file (so should be a link, not this onselect callback)
-							diskfiles.select(diskfile.id, hard);
+							diskfiles.select(diskfile.id, open_not_preview);
 						}}
 					/>
 				</div>

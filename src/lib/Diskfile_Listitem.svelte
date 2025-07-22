@@ -16,9 +16,10 @@
 		selected?: boolean | undefined;
 		attrs?: Record<string, unknown>;
 		/**
-		 * `hard` indicates a "hard select" like a doubleclick or enter keypress.
+		 * `open_not_preview` indicates a "open_not_preview select"
+		 * like a doubleclick or enter keypress.
 		 */
-		onselect?: (diskfile: Diskfile, hard: boolean) => void;
+		onselect?: (diskfile: Diskfile, open_not_preview: boolean) => void;
 	} = $props();
 
 	// TODO add a visible status when open in a tab
