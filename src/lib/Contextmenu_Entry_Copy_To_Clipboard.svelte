@@ -21,7 +21,7 @@
 		label?: string | undefined;
 		preview?: string | undefined;
 		preview_limit?: number | undefined;
-		show_preview?: boolean | undefined;
+		show_preview?: boolean | undefined; // TODO maybe rename to `nopreview`?
 		children?: Snippet | undefined;
 	} = $props();
 

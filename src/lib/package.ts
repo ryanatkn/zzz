@@ -6,7 +6,7 @@ import type {Src_Json} from '@ryanatkn/gro/src_json.js';
 export const package_json = {
 	name: '@ryanatkn/zzz',
 	version: '0.0.1',
-	description: 'fullstack toolkit for adaptive web environments',
+	description: 'fullstack web toolkit for power users and devs',
 	motto: 'nice web things for the tired',
 	glyph: '💤',
 	logo: 'logo.svg',
