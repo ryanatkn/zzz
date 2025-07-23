@@ -3,12 +3,10 @@
 	// Action_List.svelte
 
 	import type {SvelteHTMLElements} from 'svelte/elements';
-	import {slide} from 'svelte/transition';
 
-	import Glyph from '$lib/Glyph.svelte';
 	import {frontend_context} from '$lib/frontend.svelte.js';
 	import type {Action} from '$lib/action.svelte.js';
-	import {get_glyph_for_action_method, get_glyph_for_action_kind} from '$lib/glyphs.js';
+	import Action_Listitem from '$lib/Action_Listitem.svelte';
 	import Sortable_List from '$lib/Sortable_List.svelte';
 	import {sort_by_numeric, sort_by_text} from '$lib/sortable.svelte.js';
 
@@ -50,27 +48,11 @@
 		no_items=""
 	>
 		{#snippet children(action)}
-			{@const selected = action.id === selected_action_id}
-			<button
-				type="button"
-				class="w_100 text_align_left justify_content_start py_xs px_md border_radius_0 border_style_none box_shadow_none"
-				class:selected
-				class:color_c={action.has_error}
-				onclick={() => {
-					onselect?.(action);
-				}}
-				transition:slide
-			>
-				<div class="font_weight_400 display_flex align_items_center gap_xs w_100">
-					<Glyph glyph={get_glyph_for_action_method(action.method)} />
-					<Glyph glyph={get_glyph_for_action_kind(action.kind)} />
-					<span class="font_family_mono flex_1">{action.method}</span>
-					{#if action.has_error}
-						<small class="color_c">!</small>
-					{/if}
-					<small class="font_family_mono ml_auto">{action.created_formatted_time}</small>
-				</div>
-			</button>
+			<Action_Listitem
+				{action}
+				selected={action.id === selected_action_id}
+				{onselect}
+			/>
 		{/snippet}
 	</Sortable_List>
 

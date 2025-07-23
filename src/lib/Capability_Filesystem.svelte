@@ -46,7 +46,7 @@
 
 <p>
 	This is the backend's filesystem directory. For security reasons, filesystem operations are scoped
-	to this directory and they do not follow symlinks. Defaults to the backend's current working
+	to this directory and symlinks are not followed. Defaults to the backend's current working
 	directory. To configure it set the .env variable
 	<code class="font_size_sm">PUBLIC_ZZZ_CACHE_DIR</code>. Configure at your own risk.
 </p>
