@@ -40,7 +40,7 @@ export const ping_action_spec = {
 	initiator: 'both',
 	auth: 'public',
 	side_effects: null,
-	input: z.void().optional(), // TODO BLOCK needs to be null if we want it to appear on the json
+	input: z.void().optional(),
 	output: z
 		.object({
 			ping_id: Jsonrpc_Request_Id,
