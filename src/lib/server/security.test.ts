@@ -97,6 +97,108 @@ describe('parse_allowed_origins', () => {
 		);
 		expect(patterns).toHaveLength(3);
 	});
+
+	describe('pattern aliases', () => {
+		test('expands @localhost alias', () => {
+			const patterns = parse_allowed_origins('@localhost');
+			expect(patterns).toHaveLength(8); // All localhost variants
+
+			// Test that all localhost variants match
+			const localhostOrigins = [
+				'http://localhost:3000',
+				'https://localhost:443',
+				'http://127.0.0.1:8080',
+				'https://127.0.0.1:8443',
+				'http://[::1]:3000',
+				'https://[::1]:443',
+				'http://[::ffff:127.0.0.1]:3000',
+				'https://[::ffff:127.0.0.1]:8443',
+			];
+
+			for (const origin of localhostOrigins) {
+				expect(should_allow_origin(origin, patterns)).toBe(true);
+			}
+		});
+
+		test('expands @localhost_http alias', () => {
+			const patterns = parse_allowed_origins('@localhost_http');
+			expect(patterns).toHaveLength(4); // HTTP localhost variants only
+
+			// Should match HTTP
+			expect(should_allow_origin('http://localhost:3000', patterns)).toBe(true);
+			expect(should_allow_origin('http://127.0.0.1:8080', patterns)).toBe(true);
+			expect(should_allow_origin('http://[::1]:5000', patterns)).toBe(true);
+			expect(should_allow_origin('http://[::ffff:127.0.0.1]:8080', patterns)).toBe(true);
+
+			// Should NOT match HTTPS
+			expect(should_allow_origin('https://localhost:3000', patterns)).toBe(false);
+			expect(should_allow_origin('https://127.0.0.1:8080', patterns)).toBe(false);
+			expect(should_allow_origin('https://[::1]:5000', patterns)).toBe(false);
+		});
+
+		test('expands @localhost_https alias', () => {
+			const patterns = parse_allowed_origins('@localhost_https');
+			expect(patterns).toHaveLength(4); // HTTPS localhost variants only
+
+			// Should match HTTPS
+			expect(should_allow_origin('https://localhost:3000', patterns)).toBe(true);
+			expect(should_allow_origin('https://127.0.0.1:8080', patterns)).toBe(true);
+			expect(should_allow_origin('https://[::1]:5000', patterns)).toBe(true);
+			expect(should_allow_origin('https://[::ffff:127.0.0.1]:8443', patterns)).toBe(true);
+
+			// Should NOT match HTTP
+			expect(should_allow_origin('http://localhost:3000', patterns)).toBe(false);
+			expect(should_allow_origin('http://127.0.0.1:8080', patterns)).toBe(false);
+			expect(should_allow_origin('http://[::1]:5000', patterns)).toBe(false);
+		});
+
+		test('combines aliases with regular patterns', () => {
+			const patterns = parse_allowed_origins('@localhost_https,https://api.example.com');
+			expect(patterns).toHaveLength(5); // 4 from alias + 1 regular
+
+			// Should match localhost HTTPS
+			expect(should_allow_origin('https://localhost:3000', patterns)).toBe(true);
+			expect(should_allow_origin('https://[::1]:8443', patterns)).toBe(true);
+
+			// Should match the regular pattern
+			expect(should_allow_origin('https://api.example.com', patterns)).toBe(true);
+
+			// Should NOT match localhost HTTP or other origins
+			expect(should_allow_origin('http://localhost:3000', patterns)).toBe(false);
+			expect(should_allow_origin('https://example.com', patterns)).toBe(false);
+		});
+
+		test('handles multiple aliases', () => {
+			const patterns = parse_allowed_origins('@localhost_http,@localhost_https');
+			expect(patterns).toHaveLength(8); // Same as @localhost
+
+			// Should match both HTTP and HTTPS
+			expect(should_allow_origin('http://localhost:3000', patterns)).toBe(true);
+			expect(should_allow_origin('https://localhost:3000', patterns)).toBe(true);
+		});
+
+		test('throws on unknown alias', () => {
+			expect(() => parse_allowed_origins('@unknown')).toThrow(
+				'Unknown pattern alias: @unknown. Available aliases: @localhost, @localhost_http, @localhost_https',
+			);
+		});
+
+		test('aliases can appear anywhere in the list', () => {
+			const patterns = parse_allowed_origins(
+				'https://example.com,@localhost_http,https://api.example.com',
+			);
+			expect(patterns).toHaveLength(6); // 1 + 4 + 1
+
+			expect(should_allow_origin('https://example.com', patterns)).toBe(true);
+			expect(should_allow_origin('http://localhost:3000', patterns)).toBe(true);
+			expect(should_allow_origin('https://api.example.com', patterns)).toBe(true);
+		});
+
+		test('handles whitespace around aliases', () => {
+			const patterns = parse_allowed_origins('  @localhost  ,  https://example.com  ');
+			expect(patterns).toHaveLength(9); // 8 from alias + 1 regular
+		});
+	});
 });
 
 describe('should_allow_origin', () => {
@@ -371,7 +473,7 @@ describe('verify_origin middleware', () => {
 					'sec-fetch-site': 'cross-site',
 					origin: 'http://localhost:3000',
 				},
-				'cross-site requests forbidden',
+				'forbidden cross-site request',
 			);
 		});
 
@@ -554,7 +656,7 @@ describe('verify_origin middleware', () => {
 				{
 					'Sec-Fetch-Site': 'cross-site',
 				},
-				'cross-site requests forbidden',
+				'forbidden cross-site request',
 			);
 		});
 
@@ -591,6 +693,31 @@ describe('integration scenarios', () => {
 		}
 	});
 
+	test('typical development setup with alias', () => {
+		const dev_patterns = parse_allowed_origins('@localhost');
+		// Common dev server origins including IPv6
+		const dev_origins = [
+			'http://localhost:3000',
+			'http://localhost:5173',
+			'https://localhost:3000',
+			'https://localhost:5173',
+			'http://127.0.0.1:3000',
+			'http://127.0.0.1:8080',
+			'https://127.0.0.1:3000',
+			'https://127.0.0.1:8080',
+			'http://[::1]:3000',
+			'http://[::1]:5173',
+			'https://[::1]:3000',
+			'https://[::1]:5173',
+			'http://[::ffff:127.0.0.1]:3000',
+			'https://[::ffff:127.0.0.1]:3000',
+		];
+
+		for (const origin of dev_origins) {
+			expect(should_allow_origin(origin, dev_patterns)).toBe(true);
+		}
+	});
+
 	test('production multi-domain setup', () => {
 		const prod_patterns = parse_allowed_origins(
 			'https://app.example.com,https://*.example.com,https://partner.com',
@@ -617,6 +744,23 @@ describe('integration scenarios', () => {
 		for (const origin of blocked) {
 			expect(should_allow_origin(origin, prod_patterns)).toBe(false);
 		}
+	});
+
+	test('mixed development and production with aliases', () => {
+		const patterns = parse_allowed_origins('@localhost_https,https://*.example.com');
+
+		// Should allow HTTPS localhost
+		expect(should_allow_origin('https://localhost:3000', patterns)).toBe(true);
+		expect(should_allow_origin('https://127.0.0.1:8443', patterns)).toBe(true);
+		expect(should_allow_origin('https://[::1]:443', patterns)).toBe(true);
+
+		// Should allow production domains
+		expect(should_allow_origin('https://app.example.com', patterns)).toBe(true);
+		expect(should_allow_origin('https://api.example.com', patterns)).toBe(true);
+
+		// Should NOT allow HTTP localhost
+		expect(should_allow_origin('http://localhost:3000', patterns)).toBe(false);
+		expect(should_allow_origin('http://127.0.0.1:8080', patterns)).toBe(false);
 	});
 
 	test('complex enterprise setup', () => {
@@ -738,65 +882,5 @@ describe('edge cases', () => {
 			['https://example.com/path(with)special[chars]'],
 			['https://example.com/pathwithspecialchars'],
 		);
-	});
-});
-
-/**
- * Common localhost patterns including IPv4 and IPv6
- */
-const LOCALHOST_PATTERNS = [
-	'http://localhost:*',
-	'https://localhost:*',
-	'http://127.0.0.1:*',
-	'https://127.0.0.1:*',
-	'http://[::1]:*',
-	'https://[::1]:*',
-	'http://[::ffff:127.0.0.1]:*', // IPv4-mapped IPv6
-	'https://[::ffff:127.0.0.1]:*',
-];
-
-describe('LOCALHOST_PATTERNS', () => {
-	test('includes all common localhost variants', () => {
-		expect(LOCALHOST_PATTERNS).toEqual([
-			'http://localhost:*',
-			'https://localhost:*',
-			'http://127.0.0.1:*',
-			'https://127.0.0.1:*',
-			'http://[::1]:*',
-			'https://[::1]:*',
-			'http://[::ffff:127.0.0.1]:*',
-			'https://[::ffff:127.0.0.1]:*',
-		]);
-	});
-
-	test('LOCALHOST_PATTERNS work correctly when parsed', () => {
-		const patterns = parse_allowed_origins(LOCALHOST_PATTERNS.join(','));
-
-		// Test various localhost origins
-		const localhostOrigins = [
-			'http://localhost:3000',
-			'https://localhost:443',
-			'http://127.0.0.1:8080',
-			'https://127.0.0.1:8443',
-			'http://[::1]:3000',
-			'https://[::1]:443',
-			'http://[::ffff:127.0.0.1]:3000',
-			'https://[::ffff:127.0.0.1]:8443',
-		];
-
-		for (const origin of localhostOrigins) {
-			expect(should_allow_origin(origin, patterns)).toBe(true);
-		}
-
-		// Test non-localhost origins should not match
-		const nonLocalhostOrigins = [
-			'http://example.com:3000',
-			'https://192.168.1.1:8080',
-			'http://[2001:db8::1]:3000',
-		];
-
-		for (const origin of nonLocalhostOrigins) {
-			expect(should_allow_origin(origin, patterns)).toBe(false);
-		}
 	});
 });

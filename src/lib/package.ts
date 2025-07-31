@@ -2555,9 +2555,9 @@ export const src_json = {
 		'./server/security.js': {
 			path: 'server/security.ts',
 			declarations: [
-				{name: 'Allowed_Origins', kind: 'type'},
-				{name: 'verify_origin', kind: 'function'},
+				{name: 'parse_allowed_origins', kind: 'function'},
 				{name: 'should_allow_origin', kind: 'function'},
+				{name: 'verify_origin', kind: 'function'},
 			],
 		},
 		'./server/server_helpers.js': {

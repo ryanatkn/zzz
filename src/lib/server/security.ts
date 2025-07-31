@@ -1,13 +1,45 @@
 import {escape_regexp} from '@ryanatkn/belt/regexp.js';
 import type {Handler} from 'hono';
 
-// TODO this design is currently rigid, like it requires protocol, so config can be verbose
-// **Strict origin-based access control for a server/API** - blocking all cross-origin requests by default and only allowing explicitly whitelisted origins (including localhost variants). You're enforcing this at the middleware level for all requests (not just mutations), using multiple headers (origin, referer, sec-fetch-site) for defense in depth, while still permitting direct access (like curl/API clients).
-// We're building something that needs tight control over which web frontends can access it - likely an API or service where you want to prevent unauthorized websites from making requests on behalf of users (CSRF protection) while maintaining developer ergonomics for local development and testing.
+// Pattern aliases for common configurations
+const PATTERN_ALIASES: Record<string, ReadonlyArray<string> | undefined> = {
+	'@localhost': [
+		'http://localhost:*',
+		'https://localhost:*',
+		'http://127.0.0.1:*',
+		'https://127.0.0.1:*',
+		'http://[::1]:*',
+		'https://[::1]:*',
+		'http://[::ffff:127.0.0.1]:*',
+		'https://[::ffff:127.0.0.1]:*',
+	],
+	'@localhost_http': [
+		'http://localhost:*',
+		'http://127.0.0.1:*',
+		'http://[::1]:*',
+		'http://[::ffff:127.0.0.1]:*',
+	],
+	'@localhost_https': [
+		'https://localhost:*',
+		'https://127.0.0.1:*',
+		'https://[::1]:*',
+		'https://[::ffff:127.0.0.1]:*',
+	],
+} as const;
 
 /**
  * Parses ALLOWED_ORIGINS env var into regex matchers.
- * Accepts comma-separated patterns with limited wildcards.
+ * Accepts comma-separated patterns with limited wildcards and pattern aliases.
+ *
+ * Pattern aliases:
+ * - @localhost: All localhost variants (HTTP + HTTPS)
+ * - @localhost_http: HTTP localhost variants only
+ * - @localhost_https: HTTPS localhost variants only
+ *
+ * Examples:
+ * - "@localhost,https://api.example.com"
+ * - "@localhost_https,https://*.example.com:*"
+ * - "http://localhost:3000,@localhost_http,https://prod.example.com"
  */
 export const parse_allowed_origins = (env_value: string | undefined): Array<RegExp> =>
 	env_value
@@ -15,6 +47,21 @@ export const parse_allowed_origins = (env_value: string | undefined): Array<RegE
 				.split(',')
 				.map((s) => s.trim())
 				.filter(Boolean)
+				.flatMap((pattern) => {
+					// Expand aliases
+					if (pattern.startsWith('@')) {
+						const alias = PATTERN_ALIASES[pattern];
+						if (!alias) {
+							throw new Error(
+								`Unknown pattern alias: ${pattern}. Available aliases: ${Object.keys(
+									PATTERN_ALIASES,
+								).join(', ')}`,
+							);
+						}
+						return [...alias]; // Return a copy of the array
+					}
+					return pattern;
+				})
 				.map(origin_pattern_to_regexp)
 		: [];
 
@@ -37,7 +84,7 @@ export const verify_origin =
 
 		// Block cross-site requests immediately (modern browsers)
 		if (sec_fetch_site === 'cross-site') {
-			return c.text('cross-site requests forbidden', 403);
+			return c.text('forbidden cross-site request', 403);
 		}
 
 		// For requests with origin header
