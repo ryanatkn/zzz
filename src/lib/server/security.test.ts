@@ -3,7 +3,7 @@
 import {describe, test, expect, vi} from 'vitest';
 import type {Handler} from 'hono';
 
-import {parse_allowed_origins, should_allow_origin, verify_origin} from './security.js';
+import {parse_allowed_origins, should_allow_origin, verify_request_source} from './security.js';
 
 // Test helpers
 const create_mock_context = (headers: Record<string, string> = {}) => {
@@ -607,38 +607,11 @@ describe('pattern_to_regexp', () => {
 	});
 });
 
-describe('verify_origin middleware', () => {
+describe('verify_request_source middleware', () => {
 	const allowed_patterns = parse_allowed_origins(
 		'http://localhost:3000,https://*.example.com,http://[::1]:3000,https://[2001:db8::1]:*',
 	);
-	const middleware = verify_origin(allowed_patterns);
-
-	describe('sec-fetch-site header', () => {
-		test('blocks cross-site requests immediately', async () => {
-			await test_middleware_blocks(
-				middleware,
-				{
-					'sec-fetch-site': 'cross-site',
-					origin: 'http://localhost:3000',
-				},
-				'forbidden cross-site request',
-			);
-		});
-
-		test('allows same-origin requests', async () => {
-			await test_middleware_allows(middleware, {
-				'sec-fetch-site': 'same-origin',
-				origin: 'http://localhost:3000',
-			});
-		});
-
-		test('allows same-site requests', async () => {
-			await test_middleware_allows(middleware, {
-				'sec-fetch-site': 'same-site',
-				origin: 'http://localhost:3000',
-			});
-		});
-	});
+	const middleware = verify_request_source(allowed_patterns);
 
 	describe('origin header', () => {
 		test('allows matching origins', async () => {
@@ -763,7 +736,7 @@ describe('verify_origin middleware', () => {
 
 			// To match trailing dots, you need them in the pattern
 			const patternsWithDot = parse_allowed_origins('http://localhost.:3000');
-			const middlewareWithDot = verify_origin(patternsWithDot);
+			const middlewareWithDot = verify_request_source(patternsWithDot);
 
 			await test_middleware_allows(middlewareWithDot, {
 				referer: 'http://localhost.:3000/page',
@@ -821,10 +794,18 @@ describe('verify_origin middleware', () => {
 				'sec-fetch-site': 'none',
 			});
 		});
+
+		test('allows cross-site requests when explicitly allowed by origin', async () => {
+			// This is the key difference - sec-fetch-site doesn't block if origin is allowed
+			await test_middleware_allows(middleware, {
+				'sec-fetch-site': 'cross-site',
+				origin: 'http://localhost:3000',
+			});
+		});
 	});
 
 	describe('empty allowed patterns', () => {
-		const strict_middleware = verify_origin([]);
+		const strict_middleware = verify_request_source([]);
 
 		test('blocks all origin requests', async () => {
 			await test_middleware_blocks(
@@ -859,13 +840,12 @@ describe('verify_origin middleware', () => {
 			await test_middleware_allows(middleware, {
 				ORIGIN: 'http://localhost:3000',
 			});
-			await test_middleware_blocks(
-				middleware,
-				{
-					'Sec-Fetch-Site': 'cross-site',
-				},
-				'forbidden cross-site request',
-			);
+			await test_middleware_allows(middleware, {
+				Referer: 'http://localhost:3000/page',
+			});
+			await test_middleware_allows(middleware, {
+				REFERER: 'http://localhost:3000/page',
+			});
 		});
 	});
 });

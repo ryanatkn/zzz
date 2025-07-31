@@ -2,14 +2,22 @@ import {escape_regexp} from '@ryanatkn/belt/regexp.js';
 import type {Handler} from 'hono';
 
 /**
- * Parses ALLOWED_ORIGINS env var into regex matchers.
- * Accepts comma-separated patterns with limited wildcards.
+ * Parses ALLOWED_ORIGINS env var into regex matchers for request source verification.
+ * This is NOT a CSRF protection mechanism - it's a simple origin/referer allowlist
+ * that verifies requests are coming from expected sources.
+ *
+ * Accepts comma-separated patterns with limited wildcards:
+ * - Exact origins: "https://api.example.com"
+ * - Wildcard subdomains: "https://*.example.com" (matches exactly one subdomain level)
+ * - Multiple wildcards: "https://*.staging.*.example.com" (for deep subdomains)
+ * - Wildcard ports: "http://localhost:*" (matches any port or no port)
+ * - IPv6 addresses: "http://[::1]:3000", "https://[2001:db8::1]"
+ * - Combined: "https://*.example.com:*"
  *
  * Examples:
- * - "https://api.example.com"
- * - "https://*.example.com:*"
  * - "http://localhost:3000,https://prod.example.com"
- * - "https://*.staging.*.example.com" (multiple wildcards for deep subdomains)
+ * - "https://*.api.example.com,http://127.0.0.1:*"
+ * - "http://[::1]:*,https://*.*.corp.example.com:*"
  */
 export const parse_allowed_origins = (env_value: string | undefined): Array<RegExp> =>
 	env_value
@@ -21,29 +29,36 @@ export const parse_allowed_origins = (env_value: string | undefined): Array<RegE
 		: [];
 
 /**
- * Tests if origin matches any of the allowed patterns
+ * Tests if a request source (origin or referer) matches any of the allowed patterns.
+ * Pattern matching is case-insensitive for domains (as per web standards).
  */
 export const should_allow_origin = (origin: string, allowed_patterns: Array<RegExp>): boolean =>
 	allowed_patterns.some((pattern) => pattern.test(origin));
 
 /**
- * Middleware that checks if the request's origin is allowed.
- * Blocks cross-site requests that don't match allowed origins.
- * Allows requests without origin/referer headers (e.g., direct access).
+ * Middleware that verifies the request source against an allowlist.
+ *
+ * NOT a CSRF protection - this is a simple origin/referer check that:
+ * - Checks the Origin header first (if present)
+ * - Falls back to Referer header (if no Origin)
+ * - Allows requests without Origin/Referer headers (direct access, curl, etc.)
+ *
+ * This is useful for:
+ * - Protecting locally-running services from being called by
+ *   untrusted websites as the user browses the web
+ * - Restricting which domains can make requests to your API
+ * - Preventing embedding of your service in unexpected sites
+ * - Basic source verification (but NOT security-critical CSRF protection)
+ *
+ * @param allowed_patterns - Array of compiled regex patterns from parse_allowed_origins
  */
-export const verify_origin =
+export const verify_request_source =
 	(allowed_patterns: Array<RegExp>): Handler =>
 	(c, next) => {
 		const origin = c.req.header('origin');
 		const referer = c.req.header('referer');
-		const sec_fetch_site = c.req.header('sec-fetch-site');
 
-		// Block cross-site requests immediately (modern browsers)
-		if (sec_fetch_site === 'cross-site') {
-			return c.text('forbidden cross-site request', 403);
-		}
-
-		// For requests with origin header
+		// Check Origin header (preferred, sent by browsers for CORS requests)
 		if (origin) {
 			if (!should_allow_origin(origin, allowed_patterns)) {
 				return c.text('forbidden origin', 403);
@@ -51,7 +66,7 @@ export const verify_origin =
 			return next();
 		}
 
-		// For requests with referer but no origin (some GET requests)
+		// Check Referer header (fallback for some requests like navigation)
 		if (referer) {
 			try {
 				const url = new URL(referer);
@@ -65,25 +80,32 @@ export const verify_origin =
 			}
 		}
 
-		// No origin or referer or `sec-fetch-site` header - likely direct access (curl, etc).
-		// Allow these requests as per requirements (will add token auth later).
+		// No origin or referer - likely direct access (curl, Postman, etc.)
+		// Allow these as the user may want to support direct API access
 		return next();
 	};
 
 /**
  * Converts origin patterns with wildcards to regex patterns.
- * Supports:
- * - Wildcard subdomains: *.example.com (matches one level)
- * - Multiple wildcards: *.staging.*.example.com
- * - Wildcard ports: http://localhost:*
- * - IPv6 addresses: http://[::1]:3000, https://[2001:db8::1]
- * Does NOT support:
- * - Paths (origins don't have paths)
- * - Wildcards in other positions
+ *
+ * Pattern format: protocol://hostname[:port]
+ *
+ * Wildcard support:
+ * - Subdomain wildcards: *.example.com matches sub.example.com (NOT example.com)
+ * - Multiple wildcards: *.*.example.com matches api.staging.example.com
+ * - Port wildcards: example.com:* matches any port or no port
+ * - IPv6 support: [::1], [2001:db8::1] (no wildcards in IPv6)
+ *
+ * Restrictions:
+ * - No paths allowed (origins don't include paths)
+ * - Wildcards must be complete labels (*.example.com, not ex*ample.com)
+ * - No wildcards in IPv6 addresses
+ * - Port wildcards must be :* exactly
+ *
+ * @throws {Error} If pattern format is invalid
  */
 const origin_pattern_to_regexp = (pattern: string): RegExp => {
-	// Parse the pattern into components
-	// Updated regex to support IPv6 addresses in brackets
+	// Parse pattern with support for IPv6 addresses in brackets
 	const parts = /^(https?:\/\/)(\[[^\]]+\]|[^:/]+)(:\*|:\d+)?(\/.*)?$/.exec(pattern);
 	if (!parts) {
 		throw new Error(`Invalid origin pattern: ${pattern}`);
@@ -91,17 +113,17 @@ const origin_pattern_to_regexp = (pattern: string): RegExp => {
 
 	const [, protocol, hostname, port = '', path = ''] = parts;
 
-	// Check for paths (not allowed)
+	// Origins cannot have paths
 	if (path) {
 		throw new Error(`Paths not allowed in origin patterns: ${pattern}`);
 	}
 
-	// Check wildcards only in allowed positions
+	// IPv6 addresses cannot contain wildcards
 	if (hostname.startsWith('[') && hostname.includes('*')) {
 		throw new Error(`Wildcards not allowed in IPv6 addresses: ${pattern}`);
 	}
 
-	// For non-IPv6 hostnames, check that wildcards only appear as complete labels
+	// For regular hostnames, wildcards must be complete labels
 	if (!hostname.startsWith('[')) {
 		const labels = hostname.split('.');
 		for (const label of labels) {
@@ -113,6 +135,7 @@ const origin_pattern_to_regexp = (pattern: string): RegExp => {
 		}
 	}
 
+	// Port wildcards must be exactly :*
 	if (port.includes('*') && port !== ':*') {
 		throw new Error(`Invalid port wildcard: ${pattern}`);
 	}
@@ -121,16 +144,16 @@ const origin_pattern_to_regexp = (pattern: string): RegExp => {
 	let regex_pattern = '^';
 	regex_pattern += escape_regexp(protocol);
 
-	// Handle hostname - IPv6 or regular hostname with potential wildcards
+	// Handle hostname
 	if (hostname.startsWith('[')) {
-		// IPv6 address - escape the brackets
+		// IPv6 address - escape brackets and contents
 		regex_pattern += escape_regexp(hostname);
 	} else {
-		// Regular hostname - handle wildcards
+		// Regular hostname - process wildcards
 		const labels = hostname.split('.');
 		const regex_labels = labels.map((label) => {
 			if (label === '*') {
-				// Match exactly one label (no dots allowed)
+				// Match exactly one label (no dots, colons, or slashes)
 				return '[^./:]+';
 			} else {
 				return escape_regexp(label);
@@ -139,15 +162,16 @@ const origin_pattern_to_regexp = (pattern: string): RegExp => {
 		regex_pattern += regex_labels.join('\\.');
 	}
 
-	// Handle port wildcard
+	// Handle port
 	if (port === ':*') {
-		regex_pattern += '(:\\d+)?'; // Optional port
+		// Optional port (matches both with and without port)
+		regex_pattern += '(:\\d+)?';
 	} else {
 		regex_pattern += escape_regexp(port);
 	}
 
 	regex_pattern += '$';
 
-	// Create case-insensitive regex (domains are case-insensitive)
+	// Case-insensitive matching (web standards specify domains are case-insensitive)
 	return new RegExp(regex_pattern, 'i');
 };
