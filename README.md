@@ -30,20 +30,23 @@ Eventually there will be a desktop app but
 for now you'll need Node 22.15+ (YMMV with Deno/Bun/etc)
 and Git to clone the repo.
 
-Zzz is deployed via SvelteKit's static adapter with diminished capabilities.
-([zzz.software](https://www.zzz.software/))
-It will have another build with the Node adapter and Hono server soon.
+Running Zzz locally in development with Node is the supported way to use it right now.
+It deploys via SvelteKit's static adapter with diminished capabilities
+([zzz.software](https://www.zzz.software/)),
+and it will have a production build with the Node adapter and Hono server soon.
 
-> Windows probably doesn't work but will be supported - help is appreciated.
-> For now I recommend [WSL](https://learn.microsoft.com/en-us/windows/wsl/install).
+> Developing on Windows
+> requires something like [WSL](https://learn.microsoft.com/en-us/windows/wsl/install).
 
-First set up an `.env` file in your project root:
+To run Zzz, we need an `.env` file in your project root.
 
-- see [src/lib/server/.env.example](/src/lib/server/.env.example)
-  - add to `.env` or `.env.development` and `.env.production` -
-    `SECRET_ANTHROPIC_API_KEY`, `SECRET_OPENAI_API_KEY`, `SECRET_GOOGLE_API_KEY`
+In your terminal, copy over [src/lib/server/.env.example](/src/lib/server/.env.example):
 
-Then in your terminal:
+```bash
+cp src/lib/server/.env.example .env --update=none
+```
+
+Edit `.env` with your API keys as needed, then:
 
 ```bash
 npm run dev

@@ -42,6 +42,7 @@ export const package_json = {
 		'@sveltejs/kit': '^2.22.2',
 		'@sveltejs/package': '^2.3.12',
 		'@sveltejs/vite-plugin-svelte': '^5.1.0',
+		'@types/node': '^24.1.0',
 		eslint: '^9.30.1',
 		'eslint-plugin-svelte': '^3.10.1',
 		jsdom: '^26.1.0',
@@ -91,6 +92,11 @@ export const package_json = {
 			types: './dist/action_collections.d.ts',
 			default: './dist/action_collections.js',
 		},
+		'./Action_Contextmenu.svelte': {
+			types: './dist/Action_Contextmenu.svelte.d.ts',
+			svelte: './dist/Action_Contextmenu.svelte',
+			default: './dist/Action_Contextmenu.svelte',
+		},
 		'./Action_Detail.svelte': {
 			types: './dist/Action_Detail.svelte.d.ts',
 			svelte: './dist/Action_Detail.svelte',
@@ -117,6 +123,11 @@ export const package_json = {
 			types: './dist/Action_List.svelte.d.ts',
 			svelte: './dist/Action_List.svelte',
 			default: './dist/Action_List.svelte',
+		},
+		'./Action_Listitem.svelte': {
+			types: './dist/Action_Listitem.svelte.d.ts',
+			svelte: './dist/Action_Listitem.svelte',
+			default: './dist/Action_Listitem.svelte',
 		},
 		'./action_metatypes.gen.js': {
 			types: './dist/action_metatypes.gen.d.ts',
@@ -1089,6 +1100,10 @@ export const src_json = {
 				{name: 'Action_Event_Datas', kind: 'type'},
 			],
 		},
+		'./Action_Contextmenu.svelte': {
+			path: 'Action_Contextmenu.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
 		'./Action_Detail.svelte': {
 			path: 'Action_Detail.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
@@ -1166,6 +1181,10 @@ export const src_json = {
 		},
 		'./Action_List.svelte': {
 			path: 'Action_List.svelte',
+			declarations: [{name: 'default', kind: 'component'}],
+		},
+		'./Action_Listitem.svelte': {
+			path: 'Action_Listitem.svelte',
 			declarations: [{name: 'default', kind: 'component'}],
 		},
 		'./action_metatypes.gen.js': {
