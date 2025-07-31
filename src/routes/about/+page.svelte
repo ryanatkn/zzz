@@ -58,16 +58,16 @@
 			access to local and remote capabilities?"
 		</blockquote>
 		<p>
-			I'm a developer, and the free and open source software I imagine answering these questions is
-			influenced by my situation and opinions:
+			I'm a developer who likes designing and making tools, and the free and open source software I
+			imagine answering these questions is influenced by my situation and opinions:
 		</p>
 		<ul>
 			<li>
 				I think UX should have primacy, and so UI quality is a top priority, informing other
-				technology decisions. It should be efficient, powerful, and customizable for devs and users.
-				My personal bias is to invest significant time in the UI, and use it to make the fullstack
-				system visible and controllable (for some early examples, try right-clicking on a
-				chat/prompt/file, or see the prototype <a href="{base}/capabilities">capabilities</a> page).
+				technology decisions. It should be efficient, powerful, and customizable for devs and users,
+				making the fullstack system visible and controllable in novel contexts (e.g. users should be
+				able to create purpose-built UIs with the least effort necessary and without sacrificing
+				security or code quality).
 			</li>
 			<li>
 				I want to make cross-platform software so it runs everywhere, shipping features once and

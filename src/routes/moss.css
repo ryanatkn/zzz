@@ -628,6 +628,9 @@ a.chip {
 .mr_md {
 	margin-right: var(--space_md);
 }
+.mr_xl {
+	margin-right: var(--space_xl);
+}
 .mb_0 {
 	margin-bottom: 0;
 }
