@@ -33,7 +33,7 @@ export const parse_allowed_origins = (env_value: string | undefined): Array<RegE
  * Pattern matching is case-insensitive for domains (as per web standards).
  */
 export const should_allow_origin = (origin: string, allowed_patterns: Array<RegExp>): boolean =>
-	allowed_patterns.some((pattern) => pattern.test(origin));
+	allowed_patterns.some((p) => p.test(origin));
 
 /**
  * Middleware that verifies the request source against an allowlist.
