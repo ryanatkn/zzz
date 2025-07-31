@@ -39,7 +39,7 @@ export class Frontend_Http_Transport implements Transport {
 		try {
 			const response = await fetch(this.#url, {
 				method: 'POST', // TODO support GET when `!spec.side_effects`
-				headers: this.#headers,
+				headers: this.#headers, // TODO support custom headers, maybe just as a second arg
 				body: JSON.stringify(message),
 				// TODO
 				// signal: AbortSignal.timeout(REQUEST_TIMEOUT),

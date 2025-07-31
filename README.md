@@ -2,14 +2,14 @@
 
 [<img src="/static/logo.svg" alt="three sleepy z's" align="right" width="192" height="192">](https://www.zzz.software/)
 
-> fullstack web toolkit for power users and devs 💤 nice web things for the tired
+> nice web things for the tired 💤
 
 ⚠️ early pre-release, does not persist your data yet
 
 **[zzz.software](https://www.zzz.software/)**
 
 Zzz, pronounced "zees" like bees,
-is a fullstack web toolkit with a focus on user power and experimentation.
+is a fullstack web toolkit for power users and developers.
 The idea is to make an integrated cross-platform environment that adapts to
 your needs and intent while remaining fully open, aligned, and in your control.
 It's both a customizable web UI for power users,
