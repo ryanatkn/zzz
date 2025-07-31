@@ -2,6 +2,8 @@ import {escape_regexp} from '@ryanatkn/belt/regexp.js';
 import type {Handler} from 'hono';
 
 // TODO this design is currently rigid, like it requires protocol, so config can be verbose
+// **Strict origin-based access control for a server/API** - blocking all cross-origin requests by default and only allowing explicitly whitelisted origins (including localhost variants). You're enforcing this at the middleware level for all requests (not just mutations), using multiple headers (origin, referer, sec-fetch-site) for defense in depth, while still permitting direct access (like curl/API clients).
+// We're building something that needs tight control over which web frontends can access it - likely an API or service where you want to prevent unauthorized websites from making requests on behalf of users (CSRF protection) while maintaining developer ergonomics for local development and testing.
 
 /**
  * Parses ALLOWED_ORIGINS env var into regex matchers.
