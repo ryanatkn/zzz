@@ -1,45 +1,15 @@
 import {escape_regexp} from '@ryanatkn/belt/regexp.js';
 import type {Handler} from 'hono';
 
-// Pattern aliases for common configurations
-const PATTERN_ALIASES: Record<string, ReadonlyArray<string> | undefined> = {
-	'@localhost': [
-		'http://localhost:*',
-		'https://localhost:*',
-		'http://127.0.0.1:*',
-		'https://127.0.0.1:*',
-		'http://[::1]:*',
-		'https://[::1]:*',
-		'http://[::ffff:127.0.0.1]:*',
-		'https://[::ffff:127.0.0.1]:*',
-	],
-	'@localhost_http': [
-		'http://localhost:*',
-		'http://127.0.0.1:*',
-		'http://[::1]:*',
-		'http://[::ffff:127.0.0.1]:*',
-	],
-	'@localhost_https': [
-		'https://localhost:*',
-		'https://127.0.0.1:*',
-		'https://[::1]:*',
-		'https://[::ffff:127.0.0.1]:*',
-	],
-} as const;
-
 /**
  * Parses ALLOWED_ORIGINS env var into regex matchers.
- * Accepts comma-separated patterns with limited wildcards and pattern aliases.
- *
- * Pattern aliases:
- * - @localhost: All localhost variants (HTTP + HTTPS)
- * - @localhost_http: HTTP localhost variants only
- * - @localhost_https: HTTPS localhost variants only
+ * Accepts comma-separated patterns with limited wildcards.
  *
  * Examples:
- * - "@localhost,https://api.example.com"
- * - "@localhost_https,https://*.example.com:*"
- * - "http://localhost:3000,@localhost_http,https://prod.example.com"
+ * - "https://api.example.com"
+ * - "https://*.example.com:*"
+ * - "http://localhost:3000,https://prod.example.com"
+ * - "https://*.staging.*.example.com" (multiple wildcards for deep subdomains)
  */
 export const parse_allowed_origins = (env_value: string | undefined): Array<RegExp> =>
 	env_value
@@ -47,21 +17,6 @@ export const parse_allowed_origins = (env_value: string | undefined): Array<RegE
 				.split(',')
 				.map((s) => s.trim())
 				.filter(Boolean)
-				.flatMap((pattern) => {
-					// Expand aliases
-					if (pattern.startsWith('@')) {
-						const alias = PATTERN_ALIASES[pattern];
-						if (!alias) {
-							throw new Error(
-								`Unknown pattern alias: ${pattern}. Available aliases: ${Object.keys(
-									PATTERN_ALIASES,
-								).join(', ')}`,
-							);
-						}
-						return [...alias]; // Return a copy of the array
-					}
-					return pattern;
-				})
 				.map(origin_pattern_to_regexp)
 		: [];
 
@@ -73,7 +28,8 @@ export const should_allow_origin = (origin: string, allowed_patterns: Array<RegE
 
 /**
  * Middleware that checks if the request's origin is allowed.
- * Blocks all requests (including GET) that don't match allowed origins.
+ * Blocks cross-site requests that don't match allowed origins.
+ * Allows requests without origin/referer headers (e.g., direct access).
  */
 export const verify_origin =
 	(allowed_patterns: Array<RegExp>): Handler =>
@@ -110,23 +66,24 @@ export const verify_origin =
 		}
 
 		// No origin or referer or `sec-fetch-site` header - likely direct access (curl, etc).
-		// For convenience we'll allow this for now but some users may want additional security,
-		// so we may restrict it later or add more options.
+		// Allow these requests as per requirements (will add token auth later).
 		return next();
 	};
 
 /**
  * Converts origin patterns with wildcards to regex patterns.
  * Supports:
- * - Wildcard subdomains: *.example.com
+ * - Wildcard subdomains: *.example.com (matches one level)
+ * - Multiple wildcards: *.staging.*.example.com
  * - Wildcard ports: http://localhost:*
- * - Both: https://*.example.com:*
  * - IPv6 addresses: http://[::1]:3000, https://[2001:db8::1]
- * Does NOT support arbitrary wildcards elsewhere.
+ * Does NOT support:
+ * - Paths (origins don't have paths)
+ * - Wildcards in other positions
  */
 const origin_pattern_to_regexp = (pattern: string): RegExp => {
+	// Parse the pattern into components
 	// Updated regex to support IPv6 addresses in brackets
-	// IPv6 pattern matches [xxxx:xxxx:...] format
 	const parts = /^(https?:\/\/)(\[[^\]]+\]|[^:/]+)(:\*|:\d+)?(\/.*)?$/.exec(pattern);
 	if (!parts) {
 		throw new Error(`Invalid origin pattern: ${pattern}`);
@@ -134,34 +91,52 @@ const origin_pattern_to_regexp = (pattern: string): RegExp => {
 
 	const [, protocol, hostname, port = '', path = ''] = parts;
 
+	// Check for paths (not allowed)
+	if (path) {
+		throw new Error(`Paths not allowed in origin patterns: ${pattern}`);
+	}
+
 	// Check wildcards only in allowed positions
 	if (hostname.startsWith('[') && hostname.includes('*')) {
 		throw new Error(`Wildcards not allowed in IPv6 addresses: ${pattern}`);
 	}
-	if (!hostname.startsWith('[') && hostname.includes('*') && !hostname.startsWith('*.')) {
-		throw new Error(`Wildcard only allowed at start of hostname: ${pattern}`);
+
+	// For non-IPv6 hostnames, check that wildcards only appear as complete labels
+	if (!hostname.startsWith('[')) {
+		const labels = hostname.split('.');
+		for (const label of labels) {
+			if (label.includes('*') && label !== '*') {
+				throw new Error(
+					`Wildcards must be complete labels (e.g., *.example.com, not *example.com): ${pattern}`,
+				);
+			}
+		}
 	}
+
 	if (port.includes('*') && port !== ':*') {
 		throw new Error(`Invalid port wildcard: ${pattern}`);
-	}
-	if (path.includes('*')) {
-		throw new Error(`Wildcards not allowed in path: ${pattern}`);
 	}
 
 	// Build regex pattern
 	let regex_pattern = '^';
 	regex_pattern += escape_regexp(protocol);
 
-	// Handle hostname wildcard or IPv6
+	// Handle hostname - IPv6 or regular hostname with potential wildcards
 	if (hostname.startsWith('[')) {
 		// IPv6 address - escape the brackets
 		regex_pattern += escape_regexp(hostname);
-	} else if (hostname.startsWith('*.')) {
-		// *.example.com matches example.com and any.subdomain.example.com
-		const domain = escape_regexp(hostname.slice(2));
-		regex_pattern += `([^:/]+\\.)?${domain}`;
 	} else {
-		regex_pattern += escape_regexp(hostname);
+		// Regular hostname - handle wildcards
+		const labels = hostname.split('.');
+		const regex_labels = labels.map((label) => {
+			if (label === '*') {
+				// Match exactly one label (no dots allowed)
+				return '[^./:]+';
+			} else {
+				return escape_regexp(label);
+			}
+		});
+		regex_pattern += regex_labels.join('\\.');
 	}
 
 	// Handle port wildcard
@@ -171,8 +146,8 @@ const origin_pattern_to_regexp = (pattern: string): RegExp => {
 		regex_pattern += escape_regexp(port);
 	}
 
-	regex_pattern += escape_regexp(path);
 	regex_pattern += '$';
 
-	return new RegExp(regex_pattern);
+	// Create case-insensitive regex (domains are case-insensitive)
+	return new RegExp(regex_pattern, 'i');
 };
