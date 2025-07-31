@@ -1,6 +1,8 @@
 import {escape_regexp} from '@ryanatkn/belt/regexp.js';
 import type {Handler} from 'hono';
 
+// TODO this design is currently rigid, like it requires protocol, so config can be verbose
+
 /**
  * Parses ALLOWED_ORIGINS env var into regex matchers.
  * Accepts comma-separated patterns with limited wildcards.
