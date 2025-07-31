@@ -48,11 +48,7 @@
 		no_items=""
 	>
 		{#snippet children(action)}
-			<Action_Listitem
-				{action}
-				selected={action.id === selected_action_id}
-				{onselect}
-			/>
+			<Action_Listitem {action} selected={action.id === selected_action_id} {onselect} />
 		{/snippet}
 	</Sortable_List>
 

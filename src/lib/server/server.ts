@@ -2,6 +2,7 @@ import {Hono} from 'hono';
 import {serve} from '@hono/node-server';
 import {createNodeWebSocket} from '@hono/node-ws';
 import {Logger} from '@ryanatkn/belt/log.js';
+import {ALLOWED_ORIGINS} from '$env/static/private';
 
 import {Backend} from '$lib/server/backend.js';
 import {backend_action_handlers} from '$lib/server/backend_action_handlers.js';
@@ -13,11 +14,10 @@ import {
 	API_PATH_FOR_HTTP_RPC,
 	SERVER_HOST,
 	SERVER_PROXIED_PORT,
-	SERVER_URL,
 	WEBSOCKET_PATH,
 	ZZZ_CACHE_DIR,
 } from '$lib/constants.js';
-import {verify_origin} from '$lib/server/security.js';
+import {parse_allowed_origins, verify_origin} from '$lib/server/security.js';
 import {handle_filer_change} from '$lib/server/backend_actions_api.js';
 import {Ollama_Backend_Provider} from '$lib/server/ollama_backend_provider.js';
 import {Claude_Backend_Provider} from '$lib/server/claude_backend_provider.js';
@@ -29,8 +29,9 @@ const log = new Logger('[server]');
 const create_server = (): void => {
 	// TODO better config
 	const config = create_config();
+
 	// Security: allow only the configured server URL, extend with care
-	const allowed_origins = [SERVER_URL];
+	const allowed_origins = parse_allowed_origins(ALLOWED_ORIGINS);
 
 	// TODO better logging
 	log.info('creating server', {
@@ -68,7 +69,6 @@ const create_server = (): void => {
 			app,
 			backend,
 			upgradeWebSocket,
-			allowed_origins, // TODO is this good or should they be separate?
 		});
 	}
 
