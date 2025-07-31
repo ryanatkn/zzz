@@ -3,6 +3,7 @@ import {strip_start} from '@ryanatkn/belt/string.js';
 
 import {Cell, type Cell_Options} from '$lib/cell.svelte.js';
 import {
+	Diskfile_Directory_Path,
 	Diskfile_Json,
 	type Diskfile_Path,
 	type Serializable_Source_File,
@@ -16,7 +17,7 @@ export interface Diskfile_Options extends Cell_Options<typeof Diskfile_Json> {} 
 
 export class Diskfile extends Cell<typeof Diskfile_Json> {
 	path: Diskfile_Path = $state()!;
-	source_dir: Diskfile_Path = $state()!;
+	source_dir: Diskfile_Directory_Path = $state()!;
 
 	content: string | null = $state()!;
 

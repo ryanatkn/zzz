@@ -5,6 +5,7 @@ import {strip_start} from '@ryanatkn/belt/string.js';
 import {Uuid, Datetime, Datetime_Now, create_uuid} from '$lib/zod_helpers.js';
 import {
 	Diskfile_Change_Type,
+	Diskfile_Directory_Path,
 	Diskfile_Path,
 	Serializable_Source_File,
 	type Diskfile_Json,
@@ -69,7 +70,7 @@ export const to_serializable_source_file = (
 	dir: string,
 ): Serializable_Source_File => ({
 	id: source_file.id as Diskfile_Path,
-	source_dir: dir as Diskfile_Path,
+	source_dir: dir as Diskfile_Directory_Path,
 	contents: source_file.contents,
 	ctime: source_file.ctime,
 	mtime: source_file.mtime,

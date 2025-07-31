@@ -15,9 +15,8 @@ export const Diskfile_Path = z
 export type Diskfile_Path = z.infer<typeof Diskfile_Path>;
 
 /** These always have a trailing slash. */
-export const Diskfile_Directory_Path = Diskfile_Path.pipe(Path_With_Trailing_Slash);
-// TODO BLOCK brand right?
-// .brand('Diskfile_Directory_Path');
+export const Diskfile_Directory_Path =
+	Diskfile_Path.pipe(Path_With_Trailing_Slash).brand('Diskfile_Directory_Path');
 export type Diskfile_Directory_Path = z.infer<typeof Diskfile_Directory_Path>;
 
 export const Diskfile_Change = z

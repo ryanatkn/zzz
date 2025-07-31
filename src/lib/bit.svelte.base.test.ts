@@ -6,7 +6,7 @@ import {test, expect, describe, beforeEach} from 'vitest';
 
 import {Bit, Text_Bit, Diskfile_Bit, Sequence_Bit} from '$lib/bit.svelte.js';
 import {create_uuid, get_datetime_now} from '$lib/zod_helpers.js';
-import {Diskfile_Path, Serializable_Source_File} from '$lib/diskfile_types.js';
+import {Diskfile_Directory_Path, Diskfile_Path} from '$lib/diskfile_types.js';
 import {Frontend} from '$lib/frontend.svelte.js';
 import {monkeypatch_zzz_for_tests} from '$lib/test_helpers.js';
 import {estimate_token_count} from '$lib/helpers.js';
@@ -22,7 +22,7 @@ const TEST_CONTENT = {
 };
 
 const TEST_PATH = Diskfile_Path.parse('/path/to/test/file.txt');
-const TEST_DIR = Serializable_Source_File.shape.source_dir.parse('/path/');
+const TEST_DIR = Diskfile_Directory_Path.parse('/path/');
 
 beforeEach(() => {
 	// Create a real Zzz instance for each test
@@ -301,7 +301,7 @@ describe('Diskfile_Bit specific behavior', () => {
 		app.diskfiles.add(
 			app.cell_registry.instantiate('Diskfile', {
 				path: path1,
-				source_dir: Serializable_Source_File.shape.source_dir.parse('/path/'),
+				source_dir: Diskfile_Directory_Path.parse('/path/'),
 				content: 'File 1 content',
 			}),
 		);
@@ -309,7 +309,7 @@ describe('Diskfile_Bit specific behavior', () => {
 		app.diskfiles.add(
 			app.cell_registry.instantiate('Diskfile', {
 				path: path2,
-				source_dir: Serializable_Source_File.shape.source_dir.parse('/path/'),
+				source_dir: Diskfile_Directory_Path.parse('/path/'),
 				content: 'File 2 content',
 			}),
 		);

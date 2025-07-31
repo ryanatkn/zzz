@@ -5,7 +5,7 @@ import {Logger} from '@ryanatkn/belt/log.js';
 
 import type {Action_Spec_Union} from '$lib/action_spec.js';
 import type {Zzz_Config} from '$lib/config_helpers.js';
-import {Diskfile_Directory_Path, Diskfile_Path} from '$lib/diskfile_types.js';
+import {Diskfile_Directory_Path} from '$lib/diskfile_types.js';
 import {Scoped_Fs} from '$lib/server/scoped_fs.js';
 import {Action_Registry} from '$lib/action_registry.js';
 import {ZZZ_CACHE_DIR} from '$lib/constants.js';
@@ -114,7 +114,9 @@ export class Backend implements Action_Event_Environment {
 	readonly #handle_filer_change: Filer_Change_Handler;
 
 	constructor(options: Backend_Options) {
-		this.zzz_cache_dir = Diskfile_Path.parse(resolve(options.zzz_cache_dir || ZZZ_CACHE_DIR));
+		this.zzz_cache_dir = Diskfile_Directory_Path.parse(
+			resolve(options.zzz_cache_dir || ZZZ_CACHE_DIR),
+		);
 
 		this.config = options.config;
 

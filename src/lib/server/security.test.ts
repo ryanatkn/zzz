@@ -1,3 +1,5 @@
+// @slop Claude Opus 4
+
 import {describe, test, expect, vi} from 'vitest';
 import type {Handler} from 'hono';
 
