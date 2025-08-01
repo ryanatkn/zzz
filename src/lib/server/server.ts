@@ -17,7 +17,7 @@ import {
 	WEBSOCKET_PATH,
 	ZZZ_CACHE_DIR,
 } from '$lib/constants.js';
-import {parse_allowed_origins, verify_origin} from '$lib/server/security.js';
+import {parse_allowed_origins, verify_request_source} from '$lib/server/security.js';
 import {handle_filer_change} from '$lib/server/backend_actions_api.js';
 import {Ollama_Backend_Provider} from '$lib/server/ollama_backend_provider.js';
 import {Claude_Backend_Provider} from '$lib/server/claude_backend_provider.js';
@@ -42,8 +42,14 @@ const create_server = (): void => {
 
 	const app = new Hono();
 
+	// app.use(async (c, next) => {
+	// 	log.info(`Incoming request: ${c.req.method} ${c.req.url}`, c.req.header());
+	// 	await next();
+	// 	log.info(`Finished request: ${c.req.method} ${c.req.url}`);
+	// });
+
 	// Security: first verify the origin of incoming requests
-	app.use(verify_origin(allowed_origins));
+	app.use(verify_request_source(allowed_origins));
 
 	const {injectWebSocket, upgradeWebSocket} = createNodeWebSocket({app});
 

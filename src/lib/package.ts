@@ -2557,7 +2557,7 @@ export const src_json = {
 			declarations: [
 				{name: 'parse_allowed_origins', kind: 'function'},
 				{name: 'should_allow_origin', kind: 'function'},
-				{name: 'verify_origin', kind: 'function'},
+				{name: 'verify_request_source', kind: 'function'},
 			],
 		},
 		'./server/server_helpers.js': {

@@ -772,7 +772,7 @@ describe('verify_request_source middleware', () => {
 				{
 					referer: 'not-a-valid-url',
 				},
-				'invalid referer',
+				'forbidden referer',
 			);
 		});
 	});

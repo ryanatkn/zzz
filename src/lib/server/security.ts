@@ -55,10 +55,8 @@ export const should_allow_origin = (origin: string, allowed_patterns: Array<RegE
 export const verify_request_source =
 	(allowed_patterns: Array<RegExp>): Handler =>
 	(c, next) => {
+		// Check origin header (preferred, sent by browsers for CORS requests)
 		const origin = c.req.header('origin');
-		const referer = c.req.header('referer');
-
-		// Check Origin header (preferred, sent by browsers for CORS requests)
 		if (origin) {
 			if (!should_allow_origin(origin, allowed_patterns)) {
 				return c.text('forbidden origin', 403);
@@ -66,18 +64,14 @@ export const verify_request_source =
 			return next();
 		}
 
-		// Check Referer header (fallback for some requests like navigation)
+		// Check referer header (fallback for some requests like navigation)
+		const referer = c.req.header('referer');
 		if (referer) {
-			try {
-				const url = new URL(referer);
-				const referer_origin = `${url.protocol}//${url.host}`;
-				if (!should_allow_origin(referer_origin, allowed_patterns)) {
-					return c.text('forbidden referer', 403);
-				}
-				return next();
-			} catch {
-				return c.text('invalid referer', 403);
+			const referer_origin = extract_origin_from_referer(referer);
+			if (!should_allow_origin(referer_origin, allowed_patterns)) {
+				return c.text('forbidden referer', 403);
 			}
+			return next();
 		}
 
 		// No origin or referer - likely direct access (curl, Postman, etc.)
@@ -174,4 +168,30 @@ const origin_pattern_to_regexp = (pattern: string): RegExp => {
 
 	// Case-insensitive matching (web standards specify domains are case-insensitive)
 	return new RegExp(regex_pattern, 'i');
+};
+
+/**
+ * Efficiently extracts the origin from a referer URL, removing the path.
+ *
+ * @param referer - The referer URL (e.g., "https://example.com/path/to/page")
+ * @returns The origin part (e.g., "https://example.com")
+ */
+const extract_origin_from_referer = (referer: string): string => {
+	// Extract origin from referer by finding the third slash
+	// Format: protocol://host[:port]/path...
+	let slash_count = 0;
+	let origin_end = -1;
+
+	for (let i = 0; i < referer.length; i++) {
+		if (referer[i] === '/') {
+			slash_count++;
+			if (slash_count === 3) {
+				origin_end = i;
+				break;
+			}
+		}
+	}
+
+	// If we found the third slash, extract origin; otherwise use the whole referer
+	return origin_end !== -1 ? referer.substring(0, origin_end) : referer;
 };
