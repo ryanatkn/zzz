@@ -14,9 +14,10 @@
 		<div out:blur={{duration: DURATION_LG}}>
 			<aside out:scale={{duration: DURATION_LG, easing: (t) => sineInOut(t / 3)}}>
 				<p>
-					⚠️ This is an early prototype and your data is not saved yet -- soon the Node backend will
-					persist data to a Postgres or pglite database. (<External_Link
-						href="https://github.com/ryanatkn/zzz/issues/7">issue 7</External_Link
+					⚠️ This is an early prototype and your data is not saved yet, except chats are saved to
+					the filesystem temporarily -- soon the Node backend will persist data to a Postgres or
+					pglite database. (<External_Link href="https://github.com/ryanatkn/zzz/issues/7"
+						>issue 7</External_Link
 					>)
 				</p>
 				<button

@@ -18,14 +18,22 @@
 
 	const strip_count = $derived(tape.strips.size);
 
-	// TODO BLOCK move to a class and add selection behavior for tapes even in multi view
-	const selected = $derived(
-		chat.view_mode === 'simple' && chat.tapes.length > 1 && chat.tapes[0].id === tape.id,
-	);
+	// TODO hacky but is the desired UX for now
+	const selectable = $derived(chat.view_mode === 'simple');
+	const selected = $derived(selectable && chat.selected_tape_id === tape.id);
 </script>
 
 <Tape_Contextmenu {tape}>
-	<div class="tape_listitem p_xs2" class:dormant={!tape.enabled} class:selected>
+	<!-- svelte-ignore a11y_no_noninteractive_tabindex -->
+	<div
+		class="tape_listitem p_xs2"
+		class:dormant={!tape.enabled}
+		class:selected
+		onclick={selectable ? () => chat.select_tape(tape.id) : undefined}
+		onkeydown={selectable ? (e) => e.key === 'Enter' && chat.select_tape(tape.id) : undefined}
+		role={selectable ? 'button' : undefined}
+		tabindex={selectable ? 0 : undefined}
+	>
 		<div class="row justify_content_space_between gap_xs">
 			<div class="flex_1">
 				<div class="font_weight_400">
