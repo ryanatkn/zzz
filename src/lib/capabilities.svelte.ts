@@ -313,17 +313,13 @@ export class Capabilities extends Cell<typeof Capabilities_Json> {
 
 	/**
 	 * Check Ollama availability by connecting to its API.
-	 * @returns A promise that resolves when the check is complete
 	 */
 	async check_ollama(): Promise<void> {
-		// Simply delegate to app.ollama.refresh()
-		// The derived state will automatically update based on ollama's state
 		try {
 			await this.app.ollama.refresh();
 		} catch (error) {
 			console.error('failed to check Ollama:', error);
 			// TODO BLOCK I think we need to handle the error here? or elsewhere
-			// Error handling is done in the ollama class itself
 		}
 	}
 
