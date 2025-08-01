@@ -74,8 +74,11 @@ export const verify_request_source =
 			return next();
 		}
 
-		// No origin or referer - likely direct access (curl, Postman, etc.)
-		// Allow these as the user may want to support direct API access
+		// TODO revisit when we add auth and CSRF protection
+		// No origin or referer - usually direct access like curl.
+		// Allow because the request is coming from a non-browser source
+		// that could be spoofing headers anyway,
+		// so we'll assume the user is running trusted code.
 		return next();
 	};
 
