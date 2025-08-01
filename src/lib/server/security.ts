@@ -64,7 +64,7 @@ export const verify_request_source =
 			return next();
 		}
 
-		// Check referer header (fallback for some requests like navigation)
+		// Check referer header (fallback for some requests like gets and navigation)
 		const referer = c.req.header('referer');
 		if (referer) {
 			const referer_origin = extract_origin_from_referer(referer);

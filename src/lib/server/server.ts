@@ -42,11 +42,16 @@ const create_server = (): void => {
 
 	const app = new Hono();
 
-	// app.use(async (c, next) => {
-	// 	log.info(`Incoming request: ${c.req.method} ${c.req.url}`, c.req.header());
-	// 	await next();
-	// 	log.info(`Finished request: ${c.req.method} ${c.req.url}`);
-	// });
+	app.use(async (c, next) => {
+		log.info(
+			'req',
+			`\n\t${c.req.method} ${c.req.url}`,
+			'\n\torigin ' + c.req.header('origin'),
+			'\n\treferer ' + c.req.header('referer'),
+		);
+		await next();
+		log.info(`Finished request: ${c.req.method} ${c.req.url}`);
+	});
 
 	// Security: first verify the origin of incoming requests
 	app.use(verify_request_source(allowed_origins));
