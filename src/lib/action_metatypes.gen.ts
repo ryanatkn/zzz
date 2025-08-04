@@ -80,9 +80,7 @@ export const gen: Gen = ({origin_path}) => {
 			${registry.specs
 				.map((spec) => {
 					const innermost_type_name = get_innermost_type_name(spec.input);
-					const has_input =
-						innermost_type_name !== z.ZodFirstPartyTypeKind.ZodNull &&
-						innermost_type_name !== z.ZodFirstPartyTypeKind.ZodVoid;
+					const has_input = innermost_type_name !== 'null' && innermost_type_name !== 'void';
 					return `${spec.method}: (${
 						has_input
 							? `input${spec.input.safeParse(undefined).success ? '?' : ''}: Action_Inputs['${spec.method}']`

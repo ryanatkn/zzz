@@ -10,7 +10,7 @@
 	import {BROWSER} from 'esm-env';
 	import {page} from '$app/state';
 	import {onNavigate} from '$app/navigation';
-	import {base} from '$app/paths';
+	import {resolve} from '$app/paths';
 
 	import {App} from '$lib/app.svelte.js';
 	import Frontend_Root from '$lib/Frontend_Root.svelte';
@@ -54,10 +54,10 @@
 
 	// Enhance schemas with metadata for deserialization - use class names
 	// Safely access Zod schema internals using type assertion
-	const prompt_json_obj = Prompt_Json as unknown as {shape?: {bits?: {_def?: {type?: any}}}};
-	if (prompt_json_obj.shape?.bits?._def?.type) {
+	const prompt_json_obj = Prompt_Json as unknown as {shape?: {bits?: {def?: {type?: any}}}};
+	if (prompt_json_obj.shape?.bits?.def?.type) {
 		// Store class name instead of schema id
-		prompt_json_obj.shape.bits._def.type.class_name = 'Bit';
+		prompt_json_obj.shape.bits.def.type.class_name = 'Bit';
 	}
 
 	if (BROWSER) (window as any).app = (window as any).app = app; // no types for this, just for runtime convenience
@@ -73,9 +73,9 @@
 	// TODO refactor this, doesn't belong here - see the comment at `to_nav_link_href`
 	onNavigate(() => {
 		const {pathname} = page.url;
-		if (pathname === `${base}/chats`) {
+		if (pathname === resolve('/chats')) {
 			app.chats.selected_id_last_non_null = null;
-		} else if (pathname === `${base}/prompts`) {
+		} else if (pathname === resolve('/prompts')) {
 			app.prompts.selected_id_last_non_null = null;
 		}
 	});

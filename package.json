@@ -1167,10 +1167,6 @@
       "types": "./dist/test_helpers.d.ts",
       "default": "./dist/test_helpers.js"
     },
-    "./test.task.js": {
-      "types": "./dist/test.task.d.ts",
-      "default": "./dist/test.task.js"
-    },
     "./time_helpers.js": {
       "types": "./dist/time_helpers.d.ts",
       "default": "./dist/time_helpers.js"

@@ -1017,7 +1017,6 @@ export const package_json: Package_Json = {
 		'./tape.svelte.js': {types: './dist/tape.svelte.d.ts', default: './dist/tape.svelte.js'},
 		'./tapes.svelte.js': {types: './dist/tapes.svelte.d.ts', default: './dist/tapes.svelte.js'},
 		'./test_helpers.js': {types: './dist/test_helpers.d.ts', default: './dist/test_helpers.js'},
-		'./test.task.js': {types: './dist/test.task.d.ts', default: './dist/test.task.js'},
 		'./time_helpers.js': {types: './dist/time_helpers.d.ts', default: './dist/time_helpers.js'},
 		'./Time_Widget.svelte': {
 			types: './dist/Time_Widget.svelte.d.ts',
@@ -2697,13 +2696,6 @@ export const src_json: Src_Json = {
 				{name: 'expect_defined', kind: 'function'},
 				{name: 'expect_nonnullish', kind: 'function'},
 				{name: 'monkeypatch_zzz_for_tests', kind: 'function'},
-			],
-		},
-		'./test.task.js': {
-			path: 'test.task.ts',
-			declarations: [
-				{name: 'Args', kind: 'variable'},
-				{name: 'task', kind: 'variable'},
 			],
 		},
 		'./time_helpers.js': {

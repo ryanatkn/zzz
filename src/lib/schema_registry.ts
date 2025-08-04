@@ -24,35 +24,35 @@ export class Schema_Registry {
 	/**
 	 * All schemas, including model schemas, action params, and responses.
 	 */
-	schemas: Array<z.ZodTypeAny> = [];
+	schemas: Array<z.ZodType> = [];
 
 	/**
 	 * Model schemas are distinct from the action schemas.
 	 * Models are the nouns compared to the Action verbs,
 	 * and compared to Views they are data not Svelte components.
 	 */
-	model_schemas: Array<z.ZodTypeAny> = [];
+	model_schemas: Array<z.ZodType> = [];
 
 	/**
 	 * Action parameter schemas.
 	 */
-	action_params_schemas: Array<z.ZodTypeAny> = [];
+	action_params_schemas: Array<z.ZodType> = [];
 
 	/**
 	 * Action response schemas.
 	 */
-	action_response_schemas: Array<z.ZodTypeAny> = [];
+	action_response_schemas: Array<z.ZodType> = [];
 
 	/**
 	 * Map of schema names to schemas.
 	 */
-	schema_by_name: Map<Vocab_Name, z.ZodTypeAny> = new Map();
+	schema_by_name: Map<Vocab_Name, z.ZodType> = new Map();
 
 	/**
 	 * Map of schemas to their names, for reverse lookup.
 	 * Zod schemas don't have a `name` property and we don't want to abuse `description`.
 	 */
-	name_by_schema: Map<z.ZodTypeAny, Vocab_Name> = new Map();
+	name_by_schema: Map<z.ZodType, Vocab_Name> = new Map();
 
 	/**
 	 * Collection of all action specs.
@@ -82,7 +82,7 @@ export class Schema_Registry {
 	/**
 	 * Add a schema to the appropriate registries.
 	 */
-	add_schema(name: Vocab_Name, schema: z.ZodTypeAny | Action_Spec_Union): void {
+	add_schema(name: Vocab_Name, schema: z.ZodType | Action_Spec_Union): void {
 		if ('_def' in schema) {
 			// It's a Zod schema
 			this.schemas.push(schema);
@@ -129,7 +129,7 @@ export class Schema_Registry {
 	/**
 	 * Lookup a schema name, guaranteed to return a string, or throws.
 	 */
-	lookup_schema_name(schema: z.ZodTypeAny): Vocab_Name {
+	lookup_schema_name(schema: z.ZodType): Vocab_Name {
 		const name = this.name_by_schema.get(schema);
 		if (!name) {
 			throw new Error(`Schema not found in name_by_schema registry`);
@@ -154,7 +154,7 @@ export class Schema_Registry {
 	/**
 	 * Get a schema by name.
 	 */
-	get_schema(name: Vocab_Name): z.ZodTypeAny | undefined {
+	get_schema(name: Vocab_Name): z.ZodType | undefined {
 		return this.schema_by_name.get(name);
 	}
 }

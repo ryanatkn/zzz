@@ -54,7 +54,7 @@ export type Uuid_With_Default = z.infer<typeof Uuid_With_Default>;
  * @param schema The schema to unwrap
  * @returns The innermost schema without wrappers
  */
-export const get_innermost_type = (schema: z.ZodTypeAny): z.ZodTypeAny => {
+export const get_innermost_type = (schema: z.ZodType): z.ZodType => {
 	if (schema instanceof z.ZodEffects) {
 		return get_innermost_type(schema.innerType());
 	}
@@ -66,25 +66,25 @@ export const get_innermost_type = (schema: z.ZodTypeAny): z.ZodTypeAny => {
 		return get_innermost_type(schema.unwrap());
 	}
 	if (schema instanceof z.ZodDefault) {
-		return get_innermost_type(schema._def.innerType);
+		return get_innermost_type(schema.def.innerType);
 	}
 	return schema;
 };
 
 // TODO type
-export const get_innermost_type_name = (schema: z.ZodTypeAny): any =>
-	get_innermost_type(schema)._def.typeName;
+export const get_innermost_type_name = (schema: z.ZodType): any =>
+	get_innermost_type(schema).def.type;
 
 /**
  * Gets all property keys from a Zod object schema.
  */
-export const zod_get_schema_keys = <T extends z.ZodTypeAny>(schema: T): Array<string> => {
+export const zod_get_schema_keys = <T extends z.ZodType>(schema: T): Array<string> => {
 	if (schema instanceof z.ZodObject) {
 		// For ZodObject, we can access the shape to get the keys
-		return Object.keys(schema._def.shape());
+		return Object.keys(schema.def.shape);
 	} else {
 		const innerType = get_innermost_type(schema);
-		return innerType instanceof z.ZodObject ? Object.keys(innerType._def.shape()) : EMPTY_ARRAY;
+		return innerType instanceof z.ZodObject ? Object.keys(innerType.def.shape) : EMPTY_ARRAY;
 	}
 };
 
@@ -95,7 +95,7 @@ export const zod_get_schema_keys = <T extends z.ZodTypeAny>(schema: T): Array<st
  * @param key The property name
  * @returns The field's schema, or throws if not found
  */
-export const get_field_schema = (schema: z.ZodTypeAny, key: string): z.ZodTypeAny => {
+export const get_field_schema = (schema: z.ZodType, key: string): z.ZodType => {
 	const field = maybe_get_field_schema(schema, key);
 	if (!field) {
 		throw new Error(`Field "${key}" not found in schema`);
@@ -110,10 +110,7 @@ export const get_field_schema = (schema: z.ZodTypeAny, key: string): z.ZodTypeAn
  * @param key The property name
  * @returns The field's schema, or undefined if not found
  */
-export const maybe_get_field_schema = (
-	schema: z.ZodTypeAny,
-	key: string,
-): z.ZodTypeAny | undefined => {
+export const maybe_get_field_schema = (schema: z.ZodType, key: string): z.ZodType | undefined => {
 	try {
 		const innerType = get_innermost_type(schema);
 
@@ -131,7 +128,7 @@ export const maybe_get_field_schema = (
 /**
  * Checks if a Zod schema is an array or contains an array through wrappers.
  */
-export const is_array_schema = (schema: z.ZodTypeAny): boolean => {
+export const is_array_schema = (schema: z.ZodType): boolean => {
 	const innerType = get_innermost_type(schema);
 	return innerType instanceof z.ZodArray;
 };
@@ -140,7 +137,7 @@ export const is_array_schema = (schema: z.ZodTypeAny): boolean => {
  * Gets the innermost array schema from a potentially nested schema structure.
  * Returns null if no array schema is found.
  */
-export const get_inner_array_schema = (schema: z.ZodTypeAny): z.ZodArray<any> | null => {
+export const get_inner_array_schema = (schema: z.ZodType): z.ZodArray<any> | null => {
 	const innerType = get_innermost_type(schema);
 	return innerType instanceof z.ZodArray ? innerType : null;
 };
@@ -148,13 +145,14 @@ export const get_inner_array_schema = (schema: z.ZodTypeAny): z.ZodArray<any> | 
 export const stringify_zod_error = (error: z.ZodError): string =>
 	error.issues.map((issue) => issue.message).join(', '); // TODO improve
 
+// TODO BLOCK use Zod's builtin now?
 /**
  * Formats a Zod validation error with field paths for clearer error messages.
  */
 export const format_zod_validation_error = (error: z.ZodError): string =>
-	error.errors
-		.map((e) => {
-			const path = e.path.length > 0 ? `${e.path.join('.')}: ` : '';
-			return `${path}${e.message}`;
+	error.issues
+		.map((i) => {
+			const path = i.path.length > 0 ? `${i.path.join('.')}: ` : '';
+			return `${path}${i.message}`;
 		})
 		.join(', ');

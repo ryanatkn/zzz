@@ -67,4 +67,4 @@ export const is_action_spec = (value: unknown): value is Action_Spec_Union =>
 	typeof value === 'object' &&
 	'method' in value &&
 	'kind' in value &&
-	Action_Kind._def.values.includes(value.kind as any);
+	Action_Kind.def.values.includes(value.kind as any);
