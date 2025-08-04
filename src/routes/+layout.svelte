@@ -6,7 +6,7 @@
 
 	import {onMount, type Snippet} from 'svelte';
 	import {contextmenu_action} from '@ryanatkn/fuz/contextmenu_state.svelte.js';
-	import {parse_package_meta} from '@ryanatkn/gro/package_meta.js';
+	import {parse_pkg} from '@ryanatkn/belt/pkg.js';
 	import {BROWSER} from 'esm-env';
 	import {page} from '$app/state';
 	import {onNavigate} from '$app/navigation';
@@ -47,7 +47,7 @@
 		}
 	});
 
-	pkg_context.set(parse_package_meta(package_json, src_json));
+	pkg_context.set(parse_pkg(package_json, src_json));
 
 	// Create the frontend's App, which extends Frontend
 	const app = new App();

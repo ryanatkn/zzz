@@ -85,7 +85,7 @@ export const gen: Gen = ({origin_path}) => {
 						innermost_type_name !== z.ZodFirstPartyTypeKind.ZodVoid;
 					return `${spec.method}: (${
 						has_input
-							? `input${spec.input.isOptional() ? '?' : ''}: Action_Inputs['${spec.method}']`
+							? `input${spec.input.safeParse(undefined).success ? '?' : ''}: Action_Inputs['${spec.method}']`
 							: 'input?: void'
 					}) => ${
 						spec.kind === 'request_response' || spec.async
