@@ -58,16 +58,22 @@
 			access to local and remote capabilities?"
 		</blockquote>
 		<p>
-			I'm a developer who likes designing and making tools, and the free and open source software I
-			imagine answering these questions is influenced by my situation and opinions:
+			I think these questions are becoming more important with technologies like LLMs in the
+			workflows of information workers; we need good options that avoid dependence on
+			service-controlled tools, like the common situation where one model provider monopolizes your
+			UX and controls your data. I'm a developer who likes designing and making tools, and the free
+			and open source software I imagine answering these questions is influenced by my situation and
+			opinions:
 		</p>
 		<ul>
 			<li>
 				I think UX should have primacy, and so UI quality is a top priority, informing other
-				technology decisions. It should be efficient, powerful, and customizable for devs and users,
-				making the fullstack system visible and controllable in novel contexts (e.g. users should be
-				able to create purpose-built UIs with the least effort necessary and without sacrificing
-				security or code quality).
+				technology decisions. It should be efficient, powerful, approachable, and customizable for
+				devs and users, making the fullstack system visible and controllable in novel contexts
+				without undue restriction (e.g. users should be able to create purpose-built UIs with the
+				least effort necessary and without sacrificing security or code quality, and for open-ended
+				flexibility with additional security implications, developers should have modular libraries
+				that fit existing workflows).
 			</li>
 			<li>
 				I want to make cross-platform software so it runs everywhere, shipping features once and
