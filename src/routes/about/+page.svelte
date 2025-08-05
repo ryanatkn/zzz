@@ -69,11 +69,11 @@
 			<li>
 				I think UX should have primacy, and so UI quality is a top priority, informing other
 				technology decisions. It should be efficient, powerful, approachable, and customizable for
-				devs and users, making the fullstack system visible and controllable in novel contexts
-				without undue restriction (e.g. users should be able to create purpose-built UIs with the
-				least effort necessary and without sacrificing security or code quality, and for open-ended
-				flexibility with additional security implications, developers should have modular libraries
-				that fit existing workflows).
+				devs and users, making the fullstack multidevice system visible and controllable in novel
+				contexts without undue restriction (e.g. users should be able to create purpose-built UIs
+				with the least effort necessary and without sacrificing security or code quality, and for
+				open-ended flexibility with additional security implications, developers should have modular
+				libraries that fit existing workflows).
 			</li>
 			<li>
 				I want to make cross-platform software so it runs everywhere, shipping features once and
