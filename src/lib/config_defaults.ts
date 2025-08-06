@@ -76,6 +76,7 @@ export const models_default: Array<z.input<typeof Model_Json>> = [
 
 	// https://docs.anthropic.com/en/home
 	{name: 'claude-sonnet-4-20250514', provider_name: 'claude', tags: ['smart']}, // name: 'claude-sonnet-4-0'
+	{name: 'claude-opus-4-1-20250805', provider_name: 'claude', tags: ['smart', 'smartest']}, // name: 'claude-opus-4-0'
 	{name: 'claude-opus-4-20250514', provider_name: 'claude', tags: ['smart', 'smarter']}, // name: 'claude-opus-4-0'
 	{name: 'claude-3-7-sonnet-20250219', provider_name: 'claude', tags: ['smart']}, // name: 'claude-3-7-sonnet-latest'
 	{name: 'claude-3-5-haiku-20241022', provider_name: 'claude', tags: ['cheap']}, // name: 'claude-3-5-haiku-latest'
