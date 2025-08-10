@@ -65,34 +65,56 @@ main() {
         exit 1
     fi
 
-    # Parse arguments
-    if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
-        echo "hex - GPU-Accelerated 2D Action RPG"
-        echo ""
-        echo "Usage: ./hex [options]"
-        echo ""
-        echo "Options:"
-        echo "  --help, -h        Show this help message"
-        echo "  --clean-shaders   Clean and rebuild all shaders"
-        echo "  --skip-shaders    Skip shader compilation"
-        echo "  --debug           Build with debug symbols"
-        echo ""
-        echo "Controls:"
-        echo "  Mouse/WASD        Movement"
-        echo "  Right Click       Fire projectile"
-        echo "  Space            Pause"
-        echo "  R                Respawn"
-        echo "  ESC              Quit"
-        exit 0
-    fi
+    # Check first argument for special cases
+    case "${1:-}" in
+        windows)
+            print_color "🪟 Building for Windows x86_64 (ReleaseFast)..." "$YELLOW"
+            compile_shaders
+            if zig build -Dtarget=x86_64-windows -Doptimize=ReleaseFast; then
+                # Rename with today's date
+                local date_str=$(date +%b_%d_%Y | tr '[:upper:]' '[:lower:]')
+                mv "./zig-out/bin/hex.exe" "./zig-out/bin/hex_${date_str}.exe"
+                print_color "✅ Windows build complete: zig-out/bin/hex_${date_str}.exe" "$GREEN"
+            else
+                print_color "❌ Windows build failed!" "$RED"
+                exit 1
+            fi
+            exit 0
+            ;;
+        --help|-h)
+            echo "hex - GPU-Accelerated 2D Action RPG"
+            echo ""
+            echo "Usage: ./hex [options]"
+            echo ""
+            echo "Special commands:"
+            echo "  windows           Build for Windows x86_64 with date suffix"
+            echo ""
+            echo "Options:"
+            echo "  --help, -h        Show this help message"
+            echo "  --clean-shaders   Clean and rebuild all shaders"
+            echo "  --skip-shaders    Skip shader compilation"
+            echo "  --debug           Build with debug symbols"
+            echo ""
+            echo "Controls:"
+            echo "  Mouse/WASD        Movement"
+            echo "  Right Click       Fire projectile"
+            echo "  Space            Pause"
+            echo "  R                Respawn"
+            echo "  ESC              Quit"
+            exit 0
+            ;;
+    esac
 
-    # Handle special flags
+    # Handle remaining flags (skip first arg if it was a special command)
     local skip_shaders=false
     local debug_build=false
     local clean_shaders=false
     local game_args=()
 
-    for arg in "$@"; do
+    # Filter out the special commands from argument processing
+    local args_to_process=("$@")
+
+    for arg in "${args_to_process[@]}"; do
         case $arg in
             --skip-shaders)
                 skip_shaders=true
