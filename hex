@@ -39,23 +39,6 @@ compile_shaders() {
     fi
 }
 
-# Function to build the game
-build_game() {
-    print_color "🔨 Building hex..." "$YELLOW"
-    if zig build -Doptimize=ReleaseFast; then
-        print_color "✅ Build successful" "$GREEN"
-    else
-        print_color "❌ Build failed" "$RED"
-        exit 1
-    fi
-}
-
-# Function to run the game
-run_game() {
-    print_color "🎮 Starting hex..." "$GREEN"
-    exec "./$BUILD_TARGET" "$@"
-}
-
 # Main execution flow
 main() {
     # Check if zig is installed
@@ -93,7 +76,6 @@ main() {
             echo "  --help, -h        Show this help message"
             echo "  --clean-shaders   Clean and rebuild all shaders"
             echo "  --skip-shaders    Skip shader compilation"
-            echo "  --debug           Build with debug symbols"
             echo ""
             echo "Controls:"
             echo "  Mouse/WASD        Movement"
@@ -105,22 +87,15 @@ main() {
             ;;
     esac
 
-    # Handle remaining flags (skip first arg if it was a special command)
+    # Handle remaining flags
     local skip_shaders=false
-    local debug_build=false
     local clean_shaders=false
     local game_args=()
 
-    # Filter out the special commands from argument processing
-    local args_to_process=("$@")
-
-    for arg in "${args_to_process[@]}"; do
+    for arg in "$@"; do
         case $arg in
             --skip-shaders)
                 skip_shaders=true
-                ;;
-            --debug)
-                debug_build=true
                 ;;
             --clean-shaders)
                 clean_shaders=true
@@ -131,34 +106,28 @@ main() {
         esac
     done
 
-    # Clean shaders if requested
+    # Handle shader compilation
     if [[ "$clean_shaders" == true ]]; then
-        print_color "🧹 Cleaning shaders..." "$YELLOW"
+        print_color "🧹 Cleaning and rebuilding shaders..." "$YELLOW"
         if [[ -f "$SHADER_SCRIPT" ]]; then
             bash "$SHADER_SCRIPT" --clean
         fi
-    fi
-
-    # Compile shaders (unless skipped)
-    if [[ "$skip_shaders" == false ]]; then
+    elif [[ "$skip_shaders" == false ]]; then
         compile_shaders
     fi
 
     # Build the game
-    if [[ "$debug_build" == true ]]; then
-        print_color "🔨 Building hex (debug mode)..." "$YELLOW"
-        if zig build -Doptimize=Debug; then
-            print_color "✅ Debug build successful" "$GREEN"
-        else
-            print_color "❌ Build failed" "$RED"
-            exit 1
-        fi
+    print_color "🔨 Building hex..." "$YELLOW"
+    if zig build -Doptimize=Debug; then
+        print_color "✅ Build successful" "$GREEN"
     else
-        build_game
+        print_color "❌ Build failed" "$RED"
+        exit 1
     fi
 
     # Run the game with any remaining arguments
-    run_game "${game_args[@]}"
+    print_color "🎮 Starting hex..." "$GREEN"
+    exec "./$BUILD_TARGET" "${game_args[@]}"
 }
 
 # Run main function with all arguments
