@@ -41,7 +41,7 @@ pub fn build(b: *std.Build) void {
     const sdl_lib = sdl_dep.artifact("SDL3");
     exe.linkLibrary(sdl_lib);
 
-    // TODO are all of these needed?
+    // TODO verify these
     // System libraries (platform-specific)
     if (target.result.os.tag == .linux) {
         exe.linkSystemLibrary("GL");
