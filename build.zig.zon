@@ -1,7 +1,7 @@
 .{
     .name = .hex,
     .version = "0.0.0",
-    .fingerprint = 0xffd12566b9c95b9e, // Changing this has security and trust implications.
+    .fingerprint = 0xffd12566b9c95b9e,
     .minimum_zig_version = "0.14.1",
     .dependencies = .{
         .sdl = .{
