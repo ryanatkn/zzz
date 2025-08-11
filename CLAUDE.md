@@ -37,20 +37,25 @@ Dependencies: SDL3 (auto-fetched), SDL_shadercross (HLSL→SPIRV/DXIL compilatio
 
 ```
 └── .
+    ├── .git [...]
+    ├── .zig-cache [...]
     ├── src/                          # Source code directory
     │   ├── docs/                     # Technical documentation
     │   │   ├── ecs.md                # Entity system architecture (no ECS abstractions)
     │   │   ├── gpu.md                # SDL3 GPU API reference and patterns
+    │   │   ├── prompt_generation_guide.md # LLM prompt generation with zz tool
     │   │   └── shader_compilation.md # HLSL compilation workflow
     │   ├── shaders/
     │   │   ├── compiled/             # Platform-specific bytecode (SPIRV/DXIL)
+    │   │   │   ├── d3d12/ [...]      # DXIL bytecode for Windows
+    │   │   │   └── vulkan/ [...]     # SPIRV bytecode for Linux/macOS
     │   │   ├── source/               # HLSL shader sources
-    │   │   │   ├── simple_circle.hlsl    # Basic circle distance field shader
-    │   │   │   ├── simple_rectangle.hlsl # Basic rectangle shader
     │   │   │   ├── circle.hlsl           # Standard circle rendering shader
     │   │   │   ├── debug_circle.hlsl     # Debug circle with orbital animation
     │   │   │   ├── effect.hlsl           # Visual effects shader
     │   │   │   ├── rectangle.hlsl        # Rectangle rendering shader
+    │   │   │   ├── simple_circle.hlsl    # Basic circle distance field shader
+    │   │   │   ├── simple_rectangle.hlsl # Basic rectangle shader
     │   │   │   ├── triangle.hlsl         # Triangle rendering shader
     │   │   │   └── triangle_uniforms.hlsl# Triangle with uniform data test
     │   │   └── compile_shaders.sh    # Automated HLSL→SPIRV/DXIL compilation
@@ -73,14 +78,17 @@ Dependencies: SDL3 (auto-fetched), SDL_shadercross (HLSL→SPIRV/DXIL compilatio
     │   ├── player.zig                # Player controller and movement logic
     │   ├── portals.zig               # Portal system for zone travel
     │   ├── renderer.zig              # GPU renderer with camera integration
-    │   ├── sdl.zig                   # SDL3 bindings and helpers
     │   ├── simple_gpu_renderer.zig  # Clean GPU rendering backend
     │   └── types.zig                 # Shared data types (GPU-compatible structs)
+    ├── zig-out [...]                 # Build output directory
+    ├── .gitignore                    # Git ignore patterns
     ├── CLAUDE.md                     # This file - AI assistant documentation
     ├── README.md                     # User-facing documentation
     ├── build.zig                     # Zig build configuration
     ├── build.zig.zon                 # Package manifest and dependencies
-    └── hex                           # Build and run script
+    ├── hex                           # Build and run script
+    ├── hex_project_prompt.md         # Generated LLM prompt
+    └── zz.zon                        # zz tool configuration
 ```
 
 **Status:** ✅ Complete GPU-accelerated game with zone-based world

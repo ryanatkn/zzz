@@ -56,29 +56,35 @@ zig build run    # Build and launch game
 
 ```
 hex/
-├── docs/                      # Technical documentation
-│   ├── ecs.md                # Entity system architecture
-│   ├── gpu.md                # SDL3 GPU API reference
-│   └── shader_compilation.md # HLSL compilation guide
-├── shaders/
-│   ├── source/               # HLSL shader sources
-│   │   ├── simple_circle.hlsl    # Distance field circles
-│   │   ├── simple_rectangle.hlsl # Basic rectangles
-│   │   └── [other shaders]       # Effects and debug
-│   ├── compiled/             # Platform-specific bytecode
-│   │   ├── vulkan/          # SPIRV for Linux/Android/macOS
-│   │   └── d3d12/           # DXIL for Windows
-│   └── compile_shaders.sh   # Build script
-├── game_data.zon            # Zone configuration data
-├── main.zig                 # SDL3 entry point
-├── game.zig                 # Core game loop
-├── entities.zig             # Entity storage system
-├── behaviors.zig            # Update logic
-├── physics.zig              # Collision detection
-├── renderer.zig             # GPU rendering pipeline
-├── camera.zig               # Viewport management
-└── types.zig                # Shared data structures
+├── src/
+│   ├── docs/                    # Technical documentation [...]
+│   ├── shaders/
+│   │   ├── source/              # HLSL shader sources
+│   │   ├── compiled/            # Platform-specific bytecode [...]
+│   │   │   ├── vulkan/          # SPIRV files [...]
+│   │   │   └── d3d12/           # DXIL files [...]
+│   │   └── compile_shaders.sh  # Build script
+│   ├── game_data.zon           # Zone configuration data
+│   ├── main.zig                # SDL3 entry point
+│   ├── game.zig                # Core game loop
+│   ├── entities.zig            # Entity storage system
+│   ├── behaviors.zig           # Update logic
+│   ├── physics.zig             # Collision detection
+│   ├── renderer.zig            # GPU rendering pipeline
+│   ├── camera.zig              # Viewport management
+│   └── types.zig               # Shared data structures
+├── zz.zon                      # zz tool configuration
+└── hex_project_prompt.md       # Generated LLM prompt
 ```
+
+For complete technical documentation and development guidelines, see **[CLAUDE.md](./CLAUDE.md)**.
+
+### Documentation
+
+- [Entity System Architecture](./src/docs/ecs.md) - Entity storage and update patterns
+- [GPU API Reference](./src/docs/gpu.md) - SDL3 GPU API usage and patterns  
+- [Shader Compilation Guide](./src/docs/shader_compilation.md) - HLSL compilation workflow
+- [Prompt Generation Guide](./src/docs/prompt_generation_guide.md) - LLM prompt creation with zz tool
 
 ### Design Philosophy
 
