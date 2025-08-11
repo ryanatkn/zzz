@@ -1,3 +1,6 @@
+# Hex project prompt
+
+> `zz prompt CLAUDE.md README.md "src/**/*.zig" "src/**/*.hlsl" "src/**/*.sh" > hex_project_prompt.md`
 
 <File path="CLAUDE.md">
 
