@@ -3,7 +3,7 @@
 ## Current State
 
 **Working:**
-- ✅ Overlay rendering with rectangles and circles
+- ✅ Overlay rendering with rectangles
 - ✅ Page routing to static paths
 - ✅ Mouse click navigation between pages
 - ✅ Backtick (`) key toggles menu
@@ -13,36 +13,81 @@
 - ✅ Address bar showing current path
 - ✅ Simple text rendering (basic ASCII letters)
 - ✅ Button labels and link text
+- ✅ SvelteKit-style routing (`+page.zig`, `+layout.zig`)
+- ✅ Layout system with composition support
+- ✅ "Back to Menu" buttons on all non-root pages
 
 **Fixed:**
 - ✅ History navigation (using SimpleHistory with fixed buffers)
 - ✅ Back/forward mouse buttons working
 - ✅ Navigation bar buttons working
 - ✅ Rectangle rendering via gpu.drawRect
+- ✅ SvelteKit migration complete
 
 **Missing:**
-- SvelteKit-style routing (`+page.zig`, `+layout.zig`)
 - Dynamic routes (`[param]` folders)
 - Form controls (inputs, sliders, checkboxes)
 - Transitions between pages
 - State persistence
 - Full font support (only basic letters implemented)
+- Nested layout composition (simplified for now)
 
 ## File Structure
 
 ```
 src/browser/
-├── browser.zig      # Main coordinator, event routing
-├── router.zig       # Static path → page mapping
-├── history.zig      # Navigation stack (BROKEN)
-├── renderer.zig     # UI rendering (circles only)
-├── page.zig         # Page interface definition
-├── DESIGN.md        # Target architecture (SvelteKit-style)
-└── CLAUDE.md        # This file
+├── browser.zig          # Main coordinator, event routing
+├── router.zig           # SvelteKit-style routing with layout support
+├── history.zig          # Navigation stack (deprecated, use simple_history)
+├── simple_history.zig   # Fixed-buffer history implementation
+├── renderer.zig         # UI rendering with rectangles and text
+├── page.zig             # Page, Layout, and RenderSlot interfaces
+├── DESIGN.md            # Architecture documentation
+└── CLAUDE.md            # This file
 
-src/routes/          # Current: simple .zig files
-                     # Target: directories with +page.zig
+src/routes/              # SvelteKit-style convention
+├── +layout.zig          # Root layout (wraps all pages)
+├── +page.zig            # Home page (/)
+├── settings/
+│   ├── +page.zig        # Settings index (/settings)
+│   ├── video/
+│   │   └── +page.zig    # Video settings (/settings/video)
+│   └── audio/
+│       └── +page.zig    # Audio settings (/settings/audio)
+└── stats/
+    └── +page.zig        # Statistics (/stats)
 ```
+
+## SvelteKit Migration ✅ COMPLETE
+
+The migration to SvelteKit-style routing is now complete:
+
+**What's Implemented:**
+- `+page.zig` convention for all pages
+- `+layout.zig` for root layout (extensible to nested layouts)
+- Layout and RenderSlot types in page.zig
+- Router loads layouts alongside pages
+- All pages follow new structure
+
+**How It Works:**
+```zig
+// Router resolves path to page and collects layouts
+"/settings/video" → 
+  - Load: root +layout.zig
+  - Load: settings/video/+page.zig
+  - Render: layout wraps page via RenderSlot
+
+// Each page exports a create function
+pub fn create(allocator: std.mem.Allocator) !*page.Page
+
+// Layouts can wrap content via slots
+pub fn render(self: *const Layout, links: *ArrayList(Link), slot: *const RenderSlot) !void
+```
+
+**Current Limitations:**
+- Nested layouts simplified (only root layout active)
+- No dynamic routes yet (would need build-time generation)
+- Manual route registration in router.zig
 
 ## Known Issues
 
@@ -75,21 +120,6 @@ pub fn getScreenSize(self: *Renderer) Vec2 {
 }
 ```
 
-## Migration to SvelteKit Style
-
-**Current router.zig approach:**
-```zig
-if (std.mem.eql(u8, path, "/settings")) {
-    self.current_page = try settings_page.create(self.allocator);
-}
-```
-
-**Target approach (unknown implementation):**
-- How to resolve `/settings/video` → `src/routes/settings/video/+page.zig`?
-- How to collect parent layouts during resolution?
-- How to handle dynamic routes at compile time?
-- How to lazy-load pages (avoid importing all routes)?
-
 ## Usage
 
 ```bash
@@ -97,37 +127,38 @@ if (std.mem.eql(u8, path, "/settings")) {
 zig build run
 
 # Test browser
-# 1. Press ` (backtick) to open
-# 2. Click circles to navigate
-# 3. Press ESC to close
+# 1. Press ` (backtick) to open menu
+# 2. Click buttons to navigate
+# 3. Use back/forward buttons or mouse buttons
+# 4. Press ESC to close
 ```
+
+## Navigation Features
+
+- **Address Bar**: Shows current path (e.g., `/settings/video`)
+- **Back/Forward**: Browser-style navigation with history
+- **Mouse Buttons**: X1/X2 buttons for back/forward
+- **Direct Links**: "Back to Menu" on all pages for quick return
+- **Breadcrumb Navigation**: Settings pages have "Back to Settings" option
 
 ## Don't Touch
 
 - `game.zig` integration (working)
 - `controls.zig` event routing (working)  
 - `main.zig` initialization (working)
+- `simple_history.zig` fixed-buffer implementation (working)
 
 ## Next Steps
 
-1. Fix history allocator issue (try workarounds)
-2. Add rectangle rendering support
-3. Implement SvelteKit-style router
-4. Add basic text rendering (even ASCII art)
+1. Add nested layout support (settings layout)
+2. Implement form controls (sliders, checkboxes)
+3. Add number/symbol rendering to text system
+4. Consider dynamic route generation at build time
+5. Add transition effects between pages
 
-## Unknown Territories
+## Technical Notes
 
-- **Text Rendering**: No font system in codebase. Options?
-  - Distance field fonts (complex)
-  - Bitmap fonts (need texture support)
-  - Procedural 7-segment display (simple, fits aesthetic)
-
-- **Dynamic Routing**: Zig has no runtime reflection
-  - Comptime route table generation?
-  - Build step to scan routes/ directory?
-  - Manual route registration?
-
-- **Layout Composition**: How to wrap pages in layouts?
-  - Comptime layout chain building?
-  - Runtime slot rendering?
-  - Multiple render passes?
+- **Layout Composition**: Currently simplified to root layout only
+- **Route Registration**: Manual in router.zig due to Zig's compile-time constraints
+- **Memory Management**: Fixed buffers for history to avoid allocator issues
+- **Text Rendering**: Procedural using rectangles, no font files needed

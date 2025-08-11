@@ -4,346 +4,261 @@
 
 The browser system provides an in-game overlay menu with SvelteKit-style filesystem-based routing. It renders over the game world (which continues running) and allows navigation between different "pages" for settings, stats, and other UI.
 
+## Current Implementation Status
+
+### ✅ Completed
+- SvelteKit-style routing with `+page.zig` and `+layout.zig` files
+- Basic layout system with RenderSlot composition
+- Navigation history with back/forward support
+- Address bar showing current path
+- Mouse and keyboard navigation
+- Rectangle-based UI rendering
+- Simple text rendering using procedural rectangles
+- "Back to Menu" quick navigation on all pages
+
+### 🚧 Simplified/In Progress
+- Layout composition (only root layout active currently)
+- Dynamic routes (not implemented, would need build-time generation)
+- Form controls (sliders, checkboxes not yet implemented)
+
+### ❌ Not Implemented
+- Transitions between pages
+- State persistence
+- Error boundaries (`+error.zig`)
+- Prefetching
+- Full font support
+
 ## Architecture
 
 ### Core Components
 
 - **browser.zig** - Main browser state and coordination
-- **router.zig** - Path resolution and page loading
-- **history.zig** - Navigation history stack with back/forward
-- **renderer.zig** - UI rendering over game world
-- **page.zig** - Page interface and helpers
+- **router.zig** - Path resolution and page/layout loading
+- **simple_history.zig** - Fixed-buffer navigation history (replaces history.zig)
+- **renderer.zig** - UI rendering with rectangles and text
+- **page.zig** - Page, Layout, and RenderSlot interfaces
 
 ## Routing Conventions (SvelteKit-style)
 
-### File Structure
-
-Every route is a directory containing:
-- **+page.zig** - The page component (required)
-- **+layout.zig** - Layout wrapper (optional, inherited by child routes)
-- **+error.zig** - Error boundary (optional)
-
-### Route Examples
+### Current File Structure
 
 ```
 src/routes/
 ├── +layout.zig              # Root layout (wraps all pages)
 ├── +page.zig                # Home page (/)
 ├── settings/
-│   ├── +layout.zig         # Settings layout (/settings)
 │   ├── +page.zig           # Settings index (/settings)
 │   ├── video/
 │   │   └── +page.zig       # Video settings (/settings/video)
 │   └── audio/
 │       └── +page.zig       # Audio settings (/settings/audio)
-├── stats/
-│   └── +page.zig           # Statistics (/stats)
-└── inventory/
-    ├── +page.zig           # Inventory (/inventory)
-    └── [item]/             # Dynamic route
-        └── +page.zig       # Item details (/inventory/sword)
+└── stats/
+    └── +page.zig           # Statistics (/stats)
 ```
 
-### Path Resolution
+### Path Resolution (Current Implementation)
 
 1. Router receives path like `/settings/video`
-2. Looks for `src/routes/settings/video/+page.zig`
-3. Collects layouts from root down: `/+layout.zig`, `/settings/+layout.zig`
-4. Renders page within nested layouts
+2. Manual route matching in router.zig
+3. Loads root layout (`+layout.zig`)
+4. Loads target page (`settings/video/+page.zig`)
+5. Renders page (layout composition simplified for now)
 
-### Dynamic Routes
+### Future: Dynamic Routes
 
+When implemented, would support:
 - `[param]` folders match single segments: `/inventory/[item]` → `/inventory/sword`
 - `[...rest]` matches remaining path: `/docs/[...path]` → `/docs/guides/intro`
 - Parameters passed to page via `params` field
 
-## Page Interface
+## Current Page Interface
 
 ```zig
 // +page.zig
 const std = @import("std");
-const browser = @import("browser");
+const page = @import("../../browser/page.zig");
 
-pub const Page = struct {
-    // Page metadata
-    pub const meta = .{
-        .title = "Settings",
-        .preload = true,  // Load before navigation completes
-    };
+const MyPage = struct {
+    base: page.Page,
     
-    // Instance data
-    data: PageData,
-    
-    // Lifecycle hooks
-    pub fn load(params: browser.Params, parent: ?*anyopaque) !PageData {
-        // Load data before rendering
+    fn init(self: *page.Page, allocator: std.mem.Allocator) !void {
+        _ = self;
+        _ = allocator;
     }
     
-    pub fn init(self: *Page, data: PageData) !void {
-        // Initialize page instance
+    fn deinit(self: *page.Page, allocator: std.mem.Allocator) void {
+        _ = self;
+        _ = allocator;
     }
     
-    pub fn deinit(self: *Page) void {
-        // Cleanup
+    fn update(self: *page.Page, dt: f32) void {
+        _ = self;
+        _ = dt;
     }
     
-    pub fn update(self: *Page, dt: f32) void {
-        // Update logic (60 FPS)
-    }
-    
-    pub fn render(self: *const Page, ctx: *browser.RenderContext) !void {
-        // Render page content
-        try ctx.link("Back", "/");
-        try ctx.text("Current Settings");
-    }
-    
-    pub fn handleEvent(self: *Page, event: browser.Event) !bool {
-        // Handle page-specific events
-        return false; // Return true if handled
+    fn render(self: *const page.Page, links: *std.ArrayList(page.Link)) !void {
+        // Add links for navigation
+        try links.append(page.createLink(
+            "Settings",
+            "/settings",
+            x, y, width, height
+        ));
     }
 };
+
+pub fn create(allocator: std.mem.Allocator) !*page.Page {
+    // Factory function to create page instance
+}
 ```
 
-## Layout Interface
+## Current Layout Interface
 
 ```zig
 // +layout.zig
-pub const Layout = struct {
-    pub const meta = .{
-        .reset = false,  // Don't reset on navigation within layout
-    };
+const std = @import("std");
+const page = @import("../browser/page.zig");
+
+const RootLayout = struct {
+    base: page.Layout,
     
-    children: *browser.Slot,
-    
-    pub fn init(self: *Layout) !void {
-        // Setup layout
+    fn init(self: *page.Layout, allocator: std.mem.Allocator) !void {
+        _ = self;
+        _ = allocator;
     }
     
-    pub fn render(self: *const Layout, ctx: *browser.RenderContext) !void {
-        // Render layout chrome
-        try ctx.text("Game Menu");
+    fn deinit(self: *page.Layout, allocator: std.mem.Allocator) void {
+        _ = self;
+        _ = allocator;
+    }
+    
+    fn render(self: *const page.Layout, links: *std.ArrayList(page.Link), slot: *const page.RenderSlot) !void {
+        // Render layout chrome (header, etc.)
         
-        // Render child page/layout
-        try self.children.render(ctx);
+        // Render child content
+        try slot.render(links);
         
-        // Render footer
-        try ctx.text("Press ESC to close");
+        // Render layout footer
     }
 };
+
+pub fn create(allocator: std.mem.Allocator) !*page.Layout {
+    // Factory function to create layout instance
+}
 ```
 
 ## Navigation
 
-### Programmatic Navigation
+### Current Implementation
 
 ```zig
-// Navigate to new page
-try browser.goto("/settings/video");
+// Router handles navigation
+try browser.router.navigate("/settings/video");
 
-// Navigate with replace (no history entry)
-try browser.goto("/", .{ .replace = true });
-
-// Go back/forward
-browser.back();
-browser.forward();
+// History provides back/forward
+browser.history.back();
+browser.history.forward();
 ```
 
-### Link Rendering
+### User Interactions
+- Click on rendered links
+- Back/forward buttons in navigation bar
+- Mouse X1/X2 buttons for back/forward
+- Backtick (`) key to open browser
+- ESC to close browser
 
+## Rendering System
+
+### Current Approach
+- Rectangle-based rendering using GPU
+- Procedural text using small rectangles
+- Links rendered as clickable rectangles with hover states
+
+### BrowserRenderer Methods
 ```zig
-// In render function
-try ctx.link("Settings", "/settings");
-
-// With styling
-try ctx.link("Settings", "/settings", .{
-    .class = "primary",
-    .prefetch = true,
-});
-```
-
-## Rendering Context
-
-The `RenderContext` provides UI primitives that work with the procedural renderer:
-
-```zig
-pub const RenderContext = struct {
-    // Layout
-    fn beginRow(self: *RenderContext) void;
-    fn beginColumn(self: *RenderContext) void;
-    fn spacing(self: *RenderContext, pixels: f32) void;
-    
-    // Elements
-    fn text(self: *RenderContext, str: []const u8) !void;
-    fn link(self: *RenderContext, label: []const u8, path: []const u8) !void;
-    fn button(self: *RenderContext, label: []const u8) !bool;
-    fn slider(self: *RenderContext, value: *f32, min: f32, max: f32) !bool;
-    fn checkbox(self: *RenderContext, value: *bool) !bool;
-    
-    // Shapes (procedural)
-    fn circle(self: *RenderContext, radius: f32, color: Color) void;
-    fn rect(self: *RenderContext, size: Vec2, color: Color) void;
-};
+renderOverlay()      // Semi-transparent background
+renderNavigationBar() // Back/forward buttons and address bar
+renderPage()         // Page content via links
+renderLinks()        // Interactive link buttons
+drawSimpleText()     // Basic ASCII text rendering
+drawChar()           // Individual character rendering
 ```
 
 ## State Management
 
-### Global State
+### Current Limitations
+- No persistent state between sessions
+- Pages recreated on each navigation
+- History limited to path strings only
 
-Browser maintains global state accessible from all pages:
-
-```zig
-browser.state.get("username");
-browser.state.set("volume", 0.8);
-```
-
-### Page State
-
-Pages can maintain local state that persists during navigation:
-
-```zig
-// Page returns to same state when navigating back
-pub fn saveState(self: *Page) ![]const u8 {
-    return try serialize(self.data);
-}
-
-pub fn restoreState(self: *Page, state: []const u8) !void {
-    self.data = try deserialize(state);
-}
-```
-
-## Hot Keys
-
-Pages can register hotkeys active only when visible:
-
-```zig
-pub fn init(self: *Page) !void {
-    try browser.registerHotkey(.{ .key = .S, .ctrl = true }, "save");
-}
-
-pub fn handleEvent(self: *Page, event: browser.Event) !bool {
-    switch (event) {
-        .hotkey => |h| if (std.mem.eql(u8, h, "save")) {
-            try self.save();
-            return true;
-        },
-        else => {},
-    }
-    return false;
-}
-```
-
-## Transitions
-
-Simple fade/slide transitions between pages:
-
-```zig
-pub const meta = .{
-    .transition = .{
-        .in = .{ .fade = 150 },   // 150ms fade in
-        .out = .{ .slide_left = 100 }, // 100ms slide out
-    },
-};
-```
-
-## Error Handling
-
-Each route can have an `+error.zig` for error boundaries:
-
-```zig
-// +error.zig
-pub const ErrorPage = struct {
-    pub fn render(self: *const ErrorPage, ctx: *browser.RenderContext, err: anyerror) !void {
-        try ctx.text("Error occurred:");
-        try ctx.text(@errorName(err));
-        try ctx.link("Go Home", "/");
-    }
-};
-```
+### Future Enhancements
+- Page state preservation during navigation
+- Global state store accessible from all pages
+- Settings persistence to disk
 
 ## Implementation Notes
 
-### Current Limitations
+### Technical Decisions
 
-1. **No text rendering** - Using circles/shapes as placeholders
-2. **No rectangle shader** - Need to add rectangle rendering to GPU pipeline
-3. **History disabled** - Allocator issue with string duplication
-4. **No dynamic routes** - Static routing only for now
-5. **No transitions** - Instant page changes
+1. **Fixed Buffers for History** - Avoids allocator issues with SimpleHistory
+2. **Manual Route Registration** - Due to Zig's compile-time constraints
+3. **Simplified Layout Composition** - Full nesting deferred for simplicity
+4. **Procedural Text** - No font files needed, fits game's aesthetic
 
-### Future Enhancements
+### Known Issues
 
-1. **Text rendering** - Distance field fonts or bitmap fonts
-2. **Form controls** - Input fields, dropdowns, etc.
-3. **Nested routers** - Multiple router instances for modals
-4. **Prefetching** - Load adjacent pages in background
-5. **Persistence** - Save/load menu state to disk
+1. **Hardcoded Screen Size** - Using 1920x1080 constants
+2. **Limited Character Set** - Only basic ASCII letters implemented
+3. **No Form Controls** - Text and buttons only currently
 
 ### Performance Considerations
 
-- Pages are lazily loaded (comptime imports)
-- Layouts cached and reused during navigation
-- Render calls batched to minimize GPU state changes
-- Event handling stops at first handler (no bubbling)
+- Pages loaded at compile-time (no runtime loading)
+- Minimal allocations using fixed buffers where possible
+- Rectangle batching for efficient GPU rendering
+- Game continues running underneath overlay
 
-## Usage Example
+## Future Roadmap
 
+### Phase 1: Polish Current Implementation ✅
+- [x] Complete SvelteKit migration
+- [x] Add "Back to Menu" navigation
+- [x] Document current state
+
+### Phase 2: Enhanced Features
+- [ ] Add number and symbol rendering
+- [ ] Implement nested layout composition
+- [ ] Add transition effects
+- [ ] Create settings layout for shared UI
+
+### Phase 3: Advanced Controls
+- [ ] Slider controls for settings
+- [ ] Checkbox/toggle controls
+- [ ] Text input fields
+- [ ] Dropdown menus
+
+### Phase 4: Dynamic Features
+- [ ] Build-time route generation
+- [ ] Dynamic route parameters
+- [ ] Error boundaries
+- [ ] State persistence
+
+## Testing Approach
+
+Routes can be tested independently:
 ```zig
-// Create a new page
-// src/routes/inventory/+page.zig
-
-const std = @import("std");
-const browser = @import("../../../browser/browser.zig");
-
-pub const Page = struct {
-    items: []const Item,
-    selected: ?usize,
+test "navigation works" {
+    var router = Router.init(allocator);
+    defer router.deinit();
     
-    pub const meta = .{
-        .title = "Inventory",
-    };
-    
-    pub fn init(self: *Page) !void {
-        self.items = try loadItems();
-        self.selected = null;
-    }
-    
-    pub fn render(self: *const Page, ctx: *browser.RenderContext) !void {
-        try ctx.text("Inventory");
-        
-        ctx.beginColumn();
-        defer ctx.end();
-        
-        for (self.items, 0..) |item, i| {
-            const selected = self.selected == i;
-            if (try ctx.button(item.name)) {
-                self.selected = i;
-            }
-        }
-        
-        if (self.selected) |idx| {
-            ctx.spacing(20);
-            try ctx.text(self.items[idx].description);
-            if (try ctx.button("Use")) {
-                try useItem(self.items[idx]);
-            }
-        }
-    }
-};
-```
-
-## Testing
-
-Routes can be tested in isolation:
-
-```zig
-test "settings page renders" {
-    var page = try Page.init(testing.allocator);
-    defer page.deinit();
-    
-    var ctx = TestRenderContext.init();
-    try page.render(&ctx);
-    
-    try testing.expect(ctx.hasLink("/"));
-    try testing.expect(ctx.hasText("Settings"));
+    try router.navigate("/settings");
+    try testing.expect(router.getCurrentPage() != null);
 }
 ```
+
+## Usage Guidelines
+
+1. **Creating New Pages**: Add `+page.zig` in appropriate directory
+2. **Adding Layouts**: Create `+layout.zig` to wrap child pages
+3. **Navigation Links**: Use `page.createLink()` in render functions
+4. **Quick Navigation**: Include "Back to Menu" on all non-root pages
+5. **Path Convention**: Use lowercase, hyphenated paths (`/my-page`)
