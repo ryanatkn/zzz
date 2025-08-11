@@ -12,6 +12,7 @@ const combat = @import("combat.zig");
 const portals = @import("portals.zig");
 const camera = @import("camera.zig");
 const effects = @import("effects.zig");
+const browser = @import("browser/browser.zig");
 
 const Vec2 = types.Vec2;
 const World = entities.World;
@@ -26,6 +27,9 @@ pub const GameState = struct {
     // Visual effects system
     effect_system: effects.EffectSystem,
 
+    // Browser system for system menu
+    browser_system: ?browser.Browser,
+
     // Iris wipe effect for resurrection
     iris_wipe_active: bool,
     iris_wipe_start_time: u64,
@@ -39,9 +43,21 @@ pub const GameState = struct {
             .game_paused = false,
             .quit_requested = false,
             .effect_system = effects.EffectSystem.init(),
+            .browser_system = null,
             .iris_wipe_active = false,
             .iris_wipe_start_time = 0,
         };
+    }
+
+    pub fn initBrowser(self: *Self, allocator: std.mem.Allocator, renderer: *@import("renderer.zig").Renderer) !void {
+        self.browser_system = try browser.Browser.init(allocator, renderer);
+    }
+
+    pub fn deinitBrowser(self: *Self) void {
+        if (self.browser_system) |*b| {
+            b.deinit();
+            self.browser_system = null;
+        }
     }
 
     pub fn travelToZone(self: *Self, destination_zone: usize) void {
@@ -110,6 +126,13 @@ pub const GameState = struct {
 };
 
 pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: f32) void {
+    // Update browser system if open
+    if (game_state.browser_system) |*b| {
+        b.update(deltaTime);
+        // Don't update game when browser is open
+        if (b.is_open) return;
+    }
+    
     if (game_state.game_paused) return;
 
     const world = &game_state.world;

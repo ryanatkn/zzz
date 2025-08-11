@@ -1,0 +1,190 @@
+const std = @import("std");
+const c = @import("../c.zig");
+const types = @import("../types.zig");
+const controls = @import("../controls.zig");
+const history_mod = @import("history.zig");
+const router_mod = @import("router.zig");
+const renderer_mod = @import("renderer.zig");
+const page = @import("page.zig");
+
+pub const Browser = struct {
+    is_open: bool,
+    history: history_mod.History,
+    router: router_mod.Router,
+    renderer: renderer_mod.BrowserRenderer,
+    links: std.ArrayList(page.Link),
+    hovered_link: ?usize,
+    allocator: std.mem.Allocator,
+
+    pub fn init(allocator: std.mem.Allocator, base_renderer: *@import("../renderer.zig").Renderer) !Browser {
+        var browser = Browser{
+            .is_open = false,
+            .history = try history_mod.History.init(allocator),
+            .router = router_mod.Router.init(allocator),
+            .renderer = renderer_mod.BrowserRenderer.init(base_renderer),
+            .links = std.ArrayList(page.Link).init(allocator),
+            .hovered_link = null,
+            .allocator = allocator,
+        };
+
+        // Initialize with home page
+        try browser.router.navigate("/");
+        
+        return browser;
+    }
+
+    pub fn deinit(self: *Browser) void {
+        self.history.deinit();
+        self.router.deinit();
+        self.links.deinit();
+    }
+
+    pub fn toggle(self: *Browser) void {
+        self.is_open = !self.is_open;
+        if (self.is_open) {
+            // Reset to home when opening
+            self.history.deinit();
+            self.history = history_mod.History.init(self.allocator) catch unreachable;
+            self.router.navigate("/") catch unreachable;
+        }
+    }
+
+    pub fn handleEvent(self: *Browser, event: c.sdl.SDL_Event) !bool {
+        if (!self.is_open) return false;
+
+        switch (event.type) {
+            c.sdl.SDL_EVENT_MOUSE_BUTTON_DOWN => {
+                const button_event = event.button;
+                
+                switch (button_event.button) {
+                    c.sdl.SDL_BUTTON_X1 => { // Back button
+                        // TODO: Re-enable when history is fixed
+                        // if (self.history.back()) {
+                        //     try self.router.navigate(self.history.getCurrentPath());
+                        // }
+                        return true;
+                    },
+                    c.sdl.SDL_BUTTON_X2 => { // Forward button
+                        // TODO: Re-enable when history is fixed
+                        // if (self.history.forward()) {
+                        //     try self.router.navigate(self.history.getCurrentPath());
+                        // }
+                        return true;
+                    },
+                    c.sdl.SDL_BUTTON_LEFT => {
+                        // Check if clicking a link
+                        if (self.hovered_link) |link_index| {
+                            const link = self.links.items[link_index];
+                            try self.navigateTo(link.path);
+                        }
+                        
+                        // Check navigation bar buttons
+                        const screen_height = 1080.0; // TODO: Get from renderer
+                        const bar_y = screen_height * 0.1;
+                        const button_margin = 50.0;
+                        
+                        const mouse_x = button_event.x;
+                        const mouse_y = button_event.y;
+                        
+                        // Back button bounds (circle at button_margin, bar_y with radius 15)
+                        if (mouse_x >= button_margin - 15 and mouse_x <= button_margin + 15 and
+                            mouse_y >= bar_y - 15 and mouse_y <= bar_y + 15) {
+                            // TODO: Re-enable when history is fixed
+                            // if (self.history.back()) {
+                            //     try self.router.navigate(self.history.getCurrentPath());
+                            // }
+                            return true;
+                        }
+                        
+                        // Forward button bounds (circle at button_margin + 40, bar_y with radius 15)
+                        if (mouse_x >= button_margin + 25 and mouse_x <= button_margin + 55 and
+                            mouse_y >= bar_y - 15 and mouse_y <= bar_y + 15) {
+                            // TODO: Re-enable when history is fixed
+                            // if (self.history.forward()) {
+                            //     try self.router.navigate(self.history.getCurrentPath());
+                            // }
+                            return true;
+                        }
+                        
+                        return true;
+                    },
+                    else => {},
+                }
+            },
+            c.sdl.SDL_EVENT_MOUSE_MOTION => {
+                const motion_event = event.motion;
+                const mouse_x = motion_event.x;
+                const mouse_y = motion_event.y;
+                
+                // Check which link is hovered
+                self.hovered_link = null;
+                for (self.links.items, 0..) |link, i| {
+                    if (mouse_x >= link.bounds.position.x and 
+                        mouse_x <= link.bounds.position.x + link.bounds.size.x and
+                        mouse_y >= link.bounds.position.y and 
+                        mouse_y <= link.bounds.position.y + link.bounds.size.y) {
+                        self.hovered_link = i;
+                        break;
+                    }
+                }
+                return true;
+            },
+            c.sdl.SDL_EVENT_KEY_DOWN => {
+                const key_event = event.key;
+                if (key_event.scancode == c.sdl.SDL_SCANCODE_GRAVE) { // Backtick
+                    self.toggle();
+                    return true;
+                } else if (key_event.scancode == c.sdl.SDL_SCANCODE_ESCAPE) {
+                    self.is_open = false;
+                    return true;
+                }
+            },
+            else => {},
+        }
+
+        return false;
+    }
+
+    pub fn navigateTo(self: *Browser, path: []const u8) !void {
+        // TODO: Fix allocator.dupe issue in history.navigate
+        // try self.history.navigate(path);
+        try self.router.navigate(path);
+    }
+
+    pub fn update(self: *Browser, dt: f32) void {
+        if (!self.is_open) return;
+        
+        if (self.router.getCurrentPage()) |current_page| {
+            current_page.update(dt);
+        }
+    }
+
+    pub fn render(self: *Browser, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass) !void {
+        if (!self.is_open) return;
+
+        // Render overlay background
+        try self.renderer.renderOverlay(cmd_buffer, render_pass);
+
+        // Render navigation bar
+        const can_go_back = self.history.current_index > 0;
+        const can_go_forward = self.history.current_index < self.history.stack.items.len - 1;
+        try self.renderer.renderNavigationBar(
+            cmd_buffer,
+            render_pass,
+            self.history.getCurrentPath(),
+            can_go_back,
+            can_go_forward
+        );
+
+        // Clear links for this frame
+        self.links.clearRetainingCapacity();
+
+        // Render current page
+        if (self.router.getCurrentPage()) |current_page| {
+            try self.renderer.renderPage(cmd_buffer, render_pass, current_page, &self.links);
+        }
+
+        // Render links with hover states
+        try self.renderer.renderLinks(cmd_buffer, render_pass, self.links.items, self.hovered_link);
+    }
+};

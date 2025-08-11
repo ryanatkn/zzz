@@ -20,6 +20,12 @@ pub fn handleSDLEvent(
     game_hud: *Hud,
     event: *c.sdl.SDL_Event,
 ) !c.sdl.SDL_AppResult {
+    // Let browser handle events first if it's open
+    if (game_state.browser_system) |*browser| {
+        const handled = try browser.handleEvent(event.*);
+        if (handled) return c.sdl.SDL_APP_CONTINUE;
+    }
+    
     switch (event.type) {
         c.sdl.SDL_EVENT_QUIT => {
             game_state.requestQuit();
@@ -32,8 +38,13 @@ pub fn handleSDLEvent(
                     game_state.requestQuit();
                     return c.sdl.SDL_APP_SUCCESS;
                 },
-                c.sdl.SDL_SCANCODE_GRAVE => { // Backtick key - toggle HUD
-                    game_hud.toggle();
+                c.sdl.SDL_SCANCODE_GRAVE => { // Backtick key - toggle browser/system menu
+                    if (game_state.browser_system) |*browser| {
+                        browser.toggle();
+                    } else {
+                        // Fallback to HUD toggle if browser not initialized
+                        game_hud.toggle();
+                    }
                 },
                 c.sdl.SDL_SCANCODE_R => { // R key - respawn/reset
                     game_controller.handleRespawn(game_state);

@@ -252,6 +252,16 @@ pub const Renderer = struct {
         self.drawDigit(cmd_buffer, render_pass, @intCast(ones), fps_x + 12.0, fps_y, WHITE);
     }
 
+    // Draw a circle at screen position (for UI elements)
+    pub fn drawCircle(self: *Renderer, pos: Vec2, radius: f32, color: Color) void {
+        // TODO: This needs to be refactored to work with the current rendering architecture
+        // For now, we'll skip this as we need access to cmd_buffer and render_pass
+        _ = self;
+        _ = pos;
+        _ = radius;
+        _ = color;
+    }
+
     fn drawDigit(self: *Renderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, digit: u8, x: f32, y: f32, color: Color) void {
         if (digit > 9) return;
 
