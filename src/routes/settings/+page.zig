@@ -1,7 +1,7 @@
 const std = @import("std");
 const page = @import("../../browser/page.zig");
 
-const AudioSettingsPage = struct {
+const SettingsPage = struct {
     base: page.Page,
 
     fn init(self: *page.Page, allocator: std.mem.Allocator) !void {
@@ -31,14 +31,30 @@ const AudioSettingsPage = struct {
         const link_width = 300.0;
         const link_spacing = 20.0;
         
-        // Placeholder for audio settings options
-        // In a real implementation, these would be sliders and toggles
+        // Add navigation links
+        try links.append(page.createLink(
+            "Video Settings",
+            "/settings/video",
+            center_x - link_width / 2.0,
+            start_y,
+            link_width,
+            link_height
+        ));
         
         try links.append(page.createLink(
-            "Back to Settings",
-            "/settings",
+            "Audio Settings",
+            "/settings/audio",
             center_x - link_width / 2.0,
-            start_y + (link_height + link_spacing) * 4,
+            start_y + link_height + link_spacing,
+            link_width,
+            link_height
+        ));
+        
+        try links.append(page.createLink(
+            "Back to Menu",
+            "/",
+            center_x - link_width / 2.0,
+            start_y + (link_height + link_spacing) * 3,
             link_width,
             link_height
         ));
@@ -46,18 +62,18 @@ const AudioSettingsPage = struct {
 };
 
 pub fn create(allocator: std.mem.Allocator) !*page.Page {
-    const audio_page = try allocator.create(AudioSettingsPage);
-    audio_page.* = .{
+    const settings_page = try allocator.create(SettingsPage);
+    settings_page.* = .{
         .base = .{
             .vtable = .{
-                .init = AudioSettingsPage.init,
-                .deinit = AudioSettingsPage.deinit,
-                .update = AudioSettingsPage.update,
-                .render = AudioSettingsPage.render,
+                .init = SettingsPage.init,
+                .deinit = SettingsPage.deinit,
+                .update = SettingsPage.update,
+                .render = SettingsPage.render,
             },
-            .path = "/settings/audio",
-            .title = "Audio Settings",
+            .path = "/settings",
+            .title = "Settings",
         },
     };
-    return &audio_page.base;
+    return &settings_page.base;
 }

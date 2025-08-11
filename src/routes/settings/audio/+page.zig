@@ -1,7 +1,7 @@
 const std = @import("std");
-const page = @import("../../browser/page.zig");
+const page = @import("../../../browser/page.zig");
 
-const VideoSettingsPage = struct {
+const AudioSettingsPage = struct {
     base: page.Page,
 
     fn init(self: *page.Page, allocator: std.mem.Allocator) !void {
@@ -31,12 +31,21 @@ const VideoSettingsPage = struct {
         const link_width = 300.0;
         const link_spacing = 20.0;
         
-        // Placeholder for video settings options
-        // In a real implementation, these would be interactive controls
+        // Placeholder for audio settings options
+        // In a real implementation, these would be sliders and toggles
         
         try links.append(page.createLink(
             "Back to Settings",
             "/settings",
+            center_x - link_width / 2.0,
+            start_y + (link_height + link_spacing) * 3,
+            link_width,
+            link_height
+        ));
+        
+        try links.append(page.createLink(
+            "Back to Menu",
+            "/",
             center_x - link_width / 2.0,
             start_y + (link_height + link_spacing) * 4,
             link_width,
@@ -46,18 +55,18 @@ const VideoSettingsPage = struct {
 };
 
 pub fn create(allocator: std.mem.Allocator) !*page.Page {
-    const video_page = try allocator.create(VideoSettingsPage);
-    video_page.* = .{
+    const audio_page = try allocator.create(AudioSettingsPage);
+    audio_page.* = .{
         .base = .{
             .vtable = .{
-                .init = VideoSettingsPage.init,
-                .deinit = VideoSettingsPage.deinit,
-                .update = VideoSettingsPage.update,
-                .render = VideoSettingsPage.render,
+                .init = AudioSettingsPage.init,
+                .deinit = AudioSettingsPage.deinit,
+                .update = AudioSettingsPage.update,
+                .render = AudioSettingsPage.render,
             },
-            .path = "/settings/video",
-            .title = "Video Settings",
+            .path = "/settings/audio",
+            .title = "Audio Settings",
         },
     };
-    return &video_page.base;
+    return &audio_page.base;
 }

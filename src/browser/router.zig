@@ -1,53 +1,103 @@
 const std = @import("std");
 const page = @import("page.zig");
 
-const index_page = @import("../routes/index.zig");
-const settings_page = @import("../routes/settings.zig");
-const settings_video_page = @import("../routes/settings/video.zig");
-const settings_audio_page = @import("../routes/settings/audio.zig");
-const stats_page = @import("../routes/stats.zig");
+const root_page = @import("../routes/+page.zig");
+const root_layout = @import("../routes/+layout.zig");
+const settings_page = @import("../routes/settings/+page.zig");
+const settings_video_page = @import("../routes/settings/video/+page.zig");
+const settings_audio_page = @import("../routes/settings/audio/+page.zig");
+const stats_page = @import("../routes/stats/+page.zig");
 
 pub const Router = struct {
     allocator: std.mem.Allocator,
     current_page: ?*page.Page,
+    current_layouts: std.ArrayList(*page.Layout),
 
     pub fn init(allocator: std.mem.Allocator) Router {
         return .{
             .allocator = allocator,
             .current_page = null,
+            .current_layouts = std.ArrayList(*page.Layout).init(allocator),
         };
     }
 
     pub fn deinit(self: *Router) void {
+        self.cleanupCurrent();
+        self.current_layouts.deinit();
+    }
+
+    fn cleanupCurrent(self: *Router) void {
         if (self.current_page) |p| {
             p.deinit(self.allocator);
             self.allocator.destroy(p);
             self.current_page = null;
         }
+        
+        for (self.current_layouts.items) |layout| {
+            layout.deinit(self.allocator);
+            self.allocator.destroy(layout);
+        }
+        self.current_layouts.clearRetainingCapacity();
     }
 
     pub fn navigate(self: *Router, path: []const u8) !void {
-        // Clean up current page
-        if (self.current_page) |p| {
-            p.deinit(self.allocator);
-            self.allocator.destroy(p);
-            self.current_page = null;
-        }
+        // Clean up current page and layouts
+        self.cleanupCurrent();
 
-        // Route to new page
+        // Route to new page based on path
         if (std.mem.eql(u8, path, "/")) {
-            self.current_page = try index_page.create(self.allocator);
+            // Load root layout
+            const layout = try root_layout.create(self.allocator);
+            try layout.init(self.allocator);
+            try self.current_layouts.append(layout);
+            
+            // Load root page
+            self.current_page = try root_page.create(self.allocator);
         } else if (std.mem.eql(u8, path, "/settings")) {
+            // Load root layout
+            const layout = try root_layout.create(self.allocator);
+            try layout.init(self.allocator);
+            try self.current_layouts.append(layout);
+            
+            // Load settings page
             self.current_page = try settings_page.create(self.allocator);
         } else if (std.mem.eql(u8, path, "/settings/video")) {
+            // Load root layout
+            const layout = try root_layout.create(self.allocator);
+            try layout.init(self.allocator);
+            try self.current_layouts.append(layout);
+            
+            // Could add settings layout here if we had one
+            
+            // Load video settings page
             self.current_page = try settings_video_page.create(self.allocator);
         } else if (std.mem.eql(u8, path, "/settings/audio")) {
+            // Load root layout
+            const layout = try root_layout.create(self.allocator);
+            try layout.init(self.allocator);
+            try self.current_layouts.append(layout);
+            
+            // Could add settings layout here if we had one
+            
+            // Load audio settings page
             self.current_page = try settings_audio_page.create(self.allocator);
         } else if (std.mem.eql(u8, path, "/stats")) {
+            // Load root layout
+            const layout = try root_layout.create(self.allocator);
+            try layout.init(self.allocator);
+            try self.current_layouts.append(layout);
+            
+            // Load stats page
             self.current_page = try stats_page.create(self.allocator);
         } else {
             // Default to index for unknown paths
-            self.current_page = try index_page.create(self.allocator);
+            // Load root layout
+            const layout = try root_layout.create(self.allocator);
+            try layout.init(self.allocator);
+            try self.current_layouts.append(layout);
+            
+            // Load root page
+            self.current_page = try root_page.create(self.allocator);
         }
 
         // Initialize the new page
@@ -58,5 +108,13 @@ pub const Router = struct {
 
     pub fn getCurrentPage(self: *const Router) ?*page.Page {
         return self.current_page;
+    }
+
+    pub fn renderWithLayouts(self: *const Router, links: *std.ArrayList(page.Link)) !void {
+        if (self.current_page == null) return;
+        
+        // For now, just render the page directly without layout composition
+        // A full implementation would compose layouts
+        try self.current_page.?.render(links);
     }
 };

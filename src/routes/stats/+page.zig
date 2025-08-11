@@ -1,5 +1,5 @@
 const std = @import("std");
-const page = @import("../browser/page.zig");
+const page = @import("../../browser/page.zig");
 
 const StatsPage = struct {
     base: page.Page,

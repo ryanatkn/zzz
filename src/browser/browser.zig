@@ -2,14 +2,14 @@ const std = @import("std");
 const c = @import("../c.zig");
 const types = @import("../types.zig");
 const controls = @import("../controls.zig");
-const history_mod = @import("history.zig");
+const simple_history = @import("simple_history.zig");
 const router_mod = @import("router.zig");
 const renderer_mod = @import("renderer.zig");
 const page = @import("page.zig");
 
 pub const Browser = struct {
     is_open: bool,
-    history: history_mod.History,
+    history: simple_history.SimpleHistory,
     router: router_mod.Router,
     renderer: renderer_mod.BrowserRenderer,
     links: std.ArrayList(page.Link),
@@ -19,7 +19,7 @@ pub const Browser = struct {
     pub fn init(allocator: std.mem.Allocator, base_renderer: *@import("../renderer.zig").Renderer) !Browser {
         var browser = Browser{
             .is_open = false,
-            .history = try history_mod.History.init(allocator),
+            .history = simple_history.SimpleHistory.init(),
             .router = router_mod.Router.init(allocator),
             .renderer = renderer_mod.BrowserRenderer.init(base_renderer),
             .links = std.ArrayList(page.Link).init(allocator),
@@ -34,7 +34,6 @@ pub const Browser = struct {
     }
 
     pub fn deinit(self: *Browser) void {
-        self.history.deinit();
         self.router.deinit();
         self.links.deinit();
     }
@@ -43,8 +42,7 @@ pub const Browser = struct {
         self.is_open = !self.is_open;
         if (self.is_open) {
             // Reset to home when opening
-            self.history.deinit();
-            self.history = history_mod.History.init(self.allocator) catch unreachable;
+            self.history = simple_history.SimpleHistory.init();
             self.router.navigate("/") catch unreachable;
         }
     }
@@ -58,17 +56,15 @@ pub const Browser = struct {
                 
                 switch (button_event.button) {
                     c.sdl.SDL_BUTTON_X1 => { // Back button
-                        // TODO: Re-enable when history is fixed
-                        // if (self.history.back()) {
-                        //     try self.router.navigate(self.history.getCurrentPath());
-                        // }
+                        if (self.history.back()) {
+                            try self.router.navigate(self.history.getCurrentPath());
+                        }
                         return true;
                     },
                     c.sdl.SDL_BUTTON_X2 => { // Forward button
-                        // TODO: Re-enable when history is fixed
-                        // if (self.history.forward()) {
-                        //     try self.router.navigate(self.history.getCurrentPath());
-                        // }
+                        if (self.history.forward()) {
+                            try self.router.navigate(self.history.getCurrentPath());
+                        }
                         return true;
                     },
                     c.sdl.SDL_BUTTON_LEFT => {
@@ -89,20 +85,18 @@ pub const Browser = struct {
                         // Back button bounds (circle at button_margin, bar_y with radius 15)
                         if (mouse_x >= button_margin - 15 and mouse_x <= button_margin + 15 and
                             mouse_y >= bar_y - 15 and mouse_y <= bar_y + 15) {
-                            // TODO: Re-enable when history is fixed
-                            // if (self.history.back()) {
-                            //     try self.router.navigate(self.history.getCurrentPath());
-                            // }
+                            if (self.history.back()) {
+                                try self.router.navigate(self.history.getCurrentPath());
+                            }
                             return true;
                         }
                         
                         // Forward button bounds (circle at button_margin + 40, bar_y with radius 15)
                         if (mouse_x >= button_margin + 25 and mouse_x <= button_margin + 55 and
                             mouse_y >= bar_y - 15 and mouse_y <= bar_y + 15) {
-                            // TODO: Re-enable when history is fixed
-                            // if (self.history.forward()) {
-                            //     try self.router.navigate(self.history.getCurrentPath());
-                            // }
+                            if (self.history.forward()) {
+                                try self.router.navigate(self.history.getCurrentPath());
+                            }
                             return true;
                         }
                         
@@ -146,8 +140,7 @@ pub const Browser = struct {
     }
 
     pub fn navigateTo(self: *Browser, path: []const u8) !void {
-        // TODO: Fix allocator.dupe issue in history.navigate
-        // try self.history.navigate(path);
+        try self.history.navigate(path);
         try self.router.navigate(path);
     }
 
@@ -167,7 +160,7 @@ pub const Browser = struct {
 
         // Render navigation bar
         const can_go_back = self.history.current_index > 0;
-        const can_go_forward = self.history.current_index < self.history.stack.items.len - 1;
+        const can_go_forward = self.history.current_index < self.history.stack_size - 1;
         try self.renderer.renderNavigationBar(
             cmd_buffer,
             render_pass,
@@ -179,10 +172,8 @@ pub const Browser = struct {
         // Clear links for this frame
         self.links.clearRetainingCapacity();
 
-        // Render current page
-        if (self.router.getCurrentPage()) |current_page| {
-            try self.renderer.renderPage(cmd_buffer, render_pass, current_page, &self.links);
-        }
+        // Render current page with layouts
+        try self.router.renderWithLayouts(&self.links);
 
         // Render links with hover states
         try self.renderer.renderLinks(cmd_buffer, render_pass, self.links.items, self.hovered_link);

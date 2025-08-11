@@ -7,6 +7,37 @@ pub const Link = struct {
     bounds: types.Rectangle,
 };
 
+pub const RenderSlot = struct {
+    render_fn: *const fn (links: *std.ArrayList(Link)) anyerror!void,
+    
+    pub fn render(self: *const RenderSlot, links: *std.ArrayList(Link)) !void {
+        try self.render_fn(links);
+    }
+};
+
+pub const Layout = struct {
+    pub const VTable = struct {
+        init: *const fn (self: *Layout, allocator: std.mem.Allocator) anyerror!void,
+        deinit: *const fn (self: *Layout, allocator: std.mem.Allocator) void,
+        render: *const fn (self: *const Layout, links: *std.ArrayList(Link), slot: *const RenderSlot) anyerror!void,
+    };
+
+    vtable: VTable,
+    path: []const u8,
+
+    pub fn init(self: *Layout, allocator: std.mem.Allocator) !void {
+        try self.vtable.init(self, allocator);
+    }
+
+    pub fn deinit(self: *Layout, allocator: std.mem.Allocator) void {
+        self.vtable.deinit(self, allocator);
+    }
+
+    pub fn render(self: *const Layout, links: *std.ArrayList(Link), slot: *const RenderSlot) !void {
+        try self.vtable.render(self, links, slot);
+    }
+};
+
 pub const Page = struct {
     pub const VTable = struct {
         init: *const fn (self: *Page, allocator: std.mem.Allocator) anyerror!void,

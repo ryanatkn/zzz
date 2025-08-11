@@ -60,19 +60,24 @@ pub const BrowserRenderer = struct {
                 link_color
             );
             
-            // Also draw a circle indicator in the center
-            const indicator_size: f32 = if (is_hovered) 8.0 else 5.0;
-            const circle_color = Color{ .r = 150, .g = 180, .b = 220, .a = 255 };
+            // Render the link text centered in the button
+            const text_color = if (is_hovered)
+                Color{ .r = 220, .g = 230, .b = 240, .a = 255 }
+            else
+                Color{ .r = 180, .g = 190, .b = 200, .a = 255 };
             
-            self.base_renderer.gpu.drawCircle(
+            // Estimate text width (rough approximation)
+            const text_width = @as(f32, @floatFromInt(link.text.len)) * 10.0;
+            const text_x = link.bounds.position.x + (link.bounds.size.x - text_width) / 2.0;
+            const text_y = link.bounds.position.y + (link.bounds.size.y - 10.0) / 2.0;
+            
+            self.drawSimpleText(
                 cmd_buffer,
                 render_pass,
-                .{ 
-                    .x = link.bounds.position.x + link.bounds.size.x / 2.0,
-                    .y = link.bounds.position.y + link.bounds.size.y / 2.0 
-                },
-                indicator_size,
-                circle_color
+                link.text,
+                text_x,
+                text_y,
+                text_color
             );
         }
     }
@@ -111,6 +116,15 @@ pub const BrowserRenderer = struct {
             back_color
         );
         
+        // Draw back arrow indicator
+        if (can_go_back) {
+            self.drawArrow(cmd_buffer, render_pass, 
+                bar_x + button_margin + button_size / 2.0, 
+                bar_y + button_margin + button_size / 2.0, 
+                10.0, .Left, 
+                Color{ .r = 200, .g = 200, .b = 220, .a = 255 });
+        }
+        
         // Forward button
         const forward_color = if (can_go_forward)
             Color{ .r = 60, .g = 70, .b = 90, .a = 255 }
@@ -125,18 +139,337 @@ pub const BrowserRenderer = struct {
             forward_color
         );
         
-        // Path display background
-        const path_x = bar_x + button_margin * 3 + button_size * 2;
-        const path_width = bar_width - (button_margin * 4 + button_size * 2);
+        // Draw forward arrow indicator
+        if (can_go_forward) {
+            self.drawArrow(cmd_buffer, render_pass, 
+                bar_x + button_margin * 2 + button_size + button_size / 2.0, 
+                bar_y + button_margin + button_size / 2.0, 
+                10.0, .Right, 
+                Color{ .r = 200, .g = 200, .b = 220, .a = 255 });
+        }
+        
+        // Address bar background
+        const address_x = bar_x + button_margin * 3 + button_size * 2;
+        const address_width = bar_width - (button_margin * 4 + button_size * 2);
         
         self.base_renderer.gpu.drawRect(
             cmd_buffer,
             render_pass,
-            .{ .x = path_x, .y = bar_y + button_margin },
-            .{ .x = path_width, .y = button_size },
+            .{ .x = address_x, .y = bar_y + button_margin },
+            .{ .x = address_width, .y = button_size },
             Color{ .r = 15, .g = 18, .b = 25, .a = 255 }
         );
         
-        _ = current_path; // TODO: Render path text when text rendering is available
+        // Address bar border (to make it look like an input field)
+        self.base_renderer.gpu.drawRect(
+            cmd_buffer,
+            render_pass,
+            .{ .x = address_x, .y = bar_y + button_margin },
+            .{ .x = address_width, .y = 2 },
+            Color{ .r = 40, .g = 45, .b = 55, .a = 255 }
+        );
+        self.base_renderer.gpu.drawRect(
+            cmd_buffer,
+            render_pass,
+            .{ .x = address_x, .y = bar_y + button_margin + button_size - 2 },
+            .{ .x = address_width, .y = 2 },
+            Color{ .r = 40, .g = 45, .b = 55, .a = 255 }
+        );
+        
+        // Render the path text
+        self.drawSimpleText(
+            cmd_buffer, 
+            render_pass, 
+            current_path, 
+            address_x + 10, 
+            bar_y + button_margin + 15,
+            Color{ .r = 180, .g = 190, .b = 200, .a = 255 }
+        );
+    }
+
+    const ArrowDirection = enum { Left, Right };
+
+    fn drawArrow(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, x: f32, y: f32, size: f32, direction: ArrowDirection, color: Color) void {
+        // Draw simple arrow using rectangles
+        const thickness = 2.0;
+        
+        switch (direction) {
+            .Left => {
+                // Draw <
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x - size/2, .y = y }, .{ .x = size, .y = thickness }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x - size/2, .y = y - thickness }, .{ .x = thickness, .y = size/2 }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x - size/2, .y = y + thickness }, .{ .x = thickness, .y = size/2 }, color);
+            },
+            .Right => {
+                // Draw >
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x - size/2, .y = y }, .{ .x = size, .y = thickness }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x + size/2 - thickness, .y = y - thickness }, .{ .x = thickness, .y = size/2 }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x + size/2 - thickness, .y = y + thickness }, .{ .x = thickness, .y = size/2 }, color);
+            },
+        }
+    }
+
+    fn drawSimpleText(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, text: []const u8, x: f32, y: f32, color: Color) void {
+        var current_x = x;
+        const char_spacing = 10.0;
+        
+        for (text) |char| {
+            self.drawChar(cmd_buffer, render_pass, char, current_x, y, color);
+            current_x += char_spacing;
+            
+            // Stop if we're going too far
+            if (current_x > 1800) break;
+        }
+    }
+
+    fn drawChar(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, char: u8, x: f32, y: f32, color: Color) void {
+        // Simple character rendering using small rectangles
+        // For now, just render some basic characters
+        const pixel_size = 2.0;
+        
+        switch (char) {
+            '/' => {
+                // Draw a forward slash
+                for (0..5) |i| {
+                    const offset = @as(f32, @floatFromInt(i));
+                    self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                        .{ .x = x + 4 - offset, .y = y + offset * 2 }, 
+                        .{ .x = pixel_size, .y = pixel_size }, color);
+                }
+            },
+            '-' => {
+                // Draw a dash
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y + 4 }, .{ .x = 6, .y = pixel_size }, color);
+            },
+            '_' => {
+                // Draw underscore
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y + 8 }, .{ .x = 6, .y = pixel_size }, color);
+            },
+            '.' => {
+                // Draw a dot
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x + 2, .y = y + 8 }, .{ .x = pixel_size, .y = pixel_size }, color);
+            },
+            'a', 'A' => {
+                // Draw an A shape
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y + 2 }, .{ .x = pixel_size, .y = 8 }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x + 4, .y = y + 2 }, .{ .x = pixel_size, .y = 8 }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y }, .{ .x = 6, .y = pixel_size }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y + 5 }, .{ .x = 6, .y = pixel_size }, color);
+            },
+            's', 'S' => {
+                // Draw an S shape
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y }, .{ .x = 6, .y = pixel_size }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y }, .{ .x = pixel_size, .y = 5 }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y + 4 }, .{ .x = 6, .y = pixel_size }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x + 4, .y = y + 4 }, .{ .x = pixel_size, .y = 5 }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y + 8 }, .{ .x = 6, .y = pixel_size }, color);
+            },
+            'e', 'E' => {
+                // Draw an E shape
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y }, .{ .x = 6, .y = pixel_size }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y }, .{ .x = pixel_size, .y = 10 }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y + 4 }, .{ .x = 4, .y = pixel_size }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y + 8 }, .{ .x = 6, .y = pixel_size }, color);
+            },
+            't', 'T' => {
+                // Draw a T shape
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y }, .{ .x = 6, .y = pixel_size }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x + 2, .y = y }, .{ .x = pixel_size, .y = 10 }, color);
+            },
+            'i', 'I' => {
+                // Draw an I shape
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x + 2, .y = y }, .{ .x = pixel_size, .y = 10 }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y }, .{ .x = 5, .y = pixel_size }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y + 8 }, .{ .x = 5, .y = pixel_size }, color);
+            },
+            'n', 'N' => {
+                // Draw an N shape
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y }, .{ .x = pixel_size, .y = 10 }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x + 4, .y = y }, .{ .x = pixel_size, .y = 10 }, color);
+                // Diagonal
+                for (0..5) |i| {
+                    const offset = @as(f32, @floatFromInt(i));
+                    self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                        .{ .x = x + offset, .y = y + offset * 2 }, 
+                        .{ .x = pixel_size, .y = pixel_size }, color);
+                }
+            },
+            'g', 'G' => {
+                // Draw a G shape
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y }, .{ .x = 6, .y = pixel_size }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y }, .{ .x = pixel_size, .y = 10 }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y + 8 }, .{ .x = 6, .y = pixel_size }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x + 4, .y = y + 4 }, .{ .x = pixel_size, .y = 5 }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x + 2, .y = y + 4 }, .{ .x = 3, .y = pixel_size }, color);
+            },
+            'v', 'V' => {
+                // Draw a V shape
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y }, .{ .x = pixel_size, .y = 6 }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x + 4, .y = y }, .{ .x = pixel_size, .y = 6 }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x + 1, .y = y + 6 }, .{ .x = pixel_size, .y = 2 }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x + 3, .y = y + 6 }, .{ .x = pixel_size, .y = 2 }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x + 2, .y = y + 8 }, .{ .x = pixel_size, .y = 2 }, color);
+            },
+            'd', 'D' => {
+                // Draw a D shape
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y }, .{ .x = pixel_size, .y = 10 }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y }, .{ .x = 4, .y = pixel_size }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y + 8 }, .{ .x = 4, .y = pixel_size }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x + 4, .y = y + 2 }, .{ .x = pixel_size, .y = 6 }, color);
+            },
+            'o', 'O' => {
+                // Draw an O shape
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y + 2 }, .{ .x = pixel_size, .y = 6 }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x + 4, .y = y + 2 }, .{ .x = pixel_size, .y = 6 }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y }, .{ .x = 6, .y = pixel_size }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y + 8 }, .{ .x = 6, .y = pixel_size }, color);
+            },
+            'u', 'U' => {
+                // Draw a U shape
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y }, .{ .x = pixel_size, .y = 10 }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x + 4, .y = y }, .{ .x = pixel_size, .y = 10 }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y + 8 }, .{ .x = 6, .y = pixel_size }, color);
+            },
+            'c', 'C' => {
+                // Draw a C shape
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y }, .{ .x = 6, .y = pixel_size }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y }, .{ .x = pixel_size, .y = 10 }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y + 8 }, .{ .x = 6, .y = pixel_size }, color);
+            },
+            'r', 'R' => {
+                // Draw an R shape
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y }, .{ .x = pixel_size, .y = 10 }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y }, .{ .x = 5, .y = pixel_size }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x + 4, .y = y }, .{ .x = pixel_size, .y = 5 }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y + 4 }, .{ .x = 5, .y = pixel_size }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x + 3, .y = y + 5 }, .{ .x = pixel_size, .y = 5 }, color);
+            },
+            'l', 'L' => {
+                // Draw an L shape
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y }, .{ .x = pixel_size, .y = 10 }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y + 8 }, .{ .x = 6, .y = pixel_size }, color);
+            },
+            'h', 'H' => {
+                // Draw an H shape
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y }, .{ .x = pixel_size, .y = 10 }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x + 4, .y = y }, .{ .x = pixel_size, .y = 10 }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y + 4 }, .{ .x = 6, .y = pixel_size }, color);
+            },
+            'p', 'P' => {
+                // Draw a P shape
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y }, .{ .x = pixel_size, .y = 10 }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y }, .{ .x = 5, .y = pixel_size }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x + 4, .y = y }, .{ .x = pixel_size, .y = 5 }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y + 4 }, .{ .x = 5, .y = pixel_size }, color);
+            },
+            'b', 'B' => {
+                // Draw a B shape
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y }, .{ .x = pixel_size, .y = 10 }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y }, .{ .x = 4, .y = pixel_size }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y + 4 }, .{ .x = 4, .y = pixel_size }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y + 8 }, .{ .x = 4, .y = pixel_size }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x + 4, .y = y + 1 }, .{ .x = pixel_size, .y = 3 }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x + 4, .y = y + 5 }, .{ .x = pixel_size, .y = 3 }, color);
+            },
+            'k', 'K' => {
+                // Draw a K shape
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y }, .{ .x = pixel_size, .y = 10 }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x + 2, .y = y + 4 }, .{ .x = pixel_size, .y = pixel_size }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x + 3, .y = y + 2 }, .{ .x = pixel_size, .y = pixel_size }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x + 4, .y = y }, .{ .x = pixel_size, .y = pixel_size }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x + 3, .y = y + 6 }, .{ .x = pixel_size, .y = pixel_size }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x + 4, .y = y + 8 }, .{ .x = pixel_size, .y = pixel_size }, color);
+            },
+            else => {
+                // For unimplemented chars, draw a small box
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y }, .{ .x = 5, .y = 1 }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y + 8 }, .{ .x = 5, .y = 1 }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x, .y = y }, .{ .x = 1, .y = 9 }, color);
+                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
+                    .{ .x = x + 4, .y = y }, .{ .x = 1, .y = 9 }, color);
+            },
+        }
     }
 };

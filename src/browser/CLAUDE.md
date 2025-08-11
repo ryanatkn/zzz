@@ -3,26 +3,30 @@
 ## Current State
 
 **Working:**
-- Basic overlay rendering (circles only, no rectangles)
-- Simple page routing to static paths
-- Mouse click navigation between pages
-- Backtick (`) key toggles menu
-- ESC key closes menu
-- Page interface with init/deinit/update/render lifecycle
+- ✅ Overlay rendering with rectangles and circles
+- ✅ Page routing to static paths
+- ✅ Mouse click navigation between pages
+- ✅ Backtick (`) key toggles menu
+- ✅ ESC key closes menu
+- ✅ Page interface with init/deinit/update/render lifecycle
+- ✅ History navigation with back/forward
+- ✅ Address bar showing current path
+- ✅ Simple text rendering (basic ASCII letters)
+- ✅ Button labels and link text
 
-**Broken:**
-- History navigation (Zig allocator.dupe compilation error)
-- Back/forward mouse buttons (disabled due to history issue)
-- Navigation bar buttons (disabled due to history issue)
+**Fixed:**
+- ✅ History navigation (using SimpleHistory with fixed buffers)
+- ✅ Back/forward mouse buttons working
+- ✅ Navigation bar buttons working
+- ✅ Rectangle rendering via gpu.drawRect
 
 **Missing:**
-- Text rendering (no font system)
-- Rectangle rendering (no shader support)
 - SvelteKit-style routing (`+page.zig`, `+layout.zig`)
 - Dynamic routes (`[param]` folders)
 - Form controls (inputs, sliders, checkboxes)
 - Transitions between pages
 - State persistence
+- Full font support (only basic letters implemented)
 
 ## File Structure
 
@@ -42,35 +46,23 @@ src/routes/          # Current: simple .zig files
 
 ## Known Issues
 
-1. **Allocator Bug**: `allocator.dupe(u8, path)` causes compilation error in std library
-   - Location: `history.zig:34`
-   - Workaround: History disabled, direct navigation only
-
-2. **No GPU Rectangles**: Renderer can only draw circles
-   - Need: Rectangle shader in src/shaders/
-   - Current: Using circles as UI indicators
-
-3. **Hardcoded Screen Size**: Using 1920x1080 constants
+1. **Hardcoded Screen Size**: Using 1920x1080 constants
    - Need: Get actual size from renderer
    - Blocked: Renderer doesn't expose screen_size
 
+2. **Limited Text Rendering**: Only basic ASCII letters implemented
+   - Missing: Numbers, special characters, lowercase variants
+   - Current: Using simple rectangle-based letter drawing
+
 ## Quick Tasks
 
-**Fix History:**
+**Add More Text Characters:**
 ```zig
-// Current (broken):
-try self.stack.append(try self.allocator.dupe(u8, path));
-
-// Potential fixes to try:
-// 1. Use ArrayList([]u8) with manual allocation
-// 2. Use fixed-size buffer pool
-// 3. Store path indices instead of strings
+// In drawChar() add cases for:
+'0'-'9' => // Numbers
+'x', 'y', 'z' => // Missing letters
+'(', ')', '[', ']' => // Brackets
 ```
-
-**Add Rectangle Support:**
-1. Check if rectangle shader exists in src/shaders/
-2. Add drawRectangle to renderer.zig 
-3. Update browser/renderer.zig to use it
 
 **Get Screen Size:**
 ```zig
