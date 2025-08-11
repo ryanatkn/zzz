@@ -1,7 +1,7 @@
 const std = @import("std");
 const math = std.math;
 
-const sdl = @import("sdl.zig").c;
+const c = @import("c.zig");
 
 const types = @import("types.zig");
 const Color = types.Color;
@@ -149,14 +149,14 @@ pub const BorderStack = struct {
 
 // Animation utility functions
 fn calculateAnimationPulse(frequency: f32) f32 {
-    const current_time_ms = @as(f32, @floatFromInt(sdl.SDL_GetTicks()));
+    const current_time_ms = @as(f32, @floatFromInt(c.sdl.SDL_GetTicks()));
     const current_time_sec = current_time_ms / 1000.0;
     return (math.sin(current_time_sec * frequency) + 1.0) * 0.5;
 }
 
 fn calculateColorCycle() f32 {
     const COLOR_CYCLE_FREQ = 4.0;
-    const current_time_ms = @as(f32, @floatFromInt(sdl.SDL_GetTicks()));
+    const current_time_ms = @as(f32, @floatFromInt(c.sdl.SDL_GetTicks()));
     const current_time_sec = current_time_ms / 1000.0;
     return (math.sin(current_time_sec * COLOR_CYCLE_FREQ) + 1.0) * 0.5;
 }
@@ -204,8 +204,8 @@ pub fn drawScreenBorder(game_state: anytype) void {
 
     // Iris wipe effect (highest priority - renders over everything)
     if (game_state.iris_wipe_active) {
-        const current_time = sdl.SDL_GetPerformanceCounter();
-        const frequency = sdl.SDL_GetPerformanceFrequency();
+        const current_time = c.sdl.SDL_GetPerformanceCounter();
+        const frequency = c.sdl.SDL_GetPerformanceFrequency();
         const elapsed_sec = @as(f32, @floatFromInt(current_time - game_state.iris_wipe_start_time)) / @as(f32, @floatFromInt(frequency));
         const wipe_duration = IRIS_WIPE_DURATION;
 

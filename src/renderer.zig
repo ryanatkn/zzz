@@ -1,6 +1,6 @@
 const std = @import("std");
 
-const sdl = @import("sdl.zig").c;
+const c = @import("c.zig");
 
 const entities = @import("entities.zig");
 const types = @import("types.zig");
@@ -18,7 +18,7 @@ pub const Renderer = struct {
     gpu: SimpleGPURenderer,
     camera: camera.Camera,
 
-    pub fn init(allocator: std.mem.Allocator, window: *sdl.SDL_Window) !Renderer {
+    pub fn init(allocator: std.mem.Allocator, window: *c.sdl.SDL_Window) !Renderer {
         return .{
             .gpu = try SimpleGPURenderer.init(allocator, window),
             .camera = camera.Camera.init(constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT),
@@ -30,22 +30,22 @@ pub const Renderer = struct {
     }
 
     // Begin a new frame
-    pub fn beginFrame(self: *Renderer, window: *sdl.SDL_Window) !*sdl.SDL_GPUCommandBuffer {
+    pub fn beginFrame(self: *Renderer, window: *c.sdl.SDL_Window) !*c.sdl.SDL_GPUCommandBuffer {
         return try self.gpu.beginFrame(window);
     }
 
     // Begin render pass
-    pub fn beginRenderPass(self: *Renderer, cmd_buffer: *sdl.SDL_GPUCommandBuffer, window: *sdl.SDL_Window, bg_color: Color) !*sdl.SDL_GPURenderPass {
+    pub fn beginRenderPass(self: *Renderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, window: *c.sdl.SDL_Window, bg_color: Color) !*c.sdl.SDL_GPURenderPass {
         return try self.gpu.beginRenderPass(cmd_buffer, window, bg_color);
     }
 
     // End render pass
-    pub fn endRenderPass(self: *Renderer, render_pass: *sdl.SDL_GPURenderPass) void {
+    pub fn endRenderPass(self: *Renderer, render_pass: *c.sdl.SDL_GPURenderPass) void {
         self.gpu.endRenderPass(render_pass);
     }
 
     // End frame
-    pub fn endFrame(self: *Renderer, cmd_buffer: *sdl.SDL_GPUCommandBuffer) void {
+    pub fn endFrame(self: *Renderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer) void {
         self.gpu.endFrame(cmd_buffer);
     }
 
@@ -67,7 +67,7 @@ pub const Renderer = struct {
     }
 
     // Render all entities in a zone
-    pub fn renderZone(self: *Renderer, cmd_buffer: *sdl.SDL_GPUCommandBuffer, render_pass: *sdl.SDL_GPURenderPass, world: *const entities.World) void {
+    pub fn renderZone(self: *Renderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const entities.World) void {
         const zone = world.getCurrentZone();
 
         // Draw all rectangles first (obstacles)
@@ -78,7 +78,7 @@ pub const Renderer = struct {
     }
 
     // Render all obstacles (rectangles)
-    fn renderObstacles(self: *Renderer, cmd_buffer: *sdl.SDL_GPUCommandBuffer, render_pass: *sdl.SDL_GPURenderPass, zone: *const entities.Zone) void {
+    fn renderObstacles(self: *Renderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, zone: *const entities.Zone) void {
         for (0..zone.obstacle_count) |i| {
             const obstacle = &zone.obstacles[i];
             if (obstacle.active) {
@@ -93,14 +93,14 @@ pub const Renderer = struct {
     }
 
     // Helper to render a single circular entity
-    fn renderCircleEntity(self: *Renderer, cmd_buffer: *sdl.SDL_GPUCommandBuffer, render_pass: *sdl.SDL_GPURenderPass, pos: Vec2, radius: f32, color: Color) void {
+    fn renderCircleEntity(self: *Renderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, pos: Vec2, radius: f32, color: Color) void {
         const screen_pos = self.camera.worldToScreen(pos);
         const screen_radius = self.camera.worldSizeToScreen(radius);
         self.gpu.drawCircle(cmd_buffer, render_pass, screen_pos, screen_radius, color);
     }
 
     // Render all circular entities
-    fn renderCircles(self: *Renderer, cmd_buffer: *sdl.SDL_GPUCommandBuffer, render_pass: *sdl.SDL_GPURenderPass, world: *const entities.World) void {
+    fn renderCircles(self: *Renderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const entities.World) void {
         const zone = world.getCurrentZone();
 
         // Draw player
@@ -141,12 +141,12 @@ pub const Renderer = struct {
     }
 
     // Render visual effects
-    pub fn renderEffects(self: *Renderer, cmd_buffer: *sdl.SDL_GPUCommandBuffer, render_pass: *sdl.SDL_GPURenderPass, effect_system: *const effects.EffectSystem) void {
+    pub fn renderEffects(self: *Renderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, effect_system: *const effects.EffectSystem) void {
         const active_effects = effect_system.getActiveEffects();
 
         // Get current time for shader animations
-        const current_time = sdl.SDL_GetPerformanceCounter();
-        const frequency = sdl.SDL_GetPerformanceFrequency();
+        const current_time = c.sdl.SDL_GetPerformanceCounter();
+        const frequency = c.sdl.SDL_GetPerformanceFrequency();
         const time_sec = @as(f32, @floatFromInt(current_time)) / @as(f32, @floatFromInt(frequency));
 
         for (active_effects) |effect| {
@@ -161,13 +161,13 @@ pub const Renderer = struct {
     }
 
     // Draw border system with stacking support
-    pub fn drawBorders(self: *Renderer, cmd_buffer: *sdl.SDL_GPUCommandBuffer, render_pass: *sdl.SDL_GPURenderPass, game_state: anytype) void {
+    pub fn drawBorders(self: *Renderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, game_state: anytype) void {
         var border_stack = borders.BorderStack.init();
 
         // Iris wipe effect (highest priority - renders over everything)
         if (game_state.iris_wipe_active) {
-            const current_time = sdl.SDL_GetPerformanceCounter();
-            const frequency = sdl.SDL_GetPerformanceFrequency();
+            const current_time = c.sdl.SDL_GetPerformanceCounter();
+            const frequency = c.sdl.SDL_GetPerformanceFrequency();
             const elapsed_sec = @as(f32, @floatFromInt(current_time - game_state.iris_wipe_start_time)) / @as(f32, @floatFromInt(frequency));
             const wipe_duration = borders.IRIS_WIPE_DURATION;
 
@@ -226,7 +226,7 @@ pub const Renderer = struct {
     }
 
     // Helper method for border system integration
-    pub fn drawBorderWithOffset(self: *Renderer, cmd_buffer: *sdl.SDL_GPUCommandBuffer, render_pass: *sdl.SDL_GPURenderPass, color: Color, width: f32, offset: f32) void {
+    pub fn drawBorderWithOffset(self: *Renderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, color: Color, width: f32, offset: f32) void {
         const rects = borders.calculateBorderRects(width, offset);
         for (rects) |rect| {
             self.gpu.drawRect(cmd_buffer, render_pass, Vec2{ .x = rect.x, .y = rect.y }, Vec2{ .x = rect.w, .y = rect.h }, color);
@@ -234,7 +234,7 @@ pub const Renderer = struct {
     }
 
     // Simple HUD rendering
-    pub fn drawFPS(self: *Renderer, cmd_buffer: *sdl.SDL_GPUCommandBuffer, render_pass: *sdl.SDL_GPURenderPass, fps: u32) void {
+    pub fn drawFPS(self: *Renderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, fps: u32) void {
         const WHITE = Color{ .r = 230, .g = 230, .b = 230, .a = 255 };
         const fps_x = 1840.0;
         const fps_y = 1060.0;
@@ -252,7 +252,7 @@ pub const Renderer = struct {
         self.drawDigit(cmd_buffer, render_pass, @intCast(ones), fps_x + 12.0, fps_y, WHITE);
     }
 
-    fn drawDigit(self: *Renderer, cmd_buffer: *sdl.SDL_GPUCommandBuffer, render_pass: *sdl.SDL_GPURenderPass, digit: u8, x: f32, y: f32, color: Color) void {
+    fn drawDigit(self: *Renderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, digit: u8, x: f32, y: f32, color: Color) void {
         if (digit > 9) return;
 
         // Simple 3x5 digit patterns

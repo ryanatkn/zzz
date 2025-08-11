@@ -1,6 +1,6 @@
 const std = @import("std");
 
-const sdl = @import("sdl.zig").c;
+const c = @import("c.zig");
 
 const types = @import("types.zig");
 
@@ -24,7 +24,7 @@ pub const Hud = struct {
         return Self{
             .fps_counter = 60, // Start with reasonable default
             .fps_frames = 0,
-            .fps_last_time = sdl.SDL_GetPerformanceCounter(),
+            .fps_last_time = c.sdl.SDL_GetPerformanceCounter(),
             .visible = true, // Start visible
         };
     }

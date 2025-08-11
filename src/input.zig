@@ -1,6 +1,6 @@
 const std = @import("std");
 
-const sdl = @import("sdl.zig").c;
+const c = @import("c.zig");
 
 const types = @import("types.zig");
 const camera = @import("camera.zig");
@@ -39,16 +39,16 @@ pub const InputState = struct {
 
     pub fn handleMouseButtonDown(self: *Self, button: u8) void {
         switch (button) {
-            sdl.SDL_BUTTON_LEFT => self.left_mouse_held = true,
-            sdl.SDL_BUTTON_RIGHT => self.right_mouse_held = true,
+            c.sdl.SDL_BUTTON_LEFT => self.left_mouse_held = true,
+            c.sdl.SDL_BUTTON_RIGHT => self.right_mouse_held = true,
             else => {},
         }
     }
 
     pub fn handleMouseButtonUp(self: *Self, button: u8) void {
         switch (button) {
-            sdl.SDL_BUTTON_LEFT => self.left_mouse_held = false,
-            sdl.SDL_BUTTON_RIGHT => self.right_mouse_held = false,
+            c.sdl.SDL_BUTTON_LEFT => self.left_mouse_held = false,
+            c.sdl.SDL_BUTTON_RIGHT => self.right_mouse_held = false,
             else => {},
         }
     }
@@ -76,16 +76,16 @@ pub const InputState = struct {
     pub fn getMovementVector(self: *const Self) Vec2 {
         var velocity = Vec2{ .x = 0, .y = 0 };
 
-        if (self.isKeyDown(sdl.SDL_SCANCODE_W)) {
+        if (self.isKeyDown(c.sdl.SDL_SCANCODE_W)) {
             velocity.y -= 1.0;
         }
-        if (self.isKeyDown(sdl.SDL_SCANCODE_S)) {
+        if (self.isKeyDown(c.sdl.SDL_SCANCODE_S)) {
             velocity.y += 1.0;
         }
-        if (self.isKeyDown(sdl.SDL_SCANCODE_A)) {
+        if (self.isKeyDown(c.sdl.SDL_SCANCODE_A)) {
             velocity.x -= 1.0;
         }
-        if (self.isKeyDown(sdl.SDL_SCANCODE_D)) {
+        if (self.isKeyDown(c.sdl.SDL_SCANCODE_D)) {
             velocity.x += 1.0;
         }
 

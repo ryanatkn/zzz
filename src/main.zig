@@ -1,6 +1,6 @@
 const std = @import("std");
 
-const sdl = @import("sdl.zig").c;
+const c = @import("c.zig");
 
 const constants = @import("constants.zig");
 const entities = @import("entities.zig");
@@ -33,7 +33,7 @@ const DEBUG_MODE = false; // Set to true to run debug tests instead of game
 pub fn main() !void {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
-    
+
     try run(gpa.allocator());
 }
 
@@ -44,7 +44,7 @@ pub fn run(allocator: std.mem.Allocator) !void {
     global_allocator = allocator;
 
     var empty_argv: [0:null]?[*:0]u8 = .{};
-    const status: u8 = @truncate(@as(c_uint, @bitCast(sdl.SDL_RunApp(empty_argv.len, @ptrCast(&empty_argv), sdlMainC, null))));
+    const status: u8 = @truncate(@as(c_uint, @bitCast(c.sdl.SDL_RunApp(empty_argv.len, @ptrCast(&empty_argv), sdlMainC, null))));
     if (app_err.load()) |err| {
         return err;
     }
@@ -54,7 +54,7 @@ pub fn run(allocator: std.mem.Allocator) !void {
 }
 
 var fully_initialized = false;
-var window: *sdl.SDL_Window = undefined;
+var window: *c.sdl.SDL_Window = undefined;
 var game_renderer: Renderer = undefined;
 var game_state: GameState = undefined;
 var game_hud: Hud = undefined;
@@ -63,22 +63,22 @@ var global_allocator: std.mem.Allocator = undefined;
 // Timing
 var last_time: u64 = 0;
 
-fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !sdl.SDL_AppResult {
+fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
     _ = appstate;
     _ = argv;
 
-    try errify(sdl.SDL_Init(sdl.SDL_INIT_VIDEO));
+    try errify(c.sdl.SDL_Init(c.sdl.SDL_INIT_VIDEO));
 
     // Create window hidden initially
-    window = sdl.SDL_CreateWindow("Hex GPU Game", window_w, window_h, sdl.SDL_WINDOW_RESIZABLE | sdl.SDL_WINDOW_HIDDEN) orelse {
+    window = c.sdl.SDL_CreateWindow("Hex GPU Game", window_w, window_h, c.sdl.SDL_WINDOW_RESIZABLE | c.sdl.SDL_WINDOW_HIDDEN) orelse {
         return error.SdlError;
     };
-    errdefer sdl.SDL_DestroyWindow(window);
+    errdefer c.sdl.SDL_DestroyWindow(window);
 
     if (DEBUG_MODE) {
         // Debug mode - no GPU renderer needed
         fully_initialized = true;
-        return sdl.SDL_APP_CONTINUE;
+        return c.sdl.SDL_APP_CONTINUE;
     }
 
     // Initialize renderer
@@ -101,41 +101,41 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !sdl.SDL_AppResult {
     game_state.effect_system.refreshAmbientEffects(&game_state.world);
 
     // Show window after initialization
-    _ = sdl.SDL_ShowWindow(window);
+    _ = c.sdl.SDL_ShowWindow(window);
 
-    last_time = sdl.SDL_GetPerformanceCounter();
+    last_time = c.sdl.SDL_GetPerformanceCounter();
 
     fully_initialized = true;
     std.debug.print("Hex GPU game initialized successfully\n", .{});
     std.debug.print("Controls: Hold mouse to move, WASD for direct movement, Space to pause, ESC to quit\n", .{});
     std.debug.print("Portal interaction: Walk into portals to travel between zones\n", .{});
-    return sdl.SDL_APP_CONTINUE;
+    return c.sdl.SDL_APP_CONTINUE;
 }
 
-fn sdlAppIterate(appstate: ?*anyopaque) !sdl.SDL_AppResult {
+fn sdlAppIterate(appstate: ?*anyopaque) !c.sdl.SDL_AppResult {
     _ = appstate;
 
     if (game_state.shouldQuit()) {
-        return sdl.SDL_APP_SUCCESS;
+        return c.sdl.SDL_APP_SUCCESS;
     }
 
     if (DEBUG_MODE) {
         // Debug mode - no tests available
-        return sdl.SDL_APP_SUCCESS;
+        return c.sdl.SDL_APP_SUCCESS;
     } else {
         // Game mode - run actual game
         try runGameLoop();
     }
 
-    return sdl.SDL_APP_CONTINUE;
+    return c.sdl.SDL_APP_CONTINUE;
 }
 
-fn sdlAppEvent(appstate: ?*anyopaque, event: *sdl.SDL_Event) !sdl.SDL_AppResult {
+fn sdlAppEvent(appstate: ?*anyopaque, event: *c.sdl.SDL_Event) !c.sdl.SDL_AppResult {
     _ = appstate;
     return controls.handleSDLEvent(&game_state, &game_renderer, &game_hud, event);
 }
 
-fn sdlAppQuit(appstate: ?*anyopaque, result: anyerror!sdl.SDL_AppResult) void {
+fn sdlAppQuit(appstate: ?*anyopaque, result: anyerror!c.sdl.SDL_AppResult) void {
     _ = appstate;
     _ = result catch {};
 
@@ -144,7 +144,7 @@ fn sdlAppQuit(appstate: ?*anyopaque, result: anyerror!sdl.SDL_AppResult) void {
             game_renderer.deinit();
             loader.deinit(); // Clean up ZON data memory
         }
-        sdl.SDL_DestroyWindow(window);
+        c.sdl.SDL_DestroyWindow(window);
         fully_initialized = false;
     }
 }
@@ -152,8 +152,8 @@ fn sdlAppQuit(appstate: ?*anyopaque, result: anyerror!sdl.SDL_AppResult) void {
 // Game loop functions
 fn runGameLoop() !void {
     // Calculate delta time
-    const current_time = sdl.SDL_GetPerformanceCounter();
-    const frequency = sdl.SDL_GetPerformanceFrequency();
+    const current_time = c.sdl.SDL_GetPerformanceCounter();
+    const frequency = c.sdl.SDL_GetPerformanceFrequency();
     const delta_ticks = current_time - last_time;
     const deltaTime: f32 = @as(f32, @floatFromInt(delta_ticks)) / @as(f32, @floatFromInt(frequency));
     last_time = current_time;
@@ -221,25 +221,25 @@ inline fn errify(value: anytype) error{SdlError}!switch (@typeInfo(@TypeOf(value
 fn sdlMainC(argc: c_int, argv: ?[*:null]?[*:0]u8) callconv(.c) c_int {
     _ = argc;
     _ = argv;
-    return sdl.SDL_EnterAppMainCallbacks(0, null, sdlAppInitC, sdlAppIterateC, sdlAppEventC, sdlAppQuitC);
+    return c.sdl.SDL_EnterAppMainCallbacks(0, null, sdlAppInitC, sdlAppIterateC, sdlAppEventC, sdlAppQuitC);
 }
 
-fn sdlAppInitC(appstate: ?*?*anyopaque, argc: c_int, argv: ?[*:null]?[*:0]u8) callconv(.c) sdl.SDL_AppResult {
+fn sdlAppInitC(appstate: ?*?*anyopaque, argc: c_int, argv: ?[*:null]?[*:0]u8) callconv(.c) c.sdl.SDL_AppResult {
     _ = argc;
     _ = argv;
     const empty_slice: [][*:0]u8 = &.{};
     return sdlAppInit(appstate.?, empty_slice) catch |err| app_err.store(err);
 }
 
-fn sdlAppIterateC(appstate: ?*anyopaque) callconv(.c) sdl.SDL_AppResult {
+fn sdlAppIterateC(appstate: ?*anyopaque) callconv(.c) c.sdl.SDL_AppResult {
     return sdlAppIterate(appstate) catch |err| app_err.store(err);
 }
 
-fn sdlAppEventC(appstate: ?*anyopaque, event: ?*sdl.SDL_Event) callconv(.c) sdl.SDL_AppResult {
+fn sdlAppEventC(appstate: ?*anyopaque, event: ?*c.sdl.SDL_Event) callconv(.c) c.sdl.SDL_AppResult {
     return sdlAppEvent(appstate, event.?) catch |err| app_err.store(err);
 }
 
-fn sdlAppQuitC(appstate: ?*anyopaque, result: sdl.SDL_AppResult) callconv(.c) void {
+fn sdlAppQuitC(appstate: ?*anyopaque, result: c.sdl.SDL_AppResult) callconv(.c) void {
     sdlAppQuit(appstate, app_err.load() orelse result);
 }
 
@@ -250,30 +250,30 @@ const ErrorStore = struct {
     const status_storing = 1;
     const status_stored = 2;
 
-    status: sdl.SDL_AtomicInt = .{},
+    status: c.sdl.SDL_AtomicInt = .{},
     err: anyerror = undefined,
     trace_index: usize = undefined,
     trace_addrs: [32]usize = undefined,
 
     fn reset(es: *ErrorStore) void {
-        _ = sdl.SDL_SetAtomicInt(&es.status, status_not_stored);
+        _ = c.sdl.SDL_SetAtomicInt(&es.status, status_not_stored);
     }
 
-    fn store(es: *ErrorStore, err: anyerror) sdl.SDL_AppResult {
-        if (sdl.SDL_CompareAndSwapAtomicInt(&es.status, status_not_stored, status_storing)) {
+    fn store(es: *ErrorStore, err: anyerror) c.sdl.SDL_AppResult {
+        if (c.sdl.SDL_CompareAndSwapAtomicInt(&es.status, status_not_stored, status_storing)) {
             es.err = err;
             if (@errorReturnTrace()) |src_trace| {
                 es.trace_index = src_trace.index;
                 const len = @min(es.trace_addrs.len, src_trace.instruction_addresses.len);
                 @memcpy(es.trace_addrs[0..len], src_trace.instruction_addresses[0..len]);
             }
-            _ = sdl.SDL_SetAtomicInt(&es.status, status_stored);
+            _ = c.sdl.SDL_SetAtomicInt(&es.status, status_stored);
         }
-        return sdl.SDL_APP_FAILURE;
+        return c.sdl.SDL_APP_FAILURE;
     }
 
     fn load(es: *ErrorStore) ?anyerror {
-        if (sdl.SDL_GetAtomicInt(&es.status) != status_stored) return null;
+        if (c.sdl.SDL_GetAtomicInt(&es.status) != status_stored) return null;
         if (@errorReturnTrace()) |dst_trace| {
             dst_trace.index = es.trace_index;
             const len = @min(dst_trace.instruction_addresses.len, es.trace_addrs.len);

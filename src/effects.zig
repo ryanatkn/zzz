@@ -1,6 +1,6 @@
 const std = @import("std");
 
-const sdl = @import("sdl.zig").c;
+const c = @import("c.zig");
 
 const types = @import("types.zig");
 const constants = @import("constants.zig");
@@ -36,7 +36,7 @@ pub const Effect = struct {
             .radius = radius,
             .effect_type = effect_type,
             .active = true,
-            .start_time = sdl.SDL_GetPerformanceCounter(),
+            .start_time = c.sdl.SDL_GetPerformanceCounter(),
             .duration = duration,
             .intensity = 1.0,
         };
@@ -46,21 +46,21 @@ pub const Effect = struct {
         if (!self.active) return false;
         if (self.duration == 0.0) return true; // Permanent effect
 
-        const current_time = sdl.SDL_GetPerformanceCounter();
+        const current_time = c.sdl.SDL_GetPerformanceCounter();
         // Check if effect has started yet (handle delayed effects)
         if (current_time < self.start_time) return true; // Not started yet, but active
 
-        const frequency = sdl.SDL_GetPerformanceFrequency();
+        const frequency = c.sdl.SDL_GetPerformanceFrequency();
         const elapsed_sec = @as(f32, @floatFromInt(current_time - self.start_time)) / @as(f32, @floatFromInt(frequency));
         return elapsed_sec < self.duration;
     }
 
     pub fn getElapsed(self: *const Effect) f32 {
-        const current_time = sdl.SDL_GetPerformanceCounter();
+        const current_time = c.sdl.SDL_GetPerformanceCounter();
         // If effect hasn't started yet, return 0 elapsed time
         if (current_time < self.start_time) return 0.0;
 
-        const frequency = sdl.SDL_GetPerformanceFrequency();
+        const frequency = c.sdl.SDL_GetPerformanceFrequency();
         return @as(f32, @floatFromInt(current_time - self.start_time)) / @as(f32, @floatFromInt(frequency));
     }
 
@@ -355,7 +355,7 @@ pub const EffectSystem = struct {
             if (self.count > 0) {
                 // Customize the effect we just added
                 var effect = &self.effects[self.count - 1];
-                effect.start_time += @as(u64, @intFromFloat(config.delay * @as(f32, @floatFromInt(sdl.SDL_GetPerformanceFrequency()))));
+                effect.start_time += @as(u64, @intFromFloat(config.delay * @as(f32, @floatFromInt(c.sdl.SDL_GetPerformanceFrequency()))));
                 effect.intensity = config.intensity;
             }
         }
@@ -375,7 +375,7 @@ pub const EffectSystem = struct {
             if (self.count > 0) {
                 // Customize the effect we just added
                 var effect = &self.effects[self.count - 1];
-                effect.start_time += @as(u64, @intFromFloat(config.delay * @as(f32, @floatFromInt(sdl.SDL_GetPerformanceFrequency()))));
+                effect.start_time += @as(u64, @intFromFloat(config.delay * @as(f32, @floatFromInt(c.sdl.SDL_GetPerformanceFrequency()))));
                 effect.intensity = config.intensity;
             }
         }
@@ -392,7 +392,7 @@ pub const EffectSystem = struct {
             if (self.count >= MAX_EFFECTS) break;
 
             self.effects[self.count] = Effect.init(pos, portal_radius * config.size_mult, .portal_ripple, config.duration);
-            self.effects[self.count].start_time += @as(u64, @intFromFloat(config.delay * @as(f32, @floatFromInt(sdl.SDL_GetPerformanceFrequency()))));
+            self.effects[self.count].start_time += @as(u64, @intFromFloat(config.delay * @as(f32, @floatFromInt(c.sdl.SDL_GetPerformanceFrequency()))));
             self.effects[self.count].intensity = config.intensity;
             self.count += 1;
         }

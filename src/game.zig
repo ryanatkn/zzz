@@ -1,6 +1,6 @@
 const std = @import("std");
 
-const sdl = @import("sdl.zig").c;
+const c = @import("c.zig");
 
 const types = @import("types.zig");
 const entities = @import("entities.zig");
@@ -198,7 +198,7 @@ pub fn handleFireBullet(game_state: *GameState, cam: *const camera.Camera) void 
 pub fn handleRespawn(game_state: *GameState) void {
     // Start iris wipe effect
     game_state.iris_wipe_active = true;
-    game_state.iris_wipe_start_time = sdl.SDL_GetPerformanceCounter();
+    game_state.iris_wipe_start_time = c.sdl.SDL_GetPerformanceCounter();
 
     combat.respawnPlayer(game_state);
 }
