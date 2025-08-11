@@ -86,7 +86,6 @@ Dependencies: SDL3 (auto-fetched), SDL_shadercross (HLSL→SPIRV/DXIL compilatio
     ├── README.md                     # User-facing documentation
     ├── build.zig                     # Zig build configuration
     ├── build.zig.zon                 # Package manifest and dependencies
-    ├── hex                           # Build and run script
     ├── hex_project_prompt.md         # Generated LLM prompt
     └── zz.zon                        # zz tool configuration
 ```
@@ -96,10 +95,9 @@ Dependencies: SDL3 (auto-fetched), SDL_shadercross (HLSL→SPIRV/DXIL compilatio
 ## Commands
 
 ```bash
-# Standard Zig workflow (recommended)
+# Standard Zig workflow
 $ zig build              # Build (includes automatic shader compilation)
 $ zig build run          # Build and run
-$ ./hex                  # Simple wrapper around 'zig build run'
 
 # Shader-specific commands
 $ zig build shaders          # Compile shaders only
@@ -111,7 +109,6 @@ $ zig build -Doptimize=ReleaseFast                          # Release build
 
 # Help and options
 $ zig build --help       # Show all build options
-$ ./hex --help           # Show game controls and usage
 ```
 
 ## Quick Start
@@ -203,7 +200,7 @@ $ ./hex --help           # Show game controls and usage
 - Game is fully functional - focus on performance and gameplay improvements
 - Prioritize procedural generation and performance over asset-based approaches
 - Focus on code-driven visuals and algorithmic generation
-- Test frequently with `zig build run` or `./hex` to ensure each step works
+- Test frequently with `zig build run` to ensure each step works
 - Less is more - avoid over-engineering
 - Performance is a top priority - always optimize for the final best code
 - When working with shaders, follow the SDL3 GPU patterns documented here

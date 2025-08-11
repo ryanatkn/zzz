@@ -10,7 +10,6 @@ zig version  # Requires 0.14.1+
 
 # Build and run (shaders compile automatically)
 zig build run    # Build and launch game
-./hex            # Simple development wrapper
 
 # Manual shader compilation (if needed)
 zig build shaders                    # Compile shaders only
