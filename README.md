@@ -12,8 +12,11 @@ zig version  # Requires 0.14.1+
 zig build run    # Build and launch game
 ./zig-out/bin/hex  # Run directly after build
 
-# Shader compilation (automatic with build)
-./shaders/compile_shaders.sh  # Manual recompile if needed
+# Development build (includes shader compilation)
+./hex            # Build, compile shaders, and run (for development)
+
+# Shader compilation (automatic with development script)
+./src/shaders/compile_shaders.sh  # Manual recompile if needed
 ```
 
 ## Features
@@ -30,7 +33,7 @@ zig build run    # Build and launch game
 - **Procedural Rendering**: No textures - pure algorithmic shape generation
 - **Distance Fields**: Anti-aliased primitives via shader mathematics
 - **Data-Driven**: Zone configuration through ZON files
-- **Cross-Platform**: SPIRV for Vulkan, DXIL for D3D12, MoltenVK for Metal
+- **Cross-Platform**: SPIRV for Vulkan, DXIL for D3D12, and in the future MoltenVK for Metal
 
 ## Game Controls
 
@@ -112,13 +115,17 @@ For complete technical documentation and development guidelines, see **[CLAUDE.m
 
 ```bash
 # Standard build
-zig build
+zig build              # Build the game
+zig build run          # Build and run
 
-# Debug build with symbols
-zig build -Doptimize=Debug
+# Development builds (with shader compilation)
+./hex                   # Build, compile shaders, and run
+./hex --skip-shaders   # Skip shader compilation
+./hex --clean-shaders  # Clean and rebuild all shaders
 
-# Release build (optimized)
-zig build -Doptimize=ReleaseFast
+# Release builds
+zig build -Doptimize=Debug        # Debug build
+zig build -Doptimize=ReleaseFast  # Release build
 ```
 
 ### Shader Development
@@ -127,16 +134,16 @@ Shaders are written in HLSL and compiled to platform-specific formats:
 
 ```bash
 # Incremental build (only changed shaders)
-./shaders/compile_shaders.sh
+./src/shaders/compile_shaders.sh
 
 # Clean rebuild (all shaders)
-./shaders/compile_shaders.sh --clean
+./src/shaders/compile_shaders.sh --clean
 ```
 
 **Platform Support:**
 - **Windows**: DXIL via D3D12
 - **Linux/Steam Deck**: SPIRV via Vulkan
-- **macOS/iOS**: SPIRV via Vulkan + MoltenVK
+- **macOS/iOS**: SPIRV via Vulkan + MoltenVK (not implemented)
 - **Android**: SPIRV via Vulkan
 
 ### Debug Mode
@@ -216,7 +223,7 @@ World {
 ### Dependencies
 - **SDL3**: Window management and GPU API (auto-fetched)
 - **SDL_shadercross**: HLSL compilation (for development)
-- **MoltenVK**: Vulkan→Metal translation (macOS/iOS, optional)
+- **MoltenVK**: Vulkan→Metal translation (macOS/iOS, optional and not implemented)
 
 ## Extending the Game
 
@@ -234,9 +241,9 @@ World {
 4. Configure portal connections
 
 ### Writing Custom Shaders
-1. Create HLSL in `shaders/source/`
+1. Create HLSL in `src/shaders/source/`
 2. Follow uniform buffer conventions
-3. Compile with `compile_shaders.sh`
+3. Compile with `./src/shaders/compile_shaders.sh`
 4. Load in renderer pipeline
 
 ## Performance Tips

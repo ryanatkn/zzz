@@ -107,7 +107,6 @@ $ ./src/shaders/compile_shaders.sh --clean # Clean rebuild all shaders
 
 # Build script options
 $ ./hex --help           # Show help and controls
-$ ./hex --debug          # Build with debug symbols
 $ ./hex --skip-shaders   # Skip shader compilation
 $ ./hex --clean-shaders  # Clean and rebuild all shaders
 ```
