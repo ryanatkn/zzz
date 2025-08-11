@@ -1,134 +1,51 @@
 #!/usr/bin/env bash
 
 # Hex - GPU-Accelerated 2D Action RPG
-# Build wrapper script that auto-compiles shaders and builds before running
+# Simple development wrapper around 'zig build run'
 
 set -e
 
-# Configuration
-readonly SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-readonly SHADER_SCRIPT="src/shaders/compile_shaders.sh"
-readonly BUILD_TARGET="zig-out/bin/hex"
+# Change to script directory
+cd "$( dirname "${BASH_SOURCE[0]}" )"
 
 # Colors for output
-readonly RED='\033[0;31m'
 readonly GREEN='\033[0;32m'
-readonly YELLOW='\033[1;33m'
 readonly NC='\033[0m'
-
-# Change to script directory
-cd "$SCRIPT_DIR"
 
 # Function to print colored output
 print_color() {
     echo -e "${2}${1}${NC}"
 }
 
-# Function to compile shaders
-compile_shaders() {
-    if [[ -f "$SHADER_SCRIPT" ]]; then
-        print_color "🎨 Compiling shaders..." "$YELLOW"
-        if bash "$SHADER_SCRIPT"; then
-            print_color "✅ Shaders compiled successfully" "$GREEN"
-        else
-            print_color "❌ Shader compilation failed" "$RED"
-            exit 1
-        fi
-    else
-        print_color "⚠️  No shader compilation script found, skipping..." "$YELLOW"
-    fi
-}
+# Check for help
+if [[ "${1:-}" == "--help" || "${1:-}" == "-h" ]]; then
+    echo "hex - GPU-Accelerated 2D Action RPG"
+    echo ""
+    echo "Usage: ./hex [game-args...]"
+    echo ""
+    echo "This is a simple wrapper around 'zig build run'."
+    echo "Shaders are compiled automatically as part of the build."
+    echo ""
+    echo "For more build options:"
+    echo "  zig build --help           Show all build options"
+    echo "  zig build                  Build (includes shader compilation)"
+    echo "  zig build run              Build and run"
+    echo "  zig build shaders          Compile shaders only"
+    echo "  zig build clean-shaders    Clean and rebuild shaders"
+    echo ""
+    echo "Cross-compilation examples:"
+    echo "  zig build -Dtarget=x86_64-windows -Doptimize=ReleaseFast"
+    echo "  zig build -Doptimize=ReleaseFast"
+    echo ""
+    echo "Game Controls:"
+    echo "  Mouse/WASD        Movement"
+    echo "  Right Click       Fire projectile"
+    echo "  Space            Pause"
+    echo "  R                Respawn"
+    echo "  ESC              Quit"
+    exit 0
+fi
 
-# Main execution flow
-main() {
-    # Check if zig is installed
-    if ! command -v zig &> /dev/null; then
-        print_color "❌ Error: zig is not installed or not in PATH" "$RED"
-        print_color "Please install Zig 0.14.1 or newer" "$YELLOW"
-        exit 1
-    fi
-
-    # Check first argument for special cases
-    case "${1:-}" in
-        windows)
-            print_color "🪟 Building for Windows x86_64 (ReleaseFast)..." "$YELLOW"
-            compile_shaders
-            if zig build -Dtarget=x86_64-windows -Doptimize=ReleaseFast; then
-                # Rename with today's date
-                local date_str=$(date +%b_%d_%Y | tr '[:upper:]' '[:lower:]')
-                mv "./zig-out/bin/hex.exe" "./zig-out/bin/hex_${date_str}.exe"
-                print_color "✅ Windows build complete: zig-out/bin/hex_${date_str}.exe" "$GREEN"
-            else
-                print_color "❌ Windows build failed!" "$RED"
-                exit 1
-            fi
-            exit 0
-            ;;
-        --help|-h)
-            echo "hex - GPU-Accelerated 2D Action RPG"
-            echo ""
-            echo "Usage: ./hex [options]"
-            echo ""
-            echo "Special commands:"
-            echo "  windows           Build for Windows x86_64 with date suffix"
-            echo ""
-            echo "Options:"
-            echo "  --help, -h        Show this help message"
-            echo "  --clean-shaders   Clean and rebuild all shaders"
-            echo "  --skip-shaders    Skip shader compilation"
-            echo ""
-            echo "Controls:"
-            echo "  Mouse/WASD        Movement"
-            echo "  Right Click       Fire projectile"
-            echo "  Space            Pause"
-            echo "  R                Respawn"
-            echo "  ESC              Quit"
-            exit 0
-            ;;
-    esac
-
-    # Handle remaining flags
-    local skip_shaders=false
-    local clean_shaders=false
-    local game_args=()
-
-    for arg in "$@"; do
-        case $arg in
-            --skip-shaders)
-                skip_shaders=true
-                ;;
-            --clean-shaders)
-                clean_shaders=true
-                ;;
-            *)
-                game_args+=("$arg")
-                ;;
-        esac
-    done
-
-    # Handle shader compilation
-    if [[ "$clean_shaders" == true ]]; then
-        print_color "🧹 Cleaning and rebuilding shaders..." "$YELLOW"
-        if [[ -f "$SHADER_SCRIPT" ]]; then
-            bash "$SHADER_SCRIPT" --clean
-        fi
-    elif [[ "$skip_shaders" == false ]]; then
-        compile_shaders
-    fi
-
-    # Build the game
-    print_color "🔨 Building hex..." "$YELLOW"
-    if zig build -Doptimize=Debug; then
-        print_color "✅ Build successful" "$GREEN"
-    else
-        print_color "❌ Build failed" "$RED"
-        exit 1
-    fi
-
-    # Run the game with any remaining arguments
-    print_color "🎮 Starting hex..." "$GREEN"
-    exec "./$BUILD_TARGET" "${game_args[@]}"
-}
-
-# Run main function with all arguments
-main "$@"
+# Run the game
+print_color "starting hex..." "$GREEN"
+exec zig build run -- "$@"

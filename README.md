@@ -5,18 +5,16 @@ A procedurally-rendered 2D top-down action RPG built with Zig, SDL3 GPU API, and
 ## Quick Start
 
 ```bash
-# Install dependencies
+# Check Zig version
 zig version  # Requires 0.14.1+
 
-# Build and run
+# Build and run (shaders compile automatically)
 zig build run    # Build and launch game
-./zig-out/bin/hex  # Run directly after build
+./hex            # Simple development wrapper
 
-# Development build (includes shader compilation)
-./hex            # Build, compile shaders, and run (for development)
-
-# Shader compilation (automatic with development script)
-./src/shaders/compile_shaders.sh  # Manual recompile if needed
+# Manual shader compilation (if needed)
+zig build shaders                    # Compile shaders only
+zig build clean-shaders             # Clean rebuild shaders
 ```
 
 ## Features
@@ -114,30 +112,29 @@ For complete technical documentation and development guidelines, see **[CLAUDE.m
 ### Building from Source
 
 ```bash
-# Standard build
+# Standard Zig workflow (shaders compile automatically)
 zig build              # Build the game
 zig build run          # Build and run
+./hex                  # Simple wrapper around 'zig build run'
 
-# Development builds (with shader compilation)
-./hex                   # Build, compile shaders, and run
-./hex --skip-shaders   # Skip shader compilation
-./hex --clean-shaders  # Clean and rebuild all shaders
+# Shader-specific commands
+zig build shaders          # Compile shaders only
+zig build clean-shaders    # Clean and rebuild all shaders
 
-# Release builds
-zig build -Doptimize=Debug        # Debug build
-zig build -Doptimize=ReleaseFast  # Release build
+# Cross-compilation and optimization
+zig build -Dtarget=x86_64-windows -Doptimize=ReleaseFast  # Windows release
+zig build -Doptimize=ReleaseFast                          # Native release
+zig build -Duse-llvm                                       # Use LLVM backend
 ```
 
 ### Shader Development
 
-Shaders are written in HLSL and compiled to platform-specific formats:
+Shaders are written in HLSL and compiled automatically during build. Manual compilation:
 
 ```bash
-# Incremental build (only changed shaders)
-./src/shaders/compile_shaders.sh
-
-# Clean rebuild (all shaders)
-./src/shaders/compile_shaders.sh --clean
+# Compile shaders (integrated into build system)
+zig build shaders          # Incremental build (only changed shaders)
+zig build clean-shaders    # Clean rebuild (all shaders)
 ```
 
 **Platform Support:**

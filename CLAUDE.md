@@ -96,19 +96,22 @@ Dependencies: SDL3 (auto-fetched), SDL_shadercross (HLSL→SPIRV/DXIL compilatio
 ## Commands
 
 ```bash
-$ zig build              # Build the game
+# Standard Zig workflow (recommended)
+$ zig build              # Build (includes automatic shader compilation)
 $ zig build run          # Build and run
-$ ./hex                  # Build, compile shaders, and run (recommended)
-$ ./zig-out/bin/hex      # Run after building
+$ ./hex                  # Simple wrapper around 'zig build run'
 
-# Shader compilation (automatic with build script)
-$ ./src/shaders/compile_shaders.sh        # Incremental build (only changed shaders)
-$ ./src/shaders/compile_shaders.sh --clean # Clean rebuild all shaders
+# Shader-specific commands
+$ zig build shaders          # Compile shaders only
+$ zig build clean-shaders    # Clean and rebuild all shaders
 
-# Build script options
-$ ./hex --help           # Show help and controls
-$ ./hex --skip-shaders   # Skip shader compilation
-$ ./hex --clean-shaders  # Clean and rebuild all shaders
+# Cross-compilation
+$ zig build -Dtarget=x86_64-windows -Doptimize=ReleaseFast  # Windows build
+$ zig build -Doptimize=ReleaseFast                          # Release build
+
+# Help and options
+$ zig build --help       # Show all build options
+$ ./hex --help           # Show game controls and usage
 ```
 
 ## Quick Start
@@ -200,7 +203,7 @@ $ ./hex --clean-shaders  # Clean and rebuild all shaders
 - Game is fully functional - focus on performance and gameplay improvements
 - Prioritize procedural generation and performance over asset-based approaches
 - Focus on code-driven visuals and algorithmic generation
-- Test frequently with `zig build run` to ensure each step works
+- Test frequently with `zig build run` or `./hex` to ensure each step works
 - Less is more - avoid over-engineering
 - Performance is a top priority - always optimize for the final best code
 - When working with shaders, follow the SDL3 GPU patterns documented here
