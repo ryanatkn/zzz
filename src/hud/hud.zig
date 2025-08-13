@@ -2,7 +2,7 @@ const std = @import("std");
 const c = @import("../lib/c.zig");
 const types = @import("../lib/types.zig");
 const controls = @import("../hex/controls.zig");
-const simple_history = @import("../lib/simple_history.zig");
+const history = @import("../lib/history.zig");
 const router_mod = @import("router.zig");
 const game_renderer = @import("../hex/game_renderer.zig");
 const browser_renderer = @import("renderer.zig");
@@ -10,7 +10,7 @@ const page = @import("page.zig");
 
 pub const Hud = struct {
     is_open: bool,
-    history: simple_history.SimpleHistory,
+    history: history.SimpleHistory,
     router: router_mod.Router,
     renderer: browser_renderer.BrowserRenderer,
     links: std.ArrayList(page.Link),
@@ -20,13 +20,16 @@ pub const Hud = struct {
     pub fn init(allocator: std.mem.Allocator, base_renderer: *game_renderer.GameRenderer) !Hud {
         var hud_sys = Hud{
             .is_open = false,
-            .history = simple_history.SimpleHistory.init(),
+            .history = history.SimpleHistory.init(),
             .router = router_mod.Router.init(allocator),
             .renderer = browser_renderer.BrowserRenderer.init(base_renderer),
             .links = std.ArrayList(page.Link).init(allocator),
             .hovered_link = null,
             .allocator = allocator,
         };
+        
+        // Initialize font system
+        try hud_sys.renderer.initFonts(allocator);
 
         // Initialize with home page
         try hud_sys.router.navigate("/");
@@ -35,6 +38,7 @@ pub const Hud = struct {
     }
 
     pub fn deinit(self: *Hud) void {
+        self.renderer.deinitFonts(self.allocator);
         self.router.deinit();
         self.links.deinit();
     }
@@ -43,7 +47,7 @@ pub const Hud = struct {
         self.is_open = !self.is_open;
         if (self.is_open) {
             // Reset to home when opening
-            self.history = simple_history.SimpleHistory.init();
+            self.history = history.SimpleHistory.init();
             self.router.navigate("/") catch unreachable;
         }
     }

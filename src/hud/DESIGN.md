@@ -6,7 +6,7 @@ The browser system provides an in-game overlay menu with SvelteKit-style filesys
 
 ## Current Implementation Status
 
-### ✅ Completed
+### ✓ Completed
 - SvelteKit-style routing with `+page.zig` and `+layout.zig` files
 - Basic layout system with RenderSlot composition
 - Navigation history with back/forward support
@@ -21,7 +21,7 @@ The browser system provides an in-game overlay menu with SvelteKit-style filesys
 - Dynamic routes (not implemented, would need build-time generation)
 - Form controls (sliders, checkboxes not yet implemented)
 
-### ❌ Not Implemented
+### 🞪 Not Implemented
 - Transitions between pages
 - State persistence
 - Error boundaries (`+error.zig`)
@@ -219,7 +219,7 @@ drawChar()           // Individual character rendering
 
 ## Future Roadmap
 
-### Phase 1: Polish Current Implementation ✅
+### Phase 1: Polish Current Implementation ✓
 - [x] Complete SvelteKit migration
 - [x] Add "Back to Menu" navigation
 - [x] Document current state

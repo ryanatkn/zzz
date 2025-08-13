@@ -4,16 +4,32 @@ const types = @import("../lib/types.zig");
 const lib_renderer = @import("../lib/renderer.zig");
 const game_renderer = @import("../hex/game_renderer.zig");
 const page = @import("page.zig");
+const fonts = @import("../lib/fonts.zig");
 
 const Color = types.Color;
 
 pub const BrowserRenderer = struct {
     base_renderer: *game_renderer.GameRenderer,
+    font_manager: ?*fonts.FontManager,
     
     pub fn init(base_renderer: *game_renderer.GameRenderer) BrowserRenderer {
         return .{
             .base_renderer = base_renderer,
+            .font_manager = null,
         };
+    }
+    
+    pub fn initFonts(self: *BrowserRenderer, allocator: std.mem.Allocator) !void {
+        self.font_manager = try allocator.create(fonts.FontManager);
+        self.font_manager.?.* = try fonts.FontManager.init(allocator, self.base_renderer.gpu.device);
+    }
+    
+    pub fn deinitFonts(self: *BrowserRenderer, allocator: std.mem.Allocator) void {
+        if (self.font_manager) |fm| {
+            fm.deinit();
+            allocator.destroy(fm);
+            self.font_manager = null;
+        }
     }
 
     pub fn renderOverlay(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass) !void {
@@ -217,6 +233,23 @@ pub const BrowserRenderer = struct {
     }
 
     fn drawSimpleText(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, text: []const u8, x: f32, y: f32, color: Color) void {
+        
+        // Try to use SDL_ttf if available, fallback to geometry text
+        if (self.font_manager) |fm| {
+            // For now, just log that we would render TTF text
+            // Full GPU text rendering requires texture atlas support in shaders
+            _ = fm;
+            const log = std.log.scoped(.browser_text);
+            log.debug("Would render TTF text: '{s}' at ({d}, {d})", .{ text, x, y });
+            
+            // Use geometric fallback for now
+            self.drawGeometricText(cmd_buffer, render_pass, text, x, y, color);
+        } else {
+            self.drawGeometricText(cmd_buffer, render_pass, text, x, y, color);
+        }
+    }
+    
+    fn drawGeometricText(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, text: []const u8, x: f32, y: f32, color: Color) void {
         var current_x = x;
         const char_spacing = 10.0;
         

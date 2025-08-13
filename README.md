@@ -27,6 +27,7 @@ zig build clean-shaders             # Clean rebuild shaders
 - **Camera System**: Fixed and follow modes with smooth transitions
 - **Input Handling**: Unified keyboard/mouse input processing
 - **Renderer Interface**: Clean abstraction for drawing operations
+- **Navigation History**: Reusable browser-style navigation system
 - **Math Utilities**: Optimized vector math and collision helpers
 
 ### Hex Game Showcase (src/hex/)
@@ -36,6 +37,7 @@ zig build clean-shaders             # Clean rebuild shaders
 - **World**: Zone-based travel system with portals between areas
 - **Respawn**: Lifestone checkpoints with persistent attunement
 - **Effects**: GPU-accelerated visual effects with AoE indicators
+- **HUD System**: Transparent overlay menu with world visible underneath
 
 ### Technical Highlights
 - **GPU-First**: SDL3 GPU API with Vulkan/D3D12 backends
@@ -71,7 +73,7 @@ zig build clean-shaders             # Clean rebuild shaders
 - **R**: Respawn when dead (spell slot 7 when alive)
 - **T**: Reset current zone units
 - **Y**: Full game reset (including lifestones)
-- **Backtick (`)**: Open system menu/character sheet
+- **Backtick (`)**: Toggle transparent HUD overlay (world remains visible)
 - **ESC**: Quit game
 - **Mouse Wheel**: Zoom in/out
 

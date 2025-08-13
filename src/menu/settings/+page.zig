@@ -51,10 +51,19 @@ const SettingsPage = struct {
         ));
         
         try links.append(page.createLink(
+            "Font Settings",
+            "/settings/fonts",
+            center_x - link_width / 2.0,
+            start_y + (link_height + link_spacing) * 2,
+            link_width,
+            link_height
+        ));
+        
+        try links.append(page.createLink(
             "Back to Menu",
             "/",
             center_x - link_width / 2.0,
-            start_y + (link_height + link_spacing) * 3,
+            start_y + (link_height + link_spacing) * 4,
             link_width,
             link_height
         ));

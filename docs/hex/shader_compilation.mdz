@@ -79,7 +79,7 @@ We provide a smart build script at `src/shaders/compile_shaders.sh` that handles
 - **🧹 Clean builds**: `--clean` deletes all compiled shaders before rebuilding
 - **⚡ Incremental builds**: Default mode only recompiles when HLSL source is newer
 - **📁 Smart directory handling**: Always creates output directories relative to script location
-- **✅ Error handling**: Clear feedback on compilation success/failure
+- **✓ Error handling**: Clear feedback on compilation success/failure
 - **⏭️ Skip optimization**: Shows which shaders are up-to-date and skipped
 
 #### Sample Output:
@@ -93,7 +93,7 @@ Compiling rectangle...
   → DXIL...
   → MSL...
   ⚠️  Failed to compile rectangle vertex shader to MSL (descriptor set compatibility issue)
-✅ Compiled rectangle (SPIRV ✓, DXIL ✓, MSL ⚠️)
+✓ Compiled rectangle (SPIRV ✓, DXIL ✓, MSL ⚠️)
 
 === Compilation Summary ===
 Successfully compiled: 2/2 shaders
@@ -185,17 +185,17 @@ Your Game → Vulkan API → MoltenVK → Metal → Apple GPU
 ```
 
 ### Platform Support Status:
-- **✅ SPIRV compilation**: Works reliably for Vulkan (Linux, Android, Steam Deck, macOS/iOS via MoltenVK)
-- **✅ DXIL compilation**: Works reliably for D3D12 (Windows)  
-- **❌ Native MSL compilation**: Disabled due to descriptor set incompatibility (use MoltenVK instead)
+- **✓ SPIRV compilation**: Works reliably for Vulkan (Linux, Android, Steam Deck, macOS/iOS via MoltenVK)
+- **✓ DXIL compilation**: Works reliably for D3D12 (Windows)  
+- **🞪 Native MSL compilation**: Disabled due to descriptor set incompatibility (use MoltenVK instead)
 
 ### **Complete Platform Coverage:**
 Our **SPIRV + DXIL strategy with MoltenVK** supports:
-- **✅ Windows** (D3D12) - Primary gaming platform
-- **✅ Linux** (Vulkan) - Steam Deck, desktop Linux  
-- **✅ Android** (Vulkan) - Mobile gaming
-- **✅ macOS** (Vulkan→Metal via MoltenVK) - Mac gaming
-- **✅ iOS** (Vulkan→Metal via MoltenVK) - Mobile gaming
+- **✓ Windows** (D3D12) - Primary gaming platform
+- **✓ Linux** (Vulkan) - Steam Deck, desktop Linux  
+- **✓ Android** (Vulkan) - Mobile gaming
+- **✓ macOS** (Vulkan→Metal via MoltenVK) - Mac gaming
+- **✓ iOS** (Vulkan→Metal via MoltenVK) - Mobile gaming
 
 This covers **100% of gaming platforms** while keeping HLSL source optimal for the primary APIs.
 

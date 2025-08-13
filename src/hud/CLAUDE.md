@@ -1,28 +1,28 @@
-# Browser System - Implementation Guide
+# HUD System - Implementation Guide
 
 ## Current State
 
 **Working:**
-- ✅ Overlay rendering with rectangles
-- ✅ Page routing to static paths
-- ✅ Mouse click navigation between pages
-- ✅ Backtick (`) key toggles menu
-- ✅ ESC key closes menu
-- ✅ Page interface with init/deinit/update/render lifecycle
-- ✅ History navigation with back/forward
-- ✅ Address bar showing current path
-- ✅ Simple text rendering (basic ASCII letters)
-- ✅ Button labels and link text
-- ✅ SvelteKit-style routing (`+page.zig`, `+layout.zig`)
-- ✅ Layout system with composition support
-- ✅ "Back to Menu" buttons on all non-root pages
+- ✓ Transparent overlay rendering with alpha blending
+- ✓ Page routing to static paths
+- ✓ Mouse click navigation between pages
+- ✓ Backtick (`) key toggles transparent HUD overlay
+- ✓ ESC key closes menu
+- ✓ Page interface with init/deinit/update/render lifecycle
+- ✓ History navigation with back/forward
+- ✓ Address bar showing current path
+- ✓ Simple text rendering (basic ASCII letters)
+- ✓ Button labels and link text
+- ✓ SvelteKit-style routing (`+page.zig`, `+layout.zig`)
+- ✓ Layout system with composition support
+- ✓ "Back to Menu" buttons on all non-root pages
 
 **Fixed:**
-- ✅ History navigation (using SimpleHistory with fixed buffers)
-- ✅ Back/forward mouse buttons working
-- ✅ Navigation bar buttons working
-- ✅ Rectangle rendering via gpu.drawRect
-- ✅ SvelteKit migration complete
+- ✓ History navigation (using SimpleHistory with fixed buffers)
+- ✓ Back/forward mouse buttons working
+- ✓ Navigation bar buttons working
+- ✓ Rectangle rendering via gpu.drawRect
+- ✓ SvelteKit migration complete
 
 **Missing:**
 - Dynamic routes (`[param]` folders)
@@ -58,7 +58,7 @@ src/routes/              # SvelteKit-style convention
     └── +page.zig        # Statistics (/stats)
 ```
 
-## SvelteKit Migration ✅ COMPLETE
+## SvelteKit Migration ✓ COMPLETE
 
 The migration to SvelteKit-style routing is now complete:
 

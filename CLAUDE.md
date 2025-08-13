@@ -47,7 +47,8 @@ Dependencies: SDL3 (auto-fetched), SDL_shadercross (HLSL→SPIRV/DXIL compilatio
     │   │   ├── input.zig             # Input handling interface
     │   │   ├── maths.zig             # Math utilities and vector operations
     │   │   ├── renderer.zig          # Renderer interface abstraction
-    │   │   ├── simple_gpu_renderer.zig # Low-level GPU rendering
+    │   │   ├── simple_gpu_renderer.zig # Low-level GPU rendering with transparency
+    │   │   ├── history.zig           # Navigation history utility
     │   │   └── types.zig             # Core data types (Vec2, Color, etc)
     │   ├── hex/                      # Hex game implementation
     │   │   ├── behaviors.zig         # Entity behavior updates
@@ -67,13 +68,12 @@ Dependencies: SDL3 (auto-fetched), SDL_shadercross (HLSL→SPIRV/DXIL compilatio
     │   │   ├── player.zig            # Player controller with modifiers
     │   │   ├── portals.zig           # Portal system for zone travel
     │   │   └── spells.zig            # Spell system (8 slots, cooldowns)
-    │   ├── browser/                  # Browser/menu system
-    │   │   ├── browser.zig           # Main browser coordinator
-    │   │   ├── renderer.zig          # Browser UI renderer
+    │   ├── hud/                      # HUD overlay system (transparent)
+    │   │   ├── hud.zig               # Main HUD coordinator
+    │   │   ├── renderer.zig          # HUD UI renderer with transparency
     │   │   ├── router.zig            # SvelteKit-style routing
-    │   │   ├── page.zig              # Page interface definitions
-    │   │   └── simple_history.zig    # Navigation history
-    │   ├── routes/                   # Browser pages (SvelteKit-style)
+    │   │   └── page.zig              # Page interface definitions
+    │   ├── menu/                     # Menu pages (SvelteKit-style)
     │   │   ├── +layout.zig           # Root layout
     │   │   ├── +page.zig             # Home page
     │   │   ├── character/            # Character sheet page
@@ -96,7 +96,7 @@ Dependencies: SDL3 (auto-fetched), SDL_shadercross (HLSL→SPIRV/DXIL compilatio
     └── zz.zon                        # zz tool configuration
 ```
 
-**Status:** ✅ Complete game engine with clean architecture separation
+**Status:** ✓ Complete game engine with clean architecture separation
 
 ## Commands
 
@@ -124,12 +124,14 @@ $ zig build --help       # Show all build options
 - **Combat:** Left-click shoot (burst/rhythm), Right-click cast spell  
 - **Spells:** 1-4, Q, E, R, F select slots
 - **System:** Space pause, R respawn, Y reset, ESC quit
+- **HUD:** ` (backtick) toggle transparent menu overlay
 
 **Key Features:**
 - **Combat System:** 6-bullet pool with 2/sec recharge, burst & rhythm modes
 - **Spell System:** 8 slots, targeted/self-cast, visual AoE indicators
 - **Effects:** GPU-accelerated particles with gameplay integration
 - **World:** Zone-based travel with persistent lifestone checkpoints
+- **HUD System:** Transparent overlay menu with world visible underneath
 - **Rendering:** Pure procedural generation, no texture assets
 
 ## GPU Performance Strategy
@@ -159,14 +161,14 @@ $ zig build --help       # Show all build options
 ## GPU Development Notes
 
 **Working Features:**
-- ✅ Complete GPU rendering pipeline with camera system
-- ✅ HLSL shaders for procedural shapes and effects
-- ✅ Zone-based world with portal travel system
-- ✅ Advanced combat with burst/rhythm shooting mechanics
-- ✅ 8-slot spell system with cooldowns and AoE effects
-- ✅ Full gameplay loop with lifestone persistence
-- ✅ Character sheet and system menu browser
-- ✅ Data-driven zone configuration via ZON files
+- ✓ Complete GPU rendering pipeline with camera system
+- ✓ HLSL shaders for procedural shapes and effects
+- ✓ Zone-based world with portal travel system
+- ✓ Advanced combat with burst/rhythm shooting mechanics
+- ✓ 8-slot spell system with cooldowns and AoE effects
+- ✓ Full gameplay loop with lifestone persistence
+- ✓ Character sheet and transparent HUD system
+- ✓ Data-driven zone configuration via ZON files
 
 **Key Success Factors:**
 - **Procedural vertex generation:** Use `SV_VertexID` instead of vertex buffers for basic shapes

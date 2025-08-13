@@ -82,30 +82,30 @@ for shader in triangle triangle_uniforms simple_circle debug_circle circle recta
     # Vulkan (SPIRV)
     echo "  → SPIRV..."
     if ! $SHADERCROSS source/${shader}.hlsl -s HLSL -d SPIRV -t vertex -e vs_main -o compiled/vulkan/${shader}_vs.spv 2>/dev/null; then
-        echo "    ❌ Failed to compile ${shader} vertex shader to SPIRV"
+        echo "    🞪 Failed to compile ${shader} vertex shader to SPIRV"
         SHADER_SUCCESS=false
     fi
     if ! $SHADERCROSS source/${shader}.hlsl -s HLSL -d SPIRV -t fragment -e ps_main -o compiled/vulkan/${shader}_ps.spv 2>/dev/null; then
-        echo "    ❌ Failed to compile ${shader} fragment shader to SPIRV"
+        echo "    🞪 Failed to compile ${shader} fragment shader to SPIRV"
         SHADER_SUCCESS=false
     fi
     
     # D3D12 (DXIL)
     echo "  → DXIL..."
     if ! $SHADERCROSS source/${shader}.hlsl -s HLSL -d DXIL -t vertex -e vs_main -o compiled/d3d12/${shader}_vs.dxil 2>/dev/null; then
-        echo "    ❌ Failed to compile ${shader} vertex shader to DXIL"
+        echo "    🞪 Failed to compile ${shader} vertex shader to DXIL"
         SHADER_SUCCESS=false
     fi
     if ! $SHADERCROSS source/${shader}.hlsl -s HLSL -d DXIL -t fragment -e ps_main -o compiled/d3d12/${shader}_ps.dxil 2>/dev/null; then
-        echo "    ❌ Failed to compile ${shader} fragment shader to DXIL"
+        echo "    🞪 Failed to compile ${shader} fragment shader to DXIL"
         SHADER_SUCCESS=false
     fi
     
     if $SHADER_SUCCESS; then
-        echo "✅ Compiled $shader (SPIRV ✓, DXIL ✓)"
+        echo "✓ Compiled $shader (SPIRV ✓, DXIL ✓)"
         SUCCESS_COUNT=$((SUCCESS_COUNT + 1))
     else
-        echo "❌ Failed to compile $shader"
+        echo "🞪 Failed to compile $shader"
         FAILED_SHADERS+=("$shader")
     fi
     
