@@ -72,8 +72,8 @@ pub fn Derived(comptime T: type) type {
                 const old_value = self.cached_value;
                 self.rederive();
                 
-                // Only notify if the value actually changed after rederive
-                if (!utils.isEqual(T, old_value, self.cached_value)) {
+                // Only notify if the value actually changed after rederive (shallow comparison)
+                if (!utils.shallowEqual(T, old_value, self.cached_value)) {
                     // Update signal value to match derived value
                     self.signal.value = self.cached_value;
                     self.signal.version_tracker.increment();
@@ -133,8 +133,8 @@ pub fn Derived(comptime T: type) type {
                 const new_value = self.derive_fn();
                 self.cached_value = new_value;
                 
-                // Only notify if value actually changed
-                if (!utils.isEqual(T, old_value, new_value)) {
+                // Only notify if value actually changed (shallow comparison)
+                if (!utils.shallowEqual(T, old_value, new_value)) {
                     self.signal.set(new_value);
                 }
             } else {
@@ -142,8 +142,8 @@ pub fn Derived(comptime T: type) type {
                 const new_value = self.derive_fn();
                 self.cached_value = new_value;
                 
-                // Only notify if value actually changed
-                if (!utils.isEqual(T, old_value, new_value)) {
+                // Only notify if value actually changed (shallow comparison)
+                if (!utils.shallowEqual(T, old_value, new_value)) {
                     self.signal.set(new_value);
                 }
             }
@@ -177,8 +177,8 @@ pub fn Derived(comptime T: type) type {
                 // Derive with dependency tracking
                 const new_value = self.derive_fn();
                 
-                // Only update if value actually changed
-                if (!utils.isEqual(T, self.cached_value, new_value)) {
+                // Only update if value actually changed (shallow comparison)
+                if (!utils.shallowEqual(T, self.cached_value, new_value)) {
                     self.cached_value = new_value;
                     // Update the signal value directly without triggering notifications
                     // Notifications were already sent by onDependencyChange()
