@@ -5,40 +5,36 @@ const lib_renderer = @import("../lib/renderer.zig");
 const game_renderer = @import("../hex/game_renderer.zig");
 const page = @import("page.zig");
 const fonts = @import("../lib/fonts.zig");
+const text_renderer = @import("../lib/text_renderer.zig");
+const menu_text = @import("../lib/ui/menu_text.zig");
+const drawing = @import("../lib/drawing.zig");
 
 const Color = types.Color;
 
 pub const BrowserRenderer = struct {
     base_renderer: *game_renderer.GameRenderer,
-    font_manager: ?*fonts.FontManager,
     
     pub fn init(base_renderer: *game_renderer.GameRenderer) BrowserRenderer {
         return .{
             .base_renderer = base_renderer,
-            .font_manager = null,
         };
     }
     
     pub fn initFonts(self: *BrowserRenderer, allocator: std.mem.Allocator) !void {
+        _ = self;
+        _ = allocator;
         const log = std.log.scoped(.browser_renderer);
-        log.info("Initializing fonts in BrowserRenderer...", .{});
-        
-        self.font_manager = try allocator.create(fonts.FontManager);
-        log.info("FontManager allocated at: {*}", .{self.font_manager});
-        
-        self.font_manager.?.* = try fonts.FontManager.init(allocator, self.base_renderer.gpu.device);
-        log.info("FontManager initialized successfully", .{});
+        log.info("HUD using main game's FontManager and TextRenderer - no separate initialization needed", .{});
     }
     
     pub fn deinitFonts(self: *BrowserRenderer, allocator: std.mem.Allocator) void {
-        if (self.font_manager) |fm| {
-            fm.deinit();
-            allocator.destroy(fm);
-            self.font_manager = null;
-        }
+        _ = self;
+        _ = allocator;
+        // No separate font manager or text renderer to clean up - using main game's
     }
 
     pub fn renderOverlay(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass) !void {
+        
         // Render semi-transparent background using rectangles
         // Draw a dark overlay by rendering multiple dark rectangles
         const screen_width = 1920.0;
@@ -83,25 +79,17 @@ pub const BrowserRenderer = struct {
                 link_color
             );
             
-            // Render the link text centered in the button - use bright red for debugging
-            const text_color = if (is_hovered)
-                Color{ .r = 255, .g = 0, .b = 0, .a = 255 }  // Bright red for debug
-            else
-                Color{ .r = 255, .g = 255, .b = 0, .a = 255 };  // Bright yellow for debug
-            
-            // Estimate text width (rough approximation)
-            const text_width = @as(f32, @floatFromInt(link.text.len)) * 10.0;
-            const text_x = link.bounds.position.x + (link.bounds.size.x - text_width) / 2.0;
-            const text_y = link.bounds.position.y + (link.bounds.size.y - 10.0) / 2.0;
-            
-            self.drawSimpleText(
-                cmd_buffer,
-                render_pass,
-                link.text,
-                text_x,
-                text_y,
-                text_color
-            );
+            // Render the link text using shared menu text utility with main game renderers
+            if (self.base_renderer.font_manager) |fm| {
+                // Debug logging disabled to reduce spam
+                
+                var menu_text_renderer = menu_text.MenuTextRenderer.init(&self.base_renderer.gpu.text_renderer, fm);
+                const link_rect = drawing.Rectangle{
+                    .position = link.bounds.position,
+                    .size = link.bounds.size,
+                };
+                menu_text_renderer.queueButtonText(link.text, link_rect, is_hovered);
+            }
         }
     }
 
@@ -199,15 +187,14 @@ pub const BrowserRenderer = struct {
             Color{ .r = 40, .g = 45, .b = 55, .a = 255 }
         );
         
-        // Render the path text
-        self.drawSimpleText(
-            cmd_buffer, 
-            render_pass, 
-            current_path, 
-            address_x + 10, 
-            bar_y + button_margin + 15,
-            Color{ .r = 180, .g = 190, .b = 200, .a = 255 }
-        );
+        // Queue the path text for rendering using shared utility with main game renderers
+        if (self.base_renderer.font_manager) |fm| {
+            var menu_text_renderer = menu_text.MenuTextRenderer.init(&self.base_renderer.gpu.text_renderer, fm);
+            menu_text_renderer.queueNavigationText(
+                current_path, 
+                .{ .x = address_x + 10, .y = bar_y + button_margin + 15 }
+            );
+        }
     }
 
     const ArrowDirection = enum { Left, Right };
@@ -238,334 +225,4 @@ pub const BrowserRenderer = struct {
         }
     }
 
-    fn drawSimpleText(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, text: []const u8, x: f32, y: f32, color: Color) void {
-        const log = std.log.scoped(.browser_text);
-        log.info("=== DRAW SIMPLE TEXT ===", .{});
-        log.info("  Text: '{s}'", .{text});
-        log.info("  Position: ({d}, {d})", .{ x, y });
-        log.info("  Font manager: {*}", .{self.font_manager});
-        
-        // Try to use SDL_ttf if available, fallback to geometry text
-        if (self.font_manager) |fm| {
-            log.info("  Font manager available, attempting TTF render...", .{});
-            
-            // Try to render text
-            const text_obj = fm.renderText(text, .sans, 14.0, color) catch |err| {
-                log.err("  Failed to render text: {}", .{err});
-                log.info("  Falling back to geometric text", .{});
-                self.drawGeometricText(cmd_buffer, render_pass, text, x, y, color);
-                return;
-            };
-            defer c.ttf.TTF_DestroyText(text_obj);
-            
-            log.info("  Text object created: {*}", .{text_obj});
-            
-            // Update the text to prepare it for GPU rendering
-            const update_result = c.ttf.TTF_UpdateText(text_obj);
-            log.info("  TTF_UpdateText result: {}", .{update_result});
-            
-            // Get GPU draw data
-            const draw_data = c.ttf.TTF_GetGPUTextDrawData(text_obj);
-            log.info("  GPU draw data: {*}", .{draw_data});
-            
-            if (draw_data != null) {
-                const data = draw_data.?;
-                log.info("  Draw data details:", .{});
-                log.info("    - Texture: {*}", .{data.*.atlas_texture});
-                log.info("    - Vertices: {d}", .{data.*.num_vertices});
-                log.info("    - Indices: {d}", .{data.*.num_indices});
-                
-                // Try to render with new surface-based approach
-                if (self.font_manager) |font_mgr| {
-                    log.info("  Trying surface-based text rendering...", .{});
-                    const text_result = font_mgr.renderTextToTexture(text, .sans, 12.0, color, self.base_renderer.gpu.device) catch {
-                        log.warn("  Surface-based rendering failed, using geometric fallback", .{});
-                        self.drawGeometricText(cmd_buffer, render_pass, text, x, y, color);
-                        return;
-                    };
-                    // Note: Texture will be released by the text renderer after drawing
-                    
-                    // Queue the text texture for rendering
-                    self.base_renderer.gpu.queueTextTexture(
-                        text_result.texture,
-                        .{ .x = x, .y = y },
-                        text_result.width,
-                        text_result.height,
-                        color
-                    );
-                    return; // Success!
-                } else {
-                    log.warn("  No font manager in HUD renderer", .{});
-                }
-                return; // Success! Don't use geometric fallback
-            } else {
-                log.warn("  No GPU draw data returned", .{});
-            }
-            
-            // Use geometric fallback for now
-            log.info("  Using geometric fallback", .{});
-            self.drawGeometricText(cmd_buffer, render_pass, text, x, y, color);
-        } else {
-            log.warn("  No font manager available, using geometric text", .{});
-            self.drawGeometricText(cmd_buffer, render_pass, text, x, y, color);
-        }
-    }
-    
-    fn drawGeometricText(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, text: []const u8, x: f32, y: f32, color: Color) void {
-        var current_x = x;
-        const char_spacing = 10.0;
-        
-        for (text) |char| {
-            self.drawChar(cmd_buffer, render_pass, char, current_x, y, color);
-            current_x += char_spacing;
-            
-            // Stop if we're going too far
-            if (current_x > 1800) break;
-        }
-    }
-
-    fn drawChar(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, char: u8, x: f32, y: f32, color: Color) void {
-        // Simple character rendering using small rectangles
-        // For now, just render some basic characters
-        const pixel_size = 2.0;
-        
-        switch (char) {
-            '/' => {
-                // Draw a forward slash
-                for (0..5) |i| {
-                    const offset = @as(f32, @floatFromInt(i));
-                    self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                        .{ .x = x + 4 - offset, .y = y + offset * 2 }, 
-                        .{ .x = pixel_size, .y = pixel_size }, color);
-                }
-            },
-            '-' => {
-                // Draw a dash
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y + 4 }, .{ .x = 6, .y = pixel_size }, color);
-            },
-            '_' => {
-                // Draw underscore
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y + 8 }, .{ .x = 6, .y = pixel_size }, color);
-            },
-            '.' => {
-                // Draw a dot
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x + 2, .y = y + 8 }, .{ .x = pixel_size, .y = pixel_size }, color);
-            },
-            'a', 'A' => {
-                // Draw an A shape
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y + 2 }, .{ .x = pixel_size, .y = 8 }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x + 4, .y = y + 2 }, .{ .x = pixel_size, .y = 8 }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y }, .{ .x = 6, .y = pixel_size }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y + 5 }, .{ .x = 6, .y = pixel_size }, color);
-            },
-            's', 'S' => {
-                // Draw an S shape
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y }, .{ .x = 6, .y = pixel_size }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y }, .{ .x = pixel_size, .y = 5 }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y + 4 }, .{ .x = 6, .y = pixel_size }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x + 4, .y = y + 4 }, .{ .x = pixel_size, .y = 5 }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y + 8 }, .{ .x = 6, .y = pixel_size }, color);
-            },
-            'e', 'E' => {
-                // Draw an E shape
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y }, .{ .x = 6, .y = pixel_size }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y }, .{ .x = pixel_size, .y = 10 }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y + 4 }, .{ .x = 4, .y = pixel_size }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y + 8 }, .{ .x = 6, .y = pixel_size }, color);
-            },
-            't', 'T' => {
-                // Draw a T shape
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y }, .{ .x = 6, .y = pixel_size }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x + 2, .y = y }, .{ .x = pixel_size, .y = 10 }, color);
-            },
-            'i', 'I' => {
-                // Draw an I shape
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x + 2, .y = y }, .{ .x = pixel_size, .y = 10 }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y }, .{ .x = 5, .y = pixel_size }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y + 8 }, .{ .x = 5, .y = pixel_size }, color);
-            },
-            'n', 'N' => {
-                // Draw an N shape
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y }, .{ .x = pixel_size, .y = 10 }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x + 4, .y = y }, .{ .x = pixel_size, .y = 10 }, color);
-                // Diagonal
-                for (0..5) |i| {
-                    const offset = @as(f32, @floatFromInt(i));
-                    self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                        .{ .x = x + offset, .y = y + offset * 2 }, 
-                        .{ .x = pixel_size, .y = pixel_size }, color);
-                }
-            },
-            'g', 'G' => {
-                // Draw a G shape
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y }, .{ .x = 6, .y = pixel_size }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y }, .{ .x = pixel_size, .y = 10 }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y + 8 }, .{ .x = 6, .y = pixel_size }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x + 4, .y = y + 4 }, .{ .x = pixel_size, .y = 5 }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x + 2, .y = y + 4 }, .{ .x = 3, .y = pixel_size }, color);
-            },
-            'v', 'V' => {
-                // Draw a V shape
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y }, .{ .x = pixel_size, .y = 6 }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x + 4, .y = y }, .{ .x = pixel_size, .y = 6 }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x + 1, .y = y + 6 }, .{ .x = pixel_size, .y = 2 }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x + 3, .y = y + 6 }, .{ .x = pixel_size, .y = 2 }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x + 2, .y = y + 8 }, .{ .x = pixel_size, .y = 2 }, color);
-            },
-            'd', 'D' => {
-                // Draw a D shape
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y }, .{ .x = pixel_size, .y = 10 }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y }, .{ .x = 4, .y = pixel_size }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y + 8 }, .{ .x = 4, .y = pixel_size }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x + 4, .y = y + 2 }, .{ .x = pixel_size, .y = 6 }, color);
-            },
-            'o', 'O' => {
-                // Draw an O shape
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y + 2 }, .{ .x = pixel_size, .y = 6 }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x + 4, .y = y + 2 }, .{ .x = pixel_size, .y = 6 }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y }, .{ .x = 6, .y = pixel_size }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y + 8 }, .{ .x = 6, .y = pixel_size }, color);
-            },
-            'u', 'U' => {
-                // Draw a U shape
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y }, .{ .x = pixel_size, .y = 10 }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x + 4, .y = y }, .{ .x = pixel_size, .y = 10 }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y + 8 }, .{ .x = 6, .y = pixel_size }, color);
-            },
-            'c', 'C' => {
-                // Draw a C shape
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y }, .{ .x = 6, .y = pixel_size }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y }, .{ .x = pixel_size, .y = 10 }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y + 8 }, .{ .x = 6, .y = pixel_size }, color);
-            },
-            'r', 'R' => {
-                // Draw an R shape
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y }, .{ .x = pixel_size, .y = 10 }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y }, .{ .x = 5, .y = pixel_size }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x + 4, .y = y }, .{ .x = pixel_size, .y = 5 }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y + 4 }, .{ .x = 5, .y = pixel_size }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x + 3, .y = y + 5 }, .{ .x = pixel_size, .y = 5 }, color);
-            },
-            'l', 'L' => {
-                // Draw an L shape
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y }, .{ .x = pixel_size, .y = 10 }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y + 8 }, .{ .x = 6, .y = pixel_size }, color);
-            },
-            'h', 'H' => {
-                // Draw an H shape
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y }, .{ .x = pixel_size, .y = 10 }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x + 4, .y = y }, .{ .x = pixel_size, .y = 10 }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y + 4 }, .{ .x = 6, .y = pixel_size }, color);
-            },
-            'p', 'P' => {
-                // Draw a P shape
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y }, .{ .x = pixel_size, .y = 10 }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y }, .{ .x = 5, .y = pixel_size }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x + 4, .y = y }, .{ .x = pixel_size, .y = 5 }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y + 4 }, .{ .x = 5, .y = pixel_size }, color);
-            },
-            'b', 'B' => {
-                // Draw a B shape
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y }, .{ .x = pixel_size, .y = 10 }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y }, .{ .x = 4, .y = pixel_size }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y + 4 }, .{ .x = 4, .y = pixel_size }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y + 8 }, .{ .x = 4, .y = pixel_size }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x + 4, .y = y + 1 }, .{ .x = pixel_size, .y = 3 }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x + 4, .y = y + 5 }, .{ .x = pixel_size, .y = 3 }, color);
-            },
-            'k', 'K' => {
-                // Draw a K shape
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y }, .{ .x = pixel_size, .y = 10 }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x + 2, .y = y + 4 }, .{ .x = pixel_size, .y = pixel_size }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x + 3, .y = y + 2 }, .{ .x = pixel_size, .y = pixel_size }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x + 4, .y = y }, .{ .x = pixel_size, .y = pixel_size }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x + 3, .y = y + 6 }, .{ .x = pixel_size, .y = pixel_size }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x + 4, .y = y + 8 }, .{ .x = pixel_size, .y = pixel_size }, color);
-            },
-            else => {
-                // For unimplemented chars, draw a small box
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y }, .{ .x = 5, .y = 1 }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y + 8 }, .{ .x = 5, .y = 1 }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x, .y = y }, .{ .x = 1, .y = 9 }, color);
-                self.base_renderer.gpu.drawRect(cmd_buffer, render_pass,
-                    .{ .x = x + 4, .y = y }, .{ .x = 1, .y = 9 }, color);
-            },
-        }
-    }
 };

@@ -6,7 +6,7 @@ const simple_gpu_renderer = @import("simple_gpu_renderer.zig");
 
 const Vec2 = types.Vec2;
 const Color = types.Color;
-const Rectangle = types.Rectangle;
+pub const Rectangle = types.Rectangle;
 const SimpleGPURenderer = simple_gpu_renderer.SimpleGPURenderer;
 
 // Higher-level drawing utilities that build on the basic GPU primitives
