@@ -70,5 +70,5 @@ pub fn updatePlayer(player: *Player, input_state: *const InputState, zone: *cons
 }
 
 pub fn getPlayerMovementDirection(player: *const Player) Vec2 {
-    return maths.normalizeVector(player.vel);
+    return maths.vec2_normalize(player.vel);
 }

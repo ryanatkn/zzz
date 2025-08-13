@@ -2,27 +2,23 @@ const std = @import("std");
 
 const entities = @import("entities.zig");
 const types = @import("../lib/types.zig");
+const maths = @import("../lib/maths.zig");
+const collision = @import("../lib/collision.zig");
 
 const Vec2 = types.Vec2;
 
-// Check circle-circle collision
+// Check circle-circle collision (now using shared math functions)
 pub fn checkCircleCollision(pos1: Vec2, radius1: f32, pos2: Vec2, radius2: f32) bool {
-    const dx = pos1.x - pos2.x;
-    const dy = pos1.y - pos2.y;
-    const distance_sq = dx * dx + dy * dy;
+    const distance_sq = maths.distanceSquared(pos1, pos2);
     const radius_sum = radius1 + radius2;
     return distance_sq < radius_sum * radius_sum;
 }
 
-// Check circle-rectangle collision
+// Check circle-rectangle collision (now using shared collision system)
 pub fn checkCircleRectCollision(circle_pos: Vec2, circle_radius: f32, rect_pos: Vec2, rect_size: Vec2) bool {
-    const closest_x = std.math.clamp(circle_pos.x, rect_pos.x, rect_pos.x + rect_size.x);
-    const closest_y = std.math.clamp(circle_pos.y, rect_pos.y, rect_pos.y + rect_size.y);
-
-    const dx = circle_pos.x - closest_x;
-    const dy = circle_pos.y - closest_y;
-
-    return dx * dx + dy * dy < circle_radius * circle_radius;
+    const circle = collision.Shape{ .circle = .{ .center = circle_pos, .radius = circle_radius } };
+    const rect = collision.Shape{ .rectangle = .{ .position = rect_pos, .size = rect_size } };
+    return collision.checkCollision(circle, rect);
 }
 
 // Check player-unit collision

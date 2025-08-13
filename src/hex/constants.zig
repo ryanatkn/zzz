@@ -1,4 +1,4 @@
-const types = @import("../lib/types.zig");
+const colors = @import("../lib/colors.zig");
 
 // Screen/Window dimensions
 pub const SCREEN_WIDTH = 1920.0;
@@ -17,15 +17,15 @@ pub const BULLET_SPEED = 400.0;
 pub const BULLET_RADIUS = 5.0;
 pub const PORTAL_SPAWN_OFFSET = 10.0; // Extra distance when spawning near portals
 
-// Color constants
-pub const COLOR_PLAYER_ALIVE = types.Color{ .r = 0, .g = 70, .b = 200, .a = 255 }; // BLUE
-pub const COLOR_UNIT_DEFAULT = types.Color{ .r = 100, .g = 100, .b = 100, .a = 255 }; // GRAY (default unit color)
-pub const COLOR_UNIT_AGGRO = types.Color{ .r = 200, .g = 30, .b = 30, .a = 255 }; // RED (aggro)
-pub const COLOR_UNIT_NON_AGGRO = types.Color{ .r = 120, .g = 60, .b = 60, .a = 255 }; // DIMMED RED (non-aggro)
-pub const COLOR_OBSTACLE_DEADLY = types.Color{ .r = 200, .g = 100, .b = 0, .a = 255 }; // ORANGE (deadly)
-pub const COLOR_OBSTACLE_BLOCKING = types.Color{ .r = 0, .g = 140, .b = 0, .a = 255 }; // GREEN (blocking)
-pub const COLOR_BULLET = types.Color{ .r = 220, .g = 160, .b = 0, .a = 255 }; // YELLOW
-pub const COLOR_PORTAL = types.Color{ .r = 120, .g = 30, .b = 160, .a = 255 }; // PURPLE
-pub const COLOR_LIFESTONE_ATTUNED = types.Color{ .r = 0, .g = 200, .b = 200, .a = 255 }; // CYAN (attuned)
-pub const COLOR_LIFESTONE_UNATTUNED = types.Color{ .r = 0, .g = 100, .b = 100, .a = 255 }; // CYAN_FADED (unattuned)
-pub const COLOR_DEAD = types.Color{ .r = 100, .g = 100, .b = 100, .a = 255 }; // GRAY
+// Color constants (imported from shared colors module)
+pub const COLOR_PLAYER_ALIVE = colors.PLAYER_ALIVE;
+pub const COLOR_UNIT_DEFAULT = colors.UNIT_DEFAULT;
+pub const COLOR_UNIT_AGGRO = colors.UNIT_AGGRO;
+pub const COLOR_UNIT_NON_AGGRO = colors.UNIT_NON_AGGRO;
+pub const COLOR_OBSTACLE_DEADLY = colors.OBSTACLE_DEADLY;
+pub const COLOR_OBSTACLE_BLOCKING = colors.OBSTACLE_BLOCKING;
+pub const COLOR_BULLET = colors.BULLET;
+pub const COLOR_PORTAL = colors.PORTAL;
+pub const COLOR_LIFESTONE_ATTUNED = colors.LIFESTONE_ATTUNED;
+pub const COLOR_LIFESTONE_UNATTUNED = colors.LIFESTONE_UNATTUNED;
+pub const COLOR_DEAD = colors.DEAD;

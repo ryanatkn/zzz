@@ -46,9 +46,13 @@ Dependencies: SDL3 (vendored), SDL_ttf (vendored), SDL_shadercross (HLSL→SPIRV
     │   │   ├── README.md             # Engine architecture documentation
     │   │   ├── c.zig                 # SDL3 C bindings
     │   │   ├── camera.zig            # Camera system (fixed/follow modes)
+    │   │   ├── colors.zig            # Centralized color system with utilities
+    │   │   ├── collision.zig         # Generic collision system
+    │   │   ├── drawing.zig           # High-level drawing utilities for UI
     │   │   ├── input.zig             # Input handling interface
-    │   │   ├── maths.zig             # Math utilities and vector operations
+    │   │   ├── maths.zig             # Math utilities with vec2_ prefixed functions
     │   │   ├── renderer.zig          # Renderer interface abstraction
+    │   │   ├── resource_manager.zig  # Unified resource initialization patterns
     │   │   ├── simple_gpu_renderer.zig # Low-level GPU rendering with transparency
     │   │   ├── history.zig           # Navigation history utility
     │   │   └── types.zig             # Core data types (Vec2, Color, etc)
@@ -283,6 +287,15 @@ $ zig build --help       # Show all build options
 - When working with shaders, follow the SDL3 GPU patterns documented here
 - The entity system is NOT an ECS - it's simple arrays with direct function calls
 
+**Shared Module Guidelines:**
+- **Always use shared modules** from `src/lib/` for common operations
+- **colors.zig**: Use for all color definitions and utilities (darken, lighten, HSV)
+- **drawing.zig**: Use for UI panels, buttons, overlays, and consistent styling
+- **maths.zig**: Use vec2_* prefixed functions (no legacy compatibility)
+- **collision.zig**: Use Shape enum and generic collision system
+- **resource_manager.zig**: Use for renderer and font manager initialization
+- **Apply DRY principles** - prefer shared utilities over duplicate code
+
 **Reactive System Guidelines:**
 - **System is production ready** ✅ - proven with ReactiveComponent and text caching
 - **Use ReactiveComponent base class** - for UI components with automatic lifecycle
@@ -312,12 +325,14 @@ $ zig build --help       # Show all build options
 
 **Established Pattern for Active Development:**
 1. **Active Work** → Root directory MD files for current tasks (`REACTIVE_UI_STATUS.md`)
-2. **Completed Work** → Move to `docs/archive/` for reference (`REACTIVE_API_GUIDE.md`)  
+2. **Fully Complete Work** → Move to `docs/archive/` only when entirely finished (`REACTIVE_API_GUIDE.md`)  
 3. **New APIs/Features** → Create dedicated guides in root for active development
 4. **Keep Root Clean** → Only current/active documentation in root directory
 
+**Important:** Files are archived only when fully complete, not after each session. Git history provides sufficient granularity for tracking progress.
+
 **This Workflow Ensures:**
 - Active work is highly visible to developers and AI assistants
-- Historical knowledge is preserved in organized archive
-- Root directory remains clean and focused on current priorities
-- Documentation moves through natural lifecycle from active → archived
+- Documentation stays in root until work is entirely finished
+- Git history tracks incremental changes and progress
+- Root directory focuses on current priorities without premature archival

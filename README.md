@@ -25,10 +25,13 @@ zig build clean-shaders             # Clean rebuild shaders
 ### Engine Capabilities (src/lib/)
 - **SDL3 GPU API**: Cross-platform rendering with Vulkan/D3D12
 - **Camera System**: Fixed and follow modes with smooth transitions
+- **Shared Module Architecture**: DRY principles with centralized utilities
 - **Input Handling**: Unified keyboard/mouse input processing
 - **Renderer Interface**: Clean abstraction for drawing operations
 - **Navigation History**: Reusable browser-style navigation system
-- **Math Utilities**: Optimized vector math and collision helpers
+- **Math Utilities**: Comprehensive vec2 operations and collision detection
+- **Color Management**: HSV conversion, darken/lighten utilities
+- **Resource Management**: Unified initialization patterns
 
 ### Hex Game Showcase (src/hex/)
 - **Movement**: WASD direct control + Shift to walk + Ctrl+mouse movement
