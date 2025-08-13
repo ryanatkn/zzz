@@ -475,6 +475,28 @@ pub const SimpleGPURenderer = struct {
         c.sdl.SDL_DrawGPUPrimitives(render_pass, 6, 1, 0, 0); // 6 vertices for quad (2 triangles)
     }
 
+    // Draw a rectangle with alpha blending (for transparent overlays)
+    pub fn drawBlendedRect(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, pos: Vec2, size: Vec2, color: Color) void {
+        // Use circle uniforms but set a very large radius to make it effectively rectangular
+        const uniform_data = CircleUniforms{
+            .screen_size = [2]f32{ self.screen_width, self.screen_height },
+            .circle_center = [2]f32{ pos.x + size.x / 2.0, pos.y + size.y / 2.0 }, // Center of rectangle
+            .circle_radius = @max(size.x, size.y) * 2.0, // Very large radius to cover the rectangle
+            .circle_color_r = @as(f32, @floatFromInt(color.r)) / 255.0,
+            .circle_color_g = @as(f32, @floatFromInt(color.g)) / 255.0,
+            .circle_color_b = @as(f32, @floatFromInt(color.b)) / 255.0,
+            .circle_color_a = @as(f32, @floatFromInt(color.a)) / 255.0,
+            ._padding = 0.0,
+        };
+
+        // Push uniform data BEFORE binding pipeline
+        c.sdl.SDL_PushGPUVertexUniformData(cmd_buffer, 0, &uniform_data, @sizeOf(CircleUniforms));
+        
+        // Use circle pipeline which has alpha blending enabled
+        c.sdl.SDL_BindGPUGraphicsPipeline(render_pass, self.circle_pipeline);
+        c.sdl.SDL_DrawGPUPrimitives(render_pass, 6, 1, 0, 0); // 6 vertices for quad
+    }
+
     // Draw a visual effect with animated rings and pulsing
     pub fn drawEffect(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, pos: Vec2, radius: f32, color: Color, intensity: f32, time: f32) void {
         // Prepare uniform data for effect shader

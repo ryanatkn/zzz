@@ -1,7 +1,7 @@
 const std = @import("std");
-const page = @import("../../../browser/page.zig");
+const page = @import("../../hud/page.zig");
 
-const AudioSettingsPage = struct {
+const StatsPage = struct {
     base: page.Page,
 
     fn init(self: *page.Page, allocator: std.mem.Allocator) !void {
@@ -31,48 +31,39 @@ const AudioSettingsPage = struct {
         const link_width = 300.0;
         const link_spacing = 20.0;
         
-        // Placeholder for audio settings options
-        // In a real implementation, these would be sliders and toggles
-        
-        try links.append(page.createLink(
-            "Back to Settings",
-            "/settings",
-            center_x - link_width / 2.0,
-            start_y + (link_height + link_spacing) * 3,
-            link_width,
-            link_height
-        ));
+        // Placeholder for game statistics display
+        // In a real implementation, this would show actual game stats
         
         try links.append(page.createLink(
             "Back to Menu",
             "/",
             center_x - link_width / 2.0,
-            start_y + (link_height + link_spacing) * 4,
+            start_y + (link_height + link_spacing) * 5,
             link_width,
             link_height
         ));
     }
     
     fn destroy(self: *page.Page, allocator: std.mem.Allocator) void {
-        const audio_settings_page: *AudioSettingsPage = @fieldParentPtr("base", self);
-        allocator.destroy(audio_settings_page);
+        const stats_page: *StatsPage = @fieldParentPtr("base", self);
+        allocator.destroy(stats_page);
     }
 };
 
 pub fn create(allocator: std.mem.Allocator) !*page.Page {
-    const audio_page = try allocator.create(AudioSettingsPage);
-    audio_page.* = .{
+    const stats_page = try allocator.create(StatsPage);
+    stats_page.* = .{
         .base = .{
             .vtable = .{
-                .init = AudioSettingsPage.init,
-                .deinit = AudioSettingsPage.deinit,
-                .update = AudioSettingsPage.update,
-                .render = AudioSettingsPage.render,
-                .destroy = AudioSettingsPage.destroy,
+                .init = StatsPage.init,
+                .deinit = StatsPage.deinit,
+                .update = StatsPage.update,
+                .render = StatsPage.render,
+                .destroy = StatsPage.destroy,
             },
-            .path = "/settings/audio",
-            .title = "Audio Settings",
+            .path = "/stats",
+            .title = "Statistics",
         },
     };
-    return &audio_page.base;
+    return &stats_page.base;
 }

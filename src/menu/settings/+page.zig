@@ -1,7 +1,7 @@
 const std = @import("std");
-const page = @import("../../browser/page.zig");
+const page = @import("../../hud/page.zig");
 
-const StatsPage = struct {
+const SettingsPage = struct {
     base: page.Page,
 
     fn init(self: *page.Page, allocator: std.mem.Allocator) !void {
@@ -31,39 +31,55 @@ const StatsPage = struct {
         const link_width = 300.0;
         const link_spacing = 20.0;
         
-        // Placeholder for game statistics display
-        // In a real implementation, this would show actual game stats
+        // Add navigation links
+        try links.append(page.createLink(
+            "Video Settings",
+            "/settings/video",
+            center_x - link_width / 2.0,
+            start_y,
+            link_width,
+            link_height
+        ));
+        
+        try links.append(page.createLink(
+            "Audio Settings",
+            "/settings/audio",
+            center_x - link_width / 2.0,
+            start_y + link_height + link_spacing,
+            link_width,
+            link_height
+        ));
         
         try links.append(page.createLink(
             "Back to Menu",
             "/",
             center_x - link_width / 2.0,
-            start_y + (link_height + link_spacing) * 5,
+            start_y + (link_height + link_spacing) * 3,
             link_width,
             link_height
         ));
     }
     
     fn destroy(self: *page.Page, allocator: std.mem.Allocator) void {
-        const stats_page: *StatsPage = @fieldParentPtr("base", self);
-        allocator.destroy(stats_page);
+        const settings_page: *SettingsPage = @fieldParentPtr("base", self);
+        allocator.destroy(settings_page);
     }
 };
 
 pub fn create(allocator: std.mem.Allocator) !*page.Page {
-    const stats_page = try allocator.create(StatsPage);
-    stats_page.* = .{
+    const settings_page = try allocator.create(SettingsPage);
+    settings_page.* = .{
         .base = .{
             .vtable = .{
-                .init = StatsPage.init,
-                .deinit = StatsPage.deinit,
-                .update = StatsPage.update,
-                .render = StatsPage.render,
-                .destroy = StatsPage.destroy,
+                .init = SettingsPage.init,
+                .deinit = SettingsPage.deinit,
+                .update = SettingsPage.update,
+                .render = SettingsPage.render,
+                .destroy = SettingsPage.destroy,
             },
-            .path = "/stats",
-            .title = "Statistics",
+            .path = "/settings",
+            .title = "Settings",
         },
     };
-    return &stats_page.base;
+    return &settings_page.base;
 }

@@ -1,7 +1,7 @@
 const std = @import("std");
-const page = @import("../../browser/page.zig");
+const page = @import("../../../hud/page.zig");
 
-const SettingsPage = struct {
+const VideoSettingsPage = struct {
     base: page.Page,
 
     fn init(self: *page.Page, allocator: std.mem.Allocator) !void {
@@ -31,21 +31,14 @@ const SettingsPage = struct {
         const link_width = 300.0;
         const link_spacing = 20.0;
         
-        // Add navigation links
-        try links.append(page.createLink(
-            "Video Settings",
-            "/settings/video",
-            center_x - link_width / 2.0,
-            start_y,
-            link_width,
-            link_height
-        ));
+        // Placeholder for video settings options
+        // In a real implementation, these would be interactive controls
         
         try links.append(page.createLink(
-            "Audio Settings",
-            "/settings/audio",
+            "Back to Settings",
+            "/settings",
             center_x - link_width / 2.0,
-            start_y + link_height + link_spacing,
+            start_y + (link_height + link_spacing) * 3,
             link_width,
             link_height
         ));
@@ -54,32 +47,32 @@ const SettingsPage = struct {
             "Back to Menu",
             "/",
             center_x - link_width / 2.0,
-            start_y + (link_height + link_spacing) * 3,
+            start_y + (link_height + link_spacing) * 4,
             link_width,
             link_height
         ));
     }
     
     fn destroy(self: *page.Page, allocator: std.mem.Allocator) void {
-        const settings_page: *SettingsPage = @fieldParentPtr("base", self);
-        allocator.destroy(settings_page);
+        const video_settings_page: *VideoSettingsPage = @fieldParentPtr("base", self);
+        allocator.destroy(video_settings_page);
     }
 };
 
 pub fn create(allocator: std.mem.Allocator) !*page.Page {
-    const settings_page = try allocator.create(SettingsPage);
-    settings_page.* = .{
+    const video_page = try allocator.create(VideoSettingsPage);
+    video_page.* = .{
         .base = .{
             .vtable = .{
-                .init = SettingsPage.init,
-                .deinit = SettingsPage.deinit,
-                .update = SettingsPage.update,
-                .render = SettingsPage.render,
-                .destroy = SettingsPage.destroy,
+                .init = VideoSettingsPage.init,
+                .deinit = VideoSettingsPage.deinit,
+                .update = VideoSettingsPage.update,
+                .render = VideoSettingsPage.render,
+                .destroy = VideoSettingsPage.destroy,
             },
-            .path = "/settings",
-            .title = "Settings",
+            .path = "/settings/video",
+            .title = "Video Settings",
         },
     };
-    return &settings_page.base;
+    return &video_page.base;
 }

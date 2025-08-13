@@ -1,13 +1,13 @@
 const std = @import("std");
 const page = @import("page.zig");
 
-const root_page = @import("../routes/+page.zig");
-const root_layout = @import("../routes/+layout.zig");
-const settings_page = @import("../routes/settings/+page.zig");
-const settings_video_page = @import("../routes/settings/video/+page.zig");
-const settings_audio_page = @import("../routes/settings/audio/+page.zig");
-const stats_page = @import("../routes/stats/+page.zig");
-const character_page = @import("../routes/character/+page.zig");
+const root_page = @import("../menu/+page.zig");
+const root_layout = @import("../menu/+layout.zig");
+const settings_page = @import("../menu/settings/+page.zig");
+const settings_video_page = @import("../menu/settings/video/+page.zig");
+const settings_audio_page = @import("../menu/settings/audio/+page.zig");
+const stats_page = @import("../menu/stats/+page.zig");
+const character_page = @import("../menu/character/+page.zig");
 
 pub const Router = struct {
     allocator: std.mem.Allocator,

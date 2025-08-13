@@ -1,7 +1,7 @@
 const std = @import("std");
-const page = @import("../../../browser/page.zig");
+const page = @import("../../../hud/page.zig");
 
-const VideoSettingsPage = struct {
+const AudioSettingsPage = struct {
     base: page.Page,
 
     fn init(self: *page.Page, allocator: std.mem.Allocator) !void {
@@ -31,8 +31,8 @@ const VideoSettingsPage = struct {
         const link_width = 300.0;
         const link_spacing = 20.0;
         
-        // Placeholder for video settings options
-        // In a real implementation, these would be interactive controls
+        // Placeholder for audio settings options
+        // In a real implementation, these would be sliders and toggles
         
         try links.append(page.createLink(
             "Back to Settings",
@@ -54,25 +54,25 @@ const VideoSettingsPage = struct {
     }
     
     fn destroy(self: *page.Page, allocator: std.mem.Allocator) void {
-        const video_settings_page: *VideoSettingsPage = @fieldParentPtr("base", self);
-        allocator.destroy(video_settings_page);
+        const audio_settings_page: *AudioSettingsPage = @fieldParentPtr("base", self);
+        allocator.destroy(audio_settings_page);
     }
 };
 
 pub fn create(allocator: std.mem.Allocator) !*page.Page {
-    const video_page = try allocator.create(VideoSettingsPage);
-    video_page.* = .{
+    const audio_page = try allocator.create(AudioSettingsPage);
+    audio_page.* = .{
         .base = .{
             .vtable = .{
-                .init = VideoSettingsPage.init,
-                .deinit = VideoSettingsPage.deinit,
-                .update = VideoSettingsPage.update,
-                .render = VideoSettingsPage.render,
-                .destroy = VideoSettingsPage.destroy,
+                .init = AudioSettingsPage.init,
+                .deinit = AudioSettingsPage.deinit,
+                .update = AudioSettingsPage.update,
+                .render = AudioSettingsPage.render,
+                .destroy = AudioSettingsPage.destroy,
             },
-            .path = "/settings/video",
-            .title = "Video Settings",
+            .path = "/settings/audio",
+            .title = "Audio Settings",
         },
     };
-    return &video_page.base;
+    return &audio_page.base;
 }

@@ -21,10 +21,10 @@ pub const BrowserRenderer = struct {
         // Draw a dark overlay by rendering multiple dark rectangles
         const screen_width = 1920.0;
         const screen_height = 1080.0;
-        const overlay_color = Color{ .r = 10, .g = 10, .b = 15, .a = 200 };
+        const overlay_color = Color{ .r = 10, .g = 10, .b = 15, .a = 120 };
         
-        // Use drawRect if available (seen in drawDigit)
-        self.base_renderer.gpu.drawRect(
+        // Use drawBlendedRect for transparent overlay
+        self.base_renderer.gpu.drawBlendedRect(
             cmd_buffer, 
             render_pass,
             .{ .x = 0, .y = 0 },

@@ -12,7 +12,7 @@ const combat = @import("combat.zig");
 const portals = @import("portals.zig");
 const camera = @import("../lib/camera.zig");
 const effects = @import("effects.zig");
-const browser = @import("../browser/browser.zig");
+const hud = @import("../hud/hud.zig");
 const game_renderer = @import("game_renderer.zig");
 const constants = @import("constants.zig");
 const spells = @import("spells.zig");
@@ -36,8 +36,8 @@ pub const GameState = struct {
     // Bullet pool for burst/rhythm shooting
     bullet_pool: combat.BulletPool,
 
-    // Browser system for system menu
-    browser_system: ?browser.Browser,
+    // HUD system for system menu
+    hud_system: ?hud.Hud,
 
     // Iris wipe effect for resurrection
     iris_wipe_active: bool,
@@ -54,20 +54,20 @@ pub const GameState = struct {
             .effect_system = effects.EffectSystem.init(),
             .spell_system = spells.SpellSystem.init(),
             .bullet_pool = combat.BulletPool.init(),
-            .browser_system = null,
+            .hud_system = null,
             .iris_wipe_active = false,
             .iris_wipe_start_time = 0,
         };
     }
 
-    pub fn initBrowser(self: *Self, allocator: std.mem.Allocator, renderer_ptr: *game_renderer.GameRenderer) !void {
-        self.browser_system = try browser.Browser.init(allocator, renderer_ptr);
+    pub fn initHud(self: *Self, allocator: std.mem.Allocator, renderer_ptr: *game_renderer.GameRenderer) !void {
+        self.hud_system = try hud.Hud.init(allocator, renderer_ptr);
     }
 
-    pub fn deinitBrowser(self: *Self) void {
-        if (self.browser_system) |*b| {
-            b.deinit();
-            self.browser_system = null;
+    pub fn deinitHud(self: *Self) void {
+        if (self.hud_system) |*h| {
+            h.deinit();
+            self.hud_system = null;
         }
     }
 
@@ -137,11 +137,11 @@ pub const GameState = struct {
 };
 
 pub fn updateGame(game_state: *GameState, cam: *const camera.Camera, deltaTime: f32) void {
-    // Update browser system if open
-    if (game_state.browser_system) |*b| {
-        b.update(deltaTime);
-        // Don't update game when browser is open
-        if (b.is_open) return;
+    // Update HUD system if open
+    if (game_state.hud_system) |*h| {
+        h.update(deltaTime);
+        // Don't update game when HUD is open
+        if (h.is_open) return;
     }
     
     if (game_state.game_paused) return;

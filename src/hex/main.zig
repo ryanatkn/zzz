@@ -103,8 +103,8 @@ fn sdlAppInit(appstate: ?*?*anyopaque, argv: [][*:0]u8) !c.sdl.SDL_AppResult {
     // Initialize ambient effects for starting zone
     game_state.effect_system.refreshAmbientEffects(&game_state.world);
 
-    // Initialize browser system
-    try game_state.initBrowser(global_allocator, &game_renderer);
+    // Initialize HUD system
+    try game_state.initHud(global_allocator, &game_renderer);
 
     // Show window after initialization
     _ = c.sdl.SDL_ShowWindow(window);
@@ -147,7 +147,7 @@ fn sdlAppQuit(appstate: ?*anyopaque, result: anyerror!c.sdl.SDL_AppResult) void 
 
     if (fully_initialized) {
         if (!DEBUG_MODE) {
-            game_state.deinitBrowser();
+            game_state.deinitHud();
             game_renderer.deinit();
             loader.deinit(); // Clean up ZON data memory
         }
@@ -196,9 +196,9 @@ fn renderGame() !void {
         game_renderer.drawFPS(cmd_buffer, render_pass, game_hud.fps_counter);
     }
 
-    // Render browser overlay if open
-    if (game_state.browser_system) |*browser| {
-        try browser.render(cmd_buffer, render_pass);
+    // Render HUD overlay if open
+    if (game_state.hud_system) |*hud_sys| {
+        try hud_sys.render(cmd_buffer, render_pass);
     }
 
     // Draw state borders with stacking support and iris wipe effect

@@ -2,13 +2,13 @@ const std = @import("std");
 const c = @import("../lib/c.zig");
 const types = @import("../lib/types.zig");
 const controls = @import("../hex/controls.zig");
-const simple_history = @import("simple_history.zig");
+const simple_history = @import("../lib/simple_history.zig");
 const router_mod = @import("router.zig");
 const game_renderer = @import("../hex/game_renderer.zig");
 const browser_renderer = @import("renderer.zig");
 const page = @import("page.zig");
 
-pub const Browser = struct {
+pub const Hud = struct {
     is_open: bool,
     history: simple_history.SimpleHistory,
     router: router_mod.Router,
@@ -17,8 +17,8 @@ pub const Browser = struct {
     hovered_link: ?usize,
     allocator: std.mem.Allocator,
 
-    pub fn init(allocator: std.mem.Allocator, base_renderer: *game_renderer.GameRenderer) !Browser {
-        var browser = Browser{
+    pub fn init(allocator: std.mem.Allocator, base_renderer: *game_renderer.GameRenderer) !Hud {
+        var hud_sys = Hud{
             .is_open = false,
             .history = simple_history.SimpleHistory.init(),
             .router = router_mod.Router.init(allocator),
@@ -29,17 +29,17 @@ pub const Browser = struct {
         };
 
         // Initialize with home page
-        try browser.router.navigate("/");
+        try hud_sys.router.navigate("/");
         
-        return browser;
+        return hud_sys;
     }
 
-    pub fn deinit(self: *Browser) void {
+    pub fn deinit(self: *Hud) void {
         self.router.deinit();
         self.links.deinit();
     }
 
-    pub fn toggle(self: *Browser) void {
+    pub fn toggle(self: *Hud) void {
         self.is_open = !self.is_open;
         if (self.is_open) {
             // Reset to home when opening
@@ -48,7 +48,7 @@ pub const Browser = struct {
         }
     }
 
-    pub fn handleEvent(self: *Browser, event: c.sdl.SDL_Event) !bool {
+    pub fn handleEvent(self: *Hud, event: c.sdl.SDL_Event) !bool {
         if (!self.is_open) return false;
 
         switch (event.type) {
@@ -140,12 +140,12 @@ pub const Browser = struct {
         return false;
     }
 
-    pub fn navigateTo(self: *Browser, path: []const u8) !void {
+    pub fn navigateTo(self: *Hud, path: []const u8) !void {
         try self.history.navigate(path);
         try self.router.navigate(path);
     }
 
-    pub fn update(self: *Browser, dt: f32) void {
+    pub fn update(self: *Hud, dt: f32) void {
         if (!self.is_open) return;
         
         if (self.router.getCurrentPage()) |current_page| {
@@ -153,7 +153,7 @@ pub const Browser = struct {
         }
     }
 
-    pub fn render(self: *Browser, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass) !void {
+    pub fn render(self: *Hud, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass) !void {
         if (!self.is_open) return;
 
         // Render overlay background

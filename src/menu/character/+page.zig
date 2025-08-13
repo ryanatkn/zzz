@@ -1,5 +1,5 @@
 const std = @import("std");
-const page = @import("../../browser/page.zig");
+const page = @import("../../hud/page.zig");
 const types = @import("../../lib/types.zig");
 
 const CharacterPage = struct {
