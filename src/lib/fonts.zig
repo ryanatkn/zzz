@@ -163,9 +163,25 @@ pub const FontManager = struct {
     
     pub fn createTextEngine(self: *FontManager) !void {
         log.info("Creating GPU text engine...", .{});
+        
+        // Debug GPU device info
+        log.info("  → GPU device address: {*}", .{self.gpu_device});
+        
+        // Check SDL3 and TTF versions
+        const sdl_version = c.sdl.SDL_GetVersion();  
+        const ttf_version = c.ttf.TTF_Version();
+        log.info("  → SDL3 version: {}, SDL_ttf version: {}", .{ sdl_version, ttf_version });
+        
         self.text_engine = c.ttf.TTF_CreateGPUTextEngine(self.gpu_device);
         if (self.text_engine == null) {
-            log.err("Failed to create GPU text engine: {s}", .{c.sdl.SDL_GetError()});
+            const err = c.sdl.SDL_GetError();
+            log.err("Failed to create GPU text engine: {s}", .{err});
+            
+            // Try to get more specific error info
+            if (err != null and std.mem.len(err) > 0) {
+                log.err("  → SDL Error details: '{s}'", .{err});
+            }
+            
             return error.TextEngineCreationFailed;
         }
         log.info("GPU text engine created successfully: {*}", .{self.text_engine});
@@ -285,6 +301,137 @@ pub const FontManager = struct {
         return handle;
     }
     
+    // Surface-based text rendering - creates a GPU texture from text
+    pub fn renderTextToTexture(
+        self: *FontManager,
+        text: []const u8,
+        category: FontCategory,
+        size: f32,
+        color: types.Color,
+        device: *c.sdl.SDL_GPUDevice
+    ) !struct {
+        texture: *c.sdl.SDL_GPUTexture,
+        width: u32,
+        height: u32,
+    } {
+        log.info("=== RENDER TEXT TO TEXTURE ===", .{});
+        log.info("  Text: '{s}'", .{text});
+        log.info("  Category: {}, Size: {d}", .{ category, size });
+        
+        const font_handle = try self.loadFont(category, size);
+        log.info("  Font handle obtained: {*}", .{font_handle.font});
+        
+        // Convert color to SDL format
+        const sdl_color = c.sdl.SDL_Color{
+            .r = color.r,
+            .g = color.g,
+            .b = color.b,
+            .a = color.a,
+        };
+        
+        // Render text to surface using high-quality blended mode
+        log.info("  Rendering text to surface...", .{});
+        const surface = c.ttf.TTF_RenderText_Blended(font_handle.font, text.ptr, @intCast(text.len), sdl_color);
+        if (surface == null) {
+            log.err("  Failed to render text to surface: {s}", .{c.sdl.SDL_GetError()});
+            return error.SurfaceRenderFailed;
+        }
+        defer c.sdl.SDL_DestroySurface(surface);
+        
+        const surf_width: u32 = @intCast(surface.*.w);
+        const surf_height: u32 = @intCast(surface.*.h);
+        log.info("  Surface created: {}x{}", .{ surf_width, surf_height });
+        
+        // Create GPU texture
+        const texture_create_info = c.sdl.SDL_GPUTextureCreateInfo{
+            .type = c.sdl.SDL_GPU_TEXTURETYPE_2D,
+            .format = c.sdl.SDL_GPU_TEXTUREFORMAT_R8G8B8A8_UNORM,
+            .usage = c.sdl.SDL_GPU_TEXTUREUSAGE_SAMPLER,
+            .width = surf_width,
+            .height = surf_height,
+            .layer_count_or_depth = 1,
+            .num_levels = 1,
+            .sample_count = c.sdl.SDL_GPU_SAMPLECOUNT_1,
+            .props = 0,
+        };
+        
+        const texture = c.sdl.SDL_CreateGPUTexture(device, &texture_create_info) orelse {
+            log.err("  Failed to create GPU texture", .{});
+            return error.TextureCreationFailed;
+        };
+        
+        // Upload surface data to GPU texture
+        log.info("  Uploading surface data to GPU texture...", .{});
+        
+        // Create transfer buffer for upload
+        const transfer_buffer_info = c.sdl.SDL_GPUTransferBufferCreateInfo{
+            .usage = c.sdl.SDL_GPU_TRANSFERBUFFERUSAGE_UPLOAD,
+            .size = @as(u32, @intCast(surface.*.pitch)) * surf_height,
+        };
+        
+        const transfer_buffer = c.sdl.SDL_CreateGPUTransferBuffer(device, &transfer_buffer_info) orelse {
+            log.err("  Failed to create transfer buffer for texture upload", .{});
+            return error.TransferBufferCreationFailed;
+        };
+        defer c.sdl.SDL_ReleaseGPUTransferBuffer(device, transfer_buffer);
+        
+        // Map the transfer buffer and copy surface pixels
+        const mapped_ptr = c.sdl.SDL_MapGPUTransferBuffer(device, transfer_buffer, false) orelse {
+            log.err("  Failed to map transfer buffer", .{});
+            return error.TransferBufferMapFailed;
+        };
+        
+        // Copy surface pixels to transfer buffer
+        const surface_pixels = surface.*.pixels;
+        const surface_size = @as(u32, @intCast(surface.*.pitch)) * surf_height;
+        @memcpy(@as([*]u8, @ptrCast(mapped_ptr))[0..surface_size], @as([*]const u8, @ptrCast(surface_pixels))[0..surface_size]);
+        
+        c.sdl.SDL_UnmapGPUTransferBuffer(device, transfer_buffer);
+        
+        // Create command buffer for upload
+        const upload_cmd_buffer = c.sdl.SDL_AcquireGPUCommandBuffer(device) orelse {
+            log.err("  Failed to acquire command buffer for texture upload", .{});
+            return error.CommandBufferFailed;
+        };
+        
+        // Copy from transfer buffer to texture
+        const copy_pass = c.sdl.SDL_BeginGPUCopyPass(upload_cmd_buffer);
+        const texture_transfer_info = c.sdl.SDL_GPUTextureTransferInfo{
+            .transfer_buffer = transfer_buffer,
+            .offset = 0,
+            .pixels_per_row = @as(u32, @intCast(surface.*.pitch)) / 4, // 4 bytes per pixel for RGBA
+            .rows_per_layer = surf_height,
+        };
+        const texture_region = c.sdl.SDL_GPUTextureRegion{
+            .texture = texture,
+            .mip_level = 0,
+            .layer = 0,
+            .x = 0,
+            .y = 0,
+            .z = 0,
+            .w = surf_width,
+            .h = surf_height,
+            .d = 1,
+        };
+        
+        c.sdl.SDL_UploadToGPUTexture(copy_pass, &texture_transfer_info, &texture_region, false);
+        c.sdl.SDL_EndGPUCopyPass(copy_pass);
+        
+        // Submit the upload command
+        _ = c.sdl.SDL_SubmitGPUCommandBuffer(upload_cmd_buffer);
+        
+        log.info("  ✓ Surface data uploaded to GPU texture successfully", .{});
+        
+        log.info("  ✓ Text texture created successfully: {}x{}", .{ surf_width, surf_height });
+        
+        return .{
+            .texture = texture,
+            .width = surf_width,
+            .height = surf_height,
+        };
+    }
+    
+    // Legacy method - kept for compatibility during transition
     pub fn renderText(
         self: *FontManager,
         text: []const u8,
@@ -292,33 +439,19 @@ pub const FontManager = struct {
         size: f32,
         color: types.Color,
     ) !*c.ttf.TTF_Text {
-        log.info("=== RENDER TEXT ===", .{});
-        log.info("  Text: '{s}'", .{text});
-        log.info("  Category: {}, Size: {d}", .{ category, size });
+        log.warn("Using legacy renderText - consider switching to renderTextToTexture", .{});
         
         const font_handle = try self.loadFont(category, size);
-        log.info("  Font handle obtained: {*}", .{font_handle.font});
         
         if (self.text_engine == null) {
-            log.info("  Text engine is null, creating...", .{});
             try self.createTextEngine();
-        } else {
-            log.info("  Using existing text engine: {*}", .{self.text_engine});
         }
         
-        // Create text with the loaded font
-        log.info("  Creating text object...", .{});
         const text_obj = c.ttf.TTF_CreateText(self.text_engine, font_handle.font, text.ptr, @intCast(text.len));
-        log.info("  TTF_CreateText returned: {*}", .{text_obj});
-        
         if (text_obj == null) {
-            log.err("  Failed to create text: {s}", .{c.sdl.SDL_GetError()});
             return error.TextCreationFailed;
         }
         
-        log.info("  ✓ Text object created successfully", .{});
-        
-        // Set text color (convert u8 to float 0-1 range)
         const r = @as(f32, @floatFromInt(color.r)) / 255.0;
         const g = @as(f32, @floatFromInt(color.g)) / 255.0;
         const b = @as(f32, @floatFromInt(color.b)) / 255.0;

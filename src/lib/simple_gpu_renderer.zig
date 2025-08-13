@@ -3,6 +3,7 @@ const std = @import("std");
 const c = @import("c.zig");
 
 const types = @import("types.zig");
+const TextRenderer = @import("text_renderer.zig").TextRenderer;
 
 const Vec2 = types.Vec2;
 const Color = types.Color;
@@ -47,19 +48,6 @@ const EffectUniforms = extern struct {
     // Total: 64 bytes
 };
 
-// Text rendering uniform buffer
-const TextUniforms = extern struct {
-    screen_size: [2]f32, // 8 bytes
-    _padding: [2]f32, // 8 bytes (16-byte alignment)
-    // Total: 16 bytes
-};
-
-// Text vertex structure for dynamic text rendering
-const TextVertex = extern struct {
-    position: [2]f32,
-    texcoord: [2]f32,
-    color: [4]f32,
-};
 
 pub const SimpleGPURenderer = struct {
     allocator: std.mem.Allocator,
@@ -82,10 +70,7 @@ pub const SimpleGPURenderer = struct {
     effect_pipeline: *c.sdl.SDL_GPUGraphicsPipeline,
 
     // Text rendering
-    text_vs: ?*c.sdl.SDL_GPUShader,
-    text_ps: ?*c.sdl.SDL_GPUShader,
-    text_pipeline: ?*c.sdl.SDL_GPUGraphicsPipeline,
-    text_sampler: ?*c.sdl.SDL_GPUSampler,
+    text_renderer: TextRenderer,
 
     // Current frame data
     screen_width: f32,
@@ -96,24 +81,52 @@ pub const SimpleGPURenderer = struct {
     pub fn init(allocator: std.mem.Allocator, window: *c.sdl.SDL_Window) !Self {
         std.debug.print("Creating simple GPU device...\n", .{});
 
-        const device = c.sdl.SDL_CreateGPUDevice(c.sdl.SDL_GPU_SHADERFORMAT_SPIRV | c.sdl.SDL_GPU_SHADERFORMAT_DXIL, false, // debug mode off
-            null // auto-select backend
-        ) orelse {
+        // Try different backends to work around NVIDIA Vulkan driver issues
+        // Priority: 1) OpenGL first 2) Software 3) Auto-select as last resort
+        const backends = [_]?[*:0]const u8{
+            "opengl",               // Force OpenGL backend first
+            "software",             // Software fallback
+            null,                   // Auto-select (usually Vulkan) as last resort
+        };
+        
+        var device: ?*c.sdl.SDL_GPUDevice = null;
+        var backend_used: []const u8 = "unknown";
+        
+        for (backends) |backend_name| {
+            const name_str = if (backend_name) |name| std.mem.span(name) else "auto-select";
+            std.debug.print("Trying GPU backend: {s}\n", .{name_str});
+            
+            device = c.sdl.SDL_CreateGPUDevice(
+                c.sdl.SDL_GPU_SHADERFORMAT_SPIRV | c.sdl.SDL_GPU_SHADERFORMAT_DXIL, 
+                true, // Enable debug mode for better error reporting
+                backend_name
+            );
+            
+            if (device != null) {
+                backend_used = name_str;
+                break;
+            } else {
+                const err = c.sdl.SDL_GetError();
+                std.debug.print("Failed to create GPU device with {s}: {s}\n", .{ name_str, err });
+            }
+        }
+        
+        const final_device = device orelse {
             std.debug.print("Failed to create GPU device\n", .{});
             return error.GPUDeviceCreationFailed;
         };
 
-        if (!c.sdl.SDL_ClaimWindowForGPUDevice(device, window)) {
+        if (!c.sdl.SDL_ClaimWindowForGPUDevice(final_device, window)) {
             std.debug.print("Failed to claim window for GPU device\n", .{});
-            c.sdl.SDL_DestroyGPUDevice(device);
+            c.sdl.SDL_DestroyGPUDevice(final_device);
             return error.WindowClaimFailed;
         }
 
-        std.debug.print("GPU device created successfully\n", .{});
+        std.debug.print("GPU device created successfully using backend: {s}\n", .{backend_used});
 
         var self = Self{
             .allocator = allocator,
-            .device = device,
+            .device = final_device,
             .window = window,
             .circle_vs = undefined,
             .circle_ps = undefined,
@@ -124,16 +137,16 @@ pub const SimpleGPURenderer = struct {
             .effect_vs = undefined,
             .effect_ps = undefined,
             .effect_pipeline = undefined,
-            .text_vs = null,
-            .text_ps = null,
-            .text_pipeline = null,
-            .text_sampler = null,
+            .text_renderer = undefined,
             .screen_width = 1920.0,
             .screen_height = 1080.0,
         };
 
         try self.createShaders();
         try self.createPipelines();
+        
+        // Initialize text renderer
+        self.text_renderer = try TextRenderer.init(self.device, allocator, self.screen_width, self.screen_height);
 
         // Show window now that GPU is set up
         _ = c.sdl.SDL_ShowWindow(window);
@@ -142,6 +155,9 @@ pub const SimpleGPURenderer = struct {
     }
 
     pub fn deinit(self: *Self) void {
+        // Clean up text renderer
+        self.text_renderer.deinit();
+        
         c.sdl.SDL_ReleaseGPUGraphicsPipeline(self.device, self.circle_pipeline);
         c.sdl.SDL_ReleaseGPUGraphicsPipeline(self.device, self.rect_pipeline);
         c.sdl.SDL_ReleaseGPUGraphicsPipeline(self.device, self.effect_pipeline);
@@ -271,6 +287,7 @@ pub const SimpleGPURenderer = struct {
             return error.FragmentShaderFailed;
         };
 
+
         std.debug.print("Simple GPU shaders loaded successfully\n", .{});
     }
 
@@ -300,7 +317,7 @@ pub const SimpleGPURenderer = struct {
 
         const multisample_state = c.sdl.SDL_GPUMultisampleState{
             .sample_count = c.sdl.SDL_GPU_SAMPLECOUNT_1,
-            .sample_mask = 0xFFFFFFFF,
+            .sample_mask = 0, // Must be 0 according to SDL assertion
             .enable_mask = false,
         };
 
@@ -408,8 +425,10 @@ pub const SimpleGPURenderer = struct {
             return error.PipelineCreationFailed;
         };
 
+
         std.debug.print("Simple graphics pipelines created successfully!\n", .{});
     }
+    
 
     // Begin frame and get command buffer ready for rendering
     pub fn beginFrame(self: *Self, window: *c.sdl.SDL_Window) !*c.sdl.SDL_GPUCommandBuffer {
@@ -419,6 +438,9 @@ pub const SimpleGPURenderer = struct {
         _ = c.sdl.SDL_GetWindowSize(window, &window_w, &window_h);
         self.screen_width = @floatFromInt(window_w);
         self.screen_height = @floatFromInt(window_h);
+        
+        // Update text renderer screen size
+        self.text_renderer.updateScreenSize(self.screen_width, self.screen_height);
 
         // Acquire command buffer
         const cmd_buffer = c.sdl.SDL_AcquireGPUCommandBuffer(self.device) orelse {
@@ -427,7 +449,8 @@ pub const SimpleGPURenderer = struct {
 
         return cmd_buffer;
     }
-
+    
+    
     // Start a render pass with the given background color
     pub fn beginRenderPass(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, window: *c.sdl.SDL_Window, bg_color: Color) !*c.sdl.SDL_GPURenderPass {
         _ = self;
@@ -575,30 +598,26 @@ pub const SimpleGPURenderer = struct {
         self.drawRect(cmd_buffer, render_pass, Vec2{ .x = x, .y = y }, Vec2{ .x = 1.0, .y = 1.0 }, color);
     }
 
-    // Draw TTF text using GPU atlas data
-    pub fn drawText(
+    // Queue a texture-based text for drawing
+    pub fn queueTextTexture(
         self: *Self,
-        cmd_buffer: *c.sdl.SDL_GPUCommandBuffer,
-        render_pass: *c.sdl.SDL_GPURenderPass,
-        draw_data: *c.ttf.TTF_GPUAtlasDrawSequence,
+        texture: *c.sdl.SDL_GPUTexture,
         position: Vec2,
+        width: u32,
+        height: u32,
         color: Color
     ) void {
-        _ = self;
-        _ = cmd_buffer;
-        _ = render_pass;
-        _ = draw_data;
-        _ = position;
-        _ = color;
-        
-        // TODO: Implement full text rendering
-        // For now, this is a placeholder that prevents compilation errors
-        // The actual implementation will:
-        // 1. Load text shaders if not already loaded
-        // 2. Create vertex buffer from draw_data
-        // 3. Bind texture atlas
-        // 4. Render triangulated text
-        
-        std.debug.print("Text rendering called but not yet implemented\n", .{});
+        self.text_renderer.queueTextTexture(texture, position, width, height, color);
     }
+
+    // Draw all queued text (call during render pass)
+    pub fn drawQueuedText(
+        self: *Self,
+        cmd_buffer: *c.sdl.SDL_GPUCommandBuffer,
+        render_pass: *c.sdl.SDL_GPURenderPass
+    ) void {
+        // Delegate to text renderer for proper textured rendering
+        self.text_renderer.drawQueuedText(cmd_buffer, render_pass);
+    }
+
 };

@@ -2,23 +2,26 @@
 // Compile with: dxc -T vs_6_0 -E vs_main text.hlsl -Fo text_vs.dxil
 // Compile with: dxc -T ps_6_0 -E ps_main text.hlsl -Fo text_ps.dxil
 
-// Per-frame uniforms
-cbuffer FrameUniforms : register(b0) {
-    float2 screen_size;
-    float4 camera_transform; // [offset_x, offset_y, zoom, rotation]
-    float time;
-    float _padding;
+// Text rendering uniforms  
+cbuffer TextUniforms : register(b0, space1) {
+    float2 screen_size;      // Screen dimensions for NDC conversion
+    float2 text_position;    // Text position in screen coordinates
+    float2 text_size;        // Text size in pixels
+    float text_color_r;      // Color components split to avoid
+    float text_color_g;      // HLSL array packing issues
+    float text_color_b;      
+    float text_color_a;      // Alpha channel
+    float time;              // Animation time
+    float _padding0, _padding1, _padding2; // Pad to 16-byte alignment
 };
 
-// Font texture atlas
-Texture2D<float4> font_atlas : register(t0);
-SamplerState atlas_sampler : register(s0);
+// Font texture atlas with combined sampler
+Texture2D<float4> font_atlas : register(t0, space2);
+SamplerState atlas_sampler : register(s0, space2);
 
-// Vertex shader input
+// Vertex shader input (just vertex ID for procedural generation)
 struct VertexInput {
-    float2 position : POSITION0;
-    float2 texcoord : TEXCOORD0;
-    float4 color : COLOR0;
+    uint vertex_id : SV_VertexID;
 };
 
 // Vertex to pixel shader
@@ -28,27 +31,40 @@ struct VertexOutput {
     float4 color : COLOR0;
 };
 
+// Generate textured quad vertices procedurally
 VertexOutput vs_main(VertexInput input) {
     VertexOutput output;
     
-    // Transform position to screen space
-    float2 world_pos = input.position;
+    // Generate quad corner from vertex ID (6 vertices for 2 triangles)
+    float2 quad_corner;
+    float2 tex_corner;
+    uint tri = input.vertex_id / 3;  // Triangle index (0 or 1)
+    uint vert = input.vertex_id % 3; // Vertex in triangle (0, 1, 2)
     
-    // Transform through camera (text is usually in screen space, not world space)
-    // For HUD text, we might want to skip camera transform
-    // world_pos = (world_pos - camera_transform.xy) * camera_transform.z;
-    // world_pos += screen_size * 0.5;
+    // First triangle: (0,0), (1,0), (0,1)
+    // Second triangle: (0,1), (1,0), (1,1)
+    if (tri == 0) {
+        if (vert == 0) { quad_corner = float2(0.0, 0.0); tex_corner = float2(0.0, 0.0); } // top-left
+        else if (vert == 1) { quad_corner = float2(1.0, 0.0); tex_corner = float2(1.0, 0.0); } // top-right
+        else { quad_corner = float2(0.0, 1.0); tex_corner = float2(0.0, 1.0); } // bottom-left
+    } else {
+        if (vert == 0) { quad_corner = float2(0.0, 1.0); tex_corner = float2(0.0, 1.0); } // bottom-left
+        else if (vert == 1) { quad_corner = float2(1.0, 0.0); tex_corner = float2(1.0, 0.0); } // top-right
+        else { quad_corner = float2(1.0, 1.0); tex_corner = float2(1.0, 1.0); } // bottom-right
+    }
     
-    // Convert to NDC
-    output.position = float4(
-        (world_pos.x / screen_size.x) * 2.0 - 1.0,
-        1.0 - (world_pos.y / screen_size.y) * 2.0,
-        0.0,
-        1.0
+    // Calculate screen position: position + corner * size
+    float2 screen_pos = text_position + quad_corner * text_size;
+    
+    // Convert to NDC coordinates
+    float2 ndc_pos = float2(
+        (screen_pos.x / screen_size.x) * 2.0 - 1.0,  // X: 0->width becomes -1->+1
+        -((screen_pos.y / screen_size.y) * 2.0 - 1.0) // Y: 0->height becomes +1->-1 (flip Y)
     );
     
-    output.texcoord = input.texcoord;
-    output.color = input.color;
+    output.position = float4(ndc_pos, 0.0, 1.0);
+    output.texcoord = tex_corner; // Use texture coordinates 0-1 for full texture
+    output.color = float4(text_color_r, text_color_g, text_color_b, text_color_a);
     
     return output;
 }
@@ -57,13 +73,29 @@ float4 ps_main(VertexOutput input) : SV_Target {
     // Sample the font atlas texture
     float4 atlas_sample = font_atlas.Sample(atlas_sampler, input.texcoord);
     
-    // For TTF fonts, typically use the alpha channel for coverage
-    // The atlas might be grayscale or RGBA depending on font type
-    float coverage = atlas_sample.a;
+    // SDL_ttf renders text in different ways depending on the function used
+    // Try sampling from different channels to find where the glyph data is
+    float coverage = atlas_sample.a; // Try alpha channel first
     
-    // Apply text color with atlas coverage
+    // If alpha is not useful, try grayscale approaches
+    if (coverage < 0.1) {
+        // Try red channel as grayscale
+        coverage = atlas_sample.r;
+        
+        // If it looks like white background with black text, invert it
+        if (coverage > 0.9) {
+            coverage = 1.0 - coverage;
+        }
+    }
+    
+    // Apply text color with coverage
     float4 final_color = input.color;
     final_color.a *= coverage;
+    
+    // Discard very transparent pixels
+    if (final_color.a < 0.01) {
+        discard;
+    }
     
     return final_color;
 }

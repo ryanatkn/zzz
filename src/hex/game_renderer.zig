@@ -9,6 +9,7 @@ const camera = @import("../lib/camera.zig");
 const borders = @import("borders.zig");
 const constants = @import("constants.zig");
 const effects = @import("effects.zig");
+const fonts = @import("../lib/fonts.zig");
 
 const Vec2 = types.Vec2;
 const Color = types.Color;
@@ -17,15 +18,33 @@ const SimpleGPURenderer = simple_gpu_renderer.SimpleGPURenderer;
 pub const GameRenderer = struct {
     gpu: SimpleGPURenderer,
     camera: camera.Camera,
+    font_manager: ?*fonts.FontManager,
+    allocator: std.mem.Allocator,
 
     pub fn init(allocator: std.mem.Allocator, window: *c.sdl.SDL_Window) !GameRenderer {
-        return .{
+        var renderer = GameRenderer{
             .gpu = try SimpleGPURenderer.init(allocator, window),
             .camera = camera.Camera.init(constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT),
+            .font_manager = null,
+            .allocator = allocator,
         };
+        
+        // Initialize font manager for TTF text rendering
+        renderer.font_manager = try allocator.create(fonts.FontManager);
+        renderer.font_manager.?.* = try fonts.FontManager.init(allocator, renderer.gpu.device);
+        
+        const log = std.log.scoped(.game_renderer);
+        log.info("GameRenderer initialized with font_manager: {*}", .{renderer.font_manager});
+        
+        return renderer;
     }
 
     pub fn deinit(self: *GameRenderer) void {
+        if (self.font_manager) |fm| {
+            fm.deinit();
+            self.allocator.destroy(fm);
+            self.font_manager = null;
+        }
         self.gpu.deinit();
     }
 
@@ -36,6 +55,8 @@ pub const GameRenderer = struct {
 
     // Begin render pass
     pub fn beginRenderPass(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, window: *c.sdl.SDL_Window, bg_color: Color) !*c.sdl.SDL_GPURenderPass {
+        // Flush any pending text buffers before starting render pass
+        // Text buffers now processed automatically in prepareTextBuffers
         return try self.gpu.beginRenderPass(cmd_buffer, window, bg_color);
     }
 
@@ -235,6 +256,44 @@ pub const GameRenderer = struct {
 
     // Simple HUD rendering
     pub fn drawFPS(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, fps: u32) void {
+        // Use white color for FPS display
+        const WHITE = Color{ .r = 255, .g = 255, .b = 255, .a = 255 };
+        
+        // Position at top-left corner as requested (make it very visible)
+        const fps_x = 100.0;   // Left margin
+        const fps_y = 100.0;   // Top margin
+
+        // Format FPS as string
+        var fps_buf: [32]u8 = undefined;
+        const fps_text = std.fmt.bufPrintZ(&fps_buf, "FPS: {d}", .{fps}) catch "FPS: ??";
+        
+        // Try surface-based TTF text rendering
+        if (self.font_manager) |fm| {
+            const log = std.log.scoped(.fps_ttf);
+            log.info("=== RENDERING FPS WITH SURFACE-BASED TTF ===", .{});
+            log.info("  Text: '{s}'", .{fps_text});
+            log.info("  Position: ({d}, {d})", .{ fps_x, fps_y });
+            
+            // Render text to texture using new surface-based method
+            const text_result = fm.renderTextToTexture(fps_text, .sans, 48.0, WHITE, self.gpu.device) catch |err| {
+                log.err("Failed to render FPS text to texture: {}", .{err});
+                // Fall back to geometric rendering
+                self.drawFPSGeometric(cmd_buffer, render_pass, fps);
+                return;
+            };
+            // Note: Texture will be released by the text renderer after drawing
+            
+            log.info("  ✓ Text texture created: {}x{}", .{ text_result.width, text_result.height });
+            
+            // Queue the text for rendering using simple texture draw
+            self.gpu.queueTextTexture(text_result.texture, .{ .x = fps_x, .y = fps_y }, text_result.width, text_result.height, WHITE);
+        } else {
+            // No font manager, use geometric fallback
+            self.drawFPSGeometric(cmd_buffer, render_pass, fps);
+        }
+    }
+    
+    fn drawFPSGeometric(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, fps: u32) void {
         const WHITE = Color{ .r = 230, .g = 230, .b = 230, .a = 255 };
         const fps_x = 1840.0;
         const fps_y = 1060.0;

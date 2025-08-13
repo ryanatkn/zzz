@@ -195,13 +195,16 @@ fn renderGame() !void {
     if (game_hud.visible) {
         game_renderer.drawFPS(cmd_buffer, render_pass, game_hud.fps_counter);
     }
+    
+    // Draw all queued text (TTF text that was queued during frame)
+    game_renderer.gpu.drawQueuedText(cmd_buffer, render_pass);
 
     // Render HUD overlay if open
     if (game_state.hud_system) |*hud_sys| {
         try hud_sys.render(cmd_buffer, render_pass);
     }
 
-    // Draw state borders with stacking support and iris wipe effect
+    // Draw state borders with stacking support and iris wipe effect - LAST for proper visual effect
     game_renderer.drawBorders(cmd_buffer, render_pass, &game_state);
 
     game_renderer.endRenderPass(render_pass);

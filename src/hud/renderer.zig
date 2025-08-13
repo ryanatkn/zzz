@@ -83,11 +83,11 @@ pub const BrowserRenderer = struct {
                 link_color
             );
             
-            // Render the link text centered in the button
+            // Render the link text centered in the button - use bright red for debugging
             const text_color = if (is_hovered)
-                Color{ .r = 220, .g = 230, .b = 240, .a = 255 }
+                Color{ .r = 255, .g = 0, .b = 0, .a = 255 }  // Bright red for debug
             else
-                Color{ .r = 180, .g = 190, .b = 200, .a = 255 };
+                Color{ .r = 255, .g = 255, .b = 0, .a = 255 };  // Bright yellow for debug
             
             // Estimate text width (rough approximation)
             const text_width = @as(f32, @floatFromInt(link.text.len)) * 10.0;
@@ -260,6 +260,10 @@ pub const BrowserRenderer = struct {
             
             log.info("  Text object created: {*}", .{text_obj});
             
+            // Update the text to prepare it for GPU rendering
+            const update_result = c.ttf.TTF_UpdateText(text_obj);
+            log.info("  TTF_UpdateText result: {}", .{update_result});
+            
             // Get GPU draw data
             const draw_data = c.ttf.TTF_GetGPUTextDrawData(text_obj);
             log.info("  GPU draw data: {*}", .{draw_data});
@@ -271,15 +275,28 @@ pub const BrowserRenderer = struct {
                 log.info("    - Vertices: {d}", .{data.*.num_vertices});
                 log.info("    - Indices: {d}", .{data.*.num_indices});
                 
-                // Use the new GPU text rendering
-                log.info("  Rendering text with GPU data...", .{});
-                self.base_renderer.gpu.drawText(
-                    cmd_buffer,
-                    render_pass,
-                    data,
-                    .{ .x = x, .y = y },
-                    color
-                );
+                // Try to render with new surface-based approach
+                if (self.font_manager) |font_mgr| {
+                    log.info("  Trying surface-based text rendering...", .{});
+                    const text_result = font_mgr.renderTextToTexture(text, .sans, 12.0, color, self.base_renderer.gpu.device) catch {
+                        log.warn("  Surface-based rendering failed, using geometric fallback", .{});
+                        self.drawGeometricText(cmd_buffer, render_pass, text, x, y, color);
+                        return;
+                    };
+                    // Note: Texture will be released by the text renderer after drawing
+                    
+                    // Queue the text texture for rendering
+                    self.base_renderer.gpu.queueTextTexture(
+                        text_result.texture,
+                        .{ .x = x, .y = y },
+                        text_result.width,
+                        text_result.height,
+                        color
+                    );
+                    return; // Success!
+                } else {
+                    log.warn("  No font manager in HUD renderer", .{});
+                }
                 return; // Success! Don't use geometric fallback
             } else {
                 log.warn("  No GPU draw data returned", .{});

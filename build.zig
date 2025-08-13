@@ -14,71 +14,35 @@ pub fn build(b: *std.Build) void {
         .use_lld = use_llvm,
     });
 
-    // Add vendored SDL3 as a dependency
-    const sdl_dep = b.dependency("vendored_sdl", .{
+    // Add SDL3 from deps as a dependency
+    const sdl_dep = b.dependency("sdl", .{
         .target = target,
         .optimize = optimize,
     });
     const sdl_lib = sdl_dep.artifact("SDL3");
     
-    exe.linkLibrary(sdl_lib);
-    exe.linkLibC();
-
-    // Add SDL_ttf as a submodule
-    const ttf_lib = b.addStaticLibrary(.{
-        .name = "SDL3_ttf",
+    // Add SDL_ttf from deps as a dependency
+    const sdl_ttf_dep = b.dependency("sdl_ttf", .{
         .target = target,
         .optimize = optimize,
     });
+    const ttf_lib = sdl_ttf_dep.artifact("SDL3_ttf");
     
-    // Add SDL_ttf C source files
-    ttf_lib.addCSourceFiles(.{
-        .files = &.{
-            "vendored/SDL_ttf/src/SDL_ttf.c",
-            "vendored/SDL_ttf/src/SDL_gpu_textengine.c",
-            "vendored/SDL_ttf/src/SDL_renderer_textengine.c",
-            "vendored/SDL_ttf/src/SDL_surface_textengine.c",
-            "vendored/SDL_ttf/src/SDL_hashtable.c",
-            "vendored/SDL_ttf/src/SDL_hashtable_ttf.c",
-        },
-        .flags = &.{
-            "-std=c11",
-            "-DSDL_BUILD_MAJOR_VERSION=3",
-            "-DSDL_BUILD_MINOR_VERSION=3",
-            "-DSDL_BUILD_MICRO_VERSION=0",
-            "-DTTF_USE_HARFBUZZ=0",
-        },
-    });
-    
-    // SDL_ttf needs SDL headers and FreeType  
-    ttf_lib.linkLibrary(sdl_lib);
-    ttf_lib.addIncludePath(b.path("vendored/SDL/include"));
-    ttf_lib.addIncludePath(b.path("vendored/SDL_ttf/include"));
-    ttf_lib.addIncludePath(b.path("vendored/SDL_ttf/src"));
-    
-    // Platform-specific FreeType configuration
-    if (target.result.os.tag == .linux) {
-        ttf_lib.addSystemIncludePath(.{ .cwd_relative = "/usr/include/freetype2" });
-        ttf_lib.addSystemIncludePath(.{ .cwd_relative = "/usr/include/libpng16" });
-    } else if (target.result.os.tag == .windows) {
-        // For Windows, we'd need to vendor FreeType or use vcpkg/similar
-        // This is a placeholder - would need actual Windows FreeType paths
-        // ttf_lib.addIncludePath(b.path("vendored/freetype/include"));
-        // ttf_lib.linkLibrary(freetype_lib);
-    }
-    ttf_lib.linkLibC();
-    
+    exe.linkLibrary(sdl_lib);
     exe.linkLibrary(ttf_lib);
-    exe.addIncludePath(b.path("vendored/SDL/include"));
-    exe.addIncludePath(b.path("vendored/SDL_ttf/include"));
+    exe.linkLibC();
     
-    // Link FreeType for font rendering
-    if (target.result.os.tag == .linux) {
-        exe.linkSystemLibrary("freetype2");
-    } else if (target.result.os.tag == .windows) {
-        // For Windows, would need to link against vendored FreeType
-        // exe.linkLibrary(freetype_lib);
-    }
+    // Add include paths for SDL and SDL_ttf
+    exe.addIncludePath(sdl_dep.path("include"));
+    exe.addIncludePath(sdl_ttf_dep.path("include"));
+    
+    // FreeType is now handled entirely by SDL_ttf - remove duplicate linking
+    // if (target.result.os.tag == .linux) {
+    //     exe.linkSystemLibrary("freetype2");
+    // } else if (target.result.os.tag == .windows) {
+    //     // For Windows, would need to link against vendored FreeType
+    //     // exe.linkLibrary(freetype_lib);
+    // }
 
     // System libraries (platform-specific)
     if (target.result.os.tag == .linux) {
