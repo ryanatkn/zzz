@@ -24,6 +24,11 @@ const RootLayout = struct {
         
         // Could add global footer here
     }
+    
+    fn destroy(self: *page.Layout, allocator: std.mem.Allocator) void {
+        const root_layout: *RootLayout = @fieldParentPtr("base", self);
+        allocator.destroy(root_layout);
+    }
 };
 
 pub fn create(allocator: std.mem.Allocator) !*page.Layout {
@@ -34,6 +39,7 @@ pub fn create(allocator: std.mem.Allocator) !*page.Layout {
                 .init = RootLayout.init,
                 .deinit = RootLayout.deinit,
                 .render = RootLayout.render,
+                .destroy = RootLayout.destroy,
             },
             .path = "/",
         },

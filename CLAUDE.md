@@ -40,57 +40,61 @@ Dependencies: SDL3 (auto-fetched), SDL_shadercross (HLSL→SPIRV/DXIL compilatio
     ├── .git [...]
     ├── .zig-cache [...]
     ├── src/                          # Source code directory
-    │   ├── docs/                     # Technical documentation
-    │   │   ├── ecs.md                # Entity system architecture (no ECS abstractions)
-    │   │   ├── gpu.md                # SDL3 GPU API reference and patterns
-    │   │   ├── prompt_generation_guide.md # LLM prompt generation with zz tool
-    │   │   └── shader_compilation.md # HLSL compilation workflow
-    │   ├── shaders/
-    │   │   ├── compiled/             # Platform-specific bytecode (SPIRV/DXIL)
-    │   │   │   ├── d3d12/ [...]      # DXIL bytecode for Windows
-    │   │   │   └── vulkan/ [...]     # SPIRV bytecode for Linux/macOS
-    │   │   ├── source/               # HLSL shader sources
-    │   │   │   ├── circle.hlsl           # Standard circle rendering shader
-    │   │   │   ├── debug_circle.hlsl     # Debug circle with orbital animation
-    │   │   │   ├── effect.hlsl           # Visual effects shader
-    │   │   │   ├── rectangle.hlsl        # Rectangle rendering shader
-    │   │   │   ├── simple_circle.hlsl    # Basic circle distance field shader
-    │   │   │   ├── simple_rectangle.hlsl # Basic rectangle shader
-    │   │   │   ├── triangle.hlsl         # Triangle rendering shader
-    │   │   │   └── triangle_uniforms.hlsl# Triangle with uniform data test
-    │   │   └── compile_shaders.sh    # Automated HLSL→SPIRV/DXIL compilation
-    │   ├── behaviors.zig             # Entity behavior updates (player, units, bullets)
-    │   ├── borders.zig               # Border rendering system
-    │   ├── camera.zig                # Viewport camera system (fixed/follow modes)
-    │   ├── combat.zig                # Combat system (bullets, damage, death)
-    │   ├── constants.zig             # Game constants and configuration
-    │   ├── controls.zig              # Control mapping and handling
-    │   ├── effects.zig               # Visual effects system
-    │   ├── entities.zig              # Zone-based world and entity system
-    │   ├── game.zig                  # Main game state management and update loop
-    │   ├── game_data.zon             # Data-driven zone configuration
-    │   ├── hud.zig                   # HUD system (FPS counter, UI elements)
-    │   ├── input.zig                 # Input handling (keyboard, mouse)
-    │   ├── loader.zig                # ZON data loading and parsing
-    │   ├── main.zig                  # SDL3 application entry point and game loop
-    │   ├── maths.zig                 # Mathematical utilities and vector operations
-    │   ├── physics.zig               # Collision detection and physics
-    │   ├── player.zig                # Player controller and movement logic
-    │   ├── portals.zig               # Portal system for zone travel
-    │   ├── renderer.zig              # GPU renderer with camera integration
-    │   ├── simple_gpu_renderer.zig  # Clean GPU rendering backend
-    │   └── types.zig                 # Shared data types (GPU-compatible structs)
+    │   ├── lib/                      # Engine library (shared components)
+    │   │   ├── README.md             # Engine architecture documentation
+    │   │   ├── c.zig                 # SDL3 C bindings
+    │   │   ├── camera.zig            # Camera system (fixed/follow modes)
+    │   │   ├── input.zig             # Input handling interface
+    │   │   ├── maths.zig             # Math utilities and vector operations
+    │   │   ├── renderer.zig          # Renderer interface abstraction
+    │   │   ├── simple_gpu_renderer.zig # Low-level GPU rendering
+    │   │   └── types.zig             # Core data types (Vec2, Color, etc)
+    │   ├── hex/                      # Hex game implementation
+    │   │   ├── behaviors.zig         # Entity behavior updates
+    │   │   ├── borders.zig           # Border rendering system
+    │   │   ├── combat.zig            # Combat system (bullets, damage)
+    │   │   ├── constants.zig         # Game constants and configuration
+    │   │   ├── controls.zig          # Control mapping and handling
+    │   │   ├── effects.zig           # Visual effects system
+    │   │   ├── entities.zig          # Zone-based world and entity system
+    │   │   ├── game.zig              # Main game state management
+    │   │   ├── game_data.zon         # Data-driven zone configuration
+    │   │   ├── game_renderer.zig     # Game-specific renderer implementation
+    │   │   ├── hud.zig               # HUD system (FPS counter, UI)
+    │   │   ├── loader.zig            # ZON data loading and parsing
+    │   │   ├── main.zig              # Game entry point and loop
+    │   │   ├── physics.zig           # Collision detection and physics
+    │   │   ├── player.zig            # Player controller and movement
+    │   │   └── portals.zig           # Portal system for zone travel
+    │   ├── browser/                  # Browser/menu system
+    │   │   ├── browser.zig           # Main browser coordinator
+    │   │   ├── renderer.zig          # Browser UI renderer
+    │   │   ├── router.zig            # SvelteKit-style routing
+    │   │   ├── page.zig              # Page interface definitions
+    │   │   └── simple_history.zig    # Navigation history
+    │   ├── routes/                   # Browser pages (SvelteKit-style)
+    │   │   ├── +layout.zig           # Root layout
+    │   │   ├── +page.zig             # Home page
+    │   │   ├── settings/             # Settings pages
+    │   │   └── stats/                # Statistics pages
+    │   ├── shaders/                  # HLSL shader sources
+    │   │   ├── compiled/             # Platform-specific bytecode
+    │   │   ├── source/               # HLSL source files
+    │   │   └── compile_shaders.sh    # Compilation script
+    │   └── docs/                     # Technical documentation
+    │       ├── ecs.md                # Entity system architecture
+    │       ├── gpu.md                # SDL3 GPU API patterns
+    │       └── shader_compilation.md # HLSL compilation workflow
     ├── zig-out [...]                 # Build output directory
     ├── .gitignore                    # Git ignore patterns
     ├── CLAUDE.md                     # This file - AI assistant documentation
     ├── README.md                     # User-facing documentation
     ├── build.zig                     # Zig build configuration
     ├── build.zig.zon                 # Package manifest and dependencies
-    ├── hex_project_prompt.md         # Generated LLM prompt
     └── zz.zon                        # zz tool configuration
 ```
 
-**Status:** ✅ Complete game engine with Hex reference implementation featuring zone-based world
+**Status:** ✅ Complete game engine with clean architecture separation
 
 ## Commands
 

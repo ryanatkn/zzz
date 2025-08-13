@@ -50,6 +50,11 @@ const IndexPage = struct {
             link_height
         ));
     }
+    
+    fn destroy(self: *page.Page, allocator: std.mem.Allocator) void {
+        const index_page: *IndexPage = @fieldParentPtr("base", self);
+        allocator.destroy(index_page);
+    }
 };
 
 pub fn create(allocator: std.mem.Allocator) !*page.Page {
@@ -61,6 +66,7 @@ pub fn create(allocator: std.mem.Allocator) !*page.Page {
                 .deinit = IndexPage.deinit,
                 .update = IndexPage.update,
                 .render = IndexPage.render,
+                .destroy = IndexPage.destroy,
             },
             .path = "/",
             .title = "System Menu",

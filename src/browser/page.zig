@@ -20,6 +20,7 @@ pub const Layout = struct {
         init: *const fn (self: *Layout, allocator: std.mem.Allocator) anyerror!void,
         deinit: *const fn (self: *Layout, allocator: std.mem.Allocator) void,
         render: *const fn (self: *const Layout, links: *std.ArrayList(Link), slot: *const RenderSlot) anyerror!void,
+        destroy: *const fn (self: *Layout, allocator: std.mem.Allocator) void,
     };
 
     vtable: VTable,
@@ -36,6 +37,10 @@ pub const Layout = struct {
     pub fn render(self: *const Layout, links: *std.ArrayList(Link), slot: *const RenderSlot) !void {
         try self.vtable.render(self, links, slot);
     }
+    
+    pub fn destroy(self: *Layout, allocator: std.mem.Allocator) void {
+        self.vtable.destroy(self, allocator);
+    }
 };
 
 pub const Page = struct {
@@ -44,6 +49,7 @@ pub const Page = struct {
         deinit: *const fn (self: *Page, allocator: std.mem.Allocator) void,
         update: *const fn (self: *Page, dt: f32) void,
         render: *const fn (self: *const Page, links: *std.ArrayList(Link)) anyerror!void,
+        destroy: *const fn (self: *Page, allocator: std.mem.Allocator) void,
     };
 
     vtable: VTable,
@@ -64,6 +70,10 @@ pub const Page = struct {
 
     pub fn render(self: *const Page, links: *std.ArrayList(Link)) !void {
         try self.vtable.render(self, links);
+    }
+    
+    pub fn destroy(self: *Page, allocator: std.mem.Allocator) void {
+        self.vtable.destroy(self, allocator);
     }
 };
 

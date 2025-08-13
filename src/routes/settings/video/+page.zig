@@ -52,6 +52,11 @@ const VideoSettingsPage = struct {
             link_height
         ));
     }
+    
+    fn destroy(self: *page.Page, allocator: std.mem.Allocator) void {
+        const video_settings_page: *VideoSettingsPage = @fieldParentPtr("base", self);
+        allocator.destroy(video_settings_page);
+    }
 };
 
 pub fn create(allocator: std.mem.Allocator) !*page.Page {
@@ -63,6 +68,7 @@ pub fn create(allocator: std.mem.Allocator) !*page.Page {
                 .deinit = VideoSettingsPage.deinit,
                 .update = VideoSettingsPage.update,
                 .render = VideoSettingsPage.render,
+                .destroy = VideoSettingsPage.destroy,
             },
             .path = "/settings/video",
             .title = "Video Settings",

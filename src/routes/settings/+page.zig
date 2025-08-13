@@ -59,6 +59,11 @@ const SettingsPage = struct {
             link_height
         ));
     }
+    
+    fn destroy(self: *page.Page, allocator: std.mem.Allocator) void {
+        const settings_page: *SettingsPage = @fieldParentPtr("base", self);
+        allocator.destroy(settings_page);
+    }
 };
 
 pub fn create(allocator: std.mem.Allocator) !*page.Page {
@@ -70,6 +75,7 @@ pub fn create(allocator: std.mem.Allocator) !*page.Page {
                 .deinit = SettingsPage.deinit,
                 .update = SettingsPage.update,
                 .render = SettingsPage.render,
+                .destroy = SettingsPage.destroy,
             },
             .path = "/settings",
             .title = "Settings",

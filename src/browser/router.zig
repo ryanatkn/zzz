@@ -29,13 +29,13 @@ pub const Router = struct {
     fn cleanupCurrent(self: *Router) void {
         if (self.current_page) |p| {
             p.deinit(self.allocator);
-            self.allocator.destroy(p);
+            p.destroy(self.allocator);
             self.current_page = null;
         }
         
         for (self.current_layouts.items) |layout| {
             layout.deinit(self.allocator);
-            self.allocator.destroy(layout);
+            layout.destroy(self.allocator);
         }
         self.current_layouts.clearRetainingCapacity();
     }

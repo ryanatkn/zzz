@@ -43,6 +43,11 @@ const StatsPage = struct {
             link_height
         ));
     }
+    
+    fn destroy(self: *page.Page, allocator: std.mem.Allocator) void {
+        const stats_page: *StatsPage = @fieldParentPtr("base", self);
+        allocator.destroy(stats_page);
+    }
 };
 
 pub fn create(allocator: std.mem.Allocator) !*page.Page {
@@ -54,6 +59,7 @@ pub fn create(allocator: std.mem.Allocator) !*page.Page {
                 .deinit = StatsPage.deinit,
                 .update = StatsPage.update,
                 .render = StatsPage.render,
+                .destroy = StatsPage.destroy,
             },
             .path = "/stats",
             .title = "Statistics",

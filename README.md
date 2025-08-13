@@ -1,6 +1,6 @@
 # Dealt - SDL3 Game Engine with Hex Example Game
 
-A GPU-accelerated game engine built with Zig, SDL3 GPU API, and HLSL shaders, featuring the Hex 2D action RPG as a showcase implementation. Pure algorithmic graphics with no texture assets.
+A GPU-accelerated game engine built with Zig, SDL3 GPU API, and HLSL shaders. Featuring the Hex 2D action RPG as a showcase implementation with pure algorithmic graphics and no texture assets.
 
 ## Quick Start
 
@@ -22,19 +22,26 @@ zig build clean-shaders             # Clean rebuild shaders
 
 ## Features
 
-### Hex Game Showcase
+### Engine Capabilities (src/lib/)
+- **SDL3 GPU API**: Cross-platform rendering with Vulkan/D3D12
+- **Camera System**: Fixed and follow modes with smooth transitions
+- **Input Handling**: Unified keyboard/mouse input processing
+- **Renderer Interface**: Clean abstraction for drawing operations
+- **Math Utilities**: Optimized vector math and collision helpers
+
+### Hex Game Showcase (src/hex/)
 - **Movement**: Mouse hold-to-move + WASD direct control
 - **Combat**: Right-click projectile firing with collision detection  
 - **World**: Zone-based travel system with portals between areas
 - **Respawn**: Lifestone checkpoints and R key instant respawn
-- **Camera**: Fixed (overworld) and follow (dungeon) modes
+- **Effects**: GPU-accelerated visual effects system
 
 ### Technical Highlights
 - **GPU-First**: SDL3 GPU API with Vulkan/D3D12 backends
 - **Procedural Rendering**: No textures - pure algorithmic shape generation
 - **Distance Fields**: Anti-aliased primitives via shader mathematics
 - **Data-Driven**: Zone configuration through ZON files
-- **Cross-Platform**: SPIRV for Vulkan, DXIL for D3D12, and in the future MoltenVK for Metal
+- **Clean Architecture**: Engine/game separation for reusability
 
 ## Game Controls
 
@@ -44,6 +51,7 @@ zig build clean-shaders             # Clean rebuild shaders
 - **Right Click**: Fire projectile
 - **Space**: Pause game
 - **R**: Respawn at lifestone
+- **Backtick (`)**: Open browser/menu
 - **ESC**: Quit
 
 ### Visual Elements
@@ -54,105 +62,85 @@ zig build clean-shaders             # Clean rebuild shaders
 - **Purple Circles**: Zone portals
 - **Cyan Circles**: Lifestone checkpoints
 
-## Architecture
-
-### Module Structure
+## Project Structure
 
 ```
-hex/
+dealt/
 ├── src/
-│   ├── docs/                    # Technical documentation [...]
-│   ├── shaders/
-│   │   ├── source/              # HLSL shader sources
-│   │   ├── compiled/            # Platform-specific bytecode [...]
-│   │   │   ├── vulkan/          # SPIRV files [...]
-│   │   │   └── d3d12/           # DXIL files [...]
-│   │   └── compile_shaders.sh  # Build script
-│   ├── game_data.zon           # Zone configuration data
-│   ├── main.zig                # SDL3 entry point
-│   ├── game.zig                # Core game loop
-│   ├── entities.zig            # Entity storage system
-│   ├── behaviors.zig           # Update logic
-│   ├── physics.zig             # Collision detection
-│   ├── renderer.zig            # GPU rendering pipeline
-│   ├── camera.zig              # Viewport management
-│   └── types.zig               # Shared data structures
-├── zz.zon                      # zz tool configuration
-└── hex_project_prompt.md       # Generated LLM prompt
+│   ├── lib/                     # Engine library (shared components)
+│   │   ├── camera.zig           # Camera system
+│   │   ├── input.zig            # Input handling
+│   │   ├── maths.zig            # Math utilities
+│   │   ├── renderer.zig         # Renderer interface
+│   │   ├── simple_gpu_renderer.zig # GPU backend
+│   │   └── types.zig            # Core data types
+│   ├── hex/                     # Hex game implementation
+│   │   ├── main.zig             # Game entry point
+│   │   ├── game.zig             # Game state management
+│   │   ├── game_renderer.zig    # Game-specific rendering
+│   │   ├── entities.zig         # Entity system
+│   │   ├── behaviors.zig        # Entity behaviors
+│   │   ├── physics.zig          # Collision detection
+│   │   └── game_data.zon        # Zone configuration
+│   ├── browser/                 # Browser/menu system
+│   │   └── browser.zig          # Menu implementation
+│   ├── routes/                  # Menu pages
+│   │   └── +page.zig            # Page definitions
+│   ├── shaders/                 # HLSL shaders
+│   │   ├── source/              # Shader sources
+│   │   └── compiled/            # Platform bytecode
+│   └── docs/                    # Technical documentation
+├── build.zig                    # Build configuration
+├── build.zig.zon                # Package manifest
+├── README.md                    # This file
+└── CLAUDE.md                    # AI assistant documentation
 ```
 
 For complete technical documentation and development guidelines, see **[CLAUDE.md](./CLAUDE.md)**.
 
-### Documentation
+## Documentation
 
-- [Entity System Architecture](./src/docs/ecs.md) - Entity storage and update patterns
-- [GPU API Reference](./src/docs/gpu.md) - SDL3 GPU API usage and patterns  
-- [Shader Compilation Guide](./src/docs/shader_compilation.md) - HLSL compilation workflow
-- [Prompt Generation Guide](./src/docs/prompt_generation_guide.md) - LLM prompt creation with zz tool
+### Engine Documentation
+- [Engine Architecture](./src/lib/README.md) - Engine/game separation and usage
+- [Entity System](./src/docs/ecs.md) - Entity storage and update patterns
+- [GPU API Reference](./src/docs/gpu.md) - SDL3 GPU API usage
+- [Shader Compilation](./src/docs/shader_compilation.md) - HLSL workflow
 
-### Design Philosophy
-
-**Procedural-First Approach:**
-- All visuals generated algorithmically
-- Shapes and effects defined in code and shaders
-- Mathematical beauty over static content
-- No sprite or texture dependencies
-
-**Performance-Focused:**
-- Minimal draw calls via batching
-- Procedural vertex generation (no buffers)
-- GPU-aligned data structures
-- Camera-aware culling
-
-**Clean Architecture:**
-- Explicit entity pools (no ECS abstractions)
-- Direct function calls (no dynamic dispatch)
-- Fixed-size arrays (no runtime allocation)
-- Zone-based world organization
-
-## Development
-
-### Building from Source
+## Building from Source
 
 ```bash
-# Standard Zig workflow (shaders compile automatically)
+# Standard workflow
 zig build              # Build the game
 zig build run          # Build and run
-./hex                  # Simple wrapper around 'zig build run'
 
-# Shader-specific commands
+# Shader compilation
 zig build shaders          # Compile shaders only
-zig build clean-shaders    # Clean and rebuild all shaders
+zig build clean-shaders    # Clean rebuild all shaders
 
-# Cross-compilation and optimization
+# Cross-compilation
 zig build -Dtarget=x86_64-windows -Doptimize=ReleaseFast  # Windows release
 zig build -Doptimize=ReleaseFast                          # Native release
-zig build -Duse-llvm                                       # Use LLVM backend
 ```
 
-### Shader Development
+## Creating New Games
 
-Shaders are written in HLSL and compiled automatically during build. Manual compilation:
+The Dealt engine is designed for creating new games. To start a new game:
 
-```bash
-# Compile shaders (integrated into build system)
-zig build shaders          # Incremental build (only changed shaders)
-zig build clean-shaders    # Clean rebuild (all shaders)
-```
+1. **Create game directory**: `src/mygame/`
+2. **Import engine components**: Use `@import("../lib/types.zig")` etc.
+3. **Implement game logic**: Follow Hex patterns as reference
+4. **Update build.zig**: Add your game as a new executable
 
-**Platform Support:**
-- **Windows**: DXIL via D3D12
-- **Linux/Steam Deck**: SPIRV via Vulkan
-- **macOS/iOS**: SPIRV via Vulkan + MoltenVK (not implemented)
-- **Android**: SPIRV via Vulkan
-
-### Debug Mode
-
-Enable GPU debug visualizations:
-
+Example structure:
 ```zig
-// In main.zig
-const DEBUG_MODE = true;  // Shows shader test patterns
+// src/mygame/main.zig
+const lib = struct {
+    const types = @import("../lib/types.zig");
+    const camera = @import("../lib/camera.zig");
+    const renderer = @import("../lib/renderer.zig");
+};
+
+// Your game implementation using engine components
 ```
 
 ## Technical Details
@@ -162,41 +150,8 @@ const DEBUG_MODE = true;  // Shows shader test patterns
 **Shader Requirements:**
 - Vertex shaders: `register(b[n], space1)` for uniforms
 - Fragment shaders: `register(b[n], space0)`
-- Avoid `float4` arrays in cbuffers (use individual floats)
 - Procedural vertex generation via `SV_VertexID`
-
-**Command Buffer Order:**
-1. Push uniform data (camera, transforms)
-2. Begin render pass
-3. Bind pipeline and draw primitives
-4. End pass and submit
-
-**Coordinate Systems:**
-- Screen space: (0,0) top-left
-- NDC space: (-1,-1) bottom-left to (1,1) top-right
-- Aspect ratio correction in shaders
-
-### Entity System
-
-**Storage Pattern:**
-```zig
-World {
-    player: Player
-    bullets: [MAX_BULLETS]Bullet
-    zones: [MAX_ZONES]Zone {
-        units: [MAX_UNITS]Unit
-        obstacles: [MAX_OBSTACLES]Obstacle
-        portals: [MAX_PORTALS]Portal
-        lifestones: [MAX_LIFESTONES]Lifestone
-    }
-}
-```
-
-**Key Features:**
-- Fixed-size pools (no dynamic allocation)
-- Contiguous arrays (cache-friendly)
-- Explicit types (no abstractions)
-- Zone-based organization
+- Distance field techniques for anti-aliasing
 
 ### Performance Optimizations
 
@@ -207,10 +162,10 @@ World {
 - Procedural generation reduces bandwidth
 
 **CPU Strategies:**
-- Short-circuit dead entities
-- Squared distance calculations
-- Zone-based spatial partitioning
 - Fixed-size memory pools
+- Squared distance calculations
+- Cache-friendly data structures
+- Zone-based spatial partitioning
 
 ## Requirements
 
@@ -223,35 +178,14 @@ World {
 ### Dependencies
 - **SDL3**: Window management and GPU API (auto-fetched)
 - **SDL_shadercross**: HLSL compilation (for development)
-- **MoltenVK**: Vulkan→Metal translation (macOS/iOS, optional and not implemented)
 
-## Extending the Game
+## Contributing
 
-### Adding New Entity Types
-1. Define struct in `entities.zig`
-2. Add update function to `behaviors.zig`
-3. Implement collision in `physics.zig`
-4. Add rendering to `renderer.zig`
-5. Update zone loader if data-driven
-
-### Creating New Zones
-1. Edit `game_data.zon` configuration
-2. Define zone properties and entities
-3. Set camera mode and scale
-4. Configure portal connections
-
-### Writing Custom Shaders
-1. Create HLSL in `src/shaders/source/`
-2. Follow uniform buffer conventions
-3. Compile with `./src/shaders/compile_shaders.sh`
-4. Load in renderer pipeline
-
-## Performance Tips
-
-- **Development**: Use debug builds for better errors
-- **Testing**: Enable `DEBUG_MODE` for GPU visualizations
-- **Production**: Use `ReleaseFast` for maximum speed
-- **Profiling**: Tools like RenderDoc for GPU analysis
+Contributions are welcome! The engine prioritizes:
+- Performance over backward compatibility
+- Procedural generation over asset loading
+- Clean architecture and separation of concerns
+- GPU-first rendering approaches
 
 ## License
 

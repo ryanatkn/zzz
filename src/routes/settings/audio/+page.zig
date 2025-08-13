@@ -52,6 +52,11 @@ const AudioSettingsPage = struct {
             link_height
         ));
     }
+    
+    fn destroy(self: *page.Page, allocator: std.mem.Allocator) void {
+        const audio_settings_page: *AudioSettingsPage = @fieldParentPtr("base", self);
+        allocator.destroy(audio_settings_page);
+    }
 };
 
 pub fn create(allocator: std.mem.Allocator) !*page.Page {
@@ -63,6 +68,7 @@ pub fn create(allocator: std.mem.Allocator) !*page.Page {
                 .deinit = AudioSettingsPage.deinit,
                 .update = AudioSettingsPage.update,
                 .render = AudioSettingsPage.render,
+                .destroy = AudioSettingsPage.destroy,
             },
             .path = "/settings/audio",
             .title = "Audio Settings",
