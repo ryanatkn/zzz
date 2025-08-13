@@ -16,13 +16,15 @@ pub fn build(b: *std.Build) void {
 
     // Build SDL3 library inline
     const sdl3 = buildSDL3(b, target, optimize);
-    exe.linkLibrary(sdl3);
     exe.addIncludePath(b.path("deps/SDL/include"));
     
     // Build SDL_ttf library inline  
     const sdl_ttf = buildSDL_ttf(b, target, optimize);
-    exe.linkLibrary(sdl_ttf);
     exe.addIncludePath(b.path("deps/SDL_ttf/include"));
+    
+    // Link libraries in correct order (SDL_ttf depends on SDL3)
+    exe.linkLibrary(sdl_ttf);
+    exe.linkLibrary(sdl3);
     
     exe.linkLibC();
 
@@ -213,6 +215,7 @@ fn buildSDL3(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.buil
         "deps/SDL/src/events/imKStoUCS.c",
         // GPU
         "deps/SDL/src/gpu/SDL_gpu.c",
+        // Skip dynapi to avoid needing all subsystem implementations
         // GPU Vulkan backend  
         "deps/SDL/src/gpu/vulkan/SDL_gpu_vulkan.c",
         // Dummy drivers for disabled features
@@ -234,6 +237,14 @@ fn buildSDL3(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.buil
         "deps/SDL/src/main/SDL_runapp.c",
         // Misc
         "deps/SDL/src/misc/SDL_url.c",
+        // Camera
+        "deps/SDL/src/camera/SDL_camera.c",
+        // Dialog  
+        "deps/SDL/src/dialog/SDL_dialog_utils.c",
+        // Locale
+        "deps/SDL/src/locale/SDL_locale.c",
+        // Tray (system tray)
+        "deps/SDL/src/tray/SDL_tray_utils.c",
         // Power
         "deps/SDL/src/power/SDL_power.c",
         // Process  
@@ -301,6 +312,8 @@ fn buildSDL3(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.buil
             "-DSDL_BUILD_MICRO_VERSION=0",
             "-DSDL_STATIC_LIB=1",
             "-DSDL_PLATFORM_LINUX=1",
+            "-DSDL_DYNAPI_DISABLED=1",
+            "-USDL_DYNAMIC_API",
         }
     else 
         &[_][]const u8{
@@ -308,6 +321,7 @@ fn buildSDL3(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.buil
             "-DSDL_BUILD_MINOR_VERSION=3", 
             "-DSDL_BUILD_MICRO_VERSION=0",
             "-DSDL_STATIC_LIB=1",
+            "-DSDL_DYNAPI_DISABLED=1",
         };
         
     sdl3.addCSourceFiles(.{
@@ -336,6 +350,13 @@ fn buildSDL3(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.buil
             "deps/SDL/src/loadso/dlopen/SDL_sysloadso.c",
             // Locale
             "deps/SDL/src/locale/unix/SDL_syslocale.c",
+            // Camera
+            "deps/SDL/src/camera/v4l2/SDL_camera_v4l2.c",
+            // Dialog
+            "deps/SDL/src/dialog/unix/SDL_portaldialog.c",
+            "deps/SDL/src/dialog/unix/SDL_zenitydialog.c",
+            // Tray
+            "deps/SDL/src/tray/unix/SDL_tray.c",
             // Power
             "deps/SDL/src/power/linux/SDL_syspower.c",
             // Process
@@ -373,6 +394,8 @@ fn buildSDL3(b: *std.Build, target: std.Build.ResolvedTarget, optimize: std.buil
                 "-DSDL_BUILD_MICRO_VERSION=0", 
                 "-DSDL_STATIC_LIB=1",
                 "-DSDL_PLATFORM_LINUX=1",
+                "-DSDL_DYNAPI_DISABLED=1",
+                "-USDL_DYNAMIC_API",
             },
         });
     }

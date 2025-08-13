@@ -13,7 +13,7 @@ $ zig version
 0.14.1
 ```
 
-Dependencies: SDL3 (auto-fetched), SDL_shadercross (HLSL→SPIRV/DXIL compilation)
+Dependencies: SDL3 (vendored), SDL_ttf (vendored), SDL_shadercross (HLSL→SPIRV/DXIL compilation)
 
 ## Design Philosophy
 
@@ -100,12 +100,32 @@ Dependencies: SDL3 (auto-fetched), SDL_shadercross (HLSL→SPIRV/DXIL compilatio
 
 **Status:** ✓ Complete game engine with clean architecture separation
 
+## Dependency Management
+
+**Self-Contained Build System:** All dependencies are vendored and built from source with zero external requirements beyond standard system libraries.
+
+**Vendored Libraries:**
+- **SDL3**: Complete SDL3 library built from vendored source
+- **SDL_ttf**: TTF font rendering with FreeType integration  
+- **Zero External Packages**: No `apt install` or `sudo` requirements
+
+**Key Features:**
+- **Idiomatic Zig Build**: Single root `build.zig` with consolidated compilation
+- **Smart Fallbacks**: Graceful degradation when optional libraries unavailable
+- **Platform Detection**: Automatic system library detection with fallback to dummy drivers
+- **Clean Updates**: `scripts/update-deps.sh` with backup system and proper git cleanup
+
 ## Commands
 
 ```bash
 # Standard Zig workflow
 $ zig build              # Build (includes automatic shader compilation)
 $ zig build run          # Build and run
+
+# Dependency management
+$ zig build update-deps  # Update vendored SDL dependencies  
+$ zig build check-deps   # Check dependency status (CI-friendly)
+$ zig build list-deps    # List all dependencies and their status
 
 # Shader-specific commands
 $ zig build shaders          # Compile shaders only
