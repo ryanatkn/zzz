@@ -1,27 +1,28 @@
 const std = @import("std");
-const c = @import("../c.zig");
-const types = @import("../types.zig");
-const controls = @import("../controls.zig");
+const c = @import("../lib/c.zig");
+const types = @import("../lib/types.zig");
+const controls = @import("../hex/controls.zig");
 const simple_history = @import("simple_history.zig");
 const router_mod = @import("router.zig");
-const renderer_mod = @import("renderer.zig");
+const game_renderer = @import("../hex/game_renderer.zig");
+const browser_renderer = @import("renderer.zig");
 const page = @import("page.zig");
 
 pub const Browser = struct {
     is_open: bool,
     history: simple_history.SimpleHistory,
     router: router_mod.Router,
-    renderer: renderer_mod.BrowserRenderer,
+    renderer: browser_renderer.BrowserRenderer,
     links: std.ArrayList(page.Link),
     hovered_link: ?usize,
     allocator: std.mem.Allocator,
 
-    pub fn init(allocator: std.mem.Allocator, base_renderer: *@import("../renderer.zig").Renderer) !Browser {
+    pub fn init(allocator: std.mem.Allocator, base_renderer: *game_renderer.GameRenderer) !Browser {
         var browser = Browser{
             .is_open = false,
             .history = simple_history.SimpleHistory.init(),
             .router = router_mod.Router.init(allocator),
-            .renderer = renderer_mod.BrowserRenderer.init(base_renderer),
+            .renderer = browser_renderer.BrowserRenderer.init(base_renderer),
             .links = std.ArrayList(page.Link).init(allocator),
             .hovered_link = null,
             .allocator = allocator,

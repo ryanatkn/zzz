@@ -134,8 +134,8 @@ pub const SimpleGPURenderer = struct {
         std.debug.print("Loading simple GPU shaders...\n", .{});
 
         // Load simple circle shaders
-        const circle_vs_spv = @embedFile("shaders/compiled/vulkan/simple_circle_vs.spv");
-        const circle_ps_spv = @embedFile("shaders/compiled/vulkan/simple_circle_ps.spv");
+        const circle_vs_spv = @embedFile("../shaders/compiled/vulkan/simple_circle_vs.spv");
+        const circle_ps_spv = @embedFile("../shaders/compiled/vulkan/simple_circle_ps.spv");
 
         const circle_vs_info = c.sdl.SDL_GPUShaderCreateInfo{
             .code_size = circle_vs_spv.len,
@@ -172,8 +172,8 @@ pub const SimpleGPURenderer = struct {
         };
 
         // Load rectangle shaders
-        const rect_vs_spv = @embedFile("shaders/compiled/vulkan/simple_rectangle_vs.spv");
-        const rect_ps_spv = @embedFile("shaders/compiled/vulkan/simple_rectangle_ps.spv");
+        const rect_vs_spv = @embedFile("../shaders/compiled/vulkan/simple_rectangle_vs.spv");
+        const rect_ps_spv = @embedFile("../shaders/compiled/vulkan/simple_rectangle_ps.spv");
 
         const rect_vs_info = c.sdl.SDL_GPUShaderCreateInfo{
             .code_size = rect_vs_spv.len,
@@ -210,8 +210,8 @@ pub const SimpleGPURenderer = struct {
         };
 
         // Load effect shaders
-        const effect_vs_spv = @embedFile("shaders/compiled/vulkan/effect_vs.spv");
-        const effect_ps_spv = @embedFile("shaders/compiled/vulkan/effect_ps.spv");
+        const effect_vs_spv = @embedFile("../shaders/compiled/vulkan/effect_vs.spv");
+        const effect_ps_spv = @embedFile("../shaders/compiled/vulkan/effect_ps.spv");
 
         const effect_vs_info = c.sdl.SDL_GPUShaderCreateInfo{
             .code_size = effect_vs_spv.len,

@@ -1,12 +1,12 @@
 const std = @import("std");
 
-const types = @import("types.zig");
+const types = @import("../lib/types.zig");
 const entities = @import("entities.zig");
 const behaviors = @import("behaviors.zig");
 const physics = @import("physics.zig");
-const input = @import("input.zig");
-const maths = @import("maths.zig");
-const camera = @import("camera.zig");
+const input = @import("../lib/input.zig");
+const maths = @import("../lib/maths.zig");
+const camera = @import("../lib/camera.zig");
 const constants = @import("constants.zig");
 
 const Vec2 = types.Vec2;

@@ -1,4 +1,4 @@
-const types = @import("types.zig");
+const types = @import("../lib/types.zig");
 
 // Screen/Window dimensions
 pub const SCREEN_WIDTH = 1920.0;

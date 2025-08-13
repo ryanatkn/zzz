@@ -1,6 +1,6 @@
 const std = @import("std");
 
-const types = @import("types.zig");
+const types = @import("../lib/types.zig");
 const constants = @import("constants.zig");
 
 const Vec2 = types.Vec2;

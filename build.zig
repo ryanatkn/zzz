@@ -6,7 +6,7 @@ pub fn build(b: *std.Build) void {
     const use_llvm = b.option(bool, "use-llvm", "Use the LLVM backend");
 
     const exe = b.addExecutable(.{
-        .name = "hex",
+        .name = "dealt",
         .root_source_file = b.path("src/main.zig"),
         .target = target,
         .optimize = optimize,
@@ -38,6 +38,9 @@ pub fn build(b: *std.Build) void {
     }
     exe.linkLibC();
 
+    // Install executable
+    b.installArtifact(exe);
+
     // Shader compilation step
     const compile_shaders = b.addSystemCommand(&.{
         "bash", "src/shaders/compile_shaders.sh",
@@ -58,7 +61,6 @@ pub fn build(b: *std.Build) void {
 
     // Make install depend on shader compilation
     b.getInstallStep().dependOn(&compile_shaders.step);
-    b.installArtifact(exe);
 
     // Run step
     const run_step = b.step("run", "Run the game");

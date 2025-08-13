@@ -1,9 +1,9 @@
 const std = @import("std");
 const math = std.math;
 
-const c = @import("c.zig");
+const c = @import("../lib/c.zig");
 
-const types = @import("types.zig");
+const types = @import("../lib/types.zig");
 const Color = types.Color;
 const constants = @import("constants.zig");
 

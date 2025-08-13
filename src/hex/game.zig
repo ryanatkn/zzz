@@ -1,18 +1,20 @@
 const std = @import("std");
 
-const c = @import("c.zig");
+const c = @import("../lib/c.zig");
 
-const types = @import("types.zig");
+const types = @import("../lib/types.zig");
 const entities = @import("entities.zig");
 const behaviors = @import("behaviors.zig");
 const physics = @import("physics.zig");
-const input = @import("input.zig");
+const input = @import("../lib/input.zig");
 const player_controller = @import("player.zig");
 const combat = @import("combat.zig");
 const portals = @import("portals.zig");
-const camera = @import("camera.zig");
+const camera = @import("../lib/camera.zig");
 const effects = @import("effects.zig");
-const browser = @import("browser/browser.zig");
+const browser = @import("../browser/browser.zig");
+const game_renderer = @import("game_renderer.zig");
+const constants = @import("constants.zig");
 
 const Vec2 = types.Vec2;
 const World = entities.World;
@@ -49,8 +51,8 @@ pub const GameState = struct {
         };
     }
 
-    pub fn initBrowser(self: *Self, allocator: std.mem.Allocator, renderer: *@import("renderer.zig").Renderer) !void {
-        self.browser_system = try browser.Browser.init(allocator, renderer);
+    pub fn initBrowser(self: *Self, allocator: std.mem.Allocator, renderer_ptr: *game_renderer.GameRenderer) !void {
+        self.browser_system = try browser.Browser.init(allocator, renderer_ptr);
     }
 
     pub fn deinitBrowser(self: *Self) void {
@@ -107,7 +109,7 @@ pub const GameState = struct {
         self.world.player.pos = self.world.player_start_pos;
         self.world.player.vel = types.Vec2{ .x = 0, .y = 0 };
         self.world.player.alive = true;
-        self.world.player.color = @import("constants.zig").COLOR_PLAYER_ALIVE;
+        self.world.player.color = constants.COLOR_PLAYER_ALIVE;
 
         // Reset to starting zone
         if (self.world.current_zone != 0) {

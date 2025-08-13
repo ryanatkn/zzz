@@ -1,11 +1,11 @@
 const std = @import("std");
 
-const c = @import("c.zig");
+const c = @import("../lib/c.zig");
 
 const entities = @import("entities.zig");
-const types = @import("types.zig");
-const simple_gpu_renderer = @import("simple_gpu_renderer.zig");
-const camera = @import("camera.zig");
+const types = @import("../lib/types.zig");
+const simple_gpu_renderer = @import("../lib/simple_gpu_renderer.zig");
+const camera = @import("../lib/camera.zig");
 const borders = @import("borders.zig");
 const constants = @import("constants.zig");
 const effects = @import("effects.zig");
@@ -14,43 +14,43 @@ const Vec2 = types.Vec2;
 const Color = types.Color;
 const SimpleGPURenderer = simple_gpu_renderer.SimpleGPURenderer;
 
-pub const Renderer = struct {
+pub const GameRenderer = struct {
     gpu: SimpleGPURenderer,
     camera: camera.Camera,
 
-    pub fn init(allocator: std.mem.Allocator, window: *c.sdl.SDL_Window) !Renderer {
+    pub fn init(allocator: std.mem.Allocator, window: *c.sdl.SDL_Window) !GameRenderer {
         return .{
             .gpu = try SimpleGPURenderer.init(allocator, window),
             .camera = camera.Camera.init(constants.SCREEN_WIDTH, constants.SCREEN_HEIGHT),
         };
     }
 
-    pub fn deinit(self: *Renderer) void {
+    pub fn deinit(self: *GameRenderer) void {
         self.gpu.deinit();
     }
 
     // Begin a new frame
-    pub fn beginFrame(self: *Renderer, window: *c.sdl.SDL_Window) !*c.sdl.SDL_GPUCommandBuffer {
+    pub fn beginFrame(self: *GameRenderer, window: *c.sdl.SDL_Window) !*c.sdl.SDL_GPUCommandBuffer {
         return try self.gpu.beginFrame(window);
     }
 
     // Begin render pass
-    pub fn beginRenderPass(self: *Renderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, window: *c.sdl.SDL_Window, bg_color: Color) !*c.sdl.SDL_GPURenderPass {
+    pub fn beginRenderPass(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, window: *c.sdl.SDL_Window, bg_color: Color) !*c.sdl.SDL_GPURenderPass {
         return try self.gpu.beginRenderPass(cmd_buffer, window, bg_color);
     }
 
     // End render pass
-    pub fn endRenderPass(self: *Renderer, render_pass: *c.sdl.SDL_GPURenderPass) void {
+    pub fn endRenderPass(self: *GameRenderer, render_pass: *c.sdl.SDL_GPURenderPass) void {
         self.gpu.endRenderPass(render_pass);
     }
 
     // End frame
-    pub fn endFrame(self: *Renderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer) void {
+    pub fn endFrame(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer) void {
         self.gpu.endFrame(cmd_buffer);
     }
 
     // Update camera based on current zone (call before game logic update)
-    pub fn updateCamera(self: *Renderer, world: *const entities.World) void {
+    pub fn updateCamera(self: *GameRenderer, world: *const entities.World) void {
         // Ensure camera has current screen dimensions (in case window resized)
         if (self.camera.screen_width != self.gpu.screen_width or
             self.camera.screen_height != self.gpu.screen_height)
@@ -67,7 +67,7 @@ pub const Renderer = struct {
     }
 
     // Render all entities in a zone
-    pub fn renderZone(self: *Renderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const entities.World) void {
+    pub fn renderZone(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const entities.World) void {
         const zone = world.getCurrentZone();
 
         // Draw all rectangles first (obstacles)
@@ -78,7 +78,7 @@ pub const Renderer = struct {
     }
 
     // Render all obstacles (rectangles)
-    fn renderObstacles(self: *Renderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, zone: *const entities.Zone) void {
+    fn renderObstacles(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, zone: *const entities.Zone) void {
         for (0..zone.obstacle_count) |i| {
             const obstacle = &zone.obstacles[i];
             if (obstacle.active) {
@@ -93,14 +93,14 @@ pub const Renderer = struct {
     }
 
     // Helper to render a single circular entity
-    fn renderCircleEntity(self: *Renderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, pos: Vec2, radius: f32, color: Color) void {
+    fn renderCircleEntity(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, pos: Vec2, radius: f32, color: Color) void {
         const screen_pos = self.camera.worldToScreen(pos);
         const screen_radius = self.camera.worldSizeToScreen(radius);
         self.gpu.drawCircle(cmd_buffer, render_pass, screen_pos, screen_radius, color);
     }
 
     // Render all circular entities
-    fn renderCircles(self: *Renderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const entities.World) void {
+    fn renderCircles(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, world: *const entities.World) void {
         const zone = world.getCurrentZone();
 
         // Draw player
@@ -141,7 +141,7 @@ pub const Renderer = struct {
     }
 
     // Render visual effects
-    pub fn renderEffects(self: *Renderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, effect_system: *const effects.EffectSystem) void {
+    pub fn renderEffects(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, effect_system: *const effects.EffectSystem) void {
         const active_effects = effect_system.getActiveEffects();
 
         // Get current time for shader animations
@@ -161,7 +161,7 @@ pub const Renderer = struct {
     }
 
     // Draw border system with stacking support
-    pub fn drawBorders(self: *Renderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, game_state: anytype) void {
+    pub fn drawBorders(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, game_state: anytype) void {
         var border_stack = borders.BorderStack.init();
 
         // Iris wipe effect (highest priority - renders over everything)
@@ -226,7 +226,7 @@ pub const Renderer = struct {
     }
 
     // Helper method for border system integration
-    pub fn drawBorderWithOffset(self: *Renderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, color: Color, width: f32, offset: f32) void {
+    pub fn drawBorderWithOffset(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, color: Color, width: f32, offset: f32) void {
         const rects = borders.calculateBorderRects(width, offset);
         for (rects) |rect| {
             self.gpu.drawRect(cmd_buffer, render_pass, Vec2{ .x = rect.x, .y = rect.y }, Vec2{ .x = rect.w, .y = rect.h }, color);
@@ -234,7 +234,7 @@ pub const Renderer = struct {
     }
 
     // Simple HUD rendering
-    pub fn drawFPS(self: *Renderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, fps: u32) void {
+    pub fn drawFPS(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, fps: u32) void {
         const WHITE = Color{ .r = 230, .g = 230, .b = 230, .a = 255 };
         const fps_x = 1840.0;
         const fps_y = 1060.0;
@@ -253,7 +253,7 @@ pub const Renderer = struct {
     }
 
     // Draw a circle at screen position (for UI elements)
-    pub fn drawCircle(self: *Renderer, pos: Vec2, radius: f32, color: Color) void {
+    pub fn drawCircle(self: *GameRenderer, pos: Vec2, radius: f32, color: Color) void {
         // TODO: This needs to be refactored to work with the current rendering architecture
         // For now, we'll skip this as we need access to cmd_buffer and render_pass
         _ = self;
@@ -262,7 +262,7 @@ pub const Renderer = struct {
         _ = color;
     }
 
-    fn drawDigit(self: *Renderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, digit: u8, x: f32, y: f32, color: Color) void {
+    fn drawDigit(self: *GameRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, digit: u8, x: f32, y: f32, color: Color) void {
         if (digit > 9) return;
 
         // Simple 3x5 digit patterns

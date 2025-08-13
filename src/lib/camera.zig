@@ -1,7 +1,8 @@
 const std = @import("std");
 
 const types = @import("types.zig");
-const constants = @import("constants.zig");
+// Note: Camera should not import game-specific constants
+// Constants will be passed as parameters instead
 
 const Vec2 = types.Vec2;
 
@@ -39,8 +40,8 @@ pub const Camera = struct {
         // View always encompasses entire world
         self.view_x = 0.0;
         self.view_y = 0.0;
-        self.view_width = constants.SCREEN_WIDTH;
-        self.view_height = constants.SCREEN_HEIGHT;
+        self.view_width = self.screen_width;
+        self.view_height = self.screen_height;
     }
 
     // Follow camera - tracks player position with adjustable zoom

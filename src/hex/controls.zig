@@ -1,22 +1,22 @@
 const std = @import("std");
 
-const c = @import("c.zig");
+const c = @import("../lib/c.zig");
 
-const types = @import("types.zig");
+const types = @import("../lib/types.zig");
 const constants = @import("constants.zig");
 const game_controller = @import("game.zig");
-const renderer = @import("renderer.zig");
+const game_renderer_mod = @import("game_renderer.zig");
 const hud = @import("hud.zig");
 const combat = @import("combat.zig");
 
 const Vec2 = types.Vec2;
 const GameState = game_controller.GameState;
-const Renderer = renderer.Renderer;
+const GameRenderer = game_renderer_mod.GameRenderer;
 const Hud = hud.Hud;
 
 pub fn handleSDLEvent(
     game_state: *GameState,
-    game_renderer: *Renderer,
+    game_renderer: *GameRenderer,
     game_hud: *Hud,
     event: *c.sdl.SDL_Event,
 ) !c.sdl.SDL_AppResult {

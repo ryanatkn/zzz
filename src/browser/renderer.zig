@@ -1,15 +1,16 @@
 const std = @import("std");
-const c = @import("../c.zig");
-const types = @import("../types.zig");
-const renderer = @import("../renderer.zig");
+const c = @import("../lib/c.zig");
+const types = @import("../lib/types.zig");
+const lib_renderer = @import("../lib/renderer.zig");
+const game_renderer = @import("../hex/game_renderer.zig");
 const page = @import("page.zig");
 
 const Color = types.Color;
 
 pub const BrowserRenderer = struct {
-    base_renderer: *renderer.Renderer,
+    base_renderer: *game_renderer.GameRenderer,
     
-    pub fn init(base_renderer: *renderer.Renderer) BrowserRenderer {
+    pub fn init(base_renderer: *game_renderer.GameRenderer) BrowserRenderer {
         return .{
             .base_renderer = base_renderer,
         };

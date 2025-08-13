@@ -1,6 +1,6 @@
-# Hex - GPU-Accelerated 2D Action RPG
+# Dealt - SDL3 Game Engine with Hex Example Game
 
-A procedurally-rendered 2D top-down action RPG built with Zig, SDL3 GPU API, and HLSL shaders. Pure algorithmic graphics with no texture assets.
+A GPU-accelerated game engine built with Zig, SDL3 GPU API, and HLSL shaders, featuring the Hex 2D action RPG as a showcase implementation. Pure algorithmic graphics with no texture assets.
 
 ## Quick Start
 
@@ -16,9 +16,13 @@ zig build shaders                    # Compile shaders only
 zig build clean-shaders             # Clean rebuild shaders
 ```
 
+## Architecture
+
+**Dealt Engine** provides the core SDL3 framework and rendering infrastructure in `src/lib/`, while **Hex** demonstrates the engine capabilities as a complete game implementation in `src/hex/`.
+
 ## Features
 
-### Core Gameplay
+### Hex Game Showcase
 - **Movement**: Mouse hold-to-move + WASD direct control
 - **Combat**: Right-click projectile firing with collision detection  
 - **World**: Zone-based travel system with portals between areas

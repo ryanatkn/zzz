@@ -1,7 +1,7 @@
 .{
-    .name = .hex,
+    .name = .dealt,
     .version = "0.0.0",
-    .fingerprint = 0xffd12566b9c95b9e,
+    .fingerprint = 0x715d11386ff0d100,
     .minimum_zig_version = "0.14.1",
     .dependencies = .{
         .sdl = .{

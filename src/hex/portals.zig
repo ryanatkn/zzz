@@ -1,12 +1,12 @@
 const std = @import("std");
 
-const types = @import("types.zig");
+const types = @import("../lib/types.zig");
 const entities = @import("entities.zig");
 const behaviors = @import("behaviors.zig");
-const maths = @import("maths.zig");
+const maths = @import("../lib/maths.zig");
 const physics = @import("physics.zig");
 const player_controller = @import("player.zig");
-const input = @import("input.zig");
+const input = @import("../lib/input.zig");
 const constants = @import("constants.zig");
 const effects = @import("effects.zig");
 

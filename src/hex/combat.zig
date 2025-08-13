@@ -1,6 +1,6 @@
 const std = @import("std");
 
-const types = @import("types.zig");
+const types = @import("../lib/types.zig");
 const entities = @import("entities.zig");
 const behaviors = @import("behaviors.zig");
 const physics = @import("physics.zig");

@@ -1,3 +1,10 @@
 # zz/web
 
 - render Mdz with Svelte, html, canvas, and webgl (via SDL3)
+
+## todo
+
+- SharedArrayBuffer
+  - https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer
+  - https://developer.mozilla.org/en-US/docs/Web/Security/Secure_Contexts
+  - https://developer.mozilla.org/en-US/docs/Web/API/Window/crossOriginIsolated
