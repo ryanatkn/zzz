@@ -42,6 +42,7 @@ pub const Dependency = struct {
 /// Observable interface for objects that can have observers
 /// This is implemented by Signal and Derived to provide consistent observer management
 pub fn Observable(comptime T: type) type {
+    _ = T; // Observable can work with any type
     return struct {
         const Self = @This();
         

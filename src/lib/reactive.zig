@@ -1,8 +1,7 @@
-//! Reactive system for Dealt Game Engine with full Svelte 5 semantics
+//! Reactive system for Dealt Game Engine with performance-first shallow reactivity
 //! 
-//! Complete implementation of Svelte 5's rune system with automatic dependency tracking:
-//! - $state: Reactive signals with automatic tracking (Signal)
-//! - $state.raw: Non-reactive state for performance optimization (SignalRaw)
+//! Complete implementation inspired by Svelte 5's rune system with automatic dependency tracking:
+//! - $state: Reactive signals with shallow equality and automatic tracking (Signal)
 //! - $state.snapshot: Create static snapshots of reactive state
 //! - $derived: Derived values that auto-update (Derived)  
 //! - $effect: Side effects with automatic cleanup (Effect)
@@ -10,6 +9,7 @@
 //! - $effect.tracking: Runtime detection of tracking context
 //! - $effect.root: Manual effect scopes with lifecycle control
 //! - Push-pull reactivity: immediate notification, lazy evaluation
+//! - Shallow reactivity: Only top-level changes trigger updates for performance
 //!
 //! ## Basic Usage
 //!
@@ -20,11 +20,11 @@
 //! try reactive.init(allocator);
 //! defer reactive.deinit(allocator);
 //! 
-//! // Create reactive state ($state)
+//! // Create reactive state ($state) - uses shallow equality 
 //! var count = try reactive.signal(allocator, u32, 0);
 //! 
-//! // Create non-reactive state ($state.raw) - no dependencies tracked
-//! var config = try reactive.signalRaw(allocator, bool, true);
+//! // For arrays/structs, only complete replacement triggers updates
+//! var position = try reactive.signal(allocator, Vec2, .{ .x = 0, .y = 0 });
 //! 
 //! // Create derived state ($derived) - automatically tracks count
 //! var doubled = try reactive.derived(allocator, u32, struct {
@@ -51,9 +51,14 @@
 //! // Batch updates for efficiency
 //! reactive.batch(struct {
 //!     fn update() void {
-//!         count.set(5); // doubled becomes 10, effects run once
+//!         count.set(5);
+//!         position.set(.{ .x = 10, .y = 20 }); // Both updates, effects run once
 //!     }
 //! }.update);
+//! 
+//! // Manual notification when modifying nested structures
+//! position.value.x = 100; // Direct modification - no automatic trigger
+//! position.notify(); // Manually notify observers
 //! 
 //! // Manual effect scopes ($effect.root)
 //! const root = try reactive.createEffectRoot(allocator, struct {
@@ -67,7 +72,8 @@
 //! ## Advanced Features
 //!
 //! ### Performance Optimization
-//! - Use `SignalRaw` for non-reactive state that doesn't trigger effects
+//! - Shallow equality prevents expensive deep comparisons
+//! - Use `notify()` method for manual updates when modifying nested structures
 //! - Use `snapshot()` to create static copies for external APIs
 //! - Batch multiple updates to prevent cascading effect runs
 //!
@@ -86,16 +92,20 @@ const signal_mod = @import("reactive/signal.zig");
 const derived_mod = @import("reactive/derived.zig");
 const effect_mod = @import("reactive/effect.zig");
 const batch_mod = @import("reactive/batch.zig");
+const collections_mod = @import("reactive/collections.zig");
 
 // Re-export core types with new names
-pub const Signal = signal_mod.Signal;
-pub const SignalRaw = signal_mod.SignalRaw;  // Non-reactive state (Svelte 5 $state.raw)
+pub const Signal = signal_mod.Signal;  // Reactive state with shallow equality (Svelte 5 $state)
 pub const Derived = derived_mod.Derived;  // Primary name (Svelte 5 $derived)
 pub const Effect = effect_mod.Effect;
 pub const EffectRoot = effect_mod.EffectRoot; // Root effect scope (Svelte 5 $effect.root)
 pub const EffectTiming = effect_mod.EffectTiming; // Effect timing modes
 pub const BatchManager = batch_mod.BatchManager;
 pub const ReactiveContext = context_mod.ReactiveContext;
+
+// Re-export reactive collections
+pub const ReactiveArray = collections_mod.ReactiveArray;  // Reactive fixed-size arrays
+pub const ReactiveSlice = collections_mod.ReactiveSlice;  // Reactive dynamic slices
 
 // Re-export context functions
 pub const getContext = context_mod.getContext;
@@ -120,18 +130,33 @@ pub fn deinit(allocator: std.mem.Allocator) void {
 }
 
 /// Convenience function to create a signal ($state)
+/// Uses shallow equality for optimal performance 
 pub fn signal(allocator: std.mem.Allocator, comptime T: type, initial_value: T) !Signal(T) {
     return try Signal(T).init(allocator, initial_value);
-}
-
-/// Convenience function to create a raw (non-reactive) signal ($state.raw)
-pub fn signalRaw(allocator: std.mem.Allocator, comptime T: type, initial_value: T) !SignalRaw(T) {
-    return try SignalRaw(T).init(allocator, initial_value);
 }
 
 /// Convenience function to create a derived signal with automatic tracking ($derived)
 pub fn derived(allocator: std.mem.Allocator, comptime T: type, derive_fn: *const fn () T) !*Derived(T) {
     return try derived_mod.derived(allocator, T, derive_fn);
+}
+
+/// Convenience function to create a reactive array
+pub fn reactiveArray(
+    allocator: std.mem.Allocator, 
+    comptime T: type, 
+    comptime N: usize, 
+    initial_items: [N]T
+) !ReactiveArray(T, N) {
+    return try collections_mod.reactiveArray(allocator, T, N, initial_items);
+}
+
+/// Convenience function to create a reactive slice
+pub fn reactiveSlice(
+    allocator: std.mem.Allocator, 
+    comptime T: type, 
+    items: []T
+) !ReactiveSlice(T) {
+    return try collections_mod.reactiveSlice(allocator, T, items);
 }
 
 

@@ -1,6 +1,8 @@
 const std = @import("std");
 const signal = @import("signal.zig");
 const context = @import("context.zig");
+const observer = @import("observer.zig");
+const utils = @import("utils.zig");
 const batch_mod = @import("batch.zig");
 
 /// A derived signal that automatically updates when its dependencies change
@@ -13,35 +15,33 @@ pub fn Derived(comptime T: type) type {
         signal: signal.Signal(T),
         
         // Function to derive the value
-        derive_fn: *const fn () T,
+        derive_fn: utils.CallbackTypes.DeriveFn(T),
         
         // Cached derived value
         cached_value: T,
         
-        // Tracking state
-        is_dirty: bool = true,
-        is_deriving: bool = false,
+        // Dirty state management
+        dirty_state: utils.DirtyState = .{},
         
         // Version tracking for optimization
-        last_derived_version: u64 = 0,
+        version_tracker: utils.VersionTracker = .{},
         dependency_versions: std.ArrayList(u64),
         
         // Observer for this derived (to receive notifications from dependencies)
-        observer: context.ReactiveContext.Observer,
+        observer: observer.Observer,
         
         // Reference to self for observer callbacks
         self_ptr: *Self = undefined,
         
-        pub fn init(allocator: std.mem.Allocator, derive_fn: *const fn () T) !Self {
+        pub fn init(allocator: std.mem.Allocator, derive_fn: utils.CallbackTypes.DeriveFn(T)) !Self {
             // Don't derive initial value yet - wait for proper setup
             
             const self = Self{
                 .signal = try signal.Signal(T).init(allocator, undefined),
                 .derive_fn = derive_fn,
                 .cached_value = undefined,
-                .is_dirty = true, // Start dirty to force initial derivation
-                .is_deriving = false,
-                .last_derived_version = 0,
+                .dirty_state = utils.DirtyState{ .is_dirty = true }, // Start dirty to force initial derivation
+                .version_tracker = utils.VersionTracker{},
                 .dependency_versions = std.ArrayList(u64).init(allocator),
                 .observer = undefined,
                 .self_ptr = undefined,
@@ -68,15 +68,15 @@ pub fn Derived(comptime T: type) type {
             context.trackDependency(dependency);
             
             // Rederive if dirty (lazy pull)
-            if (self.is_dirty and !self.is_deriving) {
+            if (self.dirty_state.isDirty() and !self.dirty_state.isComputing()) {
                 const old_value = self.cached_value;
                 self.rederive();
                 
                 // Only notify if the value actually changed after rederive
-                if (!std.meta.eql(old_value, self.cached_value)) {
+                if (!utils.isEqual(T, old_value, self.cached_value)) {
                     // Update signal value to match derived value
                     self.signal.value = self.cached_value;
-                    self.signal.version +%= 1;
+                    self.signal.version_tracker.increment();
                     // Don't call notifyObservers here as this would cause infinite recursion
                     // The tracking dependency above will handle notifications
                 }
@@ -88,7 +88,7 @@ pub fn Derived(comptime T: type) type {
         /// Get the current derived value without tracking dependency
         pub fn peek(self: *Self) T {
             // Rederive if dirty (lazy pull) but don't track
-            if (self.is_dirty and !self.is_deriving) {
+            if (self.dirty_state.isDirty() and !self.dirty_state.isComputing()) {
                 self.rederive();
             }
             
@@ -99,10 +99,10 @@ pub fn Derived(comptime T: type) type {
         fn onDependencyChange(self: *Self) void {
             // Use a simple approach: only notify if we weren't already dirty
             // This prevents duplicate notifications in diamond dependency scenarios
-            if (!self.is_dirty) {
-                self.is_dirty = true;
-                self.signal.is_dirty = true;
-                self.signal.version +%= 1;
+            if (!self.dirty_state.isDirty()) {
+                self.dirty_state.markDirty();
+                self.signal.dirty_state.markDirty();
+                self.signal.version_tracker.increment();
                 
                 // Notify observers that we might have changed
                 // Effects will be batched automatically if batching is active
@@ -112,10 +112,8 @@ pub fn Derived(comptime T: type) type {
         
         /// Check if value changed and notify observers only if it did
         fn checkAndNotifyIfChanged(self: *Self) void {
-            if (self.is_deriving) return; // Prevent recursion
-            
-            self.is_deriving = true;
-            defer self.is_deriving = false;
+            if (!self.dirty_state.startComputing()) return; // Prevent recursion
+            defer self.dirty_state.endComputing();
             
             // Store old value
             const old_value = self.cached_value;
@@ -126,7 +124,7 @@ pub fn Derived(comptime T: type) type {
                 reactive_ctx.startTracking(&self.observer) catch {
                     // If tracking fails, derive without tracking
                     self.cached_value = self.derive_fn();
-                    self.is_dirty = false;
+                    self.dirty_state.markClean();
                     return;
                 };
                 defer reactive_ctx.stopTracking();
@@ -136,7 +134,7 @@ pub fn Derived(comptime T: type) type {
                 self.cached_value = new_value;
                 
                 // Only notify if value actually changed
-                if (!std.meta.eql(old_value, new_value)) {
+                if (!utils.isEqual(T, old_value, new_value)) {
                     self.signal.set(new_value);
                 }
             } else {
@@ -145,12 +143,12 @@ pub fn Derived(comptime T: type) type {
                 self.cached_value = new_value;
                 
                 // Only notify if value actually changed
-                if (!std.meta.eql(old_value, new_value)) {
+                if (!utils.isEqual(T, old_value, new_value)) {
                     self.signal.set(new_value);
                 }
             }
             
-            self.is_dirty = false;
+            self.dirty_state.markClean();
         }
         
         /// Cleanup when derived is destroyed
@@ -161,10 +159,8 @@ pub fn Derived(comptime T: type) type {
         
         /// Manually rederive (usually happens automatically)
         pub fn rederive(self: *Self) void {
-            if (self.is_deriving) return; // Prevent infinite recursion
-            
-            self.is_deriving = true;
-            defer self.is_deriving = false;
+            if (!self.dirty_state.startComputing()) return; // Prevent infinite recursion
+            defer self.dirty_state.endComputing();
             
             // Set up tracking context
             const ctx = context.getContext();
@@ -173,7 +169,7 @@ pub fn Derived(comptime T: type) type {
                 reactive_ctx.startTracking(&self.observer) catch {
                     // If tracking fails, derive without tracking
                     self.cached_value = self.derive_fn();
-                    self.is_dirty = false;
+                    self.dirty_state.markClean();
                     return;
                 };
                 defer reactive_ctx.stopTracking();
@@ -182,31 +178,31 @@ pub fn Derived(comptime T: type) type {
                 const new_value = self.derive_fn();
                 
                 // Only update if value actually changed
-                if (!std.meta.eql(self.cached_value, new_value)) {
+                if (!utils.isEqual(T, self.cached_value, new_value)) {
                     self.cached_value = new_value;
                     // Update the signal value directly without triggering notifications
                     // Notifications were already sent by onDependencyChange()
                     self.signal.value = new_value;
-                    self.signal.version +%= 1;
+                    self.signal.version_tracker.increment();
                 }
             } else {
                 // No reactive context, derive directly
                 self.cached_value = self.derive_fn();
             }
             
-            self.is_dirty = false;
-            self.last_derived_version = self.signal.getVersion();
+            self.dirty_state.markClean();
+            self.version_tracker.set(self.signal.getVersion());
         }
         
         /// Force rederivation and return new value
         pub fn refresh(self: *Self) T {
-            self.is_dirty = true;
+            self.dirty_state.markDirty();
             return self.get();
         }
         
         /// Check if derived needs rederivation
         pub fn isDirty(self: *const Self) bool {
-            return self.is_dirty;
+            return self.dirty_state.isDirty();
         }
         
         /// Get as a signal reference (for compatibility)
@@ -218,7 +214,7 @@ pub fn Derived(comptime T: type) type {
         /// For deeply reactive state, this creates a non-reactive copy
         pub fn snapshot(self: *Self) T {
             // Ensure we have the latest value but don't track dependency
-            if (self.is_dirty and !self.is_deriving) {
+            if (self.dirty_state.isDirty() and !self.dirty_state.isComputing()) {
                 self.rederive();
             }
             return self.cached_value;
@@ -227,13 +223,13 @@ pub fn Derived(comptime T: type) type {
 }
 
 /// Create a derived signal ($derived)
-pub fn derived(allocator: std.mem.Allocator, comptime T: type, derive_fn: *const fn () T) !*Derived(T) {
+pub fn derived(allocator: std.mem.Allocator, comptime T: type, derive_fn: utils.CallbackTypes.DeriveFn(T)) !*Derived(T) {
     const deriv = try allocator.create(Derived(T));
     deriv.* = try Derived(T).init(allocator, derive_fn);
     deriv.self_ptr = deriv; // Fix self-reference after allocation
     
     // Re-create observer with correct self pointer
-    deriv.observer = context.createObserver(
+    deriv.observer = observer.createObserver(
         Derived(T),
         deriv,
         Derived(T).onDependencyChange,
@@ -241,57 +237,13 @@ pub fn derived(allocator: std.mem.Allocator, comptime T: type, derive_fn: *const
     );
     
     // Re-establish dependencies with correct observer
-    deriv.is_dirty = true;
+    deriv.dirty_state.markDirty();
     deriv.rederive();
     
     return deriv;
 }
 
 
-/// Create a derived that depends on multiple signals explicitly
-/// This is a helper for cases where automatic tracking isn't sufficient
-pub fn derivedFrom(
-    allocator: std.mem.Allocator,
-    comptime T: type,
-    comptime U: type,
-    dependencies: []const *signal.Signal(U),
-    derive_fn: *const fn ([]const U) T
-) !*Derived(T) {
-    const DeriveContext = struct {
-        deps: []const *signal.Signal(U),
-        derive_fn: *const fn ([]const U) T,
-        allocator: std.mem.Allocator,
-        
-        fn derive(ctx: @This()) T {
-            var values = std.ArrayList(U).init(ctx.allocator);
-            defer values.deinit();
-            
-            for (ctx.deps) |dep| {
-                values.append(dep.get()) catch return @as(T, undefined);
-            }
-            
-            return ctx.derive_fn(values.items);
-        }
-    };
-    
-    const ctx = DeriveContext{
-        .deps = dependencies,
-        .derive_fn = derive_fn,
-        .allocator = allocator,
-    };
-    
-    // TODO: This needs a better solution for capturing context
-    // For now, use the simple derive function
-    _ = ctx;
-    
-    return derived(allocator, T, struct {
-        fn derive() T {
-            // This is a limitation - we need the context here
-            // For now, return a default value
-            return @as(T, undefined);
-        }
-    }.derive);
-}
 
 
 // Tests

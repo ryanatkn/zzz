@@ -472,24 +472,68 @@ test "nested effects tracking" {
 
 // Test 7: Untrack/peek doesn't create dependencies
 test "untrack prevents dependency creation" {
-    // TODO: This test requires implementing untrack/peek functionality
-    // For now, just document expected behavior
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    defer _ = gpa.deinit();
+    const allocator = gpa.allocator();
     
-    // var source = signal(0);
-    // var tracked_runs = 0;
-    // var untracked_runs = 0;
-    //
-    // effect(() => {
-    //     source.get(); // Creates dependency
-    //     tracked_runs++;
-    //     
-    //     untrack(() => {
-    //         other.get(); // Does NOT create dependency
-    //     });
-    // });
-    //
-    // source.set(10); // triggers effect
-    // other.set(20); // does NOT trigger effect
+    try reactive.init(allocator);
+    defer reactive.deinit(allocator);
+    
+    var source = try reactive.signal(allocator, i32, 0);
+    defer source.deinit();
+    
+    var other = try reactive.signal(allocator, i32, 100);
+    defer other.deinit();
+    
+    var effect_runs: u32 = 0;
+    
+    const TestData = struct {
+        var src: *signal_mod.Signal(i32) = undefined;
+        var other_ref: *signal_mod.Signal(i32) = undefined;
+        var runs: *u32 = undefined;
+    };
+    
+    TestData.src = &source;
+    TestData.other_ref = &other;
+    TestData.runs = &effect_runs;
+    
+    const test_effect = try reactive.createEffect(allocator, struct {
+        fn run() void {
+            // This creates a dependency on source
+            _ = TestData.src.get();
+            TestData.runs.* += 1;
+            
+            // This does NOT create a dependency on other (untracked)
+            const untracked_value = context_mod.untrack(i32, struct {
+                fn getOther() i32 {
+                    return TestData.other_ref.get();
+                }
+            }.getOther);
+            _ = untracked_value; // Use the value to avoid unused variable warning
+        }
+    }.run);
+    defer allocator.destroy(test_effect);
+    
+    // Initial run
+    try std.testing.expect(effect_runs == 1);
+    
+    // Reset counter
+    effect_runs = 0;
+    
+    // Changing source should trigger effect (it's tracked)
+    source.set(10);
+    try std.testing.expect(effect_runs == 1);
+    
+    // Reset counter
+    effect_runs = 0;
+    
+    // Changing other should NOT trigger effect (it was read in untrack)
+    other.set(200);
+    try std.testing.expect(effect_runs == 0); // Should be 0!
+    
+    // Double-check by changing source again (should still work)
+    source.set(20);
+    try std.testing.expect(effect_runs == 1);
 }
 
 // Test 8: Memory cleanup on effect disposal

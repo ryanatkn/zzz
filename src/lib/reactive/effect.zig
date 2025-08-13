@@ -1,6 +1,7 @@
 const std = @import("std");
 const signal = @import("signal.zig");
 const context = @import("context.zig");
+const observer = @import("observer.zig");
 const batch_mod = @import("batch.zig");
 
 /// Effect timing modes for different execution phases
@@ -20,7 +21,7 @@ pub const Effect = struct {
     timing: EffectTiming = .normal,
     
     // Observer for automatic dependency tracking
-    observer: context.ReactiveContext.Observer,
+    observer: observer.Observer,
     
     // Self reference for observer callbacks
     self_ptr: *Effect = undefined,
@@ -49,7 +50,7 @@ pub const Effect = struct {
         self.self_ptr = &self;
         
         // Create observer for receiving dependency updates
-        self.observer = context.createObserver(
+        self.observer = observer.createObserver(
             Effect,
             self.self_ptr,
             Effect.onDependencyChange,
@@ -144,7 +145,7 @@ pub fn createEffect(
     effect.self_ptr = effect; // Fix self-reference after allocation
     
     // Re-create observer with correct self pointer
-    effect.observer = context.createObserver(
+    effect.observer = observer.createObserver(
         Effect,
         effect,
         Effect.onDependencyChange,
@@ -168,7 +169,7 @@ pub fn createEffectWithCleanup(
     effect.self_ptr = effect; // Fix self-reference after allocation
     
     // Re-create observer with correct self pointer
-    effect.observer = context.createObserver(
+    effect.observer = observer.createObserver(
         Effect,
         effect,
         Effect.onDependencyChange,
@@ -232,7 +233,7 @@ pub fn createOneTimeEffect(
     Context.ran = false;
     
     effect.self_ptr = effect;
-    effect.observer = context.createObserver(
+    effect.observer = observer.createObserver(
         Effect,
         effect,
         Effect.onDependencyChange,
@@ -252,7 +253,7 @@ pub fn createEffectPre(
     effect.* = Effect.init(allocator, effect_fn, null, .pre);
     effect.self_ptr = effect;
     
-    effect.observer = context.createObserver(
+    effect.observer = observer.createObserver(
         Effect,
         effect,
         Effect.onDependencyChange,

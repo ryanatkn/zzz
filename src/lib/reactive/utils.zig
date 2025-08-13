@@ -20,15 +20,56 @@ pub const VersionTracker = struct {
     }
 };
 
-/// Enhanced equality checking with performance optimizations
+/// Enhanced equality checking with performance optimizations (deep equality)
 pub fn isEqual(comptime T: type, a: T, b: T) bool {
     // For primitive types, use direct comparison (faster)
-    if (@typeInfo(T) == .Int or @typeInfo(T) == .Float or @typeInfo(T) == .Bool) {
+    const type_info = @typeInfo(T);
+    if (type_info == .int or type_info == .float or type_info == .bool) {
         return a == b;
     }
     
     // For complex types, use std.meta.eql
     return std.meta.eql(a, b);
+}
+
+/// Shallow equality checking for performance-first reactive semantics
+/// Only compares the top-level value, not nested structures
+pub fn shallowEqual(comptime T: type, a: T, b: T) bool {
+    const type_info = @typeInfo(T);
+    
+    // For primitive types, same as deep equality
+    if (type_info == .int or type_info == .float or type_info == .bool or type_info == .@"enum") {
+        return a == b;
+    }
+    
+    // For pointers, handle different types appropriately
+    if (type_info == .pointer) {
+        switch (type_info.pointer.size) {
+            .one => return a == b, // Single-item pointers: compare addresses
+            .many, .slice => {
+                // Special handling for string slices - compare contents for convenience
+                if (comptime std.meta.Child(T) == u8) {
+                    return std.mem.eql(u8, a, b);
+                }
+                // For other slices, compare pointer and length (shallow)
+                return a.ptr == b.ptr and a.len == b.len;
+            },
+            .c => return a == b, // C pointers: compare addresses
+        }
+    }
+    
+    // For optionals, compare the optional wrapper shallowly
+    if (type_info == .optional) {
+        if (a == null and b == null) return true;
+        if (a == null or b == null) return false;
+        return shallowEqual(@TypeOf(a.?), a.?, b.?);
+    }
+    
+    // For structs, arrays, and other complex types:
+    // Use bitwise comparison - fast but only catches exact value changes
+    const a_bytes = std.mem.asBytes(&a);
+    const b_bytes = std.mem.asBytes(&b);
+    return std.mem.eql(u8, a_bytes, b_bytes);
 }
 
 /// ArrayList utilities for observer management
@@ -145,10 +186,14 @@ pub const CallbackTypes = struct {
     pub const CleanupFn = *const fn () void;
     
     /// Derived computation function (Svelte 5 $derived)
-    pub const DeriveFn = fn () anytype;
+    pub fn DeriveFn(comptime T: type) type {
+        return *const fn () T;
+    }
     
     /// Update function for signals
-    pub const UpdateFn = fn (anytype) anytype;
+    pub fn UpdateFn(comptime T: type) type {
+        return *const fn (T) T;
+    }
     
     /// Batch function for grouping updates
     pub const BatchFn = *const fn () void;
@@ -182,6 +227,52 @@ test "equality checking with different types" {
     const Point = struct { x: i32, y: i32 };
     try std.testing.expect(isEqual(Point, .{ .x = 1, .y = 2 }, .{ .x = 1, .y = 2 }));
     try std.testing.expect(!isEqual(Point, .{ .x = 1, .y = 2 }, .{ .x = 1, .y = 3 }));
+}
+
+test "shallow equality checking" {
+    // Test primitives - same behavior as deep equality
+    try std.testing.expect(shallowEqual(i32, 42, 42));
+    try std.testing.expect(!shallowEqual(i32, 42, 43));
+    
+    try std.testing.expect(shallowEqual(f32, 3.14, 3.14));
+    try std.testing.expect(!shallowEqual(f32, 3.14, 2.71));
+    
+    try std.testing.expect(shallowEqual(bool, true, true));
+    try std.testing.expect(!shallowEqual(bool, true, false));
+    
+    // Test structs - bitwise comparison
+    const Point = struct { x: i32, y: i32 };
+    try std.testing.expect(shallowEqual(Point, .{ .x = 1, .y = 2 }, .{ .x = 1, .y = 2 }));
+    try std.testing.expect(!shallowEqual(Point, .{ .x = 1, .y = 2 }, .{ .x = 1, .y = 3 }));
+    
+    // Test arrays - bitwise comparison
+    const arr1 = [3]i32{ 1, 2, 3 };
+    const arr2 = [3]i32{ 1, 2, 3 };
+    const arr3 = [3]i32{ 1, 2, 4 };
+    try std.testing.expect(shallowEqual([3]i32, arr1, arr2));
+    try std.testing.expect(!shallowEqual([3]i32, arr1, arr3));
+    
+    // Test pointers - reference equality
+    var x: i32 = 42;
+    var y: i32 = 42;
+    const ptr1 = &x;
+    const ptr2 = &x;
+    const ptr3 = &y;
+    try std.testing.expect(shallowEqual(*i32, ptr1, ptr2)); // Same reference
+    try std.testing.expect(!shallowEqual(*i32, ptr1, ptr3)); // Different reference, even if values equal
+    
+    // Test string slices - content equality (special case)
+    const str1 = "hello";
+    const str2 = "hello";
+    const str3 = "world";
+    try std.testing.expect(shallowEqual([]const u8, str1, str2)); // Same content
+    try std.testing.expect(!shallowEqual([]const u8, str1, str3)); // Different content
+    
+    // Test optionals
+    try std.testing.expect(shallowEqual(?i32, null, null));
+    try std.testing.expect(shallowEqual(?i32, @as(?i32, 42), @as(?i32, 42)));
+    try std.testing.expect(!shallowEqual(?i32, @as(?i32, 42), @as(?i32, 43)));
+    try std.testing.expect(!shallowEqual(?i32, @as(?i32, 42), null));
 }
 
 test "observer list operations" {
@@ -250,16 +341,17 @@ test "lazy evaluation" {
     var cached_value: i32 = 0;
     var compute_calls: u32 = 0;
     
-    const compute_fn = struct {
+    const TestContext = struct {
         var calls: *u32 = undefined;
         fn compute() i32 {
             calls.* += 1;
             return 42;
         }
-    }.compute;
+    };
     
     // Set up compute function with call counter
-    @TypeOf(compute_fn).calls = &compute_calls;
+    TestContext.calls = &compute_calls;
+    const compute_fn = TestContext.compute;
     
     // First call should not compute (not dirty)
     var result = LazyEval.executeIfNeeded(i32, &dirty, &cached_value, compute_fn);
