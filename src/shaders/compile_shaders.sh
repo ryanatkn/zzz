@@ -46,7 +46,7 @@ FAILED_SHADERS=()
 SUCCESS_COUNT=0
 TOTAL_COUNT=0
 
-for shader in triangle triangle_uniforms simple_circle debug_circle circle rectangle effect simple_rectangle; do
+for shader in triangle triangle_uniforms simple_circle debug_circle circle rectangle effect simple_rectangle text; do
     echo "Compiling $shader..."
     
     # Check if source file exists

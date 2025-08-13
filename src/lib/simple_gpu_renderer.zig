@@ -47,6 +47,20 @@ const EffectUniforms = extern struct {
     // Total: 64 bytes
 };
 
+// Text rendering uniform buffer
+const TextUniforms = extern struct {
+    screen_size: [2]f32, // 8 bytes
+    _padding: [2]f32, // 8 bytes (16-byte alignment)
+    // Total: 16 bytes
+};
+
+// Text vertex structure for dynamic text rendering
+const TextVertex = extern struct {
+    position: [2]f32,
+    texcoord: [2]f32,
+    color: [4]f32,
+};
+
 pub const SimpleGPURenderer = struct {
     allocator: std.mem.Allocator,
     device: *c.sdl.SDL_GPUDevice,
@@ -66,6 +80,12 @@ pub const SimpleGPURenderer = struct {
     effect_vs: *c.sdl.SDL_GPUShader,
     effect_ps: *c.sdl.SDL_GPUShader,
     effect_pipeline: *c.sdl.SDL_GPUGraphicsPipeline,
+
+    // Text rendering
+    text_vs: ?*c.sdl.SDL_GPUShader,
+    text_ps: ?*c.sdl.SDL_GPUShader,
+    text_pipeline: ?*c.sdl.SDL_GPUGraphicsPipeline,
+    text_sampler: ?*c.sdl.SDL_GPUSampler,
 
     // Current frame data
     screen_width: f32,
@@ -104,6 +124,10 @@ pub const SimpleGPURenderer = struct {
             .effect_vs = undefined,
             .effect_ps = undefined,
             .effect_pipeline = undefined,
+            .text_vs = null,
+            .text_ps = null,
+            .text_pipeline = null,
+            .text_sampler = null,
             .screen_width = 1920.0,
             .screen_height = 1080.0,
         };
@@ -549,5 +573,32 @@ pub const SimpleGPURenderer = struct {
     // Draw pixel (fallback for HUD text - draw as tiny rectangle)
     pub fn drawPixel(self: *Self, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, x: f32, y: f32, color: Color) void {
         self.drawRect(cmd_buffer, render_pass, Vec2{ .x = x, .y = y }, Vec2{ .x = 1.0, .y = 1.0 }, color);
+    }
+
+    // Draw TTF text using GPU atlas data
+    pub fn drawText(
+        self: *Self,
+        cmd_buffer: *c.sdl.SDL_GPUCommandBuffer,
+        render_pass: *c.sdl.SDL_GPURenderPass,
+        draw_data: *c.ttf.TTF_GPUAtlasDrawSequence,
+        position: Vec2,
+        color: Color
+    ) void {
+        _ = self;
+        _ = cmd_buffer;
+        _ = render_pass;
+        _ = draw_data;
+        _ = position;
+        _ = color;
+        
+        // TODO: Implement full text rendering
+        // For now, this is a placeholder that prevents compilation errors
+        // The actual implementation will:
+        // 1. Load text shaders if not already loaded
+        // 2. Create vertex buffer from draw_data
+        // 3. Bind texture atlas
+        // 4. Render triangulated text
+        
+        std.debug.print("Text rendering called but not yet implemented\n", .{});
     }
 };

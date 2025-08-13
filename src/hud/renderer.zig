@@ -20,8 +20,14 @@ pub const BrowserRenderer = struct {
     }
     
     pub fn initFonts(self: *BrowserRenderer, allocator: std.mem.Allocator) !void {
+        const log = std.log.scoped(.browser_renderer);
+        log.info("Initializing fonts in BrowserRenderer...", .{});
+        
         self.font_manager = try allocator.create(fonts.FontManager);
+        log.info("FontManager allocated at: {*}", .{self.font_manager});
+        
         self.font_manager.?.* = try fonts.FontManager.init(allocator, self.base_renderer.gpu.device);
+        log.info("FontManager initialized successfully", .{});
     }
     
     pub fn deinitFonts(self: *BrowserRenderer, allocator: std.mem.Allocator) void {
@@ -233,18 +239,57 @@ pub const BrowserRenderer = struct {
     }
 
     fn drawSimpleText(self: *BrowserRenderer, cmd_buffer: *c.sdl.SDL_GPUCommandBuffer, render_pass: *c.sdl.SDL_GPURenderPass, text: []const u8, x: f32, y: f32, color: Color) void {
+        const log = std.log.scoped(.browser_text);
+        log.info("=== DRAW SIMPLE TEXT ===", .{});
+        log.info("  Text: '{s}'", .{text});
+        log.info("  Position: ({d}, {d})", .{ x, y });
+        log.info("  Font manager: {*}", .{self.font_manager});
         
         // Try to use SDL_ttf if available, fallback to geometry text
         if (self.font_manager) |fm| {
-            // For now, just log that we would render TTF text
-            // Full GPU text rendering requires texture atlas support in shaders
-            _ = fm;
-            const log = std.log.scoped(.browser_text);
-            log.debug("Would render TTF text: '{s}' at ({d}, {d})", .{ text, x, y });
+            log.info("  Font manager available, attempting TTF render...", .{});
+            
+            // Try to render text
+            const text_obj = fm.renderText(text, .sans, 14.0, color) catch |err| {
+                log.err("  Failed to render text: {}", .{err});
+                log.info("  Falling back to geometric text", .{});
+                self.drawGeometricText(cmd_buffer, render_pass, text, x, y, color);
+                return;
+            };
+            defer c.ttf.TTF_DestroyText(text_obj);
+            
+            log.info("  Text object created: {*}", .{text_obj});
+            
+            // Get GPU draw data
+            const draw_data = c.ttf.TTF_GetGPUTextDrawData(text_obj);
+            log.info("  GPU draw data: {*}", .{draw_data});
+            
+            if (draw_data != null) {
+                const data = draw_data.?;
+                log.info("  Draw data details:", .{});
+                log.info("    - Texture: {*}", .{data.*.atlas_texture});
+                log.info("    - Vertices: {d}", .{data.*.num_vertices});
+                log.info("    - Indices: {d}", .{data.*.num_indices});
+                
+                // Use the new GPU text rendering
+                log.info("  Rendering text with GPU data...", .{});
+                self.base_renderer.gpu.drawText(
+                    cmd_buffer,
+                    render_pass,
+                    data,
+                    .{ .x = x, .y = y },
+                    color
+                );
+                return; // Success! Don't use geometric fallback
+            } else {
+                log.warn("  No GPU draw data returned", .{});
+            }
             
             // Use geometric fallback for now
+            log.info("  Using geometric fallback", .{});
             self.drawGeometricText(cmd_buffer, render_pass, text, x, y, color);
         } else {
+            log.warn("  No font manager available, using geometric text", .{});
             self.drawGeometricText(cmd_buffer, render_pass, text, x, y, color);
         }
     }

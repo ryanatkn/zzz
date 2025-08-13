@@ -14,13 +14,15 @@ pub fn build(b: *std.Build) void {
         .use_lld = use_llvm,
     });
 
-    // Add SDL3 dependency
-    const sdl_dep = b.dependency("sdl", .{
+    // Add vendored SDL3 as a dependency
+    const sdl_dep = b.dependency("vendored_sdl", .{
         .target = target,
         .optimize = optimize,
     });
     const sdl_lib = sdl_dep.artifact("SDL3");
+    
     exe.linkLibrary(sdl_lib);
+    exe.linkLibC();
 
     // Add SDL_ttf as a submodule
     const ttf_lib = b.addStaticLibrary(.{
@@ -48,8 +50,9 @@ pub fn build(b: *std.Build) void {
         },
     });
     
-    // SDL_ttf needs SDL headers and FreeType
+    // SDL_ttf needs SDL headers and FreeType  
     ttf_lib.linkLibrary(sdl_lib);
+    ttf_lib.addIncludePath(b.path("vendored/SDL/include"));
     ttf_lib.addIncludePath(b.path("vendored/SDL_ttf/include"));
     ttf_lib.addIncludePath(b.path("vendored/SDL_ttf/src"));
     
@@ -66,6 +69,7 @@ pub fn build(b: *std.Build) void {
     ttf_lib.linkLibC();
     
     exe.linkLibrary(ttf_lib);
+    exe.addIncludePath(b.path("vendored/SDL/include"));
     exe.addIncludePath(b.path("vendored/SDL_ttf/include"));
     
     // Link FreeType for font rendering

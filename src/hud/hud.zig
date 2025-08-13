@@ -29,7 +29,10 @@ pub const Hud = struct {
         };
         
         // Initialize font system
+        const log = std.log.scoped(.hud);
+        log.info("Initializing HUD font system...", .{});
         try hud_sys.renderer.initFonts(allocator);
+        log.info("HUD font system initialized", .{});
 
         // Initialize with home page
         try hud_sys.router.navigate("/");

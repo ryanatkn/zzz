@@ -120,11 +120,18 @@ pub const FontManager = struct {
     gpu_device: *c.sdl.SDL_GPUDevice,
     
     pub fn init(allocator: std.mem.Allocator, gpu_device: *c.sdl.SDL_GPUDevice) !FontManager {
+        log.info("Initializing FontManager...", .{});
+        
         // Initialize SDL_ttf
-        if (!c.ttf.TTF_Init()) {
+        const ttf_result = c.ttf.TTF_Init();
+        log.info("TTF_Init result: {}", .{ttf_result});
+        
+        if (!ttf_result) {
             log.err("Failed to initialize SDL_ttf: {s}", .{c.sdl.SDL_GetError()});
             return error.TTFInitFailed;
         }
+        
+        log.info("SDL_ttf initialized successfully", .{});
         
         return FontManager{
             .allocator = allocator,
@@ -155,11 +162,13 @@ pub const FontManager = struct {
     }
     
     pub fn createTextEngine(self: *FontManager) !void {
+        log.info("Creating GPU text engine...", .{});
         self.text_engine = c.ttf.TTF_CreateGPUTextEngine(self.gpu_device);
         if (self.text_engine == null) {
             log.err("Failed to create GPU text engine: {s}", .{c.sdl.SDL_GetError()});
             return error.TextEngineCreationFailed;
         }
+        log.info("GPU text engine created successfully: {*}", .{self.text_engine});
     }
     
     pub fn loadFont(self: *FontManager, category: FontCategory, size: f32) !FontHandle {
@@ -228,19 +237,28 @@ pub const FontManager = struct {
         }
         
         // Load the font (SDL3_ttf uses float for size)
-        log.info("Attempting to load font: {s} at size {d}", .{ best_variant.?.path, size });
+        log.info("=== FONT LOADING ===", .{});
+        log.info("  Path: {s}", .{best_variant.?.path});
+        log.info("  Size: {d}", .{size});
+        log.info("  Weight: {d}, Italic: {}", .{ best_variant.?.weight, best_variant.?.italic });
+        
         const font = c.ttf.TTF_OpenFont(best_variant.?.path.ptr, size);
+        log.info("  TTF_OpenFont returned: {*}", .{font});
+        
         if (font == null) {
-            log.err("Failed to load font {s}: {s}", .{ best_variant.?.path, c.sdl.SDL_GetError() });
+            const err = c.sdl.SDL_GetError();
+            log.err("  Failed to load font: {s}", .{err});
             // Try with absolute path as fallback
             var abs_path_buf: [256]u8 = undefined;
             const abs_path = std.fmt.bufPrintZ(&abs_path_buf, "/home/desk/dev/hex/{s}", .{best_variant.?.path}) catch {
                 return error.FontLoadFailed;
             };
-            log.info("Trying absolute path: {s}", .{abs_path});
+            log.info("  Trying absolute path: {s}", .{abs_path});
             const font_abs = c.ttf.TTF_OpenFont(abs_path.ptr, size);
+            log.info("  Absolute path result: {*}", .{font_abs});
+            
             if (font_abs == null) {
-                log.err("Failed with absolute path too: {s}", .{c.sdl.SDL_GetError()});
+                log.err("  Failed with absolute path too: {s}", .{c.sdl.SDL_GetError()});
                 return error.FontLoadFailed;
             }
             const handle_abs = FontHandle{
@@ -250,8 +268,11 @@ pub const FontManager = struct {
                 .size = size,
             };
             try self.loaded_fonts.put(try self.allocator.dupe(u8, key), handle_abs);
+            log.info("  ✓ Font loaded successfully with absolute path", .{});
             return handle_abs;
         }
+        
+        log.info("  ✓ Font loaded successfully with relative path", .{});
         
         const handle = FontHandle{
             .font = font.?,
@@ -271,18 +292,31 @@ pub const FontManager = struct {
         size: f32,
         color: types.Color,
     ) !*c.ttf.TTF_Text {
+        log.info("=== RENDER TEXT ===", .{});
+        log.info("  Text: '{s}'", .{text});
+        log.info("  Category: {}, Size: {d}", .{ category, size });
+        
         const font_handle = try self.loadFont(category, size);
+        log.info("  Font handle obtained: {*}", .{font_handle.font});
         
         if (self.text_engine == null) {
+            log.info("  Text engine is null, creating...", .{});
             try self.createTextEngine();
+        } else {
+            log.info("  Using existing text engine: {*}", .{self.text_engine});
         }
         
         // Create text with the loaded font
+        log.info("  Creating text object...", .{});
         const text_obj = c.ttf.TTF_CreateText(self.text_engine, font_handle.font, text.ptr, @intCast(text.len));
+        log.info("  TTF_CreateText returned: {*}", .{text_obj});
+        
         if (text_obj == null) {
-            log.err("Failed to create text: {s}", .{c.sdl.SDL_GetError()});
+            log.err("  Failed to create text: {s}", .{c.sdl.SDL_GetError()});
             return error.TextCreationFailed;
         }
+        
+        log.info("  ✓ Text object created successfully", .{});
         
         // Set text color (convert u8 to float 0-1 range)
         const r = @as(f32, @floatFromInt(color.r)) / 255.0;
