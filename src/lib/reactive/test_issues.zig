@@ -1,6 +1,6 @@
 const std = @import("std");
 const signal_mod = @import("signal.zig");
-const computed_mod = @import("computed.zig");
+const derived_mod = @import("derived.zig");
 const effect_mod = @import("effect.zig");
 const context_mod = @import("context.zig");
 const batch_mod = @import("batch.zig");
@@ -88,8 +88,8 @@ test "issue: batching runs effects multiple times" {
     try counter.expect(1); // Currently fails with 2
 }
 
-// Issue 2: Computed values might notify even when value doesn't change
-test "issue: computed notifies without value change" {
+// Issue 2: Derived values might notify even when value doesn't change
+test "issue: derived notifies without value change" {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
@@ -98,26 +98,26 @@ test "issue: computed notifies without value change" {
     defer context_mod.deinitContext(allocator);
     
     var effect_counter = CallCounter{ .name = "effect" };
-    var compute_counter = CallCounter{ .name = "compute" };
+    var derive_counter = CallCounter{ .name = "derive" };
     
     var source = try signal_mod.Signal(i32).init(allocator, 10);
     defer source.deinit();
     
     const TestData = struct {
         var src: *signal_mod.Signal(i32) = undefined;
-        var comp: *computed_mod.Computed(bool) = undefined;
-        var compute_count: *CallCounter = undefined;
+        var derived_val: *derived_mod.Derived(bool) = undefined;
+        var derive_count: *CallCounter = undefined;
         var effect_count: *CallCounter = undefined;
     };
     
     TestData.src = &source;
-    TestData.compute_count = &compute_counter;
+    TestData.derive_count = &derive_counter;
     TestData.effect_count = &effect_counter;
     
-    // Computed that returns same value for different inputs
-    var is_positive = try computed_mod.computed(allocator, bool, struct {
+    // Derived that returns same value for different inputs
+    var is_positive = try derived_mod.derived(allocator, bool, struct {
         fn compute() bool {
-            TestData.compute_count.call();
+            TestData.derive_count.call();
             return TestData.src.get() > 0;
         }
     }.compute);
@@ -125,36 +125,36 @@ test "issue: computed notifies without value change" {
         is_positive.deinit();
         allocator.destroy(is_positive);
     }
-    TestData.comp = is_positive;
+    TestData.derived_val = is_positive;
     
-    // Effect that depends on computed
+    // Effect that depends on derived
     const eff = try effect_mod.createEffect(allocator, struct {
         fn run() void {
-            _ = TestData.comp.get();
+            _ = TestData.derived_val.get();
             TestData.effect_count.call();
         }
     }.run);
     defer allocator.destroy(eff);
     
-    std.debug.print("\n=== Computed Notification Issue Test ===\n", .{});
+    std.debug.print("\n=== Derived Notification Issue Test ===\n", .{});
     
     // Initial state
-    try compute_counter.expect(1);
+    try derive_counter.expect(1);
     try effect_counter.expect(1);
     
-    compute_counter.reset();
+    derive_counter.reset();
     effect_counter.reset();
     
-    // Change source from 10 to 20 (both positive, so computed value stays true)
+    // Change source from 10 to 20 (both positive, so derived value stays true)
     std.debug.print("Changing source from 10 to 20 (both positive)...\n", .{});
     source.set(20);
     
-    // Computed should recompute
+    // Derived should recompute
     _ = is_positive.get();
-    try compute_counter.expect(1);
+    try derive_counter.expect(1);
     
-    // ISSUE: Effect might run even though computed value didn't change (true -> true)
-    // Ideally, effect should not run if computed value stays the same
+    // ISSUE: Effect might run even though derived value didn't change (true -> true)
+    // Ideally, effect should not run if derived value stays the same
     std.debug.print("Effect ran {} times (should be 0 since value didn't change)\n", .{effect_counter.count});
 }
 
@@ -176,15 +176,15 @@ test "issue: diamond dependency double update" {
     //    effect
     
     var effect_counter = CallCounter{ .name = "effect" };
-    var sum_counter = CallCounter{ .name = "sum_compute" };
+    var sum_counter = CallCounter{ .name = "sum_derive" };
     
     var source = try signal_mod.Signal(i32).init(allocator, 1);
     defer source.deinit();
     
     const TestData = struct {
         var src: *signal_mod.Signal(i32) = undefined;
-        var left: *computed_mod.Computed(i32) = undefined;
-        var right: *computed_mod.Computed(i32) = undefined;
+        var left: *derived_mod.Derived(i32) = undefined;
+        var right: *derived_mod.Derived(i32) = undefined;
         var sum_count: *CallCounter = undefined;
         var effect_count: *CallCounter = undefined;
     };
@@ -194,7 +194,7 @@ test "issue: diamond dependency double update" {
     TestData.effect_count = &effect_counter;
     
     // Left branch
-    var left = try computed_mod.computed(allocator, i32, struct {
+    var left = try derived_mod.derived(allocator, i32, struct {
         fn compute() i32 {
             return TestData.src.get() * 2;
         }
@@ -206,7 +206,7 @@ test "issue: diamond dependency double update" {
     TestData.left = left;
     
     // Right branch
-    var right = try computed_mod.computed(allocator, i32, struct {
+    var right = try derived_mod.derived(allocator, i32, struct {
         fn compute() i32 {
             return TestData.src.get() * 3;
         }
@@ -218,7 +218,7 @@ test "issue: diamond dependency double update" {
     TestData.right = right;
     
     // Sum depends on both branches
-    var sum = try computed_mod.computed(allocator, i32, struct {
+    var sum = try derived_mod.derived(allocator, i32, struct {
         fn compute() i32 {
             TestData.sum_count.call();
             return TestData.left.get() + TestData.right.get();
@@ -230,7 +230,7 @@ test "issue: diamond dependency double update" {
     }
     
     const TestDataSum = struct {
-        var sum_ref: *computed_mod.Computed(i32) = undefined;
+        var sum_ref: *derived_mod.Derived(i32) = undefined;
     };
     TestDataSum.sum_ref = sum;
     
@@ -263,8 +263,8 @@ test "issue: diamond dependency double update" {
     // Access sum to trigger computation
     _ = sum.get();
     
-    // ISSUE: Sum might compute twice (once when left updates, once when right updates)
-    std.debug.print("Sum computed {} times (should be 1)\n", .{sum_counter.count});
+    // ISSUE: Sum might derive twice (once when left updates, once when right updates)
+    std.debug.print("Sum derived {} times (should be 1)\n", .{sum_counter.count});
     std.debug.print("Effect ran {} times (should be 1)\n", .{effect_counter.count});
     
     // Even if we don't have double computation, we might have double notification
@@ -330,8 +330,8 @@ test "issue: no way to read without tracking" {
     try effect_counter.expect(0);
 }
 
-// Issue 5: Excessive recomputation in chains
-test "issue: computed chains might recompute unnecessarily" {
+// Issue 5: Excessive re-derivation in chains
+test "issue: derived chains might recompute unnecessarily" {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
@@ -339,29 +339,29 @@ test "issue: computed chains might recompute unnecessarily" {
     try context_mod.initContext(allocator);
     defer context_mod.deinitContext(allocator);
     
-    var a_computes: u32 = 0;
-    var b_computes: u32 = 0;
-    var c_computes: u32 = 0;
+    var a_derives: u32 = 0;
+    var b_derives: u32 = 0;
+    var c_derives: u32 = 0;
     
     var source = try signal_mod.Signal(i32).init(allocator, 1);
     defer source.deinit();
     
     const TestData = struct {
         var src: *signal_mod.Signal(i32) = undefined;
-        var a: *computed_mod.Computed(i32) = undefined;
-        var b: *computed_mod.Computed(i32) = undefined;
+        var a: *derived_mod.Derived(i32) = undefined;
+        var b: *derived_mod.Derived(i32) = undefined;
         var a_count: *u32 = undefined;
         var b_count: *u32 = undefined;
         var c_count: *u32 = undefined;
     };
     
     TestData.src = &source;
-    TestData.a_count = &a_computes;
-    TestData.b_count = &b_computes;
-    TestData.c_count = &c_computes;
+    TestData.a_count = &a_derives;
+    TestData.b_count = &b_derives;
+    TestData.c_count = &c_derives;
     
     // Chain: source -> a -> b -> c
-    var a = try computed_mod.computed(allocator, i32, struct {
+    var a = try derived_mod.derived(allocator, i32, struct {
         fn compute() i32 {
             TestData.a_count.* += 1;
             return TestData.src.get() * 2;
@@ -373,7 +373,7 @@ test "issue: computed chains might recompute unnecessarily" {
     }
     TestData.a = a;
     
-    var b = try computed_mod.computed(allocator, i32, struct {
+    var b = try derived_mod.derived(allocator, i32, struct {
         fn compute() i32 {
             TestData.b_count.* += 1;
             return TestData.a.get() + 10;
@@ -385,7 +385,7 @@ test "issue: computed chains might recompute unnecessarily" {
     }
     TestData.b = b;
     
-    var c = try computed_mod.computed(allocator, i32, struct {
+    var c = try derived_mod.derived(allocator, i32, struct {
         fn compute() i32 {
             TestData.c_count.* += 1;
             return TestData.b.get() * 3;
@@ -396,16 +396,16 @@ test "issue: computed chains might recompute unnecessarily" {
         allocator.destroy(c);
     }
     
-    std.debug.print("\n=== Computed Chain Recomputation Test ===\n", .{});
+    std.debug.print("\n=== Derived Chain Recomputation Test ===\n", .{});
     
     // Initial computation
     _ = c.get();
-    std.debug.print("Initial: a={}, b={}, c={} computes\n", .{ a_computes, b_computes, c_computes });
+    std.debug.print("Initial: a={}, b={}, c={} derives\n", .{ a_derives, b_derives, c_derives });
     
     // Reset
-    a_computes = 0;
-    b_computes = 0;
-    c_computes = 0;
+    a_derives = 0;
+    b_derives = 0;
+    c_derives = 0;
     
     // Change source
     source.set(2);
@@ -413,10 +413,10 @@ test "issue: computed chains might recompute unnecessarily" {
     // Access only c
     _ = c.get();
     
-    std.debug.print("After change: a={}, b={}, c={} computes\n", .{ a_computes, b_computes, c_computes });
+    std.debug.print("After change: a={}, b={}, c={} derives\n", .{ a_derives, b_derives, c_derives });
     
-    // Each should compute exactly once
-    try std.testing.expect(a_computes == 1);
-    try std.testing.expect(b_computes == 1);
-    try std.testing.expect(c_computes == 1);
+    // Each should derive exactly once
+    try std.testing.expect(a_derives == 1);
+    try std.testing.expect(b_derives == 1);
+    try std.testing.expect(c_derives == 1);
 }

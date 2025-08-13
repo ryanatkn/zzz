@@ -6,7 +6,7 @@ const rendering_modes = @import("../rendering_modes.zig");
 const ReactiveComponent = @import("../reactive/component.zig").ReactiveComponent;
 const createComponent = @import("../reactive/component.zig").createComponent;
 const signal = @import("../reactive/signal.zig");
-const computed = @import("../reactive/computed.zig");
+const derived = @import("../reactive/derived.zig");
 
 const Vec2 = types.Vec2;
 const Color = types.Color;
@@ -416,7 +416,7 @@ pub const DebugOverlayPresets = struct {
         pub const position = Vec2{ .x = 10.0, .y = 50.0 };
         pub const font_size = 20.0;
         pub const line_height = 25.0;
-        pub const color = Color{ .r = 100, .g = 255, .g = 100, .a = 255 };
+        pub const color = Color{ .r = 100, .g = 255, .b = 100, .a = 255 };
         pub const background_color = Color{ .r = 0, .g = 0, .b = 0, .a = 180 };
         pub const max_values = 8;
         pub const update_interval_ms = 250;

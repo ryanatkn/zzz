@@ -1,6 +1,6 @@
 const std = @import("std");
 const signal = @import("signal.zig");
-const computed = @import("computed.zig");
+const derived = @import("derived.zig");
 const effect = @import("effect.zig");
 
 /// Reactive text cache to avoid re-rendering identical text content
@@ -14,8 +14,8 @@ pub const ReactiveTextCache = struct {
     hit_count: *signal.Signal(u64),
     miss_count: *signal.Signal(u64),
     
-    // Computed cache statistics
-    hit_ratio: *computed.Computed(f32),
+    // Derived cache statistics
+    hit_ratio: *derived.Derived(f32),
     
     const Self = @This();
     
@@ -49,19 +49,19 @@ pub const ReactiveTextCache = struct {
             .hit_ratio = undefined, // Set below
         };
         
-        // Create computed hit ratio
-        self.hit_ratio = try self.createHitRatioComputed();
+        // Create derived hit ratio
+        self.hit_ratio = try self.createHitRatioDerived();
         
         return self;
     }
     
-    fn createHitRatioComputed(self: *Self) !*computed.Computed(f32) {
+    fn createHitRatioDerived(self: *Self) !*derived.Derived(f32) {
         const SelfRef = struct {
             var cache_ref: *ReactiveTextCache = undefined;
         };
         SelfRef.cache_ref = self;
         
-        return try computed.computed(self.allocator, f32, struct {
+        return try derived.derived(self.allocator, f32, struct {
             fn compute() f32 {
                 const cache = SelfRef.cache_ref;
                 const hits = cache.hit_count.get();
@@ -196,7 +196,7 @@ pub const ReactiveTextCache = struct {
     }
     
     pub fn deinit(self: *Self) void {
-        // Clean up computed values
+        // Clean up derived values
         self.hit_ratio.deinit();
         self.allocator.destroy(self.hit_ratio);
         

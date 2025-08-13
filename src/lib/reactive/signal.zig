@@ -132,6 +132,12 @@ pub fn Signal(comptime T: type) type {
             self.is_dirty = false;
         }
         
+        /// Create a snapshot of the current value ($state.snapshot)
+        /// For deeply reactive state, this creates a non-reactive copy
+        pub fn snapshot(self: *const Self) T {
+            return self.value;
+        }
+        
         /// Create a computed signal that derives from this one
         /// TODO: This should use the new Computed type for proper lazy evaluation
         pub fn map(self: *Self, allocator: std.mem.Allocator, comptime U: type, map_fn: *const fn (T) U) !Signal(U) {
@@ -145,11 +151,64 @@ pub fn Signal(comptime T: type) type {
     };
 }
 
+/// A non-reactive signal that holds a value but doesn't notify observers ($state.raw)
+/// Inspired by Svelte 5's $state.raw for performance optimization
+pub fn SignalRaw(comptime T: type) type {
+    return struct {
+        const Self = @This();
+        
+        // Core state (no observers or reactivity)
+        value: T,
+        allocator: std.mem.Allocator,
+        
+        pub fn init(allocator: std.mem.Allocator, initial_value: T) !Self {
+            return Self{
+                .value = initial_value,
+                .allocator = allocator,
+            };
+        }
+        
+        pub fn deinit(self: *Self) void {
+            _ = self; // No cleanup needed for raw signals
+        }
+        
+        /// Get the current value (never tracks dependencies)
+        pub fn get(self: *const Self) T {
+            return self.value;
+        }
+        
+        /// Alias for get (consistent with reactive signals)
+        pub fn peek(self: *const Self) T {
+            return self.value;
+        }
+        
+        /// Set a new value (no notifications)
+        pub fn set(self: *Self, new_value: T) void {
+            self.value = new_value;
+        }
+        
+        /// Update value through a function (no notifications)
+        pub fn update(self: *Self, update_fn: *const fn (T) T) void {
+            self.value = update_fn(self.value);
+        }
+        
+        /// Create a snapshot of the current value
+        pub fn snapshot(self: *const Self) T {
+            return self.value;
+        }
+    };
+}
+
 // Effect creation has been moved to effect.zig with proper dependency tracking
 
 /// Utility function to create a signal with initial value
 pub fn signal(allocator: std.mem.Allocator, comptime T: type, initial_value: T) !Signal(T) {
     return try Signal(T).init(allocator, initial_value);
+}
+
+/// Utility function to create a raw (non-reactive) signal with initial value ($state.raw)
+pub fn signalRaw(allocator: std.mem.Allocator, comptime T: type, initial_value: T) !SignalRaw(T) {
+    return try SignalRaw(T).init(allocator, initial_value);
 }
 
 /// Batch multiple signal updates to prevent cascading effects
@@ -224,4 +283,72 @@ test "signal automatic dependency tracking" {
     
     source.set(30);
     try std.testing.expect(test_observer.notify_count == 2);
+}
+
+test "raw signal basic operations" {
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    defer _ = gpa.deinit();
+    const allocator = gpa.allocator();
+    
+    var count = try signalRaw(allocator, u32, 42);
+    defer count.deinit();
+    
+    // Basic operations
+    try std.testing.expect(count.get() == 42);
+    try std.testing.expect(count.peek() == 42);
+    try std.testing.expect(count.snapshot() == 42);
+    
+    // Set new value
+    count.set(100);
+    try std.testing.expect(count.get() == 100);
+    
+    // Update through function
+    count.update(struct {
+        fn double(val: u32) u32 {
+            return val * 2;
+        }
+    }.double);
+    try std.testing.expect(count.get() == 200);
+}
+
+test "raw signal non-reactive behavior" {
+    var gpa = std.heap.GeneralPurposeAllocator(.{}){};
+    defer _ = gpa.deinit();
+    const allocator = gpa.allocator();
+    
+    try context.initContext(allocator);
+    defer context.deinitContext(allocator);
+    
+    var raw_signal = try signalRaw(allocator, i32, 5);
+    defer raw_signal.deinit();
+    
+    var effect_runs: u32 = 0;
+    
+    // Create an effect that reads the raw signal
+    const effect_mod = @import("effect.zig");
+    const TestData = struct {
+        var raw_ref: *SignalRaw(i32) = undefined;
+        var runs: *u32 = undefined;
+    };
+    
+    TestData.raw_ref = &raw_signal;
+    TestData.runs = &effect_runs;
+    
+    const test_effect = try effect_mod.createEffect(allocator, struct {
+        fn run() void {
+            _ = TestData.raw_ref.get(); // This should NOT create a dependency
+            TestData.runs.* += 1;
+        }
+    }.run);
+    defer allocator.destroy(test_effect);
+    
+    // Initial run
+    try std.testing.expect(effect_runs == 1);
+    
+    // Change raw signal - effect should NOT run again
+    raw_signal.set(10);
+    try std.testing.expect(effect_runs == 1); // Still 1, not reactive!
+    
+    raw_signal.set(15);
+    try std.testing.expect(effect_runs == 1); // Still 1, confirmed non-reactive
 }

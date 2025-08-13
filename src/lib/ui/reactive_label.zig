@@ -6,7 +6,7 @@ const rendering_modes = @import("../rendering_modes.zig");
 const ReactiveComponent = @import("../reactive/component.zig").ReactiveComponent;
 const createComponent = @import("../reactive/component.zig").createComponent;
 const signal = @import("../reactive/signal.zig");
-const computed = @import("../reactive/computed.zig");
+const derived = @import("../reactive/derived.zig");
 const effect = @import("../reactive/effect.zig");
 
 const Vec2 = types.Vec2;
@@ -67,8 +67,8 @@ pub const TextContent = union(enum) {
     /// Dynamic text from a reactive signal
     signal: *signal.Signal([]const u8),
     
-    /// Computed text from reactive dependencies
-    computed: *computed.Computed([]const u8),
+    /// Derived text from reactive dependencies
+    derived: *derived.Derived([]const u8),
     
     /// Text formatted from multiple values
     formatted: FormattedText,
@@ -95,7 +95,7 @@ pub const TextContent = union(enum) {
         return switch (self.*) {
             .static => 0.0, // Never changes
             .signal => 5.0, // Moderate changes
-            .computed => 2.0, // Occasional changes
+            .derived => 2.0, // Occasional changes
             .formatted => |fmt| {
                 // Estimate based on number of dynamic values
                 var dynamic_count: f32 = 0;
@@ -123,8 +123,8 @@ pub const ReactiveLabelData = struct {
     needs_update: *signal.Signal(bool),
     last_text: *signal.Signal([]const u8),
     
-    // Computed values
-    current_text: *computed.Computed([]const u8),
+    // Derived values
+    current_text: *derived.Derived([]const u8),
     rendering_mode: rendering_modes.RenderingMode,
     
     // Cache for text allocation
@@ -165,8 +165,8 @@ pub const ReactiveLabelData = struct {
             .cached_text = null,
         };
         
-        // Create computed text value
-        self.current_text = try self.createCurrentTextComputed();
+        // Create derived text value
+        self.current_text = try self.createCurrentTextDerived();
         
         const log = std.log.scoped(.reactive_label);
         log.info("Created reactive label with {s} mode (changes: {d:.2}/sec)", .{
@@ -177,13 +177,13 @@ pub const ReactiveLabelData = struct {
         return self;
     }
     
-    fn createCurrentTextComputed(self: *Self) !*computed.Computed([]const u8) {
+    fn createCurrentTextDerived(self: *Self) !*derived.Derived([]const u8) {
         const SelfRef = struct {
             var label_ref: *ReactiveLabelData = undefined;
         };
         SelfRef.label_ref = self;
         
-        return try computed.computed(self.allocator, []const u8, struct {
+        return try derived.derived(self.allocator, []const u8, struct {
             fn compute() []const u8 {
                 const label = SelfRef.label_ref;
                 return label.computeText() catch "Error";
@@ -201,7 +201,7 @@ pub const ReactiveLabelData = struct {
         const text = switch (self.content) {
             .static => |static_text| try self.allocator.dupe(u8, static_text),
             .signal => |text_signal| try self.allocator.dupe(u8, text_signal.get()),
-            .computed => |text_computed| try self.allocator.dupe(u8, text_computed.get()),
+            .derived => |text_derived| try self.allocator.dupe(u8, text_derived.get()),
             .formatted => |fmt| try self.formatText(fmt),
         };
         
@@ -338,7 +338,7 @@ pub const ReactiveLabelData = struct {
             self.allocator.free(text);
         }
         
-        // Clean up computed value
+        // Clean up derived value
         self.current_text.deinit();
         self.allocator.destroy(self.current_text);
         
@@ -469,12 +469,12 @@ pub fn createSignalLabel(allocator: std.mem.Allocator, text_signal: *signal.Sign
     );
 }
 
-pub fn createComputedLabel(allocator: std.mem.Allocator, text_computed: *computed.Computed([]const u8), position: Vec2, style: LabelStyle) !ReactiveLabel {
+pub fn createDerivedLabel(allocator: std.mem.Allocator, text_derived: *derived.Derived([]const u8), position: Vec2, style: LabelStyle) !ReactiveLabel {
     return ReactiveLabel.init(
         allocator,
         position,
         style,
-        TextContent{ .computed = text_computed }
+        TextContent{ .derived = text_derived }
     );
 }
 
@@ -532,8 +532,8 @@ pub const PerformanceAnalysis = struct {
     /// - Good cache hit rate for stable content
     pub const signal_label_recommendation = rendering_modes.recommendModeByRate(5.0);
     
-    /// Computed labels depend on their dependencies:
+    /// Derived labels depend on their dependencies:
     /// - Change frequency varies based on inputs
     /// - System automatically selects appropriate mode
-    pub const computed_label_recommendation = rendering_modes.recommendModeByRate(2.0);
+    pub const derived_label_recommendation = rendering_modes.recommendModeByRate(2.0);
 };

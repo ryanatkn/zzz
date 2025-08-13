@@ -7,7 +7,7 @@ const reactive_time = @import("../reactive/time.zig");
 const ReactiveComponent = @import("../reactive/component.zig").ReactiveComponent;
 const createComponent = @import("../reactive/component.zig").createComponent;
 const signal = @import("../reactive/signal.zig");
-const computed = @import("../reactive/computed.zig");
+const derived = @import("../reactive/derived.zig");
 
 const Vec2 = types.Vec2;
 const Color = types.Color;
@@ -25,9 +25,9 @@ pub const FPSCounterData = struct {
     is_visible: *signal.Signal(bool),
     last_update_time: *signal.Signal(u64),
     
-    // Computed values
-    fps_text: *computed.Computed([]const u8),
-    should_update: *computed.Computed(bool),
+    // Derived values
+    fps_text: *derived.Derived([]const u8),
+    should_update: *derived.Derived(bool),
     
     // Configuration
     update_interval_ms: u64, // How often to check for FPS updates
@@ -64,20 +64,20 @@ pub const FPSCounterData = struct {
             .update_interval_ms = update_interval_ms,
         };
         
-        // Create computed values
-        self.fps_text = try self.createFPSTextComputed();
-        self.should_update = try self.createShouldUpdateComputed();
+        // Create derived values
+        self.fps_text = try self.createFPSTextDerived();
+        self.should_update = try self.createShouldUpdateDerived();
         
         return self;
     }
     
-    fn createFPSTextComputed(self: *Self) !*computed.Computed([]const u8) {
+    fn createFPSTextDerived(self: *Self) !*derived.Derived([]const u8) {
         const SelfRef = struct {
             var counter_ref: *FPSCounterData = undefined;
         };
         SelfRef.counter_ref = self;
         
-        return try computed.computed(self.allocator, []const u8, struct {
+        return try derived.derived(self.allocator, []const u8, struct {
             fn compute() []const u8 {
                 const counter = SelfRef.counter_ref;
                 const fps = counter.current_fps.get();
@@ -89,13 +89,13 @@ pub const FPSCounterData = struct {
         }.compute);
     }
     
-    fn createShouldUpdateComputed(self: *Self) !*computed.Computed(bool) {
+    fn createShouldUpdateDerived(self: *Self) !*derived.Derived(bool) {
         const SelfRef = struct {
             var counter_ref: *FPSCounterData = undefined;
         };
         SelfRef.counter_ref = self;
         
-        return try computed.computed(self.allocator, bool, struct {
+        return try derived.derived(self.allocator, bool, struct {
             fn compute() bool {
                 const counter = SelfRef.counter_ref;
                 const current_time = @as(u64, @intCast(std.time.milliTimestamp()));
@@ -157,7 +157,7 @@ pub const FPSCounterData = struct {
     }
     
     pub fn deinit(self: *Self) void {
-        // Clean up computed values
+        // Clean up derived values
         self.fps_text.deinit();
         self.allocator.destroy(self.fps_text);
         self.should_update.deinit();

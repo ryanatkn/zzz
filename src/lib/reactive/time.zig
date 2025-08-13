@@ -1,6 +1,6 @@
 const std = @import("std");
 const signal = @import("signal.zig");
-const computed = @import("computed.zig");
+const derived = @import("derived.zig");
 const effect = @import("effect.zig");
 const c = @import("../c.zig");
 
@@ -19,10 +19,10 @@ pub const Time = struct {
     now_seconds: *signal.Signal(u64),      // Current time in seconds
     frame_count: *signal.Signal(u64),      // Total frames since start
     
-    // Cached computed values at different granularities
-    fps: *computed.Computed(u32),          // FPS computed once per second
-    frame_time_ms: *computed.Computed(f32), // Average frame time
-    uptime_seconds: *computed.Computed(u64), // Time since start
+    // Cached derived values at different granularities
+    fps: *derived.Derived(u32),          // FPS derived once per second
+    frame_time_ms: *derived.Derived(f32), // Average frame time
+    uptime_seconds: *derived.Derived(u64), // Time since start
     
     // Configuration
     update_interval_ms: u32,
@@ -75,21 +75,21 @@ pub const Time = struct {
             .performance_frequency = frequency,
         };
         
-        // Create computed values with caching
-        self.fps = try self.createFPSComputed();
-        self.frame_time_ms = try self.createFrameTimeComputed();
-        self.uptime_seconds = try self.createUptimeComputed();
+        // Create derived values with caching
+        self.fps = try self.createFPSDerived();
+        self.frame_time_ms = try self.createFrameTimeDerived();
+        self.uptime_seconds = try self.createUptimeDerived();
         
         return self;
     }
     
-    fn createFPSComputed(self: *Time) !*computed.Computed(u32) {
+    fn createFPSDerived(self: *Time) !*derived.Derived(u32) {
         const TimeRef = struct {
             var time_ref: *Time = undefined;
         };
         TimeRef.time_ref = self;
         
-        return try computed.computed(self.allocator, u32, struct {
+        return try derived.derived(self.allocator, u32, struct {
             fn compute() u32 {
                 const time = TimeRef.time_ref;
                 
@@ -125,13 +125,13 @@ pub const Time = struct {
         }.compute);
     }
     
-    fn createFrameTimeComputed(self: *Time) !*computed.Computed(f32) {
+    fn createFrameTimeDerived(self: *Time) !*derived.Derived(f32) {
         const TimeRef = struct {
             var time_ref: *Time = undefined;
         };
         TimeRef.time_ref = self;
         
-        return try computed.computed(self.allocator, f32, struct {
+        return try derived.derived(self.allocator, f32, struct {
             fn compute() f32 {
                 const time = TimeRef.time_ref;
                 const fps = time.fps.get(); // Depend on FPS computation
@@ -141,13 +141,13 @@ pub const Time = struct {
         }.compute);
     }
     
-    fn createUptimeComputed(self: *Time) !*computed.Computed(u64) {
+    fn createUptimeDerived(self: *Time) !*derived.Derived(u64) {
         const TimeRef = struct {
             var time_ref: *Time = undefined;
         };
         TimeRef.time_ref = self;
         
-        return try computed.computed(self.allocator, u64, struct {
+        return try derived.derived(self.allocator, u64, struct {
             fn compute() u64 {
                 const time = TimeRef.time_ref;
                 return time.now_seconds.get(); // Simple passthrough with caching
@@ -207,7 +207,7 @@ pub const Time = struct {
         self.frame_count.deinit();
         self.allocator.destroy(self.frame_count);
         
-        // Clean up computed values
+        // Clean up derived values
         self.fps.deinit();
         self.allocator.destroy(self.fps);
         self.frame_time_ms.deinit();

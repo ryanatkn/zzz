@@ -1,6 +1,6 @@
 const std = @import("std");
 const signal = @import("signal.zig");
-const computed = @import("computed.zig");
+const derived = @import("derived.zig");
 const effect = @import("effect.zig");
 const context = @import("context.zig");
 const batch = @import("batch.zig");

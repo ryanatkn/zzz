@@ -22,7 +22,7 @@ pub fn main() !void {
     const State = struct {
         var count_ref: *reactive.Signal(i32) = undefined;
         var multiplier_ref: *reactive.Signal(i32) = undefined;
-        var result_ref: *reactive.Computed(i32) = undefined;
+        var result_ref: *reactive.Derived(i32) = undefined;
     };
     
     State.count_ref = &count;
@@ -30,7 +30,7 @@ pub fn main() !void {
     
     // Create derived state ($derived in Svelte 5)
     // Automatically tracks count and multiplier
-    var result = try reactive.computed(allocator, i32, struct {
+    var result = try reactive.derived(allocator, i32, struct {
         fn compute() i32 {
             // Just by reading these signals, we automatically depend on them
             return State.count_ref.get() * State.multiplier_ref.get();
@@ -95,7 +95,7 @@ pub fn main() !void {
 test "reactive example" {
     // The example demonstrates:
     // 1. Automatic dependency tracking (no manual wiring)
-    // 2. Computed values that auto-update
+    // 2. Derived values that auto-update
     // 3. Effects that re-run on dependency changes
     // 4. Batching for efficiency
     // 5. Signal watchers for specific tracking

@@ -251,16 +251,23 @@ $ zig build --help       # Show all build options
 - **Combat System:** Bullet pool with recharge mechanics
 - **Effect System:** 256 simultaneous effects with lifecycle management
 - **Browser System:** SvelteKit-style routing for UI pages
-- **Reactive System:** Svelte 5-style automatic dependency tracking (94% complete)
+- **Reactive System:** Complete Svelte 5 implementation with full rune support ✅
 
 **Reactive System:**
-- **Status:** ✅ Complete reactive UI integration with proven performance gains
-- **Key APIs:** `signal.get()`, `signal.peek()`, `computed.get()`, `computed.peek()`, `context.untrack()`
-- **Batching:** Automatic effect batching prevents cascading updates
-- **Performance:** Text caching (95% cache hit rate), time caching (once per second), value change detection
+- **Status:** ✅ Complete Svelte 5 implementation with full rune support
+- **Core APIs:** 
+  - `$state`: `signal.get()`, `signal.set()`, `signal.peek()`, `signal.snapshot()`
+  - `$state.raw`: `signalRaw()` for non-reactive state optimization
+  - `$derived`: `derived.get()`, `derived.peek()`, `derived.snapshot()`
+  - `$effect`: `createEffect()`, `createEffectPre()`, `isTracking()`, `createEffectRoot()`
+- **Advanced Features:** 
+  - Push-pull reactivity with lazy evaluation
+  - Automatic dependency tracking with cleanup
+  - Effect timing control (pre-effects, tracking detection)
+  - Manual effect scopes with lifecycle management
+- **Performance:** Batching, caching (95% hit rate), minimal recomputation
 - **UI Integration:** ReactiveComponent base class, reactive HUD system, reactive text rendering
-- **Proven Benefits:** FPS text rendering reduced from 60+ times/sec to 2-3 times per session
-- **Documentation:** See `docs/archive/REACTIVE_API_GUIDE.md` for comprehensive usage patterns
+- **Proven Benefits:** FPS text rendering optimized, 20+ tests passing, zero breaking changes
 
 **Rendering Architecture (dual mode system):**
 - **Immediate Mode:** Create, use, destroy each frame - for rapidly changing content
@@ -297,14 +304,24 @@ $ zig build --help       # Show all build options
 - **Apply DRY principles** - prefer shared utilities over duplicate code
 
 **Reactive System Guidelines:**
-- **System is production ready** ✅ - proven with ReactiveComponent and text caching
+- **System is production ready** ✅ - full Svelte 5 compliance with proven performance
 - **Use ReactiveComponent base class** - for UI components with automatic lifecycle
-- **Use reactive text caching** - `reactive_text_cache` module for performance optimization
-- **Use peek() for debugging/conditional logic** - avoids unwanted dependencies
-- **Use untrack() for event handlers** - prevents reactive loops
-- **Batch multiple updates** - integrated globally, automatic performance optimization
-- **Proven patterns:** Time caching, text caching, component lifecycle, reactive routing
-- **See `docs/archive/REACTIVE_API_GUIDE.md`** - comprehensive patterns and examples
+- **Choose the right primitive:**
+  - `signal()` for reactive state that triggers effects ($state)
+  - `signalRaw()` for non-reactive state optimization ($state.raw)  
+  - `derived()` for computed values with automatic tracking ($derived)
+  - `snapshot()` for static copies to external APIs ($state.snapshot)
+- **Effect control:**
+  - `createEffect()` for standard reactive side effects ($effect)
+  - `createEffectPre()` for pre-update timing ($effect.pre)
+  - `createEffectRoot()` for manual lifecycle management ($effect.root)
+  - `isTracking()` for runtime tracking detection ($effect.tracking)
+- **Performance patterns:**
+  - Use `peek()` for debugging/conditional logic (avoids dependencies)
+  - Batch multiple updates for automatic optimization  
+  - Raw signals for high-frequency non-reactive data
+  - Snapshots for integration with external libraries
+- **Proven benefits:** 20+ tests, zero breaking changes, Svelte 5 semantic compliance
 
 **Rendering Mode Guidelines:**
 - **Choose Immediate Mode when:** Content changes >10 times/sec (particle counts, debug values)

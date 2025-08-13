@@ -12,7 +12,7 @@ const ReactiveComponent = @import("../lib/reactive/component.zig").ReactiveCompo
 const createComponent = @import("../lib/reactive/component.zig").createComponent;
 const getComponentData = @import("../lib/reactive/component.zig").getComponentData;
 const signal = @import("../lib/reactive/signal.zig");
-const computed = @import("../lib/reactive/computed.zig");
+const derived = @import("../lib/reactive/derived.zig");
 const effect = @import("../lib/reactive/effect.zig");
 const batch = @import("../lib/reactive/batch.zig");
 
@@ -31,9 +31,9 @@ pub const ReactiveHudData = struct {
     hovered_link: *signal.Signal(?usize),
     needs_rerender: *signal.Signal(bool),
     
-    // Computed values
-    can_go_back: *computed.Computed(bool),
-    can_go_forward: *computed.Computed(bool),
+    // Derived values
+    can_go_back: *derived.Derived(bool),
+    can_go_forward: *derived.Derived(bool),
     
     // Cache for last rendered frame to avoid unnecessary work
     last_link_count: u32,
@@ -69,9 +69,9 @@ pub const ReactiveHudData = struct {
             .last_link_count = 0,
         };
         
-        // Create computed values
-        self.can_go_back = try self.createCanGoBackComputed();
-        self.can_go_forward = try self.createCanGoForwardComputed();
+        // Create derived values
+        self.can_go_back = try self.createCanGoBackDerived();
+        self.can_go_forward = try self.createCanGoForwardDerived();
         
         // Initialize font system
         const log = std.log.scoped(.reactive_hud);
@@ -85,13 +85,13 @@ pub const ReactiveHudData = struct {
         return self;
     }
     
-    fn createCanGoBackComputed(self: *Self) !*computed.Computed(bool) {
+    fn createCanGoBackDerived(self: *Self) !*derived.Derived(bool) {
         const SelfRef = struct {
             var hud_ref: *ReactiveHudData = undefined;
         };
         SelfRef.hud_ref = self;
         
-        return try computed.computed(self.allocator, bool, struct {
+        return try derived.derived(self.allocator, bool, struct {
             fn compute() bool {
                 const hud = SelfRef.hud_ref;
                 // Track dependency on current_path to recompute when navigation changes
@@ -101,13 +101,13 @@ pub const ReactiveHudData = struct {
         }.compute);
     }
     
-    fn createCanGoForwardComputed(self: *Self) !*computed.Computed(bool) {
+    fn createCanGoForwardDerived(self: *Self) !*derived.Derived(bool) {
         const SelfRef = struct {
             var hud_ref: *ReactiveHudData = undefined;
         };
         SelfRef.hud_ref = self;
         
-        return try computed.computed(self.allocator, bool, struct {
+        return try derived.derived(self.allocator, bool, struct {
             fn compute() bool {
                 const hud = SelfRef.hud_ref;
                 // Track dependency on current_path to recompute when navigation changes
@@ -168,7 +168,7 @@ pub const ReactiveHudData = struct {
     }
     
     pub fn deinit(self: *Self) void {
-        // Clean up computed values
+        // Clean up derived values
         self.can_go_back.deinit();
         self.allocator.destroy(self.can_go_back);
         self.can_go_forward.deinit();

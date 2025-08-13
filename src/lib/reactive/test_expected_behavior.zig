@@ -1,6 +1,6 @@
 const std = @import("std");
 const signal_mod = @import("signal.zig");
-const computed_mod = @import("computed.zig");
+const derived_mod = @import("derived.zig");
 const effect_mod = @import("effect.zig");
 const context_mod = @import("context.zig");
 const batch_mod = @import("batch.zig");
@@ -8,7 +8,7 @@ const batch_mod = @import("batch.zig");
 // Recreate reactive interface locally
 const reactive = struct {
     pub const Signal = signal_mod.Signal;
-    pub const Computed = computed_mod.Computed;
+    pub const Derived = derived_mod.Derived;
     pub const Effect = effect_mod.Effect;
     
     pub fn init(allocator: std.mem.Allocator) !void {
@@ -25,8 +25,8 @@ const reactive = struct {
         return try Signal(T).init(allocator, initial_value);
     }
     
-    pub fn computed(allocator: std.mem.Allocator, comptime T: type, compute_fn: *const fn () T) !*Computed(T) {
-        return try computed_mod.computed(allocator, T, compute_fn);
+    pub fn derived(allocator: std.mem.Allocator, comptime T: type, compute_fn: *const fn () T) !*Derived(T) {
+        return try derived_mod.derived(allocator, T, compute_fn);
     }
     
     pub fn createEffect(allocator: std.mem.Allocator, effect_fn: *const fn () void) !*Effect {
@@ -143,8 +143,8 @@ test "no double notifications on signal change" {
     try counter.expectCount(1);
 }
 
-// Test 2: Computed values update lazily
-test "computed values are lazy" {
+// Test 2: Derived values update lazily
+test "derived values are lazy" {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
@@ -152,7 +152,7 @@ test "computed values are lazy" {
     try reactive.init(allocator);
     defer reactive.deinit(allocator);
     
-    var compute_count: u32 = 0;
+    var derive_count: u32 = 0;
     
     var source = try reactive.signal(allocator, i32, 10);
     defer source.deinit();
@@ -163,34 +163,34 @@ test "computed values are lazy" {
     };
     
     TestData.test_source = &source;
-    TestData.test_count = &compute_count;
+    TestData.test_count = &derive_count;
     
-    var computed = try reactive.computed(allocator, i32, struct {
+    var derived_value = try reactive.derived(allocator, i32, struct {
         fn compute() i32 {
             TestData.test_count.* += 1;
             return TestData.test_source.get() * 2;
         }
     }.compute);
     defer {
-        computed.deinit();
-        allocator.destroy(computed);
+        derived_value.deinit();
+        allocator.destroy(derived_value);
     }
     
     // Initial computation on creation
-    try std.testing.expect(compute_count == 1);
+    try std.testing.expect(derive_count == 1);
     
-    // Change source but don't access computed - should NOT recompute yet
+    // Change source but don't access derived - should NOT re-derive yet
     source.set(20);
-    try std.testing.expect(compute_count == 1); // Still 1, lazy!
+    try std.testing.expect(derive_count == 1); // Still 1, lazy!
     
-    // Now access it - should recompute
-    const value = computed.get();
+    // Now access it - should re-derive
+    const value = derived_value.get();
     try std.testing.expect(value == 40);
-    try std.testing.expect(compute_count == 2); // Now it computed
+    try std.testing.expect(derive_count == 2); // Now it derived
     
-    // Access again without changes - should NOT recompute
-    _ = computed.get();
-    try std.testing.expect(compute_count == 2); // Still 2, cached!
+    // Access again without changes - should NOT re-derive
+    _ = derived_value.get();
+    try std.testing.expect(derive_count == 2); // Still 2, cached!
 }
 
 // Test 3: Diamond dependency - shared dependency only triggers once
@@ -211,26 +211,26 @@ test "diamond dependency updates once" {
     var a = try reactive.signal(allocator, i32, 1);
     defer a.deinit();
     
-    var b_computes: u32 = 0;
-    var c_computes: u32 = 0;
-    var d_computes: u32 = 0;
+    var b_derives: u32 = 0;
+    var c_derives: u32 = 0;
+    var d_derives: u32 = 0;
     
     const TestData = struct {
         var a_ref: *signal_mod.Signal(i32) = undefined;
-        var b_ref: *computed_mod.Computed(i32) = undefined;
-        var c_ref: *computed_mod.Computed(i32) = undefined;
+        var b_ref: *derived_mod.Derived(i32) = undefined;
+        var c_ref: *derived_mod.Derived(i32) = undefined;
         var b_count: *u32 = undefined;
         var c_count: *u32 = undefined;
         var d_count: *u32 = undefined;
     };
     
     TestData.a_ref = &a;
-    TestData.b_count = &b_computes;
-    TestData.c_count = &c_computes;
-    TestData.d_count = &d_computes;
+    TestData.b_count = &b_derives;
+    TestData.c_count = &c_derives;
+    TestData.d_count = &d_derives;
     
     // B depends on A
-    var b = try reactive.computed(allocator, i32, struct {
+    var b = try reactive.derived(allocator, i32, struct {
         fn compute() i32 {
             TestData.b_count.* += 1;
             return TestData.a_ref.get() * 2;
@@ -243,7 +243,7 @@ test "diamond dependency updates once" {
     TestData.b_ref = b;
     
     // C depends on A
-    var c = try reactive.computed(allocator, i32, struct {
+    var c = try reactive.derived(allocator, i32, struct {
         fn compute() i32 {
             TestData.c_count.* += 1;
             return TestData.a_ref.get() * 3;
@@ -256,7 +256,7 @@ test "diamond dependency updates once" {
     TestData.c_ref = c;
     
     // D depends on both B and C
-    var d = try reactive.computed(allocator, i32, struct {
+    var d = try reactive.derived(allocator, i32, struct {
         fn compute() i32 {
             TestData.d_count.* += 1;
             return TestData.b_ref.get() + TestData.c_ref.get();
@@ -271,18 +271,18 @@ test "diamond dependency updates once" {
     try std.testing.expect(d.get() == 5); // (1*2) + (1*3) = 5
     
     // Reset counters
-    b_computes = 0;
-    c_computes = 0;
-    d_computes = 0;
+    b_derives = 0;
+    c_derives = 0;
+    d_derives = 0;
     
     // Change A
     a.set(2);
     
-    // D should compute only once, not twice
+    // D should derive only once, not twice
     try std.testing.expect(d.get() == 10); // (2*2) + (2*3) = 10
-    try std.testing.expect(b_computes == 1);
-    try std.testing.expect(c_computes == 1);
-    try std.testing.expect(d_computes == 1); // EXPECTED: 1 (currently might be 2)
+    try std.testing.expect(b_derives == 1);
+    try std.testing.expect(c_derives == 1);
+    try std.testing.expect(d_derives == 1); // EXPECTED: 1 (currently might be 2)
 }
 
 // Test 4: Batching prevents multiple updates
@@ -539,8 +539,8 @@ test "effect cleanup releases dependencies" {
     try std.testing.expect(effect_runs == 0);
 }
 
-// Test 9: Computed chains work correctly
-test "computed chain updates propagate" {
+// Test 9: Derived chains work correctly
+test "derived chain updates propagate" {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
@@ -554,13 +554,13 @@ test "computed chain updates propagate" {
     
     const TestData = struct {
         var a_ref: *signal_mod.Signal(i32) = undefined;
-        var b_ref: *computed_mod.Computed(i32) = undefined;
-        var c_ref: *computed_mod.Computed(i32) = undefined;
+        var b_ref: *derived_mod.Derived(i32) = undefined;
+        var c_ref: *derived_mod.Derived(i32) = undefined;
     };
     
     TestData.a_ref = &a;
     
-    var b = try reactive.computed(allocator, i32, struct {
+    var b = try reactive.derived(allocator, i32, struct {
         fn compute() i32 {
             return TestData.a_ref.get() * 2;
         }
@@ -571,7 +571,7 @@ test "computed chain updates propagate" {
     }
     TestData.b_ref = b;
     
-    var c = try reactive.computed(allocator, i32, struct {
+    var c = try reactive.derived(allocator, i32, struct {
         fn compute() i32 {
             return TestData.b_ref.get() + 10;
         }
@@ -582,7 +582,7 @@ test "computed chain updates propagate" {
     }
     TestData.c_ref = c;
     
-    var d = try reactive.computed(allocator, i32, struct {
+    var d = try reactive.derived(allocator, i32, struct {
         fn compute() i32 {
             return TestData.c_ref.get() * 3;
         }

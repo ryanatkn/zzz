@@ -3,45 +3,45 @@ const signal = @import("signal.zig");
 const context = @import("context.zig");
 const batch_mod = @import("batch.zig");
 
-/// A computed signal that automatically updates when its dependencies change
+/// A derived signal that automatically updates when its dependencies change
 /// Implements lazy evaluation with automatic dependency tracking (Svelte 5 $derived)
-pub fn Computed(comptime T: type) type {
+pub fn Derived(comptime T: type) type {
     return struct {
         const Self = @This();
         
-        // The underlying signal that holds our computed value
+        // The underlying signal that holds our derived value
         signal: signal.Signal(T),
         
-        // Function to compute the value
-        compute_fn: *const fn () T,
+        // Function to derive the value
+        derive_fn: *const fn () T,
         
-        // Cached computed value
+        // Cached derived value
         cached_value: T,
         
         // Tracking state
         is_dirty: bool = true,
-        is_computing: bool = false,
+        is_deriving: bool = false,
         
         // Version tracking for optimization
-        last_computed_version: u64 = 0,
+        last_derived_version: u64 = 0,
         dependency_versions: std.ArrayList(u64),
         
-        // Observer for this computed (to receive notifications from dependencies)
+        // Observer for this derived (to receive notifications from dependencies)
         observer: context.ReactiveContext.Observer,
         
         // Reference to self for observer callbacks
         self_ptr: *Self = undefined,
         
-        pub fn init(allocator: std.mem.Allocator, compute_fn: *const fn () T) !Self {
-            // Don't compute initial value yet - wait for proper setup
+        pub fn init(allocator: std.mem.Allocator, derive_fn: *const fn () T) !Self {
+            // Don't derive initial value yet - wait for proper setup
             
             const self = Self{
                 .signal = try signal.Signal(T).init(allocator, undefined),
-                .compute_fn = compute_fn,
+                .derive_fn = derive_fn,
                 .cached_value = undefined,
-                .is_dirty = true, // Start dirty to force initial computation
-                .is_computing = false,
-                .last_computed_version = 0,
+                .is_dirty = true, // Start dirty to force initial derivation
+                .is_deriving = false,
+                .last_derived_version = 0,
                 .dependency_versions = std.ArrayList(u64).init(allocator),
                 .observer = undefined,
                 .self_ptr = undefined,
@@ -56,9 +56,9 @@ pub fn Computed(comptime T: type) type {
             self.dependency_versions.deinit();
         }
         
-        /// Get the current computed value (lazy evaluation)
+        /// Get the current derived value (lazy evaluation)
         pub fn get(self: *Self) T {
-            // Track this computed as a dependency if we're in a reactive context
+            // Track this derived as a dependency if we're in a reactive context
             const dependency = context.createDependency(
                 signal.Signal(T),
                 &self.signal,
@@ -67,14 +67,14 @@ pub fn Computed(comptime T: type) type {
             );
             context.trackDependency(dependency);
             
-            // Recompute if dirty (lazy pull)
-            if (self.is_dirty and !self.is_computing) {
+            // Rederive if dirty (lazy pull)
+            if (self.is_dirty and !self.is_deriving) {
                 const old_value = self.cached_value;
-                self.recompute();
+                self.rederive();
                 
-                // Only notify if the value actually changed after recompute
+                // Only notify if the value actually changed after rederive
                 if (!std.meta.eql(old_value, self.cached_value)) {
-                    // Update signal value to match computed value
+                    // Update signal value to match derived value
                     self.signal.value = self.cached_value;
                     self.signal.version +%= 1;
                     // Don't call notifyObservers here as this would cause infinite recursion
@@ -85,11 +85,11 @@ pub fn Computed(comptime T: type) type {
             return self.cached_value;
         }
         
-        /// Get the current computed value without tracking dependency
+        /// Get the current derived value without tracking dependency
         pub fn peek(self: *Self) T {
-            // Recompute if dirty (lazy pull) but don't track
-            if (self.is_dirty and !self.is_computing) {
-                self.recompute();
+            // Rederive if dirty (lazy pull) but don't track
+            if (self.is_dirty and !self.is_deriving) {
+                self.rederive();
             }
             
             return self.cached_value;
@@ -112,27 +112,27 @@ pub fn Computed(comptime T: type) type {
         
         /// Check if value changed and notify observers only if it did
         fn checkAndNotifyIfChanged(self: *Self) void {
-            if (self.is_computing) return; // Prevent recursion
+            if (self.is_deriving) return; // Prevent recursion
             
-            self.is_computing = true;
-            defer self.is_computing = false;
+            self.is_deriving = true;
+            defer self.is_deriving = false;
             
             // Store old value
             const old_value = self.cached_value;
             
-            // Recompute with dependency tracking
+            // Rederive with dependency tracking
             const ctx = context.getContext();
             if (ctx) |reactive_ctx| {
                 reactive_ctx.startTracking(&self.observer) catch {
-                    // If tracking fails, compute without tracking
-                    self.cached_value = self.compute_fn();
+                    // If tracking fails, derive without tracking
+                    self.cached_value = self.derive_fn();
                     self.is_dirty = false;
                     return;
                 };
                 defer reactive_ctx.stopTracking();
                 
-                // Compute new value
-                const new_value = self.compute_fn();
+                // Derive new value
+                const new_value = self.derive_fn();
                 self.cached_value = new_value;
                 
                 // Only notify if value actually changed
@@ -140,8 +140,8 @@ pub fn Computed(comptime T: type) type {
                     self.signal.set(new_value);
                 }
             } else {
-                // No reactive context, compute directly
-                const new_value = self.compute_fn();
+                // No reactive context, derive directly
+                const new_value = self.derive_fn();
                 self.cached_value = new_value;
                 
                 // Only notify if value actually changed
@@ -153,33 +153,33 @@ pub fn Computed(comptime T: type) type {
             self.is_dirty = false;
         }
         
-        /// Cleanup when computed is destroyed
+        /// Cleanup when derived is destroyed
         fn cleanup(self: *Self) void {
             _ = self;
             // Cleanup handled by deinit
         }
         
-        /// Manually recompute (usually happens automatically)
-        pub fn recompute(self: *Self) void {
-            if (self.is_computing) return; // Prevent infinite recursion
+        /// Manually rederive (usually happens automatically)
+        pub fn rederive(self: *Self) void {
+            if (self.is_deriving) return; // Prevent infinite recursion
             
-            self.is_computing = true;
-            defer self.is_computing = false;
+            self.is_deriving = true;
+            defer self.is_deriving = false;
             
             // Set up tracking context
             const ctx = context.getContext();
             if (ctx) |reactive_ctx| {
                 // Start tracking dependencies
                 reactive_ctx.startTracking(&self.observer) catch {
-                    // If tracking fails, compute without tracking
-                    self.cached_value = self.compute_fn();
+                    // If tracking fails, derive without tracking
+                    self.cached_value = self.derive_fn();
                     self.is_dirty = false;
                     return;
                 };
                 defer reactive_ctx.stopTracking();
                 
-                // Compute with dependency tracking
-                const new_value = self.compute_fn();
+                // Derive with dependency tracking
+                const new_value = self.derive_fn();
                 
                 // Only update if value actually changed
                 if (!std.meta.eql(self.cached_value, new_value)) {
@@ -190,21 +190,21 @@ pub fn Computed(comptime T: type) type {
                     self.signal.version +%= 1;
                 }
             } else {
-                // No reactive context, compute directly
-                self.cached_value = self.compute_fn();
+                // No reactive context, derive directly
+                self.cached_value = self.derive_fn();
             }
             
             self.is_dirty = false;
-            self.last_computed_version = self.signal.getVersion();
+            self.last_derived_version = self.signal.getVersion();
         }
         
-        /// Force recomputation and return new value
+        /// Force rederivation and return new value
         pub fn refresh(self: *Self) T {
             self.is_dirty = true;
             return self.get();
         }
         
-        /// Check if computed needs recomputation
+        /// Check if derived needs rederivation
         pub fn isDirty(self: *const Self) bool {
             return self.is_dirty;
         }
@@ -213,45 +213,56 @@ pub fn Computed(comptime T: type) type {
         pub fn asSignal(self: *Self) *signal.Signal(T) {
             return &self.signal;
         }
+        
+        /// Create a snapshot of the current derived value ($state.snapshot)
+        /// For deeply reactive state, this creates a non-reactive copy
+        pub fn snapshot(self: *Self) T {
+            // Ensure we have the latest value but don't track dependency
+            if (self.is_dirty and !self.is_deriving) {
+                self.rederive();
+            }
+            return self.cached_value;
+        }
     };
 }
 
-/// Create a computed signal
-pub fn computed(allocator: std.mem.Allocator, comptime T: type, compute_fn: *const fn () T) !*Computed(T) {
-    const comp = try allocator.create(Computed(T));
-    comp.* = try Computed(T).init(allocator, compute_fn);
-    comp.self_ptr = comp; // Fix self-reference after allocation
+/// Create a derived signal ($derived)
+pub fn derived(allocator: std.mem.Allocator, comptime T: type, derive_fn: *const fn () T) !*Derived(T) {
+    const deriv = try allocator.create(Derived(T));
+    deriv.* = try Derived(T).init(allocator, derive_fn);
+    deriv.self_ptr = deriv; // Fix self-reference after allocation
     
     // Re-create observer with correct self pointer
-    comp.observer = context.createObserver(
-        Computed(T),
-        comp,
-        Computed(T).onDependencyChange,
-        Computed(T).cleanup
+    deriv.observer = context.createObserver(
+        Derived(T),
+        deriv,
+        Derived(T).onDependencyChange,
+        Derived(T).cleanup
     );
     
     // Re-establish dependencies with correct observer
-    comp.is_dirty = true;
-    comp.recompute();
+    deriv.is_dirty = true;
+    deriv.rederive();
     
-    return comp;
+    return deriv;
 }
 
-/// Create a computed that depends on multiple signals explicitly
+
+/// Create a derived that depends on multiple signals explicitly
 /// This is a helper for cases where automatic tracking isn't sufficient
-pub fn computedFrom(
+pub fn derivedFrom(
     allocator: std.mem.Allocator,
     comptime T: type,
     comptime U: type,
     dependencies: []const *signal.Signal(U),
-    compute_fn: *const fn ([]const U) T
-) !*Computed(T) {
-    const ComputeContext = struct {
+    derive_fn: *const fn ([]const U) T
+) !*Derived(T) {
+    const DeriveContext = struct {
         deps: []const *signal.Signal(U),
-        compute_fn: *const fn ([]const U) T,
+        derive_fn: *const fn ([]const U) T,
         allocator: std.mem.Allocator,
         
-        fn compute(ctx: @This()) T {
+        fn derive(ctx: @This()) T {
             var values = std.ArrayList(U).init(ctx.allocator);
             defer values.deinit();
             
@@ -259,31 +270,32 @@ pub fn computedFrom(
                 values.append(dep.get()) catch return @as(T, undefined);
             }
             
-            return ctx.compute_fn(values.items);
+            return ctx.derive_fn(values.items);
         }
     };
     
-    const ctx = ComputeContext{
+    const ctx = DeriveContext{
         .deps = dependencies,
-        .compute_fn = compute_fn,
+        .derive_fn = derive_fn,
         .allocator = allocator,
     };
     
     // TODO: This needs a better solution for capturing context
-    // For now, use the simple compute function
+    // For now, use the simple derive function
     _ = ctx;
     
-    return computed(allocator, T, struct {
-        fn compute() T {
+    return derived(allocator, T, struct {
+        fn derive() T {
             // This is a limitation - we need the context here
             // For now, return a default value
             return @as(T, undefined);
         }
-    }.compute);
+    }.derive);
 }
 
+
 // Tests
-test "computed basic usage with automatic tracking" {
+test "derived basic usage with automatic tracking" {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
@@ -308,19 +320,19 @@ test "computed basic usage with automatic tracking" {
     TestData.test_width = &width;
     TestData.test_height = &height;
     
-    // Create computed area that automatically tracks dependencies
-    var area = try computed(allocator, f32, struct {
-        fn compute() f32 {
+    // Create derived area that automatically tracks dependencies
+    var area = try derived(allocator, f32, struct {
+        fn derive() f32 {
             // Reading these signals automatically registers them as dependencies
             return TestData.test_width.get() * TestData.test_height.get();
         }
-    }.compute);
+    }.derive);
     defer {
         area.deinit();
         allocator.destroy(area);
     }
     
-    // Initial computation
+    // Initial derivation
     try std.testing.expect(area.get() == 5000.0);
     try std.testing.expect(!area.isDirty());
     
@@ -328,7 +340,7 @@ test "computed basic usage with automatic tracking" {
     width.set(200.0);
     try std.testing.expect(area.isDirty());
     
-    // Getting the value should trigger recomputation
+    // Getting the value should trigger rederivation
     try std.testing.expect(area.get() == 10000.0);
     try std.testing.expect(!area.isDirty());
     
@@ -338,7 +350,7 @@ test "computed basic usage with automatic tracking" {
     try std.testing.expect(area.get() == 30000.0);
 }
 
-test "computed lazy evaluation" {
+test "derived lazy evaluation" {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
@@ -359,38 +371,38 @@ test "computed lazy evaluation" {
     TestData.test_source = &source;
     TestData.test_count = &compute_count;
     
-    var doubled = try computed(allocator, i32, struct {
-        fn compute() i32 {
+    var doubled = try derived(allocator, i32, struct {
+        fn derive() i32 {
             TestData.test_count.* += 1;
             return TestData.test_source.get() * 2;
         }
-    }.compute);
+    }.derive);
     defer {
         doubled.deinit();
         allocator.destroy(doubled);
     }
     
-    // Initial computation
+    // Initial derivation
     try std.testing.expect(compute_count == 1);
     try std.testing.expect(doubled.get() == 20);
     
-    // Getting again shouldn't recompute (cached)
+    // Getting again shouldn't rederive (cached)
     _ = doubled.get();
     try std.testing.expect(compute_count == 1);
     
     // Update source
     source.set(15);
     
-    // Computed is dirty but not recomputed yet (lazy)
+    // Derived is dirty but not rederived yet (lazy)
     try std.testing.expect(compute_count == 1);
     try std.testing.expect(doubled.isDirty());
     
-    // Getting the value triggers recomputation
+    // Getting the value triggers rederivation
     try std.testing.expect(doubled.get() == 30);
     try std.testing.expect(compute_count == 2);
 }
 
-test "computed chain dependencies" {
+test "derived chain dependencies" {
     var gpa = std.heap.GeneralPurposeAllocator(.{}){};
     defer _ = gpa.deinit();
     const allocator = gpa.allocator();
@@ -403,17 +415,17 @@ test "computed chain dependencies" {
     
     const TestData = struct {
         var test_base: *signal.Signal(i32) = undefined;
-        var test_doubled: *Computed(i32) = undefined;
+        var test_doubled: *Derived(i32) = undefined;
     };
     
     TestData.test_base = &base;
     
-    // First computed: double the base
-    var doubled = try computed(allocator, i32, struct {
-        fn compute() i32 {
+    // First derived: double the base
+    var doubled = try derived(allocator, i32, struct {
+        fn derive() i32 {
             return TestData.test_base.get() * 2;
         }
-    }.compute);
+    }.derive);
     defer {
         doubled.deinit();
         allocator.destroy(doubled);
@@ -421,12 +433,12 @@ test "computed chain dependencies" {
     
     TestData.test_doubled = doubled;
     
-    // Second computed: add 5 to doubled
-    var plus_five = try computed(allocator, i32, struct {
-        fn compute() i32 {
+    // Second derived: add 5 to doubled
+    var plus_five = try derived(allocator, i32, struct {
+        fn derive() i32 {
             return TestData.test_doubled.get() + 5;
         }
-    }.compute);
+    }.derive);
     defer {
         plus_five.deinit();
         allocator.destroy(plus_five);
@@ -443,6 +455,6 @@ test "computed chain dependencies" {
     try std.testing.expect(doubled.isDirty());
     try std.testing.expect(plus_five.isDirty());
     
-    // Getting final value should recompute chain
+    // Getting final value should rederive chain
     try std.testing.expect(plus_five.get() == 45); // (20 * 2) + 5
 }

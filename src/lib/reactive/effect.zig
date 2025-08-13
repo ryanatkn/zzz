@@ -3,6 +3,12 @@ const signal = @import("signal.zig");
 const context = @import("context.zig");
 const batch_mod = @import("batch.zig");
 
+/// Effect timing modes for different execution phases
+pub const EffectTiming = enum {
+    normal,    // Standard effect ($effect)
+    pre,       // Pre-update effect ($effect.pre)
+};
+
 /// An effect that automatically runs when its dependencies change
 /// Implements Svelte 5's $effect with automatic dependency tracking
 pub const Effect = struct {
@@ -11,6 +17,7 @@ pub const Effect = struct {
     cleanup_fn: ?*const fn () void = null,
     is_active: bool = true,
     is_running: bool = false,
+    timing: EffectTiming = .normal,
     
     // Observer for automatic dependency tracking
     observer: context.ReactiveContext.Observer,
@@ -24,7 +31,8 @@ pub const Effect = struct {
     pub fn init(
         allocator: std.mem.Allocator, 
         run_fn: *const fn () void, 
-        cleanup_fn: ?*const fn () void
+        cleanup_fn: ?*const fn () void,
+        timing: EffectTiming
     ) Effect {
         var self = Effect{
             .allocator = allocator,
@@ -32,6 +40,7 @@ pub const Effect = struct {
             .cleanup_fn = cleanup_fn,
             .is_active = true,
             .is_running = false,
+            .timing = timing,
             .observer = undefined,
             .needs_cleanup = false,
         };
@@ -125,13 +134,13 @@ pub const Effect = struct {
     }
 };
 
-/// Create an effect that automatically tracks dependencies
+/// Create an effect with automatic dependency tracking ($effect)
 pub fn createEffect(
     allocator: std.mem.Allocator, 
     effect_fn: *const fn () void
 ) !*Effect {
     const effect = try allocator.create(Effect);
-    effect.* = Effect.init(allocator, effect_fn, null);
+    effect.* = Effect.init(allocator, effect_fn, null, .normal);
     effect.self_ptr = effect; // Fix self-reference after allocation
     
     // Re-create observer with correct self pointer
@@ -155,7 +164,7 @@ pub fn createEffectWithCleanup(
     cleanup_fn: *const fn () void
 ) !*Effect {
     const effect = try allocator.create(Effect);
-    effect.* = Effect.init(allocator, effect_fn, cleanup_fn);
+    effect.* = Effect.init(allocator, effect_fn, cleanup_fn, .normal);
     effect.self_ptr = effect; // Fix self-reference after allocation
     
     // Re-create observer with correct self pointer
@@ -212,7 +221,7 @@ pub fn createOneTimeEffect(
                 ran = true;
             }
         }
-    }.runOnce, null);
+    }.runOnce, null, .normal);
     
     // Store the original function
     const Context = struct {
@@ -233,6 +242,91 @@ pub fn createOneTimeEffect(
     effect.run();
     return effect;
 }
+
+/// Create a pre-effect that runs before DOM updates ($effect.pre)
+pub fn createEffectPre(
+    allocator: std.mem.Allocator, 
+    effect_fn: *const fn () void
+) !*Effect {
+    const effect = try allocator.create(Effect);
+    effect.* = Effect.init(allocator, effect_fn, null, .pre);
+    effect.self_ptr = effect;
+    
+    effect.observer = context.createObserver(
+        Effect,
+        effect,
+        Effect.onDependencyChange,
+        Effect.cleanup
+    );
+    
+    effect.run();
+    return effect;
+}
+
+/// Check if code is running in a tracking context ($effect.tracking)
+pub fn isTracking() bool {
+    const ctx = context.getContext();
+    if (ctx) |reactive_ctx| {
+        return reactive_ctx.isTracking();
+    }
+    return false;
+}
+
+/// Create a root effect scope for manual control ($effect.root)
+pub fn createEffectRoot(
+    allocator: std.mem.Allocator,
+    root_fn: *const fn () void
+) !*EffectRoot {
+    const root = try allocator.create(EffectRoot);
+    root.* = EffectRoot.init(allocator, root_fn);
+    return root;
+}
+
+/// Root effect scope that doesn't auto-cleanup
+pub const EffectRoot = struct {
+    allocator: std.mem.Allocator,
+    root_fn: *const fn () void,
+    child_effects: std.ArrayList(*Effect),
+    is_disposed: bool = false,
+    
+    pub fn init(allocator: std.mem.Allocator, root_fn: *const fn () void) EffectRoot {
+        return EffectRoot{
+            .allocator = allocator,
+            .root_fn = root_fn,
+            .child_effects = std.ArrayList(*Effect).init(allocator),
+            .is_disposed = false,
+        };
+    }
+    
+    pub fn deinit(self: *EffectRoot) void {
+        self.dispose();
+        self.child_effects.deinit();
+    }
+    
+    /// Run the root function
+    pub fn run(self: *EffectRoot) void {
+        if (self.is_disposed) return;
+        self.root_fn();
+    }
+    
+    /// Dispose all child effects
+    pub fn dispose(self: *EffectRoot) void {
+        if (self.is_disposed) return;
+        
+        for (self.child_effects.items) |effect| {
+            effect.stop();
+            self.allocator.destroy(effect);
+        }
+        self.child_effects.clearRetainingCapacity();
+        self.is_disposed = true;
+    }
+    
+    /// Add a child effect to this root scope
+    pub fn addEffect(self: *EffectRoot, effect: *Effect) !void {
+        if (self.is_disposed) return;
+        try self.child_effects.append(effect);
+    }
+};
 
 // Tests
 test "effect with automatic dependency tracking" {
