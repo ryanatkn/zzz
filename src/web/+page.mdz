@@ -1,0 +1,3 @@
+# zz/web
+
+- render Mdz with Svelte, html, canvas, and webgl (via SDL3)
